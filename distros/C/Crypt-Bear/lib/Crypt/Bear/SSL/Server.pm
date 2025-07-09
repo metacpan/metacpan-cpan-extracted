@@ -1,5 +1,5 @@
 package Crypt::Bear::SSL::Server;
-$Crypt::Bear::SSL::Server::VERSION = '0.002';
+$Crypt::Bear::SSL::Server::VERSION = '0.003';
 use strict;
 use warnings;
 
@@ -21,7 +21,7 @@ Crypt::Bear::SSL::Server - A sans-io SSL Client in BearSSL
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

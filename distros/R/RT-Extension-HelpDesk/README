@@ -3,7 +3,8 @@ NAME
     Tracker
 
 RT VERSION
-    Works with RT 5.
+    Works with RT 6.0.0 and newer. Install the latest 0.* version for older
+    RTs.
 
 INSTALLATION
     perl Makefile.PL
@@ -11,7 +12,7 @@ INSTALLATION
     make install
         May need root permissions
 
-    Edit your /opt/rt5/etc/RT_SiteConfig.pm
+    Edit your /opt/rt6/etc/RT_SiteConfig.pm
         Add this line:
 
             Plugin('RT::Extension::HelpDesk');
@@ -29,7 +30,7 @@ INSTALLATION
         in case changes need to be made to your database.
 
     Clear your mason cache
-            rm -rf /opt/rt5/var/mason_data/obj
+            rm -rf /opt/rt6/var/mason_data/obj
 
     Restart your webserver
 
@@ -168,7 +169,7 @@ AUTHOR
     or via the web at
         http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-HelpDesk
 LICENSE AND COPYRIGHT
-    This software is Copyright (c) 2021 by Best Practical LLC
+    This software is Copyright (c) 2021-2025 by Best Practical LLC
 
     This is free software, licensed under:
 

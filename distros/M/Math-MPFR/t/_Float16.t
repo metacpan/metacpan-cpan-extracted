@@ -19,17 +19,31 @@ if(MPFR_VERSION >= 262912) { # MPFR-4.3.0 or later
     Rmpfr_sqrt($op16, $op16, MPFR_RNDN);
 
     cmp_ok($nv, '==', $op16, "values match");
+    cmp_ok(unpack_float16($nv, MPFR_RNDN), 'eq', '3DA8', 'hex unpacking of sqrt(2) is as expected');
+
+    my $inex = Rmpfr_set_float16($op, $nv, MPFR_RNDN);
+    cmp_ok($inex, '==', 0, 'value set exactly');
+    cmp_ok($op, '==', $op16, 'values still match');
   }
   else {
     cmp_ok(Math::MPFR::_have_float16(), '==', 0, "MPFR library support for_Float16 is not utilised");
+
+    my ($op, $nv) = (Math::MPFR->new(), 0);
+    eval { $nv = Rmpfr_get_float16(123, MPFR_RNDN);};
+    like($@, qr/^Perl interface to Rmpfr_get_float16 not available/, 'Rmpfr_get_float16: $@ set as expected');
+    eval { Rmpfr_set_float16($nv, $op, MPFR_RNDN);};
+    like($@, qr/^Perl interface to Rmpfr_set_float16 not available/, 'Rmpfr_set_float16: $@ set as expected');
   }
 }
 else {
-  eval{Rmpfr_buildopt_float16_p();};
-  like($@, qr/'mpfr_buildopt_float16_p' not implemented until MPFR\-4\.3\.0/,
-       "Rmpfr_buildopt_float16_p() croaks as expected");
-
+  cmp_ok(Rmpfr_buildopt_float16_p(), '==', 0, "Rmpfr_buildopt_float16_p() returns 0");
   cmp_ok(Math::MPFR::_have_float16(), '==', 0, "_Float16 support is lacking");
+
+  my ($op, $nv) = (Math::MPFR->new(), 0);
+  eval { $nv = Rmpfr_get_float16(123, MPFR_RNDN);};
+  like($@, qr/^Perl interface to Rmpfr_get_float16 not available/, 'Rmpfr_get_float16: $@ set as expected');
+  eval { Rmpfr_set_float16($nv, $op, MPFR_RNDN);};
+  like($@, qr/^Perl interface to Rmpfr_set_float16 not available/, 'Rmpfr_set_float16: $@ set as expected');
 }
 
 done_testing();

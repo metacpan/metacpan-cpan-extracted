@@ -285,6 +285,7 @@ else {
 }
 
 if($gmp) {
+  Rmpfr_set_default_prec(53);
   my $x = Math::GMP->new(125);
   my $y = Math::MPFR::new($x);
   my $z = Math::MPFR->new($x);
@@ -304,7 +305,9 @@ if($gmp) {
   if(Rmpfr_get_prec($mpfr1) == 53) {
     print "ok 13\n";
   }
-  else {print "not ok 13\n"}
+  else {
+    print "not ok 13\n";
+  }
 
   if($mpfr1 == $mpfr_64) { print "ok 14\n" } # $mpfr1 should be rounded up to 0x1p+64
   else { print "not ok 14\n" }

@@ -36,7 +36,7 @@ requires:
   Clone: '0'
   List::Util: '0'
   Moose: '0'
-  OIDC::Client: '0.09'
+  OIDC::Client: '0.10'
   Scalar::Util: '0'
   Try::Tiny: '0'
   namespace::autoclean: '0'
@@ -45,7 +45,7 @@ resources:
   bugtracker: https://github.com/sebmourlhou/catalyst-plugin-oidc/issues
   homepage: https://github.com/sebmourlhou/catalyst-plugin-oidc
   repository: https://github.com/sebmourlhou/catalyst-plugin-oidc.git
-version: '0.04'
+version: '0.05'
 x_generated_by_perl: v5.28.3
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: Artistic-2.0

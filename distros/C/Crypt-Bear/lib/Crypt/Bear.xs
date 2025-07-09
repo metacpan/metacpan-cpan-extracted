@@ -171,7 +171,7 @@ static const struct hash_oid sha1_oid   = { 20, { 0x05, 0x2B, 0x0E, 0x03, 0x02, 
 static const struct hash_oid sha224_oid = { 28, { 0x09, 0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x04 } };
 static const struct hash_oid sha256_oid = { 32, { 0x09, 0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x01 } };
 static const struct hash_oid sha384_oid = { 48, { 0x09, 0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x02 } };
-static const struct hash_oid sha512_oid = { 48, { 0x09, 0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x03 } };
+static const struct hash_oid sha512_oid = { 64, { 0x09, 0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x03 } };
 
 #define hash_oid_entry(name) make_map_pointer_entry(#name, &name ## _oid)
 static const map hash_oids = {
@@ -1038,7 +1038,7 @@ MODULE = Crypt::Bear PACKAGE = Crypt::Bear::Hash PREFIX = br_hash_
 
 Crypt::Bear::Hash br_hash_new(class, hash_type hash)
 CODE:
-	RETVAL = safemalloc(hash->context_size);
+	RETVAL = safemalloc(sizeof *RETVAL);
 	(*hash->init)(&RETVAL->vtable);
 OUTPUT:
 	RETVAL
@@ -1370,7 +1370,7 @@ void br_prng_update(Crypt::Bear::PRNG self, const char* data, size_t length(data
 
 bool br_prng_system_seed(Crypt::Bear::PRNG self)
 CODE:
-	RETVAL = system_seeder ? system_seeder(self) : false;
+	RETVAL = system_seeder ? system_seeder(self) : FALSE;
 OUTPUT:
 	RETVAL
 
@@ -2039,7 +2039,7 @@ CODE:
 OUTPUT:
 	RETVAL
 
-SV* br_ssl_engine_push_send(Crypt::Bear::SSL::Engine self, unsigned char* data, size_t length(data), bool flush = false)
+SV* br_ssl_engine_push_send(Crypt::Bear::SSL::Engine self, unsigned char* data, size_t length(data), bool flush = FALSE)
 CODE:
 	RETVAL = newSVpvn("", 0);
 	size_t offset = 0;
@@ -2072,7 +2072,7 @@ CODE:
 	} while (offset < STRLEN_length_of_data);
 
 	if (flush)
-		br_ssl_engine_flush(self, false);
+		br_ssl_engine_flush(self, FALSE);
 
 	while (br_ssl_engine_current_state(self) & BR_SSL_SENDREC) {
 		size_t len = 0;
@@ -2084,7 +2084,7 @@ CODE:
 OUTPUT:
 	RETVAL
 
-SV* br_ssl_engine_pull_send(Crypt::Bear::SSL::Engine self, bool force = false)
+SV* br_ssl_engine_pull_send(Crypt::Bear::SSL::Engine self, bool force = FALSE)
 CODE:
 	RETVAL = newSVpvn("", 0);
 
@@ -2118,7 +2118,7 @@ CODE:
 OUTPUT:
 	RETVAL
 
-bool br_ssl_client_reset(Crypt::Bear::SSL::Client self, SV* server_name, bool resume_session = false);
+bool br_ssl_client_reset(Crypt::Bear::SSL::Client self, SV* server_name, bool resume_session = FALSE);
 CODE:
 	if (SvOK(server_name))
 		RETVAL = br_ssl_client_reset(&self->context, SvPV_nolen(server_name), resume_session);

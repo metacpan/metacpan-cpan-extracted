@@ -1,0 +1,20 @@
+Changes
+cpanfile
+lib/Query/Tags.pm
+lib/Query/Tags/Grammar.pm
+lib/Query/Tags/To/AST.pm
+LICENSE
+Makefile
+Makefile.PL
+MANIFEST			This list of files
+MYMETA.json
+MYMETA.yml
+README.md
+share/query-tags.pgx
+t/bareword.t
+t/default_key.t
+t/junction.t
+t/list.t
+t/pair.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

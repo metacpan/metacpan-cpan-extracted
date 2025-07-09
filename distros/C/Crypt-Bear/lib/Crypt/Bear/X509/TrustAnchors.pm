@@ -1,5 +1,5 @@
 package Crypt::Bear::X509::TrustAnchors;
-$Crypt::Bear::X509::TrustAnchors::VERSION = '0.002';
+$Crypt::Bear::X509::TrustAnchors::VERSION = '0.003';
 use strict;
 use warnings;
 
@@ -53,7 +53,7 @@ Crypt::Bear::X509::TrustAnchors - A set of trust anchors in BearSSL
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

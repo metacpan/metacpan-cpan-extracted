@@ -19,6 +19,7 @@ my $have_decimal128 = undef; # Default value
 my $have_float128   = undef; # Default value
 my $want_float128   = undef; # Default value
 my $have_float16    = undef; # Default value
+my $have_bfloat16   = undef; # Default value
 my $checklib        = 1;     # Check for availability of mpfr and gmp libraries.
 my $skip_msvc       = 0;     # Will be reset to 1 for MS compiler builds of perl.
 
@@ -29,6 +30,8 @@ for(@ARGV) {
   $have_decimal128 = 0 if $_ eq 'D128=0';
   $have_float16 = 1 if $_ eq 'F16=1';
   $have_float16 = 0 if $_ eq 'F16=0';
+  $have_bfloat16 = 1 if $_ eq 'BF16=1';
+  $have_bfloat16 = 0 if $_ eq 'BF16=0';
 }
 
 # The following tests don't work with perls built using MS Visual Studio.
@@ -103,7 +106,7 @@ unless($skip_msvc) {
 
   unless(defined($have_float16)) { # make no changes and conduct no further
                                    # tests if $have_float16 is defined.
-    if($Config{ptrsize} == 4) {
+    if($Config{ptrsize} == 4 && $^O =~ /MSWin32/) {
       $have_float16 = 0;           # Currently not supported by Math::MPFR
     }
     else {
@@ -117,7 +120,33 @@ unless($skip_msvc) {
     }
   }
 
-  $defines .= ' -DHAVE_FLOAT16 -DMPFR_WANT_FLOAT16=1' if(defined $have_float16 && $have_float16 == 1);
+  if(defined $have_float16 && $have_float16 == 1) {
+    $defines .= ' -DMPFR_WANT_FLOAT16=1';
+  }
+
+  ################################
+  # Whether __bf16 is recognized #
+  ################################
+
+  unless(defined($have_bfloat16)) { # make no changes and conduct no further
+                                    # tests if $have_bfloat16 is defined.
+    if($Config{ptrsize} == 4 && $^O =~ /MSWin32/) {
+      $have_float16 = 0;           # Currently not supported by Math::MPFR
+    }
+    else {
+      my $mylibs = $mklib . " " . $mylibpth;
+      my $out = `$mycc -o have_bfloat16.exe -x c have_bfloat16.in $mylibs 2>&1`;
+
+      if( -e 'have_bfloat16.exe') {
+        my $size = $^O =~ /MSWin32/i ? `have_bfloat16.exe` : `./have_bfloat16.exe`;
+        $have_bfloat16 = 1 if $size eq '-2';
+      }
+    }
+  }
+
+  if(defined $have_bfloat16 && $have_bfloat16 == 1) {
+    $defines .= ' -DMPFR_WANT_BFLOAT16=1';
+  }
 
   ############################################
   # Whether to build with _Decimal64 support #

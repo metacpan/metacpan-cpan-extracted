@@ -96,6 +96,8 @@ padding.
 
 =head1 SEE ALSO
 
+=over 4
+
 =item * L<libsodium|https://doc.libsodium.org/helpers#base64-encoding-decoding>
 
 =back
@@ -106,6 +108,10 @@ For reporting bugs, giving feedback, submitting patches, etc. please use the
 following:
 
 =over 4
+
+=item *
+
+RT queue at L<https://rt.cpan.org/Dist/Display.html?Name=Crypt-Sodium-XS>
 
 =item *
 

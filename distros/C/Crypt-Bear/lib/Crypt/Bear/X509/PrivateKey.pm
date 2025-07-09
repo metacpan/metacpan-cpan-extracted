@@ -1,5 +1,5 @@
 package Crypt::Bear::X509::PrivateKey;
-$Crypt::Bear::X509::PrivateKey::VERSION = '0.002';
+$Crypt::Bear::X509::PrivateKey::VERSION = '0.003';
 use strict;
 use warnings;
 
@@ -33,7 +33,7 @@ Crypt::Bear::X509::PrivateKey - A X509 private key
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

@@ -91,7 +91,7 @@ has 'client' => (
 
 has 'base_url' => (
   is       => 'ro',
-  isa      => subtype(as 'Str', where { /^http/ }),
+  isa      => subtype(as 'Str', where { /^http/ || /^$/ }),
   required => 1,
 );
 

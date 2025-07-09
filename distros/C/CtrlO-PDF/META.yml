@@ -31,5 +31,5 @@ resources:
   bugtracker: https://github.com/ctrlo/CtrlO-PDF/issues
   homepage: https://github.com/ctrlo/CtrlO-PDF/
   repository: https://github.com/ctrlo/CtrlO-PDF
-version: '0.32'
+version: '0.33'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

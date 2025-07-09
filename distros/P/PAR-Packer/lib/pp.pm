@@ -519,7 +519,7 @@ machine that doesn't have perl installed:
 
     % pp -o packed.exe source.pl        # makes packed.exe
     # Now, deploy 'packed.exe' to target machine...
-    $ packed.exe                        # run it
+    % packed.exe                        # run it
 
 =item Perl interpreter only, without core modules:
 
@@ -530,7 +530,7 @@ your program uses:
 
     % pp -B -P -o packed.pl source.pl   # makes packed.pl
     # Now, deploy 'packed.pl' to target machine...
-    $ perl packed.pl                    # run it
+    % perl packed.pl                    # run it
 
 =item Perl with core modules installed:
 
@@ -540,7 +540,7 @@ a significantly smaller file than the previous version:
 
     % pp -P -o packed.pl source.pl      # makes packed.pl
     # Now, deploy 'packed.pl' to target machine...
-    $ perl packed.pl                    # run it
+    % perl packed.pl                    # run it
 
 =item Perl with PAR.pm and its dependencies installed:
 
@@ -551,7 +551,7 @@ relies upon the perl interpreter and libraries on the target machine.
     % echo "use PAR 'source.par';" > packed.pl;
     % cat source.pl >> packed.pl;       # makes packed.pl
     # Now, deploy 'source.par' and 'packed.pl' to target machine...
-    $ perl packed.pl                    # run it, perl + core modules required
+    % perl packed.pl                    # run it, perl + core modules required
 
 =back
 
@@ -567,7 +567,8 @@ can significantly reduce the executable size.
 
 L<tkpp>, L<par.pl>, L<parl>, L<perlcc>
 
-L<PAR>, L<PAR::Packer>, L<Module::ScanDeps>
+L<PAR::Packer::Troubleshooting>, L<App::PP::Autolink>, 
+L<PAR>, L<PAR::Packer>, L<Module::ScanDeps> 
 
 L<Getopt::Long>, L<Getopt::ArgvFile>
 

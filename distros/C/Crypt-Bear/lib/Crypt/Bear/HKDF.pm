@@ -1,5 +1,5 @@
 package Crypt::Bear::HKDF;
-$Crypt::Bear::HKDF::VERSION = '0.002';
+$Crypt::Bear::HKDF::VERSION = '0.003';
 use Crypt::Bear;
 
 1;
@@ -18,7 +18,7 @@ Crypt::Bear::HKDF - hkdf implementations in BearSSL
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

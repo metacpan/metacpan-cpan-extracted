@@ -361,6 +361,8 @@ Croaks on decryption failure.
 
   my ($ciphertext, $mac) = $precalc->encrypt($plaintext, $nonce);
 
+=back
+
 =head1 SEE ALSO
 
 =over 4
@@ -379,6 +381,10 @@ For reporting bugs, giving feedback, submitting patches, etc. please use the
 following:
 
 =over 4
+
+=item *
+
+RT queue at L<https://rt.cpan.org/Dist/Display.html?Name=Crypt-Sodium-XS>
 
 =item *
 

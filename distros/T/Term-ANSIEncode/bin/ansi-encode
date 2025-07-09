@@ -53,6 +53,7 @@ my $help    = FALSE;
 my $tokens  = FALSE;
 my $symbols = FALSE;
 my $colors  = FALSE;
+my $full    = FALSE;
 
 GetOptions(
     'version' => \$version,
@@ -60,6 +61,7 @@ GetOptions(
     'tokens'  => \$tokens,
     'colors'  => \$colors,
     'symbols' => \$symbols,
+	'full'    => \$full,
 );
 
 my $text = <<'VERSION';
@@ -112,7 +114,7 @@ my $text2 = <<'SECOND';
 
 SECOND
 
-my $ansi = Term::ANSIEncode->new();
+my $ansi = ($full) ? Term::ANSIEncode->new('mode' => 'full') : Term::ANSIEncode->new('mode' => 'short');
 
 ###
 my $small = <<'SMALL';
@@ -251,7 +253,7 @@ NOTE:  Use "less -r" to view ANSI in "less"
 │ HORIZONTAL RULE BRIGHT MAGENTA   │ A solid line of bright magenta background        │
 │ HORIZONTAL RULE BRIGHT CYAN      │ A solid line of bright cyan background           │
 │ HORIZONTAL RULE BRIGHT WHITE     │ A solid line of bright white background          │
-╰─────────────────────────────────────────────────────────────────────────────────────╯
+╰──────────────────────────────────┴──────────────────────────────────────────────────╯
 
 TOKENS
 ###
@@ -279,16 +281,18 @@ if ($version) {
     foreach my $name (@names) {
         $size = max($size, length($name));
     }
-    my $temp = "\nSYMBOL TOKEN NAMES\n" . '╭─' . '─' x $size . '─╮' . "\n";
+    my $temp = "\n        SYMBOL TOKEN NAMES\n" . '╭──────┬' . '─' x $size . '─╮' . "\n";
     while (scalar(@names)) {
         my $name = shift(@names);
-        if ($name =~ /^COMBINING/) {
-            $temp .= sprintf('│ %-' . $size . 's │   %s', $name, $ansi->{'characters'}->{$name}) . "\n";
-        } else {
-            $temp .= sprintf('│ %-' . $size . 's │ %s', $name, $ansi->{'characters'}->{$name}) . "\n";
-        }
+		if ($name ne '') {
+			if ($name =~ /^COMBINING/) {
+				$temp .= sprintf('│U%05X│%-' . $size . 's │   %s', charnames::vianame($name), $name, $ansi->{'characters'}->{$name}) . "\n";
+			} else {
+				$temp .= sprintf('│U%05X│%-' . $size . 's │ %s', charnames::vianame($name), $name, $ansi->{'characters'}->{$name}) . "\n";
+			}
+		}
     } ## end while (scalar(@names))
-    $temp .= '╰─' . '─' x $size . '─╯' . "\n\n";
+    $temp .= '╰──────┴' . '─' x $size . '─╯' . "\n\n";
     $ansi->ansi_output($temp, 0);
 } elsif ($colors) {
 	my $grey = chr(27) . '[38;5;235m';
@@ -335,7 +339,6 @@ if ($version) {
 exit;
 
 __END__
-
 =head1 NAME
 
 ANSI Encode
@@ -343,6 +346,7 @@ ANSI Encode
 =head1 SYNOPSIS
 
 A markup language to generate basic ANSI text
+This module is for use with the executable file
 
 =head1 AUTHOR & COPYRIGHT
 
@@ -354,7 +358,7 @@ Richard Kelsch
 
 =head1 USAGE
 
- ansi_encode file
+ ansi_encode.pl file
 
 =head1 OPTIONS
 
@@ -370,9 +374,19 @@ Simple usage and options documentation
 
 =item --B<tokens> or -B<y>
 
-Shows the most used tokens available.  A token is encapsulated within [% and %] (with one space on each side)
+Shows the most used tokens available.  A token is encapsulated within [% and %] (with at lease one space on each side)
 
-For example:
+=item --B<symbols> or -B<s> [search]
+
+Similar to "tokens", but instead shows special symbol character tokens.
+
+You may also add a search string to shorten the list.
+
+IT IS HIGHLY SUGGESTED YOU USE A SEARCH STRING.
+
+=item --B<full> -B<f>
+
+Enables the full symbol tree.  Initialization is slower.  It his highly recommended that you use a search string.
 
 =back
 
@@ -470,9 +484,26 @@ B<RESET> changes output text to normal.
  BRIGHT B_CYAN    = Bright cyan
  BRIGHT B_WHITE   = Bright white
 
-=head1 LICENSE
+=head2 HORIZONAL RULES
 
-                    GNU GENERAL PUBLIC LICENSE
-                     Version 3, 29 June 2007
+Makes a solid blank line, the full width of the screen with the selected background color
+
+ HORIZONTAL RULE RED             = A solid line of red background
+ HORIZONTAL RULE GREEN           = A solid line of green background
+ HORIZONTAL RULE YELLOW          = A solid line of yellow background
+ HORIZONTAL RULE BLUE            = A solid line of blue background
+ HORIZONTAL RULE MAGENTA         = A solid line of magenta background
+ HORIZONTAL RULE CYAN            = A solid line of cyan background
+ HORIZONTAL RULE PINK            = A solid line of hot pink background
+ HORIZONTAL RULE ORANGE          = A solid line of orange background
+ HORIZONTAL RULE WHITE           = A solid line of white background
+ HORIZONTAL RULE BRIGHT RED      = A solid line of bright red background
+ HORIZONTAL RULE BRIGHT GREEN    = A solid line of bright green background
+ HORIZONTAL RULE BRIGHT YELLOW   = A solid line of bright yellow background
+ HORIZONTAL RULE BRIGHT BLUE     = A solid line of bright blue background
+ HORIZONTAL RULE BRIGHT MAGENTA  = A solid line of bright magenta background
+ HORIZONTAL RULE BRIGHT CYAN     = A solid line of bright cyan background
+ HORIZONTAL RULE BRIGHT WHITE    = A solid line of bright white background
 
 =cut
+

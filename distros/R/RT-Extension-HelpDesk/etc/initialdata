@@ -128,11 +128,10 @@ our @Scrips = (
 );
 
 
-our @Attributes = (
+our @SavedSearches = (
     {
-        Name        => 'SavedSearch',
-        Description => 'Highest severity tickets waiting on support',
-        Object      => sub {
+        Name   => 'Highest severity tickets waiting on support',
+        Object => sub {
             my $GroupName = 'Support';
             my $group     = RT::Group->new( RT->SystemUser );
 
@@ -141,7 +140,7 @@ our @Attributes = (
 
             return $group;
         },
-        Content     => {
+        Content => {
             Format => qq['<b><a href="__WebPath__/Ticket/Display.html?id=__id__">__id__</a></b>/TITLE:#',
 '<b><a href="__WebPath__/Ticket/Display.html?id=__id__">__Subject__</a></b>/TITLE:Subject',
 Status,
@@ -173,40 +172,38 @@ our @Final = (sub {
     ($ret, $msg) =  $group->AddMember( $root->PrincipalObj->Id );
     print "Could not load root user: $msg\n" unless $ret;
 
-    foreach my $right ( qw/SeeGroupDashboard ShowSavedSearches EditSavedSearches ModifyGroupDashboard/ ) {
+    foreach my $right ( qw/SeeGroupDashboard AdminGroupDashboard SeeGroupSavedSearch AdminGroupSavedSearch/ ) {
         ($ret, $msg) = $group->PrincipalObj->GrantRight( Right => $right, Object => $group );
         print "Failed to grant right $right: $msg\n" unless $ret;
     }
 
-    # Create our new dashboard
-    my $dashboard = RT::Dashboard->new( RT->SystemUser );
-    ($ret, $msg) = $dashboard->Save(
-        Name    => 'Support',
-        Privacy => 'RT::Group-'.$group->Id,
-    );
-    die "Could not create dashboard! $msg\n" unless $ret;
-
-    my $saved_search = RT::Attribute->new( RT->SystemUser );
-    ($ret, $msg) = $saved_search->LoadByCols(
-      Name        => 'SavedSearch',
-      Description => 'Highest severity tickets waiting on support',
-      ObjectType  => 'RT::Group',
-      ObjectId    => $group->Id,
+    my $saved_search = RT::SavedSearch->new( RT->SystemUser );
+    ( $ret, $msg ) = $saved_search->LoadByCols(
+        Name        => 'Highest severity tickets waiting on support',
+        PrincipalId => $group->Id,
     );
     die "Could not load highest severity saved search: $msg" unless $ret;
 
-    ($ret, $msg) = $dashboard->Update( Panes => {
-        body => [
-            {
-                description    => "Saved Search: Highest severity tickets waiting on support",
-                id             => $saved_search->Id,
-                pane           => "body",
-                portlet_type   => "search",
-                privacy        => "RT::Group-".$group->Id
-            }
-        ],
-        sidebar => [
-        ]
-    });
-    die "$msg" unless $ret;
+    # Create our new dashboard
+    my $dashboard = RT::Dashboard->new( RT->SystemUser );
+    ( $ret, $msg ) = $dashboard->Create(
+        Name        => 'Support',
+        PrincipalId => $group->Id,
+        Content     => {
+            Elements => [
+                {
+
+                    Elements => [
+                        {
+                            description  => "Ticket: Highest severity tickets waiting on support",
+                            id           => $saved_search->Id,
+                            portlet_type => "search",
+                        }
+                    ],
+                    Layout => 'col-12',
+                }
+            ],
+        },
+    );
+    die "Could not create dashboard! $msg\n" unless $ret;
 });

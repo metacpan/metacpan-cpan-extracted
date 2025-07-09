@@ -1,0 +1,9 @@
+Revision history for perl module Query::Tags
+
+0.0.2 2025-07-08
+
+ - Added missing support for B<default_key> option.
+
+0.0.1 2025-07-03
+
+ - Initial release

@@ -479,9 +479,13 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    $inex = Rmpfr_set_z($rop, $z, $rnd); # $z is a mpz object.
    $inex = Rmpfr_set_q($rop, $q, $rnd); # $q is a mpq object.
    $inex = Rmpfr_set_f($rop, $f, $rnd); # $f is a mpf object.
-   $inex = Rmpfr_set_flt($rop, $float, $rnd);    # mpfr-3.0.0 and later only
-   $inex = Rmpfr_set_float16($rop, $f16, $rnd);  # mpfr-4.3.0 and later only
-                                                 # & only on 64-bit systems.
+   $inex = Rmpfr_set_flt($rop, $nv, $rnd);      # mpfr-3.0.0 and later only
+                                                # Set $rop to the value of
+                                                # $nv rounded to a float.
+   $inex = Rmpfr_set_float16($rop, $nv, $rnd);  # mpfr-4.3.0 and later only
+                                                # & only on 64-bit systems.
+   $inex = Rmpfr_set_bfloat16($rop, $nv, $rnd); # mpfr-4.3.0 and later only
+                                                # & only on 64-bit systems.
    $inex = Rmpfr_set_float128($rop, $f128, $rnd);# nvtype is __float128
                                                # && mpfr-4.0.0 or later
                                                # && mpfr lib built with
@@ -511,7 +515,10 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     number (this happens for 0.1 for instance), in which case it is
     first rounded by the C compiler to a double-precision number,
     and then only to a mpfr floating-point number.
-    Rmpfr_set_float16 is currently unavailable to 32-bit systems.
+    Rmpfr_set_float16 and Rmpfr_set_bfloat are currently unavailable to
+    32-bit systems. Where enabled, these 2 functions set $rop to the value
+    of the given NV argument, rounded (according to $rnd) to a _Float16
+    or (respectively) a __bf16.
 
     NOTE:
          1) Rmpfr_set_IV requires that $iv has it's IOK flag set, and
@@ -786,8 +793,11 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
                                            # && mpfr lib built with
                                            # --enable-float128.
    $NV = Rmpfr_get_NV     ($op, $rnd);   # double/long double/__float128
-   $NV = Rmpfr_get_flt    ($op, $rnd);   # mpfr-3.0.0 and later
+   $NV = Rmpfr_get_flt    ($op, $rnd);   # mpfr-3.0.0 and later.
+                                         # Set $NV to $op rounded to float.
    $NV = Rmpfr_get_float16($op, $rnd);   # mpfr-4.3.0 and later, and
+                                         # only on 64-bit systems.
+   $NV = Rmpfr_get_bfloat16($op, $rnd);  # mpfr-4.3.0 and later, and
                                          # only on 64-bit systems.
    Rmpfr_get_LD($LD, $op, $rnd);         # $LD is a Math::LongDouble object.
    Rmpfr_get_DECIMAL64($d64, $op, $rnd); # mpfr-3.1.0 or later &&
@@ -802,10 +812,13 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
                                         # $F128 is a Math::Float128
                                         # object.
     Convert $op to a 'double', a 'long double', a '__float128', an 'NV',
-    a 'float', a '_Float16', a Math::LongDouble object,
-''' a Math::Decimal64 object, or a Math::Float128 object using the
+    a 'float', a '_Float16', a '__bf16', a Math::LongDouble object,
+    a Math::Decimal64 object, or a Math::Float128 object using the
     rounding mode $rnd.
-    Rmpfr_get_float16 is currently unavailable to 32-bit systems.
+    Rmpfr_get_float16 and Rmpfr_get_bfloat16 are currently unavailable to
+    32-bit systems. Where enabled they actually return an NV that has been
+    set to the exact value of $op rounded (according to $rnd) to a _Float16
+    or (respectively) a __bf16.
 
    $double = Rmpfr_get_d1($op);
     Convert $op to a double, using the default MPFR rounding mode.
@@ -1657,6 +1670,24 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     MPFR_PREC_MAX.
     Return 0 if the export/import was successful.
 
+   $str = unpack_bfloat16($arg, $rnd, [$base]);# 16-bit "bfloat"
+   $str = unpack_float16($arg, $rnd, [$base]); # 16-bit half prec.
+   $str = unpack_float32($arg, $rnd, [$base]); # 32-bit single prec.
+    The "bfloat16" and "Float16" forms require mpfr-4.3.0 or later.
+    $arg is one of IV, UV, NV, PV, or Math::MPFR object.
+    Unpack $arg's value to an upper case hex string, where the
+    value of $arg has been cast (in accordance with $rnd) to a
+    __bf16 (bfloat) or  _Float16 or _Float32 type.
+    $base is an optional argument specifying the base when $arg
+    is a PV (string). If no $base argument is provided, then the
+    base of the given PV is determined by using the approach
+    specified in the Rmpfr_strtofr() documentation, provided
+    above in the "ASSIGNMENT" section.
+    For example:
+      print unpack_bfloat16(-2.625, MPFR_RNDN); # Outputs C028
+      print unpack_float16 (-2.625, MPFR_RNDN); # Outputs C140
+      print unpack_float32 (-2.625, MPFR_RNDN); # Outputs C0280000
+
    ########################
 
    DISPLAYING INFS AND NANS
@@ -2472,7 +2503,7 @@ $str = anytoa($op); # $op precision must be 53 or 64 or 113 or 2098
     Furthermore, all overloaded comparisons ( < <= > >= == != <=> )
     between Math::MPFR and Math::GMPz objects or between Math::MPFR
     and Math::GMPq objects are permitted.
-    Comparison oprations between Math::MPFR and Math::GMP objects
+    Comparison operations between Math::MPFR and Math::GMP objects
     must be constructed such that Math::MPFR (not Math::GMP)
     overloading is invoked.
 

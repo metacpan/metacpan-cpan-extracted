@@ -1,5 +1,11 @@
 Revision history for CtrlO::PDF
 
+0.33 Tue Jul 8 2025
+
+    * Widow support for tables - thanks Sam Kington
+    * Includes better spacing support for tables wrapping over pages and fixes
+      exceptions when table header spans pages
+
 0.32 Wed Mar 3 2025
 
     * Prevent infinite loop if unable to print text to PDF

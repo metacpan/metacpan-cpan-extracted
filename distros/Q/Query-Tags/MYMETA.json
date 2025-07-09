@@ -1,0 +1,59 @@
+{
+   "abstract" : "Raku-inspired query language for attributes",
+   "author" : [
+      "Tobias Boege <tobs@taboege.de>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Query-Tags",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker::CPANfile" : "0.09"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "ExtUtils::MakeMaker" : "6.48",
+            "List::SomeUtils" : "0",
+            "Pegex" : "0",
+            "Scalar::Util" : "0",
+            "perl" : "5.016000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/taboege/perl-Query-Tags.git",
+         "web" : "https://github.com/taboege/perl-Query-Tags"
+      }
+   },
+   "version" : "v0.0.2",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

@@ -10,7 +10,7 @@ use Moo;
 use MooX::Types::MooseLike::Base qw(:all);
 use PDF::Table;
 
-our $VERSION = '0.32';
+our $VERSION = '0.33';
 
 =head1 NAME
 
@@ -246,6 +246,18 @@ has PDFlib => (
     default => 'PDF::Builder',
 );
 
+=head2 font_size
+
+Sets or returns the font size. Default is 10 (points).
+
+=cut
+
+has font_size => (
+    is      => 'ro',
+    isa     => Int,
+    default => 10,
+);
+
 =head2 width
 
 Sets or returns the width. Default is A4.
@@ -315,7 +327,7 @@ has margin_top => (
 sub _build_margin_top
 {   my $self = shift;
     my $size = $self->margin + $self->top_padding;
-    $size += 15 if $self->header; # Arbitrary number to allow 10px of header text
+    $size += $self->_line_height($self->font_size) if $self->header;
     if ($self->logo)
     {
         $size += $self->logo_height;
@@ -338,9 +350,7 @@ has margin_bottom => (
 
 sub _build_margin_bottom
 {   my $self = shift;
-    my $size = $self->margin;
-    $size += 15; # Arbitrary number to allow 10px of footer text
-    return $size;
+    return $self->margin + $self->_line_height($self->font_size);
 };
 
 =head2 top_padding
@@ -660,7 +670,7 @@ sub text
 
     $string or return;
 
-    my $size = delete $options{size} || 10;
+    my $size = delete $options{size} || $self->font_size;
     my $color = delete $options{color} || 'black';
     my $format = delete $options{format} || 'none';
 
@@ -739,36 +749,29 @@ PDF::Table.
 sub table
 {   my ($self, %options) = @_;
 
-    $self->page; # Ensure that page is built and cursor adjusted for first use
+    # Make sure we've got a page if this was the first time we've been called.
+    $self->page;
 
-    # Move onto new page if little space left on this one.
-    # TODO Change arbitary "60" to something calculated? Needs to be able to
-    # fit header and one row as a minimum.
-    $self->add_page if $self->_y < 60 + $self->margin_bottom;
+    # Add a blank line above the table if we'd printed anything previously
+    if ($self->is_new_page) {
+        $self->_down($self->_line_height($self->font_size));
+    }
 
+    # Work out what sort of table we'd normally produce. Take a copy of the data because
+    # it's passed by reference to PDF::Table, which chews through its arguments.
     my $table = PDF::Table->new;
-
-    my $data = delete $options{data};
-
-    # Create spacing above and below table based on the line spacing for text
-    # of 10 points
-    $self->_down($self->_line_height(10));
-
-    # Keep separate so easy to dump for debug
+    my @data = @{ delete $options{data} };
     my %dimensions = (
         next_h    => $self->_y_start_default - $self->margin_bottom,
         x         => $self->_x,
         w         => $self->_width_print,
-        font_size => 10,
+        font_size => $self->font_size,
         padding   => 5,
         y         => $self->_y,
         h         => $self->_y - $self->margin_bottom,
         next_y    => $self->_y_start_default,
     );
-    my ($final_page, $number_of_pages, $final_y) = $table->table(
-        $self->pdf,
-        $self->page,
-        $data,
+    %options = (
         %dimensions,
         h_border_w    => 2,
         v_border_w    => 0,
@@ -780,16 +783,40 @@ sub table
             font       => $self->fontbold,
             repeat     => 1,
             justify    => 'left',
-            font_size  => 10,
+            font_size  => $self->font_size,
             bg_color   => 'white',
             fg_color   => 'black',
         },
         %options,
     );
-    $self->clear_new_page;
+
+    # Would the table fit on the page in its current position? PDF::Table 1.006 crashes if the
+    # header spans two page boundaries, and in any case we want at least the first row of the
+    # table to fit on the page.
+    # Returns: (0) total height of table, (1) height of header, (2) 0, (3) height of first
+    # row, (4) height of second row etc. - note that "first row" means the first non-header
+    # row.
+    my @vsizes = $table->table($self->pdf, $self->page, [@data], %options, ink => 0);
+    my $first_two_rows_height = $vsizes[1] + $vsizes[3];
+    if ($self->y_position - $first_two_rows_height < $self->margin_bottom) {
+        $self->add_page;
+        $options{y} = $self->_y;
+        $options{h} = $self->_y - $self->margin_bottom;
+    }
+
+    my ($final_page, $number_of_pages, $final_y) = $table->table(
+        $self->pdf,
+        $self->page,
+        [@data],
+        %options,
+        ink => 1,
+    );
+
+    # Remember where we got to, and add another blank line below the table. This is definitely
+    # not the start of a new page now.
     $self->_set__y($final_y);
-    # As above, padding below table
-    $self->_down($self->_line_height(10));
+    $self->_down($self->_line_height($self->font_size));
+    $self->clear_new_page;
 }
 
 sub _image_type

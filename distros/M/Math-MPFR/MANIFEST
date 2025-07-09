@@ -13,6 +13,7 @@ checklib.in
 have_d64.in
 have_d128.in
 have_float16.in
+have_bfloat16.in
 have_f128.in
 try_dec64.in
 try_dec128.in
@@ -33,12 +34,14 @@ t/_1basic.t
 t/_itsa.t
 t/_2exp.t
 t/_Float16.t
+t/_Float32.t
 t/anomaly.t
 t/anytoa.t
 t/atonum.t
 t/atonv.t
 t/base_conversion.t
 t/bessel.t
+t/bfloat16.t
 t/buildopt.t
 t/bytes.t
 t/cmp_uj_sj.t

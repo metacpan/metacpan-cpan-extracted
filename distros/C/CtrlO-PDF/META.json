@@ -54,6 +54,6 @@
          "url" : "https://github.com/ctrlo/CtrlO-PDF"
       }
    },
-   "version" : "0.32",
+   "version" : "0.33",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

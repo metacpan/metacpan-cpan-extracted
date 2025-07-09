@@ -6001,7 +6001,8 @@ SV * Rmpfr_buildopt_float16_p(pTHX) {
 #if MPFR_VERSION >= 262912
   return newSViv(mpfr_buildopt_float16_p());
 #else
-  croak("'mpfr_buildopt_float16_p' not implemented until MPFR-4.3.0");
+  warn("'mpfr_buildopt_float16_p' not implemented until MPFR-4.3.0");
+  return newSViv(0);
 #endif
 }
 
@@ -6041,7 +6042,7 @@ SV * Rmpfr_get_flt(pTHX_ mpfr_t * a, SV * round) {
 
 SV * Rmpfr_get_float16(pTHX_ mpfr_t * a, SV * round) {
 #if MPFR_VERSION >= MPFR_VERSION_NUM(4,3,0)
-#  if defined(HAVE_FLOAT16)      /* defined in Makefile.PL */
+#  if defined(MPFR_WANT_FLOAT16)      /* defined in Makefile.PL */
    return newSVnv(mpfr_get_float16(*a, (mpfr_rnd_t)SvUV(round)));
 #  else
    PERL_UNUSED_ARG2(a, round);
@@ -6054,14 +6055,29 @@ SV * Rmpfr_get_float16(pTHX_ mpfr_t * a, SV * round) {
 #endif
 }
 
+SV * Rmpfr_get_bfloat16(pTHX_ mpfr_t * a, SV * round) {
+#if MPFR_VERSION >= MPFR_VERSION_NUM(4,3,0)
+#  if defined(MPFR_WANT_BFLOAT16)      /* defined in Makefile.PL */
+   return newSVnv(mpfr_get_bfloat16(*a, (mpfr_rnd_t)SvUV(round)));
+#  else
+   PERL_UNUSED_ARG2(a, round);
+   croak("Perl interface to Rmpfr_get_bfloat16 not available. MPFR_WANT_BFLOAT was not recognized");
+#  endif
+#else
+  PERL_UNUSED_ARG2(a, round);
+  croak("Perl interface to Rmpfr_get_bfloat16 not available for this version (%s) of the mpfr library. We need at least version 4.3.0",
+         MPFR_VERSION_STRING);
+#endif
+}
+
 SV * Rmpfr_set_flt(pTHX_ mpfr_t * rop, SV * f, SV * round) {
   return newSViv(mpfr_set_flt(*rop, (float)SvNV(f), (mpfr_rnd_t)SvUV(round)));
 }
 
 SV * Rmpfr_set_float16(pTHX_ mpfr_t * rop, SV * f, SV * round) {
 #if MPFR_VERSION >= MPFR_VERSION_NUM(4,3,0)
-#  if defined(HAVE_FLOAT16)      /* defined in Makefile.PL */
-   return newSViv(mpfr_set_flt(*rop, (_Float16)SvNV(f), (mpfr_rnd_t)SvUV(round)));
+#  if defined(MPFR_WANT_FLOAT16)      /* defined in Makefile.PL */
+   return newSViv(mpfr_set_float16(*rop, (_Float16)SvNV(f), (mpfr_rnd_t)SvUV(round)));
 #  else
    PERL_UNUSED_ARG3(rop, f, round);
    croak("Perl interface to Rmpfr_set_float16 not available. The '_Float16' type was not recognized");
@@ -6069,6 +6085,21 @@ SV * Rmpfr_set_float16(pTHX_ mpfr_t * rop, SV * f, SV * round) {
 #else
   PERL_UNUSED_ARG3(rop, f, round);
   croak("Perl interface to Rmpfr_set_float16 not available for this version (%s) of the mpfr library. We need at least version 4.3.0",
+         MPFR_VERSION_STRING);
+#endif
+}
+
+SV * Rmpfr_set_bfloat16(pTHX_ mpfr_t * rop, SV * f, SV * round) {
+#if MPFR_VERSION >= MPFR_VERSION_NUM(4,3,0)
+#  if defined(MPFR_WANT_BFLOAT16)      /* defined in Makefile.PL */
+   return newSViv(mpfr_set_bfloat16(*rop, (__bf16)SvNV(f), (mpfr_rnd_t)SvUV(round)));
+#  else
+   PERL_UNUSED_ARG3(rop, f, round);
+   croak("Perl interface to Rmpfr_set_bfloat16 not available. The '__bf16' type was not recognized");
+#  endif
+#else
+  PERL_UNUSED_ARG3(rop, f, round);
+  croak("Perl interface to Rmpfr_set_bfloat16 not available for this version (%s) of the mpfr library. We need at least version 4.3.0",
          MPFR_VERSION_STRING);
 #endif
 }
@@ -6085,7 +6116,8 @@ SV * Rmpfr_buildopt_tune_case(pTHX) {
 #if (MPFR_VERSION_MAJOR == 3 && MPFR_VERSION_MINOR >= 1) || MPFR_VERSION_MAJOR > 3
   return newSVpv(mpfr_buildopt_tune_case(), 0);
 #else
-  croak("Rmpfr_buildopt_tune_case not implemented with this version of the mpfr library - we have %s but need at least 3.1.0", MPFR_VERSION_STRING);
+  warn("Rmpfr_buildopt_tune_case not implemented with this version of the mpfr library - we have %s but need at least 3.1.0", MPFR_VERSION_STRING);
+  return newSViv(0);
 #endif
 }
 
@@ -6151,7 +6183,8 @@ SV * Rmpfr_buildopt_gmpinternals_p(pTHX) {
 #if (MPFR_VERSION_MAJOR == 3 && MPFR_VERSION_MINOR >= 1) || MPFR_VERSION_MAJOR > 3
   return newSViv(mpfr_buildopt_gmpinternals_p());
 #else
-  croak("Rmpfr_buildopt_gmpinternals_p not implemented with this version of the mpfr library - we have %s but need at least 3.1.0", MPFR_VERSION_STRING);
+  warn("Rmpfr_buildopt_gmpinternals_p not implemented with this version of the mpfr library - we have %s but need at least 3.1.0", MPFR_VERSION_STRING);
+  return newSViv(0);
 #endif
 }
 
@@ -7448,7 +7481,8 @@ SV * Rmpfr_buildopt_float128_p(pTHX) {
 #if MPFR_VERSION_MAJOR >= 4
   return newSViv(mpfr_buildopt_float128_p());
 #else
-  croak("Rmpfr_buildopt_float128_p not implemented with this version of the mpfr library - we have %s but need at least 4.0.0", MPFR_VERSION_STRING);
+  warn("Rmpfr_buildopt_float128_p not implemented with this version of the mpfr library - we have %s but need at least 4.0.0", MPFR_VERSION_STRING);
+  return newSViv(0);
 #endif
 }
 
@@ -7456,7 +7490,8 @@ SV * Rmpfr_buildopt_sharedcache_p(pTHX) {
 #if MPFR_VERSION_MAJOR >= 4
   return newSViv(mpfr_buildopt_sharedcache_p());
 #else
-  croak("Rmpfr_buildopt_sharedcache_p not implemented with this version of the mpfr library - we have %s but need at least 4.0.0", MPFR_VERSION_STRING);
+  warn("Rmpfr_buildopt_sharedcache_p not implemented with this version of the mpfr library - we have %s but need at least 4.0.0", MPFR_VERSION_STRING);
+  return newSViv(0);
 #endif
 }
 
@@ -9067,7 +9102,15 @@ SV * _gmp_cc(pTHX) {
 }
 
 int _have_float16(void) {
-#if defined(HAVE_FLOAT16)      /* defined in Makefile.PL */
+#if defined(MPFR_WANT_FLOAT16)      /* defined in Makefile.PL */
+  return 1;
+#else
+  return 0;
+#endif
+}
+
+int _have_bfloat16(void) {
+#if defined(MPFR_WANT_BFLOAT16)      /* defined in Makefile.PL */
   return 1;
 #else
   return 0;
@@ -9160,6 +9203,132 @@ SV * _overload_fmod_eq (pTHX_ SV * a, mpfr_t *b, SV * third) {
      mpfr_fmod(*(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpfr_t *, SvIVX(SvRV(a)))), *b, __gmpfr_default_rounding_mode);
      return a;
 }
+
+int Rmpfr_buildopt_bfloat16_p(pTHX) {
+#if MPFR_VERSION >= 262912 /* 4.3.0 */
+  return mpfr_buildopt_bfloat16_p();
+#else
+  warn("mpfr_buildopt_bfloat16_p function not implemented until mpfr-4.3.0. (You have only version %s) ", MPFR_VERSION_STRING);
+  return 0;
+#endif
+}
+
+void _unpack_float32(pTHX_ mpfr_t * f) {
+  dXSARGS;
+  int i, n = 4;
+  char * buff;
+  float f32;
+  void * p = &f32;
+  mpfr_prec_t prec;
+
+  PERL_UNUSED_VAR(items);
+
+  prec = mpfr_get_prec(*f);
+
+  if(prec != 24)
+    croak("Precision of Math::MPFR object passed to _unpack_float XSub must be 24 - not %d", (int)prec);
+
+  f32 = mpfr_get_flt(*f, GMP_RNDN);
+
+  Newx(buff, 4, char);
+  if(buff == NULL) croak("Failed to allocate memory in _unpack_pack XSub");
+
+  sp = mark;
+
+#ifdef WE_HAVE_BENDIAN /* Big Endian architecture */
+  for (i = 0; i < n; i++) {
+#else
+  for (i = n - 1; i >= 0; i--) {
+#endif
+    sprintf(buff, "%02X", ((unsigned char*)p)[i]);
+    XPUSHs(sv_2mortal(newSVpv(buff, 0)));
+  }
+  PUTBACK;
+  Safefree(buff);
+  XSRETURN(n);
+}
+
+void _unpack_float16(pTHX_ mpfr_t * f) {
+#if defined(MPFR_WANT_FLOAT16) && MPFR_VERSION >= MPFR_VERSION_NUM(4,3,0)
+  dXSARGS;
+  int i, n = 2;
+  char * buff;
+  _Float16 f16;
+  void * p = &f16;
+  mpfr_prec_t prec;
+
+  PERL_UNUSED_VAR(items);
+
+  prec = mpfr_get_prec(*f);
+
+  if(prec != 11)
+    croak("Precision of Math::MPFR object passed to _unpack_float16 XSub must be 11 - not %d", (int)prec);
+
+  f16 = mpfr_get_float16(*f, GMP_RNDN);
+
+  Newx(buff, 4, char);
+  if(buff == NULL) croak("Failed to allocate memory in _unpack_float16 XSub");
+
+  sp = mark;
+
+#ifdef WE_HAVE_BENDIAN /* Big Endian architecture */
+  for (i = 0; i < n; i++) {
+#else
+  for (i = n - 1; i >= 0; i--) {
+#endif
+    sprintf(buff, "%02X", ((unsigned char*)p)[i]);
+    XPUSHs(sv_2mortal(newSVpv(buff, 0)));
+  }
+  PUTBACK;
+  Safefree(buff);
+  XSRETURN(n);
+#else
+  PERL_UNUSED_VAR(f);
+  croak("unpack_float16 not implemented because _Float16 type is not recognized");
+#endif
+}
+
+void _unpack_bfloat16(pTHX_ mpfr_t * f) {
+#if defined(MPFR_WANT_BFLOAT16) && MPFR_VERSION >= MPFR_VERSION_NUM(4,3,0)
+  dXSARGS;
+  int i, n = 2;
+  char * buff;
+  __bf16 bf16;
+  void * p = &bf16;
+  mpfr_prec_t prec;
+
+  PERL_UNUSED_VAR(items);
+
+  prec = mpfr_get_prec(*f);
+
+  if(prec != 8)
+    croak("Precision of Math::MPFR object passed to _unpack_bfloat16 XSub must be 8 - not %d", (int)prec);
+
+  bf16 = mpfr_get_bfloat16(*f, GMP_RNDN);
+
+  Newx(buff, 4, char);
+  if(buff == NULL) croak("Failed to allocate memory in _unpack_bfloat16 XSub");
+
+  sp = mark;
+
+#ifdef WE_HAVE_BENDIAN /* Big Endian architecture */
+  for (i = 0; i < n; i++) {
+#else
+  for (i = n - 1; i >= 0; i--) {
+#endif
+    sprintf(buff, "%02X", ((unsigned char*)p)[i]);
+    XPUSHs(sv_2mortal(newSVpv(buff, 0)));
+  }
+  PUTBACK;
+  Safefree(buff);
+  XSRETURN(n);
+#else
+  PERL_UNUSED_VAR(f);
+  croak("unpack_bfloat16 not implemented because __bf16 type is not recognized");
+#endif
+}
+
+
 
 
 MODULE = Math::MPFR  PACKAGE = Math::MPFR
@@ -12609,6 +12778,14 @@ CODE:
 OUTPUT:  RETVAL
 
 SV *
+Rmpfr_get_bfloat16 (a, round)
+	mpfr_t *	a
+	SV *	round
+CODE:
+  RETVAL = Rmpfr_get_bfloat16 (aTHX_ a, round);
+OUTPUT:  RETVAL
+
+SV *
 Rmpfr_set_flt (rop, f, round)
 	mpfr_t *	rop
 	SV *	f
@@ -12624,6 +12801,15 @@ Rmpfr_set_float16 (rop, f, round)
 	SV *	round
 CODE:
   RETVAL = Rmpfr_set_float16 (aTHX_ rop, f, round);
+OUTPUT:  RETVAL
+
+SV *
+Rmpfr_set_bfloat16 (rop, f, round)
+	mpfr_t *	rop
+	SV *	f
+	SV *	round
+CODE:
+  RETVAL = Rmpfr_set_bfloat16 (aTHX_ rop, f, round);
 OUTPUT:  RETVAL
 
 SV *
@@ -13426,6 +13612,10 @@ int
 _have_float16 ()
 
 
+int
+_have_bfloat16 ()
+
+
 SV *
 _gmp_printf_nv (a, b)
 	SV *	a
@@ -13488,4 +13678,59 @@ _overload_fmod_eq (a, b, third)
 CODE:
   RETVAL = _overload_fmod_eq (aTHX_ a, b, third);
 OUTPUT:  RETVAL
+
+int
+Rmpfr_buildopt_bfloat16_p ()
+CODE:
+  RETVAL = Rmpfr_buildopt_bfloat16_p (aTHX);
+OUTPUT:  RETVAL
+
+
+void
+_unpack_float32 (f)
+	mpfr_t *	f
+        PREINIT:
+        I32* temp;
+        PPCODE:
+        temp = PL_markstack_ptr++;
+        _unpack_float32(aTHX_ f);
+        if (PL_markstack_ptr != temp) {
+          /* truly void, because dXSARGS not invoked */
+          PL_markstack_ptr = temp;
+          XSRETURN_EMPTY; /* return empty stack */
+        }
+        /* must have used dXSARGS; list context implied */
+        return;
+
+void
+_unpack_float16 (f)
+	mpfr_t *	f
+        PREINIT:
+        I32* temp;
+        PPCODE:
+        temp = PL_markstack_ptr++;
+        _unpack_float16(aTHX_ f);
+        if (PL_markstack_ptr != temp) {
+          /* truly void, because dXSARGS not invoked */
+          PL_markstack_ptr = temp;
+          XSRETURN_EMPTY; /* return empty stack */
+        }
+        /* must have used dXSARGS; list context implied */
+        return;
+
+void
+_unpack_bfloat16 (f)
+	mpfr_t *	f
+        PREINIT:
+        I32* temp;
+        PPCODE:
+        temp = PL_markstack_ptr++;
+        _unpack_bfloat16(aTHX_ f);
+        if (PL_markstack_ptr != temp) {
+          /* truly void, because dXSARGS not invoked */
+          PL_markstack_ptr = temp;
+          XSRETURN_EMPTY; /* return empty stack */
+        }
+        /* must have used dXSARGS; list context implied */
+        return;
 

@@ -1,5 +1,5 @@
 package Crypt::Bear::AES_CTRCBC;
-$Crypt::Bear::AES_CTRCBC::VERSION = '0.002';
+$Crypt::Bear::AES_CTRCBC::VERSION = '0.003';
 use Crypt::Bear;
 
 1;
@@ -18,7 +18,7 @@ Crypt::Bear::AES_CTRCBC - AES CTRCBC class for BearSSL
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

@@ -56,6 +56,6 @@
          "web" : "https://github.com/briandfoy/business-isbn-data"
       }
    },
-   "version" : "20250605.001",
+   "version" : "20250708.001",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

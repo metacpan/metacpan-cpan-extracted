@@ -1,5 +1,5 @@
 package ExtUtils::Typemaps::MagicExt;
-$ExtUtils::Typemaps::MagicExt::VERSION = '0.008';
+$ExtUtils::Typemaps::MagicExt::VERSION = '0.009';
 use strict;
 use warnings;
 
@@ -11,20 +11,22 @@ sub new {
 
 	$self->add_inputmap(xstype => 'T_MAGICEXT', code => <<'END');
 	{
-	MAGIC* magic = SvROK($arg) && SvMAGICAL(SvRV($arg)) ? mg_findext(SvRV($arg), PERL_MAGIC_ext, &${type}_magic) : NULL;
+	SV* arg = $arg;
+	MAGIC* magic = SvROK(arg) && SvMAGICAL(SvRV(arg)) ? mg_findext(SvRV(arg), PERL_MAGIC_ext, &${type}_magic) : NULL;
 	if (magic)
 		$var = ($type)magic->mg_ptr;
 	else
-		Perl_croak(aTHX_ \"$ntype object is lacking magic\");
+		Perl_croak(aTHX_ \"%s object is lacking magic\", \"$ntype\");
 	}
 END
 	$self->add_inputmap(xstype => 'T_MAGICEXT_BASE', code => <<'END');
 	{
-	MAGIC* magic = SvROK($arg) && SvMAGICAL(SvRV($arg)) ? mg_find(SvRV($arg), PERL_MAGIC_ext) : NULL;
+	SV* arg = $arg;
+	MAGIC* magic = SvROK(arg) && SvMAGICAL(SvRV(arg)) ? mg_find(SvRV(arg), PERL_MAGIC_ext) : NULL;
 	if (magic && magic->mg_virtual)
 		$var = ($type)magic->mg_ptr;
 	else
-		Perl_croak(aTHX_ \"$ntype object is lacking magic\");
+		Perl_croak(aTHX_ \"%s object is lacking magic\", \"$ntype\");
 	}
 END
 
@@ -59,7 +61,7 @@ ExtUtils::Typemaps::MagicExt - Typemap for storing objects in magic pointer
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 

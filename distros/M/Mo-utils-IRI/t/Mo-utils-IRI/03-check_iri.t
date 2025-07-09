@@ -5,7 +5,7 @@ use English;
 use Error::Pure::Utils qw(clean);
 use Mo::utils::IRI qw(check_iri);
 use Readonly;
-use Test::More 'tests' => 8;
+use Test::More 'tests' => 10;
 use Test::NoWarnings;
 use Unicode::UTF8 qw(decode_utf8 encode_utf8);
 
@@ -16,8 +16,10 @@ Readonly::Array our @RIGHT_IRIS => (
 	'http://www.ietf.org/rfc/rfc2396.txt',
 	decode_utf8('https://michal.josef.špaček'),
 );
-Readonly::Array our @BAD_IRIS => qw(
-	foo
+Readonly::Array our @BAD_IRIS => (
+	['foo'],
+	['https://michal.josef.špaček', 'https://michal.josef.špaček in bytes'],
+	['://foo'],
 );
 
 # Test.
@@ -36,14 +38,15 @@ $ret = check_iri($self, 'key');
 is($ret, undef, 'Right not exist key.');
 
 # Test.
-foreach my $bad_iri (@BAD_IRIS) {
+foreach my $bad_iri_ar (@BAD_IRIS) {
 	$self = {
-		'key' => $bad_iri,
+		'key' => $bad_iri_ar->[0],
 	};
 	eval {
 		check_iri($self, 'key');
 	};
+	my $value = defined $bad_iri_ar->[1] ? $bad_iri_ar->[1] : $bad_iri_ar->[0];
 	is($EVAL_ERROR, "Parameter 'key' doesn't contain valid IRI.\n",
-		"Parameter 'key' doesn't contain valid IRI ($bad_iri).");
+		"Parameter 'key' doesn't contain valid IRI ($value).");
 	clean();
 }

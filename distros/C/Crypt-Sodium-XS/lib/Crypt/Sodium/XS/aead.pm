@@ -264,6 +264,8 @@ C<$adata> is optional. See notes in L</DESCRIPTION>.
 
 C<$adata> is optional. See notes in L</DESCRIPTION>.
 
+=back
+
 =head1 CONSTANTS
 
 =head2 aead_ABYTES
@@ -352,6 +354,10 @@ For reporting bugs, giving feedback, submitting patches, etc. please use the
 following:
 
 =over 4
+
+=item *
+
+RT queue at L<https://rt.cpan.org/Dist/Display.html?Name=Crypt-Sodium-XS>
 
 =item *
 

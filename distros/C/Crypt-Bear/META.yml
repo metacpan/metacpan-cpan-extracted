@@ -21,109 +21,109 @@ name: Crypt-Bear
 provides:
   Crypt::Bear:
     file: lib/Crypt/Bear.pm
-    version: '0.002'
+    version: '0.003'
   Crypt::Bear::AEAD:
     file: lib/Crypt/Bear/AEAD.pm
-    version: '0.002'
+    version: '0.003'
   Crypt::Bear::AES_CBC::Dec:
     file: lib/Crypt/Bear/AES_CBC/Dec.pm
-    version: '0.002'
+    version: '0.003'
   Crypt::Bear::AES_CBC::Enc:
     file: lib/Crypt/Bear/AES_CBC/Enc.pm
-    version: '0.002'
+    version: '0.003'
   Crypt::Bear::AES_CTR:
     file: lib/Crypt/Bear/AES_CTR.pm
-    version: '0.002'
+    version: '0.003'
   Crypt::Bear::AES_CTR::DRBG:
     file: lib/Crypt/Bear/AES_CTR/DRBG.pm
-    version: '0.002'
+    version: '0.003'
   Crypt::Bear::AES_CTRCBC:
     file: lib/Crypt/Bear/AES_CTRCBC.pm
-    version: '0.002'
+    version: '0.003'
   Crypt::Bear::CBC::Dec:
     file: lib/Crypt/Bear/CBC/Dec.pm
-    version: '0.002'
+    version: '0.003'
   Crypt::Bear::CBC::Enc:
     file: lib/Crypt/Bear/CBC/Enc.pm
-    version: '0.002'
+    version: '0.003'
   Crypt::Bear::CCM:
     file: lib/Crypt/Bear/CCM.pm
-    version: '0.002'
+    version: '0.003'
   Crypt::Bear::CTR:
     file: lib/Crypt/Bear/CTR.pm
-    version: '0.002'
+    version: '0.003'
   Crypt::Bear::CTRCBC:
     file: lib/Crypt/Bear/CTRCBC.pm
-    version: '0.002'
+    version: '0.003'
   Crypt::Bear::EAX:
     file: lib/Crypt/Bear/EAX.pm
-    version: '0.002'
+    version: '0.003'
   Crypt::Bear::EC::PrivateKey:
     file: lib/Crypt/Bear/EC/PrivateKey.pm
-    version: '0.002'
+    version: '0.003'
   Crypt::Bear::EC::PublicKey:
     file: lib/Crypt/Bear/EC/PublicKey.pm
-    version: '0.002'
+    version: '0.003'
   Crypt::Bear::GCM:
     file: lib/Crypt/Bear/GCM.pm
-    version: '0.002'
+    version: '0.003'
   Crypt::Bear::HKDF:
     file: lib/Crypt/Bear/HKDF.pm
-    version: '0.002'
+    version: '0.003'
   Crypt::Bear::HMAC:
     file: lib/Crypt/Bear/HMAC.pm
-    version: '0.002'
+    version: '0.003'
   Crypt::Bear::HMAC::DRBG:
     file: lib/Crypt/Bear/HMAC/DRBG.pm
-    version: '0.002'
+    version: '0.003'
   Crypt::Bear::HMAC::Key:
     file: lib/Crypt/Bear/HMAC/Key.pm
-    version: '0.002'
+    version: '0.003'
   Crypt::Bear::Hash:
     file: lib/Crypt/Bear/Hash.pm
-    version: '0.002'
+    version: '0.003'
   Crypt::Bear::PEM:
     file: lib/Crypt/Bear/PEM.pm
-    version: '0.002'
+    version: '0.003'
   Crypt::Bear::PEM::Decoder:
     file: lib/Crypt/Bear/PEM/Decoder.pm
-    version: '0.002'
+    version: '0.003'
   Crypt::Bear::PRNG:
     file: lib/Crypt/Bear/PRNG.pm
-    version: '0.002'
+    version: '0.003'
   Crypt::Bear::RSA:
     file: lib/Crypt/Bear/RSA.pm
-    version: '0.002'
+    version: '0.003'
   Crypt::Bear::RSA::PrivateKey:
     file: lib/Crypt/Bear/RSA/PrivateKey.pm
-    version: '0.002'
+    version: '0.003'
   Crypt::Bear::RSA::PublicKey:
     file: lib/Crypt/Bear/RSA/PublicKey.pm
-    version: '0.002'
+    version: '0.003'
   Crypt::Bear::SSL::Client:
     file: lib/Crypt/Bear/SSL/Client.pm
-    version: '0.002'
+    version: '0.003'
   Crypt::Bear::SSL::Engine:
     file: lib/Crypt/Bear/SSL/Engine.pm
-    version: '0.002'
+    version: '0.003'
   Crypt::Bear::SSL::PrivateCertificate:
     file: lib/Crypt/Bear/SSL/PrivateCertificate.pm
-    version: '0.002'
+    version: '0.003'
   Crypt::Bear::SSL::Server:
     file: lib/Crypt/Bear/SSL/Server.pm
-    version: '0.002'
+    version: '0.003'
   Crypt::Bear::X509::Certificate:
     file: lib/Crypt/Bear/X509/Certificate.pm
-    version: '0.002'
+    version: '0.003'
   Crypt::Bear::X509::Certificate::Chain:
     file: lib/Crypt/Bear/X509/Certificate/Chain.pm
-    version: '0.002'
+    version: '0.003'
   Crypt::Bear::X509::PrivateKey:
     file: lib/Crypt/Bear/X509/PrivateKey.pm
-    version: '0.002'
+    version: '0.003'
   Crypt::Bear::X509::TrustAnchors:
     file: lib/Crypt/Bear/X509/TrustAnchors.pm
-    version: '0.002'
+    version: '0.003'
 recommends:
   Mozilla::CA: '0'
 requires:
@@ -136,7 +136,7 @@ requires:
 resources:
   bugtracker: https://github.com/Leont/crypt-bear/issues
   repository: git://github.com/Leont/crypt-bear.git
-version: '0.002'
-x_generated_by_perl: v5.38.0
-x_serialization_backend: 'YAML::Tiny version 1.74'
+version: '0.003'
+x_generated_by_perl: v5.40.1
+x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -230,7 +230,7 @@ STATIC int dup_protmem(pTHX_ MAGIC *mg, CLONE_PARAMS *params) {
     croak("Failed to release protmem RO");
   }
 
-  mg->mg_ptr = (char *)new_multipart;
+  mg->mg_ptr = (char *)new_pm;
   return 0;
 }
 #endif

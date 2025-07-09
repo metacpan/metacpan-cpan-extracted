@@ -1,7 +1,10 @@
 Changes
+CONTRIBUTING.md
 LICENSE
 MANIFEST
 MANIFEST.SKIP
+README
+SECURITY.md
 XS.xs
 Makefile.PL
 bin/csxs-ppcrypt
@@ -78,6 +81,7 @@ t/kdf.t
 t/kx.t
 t/memvault.t
 t/onetimeauth.t
+t/pod.t
 t/pminisign.t
 t/pwhash.t
 t/scalarmult.t

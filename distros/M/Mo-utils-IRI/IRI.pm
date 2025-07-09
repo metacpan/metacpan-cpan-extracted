@@ -4,13 +4,14 @@ use base qw(Exporter);
 use strict;
 use warnings;
 
+use English;
 use Error::Pure qw(err);
 use Readonly;
 use IRI;
 
 Readonly::Array our @EXPORT_OK => qw(check_iri);
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 sub check_iri {
 	my ($self, $key) = @_;
@@ -20,7 +21,14 @@ sub check_iri {
 	}
 
 	my $value = $self->{$key};
-	my $iri = IRI->new($value);
+	my $iri = eval {
+		IRI->new($value);
+	};
+	if ($EVAL_ERROR) {
+		err "Parameter '".$key."' doesn't contain valid IRI.",
+			'Value', $value,
+		;
+	}
 	if (! $iri->can('scheme') || ! $iri->can('host') || ! $iri->scheme || ! $iri->host) {
 		err "Parameter '".$key."' doesn't contain valid IRI.",
 			'Value', $value,
@@ -167,12 +175,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2024 Michal Josef Špaček
+© 2024-2025 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.02
 
 =cut

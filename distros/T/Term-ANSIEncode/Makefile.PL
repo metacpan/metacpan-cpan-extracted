@@ -19,7 +19,7 @@ if (-e 'Makefile') {
 }
 
 # ANSI Encode
-my $banner = slurp_file('examples/banner.vt');
+my $banner        = slurp_file('examples/banner.vt');
 chomp(my $VERSION = slurp_file('VERSION'));
 $banner =~ s/XXXX/$VERSION/gs;
 print $banner;
@@ -63,8 +63,13 @@ WriteMakefile(
 		'Getopt::Long'     => '0',
     },
 	EXE_FILES => ['bin/ansi-encode'],
-    dist  => {COMPRESS => 'gzip -9f', SUFFIX => 'gz',},
-    clean => {FILES    => '*gz *bak *old'},
+    dist      => {
+		COMPRESS => 'gzip -9f',
+		SUFFIX   => 'gz',
+	},
+    clean     => {
+		FILES    => '*gz *bak *old',
+	},
 );
 
 print colored(['blue on_blue'],$line),"\n";

@@ -1,0 +1,183 @@
+NAME
+    Data::CEFACT::Unit - Data object for CEFACT unit.
+
+SYNOPSIS
+     use Data::CEFACT::Unit;
+
+     my $obj = Data::CEFACT::Unit->new(%params);
+     my $common_code = $obj->common_code;
+     my $conversion_factor = $obj->conversion_factor;
+     my $description = $obj->description;
+     my $level_category = $obj->level_category;
+     my $name = $obj->name;
+     my $status = $obj->status;
+     my $symbol = $obj->symbol;
+
+METHODS
+  "new"
+     my $obj = Data::CEFACT::Unit->new(%params);
+
+    Constructor.
+
+    *       "common_code"
+
+            Common code of unit.
+
+            It's required.
+
+            Default value is undef.
+
+    *       "conversion_factor"
+
+            Conversion factor of unit.
+
+            It's optional.
+
+            Default value is undef.
+
+    *       "description"
+
+            Unit description.
+
+            It's optional.
+
+            Default value is undef.
+
+    *       "level_category"
+
+            Unit level/category.
+
+            It's required.
+
+            Default value is undef.
+
+    *       "name"
+
+            Unit name.
+
+            It's required.
+
+            Default value is undef.
+
+    *       "status"
+
+            Unit status,
+
+            Possible statuses are undef as valid, 'D' as deprecated, 'X' as
+            invalid and '¦' as new.
+
+            It's optional, default value is valid status.
+
+            Default value is undef.
+
+    *       "symbol"
+
+            Unit symbol.
+
+            It's optional.
+
+            Default value is undef.
+
+    Returns instance of object.
+
+  "common_code"
+     my $common_code = $obj->common_code;
+
+    Get unit common code.
+
+    Returns string.
+
+  "conversion_factor"
+     my $conversion_factor = $obj->conversion_factor;
+
+    Get unit conversion factor.
+
+    Returns string.
+
+  "description"
+     my $description = $obj->description;
+
+    Get unit description.
+
+    Returns string.
+
+  "level_category"
+     my $level_category = $obj->level_category;
+
+    Get unit level/category.
+
+    Returns string.
+
+  "name"
+     my $name = $obj->name;
+
+    Get unit name.
+
+    Returns string.
+
+  "status"
+     my $status = $obj->status;
+
+    Get unit status.
+
+    Returns string or undef.
+
+  "symbol"
+     my $symbol = $obj->symbol;
+
+    Get unit symbol.
+
+    Returns string.
+
+EXAMPLE
+     use strict;
+     use warnings;
+
+     use Data::CEFACT::Unit;
+
+     my $obj = Data::CEFACT::Unit->new(
+             'common_code' => 'KGM',
+             'conversion_factor' => 'kg',
+             'description' => 'A unit of mass equal to one thousand grams.',
+             'level_category' => 1,
+             'name' => 'kilogram',
+             'symbol' => 'kg',
+     );
+
+     # Print out.
+     print 'Name: '.$obj->name."\n";
+     print 'Description: '.$obj->description."\n";
+     print 'Common code: '.$obj->common_code."\n";
+     print 'Status: '.(! defined $obj->status ? 'valid' : $obj->status)."\n";
+     print 'Symbol: '.$obj->symbol."\n";
+     print 'Level/Category: '.$obj->level_category."\n";
+     print 'Conversion factor: '.$obj->conversion_factor."\n";
+
+     # Output:
+     # Name: kilogram
+     # Description: A unit of mass equal to one thousand grams.
+     # Common code: KGM
+     # Status: valid
+     # Symbol: kg
+     # Level/Category: 1
+     # Conversion factor: kg
+
+DEPENDENCIES
+    Mo, Mo::utils. Readonly, Unicode::UTF8.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Data-CEFACT-Unit>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2025 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

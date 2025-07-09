@@ -17,8 +17,8 @@
 ]>
 <ISBNRangeMessage>
   <MessageSource>International ISBN Agency</MessageSource>
-  <MessageSerialNumber>dfed83c2-e6a6-42aa-bfe3-ca79182c1f34</MessageSerialNumber>
-  <MessageDate>Thu, 5 Jun 2025 04:53:44 BST</MessageDate>
+  <MessageSerialNumber>6e2248c4-0018-4cb3-91fa-a37c2a1e30aa</MessageSerialNumber>
+  <MessageDate>Tue, 8 Jul 2025 04:55:39 BST</MessageDate>
   <EAN.UCCPrefixes>
     <EAN.UCC>
       <Prefix>978</Prefix>
@@ -2429,8 +2429,12 @@
           <Length>2</Length>
         </Rule>
         <Rule>
-          <Range>1000000-4799999</Range>
+          <Range>1000000-4699999</Range>
           <Length>3</Length>
+        </Rule>
+        <Rule>
+          <Range>4700000-4799999</Range>
+          <Length>5</Length>
         </Rule>
         <Rule>
           <Range>4800000-4999999</Range>
@@ -4635,11 +4639,11 @@
       <Agency>Kenya</Agency>
       <Rules>
         <Rule>
-          <Range>0000000-3499999</Range>
+          <Range>0000000-3299999</Range>
           <Length>0</Length>
         </Rule>
         <Rule>
-          <Range>3500000-5599999</Range>
+          <Range>3300000-5599999</Range>
           <Length>2</Length>
         </Rule>
         <Rule>
@@ -8581,15 +8585,15 @@
           <Length>0</Length>
         </Rule>
         <Rule>
-          <Range>5000000-5299999</Range>
+          <Range>5000000-5499999</Range>
           <Length>2</Length>
         </Rule>
         <Rule>
-          <Range>5300000-9849999</Range>
+          <Range>5500000-9699999</Range>
           <Length>0</Length>
         </Rule>
         <Rule>
-          <Range>9850000-9999999</Range>
+          <Range>9700000-9999999</Range>
           <Length>3</Length>
         </Rule>
       </Rules>

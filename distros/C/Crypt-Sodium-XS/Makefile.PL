@@ -28,7 +28,7 @@ use Text::ParseWords;
 # no idea how to get it to function. it should be possible.
 # so for now, sorry charlie; patches and suggestions are appreciated!
 
-die "Sorry, windows is not supported" if $^O eq 'MSWin32';
+os_unsupported if $^O eq 'MSWin32';
 
 my $libsodium_version = '1.0.19';
 my $libsodium_major_minimum = '10';
@@ -112,6 +112,7 @@ my %WriteMakefileArgs = (
   "DISTNAME" => "Crypt-Sodium-XS",
   "LICENSE" => "perl",
   "NAME" => "Crypt::Sodium::XS",
+  "MIN_PERL_VERSION" => "5.001000",
   "PREREQ_PM" => {
     "XSLoader" => 0,
   },
@@ -148,6 +149,7 @@ delete $WriteMakefileArgs{BUILD_REQUIRES} if $eumm_version < 6.56;
 delete $WriteMakefileArgs{CONFIGURE_REQUIRES} if $eumm_version < 6.52;
 delete $WriteMakefileArgs{META_MERGE} if $eumm_version < 6.46;
 delete $WriteMakefileArgs{LICENSE} if $eumm_version < 6.31;
+delete $WriteMakefileArgs{MIN_PERL_VERSION} if $eumm_version < 6.48;
 
 WriteMakefile(%WriteMakefileArgs);
 

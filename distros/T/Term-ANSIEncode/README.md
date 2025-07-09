@@ -1,6 +1,6 @@
-# ansi-encode
+# ANSIEncode
 
-![Logo](ANSI-Encode.png?raw=true "Logo Title Text 1")
+![ANSIEncode Logo](ANSI-Encode.png?raw=true "ANSIEncode Logo Title Text 1")
 
 ## Description
 
@@ -8,7 +8,7 @@ Markup text to ANSI encoder
 
 ## Usage
 
-**ansi-encode** [text file name]
+**ansi-encode** [options] [text file name]
 
 ## Options
 
@@ -26,6 +26,17 @@ Markup text to ANSI encoder
 ```
     Show most used tokens
 ```
+
+### -**c** or --**colors**
+```
+    Show color grid for use with "ANSI" and "GREY" tokens
+```
+
+### -**s** or --**symbols** [search]
+```
+    Show all of the symbol character tokens
+	Use search to shorten the huge list
+````
 
 ## Tokens
 ```
@@ -116,6 +127,6 @@ NOTE:  Use "less -r" to view in "less"
 │ BRIGHT B_WHITE      │  Bright white                                    │
 │ B_ANSI0 - B_ANSI231 │ Term256 background colors (use -c to see these)  │
 │ B_GREY0 - B_GREY23  │ Levels of grey                                   │
-╰────────────────────────────────────────────────────────────────────────╯
+╰─────────────────────┴──────────────────────────────────────────────────╯
 ```
 

@@ -1,5 +1,8 @@
 Revision history for Crypt-Bear
 
+0.003     2025-07-08 20:19:20+02:00 Europe/Brussels
+          - Use FALSE instead of false for 5.14 compatability
+
 0.002     2024-11-14 00:02:26+01:00 Europe/Brussels
           - Fix compilation issue on non-threaded perls
           - Declare interpreter pointers in a more backwards compatible way

@@ -1,2 +1,6 @@
+0.02 2025-07-08T14:54:54+02:00
+ - Add support for errors from IRI module.
+ - Update copyright years.
+
 0.01 2024-02-29T22:09:25+01:00
  - First version.

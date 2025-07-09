@@ -163,6 +163,8 @@ counterparts (e.g., stream_chacha20_ietf_xor_ic, stream_salsa2012_KEYBYTES).
 
 =item * xsalsa20
 
+=back
+
 =head1 SEE ALSO
 
 =over 4
@@ -189,6 +191,10 @@ For reporting bugs, giving feedback, submitting patches, etc. please use the
 following:
 
 =over 4
+
+=item *
+
+RT queue at L<https://rt.cpan.org/Dist/Display.html?Name=Crypt-Sodium-XS>
 
 =item *
 

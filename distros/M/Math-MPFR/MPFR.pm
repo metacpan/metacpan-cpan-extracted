@@ -120,9 +120,10 @@ Rmpfr_agm Rmpfr_ai
 Rmpfr_asin Rmpfr_asinh Rmpfr_asinpi Rmpfr_asinu
 Rmpfr_atan Rmpfr_atan2 Rmpfr_atan2pi Rmpfr_atan2u Rmpfr_atanh Rmpfr_atanpi Rmpfr_atanu
 Rmpfr_beta
-Rmpfr_buildopt_decimal_p Rmpfr_buildopt_float16_p Rmpfr_buildopt_float128_p
-Rmpfr_buildopt_gmpinternals_p Rmpfr_buildopt_sharedcache_p Rmpfr_buildopt_tls_p
-Rmpfr_buildopt_tune_case Rmpfr_can_round Rmpfr_cbrt Rmpfr_ceil Rmpfr_check_range
+Rmpfr_buildopt_bfloat16_p Rmpfr_buildopt_decimal_p Rmpfr_buildopt_float16_p
+Rmpfr_buildopt_float128_p Rmpfr_buildopt_gmpinternals_p Rmpfr_buildopt_sharedcache_p
+Rmpfr_buildopt_tls_p Rmpfr_buildopt_tune_case
+Rmpfr_can_round Rmpfr_cbrt Rmpfr_ceil Rmpfr_check_range
 Rmpfr_clear Rmpfr_clear_divby0 Rmpfr_clear_erangeflag Rmpfr_clear_flags Rmpfr_clear_inexflag
 Rmpfr_clear_nanflag Rmpfr_clear_overflow Rmpfr_clear_underflow Rmpfr_clears
 Rmpfr_cmp Rmpfr_cmp_IV Rmpfr_cmp_NV Rmpfr_cmp_d Rmpfr_cmp_f Rmpfr_cmp_float128 Rmpfr_cmp_ld
@@ -146,6 +147,7 @@ Rmpfr_floor
 Rmpfr_fma Rmpfr_fmma Rmpfr_fmms Rmpfr_fmod Rmpfr_fmod_ui Rmpfr_fmodquo Rmpfr_fms
 Rmpfr_fpif_export Rmpfr_fpif_import Rmpfr_fprintf Rmpfr_frac
 Rmpfr_free_cache Rmpfr_free_cache2 Rmpfr_free_pool Rmpfr_frexp Rmpfr_gamma Rmpfr_gamma_inc
+Rmpfr_get_bfloat16
 Rmpfr_get_DECIMAL128 Rmpfr_get_DECIMAL64 Rmpfr_get_FLOAT128 Rmpfr_get_IV Rmpfr_get_LD Rmpfr_get_NV
 Rmpfr_get_d Rmpfr_get_d1 Rmpfr_get_d_2exp Rmpfr_get_default_prec Rmpfr_get_default_rounding_mode
 Rmpfr_get_emax Rmpfr_get_emax_max Rmpfr_get_emax_min Rmpfr_get_emin Rmpfr_get_emin_max
@@ -179,6 +181,7 @@ Rmpfr_root Rmpfr_rootn_ui Rmpfr_round Rmpfr_round_nearest_away Rmpfr_roundeven
 Rmpfr_sec Rmpfr_sech Rmpfr_set Rmpfr_set_DECIMAL128 Rmpfr_set_DECIMAL64 Rmpfr_set_FLOAT128
 Rmpfr_set_IV Rmpfr_set_LD Rmpfr_set_NV Rmpfr_set_d Rmpfr_set_default_prec
 Rmpfr_set_default_rounding_mode Rmpfr_set_divby0 Rmpfr_set_emax Rmpfr_set_emin Rmpfr_set_erangeflag
+Rmpfr_set_bfloat16
 Rmpfr_set_exp Rmpfr_set_f Rmpfr_set_float128 Rmpfr_set_flt Rmpfr_set_float16 Rmpfr_set_inexflag Rmpfr_set_inf
 Rmpfr_set_ld Rmpfr_set_nan Rmpfr_set_nanflag Rmpfr_set_overflow Rmpfr_set_prec Rmpfr_set_prec_raw
 Rmpfr_set_q Rmpfr_set_si Rmpfr_set_si_2exp Rmpfr_set_sj Rmpfr_set_sj_2exp Rmpfr_set_str Rmpfr_set_ui
@@ -198,11 +201,12 @@ anytoa atodouble atonum atonv
 check_exact_decimal decimalize doubletoa dragon_test
 fr_cmp_q_rounded mpfr_max_orig_len mpfr_min_inter_prec mpfrtoa numtoa nvtoa nv2mpfr nvtoa_test
 prec_cast q_add_fr q_cmp_fr q_div_fr q_fmod_fr q_mul_fr q_sub_fr rndna
+unpack_bfloat16 unpack_float16 unpack_float32
 );
 
     @Math::MPFR::EXPORT_OK = (@tags, 'bytes');
 
-    our $VERSION = '4.39';
+    our $VERSION = '4.41';
     #$VERSION = eval $VERSION;
 
     Math::MPFR->DynaLoader::bootstrap($VERSION);
@@ -1793,6 +1797,81 @@ sub overload_fmod_eq {
     return _overload_fmod_eq(Math::MPFR->new($_[1]), $_[0], 0);
   }
   return _overload_fmod_eq(@_);
+}
+
+sub unpack_float32 {
+  my ($arg, $rnd) = (shift, shift);
+  my $itsa = _itsa($arg);
+  my $mpfr = Rmpfr_init2(24);
+
+  if($itsa == 1 || $itsa == 2) {   # IV/UV
+    Rmpfr_set_IV($mpfr, $arg, $rnd);
+  }
+  elsif($itsa == 3) {              # NV
+   Rmpfr_set_NV($mpfr, $arg, $rnd);
+  }
+  elsif($itsa == 4) {              # PV
+   my $base = 0;
+   $base = shift if @_;
+   Rmpfr_strtofr($mpfr, $arg, $base, $rnd);
+  }
+  elsif($itsa == 5) {              # Math::MPFR object
+    Rmpfr_set($mpfr, $arg, $rnd);
+  }
+  else { die "Invalid first argument given to unpack_float32()" }
+
+  my @ret = _unpack_float32($mpfr);
+  return join('', @ret);
+}
+
+sub unpack_float16 {
+  my ($arg, $rnd) = (shift, shift);
+  my $itsa = _itsa($arg);
+  my $mpfr = Rmpfr_init2(11);
+
+  if($itsa == 1 || $itsa == 2) {   # IV/UV
+    Rmpfr_set_IV($mpfr, $arg, $rnd);
+  }
+  elsif($itsa == 3) {              # NV
+   Rmpfr_set_NV($mpfr, $arg, $rnd);
+  }
+  elsif($itsa == 4) {              # PV
+   my $base = 0;
+   $base = shift if @_;
+   Rmpfr_strtofr($mpfr, $arg, $base, $rnd);
+  }
+  elsif($itsa == 5) {              # Math::MPFR object
+    Rmpfr_set($mpfr, $arg, $rnd);
+  }
+  else { die "Invalid first argument given to unpack_float16()" }
+
+  my @ret = _unpack_float16($mpfr);
+  return join('', @ret);
+}
+
+sub unpack_bfloat16 {
+  my ($arg, $rnd) = (shift, shift);
+  my $itsa = _itsa($arg);
+  my $mpfr = Rmpfr_init2(8);
+
+  if($itsa == 1 || $itsa == 2) {   # IV/UV
+    Rmpfr_set_IV($mpfr, $arg, $rnd);
+  }
+  elsif($itsa == 3) {              # NV
+   Rmpfr_set_NV($mpfr, $arg, $rnd);
+  }
+  elsif($itsa == 4) {              # PV
+   my $base = 0;
+   $base = shift if @_;
+   Rmpfr_strtofr($mpfr, $arg, $base, $rnd);
+  }
+  elsif($itsa == 5) {              # Math::MPFR object
+    Rmpfr_set($mpfr, $arg, $rnd);
+  }
+  else { die "Invalid first argument given to unpack_bfloat16()" }
+
+  my @ret = _unpack_bfloat16($mpfr);
+  return join('', @ret);
 }
 
 

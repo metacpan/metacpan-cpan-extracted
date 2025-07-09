@@ -18,6 +18,7 @@ name 'Mo-utils-IRI';
 perl_version 5.006002;
 readme_from 'IRI.pm';
 recursive_author_tests('xt');
+requires 'English' => 0;
 requires 'Error::Pure' => 0.15;
 requires 'Exporter' => 0;
 requires 'Readonly' => 0;
@@ -32,7 +33,7 @@ test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 test_requires 'Unicode::UTF8' => 0;
 tests_recursive;
-version '0.01';
+version '0.02';
 
 # Run.
 WriteAll();

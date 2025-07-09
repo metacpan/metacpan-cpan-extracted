@@ -1,5 +1,8 @@
 Revision history for RT-Extension-HelpDesk
 
+1.00 2025-07-08
+ - Update for RT 6.0
+
 0.03 2024-05-23
  - Update Support saved search columns, allowing inline edition of the
    Severity field and replacing CreatedRelative by DueRelative date

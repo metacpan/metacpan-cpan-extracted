@@ -21,13 +21,13 @@ name: ExtUtils-Typemaps-Magic
 provides:
   ExtUtils::Typemaps::Magic:
     file: lib/ExtUtils/Typemaps/Magic.pm
-    version: '0.008'
+    version: '0.009'
   ExtUtils::Typemaps::MagicBuf:
     file: lib/ExtUtils/Typemaps/MagicBuf.pm
-    version: '0.008'
+    version: '0.009'
   ExtUtils::Typemaps::MagicExt:
     file: lib/ExtUtils/Typemaps/MagicExt.pm
-    version: '0.008'
+    version: '0.009'
 requires:
   ExtUtils::ParseXS: '3.50'
   ExtUtils::Typemaps: '0'
@@ -38,7 +38,7 @@ requires:
 resources:
   bugtracker: https://github.com/Leont/extutils-typemaps-magic/issues
   repository: git://github.com/Leont/extutils-typemaps-magic.git
-version: '0.008'
-x_generated_by_perl: v5.40.0
+version: '0.009'
+x_generated_by_perl: v5.40.1
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

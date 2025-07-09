@@ -13,9 +13,9 @@
 1.08    Jul 3, 2025
 
         Vastly improved token handling, expanded symbols, and improved
-		documentation.
+        documentation.
 
-		New symbol list feature as well as search.
+        New symbol list feature as well as search.
 
 1.09    Jul 3, 2025
 
@@ -24,3 +24,19 @@
 1.10    Jul 5, 2025
 
         Improved color grid output for -c option
+
+1.11    Jul 5, 2025
+
+        Added option to module to abbreviate the symbols list.  This speeds
+        up initialization.  The abbreviated symbols are U2400 to U25FF
+
+1.12    Jul 8, 2025
+
+        Better control of the symbols table.  Shortening it speeds things up.
+		The executable has a new option to enable a full symbol table (if
+		needed).
+
+1.13    Jul 8, 2025
+
+        Added more symbols to the full version of the symbol table.  It's
+		HUGE.

@@ -1,0 +1,15 @@
+#include <stdio.h>
+#include <gmp.h>
+#include <mpfr.h>
+
+int main(void) {
+ int s;
+ s = (int)sizeof(__bf16);
+
+ if(s == 2) {
+   if(mpfr_buildopt_bfloat16_p()) s -= 4;
+ }
+ printf("%d", s);
+ return 0;
+}
+

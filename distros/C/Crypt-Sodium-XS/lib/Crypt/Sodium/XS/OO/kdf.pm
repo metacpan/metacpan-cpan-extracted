@@ -160,6 +160,10 @@ following:
 
 =item *
 
+RT queue at L<https://rt.cpan.org/Dist/Display.html?Name=Crypt-Sodium-XS>
+
+=item *
+
 IRC channel C<#sodium> on C<irc.perl.org>.
 
 =item *

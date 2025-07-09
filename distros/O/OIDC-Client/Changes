@@ -1,5 +1,8 @@
 Changes for OIDC-Client distribution
 
+0.10 2025-07-09
+  - Fix "base_url" parameter check for Minion workers
+
 0.09 2025-07-07
   - build_api_useragent() : $audience_alias parameter is now optional (current audience by default)
   - added build_user_from_claims() method

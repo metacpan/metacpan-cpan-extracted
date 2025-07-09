@@ -1,0 +1,89 @@
+NAME
+    CEFACT::Unit - CEFACT unit handling.
+
+SYNOPSIS
+     use CEFACT::Unit;
+
+     my $obj = CEFACT::Unit->new(%params);
+     my $bool = $obj->check_common_code($unit_common_code);
+
+METHODS
+  "new"
+     my $obj = CEFACT::Unit->new(%params);
+
+    Constructor.
+
+    *       "units"
+
+            List of units in Data::CEFACT::Unit instances.
+
+            Default value is [].
+
+    Returns instance of object.
+
+  "check_common_code"
+     my $bool = $obj->check_common_code($unit_common_code);
+
+    Check UN/CEFACT unit common code.
+
+    Returns bool (0/1).
+
+ERRORS
+     new():
+             From Class::Utils::set_params():
+                     Unknown parameter '%s'.
+             From Mo::utils::check_array_object():
+                     Parameter 'units' must be a array.
+                             Value: %s
+                             Reference: %s
+                     UN/CEFACT isn't 'Data::CEFACT::Unit' object.
+                             Value: %s
+                             Reference: %s
+
+EXAMPLE
+     use strict;
+     use warnings;
+
+     use CEFACT::Unit;
+
+     if (@ARGV < 1) {
+             print STDERR "Usage: $0 unit_common_code\n";
+             exit 1;
+     }
+     my $unit_common_code = $ARGV[0];
+
+     # Object.
+     my $obj = CEFACT::Unit->new;
+
+     # Check unit common code.
+     my $bool = $obj->check_common_code($unit_common_code);
+
+     # Print out.
+     print "Unit '$unit_common_code' is ".($bool ? 'valid' : 'invalid')."\n";
+
+     # Output for 'KGM':
+     # Unit 'KGM' is valid
+
+     # Output for 'XXX':
+     # Unit 'XXX' is invalid
+
+DEPENDENCIES
+    Class::Utils, Data::CEFACT::Unit, File::Share, IO::File, List::Util,
+    Text::CSV_XS.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/CEFACT-Unit>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2024-2025 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

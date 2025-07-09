@@ -1,0 +1,38 @@
+Crypt::Sodium::XS - perl XS bindings for libsodium
+
+NOTE: This distribution is new and should be considered experimental. Not
+recommended for "production" use. The API is subject to change, though every
+effort will be made not to introduce breaking changes without very good reason.
+There are likely bugs and undesirable behaviors yet to be discovered.
+
+INSTALLATION
+
+perl Makefile.PL
+make install
+
+The default method of installation will attempt to detect a recent enough
+version of libsodium headers on your system or fall back to a bundled version
+of libsodium. You should prefer to install libsodium via your operating
+system's package manager (be sure to install the "development" package) before
+building this dist. If you instead fall back to the bundled libsodium, keep in
+mind that it cannot be kept up to date without updating this perl package. The
+bundled libsodium is distributed in its original form along with its OpenPGP
+signature file. You are encouraged to manually check its signature.
+
+You may prevent the automatic libsodium detection (forcing the use of the
+bundled version) by setting the environment variable SODIUM_BUNDLED to any
+true (perl's perspective) value.
+
+  SODIUM_BUNDLED=1 cpanm Crypt::Sodium::XS
+
+If you prefer to use libsodium from a non-standard location or with special
+linker options, you may set the C<SODIUM_INC> and/or C<SODIUM_LIBS> environment
+variables. This will override the detection of libsodium and explicitly use the
+given arguments. You should ensure the version of libsodium you intend to use
+is the same as the bundled lib or higher. Older versions *may* work, but no
+promises. For example, with libsodium installed in /opt/sodium you may want
+something like:
+
+  SODIUM_INC="-I/opt/sodium/include" \
+  SODIUM_LIBS="-L/opt/sodium/lib -Wl,-rpath -Wl,/opt/sodium/lib" \
+  cpanm Crypt::Sodium::XS

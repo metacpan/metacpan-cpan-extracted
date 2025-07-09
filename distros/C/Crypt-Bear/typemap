@@ -7,26 +7,26 @@ br_error_type	T_MAP_INT_TYPE
 usage_type	T_MAP_INT_TYPE
 hash_oid_type	T_MAP_POINTER_TYPE
 key_kind_type	T_MAP_INT_TYPE
-Crypt::Bear::Hash	T_OPAQUEOBJ
+Crypt::Bear::Hash	T_MAGICBUF
 Crypt::Bear::HMAC::Key	T_OPAQUEOBJ
-Crypt::Bear::HMAC	T_OPAQUEOBJ
-Crypt::Bear::PRNG	T_OPAQUEOBJ
-Crypt::Bear::HMAC::DRBG	T_OPAQUEOBJ
-Crypt::Bear::HKDF	T_OPAQUEOBJ
-Crypt::Bear::Shake	T_OPAQUEOBJ
-Crypt::Bear::AES_CTR::DRBG	T_OPAQUEOBJ
-Crypt::Bear::CBC::Enc	T_OPAQUEOBJ
-Crypt::Bear::CBC::Dec	T_OPAQUEOBJ
-Crypt::Bear::CTR	T_OPAQUEOBJ
-Crypt::Bear::CTRCBC	T_OPAQUEOBJ
-Crypt::Bear::AES_CBC::Enc	T_OPAQUEOBJ
-Crypt::Bear::AES_CBC::Dec	T_OPAQUEOBJ
-Crypt::Bear::AES_CTR	T_OPAQUEOBJ
-Crypt::Bear::AES_CTRCBC	T_OPAQUEOBJ
-Crypt::Bear::AEAD	T_OPAQUEOBJ
-Crypt::Bear::GCM	T_OPAQUEOBJ
-Crypt::Bear::EAX	T_OPAQUEOBJ
-Crypt::Bear::CCM	T_OPAQUEOBJ
+Crypt::Bear::HMAC	T_MAGICBUF
+Crypt::Bear::PRNG	T_MAGICBUF
+Crypt::Bear::HMAC::DRBG	T_MAGICBUF
+Crypt::Bear::HKDF	T_MAGICBUF
+Crypt::Bear::Shake	T_MAGICBUF
+Crypt::Bear::AES_CTR::DRBG	T_MAGICBUF
+Crypt::Bear::CBC::Enc	T_MAGICBUF
+Crypt::Bear::CBC::Dec	T_MAGICBUF
+Crypt::Bear::CTR	T_MAGICBUF
+Crypt::Bear::CTRCBC	T_MAGICBUF
+Crypt::Bear::AES_CBC::Enc	T_MAGICBUF
+Crypt::Bear::AES_CBC::Dec	T_MAGICBUF
+Crypt::Bear::AES_CTR	T_MAGICBUF
+Crypt::Bear::AES_CTRCBC	T_MAGICBUF
+Crypt::Bear::AEAD	T_MAGICBUF
+Crypt::Bear::GCM	T_MAGICBUF
+Crypt::Bear::EAX	T_MAGICBUF
+Crypt::Bear::CCM	T_MAGICBUF
 Crypt::Bear::RSA::PublicKey	T_MAGICEXT
 Crypt::Bear::RSA::PrivateKey	T_MAGICEXT
 Crypt::Bear::EC::PublicKey	T_MAGICEXT
@@ -50,48 +50,75 @@ T_MAP_POINTER_TYPE
 	$var = (map_get(${\ (qq[$ntype] =~ s/_type$/s/r) }, $arg, \"${\ (qq[$ntype] =~ s/_type$//r) }\").pointer)
 T_MAP_INT_TYPE
 	$var = (map_get(${\ (qq[$ntype] =~ s/_type$/s/r) }, $arg, \"${\ (qq[$ntype] =~ s/_type$//r) }\").integer)
-T_MAGICEXT_BASE
-	{
-	MAGIC* magic = SvROK($arg) && SvMAGICAL(SvRV($arg)) ? mg_find(SvRV($arg), PERL_MAGIC_ext) : NULL;
-	if (magic && magic->mg_virtual)
-		$var = ($type)magic->mg_ptr;
-	else
-		Perl_croak(aTHX_ \"$ntype object is lacking magic\");
-	}
 T_MAGIC
 	{
-	%:ifdef mg_findext
-	MAGIC* magic = SvROK($arg) && SvMAGICAL(SvRV($arg)) ? mg_findext(SvRV($arg), PERL_MAGIC_ext, NULL) : NULL;
-	%:else
-	MAGIC* magic = SvROK($arg) && SvMAGICAL(SvRV($arg)) ? mg_find(SvRV($arg), PERL_MAGIC_ext) : NULL;
-	%:endif
+	SV* arg = $arg;
+	MAGIC* magic = SvROK(arg) && SvRMAGICAL(SvRV(arg)) ? mg_findext(SvRV(arg), PERL_MAGIC_ext, NULL) : NULL;
 	if (magic)
 		$var = ($type)magic->mg_ptr;
 	else
-		Perl_croak(aTHX_ \"$ntype object is lacking magic\");
+		Perl_croak(aTHX_ \"%s object is lacking magic\", \"$ntype\");
+	}
+
+T_MAGICBUF
+	{
+	SV* arg = $arg;
+	MAGIC* magic = SvROK(arg) && SvRMAGICAL(SvRV(arg)) ? mg_findext(SvRV(arg), PERL_MAGIC_ext, NULL) : NULL;
+	if (magic)
+		$var = ($type)magic->mg_ptr;
+	else
+		Perl_croak(aTHX_ \"%s object is lacking magic\", \"$ntype\");
 	}
 
 T_MAGICEXT
 	{
-	%:ifdef mg_findext
-	MAGIC* magic = SvROK($arg) && SvMAGICAL(SvRV($arg)) ? mg_findext(SvRV($arg), PERL_MAGIC_ext, &${type}_magic) : NULL;
-	%:else
-	MAGIC* magic = SvROK($arg) && SvMAGICAL(SvRV($arg)) ? mg_find(SvRV($arg), PERL_MAGIC_ext) : NULL;
-	%:endif
+	SV* arg = $arg;
+	MAGIC* magic = SvROK(arg) && SvMAGICAL(SvRV(arg)) ? mg_findext(SvRV(arg), PERL_MAGIC_ext, &${type}_magic) : NULL;
 	if (magic)
 		$var = ($type)magic->mg_ptr;
 	else
-		Perl_croak(aTHX_ \"$ntype object is lacking magic\");
+		Perl_croak(aTHX_ \"%s object is lacking magic\", \"$ntype\");
+	}
+
+T_MAGICEXT_BASE
+	{
+	SV* arg = $arg;
+	MAGIC* magic = SvROK(arg) && SvMAGICAL(SvRV(arg)) ? mg_find(SvRV(arg), PERL_MAGIC_ext) : NULL;
+	if (magic && magic->mg_virtual)
+		$var = ($type)magic->mg_ptr;
+	else
+		Perl_croak(aTHX_ \"%s object is lacking magic\", \"$ntype\");
 	}
 
 T_OPAQUEOBJ
     {
 		SV * sv = $arg;
-		if (SvROK(sv) && sv_derived_from(sv, \"$ntype\"))
+		if (SvROK(sv) && SvPOK(SvRV(sv)) && SvCUR(SvRV(sv)) == sizeof(*$var))
 			$var = ($type)SvPV_nolen(SvRV(sv));
 		else
 			croak(\"%s: %s is not of type %s\", ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]}, \"$var\", \"$ntype\");
     }
+
+T_OPAQUEOBJ_BASE
+    {
+		SV * sv = $arg;
+		if (SvROK(sv) && SvPOK(SvRV(sv)) && sv_derived_from(sv, \"$ntype\"))
+			$var = ($type)SvPV_nolen(SvRV(sv));
+		else
+			croak(\"%s: %s is not of type %s\", ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]}, \"$var\", \"$ntype\");
+    }
+
+T_OPAQUEOBJ_MAYBE
+	{
+		SV * sv = $arg;
+		if (SvOK(sv)) {
+			if (SvROK(sv) && SvPOK(SvRV(sv)) && SvCUR(SvRV(sv)) == sizeof(*$var))
+				$var = ($type)SvPV_nolen(SvRV(sv));
+			else
+				croak(\"%s: %s is not of type %s\", ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]}, \"$var\", \"$ntype\");
+		} else
+			$var = NULL;
+	}
 
 
 OUTPUT
@@ -108,7 +135,13 @@ T_MAP_INT_TYPE
 		$arg = entry ? newSVpvn(entry->key, entry->length) : newSV(0);
 	} STMT_END;
 T_MAGIC
-	sv_magic(newSVrv($arg, "$ntype"), NULL, PERL_MAGIC_ext, (const char*)$var, 0);
+	sv_magicext(newSVrv($arg, "$ntype"), NULL, PERL_MAGIC_ext, NULL, (const char*)$var, 0);
+T_MAGICBUF
+	{
+	MAGIC* magic = sv_magicext(newSVrv($arg, "$ntype"), NULL, PERL_MAGIC_ext, NULL, (const char*)$var, 0);
+	magic->mg_len = sizeof(*$var);
+	}
+
 T_MAGICEXT
 	{
 	MAGIC* magic = sv_magicext(newSVrv($arg, "$ntype"), NULL, PERL_MAGIC_ext, &${type}_magic, (const char*)$var, 0);
@@ -117,7 +150,13 @@ T_MAGICEXT
 
 T_OPAQUEOBJ
 	{
-		sv_setref_pvn($arg, \"$ntype\", (const char*)$var, sizeof(*$var));
+		sv_usepvn(newSVrv($arg, \"$ntype\"), (char*)$var, sizeof(*$var));
+		SvREADONLY_on(SvRV($arg));
+	}
+
+T_OPAQUEOBJ_MAYBE
+	if (SvOK($var)) {
+		sv_usepvn(newSVrv($arg, \"$ntype\"), (char*)$var, sizeof(*$var));
 		SvREADONLY_on(SvRV($arg));
 	}
 

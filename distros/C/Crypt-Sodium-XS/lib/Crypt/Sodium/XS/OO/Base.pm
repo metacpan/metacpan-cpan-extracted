@@ -36,7 +36,7 @@ sub primitive {
 }
 
 # should not be called, to be implemented by subclass
-sub primitives { ... }
+sub primitives { die "BUG: primitives() method not override" }
 
 sub has_primitive { !!grep { $_ eq $_[1] } $_[0]->primitives }
 

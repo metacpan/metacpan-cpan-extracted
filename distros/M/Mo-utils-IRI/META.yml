@@ -27,6 +27,7 @@ no_index:
     - t
     - xt
 requires:
+  English: 0
   Error::Pure: 0.15
   Exporter: 0
   IRI: 0
@@ -37,4 +38,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Mo-utils-IRI
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Mo-utils-IRI
-version: '0.01'
+version: '0.02'

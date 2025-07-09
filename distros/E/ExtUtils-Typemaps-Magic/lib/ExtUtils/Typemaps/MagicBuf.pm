@@ -1,5 +1,5 @@
 package ExtUtils::Typemaps::MagicBuf;
-$ExtUtils::Typemaps::MagicBuf::VERSION = '0.008';
+$ExtUtils::Typemaps::MagicBuf::VERSION = '0.009';
 use strict;
 use warnings;
 
@@ -11,11 +11,12 @@ sub new {
 
 	$self->add_inputmap(xstype => 'T_MAGICBUF', code =>  <<'END');
 	{
-	MAGIC* magic = SvROK($arg) && SvMAGICAL(SvRV($arg)) ? mg_findext(SvRV($arg), PERL_MAGIC_ext, NULL) : NULL;
+	SV* arg = $arg;
+	MAGIC* magic = SvROK(arg) && SvRMAGICAL(SvRV(arg)) ? mg_findext(SvRV(arg), PERL_MAGIC_ext, NULL) : NULL;
 	if (magic)
 		$var = ($type)magic->mg_ptr;
 	else
-		Perl_croak(aTHX_ \"$ntype object is lacking magic\");
+		Perl_croak(aTHX_ \"%s object is lacking magic\", \"$ntype\");
 	}
 END
 
@@ -45,7 +46,7 @@ ExtUtils::Typemaps::MagicBuf - Typemap for storing objects in magic buffer
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 

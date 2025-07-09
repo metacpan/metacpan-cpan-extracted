@@ -1,0 +1,48 @@
+%grammar query-tags
+%version 0.0.1
+%include pegex-atoms
+
+query:
+  - (pair | string | regex | bareword)+ % ./-/ -
+
+pair:
+  - /':'/ key quoted-value?
+
+key:
+  /( [a-zA-Z._-][a-zA-Z0-9._-]* )/
+
+value:
+  quoted-value | bareword
+
+bareword:
+  /( (: WORD | DIGIT | [ '-' '.' '_' ] )+ )/
+
+quoted-value:
+  | string
+  | regex
+  | junction
+
+string: /
+  SINGLE ( (:
+    | BACK (:  # Backslash escape
+      | [ SINGLE BACK SLASH 'b' 'f' 'n' 'r' 't' ]
+      | 'u' HEX{4}
+      )
+    | [^ SINGLE CONTROLS BACK ]
+  )* )
+  SINGLE
+/
+
+regex: /
+  SLASH ( (:
+    | BACK SLASH
+    | [^ SLASH ]
+  )+ )
+  SLASH
+/
+
+list:
+  .LANGLE value+ % ./-/ .RANGLE
+
+junction:
+  /([ '~' ]?)/ /([ '!' '|' '&' ])/ list

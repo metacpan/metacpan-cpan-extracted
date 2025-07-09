@@ -201,13 +201,13 @@ If omitted, a key pair is randomly generated.
 
 Counterpart to sign_detached.
 
-=item sk_to_pk
+=head2 sk_to_pk
 
   my $public_key = $sign->sk_to_pk($secret_key);
 
 Returns the public key from the secret key.
 
-=item sk_to_seed
+=head2 sk_to_seed
 
   my $seed = $sign->sk_to_seed($secret_key);
 
@@ -307,6 +307,10 @@ For reporting bugs, giving feedback, submitting patches, etc. please use the
 following:
 
 =over 4
+
+=item *
+
+RT queue at L<https://rt.cpan.org/Dist/Display.html?Name=Crypt-Sodium-XS>
 
 =item *
 

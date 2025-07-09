@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package RT::Extension::HelpDesk;
 
-our $VERSION = '0.03';
+our $VERSION = '1.00';
 
 =head1 NAME
 
@@ -10,7 +10,7 @@ RT-Extension-HelpDesk - Default Help desk configuration for Request Tracker
 
 =head1 RT VERSION
 
-Works with RT 5.
+Works with RT 6.0.0 and newer. Install the latest 0.* version for older RTs.
 
 =head1 INSTALLATION
 
@@ -24,7 +24,7 @@ Works with RT 5.
 
 May need root permissions
 
-=item Edit your F</opt/rt5/etc/RT_SiteConfig.pm>
+=item Edit your F</opt/rt6/etc/RT_SiteConfig.pm>
 
 Add this line:
 
@@ -44,7 +44,7 @@ in case changes need to be made to your database.
 
 =item Clear your mason cache
 
-    rm -rf /opt/rt5/var/mason_data/obj
+    rm -rf /opt/rt6/var/mason_data/obj
 
 =item Restart your webserver
 
@@ -239,7 +239,7 @@ href="http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-HelpDesk">rt
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2021 by Best Practical LLC
+This software is Copyright (c) 2021-2025 by Best Practical LLC
 
 This is free software, licensed under:
 
