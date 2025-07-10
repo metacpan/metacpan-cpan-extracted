@@ -6,6 +6,14 @@ use File::Temp;
 
 use Crypt::Sodium::XS::Util 'sodium_random_bytes';
 use Crypt::Sodium::XS::secretbox qw/secretbox_KEYBYTES secretbox_keygen/;
+use FindBin '$Bin';
+use lib "$Bin/lib";
+use Test::MemVault;
+
+unless (mlock_seems_available()) {
+  diag(mlock_warning());
+  disable_mlock();
+}
 
 # for older perl with older MIME::Base64:
 sub encode_base64url { (my $str = encode_base64($_[0], '')) =~ tr,+/=,-_,d; $str }
@@ -122,7 +130,7 @@ for my $mv_data (@mv_datas) {
   is($mv_aaa->to_hex->unlock, unpack("H*", $mv_data . "aaa"),
      "concat MV . MV both locked, correct result");
 
-  $mv_aaa = $mv . Crypt::Sodium::XS::MemVault->new("aaa", 0);
+  $mv_aaa = $mv . Crypt::Sodium::XS::MemVault->new("aaa");
   isa_ok($mv_aaa, "Crypt::Sodium::XS::MemVault");
   ok($mv_aaa->is_locked, "concat MV . MV one locked, result locked");
   is($mv_aaa->to_hex->unlock, unpack("H*", $mv_data . "aaa"),

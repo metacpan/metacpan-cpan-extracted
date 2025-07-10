@@ -1,7 +1,7 @@
 use v5.14;
 package Getopt::EX::i18n;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 use warnings;
 use Data::Dumper;
@@ -78,7 +78,8 @@ available on macOS 10.15 (Catalina).
     zh_TW    Chinese / Taiwan, Province of China
 
 As for Japanese locale C<ja_JP>, following options are defined by
-default, and set C<LANG> environment as C<ja_JP>.
+default, and set C<LANG> environment as C<ja_JP>.  Environment
+variable name can be changed by B<env> option.
 
     LOCALE:     --ja_JP  (raw)
                 --ja-JP  (dash)
@@ -154,6 +155,10 @@ new option B<-l> to show available option list:
 
 Specify prefix string.  Default is C<-->.
 
+=item B<env>=I<string>
+
+Specify environment variable name to be set.  Default is C<LANG>.
+
 =back
 
 =head1 BUGS
@@ -195,6 +200,7 @@ Kazumasa Utashiro
 =cut
 
 my %opt = (
+    env          => 'LANG',
     raw          => 1,
     dash         => 1,
     long         => 1,
@@ -223,7 +229,8 @@ my %lang;
 my %cc;
 my %opthash;
 
-package Local::LocaleObj {
+package #
+Local::LocaleObj {
     sub new {
 	my($class, %hash) = @_;
 	bless \%hash, $class;
@@ -293,7 +300,7 @@ sub options {
 	my $option = $opt{prefix} . $opt;
 	my $name = $obj->name;
 	my $locale = $locale{$name};
-	my $call = "&setenv(LANG=$locale)";
+	my $call = "&setenv($opt{env}=$locale)";
 	$module->setopt($option, $call) if $arg{set};
 	if ($arg{show}) {
 	    printf "option %-*s %s # %s / %s\n",

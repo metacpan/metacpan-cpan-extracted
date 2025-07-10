@@ -1,13 +1,11 @@
 package BibTeX::Parser::Author;
 {
-  $BibTeX::Parser::Author::VERSION = '1.04';
+  $BibTeX::Parser::Author::VERSION = '1.92';
 }
 
 use warnings;
 use strict;
-
-use BibTeX::Parser;
-
+use BibTeX::Parser qw (_split_braced_string);
 
 use overload
 	'""' => \&to_string;
@@ -58,7 +56,8 @@ sub jr {
 # Take a string and create an array [first, von, last, jr]
 sub split {
     my ($self_or_class, $name) = @_;
-    
+    #warn " starting split for $name\n";
+
     # remove whitespace at start and end of string
     $name =~ s/^\s*(.*)\s*$/$1/s;
 
@@ -71,6 +70,7 @@ sub split {
     my @comma_separated = 
 	BibTeX::Parser::_split_braced_string($name, 
 					     '\s*,\s*');
+    #warn "  got ccs (", 0+@comma_separated, "): @comma_separated\n";
     if (scalar(@comma_separated) == 0) {
 	# Error?
 	return (undef, undef, undef, undef);
@@ -89,6 +89,7 @@ sub split {
 	    return (undef, undef, undef, undef);
 	}
 	my ($start_von, $start_last) = _getStartVonLast (@tokens);
+        #warn "  got start_von=$start_von, start_last=$start_last for tokens @tokens\n";
 	if ($start_von >0) {
 	    $first = join(' ', splice(@tokens,0,$start_von));
 	}
@@ -289,8 +290,22 @@ sub to_string {
 # Return 1 if the first letter on brace level 0 is lowercase
 sub _is_von_token {
     my $string = shift;
-    while ($string =~ 
-	   s/^(\\[[:alpha:]]+\{|\{|\\[[:^alpha:]]?|[[:^alpha:]])//) {
+    #warn " checking von: $string\n";
+
+    # The while loop removes all non-alpha characters from the front of
+    # the string. But our input might use an entity for a character,
+    # say &#x0160;imon for \v{S}imon. If we go through the loop, we will
+    # wrongly consider the "x" of "&#x" to be the first character, and
+    # since that is lowercase, it will become a von part.
+    # 
+    # As a kludge, we simply avoid the loop if the first character is "&",
+    # assuming it is an uppercase letter (TUGboat 46:1,
+    # tb142konecny-opbible). If a von part truly does ever start with an
+    # accented lowercase letter, this will fail.
+    #
+    if ($string !~ /^&/) {
+      while ($string =~ 
+	     s/^(\\[[:alpha:]]+\{|\{|\\[[:^alpha:]]?|[[:^alpha:]])//) {
 	if ($1 eq '{' ) {
 	    my $numbraces=1;
 	    while ($numbraces !=0 && length($string)) {
@@ -303,11 +318,16 @@ sub _is_von_token {
 		$string = substr($string,1);
 	    }
 	}
+      }
     }
 
     if (length $string ) {
 	my $symbol = substr($string, 0, 1);
-	if (lc($symbol) eq $symbol) {
+	# We have to check against uc($symbol) not being the same,
+	# rather than lc($symbol) being the same, because for a
+	# non-alpha like "&", lc will indeed be the same.
+	#warn "   von symbol: $symbol, vs. ", uc($symbol), "\n";
+	if (uc($symbol) ne $symbol) {
 	    return 1;
 	} else {
 	    return 0;
@@ -329,7 +349,7 @@ BibTeX::Author - Contains a single author for a BibTeX document.
 
 =head1 SYNOPSIS
 
-This class ist a wrapper for a single BibTeX author. It is usually created
+This class is a wrapper for a single BibTeX author. It is usually created
 by a BibTeX::Parser.
 
     use BibTeX::Parser::Author;
@@ -344,8 +364,6 @@ by a BibTeX::Parser.
     # or ...
     
     my ($first, $von, $last, $jr) = BibTeX::Author->split($fullname);
-
-
 
 =head1 FUNCTIONS
 
@@ -376,7 +394,7 @@ with four strings, some of them possibly empty.
 
 =head2 to_string
 
-Return string representation of the name.
+Return string representation of the name, as described next.
 
 =head1 NOTES
 
@@ -398,7 +416,7 @@ von Last, Jr, First
 
 =back
 
-The module always converts the first form to the second of third one
+The module always converts the first form to the second or third one
 to allow simple string comparisons.  
 
 The algorithm to determine the von part is the following: von part
@@ -409,8 +427,7 @@ the following token is not: C<{von}>
 
 =head1 VERSION
 
-version 1.04
-
+version 1.92
 
 =head1 AUTHOR
 
@@ -420,10 +437,9 @@ Karl Berry <karl@freefriends.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013--2023 by Gerhard Gossen and Boris Veytsman and Karl Berry.
+Copyright 2013-2025 Gerhard Gossen, Boris Veytsman, Karl Berry
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

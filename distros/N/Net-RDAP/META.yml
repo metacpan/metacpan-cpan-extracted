@@ -45,5 +45,5 @@ requires:
 resources:
   bugtracker: https://github.com/gbxyz/perl-Net-RDAP/issues
   repository: https://github.com/gbxyz/perl-Net-RDAP.git
-version: '0.38'
+version: '0.40'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -44,7 +44,7 @@ EOF
         );
     };
 
-    # No point continuing if the uplaods are blocked
+    # No point continuing if the uploads are blocked
     skip $trap->die->message if $trap->die->message =~ m/Upload blocked/;
 
     diag "RETURN: ", $trap->die;

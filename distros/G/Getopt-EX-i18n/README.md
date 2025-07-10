@@ -1,3 +1,4 @@
+[![Actions Status](https://github.com/kaz-utashiro/Getopt-EX-i18n/workflows/test/badge.svg)](https://github.com/kaz-utashiro/Getopt-EX-i18n/actions) [![MetaCPAN Release](https://badge.fury.io/pl/Getopt-EX-i18n.svg)](https://metacpan.org/release/Getopt-EX-i18n)
 # NAME
 
 Getopt::EX::i18n - General i18n module
@@ -68,7 +69,8 @@ available on macOS 10.15 (Catalina).
     zh_TW    Chinese / Taiwan, Province of China
 
 As for Japanese locale `ja_JP`, following options are defined by
-default, and set `LANG` environment as `ja_JP`.
+default, and set `LANG` environment as `ja_JP`.  Environment
+variable name can be changed by **env** option.
 
     LOCALE:     --ja_JP  (raw)
                 --ja-JP  (dash)
@@ -135,6 +137,10 @@ module declaration.
 - **prefix**=_string_
 
     Specify prefix string.  Default is `--`.
+
+- **env**=_string_
+
+    Specify environment variable name to be set.  Default is `LANG`.
 
 # BUGS
 

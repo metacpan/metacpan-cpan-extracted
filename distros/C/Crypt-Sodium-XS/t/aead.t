@@ -4,6 +4,14 @@ use Test::More;
 
 use Crypt::Sodium::XS::Util "sodium_increment";
 use Crypt::Sodium::XS::OO::aead;
+use FindBin '$Bin';
+use lib "$Bin/lib";
+use Test::MemVault;
+
+unless (mlock_seems_available()) {
+  diag(mlock_warning());
+  disable_mlock();
+}
 
 my $msg = "Delivered by Mr. Postman";
 my @adatas = (

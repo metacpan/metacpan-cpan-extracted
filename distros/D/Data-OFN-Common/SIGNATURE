@@ -1,0 +1,73 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 bec9f9358ba20fbd204c69560a0faee2524c205b782d36f44a9cbd3bfdd197b6 CONCEPT
+SHA256 ab8ddb0d49b8e12e06de87fdc4a11806d74bdada32d9c5b28e1b7f6fd52d6baa Changes
+SHA256 2a74d3dbb50dee6fc47fd71860ad1a259df5844389ff6b1525aab85759e5382a Common.pm
+SHA256 59756a93a0d8a2e628c4b69cbc160073c12d72a084d53554b0377f376c46df2b Common/Quantity.pm
+SHA256 db337b66e6f923bb4adda71adc5dd24e45045980eb7c49de74c91d9331be1089 Common/TimeMoment.pm
+SHA256 50cc0acdbd0c823530f3aced1dd2931d1b4adaf88e286da1cbf4ec8f01c0b1dc LICENSE
+SHA256 92f07f86230800ddc6a35f0479320564107abd193881204e6a8aebf5e933fbc3 MANIFEST
+SHA256 c8a3dcf5c4cb99766c7b2c318118a61b6bea7e8a672f2170cbce8dc99f8ca25b META.yml
+SHA256 3acb63a791f518c92565337809ea6c151effa1bd7a76d310fa4d14fa6174650d Makefile.PL
+SHA256 1db2aaffd14456b087ebaeb505542c4f2aa536ffb03208244084968bda054311 README
+SHA256 d085637bef07a2b348d07869028539761671c2e86803ca7eb506899c707b4973 examples/quantity_kilogram.pl
+SHA256 94988c53f041ce1224caec055dec0873bddd3da45349ce3bfc13b37f53fee05f examples/time_moment_date.pl
+SHA256 48b1cb96bea8f1c55d6155270615b31ccb6d4ad0c661ccab7e1af30a1f8d418b examples/time_moment_date_and_time.pl
+SHA256 cd5397bbe618f5bbd4e12a33b0cf5d21114e771c2dbd0ce28e2135beb52c35a8 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 798836f9ccb8d204b1be31fc3835631f57e9d818b21a8f0d14bfcfb82ff4a72a inc/Module/Install/Base.pm
+SHA256 d64cd4c16f83c5baf11f64a44bea3a0abc060a49da5aba040f0eb01394bf75ab inc/Module/Install/Can.pm
+SHA256 65d7a6098bf3f829e8c1c2865476d3537aa6f0ad0ffc9149e10812c856529043 inc/Module/Install/Fetch.pm
+SHA256 70c4b77acab3ff51dfb318110369607cb109e1c319459249623b787cf3859750 inc/Module/Install/Makefile.pm
+SHA256 14556386168007ce913e669fc08a332ccdb6140246fd55a90c879b5190c1b57a inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 4c746c02c5cc19bed4c352e76205b4adff4c45ce8310d71294e1b83c059659c2 inc/Module/Install/Win32.pm
+SHA256 d3d9b4583243c470ae895defa4c44564485b53693cba1c50ab0320768f443e97 inc/Module/Install/WriteAll.pm
+SHA256 7aa06058c6de5f5ea7df0a94e45a7d7969b225ea3b1fe784911a1ae4d9442946 t/Data-OFN-Common-Quantity/01-use.t
+SHA256 4ebb1fd86dba23cecb561e3d27cf0ae0a58cc4d3084bdac39eddf86f72d562b3 t/Data-OFN-Common-Quantity/02-version.t
+SHA256 823c7d868367196e29aad37424cf2269056d8b72251ab9584e0fc0490e976062 t/Data-OFN-Common-Quantity/03-new.t
+SHA256 6cf2c33545909d8aab71db1e6a9082613ed9fe0a08e21b67936220fafc651bb9 t/Data-OFN-Common-Quantity/04-unit.t
+SHA256 45a7063abfc790b376e3602d57b5d8c5a0dde2997d5fb861a08854a09f58b1f6 t/Data-OFN-Common-Quantity/05-value.t
+SHA256 394bc6397855fcabf8f8227b7bd5ec51eab8b8e01efdd3e9e412b04a6c86de62 t/Data-OFN-Common-TimeMoment/01-use.t
+SHA256 38ec998dde3c4e9b8a89a77cb401378be4ca87ffa3103f407ce6b3451a30fe1e t/Data-OFN-Common-TimeMoment/02-version.t
+SHA256 398f69c14d1d70ee65314c7f89c9d5bbbdaa3ed6099f50a9844567214fc570b7 t/Data-OFN-Common-TimeMoment/03-new.t
+SHA256 7310b099db0c6d44c54047c857eb4bfc4b5a674d8d6bffc13729a6354d5e2979 t/Data-OFN-Common-TimeMoment/04-date.t
+SHA256 3ff8e5dbbc5e35f44dc319eb7aceb97113d1fbd5b8486e21492ec9629fd4eff5 t/Data-OFN-Common-TimeMoment/05-date_and_time.t
+SHA256 2f2dcf46a468213a29aaaa9385ee812a40afc445c0f8b05e2e962a8ac7e75eaf t/Data-OFN-Common-TimeMoment/06-flag_unspecified.t
+SHA256 053fd720bb260dff1ec879d54c2857a1c7f8e3450ecda5b1754b9aecc3f0e2d0 t/Data-OFN-Common/01-use.t
+SHA256 5cd3ef03d2fc4d0f391171036c4a3ecf0eaddfdfba5b6d32ff475f6d99572ed1 t/Data-OFN-Common/02-version.t
+SHA256 0601229f25ce3c190dc481d9b92c34433e01891a44c9151fa16b2bd87ad8f9de xt/Data-OFN-Common-Quantity/01-pod_coverage.t
+SHA256 5f61a2b292f9e0093730bc153374af656c61c453d1225fece624f5db931dba45 xt/Data-OFN-Common-Quantity/02-pod.t
+SHA256 0c2d22bf0330a224bf4cb4397dbe5c4cfb3ce4b2f03bf45c9f59acf16f22520e xt/Data-OFN-Common-TimeMoment/01-pod_coverage.t
+SHA256 8df81f442c4e37f745c90329c4aa039fdf58ae0c2d0dd16bf4972a1941c2c97d xt/Data-OFN-Common-TimeMoment/02-pod.t
+SHA256 694cf614602993a425f2a4f9d041e4b9946bbefa5674807d54743fa45b897893 xt/Data-OFN-Common/01-pod_coverage.t
+SHA256 c0a3afb9c32c5c08b1b62ce73e009bcdeb0a524905b461e6c44fe4db3818eb83 xt/Data-OFN-Common/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAEBAwAdFiEE7CqvgROezncwcOKionze/HtIOPAFAmhvY+IACgkQonze/HtI
+OPARmQv+KxZyASEzZYq1MtPrS53F5Yxay1gU2ZL7Xvg1/nI6rYju4jDNRbOEt1xt
+BFwOI1rWdr1YmzlbwGpihdBkGewWNteqQUJGYo+3KrLYTiMtjW1CgC3qxdCHZGYw
+UxmTRn8ANjcLHMBdYOG1d/7SMXsbBv1I4SmapK9O76PK1QCpIJqUpgKSWXM3YN1o
+YEzPp+seNGSo3fDB4R1HQ8LUGR+cllT1p4SGJ2UDe5xe+3Ktb65mHV/Qxf5G8sJ1
+Pq5tTSR3und5Ha09ABH2ZCI9uAweqqY8+PD9SYfvASfmP4HjVibbt45kIlGBMsZ5
+kYYBxor4At+tTfYwUgFOw+KmbLmk3pSAECvwzEOhFhmAfPHJB+jzJhQXtOAfilML
+qWxDO/K+TnLERWFlxF/JBoM3ZFZ8w05Ni0R4+ri6aOwqhfrmiYv/MHyDUMyFQwWp
+AvMahHjE706qXKkaB+RwEYf+dMkUWBnBhswrbJs5T3FjjptWyf+2zSZtz9Kan/UF
+gv/M3uL3
+=wCpv
+-----END PGP SIGNATURE-----

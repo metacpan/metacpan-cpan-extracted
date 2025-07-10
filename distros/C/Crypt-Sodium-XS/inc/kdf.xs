@@ -42,7 +42,7 @@ SV * kdf_derive( \
   STRLEN new_key_req_min;
   STRLEN new_key_req_max;
   unsigned int new_key_flags;
-  int (*func)(unsigned char *, long unsigned int, uint64_t,
+  int (*func)(unsigned char *, size_t, uint64_t,
               const char *, const unsigned char *);
 
   CODE:

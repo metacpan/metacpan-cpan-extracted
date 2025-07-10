@@ -1,0 +1,41 @@
+NAME
+    Data::OFN::Common - OFN common data objects.
+
+DESCRIPTION
+    Common immutable data objects for OFN (Otevřené formální normy) in the
+    Czech Republic.
+
+    This objects are actual with 2020-07-01
+    <https://ofn.gov.cz/z%C3%A1kladn%C3%AD-datov%C3%A9-typy/2020-07-01/>
+    version of OFN basic data types standard.
+
+SEE ALSO
+    Data::OFN::Common::Quantity
+        OFN common data object for quantity.
+
+    Data::OFN::Common::TimeMoment
+        OFN common data object for time moment.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Data-OFN-Common>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2023-2025 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+
+POD ERRORS
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 63:
+        =cut found outside a pod block. Skipping to next block.
+

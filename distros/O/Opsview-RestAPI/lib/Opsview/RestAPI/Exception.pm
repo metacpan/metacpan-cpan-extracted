@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 package Opsview::RestAPI::Exception;
-$Opsview::RestAPI::Exception::VERSION = '1.210670';
+$Opsview::RestAPI::Exception::VERSION = '1.251900';
 # ABSTRACT: Opsview::RestAPI Exception object
 
 
@@ -24,12 +24,13 @@ sub new {
 
     # Build up the callstack to a max of 7 levels
     my $i=0;
-    do {
+    # note '{{' is to allow use of 'last'
+    do {{
         my @caller = (caller($i++));
-        return unless(@caller);
+        last unless(@caller);
 
         push( @{ $args{callstack} }, { map { $caller_keys[$_] => $caller[$_] } ( 0 .. $#caller_keys) } );
-    } while ( $i < 7 );
+    }} while ( $i < 7 );
 
     bless { %args }, $class;
 }
@@ -73,7 +74,7 @@ Opsview::RestAPI::Exception - Opsview::RestAPI Exception object
 
 =head1 VERSION
 
-version 1.210670
+version 1.251900
 
 =head1 SYNOPSIS
 

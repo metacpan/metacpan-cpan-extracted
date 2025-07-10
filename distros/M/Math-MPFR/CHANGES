@@ -1,5 +1,9 @@
 Revision history for Perl module Math::MPFR
 
+4.42
+  - Fix bug in t/_Float16.t and t/bfloat16.t. Fixes (eg):
+    https://www.cpantesters.org/cpan/report/0e7804d2-5c3b-11f0-943b-9bf76d8775ea
+
 4.41
   - Fix bug in t/new.t. Fixes (eg):
     https://www.cpantesters.org/cpan/report/2138de96-805b-1014-9104-da8c93be5a9b

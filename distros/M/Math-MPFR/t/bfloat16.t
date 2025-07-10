@@ -40,7 +40,7 @@ else {
   cmp_ok(Math::MPFR::_have_bfloat16(), '==', 0, "bfloat16 support is lacking");
 
   my ($op, $nv) = (Math::MPFR->new(), 0);
-  eval { $nv = Rmpfr_get_bfloat16(123, MPFR_RNDN);};
+  eval { $nv = Rmpfr_get_bfloat16($op, MPFR_RNDN);};
   like($@, qr/^Perl interface to Rmpfr_get_bfloat16 not available/, 'Rmpfr_get_bfloat16: $@ set as expected');
   eval { Rmpfr_set_bfloat16($nv, $op, MPFR_RNDN);};
   like($@, qr/^Perl interface to Rmpfr_set_bfloat16 not available/, 'Rmpfr_set_bfloat16: $@ set as expected');

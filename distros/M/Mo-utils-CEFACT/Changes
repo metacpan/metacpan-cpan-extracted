@@ -1,0 +1,5 @@
+0.02 2025-07-09T12:56:50+02:00
+ - Rewrite error in check_cefact_unit() to standard form.
+
+0.01 2025-07-09T12:37:41+02:00
+ - First version.

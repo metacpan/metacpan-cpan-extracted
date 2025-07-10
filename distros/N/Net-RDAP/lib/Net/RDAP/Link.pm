@@ -140,7 +140,7 @@ describe the language that the target is available in.
 
 =cut
 
-sub hreflang { $_[0]->{'hreflang'} ? @{$_[0]->{'hreflang'}} : undef }
+sub hreflang { exists($_[0]->{'hreflang'}) ? @{$_[0]->{'hreflang'}} : undef }
 
 =pod
 
@@ -180,7 +180,7 @@ resource.
 
 =cut
 
-sub type { $_[0]->{'type'} ? MIME::Type->new('type' => $_[0]->{'type'}) : undef }
+sub type { exists($_[0]->{'type'}) && $_[0]->{'type'} ? MIME::Type->new('type' => $_[0]->{'type'}) : undef }
 
 =pod
 
@@ -191,7 +191,7 @@ RDAP resource.
 
 =cut
 
-sub is_rdap { $_[0]->{'type'} =~ /^application\/rdap/i }
+sub is_rdap { exists($_[0]->{'type'}) && $_[0]->{'type'} =~ /^application\/rdap/i }
 
 sub TO_JSON {
     my $self = shift;

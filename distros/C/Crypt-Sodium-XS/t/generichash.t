@@ -2,8 +2,17 @@ use strict;
 use warnings;
 use Test::More;
 
+use Crypt::Sodium::XS::MemVault;
 use Crypt::Sodium::XS::generichash qw(generichash_blake2b_SALTBYTES generichash_blake2b_PERSONALBYTES);
 use Crypt::Sodium::XS::OO::generichash;
+use FindBin '$Bin';
+use lib "$Bin/lib";
+use Test::MemVault;
+
+unless (mlock_seems_available()) {
+  diag(mlock_warning());
+  disable_mlock();
+}
 
 my $msg = join('', 'a' .. 'z');
 # needs testing differing salts/personals, and lengths greater than saltbytes.

@@ -4,7 +4,7 @@
       "Kazumasa Utashiro"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.25",
+   "generated_by" : "Minilla/v3.1.26",
    "license" : [
       "perl_5"
    ],
@@ -56,16 +56,13 @@
    "provides" : {
       "Getopt::EX::i18n" : {
          "file" : "lib/Getopt/EX/i18n.pm",
-         "version" : "1.00"
+         "version" : "1.01"
       },
       "Getopt::EX::i18n::iso3361" : {
          "file" : "lib/Getopt/EX/i18n/iso3361.pm"
       },
       "Getopt::EX::i18n::iso639" : {
          "file" : "lib/Getopt/EX/i18n/iso639.pm"
-      },
-      "Local::LocaleObj" : {
-         "file" : "lib/Getopt/EX/i18n.pm"
       }
    },
    "release_status" : "stable",
@@ -80,11 +77,11 @@
          "web" : "https://github.com/kaz-utashiro/Getopt-EX-i18n"
       }
    },
-   "version" : "1.00",
+   "version" : "1.01",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.16",
+   "x_serialization_backend" : "JSON::PP version 4.06",
    "x_static_install" : 1
 }

@@ -73,16 +73,20 @@ src/libsodium-1.0.19.tar.gz
 src/libsodium-1.0.19.tar.gz.sig
 t/aead.t
 t/auth.t
+t/base64.t
 t/box.t
 t/csxs-ppcrypt.t
 t/generichash.t
 t/hash.t
+t/hkdf.t
 t/kdf.t
 t/kx.t
+t/lib/Test/MemVault.pm
 t/memvault.t
 t/onetimeauth.t
-t/pod.t
 t/pminisign.t
+t/pod.t
+t/protmem.t
 t/pwhash.t
 t/scalarmult.t
 t/secretbox.t
@@ -91,5 +95,6 @@ t/shorthash.t
 t/sign.t
 t/sodium.t
 t/stream.t
+t/util.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

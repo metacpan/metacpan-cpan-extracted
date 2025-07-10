@@ -5,6 +5,7 @@ Report security issues by email to Brad Barden <perlmodules@5c30.org>.
 If possible, please encrypt your report with OpenPGP. You can use the following
 public key, also found on https://keys.openpgp.org/
 
+```
 -----BEGIN PGP PUBLIC KEY BLOCK-----
 
 mDMEaG03lBYJKwYBBAHaRw8BAQdAnJB3ABUHPTKL6jugY/VkKnvg7WKXgJIGtIFO
@@ -18,6 +19,7 @@ N5QCGwwFCQWjmoAACgkQq/O/uTm0BaeImQEAy/Nl/+Dkz8ahJeHkO3NKQ03pvNci
 gzQajGRrQADXZ0AA+QERZlzbinSfSMqPuf1P9VDeJlcbdh9slw4gkDcSpcMP
 =BE+O
 -----END PGP PUBLIC KEY BLOCK-----
+```
 
 # Security Policy for the Crypt::Sodium::XS distribution.
 

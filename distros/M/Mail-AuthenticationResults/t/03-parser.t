@@ -53,6 +53,14 @@ lives_ok( sub{ $ParsedPostAssign = Mail::AuthenticationResults::Parser->new()->p
 is( $ParsedPostAssign->children()->[0]->children->[0]->value(), 'thisisa=test@example.com', 'Post assign value correct' );
 is( $ParsedPostAssign->children()->[0]->children->[0]->as_string(), 'address="thisisa=test@example.com"', 'Post assign stringify correct' );
 
+my $ParsedSlash;
+lives_ok( sub{ $ParsedSlash = Mail::AuthenticationResults::Parser->new()->parse( 'example.com; dkim=pass address=/somestring/orother') }, 'Slash parse lives' );
+is( $ParsedSlash->children()->[0]->children->[0]->value(), '/somestring/orother', 'Slash value correct' );
+is( $ParsedSlash->children()->[0]->children->[0]->as_string(), 'address=/somestring/orother', 'Slash value stringify correct' );
+$ParsedSlash->set_strict_quotes(1);
+is( $ParsedSlash->children()->[0]->children->[0]->as_string(), 'address="/somestring/orother"', 'Slash value stringify correct in strict mode' );
+
+
 dies_ok( sub{ Mail::AuthenticationResults::Parser->new()->parse( ';none' ) }, 'Missing AuthServ-ID dies' );
 
 done_testing();

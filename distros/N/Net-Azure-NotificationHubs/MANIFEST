@@ -14,9 +14,9 @@ t/11_send_request.t
 t/12_uri.t
 t/13_req.t
 t/21_request_do.t
-t/31_response_as_hashref.t
 t/lib/MockHTTPTiny.pm
 t/sas.conf.example
+xt/31_response_as_hashref.t
 xt/71_send.t
 META.yml
 MANIFEST

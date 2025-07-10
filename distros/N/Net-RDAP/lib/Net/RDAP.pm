@@ -22,11 +22,14 @@ use Net::RDAP::Values;
 use Net::RDAP::JCard;
 use POSIX qw(getpwuid);
 use vars qw($VERSION);
-use constant DEFAULT_CACHE_TTL => 3600;
+use constant {
+    DEFAULT_CACHE_TTL       => 3600,
+    DEFAULT_ACCEPT_LANGUAGE => "en",
+};
 use strict;
 use warnings;
 
-$VERSION = '0.38';
+$VERSION = '0.40';
 
 =pod
 
@@ -114,6 +117,9 @@ and L<Net::RDAP::Values>.
 =item * C<cache_ttl> - if set, specifies how long after a record has
 been cached before L<Net::RDAP> asks the server for any update. By
 default this is one hour (3600 seconds).
+
+=item * C<accept_language> - a string that will be passed to RDAP servers in
+the C<Accept-Language> header. If not provided, the default is "C<en>".
 
 =back
 
@@ -404,6 +410,8 @@ sub _get {
     #
     my $ttl = $self->{'use_cache'} ? ($self->{'cache_ttl'} || DEFAULT_CACHE_TTL) : 0;
 
+    my $lang = $self->{accept_language} || DEFAULT_ACCEPT_LANGUAGE;
+
     #
     # path to local copy of the remote resource
     #
@@ -415,7 +423,8 @@ sub _get {
             sha256_hex(join(chr(0), (
                 $VERSION,
                 $url->as_string,
-                getpwuid($<)
+                $lang,
+                getpwuid($<),
             )))
         )
     );
@@ -427,7 +436,7 @@ sub _get {
         $file = $1;
     }
 
-    my $response = $self->ua->mirror($url, $file, $ttl);
+    my $response = $self->ua->mirror($url, $file, $ttl, $lang);
 
     my $data = eval { decode_json(scalar(read_file($file))) };
 

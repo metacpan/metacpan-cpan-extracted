@@ -47,7 +47,7 @@ install:  all docs
 	cp -r latex-tounicode.pdf ltx2unitxt.pdf ltx2unitxt.1 $(DOCDIR)
 
 clean:
-	$(RM) *.log *.aux *.out *.toc latex-tounicode.tex *.tar.gz
+	$(RM) -r *.log *.aux *.out *.toc latex-tounicode.tex *.tar.gz
 
 distclean: clean
-	$(RM) $(DOCS)
+	$(RM) -r $(DOCS)

@@ -127,7 +127,7 @@ my $small = <<'SMALL';
 ║     Markup text to ANSI encoder.             ║
 ║                                              ║
 ║[% B_ANSI52 %][% BRIGHT YELLOW %] USAGE                                        [% RESET %]║
-║     [% CYAN %]ansi-encode[% RESET %] [text file]                  ║
+║     [% CYAN %]ansi-encode[% RESET %] [options] [text file]        ║
 ║                                              ║
 ║[% B_ANSI52 %][% BRIGHT YELLOW %] OPTIONS                                      [% RESET %]║
 ║     -[% PINK %]v[% RESET %] or --[% PINK %]version[% RESET %]                          ║
@@ -138,6 +138,16 @@ my $small = <<'SMALL';
 ║                                              ║
 ║     -[% PINK %]t[% RESET %] or --[% PINK %]tokens[% RESET %]                           ║
 ║         Show most used tokens                ║
+║                                              ║
+║     -[% PINK %]c[% RESET %] or --[% PINK %]colors[% RESET %]                           ║
+║         Show available colors and tokens     ║
+║                                              ║
+║     -[% PINK %]s[% RESET %] or --[% PINK %]symbols[% RESET %] [search]                 ║
+║         Show available symbols and tokens    ║
+║                                              ║
+║     -[% PINK %]f[% RESET %] or --[% PINK %]full[% RESET %]                             ║
+║         Loads the full symbol table.  It     ║
+║         will slow down initialization.       ║
 ╚══════════════════════════════════════════════╝
 SMALL
 

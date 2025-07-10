@@ -1,5 +1,11 @@
 Revision history for perl module Net::RDAP:
 
+0.40 - 2025-07-09
+  - update this file with the changes from the last release.
+
+0.39 - 2025-07-09
+  - add support for the accept_language constructor argument.
+
 0.38 - 2025-05-23
   - untaint filename when mirroring resources
   - tests now run under -T

@@ -4,6 +4,14 @@ use Test::More;
 
 use Crypt::Sodium::XS::Util "sodium_random_bytes";
 use Crypt::Sodium::XS::OO::auth;
+use FindBin '$Bin';
+use lib "$Bin/lib";
+use Test::MemVault;
+
+unless (mlock_seems_available()) {
+  diag(mlock_warning());
+  disable_mlock();
+}
 
 my $msg = "How do you do?";
 

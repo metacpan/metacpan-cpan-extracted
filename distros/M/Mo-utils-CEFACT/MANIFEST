@@ -1,0 +1,26 @@
+CEFACT.pm
+Changes
+examples/check_cefact_unit_fail.pl
+examples/check_cefact_unit_ok.pl
+inc/Module/Install.pm
+inc/Module/Install/AuthorRequires.pm
+inc/Module/Install/AuthorTests.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/ReadmeFromPod.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+SIGNATURE
+t/Mo-utils-CEFACT/01-use.t
+t/Mo-utils-CEFACT/02-version.t
+t/Mo-utils-CEFACT/03-check_cefact_unit.t
+xt/Mo-utils-CEFACT/01-pod_coverage.t
+xt/Mo-utils-CEFACT/02-pod.t

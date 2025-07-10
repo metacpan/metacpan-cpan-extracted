@@ -1,15 +1,13 @@
 package BibTeX::Parser::Entry;
 {
-  $BibTeX::Parser::Entry::VERSION = '1.04';
+  $BibTeX::Parser::Entry::VERSION = '1.92';
 }
 
 use warnings;
 use strict;
 
-use BibTeX::Parser;
 use BibTeX::Parser::Author;
-
-
+use BibTeX::Parser qw (_split_braced_string);
 
 sub new {
 	my ($class, $type, $key, $parse_ok, $fieldsref) = @_;
@@ -419,12 +417,11 @@ before the entry NEVER has the @ symbol inside
 Capitalization of the type names.  
 Can take values 'Uppercase' (the default), 'Lowercase' or 'Titlecase'
 
-
 =back
 
 =head1 VERSION
 
-version 1.05
+version 1.92
 
 =head1 AUTHOR
 
@@ -434,10 +431,9 @@ Karl Berry <karl@freefriends.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013-2024 by Gerhard Gossen and Boris Veytsman and Karl Berry
+Copyright 2013-2025 Gerhard Gossen, Boris Veytsman, Karl Berry
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

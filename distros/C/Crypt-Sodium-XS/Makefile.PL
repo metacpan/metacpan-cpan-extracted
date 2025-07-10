@@ -28,7 +28,7 @@ use Text::ParseWords;
 # no idea how to get it to function. it should be possible.
 # so for now, sorry charlie; patches and suggestions are appreciated!
 
-os_unsupported if $^O eq 'MSWin32';
+die "OS unsupported\n" if $^O eq 'MSWin32';
 
 my $libsodium_version = '1.0.19';
 my $libsodium_major_minimum = '10';

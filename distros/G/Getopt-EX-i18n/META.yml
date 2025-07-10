@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.25, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.26, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,13 +26,11 @@ no_index:
 provides:
   Getopt::EX::i18n:
     file: lib/Getopt/EX/i18n.pm
-    version: '1.00'
+    version: '1.01'
   Getopt::EX::i18n::iso3361:
     file: lib/Getopt/EX/i18n/iso3361.pm
   Getopt::EX::i18n::iso639:
     file: lib/Getopt/EX/i18n/iso639.pm
-  Local::LocaleObj:
-    file: lib/Getopt/EX/i18n.pm
 requires:
   Getopt::EX: v1.23.3
   List::Util: '1.45'
@@ -41,7 +39,7 @@ resources:
   bugtracker: https://github.com/kaz-utashiro/Getopt-EX-i18n/issues
   homepage: https://github.com/kaz-utashiro/Getopt-EX-i18n
   repository: https://github.com/kaz-utashiro/Getopt-EX-i18n.git
-version: '1.00'
+version: '1.01'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

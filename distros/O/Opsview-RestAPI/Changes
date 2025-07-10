@@ -1,6 +1,6 @@
 Revision history for Opsview-RestAPI
 
-1.210670  2021-03-08 17:39:18+00:00 Europe/London
+1.251900  2025-07-09 17:46:28+01:00 Europe/London
 - Corrected SYNOPSIS in the documentation
 - Skip 'file_upload' tests if uploads are blocked
 - Tests assume no TLS certificate checking

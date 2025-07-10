@@ -1,0 +1,21 @@
+Berkeley.xs
+Changes
+lib/DB/Berkeley.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/30-basics.t
+t/binary.t
+t/delete.t
+t/each.t
+t/eof.t
+t/eol.t
+t/iterator.t
+t/iterator_more.t
+t/iterator_reset.t
+t/pod-synopsis.t
+typemap
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

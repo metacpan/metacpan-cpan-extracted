@@ -4,7 +4,7 @@ package Mail::AuthenticationResults::Token::Space;
 require 5.008;
 use strict;
 use warnings;
-our $VERSION = '2.20231031'; # VERSION
+our $VERSION = '2.20250709'; # VERSION
 use Carp;
 
 use base 'Mail::AuthenticationResults::Token';
@@ -45,7 +45,7 @@ Mail::AuthenticationResults::Token::Space - Class for modelling AuthenticationRe
 
 =head1 VERSION
 
-version 2.20231031
+version 2.20250709
 
 =head1 DESCRIPTION
 

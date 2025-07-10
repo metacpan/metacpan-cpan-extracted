@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
+use Test::Exception;
 use Net::Azure::NotificationHubs::Request;
 use HTTP::Tiny;
 
@@ -9,10 +10,9 @@ subtest 'html response' => sub {
     $uri->query_form(q => 'Azure', size => 100); 
     my $req = Net::Azure::NotificationHubs::Request->new(GET => $uri);
     $req->agent(HTTP::Tiny->new);
-    my $res = $req->do;
-    can_ok $res, qw/as_hashref/;
-    my $data = $res->as_hashref;
-    is $data, undef, 'data is undefined';
+    my $res;
+    dies_ok { $res = $req->do } qr/Payment Required/;
+    is $res, undef, 'res is undefined';
 };
 
 subtest 'json response' => sub {

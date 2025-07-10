@@ -3,6 +3,14 @@ use warnings;
 use Test::More;
 
 use Crypt::Sodium::XS::OO::kdf;
+use FindBin '$Bin';
+use lib "$Bin/lib";
+use Test::MemVault;
+
+unless (mlock_seems_available()) {
+  diag(mlock_warning());
+  disable_mlock();
+}
 
 for my $alg (Crypt::Sodium::XS::OO::kdf->primitives) {
   my $m = Crypt::Sodium::XS::OO::kdf->new(primitive => $alg);

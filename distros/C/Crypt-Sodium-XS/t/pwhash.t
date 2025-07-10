@@ -4,6 +4,8 @@ use Test::More;
 
 use Crypt::Sodium::XS::OO::pwhash;
 
+#FIXME: no pwhash_str testing?
+
 my @passwords = (
   "Red horse butter on the jam",
   "One Ring to rule them all, One Ring to find them,"

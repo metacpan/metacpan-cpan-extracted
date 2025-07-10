@@ -2,7 +2,7 @@ This is the BibTeX::Parser Perl package:
 
   A pure Perl BibTeX parser
 
-Copyright 2013--2023 Gerhard Gossen, Boris Veytsman, Karl Berry
+Copyright 2013--2025 Gerhard Gossen, Boris Veytsman, Karl Berry
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

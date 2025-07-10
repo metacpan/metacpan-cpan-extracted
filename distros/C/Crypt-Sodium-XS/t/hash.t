@@ -4,6 +4,14 @@ use Test::More;
 
 use Crypt::Sodium::XS::OO::hash;
 use Digest::SHA qw/sha256_hex sha512_hex/;
+use FindBin '$Bin';
+use lib "$Bin/lib";
+use Test::MemVault;
+
+unless (mlock_seems_available()) {
+  diag(mlock_warning());
+  disable_mlock();
+}
 
 my @adatas = (
   "Parcel was dispatched",

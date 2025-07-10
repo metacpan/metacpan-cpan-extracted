@@ -22,7 +22,7 @@ warn "# has _WIN32_BIZARRE_INFNAN:   ", Math::MPFR::_has_bizarre_infnan(), "\n";
 warn "# has MPFR_PV_NV_BUG:          ", Math::MPFR::_has_pv_nv_bug(), "\n";
 warn "# has WIN32_FMT_BUG:           ", Math::MPFR::Random::_buggy(), "\n";
 warn "# has _Float16                 ", Math::MPFR::_have_float16(), "\n";
-warn "# has __bf16                   ", Rmpfr_buildopt_bfloat16_p(), "\n";
+warn "# has __bf16                   ", Math::MPFR::_have_bfloat16(), "\n";
 
 if   (pack("L", 305419897) eq pack("N", 305419897)) {warn "# Machine appears to be big-endian\n"}
 elsif(pack("L", 305419897) eq pack("V", 305419897)) {warn "# Machine appears to be little-endian\n"}
@@ -64,6 +64,12 @@ if(!$@) {
             : warn "# mpfr library built WITHOUT _Float16 support\n";
 }
 
+eval {$evaluate = Rmpfr_buildopt_bfloat16_p()};
+if(!$@) {
+  $evaluate ? warn "# mpfr library built WITH bfloat16 support\n"
+            : warn "# mpfr library built WITHOUT bfloat16 support\n";
+}
+
 eval {$evaluate = Rmpfr_buildopt_gmpinternals_p()};
 if(!$@) {
   $evaluate ? warn "# mpfr library built WITH gmp internals\n"
@@ -82,10 +88,10 @@ if(!$@) {
             : warn "# mpfr library thresholds file: $evaluate\n";
 }
 
-cmp_ok($Math::MPFR::VERSION, 'eq', '4.41', "Math::MPFR::VERSION ($Math::MPFR::VERSION) is as expected");
+cmp_ok($Math::MPFR::VERSION, 'eq', '4.42', "Math::MPFR::VERSION ($Math::MPFR::VERSION) is as expected");
 
 my $xs_version = Math::MPFR::_get_xs_version();
-cmp_ok($xs_version, 'eq', '4.41', "Math::MPFR::_get_xs_version returns $xs_version as expected");
+cmp_ok($xs_version, 'eq', '4.42', "Math::MPFR::_get_xs_version returns $xs_version as expected");
 
 my $l_ver = Rmpfr_get_version();
 my $h_ver = MPFR_VERSION_STRING;

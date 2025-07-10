@@ -5,7 +5,7 @@ This is the LaTeX::ToUnicode Perl package:
 Dev sources, bug tracker: https://github.com/borisveytsman/bibtexperllibs
 Releases: https://ctan.org/pkg/bibtexperllibs
 
-Copyright 2010-2022 Gerhard Gossen, Boris Veytsman, Karl Berry
+Copyright 2010-2025 Gerhard Gossen, Boris Veytsman, Karl Berry
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl5 programming language system itself.

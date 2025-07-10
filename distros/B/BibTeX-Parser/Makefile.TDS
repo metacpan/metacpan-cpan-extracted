@@ -30,6 +30,6 @@ Makefile MYMETA.json MYMeta.yml: Makefile.PL force
 	perl Makefile.PL || rm -f $@
 
 clean distclean:
-	$(RM) Makefile MYMETA.* blib pm_to_blib *.tar.gz
+	$(RM) -r Makefile MYMETA.* blib pm_to_blib *.tar.gz
 
 force:

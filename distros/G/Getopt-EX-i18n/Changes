@@ -1,5 +1,10 @@
 Revision history for Getopt::EX -Mi18n module
 
+1.01 2025-07-10T05:05:48Z
+
+    - Added 'env' option to allow customizing the environment variable name
+      (default: LANG) and updated documentation accordingly.
+
 1.00 2025-01-24T05:45:32Z
 
     - rename LocaleObj -> Local::LocaleObj not to indexed

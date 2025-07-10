@@ -6,6 +6,14 @@ use Crypt::Sodium::XS::Util "sodium_increment";
 use Crypt::Sodium::XS::MemVault;
 use Crypt::Sodium::XS::OO::kx;
 use Crypt::Sodium::XS::secretbox ":default";
+use FindBin '$Bin';
+use lib "$Bin/lib";
+use Test::MemVault;
+
+unless (mlock_seems_available()) {
+  diag(mlock_warning());
+  disable_mlock();
+}
 
 for my $alg (Crypt::Sodium::XS::OO::kx->primitives) {
   my $m = Crypt::Sodium::XS::OO::kx->new(primitive => $alg);

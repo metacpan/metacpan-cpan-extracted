@@ -40,3 +40,7 @@
 
         Added more symbols to the full version of the symbol table.  It's
 		HUGE.
+
+1.14    Jul 10, 2025
+
+        Improved "--help" output

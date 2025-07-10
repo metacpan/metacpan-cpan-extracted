@@ -5,6 +5,14 @@ use Test::More;
 use Crypt::Sodium::XS;
 
 my $scalarmult = Crypt::Sodium::XS->scalarmult;
+use FindBin '$Bin';
+use lib "$Bin/lib";
+use Test::MemVault;
+
+unless (mlock_seems_available()) {
+  diag(mlock_warning());
+  disable_mlock();
+}
 
 ok($scalarmult->BYTES > 0, "scalarmult_BYTES > 0");
 ok($scalarmult->SCALARBYTES > 0, "scalarmult_SCALARBYTES > 0");

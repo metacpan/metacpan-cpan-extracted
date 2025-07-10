@@ -76,8 +76,6 @@ SKIP: {
         qr/^\d\.\d$/, "api_version 'api_min_version' returned okay" );
     like( $output->{api_version},
         qr/^\d\.\d+$/, "api_version 'api_version' returned okay" );
-    like( $output->{easyxdm_version},
-        qr/^\d\.\d\.\d+$/, "api_version 'easyxdm_version' returned okay" );
 
     note( "Got 'api_version' from '$opsview{url}' of "
             . $output->{api_version} );

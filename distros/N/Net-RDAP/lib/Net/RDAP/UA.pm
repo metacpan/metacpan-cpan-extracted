@@ -40,17 +40,18 @@ sub request {
 }
 
 #
-# usage: $ua->mirror($url, $file, $ttl);
+# usage: $ua->mirror($url, $file, $ttl, $accept_language);
 #
 # this re-implements the parent mirror() method to avoid a network roundtrip if
 # a locally-cached copy of the resource is less than $ttl seconds old.
 #
 sub mirror {
-    my ($self, $url, $file, $ttl) = @_;
+    my ($self, $url, $file, $ttl, $accept_language) = @_;
 
     my $response;
 
     my $request = GET($url);
+    $request->header('Accept-Language' => $accept_language) if ($accept_language);
 
     if (-e $file && time() < stat($file)->mtime + (defined($ttl) ? $ttl : DEFAULT_CACHE_TTL)) {
         print STDERR $request->as_string if (exists($ENV{NET_RDAP_UA_DEBUG}));

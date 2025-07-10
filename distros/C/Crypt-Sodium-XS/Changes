@@ -1,3 +1,19 @@
+0.000026 Jul 9 2025
+
+- fix MANIFEST missing test files
+
+0.000025 Jul 9 2025
+
+- BUGFIX: fix mlock flag mask and _NONE
+
+- check for mlock working at all in tests (best guess), and disable if not
+
+- revert a makefile change that inadvertently required newer EUMM
+
+- fix a function argument type bug in kdf
+
+- fix pgp key in markdown
+
 0.000024 Jul 8 2025
 
 - BUGFIX: fix another bug on threaded build

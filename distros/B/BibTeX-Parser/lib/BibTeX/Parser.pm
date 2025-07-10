@@ -1,6 +1,6 @@
 package BibTeX::Parser;
 {
-  $BibTeX::Parser::VERSION = '1.05';
+  $BibTeX::Parser::VERSION = '1.92';
 }
 # ABSTRACT: A pure perl BibTeX parser
 use warnings;
@@ -14,10 +14,11 @@ my $re_name     = qr/$re_namechar+/o;
 
 
 sub new {
-    my ( $class, $fh ) = @_;
+    my ( $class, $fh, $opts ) = @_;
 
     return bless {
         fh      => $fh,
+        opts    => $opts || {},
         strings => {
             jan => "January",
             feb => "February",
@@ -95,15 +96,16 @@ sub _parse_next {
             if ( $type eq "STRING" ) {
                 if (/\G\{\s*($re_name)\s*=\s*/cgo) {
                     my $key   = $1;
-                    my $value = _parse_string( $self->{strings} );
+                    my $value = _parse_string( $self->{strings},
+                                       exists $self->{opts}->{"no-warn-ack"} );
                     if ( defined $self->{strings}->{$key} ) {
                         warn("Redefining string $key!");
                     }
                     $self->{strings}->{$key} = $value;
                     /\G[\s\n]*\}/cg;
                 } else {
-                    $current_entry->error("Malformed string!");
-					return $current_entry;
+                    $current_entry->error("Malformed string! ($raw)");
+                    return $current_entry;
                 }
             } elsif ( $type eq "COMMENT" or $type eq "PREAMBLE" ) {
                 /\G\{./cgo;
@@ -118,7 +120,8 @@ sub _parse_next {
 					# fields
                     while (/\G[\s\n]*($re_name)[\s\n]*=[\s\n]*/cgo) {
                         $current_entry->field(
-                                      $1 => _parse_string( $self->{strings} ) );
+                              $1 => _parse_string( $self->{strings}, 
+                                     exists $self->{opts}->{"no-warn-ack"} ) );
                         my $idx = index( $_, ',', pos($_) );
                         pos($_) = $idx + 1 if $idx > 0;
                     }
@@ -127,7 +130,7 @@ sub _parse_next {
 
                 } else {
 
-                    $current_entry->error("Malformed entry (key contains illegal characters) at " . substr($_, pos($_) || 0, 20)  . ", ignoring");
+                    $current_entry->error("Malformed entry (key contains invalid characters) at " . substr($_, pos($_) || 0, 20)  . ", ignoring");
                     _slurp_close_bracket;
 					return $current_entry;
                 }
@@ -169,10 +172,23 @@ sub _slurp_close_bracket {
 }
 
 # parse bibtex string in $_ and return. A BibTeX string is either enclosed
-# in double quotes '"' or matching braces '{}'. The braced form may contain
+# in double quotes '""' or matching braces '{}'. The braced form may contain
 # nested braces.
+# 
+# Second argument NO_WARN_ACK says whether to emit the warning
+# "Using undefined string" if the name of the undefined string starts
+# with "ack-". The default is to warn. The TUGboat config file
+# ltx2crossrefxml-tugboat.cfg sets this.
+# 
+# It is an unfortunate fact that people routinely copy bib entries
+# without copying the "ack-nhfb" or other "ack-..." @string definitions
+# in Nelson Beebe's bibliography files, resulting in this warning. It is
+# too irritating to have to define them (they are never used), and also
+# too irritating to have to see the many warnings on every run.
+# 
 sub _parse_string {
-    my $strings_ref = shift;
+    my ($strings_ref, $no_warn_ack) = @_;
+    $no_warn_ack ||= 0;
 
     my $value = "";
 
@@ -180,10 +196,13 @@ sub _parse_string {
         if (/\G(\d+)/cg) {
             $value .= $1;
         } elsif (/\G($re_name)/cgo) {
-            warn("Using undefined string $1") unless defined $strings_ref->{$1};
+            if (! defined $strings_ref->{$1}) {
+                warn("Using undefined string $1")
+                  unless $no_warn_ack && $1 =~ /^ack-/;
+            }
             $value .= $strings_ref->{$1} || "";
         } elsif (/\G"(([^"\\]*(\\.)*[^\\"]*)*)"/cgs)
-        {    # quoted string with embeded escapes
+        {    # quoted string with embedded escapes
             $value .= $1;
         } else {
             my $part = _extract_bracketed( $_ );
@@ -347,8 +366,7 @@ L<BibTeX::Parser::Author>
 
 =head1 VERSION
 
-version 1.04
-
+version 1.92
 
 =head1 AUTHOR
 
@@ -358,10 +376,9 @@ Karl Berry <karl@freefriends.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013-2024 by Gerhard Gossen and Boris Veytsman and Karl Berry.
+Copyright 2013-2025 Gerhard Gossen, Boris Veytsman, Karl Berry
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-
