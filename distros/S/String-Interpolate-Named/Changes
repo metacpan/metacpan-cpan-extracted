@@ -1,5 +1,9 @@
 Revision history for String-Interpolate-Named
 
+1.06	2025-07-11
+
+	Remove -T perl flag from 00-load.t.
+
 1.05	2025-04-21
 
 	Added padding and replace functions.

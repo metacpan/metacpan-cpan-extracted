@@ -7,7 +7,7 @@ xo fill_color black (initial)
   start handling path (SVGPDF::Path)
   path d="M 10 75 Q 50 10 100 ..."
     xo save
-    path linecap=1 stroke=black fill=none sda=5 10 5
+    path linecap=1 stroke=#000000 fill=none sda=5 10 5
     xo move(10.00,75.00)
     xo spline(50.00,10.00 100.00,75.00)
     xo spline(150.00,140.00 190.00,75.00)
@@ -17,7 +17,7 @@ xo fill_color black (initial)
   start handling path (SVGPDF::Path)
   path d="M 10 75 L 190 75"
     xo save
-    path stroke-width=1.00 linecap=1 stroke=red fill=none sda=5 5
+    path stroke-width=1.00 linecap=1 stroke=#FF0000 fill=none sda=5 5
     xo move(10.00,75.00)
     xo line(190.00,75.00)
     xo stroke (red)

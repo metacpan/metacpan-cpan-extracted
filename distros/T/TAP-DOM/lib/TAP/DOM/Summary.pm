@@ -1,7 +1,7 @@
 package TAP::DOM::Summary;
 our $AUTHORITY = 'cpan:SCHWIGON';
 # ABSTRACT: Accessors for TAP::DOM summary part
-$TAP::DOM::Summary::VERSION = '1.000';
+$TAP::DOM::Summary::VERSION = '1.001';
 use 5.006;
 use strict;
 use warnings;
@@ -82,7 +82,7 @@ Steffen Schwigon <ss5@renormalist.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Steffen Schwigon.
+This software is copyright (c) 2025 by Steffen Schwigon.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

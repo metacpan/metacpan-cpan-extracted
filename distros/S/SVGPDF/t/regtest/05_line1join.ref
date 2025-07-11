@@ -7,21 +7,21 @@ xo fill_color black (initial)
   start handling polyline (SVGPDF::Polyline)
   polyline points="40 60 80 20 120 60"
     xo save
-    polyline stroke-width=20.00 linecap=0 linejoin=0 stroke=black fill=none
+    polyline stroke-width=20.00 linecap=0 linejoin=0 stroke=#000000 fill=none
     xo stroke (black)
     xo restore
   end handling polyline
   start handling polyline (SVGPDF::Polyline)
   polyline points="40 140 80 100 120 14..."
     xo save
-    polyline stroke-width=20.00 linecap=1 linejoin=1 stroke=black fill=none
+    polyline stroke-width=20.00 linecap=1 linejoin=1 stroke=#000000 fill=none
     xo stroke (black)
     xo restore
   end handling polyline
   start handling polyline (SVGPDF::Polyline)
   polyline points="40 220 80 180 120 22..."
     xo save
-    polyline stroke-width=20.00 linecap=2 linejoin=2 stroke=black fill=none
+    polyline stroke-width=20.00 linecap=2 linejoin=2 stroke=#000000 fill=none
     xo stroke (black)
     xo restore
   end handling polyline

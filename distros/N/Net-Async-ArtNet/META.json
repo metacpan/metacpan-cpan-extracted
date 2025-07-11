@@ -1,10 +1,10 @@
 {
-   "abstract" : "use ArtNet with C<IO::Async>",
+   "abstract" : "use Art-Net with C<IO::Async>",
    "author" : [
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -28,14 +28,14 @@
       "test" : {
          "requires" : {
             "IO::Async::Test" : "0",
-            "Test::More" : "0.88"
+            "Test2::V0" : "0"
          }
       }
    },
    "provides" : {
       "Net::Async::ArtNet" : {
          "file" : "lib/Net/Async/ArtNet.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -44,6 +44,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.03",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

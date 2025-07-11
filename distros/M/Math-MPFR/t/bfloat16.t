@@ -29,9 +29,9 @@ if(MPFR_VERSION >= 262912) { # MPFR-4.3.0 or later
     cmp_ok(Math::MPFR::_have_bfloat16(), '==', 0, "MPFR library support for bfloat16 is not utilised");
 
     my ($op, $nv) = (Math::MPFR->new(), 0);
-    eval { $nv = Rmpfr_get_bfloat16(123, MPFR_RNDN);};
+    eval { $nv = Rmpfr_get_bfloat16($op, MPFR_RNDN);};
     like($@, qr/^Perl interface to Rmpfr_get_bfloat16 not available/, 'Rmpfr_get_bfloat16: $@ set as expected');
-    eval { Rmpfr_set_bfloat16($nv, $op, MPFR_RNDN);};
+    eval { Rmpfr_set_bfloat16($op, $nv, MPFR_RNDN);};
     like($@, qr/^Perl interface to Rmpfr_set_bfloat16 not available/, 'Rmpfr_set_bfloat16: $@ set as expected');
   }
 }
@@ -42,7 +42,7 @@ else {
   my ($op, $nv) = (Math::MPFR->new(), 0);
   eval { $nv = Rmpfr_get_bfloat16($op, MPFR_RNDN);};
   like($@, qr/^Perl interface to Rmpfr_get_bfloat16 not available/, 'Rmpfr_get_bfloat16: $@ set as expected');
-  eval { Rmpfr_set_bfloat16($nv, $op, MPFR_RNDN);};
+  eval { Rmpfr_set_bfloat16($op, $nv, MPFR_RNDN);};
   like($@, qr/^Perl interface to Rmpfr_set_bfloat16 not available/, 'Rmpfr_set_bfloat16: $@ set as expected');
 }
 

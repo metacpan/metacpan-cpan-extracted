@@ -7,7 +7,7 @@ xo fill_color black (initial)
   start handling path (SVGPDF::Path)
   path d="M 10 80 L 40 10 M 95..."
     xo save
-    path stroke=red fill=none
+    path stroke=#FF0000 fill=none
     xo move(10.00,80.00)
     xo line(40.00,10.00)
     xo move(95.00,80.00)
@@ -18,7 +18,7 @@ xo fill_color black (initial)
   start handling path (SVGPDF::Path)
   path d="M 95 80 L 120 150 M ..."
     xo save
-    path stroke=red fill=none
+    path stroke=#FF0000 fill=none
     xo move(95.00,80.00)
     xo line(120.00,150.00)
     xo move(180.00,80.00)
@@ -29,7 +29,7 @@ xo fill_color black (initial)
   start handling path (SVGPDF::Path)
   path d="M 10 80 C 40 10, 65 ..."
     xo save
-    path stroke=black fill=none
+    path stroke=#000000 fill=none
     xo move(10.00,80.00)
     xo curve(40.00,10.00 65.00,10.00 95.00,80.00)
     xo curve(125.00,150.00 150.00,150.00 180.00,80.00)

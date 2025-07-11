@@ -1,9 +1,10 @@
 #! perl
 
-use Test::More tests => 19;
+use Test::More tests => 20;
 
 BEGIN {
     # Load the elements first.
+    use_ok("SVGPDF::Colour");
     use_ok("SVGPDF::Circle");
     use_ok("SVGPDF::CSS");
     use_ok("SVGPDF::Defs");

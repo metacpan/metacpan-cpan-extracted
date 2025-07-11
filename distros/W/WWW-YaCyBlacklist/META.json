@@ -1,0 +1,82 @@
+{
+   "abstract" : "a Perl module to parse and execute YaCy blacklists",
+   "author" : [
+      "Ingram Braun <carlorff1@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "WWW-YaCyBlacklist",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::CPAN::Meta" : "0",
+            "Test::CPAN::Meta::JSON" : "0.16",
+            "Test::DistManifest" : "0",
+            "Test::EOL" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::MinimumVersion" : "0",
+            "Test::Mojibake" : "0",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Pod::LinkCheck" : "0",
+            "Test::Portability::Files" : "0",
+            "Test::Synopsis" : "0",
+            "Test::Vars" : "0",
+            "Test::Version" : "1"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::All" : "0.87",
+            "Moose" : "2.2207",
+            "Moose::Util::TypeConstraints" : "2.4000",
+            "URI::URL" : "0",
+            "perl" : "v5.6.0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "1.001014"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=WWW-YaCyBlacklist"
+      },
+      "homepage" : "https://ingram-braun.net/erga/the-www-yacyblacklist-module/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/CarlOrff/WWW-YaCyBlacklist.git",
+         "web" : "https://github.com/CarlOrff/WWW-YaCyBlacklist"
+      }
+   },
+   "version" : "0.2",
+   "x_generated_by_perl" : "v5.40.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.39",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

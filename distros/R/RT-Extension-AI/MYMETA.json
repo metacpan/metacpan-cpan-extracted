@@ -1,0 +1,55 @@
+{
+   "abstract" : "RT-Extension-AI Extension",
+   "author" : [
+      "Best Practical Solutions, LLC <modules@bestpractical.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Install version 1.21, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "gpl_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "RT-Extension-AI",
+   "no_index" : {
+      "directory" : [
+         "etc",
+         "html",
+         "inc",
+         "static"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.59"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.010001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/gpl-license.php"
+      ],
+      "repository" : {
+         "url" : "https://github.com/bestpractical/rt-extension-ai"
+      }
+   },
+   "version" : "0.01",
+   "x_module_install_rtx_version" : "0.44",
+   "x_requires_rt" : "5.0.7",
+   "x_rt_too_new" : "6.2.0",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

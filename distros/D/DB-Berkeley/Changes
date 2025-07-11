@@ -1,5 +1,12 @@
 Revision history for DB::Berkeley - XS-based OO Berkeley DB HASH interface
 
+0.03	Thu Jul 10 14:23:27 EDT 2025
+	Remove duplicated code
+	Added sync()
+	Don't allow delete() on readonly databases
+	Fix DB_RDONLY
+	Added DB::Berkeley::Iterator
+
 0.02	Wed Jul  9 15:49:47 EDT 2025
 	Added store, set and fetch alias
 

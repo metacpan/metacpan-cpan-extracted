@@ -78,8 +78,6 @@ METHODS
 ERRORS
      new():
              From Mo::utils:
-                     Parameter 'id' must be a natural number.
-                             Value: %s
                      Parameter 'name' has length greater than '50'.
                              Value: %s
                      Parameter 'name' is required.
@@ -93,6 +91,9 @@ ERRORS
                      Parameter 'valid_to' must be older than 'valid_from' parameter.
                              Value: %s
                              Valid from: %s
+
+             From Mo::utils::Number::check_positive_natural():
+                     Parameter 'id' must be a positive natural number.
 
 EXAMPLE
      use strict;
@@ -122,7 +123,7 @@ EXAMPLE
      # Valid from: 2024-01-01
 
 DEPENDENCIES
-    DateTime, Error::Pure, Mo, Mo::utils.
+    DateTime, Error::Pure, Mo, Mo::utils, Mo::utils::Number.
 
 REPOSITORY
     <https://github.com/michal-josef-spacek/Data-HashType>
@@ -133,10 +134,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2023-2024 Michal Josef Špaček
+    © 2023-2025 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.06
+    0.07
 

@@ -175,7 +175,7 @@ sub call_bridge {
   if (not $self->{bridge}) {
     my $bridge_module = $ENV{TESTML_BRIDGE} || 'TestMLBridge';
 
-    if (my $code = $self->{ast}{bridge}{perl5}) {
+    if (my $code = $self->{ast}{bridge}{perl}) {
       eval <<"..." or die $@;
 use strict; use warnings;
 package TestMLBridge;
@@ -410,6 +410,11 @@ sub each_pick {
   for my $block (@{$self->{ast}{data}}) {
     $self->{block} = $block;
 
+    if (defined $block->{ONLY} and not $self->{warned_only}) {
+      $self->err("Warning: TestML 'ONLY' in use.");
+      $self->{warned_only} = true;
+    }
+
     $self->exec_expr(['<>', $list, $expr]);
   }
 
@@ -422,7 +427,7 @@ sub pick_exec {
   my ($self, $list, $expr) = @_;
 
   my $pick = 1;
-  if (my $when = $self->{block}{point}{WHEN}) {
+  if (my $when = $self->{block}{WHEN}) {
     if ($when =~ /^Env:(\w+)$/) {
       $pick = 0 unless $ENV{$1};
     }
@@ -432,9 +437,9 @@ sub pick_exec {
     for my $point (@$list) {
       if (
         ($point =~ /^\*/ and
-          not exists $self->{block}{point}{substr($point, 1)}) or
+          not exists $self->{block}{substr($point, 1)}) or
         ($point =~ /^!*/) and
-          exists $self->{block}{point}{substr($point, 2)}
+          exists $self->{block}{substr($point, 2)}
       ) {
         $pick = 0;
         last;
@@ -512,7 +517,7 @@ sub or_set_var {
 sub getp {
   my ($self, $name) = @_;
   return unless $self->{block};
-  my $value = $self->{block}{point}{$name};
+  my $value = $self->{block}{$name};
   $self->exec($value) if defined $value;
 }
 
@@ -605,7 +610,11 @@ sub get_label {
 
   $label ||= $self->getv('Label') || '';
 
-  my $block_label = $self->{block} ? $self->{block}{label} : '';
+  my $block_label = (
+    defined($self->{block}) and
+    defined($self->{block}{Label})
+  ) ? $self->{block}{Label}
+    : '';
 
   if ($label) {
     $label =~ s/^\+/$block_label/;
@@ -664,7 +673,7 @@ sub transform1 {
 sub transform2 {
   my ($self, $name, $label) = @_;
   return '' unless $self->{block};
-  my $value = $self->{block}{point}{$name};
+  my $value = $self->{block}{$name};
   return '' unless defined $value;
   $self->transform($value, $label);
 }

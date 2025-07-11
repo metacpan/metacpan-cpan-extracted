@@ -7,7 +7,7 @@ xo fill_color black (initial)
   start handling path (SVGPDF::Path)
   path d="M 100 350 l 150 -300"
     xo save
-    path stroke-width=3.00 stroke=red fill=none
+    path stroke-width=3.00 stroke=#FF0000 fill=none
     xo move(100.00,350.00)
     xo line(250.00,50.00)
     xo stroke (red)
@@ -16,7 +16,7 @@ xo fill_color black (initial)
   start handling path (SVGPDF::Path)
   path d="M 250 50 l 150 300"
     xo save
-    path stroke-width=3.00 stroke=red fill=none
+    path stroke-width=3.00 stroke=#FF0000 fill=none
     xo move(250.00,50.00)
     xo line(400.00,350.00)
     xo stroke (red)
@@ -25,7 +25,7 @@ xo fill_color black (initial)
   start handling path (SVGPDF::Path)
   path d="M 175 200 l 150 0"
     xo save
-    path stroke-width=3.00 stroke=green fill=none
+    path stroke-width=3.00 stroke=#008000 fill=none
     xo move(175.00,200.00)
     xo line(325.00,200.00)
     xo stroke (green)
@@ -34,7 +34,7 @@ xo fill_color black (initial)
   start handling path (SVGPDF::Path)
   path d="M 100 350 q 150 -300..."
     xo save
-    path stroke-width=5.00 stroke=blue fill=none
+    path stroke-width=5.00 stroke=#0000FF fill=none
     xo move(100.00,350.00)
     xo spline(250.00,50.00 400.00,350.00)
     xo stroke (blue)
@@ -46,21 +46,21 @@ xo fill_color black (initial)
       start handling circle (SVGPDF::Circle)
       circle cx=100 cy=350 r=3
         xo save
-        circle stroke-width=3.00 stroke=black fill=black
+        circle stroke-width=3.00 stroke=#000000 fill=#000000
         xo paint (black black)
         xo restore
       end handling circle
       start handling circle (SVGPDF::Circle)
       circle cx=250 cy=50 r=3
         xo save
-        circle stroke-width=3.00 stroke=black fill=black
+        circle stroke-width=3.00 stroke=#000000 fill=#000000
         xo paint (black black)
         xo restore
       end handling circle
       start handling circle (SVGPDF::Circle)
       circle cx=400 cy=350 r=3
         xo save
-        circle stroke-width=3.00 stroke=black fill=black
+        circle stroke-width=3.00 stroke=#000000 fill=#000000
         xo paint (black black)
         xo restore
       end handling circle
@@ -70,6 +70,7 @@ xo fill_color black (initial)
   g ====
     xo save
       start handling text (SVGPDF::Text)
+      text stroke=none fill=#000000
       text  x=100 y=350 dx=-30 anchor="middle"
         xo save
         txt translate( 70.00, 350.00 ) scale( 1.00 -1.00 )
@@ -78,6 +79,7 @@ xo fill_color black (initial)
         xo restore
       end handling text
       start handling text (SVGPDF::Text)
+      text stroke=none fill=#000000
       text  x=250 y=50 dy=-10 anchor="middle"
         xo save
         txt translate( 250.00, 40.00 ) scale( 1.00 -1.00 )
@@ -86,6 +88,7 @@ xo fill_color black (initial)
         xo restore
       end handling text
       start handling text (SVGPDF::Text)
+      text stroke=none fill=#000000
       text  x=400 y=350 dx=30 anchor="middle"
         xo save
         txt translate( 430.00, 350.00 ) scale( 1.00 -1.00 )

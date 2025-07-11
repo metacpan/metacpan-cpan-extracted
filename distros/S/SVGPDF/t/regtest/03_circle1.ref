@@ -7,7 +7,7 @@ xo fill_color black (initial)
   start handling circle (SVGPDF::Circle)
   circle cx=25 cy=75 r=20
     xo save
-    circle stroke=none fill=(current) fill=black
+    circle stroke=none fill=(current) fill=#000000
     xo fill (none)
     xo restore
   end handling circle

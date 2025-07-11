@@ -7,7 +7,7 @@ xo fill_color black (initial)
   start handling path (SVGPDF::Path)
   path d="M 80 80 A 45 45, 0, ..."
     xo save
-    path stroke=none fill=green
+    path stroke=none fill=#008000
     xo move(80.00,80.00)
     xo arc(45.00,45.00 0.00 0,0 125.00,125.00)
     circular_arc(80.00,80.00 125.00,125.00 45.00 move=0 large=0 dir=0 rot=0.00)
@@ -23,7 +23,7 @@ xo fill_color black (initial)
   start handling path (SVGPDF::Path)
   path d="M 230 80 A 45 45, 0,..."
     xo save
-    path stroke=none fill=red
+    path stroke=none fill=#FF0000
     xo move(230.00,80.00)
     xo arc(45.00,45.00 0.00 1,0 275.00,125.00)
     circular_arc(230.00,80.00 275.00,125.00 45.00 move=0 large=1 dir=0 rot=0.00)
@@ -51,7 +51,7 @@ xo fill_color black (initial)
   start handling path (SVGPDF::Path)
   path d="M 230 230 A 45 45, 0..."
     xo save
-    path stroke=none fill=blue
+    path stroke=none fill=#0000FF
     xo move(230.00,230.00)
     xo arc(45.00,45.00 0.00 1,1 275.00,275.00)
     circular_arc(230.00,230.00 275.00,275.00 45.00 move=0 large=1 dir=1 rot=0.00)

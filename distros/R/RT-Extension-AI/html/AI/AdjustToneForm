@@ -1,0 +1,71 @@
+<form
+  hx-get="/Helpers/AISuggestion/ProcessAIRequest"
+  hx-target="#ai-result"
+  hx-swap="innerHTML"
+  id="toneForm"
+  hx-indicator="#spinner"
+  hx-trigger="submit"
+>
+  <input type="hidden" name="callType" value="adjust_tone">
+
+%if ( $TicketObj ) {
+<input type="hidden" class="hidden" name="id" value="<% $TicketObj->Id %>">
+% }
+  <div class="mb-3">
+    <textarea
+      name="rawText"
+      id="editorText"
+      class="form-control"
+      rows="4"
+      placeholder="Enter the text you want to adjust here."
+    ><% $rawText |n %></textarea>
+  </div>
+
+  <div class="mb-3">
+    <label for="adjustToneType" class="form-label"><&|/l&>Adjustment Type</&></label>
+    <select id="adjustToneType" name="adjustToneType" class="form-select">
+      <option value="formal">Formal</option>
+      <option value="casual">Casual</option>
+      <option value="professional">Professional</option>
+      <option value="empathetic">Empathetic</option>
+    </select>
+  </div>
+
+  <div class="mb-3">
+    <label for="ai-result" class="form-label"><&|/l&>AI Response</&></label>
+    <div
+      id="ai-result"
+      name="ai-result"
+      class="form-control"
+      style="min-height: 100px; overflow-y: auto;"
+    ></div>
+  </div>
+
+  <div class="d-flex justify-content-end gap-2 mt-3">
+    <div id="spinner" class="htmx-indicator me-2">
+      <& /Widgets/Spinner &>
+    </div>
+
+    <button type="submit" class="btn btn-primary"><&|/l&>Generate</&></button>
+
+    <button
+      type="button"
+      class="btn btn-secondary"
+      data-bs-dismiss="modal"
+      name="done-button"
+    >
+      Done
+    </button>
+  </div>
+</form>
+
+<div id="spinner" style="display: none;">
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
+
+<%ARGS>
+$rawText   => ''
+$TicketObj => undef
+</%ARGS>

@@ -23,6 +23,7 @@ t/author-pod-syntax.t
 t/dom2tap.t
 t/empty_tap.tap
 t/empty_tap_archive.tgz
+t/expected_normalized.tap
 t/illegal-utf8.tap
 t/no_tap_lines.tap
 t/partially_empty_tap.tgz
@@ -35,6 +36,7 @@ t/some_tap6_autotapversion.txt
 t/some_tap7_taplevel.txt
 t/some_tap7_taplevel_skipall.txt
 t/some_tap8_pragma.txt
+t/some_tap8_sparse.txt
 t/some_tap_document_data.tap
 t/some_tap_doublecomments.txt
 t/some_tap_whitespace.tap
@@ -51,6 +53,7 @@ t/tap_dom4.t
 t/tap_dom5_usebitsets.t
 t/tap_dom6_autotapversion.t
 t/tap_dom7_taplevel.t
+t/tap_dom8_sparse.t
 t/tap_dom_document_data.t
 t/tap_dom_dontignore_lines.t
 t/tap_dom_empty.t
@@ -58,9 +61,11 @@ t/tap_dom_ignore_lines.t
 t/tap_dom_ignore_unknown.t
 t/tap_dom_key_values.t
 t/tap_dom_key_values_case_insensitive.t
+t/tap_dom_normalize.t
 t/tap_dom_pragma.t
 t/tap_dom_unicode.t
 t/tap_dom_whitespace.t
+t/to_be_normalized.tap
 xt/pod-coverage.t
 xt/pod.t
 xt/regexp-common.tap

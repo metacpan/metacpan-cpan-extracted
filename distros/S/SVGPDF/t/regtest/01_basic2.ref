@@ -7,18 +7,19 @@ xo fill_color black (initial)
   start handling rect (SVGPDF::Rect)
   rect x=0 y=0 w=300 h=200
     xo save
-    rect stroke=none fill=red
+    rect stroke=none fill=#FF0000
     xo fill (none)
     xo restore
   end handling rect
   start handling circle (SVGPDF::Circle)
   circle cx=150 cy=100 r=80
     xo save
-    circle stroke=none fill=green
+    circle stroke=none fill=#008000
     xo fill (none)
     xo restore
   end handling circle
   start handling text (SVGPDF::Text)
+  text stroke=none fill=#FFFFFF
   text  x=150 y=125 anchor="middle"
     xo save
     txt translate( 150.00, 125.00 ) scale( 1.00 -1.00 )

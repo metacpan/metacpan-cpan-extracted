@@ -1,14 +1,14 @@
 ---
-abstract: 'use ArtNet with C<IO::Async>'
+abstract: 'use Art-Net with C<IO::Async>'
 author:
   - 'Paul Evans <leonerd@leonerd.org.uk>'
 build_requires:
   IO::Async::Test: '0'
-  Test::More: '0.88'
+  Test2::V0: '0'
 configure_requires:
   Module::Build: '0.4004'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,11 +17,11 @@ name: Net-Async-ArtNet
 provides:
   Net::Async::ArtNet:
     file: lib/Net/Async/ArtNet.pm
-    version: '0.03'
+    version: '0.04'
 requires:
   IO::Async::Loop: '0.59'
   IO::Async::Socket: '0.59'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,351 @@
+NAME
+    Data::OFN::Thing - Data object for OFN thing.
+
+SYNOPSIS
+     use Data::OFN::Thing;
+
+     my $obj = Data::OFN::Thing->new(%params);
+     my $attachment_ar = $obj->attachment;
+     my $created = $obj->created;
+     my $description_ar = $obj->description;
+     my $id = $obj->id;
+     my $invalidated = $obj->invalidated;
+     my $iri = $obj->iri;
+     my $name_ar = $obj->name;
+     my $relevant_to = $obj->relevant_to;
+     my $updated = $obj->updated;
+
+DESCRIPTION
+    Immutable data object for OFN (Otevřené formální normy) representation
+    of thing in the Czech Republic.
+
+    This object is actual with 2020-07-01
+    <https://ofn.gov.cz/v%C4%9Bc/2020-07-01/> version of OFN thing standard.
+
+    The thing is base object for other OFN objects.
+
+METHODS
+  "new"
+     my $obj = Data::OFN::Thing->new(%params);
+
+    Constructor.
+
+    *       "attachment"
+
+            The thing attachments. It's reference to array with
+            Data::OFN::DigitalObject instances.
+
+            It's optional.
+
+            Default value is [].
+
+    *       "created"
+
+            Time moment when the thing was created. It's
+            Data::OFN::Comment::TimeMoment instance.
+
+            It's optional.
+
+            Default value is undef.
+
+    *       "description"
+
+            The description of the thing. It's reference to array with
+            Data::Text::Simple instances.
+
+            It's optional.
+
+            Default value is [].
+
+    *       "id"
+
+            The thing id.
+
+            This is not official identifier of address in the Czech
+            Republic. It's used for internal identification like database.
+
+            It's optional.
+
+            Default value is undef.
+
+    *       "invalidated"
+
+            Time moment when the thing was invalidated. It's
+            Data::OFN::Comment::TimeMoment instance.
+
+            It's optional.
+
+            Default value is undef.
+
+    *       "iri"
+
+            IRI of the thing.
+
+            It's optional.
+
+            Default value is undef.
+
+    *       "name"
+
+            The name of the thing. It's reference to array with
+            Data::Text::Simple instances.
+
+            It's optional.
+
+            Default value is [].
+
+    *       "relevant_to"
+
+            Time moment to which the thing is relevant. It's
+            Data::OFN::Comment::TimeMoment instance.
+
+            It's optional.
+
+            Default value is undef.
+
+    *       "updated"
+
+            Time moment when the thing was updated. It's
+            Data::OFN::Comment::TimeMoment instance.
+
+            It's optional.
+
+            Default value is undef.
+
+    Returns instance of object.
+
+  "attachment"
+     my $attachment_ar = $obj->attachment;
+
+    Get list of attachments.
+
+    Returns reference to array with Data::OFN::DigitalObject instances.
+
+  "created"
+     my $created = $obj->created;
+
+    Get time moment when the thing was created.
+
+    Returns Data::OFN::Common::TimeMoment instance.
+
+  "description"
+     my $description_ar = $obj->description;
+
+    Get description of the thing.
+
+    Returns reference to array with Data::Text::Simple instances.
+
+  "id"
+     my $id = $obj->id;
+
+    Get OFN thing id.
+
+    Returns positive natural number.
+
+  "invalidated"
+     my $invalidated = $obj->invalidated;
+
+    Get time moment when the thing was invalidated.
+
+    Returns Data::OFN::Common::TimeMoment instance.
+
+  "iri"
+     my $iri = $obj->iri;
+
+    Get IRI of the thing.
+
+    Returns string with IRI.
+
+  "name"
+     my $name_ar = $obj->name;
+
+    Get name of the thing.
+
+    Returns reference to array with Data::Text::Simple instances.
+
+  "relevant_to"
+     my $relevant_to = $obj->relevant_to;
+
+    Get time moment to which the thing is relevant.
+
+    Returns Data::OFN::Common::TimeMoment instance.
+
+  "updated"
+     my $updated = $obj->updated;
+
+    Get time moment when the thing was updated.
+
+    Returns Data::OFN::Common::TimeMoment instance.
+
+ERRORS
+     new():
+             From Mo::utils::check_array_object():
+                     Digital object isn't 'Data::OFN::DigitalObject' object.
+                             Value: %s
+                             Reference: %s
+                     Description isn't 'Data::Text::Simple' object.
+                             Value: %s
+                             Reference: %s
+                     Name isn't 'Data::Text::Simple' object.
+                             Value: %s
+                             Reference: %s
+                     Parameter 'attachment' must be a array.
+                             Value: %s
+                             Reference: %s
+                     Parameter 'description' must be a array.
+                             Value: %s
+                             Reference: %s
+                     Parameter 'name' must be a array.
+                             Value: %s
+                             Reference: %s
+             From Mo::utils::check_isa():
+                     Parameter 'created' must be a 'Data::OFN::Common::TimeMoment' object.
+                             Value: %s
+                             Reference: %s
+                     Parameter 'invalidated' must be a 'Data::OFN::Common::TimeMoment' object.
+                             Value: %s
+                             Reference: %s
+                     Parameter 'relevant_to' must be a 'Data::OFN::Common::TimeMoment' object.
+                             Value: %s
+                             Reference: %s
+                     Parameter 'updated' must be a 'Data::OFN::Common::TimeMoment' object.
+                             Value: %s
+                             Reference: %s
+             From Mo::utils::Number::check_positive_natural():
+                     Parameter 'id' must be a positive natural number.
+                             Value: %s
+
+EXAMPLE1
+     use strict;
+     use warnings;
+
+     use Data::OFN::Common::TimeMoment;
+     use Data::OFN::Thing;
+     use Data::Text::Simple;
+     use DateTime;
+     use Unicode::UTF8 qw(decode_utf8 encode_utf8);
+
+     my $obj = Data::OFN::Thing->new(
+             'created' => Data::OFN::Common::TimeMoment->new(
+                     'date_and_time' => DateTime->new(
+                             'day' => 27,
+                             'month' => 9,
+                             'year' => 2019,
+                             'hour' => 9,
+                             'minute' => 30,
+                             'time_zone' => '+02:00',
+                     ),
+             ),
+             'description' => [
+                     Data::Text::Simple->new(
+                             'lang' => 'cs',
+                             'text' => decode_utf8("Ve čtvrtek 26. září večer došlo k loupeži banky na Masarykově náměstí.\nLupič pak prchal směrem ven z města. Obsluha městského kamerového systému incident zaznamenala,\nstrážníci městské policie zastavili auto ve Francouzské ulici a přivolali státní policii.\nTi záležitost převzali k dořešení. Pachateli hrozí až 10 let za mřížemi."),
+                     ),
+                     Data::Text::Simple->new(
+                             'lang' => 'en',
+                             'text' => decode_utf8("On Thursday evening, September 26, the bank was robbed on Masaryk Square.\nThe robber then fled out of town. The operator of the city's camera system recorded the incident,\nthus the city police officers were able to identify and stop the car in Francouzská Street and called the state police.\nThey took over the matter. Offenders face up to 10 years behind bars."),
+                     ),
+             ],
+             'id' => 7,
+             'iri' => decode_utf8('https://www.trebic.cz/zdroj/aktualita/2020/dopadení-lupiče-na-francouzské-ulici'),
+             'name' => [
+                     Data::Text::Simple->new(
+                             'lang' => 'cs',
+                             'text' => decode_utf8('Díky policistům byl lupič dopaden'),
+                     ),
+                     Data::Text::Simple->new(
+                             'lang' => 'en',
+                             'text' => 'Culprit was immediately caught, thanks to the police.',
+                     ),
+             ],
+             'relevant_to' => Data::OFN::Common::TimeMoment->new(
+                     'date_and_time' => DateTime->new(
+                             'day' => 27,
+                             'month' => 11,
+                             'year' => 2019,
+                             'hour' => 9,
+                             'time_zone' => '+02:00',
+                     ),
+             ),
+     );
+
+     sub _text {
+             my $obj = shift;
+
+             return encode_utf8($obj->text.' ('.$obj->lang.')');
+     }
+
+     # Print out.
+     print 'Id: '.$obj->id."\n";
+     print 'Name: '._text($obj->name->[0])."\n";
+     print 'Name: '._text($obj->name->[1])."\n";
+     print 'Description: '._text($obj->description->[0])."\n";
+     print 'Description: '._text($obj->description->[1])."\n";
+     print 'IRI: '.encode_utf8($obj->iri)."\n";
+     print 'Created: '.$obj->created->date_and_time."\n";
+     print 'Relevant to: '.$obj->relevant_to->date_and_time."\n";
+
+     # Output:
+     # Id: 7
+     # Name: Díky policistům byl lupič dopaden (cs)
+     # Name: Culprit was immediately caught, thanks to the police. (en)
+     # Description: Ve čtvrtek 26. září večer došlo k loupeži banky na Masarykově náměstí.
+     # Lupič pak prchal směrem ven z města. Obsluha městského kamerového systému incident zaznamenala,
+     # strážníci městské policie zastavili auto ve Francouzské ulici a přivolali státní policii.
+     # Ti záležitost převzali k dořešení. Pachateli hrozí až 10 let za mřížemi. (cs)
+     # Description: On Thursday evening, September 26, the bank was robbed on Masaryk Square.
+     # The robber then fled out of town. The operator of the city's camera system recorded the incident,
+     # thus the city police officers were able to identify and stop the car in Francouzská Street and called the state police.
+     # They took over the matter. Offenders face up to 10 years behind bars. (en)
+     # IRI: https://www.trebic.cz/zdroj/aktualita/2020/dopadení-lupiče-na-francouzské-ulici
+     # Created: 2019-09-27T09:30:00
+     # Relevant to: 2019-11-27T09:00:00
+
+EXAMPLE2
+     use strict;
+     use warnings;
+
+     use Data::OFN::Common::TimeMoment;
+     use Data::OFN::Thing;
+     use DateTime;
+
+     my $obj = Data::OFN::Thing->new(
+             'iri' => 'https://www.spilberk.cz/',
+             'invalidated' => Data::OFN::Common::TimeMoment->new(
+                     'date_and_time' => DateTime->new(
+                             'day' => 27,
+                             'month' => 11,
+                             'year' => 2019,
+                             'hour' => 9,
+                             'time_zone' => '+02:00',
+                     ),
+             ),
+     );
+
+     # Print out.
+     print 'IRI: '.$obj->iri."\n";
+     print 'Invalidated: '.$obj->invalidated->date_and_time."\n";
+
+     # Output:
+     # IRI: https://www.spilberk.cz/
+     # Invalidated: 2019-11-27T09:00:00
+
+DEPENDENCIES
+    Mo, Mo::utils, Mo::utils::IRI, Mo::utils::Number.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Data-OFN-Thing>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2023-2025 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

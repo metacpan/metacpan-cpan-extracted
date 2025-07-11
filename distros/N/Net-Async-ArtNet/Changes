@@ -1,5 +1,11 @@
 Revision history for Net-Async-ArtNet
 
+0.04    2025-07-10
+        [CHANGES]
+         * Minor style updates and refresh
+         * Use `Test::V0` instead of `Test::More`
+         * Correct hyphenation of "Art-Net" in module summary line
+
 0.03    2020-05-11
         [CHANGES]
          * Also recognise family/host/service as listen parameters

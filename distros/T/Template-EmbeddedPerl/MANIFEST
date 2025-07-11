@@ -18,6 +18,7 @@ t/crazy.t
 t/ff.t
 t/if.t
 t/interpolated.t
+t/stringification.t
 t/templates/ff.epl
 t/templates/hello.epl
 t/util.t

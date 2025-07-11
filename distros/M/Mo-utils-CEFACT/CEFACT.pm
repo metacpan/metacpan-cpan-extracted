@@ -10,7 +10,7 @@ use Readonly;
 
 Readonly::Array our @EXPORT_OK => qw(check_cefact_unit);
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 sub check_cefact_unit {
 	my ($self, $key) = @_;
@@ -67,6 +67,8 @@ Mo UN/CEFACT utilities for checking of data objects.
 Check parameter defined by C<$key> if it's UN/CEFACT unit Common Code.
 Value could be undefined.
 
+Put error if check isn't ok.
+
 Returns undef.
 
 =head1 ERRORS
@@ -116,7 +118,7 @@ Returns undef.
  print "ok\n";
 
  # Output like:
- # #Error [...CEFACT.pm:?] Parameter '%s' must be a UN/CEFACT unit common code.
+ # #Error [...CEFACT.pm:?] Parameter 'key' must be a UN/CEFACT unit common code.
 
 =head1 DEPENDENCIES
 
@@ -157,6 +159,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

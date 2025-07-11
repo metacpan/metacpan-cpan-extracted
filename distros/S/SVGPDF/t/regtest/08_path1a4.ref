@@ -14,14 +14,14 @@ xo fill_color black (initial)
   start handling rect (SVGPDF::Rect)
   rect x=1 y=1 w=1198 h=398
     xo save
-    rect stroke-width=1.00 stroke=blue fill=none
+    rect stroke-width=1.00 stroke=#0000FF fill=none
     xo stroke (blue)
     xo restore
   end handling rect
   start handling path (SVGPDF::Path)
   path d="M300,200 h-150 a150,..."
     xo save
-    path stroke-width=5.00 stroke=blue fill=red
+    path stroke-width=5.00 stroke=#0000FF fill=#FF0000
     xo move(300.00,200.00)
     xo hline(150.00)
     xo arc(150.00,150.00 0.00 1,0 300.00,50.00)
@@ -45,7 +45,7 @@ xo fill_color black (initial)
   start handling path (SVGPDF::Path)
   path d="M275,175 v-150 a150,..."
     xo save
-    path stroke-width=5.00 stroke=blue fill=yellow
+    path stroke-width=5.00 stroke=#0000FF fill=#FFFF00
     xo move(275.00,175.00)
     xo vline(25.00)
     xo arc(150.00,150.00 0.00 0,0 125.00,175.00)
@@ -61,7 +61,7 @@ xo fill_color black (initial)
   start handling path (SVGPDF::Path)
   path d="M600,350 l 50,-25 a2..."
     xo save
-    path stroke-width=5.00 stroke=red fill=none
+    path stroke-width=5.00 stroke=#FF0000 fill=none
     xo move(600.00,350.00)
     xo line(650.00,325.00)
     xo arc(25.00,25.00 -30.00 0,1 700.00,300.00)

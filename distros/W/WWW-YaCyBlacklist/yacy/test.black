@@ -1,0 +1,17 @@
+test1.co/fullpath
+test2.co/.*
+*.test3.co/.*
+sub.test5.*/.*
+*.sub.test4.co/.*
+test6.*/.*
+(regexp)test7\.\w+/[a-z]+\.\w{1,5}
+test8.co/[a-z]+\.htm
+test9.co/%C3%A4%C3%B6%C3%BC%C3%9F%C3%84%C3%96%C3%9C
+test10.co/fullpath.-_
+test11.co/fullpath-_
+test12.co/fullpath-
+test13.co/fullpath1234567890
+test14.co/fullpath?ref=test
+test15.co/fullpath\?ref=test
+sub.test16.co/.*
+test17.co/^fullpath$

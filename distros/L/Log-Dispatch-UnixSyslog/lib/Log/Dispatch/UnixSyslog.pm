@@ -1,6 +1,6 @@
 use v5.20.0;
 use warnings;
-package Log::Dispatch::UnixSyslog 0.002;
+package Log::Dispatch::UnixSyslog 0.004;
 
 use parent qw(Log::Dispatch::Output);
 # ABSTRACT: log events to syslog with Unix::Syslog
@@ -78,6 +78,7 @@ sub new {
   my $self = {
     ident     => $arg{ident},
     facility  => scalar $const->(),
+    logopt    => $arg{logopt} // 0,
   };
 
   bless $self => $class;
@@ -85,12 +86,21 @@ sub new {
   # this is our duty as a well-behaved Log::Dispatch plugin
   $self->_basic_init(%arg);
 
+  return $self;
+}
+
+sub _maybe_openlog {
+  my ($self) = @_;
+
+  return if $self->{_opened_in_pid} && $self->{_opened_in_pid} == $$;
+
   # hand wringing: What if someone is re-openlog-ing after this?  Well, they
   # ought not to do that!  We could re-open every time, but let's just see how
   # this goes, for now. -- rjbs, 2020-08-11
-  Unix::Syslog::openlog($self->{ident}, $arg{logopt} // 0, $self->{facility});
+  Unix::Syslog::openlog($self->{ident}, $self->{logopt}, $self->{facility});
+  $self->{_opened_in_pid} = $$;
 
-  return $self;
+  return;
 }
 
 #pod =method log_message
@@ -108,6 +118,7 @@ sub log_message {
   my $sys_level = 7 - $self->_level_as_number($p{level});
   my $priority  = $sys_level | $self->{facility};
 
+  $self->_maybe_openlog;
   Unix::Syslog::syslog($priority, '%s', $p{message});
 
   return;
@@ -127,7 +138,7 @@ Log::Dispatch::UnixSyslog - log events to syslog with Unix::Syslog
 
 =head1 VERSION
 
-version 0.002
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -159,14 +170,15 @@ efficient at doing it.
 =head1 PERL VERSION
 
 This module should work on any version of perl still receiving updates from
-the Perl 5 Porters.  This means it should work on any version of perl released
-in the last two to three years.  (That is, if the most recently released
-version is v5.40, then this module should work on both v5.40 and v5.38.)
+the Perl 5 Porters.  This means it should work on any version of perl
+released in the last two to three years.  (That is, if the most recently
+released version is v5.40, then this module should work on both v5.40 and
+v5.38.)
 
 Although it may work on older versions of perl, no guarantee is made that the
 minimum required version will not be increased.  The version may be increased
-for any reason, and there is no promise that patches will be accepted to lower
-the minimum required perl.
+for any reason, and there is no promise that patches will be accepted to
+lower the minimum required perl.
 
 =head1 METHODS
 
@@ -191,15 +203,25 @@ Log::Dispatch::Output.
 
 Ricardo SIGNES <cpan@semiotic.systems>
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
 =for stopwords Ricardo Signes
 
+=over 4
+
+=item *
+
 Ricardo Signes <rjbs@semiotic.systems>
+
+=item *
+
+Ricardo Signes <rjbs@users.noreply.github.com>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Ricardo SIGNES.
+This software is copyright (c) 2025 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

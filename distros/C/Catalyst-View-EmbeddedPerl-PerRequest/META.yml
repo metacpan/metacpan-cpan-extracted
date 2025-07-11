@@ -22,12 +22,12 @@ requires:
   Moose: '0'
   Scalar::Util: '0'
   String::CamelCase: '0'
-  Template::EmbeddedPerl: '0.001013'
+  Template::EmbeddedPerl: '0.001014'
 resources:
   bugtracker: https://github.com/jjn1056/Catalyst-View-EmbeddedPerl/issues
   homepage: https://github.com/jjn1056/Catalyst-View-EmbeddedPerl
   repository: https://github.com/jjn1056/Catalyst-View-EmbeddedPerl
-version: '0.001020'
+version: '0.001021'
 x_generated_by_perl: v5.40.0
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

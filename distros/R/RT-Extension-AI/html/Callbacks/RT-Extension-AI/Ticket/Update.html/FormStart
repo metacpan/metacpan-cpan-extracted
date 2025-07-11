@@ -1,0 +1,7 @@
+<& /Elements/AIJavascriptConfig, TicketObj => $Ticket &>
+<%init>
+</%init>
+<%args>
+$Ticket
+$ARGSRef
+</%args>

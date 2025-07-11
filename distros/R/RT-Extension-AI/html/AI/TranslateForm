@@ -1,0 +1,82 @@
+<form
+    id="translationForm"
+    hx-get="/Helpers/AISuggestion/ProcessAIRequest"
+    hx-target="#ai-result"
+    hx-indicator="#spinner"
+    hx-swap="innerHTML"
+    hx-trigger="submit"
+>
+  <input type="hidden" name="callType" value="translate_content">
+%if ( $TicketObj ) {
+  <input type="hidden" class="hidden" name="id" value="<% $TicketObj->Id %>">
+% }
+    <div class="mb-2">
+        <label class="form-label small text-muted mb-1"><&|/l&>Translate From</&></label>
+         <& /Elements/SelectLang, Name => 'translateFrom', Default => $transFrom &>
+    </div>
+
+    <div class="mb-2">
+        <label class="form-label small text-muted mb-1">You can edit your text here.</label>
+        <textarea
+            name="rawText"
+            class="form-control"
+            rows="6"
+        ><% $rawText |n %></textarea>
+    </div>
+
+    <div class="mb-2">
+        <label class="form-label small text-muted mb-1"><&|/l&>Translate To</&></label>
+        <& /Elements/SelectLang, Name => 'translateTo', Default => $transTo &>
+
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label small text-muted mb-1"><&|/l&>AI Response</&></label>
+        <div
+            id="ai-result"
+            name="ai-result"
+            class="form-control"
+            style="min-height: 100px;"
+        >
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-end gap-2 align-items-center">
+        <div id="spinner" class="htmx-indicator me-2">
+            <& /Widgets/Spinner &>
+        </div>
+
+        <button
+            type="submit"
+            class="btn btn-primary px-4"
+            hx-post="/Helpers/AISuggestion/ProcessAIRequest"
+            hx-trigger="click"
+            hx-target="#ai-result"
+            hx-indicator="#spinner"
+        >
+            <&|/l&>Generate</&>
+        </button>
+
+        <button
+            name="done-button"
+            type="button"
+            class="btn btn-primary px-4 close"
+            data-bs-dismiss="modal"
+        >
+            Done
+        </button>
+    </div>
+</form>
+
+<%INIT>
+if (RT->Config->Get('MessageBoxRichTextInitArguments')->{language} ) {
+    $transFrom = RT->Config->Get('MessageBoxRichTextInitArguments')->{language}->{content};
+}
+</%INIT>
+
+<%ARGS>
+$rawText   => ''
+$transFrom => undef
+$transTo   => 'es'
+$TicketObj => undef
+</%ARGS>

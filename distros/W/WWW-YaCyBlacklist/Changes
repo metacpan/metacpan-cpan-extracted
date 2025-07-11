@@ -1,0 +1,7 @@
+Revision history for WWW::YaCyBlacklist
+
+0.2       2025-07-11 01:19:39+02:00 Europe/Berlin
+        attribute 'lines' removed
+
+0.1       2025-07-10 15:31:06+02:00 Europe/Berlin
+        first release

@@ -1,0 +1,38 @@
+<%ARGS>
+$rawText    => ''
+$callType   => ''
+$transFrom  => 'en'
+$transTo    => 'es'
+$TicketId   => undef
+</%ARGS>
+
+<%INIT>
+my $TicketObj;
+if ( $TicketId ) {
+    $TicketObj = LoadTicket($TicketId);
+}
+
+my $modal_title;
+my $form_component;
+
+if ($callType eq 'translate_content') {
+    $modal_title = "Translate Text";
+    $form_component = '/AI/TranslateForm';
+} elsif ($callType eq 'adjust_tone') {
+    $modal_title = "Adjust Tone/Voice";
+    $form_component = '/AI/AdjustToneForm';
+} else {
+    $modal_title = "AI Suggestion";
+    $form_component = '/AI/SuggestionForm';
+}
+</%INIT>
+
+<& /AI/ModalContent,
+  title           => $modal_title,
+  form_component  => $form_component,
+  rawText         => $rawText,
+  callType        => $callType,
+  transFrom       => $transFrom,
+  transTo         => $transTo,
+  TicketObj       => $TicketObj
+&>

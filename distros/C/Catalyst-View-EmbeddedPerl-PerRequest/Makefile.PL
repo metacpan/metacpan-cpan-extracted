@@ -21,7 +21,7 @@ my %WriteMakefileArgs = (
     "Moose" => 0,
     "Scalar::Util" => 0,
     "String::CamelCase" => 0,
-    "Template::EmbeddedPerl" => "0.001013"
+    "Template::EmbeddedPerl" => "0.001014"
   },
   "TEST_REQUIRES" => {
     "Catalyst::Test" => 0,
@@ -29,7 +29,7 @@ my %WriteMakefileArgs = (
     "Test::Lib" => 0,
     "Test::Most" => "0.34"
   },
-  "VERSION" => "0.001020",
+  "VERSION" => "0.001021",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -44,7 +44,7 @@ my %FallbackPrereqs = (
   "Moose" => 0,
   "Scalar::Util" => 0,
   "String::CamelCase" => 0,
-  "Template::EmbeddedPerl" => "0.001013",
+  "Template::EmbeddedPerl" => "0.001014",
   "Test::Lib" => 0,
   "Test::Most" => "0.34"
 );

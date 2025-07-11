@@ -7,7 +7,7 @@ xo fill_color black (initial)
   start handling polyline (SVGPDF::Polyline)
   polyline points="60, 110 65, 120 70, ..."
     xo save
-    polyline stroke=none fill=(current) fill=black
+    polyline stroke=none fill=(current) fill=#000000
     xo fill (none)
     xo restore
   end handling polyline

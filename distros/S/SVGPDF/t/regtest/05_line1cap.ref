@@ -7,21 +7,21 @@ xo fill_color black (initial)
   start handling line (SVGPDF::Line)
   line x1=40 y1=20 x2=120 y2=20
     xo save
-    line stroke-width=20.00 linecap=0 stroke=black fill=(current) fill=black
+    line stroke-width=20.00 linecap=0 stroke=#000000 fill=(current) fill=#000000
     xo paint (black currentColor)
     xo restore
   end handling line
   start handling line (SVGPDF::Line)
   line x1=40 y1=60 x2=120 y2=60
     xo save
-    line stroke-width=20.00 linecap=2 stroke=black fill=(current) fill=black
+    line stroke-width=20.00 linecap=2 stroke=#000000 fill=(current) fill=#000000
     xo paint (black currentColor)
     xo restore
   end handling line
   start handling line (SVGPDF::Line)
   line x1=40 y1=100 x2=120 y2=100
     xo save
-    line stroke-width=20.00 linecap=1 stroke=black fill=(current) fill=black
+    line stroke-width=20.00 linecap=1 stroke=#000000 fill=(current) fill=#000000
     xo paint (black currentColor)
     xo restore
   end handling line

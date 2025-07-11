@@ -16,11 +16,13 @@ SUBROUTINES
     Check parameter defined by $key if it's UN/CEFACT unit Common Code.
     Value could be undefined.
 
+    Put error if check isn't ok.
+
     Returns undef.
 
 ERRORS
      check_cefact_unit():
-             UN/CEFACT unit common code isn't valid.
+             Parameter '%s' must be a UN/CEFACT unit common code.
                    Value: %s
 
 EXAMPLE1
@@ -58,7 +60,7 @@ EXAMPLE2
      print "ok\n";
 
      # Output like:
-     # #Error [...CEFACT.pm:?] UN/CEFACT unit common code isn't valid.
+     # #Error [...CEFACT.pm:?] Parameter 'key' must be a UN/CEFACT unit common code.
 
 DEPENDENCIES
     CEFACT::Unit, Error::Pure, Exporter, Readonly.
@@ -83,5 +85,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.02
+    0.03
 

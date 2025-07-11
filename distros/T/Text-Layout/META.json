@@ -4,7 +4,7 @@
       "Johan Vromans <jv@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -58,15 +58,15 @@
    "provides" : {
       "Text::Layout" : {
          "file" : "lib/Text/Layout.pm",
-         "version" : "0.044"
+         "version" : "0.045"
       },
       "Text::Layout::FontConfig" : {
          "file" : "lib/Text/Layout/FontConfig.pm",
-         "version" : "0.044"
+         "version" : "0.045"
       },
       "Text::Layout::FontDescriptor" : {
          "file" : "lib/Text/Layout/FontDescriptor.pm",
-         "version" : "0.044"
+         "version" : "0.045"
       }
    },
    "release_status" : "stable",
@@ -80,6 +80,6 @@
          "web" : "https://github.com/sciurius/perl-Text-Layout"
       }
    },
-   "version" : "0.044",
+   "version" : "0.045",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

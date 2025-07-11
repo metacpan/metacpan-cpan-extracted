@@ -44,7 +44,13 @@ sub inherit :Local  {
 sub attributes :Local  {
   my ($self, $c) = @_;
   return $c->view('Attributes', aaa=>1)->http_ok;
-} 
+}
+
+sub stringification :Local  {
+  my ($self, $c) = @_;
+  my $object = $c->model('Stringification')->new;
+  return $c->view('Stringification', object => $object)->http_ok;
+}
 
 __PACKAGE__->meta->make_immutable;
 __PACKAGE__->config(namespace => '');

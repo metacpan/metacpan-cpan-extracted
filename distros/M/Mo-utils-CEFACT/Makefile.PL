@@ -30,7 +30,7 @@ test_requires 'Error::Pure::Utils' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.02';
+version '0.03';
 
 # Run.
 WriteAll();

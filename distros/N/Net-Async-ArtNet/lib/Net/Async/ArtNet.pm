@@ -1,20 +1,18 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2014-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2014-2025 -- leonerd@leonerd.org.uk
 
-package Net::Async::ArtNet;
+package Net::Async::ArtNet 0.04;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.03';
 
 use base qw( IO::Async::Socket );
 
 =head1 NAME
 
-C<Net::Async::ArtNet> - use ArtNet with C<IO::Async>
+C<Net::Async::ArtNet> - use Art-Net with C<IO::Async>
 
 =head1 SYNOPSIS
 

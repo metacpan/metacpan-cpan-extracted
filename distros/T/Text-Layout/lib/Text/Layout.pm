@@ -8,7 +8,7 @@ package Text::Layout;
 
 use Carp;
 
- our $VERSION = "0.044";
+ our $VERSION = "0.045";
 
 =head1 NAME
 

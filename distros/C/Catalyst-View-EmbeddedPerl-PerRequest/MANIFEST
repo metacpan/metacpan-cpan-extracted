@@ -15,6 +15,7 @@ lib/Catalyst/View/EmbeddedPerl/PerRequest/TagUtils.pm
 lib/MooseX/Attribute/Catalyst/View/EmbeddedPerl/ExportedAttribute.pm
 t/lib/Example.pm
 t/lib/Example/Controller/Root.pm
+t/lib/Example/Model/Stringification.pm
 t/lib/Example/View/Attributes.pm
 t/lib/Example/View/Base.pm
 t/lib/Example/View/Captures.pm
@@ -25,6 +26,7 @@ t/lib/Example/View/HelloName.pm
 t/lib/Example/View/Inherit.pm
 t/lib/Example/View/NoEscape.pm
 t/lib/Example/View/Page.pm
+t/lib/Example/View/Stringification.pm
 t/lib/Example/View/TestSubs.pm
 t/lib/Example/View/test_subs.epl
 t/per-request.t

@@ -31,10 +31,11 @@ requires:
   Error::Pure: 0
   Mo: 0
   Mo::utils: 0.28
+  Mo::utils::Number: 0
   perl: 5.8.0
 resources:
   bugtracker: https://github.com/michal-josef-spacek/Data-HashType/issues
   homepage: https://github.com/michal-josef-spacek/Data-HashType
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Data-HashType
-version: '0.06'
+version: '0.07'

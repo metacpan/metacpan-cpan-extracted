@@ -757,6 +757,88 @@ sub test_verify_token_ok {
     );
   };
 
+  subtest "verify_token() with array in 'scope' claim" => sub {
+
+    # Given
+    my $obj = build_object(
+      request_headers => { Authorization => 'bearer abcd123' },
+      claims          => { iss   => 'my_issuer',
+                           exp   => 456,
+                           aud   => 'my_id',
+                           sub   => 'my_subject',
+                           scope => [qw/scope7 scope8/] },
+    );
+
+    # When
+    my $claims = $obj->verify_token();
+
+    # Then
+    my %expected_claims = (
+      iss   => 'my_issuer',
+      exp   => 456,
+      aud   => 'my_id',
+      sub   => 'my_subject',
+      scope => [qw/scope7 scope8/],
+    );
+    my %expected_stored_token = (
+      token      => 'abcd123',
+      expires_at => 456,
+      scopes     => [qw/scope7 scope8/],
+    );
+    cmp_deeply($claims,
+               \%expected_claims,
+               'expected result');
+    cmp_deeply(
+      get_stored_access_token($obj),
+      \%expected_stored_token,
+      'expected stored access token'
+    );
+  };
+
+  subtest "verify_token() with unexpected scopes type" => sub {
+
+    # Given
+    my $obj = build_object(
+      request_headers => { Authorization => 'bearer abcd123' },
+      claims          => { iss   => 'my_issuer',
+                           exp   => 456,
+                           aud   => 'my_id',
+                           sub   => 'my_subject',
+                           scope => {} },
+    );
+
+    # When
+    my $claims = $obj->verify_token();
+
+    # Then
+    my %expected_claims = (
+      iss   => 'my_issuer',
+      exp   => 456,
+      aud   => 'my_id',
+      sub   => 'my_subject',
+      scope => {},
+    );
+    my %expected_stored_token = (
+      token      => 'abcd123',
+      expires_at => 456,
+      scopes     => [],
+    );
+    cmp_deeply($claims,
+               \%expected_claims,
+               'expected result');
+    cmp_deeply(
+      get_stored_access_token($obj),
+      \%expected_stored_token,
+      'expected stored access token'
+    );
+    cmp_deeply($log->msgs->[-1],
+               superhashof({
+                 message => 'OIDC: unexpected scopes type : HASH',
+                 level   => 'warning',
+               }),
+               'expected log');
+  };
+
   subtest "verify_token() with mocked claims" => sub {
 
     my %mocked_claims = (sub => 'my_mocked_subject',

@@ -5,16 +5,19 @@ matrix( 1 0 0 -1 0 0)
 vb rect( 0.00 0.00 500.00 600.00)
 xo fill_color black (initial)
   start handling text (SVGPDF::Text)
+  text stroke=none fill=(current) fill=#000000
   text  x=100 y=100
     xo save
     txt translate( 100.00, 100.00 ) scale( 1.00 -1.00 )
       xo save
       xo restore
       xo save
+      tspan stroke=none fill=(current) fill=#000000
       tspan 
         xo save
         xo restore
         xo save
+        tspan stroke=none fill=(current) fill=#000000
         tspan  dx=5 dy=15
         txt translate( 5.00, 15.00 )
           xo save

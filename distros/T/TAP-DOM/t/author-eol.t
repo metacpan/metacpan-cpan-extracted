@@ -30,6 +30,7 @@ my @files = (
     't/dom2tap.t',
     't/empty_tap.tap',
     't/empty_tap_archive.tgz',
+    't/expected_normalized.tap',
     't/no_tap_lines.tap',
     't/some_tap.dom',
     't/some_tap.txt',
@@ -40,6 +41,7 @@ my @files = (
     't/some_tap7_taplevel.txt',
     't/some_tap7_taplevel_skipall.txt',
     't/some_tap8_pragma.txt',
+    't/some_tap8_sparse.txt',
     't/some_tap_document_data.tap',
     't/some_tap_doublecomments.txt',
     't/some_tap_with_key_values.tap',
@@ -54,6 +56,7 @@ my @files = (
     't/tap_dom5_usebitsets.t',
     't/tap_dom6_autotapversion.t',
     't/tap_dom7_taplevel.t',
+    't/tap_dom8_sparse.t',
     't/tap_dom_document_data.t',
     't/tap_dom_dontignore_lines.t',
     't/tap_dom_empty.t',
@@ -61,9 +64,11 @@ my @files = (
     't/tap_dom_ignore_unknown.t',
     't/tap_dom_key_values.t',
     't/tap_dom_key_values_case_insensitive.t',
+    't/tap_dom_normalize.t',
     't/tap_dom_pragma.t',
     't/tap_dom_unicode.t',
-    't/tap_dom_whitespace.t'
+    't/tap_dom_whitespace.t',
+    't/to_be_normalized.tap'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 0 }) foreach @files;

@@ -1100,9 +1100,18 @@ sub _get_scopes_from_claims {
   my $self = shift;
   my ($claims) = pos_validated_list(\@_, { isa => 'HashRef', optional => 0 });
 
-  return exists $claims->{scp}   ? ($claims->{scp} // [])
-       : exists $claims->{scope} ? [split(/\s+/, ($claims->{scope} // ''))]
-                                 : [];
+  my $scopes = exists $claims->{scp}   ? ($claims->{scp} // [])
+             : exists $claims->{scope} ? ($claims->{scope} // [])
+                                       : [];
+
+  unless (ref $scopes) {
+    return [split(/\s+/, $scopes)];
+  }
+
+  return $scopes if ref $scopes eq 'ARRAY';
+
+  $self->log_msg(warning => "OIDC: unexpected scopes type : " . ref $scopes);
+  return [];
 }
 
 

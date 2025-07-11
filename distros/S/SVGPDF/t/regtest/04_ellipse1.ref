@@ -7,7 +7,7 @@ xo fill_color black (initial)
   start handling ellipse (SVGPDF::Ellipse)
   ellipse cx=75 cy=75 rx=20 ry=5
     xo save
-    ellipse stroke=none fill=(current) fill=black
+    ellipse stroke=none fill=(current) fill=#000000
     xo fill (none)
     xo restore
   end handling ellipse

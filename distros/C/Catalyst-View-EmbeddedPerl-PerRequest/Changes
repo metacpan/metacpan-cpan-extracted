@@ -1,5 +1,9 @@
 The following logs changes for the CPAN distribution Catalyst-View-EmbeddedPerl-PerRequest
 
+0.001021  10 July 2025
+          - Testing support for the new object serialization support in the lastest
+          Template::EmbeddedPerl
+
 0.001020  22 April 2025
           - Update dependencies for required upstream bug fixes
 

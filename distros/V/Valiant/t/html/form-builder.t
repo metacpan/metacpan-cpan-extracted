@@ -396,4 +396,38 @@ is $fb->collection_checkbox({roles => 'id'}, $roles_collection, id=>'label', sub
 is $fb->collection_checkbox('state_ids', $states_collection, id=>'name'), '<div id="person_state_ids"><input id="person_state_ids_hidden" name="person.state_ids" type="hidden" value=""/><label for="person_state_ids_10">TX</label><input checked id="person_state_ids_10" name="person.state_ids" type="checkbox" value="10"/><label for="person_state_ids_20">NY</label><input id="person_state_ids_20" name="person.state_ids" type="checkbox" value="20"/><label for="person_state_ids_30">CA</label><input checked id="person_state_ids_30" name="person.state_ids" type="checkbox" value="30"/></div>';
 is $fb->collection_checkbox({roles => 'id'}, $roles_collection, id=>'label'), '<div id="person_roles"><input id="person_roles_hidden" name="person.roles" type="hidden" value="&#123;&quot;_nop&quot;:&quot;&quot;&#125;"/><label for="person_roles_1">User</label><input checked id="person_roles_1" name="person.roles" type="checkbox" value="&#123;&quot;id&quot;:1&#125;"/><label for="person_roles_2">Admin</label><input checked id="person_roles_2" name="person.roles" type="checkbox" value="&#123;&quot;id&quot;:2&#125;"/><label for="person_roles_3">Guest</label><input id="person_roles_3" name="person.roles" type="checkbox" value="&#123;&quot;id&quot;:3&#125;"/></div>';
 
+# Proxy
+is $fb->field('first_name')
+  ->label(+{class=>'foo'})
+  ->input,
+  '<label class="foo" for="person_first_name">First Name</label>'.
+  '<input id="person_first_name" name="person.first_name" type="text" value="J"/>';
+
+is $fb->field('first_name', sub {
+  my $fn_fb = shift;
+  return $fb->tag_helpers->input_tag('test'),
+    "Stuff<hr>",
+    $fn_fb->label(+{class=>'foo'})
+      ->input
+      ->errors_for;
+    })->field('last_name')->input, '<input id="test" name="test" type="text"/>Stuff&lt;hr&gt;<label class="foo" for="person_first_name">First Name</label><input id="person_first_name" name="person.first_name" type="text" value="J"/><ol data-error-list="1" id="person_first_name_errors"><li data-error-param="1">First Name is too short (minimum is 3 characters)</li><li data-error-param="1">First Name contains non alphabetic characters</li></ol><input id="person_last_name" name="person.last_name" type="text" value="Napiorkowski"/>';
+
+is $fb->field('first_name', sub {
+  my $fn_fb = shift;
+  return $fn_fb->label(+{class=>'foo'})
+      ->input;
+  })->field('last_name', sub {
+  my $ln_fb = shift;
+  return $ln_fb->label(+{class=>'foo'})
+      ->input;
+  })->input('age'), '<label class="foo" for="person_first_name">First Name</label><input id="person_first_name" name="person.first_name" type="text" value="J"/><label class="foo" for="person_last_name">Last Name</label><input id="person_last_name" name="person.last_name" type="text" value="Napiorkowski"/><input id="person_age" name="person.age" type="text" value=""/>';
+
+is $fb->field('first_name')
+  ->label(+{class=>'foo'})
+  ->input
+  ->end
+  ->field('last_name')
+  ->label(+{class=>'foo'})
+  ->input, '<label class="foo" for="person_first_name">First Name</label><input id="person_first_name" name="person.first_name" type="text" value="J"/><label class="foo" for="person_last_name">Last Name</label><input id="person_last_name" name="person.last_name" type="text" value="Napiorkowski"/>';
+
 done_testing;

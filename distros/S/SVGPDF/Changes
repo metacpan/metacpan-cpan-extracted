@@ -1,10 +1,19 @@
 Revision history for SVGPDF
 
-0.090 2024-12-06
+0.091.1	2025-07-11
+
+	- Fix failing test for perls compiled with -Duselongdouble.
+
+0.091	2025-07-11
+
+	- Improve colour parsing.
+	- Handle global color styles for text/tspan.
+
+0.090	2024-12-06
 
 	- Fix version numbering.
 
-0.089.1 2024-12-05
+0.089.1	2024-12-05
 
 	- Move uncontrollable test 08_path1a6 to xt.
 

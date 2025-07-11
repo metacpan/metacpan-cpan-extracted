@@ -1,6 +1,7 @@
 Berkeley.xs
 Changes
 lib/DB/Berkeley.pm
+lib/DB/Berkeley/Iterator.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
@@ -15,7 +16,15 @@ t/eol.t
 t/iterator.t
 t/iterator_more.t
 t/iterator_reset.t
+t/iterator_reset_more.t
+t/nested_loops.t
+t/nonexistent.t
 t/pod-synopsis.t
+t/readonly.t
+t/storable.t
+t/sync.t
+t/sync_flag.t
+t/sync_on_put.t
 typemap
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,5 +1,10 @@
 The following logs changes for the CPAN distribution Catalyst-View-EmbeddedPerl-PerRequest-ValiantRole
 
+0.001007  10 July 2025
+          - Updated dependencies to fix failures on CPAN testers
+          - Updated to support new object safe serialization supported
+          in the latest Template::EmbeddedPerl.
+
 0.001006  28 October 2024
           - added form_with and fields as proxies
 

@@ -1,3 +1,8 @@
+0.07 2025-07-10T22:59:29+02:00
+ - Improve code comments.
+ - Rewrite check of id to Mo::utils::Number::check_positive_natural().
+ - Update copyright years.
+
 0.06 2024-05-27T10:12:38+02:00
  - Rewrite checks for id to check_number_id().
 

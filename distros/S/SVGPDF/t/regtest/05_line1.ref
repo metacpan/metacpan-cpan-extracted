@@ -7,7 +7,7 @@ xo fill_color black (initial)
   start handling line (SVGPDF::Line)
   line x1=10 y1=110 x2=50 y2=150
     xo save
-    line stroke-width=5.00 stroke=black fill=(current) fill=black
+    line stroke-width=5.00 stroke=#000000 fill=(current) fill=#000000
     xo paint (black currentColor)
     xo restore
   end handling line

@@ -7,22 +7,19 @@
           ["eval-catch"]],
         ["*","error-patterns"]]]],
   "data": [
-    { "label": "Bad first parameter",
-      "point": {
-        "perl": "use Inline Bogus => 'code';\n",
-        "error-patterns": [[
-            ["/","You have specified 'Bogus' as an Inline programming language."],
-            ["/","I currently only know about the following languages:"]]]}},
-    { "label": "Bad shortcut",
-      "point": {
-        "perl": "use Inline 'force', 'hocum';\n",
-        "error-patterns": [[
-            ["/","Invalid shortcut 'hocum' specified."],
-            ["/","Valid shortcuts are:"],
-            ["/","VERSION, INFO, FORCE, NOCLEAN, CLEAN, UNTAINT, SAFE, UNSAFE,"],
-            ["/","GLOBAL, NOISY and REPORTBUG"]]]}},
-    { "label": "Bad config option",
-      "point": {
-        "perl": "use Inline Foo => 'xxx' => ENABLE => 'BOgUM';\n",
-        "error-patterns": [[
-            ["/","'BOGUM' is not a valid config option for Inline::Foo"]]]}}]}
+    { "Label": "Bad first parameter",
+      "perl": "use Inline Bogus => 'code';\n",
+      "error-patterns": [[
+          ["/","You have specified 'Bogus' as an Inline programming language."],
+          ["/","I currently only know about the following languages:"]]]},
+    { "Label": "Bad shortcut",
+      "perl": "use Inline 'force', 'hocum';\n",
+      "error-patterns": [[
+          ["/","Invalid shortcut 'hocum' specified."],
+          ["/","Valid shortcuts are:"],
+          ["/","VERSION, INFO, FORCE, NOCLEAN, CLEAN, UNTAINT, SAFE, UNSAFE,"],
+          ["/","GLOBAL, NOISY and REPORTBUG"]]]},
+    { "Label": "Bad config option",
+      "perl": "use Inline Foo => 'xxx' => ENABLE => 'BOgUM';\n",
+      "error-patterns": [[
+          ["/","'BOGUM' is not a valid config option for Inline::Foo"]]]}]}

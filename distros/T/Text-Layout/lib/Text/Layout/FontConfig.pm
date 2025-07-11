@@ -8,7 +8,7 @@ package Text::Layout::FontConfig;
 
 use Carp;
 
- our $VERSION = "0.044";
+ our $VERSION = "0.045";
 
 use Text::Layout::FontDescriptor;
 
@@ -664,8 +664,8 @@ use File::Basename;
 sub from_filename {
     shift if UNIVERSAL::isa( $_[0], __PACKAGE__ );
     my ( $file, $size ) = @_;
-    my $b;
-    ( $b, undef, undef ) = fileparse( $file, qr/\.\w+/ );
+    ( $file, my $sel ) = ( $1, $2 ) if $file =~ /^(.*\.ttc)(:.*)/;
+    ( my $b, undef, undef ) = fileparse( $file, qr/\.\w+/ );
     my ( $family, $style, $weight ) = ( $b, "normal", "normal" );
 
     if ( lc($b) =~ m/^
@@ -681,7 +681,7 @@ sub from_filename {
     }
 
     my $fd = Text::Layout::FontDescriptor->new
-      ( loader_data => $file,
+      ( loader_data => $file.($sel//""),
 	loader => $loader,
 	family => $family,
 	style  => $style,

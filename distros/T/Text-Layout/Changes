@@ -1,5 +1,9 @@
 Revision history for Text::Layout
 
+0.045	2025-07-10
+
+	Experimental support for ttc (TrueType collections).
+
 0.044	2025-04-27
 
 	Fix https://github.com/ChordPro/chordpro/issues/358.

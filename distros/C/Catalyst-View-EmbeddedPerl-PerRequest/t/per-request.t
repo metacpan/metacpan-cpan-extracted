@@ -108,6 +108,16 @@ ccc1
 <tag foo="1" class="aaa bbb" data-aaa="foo" data-bbb="bar">';
 }
 
+{
+  ok my $res = request GET '/stringification';
+  ok my $data = $res->content;
+  is $data, '<p>JohnDoe</p>
+<p>
+    <div>John</div>
+    <div>Doe</div>
+</p>';
+}
+
 done_testing;
 
 __END__

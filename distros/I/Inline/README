@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    This document describes Inline version 0.86.
+    This document describes Inline version 0.87.
 
 SYNOPSIS
 
@@ -44,7 +44,7 @@ DESCRIPTION
     notice the compilation time.
 
     Best of all, it works the same on both Unix and Microsoft Windows. See
-    "Inline- Support" for support information.
+    Inline-Support for support information.
 
  Why Inline?
 
@@ -363,7 +363,7 @@ USING THE INLINE.PM MODULE
         """A Python Section"""
 
     An important thing to remember is that you need to have one use Inline
-    Foo => 'DATA' for each __Foo__ marker, and they must be in the same
+    Foo=> 'DATA' for each __Foo__ marker, and they must be in the same
     order. This allows you to apply different configuration options to each
     section.
 
@@ -1022,14 +1022,14 @@ HOW INLINE WORKS
           use Inline;
           bind Inline C => "Source-Code";
 
-      where C is the programming language of the source code, and Source-
-      Code is a string, a file name, an array reference, or the special
-      'DATA' keyword.
+      where C is the programming language of the source code, and
+      Source-Code is a string, a file name, an array reference, or the
+      special 'DATA' keyword.
 
       Since Inline is coded in a "use" statement, everything is done during
       Perl's compile time. If anything needs to be done that will affect
-      the Source- Code, it needs to be done in a BEGIN block that is before
-      the "use Inline ..." statement. If you really need to specify code to
+      the Source-Code, it needs to be done in a BEGIN block that is before
+      the "useInline ..." statement. If you really need to specify code to
       Inline at runtime, you can use the bind() method.
 
       Source code that is stowed in the 'DATA' section of your code, is

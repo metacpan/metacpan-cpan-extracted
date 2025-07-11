@@ -1,0 +1,28 @@
+<script>
+    window.RT_AI_ActiveForCurrentQueue = <% $AI_Active %>;
+</script>
+<%init>
+my $config = RT->Config->Get('RT_AI_Provider');
+my $queue_name;
+
+if ( $QueueObj && $QueueObj->Id ) {
+    $queue_name = $QueueObj->Name;
+}
+
+if ( $TicketObj && $TicketObj->Id ) {
+    $queue_name = $TicketObj->QueueObj->Name;
+}
+
+$config = $config->{$queue_name} || $config->{Default};
+
+my $AI_Active = 'false';
+
+if ( $config ) {
+    $AI_Active = 'true';
+}
+
+</%init>
+<%args>
+$QueueObj => undef
+$TicketObj => undef
+</%args>

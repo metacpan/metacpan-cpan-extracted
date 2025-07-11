@@ -7,7 +7,7 @@ xo fill_color black (initial)
   start handling polygon (SVGPDF::Polygon)
   polygon points="50, 160 55, 180 70, ..."
     xo save
-    polygon stroke=none fill=(current) fill=black
+    polygon stroke=none fill=(current) fill=#000000
     xo fill (none)
     xo restore
   end handling polygon

@@ -9,6 +9,7 @@ examples/mathjax.svg
 examples/sample.pl
 lib/SVGPDF.pm
 lib/SVGPDF/CSS.pm
+lib/SVGPDF/Colour.pm
 lib/SVGPDF/Circle.pm
 lib/SVGPDF/Contrib/Bogen.pm
 lib/SVGPDF/Contrib/PathExtract.pm
@@ -41,6 +42,7 @@ t/104_css.t
 t/201_xml.t
 t/202_xml.t
 t/203_xml.t
+t/300_col.t
 t/900_regtest.pl
 t/900_regtest.t
 t/901_regtest.t

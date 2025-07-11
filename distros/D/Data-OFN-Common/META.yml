@@ -37,4 +37,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Data-OFN-Common
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Data-OFN-Common
-version: '0.01'
+version: '0.02'

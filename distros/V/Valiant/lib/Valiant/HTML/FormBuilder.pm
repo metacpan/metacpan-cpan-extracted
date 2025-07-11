@@ -61,6 +61,7 @@ sub form_action { shift->options->{html}{action} }
 sub form_method { shift->options->{html}{method} }
 sub form_enctype { shift->options->{html}{method} }
 sub csrf_token { shift->options->{html}{data}{csrf_token} }
+sub containing_view { shift->options->{view} }
 
 sub allow_method_names_outside_object {
   my $self = shift;
@@ -1181,9 +1182,105 @@ sub radio_buttons {
   }
 }
 
-# select collection needs work (with multiple)
-# select with opt grounps needs to work
-# ?? date and date time helpers (month field, weeks, etc) ??
+sub field {
+  my ($self, $attribute, $cb) = (shift, shift, shift);
+  my $proxy = Valiant::HTML::FormBuilder::Proxy->new(
+    form_builder => $self,
+    attribute => $attribute,
+  );
+  return $proxy unless $cb;
+
+  my @return = map {
+    Scalar::Util::blessed($_) && $_->can('to_safe_string')
+    ? $_->to_safe_string
+    : $_;
+  } $cb->($proxy);
+
+  return Valiant::HTML::FormBuilder::Proxy->new(
+    form_builder => $self,
+    attribute => undef,
+    _parts => \@return,
+  );
+}
+
+package Valiant::HTML::FormBuilder::Proxy;
+
+use Moo;
+use overload
+  '""' => sub { $_[0]->to_string() },
+  '0+' => sub { $_[0]->to_string() },
+  fallback => 1;
+
+has 'attribute' => (is=>'ro', required=>0);
+has 'form_builder' => (is=>'ro', required=>1);
+has '_parts' => (is=>'rw', default=>sub { [] });
+
+sub _add_part {
+  my ($self, @new_parts) = @_;
+  my @parts = @{$self->_parts};
+  $self->_parts([@parts, @new_parts]);
+}
+
+sub _clear {
+    my ($self) = @_;
+    $self->_parts([]);
+    return $self;
+}
+
+sub to_string {
+  my ($self) = @_;
+  my @parts = map { ref($_) eq 'CODE' ? $_->() : $_ } @{$self->_parts};
+  return my $safe = $self->form_builder->view->safe_concat(@parts);
+}
+
+# support for Template::EmbeddedPerl safe stringification
+sub to_safe_string {
+  my ($self, $template) = @_;
+  return $self->to_string;
+}
+
+sub end {
+  my ($self) = @_;
+  my $class = ref $self;
+  return $class->new(
+    form_builder => $self->form_builder,
+    attribute => undef,
+    _parts => $self->_parts,
+  );
+
+}
+
+sub AUTOLOAD {
+  my $self = shift;
+  my $method = our $AUTOLOAD;
+  $method =~ s/.*:://; # remove package name
+
+  return if $method eq 'DESTROY';
+
+  # This really needs to do the right thing and delegate the $method call
+  # based on what $method is. That's why this feature is prototype status
+  # and undocumented!
+
+  if($self->form_builder->can($method)) {
+    my $fb = $self->form_builder;
+    my $attribute = $self->attribute;
+    my @args = $attribute ? ($attribute, @_) : (@_);
+    my $result = $fb->$method(@args);
+
+    if(Scalar::Util::blessed($result) && $result->isa('Valiant::HTML::FormBuilder::Proxy')) {
+      $result->_parts([ @{$self->_parts}, @{$result->_parts}]);
+      return $result;
+    }
+
+    $self->_add_part($result);
+    return $self;
+  }
+
+  die "Can't find method $method on "
+    . ref($self->form_builder)
+    . " for attribute "
+    . $self->attribute;  
+} 
 
 1;
 

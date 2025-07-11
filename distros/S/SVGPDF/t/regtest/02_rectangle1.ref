@@ -7,14 +7,14 @@ xo fill_color black (initial)
   start handling rect (SVGPDF::Rect)
   rect x=10 y=10 w=30 h=30
     xo save
-    rect stroke=none fill=(current) fill=black
+    rect stroke=none fill=(current) fill=#000000
     xo fill (none)
     xo restore
   end handling rect
   start handling rect (SVGPDF::Rect)
   rect x=60 y=10 w=30 h=30
     xo save
-    rect stroke=none fill=(current) fill=black
+    rect stroke=none fill=(current) fill=#000000
     rect(rounded) rx=10 ry=10
     xo fill (none)
     xo restore

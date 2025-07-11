@@ -1,9 +1,9 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use IO::Async::Loop;
 use IO::Async::Test;
@@ -42,7 +42,7 @@ $xmit->send(
 );
 
 wait_for { scalar @dmx };
-is_deeply( \@dmx, [ 1, 35, 69, 103 ],
+is( \@dmx, [ 1, 35, 69, 103 ],
    'DMX data received'
 );
 

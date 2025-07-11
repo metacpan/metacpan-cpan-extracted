@@ -1,0 +1,59 @@
+
+<form
+    hx-get="/Helpers/AISuggestion/ProcessAIRequest"
+    hx-target="#ai-result"
+    hx-swap="innerHTML"
+    id="suggestionForm"
+    hx-indicator="#spinner"
+    hx-trigger="submit"
+>
+
+  <input type="hidden" name="callType" value="suggest_response">
+%if ( $TicketObj ) {
+  <input type="hidden" class="hidden" name="id" value="<% $TicketObj->Id %>">
+% }
+    <div class="mb-3">
+        <textarea
+                id="rawText"
+                name="rawText"
+                class="form-control"
+                rows="4"
+            ><% $rawText |n %></textarea>
+    </div>
+
+    <div class="mb-3">
+        <label for="ai-result" class="form-label"><&|/l&>AI Response</&></label>
+        <div
+            id="ai-result"
+            name="ai-result"
+            class="form-control"
+            style="min-height: 150px; overflow-y: auto;"
+        >
+        </div>
+        <div id="spinner" class="htmx-indicator me-2">
+            <& /Widgets/Spinner &>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-end gap-2">
+
+        <button type="submit" class="btn btn-primary"><&|/l&>Generate</&></button>
+
+        <button
+            name="done-button"
+            type="button"
+            class="btn btn-secondary close"
+            data-bs-dismiss="modal"
+            >
+            Done
+        </button>
+    </div>
+</form>
+
+<%ARGS>
+$rawText   => ''
+$callType  => ''
+$transFrom => ''
+$transTo   => ''
+$TicketObj => undef
+</%ARGS>

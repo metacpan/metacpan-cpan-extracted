@@ -1,5 +1,9 @@
 Revision history for TAP-DOM
 
+1.001     2025-07-10
+        - new option 'sparse' to leave out "false" values
+        - new option 'normalize' to generate normalized lines (EXPERIMENTAL)
+
 1.000     2024-11-27
         - declare stable 1.0 release
         - no functional differences

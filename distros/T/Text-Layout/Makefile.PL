@@ -9,7 +9,7 @@ exit 0 if $ENV{AUTOMATED_TESTING} && $] < 5.026000;
 use ExtUtils::MakeMaker 7.24;
 
 my $master = 'lib/Text/Layout/Version.pm';
-my $version = "0.044";
+my $version = "0.045";
 $master =~ s;/Version;;;
 
 WriteMakefile(

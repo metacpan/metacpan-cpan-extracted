@@ -1,0 +1,7 @@
+<& /Elements/AIJavascriptConfig, QueueObj => $QueueObj &>
+<%init>
+</%init>
+<%args>
+$QueueObj
+$ARGSRef
+</%args>

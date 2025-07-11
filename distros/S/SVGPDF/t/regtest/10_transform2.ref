@@ -7,7 +7,7 @@ xo fill_color black (initial)
   start handling rect (SVGPDF::Rect)
   rect x=12 y=-10 w=20 h=20
     xo save
-    rect stroke=none fill=(current) fill=black
+    rect stroke=none fill=(current) fill=#000000
     transform rotate(45.00)
     xo fill (none)
     xo restore

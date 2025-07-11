@@ -1,5 +1,10 @@
 The following logs changes for the CPAN distribution Valiant
 
+0.002019 2025 July 10
+          - This release contains some undocumented changes which are in place for
+          testing and compatibility regression with other CPAN modules. This is not
+          a required update, it has no other fixes or useful changes
+
 0.002018 2025 June 21
           - Fixed memory leak issue with the PagerBuilder control.
           Control would leak if you invoked the pager builder on a

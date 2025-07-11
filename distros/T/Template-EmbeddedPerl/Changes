@@ -1,5 +1,11 @@
 The following logs changes for the CPAN distribution Template-EmbeddedPerl
 
+0.001014 10 July 2025
+          - When using auto_escape, check any objects for 'to_safe_string'
+            method before stringifying for escape.   This allows an object
+            to properly self escape any strings that are part of its object
+            serialization.
+
 0.001013 23 December 2024
           - More flexible handling of interpolation mode; test cases
 

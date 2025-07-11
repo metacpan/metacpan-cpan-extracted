@@ -39,9 +39,14 @@ WriteMakefile(
 	PL_FILES => {},
 	CONFIGURE_REQUIRES => {
 		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
+	}, PREREQ_PM => {
+		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
+		'Exporter' => 0,
+		'XSLoader' => 0,
 	}, TEST_REQUIRES => {
 		'FindBin' => 0,
 		'File::Temp' => 0,
+		'Storable' => 0,
 		'Test::DescribeMe' => 0,
 		'Test::Most' => 0,
 		'Test::Needs' => 0,
@@ -49,9 +54,6 @@ WriteMakefile(
 		'autodie' => 0,
 		'strict' => 0,
 		'warnings' => 0,
-	}, PREREQ_PM => {
-		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
-		'XSLoader' => 0,
 	}, dist => $dist,
 	clean	 => { FILES => 'DB-Berkeley-*' },
 	# META_ADD => {

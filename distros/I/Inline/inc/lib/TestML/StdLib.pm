@@ -16,7 +16,7 @@ sub block {
   return $self->{run}{block}
     if not defined $selector;
   for my $block (@{$self->{run}{ast}{data}}) {
-    if ($block->{label} eq $selector) {
+    if ($block->{Label} eq $selector) {
       return $block;
     }
   }

@@ -1,0 +1,65 @@
+TAP Version 13
+1..63
+ok beforeafter quote
+ok string quoted
+ok double quoted and dashed
+ok numbered and dashed
+ok lots  of  whitespace
+ok lots  of  whitespace after dash
+ok lots  of  whitespace after number
+ok lots  of  whitespace
+ok leading and trailing space
+ok whole mix in one  go
+ok escaped \#todo line lower nospace
+ok escaped \#TODO line upper nospace
+ok escaped \# TODO line upper space
+ok escaped \# todo line lower space
+ok federal TAP reserve 1
+ok federal TAP reserve 2
+ok federal TAP reserve 3
+ok federal TAP reserve 4
+ok federal TAP reserve 5
+ok federal TAP reserve 6
+ok federal TAP reserve 7
+not ok beforeafter quote # TODO foo
+not ok string quoted # TODO bar
+not ok double quoted and dashed # TODO baz
+not ok numbered and dashed # TODO zapfdingbats
+not ok lots  of  whitespace # TODO #todo
+not ok lots  of  whitespace after dash # TODO # not todo
+not ok lots  of  whitespace after number # TODO woohoo
+not ok lots  of  whitespace # TODO woohoo
+not ok leading and trailing space # TODO woohoo
+not ok whole mix in one  go # TODO woohoo
+not ok escaped \#todo line lower nospace
+not ok escaped \#TODO line upper nospace
+not ok escaped \# TODO line upper space
+not ok escaped \# todo line lower space
+not ok federal TAP reserve 1 # TODO woohoo
+not ok federal TAP reserve 2 # TODO woohoo
+not ok federal TAP reserve 3 # TODO woohoo
+not ok federal TAP reserve 4 # TODO woohoo
+not ok federal TAP reserve 5 # TODO woohoo
+not ok federal TAP reserve 6 # TODO woohoo
+not ok federal TAP reserve 7 # TODO woohoo
+ok beforeafter quote # SKIP foo
+ok string quoted # SKIP bar
+ok double quoted and dashed # SKIP baz
+ok numbered and dashed # SKIP zapfdingbats
+ok lots  of  whitespace # SKIP #skip
+ok lots  of  whitespace after dash # SKIP # not skip
+ok lots  of  whitespace after number # SKIP woohoo
+ok lots  of  whitespace # SKIP woohoo
+ok leading and trailing space # SKIP woohoo
+ok whole mix in one  go # SKIP woohoo
+ok escaped \#skip line lower nospace
+ok escaped \#SKIP line upper nospace
+ok escaped \# SKIP line upper space
+ok escaped \# skip line lower space
+ok federal TAP reserve 1 # SKIP woohoo
+ok federal TAP reserve 2 # SKIP woohoo
+ok federal TAP reserve 3 # SKIP woohoo
+ok federal TAP reserve 4 # SKIP woohoo
+ok federal TAP reserve 5 # SKIP woohoo
+ok federal TAP reserve 6 # SKIP woohoo
+ok federal TAP reserve 7 # TODO woohoo

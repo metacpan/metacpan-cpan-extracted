@@ -7,7 +7,7 @@ xo fill_color black (initial)
   start handling path (SVGPDF::Path)
   path d="M 10 315 L 110 215 A..."
     xo save
-    path stroke-width=2.00 stroke=black fill=green
+    path stroke-width=2.00 stroke=#000000 fill=#008000
     xo move(10.00,315.00)
     xo line(110.00,215.00)
     xo arc(30.00,50.00 0.00 0,1 162.55,162.45)

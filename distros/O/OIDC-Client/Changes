@@ -1,5 +1,8 @@
 Changes for OIDC-Client distribution
 
+0.11 2025-07-10
+  - Gives more flexibility to the returned 'scope' and 'scp' claims as the 'scope' claim may sometimes be an array and not a string with space separators.
+
 0.10 2025-07-09
   - Fix "base_url" parameter check for Minion workers
 

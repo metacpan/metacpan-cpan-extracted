@@ -1,0 +1,61 @@
+% $m->out( $result_text );
+% $m->abort();
+
+<%ARGS>
+$rawText        => ''
+$callType       => 'autocomplete'
+$translateFrom  => 'English'
+$translateTo    => 'Spanish'
+</%ARGS>
+<%INIT>
+use JSON;
+
+my $queue = 'Default';
+if ( $ARGS{id} ) {
+    my $TicketObj = LoadTicket($ARGS{id});
+    $queue = $TicketObj->QueueObj->Name;
+}
+
+my $result_payload;
+my $result_text;
+
+my $config = RT->Config->Get('RT_AI_Provider');
+$config = $config->{$queue} || $config->{Default};
+
+if ($config) {
+    my $prompt = $config->{prompts}{$callType};
+
+    if ($callType eq 'translate_content') {
+        $prompt .= " Translate from $translateFrom to $translateTo.";
+    }
+
+    my $provider_class = "RT::Extension::AI::Provider::" . $config->{name};
+    my $provider_instance = $provider_class->new(config => $config);
+
+    my $response = $provider_instance->process_request(
+        prompt       => $prompt,
+        raw_text     => $rawText,
+        model_config => $callType eq 'autocomplete_text' ? $config->{autocomplete_model} : $config->{default_model},
+    );
+
+    if ( $response->{success} ) {
+        $result_payload = {
+            success => 1,
+            result  => $response->{result},
+        };
+    } else {
+        $result_payload = {
+            success => 0,
+            error   => $response->{error} || "Unknown error",
+        };
+        RT->Logger->error("AI request failed: " . $response->{error});
+    }
+
+    $result_text = $result_payload->{result} || '';
+}
+else {
+    $result_text = '';
+    RT->Logger->debug("Configuration for queue $queue not found.");
+}
+
+</%INIT>

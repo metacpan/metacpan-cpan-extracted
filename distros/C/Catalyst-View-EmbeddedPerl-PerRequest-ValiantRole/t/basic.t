@@ -27,7 +27,7 @@ use Catalyst::Test 'Example';
     <h1>Hello</h1>
     &lt;a href=&#39;/hello&#39;&gt;Hello&lt;/a&gt;
 <form accept-charset="UTF-8" enctype="application/x-www-form-urlencoded" method="post">
-<input id="person_name" name="person.name" type="text" value=""/>
+        <label for="person_name">Name</label><input id="person_name" name="person.name" type="text" value=""/>
 <input id="person_age" name="person.age" type="text" value=""/>
 </form>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>

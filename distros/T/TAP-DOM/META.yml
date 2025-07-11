@@ -20,22 +20,22 @@ name: TAP-DOM
 provides:
   TAP::DOM:
     file: lib/TAP/DOM.pm
-    version: '1.000'
+    version: '1.001'
   TAP::DOM::Archive:
     file: lib/TAP/DOM/Archive.pm
-    version: '1.000'
+    version: '1.001'
   TAP::DOM::Config:
     file: lib/TAP/DOM/Config.pm
-    version: '1.000'
+    version: '1.001'
   TAP::DOM::DocumentData:
     file: lib/TAP/DOM/DocumentData.pm
-    version: '1.000'
+    version: '1.001'
   TAP::DOM::Entry:
     file: lib/TAP/DOM/Entry.pm
-    version: '1.000'
+    version: '1.001'
   TAP::DOM::Summary:
     file: lib/TAP/DOM/Summary.pm
-    version: '1.000'
+    version: '1.001'
 requires:
   Archive::Tar: '0'
   Class::XSAccessor: '1.05'
@@ -58,7 +58,7 @@ resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=TAP-DOM
   homepage: http://metacpan.org/release/TAP-DOM
   repository: git://github.com/renormalist/tap-dom.git
-version: '1.000'
+version: '1.001'
 x_Dist_Zilla:
   perl:
     version: '5.041003'
@@ -321,7 +321,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.25.1
+          git_version: 2.43.0
           repo_root: .
       name: '@SCHWIGON/Git::CheckFor::CorrectBranch'
       version: '0.014'
@@ -333,7 +333,7 @@ x_Dist_Zilla:
           version_by_branch: 0
           version_regexp: (?^:^v(.+)$)
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.25.1
+          git_version: 2.43.0
           repo_root: .
       name: '@SCHWIGON/Git::NextVersion'
       version: '2.051'
@@ -349,7 +349,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.25.1
+          git_version: 2.43.0
           repo_root: .
       name: '@SCHWIGON/@Git/Check'
       version: '2.051'
@@ -367,7 +367,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.25.1
+          git_version: 2.43.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -380,11 +380,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.000
+          tag: v1.001
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.25.1
+          git_version: 2.43.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -398,7 +398,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.25.1
+          git_version: 2.43.0
           repo_root: .
       name: '@SCHWIGON/@Git/Push'
       version: '2.051'

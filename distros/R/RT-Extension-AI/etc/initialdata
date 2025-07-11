@@ -1,0 +1,49 @@
+# Add new conditions, actions, scrips to RT
+
+push @CustomFields,
+    {
+    Name       => 'Ticket Summary',
+    Type       => 'Text',
+    LookupType => 'RT::Queue-RT::Ticket',
+    };
+
+push @CustomFields,
+    {
+    LookupType => 'RT::Queue-RT::Ticket',
+    Name       => 'Ticket Sentiment',
+    Type       => 'SelectSingle',
+    RenderType => 'Dropdown',
+    Values     => [
+        { Name => 'Dissatisfied', Description => '', SortOrder => 1 },
+        { Name => 'Neutral',      Description => '', SortOrder => 2 },
+        { Name => 'Satisfied',    Description => '', SortOrder => 3 },
+    ],
+    };
+
+@ScripActions = (
+    {   Name        => 'Generate Ticket Summary',
+        Description =>
+            'Automatically generate and store a summary of the ticket conversation.',
+        ExecModule => 'AddTicketSummary',
+    },
+    {   Name        => 'Analyze Ticket Sentiment',
+        Description =>
+            'Automatically classify sentiment of the latest ticket update.',
+        ExecModule => 'AddTicketSentiment',
+    },
+);
+
+@Scrips = (
+    {   Description    => 'On Correspond Summarize Ticket History',
+        ScripCondition => 'On Correspond',
+        ScripAction    => 'Generate Ticket Summary',
+        Template       => 'Blank'
+    },
+    {   Description    => 'On Correspond Assess Reply Sentiment',
+        ScripCondition => 'On Correspond',
+        ScripAction    => 'Analyze Ticket Sentiment',
+        Template       => 'Blank'
+    },
+);
+
+1;

@@ -1,5 +1,13 @@
 Revision history for Log-Dispatch-UnixSyslog
 
+0.004     2025-07-10 11:55:54-04:00 America/New_York
+        - now that we openlog just in time when logging, do not openlog eagerly
+          at construction
+
+0.003     2025-07-10 10:54:40-04:00 America/New_York
+        - re-openlog after fork, mostly to compensate for IO::Async::Process's
+          weird "close all fds" behavior on fork (even without exec)
+
 0.002     2022-12-31 20:56:06-05:00 America/New_York
         - update author contact info
         - add perl version expectations to docs

@@ -1,6 +1,6 @@
 NAME
 
-    Net::Async::ArtNet - use ArtNet with IO::Async
+    Net::Async::ArtNet - use Art-Net with IO::Async
 
 SYNOPSIS
 

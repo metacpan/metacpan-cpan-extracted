@@ -334,8 +334,8 @@ sub render {
 		$ann->link($target);
 	    }
 	    # Named destination in other PDF.
-	    elsif ( $target =~ /^(?!\w{3,}:)(.*)(\#.+)$/ ) {
-		$ann->pdf( $1, $2 );
+	    elsif ( $target =~ /^(?!\w{3,}:)(.*)\#(.+)$/ ) {
+		$ann->pdf( $1, "/$2" );
 	    }
 	    # Arbitrary document.
 	    else {
@@ -533,6 +533,21 @@ sub load_font {
 					   );
 	};
     }
+    elsif ( $actual =~ /(.*\.ttc)(?::(.*))?$/ ) {
+	# This requires PDF::API2 augmentations. See below.
+	my $file = $1;
+	my $sel = $2 // "";
+	eval {
+	    my $ttc = $self->{_context}->ttc($file);
+	    $ff = $self->{_context}->ttcfont( $ttc,
+					      font => $sel,
+					      -dokern => 1,
+					      $fd->{nosubset}
+					      ? ( -nosubset => 1 )
+					      : ( -nosubset => 0 ),
+					    );
+	};
+    }
     else {
 	eval {
 	    $ff = $self->{_context}->corefont( $actual, -dokern => 1 );
@@ -665,6 +680,270 @@ sub PDF::API2::Resource::CIDFont::extents_cid {
 	     wx	     => $width,
 	     bl      => $bl,
 	   };
+}
+
+# Note: This is an augmented copy of the method from PDF::API2 2.047.
+no warnings 'redefine';
+use PDF::API2::Resource::CIDFont::TrueType::FontFile;
+sub PDF::API2::Resource::CIDFont::TrueType::FontFile::new {
+    package PDF::API2::Resource::CIDFont::TrueType::FontFile;
+    my ($class, $pdf, $file, %opts) = @_;
+    my $data = {};
+
+    #### Start of changes ####
+    use Carp qw(confess);
+    my $font;
+
+    # If the file is already a suitable font object, use it.
+    if ( UNIVERSAL::isa( $file, 'Font::TTF::Font' ) ) {
+	$font = $file;
+    }
+    else {
+	confess "cannot find font '$file'" unless -f $file;
+	$font = Font::TTF::Font->open($file);
+    }
+    #### End of changes ####
+
+    $data->{'obj'} = $font;
+
+    $class = ref($class) if ref($class);
+    my $self = $class->SUPER::new();
+
+    $self->{'Filter'} = PDFArray(PDFName('FlateDecode'));
+    $self->{' font'} = $font;
+    $self->{' data'} = $data;
+
+    $data->{'noembed'} = $opts{'embed'} ? 0 : 1;
+    $data->{'iscff'} = defined($font->{'CFF '}) ? 1 : 0;
+
+    $self->{'Subtype'} = PDFName('CIDFontType0C') if $data->{'iscff'};
+
+    $data->{'fontfamily'} = $font->{'name'}->read->find_name(1);
+    $data->{'fontname'} = $font->{'name'}->read->find_name(4);
+
+    $font->{'OS/2'}->read();
+    my @stretch = qw(
+        Normal
+        UltraCondensed
+        ExtraCondensed
+        Condensed
+        SemiCondensed
+        Normal
+        SemiExpanded
+        Expanded
+        ExtraExpanded
+        UltraExpanded
+    );
+    $data->{'fontstretch'} = $stretch[$font->{'OS/2'}->{'usWidthClass'}] || 'Normal';
+
+    $data->{'fontweight'} = $font->{'OS/2'}->{'usWeightClass'};
+
+    $data->{'panose'} = pack('n', $font->{'OS/2'}->{'sFamilyClass'});
+
+    foreach my $p (qw[bFamilyType bSerifStyle bWeight bProportion bContrast bStrokeVariation bArmStyle bLetterform bMidline bXheight]) {
+        $data->{'panose'} .= pack('C', $font->{'OS/2'}->{$p});
+    }
+
+    $data->{'apiname'} = join('', map { ucfirst(lc(substr($_, 0, 2))) } split m/[^A-Za-z0-9\s]+/, $data->{'fontname'});
+    $data->{'fontname'} =~ s/[\x00-\x1f\s]//g;
+
+    $data->{'altname'} = $font->{'name'}->find_name(1);
+    $data->{'altname'} =~ s/[\x00-\x1f\s]//g;
+
+    $data->{'subname'} = $font->{'name'}->find_name(2);
+    $data->{'subname'} =~ s/[\x00-\x1f\s]//g;
+
+    $font->{'cmap'}->read->find_ms();
+    if (defined $font->{'cmap'}->find_ms()) {
+        $data->{'issymbol'} = ($font->{'cmap'}->find_ms->{'Platform'} == 3 and $font->{'cmap'}->read->find_ms->{'Encoding'} == 0) || 0;
+    }
+    else {
+        $data->{'issymbol'} = 0;
+    }
+
+    $data->{'upem'} = $font->{'head'}->read->{'unitsPerEm'};
+
+    $data->{'fontbbox'} = [
+        int($font->{'head'}->{'xMin'} * 1000 / $data->{'upem'}),
+        int($font->{'head'}->{'yMin'} * 1000 / $data->{'upem'}),
+        int($font->{'head'}->{'xMax'} * 1000 / $data->{'upem'}),
+        int($font->{'head'}->{'yMax'} * 1000 / $data->{'upem'}),
+    ];
+
+    $data->{'stemv'} = 0;
+    $data->{'stemh'} = 0;
+
+    $data->{'missingwidth'} = int($font->{'hhea'}->read->{'advanceWidthMax'} * 1000 / $data->{'upem'}) || 1000;
+    $data->{'maxwidth'} = int($font->{'hhea'}->{'advanceWidthMax'} * 1000 / $data->{'upem'});
+    $data->{'ascender'} = int($font->{'hhea'}->read->{'Ascender'} * 1000 / $data->{'upem'});
+    $data->{'descender'} = int($font->{'hhea'}{'Descender'} * 1000 / $data->{'upem'});
+
+    $data->{'flags'} = 0;
+    $data->{'flags'} |= 1 if $font->{'OS/2'}->read->{'bProportion'} == 9;
+    $data->{'flags'} |= 2 unless $font->{'OS/2'}{'bSerifStyle'} > 10 and $font->{'OS/2'}{'bSerifStyle'} < 14;
+    $data->{'flags'} |= 8 if $font->{'OS/2'}{'bFamilyType'} == 2;
+    $data->{'flags'} |= 32; # if $font->{'OS/2'}{'bFamilyType'} > 3;
+    $data->{'flags'} |= 64 if $font->{'OS/2'}{'bLetterform'} > 8;
+
+    $data->{'capheight'} = $font->{'OS/2'}->{'CapHeight'} || int($data->{'fontbbox'}->[3] * 0.8);
+    $data->{'xheight'} = $font->{'OS/2'}->{'xHeight'} || int($data->{'fontbbox'}->[3] * 0.4);
+
+    if ($data->{'issymbol'}) {
+        $data->{'e2u'} = [0xf000 .. 0xf0ff];
+    }
+    else {
+        $data->{'e2u'} = [unpack('U*', decode('cp1252', pack('C*', 0 .. 255)))];
+    }
+
+    if ($font->{'post'}->read->{'FormatType'} == 3 and defined $font->{'cmap'}->read->find_ms()) {
+        $data->{'g2n'} = [];
+        foreach my $u (sort { $a <=> $b } keys %{$font->{'cmap'}->read->find_ms->{'val'}}) {
+            my $n = nameByUni($u);
+            $data->{'g2n'}->[$font->{'cmap'}->read->find_ms->{'val'}->{$u}] = $n;
+        }
+    }
+    else {
+        $data->{'g2n'} = [ map { $_ || '.notdef' } @{$font->{'post'}->read->{'VAL'}} ];
+    }
+
+    $data->{'italicangle'} = $font->{'post'}->{'italicAngle'};
+    $data->{'isfixedpitch'} = $font->{'post'}->{'isFixedPitch'};
+    $data->{'underlineposition'} = $font->{'post'}->{'underlinePosition'};
+    $data->{'underlinethickness'} = $font->{'post'}->{'underlineThickness'};
+
+    if ($self->iscff()) {
+        $data->{'cff'} = readcffstructs($font);
+    }
+
+    if (defined $data->{'cff'}->{'ROS'}) {
+        my %cffcmap = (
+            'Adobe:Japan1' => 'japanese',
+            'Adobe:Korea1' => 'korean',
+            'Adobe:CNS1' => 'traditional',
+            'Adobe:GB1' => 'simplified',
+        );
+        my $key = $data->{'cff'}->{'ROS'}->[0] . ':' . $data->{'cff'}->{'ROS'}->[1];
+        my $ccmap = _look_for_cmap($cffcmap{$key} // $key);
+        $data->{'u2g'} = $ccmap->{'u2g'};
+        $data->{'g2u'} = $ccmap->{'g2u'};
+    }
+    else {
+        $data->{'u2g'} = {};
+
+        my $gmap = $font->{'cmap'}->read->find_ms->{'val'};
+        foreach my $u (sort {$a <=> $b} keys %$gmap) {
+            my $uni = $u || 0;
+            $data->{'u2g'}->{$uni} = $gmap->{$uni};
+        }
+        $data->{'g2u'} = [ map { $_ || 0 } $font->{'cmap'}->read->reverse() ];
+    }
+
+    if ($data->{'issymbol'}) {
+        map { $data->{'u2g'}->{$_}        ||= $font->{'cmap'}->read->ms_lookup($_) } (0xf000 .. 0xf0ff);
+        map { $data->{'u2g'}->{$_ & 0xff} ||= $font->{'cmap'}->read->ms_lookup($_) } (0xf000 .. 0xf0ff);
+    }
+
+    $data->{'e2n'} = [ map { $data->{'g2n'}->[$data->{'u2g'}->{$_} || 0] || '.notdef' } @{$data->{'e2u'}} ];
+
+    $data->{'e2g'} = [ map { $data->{'u2g'}->{$_ || 0} || 0 } @{$data->{'e2u'}} ];
+    $data->{'u2e'} = {};
+    foreach my $n (reverse 0 .. 255) {
+        $data->{'u2e'}->{$data->{'e2u'}->[$n]} //= $n;
+    }
+
+    $data->{'u2n'} = { map { $data->{'g2u'}->[$_] => $data->{'g2n'}->[$_] } (0 .. (scalar @{$data->{'g2u'}} - 1)) };
+
+    $data->{'wx'} = [];
+    foreach my $i (0 .. (scalar @{$data->{'g2u'}} - 1)) {
+        my $hmtx = $font->{'hmtx'}->read->{'advance'}->[$i];
+        if ($hmtx) {
+            $data->{'wx'}->[$i] = int($hmtx * 1000 / $data->{'upem'});
+        }
+        else {
+            $data->{'wx'}->[$i] = $data->{'missingwidth'};
+        }
+    }
+
+    $data->{'kern'} = read_kern_table($font, $data->{'upem'}, $self);
+    delete $data->{'kern'} unless defined $data->{'kern'};
+
+    $data->{'fontname'}   =~ s/\s+//g;
+    $data->{'fontfamily'} =~ s/\s+//g;
+    $data->{'apiname'}    =~ s/\s+//g;
+    $data->{'altname'}    =~ s/\s+//g;
+    $data->{'subname'}    =~ s/\s+//g;
+
+    $self->subsetByCId(0);
+
+    return ($self, $data);
+}
+use warnings 'redefine';
+
+# These are additions. Methods of $pdf for convenience.
+
+# Open a TTC (TrueType font Collection) file.
+#
+# This is not really API related, but it is handy to use the API file
+# lookups.
+#
+# Returns a Font::TTF::Ttc object.
+
+sub PDF::API2::ttc {
+    my ( $self, $name, %opts ) = @_;
+    my $file = $self->can("_find_font")->($name)
+      or croak "Unable to find ttc \"$name\"";
+    require Font::TTF::Font;
+    require Font::TTF::Ttc;
+    return Font::TTF::Ttc->open($file);
+}
+
+# Create a API font from one of ttc fonts.
+#
+# The font is selected with a C<font> option.
+# Font selectors are
+#
+# * The PostScript name of the font (case insensitive)
+# * The family name : style (case insensitive), where both may be omitted
+#   to select the first matching.
+#   Note that the style must match what is in the font.
+#   E.g. "bold italic" (with a space, in this order).
+#
+# If no font option is given, the first font found is used.
+
+our @CARP_NOT = qw( ChordPro::Logger );
+
+sub PDF::API2::ttcfont {
+    my ( $self, $ttc, %opts ) = @_;
+
+    use Carp qw(confess);
+
+    my $sel = delete $opts{font} // "";
+
+    my $font;
+    foreach my $d ( @{ $ttc->{directs} } ) {
+	$d->{name}->read;
+	if ( $sel =~ /^(.*):(.*)/ ) {
+	    next if $1 && lc($d->{name}->find_name(1)) ne lc($1);
+	    next if $2 && lc($d->{name}->find_name(2)) ne lc($2);
+	}
+	elsif ( $sel ) {
+	    next unless lc($d->{name}->find_name(6)) eq lc($sel);
+	}
+	# else: use first found.
+
+	$font = $d;
+	last;
+    }
+    confess "Missing font '$sel' in ttcfont" unless $font;
+    $opts{-unicodemap} = 1 unless exists $opts{-unicodemap};
+    $opts{embed} = 1 unless exists $opts{embed};
+
+    require PDF::API2::Resource::CIDFont::TrueType;
+    my $obj = PDF::API2::Resource::CIDFont::TrueType->new($self->{'pdf'}, $font, %opts);
+    $self->{'pdf'}->out_obj($self->{'pages'});
+    $obj->tounicodemap() if $opts{-unicodemap};
+
+    return $obj;
 }
 
 ################ Extensions to PDF::Builder ################
