@@ -1,16 +1,16 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2023-2024 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2023-2025 -- leonerd@leonerd.org.uk
 
 use v5.26;
 use warnings;
 
 use Object::Pad 0.800;
-use Future::AsyncAwait;
-use Sublike::Extended;
+use Future::AsyncAwait 0.44 ':experimental(cancel)';
+use Sublike::Extended 0.29 'method';
 
-class Future::Selector 0.04;
+class Future::Selector 0.05;
 
 use Carp;
 use Scalar::Util qw( refaddr );
@@ -196,6 +196,8 @@ method _item_is_ready ( $item )
       push @items_needing_regen, $item;
    }
 
+   return if $f->is_cancelled;
+
    if( $next_waitf ) {
       if( $f->is_failed ) {
          $f->on_fail( $next_waitf ); # copy the failure
@@ -224,6 +226,9 @@ After the future becomes ready, the currently-pending C<select> future (or the
 next one to be created) will complete. It will yield the given data and future
 instance if this future succeeded, or fail with the same failure if this
 future failed. At that point it will be removed from the stored collection.
+If the item future was cancelled, it is removed from the collection but
+otherwise ignored; the C<select> future will continue waiting for another
+result.
 
    $selector->add( data => $data, gen => $gen );
 
@@ -238,7 +243,7 @@ continue watching. This continues until the generator returns C<undef>.
 
 =cut
 
-extended method add ( :$data, :$f = undef, :$gen = undef )
+method add ( :$data, :$f = undef, :$gen = undef )
 {
    if( $gen and !$f ) {
       # TODO: Consider if we should do this immediately at all?
@@ -283,36 +288,52 @@ L</run_until_ready>.
 
 method select ()
 {
-   return $next_waitf if $next_waitf;
+   my $wait_f = $next_waitf // do {
+      if( my @i = @items_needing_regen ) {
+         undef @items_needing_regen;
 
-   if( my @i = @items_needing_regen ) {
-      undef @items_needing_regen;
+         foreach my $item ( @i ) {
+            my $f = $item->gen->() or next;
 
-      foreach my $item ( @i ) {
-         my $f = $item->gen->() or next;
-
-         $f->on_ready( sub { $self->_item_is_ready( $item ) } );
-         $item->f = $f;
-         $items{ refaddr $item } = $item;
+            $f->on_ready( sub { $self->_item_is_ready( $item ) } );
+            $item->f = $f;
+            $items{ refaddr $item } = $item;
+         }
       }
-   }
 
-   keys %items or @next_ready or $next_failure or
-      croak "$self cowardly refuses to sit idle and do nothing";
+      keys %items or @next_ready or $next_failure or
+         croak "$self cowardly refuses to sit idle and do nothing";
 
-   $_->f->is_ready or $next_waitf = $_->f->new, last for values %items;
-   $next_waitf //= Future->new;
+      $_->f->is_ready or $next_waitf = $_->f->new, last for values %items;
+      $next_waitf //= Future->new;
 
-   if( $next_failure ) {
-      $next_failure->on_fail( $next_waitf ); # copy the failure
-      undef $next_failure;
-   }
-   elsif( @next_ready ) {
-      $next_waitf->done( @next_ready );
-      undef @next_ready;
-   }
+      $next_waitf->set_label( "Future::Selector next_waitf" );
 
-   return $next_waitf->on_ready( sub { undef $next_waitf } );
+      if( $next_failure ) {
+         $next_failure->on_fail( $next_waitf ); # copy the failure
+         undef $next_failure;
+      }
+      elsif( @next_ready ) {
+         $next_waitf->done( @next_ready );
+         undef @next_ready;
+      }
+
+      $next_waitf->on_ready( sub { undef $next_waitf } );
+   };
+
+   # We need to ensure that overlapping calls to ->select can't accidentally
+   # cancel each other.
+   # A simple call to ->without_cancel doesn't quite work as it causes
+   # sequence futures to be lost.
+
+   my $ret_f = $wait_f->new;
+   $wait_f->on_done( $ret_f )
+      ->on_fail( $ret_f );
+   # nothing about cancel of $ret_f here. technically if we don't tidy up the
+   # on_done/on_fail above these will retain $ret_f longer than necessary, but
+   # there's no API to do that currently. Hopefully $wait_f will get cycled
+   # and replaced soon enough anyway and that will all go then.
+   return $ret_f;
 }
 
 =head2 run
@@ -344,7 +365,9 @@ I<Since version 0.02.>
 
 Returns a future that represents repeatedly calling the L</select> method
 until the given future instance is ready. When it becomes ready (either by
-success or failure) the returned future will yield the same result.
+success or failure) the returned future will yield the same result. If the
+returned future is cancelled, then C<$f> itself will be cancelled too. This
+will not cancel a concurrently-pending C<select> or C<run> call, however.
 
 The given future will be added to the selector by calling this method; you
 should I<not> call L</add> on it yourself first.
@@ -361,6 +384,7 @@ as the input to another outer-level selector instance.
 async method run_until_ready ( $f )
 {
    $self->add( data => undef, f => $f );
+   CANCEL { $f->cancel; }
    await $self->select until $f->is_ready;
    return await $f;
 }

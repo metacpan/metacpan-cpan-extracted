@@ -45,7 +45,7 @@ WriteMakefile(
 				web  => 'https://github.com/dk/PDL-Drawing-Prima',
 			},
 			bugtracker   => {
-				web  => 'https://github.com/PDLPorters/PDL-Drawing-Prima/issues',
+				web  => 'https://github.com/dk/PDL-Drawing-Prima/issues',
 			},
 		},
 		no_index => {

@@ -1,5 +1,20 @@
 Revision history for Test2-Util-DistFiles:
 
+v0.2.0    2025-07-11 21:25:31+01:00 Europe/London
+  [Enhancements]
+  - Added use_default option.
+
+  [Bug Fixes]
+  - Using a filter does not override the default, GH#1.
+
+  - The is_perl_file function will ignore files in Carton local-lib.
+
+  [Documentation]
+  - Documented options.
+
+  [Other]
+  - Fixed metadata.
+
 v0.1.1    2025-07-06 14:23:32+01:00 Europe/London
   [Documentation]
   - Fixed typo in abstract. (Thanks Rihards Olups and Oriel Jutty.)

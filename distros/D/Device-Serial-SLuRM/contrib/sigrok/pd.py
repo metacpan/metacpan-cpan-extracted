@@ -81,6 +81,9 @@ class Decoder(srd.Decoder):
 
         if ptype != 'DATA':
             return
+        if self.state != SLURM.STATE_IDLE and rxtx != self.rxtx:
+            # Ignore data on other channels except when idle
+            return
 
         b = pdata[0]
 
@@ -89,6 +92,7 @@ class Decoder(srd.Decoder):
                 return
             self.putx(ss, es, [Ann.SYNC, ["Sync"]])
             self.state = SLURM.STATE_PKTCTRL
+            self.rxtx = rxtx
 
         elif self.state == SLURM.STATE_PKTCTRL:
             self.header_pktctrl = SLURM.name_for_pktctrl(b)

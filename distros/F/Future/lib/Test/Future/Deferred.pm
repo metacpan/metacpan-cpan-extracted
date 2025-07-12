@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2018 -- leonerd@leonerd.org.uk
 
-package Test::Future::Deferred 0.51;
+package Test::Future::Deferred 0.52;
 
 use v5.14;
 use warnings;
@@ -42,22 +42,38 @@ or similar.
 
 =cut
 
+=head1 METHODS
+
+=cut
+
+=head2 flush
+
+   Test::Future::Deferred->flush
+
+I<Since version 0.52.>
+
+Invokes all of the currently-pending deferrals, allowing any "later"-queued
+activities to take place.
+
+=cut
+
 my @deferrals;
 
-sub await
+sub flush
 {
    while( my $d = shift @deferrals ) {
       my ( $f, $method, @args ) = @$d;
       $f->$method( @args );
    }
+}
+
+sub await
+{
+   Test::Future::Deferred->flush;
 
    $_[0]->is_ready or
       croak "$_[0] ran out of things to do and is still not ready";
 }
-
-=head1 METHODS
-
-=cut
 
 =head2 done_later
 

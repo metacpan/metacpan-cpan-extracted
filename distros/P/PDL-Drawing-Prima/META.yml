@@ -30,7 +30,7 @@ requires:
   perl: '5.012'
 resources:
   IRC: irc://irc.perl.org/#pdl
-  bugtracker: https://github.com/PDLPorters/PDL-Drawing-Prima/issues
+  bugtracker: https://github.com/dk/PDL-Drawing-Prima/issues
   repository: https://github.com/dk/PDL-Drawing-Prima
-version: '0.19'
+version: '0.20'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -18,7 +18,7 @@ use constant FALSE => !!0;
 
 use overload '""' => 'to_string', fallback => 1;
 
-our $VERSION = '2.22';
+our $VERSION = '2.23';
 our @EXPORT  = qw(encode_vers decode_vers);
 
 my $VERS_REGEXP = qr{^vers:[a-z\\.\\-\\+][a-z0-9\\.\\-\\+]*/.+};
@@ -42,17 +42,30 @@ sub new {
 
     }
 
-    my $self = {
-        scheme         => lc($scheme),
-        constraints    => \@constraints,
-        _version_class => _load_version_class_from_scheme(lc($scheme))
-    };
+    $scheme = lc $scheme;
+
+    my $self = {scheme => $scheme, constraints => \@constraints, _version_class => _scheme_version_class($scheme)};
 
     return bless $self, $class;
 
 }
 
-sub _load_version_class_from_scheme {
+sub _load_version_class {
+
+    my $version_class = shift;
+
+    if ($version_class->can('new') or eval "require $version_class; 1") {
+        DEBUG and say STDERR "-- Loaded '$version_class' class";
+        return 1;
+    }
+
+    DEBUG and say STDERR "-- (E) Failed to load '$version_class' class:" if $@;
+
+    return 0;
+
+}
+
+sub _scheme_version_class {
 
     my $scheme = shift;
 
@@ -62,24 +75,13 @@ sub _load_version_class_from_scheme {
         'URI::VersionRange::Version'                              # Fallback class
     );
 
-    my $loaded_version_class = undef;
-
-VERSION_CLASS:
     foreach my $version_class (@CLASSES) {
-
-        if ($version_class->can('new') or eval "require $version_class; 1") {
-            $loaded_version_class = $version_class;
-            last VERSION_CLASS;
+        if (_load_version_class($version_class)) {
+            return $version_class;
         }
-
-        DEBUG and say STDERR "-- (E) Failed to load '$version_class' class for '$scheme' scheme ... try next class"
-            if $@;
-
     }
 
-    DEBUG and say STDERR "-- Loaded '$loaded_version_class' class for '$scheme' scheme";
-
-    return $loaded_version_class;
+    Carp::croak 'Unable to find version scheme class';
 
 }
 
@@ -94,6 +96,10 @@ sub from_string {
     my ($class, $string) = @_;
 
     if ($string !~ /$VERS_REGEXP/) {
+        Carp::croak 'Malformed Version Range string';
+    }
+
+    if ($string =~ /^vers\:(none|all)\// && $string !~ /^vers\:(none|all)\/\*$/) {
         Carp::croak 'Malformed Version Range string';
     }
 
@@ -339,11 +345,11 @@ URI::VersionRange - Perl extension for Version Range Specification
   }
 
   # Parse "vers" string
-  $vers = URI::VersionRange->from_string('vers:cpan/>2.00|<2.22');
+  $vers = URI::VersionRange->from_string('vers:cpan/>2.00|<2.23');
 
   # exported functions
 
-  $vers = decode_vers('vers:cpan/>2.00|<2.22');
+  $vers = decode_vers('vers:cpan/>2.00|<2.23');
   say $vers->scheme;  # cpan
 
   $vers_string = encode_vers(scheme => cpan, constraints => ['>2.00']);
@@ -418,7 +424,7 @@ C<constraints> is ARRAY of L<URI::VersionRange::Constraint> object.
 
 Check if a version is contained within a range
 
-    my $vers = URI::VersionRange::from_string('vers:cpan/>2.00|<2.22');
+    my $vers = URI::VersionRange::from_string('vers:cpan/>2.00|<2.23');
 
     if ($vers->contains('2.10')) {
         say "The version is in range";
@@ -442,7 +448,7 @@ Helper method for JSON modules (L<JSON>, L<JSON::PP>, L<JSON::XS>, L<Mojo::JSON>
 
     use Mojo::JSON qw(encode_json);
 
-    say encode_json($vers);  # {"constraints":[{"comparator":">","version":"2.00"},{"comparator":"<","version":"2.22"}],"scheme":"cpan"}
+    say encode_json($vers);  # {"constraints":[{"comparator":">","version":"2.00"},{"comparator":"<","version":"2.23"}],"scheme":"cpan"}
 
 =item $vers = URI::VersionRange->from_string($vers_string);
 
@@ -480,7 +486,7 @@ L<https://github.com/giterlizzi/perl-URI-PackageURL>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2022-2024 by Giuseppe Di Terlizzi.
+This software is copyright (c) 2022-2025 by Giuseppe Di Terlizzi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -7,7 +7,7 @@ use warnings;
 
 use Exporter qw(import);
 
-our $VERSION = '2.22';
+our $VERSION = '2.23';
 our @EXPORT  = qw(purl_to_urls purl_components_normalize);
 
 sub purl_components_normalize {
@@ -77,26 +77,38 @@ sub _cpan_normalize {
 
     my (%component) = @_;
 
-    # To refer to a CPAN distribution name, the "namespace" MUST be present. In this
-    # case, the "namespace" is the CPAN id of the author/publisher. It MUST be
-    # written uppercase, followed by the distribution name in the "name" component. A
-    # distribution name MUST NOT contain the string "::".
+    # Use legacy CPAN PURL type SPEC
+    if ($ENV{PURL_LEGACY_CPAN_TYPE}) {
 
-    # To refer to a CPAN module, the "namespace" MUST be absent. The module name MAY
-    # contain zero or more "::" strings, and the module name MUST NOT contain a "-"
+        $component{namespace} = uc $component{namespace} if (defined $component{namespace});
 
-    $component{namespace} = uc $component{namespace} if (defined $component{namespace});
+        if ((defined $component{namespace} && defined $component{name}) && $component{namespace} =~ /\:/) {
+            Carp::croak "Invalid Package URL: CPAN 'namespace' component must have the distribution author";
+        }
 
-    if ((defined $component{namespace} && defined $component{name}) && $component{namespace} =~ /\:/) {
-        Carp::croak "Invalid Package URL: CPAN 'namespace' component must have the distribution author";
+        if ((defined $component{namespace} && defined $component{name}) && $component{name} =~ /\:/) {
+            Carp::croak "Invalid Package URL: CPAN 'name' component must have the distribution name";
+        }
+
+        if (!defined $component{namespace} && $component{name} =~ /\-/) {
+            Carp::croak "Invalid Package URL: CPAN 'name' component must have the module name";
+        }
+
+        return \%component;
+
     }
 
-    if ((defined $component{namespace} && defined $component{name}) && $component{name} =~ /\:/) {
-        Carp::croak "Invalid Package URL: CPAN 'name' component must have the distribution name";
+    # The namespace is the CPAN id of the author/publisher. It MUST be written uppercase and is required.
+
+    unless (defined($component{namespace})) {
+        Carp::croak
+            "Invalid Package URL: The CPAN 'namespace' is required and must contain the CPAN ID of the author/publisher";
     }
 
-    if (!defined $component{namespace} && $component{name} =~ /\-/) {
-        Carp::croak "Invalid Package URL: CPAN 'name' component must have the module name";
+    $component{namespace} = uc $component{namespace};
+
+    if ($component{name} =~ /\:/) {
+        Carp::croak "Invalid Package URL: The CPAN 'name' component must have the distribution name";
     }
 
     return \%component;
@@ -569,7 +581,7 @@ URI::PackageURL::Util - Utility for URI::PackageURL
 
   use URI::PackageURL::Util qw(purl_to_urls);
 
-  $urls = purl_to_urls('pkg:cpan/GDT/URI-PackageURL@2.22');
+  $urls = purl_to_urls('pkg:cpan/GDT/URI-PackageURL@2.23');
 
   $filename = basename($urls->{download});
   $ua->mirror($urls->{download}, "/tmp/$filename");
@@ -615,13 +627,13 @@ C<cpan>, C<docker>, C<gem>, C<github>, C<gitlab>, C<luarocks>, C<maven>, C<npm>,
 (*)  Only with B<version> component
 (**) Only if B<download_url> qualifier is provided
 
-  $urls = purl_to_urls('pkg:cpan/GDT/URI-PackageURL@2.22');
+  $urls = purl_to_urls('pkg:cpan/GDT/URI-PackageURL@2.23');
 
   print Dumper($urls);
 
   # $VAR1 = {
-  #           'repository' => 'https://metacpan.org/release/GDT/URI-PackageURL-2.22',
-  #           'download' => 'http://www.cpan.org/authors/id/G/GD/GDT/URI-PackageURL-2.22.tar.gz'
+  #           'repository' => 'https://metacpan.org/release/GDT/URI-PackageURL-2.23',
+  #           'download' => 'http://www.cpan.org/authors/id/G/GD/GDT/URI-PackageURL-2.23.tar.gz'
   #         };
 
 =back
@@ -655,7 +667,7 @@ L<https://github.com/giterlizzi/perl-URI-PackageURL>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2022-2024 by Giuseppe Di Terlizzi.
+This software is copyright (c) 2022-2025 by Giuseppe Di Terlizzi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

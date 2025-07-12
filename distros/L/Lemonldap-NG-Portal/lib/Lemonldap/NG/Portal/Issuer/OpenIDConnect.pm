@@ -2037,6 +2037,14 @@ sub _handleRefreshTokenGrant {
     # Else, we are in an offline session
     else {
 
+        unless ( $self->rpOptions->{$rp}->{oidcRPMetaDataOptionsAllowOffline} )
+        {
+            $self->logger->error(
+                'Got a offline refresh_token for an application no more allowed'
+            );
+            return $self->sendOIDCError( $req, 'invalid_grant', 400 );
+        }
+
         # Lookup attributes and macros for user
         $self->getAttributesForUser( $req, $refreshSession )
           or return $self->sendOIDCError( $req, 'invalid_grant', 400 );

@@ -423,6 +423,68 @@ $idpId = expectCookie($res);
 
 #print STDERR Dumper($res);
 
+# Test OIDC auth retry (#3427)
+ok(
+    $res = $rp->_get(
+        "/", accept => 'text/html',
+    ),
+    "Initiate login"
+);
+count(1);
+
+( $url, $query ) =
+  expectRedirection( $res, qr#http://auth.op.com(/oauth2/authorize)\?(.*)$# );
+
+my $state = do {
+    my $u = URI->new;
+    $u->query($query);
+    $u->query_param('state');
+};
+
+ok(
+    $res = $rp->_get(
+        "/",
+        query => {
+            openidconnectcallback => 1,
+            error                 => "canceled",
+            state                 => $state,
+        },
+        accept => 'text/html',
+    ),
+    "Return with error"
+);
+count(1);
+expectPortalError( $res, 106 );
+
+( $host, $url, $query ) =
+  expectForm( $res, '#', undef, 'oidc_callback_processed' );
+
+ok(
+    $res = $rp->_post(
+        "/", $query,
+        query => {
+            openidconnectcallback => 1,
+            error                 => "canceled",
+            state                 => $state,
+        },
+        accept => 'text/html',
+    ),
+    "Submit form again"
+);
+count(1);
+
+( $url, $query ) =
+  expectRedirection( $res, qr#http://auth.op.com(/oauth2/authorize)\?(.*)$# );
+
+my $new_state = do {
+    my $u = URI->new;
+    $u->query($query);
+    $u->query_param('state');
+};
+ok( $new_state, "New state was generated" );
+isnt( $new_state, $state, "New state is different than previous" );
+count(2);
+
 clean_sessions();
 done_testing( count() );
 

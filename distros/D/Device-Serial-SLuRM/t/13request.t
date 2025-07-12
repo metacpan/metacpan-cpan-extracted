@@ -4,6 +4,7 @@ use v5.14;
 use warnings;
 
 use Test2::V0;
+use Test::Future::Deferred 0.52;  # ->flush method
 use Test::Future::IO 0.05;
 
 use constant HAVE_TEST_METRICS_ANY => eval {
@@ -206,6 +207,43 @@ sub with_crc8
    is( scalar await $f2, "A2", 'Reply to R2' );
 
    $controller->check_and_clear( 'Responses to ->request delivered out of order' );
+
+   $slurm->stop;
+}
+
+# Request can be cancelled without upsetting anything
+{
+   $controller->use_sysread_buffer( "DummyFH" );
+
+   $controller->expect_syswrite( "DummyFH",
+      "\x55" . with_crc8( with_crc8( "\x37\x07" ) . "no-need" ) );
+   $controller->expect_sleep( 0.05 )
+      ->remains_pending;
+
+   my $f = $slurm->request( "no-need" );
+   Test::Future::Deferred->flush;
+   $f->cancel;
+
+   ok( $f->is_cancelled, '$f was cancelled' ) or
+      $f->get;
+
+   # A later request works fine
+   $controller->expect_syswrite( "DummyFH",
+      "\x55" . with_crc8( with_crc8( "\x38\x05" ) . "later" ) )
+      ->will_write_sysread_buffer_later( "DummyFH",
+         "\x55" . with_crc8( with_crc8( "\xB8\x04" ) . "fine" ) );
+   $controller->expect_sleep( 0.05 )
+      ->remains_pending;
+   $controller->expect_syswrite( "DummyFH",
+      "\x55" . with_crc8( with_crc8( "\xC8\x00" ) ) );
+   $controller->expect_sleep( Test::Deep::num( 0.0017, 1E-4 ) );
+   $controller->expect_syswrite( "DummyFH",
+      "\x55" . with_crc8( with_crc8( "\xC8\x00" ) ) );
+
+   is( await $slurm->request( "later" ), "fine",
+      'later ->request after cancel yields response' );
+
+   $controller->check_and_clear( '->request cancelled' );
 
    $slurm->stop;
 }

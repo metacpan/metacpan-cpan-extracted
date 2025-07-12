@@ -14,8 +14,16 @@ my $controller = Test::Future::IO->controller;
 
 my $latest_command;
 
+my %testserver_args;
+
 class TestServer {
-   apply IPC::MicroSocket::Server;
+   inherit IPC::MicroSocket::Server;
+
+   # For constructor args test
+   ADJUST :params ( %rest ) {
+      %testserver_args = %rest;
+      %rest = ();
+   }
 
    async method on_connection_request ( $conn, $cmd, @args )
    {
@@ -90,6 +98,29 @@ my $run_f;
    $server->publish( "DIFFERENT", "message" ); # nothing should happen
 
    $controller->check_and_clear( '->publish unsubscribed' );
+}
+
+# ->new_unix passes args to IO::Socket::UNIX
+{
+   require IO::Socket::UNIX;
+   my %io_socket_unix_args;
+   no warnings qw( once redefine );
+   *IO::Socket::UNIX::new = sub {
+      shift;
+      %io_socket_unix_args = @_;
+      return 1;
+   };
+
+   TestServer->new_unix(
+      path   => "path-to-the-socket",
+      listen => 10,
+      other_args => "go here",
+   );
+
+   is( \%io_socket_unix_args, { Local => "path-to-the-socket", Listen => 10, ReuseAddr => 1 },
+      'path + listen args passed to IO::Socket::UNIX constructor' );
+   is( \%testserver_args, { other_args => "go here" },
+      'other args passed to TestServer constructor' );
 }
 
 done_testing;

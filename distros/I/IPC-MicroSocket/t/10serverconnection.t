@@ -18,7 +18,7 @@ $controller->use_sysread_buffer( "DummyFH" )
 my $next_subscribe;
 
 class TestConnection {
-   apply IPC::MicroSocket::ServerConnection;
+   inherit IPC::MicroSocket::ServerConnection;
 
    async method on_request ( $meth, @args )
    {

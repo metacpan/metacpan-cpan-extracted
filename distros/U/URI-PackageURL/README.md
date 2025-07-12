@@ -10,19 +10,32 @@ use URI::PackageURL;
 # OO-interface
 
 # Encode components in PackageURL string
-$purl = URI::PackageURL->new(type => cpan, namespace => 'GDT', name => 'URI-PackageURL', version => '2.21');
+$purl = URI::PackageURL->new(type => cpan, namespace => 'GDT', name => 'URI-PackageURL', version => '2.23');
 
-say $purl; # pkg:cpan/GDT/URI-PackageURL@2.21
+say $purl; # pkg:cpan/GDT/URI-PackageURL@2.23
 
 # Parse PackageURL string
-$purl = URI::PackageURL->from_string('pkg:cpan/GDT/URI-PackageURL@2.21');
+$purl = URI::PackageURL->from_string('pkg:cpan/GDT/URI-PackageURL@2.23');
+
+
+# use setter methods
+
+my $purl = URI::PackageURL->new(type => 'cpan', namespace => 'GDT', name => 'URI-PackageURL');
+
+say $purl; # pkg:cpan/GDT/URI-PackageURL
+say $purl->version; # undef
+
+$purl->version('2.23');
+say $purl; # pkg:cpan/GDT/URI-PackageURL@2.23
+say $purl->version; # 2.23
+
 
 # exported functions
 
-$purl = decode_purl('pkg:cpan/GDT/URI-PackageURL@2.21');
+$purl = decode_purl('pkg:cpan/GDT/URI-PackageURL@2.23');
 say $purl->type;  # cpan
 
-$purl_string = encode_purl(type => cpan, namespace => 'GDT', name => 'URI::PackageURL', version => '2.21');
+$purl_string = encode_purl(type => cpan, namespace => 'GDT', name => 'URI::PackageURL', version => '2.23');
 ```
 
 
@@ -31,14 +44,14 @@ $purl_string = encode_purl(type => cpan, namespace => 'GDT', name => 'URI::Packa
 Inspect and export "purl" string in various formats (JSON, YAML, Data::Dumper, ENV):
 
 ```console
-$ purl-tool pkg:cpan/GDT/URI-PackageURL@2.21 --json | jq
+$ purl-tool pkg:cpan/GDT/URI-PackageURL@2.23 --json | jq
 {
   "name": "URI-PackageURL",
   "namespace": "GDT",
   "qualifiers": {},
   "subpath": null,
   "type": "cpan",
-  "version": "2.21"
+  "version": "2.23"
 }
 ```
 
@@ -46,7 +59,7 @@ $ purl-tool pkg:cpan/GDT/URI-PackageURL@2.21 --json | jq
 Download package using "purl" string:
 
 ```console
-$ wget $(purl-tool pkg:cpan/GDT/URI-PackageURL@2.21 --download-url)
+$ wget $(purl-tool pkg:cpan/GDT/URI-PackageURL@2.23 --download-url)
 ```
 
 
@@ -57,7 +70,7 @@ Use "purl" string in your shell-scripts:
 
 set -e 
 
-PURL="pkg:cpan/GDT/URI-PackageURL@2.21"
+PURL="pkg:cpan/GDT/URI-PackageURL@2.23"
 
 eval $(purl-tool "$PURL" --env)
 
@@ -79,7 +92,7 @@ Create on-the-fly a "purl" string:
 $ purl-tool --type cpan \
             --namespace GDT \
             --name URI-PackageURL \
-            --version 2.21
+            --version 2.23
 ```
 
 
@@ -108,4 +121,4 @@ Using App::cpanminus:
 
 ## Copyright
 
- - Copyright 2022-2024 © Giuseppe Di Terlizzi
+ - Copyright 2022-2025 © Giuseppe Di Terlizzi

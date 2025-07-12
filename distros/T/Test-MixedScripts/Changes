@@ -1,5 +1,8 @@
-
 Revision history for Test-MixedScripts:
+
+v0.6.2    2025-07-11 21:32:00+01:00 Europe/London
+  [Bug Fixes]
+  - Updated the minimum Test2::Util::DistFiles version to fix a bug handling scaffolding files.
 
 v0.6.1    2025-07-07 20:52:38+01:00 Europe/London
   [Enhancements]

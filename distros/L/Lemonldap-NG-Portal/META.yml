@@ -79,7 +79,7 @@ recommends:
   Web::ID: '0'
 requires:
   Clone: '0'
-  Lemonldap::NG::Handler: v2.21.1
+  Lemonldap::NG::Handler: v2.21.2
   Regexp::Assemble: '0'
 resources:
   MailingList: mailto:lemonldap-ng-dev@ow2.org
@@ -87,5 +87,5 @@ resources:
   bugtracker: https://gitlab.ow2.org/lemonldap-ng/lemonldap-ng/issues
   homepage: https://lemonldap-ng.org/
   license: http://opensource.org/licenses/GPL-2.0
-version: v2.21.1
+version: v2.21.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

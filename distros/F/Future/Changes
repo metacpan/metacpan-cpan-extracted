@@ -1,5 +1,10 @@
 Revision history for Future
 
+0.52    2025-07-11
+        [CHANGES]
+         * Expose `Test::Future::Deferred->flush` as a method for test scripts
+         * Include constructed-at message in debug warnings
+
 0.51    2024-10-21
         [CHANGES]
          * Permit convergent futures to not cancel some component futures,

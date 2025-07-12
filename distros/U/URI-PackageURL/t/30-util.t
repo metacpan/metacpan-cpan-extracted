@@ -15,10 +15,10 @@ my @tests = (
     },
 
     {
-        purl         => 'pkg:github/package-url/purl-spec@40d01e26f9ae0af6b50a1309e6b089c14d6d2244',
-        download_url =>
-            'https://github.com/package-url/purl-spec/archive/40d01e26f9ae0af6b50a1309e6b089c14d6d2244.tar.gz',
-        repository_url => 'https://github.com/package-url/purl-spec'
+        purl           => 'pkg:github/package-url/purl-spec@40d01e26f9ae0af6b50a1309e6b089c14d6d2244',
+        repository_url => 'https://github.com/package-url/purl-spec',
+        download_url   => 'https://github.com/package-url/purl-spec/'
+            . 'archive/40d01e26f9ae0af6b50a1309e6b089c14d6d2244.tar.gz',
     },
 
     {
@@ -60,8 +60,8 @@ my @tests = (
     {
         purl           => 'pkg:maven/org.apache.xmlgraphics/batik-anim@1.9.1?packaging=sources',
         repository_url => 'https://mvnrepository.com/artifact/org.apache.xmlgraphics/batik-anim/1.9.1',
-        download_url   =>
-            'https://repo.maven.apache.org/maven2/org/apache/xmlgraphics/batik-anim/1.9.1/batik-anim-1.9.1.jar'
+        download_url   => 'https://repo.maven.apache.org/maven2/'
+            . 'org/apache/xmlgraphics/batik-anim/1.9.1/batik-anim-1.9.1.jar'
     },
 
     {purl => 'pkg:pypi/django@1.11.1', repository_url => 'https://pypi.org/project/django/1.11.1'},

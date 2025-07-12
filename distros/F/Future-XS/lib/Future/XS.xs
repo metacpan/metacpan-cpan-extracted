@@ -239,8 +239,8 @@ SV *
 cancel(SV *self)
   CODE:
     CHECK_INSTANCE(self);
-    future_cancel(self);
     RETVAL = SvREFCNT_inc(self);
+    future_cancel(self);
   OUTPUT:
     RETVAL
 

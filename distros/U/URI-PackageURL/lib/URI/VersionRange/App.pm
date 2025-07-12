@@ -13,7 +13,7 @@ use Data::Dumper ();
 
 use URI::VersionRange ();
 
-our $VERSION = '2.22';
+our $VERSION = '2.23';
 
 sub cli_error {
     my ($error) = @_;
@@ -53,7 +53,7 @@ sub run {
         say <<"VERSION";
 $progname version $URI::VersionRange::VERSION
 
-Copyright 2022-2024, Giuseppe Di Terlizzi <gdt\@cpan.org>
+Copyright 2022-2025, Giuseppe Di Terlizzi <gdt\@cpan.org>
 
 This program is part of the "URI-PackageURL" distribution and is free software;
 you can redistribute it and/or modify it under the same terms as Perl itself.
@@ -122,7 +122,7 @@ __END__
 
 =head1 NAME
 
-URI::VersionRange::App - URL::VersionRange (vers) Command Line Interface
+URI::VersionRange::App - URI::VersionRange (vers) Command Line Interface
 
 =head1 SYNOPSIS
 
@@ -152,7 +152,7 @@ L<Giuseppe Di Terlizzi|https://metacpan.org/author/gdt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2022-2024 L<Giuseppe Di Terlizzi|https://metacpan.org/author/gdt>
+Copyright © 2022-2025 L<Giuseppe Di Terlizzi|https://metacpan.org/author/gdt>
 
 You may use and distribute this module according to the same terms
 that Perl is distributed under.

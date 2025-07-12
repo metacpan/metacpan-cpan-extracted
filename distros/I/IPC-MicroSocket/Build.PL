@@ -9,8 +9,8 @@ my $build = Module::Build->new(
    requires => {
       'perl' => '5.036',
       'Future::AsyncAwait' => 0,
-      'Object::Pad' => '0.809',
-      'Sublike::Extended' => '0.23',
+      'Object::Pad' => '0.817',
+      'Sublike::Extended' => '0.29',
       'Syntax::Keyword::Match' => 0,
 
       'Future::Buffer' => '0.03',

@@ -15,7 +15,11 @@ my $htmldoc = new HTML::HTMLDoc();
 is(ref($htmldoc), 'HTML::HTMLDoc', 'Create HTMLDoc object');
 
 # check mode of instance
-is($htmldoc->_config('mode'), 'ipc', 'Set config mode');
+my $config_mode = 'ipc';
+if ($^O eq 'freebsd') {
+	$config_mode = 'file';
+}
+is($htmldoc->_config('mode'), $config_mode, 'Set config mode');
 
 # test internal method for checking allowed parameters
 is($htmldoc->_test_params('asdf', ['jhgjhg', 'trztr', 'asdf', 'jhkjh']), 1, 'Allowed parameters (1/2)' );

@@ -1,5 +1,14 @@
 Revision history for IPC-MicroSocket
 
+0.03    2025-07-11
+        [CHANGES]
+         * Provide abstract classes (as per Object::Pad v0.817) rather than
+           roles
+
+        [BUGFIXES]
+         * Make sure to pass other named arguments from Server->new_unix
+           wrapper to the actual class constructor
+
 0.02    2024-08-15
         [CHANGES]
          * Use named parameter support of Sublike::Extended

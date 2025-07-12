@@ -16,14 +16,14 @@ name: Future-Selector
 provides:
   Future::Selector:
     file: lib/Future/Selector.pm
-    version: '0.04'
+    version: '0.05'
 requires:
-  Future::AsyncAwait: '0'
+  Future::AsyncAwait: '0.44'
   Object::Pad: '0.800'
   Scalar::Util: '0'
-  Sublike::Extended: '0'
+  Sublike::Extended: '0.29'
   perl: '5.026'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

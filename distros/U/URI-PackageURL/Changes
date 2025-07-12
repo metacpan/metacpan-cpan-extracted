@@ -1,5 +1,18 @@
 Change history for URI-PackageURL
 
+2.23 2025-07-11
+    - Updated CPAN PURL type spec
+    - Added PURL_LEGACY_CPAN_TYPE env
+    - Added "to_hash" helper
+    - Use "checksum" qualifier as singular (giterlizzi/perl-URI-PackageURL#15)
+    - Added getter/setter methods for PURL components (giterlizzi/perl-URI-PackageURL#16)
+    - Improved the support of "vers" qualifier (giterlizzi/perl-URI-PackageURL#17)
+    - Improved encoding
+    - Added support for "vers:none/*" and "vers:all/*" in "URI::VersionRange"
+    - Improved version comparator class loader in "URI::VersionRange"
+    - Updated tests
+    - Synced "test-suite-data.json" from "package-url/purl-spec"
+
 2.22 2024-12-16
     - Improved parsing of non-canonical PURL (package-url/purl-spec#363)
     - Improved "URI::VersionRange->constraint_contains"

@@ -5,14 +5,18 @@ use warnings;
 
 use Test::More;
 
-use_ok('URI::PackageURL');
-use_ok('URI::PackageURL::Util');
-use_ok('URI::PackageURL::App');
+my @CLASSES = qw(
+    URI::PackageURL
+    URI::PackageURL::Util
+    URI::PackageURL::App
 
-use_ok('URI::VersionRange');
-use_ok('URI::VersionRange::Constraint');
-use_ok('URI::VersionRange::Version');
-use_ok('URI::VersionRange::App');
+    URI::VersionRange
+    URI::VersionRange::Constraint
+    URI::VersionRange::Version
+    URI::VersionRange::App
+);
+
+use_ok($_) for @CLASSES;
 
 done_testing();
 

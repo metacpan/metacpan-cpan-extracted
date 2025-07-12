@@ -27,7 +27,7 @@
             "Future::IO" : "0",
             "Future::Selector" : "0.02",
             "IO::Termios" : "0",
-            "Object::Pad" : "0.800",
+            "Object::Pad" : "0.807",
             "Syntax::Keyword::Match" : "0",
             "perl" : "5.028"
          }
@@ -37,6 +37,7 @@
             "Future::Buffer" : "0.05",
             "Test2::V0" : "0",
             "Test::ExpectAndCheck::Future" : "0.04",
+            "Test::Future::Deferred" : "0.52",
             "Test::Future::IO" : "0.05"
          }
       }
@@ -44,15 +45,15 @@
    "provides" : {
       "Device::Serial::MSLuRM" : {
          "file" : "lib/Device/Serial/MSLuRM.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       },
       "Device::Serial::SLuRM" : {
          "file" : "lib/Device/Serial/SLuRM.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       },
       "Device::Serial::SLuRM::Protocol" : {
          "file" : "lib/Device/Serial/SLuRM/Protocol.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       }
    },
    "release_status" : "stable",
@@ -61,6 +62,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.08",
+   "version" : "0.09",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

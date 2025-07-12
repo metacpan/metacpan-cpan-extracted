@@ -8,9 +8,9 @@ my $build = Module::Build->new(
    module_name => 'Future::Selector',
    requires => {
       'perl' => '5.026',
-      'Future::AsyncAwait' => 0,
+      'Future::AsyncAwait' => '0.44',
       'Object::Pad' => '0.800',
-      'Sublike::Extended' => 0,
+      'Sublike::Extended' => '0.29',
 
       'Scalar::Util' => 0,
    },

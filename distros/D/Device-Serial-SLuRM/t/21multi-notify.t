@@ -4,6 +4,7 @@ use v5.14;
 use warnings;
 
 use Test2::V0;
+use Test::Future::Deferred 0.52;  # ->flush method
 use Test::Future::IO;
 
 use constant HAVE_TEST_METRICS_ANY => eval { require Test::Metrics::Any };
@@ -39,7 +40,7 @@ sub notifications_received_for
    my $run_f = $slurm->run(
       on_notify => sub { push @notifications, [ $_[0], $_[1] ] }
    );
-   $run_f->await;
+   Test::Future::Deferred->flush;
 
    ok( $next_read_f->is_cancelled, 'Next read future is cancelled' );
 

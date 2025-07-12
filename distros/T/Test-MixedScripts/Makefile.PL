@@ -28,7 +28,7 @@ my %WriteMakefileArgs = (
     "IO" => 0,
     "List::Util" => 0,
     "Test2::API" => "1.302200",
-    "Test2::Util::DistFiles" => 0,
+    "Test2::Util::DistFiles" => "0.2.0",
     "Unicode::UCD" => 0,
     "utf8" => 0,
     "warnings" => 0
@@ -43,7 +43,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "strict" => 0
   },
-  "VERSION" => "v0.6.1",
+  "VERSION" => "v0.6.2",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -63,7 +63,7 @@ my %FallbackPrereqs = (
   "Test2::API" => "1.302200",
   "Test2::Plugin::UTF8" => 0,
   "Test2::Tools::Exception" => 0,
-  "Test2::Util::DistFiles" => 0,
+  "Test2::Util::DistFiles" => "0.2.0",
   "Test2::V0" => 0,
   "Test::More" => 0,
   "Unicode::UCD" => 0,

@@ -4,7 +4,7 @@ Test2::Util::DistFiles - Gather a list of files in a distribution
 
 # VERSION
 
-version v0.1.1
+version v0.2.0
 
 # SYNOPSIS
 
@@ -25,7 +25,9 @@ developers.
 ## manifest\_files
 
 ```perl
-my @files = manifest_files();
+my @files = manifest_files(); # use default filter
+
+my @files = manifest_files( \%options, \&filter );
 
 my @perl  = manifest_files( \&is_perl_file );
 ```
@@ -35,12 +37,24 @@ This returns a list of files from the `MANIFEST`, filtered by an optional functi
 If there is no manifest, then it will use [ExtUtils::Manifest](https://metacpan.org/pod/ExtUtils%3A%3AManifest) to build a list of files that would be added to the
 manifest.
 
+The following options are supported:
+
 ## is\_perl\_file
 
 This returns a list of Perl files in the distribution, excluding installation scaffolding like [Module::Install](https://metacpan.org/pod/Module%3A%3AInstall) files
 in `inc`.
 
 Note that it will include files like `Makefile.PL` or `Build.PL`.
+
+- dir
+
+    Search for files in this directory.
+
+- use\_default
+
+    Use the default filter to ignore local lib files, build files, version control files and temporary files.
+
+    This is true by default.
 
 # SEE ALSO
 

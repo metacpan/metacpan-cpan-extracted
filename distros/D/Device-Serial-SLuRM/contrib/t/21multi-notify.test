@@ -1,0 +1,21 @@
+*SELECT mslurm
+
+CONF 5
+
+!Basic receive
+RECV 0x55
+RECV 0x118501 +C "A" +C
+  notify "A"
+
+!Messages to other node IDs are ignored
+RECV 0x55
+RECV 0x128701 +C "A" +C
+  # nothing happens
+
+!Basic send
+NOTIFY "A1"
+  send 0x55
+  send 0x110502 +C "A1" +C
+  # TODO: there should be a time delay here
+  send 0x55
+  send 0x110502 +C "A1" +C

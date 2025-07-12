@@ -1,5 +1,9 @@
 -----
 
+0.0.21   2025-07-11
+   [Changed]
+       * Updated to libvirt tag v11.5.0 (from v11.4.0)
+
 0.0.20   2025-05-04
     [Changed]
        * Updated to libvirt tag v11.4.0 (from v11.3.0)

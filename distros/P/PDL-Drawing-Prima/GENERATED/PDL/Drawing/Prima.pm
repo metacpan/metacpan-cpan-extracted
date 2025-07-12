@@ -1,8 +1,5 @@
-# Always load Prima first:
-use Prima;
-
 #
-# GENERATED WITH PDL::PP! Don't modify!
+# GENERATED WITH PDL::PP from prima.pd! Don't modify!
 #
 package PDL::Drawing::Prima;
 
@@ -14,10 +11,11 @@ use PDL::Exporter;
 use DynaLoader;
 
 
-   our $VERSION = '0.19';
+   our $VERSION = '0.20';
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::Drawing::Prima $VERSION;
+
 
 
 
@@ -191,9 +189,12 @@ about that, though, because they will resemble normal signatures close enough
 that you should be able to understand them, I hope.
 
 =cut
-#line 192 "Prima.pm"
+#line 193 "Prima.pm"
 
 
+=head1 FUNCTIONS
+
+=cut
 
 
 
@@ -204,17 +205,17 @@ that you should be able to understand them, I hope.
 # This is a list of the number of arguments for each property. It is based on the
 # pars_args_for hash which is built in the .pd file associated with this module
 my %N_args_for = qw(
-	splinePrecisions     1
-	linePatterns         1
-	lineJoins            1
-	rop2s                1
-	clipRects            4
-	lineWidths           1
-	fillPatterns         1
-	backColors           1
-	rops                 1
 	fillModes            1
+	backColors           1
+	lineJoins            1
 	colors               1
+	fillPatterns         1
+	lineWidths           1
+	linePatterns         1
+	clipRects            4
+	rop2s                1
+	rops                 1
+	splinePrecisions     1
 );
 
 #line 1417 "prima.pd"
@@ -263,8 +264,21 @@ sub get_sorted_args_with_defaults {
 	}
 	return @to_return;
 }
-#line 267 "Prima.pm"
+#line 268 "Prima.pm"
 
+
+=head2 prima_arcs
+
+=for sig
+
+ Signature: (double x(); double y(); double x_diameter(); double y_diameter();
+			start_angle(); end_angle(); int colors(); int backColors(); byte linePatterns(patlen); int lineWidths(); int rops(); int rop2s(); SV * arg_ref_sv)
+ Types: (double)
+
+=for usage
+
+ prima_arcs($x, $y, $x_diameter, $y_diameter, $start_angle, $end_angle, $colors, $backColors, $linePatterns, $lineWidths, $rops, $rop2s, $arg_ref_sv); # all arguments given
+ $x->prima_arcs($y, $x_diameter, $y_diameter, $start_angle, $end_angle, $colors, $backColors, $linePatterns, $lineWidths, $rops, $rop2s, $arg_ref_sv); # method call
 
 =head2 pdl_arcs
 
@@ -317,9 +331,14 @@ Spline drawing provides a similar functionality, though more complex and
 more powerful. There are no PDL bindings for the spline functions yet.
 See L<Prima::Drawable/spline> for more information.
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-pdl_arcs does not process bad values.
+C<prima_arcs> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -383,6 +402,18 @@ sub Prima::Drawable::pdl_arcs {
 
 
 
+=head2 prima_bars
+
+=for sig
+
+ Signature: (double x1(); double y1(); double x2(); double y2(); int colors(); int backColors(); int clipLeft(); int clipBottom(); int clipRight(); int clipTop(); byte fillPatterns(oct=8); int rops(); int rop2s(); SV * arg_ref_sv)
+ Types: (double)
+
+=for usage
+
+ prima_bars($x1, $y1, $x2, $y2, $colors, $backColors, $clipLeft, $clipBottom, $clipRight, $clipTop, $fillPatterns, $rops, $rop2s, $arg_ref_sv); # all arguments given
+ $x1->prima_bars($y1, $x2, $y2, $colors, $backColors, $clipLeft, $clipBottom, $clipRight, $clipTop, $fillPatterns, $rops, $rop2s, $arg_ref_sv); # method call
+
 =head2 pdl_bars
 
   Prima Signature: (widget; x1(); y1(); x2(); y2(); properties)
@@ -417,9 +448,14 @@ Compare to the Prima method L<Prima::Drawable/bar>. See also
 L</pdl_rectangles>, which is the unfilled equivalent, and L</pdl_clears>,
 which is sorta the opposite of this.
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-pdl_bars does not process bad values.
+C<prima_bars> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -481,6 +517,19 @@ sub Prima::Drawable::pdl_bars {
 
 
 
+=head2 prima_chords
+
+=for sig
+
+ Signature: (double x(); double y(); double x_diameter(); double y_diameter();
+			double start_angle(); double end_angle(); int colors(); int backColors(); int clipLeft(); int clipBottom(); int clipRight(); int clipTop(); byte linePatterns(patlen); int lineWidths(); int rops(); int rop2s(); SV * arg_ref_sv)
+ Types: (double)
+
+=for usage
+
+ prima_chords($x, $y, $x_diameter, $y_diameter, $start_angle, $end_angle, $colors, $backColors, $clipLeft, $clipBottom, $clipRight, $clipTop, $linePatterns, $lineWidths, $rops, $rop2s, $arg_ref_sv); # all arguments given
+ $x->prima_chords($y, $x_diameter, $y_diameter, $start_angle, $end_angle, $colors, $backColors, $clipLeft, $clipBottom, $clipRight, $clipTop, $linePatterns, $lineWidths, $rops, $rop2s, $arg_ref_sv); # method call
+
 =head2 pdl_chords
 
   Prima Signature: (widget; x(); y(); x_diameter(); y_diameter();
@@ -538,9 +587,14 @@ L</pdl_arcs> and L</pdl_sectors>. See also L</pdl_fill_sectors>,
 L</pdl_ellipses>, and L</pdl_fill_ellipses>, as well as
 L<Prima::Drawable/spline>.
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-pdl_chords does not process bad values.
+C<prima_chords> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -604,6 +658,18 @@ sub Prima::Drawable::pdl_chords {
 
 
 
+=head2 prima_clears
+
+=for sig
+
+ Signature: (int x1(); int y1(); int x2(); int y2();int colors(); int backColors(); int clipLeft(); int clipBottom(); int clipRight(); int clipTop(); byte linePatterns(patlen); int lineWidths(); int rops(); int rop2s(); SV * arg_ref_sv)
+ Types: (long)
+
+=for usage
+
+ prima_clears($x1, $y1, $x2, $y2, $colors, $backColors, $clipLeft, $clipBottom, $clipRight, $clipTop, $linePatterns, $lineWidths, $rops, $rop2s, $arg_ref_sv); # all arguments given
+ $x1->prima_clears($y1, $x2, $y2, $colors, $backColors, $clipLeft, $clipBottom, $clipRight, $clipTop, $linePatterns, $lineWidths, $rops, $rop2s, $arg_ref_sv); # method call
+
 =head2 pdl_clears
 
   Prima Signature: (widget; x1(); y1(); x2(); y2(); properties)
@@ -637,9 +703,14 @@ Compare to the Prima method L<Prima::Drawable/clear>. In practice I
 suppose this might be considered the opposite of L</pdl_bars>, though
 technically this is meant for erasing, not drawing.
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-pdl_clears does not process bad values.
+C<prima_clears> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -701,6 +772,18 @@ sub Prima::Drawable::pdl_clears {
 
 
 
+=head2 prima_ellipses
+
+=for sig
+
+ Signature: (double x(); double y(); double x_diameter(); double y_diameter();int colors(); int backColors(); int clipLeft(); int clipBottom(); int clipRight(); int clipTop(); byte linePatterns(patlen); int lineWidths(); int rops(); int rop2s(); SV * arg_ref_sv)
+ Types: (long)
+
+=for usage
+
+ prima_ellipses($x, $y, $x_diameter, $y_diameter, $colors, $backColors, $clipLeft, $clipBottom, $clipRight, $clipTop, $linePatterns, $lineWidths, $rops, $rop2s, $arg_ref_sv); # all arguments given
+ $x->prima_ellipses($y, $x_diameter, $y_diameter, $colors, $backColors, $clipLeft, $clipBottom, $clipRight, $clipTop, $linePatterns, $lineWidths, $rops, $rop2s, $arg_ref_sv); # method call
+
 =head2 pdl_ellipses
 
   Prima Signature: (widget; x(); y(); x_diameter();
@@ -742,9 +825,14 @@ and L</pdl_sectors> as well as L</pdl_fill_chords> and
 L</pdl_fill_sectors>. You may also be interested in L<Prima::Drawable/spline>,
 which does not yet have a PDL interface.
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-pdl_ellipses does not process bad values.
+C<prima_ellipses> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -806,6 +894,19 @@ sub Prima::Drawable::pdl_ellipses {
 
 
 
+=head2 prima_fill_chords
+
+=for sig
+
+ Signature: (double x(); double y(); double x_diameter(); double y_diameter();
+			start_angle(); end_angle(); int colors(); int backColors(); int clipLeft(); int clipBottom(); int clipRight(); int clipTop(); byte fillPatterns(oct=8); int rops(); int rop2s(); SV * arg_ref_sv)
+ Types: (double)
+
+=for usage
+
+ prima_fill_chords($x, $y, $x_diameter, $y_diameter, $start_angle, $end_angle, $colors, $backColors, $clipLeft, $clipBottom, $clipRight, $clipTop, $fillPatterns, $rops, $rop2s, $arg_ref_sv); # all arguments given
+ $x->prima_fill_chords($y, $x_diameter, $y_diameter, $start_angle, $end_angle, $colors, $backColors, $clipLeft, $clipBottom, $clipRight, $clipTop, $fillPatterns, $rops, $rop2s, $arg_ref_sv); # method call
+
 =head2 pdl_fill_chords
 
   Prima Signature: (widget; x(); y(); x_diameter(); y_diameter();
@@ -833,9 +934,14 @@ equivalent is L</pdl_chords>. Closely related to L</pdl_fill_ellipses>
 and L</pdl_fill_sectors>. See also L</pdl_arcs>, L</pdl_ellipses>,
 and L</pdl_sectors>.
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-pdl_fill_chords does not process bad values.
+C<prima_fill_chords> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -899,6 +1005,18 @@ sub Prima::Drawable::pdl_fill_chords {
 
 
 
+=head2 prima_fill_ellipses
+
+=for sig
+
+ Signature: (double x(); double y(); double x_diameter(); double y_diameter();int colors(); int backColors(); int clipLeft(); int clipBottom(); int clipRight(); int clipTop(); byte fillPatterns(oct=8); int rops(); int rop2s(); SV * arg_ref_sv)
+ Types: (long)
+
+=for usage
+
+ prima_fill_ellipses($x, $y, $x_diameter, $y_diameter, $colors, $backColors, $clipLeft, $clipBottom, $clipRight, $clipTop, $fillPatterns, $rops, $rop2s, $arg_ref_sv); # all arguments given
+ $x->prima_fill_ellipses($y, $x_diameter, $y_diameter, $colors, $backColors, $clipLeft, $clipBottom, $clipRight, $clipTop, $fillPatterns, $rops, $rop2s, $arg_ref_sv); # method call
+
 =head2 pdl_fill_ellipses
 
   Prima Signature: (widget; x(); y(); x_diameter();
@@ -938,9 +1056,14 @@ See also L</pdl_arcs>, L</pdl_ellipses>, and L</pdl_sectors>. Also,
 check out L<Prima::Drawable/fill_spline>, which does not yet have
 PDL bindings.
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-pdl_fill_ellipses does not process bad values.
+C<prima_fill_ellipses> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1002,6 +1125,18 @@ sub Prima::Drawable::pdl_fill_ellipses {
 
 
 
+=head2 prima_fillpolys
+
+=for sig
+
+ Signature: (x(n); y(n); int colors(); int backColors(); int clipLeft(); int clipBottom(); int clipRight(); int clipTop(); byte fillPatterns(oct=8); byte fillModes(); int rops(); int rop2s(); SV * arg_ref_sv)
+ Types: (double)
+
+=for usage
+
+ prima_fillpolys($x, $y, $colors, $backColors, $clipLeft, $clipBottom, $clipRight, $clipTop, $fillPatterns, $fillModes, $rops, $rop2s, $arg_ref_sv); # all arguments given
+ $x->prima_fillpolys($y, $colors, $backColors, $clipLeft, $clipBottom, $clipRight, $clipTop, $fillPatterns, $fillModes, $rops, $rop2s, $arg_ref_sv); # method call
+
 =head2 pdl_fillpolys
 
   Prima Signature: (widget; x(n); y(n); properties)
@@ -1057,9 +1192,14 @@ ratio of your (resized) window.
 Compare to the Prima method L<Prima::Drawable/fillpoly>. See also
 L</pdl_bars> and L</pdl_polylines>.
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-pdl_fillpolys processes bad values.
+C<prima_fillpolys> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1119,6 +1259,19 @@ sub Prima::Drawable::pdl_fillpolys {
 
 
 
+=head2 prima_fill_sectors
+
+=for sig
+
+ Signature: (double x(); double y(); double x_diameter(); double y_diameter();
+			double start_angle(); double end_angle(); int colors(); int backColors(); int clipLeft(); int clipBottom(); int clipRight(); int clipTop(); byte fillPatterns(oct=8); int rops(); int rop2s(); SV * arg_ref_sv)
+ Types: (double)
+
+=for usage
+
+ prima_fill_sectors($x, $y, $x_diameter, $y_diameter, $start_angle, $end_angle, $colors, $backColors, $clipLeft, $clipBottom, $clipRight, $clipTop, $fillPatterns, $rops, $rop2s, $arg_ref_sv); # all arguments given
+ $x->prima_fill_sectors($y, $x_diameter, $y_diameter, $start_angle, $end_angle, $colors, $backColors, $clipLeft, $clipBottom, $clipRight, $clipTop, $fillPatterns, $rops, $rop2s, $arg_ref_sv); # method call
+
 =head2 pdl_fill_sectors
 
   Prima Signature: (widget; x(); y(); x_diameter(); y_diameter();
@@ -1160,9 +1313,14 @@ equivalent is L</pdl_sectors>. This is closely related to C</pdl_fill_chords>
 and C</pdl_fill_ellipses>. See also L</pdl_arcs>, L</pdl_chords>, and
 L</pdl_ellipses>.
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-pdl_fill_sectors does not process bad values.
+C<prima_fill_sectors> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1226,6 +1384,18 @@ sub Prima::Drawable::pdl_fill_sectors {
 
 
 
+=head2 prima_flood_fills
+
+=for sig
+
+ Signature: (int x(); int y(); int fill_color(); int singleborder(); int colors(); int backColors(); int clipLeft(); int clipBottom(); int clipRight(); int clipTop(); byte fillPatterns(oct=8); int rops(); int rop2s(); SV * arg_ref_sv)
+ Types: (long)
+
+=for usage
+
+ prima_flood_fills($x, $y, $fill_color, $singleborder, $colors, $backColors, $clipLeft, $clipBottom, $clipRight, $clipTop, $fillPatterns, $rops, $rop2s, $arg_ref_sv); # all arguments given
+ $x->prima_flood_fills($y, $fill_color, $singleborder, $colors, $backColors, $clipLeft, $clipBottom, $clipRight, $clipTop, $fillPatterns, $rops, $rop2s, $arg_ref_sv); # method call
+
 =head2 pdl_flood_fills
 
   Prima Signature: (widget; x(); y(); fill_color();
@@ -1283,9 +1453,14 @@ positions for those space-ship looking things.
 Compare to the Prima method L<Prima::Drawable/flood_fill>. See also
 L</pdl_clears> and the various fill-based drawing methods.
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-pdl_flood_fills does not process bad values.
+C<prima_flood_fills> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1347,6 +1522,18 @@ sub Prima::Drawable::pdl_flood_fills {
 
 
 
+=head2 prima_lines
+
+=for sig
+
+ Signature: (x1(); y1(); x2(); y2(); int colors(); int backColors(); int clipLeft(); int clipBottom(); int clipRight(); int clipTop(); int lineJoins(); byte linePatterns(patlen); int lineWidths(); int rops(); int rop2s(); SV * arg_ref_sv)
+ Types: (double)
+
+=for usage
+
+ prima_lines($x1, $y1, $x2, $y2, $colors, $backColors, $clipLeft, $clipBottom, $clipRight, $clipTop, $lineJoins, $linePatterns, $lineWidths, $rops, $rop2s, $arg_ref_sv); # all arguments given
+ $x1->prima_lines($y1, $x2, $y2, $colors, $backColors, $clipLeft, $clipBottom, $clipRight, $clipTop, $lineJoins, $linePatterns, $lineWidths, $rops, $rop2s, $arg_ref_sv); # method call
+
 =head2 pdl_lines
 
   Prima Signature: (widget; x1(); y1(); x2(); y2(); properties)
@@ -1371,9 +1558,14 @@ proper bad value handling.
 Compare to the Prima methods L<Prima::Drawable/lines> and
 L<Prima::Drawable/lines>. See also L</pdl_polylines>.
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-pdl_lines processes bad values.
+C<prima_lines> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1434,6 +1626,18 @@ sub Prima::Drawable::pdl_lines {
 
 
 
+
+=head2 prima_polylines
+
+=for sig
+
+ Signature: (x(n); y(n); int colors(); int backColors(); int clipLeft(); int clipBottom(); int clipRight(); int clipTop(); int lineJoins(); byte linePatterns(patlen); int lineWidths(); int rops(); int rop2s(); SV * arg_ref_sv)
+ Types: (double)
+
+=for usage
+
+ prima_polylines($x, $y, $colors, $backColors, $clipLeft, $clipBottom, $clipRight, $clipTop, $lineJoins, $linePatterns, $lineWidths, $rops, $rop2s, $arg_ref_sv); # all arguments given
+ $x->prima_polylines($y, $colors, $backColors, $clipLeft, $clipBottom, $clipRight, $clipTop, $lineJoins, $linePatterns, $lineWidths, $rops, $rop2s, $arg_ref_sv); # method call
 
 =head2 pdl_polylines
 
@@ -1502,9 +1706,14 @@ do better to use L<PDL::Graphics::Prima> to create plots):
 Compare to the Prima method L<Prima::Drawable/polyline>. See also L</pdl_lines>
 and L</pdl_fillpolys>.
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-pdl_polylines processes bad values.
+C<prima_polylines> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1564,6 +1773,18 @@ sub Prima::Drawable::pdl_polylines {
 
 
 
+=head2 prima_rectangles
+
+=for sig
+
+ Signature: (int x1(); int y1(); int x2(); int y2(); int colors(); int backColors(); int clipLeft(); int clipBottom(); int clipRight(); int clipTop(); byte linePatterns(patlen); int lineWidths(); int rops(); int rop2s(); SV * arg_ref_sv)
+ Types: (long)
+
+=for usage
+
+ prima_rectangles($x1, $y1, $x2, $y2, $colors, $backColors, $clipLeft, $clipBottom, $clipRight, $clipTop, $linePatterns, $lineWidths, $rops, $rop2s, $arg_ref_sv); # all arguments given
+ $x1->prima_rectangles($y1, $x2, $y2, $colors, $backColors, $clipLeft, $clipBottom, $clipRight, $clipTop, $linePatterns, $lineWidths, $rops, $rop2s, $arg_ref_sv); # method call
+
 =head2 pdl_rectangles
 
   Prima Signature: (widget; x1(); y1(); x2(); y2(); properties)
@@ -1600,9 +1821,14 @@ draws a line from (x1, y1) to (x2, y2) instead. Also, there is a Prima
 method that does not (yet) have a pdl-based equivalent known as
 L<Prima::Drawable/rects3d>, which draws beveled edges around a rectangle.
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-pdl_rectangles does not process bad values.
+C<prima_rectangles> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1664,6 +1890,19 @@ sub Prima::Drawable::pdl_rectangles {
 
 
 
+=head2 prima_sectors
+
+=for sig
+
+ Signature: (double x(); double y(); double x_diameter(); double y_diameter();
+			double start_angle(); double end_angle(); int colors(); int backColors(); int clipLeft(); int clipBottom(); int clipRight(); int clipTop(); byte linePatterns(patlen); int lineWidths(); int rops(); int rop2s(); SV * arg_ref_sv)
+ Types: (double)
+
+=for usage
+
+ prima_sectors($x, $y, $x_diameter, $y_diameter, $start_angle, $end_angle, $colors, $backColors, $clipLeft, $clipBottom, $clipRight, $clipTop, $linePatterns, $lineWidths, $rops, $rop2s, $arg_ref_sv); # all arguments given
+ $x->prima_sectors($y, $x_diameter, $y_diameter, $start_angle, $end_angle, $colors, $backColors, $clipLeft, $clipBottom, $clipRight, $clipTop, $linePatterns, $lineWidths, $rops, $rop2s, $arg_ref_sv); # method call
+
 =head2 pdl_sectors
 
   Prima Signature: (widget; x(); y(); x_diameter(); y_diameter(); start_angle(); end_angle(); properties)
@@ -1718,9 +1957,14 @@ including L</pdl_arcs>, L</pdl_chords>, and L</pdl_ellipses> along with their
 filled equivalents. You may also be interested in L<Prima::Drawable/spline>,
 which does not yet have a PDL interface.
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-pdl_sectors does not process bad values.
+C<prima_sectors> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1790,8 +2034,20 @@ sub Prima::Drawable::pdl_sectors {
 These are drawing methods that have no analogous Prima::Drawable function.
 
 =cut
-#line 1883 "Prima.pm"
+#line 2038 "Prima.pm"
 
+
+=head2 prima_symbols
+
+=for sig
+
+ Signature: (x(); y(); byte N_points(); orientation(); byte filled(); int size(); byte skip(); int colors(); int backColors(); int clipLeft(); int clipBottom(); int clipRight(); int clipTop(); byte fillPatterns(oct=8); byte fillModes(); byte linePatterns(patlen); int lineWidths(); int rops(); int rop2s(); SV * arg_ref_sv)
+ Types: (double)
+
+=for usage
+
+ prima_symbols($x, $y, $N_points, $orientation, $filled, $size, $skip, $colors, $backColors, $clipLeft, $clipBottom, $clipRight, $clipTop, $fillPatterns, $fillModes, $linePatterns, $lineWidths, $rops, $rop2s, $arg_ref_sv); # all arguments given
+ $x->prima_symbols($y, $N_points, $orientation, $filled, $size, $skip, $colors, $backColors, $clipLeft, $clipBottom, $clipRight, $clipTop, $fillPatterns, $fillModes, $linePatterns, $lineWidths, $rops, $rop2s, $arg_ref_sv); # method call
 
 =head2 pdl_symbols
 
@@ -2005,9 +2261,14 @@ line to determine the line width.
 Bad values are handled by C<pdl_symbols>. If any of the values you pass in
 are bad, the symbol is not drawn at that x/y coordinate.
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-pdl_symbols processes bad values.
+C<prima_symbols> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2140,7 +2401,7 @@ Dmitry for that module because it gave me a working template for this module,
 including a working Makefile.PL. Thanks Dmitry!
 
 =cut
-#line 2239 "Prima.pm"
+#line 2405 "Prima.pm"
 
 # Exit with OK status
 

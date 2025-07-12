@@ -1,0 +1,53 @@
+!Basic receive (send response)
+RECV 0x55
+RECV 0x3103 +C "req" +C
+  request 1 "req"
+RESPOND 1 "res"
+  send 0x55
+  send 0xB103 +C "res" +C
+RECV 0x55
+RECV 0xC100 +C +C
+
+!Basic receive (send error)
+RECV 0x55
+RECV 0x3203 +C "req" +C
+  request 2 "req"
+ERR 2 "err"
+  send 0x55
+  send 0xE203 +C "err" +C
+RECV 0x55
+RECV 0xC200 +C +C
+
+!Can respond out of order
+RECV 0x55
+RECV 0x3302 +C "R1" +C
+  request 3 "R1"
+RECV 0x55
+RECV 0x3402 +C "R2" +C
+  request 4 "R2"
+RESPOND 4 "A2"
+  send 0x55
+  send 0xB402 +C "A2" +C
+RECV 0x55
+RECV 0xC400 +C +C
+RESPOND 3 "A1"
+  send 0x55
+  send 0xB302 +C "A1" +C
+RECV 0x55
+RECV 0xC300 +C +C
+
+!Duplicate request responds from buffer
+RECV 0x55
+RECV 0x3501 +C "X" +C
+  request 5 "X"
+RESPOND 5 "Y"
+  send 0x55
+  send 0xB501 +C "Y" +C
+RECV 0x55
+RECV 0x3501 +C "X" +C
+  needtasks
+TASKS
+  send 0x55
+  send 0xB501 +C "Y" +C
+RECV 0x55
+RECV 0xC500 +C +C

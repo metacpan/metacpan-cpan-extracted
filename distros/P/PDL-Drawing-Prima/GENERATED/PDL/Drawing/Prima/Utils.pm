@@ -1,5 +1,5 @@
 #
-# GENERATED WITH PDL::PP! Don't modify!
+# GENERATED WITH PDL::PP from utils.pd! Don't modify!
 #
 package PDL::Drawing::Prima::Utils;
 
@@ -15,6 +15,7 @@ use DynaLoader;
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::Drawing::Prima::Utils $VERSION;
+
 
 
 
@@ -38,7 +39,7 @@ L<PDL::Graphics::Prima>. Strictly speaking, they should probably be defined
 somewhere in that module, but they reside here at the moment.
 
 =cut
-#line 42 "Utils.pm"
+#line 43 "Utils.pm"
 
 
 =head1 FUNCTIONS
@@ -54,7 +55,16 @@ somewhere in that module, but they reside here at the moment.
 
 =for sig
 
-  Signature: (int color(); int [o] rgb(n=3))
+ Signature: (int color(); int [o] rgb(n=3))
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ $rgb = color_to_rgb($color);
+ color_to_rgb($color, $rgb);  # all arguments given
+ $rgb = $color->color_to_rgb; # method call
+ $color->color_to_rgb($rgb);
 
 =pod
 
@@ -68,6 +78,10 @@ second the green value, and the third the blue value. The resulting piddle is
 suitable for use in C<rgb_to_color> or C<rgb_to_hsv>.
 
 The code for this routine is based on C<value2rgb> from L<Prima::colorDialog>.
+
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
@@ -93,7 +107,16 @@ value.
 
 =for sig
 
-  Signature: (int rgb(n=3); int [o] color())
+ Signature: (int rgb(n=3); int [o] color())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ $color = rgb_to_color($rgb);
+ rgb_to_color($rgb, $color);  # all arguments given
+ $color = $rgb->rgb_to_color; # method call
+ $rgb->rgb_to_color($color);
 
 =pod
 
@@ -111,6 +134,10 @@ first dimension must be three, so if the input piddle has dimensions (3, m, n,
 suitable for use when specifying colors to drawing primitives.
 
 The code for this routine is based on C<rgb2value> from L<Prima::colorDialog>.
+
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
@@ -136,7 +163,16 @@ color values will all be marked as bad.
 
 =for sig
 
-  Signature: (float+ hsv(n=3); int [o]rgb(m=3))
+ Signature: (float+ hsv(n=3); int [o]rgb(m=3))
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ $rgb = hsv_to_rgb($hsv);
+ hsv_to_rgb($hsv, $rgb);  # all arguments given
+ $rgb = $hsv->hsv_to_rgb; # method call
+ $hsv->hsv_to_rgb($rgb);
 
 =pod
 
@@ -162,6 +198,10 @@ suitable for input into L</rgb_to_color> as well as manual manipulation.
 
 The code for this routine is based on C<hsv2rgb> from L<Prima::colorDialog>.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
 =for bad
@@ -186,7 +226,16 @@ color values will all be marked as bad.
 
 =for sig
 
-  Signature: (int rgb(n=3); float+ [o]hsv(m=3))
+ Signature: (int rgb(n=3); float+ [o]hsv(m=3))
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ $hsv = rgb_to_hsv($rgb);
+ rgb_to_hsv($rgb, $hsv);  # all arguments given
+ $hsv = $rgb->rgb_to_hsv; # method call
+ $rgb->rgb_to_hsv($hsv);
 
 =pod
 
@@ -210,6 +259,10 @@ The first dimension of the piddles holding the hsv and rgb values must be size
 suitable for manual manipulation and input into L</hsv_to_rgb>.
 
 The code for this routine is based on C<rgb2hsv> from L<Prima::colorDialog>.
+
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
@@ -235,7 +288,16 @@ be marked as bad.
 
 =for sig
 
-  Signature: (x(n); y(n); [o] min_x(); [o] min_y(); [o] max_x(); [o] max_y())
+ Signature: (x(n); y(n); [o] min_x(); [o] min_y(); [o] max_x(); [o] max_y())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ ($min_x, $min_y, $max_x, $max_y) = minmaxforpair($x, $y);
+ minmaxforpair($x, $y, $min_x, $min_y, $max_x, $max_y);    # all arguments given
+ ($min_x, $min_y, $max_x, $max_y) = $x->minmaxforpair($y); # method call
+ $x->minmaxforpair($y, $min_x, $min_y, $max_x, $max_y);
 
 =pod
 
@@ -268,6 +330,10 @@ purpose of this function.
 
 	
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
 =pod
@@ -292,13 +358,26 @@ Output is set bad if no pair of x/y data is good.
 
 =for sig
 
-  Signature: (min_check(Q); int min_index(Q); max_check(Q); int max_index(Q); extra0(Q); extra1(Q); extra2(Q); extra3(Q); extra4(Q); extra5(Q); extra6(Q); extra7(Q); extra8(Q); extra9(Q); extra10(Q); extra11(Q); extra12(Q); extra13(Q); extra14(Q); extra15(Q); extra16(Q); extra17(Q); extra18(Q); extra19(Q); [o] min(N); [o] max(N); int N_extras)
+ Signature: (min_check(Q); int min_index(Q); max_check(Q); int max_index(Q); extra0(Q); extra1(Q); extra2(Q); extra3(Q); extra4(Q); extra5(Q); extra6(Q); extra7(Q); extra8(Q); extra9(Q); extra10(Q); extra11(Q); extra12(Q); extra13(Q); extra14(Q); extra15(Q); extra16(Q); extra17(Q); extra18(Q); extra19(Q); [o] min(N); [o] max(N); int N_extras)
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ ($min, $max) = collate_min_max_wrt_many($min_check, $min_index, $max_check, $max_index, $extra0, $extra1, $extra2, $extra3, $extra4, $extra5, $extra6, $extra7, $extra8, $extra9, $extra10, $extra11, $extra12, $extra13, $extra14, $extra15, $extra16, $extra17, $extra18, $extra19, $N_extras);
+ collate_min_max_wrt_many($min_check, $min_index, $max_check, $max_index, $extra0, $extra1, $extra2, $extra3, $extra4, $extra5, $extra6, $extra7, $extra8, $extra9, $extra10, $extra11, $extra12, $extra13, $extra14, $extra15, $extra16, $extra17, $extra18, $extra19, $min, $max, $N_extras);    # all arguments given
+ ($min, $max) = $min_check->collate_min_max_wrt_many($min_index, $max_check, $max_index, $extra0, $extra1, $extra2, $extra3, $extra4, $extra5, $extra6, $extra7, $extra8, $extra9, $extra10, $extra11, $extra12, $extra13, $extra14, $extra15, $extra16, $extra17, $extra18, $extra19, $N_extras); # method call
+ $min_check->collate_min_max_wrt_many($min_index, $max_check, $max_index, $extra0, $extra1, $extra2, $extra3, $extra4, $extra5, $extra6, $extra7, $extra8, $extra9, $extra10, $extra11, $extra12, $extra13, $extra14, $extra15, $extra16, $extra17, $extra18, $extra19, $min, $max, $N_extras);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-collate_min_max_wrt_many processes bad values.
+C<collate_min_max_wrt_many> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -456,7 +535,16 @@ sub PDL::collate_min_max_wrt_many {
 
 =for sig
 
-  Signature: (minima(m, a=3); int [o] min_mask(m))
+ Signature: (minima(m, a=3); int [o] min_mask(m))
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ $min_mask = trim_collated_min($minima);
+ trim_collated_min($minima, $min_mask);  # all arguments given
+ $min_mask = $minima->trim_collated_min; # method call
+ $minima->trim_collated_min($min_mask);
 
 =pod
 
@@ -469,9 +557,13 @@ working here - this needs documentation
 
 	
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-trim_collated_min does not process bad values.
+C<trim_collated_min> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -490,7 +582,16 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (maxima(n, a=3); int [o] max_mask(n))
+ Signature: (maxima(n, a=3); int [o] max_mask(n))
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ $max_mask = trim_collated_max($maxima);
+ trim_collated_max($maxima, $max_mask);  # all arguments given
+ $max_mask = $maxima->trim_collated_max; # method call
+ $maxima->trim_collated_max($max_mask);
 
 =pod
 
@@ -503,9 +604,13 @@ working here - this needs documentation
 
 	
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-trim_collated_max does not process bad values.
+C<trim_collated_max> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut

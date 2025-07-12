@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2011-2022 -- leonerd@leonerd.org.uk
 
-package Future::PP 0.51;
+package Future::PP 0.52;
 
 use v5.14;
 use warnings;
@@ -75,8 +75,10 @@ sub new
 sub __selfstr
 {
    my $self = shift;
-   return "$self" unless defined $self->{label};
-   return "$self (\"$self->{label}\")";
+   my $str = "$self";
+   $str .= " (\"$self->{label}\")" if defined $self->{label};
+   $str .= " ($self->{constructed_at})" if defined $self->{constructed_at};
+   return $str;
 }
 
 my $GLOBAL_END;
@@ -94,11 +96,11 @@ sub DESTROY_debug {
    # 'near'.
 
    if( $self->{ready} and $self->{failure} ) {
-      warn "${\$self->__selfstr} was $self->{constructed_at} and was lost near $lost_at with an unreported failure of: " .
+      warn "${\$self->__selfstr} was lost near $lost_at with an unreported failure of: " .
          $self->{failure}[0] . "\n";
    }
    elsif( !$self->{ready} ) {
-      warn "${\$self->__selfstr} was $self->{constructed_at} and was lost near $lost_at before it was ready.\n";
+      warn "${\$self->__selfstr} was lost near $lost_at before it was ready.\n";
    }
 }
 *DESTROY = \&DESTROY_debug if DEBUG;
@@ -181,9 +183,7 @@ sub _mark_ready
          if( !$fseq ) { # weaken()ed; it might be gone now
             # This warning should always be printed, even not in DEBUG mode.
             # It's always an indication of a bug
-            Carp::carp +(DEBUG ? "${\$self->__selfstr} ($self->{constructed_at})"
-                               : "${\$self->__selfstr} $self" ) .
-               " lost a sequence Future";
+            Carp::carp "${\$self->__selfstr} lost a sequence Future";
             next;
          }
 

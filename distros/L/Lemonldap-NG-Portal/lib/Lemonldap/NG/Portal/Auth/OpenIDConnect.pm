@@ -121,7 +121,13 @@ sub extractFormInfo {
     }
 
     # Check callback
-    if ( $self->isCallback($req) ) {
+    if ( $self->isCallback($req)
+        and not $req->param('oidc_callback_processed') )
+    {
+        # This makes sure we don't go through the callback code when re-posting
+        # a login form
+        $self->p->setHiddenFormValue( $req, "oidc_callback_processed", "1", "",
+            0 );
 
         $self->logger->debug(
             'OpenIDConnect callback URI detected: ' . $req->uri );

@@ -25,8 +25,8 @@
             "Future::Buffer" : "0.03",
             "Future::IO" : "0",
             "Future::Selector" : "0.02",
-            "Object::Pad" : "0.809",
-            "Sublike::Extended" : "0.23",
+            "Object::Pad" : "0.817",
+            "Sublike::Extended" : "0.29",
             "Syntax::Keyword::Match" : "0",
             "perl" : "5.036"
          }
@@ -41,15 +41,15 @@
    "provides" : {
       "IPC::MicroSocket" : {
          "file" : "lib/IPC/MicroSocket.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       },
       "IPC::MicroSocket::Client" : {
          "file" : "lib/IPC/MicroSocket/Client.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       },
       "IPC::MicroSocket::Server" : {
          "file" : "lib/IPC/MicroSocket/Server.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -58,6 +58,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

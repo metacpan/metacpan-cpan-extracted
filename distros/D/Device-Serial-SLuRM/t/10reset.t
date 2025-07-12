@@ -4,6 +4,7 @@ use v5.14;
 use warnings;
 
 use Test2::V0;
+use Test::Future::Deferred 0.52;  # ->flush method
 use Test::Future::IO 0.05;
 
 use Future::AsyncAwait;
@@ -55,7 +56,9 @@ sub with_crc8
       ->will_also_later( sub { $slurm->stop } );
 
    my $f = $slurm->run;
-   $f->await; # it gets cancelled
+   Test::Future::Deferred->flush;
+
+   ok( !$f->is_cancelled, '->run future is cancelled' );
 
    $controller->check_and_clear( 'Accepted RESET' );
 }

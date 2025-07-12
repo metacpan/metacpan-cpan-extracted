@@ -453,11 +453,14 @@ sub buildAuthorizationCodeAuthnRequest {
     };
     my $authorize_request_params = {
         %$authorize_request_oauth2_params,
-        ( $display    ? ( display    => $display )    : () ),
-        ( $prompt     ? ( prompt     => $prompt )     : () ),
-        ( $ui_locales ? ( ui_locales => $ui_locales ) : () ),
+        ( $display ? ( display => $display ) : () ),
+        ( $prompt  ? ( prompt  => $prompt )  : () ),
+        # MaxAge is defined as an int type in LLNG config,
+        # so 0 means undefined
+        ( $max_age    ? ( max_age    => $max_age )    : () ),
         (
-            defined($max_age) && length($max_age) ? ( max_age => $max_age ) : ()
+            defined($ui_locales)
+              && length($ui_locales) ? ( ui_locales => $ui_locales ) : ()
         ),
         (
             defined($acr_values)
@@ -1950,10 +1953,7 @@ sub getEndPointAuthenticationCredentials {
                 and $payload->{iss} eq $_clientId )
             {
                 # client_id must match to a known relying party
-                my ($rp) = grep {
-                    $self->rpOptions->{$_}->{oidcRPMetaDataOptionsClientID} eq
-                      $_clientId
-                } keys %{ $self->rpOptions || {} };
+                my $rp = $self->getRP($_clientId);
                 if ($rp) {
 
                     # RP must have a signature key registered

@@ -13,7 +13,7 @@ use constant DEBUG => $ENV{PURL_DEBUG};
 
 use overload '""' => 'to_string', fallback => 1;
 
-our $VERSION = '2.22';
+our $VERSION = '2.23';
 our @EXPORT  = qw(encode_purl decode_purl);
 
 my $PURL_REGEXP = qr{^pkg:[A-Za-z\\.\\-\\+][A-Za-z0-9\\.\\-\\+]*/.+};
@@ -22,7 +22,7 @@ sub new {
 
     my ($class, %params) = @_;
 
-    my $scheme     = delete $params{scheme} // 'pkg';
+    my $scheme     = 'pkg';    # The scheme is a constant with the value "pkg".
     my $type       = delete $params{type} or Carp::croak "Invalid Package URL: 'type' component is required";
     my $namespace  = delete $params{namespace};
     my $name       = delete $params{name} or Carp::croak "Invalid Package URL: 'name' component is required";
@@ -42,13 +42,25 @@ sub new {
 
 }
 
-sub scheme     { shift->{scheme} }
-sub type       { shift->{type} }
-sub namespace  { shift->{namespace} }
-sub name       { shift->{name} }
-sub version    { shift->{version} }
-sub qualifiers { shift->{qualifiers} }
-sub subpath    { shift->{subpath} }
+sub _component {
+
+    my ($self, $component, $value) = @_;
+
+    if (@_ == 3) {
+        $self->{$component} = $value;
+    }
+
+    return $self->{$component};
+
+}
+
+sub scheme     {'pkg'}
+sub type       { shift->_component('type',       @_) }
+sub namespace  { shift->_component('namespace',  @_) }
+sub name       { shift->_component('name',       @_) }
+sub version    { shift->_component('version',    @_) }
+sub qualifiers { shift->_component('qualifiers', @_) }
+sub subpath    { shift->_component('subpath',    @_) }
 
 sub encode_purl { __PACKAGE__->new(@_)->to_string }
 sub decode_purl { __PACKAGE__->from_string(shift) }
@@ -97,7 +109,7 @@ sub from_string {
     #         The value is the percent-decoded right side
     #         UTF-8-decode the value if needed in your programming language
     #         Discard any key/value pairs where the value is empty
-    #         If the key is checksums, split the value on ',' to create a list of checksums
+    #         If the key is checksum, split the value on ',' to create a list of checksum
     #     This list of key/value is the qualifiers object
 
     my @s2 = split(/\?([^\?]+)$/, $s1[0]);
@@ -108,11 +120,17 @@ sub from_string {
 
         foreach my $qualifier (@qualifiers) {
 
-            my ($key, $value) = split('=', $qualifier);
+            my ($key, $value) = ($qualifier =~ /^([^=]+)(?:=(.*))?$/);
             $value = _url_decode($value);
 
-            if ($key eq 'checksums') {
+            if ($key eq 'checksums' || $key eq 'checksum') {
+
+                if ($key eq 'checksums') {
+                    Carp::carp "Detected 'checksums' qualifier. Use 'checksum' qualifier instead.";
+                }
+
                 $value = [split(',', $value)];
+
             }
 
             $components{qualifiers}->{lc $key} = $value;
@@ -201,15 +219,29 @@ sub to_string {
     }
 
     # Name
-    push @purl, _url_encode($self->name);
+    push @purl, _encode($self->name);
 
     # Version
-    push @purl, ('@', _url_encode($self->version)) if ($self->version);
+    push @purl, ('@', _encode($self->version)) if ($self->version);
 
     # Qualifiers
     if (my $qualifiers = $self->qualifiers) {
 
-        my @qualifiers = map { sprintf('%s=%s', lc $_, _url_encode($qualifiers->{$_})) }
+        if (defined $qualifiers->{checksum} && ref $qualifiers->{checksum} eq 'ARRAY') {
+            $qualifiers->{checksum} = join ',', @{$qualifiers->{checksum}};
+        }
+
+        if (defined $qualifiers->{checksums} && ref $qualifiers->{checksums} eq 'ARRAY') {
+            $qualifiers->{checksums} = join ',', @{$qualifiers->{checksums}};
+        }
+
+        # TODO Use URI::VersionRange during qualifiers decode ?
+        if (defined $qualifiers->{vers} && ref $qualifiers->{vers} eq 'URI::VersionRange') {
+            $qualifiers->{vers} = $qualifiers->{vers}->to_string;
+            say STDERR $qualifiers->{vers};
+        }
+
+        my @qualifiers = map { sprintf('%s=%s', lc $_, _encode($qualifiers->{$_})) }
             grep { $qualifiers->{$_} } sort keys %{$qualifiers};
 
         push @purl, ('?', join('&', @qualifiers)) if (@qualifiers);
@@ -218,8 +250,15 @@ sub to_string {
 
     # Subpath
     if ($self->subpath) {
-        my @subpath = map { _url_encode($_) } split '/', $self->subpath;
+
+        my $subpath = $self->subpath;
+
+        $subpath =~ s{\.\./}{};
+        $subpath =~ s{\./}{};
+
+        my @subpath = map { _encode($_) } split '/', $subpath;
         push @purl, ('#', join('/', @subpath));
+
     }
 
     return join '', @purl;
@@ -230,11 +269,12 @@ sub to_urls {
     purl_to_urls(shift);
 }
 
-sub TO_JSON {
+sub to_hash {
 
     my $self = shift;
 
     return {
+        scheme     => $self->scheme,
         type       => $self->type,
         name       => $self->name,
         version    => $self->version,
@@ -245,14 +285,29 @@ sub TO_JSON {
 
 }
 
+sub TO_JSON { shift->to_hash }
+
 sub _url_encode {
+
+    my ($string, $pattern) = @_;
+
+    # RFC-3986
+    $pattern //= '^A-Za-z0-9\-._~/' unless $pattern;
+    $string =~ s/([$pattern])/sprintf '%%%02X', ord $1/ge;
+    return $string;
+
+}
+
+sub _encode {
 
     my $string = shift;
 
-    # RFC-3986 (but exclude "/" and ":")
-    $string =~ s/([^A-Za-z0-9\-._~\/:])/sprintf '%%%02X', ord $1/ge;
-    return $string;
+    $string = _url_encode($string);
 
+    $string =~ s{%3A}{:}g;
+    $string =~ s{%2F}{/}g;
+
+    return $string;
 }
 
 sub _url_decode {
@@ -283,21 +338,41 @@ URI::PackageURL - Perl extension for Package URL (aka "purl")
     type      => 'cpan',
     namespace => 'GDT',
     name      => 'URI-PackageURL',
-    version   => '2.22'
+    version   => '2.23'
   );
   
-  say $purl; # pkg:cpan/GDT/URI-PackageURL@2.22
+  say $purl; # pkg:cpan/GDT/URI-PackageURL@2.23
 
   # Parse Package URL string
-  $purl = URI::PackageURL->from_string('pkg:cpan/GDT/URI-PackageURL@2.22');
+  $purl = URI::PackageURL->from_string('pkg:cpan/GDT/URI-PackageURL@2.23');
+  
+  
+  # use setter methods
+  
+  my $purl = URI::PackageURL->new(type => 'cpan', namespace => 'GDT', name => 'URI-PackageURL');
 
+  say $purl; # pkg:cpan/GDT/URI-PackageURL
+  say $purl->version; # undef
+
+  $purl->version('2.23');
+  say $purl; # pkg:cpan/GDT/URI-PackageURL@2.23
+  say $purl->version; # 2.23
+  
+  
   # exported functions
 
-  $purl = decode_purl('pkg:cpan/GDT/URI-PackageURL@2.22');
+  $purl = decode_purl('pkg:cpan/GDT/URI-PackageURL@2.23');
   say $purl->type;  # cpan
 
-  $purl_string = encode_purl(type => cpan, name => 'URI::PackageURL', version => '2.22');
-  say $purl_string; # pkg:cpan/URI::PackageURL@2.22
+  $purl_string = encode_purl(type => cpan, namespace => 'GDT', name => 'URI-PackageURL', version => '2.23');
+  say $purl_string; # pkg:cpan/GDT/URI-PackageURL@2.23
+  
+  
+  # uses the legacy CPAN PURL type, to be used only for compatibility (will be removed in the future)
+  
+  $ENV{PURL_LEGACY_CPAN_TYPE} = 1;
+  URI::PackageURL->new(type => 'cpan', name => 'URI::PackageURL');
+  
 
 =head1 DESCRIPTION
 
@@ -349,23 +424,11 @@ C<cpan> is an official "purl" type (L<https://github.com/package-url/purl-spec/b
 
 =item * The default repository is C<https://www.cpan.org/>.
 
-=item * The C<namespace>:
+=item * The C<namespace> is the CPAN id of the author/publisher. It MUST be written uppercase and is required.
 
-=over
+=item * The C<name> is the distribution name and is case sensitive. A distribution name MUST NOT contain the string C<::>.
 
-=item * To refer to a CPAN distribution name, the C<namespace> MUST be present.
-In this case, the namespace is the CPAN id of the author/publisher.
-It MUST be written uppercase, followed by the distribution name in the name component.
-A distribution name MUST NOT contain the string C<::>.
-
-=item * To refer to a CPAN module, the C<namespace> MUST be absent.
-The module name MAY contain zero or more C<::> strings, and the module name MUST NOT contain a C<->
-
-=back
-
-=item * The C<name> is the module or distribution name and is case sensitive.
-
-=item * The C<version> is the module or distribution version.
+=item * The C<version> is the distribution version.
 
 =item * Optional qualifiers may include:
 
@@ -385,14 +448,15 @@ The module name MAY contain zero or more C<::> strings, and the module name MUST
 
 =head3 Examples
 
-    pkg:cpan/Perl::Version@1.013
     pkg:cpan/DROLSKY/DateTime@1.55
-    pkg:cpan/DateTime@1.55
     pkg:cpan/GDT/URI-PackageURL
-    pkg:cpan/LWP::UserAgent
     pkg:cpan/OALDERS/libwww-perl@6.76
-    pkg:cpan/URI
 
+=head3 Legacy CPAN PURL type
+
+Add C<PURL_LEGACY_CPAN_TYPE> environment variable for use the legacy CPAN PURL type.
+
+B<NOTE>: This is only to be used for compatibility purposes (it will be removed in the future).
 
 =head2 FUNCTIONAL INTERFACE
 
@@ -427,6 +491,10 @@ This function call is functionally identical to:
 Create new B<URI::PackageURL> instance using provided Package URL components
 (type, name, version ,etc).
 
+=item $purl->scheme
+
+The scheme is a constant with the value "pkg".
+
 =item $purl->type
 
 The package "type" or package "protocol" such as cpan, maven, npm, nuget, gem, pypi, etc.
@@ -460,13 +528,27 @@ Stringify Package URL components.
 
 Return B<download> and/or B<repository> URLs.
 
+=item $purl->to_hash
+
+Turn PURL components into a hash reference.
+
 =item $purl->TO_JSON
 
-Helper method for JSON modules (L<JSON>, L<JSON::PP>, L<JSON::XS>, L<Mojo::JSON>, etc).
+Helper method for JSON modules (L<JSON>, L<JSON::PP>, L<JSON::XS>, L<Cpanel::JSON::XS>, L<Mojo::JSON>, etc).
 
     use Mojo::JSON qw(encode_json);
 
-    say encode_json($purl);  # {"name":"URI-PackageURL","namespace":"GDT","qualifiers":null,"subpath":null,"type":"cpan","version":"2.22"}
+    say encode_json($purl);
+
+    # {
+    #    "name" : "URI-PackageURL",
+    #    "namespace" : "GDT",
+    #    "qualifiers" : {},
+    #    "scheme" : "pkg",
+    #    "subpath" : null,
+    #    "type" : "cpan",
+    #    "version" : "2.23"
+    # }
 
 =item $purl = URI::PackageURL->from_string($purl_string);
 
@@ -504,7 +586,7 @@ L<https://github.com/giterlizzi/perl-URI-PackageURL>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2022-2024 by Giuseppe Di Terlizzi.
+This software is copyright (c) 2022-2025 by Giuseppe Di Terlizzi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

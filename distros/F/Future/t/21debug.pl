@@ -4,6 +4,8 @@ use warnings;
 
 use Test2::V0;
 
+plan skip_all => "Message format changed" if defined $Future::XS::VERSION and $Future::XS::VERSION lt '0.14';
+
 use Time::HiRes qw( gettimeofday tv_interval );
 
 BEGIN {
@@ -39,28 +41,28 @@ is( warnings_from {
    }, "", 'Cancelled Future does not give warning' );
 
 like( warnings_from {
-      $LINE = __LINE__; my $f = Future->new;
+      $LINE = __LINE__; my $f = Future->new->set_label( "the-label" );
       undef $f;
    },
-   qr/^Future=\S+ was constructed at $FILE line $LINE and was lost near $FILE line (?:$LOSTLINE|${\($LINE+1)}) before it was ready\.?$/,
+   qr/^Future=\S+ \("the-label"\) \(constructed at $FILE line $LINE\) was lost near $FILE line (?:$LOSTLINE|${\($LINE+1)}) before it was ready\.?$/,
    'Lost Future raises a warning' );
 
 my $THENLINE;
 my $SEQLINE;
 like( warnings_from {
-      $LINE = __LINE__; my $f1 = Future->new;
-      $THENLINE = __LINE__; my $fseq = $f1->then( sub { } ); undef $fseq;
+      $LINE = __LINE__; my $f1 = Future->new->set_label( "label-1" );
+      $THENLINE = __LINE__; my $fseq = $f1->then( sub { } )->set_label( "label-2" ); undef $fseq;
       $SEQLINE = __LINE__; $f1->done;
    },
-   qr/^Future=\S+ was constructed at $FILE line $THENLINE and was lost near $FILE line (?:$SEQLINE|$THENLINE) before it was ready\.?
-Future=\S+ \(constructed at $FILE line $LINE\) lost a sequence Future at $FILE line $SEQLINE\.?$/,
+   qr/^Future=\S+ \("label-2"\) \(constructed at $FILE line $THENLINE\) was lost near $FILE line (?:$SEQLINE|$THENLINE) before it was ready\.?
+Future=\S+ \("label-1"\) \(constructed at $FILE line $LINE\) lost a sequence Future at $FILE line $SEQLINE\.?$/,
    'Lost sequence Future raises warning' );
 
 like( warnings_from {
       $LINE = __LINE__; my $f = Future->fail("Failed!");
       undef $f;
    },
-   qr/^Future=\S+ was constructed at $FILE line $LINE and was lost near $FILE line (?:$LOSTLINE|${\($LINE+1)}) with an unreported failure of: Failed!\.?/,
+   qr/^Future=\S+ \(constructed at $FILE line $LINE\) was lost near $FILE line (?:$LOSTLINE|${\($LINE+1)}) with an unreported failure of: Failed!\.?/,
    'Destroyed failed future raises warning' );
 
 {

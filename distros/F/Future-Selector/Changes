@@ -1,5 +1,15 @@
 Revision history for Future-Selector
 
+0.05    2025-07-11
+        [CHANGES]
+         * Set label on longterm futures for more helpful debug messages
+         * Use `Sublike::Extended` v0.29 to avoid needing `extended` keyword
+
+        [BUGFIXES]
+         * Improved handling of `select` or `run*` futures being cancelled so
+           they don't cancel other concurrent ones
+         * Make `run_until_ready` propagate a cancellation itself
+
 0.04    2024-08-14
         [CHANGES]
          * Use named parameter support of Sublike::Extended

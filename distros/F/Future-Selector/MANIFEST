@@ -11,5 +11,6 @@ t/00use.t
 t/01select-f.t
 t/02select-gen.t
 t/03failure.t
+t/04cancel.t
 t/10run.t
 t/99pod.t

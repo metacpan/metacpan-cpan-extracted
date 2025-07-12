@@ -18,7 +18,7 @@ use Ref::Util qw( is_plain_hashref );
 
 our @EXPORT_OK = qw( manifest_files is_perl_file );
 
-our $VERSION = 'v0.1.1';
+our $VERSION = 'v0.2.0';
 
 
 sub manifest_files {
@@ -26,7 +26,9 @@ sub manifest_files {
     my $options = {};
     $options = shift if is_plain_hashref( $_[0] );
 
-    my $filter = shift;
+    state $nop = sub { 1 };
+
+    my $filter = shift || $nop;
 
     my $cwd;
     if ( my $dir = $options->{dir} ) {
@@ -34,7 +36,10 @@ sub manifest_files {
         chdir($dir) or croak "Cannot chdir to ${dir}";
     }
 
-    my $default = sub {
+    $options->{use_default} //= 1;
+
+    my $default = $options->{use_default}
+      ? sub {
         my ($file) = @_;
         my $name = basename($file);
         return
@@ -47,9 +52,8 @@ sub manifest_files {
           || $name =~ m{\.(?:old|bak|backup)$}i
           || $file eq "Build";
         return 1;
-    };
-
-    $filter //= $default;
+      }
+      : $nop;
 
     my $found;
 
@@ -65,7 +69,7 @@ sub manifest_files {
 
     chdir($cwd) if defined $cwd;
 
-    my @files = grep { !$skip->($_) && $filter->($_) } sort keys %{$found};
+    my @files = grep { !$skip->($_) && $default->($_) && $filter->($_) } sort keys %{$found};
     return File::Spec->no_upwards(@files);
 }
 
@@ -73,7 +77,7 @@ sub manifest_files {
 sub is_perl_file {
     my ($file) = @_;
     my $name = basename($file);
-    return   if $file =~ m{^inc/};                   # Module::Install
+    return   if $file =~ m{^(inc|local)/};
     return 1 if $name =~ /\.(?:PL|p[lm]|psgi|t)$/;
     return   if $name =~ /\.\w+$/ && $name !~ /\.bat$/;
     my $fh    = IO::File->new( $file, "r" ) or return;
@@ -97,7 +101,7 @@ Test2::Util::DistFiles - Gather a list of files in a distribution
 
 =head1 VERSION
 
-version v0.1.1
+version v0.2.0
 
 =head1 SYNOPSIS
 
@@ -115,7 +119,9 @@ developers.
 
 =head2 manifest_files
 
-    my @files = manifest_files();
+    my @files = manifest_files(); # use default filter
+
+    my @files = manifest_files( \%options, \&filter );
 
     my @perl  = manifest_files( \&is_perl_file );
 
@@ -124,12 +130,30 @@ This returns a list of files from the F<MANIFEST>, filtered by an optional funct
 If there is no manifest, then it will use L<ExtUtils::Manifest> to build a list of files that would be added to the
 manifest.
 
+The following options are supported:
+
 =head2 is_perl_file
 
 This returns a list of Perl files in the distribution, excluding installation scaffolding like L<Module::Install> files
 in F<inc>.
 
 Note that it will include files like F<Makefile.PL> or F<Build.PL>.
+
+=for stopwords dir
+
+=over
+
+=item dir
+
+Search for files in this directory.
+
+=item use_default
+
+Use the default filter to ignore local lib files, build files, version control files and temporary files.
+
+This is true by default.
+
+=back
 
 =head1 SEE ALSO
 

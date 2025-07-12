@@ -7,7 +7,7 @@ use v5.26;
 use warnings;
 use Object::Pad 0.800 ':experimental(adjust_params)';
 
-package Device::Serial::SLuRM::Protocol 0.08;
+package Device::Serial::SLuRM::Protocol 0.09;
 class Device::Serial::SLuRM::Protocol;
 
 use Carp;
@@ -139,12 +139,14 @@ field $_recv_buffer;
 async method recv
 {
    $_recv_buffer //= Future::Buffer->new(
-      fill => $METRICS
-         ? sub {
-            Future::IO->sysread( $_fh, 8192 )
-               ->on_done( sub { $METRICS->inc_counter_by( serial_bytes => length $_[0], [ dir => "rx" ] ) } );
-            }
-         : sub { Future::IO->sysread( $_fh, 8192 ) },
+      fill => sub {
+         my $f = Future::IO->sysread( $_fh, 8192 );
+         $f->on_done( sub { $METRICS->inc_counter_by( serial_bytes => length $_[0], [ dir => "rx" ] ) } )
+            if $METRICS;
+         $f->on_done( sub { printf STDERR "SLuRM DEV READ: %v02X\n", $_[0] } )
+            if DEBUG > 2;
+         $f;
+      },
    );
 
    my $headerlen = 3 + !!$_multidrop;
@@ -213,17 +215,25 @@ async method send ( $pktctrl, $addr, $payload )
    $METRICS and
       $METRICS->inc_counter_by( serial_bytes => 1 + length $bytes, [ dir => "tx" ] );
 
+   printf STDERR "SLuRM DEV WRITE: %v02X\n", "\x55" . $bytes
+      if DEBUG > 2;
+
    return await Future::IO->syswrite_exactly( $_fh, "\x55" . $bytes );
+}
+
+async method interpacket_delay ()
+{
+   # wait 20-ish byte times as a gap between packets
+   await Future::IO->sleep( 20 / $_bps );
 }
 
 async method send_twice ( $pktctrl, $node_id, $payload )
 {
-   await $self->send( $pktctrl, $node_id | 0x80, $payload );
+   await $self->send( $pktctrl, $node_id, $payload );
 
-   # wait 20-ish byte times before sending again
-   await Future::IO->sleep( 20 / $_bps );
+   await $self->interpacket_delay;
 
-   await $self->send( $pktctrl, $node_id | 0x80, $payload );
+   await $self->send( $pktctrl, $node_id, $payload );
 }
 
 =head1 AUTHOR

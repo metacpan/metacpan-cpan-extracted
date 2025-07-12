@@ -17,11 +17,11 @@ name: Future-XS
 provides:
   Future::XS:
     file: lib/Future/XS.pm
-    version: '0.13'
+    version: '0.14'
 requires:
   Future: 0.48_001
   perl: '5.024'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.13'
+version: '0.14'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

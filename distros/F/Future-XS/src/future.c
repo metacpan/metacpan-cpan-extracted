@@ -266,6 +266,19 @@ static void S_destroy_callbacks(pTHX_ struct FutureXS *self)
   }
 }
 
+#define future_mortal_selfstr(f)  Future_mortal_selfstr(aTHX_ f)
+static SV *Future_mortal_selfstr(pTHX_ SV *f)
+{
+  struct FutureXS *self = get_future(f);
+
+  SV *ret = newSVpvf("%" SVf, SVfARG(f));
+  if(self->label)
+    sv_catpvf(ret, " (\"%" SVf "\")", SVfARG(self->label));
+  if(future_debug)
+    sv_catpvf(ret, " (%" SVf ")", SVfARG(self->constructed_at));
+  return sv_2mortal(ret);
+}
+
 void Future_destroy(pTHX_ SV *f)
 {
 #ifdef DEBUGGING
@@ -290,13 +303,13 @@ void Future_destroy(pTHX_ SV *f)
   if(future_debug &&
     (!self->ready || (self->failure && !self->reported))) {
     if(!self->ready)
-      warn("%" SVf " was %" SVf " and was lost near %s line %d before it was ready\n",
-          SVfARG(f), SVfARG(self->constructed_at),
+      warn("%" SVf " was lost near %s line %d before it was ready\n",
+          SVfARG(future_mortal_selfstr(f)),
           CopFILE(PL_curcop), CopLINE(PL_curcop));
     else {
       SV *failure = AvARRAY(self->failure)[0];
-      warn("%" SVf " was %" SVf " and was lost near %s line %d with an unreported failure of: %" SVf "\n",
-          SVfARG(f), SVfARG(self->constructed_at),
+      warn("%" SVf " was lost near %s line %d with an unreported failure of: %" SVf "\n",
+          SVfARG(future_mortal_selfstr(f)),
           CopFILE(PL_curcop), CopLINE(PL_curcop),
           SVfARG(failure));
     }
@@ -549,12 +562,8 @@ static void S_invoke_callback(pTHX_ struct FutureXS *self, SV *selfsv, struct Fu
     SV *fseq  = cb->seq.f;
 
     if(!SvOK(fseq)) {
-      if(self->constructed_at)
-        warn("%" SVf " (%" SVf ") lost a sequence Future",
-            SVfARG(selfsv), SVfARG(self->constructed_at));
-      else
-        warn("%" SVf " lost a sequence Future",
-            SVfARG(selfsv));
+      warn("%" SVf " lost a sequence Future",
+          SVfARG(future_mortal_selfstr(selfsv)));
       return;
     }
 
@@ -1076,7 +1085,7 @@ AV *Future_get_result_av(pTHX_ SV *f, bool await)
 
   if(self->cancelled)
     croak("%" SVf " was cancelled",
-        SVfARG(f));
+        SVfARG(future_mortal_selfstr(f)));
 
   if(!self->result)
     self->result = newAV();

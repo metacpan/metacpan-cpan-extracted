@@ -76,7 +76,7 @@ use constant BACKSLASH    => q{\\};
 use Carp;
 use English    qw( -no_match_vars );
 use List::Util qw( min max first );    # min, max first are in Perl 5.8
-our $VERSION = '20250616';
+our $VERSION = '20250711';
 
 # List of hash keys to prevent -duk from listing them.
 # 'Unicode::Collate::Locale' is in the data for scan_unique_keys
@@ -913,7 +913,8 @@ BEGIN {
     @q = qw( = => );
     @is_equal_or_fat_comma{@q} = (1) x scalar(@q);
 
-    @q = qw( => ; h f );
+    # Removed 'h' (no longer needed after updated b1523)
+    @q = qw( => ; f );
     push @q, ',';
     @is_counted_type{@q} = (1) x scalar(@q);
 
@@ -2543,8 +2544,10 @@ sub check_skip_formatting_except_id {
     my $opt      = $rOpts->{$opt_name};
     return if ( !defined($opt) );
 
-    # Option should match \w except -sfei='-' which means skip everything
-    if ( $opt =~ /\W/g && $opt ne '-' ) {
+    # Option should match \w except
+    #    -sfei='-' which means skip everything
+    #    -sfei='*' which means match everything
+    if ( $opt =~ /\W/g && $opt ne '-' && $opt ne '*' ) {
         my $pos = pos($opt);
         my $msg = <<EOM;
 --$opt_name='$opt'   : expecting only letters and digits
@@ -3263,7 +3266,6 @@ sub initialize_line_up_parentheses {
 
     if ( $rOpts->{'line-up-parentheses'} ) {
 
-        # b1507 fix, Option 1: included add-whitespace here for a simple fix
         if (   $rOpts->{'indent-only'}
             || !$rOpts->{'add-newlines'}
             || !$rOpts->{'delete-old-newlines'} )
@@ -4466,6 +4468,25 @@ EOM
         if ( $rOpts_whitespace_cycle && $rOpts_whitespace_cycle <= 4 ) {
             $rOpts_delete_trailing_commas = 0;
         }
+
+        # Fix for b1522: check for possible unstable interactions with -btct
+        elsif (%trailing_comma_break_rules) {
+            my $delete_rules = $trailing_comma_rules{delete};
+            foreach my $key ( keys %{$delete_rules} ) {
+                my $delete_rule = $delete_rules->{$key};
+                next if ( !defined($delete_rule) );
+                next if ( $delete_rule->[0] ne 'i' );
+                my $break_rule = $trailing_comma_break_rules{$key};
+                next if ( !defined($break_rule) );
+
+                # Change delete option 'i' to 'b' if there is a break rule
+                # for the same trailing comma.
+                if ( $break_rule->[0] ) { $delete_rule->[0] = 'b' }
+            }
+        }
+        else {
+            ## no other cases yet
+        }
     }
 
     return;
@@ -4873,11 +4894,16 @@ sub set_whitespace_flags {
 
             $last_type_is_opening = 0;
 
-            my $seqno           = $rtokh->[_TYPE_SEQUENCE_];
-            my $block_type      = $rblock_type_of_seqno->{$seqno};
-            my $last_seqno      = $rtokh_last->[_TYPE_SEQUENCE_];
-            my $last_block_type = $rblock_type_of_seqno->{$last_seqno}
-              || $block_type_for_tightness{$last_seqno};
+            my $seqno = $rtokh->[_TYPE_SEQUENCE_];
+            my $block_type =
+              $seqno ? $rblock_type_of_seqno->{$seqno} : EMPTY_STRING;
+
+            my $last_seqno = $rtokh_last->[_TYPE_SEQUENCE_];
+            my $last_block_type =
+              $last_seqno
+              ? ( $rblock_type_of_seqno->{$last_seqno}
+                  || $block_type_for_tightness{$last_seqno} )
+              : EMPTY_STRING;
 
             $j_tight_closing_paren = -1;
 
@@ -8375,21 +8401,35 @@ EOM
         #  $line_of_tokens_old = line received from tokenizer
         #  $line_of_tokens     = line of tokens being formed for formatter
 
-        my $rtokens = $line_of_tokens_old->{_rtokens};
-        my $jmax    = @{$rtokens} - 1;
+        my (
+
+            $rtokens,
+            $line_number,
+            $rtoken_type,
+            $rblock_type,
+            $rtype_sequence,
+            $rlevels,
+
+          ) =
+
+          @{$line_of_tokens_old}{
+            qw(
+              _rtokens
+              _line_number
+              _rtoken_type
+              _rblock_type
+              _rtype_sequence
+              _rlevels
+            )
+          };
+
+        my $jmax = @{$rtokens} - 1;
         if ( $jmax < 0 ) {
 
             # safety check; shouldn't happen
-            my $lno = $line_of_tokens->{_line_number};
-            DEVEL_MODE && Fault("$lno: unexpected jmax=$jmax\n");
+            DEVEL_MODE && Fault("$line_number: unexpected jmax=$jmax\n");
             return;
         }
-
-        my $line_index     = $line_of_tokens_old->{_line_number} - 1;
-        my $rtoken_type    = $line_of_tokens_old->{_rtoken_type};
-        my $rblock_type    = $line_of_tokens_old->{_rblock_type};
-        my $rtype_sequence = $line_of_tokens_old->{_rtype_sequence};
-        my $rlevels        = $line_of_tokens_old->{_rlevels};
 
         my $rLL                     = $self->[_rLL_];
         my $rSS                     = $self->[_rSS_];
@@ -8397,7 +8437,7 @@ EOM
 
         DEVEL_MODE
           && check_sequence_numbers( $rtokens, $rtoken_type,
-            $rtype_sequence, $line_index + 1 );
+            $rtype_sequence, $line_number );
 
         # Find the starting nesting depth ...
         # It must be the value of variable 'level' of the first token
@@ -8418,14 +8458,14 @@ EOM
                 # -qwaf is expecting another 'q' token for multiline -qw
                 # based on the {_ending_in_quote} flag from the tokenizer
                 # of the previous line, but a 'q' didn't arrive.
-                my $lno = $line_index + 1;
                 Fault(
-"$lno: -qwaf expecting qw continuation line but saw type '$rtoken_type->[0]'\n"
+"$line_number: -qwaf expecting qw continuation line but saw type '$rtoken_type->[0]'\n"
                 );
             }
         }
 
-        my $j = -1;
+        my $line_index = $line_number - 1;
+        my $j          = -1;
 
         # NOTE: coding efficiency is critical in this loop over all tokens
         foreach my $token ( @{$rtokens} ) {
@@ -8452,8 +8492,9 @@ EOM
                         $new_seqno_from_old_seqno{$seqno_old} = $seqno;
                     }
                     if ( DEVEL_MODE && $seqno != $last_new_seqno + 1 ) {
-                        my $lno = $line_index + 1;
-                        Fault("$lno: seqno=$seqno last=$last_new_seqno\n");
+                        Fault(
+                            "$line_number: seqno=$seqno last=$last_new_seqno\n"
+                        );
                     }
                     $last_new_seqno                          = $seqno;
                     $self->[_K_opening_container_]->{$seqno} = @{$rLL};
@@ -8482,6 +8523,7 @@ EOM
                             $self->[_ris_sub_block_]->{$seqno} = 1;
                         }
                         else {
+
                             # not a sub type
                         }
                     }
@@ -8509,9 +8551,8 @@ EOM
                         # incrementally upon encountering each new
                         # opening token, so every positive sequence
                         # number should correspond to an opening token.
-                        my $lno = $line_index + 1;
                         DEVEL_MODE && Fault(<<EOM);
-$lno: No opening token seen for closing token = '$token' at seq=$seqno at depth=$opening_depth
+$line_number: No opening token seen for closing token = '$token' at seq=$seqno at depth=$opening_depth
 EOM
                     }
                     $self->[_K_closing_container_]->{$seqno} = @{$rLL};
@@ -8524,8 +8565,9 @@ EOM
                         $new_seqno_from_old_seqno{$seqno_old} = $seqno;
                     }
                     if ( DEVEL_MODE && $seqno != $last_new_seqno + 1 ) {
-                        my $lno = $line_index + 1;
-                        Fault("$lno: seqno=$seqno last=$last_new_seqno\n");
+                        Fault(
+                            "$line_number: seqno=$seqno last=$last_new_seqno\n"
+                        );
                     }
                     $last_new_seqno = $seqno;
                     $self->[_K_opening_ternary_]->{$seqno} = @{$rLL};
@@ -8546,9 +8588,8 @@ EOM
                 # numbers, or if an error has been introduced in a
                 # hash such as %is_opening_container
                 else {
-                    my $lno = $line_index + 1;
                     DEVEL_MODE && Fault(<<EOM);
-$lno: Unexpected sequenced token '$token' of type '$rtoken_type->[$j]', sequence=$seqno arrived from tokenizer.
+$line_number: Unexpected sequenced token '$token' of type '$rtoken_type->[$j]', sequence=$seqno arrived from tokenizer.
 Expecting only opening or closing container tokens or ternary tokens with sequence numbers.
 EOM
                 }
@@ -8564,15 +8605,19 @@ EOM
                     my $level = $rlevels->[$j];
                     if ( $level > $self->[_maximum_level_] ) {
                         $self->[_maximum_level_]         = $level;
-                        $self->[_maximum_level_at_line_] = $line_index + 1;
+                        $self->[_maximum_level_at_line_] = $line_number;
                     }
                 }
-                else { $self->[_rI_closing_]->[$seqno] = @{$rSS} }
+                else {
+                    $self->[_rI_closing_]->[$seqno] = @{$rSS};
+                }
                 push @{$rSS}, $sign * $seqno;
                 $tokary[_TYPE_SEQUENCE_] = $seqno;
             }
             else {
-                $tokary[_TYPE_SEQUENCE_] = EMPTY_STRING;
+                # Note that the coding should be robust enough to allow this to
+                # be left undefined, but for safety we assign a value. c505.
+                $tokary[_TYPE_SEQUENCE_] = DEVEL_MODE ? undef : EMPTY_STRING;
             }
 
             # Here we are storing the first five variables per token. The
@@ -8635,7 +8680,7 @@ EOM
 
 sub finish_formatting {
 
-    my ( $self, $severe_error ) = @_;
+    my ( $self, $rtokenization_info ) = @_;
 
     # The file has been tokenized and is ready to be formatted.
     # All of the relevant data is stored in $self, ready to go.
@@ -8650,6 +8695,8 @@ sub finish_formatting {
     # Some of the code in sub break_lists is not robust enough to process code
     # with arbitrary brace errors. The simplest fix is to just return the file
     # verbatim if there are brace errors.  This fixes issue c160.
+    my $severe_error        = $rtokenization_info->{severe_error};
+    my $early_FS_end_marker = $rtokenization_info->{early_FS_end_marker};
     $severe_error ||= get_saw_brace_error();
 
     # Check the maximum level. If it is extremely large we will give up and
@@ -8676,7 +8723,7 @@ EOM
     }
 
     {
-        my $rix_side_comments = $self->set_CODE_type();
+        my $rix_side_comments = $self->set_CODE_type($early_FS_end_marker);
 
         $self->find_non_indenting_braces($rix_side_comments);
 
@@ -12433,16 +12480,22 @@ sub set_maximum_field_count {
 } ## end sub set_maximum_field_count
 
 sub set_CODE_type {
-    my ($self) = @_;
+    my ( $self, $early_FS_end_marker ) = @_;
 
     # Examine each line of code and set a flag '$CODE_type' to describe it.
     # Also return a list of lines with side comments.
+
+    # Given:
+    #    $early_FS_end_marker - a format skipping end marker, like '#>>>',
+    #       which is the first format skipping marker in the file.
 
     my $rLL    = $self->[_rLL_];
     my $rlines = $self->[_rlines_];
 
     my $rOpts_format_skipping_begin = $rOpts->{'format-skipping-begin'};
     my $rOpts_format_skipping_end   = $rOpts->{'format-skipping-end'};
+    my $rOpts_detect_format_skipping_from_start =
+      $rOpts->{'detect-format-skipping-from-start'};
     my $rOpts_static_block_comment_prefix =
       $rOpts->{'static-block-comment-prefix'};
     my $rOpts_skip_formatting_except_id = $rOpts->{'skip-formatting-except-id'};
@@ -12451,7 +12504,76 @@ sub set_CODE_type {
     # Remember indexes of lines with side comments
     my @ix_side_comments;
 
-    my $In_format_skipping_section = $Inverted_skip_mode ? 1 : 0;
+    my $In_format_skipping_section = 0;
+    if ($Inverted_skip_mode) {
+        $In_format_skipping_section = !$In_format_skipping_section;
+    }
+
+    # Save a list of markers seen for possible error messages, and because
+    # user may have made begin and end markers identical.
+    my @format_marker_list;
+    my $format_markers_differ =
+      $format_skipping_pattern_begin ne $format_skipping_pattern_end;
+
+    my $check_inverted_mode_match = sub {
+        my ( $token, $input_line_no ) = @_;
+
+        # Check for a match to a format skipping id in inverted mode.
+        # Given:
+        #    $token = token of tag (or full block comment text)
+        #    $input_line_no = line number (for log file entry)
+
+        # Note1: This sub should only be called if both these are true:
+        #  - $In_format_skipping_section, and
+        #  - $inverted_skip_mode
+
+        # Note2: Normally the tag is the beginning tag, '#<<< idtext'.
+        # But it will be the ending tag if the beginning tag is missing.
+        # In that case, the id text will be on the closing tag.
+
+        # Be sure we have received a comment tag
+        if ( !defined($token) || substr( $token, 0, 1 ) ne '#' ) {
+            return;
+        }
+
+        if (
+            $rOpts_skip_formatting_except_id eq '*'
+            || (   $token =~ /\s+id=(\w+)/
+                && $1 eq $rOpts_skip_formatting_except_id )
+          )
+        {
+            $In_format_skipping_section = 0;
+            write_logfile_entry(
+"Line $input_line_no: Entering selected format section $rOpts_skip_formatting_except_id\n"
+            );
+        }
+    }; ## end $check_inverted_mode_match = sub
+
+    #----------------------------------------------------------------------
+    # Detect skipping from start if tokenizer found a leading '#>>>' marker
+    #----------------------------------------------------------------------
+    if (   $early_FS_end_marker
+        && $rOpts_detect_format_skipping_from_start
+        && $rOpts_format_skipping )
+    {
+        if ( !$Inverted_skip_mode ) {
+            if ( !$In_format_skipping_section ) {
+                $In_format_skipping_section = 1;
+                write_logfile_entry(
+"Line 1: Entering automatically detected format-skipping section\n"
+                );
+            }
+        }
+        else {
+            if ($In_format_skipping_section) {
+
+                # Note that in this case the id will be taken from the closing
+                # marker instead of the opening marker
+                $check_inverted_mode_match->( $early_FS_end_marker, 1 );
+            }
+        }
+    }
+
     my $Saw_VERSION_in_this_file   = 0;
     my $has_side_comment           = 0;
     my $last_line_had_side_comment = 0;
@@ -12521,6 +12643,12 @@ sub set_CODE_type {
                 && $rOpts_format_skipping
                 && ( $rLL->[$Kfirst]->[_TOKEN_] . SPACE ) =~
                 /$format_skipping_pattern_begin/
+
+                # Assume alternating begin/end markers if user has made them
+                # identical
+                && (   $format_markers_differ
+                    || !@format_marker_list
+                    || $format_marker_list[0] == -1 )
               )
             {
                 my $input_line_no = $line_of_tokens->{_line_number};
@@ -12544,14 +12672,7 @@ sub set_CODE_type {
                         # We are at a '#<<<' in format skipping inverted mode;
                         # start formatting (stop format skipping) if id matches
                         my $token = $rLL->[$Kfirst]->[_TOKEN_];
-                        if (   $token =~ /\s+id=(\w+)/
-                            && $1 eq $rOpts_skip_formatting_except_id )
-                        {
-                            $In_format_skipping_section = 0;
-                            write_logfile_entry(
-"Line $input_line_no: Entering selected format section $rOpts_skip_formatting_except_id\n"
-                            );
-                        }
+                        $check_inverted_mode_match->( $token, $input_line_no );
                     }
                     else {
 
@@ -12562,6 +12683,7 @@ sub set_CODE_type {
                         );
                     }
                 }
+                push @format_marker_list, [ 1, $input_line_no ];
             }
 
             # check for format-skipping end marker, normally #>>>
@@ -12570,6 +12692,7 @@ sub set_CODE_type {
                     substr( $rLL->[$Kfirst]->[_TOKEN_], 0, 4 ) eq '#>>>'
                     || $rOpts_format_skipping_end
                 )
+                && $rOpts_format_skipping
                 && ( $rLL->[$Kfirst]->[_TOKEN_] . SPACE ) =~
                 /$format_skipping_pattern_end/
               )
@@ -12587,7 +12710,11 @@ sub set_CODE_type {
                         next;
                     }
                     else {
-                        ## ignore useless #>>> not following #<<<
+
+                        # '#>>>' not following '#<<<' in inverted mode
+                        write_logfile_entry(
+"Line $input_line_no: Ignoring #>>> not following #<<<\n"
+                        );
                     }
                 }
                 else {
@@ -12598,9 +12725,14 @@ sub set_CODE_type {
                         );
                     }
                     else {
-                        ## ignore useless #>>> not following #<<<
+
+                        # '#>>>' not following '#<<<' in normal mode
+                        write_logfile_entry(
+"Line $input_line_no: Ignoring #>>> not following #<<<\n"
+                        );
                     }
                 }
+                push @format_marker_list, [ -1, $input_line_no ];
             }
             else {
                 # not at a format skipping control line
@@ -13499,8 +13631,8 @@ sub scan_variable_usage {
 
         # Store the new identifier at index $KK
         # Given:
-        #   $KK = index of this token
-        #   $true_name = the name to use for lexical methods
+        #  $KK = index of this token
+        #  $true_name = (if defined) alternate name to use for lexical methods
 
         my $name       = $rLL->[$KK]->[_TOKEN_];
         my $line_index = $rLL->[$KK]->[_LINE_INDEX_];
@@ -15726,8 +15858,6 @@ my $K_closing_container;
 my @K_sequenced_token_list;
 my @seqno_paren_arrow;
 
-my %K_first_here_doc_by_seqno;
-
 my $last_nonblank_code_type;
 my $last_nonblank_code_token;
 my $last_nonblank_block_type;
@@ -15829,8 +15959,6 @@ sub initialize_respace_tokens_closure {
       $self->[_rDOLLAR_underscore_by_sub_seqno_];
     $rK_sub_by_seqno     = $self->[_rK_sub_by_seqno_];
     $ris_my_sub_by_seqno = $self->[_ris_my_sub_by_seqno_];
-
-    %K_first_here_doc_by_seqno = ();
 
     $last_nonblank_code_type       = ';';
     $last_nonblank_code_token      = ';';
@@ -15944,7 +16072,24 @@ sub respace_tokens {
         my $input_line_number = $line_of_tokens->{_line_number};
         my $last_line_type    = $line_type;
         $line_type = $line_of_tokens->{_line_type};
-        next unless ( $line_type eq 'CODE' );
+
+        if ( $line_type ne 'CODE' ) {
+
+            # Mark containers interrupted with HERE DOC text.
+            # See test cases b1081, b1523
+            if ( $line_type eq 'HERE_END' ) {
+                my $seqno = $seqno_stack{ $depth_next - 1 };
+                if ( defined($seqno) ) {
+                    if ( !$ris_permanently_broken->{$seqno} ) {
+                        $ris_permanently_broken->{$seqno} = 1;
+                        $self->mark_parent_containers( $seqno,
+                            $ris_permanently_broken );
+                    }
+                }
+            }
+            next;
+        }
+
         $CODE_type = $line_of_tokens->{_code_type};
 
         if ( $CODE_type eq 'BL' ) {
@@ -15990,7 +16135,8 @@ sub respace_tokens {
 
             # The first token should always have been given index 0 by sub
             # write_line()
-            if ( $Kfirst != 0 ) {
+            # - but skip this check if we started in format skipping
+            if ( $Kfirst != 0 && $last_line_type ne 'FS' ) {
                 Fault("Program Bug: first K is $Kfirst but should be 0");
             }
         }
@@ -16053,7 +16199,7 @@ sub respace_tokens {
                 )
               )
             {
-                $self->store_token();
+                store_new_blank_token();
             }
         }
 
@@ -16104,7 +16250,6 @@ sub respace_tokens_inner_loop {
     #   $Klast  = index of last token on this line
     #   $input_line_number  = number of this line in input stream
 
-    my $type;
     foreach my $KK ( $Kfirst .. $Klast ) {
 
         # Update closure variable needed by sub store_token
@@ -16112,8 +16257,22 @@ sub respace_tokens_inner_loop {
 
         my $rtoken_vars = $rLL->[$KK];
 
+        my (
+
+            $type,
+            $token,
+            $type_sequence,
+
+          ) = @{$rtoken_vars}[
+
+          _TYPE_,
+          _TOKEN_,
+          _TYPE_SEQUENCE_,
+
+          ];
+
         # Handle a blank space ...
-        if ( ( $type = $rtoken_vars->[_TYPE_] ) eq 'b' ) {
+        if ( $type eq 'b' ) {
 
             # Delete it if not wanted by whitespace rules
             # or we are deleting all whitespace
@@ -16154,16 +16313,13 @@ sub respace_tokens_inner_loop {
             next;
         }
 
-        my $token = $rtoken_vars->[_TOKEN_];
-
         # Handle a sequenced token ... i.e. one of ( ) { } [ ] ? :
-        if ( $rtoken_vars->[_TYPE_SEQUENCE_] ) {
+        if ($type_sequence) {
 
             # One of ) ] } ...
             if ( $is_closing_token{$token} ) {
 
-                my $type_sequence = $rtoken_vars->[_TYPE_SEQUENCE_];
-                my $block_type    = $rblock_type_of_seqno->{$type_sequence};
+                my $block_type = $rblock_type_of_seqno->{$type_sequence};
 
                 #---------------------------------------------
                 # check for semicolon addition in a code block
@@ -16313,7 +16469,6 @@ sub respace_tokens_inner_loop {
 
             # Opening container
             else {
-                my $type_sequence = $rtoken_vars->[_TYPE_SEQUENCE_];
                 if ( $rwant_arrow_before_seqno->{$type_sequence} ) {
 
                     # +1 means add  -1 means delete previous arrow
@@ -16695,7 +16850,7 @@ EOM
                 && $rLL_new->[-1]->[_TYPE_] ne 'b'
                 && $rOpts_add_whitespace )
             {
-                $self->store_token();
+                store_new_blank_token();
             }
             $self->store_token($rtoken_vars);
             next;
@@ -16801,7 +16956,7 @@ EOM
             && $rLL_new->[-1]->[_TYPE_] ne 'b'
             && $rOpts_add_whitespace )
         {
-            $self->store_token();
+            store_new_blank_token();
         }
         $self->store_token($rtoken_vars);
 
@@ -17023,19 +17178,6 @@ EOM
         $self->mark_parent_containers( $seqno, $rhas_ternary );
     }
 
-    # Turn off -lp for containers with here-docs with text within a container,
-    # since they have their own fixed indentation.  Fixes case b1081.
-    if ($rOpts_line_up_parentheses) {
-        foreach my $seqno ( keys %K_first_here_doc_by_seqno ) {
-            my $Kh      = $K_first_here_doc_by_seqno{$seqno};
-            my $Kc      = $K_closing_container->{$seqno};
-            my $line_Kh = $rLL_new->[$Kh]->[_LINE_INDEX_];
-            my $line_Kc = $rLL_new->[$Kc]->[_LINE_INDEX_];
-            next if ( $line_Kh == $line_Kc );
-            $ris_excluded_lp_container->{$seqno} = 1;
-        }
-    }
-
     # Set a flag to turn off -cab=3 in complex structures.  Otherwise,
     # instability can occur.  When it is overridden the behavior of the closest
     # match, -cab=2, will be used instead.  This fixes cases b1096 b1113.
@@ -17129,38 +17271,15 @@ EOM
 
 sub store_token {
 
-    my ( $self, ($item) ) = @_;
+    my ( $self, $item ) = @_;
 
-    # Store one token during respace operations
+    # Store one token in the $rLL_new array during respace operations
+    # In most cases it is being directly transferred from the old $rLL array.
 
     # Given:
-    #  $item =
-    #    if defined      => reference to a token to be stored
-    #    if not defined  => make and store a blank space
+    #  $item = reference to a token to be stored
 
     # NOTE: this sub is called once per token so coding efficiency is critical.
-
-    # If no arg, then make and store a blank space
-    if ( !$item ) {
-
-        #  - Never start the array with a space, and
-        #  - Never store two consecutive spaces
-        if ( @{$rLL_new} && $rLL_new->[-1]->[_TYPE_] ne 'b' ) {
-
-            # Note that the level and ci_level of newly created spaces should
-            # be the same as the previous token.  Otherwise the coding for the
-            # -lp option can create a blinking state in some rare cases.
-            # (see b1109, b1110).
-            $item                    = [];
-            $item->[_TYPE_]          = 'b';
-            $item->[_TOKEN_]         = SPACE;
-            $item->[_TYPE_SEQUENCE_] = EMPTY_STRING;
-            $item->[_LINE_INDEX_]    = $rLL_new->[-1]->[_LINE_INDEX_];
-            $item->[_LEVEL_]         = $rLL_new->[-1]->[_LEVEL_];
-        }
-        else { return }
-    }
-
     # The next multiple assignment statements are significantly faster than
     # doing them one-by-one.
     my (
@@ -17229,7 +17348,7 @@ sub store_token {
         {
 
             # Is it a side comment or a block comment?
-            if ( $Ktoken_vars > $Kfirst_old ) {
+            if ( $Klast_old > $Kfirst_old ) {
 
                 # This is a side comment. If we do not ignore its length, and
                 # -iscl has not been set, then the line could be broken and
@@ -17431,19 +17550,6 @@ EOM
                 if ( $type eq ',' && $Ktoken_vars == $Klast_old_code ) {
                     $rlec_count_by_seqno->{$seqno}++;
                 }
-
-                # Remember index of first here doc target
-                if ( $type eq 'h' && !$K_first_here_doc_by_seqno{$seqno} ) {
-                    my $KK_new = @{$rLL_new};
-                    $K_first_here_doc_by_seqno{$seqno} = $KK_new;
-
-                    # the here doc which follows makes the container broken
-                    if ( !$ris_permanently_broken->{$seqno} ) {
-                        $ris_permanently_broken->{$seqno} = 1;
-                        $self->mark_parent_containers( $seqno,
-                            $ris_permanently_broken );
-                    }
-                }
             }
         }
     }
@@ -17469,6 +17575,130 @@ EOM
     push @{$rLL_new}, $item;
     return;
 } ## end sub store_token
+
+sub store_new_blank_token {
+
+    # Make and store a new blank token during respace operations
+
+    # Never start the array with a space
+    if ( !@{$rLL_new} ) {
+        DEVEL_MODE && Fault(<<EOM);
+Attempt to make a blank the first token
+EOM
+        return;
+    }
+
+    # Never store two consecutive spaces
+    my $item_last = $rLL_new->[-1];
+    if ( $item_last->[_TYPE_] eq 'b' ) {
+        return;
+    }
+
+    # Note that the level and ci_level of newly created spaces should
+    # be the same as the previous token.  Otherwise the coding for the
+    # -lp option can create a blinking state in some rare cases.
+    # (see b1109, b1110).
+    my $item = [];
+    $item->[_TYPE_]              = 'b';
+    $item->[_TOKEN_]             = SPACE;
+    $item->[_TYPE_SEQUENCE_]     = EMPTY_STRING;
+    $item->[_LINE_INDEX_]        = $item_last->[_LINE_INDEX_];
+    $item->[_LEVEL_]             = $item_last->[_LEVEL_];
+    $item->[_CUMULATIVE_LENGTH_] = ++$cumulative_length;
+    $item->[_TOKEN_LENGTH_]      = 1;
+    push @{$rLL_new}, $item;
+    return;
+} ## end sub store_new_blank_token
+
+sub store_new_nonblank_token {
+
+    my ( $self, $type, $token, $Kp ) = @_;
+
+    # Create and insert a completely new token into the output stream
+    # Caller must add space after this token if necessary
+    # NOTE: this is for nonblank tokens, like ',' and '->'.
+    # See 'store_new_blank_token' for creating and storing new blank tokens.
+
+    # Input parameters:
+    #  $type  = the token type
+    #  $token = the token text
+    #  $Kp    = index of the previous token in the new list, $rLL_new
+
+    # This operation is a little tricky because we are creating a new token and
+    # we have to take care to follow the requested whitespace rules.
+
+    my $Ktop         = @{$rLL_new} - 1;
+    my $top_is_space = $Ktop >= 0 && $rLL_new->[$Ktop]->[_TYPE_] eq 'b';
+    if ( $top_is_space && $want_left_space{$type} == WS_NO ) {
+
+        #----------------------------------------------------
+        # Method 1: Convert the top blank into the new token.
+        #----------------------------------------------------
+
+        # Be Careful: we are working on the top of the new stack, on a token
+        # which has been stored.
+
+        $rLL_new->[$Ktop]->[_TOKEN_]        = $token;
+        $rLL_new->[$Ktop]->[_TOKEN_LENGTH_] = length($token);
+        $rLL_new->[$Ktop]->[_TYPE_]         = $type;
+
+        # NOTE: we are changing the output stack without updating variables
+        # $last_nonblank_code_type, etc. Future needs might require that
+        # those variables be updated here.  For now, we just update the
+        # type counts as necessary.
+
+        if ( $is_counted_type{$type} ) {
+            my $seqno = $seqno_stack{ $depth_next - 1 };
+            if ($seqno) {
+                $self->[_rtype_count_by_seqno_]->{$seqno}->{$type}++;
+            }
+        }
+    }
+    else {
+
+        #----------------------------------------
+        # Method 2: Use the normal storage method
+        #----------------------------------------
+
+        # Patch for issue c078: keep line indexes in order.  If the top
+        # token is a space that we are keeping (due to '-wls=...) then
+        # we have to check that old line indexes stay in order.
+        # In very rare
+        # instances in which side comments have been deleted and converted
+        # into blanks, we may have filtered down multiple blanks into just
+        # one. In that case the top blank may have a higher line number
+        # than the previous nonblank token. Although the line indexes of
+        # blanks are not really significant, we need to keep them in order
+        # in order to pass error checks.
+        if ($top_is_space) {
+            my $old_top_ix = $rLL_new->[$Ktop]->[_LINE_INDEX_];
+            my $new_top_ix = $rLL_new->[$Kp]->[_LINE_INDEX_];
+            if ( $new_top_ix < $old_top_ix ) {
+                $rLL_new->[$Ktop]->[_LINE_INDEX_] = $new_top_ix;
+            }
+        }
+        else {
+            if ( $want_left_space{$type} == WS_YES ) {
+                store_new_blank_token();
+            }
+        }
+
+        my $rcopy = copy_token_as_type( $rLL_new->[$Kp], $type, $token );
+        $self->store_token($rcopy);
+
+    }
+
+    $last_last_nonblank_code_type  = $last_nonblank_code_type;
+    $last_last_nonblank_code_token = $last_nonblank_code_token;
+
+    $last_nonblank_code_type  = $type;
+    $last_nonblank_code_token = $token;
+
+    # This sub is currently called to store non-block types ',' and '->', so:
+    $last_nonblank_block_type = EMPTY_STRING;
+
+    return;
+} ## end sub store_new_nonblank_token
 
 sub add_phantom_semicolon {
 
@@ -17737,7 +17967,7 @@ sub add_trailing_comma {
 
         # any blank after the comma will be added before the closing paren,
         # below
-        $self->store_new_token( ',', ',', $Kp );
+        $self->store_new_nonblank_token( ',', ',', $Kp );
     }
     return;
 
@@ -17909,8 +18139,10 @@ sub add_interbracket_arrow {
         return;
     }
 
-    $self->store_new_token( '->', '->', $Kp );
-    if ( $want_right_space{'->'} == WS_YES ) { $self->store_token() }
+    $self->store_new_nonblank_token( '->', '->', $Kp );
+    if ( $want_right_space{'->'} == WS_YES ) {
+        store_new_blank_token();
+    }
 
     return;
 } ## end sub add_interbracket_arrow
@@ -18005,7 +18237,7 @@ sub unstore_last_nonblank_token {
     # add a blank if requested
     else {
         if ( $want_space == 1 ) {
-            $self->store_token();
+            store_new_blank_token();
         }
         elsif ( !$want_space ) {
 
@@ -18513,94 +18745,6 @@ sub match_trailing_comma_rule {
     return $match;
 } ## end sub match_trailing_comma_rule
 
-sub store_new_token {
-
-    my ( $self, $type, $token, $Kp ) = @_;
-
-    # Create and insert a completely new token into the output stream
-    # Caller must add space after this token if necessary
-
-    # Input parameters:
-    #  $type  = the token type
-    #  $token = the token text
-    #  $Kp    = index of the previous token in the new list, $rLL_new
-
-    # This operation is a little tricky because we are creating a new token and
-    # we have to take care to follow the requested whitespace rules.
-
-    my $Ktop         = @{$rLL_new} - 1;
-    my $top_is_space = $Ktop >= 0 && $rLL_new->[$Ktop]->[_TYPE_] eq 'b';
-    if ( $top_is_space && $want_left_space{$type} == WS_NO ) {
-
-        #----------------------------------------------------
-        # Method 1: Convert the top blank into the new token.
-        #----------------------------------------------------
-
-        # Be Careful: we are working on the top of the new stack, on a token
-        # which has been stored.
-
-        $rLL_new->[$Ktop]->[_TOKEN_]        = $token;
-        $rLL_new->[$Ktop]->[_TOKEN_LENGTH_] = length($token);
-        $rLL_new->[$Ktop]->[_TYPE_]         = $type;
-
-        # NOTE: we are changing the output stack without updating variables
-        # $last_nonblank_code_type, etc. Future needs might require that
-        # those variables be updated here.  For now, we just update the
-        # type counts as necessary.
-
-        if ( $is_counted_type{$type} ) {
-            my $seqno = $seqno_stack{ $depth_next - 1 };
-            if ($seqno) {
-                $self->[_rtype_count_by_seqno_]->{$seqno}->{$type}++;
-            }
-        }
-    }
-    else {
-
-        #----------------------------------------
-        # Method 2: Use the normal storage method
-        #----------------------------------------
-
-        # Patch for issue c078: keep line indexes in order.  If the top
-        # token is a space that we are keeping (due to '-wls=...) then
-        # we have to check that old line indexes stay in order.
-        # In very rare
-        # instances in which side comments have been deleted and converted
-        # into blanks, we may have filtered down multiple blanks into just
-        # one. In that case the top blank may have a higher line number
-        # than the previous nonblank token. Although the line indexes of
-        # blanks are not really significant, we need to keep them in order
-        # in order to pass error checks.
-        if ($top_is_space) {
-            my $old_top_ix = $rLL_new->[$Ktop]->[_LINE_INDEX_];
-            my $new_top_ix = $rLL_new->[$Kp]->[_LINE_INDEX_];
-            if ( $new_top_ix < $old_top_ix ) {
-                $rLL_new->[$Ktop]->[_LINE_INDEX_] = $new_top_ix;
-            }
-        }
-        else {
-            if ( $want_left_space{$type} == WS_YES ) {
-                $self->store_token();
-            }
-        }
-
-        my $rcopy = copy_token_as_type( $rLL_new->[$Kp], $type, $token );
-        $self->store_token($rcopy);
-
-    }
-
-    $last_last_nonblank_code_type  = $last_nonblank_code_type;
-    $last_last_nonblank_code_token = $last_nonblank_code_token;
-
-    $last_nonblank_code_type  = $type;
-    $last_nonblank_code_token = $token;
-
-    # This sub is currently called to store non-block types ',' and '->', so:
-    $last_nonblank_block_type = EMPTY_STRING;
-
-    return;
-} ## end sub store_new_token
-
 sub check_Q {
 
     my ( $self, $KK, $Kfirst, $line_number ) = @_;
@@ -18799,9 +18943,14 @@ EOM
 
         # It is only safe to trim the actual line text if the input
         # line had a terminal blank token. Otherwise, we may be
-        # in a quote.
+        # in a quote.  Fix for issue c500:
+        #  -leave trailing blanks if line goes out verbatim (FS or VB)
+        #  -add a newline back
         if ( $line_of_tokens->{_ended_in_blank_token} ) {
-            $line_of_tokens->{_line_text} =~ s/\s+$//;
+            my $CODE_type = $line_of_tokens->{_code_type};
+            if ( $CODE_type ne 'FS' && $CODE_type ne 'VB' ) {
+                $line_of_tokens->{_line_text} =~ s/\s+$/\n/;
+            }
         }
         $line_of_tokens->{_rK_range} = [ $Kfirst, $Klast ];
 
@@ -24389,8 +24538,10 @@ sub break_before_list_opening_containers {
             my $KK_test = $rK_weld_right->{$KK};
             if ( defined($KK_test) ) {
                 my $seqno_inner = $rLL->[$KK_test]->[_TYPE_SEQUENCE_];
-                $is_list ||= $self->is_list_by_seqno($seqno_inner);
-                $has_list = $rhas_list->{$seqno_inner};
+                if ($seqno_inner) {
+                    $is_list ||= $self->is_list_by_seqno($seqno_inner);
+                    $has_list = $rhas_list->{$seqno_inner};
+                }
             }
         }
 
@@ -25583,6 +25734,7 @@ sub is_fragile_block_type {
                     #        $issue->{
                     #           'borrowernumber'},  # borrowernumber
                         if (   defined($Kc_test)
+                            && $seqno_end
                             && $seqno_end == $rLL->[$Kc_test]->[_TYPE_SEQUENCE_]
                             && $rLL->[$Kc_test]->[_LINE_INDEX_] == $iline + 1 )
                         {
@@ -25657,6 +25809,18 @@ sub is_fragile_block_type {
                         }
                         if ( $length > $max_prong_len ) {
                             $max_prong_len = $length;
+                        }
+
+                        # Fix for b1525: avoid instability for a leading comma
+                        # in interrupted mode when -iscl is set
+                        elsif ($K_terminal == $K_first
+                            && $rOpts_ignore_side_comment_lengths
+                            && $has_comment )
+                        {
+                            $max_prong_len += 2;
+                        }
+                        else {
+                            ## no other special cases
                         }
                     }
                 }
@@ -27113,8 +27277,8 @@ EOM
         my ( $self, $i, $token, $level ) = @_;
 
         # End the previous group if we have reached the maximum
-        # group size
-        if ( $rOpts_kgb_size_max && @group >= $rOpts_kgb_size_max ) {
+        # group size. Fix for b1524: use $count instead of @group
+        if ( $rOpts_kgb_size_max && $count >= $rOpts_kgb_size_max ) {
             $self->kgb_end_group();
         }
 
@@ -28185,9 +28349,9 @@ EOM
 
                 # this check needed -mangle (for example rt125012)
                 (
-                       ( !$index_start_one_line_block )
-                    && ( $last_old_nonblank_type eq ';' )
-                    && ( $first_new_nonblank_token ne '}' )
+                      !$index_start_one_line_block
+                    && $last_old_nonblank_type eq ';'
+                    && $first_new_nonblank_token ne '}'
                 )
 
                 # Patch for RT #98902. Honor request to break at old commas.
@@ -29267,7 +29431,7 @@ sub starting_one_line_block {
 
         # ignore some small blocks
         my $type_sequence_i = $rLL->[$Ki]->[_TYPE_SEQUENCE_];
-        my $nobreak         = $rshort_nested->{$type_sequence_i};
+        my $nobreak = $type_sequence_i ? $rshort_nested->{$type_sequence_i} : 0;
 
         # Return false result if we exceed the maximum line length,
         if ( $pos > $maximum_line_length ) {
@@ -36232,16 +36396,6 @@ EOM
                 $tol += $rOpts_continuation_indentation;
             }
 
-            # b1507, Option 3: a minimal fix by increasing tol by -ci
-            elsif ( 0
-                && !$rOpts_add_whitespace
-                && $rOpts_extended_line_up_parentheses
-                && $rOpts_extended_continuation_indentation )
-            {
-                $tol += $rOpts_continuation_indentation;
-            }
-            else { }
-
             $is_long_term = $excess + $tol > 0;
 
         }
@@ -36657,6 +36811,7 @@ sub find_token_starting_list {
     if ( $levels_to_go[$iprev_nb] < $levels_to_go[$i_opening_paren] ) {
 
         # b1507, Option 4 fix: do not go past a decrease in level
+        # This was the best solution for that issue.
     }
     elsif ( $type_prev_nb eq ',' ) {
 
@@ -40192,9 +40347,10 @@ EOM
         my @q;
 
         # Replaced =~ and // in the list.  // had been removed in RT 119588
+        # Added 'A' for git #187
         @q = qw#
           = **= += *= &= <<= &&= -= /= |= >>= ||= //= .= %= ^= x=
-          { ? : => && || ~~ !~~ =~ !~ // <=> -> ^^=
+          { ? : => && || ~~ !~~ =~ !~ // <=> -> ^^= A
           #;
         @is_vertical_alignment_type{@q} = (1) x scalar(@q);
 
@@ -40535,6 +40691,20 @@ EOM
 
                 if ( $rOpts_valign_wide_equals && $is_assignment{$type} ) {
                     $alignment_type = '=';
+                }
+
+                # attribute colon, git #187
+                if ( $type eq 'A' ) {
+
+                    my $in = $inext_to_go[$i];
+                    my $type_next =
+                      $in > $ibeg && $in < $iend ? $types_to_go[$in] : 'b';
+
+                    # exclude poor alignment cases
+                    $alignment_type =
+                      ( $type_next eq 'w' || $type_next eq 'q' )
+                      ? $type
+                      : EMPTY_STRING;
                 }
 
                 # Do not align a terminal token.  Although it might
@@ -42144,17 +42314,14 @@ sub xlp_tweak {
             return [ $rtokens, $rfields, $rpatterns, $rfield_lengths ];
         }
 
+        my ( @tokens, @fields, @patterns, @field_lengths );
+
         my $i_start              = $ibeg;
         my $depth                = 0;
         my $i_depth_prev         = $i_start;
         my $depth_prev           = $depth;
         my %container_name       = ( 0 => EMPTY_STRING );
         my $saw_exclamation_mark = 0;
-
-        my @tokens        = ();
-        my @fields        = ();
-        my @patterns      = ();
-        my @field_lengths = ();
 
         #-------------------------------------------------------------
         # Make a container name for any uncontained commas, issue c089
@@ -42698,13 +42865,12 @@ sub make_paren_name {
 
         my $is_outdented_line;
 
-        my $type_beg            = $types_to_go[$ibeg];
-        my $token_beg           = $tokens_to_go[$ibeg];
-        my $level_beg           = $levels_to_go[$ibeg];
-        my $block_type_beg      = $block_type_to_go[$ibeg];
-        my $leading_spaces_beg  = $leading_spaces_to_go[$ibeg];
-        my $seqno_beg           = $type_sequence_to_go[$ibeg];
-        my $is_closing_type_beg = $is_closing_type{$type_beg};
+        my $type_beg           = $types_to_go[$ibeg];
+        my $token_beg          = $tokens_to_go[$ibeg];
+        my $level_beg          = $levels_to_go[$ibeg];
+        my $block_type_beg     = $block_type_to_go[$ibeg];
+        my $leading_spaces_beg = $leading_spaces_to_go[$ibeg];
+        my $seqno_beg          = $type_sequence_to_go[$ibeg];
 
         # QW INDENTATION PATCH 3:
         my $seqno_qw_closing;
@@ -42750,8 +42916,11 @@ sub make_paren_name {
 
         # Parameters needed for option 2, aligning with opening token:
         my (
-            $opening_indentation, $opening_offset,
-            $is_leading,          $opening_exists
+            $opening_indentation,
+            $opening_offset,
+            $is_leading,
+            $opening_exists,
+
         );
 
         #-------------------------------------
@@ -42787,8 +42956,9 @@ sub make_paren_name {
         # if line starts with a non-sequenced item
         #-----------------------------------------
         else {
-            if ( $type_beg eq ';' && !$rOpts_indent_leading_semicolon ) {
-                $adjust_indentation = 1;
+            if ( $type_beg eq ';' ) {
+                $adjust_indentation = 1
+                  if ( !$rOpts_indent_leading_semicolon );
             }
         }
 
@@ -43040,8 +43210,8 @@ sub make_paren_name {
 
             # MOJO patch: Set a flag if this lines begins with ')->'
             my $leading_paren_arrow = (
-                     $is_closing_type_beg
-                  && $token_beg eq ')'
+                     $token_beg eq ')'
+                  && $is_closing_type{$type_beg}
                   && (
                     (
                            $ibeg < $i_terminal
@@ -43096,16 +43266,19 @@ sub make_paren_name {
             && (
 
                 # certain leading keywords if requested
-                $rOpts_outdent_keywords
-                && $type_beg eq 'k'
-                && $outdent_keyword{$token_beg}
+                (
+                       $rOpts_outdent_keywords
+                    && $type_beg eq 'k'
+                    && $outdent_keyword{$token_beg}
+                )
 
                 # or labels if requested
-                || $rOpts_outdent_labels && $type_beg eq 'J'
+                || (   $rOpts_outdent_labels
+                    && $type_beg eq 'J' )
 
                 # or static block comments if requested
-                || $this_batch->[_is_static_block_comment_]
-                && $rOpts_outdent_static_block_comments
+                || (   $rOpts_outdent_static_block_comments
+                    && $this_batch->[_is_static_block_comment_] )
             )
           )
         {
@@ -43199,7 +43372,7 @@ sub make_paren_name {
         if ( $seqno_beg && $self->[_rwant_reduced_ci_]->{$seqno_beg} ) {
 
             # if this is an opening, it must be alone on the line ...
-            if ( $is_closing_type{$type_beg} || $ibeg == $i_terminal ) {
+            if ( $is_closing_type_beg || $ibeg == $i_terminal ) {
                 $adjust_indentation = 1;
             }
 
@@ -43919,20 +44092,12 @@ sub set_vertical_tightness_flags {
             && !$block_type_to_go[$ibeg_next]
             && $is_closing_token{$token_next}
             && !$self->[_rbreak_container_]
-            ->{ $type_sequence_to_go[$ibeg_next] }    # b1498
+            ->{ $type_sequence_to_go[$ibeg_next] }    # b1498, b977, b1303
             && $types_to_go[$iend] ne '#'
           )    # for safety, shouldn't happen!
         {
             my $cvt   = $closing_vertical_tightness{$token_next};
             my $seqno = $type_sequence_to_go[$ibeg_next];
-
-            # Avoid conflict of -bom and -pvt=1 or -pvt=2, fixes b977, b1303
-            # See similar patch above for $ovt.
-            # NOTE: this is overridden by fix for b1498 above and can
-            # eventually be removed.
-            if ( 0 && $cvt && $self->[_rbreak_container_]->{$seqno} ) {
-                $cvt = 0;
-            }
 
             # Implement cvt=3: like cvt=0 for assigned structures, like cvt=1
             # otherwise.  Added for rt136417.

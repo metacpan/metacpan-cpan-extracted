@@ -5,11 +5,14 @@
 
 use v5.26;
 use warnings;
-use Object::Pad 0.800;
+use Object::Pad 0.807;
 
-package Device::Serial::MSLuRM 0.08;
-class Device::Serial::MSLuRM
-   :isa(Device::Serial::SLuRM);
+package Device::Serial::MSLuRM 0.09;
+class Device::Serial::MSLuRM;
+
+use Object::Pad ':experimental(inherit_field)';
+inherit Device::Serial::SLuRM
+   qw( $_protocol );
 
 use Carp;
 
@@ -92,7 +95,7 @@ sent by the controller, depending on how the serial port adapter works.
 
 =cut
 
-method recv_packet () { $self->_recv; }
+method recv_packet () { $_protocol->recv; }
 
 =head2 send_packet
 

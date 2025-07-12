@@ -1465,9 +1465,7 @@ sub sendJSONresponse {
     # If this is a cross-domain request from the portal itself
     # (Ajax SSL to a different VHost)
     # we allow CORS
-    if ( $req->origin
-        and index( $req->portal, $req->origin ) == 0 )
-    {
+    if ( $self->_checkSelfCors($req) ) {
         $self->logger->debug('AJAX request from portal, allowing CORS');
         push @{ $res->[1] },
           "Access-Control-Allow-Origin"      => $req->origin,
@@ -1479,6 +1477,21 @@ sub sendJSONresponse {
         $self->setCorsHeaderFromConfig($res);
     }
     return $res;
+}
+
+sub _checkSelfCors {
+    my ( $self, $req ) = @_;
+
+    if ( $req->origin ) {
+        my $origin = URI->new( $req->origin );
+        my $portal = URI->new( $req->portal );
+
+        return (  $origin->scheme
+              and $portal->scheme eq $origin->scheme
+              and $origin->host_port
+              and $origin->host_port eq $portal->host_port );
+    }
+    return;
 }
 
 sub sendRawHtml {

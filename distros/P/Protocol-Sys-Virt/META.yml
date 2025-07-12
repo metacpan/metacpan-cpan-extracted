@@ -26,5 +26,5 @@ requires:
 resources:
   bugtracker: https://github.com/ehuelsmann/perl-protocol-sys-virt/issues
   repository: git://github.com/ehuelsmann/perl-protocol-sys-virt.git
-version: v11.4.0
+version: v11.5.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

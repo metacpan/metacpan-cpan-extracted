@@ -56,11 +56,11 @@
    "provides" : {
       "HTML::HTMLDoc" : {
          "file" : "lib/HTML/HTMLDoc.pm",
-         "version" : "0.22"
+         "version" : "0.23"
       },
       "HTML::HTMLDoc::PDF" : {
          "file" : "lib/HTML/HTMLDoc/PDF.pm",
-         "version" : "0.22"
+         "version" : "0.23"
       }
    },
    "release_status" : "stable",
@@ -75,7 +75,7 @@
          "web" : "https://github.com/ericschernoff/HTMLDoc"
       }
    },
-   "version" : "0.22",
+   "version" : "0.23",
    "x_contributors" : [
       "Eric Chernoff <eric@weaverstreet.net>",
       "Eric Chernoff <ericschernoff@gmail.com>"

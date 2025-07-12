@@ -155,7 +155,9 @@ METHODS
     the next one to be created) will complete. It will yield the given data
     and future instance if this future succeeded, or fail with the same
     failure if this future failed. At that point it will be removed from
-    the stored collection.
+    the stored collection. If the item future was cancelled, it is removed
+    from the collection but otherwise ignored; the select future will
+    continue waiting for another result.
 
        $selector->add( data => $data, gen => $gen );
     
@@ -211,6 +213,9 @@ METHODS
     Returns a future that represents repeatedly calling the "select" method
     until the given future instance is ready. When it becomes ready (either
     by success or failure) the returned future will yield the same result.
+    If the returned future is cancelled, then $f itself will be cancelled
+    too. This will not cancel a concurrently-pending select or run call,
+    however.
 
     The given future will be added to the selector by calling this method;
     you should not call "add" on it yourself first.

@@ -4,14 +4,14 @@
 #  (C) Paul Evans, 2024 -- leonerd@leonerd.org.uk
 
 use v5.36;
-use Object::Pad 0.809;  # method :common embeddable bugfix
+use Object::Pad 0.817;  # class :abstract
 use Future::AsyncAwait;
-use Sublike::Extended 0.23;  # //= in named params
+use Sublike::Extended 0.29 'method';
 
 use IPC::MicroSocket;
 
-package IPC::MicroSocket::Server 0.02;  # this 'package' statement just to keep CPAN indexers happy
-role IPC::MicroSocket::Server;
+package IPC::MicroSocket::Server 0.03;  # this 'package' statement just to keep CPAN indexers happy
+class IPC::MicroSocket::Server :abstract;
 
 use Carp;
 
@@ -83,9 +83,12 @@ Sets the size of the C<listen(2)> queue; defaults to 5 if not specified.
 
 =back
 
+I<Since version 0.03> any other remaining arguments are passed to the instance
+constructor of the underlying object class.
+
 =cut
 
-extended method new_unix :common ( :$path, :$listen //= 5 )
+method new_unix :common ( :$path, :$listen //= 5, %rest )
 {
    require IO::Socket::UNIX;
 
@@ -95,7 +98,7 @@ extended method new_unix :common ( :$path, :$listen //= 5 )
       ReuseAddr => 1,
    ) or croak "Cannot create socket - $@";
 
-   return $class->new( fh => $listensock );
+   return $class->new( fh => $listensock, %rest );
 }
 
 field $selector;
@@ -194,7 +197,7 @@ method on_connection_subscribe;
 # The default server connection class
 class IPC::MicroSocket::Server::_Connection
 {
-   apply IPC::MicroSocket::ServerConnection;
+   inherit IPC::MicroSocket::ServerConnection;
 
    field $server :param;
 

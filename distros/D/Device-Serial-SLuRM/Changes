@@ -1,5 +1,15 @@
 Revision history for Device-Serial-SLuRM
 
+0.09    2025-07-11
+        [CHANGES]
+         * Added `slurm-snoop.pl` example script
+         * Added a local test system for contrib/slurm.[ch]
+
+        [BUGFIXES]
+         * Update unit tests for breakage caused by new failure message in
+           `Test::Future::Deferred` v0.51
+         * Sigrok decoder: ignore TX/RX crosstalk
+
 0.08    2025-01-23
         [CHANGES]
          * Dynamically calculate retransmission timeout based on serial line

@@ -14,7 +14,7 @@ my $controller = Test::Future::IO->controller;
 
 my $message_f;
 class TestConnection {
-   apply IPC::MicroSocket::Connection;
+   inherit IPC::MicroSocket::Connection;
 
    method on_recv { $message_f->done( @_ ); }
 }

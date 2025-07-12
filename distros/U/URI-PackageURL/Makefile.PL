@@ -10,7 +10,7 @@ WriteMakefile(
     VERSION_FROM       => 'lib/URI/PackageURL.pm',
     ABSTRACT_FROM      => 'lib/URI/PackageURL.pm',
     LICENSE            => 'artistic_2',
-    EXE_FILES          => ['bin/purl-tool'],
+    EXE_FILES          => ['bin/purl-tool', 'bin/vers-tool'],
     MIN_PERL_VERSION   => 5.010,
     PL_FILES           => {},
     CONFIGURE_REQUIRES => {'ExtUtils::MakeMaker' => '0'},
@@ -28,6 +28,6 @@ WriteMakefile(
         },
         x_purl => 'pkg:cpan/GDT/URI-PackageURL'
     },
-    dist  => {COMPRESS => 'gzip -9f', SUFFIX => 'gz',},
+    dist  => {COMPRESS => 'gzip -9f', SUFFIX => 'gz'},
     clean => {FILES    => 'URI-PackageURL-*'},
 );

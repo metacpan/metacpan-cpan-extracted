@@ -31,4 +31,13 @@ use Test::Future::Deferred;
    is( $f->failure, "oops\n", '$f->failure returns exception anyway' );
 }
 
+# flush
+{
+   my $f = Test::Future::Deferred->done_later( "later" );
+
+   ok( !$f->is_done, '$f not yet ready' );
+   Test::Future::Deferred->flush;
+   ok( $f->is_done, '$f is ready after ->flush' );
+}
+
 done_testing;

@@ -6,12 +6,12 @@
 use v5.36;
 use Object::Pad 0.807;
 use Future::AsyncAwait;
-use Sublike::Extended;
+use Sublike::Extended 0.29 'sub';
 use Syntax::Keyword::Match;
 
 use IPC::MicroSocket;
 
-class IPC::MicroSocket::Client 0.02;
+class IPC::MicroSocket::Client 0.03;
 
 use Carp;
 
@@ -39,7 +39,7 @@ This module provides the client connector class for L<IPC::MicroSocket>.
 
 =cut
 
-apply IPC::MicroSocket::Connection;
+inherit IPC::MicroSocket::Connection;
 
 field %resp_f_by_tag;
 field %subscribes_by_topic;
@@ -58,7 +58,7 @@ UNIX socket path.
 =cut
 
 # class method
-extended sub new_unix ( $class, :$path )
+sub new_unix ( $class, :$path )
 {
    require IO::Socket::UNIX;
 

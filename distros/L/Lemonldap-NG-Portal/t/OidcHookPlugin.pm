@@ -164,6 +164,9 @@ sub getRp {
             oidcRPMetaDataOptionsAccessTokenExpiration => 120,
             oidcRPMetaDataOptionsBypassConsent         => 1,
             oidcRPMetaDataOptionsRedirectUris          => "http://hook.com/",
+            oidcRPMetaDataOptionsAllowClientCredentialsGrant => 1,
+            oidcRPMetaDataOptionsJwks                        =>
+'{ "keys": [ {"use":"sig","e":"AQAB","kty":"RSA","n":"s2jsmIoFuWzMkilJaA8__5_T30cnuzX9GImXUrFR2k9EKTMtGMHCdKlWOl3BV-BTAU9TLz7Jzd_iJ5GJ6B8TrH1PHFmHpy8_qE_S5OhinIpIi7ebABqnoVcwDdCa8ugzq8k8SWxhRNXfVIlwz4NH1caJ8lmiERFj7IvNKqEhzAk0pyDr8hubveTC39xREujKlsqutpPAFPJ3f2ybVsdykX5rx0h5SslG3jVWYhZ_SOb2aIzOr0RMjhQmsYRwbpt3anjlBZ98aOzg7GAkbO8093X5VVk9vaPRg0zxJQ0Do0YLyzkRisSAIFb0tdKuDnjRGK6y_N2j6At2HjkxntbtGQ"}] }',
         },
         macros => {
             myfullname => '"I am ". $cn',

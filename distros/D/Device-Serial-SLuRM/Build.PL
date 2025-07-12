@@ -9,7 +9,7 @@ my $build = Module::Build->new(
    requires => {
       'perl' => '5.028',
       'Future::AsyncAwait' => 0,
-      'Object::Pad' => '0.800',
+      'Object::Pad' => '0.807',
       'Syntax::Keyword::Match' => 0,
 
       'Digest::CRC' => 0,
@@ -21,6 +21,7 @@ my $build = Module::Build->new(
    test_requires => {
       'Future::Buffer' => '0.05',
       'Test::ExpectAndCheck::Future' => '0.04',
+      'Test::Future::Deferred' => '0.52',
       'Test::Future::IO' => '0.05',
       'Test2::V0' => 0,
    },

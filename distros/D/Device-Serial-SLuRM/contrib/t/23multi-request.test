@@ -1,0 +1,18 @@
+*SELECT mslurm
+
+CONF 5
+
+!Basic receive
+RECV 0x55
+RECV 0x318503 +C "req" +C
+  request 1 "req"
+RESPOND 1 "res"
+  send 0x55
+  send 0xB10503 +C "res" +C
+RECV 0x55
+RECV 0xC18500 +C +C
+
+!Messages to other node IDs are ignored
+RECV 0x55
+RECV 0x328703 +C "req" +C
+  # nothing happens

@@ -4,11 +4,11 @@
 #  (C) Paul Evans, 2024 -- leonerd@leonerd.org.uk
 
 use v5.36;
-use Object::Pad 0.807;
+use Object::Pad 0.817;  # class :abstract
 use Future::AsyncAwait;
 use Syntax::Keyword::Match;
 
-package IPC::MicroSocket 0.02;
+package IPC::MicroSocket 0.03;
 
 =head1 NAME
 
@@ -59,7 +59,7 @@ not plain byte strings, you must serialise/deserialise them.
 
 =cut
 
-role IPC::MicroSocket::Connection
+class IPC::MicroSocket::Connection :abstract
 {
    use Future::Buffer;
    use Future::IO;
@@ -114,9 +114,9 @@ role IPC::MicroSocket::Connection
 #   '+' $topic              -- subscribe
 #   '!' $topic @args        -- publish
 
-role IPC::MicroSocket::ServerConnection
+class IPC::MicroSocket::ServerConnection :abstract
 {
-   apply IPC::MicroSocket::Connection;
+   inherit IPC::MicroSocket::Connection;
 
    method on_request;
 

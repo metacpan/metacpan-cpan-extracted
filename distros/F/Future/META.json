@@ -37,31 +37,31 @@
    "provides" : {
       "Future" : {
          "file" : "lib/Future.pm",
-         "version" : "0.51"
+         "version" : "0.52"
       },
       "Future::Exception" : {
          "file" : "lib/Future/Exception.pm",
-         "version" : "0.51"
+         "version" : "0.52"
       },
       "Future::Mutex" : {
          "file" : "lib/Future/Mutex.pm",
-         "version" : "0.51"
+         "version" : "0.52"
       },
       "Future::PP" : {
          "file" : "lib/Future/PP.pm",
-         "version" : "0.51"
+         "version" : "0.52"
       },
       "Future::Utils" : {
          "file" : "lib/Future/Utils.pm",
-         "version" : "0.51"
+         "version" : "0.52"
       },
       "Test::Future" : {
          "file" : "lib/Test/Future.pm",
-         "version" : "0.51"
+         "version" : "0.52"
       },
       "Test::Future::Deferred" : {
          "file" : "lib/Test/Future/Deferred.pm",
-         "version" : "0.51"
+         "version" : "0.52"
       }
    },
    "release_status" : "stable",
@@ -71,6 +71,6 @@
       ],
       "x_IRC" : "irc://irc.perl.org/#io-async"
    },
-   "version" : "0.51",
+   "version" : "0.52",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

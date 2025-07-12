@@ -1,0 +1,45 @@
+!Basic receive
+RECV 0x55
+RECV 0x1101 +C "A" +C
+  notify "A"
+
+!Duplicates are suppressed
+RECV 0x55
+RECV 0x1201 +C "B" +C
+  notify "B"
+RECV 0x55
+RECV 0x1201 +C "B" +C
+
+!Backwards steps are suppressed
+RECV 0x55
+RECV 0x1301 +C "C" +C
+  notify "C"
+RECV 0x55
+RECV 0x1201 +C "B" +C
+
+!Gaps in the sequence are accepted
+RECV 0x55
+RECV 0x1401 +C "D" +C
+  notify "D"
+RECV 0x55
+RECV 0x1601 +C "E" +C
+  notify "E"
+RECV 0x55
+RECV 0x1A01 +C "F" +C
+  notify "F"
+
+!Wraparound at end of range is accepted
+RECV 0x55
+RECV 0x1F01 +C "G" +C
+  notify "G"
+RECV 0x55
+RECV 0x1001 +C "H" +C
+  notify "H"
+
+!Basic send
+NOTIFY "A1"
+  send 0x55
+  send 0x1102 +C "A1" +C
+  # TODO: there should be a time delay here
+  send 0x55
+  send 0x1102 +C "A1" +C

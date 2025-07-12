@@ -37,5 +37,5 @@ requires:
 resources:
   bugtracker: https://github.com/ehuelsmann/perl-sys-async-virt/issues
   repository: git://github.com/ehuelsmann/perl-sys-async-virt.git
-version: v0.0.20
+version: v0.0.21
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

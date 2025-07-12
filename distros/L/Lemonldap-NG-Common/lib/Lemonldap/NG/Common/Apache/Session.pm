@@ -1,4 +1,4 @@
-## @file
+# @file
 # Add get_key_from_all_sessions() function to Apache::Session modules.
 # This file is used by Lemonldap::NG::Manager::Status and by the
 # purgeCentralCache script.
@@ -60,10 +60,11 @@ sub populate {
         $self->{validate} = sub { 1 };
     }
 
-    my $allow_cache_for_root =
-      (   $self->{args}->{localStorageOptions}
+    my $allow_cache_for_root = (
+          $self->{args}->{localStorageOptions}
         ? $self->{args}->{localStorageOptions}->{allow_cache_for_root}
-        : 0 );
+        : 0
+    );
 
     # If cache is configured, use our specific object store module
     if ( ( $> or $allow_cache_for_root )
@@ -242,7 +243,8 @@ sub _dbiGKFAS {
     my $dbh =
       DBI->connect( $args->{DataSource}, $args->{UserName}, $args->{Password} )
       or die("$!$@");
-    my $sth = $dbh->prepare('SELECT id,a_session from sessions');
+    my $sth = $dbh->prepare(
+        'SELECT id,a_session from ' . ( $args->{TableName} || 'sessions' ) );
     $sth->execute;
     my %res;
     while ( my @row = $sth->fetchrow_array ) {

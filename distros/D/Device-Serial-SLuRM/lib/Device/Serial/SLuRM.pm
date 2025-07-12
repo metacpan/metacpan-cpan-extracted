@@ -1,13 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2022-2024 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2022-2025 -- leonerd@leonerd.org.uk
 
 use v5.28;  # delete %hash{@slice}
 use warnings;
-use Object::Pad 0.800 ':experimental(adjust_params)';
+use Object::Pad 0.807 ':experimental(adjust_params)';
 
-package Device::Serial::SLuRM 0.08;
+package Device::Serial::SLuRM 0.09;
 class Device::Serial::SLuRM;
 
 use Carp;
@@ -207,7 +207,8 @@ C<request> method will make up to 3 attempts).
 
 use constant is_multidrop => 0;
 
-field $_protocol; # TODO
+use Object::Pad ':experimental(inherit_field)';
+field $_protocol :inheritable; # TODO
 ADJUST :params ( %params )
 {
    $_protocol = Device::Serial::SLuRM::Protocol->new(
@@ -230,6 +231,7 @@ ADJUST
 }
 
 field $_on_notify;
+field $_on_request;
 
 class Device::Serial::SLuRM::_NodeState {
    field $did_reset :mutator;
@@ -245,6 +247,8 @@ class Device::Serial::SLuRM::_NodeState {
 }
 
 field @_nodestate; # keyed per peer node ID
+
+field $_rx_nodestate; # a second set of pending slots for received REQUESTs
 
 =head1 METHODS
 
@@ -262,7 +266,7 @@ field $_next_resetack_f;
 
 async method recv_packet ()
 {
-   my ( $pktctrl, undef, $payload ) = await $self->_recv;
+   my ( $pktctrl, undef, $payload ) = await $_protocol->recv;
    return ( $pktctrl, $payload );
 }
 
@@ -275,6 +279,7 @@ async method _run
          or return; # EOF
 
       redo if $addr & 0x80; # controller reflection
+
       my $node_id = $addr;
 
       my $seqno = $pktctrl & 0x0F;
@@ -325,6 +330,36 @@ async method _run
                         : warn "Received NOTIFY packet with no handler\n";
          }
 
+         case( SLURM_PKTCTRL_REQUEST ) {
+            printf STDERR "SLuRM rx-REQUEST(%d): %v02X\n", $seqno, $payload
+               if DEBUG;
+
+            $_rx_nodestate //= Device::Serial::SLuRM::_NodeState->new;
+            if( my $slot = $_rx_nodestate->pending_slot( $seqno ) ) {
+               await $self->_send_response( $node_id, $seqno, $slot->{payload} )
+                  if defined $slot->{payload};
+            }
+            else {
+               next if $is_dup;
+
+               # TODO: If multidrop we need to ignore requests except for us
+
+               $_rx_nodestate->set_pending_slot( $seqno,
+                  {
+                     # no payload yet
+                     start_time => [ gettimeofday ],
+                  }
+               );
+
+               if( $_on_request ) {
+                  $_on_request->( $seqno, $payload );
+               }
+               else {
+                  warn "Received REQUEST packet with no handler\n";
+               }
+            }
+         }
+
          case( SLURM_PKTCTRL_RESPONSE ),
          case( SLURM_PKTCTRL_ERR ) {
             my $slot = $nodestate->pending_slot( $seqno );
@@ -335,6 +370,12 @@ async method _run
 
             $METRICS and
                $METRICS->report_timer( request_duration => tv_interval $slot->{start_time} );
+
+            # Send the first ACK before completing the future
+            printf STDERR "SLuRM tx-ACK(%d)\n", $seqno
+               if DEBUG;
+
+            await $_protocol->send( SLURM_PKTCTRL_ACK | $seqno, $node_id | 0x80, "" );
 
             if( $pktctrl == SLURM_PKTCTRL_RESPONSE ) {
                printf STDERR "SLuRM rx-RESPONSE(%d): %v02X\n", $seqno, $payload
@@ -358,11 +399,18 @@ async method _run
 
             $nodestate->clear_pending_slot( $seqno );
 
-            printf STDERR "SLuRM tx-ACK(%d)\n", $seqno
-               if DEBUG;
-
-            await $_protocol->send_twice( SLURM_PKTCTRL_ACK | $seqno, $node_id, "" );
+            # Second ACK
+            await $_protocol->interpacket_delay;
+            await $_protocol->send( SLURM_PKTCTRL_ACK | $seqno, $node_id | 0x80, "" );
          }
+
+         case( SLURM_PKTCTRL_ACK ) {
+            $_rx_nodestate or next;
+            my $slot = $_rx_nodestate->pending_slot( $seqno ) or next;
+
+            $_rx_nodestate->clear_pending_slot( $seqno );
+         }
+
          default {
             warn sprintf "Received unrecognised packet type=%02X\n", $pktctrl;
          }
@@ -379,6 +427,7 @@ method _selector
    $_selector->add(
       data => "runloop",
       f    => $_run_f = $self->_run
+         ->set_label( "Device::Serial::SLuRM runloop" )
          ->on_fail( sub { die "Device::Serial::SLuRM runloop failed: $_[0]" } ),
    );
 
@@ -425,6 +474,30 @@ async method run ( %args )
 
    my $s = $self->_selector;
    my $f = $_run_f;
+
+   # Ugh this is a terrible way to do this
+   if( my $handle_request = $args{handle_request} ) {
+      # Currently undocumented pending an idea of how to do a receiver subclass
+      $_on_request = sub {
+         my ( $seqno, $payload ) = @_;
+
+         my $ret_f = $handle_request->( $payload )
+            ->then(
+               sub { # on_done
+                  my ( $response ) = @_;
+                  # TODO: insert my own node ID
+                  # TODO: Consider reporting a metric?
+                  return $self->_send_response( 0, $seqno, $response );
+               },
+               sub { # on_fail
+                  # TODO: Consider reporting a metric?
+                  warn "TODO: handle_request failed, we should send ERR somehow";
+               },
+            );
+
+         $s->add( f => $ret_f, data => undef );
+      };
+   }
 
    await $self->_autoreset;
 
@@ -484,7 +557,7 @@ async method _reset ( $node_id )
    # Need to create this before sending because of unit testing
    $_next_resetack_f = $_run_f->new;
 
-   await $_protocol->send_twice( SLURM_PKTCTRL_META_RESET, $node_id, pack "C", $nodestate->seqno_tx );
+   await $_protocol->send_twice( SLURM_PKTCTRL_META_RESET, $node_id | 0x80, pack "C", $nodestate->seqno_tx );
    $nodestate->did_reset = 1;
 
    # TODO: These might collide, do we need a Queue?
@@ -584,6 +657,21 @@ async method _request ( $node_id, $payload )
    $self->_set_retransmit( $node_id, $seqno );
 
    return await $f;
+}
+
+async method _send_response ( $node_id, $seqno, $payload )
+{
+   printf STDERR "SLuRM tx-RESPONSE(%d): %v02X\n", $seqno, $payload
+      if DEBUG;
+
+   my $pktctrl = SLURM_PKTCTRL_RESPONSE | $seqno;
+
+   my $slot = ( $_rx_nodestate // die "ARGH cannot _send_response without a valid _rx_nodestate" )
+      ->pending_slot( $seqno );
+
+   $slot->{payload} = $payload;
+
+   await $_protocol->send( $pktctrl, $node_id, $payload );
 }
 
 method _set_retransmit ( $node_id, $seqno )

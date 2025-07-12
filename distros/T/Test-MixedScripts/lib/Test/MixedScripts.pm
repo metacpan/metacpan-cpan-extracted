@@ -16,11 +16,11 @@ use List::Util    qw( first );
 use Unicode::UCD  qw( charinfo charscripts );
 
 use Test2::API 1.302200 qw( context );
-use Test2::Util::DistFiles qw( manifest_files is_perl_file );
+use Test2::Util::DistFiles v0.2.0 qw( manifest_files is_perl_file );
 
 our @EXPORT_OK = qw( all_perl_files_scripts_ok file_scripts_ok );
 
-our $VERSION = 'v0.6.1';
+our $VERSION = 'v0.6.2';
 
 
 sub file_scripts_ok {
@@ -162,7 +162,7 @@ Test::MixedScripts - test text for mixed and potentially confusable Unicode scri
 
 =head1 VERSION
 
-version v0.6.1
+version v0.6.2
 
 =head1 SYNOPSIS
 

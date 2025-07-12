@@ -136,7 +136,7 @@ BEGIN {
     # then the Release version must be bumped, and it is probably past time for
     # a release anyway.
 
-    $VERSION = '20250616';
+    $VERSION = '20250711';
 } ## end BEGIN
 
 {
@@ -3132,8 +3132,8 @@ sub process_single_case {
     # user-defined formatters are possible, and may not have a
     # sub 'finish_formatting', so we have to check
     if ( $formatter->can('finish_formatting') ) {
-        my $severe_error = $tokenizer->report_tokenization_errors();
-        my $verbatim     = $formatter->finish_formatting($severe_error);
+        my $rtok_report = $tokenizer->report_tokenization_errors();
+        my $verbatim    = $formatter->finish_formatting($rtok_report);
         $self->[_input_copied_verbatim_] = $verbatim;
     }
 
@@ -3723,9 +3723,11 @@ sub generate_options {
     $add_option->( 'code-skipping',                       'cs',    '!' );
     $add_option->( 'code-skipping-begin',                 'csb',   '=s' );
     $add_option->( 'code-skipping-end',                   'cse',   '=s' );
+    $add_option->( 'code-skipping-from-start',            'csfs',  '!' );
     $add_option->( 'format-skipping',                     'fs',    '!' );
     $add_option->( 'format-skipping-begin',               'fsb',   '=s' );
     $add_option->( 'format-skipping-end',                 'fse',   '=s' );
+    $add_option->( 'detect-format-skipping-from-start',   'dfsfs', '!' );
     $add_option->( 'hanging-side-comments',               'hsc',   '!' );
     $add_option->( 'indent-block-comments',               'ibc',   '!' );
     $add_option->( 'indent-spaced-block-comments',        'isbc',  '!' );
@@ -4040,6 +4042,7 @@ sub generate_options {
       backup-file-extension=bak
       code-skipping
       format-skipping
+      detect-format-skipping-from-start
 
       pod2html
       html-table-of-contents

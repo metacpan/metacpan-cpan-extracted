@@ -7,8 +7,7 @@ require 't/test-lib.pm';
 
 my $res;
 
-my $client = LLNG::Manager::Test->new(
-    {
+my $client = LLNG::Manager::Test->new( {
         ini => {
             logLevel          => 'error',
             useSafeJail       => 1,
@@ -22,6 +21,14 @@ my $client = LLNG::Manager::Test->new(
         }
     }
 );
+
+# Test request from alternate vhost to portal
+checkCorsAllowed( $client, "http://auth.example.com",    1 );
+checkCorsAllowed( $client, "http://auth.example.com:80", 1 );
+checkCorsAllowed( $client, "http://auth.example.comm",   0 );
+checkCorsAllowed( $client, "http://auth.example.co",     0 );
+checkCorsAllowed( $client, "http://example.com",         0 );
+checkCorsAllowed( $client, "https://auth.example.com",   0 );
 
 # Test normal first access
 # ------------------------
@@ -156,6 +163,24 @@ count(1);
 clean_sessions();
 
 done_testing( count() );
+
+sub checkCorsAllowed {
+    my ( $client, $origin, $result ) = @_;
+    ok(
+        my $res = $client->_get( '/', custom => { HTTP_ORIGIN => "$origin" } ),
+        "Unauth JSON request from $origin"
+    );
+    my %headers = @{ $res->[1] };
+    if ($result) {
+        is( $headers{'Access-Control-Allow-Origin'},
+            $origin, "$origin is allowed" );
+    }
+    else {
+        ok( !$headers{'Access-Control-Allow-Origin'},
+            "$origin is not allowed" );
+    }
+    count(2);
+}
 
 sub checkCorsPolicy {
     my ($res) = @_;

@@ -3,6 +3,7 @@ use strict;
 use warnings;
 use Test::More tests => 1;
 use Prima::noX11;
+use Prima;
 
 BEGIN {
     use_ok( 'PDL::Drawing::Prima' )
