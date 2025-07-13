@@ -14,10 +14,11 @@ use v5.26;
 use warnings;
 use experimental 'signatures';
 use Future::AsyncAwait;
+use Object::Pad;
 
-package Sys::Async::Virt::Connection::Process v0.0.21;
+class Sys::Async::Virt::Connection::Process v0.1.1;
 
-use parent qw(Sys::Async::Virt::Connection);
+inherit Sys::Async::Virt::Connection '$_in', '$_out';
 
 use Carp qw(croak);
 use IO::Async::Stream;
@@ -25,19 +26,22 @@ use Log::Any qw($log);
 
 use Protocol::Sys::Virt::URI v11.5.0; # imports parse_url
 
-sub new($class, $url, %args) {
-    return bless {
-        url => $url,
-    }, $class;
+field $_url :param :reader;
+field $_process = undef;
+
+method close() {
+    $_process->kill( 'TERM' )
+        if not $_process->is_exited;
 }
 
-sub close($self) {
-    $self->{process}->kill( 'TERM' )
-        if not $self->{process}->is_exited;
+method configure(%args) {
+    delete $args{url};
+
+    $self->SUPER::configure(%args);
 }
 
-async sub connect($self) {
-    my %c = parse_url( $self->{url} );
+async method connect() {
+    my %c = parse_url( $_url );
 
     my $cmd  = $c{command};
     my $process = $self->loop->open_process(
@@ -57,9 +61,8 @@ async sub connect($self) {
         on_finish => sub { }, # on_finish is mandatory
         );
 
-    $self->{process} = $process;
-    $self->{in}  = $process->stdout;
-    $self->{out} = $process->stdin;
+    $_in  = $process->stdout;
+    $_out = $process->stdin;
 
     return;
 }
@@ -76,7 +79,7 @@ Sys::Async::Virt::Connection::Process - Connection to LibVirt server using
 
 =head1 VERSION
 
-v0.0.21
+v0.1.1
 
 =head1 SYNOPSIS
 

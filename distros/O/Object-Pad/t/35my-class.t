@@ -11,11 +11,19 @@ use Object::Pad 0.800 ':experimental(lexical_class)';
    my class Point {
       field $x :param :reader;
       field $y :param :reader;
+
+      method m
+      {
+         # Attempt to trigger RT168139
+         my $ten = 10;
+         return $ten;
+      }
    }
 
    my $p = Point->new( x => 20, y => 40 );
    ok( defined $p, 'Lexical class Point can ->new' );
    is( $p->x, 20, 'Lexical class instances have methods' );
+   is( $p->m, 10, 'Lexical class methods work properly' );
 
    ok( !defined &Point::new, 'Point:: is not a package in the symbol table' );
 

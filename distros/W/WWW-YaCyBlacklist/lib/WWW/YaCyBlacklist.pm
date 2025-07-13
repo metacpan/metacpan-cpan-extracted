@@ -5,7 +5,7 @@ package WWW::YaCyBlacklist;
 # ABSTRACT: a Perl module to parse and execute YaCy blacklists
 
 our $AUTHORITY = 'cpan:IBRAUN';
-$WWW::YaCyBlacklist::VERSION = '0.2';
+$WWW::YaCyBlacklist::VERSION = '0.4';
 
 use Moose;
 use Moose::Util::TypeConstraints;
@@ -95,7 +95,7 @@ sub read_from_files {
     my ($self, @files) = @_;
     my @lines;
 
-    grep { push( @lines, io( $_ )->encoding( $self->file_charset )->slurp ) } @files;
+    grep { push( @lines, io( $_ )->encoding( $self->file_charset )->chomp->slurp ) } @files;
     $self->read_from_array( @lines );
 }
 
@@ -112,25 +112,26 @@ sub check_url {
     my $self = shift;
     my $url = new URI $_[0];
     my $pq = ( defined $url->query ) ? $url->path.'?'.$url->query : $url->path;
-    $pq =~ s/^\///;
+    $pq = substr $pq, 1;
 
     foreach my $pattern ( keys %{ $self->patterns } ) {
-        my $path = '^' . ${ $self->patterns }{ $pattern }{path} . '$';
-        next if $pq !~ /$path/;
-        my $host = ${ $self->patterns }{ $pattern }{host};
 
-        if ( !${ $self->patterns }{ $pattern }{host_regex} ) {
+        my $path = '^' . ${ $self->patterns }{ $pattern }{ path } . '$';
+        next if $pq !~ /$path/;
+        my $host = ${ $self->patterns }{ $pattern }{ host };
+
+        if ( !${ $self->patterns }{ $pattern }{ host_regex } ) {
             $host =~ s/\*/.*/g;
 
-            if ( ${ $self->patterns }{ $pattern }{host} =~ /\.\*$/ ) {
+            if ( ${ $self->patterns }{ $pattern }{ host } =~ /\.\*$/ ) {
                 return 1 if $url->host =~ /^$host$/;
             }
             else {
-                return 1 if $url->host =~ /^(.+\.)?$host$/;
+                return 1 if $url->host =~ /^([\w\-]+\.)*$host$/;
             }
         }
         else {
-            return 1 if $url->host  =~ /^$host$/;
+            return 1 if $self->use_regex && $url->host  =~ /^$host$/;
         }
     }
     return 0;
@@ -201,7 +202,7 @@ WWW::YaCyBlacklist - a Perl module to parse and execute YaCy blacklists
 
 =head1 VERSION
 
-version 0.2
+version 0.4
 
 =head1 SYNOPSIS
 
@@ -240,7 +241,7 @@ C<host> part is a regular expression (but the patterns remain in the list).
 
 =head2 C<filename =E<gt> '/path/to/file.black'> (default C<ycb.black>)
 
-This is file printed by C<store_list>
+This is the file printed by C<store_list>
 
 =head2 C<sortorder =E<gt>  0|1> (default C<0>)
 
@@ -287,9 +288,17 @@ Returns a list of patterns configured by C<sorting> and C<sortorder>.
 
 Prints the current list to a file. Executes C<sort_list( )>.
 
-=head1 Bugs
+=head1 OPERATIONAL NOTES
 
-YaCy does not allow host patterns with to stars at the time being. C<WWW::YaCyBlacklist> does not check for this but simply executes.
+The error
+
+    ^* matches null string many times in regex; marked by <-- HERE in m/^^* <-- HERE
+
+is probably caused by a corrupted path part of a pattern in your list (C<*> instead of C<.*>).
+
+=head1 BUGS
+
+YaCy does not allow host patterns with to stars at the time being. C<WWW::YaCyBlacklist> does not check for this but simply executes. This is rather a YaCy bug.
 
 If there is something you would like to tell me, there are different channels for you:
 
@@ -313,17 +322,31 @@ L<Contact form on my homepage|https://ingram-braun.net/erga/legal-notice-and-con
 
 =back
 
-=head1 Source
-
-L<De:Blacklists|https://wiki.yacy.net/index.php/De:Blacklists> (German).
-
-=head1 See also
+=head1 SOURCE
 
 =over
 
 =item *
 
+L<De:Blacklists|https://wiki.yacy.net/index.php/De:Blacklists> (German).
+
+=item *
+
 L<Dev:APIlist|https://wiki.yacy.net/index.php/Dev:APIlist>
+
+=back
+
+=head1 SEE ALSO
+
+=over
+
+=item *
+
+L<YaCy homepage|https://yacy.net/>
+
+=item *
+
+L<YaCy community|https://community.searchlab.eu/>
 
 =back
 

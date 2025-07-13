@@ -31,7 +31,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.228';
+our $VERSION = '1.229';
 
 use Quiq::Option;
 use Quiq::FileHandle;
@@ -3008,7 +3008,7 @@ sub getFirst {
     if (!$sloppy) {
         $this->throw(
             'PATH-00099: No pattern matches a path',
-            Patterns => join(', ',@_),
+            Patterns => join(', ',@$argA),
         );
     }
 
@@ -4497,7 +4497,7 @@ sub uid {
 
 =head1 VERSION
 
-1.228
+1.229
 
 =head1 AUTHOR
 

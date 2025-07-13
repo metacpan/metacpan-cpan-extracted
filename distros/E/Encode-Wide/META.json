@@ -1,0 +1,65 @@
+{
+   "abstract" : "Convert wide characters (Unicode) into HTML or XML-safe ASCII entities",
+   "author" : [
+      "Nigel Horne <njh@nigelhorne.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Encode-Wide",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "HTML::Entities" : "0",
+            "Params::Get" : "0",
+            "Term::ANSIColor" : "0",
+            "perl" : "5.010000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Most" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Encode-Wide@rt.cpan.org",
+         "web" : "https://github.com/nigelhorne/Encode-Wide/issues",
+         "x_url" : "https://github.com/nigelhorne/Encode-Wide/issues"
+      },
+      "homepage" : "https://metacpan.org/pod/Encode::Wide",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/nigelhorne/Encode-Wide.git",
+         "web" : "https://github.com/nigelhorne/Encode-Wide",
+         "x_repository" : "https://github.com/nigelhorne/Encode-Wide"
+      }
+   },
+   "version" : 0.01,
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

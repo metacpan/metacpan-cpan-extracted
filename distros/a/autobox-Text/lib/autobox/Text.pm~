@@ -1,0 +1,89 @@
+use strict;
+use warnings;
+package autobox::Text;
+
+# ABSTRACT: turns baubles into trinkets
+
+use base qw/autobox/;
+
+sub import {
+    my $class = shift;
+    # $class->SUPER::import(DEFAULT => 'autobox::Core::', @_);
+    $class->SUPER::import(
+			  ARRAY => 'autobox::Text::Subs',
+			  SCALAR => 'autobox::Text::Subs',
+			 );
+}
+
+package autobox::Text::Subs;
+
+no warnings qw/redefine/;
+
+use Text::Wrap;
+
+sub wrap {
+    my $text = shift;
+    $Text::Wrap::columns = shift || 80;
+    return Text::Wrap::wrap('', '', $text);
+}
+
+sub unwrap {
+    my @text = split /\n\n/, shift;
+    s/\n/ /g for (@text);
+    return (join "\n\n", @text) =~ s/^\s*|\s*$//rg;
+}
+
+sub bulletize {
+    my @text = split /\n/, shift;
+    my $bullet = shift || '-';
+
+    if ($bullet =~ /\d/) {
+	my $fmt = shift || "%i. %s";
+	return (join "\n", map { sprintf $fmt, $bullet++, $_ } @text) =~ s/^\s*|\s*$//rg
+    } else {
+	my $fmt = shift || "%s %s";
+	return (join "\n", map { sprintf $fmt, $bullet, $_ } @text) =~ s/^\s*|\s*$//rg;
+    }
+}
+
+sub unbulletize {
+    my @text = split /\n/, shift;
+    for (@text) {
+	s/^[\*\-\_]\s//;
+	s/\d+\.\s//;
+    }
+    return (join "\n", @text) =~ s/^\s*|\s*$//rg;
+}
+
+sub trim {
+    my $str = shift;
+    $str =~ s/^\s+//;
+    $str =~ s/\s+$//;
+    return $str;
+}
+
+sub tidy {
+    my $str = shift;
+    $str =~ s/^\s+//;
+    $str =~ s/\s+$//;
+    $str =~ s/[\t ]+/ /g;
+    $str =~ s/\n{3,}/\n\n/g;
+    return $str;
+}
+
+sub encode {
+    my $str = shift;
+    my $encoding = shift || "UTF-8"
+}
+
+sub decode {
+    my $str = shift;
+    my $encoding = shift || "UTF-8"
+
+}
+
+# markdown
+# lorem
+# truncate String::Truncate
+
+1;

@@ -12,9 +12,18 @@ use File::Path 'rmtree';
 use File::Spec;
 use File::Temp 'mktemp';
 use POSIX 'ENOSYS'; # Old Errno versions don't seem to have it, so we use POSIX.
-use Test::More tests => 77;
+use Test::More tests => 79;
 
 use POSIX::2008;
+
+my $HAVE_WEIRD_CREAT_MODE = $^O =~ /^(?:MSWin32|cygwin)$/ || do {
+  if (open my $fh, '<', '/proc/version') {
+    <$fh> =~ /microsoft/i;
+  }
+  else {
+    0;
+  }
+};
 
 my @cleanup;
 push @cleanup, my $dirname = mktemp('tmpXXXXX');
@@ -34,7 +43,8 @@ SKIP: {
   ok(POSIX::2008::access($tmpname, POSIX::2008::F_OK), 'access(F_OK)');
   ok(POSIX::2008::access($tmpname, POSIX::2008::R_OK), 'access(R_OK)');
   ok(POSIX::2008::access($tmpname, POSIX::2008::W_OK), 'access(W_OK)');
-  ok(POSIX::2008::access($tmpname, POSIX::2008::X_OK), 'access(X_OK)');
+  ok($HAVE_WEIRD_CREAT_MODE || POSIX::2008::access($tmpname, POSIX::2008::X_OK),
+     'access(X_OK)');
 }
 
 SKIP: {
@@ -134,6 +144,22 @@ SKIP: {
       my ($got, $expected) = ($p_stat[$i], $c_stat[$i]);
       ok($p_stat[$i] == $c_stat[$i], "lstat()[$i]: $got == $expected");
     }
+  }
+}
+
+SKIP: {
+  if (! defined  &POSIX::2008::statvfs) {
+    skip 'statfvs() UNAVAILABLE', 2;
+  }
+  my @stat = POSIX::2008::statvfs($tmpname);
+  cmp_ok(scalar(@stat), '==', 11, 'statvfs() result length');
+
+  @stat = POSIX::2008::statvfs($fh);
+  if (@stat) {
+    cmp_ok(scalar(@stat), '==', 11, 'fstatvfs() result length');
+  }
+  else {
+    cmp_ok($!, '==', ENOSYS, 'fstatvfs() not available');
   }
 }
 

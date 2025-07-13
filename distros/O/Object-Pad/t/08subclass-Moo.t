@@ -41,8 +41,8 @@ class Derived::Class {
    is( $obj->field, 345, 'field value' );
 }
 
-# Ensure the BUILD blocks don't collide with Moo's BUILD methods
+# Ensure the BUILD phasers don't collide with Moo's BUILD methods
 is( $moocount, 1, 'Moo BUILD method invoked only once' );
-is( $opcount, 1, 'Object::Pad BUILD block invoked only once' );
+is( $opcount, 1, 'Object::Pad BUILD phaser invoked only once' );
 
 done_testing;

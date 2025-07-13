@@ -14,8 +14,9 @@ use v5.26;
 use warnings;
 use experimental 'signatures';
 use Future::AsyncAwait;
+use Object::Pad;
 
-package Sys::Async::Virt::Connection::Factory v0.0.21;
+class Sys::Async::Virt::Connection::Factory v0.1.1;
 
 use Carp qw(croak);
 use Log::Any qw($log);
@@ -31,12 +32,8 @@ our @default_drivers = (
     { transport => 'ssh', class => 'SSH' },
     );
 
-sub new {
-    my ($class, %args) = @_;
-    return bless {
-        drivers => $args{drivers} // \@default_drivers,
-    }, $class;
-}
+field $_drivers :param = \@default_drivers;
+
 
 # Not documented in the POD: not a method
 sub _cls_name($n) {
@@ -44,12 +41,12 @@ sub _cls_name($n) {
         ? $n : "Sys::Async::Virt::Connection::$n";
 }
 
-sub create_connection( $self, $url, %args ) {
+method create_connection( $url, %args ) {
     my %components = parse_url( $url );
     my $transport = $components{transport} // '';
     my $host = $components{host} // '';
 
-    for my $driver ($self->{drivers}->@*) {
+    for my $driver ($_drivers->@*) {
         if ($transport eq $driver->{transport}) {
             if (defined $driver->{host}) {
                 if (($driver->{host} and $host)
@@ -58,7 +55,7 @@ sub create_connection( $self, $url, %args ) {
                     if (not eval "require $c; 1") {
                         die @!;
                     }
-                    return $c->new( $url, %args );
+                    return $c->new( url => $url, %args );
                 }
             }
             else { # "host" not defined, so not required
@@ -66,7 +63,7 @@ sub create_connection( $self, $url, %args ) {
                 if (not eval "require $c; 1") {
                     die @!;
                 }
-                return $c->new( $url, %args );
+                return $c->new( url => $url, %args );
             }
         }
     }
@@ -85,7 +82,7 @@ Sys::Async::Virt::Connection::Factory - Class for
 
 =head1 VERSION
 
-v0.0.21
+v0.1.1
 
 =head1 SYNOPSIS
 

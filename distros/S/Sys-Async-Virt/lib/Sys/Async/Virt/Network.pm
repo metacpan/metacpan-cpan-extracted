@@ -14,13 +14,14 @@ use v5.26;
 use warnings;
 use experimental 'signatures';
 use Future::AsyncAwait;
+use Object::Pad;
 
-package Sys::Async::Virt::Network v0.0.21;
+class Sys::Async::Virt::Network v0.1.1;
 
 use Carp qw(croak);
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::Remote::XDR v0.0.21;
+use Protocol::Sys::Virt::Remote::XDR v0.1.1;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
 use constant {
@@ -58,107 +59,104 @@ use constant {
 };
 
 
-sub new($class, %args) {
-    return bless {
-        id => $args{id},
-        client => $args{client},
-    }, $class;
-}
+field $_id :param :reader;
+field $_client :param :reader;
 
-sub create($self) {
-    return $self->{client}->_call(
+
+method create() {
+    return $_client->_call(
         $remote->PROC_NETWORK_CREATE,
-        { net => $self->{id} }, empty => 1 );
+        { net => $_id }, empty => 1 );
 }
 
-sub destroy($self) {
-    return $self->{client}->_call(
+method destroy() {
+    return $_client->_call(
         $remote->PROC_NETWORK_DESTROY,
-        { net => $self->{id} }, empty => 1 );
+        { net => $_id }, empty => 1 );
 }
 
-async sub get_autostart($self) {
-    return await $self->{client}->_call(
+async method get_autostart() {
+    return await $_client->_call(
         $remote->PROC_NETWORK_GET_AUTOSTART,
-        { net => $self->{id} }, unwrap => 'autostart' );
+        { net => $_id }, unwrap => 'autostart' );
 }
 
-async sub get_bridge_name($self) {
-    return await $self->{client}->_call(
+async method get_bridge_name() {
+    return await $_client->_call(
         $remote->PROC_NETWORK_GET_BRIDGE_NAME,
-        { net => $self->{id} }, unwrap => 'name' );
+        { net => $_id }, unwrap => 'name' );
 }
 
-async sub get_dhcp_leases($self, $mac, $flags = 0) {
-    return await $self->{client}->_call(
+async method get_dhcp_leases($mac, $flags = 0) {
+    return await $_client->_call(
         $remote->PROC_NETWORK_GET_DHCP_LEASES,
-        { net => $self->{id}, mac => $mac, need_results => $remote->NETWORK_DHCP_LEASES_MAX, flags => $flags // 0 }, unwrap => 'leases' );
+        { net => $_id, mac => $mac, need_results => $remote->NETWORK_DHCP_LEASES_MAX, flags => $flags // 0 }, unwrap => 'leases' );
 }
 
-async sub get_metadata($self, $type, $uri, $flags = 0) {
-    return await $self->{client}->_call(
+async method get_metadata($type, $uri, $flags = 0) {
+    return await $_client->_call(
         $remote->PROC_NETWORK_GET_METADATA,
-        { network => $self->{id}, type => $type, uri => $uri, flags => $flags // 0 }, unwrap => 'metadata' );
+        { network => $_id, type => $type, uri => $uri, flags => $flags // 0 }, unwrap => 'metadata' );
 }
 
-async sub get_xml_desc($self, $flags = 0) {
-    return await $self->{client}->_call(
+async method get_xml_desc($flags = 0) {
+    return await $_client->_call(
         $remote->PROC_NETWORK_GET_XML_DESC,
-        { net => $self->{id}, flags => $flags // 0 }, unwrap => 'xml' );
+        { net => $_id, flags => $flags // 0 }, unwrap => 'xml' );
 }
 
-async sub is_active($self) {
-    return await $self->{client}->_call(
+async method is_active() {
+    return await $_client->_call(
         $remote->PROC_NETWORK_IS_ACTIVE,
-        { net => $self->{id} }, unwrap => 'active' );
+        { net => $_id }, unwrap => 'active' );
 }
 
-async sub is_persistent($self) {
-    return await $self->{client}->_call(
+async method is_persistent() {
+    return await $_client->_call(
         $remote->PROC_NETWORK_IS_PERSISTENT,
-        { net => $self->{id} }, unwrap => 'persistent' );
+        { net => $_id }, unwrap => 'persistent' );
 }
 
-async sub list_all_ports($self, $flags = 0) {
-    return await $self->{client}->_call(
+async method list_all_ports($flags = 0) {
+    return await $_client->_call(
         $remote->PROC_NETWORK_LIST_ALL_PORTS,
-        { network => $self->{id}, need_results => $remote->NETWORK_PORT_LIST_MAX, flags => $flags // 0 }, unwrap => 'ports' );
+        { network => $_id, need_results => $remote->NETWORK_PORT_LIST_MAX, flags => $flags // 0 }, unwrap => 'ports' );
 }
 
-async sub port_create_xml($self, $xml, $flags = 0) {
-    return await $self->{client}->_call(
+async method port_create_xml($xml, $flags = 0) {
+    return await $_client->_call(
         $remote->PROC_NETWORK_PORT_CREATE_XML,
-        { network => $self->{id}, xml => $xml, flags => $flags // 0 }, unwrap => 'port' );
+        { network => $_id, xml => $xml, flags => $flags // 0 }, unwrap => 'port' );
 }
 
-async sub port_lookup_by_uuid($self, $uuid) {
-    return await $self->{client}->_call(
+async method port_lookup_by_uuid($uuid) {
+    return await $_client->_call(
         $remote->PROC_NETWORK_PORT_LOOKUP_BY_UUID,
-        { network => $self->{id}, uuid => $uuid }, unwrap => 'port' );
+        { network => $_id, uuid => $uuid }, unwrap => 'port' );
 }
 
-sub set_autostart($self, $autostart) {
-    return $self->{client}->_call(
+method set_autostart($autostart) {
+    return $_client->_call(
         $remote->PROC_NETWORK_SET_AUTOSTART,
-        { net => $self->{id}, autostart => $autostart }, empty => 1 );
+        { net => $_id, autostart => $autostart }, empty => 1 );
 }
 
-sub set_metadata($self, $type, $metadata, $key, $uri, $flags = 0) {
-    return $self->{client}->_call(
+method set_metadata($type, $metadata, $key, $uri, $flags = 0) {
+    return $_client->_call(
         $remote->PROC_NETWORK_SET_METADATA,
-        { network => $self->{id}, type => $type, metadata => $metadata, key => $key, uri => $uri, flags => $flags // 0 }, empty => 1 );
+        { network => $_id, type => $type, metadata => $metadata, key => $key, uri => $uri, flags => $flags // 0 }, empty => 1 );
 }
 
-sub undefine($self) {
-    return $self->{client}->_call(
+method undefine() {
+    return $_client->_call(
         $remote->PROC_NETWORK_UNDEFINE,
-        { net => $self->{id} }, empty => 1 );
+        { net => $_id }, empty => 1 );
 }
 
-sub update($self, $command, $section, $parentIndex, $xml, $flags = 0) {
-    return $self->{client}->_call(
+method update($command, $section, $parentIndex, $xml, $flags = 0) {
+    return $_client->_call(
         $remote->PROC_NETWORK_UPDATE,
-        { net => $self->{id}, command => $command, section => $section, parentIndex => $parentIndex, xml => $xml, flags => $flags // 0 }, empty => 1 );
+        { net => $_id, command => $command, section => $section, parentIndex => $parentIndex, xml => $xml, flags => $flags // 0 }, empty => 1 );
 }
 
 
@@ -175,7 +173,7 @@ Sys::Async::Virt::Network - Client side proxy to remote LibVirt network
 
 =head1 VERSION
 
-v0.0.21
+v0.1.1
 
 =head1 SYNOPSIS
 

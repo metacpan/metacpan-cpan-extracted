@@ -37,7 +37,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.228';
+our $VERSION = '1.229';
 
 use Quiq::Unindent;
 use Quiq::Hash;
@@ -287,6 +287,7 @@ sub link {
     push @$linkA,Quiq::Hash->new({@_},
         name => $name,
         url => undef,
+        target => undef,
     );
 
     return "L{$name}";
@@ -313,9 +314,17 @@ des Dokuments gerufen.
 sub linkDefs {
     my $self = shift;
 
+    my $ind = ' ' x $self->indentation;
+
     my $str = '';
     for my $l (@{$self->linkA}) {
-        $str .= qq~%Link:\n  name="$l->{'name'}"\n  url="$l->{'url'}"\n\n~
+        $str .= "%Link:\n";
+        for my $key (qw/name url target/) {
+            if (defined $l->{$key}) {
+                $str .= qq~$ind$key="$l->{$key}"\n~;
+            }
+        }
+        $str .= "\n";
     }
 
     return $str;
@@ -357,6 +366,59 @@ sub paragraph {
     }
 
     return "$text\n\n";
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 segment() - Segment
+
+=head4 Synopsis
+
+  $str = $gen->segment($name,
+      html => $htmlCode,
+      latex => $latexCode,
+      mediawiki => $mediawikiCode,
+  );
+
+=head4 Description
+
+Definiere ein Segment mit dem Bezeichner $name und den HTML-, LaTeX-,
+MediaWiki-Definitionen $htmlCode, $latexCode, $mediawikiCode und
+liefere den resultierenden Sdoc-Code zurück.
+
+=head4 Example
+
+  $gen->segment('red',
+      html => '<span style="color: red">%s</span>',
+      latex => '{\color{red}%s}',
+      mediawiki => '<span style="color: red">%s</span>',
+  );
+
+erzeugt
+
+  %Segment:
+    name=red
+    html='<span style="color: red">%s</span>'
+    latex='{\color{red}%s}'
+    mediawiki='<span style="color: red">%s</span>'
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub segment {
+    my ($self,$name) = splice @_,0,2;
+    # @_: @keyVal
+
+    my $ind = ' ' x $self->indentation;
+
+    my $str = qq~%Segment:\n${ind}name=$name\n~;
+    while (@_) {
+        my ($key,$val) = splice @_,0,2;
+        $str .= qq~${ind}$key='$val'\n~;
+    }
+
+    return "$str\n";
 }
 
 # -----------------------------------------------------------------------------
@@ -677,7 +739,7 @@ sub eof {
 
 =head1 VERSION
 
-1.228
+1.229
 
 =head1 AUTHOR
 

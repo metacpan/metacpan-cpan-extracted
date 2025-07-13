@@ -2,12 +2,13 @@ NAME
     Mo::utils::Number - Mo number utilities.
 
 SYNOPSIS
-     use Mo::utils::Number qw(check_int check_natural check_number check_percent check_positive_natural);
+     use Mo::utils::Number qw(check_int check_natural check_number check_percent check_positive_decimal check_positive_natural);
 
      check_int($self, $key);
      check_natural($self, $key);
      check_number($self, $key);
      check_percent($self, $key);
+     check_positive_decimal($self, $key)
      check_positive_natural($self, $key);
 
 DESCRIPTION
@@ -17,16 +18,20 @@ SUBROUTINES
   "check_int"
      check_int($self, $key);
 
-    Check parameter defined by $key if it's number integer (... -2, -1, 0,
-    1, 2, ...). Value could be undefined or doesn't exist.
+    Check if the parameter defined by $key is an integer (... -2, -1, 0, 1,
+    2, ...). Value could be undefined or doesn't exist.
+
+    Put error if check isn't ok.
 
     Returns undef.
 
   "check_natural"
      check_natural($self, $key);
 
-    Check parameter defined by $key if it's number a natural number (0, 1,
-    2, ...). Value could be undefined or doesn't exist.
+    Check if the parameter defined by $key is a natural number (0, 1, 2,
+    ...). Value could be undefined or doesn't exist.
+
+    Put error if check isn't ok.
 
     Returns undef.
 
@@ -35,9 +40,9 @@ SUBROUTINES
 
     *Since version 0.02.*
 
-    Check parameter defined by $key which is number (positive or negative)
-    or not. Number could be integer, float, exponencial and negative.
-    Implementation is via "looks_like_number" in Scalar::Util.
+    Check if the parameter defined by $key is a number. Number could be
+    integer, float, exponencial and negative. Implementation is via
+    "looks_like_number" in Scalar::Util.
 
     Put error if check isn't ok.
 
@@ -46,16 +51,32 @@ SUBROUTINES
   "check_percent"
      check_percent($self, $key);
 
-    Check parameter defined by $key if it's number a percent. Value could be
+    Check if the parameter defined by $key is a percent. Value could be
     undefined or doesn't exist.
+
+    Put error if check isn't ok.
+
+    Returns undef.
+
+  "check_positive_decimal"
+     check_positive_decimal($self, $key)
+
+    *Since version 0.05.*
+
+    Check if the parameter defined by $key is a positive decimal number.
+    Value could be undefined or doesn't exist.
+
+    Put error if check isn't ok.
 
     Returns undef.
 
   "check_positive_natural"
      check_positive_natural($self, $key);
 
-    Check parameter defined by $key if it's number a positive natural number
-    (1, 2, ...). Value could be undefined or doesn't exist.
+    Check if the parameter defined by $key is a positive natural number (1,
+    2, ...). Value could be undefined or doesn't exist.
+
+    Put error if check isn't ok.
 
     Returns undef.
 
@@ -73,6 +94,9 @@ ERRORS
              Parameter '%s' has bad percent value.
                      Value: %s
              Parameter '%s' has bad percent value (missing %).
+                     Value: %s
+     check_positive_decimal():
+             Parameter '%s' must be a positive decimal number.
                      Value: %s
      check_positive_natural():
              Parameter '%s' must be a positive natural number.
@@ -228,6 +252,42 @@ EXAMPLE9
      use strict;
      use warnings;
 
+     use Mo::utils::Number qw(check_positive_decimal);
+
+     my $self = {
+             'key' => 3.2,
+     };
+     check_positive_decimal($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output:
+     # ok
+
+EXAMPLE10
+     use strict;
+     use warnings;
+
+     $Error::Pure::TYPE = 'Error';
+
+     use Mo::utils::Number qw(check_positive_decimal);
+
+     my $self = {
+             'key' => -1.2,
+     };
+     check_positive_decimal($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output like:
+     # #Error [...Number.pm:?] Parameter 'key' must be a positive decimal number.
+
+EXAMPLE11
+     use strict;
+     use warnings;
+
      use Mo::utils::Number qw(check_positive_natural);
 
      my $self = {
@@ -241,7 +301,7 @@ EXAMPLE9
      # Output:
      # ok
 
-EXAMPLE10
+EXAMPLE12
      use strict;
      use warnings;
 
@@ -289,5 +349,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.04
+    0.05
 

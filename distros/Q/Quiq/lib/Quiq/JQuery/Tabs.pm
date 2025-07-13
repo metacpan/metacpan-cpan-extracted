@@ -91,7 +91,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.228';
+our $VERSION = '1.229';
 
 use Quiq::Hash;
 use Quiq::Html::List;
@@ -204,7 +204,7 @@ sub html {
 
 =head1 VERSION
 
-1.228
+1.229
 
 =head1 AUTHOR
 

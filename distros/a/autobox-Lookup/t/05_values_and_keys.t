@@ -23,19 +23,6 @@ my $data = {
     },
 };
 
-sub snorg {
-    my $x = shift;
-    my $r = eval $x;
-    my $d = dumper $r;
-    return sprintf "is_deeply( %s, %s, 'some test' );", $x, $d;
-}
-
-
-
-print snorg('$data->get("level1")->keys');
-print snorg('$data->get("level1")->values');
-print snorg('$data->get("level1.array_key")->values');
-
 
 is_deeply( [ sort $data->get("level1")->keys->@* ], ["array_key","level2"], 'keys on hash' );
 is_deeply( [ sort $data->get("level1.array_key")->keys->@* ], [0,1], 'keys on array' );

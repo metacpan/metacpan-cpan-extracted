@@ -1270,11 +1270,11 @@ FieldMeta *ObjectPad_mop_class_find_field(pTHX_ ClassMeta *meta, SV *fieldname, 
 void ObjectPad_mop_class_add_BUILD(pTHX_ ClassMeta *meta, CV *cv)
 {
   if(!meta->begun)
-    croak("Cannot add a new BUILD block to a class that is not yet begun");
+    croak("Cannot add a new BUILD phaser to a class that is not yet begun");
   if(meta->sealed)
-    croak("Cannot add a BUILD block to an already-sealed class");
+    croak("Cannot add a BUILD phaser to an already-sealed class");
   if(meta->strict_params)
-    croak("Cannot add a BUILD block to a class with :strict(params)");
+    croak("Cannot add a BUILD to a class with :strict(params)");
 
   if(!meta->buildcvs)
     meta->buildcvs = newAV();
@@ -1285,11 +1285,11 @@ void ObjectPad_mop_class_add_BUILD(pTHX_ ClassMeta *meta, CV *cv)
 void ObjectPad_mop_class_add_ADJUST(pTHX_ ClassMeta *meta, CV *cv)
 {
   if(!meta->begun)
-    croak("Cannot add a new ADJUST block to a class that is not yet begun");
+    croak("Cannot add a new ADJUST phaser to a class that is not yet begun");
   if(meta->sealed)
-    croak("Cannot add an ADJUST(PARAMS) block to an already-sealed class");
+    croak("Cannot add an ADJUST(PARAMS) phaser to an already-sealed class");
 
-  warn_outofblock_ops(CvROOT(cv), "Using %s to leave an ADJUST block is discouraged and will be removed in a later version");
+  warn_outofblock_ops(CvROOT(cv), "Using %s to leave an ADJUST phaser is discouraged and will be removed in a later version");
 
   if(!meta->adjustcvs)
     meta->adjustcvs = newAV();
@@ -1302,11 +1302,11 @@ void ObjectPad_mop_class_add_ADJUST(pTHX_ ClassMeta *meta, CV *cv)
 void ObjectPad_mop_class_add_APPLY(pTHX_ ClassMeta *meta, CV *cv)
 {
   if(meta->type != METATYPE_ROLE)
-    croak("Can only add a new APPLY block to a role");
+    croak("Can only add a new APPLY phaser to a role");
   if(!meta->begun)
-    croak("Cannot add a new APPLY block to a role that is not yet begun");
+    croak("Cannot add a new APPLY phaser to a role that is not yet begun");
   if(meta->sealed)
-    croak("Cannot add an APPLY block to an already-sealed role");
+    croak("Cannot add an APPLY phaser to an already-sealed role");
 
   if(!meta->role.applycvs)
     meta->role.applycvs = newAV();
@@ -1633,7 +1633,7 @@ static void S_mop_class_apply_role(pTHX_ RoleEmbedding *embedding)
   classmeta->next_fieldix += rolemeta->next_fieldix;
 
   if(rolemeta->role.applycvs) {
-    /* TODO: if APPLY blocks exist they should *replace* the built-in behaviour */
+    /* TODO: if APPLY phasers exist they should *replace* the built-in behaviour */
     dSP;
 
     AV *applycvs = rolemeta->role.applycvs;
@@ -1876,7 +1876,7 @@ void ObjectPad_mop_class_seal(pTHX_ ClassMeta *meta)
   }
 
   if(meta->strict_params && meta->buildcvs)
-    croak("Class %" SVf " cannot be :strict(params) because it has BUILD blocks",
+    croak("Class %" SVf " cannot be :strict(params) because it has BUILD phasers",
       SVfARG(meta->name));
 
   {
@@ -2001,7 +2001,7 @@ XS_INTERNAL(injected_constructor)
 #endif
 
   /* An AV storing the @_ args to pass to foreign constructor and all the
-   * build blocks
+   * build phasers
    * This does not include $self
    */
   AV *args = newAV();

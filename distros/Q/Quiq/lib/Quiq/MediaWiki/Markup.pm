@@ -63,7 +63,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.228';
+our $VERSION = '1.229';
 
 use Quiq::Unindent;
 use Quiq::Parameters;
@@ -1829,7 +1829,7 @@ sub testPage {
 
 =head1 VERSION
 
-1.228
+1.229
 
 =head1 AUTHOR
 

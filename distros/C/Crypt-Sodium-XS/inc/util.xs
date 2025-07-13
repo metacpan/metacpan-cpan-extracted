@@ -280,7 +280,7 @@ SV * sodium_sub(SV * x, SV * y)
 
   sodium_sub(out_buf, y_buf, x_len);
   if (realloc_buf)
-    free(realloc_buf);
+    Safefree(realloc_buf);
 
   sv_usepvn_flags(RETVAL, (char *)out_buf, x_len, SV_HAS_TRAILING_NUL);
 

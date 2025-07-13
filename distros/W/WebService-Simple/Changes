@@ -1,5 +1,11 @@
 Revision history for WebService-Simple
 
+0.26 2025-07-13T09:29:44Z
+
+      - test: mock a RSS feed
+      - fix: Stabilize GET params order
+      - fix: Use parse_string instead of XMLin
+
 0.25 2015-08-31T10:41:04Z
 
       - Use search.cpan.org uploads feeds for the test instead of YouTube feeds, thank you @eserte

@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2019-2025 -- leonerd@leonerd.org.uk
 
-package Object::Pad 0.820;
+package Object::Pad 0.821;
 
 use v5.18;
 use warnings;
@@ -192,14 +192,15 @@ any of these are missing an exception is thrown.
 
 =head3 The BUILD phase
 
-As part of the construction process, the C<BUILD> block of every component
-class will be invoked, passing in the list of arguments the constructor was
-invoked with. Each class should perform its required setup behaviour, but does
-not need to chain to the C<SUPER> class first; this is handled automatically.
+As part of the construction process, every C<BUILD> phaser of every component
+class will be invoked. Each will be passed in the list of arguments the
+constructor was invoked with as arguments. Each class should perform its
+required setup behaviour, but does not need to chain to the C<SUPER> class
+first; this is handled automatically.
 
 =head3 The ADJUST phase
 
-Next, the C<ADJUST> block of every component class is invoked. This happens
+Next, every C<ADJUST> phaser of every component class is invoked. This happens
 after the fields are assigned their initial values and the C<BUILD> blocks
 have been run.
 
@@ -389,19 +390,19 @@ default representation type, and does not have to be specifically requested.
 
 I<Since version 0.43.>
 
-Can only be applied to classes that contain no C<BUILD> blocks. If set, then
+Can only be applied to classes that contain no C<BUILD> phasers. If set, then
 the constructor will complain about any unrecognised named arguments passed to
 it (i.e. names that do not correspond to the C<:param> of any defined field
-and left unconsumed by any C<ADJUST> block).
+and left unconsumed by any C<ADJUST> phaser).
 
-Since C<BUILD> blocks can inspect the arguments arbitrarily, the presence of
-any such block means the constructor cannot determine which named arguments
+Since C<BUILD> phasers can inspect the arguments arbitrarily, the presence of
+any such phaser means the constructor cannot determine which named arguments
 are not recognised.
 
 This attribute is a temporary stepping-stone for compatibility with existing
 code. It is recommended to enable this whenever possible, as a later version
 of this module will likely perform this behaviour unconditionally whenever no
-C<BUILD> blocks are present.
+C<BUILD> phasers are present.
 
 =head2 class (anon)
 
@@ -462,7 +463,7 @@ implements the role.
       requires METHOD;
    }
 
-A role can provide instance fields. These are visible to any C<ADJUST> blocks
+A role can provide instance fields. These are visible to any C<ADJUST> phasers
 or methods provided by that role.
 
 I<Since version 0.33.>
@@ -661,7 +662,7 @@ I<Since version 0.66.>
 
 Declares that the instances of the class or role have a member field of the
 given name. This member field will be accessible as a lexical variable within
-any C<method> declarations and C<ADJUST> blocks in the class.
+any C<method> declarations and C<ADJUST> phasers in the class.
 
 Array and hash members are permitted and behave as expected; you do not need
 to store references to anonymous arrays or hashes.
@@ -801,7 +802,7 @@ code in the block if required by the constructor. If a named parameter is
 passed to the constructor for this field, then its code block will not be
 executed.
 
-Values for fields are assigned by the constructor before any C<BUILD> blocks
+Values for fields are assigned by the constructor before any C<BUILD> phasers
 are invoked.
 
 =head3 :inheritable
@@ -816,7 +817,7 @@ I<Since version 0.54> a deferred statement block is also permitted, on any
 field variable type. This permits code to be executed as part of the instance
 constructor, rather than running just once when the class is set up. Code in a
 field initialisation block is roughly equivalent to being placed in a C<BUILD>
-or C<ADJUST> block.
+or C<ADJUST> phaser.
 
 I<Since version 0.73> this may also be written as a plain expression
 introduced by an equals symbol (C<=>). This is equivalent to using a block.
@@ -853,8 +854,8 @@ I<Since version 0.806> fields already declared in a class are visible during
 the initialisation expression of later fields, and their assigned value can be
 used here. If the earlier field had a C<:param> declaration, it will have been
 assigned from the value passed to the constructor. Note however that all
-C<ADJUST> blocks happen I<after> field initialisation expressions, so any
-modified values set in such blocks will not be visible at this time.
+C<ADJUST> phasers happen I<after> field initialisation expressions, so any
+modified values set in such phasers will not be visible at this time.
 
 Control flow that attempts to leave a field initialiser expression or block is
 not permitted. This includes any C<return> expression, any C<next/last/redo>
@@ -1044,12 +1045,12 @@ first argument:
 
 I<Since version 0.27.>
 
-Declares the builder block for this component class. A builder block may use
+Declares a builder phaser for this component class. A builder phaser may use
 subroutine signature syntax, as for methods, to assist in unpacking its
-arguments. A build block is not a subroutine and thus is not permitted to use
+arguments. A build phaser is not a subroutine and thus is not permitted to use
 subroutine attributes (for example C<:lvalue>).
 
-Note that a C<BUILD> block is a named phaser block and not a method. Attempts
+Note that a C<BUILD> phaser is a named phaser block and not a method. Attempts
 to create a method named C<BUILD> (i.e. with syntax C<method BUILD {...}>)
 will fail with a compiletime error, to avoid this confusion.
 
@@ -1061,28 +1062,28 @@ will fail with a compiletime error, to avoid this confusion.
 
 I<Since version 0.43.>
 
-Declares an adjust block for this component class. This block of code runs
-within the constructor, after any C<BUILD> blocks and automatic field value
+Declares an adjust phaser for this component class. This block of code runs
+within the constructor, after any C<BUILD> phasers and automatic field value
 assignment. It can make any final adjustments to the instance (such as
 initialising fields from calculated values).
 
-An adjust block is not a subroutine and thus is not permitted to use
-subroutine attributes (except see below). Note that an C<ADJUST> block is a
+An adjust phaser is not a subroutine and thus is not permitted to use
+subroutine attributes (except see below). Note that an C<ADJUST> phaser is a
 named phaser block and not a method; it does not use the C<sub> or C<method>
 keyword. But, like with C<method>, the member fields are accessible within the
 code body, as is the special C<$self> lexical.
 
-Currently, an C<ADJUST> block receives a reference to the hash containing the
+Currently, an C<ADJUST> phaser receives a reference to the hash containing the
 current constructor arguments, as per L</ADJUSTPARAMS> (see below). This was
 added in version 0.66 but will be removed again as it conflicts with the more
 flexible and generally nicer named-parameter C<ADJUST :params> syntax
 (see below). Such uses should be considered deprecated. A warning will be
-printed to indicate this whenever an C<ADJUST> block uses a signature. This
+printed to indicate this whenever an C<ADJUST> phaser uses a signature. This
 warning can be quieted by using C<ADJUSTPARAMS> instead. Additionally, a
 warning may be printed on code that attempts to access the params hashref via
 the C<@_> array.
 
-I<Since version 0.801> in a future version of this module, C<ADJUST> blocks
+I<Since version 0.801> in a future version of this module, C<ADJUST> phasers
 may be implemented as true blocks and will not permit out-of-block control
 flow. At present, they are implemented as one full CV per block, but a warning
 is emitted if out-of-block control flow is attempted.
@@ -1091,12 +1092,12 @@ is emitted if out-of-block control flow is attempted.
       return;
    }
 
-   Using return to leave an ADJUST block is discouraged and will be removed
+   Using return to leave an ADJUST phaser is discouraged and will be removed
    in a later version at FILE line LINE.
 
 I<Since version 0.805> an experimental feature can be enabled that puts all
-the C<ADJUST> blocks into a single CV, rather than creating one CV for every
-block. This is currently being tested for stability, and may become the
+the C<ADJUST> phasers into a single CV, rather than creating one CV for every
+phaser. This is currently being tested for stability, and may become the
 default behaviour in a future version. For now it must be requested specially:
 
    use Object::Pad ':experimental(composed_adjust)';
@@ -1113,11 +1114,11 @@ default behaviour in a future version. For now it must be requested specially:
 
 I<Since version 0.70; non-experimental since version 0.805.>
 
-An C<ADJUST> block can marked with a C<:params> attribute, meaning that it
+An C<ADJUST> phaser can marked with a C<:params> attribute, meaning that it
 consumes additional constructor parameters by assigning them into lexical
 variables.
 
-Before the block itself, a list of lexical variables are introduced, inside
+Before the phaser itself, a list of lexical variables are introduced, inside
 parentheses. The name of each one is preceded by a colon, and consumes a
 constructor parameter of the same name. These parameters are considered
 "consumed" for the purposes of a C<:strict(params)> check.
@@ -1133,7 +1134,7 @@ For example,
    ADJUST :params ( :$x, :$y = "default", :$z ) { ... }
 
 Note here that C<x> and C<z> are required parameters for the constructor of a
-class containing this block, but C<y> is an optional parameter whose value
+class containing this phaser, but C<y> is an optional parameter whose value
 will be filled in by the expression if not provided. Because these parameters
 are named and not positional, there is no ordering constraint; required and
 optional parameters can be freely mixed.
@@ -1157,9 +1158,9 @@ This permits the caller to pass a list of values via an array reference in
 the C<things> parameter, or a single value in C<thing>.
 
 The final element may be a regular hash variable. This requests that all
-remaining named parameters are made available inside it. The code in the block
-should C<delete> from this hash any parameters it wishes to consume, as with
-the earlier case above.
+remaining named parameters are made available inside it. The code in the
+phaser should C<delete> from this hash any parameters it wishes to consume, as
+with the earlier case above.
 
 It is I<unspecified> whether named fields or parameters for subclasses yet to
 be processed are visible to hashes of earlier superclasses. In the current
@@ -1187,14 +1188,15 @@ I<Since version 0.51.>
       ...
    }
 
-A variant of an C<ADJUST> block that receives a reference to the hash
+A variant of an C<ADJUST> phaser that receives a reference to the hash
 containing the current constructor parameters. This hash will not contain any
 constructor parameters already consumed by L</:param> declarations on any
 fields, but only the leftovers once those are processed.
 
-The code in the block should C<delete> from this hash any parameters it wishes
-to consume. Once all the C<ADJUST> blocks have run, any remaining keys in the
-hash will be considered errors, subject to the L</:strict(params)> check.
+The code in the phaser should C<delete> from this hash any parameters it
+wishes to consume. Once all the C<ADJUST> phasers have run, any remaining keys
+in the hash will be considered errors, subject to the L</:strict(params)>
+check.
 
 =head2 APPLY
 
@@ -1226,7 +1228,7 @@ details will change over time.
 
 I<Since version 0.72.>
 
-Only valid within the body (or signature) of a C<method>, an C<ADJUST> block,
+Only valid within the body (or signature) of a C<method>, an C<ADJUST> phaser,
 or the initialising expression of a C<field>. Yields the class name of the
 instance that the method, block or expression is invoked on.
 
@@ -1282,11 +1284,8 @@ found useful.
 
 =head2 Implied Pragmata
 
-B<The following behaviour is likely to be removed in a later version of this
-module.>
-
 In order to encourage users to write clean, modern code, the body of the
-C<class> block currently acts as if the following pragmata are in effect:
+C<class> block B<might> act as if the following pragmata are in effect:
 
    use strict;
    use warnings;
@@ -1300,22 +1299,23 @@ behaviour here does not match the plans for core perl; where the
 recently-added C<class> keyword does none of this, although the C<method>
 keyword always behaves as if signatures were enabled anyway.
 
-It is eventually planned that this behaviour will be removed from
-C<Object::Pad> entirely (except for enabling the C<signatures> feature). While
-that won't in itself break any existing code, it would mean that code which
-previously ran with the protection of C<strict> and C<warnings> would now not
-be. A satisfactory solution to this problem has not yet been found, but until
-then it is suggested that code using this module remembers to explicitly
-enable this set of pragmata before using the C<class> keyword.
+If you import this module with a module version number of I<0.821> or higher,
+this behaviour will not happen. This will be the default behaviour in future
+versions, and matches how the core perl feature works. (Though C<method> will
+still always parse as if the C<signatures> feature is enabled.) In particular,
+this no longer applies a catch-all C<use warnings>, meaning that any prior
+declarations of C<use experimental> or C<no warnings 'experimental::...'> will
+not be overridden.
 
-A handy way to do this is to use the C<use VERSION> syntax; v5.36 or later
-will already perform all of the pragmata listed above.
+However, in order to not upset older code that may have relied on these
+pragmata being present, module imports without such a version number will
+still enable them. This ensures that code not yet updated for the version 
+I<0.821> semantics is not affected.
 
-   use v5.36;
-
-If you import this module with a module version number of C<0.800> or higher
-it will enable a warning if you forget to enable C<strict> and C<warnings>
-before using the C<class> or C<roll> keywords:
+In addition, if you import this module with a module version number of
+I<0.800> or higher (but less than I<0.821>) it will emit a warning if you
+forget to enable C<strict> and C<warnings> before using the C<class> or
+C<role> keywords:
 
    use Object::Pad 0.800;
 
@@ -1329,6 +1329,13 @@ Z<>
    class keyword enabled 'use warnings' but this will be removed in a later version at FILE line 3.
 
 =for highlighter language=perl
+
+For newly-written code in a modern style, remember that a handy way to enable
+the C<strict> and C<warnings> pragmata for the entire file at once is to use
+the C<use VERSION> syntax at the top of the file. A requested version of
+I<v5.36> or later will already perform all of the pragmata listed above.
+
+   use v5.36;
 
 =head2 Yield True
 
@@ -1362,8 +1369,8 @@ the constructor. This is supported here since C<Object::Pad> version 0.19.
 Note however that any methods invoked by the superclass constructor may not
 see the object in a fully consistent state. (This fact is not specific to
 using C<Object::Pad> and would happen in classic Perl OO as well). The field
-initialisers will have been invoked but the C<BUILD> and C<ADJUST> blocks will
-not.
+initialisers will have been invoked but the C<BUILD> and C<ADJUST> phasers
+will not.
 
 For example; in the following
 
@@ -1388,9 +1395,9 @@ For example; in the following
    say "Value seen by user is ", $obj->get_value;
 
 Until the C<ClassicPerlBaseClass::new> superconstructor has returned the
-C<ADJUST> block will not have been invoked. The C<$_value> field will still
+C<ADJUST> phaser will not have been invoked. The C<$_value> field will still
 exist, but its value will be C<B> during the superconstructor. After the
-superconstructor, the C<BUILD> and C<ADJUST> blocks are invoked before the
+superconstructor, the C<BUILD> and C<ADJUST> phasers are invoked before the
 completed object is returned to the user. The result will therefore be:
 
 =for highlighter

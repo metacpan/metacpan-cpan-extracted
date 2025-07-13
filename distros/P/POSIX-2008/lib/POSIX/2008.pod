@@ -35,7 +35,9 @@ Since version 0.22, returned handles support IO::Handle methods.
 
 =head1 SYSTEM CALL RETURN VALUES
 
-A system call return value of -1 meaning "error" is mapped to undef.
+A system call return value of -1 meaning "error" is mapped to undef except for
+L<C<poll()>|"poll"> which returns -1 to be consistent with
+L<C<select()>|perlfunc/select>.
 
 A system call return value of 0 meaning "success" is mapped to "0 but true".
 
@@ -232,29 +234,49 @@ I<New in version 0.08.>
 
 clock_id = clock_getcpuclockid(pid);
 
-pid defaults to C<$$>. Returns undef on error.
+I<pid> defaults to 0. Returns undef on error.
 
 =item C<clock_getres>
 
 (sec, nsec) = clock_getres(clock_id);
+floating_sec = clock_getres(clock_id);
 
-clock_id defaults to C<CLOCK_REALTIME>. Returns empty list on error.
+I<clock_id> defaults to C<CLOCK_REALTIME>. Returns empty list or undef on
+error.
+
+I<Changed in version 0.25:> Return floating seconds in scalar context.
 
 =item C<clock_gettime>
 
 (sec, nsec) = clock_gettime(clock_id);
+floating_sec = clock_gettime(clock_id);
 
-clock_id defaults to C<CLOCK_REALTIME>. Returns empty list on error.
+clock_id defaults to C<CLOCK_REALTIME>. Returns empty list or undef on error.
+
+I<Changed in version 0.25:> Return floating seconds in scalar context.
 
 =item C<clock_nanosleep>
 
-(rem_sec, rem_nsec) = clock_nanosleep(clock_id, flags, sec, nsec);
+(rem_sec, rem_nsec) = clock_nanosleep(clock_id, flags, floating_sec);
+floating_rem_sec = clock_nanosleep(clock_id, flags, floating_sec);
 
-In scalar context returns the remaining seconds as a floating point number.
+(rem_sec, rem_nsec) = clock_nanosleep(clock_id, flags, sec, nsec);
+floating_rem_sec = clock_nanosleep(clock_id, flags, sec, nsec);
+
+Returns zero(es) on success, the remaining time on EINTR, the empty list or
+undef otherwise. The remaining time is zero if the flag C<TIMER_ABSTIME> is
+set.
+
+I<Changed in version 0.25:> Sleep time can be floating seconds only or seconds
+and nanoseconds.
 
 =item C<clock_settime>
 
 ret = clock_settime(clock_id, sec, nsec);
+ret = clock_settime(clock_id, floating_sec);
+
+I<Changed in version 0.25:> Time can be floating seconds only or seconds and
+nanoseconds.
 
 =item C<clog>
 
@@ -383,7 +405,7 @@ y = erfc(x);
 
 execveat(dirfd, path, args, env=undef, flags=0);
 
-The execveat() system call is a nonstandard extension present in Linux.
+The C<execveat()> system call is a nonstandard extension present in Linux.
 See also L<C<fexecve()>|"fexecve">.
 
 It executes the program referred to by I<path>, which is interpreted relative
@@ -453,9 +475,9 @@ ret = fdatasync(fd);
 
 ret = fdopen(fd, mode);
 
-Returns a file handle associated with the I<numeric> file descriptor I<fd>
-or undef on error. I<mode> is one of the values C<"r">, C<"w">, C<"a"> with
-an optional C<"+"> and/or C<"b">.
+Returns a file handle associated with the numeric file descriptor I<fd> or
+undef on error. I<mode> is one of the values C<"r">, C<"w">, C<"a"> with an
+optional C<"+"> and/or C<"b">.
 
 The file descriptor is not dup'ed and will be closed when the handle is closed.
 
@@ -639,8 +661,8 @@ ret = fsync(fd);
 
 ret = futimens(fd, atime_sec, atime_nsec, mtime_sec, mtime_nsec);
 
-atime_sec and mtime_sec default to 0, atime_nsec and mtime_nsec default to
-C<UTIME_NOW>.
+I<atime_sec> and I<mtime_sec> default to 0, I<atime_nsec> and I<mtime_nsec>
+default to C<UTIME_NOW>.
 
 =item C<getdate>
 
@@ -674,7 +696,13 @@ hostname = gethostname();
 
 (int_sec, int_usec, val_sec, val_usec) = getitimer(which);
 
-I<which> is one of C<ITIMER_REAL>, C<ITIMER_VIRTUAL>, C<ITIMER_PROF>.
+I<which> can be one of C<ITIMER_REAL>, C<ITIMER_VIRTUAL>, C<ITIMER_PROF>.
+
+POSIX.1-2008 marks C<getitimer()> and C<setitimer()> obsolete, recommending
+the use of the POSIX timers API (L<C<timer_gettime()>|"timer_gettime">,
+L<C<timer_settime()>|"timer_settime">, etc.)  instead.
+
+POSIX.1-2024 removed C<getitimer()> and C<setitimer()>.
 
 =item C<getpriority>
 
@@ -699,26 +727,26 @@ uid = getuid();
 
 (user, id, line, pid, type, sec, usec) = getutxent();
 
-getutxent() reads a line from the current file position in the utmp file.
+C<getutxent()> reads a line from the current file position in the utmp file.
 
 =item C<getutxid>
 
 (user, id, line, pid, type, sec, usec) = getutxid(ut_type, ut_id);
 
-getutxid() searches forward from the current file position in the utmp file
+C<getutxid()> searches forward from the current file position in the utmp file
 based upon I<ut_type> and I<ut_id>. If I<ut_type> is one of C<RUN_LVL>,
-C<BOOT_TIME>, C<NEW_TIME>, or C<OLD_TIME>, getutxid() will find the first
+C<BOOT_TIME>, C<NEW_TIME>, or C<OLD_TIME>, C<getutxid()> will find the first
 entry whose I<ut_type> field matches I<ut_type>. If I<ut_type> is one of
 C<INIT_PROCESS>, C<LOGIN_PROCESS>, C<USER_PROCESS>, or C<DEAD_PROCESS>,
-getutxid() will find the first entry whose I<ut_id> field matches I<ut_id>.
+C<getutxid()> will find the first entry whose I<ut_id> field matches I<ut_id>.
 
 =item C<getutxline>
 
 (user, id, line, pid, type, sec, usec) = getutxline(ut_line);
 
-getutxline() searches forward from the current file position in the utmp file.
-It scans entries whose I<ut_type> is C<USER_PROCESS> or C<LOGIN_PROCESS> and
-returns the first one whose I<ut_line> field matches I<ut_line>.
+C<getutxline()> searches forward from the current file position in the utmp
+file. It scans entries whose I<ut_type> is C<USER_PROCESS> or C<LOGIN_PROCESS>
+and returns the first one whose I<ut_line> field matches I<ut_line>.
 
 =item C<hypot>
 
@@ -744,7 +772,8 @@ Like POSIX::isalpha() but returns 0 for the empty string.
 
 ret = isascii(charstring);
 
-POSIX.1-2008 marks it as obsolete, but I include it anyway.
+POSIX.1-2008 marks it as obsolete and it was removed in POSIX.1-2024, but I
+include it anyway.
 
 I<New in version 0.19.>
 
@@ -996,9 +1025,17 @@ mrand48();
 
 =item C<nanosleep>
 
-(rem_sec, rem_nsec) = nanosleep(sec, nsec);
+(rem_sec, rem_nsec) = nanosleep(floating_sec);
+floating_rem_sec = nanosleep(floating_sec);
 
-In scalar context returns the remaining seconds as a floating point number.
+(rem_sec, rem_nsec) = nanosleep(sec, nsec);
+floating_rem_sec = nanosleep(sec, nsec);
+
+Returns zero(es) on success, the remaining time on EINTR, the empty list or
+undef otherwise.
+
+I<Changed in version 0.25:> Sleep time can be floating seconds only or seconds
+and nanoseconds.
 
 =item C<nearbyint>
 
@@ -1072,14 +1109,49 @@ I<New in version 0.18.>
 
 ret = pathconf(what, name);
 
-C<what> can be a path or, if your system supports fpathconf(), a Perl file or
-directory handle or a file descriptor.
+I<what> can be a path or, if your system supports C<fpathconf()>, a Perl file
+or directory handle or a file descriptor.
 
 I<name> is one of the C<_PC_*> integer constants.
 
 Returns undef on error.
 
 I<New in version 0.22.>
+
+=item C<poll>
+
+ret = poll(pollfds, timeout=-1);
+
+I<timeout> specifies the number of milliseconds that C<poll()> should block
+waiting for a file descriptor to become ready. A negative I<timeout> value
+means an infinite timeout. A I<timeout> of zero causes C<poll()> to return
+immediately.
+
+I<pollfds> is an array reference holding array references of the form I<[fd,
+events, revents]> where I<fd> is an integer file descriptor or a file handle,
+I<events> is a bit mask of events you are interested in for I<fd>, and
+I<revents> is a bit mask of events that actually occurred.
+
+I<revents> is changed by the call (unless a timeout or error occurs),
+everything else remains unchanged.
+
+If I<fd> is negative or anything sv_2io() doesn't consider a file handle then
+the corresponding events field is ignored and the revents field returns zero.
+
+Returns the number of elements in I<pollfds> whose I<revents> have been set to
+a non-zero value, zero if the call timed out, -1 on error.
+
+Usage example:
+
+  open my $pipe, '-|', qw(tail -f /var/log/messages);
+  my $pollfds = [[\*STDIN, POLLIN, 0], [2, POLLOUT, 0], [$pipe, POLLIN, 0]];
+  my $rv = poll($pollfds, -1);
+
+  # Skip events for fd 2 this time:
+  my $pollfds = [[\*STDIN, POLLIN, 0], [-2, POLLOUT, 0], [$pipe, POLLIN, 0]];
+  my $rv = poll($pollfds, -1);
+
+I<New in version 0.25.>
 
 =item C<posix_fadvise>
 
@@ -1147,6 +1219,12 @@ manpage for details). I<flags> is set to 0 if omitted or undef.
 This syscall is Linux-specific.
 
 I<New in version 0.20.>
+
+=item C<psignal>
+
+psignal(sig, msg);
+
+I<New in version 0.25.>
 
 =item C<ptsname>
 
@@ -1225,8 +1303,8 @@ ret = raise(sig);
 
 bytes_read = read(fd, buf, count);
 
-Like C<POSIX::read()> but returns 0 at EOF instead of I<"0 but true">. Croaks
-if I<buf> is read-only and I<count> is non-zero.
+Like C<POSIX::read()> but returns 0 at EOF instead of C<0 but true>. Croaks if
+I<buf> is read-only and I<count> is non-zero.
 
 I<Changed in version 0.22:> Croak with read-only I<buf> and non-zero I<count>.
 
@@ -1391,9 +1469,16 @@ ret = setgid(gid);
 
 =item C<setitimer>
 
-(old_int_sec, old_int_usec, old_val_sec, old_val_usec) = setitimer(which, int_sec, int_usec, val_sec, val_usec);
+(old_int_sec, old_int_usec, old_val_sec, old_val_usec) = setitimer(which,
+int_sec, int_usec, val_sec, val_usec);
 
 I<which> is one of C<ITIMER_REAL>, C<ITIMER_VIRTUAL>, C<ITIMER_PROF>.
+
+POSIX.1-2008 marks C<getitimer()> and C<setitimer()> obsolete, recommending
+the use of the POSIX timers API (L<C<timer_gettime()>|"timer_gettime">,
+L<C<timer_settime()>|"timer_settime">, etc.)  instead.
+
+POSIX.1-2024 removed C<getitimer()> and C<setitimer()>.
 
 =item C<setpriority>
 
@@ -1434,9 +1519,15 @@ setutxent();
 
 ret = sighold(sig);
 
+POSIX.1-2008 marks this function as obsolete, recommending the use of
+L<POSIX/"sigprocmask"> instead.
+
 =item C<sigignore>
 
 ret = sigignore(sig);
+
+POSIX.1-2008 marks this function as obsolete, recommending the use of
+L<POSIX/"sigaction"> instead. Or use C<$SIG{SIG} = 'IGNORE';>.
 
 =item C<signbit>
 
@@ -1446,9 +1537,15 @@ b = signbit(x);
 
 sigpause(sig);
 
+POSIX.1-2008 marks this function as obsolete, recommending the use of
+L<POSIX/"sigsuspend"> instead.
+
 =item C<sigrelse>
 
 ret = sigrelse(sig);
+
+POSIX.1-2008 marks this function as obsolete, recommending the use of
+L<POSIX/"sigprocmask"> instead.
 
 =item C<sin>
 
@@ -1473,12 +1570,14 @@ srandom(seed);
 (dev, ino, mode, nlink, uid, gid, rdev, size, atim_sec, mtim_sec, ctim_sec,
 blksize, blocks, atim_nsec, mtim_nsec, ctim_nsec) = stat(what);
 
-C<what> can be a path, a Perl file handle or a file descriptor.
+I<what> can be a path, a Perl file handle or a file descriptor.
 
-C<ctim_sec>, C<blksize>, C<blocks> and nanoseconds may not be available on
-your system. Values outside Perl's internal integer range are returned as
-strings, i.e. if you need the exact values you should, for example, use C<eq>
-instead of C<==> for comparisons.
+I<ctim_sec>, I<blksize>, I<blocks> and nanoseconds may not be available on
+your system.
+
+Values outside Perl's internal integer range are returned as strings, i.e. if
+you need the exact values you should, for example, use C<eq> instead of C<==>
+for comparisons.
 
 Note that C<CORE::stat()> lies to you in some cases: It returns I<rdev> as a
 signed integer even if your OS's C<dev_t> is unsigned. It returns I<size> as
@@ -1490,6 +1589,25 @@ C<POSIX::2008::stat()> doesn't mimic these bugs and uses the correct data types
 for all values.
 
 Returns the empty list on error.
+
+=item C<statvfs>
+
+(f_bsize, f_frsize, f_blocks, f_bfree, f_bavail, f_files, f_ffree, f_favail,
+f_fsid, f_flag, f_namemax) = statvfs(what);
+
+I<what> can be a path, a Perl file handle or a file descriptor.
+
+Values outside Perl's internal integer range are returned as strings as with
+L<C<stat()>|"stat">. Note that L<Filesys::Statvfs|Filesys::Statvfs> returns
+only floating point numbers which may give wrong results, and it lacks
+I<f_fsid>.
+
+Only the ST_NOSUID and ST_RDONLY flags of the I<f_flag> field are specified
+in POSIX but this module provides additional ST_ flags if available.
+
+Returns the empty list on error.
+
+I<New in version 0.25.>
 
 =item C<strptime>
 
@@ -1519,7 +1637,14 @@ will only be processed up to the first NUL byte.
 
 I<New in version 0.02.>
 
-I<Changed in version 0.24:> Accept an array reference as the third argument.
+I<Changed in version 0.24:> Accept an array reference as the third argument
+(L<https://rt.cpan.org/Public/Bug/Display.html?id=66519>).
+
+=item C<strsignal>
+
+str = strsignal(sig);
+
+I<New in version 0.25.>
 
 =item C<symlink>
 
@@ -1613,7 +1738,7 @@ I<New in version 0.16.>
 
 ret = truncate(what, length);
 
-C<what> can be a path, a Perl file handle, or a file descriptor.
+I<what> can be a path, a Perl file handle, or a file descriptor.
 
 Note that it does not flush the file handle before truncating. Perl's built-in
 truncate() does (this is undocumented, probably because it's silly).
@@ -1721,10 +1846,11 @@ available:
  :is      All is* functions like isdigit() etc.
  :rw      read(), readv(), write(), writev()
  :prw     pread(), preadv(), preadv2(), pwrite(), pwritev(), pwritev2()
- :clock   All clock* functions and CLOCK_ constants
+ :clock   All clock* functions and CLOCK_ constants and TIMER_ABSTIME
  :fcntl   All F_, FD_, O_, POSIX_FADV_, SEEK_, _OK constants (for AT_ use :at)
  :fenv_h  All FE_ constants and fe* functions
  :fnm     fnmatch() and all FNM_ constants
+ :poll    poll() and all POLL constants
  :stat_h  All S_I* and UTIME_ constants
  :time_h  All CLOCK_ and TIMER_ constants
  :timer   All timer_ functions and TIMER_ constants
@@ -1739,6 +1865,8 @@ I<New in version 0.20:> :fenv_h export tag.
 
 I<New in version 0.22:> :confstr, :pathconf, :sysconf export tags.
 
+I<New in version 0.25:> :poll export tag.
+
 =head1 CONSTANTS
 
 C<AT_EACCESS> C<AT_EMPTY_PATH> C<AT_FDCWD> C<AT_NO_AUTOMOUNT> C<AT_REMOVEDIR>
@@ -1750,12 +1878,13 @@ C<RESOLVE_NO_SYMLINKS> C<RESOLVE_NO_XDEV>
 C<ACCOUNTING> C<EMPTY> C<BOOT_TIME> C<NEW_TIME> C<OLD_TIME> C<DEAD_PROCESS>
 C<INIT_PROCESS> C<LOGIN_PROCESS> C<USER_PROCESS> C<RUN_LVL>
 
-C<CLOCK_BOOTTIME> C<CLOCK_HIGHRES> C<CLOCK_MONOTONIC>
+C<CLOCK_BOOTTIME> C<CLOCK_BOOTTIME_ALARM> C<CLOCK_HIGHRES> C<CLOCK_MONOTONIC>
 C<CLOCK_MONOTONIC_COARSE> C<CLOCK_MONOTONIC_FAST> C<CLOCK_MONOTONIC_PRECISE>
 C<CLOCK_MONOTONIC_RAW> C<CLOCK_PROCESS_CPUTIME_ID> C<CLOCK_REALTIME>
-C<CLOCK_REALTIME_COARSE> C<CLOCK_REALTIME_FAST> C<CLOCK_REALTIME_PRECISE>
-C<CLOCK_SOFTTIME> C<CLOCK_THREAD_CPUTIME_ID> C<CLOCK_UPTIME>
-C<CLOCK_UPTIME_FAST> C<CLOCK_UPTIME_PRECISE>
+C<CLOCK_REALTIME_ALARM> C<CLOCK_REALTIME_COARSE> C<CLOCK_REALTIME_FAST>
+C<CLOCK_REALTIME_PRECISE> C<CLOCK_SOFTTIME> C<CLOCK_TAI>
+C<CLOCK_THREAD_CPUTIME_ID> C<CLOCK_UPTIME> C<CLOCK_UPTIME_FAST>
+C<CLOCK_UPTIME_PRECISE>
 
 C<F_DUPFD> C<F_DUPFD_CLOEXEC> C<F_GETFD> C<F_SETFD> C<F_GETFL>
 C<F_SETFL> C<F_GETLK> C<F_SETLK> C<F_SETLKW> C<F_GETOWN> C<F_SETOWN>
@@ -1780,6 +1909,12 @@ C<O_NONBLOCK> C<O_NOSIGPIPE> C<O_PATH> C<O_RDONLY> C<O_REGULAR>
 C<O_RESOLVE_BENEATH> C<O_RDWR> C<O_RSYNC> C<O_SEARCH> C<O_SHLOCK> C<O_SYNC>
 C<O_TMPFILE> C<O_TRUNC> C<O_TTY_INIT> C<O_WRONLY> C<FASYNC>
 
+C<POLLIN> C<POLLRDNORM> C<POLLRDBAND> C<POLLPRI> C<POLLOUT> C<POLLWRNORM>
+C<POLLWRBAND> C<POLLERR> C<POLLHUP> C<POLLNVAL>
+
+C<INFTIM> C<POLLFREE> C<POLLMSG> C<POLLNORM> C<POLLRDHUP> C<POLLREMOVE>
+C<POLL_BUSY_LOOP>
+
 C<POSIX_FADV_NORMAL> C<POSIX_FADV_SEQUENTIAL> C<POSIX_FADV_RANDOM>
 C<POSIX_FADV_NOREUSE> C<POSIX_FADV_WILLNEED> C<POSIX_FADV_DONTNEED>
 
@@ -1797,6 +1932,16 @@ C<S_IFMT> C<S_IFBLK> C<S_IFCHR> C<S_IFIFO> C<S_IFREG> C<S_IFDIR> C<S_IFLNK>
 C<S_IFSOCK> C<S_ISUID> C<S_ISGID> C<S_IRWXU> C<S_IRUSR> C<S_IWUSR> C<S_IXUSR>
 C<S_IRWXG> C<S_IRGRP> C<S_IWGRP> C<S_IXGRP> C<S_IRWXO> C<S_IROTH> C<S_IWOTH>
 C<S_IXOTH> C<S_ISVTX>
+
+C<ST_NOSUID> C<ST_RDONLY>
+
+C<ST_MANDLOCK> C<ST_NOATIME> C<ST_NODEV> C<ST_NODIRATIME> C<ST_NOEXEC>
+C<ST_RELATIME> C<ST_SYNCHRONOUS>
+
+C<ST_ASYNC> C<ST_DEFEXPORTED> C<ST_EXKERB> C<ST_EXNORESPORT> C<ST_EXPORTANON>
+C<ST_EXPORTED> C<ST_EXPUBLIC> C<ST_EXRDONLY> C<ST_LOCAL> C<ST_LOG>
+C<ST_NOCOREDUMP> C<ST_NODEVMTIME> C<ST_QUOTA> C<ST_ROOTFS> C<ST_SYMPERM>
+C<ST_UNION>
 
 C<UTIME_NOW> C<UTIME_OMIT>
 
@@ -1926,9 +2071,10 @@ automatically. You have to take care of that yourself if needed.
 C<isalnum()> and friends were cowardly removed from the POSIX module with Perl
 5.24.0. They have found a cozy home here with a fix for a long-standing bug.
 
-C<SEEK_DATA> and C<SEEK_HOLE> are nonstandard extensions present in Linux,
-Solaris, FreeBSD, and DragonFly BSD; they are proposed for inclusion in the
-next POSIX revision (Issue 8).
+C<SEEK_DATA> and C<SEEK_HOLE> were added to C<unistd.h> in
+L<POSIX.1-2024|https://pubs.opengroup.org/onlinepubs/9799919799/> (Issue
+8). Before that, they were nonstandard extensions present in Linux, Solaris,
+FreeBSD, and DragonFly BSD.
 
 For some inexplicable reason, Perl forbids you to use the built-in C<chmod()>
 and C<chown()> on an C<opendir()> handle and to use C<readdir()> and

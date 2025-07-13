@@ -1,3 +1,35 @@
+1.229 2025-07-12
+================
+
+[Quiq::Mustang]
+* business-rule.txt: Bezeichner für Bussiness Terms korrigiert
+* getResult(). Methode überarbeitet
+
+[Quiq::Path]
+* getFirst(): Fehlermeldung korrigiert
+
+[Quiq::Sdoc::Producer]
+* link(), linkDefs(): Attribut target hinzugefügt
+* segment(): Methode hinzugefügt
+
+[Quiq::StreamServe::Stream]
+* Doku erweitert
+
+[Quiq::Test::Class]
+* Doku erweitert
+
+[Quiq::Tree]
+* blessNodes(): Skalare Referenzen werden durch ihren skalaren Wert aufgelöst
+
+[Quiq::Zugferd]
+* Template EN16931 erweitert
+* business-group.csv: erweitert
+* business-term.csv: erweitert
+* processSubTree(): Doku verbessert
+
+[Quiq::Zugferd::Tree]
+* processSubTree(): Methode hinzugefügt
+
 1.228 2025-06-22
 ================
 [Quiq::Html::FrameSet}

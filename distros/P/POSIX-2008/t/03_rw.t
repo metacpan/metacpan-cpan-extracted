@@ -54,7 +54,7 @@ SKIP: {
   if (! defined &POSIX::2008::pwrite) {
     sysseek $fh, 0, 0;
     cmp_ok(syswrite($fh, '333444'), '==', 6, '... syswrite(fh) bytes written (fallback)');
-    skip 'pwrite() UNAVAILABLE', 2;
+    skip 'pwrite() UNAVAILABLE', 6;
   }
   my $rv = eval { POSIX::2008::pwrite($fh, 'foo', -3, 0) };
   ok(!$rv && $@ =~ /negative/, 'pwrite fails due to negative size');
@@ -71,7 +71,7 @@ SKIP: {
     sysseek $fh, 0, 0;
     cmp_ok(sysread($fh, $buf, 6), '==', 6, '... sysread(fh) bytes read (fallback)');
     cmp_ok($buf, 'eq', '333444', '... sysread(fh) string read (fallback)');
-    skip 'pread() UNAVAILABLE', 3;
+    skip 'pread() UNAVAILABLE', 5;
   }
   my $rv = eval { POSIX::2008::pread($fh, my $buf, -3, 0) };
   ok(!$rv && $@ =~ /negative/, 'pread fails due to negative size');

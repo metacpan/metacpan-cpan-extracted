@@ -25,8 +25,6 @@ $log->trace( 'Created libvirt client application layer' );
 await $virt->auth();
 $log->trace( 'Authenticated' );
 
-await $virt->open;
-
 try {
     my $es = await $virt->domain_event_register_any(
         $virt->DOMAIN_EVENT_ID_LIFECYCLE);

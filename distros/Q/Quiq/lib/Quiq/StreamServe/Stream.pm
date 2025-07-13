@@ -38,7 +38,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.228';
+our $VERSION = '1.229';
 
 use Quiq::StreamServe::Block;
 use Quiq::FileHandle;
@@ -120,11 +120,26 @@ sub new {
 
 # -----------------------------------------------------------------------------
 
-=head3 split() - Zerlege (Multi-)Streamdatei in Einzelstreams
+=head3 split() - Zerlege (Multi-)Stream in Einzelstreams
 
 =head4 Synopsis
 
   @arr | $arrA = $class->split($file);
+  @arr | $arrA = $class->split(\$data);
+
+=head4 Arguments
+
+=over 4
+
+=item $file
+
+Stream-Datei
+
+=item $data
+
+Stream-Daten
+
+=back
 
 =head4 Returns
 
@@ -132,8 +147,8 @@ sub new {
 
 =head4 Description
 
-Zerlege die (Multi-)Streamdatei in Einzelstreams und liefere die Liste
-der Einzelstreams zurück.
+Zerlege einen (Multi-)Stream (aus Datei oder In-Memory-Daten)
+in Einzelstreams und liefere die Liste der Einzelstreams zurück.
 
 =cut
 
@@ -338,7 +353,7 @@ sub blocks {
             $arrA = [];
         }
         else {
-            $self->thow(
+            $self->throw(
                 'STREAMSERVE-00099: Block does not exist',
                 Prefix => $prefix,
             );
@@ -378,7 +393,7 @@ sub allBlocks {
 
 =head1 VERSION
 
-1.228
+1.229
 
 =head1 AUTHOR
 

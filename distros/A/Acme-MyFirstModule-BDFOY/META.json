@@ -54,7 +54,8 @@
          "requires" : {
             "Test::Builder" : "1.001006",
             "Test::Builder::Tester" : "1.04",
-            "Test::More" : "1"
+            "Test::More" : "1",
+            "version" : "0.86"
          }
       }
    },
@@ -70,6 +71,6 @@
          "web" : "https://github.com/briandfoy/Acme-MyFirstModule-BDFOY"
       }
    },
-   "version" : "0.023",
+   "version" : "0.024",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

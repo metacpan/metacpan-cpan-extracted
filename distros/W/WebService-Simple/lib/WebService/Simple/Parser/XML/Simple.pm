@@ -17,7 +17,7 @@ sub new {
 
 sub parse_response {
     my $self = shift;
-    $self->{xs}->XMLin( $_[0]->decoded_content );
+    $self->{xs}->parse_string( $_[0]->decoded_content );
 }
 
 1;

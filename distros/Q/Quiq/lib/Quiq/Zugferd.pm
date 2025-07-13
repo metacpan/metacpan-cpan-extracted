@@ -41,7 +41,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.228';
+our $VERSION = '1.229';
 
 use Quiq::PerlModule;
 use Quiq::Path;
@@ -240,11 +240,11 @@ sub createInvoice {
 
 # -----------------------------------------------------------------------------
 
-=head3 processSubTree() - Verarbeite einen Subbaum
+=head3 processSubTree() - Verarbeite Subbaum
 
 =head4 Synopsis
 
-  $xmlA = $zug->processSubTree($name,\@arr,sub {
+  $treeA = $zug->processSubTree($name,\@arr,sub {
       my ($zug,$t,$h,$i) = @_;
       ...
       $t->resolvePlaceholders(
@@ -268,18 +268,18 @@ Name des Subbaums
 
 =item @arr
 
-Liste der Elemente, aus denen die Platzhalter im Subbaum
-ersetzt werden.
+Liste der Elemente, über die iteriert wird, um Teilbäume (mit
+ersetzten Platzhaltern) zu erzeugen.
 
 =item sub {}
 
-Subroutine, die die Einsetzung in einen Subbaum vornimmt
+Subroutine, die die Einsetzung in jeweils einen Subbaum vornimmt
 
 =back
 
 =head4 Returns
 
-(Object) Subbaum mit ersetzen Platzhaltern
+(Object) (Sub-)Baum mit ersetzen Platzhaltern
 
 =head4 Description
 
@@ -438,9 +438,9 @@ sub resolvePlaceholders {
 
     # Wandele den Baum in XML
     my $xml = $wrt->($doc,$tree);
-    
 
     # Liefere das XML formatiert
+    $xml =~ s/\x2//g; # CTRL-B herausfiltern => Quiq Fix
     return Quiq::Xml->print($xml);
 }
 
@@ -726,7 +726,7 @@ sub zugferdDir {
 
 =head1 VERSION
 
-1.228
+1.229
 
 =head1 AUTHOR
 

@@ -16,9 +16,22 @@ use Object::Pad;  # no version
          sub x { $def = $def; }
       }
 EOPERL
-      'class scope implies use strict' );
+      'class scope with no import version implies use strict' );
    like( $@, qr/^Global symbol "\$def" requires explicit package name /,
       'message from failure of use strict' );
+}
+
+{
+   no strict;
+
+   ok( eval <<'EOPERL',
+      use Object::Pad 0.821;
+      class TestNotStrict {
+         sub x { $def = $def; }
+      }
+EOPERL
+      'class scope with import version 0.821 does not imply use strict' )
+         or diag( "Code failed to compile - $@" );
 }
 
 {

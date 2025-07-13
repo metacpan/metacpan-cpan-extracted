@@ -1,5 +1,17 @@
 -----
 
+0.1.1    2025-07-13
+   [Fixed]
+       * Removed undeclared dependency Carp::Always
+
+0.1.0    2025-07-12
+   [Changed]
+       * Rewritten to use Object::Pad instead of blessed hashes as objects
+         This should not be breaking as the API remained the same.
+   [Fixed]
+       * eg/wait-domain-state.pl: domain name now taken from command line
+         (removed hard-coded domain name)
+
 0.0.21   2025-07-11
    [Changed]
        * Updated to libvirt tag v11.5.0 (from v11.4.0)

@@ -27,8 +27,9 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.228';
+our $VERSION = '1.229';
 
+use Quiq::Storable;
 use Quiq::Tree;
 use Quiq::AnsiColor;
 
@@ -99,6 +100,72 @@ sub getSubTree {
     $self->setDeep($keyPath,$placeholder);
 
     return bless $tree,'Quiq::Zugferd::Tree';
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 processSubTree() - Verarbeite Subbaum
+
+=head4 Synopsis
+
+  $treeA = $ztr->processSubTree($path,$placeholder,\@arr,sub {
+      my ($ztr,$h,$i) = @_;
+      ...
+      $t->resolvePlaceholders(
+          @keyVal
+      );
+  
+      return $t;
+  });
+
+=head4 Arguments
+
+=over 4
+
+=item $path
+
+Pfad zum Subbaum
+
+=item $placeholder
+
+Platzhalter, der in den Baum $ztr unter dem Pfad $path eingesetzt wird.
+
+=item @arr
+
+Liste der Elemente, aus denen die Platzhalter im Subbaum
+ersetzt werden.
+
+=item sub {}
+
+Subroutine, die die Einsetzung in einen Subbaum vornimmt
+
+=back
+
+=head4 Returns
+
+(Object) (Sub-)Baum mit ersetzen Platzhaltern
+
+=head4 Description
+
+Ersetze im Subbaum $name die Platzhalter aus den Elementen von @arr.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub processSubTree {
+    my ($self,$path,$placeholder,$arr,$sub) = @_;
+
+    my $t0 = $self->getSubTree($path,$placeholder);
+
+    my $i = 0;
+    my @arr;
+    for my $e (@$arr) {
+        my $t = Quiq::Storable->clone($t0);
+        push @arr,$sub->($self,$t,$e,$i++);
+    }
+
+    return \@arr;
 }
 
 # -----------------------------------------------------------------------------
@@ -247,16 +314,6 @@ sub resolvePlaceholders {
 
     # Operation ausführen
 
-    if (0) { # Debug
-        my @keys = map {$_->[0]}
-            sort {$a->[1] <=> $b->[1] or $a->[0] cmp $b->[0]}
-            map {[$_,/-(\d+)/]}
-            keys %map;
-        for my $key (@keys) {
-            say "$key => $map{$key}";
-        }
-    }
-
     # * Prüfe, dass kein Schlüssel doppelt vorkommen
 
     my %seen; # gesehene Platzhalter
@@ -304,7 +361,7 @@ sub resolvePlaceholders {
     if (@arr) {
         $self->throw(
             'TREE-00099: Non-existent Placeholders',
-            Placeholders => join('. ',@arr),
+            Placeholders => join(', ',@arr),
         );
     }
 
@@ -315,7 +372,7 @@ sub resolvePlaceholders {
 
 =head1 VERSION
 
-1.228
+1.229
 
 =head1 AUTHOR
 

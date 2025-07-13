@@ -30,7 +30,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.228';
+our $VERSION = '1.229';
 
 use Scalar::Util ();
 use Quiq::AnsiColor;
@@ -66,6 +66,10 @@ Abbildung von Typ $type auf Klasse $class
 Durchlaufe die Datenstruktur $ref rekursiv und blesse Knoten
 vom Typ $type auf Klasse $class.
 
+B<ACHTUNG>: Wir eleminieren skalare Referenzen. In einem JSON-Baum
+(erzeugt von JSON::decode_json() können Referenzen \1 und \0 als
+Repräsentation von true und false vorkommen.
+
 =head4 Example
 
   $class->blessNodes($ref,{
@@ -97,6 +101,12 @@ sub blessNodes {
         for my $e (@$ref) {
             $class->blessNodes($e,$typeH);
         }
+    }
+    elsif ($type eq 'SCALAR') {
+        # Wir eleminieren skalare Referenzen. In einem JSON-Baum (erzeugt
+        # von JSON::decode_json() können Referenzen \1 und \0 als
+        # Repräsentation von true und false vorkommen.
+        $ref = $$ref;
     }
     else {
         $class->throw(
@@ -398,7 +408,7 @@ sub setLeafValue {
 
 =head1 VERSION
 
-1.228
+1.229
 
 =head1 AUTHOR
 

@@ -14,144 +14,139 @@ use v5.26;
 use warnings;
 use experimental 'signatures';
 use Future::AsyncAwait;
+use Object::Pad 0.821;
 
-package Sys::Async::Virt::Stream v0.0.21;
+class Sys::Async::Virt::Stream v0.1.1 :repr(HASH);
 
-use parent qw( IO::Async::Notifier );
+inherit IO::Async::Notifier;
 
 use Carp qw(croak);
 use Future::Queue;
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::Remote::XDR v0.0.21;
+use Protocol::Sys::Virt::Remote::XDR v0.1.1;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
-sub new($class, %args) {
-    return bless {
-        id => $args{id},
-        proc => $args{proc},
-        client => $args{client},
-        direction => $args{direction},
-        max_items => $args{max_items},
-        pending_error => undef,
-    }, $class;
-}
+field $_id :param :reader;
+field $_proc :param :reader;
+field $_client :param :reader;
+field $_direction :param :reader;
+field $_max_items :param :reader;
+field $_pending_error = undef;
+field $_finished = undef;
+field $_queue = undef;
 
-sub _add_to_loop($self, $loop) {
-    $self->{finished} = $loop->new_future;
-    $self->{queue}    = Future::Queue->new(
+method _add_to_loop($loop) {
+    $_finished = $loop->new_future;
+    $_queue    = Future::Queue->new(
         prototype => sub { $self->new_future },
-        max_items => $self->{max_items},
+        max_items => $_max_items,
         );
     $self->SUPER::_add_to_loop($loop);
 }
 
-sub direction($self) {
-    return $self->{direction};
-}
-
-async sub receive($self) {
-    if ($self->{direction} eq 'send') {
+async method receive() {
+    if ($_direction eq 'send') {
         die "Receive called on sending stream (id: $self->{id}";
     }
-    if (my $e = $self->{pending_error}) {
-        $self->{pending_error} = undef;
+    if (my $e = $_pending_error) {
+        $_pending_error = undef;
         die $e;
     }
 
-    return { data => '' } if $self->{finished}->is_ready; # stop all reads
-    await $self->{queue}->shift;
+    return { data => '' } if $_finished->is_ready; # stop all reads
+    await $_queue->shift;
 }
 
-async sub _dispatch_receive($self, $data, $final) {
-    return if $self->{finished}->is_ready; # discard all input
+async method _dispatch_receive($data, $final) {
+    return if $_finished->is_ready; # discard all input
     if ($final) {
-        $self->{finished}->done;
+        $_finished->done;
         return;
     }
-    if ($self->{direction} eq 'send') {
+    if ($_direction eq 'send') {
         die;
     }
 
     # throttle receiving if the queue gets too long
-    await $self->{queue}->push($data);
+    await $_queue->push($data);
 }
 
-async sub _dispatch_error($self, $error) {
-    return if $self->{finished}->is_ready; # discard all input
-    $self->{finished}->done;
-    unless ($self->{pending_error}) {
-        $self->{pending_error} = $error;
+async method _dispatch_error($error) {
+    return if $_finished->is_ready; # discard all input
+    $_finished->done;
+    unless ($_pending_error) {
+        $_pending_error = $error;
     }
     return;
 }
 
-async sub send($self, $data, $offset = 0, $length = undef) {
-    if ($self->{direction} eq 'receive') {
+async method send($data, $offset = 0, $length = undef) {
+    if ($_direction eq 'receive') {
         die "'send' called on receiving stream (id: $self->{id}";
     }
-    if (my $e = $self->{pending_error}) {
-        $self->{pending_error} = undef;
+    if (my $e = $_pending_error) {
+        $_pending_error = undef;
         die $e;
     }
-    return if $self->{finished}->is_ready; # discard all transfers
+    return if $_finished->is_ready; # discard all transfers
 
-    return await $self->{client}->_send(
-        $self->{proc}, $self->{id},
+    return await $_client->_send(
+        $_proc, $_id,
         data => ($offset or $length) ? substr($data, $offset, $length) : $data );
 }
 
-async sub send_hole($self, $length, $flags = 0) {
-    if ($self->{direction} eq 'receive') {
+async method send_hole($length, $flags = 0) {
+    if ($_direction eq 'receive') {
         die "'send_hole' called on receiving stream (id: $self->{id}";
     }
-    if (my $e = $self->{pending_error}) {
-        $self->{pending_error} = undef;
+    if (my $e = $_pending_error) {
+        $_pending_error = undef;
         die $e;
     }
 
-    return if $self->{finished}->is_ready; # discard all transfers
-    return await $self->{client}->_send(
-        $self->{proc}, $self->{id},
+    return if $_finished->is_ready; # discard all transfers
+    return await $_client->_send(
+        $_proc, $_id,
         hole => { length => $length, flags => $flags } );
 }
 
-async sub abort($self) {
-    await $self->{client}->_send_finish( $self->{proc}, $self->{id}, 1 );
-    await $self->{finished};
+async method abort() {
+    await $_client->_send_finish( $_proc, $_id, 1 );
+    await $_finished;
 
     $self->cleanup;
-    if (my $e = $self->{pending_error}) {
-        $self->{pending_error} = undef;
+    if (my $e = $_pending_error) {
+        $_pending_error = undef;
         die $e;
     }
     return;
 }
 
-sub cleanup($self) {
-    delete $self->{_streams}->{$self->{id}};
+method cleanup() {
+    $_client->_remove_stream( $_id );
     $self->remove_from_parent;
-    $self->{queue} = undef;
-    $self->{finished}->done
-        unless $self->{finished}->is_ready;
+    $_queue = undef;
+    $_finished->done
+        unless $_finished->is_ready;
 
     return;
 }
 
-async sub finish($self) {
-    await $self->{client}->_send_finish( $self->{proc}, $self->{id}, 0 );
-    await $self->{finished};
+async method finish() {
+    await $_client->_send_finish( $_proc, $_id, 0 );
+    await $_finished;
 
     $self->cleanup;
-    if (my $e = $self->{pending_error}) {
-        $self->{pending_error} = undef;
+    if (my $e = $_pending_error) {
+        $_pending_error = undef;
         die $e;
     }
     return;
 }
 
-sub DESTROY($self) {
-    if (not $self->{finished}->is_ready) {
+method DESTROY() {
+    if (not $_finished->is_ready) {
         $self->abort->retain;
     }
 }
@@ -166,7 +161,7 @@ Sys::Async::Virt::Stream - Client side of a data transfer channel
 
 =head1 VERSION
 
-v0.0.21
+v0.1.1
 
 =head1 SYNOPSIS
 

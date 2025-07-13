@@ -38,8 +38,8 @@
         <ram:Name>BT-153</ram:Name>
         <ram:Description></ram:Description>
         <ram:ApplicableProductCharacteristic>
-          <ram:Description></ram:Description>
-          <ram:Value></ram:Value>
+          <ram:Description>BT-160</ram:Description>
+          <ram:Value>BT-161</ram:Value>
         </ram:ApplicableProductCharacteristic>
         <ram:DesignatedProductClassification>
           <ram:ClassCode listID="" listVersionID=""></ram:ClassCode>

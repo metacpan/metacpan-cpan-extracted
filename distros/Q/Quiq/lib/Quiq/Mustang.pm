@@ -45,7 +45,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.228';
+our $VERSION = '1.229';
 
 use Quiq::Path;
 use Quiq::PerlModule;
@@ -54,7 +54,6 @@ use Quiq::Assert;
 use Quiq::Html::Producer;
 use Quiq::Html::List;
 use Quiq::Html::Page;
-use JSON ();
 
 # -----------------------------------------------------------------------------
 
@@ -231,6 +230,7 @@ sub validate {
   
   ($status,$text) = $mus->getResult($pattern,'text');
   ($status,$ruleH) = $mus->getResult($pattern,'hash');
+  ($status,$html) = $mus->getResult($pattern,'hash');
 
 =head4 Arguments
 
@@ -251,6 +251,52 @@ Typ des Returnwerts:
 =item 'hash'
 
 =item 'html'
+
+=back
+
+=back
+
+=head4 Returns
+
+=over 4
+
+=item $status
+
+Status der Validierung. Mögliche Werte:
+
+=over 4
+
+=item Z<>0
+
+Validierung war erfolgreich.
+
+=item Z<>1
+
+Es sind bei der Validierung Fehler aufgetreten.
+
+=item Z<>2
+
+Es liegt kein Validierungsergebis vor.
+
+=back
+
+=item $val
+
+Detailinformation. Mögliche Werte:
+
+=over 4
+
+=item $text
+
+Textuelle Beschreibung.
+
+=item $ruleH
+
+Hash der verletzten Regeln.
+
+=item $html
+
+Beschreibung in HTML.
 
 =back
 
@@ -287,20 +333,13 @@ sub getResult {
     my %rule;
 
     my ($resultFile) = $p->glob($pattern);
-    if (!$resultFile) {
+    if (!$resultFile || !$p->exists($resultFile) || !$p->size($resultFile)) {
         # Es liegt kein Mustang Validierungsergebnis vor
 
-        (my $jsonPattern = $pattern) =~ s/_result\.xml/json/;
-        my ($jsonFile) = $p->glob($jsonPattern);
-        if ($jsonFile) {
-            my $json = $p->read($jsonFile);
-            my $h = eval {JSON::decode_json($json)};
-            if ($@) {
-                $status = 1;
-                $text = "JSON is invalid\n";
-                $rule{'JSON_INV'}++;
-            }
-        }        
+        $status = 2;
+        $text = $language eq 'de'? "Es liegt kein Validierungsergebnis vor\n":
+            "No validation result\n";
+        $rule{'NO_VALIDATION_RESULT'}++;
     }
     else {
         # Es liegt ein Mustang Validierungsergebnis vor
@@ -323,7 +362,7 @@ sub getResult {
                 }
                 $path .= $1;
             }
-            my $br;
+            my $br = 'NOT_FOUND';
             my ($msg) = $error =~ m|>(.*)</|;
             if ($msg =~ /^\[(.*?)\]/) {
                 $br = $1;
@@ -395,6 +434,14 @@ sub getResult {
         );
         return ($status,$html);
     }
+    else {
+        $self->throw(
+            'MUSTANG-00099: Unknown result type',
+            ResultType => $as,
+        );
+    }
+
+    # not reached
 }
 
 # -----------------------------------------------------------------------------
@@ -639,7 +686,7 @@ sub mustangDir {
 
 =head1 VERSION
 
-1.228
+1.229
 
 =head1 AUTHOR
 

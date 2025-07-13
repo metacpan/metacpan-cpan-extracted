@@ -16,11 +16,13 @@ no warnings qw(void);
 use experimental 'signatures';
 use Feature::Compat::Try;
 use Future::AsyncAwait;
-use Sublike::Extended 0.29 'sub'; # From XS-Parse-Sublike, used by Future::AsyncAwait
+use Object::Pad 0.821;
+use Sublike::Extended 0.29 'method', 'sub'; # From XS-Parse-Sublike, used by Future::AsyncAwait
 
-package Sys::Async::Virt v0.0.21;
+class Sys::Async::Virt v0.1.1 :repr(HASH);
 
-use parent qw(IO::Async::Notifier);
+inherit IO::Async::Notifier;
+
 
 use Carp qw(croak);
 use Future;
@@ -36,22 +38,22 @@ use Protocol::Sys::Virt::Remote v11.5.0;
 use Protocol::Sys::Virt::Transport v11.5.0;
 use Protocol::Sys::Virt::URI v11.5.0; # imports parse_url
 
-use Sys::Async::Virt::Connection::Factory v0.0.21;
-use Sys::Async::Virt::Domain v0.0.21;
-use Sys::Async::Virt::DomainCheckpoint v0.0.21;
-use Sys::Async::Virt::DomainSnapshot v0.0.21;
-use Sys::Async::Virt::Network v0.0.21;
-use Sys::Async::Virt::NetworkPort v0.0.21;
-use Sys::Async::Virt::NwFilter v0.0.21;
-use Sys::Async::Virt::NwFilterBinding v0.0.21;
-use Sys::Async::Virt::Interface v0.0.21;
-use Sys::Async::Virt::StoragePool v0.0.21;
-use Sys::Async::Virt::StorageVol v0.0.21;
-use Sys::Async::Virt::NodeDevice v0.0.21;
-use Sys::Async::Virt::Secret v0.0.21;
+use Sys::Async::Virt::Connection::Factory v0.1.1;
+use Sys::Async::Virt::Domain v0.1.1;
+use Sys::Async::Virt::DomainCheckpoint v0.1.1;
+use Sys::Async::Virt::DomainSnapshot v0.1.1;
+use Sys::Async::Virt::Network v0.1.1;
+use Sys::Async::Virt::NetworkPort v0.1.1;
+use Sys::Async::Virt::NwFilter v0.1.1;
+use Sys::Async::Virt::NwFilterBinding v0.1.1;
+use Sys::Async::Virt::Interface v0.1.1;
+use Sys::Async::Virt::StoragePool v0.1.1;
+use Sys::Async::Virt::StorageVol v0.1.1;
+use Sys::Async::Virt::NodeDevice v0.1.1;
+use Sys::Async::Virt::Secret v0.1.1;
 
-use Sys::Async::Virt::Callback v0.0.21;
-use Sys::Async::Virt::Stream v0.0.21;
+use Sys::Async::Virt::Callback v0.1.1;
+use Sys::Async::Virt::Stream v0.1.1;
 
 use constant {
     CLOSE_REASON_ERROR                                  => 0,
@@ -290,57 +292,97 @@ use constant {
 
 
 
-sub _no_translation {
-    shift; # $client
-    return @_;
+field $_domains            = {};
+field $_domain_checkpoints = {};
+field $_domain_snapshots   = {};
+field $_networks           = {};
+field $_network_ports      = {};
+field $_nwfilters          = {};
+field $_nwfilter_bindings  = {};
+field $_interfaces         = {};
+field $_storage_pools      = {};
+field $_storage_vols       = {};
+field $_node_devices       = {};
+field $_secrets            = {};
+field $_callbacks          = {};
+field $_streams            = {};
+
+# cached host data:
+field $_maplen                  = 0; # length of the cpu map in bytes
+field $_cpus                    = 0; # number of cpus in the hypervisor
+field $_typed_param_string_okay = undef;
+
+
+field $_url           :param = $ENV{LIBVIRT_DEFAULT_URI};
+field $_readonly      :param = undef;
+field $_connection    :param = undef;
+field $_transport     :param = undef;
+field $_remote        :param = undef;
+field $_factory       :param = undef;
+field $_keepalive     :param = undef;
+field $_ping_interval :param = 60;
+
+field $_on_close      :param = sub {};
+field $_on_stream     :param = undef;
+field $_on_message    :param = sub {};
+
+field $_keepalive_future = undef;
+field $_pump_future      = undef;
+field $_state            = 'DISCONNECTED'; # state machine
+field $_substate         = ''; # when _state=='CONNECTED'
+field $_replies          = {};
+
+
+method _no_translation(@args) {
+    return @args;
 }
 
-sub _translate_remote_nonnull_domain {
-    $_[0]->_domain_instance( $_[1] );
+method _translate_remote_nonnull_domain($dom, @) {
+    $self->_domain_instance( $dom );
 }
 
-sub _translate_remote_nonnull_domain_checkpoint {
-    $_[0]->_domain_checkpoint_instance( $_[1] );
+method _translate_remote_nonnull_domain_checkpoint($checkpoint, @) {
+    $self->_domain_checkpoint_instance( $checkpoint );
 }
 
-sub _translate_remote_nonnull_domain_snapshot {
-    $_[0]->_domain_snapshot_instance( $_[1] );
+method _translate_remote_nonnull_domain_snapshot($snapshot, @) {
+    $self->_domain_snapshot_instance( $snapshot );
 }
 
-sub _translate_remote_nonnull_network {
-    $_[0]->_network_instance( $_[1] );
+method _translate_remote_nonnull_network($network, @) {
+    $self->_network_instance( $network );
 }
 
-sub _translate_remote_nonnull_network_port {
-    $_[0]->_network_port_instance( $_[1] );
+method _translate_remote_nonnull_network_port($network_port, @) {
+    $self->_network_port_instance( $network_port );
 }
 
-sub _translate_remote_nonnull_nwfilter {
-    $_[0]->_network_nwfilter_instance( $_[1] );
+method _translate_remote_nonnull_nwfilter($nwfilter, @) {
+    $self->_network_nwfilter_instance( $nwfilter );
 }
 
-sub _translate_remote_nonnull_nwfilter_binding {
-    $_[0]->_network_nwfilter_binding_instance( $_[1] );
+method _translate_remote_nonnull_nwfilter_binding($binding, @) {
+    $self->_network_nwfilter_binding_instance( $binding );
 }
 
-sub _translate_remote_nonnull_interface {
-    $_[0]->_network_interface_instance( $_[1] );
+method _translate_remote_nonnull_interface($interface, @) {
+    $self->_network_interface_instance( $interface );
 }
 
-sub _translate_remote_nonnull_storage_pool {
-    $_[0]->_storage_pool_instance( $_[1] );
+method _translate_remote_nonnull_storage_pool($pool, @) {
+    $self->_storage_pool_instance( $pool );
 }
 
-sub _translate_remote_nonnull_storage_vol {
-    $_[0]->_storage_vol_instance( $_[1] );
+method _translate_remote_nonnull_storage_vol($vol, @) {
+    $self->_storage_vol_instance( $vol );
 }
 
-sub _translate_remote_nonnull_node_device {
-    $_[0]->_node_device_instance( $_[1] );
+method _translate_remote_nonnull_node_device($device, @) {
+    $self->_node_device_instance( $device );
 }
 
-sub _translate_remote_nonnull_secret {
-    $_[0]->_secret_instance( $_[1] );
+method _translate_remote_nonnull_secret($secret, @) {
+    $self->_secret_instance( $secret );
 }
 
 my @reply_translators = (
@@ -891,61 +933,7 @@ sub _secret_factory {
     return Sys::Async::Virt::Secret->new( @_ );
 }
 
-sub new($class, %args) {
-    my $self = bless {
-        _domains => {},
-        _domain_checkpoints => {},
-        _domain_snapshots   => {},
-        _networks => {},
-        _network_ports => {},
-        _nwfilters => {},
-        _nwfilter_bindings => {},
-        _interfaces => {},
-        _storage_pools => {},
-        _storage_vols => {},
-        _node_devices => {},
-        _secrets => {},
-        _callbacks => {},
-
-        _state    => 'DISCONNECTED', # state machine
-        _substate => '', # when _state=='CONNECTED'
-        _replies  => {},
-        _streams  => {},
-
-        # cached host data:
-        _maplen   => 0, # length of the cpu map in bytes
-        _cpus     => 0, # number of cpus in the hypervisor
-
-        domain_factory            => \&_domain_factory,
-        domain_checkpoint_factory => \&_domain_checkpoint_factory,
-        domain_snapshot_factory   => \&_domain_snapshot_factory,
-        network_factory           => \&_network_factory,
-        network_port_factory      => \&_network_port_factory,
-        nwfilter_factory          => \&_nwfilter_factory,
-        nwfilter_binding_factory  => \&_nwfilter_binding_factory,
-        interface_factory         => \&_interface_factory,
-        storage_pool_factory      => \&_storage_pool_factory,
-        storage_vol_factory       => \&_storage_vol_factory,
-        node_device_factory       => \&_node_device_factory,
-        secret_factory            => \&_secret_factory,
-
-        url           => $args{url} // $ENV{LIBVIRT_DEFAULT_URI},
-        readonly      => $args{readonly},
-        connection    => $args{connection},
-        transport     => $args{transport},
-        remote        => $args{remote},
-        factory       => $args{factory},
-        keepalive     => $args{keepalive},
-        ping_interval => $args{ping_interval} // 60,
-
-        on_close   => $args{on_close} // sub {},
-        on_stream  => $args{on_stream},
-    }, $class;
-
-    return $self;
-}
-
-sub _domain_instance($self, $id) {
+method _domain_instance($id) {
     # Use $id->{id} as part of the cache key so we return a different domain
     # instance between the cases where the server includes an 'id' and where
     # it does not, such as:
@@ -956,171 +944,171 @@ sub _domain_instance($self, $id) {
     # an 'id' because it's running.
     my $dom_id = $id->{id} // '';
     my $key = "$dom_id/$id->{uuid}";
-    my $c = $self->{_domains}->{$key};
+    my $c = $_domains->{$key};
     unless ($c) {
-        $c = $self->{_domains}->{$key} = $self->{domain_factory}->(
+        $c = $_domains->{$key} = _domain_factory(
             client => $self,
-            remote => $self->{remote},
+            remote => $_remote,
             id => $id );
-       weaken $self->{_domains}->{$key};
+        weaken $_domains->{$key};
     }
     return $c;
 }
 
-sub _domain_checkpoint_instance($self, $id) {
+method _domain_checkpoint_instance($id) {
     my $key = "$id->{dom}->{uuid}/$id->{name}";
-    my $c = $self->{_domain_checkpoints}->{$key};
+    my $c = $_domain_checkpoints->{$key};
     unless ($c) {
-        $c = $self->{_domain_checkpoints}->{$key} =
-            $self->{domain_checkpoint_factory}->(
+        $c = $_domain_checkpoints->{$key} =
+            _domain_checkpoint_factory(
                 client => $self,
-                remote => $self->{remote},
+                remote => $_remote,
                 id => $id );
-        weaken $self->{_domain_checkpoints}->{$key};
+        weaken $_domain_checkpoints->{$key};
     }
     return $c;
 }
 
-sub _domain_snapshot_instance($self, $id) {
+method _domain_snapshot_instance($id) {
     my $key = "$id->{dom}->{uuid}/$id->{name}";
-    my $c = $self->{_domain_snapshots}->{$id->{uuid}};
+    my $c = $_domain_snapshots->{$id->{uuid}};
     unless ($c) {
-        $c = $self->{_domain_snapshots}->{$id->{uuid}} =
-            $self->{domain_snapshot_factory}->(
+        $c = $_domain_snapshots->{$id->{uuid}} =
+            _domain_snapshot_factory(
                 client => $self,
-                remote => $self->{remote},
+                remote => $_remote,
                 id => $id );
-        weaken $self->{_domain_snapshots}->{$id->{uuid}};
+        weaken $_domain_snapshots->{$id->{uuid}};
     }
     return $c;
 }
 
-sub _network_instance($self, $id) {
-    my $c = $self->{_networks}->{$id->{uuid}};
+method _network_instance($id) {
+    my $c = $_networks->{$id->{uuid}};
     unless ($c) {
-        $c = $self->{_networks}->{$id->{uuid}} =
-            $self->{network_factory}->(
+        $c = $_networks->{$id->{uuid}} =
+            network_factory(
                 client => $self,
-                remote => $self->{remote},
+                remote => $_remote,
                 id => $id );
-        weaken $self->{_networks}->{$id->{uuid}};
+        weaken $_networks->{$id->{uuid}};
     }
     return $c;
 }
 
-sub _network_port_instance($self, $id) {
-    my $c = $self->{_network_ports}->{$id->{uuid}};
+method _network_port_instance($id) {
+    my $c = $_network_ports->{$id->{uuid}};
     unless ($c) {
-        $c = $self->{_network_ports}->{$id->{uuid}} =
-            $self->{network_port_factory}->(
+        $c = $_network_ports->{$id->{uuid}} =
+            network_port_factory(
                 client => $self,
-                remote => $self->{remote},
+                remote => $_remote,
                 id => $id );
-        weaken $self->{_network_ports}->{$id->{uuid}};
+        weaken $_network_ports->{$id->{uuid}};
     }
     return $c;
 }
 
-sub _nwfilter_instance($self, $id) {
-    my $c = $self->{_nwfilters}->{$id->{uuid}};
+method _nwfilter_instance($id) {
+    my $c = $_nwfilters->{$id->{uuid}};
     unless ($c) {
-        $c = $self->{_nwfilters}->{$id->{uuid}} =
-            $self->{nwfilter_factory}->(
+        $c = $_nwfilters->{$id->{uuid}} =
+            nwfilter_factory(
                 client => $self,
-                remote => $self->{remote},
+                remote => $_remote,
                 id => $id );
-        weaken $self->{_nwfilters}->{$id->{uuid}};
+        weaken $_nwfilters->{$id->{uuid}};
     }
     return $c;
 }
 
-sub _nwfilter_binding_instance($self, $id) {
+method _nwfilter_binding_instance($id) {
     my $key = "$id->{portdev}/$id->{filtername}";
-    my $c = $self->{_nwfilter_bindings}->{$key};
+    my $c = $_nwfilter_bindings->{$key};
     unless ($c) {
-        $c = $self->{_nwfilter_bindings}->{$key} =
-            $self->{nwfilter_binding_factory}->(
+        $c = $_nwfilter_bindings->{$key} =
+            nwfilter_binding_factory(
                 client => $self,
-                remote => $self->{remote},
+                remote => $_remote,
                 id => $id );
-        weaken $self->{_nwfilter_bindings}->{$key};
+        weaken $_nwfilter_bindings->{$key};
     }
     return $c;
 }
 
-sub _interface_instance($self, $id) {
+method _interface_instance($id) {
     my $key = "$id->{mac}/$id->{name}";
-    my $c = $self->{_interfaces}->{$key};
+    my $c = $_interfaces->{$key};
     unless ($c) {
-        $c = $self->{_interfaces}->{$key} =
-            $self->{interface_factory}->(
+        $c = $_interfaces->{$key} =
+            interface_factory(
                 client => $self,
-                remote => $self->{remote},
+                remote => $_remote,
                 id => $id );
-        weaken $self->{_interfaces}->{$key};
+        weaken $_interfaces->{$key};
     }
     return $c;
 }
 
-sub _storage_pool_instance($self, $id) {
-    my $c = $self->{_storage_pools}->{$id->{uuid}};
+method _storage_pool_instance($id) {
+    my $c = $_storage_pools->{$id->{uuid}};
     unless ($c) {
-        $c = $self->{_storage_pools}->{$id->{uuid}} =
-            $self->{storage_pool_factory}->(
+        $c = $_storage_pools->{$id->{uuid}} =
+            storage_pool_factory(
                 client => $self,
-                remote => $self->{remote},
+                remote => $_remote,
                 id => $id );
-        weaken $self->{_storage_pools}->{$id->{uuid}};
+        weaken $_storage_pools->{$id->{uuid}};
     }
     return $c;
 }
 
-sub _storage_vol_instance($self, $id) {
-    my $c = $self->{_storage_vols}->{$id->{key}};
+method _storage_vol_instance($id) {
+    my $c = $_storage_vols->{$id->{key}};
     unless ($c) {
-        $c = $self->{_storage_vols}->{$id->{key}} =
-            $self->{storage_vol_factory}->(
+        $c = $_storage_vols->{$id->{key}} =
+            storage_vol_factory->(
                 client => $self,
-                remote => $self->{remote},
+                remote => $_remote,
                 id => $id );
-        weaken $self->{_storage_vols}->{$id->{key}};
+        weaken $_storage_vols->{$id->{key}};
     }
     return $c;
 }
 
-sub _node_device_instance($self, $id) {
-    my $c = $self->{_node_devices}->{$id->{name}};
+method _node_device_instance($id) {
+    my $c = $_node_devices->{$id->{name}};
     unless ($c) {
-        $c = $self->{_node_devices}->{$id->{name}} =
-            $self->{node_device_factory}->(
+        $c = $_node_devices->{$id->{name}} =
+            node_device_factory(
                 client => $self,
-                remote => $self->{remote},
+                remote => $_remote,
                 id => $id );
-        weaken $self->{_node_devices}->{$id->{name}};
+        weaken $_node_devices->{$id->{name}};
     }
     return $c;
 }
 
-sub _secret_instance($self, $id) {
-    my $c = $self->{_secrets}->{$id->{uuid}};
+method _secret_instance($id) {
+    my $c = $_secrets->{$id->{uuid}};
     unless ($c) {
-        $c = $self->{_secrets}->{$id->{uuid}} =
-            $self->{secret_factory}->(
+        $c = $_secrets->{$id->{uuid}} =
+            secret_factory(
                 client => $self,
-                remote => $self->{remote},
+                remote => $_remote,
                 id => $id );
-        weaken $self->{_secrets}->{$id->{uuid}};
+        weaken $_secrets->{$id->{uuid}};
     }
     return $c;
 }
 
-async sub _call($self, $proc, $args = {}, :$unwrap = '', :$stream = '', :$empty = '') {
+async method _call($proc, $args = {}, :$unwrap = '', :$stream = '', :$empty = '') {
     die $log->fatal( "RPC call without remote connection (proc: $proc)" )
         unless $self->is_connected;
-    my $serial = await $self->{remote}->call( $proc, $args );
+    my $serial = await $_remote->call( $proc, $args );
     my $f = $self->loop->new_future;
     $log->trace( "Setting serial $serial future (proc: $proc)" );
-    $self->{_replies}->{$serial} = $f;
+    $_replies->{$serial} = $f;
     ### Return a stream somehow...
     my @rv = await $f;
     $rv[0] = $rv[0]->{$unwrap} if $unwrap;
@@ -1132,8 +1120,8 @@ async sub _call($self, $proc, $args = {}, :$unwrap = '', :$stream = '', :$empty 
             client => $self,
             direction => ($stream eq 'write' ? 'send' : 'receive'),
             );
-        $self->{_streams}->{$serial} = $s;
-        weaken $self->{_streams}->{$serial};
+        $_streams->{$serial} = $s;
+        weaken $_streams->{$serial};
         $self->add_child( $s );
 
         push @rv, $s;
@@ -1141,12 +1129,12 @@ async sub _call($self, $proc, $args = {}, :$unwrap = '', :$stream = '', :$empty 
     return @rv;
 }
 
-async sub _from_cpumap($self, $cpumap, $offset = 0) {
+async method _from_cpumap($cpumap, $offset = 0) {
     my $cpus = await $self->_cpus;
     return [ map { vec( $cpumap, $offset+$_, 1 ) } 0 .. ($cpus - 1) ];
 }
 
-async sub _to_cpumap($self, $cpuarray) {
+async method _to_cpumap($cpuarray) {
     my $maplen = await $self->_maplen;
     my $map = "\0" x $maplen;
     vec( $map, $cpuarray->[$_] ? 1 : 0, 1 )
@@ -1155,39 +1143,39 @@ async sub _to_cpumap($self, $cpuarray) {
     return $map
 }
 
-async sub _cpus($self) {
-    return $self->{_cpus} if $self->{_cpus};
+async method _cpus() {
+    return $_cpus if $_cpus;
 
     await $self->get_cpu_map;
-    return $self->{_cpus};
+    return $_cpus;
 }
 
-async sub _maplen($self) {
-    return $self->{_maplen} if $self->{_maplen};
+async method _maplen() {
+    return $_maplen if $_maplen;
 
     await $self->get_cpu_map;
-    return $self->{_maplen};
+    return $_maplen;
 }
 
-async sub _send($self, $proc, $serial, %args) {
-    await $self->{remote}->stream(
+async method _send($proc, $serial, :$data = undef, :$hole = undef, %rest) {
+    await $_remote->stream(
         $proc, $serial,
-        data => $args{data},
-        hole => $args{hole});
+        data => $data,
+        hole => $hole);
 }
 
-async sub _send_finish($self, $proc, $serial, $abort) {
-    await $self->{remote}->stream_end($proc, $serial, $abort);
+async method _send_finish($proc, $serial, $abort) {
+    await $_remote->stream_end($proc, $serial, $abort);
 }
 
-async sub _typed_param_string_okay($self) {
-    return $self->{_typed_param_string_okay} //=
+async method _typed_param_string_okay() {
+    return $_typed_param_string_okay //=
         ((await $self->_supports_feature(
-              $self->{remote}->DRV_FEATURE_TYPED_PARAM_STRING ))
+              $_remote->DRV_FEATURE_TYPED_PARAM_STRING ))
          ? $self->TYPED_PARAM_STRING_OKAY : 0);
 }
 
-async sub _filter_typed_param_string($self, $params) {
+async method _filter_typed_param_string($params) {
     return await $self->_typed_param_string_okay
         ? $params
         : [ grep {
@@ -1195,40 +1183,40 @@ async sub _filter_typed_param_string($self, $params) {
             } @$params ];
 }
 
-sub _dispatch_closed($self, @args) {
-    $self->{on_close}->( $self, @args );
+method _dispatch_closed(@args) {
+    $_on_close->( $self, @args );
     # dispatch only once, on first-come-first-serve basis:
-    $self->{on_close} = sub { };
+    $_on_close = sub { };
 }
 
-sub _dispatch_message($self, %args) {
-    if (my $k = $self->{keepalive}) {
-        $k->mark_active;
+method _dispatch_message(:$data = undef, :$header = undef, %args) {
+    if ($_keepalive) {
+        $_keepalive->mark_active;
     }
-    if ($args{data}
-        and defined $args{data}->{callbackID}
-        and my $cb = $self->{_callbacks}->{$args{data}->{callbackID}}) {
+    if ($data
+        and defined $data->{callbackID}
+        and my $cb = $_callbacks->{$data->{callbackID}}) {
 
-        my %cbargs =
-            $reply_translators[$args{header}->{proc}]->( $self, %args );
+        my %cbargs = $reply_translators[$header->{proc}]->(
+            $self, data => $data, header => $header, %args
+            );
         $cb->_dispatch_event($cbargs{data});
     }
     else {
-        my %cbargs =
-            $reply_translators[$args{header}->{proc}]->( $self, %args );
-        $self->{on_message}->( $cbargs{data} );
+        my %cbargs = $reply_translators[$header->{proc}]->( $self, %args );
+        $_on_message->( $cbargs{data} );
     }
 }
 
-sub _dispatch_reply($self, %args) {
-    $log->trace( "Dispatching serial $args{header}->{serial}" );
-    if (my $k = $self->{keepalive}) {
-        $k->mark_active;
+method _dispatch_reply(:$header, %args) {
+    $log->trace( "Dispatching serial $header->{serial}" );
+    if ($_keepalive) {
+        $_keepalive->mark_active;
     }
-    my $f = delete $self->{_replies}->{$args{header}->{serial}};
+    my $f = delete $_replies->{$header->{serial}};
 
     if (exists $args{data}) {
-        my %cbargs = $reply_translators[$args{header}->{proc}]->( $self, %args );
+        my %cbargs = $reply_translators[$header->{proc}]->( $self, header => $header, %args );
         $f->done( $cbargs{data} );
     }
     elsif (exists $args{error}) {
@@ -1241,11 +1229,11 @@ sub _dispatch_reply($self, %args) {
     return;
 }
 
-sub _dispatch_stream($self, %args) {
-    if (my $k = $self->{keepalive}) {
-        $k->mark_active;
+method _dispatch_stream(:$header, %args) {
+    if ($_keepalive) {
+        $_keepalive->mark_active;
     }
-    if (my $stream = $self->{_streams}->{$args{header}->{serial}}) {
+    if (my $stream = $_streams->{$header->{serial}}) {
         if ($args{error}) {
             return $stream->_dispatch_error($args{error});
         }
@@ -1254,24 +1242,24 @@ sub _dispatch_stream($self, %args) {
         }
     }
     else {
-        return $self->{on_stream}->( $self, %args );
+        return $_on_stream->( $self, header => $header, %args );
     }
 }
 
-sub configure($self, %args) {
+method configure(%args) {
     for my $key (keys %args) {
         $self->{$key} = $args{$key} // sub {};
     }
 }
 
-sub register($self, $r) {
+method register($r) {
     $r->configure(
         on_closed  => sub { $self->_dispatch_closed( @_ ) },
         on_message => sub { $self->_dispatch_message( @_ ) },
         on_reply   => sub { $self->_dispatch_reply( @_ ) },
         on_stream  => sub { $self->_dispatch_stream( @_ ) }
         );
-    $self->{remote} = $r;
+    $_remote = $r;
 }
 
 
@@ -1291,58 +1279,58 @@ async sub _pump($conn, $transport) {
     $log->info( 'EOF' );
 }
 
-sub is_connected($self) {
-    return $self->{_state} eq 'CONNECTED';
+method is_connected() {
+    return $_state eq 'CONNECTED';
 }
 
-sub is_opened($self) {
-    return ($self->{_state} eq 'CONNECTED'
-            and $self->{_substate} eq 'OPENED');
+method is_opened() {
+    return ($_state eq 'CONNECTED'
+            and $_substate eq 'OPENED');
+}
+
+method _remove_stream($id) {
+    delete $_streams->{$id};
+    return;
 }
 
 # ENTRYPOINT: REMOTE_PROC_CONNECT_IS_SECURE
-async sub is_secure($self) {
+async method is_secure() {
     return ($self->is_opened
-        and $self->{connection}->is_secure
+        and $_connection->is_secure
         and await $self->_call( $remote->PROC_CONNECT_IS_SECURE,
                                 {}, unwrap => 'secure' ));
 }
 
-async sub connect($self, :$pump = undef) {
-    return if $self->{_state} ne 'DISCONNECTED';
+async method connect(:$pump //= \&_pump) {
+    return if $_state ne 'DISCONNECTED';
 
-    unless ($self->{connection}) {
-        my $factory =
-            $self->{factory} //= Sys::Async::Virt::Connection::Factory->new;
-        my $conn = $factory->create_connection( $self->{url},
-                                                readonly => $self->{readonly} );
-        $self->add_child( $conn );
-        $self->{connection} = $conn;
+    unless ($_connection) {
+        $_factory    //= Sys::Async::Virt::Connection::Factory->new;
+        $_connection = $_factory->create_connection( $_url,
+                                                     readonly => $_readonly );
+        $self->add_child( $_connection );
     }
 
-    unless ($self->{transport}) {
-        my $conn      = $self->{connection};
-        my $transport = Protocol::Sys::Virt::Transport->new(
+    unless ($_transport) {
+        $_transport = Protocol::Sys::Virt::Transport->new(
             role => 'client',
             on_send => async sub($opaque, @data) {
-                await $conn->write( @data );
+                await $_connection->write( @data );
                 return $opaque;
             });
-        $self->{transport} = $transport;
     }
 
-    $self->{remote} //= Protocol::Sys::Virt::Remote->new( role => 'client' );
-    $self->{remote}->register( $self->{transport} );
-    $self->register( $self->{remote} );
+    $_remote //= Protocol::Sys::Virt::Remote->new( role => 'client' );
+    $_remote->register( $_transport );
+    $self->register( $_remote );
 
-    $self->{_state} = 'CONNECTING';
-    await $self->{connection}->connect;
-    $self->{_state} = 'CONNECTED';
-    $self->{_substate} = 'NONE';
+    $_state = 'CONNECTING';
+    await $_connection->connect;
+    $_state    = 'CONNECTED';
+    $_substate = 'NONE';
     $log->trace( "Connected" );
 
-    $pump //= \&_pump;
-    my $f = $pump->( $self->{connection}, $self->{transport} );
+    my $f = $pump->( $_connection, $_transport );
     $self->adopt_future( $f );
     $f->on_done(
         sub {
@@ -1352,11 +1340,11 @@ async sub connect($self, :$pump = undef) {
         sub {
             $self->_close( $self->CLOSE_REASON_ERROR );
         });
-    $self->{_input_pump_future} = $f;
+    $_pump_future = $f;
 
-    $self->{_substate} = 'AUTHENTICATING';
+    $_substate = 'AUTHENTICATING';
     await $self->auth();
-    $self->{_substate} = 'AUTHENTICATED';
+    $_substate = 'AUTHENTICATED';
     $log->trace( "Authenticated" );
     # auth( $auth_type )
     #  --> clients take the selected auth mechanism from the
@@ -1365,8 +1353,8 @@ async sub connect($self, :$pump = undef) {
     # authentication parameter to be passed in though...
 
     if (await $self->_supports_feature(
-            $self->{remote}->DRV_FEATURE_PROGRAM_KEEPALIVE )) {
-        $self->{keepalive} //= Protocol::Sys::Virt::KeepAlive->new(
+            $_remote->DRV_FEATURE_PROGRAM_KEEPALIVE )) {
+        $_keepalive //= Protocol::Sys::Virt::KeepAlive->new(
             max_inactive => 5,
             on_ack       => sub { $log->trace('KeepAlive PING ACK'); return; },
             on_ping      => sub {
@@ -1381,26 +1369,26 @@ async sub connect($self, :$pump = undef) {
                 return;
             });
 
-        $self->{keepalive}->register( $self->{transport} );
+        $_keepalive->register( $_transport );
         my $keep_pump = async sub {
             while (1) {
                 await $self->loop->delay_future(
-                    after => $self->{ping_interval}
+                    after => $_ping_interval
                     );
                 $log->trace('Sending PING');
-                if (my $f = $self->{keepalive}->ping ) {
+                if (my $f = $_keepalive->ping ) {
                     $self->adopt_future( $f );
                 }
             }
         };
         my $f = $keep_pump->();
         $self->adopt_future( $f );
-        $self->{_keepalive_pump_future} = $f;
+        $_keepalive_future = $f;
     }
 
-    $self->{_substate} = 'OPENING';
+    $_substate = 'OPENING';
     await $self->open();
-    $self->{_substate} = 'OPENED';
+    $_substate = 'OPENED';
 
     return;
 }
@@ -1408,10 +1396,10 @@ async sub connect($self, :$pump = undef) {
 
 # ENTRYPOINT: REMOTE_PROC_CONNECT_DOMAIN_EVENT_CALLBACK_REGISTER_ANY
 # ENTRYPOINT: REMOTE_PROC_CONNECT_DOMAIN_EVENT_CALLBACK_DEREGISTER_ANY
-async sub domain_event_register_any($self, $eventID, $domain = undef) {
+async method domain_event_register_any($eventID, $domain = undef) {
     my $rv = await $self->_call(
         $remote->PROC_CONNECT_DOMAIN_EVENT_CALLBACK_REGISTER_ANY,
-        { eventID => $eventID, dom => $domain->{id} });
+        { eventID => $eventID, dom => $domain->id });
     my $dereg = $remote->PROC_CONNECT_DOMAIN_EVENT_CALLBACK_DEREGISTER_ANY;
     my $cb = Sys::Async::Virt::Callback->new(
         id => $rv->{callbackID},
@@ -1419,18 +1407,18 @@ async sub domain_event_register_any($self, $eventID, $domain = undef) {
         deregister_call => $dereg,
         factory => sub { $self->loop->new_future }
         );
-    $self->{_callbacks}->{$rv->{callbackID}} = $cb;
-    weaken $self->{_callbacks}->{$rv->{callbackID}};
+    $_callbacks->{$rv->{callbackID}} = $cb;
+    weaken $_callbacks->{$rv->{callbackID}};
 
     return $cb;
 }
 
 # ENTRYPOINT: REMOTE_PROC_CONNECT_NETWORK_EVENT_REGISTER_ANY
 # ENTRYPOINT: REMOTE_PROC_CONNECT_NETWORK_EVENT_DEREGISTER_ANY
-async sub network_event_register_any($self, $eventID, $network = undef) {
+async method network_event_register_any($eventID, $network = undef) {
     my $rv = await $self->_call(
         $remote->PROC_CONNECT_NETWORK_EVENT_REGISTER_ANY,
-        { eventID => $eventID, net => $network->{id} });
+        { eventID => $eventID, net => $network->id });
     my $dereg = $remote->PROC_CONNECT_NETWORK_EVENT_DEREGISTER_ANY;
     my $cb = Sys::Async::Virt::Callback->new(
         id => $rv->{callbackID},
@@ -1438,17 +1426,17 @@ async sub network_event_register_any($self, $eventID, $network = undef) {
         deregister_call => $dereg,
         factory => sub { $self->loop->new_future }
         );
-    $self->{_callbacks}->{$rv->{callbackID}} = $cb;
+    $_callbacks->{$rv->{callbackID}} = $cb;
 
     return $cb;
 }
 
 # ENTRYPOINT: REMOTE_PROC_CONNECT_STORAGE_POOL_EVENT_REGISTER_ANY
 # ENTRYPOINT: REMOTE_PROC_CONNECT_STORAGE_POOL_EVENT_DEREGISTER_ANY
-async sub storage_pool_event_register_any($self, $eventID, $pool = undef) {
+async method storage_pool_event_register_any($eventID, $pool = undef) {
     my $rv = await $self->_call(
         $remote->PROC_CONNECT_STORAGE_POOL_EVENT_REGISTER_ANY,
-        { eventID => $eventID, pool => $pool->{id} });
+        { eventID => $eventID, pool => $pool->id });
     my $dereg = $remote->PROC_CONNECT_STORAGE_POOL_EVENT_DEREGISTER_ANY;
     my $cb = Sys::Async::Virt::Callback->new(
         id => $rv->{callbackID},
@@ -1456,17 +1444,17 @@ async sub storage_pool_event_register_any($self, $eventID, $pool = undef) {
         deregister_call => $dereg,
         factory => sub { $self->loop->new_future }
         );
-    $self->{_callbacks}->{$rv->{callbackID}} = $cb;
+    $_callbacks->{$rv->{callbackID}} = $cb;
 
     return $cb;
 }
 
 # ENTRYPOINT: REMOTE_PROC_CONNECT_NODE_DEVICE_EVENT_REGISTER_ANY
 # ENTRYPOINT: REMOTE_PROC_CONNECT_NODE_DEVICE_EVENT_DEREGISTER_ANY
-async sub node_device_event_register_any($self, $eventID, $dev = undef) {
+async method node_device_event_register_any($eventID, $dev = undef) {
     my $rv = await $self->_call(
         $remote->PROC_CONNECT_NODE_DEVICE_EVENT_REGISTER_ANY,
-        { eventID => $eventID, dev => $dev->{id} });
+        { eventID => $eventID, dev => $dev->id });
     my $dereg = $remote->PROC_CONNECT_NODE_DEVICE_EVENT_DEREGISTER_ANY;
     my $cb = Sys::Async::Virt::Callback->new(
         id => $rv->{callbackID},
@@ -1474,17 +1462,17 @@ async sub node_device_event_register_any($self, $eventID, $dev = undef) {
         deregister_call => $dereg,
         factory => sub { $self->loop->new_future }
         );
-    $self->{_callbacks}->{$rv->{callbackID}} = $cb;
+    $_callbacks->{$rv->{callbackID}} = $cb;
 
     return $cb;
 }
 
 # ENTRYPOINT: REMOTE_PROC_CONNECT_SECRET_EVENT_REGISTER_ANY
 # ENTRYPOINT: REMOTE_PROC_CONNECT_SECRET_EVENT_DEREGISTER_ANY
-async sub secret_event_register_any($self, $eventID, $secret = undef) {
+async method secret_event_register_any($eventID, $secret = undef) {
     my $rv = await $self->_call(
         $remote->PROC_CONNECT_SECRET_EVENT_REGISTER_ANY,
-        { eventID => $eventID, secret => $secret->{id} });
+        { eventID => $eventID, secret => $secret->id });
     my $dereg = $remote->PROC_CONNECT_SECRET_EVENT_DEREGISTER_ANY;
     my $cb = Sys::Async::Virt::Callback->new(
         id => $rv->{callbackID},
@@ -1492,7 +1480,7 @@ async sub secret_event_register_any($self, $eventID, $secret = undef) {
         deregister_call => $dereg,
         factory => sub { $self->loop->new_future }
         );
-    $self->{_callbacks}->{$rv->{callbackID}} = $cb;
+    $_callbacks->{$rv->{callbackID}} = $cb;
 
     return $cb;
 }
@@ -1500,7 +1488,7 @@ async sub secret_event_register_any($self, $eventID, $secret = undef) {
 # ENTRYPOINT: REMOTE_PROC_AUTH_LIST
 # ENTRYPOINT: REMOTE_PROC_AUTH_POLKIT
 # ENTRYPOINT: REMOTE_PROC_AUTH_SASL_INIT
-async sub auth($self, $auth_type = undef) {
+async method auth($auth_type = undef) {
     my $auth_types = await $self->_call( $remote->PROC_AUTH_LIST, {},
                                          unwrap => 'types' );
 
@@ -1549,58 +1537,58 @@ async sub auth($self, $auth_type = undef) {
 
 # ENTRYPOINT: REMOTE_PROC_CONNECT_OPEN
 # ENTRYPOINT: REMOTE_PROC_CONNECT_REGISTER_CLOSE_CALLBACK
-async sub open($self) {
-    my %parsed_url = parse_url( $self->{url} );
-    my $flags = $self->{readonly} ? RO : 0;
+async method open() {
+    my %parsed_url = parse_url( $_url );
+    my $flags = $_readonly ? RO : 0;
     await $self->_call( $remote->PROC_CONNECT_OPEN,
                         { name => $parsed_url{name}, flags => $flags } );
     if (await $self->_supports_feature(
-            $self->{remote}->DRV_FEATURE_REMOTE_CLOSE_CALLBACK )) {
+            $_remote->DRV_FEATURE_REMOTE_CLOSE_CALLBACK )) {
         await $self->_call( $remote->PROC_CONNECT_REGISTER_CLOSE_CALLBACK );
     }
     if (not await $self->_supports_feature(
-            $self->{remote}->DRV_FEATURE_REMOTE_EVENT_CALLBACK )) {
+            $_remote->DRV_FEATURE_REMOTE_EVENT_CALLBACK )) {
         die "Remote does not support REMOTE_EVENT_CALLBACK feature";
     }
 }
 
 # ENTRYPOINT: REMOTE_PROC_CONNECT_CLOSE
 # ENTRYPOINT: REMOTE_PROC_CONNECT_UNREGISTER_CLOSE_CALLBACK
-async sub _close($self, $reason) {
-    return unless $self->{_state} eq 'CONNECTED';
-    return if ($self->{_substate} eq 'CLOSING'
-               or $self->{_substate} eq 'CLEANING UP');
+async method _close($reason) {
+    return unless $_state eq 'CONNECTED';
+    return if ($_substate eq 'CLOSING'
+               or $_substate eq 'CLEANING UP');
 
-    $self->{_substate} = 'CLEANING UP';
-    unless ($self->{connection}->is_read_eof
-            or $self->{connection}->is_write_eof) {
+    $_substate = 'CLEANING UP';
+    unless ($_connection->is_read_eof
+            or $_connection->is_write_eof) {
         # when orderly connected both for reading and writing,
         # clean up all resources the server allocated for us
         try {
             await Future->wait_all(
                 (map { $_->cancel }
-                 grep values $self->{_callbacks}->%*),
+                 grep values $_callbacks->%*),
                 (map { $_->abort }
-                 grep values $self->{_streams}->%*)
+                 grep values $_streams->%*)
                 );
             $log->debug( 'Unregistering CLOSE CALLBACK' );
             await $self->_call(
                 $remote->PROC_CONNECT_UNREGISTER_CLOSE_CALLBACK );
 
             $log->debug( 'Closing session' );
-            $self->{_substate} = 'CLOSING';
+            $_substate = 'CLOSING';
             await $self->_call( $remote->PROC_CONNECT_CLOSE );
 
             # stop loops reading from and writing to the connection
-            $self->{_keepalive_pump_future}->cancel;
+            $_keepalive_future->cancel;
             my $timeout = $self->loop->delay_future( at => 60 ); # 60s timeout
             $timeout->on_done(
                 sub {
                     $log->info( 'Server failed to close connection timely; '
                                 . 'forcibly closing client socket' );
                 });
-            await Future->await_any( $timeout, $self->{_input_pump_future} );
-            $self->{connection}->close;
+            await Future->await_any( $timeout, $_pump_future );
+            $_connection->close;
         }
         catch ($e) {
             $log->error( "Error during release of server resources: $e" );
@@ -1608,56 +1596,56 @@ async sub _close($self, $reason) {
     }
     else {
         # stop loops reading from and writing to the connection
-        $self->{_keepalive_pump_future}->cancel;
+        $_keepalive_future->cancel;
         my $timeout = $self->loop->delay_future( at => 60 ); # 60s timeout
         $timeout->on_done(
             sub {
                 $log->info( 'Server failed to close connection timely; '
                             . 'forcibly closing client socket' );
             });
-        await Future->await_any( $timeout, $self->{_input_pump_future} );
-        $self->{connection}->close;
+        await Future->await_any( $timeout, $_pump_future );
+        $_connection->close;
     }
 
     # These *should* have been de-allocated above; however,
     # when the connection to the server doesn't work properly
     # anymore, we want to simply discard the client side resources
     # ... the server is on its own
-    if (my @callbacks = values $self->{_callbacks}->%*) {
+    if (my @callbacks = values $_callbacks->%*) {
         $log->debug( 'Cleaning up callbacks not deregistered from the server' );
         for my $cb (@callbacks) {
             # 'cleanup' cleans the items from the array
             $cb->cleanup;
         }
     }
-    if (my @streams = grep values $self->{_streams}->%*) {
+    if (my @streams = grep values $_streams->%*) {
         $log->debug( 'Cleaning up streams not deregistered from the server' );
         for my $stream (@streams) {
             # 'cleanup' cleans the items from the array
             $stream->cleanup;
         }
     }
-    if (my @replies = grep keys $self->{_replies}->%*) {
+    if (my @replies = grep keys $_replies->%*) {
         $log->debug( 'Cleaning up (failing) on-going RPC calls' );
         for my $serial (@replies) {
-            my $reply = delete $self->{_replies}->{$serial};
+            my $reply = delete $_replies->{$serial};
             $reply->fail( 'Closed before reply received' );
         }
     }
 
-    $self->{_state} = 'DISCONNECTED';
-    $self->{_substate} = '';
+    $_state = 'DISCONNECTED';
+    $_substate = '';
     $self->_dispatch_closed( $reason );
     return;
 }
 
-async sub close($self) {
-    return if $self->{_state} ne 'CONNECTED';
+async method close() {
+    return if $_state ne 'CONNECTED';
     await $self->_close( $self->CLOSE_REASON_CLIENT );
 }
 
 # ENTRYPOINT: REMOTE_PROC_NODE_ALLOC_PAGES
-async sub alloc_pages($self, $page_counts, $start_cell, $cell_count, $flags ) {
+async method alloc_pages($page_counts, $start_cell, $cell_count, $flags ) {
     my $rv = await $self->_call(
         $remote->PROC_NODE_ALLOC_PAGES,
         { pageSizes  => [ map { $_->{size} } $page_counts->@* ],
@@ -1670,7 +1658,7 @@ async sub alloc_pages($self, $page_counts, $start_cell, $cell_count, $flags ) {
 }
 
 # ENTRYPOINT: REMOTE_PROC_NODE_GET_CELLS_FREE_MEMORY
-async sub get_cells_free_memory($self, $start_cell, $max_cells) {
+async method get_cells_free_memory($start_cell, $max_cells) {
     my $rv = await $self->_call(
         $remote->PROC_NODE_GET_CELLS_FREE_MEMORY,
         { startCell => $start_cell, maxcells => $max_cells } );
@@ -1679,7 +1667,7 @@ async sub get_cells_free_memory($self, $start_cell, $max_cells) {
 }
 
 # ENTRYPOINT: REMOTE_PROC_NODE_GET_CPU_MAP
-async sub get_cpu_map($self) {
+async method get_cpu_map() {
     my $rv = await $self->_call(
         $remote->PROC_NODE_GET_CPU_MAP,
         { need_map => 1, need_online => 1, flags => 0 } );
@@ -1696,7 +1684,7 @@ async sub get_cpu_map($self) {
 }
 
 # ENTRYPOINT: REMOTE_PROC_NODE_GET_FREE_PAGES
-async sub get_free_pages($self, $pages, $start_cell, $cell_count, $flags = 0) {
+async method get_free_pages($pages, $start_cell, $cell_count, $flags = 0) {
     my $rv = await $self->_call(
         $remote->PROC_NODE_GET_FREE_PAGES,
         { pages => $pages, startCell => $start_cell,
@@ -1720,392 +1708,392 @@ async sub get_free_pages($self, $pages, $start_cell, $cell_count, $flags = 0) {
     return \@rv;
 }
 
-async sub _domain_migrate_finish($self, $dname, $cookie, $uri, $flags = 0) {
+async method _domain_migrate_finish($dname, $cookie, $uri, $flags = 0) {
     return await $self->_call(
         $remote->PROC_DOMAIN_MIGRATE_FINISH,
         { dname => $dname, cookie => $cookie, uri => $uri, flags => $flags // 0 }, unwrap => 'ddom' );
 }
 
-async sub _domain_migrate_finish2($self, $dname, $cookie, $uri, $flags, $retcode) {
+async method _domain_migrate_finish2($dname, $cookie, $uri, $flags, $retcode) {
     return await $self->_call(
         $remote->PROC_DOMAIN_MIGRATE_FINISH2,
         { dname => $dname, cookie => $cookie, uri => $uri, flags => $flags // 0, retcode => $retcode }, unwrap => 'ddom' );
 }
 
-sub _domain_migrate_prepare_tunnel($self, $flags, $dname, $resource, $dom_xml) {
+method _domain_migrate_prepare_tunnel($flags, $dname, $resource, $dom_xml) {
     return $self->_call(
         $remote->PROC_DOMAIN_MIGRATE_PREPARE_TUNNEL,
         { flags => $flags // 0, dname => $dname, resource => $resource, dom_xml => $dom_xml }, stream => 'write', empty => 1 );
 }
 
-async sub _supports_feature($self, $feature) {
+async method _supports_feature($feature) {
     return await $self->_call(
         $remote->PROC_CONNECT_SUPPORTS_FEATURE,
         { feature => $feature }, unwrap => 'supported' );
 }
 
-async sub baseline_cpu($self, $xmlCPUs, $flags = 0) {
+async method baseline_cpu($xmlCPUs, $flags = 0) {
     return await $self->_call(
         $remote->PROC_CONNECT_BASELINE_CPU,
         { xmlCPUs => $xmlCPUs, flags => $flags // 0 }, unwrap => 'cpu' );
 }
 
-async sub baseline_hypervisor_cpu($self, $emulator, $arch, $machine, $virttype, $xmlCPUs, $flags = 0) {
+async method baseline_hypervisor_cpu($emulator, $arch, $machine, $virttype, $xmlCPUs, $flags = 0) {
     return await $self->_call(
         $remote->PROC_CONNECT_BASELINE_HYPERVISOR_CPU,
         { emulator => $emulator, arch => $arch, machine => $machine, virttype => $virttype, xmlCPUs => $xmlCPUs, flags => $flags // 0 }, unwrap => 'cpu' );
 }
 
-async sub compare_cpu($self, $xml, $flags = 0) {
+async method compare_cpu($xml, $flags = 0) {
     return await $self->_call(
         $remote->PROC_CONNECT_COMPARE_CPU,
         { xml => $xml, flags => $flags // 0 }, unwrap => 'result' );
 }
 
-async sub compare_hypervisor_cpu($self, $emulator, $arch, $machine, $virttype, $xmlCPU, $flags = 0) {
+async method compare_hypervisor_cpu($emulator, $arch, $machine, $virttype, $xmlCPU, $flags = 0) {
     return await $self->_call(
         $remote->PROC_CONNECT_COMPARE_HYPERVISOR_CPU,
         { emulator => $emulator, arch => $arch, machine => $machine, virttype => $virttype, xmlCPU => $xmlCPU, flags => $flags // 0 }, unwrap => 'result' );
 }
 
-async sub domain_create_xml($self, $xml_desc, $flags = 0) {
+async method domain_create_xml($xml_desc, $flags = 0) {
     return await $self->_call(
         $remote->PROC_DOMAIN_CREATE_XML,
         { xml_desc => $xml_desc, flags => $flags // 0 }, unwrap => 'dom' );
 }
 
-async sub domain_define_xml($self, $xml) {
+async method domain_define_xml($xml) {
     return await $self->_call(
         $remote->PROC_DOMAIN_DEFINE_XML,
         { xml => $xml }, unwrap => 'dom' );
 }
 
-async sub domain_define_xml_flags($self, $xml, $flags = 0) {
+async method domain_define_xml_flags($xml, $flags = 0) {
     return await $self->_call(
         $remote->PROC_DOMAIN_DEFINE_XML_FLAGS,
         { xml => $xml, flags => $flags // 0 }, unwrap => 'dom' );
 }
 
-async sub domain_lookup_by_id($self, $id) {
+async method domain_lookup_by_id($id) {
     return await $self->_call(
         $remote->PROC_DOMAIN_LOOKUP_BY_ID,
         { id => $id }, unwrap => 'dom' );
 }
 
-async sub domain_lookup_by_name($self, $name) {
+async method domain_lookup_by_name($name) {
     return await $self->_call(
         $remote->PROC_DOMAIN_LOOKUP_BY_NAME,
         { name => $name }, unwrap => 'dom' );
 }
 
-async sub domain_lookup_by_uuid($self, $uuid) {
+async method domain_lookup_by_uuid($uuid) {
     return await $self->_call(
         $remote->PROC_DOMAIN_LOOKUP_BY_UUID,
         { uuid => $uuid }, unwrap => 'dom' );
 }
 
-sub domain_restore($self, $from) {
+method domain_restore($from) {
     return $self->_call(
         $remote->PROC_DOMAIN_RESTORE,
         { from => $from }, empty => 1 );
 }
 
-sub domain_restore_flags($self, $from, $dxml, $flags = 0) {
+method domain_restore_flags($from, $dxml, $flags = 0) {
     return $self->_call(
         $remote->PROC_DOMAIN_RESTORE_FLAGS,
         { from => $from, dxml => $dxml, flags => $flags // 0 }, empty => 1 );
 }
 
-async sub domain_restore_params($self, $params, $flags = 0) {
+async method domain_restore_params($params, $flags = 0) {
     $params = await $self->_filter_typed_param_string( $params );
     return await $self->_call(
         $remote->PROC_DOMAIN_RESTORE_PARAMS,
         { params => $params, flags => $flags // 0 }, empty => 1 );
 }
 
-sub domain_save_image_define_xml($self, $file, $dxml, $flags = 0) {
+method domain_save_image_define_xml($file, $dxml, $flags = 0) {
     return $self->_call(
         $remote->PROC_DOMAIN_SAVE_IMAGE_DEFINE_XML,
         { file => $file, dxml => $dxml, flags => $flags // 0 }, empty => 1 );
 }
 
-async sub domain_save_image_get_xml_desc($self, $file, $flags = 0) {
+async method domain_save_image_get_xml_desc($file, $flags = 0) {
     return await $self->_call(
         $remote->PROC_DOMAIN_SAVE_IMAGE_GET_XML_DESC,
         { file => $file, flags => $flags // 0 }, unwrap => 'xml' );
 }
 
-async sub domain_xml_from_native($self, $nativeFormat, $nativeConfig, $flags = 0) {
+async method domain_xml_from_native($nativeFormat, $nativeConfig, $flags = 0) {
     return await $self->_call(
         $remote->PROC_CONNECT_DOMAIN_XML_FROM_NATIVE,
         { nativeFormat => $nativeFormat, nativeConfig => $nativeConfig, flags => $flags // 0 }, unwrap => 'domainXml' );
 }
 
-async sub domain_xml_to_native($self, $nativeFormat, $domainXml, $flags = 0) {
+async method domain_xml_to_native($nativeFormat, $domainXml, $flags = 0) {
     return await $self->_call(
         $remote->PROC_CONNECT_DOMAIN_XML_TO_NATIVE,
         { nativeFormat => $nativeFormat, domainXml => $domainXml, flags => $flags // 0 }, unwrap => 'nativeConfig' );
 }
 
-async sub find_storage_pool_sources($self, $type, $srcSpec, $flags = 0) {
+async method find_storage_pool_sources($type, $srcSpec, $flags = 0) {
     return await $self->_call(
         $remote->PROC_CONNECT_FIND_STORAGE_POOL_SOURCES,
         { type => $type, srcSpec => $srcSpec, flags => $flags // 0 }, unwrap => 'xml' );
 }
 
-async sub get_all_domain_stats($self, $doms, $stats, $flags = 0) {
+async method get_all_domain_stats($doms, $stats, $flags = 0) {
     return await $self->_call(
         $remote->PROC_CONNECT_GET_ALL_DOMAIN_STATS,
         { doms => $doms, stats => $stats, flags => $flags // 0 }, unwrap => 'retStats' );
 }
 
-async sub get_capabilities($self) {
+async method get_capabilities() {
     return await $self->_call(
         $remote->PROC_CONNECT_GET_CAPABILITIES,
         {  }, unwrap => 'capabilities' );
 }
 
-async sub get_cpu_model_names($self, $arch, $flags = 0) {
+async method get_cpu_model_names($arch, $flags = 0) {
     return await $self->_call(
         $remote->PROC_CONNECT_GET_CPU_MODEL_NAMES,
         { arch => $arch, need_results => $remote->CPU_MODELS_MAX, flags => $flags // 0 }, unwrap => 'models' );
 }
 
-async sub get_domain_capabilities($self, $emulatorbin, $arch, $machine, $virttype, $flags = 0) {
+async method get_domain_capabilities($emulatorbin, $arch, $machine, $virttype, $flags = 0) {
     return await $self->_call(
         $remote->PROC_CONNECT_GET_DOMAIN_CAPABILITIES,
         { emulatorbin => $emulatorbin, arch => $arch, machine => $machine, virttype => $virttype, flags => $flags // 0 }, unwrap => 'capabilities' );
 }
 
-async sub get_hostname($self) {
+async method get_hostname() {
     return await $self->_call(
         $remote->PROC_CONNECT_GET_HOSTNAME,
         {  }, unwrap => 'hostname' );
 }
 
-async sub get_lib_version($self) {
+async method get_lib_version() {
     return await $self->_call(
         $remote->PROC_CONNECT_GET_LIB_VERSION,
         {  }, unwrap => 'lib_ver' );
 }
 
-async sub get_max_vcpus($self, $type) {
+async method get_max_vcpus($type) {
     return await $self->_call(
         $remote->PROC_CONNECT_GET_MAX_VCPUS,
         { type => $type }, unwrap => 'max_vcpus' );
 }
 
-async sub get_storage_pool_capabilities($self, $flags = 0) {
+async method get_storage_pool_capabilities($flags = 0) {
     return await $self->_call(
         $remote->PROC_CONNECT_GET_STORAGE_POOL_CAPABILITIES,
         { flags => $flags // 0 }, unwrap => 'capabilities' );
 }
 
-async sub get_sysinfo($self, $flags = 0) {
+async method get_sysinfo($flags = 0) {
     return await $self->_call(
         $remote->PROC_CONNECT_GET_SYSINFO,
         { flags => $flags // 0 }, unwrap => 'sysinfo' );
 }
 
-async sub get_type($self) {
+async method get_type() {
     return await $self->_call(
         $remote->PROC_CONNECT_GET_TYPE,
         {  }, unwrap => 'type' );
 }
 
-async sub get_uri($self) {
+async method get_uri() {
     return await $self->_call(
         $remote->PROC_CONNECT_GET_URI,
         {  }, unwrap => 'uri' );
 }
 
-async sub get_version($self) {
+async method get_version() {
     return await $self->_call(
         $remote->PROC_CONNECT_GET_VERSION,
         {  }, unwrap => 'hv_ver' );
 }
 
-sub interface_change_begin($self, $flags = 0) {
+method interface_change_begin($flags = 0) {
     return $self->_call(
         $remote->PROC_INTERFACE_CHANGE_BEGIN,
         { flags => $flags // 0 }, empty => 1 );
 }
 
-sub interface_change_commit($self, $flags = 0) {
+method interface_change_commit($flags = 0) {
     return $self->_call(
         $remote->PROC_INTERFACE_CHANGE_COMMIT,
         { flags => $flags // 0 }, empty => 1 );
 }
 
-sub interface_change_rollback($self, $flags = 0) {
+method interface_change_rollback($flags = 0) {
     return $self->_call(
         $remote->PROC_INTERFACE_CHANGE_ROLLBACK,
         { flags => $flags // 0 }, empty => 1 );
 }
 
-async sub interface_define_xml($self, $xml, $flags = 0) {
+async method interface_define_xml($xml, $flags = 0) {
     return await $self->_call(
         $remote->PROC_INTERFACE_DEFINE_XML,
         { xml => $xml, flags => $flags // 0 }, unwrap => 'iface' );
 }
 
-async sub interface_lookup_by_mac_string($self, $mac) {
+async method interface_lookup_by_mac_string($mac) {
     return await $self->_call(
         $remote->PROC_INTERFACE_LOOKUP_BY_MAC_STRING,
         { mac => $mac }, unwrap => 'iface' );
 }
 
-async sub interface_lookup_by_name($self, $name) {
+async method interface_lookup_by_name($name) {
     return await $self->_call(
         $remote->PROC_INTERFACE_LOOKUP_BY_NAME,
         { name => $name }, unwrap => 'iface' );
 }
 
-async sub list_all_domains($self, $flags = 0) {
+async method list_all_domains($flags = 0) {
     return await $self->_call(
         $remote->PROC_CONNECT_LIST_ALL_DOMAINS,
         { need_results => $remote->DOMAIN_LIST_MAX, flags => $flags // 0 }, unwrap => 'domains' );
 }
 
-async sub list_all_interfaces($self, $flags = 0) {
+async method list_all_interfaces($flags = 0) {
     return await $self->_call(
         $remote->PROC_CONNECT_LIST_ALL_INTERFACES,
         { need_results => $remote->INTERFACE_LIST_MAX, flags => $flags // 0 }, unwrap => 'ifaces' );
 }
 
-async sub list_all_networks($self, $flags = 0) {
+async method list_all_networks($flags = 0) {
     return await $self->_call(
         $remote->PROC_CONNECT_LIST_ALL_NETWORKS,
         { need_results => $remote->NETWORK_LIST_MAX, flags => $flags // 0 }, unwrap => 'nets' );
 }
 
-async sub list_all_node_devices($self, $flags = 0) {
+async method list_all_node_devices($flags = 0) {
     return await $self->_call(
         $remote->PROC_CONNECT_LIST_ALL_NODE_DEVICES,
         { need_results => $remote->NODE_DEVICE_LIST_MAX, flags => $flags // 0 }, unwrap => 'devices' );
 }
 
-async sub list_all_nwfilter_bindings($self, $flags = 0) {
+async method list_all_nwfilter_bindings($flags = 0) {
     return await $self->_call(
         $remote->PROC_CONNECT_LIST_ALL_NWFILTER_BINDINGS,
         { need_results => $remote->NWFILTER_BINGING_LIST_MAX, flags => $flags // 0 }, unwrap => 'bindings' );
 }
 
-async sub list_all_nwfilters($self, $flags = 0) {
+async method list_all_nwfilters($flags = 0) {
     return await $self->_call(
         $remote->PROC_CONNECT_LIST_ALL_NWFILTERS,
         { need_results => $remote->NWFILTER_LIST_MAX, flags => $flags // 0 }, unwrap => 'filters' );
 }
 
-async sub list_all_secrets($self, $flags = 0) {
+async method list_all_secrets($flags = 0) {
     return await $self->_call(
         $remote->PROC_CONNECT_LIST_ALL_SECRETS,
         { need_results => $remote->SECRET_LIST_MAX, flags => $flags // 0 }, unwrap => 'secrets' );
 }
 
-async sub list_all_storage_pools($self, $flags = 0) {
+async method list_all_storage_pools($flags = 0) {
     return await $self->_call(
         $remote->PROC_CONNECT_LIST_ALL_STORAGE_POOLS,
         { need_results => $remote->STORAGE_POOL_LIST_MAX, flags => $flags // 0 }, unwrap => 'pools' );
 }
 
-async sub list_defined_domains($self) {
+async method list_defined_domains() {
     return await $self->_call(
         $remote->PROC_CONNECT_LIST_DEFINED_DOMAINS,
         { maxnames => $remote->DOMAIN_LIST_MAX }, unwrap => 'names' );
 }
 
-async sub list_defined_interfaces($self) {
+async method list_defined_interfaces() {
     return await $self->_call(
         $remote->PROC_CONNECT_LIST_DEFINED_INTERFACES,
         { maxnames => $remote->INTERFACE_LIST_MAX }, unwrap => 'names' );
 }
 
-async sub list_defined_networks($self) {
+async method list_defined_networks() {
     return await $self->_call(
         $remote->PROC_CONNECT_LIST_DEFINED_NETWORKS,
         { maxnames => $remote->NETWORK_LIST_MAX }, unwrap => 'names' );
 }
 
-async sub list_defined_storage_pools($self) {
+async method list_defined_storage_pools() {
     return await $self->_call(
         $remote->PROC_CONNECT_LIST_DEFINED_STORAGE_POOLS,
         { maxnames => $remote->STORAGE_POOL_LIST_MAX }, unwrap => 'names' );
 }
 
-async sub list_domains($self) {
+async method list_domains() {
     return await $self->_call(
         $remote->PROC_CONNECT_LIST_DOMAINS,
         { maxids => $remote->DOMAIN_LIST_MAX }, unwrap => 'ids' );
 }
 
-async sub list_interfaces($self) {
+async method list_interfaces() {
     return await $self->_call(
         $remote->PROC_CONNECT_LIST_INTERFACES,
         { maxnames => $remote->INTERFACE_LIST_MAX }, unwrap => 'names' );
 }
 
-async sub list_networks($self) {
+async method list_networks() {
     return await $self->_call(
         $remote->PROC_CONNECT_LIST_NETWORKS,
         { maxnames => $remote->NETWORK_LIST_MAX }, unwrap => 'names' );
 }
 
-async sub list_nwfilters($self) {
+async method list_nwfilters() {
     return await $self->_call(
         $remote->PROC_CONNECT_LIST_NWFILTERS,
         { maxnames => $remote->NWFILTER_LIST_MAX }, unwrap => 'names' );
 }
 
-async sub list_secrets($self) {
+async method list_secrets() {
     return await $self->_call(
         $remote->PROC_CONNECT_LIST_SECRETS,
         { maxuuids => $remote->SECRET_LIST_MAX }, unwrap => 'uuids' );
 }
 
-async sub list_storage_pools($self) {
+async method list_storage_pools() {
     return await $self->_call(
         $remote->PROC_CONNECT_LIST_STORAGE_POOLS,
         { maxnames => $remote->STORAGE_POOL_LIST_MAX }, unwrap => 'names' );
 }
 
-async sub network_create_xml($self, $xml) {
+async method network_create_xml($xml) {
     return await $self->_call(
         $remote->PROC_NETWORK_CREATE_XML,
         { xml => $xml }, unwrap => 'net' );
 }
 
-async sub network_create_xml_flags($self, $xml, $flags = 0) {
+async method network_create_xml_flags($xml, $flags = 0) {
     return await $self->_call(
         $remote->PROC_NETWORK_CREATE_XML_FLAGS,
         { xml => $xml, flags => $flags // 0 }, unwrap => 'net' );
 }
 
-async sub network_define_xml($self, $xml) {
+async method network_define_xml($xml) {
     return await $self->_call(
         $remote->PROC_NETWORK_DEFINE_XML,
         { xml => $xml }, unwrap => 'net' );
 }
 
-async sub network_define_xml_flags($self, $xml, $flags = 0) {
+async method network_define_xml_flags($xml, $flags = 0) {
     return await $self->_call(
         $remote->PROC_NETWORK_DEFINE_XML_FLAGS,
         { xml => $xml, flags => $flags // 0 }, unwrap => 'net' );
 }
 
-async sub network_lookup_by_name($self, $name) {
+async method network_lookup_by_name($name) {
     return await $self->_call(
         $remote->PROC_NETWORK_LOOKUP_BY_NAME,
         { name => $name }, unwrap => 'net' );
 }
 
-async sub network_lookup_by_uuid($self, $uuid) {
+async method network_lookup_by_uuid($uuid) {
     return await $self->_call(
         $remote->PROC_NETWORK_LOOKUP_BY_UUID,
         { uuid => $uuid }, unwrap => 'net' );
 }
 
-async sub node_get_cpu_stats($self, $cpuNum, $flags = 0) {
+async method node_get_cpu_stats($cpuNum, $flags = 0) {
     my $nparams = await $self->_call(
         $remote->PROC_NODE_GET_CPU_STATS,
         { cpuNum => $cpuNum, nparams => 0, flags => $flags // 0 }, unwrap => 'nparams' );
@@ -2114,19 +2102,19 @@ async sub node_get_cpu_stats($self, $cpuNum, $flags = 0) {
         { cpuNum => $cpuNum, nparams => $nparams, flags => $flags // 0 }, unwrap => 'params' );
 }
 
-async sub node_get_free_memory($self) {
+async method node_get_free_memory() {
     return await $self->_call(
         $remote->PROC_NODE_GET_FREE_MEMORY,
         {  }, unwrap => 'freeMem' );
 }
 
-sub node_get_info($self) {
+method node_get_info() {
     return $self->_call(
         $remote->PROC_NODE_GET_INFO,
         {  } );
 }
 
-async sub node_get_memory_parameters($self, $flags = 0) {
+async method node_get_memory_parameters($flags = 0) {
     $flags |= await $self->_typed_param_string_okay();
     my $nparams = await $self->_call(
         $remote->PROC_NODE_GET_MEMORY_PARAMETERS,
@@ -2136,7 +2124,7 @@ async sub node_get_memory_parameters($self, $flags = 0) {
         { nparams => $nparams, flags => $flags // 0 }, unwrap => 'params' );
 }
 
-async sub node_get_memory_stats($self, $cellNum, $flags = 0) {
+async method node_get_memory_stats($cellNum, $flags = 0) {
     my $nparams = await $self->_call(
         $remote->PROC_NODE_GET_MEMORY_STATS,
         { nparams => 0, cellNum => $cellNum, flags => $flags // 0 }, unwrap => 'nparams' );
@@ -2145,13 +2133,13 @@ async sub node_get_memory_stats($self, $cellNum, $flags = 0) {
         { nparams => $nparams, cellNum => $cellNum, flags => $flags // 0 }, unwrap => 'params' );
 }
 
-sub node_get_security_model($self) {
+method node_get_security_model() {
     return $self->_call(
         $remote->PROC_NODE_GET_SECURITY_MODEL,
         {  } );
 }
 
-async sub node_get_sev_info($self, $flags = 0) {
+async method node_get_sev_info($flags = 0) {
     $flags |= await $self->_typed_param_string_okay();
     my $nparams = await $self->_call(
         $remote->PROC_NODE_GET_SEV_INFO,
@@ -2161,189 +2149,189 @@ async sub node_get_sev_info($self, $flags = 0) {
         { nparams => $nparams, flags => $flags // 0 }, unwrap => 'params' );
 }
 
-async sub node_list_devices($self, $cap, $flags = 0) {
+async method node_list_devices($cap, $flags = 0) {
     return await $self->_call(
         $remote->PROC_NODE_LIST_DEVICES,
         { cap => $cap, maxnames => $remote->NODE_DEVICE_LIST_MAX, flags => $flags // 0 }, unwrap => 'names' );
 }
 
-async sub node_num_of_devices($self, $cap, $flags = 0) {
+async method node_num_of_devices($cap, $flags = 0) {
     return await $self->_call(
         $remote->PROC_NODE_NUM_OF_DEVICES,
         { cap => $cap, flags => $flags // 0 }, unwrap => 'num' );
 }
 
-async sub node_set_memory_parameters($self, $params, $flags = 0) {
+async method node_set_memory_parameters($params, $flags = 0) {
     $params = await $self->_filter_typed_param_string( $params );
     return await $self->_call(
         $remote->PROC_NODE_SET_MEMORY_PARAMETERS,
         { params => $params, flags => $flags // 0 }, empty => 1 );
 }
 
-sub node_suspend_for_duration($self, $target, $duration, $flags = 0) {
+method node_suspend_for_duration($target, $duration, $flags = 0) {
     return $self->_call(
         $remote->PROC_NODE_SUSPEND_FOR_DURATION,
         { target => $target, duration => $duration, flags => $flags // 0 }, empty => 1 );
 }
 
-async sub num_of_defined_domains($self) {
+async method num_of_defined_domains() {
     return await $self->_call(
         $remote->PROC_CONNECT_NUM_OF_DEFINED_DOMAINS,
         {  }, unwrap => 'num' );
 }
 
-async sub num_of_defined_interfaces($self) {
+async method num_of_defined_interfaces() {
     return await $self->_call(
         $remote->PROC_CONNECT_NUM_OF_DEFINED_INTERFACES,
         {  }, unwrap => 'num' );
 }
 
-async sub num_of_defined_networks($self) {
+async method num_of_defined_networks() {
     return await $self->_call(
         $remote->PROC_CONNECT_NUM_OF_DEFINED_NETWORKS,
         {  }, unwrap => 'num' );
 }
 
-async sub num_of_defined_storage_pools($self) {
+async method num_of_defined_storage_pools() {
     return await $self->_call(
         $remote->PROC_CONNECT_NUM_OF_DEFINED_STORAGE_POOLS,
         {  }, unwrap => 'num' );
 }
 
-async sub num_of_domains($self) {
+async method num_of_domains() {
     return await $self->_call(
         $remote->PROC_CONNECT_NUM_OF_DOMAINS,
         {  }, unwrap => 'num' );
 }
 
-async sub num_of_interfaces($self) {
+async method num_of_interfaces() {
     return await $self->_call(
         $remote->PROC_CONNECT_NUM_OF_INTERFACES,
         {  }, unwrap => 'num' );
 }
 
-async sub num_of_networks($self) {
+async method num_of_networks() {
     return await $self->_call(
         $remote->PROC_CONNECT_NUM_OF_NETWORKS,
         {  }, unwrap => 'num' );
 }
 
-async sub num_of_nwfilters($self) {
+async method num_of_nwfilters() {
     return await $self->_call(
         $remote->PROC_CONNECT_NUM_OF_NWFILTERS,
         {  }, unwrap => 'num' );
 }
 
-async sub num_of_secrets($self) {
+async method num_of_secrets() {
     return await $self->_call(
         $remote->PROC_CONNECT_NUM_OF_SECRETS,
         {  }, unwrap => 'num' );
 }
 
-async sub num_of_storage_pools($self) {
+async method num_of_storage_pools() {
     return await $self->_call(
         $remote->PROC_CONNECT_NUM_OF_STORAGE_POOLS,
         {  }, unwrap => 'num' );
 }
 
-async sub nwfilter_binding_create_xml($self, $xml, $flags = 0) {
+async method nwfilter_binding_create_xml($xml, $flags = 0) {
     return await $self->_call(
         $remote->PROC_NWFILTER_BINDING_CREATE_XML,
         { xml => $xml, flags => $flags // 0 }, unwrap => 'nwfilter' );
 }
 
-async sub nwfilter_binding_lookup_by_port_dev($self, $name) {
+async method nwfilter_binding_lookup_by_port_dev($name) {
     return await $self->_call(
         $remote->PROC_NWFILTER_BINDING_LOOKUP_BY_PORT_DEV,
         { name => $name }, unwrap => 'nwfilter' );
 }
 
-async sub nwfilter_define_xml($self, $xml) {
+async method nwfilter_define_xml($xml) {
     return await $self->_call(
         $remote->PROC_NWFILTER_DEFINE_XML,
         { xml => $xml }, unwrap => 'nwfilter' );
 }
 
-async sub nwfilter_define_xml_flags($self, $xml, $flags = 0) {
+async method nwfilter_define_xml_flags($xml, $flags = 0) {
     return await $self->_call(
         $remote->PROC_NWFILTER_DEFINE_XML_FLAGS,
         { xml => $xml, flags => $flags // 0 }, unwrap => 'nwfilter' );
 }
 
-async sub nwfilter_lookup_by_name($self, $name) {
+async method nwfilter_lookup_by_name($name) {
     return await $self->_call(
         $remote->PROC_NWFILTER_LOOKUP_BY_NAME,
         { name => $name }, unwrap => 'nwfilter' );
 }
 
-async sub nwfilter_lookup_by_uuid($self, $uuid) {
+async method nwfilter_lookup_by_uuid($uuid) {
     return await $self->_call(
         $remote->PROC_NWFILTER_LOOKUP_BY_UUID,
         { uuid => $uuid }, unwrap => 'nwfilter' );
 }
 
-async sub secret_define_xml($self, $xml, $flags = 0) {
+async method secret_define_xml($xml, $flags = 0) {
     return await $self->_call(
         $remote->PROC_SECRET_DEFINE_XML,
         { xml => $xml, flags => $flags // 0 }, unwrap => 'secret' );
 }
 
-async sub secret_lookup_by_usage($self, $usageType, $usageID) {
+async method secret_lookup_by_usage($usageType, $usageID) {
     return await $self->_call(
         $remote->PROC_SECRET_LOOKUP_BY_USAGE,
         { usageType => $usageType, usageID => $usageID }, unwrap => 'secret' );
 }
 
-async sub secret_lookup_by_uuid($self, $uuid) {
+async method secret_lookup_by_uuid($uuid) {
     return await $self->_call(
         $remote->PROC_SECRET_LOOKUP_BY_UUID,
         { uuid => $uuid }, unwrap => 'secret' );
 }
 
-async sub set_identity($self, $params, $flags = 0) {
+async method set_identity($params, $flags = 0) {
     $params = await $self->_filter_typed_param_string( $params );
     return await $self->_call(
         $remote->PROC_CONNECT_SET_IDENTITY,
         { params => $params, flags => $flags // 0 }, empty => 1 );
 }
 
-async sub storage_pool_create_xml($self, $xml, $flags = 0) {
+async method storage_pool_create_xml($xml, $flags = 0) {
     return await $self->_call(
         $remote->PROC_STORAGE_POOL_CREATE_XML,
         { xml => $xml, flags => $flags // 0 }, unwrap => 'pool' );
 }
 
-async sub storage_pool_define_xml($self, $xml, $flags = 0) {
+async method storage_pool_define_xml($xml, $flags = 0) {
     return await $self->_call(
         $remote->PROC_STORAGE_POOL_DEFINE_XML,
         { xml => $xml, flags => $flags // 0 }, unwrap => 'pool' );
 }
 
-async sub storage_pool_lookup_by_name($self, $name) {
+async method storage_pool_lookup_by_name($name) {
     return await $self->_call(
         $remote->PROC_STORAGE_POOL_LOOKUP_BY_NAME,
         { name => $name }, unwrap => 'pool' );
 }
 
-async sub storage_pool_lookup_by_target_path($self, $path) {
+async method storage_pool_lookup_by_target_path($path) {
     return await $self->_call(
         $remote->PROC_STORAGE_POOL_LOOKUP_BY_TARGET_PATH,
         { path => $path }, unwrap => 'pool' );
 }
 
-async sub storage_pool_lookup_by_uuid($self, $uuid) {
+async method storage_pool_lookup_by_uuid($uuid) {
     return await $self->_call(
         $remote->PROC_STORAGE_POOL_LOOKUP_BY_UUID,
         { uuid => $uuid }, unwrap => 'pool' );
 }
 
-async sub storage_vol_lookup_by_key($self, $key) {
+async method storage_vol_lookup_by_key($key) {
     return await $self->_call(
         $remote->PROC_STORAGE_VOL_LOOKUP_BY_KEY,
         { key => $key }, unwrap => 'vol' );
 }
 
-async sub storage_vol_lookup_by_path($self, $path) {
+async method storage_vol_lookup_by_path($path) {
     return await $self->_call(
         $remote->PROC_STORAGE_VOL_LOOKUP_BY_PATH,
         { path => $path }, unwrap => 'vol' );
@@ -2360,7 +2348,7 @@ Sys::Async::Virt - LibVirt protocol implementation for clients
 
 =head1 VERSION
 
-v0.0.21
+v0.1.1
 
 Based on LibVirt tag v11.5.0
 

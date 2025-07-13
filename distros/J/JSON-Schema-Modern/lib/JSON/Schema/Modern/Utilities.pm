@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities for JSON::Schema::Modern
 
-our $VERSION = '0.614';
+our $VERSION = '0.615';
 
 use 5.020;
 use strictures 2;
@@ -60,7 +60,8 @@ use if HAVE_BUILTIN, experimental => 'builtin';
 
 use constant _BUILTIN_BOOLS => 0;
 use constant {
-  _BUILTIN_BOOLS && HAVE_BUILTIN && Mojo::JSON::JSON_XS && eval { Cpanel::JSON::XS->VERSION(4.38); 1 }
+  _BUILTIN_BOOLS && HAVE_BUILTIN && eval { +require Storable; Storable->VERSION(3.27); 1 }
+      && Mojo::JSON::JSON_XS && eval { Cpanel::JSON::XS->VERSION(4.38); 1 }
     ? ( true => builtin::true, false => builtin::false )
     : ( true => JSON::PP::true, false => JSON::PP::false )
 };
@@ -500,7 +501,7 @@ JSON::Schema::Modern::Utilities - Internal utilities for JSON::Schema::Modern
 
 =head1 VERSION
 
-version 0.614
+version 0.615
 
 =head1 SYNOPSIS
 

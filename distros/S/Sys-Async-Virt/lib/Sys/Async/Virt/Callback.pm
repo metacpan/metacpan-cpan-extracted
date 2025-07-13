@@ -12,62 +12,65 @@
 
 use v5.26;
 use warnings;
-use experimental 'signatures';
+use experimental qw/ signatures /;
 use Feature::Compat::Try;
 use Future::AsyncAwait;
+use Object::Pad 0.821;
 
-package Sys::Async::Virt::Callback v0.0.21;
+class Sys::Async::Virt::Callback v0.1.1;
+
 
 use Carp qw(croak);
 use Future::Queue;
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::Remote::XDR v0.0.21;
+use Protocol::Sys::Virt::Remote::XDR v0.1.1;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
-sub new($class, %args) {
-    return bless {
-        id => $args{id},
-        client => $args{client},
-        deregister_call => $args{deregister_call},
-        queue => Future::Queue->new(
-            max_items => $args{queue_len} // 12,
-            prototype => $args{factory}
-            ),
-    }, $class;
+field $_id :param :reader;
+field $_client :param :reader;
+field $_deregister_call :param;
+field $_queue;
+field $_cancelled;
+
+ADJUST :params (:$queue_len //= 12, :$factory) {
+    $_queue = Future::Queue->new(
+        max_items => $queue_len,
+        prototype => $factory
+        );
 }
 
-async sub next_event($self) {
-    return unless $self->{queue}; # simulate an empty queue
-    return await $self->{queue}->shift;
+async method next_event() {
+    return unless $_queue; # simulate an empty queue
+    return await $_queue->shift;
 }
 
-async sub cancel($self) {
-    return if ($self->{cancelled}
-               and $self->{cancelled}->is_ready);
-    return await $self->{cancelled} if $self->{cancelled};
+async method cancel() {
+    return if ($_cancelled
+               and $_cancelled->is_ready);
+    return await $_cancelled if $_cancelled;
 
-    $self->{cancelled} = $self->{client}->_call(
-        $self->{deregister_call},
-        { callbackID => $self->{id} });
-    await $self->{cancelled};
+    $_cancelled = $_client->_call(
+        $_deregister_call,
+        { callbackID => $_id });
+    await $_cancelled;
 
     $self->cleanup;
     return;
 }
 
-sub cleanup($self) {
-    $self->{queue}->finish;
-    $self->{queue} = undef;
-    delete $self->{client}->{_callbacks}->{$self->{id}};
+method cleanup() {
+    $_queue->finish;
+    $_queue = undef;
+    delete $_client->{_callbacks}->{$_id};
     return;
 }
 
-sub _dispatch_event($self, $event) {
-    return if $self->{cancelled};
+method _dispatch_event($event) {
+    return if $_cancelled;
 
     try {
-        $self->{queue}->push($event);
+        $_queue->push($event);
     }
     catch ($e) {
         ###TODO: Rather not RETAIN here?
@@ -75,8 +78,8 @@ sub _dispatch_event($self, $event) {
     }
 }
 
-sub DESTROY($self) {
-    $self->cancel->retain unless $self->{cancelled};
+method DESTROY() {
+    $self->cancel->retain unless $_cancelled;
 }
 
 
@@ -90,7 +93,7 @@ Sys::Async::Virt::Callback - Client side proxy to remote LibVirt event source
 
 =head1 VERSION
 
-v0.0.21
+v0.1.1
 
 =head1 SYNOPSIS
 

@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v2.5.0, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Minilla/v3.1.26, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,7 +27,7 @@ no_index:
 provides:
   WebService::Simple:
     file: lib/WebService/Simple.pm
-    version: '0.25'
+    version: '0.26'
   WebService::Simple::Parser:
     file: lib/WebService/Simple/Parser.pm
   WebService::Simple::Parser::JSON:
@@ -42,7 +42,7 @@ provides:
     file: lib/WebService/Simple/Parser/XML/Simple.pm
   WebService::Simple::Response:
     file: lib/WebService/Simple/Response.pm
-    version: '0.25'
+    version: '0.26'
 recommends:
   XML::Feed: '0'
   XML::LibXML: '0'
@@ -65,18 +65,21 @@ requires:
 resources:
   bugtracker: https://github.com/yusukebe/WebService-Simple/issues
   homepage: https://github.com/yusukebe/WebService-Simple
-  repository: git://github.com/yusukebe/WebService-Simple.git
-version: '0.25'
+  repository: https://github.com/yusukebe/WebService-Simple.git
+version: '0.26'
 x_authority: cpan:YUSUKEBE
 x_contributors:
+  - 'Alex Kapranoff <kappa@yandex.ru>'
   - 'Daisuke Maki <dmaki@cpan.org>'
-  - 'mattn <mattn.jp@gmail.com>'
-  - 'drry <drry@drry.jp>'
-  - 'Tomohiro Teranish <tomyhero@cpan.org>'
   - 'Matsuno Tokuhiro <tokuhirom@gmail.com>'
   - 'Naoki Tomita <tomita@cpan.org>'
-  - 'isync <o.zucker@web.de>'
   - 'Tim Vroom <vroom@blockstackers.com>'
-  - 'isync <O.Zucker@web.de>'
+  - 'Tomohiro Teranish <tomyhero@cpan.org>'
   - 'Yusuke Wada <yusuke@kamawada.com>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.016'
+  - 'drry <drry@drry.jp>'
+  - 'isync <O.Zucker@web.de>'
+  - 'isync <o.zucker@web.de>'
+  - 'magai <magai@users.noreply.github.com>'
+  - 'mattn <mattn.jp@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

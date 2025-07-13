@@ -14,10 +14,11 @@ use v5.26;
 use warnings;
 use experimental 'signatures';
 use Future::AsyncAwait;
+use Object::Pad;
 
-package Sys::Async::Virt::Connection::SSH v0.0.21;
+class Sys::Async::Virt::Connection::SSH v0.1.1;
 
-use parent qw(Sys::Async::Virt::Connection);
+inherit Sys::Async::Virt::Connection '$_in', '$_out';
 
 use Carp qw(croak);
 use IO::Async::Stream;
@@ -26,15 +27,21 @@ use Log::Any qw($log);
 use Protocol::Sys::Virt::UNIXSocket v11.5.0; # imports socket_path
 use Protocol::Sys::Virt::URI v11.5.0; # imports parse_url
 
-sub new($class, $url, %args) {
-    return bless {
-        url => $url,
-        %args{ qw(socket readonly) }
-    }, $class;
+field $_url :param :reader;
+field $_socket :param = undef :reader;
+field $_readonly :param :reader;
+field $_process = undef;
+
+method close() {
+    $_process->kill( 'TERM' ) if not $_process->is_exited;
 }
 
-sub close($self) {
-    $self->{process}->kill( 'TERM' ) if not $self->{process}->is_exited;
+method configure(%args) {
+    delete $args{url};
+    delete $args{socket};
+    delete $args{readonly};
+
+    $self->SUPER::configure(%args);
 }
 
 sub shell_escape($val) {
@@ -61,8 +68,8 @@ my $auto_proxy =
     q{else %s; } .
     q{fi};
 
-async sub connect($self) {
-    my %c = parse_url( $self->{url} );
+async method connect() {
+    my %c = parse_url( $_url );
     my @args =  ('-e', 'none');
     push @args, ('-p', $c{port}) if $c{port};
     push @args, ('-l', $c{username}) if $c{username};
@@ -72,8 +79,8 @@ async sub connect($self) {
 
     my $remote_cmd;
     my $proxy_mode  = $c{query}->{proxy} // 'auto';
-    my $socket_path = $self->{socket} // $c{query}->{socket} //
-        socket_path(readonly => $self->{readonly},
+    my $socket_path = $_socket // $c{query}->{socket} //
+        socket_path(readonly => $_readonly,
                     hypervisor => $c{hypervisor},
                     mode => $c{mode},
                     type => $c{type});
@@ -102,7 +109,7 @@ async sub connect($self) {
     my @cmd = ($local_cmd, @args, '--', $c{host}, $remote_cmd);
     $log->trace("SSH remote command: $remote_cmd");
     $log->trace("SSH total command: " . join(' ', @cmd) );
-    my $process = $self->loop->open_process(
+    $_process = $self->loop->open_process(
         command => \@cmd,
         stdout => {
             on_read => sub { 0 },
@@ -119,14 +126,13 @@ async sub connect($self) {
         on_finish => sub { }, # on_finish is mandatory
         );
 
-    $self->{process} = $process;
-    $self->{in}  = $process->stdout;
-    $self->{out} = $process->stdin;
+    $_in  = $_process->stdout;
+    $_out = $_process->stdin;
 
     return;
 }
 
-sub is_secure($self) {
+method is_secure() {
     return 1;
 }
 
@@ -141,7 +147,7 @@ Sys::Async::Virt::Connection::SSH - Connection to LibVirt server over SSH
 
 =head1 VERSION
 
-v0.0.21
+v0.1.1
 
 =head1 SYNOPSIS
 

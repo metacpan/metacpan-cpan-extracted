@@ -93,6 +93,8 @@ BT-151;1;Code der Umsatzsteuerkategorie des in Rechnung gestellten Artikels
 BT-152;2;Umsatzsteuersatz für den in Rechnung gestellten Artikel
 BT-153;1;Artikelname
 BT-155;0;Artikelkennung des Verkäufers
+BT-160;0;Artikelattributname
+BT-161;0;Artikelattributwert
 BT-162;0;Zeile 3 der Verkäuferanschrift
 BT-163;0;Zeile 3 der Käuferanschrift
 BT-165;0;Zeile 3 der Lieferanschrift

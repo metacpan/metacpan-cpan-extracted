@@ -64,7 +64,7 @@ class WithBuildargs {
    WithAdjust->new;
    is( \@called, [qw( BUILD ADJUST )], 'ADJUST invoked after BUILD' );
 
-   is( $class_in_ADJUST, "WithAdjust", '__CLASS__ during ADJUST block' )
+   is( $class_in_ADJUST, "WithAdjust", '__CLASS__ during ADJUST phaser' )
 }
 
 {
@@ -91,7 +91,7 @@ class WithBuildargs {
    class NoParamsAtAll :strict(params) { }
 
    ok( !defined eval { NoParamsAtAll->new( unknown => 1 ) },
-      ':strict(params) complains even with no ADJUST block' );
+      ':strict(params) complains even with no ADJUST phaser' );
    like( $@, qr/^Unrecognised parameters for NoParamsAtAll constructor: 'unknown' at /,
       'message from unrecognised param to constructor' );
 }

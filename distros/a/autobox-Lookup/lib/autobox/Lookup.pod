@@ -136,21 +136,17 @@ This returns an array containing both values.
 
 =head3 Special Cases and Invalid Queries
 
-=begin text
 
+  | Query                                 | Result                     |
+  | ------------------------------------- | -------------------------- |
+  | `"foo.bar"` (non-existent key)        | `undef`                    |
+  | `"arr.foo"` (string index on array)   | `undef`                    |
+  | `"arr.5"` (out-of-bounds index)       | `undef`                    |
+  | `".foo.bar."` (leading/trailing dots) | `undef`                    |
+  | `{}` (empty hash) with any key        | `undef`                    |
+  | `""` (empty string)                   | Returns whole structure    |
+  | Scalar base structure                 | `undef`                    |
+  | Circular references                   | Returns circular reference |
 
-| Query                                 | Result                     |
-| ------------------------------------- | -------------------------- |
-| `"foo.bar"` (non-existent key)        | `undef`                    |
-| `"arr.foo"` (string index on array)   | `undef`                    |
-| `"arr.5"` (out-of-bounds index)       | `undef`                    |
-| `".foo.bar."` (leading/trailing dots) | `undef`                    |
-| `{}` (empty hash) with any key        | `undef`                    |
-| `""` (empty string)                   | Returns whole structure    |
-| Scalar base structure                 | `undef`                    |
-| Circular references                   | Returns circular reference |
-
-
-=end text
 
 =cut

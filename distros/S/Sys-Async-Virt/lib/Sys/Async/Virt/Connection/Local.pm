@@ -14,47 +14,54 @@ use v5.26;
 use warnings;
 use experimental 'signatures';
 use Future::AsyncAwait;
+use Object::Pad;
 
-package Sys::Async::Virt::Connection::Local v0.0.21;
+class Sys::Async::Virt::Connection::Local v0.1.1;
 
-use parent qw(Sys::Async::Virt::Connection);
+inherit Sys::Async::Virt::Connection '$_in', '$_out';
 
 use Carp qw(croak);
 use IO::Async::Stream;
 use Log::Any qw($log);
 
-sub new($class, $url, %args) {
-    return bless {
-        url => $url,
-        %args{ qw( readonly socket ) }
-    }, $class;
+field $_url :param :reader;
+field $_process = undef;
+field $_readonly :param = undef;
+field $_socket :param = undef;
+
+method close() {
+    $_in->close;
 }
 
-sub close($self) {
-    $self->{in}->close;
-}
-
-async sub connect($self) {
+async method connect() {
     # disect URL
-    $self->{socket} //=
-        '/run/libvirt/libvirt-sock' . ($self->{readonly} ? '-ro' : '');
+    $_socket //=
+        '/run/libvirt/libvirt-sock' . ($_readonly ? '-ro' : '');
     my $sock = await $self->loop->connect(
         addr => {
             family => 'unix',
             socktype => 'stream',
-            path => $self->{socket}
+            path => $_socket
         });
 
-    $self->{in} = $self->{out} = IO::Async::Stream->new(
+    $_in = $_out = IO::Async::Stream->new(
         handle => $sock,
         on_read => sub { 0 }
         );
-    $self->add_child( $self->{in} );
+    $self->add_child( $_in );
 
     return;
 }
 
-sub is_secure($self) {
+method configure(%args) {
+    delete $args{url};
+    delete $args{socket};
+    delete $args{readonly};
+
+    $self->SUPER::configure(%args);
+}
+
+method is_secure() {
     return 1;
 }
 
@@ -70,7 +77,7 @@ Sys::Async::Virt::Connection::Local - Connection to LibVirt server over Unix
 
 =head1 VERSION
 
-v0.0.21
+v0.1.1
 
 =head1 SYNOPSIS
 

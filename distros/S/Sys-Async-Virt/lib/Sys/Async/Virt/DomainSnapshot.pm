@@ -14,13 +14,14 @@ use v5.26;
 use warnings;
 use experimental 'signatures';
 use Future::AsyncAwait;
+use Object::Pad;
 
-package Sys::Async::Virt::DomainSnapshot v0.0.21;
+class Sys::Async::Virt::DomainSnapshot v0.1.1;
 
 use Carp qw(croak);
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::Remote::XDR v0.0.21;
+use Protocol::Sys::Virt::Remote::XDR v0.1.1;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
 use constant {
@@ -47,65 +48,62 @@ use constant {
 };
 
 
-sub new($class, %args) {
-    return bless {
-        id => $args{id},
-        client => $args{client},
-    }, $class;
-}
+field $_id :param :reader;
+field $_client :param :reader;
 
-sub delete($self, $flags = 0) {
-    return $self->{client}->_call(
+
+method delete($flags = 0) {
+    return $_client->_call(
         $remote->PROC_DOMAIN_SNAPSHOT_DELETE,
-        { snap => $self->{id}, flags => $flags // 0 }, empty => 1 );
+        { snap => $_id, flags => $flags // 0 }, empty => 1 );
 }
 
-async sub get_parent($self, $flags = 0) {
-    return await $self->{client}->_call(
+async method get_parent($flags = 0) {
+    return await $_client->_call(
         $remote->PROC_DOMAIN_SNAPSHOT_GET_PARENT,
-        { snap => $self->{id}, flags => $flags // 0 }, unwrap => 'snap' );
+        { snap => $_id, flags => $flags // 0 }, unwrap => 'snap' );
 }
 
-async sub get_xml_desc($self, $flags = 0) {
-    return await $self->{client}->_call(
+async method get_xml_desc($flags = 0) {
+    return await $_client->_call(
         $remote->PROC_DOMAIN_SNAPSHOT_GET_XML_DESC,
-        { snap => $self->{id}, flags => $flags // 0 }, unwrap => 'xml' );
+        { snap => $_id, flags => $flags // 0 }, unwrap => 'xml' );
 }
 
-async sub has_metadata($self, $flags = 0) {
-    return await $self->{client}->_call(
+async method has_metadata($flags = 0) {
+    return await $_client->_call(
         $remote->PROC_DOMAIN_SNAPSHOT_HAS_METADATA,
-        { snap => $self->{id}, flags => $flags // 0 }, unwrap => 'metadata' );
+        { snap => $_id, flags => $flags // 0 }, unwrap => 'metadata' );
 }
 
-async sub is_current($self, $flags = 0) {
-    return await $self->{client}->_call(
+async method is_current($flags = 0) {
+    return await $_client->_call(
         $remote->PROC_DOMAIN_SNAPSHOT_IS_CURRENT,
-        { snap => $self->{id}, flags => $flags // 0 }, unwrap => 'current' );
+        { snap => $_id, flags => $flags // 0 }, unwrap => 'current' );
 }
 
-async sub list_all_children($self, $flags = 0) {
-    return await $self->{client}->_call(
+async method list_all_children($flags = 0) {
+    return await $_client->_call(
         $remote->PROC_DOMAIN_SNAPSHOT_LIST_ALL_CHILDREN,
-        { snapshot => $self->{id}, need_results => $remote->DOMAIN_SNAPSHOT_LIST_MAX, flags => $flags // 0 }, unwrap => 'snapshots' );
+        { snapshot => $_id, need_results => $remote->DOMAIN_SNAPSHOT_LIST_MAX, flags => $flags // 0 }, unwrap => 'snapshots' );
 }
 
-async sub list_children_names($self, $flags = 0) {
-    return await $self->{client}->_call(
+async method list_children_names($flags = 0) {
+    return await $_client->_call(
         $remote->PROC_DOMAIN_SNAPSHOT_LIST_CHILDREN_NAMES,
-        { snap => $self->{id}, maxnames => $remote->DOMAIN_SNAPSHOT_LIST_MAX, flags => $flags // 0 }, unwrap => 'names' );
+        { snap => $_id, maxnames => $remote->DOMAIN_SNAPSHOT_LIST_MAX, flags => $flags // 0 }, unwrap => 'names' );
 }
 
-async sub num_children($self, $flags = 0) {
-    return await $self->{client}->_call(
+async method num_children($flags = 0) {
+    return await $_client->_call(
         $remote->PROC_DOMAIN_SNAPSHOT_NUM_CHILDREN,
-        { snap => $self->{id}, flags => $flags // 0 }, unwrap => 'num' );
+        { snap => $_id, flags => $flags // 0 }, unwrap => 'num' );
 }
 
-sub revert_to_snapshot($self, $flags = 0) {
-    return $self->{client}->_call(
+method revert_to_snapshot($flags = 0) {
+    return $_client->_call(
         $remote->PROC_DOMAIN_REVERT_TO_SNAPSHOT,
-        { snap => $self->{id}, flags => $flags // 0 }, empty => 1 );
+        { snap => $_id, flags => $flags // 0 }, empty => 1 );
 }
 
 
@@ -121,7 +119,7 @@ Sys::Async::Virt::DomainSnapshot - Client side proxy to remote LibVirt domain sn
 
 =head1 VERSION
 
-v0.0.21
+v0.1.1
 
 =head1 SYNOPSIS
 

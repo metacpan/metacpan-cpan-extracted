@@ -162,15 +162,15 @@ DESCRIPTION
 
   The BUILD phase
 
-    As part of the construction process, the BUILD block of every component
-    class will be invoked, passing in the list of arguments the constructor
-    was invoked with. Each class should perform its required setup
-    behaviour, but does not need to chain to the SUPER class first; this is
-    handled automatically.
+    As part of the construction process, every BUILD phaser of every
+    component class will be invoked. Each will be passed in the list of
+    arguments the constructor was invoked with as arguments. Each class
+    should perform its required setup behaviour, but does not need to chain
+    to the SUPER class first; this is handled automatically.
 
   The ADJUST phase
 
-    Next, the ADJUST block of every component class is invoked. This
+    Next, every ADJUST phaser of every component class is invoked. This
     happens after the fields are assigned their initial values and the
     BUILD blocks have been run.
 
@@ -366,19 +366,19 @@ KEYWORDS
 
     Since version 0.43.
 
-    Can only be applied to classes that contain no BUILD blocks. If set,
+    Can only be applied to classes that contain no BUILD phasers. If set,
     then the constructor will complain about any unrecognised named
     arguments passed to it (i.e. names that do not correspond to the :param
-    of any defined field and left unconsumed by any ADJUST block).
+    of any defined field and left unconsumed by any ADJUST phaser).
 
-    Since BUILD blocks can inspect the arguments arbitrarily, the presence
-    of any such block means the constructor cannot determine which named
+    Since BUILD phasers can inspect the arguments arbitrarily, the presence
+    of any such phaser means the constructor cannot determine which named
     arguments are not recognised.
 
     This attribute is a temporary stepping-stone for compatibility with
     existing code. It is recommended to enable this whenever possible, as a
     later version of this module will likely perform this behaviour
-    unconditionally whenever no BUILD blocks are present.
+    unconditionally whenever no BUILD phasers are present.
 
  class (anon)
 
@@ -441,7 +441,7 @@ KEYWORDS
        }
 
     A role can provide instance fields. These are visible to any ADJUST
-    blocks or methods provided by that role.
+    phasers or methods provided by that role.
 
     Since version 0.33.
 
@@ -643,7 +643,8 @@ KEYWORDS
 
     Declares that the instances of the class or role have a member field of
     the given name. This member field will be accessible as a lexical
-    variable within any method declarations and ADJUST blocks in the class.
+    variable within any method declarations and ADJUST phasers in the
+    class.
 
     Array and hash members are permitted and behave as expected; you do not
     need to store references to anonymous arrays or hashes.
@@ -788,7 +789,7 @@ KEYWORDS
     block will not be executed.
 
     Values for fields are assigned by the constructor before any BUILD
-    blocks are invoked.
+    phasers are invoked.
 
   :inheritable
 
@@ -803,7 +804,7 @@ KEYWORDS
     field variable type. This permits code to be executed as part of the
     instance constructor, rather than running just once when the class is
     set up. Code in a field initialisation block is roughly equivalent to
-    being placed in a BUILD or ADJUST block.
+    being placed in a BUILD or ADJUST phaser.
 
     Since version 0.73 this may also be written as a plain expression
     introduced by an equals symbol (=). This is equivalent to using a
@@ -842,8 +843,8 @@ KEYWORDS
     during the initialisation expression of later fields, and their
     assigned value can be used here. If the earlier field had a :param
     declaration, it will have been assigned from the value passed to the
-    constructor. Note however that all ADJUST blocks happen after field
-    initialisation expressions, so any modified values set in such blocks
+    constructor. Note however that all ADJUST phasers happen after field
+    initialisation expressions, so any modified values set in such phasers
     will not be visible at this time.
 
     Control flow that attempts to leave a field initialiser expression or
@@ -1039,12 +1040,12 @@ KEYWORDS
 
     Since version 0.27.
 
-    Declares the builder block for this component class. A builder block
+    Declares a builder phaser for this component class. A builder phaser
     may use subroutine signature syntax, as for methods, to assist in
-    unpacking its arguments. A build block is not a subroutine and thus is
+    unpacking its arguments. A build phaser is not a subroutine and thus is
     not permitted to use subroutine attributes (for example :lvalue).
 
-    Note that a BUILD block is a named phaser block and not a method.
+    Note that a BUILD phaser is a named phaser block and not a method.
     Attempts to create a method named BUILD (i.e. with syntax method BUILD
     {...}) will fail with a compiletime error, to avoid this confusion.
 
@@ -1056,28 +1057,28 @@ KEYWORDS
 
     Since version 0.43.
 
-    Declares an adjust block for this component class. This block of code
-    runs within the constructor, after any BUILD blocks and automatic field
-    value assignment. It can make any final adjustments to the instance
-    (such as initialising fields from calculated values).
+    Declares an adjust phaser for this component class. This block of code
+    runs within the constructor, after any BUILD phasers and automatic
+    field value assignment. It can make any final adjustments to the
+    instance (such as initialising fields from calculated values).
 
-    An adjust block is not a subroutine and thus is not permitted to use
-    subroutine attributes (except see below). Note that an ADJUST block is
+    An adjust phaser is not a subroutine and thus is not permitted to use
+    subroutine attributes (except see below). Note that an ADJUST phaser is
     a named phaser block and not a method; it does not use the sub or
     method keyword. But, like with method, the member fields are accessible
     within the code body, as is the special $self lexical.
 
-    Currently, an ADJUST block receives a reference to the hash containing
+    Currently, an ADJUST phaser receives a reference to the hash containing
     the current constructor arguments, as per "ADJUSTPARAMS" (see below).
     This was added in version 0.66 but will be removed again as it
     conflicts with the more flexible and generally nicer named-parameter
     ADJUST :params syntax (see below). Such uses should be considered
     deprecated. A warning will be printed to indicate this whenever an
-    ADJUST block uses a signature. This warning can be quieted by using
+    ADJUST phaser uses a signature. This warning can be quieted by using
     ADJUSTPARAMS instead. Additionally, a warning may be printed on code
     that attempts to access the params hashref via the @_ array.
 
-    Since version 0.801 in a future version of this module, ADJUST blocks
+    Since version 0.801 in a future version of this module, ADJUST phasers
     may be implemented as true blocks and will not permit out-of-block
     control flow. At present, they are implemented as one full CV per
     block, but a warning is emitted if out-of-block control flow is
@@ -1087,12 +1088,12 @@ KEYWORDS
           return;
        }
     
-       Using return to leave an ADJUST block is discouraged and will be removed
+       Using return to leave an ADJUST phaser is discouraged and will be removed
        in a later version at FILE line LINE.
 
     Since version 0.805 an experimental feature can be enabled that puts
-    all the ADJUST blocks into a single CV, rather than creating one CV for
-    every block. This is currently being tested for stability, and may
+    all the ADJUST phasers into a single CV, rather than creating one CV
+    for every phaser. This is currently being tested for stability, and may
     become the default behaviour in a future version. For now it must be
     requested specially:
 
@@ -1110,11 +1111,11 @@ KEYWORDS
 
     Since version 0.70; non-experimental since version 0.805.
 
-    An ADJUST block can marked with a :params attribute, meaning that it
+    An ADJUST phaser can marked with a :params attribute, meaning that it
     consumes additional constructor parameters by assigning them into
     lexical variables.
 
-    Before the block itself, a list of lexical variables are introduced,
+    Before the phaser itself, a list of lexical variables are introduced,
     inside parentheses. The name of each one is preceded by a colon, and
     consumes a constructor parameter of the same name. These parameters are
     considered "consumed" for the purposes of a :strict(params) check.
@@ -1130,9 +1131,9 @@ KEYWORDS
        ADJUST :params ( :$x, :$y = "default", :$z ) { ... }
 
     Note here that x and z are required parameters for the constructor of a
-    class containing this block, but y is an optional parameter whose value
-    will be filled in by the expression if not provided. Because these
-    parameters are named and not positional, there is no ordering
+    class containing this phaser, but y is an optional parameter whose
+    value will be filled in by the expression if not provided. Because
+    these parameters are named and not positional, there is no ordering
     constraint; required and optional parameters can be freely mixed.
 
     Optional parameters can also use the //= and ||= operators to provide a
@@ -1156,7 +1157,7 @@ KEYWORDS
 
     The final element may be a regular hash variable. This requests that
     all remaining named parameters are made available inside it. The code
-    in the block should delete from this hash any parameters it wishes to
+    in the phaser should delete from this hash any parameters it wishes to
     consume, as with the earlier case above.
 
     It is unspecified whether named fields or parameters for subclasses yet
@@ -1186,14 +1187,14 @@ KEYWORDS
           ...
        }
 
-    A variant of an ADJUST block that receives a reference to the hash
+    A variant of an ADJUST phaser that receives a reference to the hash
     containing the current constructor parameters. This hash will not
     contain any constructor parameters already consumed by ":param"
     declarations on any fields, but only the leftovers once those are
     processed.
 
-    The code in the block should delete from this hash any parameters it
-    wishes to consume. Once all the ADJUST blocks have run, any remaining
+    The code in the phaser should delete from this hash any parameters it
+    wishes to consume. Once all the ADJUST phasers have run, any remaining
     keys in the hash will be considered errors, subject to the
     ":strict(params)" check.
 
@@ -1227,9 +1228,10 @@ KEYWORDS
 
     Since version 0.72.
 
-    Only valid within the body (or signature) of a method, an ADJUST block,
-    or the initialising expression of a field. Yields the class name of the
-    instance that the method, block or expression is invoked on.
+    Only valid within the body (or signature) of a method, an ADJUST
+    phaser, or the initialising expression of a field. Yields the class
+    name of the instance that the method, block or expression is invoked
+    on.
 
     This is similar to the core perl __PACKAGE__ constant, except that it
     cares about the dynamic class of the actual instance, not the static
@@ -1283,12 +1285,8 @@ CREPT FEATURES
 
  Implied Pragmata
 
-    The following behaviour is likely to be removed in a later version of
-    this module.
-
     In order to encourage users to write clean, modern code, the body of
-    the class block currently acts as if the following pragmata are in
-    effect:
+    the class block might act as if the following pragmata are in effect:
 
        use strict;
        use warnings;
@@ -1303,23 +1301,23 @@ CREPT FEATURES
     although the method keyword always behaves as if signatures were
     enabled anyway.
 
-    It is eventually planned that this behaviour will be removed from
-    Object::Pad entirely (except for enabling the signatures feature).
-    While that won't in itself break any existing code, it would mean that
-    code which previously ran with the protection of strict and warnings
-    would now not be. A satisfactory solution to this problem has not yet
-    been found, but until then it is suggested that code using this module
-    remembers to explicitly enable this set of pragmata before using the
-    class keyword.
+    If you import this module with a module version number of 0.821 or
+    higher, this behaviour will not happen. This will be the default
+    behaviour in future versions, and matches how the core perl feature
+    works. (Though method will still always parse as if the signatures
+    feature is enabled.) In particular, this no longer applies a catch-all
+    use warnings, meaning that any prior declarations of use experimental
+    or no warnings 'experimental::...' will not be overridden.
 
-    A handy way to do this is to use the use VERSION syntax; v5.36 or later
-    will already perform all of the pragmata listed above.
+    However, in order to not upset older code that may have relied on these
+    pragmata being present, module imports without such a version number
+    will still enable them. This ensures that code not yet updated for the
+    version 0.821 semantics is not affected.
 
-       use v5.36;
-
-    If you import this module with a module version number of 0.800 or
-    higher it will enable a warning if you forget to enable strict and
-    warnings before using the class or roll keywords:
+    In addition, if you import this module with a module version number of
+    0.800 or higher (but less than 0.821) it will emit a warning if you
+    forget to enable strict and warnings before using the class or role
+    keywords:
 
        use Object::Pad 0.800;
     
@@ -1328,6 +1326,14 @@ CREPT FEATURES
 
        class keyword enabled 'use strict' but this will be removed in a later version at FILE line 3.
        class keyword enabled 'use warnings' but this will be removed in a later version at FILE line 3.
+
+    For newly-written code in a modern style, remember that a handy way to
+    enable the strict and warnings pragmata for the entire file at once is
+    to use the use VERSION syntax at the top of the file. A requested
+    version of v5.36 or later will already perform all of the pragmata
+    listed above.
+
+       use v5.36;
 
  Yield True
 
@@ -1363,7 +1369,7 @@ SUBCLASSING CLASSIC PERL CLASSES
     not see the object in a fully consistent state. (This fact is not
     specific to using Object::Pad and would happen in classic Perl OO as
     well). The field initialisers will have been invoked but the BUILD and
-    ADJUST blocks will not.
+    ADJUST phasers will not.
 
     For example; in the following
 
@@ -1388,9 +1394,9 @@ SUBCLASSING CLASSIC PERL CLASSES
        say "Value seen by user is ", $obj->get_value;
 
     Until the ClassicPerlBaseClass::new superconstructor has returned the
-    ADJUST block will not have been invoked. The $_value field will still
+    ADJUST phaser will not have been invoked. The $_value field will still
     exist, but its value will be B during the superconstructor. After the
-    superconstructor, the BUILD and ADJUST blocks are invoked before the
+    superconstructor, the BUILD and ADJUST phasers are invoked before the
     completed object is returned to the user. The result will therefore be:
 
        Value seen by superconstructor is B

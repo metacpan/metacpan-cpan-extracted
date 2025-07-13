@@ -1,0 +1,18 @@
+use autobox::Text;
+
+$\ = "\n"; $, = "\t";
+
+my $t = <<EOF
+Et eos et aut id. Consequatur praesentium nemo alias tenetur iure. Sunt enim illo quam sint est vitae eos. Tempora sunt qui eum doloremque praesentium sint vel adipisci. Natus quisquam porro in vero dolor omnis ut atque.Accusantium et iste eveniet ex fugiat.
+
+Enim id rerum eius deleniti voluptas cumque. Ut ut maiores consequatur consequatur sequi. Dolores qui eaque nesciunt rerum explicabo rem animi consequatur.Dolor modi qui mollitia amet qui animi tenetur id.
+
+Aut quam soluta unde accusantium neque dolorem ipsum. Nulla voluptatem in et dolores aperiam dolor animi.Alias quod iste officiis non similique repudiandae placeat. Enim nihil corporis voluptatem. Ea in dolor non corporis illo et reiciendis sequi. Exercitationem saepe omnis odit veniam.Rerum ipsa aperiam et dolore aliquid doloremque rerum. Exercitationem nesciunt magni consectetur quis ad. Qui sunt mollitia aliquid. Tenetur voluptatum ipsa commodi doloremque. Vitae et consequatur velit.
+EOF
+;
+
+printf qq("%s"\n), $t->tidy;
+
+printf qq(%s\n), $t->wrap;
+
+printf qq("%s"\n), $t->wrap->unwrap;

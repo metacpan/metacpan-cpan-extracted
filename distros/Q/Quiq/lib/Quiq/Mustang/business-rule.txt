@@ -169,7 +169,7 @@ muss einen Betrag „Invoice line charge amount“ (BT-141) aufweisen.
 
 BR-44 (Charge ou frais sur ligne de facture)
 Jede Abgabe auf der Ebene der Rechnungsposition „INVOICE LINE CHARGES“ (BG-28)
-muss einen Abgabegrund „Invoice line charge reason“ (BT144) oder einen
+muss einen Abgabegrund „Invoice line charge reason“ (BT-144) oder einen
 entsprechenden Code „Invoice line charge reason code“ (BT-145) aufweisen.
 
 BR-45 (Umsatzsteueraufschlüsselung)
@@ -189,7 +189,7 @@ definiert werden.
 
 BR-48 (Umsatzsteueraufschlüsselung)
 Jede Umsatzsteueraufschlüsselung „VAT BREAKDOWN“ (BG-23) muss einen
-Umsatzsteuersatz gemäß einer Kategorie „VAT category rate“ (BT119)
+Umsatzsteuersatz gemäß einer Kategorie „VAT category rate“ (BT-119)
 haben. Sofern die Rechnung von der Umsatzsteuer ausgenommen ist, ist „0“ zu
 übermitteln.
 
@@ -316,13 +316,13 @@ BR-CO-13 (Gesamtsummen auf Dokumentenebene)
 Der Inhalt des Elementes „Invoice total amount without VAT“ (BT-109)
 entspricht der Summe aller Inhalte der Elemente „Invoice line net amount“
 (BT-131) abzüglich der Summe aller in der Rechnung enthaltenen Nachlässe der
-Dokumentenebene „Sum of allowances on document level“ (BT107) zuzüglich der
+Dokumentenebene „Sum of allowances on document level“ (BT-107) zuzüglich der
 Summe aller in der Rechnung enthaltenen Abgaben der Dokumentenebene „Sum of
 charges on document level“ (BT-108).
 
 BR-CO-14 (Gesamtsummen auf Dokumentenebene)
 Der Inhalt des Elementes „Invoice total VAT amount“ (BT-110) entspricht der
-Summe aller Inhalte der Elemente „VAT category tax amount“ (BT117).
+Summe aller Inhalte der Elemente „VAT category tax amount“ (BT-117).
 
 BR-CO-15 (Gesamtsummen auf Dokumentenebene)
 Der Inhalt des Elementes „Invoice total amount with VAT“ (BT-112) entspricht
@@ -1002,7 +1002,7 @@ der Umsatzsteuerkategorie zu versteuernde Betrag „VAT category taxable amount�
 der Summe der RechnungszeilenNettobeträge „Invoice line net amount“ (BT-131)
 zuzüglich der Summe der Beträge aller Abgaben auf der Dokumentenebene
 „Document level charge amount“ (BT-99) abzüglich der Summe der Beträge aller
-Nachlässe auf der Dokumentenebene „Document level allowance amount“ (BT92)
+Nachlässe auf der Dokumentenebene „Document level allowance amount“ (BT-92)
 sein; wobei als Code der Umsatzsteuerkategorie („Invoiced item VAT category
 code“ (BT-151), „Document level charge VAT category code“ (BT-102) und
 „Document level allowance VAT category code“ (BT-95)) der Wert „Standard
@@ -1082,7 +1082,7 @@ Informationselemente „Invoice line net amount“ (BT-131) abzüglich der
 „Document level allowance amount“ (BT-92) zuzüglich der „Document level charge
 amount“ (BT-99) sein, wobei als „Invoiced item VAT category code“ (BT-151),
 als „Document level allowance VAT category code“ (BT-95) sowie als „Document
-level charge VAT category code“ (BT102) jeweils der Wert „Zero rated“
+level charge VAT category code“ (BT-102) jeweils der Wert „Zero rated“
 angegeben wird.
 
 BR-Z-09 (Umsatzsteuer mit Nullsatz)
@@ -1122,3 +1122,7 @@ XML_INV
 Fehlermeldung, die keiner Geschäftsregel zugeordnet ist. Tritt im Falle von
 XML auf, das nicht dem ZUGFeRD XML Schema genügt. Siehe Validierungsbericht.
 
+NO_VALIDATION_RESULT
+Es liegt kein Validierungsergebnis vor.
+
+# eof

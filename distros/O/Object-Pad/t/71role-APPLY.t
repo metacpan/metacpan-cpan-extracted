@@ -37,7 +37,7 @@ role BRole {
    my $got_cmop;
    BEGIN { $got_cmop = $cmop_during_APPLY; undef $cmop_during_APPLY; }
 
-   ok( !defined $got_cmop, 'APPLY block does not run for role-in-role' );
+   ok( !defined $got_cmop, 'APPLY phaser does not run for role-in-role' );
 }
 
 {

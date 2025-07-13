@@ -107,3 +107,7 @@ SKIP: {
     die "Could not fork: $!";
   }
 }
+
+END {
+  unlink $tmpf if defined $tmpf;
+}

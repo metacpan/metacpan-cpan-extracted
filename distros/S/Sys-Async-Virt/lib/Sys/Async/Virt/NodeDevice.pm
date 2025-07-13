@@ -14,13 +14,14 @@ use v5.26;
 use warnings;
 use experimental 'signatures';
 use Future::AsyncAwait;
+use Object::Pad;
 
-package Sys::Async::Virt::NodeDevice v0.0.21;
+class Sys::Async::Virt::NodeDevice v0.1.1;
 
 use Carp qw(croak);
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::Remote::XDR v0.0.21;
+use Protocol::Sys::Virt::Remote::XDR v0.1.1;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
 use constant {
@@ -35,131 +36,128 @@ use constant {
 };
 
 
-sub new($class, %args) {
-    return bless {
-        id => $args{id},
-        client => $args{client},
-    }, $class;
-}
+field $_id :param :reader;
+field $_client :param :reader;
 
-sub create($self, $flags = 0) {
-    return $self->{client}->_call(
+
+method create($flags = 0) {
+    return $_client->_call(
         $remote->PROC_NODE_DEVICE_CREATE,
-        { name => $self->{id}, flags => $flags // 0 }, empty => 1 );
+        { name => $_id, flags => $flags // 0 }, empty => 1 );
 }
 
-async sub create_xml($self, $flags = 0) {
-    return await $self->{client}->_call(
+async method create_xml($flags = 0) {
+    return await $_client->_call(
         $remote->PROC_NODE_DEVICE_CREATE_XML,
-        { xml_desc => $self->{id}, flags => $flags // 0 }, unwrap => 'dev' );
+        { xml_desc => $_id, flags => $flags // 0 }, unwrap => 'dev' );
 }
 
-async sub define_xml($self, $flags = 0) {
-    return await $self->{client}->_call(
+async method define_xml($flags = 0) {
+    return await $_client->_call(
         $remote->PROC_NODE_DEVICE_DEFINE_XML,
-        { xml_desc => $self->{id}, flags => $flags // 0 }, unwrap => 'dev' );
+        { xml_desc => $_id, flags => $flags // 0 }, unwrap => 'dev' );
 }
 
-sub destroy($self) {
-    return $self->{client}->_call(
+method destroy() {
+    return $_client->_call(
         $remote->PROC_NODE_DEVICE_DESTROY,
-        { name => $self->{id} }, empty => 1 );
+        { name => $_id }, empty => 1 );
 }
 
-sub detach_flags($self, $driverName, $flags = 0) {
-    return $self->{client}->_call(
+method detach_flags($driverName, $flags = 0) {
+    return $_client->_call(
         $remote->PROC_NODE_DEVICE_DETACH_FLAGS,
-        { name => $self->{id}, driverName => $driverName, flags => $flags // 0 }, empty => 1 );
+        { name => $_id, driverName => $driverName, flags => $flags // 0 }, empty => 1 );
 }
 
-sub dettach($self) {
-    return $self->{client}->_call(
+method dettach() {
+    return $_client->_call(
         $remote->PROC_NODE_DEVICE_DETTACH,
-        { name => $self->{id} }, empty => 1 );
+        { name => $_id }, empty => 1 );
 }
 
-async sub get_autostart($self) {
-    return await $self->{client}->_call(
+async method get_autostart() {
+    return await $_client->_call(
         $remote->PROC_NODE_DEVICE_GET_AUTOSTART,
-        { name => $self->{id} }, unwrap => 'autostart' );
+        { name => $_id }, unwrap => 'autostart' );
 }
 
-async sub get_parent($self) {
-    return await $self->{client}->_call(
+async method get_parent() {
+    return await $_client->_call(
         $remote->PROC_NODE_DEVICE_GET_PARENT,
-        { name => $self->{id} }, unwrap => 'parentName' );
+        { name => $_id }, unwrap => 'parentName' );
 }
 
-async sub get_xml_desc($self, $flags = 0) {
-    return await $self->{client}->_call(
+async method get_xml_desc($flags = 0) {
+    return await $_client->_call(
         $remote->PROC_NODE_DEVICE_GET_XML_DESC,
-        { name => $self->{id}, flags => $flags // 0 }, unwrap => 'xml' );
+        { name => $_id, flags => $flags // 0 }, unwrap => 'xml' );
 }
 
-async sub is_active($self) {
-    return await $self->{client}->_call(
+async method is_active() {
+    return await $_client->_call(
         $remote->PROC_NODE_DEVICE_IS_ACTIVE,
-        { name => $self->{id} }, unwrap => 'active' );
+        { name => $_id }, unwrap => 'active' );
 }
 
-async sub is_persistent($self) {
-    return await $self->{client}->_call(
+async method is_persistent() {
+    return await $_client->_call(
         $remote->PROC_NODE_DEVICE_IS_PERSISTENT,
-        { name => $self->{id} }, unwrap => 'persistent' );
+        { name => $_id }, unwrap => 'persistent' );
 }
 
-async sub list_caps($self) {
-    return await $self->{client}->_call(
+async method list_caps() {
+    return await $_client->_call(
         $remote->PROC_NODE_DEVICE_LIST_CAPS,
-        { name => $self->{id}, maxnames => $remote->NODE_DEVICE_CAPS_LIST_MAX }, unwrap => 'names' );
+        { name => $_id, maxnames => $remote->NODE_DEVICE_CAPS_LIST_MAX }, unwrap => 'names' );
 }
 
-async sub lookup_by_name($self) {
-    return await $self->{client}->_call(
+async method lookup_by_name() {
+    return await $_client->_call(
         $remote->PROC_NODE_DEVICE_LOOKUP_BY_NAME,
-        { name => $self->{id} }, unwrap => 'dev' );
+        { name => $_id }, unwrap => 'dev' );
 }
 
-async sub lookup_scsi_host_by_wwn($self, $wwpn, $flags = 0) {
-    return await $self->{client}->_call(
+async method lookup_scsi_host_by_wwn($wwpn, $flags = 0) {
+    return await $_client->_call(
         $remote->PROC_NODE_DEVICE_LOOKUP_SCSI_HOST_BY_WWN,
-        { wwnn => $self->{id}, wwpn => $wwpn, flags => $flags // 0 }, unwrap => 'dev' );
+        { wwnn => $_id, wwpn => $wwpn, flags => $flags // 0 }, unwrap => 'dev' );
 }
 
-async sub num_of_caps($self) {
-    return await $self->{client}->_call(
+async method num_of_caps() {
+    return await $_client->_call(
         $remote->PROC_NODE_DEVICE_NUM_OF_CAPS,
-        { name => $self->{id} }, unwrap => 'num' );
+        { name => $_id }, unwrap => 'num' );
 }
 
-sub reattach($self) {
-    return $self->{client}->_call(
+method reattach() {
+    return $_client->_call(
         $remote->PROC_NODE_DEVICE_RE_ATTACH,
-        { name => $self->{id} }, empty => 1 );
+        { name => $_id }, empty => 1 );
 }
 
-sub reset($self) {
-    return $self->{client}->_call(
+method reset() {
+    return $_client->_call(
         $remote->PROC_NODE_DEVICE_RESET,
-        { name => $self->{id} }, empty => 1 );
+        { name => $_id }, empty => 1 );
 }
 
-sub set_autostart($self, $autostart) {
-    return $self->{client}->_call(
+method set_autostart($autostart) {
+    return $_client->_call(
         $remote->PROC_NODE_DEVICE_SET_AUTOSTART,
-        { name => $self->{id}, autostart => $autostart }, empty => 1 );
+        { name => $_id, autostart => $autostart }, empty => 1 );
 }
 
-sub undefine($self, $flags = 0) {
-    return $self->{client}->_call(
+method undefine($flags = 0) {
+    return $_client->_call(
         $remote->PROC_NODE_DEVICE_UNDEFINE,
-        { name => $self->{id}, flags => $flags // 0 }, empty => 1 );
+        { name => $_id, flags => $flags // 0 }, empty => 1 );
 }
 
-sub update($self, $xml_desc, $flags = 0) {
-    return $self->{client}->_call(
+method update($xml_desc, $flags = 0) {
+    return $_client->_call(
         $remote->PROC_NODE_DEVICE_UPDATE,
-        { name => $self->{id}, xml_desc => $xml_desc, flags => $flags // 0 }, empty => 1 );
+        { name => $_id, xml_desc => $xml_desc, flags => $flags // 0 }, empty => 1 );
 }
 
 
@@ -175,7 +173,7 @@ Sys::Async::Virt::NodeDevice - Client side proxy to remote LibVirt host device
 
 =head1 VERSION
 
-v0.0.21
+v0.1.1
 
 =head1 SYNOPSIS
 

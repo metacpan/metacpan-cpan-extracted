@@ -81,9 +81,15 @@ my %state_args = (
 
 
 my $target_state = $state_args{$target_state_name};
+unless (defined $target_state) {
+    say "Error: Unknown target state\n";
+    help();
+    exit 1;
+}
+
 try {
     await $virt->connect;
-    my $dom = await $virt->domain_lookup_by_name( 'releaser' );
+    my $dom = await $virt->domain_lookup_by_name( $domain );
     my $cb = await $virt->domain_event_register_any(
         $virt->DOMAIN_EVENT_ID_LIFECYCLE, $dom );
 

@@ -1,3 +1,7 @@
+0.05 2025-07-12T19:36:00+02:00
+ - Add check_positive_decimal() subroutine.
+ - Improve doc.
+
 0.04 2025-06-26T12:21:26+02:00
  - Add example for check_percent() to doc.
  - Add example for check_percent_range() to doc.

@@ -14,13 +14,14 @@ use v5.26;
 use warnings;
 use experimental 'signatures';
 use Future::AsyncAwait;
+use Object::Pad;
 
-package Sys::Async::Virt::StorageVol v0.0.21;
+class Sys::Async::Virt::StorageVol v0.1.1;
 
 use Carp qw(croak);
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::Remote::XDR v0.0.21;
+use Protocol::Sys::Virt::Remote::XDR v0.1.1;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
 use constant {
@@ -53,77 +54,73 @@ use constant {
 };
 
 
-sub new($class, %args) {
-    return bless {
-        id => $args{id},
-        client => $args{client},
-    }, $class;
-}
+field $_id :param :reader;
+field $_client :param :reader;
 
-sub delete($self, $flags = 0) {
-    return $self->{client}->_call(
+method delete($flags = 0) {
+    return $_client->_call(
         $remote->PROC_STORAGE_VOL_DELETE,
-        { vol => $self->{id}, flags => $flags // 0 }, empty => 1 );
+        { vol => $_id, flags => $flags // 0 }, empty => 1 );
 }
 
-sub download($self, $offset, $length, $flags = 0) {
-    return $self->{client}->_call(
+method download($offset, $length, $flags = 0) {
+    return $_client->_call(
         $remote->PROC_STORAGE_VOL_DOWNLOAD,
-        { vol => $self->{id}, offset => $offset, length => $length, flags => $flags // 0 }, stream => 'read', empty => 1 );
+        { vol => $_id, offset => $offset, length => $length, flags => $flags // 0 }, stream => 'read', empty => 1 );
 }
 
-sub get_info($self) {
-    return $self->{client}->_call(
+method get_info() {
+    return $_client->_call(
         $remote->PROC_STORAGE_VOL_GET_INFO,
-        { vol => $self->{id} } );
+        { vol => $_id } );
 }
 
-sub get_info_flags($self, $flags = 0) {
-    return $self->{client}->_call(
+method get_info_flags($flags = 0) {
+    return $_client->_call(
         $remote->PROC_STORAGE_VOL_GET_INFO_FLAGS,
-        { vol => $self->{id}, flags => $flags // 0 } );
+        { vol => $_id, flags => $flags // 0 } );
 }
 
-async sub get_path($self) {
-    return await $self->{client}->_call(
+async method get_path() {
+    return await $_client->_call(
         $remote->PROC_STORAGE_VOL_GET_PATH,
-        { vol => $self->{id} }, unwrap => 'name' );
+        { vol => $_id }, unwrap => 'name' );
 }
 
-async sub get_xml_desc($self, $flags = 0) {
-    return await $self->{client}->_call(
+async method get_xml_desc($flags = 0) {
+    return await $_client->_call(
         $remote->PROC_STORAGE_VOL_GET_XML_DESC,
-        { vol => $self->{id}, flags => $flags // 0 }, unwrap => 'xml' );
+        { vol => $_id, flags => $flags // 0 }, unwrap => 'xml' );
 }
 
-async sub pool_lookup_by_volume($self) {
-    return await $self->{client}->_call(
+async method pool_lookup_by_volume() {
+    return await $_client->_call(
         $remote->PROC_STORAGE_POOL_LOOKUP_BY_VOLUME,
-        { vol => $self->{id} }, unwrap => 'pool' );
+        { vol => $_id }, unwrap => 'pool' );
 }
 
-sub resize($self, $capacity, $flags = 0) {
-    return $self->{client}->_call(
+method resize($capacity, $flags = 0) {
+    return $_client->_call(
         $remote->PROC_STORAGE_VOL_RESIZE,
-        { vol => $self->{id}, capacity => $capacity, flags => $flags // 0 }, empty => 1 );
+        { vol => $_id, capacity => $capacity, flags => $flags // 0 }, empty => 1 );
 }
 
-sub upload($self, $offset, $length, $flags = 0) {
-    return $self->{client}->_call(
+method upload($offset, $length, $flags = 0) {
+    return $_client->_call(
         $remote->PROC_STORAGE_VOL_UPLOAD,
-        { vol => $self->{id}, offset => $offset, length => $length, flags => $flags // 0 }, stream => 'write', empty => 1 );
+        { vol => $_id, offset => $offset, length => $length, flags => $flags // 0 }, stream => 'write', empty => 1 );
 }
 
-sub wipe($self, $flags = 0) {
-    return $self->{client}->_call(
+method wipe($flags = 0) {
+    return $_client->_call(
         $remote->PROC_STORAGE_VOL_WIPE,
-        { vol => $self->{id}, flags => $flags // 0 }, empty => 1 );
+        { vol => $_id, flags => $flags // 0 }, empty => 1 );
 }
 
-sub wipe_pattern($self, $algorithm, $flags = 0) {
-    return $self->{client}->_call(
+method wipe_pattern($algorithm, $flags = 0) {
+    return $_client->_call(
         $remote->PROC_STORAGE_VOL_WIPE_PATTERN,
-        { vol => $self->{id}, algorithm => $algorithm, flags => $flags // 0 }, empty => 1 );
+        { vol => $_id, algorithm => $algorithm, flags => $flags // 0 }, empty => 1 );
 }
 
 
@@ -139,7 +136,7 @@ Sys::Async::Virt::StorageVol - Client side proxy to remote LibVirt storage volum
 
 =head1 VERSION
 
-v0.0.21
+v0.1.1
 
 =head1 SYNOPSIS
 

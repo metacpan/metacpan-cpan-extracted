@@ -1,5 +1,16 @@
 Revision history for Object-Pad
 
+0.821   2025-07-12
+        [CHANGES]
+         * Don't apply implied pragmata on `class` or `role` keywords if the
+           imported version is 0.821 or above
+         * Consistently refer to `BUILD`, `ADJUST` and `APPLY` as phasers, not
+           blocks
+
+        [BUGFIXES]
+         * Ensure that methods of lexical classes are actually able to use
+           lexical variables (RT168139)
+
 0.820   2025-02-26
         [BUGFIXES]
          * Account for perl 5.41.9's GV-less stash optimisation (RT159823)

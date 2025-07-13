@@ -99,6 +99,7 @@ sub test_linkDefs : Test(1) {
     
     my $str = $gen->link('fseitz.de',
         url => 'http://fseitz.de',
+        target => 'home',
     );
     $self->is($str,'L{fseitz.de}');
 
@@ -125,6 +126,31 @@ sub test_paragraph : Test(2) {
 
     $str = $gen->paragraph("Dies ist\nein Test\n");
     $self->is($str,"Dies ist\nein Test\n\n");
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_segment : Test(1) {
+    my $self = shift;
+
+    my $expeted = 
+
+    my $gen = Quiq::Sdoc::Producer->new;
+    
+    my $str = $gen->segment('red',
+        html => '<span style="color: red">%s</span>',
+        latex => '{\color{red}%s}',
+        mediawiki => '<span style="color: red">%s</span>',
+    );
+    $str =~ s/\n+$/\n/;
+
+    $self->isText($str,q~
+    %Segment:
+        name=red
+        html='<span style="color: red">%s</span>'
+        latex='{\color{red}%s}'
+        mediawiki='<span style="color: red">%s</span>'
+    ~);
 }
 
 # -----------------------------------------------------------------------------

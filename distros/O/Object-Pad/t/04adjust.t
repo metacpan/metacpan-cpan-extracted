@@ -133,13 +133,13 @@ use Object::Pad 0.800 ':experimental(adjust_params)';
    BEGIN { undef $SIG{__WARN__} }
 
    like( $warnings,
-      qr/^Using return to leave an ADJUST block is discouraged and will be removed in a later version at \S+ line $WARNLINE\./,
+      qr/^Using return to leave an ADJUST phaser is discouraged and will be removed in a later version at \S+ line $WARNLINE\./,
       'return from ADJUST emits warning' );
 }
 
 use Object::Pad ':experimental(composed_adjust)';
 
-# class with composed ADJUST blocks
+# class with composed ADJUST phasers
 {
    class ComposedAdjust {
       field $adjusted;
@@ -154,7 +154,7 @@ use Object::Pad ':experimental(composed_adjust)';
       method result { $adjusted }
    }
 
-   is( ComposedAdjust->new->result, "abc", 'Composed ADJUST blocks still work' );
+   is( ComposedAdjust->new->result, "abc", 'Composed ADJUST phasers still work' );
 }
 
 # ADJUST :params can also be composed
@@ -167,7 +167,7 @@ use Object::Pad ':experimental(composed_adjust)';
       method result { $adjusted }
    }
 
-   is( ComposedAdjustParams->new( x => "X" )->result, "aXc", 'Composed ADJUST blocks permit :params' );
+   is( ComposedAdjustParams->new( x => "X" )->result, "aXc", 'Composed ADJUST phasers permit :params' );
 }
 
 done_testing;

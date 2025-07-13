@@ -15,6 +15,8 @@ examples/check_percent_fail.pl
 examples/check_percent_ok.pl
 examples/check_percent_range_fail.pl
 examples/check_percent_range_ok.pl
+examples/check_positive_decimal_fail.pl
+examples/check_positive_decimal_ok.pl
 examples/check_positive_natural_fail.pl
 examples/check_positive_natural_ok.pl
 examples/check_positive_natural_range_fail.pl
@@ -56,7 +58,8 @@ t/Mo-utils-Number/03-check_int.t
 t/Mo-utils-Number/04-check_natural.t
 t/Mo-utils-Number/05-check_number.t
 t/Mo-utils-Number/06-check_percent.t
-t/Mo-utils-Number/07-check_positive_natural.t
+t/Mo-utils-Number/07-check_positive_decimal.t
+t/Mo-utils-Number/08-check_positive_natural.t
 xt/Mo-utils-Number-Range/01-pod_coverage.t
 xt/Mo-utils-Number-Range/02-pod.t
 xt/Mo-utils-Number-Utils/01-pod_coverage.t

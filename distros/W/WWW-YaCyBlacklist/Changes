@@ -1,5 +1,11 @@
 Revision history for WWW::YaCyBlacklist
 
+0.4       2025-07-13 02:20:09+02:00 Europe/Berlin
+        chomp list file lines
+
+0.3       2025-07-12 21:15:18+02:00 Europe/Berlin
+        documentation enhanced
+
 0.2       2025-07-11 01:19:39+02:00 Europe/Berlin
         attribute 'lines' removed
 

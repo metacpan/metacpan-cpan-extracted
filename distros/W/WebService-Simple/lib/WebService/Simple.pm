@@ -12,7 +12,7 @@ use Hash::MultiValue;
 use WebService::Simple::Response;
 use UNIVERSAL::require;
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 
 __PACKAGE__->config(
     base_url        => '',
@@ -147,7 +147,7 @@ sub request_url {
     }
     if($args{params}) {
         if(ref $args{params} eq 'Hash::MultiValue') {
-            for my $key ($args{params}->keys) {
+            for my $key (sort $args{params}->keys) {
                 $uri->query_param_append($key, $args{params}->get($key));
             }
         }else{

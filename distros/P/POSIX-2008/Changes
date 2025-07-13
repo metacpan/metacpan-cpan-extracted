@@ -1,5 +1,19 @@
 Revision history for POSIX::2008.
 
+0.25  2025-07-12
+  - Updated ppport.h to version 3.73.
+  - Added poll(), psignal(), strsignal(), statvfs().
+  - Added :poll export tag.
+  - Added TIMER_ABSTIME to the :clock export tag.
+  - Added t/07_poll.t.
+  - Fixed skip count in t/03_rw.t.
+  - Fixed clock_getcpuclockid() to set errno on error.
+  - clock_getcpuclockid() defaults to pid=0 instead of $$, saving a redundant
+    call to PerlProc_getpid().
+  - clock_getres(), clock_gettime() return floating seconds in scalar context.
+  - clock_settime(), clock_nanosleep(), nanosleep() also accept floating seconds.
+  - POD updates.
+
 0.24  2024-06-14
   - Updated ppport.h to version 3.72.
   - Fixed potential env buffer overflow in _execve50c().

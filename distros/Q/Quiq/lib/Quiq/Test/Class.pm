@@ -154,6 +154,10 @@ Unter CoTeDo wird für die Klasse oder das Programm definiert:
 
 Als Testmethode wird definiert:
 
+=over 4
+
+=item Klasse
+
   # <Test> ----------------------------------------------
   
   sub initMethod : Init(1) {
@@ -170,10 +174,32 @@ Als Testmethode wird definiert:
       $self->useOk('<class>');
   }
 
+=item Programm
+
+  # <Test> ----------------------------------------------
+  
+  sub initMethod : Init(1) {
+      my $self = shift;
+  
+      my $host = '<host>'; # Wir prüfen auf den Hostnamen
+  
+      if (Quiq::System->hostname ne $host) {
+          $self->skipAllTests("Not on $host");
+          return;
+      }
+      $self->ok(1);
+  
+      $self->useOk('<programclass');
+  }
+
+=back
+
 =back
 
 Hierbei ist C<< <host> >> der Name des Hosts, auf dem der Code läuft,
-C<< <class> >> ist die Name der (Programm-)Klasse, die getestet werden soll.
+C<< <class> >> ist die Name der Klasse bzw. C<< <programclass> >> die
+Programmklasse, die getestet werden soll. Statt des Hostnamens
+kann natürlich auch jede Eigenschaft geprüft werden.
 
 =cut
 
@@ -187,7 +213,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.228';
+our $VERSION = '1.229';
 
 use Test::Builder ();
 use Quiq::Option;
@@ -1270,7 +1296,7 @@ sub MODIFY_CODE_ATTRIBUTES {
 
 =head1 VERSION
 
-1.228
+1.229
 
 =head1 AUTHOR
 

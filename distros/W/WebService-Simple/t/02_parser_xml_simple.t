@@ -1,10 +1,13 @@
 use strict;
-use Test::More ( tests => 4 );
+use Test::More ( tests => 6 );
+
+use HTTP::Response;
 
 my $flickr_api_key = $ENV{FLICKR_API_KEY};
 BEGIN
 {
     use_ok("WebService::Simple");
+    use_ok("WebService::Simple::Parser::XML::Simple");
 }
 
 {
@@ -36,4 +39,15 @@ BEGIN
             }
         );
     }
+}
+
+{
+    my $parser   = WebService::Simple::Parser::XML::Simple->new;
+    my $response = HTTP::Response->new(undef, undef, undef, 'like.filename');
+
+    eval {
+        $parser->parse_response($response);
+    };
+
+    like($@, qr{\bsyntax error\b}, 'parse as string');
 }

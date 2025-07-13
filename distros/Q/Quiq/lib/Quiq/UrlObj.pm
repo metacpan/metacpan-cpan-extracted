@@ -28,7 +28,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.228';
+our $VERSION = '1.229';
 
 use Quiq::Url;
 use Quiq::Hash::Ordered;
@@ -244,7 +244,7 @@ sub url {
 
 =head1 VERSION
 
-1.228
+1.229
 
 =head1 AUTHOR
 

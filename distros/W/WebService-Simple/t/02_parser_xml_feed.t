@@ -12,17 +12,40 @@ BEGIN {
     use_ok("WebService::Simple");
 }
 
+# Mock RSS content for testing
+my $mock_rss = q{<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+<channel>
+<title>Test RSS Feed</title>
+<description>Test feed for WebService::Simple</description>
+<item>
+<title>Test Item</title>
+<description>Test description</description>
+</item>
+</channel>
+</rss>};
+
 {
     my $service = WebService::Simple->new(
         response_parser => 'XML::Feed',
-        base_url        => "http://search.cpan.org/uploads.rdf",
+        base_url        => "http://example.com/",
     );
 
     isa_ok( $service->response_parser,
         "WebService::Simple::Parser::XML::Feed" );
 
-    my $response = $service->get( {} );
-    my $feed = $response->parse_response;
+    # Create a mock HTTP::Response for testing
+    my $mock_response = HTTP::Response->new(200, 'OK');
+    $mock_response->content($mock_rss);
+    $mock_response->content_type('application/rss+xml');
+
+    # Convert to WebService::Simple::Response
+    my $ws_response = WebService::Simple::Response->new_from_response(
+        response => $mock_response,
+        parser   => $service->response_parser
+    );
+
+    my $feed = $ws_response->parse_response();
     like( ref($feed), qr/^(?:XML::Feed::RSS|XML::Feed::Format::RSS)$/ );
 }
 

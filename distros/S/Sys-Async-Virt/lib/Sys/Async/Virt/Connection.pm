@@ -14,43 +14,47 @@ use v5.26;
 use warnings;
 use experimental 'signatures';
 use Future::AsyncAwait;
+use Object::Pad;
 
-package Sys::Async::Virt::Connection v0.0.21;
+class Sys::Async::Virt::Connection v0.1.1 :repr(HASH);
 
-use parent qw(IO::Async::Notifier);
+inherit IO::Async::Notifier;
+
+field $_in  :inheritable = undef;
+field $_out :inheritable = undef;
 
 use Carp qw(croak);
 use Log::Any qw($log);
 
-sub close($self) {
+method close() {
     die $log->fatal(
         "The 'close' method must be implemented by concrete sub-classes");
 }
 
-async sub connect($self) {
+async method connect() {
     die $log->fatal(
         "The 'connect' method must be implemented by concrete sub-classes");
 }
 
-sub is_read_eof($self) {
-    return $self->{in}->is_read_eof;
+method is_read_eof() {
+    return $_in->is_read_eof;
 }
 
-sub is_secure($self) {
+method is_secure() {
     return 0;
 }
 
-sub is_write_eof($self) {
-    return $self->{out}->is_write_eof;
+method is_write_eof() {
+    return $_out->is_write_eof;
 }
 
-async sub read($self, $type, $len) {
+async method read($type, $len) {
     die $log->fatal( "Unsupported transfer type $type" ) unless $type eq 'data';
     $log->trace( "Starting read of length $len" );
-    await $self->{in}->read_exactly( $len );
+    await $_in->read_exactly( $len );
 }
 
-async sub write($self, @data) {
+async method write(@data) {
     return if @data == 0;
 
     # use the first data element as backpressure
@@ -58,13 +62,13 @@ async sub write($self, @data) {
     # all data into the send queue at once, so
     # other write calls can't mix their data
     # with ours
-    my $f = $self->{out}->write( shift @data );
+    my $f = $_out->write( shift @data );
 
     while (@data) {
         my $data = shift @data;
         next unless $data;
 
-        $self->{out}->write( $data );
+        $_out->write( $data );
     }
 
     return await $f;
@@ -81,7 +85,7 @@ Sys::Async::Virt::Connection - Connection to LibVirt server (abstract
 
 =head1 VERSION
 
-v0.0.21
+v0.1.1
 
 =head1 SYNOPSIS
 

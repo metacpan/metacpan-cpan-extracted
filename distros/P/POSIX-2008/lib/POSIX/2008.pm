@@ -5,10 +5,11 @@ use warnings;
 use Carp ();
 use IO::Dir ();
 use IO::File ();
+use Time::HiRes qw(gettimeofday tv_interval);
 
 require Exporter;
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 our $XS_VERSION = $VERSION;
 $VERSION = eval $VERSION; # so "use Module 0.002" won't warn on underscore
 
@@ -31,14 +32,15 @@ isnormal isprint ispunct isspace isunordered isupper isxdigit j0 j1 jn jrand48
 killpg l64a lchown ldexp lgamma link linkat log log10 log1p log2 logb lrand48
 lround lstat mkdir mkdirat mkdtemp mkfifo mkfifoat mknod mknodat mkstemp
 mrand48 nanosleep nearbyint nextafter nexttoward nice nrand48 open openat
-openat2 pathconf posix_fadvise posix_fallocate pread preadv preadv2 ptsname
-pwrite pwritev pwritev2 random raise read readlink readlinkat readv realpath
-remainder remove removeat remquo rename renameat renameat2 rmdir round scalbn
-seed48 setegid seteuid setgid setitimer setpriority setregid setreuid setsid
-setuid setutxent sighold sigignore signbit sigpause sigrelse sin sinh srand48
-srandom stat strptime symlink symlinkat sync sysconf tan tanh tgamma
-timer_create timer_delete timer_getoverrun timer_gettime timer_settime trunc
-truncate ttyname unlink unlinkat utimensat write writev y0 y1 yn
+openat2 pathconf poll posix_fadvise posix_fallocate pread preadv preadv2
+psignal ptsname pwrite pwritev pwritev2 random raise read readlink readlinkat
+readv realpath remainder remove removeat remquo rename renameat renameat2
+rmdir round scalbn seed48 setegid seteuid setgid setitimer setpriority
+setregid setreuid setsid setuid setutxent sighold sigignore signbit sigpause
+sigrelse sin sinh srand48 srandom stat statvfs strptime strsignal symlink
+symlinkat sync sysconf tan tanh tgamma timer_create timer_delete
+timer_getoverrun timer_gettime timer_settime trunc truncate ttyname unlink
+unlinkat utimensat write writev y0 y1 yn
 
 );
 
@@ -46,11 +48,13 @@ our @_constants = qw(
 
 AT_EACCESS AT_EMPTY_PATH AT_FDCWD AT_NO_AUTOMOUNT AT_REMOVEDIR
 AT_RESOLVE_BENEATH AT_SYMLINK_FOLLOW AT_SYMLINK_NOFOLLOW BOOT_TIME
-CLOCK_BOOTTIME CLOCK_HIGHRES CLOCK_MONOTONIC CLOCK_MONOTONIC_COARSE
-CLOCK_MONOTONIC_FAST CLOCK_MONOTONIC_PRECISE CLOCK_MONOTONIC_RAW
-CLOCK_PROCESS_CPUTIME_ID CLOCK_REALTIME CLOCK_REALTIME_COARSE
-CLOCK_REALTIME_FAST CLOCK_REALTIME_PRECISE CLOCK_SOFTTIME
-CLOCK_THREAD_CPUTIME_ID CLOCK_UPTIME CLOCK_UPTIME_FAST CLOCK_UPTIME_PRECISE
+
+CLOCK_BOOTTIME CLOCK_BOOTTIME_ALARM CLOCK_HIGHRES CLOCK_MONOTONIC
+CLOCK_MONOTONIC_COARSE CLOCK_MONOTONIC_FAST CLOCK_MONOTONIC_PRECISE
+CLOCK_MONOTONIC_RAW CLOCK_PROCESS_CPUTIME_ID CLOCK_REALTIME
+CLOCK_REALTIME_ALARM CLOCK_REALTIME_COARSE CLOCK_REALTIME_FAST
+CLOCK_REALTIME_PRECISE CLOCK_SOFTTIME CLOCK_TAI CLOCK_THREAD_CPUTIME_ID
+CLOCK_UPTIME CLOCK_UPTIME_FAST CLOCK_UPTIME_PRECISE
 
 DEAD_PROCESS FASYNC F_DUPFD F_DUPFD_CLOEXEC F_GETFD F_SETFD F_GETFL F_SETFL
 F_GETLK F_SETLK F_SETLKW F_GETOWN F_SETOWN F_RDLCK F_UNLCK F_WRLCK FD_CLOEXEC
@@ -74,6 +78,19 @@ S_IFSOCK S_ISUID S_ISGID S_IRWXU S_IRUSR S_IWUSR S_IXUSR S_IRWXG S_IRGRP
 S_IWGRP S_IXGRP S_IRWXO S_IROTH S_IWOTH S_IXOTH S_ISVTX SEEK_SET SEEK_CUR
 SEEK_END SEEK_DATA SEEK_HOLE TIMER_ABSTIME USER_PROCESS UTIME_NOW UTIME_OMIT
 F_OK R_OK W_OK X_OK
+
+INFTIM POLLERR POLLFREE POLLHUP POLLIN POLLMSG POLLNORM POLLNVAL POLLOUT
+POLLPRI POLLRDBAND POLLRDHUP POLLRDNORM POLLREMOVE POLLWRBAND POLLWRNORM
+POLL_BUSY_LOOP
+
+ST_NOSUID ST_RDONLY
+
+ST_MANDLOCK ST_NOATIME ST_NODEV ST_NODIRATIME ST_NOEXEC ST_RELATIME
+ST_SYNCHRONOUS
+
+ST_ASYNC ST_DEFEXPORTED ST_EXKERB ST_EXNORESPORT ST_EXPORTANON ST_EXPORTED
+ST_EXPUBLIC ST_EXRDONLY ST_LOCAL ST_LOG ST_NOCOREDUMP ST_NODEVMTIME
+ST_QUOTA ST_ROOTFS ST_SYMPERM ST_UNION
 
 _CS_GNU_LIBC_VERSION _CS_GNU_LIBPTHREAD_VERSION _CS_LFS64_CFLAGS
 _CS_LFS64_LDFLAGS _CS_LFS64_LIBS _CS_LFS64_LINTFLAGS _CS_LFS_CFLAGS
@@ -185,10 +202,11 @@ our %EXPORT_TAGS = (
   'is'     => [grep /^is/, @_functions],
   'rw'     => [qw(read write readv writev)],
   'prw'    => [qw(pread preadv preadv2 pwrite pwritev pwritev2)],
-  'clock'  => [grep(/^CLOCK_/, @_constants), grep(/^clock/, @_functions)],
+  'clock'  => [grep(/^(?:CLOCK_|TIMER_ABSTIME)/, @_constants), grep(/^clock/, @_functions)],
   'fcntl'  => [grep /^(?:[FORWX]|FD|POSIX_FADV|SEEK)_/, @_constants],
   'fenv_h' => [grep(/^FE_/, @_constants), grep (/^fe/, @_functions)],
   'fnm'    => [grep(/^FNM_/, @_constants), 'fnmatch'],
+  'poll'   => ['poll', grep /^(?:POLL|INFTIM)/, @_constants],
   'stat_h' => [grep /^(?:S_I|UTIME_)/, @_constants],
   'time_h' => [grep /^(?:CLOCK|TIMER)_/, @_constants],
   'timer'  => [grep(/^TIMER_/, @_constants), grep(/^timer_/, @_functions)],

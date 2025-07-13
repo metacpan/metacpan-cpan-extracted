@@ -442,6 +442,7 @@ static int build_classlike(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t n
 
   bool is_anon = false;
   bool is_lexical = (PL_parser->in_my != 0);
+  PL_parser->in_my = 0;
 
   SV *packagename = args[argi++]->sv;
   if(!packagename) {
@@ -533,7 +534,8 @@ static int build_classlike(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t n
   else
     croak("Expected a block or ';', found > %s", PL_parser->bufptr);
 
-  if(!hv_fetchs(hints, "Object::Pad/configure(no_implicit_pragmata)", 0)) {
+  if(imported_version < 821 &&
+     !hv_fetchs(hints, "Object::Pad/configure(no_implicit_pragmata)", 0)) {
     bool was_explicit_strict =
       (PL_hints & HINT_STRICT_REFS) &&
       (PL_hints & HINT_STRICT_SUBS) &&
@@ -1076,11 +1078,11 @@ static bool parse_phaser_filter_attr(pTHX_ struct XSParseSublikeContext *ctx, SV
   HV *hints = GvHV(PL_hintgv);
 
   if(hv_fetchs(hints, "Object::Pad/configure(no_adjust_attrs)", 0))
-    croak("ADJUST block attributes are not permitted");
+    croak("ADJUST phaser attributes are not permitted");
 
   if(strEQ(SvPVX(attr), "params")) {
     if(type != PHASER_ADJUST)
-      croak("Cannot set :params for a phaser block other than ADJUST");
+      croak("Cannot set :params for a phaser other than ADJUST");
 
     hv_stores(ctx->moddata, "Object::Pad/ADJUST:params", newRV_noinc((SV *)newAV()));
     return true;
@@ -1458,7 +1460,7 @@ static int parse_phaser(pTHX_ OP **out, void *hookdata)
     case PHASER_APPLY:
       if(!hv_fetchs(hints, "Object::Pad/experimental(apply_phaser)", 0))
         Perl_ck_warner(aTHX_ packWARN(WARN_EXPERIMENTAL),
-          "APPLY phaser blocks are experimental and may be changed or removed without notice");
+          "APPLY phasers are experimental and may be changed or removed without notice");
       return xs_parse_sublike(&parse_classphaser_hooks, hookdata, out);
   }
 
@@ -1489,7 +1491,7 @@ static void check_uuCLASS(pTHX_ void *hookdata)
   SV **svp;
   if(!(svp = hv_fetchs(GvHV(PL_hintgv), "Object::Pad/__CLASS__", 0)) ||
       !SvTRUE(*svp))
-    croak("Cannot use __CLASS__ outside of a method, ADJUST block or field initialiser");
+    croak("Cannot use __CLASS__ outside of a method, ADJUST phaser or field initialiser");
 }
 
 static OP *pp_curclass(pTHX)
@@ -1659,8 +1661,8 @@ static void dump_classmeta(pTHX_ DMDContext *ctx, ClassMeta *classmeta)
       {"the param map HV",           DMD_FIELD_PTR,  .ptr = classmeta->parammap},        \
       {"the requiremethods AV",      DMD_FIELD_PTR,  .ptr = classmeta->requiremethods},  \
       {"the initfields CV",          DMD_FIELD_PTR,  .ptr = classmeta->initfields},      \
-      {"the BUILD blocks AV",        DMD_FIELD_PTR,  .ptr = classmeta->buildcvs},        \
-      {"the ADJUST blocks AV",       DMD_FIELD_PTR,  .ptr = classmeta->adjustcvs},       \
+      {"the BUILD phasers AV",       DMD_FIELD_PTR,  .ptr = classmeta->buildcvs},        \
+      {"the ADJUST phasers AV",      DMD_FIELD_PTR,  .ptr = classmeta->adjustcvs},       \
       {"the temporary method scope", DMD_FIELD_PTR,  .ptr = classmeta->methodscope}
 
   switch(classmeta->type) {
@@ -1683,7 +1685,7 @@ static void dump_classmeta(pTHX_ DMDContext *ctx, ClassMeta *classmeta)
           COMMON_FIELDS,
           {"the superroles AV",           DMD_FIELD_PTR, .ptr = classmeta->role.superroles},
           {"the role applied classes HV", DMD_FIELD_PTR, .ptr = classmeta->role.applied_classes},
-          {"the role APPLY blocks AV",    DMD_FIELD_PTR, .ptr = classmeta->role.applycvs},
+          {"the role APPLY phasers AV",   DMD_FIELD_PTR, .ptr = classmeta->role.applycvs},
         })
       );
       break;
