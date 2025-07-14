@@ -1,12 +1,15 @@
- use strict;
+use strict;
 use warnings;
 no warnings 'qw';
 use SQL::Abstract::More;
 use Test::More;
 use SQL::Abstract::Test import => [qw/is_same_sql_bind/];
 
+my ($parent_SQLA) = @SQL::Abstract::More::ISA;
+my $parent_version = $parent_SQLA->VERSION;
+
 diag( "Testing SQL::Abstract::More $SQL::Abstract::More::VERSION, "
-      ."extends @SQL::Abstract::More::ISA, Perl $], $^X" );
+      ."extends $parent_SQLA version $parent_version, Perl $], $^X" );
 
 use constant N_DBI_MOCK_TESTS =>  2;
 
@@ -945,6 +948,17 @@ is_same_sql_bind(
   [2, 1, 3],
 );
 
+# support for table aliases
+($sql, @bind) = $sqla->update(
+  -table => 'Foo|a',
+  -set   => {'a.foo' => 1, 'a.bar' => 2},
+  -where => {'a.buz' => 3},
+);
+is_same_sql_bind(
+  $sql, \@bind,
+  'UPDATE Foo AS a SET a.bar = ?, a.foo = ? WHERE a.buz = ?',
+  [2, 1, 3],
+);
 
 # MySQL supports -limit and -order_by in updates !
 # see http://dev.mysql.com/doc/refman/5.6/en/update.html
@@ -1044,6 +1058,7 @@ is_same_sql_bind(
   $sql, \@bind,
   'DELETE FROM Foo WHERE buz = ?',
   [3],
+  "delete",
 );
 
 # old API
@@ -1052,6 +1067,19 @@ is_same_sql_bind(
   $sql, \@bind,
   'DELETE FROM Foo WHERE buz = ?',
   [3],
+  "delete, old API",
+);
+
+# support for table aliases
+($sql, @bind) = $sqla->delete(
+  -from => 'Foo|a',
+  -where => {buz => 3},
+);
+is_same_sql_bind(
+  $sql, \@bind,
+  'DELETE FROM Foo AS a WHERE buz = ?',
+  [3],
+  "delete with table alias",
 );
 
 # MySQL supports -limit and -order_by in deletes !
@@ -1081,7 +1109,7 @@ is_same_sql_bind(
   $sql, \@bind,
   'DELETE IGNORE FROM Foo WHERE buz = ?',
   [3],
-  'delete IGNORE',
+  'delete with -add_sql',
 );
 
 

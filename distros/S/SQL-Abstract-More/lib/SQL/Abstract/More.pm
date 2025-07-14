@@ -19,7 +19,7 @@ use namespace::clean;
 # declare error-reporting functions from SQL::Abstract
 sub puke(@); sub belch(@);  # these will be defined later in import()
 
-our $VERSION = '1.43';
+our $VERSION = '1.44';
 our @ISA;
 
 sub import {
@@ -881,9 +881,10 @@ sub update {
   if (&_called_with_named_args) {
     %args = validate(@_, \%params_for_update);
 
-    # compute join info if the datasource is a join
-    $join_info = $self->_compute_join_info($args{-table});
-    $args{-table} = \($join_info->{sql}) if $join_info;
+    # compute SQL for datasource to be updated
+    $join_info    = $self->_compute_join_info($args{-table});
+    $args{-table} = defined $join_info  ? \($join_info->{sql})
+                                        : $self->_parse_table($args{-table})->{sql};
 
     @old_API_args = @args{qw/-table -set -where/};
 
@@ -898,7 +899,6 @@ sub update {
 
   # call parent method and merge with bind values from $join_info
   my ($sql, @bind) = $self->_parent_update(@old_API_args);
-
   unshift @bind, @{$join_info->{bind}} if $join_info;
 
   # handle additional args if needed
@@ -931,7 +931,8 @@ sub delete {
   my @old_API_args;
   my %args;
   if (&_called_with_named_args) {
-    %args = validate(@_, \%params_for_delete);
+    %args         = validate(@_, \%params_for_delete);
+    $args{-from}  = $self->_parse_table($args{-from})->{sql};
     @old_API_args = @args{qw/-from -where/};
   }
   else {
@@ -949,7 +950,6 @@ sub delete {
 
   return ($sql, @bind);
 }
-
 
 
 
@@ -2841,6 +2841,10 @@ Laurent Dami, C<< <laurent dot dami at cpan dot org> >>
 
 =item *
 
+L<https://github.com/djerius> : support for table aliases in update() and delete()
+
+=item *
+
 L<https://github.com/rouzier> : support for C<-having> without C<-order_by>
 
 =item *
@@ -2867,7 +2871,7 @@ L<https://metacpan.org/module/SQL::Abstract::More>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2011-2024 Laurent Dami.
+Copyright 2011-2025 Laurent Dami.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

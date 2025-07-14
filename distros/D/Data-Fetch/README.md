@@ -9,65 +9,117 @@
 
 # NAME
 
-Data::Fetch - give advance warning that you'll be needing a value
+Data::Fetch - Prime method calls for background execution using threads
 
 # VERSION
 
-Version 0.06
+Version 0.07
 
 # SYNOPSIS
 
-Sometimes we know in advance that we'll be needing a value which is going to take a long time to compute or determine.
-This module fetches the value in the background so that you don't need to wait so long when you need the value.
+This module allows you to prepare time-consuming method calls in advance.
+It runs those methods in background threads so that when you later need the result,
+you don't need to wait for it to compute.
 
     use CalculatePi;
     use Data::Fetch;
+
     my $fetcher = Data::Fetch->new();
-    my $pi = CalculatePi->new(places => 1000000);
-    $fetcher->prime(object => $pi, message => 'as_string');     # Warn we'll run $pi->as_string() in the future
-    # Do other things
-    print $fetcher->get(object => $pi, message => 'as_string'), "\n";   # Runs $pi->as_string()
+    my $pi = CalculatePi->new(places => 1_000_000);
+
+    # Prime the method call in the background
+    $fetcher->prime(
+        object  => $pi,
+        message => 'as_string',
+        arg     => undef  # Optional
+    );
+
+    # Do other work here...
+
+    # Retrieve the result later (waits only if it hasn't completed yet)
+    my $value = $fetcher->get(
+        object  => $pi,
+        message => 'as_string',
+        arg     => undef
+    );
+
+    print $value, "\n";
+
+# DESCRIPTION
+
+Some method calls are expensive, such as generating a large dataset or performing
+heavy computations.
+If you know in advance that you'll need the result later,
+`Data::Fetch` lets you prime that method call so it begins running in a background thread.
+
+When you later call `get`,
+the value is returned immediately if ready - or you'll wait for it to finish.
 
 # SUBROUTINES/METHODS
 
 ## new
 
-Creates a Data::Fetch object.  Takes no argument.
+    my $fetcher = Data::Fetch->new();
+
+Constructs and returns a new `Data::Fetch` object.
 
 ## prime
 
-Say what is is you'll be needing later.
-Call in an array context if get() is to be used in an array context.
+    $fetcher->prime(
+        object  => $obj,
+        message => 'method_name',
+        arg     => $args_ref    # Optional
+    );
 
-Takes two mandatory parameters:
+Starts a background thread that will call the given method on the object.
 
-    object - the object you'll be sending the message to
-    message - the message you'll be sending
+Takes the following parameters:
 
-Takes one optional parameter:
+- object
 
-    arg - passes this argument to the message
+    The object on which the method will be invoked.
+
+- message
+
+    The name of the method to call.
+
+- arg
+
+    (Optional) The arguments to pass to the method. This must be:
+
+    \- A scalar
+    \- An arrayref of positional arguments
+    \- A hashref of named arguments
+
+    The arguments are passed to the method using Perl's standard `@_` behavior:
+
+        $obj->$method(@$args)      # if arg is an arrayref
+        $obj->$method(%$args)      # if arg is a hashref
+        $obj->$method($arg)        # otherwise
+
+If called in list context, the method result will be stored and returned in list context when retrieved via `get()`.
 
 ## get
 
-Retrieve get a value you've primed.
-Call in an array context only works if prime() was called in an array context, or the value wasn't primed
+    my $value = $fetcher->get(
+        object  => $obj,
+        message => 'method_name',
+        arg     => $arg         # Optional
+    );
 
-Takes two mandatory parameters:
+Retrieves the result of a previously primed method.
+If the background thread is still running, it will wait for it to finish.
+If the method wasn't primed, it
+will call the method directly and cache the result.
 
-    object - the object you'll be sending the message to
-    message - the message you'll be sending
+`get` can be called in list or scalar context, depending on what the method returns.
+If the method returns a list, use:
 
-Takes one optional parameter:
-
-    arg - passes this argument to the message
-
-If you don't prime it will still work and store the value for subsequent calls,
-but in this scenerio you gain nothing over using CHI to cache your values.
+    my @list = $fetcher->get(...);
 
 # AUTHOR
 
-Nigel Horne, `<njh at bandsman.co.uk>`
+Nigel Horne, `<njh at nigelhorne.com>`
 
 # BUGS
 
@@ -87,9 +139,22 @@ or through the web interface at
 I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
+See [http://www.cpantesters.org/cpan/report/116390147](http://www.cpantesters.org/cpan/report/116390147).
+This code could produce the "attempt to prime twice" if you're unlucky and Perl assigns the
+same address to the new object as the old object.
+
+    my $fetch = Data::Fetch->new();
+    my $data = Class::Simple->new();
+    $fetch->prime(object => $data, message => 'get');
+    $fetch->get(object => $data, message => 'get');
+    $data = Class::Simple->new();       # Possibly the address of $data isn't changed
+    $fetch->prime(object => $data, message => 'get');   # <<<< This could produce the error
+
 # SEE ALSO
 
 # SUPPORT
+
+This module is provided as-is without any warranty.
 
 You can find documentation for this module with the perldoc command.
 
@@ -113,16 +178,12 @@ You can also look for information at:
 
     [http://matrix.cpantesters.org/?dist=Data-Fetch](http://matrix.cpantesters.org/?dist=Data-Fetch)
 
-- CPAN Ratings
-
-    [http://cpanratings.perl.org/d/Data-Fetch](http://cpanratings.perl.org/d/Data-Fetch)
-
 - CPAN Testers Dependencies
 
     [http://deps.cpantesters.org/?module=Data::Fetch](http://deps.cpantesters.org/?module=Data::Fetch)
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2010-2020 Nigel Horne.
+Copyright 2010-2025 Nigel Horne.
 
 This program is released under the following licence: GPL2

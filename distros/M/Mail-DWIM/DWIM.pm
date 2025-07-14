@@ -6,7 +6,7 @@ use strict;
 use warnings;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(mail);
-our $VERSION = "0.08";
+our $VERSION = "0.09";
 our @HTML_MODULES = qw(HTML::FormatText HTML::TreeBuilder MIME::Lite);
 our @ATTACH_MODULES = qw(File::MMagic MIME::Lite);
 
@@ -128,7 +128,10 @@ sub send {
           # some smtp servers want SASL auth
         if( defined $self->{user} ) {
             require Authen::SASL;
-            push @options, (Auth => [ $self->{user}, $self->{password} ]);
+            push @options, (
+                Auth => [ $self->{user}, $self->{password} ],
+                SSL => 1,
+            );
         }
     } elsif($self->{transport} eq "mail") {
         return $self->cmd_line_mail();
@@ -161,7 +164,7 @@ sub send {
         for (keys %headers) {
             $txt .= "$_: $headers{$_}\n" if defined $headers{$_};
         }
-        $txt .= "\n";
+        $txt .= "\noptions @options\n\n";
 
         test_file_append($txt . $text);
         return 1;
@@ -526,6 +529,8 @@ a password:
 
       user     => 'joeschmoe',
       password => 'top5ecret',
+
+Note that the above will insist on using SSL/TLS as a transport protocol.
 
 Or, if you prefer that Mail::DWIM uses the C<mail> Unix command line
 utility, use 'mail' as a transport:

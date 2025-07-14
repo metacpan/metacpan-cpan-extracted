@@ -1,4 +1,4 @@
-Geo::Coder::XYZ Version 0.08
+Geo::Coder::XYZ Version 0.10
 
 INSTALLATION
 
@@ -24,15 +24,12 @@ You can also look for information at:
     AnnoCPAN, Annotated CPAN documentation
         http://annocpan.org/dist/Geo-Coder-XYZ
 
-    CPAN Ratings
-        http://cpanratings.perl.org/d/Geo-Coder-XYZ
-
     Search CPAN
         http://search.cpan.org/dist/Geo-Coder-XYZ/
 
 
 LICENSE AND COPYRIGHT
 
-Copyright (C) 2017-2018 Nigel Horne
+Copyright (C) 2017-2025 Nigel Horne
 
 This program is released under the following licence: GPL

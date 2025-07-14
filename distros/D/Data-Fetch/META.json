@@ -1,16 +1,16 @@
 {
-   "abstract" : "give advance warning that you'll be needing a value",
+   "abstract" : "Prime method calls for background execution using threads",
    "author" : [
       "Nigel Horne <njh@bandsman.co.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.52, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.74, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "open_source"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Data-Fetch",
    "no_index" : {
@@ -32,6 +32,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Scalar::Util" : "0",
             "perl" : "5.012000",
             "threads" : "0"
          }
@@ -39,7 +40,9 @@
       "test" : {
          "requires" : {
             "Test::CleanNamespaces" : "0",
+            "Test::DescribeMe" : "0",
             "Test::Most" : "0",
+            "Test::Needs" : "0",
             "Test::NoWarnings" : "0",
             "Test::Warn" : "0"
          }
@@ -58,6 +61,5 @@
          "web" : "https://github.com/nigelhorne/Data-Fetch"
       }
    },
-   "version" : "0.06",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.07"
 }

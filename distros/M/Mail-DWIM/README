@@ -1,7 +1,3 @@
-######################################################################
-    Mail::DWIM 0.08
-######################################################################
-
 NAME
     Mail::DWIM - Do-What-I-Mean Mailer
 
@@ -67,6 +63,9 @@ DESCRIPTION
 
           user     => 'joeschmoe',
           password => 'top5ecret',
+
+    Note that the above will insist on using SSL/TLS as a transport
+    protocol.
 
     Or, if you prefer that Mail::DWIM uses the "mail" Unix command line
     utility, use 'mail' as a transport:

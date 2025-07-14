@@ -1,7 +1,11 @@
-use Test::Most;
+#!/usr/bin/env perl
 
 use strict;
+use warnings;
+use Test::Most;
 
 eval 'use Test::Portability::Files';
-plan skip_all => "Test::Portability::Files required for testing filenames portability" if $@;
+
+plan(skip_all => 'Test::Portability::Files required for testing filenames portability') if $@;
+
 run_tests();

@@ -16,8 +16,9 @@ use experimental 'signatures';
 use Future::AsyncAwait;
 use Object::Pad;
 
-class Sys::Async::Virt::Connection v0.1.1 :repr(HASH);
+class Sys::Async::Virt::Connection v0.1.3;
 
+# inheriting from IO::Async::Notifier (a non-Object::Pad base class) implies ':repr(HASH)'
 inherit IO::Async::Notifier;
 
 field $_in  :inheritable = undef;
@@ -85,7 +86,7 @@ Sys::Async::Virt::Connection - Connection to LibVirt server (abstract
 
 =head1 VERSION
 
-v0.1.1
+v0.1.3
 
 =head1 SYNOPSIS
 

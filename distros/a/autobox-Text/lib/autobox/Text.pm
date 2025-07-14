@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package autobox::Text;
 
-# ABSTRACT: turns baubles into trinkets
+# ABSTRACT: autoboxed methonds for text
 
 use base qw/autobox/;
 
@@ -104,7 +104,7 @@ autobox::Text - turns baubles into trinkets
 
 =head1 DESCRIPTION
 
-This module extends scalars and arrays with a set of convenient
+This module extends scalars and arrays with a set of 
 text-processing methods using L<autobox>.
 
 =head1 METHODS
@@ -155,9 +155,10 @@ L<autobox>, L<Text::Wrap>, L<String::Truncate>
 
 =head1 AUTHOR
 
-<Your Name Here>
+Simone Cesano
 
-=head1 LICENSE
+=head1 COPYRIGHT AND LICENSE
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This software is copyright (c) 2025 by Simone Cesano.
+
+This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.

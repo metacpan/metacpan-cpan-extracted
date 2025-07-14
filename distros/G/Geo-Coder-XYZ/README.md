@@ -4,13 +4,13 @@
 [![Dependency Status](https://dependencyci.com/github/nigelhorne/Geo-Coder-XYZ/badge)](https://dependencyci.com/github/nigelhorne/Geo-Coder-XYZ)
 [![Kritika Analysis Status](https://kritika.io/users/nigelhorne/repos/3980051779912539/heads/master/status.svg)](https://kritika.io/users/nigelhorne/repos/3980051779912539/heads/master/)
 
-# Geo::Coder::XYZ
+# NAME
 
-Provides a Geo-Coding functionality using [https://geocode.xyz](https://geocode.xyz)
+Geo::Coder::XYZ - Provides a Geo-Coding functionality using [https://geocode.xyz](https://geocode.xyz)
 
 # VERSION
 
-Version 0.09
+Version 0.10
 
 # SYNOPSIS
 
@@ -40,7 +40,7 @@ Geo::Coder::XYZ provides an interface to geocode.xyz, a free Geo-Coding database
     print 'Longitude: ', $location->{'longt'}, "\n";
 
     @locations = $geo_coder->geocode('Portland, USA');
-    diag 'There are Portlands in ', join (', ', map { $_->{'state'} } @locations);
+    print 'There are Portlands in ', join (', ', map { $_->{'state'} } @locations), "\n";
 
 ## ua
 
@@ -53,7 +53,9 @@ environment variables:
 You can also set your own User-Agent object:
 
     use LWP::UserAgent::Throttled;
-    $geo_coder->ua(LWP::UserAgent::Throttled->new());
+    my $ua = LWP::UserAgent::Throttled->new();
+    $ua->throttle({ 'geocode.xyz' => 2 });
+    $geo_coder->ua($ua);
 
 ## reverse\_geocode
 
@@ -61,11 +63,15 @@ You can also set your own User-Agent object:
 
 Similar to geocode except it expects a latitude/longitude parameter.
 
+# SUPPORT
+
+This module is provided as-is without any warranty.
+
 # AUTHOR
 
-Nigel Horne <njh@bandsman.co.uk>
+Nigel Horne, `<njh at nigelhorne.com>`
 
-Based on [Geo::Coder::GooglePlaces](https://metacpan.org/pod/Geo::Coder::GooglePlaces).
+Based on [Geo::Coder::GooglePlaces](https://metacpan.org/pod/Geo%3A%3ACoder%3A%3AGooglePlaces).
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -74,10 +80,10 @@ Lots of thanks to the folks at geocode.xyz.
 
 # SEE ALSO
 
-[Geo::Coder::GooglePlaces](https://metacpan.org/pod/Geo::Coder::GooglePlaces), [HTML::GoogleMaps::V3](https://metacpan.org/pod/HTML::GoogleMaps::V3)
+[Geo::Coder::GooglePlaces](https://metacpan.org/pod/Geo%3A%3ACoder%3A%3AGooglePlaces), [HTML::GoogleMaps::V3](https://metacpan.org/pod/HTML%3A%3AGoogleMaps%3A%3AV3)
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2017-2018 Nigel Horne.
+Copyright 2017-2025 Nigel Horne.
 
 This program is released under the following licence: GPL2

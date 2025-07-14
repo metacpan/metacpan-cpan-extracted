@@ -4,7 +4,7 @@
       "Laurent Dami <dami@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4232",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -42,7 +42,7 @@
    "provides" : {
       "SQL::Abstract::More" : {
          "file" : "lib/SQL/Abstract/More.pm",
-         "version" : "1.43"
+         "version" : "1.44"
       }
    },
    "release_status" : "stable",
@@ -54,6 +54,6 @@
          "url" : "https://github.com/damil/SQL-Abstract-More"
       }
    },
-   "version" : "1.43",
-   "x_serialization_backend" : "JSON::PP version 4.05"
+   "version" : "1.44",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

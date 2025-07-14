@@ -1,6 +1,7 @@
 #!perl -w
 
 use strict;
+use warnings;
 use Test::Most;
 
 unless($ENV{AUTHOR_TESTING}) {

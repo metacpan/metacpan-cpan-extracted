@@ -1,3 +1,5 @@
+#!/usr/bin/env perl
+
 use strict;
 use warnings;
 use ExtUtils::MakeMaker 6.64;	# 6.64 for TEST_REQUIRES
@@ -6,25 +8,25 @@ use IO::Socket::INET;
 
 my $online_tests;
 
-if($ENV{AUTHOR_TESTING}) {
+if($ENV{'AUTHOR_TESTING'}) {
 	$online_tests = are_online();
-} elsif($ENV{AUTOMATED_TESTING} || $ENV{NO_NETWORK_TESTING} || (!-t STDIN)) {
-	$online_tests = 0;
 } else {
 	Getopt::Long::GetOptions('online-tests!' => \$online_tests);
 
 	if(!defined($online_tests)) {
-		if($ENV{AUTHOR_TESTING}) {
-			$online_tests = are_online();
-		} else {
-			$online_tests = 0;
-		}
+		$online_tests = are_online();
+	}
+	if(!$online_tests) {
+		print "On-line tests have been disabled\n";
 	}
 }
 
 my $test_requires = {
+	'LWP::UserAgent::Throttled' => 0,
+	'Test::DescribeMe' => 0,
 	'Test::Most' => 0,
-	'Test::NoWarnings' => 0,
+	'Test::Needs' => 0,
+	'Test::NoWarnings' => 0
 };
 
 if($online_tests) {
@@ -37,9 +39,18 @@ if($online_tests) {
 	unlink('t/online.enabled');
 }
 
+my $dist = {
+	COMPRESS => 'gzip -9f',
+	SUFFIX => 'gz'
+};
+
+if($^O eq 'darwin') {
+	$dist->{'TAR'} = 'gtar';
+}
+
 WriteMakefile(
     NAME		=> 'Geo::Coder::XYZ',
-    AUTHOR		=> q{Nigel Horne <njh@bandsman.co.uk>},
+    AUTHOR		=> q{Nigel Horne <njh@nigelhorne.com>},
     VERSION_FROM	=> 'lib/Geo/Coder/XYZ.pm',
     ABSTRACT_FROM       => 'lib/Geo/Coder/XYZ.pm',
     ((defined($ExtUtils::MakeMaker::VERSION) &&
@@ -48,15 +59,17 @@ WriteMakefile(
       : ()),
     PL_FILES	=> {},
 	TEST_REQUIRES => $test_requires,
-    PREREQ_PM => {
+	CONFIGURE_REQUIRES => {
+		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
+    }, PREREQ_PM => {
 	'Encode' => 0,
-	'JSON' => 0,
+	'JSON::MaybeXS' => 0,
 	'HTTP::Request' => 0,
 	'LWP::UserAgent' => 0,
 	'LWP::Protocol::https' => 0,
+	'Params::Get' => 0,
 	'URI' => 0,
-    },
-    dist		=> { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+    }, dist => $dist,
     clean		=> { FILES => 'Geo-Coder-XYZ-*' },
     META_MERGE		=> {
     	'meta-spec' => { version => 2 },
@@ -77,11 +90,16 @@ WriteMakefile(
 
 sub are_online
 {
-	my $s = IO::Socket::INET->new(
+	return 0 if($ENV{'NO_NETWORK_TESTING'} || $ENV{'CIRCLECI'} || $ENV{'TRAVIS_PERL_VERSION'} || $ENV{'AUTOMATED_TESTING'} || $ENV{'NONINTERACTIVE_TESTING'} || (!-t STDIN));
+
+	if(my $s = IO::Socket::INET->new(
 		PeerAddr => 'geocode.xyz:443',
 		Timeout => 10
-	);
-	if($s) {
+	)) {
+		if($ENV{'PERL_MM_USE_DEFAULT'}) {
+			close($s);
+			return 1;
+		}
 		print <<EOF;
 
 You appear to be directly connected to the Internet.  I have some tests
@@ -103,8 +121,7 @@ EOF
 			return 1;	# The default is 'y'
 		}
 		return $rc;
-	} else {
-		print "On-line tests disabled because I couldn't detect an Internet connexion\n";
-		return 0;
 	}
+	print "On-line tests disabled because I couldn't detect an Internet connexion\n";
+	return 0;
 }

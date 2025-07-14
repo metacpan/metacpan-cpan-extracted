@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   Module::Build: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4232, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,7 +19,7 @@ name: SQL-Abstract-More
 provides:
   SQL::Abstract::More:
     file: lib/SQL/Abstract/More.pm
-    version: '1.43'
+    version: '1.44'
 requires:
   MRO::Compat: '0'
   Params::Validate: '0'
@@ -31,5 +31,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/damil/SQL-Abstract-More
-version: '1.43'
+version: '1.44'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

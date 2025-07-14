@@ -1,5 +1,9 @@
 Revision history for SQL-Abstract-More
 
+
+1.44 13.07.2025
+  - accept table aliases in update() and delete() (djerius++)
+
 1.43 05.03.2024
   - accept scalar in ->with(-columns => $scalar, ...) # this was documented but not implemented
 

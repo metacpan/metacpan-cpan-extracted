@@ -1,6 +1,9 @@
 ######################################################################
 Revision history for Perl extension Mail::DWIM
 
+0.09  (2025/07/13)
+    (ms) Mandatory SSL smtp server communication with user/password auth
+
 0.08  (2014/10/24)
     (ms) Added SASL auth for SMTP servers, specify 'user' and 'password'.
     (ms) Compensated for MIME::Lite shortcomings and added 'boundary' to 

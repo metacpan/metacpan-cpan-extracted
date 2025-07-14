@@ -13,9 +13,10 @@ BEGIN {
 
 XYZ: {
 	SKIP: {
-		skip 'Test requires Internet access', 4 unless(-e 't/online.enabled');
+		skip('Test requires Internet access', 4) unless(-e 't/online.enabled');
 
 		my $geocoder = new_ok('Geo::Coder::XYZ');
+		sleep(1);	# Avoid throttling
 
 		# Check list context finds both Portland, ME and Portland, OR
 		my @locations = $geocoder->geocode('Portland, US');
@@ -37,6 +38,8 @@ XYZ: {
 		ok($maine == 1);
 		ok($oregon == 1);
 
-		# diag('There are Portlands in ', join (', ', map { $_->{'state'} } @locations));
+		if($ENV{'TEST_VERBOSE'}) {
+			diag('There are Portlands in ', join (', ', map { $_->{'state'} } @locations));
+		}
 	}
 }

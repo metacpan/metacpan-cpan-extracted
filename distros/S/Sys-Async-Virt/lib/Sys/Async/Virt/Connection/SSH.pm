@@ -16,7 +16,7 @@ use experimental 'signatures';
 use Future::AsyncAwait;
 use Object::Pad;
 
-class Sys::Async::Virt::Connection::SSH v0.1.1;
+class Sys::Async::Virt::Connection::SSH v0.1.3;
 
 inherit Sys::Async::Virt::Connection '$_in', '$_out';
 
@@ -27,10 +27,10 @@ use Log::Any qw($log);
 use Protocol::Sys::Virt::UNIXSocket v11.5.0; # imports socket_path
 use Protocol::Sys::Virt::URI v11.5.0; # imports parse_url
 
-field $_url :param :reader;
-field $_socket :param = undef :reader;
-field $_readonly :param :reader;
-field $_process = undef;
+field $_url      :reader :param;
+field $_socket   :reader :param = undef;
+field $_readonly :reader :param;
+field $_process;
 
 method close() {
     $_process->kill( 'TERM' ) if not $_process->is_exited;
@@ -147,7 +147,7 @@ Sys::Async::Virt::Connection::SSH - Connection to LibVirt server over SSH
 
 =head1 VERSION
 
-v0.1.1
+v0.1.3
 
 =head1 SYNOPSIS
 
