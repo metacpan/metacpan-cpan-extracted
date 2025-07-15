@@ -3,6 +3,64 @@ Upstream-Name: Sub-HandlesVia
 Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
 Source: https://metacpan.org/release/Sub-HandlesVia
 
+Files: Changes
+ META.json
+ META.yml
+ doap.ttl
+ lib/Sub/HandlesVia/CodeGenerator.pm.mite.pm
+ lib/Sub/HandlesVia/Handler.pm.mite.pm
+ lib/Sub/HandlesVia/HandlerLibrary.pm
+ lib/Sub/HandlesVia/HandlerLibrary/Array.pm
+ lib/Sub/HandlesVia/HandlerLibrary/Bool.pm
+ lib/Sub/HandlesVia/HandlerLibrary/Code.pm
+ lib/Sub/HandlesVia/HandlerLibrary/Counter.pm
+ lib/Sub/HandlesVia/HandlerLibrary/Hash.pm
+ lib/Sub/HandlesVia/HandlerLibrary/Number.pm
+ lib/Sub/HandlesVia/HandlerLibrary/Scalar.pm
+ lib/Sub/HandlesVia/HandlerLibrary/String.pm
+ lib/Sub/HandlesVia/Mite.pm
+ lib/Sub/HandlesVia/Toolkit.pm.mite.pm
+ lib/Sub/HandlesVia/Toolkit/Mite.pm
+ lib/Sub/HandlesVia/Toolkit/Mite.pm.mite.pm
+ lib/Sub/HandlesVia/Toolkit/Moo.pm
+ lib/Sub/HandlesVia/Toolkit/Moo.pm.mite.pm
+ lib/Sub/HandlesVia/Toolkit/Moose.pm
+ lib/Sub/HandlesVia/Toolkit/Moose.pm.mite.pm
+ lib/Sub/HandlesVia/Toolkit/Mouse.pm
+ lib/Sub/HandlesVia/Toolkit/Mouse.pm.mite.pm
+ lib/Sub/HandlesVia/Toolkit/ObjectPad.pm
+ lib/Sub/HandlesVia/Toolkit/ObjectPad.pm.mite.pm
+ lib/Sub/HandlesVia/Toolkit/Plain.pm
+ lib/Sub/HandlesVia/Toolkit/Plain.pm.mite.pm
+ t/30egpod/array.t
+ t/30egpod/bool.t
+ t/30egpod/code.t
+ t/30egpod/counter.t
+ t/30egpod/hash.t
+ t/30egpod/number.t
+ t/30egpod/scalar.t
+ t/30egpod/string.t
+ t/40mite/array.t
+ t/40mite/bool.t
+ t/40mite/code.t
+ t/40mite/counter.t
+ t/40mite/hash.t
+ t/40mite/lib/MyTest/TestClass/Array.pm
+ t/40mite/lib/MyTest/TestClass/Bool.pm
+ t/40mite/lib/MyTest/TestClass/Code.pm
+ t/40mite/lib/MyTest/TestClass/Counter.pm
+ t/40mite/lib/MyTest/TestClass/Hash.pm
+ t/40mite/lib/MyTest/TestClass/Number.pm
+ t/40mite/lib/MyTest/TestClass/Scalar.pm
+ t/40mite/lib/MyTest/TestClass/String.pm
+ t/40mite/number.t
+ t/40mite/scalar.t
+ t/40mite/string.t
+ t/50objectpad.t
+ t/99headtail.t
+Copyright: Copyright 2025 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
 Files: dist.ini
  t/00begin.t
  t/02moo.t
@@ -30,19 +88,6 @@ Files: dist.ini
  t/14enum.t
  t/15preludes.t
  t/16stackqueue.t
- t/30egpod/array.t
- t/30egpod/bool.t
- t/30egpod/code.t
- t/30egpod/counter.t
- t/30egpod/hash.t
- t/30egpod/number.t
- t/30egpod/scalar.t
- t/30egpod/string.t
- t/40mite/array.t
- t/40mite/bool.t
- t/40mite/code.t
- t/40mite/counter.t
- t/40mite/hash.t
  t/40mite/lib/MyTest.pm
  t/40mite/lib/MyTest.pm.mite.pm
  t/40mite/lib/MyTest/Class1.pm
@@ -52,25 +97,14 @@ Files: dist.ini
  t/40mite/lib/MyTest/Role1.pm.mite.pm
  t/40mite/lib/MyTest/Role2.pm
  t/40mite/lib/MyTest/Role2.pm.mite.pm
- t/40mite/lib/MyTest/TestClass/Array.pm
  t/40mite/lib/MyTest/TestClass/Array.pm.mite.pm
- t/40mite/lib/MyTest/TestClass/Bool.pm
  t/40mite/lib/MyTest/TestClass/Bool.pm.mite.pm
- t/40mite/lib/MyTest/TestClass/Code.pm
  t/40mite/lib/MyTest/TestClass/Code.pm.mite.pm
- t/40mite/lib/MyTest/TestClass/Counter.pm
  t/40mite/lib/MyTest/TestClass/Counter.pm.mite.pm
- t/40mite/lib/MyTest/TestClass/Hash.pm
  t/40mite/lib/MyTest/TestClass/Hash.pm.mite.pm
- t/40mite/lib/MyTest/TestClass/Number.pm
  t/40mite/lib/MyTest/TestClass/Number.pm.mite.pm
- t/40mite/lib/MyTest/TestClass/Scalar.pm
  t/40mite/lib/MyTest/TestClass/Scalar.pm.mite.pm
- t/40mite/lib/MyTest/TestClass/String.pm
  t/40mite/lib/MyTest/TestClass/String.pm.mite.pm
- t/40mite/number.t
- t/40mite/scalar.t
- t/40mite/string.t
  t/60detect.t
  t/61moosemetagubbins.t
  t/62mousemetagubbins.t
@@ -126,40 +160,6 @@ Files: t/02moo/role.t
  t/97pickrandom.t
  t/98apply.t
 Copyright: Copyright 2020 Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: Changes
- META.json
- META.yml
- doap.ttl
- lib/Sub/HandlesVia/CodeGenerator.pm.mite.pm
- lib/Sub/HandlesVia/Handler.pm.mite.pm
- lib/Sub/HandlesVia/HandlerLibrary.pm
- lib/Sub/HandlesVia/HandlerLibrary/Array.pm
- lib/Sub/HandlesVia/HandlerLibrary/Bool.pm
- lib/Sub/HandlesVia/HandlerLibrary/Code.pm
- lib/Sub/HandlesVia/HandlerLibrary/Counter.pm
- lib/Sub/HandlesVia/HandlerLibrary/Hash.pm
- lib/Sub/HandlesVia/HandlerLibrary/Number.pm
- lib/Sub/HandlesVia/HandlerLibrary/Scalar.pm
- lib/Sub/HandlesVia/HandlerLibrary/String.pm
- lib/Sub/HandlesVia/Mite.pm
- lib/Sub/HandlesVia/Toolkit.pm.mite.pm
- lib/Sub/HandlesVia/Toolkit/Mite.pm
- lib/Sub/HandlesVia/Toolkit/Mite.pm.mite.pm
- lib/Sub/HandlesVia/Toolkit/Moo.pm
- lib/Sub/HandlesVia/Toolkit/Moo.pm.mite.pm
- lib/Sub/HandlesVia/Toolkit/Moose.pm
- lib/Sub/HandlesVia/Toolkit/Moose.pm.mite.pm
- lib/Sub/HandlesVia/Toolkit/Mouse.pm
- lib/Sub/HandlesVia/Toolkit/Mouse.pm.mite.pm
- lib/Sub/HandlesVia/Toolkit/ObjectPad.pm
- lib/Sub/HandlesVia/Toolkit/ObjectPad.pm.mite.pm
- lib/Sub/HandlesVia/Toolkit/Plain.pm
- lib/Sub/HandlesVia/Toolkit/Plain.pm.mite.pm
- t/50objectpad.t
- t/99headtail.t
-Copyright: Copyright 2025 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: lib/Sub/HandlesVia/Declare.pm

@@ -93,9 +93,12 @@ LSF_init(
 int
 LSF_destroy(LogSyslogFast* logger)
 {
-    int ret = close(logger->sock);
-    if (ret)
-        logger->err = strerror(errno);
+    int ret = 0;
+    if (logger->sock >= 0) {
+        ret = close(logger->sock);
+        if (ret)
+           logger->err = strerror(errno);
+    }
     free(logger->sender);
     free(logger->name);
     free(logger->linebuf);
@@ -241,6 +244,7 @@ LSF_set_receiver(LogSyslogFast* logger, int proto, const char* hostname, int por
             logger->err = strerror(errno);
             return -1;
         }
+        logger->sock = -1;
     }
 
     /* set up a socket, letting kernel assign local port */
@@ -381,6 +385,10 @@ LSF_set_receiver(LogSyslogFast* logger, int proto, const char* hostname, int por
             }
         }
         else {
+            if (logger->sock >= 0) {
+                close(logger->sock);
+                logger->sock = -1;
+            }
             logger->err = strerror(errno);
             clean_return(-1);
         }

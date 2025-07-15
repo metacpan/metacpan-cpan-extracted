@@ -10,7 +10,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2022-2023 by Toby Inkster.
+This software is copyright (c) 2022-2025 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -32,6 +32,16 @@ isa_ok( 'Hydrogen::Curry::Scalar', 'Exporter::Tiny' );
 
 my %EXPORTS = map +( $_ => 1 ), @Hydrogen::Curry::Scalar::EXPORT_OK;
 
+subtest 'curry_get' => sub {
+    ok exists(&Hydrogen::Curry::Scalar::curry_get), 'function exists';
+    ok $EXPORTS{'curry_get'}, 'function is importable';
+    my $exception = dies {
+        my $curried = Hydrogen::Curry::Scalar::curry_get( undef );
+        is ref( $curried ), 'CODE', 'function returns a coderef';
+    };
+    is $exception, undef, 'no exception thrown running curry_get';
+};
+
 subtest 'curry_make_getter' => sub {
     ok exists(&Hydrogen::Curry::Scalar::curry_make_getter), 'function exists';
     ok $EXPORTS{'curry_make_getter'}, 'function is importable';
@@ -50,6 +60,26 @@ subtest 'curry_make_setter' => sub {
         is ref( $curried ), 'CODE', 'function returns a coderef';
     };
     is $exception, undef, 'no exception thrown running curry_make_setter';
+};
+
+subtest 'curry_set' => sub {
+    ok exists(&Hydrogen::Curry::Scalar::curry_set), 'function exists';
+    ok $EXPORTS{'curry_set'}, 'function is importable';
+    my $exception = dies {
+        my $curried = Hydrogen::Curry::Scalar::curry_set( undef );
+        is ref( $curried ), 'CODE', 'function returns a coderef';
+    };
+    is $exception, undef, 'no exception thrown running curry_set';
+};
+
+subtest 'curry_stringify' => sub {
+    ok exists(&Hydrogen::Curry::Scalar::curry_stringify), 'function exists';
+    ok $EXPORTS{'curry_stringify'}, 'function is importable';
+    my $exception = dies {
+        my $curried = Hydrogen::Curry::Scalar::curry_stringify( undef );
+        is ref( $curried ), 'CODE', 'function returns a coderef';
+    };
+    is $exception, undef, 'no exception thrown running curry_stringify';
 };
 
 done_testing; # :)

@@ -3,7 +3,7 @@ package Data::OFN::Common;
 use strict;
 use warnings;
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 1;
 
@@ -56,6 +56,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

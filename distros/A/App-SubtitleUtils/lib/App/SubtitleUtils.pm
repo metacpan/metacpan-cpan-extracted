@@ -6,9 +6,9 @@ use warnings;
 use Exporter qw(import);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-01-13'; # DATE
+our $DATE = '2025-07-15'; # DATE
 our $DIST = 'App-SubtitleUtils'; # DIST
-our $VERSION = '0.013'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
 our @EXPORT_OK = qw(
                        srtparse
@@ -345,7 +345,7 @@ App::SubtitleUtils - Utilities related to video subtitles
 
 =head1 VERSION
 
-This document describes version 0.013 of App::SubtitleUtils (from Perl distribution App-SubtitleUtils), released on 2024-01-13.
+This document describes version 0.014 of App::SubtitleUtils (from Perl distribution App-SubtitleUtils), released on 2025-07-15.
 
 =head1 DESCRIPTION
 
@@ -353,11 +353,11 @@ This distributions provides the following command-line utilities:
 
 =over
 
-=item 1. L<rename-subtitle-files-like-their-movie-files>
+=item 1. L<hms-secs>
 
-=item 2. L<srtadjust>
+=item 2. L<rename-subtitle-files-like-their-movie-files>
 
-=item 3. L<srtcalc>
+=item 3. L<srtadjust>
 
 =item 4. L<srtcheck>
 
@@ -604,6 +604,12 @@ L<Getopt::Long> etc; someday.
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords Philippe Bruhat (BooK)
+
+Philippe Bruhat (BooK) <philippe@bruhat.net>
+
 =head1 CONTRIBUTING
 
 
@@ -624,7 +630,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024, 2022, 2021, 2020 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

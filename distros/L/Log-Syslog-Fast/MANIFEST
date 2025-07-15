@@ -28,6 +28,9 @@ t/08-fd-leak.t
 t/09-undef-strings.pl
 t/09-undef-strings-pp.t
 t/09-undef-strings.t
+t/10-invalid-addr-pp.t
+t/10-invalid-addr.pl
+t/10-invalid-addr.t
 t/lib/LSF.pm
 t/lib/Test/LogSyslogFast.pm
 lib/Log/Syslog/Fast.pm

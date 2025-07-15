@@ -5,7 +5,7 @@ use warnings;
 package Sub::HandlesVia::HandlerLibrary;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.050002';
+our $VERSION   = '0.050003';
 
 use Types::Standard qw( Any Item );
 

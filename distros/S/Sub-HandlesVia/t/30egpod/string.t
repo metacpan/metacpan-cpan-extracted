@@ -56,6 +56,7 @@ BEGIN {
       'my_starts_with' => 'starts_with',
       'my_starts_with_i' => 'starts_with_i',
       'my_substr' => 'substr',
+      'my_trim' => 'trim',
       'my_uc' => 'uc',
     },
     default => sub { q[] },
@@ -307,6 +308,10 @@ can_ok( 'My::Class', 'my_starts_with_i' );
 ## substr
 
 can_ok( 'My::Class', 'my_substr' );
+
+## trim
+
+can_ok( 'My::Class', 'my_trim' );
 
 ## uc
 

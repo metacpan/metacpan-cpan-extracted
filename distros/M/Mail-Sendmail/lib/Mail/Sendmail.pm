@@ -53,6 +53,7 @@ our $auth_support;
 use Socket;
 use Time::Local; # for automatic time zone detection
 use Sys::Hostname; # for use of hostname in HELO
+use Sys::Hostname::Long; # for use of hostname in HELO
 
 #use Digest::HMAC_MD5 qw(hmac_md5 hmac_md5_hex);
 
@@ -339,7 +340,7 @@ sub sendmail {
     }
 
     # get local hostname for polite HELO
-    $localhost = hostname() || 'localhost';
+    $localhost = hostname_long() || hostname() || 'localhost';
 
     foreach $server ( @{$mailcfg{'smtp'}} ) {
         # open socket needs to be inside this foreach loop on Linux,
@@ -545,7 +546,7 @@ sub sendmail {
             || return fail("send $header: error");
     };
 
-    #- test diconnecting from network here, to see what happens
+    #- test disconnecting from network here, to see what happens
     #- print STDERR "DISCONNECT NOW!\n";
     #- sleep 4;
     #- print STDERR "trying to continue, expecting an error... \n";
@@ -757,7 +758,7 @@ $mail{server}='my.smtp.server:2525' will try to connect to port 2525 on server m
 
 =item $mail{auth}
 
-This must be a reference to a hash containg all your authentication options:
+This must be a reference to a hash containing all your authentication options:
 
 $mail{auth} = \%options;
 or
@@ -967,7 +968,7 @@ from your scripts.
 
 
   $mail{Smtp} = 'special_server.for-this-message-only.domain.com';
-  $mail{'X-custom'} = 'My custom additionnal header';
+  $mail{'X-custom'} = 'My custom additional header';
   $mail{'mESSaGE : '} = "The message key looks terrible, but works.";
   # cheat on the date:
   $mail{Date} = Mail::Sendmail::time_to_date( time() - 86400 );
@@ -1018,8 +1019,6 @@ terrible things will happen to you if you use it badly, like for sending
 spam, or ...?)
 
 Thanks to the many users who sent me feedback, bug reports, suggestions, etc.
-And please excuse me if I forgot to answer your mail. I am not always reliabe
-in answering mail. I intend to set up a mailing list soon.
 
 Last revision: 06.02.2003. Latest version should be available on
 CPAN: F<http://www.cpan.org/modules/by-authors/id/M/MI/MIVKOVIC/>.

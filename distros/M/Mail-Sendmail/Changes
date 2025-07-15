@@ -1,5 +1,12 @@
 Revision history for Perl module Mail::Sendmail
 
+0.82 2025-07-14 NEILB
+    - Improvement from Pete Houston to use Sys::Hostname::Long
+
+0.81 2019-05-13 NEILB
+    - Fixed typos, reported by dsteinbrunner in RT#88351
+    - Fixed typos, reported by Florian Schlichting in RT#119000
+
 0.80 2017-08-20 NEILB
     - NEILB got co-maint to do a release that includes META.yml and META.json.
     - Switched to Dist::Zilla.

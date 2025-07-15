@@ -6,6 +6,11 @@ Home page:    <https://metacpan.org/release/Hydrogen>
 Bug tracker:  <https://github.com/tobyink/p5-hydrogen/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.021000	2025-07-14
+
+ - Added: Hydrogen::Autobox.
+ - Updated: Rebuild with latest version of Sub::HandlesVia.
+
 0.020000	2023-03-04
 
  [ Documentation ]

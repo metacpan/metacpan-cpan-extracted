@@ -2,15 +2,15 @@ NAME
     App::SubtitleUtils - Utilities related to video subtitles
 
 VERSION
-    This document describes version 0.013 of App::SubtitleUtils (from Perl
-    distribution App-SubtitleUtils), released on 2024-01-13.
+    This document describes version 0.014 of App::SubtitleUtils (from Perl
+    distribution App-SubtitleUtils), released on 2025-07-15.
 
 DESCRIPTION
     This distributions provides the following command-line utilities:
 
-    1. rename-subtitle-files-like-their-movie-files
-    2. srtadjust
-    3. srtcalc
+    1. hms-secs
+    2. rename-subtitle-files-like-their-movie-files
+    3. srtadjust
     4. srtcheck
     5. srtcombine2text
     6. srtcombinetext
@@ -220,6 +220,9 @@ HISTORY
 AUTHOR
     perlancar <perlancar@cpan.org>
 
+CONTRIBUTOR
+    Philippe Bruhat (BooK) <philippe@bruhat.net>
+
 CONTRIBUTING
     To contribute, you can send patches by email/via RT, or send pull
     requests on GitHub.
@@ -237,8 +240,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2024, 2022, 2021, 2020 by perlancar
-    <perlancar@cpan.org>.
+    This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

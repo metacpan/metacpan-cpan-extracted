@@ -4,7 +4,7 @@ use warnings;
 use 5.010;
 use utf8;
 
-our $VERSION = '3.13';
+our $VERSION = '3.14';
 
 binmode( STDOUT, ':encoding(utf-8)' );
 
@@ -387,8 +387,8 @@ sub show_stopseq {
 			),
 			$stop->occupancy ? format_occupancy( $stop->occupancy ) : q{},
 			$stop->full_name,
-			$stop->niveau,
-			$stop->platform
+			$stop->niveau   // q{?},
+			$stop->platform // q{}
 		);
 	}
 }
@@ -636,7 +636,7 @@ B<efa-m> [B<-s> I<service>] I<tripid>
 
 =head1 VERSION
 
-version 3.13
+version 3.14
 
 =head1 DESCRIPTION
 

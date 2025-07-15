@@ -4,7 +4,7 @@
       "Milivoj Ivkovic <mivkovic@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -26,6 +26,7 @@
             "MIME::Base64" : "0",
             "Socket" : "0",
             "Sys::Hostname" : "0",
+            "Sys::Hostname::Long" : "0",
             "Time::Local" : "0",
             "parent" : "0",
             "perl" : "5.006",
@@ -44,7 +45,9 @@
          "web" : "https://github.com/neilb/Mail-Sendmail"
       }
    },
-   "version" : "0.80",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+   "version" : "0.82",
+   "x_generated_by_perl" : "v5.32.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

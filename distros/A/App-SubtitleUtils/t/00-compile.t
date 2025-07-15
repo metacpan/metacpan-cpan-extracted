@@ -13,9 +13,9 @@ my @module_files = (
 );
 
 my @scripts = (
+    'script/hms-secs',
     'script/rename-subtitle-files-like-their-movie-files',
     'script/srtadjust',
-    'script/srtcalc',
     'script/srtcheck',
     'script/srtcombine2text',
     'script/srtcombinetext',

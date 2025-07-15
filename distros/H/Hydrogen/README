@@ -138,7 +138,7 @@ BONUS FUNCTIONS
     first. If @args contains references, those will be dumped using
     Data::Dumper.
 
-  `Hydrogen::fc( $string? )`
+  Hydrogen::fc( $string? )
     Acts like `CORE::fc` if that function is available, and `CORE::lc`
     otherwise.
 
@@ -156,6 +156,8 @@ DEPENDENCIES
     Hydrogen also requires the module Exporter::Shiny which can be found on
     the CPAN.
 
+    Hydrogen::Autobox requires autobox and Import::Into.
+
     Hydrogen's test suite requires the module Test2::V0 which can be found on
     the CPAN.
 
@@ -167,11 +169,13 @@ SEE ALSO
     the same functionality as methods which objects can delegate to
     attributes.
 
+    Hydrogen::Autobox allows Hydrogen's functions to be called as methods.
+
 AUTHOR
     Toby Inkster <tobyink@cpan.org>.
 
 COPYRIGHT AND LICENCE
-    This software is copyright (c) 2022-2023 by Toby Inkster.
+    This software is copyright (c) 2022-2025 by Toby Inkster.
 
     This is free software; you can redistribute it and/or modify it under the
     same terms as the Perl 5 programming language system itself.

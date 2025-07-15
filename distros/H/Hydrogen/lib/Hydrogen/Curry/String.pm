@@ -9,7 +9,7 @@ use Hydrogen::String ();
 package Hydrogen::Curry::String;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.020000';
+our $VERSION   = '0.021000';
 
 =head1 NAME
 
@@ -17,8 +17,8 @@ Hydrogen::Curry::String - easily curry functions from Hydrogen::String
 
 =head1 VERSION
 
-This documentation is for Hydrogen::Curry::String 0.020000,
-which is based on Sub::HandlesVia::HandlerLibrary::String 0.046.
+This documentation is for Hydrogen::Curry::String 0.021000,
+which is based on Sub::HandlesVia::HandlerLibrary::String 0.050003.
 
 =cut
 
@@ -66,6 +66,7 @@ use Exporter::Shiny qw(
     curry_starts_with
     curry_starts_with_i
     curry_substr
+    curry_trim
     curry_uc
 );
 
@@ -846,6 +847,27 @@ sub curry_substr {
     return sub { Hydrogen::String::substr( $$ref, @_ ) };
 }
 
+=head2 C<< curry_trim( $string ) >>
+
+Curry the first argument of C<< Hydrogen::String::trim >>.
+
+=cut
+
+sub curry_trim {
+    @_ == 1
+        or Hydrogen::croak(
+            "Wrong number of parameters in signature for curry_trim: got %d, %s",
+            scalar(@_), "expected exactly 1 parameter"
+        );
+    do { package Hydrogen::String::__SANDBOX__; defined($_[0]) and do { ref(\$_[0]) eq 'SCALAR' or ref(\(my $val = $_[0])) eq 'SCALAR' } }
+        or Hydrogen::croak(
+            "Type check failed in signature for curry_trim: %s should be %s",
+            "\\$_[0]", "Str"
+        );
+    my $ref = \$_[0];
+    return sub { Hydrogen::String::trim( $$ref, @_ ) };
+}
+
 =head2 C<< curry_uc( $string ) >>
 
 Curry the first argument of C<< Hydrogen::String::uc >>.
@@ -908,7 +930,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2022-2023 by Toby Inkster.
+This software is copyright (c) 2022-2025 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

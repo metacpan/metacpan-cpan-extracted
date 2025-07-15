@@ -5,7 +5,7 @@ use warnings;
 use 5.010;
 use utf8;
 
-our $VERSION = '3.13';
+our $VERSION = '3.14';
 
 use Carp qw(confess cluck);
 use DateTime;
@@ -628,6 +628,11 @@ sub results_dm {
 	my ($self) = @_;
 	my $json = $self->{response};
 
+	# Oh EFA, you so silly
+	if ( $json->{departureList} and ref( $json->{departureList} ) eq 'HASH' ) {
+		$json->{departureList} = [ $json->{departureList}{departure} ];
+	}
+
 	my @results;
 	for my $departure ( @{ $json->{departureList} // [] } ) {
 		push(
@@ -703,7 +708,7 @@ Travel::Status::DE::EFA - unofficial EFA departure monitor
 
 =head1 VERSION
 
-version 3.13
+version 3.14
 
 =head1 DESCRIPTION
 

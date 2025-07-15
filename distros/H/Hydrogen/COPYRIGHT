@@ -32,11 +32,6 @@ Files: README
  lib/Hydrogen/Topic/Number.pm
  lib/Hydrogen/Topic/Scalar.pm
  lib/Hydrogen/Topic/String.pm
- t/00versions.t
- t/01basic.t
- t/integration/currying.t
- t/integration/lexical.t
- t/integration/topical.t
  t/unit/Hydrogen/Array.t
  t/unit/Hydrogen/ArrayRef.t
  t/unit/Hydrogen/Bool.t
@@ -64,6 +59,14 @@ Files: README
  t/unit/Hydrogen/Topic/Number.t
  t/unit/Hydrogen/Topic/Scalar.t
  t/unit/Hydrogen/Topic/String.t
+Copyright: This software is copyright (c) 2022-2025 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/00versions.t
+ t/01basic.t
+ t/integration/currying.t
+ t/integration/lexical.t
+ t/integration/topical.t
 Copyright: This software is copyright (c) 2022-2023 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
@@ -71,7 +74,7 @@ Files: Changes
  META.json
  META.yml
  doap.ttl
-Copyright: Copyright 2023 Toby Inkster.
+Copyright: Copyright 2025 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: COPYRIGHT
@@ -85,6 +88,11 @@ Files: INSTALL
 Copyright: Unknown
 License: Unknown
 
+Files: lib/Hydrogen/Autobox.pm
+ t/integration/autobox.t
+Copyright: This software is copyright (c) 2025 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
 Files: dist.ini
 Copyright: Copyright 2022 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
@@ -94,14 +102,14 @@ Copyright: Copyright 2020 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 License: Artistic-1.0
- This software is Copyright (c) 2023 by the copyright holder(s).
+ This software is Copyright (c) 2025 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2023 by the copyright holder(s).
+ This software is Copyright (c) 2025 by the copyright holder(s).
  
  This is free software, licensed under:
  

@@ -26,6 +26,7 @@ has attr => (
     'my_get' => 'get',
     'my_grep' => 'grep',
     'my_head' => 'head',
+    'my_indexed' => 'indexed',
     'my_insert' => 'insert',
     'my_is_empty' => 'is_empty',
     'my_join' => 'join',

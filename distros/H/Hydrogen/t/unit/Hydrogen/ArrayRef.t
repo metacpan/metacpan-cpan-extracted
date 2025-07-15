@@ -10,7 +10,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2022-2023 by Toby Inkster.
+This software is copyright (c) 2022-2025 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -194,6 +194,11 @@ subtest 'grep' => sub {
 subtest 'head' => sub {
     ok exists(&Hydrogen::ArrayRef::head), 'function exists';
     ok $EXPORTS{'head'}, 'function is importable';
+};
+
+subtest 'indexed' => sub {
+    ok exists(&Hydrogen::ArrayRef::indexed), 'function exists';
+    ok $EXPORTS{'indexed'}, 'function is importable';
 };
 
 subtest 'insert' => sub {

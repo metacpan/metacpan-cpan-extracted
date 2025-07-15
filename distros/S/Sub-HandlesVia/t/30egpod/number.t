@@ -21,9 +21,11 @@ BEGIN {
     handles => {
       'my_abs' => 'abs',
       'my_add' => 'add',
+      'my_ceil' => 'ceil',
       'my_cmp' => 'cmp',
       'my_div' => 'div',
       'my_eq' => 'eq',
+      'my_floor' => 'floor',
       'my_ge' => 'ge',
       'my_get' => 'get',
       'my_gt' => 'gt',
@@ -65,6 +67,10 @@ subtest 'Testing my_add' => sub {
   is( $e, undef, 'no exception thrown running add example' );
 };
 
+## ceil
+
+can_ok( 'My::Class', 'my_ceil' );
+
 ## cmp
 
 can_ok( 'My::Class', 'my_cmp' );
@@ -85,6 +91,10 @@ subtest 'Testing my_div' => sub {
 ## eq
 
 can_ok( 'My::Class', 'my_eq' );
+
+## floor
+
+can_ok( 'My::Class', 'my_floor' );
 
 ## ge
 

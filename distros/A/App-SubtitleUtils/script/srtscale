@@ -59,7 +59,7 @@ srtscale - Speed up or slow down times in .srt by a factor
 
 =head1 VERSION
 
-This document describes version 0.013 of srtscale (from Perl distribution App-SubtitleUtils), released on 2024-01-13.
+This document describes version 0.014 of srtscale (from Perl distribution App-SubtitleUtils), released on 2025-07-15.
 
 =head1 SYNOPSIS
 
@@ -72,6 +72,10 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-Subtit
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-App-SubtitleUtils>.
+
+=head1 SEE ALSO
+
+L<srtadjust> if you want to scale as well as shift.
 
 =head1 HISTORY
 
@@ -101,7 +105,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024, 2022, 2021, 2020 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

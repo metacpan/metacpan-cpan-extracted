@@ -5,7 +5,7 @@ use warnings;
 package Sub::HandlesVia::HandlerLibrary::Number;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.050002';
+our $VERSION   = '0.050003';
 
 use Sub::HandlesVia::HandlerLibrary;
 our @ISA = 'Sub::HandlesVia::HandlerLibrary';
@@ -13,7 +13,10 @@ our @ISA = 'Sub::HandlesVia::HandlerLibrary';
 use Sub::HandlesVia::Handler qw( handler );
 use Types::Standard qw( Num Any Item Defined );
 
-our @METHODS = qw( set get add sub mul div mod abs cmp eq ne gt lt ge le );
+our @METHODS = qw(
+	set get add sub mul div mod abs cmp eq ne gt lt ge le
+	ceil floor
+);
 
 sub _type_inspector {
 	my ($me, $type) = @_;
@@ -190,5 +193,22 @@ for my $comparison ( qw/ cmp eq ne lt gt le ge / ) {
 	};
 }
 
+sub ceil {
+	handler
+		name      => 'Number:ceil',
+		args      => 0,
+		template  => 'use POSIX (); « POSIX::ceil($GET) »',
+		additional_validation => 'no incoming values',
+		documentation => "Finds the ceiling of the current number, updating the attribute. Like C<ceil> from L<builtin>, but in-place.",
+}
+
+sub floor {
+	handler
+		name      => 'Number:floor',
+		args      => 0,
+		template  => 'use POSIX (); « POSIX::floor($GET) »',
+		additional_validation => 'no incoming values',
+		documentation => "Finds the floor of the current number, updating the attribute. Like C<floor> from L<builtin>, but in-place.",
+}
 
 1;

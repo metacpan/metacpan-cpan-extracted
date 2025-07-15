@@ -22,7 +22,7 @@ requires 'Error::Pure' => 0;
 requires 'Mo' => 0;
 requires 'Mo::utils' => 0.08;
 requires 'Mo::utils::CEFACT' => 0.02;
-requires 'Mo::utils::Number' => 0;
+requires 'Mo::utils::Number' => 0.02;
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Data-OFN-Common/issues';
 resources 'homepage' => 'https://github.com/michal-josef-spacek/Data-OFN-Common';
 resources 'repository' => 'git://github.com/michal-josef-spacek/Data-OFN-Common';
@@ -32,7 +32,7 @@ test_requires 'Error::Pure::Utils' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.02';
+version '0.03';
 
 # Run.
 WriteAll();

@@ -9,7 +9,7 @@ use Hydrogen::ArrayRef ();
 package Hydrogen::Curry::ArrayRef;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.020000';
+our $VERSION   = '0.021000';
 
 =head1 NAME
 
@@ -17,8 +17,8 @@ Hydrogen::Curry::ArrayRef - easily curry functions from Hydrogen::ArrayRef
 
 =head1 VERSION
 
-This documentation is for Hydrogen::Curry::ArrayRef 0.020000,
-which is based on Sub::HandlesVia::HandlerLibrary::Array 0.046.
+This documentation is for Hydrogen::Curry::ArrayRef 0.021000,
+which is based on Sub::HandlesVia::HandlerLibrary::Array 0.050003.
 
 =cut
 
@@ -47,6 +47,7 @@ use Exporter::Shiny qw(
     curry_get
     curry_grep
     curry_head
+    curry_indexed
     curry_insert
     curry_is_empty
     curry_join
@@ -468,6 +469,27 @@ sub curry_head {
         );
     my $ref = \$_[0];
     return sub { Hydrogen::ArrayRef::head( $$ref, @_ ) };
+}
+
+=head2 C<< curry_indexed( $arrayref ) >>
+
+Curry the first argument of C<< Hydrogen::ArrayRef::indexed >>.
+
+=cut
+
+sub curry_indexed {
+    @_ == 1
+        or Hydrogen::croak(
+            "Wrong number of parameters in signature for curry_indexed: got %d, %s",
+            scalar(@_), "expected exactly 1 parameter"
+        );
+    (ref($_[0]) eq 'ARRAY')
+        or Hydrogen::croak(
+            "Type check failed in signature for curry_indexed: %s should be %s",
+            "\\$_[0]", "ArrayRef"
+        );
+    my $ref = \$_[0];
+    return sub { Hydrogen::ArrayRef::indexed( $$ref, @_ ) };
 }
 
 =head2 C<< curry_insert( $arrayref ) >>
@@ -1416,7 +1438,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2022-2023 by Toby Inkster.
+This software is copyright (c) 2022-2025 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

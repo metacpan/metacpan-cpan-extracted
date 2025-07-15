@@ -7,7 +7,7 @@ use Error::Pure qw(err);
 use Mo qw(build is);
 use Mo::utils 0.08 qw(check_bool check_isa);
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 has date => (
 	is => 'ro',
@@ -259,6 +259,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

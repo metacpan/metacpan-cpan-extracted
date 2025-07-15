@@ -11,7 +11,7 @@ use Readonly;
 
 Readonly::Array our @EXPORT_OK => qw(check_language_639_1 check_language_639_2);
 
-our $VERSION = 0.08;
+our $VERSION = 0.09;
 
 sub check_language_639_1 {
 	my ($self, $key) = @_;
@@ -125,7 +125,7 @@ Returns undef.
  use strict;
  use warnings;
 
- use Mo::utils::Language qw(check_language_639_1);
+ use Mo::utils::Language 0.05 qw(check_language_639_1);
 
  my $self = {
          'key' => 'en',
@@ -146,7 +146,7 @@ Returns undef.
  use warnings;
 
  use Error::Pure;
- use Mo::utils::Language qw(check_language_639_1);
+ use Mo::utils::Language 0.05 qw(check_language_639_1);
 
  $Error::Pure::TYPE = 'Error';
 
@@ -168,7 +168,7 @@ Returns undef.
  use strict;
  use warnings;
 
- use Mo::utils::Language qw(check_language_639_2);
+ use Mo::utils::Language 0.05 qw(check_language_639_2);
 
  my $self = {
          'key' => 'eng',
@@ -189,7 +189,7 @@ Returns undef.
  use warnings;
 
  use Error::Pure;
- use Mo::utils::Language qw(check_language_639_2);
+ use Mo::utils::Language 0.05 qw(check_language_639_2);
 
  $Error::Pure::TYPE = 'Error';
 
@@ -242,12 +242,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2022-2024 Michal Josef Špaček
+© 2022-2025 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.08
+0.09
 
 =cut

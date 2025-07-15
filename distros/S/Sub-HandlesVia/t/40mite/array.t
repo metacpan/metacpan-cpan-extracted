@@ -192,6 +192,10 @@ can_ok( $CLASS, 'my_grep' );
 
 can_ok( $CLASS, 'my_head' );
 
+## indexed
+
+can_ok( $CLASS, 'my_indexed' );
+
 ## insert
 
 can_ok( $CLASS, 'my_insert' );

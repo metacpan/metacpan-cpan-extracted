@@ -15,9 +15,11 @@ Sub::HandlesVia::HandlerLibrary::Number - library of number-related methods
       handles => {
         'my_abs' => 'abs',
         'my_add' => 'add',
+        'my_ceil' => 'ceil',
         'my_cmp' => 'cmp',
         'my_div' => 'div',
         'my_eq' => 'eq',
+        'my_floor' => 'floor',
         'my_ge' => 'ge',
         'my_get' => 'get',
         'my_gt' => 'gt',
@@ -56,6 +58,10 @@ Adds a number to the existing number, updating the attribute.
   $object->my_add( 5 );
   say $object->attr; ## ==> 9
 
+=head2 C<< ceil() >>
+
+Finds the ceiling of the current number, updating the attribute. Like C<ceil> from L<builtin>, but in-place.
+
 =head2 C<< cmp( $num ) >>
 
 Arguments: B<< Num >>.
@@ -77,6 +83,10 @@ Divides the existing number by a number, updating the attribute.
 Arguments: B<< Num >>.
 
 Returns C<< $object->attr == $num >>.
+
+=head2 C<< floor() >>
+
+Finds the floor of the current number, updating the attribute. Like C<floor> from L<builtin>, but in-place.
 
 =head2 C<< ge( $num ) >>
 

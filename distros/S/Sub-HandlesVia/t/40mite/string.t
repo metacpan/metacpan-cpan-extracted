@@ -256,6 +256,10 @@ can_ok( $CLASS, 'my_starts_with_i' );
 
 can_ok( $CLASS, 'my_substr' );
 
+## trim
+
+can_ok( $CLASS, 'my_trim' );
+
 ## uc
 
 can_ok( $CLASS, 'my_uc' );

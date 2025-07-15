@@ -13,9 +13,12 @@ Sub::HandlesVia::HandlerLibrary::Scalar - library of scalar-related methods
       isa => Any,
       handles_via => 'Scalar',
       handles => {
+        'my_get' => 'get',
         'my_make_getter' => 'make_getter',
         'my_make_setter' => 'make_setter',
         'my_scalar_reference' => 'scalar_reference',
+        'my_set' => 'set',
+        'my_stringify' => 'stringify',
       },
     );
   }
@@ -25,6 +28,10 @@ Sub::HandlesVia::HandlerLibrary::Scalar - library of scalar-related methods
 This is a library of methods for L<Sub::HandlesVia>.
 
 =head1 DELEGATABLE METHODS
+
+=head2 C<< get() >>
+
+Gets the current value of the scalar.
 
 =head2 C<< make_getter() >>
 
@@ -52,6 +59,14 @@ Returns a scalar reference to the attribute value's slot within its object.
   my $ref = $object->my_scalar_reference;
   $$ref++;
   say $object->attr; ## ==> 11
+
+=head2 C<< set( $value ) >>
+
+Sets the scalar to a new value.
+
+=head2 C<< stringify() >>
+
+Gets the current value of the scalar, but as a string.
 
 =head1 BUGS
 

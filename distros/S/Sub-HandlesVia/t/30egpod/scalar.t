@@ -19,13 +19,20 @@ BEGIN {
     isa => Any,
     handles_via => 'Scalar',
     handles => {
+      'my_get' => 'get',
       'my_make_getter' => 'make_getter',
       'my_make_setter' => 'make_setter',
       'my_scalar_reference' => 'scalar_reference',
+      'my_set' => 'set',
+      'my_stringify' => 'stringify',
     },
     default => sub { q[] },
   );
 };
+
+## get
+
+can_ok( 'My::Class', 'my_get' );
 
 ## make_getter
 
@@ -68,5 +75,13 @@ subtest 'Testing my_scalar_reference' => sub {
   };
   is( $e, undef, 'no exception thrown running scalar_reference example' );
 };
+
+## set
+
+can_ok( 'My::Class', 'my_set' );
+
+## stringify
+
+can_ok( 'My::Class', 'my_stringify' );
 
 done_testing;

@@ -10,6 +10,10 @@ use lib "$Bin/lib";
 use MyTest::TestClass::Scalar;
 my $CLASS = q[MyTest::TestClass::Scalar];
 
+## get
+
+can_ok( $CLASS, 'my_get' );
+
 ## make_getter
 
 can_ok( $CLASS, 'my_make_getter' );
@@ -51,5 +55,13 @@ subtest 'Testing my_scalar_reference' => sub {
   };
   is( $e, undef, 'no exception thrown running scalar_reference example' );
 };
+
+## set
+
+can_ok( $CLASS, 'my_set' );
+
+## stringify
+
+can_ok( $CLASS, 'my_stringify' );
 
 done_testing;

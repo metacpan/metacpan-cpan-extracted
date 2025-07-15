@@ -8,7 +8,7 @@ use Hydrogen ();
 package Hydrogen::Topic::Scalar;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.020000';
+our $VERSION   = '0.021000';
 
 =head1 NAME
 
@@ -16,8 +16,8 @@ Hydrogen::Topic::Scalar - functions from Hydrogen::Scalar applied to C<$_>
 
 =head1 VERSION
 
-This documentation is for Hydrogen::Topic::Scalar 0.020000,
-which is based on Sub::HandlesVia::HandlerLibrary::Scalar 0.046.
+This documentation is for Hydrogen::Topic::Scalar 0.021000,
+which is based on Sub::HandlesVia::HandlerLibrary::Scalar 0.050003.
 
 =cut
 
@@ -28,9 +28,29 @@ Each function implicitly operates on C<< $_ >>, expecting it to be a scalar.
 =cut
 
 use Exporter::Shiny qw(
+    get
     make_getter
     make_setter
+    set
+    stringify
 );
+
+=head2 C<< get() >>
+
+Operates on C<< $_ >>, which must be a scalar.
+
+Gets the current value of the scalar.
+
+=cut
+
+sub get {
+
+    package Hydrogen::Scalar::__SANDBOX__;
+    @_ == 0
+      or Hydrogen::croak( "Wrong number of parameters for get; usage: "
+          . "Hydrogen::Topic::Scalar::get()" );
+    $_;
+}
 
 =head2 C<< make_getter() >>
 
@@ -68,6 +88,40 @@ sub make_setter {
     sub { my $val = shift; unshift @_, $s; ( $_ = $val ) }
 }
 
+=head2 C<< set( $value ) >>
+
+Operates on C<< $_ >>, which must be a scalar.
+
+Sets the scalar to a new value.
+
+=cut
+
+sub set {
+
+    package Hydrogen::Scalar::__SANDBOX__;
+    @_ == 1
+      or Hydrogen::croak( "Wrong number of parameters for set; usage: "
+          . "Hydrogen::Topic::Scalar::set( \$value )" );
+    ( $_ = $_[0] );
+}
+
+=head2 C<< stringify() >>
+
+Operates on C<< $_ >>, which must be a scalar.
+
+Gets the current value of the scalar, but as a string.
+
+=cut
+
+sub stringify {
+
+    package Hydrogen::Scalar::__SANDBOX__;
+    @_ == 0
+      or Hydrogen::croak( "Wrong number of parameters for stringify; usage: "
+          . "Hydrogen::Topic::Scalar::stringify()" );
+    do { my $shv_tmp = $_; sprintf q(%s), $shv_tmp; }
+}
+
 1;
 
 =head1 EXPORT
@@ -78,15 +132,15 @@ No functions are exported by this module by default. To import them all (this is
 
 To import a particular function, use:
 
-    use Hydrogen::Topic::Scalar 'make_getter';
+    use Hydrogen::Topic::Scalar 'make_setter';
 
 To rename functions:
 
-    use Hydrogen::Topic::Scalar 'make_getter' => { -as => 'myfunc' };
+    use Hydrogen::Topic::Scalar 'make_setter' => { -as => 'myfunc' };
 
 On Perl 5.37.2+ (or if L<Lexical::Sub> is installed) you can import lexically:
 
-    use Hydrogen::Topic::Scalar -lexical, 'make_getter';
+    use Hydrogen::Topic::Scalar -lexical, 'make_setter';
 
 See L<Exporter::Tiny::Manual::Importing> for more hints on importing.
 
@@ -108,7 +162,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2022-2023 by Toby Inkster.
+This software is copyright (c) 2022-2025 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -5,7 +5,7 @@ use warnings;
 package Sub::HandlesVia::HandlerLibrary::Array;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.050002';
+our $VERSION   = '0.050003';
 
 use Exporter::Tiny;
 use Sub::HandlesVia::HandlerLibrary;
@@ -53,7 +53,7 @@ our @METHODS = qw( count is_empty all elements flatten get pop push shift
 	shallow_clone map grep sort reverse sort_in_place splice shuffle
 	shuffle_in_place uniq uniq_in_place delete insert flatten flatten_deep
 	join print head tail apply pick_random for_each for_each_pair
-	all_true not_all_true min minstr max maxstr sum product
+	all_true not_all_true min minstr max maxstr sum product indexed
 	reductions sample uniqnum uniqnum_in_place uniqstr uniqstr_in_place
 	pairs pairkeys pairvalues pairgrep pairfirst pairmap reset );
 
@@ -1039,6 +1039,14 @@ sub reset {
 				"  say Dumper( \$object->$attr ); ## ==> []\n",
 				"\n";
 		},
+}
+
+sub indexed {
+	handler
+		name      => 'Array:indexed',
+		args      => 0,
+		template  => 'my $shv_ix = 0; map +($shv_ix++, $_), @{$GET}',
+		documentation => 'Like C<indexed> from L<builtin>.',
 }
 
 1;

@@ -8,7 +8,7 @@ use Hydrogen ();
 package Hydrogen::ArrayRef;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.020000';
+our $VERSION   = '0.021000';
 
 =head1 NAME
 
@@ -16,8 +16,8 @@ Hydrogen::ArrayRef - a standard library for arrayrefs
 
 =head1 VERSION
 
-This documentation is for Hydrogen::ArrayRef 0.020000,
-which is based on Sub::HandlesVia::HandlerLibrary::Array 0.046.
+This documentation is for Hydrogen::ArrayRef 0.021000,
+which is based on Sub::HandlesVia::HandlerLibrary::Array 0.050003.
 
 =cut
 
@@ -46,6 +46,7 @@ use Exporter::Shiny qw(
     get
     grep
     head
+    indexed
     insert
     is_empty
     join
@@ -732,6 +733,23 @@ sub head {
     $shv_count = @{$$__REF__}              if $shv_count > @{$$__REF__};
     $shv_count = @{$$__REF__} + $shv_count if $shv_count < 0;
     ( @{$$__REF__} )[ 0 .. ( $shv_count - 1 ) ];
+}
+
+=head2 C<< indexed( $arrayref ) >>
+
+Like C<indexed> from L<builtin>.
+
+=cut
+
+sub indexed {
+    my $__REF__ = \$_[0];
+
+    package Hydrogen::ArrayRef::__SANDBOX__;
+    @_ == 1
+      or Hydrogen::croak( "Wrong number of parameters for indexed; usage: "
+          . "Hydrogen::ArrayRef::indexed( \$arrayref )" );
+    my $shv_ix = 0;
+    map +( $shv_ix++, $_ ), @{$$__REF__};
 }
 
 =head2 C<< insert( $arrayref, $index, $value ) >>
@@ -2039,7 +2057,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2022-2023 by Toby Inkster.
+This software is copyright (c) 2022-2025 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

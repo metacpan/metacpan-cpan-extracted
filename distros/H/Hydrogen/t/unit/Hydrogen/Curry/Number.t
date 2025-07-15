@@ -10,7 +10,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2022-2023 by Toby Inkster.
+This software is copyright (c) 2022-2025 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -52,6 +52,16 @@ subtest 'curry_add' => sub {
     is $exception, undef, 'no exception thrown running curry_add';
 };
 
+subtest 'curry_ceil' => sub {
+    ok exists(&Hydrogen::Curry::Number::curry_ceil), 'function exists';
+    ok $EXPORTS{'curry_ceil'}, 'function is importable';
+    my $exception = dies {
+        my $curried = Hydrogen::Curry::Number::curry_ceil( 0 );
+        is ref( $curried ), 'CODE', 'function returns a coderef';
+    };
+    is $exception, undef, 'no exception thrown running curry_ceil';
+};
+
 subtest 'curry_cmp' => sub {
     ok exists(&Hydrogen::Curry::Number::curry_cmp), 'function exists';
     ok $EXPORTS{'curry_cmp'}, 'function is importable';
@@ -80,6 +90,16 @@ subtest 'curry_eq' => sub {
         is ref( $curried ), 'CODE', 'function returns a coderef';
     };
     is $exception, undef, 'no exception thrown running curry_eq';
+};
+
+subtest 'curry_floor' => sub {
+    ok exists(&Hydrogen::Curry::Number::curry_floor), 'function exists';
+    ok $EXPORTS{'curry_floor'}, 'function is importable';
+    my $exception = dies {
+        my $curried = Hydrogen::Curry::Number::curry_floor( 0 );
+        is ref( $curried ), 'CODE', 'function returns a coderef';
+    };
+    is $exception, undef, 'no exception thrown running curry_floor';
 };
 
 subtest 'curry_ge' => sub {

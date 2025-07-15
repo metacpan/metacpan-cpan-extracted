@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Error::Pure;
-use Mo::utils::Language qw(check_language_639_2);
+use Mo::utils::Language 0.05 qw(check_language_639_2);
 
 $Error::Pure::TYPE = 'Error';
 

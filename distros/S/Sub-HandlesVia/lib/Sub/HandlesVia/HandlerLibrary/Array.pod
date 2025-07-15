@@ -31,6 +31,7 @@ Sub::HandlesVia::HandlerLibrary::Array - library of array-related methods
         'my_get' => 'get',
         'my_grep' => 'grep',
         'my_head' => 'head',
+        'my_indexed' => 'indexed',
         'my_insert' => 'insert',
         'my_is_empty' => 'is_empty',
         'my_join' => 'join',
@@ -231,6 +232,10 @@ Like C<grep> from L<perlfunc>.
 Arguments: B<< Int >>.
 
 Returns the first C<< $count >> elements of the array in list context.
+
+=head2 C<< indexed() >>
+
+Like C<indexed> from L<builtin>.
 
 =head2 C<< insert( $index, $value ) >>
 

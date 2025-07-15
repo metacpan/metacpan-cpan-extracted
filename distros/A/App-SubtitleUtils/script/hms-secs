@@ -3,9 +3,9 @@
 ## no critic: TestingAndDebugging::RequireUseStrict
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-01-13'; # DATE
+our $DATE = '2025-07-15'; # DATE
 our $DIST = 'App-SubtitleUtils'; # DIST
-our $VERSION = '0.013'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
 $secs_re = qr/[+-]?\d+(?:\.\d*)?/;
 $hms_re = qr/\d\d?:\d\d?:\d\d?(?:,\d\d\d)?/;
@@ -28,7 +28,7 @@ for (@ARGV) {
 }
 
 # ABSTRACT: Convert H:M:S to number of seconds, and vice versa
-# PODNAME: srtcalc
+# PODNAME: hms-secs
 
 __END__
 
@@ -38,21 +38,17 @@ __END__
 
 =head1 NAME
 
-srtcalc - Convert H:M:S to number of seconds, and vice versa
+hms-secs - Convert H:M:S to number of seconds, and vice versa
 
 =head1 VERSION
 
-This document describes version 0.013 of srtcalc (from Perl distribution App-SubtitleUtils), released on 2024-01-13.
+This document describes version 0.014 of hms-secs (from Perl distribution App-SubtitleUtils), released on 2025-07-15.
 
 =head1 SYNOPSIS
 
-Return H:M:S:
+Return H:M:S if given number of seconds, or number of seconds if given I<H:M:S>:
 
- % srtcalc <secs> [FILE] ...
-
-Return number of seconds:
-
- % srtcalc <h:m:s> [FILE] ...
+ % srtcalc <secs or h:m:s> ...
 
 =head1 HOMEPAGE
 
@@ -90,7 +86,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024, 2022, 2021, 2020 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -11,6 +11,12 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
  [ SECURITY ]
  - Fix: Rebuild using Mite 0.013000.
 
+ [ Other ]
+ - Added: ArrayRef:indexed.
+ - Added: Number:ceil and Number:floor.
+ - Added: Scalar:get and Scalar:set.
+ - Added: String:trim.
+
 0.050001	2025-03-23
 
  [ Documentation ]

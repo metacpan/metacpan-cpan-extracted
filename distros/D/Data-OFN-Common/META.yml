@@ -30,11 +30,11 @@ requires:
   Mo: 0
   Mo::utils: 0.08
   Mo::utils::CEFACT: 0.02
-  Mo::utils::Number: 0
+  Mo::utils::Number: 0.02
   perl: 5.8.0
 resources:
   bugtracker: https://github.com/michal-josef-spacek/Data-OFN-Common/issues
   homepage: https://github.com/michal-josef-spacek/Data-OFN-Common
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Data-OFN-Common
-version: '0.02'
+version: '0.03'

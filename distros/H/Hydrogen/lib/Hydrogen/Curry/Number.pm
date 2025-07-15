@@ -9,7 +9,7 @@ use Hydrogen::Number ();
 package Hydrogen::Curry::Number;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.020000';
+our $VERSION   = '0.021000';
 
 =head1 NAME
 
@@ -17,8 +17,8 @@ Hydrogen::Curry::Number - easily curry functions from Hydrogen::Number
 
 =head1 VERSION
 
-This documentation is for Hydrogen::Curry::Number 0.020000,
-which is based on Sub::HandlesVia::HandlerLibrary::Number 0.046.
+This documentation is for Hydrogen::Curry::Number 0.021000,
+which is based on Sub::HandlesVia::HandlerLibrary::Number 0.050003.
 
 =cut
 
@@ -31,9 +31,11 @@ Each function expects a numeric scalar as its only argument and returns a codere
 use Exporter::Shiny qw(
     curry_abs
     curry_add
+    curry_ceil
     curry_cmp
     curry_div
     curry_eq
+    curry_floor
     curry_ge
     curry_get
     curry_gt
@@ -86,6 +88,27 @@ sub curry_add {
         );
     my $ref = \$_[0];
     return sub { Hydrogen::Number::add( $$ref, @_ ) };
+}
+
+=head2 C<< curry_ceil( $number ) >>
+
+Curry the first argument of C<< Hydrogen::Number::ceil >>.
+
+=cut
+
+sub curry_ceil {
+    @_ == 1
+        or Hydrogen::croak(
+            "Wrong number of parameters in signature for curry_ceil: got %d, %s",
+            scalar(@_), "expected exactly 1 parameter"
+        );
+    (do { package Hydrogen::Number::__SANDBOX__; use Scalar::Util (); defined($_[0]) && !ref($_[0]) && Scalar::Util::looks_like_number($_[0]) })
+        or Hydrogen::croak(
+            "Type check failed in signature for curry_ceil: %s should be %s",
+            "\\$_[0]", "Num"
+        );
+    my $ref = \$_[0];
+    return sub { Hydrogen::Number::ceil( $$ref, @_ ) };
 }
 
 =head2 C<< curry_cmp( $number ) >>
@@ -149,6 +172,27 @@ sub curry_eq {
         );
     my $ref = \$_[0];
     return sub { Hydrogen::Number::eq( $$ref, @_ ) };
+}
+
+=head2 C<< curry_floor( $number ) >>
+
+Curry the first argument of C<< Hydrogen::Number::floor >>.
+
+=cut
+
+sub curry_floor {
+    @_ == 1
+        or Hydrogen::croak(
+            "Wrong number of parameters in signature for curry_floor: got %d, %s",
+            scalar(@_), "expected exactly 1 parameter"
+        );
+    (do { package Hydrogen::Number::__SANDBOX__; use Scalar::Util (); defined($_[0]) && !ref($_[0]) && Scalar::Util::looks_like_number($_[0]) })
+        or Hydrogen::croak(
+            "Type check failed in signature for curry_floor: %s should be %s",
+            "\\$_[0]", "Num"
+        );
+    my $ref = \$_[0];
+    return sub { Hydrogen::Number::floor( $$ref, @_ ) };
 }
 
 =head2 C<< curry_ge( $number ) >>
@@ -371,15 +415,15 @@ No functions are exported by this module by default. To import them all (this is
 
 To import a particular function, use:
 
-    use Hydrogen::Curry::Number 'curry_cmp';
+    use Hydrogen::Curry::Number 'curry_ceil';
 
 To rename functions:
 
-    use Hydrogen::Curry::Number 'curry_cmp' => { -as => 'myfunc' };
+    use Hydrogen::Curry::Number 'curry_ceil' => { -as => 'myfunc' };
 
 On Perl 5.37.2+ (or if L<Lexical::Sub> is installed) you can import lexically:
 
-    use Hydrogen::Curry::Number -lexical, 'curry_cmp';
+    use Hydrogen::Curry::Number -lexical, 'curry_ceil';
 
 See L<Exporter::Tiny::Manual::Importing> for more hints on importing.
 
@@ -401,7 +445,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2022-2023 by Toby Inkster.
+This software is copyright (c) 2022-2025 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

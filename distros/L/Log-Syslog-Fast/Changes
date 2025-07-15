@@ -1,4 +1,7 @@
 Revision history for Perl extension Log::Syslog::Fast.
+0.68   Mon Jul 14 22:06:26 UTC 2025
+        - Fix fd leak with invalid host, courtesy brsakai-csco
+          https://github.com/athomason/Log-Syslog-Fast/pull/13
 0.67   Mon Dec 16 13:10:06 PST 2019
         - Fix missing manifest entry (RT#131175)
 0.66   Sun Dec  8 21:44:56 GMT 2019

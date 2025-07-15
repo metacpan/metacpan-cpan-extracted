@@ -9,7 +9,7 @@ use Travel::Status::DE::EFA::Stop;
 
 use parent 'Class::Accessor';
 
-our $VERSION = '3.13';
+our $VERSION = '3.14';
 
 Travel::Status::DE::EFA::Trip->mk_ro_accessors(
 	qw(operator product product_class name line number type id dest_name dest_id)
@@ -19,6 +19,8 @@ sub new {
 	my ( $obj, %conf ) = @_;
 
 	my $json = $conf{json}{transportation} // $conf{json}{leg}{transportation};
+
+	#say $json->{disassembledName} . ' <-> ' . $json->{number};
 
 	my $ref = {
 		operator      => $json->{operator}{name},
@@ -205,7 +207,7 @@ trip
 
 =head1 VERSION
 
-version 3.13
+version 3.14
 
 =head1 DESCRIPTION
 

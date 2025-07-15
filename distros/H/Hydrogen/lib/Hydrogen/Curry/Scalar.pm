@@ -9,7 +9,7 @@ use Hydrogen::Scalar ();
 package Hydrogen::Curry::Scalar;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.020000';
+our $VERSION   = '0.021000';
 
 =head1 NAME
 
@@ -17,8 +17,8 @@ Hydrogen::Curry::Scalar - easily curry functions from Hydrogen::Scalar
 
 =head1 VERSION
 
-This documentation is for Hydrogen::Curry::Scalar 0.020000,
-which is based on Sub::HandlesVia::HandlerLibrary::Scalar 0.046.
+This documentation is for Hydrogen::Curry::Scalar 0.021000,
+which is based on Sub::HandlesVia::HandlerLibrary::Scalar 0.050003.
 
 =cut
 
@@ -29,9 +29,33 @@ Each function expects a scalar as its only argument and returns a coderef.
 =cut
 
 use Exporter::Shiny qw(
+    curry_get
     curry_make_getter
     curry_make_setter
+    curry_set
+    curry_stringify
 );
+
+=head2 C<< curry_get( $scalar ) >>
+
+Curry the first argument of C<< Hydrogen::Scalar::get >>.
+
+=cut
+
+sub curry_get {
+    @_ == 1
+        or Hydrogen::croak(
+            "Wrong number of parameters in signature for curry_get: got %d, %s",
+            scalar(@_), "expected exactly 1 parameter"
+        );
+    (!!1)
+        or Hydrogen::croak(
+            "Type check failed in signature for curry_get: %s should be %s",
+            "\\$_[0]", "Any"
+        );
+    my $ref = \$_[0];
+    return sub { Hydrogen::Scalar::get( $$ref, @_ ) };
+}
 
 =head2 C<< curry_make_getter( $scalar ) >>
 
@@ -75,6 +99,48 @@ sub curry_make_setter {
     return sub { Hydrogen::Scalar::make_setter( $$ref, @_ ) };
 }
 
+=head2 C<< curry_set( $scalar ) >>
+
+Curry the first argument of C<< Hydrogen::Scalar::set >>.
+
+=cut
+
+sub curry_set {
+    @_ == 1
+        or Hydrogen::croak(
+            "Wrong number of parameters in signature for curry_set: got %d, %s",
+            scalar(@_), "expected exactly 1 parameter"
+        );
+    (!!1)
+        or Hydrogen::croak(
+            "Type check failed in signature for curry_set: %s should be %s",
+            "\\$_[0]", "Any"
+        );
+    my $ref = \$_[0];
+    return sub { Hydrogen::Scalar::set( $$ref, @_ ) };
+}
+
+=head2 C<< curry_stringify( $scalar ) >>
+
+Curry the first argument of C<< Hydrogen::Scalar::stringify >>.
+
+=cut
+
+sub curry_stringify {
+    @_ == 1
+        or Hydrogen::croak(
+            "Wrong number of parameters in signature for curry_stringify: got %d, %s",
+            scalar(@_), "expected exactly 1 parameter"
+        );
+    (!!1)
+        or Hydrogen::croak(
+            "Type check failed in signature for curry_stringify: %s should be %s",
+            "\\$_[0]", "Any"
+        );
+    my $ref = \$_[0];
+    return sub { Hydrogen::Scalar::stringify( $$ref, @_ ) };
+}
+
 1;
 
 =head1 EXPORT
@@ -85,15 +151,15 @@ No functions are exported by this module by default. To import them all (this is
 
 To import a particular function, use:
 
-    use Hydrogen::Curry::Scalar 'curry_make_getter';
+    use Hydrogen::Curry::Scalar 'curry_make_setter';
 
 To rename functions:
 
-    use Hydrogen::Curry::Scalar 'curry_make_getter' => { -as => 'myfunc' };
+    use Hydrogen::Curry::Scalar 'curry_make_setter' => { -as => 'myfunc' };
 
 On Perl 5.37.2+ (or if L<Lexical::Sub> is installed) you can import lexically:
 
-    use Hydrogen::Curry::Scalar -lexical, 'curry_make_getter';
+    use Hydrogen::Curry::Scalar -lexical, 'curry_make_setter';
 
 See L<Exporter::Tiny::Manual::Importing> for more hints on importing.
 
@@ -115,7 +181,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2022-2023 by Toby Inkster.
+This software is copyright (c) 2022-2025 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

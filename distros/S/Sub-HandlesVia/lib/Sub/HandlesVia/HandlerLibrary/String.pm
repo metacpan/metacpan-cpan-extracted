@@ -5,7 +5,7 @@ use warnings;
 package Sub::HandlesVia::HandlerLibrary::String;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.050002';
+our $VERSION   = '0.050003';
 
 use Sub::HandlesVia::HandlerLibrary;
 our @ISA = 'Sub::HandlesVia::HandlerLibrary';
@@ -14,7 +14,7 @@ use Sub::HandlesVia::Handler qw( handler );
 use Types::Standard qw( Optional Str CodeRef RegexpRef Int Any Item Defined );
 
 our @METHODS = qw(
-	set get inc append prepend chop chomp clear reset
+	set get inc append prepend chop chomp trim clear reset
 	length substr replace replace_globally uc lc fc
 	starts_with   ends_with   contains   match   cmp  eq  ne  gt  lt  ge  le
 	starts_with_i ends_with_i contains_i match_i cmpi eqi nei gti lti gei lei
@@ -287,6 +287,16 @@ sub chomp {
 		lvalue_template => 'chomp($GET)',
 		additional_validation => 'no incoming values',
 		documentation => "Like C<chomp> from L<perlfunc>.",
+}
+
+sub trim {
+	handler
+		name      => 'String:trim',
+		args      => 0,
+		template  => 'my $shv_tmp = $GET; s/\A\s+//, s/\s+\z// for $shv_tmp; «$shv_tmp»;',
+		lvalue_template => 's/\A\s+//, s/\s+\z// for $GET',
+		additional_validation => 'no incoming values',
+		documentation => "Like C<trim> from L<builtin>, but in-place.",
 }
 
 sub clear {

@@ -39,5 +39,5 @@ resources:
   bugtracker: https://github.com/briandfoy/Acme-MyFirstModule-BDFOY/issues
   homepage: https://github.com/briandfoy/Acme-MyFirstModule-BDFOY
   repository: https://github.com/briandfoy/Acme-MyFirstModule-BDFOY
-version: '0.024'
+version: '0.025'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

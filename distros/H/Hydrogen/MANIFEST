@@ -14,6 +14,7 @@ doap.ttl
 lib/Hydrogen.pm
 lib/Hydrogen/Array.pm
 lib/Hydrogen/ArrayRef.pm
+lib/Hydrogen/Autobox.pm
 lib/Hydrogen/Bool.pm
 lib/Hydrogen/Code.pm
 lib/Hydrogen/CodeRef.pm
@@ -41,6 +42,7 @@ lib/Hydrogen/Topic/Scalar.pm
 lib/Hydrogen/Topic/String.pm
 t/00versions.t
 t/01basic.t
+t/integration/autobox.t
 t/integration/currying.t
 t/integration/lexical.t
 t/integration/topical.t

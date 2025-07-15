@@ -10,7 +10,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2022-2023 by Toby Inkster.
+This software is copyright (c) 2022-2025 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -210,6 +210,16 @@ subtest 'curry_head' => sub {
         is ref( $curried ), 'CODE', 'function returns a coderef';
     };
     is $exception, undef, 'no exception thrown running curry_head';
+};
+
+subtest 'curry_indexed' => sub {
+    ok exists(&Hydrogen::Curry::ArrayRef::curry_indexed), 'function exists';
+    ok $EXPORTS{'curry_indexed'}, 'function is importable';
+    my $exception = dies {
+        my $curried = Hydrogen::Curry::ArrayRef::curry_indexed( [] );
+        is ref( $curried ), 'CODE', 'function returns a coderef';
+    };
+    is $exception, undef, 'no exception thrown running curry_indexed';
 };
 
 subtest 'curry_insert' => sub {

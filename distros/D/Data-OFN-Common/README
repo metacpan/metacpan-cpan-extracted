@@ -30,12 +30,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.02
-
-POD ERRORS
-    Hey! The above document had some coding errors, which are explained
-    below:
-
-    Around line 63:
-        =cut found outside a pod block. Skipping to next block.
+    0.03
 

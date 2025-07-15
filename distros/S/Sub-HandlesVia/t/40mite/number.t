@@ -36,6 +36,10 @@ subtest 'Testing my_add' => sub {
   is( $e, undef, 'no exception thrown running add example' );
 };
 
+## ceil
+
+can_ok( $CLASS, 'my_ceil' );
+
 ## cmp
 
 can_ok( $CLASS, 'my_cmp' );
@@ -56,6 +60,10 @@ subtest 'Testing my_div' => sub {
 ## eq
 
 can_ok( $CLASS, 'my_eq' );
+
+## floor
+
+can_ok( $CLASS, 'my_floor' );
 
 ## ge
 

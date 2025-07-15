@@ -10,7 +10,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2022-2023 by Toby Inkster.
+This software is copyright (c) 2022-2025 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -31,6 +31,11 @@ use Test2::V0 -target => "Hydrogen::Scalar";
 isa_ok( 'Hydrogen::Scalar', 'Exporter::Tiny' );
 
 my %EXPORTS = map +( $_ => 1 ), @Hydrogen::Scalar::EXPORT_OK;
+
+subtest 'get' => sub {
+    ok exists(&Hydrogen::Scalar::get), 'function exists';
+    ok $EXPORTS{'get'}, 'function is importable';
+};
 
 subtest 'make_getter' => sub {
     ok exists(&Hydrogen::Scalar::make_getter), 'function exists';
@@ -54,6 +59,16 @@ subtest 'make_setter' => sub {
         is( $testscalar, 11, q{$testscalar is 11} );
     };
     is $exception, undef, 'no exception thrown running make_setter example';
+};
+
+subtest 'set' => sub {
+    ok exists(&Hydrogen::Scalar::set), 'function exists';
+    ok $EXPORTS{'set'}, 'function is importable';
+};
+
+subtest 'stringify' => sub {
+    ok exists(&Hydrogen::Scalar::stringify), 'function exists';
+    ok $EXPORTS{'stringify'}, 'function is importable';
 };
 
 done_testing; # :)

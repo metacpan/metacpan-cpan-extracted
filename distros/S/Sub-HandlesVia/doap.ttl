@@ -953,11 +953,25 @@
 <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-050002>
 	a                    doap:Version;
 	dc:identifier        "Sub-HandlesVia-0.050002"^^xsd:string;
-	dc:issued            "2025-03-23"^^xsd:date;
+	dc:issued            "2025-03-23"^^xsd:date, "2025-07-14"^^xsd:date;
 	doap-changeset:changeset [
 		doap-changeset:item [
 			a doap-changeset:SecurityFix;
 			rdfs:label "Rebuild using Mite 0.013000.";
+		];
+	], [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "String:trim.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Number:ceil and Number:floor.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "ArrayRef:indexed.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Scalar:get and Scalar:set.";
 		];
 	];
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;

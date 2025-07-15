@@ -46,7 +46,7 @@ EXAMPLE1
      use strict;
      use warnings;
 
-     use Mo::utils::Language qw(check_language_639_1);
+     use Mo::utils::Language 0.05 qw(check_language_639_1);
 
      my $self = {
              'key' => 'en',
@@ -64,7 +64,7 @@ EXAMPLE2
      use warnings;
 
      use Error::Pure;
-     use Mo::utils::Language qw(check_language_639_1);
+     use Mo::utils::Language 0.05 qw(check_language_639_1);
 
      $Error::Pure::TYPE = 'Error';
 
@@ -83,7 +83,7 @@ EXAMPLE3
      use strict;
      use warnings;
 
-     use Mo::utils::Language qw(check_language_639_2);
+     use Mo::utils::Language 0.05 qw(check_language_639_2);
 
      my $self = {
              'key' => 'eng',
@@ -101,7 +101,7 @@ EXAMPLE4
      use warnings;
 
      use Error::Pure;
-     use Mo::utils::Language qw(check_language_639_2);
+     use Mo::utils::Language 0.05 qw(check_language_639_2);
 
      $Error::Pure::TYPE = 'Error';
 
@@ -137,10 +137,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2022-2024 Michal Josef Špaček
+    © 2022-2025 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.08
+    0.09
 

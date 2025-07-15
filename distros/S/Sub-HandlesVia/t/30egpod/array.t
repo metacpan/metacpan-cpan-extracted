@@ -37,6 +37,7 @@ BEGIN {
       'my_get' => 'get',
       'my_grep' => 'grep',
       'my_head' => 'head',
+      'my_indexed' => 'indexed',
       'my_insert' => 'insert',
       'my_is_empty' => 'is_empty',
       'my_join' => 'join',
@@ -266,6 +267,10 @@ can_ok( 'My::Class', 'my_grep' );
 ## head
 
 can_ok( 'My::Class', 'my_head' );
+
+## indexed
+
+can_ok( 'My::Class', 'my_indexed' );
 
 ## insert
 

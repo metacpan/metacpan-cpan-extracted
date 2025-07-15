@@ -10,7 +10,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2022-2023 by Toby Inkster.
+This software is copyright (c) 2022-2025 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -54,6 +54,11 @@ subtest 'add' => sub {
     is $exception, undef, 'no exception thrown running add example';
 };
 
+subtest 'ceil' => sub {
+    ok exists(&Hydrogen::Number::ceil), 'function exists';
+    ok $EXPORTS{'ceil'}, 'function is importable';
+};
+
 subtest 'cmp' => sub {
     ok exists(&Hydrogen::Number::cmp), 'function exists';
     ok $EXPORTS{'cmp'}, 'function is importable';
@@ -73,6 +78,11 @@ subtest 'div' => sub {
 subtest 'eq' => sub {
     ok exists(&Hydrogen::Number::eq), 'function exists';
     ok $EXPORTS{'eq'}, 'function is importable';
+};
+
+subtest 'floor' => sub {
+    ok exists(&Hydrogen::Number::floor), 'function exists';
+    ok $EXPORTS{'floor'}, 'function is importable';
 };
 
 subtest 'ge' => sub {

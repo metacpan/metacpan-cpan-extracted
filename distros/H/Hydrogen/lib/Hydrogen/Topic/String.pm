@@ -8,7 +8,7 @@ use Hydrogen ();
 package Hydrogen::Topic::String;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.020000';
+our $VERSION   = '0.021000';
 
 =head1 NAME
 
@@ -16,8 +16,8 @@ Hydrogen::Topic::String - functions from Hydrogen::String applied to C<$_>
 
 =head1 VERSION
 
-This documentation is for Hydrogen::Topic::String 0.020000,
-which is based on Sub::HandlesVia::HandlerLibrary::String 0.046.
+This documentation is for Hydrogen::Topic::String 0.021000,
+which is based on Sub::HandlesVia::HandlerLibrary::String 0.050003.
 
 =cut
 
@@ -65,6 +65,7 @@ use Exporter::Shiny qw(
     starts_with
     starts_with_i
     substr
+    trim
     uc
 );
 
@@ -1615,6 +1616,24 @@ Like C<substr> from L<perlfunc>, but is not an lvalue.
     }
 }
 
+=head2 C<< trim() >>
+
+Operates on C<< $_ >>, which must be a string scalar.
+
+Like C<trim> from L<builtin>, but in-place.
+
+=cut
+
+sub trim {
+
+    package Hydrogen::String::__SANDBOX__;
+    @_ == 0
+      or Hydrogen::croak( "Wrong number of parameters for trim; usage: "
+          . "Hydrogen::Topic::String::trim()" );
+    1;
+    s/\A\s+//, s/\s+\z// for $_;
+}
+
 =head2 C<< uc() >>
 
 Operates on C<< $_ >>, which must be a string scalar.
@@ -1673,7 +1692,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2022-2023 by Toby Inkster.
+This software is copyright (c) 2022-2025 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -8,7 +8,7 @@ use Hydrogen ();
 package Hydrogen::CodeRef;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.020000';
+our $VERSION   = '0.021000';
 
 =head1 NAME
 
@@ -16,8 +16,8 @@ Hydrogen::CodeRef - a standard library for coderefs
 
 =head1 VERSION
 
-This documentation is for Hydrogen::CodeRef 0.020000,
-which is based on Sub::HandlesVia::HandlerLibrary::Code 0.046.
+This documentation is for Hydrogen::CodeRef 0.021000,
+which is based on Sub::HandlesVia::HandlerLibrary::Code 0.050003.
 
 =cut
 
@@ -130,7 +130,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2022-2023 by Toby Inkster.
+This software is copyright (c) 2022-2025 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

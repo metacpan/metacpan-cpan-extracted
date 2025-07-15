@@ -8,7 +8,7 @@ use Hydrogen ();
 package Hydrogen::Number;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.020000';
+our $VERSION   = '0.021000';
 
 =head1 NAME
 
@@ -16,8 +16,8 @@ Hydrogen::Number - a standard library for numbers
 
 =head1 VERSION
 
-This documentation is for Hydrogen::Number 0.020000,
-which is based on Sub::HandlesVia::HandlerLibrary::Number 0.046.
+This documentation is for Hydrogen::Number 0.021000,
+which is based on Sub::HandlesVia::HandlerLibrary::Number 0.050003.
 
 =cut
 
@@ -30,9 +30,11 @@ Each function expects a numeric scalar as its first argument.
 use Exporter::Shiny qw(
     abs
     add
+    ceil
     cmp
     div
     eq
+    floor
     ge
     get
     gt
@@ -136,6 +138,24 @@ sub add {
             };
         }
     );
+}
+
+=head2 C<< ceil( $number ) >>
+
+Finds the ceiling of the current number, updating the original value. Like C<ceil> from L<builtin>, but in-place.
+
+=cut
+
+sub ceil {
+    my $__REF__ = \$_[0];
+
+    package Hydrogen::Number::__SANDBOX__;
+    @_ == 1
+      or Hydrogen::croak( "Wrong number of parameters for ceil; usage: "
+          . "Hydrogen::Number::ceil( \$number )" );
+    1;
+    use POSIX ();
+    ( ${$__REF__} = POSIX::ceil($$__REF__) );
 }
 
 =head2 C<< cmp( $number, $num ) >>
@@ -322,6 +342,24 @@ sub eq {
         (@_);
     };
     $$__REF__ == $_[1];
+}
+
+=head2 C<< floor( $number ) >>
+
+Finds the floor of the current number, updating the original value. Like C<floor> from L<builtin>, but in-place.
+
+=cut
+
+sub floor {
+    my $__REF__ = \$_[0];
+
+    package Hydrogen::Number::__SANDBOX__;
+    @_ == 1
+      or Hydrogen::croak( "Wrong number of parameters for floor; usage: "
+          . "Hydrogen::Number::floor( \$number )" );
+    1;
+    use POSIX ();
+    ( ${$__REF__} = POSIX::floor($$__REF__) );
 }
 
 =head2 C<< ge( $number, $num ) >>
@@ -929,15 +967,15 @@ No functions are exported by this module by default. To import them all (this is
 
 To import a particular function, use:
 
-    use Hydrogen::Number 'cmp';
+    use Hydrogen::Number 'ceil';
 
 To rename functions:
 
-    use Hydrogen::Number 'cmp' => { -as => 'myfunc' };
+    use Hydrogen::Number 'ceil' => { -as => 'myfunc' };
 
 On Perl 5.37.2+ (or if L<Lexical::Sub> is installed) you can import lexically:
 
-    use Hydrogen::Number -lexical, 'cmp';
+    use Hydrogen::Number -lexical, 'ceil';
 
 See L<Exporter::Tiny::Manual::Importing> for more hints on importing.
 
@@ -959,7 +997,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2022-2023 by Toby Inkster.
+This software is copyright (c) 2022-2025 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

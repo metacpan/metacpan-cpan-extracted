@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/SubtitleUtils.pm','script/rename-subtitle-files-like-their-movie-files','script/srtadjust','script/srtcalc','script/srtcheck','script/srtcombine2text','script/srtcombinetext','script/srtparse','script/srtrenumber','script/srtscale','script/srtshift','script/srtsplit','script/subscale','script/subshift','script/vtt2srt'];
+my $filenames = ['lib/App/SubtitleUtils.pm','script/hms-secs','script/rename-subtitle-files-like-their-movie-files','script/srtadjust','script/srtcheck','script/srtcombine2text','script/srtcombinetext','script/srtparse','script/srtrenumber','script/srtscale','script/srtshift','script/srtsplit','script/subscale','script/subshift','script/vtt2srt'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }
