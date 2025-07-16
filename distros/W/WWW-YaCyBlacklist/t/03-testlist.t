@@ -24,7 +24,7 @@ $ycb->read_from_array(
     'test14.co/fullpath?ref=test',
     'test15.co/fullpath\?ref=test',
     'sub.test16.co/.*',
-    'test17.co/^fullpath$',
+    'test17.co/fullpath$',
 );
 is( $ycb->check_url( 'http://test1.co/fullpath' ), 1, 'match0' );
 is( $ycb->check_url( 'http://sub.test1.co/fullpath' ), 1, 'match1' );
@@ -79,17 +79,18 @@ my @m = (
     'http://test6.co/fullpath',
     'http://sub.sub.test3.co/fullpath',
     'http://test9.co/%C3%A4%C3%B6%C3%BC%C3%9F%C3%84%C3%96%C3%9C',
+    'http://test2.co/',
 
     # non-matches
     'http://sub.test1.co/fullpatha',
     'http://sub.test6.co/fullpath?ref=test',
 );
 
-is( scalar $ycb->find_matches( @m ), 5, 'arraymatches' );
+is( scalar $ycb->find_matches( @m ), 6, 'arraymatches' );
 is( scalar $ycb->find_non_matches( @m ), 2, 'array non-matches' );
 
 $ycb->delete_pattern( 'test9.co/%C3%A4%C3%B6%C3%BC%C3%9F%C3%84%C3%96%C3%9C' );
-is( scalar $ycb->find_matches( @m ), 4, 'deleted pattern' );
+is( scalar $ycb->find_matches( @m ), 5, 'deleted pattern' );
 
 $ycb->sorting('length');
 $ycb->filename('C:\Users\Work\Documents\ingram\Perl\a.black');

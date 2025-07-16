@@ -10,18 +10,22 @@ use File::Temp;
 use Text::ParseWords;
 
 # builtin libsodium (these comments are to be updated when bundled lib is updated):
-# gpg: Signature made Wed Sep 13 14:19:12 2023 UTC
-# gpg:                using RSA key 0C7983A8FD9A104C623172CB62F25B592B6F76DA
-# gpg: Good signature from "Frank Denis (Jedi/Sector One) <0daydigest@pureftpd.org>" [unknown]
-# gpg:                 aka "Frank Denis (Jedi/Sector One) <j@pureftpd.org>" [unknown]
-# gpg:                 aka "Frank Denis <github@pureftpd.org>" [unknown]
-# gpg:                 aka "Frank Denis <frank.denis@corp.ovh.com>" [unknown]
+
+
+#gpg: Signature made Sat May 25 12:35:20 2024 UTC
+#gpg:                using RSA key 0C7983A8FD9A104C623172CB62F25B592B6F76DA
+#gpg: Good signature from "Frank Denis (Jedi/Sector One) <0daydigest@pureftpd.org>" [unknown]
+#gpg:                 aka "Frank Denis (Jedi/Sector One) <j@pureftpd.org>" [unknown]
+#gpg:                 aka "Frank Denis <github@pureftpd.org>" [unknown]
+#gpg:                 aka "Frank Denis <frank.denis@corp.ovh.com>" [unknown]
+#Primary key fingerprint: 54A2 B889 2CC3 D6A5 97B9  2B6C 2106 27AA BA70 9FE1
+#     Subkey fingerprint: 0C79 83A8 FD9A 104C 6231  72CB 62F2 5B59 2B6F 76DA
 # if building from the source rather than a distribution, put in src/:
-# https://download.libsodium.org/libsodium/releases/libsodium-1.0.19.tar.gz
-# https://download.libsodium.org/libsodium/releases/libsodium-1.0.19.tar.gz.sig
+# https://download.libsodium.org/libsodium/releases/libsodium-1.0.20.tar.gz
+# https://download.libsodium.org/libsodium/releases/libsodium-1.0.20.tar.gz.sig
 # check the signature, or at least:
-# sha256: 018d79fe0a045cca07331d37bd0cb57b2e838c51bc48fd837a1472e50068bbea  libsodium-1.0.19.tar.gz
-# sha512: 8e9b6d796f6330e00921ce37f1b43545966094250938626ae227deef5fd1279f2fc18b5cd55e23484732a27df4d919cf0d2f07b9c2f1aa0c0ef689e668b0d439  libsodium-1.0.19.tar.gz
+# sha256: ebb65ef6ca439333c2bb41a0c1990587288da07f6c7fd07cb3a18cc18d30ce19  libsodium-1.0.20.tar.gz
+# sha512: 7ea165f3c1b1609790e30a16348b9dfdc5731302da00c07c65e125c8ab115c75419a5631876973600f8a4b560ca2c8267001770b68f2eb3eebc9ba095d312702  libsodium-1.0.20.tar.gz
 
 # almost certainly none of this will work on windows. although libsodium is
 # cross-platform and provides some msvc scripts (or however that works), i've
@@ -30,7 +34,7 @@ use Text::ParseWords;
 
 die "OS unsupported\n" if $^O eq 'MSWin32';
 
-my $libsodium_version = '1.0.19';
+my $libsodium_version = '1.0.20';
 my $libsodium_major_minimum = '10';
 my $libsodium_minor_minimum = '3';
 my $test_src = 'int main (int argc, char **argv) { return 0; }';
@@ -165,7 +169,7 @@ sub MY::postamble {
   return <<EOMAKE;
 $libsodium_dir/configure:
 	\$(TAR) -C '$src_dir' -xzf '$src_dir/libsodium-$libsodium_version.tar.gz'
-	@[ -d "$libsodium_junk_dir" ] && mv '$libsodium_junk_dir' '$libsodium_dir'
+	-[ -d "$libsodium_junk_dir" ] && mv '$libsodium_junk_dir' '$libsodium_dir'
 $libsodium_dir/Makefile: $libsodium_dir/configure
 	cd '$libsodium_dir' && ./configure --prefix= --with-pic --disable-shared
 \$(MYEXTLIB): $libsodium_dir/Makefile

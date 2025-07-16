@@ -9,14 +9,14 @@ use IO::Handle;
 
 use Future::IO;
 
-# ->sysread_exactly yielding bytes
+# ->read_exactly yielding bytes
 {
    pipe my ( $rd, $wr ) or die "Cannot pipe() - $!";
 
    $wr->autoflush();
    $wr->print( "BYTES" );
 
-   my $f = Future::IO->sysread_exactly( $rd, 5 );
+   my $f = Future::IO->read_exactly( $rd, 5 );
 
    my @read;
    no warnings 'redefine';
@@ -26,24 +26,24 @@ use Future::IO;
       return CORE::sysread( $fh, $_[1], 1 );
    };
 
-   is( scalar $f->get, "BYTES", 'Future::IO->sysread_exactly eventually yields all the bytes' );
+   is( scalar $f->get, "BYTES", 'Future::IO->read_exactly eventually yields all the bytes' );
 
    is( \@read, [ 5, 4, 3, 2, 1 ], 'IO::Handle->sysread override worked' );
 }
 
-# ->sysread_exactly yielding EOF
+# ->read_exactly yielding EOF
 {
    pipe my ( $rd, $wr ) or die "Cannot pipe() - $!";
 
    $wr->autoflush();
 
-   my $f = Future::IO->sysread_exactly( $rd, 5 );
+   my $f = Future::IO->read_exactly( $rd, 5 );
 
    $wr->print( "BY" );
    $wr->close;
    undef $wr;
 
-   is( [ $f->get ], [], 'Future::IO->sysread_exactly yields nothing on EOF' );
+   is( [ $f->get ], [], 'Future::IO->read_exactly yields nothing on EOF' );
 }
 
 done_testing;

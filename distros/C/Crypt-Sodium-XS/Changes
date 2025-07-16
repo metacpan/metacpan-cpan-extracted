@@ -1,3 +1,14 @@
+0.000028 Jul 15 2025
+
+- add curve25519 packages implementing finite field functions
+  crypto_core_ed25519|ristretto255_*
+
+- add ed25519 and ristretto255 primitives to scalarmult
+
+- update bundled libsodium to 1.0.20
+
+- minor bugfixes and improvements
+
 0.000027 Jul 12 2025
 
 - fix a memory freeing bug

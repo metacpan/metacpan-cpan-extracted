@@ -37,13 +37,14 @@ SV * sodium_bin2base64(SV * bytes, int variant = sodium_base64_VARIANT_URLSAFE_N
   bytes_buf = SvPVbyte(bytes, bytes_len);
   out_len = sodium_base64_encoded_len(bytes_len, variant);
   Newx(out_buf, out_len, char);
+  out_len -= 1; /* decrement space for null */
   if (out_buf == NULL)
     croak("Failed to allocate memory");
-  out_buf[out_len - 1] = '\0';
-  sodium_bin2base64(out_buf, out_len, (unsigned char *)bytes_buf,
+  out_buf[out_len] = '\0';
+  sodium_bin2base64(out_buf, out_len + 1, (unsigned char *)bytes_buf,
                     bytes_len, variant);
   RETVAL = newSV(0);
-  sv_usepvn_flags(RETVAL, out_buf, out_len - 1, SV_HAS_TRAILING_NUL);
+  sv_usepvn_flags(RETVAL, out_buf, out_len, SV_HAS_TRAILING_NUL);
 
   OUTPUT:
   RETVAL
@@ -73,9 +74,9 @@ SV * sodium_base642bin(SV * bytes, int variant = sodium_base64_VARIANT_URLSAFE_N
   Newx(out_buf, out_len + 1, char);
   if (out_buf == NULL)
     croak("Failed to allocate memory");
-  out_buf[out_len] = '\0';
-  sodium_base642bin((unsigned char *)out_buf, out_len + 1, bytes_buf, bytes_len,
+  sodium_base642bin((unsigned char *)out_buf, out_len, bytes_buf, bytes_len,
                     NULL, &out_len, NULL, variant);
+  out_buf[out_len] = '\0';
   RETVAL = newSV(0);
   sv_usepvn_flags(RETVAL, out_buf, out_len, SV_HAS_TRAILING_NUL);
 

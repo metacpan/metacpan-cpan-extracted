@@ -1,7 +1,7 @@
 package Mail::DKIM::Iterator;
 use v5.10.0;
 
-our $VERSION = '1.010';
+our $VERSION = '1.011';
 
 use strict;
 use warnings;
@@ -656,6 +656,7 @@ sub _parse_header {
     # - like simple, but additionally...
     # - remove any white-space at the end of a line (excluding \r\n)
     # - compact any white-space inside the line to a single space
+    # - also, empty body will result in '', not  \r\n
 
     my $bodyc = sub {
 	my $relaxed = shift;
@@ -665,7 +666,7 @@ sub _parse_header {
 	    my $data = shift;
 	    if ($data eq '') {
 		return $no_line_yet if $realdata;
-		return "\r\n";
+		return $relaxed ? "" : "\r\n";
 	    }
 	    my $nl = rindex($data,"\n");
 	    if ($nl == -1) {
@@ -739,11 +740,11 @@ sub _parse_header {
 	    };
 
 	    $bh->{done} and next;
+	    my $tbuf = $bh->{transform}($buf);
 	    if ($buf eq '') {
 		$bh->{done} = 1;
-		goto compute_signature;
+		goto add_tbuf;
 	    }
-	    my $tbuf = $bh->{transform}($buf);
 	    $tbuf eq '' and next;
 	    {
 		defined $bh->{l} or last;
@@ -762,10 +763,11 @@ sub _parse_header {
 		}
 		$bh->{done} = 1;
 	    }
+
+	    add_tbuf:
 	    $bh->{digest}->add($tbuf) if $tbuf ne '';
 	    $bh->{done} or next;
 
-	    compute_signature:
 	    delete $sig->{'bh:collecting'};
 	    $sig->{'bh:computed'} = $bh->{digest}->digest;
 	    push @{$sig->{':warning'}}, 'data after signed body'

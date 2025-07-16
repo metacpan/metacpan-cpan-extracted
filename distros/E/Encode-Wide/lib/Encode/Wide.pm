@@ -31,9 +31,11 @@ Encode::Wide - Convert wide characters (Unicode) into HTML or XML-safe ASCII ent
 
 =head1 VERSION
 
+0.02
+
 =cut
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 =head1 SYNOPSIS
 
@@ -148,12 +150,13 @@ sub wide_to_html
 	$string =~ s/\xe2\x80\x99/&apos;/g;	# ’
 	$string =~ s/\xe2\x80\xA6/.../g;	# …
 	unless($params->{'keep_apos'}) {
-		# $string =~ s/'/&apos;/g;
-		# $string =~ s/‘/&apos;/g;
-		# $string =~ s/’/&apos;/g;
-		# $string =~ s/‘/&apos;/g;
-		# $string =~ s/\x98/&apos;/g;
-		$string =~ s/['‘’‘\x98]/&apos;/g;
+		# We can't combine since each char in the multi-byte matches, not the entire multi-byte
+		# $string =~ s/['‘’‘\x98]/&apos;/g;
+		$string =~ s/'/&apos;/g;
+		$string =~ s/‘/&apos;/g;
+		$string =~ s/’/&apos;/g;
+		$string =~ s/‘/&apos;/g;
+		$string =~ s/\x98/&apos;/g;
 	}
 
 	if($string !~ /[^[:ascii:]]/) {
@@ -336,10 +339,15 @@ sub wide_to_html
 	$string =~ s/–/&ndash;/g;
 	$string =~ s/—/&mdash;/g;
 	$string =~ s/ñ/&ntilde;/g;
-	$string =~ s/[“”«»]/&quot;/g;
+	# See above
+	# $string =~ s/[“”«»]/&quot;/g;
+	$string =~ s/“/&quot;/g;
+	$string =~ s/”/&quot;/g;
+	$string =~ s/«/&quot;/g;
+	$string =~ s/»/&quot;/g;
 	$string =~ s/…/.../g;
 	$string =~ s/●/&#x25CF;/g;
-	$string =~ tr/\x80/ /;
+	$string =~ s/\x80$/ /;
 
 	# if($string =~ /^Maria\(/) {
 		# # print STDERR (unpack 'H*', $string);
@@ -444,7 +452,12 @@ sub wide_to_xml
 	$string =~ s/\xe2\x80\x98/&apos;/g;	# ‘
 	$string =~ s/\xe2\x80\x99/&apos;/g;	# ’
 	$string =~ s/\xe2\x80\xA6/.../g;	# …
-	$string =~ s/['‘’‘\x98]/&apos;/g;
+	# $string =~ s/['‘’‘\x98]/&apos;/g;
+	$string =~ s/'/&apos;/g;
+	$string =~ s/‘/&apos;/g;
+	$string =~ s/’/&apos;/g;
+	$string =~ s/‘/&apos;/g;
+	$string =~ s/\x98/&apos;/g;
 
 	$string =~ s/&Aacute;/&#x0C1;/g;	# Á
 	$string =~ s/&aring;/&#x0E5;/g;	# å
@@ -618,7 +631,9 @@ sub wide_to_xml
 
 	# utf8::decode($string);
 
-	$string =~ s/['\x98]/&#039;/g;
+	# $string =~ s/['\x98]/&#039;/g;
+	$string =~ s/'/&#039;/g;
+	$string =~ s/\x98/&#039;/g;
 	$string =~ s/©/&#x0A9;/g;
 	$string =~ s/ª/&#x0AA;/g;
 	$string =~ s/®/&#x0AE;/g;
@@ -649,11 +664,15 @@ sub wide_to_xml
 	$string =~ s/ú/&#x0FA;/g;
 	$string =~ s/ü/&#x0FC;/g;
 	$string =~ s/þ/&#x0FE;/g;	# þ
-	$string =~ s/[“”«»]/&quot;/g;
+	# $string =~ s/[“”«»]/&quot;/g;
+	$string =~ s/“/&quot;/g;
+	$string =~ s/”/&quot;/g;
+	$string =~ s/«/&quot;/g;
+	$string =~ s/»/&quot;/g;
 	$string =~ s/—/-/g;
 	$string =~ s/…/.../g;
 	$string =~ s/●/&#x25CF;/g;
-	$string =~ tr/\x80/ /;
+	$string =~ s/\x80$/ /;
 
 	# if($string =~ /^Maria\(/) {
 		# print STDERR (unpack 'H*', $string);
@@ -687,18 +706,31 @@ sub wide_to_xml
 
 =head1 SEE ALSO
 
-L<HTML::Entities>, L<Encode>, L<XML::Entities>, L<Unicode::Escape>
+L<HTML::Entities>, L<Encode>, L<XML::Entities>, L<Unicode::Escape>.
+
+L<https://www.compart.com/en/unicode/>.
 
 =head1 AUTHOR
 
 Nigel Horne <njh@nigelhorne.com>
 
-=head1 COPYRIGHT AND LICENSE
+=head1 LICENCE AND COPYRIGHT
 
-Copyright (C) 2025 Nigel Horne
+Copyright 2025 Nigel Horne.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+Usage is subject to licence terms.
+
+The licence terms of this software are as follows:
+
+=over 4
+
+=item * Personal single user, single computer use: GPL2
+
+=item * All other users (including Commercial, Charity, Educational, Government)
+  must apply in writing for a licence for use from Nigel Horne at the
+  above e-mail.
+
+=back
 
 =cut
 

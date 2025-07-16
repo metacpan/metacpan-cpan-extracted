@@ -554,7 +554,6 @@ void pwhash_verify(SV * str, SV * passphrase)
   protmem *pw_pm = NULL;
   unsigned char *pw_buf;
   unsigned char *str_buf;
-  unsigned char *tmp_buf = NULL;
   STRLEN pw_len;
   STRLEN str_len;
   int ret = 0;
@@ -587,29 +586,15 @@ void pwhash_verify(SV * str, SV * passphrase)
   if (str_buf[str_len] != '\0')
     croak("pwhash_verify: Invalid hash string");
 
-  if (pw_pm && protmem_grant(aTHX_ pw_pm, PROTMEM_FLAG_MPROTECT_RO) != 0) {
-    if (tmp_buf) {
-      free(tmp_buf);
-      tmp_buf = NULL;
-    }
+  if (pw_pm && protmem_grant(aTHX_ pw_pm, PROTMEM_FLAG_MPROTECT_RO) != 0)
     croak("pwhash_verify: Failed to grant passphrase protmem RO");
-  }
 
   ret = func((char *)str_buf, (char *)pw_buf, pw_len);
 
-  if (pw_pm && protmem_release(aTHX_ pw_pm, PROTMEM_FLAG_MPROTECT_RO) != 0) {
-    if (tmp_buf) {
-      free(tmp_buf);
-      tmp_buf = NULL;
-    }
+  if (pw_pm && protmem_release(aTHX_ pw_pm, PROTMEM_FLAG_MPROTECT_RO) != 0)
     croak("pwhash_verify: Failed to release passphrase protmem RO");
-  }
 
   if (ret == 0)
     XSRETURN_YES;
 
   XSRETURN_NO;
-
-  CLEANUP:
-  if (tmp_buf)
-    free(tmp_buf);

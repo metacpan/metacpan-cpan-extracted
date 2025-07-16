@@ -37,14 +37,14 @@ Future::IO->override_impl( "TestImplementation" );
    $f->cancel;
 }
 
-# sysread
+# read
 {
    $impl_f = Future->new;
 
-   my $f = Future::IO->sysread( "FH", 1024 );
+   my $f = Future::IO->read( "FH", 1024 );
 
-   is( \@impl_args, [ "FH", 1024 ], '->sysread args' );
-   ref_is( $f, $impl_f, '->sysread return' );
+   is( \@impl_args, [ "FH", 1024 ], '->read args' );
+   ref_is( $f, $impl_f, '->read return' );
 
    $f->cancel;
 }

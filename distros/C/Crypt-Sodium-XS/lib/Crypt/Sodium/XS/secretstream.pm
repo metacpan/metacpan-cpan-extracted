@@ -146,6 +146,11 @@ libsodium, supports only the primitive-specific functions for one primitive
 currently. There is a single C<:xchacha20poly1305> import tag for the functions
 and constants listed below.
 
+B<NOTE>: L<Crypt::Sodium::XS::secretstream>, like libsodium, does not provide
+generic functions for secretstream. Only the primitive-specific functions are
+available, so there is no C<:default> tag. There is (at least currently) only
+one primitive available, xchacha20poly1305.
+
 =head2 secretstream_xchacha20poly1305_init_decrypt
 
   my $stream_dec = secretstream_xchacha20poly1305_init_decrypt($header, $key);

@@ -30,20 +30,15 @@ SV * hkdf_sha256_keygen(SV * flags = &PL_sv_undef)
   hkdf_sha512_keygen = 2
 
   CODE:
+#ifndef SODIUM_HAS_HKDF
+  croak("HKDF not supported by this version of libsodium");
+#endif
   switch(ix) {
     case 1:
-#ifdef SODIUM_HAS_HKDF
       RETVAL = sv_keygen(aTHX_ crypto_kdf_hkdf_sha256_KEYBYTES, flags);
-#else
-      croak("HKDF not supported by this version of libsodium");
-#endif
       break;
     default:
-#ifdef SODIUM_HAS_HKDF
       RETVAL = sv_keygen(aTHX_ crypto_kdf_hkdf_sha512_KEYBYTES, flags);
-#else
-      croak("HKDF not supported by this version of libsodium");
-#endif
   }
 
   OUTPUT:
@@ -71,7 +66,9 @@ SV * hkdf_sha256_extract( \
               const unsigned char *, size_t, const unsigned char *, size_t);
 
   CODE:
-#if defined(SODIUM_HAS_HKDF)
+#ifndef SODIUM_HAS_HKDF
+  croak("hkdf_extract: HKDF not supported by this version of libsodium");
+#endif
   if (SvOK(flags))
     prk_flags = SvUV(flags);
 
@@ -118,9 +115,6 @@ SV * hkdf_sha256_extract( \
   }
 
   RETVAL = protmem_to_sv(aTHX_ prk_pm, MEMVAULT_CLASS);
-#else
-  croak("hkdf_extract: HKDF not supported by this version of libsodium");
-#endif
 
   OUTPUT:
   RETVAL
@@ -148,7 +142,9 @@ SV * hkdf_sha256_expand( \
   int (*func)(unsigned char *, size_t, const char *, size_t, const unsigned char *);
 
   CODE:
-#if defined(SODIUM_HAS_HKDF)
+#ifndef SODIUM_HAS_HKDF
+  croak("hkdf_expand: HKDF not supported by this version of libsodium");
+#endif
   switch(ix) {
     case 1:
       out_max_len = crypto_kdf_hkdf_sha512_BYTES_MAX;
@@ -207,9 +203,6 @@ SV * hkdf_sha256_expand( \
   }
 
   RETVAL = protmem_to_sv(aTHX_ out_pm, MEMVAULT_CLASS);
-#else
-  croak("hkdf_expand: HKDF not supported by this version of libsodium");
-#endif
 
   OUTPUT:
   RETVAL
@@ -226,7 +219,9 @@ SV * hkdf_sha256_extract_init(SV * salt = &PL_sv_undef, SV * flags = &PL_sv_unde
   unsigned int state_flags = g_protmem_flags_state_default;
 
   CODE:
-#if defined(SODIUM_HAS_HKDF)
+#ifndef SODIUM_HAS_HKDF
+  croak("HKDF not supported by this version of libsodium");
+#endif
   if (SvOK(salt))
     salt_buf = (unsigned char *)SvPVbyte(salt, salt_len);
 
@@ -259,9 +254,6 @@ SV * hkdf_sha256_extract_init(SV * salt = &PL_sv_undef, SV * flags = &PL_sv_unde
     default:
       RETVAL = protmem_to_sv(aTHX_ state_pm, "Crypt::Sodium::XS::hkdf::sha256_multi");
   }
-#else
-  croak("HKDF not supported by this version of libsodium");
-#endif
 
   OUTPUT:
   RETVAL

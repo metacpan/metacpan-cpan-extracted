@@ -48,7 +48,7 @@
             "Moose" : "2.2207",
             "Moose::Util::TypeConstraints" : "2.4000",
             "URI::URL" : "0",
-            "perl" : "v5.6.0",
+            "perl" : "v5.8.0",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -74,7 +74,7 @@
          "web" : "https://github.com/CarlOrff/WWW-YaCyBlacklist"
       }
    },
-   "version" : "0.4",
+   "version" : "0.5",
    "x_generated_by_perl" : "v5.40.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.39",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

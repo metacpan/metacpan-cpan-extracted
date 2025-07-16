@@ -58,6 +58,7 @@ SV * sodium_bin2hex(SV * bytes)
   Newx(out_buf, out_len + 1, char);
   if (out_buf == NULL)
     croak("Failed to allocate memory");
+  out_buf[out_len] = '\0';
   sodium_bin2hex(out_buf, out_len + 1, (unsigned char *)bytes_buf, bytes_len);
   RETVAL = newSV(0);
   sv_usepvn_flags(RETVAL, out_buf, out_len, SV_HAS_TRAILING_NUL);
@@ -65,7 +66,7 @@ SV * sodium_bin2hex(SV * bytes)
   OUTPUT:
   RETVAL
 
-SV * sodium_compare(SV * x, SV * y, STRLEN length = 0)
+SV * sodium_compare(SV * x, SV * y, STRLEN len = 0)
 
   PREINIT:
   unsigned char *x_buf;
@@ -77,19 +78,19 @@ SV * sodium_compare(SV * x, SV * y, STRLEN length = 0)
   x_buf = (unsigned char *)SvPVbyte(x, x_len);
   y_buf = (unsigned char *)SvPVbyte(y, y_len);
 
-  if (length == 0) {
+  if (len == 0) {
     if (x_len != y_len)
       croak("Length of operands must be equal without a length argument");
-    length = x_len;
+    len = x_len;
   }
   else {
-    if (length > x_len)
+    if (len > x_len)
       croak("The first argument is shorter then requested length");
-    else if (length > y_len)
+    else if (len > y_len)
       croak("The second argument is shorter then requested length");
   }
 
-  RETVAL = newSViv(sodium_compare(x_buf, y_buf, length));
+  RETVAL = newSViv(sodium_compare(x_buf, y_buf, len));
 
   OUTPUT:
   RETVAL
@@ -109,9 +110,9 @@ SV * sodium_hex2bin(SV * bytes)
   Newx(out_buf, out_len + 1, char);
   if (out_buf == NULL)
     croak("Failed to allocate memory");
-  out_buf[out_len] = '\0';
-  sodium_hex2bin((unsigned char *)out_buf, out_len + 1, bytes_buf, bytes_len,
+  sodium_hex2bin((unsigned char *)out_buf, out_len, bytes_buf, bytes_len,
                  NULL, &out_len, NULL);
+  out_buf[out_len] = '\0';
   RETVAL = newSV(0);
   sv_usepvn_flags(RETVAL, out_buf, out_len, SV_HAS_TRAILING_NUL);
 
@@ -164,7 +165,7 @@ SV * sodium_is_zero(SV * bytes)
   OUTPUT:
   RETVAL
 
-SV * sodium_memcmp(SV * x, SV * y, STRLEN length = 0)
+SV * sodium_memcmp(SV * x, SV * y, STRLEN len = 0)
 
   PREINIT:
   unsigned char *x_buf;
@@ -176,19 +177,19 @@ SV * sodium_memcmp(SV * x, SV * y, STRLEN length = 0)
   x_buf = (unsigned char *)SvPVbyte(x, x_len);
   y_buf = (unsigned char *)SvPVbyte(y, y_len);
 
-  if (length == 0) {
+  if (len == 0) {
     if (x_len != y_len)
       croak("Length of operands must be equal without a length argument");
-    length = x_len;
+    len = x_len;
   }
   else {
-    if (length > x_len)
+    if (len > x_len)
       croak("The first argument is shorter then requested length");
-    else if (length > y_len)
+    else if (len > y_len)
       croak("The second argument is shorter then requested length");
   }
 
-  if (sodium_memcmp(x_buf, y_buf, length) == 0)
+  if (sodium_memcmp(x_buf, y_buf, len) == 0)
     RETVAL = &PL_sv_yes;
   else
     RETVAL = &PL_sv_no;

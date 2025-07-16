@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use mro 'c3';
 use English;
-our $VERSION = 2.9;
+our $VERSION = 3.0;
 use Carp;
 
 require Exporter;
@@ -14,34 +14,28 @@ our @ISA = qw(Exporter);
 
 our @EXPORT = qw(contains);
 
-sub contains {
-    my ($value, $dataset) = @_;
-
-    if(!defined($value)) {
-        croak('value is not defined in contains()');
+BEGIN {
+    # Check perl version and decide which version of the function we are going to load.
+    my $perlversion = $];
+    my $basemodule = 'Array::Contains::Legacy';
+    if($perlversion >= 5.042) {
+        $basemodule = 'Array::Contains::Any';
     }
+    #print STDERR $basemodule, "\n";
 
-    if(!defined($dataset)) {
-        croak('dataset is not defined in contains()');
+    # Import the module. require() uses a filename, not a package name. 
+    my $fname = $basemodule . '.pm';
+    $fname =~ s/\:\:/\//g;
+    require $fname;
+    $fname->import();
+
+    {
+        # make the contains() function in our package point to the _contains function of the sub-package
+        no strict 'refs'; ## no critic (TestingAndDebugging::ProhibitNoStrict)
+        my $funcname = $basemodule . '::_contains';
+        *{__PACKAGE__ . "::contains"} = \&$funcname;
     }
-
-    if(ref($value) ne '') {
-        croak('value is not a scalar in contains()');
-    }
-
-    if(ref($dataset) ne 'ARRAY') {
-        croak('dataset is not an array reference in contains()');
-    }
-
-    foreach my $key (@{$dataset}) {
-        next if(ref($key) ne '');
-        if($value eq $key) {
-            return 1;
-        }
-    }
-
-    return 0;
-}
+};
 
 1;
 __END__
@@ -65,6 +59,10 @@ array contains a specific element.
 
 This module is designed for convenience and readable code rather than for
 speed.
+
+If you are running a Perl version prior to 5.42.0, this is implemented using a classic for loop.
+
+From 5.42.0 onwards, this uses the new "any" keyword for higher performance. The API is Array::Contains shouldn't look any different to the caller, though. Just, maybe, a tiny bit faster.
 
 =head1 FUNCTIONS
 

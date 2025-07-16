@@ -44,7 +44,7 @@ sub count_future_dependents
 
 my ( $controller, $puppet ) = Test::ExpectAndCheck->create;
 
-# ->sysread does not build long future chains on EAGAIN
+# ->read does not build long future chains on EAGAIN
 {
    my $read_f;
 
@@ -70,12 +70,12 @@ my ( $controller, $puppet ) = Test::ExpectAndCheck->create;
          return length $args->[0];
       });
 
-   $read_f = Future::IO->sysread( $puppet, 128 );
-   is( $read_f->get, "result", '->sysread yields result' );
+   $read_f = Future::IO->read( $puppet, 128 );
+   is( $read_f->get, "result", '->read yields result' );
 
-   is( $dep_count, 1, '->sysread future did not build a big dependent chain' );
+   is( $dep_count, 1, '->read future did not build a big dependent chain' );
 
-   $controller->check_and_clear( '->sysread' );
+   $controller->check_and_clear( '->read' );
 }
 
 done_testing;

@@ -21,14 +21,14 @@ requires:
   Moose: '2.2207'
   Moose::Util::TypeConstraints: '2.4000'
   URI::URL: '0'
-  perl: v5.6.0
+  perl: v5.8.0
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=WWW-YaCyBlacklist
   homepage: https://ingram-braun.net/erga/the-www-yacyblacklist-module/
   repository: git://github.com/CarlOrff/WWW-YaCyBlacklist.git
-version: '0.4'
+version: '0.5'
 x_generated_by_perl: v5.40.2
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

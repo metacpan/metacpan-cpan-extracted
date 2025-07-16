@@ -37,7 +37,7 @@ my $chacha20poly1305_ietf = [
 ];
 
 my $aes256gcm = [
-  (map { "aead_aes256gcm_$_" } @bases, "available", "beforenm"),
+  (map { "aead_aes256gcm_$_" } @bases, "beforenm"),
   (map { "aead_aes256gcm_$_" } @constant_bases),
 ];
 
@@ -89,7 +89,7 @@ Crypt::Sodium::XS::aead - Authenticated encryption with additional data
 
 =head1 SYNOPSIS
 
-  use Crypt::Sodium::XS::aead ":default";
+  use Crypt::Sodium::XS::aead ":xchacha20poly1305";
   use Crypt::Sodium::XS::Util "sodium_increment";
 
   my $key = aead_xchacha20poly1305_ietf_keygen();
@@ -144,13 +144,15 @@ headers.
 
 =head1 FUNCTIONS
 
-Nothing is exported by default. A separate import tag is provided for functions
-and constants for each of the primitives listed in L</PRIMITIVES>. For example,
+Nothing is exported by default. A C<:features> tag imports the C<*_available>
+feature test functions. A separate import tag is provided for functions and
+constants for each of the primitives listed in L</PRIMITIVES>. For example,
 C<:chacha20poly1305> imports C<aead_chacha20poly1305_decrypt>. You should use
-at least one import tag.
+at least one import tag. A C<:all> tag imports everything.
 
 B<NOTE>: L<Crypt::Sodium::XS::aead>, like libsodium, does not provide generic
-functions for AEAD. only the primitive-specific functions are available.
+functions for AEAD. Only the primitive-specific functions are available, so
+there is no C<:default> tag.
 
 =head2 aead_aes256gcm_available
 
@@ -158,14 +160,14 @@ functions for AEAD. only the primitive-specific functions are available.
 
 =head2 aead_aes256gcm_beforenm
 
-** available only for the aes256gcm primitive! **
-
   my $precalc = aead_aes256gcm_beforenm($key);
+
+NOTE: aes256gcm primitive only!
 
 Returns a precalculation aead object. This is useful when performing many
 operations with the same key. See L</PRECALCULATION INTERFACE>.
 
-=head2 aead_decrypt
+=head2 aead_E<lt>primitiveE<gt>_decrypt
 
   my $plaintext = aead_xchacha20poly1305_ietf_decrypt(
                     $ciphertext, $nonce, $key, $adata, $flags);
@@ -177,7 +179,7 @@ C<$adata> is optional. See notes in L</DESCRIPTION>.
 C<$flags> is optional. It is the flags used for the C<$plaintext>
 L<Crypt::Sodium::XS::MemVault> object. See L<Crypt::Sodium::XS/MEMORY SAFETY>.
 
-=head2 aead_decrypt_detached
+=head2 aead_E<lt>primitiveE<gt>_decrypt_detached
 
   my $plaintext = aead_chacha20poly1305_decrypt_detached(
                     $ciphertext, $mac, $nonce, $key, $adata, $flags);
@@ -189,25 +191,25 @@ C<$adata> is optional. See notes in L</DESCRIPTION>.
 C<$flags> is optional. It is the flags used for the C<$plaintext>
 L<Crypt::Sodium::XS::MemVault> object. See L<Crypt::Sodium::XS/MEMORY SAFETY>.
 
-=head2 aead_encrypt
+=head2 aead_E<lt>primitiveE<gt>_encrypt
 
   my $ciphertext
     = aead_chacha20poly1305_ietf_encrypt($plaintext, $nonce, $key, $adata);
 
 C<$adata> is optional. See notes in L</DESCRIPTION>.
 
-=head2 aead_encrypt_detached
+=head2 aead_E<lt>primitiveE<gt>_encrypt_detached
 
   my ($ciphertext, $mac)
     = aead_aes256gcm_encrypt_detached($plaintext, $nonce, $key, $adata);
 
 C<$adata> is optional. See notes in L</DESCRIPTION>.
 
-=head2 aead_keygen
+=head2 aead_E<lt>primitiveE<gt>_keygen
 
   my $key = aead_xchacha20poly1305_ietf_keygen();
 
-=head2 aead_nonce
+=head2 aead_E<lt>primitiveE<gt>_nonce
 
   my $nonce = aead_xchacha20poly1305_ietf_nonce();
 
@@ -268,22 +270,22 @@ C<$adata> is optional. See notes in L</DESCRIPTION>.
 
 =head1 CONSTANTS
 
-=head2 aead_ABYTES
+=head2 aead_E<lt>primitiveE<gt>_ABYTES
 
   my $additional_data_length = aead_chacha20poly1305_ABYTES();
 
 This is not a restriction on the amount of additional data, it is the size of
 the ciphertext MAC.
 
-=head2 aead_KEYBYTES
+=head2 aead_E<lt>primitiveE<gt>_KEYBYTES
 
   my $key_length = aead_chacha20poly1305_ietf_KEYBYTES();
 
-=head2 aead_MESSAGEBYTES_MAX
+=head2 aead_E<lt>primitiveE<gt>_MESSAGEBYTES_MAX
 
   my $message_max_length = aead_aes256gcm_MESSAGEBYTES_MAX();
 
-=head2 aead_NPUBBYTES
+=head2 aead_E<lt>primitiveE<gt>_NPUBBYTES
 
   my $nonce_length = aead_xchacha20poly1305_ietf_NPUBBYTES();
 

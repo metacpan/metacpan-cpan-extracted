@@ -5,6 +5,7 @@ SYNOPSIS
      use Mo::utils::Hash qw(check_hash);
 
      check_hash($self, $key);
+     check_hash_keys($self, $key, @keys);
 
 DESCRIPTION
     Utilities for checking of hash values.
@@ -21,10 +22,27 @@ SUBROUTINES
 
     Returns undef.
 
+  "check_hash_keys"
+     check_hash_keys($self, $key, @keys);
+
+    *Since version 0.02.*
+
+    Check parameter defined by $key which contain hash keys defined by
+    @keys.
+
+    Put error if check isn't ok.
+
+    Returns undef.
+
 ERRORS
      check_hash():
              Parameter '%s' isn't hash reference.
                      Reference: %s
+
+     check_hash_keys():
+             Expected keys doesn't exists.
+             Parameter '%s' doesn't contain expected keys.
+                     Keys: %s
 
 EXAMPLE1
      use strict;
@@ -61,7 +79,52 @@ EXAMPLE2
      print "ok\n";
 
      # Output like:
-     # #Error [..Utils.pm:?] Parameter 'key' isn't hash reference.
+     # #Error [..Hash.pm:?] Parameter 'key' isn't hash reference.
+
+EXAMPLE3
+     use strict;
+     use warnings;
+
+     use Mo::utils::Hash 0.02 qw(check_hash_keys);
+
+     my $self = {
+             'key' => {
+                     'first' => {
+                            'second' => 'value',
+                     },
+             },
+     };
+     check_hash_keys($self, 'key', 'first', 'second');
+
+     # Print out.
+     print "ok\n";
+
+     # Output:
+     # ok
+
+EXAMPLE4
+     use strict;
+     use warnings;
+
+     use Error::Pure;
+     use Mo::utils::Hash 0.02 qw(check_hash_keys);
+
+     $Error::Pure::TYPE = 'Error';
+
+     my $self = {
+             'key' => {
+                     'first' => {
+                             'second_typo' => 'value',
+                     }
+             },
+     };
+     check_hash_keys($self, 'key', 'first', 'second');
+
+     # Print out.
+     print "ok\n";
+
+     # Output like:
+     # #Error [..Hash.pm:?] Parameter 'key' doesn't contain expected keys.
 
 DEPENDENCIES
     Exporter, Error::Pure, Readonly.
@@ -84,5 +147,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.01
+    0.02
 

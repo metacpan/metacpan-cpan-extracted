@@ -98,8 +98,8 @@ my %methods = (
 
 sub primitives { keys %methods }
 
-sub aes256gcm_available { goto \&Crypt::Sodium::XS::aead::aes256gcm_available }
-sub aead_aegis_available { goto \&Crypt::Sodium::XS::aead::aes_aegis_available }
+sub aes256gcm_available { goto \&Crypt::Sodium::XS::aead::aead_aes256gcm_available }
+sub aegis_available { goto \&Crypt::Sodium::XS::aead::aead_aegis_available }
 
 sub ABYTES { my $self = shift; goto $methods{$self->{primitive}}->{ABYTES}; }
 sub KEYBYTES { my $self = shift; goto $methods{$self->{primitive}}->{KEYBYTES}; }

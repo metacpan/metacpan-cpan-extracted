@@ -1,5 +1,12 @@
 Revision history for Future-IO
 
+0.17    2025-07-15
+        [CHANGES]
+         * Added new `->send`, `->recv` and `->recvfrom` socket IO wrapping
+           methods
+         * Provide `->read` and `->write` as better names for what were named
+           `->sysread` and `->syswrite`
+
 0.16    2024-09-16
         [CHANGES]
          * Added `Future::IO->load_impl` convenience method for toplevel

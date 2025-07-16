@@ -34,4 +34,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Mo-utils-Hash
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Mo-utils-Hash
-version: '0.01'
+version: '0.02'

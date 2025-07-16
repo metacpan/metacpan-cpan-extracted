@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2019-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2019-2025 -- leonerd@leonerd.org.uk
 
-package Future::IO::ImplBase 0.16;
+package Future::IO::ImplBase 0.17;
 
 use v5.14;
 use warnings;
@@ -130,6 +130,94 @@ sub connect
 
       return Future->done;
    } );
+}
+
+=head2 recv
+
+=head2 recvfrom
+
+Implemented by wrapping C<ready_for_read>, as L</sysread> uses.
+
+=cut
+
+sub _recv1
+{
+   my $self = shift;
+   my ( $f, $with_fromaddr, $fh, $length, $flags ) = @_;
+
+   my $waitf = $self->ready_for_read( $fh )->on_done( sub {
+      my $fromaddr = $fh->recv( my $buf, $length, $flags );
+      if( defined $fromaddr and length $buf ) {
+         $f->done( $buf, $with_fromaddr ? ( $fromaddr ) : () );
+      }
+      elsif( defined $fromaddr ) {
+         $f->done(); # fromaddr is not interesting at EOF
+      }
+      elsif( $! == EAGAIN or $! == EWOULDBLOCK ) {
+         # Try again
+         $self->_recv1( $f, $with_fromaddr, $fh, $length, $flags );
+      }
+      else {
+         my $name = $with_fromaddr ? "recvfrom" : "recv";
+         $f->fail( "$name: $!\n", $name => $fh, $! );
+      }
+   });
+
+   $f //= $waitf->new;
+
+   $f->on_cancel( $waitf );
+
+   return $f;
+}
+
+sub recv
+{
+   my $self = shift;
+   return $self->_recv1( undef, 0, @_ );
+}
+
+sub recvfrom
+{
+   my $self = shift;
+   return $self->_recv1( undef, 1, @_ );
+}
+
+=head2 send
+
+Implemented by wrapping C<ready_for_write>, as L</syswrite> uses.
+
+=cut
+
+sub _send1
+{
+   my $self = shift;
+   my ( $f, $fh, $data, $flags, $to ) = @_;
+
+   my $waitf = $self->ready_for_write( $fh )->on_done( sub {
+      my $len = $fh->send( $data, $flags, $to );
+      if( defined $len ) {
+         $f->done( $len );
+      }
+      elsif( $! == EAGAIN or $! == EWOULDBLOCK ) {
+         # Try again
+         $self->_syswrite1( $f, $fh, $data, $flags, $to );
+      }
+      else {
+         $f->fail( "send: $!\n", send => $fh, $! );
+      }
+   } );
+
+   $f //= $waitf->new;
+
+   $f->on_cancel( $waitf );
+
+   return $f;
+}
+
+sub send
+{
+   my $self = shift;
+   return $self->_send1( undef, @_ );
 }
 
 =head2 sysread

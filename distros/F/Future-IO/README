@@ -9,7 +9,7 @@ SYNOPSIS
        my $delay = Future::IO->sleep( 5 );
        # $delay will become done in 5 seconds time
     
-       my $input = Future::IO->sysread( \*STDIN, 4096 );
+       my $input = Future::IO->read( \*STDIN, 4096 );
        # $input will yield some input from the STDIN IO handle
 
 DESCRIPTION
@@ -27,8 +27,8 @@ DESCRIPTION
 
     If the override_impl method is not invoked, a default implementation of
     these operations is provided. This implementation allows a single queue
-    of sysread or syswrite calls on a single filehandle only, combined with
-    sleep calls. It does not support waitpid.
+    of read or write calls on a single filehandle only, combined with sleep
+    calls. It does not support waitpid.
 
     It is provided for the simple cases where modules only need one
     filehandle (most likely a single network socket or hardware device
@@ -96,16 +96,12 @@ METHODS
     Returns a Future that will become done when a connect() has succeeded
     on the given filehandle to the given sockname address.
 
- sleep
+ read
 
-       await Future::IO->sleep( $secs );
+       $bytes = await Future::IO->read( $fh, $length );
 
-    Returns a Future that will become done a fixed delay from now, given in
-    seconds. This value may be fractional.
-
- sysread
-
-       $bytes = await Future::IO->sysread( $fh, $length );
+    Since version 0.17. Before this version this method used to be named
+    sysread, and still available via that alias.
 
     Returns a Future that will become done when at least one byte can be
     read from the given filehandle. It may return up to $length bytes. On
@@ -116,11 +112,12 @@ METHODS
     Note specifically this may perform only a single sysread() call, and
     thus is not guaranteed to actually return the full length.
 
- sysread_exactly
+ read_exactly
 
-       $bytes = await Future::IO->sysread_exactly( $fh, $length );
+       $bytes = await Future::IO->read_exactly( $fh, $length );
 
-    Since version 0.03.
+    Since version 0.17. Before this version this method used to be named
+    sysread_exactly, and still available via that alias.
 
     Returns a Future that will become done when exactly the given number of
     bytes have been read from the given filehandle. It returns exactly
@@ -132,42 +129,63 @@ METHODS
 
     This may make more than one sysread() call.
 
- sysread_until_eof
+ read_until_eof
 
-       $f = Future::IO->sysread_until_eof( $fh );
+       $f = Future::IO->read_until_eof( $fh );
 
-    Since version 0.12.
+    Since version 0.17. Before this version this method used to be named
+    sysread_until_eof, and still available via that alias.
 
     Returns a Future that will become done when the given filehandle
     reaches the EOF condition. The returned future will yield all of the
     bytes read up until that point.
 
- syswrite
+ recv
 
-       $written_len = await Future::IO->syswrite( $fh, $bytes );
+ recvfrom
 
-    Since version 0.04.
+       $bytes = await Future::IO->recv( $fh, $length );
+       $bytes = await Future::IO->recv( $fh, $length, $flags );
+    
+       ( $bytes, $from ) = await Future::IO->recvfrom( $fh, $length );
+       ( $bytes, $from ) = await Future::IO->recvfrom( $fh, $length, $flags );
+
+    Since version 0.17.
+
+    Returns a Future that will become done when at least one byte is
+    received from the given filehandle (presumably a socket), by using a
+    recv(2) or recvfrom(2) system call. On any error (other than EAGAIN /
+    EWOULDBLOCK which are ignored) the future fails with a suitable error
+    message.
+
+    Optionally a flags bitmask in $flags can be passed. If no flags are
+    required, the value may be zero. The recvfrom method additionally
+    returns the sender's address as a second result value; this is
+    primarily used by unconnected datagram sockets.
+
+ send
+
+       $sent_lem = await Future::IO->send( $fh, $bytes );
+       $sent_lem = await Future::IO->send( $fh, $bytes, $flags );
+       $sent_lem = await Future::IO->send( $fh, $bytes, $flags, $to );
+
+    Since version 0.17.
 
     Returns a Future that will become done when at least one byte has been
-    written to the given filehandle. It may write up to all of the bytes.
-    On any error (other than EAGAIN / EWOULDBLOCK which are ignored) the
-    future fails with a suitable error message.
+    sent to the given filehandle (presumably a socket), by using a send(2)
+    system call. On any error (other than EAGAIN / EWOULDBLOCK which are
+    ignored) the future fails with a suitable error message.
 
-    Note specifically this may perform only a single syswrite() call, and
-    thus is not guaranteed to actually return the full length.
+    Optionally a flags bitmask in $flags or a destination address in $to
+    can also be passed. If no flags are required, the value may be zero. If
+    $to is specified then a sendto(2) system call is used instead.
 
- syswrite_exactly
+ sleep
 
-       $written_len = await Future::IO->syswrite_exactly( $fh, $bytes );
+       await Future::IO->sleep( $secs );
 
-    Since version 0.04.
-
-    Returns a Future that will become done when exactly the given bytes
-    have been written to the given filehandle. On any error (other than
-    EAGAIN / EWOULDBLOCK which are ignored) the future fails with a
-    suitable error message.
-
-    This may make more than one syswrite() call.
+    Returns a Future that will become done a fixed delay from now, given in
+    seconds. This value may be fractional.
 
  waitpid
 
@@ -186,6 +204,35 @@ METHODS
           my $exitcode = ($wstatus >> 8);
           say "Terminated with exit code $exitcode";
        }
+
+ write
+
+       $written_len = await Future::IO->write( $fh, $bytes );
+
+    Since version 0.17. Before this version this method used to be named
+    syswrite, and still available via that alias.
+
+    Returns a Future that will become done when at least one byte has been
+    written to the given filehandle. It may write up to all of the bytes.
+    On any error (other than EAGAIN / EWOULDBLOCK which are ignored) the
+    future fails with a suitable error message.
+
+    Note specifically this may perform only a single syswrite() call, and
+    thus is not guaranteed to actually return the full length.
+
+ write_exactly
+
+       $written_len = await Future::IO->write_exactly( $fh, $bytes );
+
+    Since version 0.17. Before this version this method used to be named
+    syswrite_exactly, and still available via that alias.
+
+    Returns a Future that will become done when exactly the given bytes
+    have been written to the given filehandle. On any error (other than
+    EAGAIN / EWOULDBLOCK which are ignored) the future fails with a
+    suitable error message.
+
+    This may make more than one syswrite() call.
 
  override_impl
 

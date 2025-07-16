@@ -1,5 +1,8 @@
 Revision history for Readonly-Values-Months - Months constants
 
+0.03	Tue Jul 15 20:40:39 EDT 2025
+	Added %month_names_to_short
+
 0.02	Sun Jul  6 11:12:35 EDT 2025
 	Added GitHub Actions
 	Added @month_names and @short_month_names

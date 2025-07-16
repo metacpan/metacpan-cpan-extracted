@@ -17,4 +17,4 @@ check_hash($self, 'key');
 print "ok\n";
 
 # Output like:
-# #Error [..Utils.pm:?] Parameter 'key' isn't hash reference.
+# #Error [..Hash.pm:?] Parameter 'key' isn't hash reference.

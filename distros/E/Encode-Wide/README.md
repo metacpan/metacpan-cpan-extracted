@@ -2,6 +2,10 @@
 
 Encode::Wide - Convert wide characters (Unicode) into HTML or XML-safe ASCII entities
 
+# VERSION
+
+0.02
+
 # SYNOPSIS
 
     use Encode::Wide qw(wide_to_html wide_to_xml);
@@ -55,15 +59,23 @@ Optionally exportable:
 
 # SEE ALSO
 
-[HTML::Entities](https://metacpan.org/pod/HTML%3A%3AEntities), [Encode](https://metacpan.org/pod/Encode), [XML::Entities](https://metacpan.org/pod/XML%3A%3AEntities), [Unicode::Escape](https://metacpan.org/pod/Unicode%3A%3AEscape)
+[HTML::Entities](https://metacpan.org/pod/HTML%3A%3AEntities), [Encode](https://metacpan.org/pod/Encode), [XML::Entities](https://metacpan.org/pod/XML%3A%3AEntities), [Unicode::Escape](https://metacpan.org/pod/Unicode%3A%3AEscape).
+
+[https://www.compart.com/en/unicode/](https://www.compart.com/en/unicode/).
 
 # AUTHOR
 
 Nigel Horne <njh@nigelhorne.com>
 
-# COPYRIGHT AND LICENSE
+# LICENCE AND COPYRIGHT
 
-Copyright (C) 2025 Nigel Horne
+Copyright 2025 Nigel Horne.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+Usage is subject to licence terms.
+
+The licence terms of this software are as follows:
+
+- Personal single user, single computer use: GPL2
+- All other users (including Commercial, Charity, Educational, Government)
+  must apply in writing for a licence for use from Nigel Horne at the
+  above e-mail.

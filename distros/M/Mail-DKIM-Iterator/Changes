@@ -1,3 +1,5 @@
+1.011 - 2025/07/15
+- fixed "simple" body canonicalization for empty body
 1.010 - 2021/02/26
 - change bugtracker in Makefile.PL to github
 1.009 - 2019/04/22

@@ -4,7 +4,7 @@ Readonly::Values::Months - Months Constants
 
 # VERSION
 
-Version 0.02
+Version 0.03
 
 # SYNOPSIS
 
@@ -32,6 +32,8 @@ Version 0.02
     #   %months
     #   @month_names
     #   @short_month_names
+
+    print "December is often shortened to $month_names_to_short{december}\n";   # "dec"
 
 # AUTHOR
 

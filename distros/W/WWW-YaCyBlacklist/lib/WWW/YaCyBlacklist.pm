@@ -5,13 +5,13 @@ package WWW::YaCyBlacklist;
 # ABSTRACT: a Perl module to parse and execute YaCy blacklists
 
 our $AUTHORITY = 'cpan:IBRAUN';
-$WWW::YaCyBlacklist::VERSION = '0.4';
+$WWW::YaCyBlacklist::VERSION = '0.5';
 
 use Moose;
 use Moose::Util::TypeConstraints;
 use IO::All;
 use URI::URL;
-require 5.6.0;
+require 5.8.0;
 
 
 # Needed if RegExps do not compile
@@ -82,6 +82,7 @@ sub read_from_array {
         if ( CORE::length $line > 0 ) {
             $hash{ $line }{ 'origorder' } = $self->origorder( $self->origorder + 1 );
             ( $hash{ $line }{ 'host' }, $hash{ $line }{ 'path' } ) = split /(?!\\)\/+?/, $line, 2;
+            $hash{ $line }{ 'path' } = '/' . $hash{ $line }{ 'path' };
             $hash{ $line }{ 'host_regex' } = $self->_check_host_regex( $hash{ $line }{ 'host' } );
         }
     }
@@ -110,9 +111,10 @@ sub length {
 sub check_url {
 
     my $self = shift;
-    my $url = new URI $_[0];
+    my $url = shift;
+    $url .= '/' if $url =~ /\:\/\/[\w\-\.]+$/;
+    $url = new URI $url;
     my $pq = ( defined $url->query ) ? $url->path.'?'.$url->query : $url->path;
-    $pq = substr $pq, 1;
 
     foreach my $pattern ( keys %{ $self->patterns } ) {
 
@@ -183,7 +185,7 @@ sub sort_list {
 sub store_list {
 
     my $self = shift;
-    join( "\n", $self->sort_list ) > io(  $self->filename )->encoding( $self->file_charset )->all;
+    join( "\n", $self->sort_list ) > io(  $self->filename )->all;
 }
 
 1;
@@ -202,7 +204,7 @@ WWW::YaCyBlacklist - a Perl module to parse and execute YaCy blacklists
 
 =head1 VERSION
 
-version 0.4
+version 0.5
 
 =head1 SYNOPSIS
 
@@ -290,11 +292,7 @@ Prints the current list to a file. Executes C<sort_list( )>.
 
 =head1 OPERATIONAL NOTES
 
-The error
-
-    ^* matches null string many times in regex; marked by <-- HERE in m/^^* <-- HERE
-
-is probably caused by a corrupted path part of a pattern in your list (C<*> instead of C<.*>).
+C<WWW::YaCyBlacklist> checks the path part including the leading separator C</>. This protects against regexp compiling errors with leading quantifiers. So do not something like C<host.tld/^path> although YaCy allows this.
 
 =head1 BUGS
 

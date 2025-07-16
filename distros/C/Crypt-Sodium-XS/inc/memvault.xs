@@ -989,10 +989,14 @@ void is_zero(SV * self)
 
 SV * length(SV * self)
 
+  ALIAS:
+  size = 1
+
   PREINIT:
   protmem *self_pm;
 
   CODE:
+  PERL_UNUSED_VAR(ix);
   self_pm = protmem_get(aTHX_ self, MEMVAULT_CLASS);
   RETVAL = newSVuv((UV)self_pm->size);
 

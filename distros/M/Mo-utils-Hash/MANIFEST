@@ -1,5 +1,7 @@
 Changes
 examples/check_hash_fail.pl
+examples/check_hash_keys_fail.pl
+examples/check_hash_keys_ok.pl
 examples/check_hash_ok.pl
 Hash.pm
 inc/Module/Install.pm
@@ -22,5 +24,6 @@ SIGNATURE
 t/Mo-utils-Hash/01-use.t
 t/Mo-utils-Hash/02-version.t
 t/Mo-utils-Hash/03-check_hash.t
+t/Mo-utils-Hash/03-check_hash_keys.t
 xt/Mo-utils-Hash/01-pod_coverage.t
 xt/Mo-utils-Hash/02-pod.t

@@ -7,8 +7,9 @@ use Error::Pure::Utils qw(clean);
 use Tags::HTML::Messages;
 use Tags::Output::Structure;
 use Test::MockObject;
-use Test::More 'tests' => 13;
+use Test::More 'tests' => 14;
 use Test::NoWarnings;
+use Unicode::UTF8 qw(decode_utf8);
 
 # Test.
 my $tags = Tags::Output::Structure->new;
@@ -172,6 +173,31 @@ is_deeply(
 		['e', 'div'],
 	],
 	'No messages (flag_no_messages = 1).',
+);
+
+# Test.
+$tags = Tags::Output::Structure->new;
+$obj = Tags::HTML::Messages->new(
+	'lang' => 'cze',
+	'tags' => $tags,
+	'text' => {
+		'cze' => {
+			'no_messages' => decode_utf8('Nejsou žádné zprávy'),
+		},
+	},
+);
+$message_ar = [];
+$obj->process($message_ar);
+$ret_ar = $tags->flush(1);
+is_deeply(
+	$ret_ar,
+	[
+		['b', 'div'],
+		['a', 'class', 'messages'],
+		['d', decode_utf8('Nejsou žádné zprávy')],
+		['e', 'div'],
+	],
+	'No messages (Czech translation).',
 );
 
 # Test.

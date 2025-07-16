@@ -7,9 +7,9 @@ use warnings;
 use Error::Pure qw(err);
 use Readonly;
 
-Readonly::Array our @EXPORT_OK => qw(check_hash);
+Readonly::Array our @EXPORT_OK => qw(check_hash check_hash_keys);
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 sub check_hash {
 	my ($self, $key) = @_;
@@ -22,6 +22,35 @@ sub check_hash {
 		err "Parameter '$key' isn't hash reference.",
 			'Reference', (ref $self->{$key}),
 		;
+	}
+
+	return;
+}
+
+sub check_hash_keys {
+	my ($self, $key, @hash_keys) = @_;
+
+	if (! exists $self->{$key}) {
+		return;
+	}
+
+	if (! @hash_keys) {
+		err "Expected keys doesn't exists.";
+	}
+
+	my $hash = $self->{$key};
+	my $printable_keys = '';
+	foreach my $hash_key (@hash_keys) {
+		if ($printable_keys) {
+			$printable_keys .= '.';
+		}
+		$printable_keys .= $hash_key;
+		if (ref $hash ne 'HASH' || ! exists $hash->{$hash_key}) {
+			err "Parameter '$key' doesn't contain expected keys.",
+				'Keys', $printable_keys,
+			;
+		}
+		$hash = $hash->{$hash_key};
 	}
 
 	return;
@@ -44,6 +73,7 @@ Mo::utils::Hash - Mo hash utilities.
  use Mo::utils::Hash qw(check_hash);
 
  check_hash($self, $key);
+ check_hash_keys($self, $key, @keys);
 
 =head1 DESCRIPTION
 
@@ -63,11 +93,28 @@ Put error if check isn't ok.
 
 Returns undef.
 
+=head2 C<check_hash_keys>
+
+ check_hash_keys($self, $key, @keys);
+
+I<Since version 0.02.>
+
+Check parameter defined by C<$key> which contain hash keys defined by C<@keys>.
+
+Put error if check isn't ok.
+
+Returns undef.
+
 =head1 ERRORS
 
  check_hash():
          Parameter '%s' isn't hash reference.
                  Reference: %s
+
+ check_hash_keys():
+         Expected keys doesn't exists.
+         Parameter '%s' doesn't contain expected keys.
+                 Keys: %s
 
 
 =head1 EXAMPLE1
@@ -111,7 +158,58 @@ Returns undef.
  print "ok\n";
 
  # Output like:
- # #Error [..Utils.pm:?] Parameter 'key' isn't hash reference.
+ # #Error [..Hash.pm:?] Parameter 'key' isn't hash reference.
+
+=head1 EXAMPLE3
+
+=for comment filename=check_hash_keys_ok.pl
+
+ use strict;
+ use warnings;
+
+ use Mo::utils::Hash 0.02 qw(check_hash_keys);
+
+ my $self = {
+         'key' => {
+                 'first' => {
+                        'second' => 'value',
+                 },
+         },
+ };
+ check_hash_keys($self, 'key', 'first', 'second');
+
+ # Print out.
+ print "ok\n";
+
+ # Output:
+ # ok
+
+=head1 EXAMPLE4
+
+=for comment filename=check_hash_keys_fail.pl
+
+ use strict;
+ use warnings;
+
+ use Error::Pure;
+ use Mo::utils::Hash 0.02 qw(check_hash_keys);
+
+ $Error::Pure::TYPE = 'Error';
+
+ my $self = {
+         'key' => {
+                 'first' => {
+                         'second_typo' => 'value',
+                 }
+         },
+ };
+ check_hash_keys($self, 'key', 'first', 'second');
+
+ # Print out.
+ print "ok\n";
+
+ # Output like:
+ # #Error [..Hash.pm:?] Parameter 'key' doesn't contain expected keys.
 
 =head1 DEPENDENCIES
 
@@ -147,6 +245,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.02
 
 =cut

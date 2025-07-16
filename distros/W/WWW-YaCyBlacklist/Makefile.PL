@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.006000;
+use 5.008000;
 
 use ExtUtils::MakeMaker;
 
@@ -14,7 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "WWW-YaCyBlacklist",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.006000",
+  "MIN_PERL_VERSION" => "5.008000",
   "NAME" => "WWW::YaCyBlacklist",
   "PREREQ_PM" => {
     "IO::All" => "0.87",
@@ -30,7 +30,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => "1.001014"
   },
-  "VERSION" => "0.4",
+  "VERSION" => "0.5",
   "test" => {
     "TESTS" => "t/*.t"
   }

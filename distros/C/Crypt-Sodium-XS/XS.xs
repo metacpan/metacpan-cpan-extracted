@@ -27,17 +27,24 @@
 #define TCSAFLUSH 0
 #endif
 
-#include "sodium.h"
+#include <sodium.h>
 
 /* likely needs backing off and preprocessor around supported features. "for
  * now"... */
+/* 1.0.18: major: 10 minor: 3 */
 #if (SODIUM_LIBRARY_VERSION_MAJOR < 10U)
 #error "libsodium library is not compatible (version too old)"
 #endif
 #if (SODIUM_LIBRARY_VERSION_MAJOR == 10U) && (SODIUM_LIBRARY_VERSION_MINOR < 3U)
 #error "libsodium library is not compatible (version too old)"
 #endif
+#undef SODIUM_HAS_RISTRETTO255
+#if (SODIUM_LIBRARY_VERSION_MAJOR > 10U) || \
+    ((SODIUM_LIBRARY_VERSION_MAJOR == 10U) && (SODIUM_LIBRARY_VERSION_MINOR >= 3U))
+#define SODIUM_HAS_RISTRETTO255 1U
+#endif
 
+/* 1.0.19: major: 26 minor: 1 */
 #undef SODIUM_HAS_AEGIS
 #if (SODIUM_LIBRARY_VERSION_MAJOR > 26U) || \
     ((SODIUM_LIBRARY_VERSION_MAJOR == 26U) && (SODIUM_LIBRARY_VERSION_MINOR >= 1U))
@@ -353,6 +360,8 @@ static SV * protmem_clone_sv(pTHX_ SV *pm_sv, const char *sv_pkg) {
 
 static SV * nonce_generate(pTHX_ STRLEN out_len, SV *base) {
   SV *ret;
+  STRLEN base_len;
+  unsigned char *base_buf;
   unsigned char *nonce_buf;
 
   Newxz(nonce_buf, out_len + 1, unsigned char);
@@ -360,8 +369,6 @@ static SV * nonce_generate(pTHX_ STRLEN out_len, SV *base) {
     croak("Failed to allocate memory");
 
   if (SvOK(base)) {
-    unsigned char *base_buf;
-    STRLEN base_len;
     base_buf = (unsigned char *)SvPVbyte(base, base_len);
     if (base_len > out_len) {
       Safefree(nonce_buf);
@@ -462,6 +469,10 @@ INCLUDE: inc/protmem.xs
 
 INCLUDE: inc/memvault.xs
 
+INCLUDE: inc/core.xs
+
+INCLUDE: inc/curve25519.xs
+
 INCLUDE: inc/kx.xs
 
 INCLUDE: inc/kdf.xs
@@ -493,5 +504,3 @@ INCLUDE: inc/auth.xs
 INCLUDE: inc/onetimeauth.xs
 
 INCLUDE: inc/scalarmult.xs
-
-INCLUDE: inc/finitefield.xs

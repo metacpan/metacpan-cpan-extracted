@@ -12,10 +12,10 @@ if($^O eq 'darwin') {
 }
 
 WriteMakefile(
-	NAME		=> 'Encode::Wide',
-	AUTHOR		=> q{Nigel Horne <njh@nigelhorne.com>},
-	VERSION_FROM	=> 'lib/Encode/Wide.pm',
-	ABSTRACT_FROM	=> 'lib/Encode/Wide.pm',
+	NAME	=> 'Encode::Wide',
+	AUTHOR	=> q{Nigel Horne <njh@nigelhorne.com>},
+	VERSION_FROM => 'lib/Encode/Wide.pm',
+	ABSTRACT_FROM => 'lib/Encode/Wide.pm',
 	((defined($ExtUtils::MakeMaker::VERSION) && ($ExtUtils::MakeMaker::VERSION >= 6.3002))
 		? ('LICENSE'=> 'GPL')
 		: ()),
@@ -27,9 +27,11 @@ WriteMakefile(
 		'Params::Get' => 0,
 		'Term::ANSIColor' => 0,
 	},  TEST_REQUIRES => {
-		'Test::Most'   => 0,
+		'Test::DescribeMe' => 0,
+		'Test::Most' => 0,
+		'Test::Needs' => 0,
 	}, dist => $dist,
-	clean		=> { FILES => 'Encode-Wide-*' },
+	clean => { FILES => 'Encode-Wide-*' },
 	# META_ADD => {
 		# provides => {}
 	# },

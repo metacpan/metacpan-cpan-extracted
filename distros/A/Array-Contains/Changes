@@ -1,5 +1,8 @@
 Revision history for Perl extension Array::Contains.
 
+3.0  Tue Jul 15 11:30:00 2025
+    - On Perl 5.42 and up, use the new "any" keyword instead of a for loop for better performance, with a soft fallback for older perls.
+
 2.9  Fri Apr 18 09:00:00 2025
     - Remove "use diagnostics" as this has apparently problems on some Cygwin installations
 

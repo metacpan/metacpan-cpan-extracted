@@ -24,7 +24,7 @@ FUNCTIONS
 
  run_tests
 
-       run_tests @suitenames
+       run_tests @suitenames;
 
     Runs a collection of tests against Future::IO. It is expected that the
     caller has already loaded the specific implementation module to be
@@ -43,17 +43,37 @@ TEST SUITES
 
     Tests the Future::IO->connect method.
 
+ recv, recvfrom
+
+    Since version 0.15.
+
+    Tests the Future::IO->recv and Future::IO->recvfrom methods.
+
+ send
+
+    Since version 0.15.
+
+    Tests the Future::IO->send method.
+
  sleep
 
     Tests the Future::IO->sleep method.
 
- sysread
+ read, sysread
 
-    Tests the Future::IO->sysread method.
+    Tests the Future::IO->sysread or Future::IO->sysread method.
 
- syswrite
+    These two test suites are identical other than the name of the method
+    they invoke. The two exist because of the method rename that happened
+    at Future::IO version 0.17.
 
-    Tests the Future::IO->syswrite method.
+ write, syswrite
+
+    Tests the Future::IO->write or Future::IO->syswrite method.
+
+    These two test suites are identical other than the name of the method
+    they invoke. The two exist because of the method rename that happened
+    at Future::IO version 0.17.
 
  waitpid
 

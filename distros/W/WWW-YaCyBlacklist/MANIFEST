@@ -30,6 +30,7 @@ t/release-kwalitee.t
 t/release-meta-json.t
 t/release-unused-vars.t
 xt/02-read.t
+xt/file.txt
 yacy/default.black
 yacy/ib-mirrors.black
 yacy/matches.txt

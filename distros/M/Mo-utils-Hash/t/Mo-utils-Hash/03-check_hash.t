@@ -17,7 +17,7 @@ is($ret, undef, 'Right reference to hash is present ({}).');
 # Test.
 $self = {};
 $ret = check_hash($self, 'key');
-is($ret, undef, 'Right time is present (key is not exists).');
+is($ret, undef, 'Right reference to hash is present (key is not exists).');
 
 # Test.
 $self = {

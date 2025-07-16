@@ -2,13 +2,11 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp;
-use FindBin;
+use FindBin '$Bin';
 
-# assumes the location of bin directory. booooooooo.
-SKIP: {
-  skip "perl version too old" if $] < 5.020000;
-  package Crypt::Sodium::XS::Test::Pminisign;
-  require "$FindBin::Bin/../bin/pminisign" or die "require pminisign failed: $@";
+plan skip_all => "perl version too old" if $] < 5.020000;
+{
+  ok(require "$Bin/../bin/pminisign", "require pminisign");
 }
 
 #my $tmpfile = File::Temp->new;
@@ -23,7 +21,5 @@ SKIP: {
 # with -s (path to secret key) arg
 
 # probably validate generation by 
-
-ok(1);
 
 done_testing();

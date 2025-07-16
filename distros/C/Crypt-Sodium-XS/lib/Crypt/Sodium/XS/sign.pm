@@ -264,7 +264,7 @@ it with the consistent sign_ed25519_init name (no "ph").
 
 =over 4
 
-=item * ed25519
+=item * ed25519 (default)
 
 =back
 

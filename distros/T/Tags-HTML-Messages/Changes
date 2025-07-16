@@ -1,3 +1,10 @@
+0.10 2025-07-15T16:13:26+02:00
+ [API change]
+ - Add 'lang' and 'text' parameters for translatable texts.
+
+ [Common]
+ - Update copyright years.
+
 0.09 2023-06-25T19:36:50+02:00
  - Sort message types in CSS, we need this reproducible for tests.
 

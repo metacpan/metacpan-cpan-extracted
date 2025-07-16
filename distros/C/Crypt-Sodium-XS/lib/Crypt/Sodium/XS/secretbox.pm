@@ -167,7 +167,7 @@ secretbox_xchachapoly1305_verify).
 
 =item * xchacha20poly1305
 
-=item * xsalsa20poly1305
+=item * xsalsa20poly1305 (default)
 
 =back
 

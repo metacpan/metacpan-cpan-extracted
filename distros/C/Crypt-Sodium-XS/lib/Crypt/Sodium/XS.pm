@@ -1,7 +1,7 @@
 package Crypt::Sodium::XS;
 BEGIN {
   # BEGIN block and use line for MemVault are for its overloads to work
-  our $VERSION = '0.000027';
+  our $VERSION = '0.000028';
   require XSLoader;
   XSLoader::load(__PACKAGE__, $VERSION);
 }
@@ -56,6 +56,7 @@ sub sodium_op {
 sub aead { shift; sodium_op(aead => @_) }
 sub auth { shift; sodium_op(auth => @_) }
 sub box { shift; sodium_op(box => @_) }
+sub curve25519 { shift; sodium_op(curve25519 => @_) }
 sub generichash { shift; sodium_op(generichash => @_) }
 sub hash { shift; sodium_op(hash => @_) }
 sub hkdf { shift; sodium_op(hkdf => @_) }
@@ -275,6 +276,12 @@ Public key authenticated or anonymous encryption
 
 See L<Crypt::Sodium::XS::box> or L<Crypt::Sodium::XS::OO::box>.
 
+=item * curve25519
+
+Low-level functions over Curve25519. Only for creating custom constructions.
+
+See L<Crypt::Sodium::XS::curve25519> or L<Crypt::Sodium::XS::OO::curve25519>.
+
 =item * generichash
 
 Generic cryptographic hashing
@@ -389,9 +396,6 @@ This distribution is developed on Linux. Portability has been a low priority,
 and there are likely to be bugs for non-POSIXish systems. No testing on windows
 has been done, and it likely doesn't work. Feedback, suggestions, and patches
 are appreciated!
-
-Support for low-level computations over edwards25519 curve is not yet complete,
-though point-scalar multiplication is (L<Crypt::Sodium::XS::scalarmult>).
 
 =head1 SEE ALSO
 

@@ -1,2 +1,7 @@
+0.02 2025-07-15T11:54:52+02:00
+ - Add check_hash_keys() check.
+ - Fix output of example in doc.
+ - Fix test comment for check_hash().
+
 0.01 2025-06-20T14:54:42+02:00
  - First version.

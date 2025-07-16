@@ -20,6 +20,8 @@ recursive_author_tests('xt');
 requires 'Class::Utils' => 0.02;
 requires 'Error::Pure' => 0.07;
 requires 'Scalar::Util' => 0;
+requires 'Mo::utils::Hash' => 0.02;
+requires 'Mo::utils::Language' => 0.05;
 requires 'Tags::HTML' => 0;
 requires 'perl' => '5.8.0';
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Tags-HTML-Messages/issues';
@@ -35,8 +37,9 @@ test_requires 'Tags::Output::Structure' => 0;
 test_requires 'Test::MockObject' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
+test_requires 'Unicode::UTF8' => 0;
 tests_recursive;
-version '0.09';
+version '0.10';
 
 # Run.
 WriteAll();

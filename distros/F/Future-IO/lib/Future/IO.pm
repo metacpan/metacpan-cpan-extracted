@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2019-2023 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2019-2025 -- leonerd@leonerd.org.uk
 
-package Future::IO 0.16;
+package Future::IO 0.17;
 
 use v5.14;
 use warnings;
@@ -33,7 +33,7 @@ C<Future::IO> - Future-returning IO methods
    my $delay = Future::IO->sleep( 5 );
    # $delay will become done in 5 seconds time
 
-   my $input = Future::IO->sysread( \*STDIN, 4096 );
+   my $input = Future::IO->read( \*STDIN, 4096 );
    # $input will yield some input from the STDIN IO handle
 
 =head1 DESCRIPTION
@@ -51,8 +51,8 @@ these operations.
 
 If the C<override_impl> method is not invoked, a default implementation of
 these operations is provided. This implementation allows a single queue of
-C<sysread> or C<syswrite> calls on a single filehandle only, combined with
-C<sleep> calls. It does not support C<waitpid>.
+C<read> or C<write> calls on a single filehandle only, combined with C<sleep>
+calls. It does not support C<waitpid>.
 
 It is provided for the simple cases where modules only need one filehandle
 (most likely a single network socket or hardware device handle), allowing such
@@ -167,6 +167,189 @@ sub connect
    return ( $IMPL //= "Future::IO::_DefaultImpl" )->connect( $fh, $name );
 }
 
+=head2 read
+
+   $bytes = await Future::IO->read( $fh, $length );
+
+I<Since version 0.17.> Before this version this method used to be named
+C<sysread>, and still available via that alias.
+
+Returns a L<Future> that will become done when at least one byte can be read
+from the given filehandle. It may return up to C<$length> bytes. On EOF, the
+returned future will yield an empty list (or C<undef> in scalar context). On
+any error (other than C<EAGAIN> / C<EWOULDBLOCK> which are ignored), the
+future fails with a suitable error message.
+
+Note specifically this may perform only a single C<sysread()> call, and thus
+is not guaranteed to actually return the full length.
+
+=cut
+
+sub read
+{
+   shift;
+   my ( $fh, $length ) = @_;
+
+   return ( $IMPL //= "Future::IO::_DefaultImpl" )->sysread( $fh, $length );
+}
+
+*sysread = \&read;
+
+=head2 read_exactly
+
+   $bytes = await Future::IO->read_exactly( $fh, $length );
+
+I<Since version 0.17.> Before this version this method used to be named
+C<sysread_exactly>, and still available via that alias.
+
+Returns a L<Future> that will become done when exactly the given number of
+bytes have been read from the given filehandle. It returns exactly C<$length>
+bytes. On EOF, the returned future will yield an empty list (or C<undef> in
+scalar context), even if fewer bytes have already been obtained. These bytes
+will be lost. On any error (other than C<EAGAIN> / C<EWOULDBLOCK> which are
+ignored), the future fails with a suitable error message.
+
+This may make more than one C<sysread()> call.
+
+=cut
+
+sub read_exactly
+{
+   shift;
+   my ( $fh, $length ) = @_;
+
+   $IMPL //= "Future::IO::_DefaultImpl";
+
+   if( my $code = $IMPL->can( "sysread_exactly" ) ) {
+      return $IMPL->$code( $fh, $length );
+   }
+
+   return _read_into_buffer( $IMPL, $fh, $length, \(my $buffer = '') );
+}
+
+*sysread_exactly = \&read_exactly;
+
+sub _read_into_buffer
+{
+   my ( $IMPL, $fh, $length, $bufref ) = @_;
+
+   $IMPL->sysread( $fh, $length - length $$bufref )->then( sub {
+      my ( $more ) = @_;
+      return Future->done() if !defined $more; # EOF
+
+      $$bufref .= $more;
+
+      return Future->done( $$bufref ) if length $$bufref >= $length;
+      return _read_into_buffer( $IMPL, $fh, $length, $bufref );
+   });
+}
+
+=head2 read_until_eof
+
+   $f = Future::IO->read_until_eof( $fh );
+
+I<Since version 0.17.> Before this version this method used to be named
+C<sysread_until_eof>, and still available via that alias.
+
+Returns a L<Future> that will become done when the given filehandle reaches
+the EOF condition. The returned future will yield all of the bytes read up
+until that point.
+
+=cut
+
+sub read_until_eof
+{
+   shift;
+   my ( $fh ) = @_;
+
+   $IMPL //= "Future::IO::_DefaultImpl";
+
+   return _read_until_eof( $IMPL, $fh, \(my $buffer = '') );
+}
+
+*sysread_until_eof = \&read_until_eof;
+
+sub _read_until_eof
+{
+   my ( $IMPL, $fh, $bufref ) = @_;
+
+   $IMPL->sysread( $fh, $MAX_READLEN )->then( sub {
+      my ( $more ) = @_;
+      return Future->done( $$bufref ) if !defined $more;
+
+      $$bufref .= $more;
+      return _read_until_eof( $IMPL, $fh, $bufref );
+   });
+}
+
+=head2 recv
+
+=head2 recvfrom
+
+   $bytes = await Future::IO->recv( $fh, $length );
+   $bytes = await Future::IO->recv( $fh, $length, $flags );
+
+   ( $bytes, $from ) = await Future::IO->recvfrom( $fh, $length );
+   ( $bytes, $from ) = await Future::IO->recvfrom( $fh, $length, $flags );
+
+I<Since version 0.17.>
+
+Returns a L<Future> that will become done when at least one byte is received
+from the given filehandle (presumably a socket), by using a C<recv(2)> or
+C<recvfrom(2)> system call. On any error (other than C<EAGAIN> /
+C<EWOULDBLOCK> which are ignored) the future fails with a suitable error
+message.
+
+Optionally a flags bitmask in C<$flags> can be passed. If no flags are
+required, the value may be zero. The C<recvfrom> method additionally returns
+the sender's address as a second result value; this is primarily used by
+unconnected datagram sockets.
+
+=cut
+
+sub recv
+{
+   shift;
+   my ( $fh, $length, $flags ) = @_;
+
+   return ( $IMPL //= "Future::IO::_DefaultImpl" )->recv( $fh, $length, $flags );
+}
+
+sub recvfrom
+{
+   shift;
+   my ( $fh, $length, $flags ) = @_;
+
+   return ( $IMPL //= "Future::IO::_DefaultImpl" )->recvfrom( $fh, $length, $flags );
+}
+
+=head2 send
+
+   $sent_lem = await Future::IO->send( $fh, $bytes );
+   $sent_lem = await Future::IO->send( $fh, $bytes, $flags );
+   $sent_lem = await Future::IO->send( $fh, $bytes, $flags, $to );
+
+I<Since version 0.17.>
+
+Returns a L<Future> that will become done when at least one byte has been
+sent to the given filehandle (presumably a socket), by using a C<send(2)>
+system call. On any error (other than C<EAGAIN> / C<EWOULDBLOCK> which are
+ignored) the future fails with a suitable error message.
+
+Optionally a flags bitmask in C<$flags> or a destination address in C<$to> can
+also be passed. If no flags are required, the value may be zero. If C<$to> is
+specified then a C<sendto(2)> system call is used instead.
+
+=cut
+
+sub send
+{
+   shift;
+   my ( $fh, $bytes, $flags, $to ) = @_;
+
+   return ( $IMPL //= "Future::IO::_DefaultImpl" )->send( $fh, $bytes, $flags, $to );
+}
+
 =head2 sleep
 
    await Future::IO->sleep( $secs );
@@ -182,176 +365,6 @@ sub sleep
    my ( $secs ) = @_;
 
    return ( $IMPL //= "Future::IO::_DefaultImpl" )->sleep( $secs );
-}
-
-=head2 sysread
-
-   $bytes = await Future::IO->sysread( $fh, $length );
-
-Returns a L<Future> that will become done when at least one byte can be read
-from the given filehandle. It may return up to C<$length> bytes. On EOF, the
-returned future will yield an empty list (or C<undef> in scalar context). On
-any error (other than C<EAGAIN> / C<EWOULDBLOCK> which are ignored), the
-future fails with a suitable error message.
-
-Note specifically this may perform only a single C<sysread()> call, and thus
-is not guaranteed to actually return the full length.
-
-=cut
-
-sub sysread
-{
-   shift;
-   my ( $fh, $length ) = @_;
-
-   return ( $IMPL //= "Future::IO::_DefaultImpl" )->sysread( $fh, $length );
-}
-
-=head2 sysread_exactly
-
-   $bytes = await Future::IO->sysread_exactly( $fh, $length );
-
-I<Since version 0.03.>
-
-Returns a L<Future> that will become done when exactly the given number of
-bytes have been read from the given filehandle. It returns exactly C<$length>
-bytes. On EOF, the returned future will yield an empty list (or C<undef> in
-scalar context), even if fewer bytes have already been obtained. These bytes
-will be lost. On any error (other than C<EAGAIN> / C<EWOULDBLOCK> which are
-ignored), the future fails with a suitable error message.
-
-This may make more than one C<sysread()> call.
-
-=cut
-
-sub sysread_exactly
-{
-   shift;
-   my ( $fh, $length ) = @_;
-
-   $IMPL //= "Future::IO::_DefaultImpl";
-
-   if( my $code = $IMPL->can( "sysread_exactly" ) ) {
-      return $IMPL->$code( $fh, $length );
-   }
-
-   return _sysread_into_buffer( $IMPL, $fh, $length, \(my $buffer = '') );
-}
-
-sub _sysread_into_buffer
-{
-   my ( $IMPL, $fh, $length, $bufref ) = @_;
-
-   $IMPL->sysread( $fh, $length - length $$bufref )->then( sub {
-      my ( $more ) = @_;
-      return Future->done() if !defined $more; # EOF
-
-      $$bufref .= $more;
-
-      return Future->done( $$bufref ) if length $$bufref >= $length;
-      return _sysread_into_buffer( $IMPL, $fh, $length, $bufref );
-   });
-}
-
-=head2 sysread_until_eof
-
-   $f = Future::IO->sysread_until_eof( $fh );
-
-I<Since version 0.12.>
-
-Returns a L<Future> that will become done when the given filehandle reaches
-the EOF condition. The returned future will yield all of the bytes read up
-until that point.
-
-=cut
-
-sub sysread_until_eof
-{
-   shift;
-   my ( $fh ) = @_;
-
-   $IMPL //= "Future::IO::_DefaultImpl";
-
-   return _sysread_until_eof( $IMPL, $fh, \(my $buffer = '') );
-}
-
-sub _sysread_until_eof
-{
-   my ( $IMPL, $fh, $bufref ) = @_;
-
-   $IMPL->sysread( $fh, $MAX_READLEN )->then( sub {
-      my ( $more ) = @_;
-      return Future->done( $$bufref ) if !defined $more;
-
-      $$bufref .= $more;
-      return _sysread_until_eof( $IMPL, $fh, $bufref );
-   });
-}
-
-=head2 syswrite
-
-   $written_len = await Future::IO->syswrite( $fh, $bytes );
-
-I<Since version 0.04.>
-
-Returns a L<Future> that will become done when at least one byte has been
-written to the given filehandle. It may write up to all of the bytes. On any
-error (other than C<EAGAIN> / C<EWOULDBLOCK> which are ignored) the future
-fails with a suitable error message.
-
-Note specifically this may perform only a single C<syswrite()> call, and thus
-is not guaranteed to actually return the full length.
-
-=cut
-
-sub syswrite
-{
-   shift;
-   my ( $fh, $bytes ) = @_;
-
-   return ( $IMPL //= "Future::IO::_DefaultImpl" )->syswrite( $fh, $bytes );
-}
-
-=head2 syswrite_exactly
-
-   $written_len = await Future::IO->syswrite_exactly( $fh, $bytes );
-
-I<Since version 0.04.>
-
-Returns a L<Future> that will become done when exactly the given bytes have
-been written to the given filehandle. On any error (other than C<EAGAIN> /
-C<EWOULDBLOCK> which are ignored) the future fails with a suitable error
-message.
-
-This may make more than one C<syswrite()> call.
-
-=cut
-
-sub syswrite_exactly
-{
-   shift;
-   my ( $fh, $bytes ) = @_;
-
-   $IMPL //= "Future::IO::_DefaultImpl";
-
-   if( my $code = $IMPL->can( "syswrite_exactly" ) ) {
-      return $IMPL->$code( $fh, $bytes );
-   }
-
-   return _syswrite_from_buffer( $IMPL, $fh, \$bytes, length $bytes );
-}
-
-sub _syswrite_from_buffer
-{
-   my ( $IMPL, $fh, $bufref, $len ) = @_;
-
-   $IMPL->syswrite( $fh, substr $$bufref, 0, $MAX_WRITELEN )->then( sub {
-      my ( $written_len ) = @_;
-      substr $$bufref, 0, $written_len, "";
-
-      return Future->done( $len ) if !length $$bufref;
-      return _syswrite_from_buffer( $IMPL, $fh, $bufref, $len );
-   });
 }
 
 =head2 waitpid
@@ -380,6 +393,78 @@ sub waitpid
    my ( $pid ) = @_;
 
    return ( $IMPL //= "Future::IO::_DefaultImpl" )->waitpid( $pid );
+}
+
+=head2 write
+
+   $written_len = await Future::IO->write( $fh, $bytes );
+
+I<Since version 0.17.> Before this version this method used to be named
+C<syswrite>, and still available via that alias.
+
+Returns a L<Future> that will become done when at least one byte has been
+written to the given filehandle. It may write up to all of the bytes. On any
+error (other than C<EAGAIN> / C<EWOULDBLOCK> which are ignored) the future
+fails with a suitable error message.
+
+Note specifically this may perform only a single C<syswrite()> call, and thus
+is not guaranteed to actually return the full length.
+
+=cut
+
+sub write
+{
+   shift;
+   my ( $fh, $bytes ) = @_;
+
+   return ( $IMPL //= "Future::IO::_DefaultImpl" )->syswrite( $fh, $bytes );
+}
+
+*syswrite = \&write;
+
+=head2 write_exactly
+
+   $written_len = await Future::IO->write_exactly( $fh, $bytes );
+
+I<Since version 0.17.> Before this version this method used to be named
+C<syswrite_exactly>, and still available via that alias.
+
+Returns a L<Future> that will become done when exactly the given bytes have
+been written to the given filehandle. On any error (other than C<EAGAIN> /
+C<EWOULDBLOCK> which are ignored) the future fails with a suitable error
+message.
+
+This may make more than one C<syswrite()> call.
+
+=cut
+
+sub write_exactly
+{
+   shift;
+   my ( $fh, $bytes ) = @_;
+
+   $IMPL //= "Future::IO::_DefaultImpl";
+
+   if( my $code = $IMPL->can( "syswrite_exactly" ) ) {
+      return $IMPL->$code( $fh, $bytes );
+   }
+
+   return _write_from_buffer( $IMPL, $fh, \$bytes, length $bytes );
+}
+
+*syswrite_exactly = \&write_exactly;
+
+sub _write_from_buffer
+{
+   my ( $IMPL, $fh, $bufref, $len ) = @_;
+
+   $IMPL->syswrite( $fh, substr $$bufref, 0, $MAX_WRITELEN )->then( sub {
+      my ( $written_len ) = @_;
+      substr $$bufref, 0, $written_len, "";
+
+      return Future->done( $len ) if !length $$bufref;
+      return _write_from_buffer( $IMPL, $fh, $bufref, $len );
+   });
 }
 
 =head2 override_impl
@@ -528,7 +613,7 @@ sub ready_for_write
    my $class = shift;
    my ( $fh ) = @_;
 
-   croak "This implementation can only cope with a single pending filehandle in ->syswrite"
+   croak "This implementation can only cope with a single pending filehandle in ->write"
       if @writers and $writers[-1]->fh != $fh;
 
    my $f = Future::IO::_DefaultImpl::F->new;

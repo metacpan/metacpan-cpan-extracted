@@ -6,9 +6,11 @@ use warnings;
 
 use Class::Utils qw(set_params split_params);
 use Error::Pure qw(err);
+use Mo::utils::Hash 0.02 qw(check_hash check_hash_keys);
+use Mo::utils::Language 0.05 qw(check_language_639_2);
 use Scalar::Util qw(blessed);
 
-our $VERSION = 0.09;
+our $VERSION = 0.10;
 
 # Constructor.
 sub new {
@@ -16,7 +18,7 @@ sub new {
 
 	# Create object.
 	my ($object_params_ar, $other_params_ar) = split_params(
-		['css_messages', 'flag_no_messages'], @params);
+		['css_messages', 'flag_no_messages', 'lang', 'text'], @params);
 	my $self = $class->SUPER::new(@{$other_params_ar});
 
 	# CSS class.
@@ -25,8 +27,26 @@ sub new {
 	# Flag for no messages.
 	$self->{'flag_no_messages'} = 1;
 
+	# Language.
+	$self->{'lang'} = 'eng';
+
+	# Texts.
+	$self->{'text'} = {
+		'eng' => {
+			'no_messages' => 'No messages',
+		},
+	};
+
 	# Process params.
 	set_params($self, @{$object_params_ar});
+
+	# Check language.
+	check_language_639_2($self, 'lang');
+
+	# Check texts.
+	check_hash($self, 'text');
+	check_hash_keys($self, 'text', $self->{'lang'});
+	check_hash_keys($self, 'text', $self->{'lang'}, 'no_messages');
 
 	# Object.
 	return $self;
@@ -89,7 +109,7 @@ sub _process {
 		}
 	} else {
 		$self->{'tags'}->put(
-			['d', 'No messages'],
+			['d', $self->{'text'}->{$self->{'lang'}}->{'no_messages'}],
 		);
 	}
 	$self->{'tags'}->put(
@@ -345,12 +365,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© Michal Josef Špaček 2020-2023
+© Michal Josef Špaček 2020-2025
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.09
+0.10
 
 =cut

@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2023 -- leonerd@leonerd.org.uk
 
-package Future::IO::System 0.16;
+package Future::IO::System 0.17;
 
 use v5.14;
 use warnings;
@@ -147,12 +147,12 @@ sub run
 
       if( $want_out ) {
          close $outfh[1];
-         push @f, Future::IO->sysread_until_eof( $outfh[0] );
+         push @f, Future::IO->read_until_eof( $outfh[0] );
       }
 
       if( $want_err ) {
          close $errfh[1];
-         push @f, Future::IO->sysread_until_eof( $errfh[0] );
+         push @f, Future::IO->read_until_eof( $errfh[0] );
       }
 
       return Future->needs_all( @f );

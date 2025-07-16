@@ -3,7 +3,7 @@ use warnings;
 use Test::More;
 use Mail::DKIM::Iterator;
 
-plan tests => 22;
+plan tests => 24;
 
 # basic tests with different canonicalizations and algorithms
 for my $c (qw(
@@ -143,6 +143,18 @@ for my $c (qw(
 	"DKIM signature corrupt pubkey");
 }
 
+like(
+    sign([empty_mail()], c => 'relaxed/relaxed', a => 'rsa-sha256'),
+    qr{\Qbh=47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=;},
+    "bh empty body relaxed/relaxed"
+);
+
+like(
+    sign([empty_mail()], c => 'simple/simple', a => 'rsa-sha256'),
+    qr{\Qbh=frcCV1k9oG9oKj3dpUqdJg1PxRT2RSN/XKdLCPjaYaY=;},
+    "bh empty body simple/simple"
+);
+
 
 ############################################################################
 # functions
@@ -266,12 +278,7 @@ References:
 
 1234
 MAIL
-=cut
-Hi Foo,
-Going to the Bar   Barfoot,
 
-Greetings,
-Bar
-
-
-
+sub empty_mail {
+    return mail() =~m{\A(.*(?:\r?\n){2})}s && $1;
+}

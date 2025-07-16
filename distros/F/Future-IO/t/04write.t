@@ -8,6 +8,7 @@ use Test::Future::IO::Impl;
 
 use Future::IO;
 
-run_tests 'syswrite';
+run_tests 'write';
+run_tests 'syswrite'; # remember to test the legacy name wrapper too
 
 done_testing;
