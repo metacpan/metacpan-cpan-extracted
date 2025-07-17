@@ -14,11 +14,11 @@ Query::Tags - Raku-inspired query language for attributes
 
 =head2 VERSION
 
-This document describes v0.0.2 of Query::Tags.
+This document describes v0.0.3 of Query::Tags.
 
 =cut
 
-package Query::Tags v0.0.2;
+package Query::Tags v0.0.3;
 
 =head1 DESCRIPTION
 
@@ -207,6 +207,9 @@ or a C<junction>. A pair starts with a colon C<:> and the value is written
 directly after the key. E.g., C<:key'value'> (for a string value),
 C<:key/value/> (for a regex value) or C<< :key&<value1 value2> >> (for a
 junction value). The value is optional.
+
+If instead of a value, the question mark character C<?> appears, the
+I<key> field must exist and its value must be truthy.
 
 =item Quoted string
 

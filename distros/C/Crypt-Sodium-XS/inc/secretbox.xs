@@ -77,8 +77,9 @@ SV * secretbox_decrypt( \
       func = crypto_secretbox_open_easy;
   }
 
+  SvGETMAGIC(flags);
   if (SvOK(flags))
-    msg_flags = SvUV(flags);
+    msg_flags = SvUV_nomg(flags);
 
   ct_buf = (unsigned char *)SvPVbyte(ciphertext, ct_len);
   if (ct_len < mac_len)
@@ -177,8 +178,9 @@ SV * secretbox_decrypt_detached( \
       func = crypto_secretbox_open_detached;
   }
 
+  SvGETMAGIC(flags);
   if (SvOK(flags))
-    msg_flags = SvUV(flags);
+    msg_flags = SvUV_nomg(flags);
 
   ct_buf = (unsigned char *)SvPVbyte(ciphertext, ct_len);
 

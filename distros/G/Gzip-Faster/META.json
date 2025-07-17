@@ -1,10 +1,10 @@
 {
    "abstract" : "simple and fast gzip and gunzip",
    "author" : [
-      "Ben Bullock <bkb@cpan.org>"
+      "Ben Bullock <benkasminbullock@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -47,10 +47,10 @@
          "web" : "https://github.com/benkasminbullock/gzip-faster"
       }
    },
-   "version" : "0.21",
+   "version" : "0.22",
    "x_contributors" : [
       "Aristotle Pagaltzis <aristotle@cpan.org>",
       "zgrim <zgrim@cpan.org>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

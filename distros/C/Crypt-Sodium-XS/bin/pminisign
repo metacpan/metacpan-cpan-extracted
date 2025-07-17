@@ -250,7 +250,7 @@ sub unpack_sk_data($sk_blob) {
   my $passwd = Crypt::Sodium::XS::MemVault->new_from_ttyno(fileno(*STDIN), "Passphrase: ");
   $passwd = $kdf_alg->{kdf_gen}->($passwd, $sk_data->{salt}, $sig_alg->{skbytes},
                                   @$sk_data{qw/opslimit memlimit/});
-  $sk_data->{sk}->xor($passwd);
+  $sk_data->{sk}->bitwise_xor_equals($passwd);
   $sk_data->{chk} = $key_chunk->extract(8 + $sk_len, undef, PROTMEM_ALL_DISABLED);
   die "Invalid secret key (wrong passphrase?)" if $sk_data->{chk} ne chk_sk($sk_data);
   return $sk_data;
@@ -385,7 +385,7 @@ EODIE
   my $opslimit = $kdf_alg->{opslimit_default};
   my $memlimit = $kdf_alg->{memlimit_default};
   $pw_hash = $kdf_alg->{kdf_gen}->($pw, $pw_salt, $sig_alg->{skbytes}, $opslimit, $memlimit);
-  $sk_data->{sk}->xor($pw_hash);
+  $sk_data->{sk}->bitwise_xor_equals($pw_hash);
   # supposed to /= 2 opslimit and memlimit down to minimum til it works.
   $sk_data->{opslimit} = $opslimit;
   $sk_data->{memlimit} = $memlimit;

@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::FileChooser;
-$Playwright::FileChooser::VERSION = '1.531';
+$Playwright::FileChooser::VERSION = '1.532';
 use parent 'Playwright::Base';
 
 sub new {
@@ -106,7 +106,7 @@ Playwright::FileChooser - Automatically generated class for Playwright::FileChoo
 
 =head1 VERSION
 
-version 1.531
+version 1.532
 
 =head1 CONSTRUCTOR
 

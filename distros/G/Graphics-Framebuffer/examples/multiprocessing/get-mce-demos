@@ -1,5 +1,6 @@
 #!/bin/bash
 
+echo "Getting MCE Demos";
 git clone https://github.com/marioroy/mce-examples.git
 echo "Moving framebuffer demos into examples"
 mv -f mce-examples/framebuffer/*pl .

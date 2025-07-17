@@ -1,5 +1,9 @@
 Revision history for Perl extension Catalyst::Plugin::Session
 
+0.44 - 2025-07-16
+      - use properly random session IDs using a real entropy source (using
+        Crypt::SysRandom)
+
 0.43 - 2022-06-03
       - fix tests when Catalyst::Plugin::Authentication is unavailable
 

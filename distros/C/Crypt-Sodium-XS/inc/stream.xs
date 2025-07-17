@@ -204,6 +204,8 @@ SV * stream_nonce(SV * base = &PL_sv_undef)
   stream_xsalsa20_nonce = 6
 
   CODE:
+  /* NB: not getting magic for base as nonce_generate does it. may make these
+   * alg-specific checks fail if a base is magic */
   switch(ix) {
     case 1:
       RETVAL = nonce_generate(aTHX_ crypto_stream_chacha20_NONCEBYTES, base);

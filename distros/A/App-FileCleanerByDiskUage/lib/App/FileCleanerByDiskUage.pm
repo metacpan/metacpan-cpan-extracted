@@ -4,8 +4,8 @@ use 5.006;
 use strict;
 use warnings;
 use File::Find::Rule;
-use Filesys::Df;
-use Net::Server::Daemonize qw(create_pid_file unlink_pid_file check_pid_file);
+use Filesys::Df            qw( df );
+use Net::Server::Daemonize qw(check_pid_file create_pid_file unlink_pid_file);
 
 =head1 NAME
 
@@ -13,11 +13,11 @@ App::FileCleanerByDiskUage - Removes files based on disk space usage till it dro
 
 =head1 VERSION
 
-Version 0.4.0
+Version 0.4.1
 
 =cut
 
-our $VERSION = '0.4.0';
+our $VERSION = '0.4.1';
 
 =head1 SYNOPSIS
 
@@ -203,12 +203,16 @@ sub clean {
 			}
 			$int++;
 		} ## end while ( defined( $opts{path}[$int] ) )
-		$du_path = $opts{path}[0];
+		$du_path = $paths[0];
 	} else {
 		$opts{path} = $opts{path} . '/';
 		$opts{path} =~ s/\/+$/\//;
 		$du_path = $opts{path};
 		push( @paths, $opts{path} );
+	}
+
+	if ( !defined( $paths[0] ) ) {
+		die('All specified paths are missing or not a directory');
 	}
 
 	if ( !defined( $opts{du} ) ) {

@@ -20,7 +20,7 @@ my %META = (
       requires => {
         'Catalyst::Runtime' => '5.71001',
         'namespace::clean' => '0.10',
-        'Digest' => 0,
+        'Crypt::SysRandom' => '0.007',
         'File::Spec' => 0,
         'File::Temp' => 0,
         'List::Util' => 0,
@@ -31,6 +31,9 @@ my %META = (
         'HTML::Entities' => 0,
         'Test::More' => '0.88',
         'perl' => '5.008',
+      },
+      recommends => {
+        'Crypt::SysRandom::XS' => '0.009',
       },
     },
     develop => {

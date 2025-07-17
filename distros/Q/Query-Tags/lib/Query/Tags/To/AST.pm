@@ -99,7 +99,9 @@ an explanation of its behavior. If both C<$key> and C<default_key>
 are undefined, the match fails.
 
 If C<$value> is C<undef>, then only existence of the method
-or the hash key is required and its value is ignored.
+or the hash key is required and its value is ignored. If instead
+C<$value> is (not blessed and) equal to the string C<?>,
+then the value behind C<$key> is checked for truthiness.
 
 =cut
 
@@ -131,11 +133,17 @@ package Query::Tags::To::AST::Pair {
 
         if (blessed($arg) and $arg->can($key)) {
             return 1 if not defined $value;
-            return $value->test($arg->key);
+            my $v = $arg->$key;
+            return 0 if not defined $v;
+            return !!$v if not blessed($value) and $value eq '?';
+            return $value->test($v);
         }
         elsif (reftype($arg) eq 'HASH') {
             return exists $arg->{$key} if not defined $value;
-            return $value->test($arg->{$key});
+            my $v = $arg->{$key};
+            return 0 if not defined $v;
+            return !!$v if not blessed($value) and $value eq '?';
+            return $value->test($v);
         }
         return 0;
     }

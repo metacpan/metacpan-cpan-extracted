@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::Clock;
-$Playwright::Clock::VERSION = '1.531';
+$Playwright::Clock::VERSION = '1.532';
 use parent 'Playwright::Base';
 
 sub new {
@@ -20,6 +20,46 @@ sub new {
 
 sub spec {
     return $Playwright::spec->{'Clock'}{members};
+}
+
+sub runFor {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'runFor',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub setSystemTime {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'setSystemTime',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub pauseAt {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'pauseAt',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub resume {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'resume',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
 }
 
 sub fastForward {
@@ -42,51 +82,11 @@ sub install {
     );
 }
 
-sub pauseAt {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'pauseAt',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
 sub setFixedTime {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
         command => 'setFixedTime',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub resume {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'resume',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub runFor {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'runFor',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub setSystemTime {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'setSystemTime',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -136,7 +136,7 @@ Playwright::Clock - Automatically generated class for Playwright::Clock
 
 =head1 VERSION
 
-version 1.531
+version 1.532
 
 =head1 CONSTRUCTOR
 
@@ -146,6 +146,30 @@ You shouldn't have to call this directly.
 Instead it should be returned to you as the result of calls on Playwright objects, or objects it returns.
 
 =head1 METHODS
+
+=head2 runFor(@args)
+
+Execute the Clock::runFor playwright routine.
+
+See L<https://playwright.dev/docs/api/class-Clock#Clock-runFor> for more information.
+
+=head2 setSystemTime(@args)
+
+Execute the Clock::setSystemTime playwright routine.
+
+See L<https://playwright.dev/docs/api/class-Clock#Clock-setSystemTime> for more information.
+
+=head2 pauseAt(@args)
+
+Execute the Clock::pauseAt playwright routine.
+
+See L<https://playwright.dev/docs/api/class-Clock#Clock-pauseAt> for more information.
+
+=head2 resume(@args)
+
+Execute the Clock::resume playwright routine.
+
+See L<https://playwright.dev/docs/api/class-Clock#Clock-resume> for more information.
 
 =head2 fastForward(@args)
 
@@ -159,35 +183,11 @@ Execute the Clock::install playwright routine.
 
 See L<https://playwright.dev/docs/api/class-Clock#Clock-install> for more information.
 
-=head2 pauseAt(@args)
-
-Execute the Clock::pauseAt playwright routine.
-
-See L<https://playwright.dev/docs/api/class-Clock#Clock-pauseAt> for more information.
-
 =head2 setFixedTime(@args)
 
 Execute the Clock::setFixedTime playwright routine.
 
 See L<https://playwright.dev/docs/api/class-Clock#Clock-setFixedTime> for more information.
-
-=head2 resume(@args)
-
-Execute the Clock::resume playwright routine.
-
-See L<https://playwright.dev/docs/api/class-Clock#Clock-resume> for more information.
-
-=head2 runFor(@args)
-
-Execute the Clock::runFor playwright routine.
-
-See L<https://playwright.dev/docs/api/class-Clock#Clock-runFor> for more information.
-
-=head2 setSystemTime(@args)
-
-Execute the Clock::setSystemTime playwright routine.
-
-See L<https://playwright.dev/docs/api/class-Clock#Clock-setSystemTime> for more information.
 
 =head2 on(@args)
 

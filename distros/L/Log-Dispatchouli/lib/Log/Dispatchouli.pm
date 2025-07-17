@@ -1,6 +1,6 @@
 use v5.20;
 use warnings;
-package Log::Dispatchouli 3.009;
+package Log::Dispatchouli 3.010;
 # ABSTRACT: a simple wrapper around Log::Dispatch
 
 # Not dangerous.  Accepted without change.
@@ -333,7 +333,30 @@ sub setup_syslog_output {
 #pod
 #pod =cut
 
-sub _join { shift; join q{ }, @{ $_[0] } }
+sub _flog_messages ($self, $arg, $rest) {
+  my $flogger = $self->string_flogger;
+  my @flogged = map {; $flogger->flog($_) } @$rest;
+  my $message = @flogged > 1 ? join(q{ }, @flogged) : $flogged[0];
+
+  my @prefix  = _ARRAY0($arg->{prefix})
+              ? @{ $arg->{prefix} }
+              : $arg->{prefix};
+
+  for (reverse grep { defined } $self->get_prefix, @prefix) {
+    if (_CODELIKE( $_ )) {
+      $message = $_->($message);
+    } else {
+      $message =~ s/^/$_/gm;
+    }
+  }
+
+  return $message;
+}
+
+sub flog_messages ($self, @rest) {
+  my $arg = _HASH0($rest[0]) ? shift(@rest) : {};
+  return $self->_flog_messages($arg, \@rest);
+}
 
 sub log {
   my ($self, @rest) = @_;
@@ -343,21 +366,7 @@ sub log {
 
   if ($arg->{fatal} or ! $self->get_muted) {
     try {
-      my $flogger = $self->string_flogger;
-      my @flogged = map {; $flogger->flog($_) } @rest;
-      $message    = @flogged > 1 ? $self->_join(\@flogged) : $flogged[0];
-
-      my @prefix  = _ARRAY0($arg->{prefix})
-                  ? @{ $arg->{prefix} }
-                  : $arg->{prefix};
-
-      for (reverse grep { defined } $self->get_prefix, @prefix) {
-        if (_CODELIKE( $_ )) {
-          $message = $_->($message);
-        } else {
-          $message =~ s/^/$_/gm;
-        }
-      }
+      $message = $self->flog_messages($arg, @rest);
 
       $self->dispatcher->log(
         level   => $arg->{level} || 'info',
@@ -486,31 +495,29 @@ sub log_debug {
 #pod
 #pod =cut
 
-sub log_event {
-  my ($self, $type, $data) = @_;
-
-  return $self->_log_event($type, undef, $data);
-}
-
 sub _compute_proxy_ctx_kvstr_aref {
   return [];
 }
 
-sub _log_event {
-  my ($self, $type, $ctx, $data) = @_;
-
-  return if $self->get_muted;
-
+sub fmt_event ($self, $type, $data) {
   my $kv_aref = Log::Fmt->_pairs_to_kvstr_aref([
     event => $type,
     (_ARRAY0($data) ? @$data : $data->%{ sort keys %$data })
   ]);
 
-  splice @$kv_aref, 1, 0, @$ctx if $ctx;
+  return join q{ }, @$kv_aref;
+}
+
+sub log_event {
+  my ($self, $type, $data) = @_;
+
+  return if $self->get_muted;
+
+  my $message = $self->fmt_event($type, $data);
 
   $self->dispatcher->log(
     level   => 'info',
-    message => join q{ }, @$kv_aref,
+    message => $message,
   );
 
   return;
@@ -689,6 +696,24 @@ sub env_value {
   return;
 }
 
+#pod =method flog_messages
+#pod
+#pod   my $str = $logger->flog_messages($m1, $m2, ...);
+#pod
+#pod This returns the string that would have been logged if the given arguments had
+#pod been passed to C<< $logger->log(...) >>, without regard for log level,
+#pod debugging, or the like.
+#pod
+#pod Unlike using the logger's string flogger, this will include any relevant prefix
+#pod strings.
+#pod
+#pod =method fmt_event
+#pod
+#pod   my $str = $logger->fmt_event($event_type => $data_ref);
+#pod
+#pod This method is equivalent to C<flog_messages>, but for an event.  It returns
+#pod the string format of the event, including all relevant prefixes.
+#pod
 #pod =head1 METHODS FOR TESTING
 #pod
 #pod =head2 new_tester
@@ -899,7 +924,7 @@ Log::Dispatchouli - a simple wrapper around Log::Dispatch
 
 =head1 VERSION
 
-version 3.009
+version 3.010
 
 =head1 SYNOPSIS
 
@@ -1179,6 +1204,24 @@ This method returns the logger's configuration id, which defaults to its ident.
 This can be used to make two loggers equivalent in Log::Dispatchouli::Global so
 that trying to reinitialize with a new logger with the same C<config_id> as the
 current logger will not throw an exception, and will simply do no thing.
+
+=head2 flog_messages
+
+  my $str = $logger->flog_messages($m1, $m2, ...);
+
+This returns the string that would have been logged if the given arguments had
+been passed to C<< $logger->log(...) >>, without regard for log level,
+debugging, or the like.
+
+Unlike using the logger's string flogger, this will include any relevant prefix
+strings.
+
+=head2 fmt_event
+
+  my $str = $logger->fmt_event($event_type => $data_ref);
+
+This method is equivalent to C<flog_messages>, but for an event.  It returns
+the string format of the event, including all relevant prefixes.
 
 =head2 dispatcher
 

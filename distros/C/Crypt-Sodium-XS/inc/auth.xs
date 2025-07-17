@@ -261,6 +261,7 @@ void auth_hmacsha256_verify(SV * mac, SV * msg, SV * key = &PL_sv_undef)
       func = crypto_auth_hmacsha256_verify;
   }
 
+  SvGETMAGIC(key);
   if (SvOK(key)) {
     if (sv_derived_from(key, MEMVAULT_CLASS)) {
       key_pm = protmem_get(aTHX_ key, MEMVAULT_CLASS);
@@ -268,7 +269,7 @@ void auth_hmacsha256_verify(SV * mac, SV * msg, SV * key = &PL_sv_undef)
       key_len = key_pm->size;
     }
     else
-      key_buf = (unsigned char *)SvPVbyte(key, key_len);
+      key_buf = (unsigned char *)SvPVbyte_nomg(key, key_len);
   }
 
   if (sv_derived_from(msg, MEMVAULT_CLASS)) {
@@ -372,6 +373,7 @@ SV * auth_init(SV * key = &PL_sv_undef, SV * flags = &PL_sv_undef)
   unsigned int state_flags = g_protmem_flags_key_default;
 
   CODE:
+  SvGETMAGIC(key);
   if (SvOK(key)) {
     state_flags = g_protmem_flags_key_default;
     if (sv_derived_from(key, MEMVAULT_CLASS)) {
@@ -380,12 +382,13 @@ SV * auth_init(SV * key = &PL_sv_undef, SV * flags = &PL_sv_undef)
       key_len = key_pm->size;
     }
     else {
-      key_buf = (unsigned char *)SvPVbyte(key, key_len);
+      key_buf = (unsigned char *)SvPVbyte_nomg(key, key_len);
     }
   }
 
+  SvGETMAGIC(flags);
   if (SvOK(flags))
-    state_flags = SvUV(flags);
+    state_flags = SvUV_nomg(flags);
 
   if (key_pm && protmem_grant(aTHX_ key_pm, PROTMEM_FLAG_MPROTECT_RO) != 0)
     croak("auth_init: Failed to grant key protmem RO");

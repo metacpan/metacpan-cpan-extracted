@@ -1,12 +1,15 @@
 #!/usr/bin/env perl
 
 use strict;
+use utf8;
 use warnings;
 
-use Test::More tests => 1;
+use Test2::V0;
 
-BEGIN {
-	use_ok( 'FTN::Addr' );
-}
+use FTN::Addr ();
 
 diag( "Testing FTN::Addr $FTN::Addr::VERSION, Perl $], $^X" );
+
+pass();
+
+done_testing();

@@ -1,5 +1,8 @@
 Revision history for experimental
 
+0.036     2025-07-17 01:40:39+02:00 Europe/Brussels
+          - Add features "class", "keyword_any" and "keyword_all"
+
 0.035     2025-05-01 11:35:41+02:00 Europe/Berlin
           - regex_sets no longer experimental
           - switch/smartmatch were deprecated then undeprecated

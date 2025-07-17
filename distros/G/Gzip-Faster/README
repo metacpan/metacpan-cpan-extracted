@@ -6,7 +6,7 @@
               |_|                                       
 
 
-This is the README for Gzip::Faster version 0.21.
+This is the README for Gzip::Faster version 0.22.
 
 Gzip::Faster is a "module" for the Perl computer programming language, a
 library of computer code to install on a computer.  This document contains
@@ -56,12 +56,11 @@ using "copy_perl_flags".
 2. DOCUMENTATION
 
 You can read the documentation for the module online at the following
-websites:
+website:
 
-    * http://search.cpan.org/perldoc?Gzip::Faster
     * http://metacpan.org/release/Gzip-Faster
 
-(These links go to the latest version of the module.)
+(This link goes to the latest version of the module.)
 
 After installing the module, you can read the documentation on your
 computer using
@@ -82,11 +81,11 @@ If you have the App::cpanminus installer, you may prefer
 
     cpanm Gzip::Faster
 
-To install the module from the source file, Gzip-Faster-0.21.tar.gz, follow
+To install the module from the source file, Gzip-Faster-0.22.tar.gz, follow
 this sequence of commands:
 
-    tar xfz Gzip-Faster-0.21.tar.gz
-    cd Gzip-Faster-0.21
+    tar xfz Gzip-Faster-0.22.tar.gz
+    cd Gzip-Faster-0.22
     perl Makefile.PL
     make
     make install
@@ -99,8 +98,8 @@ If you want to test the module before installing it, use "make test" after
 4. HELP
 
 To get help with the module, you can email the author, Ben Bullock, at
-<bkb@cpan.org>. If you think there is a problem in the module, you can
-report a bug at 
+<benkasminbullock@gmail.com>. If you think there is a problem in the
+module, you can report a bug at 
 
 <https://github.com/benkasminbullock/gzip-faster/issues>,
 
@@ -111,6 +110,6 @@ repository on github at
 
 -----------------------------------------------------------------------------
 
-This README was written on Fri Dec 29 10:55:08 2017.
+This README was written on Thu Jul 17 07:57:54 2025.
 
 -----------------------------------------------------------------------------

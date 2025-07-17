@@ -15,7 +15,7 @@ use Getopt::Long;
 # use Data::Dumper;$Data::Dumper::Sortkeys=1; $Data::Dumper::Purity=1; $Data::Dumper::Deepcopy=1;
 
 BEGIN {
-    our $VERSION = '5.00';
+    our $VERSION = '6.01';
 }
 
 our $F;
@@ -67,7 +67,7 @@ if (defined($new_x)) {
 } else {
     $F = Graphics::Framebuffer->new('FB_DEVICE' => "/dev/fb$dev", 'SHOW_ERRORS' => 0, 'ACCELERATED' => !$noaccel, 'SPLASH' => 0, 'RESET' => TRUE, 'IGNORE_X_WINDOWS' => $ignore_x);
 }
-$SIG{'QUIT'} = $SIG{'INT'} = $SIG{'KILL'} = $SIG{'HUP'} = $SIG{'TERM'} = sub { $F->text_mode(); exec('reset'); };
+$SIG{'QUIT'} = $SIG{'INT'} = $SIG{'KILL'} = $SIG{'HUP'} = $SIG{'TERM'} = sub { eval { $F->text_mode(); exec('reset'); }; };
 
 my $sinfo = $F->screen_dimensions();
 $F->cls('OFF');
@@ -100,11 +100,9 @@ print_it($F, ' ', '00FFFFFF');
 $F->{'SPLASH'} = $splash;
 $F->splash($Graphics::Framebuffer::VERSION) unless ($nosplash);
 
-my $benchmark;
 
 my $DORKSMILE;
 
-$benchmark->{'Image Load'} = time;
 foreach my $file (@files) {
     next if ($file =~ /^\.+/ || $file =~ /Test|gif/i || -d "$images_path/$file");
     print_it($F, "Loading Image > $file", '00FFFFFF', undef, 1);
@@ -125,10 +123,9 @@ foreach my $file (@files) {
         } else {
             push(@IMAGES, $image);
         }
-    } ## end if (defined($image))
-} ## end foreach my $file (@files)
+    }
+}
 
-$benchmark->{'Image Load'} = time - $benchmark->{'Image Load'};
 $F->cls();
 
 ##################################
@@ -275,11 +272,20 @@ if (defined($show_func)) {
         #       'DIVIDE Mode Drawing',
         'Animated',
     );
-} ## end else [ if (defined($show_func...))]
+}
 
 foreach my $name (@order) {
     if (exists($func{$name})) {
-        $func{$name}->($name);
+		unless ($name =~ /^(Color Mapping|ADD|SUBTRACT|Rotate TrueType Fonts|TrueType|Flipping)/) {
+			$F->cls();
+			$F->acceleration(PERL);
+			$func{$name}->($name . ' -> Pure-Perl');
+		}
+		unless ($name =~ /^(Anti)/) {
+			$F->cls();
+			$F->acceleration(SOFTWARE);
+			$func{$name}->($name . ' -> Accelerated');
+		}
     }
 }
 
@@ -290,28 +296,12 @@ $F->attribute_reset();
 $F->text_mode();
 $F->cls('ON');
 undef($F);
-foreach my $name (@order) {
-    next if ($name =~ /Mode/);
-    if ($name =~ /Image Load|Flood/i) {
-        print STDOUT sprintf('%-33s = %.02f seconds', $name, $benchmark->{$name}), "\n";
-    } elsif ($name eq 'Animated') {
-        print STDOUT sprintf('%-33s = %.02f frames per second', "$name Native", ($benchmark->{"$name Native"} / $delay)),         "\n";
-        print STDOUT sprintf('%-33s = %.02f frames per second', "$name Fullscreen", ($benchmark->{"$name Fullscreen"} / $delay)), "\n";
-    } elsif ($name eq 'Rotate') {
-        print STDOUT sprintf('%-33s = %.02f per second', "Clockwise $name", ($benchmark->{"Clockwise $name"} / $delay)),                 "\n";
-        print STDOUT sprintf('%-33s = %.02f per second', "Counter Clockwise $name", ($benchmark->{"Counter Clockwise $name"} / $delay)), "\n";
-    } else {
-        print STDOUT sprintf('%-33s = %.02f per second', $name, ($benchmark->{$name} / $delay)), "\n";
-    }
-} ## end foreach my $name (@order)
 
-print STDOUT "Press [ENTER] to exit...\n";
-<>;
 exit(0);
 
 sub color_mapping {
-
-    print_it($F, 'Color Mapping Test -> Red-Green-Blue');
+	my $name = shift;
+	print_it($F, $name);
     $F->rbox(
         {
             'filled'   => 1,
@@ -365,12 +355,11 @@ sub color_mapping {
     $F->blit_write($image);
 
     sleep $delay;
-} ## end sub color_mapping
+}
 
 sub plotting {
     my $name = shift;
-    $benchmark->{$name} = 0;
-    print_it($F, $name);
+	print_it($F, $name);
 
     my $s = time + $delay;
     while (time < $s) {
@@ -378,21 +367,18 @@ sub plotting {
         my $y = int(rand($screen_height));
         $F->set_color({ 'alpha' => 255, 'red' => int(rand(256)), 'green' => int(rand(256)), 'blue' => int(rand(256)) });
         $F->plot({ 'x' => $x, 'y' => $y, 'pixel_size' => $psize });
-        $benchmark->{$name}++;
-    } ## end while (time < $s)
-} ## end sub plotting
+    }
+}
 
 sub lines {
     my $name = shift;
     my $aa   = shift;
 
-    print_it($F, $name);
-    $benchmark->{$name} = 0;
+	print_it($F, $name);
     my $s = time + $delay;
     while (time < $s) {
         $F->set_color({ 'red' => int(rand(256)), 'green' => int(rand(256)), 'blue' => int(rand(256)) });
         $F->line({ 'x' => int(rand($XX)), 'y' => int(rand($YY)), 'xx' => int(rand($XX)), 'yy' => int(rand($YY)), 'antialiased' => $aa, 'pixel_size' => $psize });
-        $benchmark->{$name}++;
     }
 } ## end sub lines
 
@@ -400,8 +386,7 @@ sub angle_lines {
     my $name = shift;
     my $aa   = shift;
 
-    print_it($F, $name);
-    $benchmark->{$name} = 0;
+	print_it($F, $name);
 
     my $s     = time + $delay;
     my $angle = 0;
@@ -410,41 +395,34 @@ sub angle_lines {
         $F->angle_line({ 'x' => $center_x, 'y' => $center_y, 'radius' => int($F->{'H_CLIP'} / 2), 'angle' => $angle, 'antialiased' => $aa, 'pixel_size' => $psize });
         $angle++;
         $angle -= 360 if ($angle >= 360);
-        $benchmark->{$name}++;
-    } ## end while (time < $s)
-} ## end sub angle_lines
+    }
+}
 
 sub boxes {
     my $name = shift;
-    print_it($F, $name);
-    $benchmark->{$name} = 0;
+	print_it($F, $name);
     my $s = time + $delay;
     while (time < $s) {
         $F->set_color({ 'red' => int(rand(256)), 'green' => int(rand(256)), 'blue' => int(rand(256)) });
         $F->box({ 'x' => int(rand($XX)), 'y' => int(rand($YY)), 'xx' => int(rand($XX)), 'yy' => int(rand($YY)), 'pixel_size' => $psize });
-
-        $benchmark->{$name}++;
-    } ## end while (time < $s)
-} ## end sub boxes
+    }
+}
 
 sub filled_boxes {
     my $name = shift;
-    print_it($F, $name);
-    $benchmark->{$name} = 0;
+	print_it($F, $name);
     my $s = time + $delay;
     while (time < $s) {
         $F->set_color({ 'red' => int(rand(256)), 'green' => int(rand(256)), 'blue' => int(rand(256)) });
         $F->box({ 'x' => int(rand($XX)), 'y' => int(rand($YY)), 'xx' => int(rand($XX)), 'yy' => int(rand($YY)), 'filled' => 1 });
-
-        $benchmark->{$name}++;
-    } ## end while (time < $s)
-} ## end sub filled_boxes
+    }
+}
 
 sub gradient_boxes {
     my $name      = shift;
     my $direction = shift;
-    print_it($F, $name);
-    $benchmark->{$name} = 0;
+	print_it($F, $name);
+
     my $s = time + $delay;
     while (time < $s) {
         my $x  = int(rand($XX));
@@ -476,15 +454,13 @@ sub gradient_boxes {
                 }
             }
         );
-
-        $benchmark->{$name}++;
-    } ## end while (time < $s)
-} ## end sub gradient_boxes
+    }
+}
 
 sub hatch_filled_boxes {
     my $name = shift;
-    print_it($F, $name);
-    $benchmark->{$name} = 0;
+	print_it($F, $name);
+
     my $s = time + $delay;
     while (time < $s) {
         $F->set_color({ 'alpha' => 255, 'red' => int(rand(256)), 'green' => int(rand(256)), 'blue' => int(rand(256)) });
@@ -507,16 +483,14 @@ sub hatch_filled_boxes {
                 'hatch'  => $HATCHES[int(rand(scalar(@HATCHES)))]
             }
         );
-
-        $benchmark->{$name}++;
-    } ## end while (time < $s)
+    }
     $F->attribute_reset();
-} ## end sub hatch_filled_boxes
+}
 
 sub texture_filled_boxes {
     my $name = shift;
-    print_it($F, $name);
-    $benchmark->{$name} = 0;
+	print_it($F, $name);
+
     my $s = ($F->{'BITS'} == 16) ? time + $delay * 3 : time + $delay * 2;
     while (time < $s) {
         my $image = $IMAGES[int(rand(scalar(@IMAGES)))];
@@ -530,57 +504,49 @@ sub texture_filled_boxes {
                 'texture' => $image
             }
         );
-
-        $benchmark->{$name}++;
-    } ## end while (time < $s)
-} ## end sub texture_filled_boxes
+    }
+}
 
 sub rounded_boxes {
     my $name = shift;
-    print_it($F, $name);
-    $benchmark->{$name} = 0;
+	print_it($F, $name);
+
     my $s = time + $delay;
     while (time < $s) {
         $F->set_color({ 'red' => int(rand(256)), 'green' => int(rand(256)), 'blue' => int(rand(256)) });
         $F->box({ 'x' => int(rand($XX)), 'y' => int(rand($YY)), 'xx' => int(rand($XX)), 'yy' => int(rand($YY)), 'radius' => 4 + rand($XX / 16), 'pixel_size' => $psize });
-
-        $benchmark->{$name}++;
-    } ## end while (time < $s)
-} ## end sub rounded_boxes
+    }
+}
 
 sub filled_rounded_boxes {
     my $name = shift;
-    print_it($F, $name);
-    $benchmark->{$name} = 0;
+	print_it($F, $name);
+
     my $s = time + $delay;
     while (time < $s) {
         $F->set_color({ 'red' => int(rand(256)), 'green' => int(rand(256)), 'blue' => int(rand(256)) });
         $F->box({ 'x' => int(rand($XX)), 'y' => int(rand($YY)), 'xx' => int(rand($XX)), 'yy' => int(rand($YY)), 'radius' => 4 + rand($XX / 16), 'filled' => 1 });
-
-        $benchmark->{$name}++;
-    } ## end while (time < $s)
-} ## end sub filled_rounded_boxes
+    }
+}
 
 sub hatch_filled_rounded_boxes {
     my $name = shift;
-    print_it($F, $name);
-    $benchmark->{$name} = 0;
+	print_it($F, $name);
+
     my $s = time + $delay;
     while (time < $s) {
         $F->set_color({ 'red' => int(rand(256)), 'green' => int(rand(256)), 'blue' => int(rand(256)) });
         $F->set_b_color({ 'red' => int(rand(256)), 'green' => int(rand(256)), 'blue' => int(rand(256)) });
         $F->box({ 'x' => int(rand($XX)), 'y' => int(rand($YY)), 'xx' => int(rand($XX)), 'yy' => int(rand($YY)), 'radius' => 4 + rand($XX / 16), 'filled' => 1, 'hatch' => $HATCHES[int(rand(scalar(@HATCHES)))] });
-
-        $benchmark->{$name}++;
-    } ## end while (time < $s)
+    }
     $F->attribute_reset();
-} ## end sub hatch_filled_rounded_boxes
+}
 
 sub gradient_rounded_boxes {
     my $name      = shift;
     my $direction = shift;
-    print_it($F, $name);
-    $benchmark->{$name} = 0;
+	print_it($F, $name);
+
     my $s = time + $delay;
     while (time < $s) {
         my $x  = int(rand($XX));
@@ -612,15 +578,13 @@ sub gradient_rounded_boxes {
                 }
             }
         );
-
-        $benchmark->{$name}++;
-    } ## end while (time < $s)
-} ## end sub gradient_rounded_boxes
+    }
+}
 
 sub texture_filled_rounded_boxes {
     my $name = shift;
-    print_it($F, $name);
-    $benchmark->{$name} = 0;
+	print_it($F, $name);
+
     my $s = ($F->{'BITS'} == 16) ? time + $delay * 3 : time + $delay * 2;
     while (time < $s) {
         my $image = $IMAGES[int(rand(scalar(@IMAGES)))];
@@ -635,57 +599,49 @@ sub texture_filled_rounded_boxes {
                 'texture' => $image
             }
         );
-
-        $benchmark->{$name}++;
-    } ## end while (time < $s)
-} ## end sub texture_filled_rounded_boxes
+    }
+}
 
 sub circles {
     my $name = shift;
-    print_it($F, $name);
-    $benchmark->{$name} = 0;
+	print_it($F, $name);
+
     my $s = time + $delay;
     while (time < $s) {
         $F->set_color({ 'red' => int(rand(256)), 'green' => int(rand(256)), 'blue' => int(rand(256)) });
         $F->circle({ 'x' => int(rand($XX)), 'y' => int(rand($YY)), 'radius' => rand($center_y), 'pixel_size' => $psize });
-
-        $benchmark->{$name}++;
-    } ## end while (time < $s)
-} ## end sub circles
+    }
+}
 
 sub filled_circles {
     my $name = shift;
-    print_it($F, $name);
-    $benchmark->{$name} = 0;
+	print_it($F, $name);
+
     my $s = time + $delay;
     while (time < $s) {
         $F->set_color({ 'red' => int(rand(256)), 'green' => int(rand(256)), 'blue' => int(rand(256)) });
         $F->circle({ 'x' => int(rand($XX)), 'y' => int(rand($YY)), 'radius' => rand($center_y), 'filled' => 1 });
-
-        $benchmark->{$name}++;
-    } ## end while (time < $s)
-} ## end sub filled_circles
+    }
+}
 
 sub hatch_filled_circles {
     my $name = shift;
-    print_it($F, $name);
-    $benchmark->{$name} = 0;
+	print_it($F, $name);
+
     my $s = time + $delay;
     while (time < $s) {
         $F->set_color({ 'red' => int(rand(256)), 'green' => int(rand(256)), 'blue' => int(rand(256)) });
         $F->set_b_color({ 'red' => int(rand(256)), 'green' => int(rand(256)), 'blue' => int(rand(256)) });
         $F->circle({ 'x' => int(rand($XX)), 'y' => int(rand($YY)), 'radius' => rand($center_y), 'filled' => 1, 'hatch' => $HATCHES[int(rand(scalar(@HATCHES)))] });
-
-        $benchmark->{$name}++;
-    } ## end while (time < $s)
+    }
     $F->attribute_reset();
-} ## end sub hatch_filled_circles
+}
 
 sub gradient_circles {
     my $name      = shift;
     my $direction = shift;
-    print_it($F, $name);
-    $benchmark->{$name} = 0;
+	print_it($F, $name);
+
     my $s = time + $delay;
     while (time < $s) {
 
@@ -713,15 +669,13 @@ sub gradient_circles {
                 }
             }
         );
-
-        $benchmark->{$name}++;
-    } ## end while (time < $s)
-} ## end sub gradient_circles
+    }
+}
 
 sub texture_filled_circles {
     my $name = shift;
-    print_it($F, $name);
-    $benchmark->{$name} = 0;
+	print_it($F, $name);
+
     my $s = ($F->{'BITS'} == 16) ? time + $delay * 3 : time + $delay * 2;
     while (time < $s) {
         my $image = $IMAGES[int(rand(scalar(@IMAGES)))];
@@ -734,70 +688,60 @@ sub texture_filled_circles {
                 'texture' => $image
             }
         );
-
-        $benchmark->{$name}++;
-    } ## end while (time < $s)
-} ## end sub texture_filled_circles
+    }
+}
 
 sub arcs {
     my $name = shift;
-    print_it($F, $name);
-    $benchmark->{$name} = 0;
+	print_it($F, $name);
+
     my $s = time + $delay;
     while (time < $s) {
         $F->set_color({ 'red' => int(rand(256)), 'green' => int(rand(256)), 'blue' => int(rand(256)) });
         $F->arc({ 'x' => int(rand($XX)), 'y' => int(rand($YY)), 'radius' => rand($center_y), 'start_degrees' => rand(360), 'end_degrees' => rand(360), 'pixel_size' => $psize });
-
-        $benchmark->{$name}++;
-    } ## end while (time < $s)
-} ## end sub arcs
+    }
+}
 
 sub poly_arcs {
     my $name = shift;
-    print_it($F, $name);
-    $benchmark->{$name} = 0;
+	print_it($F, $name);
+
     my $s = time + $delay;
     while (time < $s) {
         $F->set_color({ 'red' => int(rand(256)), 'green' => int(rand(256)), 'blue' => int(rand(256)) });
         $F->poly_arc({ 'x' => int(rand($XX)), 'y' => int(rand($YY)), 'radius' => rand($center_y), 'start_degrees' => rand(360), 'end_degrees' => rand(360), 'pixel_size' => $psize });
-
-        $benchmark->{$name}++;
-    } ## end while (time < $s)
-} ## end sub poly_arcs
+    }
+}
 
 sub filled_pies {
     my $name = shift;
-    print_it($F, $name);
-    $benchmark->{$name} = 0;
+	print_it($F, $name);
+
     my $s = time + $delay;
     while (time < $s) {
         $F->set_color({ 'red' => int(rand(256)), 'green' => int(rand(256)), 'blue' => int(rand(256)) });
         $F->filled_pie({ 'x' => int(rand($XX)), 'y' => int(rand($YY)), 'radius' => rand($center_y), 'start_degrees' => rand(360), 'end_degrees' => rand(360) });
-
-        $benchmark->{$name}++;
-    } ## end while (time < $s)
-} ## end sub filled_pies
+    }
+}
 
 sub hatch_filled_pies {
     my $name = shift;
-    print_it($F, $name);
-    $benchmark->{$name} = 0;
+	print_it($F, $name);
+
     my $s = time + ($delay * 2);
     while (time < $s) {
         $F->set_color({ 'red' => int(rand(256)), 'green' => int(rand(256)), 'blue' => int(rand(256)) });
         $F->set_b_color({ 'red' => int(rand(256)), 'green' => int(rand(256)), 'blue' => int(rand(256)) });
         $F->filled_pie({ 'x' => int(rand($XX)), 'y' => int(rand($YY)), 'radius' => rand($center_y), 'start_degrees' => rand(360), 'end_degrees' => rand(360), 'hatch' => $HATCHES[int(rand(scalar(@HATCHES)))] });
-
-        $benchmark->{$name}++;
-    } ## end while (time < $s)
+    }
     $F->attribute_reset();
-} ## end sub hatch_filled_pies
+}
 
 sub gradient_pies {
     my $name      = shift;
     my $direction = shift;
-    print_it($F, $name);
-    $benchmark->{$name} = 0;
+	print_it($F, $name);
+
     my $s = time + $delay;
     while (time < $s) {
         my $x     = int(rand($XX));
@@ -824,15 +768,13 @@ sub gradient_pies {
                 }
             }
         );
-
-        $benchmark->{$name}++;
-    } ## end while (time < $s)
-} ## end sub gradient_pies
+    }
+}
 
 sub texture_filled_pies {
     my $name = shift;
-    print_it($F, $name);
-    $benchmark->{$name} = 0;
+	print_it($F, $name);
+
     my $s = ($F->{'BITS'} == 16) ? time + $delay * 3 : time + $delay * 2;
 
     while (time < $s) {
@@ -850,57 +792,49 @@ sub texture_filled_pies {
                 'texture'       => $image,
             }
         );
-
-        $benchmark->{$name}++;
-    } ## end while (time < $s)
-} ## end sub texture_filled_pies
+    }
+}
 
 sub ellipses {
     my $name = shift;
-    print_it($F, $name);
-    $benchmark->{$name} = 0;
+	print_it($F, $name);
+
     my $s = time + $delay;
     while (time < $s) {
         $F->set_color({ 'red' => int(rand(256)), 'green' => int(rand(256)), 'blue' => int(rand(256)) });
         $F->ellipse({ 'x' => int(rand($XX)), 'y' => int(rand($YY)), 'xradius' => rand($center_x), 'yradius' => rand($center_y), 'pixel_size' => $psize });
-
-        $benchmark->{$name}++;
-    } ## end while (time < $s)
-} ## end sub ellipses
+    }
+}
 
 sub filled_ellipses {
     my $name = shift;
-    print_it($F, $name);
-    $benchmark->{$name} = 0;
+	print_it($F, $name);
+
     my $s = time + $delay;
     while (time < $s) {
         $F->set_color({ 'red' => int(rand(256)), 'green' => int(rand(256)), 'blue' => int(rand(256)), 'alpha' => int(rand(256)) });
         $F->ellipse({ 'x' => int(rand($XX)), 'y' => int(rand($YY)), 'xradius' => rand($center_x), 'yradius' => rand($center_y), 'filled' => 1 });
-
-        $benchmark->{$name}++;
-    } ## end while (time < $s)
-} ## end sub filled_ellipses
+    }
+}
 
 sub hatch_filled_ellipses {
     my $name = shift;
-    print_it($F, $name);
-    $benchmark->{$name} = 0;
+	print_it($F, $name);
+
     my $s = time + $delay;
     while (time < $s) {
         $F->set_color({ 'red' => int(rand(256)), 'green' => int(rand(256)), 'blue' => int(rand(256)) });
         $F->set_b_color({ 'red' => int(rand(256)), 'green' => int(rand(256)), 'blue' => int(rand(256)) });
         $F->ellipse({ 'x' => int(rand($XX)), 'y' => int(rand($YY)), 'xradius' => rand($center_x), 'yradius' => rand($center_y), 'filled' => 1, 'hatch' => $HATCHES[int(rand(scalar(@HATCHES)))] });
-
-        $benchmark->{$name}++;
-    } ## end while (time < $s)
+    }
     $F->attribute_reset();
-} ## end sub hatch_filled_ellipses
+}
 
 sub gradient_ellipses {
     my $name      = shift;
     my $direction = shift;
-    print_it($F, $name);
-    $benchmark->{$name} = 0;
+	print_it($F, $name);
+
     my $s = time + $delay;
     while (time < $s) {
         my $rh    = int(rand($center_y) + 10);
@@ -926,15 +860,13 @@ sub gradient_ellipses {
                 }
             }
         );
-
-        $benchmark->{$name}++;
-    } ## end while (time < $s)
-} ## end sub gradient_ellipses
+    }
+}
 
 sub texture_filled_ellipses {
     my $name = shift;
-    print_it($F, $name);
-    $benchmark->{$name} = 0;
+	print_it($F, $name);
+
     my $s = time + $delay;
     while (time < $s) {
         my $image = $IMAGES[int(rand(scalar(@IMAGES)))];
@@ -948,16 +880,13 @@ sub texture_filled_ellipses {
                 'texture' => $image
             }
         );
-
-        $benchmark->{$name}++;
-    } ## end while (time < $s)
-} ## end sub texture_filled_ellipses
+    }
+}
 
 sub polygons {
     my $name = shift;
     my $aa   = shift;
-    print_it($F, $name);
-    $benchmark->{$name} = 0;
+	print_it($F, $name);
 
     my $s = time + $delay;
     while (time < $s) {
@@ -974,15 +903,13 @@ sub polygons {
                 'pixel_size'  => $psize
             }
         );
-
-        $benchmark->{$name}++;
-    } ## end while (time < $s)
-} ## end sub polygons
+    }
+}
 
 sub filled_polygons {
     my $name = shift;
-    print_it($F, $name);
-    $benchmark->{$name} = 0;
+	print_it($F, $name);
+
     $F->mask_mode() if ($F->acceleration());
     my $s = time + $delay;
     while (time < $s) {
@@ -998,15 +925,13 @@ sub filled_polygons {
                 'filled'      => 1,
             }
         );
-
-        $benchmark->{$name}++;
-    } ## end while (time < $s)
-} ## end sub filled_polygons
+    }
+}
 
 sub hatch_filled_polygons {
     my $name = shift;
-    print_it($F, $name);
-    $benchmark->{$name} = 0;
+	print_it($F, $name);
+
     $F->mask_mode() if ($F->acceleration());
     my $s = time + $delay;
     while (time < $s) {
@@ -1024,17 +949,15 @@ sub hatch_filled_polygons {
                 'hatch'       => $HATCHES[int(rand(scalar(@HATCHES)))]
             }
         );
-
-        $benchmark->{$name}++;
-    } ## end while (time < $s)
+    }
     $F->attribute_reset();
-} ## end sub hatch_filled_polygons
+}
 
 sub gradient_polygons {
     my $name      = shift;
     my $direction = shift;
-    print_it($F, $name);
-    $benchmark->{$name} = 0;
+	print_it($F, $name);
+
     $F->mask_mode() if ($F->acceleration());
     my $s = time + $delay;
     while (time < $s) {
@@ -1061,15 +984,13 @@ sub gradient_polygons {
                 }
             }
         );
-
-        $benchmark->{$name}++;
-    } ## end while (time < $s)
-} ## end sub gradient_polygons
+    }
+}
 
 sub texture_filled_polygons {
     my $name = shift;
-    print_it($F, $name);
-    $benchmark->{$name} = 0;
+	print_it($F, $name);
+
     $F->mask_mode() if ($F->acceleration());
 
     my $s = ($F->{'BITS'} == 16) ? time + $delay * 3 : time + $delay * 2;
@@ -1087,15 +1008,13 @@ sub texture_filled_polygons {
                 'texture'     => $image
             }
         );
-
-        $benchmark->{$name}++;
-    } ## end while (time < $s)
-} ## end sub texture_filled_polygons
+    }
+}
 
 sub beziers {
     my $name = shift;
-    print_it($F, $name);
-    $benchmark->{$name} = 0;
+	print_it($F, $name);
+
     my $s = time + $delay;
     while (time < $s) {
         $F->set_color({ 'red' => int(rand(256)), 'green' => int(rand(256)), 'blue' => int(rand(256)) });
@@ -1104,15 +1023,13 @@ sub beziers {
             push(@coords, int(rand($XX)), int(rand($YY)));
         }
         $F->bezier({ 'coordinates' => \@coords, 'points' => 100, 'pixel_size' => $psize });
-
-        $benchmark->{$name}++;
-    } ## end while (time < $s)
-} ## end sub beziers
+    }
+}
 
 sub truetype_fonts {
     my $name = shift;
-    print_it($F, $name);
-    $benchmark->{$name} = 0;
+	print_it($F, $name);
+
     my @fonts = (keys %{ $F->{'FONTS'} });
     my $g     = time + $delay;
     while (time < $g) {
@@ -1140,15 +1057,13 @@ sub truetype_fonts {
             $b->{'x'} = rand($F->{'XX_CLIP'} - $b->{'pwidth'});
             $F->ttf_print($b);
         }
-
-        $benchmark->{$name}++;
-    } ## end while (time < $g)
-} ## end sub truetype_fonts
+    }
+}
 
 sub truetype_printing {
     my $name = shift;
-    print_it($F, $name);
-    $benchmark->{$name} = time;
+	print_it($F, $name);
+
     $F->ttf_paragraph(
         {
             'x'       => 0,
@@ -1159,7 +1074,7 @@ sub truetype_printing {
             'color'   => sprintf('%02x%02x%02x%02x', int(rand(256)), int(rand(256)), int(rand(256)), 255),
         }
     );
-    $benchmark->{$name} = time - $benchmark->{$name};
+
     sleep $delay;
     $F->clip_set(
         {
@@ -1181,21 +1096,22 @@ sub truetype_printing {
     );
     $F->clip_reset();
     sleep $delay;
-} ## end sub truetype_printing
+}
 
 sub rotate_truetype_fonts {
     my $name = shift;
-    print_it($F, $name);
-    $benchmark->{$name} = 0;
+	print_it($F, $name);
+
     my $g     = time + $delay * 3;
-    my $angle = 0;
+    my $angle = 270;
     my $x     = $XX / 2;
     my $y     = $YY / 2;
     my $h     = ($YY <= 240 || $F->{'BITS'} == 16) ? 12 * $ym : 60 * $ym;
     my $ws    = 1;
+	my $b;
 
     while (time < $g) {
-        my $b = $F->ttf_print(
+        $b = $F->ttf_print(
             {
                 'x'            => $x,
                 'y'            => $y,
@@ -1210,19 +1126,20 @@ sub rotate_truetype_fonts {
         );
         if (defined($b)) {
             $F->ttf_print($b);
+		} else {
+			last;
         }
+		$F->vsync();
         $angle++;
-        $angle = 0 if ($angle >= 360);
-
-        $benchmark->{$name}++;
-    } ## end while (time < $g)
-} ## end sub rotate_truetype_fonts
+        $angle = 270 if ($angle >= 360);
+    }
+}
 
 sub flood_fill {
     my $name = shift;
-    print_it($F, $name);
+	print_it($F, $name);
     $F->clip_reset();
-    $benchmark->{$name} = time;
+
     if ($XX > 255) {    # && !$rpi) {
         my $image = $IMAGES[int(rand(scalar(@IMAGES)))];
         $F->set_color({ 'red' => int(rand(256)), 'green' => int(rand(256)), 'blue' => int(rand(256)) });
@@ -1246,16 +1163,14 @@ sub flood_fill {
 
         $F->set_color({ 'red' => int(rand(256)), 'green' => int(rand(256)), 'blue' => int(rand(256)) });
         $F->fill({ 'x' => 3, 'y' => 3 });
-    } ## end else [ if ($XX > 255) ]
-    $benchmark->{$name} = (time - $benchmark->{$name});
+    }
     sleep $delay if ($F->acceleration());
-} ## end sub flood_fill
+}
 
 sub color_replace {
     my $name    = shift;
     my $clipped = shift;
-    print_it($F, $name);
-    $benchmark->{$name} = 0;
+	print_it($F, $name);
 
     my $x = $F->{'XRES'} / 4;
     my $y = $F->{'YRES'} / 4;
@@ -1290,15 +1205,13 @@ sub color_replace {
                 }
             }
         );
-
-        $benchmark->{$name}++;
-    } ## end while (time < $s)
-} ## end sub color_replace
+    }
+}
 
 sub blitting {
     my $name = shift;
-    print_it($F, $name);
-    $benchmark->{$name} = 0;
+	print_it($F, $name);
+
     my $s     = time + $delay;
     my $image = $IMAGES[int(rand(scalar(@IMAGES)))];
     $image = $F->blit_transform(
@@ -1313,19 +1226,16 @@ sub blitting {
         }
     );
     while (time < $s) {
-
         $image->{'x'} = abs(rand($XX - $image->{'width'}));
         $image->{'y'} = $F->{'Y_CLIP'} + abs(rand(($YY - $F->{'Y_CLIP'}) - $image->{'height'}));
         $F->blit_write($image);
-
-        $benchmark->{$name}++;
-    } ## end while (time < $s)
-} ## end sub blitting
+    }
+}
 
 sub blit_move {
     my $name = shift;
-    print_it($F, $name);
-    $benchmark->{$name} = 0;
+	print_it($F, $name);
+
     $F->attribute_reset();
     my $image = $IMAGES[int(rand(scalar(@IMAGES)))];
     $image = $F->blit_transform(
@@ -1339,27 +1249,25 @@ sub blit_move {
             }
         }
     );
-    my $x = 20;
-    my $y = 20;
+    my $x = 0;
+    my $y = 0;
     $image->{'x'} = $x;
     $image->{'y'} = $y;
     $F->blit_write($image);
     my $s = time + $delay;
 
     while (time < $s) {
-        $image = $F->blit_move({ %{$image}, 'x_dest' => abs($x), 'y_dest' => abs($y) });
+        $image = $F->blit_move({ %{$image}, 'x_dest' => abs($x), 'y_dest' => int(abs($y)) });
         $x++;
-        $y++;
-
-        $benchmark->{$name}++;
-        $F->vsync();
-    } ## end while (time < $s)
-} ## end sub blit_move
+        $y = $y + .5;
+		sleep .016666666667;
+#        $F->vsync();
+    }
+}
 
 sub rotate {
     my $name = shift;
-    print_it($F, "Counter Clockwise $name", 'FFFF00FF');
-
+	print_it($F, "Counter Clockwise $name");
     my $image = $IMAGES[int(rand(scalar(@IMAGES)))];
     $image = $F->blit_transform(
         {
@@ -1374,8 +1282,7 @@ sub rotate {
     );
     my $angle = 0;
 
-    print_it($F, "Counter Clockwise $name");
-    $benchmark->{"Counter Clockwise $name"} = 0;
+	print_it($F, "Counter Clockwise $name");
 
     my $s     = time + $delay;
     my $count = 0;
@@ -1399,15 +1306,13 @@ sub rotate {
 
         $F->blit_write($rot);
 
-        $benchmark->{"Counter Clockwise $name"}++;
         $angle++;
         $angle = 0 if ($angle >= 360);
         $count++;
-    } ## end while (time < $s || $count...)
+    }
 
     $angle = 0;
-    $benchmark->{"Clockwise $name"} = 0;
-    print_it($F, "Clockwise $name");
+	print_it($F, "Clockwise $name");
     $s     = time + $delay;
     $count = 0;
     while (time < $s || $count < 6) {
@@ -1429,21 +1334,21 @@ sub rotate {
 
         $F->blit_write($rot);
 
-        $benchmark->{"Clockwise $name"}++;
         $angle--;
         $angle = 0 if ($angle <= -360);
         $count++;
-    } ## end while (time < $s || $count...)
-} ## end sub rotate
+    }
+}
 
 sub flipping {
     my $name  = shift;
     my $r     = rand(scalar(@IMAGES));
     my $image = $IMAGES[$r];
     $image->{'image'} = "$IMAGES[$r]->{'image'}";
-    $benchmark->{$name} = 0;
+
     my $s    = time + $delay * 2;
     my $zoom = time + $delay;
+	print_it($F, $name);
     while (time < $s) {
         foreach my $dir (qw(normal horizontal vertical both)) {
             print_it($F, "$name $dir");
@@ -1460,17 +1365,17 @@ sub flipping {
                 $image            = $IMAGES[$r];
                 $image->{'image'} = "$IMAGES[$r]->{'image'}";
                 $F->blit_write($image);
-            } ## end else
-
-            $benchmark->{$name}++;
-            $F->vsync();
-        } ## end foreach my $dir (qw(normal horizontal vertical both))
-    } ## end while (time < $s)
-} ## end sub flipping
+            }
+			sleep .0166666667;
+#            $F->vsync();
+        }
+    }
+}
 
 sub monochrome {
     my $name  = shift;
     my $image = $IMAGES[int(rand(scalar(@IMAGES)))];
+	print_it($F, $name);
     $image = $F->blit_transform(
         {
             'blit_data' => $image,
@@ -1483,8 +1388,6 @@ sub monochrome {
         }
     );
 
-    print_it($F, $name);
-    $benchmark->{$name} = 0;
     my $mono = { %{$image} };
     $mono->{'image'} = $F->monochrome({ 'image' => $image->{'image'}, 'bits' => $F->{'BITS'} });
     my $s = time + $delay;
@@ -1493,16 +1396,14 @@ sub monochrome {
         $mono->{'x'} = abs(rand($XX - $mono->{'width'}));
         $mono->{'y'} = $F->{'Y_CLIP'} + abs(rand(($YY - $F->{'Y_CLIP'}) - $mono->{'height'}));
         $F->blit_write($mono);
-
-        $benchmark->{$name}++;
-    } ## end while (time < $s)
+    }
     sleep $delay;
-} ## end sub monochrome
+}
 
 sub animated {
     my $name = shift;
-    $F->{'DIAGNOSTICS'} = 1;
-    print_it($F, "$name Loading...", 'FFFF00FF');
+	print_it($F, $name . ' -> Loading...');
+	$F->{'DIAGNOSTICS'} = TRUE;
 
     opendir(my $DIR, $images_path);
     chomp(my @list = readdir($DIR));
@@ -1533,16 +1434,19 @@ sub animated {
                         'center' => CENTER_XY
                     }
                 );
-            } ## end else [ if ($count || $XX <= 320)]
-
-            foreach my $bench (0 .. 1) {
+            }
+			my $bench = 0;
+#            foreach my $bench (0 .. 1) {
                 if ($count || $XX <= 320) {
-                    print_it($F, $bench ? "Benchmarking Animated Image of '$info' Fullscreen" : "Playing Animated Image of '$info' Fullscreen", $bench ? '0066FFFF' : 'FF00FFFF', $bench ? { 'red' => 0, 'green' => 64, 'blue' => 0, 'alpha' => 255 } : undef);
+                    print_it($F,
+						$bench ? "Loading Animated Image of '$info' Fullscreen" : $new_name, # "Playing Animated Image of '$info' Fullscreen",
+						$bench ? '0066FFFF' : 'FF00FFFF',
+						$bench ? { 'red' => 0, 'green' => 64, 'blue' => 0, 'alpha' => 255 } : undef);
                 } else {
-                    print_it($F, $bench ? "Benchmarking Animated Image of '$info' Native Size" : "Playing Animated Image of '$info' Native Size", $bench ? '0066FFFF' : 'FF00FFFF', $bench ? { 'red' => 0, 'green' => 64, 'blue' => 0, 'alpha' => 255 } : undef);
-                }
-                if ($bench) {
-                    $benchmark->{$new_name} = 0;
+                    print_it($F,
+						$bench ? "Loading Animated Image of '$info' Native Size" : $new_name, # "Playing Animated Image of '$info' Native Size",
+						$bench ? '0066FFFF' : 'FF00FFFF',
+						$bench ? { 'red' => 0, 'green' => 64, 'blue' => 0, 'alpha' => 255 } : undef);
                 }
                 if (defined($image)) {
                     $F->cls();
@@ -1564,17 +1468,14 @@ sub animated {
                             if ($delay > 0 && !$bench) {
                                 sleep $delay;
                             }
-                            if ($bench) {
-                                $benchmark->{$new_name}++;
-                            }
-                        } ## end foreach my $frame (0 .. (scalar...))
-                    } ## end while (time <= $s)
-                } ## end if (defined($image))
-            } ## end foreach my $bench (0 .. 1)
+                        }
+                    }
+                }
+#            }
             last if ($XX <= 320);
-        } ## end for my $count (0 .. 1)
-    } ## end foreach my $info (@list)
-} ## end sub animated
+        }
+    }
+}
 
 sub mode_drawing {
     my $mode = shift;
@@ -1636,8 +1537,9 @@ sub mode_drawing {
 } ## end sub mode_drawing
 
 sub alpha_drawing {
+	my $name = shift;
     $F->attribute_reset();
-    print_it($F, 'Testing Alpha Drawing Mode');
+	print_it($F, $name);
     my $image = $IMAGES[int(rand(scalar(@IMAGES)))];
     my $image2;
     do {
@@ -1670,8 +1572,9 @@ sub alpha_drawing {
 } ## end sub alpha_drawing
 
 sub mask_drawing {
+	my $name = shift;
     $F->attribute_reset();
-    print_it($F, 'Testing MASK Drawing Mode (draw over)');
+	print_it($F, $name);
 
     $F->set_b_color({ 'red' => 0, 'green' => 0, 'blue' => 0, 'alpha' => 0 });
     my $h = int($YY - $F->{'Y_CLIP'});
@@ -1691,8 +1594,9 @@ sub mask_drawing {
 } ## end sub mask_drawing
 
 sub unmask_drawing {
+	my $name = shift;
     $F->attribute_reset();
-    print_it($F, 'Testing UNMASK Drawing Mode (draw under)');
+	print_it($F, $name . ' (draw under)');
 
     $F->set_b_color({ 'red' => 0, 'green' => 0, 'blue' => 0, 'alpha' => 0 });
     my $h = int($YY - $F->{'Y_CLIP'});
@@ -1722,6 +1626,8 @@ sub print_it {
 
     $fb->set_b_color($bgcolor);
     $fb->cls() unless ($noclear);
+	my $acc = $fb->acceleration();
+	$fb->acceleration(SOFTWARE);
     unless ($XX <= 320) {
 
         #        $fb->or_mode();
@@ -1750,6 +1656,7 @@ sub print_it {
         print STDERR "$message\n";
     }
     $fb->_flush_screen();
+	$fb->acceleration($acc);
 } ## end sub print_it
 
 __END__
@@ -1838,7 +1745,7 @@ Richard Kelsch <rich@rk-internet.com>
 
 =head1 COPYRIGHT
 
-Copyright 2003-2023 Richard Kelsch
+Copyright 2003-2025 Richard Kelsch
 All Rights Reserved
 
 =head1 LICENSE

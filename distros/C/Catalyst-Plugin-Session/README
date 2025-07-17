@@ -256,49 +256,13 @@ INTERNAL METHODS
 
     generate_session_id
         This method will return a string that can be used as a session ID.
-        It is supposed to be a reasonably random string with enough bits to
-        prevent collision. It basically takes "session_hash_seed" and hashes
-        it using SHA-1, MD5 or SHA-256, depending on the availability of
-        these modules.
+        It is simply a hexidecimal string of raw bytes from the system
+        entropy source, e.g. /dev/urandom.
 
     session_hash_seed
-        This method is actually rather internal to generate_session_id, but
-        should be overridable in case you want to provide more random data.
-
-        Currently it returns a concatenated string which contains:
-
-        *   A counter
-
-        *   The current time
-
-        *   One value from "rand".
-
-        *   The stringified value of a newly allocated hash reference
-
-        *   The stringified value of the Catalyst context object
-
-        in the hopes that those combined values are entropic enough for most
-        uses. If this is not the case you can replace "session_hash_seed"
-        with e.g.
-
-            sub session_hash_seed {
-                open my $fh, "<", "/dev/random";
-                read $fh, my $bytes, 20;
-                close $fh;
-                return $bytes;
-            }
-
-        Or even more directly, replace "generate_session_id":
-
-            sub generate_session_id {
-                open my $fh, "<", "/dev/random";
-                read $fh, my $bytes, 20;
-                close $fh;
-                return unpack("H*", $bytes);
-            }
-
-        Also have a look at Crypt::Random and the various openssl bindings -
-        these modules provide APIs for cryptographically secure random data.
+        This method returns raw bytes from the system random source. It is
+        no longer used but exists for legacy code that might override
+        "generate_session_id" but still uses this method.
 
     finalize_session
         Clean up the session during "finalize".
@@ -467,7 +431,7 @@ AUTHORS
 Contributors
     Devin Austin (dhoss) <dhoss@cpan.org>
 
-    Robert Rothenberg <rrwo@cpan.org> (on behalf of Foxtons Ltd.)
+    Robert Rothenberg <rrwo@cpan.org>
 
 COPYRIGHT & LICENSE
         Copyright (c) 2005 the aforementioned authors. All rights

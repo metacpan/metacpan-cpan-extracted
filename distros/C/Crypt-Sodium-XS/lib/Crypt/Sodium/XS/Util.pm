@@ -15,9 +15,11 @@ our @EXPORT_OK = (qw(
   sodium_increment
   sodium_is_zero
   sodium_memcmp
+  sodium_memzero
+  sodium_pad
   sodium_sub
   sodium_random_bytes
-  sodium_memzero
+  sodium_unpad
   sodium_version_string
 ));
 
@@ -115,6 +117,40 @@ the bytes are equal, false otherwise.
 
 C<$length> is optional iif C<$string> and C<$other_string> are equal lengths.
 If provided, only C<$length> bytes are compared.
+
+=head2 sodium_pad
+
+=head2 sodium_unpad
+
+  my $padded = sodium_pad($str, $blocksize);
+  my $unpadded = sodium_unpad($str, $blocksize);
+
+Returns C<$str> padded or unpadded respectively, to the next multiple of
+C<$blocksize> bytes.
+
+These functions use the ISO/IEC 7816-4 padding algorithm. It supports arbitrary
+block sizes, ensures that the padding data are checked for computing the
+unpadded length, and is more resistant to some classes of attacks than other
+standard padding algorithms.
+
+Notes:
+
+=over 4
+
+Padding should be applied before encryption and removed after decryption.
+
+Usage of padding to hide the length of a password is not recommended. A client
+willing to send a password to a server should hash it instead, even with a
+single iteration of the hash function.
+
+This ensures that the length of the transmitted data is constant and that the
+server doesn’t effortlessly get a copy of the password.
+
+Applications may eventually leak the unpadded length via side channels, but the
+sodium_pad() and sodium_unpad() functions themselves try to minimize side
+channels for a given length & <block size mask> value.
+
+=back
 
 =head2 sodium_random_bytes
 

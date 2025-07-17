@@ -1,7 +1,6 @@
 
 
 
-
 =encoding UTF-8
 
 =head1 NAME
@@ -11,9 +10,9 @@ Gzip::Faster - simple and fast gzip and gunzip
 =head1 SYNOPSIS
 
     
+    use Gzip::Faster;
     # Make a random input string
     my $input = join '', map {int (rand (10))} 0..0x1000;
-    use Gzip::Faster;
     # Compress the random string.
     my $gzipped = gzip ($input);
     # Uncompress it again.
@@ -26,8 +25,8 @@ Gzip::Faster - simple and fast gzip and gunzip
 
 =head1 VERSION
 
-This documents version 0.21 of Gzip::Faster
-corresponding to git commit L<0b018b1a4df5f509a16c4262936b601382b6c3d6|https://github.com/benkasminbullock/gzip-faster/commit/0b018b1a4df5f509a16c4262936b601382b6c3d6> made on Fri Dec 29 10:54:29 2017 +0900.
+This documents version 0.22 of Gzip::Faster
+corresponding to git commit L<b1e4570195427cb9c7b209542e63e5f4d2b2229a|https://github.com/benkasminbullock/gzip-faster/commit/b1e4570195427cb9c7b209542e63e5f4d2b2229a> made on Thu Jul 17 07:57:33 2025 +0900.
 
 =head1 DESCRIPTION
 
@@ -70,14 +69,21 @@ using L</copy_perl_flags>.
 This compresses C<$plain> into the gzip format. The return value is
 the compressed version of C<$plain>. 
 
+If the input value C<$plain> is the undefined value or an empty
+string, it prints a warning (see L</DIAGNOSTICS>) and returns the
+undefined value. 
+
 =head2 gunzip
 
     my $plain = gunzip ($zipped);
 
 This uncompresses C<$zipped> and returns the result of the
-uncompression. It prints a warning and returns the undefined value if
-C<$zipped> is the undefined value or an empty string. It throws a
-fatal error if C<$zipped> is not in the gzip format.
+uncompression. 
+
+If the input value C<$zipped> is the undefined value or an empty
+string, it prints a warning (see L</DIAGNOSTICS>) and returns the
+undefined value. 
+It throws a fatal error if C<$zipped> is not in the gzip format.
 
 =head2 gzip_file
 
@@ -108,12 +114,12 @@ if C<open> fails. To retrieve a file name, use
 
     my $plain = gunzip_file ('file.gz', file_name => \my $file_name);
 
-Note that you must provide a scalar reference to the C<file_name>
-argument. This reference is filled in with the file name information
-from the header of F<file.gz>. If F<file.gz> does not contain any file
-name information, C<$file_name> will contain the undefined value.
+Provide a scalar reference to the C<file_name> argument. Your
+reference is filled with the file name from the header of
+F<file.gz>. If F<file.gz> does not contain file name information, your
+reference will be given the undefined value.
 
-The modification time can also be read from the header:
+The modification time in the header can also be read into a reference:
 
     my $plain = gunzip_file ('file.gz', file_name => \my $file_name,
 	                     mod_time => \my $mod_time);
@@ -127,8 +133,9 @@ C<gunzip_file> was added in version 0.04. File name reading was added in version
 
 This compresses C<$plain> in memory using L</gzip> and writes the
 compressed content to 'file.gz'. There is no return value. The errors
-are the same as L</gzip>, plus this may also throw an error if C<open>
-fails. To write a file name, use 
+are the same as L</gzip>, and this may also throw an error if C<open>
+fails. To write a file name into the header information of your file,
+use
 
     gzip_to_file ($plain, 'file.gz', file_name => 'file');
 
@@ -144,8 +151,11 @@ is similar to the L</gzip> format, except that it doesn't contain a
 gzip header. The output of C<deflate> can be inflated either with
 L</inflate> or with L</gunzip>.
 
-To see an example of using L</deflate> to write a PNG image file, see
-L<F<t/png.t>|https://fastapi.metacpan.org/source/BKB/Gzip-Faster-0.21/t/png.t> in the module's tests.
+If the input value C<$plain> is the undefined value or an empty
+string, it prints a warning (see L</DIAGNOSTICS>) and returns the
+undefined value.
+
+For an example using L</deflate> to write a PNG image file, see L<F<t/png.t>|https://fastapi.metacpan.org/source/BKB/Gzip-Faster-0.22/t/png.t> in the module's tests.
 
 C<deflate> was added in version 0.16.
 
@@ -158,29 +168,46 @@ this is identical to L</gunzip>, and it's included only for
 completeness. In other words, you can use inflate and gunzip
 interchangeably.
 
+If the input value C<$deflated> is the undefined value or an empty
+string, it prints a warning (see L</DIAGNOSTICS>) and returns the
+undefined value.
+
 C<inflate> was added in version 0.16.
 
 =head2 deflate_raw
 
+    my $zipped = deflate_raw ($plain);
+
 This is similar to L</deflate>, except that it doesn't write check sum
-value in the data. The output is incompatible with L</inflate> and
-L</gunzip>, and must be inflated with L</inflate_raw>.
+values in the data. The output is incompatible with L</inflate> and
+L</gunzip>, and must be inflated with L</inflate_raw>. See L</raw
+deflate format> for details.
+
+If the input value C<$plain> is the undefined value or an empty
+string, it prints a warning (see L</DIAGNOSTICS>) and returns the
+undefined value.
 
 C<deflate_raw> was added in version 0.16.
 
 =head2 inflate_raw
 
+    my $plain = inflate_raw ($zipped);
+
 This inflates data output by L</deflate_raw>. It won't work on the
-output of L</gzip> and L</deflate>. It prints a warning and returns
-the undefined value if its input is the undefined value or an empty
-string. It throws a fatal error if its input is not in the deflate
-format.
+output of L</gzip> and L</deflate>. See L</raw
+deflate format> for details.
+
+If the input value C<$zipped> is the undefined value or an empty
+string, it prints a warning (see L</DIAGNOSTICS>) and returns the
+undefined value. 
+It throws a fatal error if its input is not in the deflate format.
 
 C<inflate_raw> was added in version 0.16.
 
 =head1 METHODS
 
-This section describes the object-oriented interface of Gzip::Faster.
+This section describes the object-oriented interface of Gzip::Faster,
+which offers closer control over various options for compression.
 
 
 
@@ -212,6 +239,10 @@ C<new> was added in version 0.16.
 Compress C<$plain>. The type of compression can be set with L</gzip>
 and L</raw>.
 
+If the input value C<$plain> is the undefined value or an empty
+string, it prints a warning (see L</DIAGNOSTICS>) and returns the
+undefined value. 
+
 C<zip> was added in version 0.16.
 
 =head2 unzip
@@ -220,6 +251,10 @@ C<zip> was added in version 0.16.
 
 Uncompress C<$zipped>. The type of uncompression can be set with
 L</gzip> and L</raw>.
+
+If the input value C<$zipped> is the undefined value or an empty
+string, it prints a warning (see L</DIAGNOSTICS>) and returns the
+undefined value. 
 
 C<unzip> was added in version 0.16.
 
@@ -281,11 +316,18 @@ produces output
     Got back file name blash.gz
 
 
-(This example is included as L<F<file-name.pl>|https://fastapi.metacpan.org/source/BKB/Gzip-Faster-0.21/examples/file-name.pl> in the distribution.)
+(This example is included as L<F<file-name.pl>|https://fastapi.metacpan.org/source/BKB/Gzip-Faster-0.22/examples/file-name.pl> in the distribution.)
 
 
-The module currently has a hard-coded limit of 1024 bytes as the
-maximum length of file name it can read back.
+A potential problem is that Gzip::Faster has a hard-coded limit of
+1024 bytes as the maximum length of file name it can read back. This
+is because a length of some kind is required by zlib, and there is no
+sensible way to negotiate the required length with zlib. Please
+inspect the source code of F<inflate.c> in zlib (line 786 in zlib
+version 1.2.11) for confirmation. If you need longer file names, alter
+the value of the macro C<GF_FILE_NAME_MAX> in the file
+F<gzip-faster-perl.c> in the top level of the distribution and
+recompile the module.
 
 C<file_name> was added in version 0.16.
 
@@ -366,10 +408,10 @@ about six times faster.
 
 The versions used in this test are as follows:
 
-    $IO::Compress::Gzip::VERSION = 2.069
-    $IO::Uncompress::Gunzip::VERSION = 2.069
-    $Compress::Raw::Zlib::VERSION = 2.069
-    $Gzip::Faster::VERSION = 0.19
+    $IO::Compress::Gzip::VERSION = 2.074
+    $IO::Uncompress::Gunzip::VERSION = 2.074
+    $Compress::Raw::Zlib::VERSION = 2.076
+    $Gzip::Faster::VERSION = '0.21'
 
 
 The size after compression is as follows:
@@ -384,37 +426,37 @@ Here is a comparison of load times:
 
     
                 Rate Load IOUG Load IOCG  Load CRZ   Load GF
-    Load IOUG 25.3/s        --       -4%      -66%      -77%
-    Load IOCG 26.5/s        5%        --      -65%      -76%
-    Load CRZ  75.1/s      197%      184%        --      -31%
-    Load GF    109/s      330%      311%       45%        --
+    Load IOUG 25.2/s        --       -5%      -66%      -77%
+    Load IOCG 26.4/s        5%        --      -65%      -76%
+    Load CRZ  74.5/s      196%      182%        --      -31%
+    Load GF    108/s      329%      310%       45%        --
 
 
 Here is a comparison of a round-trip:
 
     
                            Rate IO::Compress::Gzip Compress::Raw::Zlib  Gzip::Faster
-    IO::Compress::Gzip   1309/s                 --                -66%          -90%
-    Compress::Raw::Zlib  3888/s               197%                  --          -70%
-    Gzip::Faster        12929/s               888%                233%            --
+    IO::Compress::Gzip   1307/s                 --                -66%          -90%
+    Compress::Raw::Zlib  3881/s               197%                  --          -70%
+    Gzip::Faster        12982/s               893%                234%            --
 
 
 Here is a comparison of gzip (compression) only:
 
     
                                     Rate IO::Compress::Gzip Compress::Raw::Zlib::Deflate Gzip::Faster
-    IO::Compress::Gzip            2567/s                 --                         -60%         -86%
-    Compress::Raw::Zlib::Deflate  6491/s               153%                           --         -65%
-    Gzip::Faster                 18338/s               614%                         183%           --
+    IO::Compress::Gzip            2576/s                 --                         -60%         -86%
+    Compress::Raw::Zlib::Deflate  6491/s               152%                           --         -65%
+    Gzip::Faster                 18338/s               612%                         183%           --
 
 
 Here is a comparison of gunzip (decompression) only:
 
     
                                     Rate IO::Uncompress::Gunzip Compress::Raw::Zlib::Inflate Gzip::Faster
-    IO::Uncompress::Gunzip        2818/s                     --                         -74%         -96%
-    Compress::Raw::Zlib::Inflate 10997/s                   290%                           --         -84%
-    Gzip::Faster                 69565/s                  2368%                         533%           --
+    IO::Uncompress::Gunzip        2831/s                     --                         -74%         -96%
+    Compress::Raw::Zlib::Inflate 10922/s                   286%                           --         -84%
+    Gzip::Faster                 70330/s                  2385%                         544%           --
 
 
 =head2 Long text
@@ -447,27 +489,27 @@ Here is a comparison of a round-trip:
 
     
                           Rate IO::Compress::Gzip Compress::Raw::Zlib   Gzip::Faster
-    IO::Compress::Gzip  4.43/s                 --                 -3%            -8%
-    Compress::Raw::Zlib 4.57/s                 3%                  --            -5%
-    Gzip::Faster        4.81/s                 9%                  5%             --
+    IO::Compress::Gzip  4.40/s                 --                 -3%            -8%
+    Compress::Raw::Zlib 4.53/s                 3%                  --            -6%
+    Gzip::Faster        4.81/s                 9%                  6%             --
 
 
 Here is a comparison of gzip (compression) only:
 
     
                                    Rate IO::Compress::Gzip Compress::Raw::Zlib::Deflate Gzip::Faster
-    IO::Compress::Gzip           5.04/s                 --                           0%          -6%
-    Compress::Raw::Zlib::Deflate 5.04/s                 0%                           --          -6%
-    Gzip::Faster                 5.36/s                 6%                           6%           --
+    IO::Compress::Gzip           5.00/s                 --                          -1%          -7%
+    Compress::Raw::Zlib::Deflate 5.03/s                 1%                           --          -6%
+    Gzip::Faster                 5.36/s                 7%                           7%           --
 
 
 Here is a comparison of gunzip (decompression) only:
 
     
                                    Rate IO::Uncompress::Gunzip Compress::Raw::Zlib::Inflate Gzip::Faster
-    IO::Uncompress::Gunzip       36.8/s                     --                         -18%         -20%
-    Compress::Raw::Zlib::Inflate 45.1/s                    23%                           --          -1%
-    Gzip::Faster                 45.7/s                    24%                           1%           --
+    IO::Uncompress::Gunzip       36.8/s                     --                         -20%         -20%
+    Compress::Raw::Zlib::Inflate 45.7/s                    24%                           --          -1%
+    Gzip::Faster                 46.0/s                    25%                           1%           --
 
 
 For longer files, Gzip::Faster is not much faster. The underlying
@@ -483,6 +525,18 @@ actually smaller than the input.
 In L</copy_perl_flags>, only the utf8 flag is implemented. Possible
 other things which could be implemented are the read-only and the
 taint flags.
+
+As of version 0.22, there is no way to read or write the
+OS, comment, or text fields of the gzip header. The "extra" field of
+the gzip header is co-opted by L</copy_perl_flags>. There is no way to
+set the value of the parameter C<memLevel> which controls how much
+memory the compression routines like L</gzip> use.
+
+Gzip::Faster does not offer incremental compression or
+decompression, so it's not suitable for reading and writing very long
+streams of data. Some of the other Perl modules listed in
+L</Alternatives> offer these if you require them. See also
+L</PERFORMANCE>.
 
 =head2 Browser bugs and Gzip::Faster
 
@@ -579,7 +633,7 @@ and F<lib/Gzip/Faster.pm> in the distribution.
 =head1 INSTALLATION
 
 Installation follows standard Perl methods. Detailed instructions can
-be found in the file L<F<README>|https://fastapi.metacpan.org/source/BKB/Gzip-Faster-0.21/README> in the distribution. The
+be found in the file L<F<README>|https://fastapi.metacpan.org/source/BKB/Gzip-Faster-0.22/README> in the distribution. The
 following are some extra notes for people who get stuck.
 
 Gzip::Faster requires the compression library L</zlib> (also called
@@ -770,15 +824,15 @@ produces output
     #  ###### #          ##########
 
 
-(This example is included as L<F<inflate.pl>|https://fastapi.metacpan.org/source/BKB/Gzip-Faster-0.21/examples/inflate.pl> in the distribution.)
+(This example is included as L<F<inflate.pl>|https://fastapi.metacpan.org/source/BKB/Gzip-Faster-0.22/examples/inflate.pl> in the distribution.)
 
 
 =back
 
 =head1 GLOSSARY
 
-This section describes some of the terminology of the Gzip compression
-system.
+This section explains some of the terminology of the Gzip/zlib
+compression system.
 
 =over
 
@@ -852,12 +906,12 @@ PNG> use material taken from L<Image::PNG::Write::BW> by Andrea Nall
 
 =head1 AUTHOR
 
-Ben Bullock, <bkb@cpan.org>
+Ben Bullock, <benkasminbullock@gmail.com>
 
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2014-2017
+2014-2025
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

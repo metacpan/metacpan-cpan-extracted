@@ -30,9 +30,9 @@ SV * gunzip (zipped)
 PREINIT:
 	gzip_faster_t gz;
 CODE:
+	gz.in = zipped;
 	gz.is_gzip = 1;
 	gz.is_raw = 0;
-	gz.in = zipped;
 	gz.user_object = 0;
 	RETVAL = gunzip_faster (& gz);
 OUTPUT:
@@ -56,9 +56,9 @@ SV * inflate (deflated)
 PREINIT:
 	gzip_faster_t gz;
 CODE:
+	gz.in = deflated;
 	gz.is_gzip = 0;
 	gz.is_raw = 0;
-	gz.in = deflated;
 	gz.user_object = 0;
 	RETVAL = gunzip_faster (& gz);
 OUTPUT:
@@ -107,7 +107,8 @@ DESTROY (gf)
 	Gzip::Faster gf
 CODE:
 	if (! gf->user_object) {
-		croak ("THIS IS NOT A USER-VISIBLE OBJECT");
+		croak ("%s:%d: THIS IS NOT A USER-VISIBLE OBJECT",
+		       __FILE__, __LINE__);
 	}
 	gf_delete_file_name (gf);
         gf_delete_mod_time (gf);

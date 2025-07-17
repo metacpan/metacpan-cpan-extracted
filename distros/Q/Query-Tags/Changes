@@ -1,5 +1,9 @@
 Revision history for perl module Query::Tags
 
+0.0.3 2025-07-16
+
+ - Support truthiness check with C<:key?> syntax
+
 0.0.2 2025-07-08
 
  - Added missing support for B<default_key> option.

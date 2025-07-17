@@ -36,12 +36,12 @@ SV * scalarmult_keygen(SV * flags = &PL_sv_undef)
 
   PREINIT:
   protmem *new_pm;
-  unsigned int new_flags;
+  unsigned int new_flags = g_protmem_flags_key_default;
 
   CODE:
-  new_flags = g_protmem_flags_key_default;
+  SvGETMAGIC(flags);
   if (SvOK(flags))
-    new_flags = SvUV(flags);
+    new_flags = SvUV_nomg(flags);
 
   switch(ix) {
     case 1:
@@ -203,8 +203,9 @@ SV * scalarmult(SV * sk, SV * pk, SV * flags = &PL_sv_undef)
       sk_req_len = crypto_scalarmult_SCALARBYTES;
       ss_len = crypto_scalarmult_BYTES;
   }
+  SvGETMAGIC(flags);
   if (SvOK(flags))
-    sk_flags = SvUV(flags);
+    sk_flags = SvUV_nomg(flags);
 
   if (sv_derived_from(sk, MEMVAULT_CLASS)) {
     sk_pm = protmem_get(aTHX_ sk, MEMVAULT_CLASS);

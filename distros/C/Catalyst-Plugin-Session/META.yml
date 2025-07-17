@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.74, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,9 +19,11 @@ no_index:
   directory:
     - t
     - xt
+recommends:
+  Crypt::SysRandom::XS: '0.009'
 requires:
   Catalyst::Runtime: '5.71001'
-  Digest: '0'
+  Crypt::SysRandom: '0.007'
   File::Spec: '0'
   File::Temp: '0'
   HTML::Entities: '0'
@@ -37,8 +39,8 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Catalyst-Plugin-Session
   license: http://dev.perl.org/licenses/
   repository: https://github.com/perl-catalyst/Catalyst-Plugin-Session.git
-version: '0.43'
+version: '0.44'
 x_breaks:
   Catalyst::Plugin::Session::State::Cookie: '< 0.03'
   Catalyst::Plugin::Session::State::URI: '< 0.02'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

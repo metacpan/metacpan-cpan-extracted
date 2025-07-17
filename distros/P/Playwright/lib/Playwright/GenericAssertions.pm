@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::GenericAssertions;
-$Playwright::GenericAssertions::VERSION = '1.531';
+$Playwright::GenericAssertions::VERSION = '1.532';
 use parent 'Playwright::Base';
 
 sub new {
@@ -22,31 +22,21 @@ sub spec {
     return $Playwright::spec->{'GenericAssertions'}{members};
 }
 
-sub toBeGreaterThanOrEqual {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'toBeGreaterThanOrEqual',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub objectContaining {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'objectContaining',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
 sub toHaveProperty {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
         command => 'toHaveProperty',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub toBeGreaterThan {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'toBeGreaterThan',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -62,41 +52,21 @@ sub anything {
     );
 }
 
-sub stringMatching {
+sub toThrowError {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'stringMatching',
+        command => 'toThrowError',
         object  => $self->{guid},
         type    => $self->{type}
     );
 }
 
-sub toMatchObject {
+sub toBeGreaterThanOrEqual {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'toMatchObject',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub toBeDefined {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'toBeDefined',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub toBeInstanceOf {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'toBeInstanceOf',
+        command => 'toBeGreaterThanOrEqual',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -112,11 +82,71 @@ sub toBeNaN {
     );
 }
 
-sub toBeFalsy {
+sub toBeInstanceOf {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'toBeFalsy',
+        command => 'toBeInstanceOf',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub toBe {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'toBe',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub toContain {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'toContain',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub toEqual {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'toEqual',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub stringMatching {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'stringMatching',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub toBeNull {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'toBeNull',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub any {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'any',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -142,161 +172,11 @@ sub toBeCloseTo {
     );
 }
 
-sub toBeUndefined {
+sub objectContaining {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'toBeUndefined',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub toHaveLength {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'toHaveLength',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub toEqual {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'toEqual',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub arrayContaining {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'arrayContaining',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub toContain {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'toContain',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub toBeLessThanOrEqual {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'toBeLessThanOrEqual',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub toBeGreaterThan {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'toBeGreaterThan',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub any {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'any',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub toMatch {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'toMatch',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub toBeNull {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'toBeNull',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub toBeTruthy {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'toBeTruthy',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub toThrowError {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'toThrowError',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub toContainEqual {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'toContainEqual',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub toStrictEqual {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'toStrictEqual',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub not {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'not',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub toThrow {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'toThrow',
+        command => 'objectContaining',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -312,11 +192,101 @@ sub toBeLessThan {
     );
 }
 
-sub toBe {
+sub toBeDefined {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'toBe',
+        command => 'toBeDefined',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub arrayContaining {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'arrayContaining',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub toHaveLength {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'toHaveLength',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub toThrow {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'toThrow',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub toBeTruthy {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'toBeTruthy',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub toContainEqual {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'toContainEqual',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub toBeFalsy {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'toBeFalsy',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub toBeUndefined {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'toBeUndefined',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub toMatch {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'toMatch',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub toBeLessThanOrEqual {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'toBeLessThanOrEqual',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -327,6 +297,36 @@ sub stringContaining {
     return $self->_api_request(
         args    => [@_],
         command => 'stringContaining',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub toMatchObject {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'toMatchObject',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub not {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'not',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub toStrictEqual {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'toStrictEqual',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -376,7 +376,7 @@ Playwright::GenericAssertions - Automatically generated class for Playwright::Ge
 
 =head1 VERSION
 
-version 1.531
+version 1.532
 
 =head1 CONSTRUCTOR
 
@@ -387,23 +387,17 @@ Instead it should be returned to you as the result of calls on Playwright object
 
 =head1 METHODS
 
-=head2 toBeGreaterThanOrEqual(@args)
-
-Execute the GenericAssertions::toBeGreaterThanOrEqual playwright routine.
-
-See L<https://playwright.dev/docs/api/class-GenericAssertions#GenericAssertions-toBeGreaterThanOrEqual> for more information.
-
-=head2 objectContaining(@args)
-
-Execute the GenericAssertions::objectContaining playwright routine.
-
-See L<https://playwright.dev/docs/api/class-GenericAssertions#GenericAssertions-objectContaining> for more information.
-
 =head2 toHaveProperty(@args)
 
 Execute the GenericAssertions::toHaveProperty playwright routine.
 
 See L<https://playwright.dev/docs/api/class-GenericAssertions#GenericAssertions-toHaveProperty> for more information.
+
+=head2 toBeGreaterThan(@args)
+
+Execute the GenericAssertions::toBeGreaterThan playwright routine.
+
+See L<https://playwright.dev/docs/api/class-GenericAssertions#GenericAssertions-toBeGreaterThan> for more information.
 
 =head2 anything(@args)
 
@@ -411,29 +405,17 @@ Execute the GenericAssertions::anything playwright routine.
 
 See L<https://playwright.dev/docs/api/class-GenericAssertions#GenericAssertions-anything> for more information.
 
-=head2 stringMatching(@args)
+=head2 toThrowError(@args)
 
-Execute the GenericAssertions::stringMatching playwright routine.
+Execute the GenericAssertions::toThrowError playwright routine.
 
-See L<https://playwright.dev/docs/api/class-GenericAssertions#GenericAssertions-stringMatching> for more information.
+See L<https://playwright.dev/docs/api/class-GenericAssertions#GenericAssertions-toThrowError> for more information.
 
-=head2 toMatchObject(@args)
+=head2 toBeGreaterThanOrEqual(@args)
 
-Execute the GenericAssertions::toMatchObject playwright routine.
+Execute the GenericAssertions::toBeGreaterThanOrEqual playwright routine.
 
-See L<https://playwright.dev/docs/api/class-GenericAssertions#GenericAssertions-toMatchObject> for more information.
-
-=head2 toBeDefined(@args)
-
-Execute the GenericAssertions::toBeDefined playwright routine.
-
-See L<https://playwright.dev/docs/api/class-GenericAssertions#GenericAssertions-toBeDefined> for more information.
-
-=head2 toBeInstanceOf(@args)
-
-Execute the GenericAssertions::toBeInstanceOf playwright routine.
-
-See L<https://playwright.dev/docs/api/class-GenericAssertions#GenericAssertions-toBeInstanceOf> for more information.
+See L<https://playwright.dev/docs/api/class-GenericAssertions#GenericAssertions-toBeGreaterThanOrEqual> for more information.
 
 =head2 toBeNaN(@args)
 
@@ -441,11 +423,47 @@ Execute the GenericAssertions::toBeNaN playwright routine.
 
 See L<https://playwright.dev/docs/api/class-GenericAssertions#GenericAssertions-toBeNaN> for more information.
 
-=head2 toBeFalsy(@args)
+=head2 toBeInstanceOf(@args)
 
-Execute the GenericAssertions::toBeFalsy playwright routine.
+Execute the GenericAssertions::toBeInstanceOf playwright routine.
 
-See L<https://playwright.dev/docs/api/class-GenericAssertions#GenericAssertions-toBeFalsy> for more information.
+See L<https://playwright.dev/docs/api/class-GenericAssertions#GenericAssertions-toBeInstanceOf> for more information.
+
+=head2 toBe(@args)
+
+Execute the GenericAssertions::toBe playwright routine.
+
+See L<https://playwright.dev/docs/api/class-GenericAssertions#GenericAssertions-toBe> for more information.
+
+=head2 toContain(@args)
+
+Execute the GenericAssertions::toContain playwright routine.
+
+See L<https://playwright.dev/docs/api/class-GenericAssertions#GenericAssertions-toContain> for more information.
+
+=head2 toEqual(@args)
+
+Execute the GenericAssertions::toEqual playwright routine.
+
+See L<https://playwright.dev/docs/api/class-GenericAssertions#GenericAssertions-toEqual> for more information.
+
+=head2 stringMatching(@args)
+
+Execute the GenericAssertions::stringMatching playwright routine.
+
+See L<https://playwright.dev/docs/api/class-GenericAssertions#GenericAssertions-stringMatching> for more information.
+
+=head2 toBeNull(@args)
+
+Execute the GenericAssertions::toBeNull playwright routine.
+
+See L<https://playwright.dev/docs/api/class-GenericAssertions#GenericAssertions-toBeNull> for more information.
+
+=head2 any(@args)
+
+Execute the GenericAssertions::any playwright routine.
+
+See L<https://playwright.dev/docs/api/class-GenericAssertions#GenericAssertions-any> for more information.
 
 =head2 closeTo(@args)
 
@@ -459,101 +477,11 @@ Execute the GenericAssertions::toBeCloseTo playwright routine.
 
 See L<https://playwright.dev/docs/api/class-GenericAssertions#GenericAssertions-toBeCloseTo> for more information.
 
-=head2 toBeUndefined(@args)
+=head2 objectContaining(@args)
 
-Execute the GenericAssertions::toBeUndefined playwright routine.
+Execute the GenericAssertions::objectContaining playwright routine.
 
-See L<https://playwright.dev/docs/api/class-GenericAssertions#GenericAssertions-toBeUndefined> for more information.
-
-=head2 toHaveLength(@args)
-
-Execute the GenericAssertions::toHaveLength playwright routine.
-
-See L<https://playwright.dev/docs/api/class-GenericAssertions#GenericAssertions-toHaveLength> for more information.
-
-=head2 toEqual(@args)
-
-Execute the GenericAssertions::toEqual playwright routine.
-
-See L<https://playwright.dev/docs/api/class-GenericAssertions#GenericAssertions-toEqual> for more information.
-
-=head2 arrayContaining(@args)
-
-Execute the GenericAssertions::arrayContaining playwright routine.
-
-See L<https://playwright.dev/docs/api/class-GenericAssertions#GenericAssertions-arrayContaining> for more information.
-
-=head2 toContain(@args)
-
-Execute the GenericAssertions::toContain playwright routine.
-
-See L<https://playwright.dev/docs/api/class-GenericAssertions#GenericAssertions-toContain> for more information.
-
-=head2 toBeLessThanOrEqual(@args)
-
-Execute the GenericAssertions::toBeLessThanOrEqual playwright routine.
-
-See L<https://playwright.dev/docs/api/class-GenericAssertions#GenericAssertions-toBeLessThanOrEqual> for more information.
-
-=head2 toBeGreaterThan(@args)
-
-Execute the GenericAssertions::toBeGreaterThan playwright routine.
-
-See L<https://playwright.dev/docs/api/class-GenericAssertions#GenericAssertions-toBeGreaterThan> for more information.
-
-=head2 any(@args)
-
-Execute the GenericAssertions::any playwright routine.
-
-See L<https://playwright.dev/docs/api/class-GenericAssertions#GenericAssertions-any> for more information.
-
-=head2 toMatch(@args)
-
-Execute the GenericAssertions::toMatch playwright routine.
-
-See L<https://playwright.dev/docs/api/class-GenericAssertions#GenericAssertions-toMatch> for more information.
-
-=head2 toBeNull(@args)
-
-Execute the GenericAssertions::toBeNull playwright routine.
-
-See L<https://playwright.dev/docs/api/class-GenericAssertions#GenericAssertions-toBeNull> for more information.
-
-=head2 toBeTruthy(@args)
-
-Execute the GenericAssertions::toBeTruthy playwright routine.
-
-See L<https://playwright.dev/docs/api/class-GenericAssertions#GenericAssertions-toBeTruthy> for more information.
-
-=head2 toThrowError(@args)
-
-Execute the GenericAssertions::toThrowError playwright routine.
-
-See L<https://playwright.dev/docs/api/class-GenericAssertions#GenericAssertions-toThrowError> for more information.
-
-=head2 toContainEqual(@args)
-
-Execute the GenericAssertions::toContainEqual playwright routine.
-
-See L<https://playwright.dev/docs/api/class-GenericAssertions#GenericAssertions-toContainEqual> for more information.
-
-=head2 toStrictEqual(@args)
-
-Execute the GenericAssertions::toStrictEqual playwright routine.
-
-See L<https://playwright.dev/docs/api/class-GenericAssertions#GenericAssertions-toStrictEqual> for more information.
-
-=head2 not(@args)
-
-Execute the GenericAssertions::not playwright routine.
-
-See L<https://playwright.dev/docs/api/class-GenericAssertions#GenericAssertions-not> for more information.
-
-=head2 toThrow(@args)
-
-Execute the GenericAssertions::toThrow playwright routine.
-
-See L<https://playwright.dev/docs/api/class-GenericAssertions#GenericAssertions-toThrow> for more information.
+See L<https://playwright.dev/docs/api/class-GenericAssertions#GenericAssertions-objectContaining> for more information.
 
 =head2 toBeLessThan(@args)
 
@@ -561,17 +489,89 @@ Execute the GenericAssertions::toBeLessThan playwright routine.
 
 See L<https://playwright.dev/docs/api/class-GenericAssertions#GenericAssertions-toBeLessThan> for more information.
 
-=head2 toBe(@args)
+=head2 toBeDefined(@args)
 
-Execute the GenericAssertions::toBe playwright routine.
+Execute the GenericAssertions::toBeDefined playwright routine.
 
-See L<https://playwright.dev/docs/api/class-GenericAssertions#GenericAssertions-toBe> for more information.
+See L<https://playwright.dev/docs/api/class-GenericAssertions#GenericAssertions-toBeDefined> for more information.
+
+=head2 arrayContaining(@args)
+
+Execute the GenericAssertions::arrayContaining playwright routine.
+
+See L<https://playwright.dev/docs/api/class-GenericAssertions#GenericAssertions-arrayContaining> for more information.
+
+=head2 toHaveLength(@args)
+
+Execute the GenericAssertions::toHaveLength playwright routine.
+
+See L<https://playwright.dev/docs/api/class-GenericAssertions#GenericAssertions-toHaveLength> for more information.
+
+=head2 toThrow(@args)
+
+Execute the GenericAssertions::toThrow playwright routine.
+
+See L<https://playwright.dev/docs/api/class-GenericAssertions#GenericAssertions-toThrow> for more information.
+
+=head2 toBeTruthy(@args)
+
+Execute the GenericAssertions::toBeTruthy playwright routine.
+
+See L<https://playwright.dev/docs/api/class-GenericAssertions#GenericAssertions-toBeTruthy> for more information.
+
+=head2 toContainEqual(@args)
+
+Execute the GenericAssertions::toContainEqual playwright routine.
+
+See L<https://playwright.dev/docs/api/class-GenericAssertions#GenericAssertions-toContainEqual> for more information.
+
+=head2 toBeFalsy(@args)
+
+Execute the GenericAssertions::toBeFalsy playwright routine.
+
+See L<https://playwright.dev/docs/api/class-GenericAssertions#GenericAssertions-toBeFalsy> for more information.
+
+=head2 toBeUndefined(@args)
+
+Execute the GenericAssertions::toBeUndefined playwright routine.
+
+See L<https://playwright.dev/docs/api/class-GenericAssertions#GenericAssertions-toBeUndefined> for more information.
+
+=head2 toMatch(@args)
+
+Execute the GenericAssertions::toMatch playwright routine.
+
+See L<https://playwright.dev/docs/api/class-GenericAssertions#GenericAssertions-toMatch> for more information.
+
+=head2 toBeLessThanOrEqual(@args)
+
+Execute the GenericAssertions::toBeLessThanOrEqual playwright routine.
+
+See L<https://playwright.dev/docs/api/class-GenericAssertions#GenericAssertions-toBeLessThanOrEqual> for more information.
 
 =head2 stringContaining(@args)
 
 Execute the GenericAssertions::stringContaining playwright routine.
 
 See L<https://playwright.dev/docs/api/class-GenericAssertions#GenericAssertions-stringContaining> for more information.
+
+=head2 toMatchObject(@args)
+
+Execute the GenericAssertions::toMatchObject playwright routine.
+
+See L<https://playwright.dev/docs/api/class-GenericAssertions#GenericAssertions-toMatchObject> for more information.
+
+=head2 not(@args)
+
+Execute the GenericAssertions::not playwright routine.
+
+See L<https://playwright.dev/docs/api/class-GenericAssertions#GenericAssertions-not> for more information.
+
+=head2 toStrictEqual(@args)
+
+Execute the GenericAssertions::toStrictEqual playwright routine.
+
+See L<https://playwright.dev/docs/api/class-GenericAssertions#GenericAssertions-toStrictEqual> for more information.
 
 =head2 on(@args)
 

@@ -13,9 +13,9 @@ TROUBLESHOOTING
   You Have To Run From The Console
 
     A console window doesn't count as "the console".  You cannot use this
-    module from within X-Windows.  It won't work, and likely will only go into
-    emulation mode if you do, or maybe crash, or even corrupt your X-Windows
-    screen.
+    module from within X-Windows/Wayland.  It won't work, and likely will only
+	go into emulation mode if you do, or maybe crash, or even corrupt your
+	X-Windows screen.
 
     If you want to run your program within X-Windows, then you have the wrong
     module.  Use SDL, QT, or GTK or something similar.
@@ -127,7 +127,7 @@ TROUBLESHOOTING
     then go install the package version, in that order.  You may also install
     "libfreetype6-dev" and then re-install Imager via CPAN with a forced
     install.  If you don't want the package version but still want the CPAN
-    version, then still uninstall what is there, then go an make sure the
+    version, then still uninstall what is there, then go and make sure the
     TrueType and FreeType development libraries are installed on your system,
     along with PNG, JPEG, and GIF development libraries.  Now you can go to
     CPAN and install Imager.
@@ -169,7 +169,7 @@ TROUBLESHOOTING
     average coder, but the option is there.
 
     Plain and simple, your device just may be too slow for some CPU intensive
-    operations, specifically anything involving animated images and heaviy
+    operations, specifically anything involving animated images and heavy
     blitting.  If you must use images, then make sure they are already the
     right size for your needs.  Don't force the module to resize them when
     loading, as this takes CPU time.
@@ -183,7 +183,7 @@ TROUBLESHOOTING
        perl dump.pl
 
     Please include the dump file it creates (dump.log) as an attachment to
-    your email.  Please do not include it inline as part of the message
+    your email.  Please do NOT include it inline as part of the message
     text.
 
     Also, please include a copy of your code (or at least the portion of it

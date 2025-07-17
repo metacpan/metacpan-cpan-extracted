@@ -12,7 +12,7 @@ Query::Tags - Raku-inspired query language for attributes
 
 ## VERSION
 
-This document describes v0.0.2 of Query::Tags.
+This document describes v0.0.3 of Query::Tags.
 
 # DESCRIPTION
 
@@ -136,6 +136,9 @@ language.
     directly after the key. E.g., `:key'value'` (for a string value),
     `:key/value/` (for a regex value) or `:key&<value1 value2>` (for a
     junction value). The value is optional.
+
+    If instead of a value, the question mark character `?` appears, the
+    _key_ field must exist and its value must be truthy.
 
 - Quoted string
 

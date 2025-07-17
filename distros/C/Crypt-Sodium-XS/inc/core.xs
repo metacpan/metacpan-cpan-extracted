@@ -290,8 +290,9 @@ SV * ed25519_scalar_add(SV * x, SV * y, SV * flags = &PL_sv_undef)
       y_req_len = crypto_core_ed25519_SCALARBYTES;
   }
   new_flags = g_protmem_flags_key_default;
+  SvGETMAGIC(flags);
   if (SvOK(flags))
-    new_flags = SvUV(flags);
+    new_flags = SvUV_nomg(flags);
 
   if (sv_derived_from(x, MEMVAULT_CLASS)) {
     x_pm = protmem_get(aTHX_ x, MEMVAULT_CLASS);
@@ -398,8 +399,9 @@ SV * ed25519_scalar_complement(SV * s, SV * flags = &PL_sv_undef)
       s_req_len = crypto_core_ed25519_SCALARBYTES;
   }
   new_flags = g_protmem_flags_key_default;
+  SvGETMAGIC(flags);
   if (SvOK(flags))
-    new_flags = SvUV(flags);
+    new_flags = SvUV_nomg(flags);
 
   if (sv_derived_from(s, MEMVAULT_CLASS)) {
     s_pm = protmem_get(aTHX_ s, MEMVAULT_CLASS);
@@ -467,7 +469,7 @@ SV * ed25519_scalar_random(SV * flags = &PL_sv_undef)
 
   PREINIT:
   protmem *new_pm;
-  unsigned int new_flags;
+  unsigned int new_flags = g_protmem_flags_key_default;
   STRLEN new_len;
 
   CODE:
@@ -478,9 +480,9 @@ SV * ed25519_scalar_random(SV * flags = &PL_sv_undef)
     default:
       new_len = crypto_core_ed25519_SCALARBYTES;
   }
-  new_flags = g_protmem_flags_key_default;
+  SvGETMAGIC(flags);
   if (SvOK(flags))
-    new_flags = SvUV(flags);
+    new_flags = SvUV_nomg(flags);
   new_pm = protmem_init(aTHX_ new_len, new_flags);
   switch(ix) {
     case 1:
@@ -514,7 +516,7 @@ SV * hchacha20( \
   STRLEN cnst_len;
   STRLEN key_len;
   STRLEN input_len;
-  unsigned int new_key_flags;
+  unsigned int new_key_flags = g_protmem_flags_key_default;
 
   CODE:
   if (sv_derived_from(key, MEMVAULT_CLASS)) {
@@ -531,15 +533,17 @@ SV * hchacha20( \
   if (input_len != crypto_core_hchacha20_INPUTBYTES)
     croak("hchacha20: Invalid input length");
 
+  SvGETMAGIC(cnst);
   if (SvOK(cnst)) {
-    cnst_buf = (unsigned char *)SvPVbyte(cnst, cnst_len);
+    cnst_buf = (unsigned char *)SvPVbyte_nomg(cnst, cnst_len);
     if (cnst_len != crypto_core_hchacha20_CONSTBYTES)
       croak("hchacha20: Invalid constant length");
   }
 
   new_key_flags = g_protmem_flags_key_default;
+  SvGETMAGIC(flags);
   if (SvOK(flags))
-    new_key_flags = SvUV(flags);
+    new_key_flags = SvUV_nomg(flags);
 
   new_key_pm = protmem_init(aTHX_ crypto_core_hchacha20_OUTPUTBYTES, new_key_flags);
   if (new_key_pm == NULL)

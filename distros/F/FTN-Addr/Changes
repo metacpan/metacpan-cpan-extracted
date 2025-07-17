@@ -14,7 +14,15 @@ Revision history for Perl module FTN-Addr
 20160302  2016-03-02 00:58:05-05:00 America/New_York
     Enforce frl-1028.002 ( domain only with characters 'a' .. 'z', '0' .. '9', '-', '_', '~' ).
     Support for point equal -1.
-    's5', 'f5' and 'fqfa' methods didn't work on calls after first one.
+    's5', 'f5' and 'fqfa' methods didn't work on calls after the first one.
 
 20160303  2016-03-03 00:32:18-05:00 America/New_York
     Fix typo making net field setter to work incorrectly.
+
+20250717  2025-07-17 03:34:24+00:00 UTC
+    IMPORTANT: constructor calls return a pair ( $ object, $error ) in list context
+    IMPORTANT: getters are only getters now (instead of turning into setters with argument)
+    IMPORTANT: setters return validation result instead of object
+    validation improvements
+    additional tests
+    documentation changes

@@ -197,8 +197,9 @@ SV * onetimeauth_init(SV *key, SV *flags = &PL_sv_undef)
   unsigned int state_flags = g_protmem_flags_key_default;
 
   CODE:
+  SvGETMAGIC(flags);
   if (SvOK(flags))
-    state_flags = SvUV(flags);
+    state_flags = SvUV_nomg(flags);
 
   if (sv_derived_from(key, MEMVAULT_CLASS)) {
     key_pm = protmem_get(aTHX_ key, MEMVAULT_CLASS);

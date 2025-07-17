@@ -265,7 +265,7 @@ SV * core_ed25519_scalar_add(SV * x, SV * y, SV * flags = &PL_sv_undef)
 
   PREINIT:
   protmem *new_pm, *x_pm = NULL, *y_pm = NULL;
-  unsigned int new_flags;
+  unsigned int new_flags = g_protmem_flags_key_default;
   STRLEN new_len, x_len, x_req_len, y_len, y_req_len;
   unsigned char *x_buf, *y_buf;
 
@@ -286,9 +286,9 @@ SV * core_ed25519_scalar_add(SV * x, SV * y, SV * flags = &PL_sv_undef)
       x_req_len = crypto_core_ed25519_SCALARBYTES;
       y_req_len = crypto_core_ed25519_SCALARBYTES;
   }
-  new_flags = g_protmem_flags_key_default;
+  SvGETMAGIC(flags);
   if (SvOK(flags))
-    new_flags = SvUV(flags);
+    new_flags = SvUV_nomg(flags);
 
   if (sv_derived_from(x, MEMVAULT_CLASS)) {
     x_pm = protmem_get(aTHX_ x, MEMVAULT_CLASS);
@@ -376,7 +376,7 @@ SV * core_ed25519_scalar_complement(SV * s, SV * flags = &PL_sv_undef)
 
   PREINIT:
   protmem *new_pm, *s_pm = NULL;
-  unsigned int new_flags;
+  unsigned int new_flags = g_protmem_flags_key_default;
   STRLEN new_len, s_len, s_req_len;
   unsigned char *s_buf;
 
@@ -394,7 +394,7 @@ SV * core_ed25519_scalar_complement(SV * s, SV * flags = &PL_sv_undef)
       new_len = crypto_core_ed25519_SCALARBYTES;
       s_req_len = crypto_core_ed25519_SCALARBYTES;
   }
-  new_flags = g_protmem_flags_key_default;
+  SvGETMAGIC(flags);
   if (SvOK(flags))
     new_flags = SvUV(flags);
 
@@ -464,7 +464,7 @@ SV * core_ed25519_scalar_random(SV * flags = &PL_sv_undef)
 
   PREINIT:
   protmem *new_pm;
-  unsigned int new_flags;
+  unsigned int new_flags = g_protmem_flags_key_default;
   STRLEN new_len;
 
   CODE:
@@ -475,7 +475,7 @@ SV * core_ed25519_scalar_random(SV * flags = &PL_sv_undef)
     default:
       new_len = crypto_core_ed25519_SCALARBYTES;
   }
-  new_flags = g_protmem_flags_key_default;
+  SvGETMAGIC(flags);
   if (SvOK(flags))
     new_flags = SvUV(flags);
   new_pm = protmem_init(aTHX_ new_len, new_flags);

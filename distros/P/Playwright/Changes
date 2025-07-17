@@ -1,5 +1,8 @@
 Revision history for Playwright
 
+1.532 2025-07-16 TEODESIAN
+    - Fix cookie functionality broken in prior release.  Patch by Keith Carangelo.
+
 1.531 2025-06-29 TEODESIAN
     - Fix Locator.all(), and likely other things returning arrays of playwright objects
 

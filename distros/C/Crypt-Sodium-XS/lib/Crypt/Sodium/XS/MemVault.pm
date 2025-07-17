@@ -17,8 +17,12 @@ use overload (
   '.=' => \&concat,
   cmp => \&compare,
   '<=>' => \&compare,
-  '^' => \&_overload_xor,
-  '^=' => \&xor,
+  '&' => \&bitwise_and,
+  '&=' => \&bitwise_and_equals,
+  '|' => \&bitwise_or,
+  '|=' => \&bitwise_or_equals,
+  '^' => \&bitwise_xor,
+  '^=' => \&bitwise_xor_equals,
 );
 
 1;
@@ -56,7 +60,7 @@ Crypt::Sodium::XS::MemVault - Protected memory objects
 
   $mv->unlock;
   my $mv2 = $mv->clone; # unlocked clone is unlocked
-  $mv2->xor("\x{1f}\x{0a}\x{1e}\x{00}\x{0b}");
+  $mv2->xor_equals("\x{1f}\x{0a}\x{1e}\x{00}\x{0b}");
   print "$mv, $mv2!\n";
   my $colon_idx = $mv->index('ll'); # 2
   my $unlocked_mv = $mv->clone;
@@ -138,6 +142,31 @@ The default for C<$flags> is
 L<Crypt::Sodium::XS::ProtMem/protmem_flags_memvault_default>.
 
 =head1 METHODS
+
+=head2 bitwise_and
+
+=head2 bitwise_and_equals
+
+=head2 bitwise_or
+
+=head2 bitwise_or_equals
+
+=head2 bitwise_xor
+
+=head2 bitwise_xor_equals
+
+  $mv2 = $mv->bitwise_and($bytes);
+  $mv2 = $mv->bitwise_or($other_mv);
+
+  $mv->bitwise_xor_equals($bytes);
+  $mv->bitwise_and_equals($other_mv);
+
+Modifies protected memory using the associated bitwise operation with the
+provided argument. The argument must be the same number of bytes in length as
+the protected memory.
+
+The C<*_equals> functions modify in-place. Other functions return a new
+L<Crypt::Sodium::XS::MemVault>.
 
 =head2 clone
 
@@ -247,6 +276,40 @@ otherwise.
 C<$length> is optional iif C<$mv> and C<$other_mv> (or C<$bytes>) are equal
 lengths. If provided, only C<$length> bytes are compared.
 
+=head2 pad
+
+=head2 unpad
+
+  my $padded_mv = $mv->pad(32);
+  my $unpadded_mv = $padded->unpad(32);
+
+Returns a new L<Crypt::Sodium::XS::MemVault> with the contents of C<$mv> padded
+or unpadded respectively, to the next multiple of C<$blocksize> bytes.
+
+These functions use the ISO/IEC 7816-4 padding algorithm. It supports arbitrary
+block sizes, ensures that the padding data are checked for computing the
+unpadded length, and is more resistant to some classes of attacks than other
+standard padding algorithms.
+
+Notes:
+
+=over 4
+
+Padding should be applied before encryption and removed after decryption.
+
+Usage of padding to hide the length of a password is not recommended. A client
+willing to send a password to a server should hash it instead, even with a
+single iteration of the hash function.
+
+This ensures that the length of the transmitted data is constant and that the
+server doesn’t effortlessly get a copy of the password.
+
+Applications may eventually leak the unpadded length via side channels, but the
+sodium_pad() and sodium_unpad() functions themselves try to minimize side
+channels for a given length & <block size mask> value.
+
+=back
+
 =head2 to_fd
 
   $mv->to_fd(fileno($fh));
@@ -297,20 +360,6 @@ L<Crypt::Sodium::XS::ProtMem/PROTMEM_FLAGS_MEMZERO_DISABLED> (or
 L<Crypt::Sodium::XS::ProtMem/PROTMEM_ALL_DISABLED>), the memory is zeroed when
 the object is destroyed.
 
-=head2 xor
-
-  $mv->xor($bytes);
-  $mv->xor($other_mv);
-
-Modifies protected memory using the exclusive-or operation with the provided
-argument. The argument must be the same number of bytes in length as the
-protected memory.
-
-B<NOTE>: Read carefully, this modifies in-place! It is much more performant
-this way. To instead return a new L<Crypt::Sodium::XS::MemVault> (without
-modifying the original), use the C<^> operator overload instead. An explicit
-method will be added in a future release.
-
 =head1 OVERLOADS
 
 =head2 boolean
@@ -355,7 +404,9 @@ Note: C<.=> is equivalent to L</concat>.
   my $new_mv = $bytes ^ $mv;
   my $new_mv = $mv ^ $other_mv;
 
-C<^=> is equivalent to L</xor>.
+C<^> is equivalent to L</bitwise_xor>.
+
+C<^=> is equivalent to L</bitwise_xor_equals>.
 
 =head1 FEEDBACK
 

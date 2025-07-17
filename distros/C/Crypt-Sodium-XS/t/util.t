@@ -79,4 +79,16 @@ is(sodium_hex2bin("666f6f626172"), "foobar", "sodium_bin2hex correct");
 is(sodium_hex2bin("666f6f626172:6666"), "foobar", "sodium_bin2hex stops parsing at invalid hex");
 is(sodium_hex2bin("666f6f6261726"), "", "sodium_bin2hex returns empty when unparsable");
 
+$x = sodium_pad("foobar", 16);
+is(unpack("H*", $x), "666f6f62617280000000000000000000", "sodium_pad foobar blocksize 16");
+$y = sodium_pad("foobar", 15);
+is(unpack("H*", $y), "666f6f626172800000000000000000", "sodium_pad foobar blocksize 15");
+my $z = sodium_pad("fooba", 3);
+is(unpack("H*", $z), "666f6f626180", "sodium_pad fooba blocksize 3");
+$z = sodium_pad("foobar", 3);
+is(unpack("H*", $z), "666f6f626172800000", "sodium_pad foobar blocksize 3");
+is(unpack("H*", sodium_unpad($x, 16)), "666f6f626172", "sodium_unpad foobar blocksize 16");
+is(unpack("H*", sodium_unpad($y, 15)), "666f6f626172", "sodium_unpad foobar blocksize 15");
+is(unpack("H*", sodium_unpad($z, 3)), "666f6f626172", "sodium_unpad foobar blocksize 3");
+
 done_testing();

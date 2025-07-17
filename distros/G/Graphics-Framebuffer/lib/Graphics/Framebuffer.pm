@@ -30,7 +30,7 @@ Drawing is this simple
 
  $fb->cls('ON'); # Clear screen and turn on the console cursor
 
-Methods requiring parameters require a hash (or anonymous hash) reference passed to the method.  All parameters have easy to understand english names, all lower case, to understand exactly what the method is doing.
+Methods requiring parameters require a hash (or anonymous hash) reference passed to the method (for speed).  All parameters have easy to understand english names, all lower case, to understand exactly what the method is doing.
 
 =head1 DESCRIPTION
 
@@ -76,7 +76,9 @@ Originally everything was done in Perl, and the module's speed was mostly accept
 
 =head1 SPECIAL VARIABLES
 
-The following are hash keys to the main object variable.  For example, if you use the variable $fb as the object variable, then the following are $fb->{VARIABLE_NAME}
+The following are hash keys to the main object variable.  For example, if you use the variable $fb as the object variable, then the following are $fb->{VARIABLE_NAME}.
+
+NOTE:  Do NOT set these variables directly.  They are for internal use and reference only.  Use the approprate method to change settings.
 
 =over 4
 
@@ -359,9 +361,10 @@ use constant {
     FBINFO_HWACCEL_YWRAP     => 0x4000,
 };
 
-### THREADS ###
-use if ($Config{'useithreads'}), 'threads', 'yield', 'stringify', 'stack_size' => 131076, 'exit' => 'threads_only';
-use if ($Config{'useithreads'}), 'threads::shared';
+## THREADS ##
+use threads ('yield', 'stringify', 'stack_size' => 131076, 'exit' => 'threads_only');
+use threads::shared;
+##THREADS##
 
 use POSIX ();
 use POSIX qw(modf);
@@ -388,7 +391,7 @@ BEGIN {
     require Exporter;
 
     # set the version for version checking
-    our $VERSION   = '6.61';
+    our $VERSION   = '6.63';
     our @ISA       = qw(Exporter);
     our @EXPORT_OK = qw(
       FBIOGET_VSCREENINFO
@@ -469,10 +472,10 @@ sub DESTROY { # Always clean up after yourself before exiting
 
 use Inline Config => warnings => 0;
 use Inline C => <<'C_CODE','name' => 'Graphics::Framebuffer', 'VERSION' => $VERSION;
-/* Copyright 2018-2024 Richard Kelsch, All Rights Reserved
+/* Copyright 2018-2025 Richard Kelsch, All Rights Reserved
    See the Perl documentation for Graphics::Framebuffer for licensing information.
 
-   Version:  6.61
+   Version:  6.63
 
    You may wonder why the stack is so heavily used when the global structures
    have the needed values.  Well, the module can emulate another graphics mode
@@ -647,9 +650,9 @@ void c_plot(
                             *((unsigned short*)(framebuffer + index)) = (short) color; // 16 bit can send a word at a time, the second most efficient method.
                         }
                         break;
-                    case 8 :
+                    case 8 : // Obviously not yet supported 
                         break;
-                    case 1 :
+                    case 1 : // Obviously not yet supported 
                         break;
                 }
             break;
@@ -672,9 +675,9 @@ void c_plot(
                             *((unsigned short*)(framebuffer + index)) ^= (short) color;
                         }
                         break;
-                    case 8 :
+                    case 8 : // Obviously not yet supported 
                         break;
-                    case 1 :
+                    case 1 : // Obviously not yet supported 
                         break;
                 }
             break;
@@ -697,9 +700,9 @@ void c_plot(
                            *((unsigned short*)(framebuffer + index)) |= (short) color;
                         }
                         break;
-                    case 8 :
+                    case 8 : // Obviously not yet supported 
                         break;
-                    case 1 :
+                    case 1 : // Obviously not yet supported 
                         break;
                 }
             break;
@@ -722,9 +725,9 @@ void c_plot(
                             *((unsigned short*)(framebuffer + index)) &= (short) color;
                         }
                         break;
-                    case 8 :
+                    case 8 : // Obviously not yet supported 
                         break;
-                    case 1 :
+                    case 1 : // Obviously not yet supported 
                         break;
                 }
             break;
@@ -753,9 +756,9 @@ void c_plot(
                             }
                         }
                         break;
-                    case 8 :
+                    case 8 : // Obviously not yet supported 
                         break;
-                    case 1 :
+                    case 1 : // Obviously not yet supported 
                         break;
                 }
             break;
@@ -784,10 +787,10 @@ void c_plot(
                              }
                          }
                          break;
-                    case 8 :
-                        break;
-                    case 1 :
-                        break;
+                     case 8 : // Obviously not yet supported 
+                         break;
+                     case 1 : // Obviously not yet supported 
+                         break;
                 }
             break;
             case ALPHA_MODE :
@@ -847,9 +850,9 @@ void c_plot(
                             *((unsigned short*)(framebuffer + index)) = rgb565;
                         }
                         break;
-                    case 8 :
+                    case 8 : // Obviously not yet supported 
                         break;
-                    case 1 :
+                    case 1 : // Obviously not yet supported 
                         break;
                 }
             break;
@@ -872,9 +875,9 @@ void c_plot(
                             *((unsigned short*)(framebuffer + index)) += (short) color;
                         }
                         break;
-                    case 8 :
+                    case 8 : // Obviously not yet supported 
                         break;
-                    case 1 :
+                    case 1 : // Obviously not yet supported 
                         break;
                 }
             break;
@@ -897,9 +900,9 @@ void c_plot(
                             *((unsigned short*)(framebuffer + index)) -= (short) color;
                         }
                         break;
-                    case 8 :
+                    case 8 : // Obviously not yet supported 
                         break;
-                    case 1 :
+                    case 1 : // Obviously not yet supported 
                         break;
                 }
             break;
@@ -922,9 +925,9 @@ void c_plot(
                             *((unsigned short*)(framebuffer + index)) *= (short) color;
                         }
                         break;
-                    case 8 :
+                    case 8 : // Obviously not yet supported 
                         break;
-                    case 1 :
+                    case 1 : // Obviously not yet supported 
                         break;
                 }
             break;
@@ -947,9 +950,9 @@ void c_plot(
                             *((unsigned short*)(framebuffer + index)) /= (short) color;
                         }
                         break;
-                    case 8 :
+                    case 8 : // Obviously not yet supported 
                         break;
-                    case 1 :
+                    case 1 : // Obviously not yet supported 
                         break;
                 }
             break;
@@ -1078,6 +1081,7 @@ void c_blit_write(
     char *blit_data,
     short x, short y, short w, short h,
     unsigned char bytes_per_pixel,
+	unsigned char bits_per_pixel,
     unsigned char draw_mode,
     unsigned char alpha,
     unsigned int bcolor,
@@ -1103,8 +1107,8 @@ void c_blit_write(
     } else {
         switch(draw_mode) {
             case NORMAL_MODE :
-                switch(bytes_per_pixel) {
-                    case 4 :
+                switch(bits_per_pixel) {
+                    case 32 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1124,7 +1128,7 @@ void c_blit_write(
                             }
                         }
                         break;
-                    case 3 :
+                    case 24 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1146,7 +1150,7 @@ void c_blit_write(
                             }
                         }
                         break;
-                    case 2 :
+                    case 16 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1166,11 +1170,15 @@ void c_blit_write(
                             }
                         }
                         break;
+				    case 8 :
+				        break;
+				    case 1 :
+				        break;
                 }
                 break;
             case XOR_MODE :
-                switch(bytes_per_pixel) {
-                    case 4 :
+                switch(bits_per_pixel) {
+                    case 32 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1190,7 +1198,7 @@ void c_blit_write(
                             }
                         }
                         break;
-                    case 3 :
+                    case 24 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1212,7 +1220,7 @@ void c_blit_write(
                             }
                         }
                         break;
-                    case 2 :
+                    case 16 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1232,11 +1240,15 @@ void c_blit_write(
                             }
                         }
                         break;
+				    case 8 :
+				        break;
+				    case 1 :
+				        break;
                 }
                 break;
             case OR_MODE :
-                switch(bytes_per_pixel) {
-                    case 4 :
+                switch(bits_per_pixel) {
+                    case 32 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1256,7 +1268,7 @@ void c_blit_write(
                             }
                         }
                         break;
-                    case 3 :
+                    case 24 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1278,7 +1290,7 @@ void c_blit_write(
                             }
                         }
                         break;
-                    case 2 :
+                    case 16 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1298,11 +1310,15 @@ void c_blit_write(
                             }
                         }
                         break;
+				    case 8 :
+				        break;
+				    case 1 :
+				        break;
                 }
                 break;
             case AND_MODE :
-                switch(bytes_per_pixel) {
-                    case 4 :
+                switch(bits_per_pixel) {
+                    case 32 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1322,7 +1338,7 @@ void c_blit_write(
                             }
                         }
                         break;
-                    case 3 :
+                    case 24 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1344,7 +1360,7 @@ void c_blit_write(
                             }
                         }
                         break;
-                    case 2 :
+                    case 16 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1364,11 +1380,15 @@ void c_blit_write(
                             }
                         }
                         break;
+				    case 8 :
+				        break;
+				    case 1 :
+				        break;
                 }
                 break;
             case MASK_MODE :
-                switch(bytes_per_pixel) {
-                    case 4 :
+                switch(bits_per_pixel) {
+                    case 32 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1391,7 +1411,7 @@ void c_blit_write(
                             }
                         }
                         break;
-                    case 3 :
+                    case 24 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1415,7 +1435,7 @@ void c_blit_write(
                             }
                         }
                         break;
-                    case 2 :
+                    case 16 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1438,11 +1458,15 @@ void c_blit_write(
                             }
                         }
                         break;
+				    case 8 :
+				        break;
+				    case 1 :
+				        break;
                 }
                 break;
             case UNMASK_MODE :
-                switch(bytes_per_pixel) {
-                    case 4 :
+                switch(bits_per_pixel) {
+                    case 32 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1464,7 +1488,7 @@ void c_blit_write(
                             }
                         }
                         break;
-                    case 3 :
+                    case 24 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1488,7 +1512,7 @@ void c_blit_write(
                             }
                         }
                         break;
-                    case 2 :
+                    case 16 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1510,11 +1534,15 @@ void c_blit_write(
                             }
                         }
                         break;
+				    case 8 :
+				        break;
+				    case 1 :
+				        break;
                 }
                 break;
             case ALPHA_MODE :
-                switch(bytes_per_pixel) {
-                    case 4 :
+                switch(bits_per_pixel) {
+                    case 32 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1551,7 +1579,7 @@ void c_blit_write(
                             }
                         }
                         break;
-                    case 3 :
+                    case 24 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1586,7 +1614,7 @@ void c_blit_write(
                             }
                         }
                         break;
-                    case 2 :
+                    case 16 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1621,11 +1649,15 @@ void c_blit_write(
                             }
                         }
                         break;
+				    case 8 :
+				        break;
+				    case 1 :
+				        break;
                 }
                 break;
             case ADD_MODE :
-                switch(bytes_per_pixel) {
-                    case 4 :
+                switch(bits_per_pixel) {
+                    case 32 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1645,7 +1677,7 @@ void c_blit_write(
                             }
                         }
                         break;
-                    case 3 :
+                    case 24 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1667,7 +1699,7 @@ void c_blit_write(
                             }
                         }
                         break;
-                    case 2 :
+                    case 16 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1687,11 +1719,15 @@ void c_blit_write(
                             }
                         }
                         break;
+				    case 8 :
+				        break;
+				    case 1 :
+				        break;
                 }
                 break;
             case SUBTRACT_MODE :
-                switch(bytes_per_pixel) {
-                    case 4 :
+                switch(bits_per_pixel) {
+                    case 32 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1711,7 +1747,7 @@ void c_blit_write(
                             }
                         }
                         break;
-                    case 3 :
+                    case 24 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1733,7 +1769,7 @@ void c_blit_write(
                             }
                         }
                         break;
-                    case 2 :
+                    case 16 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1753,11 +1789,15 @@ void c_blit_write(
                             }
                         }
                         break;
+				    case 8 :
+				        break;
+				    case 1 :
+				        break;
                 }
                 break;
             case MULTIPLY_MODE :
-                switch(bytes_per_pixel) {
-                    case 4 :
+                switch(bits_per_pixel) {
+                    case 32 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1777,7 +1817,7 @@ void c_blit_write(
                             }
                         }
                         break;
-                    case 3 :
+                    case 24 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1799,7 +1839,7 @@ void c_blit_write(
                             }
                         }
                         break;
-                    case 2 :
+                    case 16 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1819,11 +1859,15 @@ void c_blit_write(
                             }
                         }
                         break;
+				    case 8 :
+				        break;
+				    case 1 :
+				        break;
                 }
                 break;
             case DIVIDE_MODE :
-                switch(bytes_per_pixel) {
-                    case 4 :
+                switch(bits_per_pixel) {
+                    case 32 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1843,7 +1887,7 @@ void c_blit_write(
                             }
                         }
                         break;
-                    case 3 :
+                    case 24 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1865,7 +1909,7 @@ void c_blit_write(
                             }
                         }
                         break;
-                    case 2 :
+                    case 16 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1885,6 +1929,10 @@ void c_blit_write(
                             }
                         }
                         break;
+				    case 8 :
+				        break;
+				    case 1 :
+				        break;
                 }
                 break;
         }       
@@ -1898,7 +1946,8 @@ void c_rotate(
     short width, short height,
     unsigned short wh,
     double degrees,
-    unsigned char bytes_per_pixel)
+    unsigned char bytes_per_pixel,
+    unsigned char bits_per_pixel)
 {
     unsigned int hwh        = floor(wh / 2 + 0.5);
     unsigned int bbline     = wh * bytes_per_pixel;
@@ -1917,24 +1966,28 @@ void c_rotate(
             short xs = ((cosma * xt - sinma * yt) + hwidth);
             short ys = ((sinma * xt + cosma * yt) + hheight);
             if (xs >= 0 && xs < width && ys >= 0 && ys < height) {
-                switch(bytes_per_pixel) {
-                    case 4 :
+                switch(bits_per_pixel) {
+                    case 32 :
                         {
                             *((unsigned int*)(new_img + (x * bytes_per_pixel) + (y * bbline))) = *((unsigned int*)(image + (xs * bytes_per_pixel) + (ys * bline)));
                         }
                         break;
-                    case 3 :
+                    case 24 :
                         {
                             *(new_img + (x * bytes_per_pixel) + (y * bbline))     = *(image + (xs * bytes_per_pixel) + (ys * bline));
                             *(new_img + (x * bytes_per_pixel) + (y * bbline) + 1) = *(image + (xs * bytes_per_pixel) + (ys * bline) + 1);
                             *(new_img + (x * bytes_per_pixel) + (y * bbline) + 2) = *(image + (xs * bytes_per_pixel) + (ys * bline) + 2);
                         }
                         break;
-                    case 2 :
+                    case 16 :
                         {
                             *((unsigned short*)(new_img + (x * bytes_per_pixel) + (y * bbline))) = *((unsigned short*)(image + (xs * bytes_per_pixel) + (ys * bline)));
                         }
                         break;
+				    case 8 :
+				        break;
+				    case 1 :
+				        break;
                 }
             }
         }
@@ -2128,7 +2181,7 @@ void c_convert_24_32(char* buf24, unsigned int size24, char* buf32, unsigned cha
 }
 
 // Convert any type RGB bitmap to a monochrome bitmap of the same type
-void c_monochrome(char *pixels, unsigned int size, unsigned char color_order, unsigned char bytes_per_pixel) {
+void c_monochrome(char *pixels, unsigned int size, unsigned char color_order, unsigned char bytes_per_pixel, unsigned char bits_per_pixel) {
     unsigned int idx;
     unsigned char r;
     unsigned char g;
@@ -2137,69 +2190,116 @@ void c_monochrome(char *pixels, unsigned int size, unsigned char color_order, un
     unsigned short rgb565;
 
     for (idx = 0; idx < size; idx += bytes_per_pixel) {
-        if (bytes_per_pixel >= 3) {
-            switch(color_order) {
-                case RBG :  // RBG
-                    r = *(pixels + idx);
-                    b = *(pixels + idx + 1);
-                    g = *(pixels + idx + 2);
-                    break;
-                case BGR :  // BGR
-                    b = *(pixels + idx);
-                    g = *(pixels + idx + 1);
-                    r = *(pixels + idx + 2);
-                    break;
-                case BRG :  // BRG
-                    b = *(pixels + idx);
-                    r = *(pixels + idx + 1);
-                    g = *(pixels + idx + 2);
-                    break;
-                case GBR :  // GBR
-                    g = *(pixels + idx);
-                    b = *(pixels + idx + 1);
-                    r = *(pixels + idx + 2);
-                    break;
-                case GRB :  // GRB
-                    g = *(pixels + idx);
-                    r = *(pixels + idx + 1);
-                    b = *(pixels + idx + 2);
-                    break;
-                default : // RGB
-                    r = *(pixels + idx);
-                    g = *(pixels + idx + 1);
-                    b = *(pixels + idx + 2);
-            }
-        } else {
-            rgb565 = *((unsigned short*)(pixels + idx));
-            g      = (rgb565 >> 6) & 31;
-            if (color_order == 0) { // RGB
-                r = rgb565 & 31;
-                b = (rgb565 >> 11) & 31;
-            } else {                // BGR
-                b = rgb565 & 31;
-                r = (rgb565 >> 11) & 31;
-            }
-        }
+        switch (bits_per_pixel) {
+		    case 32 :
+                switch(color_order) {
+                    case RBG :  // RBG
+                        r = *(pixels + idx);
+				        b = *(pixels + idx + 1);
+                        g = *(pixels + idx + 2);
+                        break;
+                    case BGR :  // BGR
+                        b = *(pixels + idx);
+                        g = *(pixels + idx + 1);
+                        r = *(pixels + idx + 2);
+                        break;
+                    case BRG :  // BRG
+                        b = *(pixels + idx);
+                        r = *(pixels + idx + 1);
+                        g = *(pixels + idx + 2);
+                        break;
+                    case GBR :  // GBR
+                        g = *(pixels + idx);
+                        b = *(pixels + idx + 1);
+                        r = *(pixels + idx + 2);
+                        break;
+                    case GRB :  // GRB
+                        g = *(pixels + idx);
+                        r = *(pixels + idx + 1);
+                        b = *(pixels + idx + 2);
+                        break;
+                    default : // RGB
+                        r = *(pixels + idx);
+                        g = *(pixels + idx + 1);
+                        b = *(pixels + idx + 2);
+				        break;
+                }
+		        break;
+		    case 24 :
+                switch(color_order) {
+                    case RBG :  // RBG
+                        r = *(pixels + idx);
+				        b = *(pixels + idx + 1);
+                        g = *(pixels + idx + 2);
+                        break;
+                    case BGR :  // BGR
+                        b = *(pixels + idx);
+                        g = *(pixels + idx + 1);
+                        r = *(pixels + idx + 2);
+                        break;
+                    case BRG :  // BRG
+                        b = *(pixels + idx);
+                        r = *(pixels + idx + 1);
+                        g = *(pixels + idx + 2);
+                        break;
+                    case GBR :  // GBR
+                        g = *(pixels + idx);
+                        b = *(pixels + idx + 1);
+                        r = *(pixels + idx + 2);
+                        break;
+                    case GRB :  // GRB
+                        g = *(pixels + idx);
+                        r = *(pixels + idx + 1);
+                        b = *(pixels + idx + 2);
+                        break;
+                    default : // RGB
+                        r = *(pixels + idx);
+                        g = *(pixels + idx + 1);
+                        b = *(pixels + idx + 2);
+				        break;
+                }
+		        break;
+		    case 16 :
+                rgb565 = *((unsigned short*)(pixels + idx));
+                g      = (rgb565 >> 6) & 31;
+                if (color_order == 0) { // RGB
+                    r = rgb565 & 31;
+                    b = (rgb565 >> 11) & 31;
+                } else {                // BGR
+                    b = rgb565 & 31;
+                    r = (rgb565 >> 11) & 31;
+                }
+		        break;
+		    case 8 :
+		        break;
+		    case 1 :
+		        break;
+		}
+	   
         m = (unsigned char) round(0.2126 * r + 0.7152 * g + 0.0722 * b);
 
-        switch(bytes_per_pixel) {
-            case 4 :
+        switch(bits_per_pixel) {
+            case 32 :
                 if (m == 0)  {
                     *((unsigned int*)(pixels + idx)) = m | (m << 8) | (m << 16);
                 } else {
                     *((unsigned int*)(pixels + idx)) = m | (m << 8) | (m << 16) | 0xFF000000;
                 }
                 break;
-            case 3 :
+            case 24 :
                 *(pixels + idx)     = m;
                 *(pixels + idx + 1) = m;
                 *(pixels + idx + 2) = m;
                 break;
-            case 2 :
+            case 16 :
                 rgb565                             = 0;
                 rgb565                             = (m << 11) | (m << 6) | m;
                 *((unsigned short*)(pixels + idx)) = rgb565;
                 break;
+		    case 8 :
+		        break;
+		    case 1 :
+		        break;
         }
     }
 }
@@ -3290,7 +3390,6 @@ When called in a scalar context, it returns a hash reference:
     }
 }
 
-sub get_font_list {
 # Splash is now pulled in via "Graphics::Framebuffer::Splash"
 
 =head2 splash
@@ -3304,7 +3403,9 @@ This is automatically displayed when this module is initialized, and the variabl
  $fb->splash();
 
 =back
+=cut
 
+sub get_font_list {
 =head2 get_font_list
 
 Returns an anonymous hash containing the font face names as keys and another anonymous hash assigned as the values for each key. This second hash contains the path to the font and the font's file name.
@@ -6637,6 +6738,7 @@ It takes a hash reference.  It draws in the current drawing mode.
 
     my $draw_mode = $self->{'DRAW_MODE'};
     my $bytes     = $self->{'BYTES'};
+	my $bits      = $self->{'BITS'};
 
     return unless (defined($params->{'image'}) && $params->{'image'} ne '' && $h && $w);
 
@@ -6649,6 +6751,7 @@ It takes a hash reference.  It draws in the current drawing mode.
             $params->{'image'},
             $x, $y, $w, $h,
             $bytes,
+			$bits,
             $draw_mode,
             $self->{'COLOR_ALPHA'},
             $self->{'RAW_BACKGROUND_COLOR'},
@@ -6962,6 +7065,7 @@ It returns the transformed image in the same format the other BLIT methods use. 
     my $width  = $params->{'blit_data'}->{'width'};
     my $height = $params->{'blit_data'}->{'height'};
     my $bytes  = $self->{'BYTES'};
+	my $bits   = $self->{'BITS'};
     my $bline  = $width * $bytes;
     my $image  = $params->{'blit_data'}->{'image'};
     my $xclip  = $self->{'X_CLIP'};
@@ -7086,7 +7190,7 @@ It returns the transformed image in the same format the other BLIT methods use. 
                 # Try to define as much as possible before the loop to optimize
                 $data = $self->{'RAW_BACKGROUND_COLOR'} x (($wh**2) * $bytes);
 
-                c_rotate($image, $data, $width, $height, $wh, $degrees, $bytes);
+                c_rotate($image, $data, $width, $height, $wh, $degrees, $bytes, $bits);
                 return (
                     {
                         'x'      => $params->{'blit_data'}->{'x'},
@@ -7353,10 +7457,10 @@ It applies the following formula to calculate greyscale:
     } elsif ($params->{'bits'} == 16) {
         $inc = 2;
     } else {    # Only 32, 24, or 16 bits allowed
-        return ();
+        $inc = 1;
     }
     if ($self->{'ACCELERATED'}) {
-        c_monochrome($params->{'image'}, $size, $color_order, $inc);
+        c_monochrome($params->{'image'}, $size, $color_order, $inc, $params->{'bits'});
         return ($params->{'image'});
     } else {
         for (my $byte = 0; $byte < length($params->{'image'}); $byte += $inc) {
@@ -9257,7 +9361,7 @@ Richard Kelsch <rich@rk-internet.com>
 
 =head1 COPYRIGHT
 
-Copyright © 2003-2024 Richard Kelsch, All Rights Reserved.
+Copyright © 2003-2025 Richard Kelsch, All Rights Reserved.
 
 This program is free software; you can redistribute it and/or modify it under the GNU software license.
 
@@ -9269,7 +9373,7 @@ A copy of this license is included in the 'LICENSE' file in this distribution.
 
 =head1 VERSION
 
-Version 6.61 (Jul 10, 2024)
+Version 6.63 (Jul 16, 2025)
 
 =head1 THANKS
 

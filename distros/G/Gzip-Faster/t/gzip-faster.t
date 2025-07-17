@@ -34,11 +34,18 @@ if (! utf8::is_utf8 ($kujira)) {
 my $gf1 = Gzip::Faster->new ();
 # round trips involving object and non-object
 my $rt;
+
+# Random digits for testing round-trip.
+
 my $input = '';
 for (0..10000) {
     $input .= (0..9)[int (rand () * 10)];
 }
+
 #print "$input\n";
+
+# Test gunzip of zip method
+
 eval {
     $rt = gunzip ($gf1->zip ($input));
 };
@@ -48,6 +55,9 @@ if ($@) {
 }
 ok ($rt, "Got round trip value");
 is ($rt, $input, "Round trip is OK");
+
+# Test unzip method of gzip
+
 eval {
     $rt = $gf1->unzip (gzip ($input));
 };
@@ -58,6 +68,7 @@ if ($@) {
 ok ($rt, "Got round trip value");
 is ($rt, $input, "Round trip is OK");
 
+# Test 'raw' option.
 
 my $gfraw = Gzip::Faster->new ();
 $gfraw->raw (1);
@@ -80,11 +91,14 @@ if ($@) {
 ok ($rt, "Got round trip value");
 is ($rt, $input, "Round trip is OK");
 
+# Test preservation of Perl flags.
+
 my $gf = Gzip::Faster->new ();
 $gf->copy_perl_flags (1);
 ok (utf8::is_utf8 ($gf->unzip ($gf->zip ($kujira))), "UTF-8 round trip");
 
-# This tests the converse of the above.
+# This tests the converse of the above, stripping out of Perl flags
+# when the user doesn't request them.
 
 no utf8;
 my $iruka = '海豚';
@@ -92,6 +106,8 @@ if (utf8::is_utf8 ($iruka)) {
     die "Sanity check failed";
 }
 ok (! utf8::is_utf8 ($gf->unzip ($gf->zip ($iruka))), "no UTF-8 round trip");
+
+# Test gzip_file and gunzip_file
 
 my $f = "$FindBin::Bin/gzip-faster.t";
 my $fgz = "$f.gz";
@@ -102,14 +118,14 @@ print $out $zippedf;
 close $out or die $!;
 my $plain = gunzip_file ($fgz);
 ok ($plain, "Got back contents from $fgz");
-if (-f $fgz) {
-    unlink ($fgz);
-}
+rm ($fgz);
 
 # This tests that Z_BUF_ERROR is ignored. The file "index.html.gz" is
 # deliberately chosen to be a file which trips a Z_BUF_ERROR.
 
 gunzip_file ("$FindBin::Bin/index.html.gz");
+
+# Test gzipping of a binary scalar.
 
 for my $test (0, 10101) {
     my $binary = pack "N", $test;
@@ -149,6 +165,30 @@ my $outname;
 gunzip_file ($filename, file_name => \$outname);
 is ($outname, $filewname, "Retrieved file name from file");
 
+my $filenoname = 'no-name.gz';
+gzip_to_file ($input, $filenoname);
+my $outname2 = 'guff';
+gunzip_file ($filenoname, file_name => \$outname2);
+is ($outname2, undef, "Got undefined value in file name parameter");
+
+# Test gzip_to_file with an empty file name
+
+my $emptyname = 'empty-name.gz';
+gzip_to_file ($input, $emptyname, file_name => '');
+ok (-f $emptyname, "Made a file '$emptyname'");
+gunzip_file ($emptyname, file_name => \my $emptynamename);
+is ($emptynamename, undef, "Got undefined value with empty file name");
+rm ($emptyname);
+
+# Test gzip_to_file without options
+
+my $nofilename = 'no-name.gz';
+gzip_to_file ($input, $nofilename);
+ok (-f $nofilename, "Got a file '$nofilename' with gzip_to_file");
+my $nonameoutput = gunzip_file ($nofilename);
+is ($input, $nonameoutput, "Round trip OK with no options to gzip_to_file");
+rm ($nofilename);
+
 # $filename is unlinked below, underneath the check for warnings on
 # not using a scalar reference.
 
@@ -167,6 +207,8 @@ is ($gfnametest->file_name (), $filewname,
 
 gunzip_file ("$Bin/index.html.gz", mod_time => \my $mod_time);
 ok ($mod_time != 0, "Got modification time");
+# This numerical time is fixed by the contents of the file itself, as
+# distributed with Gzip::Faster.
 ok ($mod_time == 1396598505, "Got correct modification time");
 
 # __        __               _                 
@@ -176,6 +218,7 @@ ok ($mod_time == 1396598505, "Got correct modification time");
 #    \_/\_/ \__,_|_|  |_| |_|_|_| |_|\__, |___/
 #                                    |___/     
 
+# Capture warnings in $warning to check them.
 
 my $warning;
 $SIG{__WARN__} = sub {
@@ -227,8 +270,19 @@ for my $sub (@subs) {
 
 # Delete  the file now we have used it.
 
-unlink ($filename);
-
+rm ($filename, $filenoname);
 
 done_testing ();
 exit;
+
+sub rm
+{
+    for (@_) {
+	if (-f $_) {
+	    if (! unlink $_) {
+		warn "unlink $_ failed: $@";
+	    }
+	}
+    }
+}
+

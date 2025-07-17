@@ -54,6 +54,6 @@
          "web" : "https://github.com/taboege/perl-Query-Tags"
       }
    },
-   "version" : "v0.0.2",
+   "version" : "v0.0.3",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

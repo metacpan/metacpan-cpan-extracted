@@ -1,0 +1,66 @@
+SYNOPSIS
+
+        my $owid = WebService::OurWorldInData->new({
+            proxy => '...', # your web proxy
+        });
+    
+        my $search = $owid->search( q => 'star', fl => 'bibcode' );
+
+DESCRIPTION
+
+    This is a base class for Our World in Data APIs. You probably should be
+    using the WebService::OurWorldInData::Chart class.
+
+ Getting Started
+
+    Documentation for Chart API
+    <https://docs.owid.io/projects/etl/api/chart-api/>
+
+ Proxies
+
+    The UA gets the proxy from your environment variable _or_ create a
+    HTTP::Tiny object with the {all_proxy => "proxy url"} attribute and
+    pass that to the ua attribute of the API constructor
+
+        $tiny_ua = HTTP::Tiny->new({all_proxy => "http://proxy.url"});
+        $client = WebService::OurWorldInData->new({ ua => $tiny_ua });
+
+ACKNOWLEDGMENTS
+
+    I am stealing from Neil Bowers' WebService::HackerNews to learn how he
+    does APIs with HTTP::Tiny. This is a re-write from my first version in
+    Mojo. Any mistakes, of course, are mine.
+
+REPOSITORY
+
+    https://github.com/duffee/perl-OurWorldInData
+
+AUTHOR
+
+    Boyd Duffee <duffee@cpan.org>
+
+LICENSE
+
+    MIT License
+
+    Copyright (c) 2025 Boyd Duffee
+
+    Permission is hereby granted, free of charge, to any person obtaining a
+    copy of this software and associated documentation files (the
+    "Software"), to deal in the Software without restriction, including
+    without limitation the rights to use, copy, modify, merge, publish,
+    distribute, sublicense, and/or sell copies of the Software, and to
+    permit persons to whom the Software is furnished to do so, subject to
+    the following conditions:
+
+    The above copyright notice and this permission notice shall be included
+    in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+    CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+

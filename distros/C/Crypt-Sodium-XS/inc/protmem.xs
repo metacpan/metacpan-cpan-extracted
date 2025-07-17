@@ -74,10 +74,11 @@ void protmem_flags_memvault_default(SV * flags = &PL_sv_undef)
       global = &g_protmem_flags_memvault_default;
   }
 
+  SvGETMAGIC(flags);
   if (!SvOK(flags))
     XSRETURN_UV(*global);
 
-  mv_flags = SvUV(ST(0));
+  mv_flags = SvUV_nomg(flags);
   /* TODO: check for invalid flags */
   old_flags = *global;
   *global = mv_flags;

@@ -1,5 +1,9 @@
 Revision history for Log-Dispatchouli
 
+3.010     2025-07-16 09:04:21-04:00 America/New_York
+        - add flog_messages and fmt_event, which return formatted strings
+          without logging them
+
 3.009     2025-01-07 21:22:25-05:00 America/New_York
         - added documentation of the enable_stdout and enable_stderr methods,
           added in 2.018

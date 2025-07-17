@@ -18,3 +18,5 @@ file\.gz$
 ^examples/.*-out\.txt$
 # Output of running benchmarks used for POD
 ^bench/(short|long)\.output$
+# Makefile for benchmarks
+^bench/makefile$

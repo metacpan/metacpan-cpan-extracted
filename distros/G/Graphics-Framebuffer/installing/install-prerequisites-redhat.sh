@@ -10,7 +10,7 @@ sudo yum update # Bring RedHat's module database up to date
 
 # Absolutely Needed
 
-sudo yum upgrade gcc \
+sudo yum install gcc \
                  gcc-c++ \
                  make \
                  autoconf \
@@ -31,7 +31,7 @@ sudo yum upgrade gcc \
 read -p "Do you wish to install the packaged/system Perl prerequisites?" yn
 case $yn in
     [Yy]* )
-        sudo yum upgrade perl-math-gradient \
+        sudo yum install perl-math-gradient \
                          perl-math-bezier \
                          perl-file-map \
                          perl-imager \

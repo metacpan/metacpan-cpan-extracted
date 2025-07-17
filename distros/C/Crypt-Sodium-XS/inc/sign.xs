@@ -283,8 +283,9 @@ SV * sign_sk_to_curve25519(SV * sk, SV * flags = &PL_sv_undef)
   CODE:
   PERL_UNUSED_VAR(ix);
 
+  SvGETMAGIC(flags);
   if (SvOK(flags))
-    ed_flags = SvUV(flags);
+    ed_flags = SvUV_nomg(flags);
 
   if (sv_derived_from(sk, MEMVAULT_CLASS)) {
     sk_pm = protmem_get(aTHX_ sk, MEMVAULT_CLASS);
@@ -395,8 +396,9 @@ SV * sign_sk_to_seed(SV * sk, SV * flags = &PL_sv_undef)
   CODE:
   PERL_UNUSED_VAR(ix);
 
+  SvGETMAGIC(flags);
   if (SvOK(flags))
-    seed_flags = SvUV(flags);
+    seed_flags = SvUV_nomg(flags);
 
   if (sv_derived_from(sk, MEMVAULT_CLASS)) {
     sk_pm = protmem_get(aTHX_ sk, MEMVAULT_CLASS);
@@ -449,8 +451,9 @@ SV * sign_init(SV * flags = &PL_sv_undef)
   unsigned int state_flags = g_protmem_flags_state_default;
 
   CODE:
+  SvGETMAGIC(flags);
   if (SvOK(flags))
-    state_flags = SvUV(flags);
+    state_flags = SvUV_nomg(flags);
 
   switch(ix) {
     case 1:
@@ -496,8 +499,9 @@ void sign_keypair(SV * seed = &PL_sv_undef, SV * flags = &PL_sv_undef)
   unsigned int sk_flags = g_protmem_flags_key_default;
 
   PPCODE:
+  SvGETMAGIC(flags);
   if (SvOK(flags))
-    sk_flags = SvUV(flags);
+    sk_flags = SvUV_nomg(flags);
 
   switch(ix) {
     case 1:
@@ -516,6 +520,7 @@ void sign_keypair(SV * seed = &PL_sv_undef, SV * flags = &PL_sv_undef)
     croak("sign_keypair: Failed to allocate memory");
   pk_buf[pk_len] = '\0';
 
+  SvGETMAGIC(seed);
   if (!SvOK(seed)) {
     sk_pm = protmem_init(aTHX_ sk_len, sk_flags);
     if (sk_pm == NULL) {
@@ -536,13 +541,13 @@ void sign_keypair(SV * seed = &PL_sv_undef, SV * flags = &PL_sv_undef)
     unsigned char *seed_buf;
     STRLEN seed_len;
 
-    if (sv_derived_from(ST(0), MEMVAULT_CLASS)) {
-      seed_pm = protmem_get(aTHX_ ST(0), MEMVAULT_CLASS);
+    if (sv_derived_from(seed, MEMVAULT_CLASS)) {
+      seed_pm = protmem_get(aTHX_ seed, MEMVAULT_CLASS);
       seed_buf = seed_pm->pm_ptr;
       seed_len = seed_pm->size;
     }
     else
-      seed_buf = (unsigned char *)SvPVbyte(ST(0), seed_len);
+      seed_buf = (unsigned char *)SvPVbyte_nomg(seed, seed_len);
     if (seed_len != seed_req_len) {
       Safefree(pk_buf);
       croak("sign_keypair: Invalid seed length: %lu", seed_len);
@@ -701,8 +706,9 @@ void sign_to_curve25519(SV * pk, SV * sk, SV * flags = &PL_sv_undef)
   PPCODE:
   PERL_UNUSED_VAR(ix);
 
+  SvGETMAGIC(flags);
   if (SvOK(flags))
-    sk_flags = SvUV(flags);
+    sk_flags = SvUV_nomg(flags);
 
   pk_buf = (unsigned char *)SvPVbyte(pk, pk_len);
   if (pk_len != crypto_sign_ed25519_PUBLICKEYBYTES)

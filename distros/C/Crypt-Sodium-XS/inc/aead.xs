@@ -94,8 +94,9 @@ SV * aead_aes256gcm_beforenm(SV * key, SV * flags = &PL_sv_undef)
   if (!has_aes256gcm)
     croak("aead_beforenm: AES256GCM is not supported on this cpu");
 
+  SvGETMAGIC(flags);
   if (SvOK(flags))
-    precalc_pm_flags = SvUV(flags);
+    precalc_pm_flags = SvUV_nomg(flags);
 
   if (sv_derived_from(key, MEMVAULT_CLASS)) {
     key_pm = protmem_get(aTHX_ key, MEMVAULT_CLASS);
@@ -217,8 +218,9 @@ SV * aead_chacha20poly1305_decrypt( \
       func = crypto_aead_chacha20poly1305_decrypt;
   }
 
+  SvGETMAGIC(flags);
   if (SvOK(flags))
-    msg_flags = SvUV(flags);
+    msg_flags = SvUV_nomg(flags);
 
   ct_buf = (unsigned char *)SvPVbyte(ciphertext, ct_len);
   if (ct_len < adata_req_len)
@@ -228,8 +230,9 @@ SV * aead_chacha20poly1305_decrypt( \
   if (nonce_len != nonce_req_len)
     croak("aead_decrypt: Invalid nonce length %lu", nonce_len);
 
+  SvGETMAGIC(adata);
   if (SvOK(adata))
-    adata_buf = (unsigned char *)SvPVbyte(adata, adata_len);
+    adata_buf = (unsigned char *)SvPVbyte_nomg(adata, adata_len);
 
   if (sv_derived_from(key, MEMVAULT_CLASS)) {
     key_pm = protmem_get(aTHX_ key, MEMVAULT_CLASS);
@@ -368,11 +371,13 @@ SV * aead_chacha20poly1305_decrypt_detached( \
   if (nonce_len != nonce_req_len)
     croak("aead_decrypt_detached: Invalid nonce length %lu", nonce_len);
 
+  SvGETMAGIC(adata);
   if (SvOK(adata))
-    adata_buf = (unsigned char *)SvPVbyte(adata, adata_len);
+    adata_buf = (unsigned char *)SvPVbyte_nomg(adata, adata_len);
 
+  SvGETMAGIC(flags);
   if (SvOK(flags))
-    msg_flags = SvUV(flags);
+    msg_flags = SvUV_nomg(flags);
 
   if (sv_derived_from(key, MEMVAULT_CLASS)) {
     key_pm = protmem_get(aTHX_ key, MEMVAULT_CLASS);
@@ -527,8 +532,9 @@ void aead_chacha20poly1305_encrypt( \
   if (nonce_len != nonce_req_len)
     croak("aead_encrypt: Invalid nonce length %lu", nonce_len);
 
+  SvGETMAGIC(adata);
   if (SvOK(adata))
-    adata_buf = (unsigned char *)SvPVbyte(adata, adata_len);
+    adata_buf = (unsigned char *)SvPVbyte_nomg(adata, adata_len);
 
   if (sv_derived_from(msg, MEMVAULT_CLASS)) {
     msg_pm = protmem_get(aTHX_ msg, MEMVAULT_CLASS);
@@ -755,11 +761,13 @@ SV * decrypt( \
   if (nonce_len != crypto_aead_aes256gcm_NPUBBYTES)
     croak("decrypt: Invalid nonce length %lu", nonce_len);
 
+  SvGETMAGIC(adata);
   if (SvOK(adata))
-    adata_buf = (unsigned char *)SvPVbyte(adata, adata_len);
+    adata_buf = (unsigned char *)SvPVbyte_nomg(adata, adata_len);
 
+  SvGETMAGIC(flags);
   if (SvOK(flags))
-    msg_flags = SvUV(flags);
+    msg_flags = SvUV_nomg(flags);
 
   msg_pm = protmem_init(aTHX_ ct_len - crypto_aead_aes256gcm_ABYTES, msg_flags);
   if (msg_pm == NULL)
@@ -829,11 +837,13 @@ SV * decrypt_detached( \
   if (nonce_len != crypto_aead_aes256gcm_NPUBBYTES)
     croak("decrypt_detached: Invalid nonce length %lu", nonce_len);
 
+  SvGETMAGIC(adata);
   if (SvOK(adata))
-    adata_buf = (unsigned char *)SvPVbyte(adata, adata_len);
+    adata_buf = (unsigned char *)SvPVbyte_nomg(adata, adata_len);
 
+  SvGETMAGIC(flags);
   if (SvOK(flags))
-    msg_flags = SvUV(flags);
+    msg_flags = SvUV_nomg(flags);
 
   msg_pm = protmem_init(aTHX_ ct_len, msg_flags);
   if (msg_pm == NULL)
@@ -894,8 +904,9 @@ void encrypt(SV * self, SV * msg, SV * nonce, SV * adata = &PL_sv_undef)
   if (nonce_len != crypto_aead_aes256gcm_NPUBBYTES)
     croak("encrypt: Invalid nonce length %lu", nonce_len);
 
+  SvGETMAGIC(adata);
   if (SvOK(adata))
-    adata_buf = (unsigned char *)SvPVbyte(adata, adata_len);
+    adata_buf = (unsigned char *)SvPVbyte_nomg(adata, adata_len);
 
   if (sv_derived_from(msg, MEMVAULT_CLASS)) {
     msg_pm = protmem_get(aTHX_ msg, MEMVAULT_CLASS);

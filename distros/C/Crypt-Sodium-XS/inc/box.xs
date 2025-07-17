@@ -107,8 +107,9 @@ SV * box_beforenm(SV * pk, SV * sk, SV * flags = &PL_sv_undef)
       func = crypto_box_beforenm;
   }
 
+  SvGETMAGIC(flags);
   if (SvOK(flags))
-    precalc_flags = SvUV(flags);
+    precalc_flags = SvUV_nomg(flags);
 
   pk_buf = (unsigned char *)SvPVbyte(pk, pk_len);
   if (pk_len != pk_req_len)
@@ -222,8 +223,9 @@ SV * box_decrypt( \
       func = crypto_box_open_easy;
   }
 
+  SvGETMAGIC(flags);
   if (SvOK(flags))
-    msg_flags = SvUV(flags);
+    msg_flags = SvUV_nomg(flags);
 
   ct_buf = (unsigned char *)SvPVbyte(ciphertext, ct_len);
   if (ct_len < mac_len)
@@ -340,8 +342,9 @@ SV * box_decrypt_detached( \
       func = crypto_box_open_detached;
   }
 
+  SvGETMAGIC(flags);
   if (SvOK(flags))
-    msg_flags = SvUV(flags);
+    msg_flags = SvUV_nomg(flags);
 
   ct_buf = (unsigned char *)SvPVbyte(ciphertext, ct_len);
 
@@ -580,8 +583,9 @@ void box_keypair(SV * seed = &PL_sv_undef, SV * flags = &PL_sv_undef)
   unsigned int sk_flags = g_protmem_flags_key_default;
 
   PPCODE:
+  SvGETMAGIC(flags);
   if (SvOK(flags))
-    sk_flags = SvUV(flags);
+    sk_flags = SvUV_nomg(flags);
 
   switch(ix) {
     case 1:
@@ -605,6 +609,7 @@ void box_keypair(SV * seed = &PL_sv_undef, SV * flags = &PL_sv_undef)
     croak("box_keypair: Failed to allocate memory");
   pk_buf[pk_len] = '\0';
 
+  SvGETMAGIC(seed);
   if (!SvOK(seed)) {
     sk_pm = protmem_init(aTHX_ sk_len, sk_flags);
     if (sk_pm == NULL) {
@@ -628,13 +633,13 @@ void box_keypair(SV * seed = &PL_sv_undef, SV * flags = &PL_sv_undef)
     unsigned char *seed_buf;
     STRLEN seed_len;
 
-    if (sv_derived_from(ST(0), MEMVAULT_CLASS)) {
-      seed_pm = protmem_get(aTHX_ ST(0), MEMVAULT_CLASS);
+    if (sv_derived_from(seed, MEMVAULT_CLASS)) {
+      seed_pm = protmem_get(aTHX_ seed, MEMVAULT_CLASS);
       seed_buf = seed_pm->pm_ptr;
       seed_len = seed_pm->size;
     }
     else
-      seed_buf = (unsigned char *)SvPVbyte(ST(0), seed_len);
+      seed_buf = (unsigned char *)SvPVbyte_nomg(seed, seed_len);
     if (seed_len != seed_req_len) {
       Safefree(pk_buf);
       croak("box_keypair: Invalid seed length: %lu", seed_len);
@@ -812,8 +817,9 @@ SV * box_seal_decrypt(SV * ciphertext, SV * pk, SV * sk, SV * flags = &PL_sv_und
       func = crypto_box_seal_open;
   }
 
+  SvGETMAGIC(flags);
   if (SvOK(flags))
-    msg_flags = SvUV(flags);
+    msg_flags = SvUV_nomg(flags);
 
   ct_buf = (unsigned char *)SvPVbyte(ciphertext, ct_len);
   if (ct_len < seal_len)
@@ -926,8 +932,9 @@ SV * decrypt(SV * self, SV * ciphertext, SV * nonce, SV * flags = &PL_sv_undef)
       func = crypto_box_open_easy_afternm;
   }
 
+  SvGETMAGIC(flags);
   if (SvOK(flags))
-    msg_flags = SvUV(flags);
+    msg_flags = SvUV_nomg(flags);
 
   ct_buf = (unsigned char *)SvPVbyte(ciphertext, ct_len);
   if (ct_len < mac_len)
@@ -1013,8 +1020,9 @@ SV * decrypt_detached(SV * self, SV * ciphertext, SV * mac, SV * nonce, SV * fla
       func = crypto_box_open_detached_afternm;
   }
 
+  SvGETMAGIC(flags);
   if (SvOK(flags))
-    msg_flags = SvUV(flags);
+    msg_flags = SvUV_nomg(flags);
 
   ct_buf = (unsigned char *)SvPVbyte(ciphertext, ct_len);
 

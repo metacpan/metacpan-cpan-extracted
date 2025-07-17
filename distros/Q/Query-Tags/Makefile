@@ -62,11 +62,11 @@ DIRFILESEP = /
 DFSEP = $(DIRFILESEP)
 NAME = Query::Tags
 NAME_SYM = Query_Tags
-VERSION = v0.0.2
+VERSION = v0.0.3
 VERSION_MACRO = VERSION
-VERSION_SYM = v0_0_2
+VERSION_SYM = v0_0_3
 DEFINE_VERSION = -D$(VERSION_MACRO)=\"$(VERSION)\"
-XS_VERSION = v0.0.2
+XS_VERSION = v0.0.3
 XS_VERSION_MACRO = XS_VERSION
 XS_DEFINE_VERSION = -D$(XS_VERSION_MACRO)=\"$(XS_VERSION)\"
 INST_ARCHLIB = blib/arch
@@ -264,7 +264,7 @@ RCS_LABEL = rcs -Nv$(VERSION_SYM): -q
 DIST_CP = best
 DIST_DEFAULT = tardist
 DISTNAME = Query-Tags
-DISTVNAME = Query-Tags-v0.0.2
+DISTVNAME = Query-Tags-v0.0.3
 
 
 # --- MakeMaker macro section:
@@ -519,7 +519,7 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '  perl: '\''5.016000'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) 'resources:' >> META_new.yml
 	$(NOECHO) $(ECHO) '  repository: https://github.com/taboege/perl-Query-Tags.git' >> META_new.yml
-	$(NOECHO) $(ECHO) 'version: v0.0.2' >> META_new.yml
+	$(NOECHO) $(ECHO) 'version: v0.0.3' >> META_new.yml
 	$(NOECHO) $(ECHO) 'x_serialization_backend: '\''CPAN::Meta::YAML version 0.018'\''' >> META_new.yml
 	-$(NOECHO) $(MV) META_new.yml $(DISTVNAME)/META.yml
 	$(NOECHO) $(ECHO) Generating META.json
@@ -579,7 +579,7 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '         "web" : "https://github.com/taboege/perl-Query-Tags"' >> META_new.json
 	$(NOECHO) $(ECHO) '      }' >> META_new.json
 	$(NOECHO) $(ECHO) '   },' >> META_new.json
-	$(NOECHO) $(ECHO) '   "version" : "v0.0.2",' >> META_new.json
+	$(NOECHO) $(ECHO) '   "version" : "v0.0.3",' >> META_new.json
 	$(NOECHO) $(ECHO) '   "x_serialization_backend" : "JSON::PP version 4.16"' >> META_new.json
 	$(NOECHO) $(ECHO) '}' >> META_new.json
 	-$(NOECHO) $(MV) META_new.json $(DISTVNAME)/META.json
@@ -889,7 +889,7 @@ testdb_static :: static pure_all
 # --- MakeMaker ppd section:
 # Creates a PPD (Perl Package Description) for a binary distribution.
 ppd :
-	$(NOECHO) $(ECHO) '<SOFTPKG NAME="Query-Tags" VERSION="v0.0.2">' > Query-Tags.ppd
+	$(NOECHO) $(ECHO) '<SOFTPKG NAME="Query-Tags" VERSION="v0.0.3">' > Query-Tags.ppd
 	$(NOECHO) $(ECHO) '    <ABSTRACT>Raku-inspired query language for attributes</ABSTRACT>' >> Query-Tags.ppd
 	$(NOECHO) $(ECHO) '    <AUTHOR>Tobias Boege &lt;tobs@taboege.de&gt;</AUTHOR>' >> Query-Tags.ppd
 	$(NOECHO) $(ECHO) '    <IMPLEMENTATION>' >> Query-Tags.ppd

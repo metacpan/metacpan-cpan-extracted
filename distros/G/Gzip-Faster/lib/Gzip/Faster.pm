@@ -7,9 +7,11 @@ our @EXPORT = qw/gzip gunzip gzip_file gunzip_file gzip_to_file/;
 our @EXPORT_OK = qw/deflate inflate deflate_raw inflate_raw/;
 our %EXPORT_TAGS = ('all' => [@EXPORT, @EXPORT_OK]);
 use Carp;
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 require XSLoader;
 XSLoader::load ('Gzip::Faster', $VERSION);
+
+# Read the whole file in to memory.
 
 sub get_file
 {
@@ -20,6 +22,10 @@ sub get_file
     close $in or croak "Error closing '$file': $!";
     return $zipped;
 }
+
+# Make a temporary user object so that gzip_file and friends can
+# fiddle with the options of it to set the file name, etc. The object
+# is discarded after the call.
 
 sub gzip_options
 {
@@ -55,6 +61,11 @@ sub gunzip_file
     my $zipped = get_file ($file);
     my $plain;
     if (keys %options) {
+
+	# Make a temporary user object so that we can fiddle with the
+	# options of it to get the file name, etc. The object is
+	# discarded outside this scope.
+
 	my $gf = __PACKAGE__->new ();
 	$plain = $gf->unzip ($zipped);
 	my $file_name_ref = $options{file_name};

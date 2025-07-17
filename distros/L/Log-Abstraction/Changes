@@ -1,5 +1,11 @@
 Revision history for Log-Abstraction
 
+0.21	Wed Jul 16 16:21:25 EDT 2025
+	Added error()
+
+0.20	Sun Jun 15 21:19:03 EDT 2025
+	Fix GitHub#2
+
 0.19	Tue Jun 10 08:32:28 EDT 2025
 	Bump minimum version of Sys::Syslog
 	More untaint checking

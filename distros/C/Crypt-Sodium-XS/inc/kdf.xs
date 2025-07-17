@@ -46,9 +46,6 @@ SV * kdf_derive( \
               const char *, const unsigned char *);
 
   CODE:
-  if (SvOK(flags))
-    new_key_flags = SvUV(flags);
-
   switch(ix) {
     case 1:
       key_req_len = crypto_kdf_blake2b_KEYBYTES;
@@ -70,8 +67,9 @@ SV * kdf_derive( \
   if (new_key_len > new_key_req_max)
     croak("derive: Invalid derived key length (too long)");
 
+  SvGETMAGIC(ctx);
   if (SvOK(ctx)) {
-    ctx_buf = SvPVbyte(ctx, ctx_len);
+    ctx_buf = SvPVbyte_nomg(ctx, ctx_len);
     if (ctx_len < ctx_req_len)
       croak("derive: Invalid context length (too short)");
   }
@@ -90,12 +88,15 @@ SV * kdf_derive( \
   if (key_len != key_req_len)
     croak("derive: Invalid key length");
 
-  if (SvOK(flags))
-    new_key_flags = SvUV(flags);
-  else if (key_mv)
+  if (key_mv)
     new_key_flags = key_mv->flags;
-  else
-    new_key_flags = g_protmem_flags_key_default;
+  else {
+    SvGETMAGIC(flags);
+    if (SvOK(flags))
+      new_key_flags = SvUV_nomg(flags);
+    else
+      new_key_flags = g_protmem_flags_key_default;
+  }
 
   new_key_mv = protmem_init(aTHX_ key_req_len, new_key_flags);
   if (new_key_mv == NULL)

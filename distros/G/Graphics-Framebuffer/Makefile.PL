@@ -7,15 +7,16 @@ use constant {
     TRUE  => 1,
     FALSE => 0,
 };
-use Config;
 # These should be in Perl's installation already
+use Config;
 use Inline::MakeMaker; # Layers on top of ExtUtils::MakeMaker
 use Term::ReadKey;
 use Term::ANSIColor;
 
 my ($COLS,$ROWS,$w,$h) = GetTerminalSize(*STDOUT);
 my $pmt = 'Y';
-my $line = '-' x 28 . ' Graphics::Framebuffer ' . '-' x 28;
+my $pad = int(($COLS - 23)/2);
+my $line = '-' x $pad . ' Graphics::Framebuffer ' . '-' x $pad;
 if (-e 'Makefile') {
 	`make veryclean;reset`;
 }
@@ -58,15 +59,26 @@ unless($pmt =~ /^Y/i) {
 
 
 # Process the src files
+print colored(['bright_yellow'],'             Loading C code'), ' ... ';
 my $ccode    = slurp_file('src/Framebuffer.c');
+print colored(['bright_green'],"Loaded\n");
+print colored(['bright_yellow'],'    Loading Module Template'), ' ... ';
 my $template = slurp_file('src/Framebuffer.pm.template');
+print colored(['bright_green'],"Loaded\n");
 my $Eml;
 
-print colored(['bright_yellow'],' Adding C to Framebuffer.pm') . ' ...';
+print colored(['bright_yellow'],' Adding C to Framebuffer.pm') . ' ... ';
 $template =~ s/\#\# C CODE \#\#/$ccode/s;
-print colored(['bright_green']," Added\n");
+print colored(['bright_green'],"Added\n");
 
 if ($template =~ /^\# (.*?)\n/s) {
+	print colored(['bright_yellow'],'   Is this a threaded Perl?'), ' ... ';
+	if ($Config{'useithreads'}) {
+		print colored(['bright_green'],'YES'),"\n";
+	} else {
+		$template =~ s/\#\# THREADS \#.*?\#\#THREADS\#\#//sg;
+		print colored(['red'],'NO'),"\n";
+	}
     print colored(['bright_yellow'],'         Inserting versions'), ' ... ';
     my ($version, $date, $email) = split(/\:/, $1 );
     my ($month, $day, $year) = split(/ |, /,$date);
@@ -84,13 +96,13 @@ if ($template =~ /^\# (.*?)\n/s) {
     print colored(['bright_yellow'],'                     Author') . ' ... ', colored(['bright_green'],"$email") . "\n";
 }
 
-print colored(['cyan'],'Framebuffer.pm Modification'), ' ... ';
+print colored(['bright_white'],'Framebuffer.pm Modification'), ' ... ';
 open(my $FILE,'>','lib/Graphics/Framebuffer.pm');
 print $FILE $template;
 close($FILE);
 print colored(['bright_green'],'Complete'),"\n";
 
-WriteMakefile(
+if (WriteMakefile(
     NAME               => 'Graphics::Framebuffer',
     AUTHOR             => $Eml,
     VERSION_FROM       => 'lib/Graphics/Framebuffer.pm',
@@ -114,19 +126,19 @@ WriteMakefile(
         'Math::Gradient' => '0.03',
         'List::Util'     => '1.20',
         'File::Map'      => '0.64',
-        'Imager'         => '0.91',
+        'Imager'         => '0.80',
         'Inline'         => '0.53',
         'Inline::C'      => '0.53',
     },
     dist  => {COMPRESS => 'gzip -9f', SUFFIX => 'gz',},
     clean => {FILES    => 'Graphics-Framebuffer* _Inline* examples/_Inline* *log lib/Graphics/Framebuffer.pm *bak *old'},
-);
-print colored(['cyan on_cyan'],$line),"\n";
+)) {
+	print colored(['black on_cyan'],$line),"\n";
 
-my $message;
-if ($COLS <= 185) {
-    print "The ",'"', colored(['bold green'],'examples'), qq{" directory has some handy scripts to help get you started, and\nshow you how to use the module.  Just "} . colored(['bold green'],'perldoc') . qq{" on each to see how to use\nthem:};
-    $message = qq{
+	my $message;
+	if ($COLS <= 185) {
+		print "The ",'"', colored(['bold green'],'examples'), qq{" directory has some handy scripts to help get you started, and\nshow you how to use the module.  Just "} . colored(['bold green'],'perldoc') . qq{" on each to see how to use\nthem:};
+        $message = qq{
 ------------------------------------------------------------------------------
 primitives.pl          - This script will pretty much demonstrate all of
                          the capabilities of this module.
@@ -153,11 +165,11 @@ threaded_template.pl   - Like the above, but for threading.  Requires
 get-mce-demos          - Go and grab MCE multiprocessing demos (an alternate
                          threading method using only one instance of GFB)
 };
-} else {
-    my $pad = int(($COLS - 21)/2);
-    my $mult = '-' x $pad . '-- MULTIPROCESSING --' . '-' x $pad;
-    print "The ",'"', colored(['bold green'],'examples'), qq{" directory has some handy scripts to help get you started, and show you how to use the module.  Just "} . colored(['bold green'],'perldoc') . qq{" on each to see how to use them:\n};
-    $message = '-' x $COLS . qq{
+    } else {
+		$pad = int(($COLS - 21)/2);
+		my $mult = '-' x $pad . '-- MULTIPROCESSING --' . '-' x $pad;
+		print "The ",'"', colored(['bold green'],'examples'), qq{" directory has some handy scripts to help get you started, and show you how to use the module.  Just "} . colored(['bold green'],'perldoc') . qq{" on each to see how to use them:\n};
+        $message = '-' x $COLS . qq{
 primitives.pl          - This script will pretty much demonstrate all of the capabilities of this module.
 slideshow.pl           - This script shows all of the images in a specific path (full screen, if asked).
 viewpic.pl             - This script shows one specific image (or animation).
@@ -169,35 +181,38 @@ $mult
 threaded_primitives.pl - A threaded version of the above.  It can make a mess of the screen.  Requires "Sys::CPU".
 threaded_slideshow.pl  - This script shows all of the images in a specific path.  It divides your screen by how many threads, and dedicates each to show an image.  Requires "Sys::CPU".
 threaded_template.pl   - Like the above, but for threading.  Requires "Sys::CPU"
-get-mce-demos          - Go and grab MCE multiprocessing demos (an alternate threading method using only one instance of a GFB object)
+get-mce-demos          - Go and grab MCE multiprocessing demos (an alternate threading method using only one instance of a GFB object).  Requires "MCE::Hobo".
 };
-}
-
-foreach my $l (split(/\n/,$message)) {
-    if ($l =~ /^(\S+pl|get-mce-demos)/) {
-        my $old = $1;
-        my $new = colored(['bold green'],$old);
-        $l =~ s/$old/$new/;
-    } elsif ($l =~ /^-------/) {
-        $l = colored(['bold cyan'],$l);
     }
-    print "$l\n";
-}
-print colored(['blue on_blue'],$line),"\n";
 
-unless (defined($ENV{'DISPLAY'})) {
-	print colored(['bright_white on_magenta'],' Building    -> '),colored(['bright_green'],'       make'),"\n";
-	print colored(['bright_white on_magenta'],' Testing     -> '),colored(['bright_green'],'       make')," test\n";
-	print colored(['bright_white on_magenta'],' Installing  -> '),colored(['red'],'  sudo '),colored(['bright_green'],'make')," install\n";
-	print colored(['bright_white on_magenta'],' Cleaning Up -> '),colored(['bright_green'],'       make')," veryclean\n";
+    foreach my $l (split(/\n/,$message)) {
+		if ($l =~ /^(\S+pl|get-mce-demos)/) {
+			my $old = $1;
+			my $new = ($old =~ /template\.pl/) ? colored(['bright_cyan'],$old) : colored(['bold green'],$old);
+			$l =~ s/$old/$new/;
+		} elsif ($l =~ /^-------/) {
+			$l = colored(['bold cyan'],$l);
+		}
+		print "$l\n";
+	}
+    print colored(['black on_blue'],'-' x $COLS),"\n";
+
+    unless (defined($ENV{'DISPLAY'})) {
+		print colored(['bright_white on_magenta'],' Building    -> '),colored(['bright_green'],'      make'),"\n";
+		print colored(['bright_white on_magenta'],' Testing     -> '),colored(['bright_green'],'      make')," test\n";
+		print colored(['bright_white on_magenta'],' Installing  -> '),colored(['red'],' sudo '),colored(['bright_green'],'make')," install\n";
+		print colored(['bright_white on_magenta'],' Cleaning Up -> '),colored(['bright_green'],'      make')," veryclean\n";
+	} else {
+		print colored(['bright_white on_magenta'],' Building    -> '),colored(['bright_green'],'               make'),"\n";
+		print colored(['bright_white on_magenta'],' Testing     -> '),colored(['red'],'GFB_IGNORE_X=1 '),colored(['bright_green'],'make')," test\n";
+		print colored(['bright_white on_magenta'],' Installing  -> '),colored(['red'],'          sudo '),colored(['bright_green'],'make')," install\n";
+		print colored(['bright_white on_magenta'],' Cleaning Up -> '),colored(['bright_green'],'               make')," veryclean\n";
+	}
+    exit(0);
 } else {
-	print colored(['bright_white on_magenta'],' Building    -> '),colored(['bright_green'],'               make'),"\n";
-	print colored(['bright_white on_magenta'],' Testing     -> '),colored(['red'],'GFB_IGNORE_X=1 '),colored(['bright_green'],'make')," test\n";
-	print colored(['bright_white on_magenta'],' Installing  -> '),colored(['red'],'          sudo '),colored(['bright_green'],'make')," install\n";
-	print colored(['bright_white on_magenta'],' Cleaning Up -> '),colored(['bright_green'],'               make')," veryclean\n";
+	print colored(['red'],'Missing prerequisites'), "\n";
 }
-
-exit(0);
+exit(1);
 
 sub slurp_file {
     my $file = shift;

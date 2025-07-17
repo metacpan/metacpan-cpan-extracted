@@ -99,18 +99,28 @@ $logger->debug('Code debug message');
 $logger->info('Code info message');
 
 diag(Data::Dumper->new([\@code_log])->Dump()) if($ENV{'TEST_VERBOSE'});
+
+# GitHub#2
+if($^O eq 'MSWin32') {
+	foreach my $log_entry(@code_log) {
+		if($log_entry->{'file'} eq 't\30-basics.t') {
+			$log_entry->{'file'} = 't/30-basics.t';
+		}
+	}
+}
+
 is_deeply(
 	\@code_log,
 	[
 		{
 			class => 'Log::Abstraction',
-			file => ($^O eq 'MSWin32') ? 't\30-basics.t' : 't/30-basics.t',
+			file => 't/30-basics.t',
 			line => 98,	# Adjust line number if needed
 			level => 'debug',
 			message => ['Code debug message']
 		}, {
 			class => 'Log::Abstraction',
-			file => ($^O eq 'MSWin32') ? 't\30-basics.t' : 't/30-basics.t',
+			file => 't/30-basics.t',
 			line => 99,	# Adjust line number if needed
 			level => 'info',
 			message => ['Code info message']
@@ -120,9 +130,13 @@ is_deeply(
 );
 
 # Test logging to syslog
-$logger = Log::Abstraction->new(syslog => { type => 'unix' }, script_name => 'test');
+if($^O ne 'MSWin32') {
+	diag('Ignore message about no connection to syslog available') if($^O eq 'solaris');
 
-$logger->warn({ warning => 'Syslog warning message' });
+	$logger = Log::Abstraction->new(syslog => { type => 'unix' }, script_name => 'test');
+
+	$logger->warn({ warning => 'Syslog warning message' });
+}
 
 # Note: Verifying syslog output requires checking the syslog file, not done here
 

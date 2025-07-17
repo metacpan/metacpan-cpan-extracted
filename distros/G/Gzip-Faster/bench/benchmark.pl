@@ -9,12 +9,18 @@ use IO::Compress::Gzip 'gzip';
 use IO::Uncompress::Gunzip 'gunzip';
 use Gzip::Faster;
 use Compress::Raw::Zlib;
+use Getopt::Long;
 
 # Switch the comment on the following lines to get the long test.
 
 #my $testinput = 'chinese';
 my $testinput = 'english';
-
+my $ok = GetOptions (
+    "input=s" => \$testinput,
+);
+if (! $ok) {
+    die "Bad options";
+}
 my $testtype = 'speed';
 
 my $validate = 0;
@@ -67,8 +73,7 @@ And lose the name of action.Soft you now!
 The fair Ophelia! Nymph, in thy orisons
 Be all my sins remember'd.
 EOF
-$repeat = 50000;
-
+    $repeat = 50000;
 }
 elsif ($testinput eq 'chinese') {
     my $path = path ("$Bin/chinese.txt");
@@ -159,27 +164,27 @@ sub crzdeflatevalue
 
 sub load_io_comp_gzip
 {
-    system ("perl $FindBin::Bin/load_io_comp_gzip");
+    system ("perl $Bin/load_io_comp_gzip");
 }
 
 sub load_io_uncomp_gunzip
 {
-    system ("perl $FindBin::Bin/load_io_uncomp_gunzip");
+    system ("perl $Bin/load_io_uncomp_gunzip");
 }
 
 sub load_comp_raw_zlib
 {
-    system ("perl $FindBin::Bin/load_comp_raw_zlib");
+    system ("perl $Bin/load_comp_raw_zlib");
 }
 
 sub load_gzip_faster
 {
-    system ("perl $FindBin::Bin/load_gzip_faster");
+    system ("perl $Bin/load_gzip_faster");
 }
 
 sub do_nothing
 {
-    system ("perl $FindBin::Bin/do_nothing");
+    system ("perl $Bin/do_nothing");
 }
 
 sub io_comp_gzip

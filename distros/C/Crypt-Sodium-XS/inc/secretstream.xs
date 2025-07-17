@@ -48,8 +48,9 @@ SV * secretstream_xchacha20poly1305_init_decrypt( \
   unsigned int state_flags = g_protmem_flags_key_default;
 
   CODE:
+  SvGETMAGIC(flags);
   if (SvOK(flags))
-    state_flags = SvUV(flags);
+    state_flags = SvUV_nomg(flags);
 
   header_buf = (unsigned char *)SvPVbyte(header, header_len);
   if (header_len != crypto_secretstream_xchacha20poly1305_HEADERBYTES)
@@ -108,8 +109,9 @@ void secretstream_xchacha20poly1305_init_encrypt(SV * key, SV * flags = &PL_sv_u
   unsigned int state_flags = g_protmem_flags_key_default;
 
   PPCODE:
+  SvGETMAGIC(flags);
   if (SvOK(flags))
-    state_flags = SvUV(flags);
+    state_flags = SvUV_nomg(flags);
 
   if (sv_derived_from(key, MEMVAULT_CLASS)) {
     key_pm = protmem_get(aTHX_ key, MEMVAULT_CLASS);
@@ -214,8 +216,9 @@ void decrypt( \
   int ret;
 
   PPCODE:
+  SvGETMAGIC(flags);
   if (SvOK(flags))
-    msg_flags = SvUV(flags);
+    msg_flags = SvUV_nomg(flags);
 
   if (sv_derived_from(ciphertext, MEMVAULT_CLASS)) {
     ct_pm = protmem_get(aTHX_ ciphertext, MEMVAULT_CLASS);
@@ -227,8 +230,9 @@ void decrypt( \
   if (ct_len < crypto_secretstream_xchacha20poly1305_ABYTES)
     croak("decrypt: Invalid ciphertext (too short): %lu", ct_len);
 
+  SvGETMAGIC(adata);
   if (SvOK(adata))
-    adata_buf = (unsigned char *)SvPVbyte(adata, adata_len);
+    adata_buf = (unsigned char *)SvPVbyte_nomg(adata, adata_len);
 
   msg_pm = protmem_init(aTHX_
            ct_len - crypto_secretstream_xchacha20poly1305_ABYTES, msg_flags);
@@ -313,8 +317,9 @@ SV * encrypt( \
     msg_buf = (unsigned char *)SvPVbyte(msg, msg_len);
   ct_len = msg_len + crypto_secretstream_xchacha20poly1305_ABYTES;
 
+  SvGETMAGIC(adata);
   if (SvOK(adata))
-    adata_buf = (unsigned char *)SvPVbyte(adata, adata_len);
+    adata_buf = (unsigned char *)SvPVbyte_nomg(adata, adata_len);
 
   Newx(ct_buf, ct_len + 1, unsigned char);
   if (ct_buf == NULL)

@@ -1,7 +1,7 @@
 package Crypt::Sodium::XS;
 BEGIN {
   # BEGIN block and use line for MemVault are for its overloads to work
-  our $VERSION = '0.000028';
+  our $VERSION = '0.000029';
   require XSLoader;
   XSLoader::load(__PACKAGE__, $VERSION);
 }
@@ -196,15 +196,24 @@ version of libsodium headers on your system or fall back to a bundled version
 of libsodium. You should prefer to install libsodium via your operating
 system's package manager (be sure to install the "development" package) before
 building this dist. If you instead fall back to the bundled libsodium, keep in
-mind that it cannot be kept up to date without updating this perl package. The
-bundled libsodium is distributed in its original form along with its OpenPGP
-signature file. You are encouraged to manually check its signature.
+mind that it cannot be kept up to date without updating this perl package: see
+below for how to update a bundled libsodium if a newer version of this package
+is not available. The bundled libsodium is distributed in its original form
+along with its OpenPGP signature file. You are encouraged to manually check its
+signature.
 
 You may prevent the automatic libsodium detection (forcing the use of the
 bundled version) by setting the environment variable SODIUM_BUNDLED to any
 true (perl's perspective) value.
 
   SODIUM_BUNDLED=1 cpanm Crypt::Sodium::XS
+
+You may explicitly use a libsodium tarball of your choosing by setting the
+SODIUM_BUNDLED environment variable to its absolute path. In this way, it is
+possible to build this dist with a newer version of libsodium than it bundles.
+
+  SODIUM_BUNDLED=$HOME/download/libsodium-x.y.z.tar.gz \
+    cpanm --reinstall Crypt::Sodium::XS
 
 If you prefer to use libsodium from a non-standard location or with special
 linker options, you may set the C<SODIUM_INC> and/or C<SODIUM_LIBS> environment

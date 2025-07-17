@@ -1,3 +1,19 @@
+0.000029 Jul 16 2025
+
+- BUGFIX: fix a regression in build failures when hkdf is not available.
+  author's testing against older versions has been improved to prevent future
+  regressions.
+
+- added pad and unpad methods to MemVault and functions in Util package
+
+- improved/added bitwise methods and overloads for MemVault
+
+- Makefile.PL: allow SODIUM_BUNDLED env var to specify a libsodium tarball.
+  this allows bundling a specific version of libsodium, older or newer than
+  bundled with the dist.
+
+- fix missing magic fetching in many places
+
 0.000028 Jul 15 2025
 
 - add curve25519 packages implementing finite field functions

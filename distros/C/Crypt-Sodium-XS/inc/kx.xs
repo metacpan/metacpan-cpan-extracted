@@ -41,14 +41,16 @@ void kx_keypair(SV * seed = &PL_sv_undef, SV * flags = &PL_sv_undef)
   PPCODE:
   PERL_UNUSED_VAR(ix);
 
+  SvGETMAGIC(flags);
   if (SvOK(flags))
-    sk_flags = SvUV(flags);
+    sk_flags = SvUV_nomg(flags);
 
   Newx(pk_buf, crypto_kx_PUBLICKEYBYTES + 1, unsigned char);
   if (pk_buf == NULL)
     croak("kx_keypair: Failed to allocate memory");
   pk_buf[crypto_kx_PUBLICKEYBYTES] = '\0';
 
+  SvGETMAGIC(seed);
   if (!SvOK(seed)) {
     sk_pm = protmem_init(aTHX_ crypto_kx_SECRETKEYBYTES, sk_flags);
 
@@ -70,13 +72,13 @@ void kx_keypair(SV * seed = &PL_sv_undef, SV * flags = &PL_sv_undef)
     unsigned char *seed_buf;
     STRLEN seed_len;
 
-    if (sv_derived_from(ST(0), MEMVAULT_CLASS)) {
-      seed_pm = protmem_get(aTHX_ ST(0), MEMVAULT_CLASS);
+    if (sv_derived_from(seed, MEMVAULT_CLASS)) {
+      seed_pm = protmem_get(aTHX_ seed, MEMVAULT_CLASS);
       seed_buf = seed_pm->pm_ptr;
       seed_len = seed_pm->size;
     }
     else
-      seed_buf = (unsigned char *)SvPVbyte(ST(0), seed_len);
+      seed_buf = (unsigned char *)SvPVbyte_nomg(seed, seed_len);
 
     if (seed_len != crypto_kx_SEEDBYTES) {
       Safefree(pk_buf);
@@ -138,8 +140,9 @@ void kx_client_session_keys(SV * cpk, SV * csk, SV * spk, SV * flags = &PL_sv_un
   PPCODE:
   PERL_UNUSED_VAR(ix);
 
+  SvGETMAGIC(flags);
   if (SvOK(flags))
-    key_flags = SvUV(flags);
+    key_flags = SvUV_nomg(flags);
 
   cpk_buf = (unsigned char *)SvPVbyte(cpk, cpk_len);
   if (cpk_len != crypto_kx_PUBLICKEYBYTES)
@@ -227,8 +230,9 @@ void kx_server_session_keys(SV * spk, SV * ssk, SV * cpk, SV * flags = &PL_sv_un
   PPCODE:
   PERL_UNUSED_VAR(ix);
 
+  SvGETMAGIC(flags);
   if (SvOK(flags))
-    key_flags = SvUV(flags);
+    key_flags = SvUV_nomg(flags);
 
   spk_buf = (unsigned char *)SvPVbyte(spk, spk_len);
   if (spk_len != crypto_kx_PUBLICKEYBYTES)

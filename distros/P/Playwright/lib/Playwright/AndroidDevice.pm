@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::AndroidDevice;
-$Playwright::AndroidDevice::VERSION = '1.531';
+$Playwright::AndroidDevice::VERSION = '1.532';
 use parent 'Playwright::Base';
 
 sub new {
@@ -22,71 +22,21 @@ sub spec {
     return $Playwright::spec->{'AndroidDevice'}{members};
 }
 
-sub close {
+sub installApk {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'close',
+        command => 'installApk',
         object  => $self->{guid},
         type    => $self->{type}
     );
 }
 
-sub setDefaultTimeout {
+sub launchBrowser {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'setDefaultTimeout',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub push {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'push',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub waitForEvent {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'waitForEvent',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub tap {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'tap',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub shell {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'shell',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub info {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'info',
+        command => 'launchBrowser',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -102,21 +52,51 @@ sub pinchClose {
     );
 }
 
-sub serial {
+sub drag {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'serial',
+        command => 'drag',
         object  => $self->{guid},
         type    => $self->{type}
     );
 }
 
-sub open {
+sub waitForEvent {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'open',
+        command => 'waitForEvent',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub info {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'info',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub webViews {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'webViews',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub fill {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'fill',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -127,6 +107,46 @@ sub model {
     return $self->_api_request(
         args    => [@_],
         command => 'model',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub input {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'input',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub scroll {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'scroll',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub webView {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'webView',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub serial {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'serial',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -152,51 +172,31 @@ sub wait {
     );
 }
 
-sub webViews {
+sub press {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'webViews',
+        command => 'press',
         object  => $self->{guid},
         type    => $self->{type}
     );
 }
 
-sub longTap {
+sub close {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'longTap',
+        command => 'close',
         object  => $self->{guid},
         type    => $self->{type}
     );
 }
 
-sub installApk {
+sub shell {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'installApk',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub drag {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'drag',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub screenshot {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'screenshot',
+        command => 'shell',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -212,61 +212,41 @@ sub pinchOpen {
     );
 }
 
-sub webView {
+sub push {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'webView',
+        command => 'push',
         object  => $self->{guid},
         type    => $self->{type}
     );
 }
 
-sub fill {
+sub screenshot {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'fill',
+        command => 'screenshot',
         object  => $self->{guid},
         type    => $self->{type}
     );
 }
 
-sub press {
+sub setDefaultTimeout {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'press',
+        command => 'setDefaultTimeout',
         object  => $self->{guid},
         type    => $self->{type}
     );
 }
 
-sub scroll {
+sub tap {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'scroll',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub launchBrowser {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'launchBrowser',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub input {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'input',
+        command => 'tap',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -277,6 +257,26 @@ sub fling {
     return $self->_api_request(
         args    => [@_],
         command => 'fling',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub longTap {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'longTap',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub open {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'open',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -326,7 +326,7 @@ Playwright::AndroidDevice - Automatically generated class for Playwright::Androi
 
 =head1 VERSION
 
-version 1.531
+version 1.532
 
 =head1 CONSTRUCTOR
 
@@ -337,47 +337,17 @@ Instead it should be returned to you as the result of calls on Playwright object
 
 =head1 METHODS
 
-=head2 close(@args)
+=head2 installApk(@args)
 
-Execute the AndroidDevice::close playwright routine.
+Execute the AndroidDevice::installApk playwright routine.
 
-See L<https://playwright.dev/docs/api/class-AndroidDevice#AndroidDevice-close> for more information.
+See L<https://playwright.dev/docs/api/class-AndroidDevice#AndroidDevice-installApk> for more information.
 
-=head2 setDefaultTimeout(@args)
+=head2 launchBrowser(@args)
 
-Execute the AndroidDevice::setDefaultTimeout playwright routine.
+Execute the AndroidDevice::launchBrowser playwright routine.
 
-See L<https://playwright.dev/docs/api/class-AndroidDevice#AndroidDevice-setDefaultTimeout> for more information.
-
-=head2 push(@args)
-
-Execute the AndroidDevice::push playwright routine.
-
-See L<https://playwright.dev/docs/api/class-AndroidDevice#AndroidDevice-push> for more information.
-
-=head2 waitForEvent(@args)
-
-Execute the AndroidDevice::waitForEvent playwright routine.
-
-See L<https://playwright.dev/docs/api/class-AndroidDevice#AndroidDevice-waitForEvent> for more information.
-
-=head2 tap(@args)
-
-Execute the AndroidDevice::tap playwright routine.
-
-See L<https://playwright.dev/docs/api/class-AndroidDevice#AndroidDevice-tap> for more information.
-
-=head2 shell(@args)
-
-Execute the AndroidDevice::shell playwright routine.
-
-See L<https://playwright.dev/docs/api/class-AndroidDevice#AndroidDevice-shell> for more information.
-
-=head2 info(@args)
-
-Execute the AndroidDevice::info playwright routine.
-
-See L<https://playwright.dev/docs/api/class-AndroidDevice#AndroidDevice-info> for more information.
+See L<https://playwright.dev/docs/api/class-AndroidDevice#AndroidDevice-launchBrowser> for more information.
 
 =head2 pinchClose(@args)
 
@@ -385,23 +355,65 @@ Execute the AndroidDevice::pinchClose playwright routine.
 
 See L<https://playwright.dev/docs/api/class-AndroidDevice#AndroidDevice-pinchClose> for more information.
 
-=head2 serial(@args)
+=head2 drag(@args)
 
-Execute the AndroidDevice::serial playwright routine.
+Execute the AndroidDevice::drag playwright routine.
 
-See L<https://playwright.dev/docs/api/class-AndroidDevice#AndroidDevice-serial> for more information.
+See L<https://playwright.dev/docs/api/class-AndroidDevice#AndroidDevice-drag> for more information.
 
-=head2 open(@args)
+=head2 waitForEvent(@args)
 
-Execute the AndroidDevice::open playwright routine.
+Execute the AndroidDevice::waitForEvent playwright routine.
 
-See L<https://playwright.dev/docs/api/class-AndroidDevice#AndroidDevice-open> for more information.
+See L<https://playwright.dev/docs/api/class-AndroidDevice#AndroidDevice-waitForEvent> for more information.
+
+=head2 info(@args)
+
+Execute the AndroidDevice::info playwright routine.
+
+See L<https://playwright.dev/docs/api/class-AndroidDevice#AndroidDevice-info> for more information.
+
+=head2 webViews(@args)
+
+Execute the AndroidDevice::webViews playwright routine.
+
+See L<https://playwright.dev/docs/api/class-AndroidDevice#AndroidDevice-webViews> for more information.
+
+=head2 fill(@args)
+
+Execute the AndroidDevice::fill playwright routine.
+
+See L<https://playwright.dev/docs/api/class-AndroidDevice#AndroidDevice-fill> for more information.
 
 =head2 model(@args)
 
 Execute the AndroidDevice::model playwright routine.
 
 See L<https://playwright.dev/docs/api/class-AndroidDevice#AndroidDevice-model> for more information.
+
+=head2 input(@args)
+
+Execute the AndroidDevice::input playwright routine.
+
+See L<https://playwright.dev/docs/api/class-AndroidDevice#AndroidDevice-input> for more information.
+
+=head2 scroll(@args)
+
+Execute the AndroidDevice::scroll playwright routine.
+
+See L<https://playwright.dev/docs/api/class-AndroidDevice#AndroidDevice-scroll> for more information.
+
+=head2 webView(@args)
+
+Execute the AndroidDevice::webView playwright routine.
+
+See L<https://playwright.dev/docs/api/class-AndroidDevice#AndroidDevice-webView> for more information.
+
+=head2 serial(@args)
+
+Execute the AndroidDevice::serial playwright routine.
+
+See L<https://playwright.dev/docs/api/class-AndroidDevice#AndroidDevice-serial> for more information.
 
 =head2 swipe(@args)
 
@@ -415,35 +427,23 @@ Execute the AndroidDevice::wait playwright routine.
 
 See L<https://playwright.dev/docs/api/class-AndroidDevice#AndroidDevice-wait> for more information.
 
-=head2 webViews(@args)
+=head2 press(@args)
 
-Execute the AndroidDevice::webViews playwright routine.
+Execute the AndroidDevice::press playwright routine.
 
-See L<https://playwright.dev/docs/api/class-AndroidDevice#AndroidDevice-webViews> for more information.
+See L<https://playwright.dev/docs/api/class-AndroidDevice#AndroidDevice-press> for more information.
 
-=head2 longTap(@args)
+=head2 close(@args)
 
-Execute the AndroidDevice::longTap playwright routine.
+Execute the AndroidDevice::close playwright routine.
 
-See L<https://playwright.dev/docs/api/class-AndroidDevice#AndroidDevice-longTap> for more information.
+See L<https://playwright.dev/docs/api/class-AndroidDevice#AndroidDevice-close> for more information.
 
-=head2 installApk(@args)
+=head2 shell(@args)
 
-Execute the AndroidDevice::installApk playwright routine.
+Execute the AndroidDevice::shell playwright routine.
 
-See L<https://playwright.dev/docs/api/class-AndroidDevice#AndroidDevice-installApk> for more information.
-
-=head2 drag(@args)
-
-Execute the AndroidDevice::drag playwright routine.
-
-See L<https://playwright.dev/docs/api/class-AndroidDevice#AndroidDevice-drag> for more information.
-
-=head2 screenshot(@args)
-
-Execute the AndroidDevice::screenshot playwright routine.
-
-See L<https://playwright.dev/docs/api/class-AndroidDevice#AndroidDevice-screenshot> for more information.
+See L<https://playwright.dev/docs/api/class-AndroidDevice#AndroidDevice-shell> for more information.
 
 =head2 pinchOpen(@args)
 
@@ -451,47 +451,47 @@ Execute the AndroidDevice::pinchOpen playwright routine.
 
 See L<https://playwright.dev/docs/api/class-AndroidDevice#AndroidDevice-pinchOpen> for more information.
 
-=head2 webView(@args)
+=head2 push(@args)
 
-Execute the AndroidDevice::webView playwright routine.
+Execute the AndroidDevice::push playwright routine.
 
-See L<https://playwright.dev/docs/api/class-AndroidDevice#AndroidDevice-webView> for more information.
+See L<https://playwright.dev/docs/api/class-AndroidDevice#AndroidDevice-push> for more information.
 
-=head2 fill(@args)
+=head2 screenshot(@args)
 
-Execute the AndroidDevice::fill playwright routine.
+Execute the AndroidDevice::screenshot playwright routine.
 
-See L<https://playwright.dev/docs/api/class-AndroidDevice#AndroidDevice-fill> for more information.
+See L<https://playwright.dev/docs/api/class-AndroidDevice#AndroidDevice-screenshot> for more information.
 
-=head2 press(@args)
+=head2 setDefaultTimeout(@args)
 
-Execute the AndroidDevice::press playwright routine.
+Execute the AndroidDevice::setDefaultTimeout playwright routine.
 
-See L<https://playwright.dev/docs/api/class-AndroidDevice#AndroidDevice-press> for more information.
+See L<https://playwright.dev/docs/api/class-AndroidDevice#AndroidDevice-setDefaultTimeout> for more information.
 
-=head2 scroll(@args)
+=head2 tap(@args)
 
-Execute the AndroidDevice::scroll playwright routine.
+Execute the AndroidDevice::tap playwright routine.
 
-See L<https://playwright.dev/docs/api/class-AndroidDevice#AndroidDevice-scroll> for more information.
-
-=head2 launchBrowser(@args)
-
-Execute the AndroidDevice::launchBrowser playwright routine.
-
-See L<https://playwright.dev/docs/api/class-AndroidDevice#AndroidDevice-launchBrowser> for more information.
-
-=head2 input(@args)
-
-Execute the AndroidDevice::input playwright routine.
-
-See L<https://playwright.dev/docs/api/class-AndroidDevice#AndroidDevice-input> for more information.
+See L<https://playwright.dev/docs/api/class-AndroidDevice#AndroidDevice-tap> for more information.
 
 =head2 fling(@args)
 
 Execute the AndroidDevice::fling playwright routine.
 
 See L<https://playwright.dev/docs/api/class-AndroidDevice#AndroidDevice-fling> for more information.
+
+=head2 longTap(@args)
+
+Execute the AndroidDevice::longTap playwright routine.
+
+See L<https://playwright.dev/docs/api/class-AndroidDevice#AndroidDevice-longTap> for more information.
+
+=head2 open(@args)
+
+Execute the AndroidDevice::open playwright routine.
+
+See L<https://playwright.dev/docs/api/class-AndroidDevice#AndroidDevice-open> for more information.
 
 =head2 on(@args)
 

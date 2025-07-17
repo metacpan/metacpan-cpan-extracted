@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::APIRequestContext;
-$Playwright::APIRequestContext::VERSION = '1.531';
+$Playwright::APIRequestContext::VERSION = '1.532';
 use parent 'Playwright::Base';
 
 sub new {
@@ -32,11 +32,11 @@ sub put {
     );
 }
 
-sub storageState {
+sub patch {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'storageState',
+        command => 'patch',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -52,11 +52,21 @@ sub dispose {
     );
 }
 
-sub post {
+sub get {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'post',
+        command => 'get',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub head {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'head',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -72,21 +82,11 @@ sub createFormData {
     );
 }
 
-sub get {
+sub post {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'get',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub patch {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'patch',
+        command => 'post',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -102,11 +102,11 @@ sub delete {
     );
 }
 
-sub head {
+sub storageState {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'head',
+        command => 'storageState',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -166,7 +166,7 @@ Playwright::APIRequestContext - Automatically generated class for Playwright::AP
 
 =head1 VERSION
 
-version 1.531
+version 1.532
 
 =head1 CONSTRUCTOR
 
@@ -183,11 +183,11 @@ Execute the APIRequestContext::put playwright routine.
 
 See L<https://playwright.dev/docs/api/class-APIRequestContext#APIRequestContext-put> for more information.
 
-=head2 storageState(@args)
+=head2 patch(@args)
 
-Execute the APIRequestContext::storageState playwright routine.
+Execute the APIRequestContext::patch playwright routine.
 
-See L<https://playwright.dev/docs/api/class-APIRequestContext#APIRequestContext-storageState> for more information.
+See L<https://playwright.dev/docs/api/class-APIRequestContext#APIRequestContext-patch> for more information.
 
 =head2 dispose(@args)
 
@@ -195,11 +195,17 @@ Execute the APIRequestContext::dispose playwright routine.
 
 See L<https://playwright.dev/docs/api/class-APIRequestContext#APIRequestContext-dispose> for more information.
 
-=head2 post(@args)
+=head2 get(@args)
 
-Execute the APIRequestContext::post playwright routine.
+Execute the APIRequestContext::get playwright routine.
 
-See L<https://playwright.dev/docs/api/class-APIRequestContext#APIRequestContext-post> for more information.
+See L<https://playwright.dev/docs/api/class-APIRequestContext#APIRequestContext-get> for more information.
+
+=head2 head(@args)
+
+Execute the APIRequestContext::head playwright routine.
+
+See L<https://playwright.dev/docs/api/class-APIRequestContext#APIRequestContext-head> for more information.
 
 =head2 createFormData(@args)
 
@@ -207,17 +213,11 @@ Execute the APIRequestContext::createFormData playwright routine.
 
 See L<https://playwright.dev/docs/api/class-APIRequestContext#APIRequestContext-createFormData> for more information.
 
-=head2 get(@args)
+=head2 post(@args)
 
-Execute the APIRequestContext::get playwright routine.
+Execute the APIRequestContext::post playwright routine.
 
-See L<https://playwright.dev/docs/api/class-APIRequestContext#APIRequestContext-get> for more information.
-
-=head2 patch(@args)
-
-Execute the APIRequestContext::patch playwright routine.
-
-See L<https://playwright.dev/docs/api/class-APIRequestContext#APIRequestContext-patch> for more information.
+See L<https://playwright.dev/docs/api/class-APIRequestContext#APIRequestContext-post> for more information.
 
 =head2 delete(@args)
 
@@ -225,11 +225,11 @@ Execute the APIRequestContext::delete playwright routine.
 
 See L<https://playwright.dev/docs/api/class-APIRequestContext#APIRequestContext-delete> for more information.
 
-=head2 head(@args)
+=head2 storageState(@args)
 
-Execute the APIRequestContext::head playwright routine.
+Execute the APIRequestContext::storageState playwright routine.
 
-See L<https://playwright.dev/docs/api/class-APIRequestContext#APIRequestContext-head> for more information.
+See L<https://playwright.dev/docs/api/class-APIRequestContext#APIRequestContext-storageState> for more information.
 
 =head2 fetch(@args)
 

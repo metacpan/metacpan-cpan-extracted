@@ -4,7 +4,7 @@ use Moose;
 with 'MooseX::Emulate::Class::Accessor::Fast';
 use MRO::Compat;
 use Catalyst::Exception ();
-use Digest              ();
+use Crypt::SysRandom    ();
 use overload            ();
 use Object::Signature   ();
 use HTML::Entities      ();
@@ -13,7 +13,7 @@ use List::Util qw/ max /;
 
 use namespace::clean -except => 'meta';
 
-our $VERSION = '0.43';
+our $VERSION = '0.44';
 $VERSION =~ tr/_//d;
 
 my @session_data_accessors; # used in delete_session
@@ -598,11 +598,7 @@ sub initialize_session_data {
 }
 
 sub generate_session_id {
-    my $c = shift;
-
-    my $digest = $c->_find_digest();
-    $digest->add( $c->session_hash_seed() );
-    return $digest->hexdigest;
+    return unpack( "H*", Crypt::SysRandom::random_bytes(20) );
 }
 
 sub create_session_id_if_needed {
@@ -627,28 +623,7 @@ sub create_session_id {
 my $counter;
 
 sub session_hash_seed {
-    my $c = shift;
-
-    return join( "", ++$counter, time, rand, $$, {}, overload::StrVal($c), );
-}
-
-my $usable;
-
-sub _find_digest () {
-    unless ($usable) {
-        foreach my $alg (qw/SHA-1 SHA-256 MD5/) {
-            if ( eval { Digest->new($alg) } ) {
-                $usable = $alg;
-                last;
-            }
-        }
-        Catalyst::Exception->throw(
-                "Could not find a suitable Digest module. Please install "
-              . "Digest::SHA1, Digest::SHA, or Digest::MD5" )
-          unless $usable;
-    }
-
-    return Digest->new($usable);
+    return Crypt::SysRandom::random_bytes( 20 );
 }
 
 sub dump_these {
@@ -973,53 +948,15 @@ insensitive hexadecimal characters.
 
 =item generate_session_id
 
-This method will return a string that can be used as a session ID. It is
-supposed to be a reasonably random string with enough bits to prevent
-collision. It basically takes C<session_hash_seed> and hashes it using SHA-1,
-MD5 or SHA-256, depending on the availability of these modules.
+This method will return a string that can be used as a session ID.  It
+is simply a hexidecimal string of raw bytes from the system entropy
+source, e.g. F</dev/urandom>.
 
 =item session_hash_seed
 
-This method is actually rather internal to generate_session_id, but should be
-overridable in case you want to provide more random data.
-
-Currently it returns a concatenated string which contains:
-
-=over 4
-
-=item * A counter
-
-=item * The current time
-
-=item * One value from C<rand>.
-
-=item * The stringified value of a newly allocated hash reference
-
-=item * The stringified value of the Catalyst context object
-
-=back
-
-in the hopes that those combined values are entropic enough for most uses. If
-this is not the case you can replace C<session_hash_seed> with e.g.
-
-    sub session_hash_seed {
-        open my $fh, "<", "/dev/random";
-        read $fh, my $bytes, 20;
-        close $fh;
-        return $bytes;
-    }
-
-Or even more directly, replace C<generate_session_id>:
-
-    sub generate_session_id {
-        open my $fh, "<", "/dev/random";
-        read $fh, my $bytes, 20;
-        close $fh;
-        return unpack("H*", $bytes);
-    }
-
-Also have a look at L<Crypt::Random> and the various openssl bindings - these
-modules provide APIs for cryptographically secure random data.
+This method returns raw bytes from the system random source. It is no
+longer used but exists for legacy code that might override
+C<generate_session_id> but still uses this method.
 
 =item finalize_session
 
@@ -1240,7 +1177,7 @@ And countless other contributers from #catalyst. Thanks guys!
 
 Devin Austin (dhoss) <dhoss@cpan.org>
 
-Robert Rothenberg <rrwo@cpan.org> (on behalf of Foxtons Ltd.)
+Robert Rothenberg <rrwo@cpan.org>
 
 =head1 COPYRIGHT & LICENSE
 
@@ -1249,5 +1186,3 @@ Robert Rothenberg <rrwo@cpan.org> (on behalf of Foxtons Ltd.)
     it and/or modify it under the same terms as Perl itself.
 
 =cut
-
-

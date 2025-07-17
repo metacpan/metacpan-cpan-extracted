@@ -88,8 +88,9 @@ SV * hash_init(SV * flags = &PL_sv_undef)
   unsigned int state_flags = g_protmem_flags_state_default;
 
   CODE:
+  SvGETMAGIC(flags);
   if (SvOK(flags))
-    state_flags = SvUV(flags);
+    state_flags = SvUV_nomg(flags);
 
   switch(ix) {
     case 1:

@@ -85,6 +85,7 @@ SV * generichash(SV * msg, STRLEN out_len = 0, SV * key = &PL_sv_undef)
   else
     msg_buf = (unsigned char *)SvPVbyte(msg, msg_len);
 
+  SvGETMAGIC(key);
   if (SvOK(key)) {
     if (sv_derived_from(key, MEMVAULT_CLASS)) {
       key_pm = protmem_get(aTHX_ key, MEMVAULT_CLASS);
@@ -92,7 +93,7 @@ SV * generichash(SV * msg, STRLEN out_len = 0, SV * key = &PL_sv_undef)
       key_len = key_pm->size;
     }
     else {
-      key_buf = (unsigned char *)SvPVbyte(key, key_len);
+      key_buf = (unsigned char *)SvPVbyte_nomg(key, key_len);
     }
     if (key_len < key_req_min || key_len > key_req_max)
       croak("generichash: Invalid key length %lu", key_len);
@@ -167,6 +168,7 @@ SV * generichash_blake2b_init_salt_personal( \
   if (personal_len < crypto_generichash_blake2b_PERSONALBYTES)
     croak("generichash_init_salt_personal: Invalid personalization length (too short) %lu", personal_len);
 
+  SvGETMAGIC(key);
   if (SvOK(key)) {
     if (sv_derived_from(key, MEMVAULT_CLASS)) {
       key_pm = protmem_get(aTHX_ key, MEMVAULT_CLASS);
@@ -174,15 +176,16 @@ SV * generichash_blake2b_init_salt_personal( \
       key_len = key_pm->size;
     }
     else {
-      key_buf = (unsigned char *)SvPVbyte(key, key_len);
+      key_buf = (unsigned char *)SvPVbyte_nomg(key, key_len);
     }
     if (key_len <  crypto_generichash_blake2b_KEYBYTES_MIN
         || key_len > crypto_generichash_blake2b_KEYBYTES_MAX)
       croak("generichash_init_salt_personal: Invalid key length %lu", key_len);
   }
 
+  SvGETMAGIC(flags);
   if (SvOK(flags))
-    pm_flags = SvUV(flags);
+    pm_flags = SvUV_nomg(flags);
 
   if (out_len < crypto_generichash_BYTES_MIN
       || out_len > crypto_generichash_BYTES_MAX)
@@ -260,6 +263,7 @@ SV * generichash_blake2b_salt_personal( \
   else
     msg_buf = (unsigned char *)SvPVbyte(msg, msg_len);
 
+  SvGETMAGIC(key);
   if (SvOK(key)) {
     if (sv_derived_from(key, MEMVAULT_CLASS)) {
       key_pm = protmem_get(aTHX_ key, MEMVAULT_CLASS);
@@ -267,7 +271,7 @@ SV * generichash_blake2b_salt_personal( \
       key_len = key_pm->size;
     }
     else {
-      key_buf = (unsigned char *)SvPVbyte(key, key_len);
+      key_buf = (unsigned char *)SvPVbyte_nomg(key, key_len);
     }
     if (key_len < crypto_generichash_blake2b_KEYBYTES_MIN
         || key_len > crypto_generichash_blake2b_KEYBYTES_MAX)
@@ -343,6 +347,7 @@ SV * generichash_init( \
         croak("generichash_init: Invalid output length: %lu", out_len);
   }
 
+  SvGETMAGIC(key);
   if (SvOK(key)) {
     if (sv_derived_from(key, MEMVAULT_CLASS)) {
       key_pm = protmem_get(aTHX_ key, MEMVAULT_CLASS);
@@ -350,15 +355,16 @@ SV * generichash_init( \
       key_len = key_pm->size;
     }
     else {
-      key_buf = (unsigned char *)SvPVbyte(key, key_len);
+      key_buf = (unsigned char *)SvPVbyte_nomg(key, key_len);
     }
     if (key_len <  crypto_generichash_KEYBYTES_MIN
         || key_len > crypto_generichash_KEYBYTES_MAX)
       croak("generichash_init: Invalid key length %lu", key_len);
   }
 
+  SvGETMAGIC(flags);
   if (SvOK(flags))
-    pm_flags = SvUV(flags);
+    pm_flags = SvUV_nomg(flags);
 
   if (key_pm && protmem_grant(aTHX_ key_pm, PROTMEM_FLAG_MPROTECT_RO) != 0)
     croak("generichash_init: Failed to grant key protmem RO");

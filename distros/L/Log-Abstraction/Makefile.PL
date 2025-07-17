@@ -10,7 +10,7 @@ if($^O eq 'darwin') {
 }
 
 WriteMakefile(
-	NAME		 => 'Log::Abstraction',
+	NAME	 => 'Log::Abstraction',
 	ABSTRACT_FROM => 'lib/Log/Abstraction.pm',
 	VERSION_FROM => 'lib/Log/Abstraction.pm', # finds $VERSION
 	AUTHOR	 => 'Nigel Horne <njh@nigelhorne.com>',
@@ -29,7 +29,6 @@ WriteMakefile(
 	},
 	TEST_REQUIRES => {
 		'Test::DescribeMe' => 0,
-		'Test::More' => 0,
 		'Test::Most' => 0,
 		'Test::Needs' => 0,
 		'File::Spec' => 0,

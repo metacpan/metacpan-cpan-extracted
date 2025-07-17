@@ -41,7 +41,7 @@ DETERMINE YOUR DISTRIBUTION
   system.  This includes, but is not limited to Unix, Linux, and BSD.
 
   The two I will concentrate on in this document are Debian and RedHat based
-  linux distributions.
+  Linux distributions.
 
   Debian distributions use "apt" utility to manage packages.  Debian
   distributions are typically:
@@ -100,7 +100,7 @@ INSTALLING WITH PACKAGED PERL
   Acquiring (use only one method):
   
     *  Use CPAN, run:  install Graphics::Framebuffer
-    *  git https://github.com/richcsst/Graphics-Framebuffer.git
+    *  git clone https://github.com/richcsst/Graphics-Framebuffer.git
 
        perl Makefile.PL
        make
@@ -123,7 +123,7 @@ INSTALLING WITH PERLBREW (and installing Perlbrew)
 
     *  perlbrew init
     *  perlbrew install-cpanm
-	*  perlbrew install-patchperl
+    *  perlbrew install-patchperl
     *  perlbrew install -n perl-5.30.1 -Dusethreads
     *  perlbrew clean
     *  perlbrew switch perl-5.30.1

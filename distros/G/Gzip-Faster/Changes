@@ -1,5 +1,9 @@
 Revision history for Perl module 'Gzip::Faster'
 
+0.22 2025-07-17
+
+* Patch for memory leak
+
 0.21 2017-12-29
 
 * Empty string input to gzip/gunzip and friends now causes a warning

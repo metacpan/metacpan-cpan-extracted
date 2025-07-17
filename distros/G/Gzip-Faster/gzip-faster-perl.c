@@ -3,11 +3,15 @@
 #define CHUNK 0x4000
 
 /* These are magic numbers for zlib, please refer to
-   "/usr/include/zlib.h" for the details. */
+   "/usr/include/zlib.h" for the details. zlib does not provide any
+   macros for these. */
 
+/* Just use the maximum. */
 #define windowBits 15
 #define DEFLATE_ENABLE_ZLIB_GZIP 16
 #define INFLATE_ENABLE_ZLIB_GZIP 32
+/* Default as given in zlib.h. */
+#define DEFAULT_MEMLEVEL 8
 
 #define CALL_ZLIB(x)						 \
 	zlib_status = x;					 \
@@ -47,26 +51,33 @@ typedef struct
 }
 gzip_faster_t;
 
-/* See "http://www.gzip.org/zlib/rfc-gzip.html". */
+/* This is our marker for the extra buffer in the Gzip header. See
+   "http://www.gzip.org/zlib/rfc-gzip.html". */
 
 #define GZIP_PERL_ID "GF\1\0"
 #define GZIP_PERL_ID_LENGTH 4
 
-/* Perl stuff. */
+/* Perl flags which go in our extra buffer. */
 
 #define GZIP_PERL_LENGTH 1
 #define EXTRA_LENGTH GZIP_PERL_ID_LENGTH + GZIP_PERL_LENGTH
 #define GZIP_PERL_UTF8 (1<<0)
+
 /* Add more Perl flags here like 
 
 #define SOMETHING (1<<1)
 
 etc. */
 
+/* Set up the gzip buffer in "gf->strm" using the scalar in
+   "gf->in". */
+
 static void
 gf_set_up (gzip_faster_t * gf)
 {
-    /* Extract the information from "gf->in". */
+    /* Extract the information from "gf->in". Note that SvPV is a
+       macro, and so the following line of code sets "gf->in_length"
+       rather than retrieving it. */
     gf->in_char = SvPV (gf->in, gf->in_length);
     gf->strm.next_in = (unsigned char *) gf->in_char;
     gf->strm.avail_in = gf->in_length;
@@ -82,11 +93,11 @@ gf_set_up (gzip_faster_t * gf)
 /* Check that we are always dealing with a user-defined object, not a
    module-defined object, before altering the values. */
 
-#define UO					\
-    if (! gf->user_object) {			\
-	croak ("THIS IS NOT A USER OBJECT");	\
+#define UO							\
+    if (! gf->user_object) {					\
+	croak ("%s:%d: THIS IS NOT A USER OBJECT",		\
+	       __FILE__, __LINE__);				\
     }
-
 
 /* Delete the file name in the object. */
 
@@ -95,6 +106,8 @@ gf_delete_file_name (gzip_faster_t * gf)
 {
     UO;
     if (gf->file_name) {
+	/* Decrement the reference count by one to tell Perl we are no
+	   longer keeping a pointer to this SV. */
 	SvREFCNT_dec (gf->file_name);
 	gf->file_name = 0;
     }
@@ -107,6 +120,8 @@ gf_delete_mod_time (gzip_faster_t * gf)
 {
     UO;
     if (gf->mod_time) {
+	/* Decrement the reference count by one to tell Perl we are no
+	   longer keeping a pointer to this SV. */
 	SvREFCNT_dec (gf->mod_time);
 	gf->mod_time = 0;
     }
@@ -119,6 +134,9 @@ gf_set_file_name (gzip_faster_t * gf, SV * file_name)
     if (gf->file_name) {
 	gf_delete_file_name (gf);
     }
+    /* Add one to the reference count of the SV to tell Perl we have a
+       pointer to it in our structure, in case it loses all its other
+       references and Perl decides to delete it. */
     SvREFCNT_inc (file_name);
     gf->file_name = file_name;
 }
@@ -140,6 +158,9 @@ gf_set_mod_time (gzip_faster_t * gf, SV * mod_time)
     if (gf->mod_time) {
 	gf_delete_mod_time (gf);
     }
+    /* Add one to the reference count of the SV to tell Perl we have a
+       pointer to it in our structure, in case it loses all its other
+       references and Perl decides to delete it. */
     SvREFCNT_inc (mod_time);
     gf->mod_time = mod_time;
 }
@@ -154,6 +175,9 @@ gf_get_mod_time (gzip_faster_t * gf)
     return & PL_sv_undef;
 }
 
+/* Check for an unlikely condition after the end of the
+   inflate/deflate loop. */
+
 static void
 check_avail_in (gzip_faster_t * gf)
 {
@@ -163,6 +187,9 @@ check_avail_in (gzip_faster_t * gf)
     }
 }
 
+/* Check for an unlikely condition after the end of the
+   inflate/deflate loop. */
+
 static void
 check_zlib_status (int zlib_status)
 {
@@ -171,6 +198,8 @@ check_zlib_status (int zlib_status)
 	       zlib_status);
     }
 }
+
+/* Compress "gf->in" (an SV *) and return the compressed value. */
 
 static SV *
 gzip_faster (gzip_faster_t * gf)
@@ -190,19 +219,37 @@ gzip_faster (gzip_faster_t * gf)
 	return & PL_sv_undef;
     }
 
+    /* Set the windowBits parameter "gf->wb" depending on what kind of
+       compression the user wants. */
     if (gf->is_gzip) {
 	if (gf->is_raw) {
 	    croak ("Raw deflate and gzip are incompatible");
 	}
+	/* From zlib.h: "windowBits can also be greater than 15 for
+	   optional gzip decoding.  Add 32 to windowBits to enable
+	   zlib and gzip decoding with automatic header detection, or
+	   add 16 to decode only the gzip format (the zlib format will
+	   return a Z_DATA_ERROR)." */
+
 	gf->wb += DEFLATE_ENABLE_ZLIB_GZIP;
     }
     else {
 	if (gf->is_raw) {
+
+	    /* From zlib.h: " windowBits can also be -8..-15 for raw
+	       inflate.  In this case, -windowBits determines the
+	       window size.  inflate() will then process raw deflate
+	       data, not looking for a zlib or gzip header, not
+	       generating a check value, and not looking for any check
+	       values for comparison at the end of the stream.  " */
+
 	    gf->wb = -gf->wb;
 	}
     }
+    /* The second-to-final parameter is "memLevel". Currently there is
+       no way for the user to set this. */
     CALL_ZLIB (deflateInit2 (& gf->strm, gf->level, Z_DEFLATED,
-			     gf->wb, 8,
+			     gf->wb, DEFAULT_MEMLEVEL,
 			     Z_DEFAULT_STRATEGY));
 
     if (gf->user_object) {
@@ -213,6 +260,8 @@ gzip_faster (gzip_faster_t * gf)
 	    int set_header;
 	    set_header = 0;
 	    if (gf->copy_perl_flags) {
+		/* Copy the Perl flags of "in" into the compressed
+		   output. */
 		memcpy (extra, GZIP_PERL_ID, GZIP_PERL_ID_LENGTH);
 		extra[GZIP_PERL_ID_LENGTH] = 0;
 		if (SvUTF8 (gf->in)) {
@@ -224,6 +273,9 @@ gzip_faster (gzip_faster_t * gf)
 	    }
 	    if (gf->file_name) {
 		char * fn;
+		/* zlib doesn't use the length of the name, it uses
+		   nul-termination of the string to indicate the
+		   length of the file name. */
 		fn = SvPV_nolen (gf->file_name);
 		header.name = (Bytef *) fn;
 		set_header++;
@@ -245,6 +297,7 @@ gzip_faster (gzip_faster_t * gf)
 	    }
 	}
     }
+    /* Mark the return value as uninitialised. */
     zipped = 0;
 
     do {
@@ -264,6 +317,7 @@ gzip_faster (gzip_faster_t * gf)
 	    /* This is supposed to never happen, but just in case it
 	       does. */
 	    croak ("Z_STREAM_ERROR from zlib during deflate");
+	    break;
 
 	default:
 	    deflateEnd (& gf->strm);
@@ -280,18 +334,33 @@ gzip_faster (gzip_faster_t * gf)
 	}
     }
     while (gf->strm.avail_out == 0);
+    /* Check completed ok */
     check_avail_in (gf);
     check_zlib_status (zlib_status);
+    /* zlib clean up */
     deflateEnd (& gf->strm);
+    /* Delete any user-defined file names so that they don't
+       accidentally get recycled into the next thing to be zipped. */
     if (gf->user_object) {
 	if (gf->file_name) {
 	    gf_delete_file_name (gf);
 	}
     }
+    /* Safety measure. We don't expect this to happen, but on the
+       other hand we have set "zipped" to be zero before the
+       do...while loop, so just check it didn't accidentally remain
+       unset here. */
+    if (! zipped) {
+	croak ("%s:%d: failed to set zipped", __FILE__, __LINE__);
+    }
     return zipped;
 }
 
+/* The maximum length of file name which we allow for. */
+
 #define GF_FILE_NAME_MAX 0x400
+
+/* Decompress "gf->in" (an SV *) and return the decompressed value. */
 
 static SV *
 gunzip_faster (gzip_faster_t * gf)
@@ -397,13 +466,20 @@ gunzip_faster (gzip_faster_t * gf)
 	}
     }
     while (gf->strm.avail_out == 0);
+    /* Check everything is OK. */
     check_avail_in (gf);
     check_zlib_status (zlib_status);
+    /* Clean up. */
     inflateEnd (& gf->strm);
+    /* "header.done" is filled by zlib. */
     if (gf->user_object && gf->is_gzip && header.done == 1) {
+
 	if (gf->copy_perl_flags) {
+	    /* Check whether the "extra" segment of the header looks
+	       like one of ours. */
 	    if (strncmp ((const char *) header.extra, GZIP_PERL_ID,
 			 GZIP_PERL_ID_LENGTH) == 0) {
+		/* Copy the Perl flags from the extra segment. */
 		unsigned is_utf8;
 		is_utf8 = header.extra[GZIP_PERL_ID_LENGTH] & GZIP_PERL_UTF8;
 		if (is_utf8) {
@@ -411,30 +487,35 @@ gunzip_faster (gzip_faster_t * gf)
 		}
 	    }
 	}
+
+	/* If the header includes a file name, copy it into
+	   $gf->file_name. */
 	if (header.name && header.name_max > 0) {
 	    gf->file_name = newSVpv ((const char *) header.name, 0);
-	    SvREFCNT_inc (gf->file_name);
 	}
-	else {
-	    gf_delete_file_name (gf);
-	}
+
 	/* If the header includes a modification time, copy it into
-	   $gf->mod_time. If the header doesn't include a modification
-	   time, make sure the modification time of $gf is completely
-	   clear, so the user doesn't get old junk data. */
+	   $gf->mod_time. */
 	if (header.time) {
 	    /* I'm not 100% sure of the type conversion
 	       here. header.time is uLong in the zlib documentation,
 	       and UV is unsigned int, or something? */
 	    gf->mod_time = newSVuv (header.time);
-	    SvREFCNT_inc (gf->mod_time);
 	}
-	else {
-	    gf_delete_mod_time (gf);
-	}
+
+	/* Old file names and modification times have been deleted
+	   before the call to inflate, so we don't need to delete them
+	   again here. */
+
+    }
+    /* Safety measure. See similar comment above. */
+    if (! plain) {
+	croak ("%s:%d: failed to set plain", __FILE__, __LINE__);
     }
     return plain;
 }
+
+/* Set the values of "gf" to the module defaults. */
 
 static void
 new_user_object (gzip_faster_t * gf)
@@ -446,6 +527,8 @@ new_user_object (gzip_faster_t * gf)
     gf->user_object = 1;
     gf->level = Z_DEFAULT_COMPRESSION;
 }
+
+/* Set the compression level of "gf" to "level", with checks. */
 
 static void
 set_compression_level (gzip_faster_t * gf, int level)

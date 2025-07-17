@@ -197,20 +197,58 @@ SV * sodium_memcmp(SV * x, SV * y, STRLEN len = 0)
   OUTPUT:
   RETVAL
 
+SV * sodium_pad(SV * buf, STRLEN blocksize)
+
+  PREINIT:
+  unsigned char *buf_buf, *padded_buf;
+  STRLEN buf_len, pad_len, padded_len;
+
+  CODE:
+  if (blocksize <= 0)
+    croak("sodium_pad: Invalid blocksize <= 0");
+
+  buf_buf = (unsigned char *)SvPVbyte(buf, buf_len);
+
+  pad_len = blocksize - 1;
+  if ((blocksize & (blocksize - 1)) == 0)
+    pad_len -= buf_len & (blocksize - 1);
+  else
+    pad_len -= buf_len % blocksize;
+
+  if ((STRLEN)SIZE_MAX - buf_len - 1 <= pad_len)
+    croak("sodium_pad: Pad exceeds SIZE_MAX");
+  padded_len = buf_len + pad_len + 1;
+
+  Newx(padded_buf, padded_len + 1, unsigned char);
+  padded_buf[padded_len] = '\0';
+  memcpy(padded_buf, buf_buf, buf_len);
+  if (sodium_pad(&padded_len, padded_buf, buf_len, blocksize, padded_len) != 0)
+    /* should be impossible */
+    croak("BUG: sodium_pad: sodium_pad returned error");
+
+  RETVAL=newSV(0);
+  sv_usepvn_flags(RETVAL, (char *)padded_buf, padded_len, SV_HAS_TRAILING_NUL);
+
+  OUTPUT:
+  RETVAL
+
 SV * sodium_random_bytes( \
   STRLEN out_len, \
   SV * use_memvault = &PL_sv_undef, \
   SV * flags = &PL_sv_undef \
 )
 
+  PREINIT:
+  int mv_flags = g_protmem_flags_memvault_default;
+
   CODE:
   if (out_len < 1)
     croak("Length must be greater than 0");
 
   if (SvTRUE(use_memvault)) {
-    int mv_flags = g_protmem_flags_memvault_default;
+    SvGETMAGIC(flags);
     if (SvOK(flags))
-      mv_flags = SvUV(flags);
+      mv_flags = SvUV_nomg(flags);
     protmem *new_pm;
     new_pm = protmem_init(aTHX_ out_len, mv_flags);
     if (new_pm == NULL)
@@ -284,6 +322,33 @@ SV * sodium_sub(SV * x, SV * y)
     Safefree(realloc_buf);
 
   sv_usepvn_flags(RETVAL, (char *)out_buf, x_len, SV_HAS_TRAILING_NUL);
+
+  OUTPUT:
+  RETVAL
+
+SV * sodium_unpad(SV * buf, STRLEN blocksize);
+
+  PREINIT:
+  unsigned char *buf_buf, *unpadded_buf;
+  STRLEN buf_len, unpadded_len;
+
+  CODE:
+  if (blocksize <= 0)
+    croak("sodium_unpad: Invalid blocksize <= 0");
+
+  buf_buf = (unsigned char *)SvPVbyte(buf, buf_len);
+  if (buf_len < blocksize)
+    croak("sodium_unpad: Buffer is shorter than blocksize");
+
+  if (sodium_unpad(&unpadded_len, buf_buf, buf_len, blocksize) != 0)
+    croak("sodium_unpad: Invalid padded buffer");
+
+  Newx(unpadded_buf, unpadded_len + 1, unsigned char);
+  unpadded_buf[unpadded_len] = '\0';
+  memcpy(unpadded_buf, buf_buf, unpadded_len);
+
+  RETVAL=newSV(0);
+  sv_usepvn_flags(RETVAL, (char *)unpadded_buf, unpadded_len, SV_HAS_TRAILING_NUL);
 
   OUTPUT:
   RETVAL

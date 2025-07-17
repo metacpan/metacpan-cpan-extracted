@@ -6,7 +6,10 @@ query:
   - (pair | string | regex | bareword)+ % ./-/ -
 
 pair:
-  - /':'/ key quoted-value?
+  - /':'/ key (qmark | quoted-value)?
+
+qmark:
+  /( '?' )/
 
 key:
   /( [a-zA-Z._-][a-zA-Z0-9._-]* )/

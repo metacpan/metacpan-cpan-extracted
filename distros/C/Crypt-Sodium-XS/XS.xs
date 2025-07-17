@@ -98,6 +98,27 @@
 
 #define SODIUM_MALLOC(size) (sodium_malloc(((size) + (size_t)63U) & ~(size_t)63U))
 
+/* fallback for pre-5.31.4 */
+#ifndef SvPVbyte_nomg
+#ifdef PERL_STATIC_INLINE
+PERL_STATIC_INLINE char * SvPVbyte_nomg(pTHX_ SV *sv, STRLEN *len)
+#else
+static char * SvPVbyte_nomg(pTHX_ SV *sv, STRLEN *len)
+#endif
+{
+  char *buf = SvPV_nomg(sv, *len);
+  if (!SvUTF8(sv))
+    return buf;
+  if (SvGMAGICAL(sv)) {
+    sv = sv_2mortal(newSVpvn(buf, *len));
+    SvUTF8_on(sv);
+  }
+  return SvPVbyte(sv, *len);
+}
+#define SvPVbyte_nomg(sv, len) SvPVbyte_nomg(aTHX_ (sv), &(len))
+#endif
+
+
 static unsigned int
 g_protmem_flags_state_default = PROTMEM_FLAG_MPROTECT_NOACCESS
                               | PROTMEM_FLAG_MLOCK_STRICT;
@@ -368,8 +389,9 @@ static SV * nonce_generate(pTHX_ STRLEN out_len, SV *base) {
   if (nonce_buf == NULL)
     croak("Failed to allocate memory");
 
+  SvGETMAGIC(base);
   if (SvOK(base)) {
-    base_buf = (unsigned char *)SvPVbyte(base, base_len);
+    base_buf = (unsigned char *)SvPVbyte_nomg(base, base_len);
     if (base_len > out_len) {
       Safefree(nonce_buf);
       croak("Invalid nonce length (too long): %lu", base_len);
@@ -391,8 +413,9 @@ static SV * sv_keygen(pTHX_ STRLEN size, SV * flags) {
   protmem *key_pm;
   unsigned int mv_flags = g_protmem_flags_key_default;
 
+  SvGETMAGIC(flags);
   if (SvOK(flags))
-    mv_flags = SvUV(flags);
+    mv_flags = SvUV_nomg(flags);
 
   key_pm = protmem_init(aTHX_ size, mv_flags);
   if (key_pm == NULL)

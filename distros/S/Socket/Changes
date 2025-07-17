@@ -1,5 +1,10 @@
 Revision history for Socket
 
+2.040   2025-07-16
+        [BUGFIXES]
+         * Fix test skip count for INET6 sockaddr tests (RT168005)
+           (no code change other than unit tests)
+
 2.039   2025-06-25
         [BUGFIXES]
          * Make sure to invoke GETMAGIC on arguments to `pack_sockaddr_in` and

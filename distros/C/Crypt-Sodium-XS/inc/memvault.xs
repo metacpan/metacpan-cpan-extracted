@@ -11,8 +11,9 @@ SV * new(SV * class, SV * bytes, SV * flags = &PL_sv_undef)
   CODE:
   PERL_UNUSED_VAR(class);
 
+  SvGETMAGIC(flags);
   if (SvOK(flags))
-    new_flags = SvUV(flags);
+    new_flags = SvUV_nomg(flags);
 
   out_buf = (unsigned char *)SvPVbyte(bytes, out_len);
 
@@ -51,8 +52,9 @@ SV * new_from_hex(SV * class, SV * hex, SV * flags = &PL_sv_undef)
   else
     hex_buf = SvPVbyte(hex, hex_len);
 
+  SvGETMAGIC(flags);
   if (SvOK(flags))
-    new_flags = SvUV(flags);
+    new_flags = SvUV_nomg(flags);
 
   new_pm = protmem_init(aTHX_ hex_len / 2, new_flags);
   if (new_pm == NULL)
@@ -112,8 +114,9 @@ SV * new_from_base64( \
   else
     b64_buf = SvPVbyte(b64, b64_len);
 
+  SvGETMAGIC(flags);
   if (SvOK(flags))
-    new_flags = SvUV(flags);
+    new_flags = SvUV_nomg(flags);
 
   switch (variant) {
     case 0:
@@ -185,8 +188,9 @@ SV * new_from_fd(SV * class, SV * file, SV * flags = &PL_sv_undef)
   CODE:
   PERL_UNUSED_VAR(class);
 
+  SvGETMAGIC(flags);
   if (SvOK(flags))
-    new_flags = SvUV(flags);
+    new_flags = SvUV_nomg(flags);
 
   switch(ix) {
     case 1:
@@ -271,22 +275,27 @@ SV * new_from_ttyno( \
   char *vbuf;
   int fd;
   unsigned int new_flags = g_protmem_flags_key_default;
+  STRLEN prompt_len;
   struct termios tattr;
   FILE *file;
 
   CODE:
   PERL_UNUSED_VAR(class);
 
+  SvGETMAGIC(ttyno);
   if (SvOK(ttyno))
-    fd = SvIV(ttyno);
+    fd = SvIV_nomg(ttyno);
   else
     fd = 0;
 
+  SvGETMAGIC(prompt);
   if (SvOK(prompt))
-    prompt_buf = SvPVbyte_nolen(prompt);
+    /* prompt_len unused */
+    prompt_buf = SvPVbyte_nomg(prompt, prompt_len);
   else
     prompt_buf = "Password: ";
 
+  SvGETMAGIC(flags);
   if (SvOK(flags))
     new_flags = SvUV(flags);
 
@@ -452,6 +461,123 @@ SV * _overload_str(SV * self, ...)
   OUTPUT:
   RETVAL
 
+void bitwise_and(SV * self, SV * other, ...)
+
+  ALIAS:
+  bitwise_or = 1
+  bitwise_xor = 2
+  bitwise_and_equals = 100
+  bitwise_or_equals = 101
+  bitwise_xor_equals = 102
+
+  PREINIT:
+  protmem *self_pm;
+  protmem *other_pm = NULL;
+  protmem *new_pm = NULL;
+  unsigned char *buf;
+  unsigned char *other_buf;
+  STRLEN other_len;
+  STRLEN i;
+  unsigned int new_flags;
+
+  PPCODE:
+  self_pm = protmem_get(aTHX_ self, MEMVAULT_CLASS);
+
+  if (sv_derived_from(other, MEMVAULT_CLASS)) {
+    other_pm = protmem_get(aTHX_ other, MEMVAULT_CLASS);
+    other_buf = other_pm->pm_ptr;
+    other_len = other_pm->size;
+  }
+  else
+    other_buf = (unsigned char *)SvPVbyte(other, other_len);
+    /* should probably zero afterwards */
+  if (other_len != self_pm->size)
+    /* lengths MUST be identical below */
+    croak("Exclusive-or operands do not have equal length");
+
+  if (ix >= 100) {
+    if (other_pm)
+      if (protmem_grant(aTHX_ other_pm, PROTMEM_FLAG_MPROTECT_RO) != 0) {
+        protmem_release(aTHX_ self_pm, PROTMEM_FLAG_MPROTECT_RO);
+        croak("xor: Failed to grant other protmem RO");
+      }
+    if (protmem_grant(aTHX_ self_pm, PROTMEM_FLAG_MPROTECT_RW) != 0) {
+      if (other_pm)
+        protmem_release(aTHX_ other_pm, PROTMEM_FLAG_MPROTECT_RO);
+      croak("xor: Failed to grant self protmem RW");
+    }
+    buf = self_pm->pm_ptr;
+    /* lengths identical, assured above */
+    for (i = 0; i < other_len; i++)
+      switch(ix) {
+        case 101:
+          buf[i] |= other_buf[i];
+          break;
+        case 102:
+          buf[i] ^= other_buf[i];
+          break;
+        default: /* 100 */
+          buf[i] &= other_buf[i];
+      }
+    if (protmem_release(aTHX_ self_pm, PROTMEM_FLAG_MPROTECT_RW) != 0) {
+      if (other_pm)
+        protmem_release(aTHX_ other_pm, PROTMEM_FLAG_MPROTECT_RO);
+      croak("xor: Failed to release self protmem RW");
+    }
+  }
+  else {
+    new_flags = self_pm->flags;
+    if (other_pm)
+      new_flags &= other_pm->flags;
+    new_pm = protmem_init(aTHX_ self_pm->size, new_flags);
+    if (new_pm == NULL)
+      croak("xor: Failed to allocate protmem");
+
+    if (protmem_grant(aTHX_ self_pm, PROTMEM_FLAG_MPROTECT_RO) != 0)
+      croak("xor: Failed to grant self protmem RO");
+
+    if (other_pm)
+      if (protmem_grant(aTHX_ other_pm, PROTMEM_FLAG_MPROTECT_RO) != 0) {
+        protmem_release(aTHX_ self_pm, PROTMEM_FLAG_MPROTECT_RO);
+        croak("xor: Failed to grant other protmem RO");
+      }
+
+    buf = memcpy(new_pm->pm_ptr, self_pm->pm_ptr, self_pm->size);
+    for (i = 0; i < other_len; i++)
+      switch(ix) {
+        case 1:
+          buf[i] |= other_buf[i];
+          break;
+        case 2:
+          buf[i] ^= other_buf[i];
+          break;
+        default:
+          buf[i] &= other_buf[i];
+      }
+
+    if (protmem_release(aTHX_ new_pm, PROTMEM_FLAG_MPROTECT_RW) != 0) {
+      if (other_pm)
+        protmem_release(aTHX_ other_pm, PROTMEM_FLAG_MPROTECT_RO);
+      protmem_release(aTHX_ self_pm, PROTMEM_FLAG_MPROTECT_RO);
+      protmem_free(aTHX_ new_pm);
+      croak("xor: Failed to release new protmem RW");
+    }
+    if (protmem_release(aTHX_ self_pm, PROTMEM_FLAG_MPROTECT_RW) != 0) {
+      if (other_pm)
+        protmem_release(aTHX_ other_pm, PROTMEM_FLAG_MPROTECT_RO);
+      protmem_free(aTHX_ new_pm);
+      croak("xor: Failed to release self protmem RW");
+    }
+
+    mXPUSHs(protmem_to_sv(aTHX_ new_pm, MEMVAULT_CLASS));
+  }
+
+  if (other_pm)
+    if (protmem_release(aTHX_ other_pm, PROTMEM_FLAG_MPROTECT_RO) != 0)
+      croak("xor: Failed to release other protmem RO");
+
+  XSRETURN(1);
+
 SV * clone(SV * self)
 
   CODE:
@@ -567,9 +693,6 @@ void concat(SV * self, SV * other, SV * swapped = &PL_sv_undef)
   unsigned int new_flags;
 
   PPCODE:
-  if (items > 3)
-    croak("Invalid number of arguments");
-
   if (sv_derived_from(other, MEMVAULT_CLASS)) {
     other_pm = protmem_get(aTHX_ other, MEMVAULT_CLASS);
     buf = other_pm->pm_ptr;
@@ -703,8 +826,9 @@ SV * extract( \
   if (offset < 0)
     offset = self_len + offset;
 
+  SvGETMAGIC(length);
   if (SvOK(length)) {
-    new_len = SvIV(length);
+    new_len = SvIV_nomg(length);
     if (new_len > (long)(self_len - offset))
       new_len = self_len - offset;
     else if (new_len < -(long)(self_len - offset))
@@ -715,8 +839,9 @@ SV * extract( \
   else
     new_len = self_len - offset;
 
+  SvGETMAGIC(flags);
   if (SvOK(flags))
-    new_flags = SvIV(flags);
+    new_flags = SvIV_nomg(flags);
   else
     new_flags = self_pm->flags;
 
@@ -752,10 +877,11 @@ unsigned int flags(SV * self, SV * flags = &PL_sv_undef)
   CODE:
   self_pm = protmem_get(aTHX_ self, MEMVAULT_CLASS);
 
+  SvGETMAGIC(flags);
   if (SvOK(flags)) {
     unsigned int new_flags;
     unsigned int old_flags;
-    new_flags = SvUV(flags);
+    new_flags = SvUV_nomg(flags);
     old_flags = self_pm->flags;
     /* may want to allow changing malloc? likely not useful. */
     if ((old_flags & PROTMEM_FLAG_MALLOC_MASK)
@@ -793,8 +919,9 @@ SV * from_base64( \
   self_len = self_pm->size;
   new_flags = self_pm->flags;
 
+  SvGETMAGIC(flags);
   if (SvOK(flags))
-    new_flags = SvUV(flags);
+    new_flags = SvUV_nomg(flags);
 
   switch (variant) {
     case 0:
@@ -853,8 +980,9 @@ SV * from_hex(SV * self, SV * flags = &PL_sv_undef)
   self_len = self_pm->size;
   new_flags = self_pm->flags;
 
+  SvGETMAGIC(flags);
   if (SvOK(flags))
-    new_flags = SvUV(flags);
+    new_flags = SvUV_nomg(flags);
 
   new_pm = protmem_init(aTHX_ self_len / 2, new_flags);
   if (new_pm == NULL)
@@ -1013,6 +1141,59 @@ void lock(SV * self)
   self_pm->flags &= ~PROTMEM_FLAG_LOCK_UNLOCKED;
   XSRETURN(1);
 
+SV * pad(SV * self, STRLEN blocksize)
+
+  PREINIT:
+  protmem *self_pm, *realloc_pm;
+  STRLEN buf_len, pad_len, padded_len;
+
+  CODE:
+  if (blocksize <= 0)
+    croak("pad: Invalid blocksize <= 0");
+
+  self_pm = protmem_get(aTHX_ self, MEMVAULT_CLASS);
+  buf_len = self_pm->size;
+
+  pad_len = blocksize - 1;
+  if ((blocksize & (blocksize - 1)) == 0)
+    pad_len -= buf_len & (blocksize - 1);
+  else
+    pad_len -= buf_len % blocksize;
+
+  if ((STRLEN)SIZE_MAX - buf_len - 1 <= pad_len)
+    croak("pad: Pad exceeds SIZE_MAX");
+  padded_len = buf_len + pad_len + 1;
+
+  if (protmem_grant(aTHX_ self_pm, PROTMEM_FLAG_MPROTECT_RO) != 0)
+    croak("pad: Failed to grant self protmem RO");
+
+  realloc_pm = protmem_clone(aTHX_ self_pm, padded_len);
+  if (realloc_pm == NULL) {
+    protmem_release(aTHX_ self_pm, PROTMEM_FLAG_MPROTECT_RO);
+    croak("pad: Failed to allocate protmem");
+  }
+
+  if (protmem_release(aTHX_ self_pm, PROTMEM_FLAG_MPROTECT_RO) != 0) {
+    protmem_free(aTHX_ realloc_pm);
+    croak("pad: Failed to release self protmem RO");
+  }
+
+  if (sodium_pad(&padded_len, realloc_pm->pm_ptr, buf_len, blocksize, padded_len) != 0) {
+    /* should be impossible */
+    protmem_free(aTHX_ realloc_pm);
+    croak("BUG: pad: sodium_pad returned error");
+  }
+
+  if (protmem_release(aTHX_ realloc_pm, PROTMEM_FLAG_MPROTECT_RW) != 0) {
+    protmem_free(aTHX_ realloc_pm);
+    croak("pad: Failed to release protmem RW");
+  }
+
+  RETVAL = protmem_to_sv(aTHX_ realloc_pm, MEMVAULT_CLASS);
+
+  OUTPUT:
+  RETVAL
+
 SV * to_base64( \
   SV * self, \
   int variant = sodium_base64_VARIANT_URLSAFE_NO_PADDING, \
@@ -1029,8 +1210,9 @@ SV * to_base64( \
   self_pm = protmem_get(aTHX_ self, MEMVAULT_CLASS);
   new_flags = self_pm->flags;
 
+  SvGETMAGIC(flags);
   if (SvOK(flags))
-    new_flags = SvUV(flags);
+    new_flags = SvUV_nomg(flags);
   new_len = sodium_base64_encoded_len(self_pm->size, variant);
   new_pm = protmem_init(aTHX_ new_len, new_flags);
   if (new_pm == NULL)
@@ -1074,8 +1256,9 @@ SV * to_hex(SV * self, SV * flags = &PL_sv_undef)
   self_pm = protmem_get(aTHX_ self, MEMVAULT_CLASS);
   new_flags = self_pm->flags;
 
+  SvGETMAGIC(flags);
   if (SvOK(flags))
-    new_flags = SvUV(flags);
+    new_flags = SvUV_nomg(flags);
   new_len = self_pm->size * 2 + 1;
   new_pm = protmem_init(aTHX_ new_len, new_flags);
   if (new_pm == NULL)
@@ -1198,6 +1381,50 @@ void unlock(SV * self)
   self_pm->flags |= PROTMEM_FLAG_LOCK_UNLOCKED;
   XSRETURN(1);
 
+SV * unpad(SV * self, STRLEN blocksize)
+
+  PREINIT:
+  protmem *self_pm, *realloc_pm;
+  STRLEN buf_len, unpadded_len;
+
+  CODE:
+  if (blocksize <= 0)
+    croak("unpad: Invalid blocksize <= 0");
+
+  self_pm = protmem_get(aTHX_ self, MEMVAULT_CLASS);
+  buf_len = self_pm->size;
+  if (buf_len < blocksize)
+    croak("unpad: Buffer is shorter than blocksize");
+
+  if (protmem_grant(aTHX_ self_pm, PROTMEM_FLAG_MPROTECT_RO) != 0)
+    croak("unpad: Failed to grant self protmem RO");
+
+  if (sodium_unpad(&unpadded_len, self_pm->pm_ptr, self_pm->size, blocksize) != 0) {
+    protmem_release(aTHX_ self_pm, PROTMEM_FLAG_MPROTECT_RO);
+    croak("unpad: Invalid padded buffer");
+  }
+
+  realloc_pm = protmem_clone(aTHX_ self_pm, unpadded_len);
+  if (realloc_pm == NULL) {
+    protmem_release(aTHX_ self_pm, PROTMEM_FLAG_MPROTECT_RO);
+    croak("sodium_pad: Failed to allocate protmem");
+  }
+
+  if (protmem_release(aTHX_ realloc_pm, PROTMEM_FLAG_MPROTECT_RW) != 0) {
+    protmem_free(aTHX_ realloc_pm);
+    protmem_release(aTHX_ self_pm, PROTMEM_FLAG_MPROTECT_RO);
+    croak("sodium_pad: Failed to release protmem RW");
+  }
+  if (protmem_release(aTHX_ self_pm, PROTMEM_FLAG_MPROTECT_RO) != 0) {
+    protmem_free(aTHX_ realloc_pm);
+    croak("sodium_pad: Failed to release self protmem RO");
+  }
+
+  RETVAL = protmem_to_sv(aTHX_ realloc_pm, MEMVAULT_CLASS);
+
+  OUTPUT:
+  RETVAL
+
 void memzero(SV * self)
 
   PREINIT:
@@ -1218,98 +1445,3 @@ void memzero(SV * self)
   overload.
 
 =cut
-
-void xor(SV * self, SV * other, ...)
-
-  ALIAS:
-  _overload_xor = 1
-
-  PREINIT:
-  protmem *self_pm;
-  protmem *other_pm = NULL;
-  protmem *new_pm = NULL;
-  unsigned char *buf;
-  unsigned char *other_buf;
-  STRLEN other_len;
-  STRLEN i;
-  unsigned int new_flags;
-
-  PPCODE:
-  self_pm = protmem_get(aTHX_ self, MEMVAULT_CLASS);
-
-  if (sv_derived_from(other, MEMVAULT_CLASS)) {
-    other_pm = protmem_get(aTHX_ other, MEMVAULT_CLASS);
-    other_buf = other_pm->pm_ptr;
-    other_len = other_pm->size;
-  }
-  else
-    other_buf = (unsigned char *)SvPVbyte(other, other_len);
-    /* should probably zero afterwards */
-  if (other_len != self_pm->size)
-    /* lengths MUST be identical below */
-    croak("Exclusive-or operands do not have equal length");
-
-  if (ix == 1) {
-    new_flags = self_pm->flags;
-    if (other_pm)
-      new_flags &= other_pm->flags;
-    new_pm = protmem_init(aTHX_ self_pm->size, new_flags);
-    if (new_pm == NULL)
-      croak("xor: Failed to allocate protmem");
-
-    if (protmem_grant(aTHX_ self_pm, PROTMEM_FLAG_MPROTECT_RO) != 0)
-      croak("xor: Failed to grant self protmem RO");
-
-    if (other_pm)
-      if (protmem_grant(aTHX_ other_pm, PROTMEM_FLAG_MPROTECT_RO) != 0) {
-        protmem_release(aTHX_ self_pm, PROTMEM_FLAG_MPROTECT_RO);
-        croak("xor: Failed to grant other protmem RO");
-      }
-
-    buf = memcpy(new_pm->pm_ptr, self_pm->pm_ptr, self_pm->size);
-    for (i = 0; i < other_len; i++)
-      buf[i] ^= other_buf[i];
-
-    if (protmem_release(aTHX_ new_pm, PROTMEM_FLAG_MPROTECT_RW) != 0) {
-      if (other_pm)
-        protmem_release(aTHX_ other_pm, PROTMEM_FLAG_MPROTECT_RO);
-      protmem_release(aTHX_ self_pm, PROTMEM_FLAG_MPROTECT_RO);
-      protmem_free(aTHX_ new_pm);
-      croak("xor: Failed to release new protmem RW");
-    }
-    if (protmem_release(aTHX_ self_pm, PROTMEM_FLAG_MPROTECT_RW) != 0) {
-      if (other_pm)
-        protmem_release(aTHX_ other_pm, PROTMEM_FLAG_MPROTECT_RO);
-      protmem_free(aTHX_ new_pm);
-      croak("xor: Failed to release self protmem RW");
-    }
-
-    mXPUSHs(protmem_to_sv(aTHX_ new_pm, MEMVAULT_CLASS));
-  }
-  else {
-    if (other_pm)
-      if (protmem_grant(aTHX_ other_pm, PROTMEM_FLAG_MPROTECT_RO) != 0) {
-        protmem_release(aTHX_ self_pm, PROTMEM_FLAG_MPROTECT_RO);
-        croak("xor: Failed to grant other protmem RO");
-      }
-    if (protmem_grant(aTHX_ self_pm, PROTMEM_FLAG_MPROTECT_RW) != 0) {
-      if (other_pm)
-        protmem_release(aTHX_ other_pm, PROTMEM_FLAG_MPROTECT_RO);
-      croak("xor: Failed to grant self protmem RW");
-    }
-    buf = self_pm->pm_ptr;
-    /* lengths identical, assured above */
-    for (i = 0; i < other_len; i++)
-      buf[i] ^= other_buf[i];
-    if (protmem_release(aTHX_ self_pm, PROTMEM_FLAG_MPROTECT_RW) != 0) {
-      if (other_pm)
-        protmem_release(aTHX_ other_pm, PROTMEM_FLAG_MPROTECT_RO);
-      croak("xor: Failed to release self protmem RW");
-    }
-  }
-
-  if (other_pm)
-    if (protmem_release(aTHX_ other_pm, PROTMEM_FLAG_MPROTECT_RO) != 0)
-      croak("xor: Failed to release other protmem RO");
-
-  XSRETURN(1);

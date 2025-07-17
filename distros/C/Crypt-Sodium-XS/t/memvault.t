@@ -206,21 +206,51 @@ for my $mv_data (@mv_datas) {
   }
 }
 
-my $mv = Crypt::Sodium::XS::MemVault->new("\x01\x02\x03");
-$mv->xor("\x03\x03\x03");
-is($mv->to_hex->unlock, "020100", "exclusive or");
-$mv->xor("\x03\x03\x03");
-is($mv->to_hex->unlock, "010203", "exclusive or (roundtrip)");
-my $mv2 = $mv ^ "\x03\x03\x03";
-is($mv->to_hex->unlock, "010203", "overloaded ^ does not mutate");
-is($mv2->to_hex->unlock, "020100", "overloaded ^ result");
+my $mv = Crypt::Sodium::XS::MemVault->new("\xff\xff\xff")->unlock;
+my $mv2 = $mv->bitwise_and("\x00\x00\x00")->unlock;
+is($mv2->to_hex, "000000", "bitwise and");
+$mv = Crypt::Sodium::XS::MemVault->new("\x01\x02\x03")->unlock;
+$mv->bitwise_and_equals("\x04\x05\x06");
+is($mv->to_hex, "000002", "bitwise and-equals");
+$mv = Crypt::Sodium::XS::MemVault->new("\xaa\xbb\xcc")->unlock;
+$mv2 = $mv & "\xdd\xee\xff";
+is($mv->to_hex, "aabbcc", "overloaded & does not mutate");
+is($mv2->to_hex, "88aacc", "overloaded & result");
+$mv2 = "\xff\x00\xff" & $mv;
+is($mv2->to_hex, "aa00cc", "overloaded & result, reverse args");
+$mv &= "\xff\x00\xff";
+is($mv->to_hex, "aa00cc", "overloaded &= mutates");
+
+$mv = Crypt::Sodium::XS::MemVault->new("\xff\xff\xff")->unlock;
+$mv2 = $mv->bitwise_or("\x00\x00\x00");
+is($mv2->to_hex, "ffffff", "bitwise or");
+$mv = Crypt::Sodium::XS::MemVault->new("\x01\x02\x03")->unlock;
+$mv->bitwise_or_equals("\x04\x05\x06");
+is($mv->to_hex, "050707", "bitwise or-equals");
+$mv = Crypt::Sodium::XS::MemVault->new("\xad\xbe\xcf")->unlock;
+$mv2 = $mv | "\xda\xeb\xfc";
+is($mv->to_hex, "adbecf", "overloaded | does not mutate");
+is($mv2->to_hex, "ffffff", "overloaded | result");
+$mv2 = "\xff\x00\xff" | $mv;
+is($mv2->to_hex, "ffbeff", "overloaded | result, reverse args");
+$mv |= "\xff\x00\xff";
+is($mv->to_hex, "ffbeff", "overloaded |= mutates");
+
+$mv = Crypt::Sodium::XS::MemVault->new("\x01\x02\x03")->unlock;
+$mv->bitwise_xor_equals("\x03\x03\x03");
+is($mv->to_hex, "020100", "exclusive-or-equals");
+$mv->bitwise_xor_equals("\x03\x03\x03");
+is($mv->to_hex, "010203", "exclusive-or-equals (roundtrip)");
+$mv2 = $mv ^ "\x03\x03\x03";
+is($mv->to_hex, "010203", "overloaded ^ does not mutate");
+is($mv2->to_hex, "020100", "overloaded ^ result");
 $mv2 = "\x03\x03\x03" ^ $mv;
-is($mv2->to_hex->unlock, "020100", "overloaded ^ result, reverse args");
+is($mv2->to_hex, "020100", "overloaded ^ result, reverse args");
 $mv ^= "\x03\x03\x03";
-is($mv->to_hex->unlock, "020100", "overloaded ^= mutates");
-$mv2 = Crypt::Sodium::XS::MemVault->new("\x03\x03\x03");
-$mv->xor($mv2);
-is($mv->to_hex->unlock, "010203", "xor method with memvault arg");
+is($mv->to_hex, "020100", "overloaded ^= mutates");
+$mv2 = Crypt::Sodium::XS::MemVault->new("\x03\x03\x03")->unlock;
+$mv->bitwise_xor_equals($mv2);
+is($mv->to_hex, "010203", "xor_equals method with memvault arg");
 
 my $secret = "secret secrets are no fun...";
 my $tmpfile = File::Temp->new;
@@ -261,5 +291,28 @@ $mv->to_fd(fileno($tmpfile));
 $mv = Crypt::Sodium::XS::MemVault->new_from_file($tmpfile->filename);
 is($mv->length, 8193, "MemVault (8193) to file/from file correct length");
 is($mv->unlock, $large, "MemVault (8193) roundtripped to fd/from file");
+
+{
+  local $1;
+  "32" =~ m/([0-9]+)/;
+  $mv = Crypt::Sodium::XS::MemVault->new("foobar", $1);
+  is($mv->flags, 32, "MemVault constructor invokes magic on flags arg");
+}
+
+$mv = Crypt::Sodium::XS::MemVault->new("foobar")->unlock;
+my $x = $mv->pad(16);
+is($mv->pad(16)->to_hex, "666f6f62617280000000000000000000", "sodium_pad foobar blocksize 16");
+is($x->unpad(16)->to_hex, "666f6f626172", "sodium_unpad foobar blocksize 16");
+$x = $mv->pad(15);
+is($x->to_hex, "666f6f626172800000000000000000", "sodium_pad foobar blocksize 15");
+is($x->unpad(15)->to_hex, "666f6f626172", "sodium_unpad foobar blocksize 15");
+$x = $mv->pad(3);
+is($x->to_hex, "666f6f626172800000", "sodium_pad foobar blocksize 3");
+is($x->unpad(3)->to_hex, "666f6f626172", "sodium_unpad foobar blocksize 3");
+$mv = Crypt::Sodium::XS::MemVault->new("fooba")->unlock;
+$x = $mv->pad(3);
+is($x->to_hex, "666f6f626180", "sodium_pad fooba blocksize 3");
+is($x->unpad(3)->to_hex, "666f6f6261", "sodium_unpad foobar blocksize 3");
+
 
 done_testing();

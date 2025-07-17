@@ -34,9 +34,11 @@ use Text::ParseWords;
 
 die "OS unsupported\n" if $^O eq 'MSWin32';
 
+my $src_dir = File::Spec->catdir(getcwd(), "src");
 my $libsodium_version = '1.0.20';
 my $libsodium_major_minimum = '10';
 my $libsodium_minor_minimum = '3';
+my $bundled_src_path = File::Spec->catfile($src_dir, "libsodium-$libsodium_version.tar.gz");
 my $test_src = 'int main (int argc, char **argv) { return 0; }';
 my $test_sodium_src = <<EOTEST;
 #include <sodium.h>
@@ -93,21 +95,30 @@ EODIE
   }
 }
 else {
-  if (!$ENV{SODIUM_BUNDLED} && _c_compile_test($test_sodium_src, "$Config{cc} $cflags -lsodium")) {
+  if ($ENV{SODIUM_BUNDLED}) {
+    unless (File::Spec->file_name_is_absolute($ENV{SODIUM_BUNDLED})) {
+      $ENV{SODIUM_BUNDLED} = $bundled_src_path;
+    }
+  }
+  elsif (_c_compile_test($test_sodium_src, "$Config{cc} $cflags -lsodium")) {
     $ENV{SODIUM_LIBS} = $eumm_args{LIBS} = " -lsodium ";
   }
   else {
-    warn <<EOWARN unless $ENV{SODIUM_BUNDLED};
+    warn <<EOWARN;
 !!! using the bundled version of libsodium ($libsodium_version).
-!!! if this is not what you want, please set environment variables SODIUM_INC
-!!! and/or SODIUM_LIBS as needed
+!!! if this is not what you want, please set environment variables
+!!! SODIUM_BUNDLED, SODIUM_INC, and/or SODIUM_LIBS as needed
 EOWARN
-    $ENV{SODIUM_BUNDLED} = 1;
-    $eumm_args{depend} = { '$(OBJECT)' => '$(MYEXTLIB)' };
-    $eumm_args{INC} .= " -Isrc/libsodium-$libsodium_version/src/libsodium/include ";
-    $eumm_args{MYEXTLIB} = "src/lib/libsodium$Config{lib_ext}";
-    $eumm_args{clean} = { FILES => "src/libsodium-$libsodium_version src/libsodium-stable src/include src/lib" };
+    $ENV{SODIUM_BUNDLED} = $bundled_src_path;
   }
+}
+
+if ($ENV{SODIUM_BUNDLED}) {
+  $ENV{SODIUM_BUNDLED} = File::Spec->rel2abs($ENV{SODIUM_BUNDLED});
+  $eumm_args{depend} = { '$(OBJECT)' => '$(MYEXTLIB)' };
+  $eumm_args{INC} .= " -Isrc/libsodium-build/src/libsodium/include ";
+  $eumm_args{MYEXTLIB} = "src/lib/libsodium$Config{lib_ext}";
+  $eumm_args{clean} = { FILES => "src/libsodium-build src/include src/lib" };
 }
 
 my %WriteMakefileArgs = (
@@ -160,16 +171,16 @@ WriteMakefile(%WriteMakefileArgs);
 sub MY::postamble {
   return '' unless $ENV{SODIUM_BUNDLED};
   my $src_dir = File::Spec->catdir(getcwd(), "src");
-  # handle the upstream insanity. now release tarballs do not have a
-  # libsodium-$version subdir, it's always libsodium-stable. just move it into
-  # a proper location.
-  my $libsodium_junk_dir = File::Spec->catdir($src_dir, 'libsodium-stable');
-  my $libsodium_dir = File::Spec->catdir($src_dir, "libsodium-$libsodium_version");
+  # handle whatever subdir there is in the tarball. it must start with
+  # "libsodium-" (all release tarballs have this).
+  my $libsodium_dir = File::Spec->catdir($src_dir, "libsodium-build");
+  # do not use minimal. completely untested.
   my $min_build = $ENV{SODIUM_LIBRARY_MINIMAL} ? 'SODIUM_LIBRARY_MINIMAL=1' : '';
   return <<EOMAKE;
 $libsodium_dir/configure:
-	\$(TAR) -C '$src_dir' -xzf '$src_dir/libsodium-$libsodium_version.tar.gz'
-	-[ -d "$libsodium_junk_dir" ] && mv '$libsodium_junk_dir' '$libsodium_dir'
+	\$(TAR) -C '$src_dir' -xzf '$ENV{SODIUM_BUNDLED}'
+	rm -rf "$src_dir/libsodium-build"
+	mv "$src_dir/libsodium-"*/ "$src_dir/libsodium-build"
 $libsodium_dir/Makefile: $libsodium_dir/configure
 	cd '$libsodium_dir' && ./configure --prefix= --with-pic --disable-shared
 \$(MYEXTLIB): $libsodium_dir/Makefile

@@ -18,11 +18,11 @@ Log::Abstraction - Logging Abstraction Layer
 
 =head1 VERSION
 
-0.19
+0.21
 
 =cut
 
-our $VERSION = 0.19;
+our $VERSION = 0.21;
 
 =head1 SYNOPSIS
 
@@ -305,7 +305,7 @@ sub _log
 		# Untaint the file name
 		# if($file =~ /^([-\@\w.\/\\]+)$/) {
 		if($file =~ /^([a-zA-Z0-9_\.\-\/\\:~]+)$/) {
-			$file = $1;  # untainted version
+			$file = $1;	# untainted version
 		} else {
 			croak(ref($self), ": Tainted or unsafe filename: $file");
 		}
@@ -397,6 +397,20 @@ Logs a notice message.
 sub notice {
 	my $self = shift;
 	$self->_log('notice', @_);
+}
+
+=head2 error
+
+    $logger->error(@messages);
+
+Logs an error message.
+
+=cut
+
+# TODO: do similar things to warn()
+sub error {
+	my $self = shift;
+	$self->_log('error', @_);
 }
 
 =head2 trace

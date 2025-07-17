@@ -83,9 +83,19 @@ sub make_tree {   # Generated/Inlined by Pegex::Grammar (0.75)
         },
         {
           '+max' => 1,
-          '.ref' => 'quoted_value'
+          '.any' => [
+            {
+              '.ref' => 'qmark'
+            },
+            {
+              '.ref' => 'quoted_value'
+            }
+          ]
         }
       ]
+    },
+    'qmark' => {
+      '.rgx' => qr/\G(\?)/
     },
     'query' => {
       '.all' => [

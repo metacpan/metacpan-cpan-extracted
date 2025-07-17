@@ -4,7 +4,7 @@ Log::Abstraction - Logging Abstraction Layer
 
 # VERSION
 
-0.19
+0.21
 
 # SYNOPSIS
 
@@ -111,6 +111,12 @@ Logs an info message.
     $logger->notice(@messages);
 
 Logs a notice message.
+
+## error
+
+    $logger->error(@messages);
+
+Logs an error message.
 
 ## trace
 

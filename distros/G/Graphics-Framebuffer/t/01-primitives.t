@@ -27,7 +27,7 @@ my $dev      = 0;
 my $psize    = 1;
 my $noaccel  = $ENV{'GFB_NOACCEL'} || FALSE; # not used for testing, but here to make sure nothing breaks
 my $nosplash = $ENV{'GFB_NOSPLASH'} || FALSE;
-my $delay    = $ENV{'GFB_DELAY'} || 0.25;
+my $delay    = $ENV{'GFB_DELAY'} || 1;
 my $ignore_x = $ENV{'GFB_IGNORE_X'} || FALSE;
 my $small    = $ENV{'GFB_SMALL'} || FALSE;
 my $show_func; # = 'Color Replace Non-Clipped,Color Replace Clipped';
@@ -40,19 +40,20 @@ if ($small) {
 my $images_path = 'examples/images';
 my @RESULTS;
 my $splash = ($nosplash) ? 0 : 2;
-# diag("Gathering images...");
+diag("Gathering images...");
 $|=1;
 opendir(my $DIR, $images_path);
 chomp(my @files = readdir($DIR));
 closedir($DIR);
 
 our @IMAGES;
+our @ANIMATIONS;
 our $STAMP = sprintf('%.1', time);
 
 if (defined($new_x)) {
-    $F = Graphics::Framebuffer->new('FB_DEVICE' => "/dev/fb$dev", 'SHOW_ERRORS' => 0, 'SIMULATED_X' => $new_x, 'SIMULATED_Y' => $new_y, 'RESET' => FALSE, 'IGNORE_X_WINDOWS' => $ignore_x, 'SPLASH' => TRUE);
+    $F = Graphics::Framebuffer->new('FB_DEVICE' => "/dev/fb$dev", 'SHOW_ERRORS' => 0, 'SIMULATED_X' => $new_x, 'SIMULATED_Y' => $new_y, 'RESET' => FALSE, 'IGNORE_X_WINDOWS' => $ignore_x, 'SPLASH' => FALSE);
 } else {
-    $F = Graphics::Framebuffer->new('FB_DEVICE' => "/dev/fb$dev", 'SHOW_ERRORS' => 0, 'RESET' => FALSE, 'IGNORE_X_WINDOWS' => $ignore_x, 'SPLASH' => TRUE);
+    $F = Graphics::Framebuffer->new('FB_DEVICE' => "/dev/fb$dev", 'SHOW_ERRORS' => 0, 'RESET' => FALSE, 'IGNORE_X_WINDOWS' => $ignore_x, 'SPLASH' => FALSE);
 }
 $SIG{'QUIT'} = $SIG{'INT'} = $SIG{'KILL'} = $SIG{'HUP'} = $SIG{'TERM'} = sub { $F->text_mode(); exec('reset'); };
 
@@ -83,29 +84,73 @@ my $thread;
 # $F->splash($Graphics::Framebuffer::VERSION) unless ($nosplash);
 
 my $DORKSMILE;
-
-foreach my $file (@files) {
-    next if ($file =~ /^\.+/ || $file =~ /Test|gif/i || -d "$images_path/$file");
-    my $image = $F->load_image(
-        {
-            'x'            => 0,
-            'y'            => 0,
-            'width'        => $XX,
-            'height'       => $F->{'H_CLIP'},
-            'file'         => "$images_path/$file",
-            'convertalpha' => ($file =~ /wolf|Crescent/i) ? 1 : 0,
-            'center'       => CENTER_XY,
-        }
-    );
-    if (defined($image)) {
-        if ($file =~ /Solid/) {
-            $DORKSMILE = $image;
-        } else {
-            push(@IMAGES, $image);
-        }
-    }
+diag('Loading Images...');
+my $image = $F->load_image(
+	{
+		'x' => 0,
+		  'y' => 0,
+		  'width' => $XX,
+		  'height' => $F->{'H_CLIP'},
+		  'file' => 'GFB.png',
+		  'center' => CENTER_XY,
+	}
+);
+$F->blit_write($image);
+{
+	my $b = $F->ttf_print(
+		{
+			'x'            => 5 * $xm,
+			  'y'            => max(18, 25 * $ym),
+			  'height'       => max(9,  20 * $ym),
+			  'wscale'       => 1.25,
+			  'text'         => 'Loading Images...',
+			  'bounding_box' => 1,
+			  'antialias'    => 0,
+			  'color'        => 'FFFFFFFF',
+		}
+	);
+	$F->ttf_print($b);
 }
-print_it($F,TRUE,"Loaded Images");
+foreach my $file (@files) {
+    next if ($file =~ /^\.+/ || $file =~ /Test/i || -d "$images_path/$file");
+	if ($file =~ /gif$/i) {
+		$image = $F->load_image(
+			{
+				'file'   => "$images_path/$file",
+				  'center' => CENTER_XY,
+			}
+		);
+		push(@ANIMATIONS,$image);
+		$image = $F->load_image(
+			{
+				'width'  => $XX,
+				  'height' => $YY - $F->{'Y_CLIP'},
+				  'file'   => "$images_path/$file",
+				  'center' => CENTER_XY,
+			}
+		);
+		push(@ANIMATIONS,$image);
+	} else {
+		$image = $F->load_image(
+			{
+				'x'            => 0,
+				  'y'            => 0,
+				  'width'        => $XX,
+				  'height'       => $F->{'H_CLIP'},
+				  'file'         => "$images_path/$file",
+				  'convertalpha' => ($file =~ /wolf|Crescent/i) ? 1 : 0,
+				  'center'       => CENTER_XY,
+			}
+		);
+		if (defined($image)) {
+			if ($file =~ /Solid/) {
+				$DORKSMILE = $image;
+			} else {
+				push(@IMAGES, $image);
+			}
+		}
+	}
+}
 
 ##################################
 my %func = (
@@ -232,18 +277,18 @@ if (defined($show_func)) {
 		'TrueType Fonts',
 #		'TrueType Printing',
 #		'Rotate TrueType Fonts',
-		'Color Replace Non-Clipped',
-		'Color Replace Clipped',
+#		'Color Replace Non-Clipped',
+#		'Color Replace Clipped',
 		'Blitting',
-#		'Blit Move',
+		'Blit Move',
 		'Rotate',
 		'Flipping',
 		'Monochrome',
 		'XOR Mode Drawing',
-#		'OR Mode Drawing',
+		'OR Mode Drawing',
 #		'AND Mode Drawing',
-#		'MASK Mode Drawing',
-#		'UNMASK Mode Drawing',
+		'MASK Mode Drawing',
+		'UNMASK Mode Drawing',
 		'ALPHA Mode Drawing',
 #		'ADD Mode Drawing',
 #		'SUBTRACT Mode Drawing',
@@ -1189,9 +1234,10 @@ sub blit_move {
     $F->blit_write($image);
     my $s = time + $delay;
     while (time < $s) {
-        $image = $F->blit_move({ %{$image}, 'x_dest' => abs($x), 'y_dest' => abs($y)});
-        $x++;
-        $y++;
+        $image = $F->blit_move({ %{$image}, 'x_dest' => abs($x), 'y_dest' => int(abs($y))});
+        $x += 3;
+        $y += 2;
+		sleep .016666667;
     } ## end while (time < $s)
 	return(TRUE);
 } ## end sub blit_move
@@ -1328,7 +1374,7 @@ sub monochrome {
 
 sub animated {
     my $name = shift;
-#    $F->{'DIAGNOSTICS'} = 1;
+
     # diag("$name Loading...");
 
     opendir(my $DIR, $images_path);
@@ -1342,29 +1388,17 @@ sub animated {
             my $new_name = ($count) ? "$name Fullscreen" : "$name Native";
             if ($count || $XX <= 320) {
                 # diag("Loading Animated Image '$info' Scaled to Full Screen");
-                $image = $F->load_image(
-                    {
-                        'width'  => $XX,
-                        'height' => $YY - $F->{'Y_CLIP'},
-                        'file'   => "$images_path/$info",
-                        'center' => CENTER_XY
-                    }
-                );
+                $image = shift(@ANIMATIONS);
             } else {
                 # diag("Loading Animated Image '$info' Native Size");
-                $image = $F->load_image(
-                    {
-                        'file'   => "$images_path/$info",
-                        'center' => CENTER_XY
-                    }
-                );
+                $image = shift(@ANIMATIONS);
             } ## end else [ if ($count || $XX <= 320)]
-
-            foreach my $bench (0 .. 1) {
+			my $bench = 0;
+#            foreach my $bench (0 .. 1) {
                 if ($count || $XX <= 320) {
-                    # diag($bench ? "Benchmarking Animated Image of '$info' Fullscreen" : "Playing Animated Image of '$info' Fullscreen");
+                  #  diag($bench ? "Benchmarking Animated Image of '$info' Fullscreen" : "Playing Animated Image of '$info' Fullscreen");
                 } else {
-                    # diag($bench ? "Benchmarking Animated Image of '$info' Native Size" : "Playing Animated Image of '$info' Native Size");
+                  #  diag($bench ? "Benchmarking Animated Image of '$info' Native Size" : "Playing Animated Image of '$info' Native Size");
                 }
                 if (defined($image)) {
                     $F->cls();
@@ -1389,7 +1423,7 @@ sub animated {
                         } ## end foreach my $frame (0 .. (scalar...))
                     } ## end while (time <= $s)
                 } ## end if (defined($image))
-            } ## end foreach my $bench (0 .. 1)
+#            } ## end foreach my $bench (0 .. 1)
             last if ($XX <= 320);
         } ## end for my $count (0 .. 1)
     } ## end foreach my $info (@list)

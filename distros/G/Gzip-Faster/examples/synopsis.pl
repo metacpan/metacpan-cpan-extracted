@@ -1,9 +1,9 @@
 #!/home/ben/software/install/perl
 use warnings;
 use strict;
+use Gzip::Faster;
 # Make a random input string
 my $input = join '', map {int (rand (10))} 0..0x1000;
-use Gzip::Faster;
 # Compress the random string.
 my $gzipped = gzip ($input);
 # Uncompress it again.

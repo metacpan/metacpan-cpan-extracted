@@ -1,19 +1,12 @@
 # Graphics-Framebuffer
 
-                      ____                 _     _
-                     / ___|_ __ __ _ _ __ | |__ (_) ___ ___
-                    | |  _| '__/ _` | '_ \| '_ \| |/ __/ __|
-                    | |_| | | | (_| | |_) | | | | | (__\__ \
-                     \____|_|  \__,_| .__/|_| |_|_|\___|___/
-                                    |_|
-          _____                         _            __  __
-         |  ___| __ __ _ _ __ ___   ___| |__  _   _ / _|/ _| ___ _ __
-         | |_ | '__/ _` | '_ ` _ \ / _ \ '_ \| | | | |_| |_ / _ \ '__|
-         |  _|| | | (_| | | | | | |  __/ |_) | |_| |  _|  _|  __/ |
-         |_|  |_|  \__,_|_| |_| |_|\___|_.__/ \__,_|_| |_|  \___|_|
+![Graphics::Framebuffer Logo](GFB.png?raw=true "Graphics::Framebuffer")
 
+### Windows Incompatibility
 
-###   Note, this module does NOT work (natively) in Microsoft Windows.  It will only function in "emulation" mode, and you will not see any screen output.  See the documentation on emulation mode for more details.  Use a Virtual Machine like VirtualBox to use on Windows, with a Linux distribution installed.
+![Windows Incompatible](Win-No.png?raw=true "Windows Incompatible")
+
+Note, this module does NOT work (natively) in Microsoft Windows.  It will only function in "emulation" mode, and you will not see any screen output.  See the documentation on emulation mode for more details.  Use a Virtual Machine like VirtualBox to use on Windows, with a Linux distribution installed.
 
 ## PREREQUISITES
 
@@ -52,7 +45,7 @@ installation/install-prerequisites-redhat.sh
 You can use the following to detect your distribution type:
 
 ```bash
-installation/detech.sh
+installation/detect.sh
 ```
 
 ## Continuing...
@@ -130,7 +123,7 @@ You can also look for information at:
 
 ## LICENSE AND COPYRIGHT
 
-Copyright © 2013-2024 Richard Kelsch
+Copyright © 2013-2025 Richard Kelsch
 
 This program is free software; you can redistribute it and/or modify it under the terms of either: the GNU General Public License as published by the Free Software Foundation; or the Artistic License.
 

@@ -4,7 +4,7 @@
       "Yuval Kogman <nothingmuch@woobling.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.74, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -33,9 +33,12 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "Crypt::SysRandom::XS" : "0.009"
+         },
          "requires" : {
             "Catalyst::Runtime" : "5.71001",
-            "Digest" : "0",
+            "Crypt::SysRandom" : "0.007",
             "File::Spec" : "0",
             "File::Temp" : "0",
             "HTML::Entities" : "0",
@@ -72,10 +75,10 @@
          "web" : "https://github.com/perl-catalyst/Catalyst-Plugin-Session"
       }
    },
-   "version" : "0.43",
+   "version" : "0.44",
    "x_breaks" : {
       "Catalyst::Plugin::Session::State::Cookie" : "< 0.03",
       "Catalyst::Plugin::Session::State::URI" : "< 0.02"
    },
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

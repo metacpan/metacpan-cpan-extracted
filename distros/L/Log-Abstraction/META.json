@@ -48,7 +48,6 @@
             "File::Spec" : "0",
             "File::Temp" : "0",
             "Test::DescribeMe" : "0",
-            "Test::More" : "0",
             "Test::Most" : "0",
             "Test::Needs" : "0",
             "YAML::XS" : "0"
@@ -70,6 +69,6 @@
          "x_repository" : "https://github.com/nigelhorne/Log-Abstraction"
       }
    },
-   "version" : 0.19,
+   "version" : 0.21,
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

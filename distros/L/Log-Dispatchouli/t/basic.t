@@ -84,7 +84,7 @@ use Test::Deep;
   );
 }
 
-{
+subtest "flogging, prefixing, and logging" => sub {
   my $logger = Log::Dispatchouli->new({
     ident   => 'foo',
     to_self => 1,
@@ -106,7 +106,27 @@ use Test::Deep;
 
   is($logger->events->[1]{message}, 'xyzzy: foo', 'set a prefix');
   is($logger->events->[2]{message}, 'bar',        'clear prefix');
-}
+};
+
+subtest "flogging, prefixing, no logging" => sub {
+  my $logger = Log::Dispatchouli->new({
+    ident   => 'foo',
+    to_self => 0,
+    log_pid => 0,
+  });
+
+  is(
+    $logger->flog_messages([ '%s %s', '[foo]', [qw(foo)] ], ".."),
+    '[foo] {{["foo"]}} ..',
+    "multi-arg logging",
+  );
+
+  $logger->set_prefix('xyzzy: ');
+  is($logger->flog_messages('foo'), 'xyzzy: foo', 'set a prefix');
+  $logger->clear_prefix;
+  $logger->log('bar');
+  is($logger->flog_messages('bar'), 'bar', 'set a prefix');
+};
 
 {
   my $logger = eval { Log::Dispatchouli->new; };
