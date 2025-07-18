@@ -1,6 +1,10 @@
 #include "stats.h"
 #include <math.h>
 
+#ifndef M_PI
+#  define M_PI 3.14159265
+#endif
+
 #define SWAP(a,b) tmp=(a);(a)=(b);(b)=tmp;
 
 double

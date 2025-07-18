@@ -5,22 +5,28 @@
 
 use strict;
 use warnings;
+use Math::Prime::Util qw(invmod);
 use Math::DifferenceSet::Planar 1.002;
 
 $| = 1;
 
 my $BAR_WIDTH = 64;
-
-my $USAGE = "usage: pds_find_lex_ref [-f] [-v] [file]...\n";
+my $USAGE = "usage: pds_find_lex_ref [-f] [-p] [-part/parts] [file]...\n";
 
 my $force = 0;
 my $pro_b = 0;
+my $part  = 1;
+my $parts = 1;
 while (@ARGV && $ARGV[0] =~ /^-(.+)/s) {
     my $opt = $1;
     shift @ARGV;
     last if '-' eq $opt;
     $force = 1, next if 'f' eq $opt;
     $pro_b = 1, next if 'p' eq $opt;
+    if ($opt =~ m{^([1-9][0-9]*)/([1-9][0-9]*)\z}) {
+        ($part, $parts) = ($1, $2);
+        next if $part <= $parts;
+    }
     die $USAGE;
 }
 
@@ -33,20 +39,30 @@ while(<<>>) {
 
     my $s1 = !$force && Math::DifferenceSet::Planar->lex_reference($#list);
     if (!$s1) {
-        my $s2 = Math::DifferenceSet::Planar->from_elements_fast(@list);
-        my $ni = $s2->plane_principal_elements;
-        my $it = $s2->iterate_principal_planes;
-        if (!$ni) {
-            $ni = $s2->n_planes;
-            $it = $s2->iterate_planes;
-        };
-        progress_bar(0, $ni) if $pro_b;
-        $s1 = $it->();
-        my $i = 1;
-        progress_bar($i, $ni) if $pro_b;
-        while (my $s3 = $it->()) {
-            $s1 = $s3 if $s3->compare($s1) < 0;
-            progress_bar(++$i, $ni) if $pro_b;
+        my $s2 =
+            Math::DifferenceSet::Planar->from_elements_fast(@list)
+                ->zeta_canonize;
+        my $modulus = $s2->modulus;
+        my @pe = $s2->plane_principal_elements;
+        if (!@pe) {
+            my $it = $s2->iterate_rotators;
+            while (my $ro = $it->()) {
+                push @pe, $ro;
+            }
+        }
+        if (1 < $parts) {
+            my $lo = int( @pe * ($part - 1) / $parts );
+            my $hi = int( @pe * $part / $parts );
+            @pe = @pe[$lo .. $hi-1];
+        }
+        my $i = 0;
+        progress_bar(0, 0+@pe) if $pro_b;
+        next if !@pe;
+        foreach my $d (@pe) {
+            my $f  = invmod($d, $modulus);
+            my $s3 = $s2->multiply($f)->lex_canonize;
+            $s1 = $s3 if !$s1 || $s3->compare($s1) < 0;
+            progress_bar(++$i, 0+@pe) if $pro_b;
         }
     }
 
@@ -56,7 +72,7 @@ while(<<>>) {
 
 sub progress_bar {
     my ($i, $ni) = @_;
-    my $black = int 0.5 + $BAR_WIDTH * $i / $ni;
+    my $black = $i && int 0.5 + $BAR_WIDTH * $i / $ni;
     my $white = $BAR_WIDTH - $black;
     print STDERR "\r", 'X' x $black, '.' x $white, " $i/$ni";
     print STDERR "\n" if $i >= $ni;
@@ -70,7 +86,7 @@ pds_find_lex_ref - find lexically minimal planar difference sets
 
 =head1 SYNOPSIS
 
-  pds_find_lex_ref [-f] [-p] [file]...
+  pds_find_lex_ref [-f] [-p] [-part/parts] [file]...
 
 =head1 DESCRIPTION
 
@@ -86,6 +102,14 @@ already known.
 Option C<-p> displays a progress bar for each set that needs to be
 calculated.
 
+Argument dash, number, slash, number limits the search to a partial run,
+where the number before the slash specifies the run (starting with 1)
+and the other number the total number of runs.  The final result has
+then to be chosen as the best one of the partial results.
+
+Partial runs and progress bars only are employed if the result is
+actually calculated rather than just looked up.
+
 The algorithm uses the fact that the planes containing a set with elements
 0, 1, and 3, are precisely those planes with 1 among their principal
 elements.  This greatly reduces the number of planes to be considered
@@ -98,15 +122,15 @@ Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2024 by Martin Becker, Blaubeuren.
+Copyright (c) 2024-2025 by Martin Becker, Blaubeuren.
 
 This library is free software; you can distribute it and/or modify it
 under the terms of the Artistic License 2.0 (see the LICENSE file).
 
-The licence grants freedom for related software development but does
+The license grants freedom for related software development but does
 not cover incorporating code or documentation into AI training material.
 Please contact the copyright holder if you want to use the library whole
-or in part for other purposes than stated in the licence.
+or in part for other purposes than stated in the license.
 
 =head1 DISCLAIMER OF WARRANTY
 

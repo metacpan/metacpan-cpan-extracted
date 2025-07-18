@@ -1,0 +1,14 @@
+package Module::Install::RTx;
+
+@remove_files = (
+    'etc/Captcha_Config.pm',
+    'html/Callbacks/RT-Extension-Captcha/index.html/Initial',
+    'html/Callbacks/RT-Extension-Captcha/Ticket/Create.html/BeforeCreate',
+    'html/Callbacks/RT-Extension-Captcha/Ticket/Create.html/FormStart',
+    'html/Callbacks/RT-Extension-Captcha/Ticket/Update.html/FormStart',
+    'html/Callbacks/RT-Extension-Captcha/Ticket/Update.html/Initial',
+    'html/Helpers/Captcha',
+);
+
+1;
+

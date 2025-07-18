@@ -1,4 +1,8 @@
 Revision history for RT-Extension-AI
 
+0.02 2025-07-17
+ - Pass ticket id for autocomplete calls to allow queue-specific configuration
+   to be loaded
+
 0.01 2025-07-09
  - Initial version

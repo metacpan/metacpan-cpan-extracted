@@ -18,11 +18,11 @@ Log::Abstraction - Logging Abstraction Layer
 
 =head1 VERSION
 
-0.21
+0.23
 
 =cut
 
-our $VERSION = 0.21;
+our $VERSION = 0.23;
 
 =head1 SYNOPSIS
 
@@ -232,9 +232,10 @@ sub _log
 		# Passed a reference to an array
 		@messages = @{$messages[0]};
 	}
+	@messages = grep defined, @messages;
 
 	# Push the message to the internal messages array
-	push @{$self->{messages}}, { level => $level, message => join('', grep defined, @messages) };
+	push @{$self->{messages}}, { level => $level, message => join('', @messages) };
 
 	my $class = blessed($self) || '';
 	if($class eq __PACKAGE__) {
@@ -254,7 +255,7 @@ sub _log
 			});
 		} elsif(ref($logger) eq 'ARRAY') {
 			# If logger is an array reference, push the log message to the array
-			push @{$logger}, { level => $level, message => join('', grep defined, @messages) };
+			push @{$logger}, { level => $level, message => join('', @messages) };
 		} elsif(ref($logger) eq 'HASH') {
 			if(my $file = $logger->{'file'}) {
 				if($file =~ /^([a-zA-Z0-9_\.\-\/\\~:]+)$/) {
@@ -269,7 +270,7 @@ sub _log
 				}
 			}
 			if(my $array = $logger->{'array'}) {
-				push @{$array}, { level => $level, message => join('', grep defined, @messages) };
+				push @{$array}, { level => $level, message => join('', @messages) };
 			}
 			if(my $fout = $logger->{'fd'}) {
 				print $fout uc($level), "> $class ", (caller(1))[1], ' ', (caller(1))[2], ' ', join('', @messages), "\n" or
@@ -294,10 +295,10 @@ sub _log
 			# The test is because Log::Log4perl doesn't understand notice()
 			$logger->$level(@messages);
 		} else {
-			croak(ref($self), ": Don't know how to deal with the $level message");
+			croak(ref($self), ': ', ref($logger), " doesn't know how to deal with the $level message");
 		}
 	} elsif($self->{'array'}) {
-		push @{$self->{'array'}}, { level => $level, message => join('', grep defined, @messages) };
+		push @{$self->{'array'}}, { level => $level, message => join('', @messages) };
 	}
 	if($self->{'file'}) {
 		my $file = $self->{'file'};
@@ -403,14 +404,17 @@ sub notice {
 
     $logger->error(@messages);
 
-Logs an error message.
+Logs an error message. This method also supports logging to syslog if configured.
+If not logging mechanism is set,
+falls back to C<Carp>.
 
 =cut
 
 # TODO: do similar things to warn()
 sub error {
 	my $self = shift;
-	$self->_log('error', @_);
+
+	$self->_high_priority('error', @_);
 }
 
 =head2 trace
@@ -440,13 +444,27 @@ falls back to C<Carp>.
 
 sub warn {
 	my $self = shift;
+
+	$self->_high_priority('warn', @_);
+}
+
+=head2 _high_priority
+
+Helper to handle important messages.
+
+=cut
+
+sub _high_priority
+{
+	my $self = shift;
+	my $level = shift;	# 'warn' or 'error'
 	my $params = Params::Get::get_params('warning', @_);	# Get parameters
 
 	# Validate input parameters
 	return unless ($params && (ref($params) eq 'HASH'));
 
 	# Only logging things higher than warn level
-	return if($self->{'level'} < $syslog_values{'warn'});
+	return if($self->{'level'} < $syslog_values{$level});
 
 	my $warning = $params->{warning};
 	if(!defined($warning)) {
@@ -469,21 +487,28 @@ sub warn {
 	}
 
 	# Log the warning message
-	$self->_log('warn', $warning);
+	$self->_log($level, $warning);
 
-	if($self->{syslog}) {
+	if($self->{'syslog'}) {
 		# Handle syslog-based logging
 		if(ref($self->{syslog}) eq 'HASH') {
-			# HASH argument to setlogsocket introduced in Sys::Syslog 0.28
+			# HASH argument to setlogsock introduced in Sys::Syslog 0.28
+
+			# CHI uses server, Sys::Syslog uses host :-(
+			if($self->{'syslog'}->{'server'}) {
+				$self->{'syslog'}->{'host'} = delete $self->{'syslog'}->{'server'};
+			}
 			Sys::Syslog::setlogsock($self->{'syslog'});
 		}
+		my $ident = (($level eq 'error') ? 'err' : 'warning') . '|local0';
 		openlog($self->{script_name}, 'cons,pid', 'user');
 		eval {
-			syslog('warning|local0', $warning);
+			syslog($ident, $warning);
 		};
 		my $err = $@;
 		closelog();
 		if($err) {
+			$err .= ": \n" . Data::Dumper->new([$self->{'syslog'}])->Dump();
 			Carp::carp($err);
 		} elsif($self->{'carp_on_warn'}) {
 			Carp::carp($warning);

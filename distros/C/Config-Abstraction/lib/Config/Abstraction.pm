@@ -17,11 +17,11 @@ Config::Abstraction - Configuration Abstraction Layer
 
 =head1 VERSION
 
-Version 0.32
+Version 0.33
 
 =cut
 
-our $VERSION = '0.32';
+our $VERSION = '0.33';
 
 =head1 SYNOPSIS
 
@@ -422,7 +422,7 @@ sub _load_config
 					$logger->debug(ref($self), ' ', __LINE__, ": Loaded data from $path");
 				}
 				%merged = %{ merge( $data, \%merged ) };
-				push @{$self->{'config_path'}}, $path;
+				push @{$merged{'config_path'}}, $path;
 			}
 		}
 
@@ -572,7 +572,7 @@ sub _load_config
 					$logger->debug(ref($self), ' ', __LINE__, ': No configuration file loaded');
 				}
 
-				push @{$self->{'config_path'}}, $path;
+				push @{$merged{'config_path'}}, $path;
 			}
 		}
 	}

@@ -11,10 +11,16 @@ return unless $queue->id;
 
 return if $queue->CurrentUserHasRight('NoCaptchaOnCreate');
 
-delete $session{'Captcha'};
 my $key = Digest::MD5::md5_hex( rand(1024) );
-push @{ $session{"Actions"}->{ $key } ||= [] }, @$results;
-$session{'i'}++;
+
+my $actions = $session{"Actions"}->{ $key } || [];
+push @$actions, @$results;
+RT::Interface::Web::Session::Set(
+    Key    => 'Actions',
+    SubKey => $key,
+    Value  => $actions,
+);
+
 RT::Interface::Web::Redirect(
     RT->Config->Get('WebURL')
     ."Ticket/Create.html?". $m->comp('/Elements/QueryString',

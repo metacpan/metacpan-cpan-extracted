@@ -7,13 +7,11 @@ Perl.
 
 **noss** depends on the following:
 * `perl` (>= `5.16`)
-* `DateTime`
-* `DateTime::Format::Mail`
-* `DateTime::Format::RFC3339`
 * `DBI`
 * `DBD::SQLite`
 * `JSON`
 * `Parallel::ForkManager`
+* `Time::Piece`
 * `XML::LibXML`
 * `curl` (>= `7.68.0`)
 * `lynx`

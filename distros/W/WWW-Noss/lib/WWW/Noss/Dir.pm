@@ -2,7 +2,7 @@ package WWW::Noss::Dir;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 use Exporter qw(import);
 our @EXPORT_OK = qw(dir);
@@ -11,19 +11,19 @@ use File::Spec;
 
 sub dir {
 
-	my ($dir, %param) = @_;
-	my $hidden = $param{ hidden } // 0;
+    my ($dir, %param) = @_;
+    my $hidden = $param{ hidden } // 0;
 
-	opendir my $dh, $dir
-		or die "Failed to open $dir as a directory: $!\n";
-	my @f = sort grep { ! /^\.\.?$/ } readdir $dh;
-	closedir $dh;
+    opendir my $dh, $dir
+        or die "Failed to open $dir as a directory: $!\n";
+    my @f = sort grep { ! /^\.\.?$/ } readdir $dh;
+    closedir $dh;
 
-	unless ($hidden) {
-		@f = grep { ! /^\./ } @f;
-	}
+    unless ($hidden) {
+        @f = grep { ! /^\./ } @f;
+    }
 
-	return map { File::Spec->catfile($dir, $_) } @f;
+    return map { File::Spec->catfile($dir, $_) } @f;
 
 }
 

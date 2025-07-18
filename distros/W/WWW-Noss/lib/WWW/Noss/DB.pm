@@ -2,7 +2,7 @@ package WWW::Noss::DB;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 use List::Util qw(all any max);
 
@@ -12,879 +12,881 @@ use JSON;
 use WWW::Noss::FeedReader qw(read_feed);
 
 my %DAY_MAP = (
-	0 => 'Sunday',
-	1 => 'Monday',
-	2 => 'Tuesday',
-	3 => 'Wednesday',
-	4 => 'Thursday',
-	5 => 'Friday',
-	6 => 'Saturday',
+    0 => 'Sunday',
+    1 => 'Monday',
+    2 => 'Tuesday',
+    3 => 'Wednesday',
+    4 => 'Thursday',
+    5 => 'Friday',
+    6 => 'Saturday',
 );
 
 sub _initialize {
 
-	my ($self) = @_;
+    my ($self) = @_;
 
-	$self->{ DB } = DBI->connect(
-		"dbi:SQLite:dbname=$self->{ Path }", '', '',
-		{
-			RaiseError => 1,
-			AutoInactiveDestroy => 1,
-			AutoCommit => 0,
-		}
-	);
+    $self->{ DB } = DBI->connect(
+        "dbi:SQLite:dbname=$self->{ Path }", '', '',
+        {
+            RaiseError => 1,
+            AutoInactiveDestroy => 1,
+            AutoCommit => 0,
+        }
+    );
 
-	$self->{ DB }->do(
-		q{
+    $self->{ DB }->do(
+        q{
 CREATE TABLE IF NOT EXISTS feeds (
-	nossname TEXT NOT NULL UNIQUE,
-	nosslink TEXT NOT NULL,
-	title TEXT NOT NULL,
-	link TEXT,
-	description TEXT,
-	updated INTEGER,
-	author TEXT,
-	category TEXT,
-	generator TEXT,
-	image TEXT,
-	rights TEXT,
-	skiphours TEXT,
-	skipdays TEXT
+    nossname TEXT NOT NULL UNIQUE,
+    nosslink TEXT NOT NULL,
+    title TEXT NOT NULL,
+    link TEXT,
+    description TEXT,
+    updated INTEGER,
+    author TEXT,
+    category TEXT,
+    generator TEXT,
+    image TEXT,
+    rights TEXT,
+    skiphours TEXT,
+    skipdays TEXT
 );
-		}
-	);
+        }
+    );
 
-	$self->{ DB }->do(
-		q{
+    $self->{ DB }->do(
+        q{
 CREATE INDEX IF NOT EXISTS
-	idx_feeds_nossname
+    idx_feeds_nossname
 ON
-	feeds(nossname);
-		}
-	);
+    feeds(nossname);
+        }
+    );
 
-	$self->{ DB }->do(
-		q{
+    $self->{ DB }->do(
+        q{
 CREATE TABLE IF NOT EXISTS posts (
-	nossid INTEGER NOT NULL,
-	status TEXT NOT NULL,
-	feed TEXT NOT NULL,
-	title TEXT,
-	link TEXT,
-	author TEXT,
-	category TEXT,
-	summary TEXT,
-	published INTEGER,
-	updated INTEGER,
-	uid TEXT
+    nossid INTEGER NOT NULL,
+    status TEXT NOT NULL,
+    feed TEXT NOT NULL,
+    title TEXT,
+    link TEXT,
+    author TEXT,
+    category TEXT,
+    summary TEXT,
+    published INTEGER,
+    updated INTEGER,
+    uid TEXT
 );
-		}
-	);
+        }
+    );
 
-	$self->{ DB }->do(
-		q{
+    $self->{ DB }->do(
+        q{
 CREATE INDEX IF NOT EXISTS
-	idx_posts_uid
+    idx_posts_uid
 ON
-	posts(uid);
-		}
-	);
+    posts(uid);
+        }
+    );
 
-	$self->{ DB }->do(
-		q{
+    $self->{ DB }->do(
+        q{
 CREATE INDEX IF NOT EXISTS
-	idx_posts_feedid
+    idx_posts_feedid
 ON
-	posts(feed, nossid);
-		}
-	);
+    posts(feed, nossid);
+        }
+    );
 
-	return 1;
+    return 1;
 
 }
 
 sub new {
 
-	my ($class, $file) = @_;
+    my ($class, $file) = @_;
 
-	my $self = {
-		Path => undef,
-		DB   => undef,
-	};
+    my $self = {
+        Path => undef,
+        DB   => undef,
+    };
 
-	bless $self, $class;
+    bless $self, $class;
 
-	$self->{ Path } = $file;
+    $self->{ Path } = $file;
 
-	$self->_initialize;
-	$self->commit;
+    $self->_initialize;
+    $self->commit;
 
-	return $self;
+    return $self;
 
 }
 
 sub has_feed {
 
-	my ($self, $feed) = @_;
+    my ($self, $feed) = @_;
 
-	my $name =
-		$feed->isa('WWW::Noss::FeedConfig')
-		? $feed->name
-		: $feed;
+    my $name =
+        $feed->isa('WWW::Noss::FeedConfig')
+        ? $feed->name
+        : $feed;
 
-	my $row = $self->{ DB }->selectrow_arrayref(
-		q{
+    my $row = $self->{ DB }->selectrow_arrayref(
+        q{
 SELECT
-	rowid
+    rowid
 FROM
-	feeds
+    feeds
 WHERE
-	nossname = ?;
-		},
-		undef,
-		$name
-	);
+    nossname = ?;
+        },
+        undef,
+        $name
+    );
 
-	return defined $row;
+    return defined $row;
 
 }
 
 sub load_feed {
 
-	my ($self, $feed) = @_;
+    my ($self, $feed) = @_;
 
-	my ($feedref, $postref) = read_feed($feed);
+    my ($feedref, $postref) = read_feed($feed);
 
-	$self->{ DB }->do(
-		q{
+    $self->{ DB }->do(
+        q{
 INSERT INTO feeds(
-	nossname,
-	nosslink,
-	title,
-	link,
-	description,
-	updated,
-	author,
-	category,
-	generator,
-	image,
-	rights,
-	skiphours,
-	skipdays
+    nossname,
+    nosslink,
+    title,
+    link,
+    description,
+    updated,
+    author,
+    category,
+    generator,
+    image,
+    rights,
+    skiphours,
+    skipdays
 )
 VALUES(
-	?,
-	?,
-	?,
-	?,
-	?,
-	(0 + ?),
-	?,
-	?,
-	?,
-	?,
-	?,
-	?,
-	?
+    ?,
+    ?,
+    ?,
+    ?,
+    ?,
+    (0 + ?),
+    ?,
+    ?,
+    ?,
+    ?,
+    ?,
+    ?,
+    ?
 )
 ON CONFLICT (nossname) DO
 UPDATE
 SET
-	nossname = excluded.nossname,
-	nosslink = excluded.nosslink,
-	title = excluded.title,
-	link = excluded.link,
-	description = excluded.description,
-	updated = excluded.updated,
-	author = excluded.author,
-	category = excluded.category,
-	generator = excluded.generator,
-	image = excluded.image,
-	rights = excluded.rights,
-	skiphours = excluded.skiphours,
-	skipdays = excluded.skipdays;
-		},
-		undef,
-		$feedref->{ nossname },
-		$feedref->{ nosslink },
-		$feedref->{ title },
-		$feedref->{ link },
-		$feedref->{ description },
-		$feedref->{ updated },
-		$feedref->{ author },
-		(defined $feedref->{ category } ? encode_json($feedref->{ category }) : undef),
-		$feedref->{ generator },
-		$feedref->{ image },
-		$feedref->{ rights },
-		(defined $feedref->{ skiphours } ? encode_json($feedref->{ skiphours }) : undef),
-		(defined $feedref->{ skipdays  } ? encode_json($feedref->{ skipdays  }) : undef),
-	);
+    nossname = excluded.nossname,
+    nosslink = excluded.nosslink,
+    title = excluded.title,
+    link = excluded.link,
+    description = excluded.description,
+    updated = excluded.updated,
+    author = excluded.author,
+    category = excluded.category,
+    generator = excluded.generator,
+    image = excluded.image,
+    rights = excluded.rights,
+    skiphours = excluded.skiphours,
+    skipdays = excluded.skipdays;
+        },
+        undef,
+        $feedref->{ nossname },
+        $feedref->{ nosslink },
+        $feedref->{ title },
+        $feedref->{ link },
+        $feedref->{ description },
+        $feedref->{ updated },
+        $feedref->{ author },
+        (defined $feedref->{ category } ? encode_json($feedref->{ category }) : undef),
+        $feedref->{ generator },
+        $feedref->{ image },
+        $feedref->{ rights },
+        (defined $feedref->{ skiphours } ? encode_json($feedref->{ skiphours }) : undef),
+        (defined $feedref->{ skipdays  } ? encode_json($feedref->{ skipdays  }) : undef),
+    );
 
-	# Can't pass undef directly to an SQL statement, so we have to do this ugly
-	# hack...
-	my $sel_id = $self->{ DB }->prepare(
-		q{
+    # Can't pass undef directly to an SQL statement, so we have to do this ugly
+    # hack...
+    my $sel_id = $self->{ DB }->prepare(
+        q{
 SELECT
-	rowid
+    rowid
 FROM
-	posts
+    posts
 WHERE
-	(uid = ? OR (uid IS NULL AND ? IS NULL)) AND
-	feed = ? AND
-	(title = ? OR (title IS NULL AND ? IS NULL)) AND
-	(link = ? OR (link IS NULL AND ? IS NULL)) AND
-	(published = ? OR (published IS NULL AND ? IS NULL));
-		}
-	);
+    (uid = ? OR (uid IS NULL AND ? IS NULL)) AND
+    feed = ? AND
+    (title = ? OR (title IS NULL AND ? IS NULL)) AND
+    (link = ? OR (link IS NULL AND ? IS NULL)) AND
+    (published = ? OR (published IS NULL AND ? IS NULL));
+        }
+    );
 
-	my $insert_post = $self->{ DB }->prepare(
-		q{
+    my $insert_post = $self->{ DB }->prepare(
+        q{
 INSERT INTO posts (
-	nossid,
-	status,
-	feed,
-	title,
-	link,
-	author,
-	category,
-	summary,
-	published,
-	updated,
-	uid
+    nossid,
+    status,
+    feed,
+    title,
+    link,
+    author,
+    category,
+    summary,
+    published,
+    updated,
+    uid
 )
 VALUES (
-	(0 + ?),
-	?,
-	?,
-	?,
-	?,
-	?,
-	?,
-	?,
-	(0 + ?),
-	(0 + ?),
-	?
+    (0 + ?),
+    ?,
+    ?,
+    ?,
+    ?,
+    ?,
+    ?,
+    ?,
+    (0 + ?),
+    (0 + ?),
+    ?
 )
 RETURNING
-	rowid as rowid;
-		}
-	);
+    rowid as rowid;
+        }
+    );
 
-	my $update_post = $self->{ DB }->prepare(
-		q{
+    my $update_post = $self->{ DB }->prepare(
+        q{
 UPDATE posts
 SET
-	nossid = (0 + ?),
-	author = ?,
-	category = ?,
-	summary = ?,
-	updated = (0 + ?)
+    nossid = (0 + ?),
+    author = ?,
+    category = ?,
+    summary = ?,
+    updated = (0 + ?)
 WHERE
-	rowid = (0 + ?);
-		},
-	);
+    rowid = (0 + ?);
+        },
+    );
 
-	my $new = 0;
-	my @ok;
+    my $new = 0;
+    my @ok;
 
-	for my $e (@$postref) {
+    for my $e (@$postref) {
 
-		$sel_id->execute(
-			$e->{ uid }, $self->{ uid },
-			$e->{ feed },
-			$e->{ title }, $self->{ title },
-			$e->{ link }, $self->{ link },
-			$e->{ published }, $self->{ published },
-		);
+        $sel_id->execute(
+            $e->{ uid }, $self->{ uid },
+            $e->{ feed },
+            $e->{ title }, $self->{ title },
+            $e->{ link }, $self->{ link },
+            $e->{ published }, $self->{ published },
+        );
 
-		my $sel = $sel_id->fetchrow_arrayref;
+        my $sel = $sel_id->fetchrow_arrayref;
 
-		if (defined $sel) {
+        if (defined $sel) {
 
-			$update_post->execute(
-				$e->{ nossid },
-				$e->{ author },
-				(defined $e->{ category } ? encode_json($e->{ category }) : undef),
-				$e->{ summary },
-				$e->{ updated },
-				$sel->[0]
-			);
+            $update_post->execute(
+                $e->{ nossid },
+                $e->{ author },
+                (defined $e->{ category } ? encode_json($e->{ category }) : undef),
+                $e->{ summary },
+                $e->{ updated },
+                $sel->[0]
+            );
 
-			push @ok, $sel->[0];
+            push @ok, $sel->[0];
 
-		} else {
+        } else {
 
-			$insert_post->execute(
-				$e->{ nossid },
-				($feed->autoread ? 'read' : 'unread'),
-				$e->{ feed },
-				$e->{ title },
-				$e->{ link },
-				$e->{ author },
-				(defined $e->{ category } ? encode_json($e->{ category }) : undef),
-				$e->{ summary },
-				$e->{ published },
-				$e->{ updated },
-				$e->{ uid },
-			);
+            $insert_post->execute(
+                $e->{ nossid },
+                ($feed->autoread ? 'read' : 'unread'),
+                $e->{ feed },
+                $e->{ title },
+                $e->{ link },
+                $e->{ author },
+                (defined $e->{ category } ? encode_json($e->{ category }) : undef),
+                $e->{ summary },
+                $e->{ published },
+                $e->{ updated },
+                $e->{ uid },
+            );
 
-			my $ins = $insert_post->fetchrow_arrayref;
-			push @ok, $ins->[0];
-			$new++;
+            my $ins = $insert_post->fetchrow_arrayref;
+            push @ok, $ins->[0];
+            $new++;
 
-		}
-	}
+        }
+    }
 
-	my $ok_set = sprintf "(%s)", join ',', @ok;
+    my $ok_set = sprintf "(%s)", join ',', @ok;
 
-	$self->{ DB }->do(
-		qq{
+    $self->{ DB }->do(
+        qq{
 DELETE FROM
-	posts
+    posts
 WHERE
-	feed = ? AND
-	rowid NOT IN $ok_set;
-		},
-		undef,
-		$feed->name
-	);
+    feed = ? AND
+    rowid NOT IN $ok_set;
+        },
+        undef,
+        $feed->name
+    );
 
-	return $new;
+    return $new;
 
 }
 
 sub feed {
 
-	my ($self, $feed, %param) = @_;
+    my ($self, $feed, %param) = @_;
 
-	my $name =
-		$feed->isa('WWW::Noss::FeedConfig')
-		? $feed->name
-		: $feed;
+    my $name =
+        $feed->isa('WWW::Noss::FeedConfig')
+        ? $feed->name
+        : $feed;
 
-	my $row = $self->{ DB }->selectrow_hashref(
-		q{
+    my $row = $self->{ DB }->selectrow_hashref(
+        q{
 SELECT
-	nossname,
-	nosslink,
-	title,
-	link,
-	description,
-	updated,
-	author,
-	category,
-	generator,
-	image,
-	rights,
-	skiphours,
-	skipdays
+    nossname,
+    nosslink,
+    title,
+    link,
+    description,
+    updated,
+    author,
+    category,
+    generator,
+    image,
+    rights,
+    skiphours,
+    skipdays
 FROM
-	feeds
+    feeds
 WHERE
-	nossname = ?;
-		},
-		undef,
-		$name
-	);
+    nossname = ?;
+        },
+        undef,
+        $name
+    );
 
-	return undef unless defined $row;
+    return undef unless defined $row;
 
-	$row->{ category } =
-		defined $row->{ category }
-		? decode_json($row->{ category })
-		: [];
-	$row->{ skiphours } =
-		defined $row->{ skiphours }
-		? decode_json($row->{ skiphours })
-		: [];
-	$row->{ skipdays } =
-		defined $row->{ skipdays }
-		? decode_json($row->{ skipdays })
-		: [];
+    $row->{ category } =
+        defined $row->{ category }
+        ? decode_json($row->{ category })
+        : [];
+    $row->{ skiphours } =
+        defined $row->{ skiphours }
+        ? decode_json($row->{ skiphours })
+        : [];
+    $row->{ skipdays } =
+        defined $row->{ skipdays }
+        ? decode_json($row->{ skipdays })
+        : [];
 
-	if ($param{ post_info }) {
+    if ($param{ post_info }) {
 
-		my $posts = $self->{ DB }->selectall_arrayref(
-			q{
+        my $posts = $self->{ DB }->selectall_arrayref(
+            q{
 SELECT
-	status,
-	updated,
-	published
+    status,
+    updated,
+    published
 FROM
-	posts
+    posts
 WHERE
-	feed = ?;
-			},
-			undef,
-			$name
-		);
+    feed = ?;
+            },
+            undef,
+            $name
+        );
 
-		$row->{ updated } //=
-			(max grep { defined } map { $_->[1] } @$posts) //
-			(max grep { defined } map { $_->[2] } @$posts);
+        $row->{ updated } //=
+            (max grep { defined } map { $_->[1] } @$posts) //
+            (max grep { defined } map { $_->[2] } @$posts);
 
-		$row->{ posts }  = scalar @$posts;
-		$row->{ unread } = scalar grep { $_->[0] eq 'unread' } @$posts;
+        $row->{ posts }  = scalar @$posts;
+        $row->{ unread } = scalar grep { $_->[0] eq 'unread' } @$posts;
 
-	}
+    }
 
-	return $row;
+    return $row;
 
 }
 
 sub feeds {
 
-	my ($self) = @_;
+    my ($self) = @_;
 
-	my $feeds = $self->{ DB }->selectall_arrayref(
-		q{
+    my $feeds = $self->{ DB }->selectall_arrayref(
+        q{
 SELECT
-	nossname,
-	nosslink,
-	title,
-	link,
-	description,
-	updated,
-	author,
-	category,
-	generator,
-	image,
-	rights,
-	skiphours,
-	skipdays
+    nossname,
+    nosslink,
+    title,
+    link,
+    description,
+    updated,
+    author,
+    category,
+    generator,
+    image,
+    rights,
+    skiphours,
+    skipdays
 FROM
-	feeds;
-		},
-		{ Slice => {} },
-	);
+    feeds;
+        },
+        { Slice => {} },
+    );
 
-	for my $f (@$feeds) {
-		$f->{ category } =
-			defined $f->{ category }
-			? decode_json($f->{ category })
-			: [];
-		$f->{ skiphours } =
-			defined $f->{ skiphours }
-			? decode_json($f->{ skiphours })
-			: [];
-		$f->{ skipdays } =
-			defined $f->{ skipdays }
-			? decode_json($f->{ skipdays })
-			: [];
-	}
+    for my $f (@$feeds) {
+        $f->{ category } =
+            defined $f->{ category }
+            ? decode_json($f->{ category })
+            : [];
+        $f->{ skiphours } =
+            defined $f->{ skiphours }
+            ? decode_json($f->{ skiphours })
+            : [];
+        $f->{ skipdays } =
+            defined $f->{ skipdays }
+            ? decode_json($f->{ skipdays })
+            : [];
+    }
 
-	return @$feeds;
+    return @$feeds;
 
 }
 
 sub del_feeds {
 
-	my ($self, @feeds) = @_;
+    my ($self, @feeds) = @_;
 
-	my $feed_set =
-		sprintf '(%s)',
-		join ',',
-		map { $self->{ DB }->quote($_) }
-		@feeds;
+    my $feed_set =
+        sprintf '(%s)',
+        join ',',
+        map { $self->{ DB }->quote($_) }
+        @feeds;
 
-	$self->{ DB }->do(
-		qq{
+    $self->{ DB }->do(
+        qq{
 DELETE FROM
-	feeds
+    feeds
 WHERE
-	nossname IN $feed_set;
-		}
-	);
+    nossname IN $feed_set;
+        }
+    );
 
-	$self->{ DB }->do(
-		qq{
+    $self->{ DB }->do(
+        qq{
 DELETE FROM
-	posts
+    posts
 WHERE
-	feed IN $feed_set;
-		}
-	);
+    feed IN $feed_set;
+        }
+    );
 
-	return 1;
+    return 1;
 
 }
 
 sub post {
 
-	my ($self, $feed, $post) = @_;
+    my ($self, $feed, $post) = @_;
 
-	my $name =
-		$feed->isa('WWW::Noss::FeedConfig')
-		? $feed->name
-		: $feed;
+    my $name =
+        $feed->isa('WWW::Noss::FeedConfig')
+        ? $feed->name
+        : $feed;
 
-	my $postref = $self->{ DB }->selectrow_hashref(
-		q{
+    my $postref = $self->{ DB }->selectrow_hashref(
+        q{
 SELECT
-	nossid,
-	status,
-	feed,
-	title,
-	link,
-	author,
-	category,
-	summary,
-	published,
-	updated,
-	uid
+    nossid,
+    status,
+    feed,
+    title,
+    link,
+    author,
+    category,
+    summary,
+    published,
+    updated,
+    uid
 FROM
-	posts
+    posts
 WHERE
-	feed = ? AND
-	nossid = (0 + ?);
-		},
-		undef,
-		$feed,
-		$post
-	);
+    feed = ? AND
+    nossid = (0 + ?);
+        },
+        undef,
+        $feed,
+        $post
+    );
 
-	return undef unless defined $postref;
+    return undef unless defined $postref;
 
-	$postref->{ category } =
-		defined $postref->{ category }
-		? decode_json($postref->{ category })
-		: [];
+    $postref->{ category } =
+        defined $postref->{ category }
+        ? decode_json($postref->{ category })
+        : [];
 
-	return $postref;
+    return $postref;
 
 }
 
 sub first_unread {
 
-	my ($self, $feed) = @_;
+    my ($self, $feed) = @_;
 
-	my $name =
-		$feed->isa('WWW::Noss::FeedConfig')
-		? $feed->name
-		: $feed;
+    my $name =
+        $feed->isa('WWW::Noss::FeedConfig')
+        ? $feed->name
+        : $feed;
 
-	my $postref = $self->{ DB }->selectrow_hashref(
-		q{
+    my $postref = $self->{ DB }->selectrow_hashref(
+        q{
 SELECT
-	nossid,
-	status,
-	feed,
-	title,
-	link,
-	author,
-	category,
-	summary,
-	published,
-	updated,
-	uid
+    nossid,
+    status,
+    feed,
+    title,
+    link,
+    author,
+    category,
+    summary,
+    published,
+    updated,
+    uid
 FROM
-	posts
+    posts
 WHERE
-	feed = ? AND
-	status = 'unread'
+    feed = ? AND
+    status = 'unread'
 ORDER BY
-	nossid DESC;
-		},
-		undef,
-		$feed,
-	);
+    nossid DESC;
+        },
+        undef,
+        $feed,
+    );
 
-	return undef unless defined $postref;
+    return undef unless defined $postref;
 
-	$postref->{ category } =
-		defined $postref->{ category }
-		? decode_json($postref->{ category })
-		: [];
+    $postref->{ category } =
+        defined $postref->{ category }
+        ? decode_json($postref->{ category })
+        : [];
 
-	return $postref;
+    return $postref;
 
 }
 
 sub largest_id {
 
-	my ($self, @feeds) = @_;
+    my ($self, @feeds) = @_;
 
-	my $where = '';
+    my $where = '';
 
-	if (@feeds) {
-		$where = sprintf
-			"WHERE feed IN (%s)",
-			join(',', map { $self->{ DB }->quote($_) } @feeds);
-	}
+    if (@feeds) {
+        $where = sprintf
+            "WHERE feed IN (%s)",
+            join(',', map { $self->{ DB }->quote($_) } @feeds);
+    }
 
-	my $row = $self->{ DB }->selectrow_arrayref(
-		qq{
+    my $row = $self->{ DB }->selectrow_arrayref(
+        qq{
 SELECT
-	nossid
+    nossid
 FROM
-	posts
+    posts
 $where
 ORDER BY
-	nossid DESC
+    nossid DESC
 LIMIT 1;
-		},
-	);
+        },
+    );
 
-	return defined $row ? $row->[0] : undef;
+    return defined $row ? $row->[0] : undef;
 
 }
 
 sub look {
 
-	my ($self, %param) = @_;
+    my ($self, %param) = @_;
 
-	my @posts;
+    my @posts;
 
-	my $title = $param{ title };
-	my @feeds =
-		ref $param{ feeds } eq 'ARRAY'
-		? @{ $param{ feeds } }
-		: ();
-	my $status = $param{ status };
-	my @tags =
-		ref $param{ tags } eq 'ARRAY'
-		? @{ $param{ tags } }
-		: ();
-	my @content =
-		ref $param{ content } eq 'ARRAY'
-		? @{ $param{ content } }
-		: ();
-	my $order = $param{ order } // 'feed';
-	my $reverse = $param{ reverse } // 0;
-	my $callback = $param{ callback } // sub {
-		push @posts, $_[0];
-	};
+    my $title = $param{ title };
+    my @feeds =
+        ref $param{ feeds } eq 'ARRAY'
+        ? @{ $param{ feeds } }
+        : ();
+    my $status = $param{ status };
+    my @tags =
+        ref $param{ tags } eq 'ARRAY'
+        ? @{ $param{ tags } }
+        : ();
+    my @content =
+        ref $param{ content } eq 'ARRAY'
+        ? @{ $param{ content } }
+        : ();
+    my $order = $param{ order } // 'feed';
+    my $reverse = $param{ reverse } // 0;
+    my $limit = $param{ limit } // 0;
+    my $callback = $param{ callback } // sub {
+        push @posts, $_[0];
+    };
 
-	if (defined $status and $status !~ /^(un)?read$/) {
-		die "status must be 'read' or 'unread'";
-	}
+    if (defined $status and $status !~ /^(un)?read$/) {
+        die "status must be 'read' or 'unread'";
+    }
 
-	unless (ref $callback eq 'CODE') {
-		die "callback must be a code ref";
-	}
+    unless (ref $callback eq 'CODE') {
+        die "callback must be a code ref";
+    }
 
-	my @wheres;
+    my @wheres;
 
-	if (defined $title) {
-		push @wheres, 'title REGEXP ' . $self->{ DB }->quote($title);
-	}
+    if (defined $title) {
+        push @wheres, 'title REGEXP ' . $self->{ DB }->quote($title);
+    }
 
-	if (@feeds) {
-		my $feed_set =
-			sprintf '(%s)',
-			join ',',
-			map { $self->{ DB }->quote($_) }
-			@feeds;
-		push @wheres, "feed IN $feed_set";
-	}
+    if (@feeds) {
+        my $feed_set =
+            sprintf '(%s)',
+            join ',',
+            map { $self->{ DB }->quote($_) }
+            @feeds;
+        push @wheres, "feed IN $feed_set";
+    }
 
-	if (defined $status) {
-		push @wheres, 'status = ' . $self->{ DB }->quote($status);
-	}
+    if (defined $status) {
+        push @wheres, 'status = ' . $self->{ DB }->quote($status);
+    }
 
-	if (@content) {
-		push @wheres, map { 'summary REGEXP ' . $self->{ DB }->quote($_) } @content;
-	}
+    if (@content) {
+        push @wheres, map { 'summary REGEXP ' . $self->{ DB }->quote($_) } @content;
+    }
 
-	my $where = @wheres ? 'WHERE ' . join ' AND ', @wheres  : '';
+    my $where = @wheres ? 'WHERE ' . join ' AND ', @wheres  : '';
 
-	my ($asc, $desc, $first, $last) =
-		$reverse
-		? ('DESC', 'ASC' , 'LAST',  'FIRST')
-		: ('ASC',  'DESC', 'FIRST', 'LAST');
+    my ($asc, $desc, $first, $last) =
+        $reverse
+        ? ('DESC', 'ASC' , 'LAST',  'FIRST')
+        : ('ASC',  'DESC', 'FIRST', 'LAST');
 
-	my $order_clause;
+    my $order_clause;
 
-	if ($order eq 'feed') {
-		$order_clause = qq{
+    if ($order eq 'feed') {
+        $order_clause = qq{
 feed $asc,
 nossid $asc
-		};
-	} elsif ($order eq 'title') {
-		$order_clause = qq{
+        };
+    } elsif ($order eq 'title') {
+        $order_clause = qq{
 title $asc NULLS $last,
 feed $asc,
 nossid $asc
-		};
-	} elsif ($order eq 'date') {
-		$order_clause = qq{
+        };
+    } elsif ($order eq 'date') {
+        $order_clause = qq{
 
 CASE
-	WHEN updated IS NOT NULL THEN updated
-	ELSE published
+    WHEN updated IS NOT NULL THEN updated
+    ELSE published
 END $asc NULLS $first,
 feed $asc,
 nossid $asc
-		};
-	} else {
-		die "Cannot order posts by '$order'";
-	}
+        };
+    } else {
+        die "Cannot order posts by '$order'";
+    }
 
-	my $sth = $self->{ DB }->prepare(
-		qq{
+    my $limit_clause = $limit > 0 ? "LIMIT $limit" : '';
+
+    my $sth = $self->{ DB }->prepare(
+        qq{
 SELECT
-	nossid,
-	status,
-	feed,
-	title,
-	link,
-	author,
-	category,
-	summary,
-	published,
-	updated,
-	uid
+    nossid,
+    status,
+    feed,
+    title,
+    link,
+    author,
+    category,
+    summary,
+    published,
+    updated,
+    uid
 FROM
-	posts
+    posts
 $where
 ORDER BY
-	$order_clause;
-		}
-	);
+    $order_clause
+$limit_clause;
+        }
+    );
 
-	$sth->execute;
+    $sth->execute;
 
-	my $n = 0;
+    my $n = 0;
 
-	while (my $p = $sth->fetchrow_hashref) {
-		$p->{ category } =
-			defined $p->{ category }
-			? decode_json($p->{ category })
-			: [];
-		next unless all {
-			my $t = $_;
-			any { $_ =~ $t } @{ $p->{ category } };
-		} @tags;
-		$callback->($p);
-		$n++;
-	}
+    while (my $p = $sth->fetchrow_hashref) {
+        $p->{ category } =
+            defined $p->{ category }
+            ? decode_json($p->{ category })
+            : [];
+        next unless all {
+            my $t = $_;
+            any { $_ =~ $t } @{ $p->{ category } };
+        } @tags;
+        $callback->($p);
+        $n++;
+    }
 
-	$DB::single = 1;
-
-	return defined $param{ callback } ? $n : @posts;
+    return defined $param{ callback } ? $n : @posts;
 
 }
 
 sub mark {
 
-	my ($self, $mark, $feed, @post) = @_;
+    my ($self, $mark, $feed, @post) = @_;
 
-	my $name =
-		$feed->isa('WWW::Noss::FeedConfig')
-		? $feed->name
-		: $feed;
+    my $name =
+        $feed->isa('WWW::Noss::FeedConfig')
+        ? $feed->name
+        : $feed;
 
-	unless ($mark =~ /^(un)?read$/) {
-		die "Posts can only be marked as either 'read' or 'unread'";
-	}
+    unless ($mark =~ /^(un)?read$/) {
+        die "Posts can only be marked as either 'read' or 'unread'";
+    }
 
-	my @wheres = ("feed = " . $self->{ DB }->quote($feed));
+    my @wheres = ("feed = " . $self->{ DB }->quote($feed));
 
-	if (@post) {
-		push @wheres, sprintf "nossid IN (%s)", join ',', @post;
-	}
+    if (@post) {
+        push @wheres, sprintf "nossid IN (%s)", join ',', @post;
+    }
 
-	my $where = join ' AND ', @wheres;
+    my $where = join ' AND ', @wheres;
 
-	my $num = $self->{ DB }->do(
-		qq{
+    my $num = $self->{ DB }->do(
+        qq{
 UPDATE
-	posts
+    posts
 SET
-	status = ?
+    status = ?
 WHERE
-	$where;
-		},
-		undef,
-		$mark
-	);
+    $where;
+        },
+        undef,
+        $mark
+    );
 
-	return $num;
+    return $num;
 
 }
 
 sub skip {
 
-	my ($self, $feed) = @_;
+    my ($self, $feed) = @_;
 
-	my $name =
-		$feed->isa('WWW::Noss::FeedConfig')
-		? $feed->name
-		: $feed;
+    my $name =
+        $feed->isa('WWW::Noss::FeedConfig')
+        ? $feed->name
+        : $feed;
 
-	my $row = $self->{ DB }->selectrow_hashref(
-		q{
+    my $row = $self->{ DB }->selectrow_hashref(
+        q{
 SELECT
-	skiphours,
-	skipdays
+    skiphours,
+    skipdays
 FROM
-	feeds
+    feeds
 WHERE
-	nossname = ?;
-		},
-		undef,
-		$name
-	);
+    nossname = ?;
+        },
+        undef,
+        $name
+    );
 
-	return undef unless defined $row;
+    return undef unless defined $row;
 
-	my ($hour, $day) = (gmtime)[2, 6];
+    my ($hour, $day) = (gmtime)[2, 6];
 
-	my @skip_hours =
-		defined $row->{ skiphours }
-		? @{ decode_json($row->{ skiphours }) }
-		: ();
-	my @skip_days =
-		defined $row->{ skipdays }
-		? @{ decode_json($row->{ skipdays }) }
-		: ();
+    my @skip_hours =
+        defined $row->{ skiphours }
+        ? @{ decode_json($row->{ skiphours }) }
+        : ();
+    my @skip_days =
+        defined $row->{ skipdays }
+        ? @{ decode_json($row->{ skipdays }) }
+        : ();
 
-	if (grep { $hour eq $_ } @skip_hours) {
-		return 1;
-	}
+    if (grep { $hour eq $_ } @skip_hours) {
+        return 1;
+    }
 
-	if (grep { $DAY_MAP{ $day } eq $_ } @skip_days) {
-		return 1;
-	}
+    if (grep { $DAY_MAP{ $day } eq $_ } @skip_days) {
+        return 1;
+    }
 
-	return 0;
+    return 0;
 
 }
 
 sub vacuum {
 
-	my ($self) = @_;
+    my ($self) = @_;
 
-	# Stops the 'cannot VACUUM from within a transaction' error
-	local $self->{ DB }{ AutoCommit } = 1;
+    # Stops the 'cannot VACUUM from within a transaction' error
+    local $self->{ DB }{ AutoCommit } = 1;
 
-	$self->{ DB }->do(q{ VACUUM; });
+    $self->{ DB }->do(q{ VACUUM; });
 
-	return 1;
+    return 1;
 
 }
 
 sub commit {
 
-	my ($self) = @_;
+    my ($self) = @_;
 
-	return $self->{ DB }->commit;
+    return $self->{ DB }->commit;
 
 }
 
 sub finish {
 
-	my ($self) = @_;
+    my ($self) = @_;
 
-	$self->{ DB }->disconnect;
+    $self->{ DB }->disconnect;
 
 }
 
 DESTROY {
 
-	my ($self) = @_;
+    my ($self) = @_;
 
-	$self->finish;
+    $self->finish;
 
 }
 
@@ -936,20 +938,20 @@ C<\%feed> will look something like this:
 
   {
     nossname    => ...,
-	nosslink    => ...,
-	title       => ...,
-	link        => ...,
-	description => ...,
-	updated     => ...,
-	author	    => ...,
-	category    => [ ... ],
-	generator   => ...,
-	image		=> ...,
-	rights      => ...,
-	skiphours   => [ ... ],
-	skipdays    => [ ... ],
-	posts       => ...,     # only with post_info set
-	unread      => ...,     # only with post_info set
+    nosslink    => ...,
+    title       => ...,
+    link        => ...,
+    description => ...,
+    updated     => ...,
+    author        => ...,
+    category    => [ ... ],
+    generator   => ...,
+    image        => ...,
+    rights      => ...,
+    skiphours   => [ ... ],
+    skipdays    => [ ... ],
+    posts       => ...,     # only with post_info set
+    unread      => ...,     # only with post_info set
   }
 
 The following is a list of valid fields for C<%param>:
@@ -983,17 +985,17 @@ C<$feed>. C<$feed> can be a feed name or a L<WWW::Noss::FeedConfig> object.
 C<\%post> will look something like this:
 
   {
-	nossid    => ...,
-	status    => ...,
-	feed      => ...,
-	title     => ...,
-	link      => ...,
-	author    => ...,
-	category  => [ ... ],
-	summary   => ...,
-	published => ...,
-	updated   => ...,
-	uid       => ...,
+    nossid    => ...,
+    status    => ...,
+    feed      => ...,
+    title     => ...,
+    link      => ...,
+    author    => ...,
+    category  => [ ... ],
+    summary   => ...,
+    published => ...,
+    updated   => ...,
+    uid       => ...,
   }
 
 Returns C<undef> if no matching post exists.
@@ -1062,6 +1064,11 @@ Order by post date.
 =item reverse
 
 Return the post list in reverse order.
+
+=item limit
+
+Limit the number of posts that are selected. If equal to or less than C<0>,
+there is no limit. Default is C<0> (no limit).
 
 =item callback
 

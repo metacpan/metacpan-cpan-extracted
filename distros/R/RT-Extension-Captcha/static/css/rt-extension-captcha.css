@@ -1,0 +1,4 @@
+/* ensure the captcha badge is always on top  */
+.grecaptcha-badge {
+  z-index: 99999;
+}

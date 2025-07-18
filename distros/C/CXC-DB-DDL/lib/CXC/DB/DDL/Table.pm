@@ -1,21 +1,21 @@
 package CXC::DB::DDL::Table;
 
-# ABSTRACT: CXC::DB::DDL Table class
+# ABSTRACT: A Table
 
 use v5.26;
 use strict;
 use warnings;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use List::Util qw( any );
-use Ref::Util  qw( is_ref is_arrayref is_coderef);
+use Ref::Util  qw( is_ref is_arrayref is_coderef is_plain_hashref);
 
 use CXC::DB::DDL::Failure;
 use CXC::DB::DDL::Constants -all;
 use CXC::DB::DDL::Types -all;
-use Type::Params          qw( signature_for  );
-use Types::Standard       qw( ArrayRef Bool Dict Enum HashRef InstanceOf Object Optional Undef );
+use Type::Params    qw( signature_for  );
+use Types::Standard qw( ArrayRef Bool Dict Enum HashRef InstanceOf Object Optional Str Undef );
 use Types::Common::String qw( NonEmptyStr );
 
 use Moo;
@@ -28,16 +28,18 @@ with 'CXC::DB::DDL::CloneClear';
 # use after namespace::clean to avoid cleaning out important bits.
 use MooX::StrictConstructor;
 
+
+
+
+
+
+
+use constant FIELD_CLASS => 'CXC::DB::DDL::Field';
+
 my sub croak {
     require Carp;
     goto \&Carp::croak;
 }
-
-
-
-
-
-
 
 has _name => (
     is       => 'ro',
@@ -58,15 +60,18 @@ has _name => (
 
 
 
-
-
-
-
 has schema => (
     is        => 'ro',
     isa       => NonEmptyStr,
     predicate => 1,
 );
+
+
+
+
+
+
+
 
 has name => (
     is       => 'lazy',
@@ -111,19 +116,6 @@ has indexes => (
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 has constraints => (
     is         => 'lazy',
     isa        => ArrayRef->of( Constraint )->plus_coercions( Constraint, q{ [$_] } ),
@@ -132,8 +124,6 @@ has constraints => (
     cloneclear => 1,
     builder    => sub { [] },
 );
-
-
 
 
 
@@ -157,13 +147,12 @@ has checks => (
 
 
 
+
 has fields => (
-    is  => 'lazy',
-    isa => ArrayRef( [ InstanceOf ['CXC::DB::DDL::Field'] ] )
-      ->plus_coercions( ArrayRef [HashRef], q{ [ map CXC::DB::DDL::Field->new( $_ ), $_->@* ] }, ),
+    is         => 'lazy',
+    isa        => ArrayRef( [ InstanceOf [FIELD_CLASS] ] ),
     clearer    => 1,
     cloneclear => 1,
-    coerce     => 1,
     builder    => sub { [] },
 );
 
@@ -173,9 +162,89 @@ has fields => (
 
 
 
-around BUILDARGS => sub ( $orig, $self, @args ) {
 
-    my \%args = $self->$orig( @args );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+around BUILDARGS => sub ( $orig, $class, @args ) {
+
+    my \%args = $class->$orig( @args );
 
     if ( defined $args{name} && !defined $args{schema} ) {
 
@@ -189,8 +258,19 @@ around BUILDARGS => sub ( $orig, $self, @args ) {
             $args{name}   = substr( $args{name}, $pos + 1 );
         }
         else {
-            parameter_constraint->throw( sprintf( q{illegal table name: %s}, $self->name ) );
+            parameter_constraint->throw( "illegal table name: $args{name}" );
         }
+    }
+
+    if ( defined $args{fields} && is_arrayref( $args{fields} ) ) {
+        require Module::Load;
+        Module::Load::load( $class->field_class );
+
+        my @fields = $args{fields}->@*;
+
+        $_ = $class->field_class->new( $_ ) for grep { is_plain_hashref( $_ ) } @fields;
+
+        $args{fields} = \@fields;
     }
 
     return \%args;
@@ -217,6 +297,16 @@ sub BUILD ( $self, $args ) {
     }
 
 }
+
+
+
+
+
+
+
+
+
+sub field_class { FIELD_CLASS }
 
 
 
@@ -410,6 +500,16 @@ around 'clone_simple' => sub ( $orig, $self, @args ) {
     return $clone;
 };
 
+#
+# This file is part of CXC-DB-DDL
+#
+# This software is Copyright (c) 2022 by Smithsonian Astrophysical Observatory.
+#
+# This is free software, licensed under:
+#
+#   The GNU General Public License, Version 3, June 2007
+#
+
 1;
 
 __END__
@@ -420,25 +520,25 @@ __END__
 
 =head1 NAME
 
-CXC::DB::DDL::Table - CXC::DB::DDL Table class
+CXC::DB::DDL::Table - A Table
 
 =head1 VERSION
 
-version 0.19
+version 0.20
+
+=head1 DESCRIPTION
+
+B<CXC::DB::DDL::Table> represents a database table, including its fields, indexes, and constraints.
 
 =head1 OBJECT ATTRIBUTES
 
-=head2 name
-
-  The table name
-
 =head2 schema
 
-The schema that the table is in. If not specified,
-The L</name> attribute is scanned for the schema,
-under the assumption that the form is
+The schema that the table is in.
 
-  <schema>.<table name>
+=head2 name
+
+The table name, qualified with its schema.
 
 =head2 temporary
 
@@ -446,36 +546,109 @@ true if the table should be created as a temporary table
 
 =head2 indexes
 
-The list of table indexes
+A list of table indexes, see the L</indexes> constructor parameter for more information.
 
 =head2 constraints
 
-One or more table constraints, either as a single constraint or an
-array of constraints.
-
-The constraints must meet the L<CXC::DB::DDL::Types/Constraint> type.
-
-If the constraint attribute B<expression> is a coderef, it is called as
-
-   $expression->( $dbh, $sqlt, $constraint )
-
-where B<$dbh> is L<DBI> handle,  B<$sqlt> is the L<SQL::Translator> object, and must return a scalar
-containing the final expression. This is typically used to ensure that identifiers are properly quoted.
-See L<DBI/quote> and L<DBI/quote_identifier>.
-
-B<$dbh>, B<$sqlt> and B<$constraint> must B<not> be changed.
+A list of table constraints, see the L</constraints> constructor parameter for more information.
 
 =head2 checks
 
-DEPRECATED; add an entry to L</constraints> with fields
+DEPRECATED.
 
-   type => CHECK_C, expression => $expr
-
-The list of table check constraints
+A list of table check constraints, see the L</check> constructor parameter for more information.
 
 =head2 fields
 
-The list of fields
+The list of fields as instances of the L<CXC::DB::DDL::Field> class (or
+a subclass). See the L</fields> constructor parameter.
+
+=head1 CONSTRUCTORS
+
+=head2 new
+
+  $table = CXC::DB::DDL::Table->new( %params );
+
+C<%params> may have the following entries:
+
+=over
+
+=item C<name> I<string>
+
+The table name. If the name is qualified with a schema, e.g.
+
+   <schema-name>.<table-name>
+
+The schema will be extracted for the L</schema> parameter.
+
+Note that if a separate schema is provided via the L</schema>
+parameter, the table name is I<not> parsed for a schema, so
+don't specify one or things will break.
+
+=item C<schema> => I<string>
+
+An optional schema.
+
+=item C<temporary> => I<boolean>
+
+True if the table should be created as a temporary table
+
+=item C<indexes> => I<arrayref>
+
+An array of indexes; an index is a hashref; see
+L<CXC::DB::DDL::Types/Index> for its structure.
+
+=item C<constraints>
+
+One or more table constraints, as either a single constraint or as an
+array of constraints.
+
+Constraints must meet the L<CXC::DB::DDL::Types/Constraint> type.
+
+If the constraint attribute B<expression> is a coderef, it is called
+as
+
+   $expression->( $dbh, $sqlt, $constraint )
+
+where B<$dbh> is L<DBI> handle, B<$sqlt> is the L<SQL::Translator>
+object, and must return a scalar containing the final expression. This
+is typically used to ensure that identifiers are properly quoted.  See
+L<DBI/quote> and L<DBI/quote_identifier>.
+
+B<$dbh>, B<$sqlt> and B<$constraint> must B<not> be changed.
+
+=item C<checks>  B<DEPRECATED>
+
+Use a check constraint instead by adding an entry to L</constraints> with fields
+
+   type => CHECK_C, expression => $expr
+
+Originally: The list of table check constraints
+
+=item C<fields>
+
+A list of field specifications.  A specification is either:
+
+=over
+
+=item an instance of L<CXC::DB::DDL::Field> or a subclass
+
+=item a hashref which can be passed to a field constructor.
+
+The default class is L<CXC::CB::DDL::Field>. To change the default,
+subclass this class, and override the L</field_class> class method.
+
+=back
+
+=back
+
+=head1 CLASS METHODS
+
+=head2 field_class
+
+returns the name of the class used by the constructor to create a
+field object from a hash field specification.  Override this in a
+subclass to change it.
 
 =head1 METHODS
 
@@ -520,6 +693,17 @@ delete the table from the database
    $table->add_to_schema( $dbh, $schema );
 
 Add the table to the schema (a L<SQL::Translator::Schema> object).
+
+=head1 SUBROUTINES
+
+=head2 FIELD_CLASS
+
+=begin Pod::Coverage
+
+
+
+
+=end Pod::Coverage
 
 =for Pod::Coverage BUILDARGS
 BUILD

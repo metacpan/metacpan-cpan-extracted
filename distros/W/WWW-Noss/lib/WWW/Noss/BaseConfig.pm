@@ -2,323 +2,323 @@ package WWW::Noss::BaseConfig;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 use List::Util qw(any all);
 
 sub new {
 
-	my ($class, %param) = @_;
+    my ($class, %param) = @_;
 
-	my $self = bless {}, $class;
+    my $self = bless {}, $class;
 
-	$self->initialize(%param);
+    $self->initialize(%param);
 
-	return $self;
+    return $self;
 
 }
 
 sub initialize {
 
-	my ($self, %param) = @_;
+    my ($self, %param) = @_;
 
-	$self->set_limit($param{ limit });
-	$self->set_respect_skip($param{ respect_skip } // 1);
-	$self->set_include_title($param{ include_title } // []);
-	$self->set_exclude_title($param{ exclude_title } // []);
-	$self->set_include_content($param{ include_content } // []);
-	$self->set_exclude_content($param{ exclude_content } // []);
-	$self->set_include_tags($param{ include_tags } // []);
-	$self->set_exclude_tags($param{ exclude_tags } // []);
-	$self->set_autoread($param{ autoread } // 0);
-	$self->set_default_update($param{ default_update } // 1);
-	$self->set_hidden($param{ hidden } // 0);
+    $self->set_limit($param{ limit });
+    $self->set_respect_skip($param{ respect_skip } // 1);
+    $self->set_include_title($param{ include_title } // []);
+    $self->set_exclude_title($param{ exclude_title } // []);
+    $self->set_include_content($param{ include_content } // []);
+    $self->set_exclude_content($param{ exclude_content } // []);
+    $self->set_include_tags($param{ include_tags } // []);
+    $self->set_exclude_tags($param{ exclude_tags } // []);
+    $self->set_autoread($param{ autoread } // 0);
+    $self->set_default_update($param{ default_update } // 1);
+    $self->set_hidden($param{ hidden } // 0);
 
-	return 1;
+    return 1;
 
 }
 
 sub limit {
 
-	my ($self) = @_;
+    my ($self) = @_;
 
-	return $self->{ Limit };
+    return $self->{ Limit };
 
 }
 
 sub set_limit {
 
-	my ($self, $new) = @_;
+    my ($self, $new) = @_;
 
-	if (defined $new and $new <= 0) {
-		die "limit must be greater than 0";
-	}
+    if (defined $new and $new <= 0) {
+        die "limit must be greater than 0";
+    }
 
-	$self->{ Limit } = $new;
+    $self->{ Limit } = $new;
 
 }
 
 sub respect_skip {
 
-	my ($self) = @_;
+    my ($self) = @_;
 
-	return $self->{ RespectSkip };
+    return $self->{ RespectSkip };
 
 }
 
 sub set_respect_skip {
 
-	my ($self, $new) = @_;
+    my ($self, $new) = @_;
 
-	$self->{ RespectSkip } = !! $new;
+    $self->{ RespectSkip } = !! $new;
 
 }
 
 sub include_title {
 
-	my ($self) = @_;
+    my ($self) = @_;
 
-	return $self->{ IncludeTitle };
+    return $self->{ IncludeTitle };
 
 }
 
 sub set_include_title {
 
-	my ($self, $new) = @_;
+    my ($self, $new) = @_;
 
-	if (ref $new ne 'ARRAY') {
-		die "include_title must be an array ref";
-	}
+    if (ref $new ne 'ARRAY') {
+        die "include_title must be an array ref";
+    }
 
-	$self->{ IncludeTitle } = $new;
+    $self->{ IncludeTitle } = $new;
 
 }
 
 sub exclude_title {
 
-	my ($self) = @_;
+    my ($self) = @_;
 
-	return $self->{ ExcludeTitle };
+    return $self->{ ExcludeTitle };
 
 }
 
 sub set_exclude_title {
 
-	my ($self, $new) = @_;
+    my ($self, $new) = @_;
 
-	if (ref $new ne 'ARRAY') {
-		die "exclude_title must be an array ref";
-	}
+    if (ref $new ne 'ARRAY') {
+        die "exclude_title must be an array ref";
+    }
 
-	$self->{ ExcludeTitle } = $new;
+    $self->{ ExcludeTitle } = $new;
 
 }
 
 sub title_ok {
 
-	my ($self, $title) = @_;
+    my ($self, $title) = @_;
 
-	if (@{ $self->include_title }) {
-		unless (defined $title) {
-			return 0;
-		}
-		unless (all { $title =~ $_ } @{ $self->include_title }) {
-			return 0;
-		}
-	}
+    if (@{ $self->include_title }) {
+        unless (defined $title) {
+            return 0;
+        }
+        unless (all { $title =~ $_ } @{ $self->include_title }) {
+            return 0;
+        }
+    }
 
-	if (@{ $self->exclude_title }) {
-		unless (defined $title) {
-			return 1;
-		}
-		if (any { $title =~ $_ } @{ $self->exclude_title }) {
-			return 0;
-		}
-	}
+    if (@{ $self->exclude_title }) {
+        unless (defined $title) {
+            return 1;
+        }
+        if (any { $title =~ $_ } @{ $self->exclude_title }) {
+            return 0;
+        }
+    }
 
-	return 1;
+    return 1;
 
 }
 
 sub include_content {
 
-	my ($self) = @_;
+    my ($self) = @_;
 
-	return $self->{ IncludeContent };
+    return $self->{ IncludeContent };
 
 }
 
 sub set_include_content {
 
-	my ($self, $new) = @_;
+    my ($self, $new) = @_;
 
-	if (ref $new ne 'ARRAY') {
-		die "include_content must be an array ref";
-	}
+    if (ref $new ne 'ARRAY') {
+        die "include_content must be an array ref";
+    }
 
-	$self->{ IncludeContent } = $new;
+    $self->{ IncludeContent } = $new;
 
 }
 
 sub exclude_content {
 
-	my ($self) = @_;
+    my ($self) = @_;
 
-	return $self->{ ExcludeContent };
+    return $self->{ ExcludeContent };
 
 }
 
 sub set_exclude_content {
 
-	my ($self, $new) = @_;
+    my ($self, $new) = @_;
 
-	if (ref $new ne 'ARRAY') {
-		die "exclude_content must be an array ref";
-	}
+    if (ref $new ne 'ARRAY') {
+        die "exclude_content must be an array ref";
+    }
 
-	$self->{ ExcludeContent } = $new;
+    $self->{ ExcludeContent } = $new;
 
 }
 
 sub content_ok {
 
-	my ($self, $content) = @_;
+    my ($self, $content) = @_;
 
-	if (@{ $self->include_content }) {
-		unless (defined $content) {
-			return 0;
-		}
-		if (not all { $content =~ $_ } @{ $self->include_content }) {
-			return 0;
-		}
-	}
+    if (@{ $self->include_content }) {
+        unless (defined $content) {
+            return 0;
+        }
+        if (not all { $content =~ $_ } @{ $self->include_content }) {
+            return 0;
+        }
+    }
 
-	if (@{ $self->exclude_content }) {
-		unless (defined $content) {
-			return 1;
-		}
-		if (any { $content =~ $_ } @{ $self->exclude_content }) {
-			return 0;
-		}
-	}
+    if (@{ $self->exclude_content }) {
+        unless (defined $content) {
+            return 1;
+        }
+        if (any { $content =~ $_ } @{ $self->exclude_content }) {
+            return 0;
+        }
+    }
 
-	return 1;
+    return 1;
 
 }
 
 sub include_tags {
 
-	my ($self) = @_;
+    my ($self) = @_;
 
-	return $self->{ IncludeTags };
+    return $self->{ IncludeTags };
 
 }
 
 sub set_include_tags {
 
-	my ($self, $new) = @_;
+    my ($self, $new) = @_;
 
-	if (ref $new ne 'ARRAY') {
-		die "include_tags must be an array ref";
-	}
+    if (ref $new ne 'ARRAY') {
+        die "include_tags must be an array ref";
+    }
 
-	$self->{ IncludeTags } = $new;
+    $self->{ IncludeTags } = $new;
 
 }
 
 sub exclude_tags {
 
-	my ($self) = @_;
+    my ($self) = @_;
 
-	return $self->{ ExcludeTags };
+    return $self->{ ExcludeTags };
 
 }
 
 sub set_exclude_tags {
 
-	my ($self, $new) = @_;
+    my ($self, $new) = @_;
 
-	if (ref $new ne 'ARRAY') {
-		die "exclude_tags must be an array ref";
-	}
+    if (ref $new ne 'ARRAY') {
+        die "exclude_tags must be an array ref";
+    }
 
-	$self->{ ExcludeTags } = $new;
+    $self->{ ExcludeTags } = $new;
 
 }
 
 sub tags_ok {
 
-	my ($self, $tags) = @_;
+    my ($self, $tags) = @_;
 
-	my %tagmap = map { fc $_ => 1 } @$tags if defined $tags;
+    my %tagmap = defined $tags ? (map { fc $_ => 1 } @$tags) : ();
 
-	if (@{ $self->include_tags }) {
-		unless (defined $tags) {
-			return 0;
-		}
-		if (any { not exists $tagmap{ fc $_ } } @{ $self->include_tags }) {
-			return 0;
-		}
-	}
+    if (@{ $self->include_tags }) {
+        unless (defined $tags) {
+            return 0;
+        }
+        if (any { not exists $tagmap{ fc $_ } } @{ $self->include_tags }) {
+            return 0;
+        }
+    }
 
-	if (@{ $self->exclude_tags }) {
-		unless (defined $tags) {
-			return 1;
-		}
-		if (any { exists $tagmap{ fc $_ } } @{ $self->exclude_tags }) {
-			return 0;
-		}
-	}
+    if (@{ $self->exclude_tags }) {
+        unless (defined $tags) {
+            return 1;
+        }
+        if (any { exists $tagmap{ fc $_ } } @{ $self->exclude_tags }) {
+            return 0;
+        }
+    }
 
-	return 1;
+    return 1;
 
 }
 
 sub autoread {
 
-	my ($self) = @_;
+    my ($self) = @_;
 
-	return $self->{ Autoread };
+    return $self->{ Autoread };
 
 }
 
 sub set_autoread {
 
-	my ($self, $read) = @_;
+    my ($self, $read) = @_;
 
-	$self->{ Autoread } = !! $read;
+    $self->{ Autoread } = !! $read;
 
 }
 
 sub default_update {
 
-	my ($self) = @_;
+    my ($self) = @_;
 
-	return $self->{ DefaultUpdate };
+    return $self->{ DefaultUpdate };
 
 }
 
 sub set_default_update {
 
-	my ($self, $new) = @_;
+    my ($self, $new) = @_;
 
-	$self->{ DefaultUpdate } = !! $new;
+    $self->{ DefaultUpdate } = !! $new;
 
 }
 
 sub hidden {
 
-	my ($self) = @_;
+    my ($self) = @_;
 
-	return $self->{ Hidden };
+    return $self->{ Hidden };
 
 }
 
 sub set_hidden {
 
-	my ($self, $new) = @_;
+    my ($self, $new) = @_;
 
-	$self->{ Hidden } = !! $new;
+    $self->{ Hidden } = !! $new;
 
 }
 

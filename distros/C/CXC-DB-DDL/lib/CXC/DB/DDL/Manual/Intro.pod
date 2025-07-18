@@ -14,7 +14,7 @@ CXC::DB::DDL::Manual::Intro - Introduction to CXC::DB::DDL
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 SYNOPSIS
 

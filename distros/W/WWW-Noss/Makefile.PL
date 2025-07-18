@@ -24,9 +24,6 @@ my %WriteMakefileArgs = (
     },
     PREREQ_PM => {
         'Cwd' => '0',
-        'DateTime' => '0',
-        'DateTime::Format::Mail' => '0',
-        'DateTime::Format::RFC3339' => '0',
         'DBD::SQLite' => '0',
         # for 'AutoInactiveDestroy'
         'DBI' => '1.614',
@@ -42,6 +39,7 @@ my %WriteMakefileArgs = (
         # for retrieving data structures from children
         'Parallel::ForkManager' => '0.7.6',
         'POSIX' => '0',
+        'Time::Piece' => '0',
         # for load_xml()
         'XML::LibXML' => '1.70',
     },

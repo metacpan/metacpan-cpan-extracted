@@ -1,5 +1,23 @@
 Revision history for noss (WWW::Noss)
 
+1.05  Jul 17 2025
+  - Remove dependency on DateTime, DateTime::Format::Mail, and
+    DateTime::Format::RFC3339 modules. This should give noss some minor
+    performance improvements and drastically simplify its dependency tree.
+  - Add dependency to Time::Piece.
+  - Improved reading Atom post content elements.
+  - export no longer exports shel:// and file:// feeds by default. This can be
+    re-enabled with the --export-special option.
+  - Added --list-limit option to list command: Limit the number of posts that
+    are returned by the list command.
+  - The feed and post commands now use the %z code for their updated fields by
+    default.
+  - Empty Atom author names/emails are now ignored. Existing databases will have
+    to be reloaded to reflect this change.
+  - More informative error messages.
+  - Fix grammar in some messages.
+  - Fix documentation errors.
+
 1.04  Jul 04 2025
   - Skip lynx tests if lynx is not installed.
   - nossui: Clean up temporary files that were forgotten in some menus.

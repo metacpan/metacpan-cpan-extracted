@@ -24,7 +24,7 @@ set -f
 
 print_help() {
 
-	cat <<HERE
+    cat <<HERE
 Usage: $PRGNAM [options] ...
 
 Options:
@@ -40,672 +40,673 @@ HERE
 
 print_version() {
 
-	noss -v | sed -e 's/noss/nossui/'
+    noss -v | sed -e 's/noss/nossui/'
 
 }
 
 die() {
-	printf "%s\n" "$1" 1>&2
-	exit 1
+    printf "%s\n" "$1" 1>&2
+    exit 1
 }
 
 wnoss() {
 
-	if [ -n "$NOSS_CONFIG" ]
-	then
-		set -- '--config' "$NOSS_CONFIG" "$@"
-	fi
+    if [ -n "$NOSS_CONFIG" ]
+    then
+        set -- '--config' "$NOSS_CONFIG" "$@"
+    fi
 
-	if [ -n "$NOSS_FEEDS" ]
-	then
-		set -- '--feeds' "$NOSS_FEEDS" "$@"
-	fi
+    if [ -n "$NOSS_FEEDS" ]
+    then
+        set -- '--feeds' "$NOSS_FEEDS" "$@"
+    fi
 
-	if [ -n "$NOSS_DATA" ]
-	then
-		set -- '--data' "$NOSS_DATA" "$@"
-	fi
+    if [ -n "$NOSS_DATA" ]
+    then
+        set -- '--data' "$NOSS_DATA" "$@"
+    fi
 
-	noss --autoclean 0 "$@"
+    noss --autoclean 0 "$@"
 
 
 }
 
 dialog_read_post() {
 
-	wnoss read $(printf "%s" "$1" | sed -e 's/:/ /')
+    wnoss read $(printf "%s" "$1" | sed -e 's/:/ /')
 
 }
 
 dialog_open_post() {
 
-	wnoss open $(printf "%s" "$1" | sed -e 's/:/ /')
+    wnoss open $(printf "%s" "$1" | sed -e 's/:/ /')
 
 }
 
 dialog_update() {
 
-	wnoss update "$@" 2>&1 | dialog \
-		--title 'Updating' \
-		--programbox 'Updating...' -1 -1
+    wnoss update "$@" 2>&1 | dialog \
+        --title 'Updating' \
+        --programbox 'Updating...' -1 -1
 
 }
 
 dialog_reload() {
 
-	wnoss reload "$@" 2>&1 | dialog \
-		--title 'Reloading' \
-		--programbox 'Reloading...' -1 -1
+    wnoss reload "$@" 2>&1 | dialog \
+        --title 'Reloading' \
+        --programbox 'Reloading...' -1 -1
 
 }
 
 dialog_mark_read() {
 
-	wnoss mark read "$@"
+    wnoss mark read "$@"
 
-	if [ "$?" = '0' ]
-	then
-		dialog --msgbox "$* has been marked as read." 0 0
-	else
-		dialog --msgbox "Could not mark $* as read." 0 0
-	fi
+    if [ "$?" = '0' ]
+    then
+        dialog --msgbox "$* has been marked as read." 0 0
+    else
+        dialog --msgbox "Could not mark $* as read." 0 0
+    fi
 
 }
 
 dialog_mark_unread() {
 
-	wnoss mark unread "$@"
+    wnoss mark unread "$@"
 
-	if [ "$?" = '0' ]
-	then
-		dialog --msgbox "$* has been marked as unread." 0 0
-	else
-		dialog --msgbox "Could not mark $* as unread." 0 0
-	fi
+    if [ "$?" = '0' ]
+    then
+        dialog --msgbox "$* has been marked as unread." 0 0
+    else
+        dialog --msgbox "Could not mark $* as unread." 0 0
+    fi
 
 
 }
 
 dialog_info_post() {
 
-	dialog \
-		--no-collapse \
-		--msgbox "$(wnoss post $(printf "%s" "$1" | sed -e 's/:/ /'))" 0 0
+    dialog \
+        --no-collapse \
+        --msgbox "$(wnoss post $(printf "%s" "$1" | sed -e 's/:/ /'))" 0 0
 
 }
 
 dialog_select_post() {
 
-	dialog_select_post_tmpsel="$(mktemp)"
+    dialog_select_post_tmpsel="$(mktemp)"
 
-	while true; do
+    while true; do
 
-		dialog \
-			--title "$1" \
-			--erase-on-exit \
-			--menu 'Please select an action for this post.' 0 0 0 \
-			'Read'        'Read post in pager' \
-			'Open'        'Open post in browser' \
-			'Mark Read'   'Mark post as read' \
-			'Mark Unread' 'Mark post as unread' \
-			'Info'        'View more post information' \
-			2> "$dialog_select_post_tmpsel"
+        dialog \
+            --title "$1" \
+            --erase-on-exit \
+            --menu 'Please select an action for this post.' 0 0 0 \
+            'Read'        'Read post in pager' \
+            'Open'        'Open post in browser' \
+            'Mark Read'   'Mark post as read' \
+            'Mark Unread' 'Mark post as unread' \
+            'Info'        'View more post information' \
+            2> "$dialog_select_post_tmpsel"
 
-		if [ "$?" != "$DIALOG_OK" ]
-		then
-			break
-		fi
+        if [ "$?" != "$DIALOG_OK" ]
+        then
+            break
+        fi
 
-		case "$(cat "$dialog_select_post_tmpsel")" in
-			'Read')
-				dialog_read_post "$1"
-			;;
-			'Open')
-				dialog_open_post "$1"
-			;;
-			'Mark Read')
-				dialog_mark_read $(printf "%s" "$1" | sed -e 's/:/ /')
-			;;
-			'Mark Unread')
-				dialog_mark_unread $(printf "%s" "$1" | sed -e 's/:/ /')
-			;;
-			'Info')
-				dialog_info_post "$1"
-			;;
-		esac
+        case "$(cat "$dialog_select_post_tmpsel")" in
+            'Read')
+                dialog_read_post "$1"
+            ;;
+            'Open')
+                dialog_open_post "$1"
+            ;;
+            'Mark Read')
+                dialog_mark_read $(printf "%s" "$1" | sed -e 's/:/ /')
+            ;;
+            'Mark Unread')
+                dialog_mark_unread $(printf "%s" "$1" | sed -e 's/:/ /')
+            ;;
+            'Info')
+                dialog_info_post "$1"
+            ;;
+        esac
 
-	done
+    done
 
-	rm -f "$dialog_select_post_tmpsel"
+    rm -f "$dialog_select_post_tmpsel"
 
 }
 
 dialog_select_sort() {
 
-	dialog_select_sort_tmpsel="$(mktemp)"
+    dialog_select_sort_tmpsel="$(mktemp)"
 
-	dialog \
-		--menu "How would you like $PRGNAM to sort posts?" 0 0 0 \
-		'Date'  'Sort posts by date (default)' \
-		'Feed'  'Sort posts by their feed alphabetically' \
-		'Title' 'Sort posts by their titles alphabetically' \
-		2> "$dialog_select_sort_tmpsel"
+    dialog \
+        --menu "How would you like $PRGNAM to sort posts?" 0 0 0 \
+        'Date'  'Sort posts by date (default)' \
+        'Feed'  'Sort posts by their feed alphabetically' \
+        'Title' 'Sort posts by their titles alphabetically' \
+        2> "$dialog_select_sort_tmpsel"
 
-	if [ "$?" != "$DIALOG_OK" ]
-	then
-		rm -f "$dialog_select_sort_tmpsel"
-		return
-	fi
+    if [ "$?" != "$DIALOG_OK" ]
+    then
+        rm -f "$dialog_select_sort_tmpsel"
+        return
+    fi
 
-	case "$(cat "$dialog_select_sort_tmpsel")" in
-		'Date')
-			SORT_OPT='--reverse --sort date'
-		;;
-		'Feed')
-			SORT_OPT='--sort feed'
-		;;
-		'Title')
-			SORT_OPT='--sort title'
-		;;
-	esac
+    case "$(cat "$dialog_select_sort_tmpsel")" in
+        'Date')
+            SORT_OPT='--reverse --sort date'
+        ;;
+        'Feed')
+            SORT_OPT='--sort feed'
+        ;;
+        'Title')
+            SORT_OPT='--sort title'
+        ;;
+    esac
 
-	rm -f "$dialog_select_sort_tmpsel"
+    rm -f "$dialog_select_sort_tmpsel"
 
 }
 
 dialog_posts() {
 
-	dialog_posts_tmpposts="$(mktemp)"
-	dialog_posts_tmpsel="$(mktemp)"
+    dialog_posts_tmpposts="$(mktemp)"
+    dialog_posts_tmpsel="$(mktemp)"
 
-	remember_post=
+    remember_post=
 
-	while true; do
+    while true; do
 
-		wnoss list "$@" \
-			--list-format "$(printf "%%f:%%i\n(%%s) %%t")" \
-			$SORT_OPT | \
-			perl -plE '$_ = "\"" . s/\"/\\"/gr . "\""' \
-			> "$dialog_posts_tmpposts"
+        wnoss list "$@" \
+            --list-format "$(printf "%%f:%%i\n(%%s) %%t")" \
+            --list-limit 0 \
+            $SORT_OPT | \
+            perl -plE '$_ = "\"" . s/\"/\\"/gr . "\""' \
+            > "$dialog_posts_tmpposts"
 
-		if [ ! -s "$dialog_posts_tmpposts" ]
-		then
-			dialog --msgbox 'No posts were found' 0 0
-			rm -f "$dialog_posts_tmpposts" "$dialog_posts_tmpsel"
-			return
-		fi
+        if [ ! -s "$dialog_posts_tmpposts" ]
+        then
+            dialog --msgbox 'No posts were found' 0 0
+            rm -f "$dialog_posts_tmpposts" "$dialog_posts_tmpsel"
+            return
+        fi
 
-		dialog \
-			--erase-on-exit \
-			--ok-label 'Read' \
-			--extra-button --extra-label 'Actions' \
-			--cancel-label 'Sort' \
-			--help-button --help-label 'Cancel' \
-			$remember_post \
-			--menu 'Please select a post to view' 0 0 0 \
-			--file "$dialog_posts_tmpposts" \
-			2> "$dialog_posts_tmpsel"
+        dialog \
+            --erase-on-exit \
+            --ok-label 'Read' \
+            --extra-button --extra-label 'Actions' \
+            --cancel-label 'Sort' \
+            --help-button --help-label 'Cancel' \
+            $remember_post \
+            --menu 'Please select a post to view' 0 0 0 \
+            --file "$dialog_posts_tmpposts" \
+            2> "$dialog_posts_tmpsel"
 
-		case "$?" in
-			"$DIALOG_OK")
-				remember_post="--default-item $(cat "$dialog_posts_tmpsel")"
-				dialog_read_post "$(cat "$dialog_posts_tmpsel")"
-			;;
-			"$DIALOG_EXTRA")
-				remember_post="--default-item $(cat "$dialog_posts_tmpsel")"
-				dialog_select_post "$(cat "$dialog_posts_tmpsel")"
-			;;
-			"$DIALOG_CANCEL")
-				remember_post=
-				dialog_select_sort
-			;;
-			*)
-				break
-			;;
-		esac
+        case "$?" in
+            "$DIALOG_OK")
+                remember_post="--default-item $(cat "$dialog_posts_tmpsel")"
+                dialog_read_post "$(cat "$dialog_posts_tmpsel")"
+            ;;
+            "$DIALOG_EXTRA")
+                remember_post="--default-item $(cat "$dialog_posts_tmpsel")"
+                dialog_select_post "$(cat "$dialog_posts_tmpsel")"
+            ;;
+            "$DIALOG_CANCEL")
+                remember_post=
+                dialog_select_sort
+            ;;
+            *)
+                break
+            ;;
+        esac
 
-	done
+    done
 
-	rm -f "$dialog_posts_tmpsel" "$dialog_posts_tmpposts"
+    rm -f "$dialog_posts_tmpsel" "$dialog_posts_tmpposts"
 
 }
 
 dialog_search() {
 
-	search_title=
-	search_content=
-	search_feedgroup=
-	search_tags=
-	search_status=
-	search_hidden='0'
+    search_title=
+    search_content=
+    search_feedgroup=
+    search_tags=
+    search_status=
+    search_hidden='0'
 
-	dialog_search_tmpform="$(mktemp)"
+    dialog_search_tmpform="$(mktemp)"
 
-	while true; do
+    while true; do
 
-		dialog \
-			--ok-label 'Search' \
-			--form 'Please enter your search parameters.' 0 0 0 \
-			'Title'      1 0 "$search_title"     1 12 18 255 \
-			'Content'    2 0 "$search_content"   2 12 18 255 \
-			'Feed/Group' 3 0 "$search_feedgroup" 3 12 18 255 \
-			'Tags'       4 0 "$search_tags"      4 12 18 255 \
-			'Status'     5 0 "$search_status"    5 12 18 255 \
-			'Hidden'     6 0 "$search_hidden"    6 12 18 1 \
-			2> "$dialog_search_tmpform"
+        dialog \
+            --ok-label 'Search' \
+            --form 'Please enter your search parameters.' 0 0 0 \
+            'Title'      1 0 "$search_title"     1 12 18 255 \
+            'Content'    2 0 "$search_content"   2 12 18 255 \
+            'Feed/Group' 3 0 "$search_feedgroup" 3 12 18 255 \
+            'Tags'       4 0 "$search_tags"      4 12 18 255 \
+            'Status'     5 0 "$search_status"    5 12 18 255 \
+            'Hidden'     6 0 "$search_hidden"    6 12 18 1 \
+            2> "$dialog_search_tmpform"
 
-		if [ "$?" != "$DIALOG_OK" ]
-		then
-			break
-		fi
+        if [ "$?" != "$DIALOG_OK" ]
+        then
+            break
+        fi
 
-		set --
+        set --
 
-		while IFS= read -r line; do
-			set -- "$@" "$line"
-		done < "$dialog_search_tmpform"
+        while IFS= read -r line; do
+            set -- "$@" "$line"
+        done < "$dialog_search_tmpform"
 
-		search_title="$1"
-		search_content="$2"
-		search_feedgroup="$3"
-		search_tags="$4"
-		search_status="$5"
-		search_hidden="$6"
+        search_title="$1"
+        search_content="$2"
+        search_feedgroup="$3"
+        search_tags="$4"
+        search_status="$5"
+        search_hidden="$6"
 
-		set --
+        set --
 
-		if [ -n "$search_title" ]
-		then
-			set -- "$@" '--title' "$search_title"
-		fi
+        if [ -n "$search_title" ]
+        then
+            set -- "$@" '--title' "$search_title"
+        fi
 
-		if [ -n "$search_content" ]
-		then
-			set -- "$@" '--content' "$search_content"
-		fi
+        if [ -n "$search_content" ]
+        then
+            set -- "$@" '--content' "$search_content"
+        fi
 
-		if [ -n "$search_tags" ]
-		then
-			for tag in $search_tags; do
-				set -- "$@" '--tag' "$tag"
-			done
-		fi
+        if [ -n "$search_tags" ]
+        then
+            for tag in $search_tags; do
+                set -- "$@" '--tag' "$tag"
+            done
+        fi
 
-		if [ "$search_status" = 'read' ]
-		then
-			set -- "$@" '--status' 'read'
-		elif [ "$search_status" = 'unread' ]
-		then
-			set -- "$@" '--status' 'unread'
-		elif [ -n "$search_status" ]
-		then
-			dialog --msgbox "'status' must either be 'read' or 'unread'." 0 0
-			continue
-		fi
+        if [ "$search_status" = 'read' ]
+        then
+            set -- "$@" '--status' 'read'
+        elif [ "$search_status" = 'unread' ]
+        then
+            set -- "$@" '--status' 'unread'
+        elif [ -n "$search_status" ]
+        then
+            dialog --msgbox "'status' must either be 'read' or 'unread'." 0 0
+            continue
+        fi
 
-		if [ "$search_hidden" = '1' ]
-		then
-			set -- "$@" '--hidden'
-		elif [ -n "$search_hidden" ] && [ "$search_hidden" != '0' ]
-		then
-			dialog --msgbox "'hidden' must either be '1' or '0'" 0 0
-			continue
-		fi
+        if [ "$search_hidden" = '1' ]
+        then
+            set -- "$@" '--hidden'
+        elif [ -n "$search_hidden" ] && [ "$search_hidden" != '0' ]
+        then
+            dialog --msgbox "'hidden' must either be '1' or '0'" 0 0
+            continue
+        fi
 
-		if [ -n "$search_feedgroup" ]
-		then
-			for feedgroup in $search_feedgroup; do
-				set -- "$@" "$feedgroup"
-			done
-		fi
+        if [ -n "$search_feedgroup" ]
+        then
+            for feedgroup in $search_feedgroup; do
+                set -- "$@" "$feedgroup"
+            done
+        fi
 
-		dialog_posts "$@"
+        dialog_posts "$@"
 
-	done
+    done
 
-	rm -f "$dialog_search_tmpform"
+    rm -f "$dialog_search_tmpform"
 
 }
 
 dialog_info_feed() {
 
-	dialog \
-		--no-collapse \
-		--msgbox "$(wnoss feeds "$1")" 0 0
+    dialog \
+        --no-collapse \
+        --msgbox "$(wnoss feeds "$1")" 0 0
 
 }
 
 dialog_select_feed() {
 
-	dialog_select_feed_tmpsel="$(mktemp)"
+    dialog_select_feed_tmpsel="$(mktemp)"
 
-	while true; do
+    while true; do
 
-		dialog \
-			--title "$1" \
-			--ok-label 'Select' \
-			--menu 'Please select an action to perform.' 0 0 0 \
-			'Posts'       "View all posts in $1" \
-			'Mark Read'   "Mark all posts in $1 as read" \
-			'Mark Unread' "Mark all posts in $1 as unread" \
-			'Update'      "Update $1" \
-			'Reload'      "Reload $1" \
-			'Info'        " View $1 feed information" \
-			2> "$dialog_select_feed_tmpsel"
+        dialog \
+            --title "$1" \
+            --ok-label 'Select' \
+            --menu 'Please select an action to perform.' 0 0 0 \
+            'Posts'       "View all posts in $1" \
+            'Mark Read'   "Mark all posts in $1 as read" \
+            'Mark Unread' "Mark all posts in $1 as unread" \
+            'Update'      "Update $1" \
+            'Reload'      "Reload $1" \
+            'Info'        " View $1 feed information" \
+            2> "$dialog_select_feed_tmpsel"
 
-		if [ "$?" != '0' ]
-		then
-			break
-		fi
+        if [ "$?" != '0' ]
+        then
+            break
+        fi
 
-		case "$(cat "$dialog_select_feed_tmpsel")" in
-			'Posts')
-				dialog_posts "$1"
-			;;
-			'Mark Read')
-				dialog_mark_read "$1"
-			;;
-			'Mark Unread')
-				dialog_mark_unread "$1"
-			;;
-			'Update')
-				dialog --yesno "Would you like to update $1?" 0 0
-				if [ "$?" != '0' ]
-				then
-					continue
-				fi
-				dialog_update "$1"
-			;;
-			'Reload')
-				dialog --yesno "Would you like to reload $1?" 0 0
-				if [ "$?" != '0' ]
-				then
-					continue
-				fi
-				dialog_reload "$1"
-			;;
-			'Info')
-				dialog_info_feed "$1"
-			;;
-		esac
+        case "$(cat "$dialog_select_feed_tmpsel")" in
+            'Posts')
+                dialog_posts "$1"
+            ;;
+            'Mark Read')
+                dialog_mark_read "$1"
+            ;;
+            'Mark Unread')
+                dialog_mark_unread "$1"
+            ;;
+            'Update')
+                dialog --yesno "Would you like to update $1?" 0 0
+                if [ "$?" != '0' ]
+                then
+                    continue
+                fi
+                dialog_update "$1"
+            ;;
+            'Reload')
+                dialog --yesno "Would you like to reload $1?" 0 0
+                if [ "$?" != '0' ]
+                then
+                    continue
+                fi
+                dialog_reload "$1"
+            ;;
+            'Info')
+                dialog_info_feed "$1"
+            ;;
+        esac
 
-	done
+    done
 
-	rm -f "$dialog_select_feed_tmpsel"
+    rm -f "$dialog_select_feed_tmpsel"
 
 }
 
 dialog_feeds() {
 
-	dialog_feeds_tmpsel="$(mktemp)"
-	dialog_feeds_tmpfeeds="$(mktemp)"
+    dialog_feeds_tmpsel="$(mktemp)"
+    dialog_feeds_tmpfeeds="$(mktemp)"
 
-	while true; do
+    while true; do
 
-		wnoss feeds "$@" \
-			--feeds-format "$(printf "%%f\n%%t")" | \
-			perl -plE '$_ = "\"" . s/\"/\\"/gr . "\""' \
-			> "$dialog_feeds_tmpfeeds"
+        wnoss feeds "$@" \
+            --feeds-format "$(printf "%%f\n%%t")" | \
+            perl -plE '$_ = "\"" . s/\"/\\"/gr . "\""' \
+            > "$dialog_feeds_tmpfeeds"
 
-		if [ ! -s "$dialog_feeds_tmpfeeds" ]
-		then
-			dialog --msgbox 'No feeds were found' 0 0
-			break
-		fi
+        if [ ! -s "$dialog_feeds_tmpfeeds" ]
+        then
+            dialog --msgbox 'No feeds were found' 0 0
+            break
+        fi
 
-		dialog \
-			--ok-label 'Posts' \
-			--extra-button --extra-label 'Actions' \
-			--menu 'Please select a feed to view' 0 0 0 \
-			--file "$dialog_feeds_tmpfeeds" \
-			2> "$dialog_feeds_tmpsel"
+        dialog \
+            --ok-label 'Posts' \
+            --extra-button --extra-label 'Actions' \
+            --menu 'Please select a feed to view' 0 0 0 \
+            --file "$dialog_feeds_tmpfeeds" \
+            2> "$dialog_feeds_tmpsel"
 
-		case "$?" in
-			"$DIALOG_OK")
-				dialog_posts "$(cat "$dialog_feeds_tmpsel")"
-			;;
-			"$DIALOG_EXTRA")
-				dialog_select_feed "$(cat "$dialog_feeds_tmpsel")"
-			;;
-			*)
-				break
-			;;
-		esac
+        case "$?" in
+            "$DIALOG_OK")
+                dialog_posts "$(cat "$dialog_feeds_tmpsel")"
+            ;;
+            "$DIALOG_EXTRA")
+                dialog_select_feed "$(cat "$dialog_feeds_tmpsel")"
+            ;;
+            *)
+                break
+            ;;
+        esac
 
-	done
+    done
 
-	rm -f "$dialog_feeds_tmpsel" "$dialog_feeds_tmpfeeds"
+    rm -f "$dialog_feeds_tmpsel" "$dialog_feeds_tmpfeeds"
 
 }
 
 dialog_select_group() {
 
-	dialog_select_group_tmpsel="$(mktemp)"
+    dialog_select_group_tmpsel="$(mktemp)"
 
-	while true; do
+    while true; do
 
-		dialog \
-			--ok-label 'Select' \
-			--menu 'Please select an action to perform for this group.' 0 0 0 \
-			'Posts'       'View list of posts from this group' \
-			'Feeds'       'View list of feeds in this group' \
-			'Mark Read'   'Mark all posts in this group as read' \
-			'Mark Unread' 'Mark all posts in this group as unread' \
-			'Update'      'Update all feeds in this group' \
-			'Reload'      'Reload all feeds in this group' \
-			2> "$dialog_select_group_tmpsel"
+        dialog \
+            --ok-label 'Select' \
+            --menu 'Please select an action to perform for this group.' 0 0 0 \
+            'Posts'       'View list of posts from this group' \
+            'Feeds'       'View list of feeds in this group' \
+            'Mark Read'   'Mark all posts in this group as read' \
+            'Mark Unread' 'Mark all posts in this group as unread' \
+            'Update'      'Update all feeds in this group' \
+            'Reload'      'Reload all feeds in this group' \
+            2> "$dialog_select_group_tmpsel"
 
-		if [ "$?" != "$DIALOG_OK" ]
-		then
-			break
-		fi
+        if [ "$?" != "$DIALOG_OK" ]
+        then
+            break
+        fi
 
-		case "$(cat "$dialog_select_group_tmpsel")" in
-			'Posts')
-				dialog_posts "$1"
-			;;
-			'Feeds')
-				dialog_feeds "$1"
-			;;
-			'Mark Read')
-				dialog_mark_read "$1"
-			;;
-			'Mark Unread')
-				dialog_mark_unread "$1"
-			;;
-			'Update')
-				dialog --yesno "Would you like to update the feeds in $1?" 0 0
-				if [ "$?" != '0' ]
-				then
-					continue
-				fi
-				dialog_update "$1"
-			;;
-			'Reload')
-				dialog --yesno "Would you like to reload the feeds in $1?" 0 0
-				if [ "$?" != '0' ]
-				then
-					continue
-				fi
-				dialog_reload "$1"
-			;;
-		esac
+        case "$(cat "$dialog_select_group_tmpsel")" in
+            'Posts')
+                dialog_posts "$1"
+            ;;
+            'Feeds')
+                dialog_feeds "$1"
+            ;;
+            'Mark Read')
+                dialog_mark_read "$1"
+            ;;
+            'Mark Unread')
+                dialog_mark_unread "$1"
+            ;;
+            'Update')
+                dialog --yesno "Would you like to update the feeds in $1?" 0 0
+                if [ "$?" != '0' ]
+                then
+                    continue
+                fi
+                dialog_update "$1"
+            ;;
+            'Reload')
+                dialog --yesno "Would you like to reload the feeds in $1?" 0 0
+                if [ "$?" != '0' ]
+                then
+                    continue
+                fi
+                dialog_reload "$1"
+            ;;
+        esac
 
-	done
+    done
 
-	rm -f "$dialog_select_group_tmpsel"
+    rm -f "$dialog_select_group_tmpsel"
 
 }
 
 dialog_groups() {
 
-	dialog_groups_tmpsel="$(mktemp)"
-	dialog_groups_tmpgroups="$(mktemp)"
+    dialog_groups_tmpsel="$(mktemp)"
+    dialog_groups_tmpgroups="$(mktemp)"
 
-	while true; do
+    while true; do
 
-		wnoss groups --brief > "$dialog_groups_tmpgroups"
+        wnoss groups --brief > "$dialog_groups_tmpgroups"
 
-		if  [ ! -s "$dialog_groups_tmpgroups" ]
-		then
-			dialog --msgbox 'No feed groups were found' 0 0
-			break
-		fi
+        if  [ ! -s "$dialog_groups_tmpgroups" ]
+        then
+            dialog --msgbox 'No feed groups were found' 0 0
+            break
+        fi
 
-		dialog \
-			--ok-label 'Posts' \
-			--extra-button --extra-label 'Actions' \
-			--no-items \
-			--menu 'Please select a group to view.' 0 0 0 \
-			--file "$dialog_groups_tmpgroups" \
-			2> "$dialog_groups_tmpsel"
+        dialog \
+            --ok-label 'Posts' \
+            --extra-button --extra-label 'Actions' \
+            --no-items \
+            --menu 'Please select a group to view.' 0 0 0 \
+            --file "$dialog_groups_tmpgroups" \
+            2> "$dialog_groups_tmpsel"
 
-		case "$?" in
-			"$DIALOG_OK")
-				dialog_posts "$(cat "$dialog_groups_tmpsel")"
-			;;
-			"$DIALOG_EXTRA")
-				dialog_select_group "$(cat "$dialog_groups_tmpsel")"
-			;;
-			*)
-				break
-			;;
-		esac
+        case "$?" in
+            "$DIALOG_OK")
+                dialog_posts "$(cat "$dialog_groups_tmpsel")"
+            ;;
+            "$DIALOG_EXTRA")
+                dialog_select_group "$(cat "$dialog_groups_tmpsel")"
+            ;;
+            *)
+                break
+            ;;
+        esac
 
-	done
+    done
 
-	rm -f "$dialog_groups_tmpsel" "$dialog_groups_tmpgroups"
+    rm -f "$dialog_groups_tmpsel" "$dialog_groups_tmpgroups"
 
 }
 
 dialog_clean() {
 
-	dialog --infobox 'Cleaning up...' 0 0
+    dialog --infobox 'Cleaning up...' 0 0
 
-	wnoss clean
+    wnoss clean
 
-	dialog --msgbox 'Finished cleanup.' 0 0
+    dialog --msgbox 'Finished cleanup.' 0 0
 
 }
 
 dialog_main() {
 
-	dialog_main_tmpsel="$(mktemp)"
+    dialog_main_tmpsel="$(mktemp)"
 
-	while true; do
+    while true; do
 
-		dialog \
-			--erase-on-exit \
-			--menu 'Please select a menu item.' 0 0 0 \
-			'Posts' 'View all posts' \
-			'Unread' 'View unread posts' \
-			'Search' 'Search for posts that match given parameters' \
-			'Feeds' 'Browse your feeds' \
-			'Groups' 'Browse your feed groups' \
-			'Update' 'Fetch and load feed updates' \
-			'Reload' 'Reload feed cache' \
-			'Clean' 'Clean up feed cache and database' \
-			2> "$dialog_main_tmpsel"
+        dialog \
+            --erase-on-exit \
+            --menu 'Please select a menu item.' 0 0 0 \
+            'Posts' 'View all posts' \
+            'Unread' 'View unread posts' \
+            'Search' 'Search for posts that match given parameters' \
+            'Feeds' 'Browse your feeds' \
+            'Groups' 'Browse your feed groups' \
+            'Update' 'Fetch and load feed updates' \
+            'Reload' 'Reload feed cache' \
+            'Clean' 'Clean up feed cache and database' \
+            2> "$dialog_main_tmpsel"
 
-		if [ "$?" != "$DIALOG_OK" ]
-		then
-			rm -f "$dialog_main_tmpsel"
-			exit 0
-		fi
+        if [ "$?" != "$DIALOG_OK" ]
+        then
+            rm -f "$dialog_main_tmpsel"
+            exit 0
+        fi
 
-		case "$(cat "$dialog_main_tmpsel")" in
-			'Posts')
-				dialog_posts
-			;;
-			'Unread')
-				dialog_posts --status 'unread'
-			;;
-			'Search')
-				dialog_search
-			;;
-			'Feeds')
-				dialog_feeds
-			;;
-			'Groups')
-				dialog_groups
-			;;
-			'Update')
-				dialog --yesno "Would you like to update all of your feeds?" 0 0
-				if [ "$?" != '0' ]
-				then
-					continue
-				fi
-				dialog_update
-			;;
-			'Reload')
-				dialog --yesno "Would you like to reload all of your feeds?" 0 0
-				if [ "$?" != '0' ]
-				then
-					continue
-				fi
-				dialog_reload
-			;;
-			'Clean')
-				dialog_clean
-			;;
-		esac
+        case "$(cat "$dialog_main_tmpsel")" in
+            'Posts')
+                dialog_posts
+            ;;
+            'Unread')
+                dialog_posts --status 'unread'
+            ;;
+            'Search')
+                dialog_search
+            ;;
+            'Feeds')
+                dialog_feeds
+            ;;
+            'Groups')
+                dialog_groups
+            ;;
+            'Update')
+                dialog --yesno "Would you like to update all of your feeds?" 0 0
+                if [ "$?" != '0' ]
+                then
+                    continue
+                fi
+                dialog_update
+            ;;
+            'Reload')
+                dialog --yesno "Would you like to reload all of your feeds?" 0 0
+                if [ "$?" != '0' ]
+                then
+                    continue
+                fi
+                dialog_reload
+            ;;
+            'Clean')
+                dialog_clean
+            ;;
+        esac
 
-	done
+    done
 
-	rm -f "$dialog_main_tmpsel"
+    rm -f "$dialog_main_tmpsel"
 
 }
 
 main() {
 
-	if [ ! -x "$(command -v noss)" ]
-	then
-		die "noss is not installed or is not in PATH"
-	fi
+    if [ ! -x "$(command -v noss)" ]
+    then
+        die "noss is not installed or is not in PATH"
+    fi
 
-	if [ ! -x "$(command -v "dialog")" ]
-	then
-		die "dialog is not installed or is not in PATH"
-	fi
+    if [ ! -x "$(command -v "dialog")" ]
+    then
+        die "dialog is not installed or is not in PATH"
+    fi
 
-	while getopts 'c:D:f:hv' opt
-	do
-		case "$opt" in
-			'c')
-				NOSS_CONFIG="$OPTARG"
-			;;
-			'D')
-				NOSS_DATA="$OPTARG"
-			;;
-			'f')
-				NOSS_FEEDS="$OPTARG"
-			;;
-			'h')
-				print_help
-				exit 0
-			;;
-			'v')
-				print_version
-				exit 0
-			;;
-			'?')
-				print_help 1>&2
-				exit 1
-			;;
-		esac
-	done
+    while getopts 'c:D:f:hv' opt
+    do
+        case "$opt" in
+            'c')
+                NOSS_CONFIG="$OPTARG"
+            ;;
+            'D')
+                NOSS_DATA="$OPTARG"
+            ;;
+            'f')
+                NOSS_FEEDS="$OPTARG"
+            ;;
+            'h')
+                print_help
+                exit 0
+            ;;
+            'v')
+                print_version
+                exit 0
+            ;;
+            '?')
+                print_help 1>&2
+                exit 1
+            ;;
+        esac
+    done
 
-	if [ -n "$NOSS_CONFIG" ] && [ ! -f "$NOSS_CONFIG" ]
-	then
-		die "$NOSS_CONFIG does not exist"
-	fi
+    if [ -n "$NOSS_CONFIG" ] && [ ! -f "$NOSS_CONFIG" ]
+    then
+        die "$NOSS_CONFIG does not exist"
+    fi
 
-	if [ -n "$NOSS_FEEDS" ] && [ ! -f "$NOSS_FEEDS" ]
-	then
-		die "$NOSS_FEEDS does not exist"
-	fi
+    if [ -n "$NOSS_FEEDS" ] && [ ! -f "$NOSS_FEEDS" ]
+    then
+        die "$NOSS_FEEDS does not exist"
+    fi
 
-	dialog_main
+    dialog_main
 
 }
 

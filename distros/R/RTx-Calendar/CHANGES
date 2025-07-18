@@ -1,5 +1,8 @@
 Revision history for RTx-Calendar
 
+2.01 2025-07-17
+ - Remove POD for internal function
+
 2.00 2025-05-29
  - Update for RT 6
 

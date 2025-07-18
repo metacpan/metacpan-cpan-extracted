@@ -1,7 +1,3 @@
-  GetEventData $Object
-    Accepts a ticket object and returns an array of ticket metadata values
-    based on the configured CalendarEventLineValues.
-
 NAME
     RTx::Calendar - Calendar view for RT ticket dates and custom fields
 

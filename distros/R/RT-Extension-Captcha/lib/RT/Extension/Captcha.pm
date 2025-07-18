@@ -4,19 +4,25 @@ use 5.008003;
 use strict;
 use warnings;
 
-our $VERSION = '1.21';
-
-use GD::SecurityImage;
+our $VERSION = '2.00';
 
 =head1 NAME
 
-RT::Extension::Captcha - solve a CAPTCHA before some actions in RT
+RT::Extension::Captcha - use Google reCAPTCHA v3 to verify users before some actions in RT
 
 =head1 DESCRIPTION
 
-This extension is for RT 4.2 or newer.  It requires solving captchas
-when a user creates a ticket (using either regular interface or quick
-create) and on replies/comments (updates).
+This extension uses Google reCAPTCHA v3 for user verification when a user
+creates a ticket (using either regular interface or quick create) and on
+replies/comments (updates).
+
+Previous 1.* versions of this extension generated a captcha image for the user
+to solve. With the switch to Google reCAPTCHA v3 the user will no longer be
+interrupted by a captcha image.
+
+=head1 RT VERSION
+
+Works with RT 6.0.0 and newer. Install the latest 1.* version for older RTs.
 
 =head1 INSTALLATION
 
@@ -48,35 +54,39 @@ Add this line:
 
 =head2 No CAPTCHA rights
 
-Users who have right 'NoCaptchaOnCreate' or 'NoCaptchaOnUpdate'
-will see no captchas on corresponding actions.
+Users who have right 'NoCaptchaOnCreate' or 'NoCaptchaOnUpdate' will not have
+any user verification done on corresponding actions.
 
-=head2 Font
+=head2 Create Google reCAPTCHA key
 
-As GD's builtin font is kinda small. A ttf font is used instead.
-By default font defined by ChartFont option (RT's option to set
-fonts for charts) is used for CAPTCHA images.
+To create a reCAPTCHA key see L<here|https://cloud.google.com/recaptcha/docs/create-key-website>
 
-As well, you can set font for cpatchas only using L</%Captcha option>
-described below.
+=head2 $CaptchaSiteKey
 
-=head2 %Captcha option
+Set your Google reCAPTCHA site key. This is required.
 
-See F<etc/Captcha_Config.pm> for defaults and example. C<%Captcha>
-option is a hash. Now, only ImageProperties key has meaning:
+    Set( $CaptchaSiteKey, '...' );
 
-    Set(%Captcha,
-        ImageProperties => {
-            option => value,
-            option => value,
-            ...
-        },
-    );
+=head2 $CaptchaSecret
 
-ImageProperties are passed into L<GD::SecurityImage/new>. Read documentation
-for the module for full list of options.
+Set your Google reCAPTCHA secret key. This is required.
+
+    Set( $CaptchaSecret, '...' );
+
+=head2 $CaptchaScore
+
+Set the minimum score to verify a user. This is optional and must be a value
+between 0 and 1. It defaults to 0.5.
+
+The higher the score the more likely the user is real. Setting a higher value
+for CaptchaScore means it is harder for robots to fool the verification but
+also makes it more possible a real user might fail verification.
+
+    Set( $CaptchaScore, 0.4 );
 
 =cut
+
+RT->AddStyleSheets( 'rt-extension-captcha.css' );
 
 require RT::Queue;
 RT::Queue->AddRight( Staff => NoCaptchaOnCreate => "Don't ask user to solve a CAPTCHA on ticket create" ); #loc_pair
@@ -98,7 +108,7 @@ or via the web at
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2014-2020 by Best Practical Solutions
+This software is Copyright (c) 2014-2025 by Best Practical Solutions
 
 This is free software, licensed under:
 

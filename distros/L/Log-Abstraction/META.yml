@@ -37,5 +37,5 @@ resources:
   bugtracker: https://github.com/nigelhorne/Log-Abstraction/issues
   homepage: https://metacpan.org/pod/Log::Abstraction
   repository: git://github.com/nigelhorne/Log-Abstraction.git
-version: 0.21
+version: 0.23
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

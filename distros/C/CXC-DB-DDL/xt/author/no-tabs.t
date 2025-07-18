@@ -23,9 +23,16 @@ my @files = (
     't/DDL/Table.t',
     't/DDL/Util.t',
     't/DDL/Util/dbd_types.t',
+    't/DDL/constructor.t',
     't/DDL/create.t',
+    't/DDL/subclass.t',
     't/lib/DBD/MyTestDBD.pm',
-    't/lib/My/Field.pm'
+    't/lib/My/Field.pm',
+    't/lib/My/SubClass1/DDL.pm',
+    't/lib/My/SubClass1/Table.pm',
+    't/lib/My/SubClass2/DDL.pm',
+    't/lib/My/SubClass2/Field.pm',
+    't/lib/My/SubClass2/Table.pm'
 );
 
 notabs_ok($_) foreach @files;

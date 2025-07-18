@@ -44,6 +44,6 @@
          "web" : "https://github.com/TvdW/perl-AnyEvent-YACurl"
       }
    },
-   "version" : "0.22",
+   "version" : "0.23",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

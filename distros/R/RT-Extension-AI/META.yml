@@ -25,7 +25,7 @@ requires:
 resources:
   license: http://opensource.org/licenses/gpl-license.php
   repository: https://github.com/bestpractical/rt-extension-ai
-version: '0.01'
+version: '0.02'
 x_module_install_rtx_version: '0.44'
 x_requires_rt: 5.0.7
 x_rt_too_new: 6.2.0

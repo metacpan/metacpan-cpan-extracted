@@ -64,5 +64,5 @@ resources:
   bugtracker: https://github.com/nigelhorne/CGI-Info/issues
   homepage: https://metacpan.org/pod/CGI::Info
   repository: git://github.com/nigelhorne/CGI-Info.git
-version: '1.04'
+version: '1.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

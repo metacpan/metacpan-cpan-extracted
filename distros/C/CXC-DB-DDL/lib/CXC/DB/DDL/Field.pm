@@ -14,7 +14,7 @@ use Types::Common::String qw( NonEmptyStr );
 use Moo;
 use experimental 'signatures', 'postderef', 'declared_refs', 'refaliasing';
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use namespace::clean -except => [ 'has', '_tag_list', '_tags' ];
 
@@ -284,6 +284,16 @@ sub to_sqlt ( $self, $dbh, $table ) {
     return $field;
 }
 
+#
+# This file is part of CXC-DB-DDL
+#
+# This software is Copyright (c) 2022 by Smithsonian Astrophysical Observatory.
+#
+# This is free software, licensed under:
+#
+#   The GNU General Public License, Version 3, June 2007
+#
+
 1;
 
 __END__
@@ -298,7 +308,7 @@ CXC::DB::DDL::Field - DDL Representation of a field
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 OBJECT ATTRIBUTES
 

@@ -2,268 +2,268 @@ package WWW::Noss::OPML;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 use XML::LibXML;
 
 sub _read_outline {
 
-	my ($self, $node, $groups) = @_;
+    my ($self, $node, $groups) = @_;
 
-	my $type = $node->getAttribute('type');
+    my $type = $node->getAttribute('type');
 
-	return unless defined $type;
+    return unless defined $type;
 
-	my $title = $node->getAttribute('title');
+    my $title = $node->getAttribute('title');
 
-	if ($type eq 'folder') {
+    if ($type eq 'folder') {
 
-		my @new = ($title // (), @$groups);
+        my @new = ($title // (), @$groups);
 
-		for my $n ($node->findnodes('./outline')) {
-			$self->_read_outline($n, \@new);
-		}
+        for my $n ($node->findnodes('./outline')) {
+            $self->_read_outline($n, \@new);
+        }
 
-	} elsif ($type eq 'rss') {
+    } elsif ($type eq 'rss') {
 
-		my $name    = $title // return;
-		my $xmlurl  = $node->getAttribute('xmlUrl') // return;
-		my $text    = $node->getAttribute('text');
-		my $htmlurl = $node->getAttribute('htmlUrl');
+        my $name    = $title // return;
+        my $xmlurl  = $node->getAttribute('xmlUrl') // return;
+        my $text    = $node->getAttribute('text');
+        my $htmlurl = $node->getAttribute('htmlUrl');
 
-		push @{ $self->feeds }, {
-			title    => $name,
-			xml_url  => $xmlurl,
-			text     => $text,
-			html_url => $htmlurl,
-			groups   => [ @$groups ],
-		};
+        push @{ $self->feeds }, {
+            title    => $name,
+            xml_url  => $xmlurl,
+            text     => $text,
+            html_url => $htmlurl,
+            groups   => [ @$groups ],
+        };
 
-	} else {
+    } else {
 
-		return;
+        return;
 
-	}
+    }
 
-	return 1;
+    return 1;
 
 }
 
 sub from_perl {
 
-	my ($class, %param) = @_;
+    my ($class, %param) = @_;
 
-	my $self = bless {}, $class;
+    my $self = bless {}, $class;
 
-	$self->set_title($param{ title });
-	$self->set_feeds($param{ feeds } // []);
+    $self->set_title($param{ title });
+    $self->set_feeds($param{ feeds } // []);
 
-	return $self;
+    return $self;
 
 }
 
 sub from_xml {
 
-	my ($class, $file) = @_;
+    my ($class, $file) = @_;
 
-	my $self = bless {}, $class;
+    my $self = bless {}, $class;
 
-	my $dom = eval { XML::LibXML->load_xml(location => $file) };
+    my $dom = eval { XML::LibXML->load_xml(location => $file) };
 
-	unless (defined $dom) {
-		die "Failed to read $file as an XML document\n";
-	}
+    unless (defined $dom) {
+        die "Failed to read $file as an XML document\n";
+    }
 
-	my ($title) = $dom->findnodes('/opml/head/title');
+    my ($title) = $dom->findnodes('/opml/head/title');
 
-	$self->set_title(
-		defined $title ? $title->textContent : ''
-	);
+    $self->set_title(
+        defined $title ? $title->textContent : ''
+    );
 
-	$self->set_feeds([]);
+    $self->set_feeds([]);
 
-	my @outs = $dom->findnodes('/opml/body/outline');
+    my @outs = $dom->findnodes('/opml/body/outline');
 
-	for my $o (@outs) {
-		$self->_read_outline($o, []);
-	}
+    for my $o (@outs) {
+        $self->_read_outline($o, []);
+    }
 
-	return $self;
+    return $self;
 
 }
 
 sub to_xml {
 
-	my ($self, %param) = @_;
+    my ($self, %param) = @_;
 
-	my $dom = XML::LibXML::Document->new('1.0', 'UTF-8');
+    my $dom = XML::LibXML::Document->new('1.0', 'UTF-8');
 
-	my $root = XML::LibXML::Element->new('opml');
-	$root->setAttribute('version', '1.0');
+    my $root = XML::LibXML::Element->new('opml');
+    $root->setAttribute('version', '1.0');
 
-	$dom->setDocumentElement($root);
+    $dom->setDocumentElement($root);
 
-	my $head = XML::LibXML::Element->new('head');
-	my $title = XML::LibXML::Element->new('title');
-	$title->addChild(
-		XML::LibXML::Text->new($self->title)
-	);
-	$head->addChild($title);
-	$root->addChild($head);
+    my $head = XML::LibXML::Element->new('head');
+    my $title = XML::LibXML::Element->new('title');
+    $title->addChild(
+        XML::LibXML::Text->new($self->title)
+    );
+    $head->addChild($title);
+    $root->addChild($head);
 
-	my $body = XML::LibXML::Element->new('body');
-	$root->addChild($body);
+    my $body = XML::LibXML::Element->new('body');
+    $root->addChild($body);
 
-	my %folders;
-	my @ungrouped;
+    my %folders;
+    my @ungrouped;
 
-	if (defined $param{ folders } and !$param{ folders }) {
-		@ungrouped = @{ $self->{ Feeds } };
-	} else {
-		for my $f (@{ $self->{ Feeds } }) {
-			if (@{ $f->{ groups } }) {
-				for my $g (@{ $f->{ groups } }) {
-					push @{ $folders{ $g } }, $f;
-				}
-			} else {
-				push @ungrouped, $f;
-			}
-		}
-	}
+    if (defined $param{ folders } and !$param{ folders }) {
+        @ungrouped = @{ $self->{ Feeds } };
+    } else {
+        for my $f (@{ $self->{ Feeds } }) {
+            if (@{ $f->{ groups } }) {
+                for my $g (@{ $f->{ groups } }) {
+                    push @{ $folders{ $g } }, $f;
+                }
+            } else {
+                push @ungrouped, $f;
+            }
+        }
+    }
 
-	for my $g (sort keys %folders) {
+    for my $g (sort keys %folders) {
 
-		my $folder = XML::LibXML::Element->new('outline');
-		$folder->setAttribute('type', 'folder');
-		$folder->setAttribute('title', $g);
-		$folder->setAttribute('text', $g);
-		$folder->setAttribute('description', $g);
+        my $folder = XML::LibXML::Element->new('outline');
+        $folder->setAttribute('type', 'folder');
+        $folder->setAttribute('title', $g);
+        $folder->setAttribute('text', $g);
+        $folder->setAttribute('description', $g);
 
-		for my $f (@{ $folders{ $g } }) {
-			my $feed = XML::LibXML::Element->new('outline');
-			$feed->setAttribute('type', 'rss');
-			$feed->setAttribute('title', $f->{ title });
-			$feed->setAttribute('text', $f->{ text } // $f->{ title });
-			$feed->setAttribute('xmlUrl', $f->{ xml_url });
-			$feed->setAttribute('htmlUrl', $f->{ html_url }) if defined $f->{ html_url };
-			$folder->addChild($feed);
-		}
+        for my $f (@{ $folders{ $g } }) {
+            my $feed = XML::LibXML::Element->new('outline');
+            $feed->setAttribute('type', 'rss');
+            $feed->setAttribute('title', $f->{ title });
+            $feed->setAttribute('text', $f->{ text } // $f->{ title });
+            $feed->setAttribute('xmlUrl', $f->{ xml_url });
+            $feed->setAttribute('htmlUrl', $f->{ html_url }) if defined $f->{ html_url };
+            $folder->addChild($feed);
+        }
 
-		$body->addChild($folder);
+        $body->addChild($folder);
 
-	}
+    }
 
-	for my $f (sort { $a->{ title } cmp $b->{ title } } @ungrouped) {
-		my $feed = XML::LibXML::Element->new('outline');
-		$feed->setAttribute('type', 'rss');
-		$feed->setAttribute('title', $f->{ title });
-		$feed->setAttribute('text', $f->{ text } // $f->{ title });
-		$feed->setAttribute('xmlUrl', $f->{ xml_url });
-		$feed->setAttribute('htmlUrl', $f->{ html_url }) if defined $f->{ html_url };
-		$body->addChild($feed);
-	}
+    for my $f (sort { $a->{ title } cmp $b->{ title } } @ungrouped) {
+        my $feed = XML::LibXML::Element->new('outline');
+        $feed->setAttribute('type', 'rss');
+        $feed->setAttribute('title', $f->{ title });
+        $feed->setAttribute('text', $f->{ text } // $f->{ title });
+        $feed->setAttribute('xmlUrl', $f->{ xml_url });
+        $feed->setAttribute('htmlUrl', $f->{ html_url }) if defined $f->{ html_url };
+        $body->addChild($feed);
+    }
 
-	return $dom;
+    return $dom;
 
 }
 
 sub to_file {
 
-	my ($self, $file, %param) = @_;
+    my ($self, $file, %param) = @_;
 
-	open my $fh, '>', $file
-		or die "Failed to open $file for writing: $!\n";
-	binmode $fh;
-	$self->to_xml(%param)->toFH($fh, 1);
-	close $fh;
+    open my $fh, '>', $file
+        or die "Failed to open $file for writing: $!\n";
+    binmode $fh;
+    $self->to_xml(%param)->toFH($fh, 1);
+    close $fh;
 
-	return $file;
+    return $file;
 
 }
 
 sub to_fh {
 
-	my ($self, $fh, %param) = @_;
+    my ($self, $fh, %param) = @_;
 
-	binmode $fh;
-	$self->to_xml(%param)->toFH($fh, 1);
+    binmode $fh;
+    $self->to_xml(%param)->toFH($fh, 1);
 
-	return $fh;
+    return $fh;
 
 }
 
 sub title {
 
-	my ($self) = @_;
+    my ($self) = @_;
 
-	return $self->{ Title };
+    return $self->{ Title };
 
 }
 
 sub set_title {
 
-	my ($self, $new) = @_;
+    my ($self, $new) = @_;
 
-	unless (defined $new) {
-		die "title cannot be undefined";
-	}
+    unless (defined $new) {
+        die "title cannot be undefined";
+    }
 
-	$self->{ Title } = $new;
+    $self->{ Title } = $new;
 
 }
 
 sub feeds {
 
-	my ($self) = @_;
+    my ($self) = @_;
 
-	return $self->{ Feeds };
+    return $self->{ Feeds };
 
 }
 
 sub set_feeds {
 
-	my ($self, $new) = @_;
+    my ($self, $new) = @_;
 
-	unless (ref $new eq 'ARRAY') {
-		die "feeds must be an array ref";
-	}
+    unless (ref $new eq 'ARRAY') {
+        die "feeds must be an array ref";
+    }
 
-	for my $i (0 .. $#$new) {
-		unless (defined $new->[$i]{ xml_url }) {
-			die "feeds[$i] is missing xml_url";
-		}
-		unless (defined $new->[$i]{ title }) {
-			die "feeds[$i] is missing title";
-		}
-		if (defined $new->[$i]{ groups } and ref $new->[$i]{ groups } ne 'ARRAY') {
-			die "feeds[$i]{ groups } is not an array ref";
-		}
-	}
+    for my $i (0 .. $#$new) {
+        unless (defined $new->[$i]{ xml_url }) {
+            die "feeds[$i] is missing xml_url";
+        }
+        unless (defined $new->[$i]{ title }) {
+            die "feeds[$i] is missing title";
+        }
+        if (defined $new->[$i]{ groups } and ref $new->[$i]{ groups } ne 'ARRAY') {
+            die "feeds[$i]{ groups } is not an array ref";
+        }
+    }
 
-	$self->{ Feeds } = $new;
+    $self->{ Feeds } = $new;
 
 }
 
 sub rename_group {
 
-	my ($self, $old, $new) = @_;
+    my ($self, $old, $new) = @_;
 
-	my $rn = 0;
+    my $rn = 0;
 
-	for my $f (@{ $self->{ Feeds } }) {
+    for my $f (@{ $self->{ Feeds } }) {
 
-		next unless defined $f->{ groups };
+        next unless defined $f->{ groups };
 
-		for my $i (0 .. $#{ $f->{ groups } }) {
-			if ($f->{ groups }[$i] eq $old) {
-				$f->{ groups }[$i] = $new;
-				$rn++;
-			}
-		}
+        for my $i (0 .. $#{ $f->{ groups } }) {
+            if ($f->{ groups }[$i] eq $old) {
+                $f->{ groups }[$i] = $new;
+                $rn++;
+            }
+        }
 
-	}
+    }
 
-	return $rn;
+    return $rn;
 
 }
 
@@ -316,11 +316,11 @@ Title string for the OPML file.
 Array ref of outline feed hashes. The hashes should look something like this:
 
   {
-	title    => ..., # required
-	xml_url  => ..., # required
-	text     => ...,
-	html_url => ...,
-	groups   => [ ... ],
+    title    => ..., # required
+    xml_url  => ..., # required
+    text     => ...,
+    html_url => ...,
+    groups   => [ ... ],
   }
 
 =back

@@ -2,84 +2,84 @@ package WWW::Noss::GroupConfig;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 use parent 'WWW::Noss::BaseConfig';
 
 sub new {
 
-	my ($class, %param) = @_;
+    my ($class, %param) = @_;
 
-	my $self = bless {}, $class;
+    my $self = bless {}, $class;
 
-	$self->initialize(%param);
+    $self->initialize(%param);
 
-	return $self;
+    return $self;
 
 }
 
 sub initialize {
 
-	my ($self, %param) = @_;
+    my ($self, %param) = @_;
 
-	$self->SUPER::initialize(%param);
-	$self->set_name($param{ name });
-	$self->set_feeds($param{ feeds } // []);
+    $self->SUPER::initialize(%param);
+    $self->set_name($param{ name });
+    $self->set_feeds($param{ feeds } // []);
 
-	return 1;
+    return 1;
 
 }
 
 sub name {
 
-	my ($self) = @_;
+    my ($self) = @_;
 
-	return $self->{ Name };
+    return $self->{ Name };
 
 }
 
 sub set_name {
 
-	my ($self, $new) = @_;
+    my ($self, $new) = @_;
 
-	unless (defined $new) {
-		die "group name cannot be undefined";
-	}
+    unless (defined $new) {
+        die "group name cannot be undefined";
+    }
 
-	# ':' groups are reserved for internal use
-	unless ($new =~ /^\:?\w+$/) {
-		die "group name can only contain alphanumeric characters";
-	}
+    # ':' groups are reserved for internal use
+    unless ($new =~ /^\:?\w+$/) {
+        die "group name can only contain alphanumeric characters";
+    }
 
-	$self->{ Name } = $new;
+    $self->{ Name } = $new;
 
 }
 
 sub feeds {
 
-	my ($self) = @_;
+    my ($self) = @_;
 
-	return $self->{ Feeds };
+    return $self->{ Feeds };
 
 }
 
 sub set_feeds {
 
-	my ($self, $new) = @_;
+    my ($self, $new) = @_;
 
-	unless (ref $new eq 'ARRAY') {
-		die "feeds must be an array ref";
-	}
+    unless (ref $new eq 'ARRAY') {
+        die "feeds must be an array ref";
+    }
 
-	$self->{ Feeds } = $new;
+    $self->{ Feeds } = $new;
 
 }
 
 sub has_feed {
 
-	my ($self, $feed) = @_;
+    my ($self, $feed) = @_;
 
-	return !! grep { $feed eq $_ } @{ $self->feeds };
+    return !! grep { $feed eq $_ } @{ $self->feeds };
 
 }
 
@@ -94,8 +94,8 @@ WWW::Noss::GroupConfig - Class for storing feed group configurations
   use WWW::Noss::GroupConfig;
 
   my $group = WWW::Noss::GroupConfig->new(
-	  name  => 'name',
-	  feeds => [ 'feed1', 'feed2' ],
+      name  => 'name',
+      feeds => [ 'feed1', 'feed2' ],
   );
 
 =head1 DESCRIPTION

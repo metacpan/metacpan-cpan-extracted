@@ -4,7 +4,7 @@ CLI::Helpers - Subroutines for making simple command line scripts
 
 # VERSION
 
-version 2.0
+version 2.1
 
 # SYNOPSIS
 
@@ -146,6 +146,12 @@ the specified color to the string.
 Exported.  Takes an optional hash reference and a list of
 messages to be output.
 
+Any data references in the the `@messages` list will automatically be converted to JSON. You may also pass
+
+    { yaml => 1 }
+
+In the options to output in YAML format.
+
 ## verbose( \\%opts, @messages )
 
 Exported.  Takes an optional hash reference of formatting options.  Automatically
@@ -160,6 +166,12 @@ Does not output anything unless DEBUG is set.
 
 Exported.  Takes an optional hash reference of formatting options.
 Does not output anything unless DEBUG is set.
+
+Passing:
+
+    { json => 1 }
+
+in `\%opts` will format the output as JSON
 
 ## override( variable => 1 )
 
@@ -193,6 +205,12 @@ Valid options are:
 
     Set as a key with any value and the prompt will turn off echoing responses as well as disabling all
     ReadLine magic.  See also **pwprompt**.
+
+- **clear\_line**
+
+    After prompting for and receiving input, remove that line from the terminal.
+    This only works on interactive terminals, and is useful for things like
+    password prompts.
 
 Returns the text that has passed all validators.
 
@@ -416,7 +434,7 @@ Brad Lhotsky <brad@divisionbyzero.net>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Brad Lhotsky.
+This software is Copyright (c) 2025 by Brad Lhotsky.
 
 This is free software, licensed under:
 

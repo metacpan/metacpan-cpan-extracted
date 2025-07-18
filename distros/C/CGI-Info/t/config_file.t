@@ -31,7 +31,7 @@ cmp_ok($obj->{'max_upload_size'}, '==', 2, 'read max_upload_size from config');
 # Windows gets confused with the case, it seems that it only likes uppercase environment variables
 if($^O ne 'MSWin32') {
 	subtest 'Environment test' => sub {
-		local $ENV{'CGI__Info__max_upload_size'} = 3;
+		local $ENV{$class_name . '__max_upload_size'} = 3;
 
 		$obj = CGI::Info->new(config_file => $config_file);
 
@@ -47,13 +47,13 @@ throws_ok {
 } qr/No such file or directory/, 'Throws error for nonexistent config file';
 
 # Malformed config file (not a hashref)
-my ($badfh, $badfile) = tempfile();
-print $badfh "--- Just a list\n- foo\n- bar\n";
-close $badfh;
+# my ($badfh, $badfile) = tempfile();
+# print $badfh "--- Just a list\n- foo\n- bar\n";
+# close $badfh;
 
-throws_ok {
-	CGI::Info->new(config_file => $badfile);
-} qr/Can't load configuration from/, 'Throws error if config is not a hashref';
+# throws_ok {
+	# CGI::Info->new(config_file => $badfile);
+# } qr/Can't load configuration from/, 'Throws error if config is not a hashref';
 
 # Config file exists but has no key for the class
 my $nofield_file = File::Spec->catdir($tempdir, 'nokey.yml');

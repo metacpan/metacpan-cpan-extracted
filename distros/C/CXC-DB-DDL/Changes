@@ -1,5 +1,15 @@
 Revision history for CXC-DB-DDL
 
+0.20      2025-07-17 13:23:46-04:00 America/New_York
+
+  [ENHANCEMENT]
+
+   * The classes used to create tables and fields when passing plain
+     structures to the CXC::DB::DDL and CXC::DB::DDL::Table constructors
+     can now be specified.
+
+   * More Documentation
+
 0.19      2025-03-19 18:48:51-04:00 America/New_York
 
   [API CHANGE]

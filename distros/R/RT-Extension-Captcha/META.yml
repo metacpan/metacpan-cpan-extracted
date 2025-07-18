@@ -1,5 +1,5 @@
 ---
-abstract: 'solve a CAPTCHA before some actions in RT'
+abstract: 'use Google reCAPTCHA v3 to verify users before some actions in RT'
 author:
   - 'Best Practical Solutions, LLC <modules@bestpractical.com>'
 build_requires:
@@ -8,7 +8,7 @@ configure_requires:
   ExtUtils::MakeMaker: 6.59
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.19'
+generated_by: 'Module::Install version 1.21'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,12 +19,13 @@ no_index:
     - etc
     - html
     - inc
+    - static
 requires:
-  GD::SecurityImage: 0
+  Captcha::reCAPTCHA::V3: 0
   perl: 5.10.1
 resources:
   license: http://opensource.org/licenses/gpl-license.php
   repository: https://github.com/bestpractical/rt-extension-captcha
-version: '1.21'
-x_module_install_rtx_version: '0.42'
-x_requires_rt: 4.2.0
+version: '2.00'
+x_module_install_rtx_version: '0.44'
+x_requires_rt: 6.0.0

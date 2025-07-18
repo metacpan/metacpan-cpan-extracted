@@ -2,3 +2,5 @@ node_modules/
 .git/
 .vscode/
 blib/
+pm_to_blib/
+.gitignore

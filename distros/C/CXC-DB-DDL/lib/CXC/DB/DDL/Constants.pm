@@ -7,7 +7,7 @@ use strict;
 use warnings;
 use experimental 'signatures', 'postderef';
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use DBI ();
 use CXC::Exporter::Util ':all';
@@ -76,6 +76,16 @@ BEGIN {
 
 install_EXPORTS;
 
+#
+# This file is part of CXC-DB-DDL
+#
+# This software is Copyright (c) 2022 by Smithsonian Astrophysical Observatory.
+#
+# This is free software, licensed under:
+#
+#   The GNU General Public License, Version 3, June 2007
+#
+
 1;
 
 __END__
@@ -90,7 +100,7 @@ CXC::DB::DDL::Constants - Constants
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 SYNOPSIS
 

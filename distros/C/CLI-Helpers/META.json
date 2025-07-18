@@ -4,7 +4,7 @@
       "Brad Lhotsky <brad@divisionbyzero.net>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "bsd"
    ],
@@ -17,7 +17,7 @@
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
-            "perl" : "5.010001"
+            "perl" : "v5.10.0"
          }
       },
       "develop" : {
@@ -29,7 +29,7 @@
             "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "1.08",
-            "Test::Spelling" : "0.12"
+            "Test::Spelling" : "0.17"
          }
       },
       "runtime" : {
@@ -43,15 +43,16 @@
             "File::Basename" : "0",
             "Getopt::Long" : "0",
             "IO::Interactive" : "0",
+            "JSON::MaybeXS" : "0",
             "Module::Load" : "0",
             "Ref::Util" : "0",
             "Sys::Syslog" : "0",
             "Term::ANSIColor" : "2.01",
             "Term::ReadKey" : "0",
             "Term::ReadLine" : "0",
-            "YAML" : "0",
+            "YAML::XS" : "0",
             "feature" : "0",
-            "perl" : "5.010001",
+            "perl" : "5.013002",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -62,9 +63,9 @@
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Pod::Coverage::TrustPod" : "0",
-            "Test::More" : "0",
+            "Test::More" : "1.302210",
             "Test::Perl::Critic" : "0",
-            "perl" : "5.010001"
+            "perl" : "5.013002"
          }
       }
    },
@@ -77,14 +78,14 @@
          "web" : "https://github.com/reyjrar/CLI-Helpers"
       }
    },
-   "version" : "2.0",
+   "version" : "2.1",
    "x_contributors" : [
       "Kang-min Liu <gugod@gugod.org>",
       "Kevin M. Goess <kgoess@craigslist.org>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],
-   "x_generated_by_perl" : "v5.34.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
-   "x_spdx_expression" : "BSD"
+   "x_generated_by_perl" : "v5.40.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.39",
+   "x_spdx_expression" : "BSD-3-Clause"
 }
 

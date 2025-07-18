@@ -1,5 +1,12 @@
 Revision history for CGI-Info
 
+0.105	Thu Jul 17 15:07:43 EDT 2025
+	carp for warning when logger not set
+	Flag Google-InspectionTool as a search_engine
+	Added "Fuzz Faster U Fool" as a bot
+	Also look in SSL_TLS_SNI for hostname
+	Allow domain_name() to be called as a class method
+
 0.104	Fri Jun 20 07:41:53 EDT 2025
 	Bumped minimum version of Config::Abstraction - and hence removed MD5_CTX workaround code
 	Flag Alibaba as a search engine

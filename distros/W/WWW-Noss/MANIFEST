@@ -16,6 +16,7 @@ lib/WWW/Noss/Home.pm
 lib/WWW/Noss/Lynx.pm
 lib/WWW/Noss/OPML.pm
 lib/WWW/Noss/TextToHtml.pm
+lib/WWW/Noss/Timestamp.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
@@ -26,6 +27,7 @@ t/10_home.t
 t/15_feed_config.t
 t/20_dir.t
 t/25_lynx.t
+t/27_times.t
 t/30_atom.t
 t/35_rss.t
 t/40_read_feed.t
@@ -37,7 +39,9 @@ t/data/dir/a.txt
 t/data/dir/b.txt
 t/data/dir/c.txt
 t/data/lynx.html
+t/data/mail-dates
 t/data/opml.xml
+t/data/rfc3339-dates
 t/data/rss.xml
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

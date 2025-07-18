@@ -36,7 +36,9 @@ my $config = Config::Abstraction->new(
 
 ok(defined($config));
 diag(Data::Dumper->new([$config->all()])->Dump()) if($ENV{'TEST_VERBOSE'});
-cmp_deeply($config->all(), {
+$config = $config->all();
+delete($config->{'config_path'});
+cmp_deeply($config, {
 	'book' => {
 		'chapter1' => {
 			'title' => 'The First Chapter, ever',

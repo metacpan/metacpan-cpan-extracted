@@ -4,7 +4,7 @@ use v5.26;
 use strict;
 use warnings;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 # ABSTRACT: DDL for table creation, based on SQL::Translator::Schema
 
@@ -15,7 +15,7 @@ use Hash::Ordered;
 use SQL::Translator::Schema;
 use SQL::Translator::Schema::Table;
 
-use Ref::Util qw( is_hashref is_arrayref );
+use Ref::Util qw( is_arrayref is_plain_hashref);
 use CXC::DB::DDL::Util 'sqlt_entity_map', 'db_version';
 use CXC::DB::DDL::Failure;
 use CXC::DB::DDL::Table;
@@ -34,34 +34,64 @@ use namespace::clean;
 # use after namespace::clean to avoid cleaning out important bits.
 use MooX::StrictConstructor;
 
+use constant TABLE_CLASS => 'CXC::DB::DDL::Table';
+
 my sub wrap_producers;
 
-
-my sub coerce_table_arrayref {
+my sub coerce_table_arrayref ( $class, $array ) {
+    require Module::Load;
+    Module::Load::load( $class->table_class );
     Hash::Ordered->new(
         map {
-            my $table = CXC::DB::DDL::Table->new( $_ );
+            my $table = $class->table_class->new( $_ );
             $table->name, $table
-        } $_->@*,
+        } $array->@*,
     );
 }
 
 has _tables => (
     is       => 'ro',
     init_arg => 'tables',
-    isa      => InstanceOf( ['Hash::Ordered'] )->plus_coercions(
-        ArrayRef [HashRef],
-        \&coerce_table_arrayref,
-        HashRef,
-        sub { local $_ = [$_]; coerce_table_arrayref; },
-        ArrayRef [ InstanceOf ['CXC::DB::DDL::Table'] ] => sub {
-            Hash::Ordered->new( map { $_->name, $_ } $_->@* );
-        },
-    ),
-    coerce  => 1,
-    default => sub { Hash::Ordered->new },
-    handles => [qw( get set exists )],
+    isa      => InstanceOf( ['Hash::Ordered'] ),
+    coerce   => 1,
+    default  => sub { Hash::Ordered->new },
+    handles  => [qw( get set exists )],
 );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -70,20 +100,32 @@ has _tables => (
 
 around BUILDARGS => sub ( $orig, $class, @args ) {
 
-    # handle ->new( \@tables );
-    if ( is_arrayref( $args[0] ) ) {
+    if ( @args == 1 && !( is_plain_hashref( $args[0] ) && exists $args[0]{tables} ) ) {
         unshift @args, 'tables';
     }
+    my \%args = $class->$orig( @args );
 
-    # handle ->new( \%table );
-    elsif ( is_hashref( $args[0] ) && !exists $args[0]{table} ) {
+    return \%args unless exists $args{tables};
 
-        $args[0] = [ $args[0] ];
-        unshift @args, 'tables';
-    }
+    my $tables = $args{tables};
 
-    return $class->$orig( @args );
+    $tables = [$tables]
+      unless is_arrayref $tables;
+
+    $args{tables} = coerce_table_arrayref( $class, $tables );
+
+    return \%args;
 };
+
+
+
+
+
+
+
+
+
+sub table_class { TABLE_CLASS }
 
 
 
@@ -134,7 +176,7 @@ sub tables ( $self ) {
 
 signature_for add_table => (
     method     => 1,
-    positional => [ InstanceOf ['CXC::DB::DDL::Table'] ] );
+    positional => [ InstanceOf [TABLE_CLASS] ] );
 
 sub add_table ( $self, $table ) {
     CXC::DB::DDL::Failure::parameter_constraint->throw(
@@ -289,6 +331,24 @@ sub sql ( $self, $dbh, $opt ) {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 signature_for create => (
     method     => 1,
     positional => [ Object, Slurpy [HashRef] ] );
@@ -403,7 +463,7 @@ CXC::DB::DDL - DDL for table creation, based on SQL::Translator::Schema
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 DESCRIPTION
 
@@ -413,6 +473,48 @@ It uses L<SQL::Translator> to create the required SQL, and provides a
 little bit of extra DSL sauce in L<CXC::DB::DDL::Util>.
 
 See L<CXC::DB:DDL::Manual::Intro>.
+
+=head1 CONSTRUCTORS
+
+=head2 new
+
+   $ddl = CXC::DB::DDL->new( tables => [ $table, $table, ... ] );
+   $ddl = CXC::DB::DDL->new( tables => $table );
+
+   $ddl = CXC::DB::DDL->new( { tables => $table } );
+   $ddl = CXC::DB::DDL->new( { tables => [ $table, $table, ... ] } );
+
+   $ddl = CXC::DB::DDL->new( $table );
+   $ddl = CXC::DB::DDL->new( [ $table, $table, ... ] );
+w
+Construct an object which manages a set of tables, their fields,
+constraints, and indices.
+
+B<There are too many ways of calling this routine.>
+
+A C<$table> is either
+
+=over
+
+=item *
+
+an instance of L<CXC::DB::DDL::Table> (or a subclass)
+
+=item *
+
+a hashref which can be passed to a table constructor.
+
+The default class is L<CXC::CB::DDL::Table>. To change the default,
+subclass this class, and override the L</table_class> class method.
+
+=back
+
+=head1 CLASS METHODS
+
+=head2 table_class
+
+returns the name of the class used by the constructor to create a
+table object from a hash.  Override this in a subclass to change it.
 
 =head1 METHODS
 
@@ -450,15 +552,15 @@ database handle, C<$dbh>. Various options may be specified:
 One of the constants (see <CXC::DB::DDL::Constants>) C<CREATE_ONCE>,
 C<CREATE_ALWAYS>, C<CREATE_IF_NOT_EXISTS>.
 
-=item sqlt_comments I<Bool>
+=item sqlt_comments I<boolean>
 
 Add comments in SQL [Default: true].
 
-=item sqlt_quote_identifiers I<Bool>
+=item sqlt_quote_identifiers I<boolean>
 
 Quote identifiers (Default: producer specific)
 
-=item sqlt_debug I<Bool>
+=item sqlt_debug I<boolean>
 
 L<SQL::Translator> constructor C<debug> option.
 
@@ -470,17 +572,33 @@ L<SQL::Translator> constructor C<trace> option.
 
 =head2 create
 
-  $ddl->create( $dbh, ?$create = CREATE_ONCE | CREATE_ALWAYS | CREATE_IF_NOT_EXISTS );
+  $ddl->create( $dbh, ?$create );
 
 Create the tables associated with the C<$ddl> object using the L<DBI>
-database handle, C<$dbh>.  C<$create> defaults to C<CREATE_ONCE>;
+database handle, C<$dbh>.
 
-B<CREATE_ALWAYS> drops the tables and creates them.
+C<$create> is optional, and determines when the table is created.  It
+can take one of the following constants (available from
+L<CXC::DB::DDL::Constants>)
 
-B<CREATE_IF_NOT_EXISTS> checks if there are any missing tables; if not it returns.
+=over
 
-B<CREATE_ONCE> will attempt to create the tables, and will throw an exception
-if one exists.
+=item C<CREATE_ALWAYS>
+
+drops the tables and creates them.
+
+=item C<CREATE_IF_NOT_EXISTS>
+
+checks if there are any missing tables; if not it returns.
+
+=item C<CREATE_ONCE>
+
+will attempt to create the tables, and will throw an exception if one
+exists.
+
+=back
+
+The default is C<CREATE_ONCE>.
 
 Returns true if tables were created.
 

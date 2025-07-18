@@ -1,5 +1,8 @@
 Revision history for Config::Abstraction - Configuration Abstraction Layer
 
+0.33	Thu Jul 17 08:19:41 EDT 2025
+	The config_path value wasn't being stashed properly
+
 0.32	Wed Jun 18 14:47:07 EDT 2025
 	Bash doesn't allow colons in variable names, so use _ everywhere
 

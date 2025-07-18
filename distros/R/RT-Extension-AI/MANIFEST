@@ -1,4 +1,3 @@
-.gitignore
 Changes
 etc/initialdata
 etc/RTExtensionAI_Config.pm
@@ -33,7 +32,6 @@ lib/RT/Extension/AI/Provider/OpenAI.pm
 Makefile
 Makefile.PL
 MANIFEST			This list of files
-MANIFEST.bak
 MANIFEST.SKIP
 META.yml
 MYMETA.json

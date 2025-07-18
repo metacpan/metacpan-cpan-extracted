@@ -2,7 +2,7 @@ package WWW::Noss::FeedConfig;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 use parent 'WWW::Noss::BaseConfig';
 
@@ -10,240 +10,240 @@ use List::Util qw(any min);
 
 sub new {
 
-	my ($class, %param) = @_;
+    my ($class, %param) = @_;
 
-	my $self = bless {}, $class;
+    my $self = bless {}, $class;
 
-	$self->initialize(%param);
+    $self->initialize(%param);
 
-	return $self;
+    return $self;
 
 }
 
 sub initialize {
 
-	my ($self, %param) = @_;
+    my ($self, %param) = @_;
 
-	$self->SUPER::initialize;
-	$self->set_name($param{ name });
-	$self->set_feed($param{ feed });
-	$self->set_path($param{ path });
-	$self->set_etag($param{ etag });
+    $self->SUPER::initialize;
+    $self->set_name($param{ name });
+    $self->set_feed($param{ feed });
+    $self->set_path($param{ path });
+    $self->set_etag($param{ etag });
 
-	my $default = $param{ default };
+    my $default = $param{ default };
 
-	# Apply default parameters
-	if (defined $default) {
-		$self->set_limit($default->limit);
-		$self->set_respect_skip($default->respect_skip);
-		$self->set_include_title($default->include_title);
-		$self->set_exclude_title($default->exclude_title);
-		$self->set_include_content($default->include_content);
-		$self->set_exclude_content($default->exclude_content);
-		$self->set_include_tags($default->include_tags);
-		$self->set_exclude_tags($default->exclude_tags);
-		$self->set_autoread($default->autoread);
-		$self->set_default_update($default->default_update);
-		$self->set_hidden($default->hidden);
-	}
+    # Apply default parameters
+    if (defined $default) {
+        $self->set_limit($default->limit);
+        $self->set_respect_skip($default->respect_skip);
+        $self->set_include_title($default->include_title);
+        $self->set_exclude_title($default->exclude_title);
+        $self->set_include_content($default->include_content);
+        $self->set_exclude_content($default->exclude_content);
+        $self->set_include_tags($default->include_tags);
+        $self->set_exclude_tags($default->exclude_tags);
+        $self->set_autoread($default->autoread);
+        $self->set_default_update($default->default_update);
+        $self->set_hidden($default->hidden);
+    }
 
-	$self->set_groups($param{ groups } // []);
+    $self->set_groups($param{ groups } // []);
 
-	if (@{ $self->groups }) {
+    if (@{ $self->groups }) {
 
-		# Set lowest limit defined by groups if present
-		my $limit = min grep { defined } map { $_->limit } @{ $self->groups };
-		$self->set_limit($limit) if defined $limit;
+        # Set lowest limit defined by groups if present
+        my $limit = min grep { defined } map { $_->limit } @{ $self->groups };
+        $self->set_limit($limit) if defined $limit;
 
-		# If any group respects skip, we respect skip
-		my $rs = any { $_->respect_skip } @{ $self->groups };
-		$self->set_respect_skip($rs);
+        # If any group respects skip, we respect skip
+        my $rs = any { $_->respect_skip } @{ $self->groups };
+        $self->set_respect_skip($rs);
 
-		# Overlay group filters
-		push @{ $self->include_title },
-			map { @{ $_->include_title // [] } }
-			@{ $self->groups };
-		push @{ $self->exclude_title },
-			map { @{ $_->exclude_title // [] } }
-			@{ $self->groups };
-		push @{ $self->include_content },
-			map { @{ $_->include_content // [] } }
-			@{ $self->groups };
-		push @{ $self->exclude_content },
-			map { @{ $_->exclude_content // [] } }
-			@{ $self->groups };
-		push @{ $self->include_tags },
-			map { @{ $_->include_tags // [] } }
-			@{ $self->groups };
-		push @{ $self->exclude_tags },
-			map { @{ $_->exclude_tags // [] } }
-			@{ $self->groups };
+        # Overlay group filters
+        push @{ $self->include_title },
+            map { @{ $_->include_title // [] } }
+            @{ $self->groups };
+        push @{ $self->exclude_title },
+            map { @{ $_->exclude_title // [] } }
+            @{ $self->groups };
+        push @{ $self->include_content },
+            map { @{ $_->include_content // [] } }
+            @{ $self->groups };
+        push @{ $self->exclude_content },
+            map { @{ $_->exclude_content // [] } }
+            @{ $self->groups };
+        push @{ $self->include_tags },
+            map { @{ $_->include_tags // [] } }
+            @{ $self->groups };
+        push @{ $self->exclude_tags },
+            map { @{ $_->exclude_tags // [] } }
+            @{ $self->groups };
 
-		# If any group wants autoread, we'll take autoread
-		my $ar = any { $_->autoread } @{ $self->groups };
-		$self->set_autoread($ar);
+        # If any group wants autoread, we'll take autoread
+        my $ar = any { $_->autoread } @{ $self->groups };
+        $self->set_autoread($ar);
 
-		# If any group does not want default_updates, we'll take no default
-		# updates
-		my $ndu = any { !$_->default_update } @{ $self->groups };
-		$self->set_default_update(!$ndu);
+        # If any group does not want default_updates, we'll take no default
+        # updates
+        my $ndu = any { !$_->default_update } @{ $self->groups };
+        $self->set_default_update(!$ndu);
 
-		# If any groups wants hidden, take hidden
-		my $hid = any { $_->hidden } @{ $self->groups };
-		$self->set_hidden($hid);
+        # If any groups wants hidden, take hidden
+        my $hid = any { $_->hidden } @{ $self->groups };
+        $self->set_hidden($hid);
 
-	}
+    }
 
-	if (defined $param{ limit }) {
-		$self->set_limit($param{ limit });
-	}
-	if (defined $param{ respect_skip }) {
-		$self->set_respect_skip($param{ respect_skip });
-	}
-	if (defined $param{ include_title }) {
-		push @{ $self->include_title }, @{ $param{ include_title } };
-	}
-	if (defined $param{ exclude_title }) {
-		push @{ $self->exclude_title }, @{ $param{ exclude_title } };
-	}
-	if (defined $param{ include_content }) {
-		push @{ $self->include_content }, @{ $param{ include_content } };
-	}
-	if (defined $param{ exclude_content }) {
-		push @{ $self->exclude_content }, @{ $param{ exclude_content } };
-	}
-	if (defined $param{ include_tags }) {
-		push @{ $self->include_tags }, @{ $param{ include_tags } };
-	}
-	if (defined $param{ exclude_tags }) {
-		push @{ $self->exclude_tags }, @{ $param{ exclude_tags } };
-	}
-	if (defined $param{ autoread }) {
-		$self->set_autoread($param{ autoread });
-	}
-	if (defined $param{ default_update }) {
-		$self->set_default_update($param{ default_update });
-	}
-	if (defined $param{ hidden }) {
-		$self->set_hidden($param{ hidden });
-	}
+    if (defined $param{ limit }) {
+        $self->set_limit($param{ limit });
+    }
+    if (defined $param{ respect_skip }) {
+        $self->set_respect_skip($param{ respect_skip });
+    }
+    if (defined $param{ include_title }) {
+        push @{ $self->include_title }, @{ $param{ include_title } };
+    }
+    if (defined $param{ exclude_title }) {
+        push @{ $self->exclude_title }, @{ $param{ exclude_title } };
+    }
+    if (defined $param{ include_content }) {
+        push @{ $self->include_content }, @{ $param{ include_content } };
+    }
+    if (defined $param{ exclude_content }) {
+        push @{ $self->exclude_content }, @{ $param{ exclude_content } };
+    }
+    if (defined $param{ include_tags }) {
+        push @{ $self->include_tags }, @{ $param{ include_tags } };
+    }
+    if (defined $param{ exclude_tags }) {
+        push @{ $self->exclude_tags }, @{ $param{ exclude_tags } };
+    }
+    if (defined $param{ autoread }) {
+        $self->set_autoread($param{ autoread });
+    }
+    if (defined $param{ default_update }) {
+        $self->set_default_update($param{ default_update });
+    }
+    if (defined $param{ hidden }) {
+        $self->set_hidden($param{ hidden });
+    }
 
-	return 1;
+    return 1;
 
 }
 
 sub name {
 
-	my ($self) = @_;
+    my ($self) = @_;
 
-	return $self->{ Name };
+    return $self->{ Name };
 
 }
 
 sub set_name {
 
-	my ($self, $name) = @_;
+    my ($self, $name) = @_;
 
-	unless (defined $name) {
-		die "name cannot be undefined";
-	}
+    unless (defined $name) {
+        die "name cannot be undefined";
+    }
 
-	# ':' feeds are reserved for internal use
-	unless ($name =~ /^\:?\w+$/) {
-		die "name can only contain alphanumeric and underscore characters";
-	}
+    # ':' feeds are reserved for internal use
+    unless ($name =~ /^\:?\w+$/) {
+        die "name can only contain alphanumeric and underscore characters";
+    }
 
-	$self->{ Name } = $name;
+    $self->{ Name } = $name;
 
 }
 
 sub feed {
 
-	my ($self) = @_;
+    my ($self) = @_;
 
-	return $self->{ Feed };
+    return $self->{ Feed };
 
 }
 
 sub set_feed {
 
-	my ($self, $feed) = @_;
+    my ($self, $feed) = @_;
 
-	unless (defined $feed) {
-		die "feed cannot be undefined";
-	}
+    unless (defined $feed) {
+        die "feed cannot be undefined";
+    }
 
-	$self->{ Feed } = $feed;
+    $self->{ Feed } = $feed;
 
 }
 
 sub groups {
 
-	my ($self) = @_;
+    my ($self) = @_;
 
-	return $self->{ Groups };
+    return $self->{ Groups };
 
 }
 
 sub set_groups {
 
-	my ($self, $new) = @_;
+    my ($self, $new) = @_;
 
-	unless (ref $new eq 'ARRAY') {
-		die "groups must be an array ref";
-	}
+    unless (ref $new eq 'ARRAY') {
+        die "groups must be an array ref";
+    }
 
-	for my $i (0 .. $#$new) {
-		unless ($new->[$i]->isa('WWW::Noss::GroupConfig')) {
-			die "group[$i] is not a WWW::Noss::GroupConfig object";
-		}
-	}
+    for my $i (0 .. $#$new) {
+        unless ($new->[$i]->isa('WWW::Noss::GroupConfig')) {
+            die "group[$i] is not a WWW::Noss::GroupConfig object";
+        }
+    }
 
-	$self->{ Groups } = $new;
+    $self->{ Groups } = $new;
 
 }
 
 sub has_group {
 
-	my ($self, $grp) = @_;
+    my ($self, $grp) = @_;
 
-	return !! grep { $_->name eq $grp } @{ $self->groups };
+    return !! grep { $_->name eq $grp } @{ $self->groups };
 
 }
 
 sub path {
 
-	my ($self) = @_;
+    my ($self) = @_;
 
-	return $self->{ Path };
+    return $self->{ Path };
 
 }
 
 sub set_path {
 
-	my ($self, $path) = @_;
+    my ($self, $path) = @_;
 
-	unless (defined $path) {
-		die "path cannot be undefined";
-	}
+    unless (defined $path) {
+        die "path cannot be undefined";
+    }
 
-	$self->{ Path } = $path;
+    $self->{ Path } = $path;
 
 }
 
 sub etag {
 
-	my ($self) = @_;
+    my ($self) = @_;
 
-	return $self->{ Etag };
+    return $self->{ Etag };
 
 }
 
 sub set_etag {
 
-	my ($self, $etag) = @_;
+    my ($self, $etag) = @_;
 
-	$self->{ Etag } = $etag;
+    $self->{ Etag } = $etag;
 
 }
 
@@ -258,9 +258,9 @@ WWW::Noss::FeedConfig - Class for storing feed configurations
   use WWW::Noss::FeedConfig;
 
   my $feed = WWW::Noss::FeedConfig->new(
-	  name => 'feed',
-	  feed => 'https://feed.xml',
-	  path => 'feed.xml',
+      name => 'feed',
+      feed => 'https://feed.xml',
+      path => 'feed.xml',
   );
 
 =head1 DESCRIPTION

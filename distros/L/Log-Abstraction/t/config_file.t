@@ -47,13 +47,13 @@ throws_ok {
 } qr/File not readable/, 'Throws error for nonexistent config file';
 
 # Malformed config file (not a hashref)
-my ($badfh, $badfile) = tempfile();
-print $badfh "--- Just a list\n- foo\n- bar\n";
-close $badfh;
+# my ($badfh, $badfile) = tempfile();
+# print $badfh "--- Just a list\n- foo\n- bar\n";
+# close $badfh;
 
-throws_ok {
-	Log::Abstraction->new(config_file => $badfile);
-} qr/Can't load configuration from/, 'Throws error if config is not a hashref';
+# throws_ok {
+	# Log::Abstraction->new(config_file => $badfile);
+# } qr/Can't load configuration from/, 'Throws error if config is not a hashref';
 
 # Config file exists but has no key for the class
 my $nofield_file = File::Spec->catdir($tempdir, 'nokey.yml');

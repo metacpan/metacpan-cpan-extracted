@@ -1,3 +1,8 @@
+2.00 2025-07-17
+ - Update for RT 6
+ - Switch to Google reCAPTCHA v3 for user verification
+ - Not backwards compatible with previous versions of RT
+
 1.21 2020-07-23
  - Add RT 5 support
 

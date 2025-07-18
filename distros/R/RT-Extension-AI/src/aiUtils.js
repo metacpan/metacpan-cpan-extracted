@@ -3,7 +3,7 @@ export async function fetchAiResults(inputText, optionType) {
         const response = await fetch('/Helpers/AISuggestion/ProcessAIRequest', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: new URLSearchParams({ rawText: inputText, callType: optionType }).toString()
+            body: new URLSearchParams({ rawText: inputText, callType: optionType, id: getTicketIdFromUrl(window.location.href) }).toString()
         });
 
         if (!response.ok) {

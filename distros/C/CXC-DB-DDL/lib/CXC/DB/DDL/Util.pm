@@ -7,7 +7,7 @@ use strict;
 use warnings;
 use experimental 'signatures', 'postderef', 'declared_refs';
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use List::Util      qw( pairs first );
 use Sub::Util       qw( set_subname );
@@ -563,7 +563,7 @@ CXC::DB::DDL::Util - CXC::DB::DDL utilities
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 SYNOPSIS
 
@@ -605,6 +605,9 @@ pair suitable to be passed to L<CXC::DB::DDL>'s constructor.
 
 The type generators accept any of the L<CXC::DB::DDL::Field> attribute
 specifications.
+
+Unfortunately, it is not possible to easily override the class used
+to create fields.
 
 =head2 DBD Specific Types
 

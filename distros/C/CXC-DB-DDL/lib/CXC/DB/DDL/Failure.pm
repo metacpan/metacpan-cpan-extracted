@@ -6,7 +6,7 @@ use v5.26;
 use strict;
 use warnings;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use custom::failures qw(
   parameter_constraint
@@ -39,7 +39,7 @@ CXC::DB::DDL::Failure - Failure classes for App::Deosc
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 DESCRIPTION
 

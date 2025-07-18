@@ -1,48 +1,71 @@
 ==================================================
-Changes from 2020-06-01 00:00:00 +0000 to present.
+Changes from 2023-07-19 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 2.0 at 2022-06-01 02:00:03 +0000
+version 2.1 at 2025-07-18 04:43:35 +0000
 ----------------------------------------
 
-  Change: b8564a2f435a1cbdd50698f0188c36a20f4e879a
+  Change: dba17228900e5af66625ba942914a3fb6ea3e0e9
   Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2022-05-31 03:45:04 +0000
+  Date : 2025-07-17 21:43:06 +0000
 
-    Fix bug with pwprompt() eating the first character
+    Cleanup cpanfile commit that got missed 
 
-    Make the `Term::ReadLine::*` fail safe not broken. 
-
-----------------------------------------
-version 1.9 at 2022-05-17 20:16:22 +0000
-----------------------------------------
-
-  Change: e2dba9c373b8246ba53c2918b080ac4ac677914b
+  Change: fc68db2442a3819d3aa64d778b18eaeff57634f9
   Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2022-05-17 12:42:59 +0000
+  Date : 2025-04-13 20:03:33 +0000
 
-    More optimizations for loading
+    Fix broken test on older Perl's
 
-    * Don't exec `git` when we're not running in a interactive environment *
-    Adds `IO::Interactive` as a prereq * Make the input functions smart enough
-    to know if we're using a
+    This fixes the broken tests by forcing a newer `Test::More`. 
 
-    terminal or not * Now that we use `IO::Interactive`, don't implement the
-    readline
-
-    monkey-patch as it's probably not required any longer * Recommend
-    `Term::ReadLine::Gnu` as it provides a better feature set 
-
-  Change: 0b28fadad5cbb740696d4601e70bd769885d929d
+  Change: 730560a71b5358b058b18946212827cdfba9ea31
   Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2022-05-17 10:11:18 +0000
+  Date : 2025-04-13 19:29:36 +0000
 
-    More optimizations for loading
+    Convert the CI to Github Actions 
 
-    * Don't exec `git` when we're not running in a interactive environment *
-    Adds `IO::Interactive` as a prereq 
+  Change: e94b3461c02eab53ee498566924cf6ccb759863f
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2025-04-13 19:25:37 +0000
+
+    Packaging work 
+
+  Change: 40d332e28b688b41446c7ad57ae60c024642143e
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2025-04-11 21:43:16 +0000
+
+    Add JSON / YAML Encoding Option and Allow References in Output
+
+    * Adds a `--encode=yaml` and `--encode=json` to set default output
+
+    format for everything but `debug_var()` output for references * Adds
+    testing for passing references to `output()` function * Convert to
+    `YAML::XS` 
+
+  Change: de4ebcaf483ddd8aa4261e823fd76d32bd1c0fd3
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2025-04-11 19:51:39 +0000
+
+    Improvements and options
+
+    * Add `json` option to the `debug_var()` function to output the data as
+
+    JSON * Add `cpanfile` capabilities to the build 
+
+  Change: 3f6c3178342e02e49864603a998406887df74be5
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2025-01-03 16:35:17 +0000
+
+    Simplify the ouput array 
+
+  Change: 3242de532c266bb6189f4cce0511c7b6ac809c5e
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2024-07-26 12:51:20 +0000
+
+    Add `clear_line` option to `text_input()` and use it for `pwprompt()` 
 
 =================================================
-Plus 18 releases after 2020-06-01 00:00:00 +0000.
+Plus 20 releases after 2023-07-19 00:00:00 +0000.
 =================================================

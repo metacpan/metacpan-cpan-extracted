@@ -13,15 +13,16 @@ my $USAGE =
 $USAGE   .= "       pds_info -k\n";
 my @KEYS = qw(
     order order_base order_exponent modulus n_planes n_sets
-    start_element peak_elements min_element max_element
-    largest_gap eta zeta theta lambda n_mult phi_modulus sigma tau_zero
+    start_element peak_elements min_element max_element largest_gap
+    eta zeta theta lambda n_mult phi_modulus sigma tau_zero
     n_elems n_princ n_suppl n_deriv n_princ_deriv n_suppl_deriv n_fill
     elems
 );
 my @SUBKEYS = qw(
     largest_gap_elements largest_gap_difference
 );
-my %keys = map {($_ => 1)} @KEYS, @SUBKEYS;
+my @ALIASES = qw(gamma psi);
+my %keys = map {($_ => 1)} @KEYS, @SUBKEYS, @ALIASES;
 @keys{qw(peak_elements largest_gap largest_gap_elements)} = (2, 3, 2);
 my @SUPER = ();
 foreach my $key (@SUBKEYS) {
@@ -35,6 +36,7 @@ foreach my $key (@SUBKEYS) {
         }
     }
 }
+my %ALIAS   = qw(gamma largest_gap_difference psi n_princ);
 
 my @cols  = ();
 my $head  = 0;
@@ -81,9 +83,10 @@ while (<<>>) {
 
 sub missing_keys {
     my %have = ();
-    @have{@_} = ();
+    my @aliased = @ALIAS{ grep { exists $ALIAS{$_} } @_ };
+    @have{@_, @aliased} = ();
     foreach my $r (@SUPER) {
-        my ($sk, $ks) =@{$r};
+        my ($sk, $ks) = @{$r};
         if (exists $have{$sk}) {
             @have{@{$ks}} = ();
         }
@@ -95,13 +98,18 @@ sub missing_keys {
 }
 
 sub display_keys {
-    print map {; "--$_\n" } @KEYS, @SUBKEYS;
+    print map {; "--$_\n" } @KEYS, @SUBKEYS, @ALIASES;
     exit 0;
 }
 
 package Math::DifferenceSet::Planar;
 
 use Math::BigInt try => 'GMP';
+
+BEGIN {
+    *gamma = \&largest_gap_difference;
+    *psi   = \&n_princ;
+}
 
 sub n_sets   { Math::BigInt->new($_[0]->modulus) * $_[0]->n_planes }
 sub n_mult   { 0 + $_[0]->multipliers }
@@ -264,8 +272,11 @@ and the increment I<4>, as I<6 + 4 (mod 7)> is congruent to I<3 (mod 7)>.
 
 =item largest_gap_difference
 
+=item gamma
+
 The elements (first two columns) of largest_gap can also be accessed as
 largest_gap_elements and the increment amount as largest_gap_difference.
+A synonym for largest_gap_difference is gamma.
 
 =item eta
 
@@ -305,6 +316,7 @@ The number of principal elements of a set's plane.
 For the definition, cf. L<Math::DifferenceSet::Planar>.
 
 Also the number of principal planes of a set's order.
+A synonym for n_princ is psi.
 
 Note that you can get principal and supplemental elements themselves
 with the example program F<pds_main_elements>.
@@ -367,15 +379,15 @@ Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2022-2024 by Martin Becker, Blaubeuren.
+Copyright (c) 2022-2025 by Martin Becker, Blaubeuren.
 
 This library is free software; you can distribute it and/or modify it
 under the terms of the Artistic License 2.0 (see the LICENSE file).
 
-The licence grants freedom for related software development but does
+The license grants freedom for related software development but does
 not cover incorporating code or documentation into AI training material.
 Please contact the copyright holder if you want to use the library whole
-or in part for other purposes than stated in the licence.
+or in part for other purposes than stated in the license.
 
 =head1 DISCLAIMER OF WARRANTY
 

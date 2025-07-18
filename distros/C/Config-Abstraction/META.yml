@@ -42,5 +42,5 @@ resources:
   bugtracker: https://github.com/nigelhorne/Config-Abstraction/issues
   homepage: https://metacpan.org/pod/Config::Abstraction
   repository: git://github.com/nigelhorne/Config-Abstraction.git
-version: '0.32'
+version: '0.33'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

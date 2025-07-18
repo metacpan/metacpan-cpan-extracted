@@ -1,5 +1,10 @@
 Revision history for Perl extension Math::DifferenceSet::Planar.
 
+1.003   Fri, 18 Jul 2025 07:47:22 +0200
+        - small performance improvement in multiply
+        - extended examples
+        - minor edits in documentation
+
 1.002   Sun, 14 Jul 2024 13:53:26 +0200
         - new principal planes iterators
         - new plane unit/nonunit elements methods

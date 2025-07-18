@@ -2,178 +2,178 @@ package WWW::Noss::Curl;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 use Exporter qw(import);
 our @EXPORT_OK = qw(curl curl_error);
 
 our %CODES = (
-	-1 => 'Failed to execute curl',
-	0  => 'Success',
-	1  => 'Unsupported protocol',
-	2  => 'Failed to initialize curl',
-	3  => 'Malformed URL',
-	4  => 'Required feature disabled',
-	5  => 'Could not resolve proxy',
-	6  => 'Could not resolve host',
-	7  => 'Failed to connect to host',
-	8  => 'Weird server reply',
-	9  => 'FTP access denied',
-	10 => 'FTP accept failed',
-	11 => 'Weird FTP PASS reply',
-	12 => 'FTP session timeout expired',
-	13 => 'Weird FTP PASV reply',
-	14 => 'Weird FTP 227 reply',
-	15 => 'Cannot use FTP host',
-	16 => 'HTTP/2 error',
-	17 => 'Failed to set FTP transfer to binary',
-	18 => 'Could only receive partial file',
-	19 => 'FTP file access error',
-	21 => 'FTP quote error',
-	22 => 'HTTP page not retrieved',
-	23 => 'Write error',
-	25 => 'FTP STOR error',
-	26 => 'Read error',
-	27 => 'Out of memory',
-	28 => 'Operation timeout',
-	30 => 'FTP PORT failed',
-	31 => 'FTP REST failed',
-	33 => 'HTTP range error',
-	34 => 'HTTP post error',
-	35 => 'SSL connection failed',
-	36 => 'Failed to resume download',
-	37 => 'Failed to open file',
-	38 => 'LDAP bind failed',
-	39 => 'LDAP search failed',
-	41 => 'LDAP function not found',
-	42 => 'Aborted',
-	43 => 'Internal error',
-	45 => 'Interface error',
-	47 => 'Too many redirects',
-	48 => 'Unknown option passed to libcurl',
-	49 => 'Mailformed telnet option',
-	52 => 'No server reply',
-	53 => 'SSL crypto engine not found',
-	54 => 'Cannot set SSL crypto engine as default',
-	55 => 'Failed sending network data',
-	56 => 'Failed to receive network data',
-	58 => 'Problem with local certificate',
-	59 => 'Could not use specified SSL cipher',
-	60 => 'Peer certificate cannot be authenticated with known CA certificates',
-	61 => 'Unrecognized transfer encoding',
-	63 => 'Maximum file size exceeded',
-	64 => 'Requested FTP SSL level failed',
-	65 => 'Rewind failed',
-	66 => 'Failed to initialize SSL engine',
-	67 => 'Username or password not accepted',
-	68 => 'TFTP file not found',
-	69 => 'TFTP permission error',
-	70 => 'TFTP out of disk space',
-	71 => 'Illegal TFTP operation',
-	72 => 'Unknown TFTP transfer ID',
-	73 => 'TFTP file already exists',
-	74 => 'TFTP no such user',
-	77 => 'Problem reading SSL CA cert',
-	78 => 'Resource referenced in URL does not exist',
-	79 => 'Unspecified error occurred during SSH session',
-	80 => 'Failed to shut down SSL connection',
-	82 => 'Could not load CRL file',
-	83 => 'Issuer check failed',
-	84 => 'FTP PRET failed',
-	85 => 'RTSP CSeq number mismatch',
-	86 => 'RTSP Session ID mismatch',
-	87 => 'Failed to parse FTP file list',
-	88 => 'FTP chunk callback error',
-	89 => 'No connection available',
-	90 => 'SSL public key does not match pinned public key',
-	91 => 'Invalid SSL certificate status',
-	92 => 'Stream error in HTTP/2 framing layer',
-	93 => 'API function called from inside callback',
-	94 => 'Authentication function returned error',
-	95 => 'Error detected in HTTP/3 layer',
-	96 => 'QUIC connection error',
-	# and maybe some more in the future...
+    -1 => 'Failed to execute curl',
+    0  => 'Success',
+    1  => 'Unsupported protocol',
+    2  => 'Failed to initialize curl',
+    3  => 'Malformed URL',
+    4  => 'Required feature disabled',
+    5  => 'Could not resolve proxy',
+    6  => 'Could not resolve host',
+    7  => 'Failed to connect to host',
+    8  => 'Weird server reply',
+    9  => 'FTP access denied',
+    10 => 'FTP accept failed',
+    11 => 'Weird FTP PASS reply',
+    12 => 'FTP session timeout expired',
+    13 => 'Weird FTP PASV reply',
+    14 => 'Weird FTP 227 reply',
+    15 => 'Cannot use FTP host',
+    16 => 'HTTP/2 error',
+    17 => 'Failed to set FTP transfer to binary',
+    18 => 'Could only receive partial file',
+    19 => 'FTP file access error',
+    21 => 'FTP quote error',
+    22 => 'HTTP page not retrieved',
+    23 => 'Write error',
+    25 => 'FTP STOR error',
+    26 => 'Read error',
+    27 => 'Out of memory',
+    28 => 'Operation timeout',
+    30 => 'FTP PORT failed',
+    31 => 'FTP REST failed',
+    33 => 'HTTP range error',
+    34 => 'HTTP post error',
+    35 => 'SSL connection failed',
+    36 => 'Failed to resume download',
+    37 => 'Failed to open file',
+    38 => 'LDAP bind failed',
+    39 => 'LDAP search failed',
+    41 => 'LDAP function not found',
+    42 => 'Aborted',
+    43 => 'Internal error',
+    45 => 'Interface error',
+    47 => 'Too many redirects',
+    48 => 'Unknown option passed to libcurl',
+    49 => 'Mailformed telnet option',
+    52 => 'No server reply',
+    53 => 'SSL crypto engine not found',
+    54 => 'Cannot set SSL crypto engine as default',
+    55 => 'Failed sending network data',
+    56 => 'Failed to receive network data',
+    58 => 'Problem with local certificate',
+    59 => 'Could not use specified SSL cipher',
+    60 => 'Peer certificate cannot be authenticated with known CA certificates',
+    61 => 'Unrecognized transfer encoding',
+    63 => 'Maximum file size exceeded',
+    64 => 'Requested FTP SSL level failed',
+    65 => 'Rewind failed',
+    66 => 'Failed to initialize SSL engine',
+    67 => 'Username or password not accepted',
+    68 => 'TFTP file not found',
+    69 => 'TFTP permission error',
+    70 => 'TFTP out of disk space',
+    71 => 'Illegal TFTP operation',
+    72 => 'Unknown TFTP transfer ID',
+    73 => 'TFTP file already exists',
+    74 => 'TFTP no such user',
+    77 => 'Problem reading SSL CA cert',
+    78 => 'Resource referenced in URL does not exist',
+    79 => 'Unspecified error occurred during SSH session',
+    80 => 'Failed to shut down SSL connection',
+    82 => 'Could not load CRL file',
+    83 => 'Issuer check failed',
+    84 => 'FTP PRET failed',
+    85 => 'RTSP CSeq number mismatch',
+    86 => 'RTSP Session ID mismatch',
+    87 => 'Failed to parse FTP file list',
+    88 => 'FTP chunk callback error',
+    89 => 'No connection available',
+    90 => 'SSL public key does not match pinned public key',
+    91 => 'Invalid SSL certificate status',
+    92 => 'Stream error in HTTP/2 framing layer',
+    93 => 'API function called from inside callback',
+    94 => 'Authentication function returned error',
+    95 => 'Error detected in HTTP/3 layer',
+    96 => 'QUIC connection error',
+    # and maybe some more in the future...
 );
 
 sub curl_error {
 
-	my ($code) = @_;
+    my ($code) = @_;
 
-	return $CODES{ $code } // 'Unknown error';
+    return $CODES{ $code } // 'Unknown error';
 
 }
 
 sub curl {
 
-	my ($link, $output, %param) = @_;
-	my $verbose      = $param{ verbose      } // 0;
-	my $agent        = $param{ agent        } // undef;
-	my $time_cond    = $param{ time_cond    } // undef;
-	my $remote_time  = $param{ remote_time  } // 0;
-	my $etag_save    = $param{ etag_save    } // undef;
-	my $etag_compare = $param{ etag_compare } // undef;
-	my $limit_rate   = $param{ limit_rate   } // undef;
-	my $user_agent   = $param{ user_agent   } // undef;
-	my $timeout      = $param{ timeout      } // undef;
-	my $fail         = $param{ fail         } // 0;
-	my $proxy        = $param{ proxy        } // undef;
-	my $proxy_user   = $param{ proxy_user   } // undef;
+    my ($link, $output, %param) = @_;
+    my $verbose      = $param{ verbose      } // 0;
+    my $agent        = $param{ agent        } // undef;
+    my $time_cond    = $param{ time_cond    } // undef;
+    my $remote_time  = $param{ remote_time  } // 0;
+    my $etag_save    = $param{ etag_save    } // undef;
+    my $etag_compare = $param{ etag_compare } // undef;
+    my $limit_rate   = $param{ limit_rate   } // undef;
+    my $user_agent   = $param{ user_agent   } // undef;
+    my $timeout      = $param{ timeout      } // undef;
+    my $fail         = $param{ fail         } // 0;
+    my $proxy        = $param{ proxy        } // undef;
+    my $proxy_user   = $param{ proxy_user   } // undef;
 
-	my @cmd = ('curl', '-o', $output);
+    my @cmd = ('curl', '-o', $output);
 
-	if (!$verbose) {
-		push @cmd, '-s';
-	}
+    if (!$verbose) {
+        push @cmd, '-s';
+    }
 
-	if (defined $agent) {
-		push @cmd, '-A', $agent;
-	}
+    if (defined $agent) {
+        push @cmd, '-A', $agent;
+    }
 
-	if (defined $time_cond) {
-		push @cmd, '-z', $time_cond;
-	}
+    if (defined $time_cond) {
+        push @cmd, '-z', $time_cond;
+    }
 
-	if ($remote_time) {
-		push @cmd, '-R';
-	}
+    if ($remote_time) {
+        push @cmd, '-R';
+    }
 
-	if (defined $etag_save) {
-		push @cmd, '--etag-save', $etag_save;
-	}
+    if (defined $etag_save) {
+        push @cmd, '--etag-save', $etag_save;
+    }
 
-	if (defined $etag_compare) {
-		push @cmd, '--etag-compare', $etag_compare;
-	}
+    if (defined $etag_compare) {
+        push @cmd, '--etag-compare', $etag_compare;
+    }
 
-	if (defined $limit_rate) {
-		push @cmd, '--limit-rate', $limit_rate;
-	}
+    if (defined $limit_rate) {
+        push @cmd, '--limit-rate', $limit_rate;
+    }
 
-	if (defined $user_agent) {
-		push @cmd, '-A', $user_agent;
-	}
+    if (defined $user_agent) {
+        push @cmd, '-A', $user_agent;
+    }
 
-	if (defined $timeout) {
-		push @cmd, '-m', $timeout;
-	}
+    if (defined $timeout) {
+        push @cmd, '-m', $timeout;
+    }
 
-	if ($fail) {
-		push @cmd, '-f';
-	}
+    if ($fail) {
+        push @cmd, '-f';
+    }
 
-	if (defined $proxy) {
-		push @cmd, '-x', $proxy;
-	}
+    if (defined $proxy) {
+        push @cmd, '-x', $proxy;
+    }
 
-	if (defined $proxy_user) {
-		push @cmd, '-U', $proxy_user;
-	}
+    if (defined $proxy_user) {
+        push @cmd, '-U', $proxy_user;
+    }
 
-	push @cmd, $link;
+    push @cmd, $link;
 
-	system @cmd;
+    system @cmd;
 
-	return $? == -1 ? $? : $? >> 8;
+    return $? == -1 ? $? : $? >> 8;
 
 }
 

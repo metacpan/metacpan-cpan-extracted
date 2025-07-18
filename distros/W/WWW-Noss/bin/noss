@@ -587,6 +587,13 @@ This option can also be configured via the C<sort> configuration field.
 
 Print the post list in reverse order.
 
+=item B<--list-limit>=I<limit>
+
+Only list the first I<limit> posts. When used with the C<--reverse> option,
+shows the last I<limit> posts. If I<limit> is less than or equal to C<0>, there
+is no limit. By default, there is no limit. This option can also be
+configured via the C<list_limit> configuration field.
+
 =item B<--hidden>
 
 Show hidden feeds when using C<list> with no arguments.
@@ -744,6 +751,8 @@ This command has the following options:
 
 =over 4
 
+=item B<--brief>
+
 Only print group names, not additional group info.
 
 =back
@@ -767,6 +776,11 @@ This command has the following options:
 =item B<--no-groups>
 
 Do not try to generate feed group structures in the exported OPML.
+
+=item B<--export-special>
+
+By default, C<export> does not export feeds that use special B<noss>-specific
+URLs like C<shel://> or C<file://> feeds. This option disables that behavior.
 
 =back
 
@@ -821,6 +835,9 @@ option can also be configured via the C<autoclean> configuration field.
 Specify the time format to use for the C<%z> formatting code. L<strftime(3)> is
 used to perform the time formatting, so consult its manual for writing a
 format string. See also the C<time_format> configuration field.
+
+C<%z> is the default formatting code used by the C<feed> and C<post> commands,
+so this option will also affect their output.
 
 If this option is not set, C<%z> will default to the C<%c> L<strftime(3)>
 formatting code.
@@ -920,6 +937,12 @@ also the C<open> command's C<--browser> option.
 How you would like the C<list> command to sort posts. Valid methods are
 C<date>, C<feed>, and C<title>. See also the C<list> command's C<--sort>
 option.
+
+=item "B<list_limit>": I<limit>
+
+Limit the number of posts that are listed with the C<list> command. If I<limit>
+is less than or equal to C<0>, there is no limit. See also the C<list> command's
+C<--list-limit> option.
 
 =item "B<line_width>": I<width>
 

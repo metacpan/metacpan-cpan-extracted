@@ -4,7 +4,7 @@ Log::Abstraction - Logging Abstraction Layer
 
 # VERSION
 
-0.21
+0.23
 
 # SYNOPSIS
 
@@ -116,7 +116,9 @@ Logs a notice message.
 
     $logger->error(@messages);
 
-Logs an error message.
+Logs an error message. This method also supports logging to syslog if configured.
+If not logging mechanism is set,
+falls back to `Carp`.
 
 ## trace
 
@@ -133,6 +135,10 @@ Logs a trace message.
 Logs a warning message. This method also supports logging to syslog if configured.
 If not logging mechanism is set,
 falls back to `Carp`.
+
+## \_high\_priority
+
+Helper to handle important messages.
 
 # AUTHOR
 

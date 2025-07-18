@@ -11,15 +11,16 @@ use Capture::Tiny qw(capture);
 use File::Basename;
 use Getopt::Long qw(GetOptionsFromArray :config pass_through);
 use IO::Interactive qw( is_interactive );
+use JSON::MaybeXS;
 use Module::Load qw(load);
 use Ref::Util qw(is_ref is_arrayref is_hashref);
 use Sys::Syslog qw(:standard);
 use Term::ANSIColor 2.01 qw(color colored colorstrip);
 use Term::ReadKey;
 use Term::ReadLine;
-use YAML;
+use YAML::XS ();
 
-our $VERSION = '2.0'; # VERSION
+our $VERSION = '2.1'; # VERSION
 
 # Capture ARGV at Load
 my @ORIG_ARGS;
@@ -97,6 +98,7 @@ sub import {
             syslog-tag=s
             syslog-debug!
             tags=s
+            encode=s
             nopaste
             nopaste-public
             nopaste-service=s
@@ -158,6 +160,7 @@ sub cli_helpers_initialize {
     %DEF = (
         DEBUG           => $opts->{debug}   || 0,
         DEBUG_CLASS     => $opts->{'debug-class'} || 'main',
+        ENCODE          => lc($opts->{encode}  || 'json'),
         VERBOSE         => $opts->{verbose} || 0,
         KV_FORMAT       => ': ',
         QUIET           => $opts->{quiet}   || 0,
@@ -171,6 +174,7 @@ sub cli_helpers_initialize {
         NOPASTE_PUBLIC  => $opts->{'nopaste-public'},
     );
     $DEF{COLOR} = $opts->{color} // git_color_check();
+    $DEF{ENCODE} = 'json' unless $DEF{ENCODE} eq 'json' or $DEF{ENCODE} eq 'yaml';
 
     debug("DEFINITIONS");
     debug_var(\%DEF);
@@ -284,17 +288,44 @@ sub colorize {
 }
 
 
+my %_valid_opts = map { $_ => 1 } qw(_caller_package clear color data encode indent json kv level no_syslog stderr sticky syslog_level tag yaml);
+sub _output_args {
+    my @args = @_;
+
+    return unless @args;
+
+    if ( @args == 1 ) {
+        return {}, $args[0];
+    }
+
+    if ( is_hashref($args[0]) ) {
+        my $invalid = 0;
+        foreach my $k ( keys %{ $args[0] } ) {
+            next if exists $_valid_opts{$k};
+            $invalid = 1;
+            last;
+        }
+        return {}, @args if $invalid;
+    }
+
+    return @args;
+}
+
 sub output {
-    my $opts = is_hashref($_[0]) ? shift @_ : {};
+    my ($opts,@lines) = _output_args(@_);
+
+    state $json = JSON->new->canonical->utf8->allow_blessed->convert_blessed;
 
     # Return unless we have something to work with;
-    return unless @_;
+    return unless @lines;
 
     # Ensure we're all setup
     cli_helpers_initialize() unless keys %DEF;
 
     # Input/output Arrays
-    my @input = map { my $x=$_; chomp($x) if defined $x; $x; } @_;
+    my $encode = sub { $DEF{ENCODE} eq 'yaml' || $opts->{yaml} ? YAML::XS::Dump($_[0]) : $json->encode($_[0]) };
+    my @input  = map { my $x=$_; chomp($x) if defined $x; $x; }
+                 map { defined $_ && ref $_ ? $encode->($_) : $_ } @lines;
     my @output = ();
 
     # Determine the color
@@ -324,7 +355,7 @@ sub output {
         }
     }
     else {
-        @output = map { defined $color ? colorize($color, $_) : $_; } @input;
+        @output = map { colorize($color, $_) } @input;
     }
 
     # Out to the console
@@ -430,7 +461,9 @@ sub debug_var {
             $opts->{$k} = $ref->{$k};
         };
     }
-    debug($opts, Dump shift);
+
+    my $var = shift;
+    debug($opts, $DEF{ENCODE} eq 'json' || $opts->{json} ? $var : YAML::XS::Dump $var);
 }
 
 
@@ -545,7 +578,8 @@ sub pwprompt {
         @more_validate = %$validate;
     }
     return text_input($prompt,
-        noecho   => 1,
+        noecho     => 1,
+        clear_line => 1,
         validate => { "password length can't be zero." => sub { defined && length },
                       @more_validate,
                     },
@@ -579,29 +613,22 @@ sub _get_input {
         # Initialize Term
         $term ||= Term::ReadLine->new($0);
         $args ||= {};
-        if( exists $args->{noecho} ) {
-            my $attrs = $term->Attribs;
-            if( $attrs->{shadow_redisplay} ) {
-                my $restore = $attrs->{redisplay_function};
-                $attrs->{redisplay_function} = $attrs->{shadow_redisplay};
-                $text = $term->readline($prompt);
-                $attrs->{redisplay_function} = $restore;
-            }
-            else {
-                # Disable all the Term ReadLine magic
-                local $|=1;
-                print $prompt;
-                ReadMode('noecho');
-                $text = ReadLine();
-                ReadMode('restore');
-                print "\n";
-                chomp($text);
-            }
+        print "\e[s" if $args->{clear_line}; # Save cursor position
+        if( $args->{noecho} ) {
+            # Disable all the Term ReadLine magic
+            local $|=1;
+            print $prompt;
+            ReadMode('noecho');
+            $text = ReadLine();
+            ReadMode('restore');
+            print "\n";
+            chomp($text);
         }
         else {
             $text = $term->readline($prompt);
             $term->addhistory($text) if length $text && $text =~ /\S/;
         }
+        print "\e[u\e[K" if $args->{clear_line}; # Return to saved position, erase line
     }
     else {
         # Read one line from STDIN
@@ -627,7 +654,7 @@ CLI::Helpers - Subroutines for making simple command line scripts
 
 =head1 VERSION
 
-version 2.0
+version 2.1
 
 =head1 SYNOPSIS
 
@@ -769,6 +796,12 @@ the specified color to the string.
 Exported.  Takes an optional hash reference and a list of
 messages to be output.
 
+Any data references in the the C<@messages> list will automatically be converted to JSON. You may also pass
+
+    { yaml => 1 }
+
+In the options to output in YAML format.
+
 =head2 verbose( \%opts, @messages )
 
 Exported.  Takes an optional hash reference of formatting options.  Automatically
@@ -783,6 +816,12 @@ Does not output anything unless DEBUG is set.
 
 Exported.  Takes an optional hash reference of formatting options.
 Does not output anything unless DEBUG is set.
+
+Passing:
+
+    { json => 1 }
+
+in C<\%opts> will format the output as JSON
 
 =head2 override( variable => 1 )
 
@@ -818,6 +857,12 @@ A hashref, keys are error messages, values are sub routines that return true whe
 
 Set as a key with any value and the prompt will turn off echoing responses as well as disabling all
 ReadLine magic.  See also B<pwprompt>.
+
+=item B<clear_line>
+
+After prompting for and receiving input, remove that line from the terminal.
+This only works on interactive terminals, and is useful for things like
+password prompts.
 
 =back
 
@@ -1051,7 +1096,7 @@ Brad Lhotsky <brad@divisionbyzero.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Brad Lhotsky.
+This software is Copyright (c) 2025 by Brad Lhotsky.
 
 This is free software, licensed under:
 

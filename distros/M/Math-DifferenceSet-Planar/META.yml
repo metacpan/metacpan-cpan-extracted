@@ -10,7 +10,7 @@ configure_requires:
   File::ShareDir::Install: '0'
   File::Spec: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.74, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,22 +23,22 @@ no_index:
 provides:
   Math::DifferenceSet::Planar:
     file: lib/Math/DifferenceSet/Planar.pm
-    version: '1.002'
+    version: '1.003'
   Math::DifferenceSet::Planar::Data:
     file: lib/Math/DifferenceSet/Planar/Data.pm
-    version: '1.002'
+    version: '1.003'
   Math::DifferenceSet::Planar::Schema:
     file: lib/Math/DifferenceSet/Planar/Schema.pm
-    version: '1.002'
+    version: '1.003'
   Math::DifferenceSet::Planar::Schema::Result::DatabaseVersion:
     file: lib/Math/DifferenceSet/Planar/Schema/Result/DatabaseVersion.pm
-    version: '1.002'
+    version: '1.003'
   Math::DifferenceSet::Planar::Schema::Result::DifferenceSet:
     file: lib/Math/DifferenceSet/Planar/Schema/Result/DifferenceSet.pm
-    version: '1.002'
+    version: '1.003'
   Math::DifferenceSet::Planar::Schema::Result::DifferenceSetSpace:
     file: lib/Math/DifferenceSet/Planar/Schema/Result/DifferenceSetSpace.pm
-    version: '1.002'
+    version: '1.003'
 requires:
   Carp: '0'
   DBD::SQLite: '1.48'
@@ -52,5 +52,5 @@ resources:
   homepage: https://vera.in-ulm.de/planar-diffsets/
   license: https://www.perlfoundation.org/artistic-license-20.html
   repository: git://github.com/mhasch/perl-Math-DifferenceSet-Planar.git
-version: '1.002'
+version: '1.003'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

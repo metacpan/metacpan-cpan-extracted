@@ -1,5 +1,13 @@
 Revision history for Log-Abstraction
 
+0.23	Thu Jul 17 14:45:54 EDT 2025
+	Better error message when we don't know what to do
+	Allow the syslog config to say 'server' instead of 'host' for consistency with CHI
+
+0.22	Thu Jul 17 08:22:16 EDT 2025
+	Error() now sends to syslog like warn()
+	Ensure undef isn't passed in the messages array to coderefs
+
 0.21	Wed Jul 16 16:21:25 EDT 2025
 	Added error()
 

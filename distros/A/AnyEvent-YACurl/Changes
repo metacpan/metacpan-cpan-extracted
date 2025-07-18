@@ -1,5 +1,8 @@
 Revision history for Perl extension AnyEvent::YACurl.
 
+0.23  Thu Jul 17 2025
+    - fix compatibility with some newer curl versions
+
 0.22  Sun Jul 16 2023
     - significantly widen curl compatibility range, and constants/curlopts available
 

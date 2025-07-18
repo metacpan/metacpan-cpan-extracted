@@ -16,7 +16,7 @@ CGI::Info - Information about the CGI environment
 
 # VERSION
 
-Version 1.04
+Version 1.05
 
 # SYNOPSIS
 
@@ -177,6 +177,8 @@ There is a good chance that this will be domain\_name() prepended with either
 
 Domain\_name is the name of the controlling domain for this website.
 Usually it will be similar to host\_name, but will lack the http:// or www prefixes.
+
+Can be called as a class method.
 
 ## cgi\_host\_url
 

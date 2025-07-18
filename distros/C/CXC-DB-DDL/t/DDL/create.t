@@ -9,8 +9,6 @@ use CXC::DB::DDL;
 use CXC::DB::DDL::Util -all;
 use CXC::DB::DDL::Constants -all;
 
-
-
 use Syntax::Keyword::Defer;
 
 use File::Temp;

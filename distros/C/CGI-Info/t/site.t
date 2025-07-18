@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 25;
+use Test::Most tests => 26;
 use Test::NoWarnings;
 use Sys::Hostname;
 use lib 't/lib';
@@ -49,6 +49,7 @@ HOSTNAMES: {
 	$i = new_ok('CGI::Info');
 	ok($i->host_name() eq 'www.example.com');
 	ok($i->domain_name() eq 'example.com');
+	ok(CGI::Info->domain_name() eq 'example.com');
 
 	# Check rereading returns the same value
 	ok($i->domain_name() eq 'example.com');

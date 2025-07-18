@@ -4,7 +4,7 @@ use strict;
 use DateTime;
 use DateTime::Set;
 
-our $VERSION = "2.00";
+our $VERSION = "2.01";
 
 RT->AddStyleSheets('calendar.css');
 RT->AddJavaScript('calendar.js');
@@ -298,13 +298,12 @@ CALENDAR_ICON:
     }
 }
 
-=head2 GetEventData $Object
-
-Accepts a ticket object and returns an array of ticket metadata
-values based on the configured CalendarEventLineValues.
-
-=cut
-
+#
+# GetEventData $Object
+#
+# Accepts a ticket object and returns an array of ticket metadata
+# values based on the configured CalendarEventLineValues.
+#
 sub GetEventData {
     my $Object   = shift;
 

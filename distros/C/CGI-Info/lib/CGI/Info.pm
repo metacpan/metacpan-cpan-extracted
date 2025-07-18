@@ -34,11 +34,11 @@ CGI::Info - Information about the CGI environment
 
 =head1 VERSION
 
-Version 1.04
+Version 1.05
 
 =cut
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 =head1 SYNOPSIS
 
@@ -362,12 +362,11 @@ sub _find_site_details
 
 	return if $self->{site} && $self->{cgi_site};
 
-	# Import necessary modules
-	require URI::Heuristic unless URI::Heuristic->can('uf_uristr');
-	require Sys::Hostname unless Sys::Hostname->can('hostname');
-
 	# Determine cgi_site using environment variables or hostname
-	if (my $host = $ENV{'HTTP_HOST'} || $ENV{'SERVER_NAME'}) {
+	if (my $host = ($ENV{'HTTP_HOST'} || $ENV{'SERVER_NAME'} || $ENV{'SSL_TLS_SNI'})) {
+		# Import necessary module
+			require URI::Heuristic unless URI::Heuristic->can('uf_uristr');
+
 		$self->{cgi_site} = URI::Heuristic::uf_uristr($host);
 		# Remove trailing dots from the name.  They are legal in URLs
 		# and some sites link using them to avoid spoofing (nice)
@@ -377,6 +376,9 @@ sub _find_site_details
 			$self->{cgi_site} =~ s/^http/$protocol/;
 		}
 	} else {
+		# Import necessary module
+		require Sys::Hostname unless Sys::Hostname->can('hostname');
+
 		$self->_debug('Falling back to using hostname');
 		$self->{cgi_site} = Sys::Hostname::hostname();
 	}
@@ -399,11 +401,16 @@ sub _find_site_details
 Domain_name is the name of the controlling domain for this website.
 Usually it will be similar to host_name, but will lack the http:// or www prefixes.
 
+Can be called as a class method.
+
 =cut
 
 sub domain_name {
 	my $self = shift;
 
+	if(!ref($self)) {
+		$self = __PACKAGE__->new();
+	}
 	return $self->{domain} if $self->{domain};
 
 	$self->_find_site_details();
@@ -1570,10 +1577,14 @@ sub is_robot {
 		}
 		return 1;
 	}
-	if($agent =~ /.+bot|axios\/1\.6\.7|bytespider|ClaudeBot|Clickagy.Intelligence.Bot|msnptc|CriteoBot|is_archiver|backstreet|linkfluence\.com|spider|scoutjet|gingersoftware|heritrix|dodnetdotcom|yandex|nutch|ezooms|plukkie|nova\.6scan\.com|Twitterbot|adscanner|Go-http-client|python-requests|Mediatoolkitbot|NetcraftSurveyAgent|Expanse|serpstatbot|DreamHost SiteMonitor|techiaith.cymru|trendictionbot|ias_crawler|Yak\/1\.0|ZoominfoBot/i) {
+	if($agent =~ /.+bot|axios\/1\.6\.7|bytespider|ClaudeBot|Clickagy.Intelligence.Bot|msnptc|CriteoBot|is_archiver|backstreet|fuzz faster|linkfluence\.com|spider|scoutjet|gingersoftware|heritrix|dodnetdotcom|yandex|nutch|ezooms|plukkie|nova\.6scan\.com|Twitterbot|adscanner|Go-http-client|python-requests|Mediatoolkitbot|NetcraftSurveyAgent|Expanse|serpstatbot|DreamHost SiteMonitor|techiaith.cymru|trendictionbot|ias_crawler|WPsec|Yak\/1\.0|ZoominfoBot/i) {
 		$self->{is_robot} = 1;
 		return 1;
 	}
+
+	# TODO:
+	# Download and use list from
+	#	https://raw.githubusercontent.com/mitchellkrogza/apache-ultimate-bad-bot-blocker/refs/heads/master/_generator_lists/bad-user-agents.list
 
 	my $key = "$remote/$agent";
 
@@ -1741,6 +1752,7 @@ sub is_search_engine
 		my $is_search = ($browser->google() || $browser->msn() || $browser->baidu() || $browser->altavista() || $browser->yahoo() || $browser->bingbot());
 		if(!$is_search) {
 			if(($agent =~ /SeznamBot\//) ||
+			   ($agent =~ /Google-InspectionTool\//) ||
 			   ($agent =~ /Googlebot\//)) {
 				$is_search = 1;
 			}
@@ -1754,17 +1766,10 @@ sub is_search_engine
 	# TODO: DNS lookup, not gethostbyaddr - though that will be slow
 	my $hostname = gethostbyaddr(inet_aton($remote), AF_INET) || $remote;
 
-	if(defined($hostname) && ($hostname =~ /google|msnbot|bingbot|amazonbot|GPTBot/) && ($hostname !~ /^google-proxy/)) {
-		if($self->{cache}) {
-			$self->{cache}->set($key, 'search', '1 day');
-		}
-		$self->{is_search_engine} = 1;
-		return 1;
-	}
-
 	my @cidr_blocks = ('47.235.0.0/12');	# Alibaba
 
-	if(Net::CIDR::cidrlookup($remote, @cidr_blocks)) {
+	if((defined($hostname) && ($hostname =~ /google|msnbot|bingbot|amazonbot|GPTBot/) && ($hostname !~ /^google-proxy/)) ||
+	   (Net::CIDR::cidrlookup($remote, @cidr_blocks))) {
 		if($self->{cache}) {
 			$self->{cache}->set($key, 'search', '1 day');
 		}
@@ -2044,6 +2049,9 @@ sub _warn {
 	my $params = Params::Get::get_params('warning', @_);
 
 	$self->_log('warn', $params->{'warning'});
+	if(!defined($self->{'logger'})) {
+		Carp::carp($params->{'warning'});
+	}
 }
 
 # Ensure all environment variables are sanitized and validated before use.

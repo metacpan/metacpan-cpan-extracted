@@ -14,12 +14,12 @@ use base 'DBIx::Class::Core';
 
 =head1 VERSION
 
-This documentation refers to version 1.002 of
+This documentation refers to version 1.003 of
 Math::DifferenceSet::Planar::Schema::Result::DifferenceSet.
 
 =cut
 
-our $VERSION = '1.002';
+our $VERSION = '1.003';
 
 =head1 TABLE: C<difference_set>
 
@@ -130,15 +130,15 @@ Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2019-2024 by Martin Becker, Blaubeuren.
+Copyright (c) 2019-2025 by Martin Becker, Blaubeuren.
 
 This library is free software; you can distribute it and/or modify it
 under the terms of the Artistic License 2.0 (see the LICENSE file).
 
-The licence grants freedom for related software development but does
+The license grants freedom for related software development but does
 not cover incorporating code or documentation into AI training material.
 Please contact the copyright holder if you want to use the library whole
-or in part for other purposes than stated in the licence.
+or in part for other purposes than stated in the license.
 
 =head1 DISCLAIMER OF WARRANTY
 

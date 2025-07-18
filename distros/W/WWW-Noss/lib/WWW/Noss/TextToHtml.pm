@@ -2,7 +2,7 @@ package WWW::Noss::TextToHtml;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 use Exporter 'import';
 our @EXPORT_OK = qw(text2html escape_html);

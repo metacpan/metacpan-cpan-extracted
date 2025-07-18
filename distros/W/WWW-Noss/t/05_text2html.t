@@ -19,30 +19,30 @@ my $TEST_ENTITY = '<>< && << >> &&';
 my $text2html = text2html($TEST_TEXT);
 
 like(
-	$text2html,
-	qr/\Q&gt; This is a paragraph.\E/,
-	'text2html retained paragraphs'
+    $text2html,
+    qr/\Q&gt; This is a paragraph.\E/,
+    'text2html retained paragraphs'
 );
 like(
-	$text2html,
-	qr/\Q&gt;&lt; This is another paragraph.\E/,
-	'text2html retained paragraphs'
+    $text2html,
+    qr/\Q&gt;&lt; This is another paragraph.\E/,
+    'text2html retained paragraphs'
 );
 like(
-	$text2html,
-	qr/\Q&gt;&amp; This is an additional paragraph.\E/,
-	'text2html retained paragraphs'
+    $text2html,
+    qr/\Q&gt;&amp; This is an additional paragraph.\E/,
+    'text2html retained paragraphs'
 );
 like(
-	$text2html,
-	qr/(<p>.+?<\/p>.*?){3}/s,
-	'text2html added paragraph tags'
+    $text2html,
+    qr/(<p>.+?<\/p>.*?){3}/s,
+    'text2html added paragraph tags'
 );
 
 is(
-	escape_html($TEST_ENTITY),
-	'&lt;&gt;&lt; &amp;&amp; &lt;&lt; &gt;&gt; &amp;&amp;',
-	'escape_html performed entity conversions correctly'
+    escape_html($TEST_ENTITY),
+    '&lt;&gt;&lt; &amp;&amp; &lt;&lt; &gt;&gt; &amp;&amp;',
+    'escape_html performed entity conversions correctly'
 );
 
 done_testing;

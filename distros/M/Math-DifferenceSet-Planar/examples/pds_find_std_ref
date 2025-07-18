@@ -11,12 +11,15 @@ use Math::DifferenceSet::Planar 0.016;
 
 $| = 1;
 
-my $USAGE = "usage: pds_find_std_ref [file]...\n";
+my $BAR_WIDTH = 64;
+my $USAGE = "usage: pds_find_std_ref [-p] [file]...\n";
 
+my $pro_b = 0;
 while (@ARGV && $ARGV[0] =~ /^-(.+)/s) {
     my $opt = $1;
     shift @ARGV;
     last if '-' eq $opt;
+    $pro_b = 1, next if 'p' eq $opt;
     die $USAGE;
 }
 
@@ -69,6 +72,10 @@ while(<<>>) {
         }
     }
 
+    my $run = 0;
+    my $runs = @divs;
+    progress_bar(0, $runs) if $pro_b;
+
     # compute main elements of candidate reference sets and keep best set
     my $bf = shift @divs;
     my @best = ();
@@ -91,6 +98,7 @@ while(<<>>) {
         push @best, $s0;
     }
     @best = sort { $a <=> $b } @best;
+    progress_bar(++$run, $runs) if $pro_b;
     DIV:
     foreach my $div (@divs) {
         my @this = ();
@@ -113,6 +121,7 @@ while(<<>>) {
             push @this, $s0;
         }
         @this = sort { $a <=> $b } @this;
+        progress_bar(++$run, $runs) if $pro_b;
         foreach my $i (0 .. $#best) {
             my $cmp = $this[$i] <=> $best[$i];
             if ($cmp) {
@@ -129,6 +138,14 @@ while(<<>>) {
     print "@e\n";
 }
 
+sub progress_bar {
+    my ($i, $ni) = @_;
+    my $black = $i && int 0.5 + $BAR_WIDTH * $i / $ni;
+    my $white = $BAR_WIDTH - $black;
+    print STDERR "\r", 'X' x $black, '.' x $white, " $i/$ni";
+    print STDERR "\n" if $i >= $ni;
+}
+
 __END__
 
 =head1 NAME
@@ -137,7 +154,7 @@ pds_find_std_ref - find lambda one planar difference sets
 
 =head1 SYNOPSIS
 
-  pds_find_std_ref [file]...
+  pds_find_std_ref [-p] [file]...
 
 =head1 DESCRIPTION
 
@@ -168,21 +185,23 @@ The computation of main elements is done explicitly here without
 using Math::DifferenceSet::Planar methods, to illustrate all essential
 components of the algorithm in one place.
 
+Option C<-p> displays a progress bar during the search.
+
 =head1 AUTHOR
 
 Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2019-2024 by Martin Becker, Blaubeuren.
+Copyright (c) 2019-2025 by Martin Becker, Blaubeuren.
 
 This library is free software; you can distribute it and/or modify it
 under the terms of the Artistic License 2.0 (see the LICENSE file).
 
-The licence grants freedom for related software development but does
+The license grants freedom for related software development but does
 not cover incorporating code or documentation into AI training material.
 Please contact the copyright holder if you want to use the library whole
-or in part for other purposes than stated in the licence.
+or in part for other purposes than stated in the license.
 
 =head1 DISCLAIMER OF WARRANTY
 
