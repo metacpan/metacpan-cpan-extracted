@@ -18,7 +18,7 @@ if (! $dbh) {
     plan skip_all => 'Connection to database failed, cannot continue testing';
 }
 
-plan tests => 71;
+plan tests => 79;
 
 isnt ($dbh, undef, 'Connect to database for async testing');
 
@@ -446,6 +446,57 @@ is ($res, 2, $t);
     is ($@, q{}, $t);
 
     $dbh->{pg_use_async} = 0;
+}
+
+{
+    # savepoint tests
+    #
+    $t=q{Dbh async status is 1 after async savepoint};
+    $$dbh{pg_use_async} = 1;
+    $$dbh{AutoCommit} = 0;
+    $dbh->pg_savepoint('a');
+    is ($$dbh{pg_async_status}, 1, $t);
+
+    $t=q{Savepoint not recorded before waiting for result};
+    my @a = $dbh->pg_savepoints();
+    is (scalar(@a), 0, $t);
+
+    $t=q{Database method pg_result works after async savepoint};
+    eval {
+        $dbh->pg_result();
+    };
+    is ($@, q{}, $t);
+
+    $t=q{Savepoint recorded after waiting for result};
+    my @b = $dbh->pg_savepoints();
+    is_deeply (\@b, ['a'], $t);
+
+    # rollback_to tests
+    #
+    $t=q{Dbh async status is 1 after async rollback_to};
+    $dbh->pg_rollback_to('a');
+    is ($$dbh{pg_async_status}, 1, $t);
+
+    $t=q{Savepoint recorded before waiting for result};
+    @a = $dbh->pg_savepoints();
+    is_deeply (\@a, ['a'], $t);
+
+    $t=q{Database method pg_result works after async rollback_to};
+    eval {
+        $dbh->pg_result();
+    };
+    is ($@, q{}, $t);
+
+    $t=q{Savepoint gone after waiting for result};
+    @b = $dbh->pg_savepoints();
+    is (scalar(@b), 0, $t);
+
+    $$dbh{pg_use_async} = 0;
+
+    #
+    # no tests for async release as that 100% the same code
+    # as rollback_to
+    #
 }
 
 $dbh->do('DROP TABLE dbd_pg_test5');

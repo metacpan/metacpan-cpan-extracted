@@ -13,11 +13,13 @@ use Time::Piece; # core module
 
 my $time = localtime;
 my $record_date = $ENV{ LWP_UA_MOCK } eq 'playback'
-    ? '2025-07-16'
+    ? '2025-07-18'
     : $time->ymd;
 
 my $dataset = 'sea-surface-temperature-anomaly';
-my $chart = WebService::OurWorldInData::Chart->new( chart => $dataset );
+my $ua    = LWP::UserAgent->new;
+$ua->agent('WebService::OurWorldInData-test/0.1');
+my $chart = WebService::OurWorldInData::Chart->new( chart => $dataset, ua => $ua );
 
 subtest 'Chart object ok' => sub {
     is $chart, object {
@@ -28,7 +30,7 @@ subtest 'Chart object ok' => sub {
         field short_names => F();
 
         field base_url => 'https://ourworldindata.org';
-        field ua       => check_isa 'HTTP::Tiny';
+        field ua       => check_isa 'LWP::UserAgent';
 
         end();
     }, 'Chart object correct';
@@ -47,18 +49,21 @@ subtest data => sub {
 subtest 'filtered data' => sub {
     my ($result, );
     my $gdp   = WebService::OurWorldInData::Chart->new(
-                    chart => 'gdp-per-capita-worldbank',
+                    chart    => 'gdp-per-capita-worldbank',
                     csv_type => 'filtered',
-                    time => 2020 );
+                    time     => 2020,
+                    ua       => $ua );
     my $japan = WebService::OurWorldInData::Chart->new(
-                    chart => 'life-expectancy',
+                    chart    => 'life-expectancy',
                     csv_type => 'filtered',
-                    country => 'Japan' ); # ~JPN
+                    country  => 'Japan',
+                    ua       => $ua ); # ~JPN
     my $chile = WebService::OurWorldInData::Chart->new(
-                    chart => 'life-expectancy',
+                    chart    => 'life-expectancy',
                     csv_type => 'filtered',
-                    country => '~CHL',
-                    time => '1998..2023' );
+                    country  => '~CHL',
+                    time     => '1998..2023',
+                    ua       => $ua );
 
     ok $result = $gdp->data(), 'fetch GDP for 2020';
     ok $result = $japan->data(), 'fetch life expectancy for Japan';

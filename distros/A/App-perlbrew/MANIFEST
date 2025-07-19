@@ -9,6 +9,7 @@ META.yml
 README
 cpanfile
 lib/App/Perlbrew/HTTP.pm
+lib/App/Perlbrew/Patchperl.pm
 lib/App/Perlbrew/Path.pm
 lib/App/Perlbrew/Path/Installation.pm
 lib/App/Perlbrew/Path/Installations.pm
@@ -43,6 +44,7 @@ t/16.release-detail.t
 t/18.release-detail-perl-local.t
 t/18.release-detail-perl-remote.t
 t/19.find_similar_commands.t
+t/20.patchperl.t
 t/PerlbrewTestHelpers.pm
 t/app-perlbrew-path-installation.t
 t/app-perlbrew-path.t

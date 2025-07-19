@@ -46,9 +46,7 @@ sub data {
                 useColumnShortNames => 'true',
     };
 
-    my $params = $self->ua->www_form_urlencode( $query );
-
-    return $self->get_response( $url );
+    return $self->get_response( $url, $query );
 }
 
 sub get_path {

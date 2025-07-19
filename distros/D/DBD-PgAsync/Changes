@@ -1,5 +1,15 @@
 Changes for the DBD::PgAsync module
 
+--- 07/18/2025 rweikusat@talktalk.net ---
+
+    - document pg_savepoints method
+
+--- 07/17/2025 rweikusat@talktalk.net ---
+
+    - integrated upstream regdatabase changes
+    - added a method to query the set of existing savepoints
+    - asynchronous savepoint handling when pg_use_async is true
+
 --- 06/26/2025 rweikusat@talktalk.net ---
 
    - fix pg_db_result to work as documented in face of asynchronous

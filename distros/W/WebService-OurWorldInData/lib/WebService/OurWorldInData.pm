@@ -2,9 +2,9 @@ package WebService::OurWorldInData;
 # ABSTRACT: Perl library to connect with the Our World in Data API
 # https://ourworldindata.org
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
-use v5.12;
+use v5.8;
 use Moo;
 use Carp;
 
@@ -25,15 +25,45 @@ has base_url => (
 );
 
 sub get_response {
-    my ($self, $url) = @_;
+#TODO Needs to be re-written to handle different UAs gracefully ####
+    my ($self, $url, $query) = @_;
 
-    my $res = $self->ua->get( $url );
+    my $res;
+    if ( ref $self->ua eq 'HTTP::Tiny' ) {
+        my $params = $self->ua->www_form_urlencode( $query );
+        $res = $self->ua->get( join('?', $url, $params) );
+        _report_status_tiny($res);
+    }
+    elsif ( ref $self->ua eq 'LWP::UserAgent' ) {
+        require URI;
+        my $uri = URI->new( $url );
+        $uri->query( %$query ) if $query;
+        $res = $self->ua->get( $uri->as_string );
+        _report_status_full($res);
+    }
+    else {
+        carp 'No url_encoding for ', ref $self->ua;
+        $res = $self->ua->get( $url );
+        _report_status_full($res);
+    }
+
+    return ref $self->ua eq 'HTTP::Tiny' ? $res->{content} : $res->content;
+}
+
+sub _report_status_tiny {
+    my $res = shift;
 
     if    ($res->{success})  { warn $res->{content} if $DEBUG > 1 }
     elsif ($res->{redirects}) { carp 'Redirected: ', $res->headers->location if $DEBUG }
     else  { carp 'HTTP Error: ', $res->{status}, $res->{reason}; }
+}
 
-    return $res->{content};
+sub _report_status_full {
+    my $res = shift;
+
+    if    ($res->is_success)  { warn $res->content if $DEBUG > 1 }
+    elsif ($res->is_redirect) { carp 'Redirected: ', $res->headers->location if $DEBUG }
+    else  { carp join q{ }, 'HTTP Error:', $res->code, $res->message; }
 }
 
 sub post_response {

@@ -25,7 +25,13 @@ do { my $x = {
                                     }
                     },
        'runtime' => {
+                      'recommends' => {
+                                        'Text::CSV' => '0'
+                                      },
                       'requires' => {
+                                      'HTTP::Tiny' => '0',
+                                      'IO::Socket::SSL' => '0',
+                                      'JSON' => '0',
                                       'Moo' => '0',
                                       'PerlX::Maybe' => '0',
                                       'Types::Standard' => '0',
@@ -44,6 +50,9 @@ do { my $x = {
                                    'Test2::V0' => '0',
                                    'Test::More' => '0',
                                    'Time::Piece' => '0'
+                                 },
+                   'suggests' => {
+                                   'Archive::Zip' => '0'
                                  }
                  }
      };

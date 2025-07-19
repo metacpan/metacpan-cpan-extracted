@@ -1,6 +1,7 @@
+0.02      2025 Jul 18
+====
+* recording tests so we don't flood the service
+
 0.01      2025 Jul 16
 ====
-
-v0.01   2025 Jul    DUFFEE
-====
-Initial commit implementing the Chart API
+* Initial commit implementing the Chart API

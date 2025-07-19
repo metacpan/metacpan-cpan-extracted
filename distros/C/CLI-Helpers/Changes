@@ -1,9 +1,50 @@
 ==================================================
-Changes from 2023-07-19 00:00:00 +0000 to present.
+Changes from 2023-07-20 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 2.1 at 2025-07-18 04:43:35 +0000
+version 2.2 at 2025-07-19 04:23:30 +0000
+----------------------------------------
+
+  Change: f7398d4f658c8c43e74b40968ec33a359239dcf8
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2025-07-18 21:20:52 +0000
+
+    Fixing the documentation for the 2.2 release 
+
+  Change: a248fcc2dfaa97eba06380f1fd0b0581eab77394
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2025-07-18 10:21:38 +0000
+
+    Prepping a 2.2 Release, the 2.1 Release is missing the commits 
+
+  Change: b91219fd21612cd6fb647e23f3498010ec2b00d2
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2025-07-17 21:40:40 +0000
+
+    Prepping the 2.1 Release 
+
+  Change: a27582523acc666a40107e18c524c65fe405b145
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2025-07-17 21:40:40 +0000
+
+    Documentation updates and extensions
+
+    * Updated the documentation to cover all the export groups * Added an
+    `options_description()` for use with `Getopt:Long::Descriptive` 
+
+  Change: dd4901d17b5b37e3d01b743762e871d171b8f60e
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2025-07-17 21:40:40 +0000
+
+    Bugfix for Issue #7
+
+    `CLI::Helpers` was messing with the global configuration of `Getopt::Long`
+    causing unexpected behavior. I rolled back the automatic initialization,
+    but this bug report demonstrates that behavior is expected by users. 
+
+----------------------------------------
+version 2.1 at 2025-07-18 04:43:06 +0000
 ----------------------------------------
 
   Change: dba17228900e5af66625ba942914a3fb6ea3e0e9
@@ -67,5 +108,5 @@ version 2.1 at 2025-07-18 04:43:35 +0000
     Add `clear_line` option to `text_input()` and use it for `pwprompt()` 
 
 =================================================
-Plus 20 releases after 2023-07-19 00:00:00 +0000.
+Plus 20 releases after 2023-07-20 00:00:00 +0000.
 =================================================

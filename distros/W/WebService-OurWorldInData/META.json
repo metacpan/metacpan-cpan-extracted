@@ -50,7 +50,13 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "Text::CSV" : "0"
+         },
          "requires" : {
+            "HTTP::Tiny" : "0",
+            "IO::Socket::SSL" : "0",
+            "JSON" : "0",
             "Moo" : "0",
             "PerlX::Maybe" : "0",
             "Types::Standard" : "0",
@@ -69,17 +75,20 @@
             "Test2::V0" : "0",
             "Test::More" : "0",
             "Time::Piece" : "0"
+         },
+         "suggests" : {
+            "Archive::Zip" : "0"
          }
       }
    },
    "provides" : {
       "WebService::OurWorldInData" : {
          "file" : "lib/WebService/OurWorldInData.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "WebService::OurWorldInData::Chart" : {
          "file" : "lib/WebService/OurWorldInData/Chart.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -94,7 +103,7 @@
          "web" : "https://github.com/duffee/perl-OurWorldInData"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038002"
@@ -364,7 +373,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.01",
+                  "tag" : "v0.02",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },

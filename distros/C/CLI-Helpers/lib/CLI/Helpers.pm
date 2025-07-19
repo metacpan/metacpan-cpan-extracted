@@ -9,7 +9,7 @@ use warnings;
 
 use Capture::Tiny qw(capture);
 use File::Basename;
-use Getopt::Long qw(GetOptionsFromArray :config pass_through);
+use Getopt::Long qw(GetOptionsFromArray);
 use IO::Interactive qw( is_interactive );
 use JSON::MaybeXS;
 use Module::Load qw(load);
@@ -20,7 +20,7 @@ use Term::ReadKey;
 use Term::ReadLine;
 use YAML::XS ();
 
-our $VERSION = '2.1'; # VERSION
+our $VERSION = '2.2'; # VERSION
 
 # Capture ARGV at Load
 my @ORIG_ARGS;
@@ -32,14 +32,15 @@ BEGIN {
 require Exporter;
 our @ISA = qw(Exporter);
 
-my @output_tags = qw(output verbose debug debug_var cli_helpers_initialize);
-my @input_tags  = qw(prompt menu text_input confirm pwprompt);
+my @export_output = qw(output verbose debug debug_var);
+my @export_input  = qw(prompt menu text_input confirm pwprompt);
+my @export_always = qw(cli_helpers_initialize options_description);
 
-our @EXPORT_OK = ( @output_tags, @input_tags );
+our @EXPORT_OK = ( @export_output, @export_input, @export_always );
 our %EXPORT_TAGS = (
-    all    => [@output_tags,@input_tags],
-    input  => \@input_tags,
-    output => \@output_tags,
+    all    => [@export_always, @export_input, @export_output],
+    input  => [@export_always, @export_input],
+    output => [@export_always, @export_output],
 );
 
 my $ARGV_AT_INIT    = 0;
@@ -51,12 +52,15 @@ sub import {
 
     my @import = ();
     # We need to process the config options
+    my $explicit_argv = 0;
     foreach my $arg ( @args ) {
         if( $arg eq 'delay_argv' ) {
             $ARGV_AT_INIT = 0;
+            $explicit_argv++;
         }
         elsif( $arg eq 'preprocess_argv' ) {
             $ARGV_AT_INIT = 1;
+            $explicit_argv++;
         }
         elsif( $arg eq 'copy_argv' ) {
             $COPY_ARGV = 1;
@@ -65,6 +69,10 @@ sub import {
         else {
             push @import, $arg;
         }
+    }
+    if ( $explicit_argv != 1 ) {
+        my ($package) = caller;
+        $ARGV_AT_INIT = $package eq 'main';
     }
 
     CLI::Helpers->export_to_level( 1, @import );
@@ -81,52 +89,97 @@ sub import {
 }
 
 
-{
-    my @argv_original = ();
-    my $parsed_argv = 0;
-    sub _parse_options {
-        my ($opt_ref) = @_;
-        my @opt_spec = qw(
-            color!
-            verbose|v+
-            debug
-            debug-class=s
-            quiet
-            data-file=s
-            syslog!
-            syslog-facility=s
-            syslog-tag=s
-            syslog-debug!
-            tags=s
-            encode=s
-            nopaste
-            nopaste-public
-            nopaste-service=s
-        );
+my %OPTIONS = (
+    color => {
+        description => "Enable colorized output",
+        reversible => 1,
+    },
+    'data-file' => {
+        description => "Filename for output tagged as data",
+        format => "s",
+    },
+    debug => {
+        description => "Show developer output",
+    },
+    'debug-class' => {
+        description => "Show developer output for a specific class",
+        format => "s",
+    },
+    nopaste => {
+        description => "Paste output to configured paste service",
+    },
+    'nopaste-public' => {
+        description => "Must be set to use public paste services",
+    },
+    'nopaste-service' => {
+        description => "Comma-separated App::Nopaste services",
+        format => "s",
+    },
+    quiet => {
+        description => "Suppress output to STDERR and STDOUT",
+    },
+    syslog => {
+        description => "Generate messages to syslog as well",
+    },
+    'syslog-debug' => {
+        description => "Enable debug messages to syslog if in use",
+    },
+    'syslog-facility' => {
+        description => "Syslog facility, defaults to 'local0'",
+        format => "s",
+    },
+    'syslog-tag' => {
+        description => "Syslog program name, defaults to script name",
+        format => "s",
+    },
+    tags => {
+        description => "A comma separated list of tags to display",
+        format => "s",
+    },
+    verbose => {
+        aliases => [qw(v)],
+        description => "Incremental, increase verbosity output",
+        incremental => 1,
+    },
+);
 
-        my $argv;
-        my %opt;
-        if( defined $opt_ref && is_arrayref($opt_ref) ) {
-            # If passed an argv array, use that
-            $argv = $COPY_ARGV ? [ @{ $opt_ref } ] : $opt_ref;
+sub _parse_options {
+    my ($opt_ref) = @_;
+    my @opt_spec;
+
+    foreach my $opt (sort keys %OPTIONS) {
+        my $def = $OPTIONS{$opt};
+        my $spec = join("|", $opt, $def->{aliases} ? @{ $def->{aliases} } : ());
+        if ( $def->{format} ) {
+            $spec .= "=$def->{format}";
+        } elsif ( $def->{incremental} ) {
+            $spec .= "+";
+        } elsif ( $def->{reversible} ) {
+            $spec .= "!";
         }
-        else {
-            # Ensure multiple calls to cli_helpers_initialize() yield the same results
-            if ( $parsed_argv ) {
-                ## no critic
-                @ARGV = @argv_original;
-                ## use critic
-            }
-            else {
-                @argv_original = @ARGV;
-                $parsed_argv++;
-            }
-            # Operate on @ARGV
-            $argv = $COPY_ARGV ? [ @ARGV ] : \@ARGV;
-        }
-        GetOptionsFromArray($argv, \%opt, @opt_spec );
-        return \%opt;
+        push @opt_spec, $spec;
     }
+
+    my $argv;
+    my %opt;
+    if( defined $opt_ref && is_arrayref($opt_ref) ) {
+        # If passed an argv array, use that
+        $argv = $COPY_ARGV ? [ @{ $opt_ref } ] : $opt_ref;
+    }
+    else {
+        $argv = $COPY_ARGV ? [ @ARGV ] : \@ARGV;
+    }
+    # Set pass_through and save previous settings
+    my $prev = Getopt::Long::Configure('pass_through');
+    eval {
+        GetOptionsFromArray($argv, \%opt, @opt_spec );
+    } or do {
+        my $err = $@;
+        warn "CLI::Helpers::_parse_options failed: $err";
+    };
+    # Restore previous settings
+    Getopt::Long::Configure($prev);
+    return \%opt;
 }
 
 my $DATA_HANDLE = undef;
@@ -153,7 +206,8 @@ my %TAGS    = ();
 sub cli_helpers_initialize {
     my ($argv) = @_;
 
-    my $opts = _parse_options($argv);
+    state $defaults = _parse_options() unless $argv;
+    my $opts = $argv ? _parse_options($argv) : $defaults;
     _open_data_file($opts->{'data-file'}) if $opts->{'data-file'};
 
     # Initialize Global Definitions
@@ -255,7 +309,49 @@ END {
 }
 
 
-sub def { return exists $DEF{$_[0]} ? $DEF{$_[0]} : undef }
+sub options_description {
+    my @description = (
+        [],
+        ["CLI::Helpers Options"],
+    );
+
+    my(@opt,@desc);
+    my $opt_width = 0;
+    foreach my $opt ( sort keys %OPTIONS ) {
+        my $def = $OPTIONS{$opt};
+        my $desc = sprintf "--%s", $opt;
+        if ( $def->{aliases} ) {
+            $desc .= ' (';
+            foreach my $alias ( @{ $def->{aliases} } ) {
+                $desc .= sprintf "or %s%s", length($alias) > 1 ? '--' : '-', $alias;
+            }
+            $desc .= ')';
+        }
+        push @opt, $desc;
+        $opt_width = length($desc) if length($desc) > $opt_width;
+        push @desc, $def->{description};
+        if ( $def->{reversible} ) {
+            push @opt, sprintf "--no%s", $opt;
+            push @desc, $def->{description} =~ s/Enable/Disable/r;
+        }
+    }
+
+    while( @opt && @desc ) {
+        push @description, [sprintf "%-${opt_width}s  %s", shift(@opt), shift(@desc) ];
+    }
+
+    return @description;
+}
+
+
+sub colorize {
+    my ($color,$string) = @_;
+
+   if( defined $color && $DEF{COLOR} ) {
+        $string=colored([ $color ], $string);
+    }
+    return $string;
+}
 
 
 sub git_color_check {
@@ -278,14 +374,7 @@ sub git_color_check {
 }
 
 
-sub colorize {
-    my ($color,$string) = @_;
-
-   if( defined $color && $DEF{COLOR} ) {
-        $string=colored([ $color ], $string);
-    }
-    return $string;
-}
+sub def { return exists $DEF{$_[0]} ? $DEF{$_[0]} : undef }
 
 
 my %_valid_opts = map { $_ => 1 } qw(_caller_package clear color data encode indent json kv level no_syslog stderr sticky syslog_level tag yaml);
@@ -646,150 +735,99 @@ __END__
 
 =pod
 
-=encoding UTF-8
-
 =head1 NAME
 
 CLI::Helpers - Subroutines for making simple command line scripts
 
 =head1 VERSION
 
-version 2.1
+version 2.2
 
 =head1 SYNOPSIS
-
-Use this module to make writing intelligent command line scripts easier.
-
-    #!/usr/bin/env perl
-    use CLI::Helpers qw(:all);
-
-    output({color=>'green'}, "Hello, World!");
-    verbose({indent=>1,color=>'yellow'}, "Shiny, happy people!");
-    verbose({level=>2,kv=>1,color=>'red'}, a => 1, b => 2);
-    debug_var({ c => 3, d => 4});
-
-    # Data
-    output({data=>1}, join(',', qw(a b c d)));
-
-    # Wait for confirmation
-    die "ABORTING" unless confirm("Are you sure?");
-
-    # Ask for a number
-    my $integer = prompt "Enter an integer:", validate => { "not a number" => sub { /^\d+$/ } }
-
-    # Ask for next move
-    my %menu = (
-        north => "Go north.",
-        south => "Go south.",
-    );
-    my $dir = prompt "Where to, adventurous explorer?", menu => \%menu;
-
-    # Ask for a favorite animal
-    my $favorite = menu("Select your favorite animal:", [qw(dog cat pig fish otter)]);
-
-Running:
-
-    $ ./test.pl
-    Hello, World!
-    a,b,c,d
-    $ ./test.pl --verbose
-    Hello, World!
-      Shiny, Happy people!
-    a,b,c,d
-    $ ./test.pl -vv
-    Hello, World!
-      Shiny, Happy people!
-      a: 1
-      b: 2
-    a,b,c,d
-    $ ./test.pl --debug
-    Hello, World!
-      Shiny, Happy people!
-      a: 1
-      b: 2
-    ---
-    c: 3
-    d: 4
-    a,b,c,d
-
-    $ ./test.pl --data-file=output.csv
-    Hello, World!
-    a,b,c,d
-    $ cat output.csv
-    a,b,c,d
-
-Colors would be automatically enabled based on the user's ~/.gitconfig
-
-=head1 OVERVIEW
 
 This module provides a library of useful functions for constructing simple command
 line interfaces.  It is able to extract information from the environment and your
 ~/.gitconfig to display data in a reasonable manner.
 
-Using this module adds argument parsing using L<Getopt::Long> to your script.  It
-enables pass-through, so you can still use your own argument parsing routines or
-Getopt::Long in your script.
-
-=head1 FUNCTIONS
-
-=head2 cli_helpers_initialize
-
-This is called automatically when C<preprocess_argv> is set. By default, it'll
-be run the first time a definition is needed, usually the first call to
-C<output()>.  If called automatically, it will operate on C<@ARGV>.  You can
-optionally pass an array reference to this function and it'll operate that
-instead.
-
-In most cases, you don't need to call this function directly.  It must be
-explicitly requested in the import.
-
-    use CLI::Helpers qw( :output );
+    use CLI::Helpers;
 
     ...
-    # I want access to ARGV before CLI::Helpers;
-    my %opts = get_important_things_from(\@ARGV);
+    output({color=>"green"}, "Hello, world!");
+    debug({color=>"yellow"}, "Debug output!");
 
-    # Now, let CLI::Helpers take the rest, implicit
-    #   call to cli_helpers_initialize()
-    output("ready");
+Using this module adds argument parsing using L<Getopt::Long> to your script.  It
+enables pass-through, so you can still use your own argument parsing routines or
+L<Getopt::Long> in your script.
 
-Alternatively, you could:
+=head1 EXPORT
+
+This module exports the C<:all> group by default.
+
+=head2 Export Groups
+
+Optionally, you can specify the groups you prefer:
+
+=over 2
+
+=item B<:output>
+
+    output()
+    verbose()
+    debug()
+    debug_var()
+
+=item B<:input>
+
+    menu()
+    text_input()
+    confirm()
+    prompt()
+    pwprompt()
+
+=item B<:all>
+
+    :output
+    :input
+
+=back
+
+All groups include these functions:
+
+    cli_helpers_initialize()
+    options_description()
+
+=head2 Configuration
+
+It's possible to change the behavior of the import process.
+
+=over 2
+
+=item B<copy_argv>
+
+Instead of messing with C<@ARGV>, operate on a copy of C<@ARGV>.
+
+    use CLI::Helpers qw( :output copy_argv );
+
+=item B<preprocess_argv>
+
+This causes the C<@ARGV> processing to happen during the C<INIT> phase, after
+import but before runtime. This is usually OK for scripts, but for use in
+libraries, it may be undesirable. This is the default when C<CLI::Helpers> is
+imported from the C<main> package.
 
     use CLI::Helpers qw( :output preprocess_argv );
 
-    ...
-    # Since CLI::Helpers opts are stripped from @ARGV,
-    #  Getopt::Long::Descriptive won't complain about extra args
-    my ($opt,$usage) = describe_option( ... );
+=item B<delay_argv>
 
-    # Now, let CLI::Helpers take the rest, implicit
-    #   call to cli_helpers_initialize()
-    output("ready");
+This causes the C<@ARGV> processing to happen when the first call to a function
+needing it run, usually an C<output()> call. This is the default when import
+from any other package other than C<main>.
 
-Or if you'd prefer not to touch C<@ARGV> at all, you pass in an array ref:
+    use CLI::Helpers qw( :output delay_argv );
 
-    use CLI::Helpers qw( :output );
+=back
 
-    my ($opt,$usage) = describe_option( ... );
-
-    cli_helpers_initialize([ qw( --verbose ) ]);
-
-    output("ready?");
-    verbose("you bet I am");
-
-=head2 def
-
-Not exported by default, returns the setting defined.
-
-=head2 git_color_check
-
-Not exported by default.  Returns 1 if git is configured to output
-using color of 0 if color is not enabled.
-
-=head2 colorize( $color => 'message to be output' )
-
-Not exported by default.  Checks if color is enabled and applies
-the specified color to the string.
+=head1 OUTPUT FUNCTIONS
 
 =head2 output( \%opts, @messages )
 
@@ -822,164 +860,6 @@ Passing:
     { json => 1 }
 
 in C<\%opts> will format the output as JSON
-
-=head2 override( variable => 1 )
-
-Exported.  Allows a block of code to override the debug or verbose level.  This
-can be used during development to enable/disable the DEBUG/VERBOSE settings.
-
-=head2 confirm("prompt")
-
-Exported.  Creates a Yes/No Prompt which accepts y/n or yes/no case insensitively
-but requires one or the other.
-
-Returns 1 for 'yes' and 0 for 'no'
-
-=head2 text_input("prompt", validate => { "too short" => sub { length $_ > 10 } })
-
-Exported.  Provides a prompt to the user for input.  If validate is passed, it should be a hash reference
-containing keys of error messages and values which are subroutines to validate the input available as $_.
-If a validator fails, it's error message will be displayed, and the user will be re-prompted.
-
-Valid options are:
-
-=over 4
-
-=item B<default>
-
-Any string which will be used as the default value if the user just presses enter.
-
-=item B<validate>
-
-A hashref, keys are error messages, values are sub routines that return true when the value meets the criteria.
-
-=item B<noecho>
-
-Set as a key with any value and the prompt will turn off echoing responses as well as disabling all
-ReadLine magic.  See also B<pwprompt>.
-
-=item B<clear_line>
-
-After prompting for and receiving input, remove that line from the terminal.
-This only works on interactive terminals, and is useful for things like
-password prompts.
-
-=back
-
-Returns the text that has passed all validators.
-
-=head2 menu("prompt", $ArrayOrHashRef)
-
-Exported.  Used to create a menu of options from a list.  Can be either a hash or array reference
-as the second argument.  In the case of a hash reference, the values will be displayed as options while
-the selected key is returned.  In the case of an array reference, each element in the list is displayed
-the selected element will be returned.
-
-Returns selected element (HashRef -> Key, ArrayRef -> The Element)
-
-=head2 pwprompt("Prompt", options )
-
-Exported.  Synonym for text_input("Password: ", noecho => 1);  Also requires the password to be longer than 0 characters.
-
-=head2 prompt("Prompt", options )
-
-Exported.  Wrapper function with rudimentary mimicry of IO::Prompt(er).
-Uses:
-
-    # Mapping back to confirm();
-    my $value = prompt "Are you sure?", yn => 1;
-
-    # Mapping back to text_input();
-    my $value = prompt "Enter something:";
-
-    # With Validator
-    my $value = prompt "Enter an integer:", validate => { "not a number" => sub { /^\d+$/ } }
-
-    # Pass to menu();
-    my $value = prompt "Select your favorite animal:", menu => [qw(dog cat pig fish otter)];
-
-    # If you request a password, autodisable echo:
-    my $passwd = prompt "Password: ";  # sets noecho => 1, disables ReadLine history.
-
-See also: B<text_input>
-
-=head1 EXPORT
-
-This module uses L<Sub::Exporter> for flexible imports, the defaults provided by
-:all are as follows.
-
-=head2 Exported Functions
-
-    output  ( \%options, @messages )
-    verbose ( \%options, @messages )
-    debug   ( \%options, @messages )
-    debug_var ( \$var )
-    override( option => $value )
-
-    menu       ( "Question", \%Options or \@Options )
-    text_input ( "Question", validate => { "error message" => sub { length $_[0] } } )
-    confirm    ( "Question" )
-
-    prompt()    Wrapper which mimics IO::Prompt a bit
-    pwprompt()  Wrapper to get sensitive data
-
-=head2 Import Time Configurations
-
-It's possible to change the behavior of the import process.
-
-=over 2
-
-=item B<copy_argv>
-
-Instead of messing with C<@ARGV>, operate on a copy of C<@ARGV>.
-
-    use CLI::Helpers qw( :output copy_argv );
-
-=item B<preprocess_argv>
-
-This causes the C<@ARGV> processing to happen during the C<INIT> phase, after
-import but before runtime. This is usually OK for scripts, but for use in
-libraries, it may be undesirable.
-
-    use CLI::Helpers qw( :output preprocess_argv );
-
-=item B<delay_argv>
-
-This causes the C<@ARGV> processing to happen when the first call to a function
-needing it run, usually an C<output()> call. This is the default.
-
-    use CLI::Helpers qw( :output delay_argv );
-
-=back
-
-=head1 ARGS
-
-From CLI::Helpers:
-
-    --data-file         Path to a file to write lines tagged with 'data => 1'
-    --tags              A comma separated list of tags to display
-    --color             Boolean, enable/disable color, default use git settings
-    --verbose           Incremental, increase verbosity (Alias is -v)
-    --debug             Show developer output
-    --debug-class       Show debug messages originating from a specific package, default: main
-    --quiet             Show no output (for cron)
-    --syslog            Generate messages to syslog as well
-    --syslog-facility   Default "local0"
-    --syslog-tag        The program name, default is the script name
-    --syslog-debug      Enable debug messages to syslog if in use, default false
-    --nopaste           Use App::Nopaste to paste output to configured paste service
-    --nopaste-public    Defaults to false, specify to use public paste services
-    --nopaste-service   Comma-separated App::Nopaste service, defaults to Shadowcat
-
-=head1 NOPASTE
-
-This is optional and will only work if you have L<App::Nopaste> installed.  If
-you just specify C<--nopaste>, any output that would be displayed to the screen
-is submitted to the L<App::Nopaste::Service::Shadowcat> paste bin.  This
-paste service is pretty simple, but works reliably.
-
-During the C<END> block, the output is submitted and the URL of the paste is
-returned to the user.
 
 =head1 OUTPUT OPTIONS
 
@@ -1090,17 +970,259 @@ piping elsewhere.
 
 =back
 
+=head1 INPUT FUNCTIONS
+
+=head2 confirm("prompt")
+
+Exported.  Creates a Yes/No Prompt which accepts y/n or yes/no case insensitively
+but requires one or the other.
+
+Returns 1 for 'yes' and 0 for 'no'
+
+=head2 text_input("prompt", validate => { "too short" => sub { length $_ > 10 } })
+
+Exported.  Provides a prompt to the user for input.  If validate is passed, it should be a hash reference
+containing keys of error messages and values which are subroutines to validate the input available as $_.
+If a validator fails, it's error message will be displayed, and the user will be re-prompted.
+
+Valid options are:
+
+=over 4
+
+=item B<default>
+
+Any string which will be used as the default value if the user just presses enter.
+
+=item B<validate>
+
+A hashref, keys are error messages, values are sub routines that return true when the value meets the criteria.
+
+=item B<noecho>
+
+Set as a key with any value and the prompt will turn off echoing responses as well as disabling all
+ReadLine magic.  See also B<pwprompt>.
+
+=item B<clear_line>
+
+After prompting for and receiving input, remove that line from the terminal.
+This only works on interactive terminals, and is useful for things like
+password prompts.
+
+=back
+
+Returns the text that has passed all validators.
+
+=head2 menu("prompt", $ArrayOrHashRef)
+
+Exported.  Used to create a menu of options from a list.  Can be either a hash or array reference
+as the second argument.  In the case of a hash reference, the values will be displayed as options while
+the selected key is returned.  In the case of an array reference, each element in the list is displayed
+the selected element will be returned.
+
+Returns selected element (HashRef -> Key, ArrayRef -> The Element)
+
+=head2 pwprompt("Prompt", options )
+
+Exported.  Synonym for text_input("Password: ", noecho => 1);  Also requires the password to be longer than 0 characters.
+
+=head2 prompt("Prompt", options )
+
+Exported.  Wrapper function with rudimentary mimicry of IO::Prompt(er).
+Uses:
+
+    # Mapping back to confirm();
+    my $value = prompt "Are you sure?", yn => 1;
+
+    # Mapping back to text_input();
+    my $value = prompt "Enter something:";
+
+    # With Validator
+    my $value = prompt "Enter an integer:", validate => { "not a number" => sub { /^\d+$/ } }
+
+    # Pass to menu();
+    my $value = prompt "Select your favorite animal:", menu => [qw(dog cat pig fish otter)];
+
+    # If you request a password, autodisable echo:
+    my $passwd = prompt "Password: ";  # sets noecho => 1, disables ReadLine history.
+
+See also: B<text_input>
+
+=head1 OTHER FUNCTIONS
+
+=head2 cli_helpers_initialize()
+
+This is called automatically when C<preprocess_argv> is set. By default, it'll
+be run the first time a definition is needed, usually the first call to
+C<output()>.  If called automatically, it will operate on C<@ARGV>.  You can
+optionally pass an array reference to this function and it'll operate that
+instead.
+
+In most cases, you don't need to call this function directly.
+
+    #!perl
+    # Normal use from main package in a script
+    use v5.42;
+    use CLI::Helpers qw( :output );
+
+    ...
+    # CLI::Helpers has already stripped its args from @ARGV
+    my %opts = get_important_things_from(\@ARGV);
+
+    output("ready");
+
+This is the same as specifying C<preprocess_argv> from the C<main> package.
+
+    use CLI::Helpers qw( :output preprocess_argv );
+
+    ...
+    # Since CLI::Helpers opts are stripped from @ARGV,
+    #  Getopt::Long::Descriptive won't complain about extra args
+    my ($opt,$usage) = describe_option( ... );
+
+    # Now, let CLI::Helpers take the rest, implicit
+    #   call to cli_helpers_initialize()
+    output("ready");
+
+Or if you'd prefer not to touch C<@ARGV> at all, you pass in an array ref:
+
+    use CLI::Helpers qw( :output delay_argv );
+
+    my ($opt,$usage) = describe_option( ... );
+
+    cli_helpers_initialize([ qw( --verbose ) ]);
+
+    output("ready?");
+    verbose("you bet I am");
+
+=head2 options_description()
+
+Returns an array of arrayrefs to use with L<Getopt::Long::Descriptive>.
+
+    use CLI::Helpers qw( option_description );
+    use Getopt::Long::Descriptive qw( describe_options );
+
+    my ($opt,$usage) = describe_options("%c %o",
+        # Your opts here
+        options_description(),
+    );
+
+=head2 colorize( $color => 'message to be output' )
+
+Not exported by default.  Checks if color is enabled and applies
+the specified color to the string.
+
+=head2 git_color_check()
+
+Not exported by default.  Returns 1 if git is configured to output
+using color of 0 if color is not enabled.
+
+=head2 def($key)
+
+Not exported by default, returns the setting defined.
+
+=head2 override( variable => 1 )
+
+Exported.  Allows a block of code to override the debug or verbose level.  This
+can be used during development to enable/disable the DEBUG/VERBOSE settings.
+
+=head1 ARGS
+
+From CLI::Helpers:
+
+    --data-file         Path to a file to write lines tagged with 'data => 1'
+    --tags              A comma separated list of tags to display
+    --color             Boolean, enable/disable color, default use git settings
+    --verbose           Incremental, increase verbosity (Alias is -v)
+    --debug             Show developer output
+    --debug-class       Show debug messages originating from a specific package, default: main
+    --quiet             Show no output (for cron)
+    --syslog            Generate messages to syslog as well
+    --syslog-facility   Default "local0"
+    --syslog-tag        The program name, default is the script name
+    --syslog-debug      Enable debug messages to syslog if in use, default false
+    --nopaste           Use App::Nopaste to paste output to configured paste service
+    --nopaste-public    Defaults to false, specify to use public paste services
+    --nopaste-service   Comma-separated App::Nopaste service, defaults to Shadowcat
+
+=head1 EXAMPLE
+
+A simple example of how to use this module and what it does.
+
+=head2 Script
+
+    #!/usr/bin/env perl
+    use CLI::Helpers qw(:all);
+
+    output({color=>'green'}, "Hello, World!");
+    verbose({indent=>1,color=>'yellow'}, "Shiny, happy people!");
+    verbose({level=>2,kv=>1,color=>'red'}, a => 1, b => 2);
+    debug_var({ c => 3, d => 4});
+
+    # Data
+    output({data=>1}, join(',', qw(a b c d)));
+
+    # Wait for confirmation
+    die "ABORTING" unless confirm("Are you sure?");
+
+    # Ask for a number
+    my $integer = prompt "Enter an integer:", validate => { "not a number" => sub { /^\d+$/ } }
+
+    # Ask for next move
+    my %menu = (
+        north => "Go north.",
+        south => "Go south.",
+    );
+    my $dir = prompt "Where to, adventurous explorer?", menu => \%menu;
+
+    # Ask for a favorite animal
+    my $favorite = menu("Select your favorite animal:", [qw(dog cat pig fish otter)]);
+
+=head2 Usage
+
+    $ ./test.pl
+    Hello, World!
+    a,b,c,d
+    $ ./test.pl --verbose
+    Hello, World!
+      Shiny, Happy people!
+    a,b,c,d
+    $ ./test.pl -vv
+    Hello, World!
+      Shiny, Happy people!
+      a: 1
+      b: 2
+    a,b,c,d
+    $ ./test.pl --debug
+    Hello, World!
+      Shiny, Happy people!
+      a: 1
+      b: 2
+    ---
+    c: 3
+    d: 4
+    a,b,c,d
+
+    $ ./test.pl --data-file=output.csv
+    Hello, World!
+    a,b,c,d
+    $ cat output.csv
+    a,b,c,d
+
+Colors would be automatically enabled based on the user's ~/.gitconfig
+
+=head1 NOPASTE
+
+This is optional and will only work if you have L<App::Nopaste> installed.  If
+you just specify C<--nopaste>, any output that would be displayed to the screen
+is submitted to the L<App::Nopaste::Service::Shadowcat> paste bin.  This
+paste service is pretty simple, but works reliably.
+
+During the C<END> block, the output is submitted and the URL of the paste is
+returned to the user.
+
 =head1 AUTHOR
 
 Brad Lhotsky <brad@divisionbyzero.net>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2025 by Brad Lhotsky.
-
-This is free software, licensed under:
-
-  The (three-clause) BSD License
 
 =head1 CONTRIBUTORS
 
@@ -1143,13 +1265,25 @@ L<https://metacpan.org/release/CLI-Helpers>
 
 =item *
 
-RT: CPAN's Bug Tracker
+CPAN Testers
 
-The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
 
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=CLI-Helpers>
+L<http://www.cpantesters.org/distro/C/CLI-Helpers>
+
+=item *
+
+CPAN Testers Matrix
+
+The CPAN Testers Matrix is a website that provides a visual overview of the test results for a distribution on various Perls/platforms.
+
+L<http://matrix.cpantesters.org/?dist=CLI-Helpers>
 
 =back
+
+=head2 Bugs / Feature Requests
+
+This module uses the GitHub Issue Tracker: L<https://github.com/reyjrar/CLI-Helpers/issues>
 
 =head2 Source Code
 

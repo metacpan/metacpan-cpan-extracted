@@ -1,3 +1,17 @@
+libdbd-pg-async-perl (0.7.1) unstable; urgency=medium
+
+  * document pg_savepoints method
+
+ -- Rainer Weikusat <rweikusat@talktalk.net>  Fri, 18 Jul 2025 12:00:01 +0100
+
+libdbd-pg-async-perl (0.7) unstable; urgency=medium
+
+  * method for querying savepoints
+  * support for asynchronous savepoint handling when pg_use_async is true
+  * integrated upstream regdatabase changes
+
+ -- Rainer Weikusat <rweikusat@talktalk.net>  Thu, 17 Jul 2025 13:18:55 +0100
+
 libdbd-pg-async-perl (0.6) unstable; urgency=medium
 
   * pg_use_async dbh attribute to enable async everywhere where it's

@@ -27,6 +27,8 @@ PQsendPrepare instead of PQprepare for async statements.
 
 	- commit and rollback can be executed asynchronusly
 
+	- savepoint methods will use asynchronous mode if enabled
+
 Bug reports etc specifically about this code should probably rather be
 sent to me than to any other DBD::Pg address, especially including the
 principal author of most of the code (<greg@turnstep.com>).

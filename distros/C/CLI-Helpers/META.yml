@@ -12,7 +12,7 @@ build_requires:
   perl: '5.013002'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  perl: v5.10.0
+  perl: '5.013002'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010'
 license: bsd
@@ -42,9 +42,9 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
-  homepage: https://github.com/reyjrar/CLI-Helpers
-  repository: https://github.com/reyjrar/CLI-Helpers.git
-version: '2.1'
+  bugtracker: https://github.com/reyjrar/CLI-Helpers/issues
+  repository: git://github.com/reyjrar/CLI-Helpers.git
+version: '2.2'
 x_contributors:
   - 'Kang-min Liu <gugod@gugod.org>'
   - 'Kevin M. Goess <kgoess@craigslist.org>'

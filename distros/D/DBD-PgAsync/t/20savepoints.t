@@ -16,7 +16,7 @@ my $dbh = connect_database();
 if (! $dbh) {
     plan skip_all => 'Connection to database failed, cannot continue testing';
 }
-plan tests => 3;
+plan tests => 4;
 
 isnt ($dbh, undef, 'Connect to database for savepoint testing');
 
@@ -59,6 +59,13 @@ ok (eq_set($ids, [500, 502, 503, 504]), $t);
 
 $dbh->do('DELETE FROM dbd_pg_test');
 $dbh->commit();
+
+{
+    $t='Savepoints method works';
+    $dbh->pg_savepoint($_) for 'a' .. 'c';
+    my @sps = $dbh->pg_savepoints();
+    is_deeply (\@sps, [qw(a b c)], $t);
+}
 
 cleanup_database($dbh,'test');
 $dbh->disconnect();

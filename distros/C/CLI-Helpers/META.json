@@ -17,7 +17,7 @@
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
-            "perl" : "v5.10.0"
+            "perl" : "5.013002"
          }
       },
       "develop" : {
@@ -71,14 +71,16 @@
    },
    "release_status" : "stable",
    "resources" : {
-      "homepage" : "https://github.com/reyjrar/CLI-Helpers",
+      "bugtracker" : {
+         "web" : "https://github.com/reyjrar/CLI-Helpers/issues"
+      },
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/reyjrar/CLI-Helpers.git",
+         "url" : "git://github.com/reyjrar/CLI-Helpers.git",
          "web" : "https://github.com/reyjrar/CLI-Helpers"
       }
    },
-   "version" : "2.1",
+   "version" : "2.2",
    "x_contributors" : [
       "Kang-min Liu <gugod@gugod.org>",
       "Kevin M. Goess <kgoess@craigslist.org>",

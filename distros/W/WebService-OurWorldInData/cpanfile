@@ -2,9 +2,14 @@
 
 requires 'perl' => '5.012';
 
+requires 'HTTP::Tiny';
+requires 'IO::Socket::SSL';
+requires 'JSON';
 requires 'Moo';
 requires 'PerlX::Maybe';
 requires 'Types::Standard';
+
+recommends 'Text::CSV';
 
 on test => sub {
     requires 'Test2::V0';
@@ -12,7 +17,8 @@ on test => sub {
     requires 'Archive::Extract';
     requires 'LWP::UserAgent::Mockable';
     requires 'Time::Piece';
-    #requires 'Test2::Tools::Compare'        => '1.302196'; # number_gt available Apr 2023
+
+    suggests 'Archive::Zip';
 };
 
 on 'develop' => sub {

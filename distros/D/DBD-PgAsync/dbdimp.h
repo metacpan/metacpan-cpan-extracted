@@ -62,6 +62,11 @@ struct imp_dbh_st {
     imp_sth_t *do_tmp_sth;      /* temporary sth to refer inside a do() call */
     async_action_t *aa_first, **aa_pp; /* list of asynchronous actions which need to be done before pg_ready can return true */
     int       use_async;               /* use async operations for everything */
+
+    struct {
+        void (*cb)(int, imp_dbh_t *, void *);
+        void *arg;
+    } after_async;
 };
 
 /* Each statement is broken up into segments */
@@ -260,7 +265,7 @@ void pg_db_pg_server_untrace (SV *dbh);
 
 int pg_db_savepoint (SV *dbh, imp_dbh_t *imp_dbh, char * savepoint);
 
-int pg_db_rollback_to (SV *dbh, imp_dbh_t *imp_dbh, const char * savepoint);
+int pg_db_rollback_to (SV *dbh, imp_dbh_t *imp_dbh, char * savepoint);
 
 int pg_db_release (SV *dbh, imp_dbh_t *imp_dbh, char * savepoint);
 

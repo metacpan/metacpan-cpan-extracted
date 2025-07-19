@@ -159,6 +159,8 @@ constant(name=Nullch)
     PG_REGCOLLATIONARRAY              = 4192
     PG_REGCONFIG                      = 3734
     PG_REGCONFIGARRAY                 = 3735
+    PG_REGDATABASE                    = 8326
+    PG_REGDATABASEARRAY               = 8327
     PG_REGDICTIONARY                  = 3769
     PG_REGDICTIONARYARRAY             = 3770
     PG_REGNAMESPACE                   = 4089
@@ -462,6 +464,22 @@ pg_savepoint(dbh,name)
             warn("savepoint ineffective with AutoCommit enabled");
         ST(0) = (pg_db_savepoint(dbh, imp_dbh, name)!=0) ? &PL_sv_yes : &PL_sv_no;
 
+void
+pg_savepoints(dbh)
+    SV * dbh
+    PREINIT:
+        AV *sps;
+        SV **sps_a;
+        size_t a_len, ndx;
+    PPCODE:
+        D_imp_dbh(dbh);
+        sps = imp_dbh->savepoints;
+        a_len = av_count(sps);
+        if (!a_len) XSRETURN(0);
+        sps_a = AvARRAY(sps);
+        EXTEND(SP, a_len);
+        ndx = 0;
+        do PUSHs(sps_a[ndx]); while (++ndx < a_len);
 
 void
 pg_rollback_to(dbh,name)

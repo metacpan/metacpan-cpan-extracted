@@ -91,6 +91,16 @@ enum {
     AA_CANCELLED
 };
 
+enum {
+    TEMP_STH = 8
+};
+
+enum {
+    STMT_ERR,
+    STMT_SENT,
+    STMT_DONE
+};
+
 static void pg_error(pTHX_ SV *h, int error_num, const char *error_msg);
 static void pg_warn (void * arg, const char * message);
 static ExecStatusType _result(pTHX_ imp_dbh_t *imp_dbh, const char *sql);
@@ -105,7 +115,9 @@ static PGTransactionStatusType pg_db_txn_status (pTHX_ imp_dbh_t *imp_dbh);
 static int pg_db_start_txn (pTHX_ SV *dbh, imp_dbh_t *imp_dbh);
 static void pg_db_detect_client_encoding_utf8(pTHX_ imp_dbh_t *imp_dbh);
 
-static int send_prep(imp_dbh_t *imp_dbh);
+static int do_stmt(SV *dbh, char const *sql, int want_async,
+                   void (*after_query)(int, imp_dbh_t *, void *), void *arg,
+                   char *caller);
 
 /* ================================================================== */
 void dbd_init (dbistate_t *dbistate)
@@ -254,8 +266,8 @@ static int handle_async_action(SV *h, imp_dbh_t *imp_dbh, char *our_call)
         imp_sth = imp_dbh->async_sth;
         pq_call = send_async_query(imp_dbh, imp_sth);
 
-        if (!pq_call && 8 == imp_sth->async_flag){
-            if (TRACE5_slow) TRC(DBILOGFP, "%sFreeing quickexec temp sth\n", THEADER_slow);
+        if (!pq_call && TEMP_STH == imp_sth->async_flag){
+            if (TRACE5_slow) TRC(DBILOGFP, "%sFreeing temp sth\n", THEADER_slow);
 
             Safefree(imp_sth->statement);
             Safefree(imp_sth);
@@ -3410,23 +3422,18 @@ static void pg_db_detect_client_encoding_utf8(pTHX_ imp_dbh_t *imp_dbh) {
 }
 
 /* ================================================================== */
-long pg_quickexec (SV * dbh, const char * sql, const int asyncflag)
+static int do_stmt(SV *dbh, char const *sql, int want_async,
+                   void (*after_query)(int, imp_dbh_t *, void *), void *arg,
+                   char *caller)
 {
     dTHX;
     D_imp_dbh(dbh);
-    ExecStatusType          status = PGRES_FATAL_ERROR; /* Assume the worst */
-    PGTransactionStatusType txn_status;
-    char *                  cmdStatus = NULL;
-    long                    rows = 0;
-    imp_sth_t *             sth;
-    int                     want_begin;
-
-    if (TSTART_slow) TRC(DBILOGFP, "%sBegin pg_quickexec (query: %s async: %d async_status: %d)\n",
-            THEADER_slow, sql, asyncflag, imp_dbh->async_status);
+    imp_sth_t *sth;
+    int want_begin, status;
 
     if (NULL == imp_dbh->conn) {
         pg_error(aTHX_ dbh, PGRES_FATAL_ERROR, "Database handle has been disconnected");
-        return -2;
+        return STMT_ERR;
     }
 
     /* Abort if we are in the middle of a copy */
@@ -3454,15 +3461,15 @@ long pg_quickexec (SV * dbh, const char * sql, const int asyncflag)
     /* If not autocommit, start a new transaction */
     want_begin = 0;
     if (!imp_dbh->done_begin && !DBIc_has(imp_dbh, DBIcf_AutoCommit)) {
-        if (asyncflag & PG_ASYNC)
+        if (want_async)
             want_begin = 1;
         else {
             status = _result(aTHX_ imp_dbh, "begin");
             if (PGRES_COMMAND_OK != status) {
                 TRACE_PQERRORMESSAGE;
                 pg_error(aTHX_ dbh, status, PQerrorMessage(imp_dbh->conn));
-                if (TEND_slow) TRC(DBILOGFP, "%sEnd pg_quickexec (error: begin failed)\n", THEADER_slow);
-                return -2;
+                if (TEND_slow) TRC(DBILOGFP, "%sEnd %s (error: begin failed)\n", caller, THEADER_slow);
+                return STMT_ERR;
             }
             imp_dbh->done_begin = DBDPG_TRUE;
             /* If read-only mode, make it so */
@@ -3471,21 +3478,17 @@ long pg_quickexec (SV * dbh, const char * sql, const int asyncflag)
                 if (PGRES_COMMAND_OK != status) {
                     TRACE_PQERRORMESSAGE;
                     pg_error(aTHX_ dbh, status, PQerrorMessage(imp_dbh->conn));
-                    if (TEND_slow) TRC(DBILOGFP, "%sEnd pg_quickexec (error: set transaction read only failed)\n", THEADER_slow);
-                    return -2;
+                    if (TEND_slow) TRC(DBILOGFP, "%sEnd %s (error: set transaction read only failed)\n",
+                                       caller, THEADER_slow);
+                    return STMT_ERR;
                 }
             }
         }
     }
 
-    /*
-      We want txn mode if AutoCommit
-     */
-
-
     /* Asynchronous commands get kicked off and return undef */
-    if (asyncflag & PG_ASYNC) {
-        if (TRACE4_slow) TRC(DBILOGFP, "%sGoing asychronous with do()\n", THEADER_slow);
+    if (want_async) {
+        if (TRACE4_slow) TRC(DBILOGFP, "%sGoing asychronous with %s\n", THEADER_slow, caller);
         if (want_begin) {
             aa_send_query(imp_dbh, "begin");
             add_async_action(NULL, NULL, aa_after_begin, imp_dbh);
@@ -3506,19 +3509,19 @@ long pg_quickexec (SV * dbh, const char * sql, const int asyncflag)
 
                 TRACE_PQERRORMESSAGE;
                 pg_error(aTHX_ dbh, status, PQerrorMessage(imp_dbh->conn));
-                if (TEND_slow) TRC(DBILOGFP, "%sEnd pg_quickexec (error: async do failed)\n", THEADER_slow);
-                return -2;
+                if (TEND_slow) TRC(DBILOGFP, "%sEnd %s (error: PQsendQuery failed)\n",
+                                   THEADER_slow, caller);
+                return STMT_ERR;
             }
         }
 
         imp_dbh->async_status = DBH_ASYNC;
+        imp_dbh->after_async.cb = after_query;
+        imp_dbh->after_async.arg = arg;
 
-        if (TEND_slow) TRC(DBILOGFP, "%sEnd pg_quickexec (async)\n", THEADER_slow);
-        return 0;
+        if (TEND_slow) TRC(DBILOGFP, "%sEnd %s (async)\n", THEADER_slow, caller);
+        return STMT_SENT;
     }
-
-    if (TSQL) TRC(DBILOGFP, "%s;\n\n", sql);
-
 
     /* Free the last_result as needed, as we are about to replace it */
     if (imp_dbh->last_result && imp_dbh->result_clearable) {
@@ -3530,9 +3533,48 @@ long pg_quickexec (SV * dbh, const char * sql, const int asyncflag)
         imp_dbh->last_result = NULL;
     }
 
+    if (TSQL) TRC(DBILOGFP, "%s;\n\n", sql);
+
     TRACE_PQEXEC;
     imp_dbh->last_result = PQexec(imp_dbh->conn, sql);
     imp_dbh->result_clearable = DBDPG_TRUE;
+
+    if (after_query)
+        switch (PQresultStatus(imp_dbh->last_result)) {
+        case PGRES_BAD_RESPONSE:
+        case PGRES_FATAL_ERROR:
+            after_query(0, imp_dbh, arg);
+            break;
+
+        default:
+            after_query(1, imp_dbh, arg);
+        }
+
+    return STMT_DONE;
+}
+
+long pg_quickexec (SV * dbh, const char * sql, const int asyncflag)
+{
+    dTHX;
+    D_imp_dbh(dbh);
+    ExecStatusType          status = PGRES_FATAL_ERROR; /* Assume the worst */
+    PGTransactionStatusType txn_status;
+    char *                  cmdStatus = NULL;
+    long                    rows = 0;
+    int                     rc;
+
+    if (TSTART_slow) TRC(DBILOGFP, "%sBegin pg_quickexec (query: %s async: %d async_status: %d)\n",
+            THEADER_slow, sql, asyncflag, imp_dbh->async_status);
+
+    rc = do_stmt(dbh, sql, asyncflag, NULL, NULL, "pg_quickexec");
+    switch (rc) {
+    case STMT_ERR:
+        return -2;
+
+    case STMT_SENT:
+        return 0;
+    }
+
     status = _sqlstate(aTHX_ imp_dbh, imp_dbh->last_result);
 
     imp_dbh->copystate = 0; /* Assume not in copy mode until told otherwise */
@@ -5103,13 +5145,16 @@ void pg_db_pg_server_untrace (SV * dbh)
 
 
 /* ================================================================== */
-int pg_db_savepoint (SV * dbh, imp_dbh_t * imp_dbh, char * savepoint)
+static int savepoint_action(SV * dbh, imp_dbh_t * imp_dbh, char *cmd, char *savepoint,
+                            void (*done)(int, imp_dbh_t *, void *), char *caller)
 {
     dTHX;
-    int    status;
-    char * action;
+    unsigned need;
+    int    rc;
+    char *action;
 
-    if (TSTART_slow) TRC(DBILOGFP, "%sBegin pg_db_savepoint (name: %s)\n", THEADER_slow, savepoint);
+    if (TSTART_slow) TRC(DBILOGFP, "%sBegin %s (name: %s)\n",
+                         THEADER_slow, caller, savepoint);
 
     /* no action if AutoCommit = on or the connection is invalid */
     if ((NULL == imp_dbh->conn) || (DBIc_has(imp_dbh, DBIcf_AutoCommit))) {
@@ -5117,104 +5162,109 @@ int pg_db_savepoint (SV * dbh, imp_dbh_t * imp_dbh, char * savepoint)
         return 0;
     }
 
-    /* Start a new transaction if this is the first command */
-    if (!imp_dbh->done_begin) {
-        status = _result(aTHX_ imp_dbh, "begin");
-        if (PGRES_COMMAND_OK != status) {
-            TRACE_PQERRORMESSAGE;
-            pg_error(aTHX_ dbh, status, PQerrorMessage(imp_dbh->conn));
-            if (TEND_slow) TRC(DBILOGFP, "%sEnd pg_db_savepoint (error: status not OK for begin)\n", THEADER_slow);
-            return -2;
+    savepoint = savepv(savepoint);
+    need = strlen(cmd) + strlen(savepoint) + 2;
+    action = alloca(need);
+    sprintf(action, "%s %s", cmd, savepoint);
+    rc = do_stmt(dbh, action, imp_dbh->use_async, done, savepoint,
+                 caller);
+    switch (rc) {
+    case STMT_ERR:
+        return 0;
+
+    case STMT_SENT:
+        return 1;
+    }
+
+    rc = _sqlstate(aTHX_ imp_dbh, imp_dbh->last_result);
+    if (PGRES_COMMAND_OK != rc) {
+        TRACE_PQERRORMESSAGE;
+        pg_error(aTHX_ dbh, rc, PQerrorMessage(imp_dbh->conn));
+        if (TEND_slow) TRC(DBILOGFP, "%sEnd %s (error: status not OK)\n", THEADER_slow, caller);
+        return 0;
+    }
+
+    if (TEND_slow) TRC(DBILOGFP, "%sEnd %s\n", THEADER_slow, caller);
+    return 1;
+}
+
+static void after_savepoint(int success, imp_dbh_t *imp_dbh, void *arg)
+{
+    dTHX;
+
+    if (success) av_push(imp_dbh->savepoints, newSVpv(arg, 0));
+    safefree(arg);
+}
+
+int pg_db_savepoint (SV * dbh, imp_dbh_t * imp_dbh, char * savepoint)
+{
+    return savepoint_action(dbh, imp_dbh, "savepoint", savepoint,
+                            after_savepoint, "pg_db_savepoint");
+}
+
+static int have_savepoint(imp_dbh_t *imp_dbh, char const *savepoint)
+{
+    dTHX;
+    SV **sps;
+    char *sp;
+    size_t ndx;
+
+    if (TRACE5_slow) TRC(DBILOGFP, "%sLooking for savepoint %s ... ",
+                         THEADER_slow, savepoint);
+
+    ndx = av_count(imp_dbh->savepoints);
+    sps = AvARRAY(imp_dbh->savepoints);
+    while (ndx) {
+        --ndx;
+        sp = SvPV_nolen(sps[ndx]);
+
+        if (strcmp(sp, savepoint) == 0) {
+            if (TRACE5_slow) TRC(DBILOGFP, "found\n");
+            return 1;
         }
-        imp_dbh->done_begin = DBDPG_TRUE;
     }
 
-    New(0, action, strlen(savepoint) + 11, char); /* freed below */
-    sprintf(action, "savepoint %s", savepoint);
-    status = _result(aTHX_ imp_dbh, action);
-    Safefree(action);
-
-    if (PGRES_COMMAND_OK != status) {
-        TRACE_PQERRORMESSAGE;
-        pg_error(aTHX_ dbh, status, PQerrorMessage(imp_dbh->conn));
-        if (TEND_slow) TRC(DBILOGFP, "%sEnd pg_db_savepoint (error: status not OK for savepoint)\n", THEADER_slow);
-        return 0;
-    }
-
-    av_push(imp_dbh->savepoints, newSVpv(savepoint,0));
-    if (TEND_slow) TRC(DBILOGFP, "%sEnd pg_db_savepoint\n", THEADER_slow);
-    return 1;
-
-} /* end of pg_db_savepoint */
+    if (TRACE5_slow) TRC(DBILOGFP, "not found\n");
+    return 0;
+}
 
 
 /* ================================================================== */
-int pg_db_rollback_to (SV * dbh, imp_dbh_t * imp_dbh, const char *savepoint)
+static void after_release(int success, imp_dbh_t *imp_dbh, void *arg)
 {
     dTHX;
-    int    status;
-    char * action;
 
-    if (TSTART_slow) TRC(DBILOGFP, "%sBegin pg_db_rollback_to (name: %s)\n", THEADER_slow, savepoint);
+    if (success) pg_db_free_savepoints_to(aTHX_ imp_dbh, arg);
+    safefree(arg);
+}
 
-    /* no action if AutoCommit = on or the connection is invalid */
-    if ((NULL == imp_dbh->conn) || (DBIc_has(imp_dbh, DBIcf_AutoCommit))) {
-        if (TEND_slow) TRC(DBILOGFP, "%sEnd pg_db_rollback_to (0)\n", THEADER_slow);
-        return 0;
-    }
-
-    New(0, action, strlen(savepoint) + 13, char);
-    sprintf(action, "rollback to %s", savepoint);
-    status = _result(aTHX_ imp_dbh, action);
-    Safefree(action);
-
-    if (PGRES_COMMAND_OK != status) {
-        TRACE_PQERRORMESSAGE;
-        pg_error(aTHX_ dbh, status, PQerrorMessage(imp_dbh->conn));
-        if (TEND_slow) TRC(DBILOGFP, "%sEnd pg_db_rollback_to (error: status not OK for rollback)\n", THEADER_slow);
-        return 0;
-    }
-
-    pg_db_free_savepoints_to(aTHX_ imp_dbh, savepoint);
-    if (TEND_slow) TRC(DBILOGFP, "%sEnd pg_db_rollback_to\n", THEADER_slow);
-    return 1;
-
-} /* end of pg_db_rollback_to */
-
-
-/* ================================================================== */
-int pg_db_release (SV * dbh, imp_dbh_t * imp_dbh, char * savepoint)
+int pg_db_rollback_to(SV * dbh, imp_dbh_t * imp_dbh, char *savepoint)
 {
     dTHX;
-    int    status;
-    char * action;
 
-    if (TSTART_slow) TRC(DBILOGFP, "%sBegin pg_db_release (name: %s)\n", THEADER_slow, savepoint);
-
-    /* no action if AutoCommit = on or the connection is invalid */
-    if ((NULL == imp_dbh->conn) || (DBIc_has(imp_dbh, DBIcf_AutoCommit))) {
-        if (TEND_slow) TRC(DBILOGFP, "%sEnd pg_db_release (0)\n", THEADER_slow);
+    if (!have_savepoint(imp_dbh, savepoint)) {
+        if (TEND_slow) TRC(DBILOGFP, "%sEnd pg_db_rollback_to (%s not found)\n",
+                           THEADER_slow, savepoint);
         return 0;
     }
 
-    New(0, action, strlen(savepoint) + 9, char);
-    sprintf(action, "release %s", savepoint);
-    status = _result(aTHX_ imp_dbh, action);
-    Safefree(action);
+    return savepoint_action(dbh, imp_dbh, "rollback to", savepoint,
+                            after_release, "pg_db_rollback_to");
+}
 
-    if (PGRES_COMMAND_OK != status) {
-        TRACE_PQERRORMESSAGE;
-        pg_error(aTHX_ dbh, status, PQerrorMessage(imp_dbh->conn));
-        if (TEND_slow) TRC(DBILOGFP, "%sEnd pg_db_release (error: status not OK for release)\n", THEADER_slow);
+int pg_db_release(SV * dbh, imp_dbh_t * imp_dbh, char *savepoint)
+{
+    dTHX;
+
+    if (!have_savepoint(imp_dbh, savepoint)) {
+        if (TEND_slow) TRC(DBILOGFP, "%sEnd pg_db_release (%s not found)\n",
+                           THEADER_slow, savepoint);
         return 0;
     }
 
-    pg_db_free_savepoints_to(aTHX_ imp_dbh, savepoint);
-    if (TEND_slow) TRC(DBILOGFP, "%sEnd pg_db_release\n", THEADER_slow);
-    return 1;
-
-} /* end of pg_db_release */
-
+    return savepoint_action(dbh, imp_dbh, "release", savepoint,
+                            after_release, "pg_db_release");
+}
 
 /* ================================================================== */
 /* 
@@ -5714,6 +5764,8 @@ long pg_db_result (SV *h, imp_dbh_t *imp_dbh)
     long rows = 0;
     char *cmdStatus = NULL;
     imp_sth_t *imp_sth;
+    void (*after_async)(int, imp_dbh_t *, void *);
+    void *arg;
 
     if (TSTART_slow) TRC(DBILOGFP, "%sBegin pg_db_result\n", THEADER_slow);
 
@@ -5865,6 +5917,15 @@ long pg_db_result (SV *h, imp_dbh_t *imp_dbh)
         imp_dbh->async_sth->async_status = STH_NO_ASYNC;
     }
     imp_dbh->async_status = DBH_NO_ASYNC;
+
+    after_async = imp_dbh->after_async.cb;
+    if (after_async) {
+        imp_dbh->after_async.cb = NULL;
+        arg = imp_dbh->after_async.arg;
+        imp_dbh->after_async.arg = NULL;
+
+        after_async(rows >= 0, imp_dbh, arg);
+    }
 
     if (TEND_slow) TRC(DBILOGFP, "%sEnd pg_db_result (rows: %ld)\n", THEADER_slow, rows);
     return rows;

@@ -33,7 +33,7 @@ resources:
   bugtracker: https://github.com/ingydotnet/yamlscript/issues
   homepage: https://github.com/ingydotnet/yamlscript
   repository: https://github.com/ingydotnet/yamlscript.git
-version: 0.2.1
+version: 0.2.2
 x_alienfile:
   generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.32'
   requires:
