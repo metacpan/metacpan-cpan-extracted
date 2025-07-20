@@ -24,9 +24,9 @@ use Test::More 0.96;
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
 use Test::Deep; # import symbols: ignore, re etc
 use JSON::Schema::Modern::Document::OpenAPI;
+use JSON::Schema::Modern::Utilities qw(true false);
 use OpenAPI::Modern;
 use Test::File::ShareDir -share => { -dist => { 'OpenAPI-Modern' => 'share' } };
-use constant { true => JSON::PP::true, false => JSON::PP::false };
 use YAML::PP 0.005;
 
 use constant DEFAULT_DIALECT => JSON::Schema::Modern::Document::OpenAPI::DEFAULT_DIALECT;

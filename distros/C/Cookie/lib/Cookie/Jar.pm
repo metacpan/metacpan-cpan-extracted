@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Cookies API for Server & Client - ~/lib/Cookie/Jar.pm
-## Version v0.3.2
-## Copyright(c) 2023 DEGUEST Pte. Ltd.
+## Version v0.3.3
+## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/10/08
-## Modified 2025/04/20
+## Modified 2025/07/19
 ## You can use, copy, modify and  redistribute  this  package  and  associated
 ## files under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
@@ -38,7 +38,7 @@ BEGIN
     use Module::Generic::HeaderValue;
     use Scalar::Util;
     use URI::Escape ();
-    our $VERSION = 'v0.3.2';
+    our $VERSION = 'v0.3.3';
     # This flag to allow extensive debug message to be enabled
     our $COOKIES_DEBUG = 0;
     use constant CRYPTX_VERSION => '0.074';
@@ -358,7 +358,7 @@ sub delete
                 if( CORE::exists( $idx->{ $key } ) )
                 {
                     # if( !$self->_is_array( $idx->{ $key } ) )
-                    if( !Scalar::Util::reftype( $idx->{ $key } ) eq 'ARRAY' )
+                    if( Scalar::Util::reftype( $idx->{ $key } ) ne 'ARRAY' )
                     {
                         return( $self->error( "I was expecting an array for key '$key', but got '", overload::StrVal( $idx->{ $key } // 'undef' ), "' (", ref( $idx->{ $key } ), ")" ) );
                     }
@@ -2419,7 +2419,7 @@ Cookie::Jar - Cookie Jar Class for Server & Client
 
 =head1 VERSION
 
-    v0.3.2
+    v0.3.3
 
 =head1 DESCRIPTION
 

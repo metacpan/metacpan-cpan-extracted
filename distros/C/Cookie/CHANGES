@@ -1,5 +1,8 @@
 Revision history for Perl module Cookie
 
+v0.3.7 2025-07-19T19:58:29+0900
+    - Corrected a poor syntax in Cookie::Jar in method delete(). Gitlab issue #3 (thanks to Lukas Mai).
+
 v0.3.6 2025-04-20T16:15:26+0900
     - Corrected a bug in method 'load_as_mozilla'
 

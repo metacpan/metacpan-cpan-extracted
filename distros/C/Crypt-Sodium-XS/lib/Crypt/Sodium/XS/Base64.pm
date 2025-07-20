@@ -61,13 +61,17 @@ No real advantage over L<MIME::Base64>. Stops parsing at any invalid base64
 bytes. C<$bytes> will be empty if C<$string> could not be validly interpreted
 as base64 (i.e., if the output would not be a multiple of 8 bits).
 
+Returns the base64 decoded bytes.
+
 =head2 sodium_bin2base64
 
   my $string = sodium_bin2base64($bytes);
   my $string = sodium_bin2base64($bytes, $variant);
 
-No real advantage over L<MIME::Base64>. For C<$variant>, see L</BASE64
-CONSTANTS>. The default is L</BASE64_VARIANT_URLSAFE_NO_PADDING>.
+C<$variant> is optional. See L</BASE64 CONSTANTS>. If not provided, the default
+is L</BASE64_VARIANT_URLSAFE_NO_PADDING>.
+
+Returns the base64 encoded string.
 
 =head1 CONSTANTS
 

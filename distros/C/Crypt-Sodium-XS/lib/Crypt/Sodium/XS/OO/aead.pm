@@ -136,7 +136,7 @@ Crypt::Sodium::XS::OO::aead - Authenticated encryption with additional data
   my $nonce = $aead->nonce;
   my $msg = "hello";
 
-  # combined mode, mac and ciphertext combined
+  # combined mode, authentication tag and ciphertext combined
 
   my $ciphtertext = $aead->encrypt($msg, $nonce, $key);
   my $plaintext = $aead->decrypt($ciphertext, $nonce, $key);
@@ -150,14 +150,14 @@ Crypt::Sodium::XS::OO::aead - Authenticated encryption with additional data
   $plaintext = $aead->decrypt($ciphertext, $nonce, $key, $adata);
   # $plaintext eq $msg and $adata is authentic
 
-  # detached mode, mac and ciphertext separate
+  # detached mode, authentication tag and ciphertext separate
 
   $nonce = sodium_increment($nonce);
 
-  my ($ciphtertext, $mac)
+  my ($ciphtertext, $tag)
     = $aead->encrypt_detached($msg, $nonce, $key, $adata);
   my $plaintext
-    = $aead->decrypt($ciphertext, $mac, $nonce, $key, $adata);
+    = $aead->decrypt($ciphertext, $tag, $nonce, $key, $adata);
   # $plaintext eq $msg and $adata is authentic
 
 =head1 DESCRIPTION
@@ -165,25 +165,28 @@ Crypt::Sodium::XS::OO::aead - Authenticated encryption with additional data
 L<Crypt::Sodium::XS::OO::aead> encrypts a message with a key and a nonce to
 keep it confidential.
 
-L<Crypt::Sodium::XS::OO::aead> computes an authentication MAC. This MAC is used
+L<Crypt::Sodium::XS::OO::aead> computes an authentication tag. This tag is used
 to make sure that the message, as well as optional, non-confidential
 (non-encrypted) data haven't been tampered with.
 
 These functions accept an optional, arbitrary long "additional data" (C<$adata>
 below) parameter. These data are not present in the ciphertext, but are mixed
-in the computation of the authentication MAC. A typical use for these data is
+in the computation of the authentication tag. A typical use for these data is
 to authenticate version numbers, timestamps or monotonically increasing
 counters in order to discard previous messages and prevent replay attacks. It
 can also be used to to authenticate protocol-specific metadata about the
 message, such as its length and encoding, or other arbitrary non-confidential
-headers.
+headers. The additional data must then be provided to the decryption functions
+(as C<$adata>) to successfully decrypt.
 
 =head1 CONSTRUCTOR
 
 =head2 new
 
-  my $aead = Crypt::Sodium::XS::OO::aead->new(primitive => 'xchacha20poly1305_ietf');
-  my $aead = Crypt::Sodium::XS->aead(primitive => 'xchacha20poly1305_ietf');
+  my $aead
+    = Crypt::Sodium::XS::OO::aead->new(primitive => 'xchacha20poly1305_ietf');
+  my $aead
+    = Crypt::Sodium::XS->aead(primitive => 'xchacha20poly1305_ietf');
 
 Returns a new aead object for the given primitive. The primitive argument is
 required.
@@ -195,55 +198,64 @@ required.
   my $primitive = $aead->primitive;
   $aead->primitive('aegis256');
 
-The primitive used for all operations by this object.
+Gets or sets the primitive used for all operations by this object. For this
+module, the returned primitive is always identical to L</PRIMITIVE>.
 
 =head1 METHODS
+
+=head2 aes256gcm_available
+
+  my $has_aes256gcm = Crypt::Sodium::XS::OO::aead->aes256gcm_available;
+  my $has_aes256gcm = $aead->aes256gcm_available;
+
+Returns true if the current environment supports the C<aes256gcm> primitive,
+false otherwise.
+
+Can be called as a class method.
+
+=head2 aegis_available
+
+  my $has_aegis = Crypt::Sodium::XS::OO::aead->aegis_available;
+  my $has_aegis = $aead->aegis_available;
+
+Returns true if L<Crypt::Sodium::XS> supports AEGIS primitives, false
+otherwise. AEGIS will only be supported if L<Crypt::Sodium::XS> was built with
+a new enough version of libsodium headers. A newer dynamic library at runtime
+will not enable support.
+
+Can be called as a class method.
+
+=head2 primitives
+
+  my @primitives = Crypt::Sodium::XS::OO::aead->primitives
+  my @primitives = $aead->primitives
+
+Returns a list of all supported primitive names.
+
+Can be called as a class method.
 
 =head2 PRIMITIVE
 
   my $primitive = $aead->PRIMITIVE;
 
-=head2 ABYTES
-
-  my $additional_data_length = $aead->ABYTES;
-
-This is not a restriction on the amount of additional data, it is the size of
-the ciphertext MAC.
-
-=head2 KEYBYTES
-
-  my $key_length = $aead->KEYBYTES;
-
-=head2 MESSAGEBYTES_MAX
-
-  my $message_max_length = $aead->MESSAGEBYTES_MAX;
-
-=head2 NPUBBYTES
-
-  my $nonce_length = $aead->NPUBBYTES;
-
-=head2 primitives
-
-  my @primitives = $aead->primitives
-
-Returns a list of all supported primitive names.
-
-=head2 aes256gcm_available
-
-  my $has_aes256gcm = $aead->aes256gcm_available;
-
-=head2 aegis_available
-
-  my $has_aes256gcm = $aead->aegis_available;
+Returns the primitive used for all operations by this object. For this module,
+always identical to the L</primitive> attribute.
 
 =head2 beforenm
 
-** available only for the aes256gcm primitive! **
+  my $precalc = $aead->beforenm($key, $flags);
 
-  my $precalc = $aead->beforenm($key);
+B<Note>: Available for the aes256gcm primitive only.
 
-Returns a precalculation aead object. This is useful when performing many
-operations with the same key. See L</PRECALCULATION INTERFACE>.
+C<$key> is the secret key used by the precalculation object. It must be
+L</KEYBYTES> bytes. It may be a L<Crypt::Sodium::XS::MemVault>.
+
+C<$flags> is optional. It is the flags used for the precalculation protected
+memory object. See L<Crypt::Sodium::XS::ProtMem>.
+
+Returns an opaque protected memory object: a precalculation aead object. This
+is useful when performing many operations with the same key. See
+L</PRECALCULATION INTERFACE>.
 
 =head2 decrypt
 
@@ -251,50 +263,130 @@ operations with the same key. See L</PRECALCULATION INTERFACE>.
 
 Croaks on decryption failure.
 
+C<$ciphertext> is the combined ciphertext to decrypt.
+
+C<$nonce> is the nonce used to encrypt the ciphertext. It must be L</NPUBBYTES>
+bytes.
+
+C<$key> is the secret key used to encrypt the ciphertext. It must be
+L</KEYBYTES> bytes. It may be a L<Crypt::Sodium::XS::MemVault>.
+
 C<$adata> is optional. See notes in L</DESCRIPTION>.
 
 C<$flags> is optional. It is the flags used for the C<$plaintext>
-L<Crypt::Sodium::XS::MemVault> object. See L<Crypt::Sodium::XS/MEMORY SAFETY>.
+L<Crypt::Sodium::XS::MemVault>. See L<Crypt::Sodium::XS::ProtMem>.
+
+Returns a L<Crypt::Sodium::XS::MemVault>: the decrypted plaintext.
 
 =head2 decrypt_detached
 
   my $plaintext
-    = $aead->decrypt_detached($ciphertext, $mac, $nonce, $key, $adata, $flags);
+    = $aead->decrypt_detached($ciphertext, $tag, $nonce, $key, $adata, $flags);
 
 Croaks on decryption failure.
+
+C<$ciphertext> is the detached ciphertext to decrypt.
+
+C<$tag> is the ciphertext's authentication tag. It must be L</ABYTES> bytes.
+
+C<$nonce> is the nonce used to encrypt the ciphertext.
+
+C<$key> is the secret key used to encrypt the ciphertext. It must be
+L</KEYBYTES> bytes. It may be a L<Crypt::Sodium::XS::MemVault>.
 
 C<$adata> is optional. See notes in L</DESCRIPTION>.
 
 C<$flags> is optional. It is the flags used for the C<$plaintext>
-L<Crypt::Sodium::XS::MemVault> object. See L<Crypt::Sodium::XS/MEMORY SAFETY>.
+L<Crypt::Sodium::XS::MemVault>. See L<Crypt::Sodium::XS::Protmem>.
+
+Returns a L<Crypt::Sodium::XS::MemVault>: the decrypted plaintext.
 
 =head2 encrypt
 
   my $ciphertext = $aead->encrypt($plaintext, $nonce, $key, $adata);
 
+C<$plaintext> is the plaintext to encrypt. It may be a
+L<Crypt::Sodium::XS::MemVault>.
+
+C<$nonce> is the nonce used to encrypt the ciphertext. It must be L</NPUBBYTES>
+bytes.
+
+C<$key> is the secret key used to encrypt the ciphertext. It must be
+L</KEYBYTES> bytes. It may be a L<Crypt::Sodium::XS::MemVault>.
+
 C<$adata> is optional. See notes in L</DESCRIPTION>.
+
+Returns the combined encrypted ciphertext.
 
 =head2 encrypt_detached
 
-  my ($ciphertext, $mac)
+  my ($ciphertext, $tag)
     = $aead->encrypt_detached($plaintext, $nonce, $key, $adata);
+
+C<$plaintext> is the plaintext to encrypt.
+
+C<$nonce> is the nonce used to encrypt the ciphertext. It must be L</NPUBBYTES>
+bytes.
+
+C<$key> is the secret key used to encrypt the ciphertext. It must be
+L</KEYBYTES> bytes. It may be a L<Crypt::Sodium::XS::MemVault>.
 
 C<$adata> is optional. See notes in L</DESCRIPTION>.
 
+Returns the detached encrypted ciphertext and its authentication tag.
+
 =head2 keygen
 
-  my $key = $aead->keygen;
+  my $key = $aead->keygen($flags);
+
+C<$flags> is optional. It is the flags used for the C<$key>
+L<Crypt::Sodium::XS::MemVault>. See L<Crypt::Sodium::XS::ProtMem>.
+
+Returns a L<Crypt::Sodium::XS::MemVault>: a new secret key of L</KEYBYTES>
+bytes.
 
 =head2 nonce
 
-  my $nonce = $aead->nonce;
+  my $nonce = $aead->nonce($base);
 
-B<NOTE>: This function provides a random nonce of the correct size for the
-given primitive. chacha20poly1305 and aes256gcm should *not* be used with only
-random nonces, as they have a short nonce and collisions are a risk. For those
+C<$base> is optional. It must be less than or equal to L</NPUBBYTES> bytes. If
+not provided, the nonce will be random.
+
+Returns a nonce of L</NPUBBYTES> bytes.
+
+B<NOTE>: chacha20poly1305 and aes256gcm should *not* be used with only random
+nonces, as they have a short nonce and collisions are a risk. For those
 primitives, you can still generate a random nonce with this function, but you
 should then use L<Crypt::Sodium::XS/sodium_increment> to get a new nonce for
 each message.
+
+=head2 ABYTES
+
+  my $tag_size = $aead->ABYTES;
+
+Returns the size, in bytes, of the authentication tag. Note that this is B<not>
+a size restriction on the amount of additional data (adata).
+
+The size of any combined (not detached) ciphertext is message size +
+L</ABYTES>.
+
+=head2 KEYBYTES
+
+  my $key_size = $aead->KEYBYTES;
+
+Returns the size, in bytes, of a secret key.
+
+=head2 MESSAGEBYTES_MAX
+
+  my $message_max_size = $aead->MESSAGEBYTES_MAX;
+
+Returns the size, in bytes, of the maximum size of any message to be encrypted.
+
+=head2 NPUBBYTES
+
+  my $nonce_size = $aead->NPUBBYTES;
+
+Returns the size, in bytes, of a nonce.
 
 =head1 PRECALCULATION INTERFACE
 
@@ -314,40 +406,85 @@ is an opaque object which provides the following methods:
 
 Croaks on decryption failure.
 
+C<$ciphertext> is the detached ciphertext to decrypt.
+
+C<$tag> is the ciphertext's authentication tag. It must be L</ABYTES> bytes.
+
+C<$nonce> is the nonce used to encrypt the ciphertext.
+
+C<$key> is the secret key used to encrypt the ciphertext. It must be
+L</KEYBYTES> bytes. It may be a L<Crypt::Sodium::XS::MemVault>.
+
 C<$adata> is optional. See notes in L</DESCRIPTION>.
 
 C<$flags> is optional. It is the flags used for the C<$plaintext>
-L<Crypt::Sodium::XS::MemVault> object. See L<Crypt::Sodium::XS/MEMORY SAFETY>.
+L<Crypt::Sodium::XS::MemVault>. See L<Crypt::Sodium::XS::ProtMem>.
+
+Returns a L<Crypt::Sodium::XS::MemVault>: the decrypted plaintext.
 
 =item decrypt_detached
 
-  my $plaintext = $precalc->decrypt($ciphertext, $mac, $nonce, $adata, $flags);
+  my $plaintext
+    = $precalc->decrypt_detached($ciphertext, $tag, $nonce, $adata, $flags);
 
 Croaks on decryption failure.
+
+C<$ciphertext> is the detached ciphertext to decrypt.
+
+C<$tag> is the ciphertext's authentication tag. It must be L</ABYTES> bytes.
+
+C<$nonce> is the nonce used to encrypt the ciphertext.
+
+C<$key> is the secret key used to encrypt the ciphertext. It must be
+C</KEYBYTES> bytes. It may be a L<Crypt::Sodium::XS::MemVault>.
 
 C<$adata> is optional. See notes in L</DESCRIPTION>.
 
 C<$flags> is optional. It is the flags used for the C<$plaintext>
-L<Crypt::Sodium::XS::MemVault> object. See L<Crypt::Sodium::XS/MEMORY SAFETY>.
+L<Crypt::Sodium::XS::MemVault>. See L<Crypt::Sodium::XS::ProtMem>.
+
+Returns a L<Crypt::Sodium::XS::MemVault>: the decrypted plaintext.
 
 =item encrypt
 
   my $ciphertext = $precalc->encrypt($plaintext, $nonce, $adata, $flags);
 
+C<$plaintext> is the plaintext to encrypt. It may be a
+L<Crypt::Sodium::XS::MemVault>.
+
+C<$nonce> is the nonce used to encrypt the ciphertext. It must be L</NPUBBYTES>
+bytes.
+
+C<$key> is the secret with which to encrypt the plaintext. It must be
+L</KEYBYTES> bytes. It may be a L<Crypt::Sodium::XS::MemVault>.
+
 C<$adata> is optional. See notes in L</DESCRIPTION>.
+
+Returns the combined encrypted ciphertext.
 
 =item encrypt_detached
 
-  my ($ciphertext, $mac)
+  my ($ciphertext, $tag)
     = $precalc->encrypt_detached($plaintext, $nonce, $adata, $flags);
 
+C<$plaintext> is the plaintext to encrypt. It may be a
+L<Crypt::Sodium::XS::MemVault>.
+
+C<$nonce> is the nonce used to encrypt the ciphertext. It must be L</NPUBBYTES>
+bytes.
+
+C<$key> is the secret with which to encrypt the plaintext. It must be
+L</KEYBYTES> bytes. It may be a L<Crypt::Sodium::XS::MemVault>.
+
 C<$adata> is optional. See notes in L</DESCRIPTION>.
+
+Returns the detached encrypted ciphertext and its authentication tag.
 
 =back
 
 =head1 IMPORTANT NOTE ON aes256gcm
 
-WARNING: Despite being the most popular AEAD construction due to its use in
+B<Warning>: Despite being the most popular AEAD construction due to its use in
 TLS, safely using AES-GCM in a different context is tricky.
 
 No more than ~ 350 GB of input data should be encrypted with a given key. This

@@ -76,22 +76,21 @@ edwards25519 curve
   my $server_sk = sodium_random_bytes($keysize);
   my $server_pk = $scalarmult->base($client_sk);
 
-  # !!! do not use output directly for key exchange; use Crypt::Sodium::XS::kx.
-  # if you really want to, you can manually do this:
+  # !!! do not use output directly as key exchange !!!
+  # use Crypt::Sodium::XS::kx instead, or you can extract shared keys of
+  # arbitrary size with generichash:
 
   # client side:
-  my $q = $scalarmult->scalarmult($client_sk, $server_pk);
+  my $client_shared_secret = $scalarmult->scalarmult($client_sk, $server_pk);
   my $hasher = Crypt::Sodium::XS->generichash->init;
-  $hasher->update($q, $client_pk, $server_pk);
-  my $client_shared_secret = $hasher->final;
+  $hasher->update($shared_secret, $client_pk, $server_pk);
+  my $client_shared_key = $hasher->final;
 
   # server side:
-  my $q = $scalarmult->scalarmult($server_sk, $client_pk);
+  my $server_shared_secret = $scalarmult->scalarmult($server_sk, $client_pk);
   my $hasher = Crypt::Sodium::XS->generichash->init;
-  $hasher->update($q, $client_pk, $server_pk);
-  my $server_shared_secret = $hasher->final;
-
-  # $client_shared_secret and $server_shared_secret are now identical keys.
+  $hasher->update($shared_secret, $client_pk, $server_pk);
+  my $server_shared_key = $hasher->final;
 
 =head1 DESCRIPTION
 
@@ -106,33 +105,56 @@ generally want to use L<Crypt::Sodium::XS::kx> instead.
 
 =head2 new
 
-  my $scalarmult = Crypt::Sodium::XS::OO::scalarmult->new;
-  my $pwhash = Crypt::Sodium::XS->scalarmult;
+  my $scalarmult
+    = Crypt::Sodium::XS::OO::scalarmult->new(primitive => 'x25519');
+  my $scalarmult = Crypt::Sodium::XS->scalarmult;
 
-Returns a new scalarmult object.
+Returns a new scalarmult object for the given primitive. If not given, the
+default primitive is C<default>.
+
+=head1 ATTRIBUTES
+
+=head2 primitive
+
+  my $primitive = $scalarmult->primitive;
+  $scalarmult->primitive('poly1305');
+
+Gets or sets the primitive used for all operations by this object. Note this
+can be C<default>.
 
 =head1 METHODS
 
-=head2 BYTES
+=head2 primitives
 
-  my $out_size = $scalarmult->BYTES
+  my @primitives = Crypt::Sodium::XS::OO::scalarmult->primitives;
+  my @primitives = $scalarmult->primitives;
 
-=head2 SCALARBYTES
+Returns a list of all supported primitive names, including C<default>.
 
-  my $out_size = $scalarmult->SCALARBYTES
+Can be called as a class method.
+
+=head2 PRIMITIVE
+
+  my $primitive = $scalarmult->PRIMITIVE;
+
+Returns the primitive used for all operations by this object. Note this will
+never be C<default> but would instead be the primitive it represents.
 
 =head2 keygen
 
   my $secret_key = $scalarmult->keygen;
 
-Generates a new random secret key. Returns C<$secret_key> as a
-L<Crypt::Sodium::XS::MemVault>.
+Returns a L<Crypt::Sodium::XS::MemVault>: a secret key of
+L</SCALARBYTES> bytes.
 
 =head2 base
 
   my $public_key = $scalarmult->base($secret_key);
 
-Given a user’s C<$secret_key>, return the user’s public key.
+C<$secret_key> is a secret key. It must be L</SCALARBYTES> bytes. It may be a
+L<Crypt::Sodium::XS::MemVault>.
+
+Returns a public key which is L</BYTES> bytes.
 
 Multiplies the base point (x, 4/5) by a scalar C<$secret_key> (clamped) and
 returns the Y coordinate of the resulting point.
@@ -143,10 +165,31 @@ NOTE: With the ed25519 primitive, a C<$secret_key> of 0 will croak.
 
   my $q = $scalarmult->scalarmult($my_secret_key, $their_public_key);
 
-This method can be used to compute a shared secret C<$q> given a user’s
-C<$my_secret_key> and another user’s C<$their_public_key>.
+C<$my_secret_key> is a secret key. It must be L</SCALARBYTES> bytes. It may be
+a L<Crypt::Sodium::XS::MemVault>.
 
-NOTE:
+C<$their_public_key> is a public key. It must be L</BYTES> bytes.
+
+Returns a L<Crypt::Sodium::XS::MemVault>: a shared secret of L</SCALARBYTES>
+bytes.
+
+B<Note> (ed25519):
+
+=over 4
+
+With the ed25519 primitive, this function will croak if C<$my_secret_key>
+is 0 or if C<$their_public_key> is not on the curve, not on the main subgroup,
+is a point of small order, or is not provided in canonical form.
+
+Also with ed25519, C<$my_secret_key> is “clamped” (the 3 low bits are cleared
+to make it a multiple of the cofactor, bit 254 is set and bit 255 is cleared to
+respect the original design).
+
+=back
+
+B<Note>:
+
+=over 4
 
 C<$q> represents the X coordinate of a point on the curve. As a result, the
 number of possible keys is limited to the group size (≈2^252), which is smaller
@@ -165,19 +208,11 @@ producing the same shared secret can be trivially computed).
 
 See L</SYNOPSIS> for an example of this.
 
-ed225519 notes (C<$secret_key> is 'n', C<$public_key> is 'p'):
-
-NOTE: With the ed25519 primitive, this function will croak if C<$my_secret_key>
-is 0 or if C<$their_public_key> is not on the curve, not on the main subgroup,
-is a point of small order, or is not provided in canonical form.
-
-C<$my_secret_key> is “clamped” (the 3 low bits are cleared to make it a
-multiple of the cofactor, bit 254 is set and bit 255 is cleared to respect the
-original design).
+=back
 
 =head1 SCALAR MULTIPLICATION WITHOUT CLAMPING
 
-In order to prevent attacks using small subgroups, the scalarmult functions
+In order to prevent attacks using small subgroups, the scalarmult methods
 above clear lower bits of the scalar (C<$secret_key>). This may be indesirable
 to build protocols that requires C<$secret_key> to be invertible.
 
@@ -186,9 +221,28 @@ the high bit either. These variants expect a scalar in the ]0..L[ range.
 
 These methods are only available for the ed25519 primitive.
 
-=head2 scalarmult_ed2551_base_noclamp
+=head2 scalarmult_base_noclamp
 
-=head2 scalarmult_ed2551_noclamp
+  my $q_noclamp = $scalarmult->base_noclamp($n);
+
+=head2 scalarmult_noclamp
+
+  my $q_noclamp = $scalarmult->scalarmult_noclamp($n, $p);
+
+=head2 BYTES
+
+  my $out_size = $scalarmult->BYTES
+
+Returns the size, in bytes, of a public key.
+
+=head2 SCALARBYTES
+
+Returns the size, in bytes, of a shared or secret key.
+
+  my $out_size = $scalarmult->SCALARBYTES
+
+L</BYTES> and L</SCALARBYTES> are provided for consistency, but it is safe to
+assume that C<$scalarmult->BYTES == $scalarmult->SCALARBYTES>.
 
 =head1 SEE ALSO
 

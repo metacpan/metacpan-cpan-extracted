@@ -132,8 +132,8 @@ encryption
   # $pt is now "hello" (MemVault)
 
   $nonce = sodium_increment($nonce);
-  ($ct, my $mac) = $box->encrypt_detached("world", $nonce, $pk, $sk2);
-  $pt = $box->decrypt_detached($ct, $mac, $nonce, $pk2, $sk);
+  ($ct, my $tag) = $box->encrypt_detached("world", $nonce, $pk, $sk2);
+  $pt = $box->decrypt_detached($ct, $tag, $nonce, $pk2, $sk);
   # $pt is now "world" (MemVault)
 
   my $precalc = $box->beforenm($pk2, $sk);
@@ -166,15 +166,15 @@ and the ciphertext. Alice should never ever share her secret key either, even
 with Bob.
 
 Bob can reply to Alice using the same system, without having to generate a
-distinct key pair.  The nonce doesn't have to be confidential, but it should be
-used with just one invocation of L</box_encrypt> for a particular pair of
+distinct key pair. The nonce doesn't have to be confidential, but it must be
+used with just one invocation of L</encrypt> for a particular pair of
 public and secret keys.
 
-One easy way to generate a nonce is to use L</box_nonce>, considering the size
+One easy way to generate a nonce is to use L</nonce>, considering the size
 of the nonces the risk of any random collisions is negligible. For some
 applications, if you wish to use nonces to detect missing messages or to ignore
 replayed messages, it is also acceptable to use a simple incrementing counter
-as a nonce. A better alternative is to use the
+as a nonce. A better alternative for that use case is the
 L<Crypt::Sodium::XS::secretstream> API.
 
 When doing so you must ensure that the same nonce can never be re-used (for
@@ -184,8 +184,7 @@ the same key pairs).
 As stated above, senders can decrypt their own messages, and compute a valid
 authentication tag for any messages encrypted with a given shared secret key.
 This is generally not an issue for online protocols. If this is not acceptable,
-check out L</box_seal_encrypt> and L</box_seal_decrypt>, as well as the
-L<Crypt::Sodium::XS::kx>.
+check out L</SEALED BOXES>, as well as L<Crypt::Sodium::XS::kx>.
 
 =head1 CONSTRUCTOR
 
@@ -199,59 +198,55 @@ L<Crypt::Sodium::XS::kx>.
 Returns a new box object for the given primitive. If not given, the default
 primitive is C<default>.
 
+=head1 ATTRIBUTES
+
+=head2 primitive
+
+  my $primitive = $box->primitive;
+  $box->primitive('curve25519xsalsa20poly1305');
+
+Gets or sets the primitive used for all operations by this object. Note this
+can be C<default>.
+
 =head1 METHODS
+
+=head2 primitives
+
+  my @primitives = Crypt::Sodium::XS::OO::box->primitives;
+  my @primitives = $box->primitives;
+
+Returns a list of all supported primitive names, including C<default>.
+
+Can be called as a class method.
 
 =head2 PRIMITIVE
 
-  my $box = Crypt::Sodium::XS->box;
-  my $default_primitive = $box->PRIMITIVE;
+  my $primitive = $box->PRIMITIVE;
 
-=head2 BEFORENMBYTES
-
-  my $shared_key_length = $box->BEFORENMBYTES;
-
-=head2 MACBYTES
-
-  my $mac_length = $box->MACBYTES;
-
-=head2 MESSAGEBYTES_MAX
-
-  my $message_max_length = $box->MESSAGEBYTES_MAX;
-
-=head2 NONCEBYTES
-
-  my $nonce_length = $box->NONCEBYTES;
-
-=head2 PUBLICKEYBYTES
-
-  my $public_key_length = $box->PUBLICKEYBYTES;
-
-=head2 SEALBYTES
-
-  my $seal_length = $box->SEALBYTES;
-
-ciphertext for sealed boxes is message length + seal length.
-
-=head2 SECRETKEYBYTES
-
-  my $secret_key_length = $box->SECRETKEYBYTES;
-
-=head2 SEEDBYTES
-
-  my $keypair_seed_length = $box->SEEDBYTES;
+Returns the primitive used for all operations by this object. Note this will
+never be C<default> but would instead be the primitive it represents.
 
 =head2 beforenm
 
-  my $precalc = $box->beforenm($their_public_key, $my_secret_key);
+  my $precalc = $box->beforenm($their_public_key, $my_secret_key, $flags);
 
-Returns a precalculation box object. This is useful if you send or receive many
-messages using the same public key. See L</PRECALCULATION INTERFACE>.
+C<$their_public_key> is the public key used by the precalcuation object. It
+must be L</PUBLICKEYBYTES> bytes.
+
+C<$my_secret_key> is the secret key used by the precalculation object. It must
+be L</KEYBYTES> bytes. It may be a L<Crypt::Sodium::XS::MemVault>.
+
+C<$flags> is optional. It is the flags used for the precalculation protected
+memory object. See L<Crypt::Sodium::XS::ProtMem>.
+
+Returns an opaque protected memory object: a precalculation box object. This is
+useful if you send or receive many messages using the same public key. See
+L</PRECALCULATION INTERFACE>.
 
 =head2 decrypt
 
   my $plaintext = $box->decrypt(
     $ciphertext,
-    $mac,
     $nonce,
     $their_public_key,
     $my_secret_key,
@@ -259,15 +254,31 @@ messages using the same public key. See L</PRECALCULATION INTERFACE>.
   );
 
 Croaks on decryption failure.
+
+C<$ciphertext> is the ciphertext to decrypt.
+
+C<$nonce> is the nonce used to encrypt the ciphertext. It must be L</NONCEBYTES>
+bytes.
+
+C<$their_public_key> is the public key used to authenticate the ciphertext. It
+must be L</PUBLICKEYBYTES> bytes.
+
+C<$my_secret_key> is the secret key used to decrypt the ciphertext. It must be
+L</SECRETKEYBYTES> bytes. It may be a L<Crypt::Sodium::XS::MemVault>.
+
+C<$flags> is optional. It is the flags used for the C<$plaintext>
+L<Crypt::Sodium::XS::MemVault>. See L<Crypt::Sodium::XS::ProtMem>.
+
+Returns a L<Crypt::Sodium::XS::MemVault>: the decrypted plaintext.
 
 B<NOTE>: this is the libsodium function C<crypto_box_open_easy>. Its name is
 slightly different for consistency of this API.
 
 =head2 decrypt_detached
 
-  my ($plaintext, $mac) = $box->decrypt(
+  my ($plaintext, $tag) = $box->decrypt(
     $ciphertext,
-    $mac,
+    $tag,
     $nonce,
     $their_public_key,
     $my_secret_key,
@@ -275,6 +286,24 @@ slightly different for consistency of this API.
   );
 
 Croaks on decryption failure.
+
+C<$ciphertext> is the ciphertext to decrypt.
+
+C<$tag> is the ciphertext's authentication tag. It must be L</MACBYTES> bytes.
+
+C<$nonce> is the nonce used to encrypt the ciphertext. It must be L</NONCEBYTES>
+bytes.
+
+C<$their_public_key> is the public key used to authenticate the ciphertext. It
+must be L</PUBLICKEYBYTES> bytes.
+
+C<$my_secret_key> is the secret key used to decrypt the ciphertext. It must be
+L</SECRETKEYBYTES> bytes. It may be a L<Crypt::Sodium::XS::MemVault>.
+
+C<$flags> is optional. It is the flags used for the C<$plaintext>
+L<Crypt::Sodium::XS::MemVault>. See L<Crypt::Sodium::XS::Protmem>.
+
+Returns a L<Crypt::Sodium::XS::MemVault>: the decrypted plaintext.
 
 B<NOTE>: this is the libsodium function C<crypto_box_open_detached>. Its name
 is slightly different for consistency of this API.
@@ -284,50 +313,187 @@ is slightly different for consistency of this API.
   my $ciphertext
     = $box->encrypt($message, $nonce, $their_public_key, $my_secret_key);
 
+C<$message> is the message to encrypt. It may be a
+L<Crypt::Sodium::XS::MemVault>.
+
+C<$nonce> is the nonce used to encrypt the ciphertext. It must be
+L</NONCEBYTES> bytes.
+
+C<$their_public_key> is the public key used to encrypt the ciphertext. It must
+be L</PUBLICKEYBYTES> bytes.
+
+C<$my_secret_key> is the secret key used to authenticate the ciphertext. It
+must be L</SECRETKEYBYTES> bytes. It may be a L<Crypt::Sodium::XS::MemVault>.
+
+Returns the encrypted ciphertext.
+
 B<NOTE>: this is the libsodium function C<crypto_box>. Its name is slightly
 different for consistency of this API.
 
 =head2 encrypt_detached
 
-  my ($ciphertext, $mac) = $box->encrypt_detached(
+  my ($ciphertext, $tag) = $box->encrypt_detached(
     $message,
     $nonce,
     $their_public_key,
     $my_secret_key
   );
 
+C<$message> is the message to encrypt. It may be a
+L<Crypt::Sodium::XS::MemVault>.
+
+C<$nonce> is the nonce used to encrypt the ciphertext. It must be
+L</NONCEBYTES> bytes.
+
+C<$their_public_key> is the public key used to encrypt the ciphertext. It must
+be L</PUBLICKEYBYTES> bytes.
+
+C<$my_secret_key> is the secret key used to authenticate the ciphertext. It
+must be L</SECRETKEYBYTES> bytes. It may be a L<Crypt::Sodium::XS::MemVault>.
+
+Returns the encrypted ciphertext and its authentication tag.
+
 B<NOTE>: this is the libsodium function C<crypto_box_easy_detached>. Its name
 is slightly different for consistency of this API.
 
 =head2 keypair
 
-  my ($public_key, $secret_key) = $box->keypair;
-  my ($public_key, $secret_key) = $box->keypair($seed);
+  my ($public_key, $secret_key) = $box->keypair($seed, $flags);
 
-C<$seed> is optional. If provided, it must be L</box_SEEDBYTES> in length.
-Using the same seed will generate the same key pair, so it must be kept
-confidential. If omitted, a key pair is randomly generated.
+C<$seed> is optional. It must be L</SEEDBYTES> bytes. It may be a
+L<Crypt::Sodium::XS::MemVault>. Using the same seed will generate the same key
+pair, so it must be kept confidential. If omitted, a key pair is randomly
+generated.
+
+C<$flags> is optional. It is the flags used for the C<$secret_key>
+L<Crypt::Sodium::XS::MemVault>. See L<Crypt::Sodium::XS::ProtMem>.
+
+Returns a public key of L</PUBLICKEYBYTES> bytes and a
+L<Crypt::Sodium::XS::MemVault>: the secret key of L</SECRETKEYBYTES> bytes.
 
 =head2 nonce
 
-  my $nonce = $box->nonce;
-  my $nonce = $box->nonce($base_nonce);
+  my $nonce = $box->nonce($base);
+
+C<$base> is optional. It must be less than or equal to L</NONCEBYTES> bytes. If
+not provided, the nonce will be random.
+
+Returns a nonce of L</NONCEBYTES> bytes.
+
+=head2 BEFORENMBYTES
+
+  my $shared_key_size = $box->BEFORENMBYTES;
+
+Returns the size, in bytes, of the pre-calculated state created by
+L</beforenm>. Not normally needed.
+
+=head2 MACBYTES
+
+  my $tag_size = $box->MACBYTES;
+
+Returns the size, in bytes, of a message authentication tag.
+
+The size of a combined (not detached) ciphertext is message size +
+L</MACBYTES>.
+
+=head2 MESSAGEBYTES_MAX
+
+  my $message_max_size = $box->MESSAGEBYTES_MAX;
+
+Returns the size, in bytes, of the maximum size of any message to be encrypted.
+
+=head2 NONCEBYTES
+
+  my $nonce_size = $box->NONCEBYTES;
+
+Returns the size, in bytes, of a nonce.
+
+=head2 PUBLICKEYBYTES
+
+  my $public_key_size = $box->PUBLICKEYBYTES;
+
+Returns the size, in bytes, of a public key.
+
+=head2 SEALBYTES
+
+  my $seal_size = $box->SEALBYTES;
+
+Returns the size, in bytes, of the "seal" attached to a sealed box. The size of
+a sealed box is the message size + L</SEALBYTES>.
+
+=head2 SECRETKEYBYTES
+
+  my $secret_key_size = $box->SECRETKEYBYTES;
+
+Returns the size, in bytes, of a private key.
+
+=head2 SEEDBYTES
+
+  my $keypair_seed_size = $box->SEEDBYTES;
+
+Returns the size, in bytes, of a seed used by L</keypair>.
+
+=head1 SEALED BOXES
+
+Sealed boxes are designed to anonymously send messages to a recipient given
+their public key.
+
+Only the recipient can decrypt these messages using their private key. While
+the recipient can verify the integrity of the message, they cannot verify the
+identity of the sender.
+
+A message is encrypted using an ephemeral key pair, with the secret key being
+erased right after the encryption process.
+
+Without knowing the secret key used for a given message, the sender cannot
+decrypt the message later. Furthermore, without additional data, a message
+cannot be correlated with the identity of its sender.
+
+=head2 seal_decrypt
+
+  my $plaintext
+    = $box->seal_decrypt($ciphertext, $my_public_key, $my_secret_key, $flags);
+
+Croaks on decryption failure.
+
+C<$ciphertext> is the ciphertext to decrypt.
+
+C<$my_public_key> is the public key to which the message was encrypted. It must
+be L</PUBLICKEYBYTES> bytes.
+
+C<$my_secret_key> is the secret key from which the public key is derived. It
+must be L</SECRETKEYBYTES> bytes. It may be a L<Crypt::Sodium::XS::MemVault>.
+
+C<$flags> is optional. It is the flags used for the C<$plaintext>
+L<Crypt::Sodium::XS::MemVault>. See L<Crypt::Sodium::XS::ProtMem>.
+
+Returns a L<Crypt::Sodium::XS::MemVault>: the decrypted plaintext.
+
+This method doesn’t require passing the public key of the sender as the
+ciphertext already includes this information. It requires passing
+C<$my_public_key> as the anonymous sender and recipient public keys are used to
+generate a nonce.
+
+B<Note>: this is the libsodium function C<crypto_box_seal_open>. Its name is
+slightly different for consistency of this API.
 
 =head2 seal_encrypt
 
   my $ciphertext = $box->seal_encrypt($message, $their_public_key);
 
+C<$message> is the message to encrypt. It may be a
+L<Crypt::Sodium::XS::MemVault>.
+
+C<$their_public_key> is the public key to which the message is encrypted. It
+must be L</PUBLICKEYBYTES> bytes.
+
+Returns the combined ciphertext.
+
+The function creates a new key pair for each message and attaches the public
+key to the ciphertext. The secret key is overwritten and is not accessible
+after this function returns.
+
 B<NOTE>: this is the libsodium function C<crypto_box_seal>. Its name is
-slightly different for consistency of this API.
-
-=head2 seal_decrypt
-
-  my $plaintext
-    = $box->seal($ciphertext, $my_public_key, $my_secret_key, $flags);
-
-Croaks on decryption failure.
-
-B<NOTE>: this is the libsodium function C<crypto_box_seal_open>. Its name is
 slightly different for consistency of this API.
 
 =head1 PRECALCULATION INTERFACE
@@ -347,19 +513,71 @@ an opaque object which provides the following methods:
 
 Croaks on decryption failure.
 
+C<$ciphertext> is the ciphertext to decrypt.
+
+C<$nonce> is the nonce used to encrypt the ciphertext. It must be L</NONCEBYTES>
+bytes.
+
+C<$their_public_key> is the public key derived from the secret key used to
+encrypt the ciphertext. It must be L</PUBLICKEYBYTES> bytes.
+
+C<$my_secret_key> is the secret key from which was derived the public key used
+to encrypt the ciphertext. It must be L</SECRETKEYBYTES> bytes. It may be a
+L<Crypt::Sodium::XS::MemVault>.
+
+C<$flags> is optional. It is the flags used for the C<$plaintext>
+L<Crypt::Sodium::XS::MemVault>. See L<Crypt::Sodium::XS::ProtMem>.
+
+Returns a L<Crypt::Sodium::XS::MemVault>: the decrypted plaintext.
+
 =item decrypt_detached
 
-  my $plaintext = $precalc->decrypt($ciphertext, $mac, $nonce, $flags);
+  my $plaintext = $precalc->decrypt($ciphertext, $tag, $nonce, $flags);
 
 Croaks on decryption failure.
 
+C<$ciphertext> is the ciphertext to decrypt.
+
+C<$tag> is the ciphertext's authentication tag.
+
+C<$nonce> is the nonce used to encrypt the ciphertext. It must be L</NONCEBYTES>
+bytes.
+
+C<$their_public_key> is the public key derived from the secret key used to
+encrypt the ciphertext. It must be L</PUBLICKEYBYTES> bytes.
+
+C<$my_secret_key> is the secret key from which was derived the public key used
+to encrypt the ciphertext. It must be L</SECRETKEYBYTES> bytes. It may be a
+L<Crypt::Sodium::XS::MemVault>.
+
+C<$flags> is optional. It is the flags used for the C<$plaintext>
+L<Crypt::Sodium::XS::MemVault>. See L<Crypt::Sodium::XS::ProtMem>.
+
+Returns a L<Crypt::Sodium::XS::MemVault>: the decrypted plaintext.
+
 =item encrypt
 
-  my $ciphertext = $precalc->encrypt($plaintext, $nonce);
+  my $ciphertext = $precalc->encrypt($message, $nonce);
+
+C<$message> is the message to encrypt. It may be a
+L<Crypt::Sodium::XS::MemVault>.
+
+C<$nonce> is the nonce used to encrypt the ciphertext. It must be
+L</NONCEBYTES> bytes.
+
+Returns the encrypted ciphertext.
 
 =item encrypt_detached
 
-  my ($ciphertext, $mac) = $precalc->encrypt($plaintext, $nonce);
+  my ($ciphertext, $tag) = $precalc->encrypt($message, $nonce);
+
+C<$message> is the message to encrypt. It may be a
+L<Crypt::Sodium::XS::MemVault>.
+
+C<$nonce> is the nonce used to encrypt the ciphertext. It must be
+L</NONCEBYTES> bytes.
+
+Returns the encrypted ciphertext and its authentication tag.
 
 =back
 

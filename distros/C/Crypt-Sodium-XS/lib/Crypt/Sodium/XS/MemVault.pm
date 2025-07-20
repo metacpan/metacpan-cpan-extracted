@@ -82,64 +82,71 @@ Memory protections are documented in L<Crypt::Sodium::XS::ProtMem>.
 
 =head2 new
 
-  my $mv = Crypt::Sodium::XS::MemVault->new($bytes);
   my $mv = Crypt::Sodium::XS::MemVault->new($bytes, $flags);
 
-Create a new L<Crypt::Sodium::XS::MemVault> from the content of C<$bytes>.
+C<$bytes> is an arbitrary string of bytes.
 
-The default for C<$flags> is
+C<$flags> is optional. If not provided, the default is
 L<Crypt::Sodium::XS::ProtMem/protmem_flags_memvault_default>.
+
+Returns a L<Crypt::Sodium::XS::MemVault>: the content of C<$bytes>.
 
 =head2 new_from_hex
 
-  my $mv = Crypt::Sodium::XS::MemVault->new_from_hex($hex_string);
   my $mv = Crypt::Sodium::XS::MemVault->new_from_hex($hex_string, $flags);
 
-Create a new L<Crypt::Sodium::XS::MemVault> from the decoded content of
-C<$hex_string>.
+C<$hex_string> is an arbitrary length string. Decoding of C<$hex_string> will
+stop at the first non-hex character.
 
-The default for C<$flags> is
+C<$flags> is optional. If not provided, the default is
 L<Crypt::Sodium::XS::ProtMem/protmem_flags_memvault_default>.
+
+Returns a L<Crypt::Sodium::XS::MemVault>: the decoded content of
+C<$hex_string>.
 
 =head2 new_from_base64
 
-  my $mv = Crypt::Sodium::XS::MemVault->new_from_base64($base64);
-  my $mv = Crypt::Sodium::XS::MemVault->new_from_base64($base64, $variant);
   my $mv
     = Crypt::Sodium::XS::MemVault->new_from_base64($base64, $variant, $flags);
-  my $mv = Crypt::Sodium::XS::MemVault->new_from_base64($base64, undef, $flags);
 
-Create a new L<Crypt::Sodium::XS::MemVault> from the decoded content of
-C<$base64>.
+C<$base64> is an arbitrary length string. Decoding of C<$base64> will stop at
+the first non-base64 character.
 
-The default for C<$variant> is
+C<$variant> is optional. If not provided, the default is
 L<Crypt::Sodium::XS::Base64/BASE64_VARIANT_URLSAFE_NO_PADDING>. See
 L<Crypt::Sodium::XS::Base64/CONSTANTS>.
 
-The default for C<$flags> is
+C<$flags> is optional. If not provided, the default is
 L<Crypt::Sodium::XS::ProtMem/protmem_flags_memvault_default>.
+
+Returns a L<Crypt::Sodium::XS::MemVault>: the decoded content of C<$base64>.
 
 =head2 new_from_file
 
   my $mv = Crypt::Sodium::XS::MemVault->new_from_file($path, $flags);
 
-Create a new L<Crypt::Sodium::XS::MemVault> by slurping all content from the
-file located at C<$path>.
+C<$path> is a filesystem path.
 
-The default for C<$flags> is
+C<$flags> is optional. If not provided, the default is
 L<Crypt::Sodium::XS::ProtMem/protmem_flags_memvault_default>.
+
+Returns a L<Crypt::Sodium::XS::MemVault>: the slurped bytes from the file
+located at C<$path>.
+
+Croaks on failure to open or read C<$path>.
 
 =head2 new_from_fd
 
-  my $fd = fileno($fh);
   my $mv = Crypt::Sodium::XS::MemVault->new_from_fd($fd, $flags);
 
-Create a new L<Crypt::Sodium::XS::MemVault> by reading from C<$fd> until EOF.
+C<$fd> is a file descriptor number. Note this is B<not> a perl file handle. You
+may need to use the C<fileno> function.
 
-B<Note>: This requires the file descriptor number, not a perl file handle.
-
-The default for C<$flags> is
+C<$flags> is optional. If not provided, the default is
 L<Crypt::Sodium::XS::ProtMem/protmem_flags_memvault_default>.
+
+Returns a L<Crypt::Sodium::XS::MemVault>: the bytes from reading C<$fd> until
+end-of-file.
 
 =head1 METHODS
 
@@ -398,7 +405,29 @@ Note: C<.=> is equivalent to L</concat>.
 
   my $new_mv = $mv x 3;
 
-=head2 exclusive or
+=head2 bitwise and
+
+  my $new_mv = $mv & $bytes;
+  my $new_mv = $bytes & $mv;
+  my $new_mv = $mv & $other_mv;
+  $mv &= $other_mv;
+
+C<&> is equivalent to L</bitwise_and>.
+
+C<&=> is equivalent to L</bitwise_and_equals>.
+
+=head2 bitwise or
+
+  my $new_mv = $mv | $bytes;
+  my $new_mv = $bytes | $mv;
+  my $new_mv = $mv | $other_mv;
+  $new_mv |= $other_mv;
+
+C<|> is equivalent to L</bitwise_or>.
+
+C<|=> is equivalent to L</bitwise_or_equals>.
+
+=head2 bitwise exclusive-or
 
   my $new_mv = $mv ^ $bytes;
   my $new_mv = $bytes ^ $mv;

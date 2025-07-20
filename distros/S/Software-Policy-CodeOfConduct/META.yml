@@ -1,0 +1,50 @@
+---
+abstract: 'generate a Code of Conduct policy'
+author:
+  - 'Robert Rothenberg <rrwo@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  Module::Metadata: '0'
+  Test2::V0: '0'
+  Test::File::ShareDir: '0'
+  Test::More: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - Code
+  - of
+  - Conduct
+  - policy
+  - communicty
+  - documents
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Software-Policy-CodeOfConduct
+provides:
+  Software::Policy::CodeOfConduct:
+    file: lib/Software/Policy/CodeOfConduct.pm
+    version: v0.1.0
+requires:
+  File::ShareDir: '0'
+  Moo: '1.006000'
+  Text::Template: '0'
+  Text::Wrap: '0'
+  Types::Common: '0'
+  experimental: '0'
+  namespace::autoclean: '0'
+  perl: v5.20.0
+resources:
+  bugtracker: https://github.com/robrwo/perl-Software-Policy-CodeOfConduct/issues
+  repository: git://github.com/robrwo/perl-Software-Policy-CodeOfConduct.git
+version: v0.1.0
+x_authority: cpan:RRWO
+x_generated_by_perl: v5.34.3
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: Artistic-2.0

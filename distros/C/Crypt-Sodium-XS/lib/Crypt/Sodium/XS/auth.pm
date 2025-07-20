@@ -66,75 +66,116 @@ Crypt::Sodium::XS::auth - Secret key message authentication
   my $key = auth_keygen;
   my $msg = "authenticate this message";
 
-  my $mac = auth($msg, $key);
-  die "message tampered with!" unless auth_verify($mac, $msg, $key);
+  my $tag = auth($msg, $key);
+  die "message tampered with!" unless auth_verify($tag, $msg, $key);
 
   my $multipart = auth_init($key);
   $multipart->update("authenticate");
   $multipart->update(" this", " message");
-  $mac = $multipart->final;
-  die "message tampered with!" unless auth_verify($mac, $msg, $key);
+  $tag = $multipart->final;
+  die "message tampered with!" unless auth_verify($tag, $msg, $key);
 
 =head1 DESCRIPTION
 
-L<Crypt::Sodium::XS::auth> Computes an authentication MAC for a message and a
-secret key, and provides a way to verify that a given MAC is valid for a given
+L<Crypt::Sodium::XS::auth> Computes an authentication tag for a message and a
+secret key, and provides a way to verify that a given tag is valid for a given
 message and a key.
 
-The function computing the MAC is deterministic: the same C<($message, $key)>
+The function computing the tag is deterministic: the same C<($message, $key)>
 tuple will always produce the same output. However, even if the message is
-public, knowing the key is required in order to be able to compute a valid MAC.
-Therefore, the key should remain confidential. The MAC, however, can be public.
+public, knowing the key is required in order to be able to compute a valid tag.
+Therefore, the key should remain confidential. The tag, however, can be public.
 
 A typical use case is:
 
-* Alice prepares a message, adds an authentication MAC, sends it to Bob
+* Alice prepares a message, adds an authentication tag, sends it to Bob
 
 * Alice doesn't store the message
 
-* Later on, Bob sends the message and the authentication MAC back to Alice
+* Later on, Bob sends the message and the authentication tag back to Alice
 
-* Alice uses the authentication MAC to verify that she created this message
+* Alice uses the authentication tag to verify that she created this message
 
 L<Crypt::Sodium::XS::auth> does not encrypt the message. It only computes and
-verifies an authentication MAC.
+verifies an authentication tag.
 
 =head1 FUNCTIONS
 
 Nothing is exported by default. A C<:default> tag imports the functions and
-constants as documented below. A separate import tag is provided for each of
-the primitives listed in L</PRIMITIVES>. For example, C<:hmacsha256>
-imports C<auth_hmacsha256_verify>. You should use at least one import tag.
+constants documented below. A separate C<:E<lt>primitiveE<gt>> import tag is
+provided for each of the primitives listed in L</PRIMITIVES>. These tags import
+the C<auth_E<lt>primitiveE<gt>_*> functions and constants for that primitive. A
+C<:all> tag imports everything.
 
 =head2 auth
 
-  my $mac = auth($message, $key);
+=head2 auth_E<lt>primitiveE<gt>
+
+  my $tag = auth($message, $key);
+
+C<$message> is the message to authenticate. It may be a
+L<Crypt::Sodium::XS::MemVault>.
+
+C<$key> is the secret key with which to generate the authentication tag. It
+must be L</auth_KEYBYTES> bytes. It may be a L<Crypt::Sodium::XS::MemVault>.
+
+Returns the authentication tag. The tag is L</auth_BYTES> bytes.
 
 =head2 auth_init
 
-  my $multipart = auth_init($key);
+=head2 auth_E<lt>primitiveE<gt>_init
 
-Returns a multi-part auth object. This is useful when authenticating a stream
-or large message in chunks, rather than in one message. See L</MULTI-PART
-INTERFACE>.
+  my $multipart = auth_init($key, $flags);
+
+C<$key> is the secret key used by the multipart object. It should be at least
+L</auth_KEYBYTES> bytes. It may be a L<Crypt::Sodium::XS::MemVault>.
+
+C<$flags> is optional. It is the flags used for the multipart protected memory
+object. See L<Crypt::Sodium::XS::ProtMem>.
+
+Returns an opaque protected memory object: a multi-part auth object. This is
+useful when authenticating a stream or large message in chunks, rather than in
+one message. See L</MULTI-PART INTERFACE>.
+
+B<Note>: The multipart interface may use arbitrary-size keys. This is not
+recommended as it can be easily misused (e.g., accidentally using an empty
+key). Avoid by always using keys of L</auth_KEYBYTES> bytes as returned by
+L</auth_keygen>.
 
 =head2 auth_keygen
 
-  my $key = auth_keygen();
+=head2 auth_E<lt>primitiveE<gt>_keygen
+
+  my $key = auth_keygen($flags);
+
+C<$flags> is optional. It is the flags used for the C<$key>
+L<Crypt::Sodium::XS::MemVault>. See L<Crypt::Sodium::XS::ProtMem>.
+
+Returns a L<Crypt::Sodium::XS::MemVault>: a new secret key of L</auth_KEYBYTES>
+bytes.
 
 =head2 auth_verify
 
-  my $is_valid = auth_verify($mac, $message, $key);
+=head2 auth_E<lt>primitiveE<gt>_verify
+
+  my $is_valid = auth_verify($tag, $message, $key);
+
+C<$tag> is the previously generated authentication tag. It must be
+L</auth_BYTES> bytes.
+
+C<$message> is the message to authenticate.
+
+C<$key> is the secret key used to generate the authentication tag. It must be
+L</auth_KEYBYTES> bytes. It may be a L<Crypt::Sodium::XS::MemVault>.
+
+Returns true if C<$tag> is a valid tag for C<$message> and C<$key>, false
+otherwise.
 
 =head1 MULTI-PART INTERFACE
 
-NOTE: The multipart interface may use arbitrary-length keys. this is not
-recommended as it can be easily misused (e.g., accidentally using an empty
-key).
-
 A multipart auth object is created by calling the L</auth_init> function. Data
 to be authenticated is added by calling the L</update> method of that object as
-many times as desired. An output mac is generated by calling its L</final>
+many times as desired. An output tag is generated by calling its L</final>
 method. Do not use the object after calling L</final>.
 
 The multipart auth object is an opaque object which provides the following
@@ -149,16 +190,19 @@ state.
 
 =head2 final
 
-  my $mac = $multipart->final;
+  my $tag = $multipart->final;
 
-Once C<final> has been called, the auth object must not be used further.
+Returns a tag for C<$key> (from L</auth_init>) and all authenticated data (from
+L</update>). The tag is L</auth_BYTES> bytes.
+
+Once L</final> has been called, the multipart object must not be used further.
 
 =head2 update
 
-  $multipart->update($message);
   $multipart->update(@messages);
 
-Adds all given arguments (stringified) to authenticated data.
+Adds all given arguments (stringified) to authenticated data. Any argument may
+be a L<Crypt::Sodium::XS::MemVault>.
 
 =head1 CONSTANTS
 
@@ -166,19 +210,25 @@ Adds all given arguments (stringified) to authenticated data.
 
   my $default_primitive = auth_PRIMITIVE();
 
+Returns the name of the default primitive.
+
 =head2 auth_BYTES
 
-  my $mac_length = auth_BYTES();
+=head2 auth_E<lt>primitiveE<gt>_BYTES
+
+  my $tag_size = auth_BYTES();
+
+The size, in bytes, of an authentication tag.
 
 =head2 auth_KEYBYTES
 
-  my $key_length = auth_KEYBTES();
+=head2 auth_E<lt>primitiveE<gt>_KEYBYTES
+
+  my $key_size = auth_KEYBYTES();
+
+The size, in bytes, of a secret key.
 
 =head1 PRIMITIVES
-
-All constants (except _PRIMITIVE) and functions have
-C<auth_E<lt>primitiveE<gt>>-prefixed counterparts (e.g.,
-auth_hmacsha256_verify, auth_hmacsha512256_BYTES).
 
 =over 4
 
@@ -186,7 +236,7 @@ auth_hmacsha256_verify, auth_hmacsha512256_BYTES).
 
 =item * hmacsha512
 
-=item * hmacsha512256
+=item * hmacsha512256 (default)
 
 =back
 

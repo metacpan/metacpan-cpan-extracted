@@ -133,52 +133,134 @@ alternatives to L<Crypt::Sodium::XS::OO::secretbox>.
 Returns a new secretstream object for the given primitive. If not given, the
 default primitive is C<default>.
 
+=head1 ATTRIBUTES
+
+=head2 primitive
+
+  my $primitive = $stream->primitive;
+  $stream->primitive('xchacha20');
+
+Gets or sets the primitive used for all operations by this object. Note this
+can be C<default>.
+
 =head1 METHODS
-
-=head2 PRIMITIVE
-
-  my $stream = Crypt::Sodium::XS::OO::stream->new;
-  my $default_primitive = $stream->PRIMITIVE;
-
-=head2 KEYBYTES
-
-  my $key_length = $stream->KEYBYTES;
-
-=head2 MESSAGEBYTES_MAX
-
-  my $plaintext_max_length = $stream->MESSAGEBYTES_MAX;
-
-=head2 NONCEBYTES
-
-  my $nonce_length = $stream->NONCEBYTES;
 
 =head2 primitives
 
-  my @primitives = $pwhash->primitives;
+  my @primitives = Crypt::Sodium::XS::OO::stream->primitives;
+  my @primitives = $stream->primitives;
 
-Returns a list of all supported primitive names (including 'default').
+Returns a list of all supported primitive names, including C<default>.
+
+Can be called as a class method.
+
+=head2 PRIMITIVE
+
+  my $primitive = $stream->PRIMITIVE;
+
+Returns the primitive used for all operations by this object. Note this will
+never be C<default> but would instead be the primitive it represents.
 
 =head2 keygen
 
-  my $key = $stream->keygen;
+  my $key = $stream->keygen($flags);
+
+C<$flags> is optional. It is the flags used for the C<$key>
+L<Crypt::Sodium::XS::MemVault>. See L<Crypt::Sodium::XS::Protmem>.
+
+Returns a L<Crypt::Sodium::XS::MemVault>: a secret key of L</KEYBYTES> bytes.
 
 =head2 nonce
 
-  my $nonce = $stream->nonce;
+  my $nonce = $stream->nonce($base);
+
+C<$base> is optional. It must be less than or equal to L</NONCEBYTES> bytes. If
+not provided, the nonce will be random.
+
+Returns a nonce of L</NONCEBYTES> bytes.
 
 =head2 stream
 
-  my $stream_data = $stream->stream($length, $nonce, $key);
+  my $stream_data = $stream->stream($out_size, $nonce, $key);
+
+C<$out_size> is the desired size, in bytes, of stream data output.
+
+C<$nonce> is the nonce used to encrypt the stream data. It must be
+L</NONCEBYTES> bytes.
+
+C<$key> is the secret key used to encrypt the stream data. It must be
+L</KEYBYTES> bytes. It may be a L<Crypt::Sodium::XS::MemVault>.
+
+Returns C<$out_size> bytes of stream data.
 
 =head2 xor
 
-  my $ciphertext = $stream->xor($plaintext, $nonce, $key);
+  my $outdata = $stream->xor($indata, $nonce, $key, $flags);
+
+C<$indata> is the data to xor. It may be a L<Crypt::Sodium::XS::MemVault>.
+
+C<$nonce> is the nonce used to xor the data. It must be L</NONCEBYTES> bytes.
+
+C<$key> is the secret key used to xor the data. It must be L</KEYBYTES> bytes.
+It may be a L<Crypt::Sodium::XS::MemVault>.
+
+C<$flags> is optional. If provided, the returned data will be a
+L<Crypt::Sodium::XS::MemVault>, created with the given flags.
+
+Returns the xor result. May be a L<Crypt::Sodium::XS::MemVault>; see C<$flags>
+above.
+
+When using this method to decrypt data, C<$flags> should be passed (even if 0
+or undef) to ensure the decrypted data is protected with a
+L<Crypt::Sodium::XS::MemVault>.
 
 =head2 xor_ic
 
-  my $ciphertext = $stream->xor_ic($plaintext, $nonce, $internal_counter, $key);
+  my $outdata
+    = $stream->xor_ic($indata, $nonce, $internal_counter, $key, $flags);
 
-NOTE: xor_ic is not supported with the C<salsa2012> primitive.
+B<Note>: xor_ic is not supported with the C<salsa2012> primitive.
+
+C<$indata> is the data to xor. It may be a L<Crypt::Sodium::XS::MemVault>.
+
+C<$nonce> is the nonce used to xor the data. It must be L</NONCEBYTES> bytes.
+
+C<$internal_counter> is the initial value of the block counter.
+
+C<$key> is the secret key used to xor the data. It must be L</KEYBYTES> bytes.
+It may be a L<Crypt::Sodium::XS::MemVault>.
+
+C<$flags> is optional. If provided, the returned data will be a
+L<Crypt::Sodium::XS::MemVault>, created with the given flags.
+
+Returns the xor result. May be a L<Crypt::Sodium::XS::MemVault>; see C<$flags>
+above.
+
+L</xor_ic> is similar to L</xor> but adds the ability to set the initial value
+of the block counter (C<$internal_counter>) to a non-zero value. This permits
+direct access to any block without having to compute the previous ones.
+
+When using this method to decrypt data, C<$flags> should be passed (even if 0
+or undef) to ensure the decrypted data is protected with a
+L<Crypt::Sodium::XS::MemVault>.
+
+=head2 KEYBYTES
+
+  my $key_size = $stream->KEYBYTES;
+
+Returns the size, in bytes, of a secret key.
+
+=head2 MESSAGEBYTES_MAX
+
+  my $plaintext_max_size = $stream->MESSAGEBYTES_MAX;
+
+Returns the size, in bytes, of the maximum size of any message to be encrypted.
+
+=head2 NONCEBYTES
+
+  my $nonce_size = $stream->NONCEBYTES;
+
+Returns the size, in bytes, of a nonce.
 
 =head1 SEE ALSO
 
@@ -187,6 +269,8 @@ NOTE: xor_ic is not supported with the C<salsa2012> primitive.
 =item L<Crypt::Sodium::XS>
 
 =item L<Crypt::Sodium::XS::stream>
+
+=item L<Crypt::Sodium::XS::stream/PRIMITIVES>
 
 =item L<https://doc.libsodium.org/advanced/stream_ciphers>
 

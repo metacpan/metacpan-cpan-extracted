@@ -210,21 +210,24 @@ sub catch_me
 
 done_testing;
 
-package My::Object;
-
-# sub new { return( bless( {} => shift( @_ ) ) ); }
-sub new
 {
-    my $that = shift( @_ );
-    # print( STDERR "Got here in My::Object->new with args '", join( "', '", @_ ), "'\n" );
-    return( bless( { val => [@_] } => ( ref( $that ) || $that ) ) );
-}
-
-sub callmore
-{
-    my $self = shift( @_ );
-    # print( "My::Object stored args are: '", join( "', '", @{$self->{val}} ), "'\n" );
-    return( $self );
+    package
+        My::Object;
+    
+    # sub new { return( bless( {} => shift( @_ ) ) ); }
+    sub new
+    {
+        my $that = shift( @_ );
+        # print( STDERR "Got here in My::Object->new with args '", join( "', '", @_ ), "'\n" );
+        return( bless( { val => [@_] } => ( ref( $that ) || $that ) ) );
+    }
+    
+    sub callmore
+    {
+        my $self = shift( @_ );
+        # print( "My::Object stored args are: '", join( "', '", @{$self->{val}} ), "'\n" );
+        return( $self );
+    }
 }
 
 __END__

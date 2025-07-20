@@ -63,6 +63,6 @@
          "web" : "https://gitlab.com/jackdeguest/Nice-Try"
       }
    },
-   "version" : "v1.3.16",
+   "version" : "v1.3.17",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

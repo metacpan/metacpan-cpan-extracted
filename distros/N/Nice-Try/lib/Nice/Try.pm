@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## A real Try Catch Block Implementation Using Perl Filter - ~/lib/Nice/Try.pm
-## Version v1.3.16
+## Version v1.3.17
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/05/17
-## Modified 2025/05/01
+## Modified 2025/07/20
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -26,7 +26,7 @@ BEGIN
     use Scalar::Util ();
     use List::Util ();
     use Want ();
-    our $VERSION = 'v1.3.16';
+    our $VERSION = 'v1.3.17';
     our $ERROR;
     our( $CATCH, $DIED, $EXCEPTION, $FINALLY, $HAS_CATCH, @RETVAL, $SENTINEL, $TRY, $WANTARRAY );
 }
@@ -1556,21 +1556,28 @@ EOT
             
             # Define the BEGIN block code with the filtered data
             my $begin_block_code = <<"END_CODE";
-CHECK
 {
-    my \$nice_try_data_block_str = <<'END_OF_DATA';
+    no warnings;
+    CHECK
+    {
+        my \$nice_try_data_block_str = <<'END_OF_DATA';
 ${filtered_data_str}
 END_OF_DATA
-    
-    require Symbol;
-    my \$fh = Symbol::geniosym();
-    open( \$fh, '<:scalar', \\\$nice_try_data_block_str ) || die( \$! );
-    no strict 'refs';
-    no warnings 'redefine';
-    *{ __PACKAGE__ . '::DATA' } = \$fh;
-};
+
+        require Symbol;
+        my \$fh = Symbol::geniosym();
+        open( \$fh, '<:scalar', \\\$nice_try_data_block_str ) || die( \$! );
+        no strict 'refs';
+        no warnings 'redefine';
+        *{ __PACKAGE__ . '::DATA' } = \$fh;
+    };
+}
 
 END_CODE
+            if( $this->class eq 'PPI::Statement::End' )
+            {
+                $begin_block_code .= "1;\n";
+            }
             $self->_message( 5, "BEGIN block is:\n${begin_block_code}" );
             my $begin_block = PPI::Token->new( $begin_block_code ) || die( "Unable to create token" );
             $self->_message( 5, "Inserting BEGIN element object '", overload::StrVal( $begin_block ), "', before '", overload::StrVal( $this ), "'" );
@@ -2280,7 +2287,7 @@ And you also have granular power in the catch block to filter which exception to
 
 =head1 VERSION
 
-    v1.3.16
+    v1.3.17
 
 =head1 DESCRIPTION
 

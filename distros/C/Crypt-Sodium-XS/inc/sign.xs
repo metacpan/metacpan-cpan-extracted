@@ -490,12 +490,11 @@ void sign_keypair(SV * seed = &PL_sv_undef, SV * flags = &PL_sv_undef)
   sign_ed25519_keypair = 1
 
   PREINIT:
-  protmem *sk_pm;
+  protmem *seed_pm = NULL, *sk_pm;
   SV *pk_sv;
-  unsigned char *pk_buf;
-  STRLEN seed_req_len;
-  STRLEN pk_len;
-  STRLEN sk_len;
+  unsigned char *pk_buf, *seed_buf;
+  STRLEN seed_req_len, seed_len;
+  STRLEN pk_len, sk_len;
   unsigned int sk_flags = g_protmem_flags_key_default;
 
   PPCODE:
@@ -537,10 +536,6 @@ void sign_keypair(SV * seed = &PL_sv_undef, SV * flags = &PL_sv_undef)
   }
   else {
     /* from seed */
-    protmem *seed_pm = NULL;
-    unsigned char *seed_buf;
-    STRLEN seed_len;
-
     if (sv_derived_from(seed, MEMVAULT_CLASS)) {
       seed_pm = protmem_get(aTHX_ seed, MEMVAULT_CLASS);
       seed_buf = seed_pm->pm_ptr;

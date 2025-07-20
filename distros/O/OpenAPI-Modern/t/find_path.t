@@ -1003,6 +1003,9 @@ webhooks:
     description: good luck here too
     post:
       operationId: my_webhook_operation
+  zero_hook:
+    post:
+      operationId: '0'
 YAML
 
   $request = request('POST', 'http://example.com/foo/bar');
@@ -1072,6 +1075,28 @@ YAML
       ],
     },
     'operation is not under a path-item with a path template',
+  );
+
+  ok(!$openapi->find_path($options = { request => $request, operation_id => '0' }),
+    to_str($request).': find_path returns false');
+  cmp_result(
+    $options,
+    {
+      request => isa('Mojo::Message::Request'),
+      method => 'post',
+      path_template => '/foo/bar',
+      _path_item => { post => ignore },
+      operation_id => '0',
+      errors => [
+        methods(TO_JSON => {
+          instanceLocation => '',
+          keywordLocation => jsonp(qw(/paths /foo/bar)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/bar)))->to_string,
+          error => 'templated operation does not match provided operation_id',
+        }),
+      ],
+    },
+    'operation is not under a path-item with a path template - operation_id is "false"',
   );
 
   # TODO: no way at present to match a callback request to its path-item embedded under the

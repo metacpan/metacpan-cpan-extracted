@@ -88,7 +88,7 @@ Crypt::Sodium::XS::curve25519 - Low-level functions over Curve25519
 
 =head1 SYNOPSIS
 
-  ...
+  # TODO
 
 =head1 DESCRIPTION
 
@@ -100,8 +100,10 @@ and must only be used to implement custom constructions.
 
 =head2 new
 
-  my $curve25519 = Crypt::Sodium::XS::OO::curve25519->new(primitive => 'ed25519');
-  my $curve25519 = Crypt::Sodium::XS->curve25519(primitive => 'ristretto255');
+  my $curve25519
+    = Crypt::Sodium::XS::OO::curve25519->new(primitive => 'ed25519');
+  my $curve25519
+    = Crypt::Sodium::XS->curve25519(primitive => 'ristretto255');
 
 Returns a new curve25519 object for the given primitive. The primitive argument
 is required.
@@ -111,9 +113,9 @@ is required.
 =head2 primitive
 
   my $primitive = $curve25519->primitive;
-  $curve25519->primitive('aegis256');
+  $curve25519->primitive('ristretto255');
 
-The primitive used for all operations by this object.
+Gets or sets the primitive used for all operations by this object.
 
 =head1 METHODS
 
@@ -127,30 +129,28 @@ Non-reduced inputs are expected to be within that interval.
 
 =head2 ristretto255_available
 
+  my $ristretto255_available
+    = Crypt::Sodium::XS:OO::curve25510->ristretto255_available;
+  my $ristretto255_available
+    = $curve25510->ristretto255_available;
+
 Returns true if the version of libsodium this module was built with had the
 ristretto255 primitive available, false otherwise.
 
-=head2 PRIMITIVE
-
-  my $primitive = $aead->PRIMITIVE;
-
-=head2 BYTES
-
-Size of points, in bytes.
-
-=head2 SCALARBYTES
-
-Size of scalars, in bytes.
-
-=head2 UNIFORMBYTES
-
-For ed25519 only; input size to the L</from_uniform> method.
-
-=head2 HASHBYTES
-
-For ristretto255 only; input size to the L</from_hash> method.
+Can be called as a class method.
 
 =head2 primitives
+
+  my @primitives = Crypt::Sodium::XS::OO::curve25519->primitives;
+  my @primitives = $curve25519->primitives;
+
+Returns a list of all supported primitive names, including C<default>.
+
+Can be called as a class method.
+
+=head2 PRIMITIVE
+
+  my $primitive = $curve25519->PRIMITIVE;
 
 =head2 add
 
@@ -167,9 +167,7 @@ The function croaks if C<$p> and/or C<$q> are not valid encoded elements.
 
 Checks that C<$point> represents a point on the edwards25519 curve, in
 canonical form, on the main subgroup, and that the point doesn’t have a small
-order.
-
-It returns true on success, and false if the checks didn’t pass.
+order. Returns true if so, false otherwise.
 
 =head2 random
 
@@ -179,14 +177,14 @@ Returns the representation of a random group element.
 
 =head2 from_uniform
 
-=head2 core_ristretto255_from_hash
+=head2 from_hash
 
   $curve25519->primitve('ed25519');
   my $vector = sodium_random_bytes($curve25519->UNIFORMBYTES);
   my $point = $curve25519->from_uniform($vector);
   $curve25519->primitive('ristretto255');
   my $vector2 = sodium_random_bytes($curve25519->HASHBYTES);
-  my $point2 = $curve25519->from_hash($vector);
+  my $point2 = $curve25519->from_hash($vector2);
 
 NOTE: Different methods for primitives ed25519 and ristretto255!
 
@@ -207,7 +205,7 @@ Adds the point C<$p> to the point C<$q>.
 
 The function croaks if C<$p> and/or C<$q> are not valid points.
 
-=head2 core_ed25519_sub
+=head2 sub
 
   my $point = $curve25519->sub($p, $q);
 
@@ -217,36 +215,39 @@ The function croaks if C<$p> and/or C<$q> are not valid points.
 
 =head2 scalar_complement
 
-  my $comp = $curve25519->scalar_complement($s);
+  my $comp = $curve25519->scalar_complement($s, $flags);
 
-Returns C<$comp> so that C<$s> + C<$comp> = 1 (mod L).
+Returns a L<Crypt::Sodium::XS::MemVault>: C<$comp> so that C<$s> + C<$comp> = 1
+(mod L).
 
 =head2 scalar_mul
 
-  my $z = $curve25519->scalar_mul($x, $y);
+  my $z = $curve25519->scalar_mul($x, $y, $flags);
 
-Returns C<$x> * C<$y> (mod L).
+Returns a L<Crypt::Sodium::XS::MemVault>: C<$x> * C<$y> (mod L).
 
 =head2 scalar_negate
 
-  my $neg = $curve25519->scalar_negate($s);
+  my $neg = $curve25519->scalar_negate($s, $flags);
 
-Returns C<$neg> so that C<$s> + C<$neg> = 0 (mod L).
+Returns a L<Crypt::Sodium::XS::MemVault>: C<$neg> so that C<$s> + C<$neg> = 0
+(mod L).
 
 =head2 scalar_random
 
-  my $r = $curve25519->scalar_random;
+  my $r = $curve25519->scalar_random($flags);
 
-Returns a representation of a random scalar in the ]0..L[ interval.
+Returns a L<Crypt::Sodium::XS::MemVault>: a representation of a random scalar
+in the ]0..L[ interval.
 
 A scalar in the [0..L[ interval can also be obtained by reducing a possibly
-larger value with L</core_ed25519_scalar_reduce>.
+larger value with L</scalar_reduce>.
 
 =head2 scalar_reduce
 
-  my $r = $curve25519->scalar_reduce($s);
+  my $r = $curve25519->scalar_reduce($s, $flags);
 
-Reduces C<$s> to C<$s> mod L.
+Returns a L<Crypt::Sodium::XS::MemVault>: C<$s> reduced to C<$s> mod L.
 
 Note that C<$s> is much larger than C<$r> (64 bytes vs 32 bytes). Bits of C<$s>
 can be left to 0, but the interval C<$s> is sampled from should be at least 317
@@ -254,9 +255,35 @@ bits to ensure almost uniformity of C<$r> over L.
 
 =head2 scalar_sub
 
-  my $z = $curve25519->scalar_sub($x, $y);
+  my $z = $curve25519->scalar_sub($x, $y, $flags);
 
-Returns C<$x> - C<$y> (mod L).
+Returns a L<Crypt::Sodium::XS::MemVault>: C<$x> - C<$y> (mod L).
+
+=head2 BYTES
+
+  my $element_size = $curve25519->bytes;
+
+Returns the size of points, in bytes.
+
+=head2 SCALARBYTES
+
+  my $scalar_size = $curve25519->SCALARBYTES;
+
+Returns the size of scalars, in bytes.
+
+=head2 UNIFORMBYTES
+
+  my $uniform_input_size = $curve25519->UNIFORMBYTES;
+
+For ed25519 only; returns the size, in bytes, of input to the L</from_uniform>
+method.
+
+=head2 HASHBYTES
+
+  my $hash_input_size = $curve25519->HASHBYTES;
+
+For ristretto255 only; returns the size, in bytes, of input to the
+L</from_hash> method.
 
 =head1 SEE ALSO
 

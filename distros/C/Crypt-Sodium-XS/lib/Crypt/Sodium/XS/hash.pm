@@ -80,31 +80,33 @@ available to process a message as a sequence of multiple chunks.
 =head1 FUNCTIONS
 
 Nothing is exported by default. A C<:default> tag imports the functions and
-constants as documented below. A separate import tag is provided for each of
-the primitives listed in L</PRIMITIVES>. For example, C<:sha256> imports
-C<hash_sha256_init>. You should use at least one import tag.
+constants documented below. A separate C<:E<lt>primitiveE<gt>> import tag is
+provided for each of the primitives listed in L</PRIMITIVES>. These tags import
+the C<hash_E<lt>primitiveE<gt>_*> functions and constants for that primitive. A
+C<:all> tag imports everything.
 
 =head2 hash
 
+=head2 hash_E<lt>primitiveE<gt>
+
   my $hash = hash($message);
+
+C<$message> is the message to hash. It may be a L<Crypt::Sodium::XS::MemVault>.
+
+Returns the hash output of L</hash_BYTES> bytes.
 
 =head2 MULTI-PART INTERFACE
 
 =head2 hash_init
 
-  my $multipart = hash_init();
+=head2 hash_E<lt>primitiveE<gt>_init
+
+  my $multipart = hash_init($flags);
+
+C<$flags> is optional. It is the flags used for the multipart protected memory
+object. See L<Crypt::Sodium::XS::ProtMem>.
 
 Returns a multipart hashing object. See L</MULTI-PART INTERFACE>.
-
-=head1 CONTSANTS
-
-=head2 hash_PRIMITIVE
-
-  my $default_primitive = hash_PRIMITIVE();
-
-=head2 hash_BYTES
-
-  my $hash_length = hash_BYTES();
 
 =head1 MULTI-PART INTERFACE
 
@@ -133,10 +135,26 @@ Once C<final> has been called, the hashing object must not be used further.
 
 =head2 update
 
-  $multipart->update($message);
   $multipart->update(@messages);
 
-Adds all given arguments (stringified) to hashed data.
+Adds all given arguments (stringified) to hashed data. Any argument may be a
+L<Crypt::Sodium::XS::MemVault>.
+
+=head1 CONTSANTS
+
+=head2 hash_PRIMITIVE
+
+  my $default_primitive = hash_PRIMITIVE();
+
+Returns the name of the default primitive.
+
+=head2 hash_BYTES
+
+=head2 hash_E<lt>primitiveE<gt>_BYTES
+
+  my $hash_size = hash_BYTES();
+
+Returns the size, in bytes, of hash output.
 
 =head1 PRIMITIVES
 
@@ -148,7 +166,7 @@ hash_sha512_BYTES).
 
 =item * sha256
 
-=item * sha512
+=item * sha512 (default)
 
 =back
 

@@ -82,32 +82,56 @@ available to process a message as a sequence of multiple chunks.
 Returns a new hash object for the given primitive. If not given, the default
 primitive is C<default>.
 
+=head1 ATTRIBUTES
+
+=head2 primitive
+
+  my $primitive = $xs_hash->primitive;
+  $xs_hash->primitive('sha256');
+
+Gets or sets the primitive used for all operations by this object. Note this
+can be C<default>.
+
 =head1 METHODS
-
-=head2 PRIMITIVE
-
-  my $xs_hash = Crypt::Sodium::XS::OO::hash->new;
-  my $default_primitive = $xs_hash->PRIMITIVE;
-
-=head2 BYTES
-
-  my $xs_hash_length = $xs_hash->BYTES;
 
 =head2 primitives
 
+  my @primitives = Crypt::Sodium::XS::OO::hash->primitives;
   my @primitives = $xs_hash->primitives;
 
-Returns a list of all supported primitive names (including 'default').
+Returns a list of all supported primitive names, including C<default>.
+
+Can be called as a class method.
+
+=head2 PRIMITIVE
+
+  my $primitive = $xs_hash->PRIMITIVE;
+
+Returns the primitive used for all operations by this object. Note this will
+never be C<default> but would instead be the primitive it represents.
 
 =head2 hash
 
-  my $xs_hash = hash($message);
+  my $hash = $xs_hash->hash($message);
+
+C<$message> is the message to hash. It may be a L<Crypt::Sodium::XS::MemVault>.
+
+Returns the hash output of L</BYTES> bytes.
 
 =head2 init
 
-  my $multipart = $xs_hash->init;
+  my $multipart = $xs_hash->init($flags);
+
+C<$flags> is optional. It is the flags used for the multipart protected memory
+object. See L<Crypt::Sodium::XS::ProtMem>.
 
 Returns a multipart hashing object. See L</MULTI-PART INTERFACE>.
+
+=head2 BYTES
+
+  my $xs_hash_size = $xs_hash->BYTES;
+
+Returns the size, in bytes, of hash output.
 
 =head1 MULTI-PART INTERFACE
 
@@ -136,10 +160,10 @@ Once C<final> has been called, the hashing object must not be used further.
 
 =head2 update
 
-  $multipart->update($message);
   $multipart->update(@messages);
 
-Adds all given arguments (stringified) to hashed data.
+Adds all given arguments (stringified) to hashed data. Any argument may be a
+L<Crypt::Sodium::XS::MemVault>.
 
 =head1 SEE ALSO
 

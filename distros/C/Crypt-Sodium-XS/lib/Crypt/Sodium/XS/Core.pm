@@ -32,13 +32,15 @@ Crypt::Sodium::XS::Core - libsodium low-level functions
 
 =head1 SYNOPSIS
 
-  ...
+  # TODO
 
 =head1 DESCRIPTION
 
 L<Crypt::Sodium::XS::Core> provides an API to libsodium's core functions. These
 low-level functions are not usually needed, and must only be used to implement
 custom constructions.
+
+This module is a work in progress.
 
 =head1 FUNCTIONS
 

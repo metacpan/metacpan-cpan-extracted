@@ -83,7 +83,6 @@ Use cases:
 
 =head2 new
 
-  my $shorthash = Crypt::Sodium::XS::OO::shorthash->new;
   my $shorthash
     = Crypt::Sodium::XS::OO::shorthash->new(primitive => 'siphash24');
   my $shorthash = Crypt::Sodium::XS->shorthash;
@@ -91,33 +90,66 @@ Use cases:
 Returns a new secretstream object for the given primitive. If not given, the
 default primitive is C<default>.
 
+=head1 ATTRIBUTES
+
+=head2 primitive
+
+  my $primitive = $shorthash->primitive;
+  $shorthash->primitive('poly1305');
+
+Gets or sets the primitive used for all operations by this object. Note this
+can be C<default>.
+
 =head1 METHODS
-
-=head2 PRIMITIVE
-
-  my $default_primitive = $shorthash->PRIMITIVE;
-
-=head2 BYTES
-
-  my $hash_length = $shorthash->BYTES;
-
-=head2 KEYBYTES
-
-  my $key_length = $shorthash->KEYBYTES;
 
 =head2 primitives
 
-  my @primitives = $pwhash->primitives;
+  my @primitives = Crypt::Sodium::XS::OO::shorthash->primitives;
+  my @primitives = $shorthash->primitives;
 
-Returns a list of all supported primitive names (including 'default').
+Returns a list of all supported primitive names, including C<default>.
+
+Can be called as a class method.
+
+=head2 PRIMITIVE
+
+  my $primitive = $shorthash->PRIMITIVE;
+
+Returns the primitive used for all operations by this object. Note this will
+never be C<default> but would instead be the primitive it represents.
 
 =head2 keygen
 
-  my $key = $shorthash->keygen;
+  my $key = $shorthash->keygen($flags);
+
+C<$flags> is optional. It is the flags used for the C<$key>
+L<Crypt::Sodium::XS::MemVault>. See L<Crypt::Sodium::XS::ProtMem>.
+
+Returns a L<Crypt::Sodium::XS::MemVault>: a new secret key of L</KEYBYTES>
+bytes.
 
 =head2 shorthash
 
   my $hash = $shorthash->shorthash($message, $key);
+
+C<$message> is the message to hash. It may be a L<Crypt::Sodium::XS::MemVault>.
+
+C<$key> is the secret key used in the hash. It must be L</KEYBYTES> bytes. It
+may be a L<Crypt::Sodium::XS::MemVault>.
+
+Returns the hash output of L</BYTES> bytes.
+
+=head2 BYTES
+
+  my $hash_size = $shorthash->BYTES;
+
+Returns the size, in bytes, of hash output.
+
+=head2 KEYBYTES
+
+  my $key_size = $shorthash->KEYBYTES;
+
+Returns the size, in bytes, of a secret key.
 
 =head1 SEE ALSO
 

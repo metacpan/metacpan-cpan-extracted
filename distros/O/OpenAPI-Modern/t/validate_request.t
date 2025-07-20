@@ -191,12 +191,6 @@ YAML
     to_str($request).': operation is not under a path-item with a path template',
   );
 
-  # TODO test: path-item exists, under paths with a template, but a $ref is followed before finding
-  # the actual definition: should be usable.
-  # we need to make sure that the URI matches the path_template above all the $refs.
-  # the destination path-item could be under /components/pathItems or /webhooks or in a callback,
-  # or shared by a path-item in another /path/<path_template>.
-
   cmp_result(
     $openapi->validate_request(request('GET', 'http://example.com/bloop/blah'))->TO_JSON,
     {
@@ -860,6 +854,85 @@ YAML
           keywordLocation => jsonp(qw(/paths /foo post parameters 2 schema not)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post parameters 2 schema not)))->to_string,
           error => 'subschema is true',
+        },
+      ],
+    },
+    'query and header parameters are evaluated against their schemas',
+  );
+
+
+  $openapi = OpenAPI::Modern->new(
+    openapi_uri => $doc_uri,
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+paths:
+  /foo/{null_path}/{boolean_path}:
+    parameters:
+    - name: null_path
+      in: path
+      required: true
+      schema:
+        type: 'null'
+    - name: boolean_path
+      in: path
+      required: true
+      schema:
+        type: boolean
+    get:
+      parameters:
+      - name: null_query
+        in: query
+        required: false
+        schema:
+          type: 'null'
+      - name: boolean_query
+        in: query
+        required: false
+        schema:
+          type: boolean
+          const: true
+      - name: NullHeader
+        in: header
+        required: false
+        schema:
+          type: 'null'
+      - name: BooleanHeader
+        in: header
+        required: false
+        schema:
+          type: boolean
+          const: true
+YAML
+
+  $request = request('GET', 'http://example.com/foo/bar/baz?null_query=&boolean_query=0',
+    [ NullHeader => '', BooleanHeader => 0 ]);
+  cmp_result(
+    $openapi->validate_request($request)->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/request/uri/query/boolean_query',
+          keywordLocation => jsonp(qw(/paths /foo/{null_path}/{boolean_path} get parameters 1 schema const)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{null_path}/{boolean_path} get parameters 1 schema const)))->to_string,
+          error => 'value does not match',
+        },
+        {
+          instanceLocation => '/request/header/BooleanHeader',
+          keywordLocation => jsonp(qw(/paths /foo/{null_path}/{boolean_path} get parameters 3 schema const)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{null_path}/{boolean_path} get parameters 3 schema const)))->to_string,
+          error => 'value does not match',
+        },
+        {
+          instanceLocation => '/request/uri/path/null_path',
+          keywordLocation => jsonp(qw(/paths /foo/{null_path}/{boolean_path} parameters 0 schema type)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{null_path}/{boolean_path} parameters 0 schema type)))->to_string,
+          error => 'got string, not null',
+        },
+        {
+          instanceLocation => '/request/uri/path/boolean_path',
+          keywordLocation => jsonp(qw(/paths /foo/{null_path}/{boolean_path} parameters 1 schema type)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{null_path}/{boolean_path} parameters 1 schema type)))->to_string,
+          error => 'got string, not boolean',
         },
       ],
     },
@@ -2002,14 +2075,27 @@ paths:
         schema:
           $ref: '#/paths/~1foo/get/parameters/2/schema'
           not: true
-      - name: ArrayWithBrokenRef
-        in: header
-        schema:
-          $ref: '#/components/schemas/i_do_not_exist'
       - name: MultipleValuesAsRawString
         in: header
         schema:
           const: 'one , two  , three'
+      - name: ArrayWithLocalTypeAndRef
+        in: header
+        schema:
+          type: array   # if detected, this will be used first to determine the parsing
+          $ref: '#/paths/~1foo/get/parameters/3/schema' # this provides  type: object
+          not: true
+      - name: ArrayWithAllOfAndRef
+        in: header
+        schema:
+          allOf:
+            - $ref: '#/paths/~1foo/get/parameters/2/schema'
+            - not: true
+      # must be evaluated last, as broken $refs abort all validation
+      - name: ArrayWithBrokenRef
+        in: header
+        schema:
+          $ref: '#/components/schemas/i_do_not_exist'
 YAML
 
   my $request = request('GET', 'http://example.com/foo', [ SingleValue => '  mystring  ' ]);
@@ -2085,6 +2171,8 @@ YAML
   $request = request('GET', 'http://example.com/foo', [
       ArrayWithRef => 'one, one, three',
       ArrayWithRefAndOtherKeywords => 'one, one, three',
+      ArrayWithLocalTypeAndRef => 'one, two, two',
+      ArrayWithAllOfAndRef => 'one, three, three',
       ArrayWithBrokenRef => 'hi',
     ]);
   cmp_result(
@@ -2111,14 +2199,79 @@ YAML
           error => 'subschema is true',
         },
         {
+          instanceLocation => '/request/header/ArrayWithLocalTypeAndRef',
+          keywordLocation => jsonp(qw(/paths /foo get parameters 8 schema $ref type)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo get parameters 3 schema type)))->to_string,
+          error => 'got array, not object',
+        },
+        {
+          instanceLocation => '/request/header/ArrayWithLocalTypeAndRef',
+          keywordLocation => jsonp(qw(/paths /foo get parameters 8 schema not)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo get parameters 8 schema not)))->to_string,
+          error => 'subschema is true',
+        },
+        {
+          instanceLocation => '/request/header/ArrayWithAllOfAndRef',
+          keywordLocation => jsonp(qw(/paths /foo get parameters 9 schema allOf 0 $ref uniqueItems)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo get parameters 2 schema uniqueItems)))->to_string,
+          error => 'items at indices 1 and 2 are not unique',
+        },
+        {
+          instanceLocation => '/request/header/ArrayWithAllOfAndRef',
+          keywordLocation => jsonp(qw(/paths /foo get parameters 9 schema allOf 1 not)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo get parameters 9 schema allOf 1 not)))->to_string,
+          error => 'subschema is true',
+        },
+        {
+          instanceLocation => '/request/header/ArrayWithAllOfAndRef',
+          keywordLocation => jsonp(qw(/paths /foo get parameters 9 schema allOf)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo get parameters 9 schema allOf)))->to_string,
+          error => 'subschemas 0, 1 are not valid',
+        },
+        {
           instanceLocation => '/request/header/ArrayWithBrokenRef',
-          keywordLocation => jsonp(qw(/paths /foo get parameters 7 schema $ref)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo get parameters 7 schema $ref)))->to_string,
+          keywordLocation => jsonp(qw(/paths /foo get parameters 10 schema $ref)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo get parameters 10 schema $ref)))->to_string,
           error => 'EXCEPTION: unable to find resource "'.$doc_uri.'#/components/schemas/i_do_not_exist"',
         },
       ],
     },
     'header schemas can use a $ref and we follow it correctly, updating locations, and respect adjacent keywords',
+  );
+
+
+  $openapi = OpenAPI::Modern->new(
+    openapi_uri => $doc_uri,
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+paths:
+  /foo:
+    get:
+      parameters:
+      - name: ZeroSchema
+        in: header
+        schema:
+          $ref: '0'
+YAML
+
+  $openapi->evaluator->add_schema(
+    Mojo::URL->new('0')->to_abs($doc_uri),
+    { type => 'array', minItems => 3 },
+  );
+
+  cmp_result(
+    $openapi->validate_request(request('GET', 'http://example.com/foo', [ ZeroSchema => 'foo,bar' ]))->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/request/header/ZeroSchema',
+          keywordLocation => jsonp(qw(/paths /foo get parameters 0 schema $ref minItems)),
+          absoluteKeywordLocation => 'http://example.com/0#/minItems',
+          error => 'array has fewer than 3 items',
+        },
+      ],
+    },
+    'can correctly use a $ref to "0" when parsing parameter schemas for type hints',
   );
 };
 

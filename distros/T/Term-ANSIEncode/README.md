@@ -37,96 +37,118 @@ Markup text to ANSI encoder
     Show all of the symbol character tokens
 	Use search to shorten the huge list
 ````
+### -**f** or --**full**
+```
+    Use the full token table.  This will increase the initialization time.
+```
 
 ## Tokens
 ```
-Tokens have to be encapsulated inside [% token %]
+Tokens have to be encapsulated inside [% token %] (the token must be
+surrounded by at least one space on each side.  Colors beyond the standard 8
+will require a terminal that supports 256 colors.
 
-NOTE:  Use "less -r" to view in "less"
+NOTE:  Use "less -r" to view ANSI in "less"
 
-╭────────────────────────────────────────────────────────────────────────╮
-│    ::::::::::::   ...      :::  .   .,:::::::::.    :::. .::::::.      │
-│    ;;;;;;;;''''.;;;;;;;.   ;;; .;;,.;;;;''''`;;;;,  `;;;;;;`    `      │
-│         [[    ,[[     \[[, [[[[[/'   [[cccc   [[[[[. '[['[==/[[[[,     │
-│         $$    $$$,     $$$_$$$$,     $$""""   $$$ "Y$c$$  '''    $     │
-│         88,   "888,_ _,88P"888"88o,  888oo,__ 888    Y88 88b    dP     │
-│         MMM     "YMMMMMP"  MMM "MMP" """"YUMMMMMM     YM  "YMmMY"      │
-├─────────────────────┬────────── GENERAL ───────────────────────────────┤
-│ RETURN              │ ASCII RETURN (13)                                │
-│ LINEFEED            │ ASCII LINEFEED (10)                              │
-│ NEWLINE             │ RETURN + LINEFEED (13 + 10)                      │
-│ CLEAR               │ Places cursor at top left, screen cleared        │
-│ CLS                 │ Same as CLEAR                                    │
-│ CLEAR LINE          │ Clear to the end of line                         │
-│ CLEAR DOWN          │ Clear down from current cursor position          │
-│ CLEAR UP            │ Clear up from current cursor position            │
-│ RESET               │ Reset all colors and attributes                  │
-├─────────────────────┼────────── CURSOR ────────────────────────────────┤
-│ UP                  │ Moves cursor up one step                         │
-│ DOWN                │ Moves cursor down one step                       │
-│ RIGHT               │ Moves cursor right one step                      │
-│ LEFT                │ Moves cursor left one step                       │
-│ SAVE                │ Save cursor position                             │
-│ RESTORE             │ Place cursor at saved position                   │
-│ BOLD                │ Bold text (not all terminals support this)       │
-│ FAINT               │ Faded text (not all terminals support this)      │
-│ ITALIC              │ Italicized text (not all terminals support this) │
-│ UNDERLINE           │ Underlined text (not all terminals support this) │
-│ SLOW BLINK          │ Slow cursor blink                                │
-│ RAPID BLINK         │ Rapid cursor blink                               │
-├─────────────────────┼───────── ATTRIBUTES ─────────────────────────────┤
-│ INVERT              │ Invert text (flip background and foreground)     │
-│ REVERSE             │ Reverse                                          │
-│ CROSSED OUT         │ Crossed out                                      │
-│ DEFAULT FONT        │ Default font                                     │
-├─────────────────────┼─────────── COLORS ───────────────────────────────┤
-│ NORMAL              │ Sets colors to default                           │
-├─────────────────────┼───────── FOREGROUND ─────────────────────────────┤
-│ DEFAULT             │ Default foreground color                         │
-│ BLACK               │ Black                                            │
-│ RED                 │ Red                                              │
-│ PINK                │ Hot pink                                         │
-│ ORANGE              │ Orange                                           │
-│ NAVY                │ Deep blue                                        │
-│ GREEN               │ Green                                            │
-│ YELLOW              │ Yellow                                           │
-│ BLUE                │ Blue                                             │
-│ MAGENTA             │ Magenta                                          │
-│ CYAN                │ Cyan                                             │
-│ WHITE               │ White                                            │
-│ BRIGHT BLACK        │ Bright black (dim grey)                          │
-│ BRIGHT RED          │ Bright red                                       │
-│ BRIGHT GREEN        │ Lime                                             │
-│ BRIGHT YELLOW       │ Bright Yellow                                    │
-│ BRIGHT BLUE         │ Bright blue                                      │
-│ BRIGHT MAGENTA      │ Bright magenta                                   │
-│ BRIGHT CYAN         │ Bright cyan                                      │
-│ BRIGHT WHITE        │ Bright white                                     │
-│ ANSI0 - ANSI231     │ Term256 colors (use -c to see these)             │
-│ GREY0 - GREY23      │ Levels of grey                                   │
-├─────────────────────┼───────── BACKGROUND ─────────────────────────────┤
-│ B_DEFAULT           │ Default background color                         │
-│ B_BLACK             │  Black                                           │
-│ B_RED               │  Red                                             │
-│ B_GREEN             │  Green                                           │
-│ B_YELLOW            │  Yellow                                          │
-│ B_BLUE              │  Blue                                            │
-│ B_MAGENTA           │  Magenta                                         │
-│ B_CYAN              │  Cyan                                            │
-│ B_WHITE             │  White                                           │
-│ B_PINK              │  Hot pink                                        │
-│ B_ORANGE            │  Orange                                          │
-│ B_NAVY              │  Deep blue                                       │
-│ BRIGHT B_BLACK      │  Bright black    (grey)                          │
-│ BRIGHT B_RED        │  Bright red                                      │
-│ BRIGHT B_GREEN      │  Lime                                            │
-│ BRIGHT B_YELLOW     │  Bright yellow                                   │
-│ BRIGHT B_BLUE       │  Bright blue                                     │
-│ BRIGHT B_MAGENTA    │  Bright magenta                                  │
-│ BRIGHT B_CYAN       │  Bright cyan                                     │
-│ BRIGHT B_WHITE      │  Bright white                                    │
-│ B_ANSI0 - B_ANSI231 │ Term256 background colors (use -c to see these)  │
-│ B_GREY0 - B_GREY23  │ Levels of grey                                   │
-╰─────────────────────┴──────────────────────────────────────────────────╯
+╭───────────────────────────────────────────────────────────────────────────────────╮
+│         ::::::::::::   ...      :::  .   .,:::::::::.    :::. .::::::.            │
+│         ;;;;;;;;''''.;;;;;;;.   ;;; .;;,.;;;;''''`;;;;,  `;;;;;;`    `            │
+│              [[    ,[[     \[[, [[[[[/'   [[cccc   [[[[[. '[['[==/[[[[,           │
+│              $$    $$$,     $$$_$$$$,     $$""""   $$$ "Y$c$$  '''    $           │
+│              88,   "888,_ _,88P"888"88o,  888oo,__ 888    Y88 88b    dP           │
+│              MMM     "YMMMMMP"  MMM "MMP" """"YUMMMMMM     YM  "YMmMY"            │
+╞ GENERAL ═══════════════════════╤══════════════════════════════════════════════════╡
+│ RETURN                         │ ASCII RETURN (13)                                │
+│ LINEFEED                       │ ASCII LINEFEED (10)                              │
+│ NEWLINE                        │ RETURN + LINEFEED (13 + 10)                      │
+│ CLEAR                          │ Places cursor at top left, screen cleared        │
+│ CLS                            │ Same as CLEAR                                    │
+│ CLEAR LINE                     │ Clear to the end of line                         │
+│ CLEAR DOWN                     │ Clear down from current cursor position          │
+│ CLEAR UP                       │ Clear up from current cursor position            │
+│ RESET                          │ Reset all colors and attributes                  │
+╞ CURSOR ════════════════════════╪══════════════════════════════════════════════════╡
+│ UP                             │ Moves cursor up one step                         │
+│ DOWN                           │ Moves cursor down one step                       │
+│ RIGHT                          │ Moves cursor right one step                      │
+│ LEFT                           │ Moves cursor left one step                       │
+│ SAVE                           │ Save cursor position                             │
+│ RESTORE                        │ Place cursor at saved position                   │
+│ BOLD                           │ Bold text       (not all terminals support this) │
+│ FAINT                          │ Faded text      (not all terminals support this) │
+│ ITALIC                         │ Italicized text (not all terminals support this) │
+│ UNDERLINE                      │ Underlined text (not all terminals support this) │
+│ SLOW BLINK                     │ Slow cursor blink   (Usually one speed for most) │
+│ RAPID BLINK                    │ Rapid cursor blink  (Usually one speed for most) │
+╞ ATTRIBUTES ════════════════════╪══════════════════════════════════════════════════╡
+│ INVERT                         │  Invert text    (flip background and foreground) │
+│ REVERSE                        │  Reverse                                         │
+│ CROSSED OUT                    │ Crossed out     (not all terminals support this) │
+│ DEFAULT FONT                   │ Default font                                     │
+╞ COLORS ════════════════════════╪══════════════════════════════════════════════════╡
+│ NORMAL                         │ Sets colors to default                           │
+╞ FOREGROUND ════════════════════╪══════════════════════════════════════════════════╡
+│ DEFAULT                        │ Default foreground color                         │
+│ BLACK                          │  Black                                           │
+│ RED                            │ Red                                              │
+│ PINK                           │ Hot pink           (requires 256 color terminal) │
+│ ORANGE                         │ Orange             (requires 256 color terminal) │
+│ NAVY                           │ Deep blue          (requires 256 color terminal) │
+│ GREEN                          │ Green                                            │
+│ YELLOW                         │ Yellow                                           │
+│ BLUE                           │ Blue                                             │
+│ MAGENTA                        │ Magenta                                          │
+│ CYAN                           │ Cyan                                             │
+│ WHITE                          │ White                                            │
+│ BRIGHT BLACK                   │ Bright black                          (dim grey) │
+│ BRIGHT RED                     │ Bright red                                       │
+│ BRIGHT GREEN                   │ Lime                                             │
+│ BRIGHT YELLOW                  │ Bright Yellow                                    │
+│ BRIGHT BLUE                    │ Bright blue                                      │
+│ BRIGHT MAGENTA                 │ Bright magenta                                   │
+│ BRIGHT CYAN                    │ Bright cyan                                      │
+│ BRIGHT WHITE                   │ Bright white                                     │
+│ ANSI0 - ANSI231                │ Term256 colors             (use -c to see these) │
+│ GREY0 - GREY23                 │ Levels of grey                                   │
+╞ BACKGROUND ════════════════════╪══════════════════════════════════════════════════╡
+│ B_DEFAULT                      │ Default background color                         │
+│ B_BLACK                        │  Black                                           │
+│ B_RED                          │  Red                                             │
+│ B_GREEN                        │  Green                                           │
+│ B_YELLOW                       │  Yellow                                          │
+│ B_BLUE                         │  Blue                                            │
+│ B_MAGENTA                      │  Magenta                                         │
+│ B_CYAN                         │  Cyan                                            │
+│ B_WHITE                        │  White                                           │
+│ B_PINK                         │  Hot pink          (requires 256 color terminal) │
+│ B_ORANGE                       │  Orange            (requires 256 color terminal) │
+│ B_NAVY                         │  Deep blue         (requires 256 color terminal) │
+│ BRIGHT B_BLACK                 │  Bright black                             (grey) │
+│ BRIGHT B_RED                   │  Bright red                                      │
+│ BRIGHT B_GREEN                 │  Lime                                            │
+│ BRIGHT B_YELLOW                │  Bright yellow                                   │
+│ BRIGHT B_BLUE                  │  Bright blue                                     │
+│ BRIGHT B_MAGENTA               │  Bright magenta                                  │
+│ BRIGHT B_CYAN                  │  Bright cyan                                     │
+│ BRIGHT B_WHITE                 │  Bright white                                    │
+│ B_ANSI0 - B_ANSI231            │ Term256 background colors (use -c to see these)  │
+│ B_GREY0 - B_GREY23             │ Levels of grey                                   │
+╞ HORIZONTAL RULES ══════════════╪══════════════════════════════════════════════════╡
+│ HORIZONTAL RULE RED            │ A solid line of red background                   │
+│ HORIZONTAL RULE GREEN          │ A solid line of green background                 │
+│ HORIZONTAL RULE YELLOW         │ A solid line of yellow background                │
+│ HORIZONTAL RULE BLUE           │ A solid line of blue background                  │
+│ HORIZONTAL RULE MAGENTA        │ A solid line of magenta background               │
+│ HORIZONTAL RULE CYAN           │ A solid line of cyan background                  │
+│ HORIZONTAL RULE PINK           │ A solid line of hot pink background              │
+│ HORIZONTAL RULE ORANGE         │ A solid line of orange background                │
+│ HORIZONTAL RULE WHITE          │ A solid line of white background                 │
+│ HORIZONTAL RULE BRIGHT RED     │ A solid line of bright red background            │
+│ HORIZONTAL RULE BRIGHT GREEN   │ A solid line of bright green background          │
+│ HORIZONTAL RULE BRIGHT YELLOW  │ A solid line of bright yellow background         │
+│ HORIZONTAL RULE BRIGHT BLUE    │ A solid line of bright blue background           │
+│ HORIZONTAL RULE BRIGHT MAGENTA │ A solid line of bright magenta background        │
+│ HORIZONTAL RULE BRIGHT CYAN    │ A solid line of bright cyan background           │
+│ HORIZONTAL RULE BRIGHT WHITE   │ A solid line of bright white background          │
+╰────────────────────────────────┴──────────────────────────────────────────────────╯
 ```
-

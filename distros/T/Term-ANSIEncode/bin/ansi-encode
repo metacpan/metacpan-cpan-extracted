@@ -54,6 +54,7 @@ my $tokens  = FALSE;
 my $symbols = FALSE;
 my $colors  = FALSE;
 my $full    = FALSE;
+my $Dump    = FALSE;
 
 GetOptions(
     'version' => \$version,
@@ -62,35 +63,36 @@ GetOptions(
     'colors'  => \$colors,
     'symbols' => \$symbols,
 	'full'    => \$full,
+	'dump'    => \$Dump,
 );
 
 my $text = <<'VERSION';
-[% CLEAR %]▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
-▌[% RED %]               [% BRIGHT YELLOW %] _   _ [% GREEN %] _____ [% BRIGHT BLUE %]_____  [% BRIGHT WHITE %] ______                     _            [% RESET %]▐
-▌[% RED %]          ╱╲   [% BRIGHT YELLOW %]│ ╲ │ │[% GREEN %]╱ ____│[% BRIGHT BLUE %]_   _│ [% BRIGHT WHITE %]│  ____│                   │ │           [% RESET %]▐
-▌[% RED %]         ╱  ╲  [% BRIGHT YELLOW %]│  ╲│ │[% GREEN %] (___  [% BRIGHT BLUE %] │ │   [% BRIGHT WHITE %]│ │__   _ __   ___ ___   __│ │ ___       [% RESET %]▐
-▌[% RED %]        ╱ ╱╲ ╲ [% BRIGHT YELLOW %]│ . ` │[% GREEN %]╲___ ╲ [% BRIGHT BLUE %] │ │   [% BRIGHT WHITE %]│  __│ │ '_ ╲ ╱ __╱ _ ╲ ╱ _` │╱ _ ╲      [% RESET %]▐
-▌[% RED %]       ╱ ____ ╲[% BRIGHT YELLOW %]│ │╲  │[% GREEN %]____) │[% BRIGHT BLUE %]_│ │_  [% BRIGHT WHITE %]│ │____│ │ │ │ (_│ (_) │ (_│ │  __╱      [% RESET %]▐
-▌[% RED %]      ╱_╱    ╲_╲[% BRIGHT YELLOW %]_│ ╲_│[% GREEN %]_____╱[% BRIGHT BLUE %]│_____│ [% BRIGHT WHITE %]│______│_│ │_│╲___╲___╱ ╲__,_│╲___│      [% RESET %]▐
-▌▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▐
-▌[% B_ANSI52 %]                         Written By [% BRIGHT YELLOW %]Richard Kelsch[% RESET %][% B_ANSI52 %]                           [% RESET %]▐
-▌[% B_ANSI52 %]                       Copyright ©[% GREEN %]2025 [% BRIGHT YELLOW %]Richard Kelsch[% RESET %][% B_ANSI52 %]                        [% RESET %]▐
-▌[% B_ANSI52 %]                            All Rights Reserved                              [% RESET %]▐
-▌[% B_ANSI52 %]                               Version [% GREEN %]XXXX[% RESET %][% B_ANSI52 %]                                  [% RESET %]▐
-▌▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▐
-▌                                                                             ▐
-▌                                                                             ▐
-▌                                                                             ▐
-▌                                                                             ▐
-▌                                                                             ▐
-▌                                                                             ▐
-▌                                                                             ▐
-▌                                                                             ▐
-▌                                                                             ▐
-▌                                                                             ▐
-▌                                                                             ▐
-▌                                                                             ▐
-▙▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▟
+[% CLEAR %][% INVERT %]◤[% RESET %]█████████████████████████████████████████████████████████████████████████████[% INVERT %]◥[% RESET %]
+█◤[% RED %]              [% BRIGHT YELLOW %] _   _ [% GREEN %] _____ [% BRIGHT BLUE %]_____  [% BRIGHT WHITE %] ______                     _           [% RESET %]◥█
+█[% RED %]          ╱╲   [% BRIGHT YELLOW %]│ ╲ │ │[% GREEN %]╱ ____│[% BRIGHT BLUE %]_   _│ [% BRIGHT WHITE %]│  ____│                   │ │           [% RESET %]█
+█[% RED %]         ╱  ╲  [% BRIGHT YELLOW %]│  ╲│ │[% GREEN %] (___  [% BRIGHT BLUE %] │ │   [% BRIGHT WHITE %]│ │__   _ __   ___ ___   __│ │ ___       [% RESET %]█
+█[% RED %]        ╱ ╱╲ ╲ [% BRIGHT YELLOW %]│ . ` │[% GREEN %]╲___ ╲ [% BRIGHT BLUE %] │ │   [% BRIGHT WHITE %]│  __│ │ '_ ╲ ╱ __╱ _ ╲ ╱ _` │╱ _ ╲      [% RESET %]█
+█[% RED %]       ╱ ____ ╲[% BRIGHT YELLOW %]│ │╲  │[% GREEN %]____) │[% BRIGHT BLUE %]_│ │_  [% BRIGHT WHITE %]│ │____│ │ │ │ (_│ (_) │ (_│ │  __╱      [% RESET %]█
+█[% RED %]      ╱_╱    ╲_╲[% BRIGHT YELLOW %]_│ ╲_│[% GREEN %]_____╱[% BRIGHT BLUE %]│_____│ [% BRIGHT WHITE %]│______│_│ │_│╲___╲___╱ ╲__,_│╲___│      [% RESET %]█
+█▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒█
+█[% B_ANSI52 %]                         Written By [% BRIGHT YELLOW %]Richard Kelsch[% RESET %][% B_ANSI52 %]                           [% RESET %]█
+█[% B_ANSI52 %]                       Copyright ©[% GREEN %]2025 [% BRIGHT YELLOW %]Richard Kelsch[% RESET %][% B_ANSI52 %]                        [% RESET %]█
+█[% B_ANSI52 %]                            All Rights Reserved                              [% RESET %]█
+█[% B_ANSI52 %]                               Version [% GREEN %]XXXX[% RESET %][% B_ANSI52 %]                                  [% RESET %]█
+█▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒█
+█                                                                             █
+█                                                                             █
+█                                                                             █
+█                                                                             █
+█                                                                             █
+█                                                                             █
+█                                                                             █
+█                                                                             █
+█                                                                             █
+█                                                                             █
+█                                                                             █
+█[% INVERT %]◥[% RESET %]                                                                           [% INVERT %]◤[% RESET %]█
+◥█████████████████████████████████████████████████████████████████████████████◤
 
 
 VERSION
@@ -98,18 +100,18 @@ VERSION
 $text =~ s/XXXX/$VERSION/gs;
 
 my $text2 = <<'SECOND';
-▌ [% CYAN %]This program is free software: you can redistribute it and/or modify it    [% RESET %] ▐
-▌ [% CYAN %]under the terms of the GNU General Public License as published by the Free [% RESET %] ▐
-▌ [% CYAN %]Software Foundation, either version 3 of the License, or (at your option)  [% RESET %] ▐
-▌ [% CYAN %]any later version.                                                         [% RESET %] ▐
+█ [% CYAN %]This program is free software: you can redistribute it and/or modify it    [% RESET %] █
+█ [% CYAN %]under the terms of the GNU General Public License as published by the Free [% RESET %] █
+█ [% CYAN %]Software Foundation, either version 3 of the License, or (at your option)  [% RESET %] █
+█ [% CYAN %]any later version.                                                         [% RESET %] █
 
-▌ [% CYAN %]This program is distributed in the hope that it will be useful, but WITHOUT[% RESET %] ▐
-▌ [% CYAN %]ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or      [% RESET %] ▐
-▌ [% CYAN %]FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for  [% RESET %] ▐
-▌ [% CYAN %]more details.                                                              [% RESET %] ▐
+█ [% CYAN %]This program is distributed in the hope that it will be useful, but WITHOUT[% RESET %] █
+█ [% CYAN %]ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or      [% RESET %] █
+█ [% CYAN %]FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for  [% RESET %] █
+█ [% CYAN %]more details.                                                              [% RESET %] █
 
-▌ [% CYAN %]You should have received a copy of the GNU General Public License along    [% RESET %] ▐
-▌ [% CYAN %]with this program.  If not, see:  [% PINK %]<http://www.gnu.org/licenses/>.          [% RESET %] ▐
+█ [% CYAN %]You should have received a copy of the GNU General Public License along    [% RESET %] █
+█[% INVERT %]◥[% RESET %][% CYAN %]with this program.  If not, see:  [% PINK %]<http://www.gnu.org/licenses/>.          [% RESET %][% INVERT %]◤[% RESET %]█
 
 
 SECOND
@@ -118,37 +120,36 @@ my $ansi = ($full) ? Term::ANSIEncode->new('mode' => 'full') : Term::ANSIEncode-
 
 ###
 my $small = <<'SMALL';
-╔══════════════════════════════════════════════╗
-║       [% RED %]┏━┓[% BRIGHT YELLOW %]┏┓╻[% GREEN %]┏━┓[% BRIGHT BLUE %]╻[% RESET %]   [% BRIGHT WHITE %]┏━╸┏┓╻┏━╸┏━┓╺┳┓┏━╸[% RESET %]        ║
-║       [% RED %]┣━┫[% BRIGHT YELLOW %]┃┗┫[% GREEN %]┗━┓[% BRIGHT BLUE %]┃[% RESET %]   [% BRIGHT WHITE %]┣╸ ┃┗┫┃  ┃ ┃ ┃┃┣╸ [% RESET %]        ║
-║       [% RED %]╹ ╹[% BRIGHT YELLOW %]╹ ╹[% GREEN %]┗━┛[% BRIGHT BLUE %]╹[% RESET %]   [% BRIGHT WHITE %]┗━╸╹ ╹┗━╸┗━┛╺┻┛┗━╸[% RESET %]        ║
-╠══════════════════════════════════════════════╣
-║[% B_ANSI52 %][% BRIGHT YELLOW %] DESCRIPTION                                  [% RESET %]║
-║     Markup text to ANSI encoder.             ║
-║                                              ║
-║[% B_ANSI52 %][% BRIGHT YELLOW %] USAGE                                        [% RESET %]║
-║     [% CYAN %]ansi-encode[% RESET %] [options] [text file]        ║
-║                                              ║
-║[% B_ANSI52 %][% BRIGHT YELLOW %] OPTIONS                                      [% RESET %]║
-║     -[% PINK %]v[% RESET %] or --[% PINK %]version[% RESET %]                          ║
-║         Shows version and licensing info     ║
-║                                              ║
-║     -[% PINK %]h[% RESET %] or --[% PINK %]help[% RESET %]                             ║
-║         Usage information                    ║
-║                                              ║
-║     -[% PINK %]t[% RESET %] or --[% PINK %]tokens[% RESET %]                           ║
-║         Show most used tokens                ║
-║                                              ║
-║     -[% PINK %]c[% RESET %] or --[% PINK %]colors[% RESET %]                           ║
-║         Show available colors and tokens     ║
-║                                              ║
-║     -[% PINK %]s[% RESET %] or --[% PINK %]symbols[% RESET %] [search]                 ║
-║         Show available symbols and tokens    ║
-║                                              ║
-║     -[% PINK %]f[% RESET %] or --[% PINK %]full[% RESET %]                             ║
-║         Loads the full symbol table.  It     ║
-║         will slow down initialization.       ║
-╚══════════════════════════════════════════════╝
+╔═════════════════════════════════════════════════════════════════════════╗
+║                     [% RED %]┏━┓[% BRIGHT YELLOW %]┏┓╻[% GREEN %]┏━┓[% BRIGHT BLUE %]╻[% RESET %]   [% BRIGHT WHITE %]┏━╸┏┓╻┏━╸┏━┓╺┳┓┏━╸[% RESET %]                     ║
+║                     [% RED %]┣━┫[% BRIGHT YELLOW %]┃┗┫[% GREEN %]┗━┓[% BRIGHT BLUE %]┃[% RESET %]   [% BRIGHT WHITE %]┣╸ ┃┗┫┃  ┃ ┃ ┃┃┣╸ [% RESET %]                     ║
+║                     [% RED %]╹ ╹[% BRIGHT YELLOW %]╹ ╹[% GREEN %]┗━┛[% BRIGHT BLUE %]╹[% RESET %]   [% BRIGHT WHITE %]┗━╸╹ ╹┗━╸┗━┛╺┻┛┗━╸[% RESET %]                     ║
+╠═════════════════════════════════════════════════════════════════════════╣
+║[% B_ANSI52 %][% BRIGHT YELLOW %] DESCRIPTION                                                             [% RESET %]║
+║     Markup text to ANSI encoder.                                        ║
+║                                                                         ║
+║[% B_ANSI52 %][% BRIGHT YELLOW %] USAGE                                                                   [% RESET %]║
+║     [% CYAN %]ansi-encode[% RESET %] [options] [text file]                                   ║
+║                                                                         ║
+║[% B_ANSI52 %][% BRIGHT YELLOW %] OPTIONS                                                                 [% RESET %]║
+║     -[% PINK %]v[% RESET %] or --[% PINK %]version[% RESET %]                                                     ║
+║         Shows version and licensing info                                ║
+║                                                                         ║
+║     -[% PINK %]h[% RESET %] or --[% PINK %]help[% RESET %]                                                        ║
+║         Usage information                                               ║
+║                                                                         ║
+║     -[% PINK %]t[% RESET %] or --[% PINK %]tokens[% RESET %]                                                      ║
+║         Show most used tokens                                           ║
+║                                                                         ║
+║     -[% PINK %]c[% RESET %] or --[% PINK %]colors[% RESET %]                                                      ║
+║         Show available colors and tokens                                ║
+║                                                                         ║
+║     -[% PINK %]s[% RESET %] or --[% PINK %]symbols[% RESET %] [search]                                            ║
+║         Show available symbols and tokens                               ║
+║                                                                         ║
+║     -[% PINK %]f[% RESET %] or --[% PINK %]full[% RESET %]                                                        ║
+║         Loads the full symbol table.  It will slow down initialization. ║
+╚═════════════════════════════════════════════════════════════════════════╝
 SMALL
 
 my $greydient = '';    # Yes, the spelling is intentional
@@ -159,111 +160,112 @@ $greydient .= '[% RESET %]';
 my $to = <<'TOKENS';
 
 Tokens have to be encapsulated inside [% token %] (the token must be
-surrounded by at least one space on each side.
+surrounded by at least one space on each side.  Colors beyond the standard 8
+will require a terminal that supports 256 colors.
 
 NOTE:  Use "less -r" to view ANSI in "less"
 
-╭─────────────────────────────────────────────────────────────────────────────────────╮
-│[% RED           %]          ::::::::::::   ...      :::  .   .,:::::::::.    :::. .::::::.             [% RESET %]│
-│[% ORANGE        %]          ;;;;;;;;''''.;;;;;;;.   ;;; .;;,.;;;;''''`;;;;,  `;;;;;;`    `             [% RESET %]│
-│[% BRIGHT YELLOW %]               [[    ,[[     \[[, [[[[[/'   [[cccc   [[[[[. '[['[==/[[[[,            [% RESET %]│
-│[% GREEN         %]               $$    $$$,     $$$_$$$$,     $$""""   $$$ "Y$c$$  '''    $            [% RESET %]│
-│[% CYAN          %]               88,   "888,_ _,88P"888"88o,  888oo,__ 888    Y88 88b    dP            [% RESET %]│
-│[% BLUE          %]               MMM     "YMMMMMP"  MMM "MMP" """"YUMMMMMM     YM  "YMmMY"             [% RESET %]│
-├──────────────────────────────────┬────────── [% MAGENTA %]GENERAL[% RESET %] ───────────────────────────────┤
-│ RETURN                           │ ASCII RETURN (13)                                │
-│ LINEFEED                         │ ASCII LINEFEED (10)                              │
-│ NEWLINE                          │ RETURN + LINEFEED (13 + 10)                      │
-│ CLEAR                            │ Places cursor at top left, screen cleared        │
-│ CLS                              │ Same as CLEAR                                    │
-│ CLEAR LINE                       │ Clear to the end of line                         │
-│ CLEAR DOWN                       │ Clear down from current cursor position          │
-│ CLEAR UP                         │ Clear up from current cursor position            │
-│ RESET                            │ Reset all colors and attributes                  │
-├──────────────────────────────────┼────────── [% CYAN %]CURSOR[% RESET %] ────────────────────────────────┤
-│ UP                               │ Moves cursor up one step                         │
-│ DOWN                             │ Moves cursor down one step                       │
-│ RIGHT                            │ Moves cursor right one step                      │
-│ LEFT                             │ Moves cursor left one step                       │
-│ SAVE                             │ Save cursor position                             │
-│ RESTORE                          │ Place cursor at saved position                   │
-│ BOLD                             │ [% BOLD %]Bold text[% RESET %] (not all terminals support this)       │
-│ FAINT                            │ [% FAINT %]Faded text[% RESET %] (not all terminals support this)      │
-│ ITALIC                           │ [% ITALIC %]Italicized text[% RESET %] (not all terminals support this) │
-│ UNDERLINE                        │ [% UNDERLINE %]Underlined text[% RESET %] (not all terminals support this) │
-│ SLOW BLINK                       │ Slow cursor [% SLOW BLINK %]blink[% RESET %] (Usually one speed for most)   │
-│ RAPID BLINK                      │ Rapid cursor [% RAPID BLINK %]blink[% RESET %] (Usually one speed for most)  │
-├──────────────────────────────────┼───────── [% BRIGHT YELLOW %]ATTRIBUTES[% RESET %] ─────────────────────────────┤
-│ INVERT                           │ [% INVERT %] Invert text [% RESET %] (flip background and foreground)   │
-│ REVERSE                          │ [% REVERSE %] Reverse [% RESET %]                                        │
-│ CROSSED OUT                      │ [% CROSSED OUT %]Crossed out[% RESET %]                                      │
-│ DEFAULT FONT                     │ Default font                                     │
-├──────────────────────────────────┼─────────── [% GREEN %]COLORS[% RESET %] ───────────────────────────────┤
-│ NORMAL                           │ Sets colors to default                           │
-├──────────────────────────────────┼───────── [% PINK %]FOREGROUND[% RESET %] ─────────────────────────────┤
-│ DEFAULT                          │ Default foreground color[% RESET %]                         │
-│ BLACK                            │ [% B_GREY3        %][% BLACK %] Black [% RESET %]                                          │
-│ RED                              │ [% RED            %]Red[% RESET %]                                              │
-│ PINK                             │ [% PINK           %]Hot pink[% RESET %]                                         │
-│ ORANGE                           │ [% ORANGE         %]Orange[% RESET %]                                           │
-│ NAVY                             │ [% NAVY           %]Deep blue[% RESET %]                                        │
-│ GREEN                            │ [% GREEN          %]Green[% RESET %]                                            │
-│ YELLOW                           │ [% YELLOW         %]Yellow[% RESET %]                                           │
-│ BLUE                             │ [% BLUE           %]Blue[% RESET %]                                             │
-│ MAGENTA                          │ [% MAGENTA        %]Magenta[% RESET %]                                          │
-│ CYAN                             │ [% CYAN           %]Cyan[% RESET %]                                             │
-│ WHITE                            │ [% WHITE          %]White[% RESET %]                                            │
-│ BRIGHT BLACK                     │ [% BRIGHT BLACK   %]Bright black[% RESET %] (dim grey)                          │
-│ BRIGHT RED                       │ [% BRIGHT RED     %]Bright red[% RESET %]                                       │
-│ BRIGHT GREEN                     │ [% BRIGHT GREEN   %]Lime[% RESET %]                                             │
-│ BRIGHT YELLOW                    │ [% BRIGHT YELLOW  %]Bright Yellow[% RESET %]                                    │
-│ BRIGHT BLUE                      │ [% BRIGHT BLUE    %]Bright blue[% RESET %]                                      │
-│ BRIGHT MAGENTA                   │ [% BRIGHT MAGENTA %]Bright magenta[% RESET %]                                   │
-│ BRIGHT CYAN                      │ [% BRIGHT CYAN    %]Bright cyan[% RESET %]                                      │
-│ BRIGHT WHITE                     │ [% BRIGHT WHITE   %]Bright white[% RESET %]                                     │
-│ ANSI0 - ANSI231                  │ Term256 colors (use -c to see these)             │
-│ GREY0 - GREY23                   │ Levels of grey  [% GREYDIENT %]         │
-├──────────────────────────────────┼───────── [% ORANGE %]BACKGROUND[% RESET %] ─────────────────────────────┤
-│ B_DEFAULT                        │ Default background color                         │
-│ B_BLACK                          │ [% B_BLACK          %] Black          [% RESET %]                                 │
-│ B_RED                            │ [% B_RED            %] Red            [% RESET %]                                 │
-│ B_GREEN                          │ [% B_GREEN          %] Green          [% RESET %]                                 │
-│ B_YELLOW                         │ [% B_YELLOW         %] Yellow         [% RESET %]                                 │
-│ B_BLUE                           │ [% B_BLUE           %] Blue           [% RESET %]                                 │
-│ B_MAGENTA                        │ [% B_MAGENTA        %] Magenta        [% RESET %]                                 │
-│ B_CYAN                           │ [% B_CYAN           %] Cyan           [% RESET %]                                 │
-│ B_WHITE                          │ [% B_WHITE          %][% BLACK %] White          [% RESET %]                                 │
-│ B_PINK                           │ [% B_PINK           %] Hot pink       [% RESET %]                                 │
-│ B_ORANGE                         │ [% B_ORANGE         %][% BLACK %] Orange         [% RESET %]                                 │
-│ B_NAVY                           │ [% B_NAVY           %] Deep blue      [% RESET %]                                 │
-│ BRIGHT B_BLACK                   │ [% BRIGHT B_BLACK   %] Bright black   [% RESET %] (grey)                          │
-│ BRIGHT B_RED                     │ [% BRIGHT B_RED     %] Bright red     [% RESET %]                                 │
-│ BRIGHT B_GREEN                   │ [% BRIGHT B_GREEN   %] Lime           [% RESET %]                                 │
-│ BRIGHT B_YELLOW                  │ [% BRIGHT B_YELLOW  %] Bright yellow  [% RESET %]                                 │
-│ BRIGHT B_BLUE                    │ [% BRIGHT B_BLUE    %] Bright blue    [% RESET %]                                 │
-│ BRIGHT B_MAGENTA                 │ [% BRIGHT B_MAGENTA %] Bright magenta [% RESET %]                                 │
-│ BRIGHT B_CYAN                    │ [% BRIGHT B_CYAN    %] Bright cyan    [% RESET %]                                 │
-│ BRIGHT B_WHITE                   │ [% BRIGHT B_WHITE   %] Bright white   [% RESET %]                                 │
-│ B_ANSI0 - B_ANSI231              │ Term256 background colors (use -c to see these)  │
-│ B_GREY0 - B_GREY23               │ Levels of grey  [% GREYDIENT %]         │
-├──────────────────────────────────┼────── [% BRIGHT RED %]HORIZONTAL RULES[% RESET %] ──────────────────────────┤
-│ HORIZONTAL RULE RED              │ A solid line of red background                   │
-│ HORIZONTAL RULE GREEN            │ A solid line of green background                 │
-│ HORIZONTAL RULE YELLOW           │ A solid line of yellow background                │
-│ HORIZONTAL RULE BLUE             │ A solid line of blue background                  │
-│ HORIZONTAL RULE MAGENTA          │ A solid line of magenta background               │
-│ HORIZONTAL RULE CYAN             │ A solid line of cyan background                  │
-│ HORIZONTAL RULE PINK             │ A solid line of hot pink background              │
-│ HORIZONTAL RULE ORANGE           │ A solid line of orange background                │
-│ HORIZONTAL RULE WHITE            │ A solid line of white background                 │
-│ HORIZONTAL RULE BRIGHT RED       │ A solid line of bright red background            │
-│ HORIZONTAL RULE BRIGHT GREEN     │ A solid line of bright green background          │
-│ HORIZONTAL RULE BRIGHT YELLOW    │ A solid line of bright yellow background         │
-│ HORIZONTAL RULE BRIGHT BLUE      │ A solid line of bright blue background           │
-│ HORIZONTAL RULE BRIGHT MAGENTA   │ A solid line of bright magenta background        │
-│ HORIZONTAL RULE BRIGHT CYAN      │ A solid line of bright cyan background           │
-│ HORIZONTAL RULE BRIGHT WHITE     │ A solid line of bright white background          │
-╰──────────────────────────────────┴──────────────────────────────────────────────────╯
+╭───────────────────────────────────────────────────────────────────────────────────╮
+│[% RED           %]         ::::::::::::   ...      :::  .   .,:::::::::.    :::. .::::::.            [% RESET %]│
+│[% ORANGE        %]         ;;;;;;;;''''.;;;;;;;.   ;;; .;;,.;;;;''''`;;;;,  `;;;;;;`    `            [% RESET %]│
+│[% BRIGHT YELLOW %]              [[    ,[[     \[[, [[[[[/'   [[cccc   [[[[[. '[['[==/[[[[,           [% RESET %]│
+│[% GREEN         %]              $$    $$$,     $$$_$$$$,     $$""""   $$$ "Y$c$$  '''    $           [% RESET %]│
+│[% CYAN          %]              88,   "888,_ _,88P"888"88o,  888oo,__ 888    Y88 88b    dP           [% RESET %]│
+│[% BLUE          %]              MMM     "YMMMMMP"  MMM "MMP" """"YUMMMMMM     YM  "YMmMY"            [% RESET %]│
+╞ [% BOLD %][% MAGENTA %]GENERAL[% RESET %] ═══════════════════════╤══════════════════════════════════════════════════╡
+│ RETURN                         │ ASCII RETURN (13)                                │
+│ LINEFEED                       │ ASCII LINEFEED (10)                              │
+│ NEWLINE                        │ RETURN + LINEFEED (13 + 10)                      │
+│ CLEAR                          │ Places cursor at top left, screen cleared        │
+│ CLS                            │ Same as CLEAR                                    │
+│ CLEAR LINE                     │ Clear to the end of line                         │
+│ CLEAR DOWN                     │ Clear down from current cursor position          │
+│ CLEAR UP                       │ Clear up from current cursor position            │
+│ RESET                          │ Reset all colors and attributes                  │
+╞ [% BOLD %][% CYAN %]CURSOR[% RESET %] ════════════════════════╪══════════════════════════════════════════════════╡
+│ UP                             │ Moves cursor up one step                         │
+│ DOWN                           │ Moves cursor down one step                       │
+│ RIGHT                          │ Moves cursor right one step                      │
+│ LEFT                           │ Moves cursor left one step                       │
+│ SAVE                           │ Save cursor position                             │
+│ RESTORE                        │ Place cursor at saved position                   │
+│ BOLD                           │ [% BOLD %]Bold text[% RESET %]       (not all terminals support this) │
+│ FAINT                          │ [% FAINT %]Faded text[% RESET %]      (not all terminals support this) │
+│ ITALIC                         │ [% ITALIC %]Italicized text[% RESET %] (not all terminals support this) │
+│ UNDERLINE                      │ [% UNDERLINE %]Underlined text[% RESET %] (not all terminals support this) │
+│ SLOW BLINK                     │ Slow cursor [% SLOW BLINK %]blink[% RESET %]   (Usually one speed for most) │
+│ RAPID BLINK                    │ Rapid cursor [% RAPID BLINK %]blink[% RESET %]  (Usually one speed for most) │
+╞ [% BOLD %][% BRIGHT YELLOW %]ATTRIBUTES[% RESET %] ════════════════════╪══════════════════════════════════════════════════╡
+│ INVERT                         │ [% INVERT %] Invert text [% RESET %]   (flip background and foreground) │
+│ REVERSE                        │ [% REVERSE %] Reverse [% RESET %]                                        │
+│ CROSSED OUT                    │ [% CROSSED OUT %]Crossed out[% RESET %]     (not all terminals support this) │
+│ DEFAULT FONT                   │ Default font                                     │
+╞ [% BOLD %][% GREEN %]COLORS[% RESET %] ════════════════════════╪══════════════════════════════════════════════════╡
+│ NORMAL                         │ Sets colors to default                           │
+╞ [% BOLD %][% PINK %]FOREGROUND[% RESET %] ════════════════════╪══════════════════════════════════════════════════╡
+│ DEFAULT                        │ Default foreground color[% RESET %]                         │
+│ BLACK                          │ [% B_GREY3        %][% BLACK %] Black [% RESET %]                                          │
+│ RED                            │ [% RED            %]Red[% RESET %]                                              │
+│ PINK                           │ [% PINK           %]Hot pink[% RESET %]           (requires 256 color terminal) │
+│ ORANGE                         │ [% ORANGE         %]Orange[% RESET %]             (requires 256 color terminal) │
+│ NAVY                           │ [% NAVY           %]Deep blue[% RESET %]          (requires 256 color terminal) │
+│ GREEN                          │ [% GREEN          %]Green[% RESET %]                                            │
+│ YELLOW                         │ [% YELLOW         %]Yellow[% RESET %]                                           │
+│ BLUE                           │ [% BLUE           %]Blue[% RESET %]                                             │
+│ MAGENTA                        │ [% MAGENTA        %]Magenta[% RESET %]                                          │
+│ CYAN                           │ [% CYAN           %]Cyan[% RESET %]                                             │
+│ WHITE                          │ [% WHITE          %]White[% RESET %]                                            │
+│ BRIGHT BLACK                   │ [% BRIGHT BLACK   %]Bright black[% RESET %]                          (dim grey) │
+│ BRIGHT RED                     │ [% BRIGHT RED     %]Bright red[% RESET %]                                       │
+│ BRIGHT GREEN                   │ [% BRIGHT GREEN   %]Lime[% RESET %]                                             │
+│ BRIGHT YELLOW                  │ [% BRIGHT YELLOW  %]Bright Yellow[% RESET %]                                    │
+│ BRIGHT BLUE                    │ [% BRIGHT BLUE    %]Bright blue[% RESET %]                                      │
+│ BRIGHT MAGENTA                 │ [% BRIGHT MAGENTA %]Bright magenta[% RESET %]                                   │
+│ BRIGHT CYAN                    │ [% BRIGHT CYAN    %]Bright cyan[% RESET %]                                      │
+│ BRIGHT WHITE                   │ [% BRIGHT WHITE   %]Bright white[% RESET %]                                     │
+│ ANSI0 - ANSI231                │ Term256 colors             (use -c to see these) │
+│ GREY0 - GREY23                 │ Levels of grey  [% GREYDIENT %]         │
+╞ [% BOLD %][% ORANGE %]BACKGROUND[% RESET %] ════════════════════╪══════════════════════════════════════════════════╡
+│ B_DEFAULT                      │ Default background color                         │
+│ B_BLACK                        │ [% B_BLACK          %] Black          [% RESET %]                                 │
+│ B_RED                          │ [% B_RED            %] Red            [% RESET %]                                 │
+│ B_GREEN                        │ [% B_GREEN          %] Green          [% RESET %]                                 │
+│ B_YELLOW                       │ [% B_YELLOW         %] Yellow         [% RESET %]                                 │
+│ B_BLUE                         │ [% B_BLUE           %] Blue           [% RESET %]                                 │
+│ B_MAGENTA                      │ [% B_MAGENTA        %] Magenta        [% RESET %]                                 │
+│ B_CYAN                         │ [% B_CYAN           %] Cyan           [% RESET %]                                 │
+│ B_WHITE                        │ [% B_WHITE          %][% BLACK %] White          [% RESET %]                                 │
+│ B_PINK                         │ [% B_PINK           %] Hot pink       [% RESET %]   (requires 256 color terminal) │
+│ B_ORANGE                       │ [% B_ORANGE         %][% BLACK %] Orange         [% RESET %]   (requires 256 color terminal) │
+│ B_NAVY                         │ [% B_NAVY           %] Deep blue      [% RESET %]   (requires 256 color terminal) │
+│ BRIGHT B_BLACK                 │ [% BRIGHT B_BLACK   %] Bright black   [% RESET %]                          (grey) │
+│ BRIGHT B_RED                   │ [% BRIGHT B_RED     %] Bright red     [% RESET %]                                 │
+│ BRIGHT B_GREEN                 │ [% BRIGHT B_GREEN   %] Lime           [% RESET %]                                 │
+│ BRIGHT B_YELLOW                │ [% BRIGHT B_YELLOW  %] Bright yellow  [% RESET %]                                 │
+│ BRIGHT B_BLUE                  │ [% BRIGHT B_BLUE    %] Bright blue    [% RESET %]                                 │
+│ BRIGHT B_MAGENTA               │ [% BRIGHT B_MAGENTA %] Bright magenta [% RESET %]                                 │
+│ BRIGHT B_CYAN                  │ [% BRIGHT B_CYAN    %] Bright cyan    [% RESET %]                                 │
+│ BRIGHT B_WHITE                 │ [% BRIGHT B_WHITE   %] [% BLACK %]Bright white   [% RESET %]                                 │
+│ B_ANSI0 - B_ANSI231            │ Term256 background colors (use -c to see these)  │
+│ B_GREY0 - B_GREY23             │ Levels of grey  [% GREYDIENT %]         │
+╞ [% BOLD %][% BRIGHT BLUE %]HORIZONTAL RULES[% RESET %] ══════════════╪══════════════════════════════════════════════════╡
+│ HORIZONTAL RULE RED            │ A solid line of red background                   │
+│ HORIZONTAL RULE GREEN          │ A solid line of green background                 │
+│ HORIZONTAL RULE YELLOW         │ A solid line of yellow background                │
+│ HORIZONTAL RULE BLUE           │ A solid line of blue background                  │
+│ HORIZONTAL RULE MAGENTA        │ A solid line of magenta background               │
+│ HORIZONTAL RULE CYAN           │ A solid line of cyan background                  │
+│ HORIZONTAL RULE PINK           │ A solid line of hot pink background              │
+│ HORIZONTAL RULE ORANGE         │ A solid line of orange background                │
+│ HORIZONTAL RULE WHITE          │ A solid line of white background                 │
+│ HORIZONTAL RULE BRIGHT RED     │ A solid line of bright red background            │
+│ HORIZONTAL RULE BRIGHT GREEN   │ A solid line of bright green background          │
+│ HORIZONTAL RULE BRIGHT YELLOW  │ A solid line of bright yellow background         │
+│ HORIZONTAL RULE BRIGHT BLUE    │ A solid line of bright blue background           │
+│ HORIZONTAL RULE BRIGHT MAGENTA │ A solid line of bright magenta background        │
+│ HORIZONTAL RULE BRIGHT CYAN    │ A solid line of bright cyan background           │
+│ HORIZONTAL RULE BRIGHT WHITE   │ A solid line of bright white background          │
+╰────────────────────────────────┴──────────────────────────────────────────────────╯
 
 TOKENS
 ###
@@ -279,6 +281,15 @@ if ($version) {
     $ansi->ansi_output($small, 0);
 } elsif ($tokens) {
     $ansi->ansi_output($to, 0);
+} elsif ($Dump) {
+	my $temp = "\n\n";
+	my @names = (sort(keys %{ $ansi->{'characters'} }));
+	while (scalar(@names)) {
+		my $name = shift(@names);
+		$temp .= $ansi->{'characters'}->{$name} . ' ';
+	}
+	$temp .= "\n\n";
+	$ansi->ansi_output($temp,0);
 } elsif ($symbols) {
     my @names;
     my $search = pop(@ARGV);
@@ -291,23 +302,25 @@ if ($version) {
     foreach my $name (@names) {
         $size = max($size, length($name));
     }
-    my $temp = "\n        SYMBOL TOKEN NAMES\n" . '╭──────┬' . '─' x $size . '─╮' . "\n";
+    my $temp = "\nNOTE:  Not all terminals will support all characters\n" . '[% GREY5 %]╭───────┬─' . '─' x $size . '─╮[% RESET %]' . "\n";
+	$temp   .= '[% GREY5 %]│[% CYAN %]Unicode[% GREY5 %]│' . ' ' x ($size - 20) . '[% BRIGHT YELLOW %]Character Token Names[% RESET %] ' . "[% GREY5 %]│[% RESET %]\n";
+	$temp .= '[% GREY5 %]├───────┼─' .  '─' x $size . "─┤[% RESET %]\n";
     while (scalar(@names)) {
         my $name = shift(@names);
 		if ($name ne '') {
 			if ($name =~ /^COMBINING/) {
-				$temp .= sprintf('│U%05X│%-' . $size . 's │   %s', charnames::vianame($name), $name, $ansi->{'characters'}->{$name}) . "\n";
+				$temp .= sprintf('%s│%sU%05X %s│%s %' . $size . 's %s│%s   %s', '[% GREY5 %]','[% RESET %]', charnames::vianame($name), '[% GREY5 %]','[% RESET %]', $name, '[% GREY5 %]','[% RESET %]', $ansi->{'characters'}->{$name}) . "\n";
 			} else {
-				$temp .= sprintf('│U%05X│%-' . $size . 's │ %s', charnames::vianame($name), $name, $ansi->{'characters'}->{$name}) . "\n";
+				$temp .= sprintf('%s│%sU%05X %s│%s %' . $size . 's %s│%s %s', '[% GREY5 %]','[% RESET %]',charnames::vianame($name), '[% GREY5 %]','[% RESET %]',$name, '[% GREY5 %]','[% RESET %]', $ansi->{'characters'}->{$name}) . "\n";
 			}
 		}
     } ## end while (scalar(@names))
-    $temp .= '╰──────┴' . '─' x $size . '─╯' . "\n\n";
+    $temp .= '[% GREY5 %]╰───────┴─' . '─' x $size . '─╯[% RESET %]' . "\n\n";
     $ansi->ansi_output($temp, 0);
 } elsif ($colors) {
 	my $grey = chr(27) . '[38;5;235m';
 	my $off  = chr(27) . '[0m';
-	print "\nANSI Colors and GREY colors\n";
+	print "\nANSI Colors and GREY colors (requires a terminal with 256 color support for all colors)\n";
 	print $grey, '╭────┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──╮', $off, "\n";
 	print $grey, '│', $off, 'ANSI';
 	foreach my $i (0..35) {

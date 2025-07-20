@@ -6,7 +6,10 @@ use strict;
 use warnings;
 use Carp;	# Import Carp for warnings
 use Config::Abstraction 0.25;
-use Log::Log4perl;
+use Data::Dumper;
+use Email::Simple;
+use Email::Sender::Simple qw(sendmail);
+use Email::Sender::Transport::SMTP;
 use Params::Get 0.05;	# Import Params::Get for parameter handling
 use Readonly::Values::Syslog 0.02;
 use Sys::Syslog 0.28;	# Import Sys::Syslog for syslog support
@@ -18,11 +21,11 @@ Log::Abstraction - Logging Abstraction Layer
 
 =head1 VERSION
 
-0.23
+0.24
 
 =cut
 
-our $VERSION = 0.23;
+our $VERSION = 0.24;
 
 =head1 SYNOPSIS
 
@@ -69,7 +72,7 @@ The file can be in any common format,
 including C<YAML>, C<XML>, and C<INI>.
 This allows the parameters to be set at run time.
 
-On non-Windows system,
+On a non-Windows system,
 the class can be configured using environment variables starting with C<"Log::Abstraction::">.
 For example:
 
@@ -98,13 +101,31 @@ A logger can be one or more of:
 
 =item * an object
 
-=item * a hash of options, e.g. 'file' containing the filename, 'array' a reference to an array, or 'fd' containing a file descriptor to log to
+=item * a hash of options
+
+=item * sendmail - send higher priority messages to an email address
+
+=over
+
+=item * array - a reference to an array
+
+=item * fd - containing a file descriptor to log to
+
+=item * file - containing the filename
+
+=back
 
 =back
 
 Defaults to L<Log::Log4perl>.
+In that case the argument 'verbose' to new() will raise the logging level.
 
-=item * C<syslog> - A hash reference for syslog configuration.
+=item * C<syslog>
+
+A hash reference for syslog configuration.
+Only warnings and above will be sent to syslog.
+This restriction should be lifted in the future,
+since it's reasonable to send notices and above to the syslog.
 
 =item * C<script_name>
 
@@ -164,7 +185,9 @@ sub new {
 		$class = __PACKAGE__;
 	} elsif(Scalar::Util::blessed($class)) {
 		# If $class is an object, clone it with new arguments
-		return bless { %{$class}, %args }, ref($class);
+		my $clone = bless { %{$class}, %args }, ref($class);
+		$clone->{messages} = [ @{$class->{messages}} ];	# Deep copy
+		return $clone;
 	}
 
 	if($args{'syslog'} && !$args{'script_name'}) {
@@ -183,12 +206,18 @@ sub new {
 		}
 	} elsif((!$args{'file'}) && (!$args{'array'})) {
 		# Default to Log4perl
+		require Log::Log4perl;
+		Log::Log4perl->import();
+
 		# FIXME: add default minimum logging level
 		Log::Log4perl->easy_init($args{verbose} ? $Log::Log4perl::DEBUG : $Log::Log4perl::ERROR);
 		$args{'logger'} = Log::Log4perl->get_logger();
 	}
 
 	if($level) {
+		if(ref($level) eq 'ARRAY') {
+			$level = $level->[0];
+		}
 		$level = lc($level);
 		if(!defined($syslog_values{$level})) {
 			Carp::croak("$class: invalid syslog level '$level'");
@@ -234,6 +263,9 @@ sub _log
 	}
 	@messages = grep defined, @messages;
 
+	my $str = join('', @messages);
+	chomp($str);
+
 	# Push the message to the internal messages array
 	push @{$self->{messages}}, { level => $level, message => join('', @messages) };
 
@@ -242,7 +274,7 @@ sub _log
 		$class = '';
 	}
 
-	if(my $logger = $self->{logger}) {
+	if(my $logger = $self->{'logger'}) {
 		if(ref($logger) eq 'CODE') {
 			# If logger is a code reference, call it with log details
 			$logger->({
@@ -258,13 +290,14 @@ sub _log
 			push @{$logger}, { level => $level, message => join('', @messages) };
 		} elsif(ref($logger) eq 'HASH') {
 			if(my $file = $logger->{'file'}) {
-				if($file =~ /^([a-zA-Z0-9_\.\-\/\\~:]+)$/) {
-					my $file = $1;	# Will untaint
+				# if($file =~ /^([-\@\w.\/\\]+)$/) {
+				if($file =~ /^([^<>|*?;!`$"\0-\037]+)$/) {
+					$file = $1;	# Will untaint
 				} else {
 					Carp::croak(ref($self), ": Invalid file name: $file");
 				}
 				if(open(my $fout, '>>', $logger->{'file'})) {
-					print $fout uc($level), "> $class ", (caller(1))[1], ' ', (caller(1))[2], ' ', join('', @messages), "\n" or
+					print $fout uc($level), "> $class ", (caller(1))[1], ' ', (caller(1))[2], " $str\n" or
 						Carp::croak(ref($self), ": Can't write to $file: $!");
 					close $fout;
 				}
@@ -272,10 +305,75 @@ sub _log
 			if(my $array = $logger->{'array'}) {
 				push @{$array}, { level => $level, message => join('', @messages) };
 			}
+			if($logger->{'sendmail'}->{'to'}) {
+				# Send an email
+				# TODO: throttle the number of emails
+				if((!defined($logger->{'sendmail'}->{'level'})) ||
+				   ($syslog_values{$level} <= $syslog_values{$logger->{'sendmail'}->{'level'}})) {
+					eval {
+						my $email = Email::Simple->new('');
+						$email->header_set('to', $logger->{'sendmail'}->{'to'});
+						if(my $from = $logger->{'sendmail'}->{'from'}) {
+							$email->header_set('from', $from);
+						} else {
+							$email->header_set('from', 'noreply@localhost');
+						}
+						if(my $subject = $logger->{'sendmail'}->{'subject'}) {
+							$email->header_set('subject', $subject);
+						}
+						$email->body_set(join(' ', @messages));
+
+						# Configure SMTP transport (adjust for your SMTP server)
+						my $transport = Email::Sender::Transport::SMTP->new({
+							host => $logger->{'sendmail'}->{'host'} || 'localhost',
+							port => $logger->{'sendmail'}->{'port'} || 25
+						});
+
+						sendmail($email, { transport => $transport });
+					};
+
+					if ($@) {
+						Carp::carp("Failed to send email: $@");
+						return;
+					}
+				}
+			}
+			if(my $syslog = $logger->{'syslog'}) {
+				if((!defined($syslog->{'level'})) || ($syslog_values{$level} <= $syslog->{'level'})) {
+					if(!$self->{_syslog_opened}) {
+						# Open persistent syslog connection
+						my $facility = delete $syslog->{'facility'} || 'local0';
+						my $min_level = delete $syslog->{'level'};
+						# CHI uses server, Sys::Syslog uses host :-(
+						if($syslog->{'server'}) {
+							$syslog->{'host'} = delete $syslog->{'server'};
+						}
+						Sys::Syslog::setlogsock($syslog) if(scalar keys %{$syslog});
+						$syslog->{'facility'} = $facility;
+						$syslog->{'level'} = $min_level;
+
+						openlog($self->{script_name}, 'cons,pid', 'user');
+						$self->{_syslog_opened} = 1;	# Flag to track active connection
+					}
+
+					# Handle syslog-based logging
+					eval {
+						my $priority = ($level eq 'error') ? 'err' : 'warning';
+						my $facility = $syslog->{'facility'};
+						Sys::Syslog::syslog("$priority|$facility", join(' ', @messages));
+					};
+					if($@) {
+						my $err = $@;
+						$err .= ":\n" . Data::Dumper->new([$syslog])->Dump();
+						Carp::carp($err);
+					}
+				}
+			}
+				
 			if(my $fout = $logger->{'fd'}) {
-				print $fout uc($level), "> $class ", (caller(1))[1], ' ', (caller(1))[2], ' ', join('', @messages), "\n" or
+				print $fout uc($level), "> $class ", (caller(1))[1], ' ', (caller(1))[2], " $str\n" or
 					die "ref($self): Can't write to file descriptor: $!";
-			} elsif((!$logger->{'file'}) && (!$logger->{'syslog'})) {
+			} elsif((!$logger->{'file'}) && (!$logger->{'syslog'}) && (!$logger->{'sendmail'})) {
 				croak(ref($self), ": Don't know how to deal with the $level message");
 			}
 		} elsif(!ref($logger)) {
@@ -286,26 +384,33 @@ sub _log
 					(caller(1))[1],
 					' (',
 					(caller(1))[2],
-					'): ',
-					join('', @messages), "\n";
+					"): $str\n";
 				close $fout;
 			}
-		} elsif(Scalar::Util::blessed($logger) && $logger->can($level)) {
+		} elsif(Scalar::Util::blessed($logger)) {
 			# If logger is an object, call the appropriate method on the object
-			# The test is because Log::Log4perl doesn't understand notice()
+			if(!$logger->can($level)) {
+				if(($level eq 'notice') && $logger->can('info')) {
+					# Map notice to info for Log::Log4perl
+					$level = 'info';
+				} else {
+					croak(ref($self), ': ', ref($logger), " doesn't know how to deal with the $level message");
+				}
+			}
 			$logger->$level(@messages);
 		} else {
-			croak(ref($self), ': ', ref($logger), " doesn't know how to deal with the $level message");
+			croak(ref($self), ": configuration error, no handler written for the $level message");
 		}
 	} elsif($self->{'array'}) {
 		push @{$self->{'array'}}, { level => $level, message => join('', @messages) };
 	}
+
 	if($self->{'file'}) {
 		my $file = $self->{'file'};
 
 		# Untaint the file name
 		# if($file =~ /^([-\@\w.\/\\]+)$/) {
-		if($file =~ /^([a-zA-Z0-9_\.\-\/\\:~]+)$/) {
+		if($file =~ /^([^<>|*?;!`$"\0-\037]+)$/) {
 			$file = $1;	# untainted version
 		} else {
 			croak(ref($self), ": Tainted or unsafe filename: $file");
@@ -313,17 +418,17 @@ sub _log
 
 		if(open(my $fout, '>>', $file)) {
 			if(blessed($self) eq __PACKAGE__) {
-				print $fout uc($level), '> ', (caller(1))[1], '(', (caller(1))[2], ') ', join('', @messages), "\n" or
+				print $fout uc($level), '> ', (caller(1))[1], '(', (caller(1))[2], ") $str\n" or
 					die "ref($self): Can't write to ", $self->{'file'}, ": $!";
 			} else {
-				print $fout uc($level), '> ', blessed($self) || '', ' ', (caller(1))[1], '(', (caller(1))[2], ') ', join('', @messages), "\n" or
+				print $fout uc($level), '> ', blessed($self) || '', ' ', (caller(1))[1], '(', (caller(1))[2], ") $str\n" or
 					die "ref($self): Can't write to ", $self->{'file'}, ": $!";
 			}
 			close $fout;
 		}
 	}
 	if(my $fout = $self->{'fd'}) {
-		print $fout uc($level), '> ', blessed($self) || '', ' ', (caller(1))[1], ' ', (caller(1))[2], ' ', join('', @messages), "\n" or
+		print $fout uc($level), '> ', blessed($self) || '', ' ', (caller(1))[1], '(', (caller(1))[2], ") $str\n" or
 			croak(ref($self), ": Can't write to file descriptor: $!");
 	}
 }
@@ -464,7 +569,7 @@ sub _high_priority
 	return unless ($params && (ref($params) eq 'HASH'));
 
 	# Only logging things higher than warn level
-	return if($self->{'level'} < $syslog_values{$level});
+	return if($syslog_values{$level} > $WARNING);
 
 	my $warning = $params->{warning};
 	if(!defined($warning)) {
@@ -489,33 +594,18 @@ sub _high_priority
 	# Log the warning message
 	$self->_log($level, $warning);
 
-	if($self->{'syslog'}) {
-		# Handle syslog-based logging
-		if(ref($self->{syslog}) eq 'HASH') {
-			# HASH argument to setlogsock introduced in Sys::Syslog 0.28
-
-			# CHI uses server, Sys::Syslog uses host :-(
-			if($self->{'syslog'}->{'server'}) {
-				$self->{'syslog'}->{'host'} = delete $self->{'syslog'}->{'server'};
-			}
-			Sys::Syslog::setlogsock($self->{'syslog'});
-		}
-		my $ident = (($level eq 'error') ? 'err' : 'warning') . '|local0';
-		openlog($self->{script_name}, 'cons,pid', 'user');
-		eval {
-			syslog($ident, $warning);
-		};
-		my $err = $@;
-		closelog();
-		if($err) {
-			$err .= ": \n" . Data::Dumper->new([$self->{'syslog'}])->Dump();
-			Carp::carp($err);
-		} elsif($self->{'carp_on_warn'}) {
-			Carp::carp($warning);
-		}
-	} elsif($self->{'carp_on_warn'} || !defined($self->{logger})) {
+	if($self->{'carp_on_warn'} || !defined($self->{logger})) {
 		# Fallback to Carp if no logger or syslog is defined
 		Carp::carp($warning);
+	}
+}
+
+# Destructor to close syslog connection
+sub DESTROY {
+	my $self = shift;
+	if ($self->{_syslog_opened}) {
+		closelog();
+		delete $self->{_syslog_opened};
 	}
 }
 

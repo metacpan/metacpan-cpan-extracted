@@ -84,8 +84,8 @@ Crypt::Sodium::XS::OO::secretbox - Secret key authenticated encryption
   # $pt is now "hello" (MemVault)
 
   $nonce = sodium_increment($nonce);
-  ($ct, my $mac) = $sbox->encrypt_detached("world", $nonce, $sk);
-  $pt = $sbox->decrypt_detached($ct, $mac, $nonce, $sk);
+  ($ct, my $tag) = $sbox->encrypt_detached("world", $nonce, $sk);
+  $pt = $sbox->decrypt_detached($ct, $tag, $nonce, $sk);
   # $pt is now "world" (MemVault)
 
 =head1 DESCRIPTION
@@ -119,58 +119,141 @@ requirement, see L<Crypt::Sodium::XS::secretstream>.
 Returns a new secretbox object for the given primitive. If not given, the
 default primitive is C<default>.
 
+=head1 ATTRIBUTES
+
+=head2 primitive
+
+  my $primitive = $sbox->primitive;
+  $sbox->primitive('poly1305');
+
+Gets or sets the primitive used for all operations by this object. Note this
+can be C<default>.
+
 =head1 METHODS
-
-=head2 PRIMITIVE
-
-  my $default_primitive = $sbox->PRIMITIVE;
-
-=head2 NONCEBYTES
-
-  my $nonce_length = $sbox->NONCEBYTES;
-
-=head2 KEYBYTES
-
-  my $key_length = $sbox->KEYBYTES;
-
-=head2 MACBYTES
-
-  my $mac_length = $sbox->MACBYTES;
 
 =head2 primitives
 
-  my @primitives = $pwhash->primitives;
+  my @primitives = Crypt::Sodium::XS::OO::secretbox->primitives;
+  my @primitives = $sbox->primitives;
 
-Returns a list of all supported primitive names (including 'default').
+Returns a list of all supported primitive names, including C<default>.
+
+Can be called as a class method.
+
+=head2 PRIMITIVE
+
+  my $primitive = $sbox->PRIMITIVE;
+
+Returns the primitive used for all operations by this object. Note this will
+never be C<default> but would instead be the primitive it represents.
 
 =head2 decrypt
 
-  my $plaintext = $sbox->decrypt($ciphertext, $nonce, $key);
+  my $plaintext = $sbox->decrypt($ciphertext, $nonce, $key, $flags);
 
 Croaks on decryption failure.
+
+C<$ciphertext> is the combined ciphertext to decrypt.
+
+C<$nonce> is the nonce used to encrypt the ciphertext. It must be L</NONCEBYTES>
+bytes.
+
+C<$key> is the secret key used to encrypt the ciphertext. It must be
+L</KEYBYTES> bytes. It may be a L<Crypt::Sodium::XS::MemVault>.
+
+C<$flags> is optional. It is the flags used for the C<$plaintext>
+L<Crypt::Sodium::XS::MemVault>. See L<Crypt::Sodium::XS::Protmem>.
+
+Returns a L<Crypt::Sodium::XS::MemVault>: the decrypted plaintext.
 
 =head2 decrypt_detached
 
-  my $plaintext = $sbox->decrypt_detached($ciphertext, $mac, $nonce, $key);
+  my $plaintext
+    = $sbox->decrypt_detached($ciphertext, $tag, $nonce, $key, $flags);
 
 Croaks on decryption failure.
+
+C<$ciphertext> is the detached ciphertext to decrypt.
+
+C<$tag> is the ciphertext's authentication tag. It must be L</MACBYTES> bytes.
+
+C<$nonce> is the nonce used to encrypt the ciphertext. It must be L</NONCEBYTES>
+bytes.
+
+C<$key> is the secret key used to encrypt the ciphertext. It must be
+L</KEYBYTES> bytes. It may be a L<Crypt::Sodium::XS::MemVault>.
+
+C<$flags> is optional. It is the flags used for the C<$plaintext>
+L<Crypt::Sodium::XS::MemVault>. See L<Crypt::Sodium::XS::Protmem>.
+
+Returns a L<Crypt::Sodium::XS::MemVault>: the decrypted plaintext.
 
 =head2 encrypt
 
   my $ciphertext = $sbox->encrypt($message, $nonce, $key);
 
+C<$message> is the message to encrypt. It may be a
+L<Crypt::Sodium::XS::MemVault>.
+
+C<$nonce> is the nonce used to encrypt the ciphertext. It must be L</NONCEBYTES>
+bytes.
+
+C<$key> is the secret key used to encrypt the ciphertext. It must be
+L</KEYBYTES> bytes. It may be a L<Crypt::Sodium::XS::MemVault>.
+
+Returns the encrypted ciphertext.
+
 =head2 encrypt_detached
 
-  my ($ciphertext, $mac) = $sbox->encrypt($message, $nonce, $key);
+  my ($ciphertext, $tag) = $sbox->encrypt($message, $nonce, $key);
+
+C<$message> is the message to encrypt. It may be a
+L<Crypt::Sodium::XS::MemVault>.
+
+C<$nonce> is the nonce used to encrypt the ciphertext. It must be L</NONCEBYTES>
+bytes.
+
+C<$key> is the secret key used to encrypt the ciphertext. It must be
+L</KEYBYTES> bytes. It may be a L<Crypt::Sodium::XS::MemVault>.
+
+Returns the encrypted ciphertext and its authentication tag.
 
 =head2 keygen
 
-  my $key = $sbox->keygen;
+  my $key = $sbox->keygen($flags);
+
+C<$flags> is optional. It is the flags used for the C<$key>
+L<Crypt::Sodium::XS::MemVault>. See L<Crypt::Sodium::XS::Protmem>.
+
+Returns a L<Crypt::Sodium::XS::MemVault>: a secret key of L</KEYBYTES> bytes.
 
 =head2 nonce
 
   my $nonce = $sbox->nonce;
   my $nonce = $sbox->nonce($base);
+
+C<$base> is optional. It must be less than or equal to L</NONCEBYTES> bytes. If
+not provided, the nonce will be random.
+
+Returns a nonce of L</NONCEBYTES> bytes.
+
+=head2 NONCEBYTES
+
+  my $nonce_size = $sbox->NONCEBYTES;
+
+Returns the size, in bytes, of a nonce.
+
+=head2 KEYBYTES
+
+  my $key_size = $sbox->KEYBYTES;
+
+Returns the size, in bytes, of a secret key.
+
+=head2 MACBYTES
+
+  my $tag_size = $sbox->MACBYTES;
+
+Returns the size, in bytes, of an authentication tag.
 
 =head1 SEE ALSO
 

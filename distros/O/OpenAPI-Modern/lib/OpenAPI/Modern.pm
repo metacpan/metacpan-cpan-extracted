@@ -1,10 +1,10 @@
 use strictures 2;
-package OpenAPI::Modern; # git description: v0.086-15-g8f56a9c
+package OpenAPI::Modern; # git description: v0.087-8-g6c65e6c
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI v3.1 document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI v3.1 Swagger HTTP request response
 
-our $VERSION = '0.087';
+our $VERSION = '0.088';
 
 use 5.020;
 use utf8;
@@ -28,11 +28,10 @@ use builtin::compat 'indexed';
 use Feature::Compat::Try;
 use Encode 2.89 ();
 use JSON::Schema::Modern;
-use JSON::Schema::Modern::Utilities qw(jsonp unjsonp canonical_uri E abort is_equal is_elements_unique);
+use JSON::Schema::Modern::Utilities qw(jsonp unjsonp canonical_uri E abort is_equal is_elements_unique true false);
 use JSON::Schema::Modern::Document::OpenAPI;
 use MooX::TypeTiny 0.002002;
 use Types::Standard qw(InstanceOf Bool);
-use constant { true => JSON::PP::true, false => JSON::PP::false };
 use Mojo::Util 'url_unescape';
 use Mojo::Message::Request;
 use Mojo::Message::Response;
@@ -131,7 +130,7 @@ sub validate_request ($self, $request, $options = {}) {
         my $state = { %$state, schema_path => jsonp($state->{schema_path},
           ($section eq $method ? $method : ()), 'parameters', $idx) };
         my $param_obj = ($section eq $method ? $operation : $path_item)->{parameters}[$idx];
-        while (my $ref = $param_obj->{'$ref'}) {
+        while (defined(my $ref = $param_obj->{'$ref'})) {
           $param_obj = $self->_resolve_ref('parameter', $ref, $state);
         }
 
@@ -186,7 +185,7 @@ sub validate_request ($self, $request, $options = {}) {
     if (my $body_obj = $operation->{requestBody}) {
       $state->{schema_path} = $state->{schema_path}.'/requestBody';
 
-      while (my $ref = $body_obj->{'$ref'}) {
+      while (defined(my $ref = $body_obj->{'$ref'})) {
         $body_obj = $self->_resolve_ref('request-body', $ref, $state);
       }
 
@@ -289,7 +288,7 @@ sub validate_response ($self, $response, $options = {}) {
 
     my $response_obj = $operation->{responses}{$response_name};
     $state->{schema_path} = jsonp($state->{schema_path}, 'responses', $response_name);
-    while (my $ref = $response_obj->{'$ref'}) {
+    while (defined(my $ref = $response_obj->{'$ref'})) {
       $response_obj = $self->_resolve_ref('response', $ref, $state);
     }
 
@@ -297,7 +296,7 @@ sub validate_response ($self, $response, $options = {}) {
       next if fc $header_name eq fc 'Content-Type';
       my $state = { %$state, schema_path => jsonp($state->{schema_path}, 'headers', $header_name) };
       my $header_obj = $response_obj->{headers}{$header_name};
-      while (my $ref = $header_obj->{'$ref'}) {
+      while (defined(my $ref = $header_obj->{'$ref'})) {
         $header_obj = $self->_resolve_ref('header', $ref, $state);
       }
 
@@ -493,7 +492,7 @@ sub find_path ($self, $options, $state = {}) {
   else {
     $state->{path_item} = $schema->{paths}{$path_template};
     $state->{schema_path} = jsonp('/paths', $path_template);
-    while (my $ref = $state->{path_item}{'$ref'}) {
+    while (defined(my $ref = $state->{path_item}{'$ref'})) {
       $state->{path_item} = $self->_resolve_ref('path-item', $ref, $state);
     }
   }
@@ -506,7 +505,7 @@ sub find_path ($self, $options, $state = {}) {
   # this can only happen if we were not able to derive the path_template from the provided
   # operation_id earlier, but we still matched the request against some other path-item
   return E({ %$state, recommended_response => [ 500 ] }, 'templated operation does not match provided operation_id')
-    if $options->{operation_id} and ($options->{_path_item}{$method}{operationId}//'') ne $options->{operation_id};
+    if exists $options->{operation_id} and ($options->{_path_item}{$method}{operationId}//'') ne $options->{operation_id};
 
   # this can only happen if we do not have a request object, as otherwise a missing operation is
   # simply reported as a match failure
@@ -613,7 +612,7 @@ sub _match_uri ($self, $method, $uri, $path_template, $state) {
 
   my $local_state = +{ %$state };
 
-  while (my $ref = $local_state->{path_item}{'$ref'}) {
+  while (defined(my $ref = $local_state->{path_item}{'$ref'})) {
     $local_state->{path_item} = $self->_resolve_ref('path-item', $ref, $local_state);
   }
 
@@ -711,21 +710,26 @@ sub _validate_path_parameter ($self, $state, $param_obj, $path_captures) {
       'missing path parameter: %s', $param_obj->{name})
     if not exists $path_captures->{$param_obj->{name}};
 
-  my $value = $path_captures->{$param_obj->{name}};
-  $value .= '';
+  my $data = $path_captures->{$param_obj->{name}};
+  $data .= '';
 
-  return $self->_validate_parameter_content({ %$state, depth => $state->{depth}+1 }, $param_obj, \$value)
+  return $self->_validate_parameter_content({ %$state, depth => $state->{depth}+1 }, $param_obj, \$data)
     if exists $param_obj->{content};
 
   return E({ %$state, keyword => 'style' }, 'only style: simple is supported in path parameters')
     if ($param_obj->{style}//'simple') ne 'simple';
 
-  my $types = $self->_type_in_schema($param_obj->{schema}, { %$state, schema_path => $state->{schema_path}.'/schema' });
-  if (grep $_ eq 'array', @$types or grep $_ eq 'object', @$types) {
+  my @types = $self->_type_in_schema($param_obj->{schema}, { %$state, schema_path => $state->{schema_path}.'/schema' });
+  if (grep $_ eq 'array', @types or grep $_ eq 'object', @types) {
     return E($state, 'deserializing to non-primitive types is not yet supported in path parameters');
   }
+  if (grep $_ eq 'boolean', @types) {
+    $data = false if $data eq '0' or $data eq 'false' or $data eq '';
+    $data = true if $data eq '1' or $data eq 'true';
+  }
+  $data = undef if $data eq '' and grep $_ eq 'null', @types;
 
-  $self->_evaluate_subschema(\$value, $param_obj->{schema}, { %$state, schema_path => $state->{schema_path}.'/schema', stringy_numbers => 1, depth => $state->{depth}+1 });
+  $self->_evaluate_subschema(\$data, $param_obj->{schema}, { %$state, schema_path => $state->{schema_path}.'/schema', stringy_numbers => 1, depth => $state->{depth}+1 });
 }
 
 sub _validate_query_parameter ($self, $state, $param_obj, $uri) {
@@ -739,7 +743,9 @@ sub _validate_query_parameter ($self, $state, $param_obj, $uri) {
     return 1;
   }
 
-  return $self->_validate_parameter_content({ %$state, depth => $state->{depth}+1 }, $param_obj, \ $query_params->{$param_obj->{name}})
+  my $data = $query_params->{$param_obj->{name}};
+
+  return $self->_validate_parameter_content({ %$state, depth => $state->{depth}+1 }, $param_obj, \$data)
     if exists $param_obj->{content};
 
   # §4.8.12.2.1: "If `true`, clients MAY pass a zero-length string value in place of parameters that
@@ -747,7 +753,7 @@ sub _validate_query_parameter ($self, $state, $param_obj, $uri) {
   # unused."
   return if $param_obj->{allowEmptyValue}
     and ($param_obj->{style}//'form') eq 'form'
-    and not length($query_params->{$param_obj->{name}});
+    and not length($data);
 
   # TODO: check 'allowReserved'; difficult to do without access to the raw request string
 
@@ -759,13 +765,19 @@ sub _validate_query_parameter ($self, $state, $param_obj, $uri) {
   return E({ %$state, keyword => 'style' }, 'only style: form is supported in query parameters')
     if ($param_obj->{style}//'form') ne 'form';
 
-  my $types = $self->_type_in_schema($param_obj->{schema}, { %$state, schema_path => $state->{schema_path}.'/schema' });
-  if (grep $_ eq 'array', @$types or grep $_ eq 'object', @$types) {
+  my @types = $self->_type_in_schema($param_obj->{schema}, { %$state, schema_path => $state->{schema_path}.'/schema' });
+  if (grep $_ eq 'array', @types or grep $_ eq 'object', @types) {
     return E($state, 'deserializing to non-primitive types is not yet supported in query parameters');
   }
 
+  if (grep $_ eq 'boolean', @types) {
+    $data = false if $data eq '0' or $data eq 'false' or $data eq '';
+    $data = true if $data eq '1' or $data eq 'true';
+  }
+  $data = undef if $data eq '' and grep $_ eq 'null', @types;
+
   $state = { %$state, schema_path => $state->{schema_path}.'/schema', stringy_numbers => 1, depth => $state->{depth}+1 };
-  $self->_evaluate_subschema(\ $query_params->{$param_obj->{name}}, $param_obj->{schema}, $state);
+  $self->_evaluate_subschema(\$data, $param_obj->{schema}, $state);
 }
 
 # validates a header, from either the request or the response
@@ -789,7 +801,7 @@ sub _validate_header_parameter ($self, $state, $header_name, $header_obj, $heade
   # line value from a field line."
   my @values = map s/^\s*//r =~ s/\s*$//r, map split(/,/, $_), $headers->every_header($header_name)->@*;
 
-  my $types = $self->_type_in_schema($header_obj->{schema}, { %$state, schema_path => $state->{schema_path}.'/schema' });
+  my @types = $self->_type_in_schema($header_obj->{schema}, { %$state, schema_path => $state->{schema_path}.'/schema' });
 
   # RFC9110 §5.3-1: "A recipient MAY combine multiple field lines within a field section that have
   # the same field name into one field line, without changing the semantics of the message, by
@@ -797,11 +809,11 @@ sub _validate_header_parameter ($self, $state, $header_name, $header_obj, $heade
   # by a comma (",") and optional whitespace (OWS, defined in Section 5.6.3). For consistency, use
   # comma SP."
   my $data;
-  if (grep $_ eq 'array', @$types) {
+  if (grep $_ eq 'array', @types) {
     # style=simple, explode=false or true: "blue,black,brown" -> ["blue","black","brown"]
     $data = \@values;
   }
-  elsif (grep $_ eq 'object', @$types) {
+  elsif (grep $_ eq 'object', @types) {
     if ($header_obj->{explode}//false) {
       # style=simple, explode=true: "R=100,G=200,B=150" -> { "R": 100, "G": 200, "B": 150 }
       $data = +{ map m/^([^=]*)=?(.*)$/g, @values };
@@ -815,10 +827,16 @@ sub _validate_header_parameter ($self, $state, $header_name, $header_obj, $heade
     # when validating as a single string, preserve internal whitespace in each individual header
     # but strip leading/trailing whitespace
     $data = join ', ', map s/^\s*//r =~ s/\s*$//r, $headers->every_header($header_name)->@*;
+
+    if (grep $_ eq 'boolean', @types) {
+      $data = false if $data eq '0' or $data eq 'false' or $data eq '';
+      $data = true if $data eq '1' or $data eq 'true';
+    }
+    $data = undef if $data eq '' and grep $_ eq 'null', @types;
   }
 
   $state = { %$state, schema_path => $state->{schema_path}.'/schema', stringy_numbers => 1, depth => $state->{depth}+1 };
-  $self->_evaluate_subschema(\ $data, $header_obj->{schema}, $state);
+  $self->_evaluate_subschema(\$data, $header_obj->{schema}, $state);
 }
 
 sub _validate_cookie_parameter ($self, $state, $param_obj, $request) {
@@ -947,17 +965,28 @@ sub _resolve_ref ($self, $entity_type, $ref, $state) {
   return $schema_info->{schema};
 }
 
-# determines the type(s) requested in a schema, and the new schema.
+# determines the type(s) expected in a schema: array, object, null, boolean, string.
+# "" will be interpreted as null when type = null
+# 0, 1, false, true will be interpreted as boolean when type = boolean
+# (number and integer are implicit via evaluation with "stringy_numbers" enabled)
 sub _type_in_schema ($self, $schema, $state) {
   return [] if not is_plain_hashref($schema);
 
-  while (my $ref = $schema->{'$ref'}) {
-    $schema = $self->_resolve_ref('schema', $ref, $state);
-  }
-  my $types = is_plain_hashref($schema) ? $schema->{type}//[] : [];
-  $types = [ $types ] if not is_plain_arrayref($types);
+  my @types;
 
-  return $types;
+  push @types, is_plain_arrayref($schema->{type}) ? ($schema->{types}->@*) : ($schema->{type})
+    if exists $schema->{type};
+
+  push @types, map $self->_type_in_schema($schema->{allOf}[$_],
+      { %$state, schema_path => $state->{schema_path}.'/allOf/'.$_ }), 0..$schema->{allOf}->$#*
+    if exists $schema->{allOf};
+
+  if (defined(my $ref = $schema->{'$ref'})) {
+    $schema = $self->_resolve_ref('schema', $ref, $state);
+    push @types, $self->_type_in_schema($schema, $state);
+  }
+
+  return @types;
 }
 
 # evaluates data against the subschema at the current state location
@@ -1094,7 +1123,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI v3.1 d
 
 =head1 VERSION
 
-version 0.087
+version 0.088
 
 =head1 SYNOPSIS
 

@@ -155,8 +155,8 @@ Crypt::Sodium::XS::OO::pwhash - Password hashing and verification
 
   # key derivation
   my $salt = sodium_random_bytes($pwhash->SALTBYTES);
-  my $key_length = 32;
-  my $key = $pwhash->pwhash($passphrase, $salt, $key_length);
+  my $key_size = 32;
+  my $key = $pwhash->pwhash($passphrase, $salt, $key_size);
 
   # password storage
   my $pwhash_str = $pwhash->str($passphrase);
@@ -210,139 +210,271 @@ have to worry about backward compatibility.
 
 =back
 
-The more specific C<pwhash_scryptsalsa208sha256_*> API uses the more
-conservative and widely deployed Scrypt function.
+The C<scryptsalsa208sha256> primitive uses the more conservative and widely
+deployed Scrypt function.
 
 =head1 CONSTRUCTOR
 
 =head2 new
 
-  my $pwhash = Crypt::Sodium::XS::OO::pwhash->new;
   my $pwhash = Crypt::Sodium::XS::OO::pwhash->new(primitive => 'argon2id');
   my $pwhash = Crypt::Sodium::XS->pwhash;
 
 Returns a new onetimeauth object for the given primitive. If not given, the
 default primitive is C<default>.
 
+=head1 ATTRIBUTES
+
+=head2 primitive
+
+  my $primitive = $pwhash->primitive;
+  $pwhash->primitive('poly1305');
+
+Gets or sets the primitive used for all operations by this object. Note this
+can be C<default>.
+
 =head1 METHODS
-
-=head2 PRIMITIVE
-
-  my $pwhash = Crypt::Sodium::XS::OO::pwhash->new;
-  my $default_primitive = $pwhash->PRIMITIVE;
-
-=head2 BYTES_MAX
-
-  my $hash_max_length = $pwhash->BYTES_MAX;
-
-=head2 BYTES_MIN
-
-  my $hash_min_length = $pwhash->BYTES_MAX;
-
-=head2 MEMLIMIT_INTERACTIVE
-
-  my $memlimit = $pwhash->MEMLIMIT_INTERACTIVE;
-
-=head2 MEMLIMIT_MAX
-
-  my $memlimit = $pwhash->MEMLIMIT_MAX;
-
-=head2 MEMLIMIT_MIN
-
-  my $memlimit = $pwhash->MEMLIMIT_MIN;
-
-=head2 MEMLIMIT_MODERATE
-
-  my $memlimit = $pwhash->MEMLIMIT_MODERATE;
-
-=head2 MEMLIMIT_SENSITIVE
-
-  my $memlimit = $pwhash->MEMLIMIT_SENSITIVE;
-
-=head2 OPSLIMIT_INTERACTIVE
-
-  my $opslimit = $pwhash->OPSLIMIT_INTERACTIVE;
-
-=head2 OPSLIMIT_MAX
-
-  my $memlimit = $pwhash->OPSLIMIT_MAX;
-
-=head2 OPSLIMIT_MIN
-
-  my $memlimit = $pwhash->OPSLIMIT_MIN;
-
-=head2 OPSLIMIT_MODERATE
-
-  my $opslimit = $pwhash->OPSLIMIT_MODERATE;
-
-=head2 OPSLIMIT_SENSITIVE
-
-  my $opslimit = $pwhash->OPSLIMIT_SENSITIVE;
-
-=head2 PASSWD_MAX
-
-  my $hash_max_length = $pwhash->PASSWD_MAX;
-
-=head2 PASSWD_MIN
-
-  my $hash_min_length = $pwhash->PASSWD_MIN;
-
-=head2 SALTBYTES
-
-  my $salt_length = $pwhash->SALTBYTES;
-
-=head2 STRBYTES
-
-  my $hash_string_length = $pwhash->STRBYTES;
-
-=head2 STRPREFIX
-
-  my $hash_string_prefix = $pwhash->STRPREFIX;
 
 =head2 primitives
 
+  my @primitives = Crypt::Sodium::XS::OO::pwhash->primitives;
   my @primitives = $pwhash->primitives;
 
-Returns a list of all supported primitive names (including 'default').
+Returns a list of all supported primitive names, including C<default>.
+
+Can be called as a class method.
+
+=head2 PRIMITIVE
+
+  my $default_primitive = $pwhash->PRIMITIVE;
+
+Returns the primitive used for all operations by this object. Note this will
+never be C<default> but would instead be the primitive it represents.
 
 =head2 pwhash
 
   my $hash
-    = $pwhash->pwhash($password, $salt, $hash_length, $opslimit, $memlimit);
+    = $pwhash->pwhash($password, $salt, $hash_size, $opslimit, $memlimit);
 
-C<$hash_length> specifies the desired output hash length. It is optional. If
-omitted or the provided argument is false, the default of L</STRBYTES> will be
-used. If provided, it must be from L</BYTES_MIN> to L</BYTES_MAX>, inclusive.
+C<$password> is an arbitrary-length input password. It may be a
+L<Crypt::Sodium::XS::MemVault>.
 
-C<$opslimit> specifies the cpu-hardness of generating the hash. It is optional.
-If omitted or the provided argument is false, the default of
-L</OPSLIMIT_INTERACTIVE> will be used. If provided, it must be from
-L</OPSLIMIT_MIN> to L</OPSLIMIT_MAX>, inclusive.
+C<$salt> is an arbitrary string which must be L</SALTBYTES> bytes. It may be
+random and does not need to be kept secret.
 
-C<$memlimit> specifies the memory-hardness of generating the hash. It is
-optional. If omitted or the provided argument is false, the default of
-L</MEMLIMIT_INTERACTIVE> will be used. If provided, it must be from
-L</MEMLIMIT_MIN> to L</MEMLIMIT_MAX>, inclusive.
+C<$hash_size> is optional. It specifies the desired output hash size, in bytes.
+It must be in the range of L</BYTES_MIN> to L</BYTES_MAX>, inclusive. If it is
+omitted or numifies to zero (undef, 0, ""), the default of L</pwhash_STRBYTES>
+will be used.
+
+C<$opslimit> is optional. It specifies the cpu-hardness of generating the hash.
+It must be in the range of L</OPSLIMIT_MIN> to L</OPSLIMIT_MAX>, inclusive. If
+it is omitted or numifies to zero (undef, 0, ""), the default of
+L</OPSLIMIT_INTERACTIVE> will be used.
+
+C<$memlimit> is optional. It specifies the memory-hardness of generating the hash.
+It must be in the range of L</MEMLIMIT_MIN> to L</MEMLIMIT_MAX>, inclusive. If
+it is omitted or numifies to zero (undef, 0, ""), the default of
+L</MEMLIMIT_INTERACTIVE> will be used.
+
+Returns the output hash of C<$hash_size> bytes.
 
 =head2 salt
 
   my $salt = $pwhash->salt;
 
-Generate a random salt of L</SALTBYTES> length.
+Returns a random salt of L</SALTBYTES> bytes.
 
 =head2 str
 
   my $hash_string = $pwhash->str($password, $opslimit, $memlimit);
 
+C<$password> is an arbitrary-length input password. It may be a
+L<Crypt::Sodium::XS::MemVault>.
+
+C<$opslimit> is optional. It specifies the cpu-hardness of generating the hash.
+It must be in the range of L</OPSLIMIT_MIN> to L</OPSLIMIT_MAX>, inclusive. If
+it is omitted or numifies to zero (undef, 0, ""), the default of
+L</OPSLIMIT_INTERACTIVE> will be used.
+
+C<$memlimit> is optional. It specifies the memory-hardness of generating the hash.
+It must be in the range of L</MEMLIMIT_MIN> to L</MEMLIMIT_MAX>, inclusive. If
+it is omitted or numifies to zero (undef, 0, ""), the default of
+L</MEMLIMIT_INTERACTIVE> will be used.
+
+Returns an ASCII encoded string into out, which includes:
+
+=over 4
+
+* the result of a memory-hard, CPU-intensive hash function applied to the
+  password passwd of length passwdlen
+
+* the automatically generated salt used for the previous computation
+
+* the other parameters required to verify the password, including the algorithm
+  identifier, its version, opslimit, and memlimit.
+
+=back
+
 =head2 str_needs_rehash
 
-  my $needs_rehash = $pwhash->str_needs_rehash($string);
-  my $needs_rehash = $pwhash->str_needs_rehash($string, $opslimit);
-  my $needs_rehash = $pwhash->str_needs_rehash($string, $opslimit, $memlimit);
+  my $needs_rehash
+    = $pwhash->str_needs_rehash($hash_string, $opslimit, $memlimit);
+
+C<$hash_string> is a string returned by a previous call to L</str>.
+
+C<$opslimit> is optional. It specifies the required cpu-hardness of generating
+the hash. It must be in the range of L</OPSLIMIT_MIN> to L</OPSLIMIT_MAX>,
+inclusive. If it is omitted or numifies to zero (undef, 0, ""), the default of
+L</OPSLIMIT_INTERACTIVE> will be used.
+
+C<$memlimit> is optional. It specifies the required memory-hardness of
+generating the hash. It must be in the range of L</MEMLIMIT_MIN> to
+L</MEMLIMIT_MAX>, inclusive. If it is omitted or numifies to zero (undef, 0,
+""), the default of L</MEMLIMIT_INTERACTIVE> will be used.
+
+Returns false if C<$hash_str> is a valid password verification string (as
+generated by L</str>) and matches the parameters C<$opslimit>, C<$memlimit>,
+and the current primitive, true otherwise.
 
 =head2 verify
 
   my $is_valid = $pwhash->verify($hash_string, $password);
+
+C<$hash_string> is a string returned by a previous call to L</str>.
+
+C<$password> is an arbitrary-length input password. It may be a
+L<Crypt::Sodium::XS::MemVault>.
+
+Returns true if C<$hash_string> is a valid password verification string (as
+generated by L</str>) for C<$password>, false otherwise.
+
+=head2 BYTES_MAX
+
+  my $hash_max_size = $pwhash->BYTES_MAX;
+
+Returns the maximum size, in bytes, of hash output.
+
+=head2 BYTES_MIN
+
+  my $hash_min_size = $pwhash->BYTES_MAX;
+
+Returns the minimum size, in bytes, of hash output.
+
+=head2 MEMLIMIT_INTERACTIVE
+
+=head2 OPSLIMIT_INTERACTIVE
+
+  my $memlimit = $pwhash->MEMLIMIT_INTERACTIVE;
+  my $opslimit = $pwhash->OPSLIMIT_INTERACTIVE;
+
+Returns baseline values for interactive online applications. This currently
+requires 64 MiB of dedicated RAM.
+
+=head2 MEMLIMIT_MODERATE
+
+=head2 OPSLIMIT_MODERATE
+
+  my $memlimit = $pwhash->MEMLIMIT_MODERATE;
+  my $opslimit = $pwhash->OPSLIMIT_MODERATE;
+
+Returns baseline settings slightly higher than interactive. This requires 256
+MiB of dedicated RAM and takes about 0.7 seconds on a 2.8 GHz Core i7 CPU.
+
+=head2 MEMLIMIT_SENSITIVE
+
+=head2 OPSLIMIT_SENSITIVE
+
+  my $memlimit = $pwhash->MEMLIMIT_SENSITIVE;
+  my $opslimit = $pwhash->OPSLIMIT_SENSITIVE;
+
+Returns baseline settings for highly-sensitive and non-interactive sessions.
+With these parameters, deriving a key takes about 3.5 seconds on a 2.8 GHz Core
+i7 CPU and requires 1024 MiB of dedicated RAM.
+
+=head2 MEMLIMIT_MAX
+
+  my $memlimit = $pwhash->MEMLIMIT_MAX;
+
+Returns the maximum memlimit.
+
+=head2 MEMLIMIT_MIN
+
+  my $memlimit = $pwhash->MEMLIMIT_MIN;
+
+Returns the minimum memlimit.
+
+=head2 OPSLIMIT_MAX
+
+  my $memlimit = $pwhash->OPSLIMIT_MAX;
+
+Returns the maximum opslimit.
+
+=head2 OPSLIMIT_MIN
+
+  my $memlimit = $pwhash->OPSLIMIT_MIN;
+
+Returns the minimum opslimit.
+
+=head2 PASSWD_MAX
+
+  my $hash_max_size = $pwhash->PASSWD_MAX;
+
+Returns the maximum size, in bytes, of password input.
+
+=head2 PASSWD_MIN
+
+  my $hash_min_size = $pwhash->PASSWD_MIN;
+
+Returns the minimum size, in bytes, of password input.
+
+=head2 SALTBYTES
+
+  my $salt_size = $pwhash->SALTBYTES;
+
+Returns the size, in bytes, of a salt.
+
+=head2 STRBYTES
+
+  my $hash_string_size = $pwhash->STRBYTES;
+
+Returns the size, in bytes, of a string returned by L</str>.
+
+=head2 STRPREFIX
+
+  my $hash_string_prefix = $pwhash->STRPREFIX;
+
+Returns the primitive-specific prefix of a string returned by L</str>.
+
+=head1 GUIDELINES FOR CHOOSING OPSLIMIT AND MEMLIMIT
+
+Start by determining how much memory the function can use. What will be the
+highest number of processes evaluating the function simultaneously (ideally, no
+more than 1 per CPU core)? How much physical memory is guaranteed to be
+available?
+
+Set memlimit to the amount of memory you want to reserve for password hashing.
+
+Then set opslimit to 3 and measure the time it takes to hash a password.
+
+If this is way too long for your application, reduce memlimit, but keep
+opslimit set to 3.
+
+If the function is so fast that you can afford it to be more computationally
+intensive without any usability issues, then increase opslimit.
+
+For online use (e.g. logging in on a website), a 1 second computation is likely
+to be the acceptable maximum.
+
+For interactive use (e.g. a desktop application), a 5 second pause after having
+entered a password is acceptable if the password doesn’t need to be entered
+more than once per session.
+
+For non-interactive and infrequent use (e.g. restoring an encrypted backup), an
+even slower computation can be an option.
+
+However, the best defense against brute-force password cracking is to use
+strong passwords.
 
 =head1 SEE ALSO
 

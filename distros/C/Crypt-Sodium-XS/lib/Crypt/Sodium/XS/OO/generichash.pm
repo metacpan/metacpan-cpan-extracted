@@ -80,8 +80,18 @@ Crypt::Sodium::XS::OO::generichash - Cryptographic hashing
 
 =head1 DESCRIPTION
 
-L<Crypt::Sodium::XS::OO::generichash> computes a fixed-length fingerprint for
-an arbitrary long message.
+L<Crypt::Sodium::XS::OO::generichash> computes a fixed-size fingerprint for an
+arbitrary long message.
+
+Sample use cases:
+
+=over 4
+
+=item * File integrity checking
+
+=item * Creating unique identifiers to index arbitrary long data
+
+=back
 
 =head1 CONSTRUCTOR
 
@@ -94,79 +104,123 @@ an arbitrary long message.
 Returns a new generichash object for the given primitive. If not given, the
 default primitive is C<default>.
 
+=head1 ATTRIBUTES
+
+=head2 primitive
+
+  my $primitive = $gh->primitive;
+  $gh->primitive('chacha20poly1305');
+
+Gets or sets the primitive used for all operations by this object. Note this
+can be C<default>.
+
 =head1 METHODS
-
-=head2 PRIMITIVE
-
-  my $gh = Crypt::Sodium::XS::OO::generichash->new(primitive => 'default');
-  my $default_primitive = $gh->PRIMITIVE;
-
-=head2 BYTES
-
-  my $hash_default_length = $gh->BYTES;
-
-=head2 BYTES_MIN
-
-  my $hash_min_length = $gh->BYTES_MIN;
-
-=head2 BYTES_MAX
-
-  my $hash_max_length = $gh->BYTES_MAX;
-
-=head2 KEYBYTES
-
-  my $key_default_length = $gh->KEYBYTES;
-
-=head2 KEYBYTES_MIN
-
-  my $key_min_length = $gh->KEYBYTES_MIN;
-
-=head2 KEYBYTES_MAX
-
-  my $key_max_length = $gh->KEYBYTES_MAX;
 
 =head2 primitives
 
+  my @primitives = Crypt::Sodium::XS::generichash->primitives;
   my @primitives = $gh->primitives;
 
-Returns a list of all supported primitive names (including 'default').
+Returns a list of all supported primitive names, including C<default>.
+
+Can be called as a class method.
+
+=head2 PRIMITIVE
+
+  my $primitive = $gh->PRIMITIVE;
+
+Returns the primitive used for all operations by this object. Note this will
+never be C<default> but would instead be the primitive it represents.
 
 =head2 generichash
 
-  my $hash = $gh->generichash($message, $hash_length, $key);
-  my $hash = $gh->generichash($message, $hash_length);
+  my $hash = $gh->generichash($message, $hash_size, $key);
+  my $hash = $gh->generichash($message, $hash_size);
   my $hash = $gh->generichash($message);
   my $hash = $gh->generichash($message, undef, $key);
 
-C<$hash_length> is the desired length of the hashed output. It is optional. If
-C<$hash_length> is omitted or numifies to zero (undef, 0, ""), the default hash
-length (L</BYTES>) will be used.
+C<$message> is the message to hash. It may be a L<Crypt::Sodium::XS::MemVault>.
 
-C<$key> is optional.
+C<$hash_size> is optional. It is the desired size of the hashed output. If
+it is omitted or numifies to zero (undef, 0, ""), the default hash size
+L</BYTES> will be used. It must be in the range of L</BYTES_MIN> to
+L</BYTES_MAX>, inclusive.
+
+C<$key> is optional. It must be L</KEYBYTES> bytes. It may be a
+L<Crypt::Sodium::XS::MemVault>. Note that if a key is not provided, the same
+message will always produce the same hash output.
+
+Returns hash output of the requested length.
 
 =head2 init
 
-  my $multipart = $gh->init($hash_length, $key);
-  my $multipart = $gh->init($hash_length);
-  my $multipart = $gh->init(undef, $key);
+  my $multipart = $gh->init($hash_size, $key, $flags);
 
-Returns a multipart hashing object. See L</MULTI-PART INTERFACE>.
-
-C<$hash_length> is the desired length of the hashed output. It is optional. If
+C<$hash_size> is optional. It is the desired length of the hashed output. If
 it is omitted or numifies to zero (undef, 0, ""), the default hash length
-(L</BYTES>) will be used.
+L</BYTES> will be used. It must be in the range of L</BYTES_MIN> to
+L</BYTES_MAX>, inclusive.
 
-C<$key> is optional. If provided, it must be L</KEYBYTES> in length.
+C<$key> is optional. It must be L</KEYBYTES> bytes. It may be a
+L<Crypt::Sodium::XS::MemVault>. Note that if a key is not provided, the same
+message will always produce the same hash output.
+
+C<$flags> is optional. It is the flags used for the multipart protected memory
+object. See L<Crypt::Sodium::XS::ProtMem>.
+
+Returns an opaque protected memory object: a multipart hashing object. See
+L</MULTI-PART INTERFACE>.
 
 =head2 keygen
 
-  my $key = $gh->keygen;
-  my $key = $gh->keygen($key_length);
+  my $key = $gh->keygen($key_size, $flags);
 
-C<$key_length> is the desired length of the generated key. It is optional. If
+C<$key_size> is optional. It is the desired length of the generated key. If
 it is omitted or numifies to zero (undef, 0, ""), the default key length
-(L</KEYBYTES>) will be used. The length of C<$key_length>, if given, must be
-from L</KEYBYTES_MIN> to L</KEYBYTES_MAX>, inclusive.
+L</KEYBYTES> will be used. It must be in the range of L</KEYBYTES_MIN> to
+L</KEYBYTES_MAX>, inclusive.
+
+C<$flags> is optional. It is the flags used for the C<$key>
+L<Crypt::Sodium::XS::MemVault>. See L<Crypt::Sodium::XS::ProtMem>.
+
+Returns a L<Crypt::Sodium::XS::MemVault>: a secret key of C<$key_size> bytes.
+
+=head2 BYTES
+
+  my $hash_default_size = $gh->BYTES;
+
+Returns the recommended minimum size, in bytes, of hash output. This size makes
+it practically impossible for two messages to produce the same fingerprint.
+
+=head2 BYTES_MIN
+
+  my $hash_min_size = $gh->BYTES_MIN;
+
+Returns the minimum size, in bytes, of hash output.
+
+=head2 BYTES_MAX
+
+  my $hash_max_size = $gh->BYTES_MAX;
+
+Returns the maximum size, in bytes, of hash output.
+
+=head2 KEYBYTES
+
+  my $key_default_size = $gh->KEYBYTES;
+
+Returns the recommended size, in bytes, of secret keys.
+
+=head2 KEYBYTES_MIN
+
+  my $key_min_size = $gh->KEYBYTES_MIN;
+
+Returns the minimum size, in bytes, of secret keys.
+
+=head2 KEYBYTES_MAX
+
+  my $key_max_size = $gh->KEYBYTES_MAX;
+
+Returns the maximum size, in bytes, of secret keys.
 
 =head1 MULTI-PART INTERFACE
 
@@ -189,73 +243,83 @@ state.
 
   my $hash = $multipart->final;
 
-Note there is a difference to the sodium API. Finalizing the hash does not
-require, nor accept, a new output length. The output hash length will be the
-original C<$hash_length> given to L</init>.
-
-Retruns the final hash for all data added with L</update>.
+Returns the final hash for all data added with L</update>. The output hash size
+will be the original C<$hash_size> given to L</init>.
 
 Once C<final> has been called, the hashing object must not be used further.
 
 =head2 update
 
-  $multipart->update($message);
   $multipart->update(@messages);
 
-Adds all given arguments (stringified) to hashed data.
+Adds all given arguments (stringified) to hashed data. Any argument may be a
+L<Crypt::Sodium::XS::MemVault>.
 
 =head1 blake2b METHODS
 
 The following methods are available only when explicitly using the C<blake2b>
 primitive and fatal otherwise.
 
+B<Warning>: For these methods, C<$salt> and C<$personal> must be at least
+L</SALTBYTES> and L</PERSONALBYTES> in bytes, respectively. If they are longer
+than the required size, only the initial bytes of the required size will be
+used. If these values are not being randomly chosen, it is recommended to use
+an arbitrary-length string as the input to a hash function (e.g.,
+L<Crypt::Sodium::XS::generichash/generichash> or
+L<Crypt::Sodium::XS::shorthash/shorthash>) and use the hash output rather than
+the strings.
+
 =head2 PERSONALBYTES
 
   my $personalbytes_len = $gh->PERSONALBYTES;
+
+The size, in bytes, of personalization strings.
 
 =head2 SALTBYTES
 
   my $salt_len = $gh->SALTBYTES;
 
+=head2 generichash_blake2b_SALTBYTES
+
 =head2 salt_personal
 
-  my $hash = $gh->salt_personal($message, $salt, $personal, $hash_length, $key);
-  my $hash = $gh->salt_personal($message, $salt, $personal, $hash_length);
-  my $hash = $gh->salt_personal($message, $salt, $personal);
-  my $hash = $gh->salt_personal($message, $salt, $personal, undef, $key);
+  my $hash = $gh->salt_personal($message, $salt, $personal, $hash_size, $key);
 
-C<$salt> as an arbitrary string which is at least L<SALTBYTES> in length (see
-warnings below).
+C<$salt> is an arbitrary string which is at least L</SALTBYTES> bytes (see
+warnings above).
 
-C<$personal> as an arbitrary string which is at least L<PERSONALBYTES> in
-length (see warnings below).
+C<$personal> as an arbitrary string which is at least L</PERSONALBYTES> bytes
+(see warnings above).
 
-C<$hash_length> is the desired length of the hashed output. It is optional. If
-C<$hash_length> is omitted or numifies to zero (undef, 0, ""), the default hash
-length (L<BYTES>) will be used.
+C<$hash_size> is optional. It is the desired size of the hashed output. If it
+is omitted or numifies to zero (undef, 0, ""), the default hash size L</BYTES>
+will be used. It must be in the range of L</BYTES_MIN> to L</BYTES_MAX>,
+inclusive.
 
-C<$key> is optional.
-
-B<WARNING>: C<$salt> and C<$personal> must be at least L<SALTBYTES> and
-L<PERSONALBYTES> in length, respectively. If they are longer than the required
-length, only the required length of initial bytes will be used. If these values
-are not being randomly chosen, it is recommended to use an arbitrary-length
-string as the input to a hash function (e.g.,
-L<Crypt::Sodium::XS::generichash/generichash> or
-L<Crypt::Sodium::XS::shorthash/shorthash>) and use the hash output rather than
-the strings.
+C<$key> is optional. It must be L</KEYBYTES> bytes. It may be a
+L<Crypt::Sodium::XS::MemVault>. Note that if a key is not provided, the same
+message will always produce the same hash output.
 
 =head2 init_salt_personal
 
-  my $multipart = $gh->init_salt_personal($hash_length, $key);
-  my $multipart = $gh->init_salt_personal($hash_length);
-  my $multipart = $gh->init_salt_personal($hash_length, $key);
+  my $multipart = $gh->init_salt_personal($salt, $personal, $hash_size, $key);
 
-C<$hash_length> is the desired length of the hashed output. It is optional. If
-it is omitted or numifies to zero (undef, 0, ""), the default hash length
-(L<BYTES>) will be used.
+C<$salt> as an arbitrary string which is at least L</SALTBYTES> bytes (see
+warnings above).
 
-C<$key> is optional. If provided, it must be L<KEYBYTES> in length.
+C<$personal> as an arbitrary string which is at least L</PERSONALBYTES> bytes
+(see warnings above).
+
+C<$hash_size> is optional. It is the desired size of the hashed output. If it
+is omitted or numifies to zero (undef, 0, ""), the default hash size L</BYTES>
+will be used. It must be in the range of L</BYTES_MIN> to L</BYTES_MAX>,
+inclusive.
+
+C<$key> is optional. It must be L</KEYBYTES> bytes. It may be a
+L<Crypt::Sodium::XS::MemVault>. Note that if a key is not provided, the same
+message will always produce the same hash output.
+
+Returns a multipart hashing object. See L</MULTI-PART INTERFACE>.
 
 =head1 SEE ALSO
 

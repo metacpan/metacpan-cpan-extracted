@@ -17,7 +17,7 @@ use warnings;
 # 230818 : préparation évolution check à la demande (base stats AGREGE à valider)
 # check sql : https://www.eversql.com
 use Exporter;
-our $VERSION		= 1.8111; #bug création create Tracking in SQLite
+our $VERSION		= 1.8123; #bug test $cfg->{EDTK_DB_CHECK_AUTO} défini par défaut à YES
 our @ISA			= qw(Exporter);
 our @EXPORT_OK		= qw(
 				admin_check_db
@@ -388,7 +388,8 @@ sub _db_connect1 {
 
 			if ($CONNECT_COUNT == 1 
 					and $dsnvar ne "EDTK_DBI_PARAM" 
-					and ($cfg->{EDTK_DB_CHECK_AUTO}||"YES")!~/NO/i
+					#and ($cfg->{EDTK_DB_CHECK_AUTO}||"YES")!~/NO/i
+					and (defined $cfg->{EDTK_DB_CHECK_AUTO} && $cfg->{EDTK_DB_CHECK_AUTO} !~ /NO/i)
 					and looks_like_number($cfg->{EDTK_DB_MAX_DAYS_KEPT})
 					and looks_like_number($cfg->{EDTK_DB_MAX_DAYS_KEPT_STATS})
 					and	looks_like_number($cfg->{EDTK_DB_MAX_DAYS_TRACKED})

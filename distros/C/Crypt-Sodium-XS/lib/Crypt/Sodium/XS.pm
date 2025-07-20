@@ -1,7 +1,7 @@
 package Crypt::Sodium::XS;
 BEGIN {
   # BEGIN block and use line for MemVault are for its overloads to work
-  our $VERSION = '0.000029';
+  our $VERSION = '0.000030';
   require XSLoader;
   XSLoader::load(__PACKAGE__, $VERSION);
 }
@@ -142,6 +142,9 @@ B<NOTE>: This distribution is new and should be considered experimental. Not
 recommended for "production" use. The API is subject to change, though every
 effort will be made not to introduce breaking changes without very good reason.
 There are likely bugs and undesirable behaviors yet to be discovered.
+Documentation is a work in progress. There shouldn't be any inaccuracies, but
+some interfaces may require a bit of intuition from the existing docs and
+examples.
 
 L<Sodium|https://libsodium.org> is a modern, easy-to-use software library for
 encryption, decryption, signatures, password hashing and more. Its goal is to

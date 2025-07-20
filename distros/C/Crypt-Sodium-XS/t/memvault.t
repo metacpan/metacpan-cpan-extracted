@@ -4,6 +4,7 @@ use Test::More;
 use MIME::Base64 'encode_base64';
 use File::Temp;
 
+use Crypt::Sodium::XS::ProtMem ':constants';
 use Crypt::Sodium::XS::Util 'sodium_random_bytes';
 use Crypt::Sodium::XS::secretbox qw/secretbox_KEYBYTES secretbox_keygen/;
 use FindBin '$Bin';
@@ -294,9 +295,9 @@ is($mv->unlock, $large, "MemVault (8193) roundtripped to fd/from file");
 
 {
   local $1;
-  "32" =~ m/([0-9]+)/;
+  PROTMEM_ALL_DISABLED =~ m/([0-9]+)/;
   $mv = Crypt::Sodium::XS::MemVault->new("foobar", $1);
-  is($mv->flags, 32, "MemVault constructor invokes magic on flags arg");
+  is($mv->flags, PROTMEM_ALL_DISABLED, "MemVault constructor invokes magic on flags arg");
 }
 
 $mv = Crypt::Sodium::XS::MemVault->new("foobar")->unlock;

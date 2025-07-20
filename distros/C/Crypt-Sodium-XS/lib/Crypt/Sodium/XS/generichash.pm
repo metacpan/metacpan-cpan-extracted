@@ -71,7 +71,7 @@ Crypt::Sodium::XS::generichash - Cryptographic hashing
 
 =head1 DESCRIPTION
 
-L<Crypt::Sodium::XS::generichash> computes a fixed-length fingerprint for an
+L<Crypt::Sodium::XS::generichash> computes a fixed-size fingerprint for an
 arbitrary long message.
 
 Sample use cases:
@@ -87,53 +87,125 @@ Sample use cases:
 =head1 FUNCTIONS
 
 Nothing is exported by default. A C<:default> tag imports the functions and
-constants as documented below. A separate import tag is provided for each of
-the primitives listed in L</PRIMITIVES>. For example, C<:blake2b> imports
-C<generichash_blake2b>. You should use at least one import tag.
+constants documented below. A separate C<:E<lt>primitiveE<gt>> import tag is
+provided for each of the primitives listed in L</PRIMITIVES>. These tags import
+the C<generichash_E<lt>primitiveE<gt>_*> functions and constants for that
+primitive. A C<:all> tag imports everything.
 
 =head2 generichash
 
-  my $hash = generichash($message, $hash_length, $key);
-  my $hash = generichash($message, $hash_length);
-  my $hash = generichash($message);
-  my $hash = generichash($message, undef, $key);
+  my $hash = generichash($message, $hash_size, $key);
 
-C<$hash_length> is the desired length of the hashed output. It is optional. If
-C<$hash_length> is omitted or numifies to zero (undef, 0, ""), the default hash
-length (L</generichash_BYTES>) will be used.
+C<$message> is the message to hash. It may be a L<Crypt::Sodium::XS::MemVault>.
 
-C<$key> is optional.
+C<$hash_size> is optional. It is the desired size, in bytes,  of the hashed
+output. If it is omitted or numifies to zero (undef, 0, ""), the default hash
+size L</generichash_BYTES> will be used. It must be in the range of
+L</generichash_BYTES_MIN> to L</generichash_BYTES_MAX>, inclusive.
+
+C<$key> is optional. It must be L</generichash_KEYBYTES> bytes. It may be a
+L<Crypt::Sodium::XS::MemVault>. Note that if a key is not provided, the same
+message will always produce the same hash output.
+
+Returns hash output of the requested size.
 
 =head2 generichash_init
 
-  my $multipart = generichash_init($hash_length, $key);
-  my $multipart = generichash_init($hash_length);
-  my $multipart = generichash_init(undef, $key);
+  my $multipart = generichash_init($hash_size, $key, $flags);
 
-C<$hash_length> is the desired length of the hashed output. It is optional. If
-it is omitted or numifies to zero (undef, 0, ""), the default hash length
-(L</generichash_BYTES>) will be used.
+C<$hash_size> is optional. It is the desired size, in bytes, of the hashed
+output. If it is omitted or numifies to zero (undef, 0, ""), the default hash
+size L</generichash_BYTES> will be used. It must be in the range of
+L</generichash_BYTES_MIN> to L</generichash_BYTES_MAX>, inclusive.
 
-C<$key> is optional. If provided, it must be L</generichash_KEYBYTES> in
-length.
+C<$key> is optional. It must be L</generichash_KEYBYTES> bytes. It may be a
+L<Crypt::Sodium::XS::MemVault>. Note that if a key is not provided, the same
+message will always produce the same hash output.
 
-See L</MULTI-PART INTERFACE>.
+C<$flags> is optional. It is the flags used for the multipart protected memory
+object. See L<Crypt::Sodium::XS::ProtMem>.
 
-=head2 generichash_keygen()
-
-  my $key = generichash_keygen();
-  my $key = generichash_keygen($key_length);
-
-C<$key_length> is the desired length of the generated key. It is optional. If
-it is omitted or numifies to zero (undef, 0, ""), the default key length
-(L</generichash_KEYBYTES>) will be used. The length of C<$key_length>, if
-given, must be from L</generichash_KEYBYTES_MIN> to
-L</generichash_KEYBYTES_MAX>, inclusive.
+Returns an opaque protected memory object: a multipart hashing object. See
+L</MULTI-PART INTERFACE>.
 
 =head2 generichash_keygen
 
-  my $key = generichash_keygen();
-  my $key = generichash_keygen($key_length);
+  my $key = generichash_keygen($key_size, $flags);
+
+C<$key_size> is optional. It is the desired size, in bytes, of the generated
+key. If it is omitted or numifies to zero (undef, 0, ""), the default key
+size L</generichash_KEYBYTES> will be used. It must be in the range of
+L</generichash_KEYBYTES_MIN> to L</generichash_KEYBYTES_MAX>, inclusive.
+
+C<$flags> is optional. It is the flags used for the C<$key>
+L<Crypt::Sodium::XS::MemVault>. See L<Crypt::Sodium::XS::ProtMem>.
+
+Returns a L<Crypt::Sodium::XS::MemVault>: a secret key of C<$key_size> bytes.
+
+=head1 blake2b FUNCTIONS
+
+L<Crypt::Sodium::XS::generichash> has the following functions available only in
+their primitive-specific form.
+
+B<Warning>: For these functions C<$salt> and C<$personal> must be at least
+L</generichash_blake2b_SALTBYTES> and L</generichash_blake2b_PERSONALBYTES> in
+bytes, respectively. If they are longer than the required size, only the
+initial bytes of the required size will be used. If these values are not being
+randomly chosen, it is recommended to use an arbitrary-length string as the
+input to a hash function (e.g., L<Crypt::Sodium::XS::generichash/generichash>
+or L<Crypt::Sodium::XS::shorthash/shorthash>) and use the hash output rather
+than the strings.
+
+=head2 generichash_blake2b_salt_personal
+
+  my $hash = generichash_blake2b_salt_personal(
+    $message,
+    $salt,
+    $personal,
+    $hash_size,
+    $key
+  );
+
+C<$salt> is an arbitrary string which is at least
+L</generichash_blake2b_SALTBYTES> bytes (see warnings above).
+
+C<$personal> as an arbitrary string which is at least
+L</generichash_blake2b_PERSONALBYTES> bytes (see warnings above).
+
+C<$hash_size> is optional. It is the desired size of the hashed output. If it
+is omitted or numifies to zero (undef, 0, ""), the default hash size
+L</generichash_blake2b_BYTES> will be used. It must be in the range of
+L</generichash_BYTES_MIN> to L</generichash_BYTES_MAX>, inclusive.
+
+C<$key> is optional. It must be L</generichash_blake2b_KEYBYTES> bytes. It may
+be a L<Crypt::Sodium::XS::MemVault>. Note that if a key is not provided, the
+same message will always produce the same hash output.
+
+=head2 generichash_blake2b_init_salt_personal
+
+  my $multipart = generichash_blake2b_init_salt_personal(
+    $salt,
+    $personal,
+    $hash_size,
+    $key
+  );
+
+C<$salt> as an arbitrary string which is at least
+C<generichash_blake2b_SALTBYTES> bytes(see warnings above).
+
+C<$personal> as an arbitrary string which is at least
+C<generichash_blake2b_PERSONALBYTES> bytes (see warnings above).
+
+C<$hash_size> is optional. It is the desired size of the hashed output. If it
+is omitted or numifies to zero (undef, 0, ""), the default hash size
+L</generichash_blake2b_BYTES> will be used. It must be in the range of
+L</generichash_BYTES_MIN> to L</generichash_BYTES_MAX>, inclusive.
+
+C<$key> is optional. It must be L</generichash_blake2b_KEYBYTES> bytes. It may
+be a L<Crypt::Sodium::XS::MemVault>. Note that if a key is not provided, the
+same message will always produce the same hash output.
+
+Returns a multipart hashing object. See L</MULTI-PART INTERFACE>.
 
 =head1 MULTI-PART INTERFACE
 
@@ -149,20 +221,24 @@ methods:
 
   my $multipart_copy = $multipart->clone;
 
+Returns a cloned copy of the multipart hashing object, duplicating its internal
+state.
+
 =head2 final
 
   my $hash = $multipart->final;
 
-Note there is a difference to the sodium API. Finalizing the hash does not
-require, nor accept, a new output length. The output hash length will be the
-original C<$hash_length> given to L</generichash_init>.
+Returns the final hash for all data added with L</update>. The output hash size
+will be the original C<$hash_size> given to L</generichash_init>.
 
 Once C<final> has been called, the hashing object must not be used further.
 
 =head2 update
 
-  $multipart->update($message);
   $multipart->update(@messages);
+
+Adds all given arguments (stringified) to hashed data. Any argument may be a
+L<Crypt::Sodium::XS::MemVault>.
 
 =head1 CONSTANTS
 
@@ -170,29 +246,57 @@ Once C<final> has been called, the hashing object must not be used further.
 
   my $default_primitive = generichash_PRIMITIVE();
 
+Returns the name of the default primitive.
+
 =head2 generichash_BYTES
 
-  my $hash_default_length = generichash_BYTES();
+  my $hash_default_size = generichash_BYTES();
+
+Returns the recommended minimum size, in bytes, of hash output. This size makes
+it practically impossible for two messages to produce the same fingerprint.
 
 =head2 generichash_BYTES_MIN
 
-  my $hash_min_length = generichash_BYTES_MIN();
+  my $hash_min_size = generichash_BYTES_MIN();
+
+Returns the minimum size, in bytes, of hash output.
 
 =head2 generichash_BYTES_MAX
 
-  my $hash_max_length = generichash_BYTES_MAX();
+  my $hash_max_size = generichash_BYTES_MAX();
+
+Returns the maximum size, in bytes, of hash output.
 
 =head2 generichash_KEYBYTES
 
-  my $key_default_length = generichash_KEYBYTES();
+  my $key_default_size = generichash_KEYBYTES();
+
+Returns the recommended size, in bytes, of secret keys.
 
 =head2 generichash_KEYBYTES_MIN
 
-  my $key_min_length = generichash_KEYBYTES_MIN();
+  my $key_min_size = generichash_KEYBYTES_MIN();
+
+Returns the minimum size, in bytes, of secret keys.
 
 =head2 generichash_KEYBYTES_MAX
 
-  my $key_max_length = generichash_KEYBYTES_MAX();
+  my $key_max_size = generichash_KEYBYTES_MAX();
+
+Returns the maximum size, in bytes, of secret keys.
+
+=head1 blake2b CONSTANTS
+
+L<Crypt::Sodium::XS::generichash> has the following constants available only in
+their primitive-specific form.
+
+=head3 generichash_blake2b_PERSONALBYTES
+
+The size, in bytes, of personalization strings.
+
+=head3 generichash_blake2b_SALTBYTES
+
+The size, in bytes, of salts.
 
 =head1 PRIMITIVES
 
@@ -202,64 +306,9 @@ generichash_blake2b, generichash_blake2b_BYTES).
 
 =over 4
 
-=item * blake2b
+=item * blake2b (default)
 
 =back
-
-=head2 blake2b FUNCTIONS
-
-L<Crypt::Sodium::XS::generichash> has the following functions available only in
-their primitive-specific form.
-
-=head3 generichash_blake2b_salt_personal
-
-  my $hash = generichash_blake2b_salt_personal($message, $salt, $personal, $hash_length, $key);
-  my $hash = generichash_blake2b_salt_personal($message, $salt, $personal, $hash_length);
-  my $hash = generichash_blake2b_salt_personal($message, $salt, $personal);
-  my $hash = generichash_blake2b_salt_personal($message, $salt, $personal, undef, $key);
-
-C<$salt> as an arbitrary string which is at least
-C<generichash_blake2b_SALTBYTES> in length (see warnings below).
-
-C<$personal> as an arbitrary string which is at least
-C<generichash_blake2b_PERSONALBYTES> in length (see warnings below).
-
-C<$hash_length> is the desired length of the hashed output. It is optional. If
-C<$hash_length> is omitted or numifies to zero (undef, 0, ""), the default hash
-length (C<generichash_blake2b_BYTES>) will be used.
-
-C<$key> is optional.
-
-B<WARNING>: C<$salt> and C<$personal> must be at least
-C<generichash_blake2b_SALTBYTES> and C<generichash_blake2b_PERSONALBYTES> in
-length, respectively. If they are longer than the required length, only the
-required length of initial bytes will be used. If these values are not being
-randomly chosen, it is recommended to use an arbitrary-length string as the
-input to a hash function (e.g., L<Crypt::Sodium::XS::generichash/generichash>
-or L<Crypt::Sodium::XS::shorthash/shorthash>) and use the hash output rather
-than the strings.
-
-=head3 generichash_blake2b_init_salt_personal
-
-  my $multipart = generichash_blake2b_init_salt_personal($hash_length, $key);
-  my $multipart = generichash_blake2b_init_salt_personal($hash_length);
-  my $multipart = generichash_blake2b_init_salt_personal($hash_length, $key);
-
-C<$hash_length> is the desired length of the hashed output. It is optional. If
-it is omitted or numifies to zero (undef, 0, ""), the default hash length
-(C<generichash_blake2b_BYTES>) will be used.
-
-C<$key> is optional. If provided, it must be C<generichash_blake2b_KEYBYTES> in
-length.
-
-=head2 blake2b CONSTANTS
-
-L<Crypt::Sodium::XS::generichash> has the following constants available only in
-their primitive-specific form.
-
-=head3 generichash_blake2b_PERSONALBYTES
-
-=head3 generichash_blake2b_SALTBYTES
 
 =head1 SEE ALSO
 

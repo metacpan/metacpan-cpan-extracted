@@ -127,93 +127,164 @@ does not change the representation of the message itself.
 
 =head2 new
 
-  my $shorthash = Crypt::Sodium::XS::OO::shorthash->new;
-  my $shorthash
-    = Crypt::Sodium::XS::OO::shorthash->new(primitive => 'siphash24');
-  my $shorthash = Crypt::Sodium::XS->shorthash;
+  my $sign = Crypt::Sodium::XS::OO::sign->new(primitive => 'ed25519');
+  my $sign = Crypt::Sodium::XS->sign;
 
 Returns a new secretstream object for the given primitive. If not given, the
 default primitive is C<default>.
 
+=head1 ATTRIBUTES
+
+=head2 primitive
+
+  my $primitive = $sign->primitive;
+  $sign->primitive('ed25519');
+
+Gets or sets the primitive used for all operations by this object. Note this
+can be C<default>.
+
 =head1 METHODS
-
-=head2 PRIMITIVE
-
-  my $sign = Crypt::Sodium::XS::OO::sign->new;
-  my $default_primitive = $sign->PRIMITIVE;
-
-=head2 BYTES
-
-  my $signature_length = $sign->BYTES;
-
-=head2 MESSAGEBYTES_MAX
-
-  my $message_max_length = $sign->MESSAGEBYTES_MAX;
-
-=head2 PUBLICKEYBYTES
-
-  my $public_key_length = $sign->PUBLICKEYBYTES;
-
-=head2 SECRETKEYBYTES
-
-  my $secret_key_length = $sign->SECRETKEYBYTES;
-
-=head2 SEEDBYTES
-
-  my $seed_length = $sign->SEEDBYTES;
 
 =head2 primitives
 
-  my @primitives = $pwhash->primitives;
+  my @primitives = Crypt::Sodium::XS::OO::sign->primitives;
+  my @primitives = $sign->primitives;
 
-Returns a list of all supported primitive names (including 'default').
+Returns a list of all supported primitive names, including C<default>.
+
+Can be called as a class method.
+
+=head2 PRIMITIVE
+
+  my $primitive = $sign->PRIMITIVE;
+
+Returns the primitive used for all operations by this object. Note this will
+never be C<default> but would instead be the primitive it represents.
 
 =head2 detached
 
   my $signature = $sign->detached($message, $my_secret_key);
 
+C<$message> is the message to sign.
+
+C<$my_secret_key> is a secret key used to sign the message. It must be
+L</SECRETKEYBYTES> bytes. It may be a L<Crypt::Sodium::XS::MemVault>.
+
+Returns a message signature of L</BYTES> bytes.
+
 =head2 init
 
-  my $multipart = $sign->init;
+  my $multipart = $sign->init($flags);
+
+C<$flags> is optional. It is the flags used for the multipart sign protected
+memory object. See L<Crypt::Sodium::XS::ProtMem>.
 
 Returns a multipart sign object. See L<MULTI-PART INTERFACE>.
 
 =head2 keypair
 
-  my ($public_key, $secret_key) = $sign->keypair;
-  my ($public_key, $secret_key) = $sign->keypair($seed);
+  my ($public_key, $secret_key) = $sign->keypair($seed, $flags);
 
-C<$seed> is optional. If provided, it must be L</SEEDBYTES> in length. Using
-the same seed will generate the same key pair, so it must be kept confidential.
-If omitted, a key pair is randomly generated.
+C<$seed> is optional. It must be L</SEEDBYTES> bytes. It may be a
+L<Crypt::Sodium::XS::MemVault>. Using the same seed will generate the same key
+pair, so it must be kept confidential. If omitted, a key pair is randomly
+generated.
+
+Returns a public key of L</PUBLICKEYBYTES> bytes and a
+L<Crypt::Sodium::XS::MemVault>: a secret key of L</SECRETKEYBYTES> bytes.
 
 =head2 open
 
   my $message = $sign->open($signed_message, $their_public_key);
 
+Croaks on invalid signature.
+
+C<$signed_message> is the combined message and signature from an earlier call
+to L</sign>.
+
+C<$their_public_key> is the public key used to authenticate the message
+signature. It must be L</PUBLICKEYBYTES> bytes.
+
+Returns the message content without the signature.
+
 =head2 sign
 
   my $signed_message = $sign->sign($message, $my_secret_key);
+
+C<$message> is the message to sign. It may be a L<Crypt::Sodium::XS::MemVault>.
+
+C<$my_secret_key> is a secret key used to sign the message. It must be
+L</KEYBYTES> bytes. It may be a L<Crypt::Sodium::XS::MemVault>.
+
+Returns the combined message and signature.
 
 =head2 verify
 
   my $is_valid = $sign->verify($message, $signature, $their_public_key);
 
-Counterpart to sign_detached.
+C<$message> is the message data to validate against the signature and key.
+
+C<$signature> is the detached message signature from an earlier call to
+L</detached>. It must be L</BYTES> bytes.
+
+C<$their_public_key> is the public key used to authenticate the message
+signature. It must be L</PUBLICKEYBYTES> bytes.
+
+Returns the true if the signature is valid for the message and public key,
+false otherwise.
 
 =head2 sk_to_pk
 
   my $public_key = $sign->sk_to_pk($secret_key);
 
-Returns the public key from the secret key.
+C<$secret_key> is a secret key. It must be L</SECRETKEYBYTES> bytes. It may be
+a L<Crypt::Sodium::XS::MemVault>.
+
+Returns the public key of L</PUBLICKEYBYTES> bytes derived from the secret key.
 
 =head2 sk_to_seed
 
-  my $seed = $sign->sk_to_seed($secret_key);
+  my $seed = $sign->sk_to_seed($secret_key, $flags);
 
-Returns the seed that was used to create the secret key.
+C<$secret_key> is a secret key. It must be L</SECRETKEYBYTES> bytes. It may be
+a L<Crypt::Sodium::XS::MemVault>.
+
+Returns a L<Crypt::Sodium::XS::MemVault>: a seed which can be used to recreate
+the same secret (and public) key with L</keypair>.
+
+=head2 BYTES
+
+  my $signature_size = $sign->BYTES;
+
+Returns the size, in bytes, of a signature.
+
+=head2 MESSAGEBYTES_MAX
+
+  my $message_max_size = $sign->MESSAGEBYTES_MAX;
+
+Returns the size, in bytes, of the maximum size of any message to be encrypted.
+
+=head2 PUBLICKEYBYTES
+
+  my $public_key_size = $sign->PUBLICKEYBYTES;
+
+Returns the size, in bytes, of a public key.
+
+=head2 SECRETKEYBYTES
+
+  my $secret_key_size = $sign->SECRETKEYBYTES;
+
+Returns the size, in bytes, of a secret key.
+
+=head2 SEEDBYTES
+
+  my $seed_size = $sign->SEEDBYTES;
+
+Returns the size, in bytes, of a seed used by L</keypair>.
 
 =head1 ed25519 to curve25519 METHODS
+
+For the ed25519 primitive only.
 
 Ed25519 keys can be converted to X25519 keys, so that the same key pair can be
 used both for authenticated encryption (L<Crypt::Sodium::XS::box>) and for
@@ -222,22 +293,43 @@ signatures (L<Crypt::Sodium::XS::sign>).
 If you can afford it, using distinct keys for signing and for encryption is
 still highly recommended.
 
-The following algorithm-specific methods perform these conversions:
+The following methods perform these conversions:
 
 =head2 pk_to_curve25519
 
-  my ($public_key, $secret_key) = $sign->keypair;
-  my $curve_public_key = $sign->ed25519_pk_to_curve25519($public_key);
+  my $curve_public_key = $sign->pk_to_curve25519($public_key);
+
+C<$public_key> is a public key. It must be L</PUBLICKEYBYTES> bytes.
+
+Returns the x25519 public key.
 
 =head2 sk_to_curve25519
 
-  my ($public_key, $secret_key) = $sign->keypair;
-  my $curve_secret_key = $sign->ed25519_pk_to_curve25519($secret_key);
+  my $curve_secret_key = $sign->pk_to_curve25519($secret_key, $flags);
+
+C<$secret_key> is a secret key. It must be L</SECRETKEYBYTES> bytes. It may be
+a L<Crypt::Sodium::XS::MemVault>.
+
+C<$flags> is optional. It is the flags used for the C<$curve_secret_key>
+L<Crypt::Sodium::XS::MemVault>. See L<Crypt::Sodium::XS::ProtMem>.
+
+Returns a L<Crypt::Sodium::XS::MemVault>: the x25519 secret key.
 
 =head2 to_curve25519
 
-  my ($public_key, $secret_key) = $sign->keypair;
-  my ($curve_pk, $curve_sk) $sign->to_curve25519($public_key, $secret_key);
+  my ($curve_pk, $curve_sk) 
+    = $sign->to_curve25519($public_key, $secret_key, $flags);
+
+C<$public_key> is a public key. It must be L</PUBLICKEYBYTES> bytes.
+
+C<$secret_key> is a secret key. It must be L</SECRETKEYBYTES> bytes. It may be
+a L<Crypt::Sodium::XS::MemVault>.
+
+C<$flags> is optional. It is the flags used for the C<$curve_secret_key>
+L<Crypt::Sodium::XS::MemVault>. See L<Crypt::Sodium::XS::ProtMem>.
+
+Returns the x25519 public key and a L<Crypt::Sodium::XS::MemVault>: the x25519
+secret key.
 
 =head1 MULTI-PART INTERFACE
 
@@ -270,22 +362,38 @@ performed by calling L</final_verify>.
 The multipart sign object is an opaque object which provides the following
 methods:
 
-=head2 update
-
-  $multipart->update($message);
-  $multipart->update(@messages);
-
 =head2 clone
 
   my $multipart_copy = $multipart->clone;
+
+Returns a cloned copy of the multipart sign object, duplicating its internal
+state.
 
 =head2 final_sign
 
   my $signature = $multipart->final_sign($my_secret_key);
 
+C<$my_secret_key> is a secret key used to sign the data. It must be
+L</SECRETKEYBYTES> bytes. It may be a L<Crypt::Sodium::XS::MemVault>.
+
+Returns the detached signature of L</BYTES> bytes.
+
 =head2 final_verify
 
   my $is_valid = $multipart->final_verify($signature, $their_public_key);
+
+C<$signature> is the detached signature to validate against signed data and the
+public key. It must be L</BYTES> bytes.
+
+C<$their_public_key> is the public key used to authenticate the signature. It
+must be L</PUBLICKEYBYTES> bytes.
+
+=head2 update
+
+  $multipart->update(@messages);
+
+Adds all given arguments (stringified) to signed data. Any argument may be a
+L<Crypt::Sodium::XS::MemVault>.
 
 =head1 SEE ALSO
 

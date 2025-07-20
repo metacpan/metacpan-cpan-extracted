@@ -78,6 +78,6 @@
          "web" : "https://gitlab.com/jackdeguest/Cookie"
       }
    },
-   "version" : "v0.3.6",
+   "version" : "v0.3.7",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

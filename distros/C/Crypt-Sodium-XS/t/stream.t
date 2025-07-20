@@ -2,6 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 
+use Crypt::Sodium::XS::ProtMem ':constants';
 use Crypt::Sodium::XS::OO::stream;
 use FindBin '$Bin';
 use lib "$Bin/lib";
@@ -48,6 +49,11 @@ for my $alg (Crypt::Sodium::XS::OO::stream->primitives) {
   ok($pt, "decrypted ciphertext ($alg)");
   is($pt, $msg, "decrypted ciphertext correctly ($alg)");
 
+  $pt = $m->xor($ct, $nonce, $key, PROTMEM_ALL_DISABLED);
+  isa_ok($pt, "Crypt::Sodium::XS::MemVault", "xor with flags returns MemVault ($alg)");
+  is($pt->flags, PROTMEM_ALL_DISABLED, "xor with flags has correct flags ($alg)");
+  is($pt->unlock, $msg, "xor with flags decrypted ciphertext correctly ($alg)");
+
   unless ($alg eq 'salsa2012') {
     my $ic = 0;
     my $ct_ic = $m->xor_ic($msg, $nonce, $ic, $key);
@@ -59,6 +65,11 @@ for my $alg (Crypt::Sodium::XS::OO::stream->primitives) {
     $pt = $m->xor_ic($ct_ic, $nonce, $ic, $key);
     ok($pt, "decrypted ciphertext with ic ($alg)");
     is($pt, $msg, "decrypted ciphertext with ic correctly ($alg)");
+
+    $pt = $m->xor($ct, $nonce, $key, PROTMEM_ALL_DISABLED);
+    isa_ok($pt, "Crypt::Sodium::XS::MemVault", "xor_ic with flags returns MemVault ($alg)");
+    is($pt->flags, PROTMEM_ALL_DISABLED, "xor_ic with flags has correct flags ($alg)");
+    is($pt->unlock, $msg, "xor_ic with flags decrypted ciphertext correctly ($alg)");
   }
 }
 

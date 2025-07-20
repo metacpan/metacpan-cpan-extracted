@@ -239,7 +239,7 @@ SV * stream_nonce(SV * base = &PL_sv_undef)
   OUTPUT:
   RETVAL
 
-SV * stream_xor(SV * msg, SV * nonce, SV * key)
+SV * stream_xor(SV * msg, SV * nonce, SV * key, SV * flags = &PL_sv_undef)
 
   ALIAS:
   stream_chacha20_xor = 1
@@ -252,10 +252,12 @@ SV * stream_xor(SV * msg, SV * nonce, SV * key)
   PREINIT:
   protmem *msg_pm = NULL;
   protmem *key_pm = NULL;
+  protmem *ct_pm = NULL;
   unsigned char *msg_buf;
   unsigned char *nonce_buf;
   unsigned char *key_buf;
   unsigned char *ct_buf;
+  unsigned int new_flags = g_protmem_flags_decrypt_default;
   STRLEN msg_len;
   STRLEN nonce_len;
   STRLEN key_len;
@@ -333,29 +335,57 @@ SV * stream_xor(SV * msg, SV * nonce, SV * key)
     croak("stream_xor: Failed to grant key protmem RO");
   }
 
-  Newx(ct_buf, msg_len + 1, unsigned char);
-  if (ct_buf == NULL) {
-    if (msg_pm)
-      protmem_release(aTHX_ msg_pm, PROTMEM_FLAG_MPROTECT_RO);
-    if (key_pm)
-      protmem_release(aTHX_ key_pm, PROTMEM_FLAG_MPROTECT_RO);
-    croak("stream_xor: Failed to allocate memory");
+  if (items == 3) {
+    Newx(ct_buf, msg_len + 1, unsigned char);
+    if (ct_buf == NULL) {
+      if (msg_pm)
+        protmem_release(aTHX_ msg_pm, PROTMEM_FLAG_MPROTECT_RO);
+      if (key_pm)
+        protmem_release(aTHX_ key_pm, PROTMEM_FLAG_MPROTECT_RO);
+      croak("stream_xor: Failed to allocate memory");
+    }
+    ct_buf[msg_len] = '\0';
   }
-  ct_buf[msg_len] = '\0';
+  else {
+    SvGETMAGIC(flags);
+    if (SvOK(flags))
+      new_flags = SvUV_nomg(flags);
+    ct_pm = protmem_init(aTHX_ msg_len, new_flags);
+    if (ct_pm == NULL) {
+      if (msg_pm)
+        protmem_release(aTHX_ msg_pm, PROTMEM_FLAG_MPROTECT_RO);
+      if (key_pm)
+        protmem_release(aTHX_ key_pm, PROTMEM_FLAG_MPROTECT_RO);
+      croak("stream_xor: Failed to allocate protmem");
+    }
+    ct_buf = ct_pm->pm_ptr;
+  }
 
   func(ct_buf, msg_buf, msg_len, nonce_buf, key_buf);
 
   if (key_pm && protmem_release(aTHX_ key_pm, PROTMEM_FLAG_MPROTECT_RO) != 0) {
+    if (ct_pm)
+      protmem_free(aTHX_ ct_pm);
     if (msg_pm)
       protmem_release(aTHX_ msg_pm, PROTMEM_FLAG_MPROTECT_RO);
     croak("stream_xor: Failed to release key protmem RO");
   }
 
-  if (msg_pm && protmem_release(aTHX_ msg_pm, PROTMEM_FLAG_MPROTECT_RO) != 0)
+  if (msg_pm && protmem_release(aTHX_ msg_pm, PROTMEM_FLAG_MPROTECT_RO) != 0) {
+    if (ct_pm)
+      protmem_free(aTHX_ ct_pm);
     croak("stream_xor: Failed to release msg protmem RO");
+  }
 
-  RETVAL = newSV(0);
-  sv_usepvn_flags(RETVAL, (char *)ct_buf, msg_len, SV_HAS_TRAILING_NUL);
+  if (ct_pm && protmem_release(aTHX_ ct_pm, PROTMEM_FLAG_MPROTECT_RW) != 0)
+    croak("stream_xor: Failed to release protmem RW");
+
+  if (ct_pm)
+    RETVAL = protmem_to_sv(aTHX_ ct_pm, MEMVAULT_CLASS);
+  else {
+    RETVAL = newSV(0);
+    sv_usepvn_flags(RETVAL, (char *)ct_buf, msg_len, SV_HAS_TRAILING_NUL);
+  }
 
   OUTPUT:
   RETVAL
@@ -370,7 +400,7 @@ providing generic stream_xor_ic though libsodium doesn't
 
 =cut
 
-SV * stream_xor_ic(SV * msg, SV * nonce, UV ic, SV * key)
+SV * stream_xor_ic(SV * msg, SV * nonce, UV ic, SV * key, SV * flags = &PL_sv_undef)
 
   ALIAS:
   stream_chacha20_xor_ic = 1
@@ -381,10 +411,12 @@ SV * stream_xor_ic(SV * msg, SV * nonce, UV ic, SV * key)
   PREINIT:
   protmem *msg_pm = NULL;
   protmem *key_pm = NULL;
+  protmem *ct_pm = NULL;
   unsigned char *msg_buf;
   unsigned char *nonce_buf;
   unsigned char *key_buf;
   unsigned char *ct_buf;
+  unsigned int new_flags = g_protmem_flags_decrypt_default;
   STRLEN msg_len;
   STRLEN nonce_len;
   STRLEN key_len;
@@ -447,29 +479,57 @@ SV * stream_xor_ic(SV * msg, SV * nonce, UV ic, SV * key)
     croak("stream_xor_ic: Failed to grant key protmem RO");
   }
 
-  Newx(ct_buf, msg_len + 1, unsigned char);
-  if (ct_buf == NULL) {
-    if (msg_pm)
-      protmem_release(aTHX_ msg_pm, PROTMEM_FLAG_MPROTECT_RO);
-    if (key_pm)
-      protmem_release(aTHX_ key_pm, PROTMEM_FLAG_MPROTECT_RO);
-    croak("stream_xor_ic: Failed to allocate memory");
+  if (items == 4) {
+    Newx(ct_buf, msg_len + 1, unsigned char);
+    if (ct_buf == NULL) {
+      if (msg_pm)
+        protmem_release(aTHX_ msg_pm, PROTMEM_FLAG_MPROTECT_RO);
+      if (key_pm)
+        protmem_release(aTHX_ key_pm, PROTMEM_FLAG_MPROTECT_RO);
+      croak("stream_xor_ic: Failed to allocate memory");
+    }
+    ct_buf[msg_len] = '\0';
   }
-  ct_buf[msg_len] = '\0';
+  else {
+    SvGETMAGIC(flags);
+    if (SvOK(flags))
+      new_flags = SvUV_nomg(flags);
+    ct_pm = protmem_init(aTHX_ msg_len, new_flags);
+    if (ct_pm == NULL) {
+      if (msg_pm)
+        protmem_release(aTHX_ msg_pm, PROTMEM_FLAG_MPROTECT_RO);
+      if (key_pm)
+        protmem_release(aTHX_ key_pm, PROTMEM_FLAG_MPROTECT_RO);
+      croak("stream_xor: Failed to allocate protmem");
+    }
+    ct_buf = ct_pm->pm_ptr;
+  }
 
   func(ct_buf, msg_buf, msg_len, nonce_buf, ic, key_buf);
 
   if (key_pm && protmem_release(aTHX_ key_pm, PROTMEM_FLAG_MPROTECT_RO) != 0) {
+    if (ct_pm)
+      protmem_free(aTHX_ ct_pm);
     if (msg_pm)
       protmem_release(aTHX_ msg_pm, PROTMEM_FLAG_MPROTECT_RO);
     croak("stream_xor_ic: Failed to release key protmem RO");
   }
 
-  if (msg_pm && protmem_release(aTHX_ msg_pm, PROTMEM_FLAG_MPROTECT_RO) != 0)
+  if (msg_pm && protmem_release(aTHX_ msg_pm, PROTMEM_FLAG_MPROTECT_RO) != 0) {
+    if (ct_pm)
+      protmem_free(aTHX_ ct_pm);
     croak("stream_xor_ic: Failed to release msg protmem RO");
+  }
 
-  RETVAL = newSV(0);
-  sv_usepvn_flags(RETVAL, (char *)ct_buf, msg_len, SV_HAS_TRAILING_NUL);
+  if (ct_pm && protmem_release(aTHX_ ct_pm, PROTMEM_FLAG_MPROTECT_RW) != 0)
+    croak("stream_xor: Failed to release protmem RW");
+
+  if (ct_pm)
+    RETVAL = protmem_to_sv(aTHX_ ct_pm, MEMVAULT_CLASS);
+  else {
+    RETVAL = newSV(0);
+    sv_usepvn_flags(RETVAL, (char *)ct_buf, msg_len, SV_HAS_TRAILING_NUL);
+  }
 
   OUTPUT:
   RETVAL
@@ -482,15 +542,17 @@ do not use with a counter that could exceed 2 ** 32 -1.
 
 =cut
 
-SV * stream_chacha20_ietf_xor_ic(SV * msg, SV * nonce, U32 ic, SV * key)
+SV * stream_chacha20_ietf_xor_ic(SV * msg, SV * nonce, U32 ic, SV * key, SV * flags = &PL_sv_undef)
 
   PREINIT:
   protmem *msg_pm = NULL;
   protmem *key_pm = NULL;
+  protmem *ct_pm = NULL;
   unsigned char *msg_buf;
   unsigned char *nonce_buf;
   unsigned char *key_buf;
   unsigned char *ct_buf;
+  unsigned int new_flags = g_protmem_flags_decrypt_default;
   STRLEN msg_len;
   STRLEN nonce_len;
   STRLEN key_len;
@@ -527,30 +589,58 @@ SV * stream_chacha20_ietf_xor_ic(SV * msg, SV * nonce, U32 ic, SV * key)
     croak("stream_chacha20_ietf_xor_ic: Failed to grant key protmem RO");
   }
 
-  Newx(ct_buf, msg_len + 1, unsigned char);
-  if (ct_buf == NULL) {
-    if (msg_pm)
-      protmem_release(aTHX_ msg_pm, PROTMEM_FLAG_MPROTECT_RO);
-    if (key_pm)
-      protmem_release(aTHX_ key_pm, PROTMEM_FLAG_MPROTECT_RO);
-    croak("stream_chacha20_ietf_xor_ic: Failed to allocate memory");
+  if (items == 4) {
+    Newx(ct_buf, msg_len + 1, unsigned char);
+    if (ct_buf == NULL) {
+      if (msg_pm)
+        protmem_release(aTHX_ msg_pm, PROTMEM_FLAG_MPROTECT_RO);
+      if (key_pm)
+        protmem_release(aTHX_ key_pm, PROTMEM_FLAG_MPROTECT_RO);
+      croak("stream_chacha20_ietf_xor_ic: Failed to allocate memory");
+    }
+    ct_buf[msg_len] = '\0';
   }
-  ct_buf[msg_len] = '\0';
+  else {
+    SvGETMAGIC(flags);
+    if (SvOK(flags))
+      new_flags = SvUV_nomg(flags);
+    ct_pm = protmem_init(aTHX_ msg_len, new_flags);
+    if (ct_pm == NULL) {
+      if (msg_pm)
+        protmem_release(aTHX_ msg_pm, PROTMEM_FLAG_MPROTECT_RO);
+      if (key_pm)
+        protmem_release(aTHX_ key_pm, PROTMEM_FLAG_MPROTECT_RO);
+      croak("stream_xor: Failed to allocate protmem");
+    }
+    ct_buf = ct_pm->pm_ptr;
+  }
 
   crypto_stream_chacha20_ietf_xor_ic(ct_buf, msg_buf, msg_len,
                                      nonce_buf, ic, key_buf);
 
   if (key_pm && protmem_release(aTHX_ key_pm, PROTMEM_FLAG_MPROTECT_RO) != 0) {
+    if (ct_pm)
+      protmem_free(aTHX_ ct_pm);
     if (msg_pm)
       protmem_release(aTHX_ msg_pm, PROTMEM_FLAG_MPROTECT_RO);
     croak("stream_chacha20_ietf_xor_ic: Failed to release key protmem RO");
   }
 
-  if (msg_pm && protmem_release(aTHX_ msg_pm, PROTMEM_FLAG_MPROTECT_RO) != 0)
+  if (msg_pm && protmem_release(aTHX_ msg_pm, PROTMEM_FLAG_MPROTECT_RO) != 0) {
+    if (ct_pm)
+      protmem_free(aTHX_ ct_pm);
     croak("stream_chacha20_ietf_xor_ic: Failed to release msg protmem RO");
+  }
 
-  RETVAL = newSV(0);
-  sv_usepvn_flags(RETVAL, (char *)ct_buf, msg_len, SV_HAS_TRAILING_NUL);
+  if (ct_pm && protmem_release(aTHX_ ct_pm, PROTMEM_FLAG_MPROTECT_RW) != 0)
+    croak("stream_xor: Failed to release protmem RW");
+
+  if (ct_pm)
+    RETVAL = protmem_to_sv(aTHX_ ct_pm, MEMVAULT_CLASS);
+  else {
+    RETVAL = newSV(0);
+    sv_usepvn_flags(RETVAL, (char *)ct_buf, msg_len, SV_HAS_TRAILING_NUL);
+  }
 
   OUTPUT:
   RETVAL

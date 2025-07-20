@@ -66,21 +66,21 @@ Function
   my $application_key_2 = $hkdf->expand($prk, "application two");
 
   my $multipart = $hkdf->extract_init($salt);
-  $multipart->update("initial");
-  $multipart->update(" key material", " added in parts");
+  $multipart->update("input");
+  $multipart->update(" keying material", " added in parts");
   $prk = $multipart->final;
   ...
 
 =head1 DESCRIPTION
 
-NOTE: Secret keys used to encrypt or sign confidential data have to be chosen
-from a very large keyspace. However, passwords are usually short,
+B<Note>: Secret keys used to encrypt or sign confidential data have to be
+chosen from a very large keyspace. However, passwords are usually short,
 human-generated strings, making dictionary attacks practical. If you are
 intending to derive keys from a password, see L<Crypt::Sodium::XS::pwhash>
 instead.
 
 HKDF (HMAC-based Extract-and-Expand Key Derivation Function) is a key
-derivation function used by many standard protocols.  It actually includes two
+derivation function used by many standard protocols. It actually includes two
 operations:
 
 =over 4
@@ -100,8 +100,20 @@ many keys as necessary.
 
 =back
 
-The latter can be used without the former, if a randomly sampled key of the
-right size is already available (e.g., from L</keygen>).
+Expand can be performed without extract, if a randomly sampled key of the right
+size is already available, such as from L</keygen>.
+
+The generated keys satifsy the typical requirements of keys used for symmetric
+cryptography. In particular, they appear to be sampled from a uniform
+distribution over the entire range of possible keys. Contexts don’t have to
+secret. They just need to be distinct in order to produce distinct keys from
+the same master key.
+
+Any L</KEYBYTES> bytes key that appears to be sampled from a uniform
+distribution can be used for the PRK. For example, the output of a key exchange
+mechanism (such as from L<Crypt::Sodium::XS::OO::kx>) can be used as a master
+key. For convenience, the L</keygen> method creates a random PRK. The master
+key should remain secret.
 
 =head1 CONSTRUCTOR
 
@@ -113,67 +125,91 @@ right size is already available (e.g., from L</keygen>).
 Returns a new hkdf object for the given primitive. The primitive argument is
 required.
 
+=head1 ATTRIBUTES
+
+=head2 primitive
+
+  my $primitive = $hkdf->primitive;
+  $hkdf->primitive('sha256');
+
+Gets or sets the primitive used for all operations by this object. For this
+module, the returned primitive is always identical to L</PRIMITIVE>.
+
 =head1 METHODS
-
-=head2 BYTES_MAX
-
-Maximum length of output from L</expand> functions.
-
-=head2 BYTES_MIN
-
-Defined by libsodium to be 0.
-
-=head2 KEYBYTES
-
-Length in bytes of both master keys (PRK) and L</keygen> function output.
 
 =head2 available
 
+  my $has_hkdf = Crypt::Sodium::XS::OO::hkdf->available;
   my $has_hkdf = $hkdf->available;
 
-Indicates the availability of HKDF in the linked version of libsodium. It is a
-good idea to test for availability, as at time of writing it is only available
-in the most recent library version and may not yet be widely deployed.
+Returns true if L<Crypt::Sodium::XS> supports HKDF, false otherwise. HKDF will
+only be supported if L<Crypt::Sodium::XS> was built with a new enough version
+of libsodium headers. A newer dynamic library at runtime will not enable
+support.
+
+Can be called as a class method.
+
+=head2 primitives
+
+  my @primitives = Crypt::Sodium::XS::OO::hkdf->primitives;
+  my @primitives = $hkdf->primitives;
+
+
+Returns a list of all supported primitive names.
+
+Can be called as a class method.
+
+=head2 PRIMITIVE
+
+  my $primitive = $hkdf->PRIMITIVE;
+
+Returns the primitive used for all operations by this object. For this module,
+always identical to the L</primitive> attribute.
 
 =head2 expand
 
-  my $subkey = $hkdf->expand($prk, $out_len);
-  my $subkey = $hkdf->expand($prk, $out_len, $context);
+  my $subkey = $hkdf->expand($prk, $out_len, $context, $flags);
 
-This function derives a subkey of length C<$out_len> from a context/description
-C<$context> and a master key C<$prk>.
+C<$prk> is a PRK (master key). It must be L</KEYBYTES> bytes. It may be a
+L<Crypt::Sodium::XS::MemVault>.
 
-Up to L</BYTES_MAX> bytes can be produced.
+C<$out_len> is the size, in bytes, of the subkey output. It must be in the
+range of L</BYTES_MIN> to L</BYTES_MAX>, inclusive.
 
-The generated keys satifsy the typical requirements of keys used for symmetric
-cryptography. In particular, they appear to be sampled from a uniform
-distribution over the entire range of possible keys. Contexts don’t have to
-secret. They just need to be distinct in order to produce distinct keys from
-the same master key.
+C<$context> is optional. It is an arbitrary-size string, which can be used to
+generate distinct subkeys from the same master key.
 
-Any L</KEYBYTES> bytes key that appears to be sampled from a uniform
-distribution can be used for the prk. For example, the output of a key exchange
-mechanism (such as from L<Crypt::Sodium::XS::kx>) can be used as a master key.
-For convenience, the L</keygen> function creates a random prk. The master key
-should remain secret.
+C<$flags> is optional. It is the flags used for the C<$subkey>
+L<Crypt::Sodium::XS::MemVault>. See L<Crypt::Sodium::XS::ProtMem>.
+
+Returns a L<Crypt::Sodium::XS::MemVault>: a subkey of the requested size.
+
+=over 4
 
 This function is effectively a standard alternative to
 L<Crypt::Sodium::XS::kdf::derive_from_key>. It is slower, but the context can
 be of any size.
 
+=back
+
 =head2 extract
 
-  my $prk = $hkdf->extract($ikm);
-  my $prk = $hkdf->extract($ikm, $salt);
+  my $prk = $hkdf->extract($ikm, $salt, $flags);
 
-Creates a master key (prk) given Input Keying Material (IKM) <$ikm> and
-C<$salt>.
+C<$ikm> is the input keying material from which to extract a PRK (master key).
 
 C<$salt> is optional. It can be a public, unique identifier for a protocol or
 application. Its purpose is to ensure that distinct keys will be created even
 if the input keying material is accidentally reused across protocols.
 
-A UUID is a decent example of a salt. There is no minimum length.
+C<$flags> is optional. It is the flags used for the C<$prk>
+L<Crypt::Sodium::XS::MemVault>. See L<Crypt::Sodium::XS::ProtMem>.
+
+Returns a L<Crypt::Sodium::XS::MemVault>: a master key of L</KEYBYTES> bytes.
+
+=over 4
+
+A UUID is a decent example of a salt. There is no minimum size.
 
 If input keying material cannot be accidentally reused, using an empty (undef
 or empty string) salt is perfectly acceptable. IKM is an arbitrary-long byte
@@ -182,45 +218,80 @@ can be any combination of text and binary data.
 
 But the overall sequence needs to include some entropy.
 
-The resulting PRK will roughly have the same entropy. The “extract” operation
+The resulting PRK will roughly have the same entropy. The extract operation
 effectively extracts the entropy and packs it into a fixed-size key, but it
 doesn’t add any entropy.
 
+=back
+
 =head2 extract_init
 
-  my $multipart = $hkdf->extract_init($salt);
+  my $multipart = $hkdf->extract_init($salt, $flags);
 
 C<$salt> is optional. It can be a public, unique identifier for a protocol or
 application. Its purpose is to ensure that distinct keys will be created even
 if the input keying material is accidentally reused across protocols.
 
-Returns a multipart hkdf object. See the notes in L</extract> and L</MULTI-PART
-INTERFACE>.
+C<$flags> is optional. It is the flags used for the multipart protected memory
+object. See L<Crypt::Sodium::XS::ProtMem>.
+
+Returns an opaque protected memory object: a multipart hkdf object. See
+L</MULTI-PART INTERFACE>.
+
+Also see the notes for L</extract>.
 
 =head2 keygen
 
-  my $ikm = $hkdf->keygen;
+  my $prk = $hkdf->keygen($flags);
+
+C<$flags> is optional. It is the flags used for the C<$prk>
+L<Crypt::Sodium::XS::MemVault>. See L<Crypt::Sodium::XS::ProtMem>.
+
+Returns a L<Crypt::Sodium::XS::MemVault>: a PRK (master key) of L</KEYBYTES>
+bytes.
+
+=head2 BYTES_MAX
+
+Returns the maximum size, in bytes, of output from L</expand>.
+
+=head2 BYTES_MIN
+
+Defined by libsodium to be 0.
+
+=head2 KEYBYTES
+
+Returns the size, in bytes of a secret key (both PRK and subkey).
 
 =head1 MULTI-PART INTERFACE
 
-To extract a pseudorandom key from an arbitrary length of initial key material,
+To extract a pseudorandom key from an arbitrary size of input keying material,
 you may wish to use the multi-part interface. A multipart hkdf object is
 created by calling the L</extract_init> method with optional salt. Key material
 can be added by calling the </update> method of that object as many times as
-desired. An output master key (prk) is generated by calling its L</final>
+desired. An output PRK (master key) is generated by calling its L</final>
 method. Do not continue to use the object after calling L</final>.
 
-The precalculated hkdf object is an opaque object which provides the following
-methods:
+The precalculated hkdf object is an opaque protected memory object which
+provides the following methods:
 
 =head2 final
 
-  my $prk = $multipart->final;
+  my $prk = $multipart->final($flags);
+
+C<$flags> is optional. It is the flags used for the C<$prk>
+L<Crypt::Sodium::XS::MemVault>. See L<Crypt::Sodium::XS::ProtMem>.
+
+Returns a L<Crypt::Sodium::XS::MemVault>: a PRK (master key) of
+L</KEYBYTES> bytes.
+
+Once C<final> has been called, the multipart object must not be used further.
 
 =head2 update
 
-  $multipart->update($key_data);
   $multipart->update(@key_data);
+
+Adds all given arguments (stringified) to input keying material. Any argument
+may be a L<Crypt::Sodium::XS::MemVault>.
 
 =head1 SEE ALSO
 

@@ -62,7 +62,7 @@ Crypt::Sodium::XS::curve25519 - Low-level functions over Curve25519
 
 =head1 SYNOPSIS
 
-...
+  # TODO
 
 =head1 DESCRIPTION
 
@@ -72,13 +72,17 @@ and must only be used to implement custom constructions.
 
 =head1 FUNCTIONS
 
-Nothing is exported by default. A separate import tag is provided for functions
-and constants for each of the primitives listed in L</PRIMITIVES>. For example,
-C<:ed25519> imports C<core_ed25519_base>. You should use at least one import
-tag. A C<:all> tag imports everything.
+Nothing is exported by default. A separate C<:E<lt>primitiveE<gt>> import tag
+is provided for each of the primitives listed in L</PRIMITIVES>. These tags
+import the C<core_E<lt>primitiveE<gt>_*> functions and constants for that
+primitive. A C<:all> tag imports everything.
 
-B<NOTE>: L<Crypt::Sodium::XS::curve25519> does not provide a default primitive.
-All functions must be called in their C<core_E<lt>primitiveE<gt>_*> form.
+B<Note>: L<Crypt::Sodium::XS::curve25519> does provide generic functions for
+curve25519. Only the primitive-specific functions are available, so there is no
+C<:default> tag.
+
+B<Note>: Functions are prefixed with C<core_> (not C<curve25519_>) for
+consistency with libsodium function names.
 
 =head2 Scalar arithmetic over L
 
@@ -110,9 +114,7 @@ The function croaks if C<$p> and/or C<$q> are not valid encoded elements.
 
 Checks that C<$point> represents a point on the edwards25519 curve, in
 canonical form, on the main subgroup, and that the point doesn’t have a small
-order.
-
-It returns true on success, and false if the checks didn’t pass.
+order. Returns true if so, false otherwise.
 
 =head2 core_E<lt>primitiveE<gt>_random
 
@@ -158,36 +160,39 @@ The function croaks if C<$p> and/or C<$q> are not valid points.
 
 =head2 core_E<lt>primitiveE<gt>_scalar_complement
 
-  my $comp = core_ed25519_scalar_complement($s);
+  my $comp = core_ed25519_scalar_complement($s, $flags);
 
-Returns C<$comp> so that C<$s> + C<$comp> = 1 (mod L).
+Returns a L<Crypt::Sodium::XS::MemVault>: C<$comp> so that C<$s> + C<$comp> = 1
+(mod L).
 
 =head2 core_E<lt>primitiveE<gt>_scalar_mul
 
-  my $z = core_ed25519_scalar_mul($x, $y);
+  my $z = core_ed25519_scalar_mul($x, $y, $flags);
 
-Returns C<$x> * C<$y> (mod L).
+Returns a L<Crypt::Sodium::XS::MemVault>: C<$x> * C<$y> (mod L).
 
 =head2 core_E<lt>primitiveE<gt>_scalar_negate
 
-  my $neg = core_ed25519_scalar_negate($s);
+  my $neg = core_ed25519_scalar_negate($s, $flags);
 
-Returns C<$neg> so that C<$s> + C<$neg> = 0 (mod L).
+Returns a L<Crypt::Sodium::XS::MemVault>: C<$neg> so that C<$s> + C<$neg> = 0
+(mod L).
 
 =head2 core_E<lt>primitiveE<gt>_scalar_random
 
-Returns a representation of a random scalar in the ]0..L[ interval.
+Returns a L<Crypt::Sodium::XS::MemVault>: a representation of a random scalar
+in the ]0..L[ interval.
 
-  my $r = core_E<lt>primitiveE<gt>_scalar_random();
+  my $r = core_E<lt>primitiveE<gt>_scalar_random($flags);
 
 A scalar in the [0..L[ interval can also be obtained by reducing a possibly
 larger value with L</core_ed25519_scalar_reduce>.
 
 =head2 core_E<lt>primitiveE<gt>_scalar_reduce
 
-  my $r = core_ed25519_scalar_reduce($s);
+  my $r = core_ed25519_scalar_reduce($s, $flags);
 
-Reduces C<$s> to C<$s> mod L.
+Returns a L<Crypt::Sodium::XS::MemVault>: C<$s> reduced to C<$s> mod L.
 
 Note that C<$s> is much larger than C<$r> (64 bytes vs 32 bytes). Bits of C<$s>
 can be left to 0, but the interval C<$s> is sampled from should be at least 317
@@ -195,26 +200,37 @@ bits to ensure almost uniformity of C<$r> over L.
 
 =head2 core_E<lt>primitiveE<gt>_scalar_sub
 
-  my $z = core_ed25519_scalar_sub($x, $y);
+  my $z = core_ed25519_scalar_sub($x, $y, $flags);
 
-Returns C<$x> - C<$y> (mod L).
+Returns a L<Crypt::Sodium::XS::MemVault>: C<$x> - C<$y> (mod L).
 
 =head1 CONSTANTS
 
 =head2 core_E<lt>primitiveE<gt>_BYTES
 
-Size of points, in bytes.
+  my $element_size = core_ed25519_bytes;
+
+Returns the size of points, in bytes.
 
 =head2 core_E<lt>primitiveE<gt>_SCALARBYTES
 
-Size of scalars, in bytes.
+  my $scalar_size = core_ed25519_SCALARBYTES;
+
+Returns the size of scalars, in bytes.
 
 =head2 core_ed25519_UNIFORMBYTES
 
+  my $uniform_input_size = core_ed25519_UNIFORMBYTES;
+
+For ed25519 only; returns the size, in bytes, of input to the
+L</ed25519_from_uniform> function.
+
 =head2 core_ristretto255_HASHBYTES
 
-Input size to L</core_ed25519_from_uniform> and
-L</core_ristretto255_from_hash>, respectively.
+  my $hash_input_size = core_ristretto255_HASHBYTES;
+
+For ristretto255 only; returns the size, in bytes, of input to the
+L</core_ristretto255_from_hash> function.
 
 =head1 PRIMITIVES
 

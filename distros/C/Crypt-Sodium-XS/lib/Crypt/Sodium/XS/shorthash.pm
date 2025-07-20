@@ -84,17 +84,31 @@ Use cases:
 =head1 FUNCTIONS
 
 Nothing is exported by default. A C<:default> tag imports the functions and
-constants as documented below. A separate import tag is provided for each of
-the primitives listed in L</PRIMITIVES>. For example, C<:siphash24> imports
-C<shorthash_siphash24>. You should use at least one import tag.
+constants documented below. A separate C<:E<lt>primitiveE<gt>> import tag is
+provided for each of the primitives listed in L</PRIMITIVES>. These tags import
+the C<shorthash_E<lt>primitiveE<gt>_*> functions and constants for that
+primitive. A C<:all> tag imports everything.
 
 =head2 shorthash_keygen
 
-  my $key = shorthash_keygen();
+  my $key = shorthash_keygen($flags);
+
+C<$flags> is optional. It is the flags used for the C<$key>
+L<Crypt::Sodium::XS::MemVault>. See L<Crypt::Sodium::XS::ProtMem>.
+
+Returns a L<Crypt::Sodium::XS::MemVault>: a new secret key of
+L</shorthash_KEYBYTES> bytes.
 
 =head2 shorthash
 
   my $hash = shorthash($message, $key);
+
+C<$message> is the message to hash. It may be a L<Crypt::Sodium::XS::MemVault>.
+
+C<$key> is the secret key used in the hash. It must be L</shorthash_KEYBYTES>
+bytes. It may be a L<Crypt::Sodium::XS::MemVault>.
+
+Returns the hash output of L</BYTES> bytes.
 
 =head1 CONSTANTS
 
@@ -102,13 +116,19 @@ C<shorthash_siphash24>. You should use at least one import tag.
 
   my $default_primitive = shorthash_PRIMITIVE();
 
+Returns the name of the default primitive.
+
 =head2 shorthash_BYTES
 
-  my $hash_length = shorthash_BYTES();
+  my $hash_size = shorthash_BYTES();
+
+Returns the size, in bytes, of hash output.
 
 =head2 shorthash_KEYBYTES
 
-  my $key_length = shorthash_KEYBYTES();
+  my $key_size = shorthash_KEYBYTES();
+
+Returns the size, in bytes, of a secret key.
 
 =head1 PRIMITIVES
 
@@ -117,7 +137,7 @@ All functions have C<shorthash_E<lt>primitiveE<gt>>-prefixed counterparts
 
 =over 4
 
-=item * siphash24
+=item * siphash24 (default)
 
 =item * siphashx24
 

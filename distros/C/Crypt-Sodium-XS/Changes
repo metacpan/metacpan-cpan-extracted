@@ -1,3 +1,13 @@
+0.000030 Jul 19 2025
+
+- BUGFIX: fix missing null check in curve25519
+
+- stream: support returning memvault from xor and xor_ic
+
+- many documentation updates
+
+- minor bugfixes and improvements
+
 0.000029 Jul 16 2025
 
 - BUGFIX: fix a regression in build failures when hkdf is not available.

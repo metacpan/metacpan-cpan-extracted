@@ -74,24 +74,23 @@ curve.
   my $server_sk = sodium_random_bytes($keysize);
   my $server_pk = scalarmult_base($client_sk);
 
-  # !!! do not use output directly for key exchange; use Crypt::Sodium::XS::kx.
-  # if you really want to, you can manually do this:
+  # !!! do not use output directly as key exchange !!!
+  # use Crypt::Sodium::XS::kx instead, or you can extract shared keys of
+  # arbitrary size with generichash:
 
   use Crypt::Sodium::XS::generichash 'generichash_init';
 
   # client side:
-  my $q = scalarmult($client_sk, $server_pk);
+  my $client_shared_secret = scalarmult($client_sk, $server_pk);
   my $hasher = generichash_init();
-  $hasher->update($q, $client_pk, $server_pk);
-  my $client_shared_secret = $hasher->final;
+  $hasher->update($client_shared_secret, $client_pk, $server_pk);
+  my $client_shared_key = $hasher->final;
 
   # server side:
-  my $q = scalarmult($server_sk, $client_pk);
+  my $server_shared_secret = scalarmult($server_sk, $client_pk);
   my $hasher = generichash_init();
-  $hasher->update($q, $client_pk, $server_pk);
-  my $server_shared_secret = $hasher->final;
-
-  # $client_shared_secret and $server_shared_secret are now identical keys.
+  $hasher->update($server_shared_secret, $client_pk, $server_pk);
+  my $server_shared_key = $hasher->final;
 
 =head1 DESCRIPTION
 
@@ -104,24 +103,22 @@ generally want to use L<Crypt::Sodium::XS::kx> instead.
 
 =head1 FUNCTIONS
 
-Nothing is exported by default. A C<:default> tag imports all the functions as
-documented for the default primitiave. A separate import tag is provided for
-functions and constants for each of the primitives listed in L</PRIMITIVES>.
-For example, C<:ed25519> imports C<scalarmult_ed25519_base>. You should use at
-least one import tag. A C<:all> tag imports everything.
-
-=head2 scalarmult_keygen
-
-  my $secret_key = scalarmult_keygen();
-
-Generates a new random secret key. Returns C<$secret_key> as a
-L<Crypt::Sodium::XS::MemVault>.
+Nothing is exported by default. A C<:default> tag imports the functions and
+constants documented below. A separate C<:E<lt>primitiveE<gt>> import tag is
+provided for each of the primitives listed in L</PRIMITIVES>. These tags import
+the C<scalarmult_E<lt>primitiveE<gt>_*> functions and constants for that
+primitive.  A C<:all> tag imports everything.
 
 =head2 scalarmult_base
 
+=head2 scalarmult_E<lt>primitiveE<gt>_base
+
   my $public_key = scalarmult_base($secret_key);
 
-Given a user’s C<$secret_key>, return the user’s public key.
+C<$secret_key> is a secret key. It must be L</scalarmult_SCALARBYTES> bytes. It
+may be a L<Crypt::Sodium::XS::MemVault>.
+
+Returns a public key which is L</scalarmult_BYTES> bytes.
 
 Multiplies the base point (x, 4/5) by a scalar C<$secret_key> (clamped) and
 returns the Y coordinate of the resulting point.
@@ -130,12 +127,35 @@ NOTE: With the ed25519 primitive, a C<$secret_key> of 0 will croak.
 
 =head2 scalarmult
 
-  my $q = scalarmult($my_secret_key, $their_public_key);
+=head2 scalarmult_E<lt>primitiveE<gt>
 
-This function can be used to compute a shared secret C<$q> given a user’s
-C<$my_secret_key> and another user’s C<$their_public_key>.
+  my $shared_secret = scalarmult($my_secret_key, $their_public_key);
 
-NOTE:
+C<$my_secret_key> is a secret key. It must be L</scalarmult_SCALARBYTES> bytes.
+It may be a L<Crypt::Sodium::XS::MemVault>.
+
+C<$their_public_key> is a public key. It must be L</scalarmult_BYTES> bytes.
+
+Returns a L<Crypt::Sodium::XS::MemVault>: a shared secret of
+L</scalarmult_SCALARBYTES> bytes.
+
+B<Note> (ed25519):
+
+=over 4
+
+With the ed25519 primitive, this function will croak if C<$my_secret_key>
+is 0 or if C<$their_public_key> is not on the curve, not on the main subgroup,
+is a point of small order, or is not provided in canonical form.
+
+Also with ed25519, C<$my_secret_key> is “clamped” (the 3 low bits are cleared
+to make it a multiple of the cofactor, bit 254 is set and bit 255 is cleared to
+respect the original design).
+
+=back
+
+B<Note>:
+
+=over 4
 
 C<$q> represents the X coordinate of a point on the curve. As a result, the
 number of possible keys is limited to the group size (≈2^252), which is smaller
@@ -154,15 +174,16 @@ producing the same shared secret can be trivially computed).
 
 See L</SYNOPSIS> for an example of this.
 
-ed225519 notes (C<$secret_key> is 'n', C<$public_key> is 'p'):
+=back
 
-NOTE: With the ed25519 primitive, this function will croak if C<$my_secret_key>
-is 0 or if C<$their_public_key> is not on the curve, not on the main subgroup,
-is a point of small order, or is not provided in canonical form.
+=head2 scalarmult_keygen
 
-Also with ed25519, C<$my_secret_key> is “clamped” (the 3 low bits are cleared
-to make it a multiple of the cofactor, bit 254 is set and bit 255 is cleared to
-respect the original design).
+=head2 scalarmult_E<lt>primitiveE<gt>_keygen
+
+  my $secret_key = scalarmult_keygen();
+
+Returns a L<Crypt::Sodium::XS::MemVault>: a secret key of
+L</scalarmult_SCALARBYTES> bytes.
 
 =head1 ed25519 SCALAR MULTIPLICATION WITHOUT CLAMPING
 
@@ -179,17 +200,33 @@ These functions are only available for the ed25519 primitive.
 
 =head2 scalarmult_ed25519_base_noclamp
 
+  my $q_noclamp = scalarmult_ed25519_base_noclamp($n);
+
 =head2 scalarmult_ed25519_noclamp
+
+  my $q_noclamp = scalarmult_ed25519_noclamp($n, $p);
 
 =head1 CONTSANTS
 
+L</scalarmult_BYTES> and L</scalarmult_SCALARBYTES> are provided for
+consistency, but it is safe to assume that C<scalarmult_BYTES ==
+scalarmult_SCALARBYTES>.
+
 =head2 scalarmult_BYTES
 
-  my $public_key_length = scalarmult_BYTES();
+=head2 scalarmult_E<lt>primitiveE<gt>_BYTES
+
+  my $public_key_size = scalarmult_BYTES();
+
+Returns the size, in bytes, of a public key.
 
 =head2 scalarmult_SCALARBYTES
 
-  my $shared_and_secret_key_length = scalarmult_SCALARBYTES();
+=head2 scalarmult_E<lt>primitiveE<gt>_SCALARBYTES
+
+  my $shared_and_secret_key_size = scalarmult_SCALARBYTES();
+
+Returns the size, in bytes, of a shared or secret key.
 
 =head1 PRIMITIVES
 

@@ -1,4 +1,4 @@
-                     THE HISTORY OF ANSIEncode
+                     THE HISTORY OF (Term::)ANSIEncode
 
 This utility actually came from an abandoned project called "BBSUniversal".
 It was a perl based modern BBS program that had various screen output formats
@@ -8,8 +8,7 @@ actually worked quite well.
 
 However, it seemed every single Perl module for networking had piss-poor
 telnet server implementations and configuring a socket for per-character
-input never worked how I intended (basically for telnet acted like a modem
-instead of a line by line terminal).
+input never worked how I intended.
 
 It accepted connections just fine, and sent various output standards just
 fine, but getting single character input without blocking and the necessity
