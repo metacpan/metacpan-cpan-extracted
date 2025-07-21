@@ -34,9 +34,16 @@ Markup text to ANSI encoder
 
 ### -**s** or --**symbols** [search]
 ```
-    Show all of the symbol character tokens
+    Show all of the symbol character tokens by name
 	Use search to shorten the huge list
 ````
+
+### -**u** or --**unicode** [search]
+```
+    Show all of the symbol character tokens by unicode
+	Use search to shorten the huge list
+```
+
 ### -**f** or --**full**
 ```
     Use the full token table.  This will increase the initialization time.

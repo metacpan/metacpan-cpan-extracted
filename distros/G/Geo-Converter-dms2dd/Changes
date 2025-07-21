@@ -1,5 +1,9 @@
 Revision history for Perl extension Geo::Converter::dms2dd.
 
+0.06 2025-07-20
+    - Only load numeric regexps from Regexp::Common.  
+      A small load time change but makes a differenceunder profiling.
+
 0.05 2017-01-09
     - Fix hemisphere handling when full word is given
     - Correct some incorrect test expectations

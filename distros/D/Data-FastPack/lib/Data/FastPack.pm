@@ -2,7 +2,7 @@ package Data::FastPack;
 use strict;
 use warnings;
 
-our $VERSION="v0.2.0";
+our $VERSION="v0.2.1";
 
 use feature ":all";
 no warnings "experimental";
@@ -14,6 +14,9 @@ use constant::more <FP_MSG_{TIME=0,ID,PAYLOAD,TOTAL_LEN}>;
 
 use constant::more <FP_NS_{ID=0,SPACE,PARENT,NAME,USER}>;
 use constant::more qw<N2E=0 I2E NEXT_ID FREE_ID>;
+
+use constant::more DEBUG=>0;
+
 # routine indicating the required size of a buffer to store the requested
 # payload length
 #
@@ -55,6 +58,9 @@ Returns the number of bytes encoded
 
 =cut
 
+my @_ids;  #original name cache
+my $i;
+
 sub encode_message;
 sub encode_message {
   \my $buf=\$_[0]; shift;
@@ -74,23 +80,29 @@ sub encode_message {
   my $flags=0;
   # Loop through and do namespace name to id conversion
   if($ns){
+    $i=0;
     for(@$inputs){
       # NOTE: messages with "0" and 0 and undef are ignored
       if($_->[FP_MSG_ID]){
+        DEBUG and print STDERR __PACKAGE__ . "true value for message id\n";
         my $name=$_->[FP_MSG_ID];
         # Convert to id if ns is present and ID is NOT 0
         my $id=$ns->[N2E]{$name};
         unless (defined $id){
+          DEBUG and print STDERR __PACKAGE__ . "id/name does NOT existes in table: $id\n";
           if(defined $_->[FP_MSG_PAYLOAD]){
+            DEBUG and print STDERR __PACKAGE__ . "payload is defined... so we want to send/register\n";
             # Update id tracking and lookup tables
             $id=pop($ns->[FREE_ID]->@*)//$ns->[NEXT_ID]++;
             $ns->[N2E]{$name}=$id;
             $ns->[I2E]{$id}=$name;
 
+            DEBUG and print STDERR __PACKAGE__ . "encode registration\n";
             # encode definition into buffer
             $bytes+=encode_message $buf, [[$_->[FP_MSG_TIME], $id, $name ]];
           }
           else {
+            DEBUG and print STDERR __PACKAGE__ . "payload is undefined... so we want to unregister\n";
             # A message with no payload is an unregistration
             # Remove the entry from the tabe
             #
@@ -99,27 +111,58 @@ sub encode_message {
             push $ns->[FREE_ID]->@*, $id;
           }
         }
-        $_->[FP_MSG_ID]=$id;
+        $_ids[$i++]=$id;
+        #$_->[FP_MSG_ID]=$id;
       }
       else {
+        $_ids[$i++]=$_[FP_MSG_ID];
         # If the msg id is 0 this  is passed thourgh un modified and not name translated. 
         #
         #warn 'FastPack encode: Ignoring message. Named FastPack Messages cannot be named 0 or "0" or undefined';
       }
+
+    }
+    $i=0;
+    for(@$inputs){
+      $padding=((length $_->[FP_MSG_PAYLOAD])%8);
+      $padding= 8-$padding  if $padding;
+
+      my $s=pack("d V V/a*", $_->[FP_MSG_TIME], $_ids[$i++], $_->[FP_MSG_PAYLOAD] );
+      $tmp=$s.substr $pbuf, 0, $padding;
+      $bytes+=length $tmp;
+      $buf.=$tmp;
+      last if ++$processed == $limit;
     }
   }
+  else {
+    $i=0;
+    for(@$inputs){
+      $padding=((length $_->[FP_MSG_PAYLOAD])%8);
+      $padding= 8-$padding  if $padding;
 
-  # Do normal encoding
-	for(@$inputs){
-		$padding=((length $_->[FP_MSG_PAYLOAD])%8);
-    $padding= 8-$padding  if $padding;
+      my $s=pack("d V V/a*", @$_);
+      $tmp=$s.substr $pbuf, 0, $padding;
+      $bytes+=length $tmp;
+      $buf.=$tmp;
+      last if ++$processed == $limit;
+    }
 
-		my $s=pack("d V V/a*", @$_);
-    $tmp=$s.substr $pbuf, 0, $padding;
-    $bytes+=length $tmp;
-		$buf.=$tmp;
-    last if ++$processed == $limit;
-	}
+  }
+
+  ################################################################################################
+  # # Do normal encoding                                                                         #
+  # $i=0;                                                                                        #
+  #       for(@$inputs){                                                                         #
+  #               $padding=((length $_->[FP_MSG_PAYLOAD])%8);                                    #
+  #   $padding= 8-$padding  if $padding;                                                         #
+  #                                                                                              #
+  #               my $s=pack("d V V/a*", $_->[FP_MSG_TIME], $_ids[$i++], $_->[FP_MSG_PAYLOAD] ); #
+  #   $tmp=$s.substr $pbuf, 0, $padding;                                                         #
+  #   $bytes+=length $tmp;                                                                       #
+  #               $buf.=$tmp;                                                                    #
+  #   last if ++$processed == $limit;                                                            #
+  #       }                                                                                      #
+  ################################################################################################
   # Remove the messages from the input array
   splice @$inputs, 0, $processed;
   
@@ -198,20 +241,24 @@ sub decode_message {
       my $id=$message[FP_MSG_ID];
       my $name= $ns->[I2E]{$id};
       unless($name){
+        DEBUG and print STDERR __PACKAGE__ . " message id has not been seen before: $id\n";
         # This id has not been seen before. so we know the payload it the name
         $name=$message[FP_MSG_PAYLOAD];
+        DEBUG and print STDERR __PACKAGE__ . " use payload ans name: $name\n";
         $ns->[I2E]{$id}=$name;
         $ns->[N2E]{$name}=$id;
       }
       else {
+        DEBUG and print STDERR __PACKAGE__ . " message name exisits: $name\n";
         if($message[FP_MSG_PAYLOAD]){
-
+          DEBUG and print STDERR __PACKAGE__ . " has payload.. process as normal. push to output\n";
           # only push the message to output if this code has been seen before
           push @$output, \@message;
           # Finally convert id to name as we asked for named message
           $message[FP_MSG_ID]=$name;
         }
         else {
+          DEBUG and print STDERR __PACKAGE__ . " has NO payload.. un register and do no push to ouput\n";
           delete $ns->[N2E]{$name};
           delete $ns->[I2E]{$id};
           push $ns->[FREE_ID]->@*, $id;

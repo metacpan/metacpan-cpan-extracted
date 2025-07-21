@@ -4,7 +4,7 @@
       "Ken Williams <ken@mathforum.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -55,6 +55,6 @@
          "url" : "https://github.com/Perl/perl5.git"
       }
    },
-   "version" : "3.57",
+   "version" : "3.58",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

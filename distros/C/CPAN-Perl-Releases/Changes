@@ -1,6 +1,16 @@
 ==================================================
-Changes from 2020-07-04 00:00:00 +0000 to present.
+Changes from 2020-07-21 00:00:00 +0000 to present.
 ==================================================
+
+-----------------------------------------------
+version 5.20250720 at 2025-07-20 21:44:29 +0000
+-----------------------------------------------
+
+  Change: 3820ed4d24d847aa488ada1790d2031dcf66ba66
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2025-07-20 22:44:29 +0000
+
+    Updated for v5.43.1 
 
 -----------------------------------------------
 version 5.20250703 at 2025-07-03 16:01:41 +0000
@@ -390,6 +400,19 @@ version 5.20230623 at 2023-06-23 21:52:24 +0000
   Change: 488c1baf27c61a77e2af01f2205fa3230e8ac4da
   Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
   Date : 2023-06-16 09:15:45 +0000
+
+    Deal with pumpkins who have deleted dev releases
+
+    Special case SHAY who has only removed tar.bz2 tarballs for releases
+    below v5.28.0 
+
+-----------------------------------------------
+version 5.20230616 at 2023-06-16 08:11:37 +0000
+-----------------------------------------------
+
+  Change: 0843bf23082ec504703d9eca46a91e8f95844bac
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2023-06-16 09:11:37 +0000
 
     Deal with pumpkins who have deleted dev releases
 
@@ -882,16 +905,6 @@ version 5.20200820 at 2020-08-20 20:43:19 +0000
 
     Updated for v5.33.1 
 
------------------------------------------------
-version 5.20200717 at 2020-07-18 08:09:53 +0000
------------------------------------------------
-
-  Change: ca169a1624dd67c4066927f67909b5f1b56b0acb
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2020-07-18 09:09:53 +0000
-
-    Updated for v5.33.0 
-
 ==================================================
-Plus 221 releases after 2020-07-04 00:00:00 +0000.
+Plus 222 releases after 2020-07-21 00:00:00 +0000.
 ==================================================

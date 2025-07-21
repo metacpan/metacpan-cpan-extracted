@@ -1,7 +1,9 @@
 package Dist::Zilla::Plugin::TemplateXS;
-$Dist::Zilla::Plugin::TemplateXS::VERSION = '0.003';
+$Dist::Zilla::Plugin::TemplateXS::VERSION = '0.004';
 use Moose;
 with qw(Dist::Zilla::Role::FileGatherer Dist::Zilla::Role::TextTemplate);
+
+use experimental 'signatures';
 
 use Path::Tiny;
 
@@ -11,10 +13,11 @@ use Sub::Exporter::ForMethods;
 use Data::Section 0.200002 { installer => Sub::Exporter::ForMethods::method_installer }, '-setup';
 use Dist::Zilla::File::InMemory;
 use Moose::Util::TypeConstraints;
+use MooseX::Types::Moose qw/Str Bool/;
 
 has template => (
 	is	=> 'ro',
-	isa => 'Str',
+	isa => Str,
 	predicate => 'has_template',
 );
 
@@ -24,8 +27,18 @@ has style => (
 	required => 1,
 );
 
-sub filename {
-	my ($self, $name) = @_;
+has prototypes_line => (
+	is      => 'ro',
+	isa     => Bool,
+	lazy    => 1,
+	builder => '_build_prototypes_line',
+);
+
+sub _build_prototypes_line($self) {
+	return $self->style eq 'MakeMaker';
+}
+
+sub filename($self, $name) {
 	my @module_parts = split /::/, $name;
 	if ($self->style eq 'MakeMaker') {
 		return $module_parts[-1] . '.xs';
@@ -38,15 +51,16 @@ sub filename {
 	}
 }
 
-sub content {
-	my ($self, $name) = @_;
+sub content($self, $name) {
 	my $template = $self->has_template ? path($self->template)->slurp_utf8 : ${ $self->section_data('Module.xs') };
-	return $self->fill_in_string($template, { dist => \($self->zilla), name => $name, style => $self->style });
+	return $self->fill_in_string($template, {
+		name            => $name,
+		prototypes_line => $self->prototypes_line,
+	});
 }
 
-sub gather_files {
-	my $self = shift;
-	(my $name = $self->zilla->name) =~ s/-/::/g;
+sub gather_files($self) {
+	my $name = $self->zilla->name =~ s/-/::/gr;
 	$self->add_file(Dist::Zilla::File::InMemory->new({ name => $self->filename($name), content => $self->content($name) }));
 	return;
 }
@@ -67,7 +81,7 @@ Dist::Zilla::Plugin::TemplateXS - A simple xs-file-from-template plugin
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -97,9 +111,13 @@ This will cause the XS file for Foo::Bar to be written to F<lib/Foo/Bar.xs>.
 
 =back
 
+=head2 prototypes_line
+
+If enabled, a prototypes lines will be emitted. This is necessary when using L<ExtUtils::MakeMaker>, but when using L<Module::Build> or L<Module::Build::Tiny>, so it's enabled by default only when C<style> is C<MakeMaker>.
+
 =head2 template
 
-This contains the path to the template that is to be used. If not set, a default template will be used that looks something like this:
+This contains the B<path> to the template that is to be used. If not set, a default template will be used that looks something like this:
 
  #define PERL_NO_GET_CONTEXT
  #include "EXTERN.h"
@@ -107,22 +125,8 @@ This contains the path to the template that is to be used. If not set, a default
  #include "XSUB.h"
  
  MODULE = {{ $name }}				PACKAGE = {{ $name }}
- 
- PROTOTYPES: DISABLED
 
-=head1 METHODS
-
-=head2 filename($module_name)
-
-This returns the filename for C<$module_name>, given the specified C<style>.
-
-=head2 content($module_name)
-
-This returns the appropriate content for C<$module_name>.
-
-=head2 gather_files()
-
-This adds an XS file for the main module of the distribution.
+{{ if ($prototypes_line) { $OUT = "PROTOTYPES: DISABLED\n"; } }}
 
 =head1 AUTHOR
 
@@ -146,5 +150,4 @@ __[ Module.xs ]__
 
 MODULE = {{ $name }}				PACKAGE = {{ $name }}
 
-PROTOTYPES: DISABLED
-
+{{ if ($prototypes_line) { $OUT = "PROTOTYPES: DISABLE\n\n"; } }}

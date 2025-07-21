@@ -73,6 +73,16 @@ sub zip {
     return $response;
 }
 
+=head2 parse_data
+
+Takes the output from the C<data> method and uses Text::CSV
+to read each line, returning an arrayref of rows.
+
+If the parsing throws an error, it bails warning you to save
+the file and parse it in full.
+
+=cut
+
 sub parse_data {
     my ($self, $body) = @_;
 

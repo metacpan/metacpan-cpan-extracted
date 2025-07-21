@@ -28,11 +28,14 @@ ok length($buffer)==0, "Length ok";
 
 ok @input_copy==@output, "Same message count";
 
+#use Data::Dumper;
 # Test decoded messages are identical
 for(0..$#input_copy){
-  ok $input_copy[$_][0]==$output[$_][0];
-  ok $input_copy[$_][1]==$output[$_][1];
-  ok $input_copy[$_][2] eq $output[$_][2];
+  #print STDERR Dumper $input_copy[$_];
+  #print STDERR Dumper $output[$_];
+  ok $input_copy[$_][0]==$output[$_][0], "time ok";
+  ok $input_copy[$_][1]==$output[$_][1], "name/id ok";
+  ok $input_copy[$_][2] eq $output[$_][2], "payload ok";
 }
 
 

@@ -1,5 +1,11 @@
 Revision history for WWW::YaCyBlacklist
 
+0.6       2025-07-20 18:45:50+02:00 Europe/Berlin
+        faster check_url( )
+        check_url( ) matches allways if protocoll is not http or ftp
+        store_list( ) fixed
+        *.black files in UTF-8
+
 0.5       2025-07-15 23:32:51+02:00 Europe/Berlin
         check_url() more robust
 

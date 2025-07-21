@@ -29,8 +29,13 @@ t/release-dist-manifest.t
 t/release-kwalitee.t
 t/release-meta-json.t
 t/release-unused-vars.t
+xt/01-linkextor.t
 xt/02-read.t
+xt/03-print.t
 xt/file.txt
+xt/links.txt
+xt/matched.txt
+xt/ycb.black
 yacy/default.black
 yacy/ib-mirrors.black
 yacy/matches.txt

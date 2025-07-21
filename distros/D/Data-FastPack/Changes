@@ -1,5 +1,10 @@
 Revision history for Perl extension Data::FastPack.
 
+v0.2.1 2025-06-24
+  [fixes]
+  - fixed action at a distance when encoding messages
+  - Added Debug 
+
 v0.2.0 2025-01-01
   [improvments]
     - now supports optiional named ids and automatic/dynamic message id selection

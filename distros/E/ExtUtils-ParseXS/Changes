@@ -1,6 +1,11 @@
 Revision history for Perl extension ExtUtils::ParseXS.
 
-5.57 Fri May  2 05:40:59 PM CEST 2025
+5.58 Sun Jul 20 09:10:41 PM CEST 2025
+  - ExtUtils::ParseXS has been extensively restructured internally.
+    Most of these changes shouldn't be visible externally, but might
+	affect XS code which was using invalid or unsupported syntax.
+
+3.57 Fri May  2 05:40:59 PM CEST 2025
   - Rewrite half of the internals to facilitate refcounted stack
     later on
 

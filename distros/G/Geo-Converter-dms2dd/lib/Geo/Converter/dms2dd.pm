@@ -6,12 +6,12 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use Carp;
 
 use Readonly;
-use Regexp::Common;
+use Regexp::Common qw/number/;
 use English qw { -no_match_vars };
 
 require Exporter;
@@ -334,8 +334,6 @@ solution.  Patches welcome.
 It could probably also give the parsed degrees, minutes and seconds rather
 than convert them.  They are pretty easy to calculate, though.
 
-Submit bugs, fixes and enhancement requests via the bug tracker
-at L<http://code.google.com/p/geo-converter-dms2dd/>.
 
 =head1 LICENSE
 

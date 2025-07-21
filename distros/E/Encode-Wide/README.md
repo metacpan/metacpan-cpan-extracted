@@ -4,7 +4,7 @@ Encode::Wide - Convert wide characters (Unicode) into HTML or XML-safe ASCII ent
 
 # VERSION
 
-0.02
+0.03
 
 # SYNOPSIS
 

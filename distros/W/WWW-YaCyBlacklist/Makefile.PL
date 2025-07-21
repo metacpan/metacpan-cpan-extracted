@@ -26,11 +26,14 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
+    "HTML::LinkExtor" => "3.83",
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
-    "Test::More" => "1.001014"
+    "LWP::UserAgent" => "6.79",
+    "Test::More" => "1.001014",
+    "URI" => "5.32"
   },
-  "VERSION" => "0.5",
+  "VERSION" => "0.6",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -39,12 +42,15 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "File::Spec" => 0,
+  "HTML::LinkExtor" => "3.83",
   "IO::All" => "0.87",
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
+  "LWP::UserAgent" => "6.79",
   "Moose" => "2.2207",
   "Moose::Util::TypeConstraints" => "2.4000",
   "Test::More" => "1.001014",
+  "URI" => "5.32",
   "URI::URL" => 0,
   "strict" => 0,
   "warnings" => 0

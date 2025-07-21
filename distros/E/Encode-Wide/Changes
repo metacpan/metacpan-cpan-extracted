@@ -1,6 +1,10 @@
 Revision history for Encode::Wide
 
-0.02
+0.03	Sun Jul 20 11:22:05 EDT 2025
+	Added – (ndash) and U2018/U2019 encoding in wide_to_xml
+	Better debug message now dumps the errant bytes
+
+0.02	Tue Jul 15 21:48:42 EDT 2025
 	Extended testing
 
 0.01    Sat Jul 12 19:33:14 EDT 2025

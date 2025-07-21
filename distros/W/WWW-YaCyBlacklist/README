@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.5
+    version 0.6
 
 SYNOPSIS
 
@@ -30,7 +30,8 @@ SYNOPSIS
     
         $ycb->sortorder( 1 );
         $ycb->sorting( 'alphabetical' );
-        $ycb->store_list( '/path/to/new.black' );
+            $ycb->sortorder( '/path/to/new.black' );
+        $ycb->store_list( );
 
 METHODS
 
@@ -97,6 +98,9 @@ OPERATIONAL NOTES
     /. This protects against regexp compiling errors with leading
     quantifiers. So do not something like host.tld/^path although YaCy
     allows this.
+
+    check_url( ) alway returns true if the protocol of the URL is not
+    https? of ftps?.
 
 BUGS
 

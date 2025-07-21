@@ -27,6 +27,7 @@
    * arg=>{buffer: Uint8Array, inputs:array of inputs, limit:int}
    * each input is a message object of {time: float, id: int, payload; Uint8}
    */
+  let ids=[];
   function encode_message(args){
     //Javascript doesn't have aliasing or inout params, so via an object....
     let padding;
@@ -69,13 +70,6 @@
               let new_arg={buffer: buffer, inputs:[{time: args.inputs[i].time, id: id, payload: utf8encoder.encode(name) }]};
               temp=encode_message(new_arg);
               buffer=new_arg.buffer;
-              //Actual translation
-              args.inputs[i].id=id;
-            }
-          }
-          else {
-            if(args.inputs[i].payload.length){
-              //Normal message
             }
             else {
               //Defined id, but no payload... unreg
@@ -83,8 +77,14 @@
               delete ns.n2e[name];
               delete ns.i2e[id];
               ns.free_id.push(id);
-              args.inputs[i].id=id;
+
             }
+            //Translate
+            ids[i]=id;
+          }
+          else {
+            // No namespace so no translation
+            ids[i]=args.inputs[i].id;
           }
         }
 
@@ -119,11 +119,23 @@
 
     let view=new DataView(concat.buffer); 
 
-    for(let i=0; i< limit; i++){
-      view.setFloat64(offsets[i], args.inputs[i].time,1);
-      view.setUint32(offsets[i]+8, args.inputs[i].id, 1);
-      view.setUint32(offsets[i]+12, args.inputs[i].payload.length, 1);
-      concat.set(args.inputs[i].payload, offsets[i]+16);
+    if(ns){
+      // use the translated ids
+      for(let i=0; i< limit; i++){
+        view.setFloat64(offsets[i], args.inputs[i].time,1);
+        view.setUint32(offsets[i]+8, ids[i], 1);  /// US THE TRANSLATED ID
+        view.setUint32(offsets[i]+12, args.inputs[i].payload.length, 1);
+        concat.set(args.inputs[i].payload, offsets[i]+16);
+      }
+    }
+    else {
+      //use incoming ids
+      for(let i=0; i< limit; i++){
+        view.setFloat64(offsets[i], args.inputs[i].time,1);
+        view.setUint32(offsets[i]+8, args.inputs[i].id, 1);
+        view.setUint32(offsets[i]+12, args.inputs[i].payload.length, 1);
+        concat.set(args.inputs[i].payload, offsets[i]+16);
+      }
     }
 
     args.buffer=concat;

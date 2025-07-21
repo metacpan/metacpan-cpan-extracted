@@ -1,5 +1,35 @@
 ---
 
+
+2025-07-21   0.999.5
+   [Changed]
+       * Use absolute paths for -I argument in generated
+         'server-start' script
+   [Fixed]
+       * Incorrect path to local::lib (duplicated installation
+         directory base name
+       * Missing '-I old/lib' in 'server-start' script
+       * Kwalitee errors:
+         * 'buildtool_not_executable'
+         * 'use_strict'
+
+2025-07-20   0.999.4
+   [Changed]
+       * Use absolute PERL5LIB paths
+   [Fixed]
+       * Path setting for local::lib installation
+       * Prefer extra paths (from e.g. local::lib) over system paths
+         to make sure self-installed tools are discovered over
+         system-provided ones
+
+2025-07-20   0.999.3
+   [Fixed]
+       * Update version number as 0.999.2 apparently was aleady uploaded
+
+2025-07-20   0.999.2
+   [Fixed]
+       * Don't use tarball owner and group when running as root
+
 2025-05-07   0.999.1
    [Fixed]
        * Tests were testing the --version option argument

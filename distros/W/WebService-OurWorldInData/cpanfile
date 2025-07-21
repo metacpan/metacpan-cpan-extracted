@@ -1,6 +1,6 @@
 # https://metacpan.org/pod/distribution/Module-CPANfile/lib/cpanfile.pod
 
-requires 'perl' => '5.012';
+requires 'perl' => '5.008';
 
 requires 'HTTP::Tiny';
 requires 'IO::Socket::SSL';
@@ -10,13 +10,16 @@ requires 'PerlX::Maybe';
 requires 'Types::Standard';
 
 recommends 'Text::CSV';
+recommends 'URI';
 
 on test => sub {
     requires 'Test2::V0';
 
-    requires 'Archive::Extract';
-    requires 'LWP::UserAgent::Mockable';
     requires 'Time::Piece';
+
+    recommends 'Archive::Extract';
+    recommends 'LWP::UserAgent';
+    recommends 'LWP::UserAgent::Mockable'; # stronly recommended
 
     suggests 'Archive::Zip';
 };

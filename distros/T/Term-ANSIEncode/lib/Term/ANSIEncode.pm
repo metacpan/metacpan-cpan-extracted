@@ -11,7 +11,7 @@ package Term::ANSIEncode;
 #                     Written By Richard Kelsch                       #
 #                  © Copyright 2025 Richard Kelsch                    #
 #                        All Rights Reserved                          #
-#                           Version 1.15                              #
+#                           Version 1.17                              #
 #######################################################################
 # This program is free software: you can redistribute it and/or       #
 # modify it under the terms of the GNU General Public License as      #
@@ -45,7 +45,7 @@ use constant {
 binmode(STDOUT, ":encoding(UTF-8)");
 
 BEGIN {
-    our $VERSION = '1.15';
+    our $VERSION = '1.17';
 }
 
 sub ansi_output {
@@ -62,8 +62,11 @@ sub ansi_output {
                 $text =~ s/\[\%\s+$string\s+\%\]/$self->{'ansi_sequences'}->{$string}/gi;
             }
         } ## end foreach my $string (keys %{...})
-        foreach my $string (keys %{ $self->{'characters'} }) {
-            $text =~ s/\[\%\s+$string\s+\%\]/$self->{'characters'}->{$string}/gi;
+        foreach my $string (keys %{ $self->{'characters'}->{'NAME'} }) {
+            $text =~ s/\[\%\s+$string\s+\%\]/$self->{'characters'}->{'NAME'}->{$string}/gi;
+        }
+        foreach my $string (keys %{ $self->{'characters'}->{'UNICODE'} }) {
+            $text =~ s/\[\%\s+$string\s+\%\]/$self->{'characters'}->{'UNICODE'}->{$string}/gi;
         }
     } ## end if (length($text) > 1)
     my $s_len = length($text);
@@ -113,14 +116,15 @@ sub new {
 			'SAVE'        => $esc . 's',
 			'RESTORE'     => $esc . 'u',
 			'RESET'       => $esc . '0m',
-			'BOLD'        => $esc . '1m',
-			'FAINT'       => $esc . '2m',
-			'ITALIC'      => $esc . '3m',
-			'UNDERLINE'   => $esc . '4m',
-			'SLOW BLINK'  => $esc . '5m',
-			'RAPID BLINK' => $esc . '6m',
 
 			# Attributes
+			'BOLD'         => $esc . '1m',
+			'FAINT'        => $esc . '2m',
+			'ITALIC'       => $esc . '3m',
+			'UNDERLINE'    => $esc . '4m',
+			'OVERLINE'     => $esc . '53m',
+			'SLOW BLINK'   => $esc . '5m',
+			'RAPID BLINK'  => $esc . '6m',
 			'INVERT'       => $esc . '7m',
 			'REVERSE'      => $esc . '7m',
 			'CROSSED OUT'  => $esc . '9m',
@@ -136,7 +140,7 @@ sub new {
 			'FONT9'        => $esc . '19m',
 
 			# Color
-			'NORMAL' => $esc . '21m',
+			'NORMAL' => $esc . '22m',
 
 			# Foreground color
 			'BLACK'          => $esc . '30m',
@@ -217,26 +221,31 @@ sub new {
 	my $start = 0x2400;
 	my $finish = 0x2605;
 	if ($self->{'mode'} =~ /full|long/i) {
-		$start  = 0x2000;
+		$start  = 0x2010;
 		$finish = 0x2B59;
 	}
 
 	my $name = charnames::viacode(0x1F341); # Maple Leaf
-	$self->{'characters'}->{$name} = charnames::string_vianame($name);
+	$self->{'characters'}->{'NAME'}->{$name} = charnames::string_vianame($name);
+	$self->{'characters'}->{'UNICODE'}->{'U1F341'} = charnames::string_vianame($name);
     foreach my $u ($start .. $finish) {
         $name = charnames::viacode($u);
-        unless ($name =~ /^(ZERO|LINE SEPARATOR|LEFT-TO-RIGHT|PARAGRAPH|POP |RIGHT-TO-LEFT|TRIGRAM|BRAILLE)/) {
-            $self->{'characters'}->{$name} = charnames::string_vianame($name);
-        }
+		next if ($name eq '');
+		my $char = charnames::string_vianame($name);
+		$char = '?' unless(defined($char));
+		$self->{'characters'}->{'NAME'}->{$name} = $char;
+		$self->{'characters'}->{'UNICODE'}->{sprintf('U%05X',$u)} = $char;
     }
 	if ($self->{'mode'} =~ /full|long/i) {
 		$start = 0x1F300;
 		$finish = 0x1FBFF;
 		foreach my $u ($start .. $finish) {
 			$name = charnames::viacode($u);
-			unless ($name =~ /^(ZERO|LINE SEPARATOR|LEFT-TO-RIGHT|PARAGRAPH|POP |RIGHT-TO-LEFT|TRIGRAM|BRAILLE)/) {
-				$self->{'characters'}->{$name} = charnames::string_vianame($name);
-			}
+			next if ($name eq '');
+			my $char = charnames::string_vianame($name);
+			$char = '?' unless(defined($char));
+			$self->{'characters'}->{'NAME'}->{$name} = $char;
+			$self->{'characters'}->{'UNICODE'}->{sprintf('U%05X',$u)} = $char;
 		}
 	}
     bless($self, $class);

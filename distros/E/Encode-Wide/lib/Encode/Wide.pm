@@ -31,11 +31,11 @@ Encode::Wide - Convert wide characters (Unicode) into HTML or XML-safe ASCII ent
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 =head1 SYNOPSIS
 
@@ -254,6 +254,8 @@ sub wide_to_html
 	$string =~ s/\N{U+0160}/&Scaron;/g;
 	$string =~ s/\N{U+2013}/&ndash;/g;
 	$string =~ s/\N{U+2014}/&mdash;/g;
+	$string =~ s/\N{U+2018}/&quot;/g;
+	$string =~ s/\N{U+2019}/&quot;/g;
 	$string =~ s/\N{U+201C}/&quot;/g;
 	$string =~ s/\N{U+201D}/&quot;/g;
 	$string =~ s/\N{U+2026}/.../g;	# …
@@ -374,7 +376,12 @@ sub wide_to_html
 			}
 			$complain->("TODO: wide_to_html($string)") if($complain);
 			warn "TODO: wide_to_html($string)";
-			$string =~ s/[^[:ascii:]]/XXXXX/g;
+			# $string =~ s/[^[:ascii:]]/XXXXX/g;
+			$string =~ s{
+					([^[:ascii:]])
+				}{
+					'>>>>' . sprintf("%04X", ord($1)) . '<<<<'
+				}gex;	# e=evaluate, g=global, x=extended
 			die "BUG: wide_to_html($string)";
 		}
 	}
@@ -606,6 +613,8 @@ sub wide_to_xml
 	# print STDERR "\n";
 	$string =~ s/\N{U+2013}/-/g;
 	$string =~ s/\N{U+2014}/-/g;
+	$string =~ s/\N{U+2018}/&quot;/g;
+	$string =~ s/\N{U+2019}/&quot;/g;
 	$string =~ s/\N{U+201C}/&quot;/g;
 	$string =~ s/\N{U+201D}/&quot;/g;
 	$string =~ s/\N{U+2026}/.../g;	# …
@@ -670,6 +679,7 @@ sub wide_to_xml
 	$string =~ s/«/&quot;/g;
 	$string =~ s/»/&quot;/g;
 	$string =~ s/—/-/g;
+	$string =~ s/–/-/g;
 	$string =~ s/…/.../g;
 	$string =~ s/●/&#x25CF;/g;
 	$string =~ s/\x80$/ /;
@@ -698,7 +708,12 @@ sub wide_to_xml
 		}
 		$complain->("TODO: wide_to_xml($string)") if($complain);
 		warn "TODO: wide_to_xml($string)";
-		$string =~ s/[^[:ascii:]]/XXXXX/g;
+		# $string =~ s/[^[:ascii:]]/XXXXX/g;
+		$string =~ s{
+				([^[:ascii:]])
+			}{
+				'>>>>' . sprintf("%04X", ord($1)) . '<<<<'
+			}gex;	# e=evaluate, g=global, x=extended
 		die "BUG: wide_to_xml($string)";
 	}
 	return $string;

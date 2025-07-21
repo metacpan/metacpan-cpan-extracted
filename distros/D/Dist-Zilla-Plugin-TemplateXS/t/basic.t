@@ -27,6 +27,8 @@ like($pm, qr/package DZT::Minty::XS;/, "our new module has the package declarati
 my $xs = $tzil->slurp_file('mint/lib/DZT/Minty/XS.xs');
 like($xs, qr/^MODULE = DZT::Minty::XS/m, "our new module has the package declaration we want");
 
+unlike($xs, qr/PROTOTYPES/, '');
+
 my $distini = $tzil->slurp_file('mint/dist.ini');
 like($distini, qr/copyright_holder = A. U. Thor/, "copyright_holder in dist.ini");
 
@@ -44,6 +46,7 @@ like($pm, qr/package DZT::Minty::XS;/, "our new module has the package declarati
 
 $xs = $tzil->slurp_file('mint/XS.xs');
 like($xs, qr/^MODULE = DZT::Minty::XS/m, "our new module has the package declaration we want");
+like($xs, qr/PROTOTYPES/, '');
 
 $distini = $tzil->slurp_file('mint/dist.ini');
 like($distini, qr/copyright_holder = A. U. Thor/, "copyright_holder in dist.ini");

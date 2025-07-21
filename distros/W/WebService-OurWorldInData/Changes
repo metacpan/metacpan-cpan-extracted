@@ -1,3 +1,8 @@
+0.03      2025 Jul 20
+====
+* adding fake Catalog module as a placeholder
+* make tests skip if function not installed to lower actual required modules to install
+
 0.02      2025 Jul 18
 ====
 * recording tests so we don't flood the service

@@ -1,4 +1,4 @@
-package LedgerSMB::Installer v0.999.1;
+package LedgerSMB::Installer v0.999.5;
 
 use v5.20;
 use experimental qw(signatures);
@@ -67,6 +67,7 @@ sub _build_install_tree($class, $dss, $config, $installpath, $version) {
     $log->info( "Extracting release tarball" );
     $dss->untar( File::Spec->catfile( $installpath, $archive),
                  $installpath,
+                 no_same_owner => 1,
                  strip_components => 1 );
     $config->cpanfile( File::Spec->catfile( $installpath, 'cpanfile' ) );
 
@@ -639,7 +640,8 @@ sub install($class, @args) {
     $rv = 0;
 
     $log->info( "Generating application server startup script (server-start)" );
-    $dss->generate_start_script( $config->installpath, $config->locallib );
+    $dss->generate_start_script( File::Spec->rel2abs( $config->installpath ),
+                                 File::Spec->rel2abs( $config->locallib ) );
 
   CLEANUP:
     $log->warning( "Cleaning up Perl module installation dependencies" );

@@ -7,14 +7,17 @@ BEGIN {
 
 use WebService::OurWorldInData::Chart;
 
-use Archive::Extract;
-use LWP::UserAgent::Mockable;
+use Test2::Require::Module 'LWP::UserAgent';
+use Test2::Require::Module 'LWP::UserAgent::Mockable';
+use Test2::Require::Module 'URI';
 use Time::Piece; # core module
 
 my $time = localtime;
 my $record_date = $ENV{ LWP_UA_MOCK } eq 'playback'
-    ? '2025-07-18'
+    ? '2025-07-20'
     : $time->ymd;
+diag 'Remember to set $record_date = ', $time->ymd, " in $0"
+    if $ENV{ LWP_UA_MOCK } eq 'record';
 
 my $dataset = 'sea-surface-temperature-anomaly';
 my $ua    = LWP::UserAgent->new;
@@ -121,26 +124,10 @@ subtest 'fetch metadata' => sub {
         'check JSON fields';
 
     # loop through very long key names because nested hashes are hard to test
+    # could this be done as a bag { } check?
     for my $key (sort keys %{$result->{columns}} ) {
         is $result->{columns}->{$key}, $column_check, "check column metadata for $key";
     }
-};
-
-subtest 'zipped package' => sub {
-    ok my $result = $chart->zip, 'Get zipped package';
-
-    my $filename = join '.', $dataset, 'zip';
-    open my $fh, '>:raw', $filename
-        or warn "Can't open $filename: $!\n", return;
-    print $fh $result; # write the binary file
-    close $fh;
-
-    my $ae = Archive::Extract->new( archive => $filename );
-    ok $ae->extract or diag $ae->error;
-    my $files = $ae->files;
-    is $files, [ "$dataset.metadata.json", "$dataset.csv", 'readme.md'], 'Files there';
-
-    unlink $filename, @$files;
 };
 
 done_testing();

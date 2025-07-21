@@ -5,7 +5,7 @@ package WWW::YaCyBlacklist;
 # ABSTRACT: a Perl module to parse and execute YaCy blacklists
 
 our $AUTHORITY = 'cpan:IBRAUN';
-$WWW::YaCyBlacklist::VERSION = '0.5';
+$WWW::YaCyBlacklist::VERSION = '0.6';
 
 use Moose;
 use Moose::Util::TypeConstraints;
@@ -31,7 +31,7 @@ has 'filename' => (
 has 'file_charset' => (
     is  => 'ro',
     isa => 'Str',
-    default => 'cp1252', # YaCy files are encoded in ANSI
+    default => 'UTF-8', # YaCy files are encoded in ANSI
     init_arg => undef,
 );
 
@@ -112,6 +112,7 @@ sub check_url {
 
     my $self = shift;
     my $url = shift;
+    return 1 if $url !~ /^(ht|f)tps?\:\/\//i;
     $url .= '/' if $url =~ /\:\/\/[\w\-\.]+$/;
     $url = new URI $url;
     my $pq = ( defined $url->query ) ? $url->path.'?'.$url->query : $url->path;
@@ -123,13 +124,14 @@ sub check_url {
         my $host = ${ $self->patterns }{ $pattern }{ host };
 
         if ( !${ $self->patterns }{ $pattern }{ host_regex } ) {
-            $host =~ s/\*/.*/g;
 
-            if ( ${ $self->patterns }{ $pattern }{ host } =~ /\.\*$/ ) {
+            if ( index( ${ $self->patterns }{ $pattern }{ host }, '*') > -1 ) {
+
+                $host =~ s/\*/.*/g;
                 return 1 if $url->host =~ /^$host$/;
             }
             else {
-                return 1 if $url->host =~ /^([\w\-]+\.)*$host$/;
+                return 1 if index( $url->host, ${ $self->patterns }{ $pattern }{ host } ) > -1 && $url->host =~ /^([\w\-]+\.)*$host$/;
             }
         }
         else {
@@ -185,7 +187,7 @@ sub sort_list {
 sub store_list {
 
     my $self = shift;
-    join( "\n", $self->sort_list ) > io(  $self->filename )->all;
+    join( "\n", $self->sort_list( ) ) > io( $self->filename );
 }
 
 1;
@@ -204,7 +206,7 @@ WWW::YaCyBlacklist - a Perl module to parse and execute YaCy blacklists
 
 =head1 VERSION
 
-version 0.5
+version 0.6
 
 =head1 SYNOPSIS
 
@@ -230,7 +232,8 @@ version 0.5
 
     $ycb->sortorder( 1 );
     $ycb->sorting( 'alphabetical' );
-    $ycb->store_list( '/path/to/new.black' );
+	$ycb->sortorder( '/path/to/new.black' );
+    $ycb->store_list( );
 
 =head1 METHODS
 
@@ -293,6 +296,8 @@ Prints the current list to a file. Executes C<sort_list( )>.
 =head1 OPERATIONAL NOTES
 
 C<WWW::YaCyBlacklist> checks the path part including the leading separator C</>. This protects against regexp compiling errors with leading quantifiers. So do not something like C<host.tld/^path> although YaCy allows this.
+
+C<check_url( )> alway returns true if the protocol of the URL is not C<https?> of C<ftps?>.
 
 =head1 BUGS
 

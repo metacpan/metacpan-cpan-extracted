@@ -1,4 +1,4 @@
-package LedgerSMB::Installer::OS::unix v0.999.1;
+package LedgerSMB::Installer::OS::unix v0.999.5;
 
 use v5.20;
 use experimental qw(signatures);
@@ -89,6 +89,8 @@ sub untar($self, $tar, $target, %options) {
     my @cmd = ($self->{cmd}->{tar}, 'xzf', $tar, '-C', $target);
     push @cmd, ('--strip-components', $options{strip_components})
         if $options{strip_components};
+    push @cmd, '--no-same-owner'
+        if $options{no_same_owner};
     $log->debug( 'system(): ' . join(' ', map { "'$_'" } @cmd ) );
     system(@cmd) == 0
         or croak $log->fatal( "Failure executing tar: $!" );
@@ -99,14 +101,15 @@ sub generate_start_script($self, $installpath, $locallib) {
     my $script = File::Spec->catfile( $installpath, 'server-start' );
     open( my $fh, '>', $script );
     my $starman = $self->have_cmd( 'starman', 0, [ File::Spec->catdir( $locallib, 'bin' ) ] );
-    my $locallib_lib = File::Spec->catdir( $locallib, 'lib' );
+    my $locallib_lib = File::Spec->catdir( $locallib, 'lib', 'perl5' );
 
     say $fh <<~EOF;
-      #!/bin/bash
+      #!/usr/bin/bash
 
       cd $installpath
       exec $^X \\
-          -I lib \\
+          -I $installpath/lib \\
+          -I $installpath/old/lib \\
           -I $locallib_lib \\
           $starman \\
           --listen 0.0.0.0:5762 \\

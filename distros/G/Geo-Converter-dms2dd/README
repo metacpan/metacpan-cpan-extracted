@@ -1,5 +1,5 @@
-Geo-Converter-dms2dd version 0.04
-=================================
+Geo-Converter-dms2dd 
+====================
 
 Use this module to convert a coordinate value in degrees minutes seconds
 to decimal degrees.  It exports a single sub `dms2dd` which will

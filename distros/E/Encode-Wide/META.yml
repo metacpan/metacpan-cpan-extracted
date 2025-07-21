@@ -30,5 +30,5 @@ resources:
   bugtracker: https://github.com/nigelhorne/Encode-Wide/issues
   homepage: https://metacpan.org/pod/Encode::Wide
   repository: git://github.com/nigelhorne/Encode-Wide.git
-version: 0.02
+version: 0.03
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

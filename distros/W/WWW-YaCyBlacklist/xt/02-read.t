@@ -37,20 +37,15 @@ my @urls = (
     'https://theporndude.com/',
     'https://pornmopsfidel.de/',
 );
-my @matched = $ycb->find_matches( @urls );
-my @notmatched = $ycb->find_non_matches( @urls );
-is( scalar @matched, 6, 'matched with regex' );
-is( scalar @notmatched, 5, 'not matched with regex' );
+is( scalar $ycb->find_matches( @urls ), 6, 'matched with regex' );
+is( scalar $ycb->find_non_matches( @urls ), 5, 'not matched with regex' );
 
 $ycb = WWW::YaCyBlacklist->new( { 'use_regex' => 0 } );
 $ycb->read_from_files($black1,$black2);
-@matched = $ycb->find_matches( @urls );
-@notmatched = $ycb->find_non_matches( @urls );
-is( scalar @matched, 5, 'matched w/o regex' );
-is( scalar @notmatched, 6, 'not matched w/o regex' );
+
+is( scalar $ycb->find_matches( @urls ), 5, 'matched w/o regex' );
+is( scalar $ycb->find_non_matches( @urls ), 6, 'not matched w/o regex' );
 
 my @lines = ( io('C:\Users\Work\Documents\ingram\Perl\dzil\WWW-YaCyBlacklist\xt\file.txt')->chomp->slurp, @urls );
-@matched = $ycb->find_matches( @lines );
-@notmatched = $ycb->find_non_matches( @lines );
-is( scalar @matched, 8, 'file matched w/o regex' );
-is( scalar @notmatched, 11, 'file not matched w/o regex' );
+is( scalar $ycb->find_matches( @lines ), 8, 'file matched w/o regex' );
+is( scalar $ycb->find_non_matches( @lines ), 11, 'file not matched w/o regex' );

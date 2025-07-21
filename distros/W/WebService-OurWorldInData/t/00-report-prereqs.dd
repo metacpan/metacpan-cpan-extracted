@@ -26,7 +26,8 @@ do { my $x = {
                     },
        'runtime' => {
                       'recommends' => {
-                                        'Text::CSV' => '0'
+                                        'Text::CSV' => '0',
+                                        'URI' => '0'
                                       },
                       'requires' => {
                                       'HTTP::Tiny' => '0',
@@ -35,18 +36,19 @@ do { my $x = {
                                       'Moo' => '0',
                                       'PerlX::Maybe' => '0',
                                       'Types::Standard' => '0',
-                                      'perl' => '5.012'
+                                      'perl' => '5.008'
                                     }
                     },
        'test' => {
                    'recommends' => {
-                                     'CPAN::Meta' => '2.120900'
+                                     'Archive::Extract' => '0',
+                                     'CPAN::Meta' => '2.120900',
+                                     'LWP::UserAgent' => '0',
+                                     'LWP::UserAgent::Mockable' => '0'
                                    },
                    'requires' => {
-                                   'Archive::Extract' => '0',
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
-                                   'LWP::UserAgent::Mockable' => '0',
                                    'Test2::V0' => '0',
                                    'Test::More' => '0',
                                    'Time::Piece' => '0'
