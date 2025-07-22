@@ -46,14 +46,8 @@ sub wait_for
 sub wait_for_query
 {
     my $dbh = $_[0];
-    my ($fd, $rc);
 
-    $fd = $$dbh{pg_socket};
-    do {
-        wait_for($fd, 1);
-        $rc = $dbh->pg_ready();
-    } until $rc;
-
+    wait_for($$dbh{pg_socket}, 1) until $dbh->pg_ready();
     $dbh->pg_result();
 }
 

@@ -55,13 +55,9 @@ package Win32::Console::DotNet;
 use 5.014;
 use warnings;
 
-use Class::Accessor qw( antlers );
-use Class::Method::Modifiers;
-use namespace::sweep;
-
 # version '...'
 our $version = 'v4.6.0';
-our $VERSION = '0.005004';
+our $VERSION = '0.005005';
 $VERSION = eval $VERSION;
 
 # authority '...'
@@ -92,6 +88,8 @@ use threads::shared;
 use Win32;
 use Win32::Console;
 use Win32API::File;
+
+use namespace::clean;
 
 # ------------------------------------------------------------------------
 # Encode::Encoding -------------------------------------------------------
@@ -143,7 +141,7 @@ BEGIN {
 }
 
 # ------------------------------------------------------------------------
-# Class Defnition --------------------------------------------------------
+# Class Definition -------------------------------------------------------
 # ------------------------------------------------------------------------
 
 =head1 DESCRIPTION
@@ -205,31 +203,15 @@ package Win32::Console::DotNet {
   # Type Constraints -------------------------------------------------------
   # ------------------------------------------------------------------------
 
+  no namespace::clean;
+
 =begin private
 
-=cut
+=head2 Type Checks
 
-  use namespace::sweep -also => [qw(
-    is_Bool
-    is_ClassName
-    is_FileHandle
-    is_Object
-    is_Str
-    assert
-    assert_Bool
-    assert_ArrayRef
-    assert_CodeRef
-    assert_FileHandle
-    assert_Int
-    assert_Object
-    assert_Str
-  )];
+Basic type checks
 
-=head2 Type Ckecks
-
-Basic type ckecks
-
-This module use the following type ckecks:
+This module use the following type checks:
 
     is_Bool
     is_ClassName
@@ -531,7 +513,7 @@ I<Throws>: I<IllegalArgumentException> if the check fails.
   sub assert_Object($) {
     confess(sprintf("IllegalArgumentException: %s\n", 
       'Object'->$get_message($_[0])))
-        if STRICT and !blessed($_[0]);
+        if STRICT and !is_Object($_[0]);
     return $_[0];
   }
 
@@ -565,59 +547,6 @@ I<Throws>: I<IllegalArgumentException> if the check fails.
   # ------------------------------------------------------------------------
   # Constants --------------------------------------------------------------
   # ------------------------------------------------------------------------
-
-=begin private
-
-=cut
-
-  use namespace::sweep -also => [qw(
-    _DEBUG
-    TRUE
-    FALSE
-    DefaultConsoleBufferSize
-    MinBeepFrequency
-    MaxBeepFrequency
-    MaxConsoleTitleLength
-    StdConUnicodeEncoding
-
-    AltVKCode
-    NumberLockVKCode
-    CapsLockVKCode
-
-    VK_CLEAR
-    VK_SHIFT
-    VK_PRIOR
-    VK_NEXT
-    VK_INSERT
-    VK_NUMPAD0
-    VK_NUMPAD9
-    VK_SCROLL
-
-    eventType
-    keyDown
-    repeatCount
-    virtualKeyCode
-    virtualScanCode
-    uChar
-    controlKeyState
-
-    dwSizeX
-    dwSizeY
-    dwCursorPositionX
-    dwCursorPositionY
-    wAttributes
-    srWindowLeft
-    srWindowTop
-    srWindowRight
-    srWindowBottom
-    dwMaximumWindowSizeX
-    dwMaximumWindowSizeY
-
-    dwSize
-    bVisible
-  )]; 
-
-=end private
 
 =head2 Constants
 
@@ -720,7 +649,7 @@ order) or 1201 (big endian byte order).
 
 =item I<WinError.h>
 
-  use constant Win32Native::ERROR_INVALID_HANDLE = 0x6;
+  use constant Win32Native::ERROR_INVALID_HANDLE => 0x6;
 
 C<ERROR_INVALID_HANDLE> is a predefined constant that is used to represent a 
 value that is passed to or returned by one or more built-in functions.
@@ -855,6 +784,8 @@ I<See also>: I<CONSOLE_CURSOR_INFO> structure.
 =back
 
 =cut
+
+  use namespace::clean;
 
   # ------------------------------------------------------------------------
   # Variables --------------------------------------------------------------
@@ -1108,10 +1039,10 @@ package.
     ArgumentOutOfRange_ConsoleTitleTooLong
       => "The console title is too long.",
     ArgumentOutOfRange_ConsoleWindowBufferSize =>
-      "The new console window size would force the console buffer size to be "
-      ."too large.",
+      "The new console window size would force the console buffer size to be ".
+      "too large.",
     ArgumentOutOfRange_ConsoleWindowPos =>
-      "The window position must be set such that the current window size fits".
+      "The window position must be set such that the current window size fits ".
       "within the console's buffer, and the numbers must not be negative.",
     ArgumentOutOfRange_ConsoleWindowSize_Size =>
       "The value must be less than the console's current maximum window size ".
@@ -1143,52 +1074,12 @@ package.
 
 =head2 Attributes
 
-=begin private
-
-=item I<get>
-
-  override get(Str $key) : Any;
-
-I<get()> defines how an attribute is generally retrieved from our object.
-
-=cut
-
-  before 'get' => sub {
-    assert ( @_ == 2 );
-    assert ( is_Object $_[0] );
-    assert ( is_Str $_[1] );
-    assert ( $_ = $_[1] );
-    assert ( exists &$_ 
-      or ~- warn "InvalidPropertyException" 
-    );
-  };
-  
-=item I<set>
-
-  override set(Str $key, Any $value);
-
-I<set()> defines how an attribute is generally stored in our object.
-
-=cut
-
-  before 'set' => sub {
-    assert ( @_ == 3 );
-    assert ( is_Object $_[0] );
-    assert ( is_Str $_[1] );
-    assert ( $_ = $_[1] );
-    assert ( exists &$_ 
-      or ~- warn "InvalidPropertyException"
-    );
-  };
-
-=end private
-
 =over
 
 =item I<BackgroundColor>
 
   field BackgroundColor ( is => rw, type => Int,
-    default => $Win32::Console::BG_BLACK >> 4);
+    default => $Win32::Console::BG_BLACK >> 4 );
 
 A Color that specifies the background color of the console; that is, the color 
 that appears behind each character.  The default is black.
@@ -1198,16 +1089,8 @@ valid.
 
 =cut
 
-  has BackgroundColor => (
-    is        => 'rw',
-    # isa       => Int,
-    # init_arg  => undef,
-    # default   => sub { ($BG_BLACK & 0xf0) >> 4 },
-  );
-
-  around 'BackgroundColor' => sub {
-    assert ( @_ >= 2 && @_ <= 3 );
-    my $orig = assert_CodeRef shift;
+  sub BackgroundColor {
+    assert ( @_ >= 1 && @_ <= 2 );
     my $self = assert_Object shift;
     goto SET if @_;
     GET: {
@@ -1217,18 +1100,15 @@ valid.
       # For code that may be used from Windows app w/ no console
       if ( !$succeeded ) {
         my $BLACK = ($BG_BLACK & 0xf0) >> 4;
-        $self->set(BackgroundColor => $BLACK);
-        return $self->$orig();
+        return $BLACK;
       }
 
       my $c = $csbi->{wAttributes} & 0xf0;
       my $value = ColorAttributeToConsoleColor($c);
-      $self->set(BackgroundColor => $value);
-      return $self->$orig();
+      return assert_Int $value;
     }
     SET: {
       my $value = assert_Int shift;
-      $self->$orig($value);
       if ( $value < 0 || $value > 15 ) {
         confess("ArgumentException:\n".
           "$ResourceString{Arg_InvalidConsoleColor}\n");
@@ -1247,7 +1127,7 @@ valid.
 
       my $attr = $csbi->{wAttributes};
       $attr &= ~0xf0;
-      # Perl#'s bitwise-or.
+      # Perl's bitwise-or.
       $attr = $attr | $c;
       # Ignore errors here - there are some scenarios for running code that 
       # wants to print in colors to the console in a Windows application.
@@ -1270,22 +1150,14 @@ I<Throws>: I<IOException> if an I/O error occurred.
 
 =cut
 
-  has BufferHeight => (
-    is        => 'rw',
-    # isa       => Int,
-    # init_arg  => undef,
-  );
-
-  around 'BufferHeight' => sub {
-    assert ( @_ >= 2 && @_ <= 3 );
-    my $orig = assert_CodeRef shift;
+  sub BufferHeight {
+    assert ( @_ >= 1 && @_ <= 2 );
     my $self = assert_Object shift;
     goto SET if @_;
     GET: {
       my $csbi = GetBufferInfo();
       my $value = $csbi->{dwSize}->{Y};
-      $self->set(BufferHeight => $value);
-      return $self->$orig();
+      return assert_Int $value;
     }
     SET: {
       my $value = assert_Int shift;
@@ -1306,22 +1178,14 @@ L</WindowLeft> + L</WindowWidth>.
 
 =cut
 
-  has BufferWidth => (
-    is        => 'rw',
-    # isa       => Int,
-    # init_arg  => undef,
-  );
-
-  around 'BufferWidth' => sub {
-    assert ( @_ >= 2 && @_ <= 3 );
-    my $orig = assert_CodeRef shift;
+  sub BufferWidth {
+    assert ( @_ >= 1 && @_ <= 2 );
     my $self = assert_Object shift;
     goto SET if @_;
     GET: {
       my $csbi = GetBufferInfo();
       my $value = $csbi->{dwSize}->{X};
-      $self->set(BufferWidth => $value);
-      return $self->$orig();
+      return assert_Int $value;
     }
     SET: {
       my $value = assert_Int shift;
@@ -1339,21 +1203,13 @@ or turned off.
 
 =cut
 
-  has CapsLock => (
-    is        => 'ro',
-    # isa       => Bool,
-    # init_arg  => undef,
-  );
-
-  around 'CapsLock' => sub {
-    assert ( @_ == 2 );
-    my $orig = assert_CodeRef shift;
+  sub CapsLock {
+    assert ( @_ == 1 );
     my $self = assert_Object shift;
     GET: {
       require Win32Native;
       my $value = (Win32Native::GetKeyState(CapsLockVKCode) & 1) == 1;
-      $self->set(CapsLock => $value);
-      return $self->$orig();
+      return assert_Bool $value;
     }
   };
 
@@ -1368,22 +1224,14 @@ less than zero or greater than or equal to L</BufferWidth>.
 
 =cut
 
-  has CursorLeft => (
-    is        => 'rw',
-    # isa       => Int,
-    # init_arg  => undef,
-  );
-
-  around 'CursorLeft' => sub {
-    assert ( @_ >= 2 && @_ <= 3 );
-    my $orig = assert_CodeRef shift;
+  sub CursorLeft {
+    assert ( @_ >= 1 && @_ <= 2 );
     my $self = assert_Object shift;
     goto SET if @_;
     GET: {
       my $csbi = GetBufferInfo();
       my $value = $csbi->{dwCursorPosition}->{X};
-      $self->set(CursorLeft => $value);
-      return $self->$orig();
+      return assert_Int $value;
     }
     SET: {
       my $value = assert_Int shift;
@@ -1399,22 +1247,15 @@ less than zero or greater than or equal to L</BufferWidth>.
 The height of the cursor within a character cell.
 
 The size of the cursor expressed as a percentage of the height of a character 
-cell.  The property value ranges from C<1> to C<100>.
+cell. The property value ranges from C<1> to C<100>.
 
 I<Throws>: I<ArgumentOutOfRangeException> if the value specified in a set 
 operation is less than C<1> or greater than C<100>.
 
 =cut
 
-  has CursorSize => (
-    is        => 'rw',
-    # isa       => Int,
-    # init_arg  => undef,
-  );
-
-  around 'CursorSize' => sub {
-    assert ( @_ >= 2 && @_ <= 3 );
-    my $orig = assert_CodeRef shift;
+  sub CursorSize {
+    assert ( @_ >= 1 && @_ <= 2 );
     my $self = assert_Object shift;
     goto SET if @_;
     GET: {
@@ -1427,12 +1268,11 @@ operation is less than C<1> or greater than C<100>.
       if ( !$r ) {
         confess("WinIOError:\n$EXTENDED_OS_ERROR\n")
       }
-      $self->set(CursorSize => $cci[dwSize]);
-      return $self->$orig();
+      my $value = $cci[dwSize];
+      return assert_Int $value;
     }
     SET: {
       my $value = assert_Int shift;
-      $self->$orig($value);
       if ( $value < 1 || $value > 100 ) {
         confess("ArgumentOutOfRangeException: value $value\n". 
           "$ResourceString{ArgumentOutOfRange_CursorSize}\n");
@@ -1468,22 +1308,14 @@ less than zero or greater than or equal to L</BufferHeight>.
 
 =cut
 
-  has CursorTop => (
-    is        => 'rw',
-    # isa       => Int,
-    # init_arg  => undef,
-  );
-
-  around 'CursorTop' => sub {
-    assert ( @_ >= 2 && @_ <= 3 );
-    my $orig = assert_CodeRef shift;
+  sub CursorTop {
+    assert ( @_ >= 1 && @_ <= 2 );
     my $self = assert_Object shift;
     goto SET if @_;
     GET: {
       my $csbi = GetBufferInfo();
       my $value = $csbi->{dwCursorPosition}->{Y};
-      $self->set(CursorTop => $value);
-      return $self->$orig();
+      return assert_Int $value;
     }
     SET: {
       my $value = assert_Int shift;
@@ -1502,15 +1334,8 @@ I<True> if the cursor is visible; otherwise, I<false>.
 
 =cut
 
-  has CursorVisible => (
-    is        => 'rw',
-    # isa       => Bool,
-    # init_arg  => undef,
-  );
-
-  around 'CursorVisible' => sub {
-    assert ( @_ >= 2 && @_ <= 3 );
-    my $orig = assert_CodeRef shift;
+  sub CursorVisible {
+    assert ( @_ >= 1 && @_ <= 2 );
     my $self = assert_Object shift;
     goto SET if @_;
     GET: {
@@ -1523,12 +1348,11 @@ I<True> if the cursor is visible; otherwise, I<false>.
       if ( !$r ) {
         confess("WinIOError:\n$EXTENDED_OS_ERROR\n")
       }
-      $self->set(CursorVisible => $cci[bVisible]);
-      return $self->$orig();
+      my $value = $cci[bVisible];
+      return assert_Bool $value;
     }
     SET: {
       my $value = assert_Bool shift;
-      $self->$orig($value);
 
       my @cci;
       my $hConsole = ConsoleOutputHandle();
@@ -1553,26 +1377,18 @@ I<True> if the cursor is visible; otherwise, I<false>.
 
   field Error ( is => ro, type => FileHandle );
 
-A FileHandle that represents the standard error stream.
+A I<FileHandle> that represents the standard error stream.
 
 =cut
 
-  has Error => (
-    is        => 'ro',
-    # isa       => FileHandle,
-    # init_arg  => undef,
-  );
-
-  around 'Error' => sub {
-    assert ( @_ == 2 );
-    my $orig = assert_CodeRef shift;
+  sub Error {
+    assert ( @_ == 1 );
     my $self = assert_Object shift;
     GET: {
       if ( !defined $_error ) {
         InitializeStdOutError(FALSE);
-        $self->set(Error => $_error);
       }
-      return $self->$orig();
+      return $_error;
     }
   };
 
@@ -1582,23 +1398,15 @@ A FileHandle that represents the standard error stream.
     default => $Win32::Console::FG_LIGHTGRAY);
 
 Color that specifies the foreground color of the console; that is, the color
-of each character that is displayed.  The default is gray.
+of each character that is displayed. The default is gray.
 
 I<Throws>: I<ArgumentException> if the color specified in a set operation is not
 valid.
 
 =cut
 
-  has ForegroundColor => (
-    is        => 'rw',
-    # isa       => Int,
-    # init_arg  => undef,
-    # default   => sub { $FG_LIGHTGRAY },
-  );
-
-  around 'ForegroundColor' => sub {
-    assert ( @_ >= 2 && @_ <= 3 );
-    my $orig = assert_CodeRef shift;
+  sub ForegroundColor {
+    assert ( @_ >= 1 && @_ <= 2 );
     my $self = assert_Object shift;
     goto SET if @_;
     GET: {
@@ -1607,18 +1415,15 @@ valid.
 
       # For code that may be used from Windows app w/ no console
       if ( !$succeeded ) {
-        $self->set(ForegroundColor => $FG_LIGHTGRAY);
         return $FG_LIGHTGRAY;
       }
 
       my $c = $csbi->{wAttributes} & 0x0f;
       my $value = ColorAttributeToConsoleColor($c);
-      $self->set(ForegroundColor => $value);
-      return $self->$orig();
+      return assert_Int $value;
     }
     SET: {
       my $value = assert_Int shift;
-      $self->$orig($value);
       if ( $value < 0 || $value > 15 ) {
         confess("ArgumentException:\n".
           "$ResourceString{Arg_InvalidConsoleColor}\n");
@@ -1650,19 +1455,12 @@ valid.
 
   field In ( is => ro, type => FileHandle );
 
-A FileHandle that represents the standard input stream.
+A I<FileHandle> that represents the standard input stream.
 
 =cut
 
-  has In => (
-    is        => 'ro',
-    # isa       => FileHandle,
-    # init_arg  => undef,
-  );
-
-  around 'In' => sub {
-    assert ( @_ == 2 );
-    my $orig = assert_CodeRef shift;
+  sub In {
+    assert ( @_ == 1 );
     my $self = assert_Object shift;
     GET: {
       # Because most applications don't use stdin, we can delay 
@@ -1680,9 +1478,9 @@ A FileHandle that represents the standard input stream.
           $reader = IO::File->new_from_fd(fileno($s), 'r');
           $reader->binmode(":encoding(cp$cpi)");
         }
-        $self->set(In => $_in = $reader);
+        $_in = assert_FileHandle $reader;
       }
-      return $self->$orig();
+      return $_in;
     }
   };
 
@@ -1756,7 +1554,7 @@ current input encoding.
   class_has IsErrorRedirected ( is => ro, type => Bool, init_arg => undef );
 
 Gets a value that indicates whether error has been redirected from the 
-standard error stream.  I<True> if error is redirected; otherwise, I<false>.
+standard error stream. I<True> if error is redirected; otherwise, I<false>.
 
 =cut
 
@@ -1792,7 +1590,7 @@ standard error stream.  I<True> if error is redirected; otherwise, I<false>.
   class_has IsInputRedirected ( is => ro, type => Bool, init_arg => undef );
 
 Gets a value that indicates whether input has been redirected from the 
-standard input stream.  I<True> if input is redirected; otherwise, I<false>.
+standard input stream. I<True> if input is redirected; otherwise, I<false>.
 
 =cut
 
@@ -1827,7 +1625,7 @@ standard input stream.  I<True> if input is redirected; otherwise, I<false>.
   class_has IsOutputRedirected ( is => ro, type => Bool, init_arg => undef );
 
 Gets a value that indicates whether output has been redirected from the 
-standard output stream.  I<True> if output is redirected; otherwise, I<false>.
+standard output stream. I<True> if output is redirected; otherwise, I<false>.
 
 =cut
 
@@ -1864,20 +1662,12 @@ Gets a value indicating whether a key press is available in the input stream.
 
 =cut
 
-  has KeyAvailable => (
-    is        => 'ro',
-    # isa       => Bool,
-    # init_arg  => undef,
-  );
-  
-  around 'KeyAvailable' => sub {
-    assert ( @_ == 2 );
-    my $orig = assert_CodeRef shift;
+  sub KeyAvailable {
+    assert ( @_ == 1 );
     my $self = assert_Object shift;
     GET: {
       if ( $_cachedInputRecord->[eventType] == Win32Native::KEY_EVENT ) {
-        $self->set(KeyAvailable => TRUE);
-        return $self->$orig();
+        return TRUE;
       }
 
       my @ir;
@@ -1899,8 +1689,7 @@ Gets a value indicating whether a key press is available in the input stream.
         }
 
         if ( $numEventsRead == 0 ) {
-          $self->set(KeyAvailable => FALSE);
-          return $self->$orig();
+          return FALSE;
         }
 
         # Skip non key-down && mod key events.
@@ -1919,8 +1708,7 @@ Gets a value indicating whether a key press is available in the input stream.
           }
         } 
         else {
-          $self->set(KeyAvailable => TRUE);
-          return $self->$orig();
+          return TRUE;
         }
       }
     }
@@ -1935,23 +1723,15 @@ font and screen resolution.
 
 =cut
 
-  has LargestWindowHeight => (
-    is        => 'ro',
-    # isa       => Int,
-    # init_arg  => undef,
-  );
-
-  around 'LargestWindowHeight' => sub {
-    assert ( @_ == 2 );
-    my $orig = assert_CodeRef shift;
+  sub LargestWindowHeight {
+    assert ( @_ == 1 );
     my $self = assert_Object shift;
     GET: {
       # Note this varies based on current screen resolution and 
       # current console font.  Do not cache this value.
       my (undef, $bounds_Y) = Win32::Console::_GetLargestConsoleWindowSize(
         ConsoleOutputHandle());
-      $self->set(LargestWindowHeight => $bounds_Y);
-      return $self->$orig();
+      return assert_Int $bounds_Y;
     }
   };
 
@@ -1964,23 +1744,15 @@ current font and screen resolution.
 
 =cut
 
-  has LargestWindowWidth => (
-    is        => 'ro',
-    # isa       => Int,
-    # init_arg  => undef,
-  );
-
-  around 'LargestWindowWidth' => sub {
-    assert ( @_ == 2 );
-    my $orig = assert_CodeRef shift;
+  sub LargestWindowWidth {
+    assert ( @_ == 1 );
     my $self = assert_Object shift;
     GET: {
       # Note this varies based on current screen resolution and 
       # current console font.  Do not cache this value.
       my ($bounds_X) = Win32::Console::_GetLargestConsoleWindowSize(
         ConsoleOutputHandle());
-      $self->set(LargestWindowWidth => $bounds_X);
-      return $self->$orig();
+      return assert_Int $bounds_X;
     }
   };
 
@@ -1993,21 +1765,13 @@ or turned off.
 
 =cut
 
-  has NumberLock => (
-    is        => 'ro',
-    # isa       => Bool,
-    # init_arg  => undef,
-  );
-
-  around 'NumberLock' => sub {
-    assert ( @_ == 2 );
-    my $orig = assert_CodeRef shift;
+  sub NumberLock {
+    assert ( @_ == 1 );
     my $self = assert_Object shift;
     GET: {
       require Win32Native;
       my $value = (Win32Native::GetKeyState(NumberLockVKCode) & 1) == 1;
-      $self->set(NumberLock => $value);
-      return $self->$orig();
+      return assert_Bool $value;
     }
   };
 
@@ -2015,26 +1779,18 @@ or turned off.
 
   field Out ( is => ro, type => FileHandle );
 
-A FileHandle that represents the standard output stream.
+A I<FileHandle> that represents the standard output stream.
 
 =cut
 
-  has Out => (
-    is        => 'ro',
-    # isa       => FileHandle,
-    # init_arg  => undef,
-  );
-
-  around 'Out' => sub {
-    assert ( @_ == 2 );
-    my $orig = assert_CodeRef shift;
+  sub Out {
+    assert ( @_ == 1 );
     my $self = assert_Object shift;
     GET: {
       if ( !defined $_out ) {
         InitializeStdOutError(TRUE);
-        $self->set(Out => $_out);
       }
-      return $self->$orig();
+      return $_out;
     }
   };
 
@@ -2070,7 +1826,7 @@ current output encoding.
 
         my $cp = Win32::GetConsoleOutputCP() || Win32::GetACP();
         $_outputEncoding = Encode::find_encoding("cp$cp");
-        return $_outputEncoding;
+        return assert_Object $_outputEncoding;
       }
     }
     SET: {
@@ -2083,7 +1839,7 @@ current output encoding.
       {
         lock($InternalSyncObject);
         # Before changing the code page we need to flush the data 
-        # if Out hasn't been redirected. Also, have the next call to  
+        # if Out hasn't been redirected. Also, have the next call to
         # $_out reinitialize the console code page.
 
         if ( defined($_out) && !$_isOutTextWriterRedirected ) {
@@ -2128,20 +1884,13 @@ is C<undef>.
 I<Throws>: I<Exception> in a set operation, if the specified title is not a 
 string.
 
-I<Note>: The return value is a empty string if the specific length is > 1024.
+I<Remarks>: The return value is a empty string if the specific length is greater
+than C<1024>.
 
 =cut
 
-  has Title => (
-    is        => 'rw',
-    # isa       => Str,
-    # init_arg  => undef,
-    # default   => sub { '' },
-  );
-
-  around 'Title' => sub {
-    assert ( @_ >= 2 && @_ <= 3 );
-    my $orig = assert_CodeRef shift;
+  sub Title {
+    assert ( @_ >= 1 && @_ <= 2 );
     my $self = assert_Object shift;
     goto SET if @_;
     GET: {
@@ -2165,16 +1914,15 @@ I<Note>: The return value is a empty string if the specific length is > 1024.
           "$ResourceString{ArgumentOutOfRange_ConsoleTitleTooLong}\n");
       }
 
-      $self->set(Title => $title);
-      return $self->$orig();
+      return assert_Str $title;
     }
     SET: {
-      if ( !defined $_[0] ) {
+      my $value = shift;
+      if ( !defined $value ) {
         confess("ArgumentNullException:\n". 
           sprintf("$ResourceString{ArgumentNullException}\n", "value"));
       }
-      my $value = assert_Str shift;
-      $self->$orig($value);
+      assert_Str $value;
       if ( length($value) > MaxConsoleTitleLength ) {
         confess("ArgumentOutOfRangeException:\n".
           "$ResourceString{ArgumentOutOfRange_ConsoleTitleTooLong}\n");
@@ -2202,16 +1950,8 @@ input buffer.
 
 =cut
 
-  has TreatControlCAsInput => (
-    is        => 'rw',
-    # isa       => Bool,
-    # init_arg  => undef,
-    # default   => sub { FALSE },
-  );
-
-  around 'TreatControlCAsInput' => sub {
-    assert ( @_ >= 2 && @_ <= 3 );
-    my $orig = assert_CodeRef shift;
+   sub TreatControlCAsInput {
+    assert ( @_ >= 1 && @_ <= 2 );
     my $self = assert_Object shift;
     goto SET if @_;
     GET: {
@@ -2229,12 +1969,10 @@ input buffer.
         confess("WinIOError:\n$EXTENDED_OS_ERROR\n");
       }
       my $value = ($mode & ENABLE_PROCESSED_INPUT) == 0;
-      $self->set(TreatControlCAsInput => $value);
-      return $self->$orig();
+      return assert_Bool $value;
     }
     SET: {
       my $value = assert_Bool shift;
-      $self->$orig($value);
       my $handle = ConsoleInputHandle();
       if ( $handle == Win32API::File::INVALID_HANDLE_VALUE ) {
         confess("IOException:\n$ResourceString{IO_NoConsole}\n");
@@ -2273,22 +2011,14 @@ I<Throws>: I<Exception> if an error occurs when reading or writing information.
 
 =cut
 
-  has WindowHeight => (
-    is        => 'rw',
-    # isa       => Int,
-    # init_arg  => undef,
-  );
-
-  around 'WindowHeight' => sub {
-    assert ( @_ >= 2 && @_ <= 3 );
-    my $orig = assert_CodeRef shift;
+  sub WindowHeight {
+    assert ( @_ >= 1 && @_ <= 2 );
     my $self = assert_Object shift;
     goto SET if @_;
     GET: {
       my $csbi = GetBufferInfo();
       my $value = $csbi->{srWindow}->{Bottom} - $csbi->{srWindow}->{Top} + 1;
-      $self->set(WindowHeight => $value);
-      return $self->$orig();
+      return assert_Int $value;
     }
     SET: {
       my $value = assert_Int shift;
@@ -2311,22 +2041,14 @@ I<Throws>: I<Exception> if an error occurs when reading or writing information.
 
 =cut
 
-  has WindowLeft => (
-    is        => 'rw',
-    # isa       => Int,
-    # init_arg  => undef,
-  );
-
-  around 'WindowLeft' => sub {
-    assert ( @_ >= 2 && @_ <= 3 );
-    my $orig = assert_CodeRef shift;
+  sub WindowLeft {
+    assert ( @_ >= 1 && @_ <= 2 );
     my $self = assert_Object shift;
     goto SET if @_;
     GET: {
       my $csbi = GetBufferInfo();
       my $value = $csbi->{srWindow}->{Left};
-      $self->set(WindowLeft => $value);
-      return $self->$orig();
+      return assert_Int $value;
     }
     SET: {
       my $value = assert_Int shift;
@@ -2349,22 +2071,14 @@ I<Throws>: I<Exception> if an error occurs when reading or writing information.
 
 =cut
 
-  has WindowTop => (
-    is        => 'rw',
-    # isa       => Int,
-    # init_arg  => undef,
-  );
-
-  around 'WindowTop' => sub {
-    assert ( @_ >= 2 && @_ <= 3 );
-    my $orig = assert_CodeRef shift;
+  sub WindowTop {
+    assert ( @_ >= 1 && @_ <= 2 );
     my $self = assert_Object shift;
     goto SET if @_;
     GET: {
       my $csbi = GetBufferInfo();
       my $value = $csbi->{srWindow}->{Top};
-      $self->set(WindowTop => $value);
-      return $self->$orig();
+      return assert_Int $value;
     }
     SET: {
       my $value = assert_Int shift;
@@ -2388,22 +2102,14 @@ I<Throws>: I<Exception> if an error occurs when reading or writing information.
 
 =cut
 
-  has WindowWidth => (
-    is        => 'rw',
-    # isa       => Int,
-    # init_arg  => undef,
-  );
-
-  around 'WindowWidth' => sub {
-    assert ( @_ >= 2 && @_ <= 3 );
-    my $orig = assert_CodeRef shift;
+  sub WindowWidth {
+    assert ( @_ >= 1 && @_ <= 2 );
     my $self = assert_Object shift;
     goto SET if @_;
     GET: {
       my $csbi = GetBufferInfo();
       my $value = $csbi->{srWindow}->{Right} - $csbi->{srWindow}->{Left} + 1;
-      $self->set(WindowWidth => $value);
-      return $self->$orig();
+      return assert_Int $value;
     }
     SET: {
       my $value = assert_Int shift;
@@ -2438,12 +2144,7 @@ Public constructor.
     assert ( @_ == 1 );
     my $class = shift;
     assert ( is_ClassName $class );
-    return $class->SUPER::new({
-      BackgroundColor       => ($BG_BLACK & 0xf0) >> 4,
-      ForegroundColor       => $FG_LIGHTGRAY,
-      Title                 => '',
-      TreatControlCAsInput  => FALSE,
-    });
+    return bless {}, $class;
   };
 
 =item I<instance>
@@ -2976,7 +2677,7 @@ I<Throws>: I<IOException> if an I/O error occurred.
     my $r = $self->In->read(my $ch, 1);
     if ( !$r ) {
       confess("IOException:\n$OS_ERROR\n") unless defined $r;
-      # flush on stdin is not provided, so a loop is used  
+      # flush on stdin is not provided, so a loop is used
       1 while defined $self->In->getline();
       return -1;
     }
@@ -2992,12 +2693,12 @@ Obtains the next character or function key pressed by the user.
 The pressed key is optionally displayed in the console window.
 
 I<Param>: C<$intercept> determines whether to display the pressed key in the 
-console window. I<true> to not display the pressed key; otherwise, I<false>.
+console window. I<True> to not display the pressed key; otherwise, I<false>.
 
-I<Returns>: an ConsoleKeyInfo (blessed HashRef) that describes the console key 
-and unicode character, if any, that correspond to the pressed console key.  
-The ConsoleKeyInfo also describes, in a bitwise combination of values, whether 
-one or more C<Shift>, C<Alt>, or C<Ctrl> modifier keys was pressed 
+I<Returns>: an I<ConsoleKeyInfo> (blessed HashRef) that describes the console 
+key and unicode character, if any, that correspond to the pressed console key. 
+The I<ConsoleKeyInfo> also describes, in a bitwise combination of values, 
+whether one or more C<Shift>, C<Alt>, or C<Ctrl> modifier keys was pressed 
 simultaneously with the console key.
 
 =cut
@@ -3198,8 +2899,6 @@ I<Param>: C<$height> of the buffer area measured in rows.
     Win32::Console::_SetConsoleScreenBufferSize(ConsoleOutputHandle(), 
       $width, $height) or confess("WinIOError:\n$EXTENDED_OS_ERROR\n");
 
-    $self->set(BufferHeight => $height);
-    $self->set(BufferWidth => $width);
     return;
   }
 
@@ -3253,8 +2952,6 @@ bottom starting at C<0>.
       confess("WinIOError:\n$EXTENDED_OS_ERROR\n");
     }
 
-    $self->set(CursorLeft => $left);
-    $self->set(CursorTop => $top);
     return;
   }
 
@@ -3262,9 +2959,9 @@ bottom starting at C<0>.
 
   method SetError(FileHandle $newError)
 
-Sets the L</Error> attribute to the specified error FileHandle.
+Sets the L</Error> attribute to the specified error I<FileHandle>.
 
-I<Param>: C<$newError> represents a FileHandle that is the new standard error.
+I<Param>: C<$newError> represents a io handle that is the new standard error.
 
 =cut
 
@@ -3280,7 +2977,7 @@ I<Param>: C<$newError> represents a FileHandle that is the new standard error.
     $_isErrorTextWriterRedirected = TRUE;
     {
       lock($InternalSyncObject);
-      $self->set(Error => $_error = $newError);
+      $_error = assert_FileHandle $newError;
     }
     return;
   }
@@ -3289,7 +2986,7 @@ I<Param>: C<$newError> represents a FileHandle that is the new standard error.
 
   method SetIn(FileHandle $newIn)
 
-Sets the L</In> attribute to the specified input FileHandle.
+Sets the L</In> attribute to the specified input I<FileHandle>.
 
 I<Param>: C<$newIn> represents a io handle that is the new standard input.
 
@@ -3306,7 +3003,7 @@ I<Param>: C<$newIn> represents a io handle that is the new standard input.
     }
     {
       lock($InternalSyncObject);
-      $self->set(In => $_in = $newIn);
+      $_in = assert_FileHandle $newIn;
     }
     return;
   }
@@ -3315,7 +3012,7 @@ I<Param>: C<$newIn> represents a io handle that is the new standard input.
 
   method SetOut(FileHandle $newOut)
 
-Sets the L</Out> attribute to the specified output FileHandle.
+Sets the L</Out> attribute to the specified output I<FileHandle>.
 
 I<Param>: C<$newOut> represents a io handle that is the new standard output.
 
@@ -3333,7 +3030,7 @@ I<Param>: C<$newOut> represents a io handle that is the new standard output.
     $_isOutTextWriterRedirected = TRUE;
     {
       lock($InternalSyncObject);
-      $self->set(Out => $_out = $newOut);
+      $_out = assert_FileHandle $newOut;
     }
     return;
   }
@@ -3436,15 +3133,6 @@ I<Param>: C<$height> of the console window measured in rows.
       confess(sprintf("WinIOError:\n%s\n", Win32::FormatMessage($errorCode)));
     }
 
-    if ( $resizeBuffer ) {
-      $self->set(BufferHeight => $size->{X});
-      $self->set(BufferWidth => $size->{Y});
-    }
-    $self->set(WindowLeft => $srWindow->{Left});
-    $self->set(WindowTop => $srWindow->{Top});
-    $self->set(WindowWidth => $srWindow->{Right} - $srWindow->{Left} + 1);
-    $self->set(WindowHeight => $srWindow->{Bottom} - $srWindow->{Top} + 1);
-
     return;
   }
 
@@ -3497,11 +3185,6 @@ I<Param>: C<$top> corner of the console window.
       confess("WinIOError:\n$EXTENDED_OS_ERROR\n");
     }
 
-    $self->set(WindowLeft => $srWindow->{Left});
-    $self->set(WindowTop => $srWindow->{Top});
-    $self->set(WindowWidth => $srWindow->{Right} - $srWindow->{Left} + 1);
-    $self->set(WindowHeight => $srWindow->{Bottom} - $srWindow->{Top} + 1);
-
     return;
   }
 
@@ -3525,7 +3208,7 @@ I<Throws>: I<IOException> if an I/O error occurred.
 I<Throws>: I<ArgumentNullException> if C<$format> is C<undef>.
 
 I<Remarks>: this method does not perform any formatting of its own: It uses the 
-Perl function I<sprintf>.
+Perl's subroutine I<sprintf>.
 
   method Write(Int $value)
 
@@ -3555,7 +3238,7 @@ I<Throws>: I<IOException> if an I/O error occurred.
 
 I<Remarks>: If C<$value> is C<undef>, nothing is written and no exception is 
 thrown. Otherwise, the stringification method of C<$value> is called to produce 
-its stringrepresentation, and the resulting string is written to the standard 
+its string representation, and the resulting string is written to the standard 
 output stream.
 
   method Write(Num $value)
@@ -3569,7 +3252,7 @@ I<Throws>: I<IOException> if an I/O error occurred.
 
   method Write(Bool $value)
 
-Writes the text representation of the specified Boolean value to the standard 
+Writes the text representation of the specified boolean value to the standard 
 output stream.
 
 I<Param>: C<$value> is the value to write.
@@ -3620,7 +3303,7 @@ I<Throws>: I<IOException> if an I/O error occurred.
 I<Throws>: I<ArgumentNullException> if C<$format> is C<undef>.
 
 I<Remarks>: this method does not perform any formatting of its own: It uses the 
-Perl function I<sprintf>.
+Perl's subroutine I<sprintf>.
 
   method WriteLine(String $value)
 
@@ -3651,7 +3334,7 @@ I<Throws>: I<IOException> if an I/O error occurred.
 
   method WriteLine(Bool $value)
 
-Writes the text representation of the specified Boolean value, followed by the 
+Writes the text representation of the specified boolean value, followed by the 
 current line terminator, to the standard output stream.
 
 I<Param>: C<$value> is the value to write.
@@ -3716,29 +3399,9 @@ output stream.
   # Subroutines ------------------------------------------------------------
   # ------------------------------------------------------------------------
 
+  no namespace::clean;
+
 =begin private
-
-=cut
-
-  use namespace::sweep -also => [qw(
-    CheckOutputDebug
-    ColorAttributeToConsoleColor
-    ConsoleColorToColorAttribute
-    ConsoleHandleIsWritable
-    ConsoleInputHandle
-    ConsoleOutputHandle
-    GetBufferInfo
-    GetStandardFile
-    GetUseFileAPIs
-    InitializeStdOutError
-    IsAltKeyDown
-    IsHandleRedirected
-    IsKeyDownEvent
-    IsModKey
-    IsStandardConsoleUnicodeEncoding
-    MakeDebugOutputTextWriter
-    SafeFileHandle
-  )];
 
 =item I<CheckOutputDebug>
 
@@ -3849,7 +3512,7 @@ I<Returns>: I<true> if the specified handle is writable, otherwise I<false>.
 
     my $bytesWritten;
     my $junkByte = chr 0x41;
-    # We use our own Win32::API call for WriteFile because the Win32API::File 
+    # We use our own Windows API call for WriteFile because the Win32API::File 
     # version provides a different implementation for the use of the third 
     # parameter (nNumberOfBytesToWrite). 
     # According to the Windows API, it is intended that the value 0 performs a 
@@ -3907,7 +3570,7 @@ be returned instead.
 I<Param>: C<$succeeded> [out] is I<true> if no error occurred and I<false> if an 
 error occurred.
 
-I<Returns>: an hash reference with informations about the console.
+I<Returns>: an hash reference with information's about the console.
 
 =cut
 
@@ -4035,9 +3698,9 @@ to see which values are available.
 
 I<Param>: C<$bufferSize> buffer size.
 
-I<Returns>: a FileHandle of the specified standard device (C<STD_INPUT_HANDLE>, 
-C<STD_OUTPUT_HANDLE> or C<STD_ERROR_HANDLE>) or L<IO::Null> in the event of an 
-error.
+I<Returns>: a I<FileHandle> of the specified standard device 
+(C<STD_INPUT_HANDLE>, C<STD_OUTPUT_HANDLE> or C<STD_ERROR_HANDLE>) or 
+L<IO::Null> in the event of an error.
 
 =cut
 
@@ -4373,13 +4036,13 @@ I<Returns>: of an L<IO::Handle> of type I<IO::DebugOutputTextWriter>.
 
 Create a reference to safe an existing file handle.
 
-I<Param>: C<$preexistingHandle> is an FileHandle that represents the 
+I<Param>: C<$preexistingHandle> is an I<FileHandle> that represents the 
 pre-existing file handle to use.
 
 I<Param>: C<$ownsHandle> should be set to I<true> to reliably release the file 
 handle during the closing phase; I<false> to prevent release.
 
-I<Returns>: the specified FileHandle.
+I<Returns>: the specified I<FileHandle>.
 
 =cut
 
@@ -4411,11 +4074,16 @@ I<Returns>: the specified FileHandle.
 
 =back
 
+=cut
+
+  use namespace::clean;
+
 =head2 Inheritance
 
 Methods inherited from class L<Class::Accessor>
 
-  new, set, get
+  new, accessor_name_for, mutator_name_for, make_accessor, make_ro_accessor, 
+  make_wo_accessor
 
 Methods inherited from class L<UNIVERSAL>
 
@@ -4597,10 +4265,16 @@ package ConsoleColor {
   BEGIN {
     eval "use constant (_enum)[$_] => $_;" foreach 0..(_enum)-1;
   }
-  use constant elements => grep {defined} _enum;
-  use constant values   => grep {defined((_enum)[$_])} 0..(_enum)-1;
+  # Returns all valid names (Str) in the enumeration as a list.
+  use constant elements =>  grep {defined} _enum;
+  # Returns a list of all values (Int) of the enumeration.
+  use constant values   =>  grep {defined((_enum)[$_])} 0..(_enum)-1;
+  # Returns the number of elements (Int) in the array.
   use constant count    => +grep {defined} _enum;
-  sub get($;$) {
+  # Returns an element (Str) of the array by it's index (Int). You can also 
+  # use negative index numbers, just as with Perl's core array handling.
+  # If the specified element does not exist, this will return undef.
+  sub get { # $name (|$class, $value)
     shift if @_ > 1 && defined($_[0]) && $_[0] eq __PACKAGE__;
     my $key = shift // return;
     (_enum)[$key];
@@ -4778,10 +4452,10 @@ package ConsoleKey {
   BEGIN {
     eval "use constant (_enum)[$_] => $_;" foreach 0..(_enum)-1;
   }
-  use constant elements => grep {defined} _enum;
-  use constant values   => grep {defined((_enum)[$_])} 0..(_enum)-1;
+  use constant elements =>  grep {defined} _enum;
+  use constant values   =>  grep {defined((_enum)[$_])} 0..(_enum)-1;
   use constant count    => +grep {defined} _enum;
-  sub get {
+  sub get { # $name (|$class, $value)
     shift if @_ > 1 && defined($_[0]) && $_[0] eq __PACKAGE__;
     my $key = shift // return;
     (_enum)[$key];
@@ -4916,17 +4590,13 @@ The requirements necessary for the runtime are listed below:
 
 =item * L<5.014|http://metacpan.org/release/DAPM/perl-5.14.4>
 
-=item * L<Class::Accessor>
-
-=item * L<Class::Method::Modifiers>
-
 =item * L<Devel::Assert>
 
 =item * L<Devel::StrictMode>
 
 =item * L<IO::Null>
 
-=item * L<namespace::sweep> 
+=item * L<namespace::clean> 
 
 =item * L<Win32::API> 
 

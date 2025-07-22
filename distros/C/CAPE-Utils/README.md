@@ -82,6 +82,9 @@ pass=
 base=/opt/CAPEv2/
 # 0/1 if poetry should be used
 poetry=1
+# the path for poetry... point this at where poetry is setup for your CAPEv2 install
+# defaults to /etc/poetry/bin/poetry to be compatible with new CAPEv2 installs
+poetry_path=/etc/poetry/bin/poetry
 # 0/1 if fail should be allowed to run with out a where statement
 fail_all=0
 # colums to use for pending table show

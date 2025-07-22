@@ -1,3 +1,10 @@
+0.000031 Jul 21 2025
+
+- fix a handful of missing memory allocation failure checks. found in manual
+  review.
+
+- no functional changes
+
 0.000030 Jul 19 2025
 
 - BUGFIX: fix missing null check in curve25519

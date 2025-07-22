@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [28.1.0] - 2025-07-21
+### Added
+- [java] Add comparators for comparable objects ([#312](https://github.com/cucumber/messages/pull/312))
+
 ## [28.0.0] - 2025-07-07
 ### Changed
 - Add `Attachment.testRunHookStartedId` for traceability of attachments to test run hooks ([#301](https://github.com/cucumber/messages/pull/301))
@@ -15,6 +19,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 - [python] Add a LICENSE file for Python ([#278](https://github.com/cucumber/messages/pull/278))
 - [.NET] Fix NuGet package generation
+
+### Removed
+- [JavaScript] BREAKING CHANGE: Remove Node.js 18 support ([#299](https://github.com/cucumber/messages/pull/299))
 
 ## [27.2.0] - 2025-01-31
 ### Added
@@ -582,7 +589,8 @@ aggregated status.
 ### Added
 - Protobuf messages for Go, Java, JavaScript, TypeScript and Ruby
 
-[Unreleased]: https://github.com/cucumber/messages/compare/v28.0.0...HEAD
+[Unreleased]: https://github.com/cucumber/messages/compare/v28.1.0...HEAD
+[28.1.0]: https://github.com/cucumber/messages/compare/v28.0.0...v28.1.0
 [28.0.0]: https://github.com/cucumber/messages/compare/v27.2.0...v28.0.0
 [27.2.0]: https://github.com/cucumber/messages/compare/v27.1.0...v27.2.0
 [27.1.0]: https://github.com/cucumber/messages/compare/v27.0.2...v27.1.0

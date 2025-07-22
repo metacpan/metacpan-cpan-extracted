@@ -20,13 +20,15 @@ BEGIN { use_ok('Object::Configure') }
 local %ENV;
 
 # Mock environment variables with the expected prefix
-$ENV{'My::EnvTest::Class::env_flag'} = 'true';
-$ENV{'My::EnvTest::Class::level'} = 'debug';
+$ENV{'My__EnvTest__Class__env_flag'} = 'true';
+$ENV{'My__EnvTest__Class__level'} = 'debug';
 
 # Create the object without passing those values explicitly
 my $obj = My::EnvTest::Class->new(foo => 'bar');
 
 isa_ok($obj, 'My::EnvTest::Class', 'object created with env overrides');
+
+diag(Data::Dumper->new([$obj])->Dump()) if($ENV{'TEST_VERBOSE'});
 
 # Confirm values came from %ENV
 is($obj->{env_flag}, 'true', 'env_flag read from environment');

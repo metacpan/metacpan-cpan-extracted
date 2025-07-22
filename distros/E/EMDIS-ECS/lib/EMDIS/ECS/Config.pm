@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 #
-# Copyright (C) 2002-2020 National Marrow Donor Program. All rights reserved.
+# Copyright (C) 2002-2025 National Marrow Donor Program. All rights reserved.
 #
 # For a description of this module, please refer to the POD documentation
 # embedded at the bottom of the file (e.g. perldoc EMDIS::ECS::Config).
@@ -42,7 +42,13 @@ BEGIN
         AMQP_USERNAME AMQP_PASSWORD
         AMQP_RECV_TIMEOUT AMQP_RECV_TIMELIMIT AMQP_SEND_TIMELIMIT
         AMQP_DEBUG_LEVEL AMQP_CMD_SEND AMQP_CMD_RECV
-        EMDIS_MESSAGE_VERSION
+        EMDIS_MESSAGE_VERSION ENABLE_ENV_CONFIG
+        INBOX_OAUTH_TOKEN_CMD
+        INBOX_OAUTH_TOKEN_CMD_TIMELIMIT
+        INBOX_OAUTH_SASL_MECHANISM
+        SMTP_OAUTH_TOKEN_CMD
+        SMTP_OAUTH_TOKEN_CMD_TIMELIMIT
+        SMTP_OAUTH_SASL_MECHANISM
     );
     for my $attr (@attrlist)
     {
@@ -176,12 +182,38 @@ sub _massage_config
     my $this = shift;
 
     # initialize
+    my $err = '';
     my $script_dir = dirname($0);
     $script_dir = rel2abs($script_dir)
         unless file_name_is_absolute($script_dir);
     my $config_dir = dirname($this->{CFG_FILE});
     $config_dir = rel2abs($config_dir)
         unless file_name_is_absolute($config_dir);
+    if(is_yes($this->{ENABLE_ENV_CONFIG}))
+    {
+        for my $attr (keys %ok_attr)
+        {
+            if(exists $this->{$attr})
+            {
+                my $value = $this->{$attr};
+                # if value follows $ENV{envvar} pattern, use value of environment variable
+                if($value =~ /^\$ENV\{(\S+)\}$/)
+                {
+                    my $envvar = $1;
+                    my $env_value = $ENV{$envvar};
+                    if(defined $env_value)
+                    {
+                        $this->{$attr} = $env_value;
+                    }
+                    else
+                    {
+                        $err .=
+                            "Environment variable '$envvar' has undefined value - referenced by $attr in config file '$this->{CFG_FILE}'\n";
+                    }
+                }
+            }
+        }
+    }
 
     # parse some special tokens
     for my $attr (keys %ok_attr)
@@ -271,7 +303,7 @@ sub _massage_config
         }
     }
 
-    return '';
+    return $err;
 }
 
 # ----------------------------------------------------------------------
@@ -289,6 +321,7 @@ sub _set_defaults
     $this->{MAIL_MRK}          = "EMDIS";
     $this->{T_CHK}             = "7200";
     $this->{T_SCN}             = "3600";
+    $this->{ENABLE_ENV_CONFIG} = 'YES';
     my $basename = basename($0);   # default;  use magic logfile name
     $this->{ERR_FILE}          = "$basename.err";
     $this->{LOG_FILE}          = "$basename.log";
@@ -324,15 +357,16 @@ sub _set_defaults
     $this->{INBOX_MAX_MSG_SIZE} = "1048576";
     $this->{OPENPGP_CMD_ENCRYPT} = '/usr/local/bin/gpg --armor --batch ' .
         '--charset ISO-8859-1 --force-mdc --logger-fd 1 --openpgp ' .
-            '--output __OUTPUT__ --passphrase-fd 0 --quiet ' .
-                '--recipient __RECIPIENT__ --recipient __SELF__ --yes ' .
-                    '--sign --local-user __SELF__ --encrypt __INPUT__';
+        '--output __OUTPUT__ --pinentry-mode loopback --passphrase-fd 0 ' .
+        '--quiet --recipient __RECIPIENT__ --recipient __SELF__ --yes ' .
+        '--sign --local-user __SELF__ --encrypt __INPUT__';
     $this->{OPENPGP_CMD_DECRYPT} = '/usr/local/bin/gpg --batch ' .
         '--charset ISO-8859-1 --logger-fd 1 --openpgp --output __OUTPUT__ ' .
-            '--passphrase-fd 0 --quiet --yes --decrypt __INPUT__';
+        '--pinentry-mode loopback --passphrase-fd 0 --quiet --yes ' .
+        '--decrypt __INPUT__';
     $this->{PGP2_CMD_ENCRYPT} = '/usr/local/bin/pgp +batchmode +verbose=0 ' .
         '+force +CharSet=latin1 +ArmorLines=0 -o __OUTPUT__ ' .
-            '-u __SELF__ -eats __INPUT__ __RECIPIENT__ __SELF__';
+        '-u __SELF__ -eats __INPUT__ __RECIPIENT__ __SELF__';
     $this->{PGP2_CMD_DECRYPT} = '/usr/local/bin/pgp +batchmode +verbose=0 ' .
         '+force +CharSet=latin1 -o __OUTPUT__ __INPUT__';
     $this->{ENABLE_AMQP}       = "NO";
@@ -342,6 +376,10 @@ sub _set_defaults
     $this->{AMQP_DEBUG_LEVEL}  = 0;
     $this->{AMQP_CMD_SEND}     = 'ecs_amqp_send.py';
     $this->{AMQP_CMD_RECV}     = 'ecs_amqp_recv.py';
+    $this->{INBOX_OAUTH_TOKEN_CMD_TIMELIMIT} = "60";
+    $this->{INBOX_OAUTH_SASL_MECHANISM} = "XOAUTH2 OAUTHBEARER";
+    $this->{SMTP_OAUTH_TOKEN_CMD_TIMELIMIT} = "60";
+    $this->{SMTP_OAUTH_SASL_MECHANISM} = "XOAUTH2 OAUTHBEARER";
 }
 
 # ----------------------------------------------------------------------
@@ -372,14 +410,24 @@ sub _validate_config
     # validate INBOX_PROTOCOL
     
     # username/password not needed for DIRECTORY inbox
-    if($this->{INBOX_PROTOCOL} !~ /DIRECTORY/i)
+    if($this->{INBOX_PROTOCOL} !~ /DIRECTORY/i and not exists($this->{INBOX_OAUTH_TOKEN_CMD}))
     { 
         for my $attr (qw( INBOX_USERNAME INBOX_PASSWORD))
         {
             push(@errors, "$attr not defined.")
                 unless exists($this->{$attr});
         }
-   }
+    }
+
+    if(exists $this->{INBOX_OAUTH_TOKEN_CMD}) {
+        for my $attr (qw(INBOX_USERNAME
+                         INBOX_OAUTH_TOKEN_CMD_TIMELIMIT
+                         INBOX_OAUTH_SASL_MECHANISM))
+        {
+            push(@errors, "$attr not defined.")
+                unless exists($this->{$attr});
+        }
+    }
 
     if($this->{INBOX_PROTOCOL} =~ /IMAP/i)
     {
@@ -407,6 +455,16 @@ sub _validate_config
     {
         push(@errors,
             "Unrecognized INBOX_PROTOCOL:  $this->{INBOX_PROTOCOL}");
+    }
+
+    if(exists $this->{SMTP_OAUTH_TOKEN_CMD}) {
+        for my $attr (qw(SMTP_USERNAME
+                         SMTP_OAUTH_TOKEN_CMD_TIMELIMIT
+                         SMTP_OAUTH_SASL_MECHANISM))
+        {
+            push(@errors, "$attr not defined.")
+                unless exists($this->{$attr});
+        }
     }
 
     if(is_yes($this->{ENABLE_AMQP}))
@@ -504,11 +562,27 @@ sub _validate_config
             "are both selected, but they are mutually exclusive.");
     }
 
+    if(exists $this->{INBOX_OAUTH_TOKEN_CMD}
+        and not is_yes($this->{INBOX_USE_SSL})
+        and not is_yes($this->{INBOX_USE_STARTTLS}))
+    {
+        push(@errors, "INBOX OAuth 2.0 authentication requires SSL/TLS " .
+            "(INBOX_USE_SSL or INBOX_USE_STARTTLS).");
+    }
+
     if(is_yes($this->{SMTP_USE_SSL})
         and is_yes($this->{SMTP_USE_STARTTLS}))
     {
         push(@errors, "SMTP_USE_SSL and SMTP_USE_STARTTLS " .
             "are both selected, but they are mutually exclusive.");
+    }
+
+    if(exists $this->{SMTP_OAUTH_TOKEN_CMD}
+        and not is_yes($this->{SMTP_USE_SSL})
+        and not is_yes($this->{SMTP_USE_STARTTLS}))
+    {
+        push(@errors, "SMTP OAuth 2.0 authentication requires SSL/TLS " .
+            "(SMTP_USE_SSL or SMTP_USE_STARTTLS).");
     }
 
     # check whether directories exist
@@ -693,6 +767,13 @@ location of a directory which has a subdirectory for each partner
 node;  each subdirectory here contains untransmitted outbound messages
 for the corresponding partner node
 
+=item ENABLE_ENV_CONFIG
+
+YES/NO value, with default value of YES.  If set to YES, enable use
+of $ENV{envvar} syntax to get the value of a configuration setting from
+an environment variable.  Notably, this makes it possible to avoid
+storing secrets such as passwords in the ECS configuration file.
+
 =item ENABLE_AMQP
 
 YES/NO value.  If set to YES, enable use of AMQP messaging.
@@ -733,6 +814,28 @@ POP3/IMAP server name
 =item INBOX_MAX_MSG_SIZE
 
 size limit for incoming email messages
+
+=item  INBOX_OAUTH_TOKEN_CMD
+
+Executable command which outputs an OAuth 2.0 access token for use with
+token-based authentication.  This setting is unconfigured by default,
+but if it is configured the software will attempt to use a SASL OAuth
+mechanism such as XOAUTH2 or OAUTHBEARER to authenticate with the POP3
+or IMAP server, instead of using a password.
+
+Depending on the email account configuration and email provider (e.g.,
+Gmail, Office 365, Yahoo), details of the procedure to get the access
+token may vary.
+
+=item  INBOX_OAUTH_TOKEN_CMD_TIMELIMIT
+
+Time limit, in seconds, after which INBOX_OAUTH_TOKEN_CMD command is
+forcibly terminated.
+
+=item  INBOX_OAUTH_SASL_MECHANISM
+
+Supported SASL mechanism(s) for inbox OAuth authentication, e.g. XOAUTH2
+and/or OAUTHBEARER.
 
 =item INBOX_PASSWORD
 
@@ -861,6 +964,28 @@ email "from" address
 =item SMTP_HOST
 
 SMTP server hostname
+
+=item  SMTP_OAUTH_TOKEN_CMD
+
+Executable command which outputs an OAuth 2.0 access token for use with
+token-based authentication.  This setting is unconfigured by default,
+but if it is configured the software will attempt to use a SASL OAuth
+mechanism such as XOAUTH2 or OAUTHBEARER to authenticate with the SMTP
+server, instead of using a password.
+
+Depending on the email account configuration and email provider (e.g.,
+Gmail, Office 365, Yahoo), details of the procedure to get the access
+token may vary.
+
+=item  SMTP_OAUTH_TOKEN_CMD_TIMELIMIT
+
+Time limit, in seconds, after which SMTP_OAUTH_TOKEN_CMD command is
+forcibly terminated.
+
+=item  SMTP_OAUTH_SASL_MECHANISM
+
+Supported SASL mechanism(s) for SMTP OAuth authentication, e.g. XOAUTH2
+and/or OAUTHBEARER.
 
 =item SMTP_PASSWORD
 

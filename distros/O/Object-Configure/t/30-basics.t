@@ -23,7 +23,7 @@ BEGIN { use_ok('Object::Configure') }
 # Create a temporary config file
 my ($fh, $filename) = tempfile();
 print $fh <<'EOF';
-My::Module:
+My__Module:
   logger:
     file: foo.log
     level: debug
@@ -57,8 +57,8 @@ unlink 'foo.log';
 # === Test using environment variables ===
 
 ($fh, $filename) = tempfile();
-$ENV{'My::Module::logger__file'} = $filename;
-$ENV{'My::Module::logger__level'} = 'debug';
+$ENV{'My__Module__logger__file'} = $filename;
+$ENV{'My__Module__logger__level'} = 'debug';
 close $fh;
 
 my $obj_with_env = My::Module->new();
@@ -80,6 +80,6 @@ unlink $filename;
 
 # Clean up
 unlink $filename;
-delete $ENV{'My::Module::logger.syslog'};
+# delete $ENV{'My__Module__logger.syslog'};
 
 done_testing();

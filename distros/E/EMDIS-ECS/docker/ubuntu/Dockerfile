@@ -1,4 +1,4 @@
-# This file defines a docker image based on Ubuntu 18.04 which can be
+# This file defines a docker image based on Ubuntu 24.04 which can be
 # used for EMDIS::ECS (Perl ECS).
 #
 # For additional information about docker, see https://www.docker.com/
@@ -11,12 +11,12 @@
 #
 # 2) Build a "perlecs/ubuntu" Docker image based on the Dockerfile.
 #
-#    docker build -t perlecs/ubuntu:0.44-1 .
+#    docker build -t perlecs/ubuntu:0.45-1 .
 #
 # 3) Generate a Docker container based on the image, and run an interactive
 #    bash shell within the container.
 #
-#    docker run -it --name=perlecs_ubuntu  perlecs/ubuntu:0.44-1 /bin/bash
+#    docker run --rm -it --name=perlecs_ubuntu  perlecs/ubuntu:0.45-1 /bin/bash
 #
 # 4) Configure Perl ECS within the docker container.  For example, use
 #    "ecs_setup" to generate an ecs.cfg configuration file, "ecstool" to
@@ -30,18 +30,18 @@
 #    ECS, refer to the EMDIS and ECS specifications available from
 #    http://emdis.net/.
 
-# image is based on Ubuntu 18.04
-FROM ubuntu:18.04
+# image is based on Ubuntu 24.04
+FROM ubuntu:24.04
 LABEL Maintainer="Joel Schneider <joel@joelschneider.net>"
 LABEL Description="EMDIS::ECS (Perl ECS) on Ubuntu"
-LABEL Version="0.44"
+LABEL Version="0.45"
 
 # install extra Ubuntu packages
 RUN apt-get update -y
 #RUN apt-get upgrade -y perl-modules
 RUN apt-get install -y \
   ca-certificates libmail-imapclient-perl build-essential cpanminus make telnet \
-  perl-doc man-db manpages groff-base vim-tiny python3 python3-qpid-proton
+  pass perl-doc man-db manpages groff-base vim-tiny python3 python3-qpid-proton
 
 # create perlecs user
 RUN useradd --comment "Perl ECS user" --shell /bin/bash --create-home perlecs
@@ -54,6 +54,9 @@ WORKDIR ${HOME}
 RUN mkdir ${HOME}/perl5lib
 COPY --chown=perlecs:perlecs README_GPG ${HOME}/README_GPG
 
+# install Authen::SASL::Perl via CPAN (need version >= 2.1800 for XOAUTH2 or OAUTHBEARER)
+RUN cpanm --local-lib ${HOME}/perl5lib Authen::SASL::Perl
+
 # install EMDIS::ECS into local-lib directory
 RUN cpanm --local-lib ${HOME}/perl5lib EMDIS::ECS
 
@@ -63,5 +66,3 @@ ENV PATH=${HOME}/perl5lib/bin:${PATH} \
  PERL5LIB=${HOME}/perl5lib/lib/perl5
 
 #USER root
-
-CMD echo "Welcome to Perl ECS.  To create a configuration file, use ecs_setup."

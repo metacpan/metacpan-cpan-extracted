@@ -37,9 +37,9 @@ SV * sodium_bin2base64(SV * bytes, int variant = sodium_base64_VARIANT_URLSAFE_N
   bytes_buf = SvPVbyte(bytes, bytes_len);
   out_len = sodium_base64_encoded_len(bytes_len, variant);
   Newx(out_buf, out_len, char);
-  out_len -= 1; /* decrement space for null */
   if (out_buf == NULL)
     croak("Failed to allocate memory");
+  out_len -= 1; /* decrement space for null */
   out_buf[out_len] = '\0';
   sodium_bin2base64(out_buf, out_len + 1, (unsigned char *)bytes_buf,
                     bytes_len, variant);

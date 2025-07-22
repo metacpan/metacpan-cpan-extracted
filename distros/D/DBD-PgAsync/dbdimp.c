@@ -17,6 +17,10 @@
 #define atoll(X) _atoi64(X)
 #endif
 
+#ifndef SvIsBOOL
+#define SvIsBOOL(sv) DBDPG_FALSE
+#endif
+
 #define DEBUG_LAST_RESULT 0
 
 #if PGLIBVERSION < 80300
@@ -3029,9 +3033,18 @@ int dbd_bind_ph (SV * sth, imp_sth_t * imp_sth, SV * ph_name, SV * newvalue, IV 
     (void)SvUPGRADE(newvalue, SVt_PV);
 
     if (SvOK(newvalue)) {
-        /* get the right encoding, without modifying the caller's copy */
-        newvalue = pg_rightgraded_sv(aTHX_ newvalue, imp_dbh->pg_utf8_flag && PG_BYTEA!=currph->bind_type->type_id);
-        value_string = SvPV(newvalue, currph->valuelen);
+        if (SvIsBOOL(newvalue)) {
+            /* bind native booleans as 1/0 or t/f if pg_bool_tf is set */
+            value_string = SvTRUE(newvalue)
+                ? imp_dbh->pg_bool_tf ? "t" : "1"
+                : imp_dbh->pg_bool_tf ? "f" : "0";
+            currph->valuelen = 1;
+        }
+        else {
+            /* get the right encoding, without modifying the caller's copy */
+            newvalue = pg_rightgraded_sv(aTHX_ newvalue, imp_dbh->pg_utf8_flag && PG_BYTEA!=currph->bind_type->type_id);
+            value_string = SvPV(newvalue, currph->valuelen);
+        }
         Renew(currph->value, currph->valuelen+1, char); /* freed in dbd_st_destroy */
         Copy(value_string, currph->value, currph->valuelen+1, char);
         currph->value[currph->valuelen] = '\0';
@@ -3802,7 +3815,7 @@ long dbd_st_execute (SV * sth, imp_sth_t * imp_sth)
         || !imp_sth->server_prepare
         )
         pqtype = PQTYPE_EXEC;
-    else if (STH_ASYNC_PREPARE == imp_sth->async_status) {
+    else if (NULL != imp_sth->prepare_name) {
         pqtype = PQTYPE_PREPARED;
     }
     else if (0==imp_sth->switch_prepared || imp_sth->number_iterations < imp_sth->switch_prepared) {

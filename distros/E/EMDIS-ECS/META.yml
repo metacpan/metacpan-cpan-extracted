@@ -18,6 +18,7 @@ no_index:
     - t
     - inc
 requires:
+  Authen::SASL::Perl: '2.14'
   CPAN::Version: '5.4'
   Data::Dumper: '2.101'
   Fcntl: '1.03'
@@ -34,5 +35,5 @@ requires:
   Net::SMTP: '2.13'
   SDBM_File: '1.03'
   Text::ParseWords: '3.2'
-version: '0.44'
+version: '0.45'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

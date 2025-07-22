@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 #
-# Copyright (C) 2002-2020 National Marrow Donor Program. All rights reserved.
+# Copyright (C) 2002-2025 National Marrow Donor Program. All rights reserved.
 #
 # For a description of this program, please refer to the POD documentation
 # embedded at the bottom of the file (e.g. perldoc ecs_setup).
@@ -224,7 +224,20 @@ $CFGFMT = "%-20s | %-14s | %s\n";
   ],
  INBOX_MAX_MSG_SIZE =>
  ['size limit for incoming messages',
-  ''
+  'size limit for incoming messages'
+  ],
+ INBOX_OAUTH_TOKEN_CMD =>
+ ['executable command to get OAuth token',
+  'INBOX_OAUTH_TOKEN_CMD specifies an executable command which',
+  'outputs an OAuth 2.0 access token for use with token-based',
+  'authentication.  This setting is unconfigured by default, but',
+  'if it is configured the software will attempt to use a SASL OAuth',
+  'mechanism such as XOAUTH2 or OAUTHBEARER to authenticate with the',
+  'POP3 or IMAP server, instead of using a password.',
+  '',
+  'Depending on the email account configuration and email provider',
+  '(e.g., Gmail, Office 365, Yahoo), details of the procedure to get',
+  'the access token may vary.'
   ],
  INBOX_PASSWORD =>
  ['password',
@@ -352,6 +365,19 @@ $CFGFMT = "%-20s | %-14s | %s\n";
  SMTP_HOST =>
  ['name of SMTP server',
   'SMTP_HOST specifies the mail server host name for outbound email.'
+  ],
+ SMTP_OAUTH_TOKEN_CMD =>
+ ['executable command to get OAuth token',
+  'SMTP_OAUTH_TOKEN_CMD specifies an executable command which ',
+  'outputs an OAuth 2.0 access token for use with token-based',
+  'authentication.  This setting is unconfigured by default, but',
+  'if it is configured the software will attempt to use a SASL OAuth',
+  'mechanism such as XOAUTH2 or OAUTHBEARER to authenticate with the',
+  'SMTP server, instead of using a password.',
+  '',
+  'Depending on the email account configuration and email provider',
+  '(e.g., Gmail, Office 365, Yahoo), details of the procedure to get',
+  'the access token may vary.'
   ],
  SMTP_PASSWORD =>
  ['password',
@@ -508,9 +534,15 @@ ask('SMTP_HOST');
 ask('SMTP_FROM');
 ask('SMTP_USE_SSL');
 ask('SMTP_USE_STARTTLS');
-if(is_yes($cfg->{SMTP_USE_SSL}) or is_yes($cfg->{SMTP_USE_STARTTLS})) {
+if(yes($term->readline("\nUse \"modern\" OAuth 2.0 authentication for SMTP [Y/n]? "))) {
+    $cfg->{SMTP_OAUTH_TOKEN_CMD} = 'ecs_token refresh';
+    ask('SMTP_OAUTH_TOKEN_CMD');
+}
+if(exists $cfg->{SMTP_OAUTH_TOKEN_CMD} or is_yes($cfg->{SMTP_USE_SSL})
+    or is_yes($cfg->{SMTP_USE_STARTTLS})) {
     ask('SMTP_USERNAME');
-    ask('SMTP_PASSWORD');
+    ask('SMTP_PASSWORD')
+        unless exists $cfg->{SMTP_OAUTH_TOKEN_CMD};
 }
 
 ask('INBOX_PROTOCOL');
@@ -518,13 +550,18 @@ ask('INBOX_PROTOCOL');
 $cfg->{INBOX_USERNAME} = 'username'
     unless $cfg->{INBOX_USERNAME};
 $cfg->{INBOX_PASSWORD} = 'password'
-    unless $cfg->{INBOX_PASSWORD};       
+    unless $cfg->{INBOX_PASSWORD} or $cfg->{SMTP_OAUTH_TOKEN_CMD};
     
 if($cfg->{INBOX_PROTOCOL} !~ /directory/i )
 {
+    if(yes($term->readline("\nUse \"modern\" OAuth 2.0 authentication for inbox [Y/n]? "))) {
+        $cfg->{INBOX_OAUTH_TOKEN_CMD} = 'ecs_token refresh';
+        ask('INBOX_OAUTH_TOKEN_CMD');
+    }
     ask('INBOX_HOST');
     ask('INBOX_USERNAME');
-    ask('INBOX_PASSWORD');
+    ask('INBOX_PASSWORD')
+        unless exists $cfg->{INBOX_OAUTH_TOKEN_CMD};
     ask('INBOX_MAX_MSG_SIZE');
 }					 
 ask('INBOX_FOLDER')
@@ -836,8 +873,11 @@ EOF
     print CFG cfgline('SMTP_USE_STARTTLS');
     print CFG '#' if not is_yes($cfg->{SMTP_USE_SSL}) and not is_yes($cfg->{SMTP_USE_STARTTLS});
     print CFG cfgline('SMTP_USERNAME');
-    print CFG '#' if not is_yes($cfg->{SMTP_USE_SSL}) and not is_yes($cfg->{SMTP_USE_STARTTLS});
+    print CFG '#' if exists $cfg->{SMTP_OAUTH_TOKEN_CMD}
+        or (not is_yes($cfg->{SMTP_USE_SSL}) and not is_yes($cfg->{SMTP_USE_STARTTLS}));
     print CFG cfgline('SMTP_PASSWORD');
+    print CFG '#' if not exists $cfg->{SMTP_OAUTH_TOKEN_CMD};
+    print CFG cfgline('SMTP_OAUTH_TOKEN_CMD');
 
     print CFG "\n# POP3/IMAP email inbox configuration parameters\n";
     print CFG cfgline('INBOX_PROTOCOL');
@@ -856,8 +896,10 @@ EOF
    
     print CFG '#' if $cfg->{INBOX_PROTOCOL} =~ /DIRECTORY/i;    
     print CFG cfgline('INBOX_USERNAME');
-    print CFG '#' if $cfg->{INBOX_PROTOCOL} =~ /DIRECTORY/i;       
+    print CFG '#' if exists $cfg->{INBOX_OAUTH_TOKEN_CMD} or $cfg->{INBOX_PROTOCOL} =~ /DIRECTORY/i;       
     print CFG cfgline('INBOX_PASSWORD');
+    print CFG '#' if not exists $cfg->{INBOX_OAUTH_TOKEN_CMD};
+    print CFG cfgline('INBOX_OAUTH_TOKEN_CMD');
     print CFG '#' if $cfg->{INBOX_PROTOCOL} !~ /DIRECTORY/i;    
     print CFG cfgline('INBOX_DIRECTORY');    
     print CFG cfgline('INBOX_MAX_MSG_SIZE');

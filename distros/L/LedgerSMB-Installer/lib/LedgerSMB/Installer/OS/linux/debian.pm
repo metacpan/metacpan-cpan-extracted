@@ -1,4 +1,4 @@
-package LedgerSMB::Installer::OS::linux::debian v0.999.5;
+package LedgerSMB::Installer::OS::linux::debian v0.999.6;
 
 use v5.20;
 use experimental qw(signatures);
@@ -44,16 +44,31 @@ sub pkgs_from_modules($self, $mods) {
         or return ({}, []);
 
     my (%pkgs, @unmapped);
+    my %found;
     while (my $pkg_line = <$fh>) {
         if ($pkg_line =~ m/^(\S+) is not found in any/) {
+            $found{$1} = 1;
             push @unmapped, $1;
             $log->trace( "Module '$1' not found" );
         }
-        elsif ($pkg_line =~ m/^(\S+) is in (\S+) package/) {
+        elsif ($pkg_line =~ m/^(\S+) is in (\S+)(?: \| \S+)* package/) {
+            $found{$1} = 1;
             $pkgs{$2} //= [];
             push $pkgs{$2}->@*, $1;
             $log->trace( "Module '$1' found in package $2" );
         }
+        elsif ($pkg_line =~ m/^(\S+) is in Perl core/) {
+            $found{$1} = 1;
+            $log->trace( "Module '$1' resolves to 'perl' package; skipping as explicit dependency" );
+        }
+        else {
+            $log->trace( "Unprocessed $self->{cmd}->{'dh_make_perl'} output line: " . $pkg_line );
+        }
+    }
+    my @skipped = grep { !$found{$_} } $mods->@*;
+    if (@skipped) {
+        $log->error( "Error: Modules skipped while mapping to packages: " . join(', ', @skipped ) );
+        push @unmapped, @skipped;
     }
     return (\%pkgs, \@unmapped);
 }

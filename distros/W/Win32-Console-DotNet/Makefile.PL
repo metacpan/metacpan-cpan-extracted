@@ -19,12 +19,10 @@ WriteMakefile(
   },
 
   PREREQ_PM => {
-    'Class::Accessor'           => 0.34,
-    'Class::Method::Modifiers'  => 2.11,
     'Devel::Assert'             => 1.06,
     'Devel::StrictMode'         => 0.003,
     'IO::Null'                  => 1.01,
-    'namespace::sweep'          => 0.006,
+    'namespace::clean'          => 0.27,
     'Win32'                     => 0.54,
     'Win32::API'                => 0.79,
     'Win32::Console'            => "0.10",

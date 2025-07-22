@@ -53,11 +53,11 @@ void kx_keypair(SV * seed = &PL_sv_undef, SV * flags = &PL_sv_undef)
   SvGETMAGIC(seed);
   if (!SvOK(seed)) {
     sk_pm = protmem_init(aTHX_ crypto_kx_SECRETKEYBYTES, sk_flags);
-
     if (sk_pm == NULL) {
       Safefree(pk_buf);
       croak("kx_keypair: Failed to allocate protmem");
     }
+
     crypto_kx_keypair(pk_buf, sk_pm->pm_ptr);
 
     if (protmem_release(aTHX_ sk_pm, PROTMEM_FLAG_MPROTECT_RW) != 0) {

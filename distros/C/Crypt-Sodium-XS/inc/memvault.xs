@@ -846,6 +846,8 @@ SV * extract( \
     new_flags = self_pm->flags;
 
   new_pm = protmem_init(aTHX_ new_len, new_flags);
+  if (new_pm == NULL)
+    croak("extract: Failed to allocate protmem");
 
   if (protmem_grant(aTHX_ self_pm, PROTMEM_FLAG_MPROTECT_RO) != 0) {
     protmem_free(aTHX_ new_pm);

@@ -45,6 +45,6 @@ throws_ok {
 	Object::Configure::configure($class, {
 		config_file => $bad_file,
 	});
-} qr/No such file or directory/, 'throws on unreadable config file';
+} qr/My__Test__Class: \/nonexistent\/config.yml:/, 'throws on unreadable config file';
 
 done_testing();

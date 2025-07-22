@@ -1,5 +1,14 @@
 Revision history for Path-Tiny
 
+0.150     2025-07-21 10:58:00-04:00 America/New_York
+
+    - No changes from 0.149-TRIAL
+
+0.149     2025-07-21 05:49:38-04:00 America/New_York (TRIAL RELEASE)
+
+    [Other]
+    - Released with newest Dist::Zilla to avoid xattrs in the tarball.
+
 0.148     2025-03-17 07:18:28-04:00 America/New_York
 
     [Bug fixes]

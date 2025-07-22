@@ -116,7 +116,7 @@ __DATA__
 
 Class::Accessor
 Class::Method::Modifiers
-namespace::sweep
+namespace::clean
 
 Devel::Assert
 Devel::StrictMode

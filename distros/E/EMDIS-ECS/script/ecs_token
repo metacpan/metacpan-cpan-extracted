@@ -1,0 +1,806 @@
+#!/usr/bin/perl -w
+#
+# Copyright (C) 2025 National Marrow Donor Program. All rights reserved.
+#
+# This program illustrates a process for requesting an OAuth 2.0 access token.
+# Its output, the OAuth 2.0 access token, matches the requirements of the
+# INBOX_OAUTH_TOKEN_CMD and SMTP_OAUTH_TOKEN_CMD EMDIS::ECS configuration
+# settings.  The process uses a refresh token and related data stored in an
+# encrypted password store managed by "pass" (passwordstore.org).
+#
+# For details about this program, please see the POD documentation embedded
+# following the __END__ marker in this file, or run "perldoc ecs_token".
+
+use EMDIS::ECS qw(timelimit_cmd);
+use Getopt::Long;
+use JSON::PP qw(decode_json encode_json);
+use LWP::UserAgent;
+use Term::ReadLine;
+use URI::Escape;
+
+my $SECSTOR_LOCATION = {
+    auth_endpoint          => 'emdis/ecs/oauth/auth_endpoint',
+    cached_token_response  => 'emdis/ecs/oauth/cached_token_response',
+    cached_token_timestamp => 'emdis/ecs/oauth/cached_token_timestamp',
+    client_id              => 'emdis/ecs/oauth/client_id',
+    client_secret          => 'emdis/ecs/oauth/client_secret',
+    redirect_uri           => 'emdis/ecs/oauth/redirect_uri',
+    refresh_token          => 'emdis/ecs/oauth/refresh_token',
+    scope                  => 'emdis/ecs/oauth/scope',
+    token_endpoint         => 'emdis/ecs/oauth/token_endpoint',
+};
+my $SECSTOR_TIMELIMIT = 3;
+my $CACHED_TOKEN_EXPIRATION_MARGIN = 600;
+
+# add --nocache option
+my $USAGE =
+    "Usage:$/" .
+    "  ecs_token <command> [options]$/" .
+    "Where:$/" .
+    "  <command> is code, credentials, or refresh$/" .
+    "  code [options] are:$/" .
+    "    --auth_endpoint <auth_endpoint>$/" .
+    "    --client_id <client_id>$/" .
+    "    --client_secret <client_secret>$/" .
+    "    --nocache$/" .
+    "    --redirect_uri <redirect_uri>$/" .
+    "    --scope <scope>$/" .
+    "    --token_endpoint <token_endpoint>$/" .
+    "  credentials [options] are:$/" .
+    "    --client_id <client_id>$/" .
+    "    --client_secret <client_secret>$/" .
+    "    --nocache$/" .
+    "    --scope <scope>$/" .
+    "    --token_endpoint <token_endpoint>$/" .
+    "  refresh [options] are:$/" .
+    "    --client_id <client_id>$/" .
+    "    --client_secret <client_secret>$/" .
+    "    --nocache$/" .
+    "    --refresh_token <refresh_token>$/" .
+    "    --token_endpoint <token_endpoint>$/" .
+    "  [options] not present on command line will be read from secure storage$/" .
+    "For details, refer to documentation:$/" .
+    "  perldoc ecs_token$/";
+
+my %options = ();
+GetOptions(\%options, 'auth_endpoint=s', 'client_id=s', 'client_secret=s',
+    'nocache', 'redirect_uri=s', 'refresh_token=s', 'scope=s',
+    'token_endpoint=s')
+    or die "Error - Unrecognized command line option$/" . $USAGE;
+
+my $command = ($#ARGV == 0 ? $ARGV[0] : '');
+die "Error - unrecognized, invalid, or missing <command>$/" . $USAGE
+    unless $command eq 'code' or $command eq 'credentials' or $command eq 'refresh';
+
+# if configured, have gpg-agent cache GnuPG passphrase used by "pass"
+if(exists $ENV{PASS_GPG_KEYGRIP} and exists $ENV{PASS_GPG_PASSPHRASE}) {
+    # default (linux) location of gpg-preset-passphrase program is in
+    # /usr/libexec (not on PATH)
+    my $gpg_preset_passphrase = exists $ENV{GPG_PRESET_PASSPHRASE}
+        ? $ENV{GPG_PRESET_PASSPHRASE}
+        : '/usr/libexec/gpg-preset-passphrase';
+
+    # use gpg-preset-passphrase to set passphrase in gpg-agent cache
+    # (to prevent "pass" from prompting for it interactively)
+    my $keygrip = $ENV{PASS_GPG_KEYGRIP};
+    my $passphrase = $ENV{PASS_GPG_PASSPHRASE};
+    my $err = timelimit_cmd(
+        $SECSTOR_TIMELIMIT,
+        "$gpg_preset_passphrase --preset $keygrip",
+        $passphrase);
+    die "Error - gpg-preset-passphrase command failed:  $err\n"
+        if $err;
+}
+
+# define LWP user agent
+my $user_agent = LWP::UserAgent->new;
+$user_agent->agent("PerlECS/$EMDIS::ECS::VERSION ");
+
+if($command eq 'code') {
+    # using authorization code flow ...
+
+    # get configuration parameters
+    my $auth_endpoint = get_config_param('auth_endpoint');
+    my $client_id = get_config_param('client_id');
+    my $client_secret = get_config_param('client_secret');
+    my $nocache = exists $options{nocache};
+    my $redirect_uri = get_config_param('redirect_uri');
+    my $scope = get_config_param('scope');
+    my $token_endpoint = get_config_param('token_endpoint');
+
+    # fail fast if command line contains unsupported options
+    die "Error - Option(s) unsupported for \"code\" command$/" . $USAGE
+        if exists $options{refresh_token};
+
+    # construct Term::Readline object for interactive I/O
+    my $term = new Term::ReadLine("ECS New Access Token Dialog")
+        or die "Error - Unable to initialize Term::ReadLine.$/";
+    $term->ornaments(0);
+    my $OUT = $term->OUT || *STDOUT;
+
+    # Construct URL to request authorization code.
+    # uses client id, redirect uri, scope, and auth endpoint
+    my $url = $auth_endpoint .
+        '?client_id=' . uri_escape($client_id) .
+        '&redirect_uri=' . uri_escape($redirect_uri) .
+        '&scope=' . uri_escape($scope) .
+        '&response_type=code' .
+        '&access_type=offline' .
+        '&prompt=consent';
+
+    # Using a web browser, while logged in to the EMDIS email account, the
+    # user visits the authorization code URL and navigates the approval flow
+    # to obtain the authorization code and paste it here.
+    print $OUT "To authorize token, using a web browser logged in to the EMDIS email$/" .
+        "account, visit this url and follow the directions:$/";
+    print $OUT "  $url$/";
+    my $authorization_code = $term->readline("Enter authorization code: ");
+
+    my $token_request_timestamp = time;
+
+    # use authorization code, client id, client secret, and redirect uri
+    # to request access token from token endpoint
+    my $response = $user_agent->post($token_endpoint, [
+        client_id     => $client_id,
+        client_secret => $client_secret,
+        code          => $authorization_code,
+        redirect_uri  => $redirect_uri,
+        grant_type    => 'authorization_code',
+    ]);
+
+    die "Error - Access token request failed:  " . $response->status_line . $/ .
+        $response->decoded_content . $/
+        unless $response->is_success;
+
+    print $OUT $response->decoded_content . $/;
+
+    # parse JSON response content
+    my $parsed_content = decode_json($response->decoded_content);
+
+    die "Error - Unexpected response content:  " . ref($parsed_content) . $/
+        unless ref($parsed_content) eq 'HASH';
+
+    die "Error - Refresh token not received$/"
+        if not exists $parsed_content->{refresh_token};
+    store_secret(
+        $SECSTOR_LOCATION->{refresh_token},
+        $parsed_content->{refresh_token});
+    print $OUT "New refresh token stored.$/";
+
+    die "Error - Access token not received$/"
+        unless exists $parsed_content->{access_token};
+
+    if(not $nocache) {
+        store_cached_token($response->decoded_content, $token_request_timestamp);
+    }
+}
+
+if($command eq 'credentials') {
+    # using client credentials flow ... (with client secret, not cert-based JWT)
+
+    # get configuration parameters
+    my $client_id = get_config_param('client_id');
+    my $client_secret = get_config_param('client_secret');
+    my $nocache = exists $options{nocache};
+    my $scope = get_config_param('scope');
+    my $token_endpoint = get_config_param('token_endpoint');
+
+    # fail fast if command line contains unsupported options
+    die "Error - Option(s) unsupported for \"credentials\" command$/" . $USAGE
+        if exists $options{auth_endpoint} or exists $options{redirect_uri}
+            or exists $options{refresh_token};
+
+    if(not $nocache) {
+        # use cached token if available
+        my $cached_token = get_cached_token();
+        if($cached_token) {
+            print $cached_token, $/;
+            exit 0;
+        }
+    }
+
+    my $token_request_timestamp = time;
+
+    # use client id, client secret, and resource to request access token
+    # from token endpoint
+    my $response = $user_agent->post($token_endpoint, [
+        client_id     => $client_id,
+        client_secret => $client_secret,
+        scope         => $scope,
+        grant_type    => 'client_credentials',
+    ]);
+
+    die "Error - Access token request failed:  " . $response->status_line . $/ .
+        $response->decoded_content . $/
+        unless $response->is_success;
+
+    # parse JSON response content
+    my $parsed_content = decode_json($response->decoded_content);
+
+    die "Error - Unexpected response content:  " . ref($parsed_content) . $/
+        unless ref($parsed_content) eq 'HASH';
+
+    die "Error - Access token not received$/"
+        unless exists $parsed_content->{access_token};
+
+    if(not $nocache) {
+        store_cached_token($response->decoded_content, $token_request_timestamp);
+    }
+
+    # print access token
+    print $parsed_content->{access_token}, $/;
+}
+
+if($command eq 'refresh') {
+    # using refresh token flow ...
+
+    # get configuration parameters
+    my $client_id = get_config_param('client_id');
+    my $client_secret = get_config_param('client_secret');
+    my $nocache = exists $options{nocache};
+    my $refresh_token = get_config_param('refresh_token');
+    my $token_endpoint = get_config_param('token_endpoint');
+
+    # fail fast if command line contains unsupported options
+    die "Error - Option(s) unsupported for \"refresh\" command$/" . $USAGE
+        if exists $options{auth_endpoint} or exists $options{redirect_uri}
+            or exists $options{scope};
+
+    if(not $nocache) {
+        # use cached token if available
+        my $cached_token = get_cached_token();
+        if($cached_token) {
+            print $cached_token, $/;
+            exit 0;
+        }
+    }
+
+    my $token_request_timestamp = time;
+
+    # use client id, client secret and refresh token to request access token
+    # from token endpoint
+    my $response = $user_agent->post($token_endpoint, [
+        client_id     => $client_id,
+        client_secret => $client_secret,
+        refresh_token => $refresh_token,
+        grant_type    => 'refresh_token',
+    ]);
+
+    die "Error - Access token request failed:  " . $response->status_line . $/ .
+        $response->decoded_content . $/
+        unless $response->is_success;
+
+    # parse JSON response content
+    my $parsed_content = decode_json($response->decoded_content);
+
+    die "Error - Unexpected response content:  " . ref($parsed_content) . $/
+        unless ref($parsed_content) eq 'HASH';
+
+    # if indicated, store new refresh token
+    if(exists $parsed_content->{refresh_token}) {
+        store_secret(
+            $SECSTOR_LOCATION->{refresh_token},
+            $parsed_content->{refresh_token});
+    }
+
+    die "Error - Access token not received$/"
+        unless exists $parsed_content->{access_token};
+
+    if(not $nocache) {
+        store_cached_token($response->decoded_content, $token_request_timestamp);
+    }
+
+    # print access token
+    print $parsed_content->{access_token}, $/;
+}
+
+exit 0;
+
+# attempt to get cached access token
+sub get_cached_token {
+    my $token = '';
+    eval {
+        my $cached_token_response = get_secret($SECSTOR_LOCATION->{cached_token_response});
+        my $cached_token_timestamp = get_secret($SECSTOR_LOCATION->{cached_token_timestamp});
+        my $current_timestamp = time;
+        my $parsed_token_response = decode_json($cached_token_response);
+        my $expires_in = (exists $parsed_token_response->{expires_in} ? $parsed_token_response->{expires_in} : 0);
+        my $expiration_timestamp = $cached_token_timestamp + $expires_in - $CACHED_TOKEN_EXPIRATION_MARGIN;
+        if($cached_token_timestamp < $current_timestamp and $current_timestamp < $expiration_timestamp) {
+            $token = $parsed_token_response->{access_token};
+        }
+    };
+    return $token;
+}
+
+# get configuration parameter value - get value from command-line option
+# if defined, otherwise get value from secure storage
+sub get_config_param {
+    my $param_name = shift;
+    die "Error - get_config_param():  param_name not specified$/"
+        unless $param_name;
+
+    # if defined, get value from command-line option
+    return $options{$param_name}
+        if exists $options{$param_name};
+
+    # get value from secure storage
+    return get_secret($SECSTOR_LOCATION->{$param_name});
+}
+
+# This subroutine uses "pass" to get the value of a secret.
+#
+# For this to work, the GnuPG passphrase needed by pass must be preloaded
+# into the gpg-agent cache, e.g., using gpg-preset-passphrase.
+#
+# See also:
+# - https://www.passwordstore.org/
+# - https://www.gnupg.org/documentation/manuals/gnupg/gpg_002dpreset_002dpassphrase.html
+# - embedded documentation below
+#
+sub get_secret {
+    my $location = shift;
+    die "Error - get_secret():  location not specified$/"
+        unless $location;
+
+    my $err = timelimit_cmd($SECSTOR_TIMELIMIT, "pass show $location");
+    die "Error - get_secret() - command failed:  $err$/"
+        if $err;
+
+    my $retval = $EMDIS::ECS::cmd_output;
+    chomp $retval;
+    return $retval;
+}
+
+# store cached access token
+sub store_cached_token {
+    my $token_response = shift;
+    my $token_timestamp = shift;
+    eval {
+        store_secret(
+            $SECSTOR_LOCATION->{cached_token_response},
+            encode_json(decode_json($token_response)));  # re-encode JSON to store as single line
+        store_secret(
+            $SECSTOR_LOCATION->{cached_token_timestamp},
+            $token_timestamp);
+    }
+}
+
+# This subroutine uses "pass" to set the value of a secret.
+#
+# For this to work, the GnuPG passphrase needed by pass must be preloaded
+# into the gpg-agent cache, e.g., using gpg-preset-passphrase.
+#
+# See also:
+# - https://www.passwordstore.org/
+# - https://www.gnupg.org/documentation/manuals/gnupg/gpg_002dpreset_002dpassphrase.html
+# - embedded documentation below
+#
+sub store_secret {
+    my $location = shift;
+    my $new_value = shift;
+    die "Error - store_secret():  location not specified$/"
+        unless $location;
+    die "Error - store_secret():  new_value not specified$/"
+        unless $new_value;
+
+    my $err = timelimit_cmd($SECSTOR_TIMELIMIT, "pass insert --echo $location", $new_value);
+    die "Error - store_secret() - command failed:  $err$/"
+        if $err;
+}
+
+__END__
+
+# embedded POD documentation
+=pod
+
+=head1 NAME
+
+ecs_token - Use OAuth 2.0 refresh token to get new access token
+
+=head1 SYNOPSIS
+
+ ecs_token code
+ (use web browser to log in to EMDIS email account)
+ (open displayed URL in web browser and follow flow to get auth code)
+ (paste auth code at input prompt)
+
+ ecs_token credentials
+
+ ecs_token refresh
+
+=head1 DESCRIPTION
+
+C<ecs_token> offers support for obtaining an OAuth 2.0 access token.  A
+valid OAuth 2.0 access token is needed when connecting to email services
+that require "modern" SASL XOAUTH2 or OAUTHBEARER authentication.
+
+When successful, the output of the non-interactive C<ecs_token credentials>
+and C<ecs_token refresh> commands match the requirements of the
+INBOX_OAUTH_TOKEN_CMD and SMTP_OAUTH_TOKEN_CMD configuration settings
+for EMDIS::ECS.  
+
+To securely store the client id, client secret, refresh token and related
+parameters, C<ecs_token> uses the C<pass> (passwordstore.org) command-line
+password manager, which stores its data in gpg-encrypted files.
+
+Note:  Due to variations in OAuth 2.0 identity provider setup requirements
+and implementation details, this C<ecs_token> program may not be directly
+usable with all identity providers.
+
+=head1 OPTIONS
+
+=head2 Usage
+
+ ecs_token <command> [options]
+
+=head2 Commands
+
+Each command implements a different OAuth 2.0 flow.
+
+=over
+
+=item code
+
+Use authorization code flow to request new OAuth 2.0 access token and refresh
+token.  Displays URL for user to visit in web browser to log in and give consent.
+Waits for user to enter authorization code, then uses code to request an access
+token.  Stores new refresh token from response to token request.
+
+=item credentials
+
+Use client credentials flow to request new OAuth 2.0 access token.
+
+=item refresh
+
+Use existing refresh token to request new OAuth 2.0 access token.  Store new
+refresh token if present in response to token request.
+
+=back
+
+=head2 Configuration Parameters
+
+Configuration parameter values can be set by storing the value in secure
+storage or by passing the value on the C<ecs_token> command line.
+
+Example using C<pass> secure storage:
+
+ echo -n 'https://accounts.google.com/o/oauth2/auth' | \
+   pass insert --echo emdis/ecs/oauth/auth_endpoint
+
+Example using command line parameter:
+
+ ecs_token code --auth_endpoint https://accounts.google.com/o/oauth2/auth
+
+=over
+
+=item auth_endpoint
+
+OAuth 2.0 authorization code endpoint, for authorization code flow.
+Required by the C<ecs_token code> command.  Example value:
+
+ https://accounts.google.com/o/oauth2/auth
+
+=item cached_token_response
+
+Not a true configuration parameter, but only a secure storage location to
+hold a copy of the most recent token response, so it can be reused until it
+expires.  To avoid a secure storage retrieval error, initialize this to the
+value '' (empty string).
+
+=item cached_token_timestamp
+
+Not a true configuration parameter, but only a secure storage location to
+hold a timestamp for the most recent token response.  To avoid a secure
+storage retrieval error, initialize this to the value '0' (zero).
+
+=item client_id
+
+OAuth 2.0 client id.  Required by the C<ecs_token code>,
+C<ecs_token credentials>, and C<ecs_token refresh> commands.  Example value:
+
+ 1083558311832-0q5ul7ffdg6n4fj1p1to6rae88hvhsha.apps.googleusercontent.com
+
+=item client_secret
+
+OAuth 2.0 client secret.  Required by the C<ecs_token code>,
+C<ecs_token credentials>, and C<ecs_token refresh> commands.  Example value:
+
+ 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
+
+=item nocache
+
+This flag can only be set via the command line, not via secure storage.
+When nocache is set, the program will not attempt to retrieve a cached
+access token from storage or cache a new access token for future use.
+
+=item redirect_uri
+
+OAuth 2.0 redirect URI, for authorization code flow.  Required by the
+C<ecs_token code> command.  Example value:
+
+ https://google.github.io/gmail-oauth2-tools/html/oauth2.dance.html
+
+=item refresh_token
+
+OAuth 2.0 refresh token, for refresh token flow.  Required by the
+C<ecs_token refresh> command.  Initialized by the C<ecs_token code>
+command.  May also be populated by the C<ecs_token refresh> command.
+Example value:
+
+ 1//04Gei0xdQmoxKCgYIARAAGAQSNwF-L9IrizgSeuBmjQf7RNSPpAKUK-wsOFcDicS8jZEmusXSppx09bFyehICh4WkGqRrUj73OH0
+
+=item scope
+
+OAuth 2.0 scope.  Required by the C<ecs_token code> and
+C<ecs_token credentials> commands.  Example values:
+
+ https://mail.google.com/
+ https://outlook.office365.com/.default
+
+=item token_endpoint
+
+OAuth 2.0 token endpoint.  Required by the C<ecs_token code>,
+C<ecs_token credentials>, and C<ecs_token refresh> commands.  Example
+values:
+
+ https://accounts.google.com/o/oauth2/token
+ https://login.microsoftonline.com/[tenant_id]/oauth2/v2.0/token
+
+=back
+
+=head1 SETUP
+
+=head2 GnuPG
+
+See also https://gnupg.org/ for additional details about GnuPG.
+
+=over
+
+=item 1.
+
+Start C<gpg-agent> with C<--allow-preset-passphrase> option.  E.g.:
+
+  gpg-agent --homedir /home/perlecs/.gnupg --daemon \
+    --allow-preset-passphrase
+
+The C<allow-preset-passphrase> option can also be specified in a
+C<gpg-agent.conf> configuration file.
+
+=item 2.
+
+Find the keygrip for the selected key.
+
+  gpg --list-keys --with-keygrip
+
+=item 3.
+
+Use the keygrip to preset the key's passphrase in the C<gpg-agent> cache.
+
+  echo -n '<gpg_passphrase>' | \
+    /usr/libexec/gpg-preset-passphrase --preset <gpg_keygrip>
+
+=back
+
+=head2 pass
+
+See also https://www.passwordstore.org/ for additional details about
+C<pass>.
+
+=over
+
+=item 1.
+
+Find the fingerprint for the selected key.
+
+  gpg --list-keys
+
+=item 2.
+
+Initialize password storage using the selected key.
+
+  pass init <gpg-key-fingerprint>
+
+=item 3.
+
+Populate the expected secure storage locations with information needed by
+C<ecs_token>.  E.g.:
+
+  echo -n 'https://accounts.google.com/o/oauth2/auth' | \
+    pass insert --echo emdis/ecs/oauth/auth_endpoint
+
+  echo -n '' | \
+    pass insert --echo emdis/ecs/oauth/cached_token_response
+
+  echo -n '0' | \
+    pass insert --echo emdis/ecs/oauth/cached_token_timestamp
+
+  echo -n '<client_id>' | \
+    pass insert --echo emdis/ecs/oauth/client_id
+
+  echo -n '<client_secret>' | \
+    pass insert --echo emdis/ecs/oauth/client_secret
+
+  echo -n 'https://google.github.io/gmail-oauth2-tools/html/oauth2.dance.html' | \
+    pass insert --echo emdis/ecs/oauth/redirect_uri
+
+  echo -n '<refresh_token>' | \
+    pass insert --echo emdis/ecs/oauth/refresh_token
+
+  echo -n 'https://mail.google.com/' | \
+    pass insert --echo emdis/ecs/oauth/scope
+
+  echo -n 'https://accounts.google.com/o/oauth2/token' | \
+    pass insert --echo emdis/ecs/oauth/token_endpoint
+
+=back
+
+=head2 Gmail Setup Notes
+
+The following are notes on setting up an app and getting an OAuth 2.0 access
+token for use with Gmail SMTP/IMAP/POP3.
+
+=over
+
+=item 1.
+
+Download C<oauth2.py> from GitHub.  See comments in script for additional
+info.
+
+https://github.com/google/gmail-oauth2-tools/blob/master/python/oauth2.py
+
+=item 2.
+
+In a web browser, log in to the Google account that will be using Gmail.
+
+https://accounts.google.com
+
+=item 3.
+
+Define the OAuth 2.0 client id and client secret to be used by the Perl ECS
+app.
+
+=over
+
+=item 1.
+
+Go to Google developers console.
+
+https://console.developers.google.com
+
+=item 2.
+
+If needed, create a project.  In I<Google Cloud> console, select
+I<Navigation menu> (three horizontal bars in upper left corner of page) >
+I<IAM & Admin> > I<Create a Project>.  On I<New Project> page, enter
+I<Project name> and select I<Location>, then click I<Create> button.
+
+=item 3.
+
+Select the applicable project.  In I<Google Cloud> console, click the
+I<Open project picker> button (next to Google Cloud logo at top of page),
+then, in the I<Select a project> popup, click the link for the project.
+
+=item 4.
+
+Configure OAuth settings for the new project.  In I<Google Cloud>
+console, select I<Navigation menu> > I<APIs & Services> >
+I<OAuth consent screen>.  On the I<OAuth Overview> page, click the
+I<Get started> button.  On the I<Project configuration> page, under
+I<App Information> enter the I<App name> and I<User support email>, and
+click the I<Next> button.  Under I<Audience> select I<External> and click
+the I<Next> button.  Under I<Contact information> enter I<Email addresses>
+and click the I<Next> button.  Under I<Finish> click the I<I agree ...>
+checkbox and click the I<Continue> button.  Then, click the I<Create>
+button.
+
+=item 5.
+
+Create OAuth 2.0 client ID for Perl ECS app.  In I<Google Cloud> console,
+select I<Navigation menu> > I<APIs & Services> > I<Credentials>.  On the
+I<Credentials> page, click the I<+ Create credentials> button and select
+I<OAuth client ID> from the drop-down menu.  On the I<Create OAuth client ID>
+page select I<Web application> as the I<Application type> and enter an
+appropriate name for the app (e.g. "Perl ECS").  Under
+I<Authorized redirect URIs> click the I<+ Add URI> button and enter the
+following URI (as mentioned in the C<oauth.py> script):
+
+https://google.github.io/gmail-oauth2-tools/html/oauth2.dance.html
+
+Then, click the I<Create> button.
+
+From the I<OAuth client created> popup, make note of the I<Client ID> and
+I<Client secret>.  Click I<OK>.
+
+=item 6.
+
+Allow a few minutes for the settings to take effect.
+
+=back
+
+=item 4.
+
+Add the email account as a test user for the project.  In I<Google Cloud>
+console, select I<Navigation menu> > I<APIs & Services> >
+I<OAuth consent screen>, then select I<Audience>.  On the I<Audience>
+page, under I<Test users> click the I<+ Add users> button.  In the
+I<Add users> panel enter the test user's email address (e.g. xyz@gmail.com)
+and click the I<Save> button.
+
+=item 5.
+
+Use C<oauth2.py> script to generate and authorize an OAuth 2 token.  See also
+comments in script.  E.g.:
+
+  python3 oauth2.py --user=xyz@gmail.com \
+    --client_id=1038[...].apps.googleusercontent.com \
+    --client_secret=VWFn8LIKAMC-MsjBMhJeOplZ \
+    --generate_oauth2_token
+
+To authorize the token, use a web browser to visit the URL indicated by the
+script and follow the browser-based authorization flow.  At the script's
+C<Enter verification code> prompt, enter the authorization code displayed in
+the web browser.  If successful, the script displays a C<Refresh Token> and
+C<Access Token>.
+
+If the browser authorization flow results in an error saying "Access
+blocked: google.github.io has not completed the Google verification process",
+add the email account as a test user for the project (see above) and reload
+the URL provided by the C<oauth2.py> script.
+
+=item 6.
+
+Use C<oauth2.py> script to test SMTP authentication.  E.g.:
+
+  python3 oauth2.py --user=xxx@gmail.com \
+    --access_token=ya29.a0A[...]0175 \
+    --test_smtp_authentication
+
+=item 7.
+
+Use C<oauth2.py> script to test IMAP authentication.  E.g.:
+
+  python3 oauth2.py --user=xxx@gmail.com \
+    --access_token=ya29.a0A[...]0175 \
+    --test_imap_authentication
+
+=item 8.
+
+Use C<oauth2.py> script to obtain a new access token, using a refresh token.
+E.g.:
+
+  python3 oauth2.py \
+    --client_id=1038[...].apps.googleusercontent.com \
+    --client_secret=VWFn8LIKAMC-MsjBMhJeOplZ \
+    --refresh_token=1//04[...]anrA
+
+=back
+
+=head1 RETURN VALUE
+
+Returns a non-zero exit code if an error is encountered.
+
+=head1 SEE ALSO
+
+EMDIS::ECS::Config, https://gnupg.org/, https://www.passwordstore.org/,
+https://oauth.net/2/, https://datatracker.ietf.org/doc/html/rfc6749
+
+=head1 AUTHOR
+
+Joel Schneider <jschneid@nmdp.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED 
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF 
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+Copyright (C) 2025 National Marrow Donor Program. All rights reserved.
+
+See LICENSE file for license details.
+
+=head1 HISTORY
+
+ECS, the EMDIS Communication System, was originally designed and implemented
+by ZKRD (https://zkrd.de/).  This Perl implementation of ECS was developed
+by NMDP (https://nmdp.org/).

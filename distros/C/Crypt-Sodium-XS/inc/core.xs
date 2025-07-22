@@ -484,6 +484,8 @@ SV * ed25519_scalar_random(SV * flags = &PL_sv_undef)
   if (SvOK(flags))
     new_flags = SvUV_nomg(flags);
   new_pm = protmem_init(aTHX_ new_len, new_flags);
+  if (new_pm == NULL)
+    croak("ed25519_scalar_random: Failed to allocate protmem");
   switch(ix) {
     case 1:
       crypto_core_ristretto255_scalar_random(new_pm->pm_ptr);

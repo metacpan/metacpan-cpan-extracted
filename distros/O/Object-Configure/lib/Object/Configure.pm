@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Carp;
-use Config::Abstraction 0.25;
+use Config::Abstraction 0.32;
 use Log::Abstraction 0.15;
 use Params::Get;
 
@@ -14,11 +14,11 @@ Object::Configure - Runtime Configuration for an Object
 
 =head1 VERSION
 
-0.08
+0.11
 
 =cut
 
-our $VERSION = 0.08;
+our $VERSION = 0.11;
 
 =head1 SYNOPSIS
 
@@ -77,7 +77,7 @@ To control behavior at runtime, C<Object::Configure> supports loading settings f
 
 A minimal example of a config file (C<~/.conf/local.conf>) might look like:
 
-   [My::Module]
+   [My__Module]
 
    logger.file = /var/log/mymodule.log
 
@@ -104,7 +104,7 @@ These variables should be prefixed with your class name, followed by a double co
 For example, to enable syslog logging for your C<My::Module> class,
 you could set:
 
-    export My::Module::logger__file=/var/log/mymodule.log
+    export My__Module__logger__file=/var/log/mymodule.log
 
 This would be equivalent to passing the following in your constructor:
 
@@ -152,6 +152,8 @@ sub configure
 		$array = delete $params->{'logger'};	# The merge seems to lose this
 	}
 
+	$class =~ s/::/__/g;
+
 	# Load the configuration from a config file, if provided
 	if(exists($params->{'config_file'})) {
 		# my $config = YAML::XS::LoadFile($params->{'config_file'});
@@ -160,14 +162,14 @@ sub configure
 			croak("$class: ", $params->{'config_file'}, ": $!");
 		}
 
-		if(my $config = Config::Abstraction->new(config_dirs => $config_dirs, config_file => $params->{'config_file'}, env_prefix => "${class}::")) {
+		if(my $config = Config::Abstraction->new(config_dirs => $config_dirs, config_file => $params->{'config_file'}, env_prefix => "${class}__")) {
 			$params = $config->merge_defaults(defaults => $params, section => $class, merge => 1, deep => 1);
 		} elsif($@) {
 			croak("$class: Can't load configuration from ", $params->{'config_file'}, ": $@");
 		} else {
 			croak("$class: Can't load configuration from ", $params->{'config_file'});
 		}
-	} elsif(my $config = Config::Abstraction->new(env_prefix => "${class}::")) {
+	} elsif(my $config = Config::Abstraction->new(env_prefix => "${class}__")) {
 		$params = $config->merge_defaults(defaults => $params, section => $class, merge => 1, deep => 1);
 	}
 
@@ -179,7 +181,7 @@ sub configure
 			} else {
 				$params->{'logger'} = Log::Abstraction->new({ carp_on_warn => 1, %{$logger} });
 			}
-		} else {
+		} elsif(!Scalar::Util::blessed($logger) || (ref($logger) ne 'Log::Abstraction')) {
 			$params->{'logger'} = Log::Abstraction->new({ carp_on_warn => 1, logger => $logger });
 		}
 	} elsif($array) {

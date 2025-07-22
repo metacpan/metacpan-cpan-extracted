@@ -1,3 +1,11 @@
+libdbd-pg-async-perl (0.7.2) unstable; urgency=medium
+
+  * fixed a bug in dbd_st_execute which prevented an already prepared
+    statement from being used when the autoprepare threshold hadn't yet
+    been reached
+
+ -- Rainer Weikusat <rweikusat@talktalk.net>  Mon, 21 Jul 2025 14:11:55 +0100
+
 libdbd-pg-async-perl (0.7.1) unstable; urgency=medium
 
   * document pg_savepoints method

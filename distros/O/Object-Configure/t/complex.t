@@ -23,7 +23,7 @@ BEGIN { use_ok('Object::Configure') }
 my ($fh, $filename) = tempfile(SUFFIX => '.yml', UNLINK => 1);
 
 my $config_data = {
-	'My::Debuggable::Class' => {
+	'My__Debuggable__Class' => {
 		from_config => 'yes',
 		foo => 'overridden',
 	}

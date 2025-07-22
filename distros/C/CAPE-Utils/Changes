@@ -1,5 +1,8 @@
 Revision history for CAPE-Utils
 
+4.0.0   2025-07-21/15:00
+		 - Add poetry_path config with a default of /etc/poetry/bin/poetry, which is where it is located for new CAPEv2 installs... older installs should set it to just poetry
+
 3.0.0   2024-09-24/16:30
 		 - Add ignoreMaxSize with a default value of 52428800 for skipping large extracts.
 

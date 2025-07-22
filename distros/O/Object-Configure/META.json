@@ -33,7 +33,7 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "Config::Abstraction" : "0.25",
+            "Config::Abstraction" : "0.32",
             "ExtUtils::MakeMaker" : "6.64",
             "Log::Abstraction" : "0.15",
             "perl" : "5.008"
@@ -64,6 +64,6 @@
          "x_repository" : "https://github.com/nigelhorne/Object-Configure"
       }
    },
-   "version" : 0.08,
+   "version" : 0.11,
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

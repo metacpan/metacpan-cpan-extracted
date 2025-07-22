@@ -46,6 +46,8 @@ SV * scalarmult_keygen(SV * flags = &PL_sv_undef)
   switch(ix) {
     case 1:
       new_pm = protmem_init(aTHX_ crypto_core_ed25519_SCALARBYTES, new_flags);
+      if (new_pm == NULL)
+        croak("scalarmult_ed25519_keygen: Failed to allocate protmem");
       crypto_core_ed25519_scalar_random(new_pm->pm_ptr);
       if (protmem_release(aTHX_ new_pm, PROTMEM_FLAG_MPROTECT_RW) != 0) {
         croak("scalarmult_ed25519_keygen: Failed to release protmem RW");
@@ -56,6 +58,8 @@ SV * scalarmult_keygen(SV * flags = &PL_sv_undef)
     case 2:
 #ifdef SODIUM_HAS_RISTRETTO255
       new_pm = protmem_init(aTHX_ crypto_core_ed25519_SCALARBYTES, new_flags);
+      if (new_pm == NULL)
+        croak("scalarmult_ed25519_keygen: Failed to allocate protmem");
       crypto_core_ristretto255_scalar_random(new_pm->pm_ptr);
       if (protmem_release(aTHX_ new_pm, PROTMEM_FLAG_MPROTECT_RW) != 0) {
         croak("scalarmult_ed25519_keygen: Failed to release protmem RW");

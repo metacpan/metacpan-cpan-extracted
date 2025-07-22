@@ -110,7 +110,6 @@ and verifies an authentication tag.
 
 =head2 new
 
-  my $auth = Crypt::Sodium::XS::OO::auth->new;
   my $auth = Crypt::Sodium::XS::OO::auth->new(primitive => 'hmacsha256');
   my $auth = Crypt::Sodium::XS->auth;
 

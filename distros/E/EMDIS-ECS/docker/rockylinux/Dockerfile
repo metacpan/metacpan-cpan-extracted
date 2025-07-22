@@ -11,12 +11,12 @@
 #
 # 2) Build a "perlecs/rockylinux" Docker image based on the Dockerfile.
 #
-#    docker build -t perlecs/rockylinux:0.44-1 .
+#    docker build -t perlecs/rockylinux:0.45-1 .
 #
 # 3) Generate a Docker container based on the image, and run an interactive
 #    bash shell within the container.
 #
-#    docker run --rm -it --name=perlecs_rockylinux  perlecs/rockylinux:0.44-1 /bin/bash
+#    docker run --rm -it --name=perlecs_rockylinux  perlecs/rockylinux:0.45-1 /bin/bash
 #
 # 4) Configure Perl ECS within the docker container.  For example, use
 #    "ecs_setup" to generate an ecs.cfg configuration file, "ecstool" to
@@ -34,7 +34,7 @@
 FROM rockylinux:9
 LABEL Maintainer="Joel Schneider <joel@joelschneider.net>"
 LABEL Description="EMDIS::ECS (Perl ECS) on Rocky Linux"
-LABEL Version="0.44"
+LABEL Version="0.45"
 
 # update installed packages
 RUN yum -y update
@@ -42,12 +42,13 @@ RUN yum -y update
 # install extra Rocky Linux packages
 RUN yum -y install \
  perl perl-Env perl-Data-Dumper make perl-ExtUtils-MakeMaker perl-CPAN \
- perl-App-cpanminus gcc perl-Test-Simple perl-Authen-SASL less which \
- python3 cyrus-sasl cyrus-sasl-plain
+ perl-App-cpanminus gcc perl-Test-Simple perl-Authen-SASL perl-libwww-perl \
+ perl-LWP-Protocol-https diffutils less which python3 \
+ cyrus-sasl cyrus-sasl-plain
 
 # add EPEL repository and install Mail::IMAPClient from there
 RUN yum -y install epel-release
-RUN yum -y install perl-Mail-IMAPClient python3-qpid-proton
+RUN yum -y install pass perl-Mail-IMAPClient python3-qpid-proton
 
 # create perlecs user
 RUN useradd --comment "Perl ECS user" --create-home perlecs
@@ -58,6 +59,9 @@ ENV HOME=/home/perlecs
 USER perlecs
 WORKDIR ${HOME}
 
+# install Authen::SASL::Perl via CPAN (need version >= 2.1800 for XOAUTH2 or OAUTHBEARER)
+RUN cpanm --local-lib ${HOME}/perl5lib Authen::SASL::Perl
+
 # as perlecs user, install EMDIS::ECS into local-lib directory
 RUN cpanm --local-lib ${HOME}/perl5lib EMDIS::ECS
 
@@ -67,5 +71,3 @@ ENV PATH=${HOME}/perl5lib/bin:${PATH} \
  PERL5LIB=${HOME}/perl5lib/lib/perl5
 
 #USER root
-
-CMD echo "Welcome to Perl ECS.  To create a configuration file, use ecs_setup."

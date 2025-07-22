@@ -1,4 +1,4 @@
-package LedgerSMB::Installer v0.999.5;
+package LedgerSMB::Installer v0.999.6;
 
 use v5.20;
 use experimental qw(signatures);
@@ -81,12 +81,13 @@ sub _build_install_tree($class, $dss, $config, $installpath, $version) {
 sub _get_cpanfile($class, $config) {
     return $config->cpanfile if $config->cpanfile;
 
-    my $response = $http->get(
+    my $url =
         sprintf("https://raw.githubusercontent.com/ledgersmb/LedgerSMB/refs/tags/%s/cpanfile",
-               $config->effective_version)
-        );
+                $config->effective_version);
+
+    my $response = $http->get( $url );
     unless ($response->{success}) {
-        die $log->fatal("Unable to get 'cpanfile' from GitHub: $response->{content}");
+        die $log->fatal("Unable to get '$url' from GitHub: $response->{content}");
     }
 
     my ($fh, $fn) = tempfile();
@@ -119,12 +120,14 @@ sub _compute_immediate_deps($class, $config) {
     my @mods = sort { lc($a) cmp lc($b) } $effective->required_modules;
 
     $log->debug( "Direct dependency count: " . scalar(@mods) );
-    return @mods;
+    $log->trace( "- $_" ) for (sort @mods);
+    return sort @mods;
 }
 
 sub _compute_all_deps($class, $config) {
     my @deps = $class->_compute_immediate_deps( $config );
 
+    my @orig_deps = (@deps, );
     my @last_deps = @deps;
     my %dists;
     my $iteration = 1;
@@ -180,9 +183,17 @@ sub _compute_all_deps($class, $config) {
         $iteration++;
     } while (@last_deps);
 
-    @deps = uniq @deps;
+    my @missed = do {
+        my %deps = map { $_ => 1 } @deps;
+        grep { !$deps{$_} } @orig_deps;
+    };
+    $log->error( "Unable to resolve dependencies for modules: "
+                 . join(', ', @missed) )
+        if (@missed);
+    @deps = sort uniq (@deps, @missed);
     $log->debug( "Dependency tree size: " . scalar(@deps) );
-    return uniq @deps;
+    $log->trace( "- $_" ) for (@deps);
+    return @deps;
 }
 
 sub _compute_dep_pkgs($class, $dss, $config ) {
@@ -696,7 +707,7 @@ sub run($class, $cmd, @args) {
         return $class->help( @args );
     }
     elsif ($cmd eq 'install') {
-        say $log->info( "Installing LedgerSMB using $INSTALLER_VERSION" );
+        say $log->info( "Installing LedgerSMB using installer version $INSTALLER_VERSION" );
         return $class->install( @args );
     }
     elsif ($cmd eq 'system-id') {

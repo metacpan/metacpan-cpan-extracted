@@ -40,6 +40,7 @@ script/ecs_proc_meta
 script/ecs_proc_msg
 script/ecs_scan_mail
 script/ecs_setup
+script/ecs_token
 script/ecstool
 t/config.t
 t/data/01-ecs.cfg
@@ -48,6 +49,9 @@ t/data/03-ecs.cfg
 t/data/04-ecs.cfg
 t/data/05-ecs.cfg
 t/data/06-ecs.cfg
+t/data/07-ecs.cfg
+t/data/08-ecs.cfg
+t/data/09-ecs.cfg
 t/data/A1_01.msg
 t/data/AA_01.msg
 t/data/AA_01_32_47.msg

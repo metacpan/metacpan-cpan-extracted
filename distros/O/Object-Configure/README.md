@@ -7,7 +7,7 @@ Object::Configure - Runtime Configuration for an Object
 
 # VERSION
 
-0.08
+0.11
 
 # SYNOPSIS
 
@@ -66,7 +66,7 @@ To control behavior at runtime, `Object::Configure` supports loading settings fr
 
 A minimal example of a config file (`~/.conf/local.conf`) might look like:
 
-    [My::Module]
+    [My__Module]
 
     logger.file = /var/log/mymodule.log
 
@@ -93,7 +93,7 @@ These variables should be prefixed with your class name, followed by a double co
 For example, to enable syslog logging for your `My::Module` class,
 you could set:
 
-    export My::Module::logger__file=/var/log/mymodule.log
+    export My__Module__logger__file=/var/log/mymodule.log
 
 This would be equivalent to passing the following in your constructor:
 

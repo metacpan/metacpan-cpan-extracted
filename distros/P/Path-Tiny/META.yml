@@ -18,7 +18,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.17'
   perl: '5.008001'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010'
 license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -36,10 +36,10 @@ no_index:
 provides:
   Path::Tiny:
     file: lib/Path/Tiny.pm
-    version: '0.148'
+    version: '0.150'
   Path::Tiny::Error:
     file: lib/Path/Tiny.pm
-    version: '0.148'
+    version: '0.150'
 recommends:
   Unicode::UTF8: '0.58'
 requires:
@@ -67,7 +67,7 @@ resources:
   bugtracker: https://github.com/dagolden/Path-Tiny/issues
   homepage: https://github.com/dagolden/Path-Tiny
   repository: https://github.com/dagolden/Path-Tiny.git
-version: '0.148'
+version: '0.150'
 x_authority: cpan:DAGOLDEN
 x_contributors:
   - 'Alex Efros <powerman@powerman.name>'

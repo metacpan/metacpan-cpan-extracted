@@ -516,6 +516,33 @@ Version 0.44 2025-04-23
 - docker/qpid-broker-python: add Docker setup for Python AMQP test broker
   (files added: Dockerfile, pybroker.conf, pybroker.py, run_broker.sh)
 
+Version 0.45 2025-07-21
+=======================
+- Config.pm:  add ENABLE_ENV_CONFIG setting, along with support for $ENV{envvar}
+  syntax to define configuration settings using environment variable values;
+  add INBOX_OAUTH_TOKEN_CMD, INBOX_OAUTH_TOKEN_CMD_TIMELIMIT,
+  INBOX_OAUTH_SASL_MECHANISM, SMTP_OAUTH_TOKEN_CMD,
+  SMTP_OAUTH_TOKEN_CMD_TIMELIMIT, and SMTP_OAUTH_SASL_MECHANISM settings;
+  add "--pinentry-mode loopback" to default OPENPGP_CMD_ENCRYPT and
+  OPENPGP_CMD_DECRYPT values
+- ECS.pm:  add support for SASL XOAUTH2 and OAUTHBEARER authentication
+  mechanisms on SMTP connection
+- ecs_scan_mail:  add support for SASL XOAUTH2 and OAUTHBEARER authentication
+  mechanisms on POP3 and IMAP connections
+- ecs_setup:  add configuration options for "modern" OAuth 2.0 authentication
+- ecs_token:  add this as example OAuth 2.0 token request helper script for
+  INBOX_OAUTH_TOKEN_CMD and SMTP_OAUTH_TOKEN_CMD
+- docker/dist/Dockerfile:  add diffutils, pass (unix password manager),
+  perl-libwww-perl, and perl-LWP-Protocol-https packages; install
+  Authen::SASL::Perl via CPAN; remove code to install Net::SMTP, Net::POP3
+  and IO::Socket::SSL via CPAN
+- docker/rockylinux/Dockerfile:  add diffutils, pass (unix password manager),
+  perl-libwww-perl, and perl-LWP-Protocol-https packages; install
+  Authen::SASL::Perl via CPAN
+- docker/ubuntu/Dockerfile:  update to use Ubuntu 24.04; add pass (unix
+  password manager) package;  install Authen::SASL::Perl via CPAN
+- LICENSE:  restore missing AGNIS license language about NIH
+
 
 Ideas for Future Enhancements
 =============================

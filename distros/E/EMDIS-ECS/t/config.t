@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 #
-# Copyright (C) 2002-2020 National Marrow Donor Program. All rights reserved.
+# Copyright (C) 2002-2025 National Marrow Donor Program. All rights reserved.
 
 use strict;
 use File::Copy qw(copy);
@@ -12,7 +12,7 @@ use lib "$FindBin::Bin";
 require 'setup';
 
 # print test plan before loading modules
-BEGIN { plan(tests => 173); }
+BEGIN { plan(tests => 200); }
 use EMDIS::ECS::Config;
 
 # [1] Was module successfully loaded?
@@ -51,7 +51,7 @@ ok($cfg =~ /ECS_MBX_STORE_DIR \([^\n]+store\) directory not found./);
 ok($cfg =~ /Error\(s\) detected in configuration file .+01-ecs.cfg/);
 ok($cfg =~ /Fatal configuration error\(s\) encountered./);
 
-# [23..82] Read minimal good config file
+# [23..88] Read minimal good config file
 copy catfile($datadir, '02-ecs.cfg'), $tmpcfg
     or die 'copy failed';
 $cfg = new EMDIS::ECS::Config($tmpcfg);
@@ -107,18 +107,25 @@ ok($cfg->INBOX_USE_SSL eq 'NO');
 ok($cfg->INBOX_PORT == 110);
 ok($cfg->INBOX_MAX_MSG_SIZE == 1048576);
 ok($cfg->OPENPGP_CMD_ENCRYPT eq '/usr/local/bin/gpg --armor --batch ' .
-        '--charset ISO-8859-1 --force-mdc --logger-fd 1 --openpgp ' .
-            '--output __OUTPUT__ --passphrase-fd 0 --quiet ' .
-                '--recipient __RECIPIENT__ --recipient __SELF__ --yes ' .
-                    '--sign --local-user __SELF__ --encrypt __INPUT__');
+    '--charset ISO-8859-1 --force-mdc --logger-fd 1 --openpgp ' .
+    '--output __OUTPUT__ --pinentry-mode loopback --passphrase-fd 0 ' .
+    '--quiet --recipient __RECIPIENT__ --recipient __SELF__ --yes ' .
+    '--sign --local-user __SELF__ --encrypt __INPUT__');
 ok($cfg->OPENPGP_CMD_DECRYPT eq '/usr/local/bin/gpg --batch ' .
-        '--charset ISO-8859-1 --logger-fd 1 --openpgp --output __OUTPUT__ ' .
-            '--passphrase-fd 0 --quiet --yes --decrypt __INPUT__');
+    '--charset ISO-8859-1 --logger-fd 1 --openpgp --output __OUTPUT__ ' .
+    '--pinentry-mode loopback --passphrase-fd 0 --quiet --yes ' .
+    '--decrypt __INPUT__');
 ok($cfg->PGP2_CMD_ENCRYPT eq '/usr/local/bin/pgp +batchmode +verbose=0 ' .
-        '+force +CharSet=latin1 +ArmorLines=0 -o __OUTPUT__ ' .
-            '-u __SELF__ -eats __INPUT__ __RECIPIENT__ __SELF__');
+    '+force +CharSet=latin1 +ArmorLines=0 -o __OUTPUT__ ' .
+    '-u __SELF__ -eats __INPUT__ __RECIPIENT__ __SELF__');
 ok($cfg->PGP2_CMD_DECRYPT eq '/usr/local/bin/pgp +batchmode +verbose=0 ' .
-        '+force +CharSet=latin1 -o __OUTPUT__ __INPUT__');
+    '+force +CharSet=latin1 -o __OUTPUT__ __INPUT__');
+ok(not defined $cfg->INBOX_OAUTH_TOKEN_CMD);
+ok($cfg->INBOX_OAUTH_TOKEN_CMD_TIMELIMIT == 60);
+ok($cfg->INBOX_OAUTH_SASL_MECHANISM eq 'XOAUTH2 OAUTHBEARER');
+ok(not defined $cfg->SMTP_OAUTH_TOKEN_CMD);
+ok($cfg->SMTP_OAUTH_TOKEN_CMD_TIMELIMIT == 60);
+ok($cfg->SMTP_OAUTH_SASL_MECHANISM eq 'XOAUTH2 OAUTHBEARER');
 # derived values
 ok($cfg->ECS_TMP_DIR =~ /tmp$/);
 ok($cfg->ECS_DRP_DIR =~ /maildrop$/);
@@ -129,7 +136,7 @@ ok($cfg->ECS_MBX_OUT_DIR =~ /out$/);
 ok($cfg->ECS_MBX_TRASH_DIR =~ /trash$/);
 ok($cfg->ECS_MBX_STORE_DIR =~ /store$/);
 
-# [83..85] Read config file with known errors
+# [87..91] Read config file with known errors
 copy catfile($datadir, '03-ecs.cfg'), $tmpcfg
     or die 'copy failed';
 $cfg = new EMDIS::ECS::Config($tmpcfg);
@@ -137,7 +144,7 @@ ok(not ref $cfg);
 ok($cfg =~ /Unexpected input \'BOGUS\' at .+ecs.cfg line 17/);
 ok($cfg =~ /Error\(s\) encountered while attempting to process .+ecs.cfg/);
 
-# [86..99] Read config file with known errors
+# [92..105] Read config file with known errors
 copy catfile($datadir, '04-ecs.cfg'), $tmpcfg
     or die 'copy failed';
 $cfg = new EMDIS::ECS::Config($tmpcfg);
@@ -156,7 +163,7 @@ ok($cfg =~ /SMTP_USE_SSL and SMTP_USE_STARTTLS are both selected, but they are m
 ok($cfg =~ /Error\(s\) detected in configuration file .+ecs.cfg/);
 ok($cfg =~ /Fatal configuration error\(s\) encountered./);
 
-# [100..107] Read config file with known errors
+# [106..113] Read config file with known errors
 copy catfile($datadir, '05-ecs.cfg'), $tmpcfg
     or die 'copy failed';
 $cfg = new EMDIS::ECS::Config($tmpcfg);
@@ -169,7 +176,7 @@ ok($cfg =~ /Unrecognized INBOX_PROTOCOL:  PIGEON/);
 ok($cfg =~ /Error\(s\) detected in configuration file .+ecs.cfg/);
 ok($cfg =~ /Fatal configuration error\(s\) encountered./);
 
-# [108..173] Read error-free config file
+# [114..179] Read error-free config file
 copy catfile($datadir, '06-ecs.cfg'), $tmpcfg
     or die 'copy failed';
 $cfg = new EMDIS::ECS::Config($tmpcfg);
@@ -249,5 +256,56 @@ ok($cfg->ECS_MBX_IN_FML_DIR =~ /in_fml$/);
 ok($cfg->ECS_MBX_OUT_DIR =~ /out$/);
 ok($cfg->ECS_MBX_TRASH_DIR =~ /trash$/);
 ok($cfg->ECS_MBX_STORE_DIR =~ /store$/);
+
+# [180..194] Read minimal config file with AMQP settings added
+copy catfile($datadir, '07-ecs.cfg'), $tmpcfg
+    or die 'copy failed';
+$cfg = new EMDIS::ECS::Config($tmpcfg, 1);  # using skip_val = 1
+die "new EMDIS::ECS::Config failed: $cfg"
+    unless ref $cfg;
+ok(1);
+ok($cfg->ENABLE_AMQP eq 'YES');
+ok($cfg->AMQP_DEBUG_LEVEL eq '1');
+ok($cfg->AMQP_RECV_TIMEOUT eq '1');
+ok($cfg->AMQP_BROKER_URL eq 'amqps://amqp-broker:5671');
+ok($cfg->AMQP_VHOST eq 'default');
+ok($cfg->AMQP_ADDR_META eq 'emdis.aa.meta');
+ok($cfg->AMQP_ADDR_MSG eq 'emdis.aa.msg');
+ok($cfg->AMQP_ADDR_DOC eq 'emdis.aa.doc');
+ok($cfg->AMQP_TRUSTSTORE eq 'test-ca.pem');
+ok($cfg->AMQP_SSLCERT eq 'test-client.pem');
+ok($cfg->AMQP_SSLKEY eq 'test-client-key.pem');
+ok($cfg->AMQP_SSLPASS eq 'sslpass');
+ok($cfg->AMQP_USERNAME eq 'emdis-aa');
+ok($cfg->AMQP_PASSWORD eq 'saslpass');
+
+# [195..197] Read minimal config file, using $ENV{envvar} pattern for INBOX_PASSWORD and GPG_PASSPHRASE
+copy catfile($datadir, '08-ecs.cfg'), $tmpcfg
+    or die 'copy failed';
+# set values of environment variables referenced by config
+my $prev_EMDIS_ECS_TEST_PWD_MBX = $ENV{EMDIS_ECS_TEST_PWD_MBX};
+$ENV{EMDIS_ECS_TEST_PWD_MBX} = 'mbxpass';
+my $prev_EMDIS_ECS_TEST_PWD_GPG = $ENV{EMDIS_ECS_TEST_PWD_GPG};
+$ENV{EMDIS_ECS_TEST_PWD_GPG} = 'gpgpass';
+# read config
+$cfg = new EMDIS::ECS::Config($tmpcfg);
+# restore previous values (if any) of environment variables
+if(defined $prev_EMDIS_ECS_TEST_PWD_MBX) { $ENV{EMDIS_ECS_TEST_PWD_MBX} = $prev_EMDIS_ECS_TEST_PWD_MBX; }
+else { delete($ENV{EMDIS_ECS_TEST_PWD_MBX}); }
+if(defined $prev_EMDIS_ECS_TEST_PWD_GPG) { $ENV{EMDIS_ECS_TEST_PWD_GPG} = $prev_EMDIS_ECS_TEST_PWD_GPG; }
+else { delete($ENV{EMDIS_ECS_TEST_PWD_GPG}); }
+die "new EMDIS::ECS::Config failed: $cfg"
+    unless ref $cfg;
+ok(1);
+ok($cfg->INBOX_PASSWORD eq 'mbxpass');
+ok($cfg->GPG_PASSPHRASE eq 'gpgpass');
+
+# [198..200] Read minimal config file, using $ENV{envvar} pattern for INBOX_PASSWORD and GPG_PASSPHRASE, but ENABLE_ENV_CONFIG = NO
+copy catfile($datadir, '09-ecs.cfg'), $tmpcfg
+    or die 'copy failed';
+$cfg = new EMDIS::ECS::Config($tmpcfg);
+ok(1);
+ok($cfg->INBOX_PASSWORD eq '$ENV{EMDIS_ECS_TEST_PWD_MBX}');
+ok($cfg->GPG_PASSPHRASE eq '$ENV{EMDIS_ECS_TEST_PWD_GPG}');
 
 exit 0;

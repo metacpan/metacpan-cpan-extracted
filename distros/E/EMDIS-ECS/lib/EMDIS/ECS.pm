@@ -7,6 +7,7 @@
 
 package EMDIS::ECS;
 
+use Authen::SASL qw(Perl);
 use CPAN::Version;
 use Fcntl qw(:DEFAULT :flock);
 use File::Basename;
@@ -16,6 +17,7 @@ use File::Temp qw(tempfile);
 use IO::File;
 use IO::Handle;
 use IPC::Open2;
+use MIME::Base64;
 use Net::SMTP;
 use strict;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS
@@ -33,7 +35,7 @@ BEGIN
 }
 
 # module/package version
-$VERSION = '0.44';
+$VERSION = '0.45';
 
 # file creation mode (octal, a la chmod)
 $FILEMODE = 0660;
@@ -54,7 +56,7 @@ require Exporter;
        format_msg_filename openpgp_decrypt openpgp_encrypt
        pgp2_decrypt pgp2_encrypt check_pid save_pid
        timelimit_cmd remove_pidfile trim valid_encr_typ EOL
-       is_yes is_no) ] );
+       is_yes is_no get_oauth_token) ] );
 Exporter::export_ok_tags('ALL');   # use tag handling fn to define EXPORT_OK
 
 BEGIN {
@@ -265,6 +267,27 @@ sub move_to_dir {
     my $err = copy_to_dir($filename, $targetdir);
     unlink $filename unless $err;
     return $err;
+}
+
+# ----------------------------------------------------------------------
+# Execute AUTHN_OAUTH_TOKEN_CMD to get OAuth access token
+# Returns two-element list:  ($err, $access_token)
+sub get_oauth_token {
+    my $timelimit = shift;
+    my $token_cmd = shift;
+    my $desc = shift;
+
+    # execute command
+    my $err = timelimit_cmd($timelimit, $token_cmd);
+    return("EMDIS::ECS::get_oauth_token(): $desc command execution failed:  $err", undef)
+        if $err;
+
+    # get command output from module-level variable
+    my $access_token = $EMDIS::ECS::cmd_output
+        or return("EMDIS::ECS::get_oauth_token(): $desc command returned no access token", undef);
+
+    chomp $access_token;   # remove any trailing EOL, just in case
+    return('', $access_token);
 }
 
 # ----------------------------------------------------------------------
@@ -555,13 +578,55 @@ sub send_email {
             }
         }
     }
-    if($cfg->SMTP_USERNAME and $cfg->SMTP_PASSWORD) {
-        if(not $smtp->auth($cfg->SMTP_USERNAME, $cfg->SMTP_PASSWORD)) {
-            my $err = "Unable to authenticate with " . $cfg->SMTP_DOMAIN .
-                " SMTP server as user " . $cfg->SMTP_USERNAME . ":  " .
-                $smtp->message();
+    if($cfg->SMTP_OAUTH_TOKEN_CMD) {
+        if(!is_yes($ECS_CFG->SMTP_USE_SSL) and !is_yes($ECS_CFG->SMTP_USE_STARTTLS)) {
             $smtp->quit();
-            return $err;
+            return "Unable to use SMTP SASL OAuth authentication without SSL/TLS.";
+        }
+
+        return "To use SASL authentication mechanisms XOAUTH2 or OAUTHBEARER " .
+            "please install Authen::SASL::Perl with version >= 2.1800"
+            if CPAN::Version->vlt($Authen::SASL::Perl::VERSION, '2.1800');
+
+        # using SASL XOAUTH2 or OAUTHBEARER authentication
+        my ($err, $access_token) = get_oauth_token(
+            $cfg->SMTP_OAUTH_TOKEN_CMD_TIMELIMIT,
+            $cfg->SMTP_OAUTH_TOKEN_CMD,
+            'SMTP_OAUTH_TOKEN_CMD');
+        if($err) {
+            $smtp->quit();
+            return "Unable to get access token:  $err";
+        }
+
+        my $sasl = Authen::SASL->new(
+            mechanism => $ECS_CFG->SMTP_OAUTH_SASL_MECHANISM,
+            callback => {
+                user => $ECS_CFG->SMTP_USERNAME,
+                pass => $access_token,
+            }
+        );
+        if(not $sasl) {
+            $smtp->quit();
+            return("Unable to construct Authen::SASL object (SMTP).", undef);
+        }
+
+        if(not $smtp->auth($sasl)) {
+            my $err = $smtp->message();
+            $smtp->quit();
+            return "Unable to authenticate via SASL OAuth method to " . $cfg->SMTP_DOMAIN .
+                " SMTP server:  $err";
+        }
+    }
+    else {
+        # using username/password authentication
+        if($cfg->SMTP_USERNAME and $cfg->SMTP_PASSWORD) {
+            if(not $smtp->auth($cfg->SMTP_USERNAME, $cfg->SMTP_PASSWORD)) {
+                my $err = "Unable to authenticate with " . $cfg->SMTP_DOMAIN .
+                    " SMTP server as user " . $cfg->SMTP_USERNAME . ":  " .
+                    $smtp->message();
+                $smtp->quit();
+                return $err;
+            }
         }
     }
     $smtp->mail($cfg->SMTP_FROM)
@@ -1135,6 +1200,9 @@ sub timelimit_cmd_win32
     my $result = "";
     my ($ProcessObj, $rc, $appname, $cmdline);
 
+    # reset module-level variable containing command output
+    $cmd_output = '';
+
     pipe(READ, WRITE);
     select(WRITE);
     $| = 1;
@@ -1266,6 +1334,9 @@ sub timelimit_cmd_unix
     my $timelimit = shift;
     my $cmd = shift;
     my $input_data = shift;
+
+    # reset module-level variable containing command output
+    $cmd_output = '';
 
     # initialize
     my ($reader, $writer) = (IO::Handle->new, IO::Handle->new);
@@ -1426,6 +1497,11 @@ available for this purpose.
 To read incoming email, Perl-ECS can use IMAP protocol, POP3 protocol,
 or a DIRECTORY method.  If IMAP or POP3 protocol is used, that service
 will also need to be available.
+
+Some cloud-based email providers such as GMail and Office 365 require
+the use of an OAuth 2.0 access token for authentication with their
+SMTP, IMAP, and POP3 services.  Version 0.45 of Perl-ECS added OAuth
+configuration settings to enable authentication with those services.
 
 =item Encryption Software
 

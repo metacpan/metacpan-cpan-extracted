@@ -220,6 +220,8 @@ SV * sodium_pad(SV * buf, STRLEN blocksize)
   padded_len = buf_len + pad_len + 1;
 
   Newx(padded_buf, padded_len + 1, unsigned char);
+  if (padded_buf == NULL)
+    croak("sodium_pad: Failed to allocate memory");
   padded_buf[padded_len] = '\0';
   memcpy(padded_buf, buf_buf, buf_len);
   if (sodium_pad(&padded_len, padded_buf, buf_len, blocksize, padded_len) != 0)
@@ -344,6 +346,8 @@ SV * sodium_unpad(SV * buf, STRLEN blocksize);
     croak("sodium_unpad: Invalid padded buffer");
 
   Newx(unpadded_buf, unpadded_len + 1, unsigned char);
+  if (unpadded_buf == NULL)
+    croak("sodium_pad: Failed to allocate memory");
   unpadded_buf[unpadded_len] = '\0';
   memcpy(unpadded_buf, buf_buf, unpadded_len);
 

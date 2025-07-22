@@ -3,7 +3,7 @@
 require 5.000;
 use ExtUtils::MakeMaker;
 my @scripts = qw(ecs_chk_com ecs_pid_chk ecs_proc_meta ecs_proc_msg
-                 ecs_scan_mail ecs_setup ecstool ecs_ctl);
+                 ecs_scan_mail ecs_setup ecs_token ecstool ecs_ctl);
 my @cgi_scripts = qw(ecs_status ecs_status.pl);
 my @python_scripts = qw(ecs_amqp_recv.py ecs_amqp_send.py);
 my @ecsmods = qw(Config FileBackedMessage LockedHash Message);
@@ -18,6 +18,7 @@ WriteMakefile(
 
     'PREREQ_PM'		=> { # e.g., Module::Name => 1.1
         # uncertain whether these exact versions are absolutely required
+        Authen::SASL::Perl => 2.14,
         CPAN::Version    => 5.4,
         Data::Dumper     => 2.101,
         Fcntl            => 1.03,
@@ -50,7 +51,7 @@ WriteMakefile(
     # modules
     'PM' => {
         'lib/EMDIS/ECS.pm' => '$(INST_LIBDIR)/ECS.pm',
-        map { ("lib/EMDIS/ECS/$_.pm" => "\$(INST_LIBDIR)/ECS/$_.pm") } @ecsmods
+        map { ("lib/EMDIS/ECS/$_.pm" => "\$(INST_LIBDIR)/ECS/$_.pm"), } @ecsmods
     },
 
     # man pages for modules

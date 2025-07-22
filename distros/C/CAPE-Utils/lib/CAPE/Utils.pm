@@ -23,11 +23,11 @@ CAPE::Utils - A helpful library for with CAPE.
 
 =head1 VERSION
 
-Version 3.0.0
+Version 4.0.0
 
 =cut
 
-our $VERSION = '3.0.0';
+our $VERSION = '4.0.0';
 
 =head1 SYNOPSIS
 
@@ -92,6 +92,7 @@ sub new {
 			incoming_json       => '/malware/incoming-json',
 			eve_look_back       => 360,
 			malscore            => 0,
+			poetry_path         => '/etc/poetry/bin/poetry',
 		},
 	};
 
@@ -1230,7 +1231,7 @@ sub submit {
 	my @to_run = ();
 
 	if ( $self->{config}->{_}->{poetry} ) {
-		push( @to_run, 'poetry', 'run' );
+		push( @to_run, $self->{config}->{_}->{poetry_path}, 'run' );
 	}
 
 	push( @to_run, 'python3', $self->{config}->{_}->{base} . '/utils/submit.py' );
@@ -1572,6 +1573,9 @@ default with CAPEv2 in it's default config.
     base=/opt/CAPEv2/
     # 0/1 if poetry should be used
     poetry=1
+    # the path for poetry... point this at where poetry is setup for your CAPEv2 install
+    # defaults to /etc/poetry/bin/poetry to be compatible with new CAPEv2 installs
+    poetry_path=/etc/poetry/bin/poetry
     # 0/1 if fail should be allowed to run with out a where statement
     fail_all=0
     # colums to use for pending table show

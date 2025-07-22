@@ -11,12 +11,12 @@
 #
 # 2) Build a "perlecs/centos" Docker image based on the Dockerfile.
 #
-#    docker build -t perlecs/centos:0.44-1 .
+#    docker build -t perlecs/centos:0.45-1 .
 #
 # 3) Generate a Docker container based on the image, and run an interactive
 #    bash shell within the container.
 #
-#    docker run --rm -it --name=perlecs_centos  perlecs/centos:0.44-1 /bin/bash
+#    docker run --rm -it --name=perlecs_centos  perlecs/centos:0.45-1 /bin/bash
 #
 # 4) Configure Perl ECS within the docker container.  For example, use
 #    "ecs_setup" to generate an ecs.cfg configuration file, "ecstool" to
@@ -35,7 +35,7 @@
 FROM centos:7
 LABEL Maintainer="Joel Schneider <joel@joelschneider.net>"
 LABEL Description="EMDIS::ECS (Perl ECS) on CentOS"
-LABEL Version="0.44"
+LABEL Version="0.45"
 
 # hack yum config for post-EOL CentOS 7
 # see also https://superuser.com/questions/1373881/centos-7-cannot-find-a-valid-baseurl-for-repo-base-7-x86-64-when-i-run-yum-upda

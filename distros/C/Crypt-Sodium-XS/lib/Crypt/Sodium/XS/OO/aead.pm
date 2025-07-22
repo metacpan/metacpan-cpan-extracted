@@ -323,7 +323,8 @@ Returns the combined encrypted ciphertext.
   my ($ciphertext, $tag)
     = $aead->encrypt_detached($plaintext, $nonce, $key, $adata);
 
-C<$plaintext> is the plaintext to encrypt.
+C<$plaintext> is the plaintext to encrypt. It may be a
+L<Crypt::Sodium::XS::MemVault>.
 
 C<$nonce> is the nonce used to encrypt the ciphertext. It must be L</NPUBBYTES>
 bytes.

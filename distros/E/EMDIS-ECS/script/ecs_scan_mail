@@ -1,10 +1,11 @@
 #!/usr/bin/perl -w
 #
-# Copyright (C) 2002-2020 National Marrow Donor Program. All rights reserved.
+# Copyright (C) 2002-2025 National Marrow Donor Program. All rights reserved.
 #
 # For a description of this program, please refer to the POD documentation
 # embedded at the bottom of the file (e.g. perldoc ecs_scan_mail).
 
+use Authen::SASL qw(Perl);
 use EMDIS::ECS qw(:ALL);
 use EMDIS::ECS::FileBackedMessage;
 use EMDIS::ECS::Message;
@@ -13,6 +14,7 @@ use File::Copy;
 use File::Spec::Functions qw(catdir catfile);
 use File::Temp qw(tempfile);
 use Getopt::Long;
+use MIME::Base64;
 use Net::POP3;
 use POSIX qw(setsid);
 use sigtrap;
@@ -216,6 +218,7 @@ sub scan_mail
         ($mbox_err, $msgcount) = mbox_open();
         if($mbox_err) {
             log_error("scan_mail(): unable to open email inbox: $mbox_err");
+            mbox_close();
             last;
         }
         print "$DEBUG_LABEL msgcount = $msgcount\n"
@@ -1453,12 +1456,50 @@ sub mbox_open
             return("Unable to create Net::POP3 object: $@", undef)
                 if not $mbox;
             if(is_yes($ECS_CFG->INBOX_USE_STARTTLS)) {
-                return("STARTTLS failed.", undef) unless $mbox->starttls();
+                $mbox->starttls()
+                    or return("STARTTLS failed.", undef);
             }
-            my $msgcount = $mbox->login($ECS_CFG->INBOX_USERNAME,
-                                        $ECS_CFG->INBOX_PASSWORD);
-            return("Unable to log in to POP server.", undef)
-                if not defined $msgcount;
+
+            my $msgcount;
+            if($ECS_CFG->INBOX_OAUTH_TOKEN_CMD) {
+                return("Unable to use inbox SASL OAuth authentication without SSL/TLS.", undef)
+                    unless is_yes($ECS_CFG->INBOX_USE_SSL) or is_yes($ECS_CFG->INBOX_USE_STARTTLS);
+
+                return("To use SASL authentication mechanisms XOAUTH2 or OAUTHBEARER " .
+                    "please install Authen::SASL::Perl with version >= 2.1800", undef)
+                    if CPAN::Version->vlt($Authen::SASL::Perl::VERSION, '2.1800');
+
+                # using SASL XOAUTH2 or OAUTHBEARER authentication
+
+                my ($err, $access_token) = get_oauth_token(
+                    $ECS_CFG->INBOX_OAUTH_TOKEN_CMD_TIMELIMIT,
+                    $ECS_CFG->INBOX_OAUTH_TOKEN_CMD,
+                    'INBOX_OAUTH_TOKEN_CMD');
+                return("Unable to get access token:  $err", undef)
+                    if $err;
+
+                my $sasl = Authen::SASL->new(
+                    mechanism => $ECS_CFG->INBOX_OAUTH_SASL_MECHANISM,
+                    callback => {
+                        user => $ECS_CFG->INBOX_USERNAME,
+                        pass => $access_token,
+                } );
+                $mbox->auth($sasl);
+                $mbox->status() == Net::POP3::CMD_OK
+                    or return("Unable to authenticate with POP3 server:  " . $mbox->message(), undef);
+
+                $msgcount = $mbox->_get_mailbox_count();
+            }
+            else {
+                # using username/password authentication
+                $msgcount = $mbox->login($ECS_CFG->INBOX_USERNAME,
+                                         $ECS_CFG->INBOX_PASSWORD);
+                return("Failed to authenticate with POP3 server via username/password", undef)
+                    unless defined $msgcount;
+            }
+
+            return("Unable to get message count from POP3 server.", undef)
+                unless defined $msgcount;
             return('', $msgcount);  # successful return
         };
         /IMAP/ and do {
@@ -1475,31 +1516,75 @@ sub mbox_open
             $mbox->Port($ECS_CFG->INBOX_PORT);
             $mbox->Timeout($ECS_CFG->INBOX_TIMEOUT);
             $mbox->Debug($ECS_CFG->INBOX_DEBUG);
-            $mbox->User($ECS_CFG->INBOX_USERNAME);
-            $mbox->Password($ECS_CFG->INBOX_PASSWORD);
             if(is_yes($ECS_CFG->INBOX_USE_SSL)) {
                 $mbox->Ssl(1);
             }
             $mbox->Uid(0);
             $mbox->Clear(1);
             $mbox->Ignoresizeerrors(1);
-            if(not $mbox->connect) {
-                return("Unable to connect to IMAP server " .
-                       "(" .     $ECS_CFG->INBOX_HOST .
-                       ":" .     $ECS_CFG->INBOX_PORT .
-                       ") as " . $ECS_CFG->INBOX_USERNAME .
-                       ": $!", undef);
-            }
+            $mbox->connect()
+                or return("Unable to open IMAP connection (" . $ECS_CFG->INBOX_HOST . ":" . $ECS_CFG->INBOX_PORT . "):  " . $@, undef);
             if(is_yes($ECS_CFG->INBOX_USE_STARTTLS)) {
-                return("STARTTLS failed.", undef) unless $mbox->starttls();
+                $mbox->starttls()
+                    or return("STARTTLS failed.", undef);
             }
-            if(not $mbox->select($ECS_CFG->INBOX_FOLDER)) {
-                return("Unable to select folder " . $ECS_CFG->INBOX_FOLDER . ".",
-                       undef);
+            if($ECS_CFG->INBOX_OAUTH_TOKEN_CMD) {
+                return("Unable to use inbox SASL OAuth authentication without SSL/TLS.", undef)
+                    unless is_yes($ECS_CFG->INBOX_USE_SSL) or is_yes($ECS_CFG->INBOX_USE_STARTTLS);
+
+                return("To use SASL authentication mechanisms XOAUTH2 or OAUTHBEARER " .
+                    "please install Authen::SASL::Perl with version >= 2.1800", undef)
+                    if CPAN::Version->vlt($Authen::SASL::Perl::VERSION, '2.1800');
+
+                # using SASL XOAUTH2 or OAUTHBEARER authentication
+                # see also https://gist.github.com/mugifly/4187031
+
+                my ($err, $access_token) = get_oauth_token(
+                    $ECS_CFG->INBOX_OAUTH_TOKEN_CMD_TIMELIMIT,
+                    $ECS_CFG->INBOX_OAUTH_TOKEN_CMD,
+                    'INBOX_OAUTH_TOKEN_CMD');
+                return("Unable to get access token:  $err", undef)
+                    if $err;
+
+                my $sasl = Authen::SASL->new(
+                    mechanism => $ECS_CFG->INBOX_OAUTH_SASL_MECHANISM,
+                    callback => {
+                        user => $ECS_CFG->INBOX_USERNAME,
+                        pass => $access_token,
+                    } )
+                    or return("Failed to construct Authen::SASL object", undef);
+                my $client = $sasl->client_new('imap', 'localhost')
+                    or return("Authen::SASL->client_new failed:  " . $sasl->error, undef);
+                my $auth_str = $client->client_start()
+                    or return("Authen::SASL->client_new->client_start failed for mechanism " .
+                        $client->mechanism . ":  " . $client->error, undef);
+                my $auth_str_base64 = MIME::Base64::encode_base64($auth_str, '');
+
+                if(not $mbox->authenticate($client->mechanism, sub { return $auth_str_base64 })) {
+                    return("Failed to authenticate with IMAP server via SASL " .
+                           $client->mechanism .
+                           " (" .    $ECS_CFG->INBOX_HOST .
+                           ":" .     $ECS_CFG->INBOX_PORT .
+                           ") as " . $ECS_CFG->INBOX_USERNAME .
+                           $mbox->LastError, undef);
+                }
             }
+            else {
+                # using username/password authentication
+                $mbox->User($ECS_CFG->INBOX_USERNAME);
+                $mbox->Password($ECS_CFG->INBOX_PASSWORD);
+                $mbox->login
+                    or return("Failed to authenticate with IMAP server via username/password " .
+                           "(" .     $ECS_CFG->INBOX_HOST .
+                           ":" .     $ECS_CFG->INBOX_PORT .
+                           ") as " . $ECS_CFG->INBOX_USERNAME .
+                           ": $@", undef);
+            }
+            $mbox->select($ECS_CFG->INBOX_FOLDER)
+                or return("Unable to select folder " . $ECS_CFG->INBOX_FOLDER . ".", undef);
             my $msgcount = $mbox->message_count();
             return("Unable to retrieve message count.", undef)
-                if not defined $msgcount;
+                unless defined $msgcount;
             return('', $msgcount);  # successful return
         };
         /DIRECTORY/ and do {

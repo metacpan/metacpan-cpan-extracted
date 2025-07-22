@@ -27,14 +27,14 @@ BEGIN { use_ok('Object::Configure') }
 
 # --- Test config file integration ---
 
-# Create a temporary config file
+# Create a temporary YAML config file
 my ($fh, $filename) = tempfile();
-print $fh <<'CONF';
+print $fh <<'YAML';
 ---
 custom: from_config_file
 logger:
   file: /tmp/foo
-CONF
+YAML
 close $fh;
 
 my $from_file = Object::Configure::instantiate(
@@ -47,17 +47,39 @@ is($from_file->{custom}, 'from_config_file', 'Custom param from config file');
 isa_ok($from_file->{logger}, 'Log::Abstraction', 'Logger configured via config file');
 is($from_file->{logger}->{file}, '/tmp/foo', 'Logger has setting from config');
 
+# Create a temporary config file
+($fh, $filename) = tempfile();
+print $fh <<'CONF';
+[My::Dummy]
+custom: from_config_file
+logger.file: /tmp/baz
+CONF
+close $fh;
+
+$from_file = Object::Configure::instantiate(
+	class	 => 'My::Dummy',
+	config_file => $filename,
+);
+
+isa_ok($from_file, 'My::Dummy', 'Instantiated object with config file');
+is($from_file->{custom}, 'from_config_file', 'Custom param from config file');
+
+TODO: {
+	local $TODO = 'Fails because of RT#166761';
+
+	isa_ok($from_file->{logger}, 'Log::Abstraction', 'Logger configured via config file');
+	is($from_file->{logger}->{file}, '/tmp/foo', 'Logger has setting from config');
+}
+
 # --- Test environment variable integration ---
 
 # Clean up file test
 unlink $filename;
 
 # Set environment variable
-$ENV{'My::Dummy::custom'} = 'from_env_var';
+local $ENV{'My__Dummy__custom'} = 'from_env_var';
 
-my $from_env = Object::Configure::instantiate(
-	class => 'My::Dummy',
-);
+my $from_env = Object::Configure::instantiate(class => 'My::Dummy');
 
 isa_ok($from_env, 'My::Dummy', 'Instantiated object with env var');
 is($from_env->{custom}, 'from_env_var', 'Custom param from env var');

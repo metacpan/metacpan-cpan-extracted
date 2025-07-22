@@ -23,5 +23,5 @@ requires:
   perl: '5.001000'
 resources:
   IRC: irc://irc.perl.org/#sodium
-version: '0.000030'
+version: '0.000031'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

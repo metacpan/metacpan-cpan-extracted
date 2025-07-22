@@ -1,5 +1,11 @@
 Changes for the DBD::PgAsync module
 
+--- 07/21/2025 rweikusat@talktalk.net ---
+
+    - fixed a bug in dbd_st_execute which prevented the use of an
+      already prepared query when the autoprepare repetition threshold
+      hadn't yet been reached
+
 --- 07/18/2025 rweikusat@talktalk.net ---
 
     - document pg_savepoints method
@@ -40,6 +46,12 @@ Changes for the DBD::PgAsync module
 Changes for DBD::Pg module
 
 RT refers to rt.cpan.org
+
+ - Support binding native boolean false on Perl 5.36 and newer
+   [Dagfinn Ilmari Mannsåker]
+
+ - Respect pg_bool_tf when binding native booleans on Perl 5.36 and newer
+   [Dagfinn Ilmari Mannsåker]
 
 Version 3.18.0 (released December 6, 2023)
 

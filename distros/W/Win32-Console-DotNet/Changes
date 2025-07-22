@@ -1,5 +1,10 @@
 Revision history for Win32::Console::DotNet
 
+0.5.5   2025-06-17
+        - Update (POD) documentation
+        - Change from 'namespace::sweep' to 'namespace::clean'
+        - Change to 'Old School Object Oriented Perl'
+
 0.5.4   2025-02-18
         - Bugfix test case 'GetCursorPosition_Invoke_ReturnsExpected'
         - Bugfix test case 'CursorTop_Set_GetReturnsExpected'

@@ -1,7 +1,15 @@
 ---
 
+0.999.6      2025-07-21
+   [Fixed]
+       * Don't drop dependencies which are either not resolved by
+         MetaCPAN or by dh_make_perl (Debian)
+   [Changed]
+       * More debug logging better problem assessment capabilities
+       * Explain better that the reported version is the installer version
+       * Changes file to list version before date for parsing by MetaCPAN
 
-2025-07-21   0.999.5
+0.999.5      2025-07-21
    [Changed]
        * Use absolute paths for -I argument in generated
          'server-start' script
@@ -13,7 +21,7 @@
          * 'buildtool_not_executable'
          * 'use_strict'
 
-2025-07-20   0.999.4
+0.999.4      2025-07-20
    [Changed]
        * Use absolute PERL5LIB paths
    [Fixed]
@@ -22,21 +30,21 @@
          to make sure self-installed tools are discovered over
          system-provided ones
 
-2025-07-20   0.999.3
+0.999.3      2025-07-20
    [Fixed]
        * Update version number as 0.999.2 apparently was aleady uploaded
 
-2025-07-20   0.999.2
+0.999.2      2025-07-20
    [Fixed]
        * Don't use tarball owner and group when running as root
 
-2025-05-07   0.999.1
+0.999.1      2025-05-07
    [Fixed]
        * Tests were testing the --version option argument
          which was removed just before release
        * Tests were not adapted for changes in the return
          value(s) of "retrieve_precomputed_deps"
 
-2025-05-05   0.999.0
+0.999.0      2025-05-05
    [Added]
        * Initial release
