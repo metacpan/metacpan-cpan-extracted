@@ -3,21 +3,46 @@ use v5.20;
 use warnings;
 
 use Test2::V0;
+use Path::Tiny 0.119 qw( path tempdir );
 
 use Test::File::ShareDir -share => {
-    -module => {
-        "Software::Policy::CodeOfConduct" => "share"
+    -dist => {
+        "Software-Policy-CodeOfConduct" => "share"
     }
 };
 
 use Software::Policy::CodeOfConduct;
 
-ok my $policy = Software::Policy::CodeOfConduct->new( contact => 'bogon@example.com' ), 'constructor';
+for my $file (qw( Contributor_Covenant_1.4 Contributor_Covenant_2.0 Contributor_Covenant_2.1 )) {
 
-ok $policy->template_path, "template_path";
+    subtest $file => sub {
 
-ok $policy->text, "text";
+        ok my $policy =
+          Software::Policy::CodeOfConduct->new( contact => 'bogon@example.com', name => "Bogomip", policy => $file ),
+        'constructor';
 
-note $policy->text;
+        ok $policy->template_path, "template_path";
+
+        ok my $text = $policy->text, "text";
+
+        my $re = quotemeta( $policy->name );
+        like $text, qr/\b${re}\b/, "text has the name";
+
+        note $text;
+
+        is $policy->filename, "CODE_OF_CONDUCT.md", "filename";
+
+        my $dir = tempdir();
+        ok my $path = $policy->save($dir), "save";
+
+        ok -e $path, "file ${path} exists";
+
+        is $path, path( $dir, $policy->filename ), "expected path";
+
+        is $path->slurp_raw, $policy->text, "expected content";
+
+    };
+
+}
 
 done_testing;

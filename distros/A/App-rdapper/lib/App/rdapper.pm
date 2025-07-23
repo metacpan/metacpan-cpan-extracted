@@ -1,19 +1,24 @@
 package App::rdapper;
+use App::rdapper::l10n;
+use Encode qw(decode);
+use File::ShareDir qw(:ALL);
 use Getopt::Long qw(GetOptionsFromArray :config pass_through);
 use JSON;
-use List::Util qw(any min max);
+use List::Util qw(any min max uniq);
 use Net::ASN;
 use Net::DNS::Domain;
 use Net::IDN::Encode qw(domain_to_ascii domain_to_unicode);
 use Net::IP;
 use Net::RDAP::EPPStatusMap;
-use Net::RDAP 0.35;
+use Net::RDAP 0.40;
 use Pod::Usage;
+use POSIX qw(setlocale LC_ALL);
 use Term::ANSIColor;
 use Term::Size;
 use Text::Wrap;
 use URI;
 use constant {
+    GETTEXT_DOMAIN  => q{rdapper},
     # see RFC 6350, Section 6.3.1.
     'ADR_STREET'    => 2,
     'ADR_CITY'      => 3,
@@ -23,17 +28,25 @@ use constant {
     'INDENT'        => '  ',
     'IANA_BASE_URL' => 'https://rdap.iana.org/',
 };
-use vars qw($VERSION);
+use locale;
+use vars qw($VERSION $LH);
 use strict;
 
-$VERSION = '1.15';
+$VERSION = '1.17';
+
+$LH = App::rdapper::l10n->get_handle;
+
+$LH->die_for_lookup_failures(1);
+$LH->bindtextdomain(GETTEXT_DOMAIN, $ENV{RDAPPER_LOCALE_DIR} || module_dir(__PACKAGE__));
+$LH->textdomain(GETTEXT_DOMAIN);
 
 #
-# global arg variables (note: nopager is now ignored)
+# global arg variables
 #
 my (
     $type, $object, $help, $short, $bypass, $auth, $nopager, $raw, $both,
-    $registrar, $nocolor, $reverse, $version, $search, $debug, $registry
+    $registrar, $nocolor, $reverse, $version, $search, $debug, $registry,
+    $strings
 );
 
 #
@@ -46,7 +59,7 @@ my %opts = (
     'short'         => \$short,
     'bypass-cache'  => \$bypass,
     'auth:s'        => \$auth,
-    'nopager'       => \$nopager,
+    'nopager'       => \$nopager, # ignored
     'raw'           => \$raw,
     'both'          => \$both,
     'registrar'     => \$registrar,
@@ -62,6 +75,7 @@ my %opts = (
     'ip'            => sub { $type = 'ip' },
     'tld'           => sub { $type = 'tld' },
     'url'           => sub { $type = 'url' },
+    'strings'       => \$strings,
 );
 
 my $funcs = {
@@ -73,10 +87,85 @@ my $funcs = {
     'help'       => sub { 1 }, # help only contains generic properties
 };
 
+my $OBJECT_TYPE_DISPLAY_NAMES = {
+    'ip network' => _('IP Network'),
+    'autnum'     => _('Autonomous System'),
+    'domain'     => _('Domain Name'),
+    'entity'     => _('Entity'),
+    'nameserver' => _('Nameserver'),
+    'help'       => _('Help'),
+};
+
 my @ROLE_DISPLAY_NAMES_ORDER = qw(registrant administrative technical billing
     abuse registrar reseller sponsor proxy notifications noc);
 
-my %ROLE_DISPLAY_NAMES = ('noc' => 'NOC');
+my %ROLE_DISPLAY_NAMES = (
+    'registrant'        => _('Registrant'),
+    'technical'         => _('Technical'),
+    'administrative'    => _('Administrative'),
+    'abuse'             => _('Abuse'),
+    'billing'           => _('Billing'),
+    'registrar'         => _('Registrar'),
+    'reseller'          => _('Reseller'),
+    'sponsor'           => _('Sponsor'),
+    'proxy'             => _('Proxy'),
+    'notifications'     => _('Notifications'),
+    'noc'               => _('NOC'),
+);
+
+my %EVENT_DISPLAY_NAMES = (
+    'registration'                  => _('Registration'),
+    'reregistration'                => _('Reregistration'),
+    'last changed'                  => _('Last Changed'),
+    'expiration'                    => _('Expiration'),
+    'deletion'                      => _('Deletion'),
+    'reinstantiation'               => _('Reinstantiation'),
+    'transfer'                      => _('Transfer'),
+    'locked'                        => _('Locked'),
+    'unlocked'                      => _('Unlocked'),
+    'last update of RDAP database'  => _('Last update of RDAP database'),
+    'registrar expiration'          => _('Registrar expiration'),
+    'enum validation expiration'    => _('ENUM validation expiration'),
+);
+
+my %STATUS_DISPLAY_NAMES = (
+    'validated'                     => _('validated'),
+    'renew prohibited'              => _('renew prohibited'),
+    'update prohibited'             => _('update prohibited'),
+    'transfer prohibited'           => _('transfer prohibited'),
+    'delete prohibited'             => _('delete prohibited'),
+    'proxy'                         => _('proxy'),
+    'private'                       => _('private'),
+    'removed'                       => _('removed'),
+    'obscured'                      => _('obscured'),
+    'associated'                    => _('associated'),
+    'active'                        => _('active'),
+    'inactive'                      => _('inactive'),
+    'locked'                        => _('locked'),
+    'pending create'                => _('pending create'),
+    'pending renew'                 => _('pending renew'),
+    'pending transfer'              => _('pending transfer'),
+    'pending update'                => _('pending update'),
+    'pending delete'                => _('pending delete'),
+    'add period'                    => _('add period'),
+    'auto renew period'             => _('auto renew period'),
+    'client delete prohibited'      => _('client delete prohibited'),
+    'client hold'                   => _('client hold'),
+    'client renew prohibited'       => _('client renew prohibited'),
+    'client transfer prohibited'    => _('client transfer prohibited'),
+    'client update prohibited'      => _('client update prohibited'),
+    'pending restore'               => _('pending restore'),
+    'redemption period'             => _('redemption period'),
+    'renew period'                  => _('renew period'),
+    'server delete prohibited'      => _('server delete prohibited'),
+    'server renew prohibited'       => _('server renew prohibited'),
+    'server transfer prohibited'    => _('server transfer prohibited'),
+    'server update prohibited'      => _('server update prohibited'),
+    'server hold'                   => _('server hold'),
+    'transfer period'               => _('transfer period'),
+    'administrative'                => _('administrative'),
+    'reserved'                      => _('reserved'),
+);
 
 my @EVENTS = (
     'registration',
@@ -98,26 +187,43 @@ for (my $i = 0 ; $i < scalar(@EVENTS) ; $i++) {
     $EVENT_DISPLAY_ORDER{$EVENTS[$i]} = $i;
 }
 
+my %NOTICE_REMARK_TYPE = (
+    'result set truncated due to authorization'         => _('result set truncated due to authorization'),
+    'result set truncated due to excessive load'        => _('result set truncated due to excessive load'),
+    'result set truncated due to unexplainable reasons' => _('result set truncated due to unexplainable reasons'),
+    'object truncated due to authorization'             => _('object truncated due to authorization'),
+    'object truncated due to excessive load'            => _('object truncated due to excessive load'),
+    'object truncated due to unexplainable reasons'     => _('object truncated due to unexplainable reasons'),
+    'object redacted due to authorization'              => _('object redacted due to authorization'),
+);
+
 my @VCARD_DISPLAY_ORDER = qw(SOURCE KIND FN TITLE ROLE ORG ADR GEO EMAIL CONTACT-URI SOCIALPROFILE TEL IMPP URL CATEGORIES NOTE);
 my %VCARD_NODE_NAMES = (
-    FN              => 'Name',
-    ORG             => 'Organization',
-    TEL             => 'Phone',
-    EMAIL           => 'Email',
-    IMPP            => 'Messaging',
-    URL             => 'Website',
-    SOCIALPROFILE   => 'Profile',
-    'CONTACT-URI'   => 'Contact Link',
-    GEO             => 'Location',
+    ADR             => _('Address'),
+    CATEGORIES      => _('Categories'),
+    'CONTACT-URI'   => _('Contact Link'),
+    EMAIL           => _('Email'),
+    FN              => _('Name'),
+    GEO             => _('Location'),
+    IMPP            => _('Messaging'),
+    KIND            => _('Kind'),
+    NOTE            => _('Note'),
+    ORG             => _('Organization'),
+    ROLE            => _('Role'),
+    SOCIALPROFILE   => _('Profile'),
+    SOURCE          => _('Source'),
+    TEL             => _('Phone'),
+    TITLE           => _('Title'),
+    URL             => _('Website'),
 );
 
 my @ADR_DISPLAY_ORDER = (ADR_STREET, ADR_CITY, ADR_SP, ADR_PC, ADR_CC);
 my %ADR_DISPLAY_NAMES = (
-    &ADR_STREET => 'Street',
-    &ADR_CITY   => 'City',
-    &ADR_SP     => 'State/Province',
-    &ADR_PC     => 'Postal Code',
-    &ADR_CC     => 'Country',
+    &ADR_STREET => _('Street'),
+    &ADR_CITY   => _('City'),
+    &ADR_SP     => _('State/Province'),
+    &ADR_PC     => _('Postal Code'),
+    &ADR_CC     => _('Country'),
 );
 
 my $json = JSON->new->utf8->canonical->pretty->convert_blessed;
@@ -138,20 +244,30 @@ sub main {
 
     GetOptionsFromArray(\@_, %opts) || $package->show_usage;
 
+    #
+    # this undocumented behaviour is used to export all the translateable
+    # strings in this file.
+    #
+    export_strings() if ($strings);
+
     $ENV{NET_RDAP_UA_DEBUG} = 1 if ($debug);
 
+    my $lang = $LH->language_tag || q{en};
+    $lang =~ s/_/-/g;
+
     $rdap = Net::RDAP->new(
-        'use_cache' => !$bypass,
-        'cache_ttl' => 300,
+        'use_cache'         => !$bypass,
+        'cache_ttl'         => 300,
+        'accept_language'   => $lang,
     );
 
     $package->show_version if ($version);
 
     if ($registry && $registrar) {
-        $package->error("cannot specify both --registry and --registrar, use one or the other.");
+        $package->error(_("cannot specify both --registry and --registrar, use one or the other."));
 
     } elsif ($registry && $both) {
-        $package->error("cannot specify both --registry and --both, use one or the other.");
+        $package->error(_("cannot specify both --registry and --both, use one or the other."));
 
     }
 
@@ -196,7 +312,7 @@ sub lookup {
     if ('ip' eq $type) {
         my $ip = Net::IP->new($object);
 
-        $package->error("invalid IP address '$object'") unless ($ip);
+        $package->error(_("invalid IP address '[_1]'", $object)) unless ($ip);
 
         $response = $rdap->ip($ip, %args);
 
@@ -240,7 +356,7 @@ sub lookup {
         $response = $rdap->fetch($uri, %args);
 
     } else {
-        $package->error("Unable to handle type '$type'");
+        $package->error(_("Unable to handle type '[_1]'", $type));
 
     }
 
@@ -270,7 +386,7 @@ sub search {
         $package->domain_search($rdap, $object, %args);
 
     } else {
-        $package->error('current unable to do searches for %s objects.', $type);
+        $package->error(_("current unable to do searches for '[_1]' objects.", $type));
 
     }
 }
@@ -375,7 +491,7 @@ sub display {
                 if ($result->isa('Net::RDAP::Error')) {
                     $package->display($result, $indent, 1);
 
-                    $package->warning('Unable to retrieve registrar record, displaying the registry record...');
+                    $package->warning(_('Unable to retrieve registrar record, displaying the registry record...'));
                     $package->display($object, $indent);
 
                 } else {
@@ -404,24 +520,24 @@ sub display {
 sub display_object {
     my ($package, $object, $indent) = @_;
 
-    $package->error("object does not include the 'objectClassName' properties") unless ($object->class);
-    $package->error(sprintf("unknown object type '%s'", $object->class)) unless ($funcs->{$object->class});
+    $package->error(_("object does not include the 'objectClassName' properties")) unless ($object->class);
+    $package->error(_("unknown object type '[_1]'", $object->class)) unless ($funcs->{$object->class});
 
     #
     # generic properties
     #
-    $package->print_kv('Object type', $object->class, $indent) if ($indent < 1);
-    $package->print_kv('URL', u($object->self->href), $indent) if ($indent < 1 && $object->self);
+    $package->print_kv(_('Object type'), $OBJECT_TYPE_DISPLAY_NAMES->{$object->class}, $indent) if ($indent < 1);
+    $package->print_kv(_('URL'), u($object->self->href), $indent) if ($indent < 1 && $object->self);
 
     if ($object->can('name')) {
         my $name = $object->name->name;
         my $xname = $object->can('unicodeName') ? $object->unicodeName || $name : $name;
 
         if ($xname ne $name) {
-            $package->print_kv('Name', sprintf('%s (%s)', uc($xname), uc($name)));
+            $package->print_kv(_('Name'), sprintf('%s (%s)', uc($xname), uc($name)));
 
         } else {
-            $package->print_kv('Name', uc($name));
+            $package->print_kv(_('Name'), uc($name));
 
         }
     }
@@ -457,12 +573,12 @@ sub display_object {
 
         my @fields = $object->redactions;
         if (scalar(@fields) > 0) {
-            $package->print_kv('Redacted Fields', '', $indent);
+            $package->print_kv(_('Redacted Fields'), '', $indent);
             foreach my $field (@fields) {
                 $out->print(wrap(
                     (INDENT x ($indent + 1)),
                     (INDENT x ($indent + 2)),
-                    sprintf("%s %s (reason: %s)\n", b('*'), $field->name, $field->reason)
+                    sprintf("%s %s\n", b('*'), _("[_1] (reason: [_2])", $field->name, $field->reason))
                 ));
             }
         }
@@ -474,60 +590,60 @@ sub display_object {
 sub print_ip {
     my ($package, $ip, $indent) = @_;
 
-    $package->print_kv('Handle',    $ip->handle, $indent)               if ($ip->handle);
-    $package->print_kv('Version',   $ip->version, $indent)              if ($ip->version);
-    $package->print_kv('Domain',    u($ip->domain->as_string), $indent) if ($ip->domain);
-    $package->print_kv('Type',      $ip->type, $indent)                 if ($ip->type);
-    $package->print_kv('Country',   $ip->country, $indent)              if ($ip->country);
-    $package->print_kv('Parent',    $ip->parentHandle, $indent)         if ($ip->parentHandle);
-    $package->print_kv('Range',     $ip->range->prefix, $indent)        if ($ip->range);
+    $package->print_kv(_('Handle'),     $ip->handle, $indent)               if ($ip->handle);
+    $package->print_kv(_('Version'),    $ip->version, $indent)              if ($ip->version);
+    $package->print_kv(_('Domain'),     u($ip->domain->as_string), $indent) if ($ip->domain);
+    $package->print_kv(_('Type'),       $ip->type, $indent)                 if ($ip->type);
+    $package->print_kv(_('Country'),    $ip->country, $indent)              if ($ip->country);
+    $package->print_kv(_('Parent'),     $ip->parentHandle, $indent)         if ($ip->parentHandle);
+    $package->print_kv(_('Range'),      $ip->range->prefix, $indent)        if ($ip->range);
 
     foreach my $cidr ($ip->cidrs) {
-        $package->print_kv('CIDR', $cidr->prefix, $indent);
+        $package->print_kv(_('CIDR'), $cidr->prefix, $indent);
     }
 }
 
 sub print_asn {
     my ($package, $asn, $indent) = @_;
 
-    $package->print_kv('Handle',    $asn->handle, $indent) if ($asn->handle);
-    $package->print_kv('Range',     sprintf('%u - %u', $asn->start, $asn->end), $indent) if ($asn->start > 0 && $asn->end > 0 && $asn->end > $asn->start);
-    $package->print_kv('Type',      $asn->type, $indent) if ($asn->type);
+    $package->print_kv(_('Handle'), $asn->handle, $indent) if ($asn->handle);
+    $package->print_kv(_('Range'),  sprintf('%u - %u', $asn->start, $asn->end), $indent) if ($asn->start > 0 && $asn->end > 0 && $asn->end > $asn->start);
+    $package->print_kv(_('Type'),   $asn->type, $indent) if ($asn->type);
 }
 
 sub print_domain {
     my ($package, $domain, $indent) = @_;
 
-    $package->print_kv('Handle', $domain->handle, $indent) if ($domain->handle);
+    $package->print_kv(_('Handle'), $domain->handle, $indent) if ($domain->handle);
 
     foreach my $ns (sort { lc($a->name->name) cmp lc($b->name->name) } $domain->nameservers) {
         if ($short) {
-            $package->print_kv('Nameserver', uc($ns->name->name) . ' ' . join(' ', map { $_->short } $ns->addresses), $indent);
+            $package->print_kv(_('Nameserver'), uc($ns->name->name) . ' ' . join(' ', map { $_->short } $ns->addresses), $indent);
 
         } else {
-            $package->print_kv('Nameserver', uc($ns->name->name), $indent);
+            $package->print_kv(_('Nameserver'), uc($ns->name->name), $indent);
             $package->print_nameserver($ns, 1+$indent);
         }
     }
 
     foreach my $ds ($domain->ds) {
-        $package->print_kv('DS Record', $ds->plain, $indent);
+        $package->print_kv(_('DS Record'), $ds->plain, $indent);
     }
 
     foreach my $key ($domain->keys) {
-        $package->print_kv('DNSKEY Record', $key->plain, $indent);
+        $package->print_kv(_('DNSKEY Record'), $key->plain, $indent);
     }
 
     $package->display_artRecord($domain->{'artRecord_record'}, $indent) if ($domain->{'artRecord_record'});
     $package->display_platform_nameservers($domain->{'platformNS_nameservers'}, $indent) if ($domain->{'platformNS_nameservers'});
 
-    $package->print_kv('Registration Type', $domain->{'regType_regType'}) if ($domain->{'regType_regType'});
+    $package->print_kv(_('Registration Type'), $domain->{'regType_regType'}) if ($domain->{'regType_regType'});
 }
 
 sub display_artRecord {
     my ($package, $records, $indent) = @_;
 
-    $package->print_kv('Art Record', undef, $indent);
+    $package->print_kv(_('Art Record'), undef, $indent);
 
     foreach my $record (@{$records}) {
         $package->print_kv($record->{'name'}, $record->{'value'}, 1+$indent);
@@ -538,14 +654,14 @@ sub display_platform_nameservers {
     my ($package, $nameservers, $indent) = @_;
 
     foreach my $ns (@{$nameservers}) {
-        $package->print_kv('Platform Nameserver', uc(Net::RDAP::Object::Nameserver->new($ns)->name->name), $indent);
+        $package->print_kv(_('Platform Nameserver'), uc(Net::RDAP::Object::Nameserver->new($ns)->name->name), $indent);
     }
 }
 
 sub print_entity {
     my ($package, $entity, $indent) = @_;
 
-    $package->print_kv('Handle', $entity->handle, $indent) if ($entity->handle && $indent < 1);
+    $package->print_kv(_('Handle'), $entity->handle, $indent) if ($entity->handle && $indent < 1);
 
     foreach my $id ($entity->ids) {
         $package->print_kv($id->type, $id->identifier, $indent);
@@ -578,10 +694,10 @@ sub print_jcard_property {
 
         if ('TEL' eq uc($property->type)) {
             if (any { 'fax' eq lc($_) } @{$property->param('type')}) {
-                $label = 'Fax';
+                $label = _('Fax');
 
             } else {
-                $label = 'Phone';
+                $label = _('Phone');
 
             }
         }
@@ -597,7 +713,7 @@ sub print_jcard_property {
 sub print_jcard_adr {
     my ($package, $property, $indent) = @_;
 
-    $package->print_kv('Address', '', $indent);
+    $package->print_kv(_('Address'), '', $indent);
 
     if ($property->param('label')) {
         $out->print(wrap(
@@ -623,17 +739,17 @@ sub print_jcard_adr {
     }
 
     if ($property->param('cc')) {
-        $package->print_kv('Country', $property->param('cc'), $indent+1);
+        $package->print_kv(_('Country'), $property->param('cc'), $indent+1);
     }
 }
 
 sub print_nameserver {
     my ($package, $nameserver, $indent) = @_;
 
-    $package->print_kv('Handle', $nameserver->handle, $indent) if ($nameserver->handle);
+    $package->print_kv(_('Handle'), $nameserver->handle, $indent) if ($nameserver->handle);
 
     foreach my $ip ($nameserver->addresses) {
-        $package->print_kv('IP Address', $ip->short, $indent);
+        $package->print_kv(_('IP Address'), $ip->short, $indent);
     }
 }
 
@@ -641,11 +757,13 @@ sub print_events {
     my ($package, $object, $indent) = @_;
 
     foreach my $event (sort { $EVENT_DISPLAY_ORDER{$a->action} - $EVENT_DISPLAY_ORDER{$b->action} } $object->events) {
+        my $action = $EVENT_DISPLAY_NAMES{$event->action} || ucfirst($event->action);
+
         if ($event->actor) {
-            $package->print_kv(ucfirst($event->action), sprintf('%s (by %s)', scalar($event->date), $event->actor), $indent);
+            $package->print_kv($action, _('[_1] (by [_2])', scalar($event->date), $event->actor), $indent);
 
         } else {
-            $package->print_kv(ucfirst($event->action), scalar($event->date).$event->date_tz, $indent);
+            $package->print_kv($action, scalar($event->date).$event->date_tz, $indent);
 
         }
     }
@@ -655,12 +773,20 @@ sub print_status {
     my ($package, $object, $indent, $is_domain) = @_;
 
     foreach my $status ($object->status) {
+
         my $epp = rdap2epp($status);
         if ($epp && $is_domain && !$short) {
-            $package->print_kv('Status', sprintf('%s (EPP: %s, %s)', $status, $epp, u(sprintf('https://icann.org/epp#%s', $epp))), $indent);
+            my $friendly = $STATUS_DISPLAY_NAMES{$status} || $status;
+            if ($friendly ne $status) {
+                $package->print_kv(_('Status'), _('[_1] ([_2], EPP: [_3], [_4])', $friendly, $status, $epp, u(sprintf('https://icann.org/epp#%s', $epp))), $indent);
+
+            } else {
+                $package->print_kv(_('Status'), _('[_1] (EPP: [_2], [_3])', $status, $epp, u(sprintf('https://icann.org/epp#%s', $epp))), $indent);
+
+            }
 
         } else {
-            $package->print_kv('Status', $status, $indent);
+            $package->print_kv(_('Status'), $status, $indent);
 
         }
     }
@@ -680,7 +806,7 @@ sub print_entities {
             if (any { $role eq $_ } $entity->roles) {
                 $seen{$i} = 1;
 
-                my $rstring = join(', ', map { sprintf('%s Contact', $ROLE_DISPLAY_NAMES{$_} || ucfirst($_)) } $entity->roles);
+                my $rstring = join(', ', map { _('[_1] Contact', $ROLE_DISPLAY_NAMES{$_} || ucfirst($_)) } $entity->roles);
 
                 if ($entity->handle && 'not applicable' ne $entity->handle && 'HANDLE REDACTED FOR PRIVACY' ne $entity->handle) {
                     $package->print_kv($rstring, $entity->handle, $indent);
@@ -701,13 +827,13 @@ sub print_entities {
 sub print_remark_or_notice {
     my ($package, $thing, $indent) = @_;
 
-    my $type = ($thing->isa('Net::RDAP::Notice') ? 'Notice' : 'Remark');
+    my $type = ($thing->isa('Net::RDAP::Notice') ? _('Notice') : _('Remark'));
 
     if (1 == scalar($thing->description)) {
         $package->print_kv($thing->title || $type, ($thing->description)[0], $indent);
 
     } else {
-        $package->print_kv($thing->title || $type, , '', $indent);
+        $package->print_kv($thing->title || $NOTICE_REMARK_TYPE{$thing->type} || $type, , '', $indent);
 
         $out->print(fill(
             (INDENT x (1+$indent)),
@@ -744,26 +870,26 @@ sub print_kv {
 sub debug {
     my ($package, $fmt, @params) = @_;
     if ($debug) {
-        my $str = sprintf("Debug: $fmt", @params);
+        my $str = sprintf(_("Debug: [_1]", $fmt), @params);
         $err->say(colourise([qw(magenta)], $str));
     }
 }
 
 sub info {
     my ($package, $fmt, @params) = @_;
-    my $str = sprintf("Info: $fmt", @params);
+    my $str = sprintf(_("Info: [_1]", $fmt), @params);
     $err->say(colourise([qw(cyan)], $str));
 }
 
 sub warning {
     my ($package, $fmt, @params) = @_;
-    my $str = sprintf("Warning: $fmt", @params);
+    my $str = sprintf(_("Warning: [_1]", $fmt), @params);
     $err->say(colourise([qw(yellow)], $str));
 }
 
 sub error {
     my ($package, $fmt, @params) = @_;
-    my $str = sprintf("Error: $fmt", @params);
+    my $str = sprintf(_("Error: [_1]", $fmt), @params);
     $err->say(colourise([qw(red)], $str));
     exit 1;
 }
@@ -782,6 +908,51 @@ sub colourise {
 
 sub u { colourise([qw(underline)], shift) }
 sub b { colourise([qw(bold)], shift) }
+sub _ { decode($LH->encoding, $LH->maketext(@_)) }
+
+#
+# this function uses PPI to parse this file, extract the messages passed to _()
+# and prints a .po file on STDOUT.
+#
+sub export_strings {
+    eval {
+        use PPI;
+
+        my $doc = PPI::Document->new(__FILE__);
+        $doc->prune(q{PPI::Token::Comment});
+        $doc->prune(q{PPI::Token::Whitespace});
+
+        my @msgs;
+
+        my @nodes = @{$doc->find(sub { 1 })};
+        for (my $i = 0 ; $i < scalar(@nodes) ; $i++) {
+            my $node = $nodes[$i];
+
+            if ($node->isa(q{PPI::Token::Magic}) && q{_} eq $node->content) {
+                my $next = $nodes[$i+1];
+
+                if ($next->isa(q{PPI::Structure::List})) {
+                    my $msg = ($next->tokens)[1];
+
+                    if (!$msg->isa(q{PPI::Token::Quote})) {
+                        die(sprintf(
+                            "%s: first argument to _() must be a string literal",
+                            $msg->content,
+                        ));
+                    }
+
+                    push(@msgs, $msg->string);
+                }
+            }
+        }
+
+        foreach my $msg (uniq(@msgs)) {
+            printf("msgid \"%s\"\nmsgstr \"\"\n\n", $msg);
+        }
+    };
+
+    exit;
+}
 
 1;
 

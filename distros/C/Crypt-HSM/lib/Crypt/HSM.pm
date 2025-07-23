@@ -1,10 +1,13 @@
 package Crypt::HSM;
-$Crypt::HSM::VERSION = '0.020';
+$Crypt::HSM::VERSION = '0.021';
 use strict;
 use warnings;
 
 use XSLoader;
 XSLoader::load(__PACKAGE__, __PACKAGE__->VERSION);
+
+# Pure-perl backwards compatibility methods
+use Crypt::HSM::Mechanism;
 
 1;
 
@@ -22,21 +25,44 @@ Crypt::HSM - A PKCS11 interface for Perl
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 SYNOPSIS
 
- my $hsm = Crypt::HSM->load('/usr/lib/pkcs11/libsofthsm2.so');
- my ($slot) = $hsm->slots;
+ my $provider = Crypt::HSM->load('/usr/lib/pkcs11/libsofthsm2.so');
+ my ($slot) = $provider->slots or die "No slots available";
  my $session = $slot->open_session;
  $session->login('user', '1234');
 
- my ($key) = $session->find_objects({ class => 'secret-key', label => "my-key" });
+ my %key_attrs = (label => 'my-key', class => 'secret-key');
+ my ($key) = $session->find_objects(\%key_attrs)
+	or die "No such key 'my-key'";
+ my $iv = $session->generate_random(16);
  my $ciphertext = $session->encrypt('aes-gcm', $key, $plaintext, $iv);
 
 =head1 DESCRIPTION
 
 This module interfaces with any PKCS11 library to use its cryptography.
+
+=over 4
+
+=item * L<Provider|Crypt::HSM::Provider>
+
+This represents a PKCS11 provider, typically a piece of cryptographic hardware. A provider may have one or more slots.
+
+=item * L<Slot|Crypt::HSM::Slot>
+
+This represents a slot on the provider. A slot may or may not contain a token; this distinction is only relevant on providers that can swap tokens (e.g. smartcard readers), on others there will always be a token in the slot that can't be swapped. A token is a data container, and as such performs cryptographic operations for its sessions.
+
+=item * L<Session|Crypt::HSM::Session>
+
+This represents a session on a token / slot. It may or may not be. It may contain session data (e.g. keys not stored on the token) in addition to its token data.
+
+=item * L<Slot|Crypt::HSM::Slot>
+
+This represents a cryptographic stream. There are two types of stream that produce a result of similar length as the input: L<encrypt|Crypt::HSM::Encrypt> and L<decrypt|Crypt::HSM::Decrypt>; and 2 that return a fixed sized product: L<digest|Crypt::HSM::Digest> and L<sign|Crypt::HSM::Sign>; and one that returns a bool: L<verify|Crypt::HSM::Verify>.
+
+=back
 
 =head1 METHODS
 

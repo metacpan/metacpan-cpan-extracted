@@ -718,3 +718,17 @@ Revision history for StreamFinder
         exclude their new "video-only" streams ("*.[A-Z]aa.mp4*" urls).
         - StreamFinder::Youtube - Strip "?list=..." part off Youtube video urls 
         to prevent fetch "hanging" issue.
+2.45    2025/07/22
+        - StreamFinder::Youtube - Add ability to fetch the "New & Improved xxxx 
+        Screwed Up" Bitchute streams which can no longer be scraped except by 
+        the very latest (version 2025.05.22) of yt-dlp!  We still scrape the 
+        Bitchute video page for metadata (so StreamFinder::Bitchute remains 
+        the default and best way to fetch Bitchute videos).  NOTE:  Users 
+        must *NOT* have the "-youtube" option set to 'No', else Bitchute video 
+        streams can no longer be retrieved.  Also, users can no longer supply 
+        a Bitchute channel page and get the latest video.  
+        Internet Encrapification continues at full speed ahead here in 2025 as 
+        more and more streaming sites continue to invest tons of money to 
+        hire developers to obfuscate their sites to prevent a handful of users 
+        like us avoiding their javascripts, trackers, spam, excess ads, etc. :(
+        - StreamFinder::Rumble - Set default "-order" to "quality".

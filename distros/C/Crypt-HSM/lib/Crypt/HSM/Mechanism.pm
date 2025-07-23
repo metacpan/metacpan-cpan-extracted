@@ -1,10 +1,19 @@
 package Crypt::HSM::Mechanism;
-$Crypt::HSM::Mechanism::VERSION = '0.020';
+$Crypt::HSM::Mechanism::VERSION = '0.021';
 use strict;
 use warnings;
 
 # Contains the actual implementation
 use Crypt::HSM;
+
+# Backwards compatibility
+for my $method (qw/min_key_size max_key_size flags has_flags/) {
+	no strict 'refs';
+	*{$method} = sub {
+		my ($self, @args) = @_;
+		return $self->info->$method(@args);
+	}
+}
 
 1;
 
@@ -22,11 +31,11 @@ Crypt::HSM::Mechanism - A PKCS11 mechanism
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 SYNOPSIS
 
- my @signers = grep { $_->has_flags('sign', 'verify') } $slot->mechanisms;
+ my @signers = grep { $_->info->has_flags('sign', 'verify') } $slot->mechanisms;
 
 =head1 DESCRIPTION
 
@@ -36,43 +45,11 @@ This represents a mechanism in a PKCS implementation.
 
 =head2 name()
 
-This returns the name of the mechanism
-
-=head2 min_key_size()
-
-This returns the minimum key size for this mechanism.
-
-=head2 max_key_size()
-
-This returns the maximum key size for this mechanism.
-
-=head2 flags()
-
-This array lists properties of the mechanism. It may contain values like C<'encrypt'>, C<'decrypt'>, C<'sign'>, C<'verify'>, C<'generate'>, C<'wrap'> and C<'unwrap'>.
-
-=head2 has_flags(@flags)
-
-This returns true the flags contain all of C<@flags>.
+This looks up the name of the mechanism, or C<undef> if the name is unknown.
 
 =head2 info()
 
-This returns a hash with information about the mechanism. This includes the following fields.
-
-=over 4
-
-=item * min-key-size
-
-The minimum key size
-
-=item * max-key-size
-
-The maximum key size
-
-=item * flags
-
-This contains the flags much like the C<flags> method.
-
-=back
+This returns an L<information|Crypt::HSM::Mechanism::Info> object about the mechanism.
 
 =head1 ADDITIONAL ARGUMENTS
 
@@ -167,6 +144,11 @@ This takes two mandatory arguments: the hash and the generator function.
 This takes two optional arguments. If no arguments are given it's run in pure mode, if they are given it's run in contextual mode. The first argument is the context data. The second is the pre-hash flag: if true it will enable pre-hashing mode.
 
 =back
+
+=for Pod::Coverage min_key_size
+max_key_size
+has_flags
+flags
 
 =head1 AUTHOR
 

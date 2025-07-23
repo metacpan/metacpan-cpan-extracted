@@ -719,6 +719,23 @@ RETRYIT:
 			goto RETRYIT  if ($ytdlArgs =~ s/\-f\s+\"[^\"]+\"//);
 		}
 	}
+	@ytStreams = ();
+	my $urlcount = 0;
+	#ADDED FOLLOWING TO HANDLE CRAPPED UP BITCHUTE VIDEOS:
+	unless (scalar(@ytdldata) > 0) {   #LAST DITCH EFFORT THAT SEEMS TO SOMETIMES WORK:
+		$cmd = $self->{'youtube-dl'} . ' -F "' . $url2fetch . '"';
+		print STDERR "--TRY(last ditch): COMMAND==>$cmd<==\n"  if ($DEBUG);
+		$_ = `$cmd`;
+		print STDERR "--YT RETURNED DATA===>$_<===\n"  if ($DEBUG);
+		@ytdldata = split /\r?\n/s;
+		foreach my $line (@ytdldata) {
+			if ($line =~ /: Checking\s+(http\S+)$/o) {
+				push @ytStreams, $1  unless ($self->{'secure'} && $_ !~ /^https/o);
+				$urlcount++;
+			}
+		}
+	}
+		
 	return undef unless (scalar(@ytdldata) > 0);
 
 	#NOTE:  ytdldata is ORDERED:  TITLE?, ID, STREAM-URLS, THEN THE ICON URL, THEN DESCRIPTION, LASTLY FORMATS!:
@@ -734,8 +751,6 @@ RETRYIT:
 	my $fmtline = ($ytdldata[$#ytdldata] =~ m#^https?\:\/\/#) ? '-none' : pop(@ytdldata);  #LAST LINE IS (USUALLY) THE LIST OF FORMATS RETURNED.
 	my @fmtsfound = split(/\+/, $fmtline);
 	$self->{'description'} = '';
-	@ytStreams = ();
-	my $urlcount = 0;
 	while (@ytdldata) {
 		$_ = shift @ytdldata;
 		if ($urlcount <= $#fmtsfound) {

@@ -599,6 +599,7 @@ sub new
 				(my $arg0 = $arg) =~ s/^youtube\-(?!dl)//o;
 				$globalArgs{$arg0} = $self->{$arg}  if (defined $self->{$arg});
 			}
+			$url2fetch =~ s#api.bitchute.com#old.bitchute.com#i;
 			my $yt = new StreamFinder::Youtube($url2fetch, %globalArgs);
 			if ($yt && $yt->count() > 0) {
 				my @ytStreams = $yt->get();

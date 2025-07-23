@@ -1,0 +1,390 @@
+msgid "IP Network"
+msgstr ""
+
+msgid "Autonomous System"
+msgstr ""
+
+msgid "Domain Name"
+msgstr ""
+
+msgid "Entity"
+msgstr ""
+
+msgid "Nameserver"
+msgstr ""
+
+msgid "Help"
+msgstr ""
+
+msgid "Registrant"
+msgstr ""
+
+msgid "Technical"
+msgstr ""
+
+msgid "Administrative"
+msgstr ""
+
+msgid "Abuse"
+msgstr ""
+
+msgid "Billing"
+msgstr ""
+
+msgid "Registrar"
+msgstr ""
+
+msgid "Reseller"
+msgstr ""
+
+msgid "Sponsor"
+msgstr ""
+
+msgid "Proxy"
+msgstr ""
+
+msgid "Notifications"
+msgstr ""
+
+msgid "NOC"
+msgstr ""
+
+msgid "Registration"
+msgstr ""
+
+msgid "Reregistration"
+msgstr ""
+
+msgid "Last Changed"
+msgstr ""
+
+msgid "Expiration"
+msgstr ""
+
+msgid "Deletion"
+msgstr ""
+
+msgid "Reinstantiation"
+msgstr ""
+
+msgid "Transfer"
+msgstr ""
+
+msgid "Locked"
+msgstr ""
+
+msgid "Unlocked"
+msgstr ""
+
+msgid "Last update of RDAP database"
+msgstr ""
+
+msgid "Registrar expiration"
+msgstr ""
+
+msgid "ENUM validation expiration"
+msgstr ""
+
+msgid "validated"
+msgstr ""
+
+msgid "renew prohibited"
+msgstr ""
+
+msgid "update prohibited"
+msgstr ""
+
+msgid "transfer prohibited"
+msgstr ""
+
+msgid "delete prohibited"
+msgstr ""
+
+msgid "proxy"
+msgstr ""
+
+msgid "private"
+msgstr ""
+
+msgid "removed"
+msgstr ""
+
+msgid "obscured"
+msgstr ""
+
+msgid "associated"
+msgstr ""
+
+msgid "active"
+msgstr ""
+
+msgid "inactive"
+msgstr ""
+
+msgid "locked"
+msgstr ""
+
+msgid "pending create"
+msgstr ""
+
+msgid "pending renew"
+msgstr ""
+
+msgid "pending transfer"
+msgstr ""
+
+msgid "pending update"
+msgstr ""
+
+msgid "pending delete"
+msgstr ""
+
+msgid "add period"
+msgstr ""
+
+msgid "auto renew period"
+msgstr ""
+
+msgid "client delete prohibited"
+msgstr ""
+
+msgid "client hold"
+msgstr ""
+
+msgid "client renew prohibited"
+msgstr ""
+
+msgid "client transfer prohibited"
+msgstr ""
+
+msgid "client update prohibited"
+msgstr ""
+
+msgid "pending restore"
+msgstr ""
+
+msgid "redemption period"
+msgstr ""
+
+msgid "renew period"
+msgstr ""
+
+msgid "server delete prohibited"
+msgstr ""
+
+msgid "server renew prohibited"
+msgstr ""
+
+msgid "server transfer prohibited"
+msgstr ""
+
+msgid "server update prohibited"
+msgstr ""
+
+msgid "server hold"
+msgstr ""
+
+msgid "transfer period"
+msgstr ""
+
+msgid "administrative"
+msgstr ""
+
+msgid "reserved"
+msgstr ""
+
+msgid "result set truncated due to authorization"
+msgstr ""
+
+msgid "result set truncated due to excessive load"
+msgstr ""
+
+msgid "result set truncated due to unexplainable reasons"
+msgstr ""
+
+msgid "object truncated due to authorization"
+msgstr ""
+
+msgid "object truncated due to excessive load"
+msgstr ""
+
+msgid "object truncated due to unexplainable reasons"
+msgstr ""
+
+msgid "object redacted due to authorization"
+msgstr ""
+
+msgid "Address"
+msgstr ""
+
+msgid "Categories"
+msgstr ""
+
+msgid "Contact Link"
+msgstr ""
+
+msgid "Email"
+msgstr ""
+
+msgid "Name"
+msgstr ""
+
+msgid "Location"
+msgstr ""
+
+msgid "Messaging"
+msgstr ""
+
+msgid "Kind"
+msgstr ""
+
+msgid "Note"
+msgstr ""
+
+msgid "Organization"
+msgstr ""
+
+msgid "Role"
+msgstr ""
+
+msgid "Profile"
+msgstr ""
+
+msgid "Source"
+msgstr ""
+
+msgid "Phone"
+msgstr ""
+
+msgid "Title"
+msgstr ""
+
+msgid "Website"
+msgstr ""
+
+msgid "Street"
+msgstr ""
+
+msgid "City"
+msgstr ""
+
+msgid "State/Province"
+msgstr ""
+
+msgid "Postal Code"
+msgstr ""
+
+msgid "Country"
+msgstr ""
+
+msgid "cannot specify both --registry and --registrar, use one or the other."
+msgstr ""
+
+msgid "cannot specify both --registry and --both, use one or the other."
+msgstr ""
+
+msgid "invalid IP address '[_1]'"
+msgstr ""
+
+msgid "Unable to handle type '[_1]'"
+msgstr ""
+
+msgid "current unable to do searches for '[_1]' objects."
+msgstr ""
+
+msgid "Unable to retrieve registrar record, displaying the registry record..."
+msgstr ""
+
+msgid "object does not include the 'objectClassName' properties"
+msgstr ""
+
+msgid "unknown object type '[_1]'"
+msgstr ""
+
+msgid "Object type"
+msgstr ""
+
+msgid "URL"
+msgstr ""
+
+msgid "Redacted Fields"
+msgstr ""
+
+msgid "[_1] (reason: [_2])"
+msgstr ""
+
+msgid "Handle"
+msgstr ""
+
+msgid "Version"
+msgstr ""
+
+msgid "Domain"
+msgstr ""
+
+msgid "Type"
+msgstr ""
+
+msgid "Parent"
+msgstr ""
+
+msgid "Range"
+msgstr ""
+
+msgid "CIDR"
+msgstr ""
+
+msgid "DS Record"
+msgstr ""
+
+msgid "DNSKEY Record"
+msgstr ""
+
+msgid "Registration Type"
+msgstr ""
+
+msgid "Art Record"
+msgstr ""
+
+msgid "Platform Nameserver"
+msgstr ""
+
+msgid "Fax"
+msgstr ""
+
+msgid "IP Address"
+msgstr ""
+
+msgid "[_1] (by [_2])"
+msgstr ""
+
+msgid "Status"
+msgstr ""
+
+msgid "[_1] ([_2], EPP: [_3], [_4])"
+msgstr ""
+
+msgid "[_1] (EPP: [_2], [_3])"
+msgstr ""
+
+msgid "[_1] Contact"
+msgstr ""
+
+msgid "Notice"
+msgstr ""
+
+msgid "Remark"
+msgstr ""
+
+msgid "Debug: [_1]"
+msgstr ""
+
+msgid "Info: [_1]"
+msgstr ""
+
+msgid "Warning: [_1]"
+msgstr ""
+
+msgid "Error: [_1]"
+msgstr ""
+

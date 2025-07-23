@@ -1,5 +1,5 @@
 package Crypt::HSM::Session;
-$Crypt::HSM::Session::VERSION = '0.020';
+$Crypt::HSM::Session::VERSION = '0.021';
 use strict;
 use warnings;
 
@@ -22,7 +22,7 @@ Crypt::HSM::Session - A PKCS11 session
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 SYNOPSIS
 
@@ -30,7 +30,8 @@ version 0.020
 
  my ($key) = $session->find_objects({ label => $label, encrypt => 1 });
  if (not $key) {
-	$key = $session->generate_key('aes-key-gen', { label => $label, sensitive => 1, "value-len" => 32 });
+     my %attrs = (label => $label, sensitive => 1, 'value-len' => 32);
+     $key = $session->generate_key('aes-key-gen', \%attrs);
  }
  my $iv = $session->generate_random(16);
  $session->encrypt('aes-cbc', $key, $plaintext, $iv);

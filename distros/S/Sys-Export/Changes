@@ -1,0 +1,5 @@
+2025-07-22 - Version 0.001
+
+  - Initial version, with functioning t/81-qemu-initrd.t to prove that
+    the basics work.  But, it's a bit light on testing considering the
+    overall number of features and potential use cases.

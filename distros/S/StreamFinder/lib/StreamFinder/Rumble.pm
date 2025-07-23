@@ -396,6 +396,7 @@ sub new
 	my $self = $class->SUPER::new('Rumble', @_);
 	$DEBUG = $self->{'debug'}  if (defined $self->{'debug'});
 
+	$self->{'order'} = 'quality';
 	my (@okStreams);
 	while (@_) {
 		if ($_[0] =~ /^\-?keep$/o) {

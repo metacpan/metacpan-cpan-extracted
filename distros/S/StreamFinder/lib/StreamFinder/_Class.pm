@@ -4,7 +4,7 @@ StreamFinder::_Class - Base module containing default methods common to all Stre
 
 =head1 AUTHOR
 
-This module is Copyright (C) 2017-2024 by
+This module is Copyright (C) 2017-2025 by
 
 Jim Turner, C<< <turnerjw784 at yahoo.com> >>
 		

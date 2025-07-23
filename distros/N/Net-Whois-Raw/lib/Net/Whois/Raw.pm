@@ -1,5 +1,5 @@
 package Net::Whois::Raw;
-$Net::Whois::Raw::VERSION = '2.99041';
+$Net::Whois::Raw::VERSION = '2.99042';
 # ABSTRACT: Get Whois information of domains and IP addresses.
 
 require 5.008_001;
@@ -191,7 +191,7 @@ sub recursive_whois {
         elsif ( /Contact information can be found in the (\S+)\s+database/ ) {
             $newsrv = $Net::Whois::Raw::Data::ip_whois_servers{ $1 };
         }
-        elsif ( ( /OrgID:\s+(\w+)/ || /descr:\s+(\w+)/ ) && Net::Whois::Raw::Common::is_ipaddr( $dom ) ) {
+        elsif ( ( /OrgID:\s+(\w+)/i || /descr:\s+(\w+)/ ) && Net::Whois::Raw::Common::is_ipaddr( $dom ) ) {
             my $val = $1;
             if ( $val =~ /^(?:RIPE|APNIC|KRNIC|LACNIC)$/ ) {
                 $newsrv = $Net::Whois::Raw::Data::ip_whois_servers{ $val };
@@ -480,7 +480,7 @@ Net::Whois::Raw - Get Whois information of domains and IP addresses.
 
 =head1 VERSION
 
-version 2.99041
+version 2.99042
 
 =head1 SYNOPSIS
 
