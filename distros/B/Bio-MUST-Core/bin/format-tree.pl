@@ -200,7 +200,7 @@ format-tree.pl - Format (and annotate) trees for printing
 
 =head1 VERSION
 
-version 0.251810
+version 0.252040
 
 =head1 USAGE
 
@@ -338,11 +338,11 @@ When specified, a taxonomic analysis of all nodes is carried out and the
 nodes are named after their taxon at (or above) the specified taxonomic
 level. This requires a local mirror of the NCBI Taxonomy database.
 
-Available levels are: superkingdom, kingdom, subkingdom, superphylum, phylum,
-subphylum, superclass, class, subclass, infraclass, superorder, order,
-suborder, infraorder, parvorder, superfamily, family, subfamily, tribe,
-subtribe, genus, subgenus, species group, species subgroup, species,
-subspecies, varietas, forma and 'no rank' (don't forget the quotes).
+Available levels include: domain (or realm for viruses), kingdom, subkingdom,
+superphylum, phylum, subphylum, superclass, class, subclass, infraclass,
+superorder, order, suborder, infraorder, parvorder, superfamily, family,
+subfamily, tribe, subtribe, genus, subgenus, species group, species subgroup,
+species, subspecies, varietas, forma and 'no rank' (don't forget the quotes).
 
 =for Euclid: level.type: string
     level.opt_default: 'missing'

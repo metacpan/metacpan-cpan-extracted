@@ -1,7 +1,7 @@
 package Bio::MUST::Apps::OmpaPa::Hmmer;
 # ABSTRACT: internal class for tabular HMMER parser
 # CONTRIBUTOR: Amandine BERTRAND <amandine.bertrand@doct.uliege.be>
-$Bio::MUST::Apps::OmpaPa::Hmmer::VERSION = '0.251770';
+$Bio::MUST::Apps::OmpaPa::Hmmer::VERSION = '0.252040';
 use Moose;
 use namespace::autoclean;
 
@@ -10,6 +10,7 @@ use feature qw(say);
 
 use Smart::Comments '###';
 
+use Carp;
 use List::AllUtils qw(mesh);
 
 extends 'Bio::FastParsers::Hmmer::DomTable';
@@ -22,7 +23,14 @@ sub collect_hits {
     my @hits;
 
     # parse HMMER report
+    HIT:
     while (my $hit = $self->next_hit) {
+
+        # honor --max-hits limit
+        if (@hits >= $self->max_hits) {
+            carp 'Reached --max-hits limit; truncating report!';
+            last HIT;
+        }
 
         if ($hit->rank == 1) {
 
@@ -56,7 +64,7 @@ Bio::MUST::Apps::OmpaPa::Hmmer - internal class for tabular HMMER parser
 
 =head1 VERSION
 
-version 0.251770
+version 0.252040
 
 =head1 SYNOPSIS
 

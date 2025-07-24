@@ -1,0 +1,8 @@
+name,value
+domain_name,savage.net.au
+encoding,:encoding(UTF-8)
+logo_path,/assets/images/local/rons.logo.png
+page_name,cpan.metacurator.tree.html
+time_zone,Australia/Melbourne
+title_font_path,/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf
+title_font_size,16

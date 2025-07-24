@@ -1,3 +1,11 @@
+0.009   2025-07-24  Released-By: PERLANCAR; Urgency: medium
+
+        - Add options: --print-total (-t), --no-print-total (-T),
+          --clear-before-output, --output-every.
+
+        - [bugfix] Fix percent formatting.
+
+
 0.008   2023-12-28  Released-By: PERLANCAR; Urgency: medium
 
         - Add option: --percent (-p).

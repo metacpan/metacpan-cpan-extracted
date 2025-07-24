@@ -11,7 +11,7 @@ use Mac::PropertyList;
 use Math::BigInt;
 use POSIX             qw(SEEK_END SEEK_SET);
 
-our $VERSION = '1.506';
+our $VERSION = '1.603_02';
 
 my $Debug = $ENV{PLIST_DEBUG} || 0;
 
@@ -211,7 +211,7 @@ my $type_readers = {
 			my( $high, $low ) = @values;
 
 			my $b = Math::BigInt->new($high)->blsft(32)->bior($low);
-			if( $b->bcmp(Math::BigInt->new(2)->bpow(63)) > 0) {
+			if( $b->bcmp(Math::BigInt->new(2)->bpow(63)) >= 0) {
 				$b -= Math::BigInt->new(2)->bpow(64);
 				}
 
@@ -227,7 +227,7 @@ my $type_readers = {
 				->blsft(32)->bior($high)
 				->blsft(32)->bior($low);
 
-			if( $b->bcmp(Math::BigInt->new(2)->bpow(127)) > 0) {
+			if( $b->bcmp(Math::BigInt->new(2)->bpow(127)) >= 0) {
 				$b -= Math::BigInt->new(2)->bpow(128);
 				}
 
@@ -410,7 +410,7 @@ Tom Wyant added support for UID types.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2004-2024, brian d foy <briandfoy@pobox.com>. All rights reserved.
+Copyright © 2004-2025, brian d foy <briandfoy@pobox.com>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the Artistic License 2.0.

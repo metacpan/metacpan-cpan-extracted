@@ -22,7 +22,7 @@ use File::Glob;
 use Hash::Util qw( lock_hashref unlock_hashref lock_ref_keys );
 use Fcntl qw( :flock );
 
-our $VERSION = '1.46';
+our $VERSION = '1.47';
 
 our @ISA    = qw( Exporter );
 our @EXPORT = qw(
@@ -42,6 +42,7 @@ our @EXPORT = qw(
               file_text_append
               file_text_load
               file_text_load_ar
+              file_text_load_first_line
 
               cmd_read_from
               cmd_write_to
@@ -118,6 +119,8 @@ our @EXPORT = qw(
               str_hms_to_secs
               
               str_password_strength
+              
+              str_capitalize
 
               perl_package_to_file
 
@@ -130,6 +133,7 @@ our @EXPORT = qw(
               sha1_hex_file
               
               create_random_id
+              create_random_binary
               
               glob_tree
               read_dir_entries
@@ -143,6 +147,7 @@ our @EXPORT = qw(
                   FFT_SYMD
                   
                   FFT_FOLLOW
+                  FFT_DEBUG
 
                   FFT_ALL
                   FFT_ALL4
@@ -304,12 +309,13 @@ sub file_bin_save
 sub file_text_load
 {
   my $fn  = shift; # file name
+  my $opt = shift;
 
   my $i;
   my $enc = ":encoding($TEXT_IO_ENCODING)" if $TEXT_IO_ENCODING;
   open( $i, "<$enc", $fn ) or return undef;
   binmode( $i ) unless $TEXT_IO_ENCODING;
-  local $/ = undef;
+  local $/ = undef unless $opt->{ 'FIRST_LINE_ONLY' };
   my $s = <$i>;
   close $i;
   return $s;
@@ -326,6 +332,11 @@ sub file_text_load_ar
   my @a = <$i>;
   close $i;
   return \@a;
+}
+
+sub file_text_load_first_line
+{
+  return file_text_load( shift(), { 'FIRST_LINE_ONLY' => 1 } );
 }
 
 sub file_text_save
@@ -549,7 +560,8 @@ sub str_url_escape
 {
   my $text = shift;
   
-  $text =~ s/([^ -\$\&-<>-~])/$URL_ESCAPES{$1}/gs;
+#  $text =~ s/([^ -\$\&-<>-~])/$URL_ESCAPES{$1}/gs;
+  $text =~ s/([^A-Za-z_0-9])/$URL_ESCAPES{$1}/gs; # strict
   return $text;
 }
 
@@ -737,6 +749,14 @@ sub str_password_strength
   
   return $res;
 }
+
+##############################################################################
+# takes one SCALAR, returns first letter in upper case and lower case the rest
+
+sub str_capitalize
+{
+  return uc( substr( $_[0], 0, 1 ) ) . lc( substr( $_[0], 1 ) );
+}  
 
 ##############################################################################
 
@@ -1171,6 +1191,15 @@ sub create_random_id
   return $id;
 };
 
+sub create_random_binary
+{
+  my $len = shift();
+
+  my $bin;
+  $bin .= chr( int rand( 256 ) ) for ( 1 .. $len );
+  return $bin;
+};
+
 ##############################################################################
 
 sub __glob_tree_tree_walk
@@ -1227,17 +1256,22 @@ use constant
     FFT_SYMD   => 0x08, # allow symlink dirs in result  (requires FFT_DIRS )
     
     FFT_FOLLOW => 0x10,
+    FFT_DEBUG  => 0x80,
 
     FFT_ALL    => 0x01 | 0x02,
+    FFT_ALLF   => 0x01 | 0x04,
+    FFT_ALLD   => 0x02 | 0x08,
     FFT_ALL4   => 0x01 | 0x02 | 0x04 | 0x08,
     FFT_FULL   => 0x01 | 0x02 | 0x04 | 0x08 | 0x10,
 };
 
 sub __fftwalk
 {
-  my $e  = shift;
-  my $a  = shift;
+  my $e  = shift; # directory entry to traverse
+  my $a  = shift; # results array ref
   my $ty = shift; # typemap, see FFTs above
+
+  print "debug: __fftwalk [$e]\n" if $ty & FFT_DEBUG;
   
   opendir( my $dir, $e ) or return undef;
   my $ee;
@@ -1263,8 +1297,13 @@ sub __fftwalk
 }
 
 # fast file tree walk
-# first argument traversal typemap scalar or hash with options
-# rest of arguments are directory names to be walked
+# * first argument is traversal typemap scalar or hash with options
+# * rest of arguments are directory names to be walked
+#
+# examples:
+#   my $res_arrref = fftwalk( FFT_FILES | FFT_SYMF, 'go', 'now/' );
+#   fftwalk( { TYPE => FFT_FULL, ARRAY => \@res_arr }, 'go', 'now/' );
+# 
 # options hash can have:
 #   TYPE  => typemap
 # this option tells which types of filesystem entries to be processed:
@@ -1273,12 +1312,14 @@ sub __fftwalk
 #   FFT_SYMF   -- add found file symlinks (needs FFT_FILES)
 #   FFT_SYMD   -- add found dir  symlinks (needs FFT_DIRS )
 #   FFT_FOLLOW -- follow/traverse symlink dirs
-# there are few shortcut options:
+# there are few shortcut options (those above, combined):
 #   FFT_ALL    -- all files and dirs but no symlinks
+#   FFT_ALLF   -- all files and file symlinks
+#   FFT_ALLD   -- all dirs  and  dir symlinks
 #   FFT_ALL4   -- all files and dirs including symlinks
 #   FFT_FULL   -- all files, dirs, symlinks and follow symlink dirs
 # if TYPE is zero, fftwalk will not do anything
-#   ARRAY => hashref_for_result_list
+#   ARRAY => hashref_to_append_result_list
 
 sub fftwalk
 {
@@ -1297,12 +1338,12 @@ sub fftwalk
   
   die "fftwalk() uses TYPE instead of MODE" if $opt->{ 'MODE' };
 
-  my $e = $opt->{ 'ARRAY' } ? $opt->{ 'ARRAY' } : [];
+  my $a = $opt->{ 'ARRAY' } ? $opt->{ 'ARRAY' } : [];
 
-  return $e unless $ty > 0; # do nothing if TYPE is zero
+  return $a unless $ty > 0; # do nothing if TYPE is zero
 
-  __fftwalk( $_, $e, $ty ) for @_;
-  return $e;
+  __fftwalk( $_, $a, $ty ) for @_;
+  return $a;
 }
 
 ##############################################################################

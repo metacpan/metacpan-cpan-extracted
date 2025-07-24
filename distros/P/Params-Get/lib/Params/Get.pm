@@ -16,11 +16,11 @@ Params::Get - Get the parameters to a subroutine in any way you want
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =cut
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 =head1 SYNOPSIS
 
@@ -88,14 +88,21 @@ Some people like this sort of model, which is also supported.
 
 sub get_params
 {
-	my $default = shift;
-
 	# Directly return hash reference if the only parameter is a hash reference
 	return $_[0] if((scalar(@_) == 1) && (ref($_[0]) eq 'HASH'));	# Note - doesn't check if "default" was given
+
+	my $default = shift;
 
 	my $args;
 	my $array_ref;
 	if((scalar(@_) == 1) && (ref($_[0]) eq 'ARRAY')) {
+		if($default && (scalar(@{$_[0]}) == 2) && (@{$_[0]}[0] eq $default) && (!ref(@{$_[0]}[1]))) {
+			# in main:
+			#	routine('country' => 'US');
+			# in routine():
+			#	$params = Params::Get::get_params('country', \@);
+			return { $default => @{$_[0]}[1] };
+		}
 		$args = $_[0];
 		$array_ref = 1;
 	} else {

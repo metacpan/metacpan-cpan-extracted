@@ -7,14 +7,15 @@ use Getopt::Long qw(:config bundling no_ignore_case);
 use POSIX qw(ceil);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-12-28'; # DATE
+our $DATE = '2025-07-24'; # DATE
 our $DIST = 'App-freqtable'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 my $tmp_freq;
 my %Opts = (
     mode => 'line',
     ignore_case => 0,
+    print_total => 0,
     print_freq => 1,
     # XXX options to limit memory usage, e.g. max keys, max line length, --md5 (like in nauniq), ...
     min_freq => undef,
@@ -22,7 +23,12 @@ my %Opts = (
     sort_args => {},
     sort_sub => undef,
     percent => 0,
+    clear_before_output => 0,
+    output_every => undef,
 );
+my $Numeric;
+my %Occurences;
+my $Fmt;
 
 sub parse_cmdline {
     my $res = GetOptions(
@@ -35,11 +41,15 @@ sub parse_cmdline {
         'ignore-case|f' => \$Opts{ignore_case},
         'no-print-freq|F' => sub { $Opts{print_freq} = 0 },
         'print-freq'      => sub { $Opts{print_freq} = 1 },
+        'no-print-total|T' => sub { $Opts{print_total} = 0 },
+        'print-total|t'    => sub { $Opts{print_total} = 1 },
         'freq=s'    => \$tmp_freq,
         'sort-sub=s' => \$Opts{sort_sub},
         'sort-arg=s%' => $Opts{sort_args},
         'a'   => sub { $Opts{sort_sub} = 'asciibetically' },
         'percent|p' => sub { $Opts{percent} = 1 },
+        'clear-before-output' => sub { $Opts{clear_before_output} = 1 },
+        'output-every=i' => \$Opts{output_every},
         'help|h'  => sub {
             print <<USAGE;
 Usage:
@@ -59,6 +69,8 @@ Options:
   --sort-arg=ARG=VAL
   -a
   --percent, -p
+  --output-every=i
+  --clear-before-output
 For more details, see the manpage/documentation.
 USAGE
             exit 0;
@@ -85,10 +97,59 @@ USAGE
     exit 99 if !$res;
 }
 
-sub run {
-    my %occurences;
-    my $numeric;
+sub _print_freqline {
+    my ($n, $k, $totoccurrences) = @_;
 
+    if ($Opts{print_freq}) {
+        if ($Opts{percent}) {
+            $n = $totoccurrences == 0 ? 0 : $n/$totoccurrences*100;
+            unless (defined $Fmt) {
+                $Fmt = "%5.2f%%\t%s\n";
+            }
+        } else {
+            unless (defined $Fmt) {
+                $Fmt = "%" . ceil(log($n)/log(10)) . "s\t%s\n";
+            }
+        }
+        printf $Fmt, $n, $k;
+    } else {
+        print $k, "\n";
+    }
+}
+
+sub _display_table {
+    my @keys = keys %Occurences;
+
+    my $totoccurrences = 0;
+    $totoccurrences += $Occurences{$_} for @keys;
+
+    if (defined $Opts{sort_sub}) {
+        require Sort::Sub;
+        my $sorter = Sort::Sub::get_sorter($Opts{sort_sub}, $Opts{sort_args});
+        @keys = sort $sorter @keys;
+    } else {
+        @keys = sort {
+        $Occurences{$b} <=> $Occurences{$a} ||
+            ($Numeric ? $a <=> $b : $a cmp $b)
+        } @keys;
+    }
+
+    print "\033[2J" if $Opts{clear_before_output};
+
+    for my $k (@keys) {
+        my $n = $Occurences{$k};
+        next if defined $Opts{min_freq} && $n < $Opts{min_freq};
+        next if defined $Opts{max_freq} && $n > $Opts{max_freq};
+        _print_freqline($n, $k, $totoccurrences);
+    }
+
+    _print_freqline($totoccurrences, "TOTAL", $totoccurrences) if $Opts{print_total};
+}
+
+sub run {
+    $|++ if $Opts{output_every};
+
+    my $i = 0;
     if ($Opts{mode} eq 'byte' || $Opts{mode} eq 'char') {
         @ARGV = (\*STDIN) unless @ARGV;
         for my $fn (@ARGV) {
@@ -110,11 +171,13 @@ sub run {
                 read $fh, my $block, 4096;
                 last if !length $block;
                 for (split //, $block) {
+                    $i++;
                     if ($Opts{ignore_case}) {
-                        $occurences{lc $_}++;
+                        $Occurences{lc $_}++;
                     } else {
-                        $occurences{$_}++;
+                        $Occurences{$_}++;
                     }
+                    _display_table() if $Opts{output_every} && $i % $Opts{output_every} == 0;
                 }
             }
         } # fn
@@ -122,70 +185,39 @@ sub run {
         while (defined(my $line = <>)) {
             chomp $line;
             while ($line =~ /(\w+)/g) {
+                $i++;
                 if ($Opts{ignore_case}) {
-                    $occurences{lc $1}++;
+                    $Occurences{lc $1}++;
                 } else {
-                    $occurences{$1}++;
+                    $Occurences{$1}++;
                 }
+                _display_table() if $Opts{output_every} && $i % $Opts{output_every} == 0;
             }
         }
     } elsif ($Opts{mode} eq 'line') {
         while (defined(my $line = <>)) {
+            $i++;
             chomp $line;
             if ($Opts{ignore_case}) {
-                $occurences{lc $line}++;
+                $Occurences{lc $line}++;
             } else {
-                $occurences{$line}++;
+                $Occurences{$line}++;
             }
+            _display_table() if $Opts{output_every} && $i % $Opts{output_every} == 0;
         }
     } elsif ($Opts{mode} eq 'number' || $Opts{mode} eq 'integer') {
-        $numeric++;
+        $Numeric++;
         while (defined(my $line = <>)) {
+            $i++;
             my $num = $Opts{mode} eq 'integer' ? int($line) : $line + 0;
-            $occurences{$num}++;
+            $Occurences{$num}++;
+            _display_table() if $Opts{output_every} && $i % $Opts{output_every} == 0;
         }
     } else {
         die "freqtable: BUG: Unknown mode '$Opts{mode}'";
     }
 
-    my $fmt;
-    my @keys = keys %occurences;
-    my $totoccurrences = 0;
-    $totoccurrences += $occurences{$_} for @keys;
-
-    if (defined $Opts{sort_sub}) {
-        require Sort::Sub;
-        my $sorter = Sort::Sub::get_sorter($Opts{sort_sub}, $Opts{sort_args});
-        @keys = sort $sorter @keys;
-    } else {
-        @keys = sort {
-        $occurences{$b} <=> $occurences{$a} ||
-            ($numeric ? $a <=> $b : $a cmp $b)
-        } @keys;
-    }
-
-    my $sum;
-
-    for my $k (@keys) {
-        my $n = $occurences{$k};
-        next if defined $Opts{min_freq} && $n < $Opts{min_freq};
-        next if defined $Opts{max_freq} && $n > $Opts{max_freq};
-        if ($Opts{print_freq}) {
-            if ($Opts{percent}) {
-                $n = $totoccurrences == 0 ? 0 : $n/$totoccurrences*100;
-                unless (defined $fmt) {
-                    $fmt = "%5.2s%%\t%s\n";
-                }
-            } else {
-                unless (defined $fmt) {
-                    $fmt = "%" . ceil(log($n)/log(10)) . "s\t%s\n";
-                }
-            }
-            printf $fmt, $n, $k;
-        } else {
-            print $k, "\n";
-        }
-    }
+    _display_table();
 }
 
 # MAIN
@@ -209,7 +241,7 @@ freqtable - Print frequency table of lines/words/characters/bytes/numbers
 
 =head1 VERSION
 
-This document describes version 0.008 of freqtable (from Perl distribution App-freqtable), released on 2023-12-28.
+This document describes version 0.009 of freqtable (from Perl distribution App-freqtable), released on 2025-07-24.
 
 =head1 SYNOPSIS
 
@@ -443,6 +475,14 @@ will be regarded as:
 
 Will not print the frequencies.
 
+=item * --print-total, -t
+
+Print the total line at the bottom.
+
+=item * --no-print-total, -T
+
+Do not print the total line at the bottom (the default).
+
 =item * --freq=s
 
 Filter by frequencies. C<N> (e.g. --freq 5) means only display items that occur
@@ -480,6 +520,16 @@ Shortcut for C<--sort=asciibetically>.
 =item * --percent, -p
 
 Show frequencies as percentages.
+
+=item * --output-every=i
+
+If set, then after every specified number of input data
+(bytes/characters/words/lines), will output the "running" (current) frequency
+table.
+
+=item * --clear-before-output
+
+Emit ANSI escape codes "\033[2J" before each output to clear the screen.
 
 =back
 
@@ -525,7 +575,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2022, 2018 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

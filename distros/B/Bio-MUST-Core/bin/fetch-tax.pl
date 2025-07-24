@@ -175,7 +175,7 @@ fetch-tax.pl - Fetch (and format) information from the NCBI Taxonomy database
 
 =head1 VERSION
 
-version 0.251810
+version 0.252040
 
 =head1 USAGE
 
@@ -305,11 +305,11 @@ Only taxa corresponding to specified levels will be conserved; others will be
 pruned out. Taxon order will follow the input level order. Beware that invalid
 or missing levels will result in undef values at the corresponding slots.
 
-Valid levels are: superkingdom, kingdom, subkingdom, superphylum, phylum,
-subphylum, superclass, class, subclass, infraclass, superorder, order,
-suborder, infraorder, parvorder, superfamily, family, subfamily, tribe,
-subtribe, genus, subgenus, 'species group', 'species subgroup', species,
-subspecies, varietas, forma.
+Valid levels include: domain (or realm for viruses), kingdom, subkingdom,
+superphylum, phylum, subphylum, superclass, class, subclass, infraclass,
+superorder, order, suborder, infraorder, parvorder, superfamily, family,
+subfamily, tribe, subtribe, genus, subgenus, 'species group', 'species
+subgroup', species, subspecies, varietas, forma.
 
 Levels can also be specified as numbers but this only makes sense for the
 highest levels in the hierarchy (i.e., 3 to 5).

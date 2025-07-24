@@ -65,12 +65,13 @@ my %WriteMakefile = (
 		},
 
 	'PREREQ_PM'     => {
-		'Math::BigInt'  => '0',
-		'MIME::Base64'  => '0',
-		'Time::Local'   => '0',
-		'Scalar::Util'  => '1.11',
-		'XML::Entities' => '0',
-		'parent'        => '0',
+		'HTML::Entities' => '0',
+		'Math::BigInt'   => '0',
+		'MIME::Base64'   => '0',
+		'parent'         => '0',
+		'Scalar::Util'   => '1.11',
+		'Time::Local'    => '0',
+		'XML::Entities'  => '0',
 		},
 
 	'META_MERGE' => {

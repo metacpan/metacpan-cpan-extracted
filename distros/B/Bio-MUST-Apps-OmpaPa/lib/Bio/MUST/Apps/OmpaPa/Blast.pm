@@ -1,7 +1,7 @@
 package Bio::MUST::Apps::OmpaPa::Blast;
 # ABSTRACT: internal class for XML BLAST parser
 # CONTRIBUTOR: Amandine BERTRAND <amandine.bertrand@doct.uliege.be>
-$Bio::MUST::Apps::OmpaPa::Blast::VERSION = '0.251770';
+$Bio::MUST::Apps::OmpaPa::Blast::VERSION = '0.252040';
 use Moose;
 use namespace::autoclean;
 
@@ -9,6 +9,8 @@ use autodie;
 use feature qw(say);
 
 use Smart::Comments;
+
+use Carp;
 
 extends 'Bio::FastParsers::Blast::Xml';
 with 'Bio::MUST::Apps::OmpaPa::Roles::Parsable';
@@ -22,7 +24,15 @@ sub collect_hits {
     # parse BLAST report
     my $iter = $self->blast_output->next_iteration;
     my $qlen = $iter->query_len;
+
+    HIT:
     while (my $hit = $iter->next_hit) {
+
+        # honor --max-hits limit
+        if (@hits >= $self->max_hits) {
+            carp 'Reached --max-hits limit; truncating report!';
+            last HIT;
+        }
 
         # split hit desc on Ctrl-A and keep only first line (nr database)
         # this is needed for table formatting as Ctrl-A has zero-width
@@ -31,13 +41,14 @@ sub collect_hits {
 
         # collect useful hit/HSP attributes
         push @hits, {
-            'acc'       => $hit->id,
+            'acc'       => ( $hit->id =~ m/^gnl\|/xms ? $hit->def : $hit->id ),
+                        # workaround to accommodate change in BLAST XML report
             'dsc'       => $desc,
             'exp'       => $hsp->evalue,
             'bit'       => $hsp->bit_score,
-            'qlen'      => $qlen,               # TODO: improve this
-            'len'       => $hit->len,           # only available in XML format
-            'hmm_from'  => $hsp->query_start,   # hmm to have the same annotation than hmmer
+            'qlen'      => $qlen,
+            'len'       => $hit->len,
+            'hmm_from'  => $hsp->query_start,       # for consistent naming
             'hmm_to'    => $hsp->query_end,
         };
     }
@@ -58,7 +69,7 @@ Bio::MUST::Apps::OmpaPa::Blast - internal class for XML BLAST parser
 
 =head1 VERSION
 
-version 0.251770
+version 0.252040
 
 =head1 SYNOPSIS
 

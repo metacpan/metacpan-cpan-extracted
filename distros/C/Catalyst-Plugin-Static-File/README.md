@@ -4,7 +4,7 @@ Catalyst::Plugin::Static::File - Serve a specific static file
 
 # VERSION
 
-version v0.2.3
+version v0.2.4
 
 # SYNOPSIS
 
@@ -32,7 +32,7 @@ Unlike [Catalyst::Plugin::Static::Simple](https://metacpan.org/pod/Catalyst%3A%3
 serve multiple files.
 - It assumes that you know what you're doing. If the file does not exist, it will throw an fatal error.
 - It uses [Plack::MIME](https://metacpan.org/pod/Plack%3A%3AMIME) to identify the content type, but you can override that.
-- It adds a file path to the file handle, plays nicely with [Plack::Middleware::XSendfile](https://metacpan.org/pod/Plack%3A%3AMiddleware%3A%3AXSendfile) and [Plack::Middleware::ETag](https://metacpan.org/pod/Plack%3A%3AMiddleware%3A%3AETag).
+- It adds a file path to the file handle, and plays nicely with [Plack::Middleware::XSendfile](https://metacpan.org/pod/Plack%3A%3AMiddleware%3A%3AXSendfile) and [Plack::Middleware::ETag](https://metacpan.org/pod/Plack%3A%3AMiddleware%3A%3AETag).
 - It does not log anything.
 
 # METHODS
@@ -53,18 +53,12 @@ It returns a true value on success.
 
 If you want to use conditional requests, use [Plack::Middleware::ConditionalGET](https://metacpan.org/pod/Plack%3A%3AMiddleware%3A%3AConditionalGET).
 
-# SECURITY
+# SECURITY CONSIDERATIONS
 
 The [serve\_static\_file](https://metacpan.org/pod/serve_static_file) method does not validate the file that is passed to it.
 
 You should ensure that arbitrary filenames are not passed to it. You should strictly validate any external data that is
 used for generating the filename.
-
-# SUPPORT FOR OLDER PERL VERSIONS
-
-This module requires Perl v5.14 or later.
-
-Future releases may only support Perl versions released in the last ten years.
 
 # SEE ALSO
 
@@ -77,7 +71,16 @@ Future releases may only support Perl versions released in the last ten years.
 The development version is on github at [https://github.com/robrwo/Catalyst-Plugin-Static-File](https://github.com/robrwo/Catalyst-Plugin-Static-File)
 and may be cloned from [git://github.com/robrwo/Catalyst-Plugin-Static-File.git](git://github.com/robrwo/Catalyst-Plugin-Static-File.git)
 
-# BUGS
+# SUPPORT
+
+Only the latest version of this module will be supported.
+
+This module requires Perl v5.14 or later.  Future releases may only support Perl versions released in the last ten
+years.
+
+This module requires Catalyst v5.90129 or later.
+
+## Bugs
 
 Please report any bugs or feature requests on the bugtracker website
 [https://github.com/robrwo/Catalyst-Plugin-Static-File/issues](https://github.com/robrwo/Catalyst-Plugin-Static-File/issues)
@@ -97,7 +100,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2023-2024 by Robert Rothenberg.
+This software is Copyright (c) 2023-2025 by Robert Rothenberg.
 
 This is free software, licensed under:
 

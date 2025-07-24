@@ -75,9 +75,9 @@ my @valid_ids = (
 
     # viruses
     [ 'HIV-1 M:C_505006@210038491',     # Note the unusual names of viruses
-        'Viruses; Riboviria; Pararnavirae; Artverviricota; Revtraviricetes; Ortervirales; Retroviridae; Orthoretrovirinae; Lentivirus; Human immunodeficiency virus 1; HIV-1 group M; HIV-1 M:C; HIV-1 M:C U2226',
-        'Viruses; Riboviria; Pararnavirae; Artverviricota; Revtraviricetes; Ortervirales; Retroviridae; Orthoretrovirinae; Lentivirus; Human immunodeficiency virus 1; HIV-1 group M; HIV-1 M:C',
-       ('Viruses; Riboviria; Pararnavirae; Artverviricota; Revtraviricetes; Ortervirales; Retroviridae; Orthoretrovirinae; Lentivirus; Human immunodeficiency virus 1; HIV-1 group M; HIV-1 M:C; HIV-1 M:C U2226') x 3,
+        'Viruses; Riboviria; Pararnavirae; Artverviricota; Revtraviricetes; Ortervirales; Retroviridae; Orthoretrovirinae; unclassified Orthoretrovirinae; Lentivirus; Lentivirus humimdef1; Human immunodeficiency virus 1; HIV-1 group M; HIV-1 M:C; HIV-1 M:C U2226',
+        'Viruses; Riboviria; Pararnavirae; Artverviricota; Revtraviricetes; Ortervirales; Retroviridae; Orthoretrovirinae; unclassified Orthoretrovirinae; Lentivirus; Lentivirus humimdef1; Human immunodeficiency virus 1; HIV-1 group M; HIV-1 M:C',
+       ('Viruses; Riboviria; Pararnavirae; Artverviricota; Revtraviricetes; Ortervirales; Retroviridae; Orthoretrovirinae; unclassified Orthoretrovirinae; Lentivirus; Lentivirus humimdef1; Human immunodeficiency virus 1; HIV-1 group M; HIV-1 M:C; HIV-1 M:C U2226') x 3,
         q{'HIV-1 M:C U2226'},
         q{'HIV-1 M:C U2226 [210038491]'} ],
 
@@ -97,9 +97,9 @@ my @valid_ids = (
         q{'Acholeplasma laidlawii PG-8A'},
         q{'Acholeplasma laidlawii PG-8A [162448101]'} ],
     [ 'Curvibacter putative_667019@260221396',
-        'cellular organisms; Bacteria; Pseudomonadati; Pseudomonadota; Betaproteobacteria; Burkholderiales; Comamonadaceae; Curvibacter; Curvibacter putative symbiont of Hydra magnipapillata',
+        'cellular organisms; Bacteria; Pseudomonadati; Pseudomonadota; Betaproteobacteria; Burkholderiales; Comamonadaceae; Curvibacter; unclassified Curvibacter; Curvibacter putative symbiont of Hydra magnipapillata',
         '',         # Note the unusual 'organism' name
-       ('cellular organisms; Bacteria; Pseudomonadati; Pseudomonadota; Betaproteobacteria; Burkholderiales; Comamonadaceae; Curvibacter; Curvibacter putative symbiont of Hydra magnipapillata') x 3,
+       ('cellular organisms; Bacteria; Pseudomonadati; Pseudomonadota; Betaproteobacteria; Burkholderiales; Comamonadaceae; Curvibacter; unclassified Curvibacter; Curvibacter putative symbiont of Hydra magnipapillata') x 3,
         q{'Curvibacter putative symbiont of Hydra magnipapillata'},
         q{'Curvibacter putative symbiont of Hydra magnipapillata [260221396]'} ],
     [ 'Desulfotomaculum gibsoniae_767817@357041591',
@@ -402,8 +402,10 @@ my @dupe_tests = (
     # short lineages
     [ 'mixed libraries', 'unclassified entries; unclassified sequences; mixed libraries', 704107,
         [ qw(undef undef undef undef undef undef undef undef) ] ],
-    [ 'environmental samples', 'Viruses; environmental samples', 186616,
-        [ qw(Viruses undef undef undef undef undef undef undef) ] ],
+#     [ 'environmental samples', 'Viruses; environmental samples', 186616,      # requires realm and not domain
+#         [ qw(Viruses undef undef undef undef undef undef undef) ] ],
+    [ 'environmental samples', 'cellular organisms; Bacteria; environmental samples', 48479,
+        [ qw(Bacteria undef undef undef undef undef undef undef) ] ],
 
     # names impossible to disambiguate due to completely identical lineage
     [ 'Frankia', 'cellular organisms; Bacteria; Terrabacteria group; Actinomycetota; Actinomycetes; Frankiales; Frankiaceae; Frankia; unclassified Frankia; Frankia sp. NRRL B-16315', 683320,
@@ -411,7 +413,7 @@ my @dupe_tests = (
 );
 
 {
-    my @ranks = qw(superkingdom kingdom phylum class order family genus species);
+    my @ranks = qw(domain kingdom phylum class order family genus species);
 
     for my $dupe_test (@dupe_tests) {
         my ($taxon, $lineage, $exp_taxon_id, $exp_taxa) = @{$dupe_test};
@@ -642,15 +644,39 @@ SKIP: {
     is_deeply [ $classifier->all_labels ], \@exp_labels,
         'got expected label list for classifier';
 
+    my @cat_ids;
+
     # classify Ali files
     my @exp_cats = ('strict', ('loose') x 5);
     for my $num ( qw(392 590 593 618 639 649) ) {
         my $alifile = file('test', "GNTPAN19$num.ali");
         my $ali = Bio::MUST::Core::Ali->load($alifile);
+        push @cat_ids, $ali->all_seq_ids;
         my $got_cat = $classifier->classify($ali) // q{undef};
         cmp_ok $got_cat, 'eq', shift @exp_cats,
             "rightly classified $alifile as $got_cat";
     }
+
+    # build single list from all Ali files to get several seqs per org
+    my $list = Bio::MUST::Core::IdList->new(ids => \@cat_ids);
+
+    # read configuration file
+    my $cfgfile_perc = file('test', 'classifier-perc.yaml');
+    my $config_perc = Config::Any->load_files( {
+        files           => [ $cfgfile_perc->stringify ],
+        flatten_to_hash => 1,
+        use_ext         => 1,
+    } );
+    explain $config_perc->{$cfgfile_perc};
+
+    # build percent-oriented classifier
+    my $class_perc = $tax->tax_classifier( $config_perc->{$cfgfile_perc} );
+
+    # classify list
+    my $exp_cat_perc = 'dom-mamm';
+    my $got_cat_perc = $class_perc->classify($list) // q{undef};
+    cmp_ok $got_cat_perc, 'eq', $exp_cat_perc,
+        "rightly classified list as $got_cat_perc";
 }
 
 {

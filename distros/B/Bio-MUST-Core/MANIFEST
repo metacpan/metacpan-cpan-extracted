@@ -175,6 +175,7 @@ test/bmge_strict.fasta
 test/cbs.ali
 test/cbs.fasta
 test/cbs.stockholm
+test/classifier-perc.yaml
 test/classifier-simple.idl
 test/classifier-zero.yaml
 test/classifier.yaml

@@ -21,7 +21,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.014000",
   "NAME" => "Catalyst::Plugin::Static::File",
   "PREREQ_PM" => {
-    "Catalyst" => 5,
+    "Catalyst" => "5.90129",
     "File::Spec" => 0,
     "File::stat" => 0,
     "IO::File" => 0,
@@ -32,7 +32,7 @@ my %WriteMakefileArgs = (
     "namespace::autoclean" => 0
   },
   "TEST_REQUIRES" => {
-    "Catalyst" => 5,
+    "Catalyst" => "5.90129",
     "Catalyst::Controller" => 0,
     "Catalyst::Test" => 0,
     "File::Spec" => 0,
@@ -54,7 +54,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "v0.2.3",
+  "VERSION" => "v0.2.4",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -62,7 +62,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Catalyst" => 5,
+  "Catalyst" => "5.90129",
   "Catalyst::Controller" => 0,
   "Catalyst::Test" => 0,
   "ExtUtils::MakeMaker" => "7.22",

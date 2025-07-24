@@ -93,7 +93,7 @@ split-rates-ali.pl - Split ALI files into subsets of sites based on site-wise st
 
 =head1 VERSION
 
-version 0.251810
+version 0.252040
 
 =head1 USAGE
 

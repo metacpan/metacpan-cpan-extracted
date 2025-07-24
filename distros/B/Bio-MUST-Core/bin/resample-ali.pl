@@ -66,7 +66,7 @@ resample-ali.pl - Resample ALI files using (variable length) bootstrap or jackkn
 
 =head1 VERSION
 
-version 0.251810
+version 0.252040
 
 =head1 USAGE
 

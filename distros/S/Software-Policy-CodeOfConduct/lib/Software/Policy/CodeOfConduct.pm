@@ -16,7 +16,13 @@ use experimental qw( lexical_subs signatures );
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.3.0';
+our $VERSION = 'v0.3.1';
+
+
+has policy => (
+    is      => 'ro',
+    default => 'Contributor_Covenant_1.4',
+);
 
 
 has name => (
@@ -46,12 +52,6 @@ has Entity => (
     builder => sub($self) {
         return ucfirst( $self->entity );
     },
-);
-
-
-has policy => (
-    is      => 'ro',
-    default => 'Contributor_Covenant_1.4',
 );
 
 
@@ -123,8 +123,9 @@ has filename => (
     default => 'CODE_OF_CONDUCT.md',
 );
 
-
 sub save($self, $dir = undef) {
+
+
     my $path = path( $dir // cwd, $self->filename );
     $path->spew_raw( $self->text );
     return $path;
@@ -145,15 +146,15 @@ Software::Policy::CodeOfConduct - generate a Code of Conduct policy
 
 =head1 VERSION
 
-version v0.3.0
+version v0.3.1
 
 =head1 SYNOPSIS
 
     my $policy = Software::Policy::CodeOfConduct->new(
+        policy   => 'Contributor_Covenant_1.4',
         name     => 'Foo',
         contact  => 'team-foo@example.com',
-        policy   => 'Contributor_Covenant_1.4',
-        filename => 'CODE-OF-CONDUCT.md',
+        filename => 'CODE_OF_CONDUCT.md',
     );
 
     $policy->save($dir); # create CODE-OF-CONDUCT.md in $dir
@@ -163,6 +164,31 @@ version v0.3.0
 This distribution generates code of conduct policies from a template.
 
 =head1 ATTRIBUTES
+
+=head2 policy
+
+This is the policy filename without the extension. It defaults to "Contributor_Covenant_1.4"
+.
+
+Available policies include
+
+=over
+
+=item *
+
+L<Contributor_Covenant_1.4|https://www.contributor-covenant.org/version/1/4/code-of-conduct.html>
+
+=item *
+
+L<Contributor_Covenant_2.0|https://www.contributor-covenant.org/version/2/0/code-of-conduct.html>
+
+=item *
+
+L<Contributor_Covenant_2.1|https://www.contributor-covenant.org/version/2/1/code-of-conduct.html>
+
+=back
+
+If you want to use a custom policy, specify the L</template_path>.
 
 =head2 name
 
@@ -186,28 +212,11 @@ A generating name for the project. It defaults to "project" but the original tem
 
 A sentence-case (ucfirst) form of L</entity>.
 
-=head2 policy
-
-This is the policy filename. It defaults to "Contributor_Covenant_1.4" which is based on
-L<https://www.contributor-covenant.org/version/1/4/code-of-conduct.html>.
-
-Available policies include
-
-=over
-
-=item "Contributor_Covenant_1.4"
-
-=item "Contributor_Covenant_2.0"
-
-=item "Contributor_Covenant_2.1"
-
-=back
-
 =head2 template_path
 
 This is the path to the template file. If omitted, it will assume it is an included file from L</policy>.
 
-This should be a L<Text::Template> file.
+This should be a L<Text::Template> template file.
 
 =head2 text_columns
 
@@ -247,7 +256,7 @@ Only the latest version of this module will be supported.
 This module requires Perl v5.20 or later.  Future releases may only support Perl versions released in the last ten
 years.
 
-=head2 Reporting Bugs
+=head2 Reporting Bugs and Submitting Feature Requests
 
 Please report any bugs or feature requests on the bugtracker website
 L<https://github.com/robrwo/perl-Software-Policy-CodeOfConduct/issues>

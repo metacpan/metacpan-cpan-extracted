@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Perl Wiki Tree</title>
+    <meta http-equiv = 'Content-Type'	content = 'text/html; charset=utf-8'>
+	<meta name = 'language'				content = 'en-au'>
+	<meta property = 'og:url'			content = 'http://!domain_name!/misc/!page_name!'>
+	<meta property = 'og:type'			content = 'website'>
+	<meta property = 'og:title	'		content = 'CPAN::MetaCurator'>
+	<meta property = 'og:description'	content = 'CPAN::MetaCurator'>
+	<meta property = 'og:image'			content = '/assets/images/local/rons.logo.png'>
+	<link rel = 'stylesheet'			type = 'text/css' href = '/assets/css/local/default.css'>
+	<link rel = 'stylesheet'			type = 'text/css' href = '/assets/css/datatables.min.css'>
+	<link rel = 'stylesheet'			type = 'text/css' href = '/assets/css/dist/themes/default/style.min.css'>
+	<script src = '/assets/js/jquery-3.7.1.min.js'></script>
+	<script src = '/assets/js/jstree.min.js'></script>
+  </head>
+  <body>
+	<a id = 'top'></a>
+<div>
+	<span><img src = '!logo_path!' width = '120' height = '120' alt = 'Logo for page: index'></span>
+	<span class = 'page_title'>Perl.Wiki morphs into a jsTree...</span>
+</div>
+<br>
+<div>
+	Perl module: !module!
+</div>
+<div>
+	V !version!. !time!
+</div>
+<div>
+	<a href = 'http://savage.net.au/'>My home page, for downloading Perl.Wiki.html</a>
+</div>
+Notes:
+<ul>
+	<li>Nodes just under the root are called Topics. Paragraphs is the TiddlyWiki equivalent.</li>
+	<li>Tokens like [[XS]] indicate a TiddlyWiki paragraph name, not a Perl module or topic.</li>
+	<li>Almost all leaf node are links. Use a middle-button click to open the link in another tab.</li>
+	<li>Infomation in Perl.Wiki beyond the first 3 lines per entry is not yet transferred into the jsTree;</li>
+	<li>I will probably implement a mouse-over pop-up thingy for this extra info.</li>
+	<li>Next, see 'DataTraversal (topic)' under ArayHandling: I can't get the JS right so clicking the text would focus on node 'DataTraversal'.</li>
+	<li>See line 219 etc of Export.pm for the versions of code I tried.</li>
+	<li>Lastly, the code does not yet cleanly handle special cases. Eg: &lt;pre&gt; and &lt;/pre&gt; etc.</li>
+	<li>Topic count: !topic_count!. Leaf count: !leaf_count!.</li>
+</ul>
+<hr>

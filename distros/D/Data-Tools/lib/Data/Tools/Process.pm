@@ -15,7 +15,7 @@ use Exporter;
 use POSIX;
 use Data::Tools;
 
-our $VERSION = '1.45';
+our $VERSION = '1.47';
 
 our @ISA    = qw( Exporter );
 our @EXPORT = qw(

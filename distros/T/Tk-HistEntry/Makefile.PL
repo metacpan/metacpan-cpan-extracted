@@ -1,10 +1,23 @@
 # -*- perl -*-
 use ExtUtils::MakeMaker;
-# See lib/ExtUtils/MakeMaker.pm for details of how to influence
-# the contents of the Makefile that is written.
+
+my $is_devel_host = defined $ENV{USER} && $ENV{USER} eq 'eserte' && ($^O =~ /bsd/i || $ENV{PERL_RELEASE_READY}) && -f "../../perl.release.mk";
+my $eumm_recent_enough = $ExtUtils::MakeMaker::VERSION >= 6.54;
+
+if (!$eumm_recent_enough) {
+    *MY::dist_core = sub {
+	<<'EOF';
+dist :
+	$(NOECHO) $(ECHO) "Sorry, use a newer EUMM!"
+
+EOF
+    };
+}
+
 WriteMakefile(
     'NAME'	=> 'Tk::HistEntry',
     'VERSION_FROM' => 'HistEntry.pm', # finds $VERSION
+    'LICENSE'   => 'perl_5',
     'dist'      => {'POSTOP'=>'-$(CHMOD) 644 $(DISTVNAME).tar$(SUFFIX)'},
     'PREREQ_PM' => {
 		    'Tk' => 0,
@@ -15,8 +28,8 @@ WriteMakefile(
             ABSTRACT_FROM => 'HistEntry.pm',
             AUTHOR => 'Slaven Rezic <srezic@cpan.org>',
         ) : () ),
-    ($ExtUtils::MakeMaker::VERSION >= 6.54 ?
-      (META_ADD => { resources => { repository => 'git://github.com/eserte/tk-histentry.git' },
+    ($eumm_recent_enough
+      ? (META_ADD => { resources => { repository => 'git://github.com/eserte/tk-histentry.git' },
 		   }) : ()),
 );
 
@@ -28,8 +41,10 @@ demo :: pure_all
 
 EOF
 
-    if (defined $ENV{USER} && $ENV{USER} eq 'eserte' && $^O =~ /bsd/i && -f "../../perl.release.mk") {
+    if ($is_devel_host) {
 	$postamble .= <<'EOF';
+
+PERL_TEST_DISTRIBUTION_CHANGES=yes
 
 .include "../../perl.release.mk"
 .include "../../perl.git.mk"

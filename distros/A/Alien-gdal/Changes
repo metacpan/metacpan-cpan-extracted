@@ -1,5 +1,9 @@
 Revision history for Alien::gdal
 
+1.42 2025-07-25
+    - MacOS: Disable some dependencies for share builds under Homebrew.
+      These cause build failures.
+
 1.41 2025-07-04
     - No functional changes.  Only difference is that
       the release is packaged on Windows to avoid

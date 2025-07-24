@@ -1,1006 +1,1786 @@
 package Brannigan;
 
-# ABSTRACT: Comprehensive, flexible system for validating and parsing input, mainly targeted at web applications.
-
-our $VERSION = "1.100001";
-$VERSION = eval $VERSION;
+# ABSTRACT: Flexible library for validating and processing input.
 
 use warnings;
 use strict;
-use Brannigan::Tree;
+
+use Hash::Merge;
+
+our $VERSION = "2.1";
+$VERSION = eval $VERSION;
 
 =head1 NAME
 
-Brannigan - Comprehensive, flexible system for validating and parsing input, mainly targeted at web applications.
+Brannigan - Flexible library for validating and processing input.
 
 =head1 SYNOPSIS
 
-	use Brannigan;
+    use Brannigan;
 
-	my %scheme1 = ( name => 'scheme1', params => ... );
-	my %scheme2 = ( name => 'scheme2', params => ... );
-	my %scheme3 = ( name => 'scheme3', params => ... );
+    my %schema1 = ( params => ... );
+    my %schema2 = ( params => ... );
+    my %schema3 = ( params => ... );
 
-	# use the OO interface
-	my $b = Brannigan->new(\%scheme1, \%scheme2);
-	$b->add_scheme(\%scheme3);
+    # use the OO interface
+    my $b = Brannigan->new();
+    $b->register_schema('schema1', \%schema1);
+    $b->register_schema('schema2', \%schema2);
+    $b->register_schema('schema3', \%schema3);
 
-	my $parsed = $b->process('scheme1', \%params);
-	if ($parsed->{_rejects}) {
-		die $parsed->{_rejects};
-	} else {
-		return $parsed;
-	}
+    my $rejects = $b->process('schema1', \%params);
+    if ($rejects) {
+        die $rejects;
+    }
 
-	# Or use the functional interface
-	my $parsed = Brannigan::process(\%scheme1, \%params);
-	if ($parsed->{_rejects}) {
-		die $parsed->{_rejects};
-	} else {
-		return $parsed;
-	}
+    # %params is valid and ready for use.
 
-For a more comprehensive example, see L</"MANUAL"> in this document
-or the L<Brannigan::Examples> document.
+    # Or use the functional interface
+    my $rejects = Brannigan::process(\%schema1, \%params);
+    if ($rejects) {
+        die $rejects;
+    }
+
+For a more comprehensive example, see L</"MANUAL">.
 
 =head1 DESCRIPTION
 
-Brannigan is an attempt to ease the pain of collecting, validating and
-parsing input parameters in web applications. It's designed to answer both of
-the main problems that web applications face:
+Brannigan is an attempt to ease the pain of collecting, validating and processing
+input parameters in user-facing applications. It's designed to answer both of
+the main problems that such applications face:
 
 =over 2
 
-=item * Simple user input
+=item * Simple User Input
 
-Brannigan can validate and parse simple, "flat", user input, possibly
-coming from web forms.
+Brannigan can validate and process simple, "flat" user input, possibly coming
+from web forms.
 
-=item * Complex data structures
+=item * Complex Data Structures
 
-Brannigan can validate and parse complex data structures, possibly
-deserialized from JSON or XML data sent to web services and APIs.
+Brannigan can validate and process complex data structures, possibly deserialized
+from JSON or XML data sent to web services and APIs.
 
 =back
 
-Brannigan's approach to data validation is as follows: define a structure
-of parameters and their needed validations, and let the module automatically
-examine input parameters against this structure. Brannigan provides you
-with common validation methods that are used everywhere, and also allows
-you to create custom validations easily. This structure also defines how,
-if at all, the input should be parsed. This is akin to schema-based
-validations such as XSD, but much more functional, and most of all
-flexible.
+Brannigan's approach to data validation is as follows: define a schema of
+parameters and their validation rules, and let the module automatically examine
+input parameters against this structure. Brannigan provides you with common
+validators that are used everywhere, and also allows you to create custom
+validators easily. This structure also defines how, if at all, the input should
+be processed. This is akin to schema-based validations such as XSD, but much more
+functional, and most of all flexible.
 
-Check the next section for an example of such a structure. I call this
-structure a validation/parsing scheme. Schemes can inherit all the properties
-of other schemes, which allows you to be much more flexible in certain
-situations. Imagine you have a blogging application. A base scheme might
-define all validations and parsing needed to create a new blog post from
-a user's input. When editing a post, however, some parameters that were
-required when creating the post might not be required now (so you can
-just use older values), and maybe new parameters are introduced. Inheritance
-helps you avoid repeating yourself. You can another scheme which gets
-all the properties of the base scheme, only changing whatever it is needs
-changing (and possibly adding specific properties that don't exist in
-the base scheme).
+Check the next section for an example of such a schema. Schemas can extend other
+schemas, allowing you to be much more flexible in certain situations. Imagine you
+have a blogging application. A base schema might define all validations and
+processing needed in order to create a new blog post from user input. When
+editing a post, however, some parameters that were required when creating the
+post might not be required now, and maybe new parameters are introduced.
+Inheritance helps you avoid repeating yourself.
 
 =head1 MANUAL
 
-In the following manual, we will look at the following example. It is based
-on L<Catalyst>, but should be fairly understandable for non-Catalyst users.
-Do not be alarmed by the size of this, this is only because it displays
-basically every aspect of Brannigan.
+Let's look at a complete usage example. Do not be alarmed by the size of these
+schemas, as they showcases almost all features of Brannigan.
 
-This example uses L<Catalyst>, but should be pretty self explanatory. It's
-fairly complex, since it details pretty much all of the available Brannigan
-functionality, so don't be alarmed by the size of this thing.
+    package MyApp;
 
-	package MyApp::Controller::Post;
+    use strict;
+    use warnings;
+    use Brannigan;
 
-	use strict;
-	use warnings;
-	use Brannigan;
+    # Create a new Brannigan object
+    my $b = Brannigan->new({ handle_unknown => "ignore" });
 
-	# create a new Brannigan object with two validation/parsing schemes:
-	my $b = Brannigan->new({
-		name => 'post',
-		ignore_missing => 1,
-		params => {
-			subject => {
-				required => 1,
-				length_between => [3, 40],
-			},
-			text => {
-				required => 1,
-				min_length => 10,
-				validate => sub {
-					my $value = shift;
+    # Create a custom 'forbid_words' validator that can be used in any schema.
+    $b->register_validator('forbid_words', sub {
+        my $value = shift;
 
-					return undef unless $value;
-					
-					return $value =~ m/^lorem ipsum/ ? 1 : undef;
-				}
-			},
-			day => {
-				required => 0,
-				integer => 1,
-				value_between => [1, 31],
-			},
-			mon => {
-				required => 0,
-				integer => 1,
-				value_between => [1, 12],
-			},
-			year => {
-				required => 0,
-				integer => 1,
-				value_between => [1900, 2900],
-			},
-			section => {
-				required => 1,
-				integer => 1,
-				value_between => [1, 3],
-				parse => sub {
-					my $val = shift;
-					
-					my $ret = $val == 1 ? 'reviews' :
-						  $val == 2 ? 'receips' :
-						  'general';
-						  
-					return { section => $ret };
-				},
-			},
-			id => {
-				required => 1,
-				exact_length => 10,
-				value_between => [1000000000, 2000000000],
-			},
-			'/^picture_(\d+)$/' => {
-				length_between => [3, 100],
-				validate => sub {
-					my ($value, $num) = @_;
+        foreach (@_) {
+            return 0 if $value =~ m/$_/;
+        }
 
-					...
-				},
-			},
-			picture_1 => {
-				default => 'http://www.example.com/avatar.png',
-			},
-			array_of_ints => {
-				array => 1,
-				min_length => 3,
-				values => {
-					integer => 1,
-				},
-			},
-			hash_of_langs => {
-				hash => 1,
-				keys => {
-					_all => {
-						exact_length => 10,
-					},
-					en => {
-						required => 1,
-					},
-				},
-			},
-		},
-		groups => {
-			date => {
-				params => [qw/year mon day/],
-				parse => sub {
-					my ($year, $mon, $day) = @_;
-					return undef unless $year && $mon && $day;
-					return { date => $year.'-'.$mon.'-'.$day };
-				},
-			},
-			tags => {
-				regex => '/^tags_(en|he|fr)$/',
-				forbid_words => ['bad_word', 'very_bad_word'],
-				parse => sub {
-					return { tags => \@_ };
-				},
-			},
-		},
-	}, {
-		name => 'edit_post',
-		inherits_from => 'post',
-		params => {
-			subject => {
-				required => 0, # subject is no longer required
-			},
-			id => {
-				forbidden => 1,
-			},
-		},
-	});
+        return 1;
+    });
 
-	# create the custom 'forbid_words' validation method
-	$b->custom_validation('forbid_words', sub {
-		my $value = shift;
+    # Create a schema for validating input to a create_post function
+    $b->register_schema('create_post', {
+        params => {
+            subject => {
+                required => 1,
+                length_between => [3, 40],
+            },
+            text => {
+                required => 1,
+                min_length => 10,
+                validate => sub {
+                    my $value = shift;
+                    return defined $value && $value =~ m/^lorem ipsum/ ? 1 : 0;
+                }
+            },
+            day => {
+                required => 0,
+                integer => 1,
+                value_between => [1, 31],
+            },
+            mon => {
+                required => 0,
+                integer => 1,
+                value_between => [1, 12],
+            },
+            year => {
+                required => 0,
+                integer => 1,
+                value_between => [1900, 2900],
+            },
+            section => {
+                required => 1,
+                integer => 1,
+                value_between => [1, 3],
+                postprocess => sub {
+                    my $val = shift;
 
-		foreach (@_) {
-			return 0 if $value =~ m/$_/;
-		}
+                    return $val == 1 ? 'reviews' :
+                           $val == 2 ? 'receips' : 'general';
+                },
+            },
+            id => {
+                required => 1,
+                exact_length => 10,
+                value_between => [1000000000, 2000000000],
+            },
+            array_of_ints => {
+                array => 1,
+                min_length => 3,
+                values => {
+                    integer => 1,
+                },
+                preprocess => sub {
+                    # Sometimes you'll find that input that is supposed to be
+                    # an array is received as a single non-array item, most
+                    # often because deserializers do not know the item should
+                    # be in an array. This is common in XML inputs. A
+                    # preprocess function can be used to fix that.
+                    my $val = shift;
+                    return [$val]
+                        if defined $val && ref $val ne 'ARRAY';
+                    return $val;
+                }
+            },
+            hash_of_langs => {
+                hash => 1,
+                keys => {
+                    en => {
+                        required => 1,
+                    },
+                },
+            },
+        },
+    });
 
-		return 1;
-	});
+    # Create a schema for validating input to an edit_post function. The schema
+    # inherits the create_post schema with one small change.
+    $b->register_schema('edit_post', {
+        inherits_from => 'create_post',
+        params => {
+            subject => {
+                required => 0, # subject is no longer required
+            }
+        }
+    });
 
-	# post a new blog post
-	sub new_post : Local {
-		my ($self, $c) = @_;
+    # Now use Brannigan to validate input in your application:
+    sub create_post {
+        my ($self, $params) = @_;
 
-		# get input parameters hash-ref
-		my $params = $c->request->params;
+        # Process and validate the parameters with the 'post' schema
+        my $rejects = $b->process('create_post', $params);
 
-		# process the parameters
-		my $parsed_params = $b->process('post', $params);
+        if ($rejects) {
+            # Turn validation errors into a structure that fits your application
+            die list_errors($rejects);
+        }
 
-		if ($parsed_params->{_rejects}) {
-			die $c->list_errors($parsed_params);
-		} else {
-			$c->model('DB::BlogPost')->create($parsed_params);
-		}
-	}
+        # Validation and processing suceeded, save the parameters to a database
+        $self->_save_post_to_db($params);
+    }
 
-	# edit a blog post
-	sub edit_post : Local {
-		my ($self, $c, $id) = @_;
+    sub edit_post {
+        my ($self, $id, $params) = @_;
 
-		my $params = $b->process('edit_posts', $c->req->params);
+        # Process and validate the parameters with the 'edit_post' schema
+        my $rejects = $b->process('edit_post', $params);
 
-		if ($params->{_rejects}) {
-			die $c->list_errors($params);
-		} else {
-			$c->model('DB::BlogPosts')->find($id)->update($params);
-		}
-	}
+        if ($rejects) {
+            # Turn validation errors into a structure that fits your application
+            die list_errors($rejects);
+        }
+
+        # Validation and processing succeeded, update the post in the database
+        $self->_update_post_in_db($params);
+    }
 
 =head2 HOW BRANNIGAN WORKS
 
-In essence, Brannigan works in three stages (which all boil down to one
-single command):
+In essence, Brannigan works in five stages (which all boil down to one single
+command):
 
-=over
+=over 5
 
-=item * Input stage and preparation
+=item 1. SCHEMA PREPARATION
 
-Brannigan receives a hash-ref of input parameters, or a hash-ref based
-data structure, and the name of a scheme to validate against. Brannigan
-then loads the scheme and prepares it (by merging it with inherited schemes)
-for later processing.
+Brannigan receives the name of a validation schema, and a hash reference of input
+parameters. Brannigan then loads the schema and prepares it (merging it with
+inherited schemas, if any) for later processing. Finalized schemas are cached
+for improved performance.
 
-=item * Data validation
+=item 2. DATA PREPROCESSING
 
-Brannigan invokes all validation methods defined in the scheme on the
-input data, and generates a hash-ref of rejected parameters. For every
-parameter in this hash-ref, a list of failed validations is created in an
-array-ref.
+Brannigan invokes all C<preprocess> functions defined in the schema on the input
+data, if there are any. These functions are allowed to modify the input.
 
-=item * Data parsing
+Configured default values will also be provided to their respective parameters in
+this stage as well, if those parameters are not provided in the input.
 
-Regardless of the previous stage, every parsing method defined in the scheme
-is applied on the relevant data. The data resulting from these parsing
-methods, along with the values of all input parameters for which no parsing
-methods were defined, is returned to the user in a hash-ref. This hash-ref
-also includes a _rejects key whose value is the rejects hash created in
-the previous stage.
+=item 3. DATA VALIDATION
 
-The reason I say this stage isn't dependant on the previous stage is
-simple. First of all, it's possible no parameters failed validation, but
-the truth is this stage doesn't care if a parameter failed validation. It
-will still parse it and return it to the user, and no errors are ever
-raised by Brannigan. It is the developer's (i.e. you) job to decide what
-to do in case rejects are present.
+Brannigan invokes all validation methods defined in the schema on the input data,
+and generates a hash reference of rejected parameters, if there were any. For
+every parameter in this hash-ref, an array-ref of failed validations is
+created.
+
+If one or more parameters failed validation, the next step (data postprocessing)
+will be skipped.
+
+=item 4. DATA POSTPROCESSING
+
+If the previous stage (validation) did not fail, Brannigan will call every
+C<postprocess> function defined in the schema. There are two types of
+C<postprocess> functions:
+
+=over 2
+
+=item * parameter-specific
+
+These are defined on specific parameters. They get the parameter's value and
+should return a new value for the parameter (possibly the same one, but they
+must return a value).
+
+=item * global
+
+The schema may also have one global C<postprocess> function. This function gets
+the entire parameter hash-ref as input. It is free to modify the hash-ref as
+it sees fit. The function should not return any value.
 
 =back
 
-=head2 HOW SCHEMES LOOK
+=item 5. FINAL RESULT
 
-The validation/parsing scheme defines the structure of the data you're
+If all input parameters passed validation, an undefined value is returned to
+the caller. Otherwise, a hash-reference of rejects is returned. This is a
+flattened structure where keys are "fully qualified" parameter names (meaning
+dot notation is used for nested parameters), and values are hash-references
+containing the validators for which the parameter had failed. For example, let's
+look at the following rejects hash-ref:
+
+    {
+        'subject'      => { required => 1 },
+        'text'         => { max_length => 500 },
+        'pictures.2'   => { matches => qr!^http://! },
+        'phone.mobile' => { required => 1 }
+    }
+
+This hash-ref tells us:
+
+=over 4
+
+=item 1. The "subject" parameter is required but was not provided.
+
+=item 2. The "text" parameter was provided, but is longer than the maximum of 500
+characters.
+
+=item 3. The third value of the "pictures" array does not start with "http://".
+
+=item 4. The "mobile" key of the "phone" hash parameter was not provided.
+
+=back
+
+=back
+
+=head2 HOW SCHEMAS LOOK
+
+The validation/processing schema defines the structure of the data you're
 expecting to receive, along with information about the way it should be
-validated and parsed. Schemes are created by passing them to the Brannigan
-constructor. You can pass as many schemes as you like, and these schemes
-can inherit from one another. You can create the Brannigan object that
-gets these schemes wherever you want. Maybe in a controller of your web
-app that will directly use this object to validate and parse input it
-gets, or maybe in a special validation class that will hold all schemes.
-It doesn't matter where, as long as you make the object available for
-your application.
+validated and processed. Schemas are created by passing them to the Brannigan
+constructor. You can pass as many schemas as you like, and these schemas
+can inherit from other schemas.
 
-A scheme is a hash-ref based data structure that has the following keys:
+A schema is a hash-ref that contains the following keys:
 
 =over
-
-=item * name
-
-Defines the name of the scheme. Required.
-
-=item * ignore_missing
-
-Boolean value indicating whether input parameters that are not referenced
-in the scheme should be added to the parsed output or not. Optional,
-defaults to false (i.e. parameters missing from the scheme will be added
-to the output as-is). You might find it is probably a good idea to turn
-this on, so any input parameters you're not expecting to receive from users
-are ignored.
 
 =item * inherits_from
 
-Either a scalar naming a different scheme or an array-ref of scheme names.
-The new scheme will inherit all the properties of the scheme(s) defined
-by this key. If an array-ref is provided, the scheme will inherit their
-properties in the order they are defined. See the L</"CAVEATS"> section for some
-"heads-up" about inheritance.
+Either a scalar naming a different schema or an array-ref of schema names.
+The new schema will inherit all the properties of the schema(s) defined by this
+key. If an array-ref is provided, the schema will inherit their properties in
+the order they are defined. See the L</"CAVEATS"> section for some "heads-up"
+about inheritance.
 
 =item * params
 
-The params key is the most important part of the scheme, as it defines
-the expected input. This key takes a hash-ref containing the names of
-input parameters. Every such name (i.e. key) in itself is also a hash-ref.
-This hash-ref defines the necessary validation methods to assert for this
-parameter, and optionally a 'parse' and 'default' method. The idea is this: use the name
-of the validation method as the key, and the appropriate values for this
-method as the value of this key. For example, if a certain parameter, let's
-say 'subject', must be between 3 to 10 characters long, then your scheme
-will contain:
+Defines the expected input. This key takes a hash-ref whose keys are the names
+of input parameters as they are expected to be received. The values are also
+hash references which define the necessary validation functions to assert for
+the parameters, and other optional settings such as default values, post- and
+pre- processing functions, and custom validation functions.
 
-	subject => {
-		length_between => [3, 10]
-	}
+For example, if a certain parameter, let's say 'subject', must be between 3 to 10
+characters long, then your schema will contain:
 
-The 'subject' parameter's value (from the user input), along with both of
-the values defined above (3 and 10) will be passed to the C<length_between()> validation
-method. Now, suppose a certain subject sent to your app failed the
-C<length_between()> validation; then the rejects hash-ref described
-earlier will have something like this:
+    subject => { length_between => [3, 10] }
 
-	subject => ['length_between(3, 10)']
+If a "subject" parameter sent to your application fails the "length_between"
+validator, then the rejects hash-ref described earlier will have the exact same
+key-value pair as above:
 
-Notice the values of the C<length_between()> validation method were added
-to the string, so you can easily know why the parameter failed the validation.
+    subject => { length_between => [3, 10] }
 
-B<Custom validation methods:> Aside for the built-in validation methods
-that come with Brannigan, a custom validation method can be defined for
-each parameter. This is done by adding a 'validate' key to the parameter,
-and an anonymous subroutine as the value. As with built-in methods, the
-parameter's value will be automatically sent to this method. So, for
-example, if the subject parameter from above must start with the words
-'lorem ipsum', then we can define the subject parameter like so:
+The following extra keys can also be used in a parameter's configuration:
 
-	subject => {
-		length_between => [3, 10],
-		validate => sub {
-			my $value = shift;
+B<validate>: Used to create a custom validation function for the parameter.
+Accepts a subroutine reference. The subroutine accepts the value from the input
+as its only parameter, and returns a boolean value indicating whether the value
+passed the validation or not.
 
-			return $value =~ m/^lorem ipsum/ ? 1 : 0;
-		}
-	}
+For example, this custom validation function requires that the 'subject' input
+parameter will always begin with the string "lorem ipsum":
 
-Custom validation methods, just like built-in ones, are expected to return
-a true value if the parameter passed the validation, or a false value
-otherwise. If a parameter failed a custom validation method, then 'validate'
-will be added to the list of failed validations for this parameter. So,
-in our 'subject' example, the rejects hash-ref will have something like this:
+    subject => {
+        length_between => [3, 10],
+        validate => sub {
+            my $value = shift;
+            return $value =~ m/^lorem ipsum/ ? 1 : 0;
+        }
+    }
 
-	subject => ['length_between(3, 10)', 'validate']
+If a parameter fails a custom validation function, 'validate' will be added to
+the failed validations hash-ref of the parameter in the rejects hash-ref:
 
-B<Default values:> For your convenience, Brannigan allows you to set default
-values for parameters that are not required (so, if you set a default
-value for a parameter, don't add the C<required()> validation method to
-it). There are two ways to add a default value: either directly, or
-through an anonymous subroutine (just like the custom validation method).
-For example, maybe we'd like the 'subject' parameter to have a default
-value of 'lorem ipsum dolor sit amet'. Then we can have the following definition:
+    subject => {
+        length_between => [3, 10],
+        validate => 1
+    }
 
-	subject => {
-		length_between => [3, 10],
-		validate => sub {
-			my $value = shift;
+B<default>: Used to set a default value for parameters that are not required
+and are not provided in the input hash-ref. Accepts a scalar value or a
+subroutine reference. In the latter case, the subroutine will be called with no
+parameters, and it should return the generated default value.
 
-			return $value =~ m/^lorem ipsum/ ? 1 : 0;
-		},
-		default => 'lorem ipsum dolor sit amet'
-	}
+    subject => {
+        length_between => [3, 10],
+        default => 'lorem ipsum'
+    }
 
-Alternatively, you can give a parameter a generated default value by using
-an anonymous subroutine, like so:
+    # Or...
 
-	subject => {
-		length_between => [3, 10],
-		validate => sub {
-			my $value = shift;
+    subject => {
+        length_between => [3, 10],
+        default => sub { UUID->new->hex }
+    }
 
-			return $value =~ m/^lorem ipsum/ ? 1 : 0;
-		},
-		default => sub {
-			return int(rand(100000000));
-		}
-	}
+Note that default values are given to missing parameters before the
+validation stage, meaning they must conform with the parameters' validators.
 
-Notice that default values are added to missing parameters only at the
-parsing stage (i.e. stage 3 - after the validation stage), so validation
-methods do not apply to default values.
+B<preprocess>: Used to process parameter values before validation functions are
+called. This can be useful to trim leading or trailing whitespace from string
+values, or turning scalars into arrays (a common task for XML inputs where the
+deserializer cannot tell whether an item actually belongs in an array or not).
+Accepts a subroutine reference with the parameter's value from the input. The
+function must return the new value for the parameter, even if it had decided not
+to do any actual changes.
 
-B<Parse methods:> It is more than possible that the way input parameters are passed to your
-application will not be exactly the way you'll eventually use them. That's
-where parsing methods can come in handy. Brannigan doesn't have any
-built-in parsing methods (obviously), so you must create these by yourself,
-just like custom validation methods. All you need to do is add a 'parse'
-key to the parameter's definition, with an anonymous subroutine. This
-subroutine also receives the value of the parameter automatically,
-and is expected to return a hash-ref of key-value pairs. You will probably
-find it that most of the time this hash-ref will only contain one key-value
-pair, and that the key will probably just be the name of the parameter. But
-note that when a parse method exists, Brannigan makes absolutely no assumptions
-of what else to do with that parameter, so you must tell it exactly how to
-return it. After all parameters were parsed by Brannigan, all these little hash-refs are
-merged into one hash-ref that is returned to the caller. If a parse
-method doesn't exist for a paramter, Brannigan will simply add it "as-is"
-to the resulting hash-ref. Returning to our subject example (which we
-defined must start with 'lorem ipsum'), let's say we want to substitute
-'lorem ipsum' with 'effing awesome' before using this parameter. Then the
-subject definition will now look like this:
+B<postprocess>: Similar to C<preprocess>, but happens after validation functions
+had been called.
 
-	subject => {
-		length_between => [3, 10],
-		validate => sub {
-			my $value = shift;
+    subject => {
+        required => 1,
+        length_between => [3, 10],
+        preprocess => sub {
+            # Trim whitespace before validating
+            my $value = shift;
+            $value =~ s/^\s\*//;
+            $value =~ s/\s\*$//;
+            return $value;
+        }
+        validate => sub {
+            # Ensure value does not start with "lorem ipsum"
+            my $value = shift;
+            return $value =~ m/^lorem ipsum/ ? 0 : 1;
+        },
+        postprocess => sub {
+            # Lowercase the value
+            my $value = shift;
+            return lc $value;
+        }
+    }
 
-			return $value =~ m/^lorem ipsum/ ? 1 : 0;
-		},
-		default => 'lorem ipsum dolor sit amet',
-		parse => sub {
-			my $value = shift;
+=item * postprocess
 
-			$value =~ s/^lorem ipsum/effing awesome/;
-			
-			return { subject => $value };
-		}
-	}
-
-If you're still not sure what happens when no parse method exists, then
-you can imagine Brannigan uses the following default parse method:
-
-	param => {
-		parse => sub {
-			my $value = shift;
-
-			return { param => $value };
-		}
-	}
-
-B<Regular expressions:> As of version 0.3, parameter names can also be regular expressions in the
-form C<'/regex/'>. Sometimes you cannot know the names of all parameters passed
-to your app. For example, you might have a dynamic web form which starts with
-a single field called 'url_1', but your app allows your visitors to dynamically
-add more fields, such as 'url_2', 'url_3', etc. Regular expressions are
-handy in such situations. Your parameter key can be C<'/^url_(\d+)$/'>, and
-all such fields will be matched. Regex params have a special feature: if
-your regex uses capturing, then captured values will be passed to the
-custom C<validate> and C<parse> methods (in their order) after the parameter's
-value. For example:
-
-	'/^url_(\d+)$/' => {
-		validate => sub {
-			my ($value, $num) = @_;
-			
-			# $num has the value captured by (\d+) in the regex
-
-			return $value =~ m!^http://! ? 1 : undef;
-		},
-		parse => sub {
-			my ($value, $num) = @_;
-
-			return { urls => { $num => $value } };
-		},
-	}
-
-Please note that a regex must be defined with a starting and trailing
-slash, in single quotes, otherwise it won't work. It is also important to
-note what happens when a parameter matches a regex rule (or perhaps rules),
-and also has a direct reference in the scheme. For example, let's say
-we have the following rules in our scheme:
-
-	'/^sub(ject|headline)$/' => {
-		required => 1,
-		length_between => [3, 10],
-	},
-	subject => {
-		required => 0,
-	}
-
-When validating and parsing the 'subject' parameter, Brannigan will
-automatically merge both of these references to the subject parameter,
-giving preference to the direct reference, so the actual structure on
-which the parameter will be validated is as follows:
-
-	subject => {
-		required => 0,
-		length_between => [3, 10],
-	}
-
-If your parameter matches more than one regex rule, they will all be
-merged, but there's no way (yet) to ensure in which order these regex
-rules will be merged.
-
-B<Complex data structures:> As previously stated, Brannigan can also validate and parse a little more
-complex data structures. So, your parameter no longer has to be just a
-string or a number, but maybe a hash-ref or an array-ref. In the first
-case, you tell Brannigan the paramter is a hash-ref by adding a 'hash'
-key with a true value, and a 'keys' key with a hash-ref which is just
-like the 'params' hash-ref. For example, suppose you're receiving a 'name'
-parameter from the user as a hash-ref containing first and last names.
-That's how the 'name' parameter might be defined:
-
-	name => {
-		hash => 1,
-		required => 1,
-		keys => {
-			first_name => {
-				length_between => [3, 10],
-			},
-			last_name => {
-				required => 1,
-				min_length => 3,
-			},
-		}
-	}
-
-What are we seeing here? We see that the 'name' parameter must be a
-hash-ref, that it's required, and that it has two keys: first_name, whose
-length must be between 3 to 10 if it's present, and last_name, which must
-be 3 characters or more, and must be present.
-
-An array parameter, on the other hand, is a little different. Similar to hashes,
-you define the parameter as an array-ref with the 'array' key with a true
-value, and a 'values' key. This key has a hash-ref of validation and parse
-methods that will be applied to EVERY value inside this array. For example,
-suppose you're receiving a 'pictures' parameter from the user as an array-ref
-containing URLs to pictures on the web. That's how the 'pictures' parameter
-might be defined:
-
-	pictures => {
-		array => 1,
-		length_between => [1, 5],
-		values => {
-			min_length => 3,
-			validate => sub {
-				my $value = shift;
-
-				return $value =~ m!^http://! ? 1 : 0;
-			},
-		},
-	}
-
-What are we seeing this time? We see that the 'pictures' parameter must
-be an array, with no less than one item (i.e. value) and no more than five
-items (notice that we're using the same C<length_between()> method from
-before, but in the context of an array, it doesn't validate against
-character count but item count). We also see that every value in the
-'pictures' array must have a minimum length of three (this time it is
-characterwise), and must match 'http://' in its beginning.
-
-Since complex data structures are supported, you can define default values
-for parameters that aren't just strings or numbers (or methods), for example:
-
-	complex_param => {
-		hash => 1,
-		keys => {
-			...
-		},
-		default => { key1 => 'def1', key2 => 'def2' }
-	}		
-
-What Brannigan returns for such structures when they fail validations is
-a little different than before. Instead of an array-ref of failed validations,
-Brannigan will return a hash-ref. This hash-ref might contain a '_self' key
-with an array-ref of validations that failed specifically on the 'pictures'
-parameter (such as the 'required' validation for the 'name' parameter or
-the 'length_between' validation for the 'pictures' parameter), and/or
-keys for each value in these structures that failed validation. If it's a
-hash, then the key will simply be the name of that key. If it's an array,
-it will be its index. For example, let's say the 'first_name' key under
-the 'name' parameter failed the C<length_between(3, 10)> validation method,
-and that the 'last_name' key was not present (and hence failed the
-C<required()> validation). Also, let's say the 'pictures' parameter failed
-the C<length_between(1, 5)> validation (for the sake of the argument, let's
-say it had 6 items instead of the maximum allowed 5), and that the 2nd
-item failed the C<min_length(3)> validation, and the 6th item failed the
-custom validate method. Then our rejects hash-ref will have something like
-this:
-
-	name => {
-		first_name => ['length_between(3, 10)'],
-		last_name => ['required(1)'],
-	},
-	pictures => {
-		_self => ['length_between(1, 5)'],
-		1 => ['min_length(3)'],
-		5 => ['validate'],
-	}
-
-Notice the '_self' key under 'pictures' and that the numbering of the
-items of the 'pictures' array starts at zero (obviously).
-
-The beauty of Brannigan's data structure support is that it's recursive.
-So, it's not that a parameter can be a hash-ref and that's it. Every key
-in that hash-ref might be in itself a hash-ref, and every key in that
-hash-ref might be an array-ref, and every value in that array-ref might
-be a hash-ref... well, you get the idea. How might that look like? Well,
-just take a look at this:
-
-	pictures => {
-		array => 1,
-		values => {
-			hash => 1,
-			keys => {
-				filename => {
-					min_length => 5,
-				},
-				source => {
-					hash => 1,
-					keys => {
-						website => {
-							validate => sub { ... },
-						},
-						license => {
-							one_of => [qw/GPL FDL CC/],
-						},
-					},
-				},
-			},
-		},
-	}
-
-So, we have a pictures array that every value in it is a hash-ref with a
-filename key and a source key whose value is a hash-ref with a website
-key and a license key.
-
-B<Local validations:> The _all "parameter" can be used in a scheme to define rules that apply
-to all of the parameters in a certain level. This can either be used directly
-in the 'params' key of the scheme, or in the 'keys' key of a hash parameter.
-
-	_all => {
-		required => 1
-	},
-	subject => {
-		length_between => [3, 255]
-	},
-	text => {
-		min_length => 10
-	}
-
-In the above example, both 'subject' and 'text' receive the C<required()>
-validation methods.
-
-=item * groups
-
-Groups are very useful to parse parameters that are somehow related
-together. This key takes a hash-ref containing the names of the groups
-(names are irrelevant, they're more for you). Every group will also take
-a hash-ref, with a rule defining which parameters are members of this group,
-and a parse method to use with these parameters (just like our custom
-parse method from the 'params' key). This parse method will
-automatically receive the values of all the parameters in the group, in
-the order they were defined.
-
-For example, suppose our app gets a user's birth date by using three web
-form fields: day, month and year. And suppose our app saves this date
-in a database in the format 'YYYY-MM-DD'. Then we can define a group,
-say 'date', that automatically does this. For example:
-
-	date => {
-		params => [qw/year month day/],
-		parse => sub {
-			my ($year, $month, $day) = @_;
-
-			$month = '0'.$month if $month < 10;
-			$day = '0'.$day if $day < 10;
-
-			return { date => $year.'-'.$month.'-'.$day };
-		},
-	}
-
-Alternative to the 'params' key, you can define a 'regex' key that takes
-a regex. All parameters whose name matches this regex will be parsed as
-a group. As oppose to using regexes in the 'params' key of the scheme,
-captured values in the regexes will not be passed to the parse method,
-only the values of the parameters will. Also, please note that there's no
-way to know in which order the values will be provided when using regexes
-for groups.
-
-For example, let's say our app receives one or more URLs (to whatever
-type of resource) in the input, in parameters named 'url_1', 'url_2',
-'url_3' and so on, and that there's no limit on the number of such
-parameters we can receive. Now, suppose we want to create an array
-of all of these URLs, possibly to push it to a database. Then we can
-create a 'urls' group such as this:
-
-	urls => {
-		regex => '/^url_(\d+)$/',
-		parse => sub {
-			my @urls = @_;
-
-			return { urls => \@urls };
-		}
-	}
+Global postprocessing function. If provided, it will be called after all
+preprocessing, input validation, and parameter-specific postprocessing had
+completed. As opposed to parameter-specific postprocess functions, this one
+receives the complete parameter hash-ref as its only input. It is not expected
+to return any values. It may modify the parameter hash-ref as it sees fit.
 
 =back
 
-=head2 BUILT-IN VALIDATION METHODS
+=head2 BUILT-IN VALIDATORS
 
-As mentioned earlier, Brannigan comes with a set of built-in validation
-methods which are most common and useful everywhere. For a list of all
-validation methods provided by Brannigan, check L<Brannigan::Validations>.
+=head3 { required => $boolean }
 
-=head2 CROSS-SCHEME CUSTOM VALIDATION METHODS
+If C<$boolean> has a true value, this method will check that a required
+parameter was indeed provided; otherwise (i.e. if C<$boolean> is not true)
+this method will simply return a true value to indicate success.
 
-Custom C<validate> methods are nice, but when you want to use the same
-custom validation method in different places inside your scheme, or more
-likely in different schemes altogether, repeating the definition of each
-custom method in every place you want to use it is not very comfortable.
+You should note that if a parameter is required, and a non-true value is
+received (i.e. 0 or the empty string ""), this method considers the
+requirement as fulfilled (i.e. it will return true). If you need to make sure
+your parameters receive true values, take a look at the C<is_true()> validation
+method.
+
+Please note that if a parameter is not required and indeed isn't provided
+with the input parameters, any other validation methods defined on the
+parameter will not be checked.
+
+=head3 { is_true => $boolean }
+
+If C<$boolean> has a true value, this method will check that C<$value>
+has a true value (so, C<$value> cannot be 0 or the empty string); otherwise
+(i.e. if C<$boolean> has a false value), this method does nothing and
+simply returns true.
+
+=head3 { length_between => [ $min_length, $max_length ] }
+
+Makes sure the value's length (stringwise) is inside the range of
+C<$min_length>-C<$max_length>, or, if the value is an array reference,
+makes sure it has between C<$min_length> and C<$max_length> items.
+
+=head3 { min_length => $min_length }
+
+Makes sure the value's length (stringwise) is at least C<$min_length>, or,
+if the value is an array reference, makes sure it has at least C<$min_length>
+items.
+
+=head3 { max_length => $max_length }
+
+Makes sure the value's length (stringwise) is no more than C<$max_length>,
+or, if the value is an array reference, makes sure it has no more than
+C<$max_length> items.
+
+=head3 { exact_length => $length }
+
+Makes sure the value's length (stringwise) is exactly C<$length>, or,
+if the value is an array reference, makes sure it has exactly C<$exact_length>
+items.
+
+=head3 { integer => $boolean }
+
+If boolean is true, makes sure the value is an integer.
+
+=head3 { function => $boolean }
+
+If boolean is true, makes sure the value is a function
+(subroutine reference).
+
+=head3 { value_between => [ $min_value, $max_value ] }
+
+Makes sure the value is between C<$min_value> and C<$max_value>.
+
+=head3 { min_value => $min_value }
+
+Makes sure the value is at least C<$min_value>.
+
+=head3 { max_value => $max_value }
+
+Makes sure the value is no more than C<$max_value>.
+
+=head3 { array => $boolean }
+
+If C<$boolean> is true, makes sure the value is actually an array reference.
+
+=head3 { hash => $boolean }
+
+If C<$boolean> is true, makes sure the value is actually a hash reference.
+
+=head3 { one_of => \@values }
+
+Makes sure a parameter's value is one of the provided acceptable values.
+
+=head3 { matches => $regex }
+
+Returns true if C<$value> matches the regular express (C<qr//>) provided.
+Will return false if C<$regex> is not a regular expression.
+
+=head3 { min_alpha => $integer }
+
+Returns a true value if C<$value> is a string that has at least C<$integer>
+alphabetic (C<A-Z> and C<a-z>) characters.
+
+=head3 { max_alpha => $integer }
+
+Returns a true value if C<$value> is a string that has at most C<$integer>
+alphabetic (C<A-Z> and C<a-z>) characters.
+
+=head3 { min_digits => $integer }
+
+Returns a true value if C<$value> is a string that has at least
+C<$integer> digits (C<0-9>).
+
+=head3 { max_digits => $integer }
+
+Returns a true value if C<$value> is a string that has at most
+C<$integer> digits (C<0-9>).
+
+=head3 { min_signs => $integer }
+
+Returns a true value if C<$value> has at least C<$integer> special or
+sign characters (e.g. C<%^&!@#>, or basically anything that isn't C<A-Za-z0-9>).
+
+=head3 { max_signs => $integer }
+
+Returns a true value if C<$value> has at most C<$integer> special or
+sign characters (e.g. C<%^&!@#>, or basically anything that isn't C<A-Za-z0-9>).
+
+=head3 { max_consec => $integer }
+
+Returns a true value if C<$value> does not have a sequence of consecutive
+characters longer than C<$integer>. Consequtive characters are either
+alphabetic (e.g. C<abcd>) or numeric (e.g. C<1234>).
+
+=head3 { max_reps => $integer }
+
+Returns a true value if C<$value> does not contain a sequence of a repeated
+character longer than C<$integer>. So, for example, if C<$integer> is 3,
+then "aaa901" will return true (even though there's a repetition of the
+'a' character it is not longer than three), while "9bbbb01" will return
+false.
+
+=head2 ADVANCED FEATURES AND TIPS
+
+=head3 COMPLEX DATA STRUCTURES
+
+Brannigan can validate and process hash references of arbitrary complexity.
+Input parameters may also be hash or array references.
+
+For arrays, the parameter needs to be marked with C<< array => 1 >>. The
+validations and processing for the array's values are then provided as a hash
+reference named C<values>. For example:
+
+    pictures => {
+        array => 1,
+        length_between => [1, 5],
+        values => {
+            min_length => 3,
+            validate => sub {
+                my $value = shift;
+                return $value =~ m!^http://! ? 1 : 0;
+            }
+        }
+    }
+
+In this example, "pictures" is an array parameter. When provided, the array must
+contain between 1 and 5 items. Every item in the array must be a string of 3
+characters or more, and must begin with the prefix "http://".
+
+For hashes, the parameter needs to be marked with C<< hash => 1 >>. The
+validations and processing for the hash's attributes are then provided as a hash
+reference named C<keys>. For example:
+
+    name => {
+        hash => 1,
+        keys => {
+            first_name => {
+                length_between => [3, 10],
+            },
+            last_name => {
+                required => 1,
+                min_length => 3
+            }
+        }
+    }
+
+In this example, "name" is a hash paremeter. When provided, it must contain an
+attribute called "first_name", which is an optional string between 3 or 10
+characters long, and "last_name", which is a required string at least 3
+characters longs.
+
+Array and hash parameters can also accept default values:
+
+    complex_param => {
+        hash => 1,
+        keys => {
+            ...
+        },
+        default => { key1 => 'def1', key2 => 'def2' }
+    }
+
+Hash and arrays can fail validation in two ways: they can fail as a unit
+(for example, schemas can enforce that an array will have between 2 and 5 items),
+and specific items within them can fail (for example, schemas can enforce that
+items in an array will be integers lower than 100).
+
+An array that failed as a unit will appear in the rejects hash-ref with its own
+name. A specific array item or hash key that failed validation will appear with
+dot notation:
+
+    'name.first_name' => { length_between => [3, 10] },
+    'name.last_name' => { required => 1 },
+    'pictures' => { exact_length => 3 },
+    'numbers.1' => { max_value => 10 },
+
+In this example, specific keys failed in the "name" hash parameter. The "pictures"
+array parameter failed as a unit (it should have exactly 3 items). The second
+item in the "numbers" array parameter failed the "max_value" validator too.
+
+Brannigan's data structure support is infinitely recursive:
+
+    pictures => {
+        array => 1,
+        values => {
+            hash => 1,
+            keys => {
+                filename => {
+                    min_length => 5,
+                },
+                source => {
+                    hash => 1,
+                    keys => {
+                        website => {
+                            validate => sub { ... },
+                        },
+                        license => {
+                            one_of => [qw/GPL FDL CC/],
+                        },
+                    },
+                },
+            },
+        },
+    }
+
+=head3 CROSS-SCHEMA CUSTOM VALIDATION METHODS
+
+Ad-hoc C<validate> functions are nice, but when you want to use the same custom
+validation function in multiple places inside your schema (or in multiple
+schemas), this can become unwieldy.
+
 Brannigan provides a simple mechanism to create custom, named validation
-methods that can be used across schemes as if they were internal methods.
+functions that can be used across schemas as if they were internal methods.
 
-The process is simple: when creating your schemes, give the names of the
-custom validation methods and their relevant supplement values as with
-every built-in validation method. For example, suppose we want to create
-a custom validation method named 'forbid_words', that makes sure a certain
-text does not contain any words we don't like it to contain. Suppose this
-will be true for a parameter named 'text'. Then we define 'text' like so:
+This example creates a validation function called "forbid_words", which fails
+string parameters that contain certain words:
 
-	text => {
-		required => 1,
-		forbid_words => ['curse_word', 'bad_word', 'ugly_word'],
-	}
+    my $b = Brannigan->new();
 
-As you can see, we have provided the name of our custom method, and the words
-we want to forbid. Now we need to actually create this C<forbid_words()>
-method. We do this after we've created our Brannigan object, by using the
-C<custom_validation()> method, as in this example:
+    $b->register_validator('forbid_words', sub {
+        my ($value, @forbidden) = @_;
+        foreach (@forbidden) {
+            return 0 if $value =~ m/$_/;
+        }
+        return 1;
+    });
 
-	$b->custom_validation('forbid_words', sub {
-		my ($value, @forbidden) = @_;
+    $b->register_schema('user_input', {
+        params => {
+            text => {
+                required => 1,
+                forbid_words => ['curse_word', 'bad_word', 'ugly_word'],
+            }
+        }
+    });
 
-		foreach (@forbidden) {
-			return 0 if $value =~ m/$_/;
-		}
+Note how the custom validation function accepts the value provided in the input,
+and whatever was provided to 'forbid_words' in the configuration of the specific
+parameter. In this case, the parameter called "text" forbids the words
+"curse_word", "bad_word" and "ugly_word".
 
-		return 1;
-	});
+If a parameter fails a named custom validation function, it will be added to the
+rejects hash-ref like any other built-in validation function:
 
-We give the C<custom_validation()> method the name of our new method, and
-an anonymous subroutine, just like in "local" custom validation methods.
+    text => [ 'forbid_words(curse_word, bad_word, ugly_word)' ]
 
-And that's it. Now we can use the C<forbid_words()> validation method
-across our schemes. If a paremeter failed our custom method, it will be
-added to the rejects like built-in methods. So, if 'text' failed our new
-method, our rejects hash-ref will contain:
+As an added bonus, you can use this mechanism to override Brannigan's built-in
+validations. Just give the name of the validation method you wish to override,
+along with the new code for this method.
 
-	text => [ 'forbid_words(curse_word, bad_word, ugly_word)' ]
+Note that you do not have to register a named validator before you register a
+schema that uses it. You can register the schema first.
 
-As an added bonus, you can use this mechanism to override Brannigan's
-built-in validations. Just give the name of the validation method you wish
-to override, along with the new code for this method. Brannigan gives
-precedence to cross-scheme custom validations, so your method will be used
-instead of the internal one.
+=head3 REPEATING RULES FOR MULTIPLE PARAMETERS
 
-=head2 NOTES ABOUT PARSE METHODS
+In previous versions, Brannigan allowed providing rules to multiple parameters
+via regular expressions. This feature has been removed in version 2.0. Instead,
+users can take advantage of the fact that schemas are simply Perl structures
+and reuse rules via variables:
 
-As stated earlier, your C<parse()> methods are expected to return a hash-ref
-of key-value pairs. Brannigan collects all of these key-value pairs
-and merges them into one big hash-ref (along with all the non-parsed
-parameters).
+    my $date = { required => 1, matches => qr/^\d{4}-\d{2}-\d{2}$/ };
 
-Brannigan actually allows you to have your C<parse()> methods be two-leveled.
-This means that a value in a key-value pair in itself can be a hash-ref
-or an array-ref. This allows you to use the same key in different places,
-and Brannigan will automatically aggregate all of these occurrences, just like
-in the first level. So, for example, suppose your scheme has a regex
-rule that matches parameters like 'tag_en' and 'tag_he'. Your parse
-method might return something like C<< { tags => { en => 'an english tag' } } >>
-when it matches the 'tag_en' parameter, and something like
-C<< { tags => { he => 'a hebrew tag' } } >> when it matches the 'tag_he'
-parameter. The resulting hash-ref from the process method will thus
-include C<< { tags => { en => 'an english tag', he => 'a hebrew tag' } } >>.
-
-Similarly, let's say your scheme has a regex rule that matches parameters
-like 'url_1', 'url_2', etc. Your parse method might return something like
-C<< { urls => [$url_1] } >> for 'url_1' and C<< { urls => [$url_2] } >>
-for 'url_2'. The resulting hash-ref in this case will be
-C<< { urls => [$url_1, $url_2] } >>.
-
-Take note however that only two-levels are supported, so don't go crazy
-with this.
-
-=head2 SO HOW DO I PROCESS INPUT?
-
-OK, so we have created our scheme(s), we know how schemes look and work,
-but what now?
-
-Well, that's the easy part. All you need to do is call the C<process()>
-method on the Brannigan object, passing it the name of the scheme to
-enforce and a hash-ref of the input parameters/data structure. This method
-will return a hash-ref back, with all the parameters after parsing. If any
-validations failed, this hash-ref will have a '_rejects' key, with the
-rejects hash-ref described earlier. Remember: Brannigan doesn't raise
-any errors. It's your job to decide what to do, and that's a good thing.
-
-Example schemes, input and output can be seen in L<Brannigan::Examples>.
+    my $schema = {
+        name => 'person',
+        params => {
+            birth_date => $date,
+            death_date => $date
+        }
+    };
 
 =head1 CONSTRUCTOR
 
-=head2 new( \%scheme | @schemes )
+=head2 new( [ %options ] )
 
-Creates a new instance of Brannigan, with the provided scheme(s) (see
-L</"HOW SCHEMES LOOK"> for more info on schemes).
+Creates a new instance of Brannigan. Schemas must be registered separately
+using the C<register_schema> method.
+
+Options:
+
+=over 1
+
+=item * C<handle_unknown>
+
+What to do with input parameters that are not defined in the processing schema.
+Values: 'ignore' (default, keep unknown parameters as they are), 'remove' (delete
+unknown parameters from the input), 'reject' (add to rejects and fail the
+processing).
+
+=back
 
 =cut
 
 sub new {
-	my $class = shift;
+    my ( $class, $options ) = @_;
 
-	return bless { map { $_->{name} => $_ } @_ }, $class;
+    $options ||= {};
+
+    my $self = bless {
+        schemas        => {},
+        validators     => {},
+        merger         => Hash::Merge->new('LEFT_PRECEDENT'),
+        handle_unknown => $options->{handle_unknown} || 'ignore',
+        _schema_cache  => {},    # Cache for finalized schemas
+    }, $class;
+
+    $self->register_validator(
+        'required',
+        sub {
+            my ( $value, $boolean ) = @_;
+
+            return !$boolean || defined $value;
+        }
+    );
+    $self->register_validator(
+        'is_true',
+        sub {
+            my ( $value, $boolean ) = @_;
+
+            return !$boolean || $value;
+        }
+    );
+    $self->register_validator(
+        'length_between',
+        sub {
+            my ( $value, $min, $max ) = @_;
+
+            return _length($value) >= $min && _length($value) <= $max;
+        }
+    );
+    $self->register_validator(
+        'min_length',
+        sub {
+            my ( $value, $min ) = @_;
+
+            return _length($value) >= $min;
+        }
+    );
+    $self->register_validator(
+        'max_length',
+        sub {
+            my ( $value, $max ) = @_;
+
+            return _length($value) <= $max;
+        }
+    );
+    $self->register_validator(
+        'exact_length',
+        sub {
+            my ( $value, $exlength ) = @_;
+
+            return _length($value) == $exlength;
+        }
+    );
+    $self->register_validator(
+        'integer',
+        sub {
+            my ( $value, $boolean ) = @_;
+
+            return !$boolean || $value =~ m/^\d+$/;
+        }
+    );
+    $self->register_validator(
+        'function',
+        sub {
+            my ( $value, $boolean ) = @_;
+
+            return !$boolean || ref $value eq 'CODE';
+        }
+    );
+    $self->register_validator(
+        'value_between',
+        sub {
+            my ( $value, $min, $max ) = @_;
+
+            return defined $value && $value >= $min && $value <= $max;
+        }
+    );
+    $self->register_validator(
+        'min_value',
+        sub {
+            my ( $value, $min ) = @_;
+
+            return defined $value && $value >= $min;
+        }
+    );
+    $self->register_validator(
+        'max_value',
+        sub {
+            my ( $value, $max ) = @_;
+
+            return defined $value && $value <= $max;
+        }
+    );
+    $self->register_validator(
+        'one_of',
+        sub {
+            my ( $value, @values ) = @_;
+
+            foreach (@values) {
+                return 1 if $value eq $_;
+            }
+
+            return;
+        }
+    );
+    $self->register_validator(
+        'matches',
+        sub {
+            my ( $value, $regex ) = @_;
+
+            return ref $regex eq 'Regexp' && $value =~ $regex;
+        }
+    );
+    $self->register_validator(
+        'min_alpha',
+        sub {
+            my ( $value, $integer ) = @_;
+
+            my @matches = ( $value =~ m/[A-Za-z]/g );
+
+            return scalar @matches >= $integer;
+        }
+    );
+    $self->register_validator(
+        'max_alpha',
+        sub {
+            my ( $value, $integer ) = @_;
+
+            my @matches = ( $value =~ m/[A-Za-z]/g );
+
+            return scalar @matches <= $integer;
+        }
+    );
+    $self->register_validator(
+        'min_digits',
+        sub {
+            my ( $value, $integer ) = @_;
+
+            my @matches = ( $value =~ m/[0-9]/g );
+
+            return scalar @matches >= $integer;
+        }
+    );
+    $self->register_validator(
+        'max_digits',
+        sub {
+            my ( $value, $integer ) = @_;
+
+            my @matches = ( $value =~ m/[0-9]/g );
+
+            return scalar @matches <= $integer;
+        }
+    );
+    $self->register_validator(
+        'min_signs',
+        sub {
+            my ( $value, $integer ) = @_;
+
+            my @matches = ( $value =~ m/[^A-Za-z0-9]/g );
+
+            return scalar @matches >= $integer;
+        }
+    );
+    $self->register_validator(
+        'max_signs',
+        sub {
+            my ( $value, $integer ) = @_;
+
+            my @matches = ( $value =~ m/[^A-Za-z0-9]/g );
+
+            return scalar @matches <= $integer;
+        }
+    );
+    $self->register_validator(
+        'max_consec',
+        sub {
+            my ( $value, $integer ) = @_;
+
+            # the idea here is to break the string into an array of characters,
+            # go over each character in the array starting at the first one,
+            # and making sure that character does not begin a sequence longer
+            # than allowed ($integer). This means we have recursive loops here,
+            # because for every character, we compare it to the following
+            # character and while they form a sequence, we move to the next pair
+            # and compare them until the sequence is broken. To make it a tad
+            # faster, our outer loop won't go over the entire characters array,
+            # but only up to the last character that might possibly form an
+            # invalid sequence. This character would be positioned $integer+1
+            # characters from the end.
+            my @chars = split( //, $value );
+            for ( my $i = 0 ; $i <= scalar(@chars) - $integer - 1 ; $i++ ) {
+                my $fc = $i;        # first character for comparison
+                my $sc = $i + 1;    # second character for comparison
+                my $sl = 1;         # sequence length
+                while ( $sc <= $#chars
+                    && ord( $chars[$sc] ) - ord( $chars[$fc] ) == 1 )
+                {
+                    # characters are in sequence, increase counters
+                    # and compare next pair
+                    $sl++;
+                    $fc++;
+                    $sc++;
+                }
+                return if $sl > $integer;
+            }
+
+            return 1;
+        }
+    );
+    $self->register_validator(
+        'max_reps',
+        sub {
+            my ( $value, $integer ) = @_;
+
+            # The idea here is pretty much the same as in max_consec but we
+            # truely compare each pair of characters.
+
+            my @chars = split( //, $value );
+            for ( my $i = 0 ; $i <= scalar(@chars) - $integer - 1 ; $i++ ) {
+                my $fc = $i;        # First character for comparison
+                my $sc = $i + 1;    # Second character for comparison
+                my $sl = 1;         # Sequence length
+                while ( $sc <= $#chars && $chars[$sc] eq $chars[$fc] ) {
+
+                    # Characters are in sequence, increase counters
+                    # and compare next pair
+                    $sl++;
+                    $fc++;
+                    $sc++;
+                }
+                return if $sl > $integer;
+            }
+
+            return 1;
+        }
+    );
+    $self->register_validator(
+        'array',
+        sub {
+            my ( $value, $boolean ) = @_;
+
+            $boolean
+              ? ref $value eq 'ARRAY'
+                  ? 1
+                  : return
+              : ref $value eq 'ARRAY' ? return
+              :                         1;
+        }
+    );
+    $self->register_validator(
+        'hash',
+        sub {
+            my ( $value, $boolean ) = @_;
+
+            $boolean
+              ? ref $value eq 'HASH'
+                  ? 1
+                  : return
+              : ref $value eq 'HASH' ? return
+              :                        1;
+        }
+    );
+
+    # Inject the schema validator schema used to validate user schemas. This is
+    # a Brannigan validation schema itself!
+    # TODO: figure out the best way to validate parameter definitions, as they
+    # are named by the user, can contain validators we don't know yet, and other
+    # complications.
+    $self->{schemas}->{'__brannigan_schema_validator__'} = {
+        name   => { required => 1, min_length => 1 },
+        schema => {
+            params => {
+                required => 1,
+                hash     => 1,
+            },
+            inherits_from => {
+                array      => 1,
+                preprocess => sub {
+                    my $value = shift;
+
+                    # Convert single string to array for uniform processing
+                    return ref $value eq 'ARRAY' ? $value : [$value]
+                      if defined $value;
+                    return $value;
+                }
+            },
+            postprocess => {
+                function => 1,
+            }
+        }
+    };
+
+    return $self;
 }
 
 =head1 OBJECT METHODS
 
-=head2 add_scheme( \%scheme | @schemes )
+=head2 register_schema( $name, \%schema )
 
-Adds one or more schemes to the object. Every scheme hash-ref should have
-a C<name> key with the name of the scheme. Existing schemes will be overridden.
-Returns the object itself for chainability.
+Registers a validation schema with the given name. If a schema with the same
+name already exists, it will be overridden. The schema hash-ref should not
+contain a C<name> key as it's provided separately. Returns the C<Brannigan>
+object itself for chain-ability.
 
 =cut
 
-sub add_scheme {
-	my $self = shift;
+sub register_schema {
+    my ( $self, $name, $schema ) = @_;
 
-	foreach (@_) {
-		$self->{$_->{name}} = $_;
-	}
+    die "Schema name is required"         unless defined $name && length $name;
+    die "Schema must be a hash reference" unless ref $schema eq 'HASH';
 
-	return $self;
+    # Validate the schema structure before storing it
+    $self->_validate_schema_definition( $name, $schema );
+
+    # Store the schema with the provided name
+    $self->{schemas}->{$name} = $schema;
+
+    # Clear the schema cache since we have a new/updated schema
+    $self->{_schema_cache} = {};
+
+    return $self;
 }
 
-=head2 process( $scheme, \%params )
+=head2 register_validator( $name, $code )
 
-Receives the name of a scheme and a hash-ref of input parameters (or a data
-structure), and validates and parses these paremeters according to the
-scheme (see L</"HOW SCHEMES LOOK"> for detailed information about this process).
+Registers a new named validator function. C<$code> is a reference to a subroutine
+that receives a value as a parameter and returns a boolean value indicating
+whether the value is valid or not. The method can be used to override
+built-in validation functions.
 
-Returns a hash-ref of parsed parameters according to the parsing scheme,
-possibly containing a list of failed validations for each parameter.
+=cut
 
-Actual processing is done by L<Brannigan::Tree>.
+sub register_validator {
+    my ( $self, $name, $code ) = @_;
+    return unless $name && $code && ref $code eq 'CODE';
+    $self->{validators}->{$name} = $code;
+}
 
-=head2 process( \%scheme, \%params )
+=head2 handle_unknown( [$value] )
 
-Same as above, but takes a scheme hash-ref instead of a name hash-ref. That
-basically gives you a functional interface for Brannigan, so you don't have
-to go through the regular object oriented interface. The only downsides to this
-are that you cannot define custom validations using the C<custom_validation()>
-method (defined below) and that your scheme must be standalone (it cannot inherit
-from other schemes). Note that when directly passing a scheme, you don't need
-to give the scheme a name.
+Gets or sets the behavior for handling unknown input parameters.
+Accepted values: 'ignore', 'remove', 'reject'.
+
+=cut
+
+sub handle_unknown {
+    my ( $self, $value ) = @_;
+
+    if ( defined $value ) {
+        die "Invalid handle_unknown value: $value"
+          unless $value =~ /^(ignore|remove|reject)$/;
+        $self->{handle_unknown} = $value;
+        return $self;
+    }
+
+    return $self->{handle_unknown};
+}
+
+=head2 process( $schema, \%params )
+
+Receives the name of a schema and a hash reference of input parameters.
+Performs pre-processing, validation and post-processing as described in the
+manual.
+
+Any processing that modifies the input is performed in-place.
+
+Returns an undefined value if there were no rejects. Returns a hash reference
+of rejects if there were any.
+
+=head1 FUNCTIONAL INTERFACE
+
+=head2 process( \%schema, \%params )
+
+Accepts a schema hash-ref and an input hash-ref, and performs pre-processing,
+validation and post-processing. If no parameters failed validation, an undefined
+value is returned. Otherwise a hash reference of rejects is returned.
+
+Note that this interface does not allow for custom validation functions and
+schema inheritance. You are not required to give the schema a name when using
+this interface.
+
+    my $rejects = Brannigan::process( $schema, $params );
 
 =cut
 
 sub process {
-	if (ref $_[0] eq 'Brannigan') {
-		my ($self, $scheme, $params) = @_;
 
-		return unless $scheme && $params && ref $params eq 'HASH' && $self->{$scheme};
-		$self->_build_tree($scheme, $self->{validations})->process($params);
-	} else {
-		Brannigan::Tree->new($_[0])->process($_[1]);
-	}
-}
+    # Called as a method
+    if ( scalar @_ == 3 && ref $_[0] eq __PACKAGE__ ) {
+        my ( $self, $schema_name, $params ) = @_;
 
-=head2 custom_validation( $name, $code )
+        # Finalize the schema, merging it with any inherited schemas
+        my $schema = $self->_finalize_schema($schema_name);
 
-Receives the name of a custom validation method (C<$name>), and a reference to an
-anonymous subroutine (C<$code>), and creates a new validation method with
-that name and code, to be used across schemes in the Brannigan object as
-if they were internal methods. You can even use this to override internal
-validation methods, just give the name of the method you want to override
-and the new code.
+        # Execute preprocessing on input parameters
+        $self->_preprocess( $schema, $params );
 
-=cut
+        # Validate input parameters
+        my $rejects = $self->_validate( $params, $schema->{params} );
+        if ($rejects) {
+            return $rejects;
+        }
 
-sub custom_validation {
-	my ($self, $name, $code) = @_;
+        # Execute postprocessing on input parameters
+        $self->_postprocess( $schema, $params );
 
-	return unless $name && $code && ref $code eq 'CODE';
+        return;
+    }
 
-	$self->{validations}->{$name} = $code;
+    # Called as a function
+    my ( $schema, $params ) = @_;
+    my $b = Brannigan->new();
+    $b->register_schema( 'temp', $schema );
+    return $b->process( 'temp', $params );
 }
 
 ############################
 ##### INTERNAL METHODS #####
 ############################
 
-# _build_tree( $scheme, [ \%custom_validations ] )
-# ------------------------------------------------
-# Builds the final "tree" of validations and parsing methods to be performed
-# on the parameters hash during processing. Optionally receives a hash-ref
-# of cross-scheme custom validation methods defined in the Brannigan object
-# (see L</"CROSS-SCHEME CUSTOM VALIDATION METHODS"> for more info).
+# _length( $value )
+# ------------------------------------------------------------------------
+# Returns the length of a string value in characters, or an array value in
+# items.
 
-sub _build_tree {
-	my ($self, $scheme, $customs) = @_;
-
-	my @trees;
-
-	# get a list of all schemes to inherit from
-	my @schemes = $self->{$scheme}->{inherits_from} && ref $self->{$scheme}->{inherits_from} eq 'ARRAY' ? @{$self->{$scheme}->{inherits_from}} : $self->{$scheme}->{inherits_from} ? ($self->{$scheme}->{inherits_from}) : ();
-
-	foreach (@schemes) {
-		next unless $self->{$_};
-		push(@trees, $self->_build_tree($_));
-	}
-
-	my $tree = Brannigan::Tree->new(@trees, $self->{$scheme});
-	$tree->{_custom_validations} = $customs;
-
-	return $tree;
+sub _length {
+    return ref $_[0] eq 'ARRAY' ? scalar( @{ $_[0] } ) : length( $_[0] );
 }
 
-=head1 CAVEATS
+# _finalize_schema( $schema_name )
+# --------------------------------------------------------------------------
+# Builds the final "tree" of validations and parsing methods to be performed
+# on the parameter hash-ref during processing.
 
-Brannigan is still in an early stage. Currently, no checks are made to
-validate the schemes built, so if you incorrectly define your schemes,
-Brannigan will not croak and processing will probably fail. Also, there
-is no support yet for recursive inheritance or any crazy inheritance
-situation. While deep inheritance is supported, it hasn't been tested
-extensively. Also bugs are popping up as I go along, so keep in mind that
-you might encounter bugs (and please report any if that happens).
+sub _finalize_schema {
+    my ( $self, $schema_name ) = @_;
 
-=head1 IDEAS FOR THE FUTURE
+    # Check cache first
+    return $self->{_schema_cache}->{$schema_name}
+      if exists $self->{_schema_cache}->{$schema_name};
 
-The following list of ideas may or may not be implemented in future
-versions of Brannigan:
+    my $schema = $self->{schemas}->{$schema_name}
+      || die "Unknown schema $schema_name";
 
-=over
+    # get a list of all schemas to inherit from
+    if ( $schema->{inherits_from} ) {
+        my @inherited_schemas =
+          $schema->{inherits_from}
+          && ref $schema->{inherits_from} eq 'ARRAY'
+          ? @{ $schema->{inherits_from} }
+          : $schema->{inherits_from} ? ( $schema->{inherits_from} )
+          :                            ();
 
-=item * Cross-scheme custom parsing methods
+        foreach my $inherited_schema_name (@inherited_schemas) {
+            my $inherited_schema = $self->{schemas}->{$inherited_schema_name}
+              || next;
 
-Add an option to define custom parse methods in the Brannigan object that
-can be used in the schemes as if they were built-in methods (cross-scheme
-custom validations are already supported, next up is parse methods).
+            # Recursively finalize inherited schemas to handle deep inheritance
+            $inherited_schema = $self->_finalize_schema($inherited_schema_name);
+            $schema = $self->{merger}->merge( $schema, $inherited_schema );
+        }
+    }
 
-=item * Support for third-party validation methods
+    # Cache the finalized schema for future use
+    $self->{_schema_cache}->{$schema_name} = $schema;
 
-Add support for loading validation methods defined in third-party modules
-(written like L<Brannigan::Validations>) and using them in schemes as if they
-were built-in methods.
+    return $schema;
+}
 
-=item * Validate schemes by yourself
+# _validate( \%params, %rules )
+# ------------------------------------------------
+# Validates the hash-ref of input parameters against a finalized schema, returns
+# undef if there are no rejects or a hash-ref of rejects if there are any.
 
-Have Brannigan use itself to validate the schemes it receives from the
-developers (i.e. users of this module).
+sub _validate {
+    my ( $self, $params, $rules ) = @_;
 
-=item * Support loading schemes from JSON/XML
+    my $rejects = {};
 
-Allow loading schemes from JSON/XML files or any other source. Does that
-make any sense?
+    # Handle unknown parameters according to the object's configuration
+    $self->_handle_unknown_params( $params, $rules, $rejects );
 
-=item * Something to aid rejects traversal
+    # Go over all the parameters in the schema and validate them
+    foreach my $param ( sort keys %{$rules} ) {
+        $self->_validate_param( $param, $params->{$param},
+            $rules->{$param}, $rejects );
+    }
 
-Find something that would make traversal of the rejects list easier or
-whatever. Plus, printing the name of the validation method and its supplement
-values in the rejects list isn't always a good idea. For example, if we
-use the C<one_of()> validation method with a big list of say 100 options,
-our rejects list will contain all these 100 options, and that's not nice.
-So, think about something there.
+    return $rejects if scalar keys %$rejects;
+    return;
+}
+
+# _validate_param( $value, \%rules )
+# ------------------------------------------------
+# Receives a parameter value and a hash-ref of validation rules to assert.
+# Returns a list of validations that failed for this parameter, if any.
+
+sub _validate_param {
+    my ( $self, $name, $value, $rules, $rejects ) = @_;
+
+    # is this a scalar, array or hash parameter?
+    if ( $rules->{hash} ) {
+        $self->_validate_hash( $name, $value, $rules, $rejects );
+    } elsif ( $rules->{array} ) {
+        $self->_validate_array( $name, $value, $rules, $rejects );
+    } else {
+        $self->_validate_scalar( $name, $value, $rules, $rejects );
+    }
+}
+
+# _validate_scalar( $value, \%rules, [$type] )
+# ----------------------------------------------------------
+# Receives the name of a parameter, its value, and a hash-ref of validations
+# to assert against. Returns a list of all failed validations for this
+# parameter. If the parameter is a child of a hash/array parameter, then
+# C<$type> must be provided with either 'hash' or 'array'.
+
+sub _validate_scalar {
+    my ( $self, $name, $value, $rules, $rejects ) = @_;
+
+    my $is_required = 0;
+
+    foreach my $v (
+        sort {
+            return -1 if $a eq 'required';   # $a is 'required' → it comes first
+            return 1  if $b eq 'required';   # $b is 'required' → it comes first
+            return
+              lc($a) cmp lc($b)
+              ;    # otherwise sort alphabetically, case-insensitive
+        } keys %{$rules}
+      )
+    {
+        next
+          if $v eq 'postprocess'
+          || $v eq 'preprocess'
+          || $v eq 'default'
+          || $v eq 'values'
+          || $v eq 'keys';
+
+        $is_required = 1 if $v eq 'required' && $rules->{$v};
+
+        last if !$is_required && !defined $value;
+
+        # Get the arguments we're passing to the validation function
+        my @args =
+          ref $rules->{$v} eq 'ARRAY'
+          ? @{ $rules->{$v} }
+          : ( $rules->{$v} );
+
+        my $validator_func =
+          $v eq 'validate' ? $rules->{$v} : $self->{validators}->{$v};
+
+        if ( !$validator_func->( $value, @args ) ) {
+            if ( $v eq 'validate' ) {
+                $rejects->{$name}->{$v} = 1;
+            } else {
+                $rejects->{$name}->{$v} = scalar @args > 1 ? \@args : $args[0];
+            }
+
+            # Do not bother with other validation functions if the 'required'
+            # validator failed (i.e. parameter was not provided at all).
+            if ( $v eq 'required' && $is_required ) {
+                last;
+            }
+        }
+    }
+}
+
+# _validate_array( $value, \%rules )
+# ------------------------------------------------
+# Receives a parameter value and a hash-ref of validation rules to assert.
+# Returns a hash-ref of rejects for the value, if any, otherwise returns undef.
+
+sub _validate_array {
+    my ( $self, $name, $value, $rules, $rejects ) = @_;
+
+    # Invoke validations on the array itself
+    $self->_validate_scalar( $name, $value, $rules, $rejects );
+    return if exists $rejects->{$name};
+
+    # Invoke validations on the items of the array value
+    if ( $rules->{values} ) {
+        my $i = 0;
+        foreach (@$value) {
+            $self->_validate_param( "$name.$i", $_, $rules->{values},
+                $rejects );
+            $i++;
+        }
+    }
+}
+
+# _validate_hash( $value, \%rules )
+# -----------------------------------------------
+# Receives a parameter value and a hash-ref of rules to assert.
+# Returns a hash-ref of rejects for the value, if any, or an undefined value
+# otherwise.
+
+sub _validate_hash {
+    my ( $self, $name, $value, $rules, $rejects ) = @_;
+
+    # Invoke validations on the parameter value itself
+    $self->_validate_scalar( $name, $value, $rules, $rejects );
+    return if exists $rejects->{$name};
+
+    # Handle unknown keys in nested hash if rules are defined
+    if ( $rules->{keys} && $self->{handle_unknown} ne 'ignore' ) {
+        $self->_handle_unknown_nested_params( $name, $value, $rules->{keys},
+            $rejects );
+    }
+
+    # Invoke validations on the key-value pairs of the hash
+    if ( $rules->{keys} ) {
+        foreach my $key ( keys %{ $rules->{keys} } ) {
+            $self->_validate_param( "$name.$key", $value->{$key},
+                $rules->{keys}->{$key}, $rejects );
+        }
+    }
+}
+
+# _preprocess( \%schema, \%params )
+# -------------------------------------------------
+# Receives a finalized schema and a hash-ref of parameter values, and performs
+# preprocessing.
+
+sub _preprocess {
+    my ( $self, $schema, $params ) = @_;
+
+    foreach my $param ( sort keys %{ $schema->{params} } ) {
+        $self->_preprocess_param( $param, $params,
+            $schema->{params}->{$param} );
+    }
+}
+
+# _preprocess_param( $name, \%params, \%rules )
+# -----------------------------------------------
+# Recursively preprocesses a parameter, applying defaults and preprocess
+# functions at all nesting levels (top-level, hashes, and array items).
+
+sub _preprocess_param {
+    my ( $self, $name, $params, $rules ) = @_;
+
+    # Early exit if no preprocessing needed
+    return
+         unless ( defined $rules->{default} && !defined $params->{$name} )
+      || ( defined $rules->{preprocess} && defined $params->{$name} )
+      || ( $rules->{hash}               && $rules->{keys} )
+      || ( $rules->{array}              && $rules->{values} );
+
+    # Apply default value if parameter not provided
+    if ( defined $rules->{default} && !defined $params->{$name} ) {
+        $params->{$name} =
+          ref $rules->{default} eq 'CODE'
+          ? $rules->{default}->()
+          : $rules->{default};
+    }
+
+    # Apply preprocess function if parameter exists and has preprocess
+    if ( defined $rules->{preprocess} && defined $params->{$name} ) {
+        $params->{$name} = $rules->{preprocess}->( $params->{$name} );
+    }
+
+    # Recursively preprocess nested structures
+    if ( defined $params->{$name} ) {
+        if (   $rules->{hash}
+            && $rules->{keys}
+            && ref( $params->{$name} ) eq 'HASH' )
+        {
+            # Preprocess hash keys recursively
+            foreach my $key ( keys %{ $rules->{keys} } ) {
+                $self->_preprocess_param( $key, $params->{$name},
+                    $rules->{keys}->{$key} );
+            }
+        } elsif ( $rules->{array}
+            && $rules->{values}
+            && ref( $params->{$name} ) eq 'ARRAY' )
+        {
+            # Preprocess array items recursively
+            for my $i ( 0 .. $#{ $params->{$name} } ) {
+                if (   $rules->{values}->{hash}
+                    && $rules->{values}->{keys}
+                    && ref( $params->{$name}->[$i] ) eq 'HASH' )
+                {
+                    # Each array item is a hash - preprocess its keys
+                    foreach my $key ( keys %{ $rules->{values}->{keys} } ) {
+                        $self->_preprocess_param(
+                            $key,
+                            $params->{$name}->[$i],
+                            $rules->{values}->{keys}->{$key}
+                        );
+                    }
+                }
+
+                # Note: We could extend this to handle other array item types,
+                # but hash items are the most common use case
+            }
+        }
+    }
+}
+
+# _postprocess( \%schema, \%params )
+# -------------------------------------------------
+# Receives a finalized schema and a hash-ref of parameter values, and performs
+# postprocessing.
+
+sub _postprocess {
+    my ( $self, $schema, $params ) = @_;
+
+    foreach my $param ( sort keys %{ $schema->{params} } ) {
+        next if !defined $schema->{params}->{$param}->{postprocess};
+
+        # This is a direct rule
+        $params->{$param} =
+          $schema->{params}->{$param}->{postprocess}->( $params->{$param} );
+    }
+
+    if ( $schema->{postprocess} && ref $schema->{postprocess} eq 'CODE' ) {
+        $schema->{postprocess}->($params);
+    }
+}
+
+# _handle_unknown_params( \%params, \%rules, \%rejects )
+# ------------------------------------------------
+# Handles input parameters that are not defined in the schema according
+# to the object's handle_unknown setting.
+
+sub _handle_unknown_params {
+    my ( $self, $params, $rules, $rejects ) = @_;
+
+    return if $self->{handle_unknown} eq 'ignore';
+
+    # Find parameters in input that are not in the schema
+    my @unknown_params;
+    foreach my $param ( keys %$params ) {
+        push @unknown_params, $param unless exists $rules->{$param};
+    }
+
+    if ( $self->{handle_unknown} eq 'remove' ) {
+
+        # Remove unknown parameters from input
+        delete $params->{$_} for @unknown_params;
+    } elsif ( $self->{handle_unknown} eq 'reject' ) {
+
+        # Add unknown parameters to rejects
+        $rejects->{$_} = { unknown => 1 } for @unknown_params;
+    }
+}
+
+# _handle_unknown_nested_params( $path, \%value, \%expected_keys, \%rejects )
+# -------------------------------------------------------------------------
+# Handles unknown parameters in nested hash structures according to the
+# object's handle_unknown setting. Similar to _handle_unknown_params but
+# works with nested paths and hash values.
+
+sub _handle_unknown_nested_params {
+    my ( $self, $path, $value, $expected_keys, $rejects ) = @_;
+
+    return if $self->{handle_unknown} eq 'ignore';
+    return unless ref($value) eq 'HASH';
+
+    # Find keys in the hash that are not in the expected keys
+    my @unknown_keys;
+    foreach my $key ( keys %$value ) {
+        push @unknown_keys, $key unless exists $expected_keys->{$key};
+    }
+
+    if ( $self->{handle_unknown} eq 'remove' ) {
+
+        # Remove unknown keys from the nested hash
+        delete $value->{$_} for @unknown_keys;
+    } elsif ( $self->{handle_unknown} eq 'reject' ) {
+
+        # Add unknown keys to rejects with nested path notation
+        for my $key (@unknown_keys) {
+            my $nested_path = $path ? "$path.$key" : $key;
+            $rejects->{$nested_path} = { unknown => 1 };
+        }
+    }
+}
+
+# _validate_schema_definition( $name, \%schema )
+# -----------------------------------------------
+# Validates a schema definition for common errors before registration.
+# Dies with descriptive error messages if the schema is invalid.
+
+sub _validate_schema_definition {
+    my ( $self, $name, $schema ) = @_;
+
+    # Use Brannigan itself to validate schema definitions.
+
+    # Skip validation for the schema validator schema itself
+    return if $name eq '__brannigan_schema_validator__';
+
+    my $handle_unknown = $self->{handle_unknown};
+    $self->{handle_unknown} = 'ignore';
+    my $rejects = $self->process(
+        '__brannigan_schema_validator__',
+        {
+            name   => $name,
+            schema => $schema
+        }
+    );
+    $self->{handle_unknown} = $handle_unknown;
+
+    die "Schema validation failed" if $rejects;
+}
+
+=head1 UPGRADING FROM 1.x TO 2.0
+
+Version 2.0 of Brannigan includes significant breaking changes. This guide will
+help you upgrade your existing code.
+
+=head2 BREAKING CHANGES
+
+=head3 Constructor and Schema Registration
+
+B<Old (1.x):>
+
+    my $b = Brannigan->new(
+        { name => 'schema1', params => { ... } },
+        { name => 'schema2', params => { ... } }
+    );
+
+B<New (2.0):>
+
+    my $b = Brannigan->new();  # No schemas in constructor
+    $b->register_schema('schema_name', { params => { ... } });
+    $b->register_schema('another_schema', { params => { ... } });
+
+=head3 Method Names
+
+Several methods have been renamed for clarity:
+
+=over 2
+
+=item * C<add_scheme()> => C<register_schema()>
+
+=item * C<custom_validation()> => C<register_validator()>
 
 =back
 
-=head1 SEE ALSO
+=head3 Return Value Changes
 
-L<Brannigan::Validations>, L<Brannigan::Tree>, L<Brannigan::Examples>.
+The C<process()> method now returns different values:
+
+B<Old (1.x):> Always returned a hash-ref with processed parameters and optional
+C<_rejects> key.
+
+B<New (2.0):> Returns C<undef> on success, hash-ref of rejects on failure.
+Processing happens in-place on the input hash-ref.
+
+    # Old style
+    my $result = $b->process('schema', \%params);
+    if ($result->{_rejects}) {
+        # Handle errors
+    }
+
+    # New style
+    my $rejects = $b->process('schema', \%params);
+    if ($rejects) {
+        # Handle $rejects hash-ref directly
+    }
+    # %params is modified in-place with processed values
+
+=head3 Error Structure Changes
+
+The structure of validation errors has changed significantly:
+
+B<Old (1.x):>
+
+    {
+        _rejects => {
+            parameter => ['required(1)', 'min_length(5)'],
+            nested    => { path => { param => ['max_value(100)'] } }
+        }
+    }
+
+B<New (2.0):>
+
+    {
+        'parameter'         => { required => 1, min_length => 5 },
+        'nested.path.param' => { max_value => 100 }
+    }
+
+Key changes:
+
+=over 4
+
+=item * Error paths are flattened using dot notation
+
+=item * Validator names and arguments are returned as key-value pairs
+
+=item * No more C<_rejects> wrapper
+
+=item * Unknown parameters are reported with C<< { unknown => 1 } >>
+
+=back
+
+=head3 Processing Function Changes
+
+=over 3
+
+=item * C<parse> functions → C<postprocess> functions
+
+=item * Default values are now calculated B<before> validation (they can fail validation)
+
+=item * C<postprocess> functions must return a replacement value, not a hash-ref
+
+=back
+
+B<Old (1.x):>
+
+    parse => sub {
+        my $value = shift;
+        return { parameter_name => process($value) };
+    }
+
+B<New (2.0):>
+
+    postprocess => sub {
+        my $value = shift;
+        return process($value);  # Return the processed value directly
+    }
+
+=head2 NEW FEATURES
+
+=head3 Preprocessing
+
+You can now preprocess input before validation:
+
+    params => {
+        username => {
+            preprocess => sub { lc },  # Lowercase parameter value
+            required => 1,
+            min_length => 3
+        }
+    }
+
+=head3 Global Postprocessing
+
+Add a global postprocess function to your schema:
+
+    {
+        params => { ... },
+        postprocess => sub {
+            my $params = shift;
+            $params->{computed_field} = calculate($params);
+            # Modify $params in-place, no return value needed
+        }
+    }
+
+=head3 Unknown Parameter Handling
+
+Control how unknown parameters are handled:
+
+    my $b = Brannigan->new();
+    $b->handle_unknown('ignore');  # Default: preserve unknown params
+    $b->handle_unknown('remove');  # Remove unknown params
+    $b->handle_unknown('reject');  # Fail validation on unknown params
+
+This works at all nesting levels (top-level, nested hashes, array items).
+
+=head3 Enhanced Default Values
+
+Default values now work in nested structures:
+
+    params => {
+        users => {
+            array => 1,
+            values => {
+                hash => 1,
+                keys => {
+                    name => { required => 1 },
+                    role => { default => 'user' }, # Applied to each array item
+                    active => { default => 1 }
+                }
+            }
+        }
+    }
+
+=head3 Improved Schema Inheritance
+
+Schema inheritance now works recursively and merges parameter definitions:
+
+    $b->register_schema('base', {
+        params => {
+            name => { required => 1, max_length => 50 }
+        }
+    });
+
+    $b->register_schema('extended', {
+        inherits => 'base',
+        params => {
+            name => { min_length => 2 },  # Merges with base constraints
+            email => { required => 1 }    # Additional parameter
+        }
+    });
+
+=head2 REMOVED FEATURES
+
+The following features have been removed:
+
+=over
+
+=item * Parameter groups (use global C<postprocess> instead)
+
+=item * Regular expression parameter definitions
+
+=item * Scope-local "_all" validators
+
+=item * C<max_dict> validator
+
+=item * C<forbidden> validator (use C<< handle_unknown => 'reject' >> instead)
+
+=item * C<ignore_missing> schema option (use C<handle_unknown> instead)
+
+=back
 
 =head1 AUTHOR
 
@@ -1008,37 +1788,13 @@ Ido Perlmuter, C<< <ido at ido50 dot net> >>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-brannigan at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Brannigan>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
+Please report any bugs or feature requests to L<https://github.com/ido50/Brannigan>.
 
 =head1 SUPPORT
 
 You can find documentation for this module with the perldoc command.
 
-	perldoc Brannigan
-
-You can also look for information at:
-
-=over 4
-
-=item * RT: CPAN's request tracker
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Brannigan>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Brannigan>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Brannigan>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Brannigan/>
-
-=back
+    perldoc Brannigan
 
 =head1 ACKNOWLEDGEMENTS
 
@@ -1047,7 +1803,7 @@ validation plugin (L<http://demos.usejquery.com/ketchup-plugin/>).
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017 Ido Perlmuter
+Copyright 2025 Ido Perlmuter
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

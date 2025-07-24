@@ -13,7 +13,7 @@ use strict;
 use Exporter;
 use Time::HiRes qw( time );
 
-our $VERSION = '1.45';
+our $VERSION = '1.47';
 
 our @ISA    = qw( Exporter );
 our @EXPORT = qw(
@@ -100,6 +100,13 @@ sub socket_print
 
 ##############################################################################
 
+# returns read data in scalar context:
+# return undef if cannot read incoming message length 
+# return "" if incoming length is 0, i.e. empty data
+# in list context:
+# ( read_data, read_length, error_string )
+# error_string is undef for OK (no error)
+
 sub socket_read_message
 {
   my $sock    = shift;
@@ -110,17 +117,17 @@ sub socket_read_message
   if( $rc_data_len == 0 )
     {
     # end of comms
-    return undef;
+    return wantarray ? ( undef, 0, 'E_EOF' ) : undef;
     }
   my $data_len = unpack( 'N', $data_len_N32 );
   if( $rc_data_len != 4 or $data_len < 0 or $data_len >= 2**32 )
     {
     # ivalid length
-    return undef;
+    return wantarray ? ( undef, 0, 'E_MSGLEN' ) : undef;
     }
   if( $data_len == 0 )
     {
-    return "";
+    return wantarray ? ( "", 0, undef ) : "";
     }
 
   my $read_data;
@@ -131,7 +138,7 @@ sub socket_read_message
     return wantarray ? ( undef, $res_data_len ) : undef;
     }
   
-  return wantarray ? ( $read_data, $res_data_len ) : $res_data_len;
+  return wantarray ? ( $read_data, $res_data_len, undef ) : $read_data;
 }
 
 sub socket_write_message

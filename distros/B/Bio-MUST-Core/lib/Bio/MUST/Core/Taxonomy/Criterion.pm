@@ -1,10 +1,10 @@
 package Bio::MUST::Core::Taxonomy::Criterion;
 # ABSTRACT: Helper class for multiple-criterion classifier based on taxonomy
-$Bio::MUST::Core::Taxonomy::Criterion::VERSION = '0.251810';
+$Bio::MUST::Core::Taxonomy::Criterion::VERSION = '0.252040';
 use Moose;
 use namespace::autoclean;
 
-use List::AllUtils qw(sum count_by);
+use List::AllUtils qw(sum count_by uniq_by);
 
 use Bio::MUST::Core::Types;
 
@@ -31,11 +31,13 @@ has $_ => (
 ) for qw(              max_seq_count
          min_org_count max_org_count
          min_copy_mean max_copy_mean
+         min_seq_perc  max_seq_perc
+         min_org_perc  max_org_perc
 );
 
 
 
-sub matches {
+sub matches {           ## no critic (Subroutines::ProhibitExcessComplexity)
     my $self     = shift;
     my $listable = shift;
 
@@ -53,14 +55,18 @@ sub matches {
     # case 2: handle "true" listable objects
 
     # get seq_ids passing tax_filter
-    my @seq_ids = grep { $self->is_allowed($_) } $listable->all_seq_ids;
-    my $seq_n = @seq_ids;
+    my @seq_ids = $listable->all_seq_ids;
+    my @targets = grep { $self->is_allowed($_) } @seq_ids;
 
     # return success if positively avoided taxa are indeed absent
+    # Note: no need to compute percentages yet
+    my $seq_n = @targets;
     unless ($seq_n) {
         return 1
             if ( defined $self->max_seq_count && !$self->max_seq_count )
             || ( defined $self->max_org_count && !$self->max_org_count )
+            || ( defined $self->max_seq_perc  && !$self->max_seq_perc  )
+            || ( defined $self->max_org_perc  && !$self->max_org_perc  )
         ;
     }
 
@@ -69,17 +75,23 @@ sub matches {
     return 0 if                                 $seq_n < $self->min_seq_count;
     return 0 if defined $self->max_seq_count && $seq_n > $self->max_seq_count;
 
+    # return failure unless #seqs within allowed bounds (in percents)
+    my $seq_p = 100.0 * $seq_n / $listable->all_seq_ids;    # *all* ids count
+    return 0 if defined $self->min_seq_perc  && $seq_p < $self->min_seq_perc;
+    return 0 if defined $self->max_seq_perc  && $seq_p > $self->max_seq_perc;
+
     # return success if no more condition for criterion
     # this is optimized for speed
     return 1
         unless defined $self->min_org_count || defined $self->max_org_count
             || defined $self->min_copy_mean || defined $self->max_copy_mean
+            || defined $self->min_org_perc  || defined $self->max_org_perc
     ;
 
     # compute #orgs, #seqs/org and mean(copy/org)
     # these statistics only pertain to seq_ids having passed tax_filter
-    my %count_for = count_by { $_->full_org // $_->taxon_id } @seq_ids;
-    # Note: use taxon_id if full_org is not defined (for tax-aware abbr ids)
+    my %count_for = count_by { $_->full_org // $_->taxon_id } @targets;
+    # Note: use taxon_id if full_org is not defined (for tax-aware abbr_ids)
     # this implies that each taxon_id must correspond to a single org
     my $org_n = keys %count_for;
     my $cpy_n = (sum values %count_for) / $org_n;
@@ -93,6 +105,13 @@ sub matches {
     # by default there is no lower nor upper bound on mean(copy/org)
     return 0 if defined $self->min_copy_mean && $cpy_n < $self->min_copy_mean;
     return 0 if defined $self->max_copy_mean && $cpy_n > $self->max_copy_mean;
+
+    # return failure unless #orgs within allowed bounds (in percents)
+    # these statistics are in percents of *all* orgs found in the listable
+    my $org_p
+        = 100.0 * $org_n / uniq_by { $_->full_org // $_->taxon_id } @seq_ids;
+    return 0 if defined $self->min_org_perc && $org_p < $self->min_org_perc;
+    return 0 if defined $self->max_org_perc && $org_p > $self->max_org_perc;
 
     # return success
     return 1;
@@ -111,7 +130,7 @@ Bio::MUST::Core::Taxonomy::Criterion - Helper class for multiple-criterion class
 
 =head1 VERSION
 
-version 0.251810
+version 0.252040
 
 =head1 SYNOPSIS
 

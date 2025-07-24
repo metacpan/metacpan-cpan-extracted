@@ -17,8 +17,8 @@
 ]>
 <ISBNRangeMessage>
   <MessageSource>International ISBN Agency</MessageSource>
-  <MessageSerialNumber>cb268895-af54-47cb-9bde-30766fb9b94e</MessageSerialNumber>
-  <MessageDate>Tue, 22 Jul 2025 04:58:57 BST</MessageDate>
+  <MessageSerialNumber>b18d4172-dd2f-4f11-9e00-1d03a9736650</MessageSerialNumber>
+  <MessageDate>Wed, 23 Jul 2025 05:00:29 BST</MessageDate>
   <EAN.UCCPrefixes>
     <EAN.UCC>
       <Prefix>978</Prefix>
@@ -8524,6 +8524,32 @@
         </Rule>
         <Rule>
           <Range>9600000-9999999</Range>
+          <Length>3</Length>
+        </Rule>
+      </Rules>
+    </Group>
+    <Group>
+      <Prefix>978-99991</Prefix>
+      <Agency>Burkina Faso</Agency>
+      <Rules>
+        <Rule>
+          <Range>0000000-0999999</Range>
+          <Length>1</Length>
+        </Rule>
+        <Rule>
+          <Range>1000000-4999999</Range>
+          <Length>0</Length>
+        </Rule>
+        <Rule>
+          <Range>5000000-5199999</Range>
+          <Length>2</Length>
+        </Rule>
+        <Rule>
+          <Range>5200000-9899999</Range>
+          <Length>0</Length>
+        </Rule>
+        <Rule>
+          <Range>9900000-9999999</Range>
           <Length>3</Length>
         </Rule>
       </Rules>

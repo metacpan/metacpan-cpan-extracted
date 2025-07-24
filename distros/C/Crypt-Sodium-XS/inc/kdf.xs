@@ -98,7 +98,7 @@ SV * kdf_derive( \
       new_key_flags = g_protmem_flags_key_default;
   }
 
-  new_key_mv = protmem_init(aTHX_ key_req_len, new_key_flags);
+  new_key_mv = protmem_init(aTHX_ new_key_len, new_key_flags);
   if (new_key_mv == NULL)
     croak("derive: Failed to allocate protmem");
 

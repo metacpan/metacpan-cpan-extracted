@@ -439,28 +439,6 @@ void _overload_nomethod(SV * self, ...)
   operator = SvPVbyte_nolen(ST(3));
   croak("Operation \"%s\" on MemVault is not supported", operator);
 
-SV * _overload_str(SV * self, ...)
-
-  PREINIT:
-  protmem *self_pm;
-
-  CODE:
-  self_pm = protmem_get(aTHX_ self, MEMVAULT_CLASS);
-
-  if (!(self_pm->flags & PROTMEM_FLAG_LOCK_UNLOCKED))
-    croak("_overload_str: Unlock MemVault object before stringifying");
-
-  if (protmem_grant(aTHX_ self_pm, PROTMEM_FLAG_MPROTECT_RO) != 0)
-    croak("_overload_str: Failed to grant protmem RO");
-
-  RETVAL = newSVpvn((char *)self_pm->pm_ptr, self_pm->size);
-
-  if (protmem_release(aTHX_ self_pm, PROTMEM_FLAG_MPROTECT_RO) != 0)
-    croak("_overload_str: Failed to release protmem RO");
-
-  OUTPUT:
-  RETVAL
-
 void bitwise_and(SV * self, SV * other, ...)
 
   ALIAS:
@@ -586,7 +564,7 @@ SV * clone(SV * self)
   OUTPUT:
   RETVAL
 
-void compare(SV * self, SV * other, STRLEN length = 0)
+void compare(SV * self, SV * other, STRLEN size = 0)
 
   ALIAS:
   _overload_eq = 1
@@ -594,43 +572,53 @@ void compare(SV * self, SV * other, STRLEN length = 0)
   memcmp = 3
 
   PREINIT:
-  protmem *self_pm;
-  protmem *other_pm = NULL;
-  unsigned char *other_buf;
-  STRLEN other_len;
+  protmem *self_pm = NULL, *other_pm = NULL;
+  unsigned char *self_buf, *other_buf;
+  STRLEN self_size, other_size;
   int ret = 0;
 
   PPCODE:
-  if (sv_derived_from(other, MEMVAULT_CLASS)) {
-    other_pm = protmem_get(aTHX_ other, MEMVAULT_CLASS);
-    other_buf = other_pm->pm_ptr;
-    other_len = other_pm->size;
+  /* since used for overloads, args could be swapped. could require either self
+   * or other to be a memvault */
+  if (sv_derived_from(self, MEMVAULT_CLASS)) {
+    self_pm = protmem_get(aTHX_ self, MEMVAULT_CLASS);
+    if (ix == 0 && !(self_pm->flags & PROTMEM_FLAG_LOCK_UNLOCKED))
+      croak("compare: Unlock MemVault object before comparison");
+    self_buf = self_pm->pm_ptr;
+    self_size = self_pm->size;
   }
   else
-    other_buf = (unsigned char *)SvPVbyte(other, other_len);
+    self_buf = (unsigned char *)SvPVbyte(self, self_size);
 
-  self_pm = protmem_get(aTHX_ self, MEMVAULT_CLASS);
-  if (self_pm->size != other_len) {
+  if (sv_derived_from(other, MEMVAULT_CLASS)) {
+    other_pm = protmem_get(aTHX_ other, MEMVAULT_CLASS);
+    if (ix == 0 && !(other_pm->flags & PROTMEM_FLAG_LOCK_UNLOCKED))
+      croak("compare: Unlock MemVault object before comparison");
+    other_buf = other_pm->pm_ptr;
+    other_size = other_pm->size;
+  }
+  else
+    other_buf = (unsigned char *)SvPVbyte(other, other_size);
+
+  if (self_size != other_size) {
     switch(ix) {
       case 1: /* fallthrough */
       case 2:
         croak("compare: %s %s",
-              "Variables of unequal length cannot be automatically compared.",
-              "Please use memcmp() with the length argument provided");
+              "Variables of unequal size cannot be automatically compared.",
+              "Please use memcmp() with the size argument provided.");
         break;
       default:
-        if (length == 0) {
-          if (self_pm->size != other_len)
-            croak("compare: %s %s",
-                  "Variables of unequal length cannot be automatically compared.",
-                  "Please provide the length argument");
-          length = other_len;
+        if (size == 0) {
+          croak("compare: %s %s",
+                "Variables of unequal size cannot be automatically compared.",
+                "Please provide the size argument.");
         }
         else {
-          if (length > self_pm->size)
-            croak("compare: The argument (left) is shorter then requested length");
-          else if (length > other_len)
-            croak("compare: The argument (right) is shorter then requested length");
+          if (size > self_size)
+            croak("compare: The argument (left) is shorter then requested size");
+          else if (size > other_size)
+            croak("compare: The argument (right) is shorter then requested size");
         }
     }
   }
@@ -639,27 +627,29 @@ void compare(SV * self, SV * other, STRLEN length = 0)
     if (protmem_grant(aTHX_ self_pm, PROTMEM_FLAG_MPROTECT_RO) != 0)
       croak("compare: Failed to grant self protmem RO");
 
-  if (other_pm)
+  if (other_pm) {
     if (protmem_grant(aTHX_ other_pm, PROTMEM_FLAG_MPROTECT_RO) != 0) {
-      protmem_release(aTHX_ self_pm, PROTMEM_FLAG_MPROTECT_RO);
+      if (self_pm)
+        protmem_release(aTHX_ self_pm, PROTMEM_FLAG_MPROTECT_RO);
       croak("compare: Failed to grant other protmem RO");
     }
+  }
 
   if (ix != 0)
-    ret = sodium_memcmp(self_pm->pm_ptr, other_buf, self_pm->size);
+    ret = sodium_memcmp(self_buf, other_buf, self_size);
   else
-    ret = sodium_compare(self_pm->pm_ptr, other_buf, self_pm->size);
+    ret = sodium_compare(self_buf, other_buf, self_size);
 
-  if (other_pm)
-    if (protmem_release(aTHX_ other_pm, PROTMEM_FLAG_MPROTECT_RO) != 0) {
+  if (other_pm && protmem_release(aTHX_ other_pm, PROTMEM_FLAG_MPROTECT_RO) != 0) {
+    if (self_pm)
       protmem_release(aTHX_ self_pm, PROTMEM_FLAG_MPROTECT_RO);
-      croak("compare: Failed to release other protmem RO");
-    }
-  if (protmem_release(aTHX_ self_pm, PROTMEM_FLAG_MPROTECT_RO) != 0)
+    croak("compare: Failed to release other protmem RO");
+  }
+  if (self_pm && protmem_release(aTHX_ self_pm, PROTMEM_FLAG_MPROTECT_RO) != 0)
     croak("compare: Failed to release self protmem RO");
 
   if (ix == 0) {
-    XSRETURN_UV(ret);
+    XSRETURN_IV(ret);
   }
   else if (ix == 2) {
     if (ret == 0)
@@ -681,7 +671,7 @@ consider a flags argument. that cannot co-exist with overloading as it is now.
 void concat(SV * self, SV * other, SV * swapped = &PL_sv_undef)
 
   ALIAS:
-  _overload_concat = 1
+  concat_inplace = 1
 
   PREINIT:
   protmem *self_pm;
@@ -715,7 +705,7 @@ void concat(SV * self, SV * other, SV * swapped = &PL_sv_undef)
     croak("concat: Failed to grant other protmem RO");
   }
 
-  if (ix == 1) {
+  if (ix == 0) {
     if (protmem_grant(aTHX_ self_pm, PROTMEM_FLAG_MPROTECT_RO) != 0) {
       if (other_pm)
         protmem_release(aTHX_ other_pm, PROTMEM_FLAG_MPROTECT_RO);
@@ -1242,6 +1232,28 @@ SV * to_base64( \
   }
 
   RETVAL = protmem_to_sv(aTHX_ new_pm, MEMVAULT_CLASS);
+
+  OUTPUT:
+  RETVAL
+
+SV * to_bytes(SV * self, ...)
+
+  PREINIT:
+  protmem *self_pm;
+
+  CODE:
+  self_pm = protmem_get(aTHX_ self, MEMVAULT_CLASS);
+
+  if (!(self_pm->flags & PROTMEM_FLAG_LOCK_UNLOCKED))
+    croak("_overload_str: Unlock MemVault object before stringifying");
+
+  if (protmem_grant(aTHX_ self_pm, PROTMEM_FLAG_MPROTECT_RO) != 0)
+    croak("_overload_str: Failed to grant protmem RO");
+
+  RETVAL = newSVpvn((char *)self_pm->pm_ptr, self_pm->size);
+
+  if (protmem_release(aTHX_ self_pm, PROTMEM_FLAG_MPROTECT_RO) != 0)
+    croak("_overload_str: Failed to release protmem RO");
 
   OUTPUT:
   RETVAL

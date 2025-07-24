@@ -1,0 +1,54 @@
+---
+abstract: 'Manage a database of curated Perl modules'
+author:
+  - 'Ron Savage (ron@savage.net.au)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '1.001002'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CPAN-MetaCurator
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Config::Tiny: '2.3'
+  DBI: '1.645'
+  DBIx::Admin::CreateTable: '2.11'
+  DBIx::Simple: '1.37'
+  Data::Dumper::Concise: '2.023'
+  DateTime: '1.65'
+  DateTime::Tiny: '1.07'
+  ExtUtils::MakeMaker: '7.7'
+  File::Slurper: '0.014'
+  File::Spec: '3.9'
+  Getopt::Long: '2.57'
+  HTML::Entities: '3.83'
+  HTML::TreeBuilder: '5.07'
+  Log::Handler: '0.9'
+  Mojo::JSON: '0'
+  Mojo::Log: '0'
+  Moo: '2.005005'
+  Path::Tiny: '0.146'
+  Pod::Usage: '2.03'
+  Text::CSV::Encoded: '0.25'
+  Types::Standard: '2.006'
+  boolean: '0.46'
+  lib: '0.65'
+  open: '1.13'
+  parent: '0.242'
+  strict: '1.12'
+  warnings: '1.58'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-MetaCurator
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/ronsavage/CPAN-MetaCurator.git
+version: '1.00'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -2,7 +2,7 @@ package Bio::MUST::Core::Taxonomy;
 # ABSTRACT: NCBI Taxonomy one-stop shop
 # CONTRIBUTOR: Loic MEUNIER <loic.meunier@doct.uliege.be>
 # CONTRIBUTOR: Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
-$Bio::MUST::Core::Taxonomy::VERSION = '0.251810';
+$Bio::MUST::Core::Taxonomy::VERSION = '0.252040';
 use Moose;
 use namespace::autoclean;
 
@@ -192,28 +192,26 @@ sub _build_ncbi_tax {
 
         # allow most NCBI Taxonomy synonyms classes
         # cut -f4 -d'|' names.dmp | sort | uniq -c
-        # last updated on Aug-18-2021
-        #    1582   acronym
-        #  576856   authority
-        #     228   blast name
-        #   14555   common name
-        #   52040   equivalent name
-        #     484   genbank acronym
-        #   29979   genbank common name
-        #    1096   genbank synonym
-        #     733   in-part
-        #   61755   includes
-        # 2354398   scientific name
-        #  199012   synonym
-        #  167825   type material
+        # last updated on Jul-23-2025
+        #    2186     acronym
+        #  872668     authority
+        #     229     blast name
+        #   14861     common name
+        #   64495     equivalent name
+        #   30837     genbank common name
+        #     653     in-part
+        #   93973     includes
+        # 2686415     scientific name
+        #  354657     synonym
+        #  322156     type material
 
         synonyms => [
-            'synonym', 'genbank synonym',
-            'acronym', 'genbank acronym',
-            'anamorph', 'genbank anamorph', 'teleomorph',       # now useless
+            'acronym', 'synonym',
+          # 'genbank acronym', 'genbank synonym',               # now useless
+          # 'anamorph', 'genbank anamorph', 'teleomorph',       # now useless
             'blast name', 'common name', 'genbank common name',
             'equivalent name', 'includes',
-          # 'authority', 'in-part', 'type material',
+          # 'authority', 'in-part', 'type material',            # unwanted
         ]
     );
 }
@@ -351,11 +349,14 @@ sub _build_dupes_for {
 
 # Note: taken from nodes.dmp as follows (then manually re-ordered)
 # cut -f3 -d'|' nodes.dmp | sort | uniq
-# last updated on Aug-18-2021
+# last updated on Jul-23-2025
 const my @LEVELS => (
     'skip',                     # default collapsing level
     'top',                      # useful to preserve 'cellular organisms'
-    'superkingdom', 'kingdom', 'subkingdom',
+    'cellular root', 'acellular root',
+    'domain', 'realm',
+    'superkingdom',             # not in use anymore (kept for compatibility)
+    'kingdom', 'subkingdom',
     'superphylum', 'phylum', 'subphylum',
     'superclass', 'class', 'subclass', 'infraclass',
     'cohort', 'subcohort',
@@ -582,7 +583,7 @@ sub get_taxid_from_seq_id {
     }
 
     # 2. default path is to use already parsed taxon_id
-    # this applies to modern MUST SeqIds and taxonomy-aware abbr ids
+    # this applies to modern MUST SeqIds and taxonomy-aware abbr_ids
     return $seq_id->taxon_id
         if $seq_id->taxon_id;
 
@@ -1505,7 +1506,7 @@ sub _setup_ncbi_taxdir {
     ### Please be patient...
 
     # setup remote archive access
-    my $base = 'ftp://ftp.ncbi.nih.gov/pub/taxonomy';
+    my $base = 'https://ftp.ncbi.nih.gov/pub/taxonomy';
     my @targets = (
         'taxdump.tar.gz',
         $gi_mapper ? qw(gi_taxid_nucl.dmp.gz gi_taxid_prot.dmp.gz) : ()
@@ -1655,7 +1656,7 @@ sub _make_gca_files {
     my %node_for;
     my %fix_for;
 
-    my $base_acc = 'ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS';
+    my $base_acc = 'https://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS';
 
     for my $target (@targets_acc) {
         #### $target
@@ -1695,10 +1696,6 @@ sub _make_gca_files {
             # skip GCF entries with corresponding GCA already available...
             # ... and transform remaining GCF entries into GCA entries
             # Note: versions are considered relevant; only prefix is ignored
-            # TODO: check how it goes with GTDB
-            # grep 021018745 gca0-names.dmp | cat -n
-            #  1	GCA_021018745.1	|	Gloeobacter morelensis	|		|	scientific name
-            #  2	GCF_021018745.1	|	Gloeobacter morelensis	|		|	scientific name
 
             if ($accession =~ $GCAONLY) {
                 $accession =~ tr/F/A/;
@@ -1922,8 +1919,8 @@ sub _setup_gtdb_taxdir {
 
     # hash for rank code
     my %rank_for = map {
-       $_ eq 'superkingdom' ? 'd__' : substr($_, 0, 1) . '__' => $_
-    } qw (superkingdom phylum class order family genus species);
+        substr($_, 0, 1) . '__' => $_
+    } qw (domain phylum class order family genus species);
 
     # setup taxonomic tree
     my %tree = (
@@ -1942,7 +1939,10 @@ sub _setup_gtdb_taxdir {
     );
 
     # fill up taxonomic tree
-    for my $gca ( keys %{$table_for} ) {
+    my %seen;
+
+    LINE:
+    for my $gca (keys %{$table_for}) {
 
         # get GTDB taxonomy
         my $lineage = $table_for->{$gca}{'gtdb_taxonomy'};
@@ -1975,16 +1975,15 @@ sub _setup_gtdb_taxdir {
             $tree_ref->{$taxon_id}{uniq_name} = $uniq_name
                 if $uniq_name;
 
-            # store GCA|F
+            # skip GCF entries with corresponding GCA already available...
+            # ... and transform remaining GCF entries into GCA entries
+            # Note: input order is actually irrelevant (no need to sort keys)
+            # Note: versions are considered relevant; only prefix is ignored
             if ($rank eq 'species') {
-
-                # change GCF to GCA and store it
-                if ($gca =~ m/^GCF/xms) {
-                    my $new_gca = $gca =~ tr/F/A/r;
-                    push @{ $tree_ref->{$taxon_id}{gca} }, $new_gca;
-                }
-
+                $gca =~ tr/F/A/;
+                next LINE if $seen{$gca};
                 push @{ $tree_ref->{$taxon_id}{gca} }, $gca;
+                $seen{$gca} = 1;
             }
 
             # setup children entry if lineage not yet exhausted
@@ -2014,6 +2013,8 @@ sub _setup_gtdb_taxdir {
     # write regular dmp files (first recursive call)
     _write_dmp_files( $name_out, $node_out, $gcaname_out, $gcanode_out,
         1, 1, $tree{1} );
+
+    # TODO: make this part more similar with NCBI (error and cache handling)
 
     if ( -r $name_file && -r $node_file ) {
         ### Successfully wrote taxid files!
@@ -2108,6 +2109,17 @@ sub _append2dmp {                           ## no critic (ProhibitManyArgs)
     return;
 }
 
+sub no_warnings {
+    my $class = shift;
+
+    return sub {
+        my $msg = shift;
+        return if $msg =~ m/is\ taxonomically\ ambiguous/xms;
+        return if $msg =~ m/cannot\ fetch\ tax/xms;
+        warn $msg;              ## no critic (ErrorHandling::RequireCarping)
+    };
+}
+
 no Moose::Util::TypeConstraints;
 
 __PACKAGE__->meta->make_immutable;
@@ -2123,7 +2135,7 @@ Bio::MUST::Core::Taxonomy - NCBI Taxonomy one-stop shop
 
 =head1 VERSION
 
-version 0.251810
+version 0.252040
 
 =head1 SYNOPSIS
 

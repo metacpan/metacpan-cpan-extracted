@@ -1,7 +1,7 @@
 package Bio::MUST::Apps::OmpaPa::Parameters;
-# ABSTRACT: Selected parameters
+# ABSTRACT: Internal class for serializing user-selected parameters
 # CONTRIBUTOR: Amandine BERTRAND <amandine.bertrand@doct.uliege.be>
-$Bio::MUST::Apps::OmpaPa::Parameters::VERSION = '0.251770';
+$Bio::MUST::Apps::OmpaPa::Parameters::VERSION = '0.252040';
 use Moose;
 
 use autodie;
@@ -35,13 +35,18 @@ has 'max_' . $_ => (
     is       => 'rw',
     isa      => 'Num',
     builder  => '_build_max_' . $_,
-) for qw(len eval cov copy);
+) for qw(hits len eval cov copy);
 
 
 ## no critic (ProhibitUnusedPrivateSubroutines)
 
 sub _build_bb_file {
     return File::Temp->new( UNLINK => 0, SUFFIX => '.bb' );
+}
+
+# TODO: improve handling of default values (DRY principle; same issue as in 42)
+sub _build_max_hits {
+    return 200000;
 }
 
 sub _build_min_copy {
@@ -88,8 +93,8 @@ sub store_bounds {
 set print "$bb_file"
 print "min_eval=" . int(GPVAL_X_MIN)
 print "max_eval=" . int(GPVAL_X_MAX)
-print "min_len=" . int(GPVAL_Y_MIN)
-print "max_len=" . int(GPVAL_Y_MAX)
+print "min_len="  . int(GPVAL_Y_MIN)
+print "max_len="  . int(GPVAL_Y_MAX)
 EOT
 }
 
@@ -124,11 +129,11 @@ __END__
 
 =head1 NAME
 
-Bio::MUST::Apps::OmpaPa::Parameters - Selected parameters
+Bio::MUST::Apps::OmpaPa::Parameters - Internal class for serializing user-selected parameters
 
 =head1 VERSION
 
-version 0.251770
+version 0.252040
 
 =head1 AUTHOR
 

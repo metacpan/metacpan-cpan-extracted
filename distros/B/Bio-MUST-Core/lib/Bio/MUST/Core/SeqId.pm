@@ -1,7 +1,7 @@
 package Bio::MUST::Core::SeqId;
 # ABSTRACT: Modern and legacy MUST-compliant sequence id
 # CONTRIBUTOR: Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
-$Bio::MUST::Core::SeqId::VERSION = '0.251810';
+$Bio::MUST::Core::SeqId::VERSION = '0.252040';
 use Moose;
 use namespace::autoclean;
 
@@ -446,7 +446,6 @@ const my @GENERA  => qw(
     2-12-FULL-37-11
     2-12-FULL-37-12
     2-12-FULL-37-14
-    2-12-FULL-37-34
     2-12-FULL-37-7b
     2-12-FULL-38-22
     2-12-FULL-39-13
@@ -458,14 +457,11 @@ const my @GENERA  => qw(
     2-12-FULL-41-16
     2-12-FULL-41-17
     2-12-FULL-41-20
-    2-12-FULL-42-10
     2-12-FULL-42-15
     2-12-FULL-43-11
     2-12-FULL-43-12
-    2-12-FULL-43-28
     2-12-FULL-44-25
     2-12-FULL-45-10
-    2-12-FULL-45-12
     2-12-FULL-45-22
     2-12-FULL-48-17
     2-12-FULL-49-11
@@ -540,7 +536,6 @@ const my @GENERA  => qw(
     40CM-68-15
     41-12-T18
     41-269
-    41T-STBD-0c-01a
     42-11
     42-54-T18
     43-108
@@ -583,11 +578,9 @@ const my @GENERA  => qw(
     58-81
     62-47
     629B-23
-    63-22
     630D-37
     64-32
     65-79
-    65-9
     66-26
     66-474
     67-14
@@ -599,7 +592,6 @@ const my @GENERA  => qw(
     9FT-COMBO-42-15
     9FT-COMBO-48-23
     9FT-COMBO-53-11
-    9FT-COMBO-55-16
     A-2
     A-MIC-10
     A05DMB-2
@@ -609,9 +601,7 @@ const my @GENERA  => qw(
     AAA240-E13
     AAA261-N23
     AAA300-D14
-    AAA536-G10
     AABM5-125-24
-    AABM5-25-91
     AaIE-18
     Aalborg-AAW-1
     AB-137-C09
@@ -619,6 +609,7 @@ const my @GENERA  => qw(
     AB-629-J13
     AB001-6
     AB1-6
+    Aba-Mianyang
     AC-14
     AC-16
     AC-21
@@ -644,8 +635,8 @@ const my @GENERA  => qw(
     acetamiprid-degrading
     Activation-tagging
     AD8-1
-    Adeno-Associated
     adeno-associated
+    Adeno-Associated
     Adeno-associated
     AE-B3A
     AE-B3B
@@ -666,7 +657,6 @@ const my @GENERA  => qw(
     AG-363-O15
     AG-363-P08
     AG-402-N21
-    AG-409-A19
     AG-409-B05
     AG-409-B13
     AG-409-D09
@@ -700,7 +690,6 @@ const my @GENERA  => qw(
     Alg240-R148
     alk-system
     allo-octoploid
-    Alpha-05
     Altai-like
     AM-0621
     AM-1111
@@ -709,7 +698,6 @@ const my @GENERA  => qw(
     AMARA-1
     ammonia-oxidizing
     aniline-degrading
-    ANME-1
     ANME-1-THS
     ANME-2
     ANMV-1
@@ -745,7 +733,6 @@ const my @GENERA  => qw(
     ASO4-4
     ASP10-02a
     ASP10-05a
-    ATCC-39006
     ATX-6F1
     Aved-18
     Avian-like
@@ -754,7 +741,6 @@ const my @GENERA  => qw(
     AWTP1-18
     AWTP1-30
     AWTP1-31
-    AWTP1-35
     AWTP1-9
     Aydin-like
     B-17B0
@@ -805,7 +791,6 @@ const my @GENERA  => qw(
     B1SED10-159
     B1SED10-16
     B1Sed10-166
-    B1SED10-173
     B1SED10-174
     B1Sed10-187
     B1SED10-225
@@ -876,9 +861,7 @@ const my @GENERA  => qw(
     B62-G9
     B64-G9
     B65-G9
-    B66-G16
     B67-G16
-    B68-G16
     B68-G9
     B69-G16
     B7-G16
@@ -905,7 +888,6 @@ const my @GENERA  => qw(
     BA-13
     BA-19
     Bact-08
-    Bact-11
     Bact-19
     Bacteroides-like
     Badici-like
@@ -942,17 +924,18 @@ const my @GENERA  => qw(
     BICA1-8
     Bidnavirus-like
     Bifidobacterium-E.
+    Big-node
     biocide-degrading
     biphenthrin-degrading
     biphenyl-degrading
-    Birds-foot
     birds-foot
-    BK-30
+    Birds-foot
     Black-and-white
     Black-eyed
     Black-headed
     black-headed
     Blackcurrant-associated
+    Blue-faced
     Bo-Circo-like
     Bog-105
     Bog-1112
@@ -986,11 +969,9 @@ const my @GENERA  => qw(
     Bog-793
     Bog-877
     BOG-908
-    BOG-930
     BOG-931
     BOG-932
     BOG-933
-    BOG-935
     BOG-938
     BOG-944
     Bog-950
@@ -1003,6 +984,7 @@ const my @GENERA  => qw(
     BP-173
     BP-191
     BP-197
+    BP-464
     BRH-c0
     BRH-c25
     BRH-c32
@@ -1028,7 +1010,6 @@ const my @GENERA  => qw(
     BS150m-G66
     BS150m-G67
     BS750-G32
-    BS750m-G10
     BS750m-G14
     BS750m-G15
     BS750m-G21
@@ -1038,7 +1019,6 @@ const my @GENERA  => qw(
     BS750m-G28
     BS750m-G30
     BS750m-G34
-    BS750m-G37
     BS750m-G39
     BS750m-G4
     BS750m-G44
@@ -1098,7 +1078,6 @@ const my @GENERA  => qw(
     C.glutamicum-E.coli
     C7867-001
     C7867-002
-    C7867-005
     C7867-006
     Cachavirus-1B
     CACIAM-22H2
@@ -1122,7 +1101,6 @@ const my @GENERA  => qw(
     CAG-238
     CAG-239
     CAG-245
-    CAG-266
     CAG-267
     CAG-269
     CAG-272
@@ -1132,7 +1110,6 @@ const my @GENERA  => qw(
     CAG-302
     CAG-303
     CAG-307
-    CAG-312
     CAG-313
     CAG-314
     CAG-345
@@ -1164,7 +1141,6 @@ const my @GENERA  => qw(
     CAG-632
     CAG-698
     CAG-710
-    CAG-724
     CAG-762
     CAG-791
     CAG-793
@@ -1183,6 +1159,7 @@ const my @GENERA  => qw(
     Calhevirus-2b
     Camellia-associated
     Campylobacter-like
+    Carajing-like
     Caraparu-like
     carbazole-degrading
     Carpediemonas-like
@@ -1196,17 +1173,17 @@ const my @GENERA  => qw(
     Casp-alpha2
     Casp-Chloro-G3
     Casp-Chloro-G4
+    Cassava-associated
     Cassava-Congo
     CASV-2
     CAT-levansucrase
     Catch-me-cave
-    CAU-1509
     CBA120-like
-    CC-CFT747
     CCA-013414725
     CCAP-1448
     CECT-8803
     Cell-free
+    cellulose-degrading
     Ceratium-like
     CF-105
     CF-107
@@ -1216,7 +1193,6 @@ const my @GENERA  => qw(
     CF-121
     CF-13
     CF-134
-    CF-154
     CF-16
     CF-161
     CF-162
@@ -1293,6 +1269,7 @@ const my @GENERA  => qw(
     CG2-30-68-42
     CG2-30-70-394
     CGMCC-115125
+    CGMCC-115725
     chain-forming
     Chaq-like
     Cherry-associated
@@ -1501,10 +1478,10 @@ const my @GENERA  => qw(
     CSBr16-58
     CSBR16-87
     CSBR16-88
+    csf-associated
     CSK15Z-1
     CSP1-1
     CSP1-2
-    CSP1-3
     CSP1-4
     CSP1-5
     CSP1-6
@@ -1573,6 +1550,7 @@ const my @GENERA  => qw(
     dibenzofuran-degrading
     dichloromethane-degrading
     Dietzia-Escherichia
+    dimethachlon-degrading
     Diporeia-associated
     diuron-degrading
     DKR-5
@@ -1601,6 +1579,7 @@ const my @GENERA  => qw(
     DSM-16000
     DSM-16054
     DSM-16500
+    DSM-16504
     DSM-1736
     DSM-17781
     DSM-18226
@@ -1621,7 +1600,6 @@ const my @GENERA  => qw(
     DSM-27016
     DSM-27196
     DSM-28697
-    DSM-29158
     DSM-2933
     DSM-4216
     DSM-44207
@@ -1632,7 +1610,6 @@ const my @GENERA  => qw(
     DSM-5130
     DSM-5807
     DSM-6294
-    DSM-6578
     DSM-8532
     DSM-8902
     DSM-9736
@@ -1660,11 +1637,6 @@ const my @GENERA  => qw(
     E26-bin7
     E29-bin14
     E29-bin15
-    E29-bin54
-    E29-bin73
-    E4-135
-    E4-60
-    E44-bin10
     E44-bin15
     E44-bin18
     E44-bin26
@@ -1696,7 +1668,6 @@ const my @GENERA  => qw(
     ES-bin-26
     EsbW-18
     Escherichia-Pseudomonas
-    ESFC-1
     ESH-2018B
     Ess09-12
     Ess09-15
@@ -1720,7 +1691,6 @@ const my @GENERA  => qw(
     EX4484-71
     EX4572-165
     EX4572-44
-    EX4572-64
     F-11
     F-183
     F1-12-MAGs170
@@ -1745,12 +1715,10 @@ const my @GENERA  => qw(
     F23-B02
     F23-D06
     FACHB-1237
-    FACHB-1375
     FACHB-1406
     FACHB-1407
     FACHB-261
     FACHB-36
-    FACHB-40
     FACHB-46
     FACHB-68
     FACHB-8
@@ -1863,7 +1831,6 @@ const my @GENERA  => qw(
     Firm-09
     Firm-10
     Firm-13
-    Firm-16
     Firm-18
     Fisa-like
     Fish-associated
@@ -1960,7 +1927,6 @@ const my @GENERA  => qw(
     GCA-002727735
     GCA-002728675
     GCA-002728855
-    GCA-002729875
     GCA-002731945
     GCA-002733105
     GCA-002733185
@@ -2073,7 +2039,6 @@ const my @GENERA  => qw(
     GCA-021513135
     GCA-022846635
     GCA-023898365
-    GCA-024661895
     GCA-030583725
     GCA-16432305
     GCA-1730015
@@ -2112,7 +2077,6 @@ const my @GENERA  => qw(
     GCA-2686855
     GCA-2686945
     GCA-2686955
-    GCA-2686995
     GCA-2687015
     GCA-2687025
     GCA-2687185
@@ -2130,7 +2094,6 @@ const my @GENERA  => qw(
     GCA-2688775
     GCA-2688925
     GCA-2688965
-    GCA-2689605
     GCA-2689925
     GCA-2689995
     GCA-2690215
@@ -2172,8 +2135,6 @@ const my @GENERA  => qw(
     GCA-2706205
     GCA-2706465
     GCA-2706885
-    GCA-2707145
-    GCA-2707185
     GCA-2707205
     GCA-2707495
     GCA-2707695
@@ -2192,7 +2153,6 @@ const my @GENERA  => qw(
     GCA-2711625
     GCA-2711925
     GCA-2712005
-    GCA-2712105
     GCA-2712585
     GCA-2712665
     GCA-2712715
@@ -2200,7 +2160,6 @@ const my @GENERA  => qw(
     GCA-2713145
     GCA-2714055
     GCA-2715305
-    GCA-2715465
     GCA-2715505
     GCA-2715565
     GCA-2715645
@@ -2234,7 +2193,6 @@ const my @GENERA  => qw(
     GCA-2720865
     GCA-2720935
     GCA-2720975
-    GCA-2721105
     GCA-2721365
     GCA-2721545
     GCA-2721815
@@ -2259,7 +2217,6 @@ const my @GENERA  => qw(
     GCA-2726865
     GCA-2728135
     GCA-2728255
-    GCA-2728355
     GCA-2729495
     GCA-2729515
     GCA-2730555
@@ -2291,7 +2248,6 @@ const my @GENERA  => qw(
     GCA-2746565
     GCA-2746605
     GCA-2746795
-    GCA-2746885
     GCA-2747035
     GCA-2747105
     GCA-2747255
@@ -2331,7 +2287,6 @@ const my @GENERA  => qw(
     GCA-2863065
     GCA-2863085
     GCA-900066905
-    GCA-918320885
     GCA-958296115
     GCA-965745
     GCF-000287335
@@ -2339,10 +2294,7 @@ const my @GENERA  => qw(
     GCF-000787395
     GCF-001939115
     GCF-002002485
-    GCF-002020805
     GCF-002020875
-    GCF-002259525
-    GCF-002776555
     GCF-013343005
     GCF-1484045
     GCF-900161835
@@ -2350,6 +2302,7 @@ const my @GENERA  => qw(
     Gene-editing
     Gene-trap
     Gene-trapping
+    genome-reconstructed
     Giardia-associated
     Gill-associated
     Ginkgoaceae-associated
@@ -2394,10 +2347,10 @@ const my @GENERA  => qw(
     Grapevine-associated
     Grass-Cactus
     Gray-bellied
+    Grey-headed
     GSA-30
     GSPS2-BC2016
     GW-Firmicutes-8
-    GW-Nitrospira-1
     GW2011-AR1
     GW2011-AR10
     GW2011-AR11
@@ -2432,7 +2385,6 @@ const my @GENERA  => qw(
     GWA2-38-13
     GWA2-38-13b
     GWA2-38-27
-    GWA2-38-27_A
     GWA2-41-24
     GWA2-42-14
     GWA2-42-15
@@ -2551,6 +2503,8 @@ const my @GENERA  => qw(
     H02-45-28
     H02-48-17
     H1-PLA3
+    H111-94
+    H17-190
     H2-BAC3
     H2/CO2-metabolizing
     H3-PLA7
@@ -2601,7 +2555,9 @@ const my @GENERA  => qw(
     HKST-UBA178
     HKST-UBA22
     HKST-UBA223
+    HKST-UBA70
     HKST-UBA85
+    HL-DH10
     HMWdDNA-degrading
     HO2-37-13b
     HO2-39-17
@@ -2615,7 +2571,9 @@ const my @GENERA  => qw(
     HO2-52-23
     HO2-FULL-38-9
     HO2-FULL-47-45
+    HoBi-like
     Hom-1
+    Honeysuckle-associated
     HOT-345
     HPIV-1
     HS-7
@@ -2673,7 +2631,6 @@ const my @GENERA  => qw(
     Janibacter-like
     JCM-10596
     JCM-19050
-    JCM-19058
     JCVI-SCAAA005
     JdFR-07
     JDFR-13
@@ -2694,7 +2651,6 @@ const my @GENERA  => qw(
     JdFR-85
     JdFR-86
     JdFR-88
-    JdFR-95
     JdFR-97
     jellyfish-degrading
     JGIOTU-2
@@ -2705,6 +2661,11 @@ const my @GENERA  => qw(
     Johnson-sea-linkia
     JS7-9
     JSC-12
+    JTS-AC122
+    JTS-AC46
+    JTS-AC90
+    JTS-RE37
+    JTS-RE94
     Juquitiba-like
     K139-like
     K23-9
@@ -2714,21 +2675,20 @@ const my @GENERA  => qw(
     Kazan-3B-28
     KBS-83
     KBS-96
+    KCTC-25726
+    Kelp-associated
     Kineococcus-like
     KJ1-10-99
     KM106-2
-    KMM-3653
     Knock-in
     Korle-bu
     KS3-K002
     L227-5C
-    L227-S17
     LANV-2
     Large-insert
     LB-PLM-3
     LB3-1
     LC-2
-    LC-3
     LC2-1
     LC3-1
     LC5-1
@@ -2767,14 +2727,13 @@ const my @GENERA  => qw(
     Luna-2
     lung-eye-trachea
     Lupinus-Cactus
+    LVI-A0039
     LW40-45
-    LW60-42
     LZORAL124-50-18
     LZORAL124-64-63
     M1-B18
     M10-OD1-1
     M10-OD1-4
-    M3-22
     MA-ANB-1
     Maedi-Visna-related
     MAG-120531
@@ -2835,14 +2794,11 @@ const my @GENERA  => qw(
     MED-G107
     MED-G116
     MED-G13
-    MED-G138
-    MED-G14
     MED-G16
     MED-G17
     MED-G20
     MED-G21
     MED-G40
-    MED-G52
     MED-G78
     MED-G82
     MED-G85
@@ -2860,7 +2816,6 @@ const my @GENERA  => qw(
     methylotroph-related
     Metopion-like
     MEX13ELK6-19
-    MFBS3-17
     MGIIa-I
     MGIIa-K1
     MGIIa-K2
@@ -2884,6 +2839,7 @@ const my @GENERA  => qw(
     Mini-Tn7
     Mint-like
     Mirim-like
+    MIT-1300
     MIT-9215
     Mito-like
     MK-D1
@@ -2935,8 +2891,8 @@ const my @GENERA  => qw(
     NBRC-107688
     NEAU-GS5
     Nebraska-like
-    nege-like
     Nege-like
+    nege-like
     Negelike-virus
     Negev-like
     Negeviridae-like
@@ -2949,6 +2905,7 @@ const my @GENERA  => qw(
     NIOZ-UU106
     NIOZ-UU13
     NIOZ-UU35
+    NIT-SL11
     NIT-T3
     nitrite-oxidizing
     nitrogen-fixing
@@ -2982,8 +2939,6 @@ const my @GENERA  => qw(
     Norovirus/Hu/GII.4/V47/09/25-Feb-2009/Slovenia
     Norovirus/Hu/GII.4/V7/09/11-Jan-2009/Slovenia
     Norwalk-like
-    NP-4
-    NP-7
     NPL-UPA2
     NS-11
     NS-12
@@ -3014,7 +2969,6 @@ const my @GENERA  => qw(
     Oceanospirillum-like
     Ochlerotatus-associated
     Odonata-associated
-    Of7-15
     oil-degrading
     oil-susceptible
     Okutama-like
@@ -3050,10 +3004,9 @@ const my @GENERA  => qw(
     Palsa-1032
     Palsa-1033
     PALSA-1081
-    PALSA-1104
     Palsa-1104
+    PALSA-1104
     Palsa-1150
-    PALSA-1152
     PALSA-1153
     PALSA-1176
     Palsa-1178
@@ -3092,7 +3045,6 @@ const my @GENERA  => qw(
     PALSA-243
     PALSA-270
     PALSA-278
-    Palsa-288
     Palsa-295
     Palsa-343
     PALSA-350
@@ -3114,8 +3066,8 @@ const my @GENERA  => qw(
     PALSA-647
     PALSA-660
     Palsa-661
-    PALSA-688
     Palsa-688
+    PALSA-688
     PALSA-693
     Palsa-739
     PALSA-743
@@ -3124,7 +3076,6 @@ const my @GENERA  => qw(
     Palsa-851
     Palsa-870
     Palsa-872
-    Palsa-875
     Palsa-881
     Palsa-883
     Palsa-89
@@ -3133,7 +3084,6 @@ const my @GENERA  => qw(
     PALSA-911
     PALSA-926
     Palsa-948
-    Palsa-948_A
     Palsa-965
     PALSA-967
     PALSA-968
@@ -3143,9 +3093,8 @@ const my @GENERA  => qw(
     Partiti-like
     Partitiviridae-like
     Partitivirus-like
-    parvo-like
     Parvo-like
-    Pasla-948_A
+    parvo-like
     Passerine-like
     Passionfruit-associated
     PB-SRB1
@@ -3153,9 +3102,7 @@ const my @GENERA  => qw(
     PCB-dechlorinating
     PCC-10605
     PCC-6303
-    PCC-6304
     PCC-6307
-    PCC-6312
     PCC-6406
     PCC-6802
     PCC-7336
@@ -3165,7 +3112,6 @@ const my @GENERA  => qw(
     PCC-9006
     PCC-9228
     PCC-9333
-    PD-1
     peach-associated
     Peach-associated
     Pechuel-loeschea
@@ -3210,6 +3156,7 @@ const my @GENERA  => qw(
     PL-Br10-E2g29
     PL-Br10-U2g16
     PLanc-01
+    plastic-degrading
     pLEV-TeLS
     PLOWO2-12-38-17
     PLOWO2-12-39-15
@@ -3221,11 +3168,15 @@ const my @GENERA  => qw(
     pnpB-pnpA
     Po-Circo-like
     Point-Douro
+    polycarboxylate-dechlorinating
     Polycystine-like
     porcine-murine
     Porphyromonas-like
     Port-miou
     Posa-like
+    PPR-0468
+    PPR-0476
+    PPR-0505
     PreXMRV-1
     PreXMRV-1/PreXMRV-2
     PreXMRV-2
@@ -3233,6 +3184,7 @@ const my @GENERA  => qw(
     Promoter-trap
     propionate-degrading
     PRT-SC02
+    PSAF-FNR
     Pseudo-nitzschia
     Pseudoalteromonas-like
     PTE-S5
@@ -3364,7 +3316,6 @@ const my @GENERA  => qw(
     RI-29
     RI-34
     RI-342
-    RI-372
     RI-382
     RI-421
     RI-43
@@ -3420,6 +3371,7 @@ const my @GENERA  => qw(
     RVW-14
     RYN-111
     RYN-115
+    RYN-117
     RYN-122
     RYN-124
     RYN-133
@@ -3550,7 +3502,9 @@ const my @GENERA  => qw(
     S2-like
     S20-B6
     S3-3
+    S34-282
     S36-B12
+    S5-327
     S5-A14a
     S5-K13
     S5-like
@@ -3571,19 +3525,16 @@ const my @GENERA  => qw(
     Saw-shelled
     Saxo-fridericia
     SB-45
-    SB3-54
     SCADC1-2-3
     SCBR16-9
     SCGC-AAA003-L08
     SCGC-AAA011-G17
     SCGC-AAA076-P13
-    SCGC-AAA160-P02
     SCGC-AAA252-I15
     SCGC-AAA471-B05
     SCGC-AG-212-F23
     SCGC-AG-212-J23
     Sciuro-hypnum
-    SCN-52-12
     SCN-57-10
     SCN-67-18
     SCN-69-37
@@ -3592,18 +3543,17 @@ const my @GENERA  => qw(
     SCSIO-12696
     SCSIO-12741
     SCSIO-59966
-    SCSIO-75732
-    SCUT-3
     SDB-A
     SDU3-3
     Sea-firefly
-    Sebastiano-Schaueria
+    Sebastiano-schaueria
     selenate-reducing
     Selenomonas-like
     Self-inactivating
     Sewage-associated
     SG-bin7
     SG-bin9
+    SG3-like
     SG8-11
     SG8-13
     SG8-24
@@ -3619,8 +3569,8 @@ const my @GENERA  => qw(
     SH-MAG3
     SHA-98
     Sharp-tailed
-    short-finned
     Short-finned
+    short-finned
     short-tailed
     Shuttle-expression
     Shuttle/allelic-replacement
@@ -3663,7 +3613,9 @@ const my @GENERA  => qw(
     SM3-B121
     SM3-B41
     SM3-B62
+    SMAG-U1939
     SMO-BIN1
+    Smooth-billed
     SMTZ1-45
     SMTZ1-83
     Snail-Cactus
@@ -3679,6 +3631,7 @@ const my @GENERA  => qw(
     Soudan-22
     Soudan-30
     Soybean-associated
+    SP-2023
     Spawner-isolated
     Sphingobacterium-like
     Sphingomonas-like
@@ -3694,13 +3647,11 @@ const my @GENERA  => qw(
     SpSt-1165
     SpSt-1174
     SpSt-1190
-    SpSt-150
     SpSt-205
     SpSt-223
     SpSt-227
     SpSt-28
     SpSt-313
-    SpSt-315
     SpSt-333
     SpSt-398
     SpSt-501
@@ -3723,6 +3674,7 @@ const my @GENERA  => qw(
     STC-54
     STC-74
     STD1-117
+    STD1-16
     STD1-204
     STD1-80
     STD1-84
@@ -3767,13 +3719,13 @@ const my @GENERA  => qw(
     Stx2d-converting
     StxXX-converting
     Styphnolobium-associated
+    sulfamethoxazole-degrading
     sulfate-reducing
     sulfide-oxidizing
     sulfite-reducing
     sulfo-oxidizing
     sulfur-oxidizing
     Sunn-hemp
-    SURF-10
     SURF-12
     SURF-13
     SURF-15
@@ -3823,7 +3775,6 @@ const my @GENERA  => qw(
     Synechocystis-like
     Syner-03
     SYSU-D60014
-    SYSU-D60015
     SZ-28-30
     SZAS-1
     SZAS-103
@@ -3883,7 +3834,6 @@ const my @GENERA  => qw(
     SZUA-236
     SZUA-24
     SZUA-242
-    SZUA-250
     SZUA-252
     SZUA-254
     SZUA-259
@@ -3908,7 +3858,6 @@ const my @GENERA  => qw(
     SZUA-378
     SZUA-38
     SZUA-381
-    SZUA-401
     SZUA-41
     SZUA-411
     SZUA-415
@@ -3958,7 +3907,6 @@ const my @GENERA  => qw(
     T-DNA
     T-vector
     T1Sed10-126
-    T1SED10-157
     T1SED10-198M
     T1SED10-24
     T1SED10-26
@@ -3988,15 +3936,15 @@ const my @GENERA  => qw(
     TA-20
     TA-21
     TAE3-ERU5
+    TAMA-11512
+    TamC13-09
     Taro-associated
     Taxeobacter-like
-    Tb-RUG-53
     Tb-RUG-64
     Tb-RUG-66
     TC-15
     TC-195
     TC-71
-    Tc-Br11
     Tc-Br11-B2g6-7
     Tc-Br11-E2g1
     Tc-Br11-E2g8
@@ -4004,13 +3952,13 @@ const my @GENERA  => qw(
     Tea-oil
     TEKIR-12S
     TEKIR-14
-    TEKIR-21
     TEKIR-8
     Temperature-sensitive
     Tener-01
     Tent-making
     Teosinte-associated
     Tetracycline-inducible
+    TF02-10
     TFI-002
     TH-plancto1
     TH1-2
@@ -4061,6 +4009,9 @@ const my @GENERA  => qw(
     UAS-Red
     UAS-Stinger
     UDEA-SF1
+    UHCC-0137
+    UHCC-0190
+    UHCC-0302
     Ui-te-Rangiora
     UKL13-2
     UKL13-3
@@ -4123,7 +4074,6 @@ const my @GENERA  => qw(
     Virus-like
     Visna-maedi
     Vittaforma-like
-    VKM-B-2647
     VKMB-3413
     W-Chloroflexi-9
     W-Firmicutes-14
@@ -4134,6 +4084,7 @@ const my @GENERA  => qw(
     W1P20-047
     W2P13-069
     W3P20-009
+    W53-108
     WA-like
     wall-less
     WCHB1-27
@@ -4152,8 +4103,8 @@ const my @GENERA  => qw(
     White-tailed
     white-throated
     White-tufted-ear
-    whitefly-associated
     Whitefly-associated
+    whitefly-associated
     Whitefly-transmitted
     WM-009
     WM-3-3
@@ -4191,6 +4142,7 @@ const my @GENERA  => qw(
     Xanthomonas-like
     XMRV-like
     XMRV-related
+    Xue-Cheng
     Xuzhou-associated
     XY-R5
     XYA12-FULL-58-9
@@ -4207,7 +4159,6 @@ const my @GENERA  => qw(
     XYB1-FULL-42-16
     XYB1-FULL-44-23
     XYB1-FULL-47-11
-    XYB12-FULL-38-5
     XYB2-FULL-36-35
     XYB2-FULL-38-15
     XYB2-FULL-45-11
@@ -4239,7 +4190,6 @@ const my @GENERA  => qw(
     XYD2-FULL-41-8
     XYD2-FULL-50-16
     xylene-degrading
-    XZGYJ-43
     Y-symbiont
     YA12-FULL-48-11
     YA12-FULL-51-18
@@ -4269,15 +4219,11 @@ const my @GENERA  => qw(
     Yes70-04
     Yes70-35
     Yes71-27
+    Yes71-31
     YIM-151500
-    YIM-152171
     YIM-78166
     YIM-B00363
-    YT-029
     YT-063
-    YT1-039
-    YT1-057
-    YT1-065
     Z-2901
     Z2-YC6860
     ZCTH02-B2
@@ -4285,7 +4231,6 @@ const my @GENERA  => qw(
     ZCTH02-B6
     ZG21-1
     Zgenome-0002
-    Zgenome-0027
     Zostera-associated
     );
 
@@ -4305,6 +4250,7 @@ const my @SPECIES => qw(
     107_oclvp18
     108_oclvp22
     109_oclvp514
+    10_HP_Shrimp
     10_xplvp428
     110_oclvp17
     111_oclvp16
@@ -4530,6 +4476,7 @@ const my @SPECIES => qw(
     33_17
     33_xplvp322
     34_xplvp425
+    35_PY_Shrimp
     35_xplvp171
     36_xplvp225
     37_xplvp454
@@ -4916,18 +4863,20 @@ const my @SPECIES => qw(
     A6T_VP8_G7
     A6T_VP8_H6
     A_20
+    abietaniphila_B
     abscessus_A
     abyssi_A
     acanthamoebae_A
     acetatoxydans_A
     aceti_B
-    acetivorans_A
+    acetivorans_B
     acetylicum_B
     acetylicum_C
     achromogenes_A
     acidaminiphila_A
     acidiceleris_A
     acidiceleris_B
+    acidiceleris_C
     acidilactici_A
     acidiphilum_A
     acidocaldarius_A
@@ -4947,6 +4896,7 @@ const my @SPECIES => qw(
     adecarboxylata_B
     adecarboxylata_C
     adecarboxylata_D
+    adecarboxylata_E
     adhaerens_A
     adhaerens_B
     adhaerens_D
@@ -4954,6 +4904,8 @@ const my @SPECIES => qw(
     adhaerens_G
     adhaerens_H
     adhaerens_I
+    adhaesiva_A
+    adhaesiva_B
     adiacens_A
     Ae_JM910
     aeolica_A
@@ -4966,7 +4918,6 @@ const my @SPECIES => qw(
     aerofaciens_AB
     aerofaciens_AC
     aerofaciens_AD
-    aerofaciens_AE
     aerofaciens_AF
     aerofaciens_AG
     aerofaciens_AH
@@ -4989,6 +4940,27 @@ const my @SPECIES => qw(
     aerofaciens_AY
     aerofaciens_AZ
     aerofaciens_BA
+    aerofaciens_BB
+    aerofaciens_BC
+    aerofaciens_BD
+    aerofaciens_BE
+    aerofaciens_BF
+    aerofaciens_BG
+    aerofaciens_BH
+    aerofaciens_BI
+    aerofaciens_BJ
+    aerofaciens_BK
+    aerofaciens_BL
+    aerofaciens_BM
+    aerofaciens_BN
+    aerofaciens_BO
+    aerofaciens_BP
+    aerofaciens_BQ
+    aerofaciens_BR
+    aerofaciens_BS
+    aerofaciens_BT
+    aerofaciens_BU
+    aerofaciens_BV
     aerofaciens_E
     aerofaciens_F
     aerofaciens_G
@@ -5011,6 +4983,7 @@ const my @SPECIES => qw(
     aerofaciens_Y
     aerofaciens_Z
     aerogenes_A
+    aerolatum_A
     aerosaccus_A
     aerosaccus_B
     aerosaccus_C
@@ -5027,6 +5000,7 @@ const my @SPECIES => qw(
     aestuarii_A
     aethiopicum_A
     AF_NAK1-3
+    africanus_A
     agalactiae_A
     agalactiae_B
     agarilyticus_A
@@ -5035,6 +5009,7 @@ const my @SPECIES => qw(
     agarilyticus_D
     agarivorans_A
     agassizii_A
+    AGG1029_pB-AeCPA-syn21-tTAV3-SV40-DsR
     AGG1095_KMOsgRNAs
     AGG1186_pIE1-Koz-FF-SV4
     AGG1187_-_pIE1-Lep-FF-S
@@ -5052,9 +5027,13 @@ const my @SPECIES => qw(
     AGG1208_sds3-Cas9
     AGG1245_Pub_AaHyPiggyBac_SV40
     AGG1448_zpg2kb-Cas9
+    AGG1506_pB-Act4-DsR-tTAV-P10-3xP3-mCh
+    AGG1522_PUb(800_77bp)
     AGG1547_nos-Cas9
     AGG1551_shu-Cas9
     AGG1552_Ewald-Cas9
+    AGG1590_zpg3Cas9
+    AGG1626_cdU6A
     AGG1687_zpg4kb-Cas9
     AGG1747_pGL3_PUb(-565)-FF
     AGG1748_pGL3_PUb(-465)-FF
@@ -5062,6 +5041,13 @@ const my @SPECIES => qw(
     AGG1750_pGL3_PUb(-265)-FF
     AGG1751_pGL3_PUb(-143)-FF
     AGG1752_pGL3_PUb(-133_77bp-intron)-FF
+    AGG1757_cdU6B
+    AGG1758_cdU6C
+    AGG1759_cd7SK
+    AGG1767_loxPUb-Bs-lox-TRE-Bn
+    AGG1829_OpIE2-Barnase-SV40
+    AGG1983_UbL40-mCherry-SV40
+    AGG1984_UbL40-BarstarA-SV40
     AGG2143_PUb(-133_77bp-intron)-AmC-SV40
     AGG2144_PUb(-265)-AmC-SV40
     AGG2145_PUb(-565)-AmC-SV40
@@ -5069,7 +5055,6 @@ const my @SPECIES => qw(
     AGG2196_pGL3_PUb(-2565)-FF
     aggregans_A
     aggregans_B
-    aggregatum_A
     aggregatum_B
     aggregatum_C
     agilis_B
@@ -5077,6 +5062,7 @@ const my @SPECIES => qw(
     agilis_E
     agri_A
     AH_HY1
+    aichiensis_A
     aidingensis_A
     Al31_1
     alba_A
@@ -5085,13 +5071,12 @@ const my @SPECIES => qw(
     alba_D
     albidus_A
     albireticuli_B
-    albulus_A
+    albolongus_A
     albulus_C
     album_A
     album_C
     album_D
     albus_A
-    albus_B
     albus_E
     alcalifaciens_A
     alcalifaciens_B
@@ -5101,10 +5086,14 @@ const my @SPECIES => qw(
     alcaligenes_C
     alcaliphila_B
     alexandrii_A
+    aleyrodidarum_A
+    aleyrodidarum_B
+    aleyrodidarum_C
+    aleyrodidarum_D
     algarum_A
     algericum_A
     algicola_B
-    alimentarius_A
+    aliena_A
     aliphaticivorans_A
     aliphaticivorans_B
     alkaliantarctica_A
@@ -5114,8 +5103,10 @@ const my @SPECIES => qw(
     alkaliphilum_B
     alkaliphilus_A
     alkaliphilus_B
+    alkalitolerans_A
     alkylphenolica_A
     alkylphenolica_B
+    all-k141_1748665
     alocis_A
     alpina_A
     alpinus_A
@@ -5133,8 +5124,9 @@ const my @SPECIES => qw(
     amalonaticus_E
     amalonaticus_F
     amalonaticus_G
+    amalonaticus_H
     amamiensis_A
-    amazonense_A
+    amargosae_A
     amazonense_B
     amazonense_C
     ambifaria_A
@@ -5147,7 +5139,6 @@ const my @SPECIES => qw(
     ampullae_A
     amycolatum_A
     amygdalina_A
-    amylolytica_A
     amylolyticus_A
     amylolyticus_B
     amylolyticus_D
@@ -5156,9 +5147,12 @@ const my @SPECIES => qw(
     anatipestifer_C
     anatipestifer_D
     anatipestifer_E
+    anatipestifer_F
+    angiospora_A
     anguilliseptica_A
     angulatum_A
     angusta_A
+    angustmyceticus_A
     angustum_A
     anhuiense_A
     animalis_B
@@ -5170,8 +5164,9 @@ const my @SPECIES => qw(
     antarctica_B
     antarctica_C
     antarcticus_A
+    antarcticus_B
+    antarcticus_C
     anthina_B
-    antibioticus_A
     antibioticus_B
     antiquum_A
     anulatus_C
@@ -5216,6 +5211,12 @@ const my @SPECIES => qw(
     aphidicola_BI
     aphidicola_BJ
     aphidicola_BK
+    aphidicola_BL
+    aphidicola_BM
+    aphidicola_BN
+    aphidicola_BO
+    aphidicola_BP
+    aphidicola_BQ
     aphidicola_C
     aphidicola_D
     aphidicola_E
@@ -5265,7 +5266,10 @@ const my @SPECIES => qw(
     aquaticum_A
     aquaticum_B
     aquaticum_C
+    aquatilis_A
+    aquatilis_B
     aquidurense_B
+    aquidurense_C
     aquimarina_A
     aquimarinus_A
     aquimaris_A
@@ -5274,7 +5278,8 @@ const my @SPECIES => qw(
     aquimaris_D
     aquimaris_E
     aquimaris_F
-    aquimixticola_A
+    aquimaris_G
+    arborescens_A
     arboricola_A
     arboricola_B
     arboricola_C
@@ -5285,6 +5290,7 @@ const my @SPECIES => qw(
     arctica_A
     arctica_B
     arcticum_A
+    arcticus_A
     arenae_A
     arenilitoris_A
     arenilitoris_B
@@ -5294,8 +5300,8 @@ const my @SPECIES => qw(
     arenilitoris_F
     argentinensis_B
     argentoratense_A
-    arginini_A
     aridicollis_A
+    armatura_A
     aromatica_A
     aromaticivorans_A
     aromaticus_B
@@ -5310,21 +5316,24 @@ const my @SPECIES => qw(
     ARS07370_00002
     arsenicoxydans_A
     arsenicus_B
+    artemiae_A
     arthritidis_A
     aryabhattai_A
     aryabhattai_B
+    asaccharolyticum_A
+    asaccharophilus_A
     asahii_A
     asburiae_B
     asburiae_C
     asburiae_D
     asburiae_E
-    asburiae_F
     ascorbata_B
     ascorbata_C
     asiaticum_A
     asiaticum_B
     asiaticum_C
     asiaticum_D
+    asini_A
     astaxanthinifaciens_A
     asteroides_A
     asteroides_F
@@ -5346,6 +5355,8 @@ const my @SPECIES => qw(
     atlantica_G
     atlanticus_A
     atratus_B
+    atratus_D
+    atrinae_A
     atrocyanea_A
     atrocyanea_B
     atsumiense_A
@@ -5355,6 +5366,7 @@ const my @SPECIES => qw(
     aurantiacum_B
     aurantiacus_A
     aurea_B
+    aurea_C
     aureofaciens_A
     aurescens_A
     aurescens_B
@@ -5364,6 +5376,7 @@ const my @SPECIES => qw(
     aurimucosum_F
     auris_A
     aurum_A
+    australasiaticum_A
     australicum_A
     australiensis_A
     australiensis_B
@@ -5371,14 +5384,17 @@ const my @SPECIES => qw(
     australis_B
     australis_C
     australis_D
+    australis_E
     autotrophica_A
     autotrophicus_A
     autotrophicus_B
     autotrophicus_C
     autotrophicus_D
     avenae_A
+    avenae_B
     aviarius_B
     aviarius_C
+    avium_A
     AZ4_17
     azadirachtae_A
     AZD10a_EZLN1
@@ -5481,6 +5497,7 @@ const my @SPECIES => qw(
     bacteriumRM12EL_02D
     bacteriumRM12EL_05A
     bactoclasticus_A
+    baculatum_A
     baderi_A
     baekdonensis_A
     baekdonensis_B
@@ -5492,9 +5509,11 @@ const my @SPECIES => qw(
     baltica_A
     bambusae_A
     bambusae_B
+    bambusae_C
     bangladeshense_B
     bannensis_A
     baratii_A
+    barbaricus_A
     barkeri_A
     barkeri_B
     barkeri_C
@@ -5503,9 +5522,13 @@ const my @SPECIES => qw(
     basilensis_D
     basilensis_E
     basilensis_F
-    bataviensis_A
+    bataviensis_B
+    bathyomarina_A
+    bathyomarina_B
+    bauzanensis_A
     BCoV/PB675/Art_lit/PAN/2011
     beibuense_A
+    beibuense_B
     beijerinckii_A
     beijerinckii_D
     beijerinckii_E
@@ -5515,6 +5538,7 @@ const my @SPECIES => qw(
     benthica_A
     bentonitica_A
     benzenivorans_A
+    benzenivorans_B
     bereziniae_A
     bermudensis_A
     bermudensis_B
@@ -5527,10 +5551,12 @@ const my @SPECIES => qw(
     BgL12_3S_Black
     BgL12_3S_Purple
     BgL12_3S_Red
-    biceps_A
     biceps_B
+    bifermentans_B
+    bigeumensis_A
     bII_SDSRA_K68
     bilis_B
+    binotii_A
     bisanense_A
     BJCX4_extB9.1
     blattaphilus_A
@@ -5553,7 +5579,9 @@ const my @SPECIES => qw(
     boronicumulans_A
     boronicumulans_B
     boronicumulans_C
+    boronicumulans_D
     boroniphilus_A
+    borstelensis_A
     bostrichidophilus_A
     bostrichidophilus_B
     bostrichidophilus_C
@@ -5563,6 +5591,8 @@ const my @SPECIES => qw(
     bostrichidophilus_G
     bostrichidophilus_H
     bostrichidophilus_I
+    bostrichidophilus_J
+    bostrichidophilus_K
     botulinum_A
     botulinum_B
     bouvetii_A
@@ -5598,16 +5628,17 @@ const my @SPECIES => qw(
     brassicacearum_E
     brassicacearum_F
     brassicacearum_G
+    brassicacearum_H
     breve_A
     brevis_B
     brevis_C
     brevis_D
+    brevis_E
     BRH_c32
     briensis_A
     brisouii_A
     britannica_A
     bromii_A
-    bromii_B
     bronchiseptica_F
     bronchisepticus_A
     bryantii_A
@@ -5683,13 +5714,14 @@ const my @SPECIES => qw(
     BtCoV/Rhi_hip/Slo57/SLO/2009
     BtCoV/Rhi_hip/Slo69/SLO/2009
     BtCoV/VH_NC2/Neo_cap/RSA/2012
-    buctense_A
-    buctense_B
     bullata_A
+    bullatum_A
     bunya-arena-like_virus
     butyricum_A
     butyricum_B
     byssoidea_A
+    byssophila_A
+    byssophila_B
     C01_2wb_b10_2005-12-15
     C02_1ub_b10_2005-12-15
     C100_CLW
@@ -5722,6 +5754,7 @@ const my @SPECIES => qw(
     caelestis_A
     caeni_A
     caeni_B
+    caeni_C
     caeruleus_A
     calcoaceticus_B
     calcoaceticus_C
@@ -5732,6 +5765,7 @@ const my @SPECIES => qw(
     calvum_A
     cambriense_A
     cambriense_B
+    cambriense_C
     camelliae_A
     camelliae_B
     campaniensis_A
@@ -5748,8 +5782,28 @@ const my @SPECIES => qw(
     canus_D
     canus_E
     canus_F
+    canus_G
     capeferrum_A
     capillosus_A
+    capleta_AA
+    capleta_AB
+    capleta_AC
+    capleta_AD
+    capleta_AE
+    capleta_AF
+    capleta_AG
+    capleta_AH
+    capleta_AI
+    capleta_AJ
+    capleta_AK
+    capleta_AL
+    capleta_AM
+    capleta_AN
+    capleta_AO
+    capleta_AP
+    capleta_AQ
+    capleta_AR
+    capleta_AS
     capleta_B
     capleta_C
     capleta_D
@@ -5761,23 +5815,35 @@ const my @SPECIES => qw(
     capleta_J
     capleta_K
     capleta_L
+    capleta_M
+    capleta_N
+    capleta_O
+    capleta_P
+    capleta_Q
+    capleta_R
+    capleta_S
+    capleta_T
+    capleta_U
+    capleta_V
+    capleta_W
+    capleta_X
+    capleta_Y
+    capleta_Z
     capsici_A
     capsulatum_A
     capsulatus_B
     capsulatus_C
-    cardiocondylae_A
     cardiocondylae_B
     cardiocondylae_C
     carnea_A
     carnea_B
     carnea_C
-    carotovorum_I
+    carotovorum_J
+    carotovorum_K
     casei_A
     caseolyticus_A
-    casseliflavus_A
     cat_SB2894
     catarrhalis_C
-    catus_A
     cavernae_A
     CCSD_DF2030_Ag37_isolate_1
     CCSD_DF2030_Ag37_isolate_2
@@ -5791,6 +5857,7 @@ const my @SPECIES => qw(
     cecembensis_B
     cecorum_A
     cecorum_B
+    cecorum_C
     Ced_B08
     celere_A
     celerecrescens_B
@@ -5802,7 +5869,6 @@ const my @SPECIES => qw(
     cellulans_F
     cellulans_G
     cellulosae_A
-    cellulositrophicus_A
     cellulosum_B
     cellulosum_D
     cellulosum_E
@@ -5819,9 +5885,9 @@ const my @SPECIES => qw(
     cereus_AV
     cereus_BA
     cereus_BB
-    cereus_BC
     cereus_BD
     cereus_BE
+    cereus_BF
     cereus_K
     cereus_S
     cereus_U
@@ -5869,20 +5935,27 @@ const my @SPECIES => qw(
     chengduensis_A
     chikugoensis_A
     chilikensis_A
+    chipingensis_A
     chitinivorans_A
+    chitinolyticus_A
     chlorellavorus_A
     chlorellavorus_B
     chlorellavorus_D
+    chloritidismutans_A
     chlorophenolicus_A
     chlororaphis_D
     chlororaphis_E
     chlororaphis_H
     chlororaphis_I
     choanae_A
+    chocolatum_B
+    chokoriensis_A
     chokoriensis_B
+    cholerae_D
     choshinensis_A
     chromiireducens_A
     chromiiresistens_A
+    chthonoplastes_A
     chubuense_A
     chungangensis_A
     cibaria_A
@@ -5892,6 +5965,7 @@ const my @SPECIES => qw(
     cicadellinicola_A
     cicadellinicola_B
     cicadellinicola_C
+    cicadellinicola_E
     ciceri_B
     cichorii_B
     cichorii_D
@@ -5903,15 +5977,16 @@ const my @SPECIES => qw(
     cinnamoneus_A
     circulans_A
     circulans_B
+    citreus_A
     citri_A
     citronellolis_A
+    clanedunensis_A
     clevelandensis_A
     cloacae_A
     cloacae_I
     cloacae_L
     cloacae_M
     cloacae_N
-    cloacae_O
     cloacae_P
     cloacae_Q
     clostridioformis_A
@@ -5929,6 +6004,7 @@ const my @SPECIES => qw(
     colombiense_A
     colombiense_B
     colombiense_C
+    coloradensis_A
     columbae_A
     columbina_A
     comes_A
@@ -5958,7 +6034,14 @@ const my @SPECIES => qw(
     concisus_AR
     concisus_AS
     concisus_AT
+    concisus_AU
+    concisus_AV
+    concisus_AW
+    concisus_AX
+    concisus_AY
+    concisus_AZ
     concisus_B
+    concisus_BA
     concisus_C
     concisus_D
     concisus_E
@@ -5984,7 +6067,6 @@ const my @SPECIES => qw(
     concisus_Y
     concisus_Z
     confusa_A
-    confusa_B
     confusa_C
     congolensis_A
     congolensis_B
@@ -5993,7 +6075,6 @@ const my @SPECIES => qw(
     contorta_A
     contortus_B
     contortus_C
-    contractile_A
     copri_A
     copri_B
     copri_C
@@ -6003,12 +6084,23 @@ const my @SPECIES => qw(
     copri_H
     copri_I
     copri_J
+    copri_K
+    copri_L
+    copri_M
+    copri_N
+    copri_O
+    copri_P
+    copri_Q
+    copri_R
+    copri_S
+    copri_T
     coralicida_A
     coralliilyticus_A
     coronavirus/KP817/Phy_dis/PAN/2011
     corrodens_B
     corynebacterioides_A
     cosmeticum_A
+    cosmicum_A
     cowanii_A
     CR1_10_MR-20148
     CR1_11_MR-2014
@@ -6016,6 +6108,7 @@ const my @SPECIES => qw(
     CR5_2_MR-2014
     CR7_6_MR-2014
     crassostreae_C
+    crassostreae_D
     crateris_A
     crateris_B
     cremea_A
@@ -6067,6 +6160,8 @@ const my @SPECIES => qw(
     cristatus_K
     cristatus_L
     cristatus_M
+    cristatus_N
+    cristatus_O
     crithidii_A
     crithidii_B
     crithidii_C
@@ -6117,8 +6212,7 @@ const my @SPECIES => qw(
     CSeA30_60
     CSu4_9
     cucumis_A
-    cucumis_B
-    cucumis_C
+    cucumis_D
     cuenoti_A
     cuenoti_AA
     cuenoti_AB
@@ -6160,15 +6254,20 @@ const my @SPECIES => qw(
     cuenoti_Y
     cuenoti_Z
     culicis_A
+    cumminsii_B
     cuniculi_A
     curvispora_A
     cyclitrophicus_A
+    cylindrica_A
     cypripedii_A
     cyriacigeorgica_B
     cyriacigeorgica_C
     cyriacigeorgica_D
     cyriacigeorgica_E
     cyriacigeorgica_F
+    cysteinexigens_A
+    cysteinexigens_B
+    cysteinexigens_C
     cytotoxicus_A
     D01_9wb_b10_2005-12-15
     D02_1pb_b10_2005-12-15
@@ -6241,6 +6340,7 @@ const my @SPECIES => qw(
     D_HF7_66
     D_HF7_9
     DAB_16s_R32(2)
+    daejeonensis_A
     daeponensis_A
     danieliae_A
     Davis_19N
@@ -6250,10 +6350,13 @@ const my @SPECIES => qw(
     DB_16s_R8
     debontii_A
     debontii_B
+    debontii_C
+    defectiva_A
     defensa_A
     defluvii_A
     defluvii_B
     defluvii_C
+    defragrans_A
     dehalogenans_B
     delafieldii_A
     delafieldii_B
@@ -6261,6 +6364,7 @@ const my @SPECIES => qw(
     delaneyi_A
     delbrueckii_B
     deleyi_A
+    deleyi_B
     dendritiformis_A
     dendritiformis_C
     denitrificans_A
@@ -6270,6 +6374,7 @@ const my @SPECIES => qw(
     denitrificans_F
     denitrificans_G
     dentiae_A
+    dentiae_B
     denticola_A
     denticola_B
     denticola_C
@@ -6292,6 +6397,7 @@ const my @SPECIES => qw(
     dextrinosolvens_A
     dextrinosolvens_B
     diastatochromogenes_A
+    diastatochromogenes_B
     diazoefficiens_A
     diazoefficiens_B
     diazoefficiens_C
@@ -6300,6 +6406,7 @@ const my @SPECIES => qw(
     diazoefficiens_F
     diazoefficiens_G
     diazoefficiens_H
+    diazotrophica_A
     difficile_A
     difficile_D
     difficile_E
@@ -6309,22 +6416,24 @@ const my @SPECIES => qw(
     diminuta_A
     diminuta_B
     diminuta_C
+    diminuta_D
+    diminuta_E
     dinghuensis_A
     dinghuensis_B
     discipulorum_A
     discipulorum_B
     dismutans_A
     dispar_B
+    dispersa_C
     disporicum_B
     distasonis_A
     distasonis_B
     distasonis_C
     distributa_B
-    distributa_C
-    distributa_D
     distributa_E
     divergens_A
     diversum_A
+    djakartensis_A
     Djaks_4
     Djaks_6
     DmelCS_103
@@ -6338,6 +6447,13 @@ const my @SPECIES => qw(
     donghaensis_A
     donghaensis_B
     drentensis_A
+    drentensis_B
+    drentensis_C
+    drentensis_D
+    drentensis_E
+    drentensis_F
+    drentensis_G
+    drozdowiczii_A
     DSFBPG_3R2A
     DSFBPG_3R2B
     DSFBPG_4R3A
@@ -6383,6 +6499,7 @@ const my @SPECIES => qw(
     DSS3_MAL1
     DSS3_PM1
     DSS3_VP1
+    dubius_A
     durus_B
     E01_10wb_b10_2005-12-15
     E56_UTI
@@ -6397,20 +6514,21 @@ const my @SPECIES => qw(
     edaphicum_A
     edaphicum_B
     eiseniae_A
-    elegans_A
+    elegans_B
     eligens_A
     elkanii_A
     elongata_B
     elongatus_A
-    elongatus_B
     elsdenii_A
     EMG_100139454
     enclense_A
+    enclense_B
     enclensis_A
-    endoloripes_D
     endophytica_A
+    endophyticum_A
     endophyticus_A
     enshiense_A
+    enshiense_B
     enterocolitica_E
     entomophila_A
     entomophila_B
@@ -6437,11 +6555,13 @@ const my @SPECIES => qw(
     equorum_A
     equorum_C
     erythraea_A
+    erythreum_A
+    erythrochromogenes_B
+    erythrochromogenes_C
     erythrophlei_A
     erythrophlei_B
     erythrophlei_C
     erythrophlei_D
-    erythropolis_D
     ES5_1357
     ES6_1418
     ES6_478
@@ -6450,12 +6570,12 @@ const my @SPECIES => qw(
     esteraromaticum_B
     esteraromaticum_C
     esteraromaticum_D
+    esteraromaticum_E
     estertheticum_A
     estertheticum_B
     estertheticum_C
     estertheticum_D
     estunensis_A
-    ethanivorans_B
     ethanivorans_C
     etli_B
     etli_C
@@ -6471,7 +6591,6 @@ const my @SPECIES => qw(
     exalbescens_A
     excellens_B
     excentricus_A
-    exercitus_A
     exile_A
     exile_C
     extorquens_A
@@ -6490,13 +6609,21 @@ const my @SPECIES => qw(
     FA_183B
     FA_2CB*
     FA_86
+    fabarum_A
     fabrum_A
+    facilis_A
     faecalis_A
     faecalis_D
+    faecalis_E
     faecihominis_A
+    faecis_A
     faeni_A
     faeni_B
     faeni_C
+    faeni_D
+    faeni_E
+    faeni_F
+    fairfieldensis_A
     FAKO05_000032F
     FAKO27_000238F
     FAKO27_000271F
@@ -6506,6 +6633,8 @@ const my @SPECIES => qw(
     fascians_E
     fastidiosus_A
     faulkneri_A
+    featherlites_A
+    featherlites_B
     Fen2266_11
     Fen418_41
     Fen4707_41
@@ -6517,6 +6646,8 @@ const my @SPECIES => qw(
     Fen7895_21
     Fen7918_21
     Fen7940_21
+    fennica_A
+    fentianensis_A
     fermentans_A
     fermentans_B
     ferrariae_A
@@ -6529,6 +6660,7 @@ const my @SPECIES => qw(
     fibrisolvens_C
     ficellus_A
     ficellus_B
+    filicis_A
     filiformis_A
     filiformis_B
     fimi_A
@@ -6536,20 +6668,15 @@ const my @SPECIES => qw(
     fimi_C
     finisterrensis_A
     finlayi_A
-    finnmarkense_A
     firmus_A
     firmus_B
     firmus_C
     fischeri_A
     fischeri_B
     fissicatena_A
-    flaccumfaciens_A
     flaccumfaciens_B
-    flaccumfaciens_C
-    flaccumfaciens_D
     flaccumfaciens_E
     flagellatus_A
-    flagelliforme_A
     flagelliforme_B
     flava_A
     flavefaciens_A
@@ -6557,6 +6684,7 @@ const my @SPECIES => qw(
     flavefaciens_AB
     flavefaciens_AC
     flavefaciens_AD
+    flavefaciens_AE
     flavefaciens_B
     flavefaciens_C
     flavefaciens_D
@@ -6590,6 +6718,7 @@ const my @SPECIES => qw(
     flavithermus_E
     flavithermus_G
     flavofungini_A
+    flavofungini_B
     flavorosea_A
     flavus_A
     flour_#16
@@ -6619,19 +6748,16 @@ const my @SPECIES => qw(
     fluorescens_BT
     fluorescens_BU
     fluorescens_BV
-    fluorescens_BW
     fluorescens_BX
     fluorescens_BY
     fluorescens_BZ
-    fluorescens_CA
     fluorescens_CB
     fluorescens_CC
     fluorescens_CD
-    fluorescens_E
+    fluorescens_CE
     fluorescens_G
     fluorescens_H
     fluorescens_M
-    fluorescens_O
     fluorescens_Q
     fluorescens_S
     fluorescens_W
@@ -6643,11 +6769,11 @@ const my @SPECIES => qw(
     fluvialis_E
     fluvialis_F
     fluviatilis_A
+    fluvii_A
     FMAS_PN2
     FMAS_PN3
     FMAS_PN5
     foliaceum_A
-    foliorum_A
     foliorum_B
     fonticola_A
     fonticola_B
@@ -6659,6 +6785,7 @@ const my @SPECIES => qw(
     formigenes_C
     formigenes_D
     formigenes_E
+    formosense_A
     formosum_A
     forsythia_A
     fortis_A
@@ -6667,7 +6794,7 @@ const my @SPECIES => qw(
     FR3_2_MR-2014
     fragariae_A
     fragi_D
-    fragi_E
+    fragilis_A
     fragilis_B
     frankenforstense_A
     franklandus_A
@@ -6680,10 +6807,13 @@ const my @SPECIES => qw(
     frederiksbergensis_G
     frederiksbergensis_H
     frederiksbergensis_I
-    frederiksbergensis_K
     fredii_A
     fredii_B
     fredii_C
+    frigidaeris_A
+    frigidisoli_A
+    frigiditerrae_A
+    frigidus_A
     frigoris_A
     frigoritolerans_A
     frigoritolerans_B
@@ -6699,6 +6829,7 @@ const my @SPECIES => qw(
     fungivorans_B
     fungorum_A
     fungorum_B
+    furvisabuli_A
     fuscovaginae_A
     fuscovaginae_B
     fuscus_A
@@ -6730,8 +6861,12 @@ const my @SPECIES => qw(
     gallolyticus_B
     gallolyticus_C
     gandavensis_A
+    gandavensis_B
+    gandavensis_C
     gangwonense_A
     garvieae_A
+    gastricus_A
+    gaviniae_A
     gazogenes_A
     gelatinosus_A
     gelatinosus_B
@@ -7049,8 +7184,8 @@ const my @SPECIES => qw(
     ginsengisoli_E
     ginsengisoli_F
     ginsenosidimutans_A
+    ginsenosidimutans_B
     glacialis_A
-    glacincola_B
     glacincola_C
     gladioli_A
     gladioli_B
@@ -7061,6 +7196,7 @@ const my @SPECIES => qw(
     globiformis_D
     globisporus_A
     globisporus_D
+    globosus_A
     globulus_B
     gloriosae_A
     glossinidia_A
@@ -7079,6 +7215,8 @@ const my @SPECIES => qw(
     gordonae_D
     gordonii_A
     gottheilii_A
+    gracile_A
+    gracile_B
     gracilis_A
     gracilis_B
     gracilis_C
@@ -7088,11 +7226,13 @@ const my @SPECIES => qw(
     graminis_D
     grandis_A
     grandis_C
+    granuli_A
     granulomatis_A
     griffiniae_A
     griseocarneus_A
     griseoluteus_A
     griseorubiginosus_B
+    griseorubiginosus_C
     griseoviridis_A
     griseus_G
     griseus_I
@@ -7106,6 +7246,7 @@ const my @SPECIES => qw(
     guariconensis_B
     guariconensis_C
     guariconensis_D
+    gummiphilus_A
     GW2011_AR1
     GW2011_AR10
     GW2011_AR11
@@ -7123,6 +7264,7 @@ const my @SPECIES => qw(
     GW2011_AR6
     GW2011_AR9
     gwangjuense_A
+    GX1-k141_326647
     H01_1mb1_b10_2005-12-15
     H9_DGR
     H_A17_151
@@ -7137,13 +7279,14 @@ const my @SPECIES => qw(
     H_C49_69
     H_C49_72
     H_C49_73
+    hadrus_C
     haematequi_A
     haemolysans_A
     haemolysans_B
     haemolysans_C
     haemolysans_D
+    haemolysans_E
     haemolytica_A
-    haemolyticum_A
     haemolyticus_A
     haemolyticus_G
     haemolyticus_I
@@ -7169,6 +7312,15 @@ const my @SPECIES => qw(
     hampsonii_C
     hankookensis_A
     haoranii_A
+    haradaeae_A
+    haradaeae_B
+    haradaeae_C
+    haradaeae_D
+    haradaeae_E
+    haradaeae_F
+    haradaeae_G
+    haradaeae_H
+    haradaeae_I
     Hare_CoV/La06_377/Lep_gra/ESP/2006
     Hare_CoV/La06_378/Lep_gra/ESP/2006
     Hare_CoV/La06_379/Lep_gra/ESP/2006
@@ -7178,17 +7330,24 @@ const my @SPECIES => qw(
     Hare_CoV/La08_60/Lep_gra/ESP/2008
     Hare_CoV/La08_96/Lep_gra/ESP/2008
     Hare_CoV/La08_99/Lep_gra/ESP/2008
-    harei_A
+    harei_B
     harenae_A
     harundinacea_A
     harundinacea_B
     harundinacea_D
     hathewayi_A
+    hauseri_B
+    hawaiiensis_A
+    HCP3S3_D8
+    helgolandensis_A
     heliothermus_B
     helleri_A
     helvetica_A
-    helveticum_A
+    helvus_A
+    helvus_B
+    helvus_C
     hengshuiensis_A
+    heparinus_A
     hepatarius_A
     hepatarius_B
     heraklionense_A
@@ -7196,11 +7355,12 @@ const my @SPECIES => qw(
     herbae_A
     hermannii_A
     hertigii_A
-    hertigii_B
     heylii_A
+    hiemivivus_A
     higoensis_A
     hippei_A
     hippocampi_A
+    hippocoleae_A
     hispanicum_A
     HMP_JCVI_SC0102
     HMP_JCVI_SC0110
@@ -7221,9 +7381,9 @@ const my @SPECIES => qw(
     hmp_mda_pilot_jcvi_0005
     hodleri_A
     hodleri_B
+    hofstadii_A
     hominis_A
     hominis_B
-    hominis_C
     hopiensis_A
     Hoplo_CB025_CB025_18_01
     hordeovulneris_A
@@ -7233,12 +7393,15 @@ const my @SPECIES => qw(
     horikoshii_D
     horikoshii_E
     horikoshii_F
-    hormaechei_B
     hormaechei_C
     Horo_12
     Horo_15
     hortorum_B
-    hortorum_C
+    hortorum_D
+    hortorum_E
+    hortorum_F
+    HSd1-k141_1565913
+    HSd1-k141_2165608
     Hu/Caterer_Company_1_pat_1/10-04-2003/NL
     Hu/Caterer_Company_1_pat_2/10-04-2003/NL
     Hu/Caterer_Company_2_pat_1/12-04-2003/NL
@@ -7988,16 +8151,19 @@ const my @SPECIES => qw(
     Human/GII/InDRE3402_Ver/2006/Mexico
     Human/GII/InDRE3432_Tamps/2006/Mexico
     Human/GII/InDRE3437_Tamps/2006/Mexico
+    humicola_A
     humilata_A
+    hundungensis_A
     hungatei_A
     hungatei_B
     hwajinpoensis_A
     hwajinpoensis_B
-    hwajinpoensis_C
     hwajinpoensis_D
+    hwajinpoensis_E
     hydrocarbonoxydans_A
     hydrocarbonoxydans_B
     hydrocarbonoxydans_C
+    hydrocarbonoxydans_D
     hydrogenitrophicus_A
     hydrogenivorans_A
     hydrophilus_A
@@ -8006,6 +8172,7 @@ const my @SPECIES => qw(
     hygroscopicus_C
     hygroscopicus_D
     hyointestinalis_A
+    hyointestinalis_B
     hypermegale_A
     I_35_MF_cl1
     I_35_MF_cl2
@@ -8056,9 +8223,10 @@ const my @SPECIES => qw(
     INBio_4100K
     INBio_4507A
     INBio_4510E
-    incarnatus_A
+    incomptus_A
     indica_A
     indica_B
+    indicatrix_A
     indicum_A
     indicus_A
     indigofera_A
@@ -8066,7 +8234,6 @@ const my @SPECIES => qw(
     indologenes_A
     indologenes_B
     indologenes_E
-    indologenes_F
     indologenes_G
     infantis_A
     infantis_B
@@ -8080,12 +8247,14 @@ const my @SPECIES => qw(
     infantis_K
     infantis_L
     infantis_M
+    infantis_N
     infantium_A
-    infera_B
     infera_D
     influenzae_D
     influenzae_E
     influenzae_H
+    influenzae_I
+    influenzae_J
     inhae_A
     inopinata_A
     insuavis_A
@@ -8093,9 +8262,11 @@ const my @SPECIES => qw(
     intermedia_A
     intermedia_B
     intermedia_C
+    intermedia_D
     intermedius_A
     intestinalis_A
     intracellularis_B
+    invictum_A
     Ips_1
     Ips_2
     Ips_3
@@ -8154,15 +8325,20 @@ const my @SPECIES => qw(
     ishigakensis_A
     ishizawai_A
     Iso11_2
+    isoporae_A
     isronensis_A
     isronensis_B
     ISW_15
     ISW_2
+    italicus_A
     itersonii_A
+    ivorense_A
     ixodetis_A
+    ixodetis_B
     jadensis_A
     japonica_A
     japonica_C
+    japonica_D
     japonicum_B
     japonicum_C
     japonicum_F
@@ -8179,7 +8355,10 @@ const my @SPECIES => qw(
     jejuni_B
     jejuni_C
     jejuni_D
+    jeongneungensis_A
     jeotgali_A
+    jeotgali_B
+    JFR_U1362B
     JGI_KR11_SmLR_4_I6
     JGI_KR11_SmLR_5_K8
     JGI_KR13_SmLR_4_D7
@@ -8194,16 +8373,20 @@ const my @SPECIES => qw(
     johnsoniae_A
     johnsoniae_C
     johnsonii_A
+    johnsonii_B
     Jomon_CT89
     jostii_A
     JPL_7
-    jumonjinensis_A
     K12_27
     K12_28b
+    kaistense_A
     kashiwanohense_A
     kashmirensis_A
+    kashmirensis_B
+    kashmirensis_C
     katrae_A
     katrae_B
+    kentuckyensis_A
     kieliensis_A
     kilianii_A
     kilonensis_B
@@ -8211,6 +8394,7 @@ const my @SPECIES => qw(
     kirkii_B
     kisseleviana_A
     kitaharae_A
+    kloosii_A
     kluyveri_B
     kmd_008
     kmd_043
@@ -8237,26 +8421,33 @@ const my @SPECIES => qw(
     kobei_A
     komagatae_A
     koreensis_A
-    koreensis_B
     koreensis_C
     koreensis_F
     koreensis_G
     koreensis_H
+    koreensis_I
     koyamae_A
     koyamae_B
     koyamae_C
     kribbensis_B
+    kronopolitis_A
     kroppenstedtii_B
+    kroppenstedtii_D
     kujiense_A
     kunkeei_C
     kunkeei_E
     kunkeei_F
+    kunmingensis_B
     kururiensis_A
     kushneri_A
     kyeonggiensis_A
     kyeonggiensis_B
+    kyogaense_A
     kyorinense_A
     kyotonensis_B
+    KZY1-k141_1027853
+    KZY1-k141_1263260
+    KZY1-k141_1938105
     L3_Loihi
     lablabi_A
     lablabi_C
@@ -8266,10 +8457,11 @@ const my @SPECIES => qw(
     lactamica_B
     lactatifermentans_A
     lactis_A
+    lactitubi_A
     lactosutens_A
     lactucae_A
     lacunata_B
-    lacus_C
+    lacus_A
     lacus_D
     lacuscaerulensis_A
     lacuscaerulensis_B
@@ -8290,6 +8482,8 @@ const my @SPECIES => qw(
     lari_E
     larrymoorei_A
     larrymoorei_B
+    larrymoorei_C
+    larvae_A
     lata_B
     lata_C
     latens_A
@@ -8297,10 +8491,10 @@ const my @SPECIES => qw(
     laterosporus_E
     lathyri_A
     lautus_A
+    LCP25S3_G4
     leadbetteri_A
     legallii_A
     leguminosarum_D
-    leguminosarum_G
     leguminosarum_I
     leguminosarum_J
     leguminosarum_M
@@ -8318,9 +8512,7 @@ const my @SPECIES => qw(
     liaoningense_A
     liaoningense_B
     liaoningense_C
-    lichenicola_A
     lichenicola_B
-    lichenicola_C
     lichenicola_D
     lichenicola_E
     limicola_A
@@ -8337,7 +8529,9 @@ const my @SPECIES => qw(
     limosus_E
     linckia_A
     linckia_B
+    lincolnensis_B
     lini_A
+    lini_B
     lipoferum_B
     lipoferum_C
     lipolytica_A
@@ -8368,9 +8562,9 @@ const my @SPECIES => qw(
     lividum_F
     ljungdahlii_A
     longbeachae_A
+    longicatena_C
     longispororuber_A
     longum_A
-    longum_D
     loti_A
     loti_B
     loti_C
@@ -8422,14 +8616,20 @@ const my @SPECIES => qw(
     lwoffii_G
     lwoffii_H
     lwoffii_I
-    lwoffii_J
     lwoffii_K
     lwoffii_L
     lwoffii_M
     lwoffii_N
     lwoffii_O
     lwoffii_P
+    lwoffii_Q
+    lwoffii_R
+    lwoffii_S
+    lwoffii_T
+    lwoffii_U
+    lycopersici_A
     lydicus_C
+    lydicus_D
     lyticus_A
     M12R1_907R_F06
     M13K07_deltapIII_deltaf1ori
@@ -10248,11 +10448,11 @@ const my @SPECIES => qw(
     magna_H
     magna_I
     magna_J
+    magna_K
     magnetica_A
     magneticus_A
     magneticus_B
     magnusonii_B
-    magnusonii_C
     mali_A
     mallensis_A
     malorum_A
@@ -10265,7 +10465,6 @@ const my @SPECIES => qw(
     maltophilia_AG
     maltophilia_AH
     maltophilia_AJ
-    maltophilia_AL
     maltophilia_AM
     maltophilia_AN
     maltophilia_AP
@@ -10303,10 +10502,8 @@ const my @SPECIES => qw(
     MAR_274_D06_2010-01-20
     marcescens_A
     marcescens_F
-    marcescens_J
-    marcescens_K
     marcescens_L
-    marginalis_D
+    marensis_A
     marina_A
     marina_B
     marincola_A
@@ -10347,6 +10544,7 @@ const my @SPECIES => qw(
     maripaludis_A
     maripaludis_D
     maris_A
+    maris_B
     marisflavi_A
     marisflavi_B
     marisnigri_B
@@ -10356,11 +10554,14 @@ const my @SPECIES => qw(
     maritimus_C
     maritypicum_A
     marmoris_A
+    marmorisolisilvae_A
+    marokkonensis_A
     massiliana_A
     massiliensis_A
     massiliensis_B
     massiliensis_C
     massiliensis_D
+    massiliensis_E
     mayombei_A
     MC1_11
     MC1_16
@@ -10394,9 +10595,11 @@ const my @SPECIES => qw(
     meluiroseus_F
     meluiroseus_G
     meluiroseus_H
+    meluiroseus_I
     mendocina_C
     mendocina_D
-    meningitidis_C
+    mendocina_E
+    meningitidis_D
     MEP_002
     MEP_003
     MEP_007
@@ -10408,6 +10611,9 @@ const my @SPECIES => qw(
     mesonae_A
     mesophila_A
     mesophilicum_A
+    mesophilicum_B
+    mesophilum_A
+    mesophilus_A
     metallireducens_B
     methanica_A
     methanica_B
@@ -10464,12 +10670,13 @@ const my @SPECIES => qw(
     millerae_A
     millerae_B
     mink/NLD/2020/NT_4
-    minutissimum_A
     minutissimum_B
     minutum_A
     minutum_B
     minutum_C
     mirabilis_B
+    mirabilis_D
+    miscanthi_A
     misionensis_A
     mitis_A
     mitis_AC
@@ -10531,7 +10738,6 @@ const my @SPECIES => qw(
     mitis_CO
     mitis_CP
     mitis_CQ
-    mitis_CR
     mitis_CS
     mitis_CT
     mitis_CU
@@ -10548,6 +10754,17 @@ const my @SPECIES => qw(
     mitis_DE
     mitis_DF
     mitis_DG
+    mitis_DH
+    mitis_DI
+    mitis_DJ
+    mitis_DK
+    mitis_DL
+    mitis_DM
+    mitis_DN
+    mitis_DO
+    mitis_DP
+    mitis_DQ
+    mitis_DR
     mitis_E
     mitis_F
     mitis_H
@@ -10562,17 +10779,19 @@ const my @SPECIES => qw(
     mitis_Q
     mitis_W
     mitis_Y
+    mitsuokai_A
     mixtus_A
+    mizutaii_A
     mobilis_A
     mobilis_B
+    monocytogenes_A
     monocytogenes_B
     monocytogenes_C
     monocytogenes_D
+    monocytogenes_E
     montana_A
-    montanisoli_A
     monteilii_A
     moraviensis_A
-    morganii_A
     morganii_B
     morganii_C
     morganii_D
@@ -10612,10 +10831,14 @@ const my @SPECIES => qw(
     MSK18_59
     MSK20_81
     MSX_63619
+    mucicola_A
     mucilaginosa_A
     mucilaginosa_B
     mucilaginosa_C
-    mucilaginosus_A
+    mucilaginosa_D
+    mucilaginosa_E
+    mucilaginosa_F
+    mucilaginosa_G
     muciniphila_A
     muciniphila_C
     muciniphila_D
@@ -10627,10 +10850,15 @@ const my @SPECIES => qw(
     muciniphilus_D
     muciniphilus_E
     mucogenicum_B
-    mucor_C
     mucosa_A
     mucosus_A
     muelleri_A
+    muelleri_B
+    muelleri_C
+    muelleri_D
+    muelleri_E
+    muelleri_F
+    muelleri_G
     mulieris_A
     multiformis_A
     multiformis_B
@@ -10641,7 +10869,7 @@ const my @SPECIES => qw(
     multivorans_A
     multocida_A
     mundtii_B
-    mundtii_C
+    mundtii_D
     murale_A
     muralis_A
     muris_A
@@ -10673,10 +10901,13 @@ const my @SPECIES => qw(
     naejangsanensis_A
     naejangsanensis_B
     namurensis_A
+    nanensis_A
     nanhaiensis_A
     nanhaiensis_B
     nanhaiensis_C
     nanhaiensis_D
+    nanhaiensis_E
+    nanoralicus_A
     nanshensis_A
     naphthalenivorans_A
     nasicola_B
@@ -10687,6 +10918,17 @@ const my @SPECIES => qw(
     nasimurium_F
     nasimurium_G
     nasimurium_H
+    NatCom_17901
+    NatCom_18656
+    NatCom_19828
+    NatCom_20922
+    NatCom_3357
+    NatCom_34192
+    NatCom_35866
+    NatCom_43819
+    NatCom_9287
+    NatCom_9291
+    natoriense_A
     natronolimnaea_A
     neapolitanus_A
     neapolitanus_B
@@ -10694,6 +10936,7 @@ const my @SPECIES => qw(
     necator_B
     necator_C
     necator_D
+    necator_E
     necessarius_E
     necessarius_F
     necessarius_G
@@ -10707,8 +10950,8 @@ const my @SPECIES => qw(
     nelsonii_A
     nelsonii_B
     neoaurum_A
+    neoaurum_B
     neocaledoniensis_A
-    neohaematopini_A
     neohaematopini_B
     neohaematopini_C
     neohaematopini_D
@@ -10767,26 +11010,33 @@ const my @SPECIES => qw(
     niacini_E
     niacini_F
     niacini_G
+    niacini_H
+    niacini_I
+    niacini_J
+    niacini_K
+    niastensis_A
     nicotinovorans_A
     nicotinovorans_B
-    nimipressuralis_A
     NIO_00081
-    nitratireducens_A
     nitritireducens_A
     nitroguajacolicus_A
     nitroguajacolicus_B
+    nitroguajacolicus_C
+    nitroguajacolicus_D
+    nitrophenolicus_A
     nitroreducens_A
     nitroreducens_B
     nitroreducens_C
+    nivalis_A
     nivea_A
     niveus_A
-    nivimaris_A
     nivimaris_B
     nivis_A
     nodosa_A
     norvegicus_A
     norvegicus_B
     nosocomialis_A
+    nototheniae_A
     nova_A
     nova_B
     novellum_A
@@ -10799,20 +11049,21 @@ const my @SPECIES => qw(
     NSA_23
     nucleatum_D
     nucleatum_J
+    nucleatum_K
     numerosa_A
     numerosa_B
+    nutrimenti_A
+    nyackensis_A
     O_ANT70
     O_MVP5180
     obscurus_A
     obscurus_B
     oceani_A
-    oceani_B
     oceanisediminis_A
     oceanisediminis_C
     oceanisediminis_D
     oculi_A
     odensis_A
-    odontolytica_A
     odontolytica_B
     odontolytica_C
     odontolytica_D
@@ -10820,6 +11071,7 @@ const my @SPECIES => qw(
     odontotermitis_B
     odontotermitis_C
     odoratimimum_A
+    odoratimimum_B
     odoratum_A
     odorimutans_A
     odysseyi_A
@@ -10833,13 +11085,14 @@ const my @SPECIES => qw(
     oleivorans_B
     oleivorans_C
     oleivorans_D
-    oleovorans_B
+    oligophenolica_A
     oligotropha_A
     oligotropha_B
     oligotrophus_A
     olivaria_A
     olivochromogenes_A
     olleyae_A
+    omnicolens_A
     omphalii_A
     omphalii_B
     oncorhynchi_A
@@ -10876,7 +11129,6 @@ const my @SPECIES => qw(
     oralis_BI
     oralis_BJ
     oralis_BK
-    oralis_BL
     oralis_BM
     oralis_BN
     oralis_BO
@@ -10907,7 +11159,19 @@ const my @SPECIES => qw(
     oralis_CM
     oralis_CN
     oralis_CO
+    oralis_CP
+    oralis_CQ
+    oralis_CR
+    oralis_CS
+    oralis_CT
+    oralis_CU
+    oralis_CV
+    oralis_CW
+    oralis_CX
+    oralis_CY
+    oralis_CZ
     oralis_D
+    oralis_DA
     oralis_E
     oralis_F
     oralis_G
@@ -10936,18 +11200,20 @@ const my @SPECIES => qw(
     orientalis_D
     oris_A
     oris_B
-    oris_C
-    oris_D
     oris_E
     oryzae_A
     oryzae_B
     oryzae_C
-    oryzihabitans_B
-    oryzihabitans_D
+    oryzae_D
+    oryzae_E
     oryzihabitans_E
+    oryzihabitans_F
+    oryzihabitans_G
     oryzisoli_A
     oryzisoli_B
     oryzisoli_C
+    osloensis_B
+    osloensis_C
     ostreistagni_A
     OSW_10
     ottawaense_A
@@ -10957,7 +11223,9 @@ const my @SPECIES => qw(
     ovipneumoniae_B
     ovipneumoniae_C
     ovipneumoniae_D
-    ovipneumoniae_E
+    ovipneumoniae_F
+    ovipneumoniae_G
+    ovis_A
     OX_B
     OX_D
     OX_LEAF1
@@ -10974,6 +11242,7 @@ const my @SPECIES => qw(
     OX_V2
     OX_Y
     oxalaticus_A
+    oxalaticus_B
     oxydans_A
     oxydans_B
     oxydans_C
@@ -11004,11 +11273,13 @@ const my @SPECIES => qw(
     pAAVsc_gSerpina1e
     pAAVsc_LP1-Cre
     pabuli_B
+    pabuli_C
     pacifica_A
     pacificus_A
     pacificus_B
     pactum_A
     pAH05_PsodB-100-GFPova_RhyB2-10-BFP_mCh
+    palleronii_A
     paludicola_A
     paludicola_B
     paludicola_C
@@ -11021,12 +11292,16 @@ const my @SPECIES => qw(
     palustris_J
     palustris_K
     palustris_L
+    palustris_M
+    palythoae_A
     panacihumi_A
+    panacisoli_A
     panaciterrae_A
     panipatense_A
     panis_A
     panniformis_A
     papyrosolvens_A
+    paraconglomeratum_A
     paradoxus_A
     paradoxus_C
     paradoxus_E
@@ -11040,7 +11315,11 @@ const my @SPECIES => qw(
     paradoxus_M
     paradoxus_N
     paradoxus_O
+    paradoxus_P
+    paradoxus_Q
+    paradoxus_R
     paraffinicum_A
+    paraffinivorans_A
     parafulva_A
     parafulva_B
     parahaemolyticus_A
@@ -11049,18 +11328,23 @@ const my @SPECIES => qw(
     parainfluenzae_AA
     parainfluenzae_AB
     parainfluenzae_AC
+    parainfluenzae_AD
+    parainfluenzae_AE
+    parainfluenzae_AF
+    parainfluenzae_AG
+    parainfluenzae_AH
+    parainfluenzae_AI
+    parainfluenzae_AJ
     parainfluenzae_J
     parainfluenzae_K
     parainfluenzae_L
     parainfluenzae_M
     parainfluenzae_N
     parainfluenzae_O
-    parainfluenzae_P
     parainfluenzae_Q
     parainfluenzae_R
     parainfluenzae_S
     parainfluenzae_T
-    parainfluenzae_U
     parainfluenzae_V
     parainfluenzae_W
     parainfluenzae_X
@@ -11069,6 +11353,7 @@ const my @SPECIES => qw(
     paralvinellae_A
     paraoxydans_B
     paraoxydans_C
+    paraoxydans_D
     parapertussis_A
     parapertussis_B
     parapertussis_C
@@ -11082,6 +11367,9 @@ const my @SPECIES => qw(
     parapertussis_K
     paraphrohaemolyticus_A
     parasanguinis_A
+    parasanguinis_AA
+    parasanguinis_AB
+    parasanguinis_AC
     parasanguinis_B
     parasanguinis_C
     parasanguinis_D
@@ -11101,9 +11389,23 @@ const my @SPECIES => qw(
     parasanguinis_S
     parasanguinis_T
     parasanguinis_U
+    parasanguinis_V
+    parasanguinis_W
+    parasanguinis_X
+    parasanguinis_Y
+    parasanguinis_Z
     parvula_A
     parvula_B
     parvula_C
+    parvula_D
+    parvula_E
+    parvula_F
+    parvula_G
+    parvula_H
+    parvula_I
+    parvula_J
+    parvula_K
+    parvula_L
     parvum_A
     parvum_B
     PAS_122122
@@ -11112,12 +11414,14 @@ const my @SPECIES => qw(
     pascens_B
     pasteuri_A
     pasteurianum_A
+    pasteurianus_A
     paucimobilis_A
     pauculus_B
     pauculus_C
     pauculus_D
     pauculus_E
     paurometabola_A
+    paurometabola_B
     pBADamp_npmC
     pBbB1c-CBGA_PlacUV5
     pBbB1c-CBGA_Ptrc
@@ -11184,11 +11488,9 @@ const my @SPECIES => qw(
     pEAQ-HT_OsD27-myc
     pEAQ-HT_OsD27deltaDIS-myc
     pEBO_BDBV-GP
-    pectinoschiza_A
     pectinoschiza_B
     pectinovorum_A
     pectinovorum_B
-    pecuniae_A
     pEG01_128_pLux-TruD
     pEG02_192_RSTN-PapoA
     pEG02_194_RSTN-BamA
@@ -11317,6 +11619,7 @@ const my @SPECIES => qw(
     pelagius_A
     penaeicida_A
     penaeicida_B
+    pennii_A
     pennivorans_A
     pentastirinorum_A
     peptidovorans_A
@@ -11326,6 +11629,7 @@ const my @SPECIES => qw(
     perflava_A
     perflava_B
     perfringens_A
+    perfringens_B
     periodonticum_B
     periodonticum_D
     permense_A
@@ -11337,6 +11641,7 @@ const my @SPECIES => qw(
     pET19b_HisDAD2
     pET19b_HisDAD2cpGFP(G166)
     pET19b_ShHTL7cpGFP(L166)LSSmOrange
+    pET28_CBD_TP84_28_His
     petrii_C
     petrii_D
     petrii_E
@@ -11387,6 +11692,7 @@ const my @SPECIES => qw(
     phage_MedDCM-OCT-S42-C7
     phage_MedDCM-OCT-S45-C18
     phage_MedDCM-OCT-S45-C4
+    phage_vB_CECAV_A40
     phage_vB_CfrD_Devorator
     phage_vB_EcoD_Punny
     phagocytophilum_A
@@ -11398,6 +11704,7 @@ const my @SPECIES => qw(
     phenacola_C
     phenacola_D
     phenanthrenivorans_B
+    phenanthrenivorans_C
     phenazinium_A
     phenazinium_B
     phenolica_A
@@ -11413,6 +11720,7 @@ const my @SPECIES => qw(
     phosalacinea_C
     phosphatis_A
     phosphatis_G
+    phosphoraccumulans_A
     phosphorivorans_A
     phosphorivorans_B
     phosphorivorans_C
@@ -11420,13 +11728,15 @@ const my @SPECIES => qw(
     phototrophica_A
     phyllosphaerae_B
     phyllosphaerae_C
+    phyllosphaerae_D
+    phyllosphaerae_E
+    phymatum_A
+    phymatum_B
     phytofermentans_A
     PI_GH1.1.B5
     PI_GH2.1.C2
     pickettii_A
-    pickettii_B
     pickettii_D
-    pictum_A
     piezotolerans_A
     pig/P15_2/2004/SVN
     pig/sw-90_1/SWE/2010
@@ -11437,6 +11747,7 @@ const my @SPECIES => qw(
     Pili_CB159_MCB012_18_01
     pilosicoli_A
     pilosicoli_B
+    pilosicoli_C
     pinensis_A
     pinensis_B
     pinensis_C
@@ -11444,6 +11755,10 @@ const my @SPECIES => qw(
     pinensis_E
     pinensis_F
     pinensis_G
+    pinensis_H
+    pinensis_I
+    pinensis_J
+    pinensis_K
     Pip1_Cr_FR_2014
     Pip2_Cr_FR_2014
     Pip3_M_FR_2014
@@ -11451,10 +11766,12 @@ const my @SPECIES => qw(
     pipientis_B
     pipientis_C
     pipientis_D
-    piscatorii_A
+    piriforme_A
+    piscatorii_B
     piscicida_A
     piscicida_B
     piscicola_A
+    piscis_A
     piscisalsi_A
     piscolens_A
     pittii_E
@@ -11484,7 +11801,6 @@ const my @SPECIES => qw(
     pKW20_CDFtet_pAraRedCas9_TracrRNA
     pKW3_MB1amp_tracr_Universal1
     pKW3_MB1amp_tracr_Universal2
-    plakortidis_A
     planktonicus_A
     plantarum_A
     pLC_pBBR1_ori
@@ -11506,9 +11822,14 @@ const my @SPECIES => qw(
     pneumoniae_B
     pneumoniae_C
     pneumoniae_E
+    pneumoniae_F
+    pneumoniae_G
     pNL4-3_gag-pol(Delta1443-4553)_EGFP
+    pnomenusa_C
     poae_A
     poae_C
+    poindexterae_A
+    poinsettiae_A
     polaris_A
     polyisoprenivorans_A
     polymorphus_A
@@ -11516,29 +11837,32 @@ const my @SPECIES => qw(
     polymyxa_C
     polymyxa_D
     polymyxa_E
+    polyplacis_A
     polysaccharea_A
     polysaccharea_B
     polysaccharolyticus_A
     polyspora_A
     polyspora_B
     polytropus_A
+    pomeroyi_A
     pontis_A
     populi_A
     populi_B
+    populi_C
     porcinum_A
     porcinus_A
     porphyrae_A
     portucalensis_A
     postgatei_A
     postgatei_B
+    potami_A
     pPGG_tRNAarI_sgRNA_Cas9
+    praeacuta_A
     pratensis_A
-    prausnitzii_A
-    prausnitzii_D
+    pratensis_B
     prausnitzii_E
     prausnitzii_F
     prausnitzii_I
-    prausnitzii_J
     prausnitzii_L
     prausnitzii_M
     PREDICT_AdV-12
@@ -12007,7 +12331,6 @@ const my @SPECIES => qw(
     profundicola_A
     profundimaris_B
     profundimaris_C
-    profundimaris_D
     profundum_A
     profundus_A
     profusus_A
@@ -12023,12 +12346,12 @@ const my @SPECIES => qw(
     protaetiae_A
     proteamaculans_D
     proteamaculans_E
-    protegens_A
     protegens_B
     proteoclasticus_A
     proteoclasticus_B
     proteolyticum_A
-    proteolyticus_A
+    proteolyticus_B
+    proteolyticus_C
     provencensis_A
     pRS315_AnSuc1:pep1
     pRS315_Ppdc_xyr1V821F:ace1
@@ -12046,6 +12369,8 @@ const my @SPECIES => qw(
     pSC101_rK-sacB_selection-construct
     pSC101_sC-rpsL_selection-construct
     pseudoflava_A
+    pseudogrignonensis_A
+    pseudogrignonensis_B
     pseudolongum_C
     pseudomultivorans_A
     pseudomycoides_B
@@ -12064,6 +12389,9 @@ const my @SPECIES => qw(
     pseudopneumoniae_P
     pseudopneumoniae_Q
     pseudopneumoniae_R
+    pseudopneumoniae_S
+    pseudopneumoniae_T
+    pseudopneumoniae_U
     pseudotrichonymphae_A
     pseudovenezuelae_A
     pSGK_ChoD
@@ -12075,15 +12403,16 @@ const my @SPECIES => qw(
     pStA0.BBa_J23113
     pStA0.BBa_J23116
     pStA0.BBa_J23118
+    PSTPg1_AroA
     psychrerythraea_A
     psychrerythraea_B
     psychrerythraea_C
     psychrerythraea_D
+    psychrodurus_A
     psychrophenolicus_A
     psychrophila_A
     psychrophila_B
     psychrophilum_A
-    psychrophilum_B
     psychrophilum_C
     psychrophilum_D
     psychrophilum_E
@@ -12117,12 +12446,14 @@ const my @SPECIES => qw(
     pullorum_B
     pullorum_C
     pulmonis_A
+    pumilus_A
     pumilus_G
     pumilus_M
     pumilus_N
     pumilus_O
     pumilus_P
     punctiforme_A
+    purpeofusca_A
     pusillum_A
     pusillum_B
     pusillum_C
@@ -12137,7 +12468,6 @@ const my @SPECIES => qw(
     putida_B
     putida_E
     putida_F
-    putida_H
     putida_J
     putida_K
     putida_L
@@ -12160,6 +12490,7 @@ const my @SPECIES => qw(
     pVMG0295_Cquin_white-sgRNA-6_recoded
     pVMG0313_ebony_gRNA4
     pVMG090_White_gRNA2
+    pWGA181v1::RBS_BTBX-1_:RBS_hsp17^derep
     pylori_A
     pylori_BU
     pylori_C
@@ -12176,7 +12507,19 @@ const my @SPECIES => qw(
     pylori_CQ
     pylori_CR
     pylori_CS
+    pylori_CT
+    pylori_CU
+    pylori_CV
+    pylori_CW
+    pylori_CX
+    pylori_CY
+    pylori_CZ
+    pylori_DA
+    pylori_DB
+    pylori_DC
     pyogenes_A
+    pyogenes_B
+    pyrenivorans_A
     pyrrocinia_B
     pyrrocinia_C
     pyrrocinia_D
@@ -12218,6 +12561,7 @@ const my @SPECIES => qw(
     Q_sR_OV_042
     qingshengii_A
     qingshengii_B
+    qinlingensis_A
     queenslandensis_A
     queenslandensis_B
     quercina_D
@@ -12247,6 +12591,7 @@ const my @SPECIES => qw(
     raffinosus_A
     ramosus_A
     ramulus_A
+    rapamycinicus_A
     RBC_A_MPN10_2
     RBC_B_mpn_10_2_GM
     RBG_16_50_20
@@ -12293,21 +12638,25 @@ const my @SPECIES => qw(
     RCoV/SPB40/Liomys_spec/MEX/2011
     RCoV/TP3_22/Ban_ind/THA/2005
     RCoV/TP3_26/Rat_rat/THA/2005
+    RE-38_switch_block
+    RE-38_trigger_block
+    RE-6_switch_block
     resinovorans_A
     resinovorans_C
     resinovorans_D
     resinovorum_A
+    resinovorum_B
+    resistens_A
     restrictus_A
-    rettgeri_A
-    rettgeri_D
     rettgeri_E
-    rettgeri_F
+    rettgeri_G
     reuszeri_A
-    reuteri_D
     reuteri_E
     reuteri_F
     reuteri_G
     reuteri_H
+    reuteri_I
+    reuteri_J
     rhinotracheale_A
     rhinotracheale_B
     rhizogenes_A
@@ -12321,6 +12670,7 @@ const my @SPECIES => qw(
     rhizovicinus_B
     rhodesiae_A
     rhodesiae_B
+    rhombi_A
     Ri1Ps_4703
     Ri1Ps_4749
     Ri1Pw_5477
@@ -12403,8 +12753,8 @@ const my @SPECIES => qw(
     RO_isolate_6
     RO_isolate_7
     robiniae_A
-    robusta_A
     rosea_A
+    rosenbergii_A
     roseus_A
     roseus_B
     rossiae_B
@@ -12417,7 +12767,9 @@ const my @SPECIES => qw(
     rubra_E
     rubra_F
     rubra_G
+    rubrum_A
     rudis_A
+    ruginosibacter_A
     ruminantium_A
     ruminantium_B
     ruminantium_C
@@ -12461,6 +12813,7 @@ const my @SPECIES => qw(
     S-RIM12_W1_24_0910
     S-RIM12_WH_05_0310
     S-RIM12_WH_07_0310
+    S143_2
     S1_MeH
     S2_MeH
     S8A-217_16S
@@ -12494,14 +12847,19 @@ const my @SPECIES => qw(
     SA_0800821
     sabuli_A
     sabulinigri_A
+    sacchari_A
     sacchari_B
     sacchari_C
+    saccharivorans_A
     saccharolyticum_A
     saccharolyticum_B
     saccharolyticum_C
+    saccharophila_A
     saccharophilus_A
     saccharophilus_B
+    sacheonensis_A
     safensis_B
+    saidenbachensis_A
     sakei_A
     SAL_1
     SAL_18
@@ -12516,7 +12874,10 @@ const my @SPECIES => qw(
     salina_C
     saliphilus_A
     salivarius_D
+    salivarius_E
+    salmonicida_A
     salmonicolor_A
+    sancti_B
     sandarakina_A
     sandarakinum_A
     sanguineus_A
@@ -12542,10 +12903,12 @@ const my @SPECIES => qw(
     sanguinis_T
     sanguinis_U
     sanguinis_V
+    sanguinis_W
+    sanguinis_X
+    sanguinis_Y
     sanxanigenens_A
     sanyensis_A
     saphenum_A
-    sartagoforme_A
     sartagoforme_B
     satyanarayanai_B
     SAV/Human/BRA/IAL01_42160/2010
@@ -12575,6 +12938,7 @@ const my @SPECIES => qw(
     schaedleri_A
     schinkii_B
     schleiferi_A
+    schleiferi_B
     schmidteae_A
     schmidteae_B
     Schreyahn_AOB_Sali_Kultur_19
@@ -12583,7 +12947,6 @@ const my @SPECIES => qw(
     Schreyahn_AOB_SSU_Aster_8
     Schreyahn_K10.Sali
     Schreyahn_K9.Sali
-    schumannianae_A
     sciuri_A
     sclerotialus_B
     scrofulaceum_C
@@ -12635,6 +12998,7 @@ const my @SPECIES => qw(
     Se3Ps_2758
     Se3Pw_3619
     seckii_A
+    sediminicola_A
     sediminis_A
     sediminum_A
     segnicrescens_A
@@ -12642,6 +13006,7 @@ const my @SPECIES => qw(
     segnis_B
     segnis_C
     segnis_D
+    segnis_E
     sejongensis_A
     selenatarsenatis_A
     selenatireducens_A
@@ -12650,26 +13015,31 @@ const my @SPECIES => qw(
     senegalensis_A
     senegalensis_B
     senioris_A
-    seoulensis_A
     SH_25-50_Exo70_native
+    shangrilense_A
     shenzhenensis_A
     shigense_A
     shinshuensis_A
     shinshuensis_B
+    shinshuensis_C
     shioyasakiensis_A
     shioyasakiensis_B
     showae_A
     showae_B
     showae_D
     showae_E
+    showae_F
+    siamensis_A
     sibiricum_A
     sicca_A
     sicca_B
     sicca_C
     sicca_E
     siccitolerans_A
+    siddallii_A
     sifiae_A
     silvestris_A
+    silvisoli_A
     simiae_A
     simplex_A
     simplex_B
@@ -12684,6 +13054,8 @@ const my @SPECIES => qw(
     sinense_C
     singularis_A
     singularis_B
+    sinus_A
+    sinus_B
     sinuspersici_A
     sinuspersici_B
     SM23_31
@@ -12717,22 +13089,19 @@ const my @SPECIES => qw(
     So3Pw_2867
     SOB_395
     sobria_A
+    soesokkakensis_A
     sojae_A
+    solani_A
+    soleae_A
     soli_A
+    soli_B
+    soli_C
     somerae_A
     sonorensis_A
     sordidicola_A
     sordidicola_C
     sp.48_UnivF-1183
-    sp.CRBC_G2051
-    sp.CRBC_G2061
-    sp.CRBC_G2073
-    sp.CRBC_G2107
     sp.CRBC_G2174
-    sp.CRBC_G2230
-    sp.CRBC_G2377
-    sp.CRBC_G2430
-    sp.CRBC_G2451
     sp.R0101_021
     sp_1_GP
     sp_2_GP
@@ -12742,9 +13111,9 @@ const my @SPECIES => qw(
     spanius_C
     spanius_D
     spanius_E
+    spanius_F
     spartinae_A
     Spd2B_4
-    sphaericus_A
     sphaericus_B
     sphaericus_D
     sphaericus_E
@@ -12762,6 +13131,7 @@ const my @SPECIES => qw(
     spongiarum_E
     spongiarum_F
     sporothermodurans_A
+    sputigena_A
     sputorum_B
     SRC_DS3
     SRC_DS3a
@@ -12782,25 +13152,30 @@ const my @SPECIES => qw(
     staleyi_A
     staleyi_B
     staleyi_C
+    stammeri_A
+    stammeri_B
+    stammeri_C
     stanieri_B
     stearothermophilus_A
-    stenotrophus_A
-    stenotrophus_B
-    stenotrophus_C
-    stenotrophus_D
+    stenotropha_A
+    stenotropha_B
+    stenotropha_C
+    stenotropha_D
     stercorihominis_A
     stercoris_A
     stetteri_A
     steynii_A
     stimsonii_A
     stipitatus_A
+    stipitatus_B
+    stipitatus_C
+    stomatis_A
     stratosphericus_B
     stuttgartiensis_A
     stutzeri_A
     stutzeri_AA
     stutzeri_AB
     stutzeri_AC
-    stutzeri_AD
     stutzeri_AE
     stutzeri_AF
     stutzeri_AH
@@ -12824,7 +13199,6 @@ const my @SPECIES => qw(
     stutzeri_R
     stutzeri_S
     stutzeri_T
-    stutzeri_U
     subflava_A
     subflava_B
     subflava_D
@@ -12871,6 +13245,7 @@ const my @SPECIES => qw(
     suis_AF
     suis_AG
     suis_AH
+    suis_AI
     suis_B
     suis_F
     suis_I
@@ -12892,6 +13267,8 @@ const my @SPECIES => qw(
     sulfidiphilus_A
     sulfonivorans_A
     sulfonivorans_B
+    sulfonivorans_C
+    suncheonense_A
     SUND_HBM1
     suwonensis_A
     suwonensis_B
@@ -12907,15 +13284,25 @@ const my @SPECIES => qw(
     syringae_A
     syringae_F
     syringae_J
-    syringae_M
     syringae_P
     syringae_Q
     syringae_R
     syringae_S
     syringae_T
+    T2S1-k141_477764
+    T2S2-k141_370465
+    T4S1-k141_462158
+    T4S1-k141_470236
+    T4S1-k141_502596
+    T4S1-k141_776450
+    T5S1-k141_18163
+    T5S1-k141_444551
+    T5S1-k141_653015
     taeanensis_A
     taeanensis_B
+    taffensis_A
     taichungensis_A
+    taiwanensis_A
     taiwanensis_B
     taiwanensis_C
     taiwanensis_D
@@ -12924,6 +13311,7 @@ const my @SPECIES => qw(
     tanakaei_C
     tannerae_A
     tannerae_B
+    tarimensis_A
     tasmaniensis_A
     tataouinensis_A
     tataouinensis_B
@@ -12941,6 +13329,7 @@ const my @SPECIES => qw(
     TC3_7_MR-2014
     tenebrarum_A
     tengchongensis_A
+    tenuis_A
     tepidamans_A
     tepidum_A
     termitidis_A
@@ -12965,6 +13354,7 @@ const my @SPECIES => qw(
     testosteroni_F
     testosteroni_G
     testosteroni_H
+    texasensis_A
     TF4_16
     TF4_17
     TF4_17_MR-2014
@@ -12982,6 +13372,7 @@ const my @SPECIES => qw(
     thermoleovorans_A
     thermophila_A
     thermophilum_A
+    thermophilum_B
     thermophilus_C
     thermosulfidooxidans_A
     thermotolerans_A
@@ -12993,15 +13384,16 @@ const my @SPECIES => qw(
     thiooxydans_A
     thiotaurini_A
     thuringiensis_AA
-    thuringiensis_AB
     thuringiensis_K
     thuringiensis_N
     thuringiensis_S
+    tibetensis_A
     tibiigranuli_A
     tiedjei_A
     timonense_A
     timonensis_A
     timorensis_A
+    toletana_A
     tombus-like_virus
     towneri_A
     toxinivorans_A
@@ -13009,7 +13401,6 @@ const my @SPECIES => qw(
     TPMV_P-EGFP_H-His6
     TPMV_P-EGFP_HaCD20
     TPMV_P-EGFP_HaEGFR
-    trachydisci_A
     translucens_C
     transvalensis_A
     trapanicum_A
@@ -13017,13 +13408,15 @@ const my @SPECIES => qw(
     tribocorum_A
     tribocorum_B
     trichothecenolyticum_B
-    triculaminicus_A
+    trichothecenolyticum_C
     tropica_A
     tropici_A
     tropici_B
     tropici_C
     tropiciagri_A
     tropiciagri_B
+    trueperi_B
+    trueperi_C
     TsCyV-1_JP-NUBS-2014
     tsukubensis_B
     tsuruhatensis_A
@@ -13031,15 +13424,19 @@ const my @SPECIES => qw(
     tuberculostearicum_C
     tuberculostearicum_D
     tuberculostearicum_E
+    tuberculostearicum_F
+    tuberculostearicum_G
+    tuberculostearicum_H
     tubiashii_A
     tubiashii_B
     tuirus_A
     tumefaciens_B
     tumefaciens_C
     tumefaciens_I
+    tumefaciens_J
+    tumefaciens_K
     tundrae_A
     tundripaludum_A
-    turgidiscabies_A
     turicensis_A
     turicensis_B
     turnerae_B
@@ -13118,6 +13515,7 @@ const my @SPECIES => qw(
     uenonis_A
     UK_ancient_CT89
     ulcerans_A
+    ulcerans_B
     uli_A
     uli_B
     uliginosa_B
@@ -13125,13 +13523,12 @@ const my @SPECIES => qw(
     ulvanivorans_A
     umbonata_A
     umbrinus_A
+    ummariense_A
     undulata_A
     universalis_A
     universalis_B
-    uraniireducens_A
     urativorans_A
     urativorans_B
-    urativorans_C
     ureae_A
     ureae_B
     ureae_C
@@ -13140,13 +13537,12 @@ const my @SPECIES => qw(
     ureilytica_A
     ureisolvens_A
     ureolyticus_A
+    ureolyticus_B
     urinae_A
-    urinae_B
-    urinae_C
-    urinae_D
     urinae_E
     usitatum_A
     utahensis_B
+    vadensis_A
     vadi_A
     vagans_C
     vaginale_A
@@ -13161,10 +13557,12 @@ const my @SPECIES => qw(
     vaginalis_C
     vaginatus_A
     vaginatus_B
+    vaginatus_C
     valericigenes_A
     valericigenes_B
     vanbaalenii_A
     vancanneytii_A
+    vancanneytii_B
     variabilis_A
     variabilis_B
     variabilis_C
@@ -13180,6 +13578,8 @@ const my @SPECIES => qw(
     vB_RanS_PJN03
     vB_SabS_Sds2
     vB_SauM_SDQ
+    vB_YpeM_GMS130
+    vB_YpeM_MHS112
     venezuelae_B
     venezuelae_C
     venezuelae_D
@@ -13190,13 +13590,17 @@ const my @SPECIES => qw(
     ventosae_C
     vermicola_A
     veronii_A
+    veronii_F
+    veronii_G
     versatilis_A
     versatilis_B
+    versicolor_A
     versiforme_A
     vesicularis_B
     vesicularis_C
     vesicularis_D
     vesicularis_E
+    vesicularis_F
     vestfoldensis_A
     vestfoldensis_B
     vibrioides_A
@@ -13206,13 +13610,16 @@ const my @SPECIES => qw(
     vicinus_A
     vietnamensis_A
     vietnamensis_B
-    violaceoruber_B
+    vinacea_A
     violaceum_A
     violaceum_B
     violaceus_A
     violaceusniger_A
     violascens_A
+    vireti_A
+    vireti_B
     virginiae_A
+    virginiae_B
     viridans_A
     viridans_B
     viridans_C
@@ -13221,7 +13628,7 @@ const my @SPECIES => qw(
     viridiflava_C
     viridiflava_D
     viridochromogenes_A
-    viridochromogenes_B
+    virosa_A
     viscerum_A
     vitaeruminis_A
     vitis_B
@@ -13418,6 +13825,7 @@ const my @SPECIES => qw(
     wenxiniae_A
     wenyonii_C
     wesenbergii_A
+    wesenbergii_B
     wexlerae_B
     wexlerae_C
     wieringae_A
@@ -13454,10 +13862,11 @@ const my @SPECIES => qw(
     XAN_14
     XAN_8
     xanthomarina_A
-    xanthopallidus_A
+    xanthopallidus_B
     xanthophaeus_A
     xanthus_A
     xanthus_B
+    xenophagum_A
     xiamenensis_A
     xiamenensis_B
     xinganensis_A
@@ -13466,9 +13875,9 @@ const my @SPECIES => qw(
     xylanexedens_B
     xylanexedens_C
     xylanilyticus_A
+    xylanilyticus_B
     xylanivorans_A
     xylanolytica_B
-    xylanolytica_C
     xylanophilus_A
     xyli_A
     xyli_C
@@ -13477,6 +13886,7 @@ const my @SPECIES => qw(
     xylinus_E
     xylosoxidans_B
     xylosoxidans_C
+    xylosoxidans_D
     xylosus_B
     XZ110_XZ_CHN_2017
     XZ111_XZ_CHN_2017
@@ -13492,10 +13902,13 @@ const my @SPECIES => qw(
     yabuuchiae_A
     yamanorum_A
     yanchengensis_A
+    yanglingense_A
     yannicii_A
     yanoikuyae_A
+    yanshanensis_A
     yeojuensis_A
     yomogidense_A
+    yonginensis_A
     YS1-2_2434
     YS1-2_2437
     yuanmingense_A
@@ -13508,6 +13921,7 @@ const my @SPECIES => qw(
     zoogloeoides_C
     zucineum_B
     zundukense_A
+    zymae_A
     );
 
 my %is_hyphenated  = map { $_ => 1 } @GENERA;
@@ -13972,7 +14386,7 @@ Bio::MUST::Core::SeqId - Modern and legacy MUST-compliant sequence id
 
 =head1 VERSION
 
-version 0.251810
+version 0.252040
 
 =head1 SYNOPSIS
 

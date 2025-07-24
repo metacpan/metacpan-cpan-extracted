@@ -18,7 +18,7 @@ use Carp;
 use Data::Tools;
 use Data::Tools::Socket;
 
-our $VERSION = '1.45';
+our $VERSION = '1.47';
 
 our @ISA    = qw( Exporter );
 our @EXPORT = qw(
@@ -69,25 +69,30 @@ sub socket_protocol_read_message
   my $timeout = shift;
   my $opt     = shift || {};
   
-  my ( $data, $data_read_len ) = socket_read_message( $socket, $timeout );
-  if( ! defined $data )
+  my ( $data, $data_read_len, $error ) = socket_read_message( $socket, $timeout );
+  if( $error )
     {
-    return wantarray ? ( undef, undef, $data_read_len == 0 ? 'E_EOF' : 'E_SOCKET' ) : undef;
+    # incoming length is unknown or socket error
+    return wantarray ? ( undef, undef, $error ) : undef;
+    }
+  if( $data eq '' )  
+    {
+    return wantarray ? ( undef, undef, 'E_EMPTY' ) : undef;
     }
 
   my $ptype = substr( $data, 0, 1 );
   confess "unknown or forbidden PROTOCOL_TYPE requested [$ptype] expected one of [" . join( ',', keys %PROTOCOL_ALLOW ) . "]" unless exists $PROTOCOL_ALLOW{ $ptype };
   my $proto = $PROTOCOL_TYPES{ $ptype };
 
-  if( $opt and $opt->{ 'CHECK_FOR_EMPTY' } and substr( $data, 1 ) eq '' )
+  if( $opt and $opt->{ 'ALLOW_EMPTY_MESSAGE' } and substr( $data, 1 ) eq '' )
     {
-    return wantarray ? ( undef, undef, 'E_EMPTY' ) : undef;
+    return wantarray ? ( undef, $ptype, 'E_EMPTY' ) : undef;
     }
 
   my $hr = $proto->{ 'unpack' }->( substr( $data, 1 ) );
   confess "invalid data received from socket stream, expected HASH reference" unless ref( $hr ) eq 'HASH';
 
-  return wantarray ? ( $hr, $ptype, 'OK' ) : $hr;
+  return wantarray ? ( $hr, $ptype, undef ) : $hr;
 }
 
 sub socket_protocol_write_message

@@ -28,8 +28,10 @@ for my $alg (Crypt::Sodium::XS::OO::kdf->primitives) {
 
   my $subkey = $m->derive($mk, 1, $min);
   ok($subkey, "generated a min length subkey ($alg)");
+  is($subkey->size, $min, "min length correct size ($alg)");
   $subkey = $m->derive($mk, 1, $max);
   ok($subkey, "generated a max length subkey ($alg)");
+  is($subkey->size, $max, "max length correct size ($alg)");
 
   eval { my $x = $m->derive($mk, 13, $m->BYTES_MIN, "short") };
   like($@, qr/Invalid context length \(too short\)/, "short context rejected ($alg)");

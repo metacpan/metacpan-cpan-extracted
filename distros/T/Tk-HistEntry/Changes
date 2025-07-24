@@ -1,5 +1,9 @@
 Revision history for Perl extension Tk::HistEntry.
 
+0.46	2025-07-23
+	- added LICENSE to META file (by manwar)
+	- mainly CI related stuff (GitHub + appveyor workflows)
+
 0.45	2017-12-31
 	- stable release with all changes in 0.44_50
 

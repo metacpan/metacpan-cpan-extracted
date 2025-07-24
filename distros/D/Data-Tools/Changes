@@ -1,5 +1,18 @@
 Revision history for Perl extension Data::Tools
 
+1.47 2025-07-23
+
+   - Data::Tools adds new functions:
+                file_text_load_first_line
+                str_capitalize
+                create_random_binary
+   - added file_text_load_first_line()
+   - added FFT_DEBUG for fftwalk()             
+   - more strict url escapes
+   - added str_kmg_to_num() to convert Kilo/Mega/Giga/Tera string to bytes num
+   - added BCD docs
+   - more CSV docs
+
 1.46 2024-11-01
 
    - Data::Tools adds new functions:

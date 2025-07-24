@@ -1,3 +1,12 @@
+0.252040  2025-07-23 23:59:32+02:00 Europe/Rome
+    - Additions
+      - Taxonomy::Criterion: added support for percentages
+      - Taxonomy: added class method no_warnings (to silence most Taxonomy-related warnings)
+    - Changes
+      - Taxonomy: updated ranks (e.g., domain) to match recent versions of NCBI Taxonomy
+      - Taxonomy: switched to https to download NCBI Taxonomy (setup-taxdir.pl)
+      - Taxonomy: improved handling of GCF numbers as GCA numbers with GTDB
+
 0.251810  2025-06-30 15:44:10+02:00 Europe/Brussels
     - Fixes
       - Taxonomy: updated URL for GTDB download (used in setup-taxdir.pl)

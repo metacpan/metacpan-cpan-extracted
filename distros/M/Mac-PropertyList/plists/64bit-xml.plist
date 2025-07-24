@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>billions</key>
+	<integer>5123456789</integer>
+	<key>quadrillions</key>
+	<integer>1298765123456789</integer>
+	<key>trillions</key>
+	<integer>8765123456789</integer>
+	<key>big_negative</key>
+	<integer>-1234567890123</integer>
+	<key>max_64_bit_signed_int</key>
+	<integer>9223372036854775807</integer>
+	<key>min_64_bit_signed_int</key>
+	<integer>-9223372036854775808</integer>
+</dict>
+</plist>

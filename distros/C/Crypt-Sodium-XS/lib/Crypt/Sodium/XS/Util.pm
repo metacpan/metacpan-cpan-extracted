@@ -55,14 +55,13 @@ L</FUNCTIONS>. The tag C<:all> imports everything.
 
 =head2 sodium_add
 
-  my $sum = sodium_add($string, $other_string);
+  my $sum = sodium_add($bytes, $other_bytes);
 
-Add C<$other_string> to C<$string> as arbitrarily long little-endian unsigned
+Add C<$other_bytes> to C<$bytes> as arbitrarily long little-endian unsigned
 numbers. This function runs in constant time for a given length.
 
-Strings may be of arbitrary length. C<$sum> will be the length of the longer
-operand (C<$string> or C<$other_string>). Addition wraps if C<$sum> would
-overflow.
+Byte strings may be of arbitrary size. C<$sum> will be the size of the larger
+operand. Addition wraps if C<$sum> would overflow.
 
 =head2 sodium_bin2hex
 
@@ -72,15 +71,20 @@ No real advantage over C<unpack("H*", $bytes)>.
 
 =head2 sodium_compare
 
-  my $lt_eq_or_gt = sodium_compare($string, $other_string, $length);
+  my $lt_eq_or_gt = sodium_compare($bytes, $other_bytes, $size);
 
-Fixed-time (for a given length) comparison of bytes C<$string> and
-C<$other_string> as little-endian arbitrary-length integers. Returns C<0> if
-the bytes are equal, C<-1> if C<$string> is less than C<$other_string>, or C<1>
-if C<$string> is greater. Comparible to the C<cmp> perl operator.
+Returns C<0> if the bytes are equal, C<-1> if C<$bytes> is less than
+C<$other_bytes>, or C<1> if C<$mv> is greater. This function runs in fixed-time
+(for a given size), and compares bytes as little-endian arbitrary-length
+integers. Comparible to the C<cmp> perl operator.
 
-C<$length> is optional iif C<$string> and C<$other_string> are equal lengths.
-If provided, only C<$length> bytes are compared.
+C<$size> is optional iif C<$bytes> and C<$other_bytes> are equal sizes.
+If provided, only C<$size> bytes are compared.
+
+B<Note>: This function is similar to L<memcmp(3)>; that is, it returns -1, 0,
+or 1 for the comparison results. For simple true/false equality comparisons,
+see L</sodium_memcmp>. The naming is chosen here to be consistent with
+libsodium.
 
 =head2 sodium_hex2bin
 
@@ -93,39 +97,52 @@ of 8 bits.)
 
 =head2 sodium_increment
 
-  my $incremented = sodium_increment($string);
+  my $incremented = sodium_increment($bytes);
 
-Interpret C<$string> as an arbitrarily long little-endian unsigned number and
+Interpret C<$bytes> as an arbitrarily long little-endian unsigned number and
 add one to it. This is intended for the return values of nonce functions. This
-function runs in constant time for a given C<$string> length. Incrementing
-wraps if $string would overflow.
+function runs in constant time for a given C<$bytes> size. Incrementing wraps
+if C<$incremented> would overflow.
 
 =head2 sodium_is_zero
 
-  my $is_zero = sodium_is_zero($string)
+  my $is_zero = sodium_is_zero($bytes)
 
-Returns true iif C<$string> consists only of null bytes. Returns false
-otherwise. This function runs in constant time for a given C<$string> length.
+Returns true iif C<$bytes> consists only of null bytes. Returns false
+otherwise. This function runs in constant time for a given C<$bytes> length.
 
 =head2 sodium_memcmp
 
-  my $is_equal = sodium_memcmp($string, $other_string, $length);
+  my $is_equal = sodium_memcmp($bytes, $other_bytes, $size);
 
-Fixed-time (for a given length) comparison of bytes C<$string> and
-C<$other_string> as little-endian arbitrary-length integers. Returns true if
-the bytes are equal, false otherwise.
+Returns true if the operands are exactly equal, false otherwise. This method
+runs in fixed-time (for a given size), and compares bytes as little-endian
+arbitrary-length integers.
 
-C<$length> is optional iif C<$string> and C<$other_string> are equal lengths.
-If provided, only C<$length> bytes are compared.
+C<$size> is optional iif C<$bytes> and C<$other_bytes> are equal sizes. If
+provided, only C<$size> bytes are compared. B<Note>: Croaks if operands are
+unequal sizes and C<$size> was not provided, or if C<$size> is larger than
+either of the operands.
+
+When a comparison involves secret data (e.g. a key, a password, etc.), it is
+critical to use a constant-time comparison function. This property does not
+relate to computational complexity: it means the time needed to perform the
+comparison is the same for all data of the same size. The goal is to mitigate
+side-channel attacks.
+
+B<Note>: L</sodium_memcmp> is different than L<memcmp(3)>. This method returns
+only true/false for equality, not -1, 0, or 1 for the comparison results. For
+that, see L</sodium_compare>. The naming is chosen here to be consistent with
+libsodium.
 
 =head2 sodium_pad
 
 =head2 sodium_unpad
 
-  my $padded = sodium_pad($str, $blocksize);
-  my $unpadded = sodium_unpad($str, $blocksize);
+  my $padded = sodium_pad($bytes, $blocksize);
+  my $unpadded = sodium_unpad($bytes, $blocksize);
 
-Returns C<$str> padded or unpadded respectively, to the next multiple of
+Returns C<$bytes> padded or unpadded respectively, to the next multiple of
 C<$blocksize> bytes.
 
 These functions use the ISO/IEC 7816-4 padding algorithm. It supports arbitrary
@@ -172,24 +189,21 @@ L<Crypt::Sodium::XS::ProtMem/protmem_flags_memvault_default>.
 
 =head2 sodium_sub
 
-  my $diff = sodium_sub($string, $other_string);
+  my $diff = sodium_sub($bytes, $other_bytes);
 
-Subtract C<$other_string> from C<$string> as arbitrarily long little-endian
+Subtract C<$other_bytes> from C<$bytes> as arbitrarily long little-endian
 unsigned numbers. This function runs in constant time for a given length.
 
-Strings may be of arbitrary length. C<$diff> will be the length of the longer
-operand (C<$string> or C<$other_string>). Subtraction wraps if C<$diff> would
-overflow.
+Byte strings may be of arbitrary size. C<$diff> will be the size of the larger
+operand. Subtraction wraps if C<$diff> would overflow.
 
 =head2 sodium_memzero
 
   sodium_memzero($x);
   sodium_memzero($x, $y, $z, ...);
 
-Helper utility for clearing out sensitive memory contents. The string values of
-any given arguments will be overwritten with (the same length of) null bytes.
-
-B<NOTE>: this is an interface to the libsodium C<sodium_memzero> function.
+Helper utility for clearing out sensitive memory contents. The PV values of any
+given arguments will be overwritten with (the same length of) null bytes.
 
 =head1 SEE ALSO
 

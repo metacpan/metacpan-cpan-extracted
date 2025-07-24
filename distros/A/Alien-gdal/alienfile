@@ -216,6 +216,11 @@ share {
       #$^O eq 'MSWin32' ? '--without-hdf5' : (),  #  issues with strawberry perl hdf5 dlls
       '-DGDAL_SET_INSTALL_RELATIVE_RPATH=ON',
     );
+
+    #  need to disable these on Macs under Homebrew - see GH#37
+    if ($^O =~ /darwin/i && defined $ENV{HOMEBREW_PREFIX}) {
+      push @with_args, qw /-DCMAKE_DISABLE_FIND_PACKAGE_Arrow=ON -DGDAL_USE_LIBKML=OFF/;
+    }
     
     Alien::Build->log('LD_LIBRARY_PATH: ' . join ':', map {defined $_ ? $_ : ''} @LD_LIBRARY_PATH);
     my @ld_flags;

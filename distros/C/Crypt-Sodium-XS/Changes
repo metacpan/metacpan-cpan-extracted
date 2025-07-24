@@ -1,3 +1,22 @@
+0.000032 Jul 23 2025
+
+- BUGFIX: fix kdf derive output length. found during manual review. test cases
+  added.
+
+- BUGFIX: fix concat method to return new memvault. test cases added.
+
+- require memvault unlock for compare method (and all new overloads that use
+  it)
+
+- add '!=' and '==' overloads for MemVault (equivalent to eq and ne)
+
+- add '<' 'lt' '<=' 'le' '>' 'gt' '>=' and 'ge' overloads for MemVault (derived
+  from compare method)
+
+- add to_bytes as explicit method for stringification
+
+- doc updates
+
 0.000031 Jul 21 2025
 
 - fix a handful of missing memory allocation failure checks. found in manual

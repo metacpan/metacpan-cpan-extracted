@@ -75,3 +75,5 @@ CHANGES\s\d
 
 \.gitattributes\b
 \Ascratch\b
+Dockerfile
+plists.md

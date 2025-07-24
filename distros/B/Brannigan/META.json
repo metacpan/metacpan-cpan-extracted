@@ -1,10 +1,10 @@
 {
-   "abstract" : "Comprehensive, flexible system for validating and parsing input, mainly targeted at web applications.",
+   "abstract" : "Flexible library for validating and processing input.",
    "author" : [
       "Ido Perlmuter <ido@ido50.net>"
    ],
-   "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.143240",
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "apache_2_0"
    ],
@@ -13,24 +13,27 @@
       "version" : 2
    },
    "name" : "Brannigan",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
    "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test2::V0" : "0"
+         }
+      },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0",
-            "perl" : "5.006"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "runtime" : {
          "requires" : {
-            "perl" : "5.006",
-            "strict" : "0",
-            "warnings" : "0"
-         }
-      },
-      "test" : {
-         "requires" : {
-            "Test::More" : "0",
-            "perl" : "5.006"
+            "Hash::Merge" : "0",
+            "perl" : "5.008"
          }
       }
    },
@@ -39,14 +42,12 @@
       "bugtracker" : {
          "web" : "https://github.com/ido50/Brannigan/issues"
       },
-      "homepage" : "http://search.cpan.org/dist/Brannigan",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/ido50/Brannigan.git",
+         "url" : "https://github.com/ido50/Brannigan.git",
          "web" : "https://github.com/ido50/Brannigan"
       }
    },
-   "version" : "1.100001",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0113"
+   "version" : "2.1",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }
-

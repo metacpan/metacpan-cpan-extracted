@@ -31,6 +31,7 @@
       },
       "runtime" : {
          "requires" : {
+            "HTML::Entities" : "0",
             "MIME::Base64" : "0",
             "Math::BigInt" : "0",
             "Scalar::Util" : "1.11",
@@ -58,6 +59,6 @@
          "web" : "https://github.com/briandfoy/mac-propertylist"
       }
    },
-   "version" : "1.602",
+   "version" : "1.604",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,0 +1,36 @@
+Changelog.ini
+Changes
+data/cpan.metacurator.conf
+data/cpan.metacurator.constants.csv
+data/cpan.metacurator.sqlite
+data/cpan.metacurator.tiddlers.json
+html/cpan.metacurator.tree.html
+lib/CPAN/MetaCurator.pm
+lib/CPAN/MetaCurator/Util/Config.pm
+lib/CPAN/MetaCurator/Util/Create.pm
+lib/CPAN/MetaCurator/Util/Database.pm
+lib/CPAN/MetaCurator/Util/Export.pm
+lib/CPAN/MetaCurator/Util/HTML.pm
+lib/CPAN/MetaCurator/Util/Import.pm
+LICENSE
+log/development.log
+Makefile.PL
+MANIFEST			This list of files
+scripts/build.db.sh
+scripts/create.tables.pl
+scripts/drop.tables.pl
+scripts/export.as.tree.pl
+scripts/populate.sqlite.tables.pl
+scripts/read.tiddlers.pl
+scripts/redo.sh
+scripts/tiddly2html.pl
+scripts/tiddly2text.pl
+SECURITY.md
+t/00.versions.t
+t/00.versions.tx
+templates/body.html
+templates/footer.html
+templates/header.html
+templates/note.html
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

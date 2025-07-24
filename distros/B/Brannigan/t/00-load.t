@@ -1,9 +1,15 @@
-#!perl -T
+#!/usr/bin/env perl
 
-use Test::More tests => 1;
+use lib './lib';
+use warnings;
+use strict;
+
+use Test2::V0;
 
 BEGIN {
-	use_ok( 'Brannigan' ) || print "Bail out!\n";
+    use ok 'Brannigan';
 }
 
-diag( "Testing Brannigan $Brannigan::VERSION, Perl $], $^X" );
+diag("Testing Brannigan $Brannigan::VERSION, Perl $], $^X");
+
+done_testing();

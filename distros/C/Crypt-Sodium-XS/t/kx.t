@@ -42,10 +42,10 @@ for my $alg (Crypt::Sodium::XS::OO::kx->primitives) {
     ok($srx, "server recv key generated ($seed_str)");
     ok($stx, "server xmit key generated ($seed_str)");
 
-    ok(!$crx->compare($stx), "client recv key == server xmit key ($seed_str)");
-    ok($crx->compare($srx), "client recv key != server recv key ($seed_str)");
-    ok(!$ctx->compare($srx), "client xmit key == server recv key ($seed_str)");
-    ok($ctx->compare($stx), "client xmit key != server xmit key ($seed_str)");
+    ok($crx->memcmp($stx), "client recv key == server xmit key ($seed_str)");
+    ok(!$crx->memcmp($srx), "client recv key != server recv key ($seed_str)");
+    ok($ctx->memcmp($srx), "client xmit key == server recv key ($seed_str)");
+    ok(!$ctx->memcmp($stx), "client xmit key != server xmit key ($seed_str)");
 
     my $nonce = secretbox_nonce;
     my $ct = secretbox_encrypt("foobar", $nonce, $ctx);

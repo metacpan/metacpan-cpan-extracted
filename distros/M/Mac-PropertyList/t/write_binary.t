@@ -9,18 +9,18 @@ write_binary.t
 
 =head1 SYNOPSIS
 
-	# run all the tests
-	% perl Makefile.PL
-	% make test
+        # run all the tests
+        % perl Makefile.PL
+        % make test
 
-	# run all the tests
-	% prove
+        # run all the tests
+        % prove
 
-	# run a single test
-	% perl -Ilib t/write_binary.t
+        # run a single test
+        % perl -Ilib t/write_binary.t
 
-	# run a single test
-	% prove t/write_binary.t
+        # run a single test
+        % prove t/write_binary.t
 
 =head1 AUTHORS
 
@@ -55,7 +55,6 @@ use utf8;
 
 use Data::Dumper;
 $Data::Dumper::Useqq = 1;
-use Math::BigInt;
 
 our($val, $expect);
 
@@ -82,7 +81,7 @@ sub testrep {
         pack('C x6 CC x4N x4N x4N',
              8,    # Offset table: offset of only object
              1, 1, # Byte sizes of offsets and of object IDs
-             1,    # Number of objects
+             1,    # Number of object
              0,    # ID of root (only) object
              8 + length($frag)  # Start offset of offset table
         );
@@ -105,9 +104,20 @@ sub testrep {
 &testrep( integer => 256,    "\x11\x01\x00" );
 &testrep( integer => 65535,  "\x11\xFF\xFF" );
 &testrep( integer => 65536,  "\x12\x00\x01\x00\x00" );
+&testrep( integer => 4294967295, "\x12\xFF\xFF\xFF\xFF" );
+&testrep( integer => '4294967296',          # Get around 32-bitness
+    "\x13\x00\x00\x00\x01\x00\x00\x00\x00" );
+&testrep( integer => '9223372036854775807', # Get around 32-bitness
+    "\x13\x7F\xFF\xFF\xFF\xFF\xFF\xFF\xFF" );
 
 &testrep( integer => -1,     "\x13\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF" );
 &testrep( integer => -255,   "\x13\xFF\xFF\xFF\xFF\xFF\xFF\xFF\x01" );
+&testrep( integer => -256,   "\x13\xFF\xFF\xFF\xFF\xFF\xFF\xFF\x00" );
+&testrep( integer => -65536, "\x13\xFF\xFF\xFF\xFF\xFF\xFF\x00\x00" );
+&testrep( integer => '-4294967296',             # Get around 32-bitness
+    "\x13\xFF\xFF\xFF\xFF\x00\x00\x00\x00" );
+&testrep( integer => '-9223372036854775808',    # Get around 32-bitness
+    "\x13\x80\x00\x00\x00\x00\x00\x00\x00" );
 
 &testrep( string => "Hi!",   "\x53\x48\x69\x21" );
 &testrep( string => "",      "\x50" );

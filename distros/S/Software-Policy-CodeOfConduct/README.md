@@ -4,16 +4,16 @@ Software::Policy::CodeOfConduct - generate a Code of Conduct policy
 
 # VERSION
 
-version v0.3.0
+version v0.3.1
 
 # SYNOPSIS
 
 ```perl
 my $policy = Software::Policy::CodeOfConduct->new(
+    policy   => 'Contributor_Covenant_1.4',
     name     => 'Foo',
     contact  => 'team-foo@example.com',
-    policy   => 'Contributor_Covenant_1.4',
-    filename => 'CODE-OF-CONDUCT.md',
+    filename => 'CODE_OF_CONDUCT.md',
 );
 
 $policy->save($dir); # create CODE-OF-CONDUCT.md in $dir
@@ -24,6 +24,19 @@ $policy->save($dir); # create CODE-OF-CONDUCT.md in $dir
 This distribution generates code of conduct policies from a template.
 
 # ATTRIBUTES
+
+## policy
+
+This is the policy filename without the extension. It defaults to "Contributor\_Covenant\_1.4"
+.
+
+Available policies include
+
+- [Contributor\_Covenant\_1.4](https://www.contributor-covenant.org/version/1/4/code-of-conduct.html)
+- [Contributor\_Covenant\_2.0](https://www.contributor-covenant.org/version/2/0/code-of-conduct.html)
+- [Contributor\_Covenant\_2.1](https://www.contributor-covenant.org/version/2/1/code-of-conduct.html)
+
+If you want to use a custom policy, specify the ["template\_path"](#template_path).
 
 ## name
 
@@ -47,22 +60,11 @@ A generating name for the project. It defaults to "project" but the original tem
 
 A sentence-case (ucfirst) form of ["entity"](#entity).
 
-## policy
-
-This is the policy filename. It defaults to "Contributor\_Covenant\_1.4" which is based on
-[https://www.contributor-covenant.org/version/1/4/code-of-conduct.html](https://www.contributor-covenant.org/version/1/4/code-of-conduct.html).
-
-Available policies include
-
-- "Contributor\_Covenant\_1.4"
-- "Contributor\_Covenant\_2.0"
-- "Contributor\_Covenant\_2.1"
-
 ## template\_path
 
 This is the path to the template file. If omitted, it will assume it is an included file from ["policy"](#policy).
 
-This should be a [Text::Template](https://metacpan.org/pod/Text%3A%3ATemplate) file.
+This should be a [Text::Template](https://metacpan.org/pod/Text%3A%3ATemplate) template file.
 
 ## text\_columns
 
@@ -104,7 +106,7 @@ Only the latest version of this module will be supported.
 This module requires Perl v5.20 or later.  Future releases may only support Perl versions released in the last ten
 years.
 
-## Reporting Bugs
+## Reporting Bugs and Submitting Feature Requests
 
 Please report any bugs or feature requests on the bugtracker website
 [https://github.com/robrwo/perl-Software-Policy-CodeOfConduct/issues](https://github.com/robrwo/perl-Software-Policy-CodeOfConduct/issues)

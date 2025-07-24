@@ -4,8 +4,8 @@ stuff
 xtest
 dist\.ini
 weaver\.ini
-test\/gtdb
-test\/taxdump
+test\/gtdb.*
+test\/taxdump.*
 test\/my_.*
 nytprof*
 tags

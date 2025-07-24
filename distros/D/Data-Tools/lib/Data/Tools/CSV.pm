@@ -12,7 +12,7 @@ package Data::Tools::CSV;
 use strict;
 use Exporter;
 
-our $VERSION = '1.45';
+our $VERSION = '1.47';
 
 our @ISA    = qw( Exporter );
 our @EXPORT = qw(
@@ -153,20 +153,21 @@ However $delim may be undef to use default delimiter.
 
 =head2 parse_csv( $csv_data_string, $delim, $strip )
 
-Parses multi-line CSV text
+Parses multi-line CSV text and returnsh hashref to array of arrays.
 
 =head2 parse_csv_line( $single_csv_line, $delim, $strip )
 
-Parses single line CSV data. This function will NOT strip trailing CR/LFs.
-However, parse_csv() and parse_csv_to_hash_array() will strip CR/LFs.
+Parses single line CSV data and returns list of parsed fields' data. 
+This function will NOT strip trailing CR/LFs. However, parse_csv() and 
+parse_csv_to_hash_array() will strip CR/LFs.
 
 =head2 parse_csv_to_hash_array( $csv_data, $delim, $strip )
 
 This function uses first line as hash key names to produce array of hashes
 for the rest of the data.
 
-  NOTE: Lines with more data than header will discard extra data.
-  NOTE: Lines with less data than header will produce keys with undef values.
+  NOTE: Lines with more data fields than header will discard extra data fields.
+  NOTE: Lines with less data fields than header will produce keys with undef values.
 
 =head1 IMPLEMENTATION DETAILS
 
@@ -182,7 +183,7 @@ RFC4180 says:
   * whitespace and delimiters can be quoted with double quotes (").
   * quotes in quoted text should be doubled ("") as escaping.
 
-=head1 KNOWN BUGS
+=head1 KNOWN ISSUES
 
 This implementation does not support multiline fields (lines split),
 as described in RFC4180, (2.6).

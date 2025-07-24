@@ -3,12 +3,9 @@
 #
 # Author: Slaven Rezic
 #
-# Copyright (C) 1997,1998,2008,2016 Slaven Rezic. All rights reserved.
+# Copyright (C) 1997,1998,2008,2016,2023 Slaven Rezic. All rights reserved.
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
-#
-# Mail: srezic@cpan.org
-# WWW:  http://user.cs.tu-berlin.de/~eserte/
 #
 
 use strict;
@@ -23,13 +20,15 @@ if (!$top) {
 }
 $top->geometry('+10+10');
 
+if (!eval { require Tk::FireButton; 1 }) {
+    plan skip_all => "Tk::FireButton missing";
+}
 if (!eval {
-    require Tk::FireButton;
     $top->event('generate', '<Button-1>');
     die "event generate is working different on Win32" if $^O eq 'MSWin32';
     1;
 }) {
-    plan skip_all => "Tk::FireButton and/or event missing";
+    plan skip_all => "Cannot generate Button-1 event, required for tests";
 }
 
 plan tests => 14;

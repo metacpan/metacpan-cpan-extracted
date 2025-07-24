@@ -100,7 +100,9 @@ subtest_buffered 'Failed StrMatch subtest' => sub {
     my $orig_pass_subtest = $event_tester_tree->{$test_name}[1]{'original type'}[5]{'should pass'};
     my $strmatch_diags    = join "\n", grep { /Diag: / } @$orig_pass_subtest;
 
+    note "=== FULL DEBUG MAP OUTPUT ===\n\n$strmatch_diags";
     like $strmatch_diags, qr<StrMatch\[.+\] constraint map:>,      'Failed test includes constraint map diag';
+    like $strmatch_diags, qr<message:>,                            'Constraint map diag includes failed message';
     like $strmatch_diags, qr<is defined as:>,                      'Constraint map diag includes type definitions';
     like $strmatch_diags, qr{\QStr->check("xyz km") ==> PASSED\E}, 'Constraint map diag passed Str check';
 };
@@ -131,7 +133,9 @@ subtest_buffered 'Failed Enum subtest' => sub {
     my $coerce_subtest = $event_tester_tree->{$test_name}[0]{'should coerce into'};
     my $enum_diags    = join "\n", grep { /Diag: / } @$coerce_subtest;
 
+    note "=== FULL DEBUG MAP OUTPUT ===\n\n$enum_diags";
     like $enum_diags, qr<Enum\[.+\] constraint map:>,          'Failed test includes constraint map diag';
+    like $enum_diags, qr<message:>,                            'Constraint map diag includes failed message';
     like $enum_diags, qr<is defined as:>,                      'Constraint map diag includes type definitions';
     like $enum_diags, qr{\QStr->check("XYZ") ==> PASSED\E},    'Constraint map diag passed Str check';
     like $enum_diags, qr<Enum\[.+\] coercion map:>,            'Failed test includes coercion map diag';

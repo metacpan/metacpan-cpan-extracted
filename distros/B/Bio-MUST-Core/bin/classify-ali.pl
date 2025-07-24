@@ -80,7 +80,7 @@ classify-ali.pl - Classify ALI files based on taxonomic filters
 
 =head1 VERSION
 
-version 0.251810
+version 0.252040
 
 =head1 USAGE
 
@@ -127,10 +127,12 @@ These respectively specify the minimum and maximum number of sequences that
 must pass the tax_filter for the ALI to match the criterion. Minimum
 defaults to 1, while there is no upper bound by default.
 
-Other conditions are available: 'min_org_count' and 'max_org_count' deal
-with organisms instead of sequences, whereas 'min_copy_mean' and
-'max_copy_mean' allow bounding the mean number of gene copies per organism.
-All default not no bound.
+Other conditions are available: 'min_org_count' and 'max_org_count' deal with
+organisms instead of sequences, whereas 'min_copy_mean' and 'max_copy_mean'
+allow bounding the mean number of gene copies per organism. Moreover, there
+exist 'perc' variants ('min_seq_perc', 'max_seq_perc', 'min_org_perc',
+'max_org_perc') that count in percents (either of total sequences or total
+organisms). All default to no bound.
 
 An example YAML file follows:
 
@@ -145,6 +147,10 @@ An example YAML file follows:
         max_org_count:
         min_copy_mean:
         max_copy_mean:
+        min_seq_perc:
+        max_seq_perc:
+        min_org_perc:
+        max_org_perc:
       - tax_filter: [ +Protopterus ]
       # min_seq_count defaults to 1
       # max_seq_count defaults to no upper bound

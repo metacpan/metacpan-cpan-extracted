@@ -1,0 +1,25 @@
+# 6 >Canis familiaris
+# 2 >Dasypus novemcinctus
+# 6 >Homo sapiens
+# 6 >Loxodonta africana
+# 4 >Macropus eugenii
+# 6 >Monodelphis domestica
+# 6 >Mus musculus
+# 36 mammals (7)
+# 5 >Danio rerio
+# 3 >Oreochromis niloticus
+# 6 >Latimeria chalumnae
+# 6 >Protopterus annectens
+# 4 >Xenopus tropicalis
+# 1 >Gallus gallus (6)
+# 25 others
+
+categories:
+- label: dom-mamm
+  description: dominant Mammalia
+  criteria:
+  - tax_filter: [ -Mammalia ]
+    max_seq_perc: 41
+  - tax_filter: [ +Mammalia ]
+    min_org_perc: 53
+    min_copy_mean: 5

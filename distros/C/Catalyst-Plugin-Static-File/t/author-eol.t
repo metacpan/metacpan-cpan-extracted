@@ -30,6 +30,7 @@ my @files = (
     't/author-eof.t',
     't/author-eol.t',
     't/author-minimum-version.t',
+    't/author-mixed-unicode-scripts.t',
     't/author-no-tabs.t',
     't/author-pod-coverage.t',
     't/author-pod-linkcheck.t',

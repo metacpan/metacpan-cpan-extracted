@@ -19,6 +19,7 @@ no_index:
     - t
     - inc
 requires:
+  HTML::Entities: '0'
   MIME::Base64: '0'
   Math::BigInt: '0'
   Scalar::Util: '1.11'
@@ -30,5 +31,5 @@ resources:
   bugtracker: https://github.com/briandfoy/mac-propertylist/issues
   homepage: https://github.com/briandfoy/mac-propertylist
   repository: https://github.com/briandfoy/mac-propertylist
-version: '1.602'
+version: '1.604'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

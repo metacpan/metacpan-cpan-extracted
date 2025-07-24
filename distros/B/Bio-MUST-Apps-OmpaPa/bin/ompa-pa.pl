@@ -6,6 +6,7 @@
 use Modern::Perl '2011';
 use autodie;
 
+use Config::Any;
 use Getopt::Euclid qw(:vars);
 use Smart::Comments;
 
@@ -17,8 +18,10 @@ use IO::Prompter [
 
 use Bio::MUST::Core;
 use aliased 'Bio::MUST::Core::Ali::Stash';
+use aliased 'Bio::MUST::Core::IdList';
 use aliased 'Bio::MUST::Core::Taxonomy';
 use aliased 'Bio::MUST::Core::Taxonomy::ColorScheme';
+use aliased 'Bio::MUST::Apps::OmpaPa::Parameters';
 use aliased 'Bio::MUST::Apps::OmpaPa::Blast';
 use aliased 'Bio::MUST::Apps::OmpaPa::Hmmer';
 
@@ -29,7 +32,7 @@ Missing required arguments:
     --database=<file>
 EOT
 
-die <<'EOT' if !$ARGV_taxdir && $ARGV_extract_tax;
+die <<'EOT' if !$ARGV_taxdir && ($ARGV_skip_config || $ARGV_colorize || $ARGV_extract_tax);
 Missing required arguments:
     --taxdir=<dir>
 EOT
@@ -37,41 +40,82 @@ EOT
 # setup OmpaPa sub-class based on report type
 my $class = $ARGV_report_type eq 'blastxml' ? Blast : Hmmer;
 
+# setup Taxonomy-related objects
 my $scheme;
+my $skip_classifier;
 if ($ARGV_taxdir) {
     my $tax = Taxonomy->new_from_cache( tax_dir => $ARGV_taxdir );
     $scheme = $ARGV_colorize ? $tax->load_color_scheme($ARGV_colorize)
             : ColorScheme->new(
-                tax => $tax,
-                names  => [ qw(Archaea Bacteria Eukaryota Viruses) ],
+                   tax => $tax,
+                 names => [ qw(Archaea Bacteria Eukaryota Viruses) ],
                 colors => [ qw(   blue    green       red  orange) ],
             )
     ;
+
+    if ($ARGV_skip_config) {
+        # read configuration file
+        my $skip_config = Config::Any->load_files( {
+            files           => [ $ARGV_skip_config ],
+            flatten_to_hash => 1,
+            use_ext         => 1,
+        } );
+        ### skip_config: $skip_config->{$ARGV_skip_config}
+        $skip_classifier
+            = $tax->tax_classifier( $skip_config->{$ARGV_skip_config} );
+    }
 }
 
 # build args hash for Bio::MUST::Apps::OmpaPa::XXX constructor
-# TODO: update attribute names
 my %args;
-$args{database}           = $ARGV_database if $ARGV_database;
-$args{extract_seqs}       = 1 if $ARGV_extract_seqs;
-$args{extract_taxs}       = 1 if $ARGV_extract_tax;
-$args{restore_last_param} = 1 if $ARGV_restore_last_params;
-$args{nb_org}             = $ARGV_max_copy;
-$args{align}              = $ARGV_min_cov;
-$args{gnuplot_term}       = $ARGV_gnuplot_term;
+$args{gnuplot_term}        = $ARGV_gnuplot_term;
+$args{database}            = $ARGV_database   if $ARGV_database;
+$args{extract_seqs}        = 1                if $ARGV_extract_seqs;
+$args{extract_taxs}        = 1                if $ARGV_extract_tax;
+$args{restore_last_params} = 1                if $ARGV_restore_last_params;
+$args{scheme}              = $scheme          if $scheme;
+
+### Silencing most Taxonomy-related warnings to reduce interactive clutter
+local $SIG{__WARN__} = Taxonomy->no_warnings;
 
 # process infiles
+FILE:
 for my $infile (@ARGV_infiles) {
     ### Processing: $infile
 
-    # read and parse report
-    my %new_args = (%args, file => $infile);
-    $new_args{scheme}     = $scheme if $scheme;
-    $new_args{parameters} = $ARGV_restore_params_from
-        if $ARGV_restore_params_from;
-    my $oum = $class->new(%new_args);
+    # enforce precedence order for Parameters (supercede class defaults)
+    if ($ARGV_restore_last_params) {
+        delete $args{parameters};
+    }
+    elsif ($ARGV_restore_params_from) {
+        $args{parameters} = $ARGV_restore_params_from;
+    }
+    else {
+        $args{parameters} = Parameters->new(
+            max_hits => $ARGV_max_hits,
+            max_copy => $ARGV_max_copy,
+             min_cov => $ARGV_min_cov,
+        );
+    }
 
+    # read and parse report
+    my $oum = $class->new( %args, file => $infile );
     say '[' . $oum->count_hits . ' hits processed] ';
+
+    # optionally skip report
+    if ($skip_classifier) {
+
+        # extract all hit ids
+        my @hits = map { $_->{acc} } $oum->all_hits;
+        my $listable = IdList->new( ids => \@hits );
+
+        # classify report
+        my $cat_label = $skip_classifier->classify($listable);
+        if ($cat_label) {
+            ### Skipping report: "$infile | $cat_label"
+            next FILE;
+        }
+    }
 
     if ($ARGV_print_plots) {
         my $suf = 'before';
@@ -141,7 +185,7 @@ ompa-pa.pl - Extract seqs from BLAST/HMMER interactively or in batch mode
 
 =head1 VERSION
 
-version 0.251770
+version 0.252040
 
 =head1 USAGE
 
@@ -191,11 +235,23 @@ This argument is required when the option C<--extract-seqs> is enabled.
 
 =for Euclid: file.type: string
 
+=item --skip-config=<file>
+
+Path to an optional configuration file specifying the reports to skip based on
+their raw taxonomic content [default: none]. The assessment is made before any
+filtering other than C<--max-hits>.
+
+The configuration file follows the classifier format (often YAML) of
+<classify-ali.pl>. This requires enabling taxonomic annotation and thus a
+local mirror of the NCBI Taxonomy database
+
+=for Euclid: file.type: readable
+
 =item --colorize=<scheme>
 
 When specified, sequence points are colored after their taxon using the
-specified CLS file. This requires enabling taxonomic annotation and thus a
-local mirror of the NCBI Taxonomy database.
+specified CLS file. As above, this requires enabling taxonomic annotation and
+thus a local mirror of the NCBI Taxonomy database.
 
 =for Euclid: scheme.type: readable
 
@@ -209,18 +265,26 @@ To build such a directory, use the following command:
 
 =for Euclid: dir.type: string
 
+=item --max-hits=<n>
+
+Maximum number of hits to read from the report [default: 200000]. This limit
+is implemented for efficiency. It applies before any other filter.
+
+=for Euclid: n.type:    0+integer
+    n.default: 200000
+
 =item --min-cov=<n>
 
 Minimum BLAST query or HMMER model coverage for selected hits [default: 0.7].
 
-=for Euclid: n.type: num
+=for Euclid: n.type:    num
     n.default: 0.7
 
 =item --max-copy=<n>
 
 Maximum gene copy number per organism for selected hits [default: 3].
 
-=for Euclid: n.type: num
+=for Euclid: n.type:    0+integer
     n.default: 3
 
 =item --extract-seqs
@@ -235,17 +299,19 @@ Taxonomy extraction switch [default: no]. When specified, NCBI taxons of
 selected sequences are stored into a file using the same basename as other
 output files. This requires a local mirror of the NCBI Taxonomy database.
 
-=item --restore-last-params
-
-Batch-mode switch [default: no]. When specified, parameters are restored from
-the last saved JSON file.
-
 =item --restore-params-from=<file>
 
 Batch-mode switch [default: no]. When specified, parameters are restored from
-the user-specified JSON file.
+the user-specified JSON file. This option takes precedence on any command-line
+specified option, such as C<--max-hits>, C<--min-cov> and C<--max-copy>.
 
 =for Euclid: file.type: string
+
+=item --restore-last-params
+
+Batch-mode switch [default: no]. When specified, parameters are restored from
+the last saved JSON file for each report. This option takes precedence over
+all other command-line options.
 
 =item --print-plots
 
@@ -254,7 +320,8 @@ When specified, plots are printed in PDF format [default: no].
 =item --gnuplot-term=<str>
 
 gnuplot terminal to use for the interactive mode [default: x11]. Other
-possible choices include qt but the option is open to experiment.
+possible choices include qt but the option is open to experiment. On macOS,
+to avoid the font warning, use C<--gnuplot-term='qt font "Arial"'>.
 
 If needed the gnuplot executable can be specified through the environment
 variable C<OUM_GNUPLOT_EXEC>.

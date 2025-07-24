@@ -9,7 +9,8 @@ no warnings;
 use vars qw($ERROR);
 use Carp qw(croak carp);
 use Data::Dumper;
-use XML::Entities;
+use HTML::Entities;
+use XML::Entities qw(decode_entities);
 
 use Exporter qw(import);
 
@@ -27,7 +28,7 @@ our %EXPORT_TAGS = (
 	'all' => \@EXPORT_OK,
 	);
 
-our $VERSION = '1.602';
+our $VERSION = '1.604';
 
 =encoding utf8
 
@@ -809,7 +810,9 @@ sub as_basic_data {
 	return \%dict;
 	}
 
-sub write_key   { "<key>$_[1]</key>" }
+sub write_key   {
+	"<key>$_[1]</key>"
+	}
 
 sub write {
 	my $self  = shift;
@@ -853,7 +856,7 @@ sub new { my $copy = $_[1]; $_[0]->SUPER::new( \$copy ) }
 
 sub as_basic_data { $_[0]->value }
 
-sub write { $_[0]->write_open . $_[0]->value . $_[0]->write_close }
+sub write { $_[0]->write_open . HTML::Entities::encode_entities($_[0]->value) . $_[0]->write_close }
 
 sub as_perl { $_[0]->value }
 
@@ -961,7 +964,7 @@ sub write {
 
 	my $string = MIME::Base64::encode_base64($value);
 
-	$self->write_open . $string . $self->write_close;
+	$self->write_open . HTML::Entities::encode_entities($string) . $self->write_close;
 	}
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -1025,7 +1028,7 @@ Tom Wyant added support for UID types.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2004-2024, brian d foy <briandfoy@pobox.com>. All rights reserved.
+Copyright © 2004-2025, brian d foy <briandfoy@pobox.com>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the Artistic License 2.0.

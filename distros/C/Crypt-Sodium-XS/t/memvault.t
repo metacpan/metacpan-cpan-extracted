@@ -32,6 +32,8 @@ for my $mv_data (@mv_datas) {
   is($mv->length, length($mv_data), "correct length");
   eval { my $x = "$mv"; };
   like($@, qr/Unlock MemVault object before/, "cannot stringify locked bytes");
+  eval { my $x = $mv->to_bytes; };
+  like($@, qr/Unlock MemVault object before/, "cannot to_bytes locked bytes");
   eval { my $x = $mv->index("dangerous"); };
   like($@, qr/Unlock MemVault object before/, "cannot index locked bytes");
   my $mv_clone = $mv->clone;
@@ -43,32 +45,26 @@ for my $mv_data (@mv_datas) {
   like($mv->to_hex->unlock, qr/^[a-f0-9]+$/, "->to_hex format");
   ok($mv->lock->is_locked, "locking returns the locked MemVault");
 
-  eval { $mv lt $mv_clone ? 1 : 0 };
-  like($@, qr/Operation "lt" on MemVault is not supported/,
-       'Operation "lt" is not supported');
-  eval { $mv le $mv_clone ? 1 : 0 };
-  like($@, qr/Operation "le" on MemVault is not supported/,
-       'Operation "le" is not supported');
-
-  eval { $mv gt $mv_clone ? 1 : 0 };
-  like($@, qr/Operation "gt" on MemVault is not supported/,
-       'Operation "gt" is not supported');
-  eval { $mv ge $mv_clone ? 1 : 0 };
-  like($@, qr/Operation "ge" on MemVault is not supported/,
-       'Operation "ge" is not supported');
-
   ok($mv eq $mv_data, "mv eq mv_data");
+  ok($mv == $mv_data, "mv == mv_data");
   ok($mv_data eq $mv, "mv_data eq mv");
+  ok($mv_data == $mv, "mv_data == mv");
   ok($mv eq $mv_clone, "mv eq clone");
+  ok($mv == $mv_clone, "mv == clone");
   ok(!($mv ne $mv_clone), "! mv ne clone");
+  ok(!($mv != $mv_clone), "! mv != clone");
   ok($mv, "boolean mv");
 
   $mv->unlock;
 
   my $mv_str = "$mv";
-  is($mv_str, $mv, "stringification works");
+  ok($mv_str, "stringification works");
   is(ref $mv_str, '', "stringified object is not a ref");
   is($mv_str, $mv_data, "stringified object correct bytes");
+  $mv_str = $mv->to_bytes;
+  ok($mv_str, "to_bytes works");
+  is(ref $mv_str, '', "to_bytes object is not a ref");
+  is($mv_str, $mv_data, "to_bytes object correct bytes");
 
   is($mv->to_hex, unpack("H*", $mv_data), "->to_hex eq unpack");
   ok($mv eq Crypt::Sodium::XS::MemVault->new_from_hex($mv->to_hex), "hex roundtripped");
@@ -110,75 +106,134 @@ for my $mv_data (@mv_datas) {
 
   my $mv_aaa = $mv . "aaa";
   isa_ok($mv_aaa, "Crypt::Sodium::XS::MemVault");
-  ok($mv_aaa->is_locked, "concat MV . SV locked, result locked");
+  ok($mv_aaa->is_locked, "overloaded .: MV . SV locked, result locked");
   is($mv_aaa->to_hex->unlock, unpack("H*", $mv_data . "aaa"),
-     "concat MV . SV, correct result");
+     "overloaded .: MV . SV, correct result");
+  is($mv->to_hex->unlock, unpack("H*", $mv_data), "overloaded .: MV . SV did not mutate");
+  $mv_aaa = $mv->concat("aaa");
+  isa_ok($mv_aaa, "Crypt::Sodium::XS::MemVault");
+  ok($mv_aaa->is_locked, "concat: MV concat SV locked, result locked");
+  is($mv_aaa->to_hex->unlock, unpack("H*", $mv_data . "aaa"),
+     "concat: MV concat SV, correct result");
+  is($mv->to_hex->unlock, unpack("H*", $mv_data), "concat: did not mutate");
 
+  $mv_clone = $mv->clone;
   $mv_clone .= "aaa";
-  ok($mv_clone->is_locked, "MV .= SV locked, result locked");
-  is($mv_clone->to_hex->unlock, unpack("H*", $mv_data . "aaa"),
-     ".= correct results");
+  ok($mv_clone->is_locked, "overloaded .=: MV .= SV locked, result locked");
+  is($mv_clone->to_hex->unlock, unpack("H*", $mv_data . "aaa"), "overloaded .=: correct results");
+  $mv_clone = $mv->clone;
+  $mv_clone->concat_inplace("aaa");
+  ok($mv_clone->is_locked, "concat_inplace: MV concat_inplace SV locked, result locked");
+  is($mv_clone->to_hex->unlock, unpack("H*", $mv_data . "aaa"), "concat_inplace: correct results");
 
   my $aaa_key = "aaa" . $mv;
   isa_ok($aaa_key, "Crypt::Sodium::XS::MemVault");
-  ok($aaa_key->is_locked, "concat SV . MV locked, result locked");
+  ok($aaa_key->is_locked, "overloaded .: SV . MV locked, result locked");
   is($aaa_key->to_hex->unlock, unpack("H*", "aaa" . $mv_data),
-     "concat SV . MV, correct result");
+     "overloaded .: SV . MV, correct result");
+  is($mv->to_hex->unlock, unpack("H*", $mv_data), "overloaded .: SV . MV did not mutate");
 
   $mv_aaa = $mv . Crypt::Sodium::XS::MemVault->new("aaa");
   isa_ok($mv_aaa, "Crypt::Sodium::XS::MemVault");
-  ok($mv_aaa->is_locked, "concat MV . MV both locked, result locked");
+  ok($mv_aaa->is_locked, "overloaded .: MV . MV both locked, result locked");
   is($mv_aaa->to_hex->unlock, unpack("H*", $mv_data . "aaa"),
-     "concat MV . MV both locked, correct result");
+     "overloaded .: MV . MV both locked, correct result");
+  is($mv->to_hex->unlock, unpack("H*", $mv_data), "overloaded .: MV . MV did not mutate");
 
-  $mv_aaa = $mv . Crypt::Sodium::XS::MemVault->new("aaa");
+  $mv_aaa = $mv . Crypt::Sodium::XS::MemVault->new("aaa")->unlock;
   isa_ok($mv_aaa, "Crypt::Sodium::XS::MemVault");
-  ok($mv_aaa->is_locked, "concat MV . MV one locked, result locked");
+  ok($mv_aaa->is_locked, "overloaded .: MV . MV one locked, result locked");
   is($mv_aaa->to_hex->unlock, unpack("H*", $mv_data . "aaa"),
-     "concat MV . MV one locked, correct result");
+     "overloaded .: MV . MV one locked, correct result");
 
   $mv_aaa = $mv->clone->unlock . Crypt::Sodium::XS::MemVault->new("aaa")->unlock;
   isa_ok($mv_aaa, "Crypt::Sodium::XS::MemVault");
-  ok(!$mv_aaa->is_locked, "concat MV . MV none locked, result unlocked");
+  ok(!$mv_aaa->is_locked, "overloaded .: MV . MV none locked, result unlocked");
   is($mv_aaa->to_hex, unpack("H*", $mv_data . "aaa"),
-     "concat MV . MV none locked, correct result");
+     "overloaded .: MV . MV none locked, correct result");
 
   my $mv_x_5 = $mv x 5;
   isa_ok($mv_x_5, "Crypt::Sodium::XS::MemVault");
   ok($mv_x_5->is_locked, "repitition of locked MemVault is locked");
 
-  is($mv_x_5->unlock,
-    "${mv_data}${mv_data}${mv_data}${mv_data}${mv_data}", "mv x 5");
+  is($mv_x_5->to_hex->unlock,
+    unpack("H*", "${mv_data}${mv_data}${mv_data}${mv_data}${mv_data}"), "mv x 5");
 }
 
 { # compare
-  my $x = Crypt::Sodium::XS::MemVault->new("abc");
+  my $x = Crypt::Sodium::XS::MemVault->new("abc")->unlock;
   my $y = "abC";
-  my $z = Crypt::Sodium::XS::MemVault->new("abC");
+  my $z = Crypt::Sodium::XS::MemVault->new("abC")->unlock;
 
   ok($x->memcmp("abc"), "memcmp: MV to same SV are equal");
   ok(!$x->compare("abc"), "compare: MV to same SV are equal");
-  ok(!$x->memcmp($y), "memcmp: 'MV to differnet SV differ");
-  ok($x->compare($y), "compare: 'MV to differnet SV differ");
+  ok(!$x->memcmp($y), "memcmp: 'MV to different SV differ");
+  ok($x->compare($y), "compare: 'MV to different SV differ");
   ok(!$x->memcmp($z), "memcmp: MV to different MV differ");
   ok($x->compare($z), "compare: MV to different MV differ");
   ok($x->memcmp("abcdefghi", 2), "memcmp: MV to SV with length are equal");
   ok(!$x->compare("abcdefghi", 2), "compare: MV to SV with length are equal");
   ok(!$x->memcmp("zbc", 2), "memcmp: MV to different SV with length differ");
   ok($x->compare("zbc", 2), "compare: MV to different SV with length differ");
-  $y = Crypt::Sodium::XS::MemVault->new("abcdefghi");
-  $z = Crypt::Sodium::XS::MemVault->new("zbcdef");
+
+  is($x->compare($y), 1, "compare: MV to lesser SV is 1");
+  is($x->compare("zbc"), -1, "compare: MV to greater SV is -1");
+  is($x->compare($z), 1, "compare: MV to lesser MV is 1");
+  $y = Crypt::Sodium::XS::MemVault->new("zbc")->unlock;
+  is($x->compare($y), -1, "compare: MV to greater MV is -1");
+
+  ok($x > "abC", "overloaded >: MV to lesser SV is true");
+  ok($x >= "abC", "overloaded >=: MV to lesser SV is true");
+  ok(!($x < "abC"), "overloaded <: MV to lesser SV is false");
+  ok(!($x <= "abC"), "overloaded <=: MV to lesser SV is false");
+  ok("abC" < $x, "overloaded <: SV to lesser MV is true");
+  ok("abC" <= $x, "overloaded <=: SV to lesser MV is true");
+  ok(!("abC" > $x), "overloaded >: SV to lesser MV is false");
+  ok(!("abC" >= $x), "overloaded >=: SV to lesser MV is false");
+  ok($x < $y, "overloaded <: MV to greater MV is true");
+  ok($x <= $y, "overloaded <=: MV to greater MV is true");
+  ok(!($x > $y), "overloaded >: MV to lesser MV is false");
+  ok(!($x >= $y), "overloaded >=: MV to lesser MV is false");
+  ok($y > $x, "overloaded >: MV to greater MV is true");
+  ok($y >= $x, "overloaded >=: MV to greater MV is true");
+  ok(!($y < $x), "overloaded <: MV to greater MV is false");
+  ok(!($y <= $x), "overloaded <=: MV to greater MV is false");
+  ok($x < "zbc", "overloaded <: SV to lesser MV is true");
+  ok($x <= "zbc", "overloaded <=: SV to lesser MV is true");
+  ok(!($x > "zbc"), "overloaded >: SV to lesser MV is false");
+  ok(!($x >= "zbc"), "overloaded >=: SV to lesser MV is false");
+  ok("abd" > $x, "overloaded >: MV to lesser SV is true");
+  ok("abd" >= $x, "overloaded >=: MV to lesser SV is true");
+  ok(!("abd" < $x), "overloaded <: MV to lesser SV is false");
+  ok(!("abd" <= $x), "overloaded <=: MV to lesser SV is false");
+
+  $y->lock;
+  eval { $y->compare("abc") };
+  like($@, qr/Unlock MemVault object before/, "cannot compare locked mv invocant");
+  eval { $z->compare($y); };
+  like($@, qr/Unlock MemVault object before/, "cannot compare locked mv arg");
+  eval { my $junk = $y > "abc" };
+  like($@, qr/Unlock MemVault object before/, "overloaded >: cannot compare locked mv");
+  eval { my $junk = "abc" > $y };
+  like($@, qr/Unlock MemVault object before/, "overloaded >: cannot compare locked mv swap");
+  eval { my $junk = $z > $y };
+  like($@, qr/Unlock MemVault object before/, "overloaded >: cannot compare locked mv to mv");
+  eval { my $junk = $y > $z };
+  like($@, qr/Unlock MemVault object before/, "overloaded >: cannot compare locked mv to mv swap");
+
+  $y = Crypt::Sodium::XS::MemVault->new("abcdefghi")->unlock;
+  $z = Crypt::Sodium::XS::MemVault->new("zbcdef")->unlock;
   ok($x->memcmp($y, 2), "memcmp: MV to MV with length are equal");
   ok(!$x->compare($y, 2), "compare: MV to MV with length are equal");
   ok(!$x->memcmp($z, 2), "memcmp: MV to different MV with length differ");
   ok($x->compare($z, 2), "compare: MV to different MV with length differ");
 
   eval { my $res = $x->memcmp("abcde"); };
-  like($@, qr/Variables of unequal length/,
-       "memcmp of unequal length must specify length");
+  like($@, qr/Variables of unequal size/,
+       "memcmp of unequal length must specify size");
   eval { my $res = $x->compare("ab"); };
-  like($@, qr/Variables of unequal length/,
-       "compare of unequal length must specify length");
+  like($@, qr/Variables of unequal size/,
+       "compare of unequal length must specify size");
   eval { my $res = $x->memcmp("abcd", 4); };
   like($@, qr/The argument \(left\) is shorter/, "memcmp: length=4 > ab");
   eval { my $res = $x->compare("abcd", 4); };
@@ -192,8 +247,8 @@ for my $mv_data (@mv_datas) {
     my $bin_len = 1 + int(rand(1000));
     my $buf1 = sodium_random_bytes(1000);
     my $buf2 = sodium_random_bytes(1000);
-    my $mv1 = Crypt::Sodium::XS::MemVault->new($buf1);
-    my $mv2 = Crypt::Sodium::XS::MemVault->new($buf2);
+    my $mv1 = Crypt::Sodium::XS::MemVault->new($buf1)->unlock;
+    my $mv2 = Crypt::Sodium::XS::MemVault->new($buf2)->unlock;
     ok($mv1->memcmp($buf1, $bin_len), "memcmp: MV to equal SV with length");
     ok(!$mv1->compare($buf1, $bin_len), "compare: MV to equal SV with length");
     ok($mv1->memcmp($mv1->clone, $bin_len), "memcmp: MV to clone MV with length");

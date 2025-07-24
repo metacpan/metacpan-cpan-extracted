@@ -1,7 +1,7 @@
 package Crypt::Sodium::XS;
 BEGIN {
   # BEGIN block and use line for MemVault are for its overloads to work
-  our $VERSION = '0.000031';
+  our $VERSION = '0.000032';
   require XSLoader;
   XSLoader::load(__PACKAGE__, $VERSION);
 }

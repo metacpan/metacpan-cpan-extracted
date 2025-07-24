@@ -1,7 +1,7 @@
 package Bio::MUST::Apps::OmpaPa::Roles::Parsable;
 # ABSTRACT: Parsable Moose role for search report objects
 # CONTRIBUTOR: Amandine BERTRAND <amandine.bertrand@doct.uliege.be>
-$Bio::MUST::Apps::OmpaPa::Roles::Parsable::VERSION = '0.251770';
+$Bio::MUST::Apps::OmpaPa::Roles::Parsable::VERSION = '0.252040';
 use Moose::Role;
 
 use autodie;
@@ -12,17 +12,17 @@ use Smart::Comments '###';
 
 use Carp;
 use Const::Fast;
-use FileHandle;
+use File::Basename;
+use File::Find::Rule;
 use File::Temp;
+use FileHandle;
 use List::AllUtils qw(sum);
 use Path::Class qw(file);
 use POSIX;
-use Text::Table;
-use Template;
-use File::Find::Rule;
-use Sort::Naturally;
-use File::Basename;
 use Scalar::Util qw(looks_like_number);
+use Sort::Naturally;
+use Template;
+use Text::Table;
 
 use IO::Prompter [
     -verbatim,
@@ -40,19 +40,22 @@ use aliased 'Bio::MUST::Apps::OmpaPa::Parameters';
 
 requires 'file', 'collect_hits';
 
-# TODO: update attribute names to match interface
+# TODO: improve wording consistency with CLI
+# TODO: update internal variable names
 # TODO: break up long lines
 # TODO: refine code layout
 
 has 'database' => (
     is       => 'ro',
     isa      => 'Bio::MUST::Core::Types::File',
+    required => 0,          # database is now optional for convenience
     coerce   => 1,
 );
 
 has 'scheme' => (
     is       => 'ro',
     isa      => 'Bio::MUST::Core::Taxonomy::ColorScheme',
+    required => 0,          # scheme is optional
 );
 
 has 'extract_seqs' => (
@@ -61,7 +64,7 @@ has 'extract_seqs' => (
     default  => 0,
 );
 
-has 'extract_taxs' => (
+has 'extract_tax' => (
     is       => 'ro',
     isa      => 'Bool',
     default  => 0,
@@ -76,20 +79,10 @@ has 'parameters' => (
     handles   => qr{.*}xms,
 );
 
-has 'restore_last_param' => (
+has 'restore_last_params' => (
     is       => 'ro',
     isa      => 'Bool',
     default  => 0,
-);
-
-has 'nb_org' => (
-    is       => 'ro',
-    isa      => 'Num',
-);
-
-has 'align' => (
-    is       => 'ro',
-    isa      => 'Num',
 );
 
 has 'gnuplot_term' => (
@@ -187,18 +180,18 @@ has '_avg_len' => (          # average length of top-25% hits
 
 has $_ . '_file' => (
     is       => 'ro',
-    isa      => 'Path::Class::File',
+    isa      => 'Bio::MUST::Core::Types::File',
     init_arg => undef,
     lazy     => 1,
     builder  => '_build_' . $_ . '_file',
 ) for qw(idl fas tax json list);
 
-has $_ . '_param_file' => (
+has $_ . '_parameter_file' => (
     is       => 'ro',
-    isa      => 'Path::Class::File',
+    isa      => 'Bio::MUST::Core::Types::File',
     init_arg => undef,
     lazy     => 1,
-    builder  => '_build_' . $_ . '_param_file',
+    builder  => '_build_' . $_ . '_parameter_file',
 ) for qw(last new);
 
 has '_data_handle' => (
@@ -227,49 +220,49 @@ sub _build_blastdb {
 }
 
 sub _build_idl_file {
-    return file( change_suffix( shift->new_param_file, '.idl' ) );
+    return file( change_suffix( shift->new_parameter_file, '.idl'   ) );
 }
 
 sub _build_fas_file {
-    return file( change_suffix( shift->new_param_file, '.fasta' ) );
+    return file( change_suffix( shift->new_parameter_file, '.fasta' ) );
 }
 
 sub _build_tax_file {
-    return file( change_suffix( shift->new_param_file, '.tax' ) );
+    return file( change_suffix( shift->new_parameter_file, '.tax'   ) );
 }
 
 sub _build_list_file {
-    return file( change_suffix( shift->new_param_file, '.list' ) );
-}
+    return file( change_suffix( shift->new_parameter_file, '.list'  ) );
+}   # TODO: choose better suffix: .text?
 
 sub _build_json_file {
-    return shift->new_param_file;
+    return shift->new_parameter_file;
 }
 
-sub _build_new_param_file {
+sub _build_new_parameter_file {
     my $self = shift;
 
-    my $filename = $self->last_param_file;
+    my $filename = $self->last_parameter_file;
     my ($basename, $dir, $suf) = fileparse( $filename, '.json' );
-    ($basename, $dir, $suf) = fileparse( $self->file, qr{ \.[^.]* }xms )
-        unless ($basename); # if first time
-    my @parts = split '-', $basename;
+       ($basename, $dir, $suf) = fileparse( $self->file, qr{ \.[^.]* }xms )
+           unless ($basename);      # if first time
+    my @parts = split q{-}, $basename;
     # default if it's the first time
-    my $file = join '-', @parts;
+    my $file = join q{-}, @parts;
     my $new_num = 1;
 
     my $num = pop @parts;
-    if (looks_like_number( $num )){
+    if (looks_like_number $num) {
         $new_num = $num + 1;
-        $file = join '-', @parts;
+        $file = join q{-}, @parts;
     }
 
-    my $new_file = join '.', (join '-', $file, $new_num), 'json';
+    my $new_file = join q{.}, ( join q{-}, $file, $new_num ), 'json';
 
     return file( $dir, $new_file );
 }
 
-sub _build_last_param_file {
+sub _build_last_parameter_file {
     my $self = shift;
 
     my ($file, $dir, $suf) = fileparse( $self->file, qr{ \.[^.]* }xms );
@@ -314,20 +307,20 @@ sub _build_coeffs {
     my %coeffs_for;
 
     for my $hit ($self->all_hits) {
+        # TODO: use SeqId methods: $_->$method // $_->taxon_id
         my $org = (split m{\|}xms, $hit->{acc})[0];
         $count_for{$org}++;
 
         my $coeff_len = $hit->{len} / $hit->{qlen};
-        my $coeff_hmm = ( $hit->{hmm_to} - $hit->{hmm_from} +1 ) / $hit->{qlen};
+        my $coeff_hmm
+            = ( $hit->{hmm_to} - $hit->{hmm_from} + 1 ) / $hit->{qlen};
 
         my ($index, $label) = $self->scheme
             ? $self->scheme->icol( $hit->{acc} ) : (undef, undef);
-
-        # TODO: debug this: GCA_010025385.1
-#         unless (defined $index) {
-#             ### $hit
-#             ### test: $self->scheme->icol( $hit->{acc} )
-#         }
+        unless (defined $index) {
+            $index = 0;
+            $label = 'MISSING';
+        }
 
         $coeffs_for{ $hit->{acc} } = {
             org       => $org,
@@ -361,17 +354,11 @@ sub _build_data_handle {
         my $info_for = $self->get_coeffs( $hit->{acc} );
         #### $info_for
 
-        if ($self->scheme) {
-            say {$data_handle} join "\t", _eval2log10( $hit->{exp} ),
-                $hit->{len}, $info_for->{count}, $info_for->{align},
-                $info_for->{coeff_len}, $info_for->{index_tax};
-        }
-
-        else {
-            say {$data_handle} join "\t", _eval2log10( $hit->{exp} ),
-                $hit->{len}, $info_for->{count}, $info_for->{align},
-                $info_for->{coeff_len};
-        }
+        say {$data_handle} join "\t",
+            _eval2log10( $hit->{exp} ), $hit->{len},
+            $info_for->{count}, $info_for->{align}, $info_for->{coeff_len},
+            ( $self->scheme ? $info_for->{index_tax} : () )
+        ;
 
     }
 
@@ -381,14 +368,8 @@ sub _build_data_handle {
 sub _build_parameters {
     my $self = shift;
 
-    if ($self->restore_last_param) {
-        return Parameters->load( $self->last_param_file->stringify );
-    }
-
-    if ($self->align && $self->nb_org) {
-        return Parameters->new( min_cov => $self->align,
-                               max_copy => $self->nb_org );
-    }
+    return Parameters->load( $self->last_parameter_file->stringify )
+        if $self->restore_last_params;
 
     return Parameters->new();
 }
@@ -492,7 +473,6 @@ sub _build_selection {
     return \@selection;
 }
 
-
 sub _build_filter {
     my $self = shift;
 
@@ -503,7 +483,7 @@ sub _build_filter {
     for my $hit ($self->all_selection) {
         if ( ( $self->get_coeffs($hit->{acc}) )->{align} >= $align
           && ( $self->get_coeffs($hit->{acc}) )->{count} <= $nb_org ) {
-            $filter_for{$hit->{acc}} = '*';
+            $filter_for{ $hit->{acc} } = q{*};
         }
     }
 
@@ -511,60 +491,46 @@ sub _build_filter {
 }
 
 sub list_selection {
-    my $self = shift;
+    my $self   = shift;
     my $option = shift;
 
     # setup table of selected hits
-    my $table = Text::Table->new( qw(keep accession description length evalue
-                                     count max alignment ratio_length) );
+    my @heads = qw(keep accession description length evalue count max alignment ratio_length);
+#     my @heads = qw(keep accession description length evalue copy max hmm_cover hit_ratio);
+    push @heads, 'taxonomy' if $self->scheme;
+    my $table = Text::Table->new(@heads);
 
-    if ($self->scheme) {
-        $table = Text::Table->new( qw(keep accession description length evalue
-                                count max alignment ratio_length taxonomy) );
-    }
+    # fill-in table (defaults to 'all' hits)
+    my @fields = qw(count max_count align coeff_len);
+    push @fields, 'tax' if $self->scheme;
+    my @rows = map { [
+        $self->get_filter( $_->{acc} ), $_->{acc},
+        @{$_}{ qw(dsc len exp) },
+        @{ $self->get_coeffs( $_->{acc} ) }{@fields}
+    ] } $self->all_selection;
 
-    # fill-in table
-    if ($option eq 'all') {
-        $table->load( map {
-            [ $self->get_filter( $_->{acc} ),
-              $_->{acc},
-              @{$_}{ qw(dsc len exp) },
-              @{ $self->get_coeffs( $_->{acc} ) }{ qw(count max_count align
-                                                      coeff_len tax) } ]
-        } $self->all_selection );
-    }
+    # optionally filter rows
+    @rows = grep { $_->[0] } @rows if $option eq 'keep';
 
-    elsif ($option eq 'keep') {
-
-        for my $hit ($self->all_selection) {
-
-            if ($self->get_filter( $hit->{acc} )) {
-                $table->load( [ $self->get_filter( $hit->{acc} ),
-                                $hit->{acc},
-                                @{$hit}{ qw(dsc len exp) },
-                                @{ $self->get_coeffs( $hit->{acc} ) }{ qw(count
-                                        max_count align coeff_len tax) } ] );
-            }
-        }
-    }
     # output table
-    my $selec = $table->rule('=') . $table->title . $table->rule('-')
-              . $table->body . $table->rule('=');
-
-    return $selec;
+    $table->load(@rows);
+    ( my $selection = $table->rule(q{=}) . $table->title . $table->rule(q{-})
+        . $table->body . $table->rule(q{=}) ) =~ s{\ +$}{}xmsg;
+                                    # trim trailing whitespace for unit test
+    return $selection;
 }
-
 
 sub save_selection {
     my $self = shift;
+    # TODO: figure out how to get rid of stringify
     $self->parameters->store( $self->json_file->stringify );
 
-    ### save_selection and parameters: $self->json_file->{file}
+    ### save_selection and parameters: $self->json_file->stringify
     # write file of accession (or GI) numbers
     my @ids;
 
+    # TODO: make this a map construct
     for my $selec ($self->all_selection) {
-
         if ( $self->get_filter( $selec->{acc} ) ) {
             push @ids, $selec->{acc};
         }
@@ -585,7 +551,7 @@ sub save_selection {
                 =~ s/lcl\| | \s unnamed \s protein \s product//xmsg;
             $seq_id->_set_full_id($full_id);
         }
-        # TODO: fix this
+        # TODO: fix this... what is the issue?
         #$seqs->store_fasta( $self->fas_file );
         my @new_seqs = $seqs->all_seqs;
         my $ali = Ali->new( seqs => \@new_seqs );
@@ -593,7 +559,7 @@ sub save_selection {
         $ali->store_fasta( $self->fas_file );
     }
 
-    if ($self->extract_taxs) {
+    if ($self->extract_tax) {
         my @labels = map { $self->scheme->classify($_) // "undef" } @ids;
         $self->tax_file->spew( join("\n", @labels) . "\n" );
     }
@@ -639,7 +605,7 @@ sub _setup_gnuplot {
     #### data: $self->_data_file
 
     my $ans = 'Y';
-    my $explaination;
+    my $explanation;
 
     COLORS:
     while (uc($ans) ne 'N') {
@@ -684,34 +650,23 @@ sub _setup_gnuplot {
 
         my $msg = "Which coloration information would you like? (If you do not want to change colors, press 'Return'.)";
 
-        unless ($explaination) {
+        unless ($explanation) {
             $msg = <<'EOT';
 Define the hit bounding-box using the mouse (button 3).
 If needed, reset the zoom level by pressing the 'U' key in the plot window.
 Press 'H' to get help for other hot keys.
 Which coloration information would you like? (If you do not want to change colors, press 'Return'.)
 EOT
-            $explaination = 1;
+            $explanation = 1;
         }
 
-        if ($self->scheme) {
-            $ans = prompt $msg,
-                          -def => 'N',
-                          -menu => { 'Organisms' => 'O',
-                                     'Taxonomy'  => 'T',
-                                     'Alignment' => 'A',
-                                     'Global'    => 'G' },
-                          '>';
-        }
-
-        else {
-            $ans = prompt $msg,
-                          -def => 'N',
-                          -menu => { 'Organisms' => 'O',
-                                     'Alignment' => 'A',
-                                     'Global'    => 'G' },
-                          '>';
-        }
+        $ans = prompt $msg,
+                      -def => 'N',
+                      -menu => { 'Organisms' => 'O',
+             ( $self->scheme ? ( 'Taxonomy'  => 'T' ) : () ),
+                                 'Alignment' => 'A',
+                                 'Global'    => 'G' },
+                      '>';
 
         $coloration = $ans;
     };
@@ -957,8 +912,8 @@ sub print_plot {
         my $global = $coloration eq 'G' ? $self->max_copy : undef;
         my $dt = $self->gnuplot_vers >= version->parse(5) ? q{dt "-"} : q{};
 
-        my ($basename, $dir) = fileparse( $self->new_param_file, '.json' );
-        my $report = join '', $dir, $basename;
+        my ($basename, $dir) = fileparse( $self->new_parameter_file, '.json' );
+        my $report = join q{}, $dir, $basename;
 
         my $tt = Template->new;
         my $vars = {
@@ -1038,7 +993,7 @@ Bio::MUST::Apps::OmpaPa::Roles::Parsable - Parsable Moose role for search report
 
 =head1 VERSION
 
-version 0.251770
+version 0.252040
 
 =head1 SYNOPSIS
 

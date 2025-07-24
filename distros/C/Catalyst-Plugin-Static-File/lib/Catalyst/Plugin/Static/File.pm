@@ -15,7 +15,7 @@ use Try::Tiny;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.2.3';
+our $VERSION = 'v0.2.4';
 
 
 sub serve_static_file {
@@ -75,7 +75,7 @@ Catalyst::Plugin::Static::File - Serve a specific static file
 
 =head1 VERSION
 
-version v0.2.3
+version v0.2.4
 
 =head1 SYNOPSIS
 
@@ -112,7 +112,7 @@ It uses L<Plack::MIME> to identify the content type, but you can override that.
 
 =item *
 
-It adds a file path to the file handle, plays nicely with L<Plack::Middleware::XSendfile> and L<Plack::Middleware::ETag>.
+It adds a file path to the file handle, and plays nicely with L<Plack::Middleware::XSendfile> and L<Plack::Middleware::ETag>.
 
 =item *
 
@@ -136,18 +136,12 @@ It returns a true value on success.
 
 If you want to use conditional requests, use L<Plack::Middleware::ConditionalGET>.
 
-=head1 SECURITY
+=head1 SECURITY CONSIDERATIONS
 
 The L<serve_static_file> method does not validate the file that is passed to it.
 
 You should ensure that arbitrary filenames are not passed to it. You should strictly validate any external data that is
 used for generating the filename.
-
-=head1 SUPPORT FOR OLDER PERL VERSIONS
-
-This module requires Perl v5.14 or later.
-
-Future releases may only support Perl versions released in the last ten years.
 
 =head1 SEE ALSO
 
@@ -160,7 +154,16 @@ L<Catalyst::Plugin::Static::Simple>
 The development version is on github at L<https://github.com/robrwo/Catalyst-Plugin-Static-File>
 and may be cloned from L<git://github.com/robrwo/Catalyst-Plugin-Static-File.git>
 
-=head1 BUGS
+=head1 SUPPORT
+
+Only the latest version of this module will be supported.
+
+This module requires Perl v5.14 or later.  Future releases may only support Perl versions released in the last ten
+years.
+
+This module requires Catalyst v5.90129 or later.
+
+=head2 Bugs
 
 Please report any bugs or feature requests on the bugtracker website
 L<https://github.com/robrwo/Catalyst-Plugin-Static-File/issues>
@@ -180,7 +183,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2023-2024 by Robert Rothenberg.
+This software is Copyright (c) 2023-2025 by Robert Rothenberg.
 
 This is free software, licensed under:
 

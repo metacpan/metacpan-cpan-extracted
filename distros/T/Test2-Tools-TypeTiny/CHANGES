@@ -1,6 +1,14 @@
 Changelog for Test2-Tools-TypeTiny
 
-v0.93.0 2025-03-18T20:51:57
+v0.93.1 2025-07-23T21:31:41
+ - Pull request #6: Patch - SM-5765 (Brendan Byrd)
+ - Update README (Brendan Byrd)
+ - Advertize failure message and deeper explanations in constraint type
+   debug maps (Brendan Byrd)
+ - Move debug map indentation to %*s notation in sprintf statements
+   (Brendan Byrd)
+
+v0.93.0 2025-03-18T20:50:15
  - Pull request #5: SM-5283 d (Brendan Byrd)
  - Update README (Brendan Byrd)
  - POD improvements (Brendan Byrd)

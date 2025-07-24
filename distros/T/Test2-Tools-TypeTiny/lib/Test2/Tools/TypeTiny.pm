@@ -2,7 +2,7 @@ package Test2::Tools::TypeTiny;
 
 # ABSTRACT: Test2 tools for checking Type::Tiny types
 use version;
-our $VERSION = 'v0.93.0'; # VERSION
+our $VERSION = 'v0.93.1'; # VERSION
 
 use v5.18;
 use strict;
@@ -22,6 +22,8 @@ use Test2::Compare          qw< compare strict_convert >;
 use Data::Dumper;
 
 use namespace::clean;
+
+our $DEBUG_INDENT = 4;
 
 #pod =encoding utf8
 #pod
@@ -783,9 +785,28 @@ sub _constraint_type_check_debug_map {
         my $check     = $current_check->check($value);
 
         my $check_label = $check ? 'PASSED' : 'FAILED';
-        push @diag_map, sprintf("    %s->check(%s) ==> %s", $type_name, $dd, $check_label);
+        push @diag_map, sprintf('%*s%s->check(%s) ==> %s', $DEBUG_INDENT, '', $type_name, $dd, $check_label);
+
+        # Advertize failure message and deeper explanations
+        unless ($check) {
+            push @diag_map, sprintf('%*s%s: %s', $DEBUG_INDENT * 2, '', 'message', $current_check->get_message($value));
+
+            if ($current_check->is_parameterized && $current_check->parent->has_deep_explanation) {
+                push @diag_map, sprintf('%*s%s:', $DEBUG_INDENT * 2, '', 'parameterized deep explanation (from parent)');
+                my $deep = eval { $current_check->parent->deep_explanation->( $current_check, $value, '$_' ) };
+
+                # Account for bugs in parent->deep_explanation
+                push @diag_map, (
+                    $@                   ? sprintf('%*s%s: %s', $DEBUG_INDENT * 3, '', 'EVAL ERROR', $@) :
+                    !defined $deep       ? sprintf('%*s%s',     $DEBUG_INDENT * 3, '', 'NO RESULTS') :
+                    ref $deep ne 'ARRAY' ? sprintf('%*s%s: %s', $DEBUG_INDENT * 3, '', 'ILLEGAL RETURN TYPE', ref $deep) :
+                    (map { sprintf('%*s%s', $DEBUG_INDENT * 3, '', $_) } @$deep)
+                );
+            }
+        }
+
         local $SIG{__WARN__} = sub {};
-        push @diag_map, sprintf('        is defined as: %s', $current_check->_perlcode);
+        push @diag_map, sprintf('%*s%s: %s', $DEBUG_INDENT * 2, '', 'is defined as', $current_check->_perlcode);
 
         $current_check = $current_check->parent;
     };
@@ -800,7 +821,7 @@ sub _coercion_type_check_debug_map {
 
     my @diag_map = ($type->display_name." coercion map:");
     if (length $dd > 30) {
-        push @diag_map, "    Full value: $dd";
+        push @diag_map, sprintf('%*s%s: %s', $DEBUG_INDENT, '', 'Full value', $dd);
         $dd = '...';
     }
 
@@ -811,7 +832,7 @@ sub _coercion_type_check_debug_map {
         my $check_label = $check ? 'PASSED' : 'FAILED';
         $check_label .= sprintf ' (coerced into %s)', _dd($type->coerce($value)) if $check && $coercion_type != $type;
 
-        push @diag_map, sprintf("    %s->check(%s) ==> %s", $type_name, $dd, $check_label);
+        push @diag_map, sprintf('%*s%s->check(%s) ==> %s', $DEBUG_INDENT, '', $type_name, $dd, $check_label);
         last if $check;
     }
 
@@ -875,8 +896,10 @@ sub _check_error_message_methods {
 #pod
 #pod     MyStringType constraint map:
 #pod         MyStringType->check("value") ==> FAILED
+#pod             message: Must be a good value
 #pod             is defined as: do { package Type::Tiny; ... ) }
 #pod         StrMatch["(?^ux:...)"]->check("value") ==> FAILED
+#pod             message: StrMatch did not pass type constraint: ...
 #pod             is defined as: do { package Type::Tiny; !ref($_) and !!( $_ =~ $Types::Standard::StrMatch::expressions{"..."} ) }
 #pod         StrMatch->check("value") ==> PASSED
 #pod             is defined as: do { package Type::Tiny; defined($_) and do { ref(\$_) eq 'SCALAR' or ref(\(my $val = $_)) eq 'SCALAR' } }
@@ -927,7 +950,7 @@ Test2::Tools::TypeTiny - Test2 tools for checking Type::Tiny types
 
 =head1 VERSION
 
-version v0.93.0
+version v0.93.1
 
 =head1 SYNOPSIS
 
@@ -1224,8 +1247,10 @@ For example, a constraint map could look like:
 
     MyStringType constraint map:
         MyStringType->check("value") ==> FAILED
+            message: Must be a good value
             is defined as: do { package Type::Tiny; ... ) }
         StrMatch["(?^ux:...)"]->check("value") ==> FAILED
+            message: StrMatch did not pass type constraint: ...
             is defined as: do { package Type::Tiny; !ref($_) and !!( $_ =~ $Types::Standard::StrMatch::expressions{"..."} ) }
         StrMatch->check("value") ==> PASSED
             is defined as: do { package Type::Tiny; defined($_) and do { ref(\$_) eq 'SCALAR' or ref(\(my $val = $_)) eq 'SCALAR' } }

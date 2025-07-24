@@ -1,5 +1,23 @@
 Revision history for Catalyst-Plugin-Static-File:
 
+v0.2.4    2025-07-23 13:25:39+01:00 Europe/London
+  [Incompatible Changes]
+  - Increased the minimum version of Catalyst to 5.90129.
+
+  [Documentation]
+  - Merged BUGS and SUPPORT FOR OLDER PERL VERSIONS into a SUPPORT section.
+
+  - Renamed SECURITY to SECURITY CONSIDERATIONS.
+
+  - Fixed a minor typo.
+
+  - Updated security policy.
+
+  - Updated copyright year.
+
+  [Tests]
+  - Added author tests.
+
 v0.2.3    2024-12-18 16:15:14+00:00 Europe/London
   [Documentation]
   - Added a security policy.

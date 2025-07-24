@@ -1,5 +1,12 @@
 Revision history for Params-Get
 
+0.09	Wed Jul 23 13:46:12 EDT 2025
+	Improved handling of:
+		in main:
+			routine('country' => 'US');
+		in routine():
+			$params = Params::Get::get_params('country', \@);
+
 0.08	Thu May 29 14:05:49 EDT 2025
 	Check number of parameters before the quick return
 	Use Devel::Confess to give a full stacktrace

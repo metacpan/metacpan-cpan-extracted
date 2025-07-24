@@ -1,14 +1,104 @@
 Revision history for Brannigan
 
-1.100001  2017-02-06 22:53:45+02:00 Asia/Jerusalem
+2.1   2025-01-23
+    - Minor documentation fixes
+
+2.0   2025-01-23
+    [ BREAKING CHANGES ]
+    - Complete refactor, all packages consolidated into one
+    - Terminology change: "scheme" => "schema".
+    - Constructor API changed: accepts only options hash-ref, schemas must be
+      registered separately via register_schema() method.
+    - Schema registration API changed: add_scheme() renamed to register_schema(),
+      and it now takes schema name as separate parameter:
+      register_schema('name', $schema) instead of embedding the name in the
+      schema hash-ref.
+    - Rename `parse` functions to `postprocess` to make it clear that they're
+      executed after validation. They should now return a replacement value for
+      the parameter they receive, not a hash-ref.
+    - Default values are calculated before validation, not after. This means
+      they can fail validation if they do not comply with the defined rules.
+    - Remove parameter groups in favor of global `postprocess` function (see
+      NEW FEATURES section below).
+    - Remove support for defining parameters via regular expressions to simplify
+      the code.
+    - Remove support for scope-local "_all" validators.
+    - Rename custom_validation() to register_validator().
+    - Remove the "max_dict" validator.
+    - Remove the "ignore_missing" schema-specific option in favor of the
+      global "handle_unknown" option which is more comprehensive. See the
+      NEW FEATURES section below.
+    - Remove the "forbidden" validator in favor of the new "handle_unknown"
+      option.
+    - The `process` method/function no longer returns the hash-ref of input
+      parameters with an optional '_rejects' key. All processing happens
+      in-place, so there's no need to return the parameter hash-ref. Instead,
+      the method will return `undef` if all validations passed successfully.
+      If not, a hash-ref of rejects is returned. Its structure is different than
+      the previous structure in several respects:
+
+         1. It is flattened. A parameter called "day" inside a hash parameter
+            called "date" in the second value of an array parameter called
+            "important_dates" will appear as "important_dates.1.date.day" in
+            the rejects hash-ref if it failed validations.
+
+         2. Instead of a list of validators that failed for a parameter, a
+            hash-ref of rules and their arguments is returned.
+
+            For example, instead of `parameter => ['required(1)']` in previous
+            versions, `parameter => { required => 1 }` is returned now.
+
+            Instead of `parameter => ['length_between(10,20)']` returned in
+            previous versions, `parameter => { length_between => [10, 20] }`
+            is returned now.
+
+    [ NEW FEATURES ]
+    - Allow `preprocess` functions for parameters, which are executed before
+      validation. Useful for input sanitation such as remove heading and
+      trailing whitespace.
+    - Allow a global `postprocess` function on a schema, that receives the
+      complete parameter hash-ref after all preprocessing, validation, and
+      parameter-specific postprocessing had completed. This function need not
+      return anything. It can directly modify the parameter hash-ref as needed.
+    - Added comprehensive unknown parameter handling with three modes:
+      * 'ignore' (default): Unknown parameters are preserved unchanged
+      * 'remove': Unknown parameters are deleted from input
+      * 'reject': Unknown parameters cause validation failure
+    - Unknown parameter handling works at all nesting levels:
+      * Top-level parameters
+      * Nested hash structures with 'keys' definitions
+      * Array items that are hashes with 'keys' definitions
+      * Deep nesting at any level (e.g., data.users.0.profile.extra_field)
+    - Enhanced error reporting: Unknown parameters appear in rejects hash-ref
+      using dot notation paths with { unknown => 1 } structure
+    - Fixed schema inheritance to work recursively with deep inheritance chains
+    - Schema inheritance now properly merges parameter definitions instead of
+      replacing them completely
+    - Default values now work recursively for all nested structures:
+      * Hash fields within arrays get their defaults applied
+      * Deeply nested structures (arrays in hashes in arrays) fully supported
+      * Both static values and function-based defaults work in nested contexts
+
+    [ DOCUMENTATION & TESTING ]
+    - Migrated test suite from Test::More to Test2::V0.
+    - Comprehensive test suite reorganization with focused feature tests.
+    - Enhanced error format documentation with comprehensive examples.
+    - Added upgrade guide for migrating from 1.x to 2.0
+
+    [ INTERNAL IMPROVEMENTS ]
+    - Improved code organization and maintainability
+    - Added initial schema validation using Brannigan itself
+    - Finalized schemas are cached to avoid repeated processing
+
+1.1.1 2017-02-06 22:53:45+02:00 Asia/Jerusalem
     - Re-release under the terms of the Apache License 2.0
 
-1.1       2013-05-02 21:41:45 Asia/Jerusalem
+1.1   2013-05-02 21:41:45 Asia/Jerusalem
 	- Sorting keys when dealing with hashes to prevent unexpected errors
 	  and test failures due to Perl's new hash key randomization
 	  introduced in version 5.17.
 
-1.0       2013-01-15 21:51:38 Asia/Jerusalem
+1.0   2013-01-15 21:51:38 Asia/Jerusalem
 	- Added the ability to add a new scheme after the Brannigan object
 	  has been created (with the add_scheme() method).
 	- Added the ability to use Brannigan functionally, by directly
@@ -16,34 +106,34 @@ Revision history for Brannigan
 	- Shortened the synopsis section, moved the example from it
 	  to a manual (still in the main pod document)
 
-0.9       2011-07-04 22:35:57 Asia/Jerusalem
+0.9   2011-07-04 22:35:57 Asia/Jerusalem
 	- Added the matches() validation for regular expression matching
 	- Added several validation methods geared toward passphrase validation
 	- Added a test file that tests Brannigan::Validations
 
-0.8       2010-07-26 21:38:19 Asia/Jerusalem
+0.8   2010-07-26 21:38:19 Asia/Jerusalem
 	- Added support for cross-scheme custom validation methods defined
 	  in the Brannigan object
 	- Updated the complex test to use the new custom validation feature
 
-0.7       2010-07-23 20:02:18 Asia/Jerusalem
+0.7   2010-07-23 20:02:18 Asia/Jerusalem
 	- Added some info about the required() validation method
 	- Added a new validation method: is_true()
 
-0.6       2010-07-23 11:48:14 Asia/Jerusalem
+0.6   2010-07-23 11:48:14 Asia/Jerusalem
 	- Fixed bug where the required() validation failed erroneously when value was false
 
-0.5       2010-07-16 16:23:32 Asia/Jerusalem
+0.5   2010-07-16 16:23:32 Asia/Jerusalem
 	- Fixed bug where an empty hash-ref was returned in the rejects hashref
 	  for array type parameters
 	- Some more documentation restructures
 
-0.4       2010-07-14 19:00:25 Asia/Jerusalem
+0.4   2010-07-14 19:00:25 Asia/Jerusalem
 	- Small bug fixes
 	- Restructured and expanded modules documentation
 	- Completed the examples POD page
 
-0.3       2010-07-06 19:33:16 Asia/Jerusalem
+0.3   2010-07-06 19:33:16 Asia/Jerusalem
 	- Added support for complex data structures (hash-refs and array-refs with nesting support)
 	- Added support for default values/methods
 	- Added support for creating rules for parameters based on regular expressions (both in 'params' and in 'groups')
@@ -58,8 +148,8 @@ Revision history for Brannigan
 	- Added the one_of validation method
 	- Modified every length related validation methods to support array references
 
-0.2       2010-06-26 04:00:53 Asia/Jerusalem
+0.2   2010-06-26 04:00:53 Asia/Jerusalem
 	- Fixed some stupid documentation mistakes.
 
-0.1       2010-06-26 03:56:58 Asia/Jerusalem
+0.1   2010-06-26 03:56:58 Asia/Jerusalem
 	- Initial release

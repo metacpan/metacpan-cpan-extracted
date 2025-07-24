@@ -10,13 +10,23 @@ use overload (
   bool => \&_overload_bool,
   "!" => \&_overload_bool,
   eq => \&_overload_eq,
-  ne => \&_overload_ne,
-  '""' => \&_overload_str,
+  '==' => \&_overload_eq,
+  'ne' => \&_overload_ne,
+  '!=' => \&_overload_ne,
+  '""' => \&to_bytes,
   x => \&_overload_mult,
-  '.' => \&_overload_concat,
-  '.=' => \&concat,
+  '.' => \&concat,
+  '.=' => \&concat_inplace,
   cmp => \&compare,
   '<=>' => \&compare,
+  '>' => sub { ($_[2] ? compare($_[1], $_[0]) : compare($_[0], $_[1])) == 1 },
+  'gt' => sub { ($_[2] ? compare($_[1], $_[0]) : compare($_[0], $_[1])) == 1 },
+  '>=' => sub { ($_[2] ? compare($_[1], $_[0]) : compare($_[0], $_[1])) != -1 },
+  'ge' => sub { ($_[2] ? compare($_[1], $_[0]) : compare($_[0], $_[1])) != -1 },
+  '<' => sub { ($_[2] ? compare($_[1], $_[0]) : compare($_[0], $_[1])) == -1 },
+  'lt' => sub { ($_[2] ? compare($_[1], $_[0]) : compare($_[0], $_[1])) == -1 },
+  '<=' => sub { ($_[2] ? compare($_[1], $_[0]) : compare($_[0], $_[1])) != 1 },
+  'le' => sub { ($_[2] ? compare($_[1], $_[0]) : compare($_[0], $_[1])) != 1 },
   '&' => \&bitwise_and,
   '&=' => \&bitwise_and_equals,
   '|' => \&bitwise_or,
@@ -72,7 +82,7 @@ L<Crypt::Sodium::XS::MemVault> is the container for protected memory objects in
 L<Crypt::Sodium::XS> which can be accessed from perl. It has constructors which
 can read in the sensitive data without going through perl. It also provides
 methods for manipulating the data while it remains only in protected memory.
-These methods (except L</index>) are time-dependent only on the length of
+These methods (except L</index>) are time-dependent only on the size of
 protected data, not its content, so using them should not create any
 sidechannels.
 
@@ -169,8 +179,8 @@ end-of-file.
   $mv->bitwise_and_equals($other_mv);
 
 Modifies protected memory using the associated bitwise operation with the
-provided argument. The argument must be the same number of bytes in length as
-the protected memory.
+provided argument. The argument must be the same size, in bytes, as the
+protected memory.
 
 The C<*_equals> functions modify in-place. Other functions return a new
 L<Crypt::Sodium::XS::MemVault>.
@@ -184,16 +194,28 @@ original C<$mv>.
 
 =head2 compare
 
-  $mv->compare($bytes, $length);
-  $mv->compare($other_mv, $length);
+B<!!WARNING!!>: The results of this comparison method can be used to leak
+information about the protected memory.
 
-Fixed-time (for a given length) comparison of bytes as little-endian
-arbitrary-length integers. Returns C<0> if the bytes are equal, C<-1> if C<$mv>
-is less than C<$other_mv> (or C<$bytes>), or C<1> if C<$mv> is greater.
-Comparible to the C<cmp> perl operator.
+  $mv->compare($bytes, $size);
+  $mv->compare($other_mv, $size);
 
-C<$length> is optional iif C<$mv> and C<$other_mv> (or C<$bytes>) are equal
-lengths. If provided, only C<$length> bytes are compared.
+Returns C<0> if the bytes are equal, C<-1> if C<$mv> is less than C<$other_mv>
+(or C<$bytes>), or C<1> if C<$mv> is greater. This method runs in fixed-time
+(for a given size), and compares bytes as little-endian arbitrary-length
+integers. Comparible to the C<cmp> perl operator.
+
+C<$size> is optional iif C<$mv> and C<$other_mv> (or C<$bytes>) are equal
+sizes. If provided, only C<$size> bytes are compared. B<Note>: Croaks if a
+comparison is of unequal sizes and C<$size> was not provided, or if C<$size> is
+larger than either of the operands.
+
+Croaks if C<$mv> or C<$other_mv> is conceptually "locked". See L</lock> and
+L</unlock>.
+
+B<Note>: This method is similar to L<memcmp(3)>; that is, it returns -1, 0, or
+1 for the comparison results. For simple true/false equality comparisons, see
+L</memcmp>. The naming is chosen here to be consistent with libsodium.
 
 =head2 concat
 
@@ -203,6 +225,14 @@ lengths. If provided, only C<$length> bytes are compared.
 Returns a new L<Crypt::Sodium::Memvault> with the concatenated contents of
 C<$mv> followed by C<$bytes> or the contents of C<$other_mv>. The new object's
 flags will be the combined restrictions of C<$mv> and C<$new_mv>.
+
+=head2 concat_inplace
+
+  $mv->concat_inplace($appended_bytes);
+  $mv->concat_inplace($another_mv);
+
+Appends C<$appended_bytes> or the contents of C<$another_mv> to the end of
+<$mv>. Returns C<$mv>.
 
 =head2 flags
 
@@ -238,8 +268,7 @@ protected memory.
 This method should only be used when protected memory starts with non-sensitive
 data, and is guaranteed to find C<$substr> before any sensitive data.
 
-This method will croak if the L<Crypt::Sodium::XS::MemVault> is conceptually
-"locked". See L</lock> and L</unlock>.
+Croaks if C<$mv> is conceptually "locked". See L</lock> and L</unlock>.
 
 The C<Crypt::Sodium::XS::MemVault> object must be unlocked (L</unlock>) before
 using this method.
@@ -255,13 +284,16 @@ Returns a boolean indicating if the object is conceptually "locked."
   my $is_null = $mv->is_zero;
 
 Returns a boolean indicating if the protected memory consists of all null
-bytes. Runs in constant time for a given length.
+bytes. Runs in constant time for a given size.
 
-=head2 length
+=head2 size
 
-  my $length = $mv->length;
+=head2 length (deprecated)
 
-Returns the byte length of the protected memory. Runtime does not depend on
+  my $size = $mv->size;
+  my $size = $mv->length;
+
+Returns the size, in bytes, of the protected memory. Runtime does not depend on
 data.
 
 =head2 lock
@@ -269,19 +301,33 @@ data.
   $mv->lock;
 
 Conceptually "lock" the object. This prevents use of the protected memory from
-perl in a way which could leak the data (i.e., stringification and L<index>).
+perl in a way which could leak the data (i.e., stringification, L</index>, and
+L</compare>).
 
 =head2 memcmp
 
-  $mv->memcmp($bytes, $length);
-  $mv->memcmp($other_mv, $length);
+  $mv->memcmp($bytes, $size);
+  $mv->memcmp($other_mv, $size);
 
-Fixed-time (for a given length) comparison of bytes as little-endian
-arbitrary-length integers. Returns true if the bytes are equal, false
-otherwise.
+Returns true if the bytes are exactly equal, false otherwise. This method runs
+in fixed-time (for a given size), and compares bytes as little-endian
+arbitrary-length integers.
 
-C<$length> is optional iif C<$mv> and C<$other_mv> (or C<$bytes>) are equal
-lengths. If provided, only C<$length> bytes are compared.
+C<$size> is optional iif C<$mv> and C<$other_mv> (or C<$bytes>) are equal
+sizes. If provided, only C<$size> bytes are compared. B<Note>: Croaks if
+operands are unequal sizes and C<$size> was not provided, or if C<$size> is
+larger than either of the operands.
+
+When a comparison involves secret data (e.g. a key, a password, etc.), it is
+critical to use a constant-time comparison function. This property does not
+relate to computational complexity: it means the time needed to perform the
+comparison is the same for all data of the same size. The goal is to mitigate
+side-channel attacks.
+
+B<Note>: L</memcmp> in libsodium is different than L<memcmp(3)>. This method
+returns only true/false for equality, not -1, 0, or 1 for the comparison
+results. For that, see L</compare>. The naming is chosen here to be consistent
+with libsodium.
 
 =head2 pad
 
@@ -341,6 +387,18 @@ C<$variant> is optional (default:
 L<Crypt::Sodium::XS::Base64/BASE64_VARIANT_URLSAFE_NO_PADDING>). See
 L<Crypt::Sodium::XS::Base64/CONSTANTS>.
 
+=head2 to_bytes
+
+B<!!WARNING!!>: This method returns protected memory as a normal perl byte
+string. This should not normally be necessary.
+
+  my $bytes = $mv->to_bytes;
+
+Returns the protected memory as a byte string. This is the method used to
+overload stringification. Consider carefully before using.
+
+Croaks if C<$mv> is conceptually "locked". See L</lock> and L</unlock>.
+
 =head2 to_hex
 
   my $new_mv = $mv->to_hex;
@@ -353,7 +411,7 @@ hexadecimal string.
   $mv->unlock;
 
 Conceptually "unlock" the object. This allows access to the protected memory
-from perl (i.e., stringification and L</index>).
+from perl (i.e., stringification, L</index>, and L</compare>).
 
 =head2 memzero
 
@@ -374,24 +432,42 @@ the object is destroyed.
   my $is_empty = !$mv;
   my $is_not_empty = !!$mv;
 
-=head2 eq
+=head2 Equality eq, ==, ne, !=
 
   my $is_equal = $mv eq $bytes;
   my $is_equal = $bytes eq $mv;
   my $is_equal = $mv eq $other_mv;
-
-=head2 ne
-
   my $not_equal = $mv ne $bytes;
   my $not_equal = $bytes ne $mv;
   my $not_equal = $mv ne $other_mv;
+
+Compares operands as arbitrary-length little-endian integers. Comparisons are
+made in fixed-time (for a given size). See L</memcmp>.
+
+=head2 Comparisons lt, E<lt>, le, E<lt>=, gt, E<gt>, ge, E<gt>=
+
+  my $less = $mv < $bytes;
+  my $less = $mv lt $bytes;
+  my $less = $bytes < $mv;
+  my $less = $bytes lt $mv;
+  my $less = $mv < $other_mv;
+  my $less = $mv lt $other_mv;
+  ...
+
+All comparisons treat their operands as arbitrary-length little-endian
+integers. Comparisons are made in fixed-type (for a given size), but the
+results can leak information about protected memory. See L</compare>.
+
+Croaks if C<$mv> or C<$other_mv> is conceptually "locked". See L</lock> and
+L</unlock>.
 
 =head2 stringification
 
   my $var = "$mv";
 
-Stringification will croak if the L<Crypt::Sodium::XS::MemVault> is
-conceptually "locked". See L</lock> and L</unlock>.
+Equivalent to L</to_bytes>. Stringification will croak if the
+L<Crypt::Sodium::XS::MemVault> is conceptually "locked". See L</lock> and
+L</unlock>. See also L</to_bytes>.
 
 =head2 concatenation
 
@@ -399,7 +475,7 @@ conceptually "locked". See L</lock> and L</unlock>.
   my $new_mv = $string . $mv;
   my $new_mv = $mv . $other_mv;
 
-Note: C<.=> is equivalent to L</concat>.
+Note: C<.=> is equivalent to L</concat_inplace>.
 
 =head2 repetition
 
