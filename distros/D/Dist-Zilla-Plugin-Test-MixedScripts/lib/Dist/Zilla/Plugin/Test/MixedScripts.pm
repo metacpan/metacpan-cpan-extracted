@@ -3,7 +3,7 @@ package Dist::Zilla::Plugin::Test::MixedScripts;
 use v5.16;
 use warnings;
 
-# ABSTRACT: author tests to ensure there is no mixed unicode
+# ABSTRACT: author tests to ensure there is no mixed Unicode
 
 use Moose;
 
@@ -26,7 +26,7 @@ with
   },
   'Dist::Zilla::Role::PrereqSource';
 
-our $VERSION = 'v0.1.2';
+our $VERSION = 'v0.1.4';
 
 
 has filename => (
@@ -136,8 +136,8 @@ sub register_prereqs {
             phase => 'develop',
             type  => 'requires',
         },
-        'Test::More'         => '1.302200',
-        'Test::MixedScripts' => '0',
+        'Test2::Tools::Basic' => '1.302200',
+        'Test::MixedScripts' => 'v0.3.0',
     );
 }
 
@@ -149,11 +149,13 @@ __PACKAGE__->meta->make_immutable;
 
 =head1 NAME
 
-Dist::Zilla::Plugin::Test::MixedScripts - author tests to ensure there is no mixed unicode
+Dist::Zilla::Plugin::Test::MixedScripts - author tests to ensure there is no mixed Unicode
 
 =head1 VERSION
 
-version v0.1.2
+version v0.1.4
+
+=for stopwords Cushing Etheridge Florian Ragwitz Unicode
 
 =head1 DESCRIPTION
 
@@ -162,7 +164,7 @@ This generates an author L<Test::MixedScripts>.
 This is an extension of L<Dist::Zilla::Plugin::InlineFiles>, providing the file F<xt/author/mixed-unicode-scripts.t> for
 testing against mixed Unicode scripts that are potentially confusing or malicious.
 
-For example, the text for the domain names "E<0x043e>nE<0x0435>.example.com" and "one.example.com" look indistinguishable in many fonts,
+For example, the text for the domain names C<< E<0x043e>nE<0x0435>.example.com >> and C<one.example.com> look indistinguishable in many fonts,
 but the first one has Cyrillic letters.  If your software interacted with a service on the second domain, then someone
 can operate a service on the first domain and attempt to fool developers into using their domain instead.
 
@@ -220,12 +222,14 @@ for example, in the F<dist.ini>:
     file = XS.xs
     file = XS.c
 
-=head1 SOURCE
+=head1 SUPPORT
 
-The development version is on github at L<https://github.com/robrwo/perl-Dist-Zilla-Plugin-Test-MixedScripts>
-and may be cloned from L<git://github.com/robrwo/perl-Dist-Zilla-Plugin-Test-MixedScripts.git>
+Only the latest version of this module will be supported.
 
-=head1 BUGS
+This module requires Perl v5.16 or later.  Future releases may only support Perl versions released in the last ten
+years.
+
+=head2 Reporting Bugs and Submitting Feature Requests
 
 Please report any bugs or feature requests on the bugtracker website
 L<https://github.com/robrwo/perl-Dist-Zilla-Plugin-Test-MixedScripts/issues>
@@ -234,10 +238,13 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
-=head2 Reporting Security Vulnerabilities
+If the bug you are reporting has security implications which make it inappropriate to send to a public issue tracker,
+then see F<SECURITY.md> for instructions how to report security vulnerabilities.
 
-Security issues should not be reported on the bugtracker website. Please see F<SECURITY.md> for instructions how to
-report security vulnerabilities
+=head1 SOURCE
+
+The development version is on github at L<https://github.com/robrwo/perl-Dist-Zilla-Plugin-Test-MixedScripts>
+and may be cloned from L<git://github.com/robrwo/perl-Dist-Zilla-Plugin-Test-MixedScripts.git>
 
 =head1 AUTHOR
 
@@ -245,6 +252,12 @@ Robert Rothenberg <rrwo@cpan.org>
 
 This code was based on L<Dist::Zilla::Plugin::Test::EOL> by Florian Ragwitz <rafl@debian.org>, Caleb Cushing
 <xenoterracide@gmail.com> and Karen Etheridge <ether@cpan.org>.
+
+=head1 CONTRIBUTOR
+
+=for stopwords Graham Knop
+
+Graham Knop <haarg@haarg.org>
 
 =head1 COPYRIGHT AND LICENSE
 
@@ -262,7 +275,7 @@ use warnings;
 
 # This test was generated with {{ ref $plugin }} {{ $plugin->VERSION }}.
 
-use Test::More 1.302200;
+use Test2::Tools::Basic 1.302200;
 
 use Test::MixedScripts qw( file_scripts_ok );
 

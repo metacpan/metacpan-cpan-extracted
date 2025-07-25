@@ -4,7 +4,11 @@
       "ipinfo.io <support@ipinfo.io>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [
+      "geo",
+      "network"
+   ],
    "license" : [
       "apache_2_0"
    ],
@@ -34,14 +38,26 @@
          "requires" : {
             "Cache::LRU" : "0",
             "JSON" : "0",
+            "LWP::Protocol::https" : "0",
             "LWP::UserAgent" : "0",
-            "Net::CIDR" : "0",
+            "Net::CIDR" : "0.22",
             "Net::CIDR::Set" : "0",
             "perl" : "5.006"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "v3.0.1",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ipinfo/perl/issues"
+      },
+      "homepage" : "https://ipinfo.io",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ipinfo/perl",
+         "web" : "https://github.com/ipinfo/perl"
+      }
+   },
+   "version" : "v3.1.1",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -8,7 +8,7 @@ package GD::Barcode::QRcode;
 use parent qw(Exporter);
 use vars qw($VERSION @ISA $errStr);
 @ISA     = qw(GD::Barcode Exporter);
-$VERSION = '2.00';
+$VERSION = '2.01';
 
 sub new {
     my ( $sClass, $sTxt, $rhPrm ) = @_;
@@ -122,7 +122,7 @@ sub init {
         while ($iFlg) {
             if ( $iRestBits > $iBuffBit ) {
                 $aCodeWords[$iCodeWords] =
-                  ( ( $aCodeWords[$iCodeWords] << $iBuffBit ) | $sBuff );
+                  ( ( ( $aCodeWords[$iCodeWords] // 0 ) << $iBuffBit ) | $sBuff );
                 $iRestBits -= $iBuffBit;
                 $iFlg = 0;
             }
@@ -214,8 +214,8 @@ sub init {
     for ( my $iMatrixRemain = $iRemainBits ; $iMatrixRemain ; $iMatrixRemain-- )
     {
         my $iRemainBitTmp = $iMatrixRemain + ( $iMaxCodeWords * 8 );
-        $aCont[ $aMatrixX[$iRemainBitTmp] ][ $aMatrixY[$iRemainBitTmp] ] =
-          ( 255 ^ $aMask[$iRemainBitTmp] );
+        $aCont[ $aMatrixX[$iRemainBitTmp] // 0 ][ $aMatrixY[$iRemainBitTmp] // 0 ] =
+          ( 255 ^ ( $aMask[$iRemainBitTmp] // 0 ) );
     }
 
     # ---- mask select
@@ -5051,7 +5051,7 @@ __END__
 
 =head1 NAME
 
-GD::Barcode::QRcode - Create QRcode barcode image with GD
+GD::Barcode::QRcode - Create QRcode barcode images with GD
 
 =head1 SYNOPSIS
 
@@ -5065,14 +5065,14 @@ I<ex. CGI>
 I<with UnitSize, ECC settings>
 
   my $oGdBar = GD::Barcode::QRcode->new('123456789',
-                            { Ecc => 'L', Version=>2, ModuleSize => 2}
+                            { Ecc => 'L', Version=>2, ModuleSize => 20}
                         );
 
 
 =head1 DESCRIPTION
 
 GD::Barcode::QRcode is a subclass of GD::Barcode and allows you to
-create QRcode barcode image with GD.
+create QRcode barcode images with GD.
 This module based on "QRcode image CGI version 0.50 (C)2000-2002,Y.Swetake".
 
 =head2 new

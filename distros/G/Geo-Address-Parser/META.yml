@@ -4,6 +4,11 @@ author:
   - 'Nigel Horne <njh@nigelhorne.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Getopt::Long: '0'
+  IPC::Open3: '0'
+  JSON::MaybeXS: '0'
+  Pod::Usage: '0'
+  Symbol: '0'
   Test::DescribeMe: '0'
   Test::Most: '0'
   Test::Needs: '0'
@@ -24,10 +29,12 @@ requires:
   Carp: '0'
   Exporter: '0'
   Module::Runtime: '0'
-  perl: '5.008'
+  Params::Get: '0'
+  Text::Capitalize: '0'
+  perl: '5.014000'
 resources:
   bugtracker: https://github.com/nigelhorne/Geo-Address-Parser/issues
   homepage: https://metacpan.org/pod/Geo::Address::Parser
   repository: git://github.com/nigelhorne/Geo-Address-Parser.git
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

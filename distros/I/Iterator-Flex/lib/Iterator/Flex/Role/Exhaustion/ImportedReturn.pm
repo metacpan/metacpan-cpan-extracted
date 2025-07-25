@@ -5,9 +5,9 @@ package Iterator::Flex::Role::Exhaustion::ImportedReturn;
 use strict;
 use warnings;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
-use Iterator::Flex::Utils qw( :default :RegistryKeys );
+use Iterator::Flex::Utils qw( :default REG_GENERAL REG_GP_INPUT_EXHAUSTION );
 
 use Role::Tiny;
 use experimental 'signatures';
@@ -23,7 +23,7 @@ use namespace::clean;
 
 
 sub imported_sentinel ( $self ) {
-    return $REGISTRY{ refaddr $self }{ +GENERAL }{ +INPUT_EXHAUSTION }[1];
+    return $REGISTRY{ refaddr $self }[REG_GENERAL][REG_GP_INPUT_EXHAUSTION][1];
 }
 
 1;
@@ -50,7 +50,7 @@ Iterator::Flex::Role::Exhaustion::ImportedReturn - Imported iterator returns a s
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 METHODS
 

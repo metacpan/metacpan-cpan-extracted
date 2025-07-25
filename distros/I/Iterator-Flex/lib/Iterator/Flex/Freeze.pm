@@ -6,10 +6,10 @@ use strict;
 use warnings;
 use experimental 'signatures';
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use Iterator::Flex::Factory;
-use Iterator::Flex::Utils qw( RETURN EXHAUSTION :IterAttrs :Methods );
+use Iterator::Flex::Utils qw( RETURN EXHAUSTION :IterAttrs :ExhaustedMethods );
 use parent 'Iterator::Flex::Base';
 use Scalar::Util;
 use Ref::Util;
@@ -51,16 +51,16 @@ use namespace::clean;
 
 sub new ( $class, $code, $iterator, $pars = {} ) {
 
-    $class->_throw( parameter => "'serialize' parameter is not a coderef" )
+    $class->_throw( parameter => q{'serialize' parameter is not a coderef} )
       unless Ref::Util::is_coderef( $code );
 
     $class->_throw( parameter => "iterator (@{[ $iterator->_name ]}) must provide a freeze method" )
-      unless $class->_can_meth( $iterator, +FREEZE );
+      unless $class->_can_meth( $iterator, FREEZE );
 
     $class->_throw(
         parameter => "iterator (@{[ $iterator->_name ]}) must provide set_exhausted/is_exhausted methods" )
-      unless $class->_can_meth( $iterator, +SET_EXHAUSTED )
-      && $class->_can_meth( $iterator, +IS_EXHAUSTED );
+      unless $class->_can_meth( $iterator, SET_EXHAUSTED )
+      && $class->_can_meth( $iterator, IS_EXHAUSTED );
 
     $class->SUPER::new( { serialize => $code, src => $iterator }, $pars );
 }
@@ -68,17 +68,17 @@ sub new ( $class, $code, $iterator, $pars = {} ) {
 
 sub construct ( $class, $state ) {
 
-    $class->_throw( parameter => "'state' parameter must be a HASH reference" )
+    $class->_throw( parameter => q{'state' parameter must be a HASH reference} )
       unless Ref::Util::is_hashref( $state );
 
     my ( $serialize, $src ) = @{$state}{qw( serialize src )};
 
-    $class->_throw( parameter => "'serialize' must be a CODE reference" )
+    $class->_throw( parameter => q{'serialize' must be a CODE reference} )
       unless Ref::Util::is_coderef( $serialize );
 
     # wrap the source iterator so that it returns undef on exhaustion.
     $src
-      = Iterator::Flex::Factory->to_iterator( $src, { ( +EXHAUSTION ) => +RETURN } );
+      = Iterator::Flex::Factory->to_iterator( $src, { ( +EXHAUSTION ) => RETURN } );
 
     my $self;
     my %params = (
@@ -98,7 +98,7 @@ sub construct ( $class, $state ) {
 
     Scalar::Util::weaken $src;
     $params{ +_ROLES } = [];
-    for my $meth ( +PREV, +CURRENT, +REWIND, +RESET ) {
+    for my $meth ( PREV, CURRENT, REWIND, RESET ) {
         next unless $src->may( $meth );
         my $sub = $src->can( $meth );
         Scalar::Util::weaken $sub;
@@ -110,8 +110,8 @@ sub construct ( $class, $state ) {
         my $Umeth = ucfirst $meth;
         my $role;
         for my $suffix ( 'Closure', 'Method' ) {
-            $role = eval { $class->_load_role( $suffix ? $Umeth . '::' . $suffix : $Umeth ); };
-            next if $@ ne '';
+            $role = eval { $class->_load_role( $suffix ? $Umeth . q{::} . $suffix : $Umeth ); };
+            next if $@ ne q{};
             last if $src->does( $role );
             undef $role;
         }
@@ -121,7 +121,7 @@ sub construct ( $class, $state ) {
 
 
         # need '+' as role names are fully qualified
-        push $params{ +_ROLES }->@*, '+' . $role;
+        push $params{ +_ROLES }->@*, q{+} . $role;
     }
 
 
@@ -157,7 +157,7 @@ Iterator::Flex::Freeze - Freeze an iterator after every next
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 METHODS
 

@@ -195,7 +195,12 @@ original C<$mv>.
 =head2 compare
 
 B<!!WARNING!!>: The results of this comparison method can be used to leak
-information about the protected memory.
+information about the protected memory. If one can make arbitrary comparisons
+and has any visibility to the result, the protected data can be determined in
+(nbits - trailing_zero_bits) iterations! For a 256-bit key, that means it takes
+no more than 256 tries to extract the key. This method is fixed-time, but the
+only safe use of the result is whether it equals 0 or not, and L</memcmp> is a
+better way to determine equality.
 
   $mv->compare($bytes, $size);
   $mv->compare($other_mv, $size);

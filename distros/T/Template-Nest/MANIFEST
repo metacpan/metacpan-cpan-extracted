@@ -10,6 +10,7 @@ t/03_params.t
 t/04_indent.t
 t/05_escapes.t
 t/06_bad_params.t
+t/07_token_placeholder.t
 t/templates/escapes.html
 t/templates/escapes_e.html
 t/templates/nested_default_contents.html

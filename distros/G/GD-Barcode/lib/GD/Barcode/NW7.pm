@@ -6,7 +6,7 @@ use GD::Barcode;
 use parent qw(Exporter);
 use vars qw($VERSION @ISA $errStr);
 @ISA     = qw(GD::Barcode Exporter);
-our $VERSION = '2.00';
+our $VERSION = '2.01';
 my $nw7Bar = {
     '0' => '0000011',
     '1' => '0000110',

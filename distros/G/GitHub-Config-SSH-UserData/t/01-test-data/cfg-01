@@ -1,0 +1,54 @@
+
+Host github-ALL-ITEMS
+#  User: John Doe <main@addr.xy> <foo@bar> additional data
+   HostName github.com
+   IdentityFile ~/.ssh/abc
+   IdentitiesOnly yes
+
+
+Host github-minimal
+#  User: <main@addr.xy>
+   HostName github.com
+   IdentityFile ~/.ssh/mini
+   IdentitiesOnly yes
+
+Host github-std
+#  User: Jonny Controlletti <main-jc@addr.xy>
+   HostName github.com
+   IdentityFile ~/.ssh/std
+   IdentitiesOnly yes
+
+Host github-std-data
+#  User: Alexander Platz <AlexPl@addr.xy> more data
+   HostName github.com
+   IdentityFile ~/.ssh/aaaaa
+   IdentitiesOnly yes
+
+Host github-no-email
+#  User: John Smith
+   HostName github.com
+   IdentityFile ~/.ssh/bbbbbbb
+   IdentitiesOnly yes
+
+Host github-no-User-comment
+   HostName github.com
+   IdentityFile ~/.ssh/ccccccccc
+   IdentitiesOnly yes
+
+
+Host github-duplicate
+   HostName github.com
+   IdentityFile ~/.ssh/d1
+   IdentitiesOnly yes
+
+
+Host github-duplicate
+   HostName github.com
+   IdentityFile ~/.ssh/d2
+   IdentitiesOnly yes
+
+Host github-foo
+   HostName github.com
+   IdentityFile ~/.ssh/foo
+   IdentitiesOnly yes
+

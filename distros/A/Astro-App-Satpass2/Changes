@@ -1,3 +1,9 @@
+0.057		2025-07-24	T. R. Wyant
+    Fix error handling in height() command and add testing to try to
+    ensure it stays fixed.
+
+    Add CONTRIBUTING and SECURITY.
+
 0.056		2025-05-24	T. R. Wyant
     Do not set iridium_status_format on Astro::SpeceTrack when
     constructing a new object. This attribute was eliminated when the

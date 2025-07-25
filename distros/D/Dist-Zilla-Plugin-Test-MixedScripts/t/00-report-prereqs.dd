@@ -28,6 +28,7 @@ do { my $x = {
                                       'Test::Pod::Coverage' => '1.08',
                                       'Test::Pod::LinkCheck' => '0',
                                       'Test::Portability::Files' => '0',
+                                      'Test::Spelling' => '0.17',
                                       'Test::TrailingSpace' => '0.0203',
                                       'Test::Vars' => '0.015'
                                     }
@@ -60,10 +61,10 @@ do { my $x = {
                                    'File::pushd' => '0',
                                    'FindBin' => '0',
                                    'Module::Metadata' => '1.000015',
+                                   'Test2::V0' => '0',
                                    'Test::DZil' => '0',
-                                   'Test::Deep' => '0',
-                                   'Test::MixedScripts' => 'v0.2.0',
-                                   'Test::More' => '1.302200',
+                                   'Test::MixedScripts' => 'v0.3.0',
+                                   'Test::More' => '0',
                                    'Test::Warnings' => '0.009',
                                    'strict' => '0'
                                  }

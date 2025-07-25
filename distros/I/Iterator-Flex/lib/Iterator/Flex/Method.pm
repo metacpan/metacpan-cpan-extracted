@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use experimental 'signatures';
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 # Package::Variant based modules generate constructor functions
 # dynamically when those modules are imported.  However, loading the
@@ -21,9 +21,10 @@ our $VERSION = '0.19';
 
 Iterator::Flex::Method::Maker->import;
 
+## no critic( MultiplePackages )
 package Iterator::Flex::Method::Maker {
 
-    use Iterator::Flex::Utils qw( :default ITERATOR METHODS );
+    use Iterator::Flex::Utils qw( :default REG_ITERATOR REG_ITER_METHODS );
     use Package::Variant importing => qw[ Role::Tiny ];
     use Module::Runtime;
 
@@ -36,6 +37,7 @@ package Iterator::Flex::Method::Maker {
             Iterator::Flex::Failure::RoleExists->throw( { payload => $package } );
         }
 
+        ## no critic (Require LocalizedPunctuationVars )
         $INC{ Module::Runtime::module_notional_filename( $package ) } = 1;
         return $package;
     }
@@ -43,7 +45,7 @@ package Iterator::Flex::Method::Maker {
     sub make_variant ( $, $, $, %arg ) {
         my $name = $arg{name};
         install $name => sub {
-            return $REGISTRY{ refaddr $_[0] }{ +ITERATOR }{ +METHODS }{$name}->( @_ );
+            return $REGISTRY{ refaddr $_[0] }[REG_ITERATOR][REG_ITER_METHODS]{$name}->( @_ );
         };
     }
 }
@@ -72,7 +74,7 @@ Iterator::Flex::Method - Compartmentalize Iterator::Flex::Method::Maker
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 INTERNALS
 

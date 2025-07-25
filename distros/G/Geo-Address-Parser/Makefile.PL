@@ -12,26 +12,33 @@ if($^O eq 'darwin') {
 }
 
 WriteMakefile(
-	NAME		 => 'Geo::Address::Parser',
+	NAME => 'Geo::Address::Parser',
 	VERSION_FROM => 'lib/Geo/Address/Parser.pm', # finds $VERSION
-	AUTHOR	 => 'Nigel Horne <njh@nigelhorne.com>',
+	AUTHOR => 'Nigel Horne <njh@nigelhorne.com>',
 	ABSTRACT_FROM => 'lib/Geo/Address/Parser.pm',
 	((defined($ExtUtils::MakeMaker::VERSION) && ($ExtUtils::MakeMaker::VERSION >= 6.3002))
 		? ('LICENSE'=> 'GPL')
 		: ()),
 	CONFIGURE_REQUIRES => {
 		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
-
-	}, PREREQ_PM => {
-		'Carp'		 => 0,
+	}, EXE_FILES => ['bin/geo-parse'],
+	PREREQ_PM => {
+		'Carp' => 0,
+		'Exporter' => 0,
 		'Module::Runtime' => 0,
-		'Exporter'	 => 0,
+		'Params::Get' => 0,
+		'Text::Capitalize' => 0,
 	}, TEST_REQUIRES => {
+		'Getopt::Long' => 0,
+		'IPC::Open3' => 0,
+		'JSON::MaybeXS' => 0,
+		'Pod::Usage' => 0,
+		'Symbol' => 0,
 		'Test::DescribeMe' => 0,
 		'Test::Most' => 0,
 		'Test::Needs' => 0,
 	}, dist => $dist,
-	clean	 => { FILES => 'Geo-Address-Parser-*' },
+	clean => { FILES => 'Geo-Address-Parser-*' },
 	META_MERGE => {	# https://perldoc.perl.org/CPAN::Meta::Spec
 		'meta-spec' => { version => 2 },
 		resources => {
@@ -50,5 +57,5 @@ WriteMakefile(
 			}
 		},
 	},
-	MIN_PERL_VERSION => '5.008'
+	MIN_PERL_VERSION => '5.14.0'
 );

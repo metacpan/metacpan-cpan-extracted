@@ -1,5 +1,6 @@
 Build.PL
 Changes
+CONTRIBUTING
 eg/almanac
 eg/es.pm
 eg/flare_vcalendar
@@ -57,6 +58,7 @@ META.json
 META.yml
 README
 script/satpass2
+SECURITY
 t/basic.t
 t/complete.t
 t/data.tle

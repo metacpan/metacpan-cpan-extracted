@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use experimental qw( signatures declared_refs refaliasing );
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use Iterator::Flex::Utils qw( RETURN STATE EXHAUSTION :IterAttrs :IterStates );
 use Iterator::Flex::Factory;
@@ -60,20 +60,22 @@ sub new ( $class, @args ) {
 }
 
 sub construct ( $class, $state ) {
-    $class->_throw( parameter => "state must be a HASH reference" )
+    $class->_throw( parameter => q{state must be a HASH reference} )
       unless Ref::Util::is_hashref( $state );
 
     $state->{value} //= [];
 
-    my ( \@depends, $prev, $current, $next, $thaw )
+    my ( \@depends, $prev, $current, undef, undef )
       = @{$state}{ 'depends', 'prev', 'current', 'next', 'thaw' };
 
     # transform into iterators if required.
     my @stack
-      = map { Iterator::Flex::Factory->to_iterator( $_, { ( +EXHAUSTION ) => +RETURN } ) } @depends;
-    my $value;
-    $value = $current
-      if $thaw;
+      = map { Iterator::Flex::Factory->to_iterator( $_, { ( +EXHAUSTION ) => RETURN } ) } @depends;
+
+    # --- cargo cult??
+    # my $value;
+    # $value = $current
+    #   if $thaw;
 
     my $self;
     my $iterator_state;
@@ -84,7 +86,7 @@ sub construct ( $class, $state ) {
         ( +STATE ) => \$iterator_state,
 
         ( +NEXT ) => sub {
-            return $self->signal_exhaustion if $iterator_state == +IterState_EXHAUSTED;
+            return $self->signal_exhaustion if $iterator_state == IterState_EXHAUSTED;
 
             while ( @stack ) {
                 my $iter  = $stack[0];
@@ -119,12 +121,12 @@ sub construct ( $class, $state ) {
         ( +METHODS ) => {
             push => sub ( $, @iters ) {
                 push @stack,
-                  map { Iterator::Flex::Factory->to_iterator( $_, { ( +EXHAUSTION ) => +RETURN } ) } @iters;
+                  map { Iterator::Flex::Factory->to_iterator( $_, { ( +EXHAUSTION ) => RETURN } ) } @iters;
             },
             pop     => sub ($) { return CORE::pop( @stack ); },
             unshift => sub ( $, @iters ) {
                 unshift @stack,
-                  map { Iterator::Flex::Factory->to_iterator( $_, { ( +EXHAUSTION ) => +RETURN } ) } @iters;
+                  map { Iterator::Flex::Factory->to_iterator( $_, { ( +EXHAUSTION ) => RETURN } ) } @iters;
             },
             shift => sub ($) { return CORE::shift( @stack ); },
         },
@@ -167,7 +169,7 @@ Iterator::Flex::Stack - An iterator which concatenates a set of iterators
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 METHODS
 

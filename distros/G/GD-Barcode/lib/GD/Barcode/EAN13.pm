@@ -5,7 +5,7 @@ use warnings;
 
 use GD::Barcode;
 
-our $VERSION = '2.00';
+our $VERSION = '2.01';
 use parent qw(Exporter);
 use vars qw($VERSION @ISA $errStr);
 @ISA     = qw(GD::Barcode Exporter);

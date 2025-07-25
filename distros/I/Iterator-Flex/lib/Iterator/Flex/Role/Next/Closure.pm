@@ -5,7 +5,7 @@ package Iterator::Flex::Role::Next::Closure;
 use strict;
 use warnings;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use Iterator::Flex::Utils 'NEXT';
 use Scalar::Util;
@@ -30,12 +30,12 @@ use namespace::clean;
 sub _construct_next ( $class, $ipar, $ ) {
 
     # ensure we don't hold any strong references in the subroutine
-    my $sub = $ipar->{ +NEXT } // $class->_throw( parameter => "Missing 'next' parameter" );
+    my $sub = $ipar->{ +NEXT } // $class->_throw( parameter => q{Missing 'next' parameter} );
     Scalar::Util::weaken $ipar->{ +NEXT };
     return $sub;
 }
 
-sub next ( $self ) { &{$self}() }
+sub next ( $self ) { &{$self}() }    ## no critic (BuiltinHomonyms)
 *__next__ = \&next;
 
 1;
@@ -62,7 +62,7 @@ Iterator::Flex::Role::Next::Closure - Construct a next() method for iterators wi
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 METHODS
 

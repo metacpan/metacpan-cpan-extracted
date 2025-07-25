@@ -38,6 +38,7 @@ our @EXPORT = qw{
     invocant
     klass
     load_or_skip
+    mock_usgs
     normalize_path
     same_path
     setup_app_mocker
@@ -105,6 +106,8 @@ sub invocant {
 
 sub check_access {
     my ( $url ) = @_;
+
+    local $@ = undef;
 
     eval {
 	require LWP::UserAgent;
@@ -267,6 +270,7 @@ sub _dtz_to_epoch {
 sub __dump_zones {
     my ( $time_tested ) = @_;
 
+    local $@ = undef;
     if ( eval { require DateTime; 1; } ) {
 	diag 'Have DateTime ', DateTime->VERSION();
     } else {
@@ -366,7 +370,15 @@ sub execute {	## no critic (RequireArgUnpacking)
     sub call_m {	## no critic (RequireArgUnpacking)
 	my ( $method, @args ) = @_;
 	my ( $want, $title ) = splice @args, -2;
-	if ( eval { $got = $app->$method( @args ); 1 } ) {
+
+	if ( defined( my $err = dies { $got = $app->$method( @args ) } ) ) {
+	    chomp $err;
+	    defined $want or $want = 'Unexpected error';
+	    REGEXP_REF eq ref $want
+		or $want = qr<\A\Q$want>smx;
+	    @_ = ( $err, $want, $title );
+	    goto &like;
+	} else {
 
 	    if ( CODE_REF eq ref $want ) {
 		@_ = ( $want, $got, $title );
@@ -378,14 +390,6 @@ sub execute {	## no critic (RequireArgUnpacking)
 	    }
 	    @_ = ( $got, $want, $title );
 	    REGEXP_REF eq ref $want ? goto &like : goto &is;
-	} else {
-	    $got = $@;
-	    chomp $got;
-	    defined $want or $want = 'Unexpected error';
-	    REGEXP_REF eq ref $want
-		or $want = qr<\Q$want>smx;
-	    @_ = ( $got, $want, $title );
-	    goto &like;
 	}
     }
 
@@ -434,6 +438,7 @@ sub execute {	## no critic (RequireArgUnpacking)
 		# ExtUtils::MakeMaker) to find the version without actually
 		# loading the module.
 		my $installed;
+		local $@ = undef;
 		eval {
 		    require $file;
 		    $installed = $module->VERSION();
@@ -455,6 +460,29 @@ sub execute {	## no critic (RequireArgUnpacking)
 
 	return @tables;
     }
+}
+
+sub mock_usgs {
+    my ( $ele ) = @_;
+    my $attr = {
+	error	=> ( defined( $ele ) ?
+	    'Unexpected error' :
+	    'Forced error for testing' ),
+    };
+    return mock 'Geo::WebService::Elevation::USGS' => (
+	override	=> [
+	    elevation	=> sub { return {
+		    Elevation	=> $ele,
+		    Units	=> 'Meters',
+		} },
+	    get		=> sub {
+		my ( undef, $name ) = @_;
+		exists $attr->{$name}
+		    or confess "Bug - Attribute '$name' not mocked";
+		return $attr->{$name};
+	    },
+	],
+    );
 }
 
 {

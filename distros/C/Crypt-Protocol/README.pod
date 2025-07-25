@@ -20,4 +20,6 @@ L<Crypt::Protocol::SIGMA>
 
 L<Crypt::Protocol::SPAKE2Plus> 
 
+L<Crypt::Protocol::SPEKE> 
+
 =cut

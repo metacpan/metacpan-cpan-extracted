@@ -12,36 +12,35 @@ my $state_re = qr/\b(ACT|NSW|NT|QLD|SA|TAS|VIC|WA)\b/i;
 my $postcode_re = qr/\b(\d{4})\b/;
 
 sub parse_address {
-    my ($class, $text) = @_;
-    return unless defined $text;
+	my ($class, $text) = @_;
+	return unless defined $text;
 
-    my @parts = map { s/^\s+|\s+$//gr } split /,/, $text;
+	my @parts = map { s/^\s+|\s+$//gr } split /,/, $text;
 
-    my ($name, $street, $suburb, $state, $postcode);
+	my ($name, $street, $suburb, $state, $postcode);
 
-    # Match state + postcode at end
-    if ($parts[-1] =~ /$state_re\s*$postcode_re/) {
-        $state    = uc($1);
-        $postcode = $2;
-        pop @parts;
-    }
-    # Match state only
-    elsif ($parts[-1] =~ /^$state_re$/) {
-        $state = uc($1);
-        pop @parts;
-    }
+	# Match state + postcode at end
+	if ($parts[-1] =~ /$state_re\s*$postcode_re/) {
+		$state = uc($1);
+		$postcode = $2;
+		pop @parts;
+	} elsif ($parts[-1] =~ /^$state_re$/) {
+		# Match state only
+		$state = uc($1);
+		pop @parts;
+	}
 
-    $suburb = pop @parts if @parts;
-    $street = pop @parts if @parts;
-    $name   = join(', ', @parts) if @parts;
+	$suburb = pop @parts if @parts;
+	$street = pop @parts if @parts;
+	$name = join(', ', @parts) if @parts;
 
-    return {
-        name     => $name,
-        street   => $street,
-        suburb   => $suburb,
-        region   => $state,
-        postcode => $postcode,
-    };
+	return {
+		name => $name,
+		street => $street,
+		suburb => $suburb,
+		region => $state,
+		postcode => $postcode,
+	};
 }
 
 1;

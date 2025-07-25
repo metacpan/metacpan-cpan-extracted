@@ -5,13 +5,13 @@ package Iterator::Flex::Role::Reset::Closure;
 use strict;
 use warnings;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use Scalar::Util;
 use List::Util;
 
 use Iterator::Flex::Base  ();
-use Iterator::Flex::Utils qw( :default ITERATOR RESET );
+use Iterator::Flex::Utils qw( :default REG_ITERATOR REG_ITER_RESET );
 use Role::Tiny;
 use experimental 'signatures';
 
@@ -27,10 +27,10 @@ use namespace::clean;
 
 
 
-sub reset ( $self ) {
+sub reset ( $self ) {    ## no critic (BuiltinHomonyms)
     $self->_apply_method_to_depends( 'reset' );
 
-    $REGISTRY{ refaddr $self }{ +ITERATOR }{ +RESET }->( $self );
+    $REGISTRY{ refaddr $self }[REG_ITERATOR][REG_ITER_RESET]->( $self );
     $self->_clear_state;
 
     return;
@@ -63,7 +63,7 @@ Iterator::Flex::Role::Reset::Closure - Implement C<reset> as a closure stored in
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 METHODS
 

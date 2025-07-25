@@ -15,7 +15,7 @@ issues, comments, and any other contributions to this project.
 
 See [AI Contributions](#ai-contributions) below for more more details.
 
-## Report Bugs and Submit Feature Requests
+## Reporting Bugs and Submiting Feature Requests
 
 Please report any bugs or feature requests on the bugtracker website
 [https://github.com/robrwo/perl-Test2-Util-DistFiles/issues](https://github.com/robrwo/perl-Test2-Util-DistFiles/issues).
@@ -30,8 +30,8 @@ Robert Rothenberg <rrwo@cpan.org>.
 
 ### Reporting Security Vulnerabilities
 
-Security issues should not be reported on the bugtracker website. Please see
-`SECURITY.md` for instructions how to report security vulnerabilities.
+If the bug you are reporting has security implications which make it inappropriate to send to a public issue tracker,
+then see `SECURITY.md` for instructions how to report security vulnerabilities.
 
 ## Submitting Patches
 

@@ -1,0 +1,6 @@
+
+Host github-no-email
+#  User: John Smith
+   HostName github.com
+   IdentityFile ~/.ssh/bbbbbbb
+   IdentitiesOnly yes

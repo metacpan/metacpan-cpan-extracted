@@ -222,6 +222,8 @@ t/industrial2of5.t
 t/itf.t
 t/matrix2of5.t
 t/nw7.t
+t/plot.t
+t/qrcode-image.t
 t/qrcode.t
 t/upca.t
 t/upce.t

@@ -4,7 +4,7 @@ Text::Minify::XS - Remove indentation and trailing whitespace from multi-line te
 
 # VERSION
 
-version v0.7.6
+version v0.7.7
 
 # SYNOPSIS
 
@@ -56,15 +56,9 @@ This is a version of ["minify"](#minify) that works on ASCII text. It was added 
 If you are only processing 8-bit text, then it should be faster.
 (Rudimentary benchmarks show it is twice as fast as ["minify"](#minify).)
 
-Unlike the ["minify"](#minify), if the input string has the UTF-8 flag set, the
+Unlike ["minify"](#minify), if the input string has the UTF-8 flag set, the
 resulting string will not.  You should ensure the string is properly
 encoded.
-
-# SUPPORT FOR OLDER PERL VERSIONS
-
-Since v0.7.0, this module requires Perl v5.14 or later.
-
-Future releases may only support Perl versions released in the last ten (10) years.
 
 # KNOWN ISSUES
 
@@ -75,17 +69,24 @@ output.  In extreme cases it may throw an exception in order to avoid
 memory overflows. You should ensure that the input string is properly
 encoded as UTF-8.
 
-# SEE ALSO
+## Byte Order Marks
 
-There are many string trimming and specialised whitespace/comment-removal modules on CPAN.
-It is not practical to include such a list.
+The Byte Order Mark (BOM) at the beginning of a file will not be removed. That is because the minifier does not know
+this is the beginning of a file or not.
 
-# SOURCE
+# SECURITY CONSIDERATIONS
 
-The development version is on github at [https://github.com/robrwo/Text-Minify-XS](https://github.com/robrwo/Text-Minify-XS)
-and may be cloned from [git://github.com/robrwo/Text-Minify-XS.git](git://github.com/robrwo/Text-Minify-XS.git)
+Passing malformed UTF-8 characters may throw an exception, which in some cases could lead to a denial of service if
+untrusted input is passed to ["minify\_utf8"](#minify_utf8).  See ["KNOWN ISSUES"](#known-issues).
 
-# BUGS
+# SUPPORT
+
+Only the latest version of this module will be supported.
+
+Since v0.7.0, this module requires Perl v5.14 or later.
+Future releases may only support Perl versions released in the last ten (10) years.
+
+## Reporting Bugs and Submitting Feature Requests
 
 Please report any bugs or feature requests on the bugtracker website
 [https://github.com/robrwo/Text-Minify-XS/issues](https://github.com/robrwo/Text-Minify-XS/issues)
@@ -94,10 +95,15 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
-## Reporting Security Vulnerabilities
+If the bug you are reporting has security implications which make it inappropriate to send to a public issue tracker,
+then see `SECURITY.md` for instructions how to report security vulnerabilities.
 
-Security issues should not be reported on the bugtracker website. Please see `SECURITY.md` for instructions how to
-report security vulnerabilities.
+# SOURCE
+
+The development version is on github at [https://github.com/robrwo/Text-Minify-XS](https://github.com/robrwo/Text-Minify-XS)
+and may be cloned from [git://github.com/robrwo/Text-Minify-XS.git](git://github.com/robrwo/Text-Minify-XS.git)
+
+See `CONTRIBUTING.md` for more information.
 
 # AUTHOR
 

@@ -1,5 +1,12 @@
 Revision history for Perl extension GD::Barcode.
 
+2.01 2025-07-24
+	- Fix unitialized value warning in QRcode.pm, contributed
+          by Dabe Murphy
+	- Documentation improvements
+        - Test improvements, fixed issue where ISBN::Barcode test missed
+          depencendy on GD, reported by eserte
+
 2.00 2023-09-13
         - 'Production' release, no changes to 1.99_03
 

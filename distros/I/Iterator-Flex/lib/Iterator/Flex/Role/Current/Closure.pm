@@ -5,9 +5,9 @@ package Iterator::Flex::Role::Current::Closure;
 use strict;
 use warnings;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
-use Iterator::Flex::Utils qw( :default ITERATOR CURRENT );
+use Iterator::Flex::Utils qw( :default REG_ITERATOR REG_ITER_CURRENT );
 use Role::Tiny;
 use experimental 'signatures';
 
@@ -24,7 +24,7 @@ use namespace::clean;
 
 
 sub current ( $self ) {
-    $REGISTRY{ refaddr $self }{ +ITERATOR }{ +CURRENT }->( $self );
+    $REGISTRY{ refaddr $self }[REG_ITERATOR][REG_ITER_CURRENT]->( $self );
 }
 *__current__ = \&current;
 
@@ -52,7 +52,7 @@ Iterator::Flex::Role::Current::Closure - Implement C<current> as a closure store
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 METHODS
 

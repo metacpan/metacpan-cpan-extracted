@@ -9,9 +9,9 @@ BEGIN {
 use strict;
 use warnings;
 
-# This test was generated with Dist::Zilla::Plugin::Test::MixedScripts v0.1.0.
+# This test was generated with Dist::Zilla::Plugin::Test::MixedScripts v0.1.4.
 
-use Test::More 1.302200;
+use Test2::Tools::Basic 1.302200;
 
 use Test::MixedScripts qw( file_scripts_ok );
 
@@ -33,6 +33,7 @@ my @files = (
     't/author-pod-syntax.t',
     't/author-portability.t',
     't/default-dir.t',
+    't/etc/perlcritic.rc',
     't/release-cpan-changes.t',
     't/release-dist-manifest.t',
     't/release-fixme.t',

@@ -1,8 +1,5 @@
 #!perl
 
-use v5.14;
-use warnings;
-
 BEGIN {
   unless ($ENV{AUTHOR_TESTING}) {
     print qq{1..0 # SKIP these tests are for testing by the author\n};
@@ -10,10 +7,9 @@ BEGIN {
   }
 }
 
-use Test2::V0;
 
-eval "use Test::Vars";
+use strict;
+use warnings;
 
-plan skip_all => "Test::Vars not installed" if $@;
-
-all_vars_ok();
+use Test::Perl::Critic (-profile => "t/etc/perlcritic.rc") x!! -e "t/etc/perlcritic.rc";
+all_critic_ok();

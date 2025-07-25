@@ -5,7 +5,7 @@ package Iterator::Flex::Role;
 use strict;
 use warnings;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use Role::Tiny;
 use experimental 'signatures';
@@ -23,7 +23,7 @@ require Iterator::Flex;
 
 
 
-sub icache ( $iter, $code ) { Iterator::Flex::icache( \&{$code}, $iter ) }
+sub icache ( $iter, $code, @args ) { Iterator::Flex::Common::icache( \&{$code}, $iter, @args ) }
 
 
 
@@ -33,7 +33,10 @@ sub icache ( $iter, $code ) { Iterator::Flex::icache( \&{$code}, $iter ) }
 
 
 
-sub igrep ( $iter, $code ) { Iterator::Flex::igrep( \&{$code}, $iter ) }
+
+
+
+sub igather ( $iter, $code, @args ) { Iterator::Flex::Common::igather( \&{$code}, $iter, @args ) }
 
 
 
@@ -43,7 +46,7 @@ sub igrep ( $iter, $code ) { Iterator::Flex::igrep( \&{$code}, $iter ) }
 
 
 
-sub imap ( $iter, $code ) { Iterator::Flex::imap( \&{$code}, $iter ) }
+sub igrep ( $iter, $code, @args ) { Iterator::Flex::Common::igrep( \&{$code}, $iter, @args ) }
 
 
 
@@ -53,7 +56,17 @@ sub imap ( $iter, $code ) { Iterator::Flex::imap( \&{$code}, $iter ) }
 
 
 
-sub ifreeze ( $iter, $code ) { Iterator::Flex::ifreeze( \&{$code}, $iter ) }
+sub imap ( $iter, $code, @args ) { Iterator::Flex::Common::imap( \&{$code}, $iter, @args ) }
+
+
+
+
+
+
+
+
+
+sub ifreeze ( $iter, $code, @args ) { Iterator::Flex::Common::ifreeze( \&{$code}, $iter, @args ) }
 
 1;
 
@@ -71,7 +84,7 @@ __END__
 
 =pod
 
-=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory igather
 
 =head1 NAME
 
@@ -79,7 +92,7 @@ Iterator::Flex::Role - Iterator Methods to add Iterator::Flex Iterator modifiers
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 METHODS
 
@@ -88,6 +101,12 @@ version 0.19
   $new_iter = $iter->icache( sub { ... } );
 
 Return a new iterator caching the original iterator via L<Iterator::Flex/icache>.
+
+=head2 igather
+
+  $new_iter = $iter->igather( sub { ... } );
+
+Return a new iterator modifying the original iterator via L<Iterator::Flex/igather>.
 
 =head2 igrep
 

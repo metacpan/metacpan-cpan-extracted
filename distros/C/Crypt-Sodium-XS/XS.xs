@@ -98,6 +98,10 @@
 
 #define SODIUM_MALLOC(size) (sodium_malloc(((size) + (size_t)63U) & ~(size_t)63U))
 
+#if IVSIZE < 8
+#define LESSTHAN64BITINT
+#endif
+
 /* fallback for pre-5.31.4 */
 #ifndef SvPVbyte_nomg
 #ifdef PERL_STATIC_INLINE

@@ -1,0 +1,41 @@
+GitHub-Config-SSH-UserData
+
+Read user data from comments in ssh config file.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc GitHub::Config::SSH::UserData
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=GitHub-Config-SSH-UserData
+
+    Search CPAN
+        https://metacpan.org/release/GitHub-Config-SSH-UserData
+
+    GitHub Repository
+        https://github.com/klaus-rindfrey/perl-github-config-ssh-userdata
+
+
+LICENSE AND COPYRIGHT
+
+This software is copyright (c) 2025 by Klaus Rindfrey.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+

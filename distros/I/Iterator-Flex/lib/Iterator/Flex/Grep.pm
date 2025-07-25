@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use experimental 'signatures';
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use Iterator::Flex::Factory;
 use Iterator::Flex::Utils qw[ THROW STATE EXHAUSTION :IterAttrs :IterStates ];
@@ -42,7 +42,7 @@ use namespace::clean;
 
 
 sub new ( $class, $code, $iterable, $pars = {} ) {
-    $class->_throw( parameter => "'code' parameter is not a coderef" )
+    $class->_throw( parameter => q{'code' parameter is not a coderef} )
       unless Ref::Util::is_coderef( $code );
 
     $class->SUPER::new( { code => $code, src => $iterable }, $pars );
@@ -51,13 +51,13 @@ sub new ( $class, $code, $iterable, $pars = {} ) {
 
 sub construct ( $class, $state ) {
 
-    $class->_throw( parameter => "'state' parameter must be a HASH reference" )
+    $class->_throw( parameter => q{'state' parameter must be a HASH reference} )
       unless Ref::Util::is_hashref( $state );
 
     my ( $code, $src ) = @{$state}{qw[ code src ]};
 
     $src
-      = Iterator::Flex::Factory->to_iterator( $src, { ( +EXHAUSTION ) => +THROW } );
+      = Iterator::Flex::Factory->to_iterator( $src, { ( +EXHAUSTION ) => THROW } );
 
     my $self;
     my $iterator_state;
@@ -71,16 +71,16 @@ sub construct ( $class, $state ) {
 
         ( +NEXT ) => sub {
             return $self->signal_exhaustion
-              if $iterator_state == +IterState_EXHAUSTED;
+              if $iterator_state == IterState_EXHAUSTED;
 
             my $ret = eval {
-                foreach ( ; ; ) {
+                while ( 1 ) {
                     my $rv = $src->();
                     local $_ = $rv;
                     return $rv if $code->();
                 }
             };
-            if ( $@ ne '' ) {
+            if ( $@ ne q{} ) {
                 die $@
                   unless Ref::Util::is_blessed_ref( $@ )
                   && $@->isa( 'Iterator::Flex::Failure::Exhausted' );
@@ -125,7 +125,7 @@ Iterator::Flex::Grep - Grep Iterator Class
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 METHODS
 

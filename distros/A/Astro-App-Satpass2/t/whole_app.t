@@ -7,6 +7,7 @@ use lib qw{ inc };
 use My::Module::Test::App;
 
 use Test2::V0;
+use Test2::Tools::LoadModule;
 use Astro::Coord::ECI::TLE;
 use Astro::Coord::ECI::Utils qw{ deg2rad };
 use Cwd qw{ cwd };
@@ -420,7 +421,22 @@ execute( 'echo Able \\',
     'Able was I, ere I saw Elba.',
     'Assembly of continued line.' );
 
-# TODO test height when/if implemented
+SKIP: {
+    load_module_or_skip 'Geo::WebService::Elevation::USGS';
+    my $usgs = mock_usgs( undef );
+    execute( 'height', qr{\AForced error\b}, 'height command, with error' );
+}
+
+SKIP: {
+    load_module_or_skip 'Geo::WebService::Elevation::USGS';
+    my $usgs = mock_usgs( 2 );
+
+    # DANGER WILL ROBINSON! ENCAPSULATION VIOLATION!
+    my $app = invocant();
+    local $app->{height} = 42;	# So we know that we changed it.
+    execute( 'height', 'set height 2', 'height command, no error' );
+}
+
 # TODO test help when/if implemented
 
 execute( 'list', undef, 'The list command, with an empty list' );
@@ -1374,9 +1390,9 @@ EOD
 
 }
 
-execute( 'perl -eval Fubar', '"Fubar"', 'perl -eval' );
+execute( 'perl --eval Fubar', q/Failed to eval 'Fubar'/, 'perl --eval' );
 
-execute( 'perl t/whole_app_file', 'OK', 'perl -noeval' );
+execute( 'perl t/whole_app_file', 'OK', 'perl --no-eval' );
 
 call_m( __TEST__frame_stack_depth => 1, 'Object frame stack is clean' );
 

@@ -6,7 +6,7 @@ use v5.14;
 use warnings;
 
 use Carp                    qw( croak );
-use Cwd                     qw( cwd chdir );
+use Cwd::Guard              qw( cwd_guard );
 use Exporter 5.57           qw( import );
 use ExtUtils::Manifest 1.68 qw( manifind maniread maniskip );
 use File::Basename          qw( basename );
@@ -18,7 +18,7 @@ use Ref::Util qw( is_plain_hashref );
 
 our @EXPORT_OK = qw( manifest_files is_perl_file );
 
-our $VERSION = 'v0.2.0';
+our $VERSION = 'v0.2.1';
 
 
 sub manifest_files {
@@ -30,10 +30,9 @@ sub manifest_files {
 
     my $filter = shift || $nop;
 
-    my $cwd;
+    my $guard;
     if ( my $dir = $options->{dir} ) {
-        $cwd = cwd();
-        chdir($dir) or croak "Cannot chdir to ${dir}";
+        $guard = cwd_guard($dir) or croak "Cannot chdir to ${dir}: $Cwd::Guard::Error";
     }
 
     $options->{use_default} //= 1;
@@ -67,7 +66,7 @@ sub manifest_files {
 
     my $skip = maniskip;
 
-    chdir($cwd) if defined $cwd;
+    $guard = undef;
 
     my @files = grep { !$skip->($_) && $default->($_) && $filter->($_) } sort keys %{$found};
     return File::Spec->no_upwards(@files);
@@ -101,7 +100,7 @@ Test2::Util::DistFiles - Gather a list of files in a distribution
 
 =head1 VERSION
 
-version v0.2.0
+version v0.2.1
 
 =head1 SYNOPSIS
 
@@ -164,7 +163,16 @@ L<Test::XTFiles>
 The development version is on github at L<https://github.com/robrwo/perl-Test2-Util-DistFiles>
 and may be cloned from L<git://github.com/robrwo/perl-Test2-Util-DistFiles.git>
 
-=head1 BUGS
+See F<CONTRIBUTING.md> for more information.
+
+=head1 SUPPORT
+
+Only the latest version of this module will be supported.
+
+This module requires Perl v5.14 or later.  Future releases may only support Perl versions released in the last ten
+years.
+
+=head2 Reporting Bugs and Submitting Feature Requests
 
 Please report any bugs or feature requests on the bugtracker website
 L<https://github.com/robrwo/perl-Test2-Util-DistFiles/issues>
@@ -173,10 +181,8 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
-=head2 Reporting Security Vulnerabilities
-
-Security issues should not be reported on the bugtracker website. Please see F<SECURITY.md> for instructions how to
-report security vulnerabilities
+If the bug you are reporting has security implications which make it inappropriate to send to a public issue tracker,
+then see F<SECURITY.md> for instructions how to report security vulnerabilities.
 
 =head1 AUTHOR
 

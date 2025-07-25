@@ -1,0 +1,54 @@
+---
+abstract: 'add a Code of Conduct to a distribution'
+author:
+  - 'Robert Rothenberg <rrwo@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '7.22'
+  File::Spec: '0'
+  Module::Metadata: '1.000015'
+  Path::Tiny: '0'
+  Software::License::Perl_5: '0.011'
+  Test::DZil: '0'
+  Test::Deep: '0'
+  Test::More: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - community
+  - documentation
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-CodeOfConduct
+provides:
+  Dist::Zilla::Plugin::CodeOfConduct:
+    file: lib/Dist/Zilla/Plugin/CodeOfConduct.pm
+    version: v0.1.0
+requires:
+  Dist::Zilla::File::InMemory: '0'
+  Dist::Zilla::Pragmas: '0'
+  Dist::Zilla::Role::FileGatherer: '0'
+  Dist::Zilla::Role::FilePruner: '0'
+  Dist::Zilla::Role::PrereqSource: '0'
+  Email::Address: '1.910'
+  Moose: '0'
+  MooseX::Types::Common::String: '0'
+  MooseX::Types::Moose: '0'
+  MooseX::Types::Perl: '0'
+  Software::Policy::CodeOfConduct: v0.4.0
+  experimental: '0'
+  namespace::autoclean: '0'
+  perl: v5.20.0
+resources:
+  bugtracker: https://github.com/robrwo/perl-Dist-Zilla-Plugin-CodeOfConduct/issues
+  repository: git://github.com/robrwo/perl-Dist-Zilla-Plugin-CodeOfConduct.git
+version: v0.1.0
+x_authority: cpan:RRWO
+x_generated_by_perl: v5.34.3
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

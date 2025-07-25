@@ -1,5 +1,29 @@
 Revision history for Iterator-Flex
 
+0.20      2025-07-24 21:20:01-04:00 America/New_York
+
+  [ENHANCEMENT]
+
+    * iterators now have a drain method.
+
+    * New iterator adapter, Gather, allows for gathering selected
+      elements into a buffer, returning the buffer, repeating. see
+      Iterator::Flex::Common/igather, Iterator::Flex::Gather
+
+  [BUG FIX]
+
+    * iterator ->may() method always returned true; now it does what's
+      on the tin.
+
+    * several of the iterator wrappers had incorrect prototypes and didn't
+      pass all of their args to the iterator constructors.
+
+  [INTERNALS]
+
+    * Iterator state is now tracked in the iterator registry using
+      arrays instead of hashes.
+
+
 0.19      2025-06-19 12:19:18-04:00 America/New_York
 
   [DOCUMENTATION]

@@ -4,7 +4,7 @@ Geo::Address::Parser - Lightweight country-aware address parser from flat text
 
 # VERSION
 
-Version 0.01
+Version 0.02
 
 # SYNOPSIS
 

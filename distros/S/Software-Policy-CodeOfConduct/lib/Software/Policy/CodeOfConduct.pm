@@ -10,13 +10,13 @@ use File::ShareDir qw( dist_file );
 use Path::Tiny 0.018 qw( cwd path );
 use Text::Template 1.48;
 use Text::Wrap    qw( wrap $columns );
-use Types::Common qw( InstanceOf Maybe NonEmptyStr NonEmptySimpleStr PositiveInt );
+use Types::Common qw( InstanceOf Maybe NonEmptyStr NonEmptySimpleStr PositiveOrZeroInt );
 
 use experimental qw( lexical_subs signatures );
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.3.1';
+our $VERSION = 'v0.5.0';
 
 
 has policy => (
@@ -26,9 +26,9 @@ has policy => (
 
 
 has name => (
-    is        => 'ro',
-    isa       => Maybe [NonEmptySimpleStr],
-    predicate => 1,
+    is      => 'ro',
+    isa     => Maybe [NonEmptySimpleStr],
+    default => sub { return undef },
 );
 
 
@@ -80,14 +80,15 @@ has _template => (
 
 has text_columns => (
     is      => 'ro',
-    isa     => PositiveInt,
+    isa     => PositiveOrZeroInt,
     default => 78,
 );
 
 
-has text => (
+has fulltext => (
     is      => 'lazy',
     isa     => NonEmptyStr,
+    init_arg => undef,
     builder => sub($self) {
         state $c = 1;
         my $pkg = __PACKAGE__ . "::Run_" . $c++;
@@ -96,7 +97,7 @@ has text => (
             STRICT  => 1,
             BROKEN  => sub(%args) { die $args{error} },
             HASH    => {
-                name    => $self->name,
+                name    => $self->name // "",
                 contact => $self->contact,
                 entity  => $self->entity,
                 Entity  => $self->Entity,
@@ -105,15 +106,18 @@ has text => (
 
         $columns = $self->text_columns;
         my sub _wrap($line) {
+            return $line unless $columns;
             return $line if $line =~ /^[ ]{4}/; # ignore preformatted code
             return wrap( "", $line =~ /^[\*\-](?![\*\-]) ?/ ? "  " : "", $line =~ s/[ ][ ]+/ /gr );
         }
 
         my @lines = map { _wrap($_) } split /\n/, $raw;
         return join( "\n", @lines );
-
     }
 );
+
+
+*text = \&fulltext;
 
 
 has filename => (
@@ -127,7 +131,7 @@ sub save($self, $dir = undef) {
 
 
     my $path = path( $dir // cwd, $self->filename );
-    $path->spew_raw( $self->text );
+    $path->spew_raw( $self->fulltext );
     return $path;
 }
 
@@ -146,7 +150,9 @@ Software::Policy::CodeOfConduct - generate a Code of Conduct policy
 
 =head1 VERSION
 
-version v0.3.1
+version v0.5.0
+
+=for stopwords fulltext
 
 =head1 SYNOPSIS
 
@@ -194,10 +200,6 @@ If you want to use a custom policy, specify the L</template_path>.
 
 This is the (optional) name of the project that the code of conduct is for,
 
-=head2 has_name
-
-True if there is a name.
-
 =head2 contact
 
 The is the contact for the project team about the code of conduct. It should be an email address or a URL.
@@ -222,11 +224,9 @@ This should be a L<Text::Template> template file.
 
 This is the number of text columns for word-wrapping the L</text>.
 
+A value of C<0> disables word wrapping.
+
 The default is C<78>.
-
-=head2 text
-
-This is the text generated from the template.
 
 =head2 filename
 
@@ -236,6 +236,14 @@ This defaults to F<CODE_OF_CONDUCT.md>.
 
 =head1 METHODS
 
+=head2 fulltext
+
+This is the text generated from the template.
+
+=head2 text
+
+This is a deprecated alias for L</fulltext>.
+
 =head2 save
 
     my $path = $policy->save( $dir );
@@ -243,11 +251,6 @@ This defaults to F<CODE_OF_CONDUCT.md>.
 This saves a file named L</filename> in directory C<$dir>.
 
 If C<$dir> is omitted, then it will save the file in the current directory.
-
-=head1 SOURCE
-
-The development version is on github at L<https://github.com/robrwo/perl-Software-Policy-CodeOfConduct>
-and may be cloned from L<git://github.com/robrwo/perl-Software-Policy-CodeOfConduct.git>
 
 =head1 SUPPORT
 
@@ -268,9 +271,20 @@ feature.
 If the bug you are reporting has security implications which make it inappropriate to send to a public issue tracker,
 then see F<SECURITY.md> for instructions how to report security vulnerabilities.
 
+=head1 SOURCE
+
+The development version is on github at L<https://github.com/robrwo/perl-Software-Policy-CodeOfConduct>
+and may be cloned from L<git://github.com/robrwo/perl-Software-Policy-CodeOfConduct.git>
+
 =head1 AUTHOR
 
 Robert Rothenberg <rrwo@cpan.org>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Leon Timmermans
+
+Leon Timmermans <leont@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -21,12 +21,14 @@ lib/Crypt/Protocol/SIGMA.pm
 lib/Crypt/Protocol/SIGMA.pod
 lib/Crypt/Protocol/SPAKE2Plus.pm
 lib/Crypt/Protocol/SPAKE2Plus.pod
+lib/Crypt/Protocol/SPEKE.pm
+lib/Crypt/Protocol/SPEKE.pod
 t/01.cpace-ocat.t
 t/02.cpace-prepend_len.t
 t/03.cpace-prefix_free_cat.t
 t/04.cpace-generator_string.t
 t/05.cpace-calculate_generator.t
-t/06.cpace-prepare_ISK.t
+t/06.cpace.t
 t/07.noise-noise_one.t
 t/08.noise-noise_two.t
 t/09.noise-noise_three.t
@@ -41,6 +43,7 @@ t/17.oprf-oprf.t
 t/18.sigma-sigma_i.t
 t/19.spake2plus-P256-SHA256-HKDF.t
 t/20.spake2plus-ccc.t
+t/21.speke.t
 t/noise-a_rs_pub.pem
 t/noise-a_s_priv.pem
 t/noise-a_s_pub.pem

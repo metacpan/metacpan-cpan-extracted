@@ -5,9 +5,9 @@ package Iterator::Flex::Role::Error::Throw;
 use strict;
 use warnings;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
-use Iterator::Flex::Utils qw( :default :RegistryKeys );
+use Iterator::Flex::Utils qw( :default REG_GENERAL REG_GP_ERROR  );
 use Ref::Util;
 
 use Role::Tiny;
@@ -27,7 +27,7 @@ use namespace::clean;
 
 sub signal_error ( $self ) {
     $self->set_error;
-    my $exception = $REGISTRY{ refaddr $self }{ +GENERAL }{ +ERROR }[1];
+    my $exception = $REGISTRY{ refaddr $self }[REG_GENERAL][REG_GP_ERROR][1];
 
     $exception->() if Ref::Util::is_coderef( $exception );
 
@@ -60,7 +60,7 @@ Iterator::Flex::Role::Error::Throw - signal error by throwing
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 METHODS
 

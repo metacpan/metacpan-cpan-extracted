@@ -5,9 +5,10 @@ package Iterator::Flex::Role::Wrap::Throw;
 use strict;
 use warnings;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
-use Iterator::Flex::Utils qw( :RegistryKeys INPUT_EXHAUSTION PASSTHROUGH );
+use List::Util 'first';
+use Iterator::Flex::Utils qw( INPUT_EXHAUSTION PASSTHROUGH );
 use Ref::Util             qw( is_ref is_blessed_ref is_regexpref is_arrayref is_coderef );
 use Role::Tiny;
 use experimental 'signatures';
@@ -22,27 +23,28 @@ around _construct_next => sub ( $orig, $class, $ipar, $gpar ) {
         $gpar->{ +INPUT_EXHAUSTION } // do {
             require Iterator::Flex::Failure;
             Iterator::Flex::Failure::parameter->throw(
-                "internal error: input exhaustion policy was not registered" );
+                q{internal error: input exhaustion policy was not registered} );
         }
     )->[1];
 
     my $wsub;
 
+    ## no critic ( CascadingIfElse )
     if ( !defined $exception ) {
 
         $wsub = sub {
             my $self = $_[0] // $wsub;
             my $val  = eval { $next->( $self ) };
-            return $@ ne '' ? $self->signal_exhaustion( $@ ) : $val;
+            return $@ ne q{} ? $self->signal_exhaustion( $@ ) : $val;
         };
     }
 
-    elsif ( !is_ref( $exception ) && $exception eq +PASSTHROUGH ) {
+    elsif ( !is_ref( $exception ) && $exception eq PASSTHROUGH ) {
 
         $wsub = sub {
             my $self = $_[0] // $wsub;
             my $val  = eval { $next->( $self ) };
-            return $@ ne '' ? $self->signal_exhaustion( $@ ) : $val;
+            return $@ ne q{} ? $self->signal_exhaustion( $@ ) : $val;
         };
     }
 
@@ -53,10 +55,10 @@ around _construct_next => sub ( $orig, $class, $ipar, $gpar ) {
         $wsub = sub {
             my $self = $_[0] // $wsub;
             my $val  = eval { $next->( $self ) };
-            if ( $@ ne '' ) {
+            if ( $@ ne q{} ) {
                 my $e = $@;
                 return $self->signal_exhaustion( $e )
-                  if is_blessed_ref( $e ) && grep { $e->isa( $_ ) } @$exception;
+                  if is_blessed_ref( $e ) && first { $e->isa( $_ ) } @$exception;
                 die $e;
             }
             return $val;
@@ -68,7 +70,7 @@ around _construct_next => sub ( $orig, $class, $ipar, $gpar ) {
         $wsub = sub {
             my $self = $_[0] // $wsub;
             my $val  = eval { $next->( $self ) };
-            if ( $@ ne '' ) {
+            if ( $@ ne q{} ) {
                 my $e = $@;
                 return $self->signal_exhaustion( $e ) if $e =~ $exception;
                 die $e;
@@ -82,7 +84,7 @@ around _construct_next => sub ( $orig, $class, $ipar, $gpar ) {
         $wsub = sub {
             my $self = $_[0] // $wsub;
             my $val  = eval { $next->( $self ) };
-            if ( $@ ne '' ) {
+            if ( $@ ne q{} ) {
                 my $e = $@;
                 return $self->signal_exhaustion( $e ) if $exception->( $e );
                 die $e;
@@ -136,7 +138,7 @@ Iterator::Flex::Role::Wrap::Throw - Role to add throw on exhaustion to an iterat
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 INTERNALS
 

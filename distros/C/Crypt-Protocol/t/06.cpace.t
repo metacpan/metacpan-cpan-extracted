@@ -12,7 +12,6 @@ use Test::More ;
 
 use Crypt::OpenSSL::EC;
 use Crypt::OpenSSL::BaseFunc;
-use Crypt::OpenSSL::BaseFunc;
 use Crypt::Protocol::CPace;
 
 # a, b with same info

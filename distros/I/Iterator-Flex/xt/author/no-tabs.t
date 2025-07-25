@@ -18,6 +18,8 @@ my @files = (
     'lib/Iterator/Flex/Factory.pm',
     'lib/Iterator/Flex/Failure.pm',
     'lib/Iterator/Flex/Freeze.pm',
+    'lib/Iterator/Flex/Gather.pm',
+    'lib/Iterator/Flex/Gather/Constants.pm',
     'lib/Iterator/Flex/Grep.pm',
     'lib/Iterator/Flex/Manual.pod',
     'lib/Iterator/Flex/Manual/Alien.pod',
@@ -65,6 +67,7 @@ my @files = (
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
     't/ArrayLike.t',
+    't/Base/drain.t',
     't/Base/error.t',
     't/Base/exhaustion.t',
     't/Base/may.t',
@@ -75,6 +78,7 @@ my @files = (
     't/Common/icat.t',
     't/Common/icycle.t',
     't/Common/ifreeze.t',
+    't/Common/igather.t',
     't/Common/igrep.t',
     't/Common/imap.t',
     't/Common/iproduct.t',
@@ -86,7 +90,6 @@ my @files = (
     't/lib/MyTest/Tests/May/Iter.pm',
     't/lib/MyTest/Utils.pm',
     't/multi_stage.t',
-    't/regressions/#icat.t#',
     't/regressions/next-active.t'
 );
 

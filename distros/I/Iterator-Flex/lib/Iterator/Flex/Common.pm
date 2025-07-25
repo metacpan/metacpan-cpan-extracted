@@ -6,15 +6,15 @@ use 5.10.0;
 use strict;
 use warnings;
 
-use experimental ( 'postderef', 'signatures' );
+use experimental qw( postderef signatures );
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use Exporter 'import';
 
 our @EXPORT_OK = qw[
   iterator iter iarray icycle icache
-  icat igrep imap iproduct iseq istack ifreeze thaw
+  icat igather igrep imap iproduct iseq istack ifreeze thaw
 ];
 
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
@@ -231,9 +231,39 @@ sub icycle ( $array, $pars = {} ) {
 
 
 
-sub igrep : prototype(&$) ( $code, $pars = {} ) {
+
+
+
+sub igather : prototype(&$@) ( $code, $iterable, $pars = {} ) {
+    require Iterator::Flex::Gather;
+    Iterator::Flex::Gather->new( $code, $iterable, $pars );
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+sub igrep : prototype(&$@) ( $code, $iterable, $pars = {} ) {
     require Iterator::Flex::Grep;
-    Iterator::Flex::Grep->new( $code, $pars );
+    Iterator::Flex::Grep->new( $code, $iterable, $pars );
 }
 
 
@@ -259,9 +289,9 @@ sub igrep : prototype(&$) ( $code, $pars = {} ) {
 
 
 
-sub imap : prototype(&$) ( $code, $pars = {} ) {
+sub imap : prototype(&$@) ( $code, $iterable, $pars = {} ) {
     require Iterator::Flex::Map;
-    Iterator::Flex::Map->new( $code, $pars );
+    Iterator::Flex::Map->new( $code, $iterable, $pars );
 }
 
 
@@ -403,9 +433,9 @@ sub istack ( @args ) {
 
 
 
-sub ifreeze : prototype(&$) ( $code, $pars = {} ) {
+sub ifreeze : prototype(&$@) ( $code, $iterable, $pars = {} ) {
     require Iterator::Flex::Freeze;
-    Iterator::Flex::Freeze->new( $code, $pars );
+    Iterator::Flex::Freeze->new( $code, $iterable, $pars );
 }
 
 
@@ -466,7 +496,7 @@ __END__
 
 =pod
 
-=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory icat istack
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory icat istack igather
 
 =head1 NAME
 
@@ -474,7 +504,7 @@ Iterator::Flex::Common - Iterator Generators and Adapters
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 SYNOPSIS
 
@@ -684,6 +714,28 @@ See L<Iterator::Flex::Cycle> for more details.
 
 =back
 
+=head2 igather
+
+  $iterator = igather { CODE } $iterable, ?\%pars;
+
+Returns an iterator which gathers up selected elements from C<$iterable>, returning them
+as an array of elements, and then optionally starting a new gathering process.
+
+To indicate how C<$iterable> signals exhaustion, use the
+C<input_exhaustion> general parameter; by default it is expected to
+return C<undef>. See L<Iterator::Flex::Gather> for more details on what C<CODE>
+should return.
+
+The iterator supports the following methods:
+
+=over
+
+=item next
+
+=item reset
+
+=back
+
 =head2 igrep
 
   $iterator = igrep { CODE } $iterable, ?\%pars;
@@ -759,13 +811,13 @@ C<prev> or C<__prev__> method.
 =head2 iseq
 
   # integer sequence starting at 0, incrementing by 1, ending at $end
-  $iterator = iseq( $end );
+  $iterator = iseq( $end, ?\%pars  );
 
   # integer sequence starting at $begin, incrementing by 1, ending at $end
-  $iterator = iseq( $begin, $end );
+  $iterator = iseq( $begin, $end, ?\%pars  );
 
   # real sequence starting at $begin, incrementing by $step, ending <= $end
-  $iterator = iseq( $begin, $end, $step );
+  $iterator = iseq( $begin, $end, $step, ?\%pars  );
 
 The iterator supports the following methods:
 

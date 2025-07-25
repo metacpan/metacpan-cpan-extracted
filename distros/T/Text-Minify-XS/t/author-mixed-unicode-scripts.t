@@ -27,7 +27,6 @@ my @files = (
     't/02-minify_utf8.t',
     't/03-minify_ascii.t',
     't/04-undef.t',
-    't/author-changes.t',
     't/author-clean-namespaces.t',
     't/author-critic.t',
     't/author-eof.t',
@@ -38,16 +37,18 @@ my @files = (
     't/author-no-tabs.t',
     't/author-pod-coverage.t',
     't/author-pod-linkcheck.t',
+    't/author-pod-spell.t',
     't/author-pod-syntax.t',
     't/author-portability.t',
     't/author-ppport.t',
-    't/author-vars.t',
     't/author-xs-check.t',
     't/etc/perlcritic.rc',
+    't/release-cpan-changes.t',
     't/release-dist-manifest.t',
     't/release-fixme.t',
     't/release-kwalitee.t',
-    't/release-trailing-space.t'
+    't/release-trailing-space.t',
+    't/release-unused-vars.t'
 );
 
 file_scripts_ok($_, { scripts => \@scxs } ) for @files;

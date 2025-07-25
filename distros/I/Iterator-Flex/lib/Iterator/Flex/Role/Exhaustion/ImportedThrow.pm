@@ -5,7 +5,7 @@ package Iterator::Flex::Role::Exhaustion::ImportedThrow;
 use strict;
 use warnings;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use Role::Tiny;
 
@@ -33,7 +33,7 @@ Iterator::Flex::Role::Exhaustion::ImportedThrow - Imported iterator throws
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 INTERNALS
 

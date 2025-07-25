@@ -5,9 +5,9 @@ package Iterator::Flex::Role::Prev::Closure;
 use strict;
 use warnings;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
-use Iterator::Flex::Utils qw( :default ITERATOR PREV );
+use Iterator::Flex::Utils qw( :default REG_ITERATOR REG_ITER_PREV );
 use Role::Tiny;
 use experimental 'signatures';
 
@@ -24,7 +24,7 @@ use namespace::clean;
 
 
 sub prev ( $self ) {
-    $REGISTRY{ refaddr $self }{ +ITERATOR }{ +PREV }->( $self );
+    $REGISTRY{ refaddr $self }[REG_ITERATOR][REG_ITER_PREV]->( $self );
 }
 *__prev__ = \&prev;
 
@@ -52,7 +52,7 @@ Iterator::Flex::Role::Prev::Closure - Implement C<prev> as a closure stored in t
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 METHODS
 

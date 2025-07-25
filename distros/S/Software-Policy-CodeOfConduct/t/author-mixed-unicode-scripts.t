@@ -9,9 +9,9 @@ BEGIN {
 use strict;
 use warnings;
 
-# This test was generated with Dist::Zilla::Plugin::Test::MixedScripts v0.1.0.
+# This test was generated with Dist::Zilla::Plugin::Test::MixedScripts v0.1.4.
 
-use Test::More 1.302200;
+use Test2::Tools::Basic 1.302200;
 
 use Test::MixedScripts qw( file_scripts_ok );
 
@@ -31,6 +31,7 @@ my @files = (
     't/author-no-tabs.t',
     't/author-pod-coverage.t',
     't/author-pod-linkcheck.t',
+    't/author-pod-spell.t',
     't/author-pod-syntax.t',
     't/etc/perlcritic.rc',
     't/release-check-manifest.t',

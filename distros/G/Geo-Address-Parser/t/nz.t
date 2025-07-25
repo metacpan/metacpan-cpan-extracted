@@ -12,4 +12,8 @@ is $result->{suburb},   'Parnell',              'Suburb parsed';
 is $result->{city},     'Auckland',             'City parsed';
 is $result->{postcode}, '1010',                 'Postcode parsed';
 
+my $messy = $parser->parse('  auckland museum , 1  museum  ctr , parnell , auckland 1010 ');
+# is $messy->{street}, '1 Museum Center', 'Abbreviations expanded';
+is $messy->{name}, 'Auckland Museum', 'Name capitalized and trimmed';
+
 done_testing();

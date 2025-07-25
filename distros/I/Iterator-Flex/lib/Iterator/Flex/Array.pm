@@ -5,7 +5,7 @@ package Iterator::Flex::Array;
 use strict;
 use warnings;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use Iterator::Flex::Utils ':IterAttrs';
 use Ref::Util;
@@ -44,7 +44,7 @@ use parent 'Iterator::Flex::Base';
 
 
 sub new ( $class, $array, $pars = {} ) {
-    $class->_throw( parameter => "argument must be an ARRAY reference" )
+    $class->_throw( parameter => 'argument must be an ARRAY reference' )
       unless Ref::Util::is_arrayref( $array );
 
     $class->SUPER::new( { array => $array }, $pars );
@@ -53,26 +53,26 @@ sub new ( $class, $array, $pars = {} ) {
 
 sub construct ( $class, $state ) {
 
-    $class->_throw( parameter => "'state' parameter must be a HASH reference" )
+    $class->_throw( parameter => q{'state' parameter must be a HASH reference} )
       unless Ref::Util::is_hashref( $state );
 
     my ( $arr, $prev, $current, $next )
       = @{$state}{qw[ array prev current next ]};
 
-    $class->_throw( parameter => "state 'array' parameter must be a HASH reference" )
+    $class->_throw( parameter => q{state 'array' parameter must be a HASH reference} )
       unless Ref::Util::is_arrayref( $arr );
 
     my $len = @$arr;
 
     $next = 0 unless defined $next;
 
-    $class->_throw( parameter => "illegal value for state 'prev' argument" )
+    $class->_throw( parameter => q{illegal value for state 'prev' argument} )
       if defined $prev && ( $prev < 0 || $prev >= $len );
 
-    $class->_throw( parameter => "illegal value for state 'current' argument" )
+    $class->_throw( parameter => q{illegal value for state 'current' argument} )
       if defined $current && ( $current < 0 || $current >= $len );
 
-    $class->_throw( parameter => "illegal value for state 'next' argument" )
+    $class->_throw( parameter => q{illegal value for state 'next' argument} )
       if $next < 0 || $next > $len;
 
     my $self;
@@ -160,7 +160,7 @@ Iterator::Flex::Array - Array Iterator Class
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 METHODS
 

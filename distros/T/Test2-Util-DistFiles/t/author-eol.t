@@ -30,6 +30,7 @@ my @files = (
     't/author-pod-syntax.t',
     't/author-portability.t',
     't/default-dir.t',
+    't/etc/perlcritic.rc',
     't/release-cpan-changes.t',
     't/release-dist-manifest.t',
     't/release-fixme.t',

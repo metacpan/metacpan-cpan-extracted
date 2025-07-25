@@ -2,6 +2,7 @@ package Geo::Address::Parser::Rules::NZ;
 
 use strict;
 use warnings;
+
 use Exporter 'import';
 our @EXPORT_OK = qw(parse_address);
 
@@ -9,32 +10,31 @@ our @EXPORT_OK = qw(parse_address);
 my $postcode_re = qr/\b(\d{4})\b/;
 
 sub parse_address {
-    my ($class, $text) = @_;
-    return unless defined $text;
+	my ($class, $text) = @_;
+	return unless defined $text;
 
-    my @parts = map { s/^\s+|\s+$//gr } split /,/, $text;
+	my @parts = map { s/^\s+|\s+$//gr } split /,/, $text;
 
-    my ($name, $street, $suburb, $city, $postcode);
+	my ($name, $street, $suburb, $city, $postcode);
 
-    if ($parts[-1] =~ /(.+?)\s+($postcode_re)$/) {
-        $postcode = $2;
-        $parts[-1] = $1;  # keep city without postcode
-    }
+	if ($parts[-1] =~ /(.+?)\s+($postcode_re)$/) {
+		$postcode = $2;
+		$parts[-1] = $1;	# keep city without postcode
+	}
 
-    $city   = pop @parts if @parts;
-    $suburb = pop @parts if @parts;
-    $street = pop @parts if @parts;
-    $name   = join(', ', @parts) if @parts;
+	$city = pop @parts if @parts;
+	$suburb = pop @parts if @parts;
+	$street = pop @parts if @parts;
+	$name = join(', ', @parts) if @parts;
 
-    return {
-        name     => $name,
-        street   => $street,
-        suburb   => $suburb,
-        city     => $city,
-        postcode => $postcode,
-    };
+	return {
+		name => $name,
+		street => $street,
+		suburb => $suburb,
+		city => $city,
+		postcode => $postcode,
+	};
 }
-
 
 1;
 

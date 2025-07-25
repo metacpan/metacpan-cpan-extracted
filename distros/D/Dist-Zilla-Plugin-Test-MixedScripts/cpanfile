@@ -27,10 +27,10 @@ on 'test' => sub {
   requires "File::pushd" => "0";
   requires "FindBin" => "0";
   requires "Module::Metadata" => "1.000015";
+  requires "Test2::V0" => "0";
   requires "Test::DZil" => "0";
-  requires "Test::Deep" => "0";
-  requires "Test::MixedScripts" => "v0.2.0";
-  requires "Test::More" => "1.302200";
+  requires "Test::MixedScripts" => "v0.3.0";
+  requires "Test::More" => "0";
   requires "Test::Warnings" => "0.009";
   requires "strict" => "0";
 };
@@ -60,6 +60,7 @@ on 'develop' => sub {
   requires "Test::Pod::Coverage" => "1.08";
   requires "Test::Pod::LinkCheck" => "0";
   requires "Test::Portability::Files" => "0";
+  requires "Test::Spelling" => "0.17";
   requires "Test::TrailingSpace" => "0.0203";
   requires "Test::Vars" => "0.015";
 };

@@ -1,5 +1,33 @@
 Revision history for Software-Policy-CodeOfConduct:
 
+v0.5.0    2025-07-25 09:37:17+01:00 Europe/London
+  [Enhancements]
+  - Setting text_columns to 0 will disable word wrapping.
+
+  [Tests]
+  - Add more author tests.
+
+v0.4.1    2025-07-24 22:10:39+01:00 Europe/London
+  [Bug Fixes]
+  - Fixed a bug when omitting the name.
+
+  - Removed unused `has_name` method.
+
+  [Documentation]
+  - Reorganised POD.
+
+v0.4.0    2025-07-24 12:57:39+01:00 Europe/London
+  [Enhancements]
+  - Renamed text to fulltext, for compatability with similar modules. Added text as an alias.
+
+  [Bug Fixes]
+  - Disallowed text attribute in the constructor.
+
+  [Documentation]
+  - Updated CONTRIBUTORS section.
+
+  - Documented text as a method instead of an attribute, since it should never be set in the constructor.
+
 v0.3.1    2025-07-23 14:24:12+01:00 Europe/London
   [Bug Fixes]
   - Committed fixes in Contributor Covenant 2.1 template that were not incluided in the last release.

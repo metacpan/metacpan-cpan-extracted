@@ -51,6 +51,6 @@
          "url" : "https://github.com/mbeijen/GD-Barcode"
       }
    },
-   "version" : "2.00",
+   "version" : "2.01",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

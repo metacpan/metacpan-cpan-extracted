@@ -23,6 +23,8 @@ lib/Iterator/Flex/Cycle.pm
 lib/Iterator/Flex/Factory.pm
 lib/Iterator/Flex/Failure.pm
 lib/Iterator/Flex/Freeze.pm
+lib/Iterator/Flex/Gather.pm
+lib/Iterator/Flex/Gather/Constants.pm
 lib/Iterator/Flex/Grep.pm
 lib/Iterator/Flex/Manual.pod
 lib/Iterator/Flex/Manual/Alien.pod
@@ -72,6 +74,7 @@ t/00-compile.t
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
 t/ArrayLike.t
+t/Base/drain.t
 t/Base/error.t
 t/Base/exhaustion.t
 t/Base/may.t
@@ -82,6 +85,7 @@ t/Common/icache.t
 t/Common/icat.t
 t/Common/icycle.t
 t/Common/ifreeze.t
+t/Common/igather.t
 t/Common/igrep.t
 t/Common/imap.t
 t/Common/iproduct.t
@@ -93,7 +97,6 @@ t/Role/Utils.t
 t/lib/MyTest/Tests/May/Iter.pm
 t/lib/MyTest/Utils.pm
 t/multi_stage.t
-t/regressions/#icat.t#
 t/regressions/next-active.t
 templates/CONTRIBUTING.md
 tidyall.ini

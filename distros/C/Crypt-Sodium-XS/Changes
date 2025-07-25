@@ -1,3 +1,11 @@
+0.000032 Jul 24 2025
+
+- kdf derive: use NV for id on platforms with less than 64-bit integers,
+  allowing for 2 ** 53 - 1 ids.
+
+- kdf derive: restrict id on all platforms to 2 ** 53 - 1 to prevent accidental
+  derivation of duplicate keys. see docs for details.
+
 0.000032 Jul 23 2025
 
 - BUGFIX: fix kdf derive output length. found during manual review. test cases

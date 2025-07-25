@@ -22,7 +22,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Test2::Util::DistFiles",
   "PREREQ_PM" => {
     "Carp" => 0,
-    "Cwd" => 0,
+    "Cwd::Guard" => 0,
     "Exporter" => "5.57",
     "ExtUtils::Manifest" => "1.68",
     "File::Basename" => 0,
@@ -38,7 +38,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "strict" => 0
   },
-  "VERSION" => "v0.2.0",
+  "VERSION" => "v0.2.1",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -47,7 +47,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => 0,
-  "Cwd" => 0,
+  "Cwd::Guard" => 0,
   "Exporter" => "5.57",
   "ExtUtils::MakeMaker" => "7.22",
   "ExtUtils::Manifest" => "1.68",

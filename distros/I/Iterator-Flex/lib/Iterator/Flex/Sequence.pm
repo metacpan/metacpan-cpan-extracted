@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use experimental 'signatures', 'postderef';
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use Scalar::Util;
 use List::Util;
@@ -53,7 +53,7 @@ sub new ( $class, @args ) {
 
     my $pars = Ref::Util::is_hashref( $args[-1] ) ? pop @args : {};
 
-    $class->_throw( parameter => "incorrect number of arguments for sequence" )
+    $class->_throw( parameter => q{incorrect number of arguments for sequence} )
       if @args < 1 || @args > 3;
 
     my %state;
@@ -112,7 +112,7 @@ sub construct ( $class, $state ) {
     else {
 
         $class->_throw(
-            parameter => "sequence will be inifinite as \$step is zero or has the incorrect sign" )
+            parameter => q{sequence will be inifinite as $step is zero or has the incorrect sign} )
           if ( $begin < $end && $step <= 0 ) || ( $begin > $end && $step >= 0 );
 
         $next = $begin unless defined $next;
@@ -214,7 +214,7 @@ Iterator::Flex::Sequence - Numeric Sequence Iterator Class
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 METHODS
 

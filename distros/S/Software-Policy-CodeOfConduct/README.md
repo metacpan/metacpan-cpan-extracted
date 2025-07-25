@@ -4,7 +4,7 @@ Software::Policy::CodeOfConduct - generate a Code of Conduct policy
 
 # VERSION
 
-version v0.3.1
+version v0.5.0
 
 # SYNOPSIS
 
@@ -42,10 +42,6 @@ If you want to use a custom policy, specify the ["template\_path"](#template_pat
 
 This is the (optional) name of the project that the code of conduct is for,
 
-## has\_name
-
-True if there is a name.
-
 ## contact
 
 The is the contact for the project team about the code of conduct. It should be an email address or a URL.
@@ -70,11 +66,9 @@ This should be a [Text::Template](https://metacpan.org/pod/Text%3A%3ATemplate) t
 
 This is the number of text columns for word-wrapping the ["text"](#text).
 
+A value of `0` disables word wrapping.
+
 The default is `78`.
-
-## text
-
-This is the text generated from the template.
 
 ## filename
 
@@ -83,6 +77,14 @@ This is the file to be generated.
 This defaults to `CODE_OF_CONDUCT.md`.
 
 # METHODS
+
+## fulltext
+
+This is the text generated from the template.
+
+## text
+
+This is a deprecated alias for ["fulltext"](#fulltext).
 
 ## save
 
@@ -93,11 +95,6 @@ my $path = $policy->save( $dir );
 This saves a file named ["filename"](#filename) in directory `$dir`.
 
 If `$dir` is omitted, then it will save the file in the current directory.
-
-# SOURCE
-
-The development version is on github at [https://github.com/robrwo/perl-Software-Policy-CodeOfConduct](https://github.com/robrwo/perl-Software-Policy-CodeOfConduct)
-and may be cloned from [git://github.com/robrwo/perl-Software-Policy-CodeOfConduct.git](git://github.com/robrwo/perl-Software-Policy-CodeOfConduct.git)
 
 # SUPPORT
 
@@ -118,9 +115,18 @@ feature.
 If the bug you are reporting has security implications which make it inappropriate to send to a public issue tracker,
 then see `SECURITY.md` for instructions how to report security vulnerabilities.
 
+# SOURCE
+
+The development version is on github at [https://github.com/robrwo/perl-Software-Policy-CodeOfConduct](https://github.com/robrwo/perl-Software-Policy-CodeOfConduct)
+and may be cloned from [git://github.com/robrwo/perl-Software-Policy-CodeOfConduct.git](git://github.com/robrwo/perl-Software-Policy-CodeOfConduct.git)
+
 # AUTHOR
 
 Robert Rothenberg <rrwo@cpan.org>
+
+# CONTRIBUTOR
+
+Leon Timmermans <leont@cpan.org>
 
 # COPYRIGHT AND LICENSE
 

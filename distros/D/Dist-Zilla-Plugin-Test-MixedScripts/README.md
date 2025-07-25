@@ -1,10 +1,10 @@
 # NAME
 
-Dist::Zilla::Plugin::Test::MixedScripts - author tests to ensure there is no mixed unicode
+Dist::Zilla::Plugin::Test::MixedScripts - author tests to ensure there is no mixed Unicode
 
 # VERSION
 
-version v0.1.2
+version v0.1.4
 
 # DESCRIPTION
 
@@ -13,7 +13,7 @@ This generates an author [Test::MixedScripts](https://metacpan.org/pod/Test%3A%3
 This is an extension of [Dist::Zilla::Plugin::InlineFiles](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3APlugin%3A%3AInlineFiles), providing the file `xt/author/mixed-unicode-scripts.t` for
 testing against mixed Unicode scripts that are potentially confusing or malicious.
 
-For example, the text for the domain names "оnе.example.com" and "one.example.com" look indistinguishable in many fonts,
+For example, the text for the domain names `оnе.example.com` and `one.example.com` look indistinguishable in many fonts,
 but the first one has Cyrillic letters.  If your software interacted with a service on the second domain, then someone
 can operate a service on the first domain and attempt to fool developers into using their domain instead.
 
@@ -63,12 +63,14 @@ file = XS.xs
 file = XS.c
 ```
 
-# SOURCE
+# SUPPORT
 
-The development version is on github at [https://github.com/robrwo/perl-Dist-Zilla-Plugin-Test-MixedScripts](https://github.com/robrwo/perl-Dist-Zilla-Plugin-Test-MixedScripts)
-and may be cloned from [git://github.com/robrwo/perl-Dist-Zilla-Plugin-Test-MixedScripts.git](git://github.com/robrwo/perl-Dist-Zilla-Plugin-Test-MixedScripts.git)
+Only the latest version of this module will be supported.
 
-# BUGS
+This module requires Perl v5.16 or later.  Future releases may only support Perl versions released in the last ten
+years.
+
+## Reporting Bugs and Submitting Feature Requests
 
 Please report any bugs or feature requests on the bugtracker website
 [https://github.com/robrwo/perl-Dist-Zilla-Plugin-Test-MixedScripts/issues](https://github.com/robrwo/perl-Dist-Zilla-Plugin-Test-MixedScripts/issues)
@@ -77,10 +79,13 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
-## Reporting Security Vulnerabilities
+If the bug you are reporting has security implications which make it inappropriate to send to a public issue tracker,
+then see `SECURITY.md` for instructions how to report security vulnerabilities.
 
-Security issues should not be reported on the bugtracker website. Please see `SECURITY.md` for instructions how to
-report security vulnerabilities
+# SOURCE
+
+The development version is on github at [https://github.com/robrwo/perl-Dist-Zilla-Plugin-Test-MixedScripts](https://github.com/robrwo/perl-Dist-Zilla-Plugin-Test-MixedScripts)
+and may be cloned from [git://github.com/robrwo/perl-Dist-Zilla-Plugin-Test-MixedScripts.git](git://github.com/robrwo/perl-Dist-Zilla-Plugin-Test-MixedScripts.git)
 
 # AUTHOR
 
@@ -88,6 +93,10 @@ Robert Rothenberg <rrwo@cpan.org>
 
 This code was based on [Dist::Zilla::Plugin::Test::EOL](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3APlugin%3A%3ATest%3A%3AEOL) by Florian Ragwitz <rafl@debian.org>, Caleb Cushing
 <xenoterracide@gmail.com> and Karen Etheridge <ether@cpan.org>.
+
+# CONTRIBUTOR
+
+Graham Knop <haarg@haarg.org>
 
 # COPYRIGHT AND LICENSE
 

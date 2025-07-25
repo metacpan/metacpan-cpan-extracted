@@ -6,7 +6,7 @@ use File::Spec;
 use Carp;
 use Data::Dumper;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 sub new{
 	my ($class,%opts) = @_;
@@ -24,7 +24,8 @@ sub new{
         defaults_namespace_char => '.',
         fixed_indent => 0,
         die_on_bad_params => 1,
-        escape_char => "\\"
+        escape_char => "\\",
+        token_placeholder => '',
     };
 
 	bless $self,$class;
@@ -69,6 +70,14 @@ sub defaults{
     return $self->{defaults};
 }
 
+sub token_placeholder{
+    my ($self,$token) = @_;
+
+    if (defined $token){
+        $self->{token_placeholder} = $token;
+    }
+    return $self->{token_placeholder};
+}
 
 sub defaults_namespace_char{
     my ($self,$char) = @_;
@@ -373,6 +382,23 @@ sub _fill_in{
                 my $val = $self->_get_default_val( $self->{defaults}, @parts );
                 my $rx = $self->_token_regex( $name );
                 $frags[$i] =~ s/$rx/$val/g;
+            }
+        }
+
+        # Handle unmatched parameters, if token_placeholder is set then
+        # we replace these parameters with the placeholder.
+        if ($self->{token_placeholder}) {
+            my $param_rx = $self->_token_regex("param_name");
+
+            my @rem = $self->_params_in( $frags[$i] );
+            for my $name ( @rem ) {
+                my @parts = ( $name );
+
+                my $placeholder = $self->{token_placeholder};
+                $placeholder =~ s/$param_rx/$name/g;
+
+                my $rx = $self->_token_regex( $name );
+                $frags[$i] =~ s/$rx/$placeholder/g;
             }
         }
 
@@ -1078,6 +1104,30 @@ To get this more readable output, then set C<fixed_indent> to 1:
 
 Bear in mind that this will result in extra space characters being inserted into the output.
 
+
+=head2 token_placeholder
+
+If specified, any tokens whose value is not specified in template hash will be replaced by the string in token_placeholder.
+
+For example:
+
+    <table><% body %></table>
+
+becomes
+
+    <table>MISSING_TOKEN</table>
+
+if token_placeholder's value is "MISSING_TOKEN", one can also use the token "param_name" within token_placeholder to add param name to the replacement string.
+
+For example:
+
+    <table><% body %></table>
+
+becomes
+
+    <table>PUT body HERE</table>
+
+if token_placeholder's value is "PUT <% param_name %> HERE", token delims must be used here.
 
 
 =head2 name_label

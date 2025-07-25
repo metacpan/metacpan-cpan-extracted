@@ -5,7 +5,7 @@ package Iterator::Flex::Role::Utils;
 use strict;
 use warnings;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use Ref::Util;
 
@@ -28,7 +28,7 @@ use experimental 'signatures';
 
 sub _load_module ( $class, $path, $namespaces ) {
 
-    if ( substr( $path, 0, 1 ) eq '+' ) {
+    if ( substr( $path, 0, 1 ) eq q{+} ) {
         my $module = substr( $path, 1 );
         return $module if eval { Module::Runtime::require_module( $module ) };
         $class->_throw( class => "unable to load $module" );
@@ -37,13 +37,13 @@ sub _load_module ( $class, $path, $namespaces ) {
         $namespaces //= [ $class->_namespaces ];
 
         for my $namespace ( @{$namespaces} ) {
-            my $module = $namespace . '::' . $path;
+            my $module = $namespace . q{::} . $path;
             return $module if eval { Module::Runtime::require_module( $module ) };
         }
     }
 
     $class->_throw(
-        class => join ' ',
+        class => join q{ },
         "unable to find a module for '$path' in @{[ join( ', ', $namespaces->@* ) ]}"
     );
 }
@@ -104,7 +104,7 @@ sub _can_meth ( $self, @methods ) {
     my $par = Ref::Util::is_hashref( $methods[-1] ) ? pop @methods : {};
 
     for my $method ( @methods ) {
-        $self->_throw( parameter => "'method' parameters must be a string" )
+        $self->_throw( parameter => q{'method' parameters must be a string} )
           if Ref::Util::is_ref( $method );
 
         my $sub;
@@ -171,7 +171,7 @@ sub _resolve_meth ( $obj, $target, $method, @fallbacks ) {
 sub _throw ( $self, $failure, $msg ) {
     require Iterator::Flex::Failure;
     local @Iterator::Flex::Role::Utils::CARP_NOT = scalar caller;
-    my $type = join( '::', 'Iterator::Flex::Failure', $failure );
+    my $type = join( q{::}, 'Iterator::Flex::Failure', $failure );
     $type->throw( { msg => $msg, trace => Iterator::Flex::Failure->croak_trace } );
 }
 
@@ -200,7 +200,7 @@ Iterator::Flex::Role::Utils - Role based utilities
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 DESCRIPTION
 

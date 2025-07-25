@@ -1,4 +1,12 @@
 
+0.0.4   2025-07-24
+   [Fixed]
+     - Certificate principles and options silently
+       discarded when issuing a new certificate
+     - Debugging output should be on STDERR, because
+       the certificate is sent to STDOUT and we don't
+       want to clobber that
+
 0.0.3   2025-07-07
    [Fixed]
      - Fixed exit codes (zero on success)

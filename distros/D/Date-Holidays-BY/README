@@ -32,7 +32,7 @@ Install Carton ( https://metacpan.org/pod/Carton  ), then dependencies:
 	perl dev/dev.pl
 Do something with code and test:
 	carton exec dzil test
-	(don't forget to change dist.ini: release and year, .pm: copyright year, Changes)
+	(don't forget to change: dist.ini copyright_year and release; .pm copyright year; Changes)
 	carton exec dzil build
 	(git commit/push)
 	carton exec dzil release (sets the tag verstion in git)

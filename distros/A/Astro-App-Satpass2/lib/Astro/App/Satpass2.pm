@@ -92,7 +92,7 @@ use constant NULL_REF	=> ref NULL;
 
 use constant SUN_CLASS_DEFAULT	=> 'Astro::Coord::ECI::Sun';
 
-our $VERSION = '0.056';
+our $VERSION = '0.057';
 
 # The following 'cute' code is so that we do not determine whether we
 # actually have optional modules until we really need them, and yet do
@@ -1162,7 +1162,7 @@ sub _height_us {
 	$self->set( height => $rslt->{Elevation} );
     } else {
 	$opt->{geocoding}
-	    or $self->wail( $eq->error() || 'No valid result found' );
+	    or $self->wail( $eq->get( 'error' ) || 'No valid result found' );
 	$self->set( height => 0 );
 	$output .= "# Unable to obtain height. Setting to 0\n";
     }

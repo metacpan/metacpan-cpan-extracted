@@ -4,7 +4,7 @@ Test2::Util::DistFiles - Gather a list of files in a distribution
 
 # VERSION
 
-version v0.2.0
+version v0.2.1
 
 # SYNOPSIS
 
@@ -65,7 +65,16 @@ Note that it will include files like `Makefile.PL` or `Build.PL`.
 The development version is on github at [https://github.com/robrwo/perl-Test2-Util-DistFiles](https://github.com/robrwo/perl-Test2-Util-DistFiles)
 and may be cloned from [git://github.com/robrwo/perl-Test2-Util-DistFiles.git](git://github.com/robrwo/perl-Test2-Util-DistFiles.git)
 
-# BUGS
+See `CONTRIBUTING.md` for more information.
+
+# SUPPORT
+
+Only the latest version of this module will be supported.
+
+This module requires Perl v5.14 or later.  Future releases may only support Perl versions released in the last ten
+years.
+
+## Reporting Bugs and Submitting Feature Requests
 
 Please report any bugs or feature requests on the bugtracker website
 [https://github.com/robrwo/perl-Test2-Util-DistFiles/issues](https://github.com/robrwo/perl-Test2-Util-DistFiles/issues)
@@ -74,10 +83,8 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
-## Reporting Security Vulnerabilities
-
-Security issues should not be reported on the bugtracker website. Please see `SECURITY.md` for instructions how to
-report security vulnerabilities
+If the bug you are reporting has security implications which make it inappropriate to send to a public issue tracker,
+then see `SECURITY.md` for instructions how to report security vulnerabilities.
 
 # AUTHOR
 

@@ -1,15 +1,8 @@
 
 #!start included /Users/michiel/.plenv/versions/5.22.1/lib/perl5/5.22.1/ExtUtils/MANIFEST.SKIP
 # Avoid version control files.
-\bRCS\b
-\bCVS\b
-\bSCCS\b
-,v$
-\B\.svn\b
 \B\.git\b
 \B\.gitignore\b
-\b_darcs\b
-\B\.cvsignore$
 
 # Avoid VMS specific MakeMaker generated files
 \bDescrip.MMS$
@@ -68,10 +61,12 @@
 \B\.git\b
 ^Makefile(\.old)?$
 .gitignore
+.github
 ^GD-Barcode-\d
 \.bak$
 \.tmp$
 \.o$
 ^MYMETA
 .mailmap
-.travis.yml
+cpanfile
+webapp

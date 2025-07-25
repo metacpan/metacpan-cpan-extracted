@@ -31,12 +31,12 @@ name: Test2-Util-DistFiles
 provides:
   Test2::Util::DistFiles:
     file: lib/Test2/Util/DistFiles.pm
-    version: v0.2.0
+    version: v0.2.1
 recommends:
   Ref::Util::XS: '0'
 requires:
   Carp: '0'
-  Cwd: '0'
+  Cwd::Guard: '0'
   Exporter: '5.57'
   ExtUtils::Manifest: '1.68'
   File::Basename: '0'
@@ -48,7 +48,7 @@ requires:
 resources:
   bugtracker: https://github.com/robrwo/perl-Test2-Util-DistFiles/issues
   repository: git://github.com/robrwo/perl-Test2-Util-DistFiles.git
-version: v0.2.0
+version: v0.2.1
 x_authority: cpan:RRWO
 x_generated_by_perl: v5.34.3
 x_serialization_backend: 'YAML::Tiny version 1.76'

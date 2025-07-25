@@ -1,12 +1,11 @@
 use v5.16;
 use warnings;
 
-use Test::More 1.302200;
-use Test::Warnings 0.009 qw( :no_end_test :all );
+use Test2::V0;
+use Test::Warnings 0.009 qw( :no_end_test had_no_warnings );
 use Test::DZil;
 use Path::Tiny;
 use File::pushd qw( pushd );
-use Test::Deep;
 
 my $tzil = Builder->from_config(
     { dist_root => 'does-not-exist' },
@@ -53,38 +52,37 @@ like( $content, qr/'\Q$_\E'/m, "test checks $_" ) foreach @files;
 
 note $content;
 
-cmp_deeply(
+is(
     $tzil->distmeta,
-    superhashof(
-        {
-            prereqs => {
-                develop => {
-                    requires => {
-                        'Test::More'         => '1.302200',
-                        'Test::MixedScripts' => '0',
-                    },
+    hash {
+        field prereqs => {
+            develop => {
+                requires => {
+                    'Test2::Tools::Basic' => '1.302200',
+                    'Test::MixedScripts' => 'v0.3.0',
                 },
             },
-            x_Dist_Zilla => superhashof(
-                {
-                    plugins => supersetof(
-                        {
-                            class  => 'Dist::Zilla::Plugin::Test::MixedScripts',
-                            config => {
-                                'Dist::Zilla::Plugin::Test::MixedScripts' => {
-                                    filename => 'xt/author/mixed-unicode-scripts.t',
-                                    finder   => [ ':ExecFiles', ':InstallModules', ':TestFiles' ],
-                                    scripts  => [ ],
-                                },
-                            },
-                            name    => 'Test::MixedScripts',
-                            version => Dist::Zilla::Plugin::Test::MixedScripts->VERSION,
+        };
+        field x_Dist_Zilla => hash {
+            field plugins => bag {
+                item {
+                    class  => 'Dist::Zilla::Plugin::Test::MixedScripts',
+                    config => {
+                        'Dist::Zilla::Plugin::Test::MixedScripts' => {
+                            filename => 'xt/author/mixed-unicode-scripts.t',
+                            finder   => [ ':ExecFiles', ':InstallModules', ':TestFiles' ],
+                            scripts  => [ ],
                         },
-                    ),
-                }
-            ),
-        }
-    ),
+                    },
+                    name    => 'Test::MixedScripts',
+                    version => Dist::Zilla::Plugin::Test::MixedScripts->VERSION,
+                };
+                etc;
+            };
+            etc;
+        };
+        etc;
+    },
     'prereqs are properly injected for the develop phase',
 ) or diag 'got distmeta: ', explain $tzil->distmeta;
 
@@ -97,7 +95,9 @@ subtest 'run the generated test' => sub {
     do $file;
     note 'ran tests successfully' if not $@;
     fail($@)                      if $@;
-    $files_tested = Test::Builder->new->current_test;
+    my $ctx = context();
+    $files_tested = $ctx->hub->count;
+    $ctx->release;
 };
 is( $files_tested, 4, 'correct number of files were tested' );
 diag 'got log messages: ', explain $tzil->log_messages

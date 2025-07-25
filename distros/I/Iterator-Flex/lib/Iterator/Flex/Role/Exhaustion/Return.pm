@@ -5,10 +5,10 @@ package Iterator::Flex::Role::Exhaustion::Return;
 use strict;
 use warnings;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use Scalar::Util();
-use Iterator::Flex::Utils qw[ :default :RegistryKeys ];
+use Iterator::Flex::Utils qw[ :default REG_GENERAL REG_GP_EXHAUSTION ];
 use Role::Tiny;
 use experimental 'signatures';
 
@@ -23,7 +23,7 @@ use namespace::clean;
 
 
 sub sentinel ( $self ) {
-    return $REGISTRY{ refaddr $self }{ +GENERAL }{ +EXHAUSTION }[1];
+    return $REGISTRY{ refaddr $self }[REG_GENERAL][REG_GP_EXHAUSTION][1];
 }
 
 
@@ -65,7 +65,7 @@ Iterator::Flex::Role::Exhaustion::Return - signal exhaustion by returning a sent
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 METHODS
 

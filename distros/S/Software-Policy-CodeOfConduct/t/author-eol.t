@@ -28,6 +28,7 @@ my @files = (
     't/author-no-tabs.t',
     't/author-pod-coverage.t',
     't/author-pod-linkcheck.t',
+    't/author-pod-spell.t',
     't/author-pod-syntax.t',
     't/etc/perlcritic.rc',
     't/release-check-manifest.t',

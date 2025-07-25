@@ -36,13 +36,21 @@ for my $alg (Crypt::Sodium::XS::OO::kdf->primitives) {
   eval { my $x = $m->derive($mk, 13, $m->BYTES_MIN, "short") };
   like($@, qr/Invalid context length \(too short\)/, "short context rejected ($alg)");
 
-  # this will likely fail on perl with 32-bit ints. it's not properly handled
-  # "yet." on such a perl, one shouldn't derive more than 2 ** 32 - 1 keys :(
   my $sk1 = $m->derive($mk, 4294967295, $min);
   my $sk2 = $m->derive($mk, 4294967296, $min);
   my $sk3 = $m->derive($mk, 4294967297, $min);
   ok(!$sk2->memcmp($sk1), "keys differ reaching id 2 ** 32 ($alg)");
   ok(!$sk3->memcmp($sk2), "keys differ after id 2 ** 32 ($alg)");
+
+  eval { $sk1 = $m->derive($mk, 2 ** 53 - 2, $min); };
+  is($@, '', "id 2 ** 53 - 2 accepted");
+  isa_ok($sk1, 'Crypt::Sodium::XS::MemVault', 'id 2 ** 53 - 2 returned MemVault');
+  eval { $sk2 = $m->derive($mk, 2 ** 53 - 1, $min); };
+  is($@, '', "id 2 ** 53 - 1 accepted");
+  isa_ok($sk2, 'Crypt::Sodium::XS::MemVault', 'id 2 ** 53 - 1 returned MemVault');
+  ok(!$sk1->memcmp($sk2), 'id 2 ** 53 - 2 and id 2 ** 53 - 1 keys differ');
+  eval { $m->derive($mk, 2 ** 53, $min); };
+  like($@, qr/id cannot be larger than/, "id above 2 ** 53 - 1 rejected");
 
   for my $len ($min .. $max) {
     next if $len % 8;

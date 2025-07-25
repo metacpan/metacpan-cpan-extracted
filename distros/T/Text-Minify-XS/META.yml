@@ -32,7 +32,7 @@ name: Text-Minify-XS
 provides:
   Text::Minify::XS:
     file: lib/Text/Minify/XS.pm
-    version: v0.7.6
+    version: v0.7.7
 requires:
   Exporter: '5.57'
   XSLoader: '0'
@@ -43,7 +43,7 @@ resources:
   bugtracker: https://github.com/robrwo/Text-Minify-XS/issues
   homepage: https://metacpan.org/release/Text-Minify-XS
   repository: git://github.com/robrwo/Text-Minify-XS.git
-version: v0.7.6
+version: v0.7.7
 x_authority: cpan:RRWO
 x_generated_by_perl: v5.34.3
 x_serialization_backend: 'YAML::Tiny version 1.76'

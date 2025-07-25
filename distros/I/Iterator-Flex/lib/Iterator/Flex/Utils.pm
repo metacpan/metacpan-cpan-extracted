@@ -9,77 +9,74 @@ use warnings;
 
 use experimental 'signatures', 'postderef';
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use Scalar::Util qw( refaddr );
 use Ref::Util    qw( is_hashref );
 use Exporter 'import';
+use experimental 'declared_refs';
 
 our %REGISTRY;
 
-our %ExhaustionActions;
-our %RegistryKeys;
-our %IterAttrs;
-our %Methods;
-our %IterStates;
-
-BEGIN {
-    %ExhaustionActions = ( map { $_ => lc $_ } qw[ THROW RETURN PASSTHROUGH ] );
-
-    %RegistryKeys
-      = ( map { $_ => lc $_ } qw[ INPUT_EXHAUSTION EXHAUSTION ERROR STATE ITERATOR GENERAL METHODS ] );
-
-    %IterAttrs = (
-        map { $_ => lc $_ }
-          qw[ _SELF _DEPENDS _ROLES _NAME STATE CLASS
-          NEXT PREV CURRENT REWIND RESET FREEZE METHODS ]
-    );
-
-    %Methods = ( map { $_ => lc $_ } qw[ IS_EXHAUSTED SET_EXHAUSTED  ] );
-
-    %IterStates = (
-        IterState_CLEAR     => 0,
-        IterState_EXHAUSTED => 1,
-        IterState_ERROR     => 2,
-    );
+sub mk_indices {
+    my $idx = 0;
+    return { map { $_ => $idx++ } @_ };
 }
 
-use constant \%ExhaustionActions;
-use constant \%RegistryKeys;
-use constant \%IterAttrs;
-use constant \%Methods;
-use constant \%IterStates;
-
-our @InterfaceParameters;
-our @SignalParameters;
-
-BEGIN {
-    @InterfaceParameters = (
-        +_NAME,  +_SELF, +_DEPENDS, +_ROLES,  +STATE,   +NEXT,
-        +REWIND, +RESET, +PREV,     +CURRENT, +METHODS, +FREEZE
-    );
-    @SignalParameters = ( +INPUT_EXHAUSTION, +EXHAUSTION, +ERROR, );
+sub mk_lc {
+    return { map { $_ => lc $_ } @_ };
 }
 
-use constant InterfaceParameters => @InterfaceParameters;
-use constant SignalParameters    => @SignalParameters;
-use constant GeneralParameters   => +InterfaceParameters, +SignalParameters;
+use constant ITER_ATTRS => qw(
+  CLASS CURRENT FREEZE METHODS NEXT PREV RESET REWIND STATE _DEPENDS _NAME _ROLES _SELF
+);
+use constant mk_lc ITER_ATTRS;
+use constant REGISTRY_ITERATION_INDICES => map { 'REG_ITER_' . $_ } ITER_ATTRS, 'MAY_METHOD';
+use constant mk_indices REGISTRY_ITERATION_INDICES;
+our \%RegIterationIndexMap = mk_indices map { lc } ITER_ATTRS;
 
-our %SignalParameters    = {}->%{ +SignalParameters };
-our %InterfaceParameters = {}->%{ +InterfaceParameters };
+use constant EXHAUSTED_METHODS => qw( IS_EXHAUSTED SET_EXHAUSTED  );
+use constant mk_lc EXHAUSTED_METHODS;
+
+use constant ITER_STATES => qw( IterState_CLEAR IterState_EXHAUSTED IterState_ERROR );
+use constant mk_indices ITER_STATES;
+
+use constant REGISTRY_INDICES => qw( REG_ITERATOR REG_GENERAL REG_METHODS );
+use constant mk_indices REGISTRY_INDICES;
+
+use constant EXHAUSTION_ACTIONS => qw[ THROW RETURN PASSTHROUGH ];
+use constant mk_lc EXHAUSTION_ACTIONS;
+
+use constant INTERFACE_PARAMETERS =>
+  qw( CURRENT FREEZE METHODS NEXT PREV RESET REWIND STATE _DEPENDS _NAME _ROLES _SELF );
+use constant INTERFACE_PARAMETER_VALUES => map { lc $_ } INTERFACE_PARAMETERS;
+use constant mk_lc INTERFACE_PARAMETERS;
+
+
+use constant SIGNAL_PARAMETERS       => qw( INPUT_EXHAUSTION EXHAUSTION ERROR );
+use constant SIGNAL_PARAMETER_VALUES => map { lc $_ } SIGNAL_PARAMETERS;
+use constant mk_lc SIGNAL_PARAMETERS;
+
+use constant GENERAL_PARAMETERS      => ( INTERFACE_PARAMETERS, SIGNAL_PARAMETERS );
+use constant REGISTRY_GENPAR_INDICES => map { 'REG_GP_' . $_ } GENERAL_PARAMETERS;
+use constant mk_indices REGISTRY_GENPAR_INDICES;
+
+our \%RegGeneralParameterIndexMap = mk_indices map { lc } GENERAL_PARAMETERS;
 
 our %EXPORT_TAGS = (
-    ExhaustionActions => [ keys %ExhaustionActions, ],
-    RegistryKeys      => [ keys %RegistryKeys ],
-    IterAttrs         => [ keys %IterAttrs ],
-    IterStates        => [ keys %IterStates ],
-    Methods           => [ keys %Methods ],
-    GeneralParameters => [GeneralParameters],
-    Functions         => [ qw(
-          check_invalid_interface_parameters
-          check_invalid_signal_parameters
-          check_valid_interface_parameters
-          check_valid_signal_parameters
+    ExhaustionActions => [EXHAUSTION_ACTIONS],
+    ExhaustedMethods  => [EXHAUSTED_METHODS],
+    RegistryIndices   => [
+        REGISTRY_INDICES,        REGISTRY_ITERATION_INDICES,
+        '%RegIterationIndexMap', REGISTRY_GENPAR_INDICES,
+        '%RegGeneralParameterIndexMap'
+    ],
+    IterAttrs           => [ITER_ATTRS],
+    IterStates          => [ITER_STATES],
+    SignalParameters    => [ SIGNAL_PARAMETERS,    'SIGNAL_PARAMETER_VALUES' ],
+    InterfaceParameters => [ INTERFACE_PARAMETERS, 'INTERFACE_PARAMETER_VALUES' ],
+    GeneralParameters   => [ GENERAL_PARAMETERS, ],
+    Functions           => [ qw(
           throw_failure
           parse_pars
         )
@@ -87,7 +84,8 @@ our %EXPORT_TAGS = (
     default => [qw( %REGISTRY refaddr )],
 );
 
-our @EXPORT = @{ $EXPORT_TAGS{default} };
+## no critic ( AutomaticExportation )
+our @EXPORT = @{ $EXPORT_TAGS{default} };    # ??? is this needed?
 
 our @EXPORT_OK = ( map { @{$_} } values %EXPORT_TAGS, );
 
@@ -97,7 +95,7 @@ with 'Iterator::Flex::Role::Utils';
 
 sub throw_failure ( $failure, $msg ) {
     require Iterator::Flex::Failure;
-    my $type = join( '::', 'Iterator::Flex::Failure', $failure );
+    my $type = join( q{::}, 'Iterator::Flex::Failure', $failure );
     $type->throw( { msg => $msg, trace => Iterator::Flex::Failure->croak_trace } );
 }
 
@@ -118,70 +116,22 @@ sub parse_pars ( @args ) {
     my %pars = do {
 
         if ( @args == 1 ) {
-            throw_failure( parameter => "expected a hashref " )
-              unless is_hashref( $args[0] );
+            is_hashref( $args[0] )
+              or throw_failure( parameter => 'expected a hashref' );
             $args[0]->%*;
         }
 
         else {
-            throw_failure( parameter => "expected an even number of arguments for hash" )
-              if @args % 2;
+            @args % 2
+              and throw_failure( parameter => 'expected an even number of arguments for hash' );
             @args;
         }
     };
 
-    my %ipars = delete %pars{ check_valid_interface_parameters( [ keys %pars ] ) };
-    my %spars = delete %pars{ check_valid_signal_parameters( [ keys %pars ] ) };
+    my %ipars = delete %pars{ grep exists $pars{$_}, INTERFACE_PARAMETER_VALUES };
+    my %spars = delete %pars{ grep exists $pars{$_}, SIGNAL_PARAMETER_VALUES };
 
     return ( \%pars, \%ipars, \%spars );
-}
-
-
-
-
-
-
-
-
-
-sub check_invalid_interface_parameters ( $pars ) {
-    return ( grep !exists $InterfaceParameters{$_}, $pars->@* );
-}
-
-
-
-
-
-
-
-
-
-sub check_valid_interface_parameters ( $pars ) {
-    return ( grep exists $InterfaceParameters{$_}, $pars->@* );
-}
-
-
-
-
-
-
-
-
-
-sub check_invalid_signal_parameters ( $pars ) {
-    return ( grep !exists $SignalParameters{$_}, $pars->@* );
-}
-
-
-
-
-
-
-
-
-
-sub check_valid_signal_parameters ( $pars ) {
-    return ( grep exists $SignalParameters{$_}, $pars->@* );
 }
 
 1;
@@ -208,7 +158,7 @@ Iterator::Flex::Utils - Internal utilities
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 SUBROUTINES
 
@@ -221,30 +171,6 @@ L<model|Iterator::Flex::Manual::Overview/Model Parameters>
 L<interface|Iterator::Flex::Manual::Overview/Interface Parameters>
 L<signal|Iterator::Flex::Manual::Overview/Signal Parameters>
 parameters from C<%args>.
-
-=head2 check_invalid_interface_parameters
-
-   @bad = check_invalid_interface_parameters( \@pars );
-
-Returns invalid interface parameters;
-
-=head2 check_valid_interface_parameters
-
-   @bad = check_valid_interface_parameters( \@pars );
-
-Returns valid interface parameters;
-
-=head2 check_invalid_signal_parameters
-
-   @bad = check_invalid_signal_parameters( \@pars );
-
-Returns invalid signal parameters;
-
-=head2 check_valid_signal_parameters
-
-   @bad = check_valid_signal_parameters( \@pars );
-
-Returns valid signal parameters;
 
 =head1 INTERNALS
 

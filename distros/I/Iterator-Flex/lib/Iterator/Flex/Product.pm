@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use experimental qw( signatures declared_refs refaliasing );
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use Iterator::Flex::Utils qw( RETURN STATE EXHAUSTION :IterAttrs :IterStates );
 use Iterator::Flex::Factory;
@@ -85,8 +85,8 @@ sub new ( $class, @args ) {
     $class->SUPER::new( { keys => \@keys, depends => \@iterators, value => [] }, $pars );
 }
 
-sub construct ( $class, $state ) {
-    $class->_throw( parameter => "state must be a HASH reference" )
+sub construct ( $class, $state ) {    ## no critic (ExcessComplexity)
+    $class->_throw( parameter => q{state must be a HASH reference} )
       unless Ref::Util::is_hashref( $state );
 
     $state->{value} //= [];
@@ -96,18 +96,19 @@ sub construct ( $class, $state ) {
 
     # transform into iterators if required.
     my @iterators
-      = map { Iterator::Flex::Factory->to_iterator( $_, { ( +EXHAUSTION ) => +RETURN } ) } @depends;
+      = map { Iterator::Flex::Factory->to_iterator( $_, { ( +EXHAUSTION ) => RETURN } ) } @depends;
 
     # can only work if the iterators support a rewind method
-    $class->_throw( parameter => "all iterables must provide a rewind method" )
+    $class->_throw( parameter => q{all iterables must provide a rewind method} )
       unless List::Util::all { defined $class->_can_meth( $_, 'rewind' ) } @iterators;
 
-    $class->_throw( parameter => "number of keys not equal to number of iterators" )
+    $class->_throw( parameter => q{number of keys not equal to number of iterators} )
       if @keys && @keys != @iterators;
 
     @value = map { $_->current } @iterators
       if $thaw;
 
+    ## no critic ( AmbiguousNames )
     my @set = ( 1 ) x @value;
 
     my $self;
@@ -119,7 +120,7 @@ sub construct ( $class, $state ) {
         ( +STATE ) => \$iterator_state,
 
         ( +NEXT ) => sub {
-            return $self->signal_exhaustion if $iterator_state == +IterState_EXHAUSTED;
+            return $self->signal_exhaustion if $iterator_state == IterState_EXHAUSTED;
 
             # first time through
             if ( !@value ) {
@@ -171,7 +172,7 @@ sub construct ( $class, $state ) {
 
         ( +CURRENT ) => sub {
             return undef                    if !@value;
-            return $self->signal_exhaustion if $iterator_state eq +IterState_EXHAUSTED;
+            return $self->signal_exhaustion if $iterator_state eq IterState_EXHAUSTED;
             if ( @keys ) {
                 my %value;
                 @value{@keys} = @value;
@@ -237,7 +238,7 @@ Iterator::Flex::Product - An iterator which produces a Cartesian product of iter
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 METHODS
 

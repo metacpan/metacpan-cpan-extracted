@@ -33,4 +33,8 @@ is minify_utf8("simple  \nstuff  ") => "simple\nstuff";
 
 is minify_utf8("\r\n\r\n\t0\r\n\t\t1\r\n") => "0\n1\n";
 
+my $BOM = chr(0xfeff);
+
+is minify_utf8( $BOM . "simple" ) => $BOM . "simple", "ignore BOM";
+
 done_testing;

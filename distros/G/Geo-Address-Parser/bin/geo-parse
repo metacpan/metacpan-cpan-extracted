@@ -1,0 +1,76 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Geo::Address::Parser;
+use Getopt::Long;
+use Pod::Usage;
+use JSON::MaybeXS;
+
+my $country;
+my $help;
+my $man;
+my $json_output;
+
+GetOptions(
+	'country|c=s' => \$country,
+	'help|h' => \$help,
+	'man' => \$man,
+	'json' => \$json_output,
+) or pod2usage(2);
+
+pod2usage(1) if $help;
+pod2usage(-verbose => 2) if $man;
+
+my $input = join(' ', @ARGV);
+if (!$input) {
+	print STDERR "No address given.\n";
+	pod2usage(1);
+}
+
+if (!$country) {
+	print STDERR "No country given.\n";
+	pod2usage(1);
+}
+
+my $parser = Geo::Address::Parser->new(country => $country);
+my $result = $parser->parse($input);
+
+if (!$result) {
+	print STDERR "Failed to parse address.\n";
+	exit 1;
+}
+
+if ($json_output) {
+	print JSON::MaybeXS->new->canonical->pretty->encode($result);
+} else {
+	foreach my $field (qw(name street suburb city region postcode country)) {
+		printf "%-10s: %s\n", ucfirst($field), $result->{$field} // '';
+	}
+}
+
+
+=head1 NAME
+
+geo-parse - Command-line tool for Geo::Address::Parser
+
+=head1 SYNOPSIS
+
+  geo-parse --country US "1600 Amphitheatre Pkwy, Mountain View, CA 94043"
+
+  geo-parse -c NZ "Auckland Museum, 1 Museum Circuit, Parnell, Auckland 1010"
+
+  geo-parse --help
+  geo-parse --man
+
+=head1 OPTIONS
+
+  -c, --country   Country code (e.g., US, UK, CA, AU, NZ)
+  -h, --help	  Print a brief help message
+      --man	  Full documentation
+  -j, --json	  JSON output
+
+=head1 DESCRIPTION
+
+This script parses a freeform postal address and extracts structured fields using Geo::Address::Parser.

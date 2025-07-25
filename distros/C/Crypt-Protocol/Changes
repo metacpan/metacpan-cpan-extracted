@@ -1,5 +1,8 @@
 Revision history for Perl extension Crypt::Protocol.
 
+0.002  2025/07/24   
+    - speke
+
 0.001  2025/07/05   
     - init
 

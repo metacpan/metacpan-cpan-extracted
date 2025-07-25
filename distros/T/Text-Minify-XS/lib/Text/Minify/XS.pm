@@ -10,7 +10,7 @@ use XSLoader;
 
 our @EXPORT_OK = qw(minify minify_utf8 minify_ascii);
 
-our $VERSION = 'v0.7.6';
+our $VERSION = 'v0.7.7';
 
 XSLoader::load( __PACKAGE__, $VERSION );
 
@@ -34,7 +34,9 @@ Text::Minify::XS - Remove indentation and trailing whitespace from multi-line te
 
 =head1 VERSION
 
-version v0.7.6
+version v0.7.7
+
+=for stopwords BOM minify minifier
 
 =head1 SYNOPSIS
 
@@ -97,15 +99,9 @@ This is a version of L</minify> that works on ASCII text. It was added in v0.5.3
 If you are only processing 8-bit text, then it should be faster.
 (Rudimentary benchmarks show it is twice as fast as L</minify>.)
 
-Unlike the L</minify>, if the input string has the UTF-8 flag set, the
+Unlike L</minify>, if the input string has the UTF-8 flag set, the
 resulting string will not.  You should ensure the string is properly
 encoded.
-
-=head1 SUPPORT FOR OLDER PERL VERSIONS
-
-Since v0.7.0, this module requires Perl v5.14 or later.
-
-Future releases may only support Perl versions released in the last ten (10) years.
 
 =head1 KNOWN ISSUES
 
@@ -116,17 +112,24 @@ output.  In extreme cases it may throw an exception in order to avoid
 memory overflows. You should ensure that the input string is properly
 encoded as UTF-8.
 
-=head1 SEE ALSO
+=head2 Byte Order Marks
 
-There are many string trimming and specialised whitespace/comment-removal modules on CPAN.
-It is not practical to include such a list.
+The Byte Order Mark (BOM) at the beginning of a file will not be removed. That is because the minifier does not know
+this is the beginning of a file or not.
 
-=head1 SOURCE
+=head1 SECURITY CONSIDERATIONS
 
-The development version is on github at L<https://github.com/robrwo/Text-Minify-XS>
-and may be cloned from L<git://github.com/robrwo/Text-Minify-XS.git>
+Passing malformed UTF-8 characters may throw an exception, which in some cases could lead to a denial of service if
+untrusted input is passed to L</minify_utf8>.  See L</KNOWN ISSUES>.
 
-=head1 BUGS
+=head1 SUPPORT
+
+Only the latest version of this module will be supported.
+
+Since v0.7.0, this module requires Perl v5.14 or later.
+Future releases may only support Perl versions released in the last ten (10) years.
+
+=head2 Reporting Bugs and Submitting Feature Requests
 
 Please report any bugs or feature requests on the bugtracker website
 L<https://github.com/robrwo/Text-Minify-XS/issues>
@@ -135,10 +138,15 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
-=head2 Reporting Security Vulnerabilities
+If the bug you are reporting has security implications which make it inappropriate to send to a public issue tracker,
+then see F<SECURITY.md> for instructions how to report security vulnerabilities.
 
-Security issues should not be reported on the bugtracker website. Please see F<SECURITY.md> for instructions how to
-report security vulnerabilities.
+=head1 SOURCE
+
+The development version is on github at L<https://github.com/robrwo/Text-Minify-XS>
+and may be cloned from L<git://github.com/robrwo/Text-Minify-XS.git>
+
+See F<CONTRIBUTING.md> for more information.
 
 =head1 AUTHOR
 

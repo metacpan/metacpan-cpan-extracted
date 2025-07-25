@@ -59,7 +59,7 @@
          "web" : "https://github.com/bes-internal/Date-Holidays-BY"
       }
    },
-   "version" : "2.2025.1",
+   "version" : "2.2026.0",
    "x_generated_by_perl" : "v5.36.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

@@ -1,5 +1,6 @@
 use Test2::V0;
 use Test2::Require::Module 'Business::ISBN' => '3.007';
+use Test2::Require::Module 'GD';
 
 # this test is adapted from the one in the Business::ISBN testsuite
 use GD::Barcode::EAN13;

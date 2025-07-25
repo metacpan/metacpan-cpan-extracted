@@ -18,7 +18,7 @@ my %module_build_args = (
     "Vladimir Varlamov <bes.internal\@gmail.com>"
   ],
   "dist_name" => "Date-Holidays-BY",
-  "dist_version" => "2.2025.1",
+  "dist_version" => "2.2026.0",
   "license" => "perl",
   "module_name" => "Date::Holidays::BY",
   "recursive_test_files" => 1,

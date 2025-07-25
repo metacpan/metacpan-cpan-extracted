@@ -1,5 +1,5 @@
 ---
-abstract: 'author tests to ensure there is no mixed unicode'
+abstract: 'author tests to ensure there is no mixed Unicode'
 author:
   - 'Robert Rothenberg <rrwo@cpan.org>'
 build_requires:
@@ -8,10 +8,10 @@ build_requires:
   File::pushd: '0'
   FindBin: '0'
   Module::Metadata: '1.000015'
+  Test2::V0: '0'
   Test::DZil: '0'
-  Test::Deep: '0'
-  Test::MixedScripts: v0.2.0
-  Test::More: '1.302200'
+  Test::MixedScripts: v0.3.0
+  Test::More: '0'
   Test::Warnings: '0.009'
   strict: '0'
 configure_requires:
@@ -34,7 +34,7 @@ name: Dist-Zilla-Plugin-Test-MixedScripts
 provides:
   Dist::Zilla::Plugin::Test::MixedScripts:
     file: lib/Dist/Zilla/Plugin/Test/MixedScripts.pm
-    version: v0.1.2
+    version: v0.1.4
 requires:
   Data::Section: '0.004'
   Dist::Zilla::File::InMemory: '0'
@@ -54,8 +54,10 @@ requires:
 resources:
   bugtracker: https://github.com/robrwo/perl-Dist-Zilla-Plugin-Test-MixedScripts/issues
   repository: git://github.com/robrwo/perl-Dist-Zilla-Plugin-Test-MixedScripts.git
-version: v0.1.2
+version: v0.1.4
 x_authority: cpan:RRWO
+x_contributors:
+  - 'Graham Knop <haarg@haarg.org>'
 x_generated_by_perl: v5.34.3
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

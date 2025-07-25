@@ -228,7 +228,7 @@ sub ssh_cert_issue($cert) {
     }
     push @cmd_args, '-s', $ca, $pubkey_fn;
 
-    say join(' ', map { "'$_'" } @cmd_args)
+    say STDERR join(' ', map { "'$_'" } @cmd_args)
         if $DEBUG;
 
     system @cmd_args;
@@ -252,7 +252,7 @@ sub _init_ca_key( %args ) {
         push @args, ('-C', $args{comment});
     }
 
-    say "Generating $args{name} key: " . join(' ', map { qq{"$_"} } @args)
+    say STDERR "Generating $args{name} key: " . join(' ', map { qq{"$_"} } @args)
         if $DEBUG;
     system(@args);
 }
@@ -302,8 +302,6 @@ sub _validity_for_cert( $cert ) {
 }
 
 sub cmd_issue(@args) {
-    my @options;
-    my @principals;
     my $type = opt( 'certtype' );
 
     my $identity = shift @args;
@@ -339,8 +337,8 @@ sub cmd_issue(@args) {
     }
     my $cert = cert_new( $identity,
                          pubkey => $pubkey,
-                         options => \@options,
-                         principals => \@principals,
+                         options => opt( 'certoptions' ),
+                         principals => opt( 'certprincipals' ),
                          type => $type );
     cert_serial( $cert, conf_next_serial() );
     cert_validity( $cert, _validity_for_cert( $cert ) );
@@ -458,7 +456,7 @@ sshca - Minimalistic SSH Certificate Authority
 
 =head1 VERSION
 
-version 0.0.3
+version 0.0.4
 
 =head1 SYNOPSIS
 

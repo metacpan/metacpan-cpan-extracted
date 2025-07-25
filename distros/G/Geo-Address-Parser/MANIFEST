@@ -1,3 +1,4 @@
+bin/geo-parse
 Changes
 lib/Geo/Address/Parser.pm
 lib/Geo/Address/Parser/Rules/AU.pm
@@ -13,9 +14,12 @@ README.md
 t/au.t
 t/basic.t
 t/ca.t
+t/cli.t
 t/eof.t
 t/eol.t
 t/nz.t
+t/pod-coverage.t
+t/pod-synopsis.t
 t/pod.t
 t/uk.t
 t/us.t

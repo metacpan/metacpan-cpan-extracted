@@ -1,3 +1,5 @@
+#define csxs_kdf_DERIVE_ID_CEILING 0x1p+53
+
 MODULE = Crypt::Sodium::XS PACKAGE = Crypt::Sodium::XS::kdf
 
 void _define_constants()
@@ -18,10 +20,11 @@ void _define_constants()
   newCONSTSUB(stash, "kdf_blake2b_KEYBYTES",
               newSVuv(crypto_kdf_blake2b_KEYBYTES));
   newCONSTSUB(stash, "kdf_PRIMITIVE", newSVpvs(crypto_kdf_PRIMITIVE));
+  newCONSTSUB(stash, "kdf_DERIVE_CEILING", newSVnv(csxs_kdf_DERIVE_ID_CEILING));
 
 SV * kdf_derive( \
   SV * key, \
-  UV id, \
+  SV * id_sv, \
   STRLEN new_key_len, \
   SV * ctx = &PL_sv_undef, \
   SV * flags = &PL_sv_undef \
@@ -42,10 +45,18 @@ SV * kdf_derive( \
   STRLEN new_key_req_min;
   STRLEN new_key_req_max;
   unsigned int new_key_flags;
+  uint64_t id;
   int (*func)(unsigned char *, size_t, uint64_t,
               const char *, const unsigned char *);
 
   CODE:
+#ifdef LESSTHAN64BITINT
+  id = SvNV(id_sv);
+#else
+  id = SvUV(id_sv);
+#endif
+  if (id >= csxs_kdf_DERIVE_ID_CEILING)
+    croak("derive: id cannot be larger than (%a - 1)", csxs_kdf_DERIVE_ID_CEILING);
   switch(ix) {
     case 1:
       key_req_len = crypto_kdf_blake2b_KEYBYTES;

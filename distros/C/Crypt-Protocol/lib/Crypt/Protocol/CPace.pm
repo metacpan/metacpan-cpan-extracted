@@ -204,7 +204,7 @@ sub prepare_ISK {
   #$point_recv = Crypt::OpenSSL::EC::EC_POINT::hex2point( $group, $point_hex, $point_recv, $ctx );
   my $nid = Crypt::OpenSSL::EC::EC_GROUP::get_curve_name($group);
   my $group_name = OBJ_nid2sn($nid);
-  print "nid,", $nid, "group, ", $group_name, ",\n";
+  #print "nid,", $nid, "group, ", $group_name, ",\n";
   my $point_recv = hex2point($group_name, $point_hex);
 
   my $K = scalar_mult_vfy( $group, $point_recv, $rnd, $ctx );

@@ -5,11 +5,11 @@ package Iterator::Flex::Role::Freeze;
 use strict;
 use warnings;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use List::Util;
 
-use Iterator::Flex::Utils qw( :default ITERATOR :IterAttrs :RegistryKeys );
+use Iterator::Flex::Utils qw( :default REG_ITERATOR REG_ITER__DEPENDS REG_ITER_FREEZE );
 use Iterator::Flex::Base;
 use Role::Tiny;
 use experimental 'signatures';
@@ -27,23 +27,23 @@ use namespace::clean;
 
 sub freeze ( $obj ) {
 
-    my $ipar = $REGISTRY{ refaddr $obj }{ +ITERATOR };
+    my $ipar = $REGISTRY{ refaddr $obj }[REG_ITERATOR];
 
     my @freeze;
 
-    if ( defined $ipar->{ +_DEPENDS } ) {
+    if ( defined $ipar->[REG_ITER__DEPENDS] ) {
 
         # first check if dependencies can freeze.
         my $cant = List::Util::first { !$_->can( 'freeze' ) }
-        @{ $ipar->{ +_DEPENDS } };
+        @{ $ipar->[REG_ITER__DEPENDS] };
         $obj->_throw( parameter => "dependency: @{[ $cant->_name ]} is not serializeable" )
           if $cant;
 
         # now freeze them
-        @freeze = map $_->freeze, @{ $ipar->{ +_DEPENDS } };
+        @freeze = map $_->freeze, @{ $ipar->[REG_ITER__DEPENDS] };
     }
 
-    push @freeze, $ipar->{ +FREEZE }->( $obj ), $obj->is_exhausted;
+    push @freeze, $ipar->[REG_ITER_FREEZE]->( $obj ), $obj->is_exhausted;
 
     return \@freeze;
 }
@@ -74,7 +74,7 @@ Iterator::Flex::Role::Freeze - Role to add serialization capability to an Iterat
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 METHODS
 

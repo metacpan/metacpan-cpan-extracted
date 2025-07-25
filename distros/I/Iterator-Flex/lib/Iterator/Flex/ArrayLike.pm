@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use experimental 'signatures';
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use Ref::Util;
 use Iterator::Flex::Utils ':IterAttrs';
@@ -77,7 +77,7 @@ Role::Tiny::With::with 'Iterator::Flex::Role::Utils';
 
 sub new ( $class, $obj, $pars = {} ) {
 
-    $class->_croak( parameter => "argument must be a blessed reference" )
+    $class->_croak( parameter => q{argument must be a blessed reference} )
       unless Ref::Util::is_blessed_ref( $obj );
 
     $class->SUPER::new( { object => $obj }, $pars );
@@ -85,13 +85,13 @@ sub new ( $class, $obj, $pars = {} ) {
 
 sub construct ( $class, $state ) {
 
-    $class->_throw( parameter => "state must be a HASH reference" )
+    $class->_throw( parameter => q{state must be a HASH reference} )
       unless Ref::Util::is_hashref( $state );
 
     my ( $obj, $prev, $current, $next, $length, $at )
       = @{$state}{qw[ object prev current next length at ]};
 
-    $class->_throw( parameter => "state 'object' argument must be a blessed reference" )
+    $class->_throw( parameter => q{state 'object' argument must be a blessed reference} )
       unless Ref::Util::is_blessed_ref( $obj );
 
     $length = $class->_resolve_meth( $obj, $length, 'length', 'len' );
@@ -102,13 +102,13 @@ sub construct ( $class, $state ) {
 
     $next = 0 unless defined $next;
 
-    $class->_throw( parameter => "illegal value for state 'prev' argument" )
+    $class->_throw( parameter => q{illegal value for state 'prev' argument} )
       if defined $prev && ( $prev < 0 || $prev >= $len );
 
-    $class->_throw( parameter => "illegal value for state 'current' argument" )
+    $class->_throw( parameter => q{illegal value for state 'current' argument} )
       if defined $current && ( $current < 0 || $current >= $len );
 
-    $class->_throw( parameter => "illegal value for state 'next' argument" )
+    $class->_throw( parameter => q{illegal value for state 'next' argument} )
       if $next < 0 || $next > $len;
 
     my $self;
@@ -183,7 +183,7 @@ Iterator::Flex::ArrayLike - ArrayLike Iterator Class
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 METHODS
 

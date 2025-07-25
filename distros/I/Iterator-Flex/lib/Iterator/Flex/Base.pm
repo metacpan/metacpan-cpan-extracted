@@ -7,11 +7,12 @@ use 5.10.0;
 use strict;
 use warnings;
 
-use experimental qw( signatures postderef );
+use experimental qw( signatures postderef declared_refs );
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use Ref::Util;
+use Scalar::Util;
 use List::Util;
 use Role::Tiny       ();
 use Role::Tiny::With ();
@@ -22,16 +23,21 @@ Role::Tiny::With::with 'Iterator::Flex::Role', 'Iterator::Flex::Role::Utils';
 use Iterator::Flex::Utils qw (
   :default
   :ExhaustionActions
-  :RegistryKeys
+  :GeneralParameters
+  :RegistryIndices
   :IterAttrs
   :IterStates
-  check_invalid_interface_parameters
-  check_invalid_signal_parameters
+  :InterfaceParameters
+  :SignalParameters
 );
 
 use namespace::clean;
 
-use overload ( '<>' => sub ( $self, $, $ ) { &{$self}() }, fallback => 1 );
+use overload
+  '<>'     => sub ( $self, $, $ ) { &{$self}() },
+  fallback => 0,
+  bool     => sub { 1 },
+  ;
 
 # We separate constructor parameters into two categories:
 #
@@ -50,7 +56,7 @@ sub new_from_state ( $class, $state, $general ) {
     return $class->new_from_attrs( $class->construct( $state ), $general );
 }
 
-sub new_from_attrs ( $class, $in_ipar = {}, $in_gpar = {} ) {
+sub new_from_attrs ( $class, $in_ipar = {}, $in_gpar = {} ) {    ## no critic (ExcessComplexity)
 
     my %ipar = $in_ipar->%*;
     my %gpar = $in_gpar->%*;
@@ -60,15 +66,16 @@ sub new_from_attrs ( $class, $in_ipar = {}, $in_gpar = {} ) {
 
     my @roles = ( delete( $ipar{ +_ROLES } ) // [] )->@*;
 
-    $gpar{ +ERROR } //= [ ( +THROW ) ];
+    $gpar{ +ERROR } //= [THROW];
     $gpar{ +ERROR } = [ $gpar{ +ERROR } ]
       unless Ref::Util::is_arrayref( $gpar{ +ERROR } );
 
-    if ( $gpar{ +ERROR }[0] eq +THROW ) {
+    if ( $gpar{ +ERROR }[0] eq THROW ) {
         push @roles, 'Error::Throw';
     }
     else {
-        $class->_throw( "unknown specification of iterator error signaling behavior:", $gpar{ +ERROR }[0] );
+        $class->_throw( q{unknown specification of iterator error signaling behavior:},
+            $gpar{ +ERROR }[0] );
     }
 
     my $exhaustion_action = $gpar{ +EXHAUSTION } // [ ( +RETURN ) => undef ];
@@ -80,13 +87,13 @@ sub new_from_attrs ( $class, $in_ipar = {}, $in_gpar = {} ) {
 
     $gpar{ +EXHAUSTION } = \@exhaustion_action;
 
-    if ( $exhaustion_action[0] eq +RETURN ) {
+    if ( $exhaustion_action[0] eq RETURN ) {
         push @roles, 'Exhaustion::Return';
     }
-    elsif ( $exhaustion_action[0] eq +THROW ) {
+    elsif ( $exhaustion_action[0] eq THROW ) {
 
         push @roles,
-          @exhaustion_action > 1 && $exhaustion_action[1] eq +PASSTHROUGH
+          @exhaustion_action > 1 && $exhaustion_action[1] eq PASSTHROUGH
           ? 'Exhaustion::PassthroughThrow'
           : 'Exhaustion::Throw';
     }
@@ -98,7 +105,7 @@ sub new_from_attrs ( $class, $in_ipar = {}, $in_gpar = {} ) {
 
         require Iterator::Flex::Method;
 
-        $class->_throw( parameter => "value for methods parameter must be a hash reference" )
+        $class->_throw( parameter => q{value for methods parameter must be a hash reference} )
           unless Ref::Util::is_hashref( $par );
 
         for my $name ( keys $par->%* ) {
@@ -111,7 +118,7 @@ sub new_from_attrs ( $class, $in_ipar = {}, $in_gpar = {} ) {
             # create role for the method
             my $role = eval { Iterator::Flex::Method::Maker( $name, name => $name ) };
 
-            if ( $@ ne '' ) {
+            if ( $@ ne q{} ) {
                 my $error = $@;
                 die $error
                   unless Ref::Util::is_blessed_ref( $error )
@@ -119,7 +126,7 @@ sub new_from_attrs ( $class, $in_ipar = {}, $in_gpar = {} ) {
                 $role = $error->payload;
             }
 
-            push @roles, '+' . $role;    # need '+', as these are fully qualified role module names.
+            push @roles, q{+} . $role;    # need '+', as these are fully qualified role module names.
         }
     }
 
@@ -140,11 +147,30 @@ sub new_from_attrs ( $class, $in_ipar = {}, $in_gpar = {} ) {
     my $self = bless $class->_construct_next( \%ipar, \%gpar ), $class;
 
     $class->_throw(
-        parameter => "attempt to register an iterator subroutine which has already been registered." )
+        parameter => q{attempt to register an iterator subroutine which has already been registered.} )
       if exists $REGISTRY{ refaddr $self };
 
-    $REGISTRY{ refaddr $self }
-      = { ( +ITERATOR ) => \%ipar, ( +GENERAL ) => \%gpar };
+    my $regentry = $REGISTRY{ refaddr $self } = [];
+
+    # convert to arrays. some of the parameter values are weak
+    # references so make sure we don't unweaken them
+    my @ipar;
+    for my $key ( keys %ipar ) {
+        $ipar[ $RegIterationIndexMap{$key} ] = $ipar{$key};
+        Scalar::Util::weaken $ipar[ $RegIterationIndexMap{$key} ]
+          if Ref::Util::is_ref( $ipar{$key} )
+          && Scalar::Util::isweak( $ipar{$key} );
+    }
+    my @gpar;
+    for my $key ( keys %gpar ) {
+        $gpar[ $RegGeneralParameterIndexMap{$key} ] = $gpar{$key};
+        Scalar::Util::weaken $gpar[ $RegGeneralParameterIndexMap{$key} ]
+          if Ref::Util::is_ref( $gpar{$key} )
+          && Scalar::Util::isweak( $gpar{$key} );
+    }
+
+    $regentry->[REG_ITERATOR] = \@ipar;
+    $regentry->[REG_GENERAL]  = \@gpar;
 
     $self->_clear_state;
 
@@ -152,14 +178,15 @@ sub new_from_attrs ( $class, $in_ipar = {}, $in_gpar = {} ) {
 }
 
 sub _validate_interface_pars ( $class, $pars ) {
+    state %InterfaceParameters = {}->%{ +INTERFACE_PARAMETER_VALUES };
 
-    my @bad = check_invalid_interface_parameters( [ keys $pars->%* ] );
+    my @bad = grep { !exists $InterfaceParameters{$_} } keys $pars->%*;
 
     $class->_throw( parameter => "unknown interface parameters: @{[ join ', ', @bad ]}" )
       if @bad;
 
-    $class->_throw( parameter => "@{[ +_ROLES ]}  must be an arrayref" )
-      if defined $pars->{ +_ROLES } && !Ref::Util::is_arrayref( $pars->{ +_ROLES } );
+    $class->_throw( parameter => "@{[ _ROLES ]}  must be an arrayref" )
+      if defined $pars->{_ROLES} && !Ref::Util::is_arrayref( $pars->{ +_ROLES } );
 
     if ( defined( my $par = $pars->{ +_DEPENDS } ) ) {
         $pars->{ +_DEPENDS } = $par = [$par] unless Ref::Util::is_arrayref( $par );
@@ -171,8 +198,8 @@ sub _validate_interface_pars ( $class, $pars ) {
 }
 
 sub _validate_signal_pars ( $class, $pars ) {
-
-    my @bad = check_invalid_signal_parameters( [ keys $pars->%* ] );
+    state %SignalParameters = {}->%{ +SIGNAL_PARAMETER_VALUES };
+    my @bad = grep { !exists $SignalParameters{$_} } keys $pars->%*;
 
     $class->_throw( parameter => "unknown signal parameters: @{[ join ', ', @bad ]}" )
       if @bad;
@@ -187,7 +214,7 @@ sub DESTROY ( $self ) {
 }
 
 sub _name ( $self ) {
-    $REGISTRY{ refaddr $self }{ +ITERATOR }{ +_NAME };
+    $REGISTRY{ refaddr $self }[REG_ITERATOR][REG_ITER__NAME];
 }
 
 
@@ -223,7 +250,7 @@ sub _is_iterator ( $, $obj ) {
 
 
 sub __iter__ ( $self ) {
-    return $REGISTRY{ refaddr $self }{ +ITERATOR }{ +NEXT };
+    return $REGISTRY{ refaddr $self }[REG_ITERATOR][REG_ITER_NEXT];
 }
 
 
@@ -238,12 +265,15 @@ sub __iter__ ( $self ) {
 
 
 
-sub may ( $self, $meth, $attributes = $self->__regentry( +ITERATOR ) ) {
+sub may ( $self, $meth ) {
 
-    return $attributes->{"_may_$meth"}
-      //= defined $attributes->{ +_DEPENDS }
-      ? !List::Util::first { !$_->may( $meth ) } $attributes->{ +_DEPENDS }->@*
-      : 1;
+    my \@attributes = $REGISTRY{ refaddr $self }[REG_ITERATOR];
+    my $may         = $attributes[REG_ITER_MAY_METHOD] //= {};
+
+    return $may->{"_may_$meth"}
+      //= defined $attributes[REG_ITER__DEPENDS]
+      ? !List::Util::first { !$_->may( $meth ) } $attributes[REG_ITER__DEPENDS]->@*
+      : defined $attributes[ $RegIterationIndexMap{$meth} ];
 }
 
 
@@ -295,7 +325,7 @@ sub _add_roles ( $class, @roles ) {
 
 sub _apply_method_to_depends ( $self, $meth ) {
 
-    if ( defined( my $depends = $REGISTRY{ refaddr $self }{ +ITERATOR }{ +_DEPENDS } ) ) {
+    if ( defined( my $depends = $REGISTRY{ refaddr $self }[REG_ITERATOR][REG_ITER__DEPENDS] ) ) {
         # first check if dependencies have method
         my $cant = List::Util::first { !$_->can( $meth ) } $depends->@*;
         $self->_throw( Unsupported => "dependency: @{[ $cant->_name ]} does not have a '$meth' method" )
@@ -314,7 +344,7 @@ sub _apply_method_to_depends ( $self, $meth ) {
 
 
 sub is_exhausted ( $self ) {
-    $self->get_state == +IterState_EXHAUSTED;
+    $self->get_state == IterState_EXHAUSTED;
 }
 
 
@@ -329,7 +359,7 @@ sub is_exhausted ( $self ) {
 
 
 sub set_exhausted ( $self ) {
-    $self->set_state( +IterState_EXHAUSTED );
+    $self->set_state( IterState_EXHAUSTED );
 }
 
 
@@ -349,7 +379,7 @@ sub set_exhausted ( $self ) {
 
 
 sub _clear_state ( $self ) {
-    $self->set_state( +IterState_CLEAR );
+    $self->set_state( IterState_CLEAR );
 }
 
 
@@ -360,7 +390,7 @@ sub _clear_state ( $self ) {
 
 
 sub is_error ( $self ) {
-    $self->get_state == +IterState_ERROR;
+    $self->get_state == IterState_ERROR;
 }
 
 
@@ -375,15 +405,38 @@ sub is_error ( $self ) {
 
 
 sub set_error ( $self ) {
-    $self->set_state( +IterState_ERROR );
+    $self->set_state( IterState_ERROR );
 }
 
-sub __regentry ( $self, @keys ) {
-    my $entry = $REGISTRY{ refaddr $self };
-    $entry = $entry->{ shift @keys } while @keys;
-    return $entry;
-}
 
+
+
+
+
+
+
+
+
+
+sub drain ( $self ) {
+
+    my @values;
+
+    eval {
+        while ( 1 ) {
+            my $value = $self->next;
+            last if $self->is_exhausted;
+            push @values, $value;
+        }
+        1;
+    } or do {
+        die $@
+          unless Ref::Util::is_blessed_ref( $@ )
+          && $@->isa( 'Iterator::Flex::Failure::Exhausted' );
+    };
+
+    return \@values;
+}
 
 1;
 
@@ -409,7 +462,7 @@ Iterator::Flex::Base - Iterator object
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 METHODS
 
@@ -498,6 +551,14 @@ An object method which sets the iterator state status to
 L<error|Iterator::Flex::Manual::Overview/Error State>.
 
 It does I<not> signal error.
+
+=head2 drain
+
+   \@values = $iter->drain;
+
+drains the iterator by repeatedly calling C<<$iter->next> until the
+iterator is exhausted.  C<$iter> will I<not> throw if it signals
+exhaustion by throwing.
 
 =head1 INTERNALS
 

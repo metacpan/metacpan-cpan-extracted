@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use experimental qw( signatures postderef );
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use parent 'Iterator::Flex::Base';
 use Iterator::Flex::Utils qw( STATE :IterAttrs :IterStates throw_failure );
@@ -59,7 +59,7 @@ use namespace::clean;
 
 sub new ( $class, $iterable, $pars = {} ) {
 
-    throw_failure( parameter => '"pars" argument must be a hash' )
+    throw_failure( parameter => 'q{pars} argument must be a hash' )
       unless Ref::Util::is_hashref( $pars );
 
     my %pars = $pars->%*;
@@ -85,7 +85,7 @@ sub new ( $class, $iterable, $pars = {} ) {
 
 sub construct ( $class, $state ) {
 
-    $class->_throw( parameter => "state must be a HASH reference" )
+    $class->_throw( parameter => q{state must be a HASH reference} )
       unless Ref::Util::is_hashref( $state );
 
     my ( $src, $capacity, $idx, $cache ) = @{$state}{qw[ depends capacity idx cache ]};
@@ -121,7 +121,7 @@ sub construct ( $class, $state ) {
         ( +NEXT ) => sub {
 
             return $self->signal_exhaustion
-              if $iterator_state == +IterState_EXHAUSTED;
+              if $iterator_state == IterState_EXHAUSTED;
 
             $idx = ++$idx % $capacity;
             my $current = $cache->[$idx] = $src->();
@@ -183,7 +183,7 @@ Iterator::Flex::Cache - Cache Iterator Class
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 METHODS
 

@@ -12,6 +12,7 @@ my @constant_bases = qw(
   BYTES_MIN
   CONTEXTBYTES
   KEYBYTES
+  DERIVE_ID_CEILING
 );
 my @bases = qw(keygen derive);
 
@@ -84,8 +85,9 @@ C<$key> is the master key from which others should be derived. It must be
 L</kdf_KEYBYTES> bytes. It may be a L<Crypt::Sodium::XS::MemVault>.
 
 C<$id> is an unsigned integer signifying the numeric identifier of the subkey
-which is being derived. The same C<$key>, C<$id>, C<$subkey_size>, and
-C<$context> will always derive the same key.
+which is being derived. It must be less than L</kdf_DERIVE_ID_CEILING> (see
+note below). The same C<$key>, C<$id>, C<$subkey_size>, and C<$context> will
+always derive the same key.
 
 C<$subkey_size> is the size, in bytes, of the subkey output. This can be used
 to derive a key of the particular size needed for the primitive with which the
@@ -99,6 +101,41 @@ C<$subkey_size> can still derive a different subkey.
 
 C<$flags> is optional. It is the flags used for the C<$subkey>
 L<Crypt::Sodium::XS::MemVault>. See L<Crypt::Sodium::XS::ProtMem>.
+
+B<Note>: C<$id> is limited to one less than L</kdf_DERIVE_ID_CEILING>. This
+limitation is applied on all platforms to prevent accidental derivation of
+duplicate keys due to handling of numeric values in perl. In perl, it is
+possible to lose numeric precision above C<2 ** 53> (when a number is stored
+and operated upon as NV; a double). This is always the case on 32-bit systems,
+but can happen to numeric values on 64-bit systems as well depending on the
+context of the perl code. Example from a 64-bit system (if this limitation were
+not in place):
+
+  my $k = "\0" x kdf_KEYBYTES(); # null key
+  my $x = 2 ** 53 - 2;
+  kdf_derive($k, $x++, 32)->to_base64->unlock for (1 .. 6);
+  # output:
+  # rHfr3QmtE_SSsGozwo9C1Ho24quHYMZqsu4Ax6KK_e0
+  # ixpuCXMoYQ15uBk_ZzFbHqH_qVQGywke-uBmutPPjcc <--- note that this is 2 ** 53
+  # v4sP0CLKMBbKmxvpG4IHzZui-5cTCozjJu57GdNB3ac
+  # Ual0mve2EEwqAh2Uqpa7dMUNyWslVb-kFWUIdnVrdcw <--- note again, 2 ** 53 + 2
+  # AbYjao-tEhLyFzPvmmk1viGummBid5MrN3kczzFm1TE
+  # rRVOLHdBIXVk6gWPHjCsjXGz-SERFUUne3_9TMtX2Vw <--- note again, 2 ** 53 + 4
+  $x = 2 ** 53;
+  kdf_derive($k, $x++, 32)->to_base64->unlock for (1 .. 5);
+  # output:
+  # ixpuCXMoYQ15uBk_ZzFbHqH_qVQGywke-uBmutPPjcc <--- 2 ** 53
+  # ixpuCXMoYQ15uBk_ZzFbHqH_qVQGywke-uBmutPPjcc
+  # ixpuCXMoYQ15uBk_ZzFbHqH_qVQGywke-uBmutPPjcc
+  # ixpuCXMoYQ15uBk_ZzFbHqH_qVQGywke-uBmutPPjcc
+  # ixpuCXMoYQ15uBk_ZzFbHqH_qVQGywke-uBmutPPjcc
+  $x += 2;  # adding 1 just repeats the above behavior
+  kdf_derive($k, $x++, 32)->to_base64->unlock for (1 .. 5);
+  # Ual0mve2EEwqAh2Uqpa7dMUNyWslVb-kFWUIdnVrdcw <--- 2 ** 53 + 2
+  # rRVOLHdBIXVk6gWPHjCsjXGz-SERFUUne3_9TMtX2Vw <--- 2 ** 53 + 4
+  # rRVOLHdBIXVk6gWPHjCsjXGz-SERFUUne3_9TMtX2Vw
+  # rRVOLHdBIXVk6gWPHjCsjXGz-SERFUUne3_9TMtX2Vw
+  # rRVOLHdBIXVk6gWPHjCsjXGz-SERFUUne3_9TMtX2Vw
 
 B<WARNING>: C<$context> must be at least L</kdf_CONTEXTBYTES> bytes. If it
 is longer than this, only the first L</kdf_CONTEXTBYTES> bytes will be used. As
@@ -134,11 +171,15 @@ Returns the name of the default primitive.
 
   my $subkey_max_size = kdf_BYTES_MAX();
 
+Returns the maximum size, in bytes, of a generated subkey.
+
 =head2 kdf_BYTES_MIN
 
 =head2 kdf_E<lt>primitiveE<gt>_BYTES_MIN
 
   my $subkey_min_size = kdf_BYTES_MIN();
+
+Returns the minimum size, in bytes, of a generated subkey.
 
 =head2 kdf_CONTEXTBYTES
 
@@ -146,11 +187,24 @@ Returns the name of the default primitive.
 
   my $context_size = kdf_CONTEXTBYTES();
 
+Returns the size, in bytes, of a context string.
+
 =head2 kdf_KEYBYTES
 
 =head2 kdf_E<lt>primitiveE<gt>_KEYBYTES
 
   my $main_key_size = kdf_KEYBYTES();
+
+Returns the size, in bytes, of a master key.
+
+=head2 kdf_DERIVE_ID_CEILING
+
+  die "cannot use this id" unless ($id < kdf_DERIVE_ID_CEILING());
+
+Returns one more than the maximum usable id for L</derive>.
+
+B<Note>: This is specific to L<Crypt::Sodium::XS>; it is not a libsodium
+constant.
 
 =head1 PRIMITIVES
 

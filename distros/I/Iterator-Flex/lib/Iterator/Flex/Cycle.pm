@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use experimental 'signatures';
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use Iterator::Flex::Utils ':IterAttrs';
 use Ref::Util;
@@ -43,7 +43,7 @@ use parent 'Iterator::Flex::Base';
 
 sub new ( $class, $array, $ ) {
 
-    $class->_throw( parameter => "argument must be an ARRAY reference" )
+    $class->_throw( parameter => q{argument must be an ARRAY reference} )
       unless Ref::Util::is_arrayref( $array );
 
     $class->SUPER::new( { array => $array }, {} );
@@ -51,7 +51,7 @@ sub new ( $class, $array, $ ) {
 
 sub construct ( $class, $state ) {
 
-    $class->_throw( parameter => "state must be a HASH reference" )
+    $class->_throw( parameter => q{state must be a HASH reference} )
       unless Ref::Util::is_hashref( $state );
 
     my ( $arr, $prev, $current, $next )
@@ -61,13 +61,13 @@ sub construct ( $class, $state ) {
 
     $next = 0 unless defined $next;
 
-    $class->_throw( parameter => "illegal value for 'prev'" )
+    $class->_throw( parameter => q{illegal value for 'prev'} )
       if defined $prev && ( $prev < 0 || $prev >= $len );
 
-    $class->_throw( parameter => "illegal value for 'current'" )
+    $class->_throw( parameter => q{illegal value for 'current'} )
       if defined $current && ( $current < 0 || $current >= $len );
 
-    $class->_throw( parameter => "illegal value for 'next'" )
+    $class->_throw( parameter => q{illegal value for 'next'} )
       if $next < 0 || $next > $len;
 
 
@@ -147,7 +147,7 @@ Iterator::Flex::Cycle - Array Cycle Iterator Class
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 METHODS
 

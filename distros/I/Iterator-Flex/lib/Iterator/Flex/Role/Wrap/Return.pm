@@ -5,7 +5,7 @@ package Iterator::Flex::Role::Wrap::Return;
 use strict;
 use warnings;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use Iterator::Flex::Utils qw( :default INPUT_EXHAUSTION );
 use Scalar::Util;
@@ -25,7 +25,7 @@ around _construct_next => sub ( $orig, $class, $ipar, $gpar ) {
         $gpar->{ +INPUT_EXHAUSTION } // do {
             require Iterator::Flex::Failure;
             Iterator::Flex::Failure::parameter->throw(
-                "internal error: input exhaustion policy was not registered" );
+                q{internal error: input exhaustion policy was not registered} );
         }
     )->[1];
 
@@ -40,14 +40,14 @@ around _construct_next => sub ( $orig, $class, $ipar, $gpar ) {
 
     # reference
     elsif ( ref $sentinel ) {
-        my $sentinel = refaddr $sentinel;
+        my $refaddr_sentinel = refaddr $sentinel;
 
         $wsub = sub {
             my $self = $_[0] // $wsub;
             my $val  = $next->( $self );
             my $addr = refaddr $val;
             return defined $addr
-              && $addr == $sentinel ? $self->signal_exhaustion : $val;
+              && $addr == $refaddr_sentinel ? $self->signal_exhaustion : $val;
         };
     }
 
@@ -106,7 +106,7 @@ Iterator::Flex::Role::Wrap::Return - wrap imported iterator which returns a sent
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 INTERNALS
 

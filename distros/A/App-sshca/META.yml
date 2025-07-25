@@ -18,7 +18,7 @@ requires:
 resources:
   bugtracker: https://github.com/ehuelsmann/perl-sshca/issues
   repository: https://github.com/ehuelsmann/perl-sshca.git
-version: 0.0.3
+version: 0.0.4
 x_generated_by_perl: v5.38.2
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: MIT

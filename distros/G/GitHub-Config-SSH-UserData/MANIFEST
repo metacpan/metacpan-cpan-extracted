@@ -1,0 +1,22 @@
+Changes
+CONTRIBUTING.md
+lib/GitHub/Config/SSH/UserData.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+SECURITY.md
+t/00-load.t
+t/01-test-data/cfg-01
+t/01-test-data/cfg-02
+t/01-user_data.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t
+xt/pod-spell.t
+xt/with_my_local_ssh_config.t
+
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+

@@ -13,7 +13,7 @@ Iterator::Flex::Manual::Using - How to use an Iterator::Flex iterator
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 DESCRIPTION
 
