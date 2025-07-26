@@ -2,10 +2,11 @@ package WWW::Noss::DB;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 
-use List::Util qw(all any max);
+use List::Util qw(all any max none);
 
+use DBD::SQLite;
 use DBI;
 use JSON;
 
@@ -33,6 +34,8 @@ sub _initialize {
             AutoCommit => 0,
         }
     );
+
+    $self->{ DB }->do('PRAGMA cache_size = 10000');
 
     $self->{ DB }->do(
         q{
@@ -76,10 +79,47 @@ CREATE TABLE IF NOT EXISTS posts (
     summary TEXT,
     published INTEGER,
     updated INTEGER,
-    uid TEXT
+    uid TEXT,
+    nossuid TEXT NOT NULL
 );
         }
     );
+
+    my @post_cols = map { $_->[0] } @{
+        $self->{ DB }->selectall_arrayref(
+            q{
+SELECT
+    name
+FROM pragma_table_info('posts');
+            }
+        )
+    };
+
+    # Pre-1.06 databases do not have nossuid, add it.
+    if (none { $_ eq 'nossuid' } @post_cols) {
+        $self->{ DB }->do(
+            q{
+ALTER TABLE
+    posts
+ADD COLUMN
+    nossuid TEXT NOT NULL DEFAULT ';;;;';
+            }
+        );
+        $self->{ DB }->do(
+            q{
+UPDATE
+    posts
+SET
+    nossuid = (
+        ifnull(uid,       '') || ';' ||
+        ifnull(feed,      '') || ';' ||
+        ifnull(title,     '') || ';' ||
+        ifnull(link,      '') || ';' ||
+        ifnull(published, '')
+    );
+            }
+        ); # no concat_ws() in the sqlite version we support :-(
+    }
 
     $self->{ DB }->do(
         q{
@@ -96,6 +136,15 @@ CREATE INDEX IF NOT EXISTS
     idx_posts_feedid
 ON
     posts(feed, nossid);
+        }
+    );
+
+    $self->{ DB }->do(
+        q{
+CREATE UNIQUE INDEX IF NOT EXISTS
+    idx_posts_nossuid
+ON
+    posts(nossuid);
         }
     );
 
@@ -220,26 +269,9 @@ SET
         (defined $feedref->{ skipdays  } ? encode_json($feedref->{ skipdays  }) : undef),
     );
 
-    # Can't pass undef directly to an SQL statement, so we have to do this ugly
-    # hack...
-    my $sel_id = $self->{ DB }->prepare(
+    my $upsert_post = $self->{ DB }->prepare(
         q{
-SELECT
-    rowid
-FROM
-    posts
-WHERE
-    (uid = ? OR (uid IS NULL AND ? IS NULL)) AND
-    feed = ? AND
-    (title = ? OR (title IS NULL AND ? IS NULL)) AND
-    (link = ? OR (link IS NULL AND ? IS NULL)) AND
-    (published = ? OR (published IS NULL AND ? IS NULL));
-        }
-    );
-
-    my $insert_post = $self->{ DB }->prepare(
-        q{
-INSERT INTO posts (
+INSERT INTO posts(
     nossid,
     status,
     feed,
@@ -250,7 +282,8 @@ INSERT INTO posts (
     summary,
     published,
     updated,
-    uid
+    uid,
+    nossuid
 )
 VALUES (
     (0 + ?),
@@ -263,79 +296,48 @@ VALUES (
     ?,
     (0 + ?),
     (0 + ?),
+    ?,
     ?
 )
-RETURNING
-    rowid as rowid;
-        }
-    );
-
-    my $update_post = $self->{ DB }->prepare(
-        q{
-UPDATE posts
+ON CONFLICT (nossuid) DO
+UPDATE
 SET
-    nossid = (0 + ?),
-    author = ?,
-    category = ?,
-    summary = ?,
-    updated = (0 + ?)
-WHERE
-    rowid = (0 + ?);
+    nossid = excluded.nossid,
+    author = excluded.author,
+    category = excluded.category,
+    summary = excluded.category,
+    updated = excluded.updated;
         },
     );
 
     my $new = 0;
     my @ok;
 
-    for my $e (@$postref) {
-
-        $sel_id->execute(
-            $e->{ uid }, $self->{ uid },
-            $e->{ feed },
-            $e->{ title }, $self->{ title },
-            $e->{ link }, $self->{ link },
-            $e->{ published }, $self->{ published },
-        );
-
-        my $sel = $sel_id->fetchrow_arrayref;
-
-        if (defined $sel) {
-
-            $update_post->execute(
-                $e->{ nossid },
-                $e->{ author },
-                (defined $e->{ category } ? encode_json($e->{ category }) : undef),
-                $e->{ summary },
-                $e->{ updated },
-                $sel->[0]
-            );
-
-            push @ok, $sel->[0];
-
-        } else {
-
-            $insert_post->execute(
-                $e->{ nossid },
-                ($feed->autoread ? 'read' : 'unread'),
-                $e->{ feed },
-                $e->{ title },
-                $e->{ link },
-                $e->{ author },
-                (defined $e->{ category } ? encode_json($e->{ category }) : undef),
-                $e->{ summary },
-                $e->{ published },
-                $e->{ updated },
-                $e->{ uid },
-            );
-
-            my $ins = $insert_post->fetchrow_arrayref;
-            push @ok, $ins->[0];
-            $new++;
-
+    $self->{ DB }->sqlite_update_hook(
+        sub {
+            $new++ if $_[0] == DBD::SQLite::INSERT;
+            push @ok, $_[3];
         }
+    );
+
+    for my $e (@$postref) {
+        $upsert_post->execute(
+            $e->{ nossid },
+            ($feed->autoread ? 'read' : 'unread'),
+            $e->{ feed },
+            $e->{ title },
+            $e->{ link },
+            $e->{ author },
+            (defined $e->{ category } ? encode_json($e->{ category }) : undef),
+            $e->{ summary },
+            $e->{ published },
+            $e->{ updated },
+            $e->{ uid },
+            $e->{ nossuid }
+        );
     }
 
-    my $ok_set = sprintf "(%s)", join ',', @ok;
+    my $ok_set = sprintf "(%s)", join ",", @ok;
 
     $self->{ DB }->do(
         qq{
@@ -346,7 +348,7 @@ WHERE
     rowid NOT IN $ok_set;
         },
         undef,
-        $feed->name
+        $feed->name,
     );
 
     return $new;
@@ -531,7 +533,8 @@ SELECT
     summary,
     published,
     updated,
-    uid
+    uid,
+    nossuid
 FROM
     posts
 WHERE
@@ -576,7 +579,8 @@ SELECT
     summary,
     published,
     updated,
-    uid
+    uid,
+    nossuid
 FROM
     posts
 WHERE
@@ -736,7 +740,8 @@ SELECT
     summary,
     published,
     updated,
-    uid
+    uid,
+    nossuid
 FROM
     posts
 $where
@@ -785,6 +790,8 @@ sub mark {
     if (@post) {
         push @wheres, sprintf "nossid IN (%s)", join ',', @post;
     }
+
+    push @wheres, "status != '$mark'";
 
     my $where = join ' AND ', @wheres;
 
@@ -996,6 +1003,7 @@ C<\%post> will look something like this:
     published => ...,
     updated   => ...,
     uid       => ...,
+    nossuid   => ...,
   }
 
 Returns C<undef> if no matching post exists.

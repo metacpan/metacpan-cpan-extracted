@@ -1,5 +1,14 @@
 Revision history for noss (WWW::Noss)
 
+1.06  Jul 25 2025
+  - Drastically speed up list command.
+  - Drastically speed up update and reload commands.
+  - The mark command accurately prints the number of posts that were actually
+    changed.
+  - Change database cache size to 10M, which should be speed up any command that
+    involves interacting with the database.
+  - Speed up start-up time.
+
 1.05  Jul 17 2025
   - Remove dependency on DateTime, DateTime::Format::Mail, and
     DateTime::Format::RFC3339 modules. This should give noss some minor

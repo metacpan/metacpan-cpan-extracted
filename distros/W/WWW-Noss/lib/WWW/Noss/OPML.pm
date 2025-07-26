@@ -2,9 +2,7 @@ package WWW::Noss::OPML;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '1.05';
-
-use XML::LibXML;
+our $VERSION = '1.06';
 
 sub _read_outline {
 
@@ -66,6 +64,8 @@ sub from_xml {
 
     my ($class, $file) = @_;
 
+    require XML::LibXML;
+
     my $self = bless {}, $class;
 
     my $dom = eval { XML::LibXML->load_xml(location => $file) };
@@ -95,6 +95,8 @@ sub from_xml {
 sub to_xml {
 
     my ($self, %param) = @_;
+
+    require XML::LibXML;
 
     my $dom = XML::LibXML::Document->new('1.0', 'UTF-8');
 

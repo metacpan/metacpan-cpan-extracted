@@ -2,9 +2,7 @@ package WWW::Noss::FeedReader::RSS;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '1.05';
-
-use XML::LibXML;
+our $VERSION = '1.06';
 
 use WWW::Noss::Timestamp;
 

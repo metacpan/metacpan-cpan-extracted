@@ -2,7 +2,7 @@ package WWW::Noss;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 
 use Cwd;
 use Getopt::Long qw(GetOptionsFromArray);
@@ -14,7 +14,6 @@ use List::Util qw(max);
 use POSIX qw(strftime);
 
 use JSON;
-use Parallel::ForkManager;
 
 use WWW::Noss::Curl qw(curl curl_error);
 use WWW::Noss::Dir qw(dir);
@@ -31,8 +30,9 @@ $0 = basename($0);
 my $PRGNAM = 'noss';
 my $PRGVER = $VERSION;
 
+# TODO: At some point, switch to Cpanel::JSON::XS
+# TODO: Add help command
 # TODO: Command to view unread post information? (what feeds are unread, how many unread, etc.)
-
 # TODO: Simplify config reading code
 
 my $HELP = <<"HERE";
@@ -110,6 +110,7 @@ my %VALID_SORTS = map { $_ => 1 } qw(
 );
 
 my $Z_FMT = '%c';
+my $Z_UNK = strftime($Z_FMT, localtime 0) =~ s/\w/?/gr;
 
 my $MARK = "\x{fffe}";
 
@@ -158,7 +159,7 @@ my %POST_FMT_CODES = (
         if (defined $t) {
             return strftime($Z_FMT, localtime $t);
         } else {
-            return strftime($Z_FMT, localtime 0) =~ s/\w/?/gr;
+            return $Z_UNK;
         }
     },
 );
@@ -207,7 +208,7 @@ my %FEED_FMT_CODES = (
         if (defined $t) {
             return strftime($Z_FMT, localtime $t);
         } else {
-            return strftime($Z_FMT, localtime 0) =~ s/\w/?/gr;
+            return $Z_UNK;
         }
     },
 );
@@ -249,6 +250,15 @@ my $DEFAULT_FEED_FMT = <<'HERE';
   Unread:  %U/%p
 
 HERE
+
+sub _set_z_fmt {
+
+    my ($z) = @_;
+
+    $Z_FMT = $z;
+    $Z_UNK = strftime($Z_FMT, localtime 0) =~ s/\w/?/gr;
+
+}
 
 sub _default_data_dir {
 
@@ -914,6 +924,8 @@ sub update {
 
     my ($self) = @_;
 
+    require Parallel::ForkManager;
+
     my @updates;
 
     if (@{ $self->{ Args } }) {
@@ -1295,8 +1307,8 @@ sub look {
     my $feedlen = max( map { length } @feeds) // 1;
 
     my $fmt = $self->{ ListFmt } // ("%s %-$feedlen" . "f %$idlen" ."i  %t");
-
-    my $callback = sub { print _fmt($fmt, \%POST_FMT_CODES)->($_[0]) };
+    my $fmtsub = _fmt($fmt, \%POST_FMT_CODES);
+    my $callback = sub { print $fmtsub->($_[0]) };
 
     $self->{ DB }->look(
         title => $titlerx,
@@ -1879,7 +1891,7 @@ sub init {
     );
 
     if (defined $self->{ TimeFmt }) {
-        $Z_FMT = $self->{ TimeFmt };
+        _set_z_fmt($self->{ TimeFmt });
     }
 
     return $self;

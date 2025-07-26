@@ -88,6 +88,7 @@ is_deeply(
         published => 1750011361,
         updated   => 1750011361,
         uid       => 'a1',
+        nossuid   => join(';', 'a1', 'atom', 'Test post #1', 'https://phonysite.com/a1', 1750011361),
     },
     'post ok'
 );
@@ -116,7 +117,7 @@ subtest 'mark ok' => sub {
 
     is(
         $obj->mark('unread', 'atom'),
-        5,
+        3,
         'mark ok'
     );
 

@@ -17,9 +17,9 @@ else
 {
     plan tests => 1;
 
-is(scalar(`"$^X" -Ilib script/remotediff -q t/data/file1 t/data/file2`), <<'EOF'
-Files t/data/file1 and t/data/file2 differ
-EOF
-, "remotediff - local diff quiet no tty");
-
+	`"$^X" -Ilib script/remotediff -q t/data/file1 t/data/file2`;
+	my $ret = $?;
+	
+	# diff exit status = 1 if files differ
+	is($ret >> 8, 1, "remotediff - local diff quiet no tty");
 }

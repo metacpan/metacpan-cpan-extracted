@@ -11,7 +11,7 @@ configure_requires:
   DBD::SQLite: '0'
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -40,5 +40,5 @@ requires:
 resources:
   bugtracker: https://codeberg.org/1-1sam/noss/issues
   repository: https://codeberg.org/1-1sam/noss.git
-version: '1.05'
+version: '1.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

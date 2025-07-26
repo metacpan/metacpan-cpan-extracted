@@ -420,6 +420,8 @@ _fmt_neg_int(char *dest, INT_MAX_TYPE i)
         _piop_tmp_sv = newSVpvn(_piop_buf, _piop_len);      \
       }                                                     \
     }                                                       \
+    else if ((int_val) <= IV_MAX)                           \
+      _piop_tmp_sv = newSViv(int_val);                      \
     else if ((int_val) <= UV_MAX)                           \
       _piop_tmp_sv = newSVuv(int_val);                      \
     else {                                                  \
@@ -772,7 +774,15 @@ _readv50c(pTHX_ int fd, SV *buffers, AV *sizes, SV *offset_sv, SV *flags_sv)
 #if PERL_BCDVERSION >= 0x5035004
           sv_setrv_noinc(buffers, (SV*)newAV());
 #else
+          /* Since Perl 5.12 references are SVt_IV (and SVt_RV is just an
+           * alias), but before that SVt_RV was a separate type and DEBUGGING
+           * perl whines 'Assertion ((svtype)((buffers)->sv_flags & 0xff))
+           * >= SVt_RV failed: file "2008.xs"' */
+#  if PERL_BCDVERSION < 0x5012000
+          sv_upgrade(buffers, SVt_RV);
+#  else
           sv_upgrade(buffers, SVt_IV);
+#  endif
           SvOK_off(buffers);
           SvRV_set(buffers, (SV*)newAV());
           SvROK_on(buffers);
@@ -1069,6 +1079,7 @@ _psx_close(pTHX_ SV *sv)
   IO *io;
   int rv = -1;
 
+  SvGETMAGIC(sv);
   if (!SvOK(sv))
     SETERRNO(EBADF, RMS_IFI);
   else if (_psx_looks_like_number(aTHX_ sv))
@@ -1186,13 +1197,6 @@ PROTOTYPES: ENABLE
 
 INCLUDE: const-xs.inc
 
-int
-_psx_looks_like_number(SV *sv);
-  CODE:
-    RETVAL = _psx_looks_like_number(aTHX_ sv);
-  OUTPUT:
-    RETVAL
-
 #ifdef PSX2008_HAS_A64L
 long
 a64l(char* s);
@@ -1272,7 +1276,7 @@ clock_getcpuclockid(pid_t pid=0);
   PPCODE:
     rv = clock_getcpuclockid(pid, &clock_id);
     if (LIKELY(rv == 0))
-      mPUSHi((IV)clock_id);
+      PUSH_INT_OR_PV(clock_id);
     else {
       PUSHs(&PL_sv_undef);
       errno = rv;
@@ -1307,6 +1311,25 @@ clock_getres(clockid_t clock_id=CLOCK_REALTIME);
 
 #endif
 
+#define LOOKS_LIKE_NV(_sv)                                              \
+  (SvNOK(_sv) ||                                                        \
+   (                                                                    \
+    (SvPOK(_sv) || SvPOKp(_sv))                                         \
+    && (_psx_looks_like_number(aTHX_ (_sv)) & IS_NUMBER_NOT_INT)        \
+   )                                                                    \
+  )
+
+#define TIMESPEC_FROM_IV(_tspec, sec_sv, nsec_long) STMT_START {        \
+    _tspec.tv_sec = (time_t)SvIV(sec_sv);                               \
+    _tspec.tv_nsec = nsec_long;                                         \
+} STMT_END
+
+#define TIMESPEC_FROM_NV(_tspec, sec_sv) STMT_START {   \
+    NV sec_nv = SvNV(sec_sv);                           \
+    _tspec.tv_sec = (time_t)sec_nv;                     \
+    _tspec.tv_nsec = (sec_nv - _tspec.tv_sec)*1e9;      \
+} STMT_END
+
 #ifdef PSX2008_HAS_CLOCK_NANOSLEEP
 void
 clock_nanosleep(clockid_t clock_id, int flags, SV *sec, long nsec=0);
@@ -1316,15 +1339,11 @@ clock_nanosleep(clockid_t clock_id, int flags, SV *sec, long nsec=0);
     struct timespec request;
     struct timespec remain = { 0, 0 };
   PPCODE:
-    if (items > 3 || !SvNOK(sec)) {
-      request.tv_sec = (time_t)SvUV(sec);
-      request.tv_nsec = nsec;
-    }
-    else {
-      NV sec_nv = SvNV(sec);
-      request.tv_sec = (time_t)sec_nv;
-      request.tv_nsec = (sec_nv - request.tv_sec)*1e9;
-    }
+    SvGETMAGIC(sec);
+    if (items == 3 && LOOKS_LIKE_NV(sec))
+      TIMESPEC_FROM_NV(request, sec);
+    else
+      TIMESPEC_FROM_IV(request, sec, nsec);
     rv = clock_nanosleep(clock_id, flags, &request, &remain);
     if (rv == 0 || ((errno = rv) == EINTR))
       PUSH_TIMESPEC(remain);
@@ -1338,16 +1357,12 @@ clock_settime(clockid_t clock_id, SV *sec, long nsec=0);
   INIT:
     struct timespec tp;
   PPCODE:
-    if (items > 2 || !SvNOK(sec)) {
-      tp.tv_sec = (time_t)SvUV(sec);
-      tp.tv_nsec = nsec;
-    }
-    else {
-      NV sec_nv = SvNV(sec);
-      tp.tv_sec = (time_t)sec_nv;
-      tp.tv_nsec = (sec_nv - tp.tv_sec)*1e9;
-    }
-    if (LIKELY(clock_settime(clock_id, &tp) == 0))
+    SvGETMAGIC(sec);
+    if (items == 2 && LOOKS_LIKE_NV(sec))
+      TIMESPEC_FROM_NV(tp, sec);
+    else
+      TIMESPEC_FROM_IV(tp, sec, nsec);
+    if (clock_settime(clock_id, &tp) == 0)
       mPUSHp("0 but true", 10);
     else
       PUSHs(&PL_sv_undef);
@@ -1362,15 +1377,11 @@ nanosleep(SV *sec, long nsec=0);
     struct timespec request;
     struct timespec remain = { 0, 0 };
   PPCODE:
-    if (items > 1 || !SvNOK(sec)) {
-      request.tv_sec = (time_t)SvUV(sec);
-      request.tv_nsec = nsec;
-    }
-    else {
-      NV sec_nv = SvNV(sec);
-      request.tv_sec = (time_t)sec_nv;
-      request.tv_nsec = (sec_nv - request.tv_sec)*1e9;
-    }
+    SvGETMAGIC(sec);
+    if (items == 1 && LOOKS_LIKE_NV(sec))
+      TIMESPEC_FROM_NV(request, sec);
+    else
+      TIMESPEC_FROM_IV(request, sec, nsec);
     if (nanosleep(&request, &remain) == 0 || errno == EINTR)
       PUSH_TIMESPEC(remain);
 
@@ -1988,6 +1999,7 @@ timer_create(clockid_t clockid, SV *sig = NULL);
   CODE:
   {
     if (sig) {
+      SvGETMAGIC(sig);
       sevp.sigev_notify = SIGEV_SIGNAL;
       sevp.sigev_signo = SvIV(sig);
     }
@@ -2740,8 +2752,8 @@ utimensat(psx_fd_t dirfd, const char *path, int flags = 0,      \
           time_t mtime_sec = 0, long mtime_nsec = UTIME_NOW);
     PROTOTYPE: $$;$@
     INIT:
-        struct timespec times[2] = { { atime_sec, atime_nsec },
-                                     { mtime_sec, mtime_nsec } };
+        const struct timespec times[2] = { { atime_sec, atime_nsec },
+                                           { mtime_sec, mtime_nsec } };
     CODE:
         RETVAL = utimensat(dirfd, path, times, flags);
     OUTPUT:
@@ -3262,9 +3274,9 @@ poll(SV *pollfds, int timeout=-1);
       nfds = av_count(pollfds_av);
     }
 
-    /* poll() expects nfds_t, av_fetch() expects SSize_t, newSV expects STRLEN,
-     * so we'll accept only the smallest of these. */
-    if (UNLIKELY((nfds_t)nfds != nfds || (STRLEN)nfds != nfds || nfds > SSize_t_MAX)) {
+    /* poll() expects nfds_t, av_count() returns Size_t, av_fetch() expects
+     * SSize_t, so we'll accept only the smallest of these. */
+    if (UNLIKELY((nfds_t)nfds != nfds || nfds > SSize_t_MAX)) {
       errno = EINVAL;
       XSRETURN_IV(-1);
     }
@@ -3274,12 +3286,18 @@ poll(SV *pollfds, int timeout=-1);
     }
     else {
       int rv;
-      SSize_t i, j;
+      SSize_t i;
       SV **pollfd;
-      struct pollfd *fds = safemalloc(nfds * sizeof(struct pollfd));
+      const struct pollfd initfd = {.fd=-1, .events=0, .revents=0};
+      struct pollfd *fds = safemalloc(nfds * sizeof(*fds));
       SAVEFREEPV(fds);
       for (i = 0; i < nfds; i++) {
-        fds[i].fd = -1;
+        /* Initialize fds item with no-op defaults in case we skip undef or
+         * placeholders. Copy() yields less bloat than assignment (with gcc,
+         * clang is smarter) and shouldn't require a function call. We could
+         * use a fancy C99 compound literal for initfd, but then, it's only
+         * 2025 ... */
+        Copy(&initfd, fds+i, 1, struct pollfd);
         pollfd = av_fetch(pollfds_av, i, 0);
         if (!pollfd)
           continue;
@@ -3287,20 +3305,19 @@ poll(SV *pollfds, int timeout=-1);
         if (!SvOK(*pollfd))
           continue;
         if (!SvROK(*pollfd) || SvTYPE(SvRV(*pollfd)) != SVt_PVAV)
-          croak("%s::poll: pollfds[%" UVuf
+          croak("%s::poll: pollfds[%" IVdf
                 "] is not an ARRAY reference: %" SVf_QUOTEDPREFIX,
-                PACKNAME, (UV)i, SVfARG(*pollfd));
+                PACKNAME, (IV)i, SVfARG(*pollfd));
         else {
           AV *pollfd_av = (AV*)SvRV(*pollfd);
-          /* Loop to avoid duplicating pollfd_elt checks. */
-          for (j = 0; j < 2; j++) {
-            SV **pollfd_elt = av_fetch(pollfd_av, j, 0);
-            if (!pollfd_elt)
-              break;  /* Continue with the outer nfds loop. */
-            if (j == 0)
-              fds[i].fd = _psx_fileno(aTHX_ *pollfd_elt);
-            else
-              fds[i].events = (short)SvIV(*pollfd_elt);
+          SV **pollfd_fd = av_fetch(pollfd_av, 0, 0);
+          if (pollfd_fd) {
+            fds[i].fd = _psx_fileno(aTHX_ *pollfd_fd);
+            if (fds[i].fd >= 0) {
+              SV **pollfd_events = av_fetch(pollfd_av, 1, 0);
+              if (pollfd_events)
+                fds[i].events = (short)(SvIV(*pollfd_events) & PERL_USHORT_MAX);
+            }
           }
         }
       }
@@ -3310,7 +3327,8 @@ poll(SV *pollfds, int timeout=-1);
       if (rv > 0) {
         for (i = 0; i < nfds; i++) {
           SV **pollfd = av_fetch(pollfds_av, i, 0);
-          if (pollfd && SvOK(*pollfd)) {
+          /* Paranoid safeguard against threads messing with pollfds_av. */
+          if (LIKELY(pollfd && SvROK(*pollfd) && SvTYPE(SvRV(*pollfd)) == SVt_PVAV)) {
             AV *pollfd_av = (AV*)SvRV(*pollfd);
             /* Cast revents to unsigned short to prevent the compiler from
              * sign-extending it to IV. */

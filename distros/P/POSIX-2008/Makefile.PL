@@ -12,7 +12,7 @@ use MIME::Base64 'decode_base64';
 
 # Import only the non-XS part to get the constants for WriteConstants.
 use lib File::Spec->catfile(File::Spec->curdir(), 'lib');
-use POSIX::2008 qw(-noxs);
+use POSIX::2008 '-noxs';
 
 my $VERBOSE = exists $ENV{VERBOSE} ? $ENV{VERBOSE} : 0;
 
@@ -31,7 +31,7 @@ sub try_compile {
     $ccode =~ /<(?:complex|fenv|math)\.h>/ ? '-lm' : '';
 
   sysopen my $C, $cfile, O_WRONLY|O_CREAT|O_EXCL or die "$cfile: $!";
-  print $C $ccode;
+  syswrite $C, $ccode or die "Couldn't write to $cfile: $!";
   close $C;
 
   my $ccflags = $Config{ccflags};
@@ -60,7 +60,7 @@ while (my $line = <DATA>) {
   my $ok = try_compile($what, $ccode);
   if ($ok) {
     my $define = 'PSX2008_HAS_' . uc $what;
-    syswrite $DEF, "#define $define\n";
+    syswrite $DEF, "#define $define\n" or die "Couldn't write to 2008.h: $!";
   }
   print "$what: ".($ok ? 'yes' : 'no')."\n";
 }
@@ -105,7 +105,7 @@ sysopen my $TMAP, 'typemap', O_WRONLY|O_CREAT|O_EXCL or die "typemap: $!";
 print $TMAP <<EOTM;
 Off_t     $iofft
 time_t    $isizet
-clock_t   $isizet
+clock_t   T_IV
 clockid_t T_IV
 gid_t     T_UV
 uid_t     T_UV
@@ -138,7 +138,7 @@ T_SYSRET_TRUE
 	if (\$var == 0)
 	  sv_setpvn(\$arg, "0 but true", 10);
 EOTM
-close $TMAP;
+close $TMAP or die "Couldn't write to typemap: $!";
 
 END {
   unlink $cfile, $tmp_ccout, $tmp_exe;

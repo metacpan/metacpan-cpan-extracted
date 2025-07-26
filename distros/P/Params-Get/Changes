@@ -1,5 +1,12 @@
 Revision history for Params-Get
 
+0.10	Fri Jul 25 11:37:24 EDT 2025
+	Improved handling of:
+		in main:
+			routine('countries' => []);
+		in routine():
+			$params = Params::Get::get_params('countries', \@);
+
 0.09	Wed Jul 23 13:46:12 EDT 2025
 	Improved handling of:
 		in main:

@@ -2,9 +2,7 @@ package WWW::Noss::FeedReader::Atom;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '1.05';
-
-use XML::LibXML;
+our $VERSION = '1.06';
 
 use WWW::Noss::TextToHtml qw(text2html);
 use WWW::Noss::Timestamp;

@@ -4,7 +4,8 @@
 #
 # Documentation at bottom of script.
 #
-# 2024.06.03 v1.16 jul : fixed documentation
+# 2025.07.25 v1.17 jul : fixed Locale-specific test failure #3
+# 2024.01.02 v1.16 jul : fixed documentation
 # 2024.06.03 v1.15 jul : replace "." with absolute path
 # 2024.05.28 v1.14 jul : fixed cleanup bug when basename contained dot
 # 2022.11.14 v1.13 jul : bypass test for solaris
@@ -23,7 +24,7 @@ use File::Temp qw(tempdir);
 use File::Path qw(make_path remove_tree);
 use Cwd qw(abs_path cwd);
 
-our $VERSION = '1.16';
+our $VERSION = '1.17';
 my $program  = basename($0);
 my $usage    = <<EOF;
 

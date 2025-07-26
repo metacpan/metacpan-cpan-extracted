@@ -2,12 +2,10 @@ package WWW::Noss::FeedReader;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 
 use Exporter qw(import);
 our @EXPORT_OK = qw(read_feed);
-
-use XML::LibXML;
 
 use WWW::Noss::FeedReader::Atom;
 use WWW::Noss::FeedReader::RSS;
@@ -15,6 +13,8 @@ use WWW::Noss::FeedReader::RSS;
 sub read_feed {
 
     my ($feed) = @_;
+
+    require XML::LibXML;
 
     my $channel;
     my $entries;
@@ -71,8 +71,12 @@ sub read_feed {
     }
 
     for my $i (0 .. $#$entries) {
-        $entries->[$i]{ nossid } = $i + 1;
-        $entries->[$i]{ author } //= $channel->{ author };
+        $entries->[$i]{ nossid  } = $i + 1;
+        $entries->[$i]{ author  } //= $channel->{ author };
+        $entries->[$i]{ nossuid } =
+            join ";",
+            map { $_ // '' }
+            @{ $entries->[$i] }{ qw(uid feed title link published) };
     }
 
     return ($channel, $entries);

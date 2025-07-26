@@ -16,11 +16,11 @@ Params::Get - Get the parameters to a subroutine in any way you want
 
 =head1 VERSION
 
-Version 0.09
+Version 0.10
 
 =cut
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 =head1 SYNOPSIS
 
@@ -131,7 +131,20 @@ sub get_params
 				return { $default => $args->[0] };
 			}
 		}
+		if(ref($args->[0]) eq 'REF') {
+			$args->[0] = ${$args->[0]};
+		}
 		if(ref($args->[0]) eq 'HASH') {
+			return $args->[0];
+		}
+		if((ref($args->[0]) eq 'ARRAY') && (scalar(@{$args->[0]}) == 0)) {
+			# in main:
+			#	routine('countries' => []);
+			# in routine():
+			#	$params = Params::Get::get_params('countries', \@);
+			if(defined($default)) {
+				return { $default => [] }
+			}
 			return $args->[0];
 		}
 		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], '()');

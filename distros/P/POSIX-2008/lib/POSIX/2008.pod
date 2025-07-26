@@ -238,8 +238,8 @@ I<pid> defaults to 0. Returns undef on error.
 
 =item C<clock_getres>
 
-(sec, nsec) = clock_getres(clock_id);
-floating_sec = clock_getres(clock_id);
+ (sec, nsec) = clock_getres(clock_id);
+ floating_sec = clock_getres(clock_id);
 
 I<clock_id> defaults to C<CLOCK_REALTIME>. Returns empty list or undef on
 error.
@@ -248,8 +248,8 @@ I<Changed in version 0.25:> Return floating seconds in scalar context.
 
 =item C<clock_gettime>
 
-(sec, nsec) = clock_gettime(clock_id);
-floating_sec = clock_gettime(clock_id);
+ (sec, nsec) = clock_gettime(clock_id);
+ floating_sec = clock_gettime(clock_id);
 
 clock_id defaults to C<CLOCK_REALTIME>. Returns empty list or undef on error.
 
@@ -257,11 +257,11 @@ I<Changed in version 0.25:> Return floating seconds in scalar context.
 
 =item C<clock_nanosleep>
 
-(rem_sec, rem_nsec) = clock_nanosleep(clock_id, flags, floating_sec);
-floating_rem_sec = clock_nanosleep(clock_id, flags, floating_sec);
+ (rem_sec, rem_nsec) = clock_nanosleep(clock_id, flags, floating_sec);
+ floating_rem_sec = clock_nanosleep(clock_id, flags, floating_sec);
 
-(rem_sec, rem_nsec) = clock_nanosleep(clock_id, flags, sec, nsec);
-floating_rem_sec = clock_nanosleep(clock_id, flags, sec, nsec);
+ (rem_sec, rem_nsec) = clock_nanosleep(clock_id, flags, sec, nsec);
+ floating_rem_sec = clock_nanosleep(clock_id, flags, sec, nsec);
 
 Returns zero(es) on success, the remaining time on EINTR, the empty list or
 undef otherwise. The remaining time is zero if the flag C<TIMER_ABSTIME> is
@@ -272,8 +272,8 @@ and nanoseconds.
 
 =item C<clock_settime>
 
-ret = clock_settime(clock_id, sec, nsec);
-ret = clock_settime(clock_id, floating_sec);
+ ret = clock_settime(clock_id, sec, nsec);
+ ret = clock_settime(clock_id, floating_sec);
 
 I<Changed in version 0.25:> Time can be floating seconds only or seconds and
 nanoseconds.
@@ -1025,11 +1025,11 @@ mrand48();
 
 =item C<nanosleep>
 
-(rem_sec, rem_nsec) = nanosleep(floating_sec);
-floating_rem_sec = nanosleep(floating_sec);
+ (rem_sec, rem_nsec) = nanosleep(floating_sec);
+ floating_rem_sec = nanosleep(floating_sec);
 
-(rem_sec, rem_nsec) = nanosleep(sec, nsec);
-floating_rem_sec = nanosleep(sec, nsec);
+ (rem_sec, rem_nsec) = nanosleep(sec, nsec);
+ floating_rem_sec = nanosleep(sec, nsec);
 
 Returns zero(es) on success, the remaining time on EINTR, the empty list or
 undef otherwise.
@@ -1912,8 +1912,8 @@ C<O_TMPFILE> C<O_TRUNC> C<O_TTY_INIT> C<O_WRONLY> C<FASYNC>
 C<POLLIN> C<POLLRDNORM> C<POLLRDBAND> C<POLLPRI> C<POLLOUT> C<POLLWRNORM>
 C<POLLWRBAND> C<POLLERR> C<POLLHUP> C<POLLNVAL>
 
-C<INFTIM> C<POLLFREE> C<POLLMSG> C<POLLNORM> C<POLLRDHUP> C<POLLREMOVE>
-C<POLL_BUSY_LOOP>
+C<INFTIM> C<POLLFREE> C<POLLINIGNEOF> C<POLLMSG> C<POLLNORM> C<POLLRDHUP>
+C<POLLREMOVE> C<POLLSTANDARD> C<POLL_BUSY_LOOP>
 
 C<POSIX_FADV_NORMAL> C<POSIX_FADV_SEQUENTIAL> C<POSIX_FADV_RANDOM>
 C<POSIX_FADV_NOREUSE> C<POSIX_FADV_WILLNEED> C<POSIX_FADV_DONTNEED>

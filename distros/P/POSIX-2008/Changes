@@ -1,5 +1,16 @@
 Revision history for POSIX::2008.
 
+0.26  2025-07-25
+  - _readv50c(): Use SVt_RV for sv_upgrade() w/ Perl < 5.12 to please DEBUGGING.
+  - poll():
+      * Initialize events with 0 for placeholders.
+      * Safeguard against nasty threads when writing back revents.
+  - clock_nanosleep(), clock_[gs]ettime(), nanosleep():
+      * Better float detection.
+      * Invoke SvGETMAGIC() on SV* argument.
+  - timer_create(): Invoke SvGETMAGIC() on SV* argument.
+  - POD "fixes" (POD doesn't have forced line breaks ...).
+
 0.25  2025-07-12
   - Updated ppport.h to version 3.73.
   - Added poll(), psignal(), strsignal(), statvfs().
