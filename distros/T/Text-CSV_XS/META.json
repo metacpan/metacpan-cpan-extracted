@@ -1,70 +1,70 @@
 {
-   "meta-spec" : {
-      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
-   },
-   "provides" : {
-      "Text::CSV_XS" : {
-         "version" : "1.60",
-         "file" : "CSV_XS.pm"
-      }
-   },
-   "dynamic_config" : 1,
-   "abstract" : "Comma-Separated Values manipulation routines",
-   "generated_by" : "Author",
-   "license" : [
-      "perl_5"
-   ],
    "prereqs" : {
-      "test" : {
-         "requires" : {
-            "Test::More" : "0",
-            "Tie::Scalar" : "0"
-         }
-      },
       "build" : {
          "requires" : {
             "Config" : "0"
          }
       },
-      "configure" : {
-         "recommends" : {
-            "ExtUtils::MakeMaker" : "7.70"
-         },
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
-      },
       "runtime" : {
+         "requires" : {
+            "perl" : "5.006001",
+            "XSLoader" : "0",
+            "IO::Handle" : "0"
+         },
          "recommends" : {
             "Encode" : "3.21"
-         },
+         }
+      },
+      "configure" : {
          "requires" : {
-            "XSLoader" : "0",
-            "IO::Handle" : "0",
-            "perl" : "5.006001"
+            "ExtUtils::MakeMaker" : "0"
+         },
+         "recommends" : {
+            "ExtUtils::MakeMaker" : "7.76"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Tie::Scalar" : "0"
          }
       }
    },
+   "author" : [
+      "H.Merijn Brand <hmbrand@cpan.org>"
+   ],
+   "provides" : {
+      "Text::CSV_XS" : {
+         "file" : "CSV_XS.pm",
+         "version" : "1.61"
+      }
+   },
+   "abstract" : "Comma-Separated Values manipulation routines",
    "resources" : {
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ],
+      "homepage" : "https://metacpan.org/pod/Text::CSV_XS",
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/Tux/Text-CSV_XS",
          "web" : "https://github.com/Tux/Text-CSV_XS"
       },
-      "x_IRC" : "irc://irc.perl.org/#csv",
       "bugtracker" : {
-         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Text-CSV_XS"
+         "web" : "https://github.com/Tux/Text-CSV_XS/issues"
       },
-      "homepage" : "https://metacpan.org/pod/Text::CSV_XS"
+      "x_IRC" : "irc://irc.perl.org/#csv",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
    },
-   "version" : "1.60",
-   "author" : [
-      "H.Merijn Brand <hmbrand@cpan.org>"
-   ],
+   "version" : "1.61",
+   "dynamic_config" : 1,
+   "meta-spec" : {
+      "version" : 2,
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec"
+   },
+   "generated_by" : "Author",
    "name" : "Text-CSV_XS",
+   "license" : [
+      "perl_5"
+   ],
    "release_status" : "stable"
 }

@@ -10,7 +10,7 @@ package Devel::Cover::Test;
 use strict;
 use warnings;
 
-our $VERSION = '1.50'; # VERSION
+our $VERSION = '1.51'; # VERSION
 
 use Carp;
 
@@ -19,7 +19,7 @@ use Test::More;
 
 use Devel::Cover::Inc;
 
-my $LATEST_RELEASED_PERL = 40;
+my $LATEST_RELEASED_PERL = 42;
 
 sub new {
   my $class = shift;
@@ -394,7 +394,7 @@ Devel::Cover::Test - Internal module for testing
 
 =head1 VERSION
 
-version 1.50
+version 1.51
 
 =head1 METHODS
 

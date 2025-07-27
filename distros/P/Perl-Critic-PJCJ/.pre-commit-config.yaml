@@ -1,0 +1,97 @@
+---
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-added-large-files
+        args: [ --maxkb=600 ]
+      - id: check-case-conflict
+      - id: check-executables-have-shebangs
+      - id: check-json
+      - id: check-merge-conflict
+      - id: check-symlinks
+      - id: check-toml
+      - id: check-vcs-permalinks
+      - id: check-xml
+      - id: check-yaml
+      - id: destroyed-symlinks
+      - id: detect-private-key
+      - id: end-of-file-fixer
+      - id: fix-byte-order-marker
+      - id: forbid-new-submodules
+      - id: mixed-line-ending
+        args: [ --fix=lf ]
+      - id: pretty-format-json
+        args: [ --autofix ]
+      - id: trailing-whitespace
+
+  - repo: https://github.com/jumanjihouse/pre-commit-hooks
+    rev: 3.0.0
+    hooks:
+      - id: forbid-binary
+      - id: git-check    # configure in .gitattributes
+      - id: protect-first-parent
+      - id: script-must-have-extension
+      - id: script-must-not-have-extension
+      - id: shellcheck
+        args: [ -a ]
+      - id: shfmt
+        args: [ -w -i 2 -s -d ]
+
+  - repo: https://github.com/adrienverge/yamllint.git
+    rev: v1.37.1
+    hooks:
+      - id: yamllint
+        args: [ --config-file=.yamllint ]
+
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.45.0
+    hooks:
+      - id: markdownlint
+
+  - repo: https://github.com/hadolint/hadolint
+    rev: v2.13.1-beta
+    hooks:
+      - id: hadolint
+
+  - repo: https://github.com/crate-ci/typos
+    rev: v1
+    hooks:
+      - id: typos
+        args: [ --force-exclude ]
+
+  - repo: https://github.com/executablebooks/mdformat
+    rev: 0.7.22
+    hooks:
+      - id: mdformat
+        args: [ --number ]
+        additional_dependencies:
+          - mdformat-gfm
+
+  - repo: https://github.com/golangci/misspell
+    rev: v0.7.0
+    hooks:
+      - id: misspell
+        # The hook will run on all files by default.
+        # To limit to some files only, use pre-commit patterns/types
+        # files: <pattern>
+        # exclude: <pattern>
+        # types: <types>
+
+  - repo: local
+    hooks:
+      - id: perlcritic
+        name: perlcritic
+        description: Ensure perl files adhere to standards
+        language: perl
+        entry: perlcritic lib t dev
+        pass_filenames: false
+      - id: jscpd
+        name: Check for duplicated code
+        description: Ensure we don't have large sections of duplicated code
+        language: node
+        entry: jscpd --gitignore
+        pass_filenames: true

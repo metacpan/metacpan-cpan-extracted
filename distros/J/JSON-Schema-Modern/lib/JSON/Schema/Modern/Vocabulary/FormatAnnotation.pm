@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::FormatAnnotation;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Format-Annotation vocabulary
 
-our $VERSION = '0.615';
+our $VERSION = '0.616';
 
 use 5.020;
 use Moo;
@@ -21,7 +21,8 @@ no feature 'switch';
 use Feature::Compat::Try;
 use JSON::Schema::Modern::Utilities qw(A E assert_keyword_type get_type);
 use JSON::Schema::Modern::Vocabulary::FormatAssertion;
-use List::Util 'any';
+use if "$]" < 5.041010, 'List::Util' => 'any';
+use if "$]" >= 5.041010, experimental => 'keyword_any';
 use Ref::Util 0.100 'is_plain_arrayref';
 use Scalar::Util 'looks_like_number';
 use namespace::clean;
@@ -98,7 +99,7 @@ JSON::Schema::Modern::Vocabulary::FormatAnnotation - Implementation of the JSON 
 
 =head1 VERSION
 
-version 0.615
+version 0.616
 
 =head1 DESCRIPTION
 

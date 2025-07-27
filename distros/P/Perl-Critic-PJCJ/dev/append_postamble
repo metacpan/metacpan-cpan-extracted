@@ -1,0 +1,183 @@
+#!/usr/bin/env perl
+
+use v5.26.0;
+use strict;
+use warnings;
+use feature "signatures";
+
+sub read_targets_file ($targets_file) {
+  unless (-f $targets_file) {
+    die "Cannot find $targets_file - make sure it exists in the current "
+      . "directory\n";
+  }
+  open my $fh, "<", $targets_file or die "Cannot read $targets_file: $!\n";
+  my $targets_content = do { local $/ = undef; <$fh> };
+  close $fh or die "Cannot close $targets_file: $!\n";
+  $targets_content
+}
+
+sub filter_conflicting_targets ($targets_content) {
+  # Remove targets that conflict with ExtUtils::MakeMaker
+  # These targets are already defined by MakeMaker with :: syntax
+
+  my $conflicts = { map { $_ => 1 } qw( test clean install ) };
+
+  # Process line by line to avoid mangling
+  my @lines = split /^/, $targets_content;
+  chomp @lines;
+  my @filtered_lines;
+  my $skip_until_next_target = 0;
+  my $in_phoney              = 0;
+
+  for my $line (@lines) {
+    $in_phoney = 0 if $line =~ "";
+
+    # Check if this line starts a new target
+    if ($line =~ /^([a-zA-Z][a-zA-Z0-9_-]*)\s*:/) {
+      my $target_name = $1;
+      # If this target conflicts, we need to skip it
+      next if $skip_until_next_target = $conflicts->{$target_name};
+    }
+
+    # Skip lines that are part of a conflicting target
+    if ($skip_until_next_target) {
+      # If this line starts with tab or is blank, it's part of the target
+      next if $line =~ /^\t/;
+      # This is a new non-target line, stop skipping
+      $skip_until_next_target = 0;
+    }
+
+    # Remove conflicting targets from .PHONY lines
+    if ($in_phoney || $line =~ /^\.PHONY:/) {
+      $in_phoney = 1;
+      for my $target (sort keys %$conflicts) {
+        # Only remove exact matches, not partial matches like "install"
+        # in "install-deps"
+        $line =~ s/\b$target\b(?!\-)//g;
+      }
+      # Clean up extra spaces and backslashes
+      $line =~ s/ +/ /g;
+      $line =~ s/ +\\$/ \\/;
+    }
+
+    push @filtered_lines, $line;
+  }
+
+  join "\n", @filtered_lines
+}
+
+sub create_postamble ($targets_content) {
+  return <<"END_POSTAMBLE";
+
+sub MY::postamble {
+    return <<'END_MAKEFILE';
+
+$targets_content
+
+END_MAKEFILE
+}
+END_POSTAMBLE
+}
+
+sub read_makefile_pl ($makefile_pl) {
+  open my $Fh, "<", $makefile_pl or die "Cannot read $makefile_pl: $!\n";
+  my $content = do { local $/ = undef; <$Fh> };
+  close $Fh or die "Cannot close $makefile_pl: $!\n";
+  $content
+}
+
+sub write_makefile_pl ($makefile_pl, $content) {
+  open my $Fh, ">", $makefile_pl or die "Cannot write $makefile_pl: $!\n";
+  print $Fh $content;
+  close $Fh or die "Cannot close $makefile_pl: $!\n";
+}
+
+sub inject_postamble ($content, $postamble) {
+  # Append the postamble before the final WriteMakefile call
+  $content =~ s/(WriteMakefile\(%WriteMakefileArgs\);)/$postamble\n$1/;
+  $content
+}
+
+sub main {
+  my $makefile_pl     = shift @ARGV or die "Usage: $0 <Makefile.PL>\n";
+  my $targets_file    = "dev/Makefile.targets";
+  my $targets_content = read_targets_file($targets_file);
+  $targets_content = filter_conflicting_targets($targets_content);
+  my $postamble = create_postamble($targets_content);
+  my $content   = read_makefile_pl($makefile_pl);
+  $content = inject_postamble($content, $postamble);
+  write_makefile_pl($makefile_pl, $content);
+  print "Successfully added targets from $targets_file to $makefile_pl\n";
+}
+
+main;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+append_postamble - Inject custom Makefile targets into Dist::Zilla
+generated Makefile.PL
+
+=head1 SYNOPSIS
+
+  perl dev/append_postamble Makefile.PL
+
+=head1 DESCRIPTION
+
+This script reads custom Makefile targets from F<dev/Makefile.targets> and
+injects them into a Dist::Zilla generated F<Makefile.PL> file via a postamble
+subroutine. It automatically filters out targets that conflict with
+ExtUtils::MakeMaker's built-in targets.
+
+The script is designed to run as part of the Dist::Zilla build process via
+the Run::AfterBuild plugin.
+
+=head1 FUNCTIONS
+
+=head2 read_targets_file($targets_file)
+
+Reads the contents of the targets file and returns it as a string.
+
+=head2 filter_conflicting_targets($targets_content)
+
+Removes targets that would conflict with ExtUtils::MakeMaker's built-in
+targets (test, clean, install) to avoid "target redefined" warnings.
+
+=head2 create_postamble($targets_content)
+
+Creates the Perl code for the MY::postamble subroutine that will be
+injected into the Makefile.PL.
+
+=head2 read_makefile_pl($makefile_pl)
+
+Reads the Makefile.PL file and returns its contents.
+
+=head2 write_makefile_pl($makefile_pl, $content)
+
+Writes the modified content back to the Makefile.PL file.
+
+=head2 inject_postamble($content, $postamble)
+
+Injects the postamble code before the WriteMakefile call in the Makefile.PL.
+
+=head2 main
+
+Main program logic that orchestrates the entire process.
+
+=head1 AUTHOR
+
+Paul Johnson C<< <paul@pjcj.net> >>
+
+=head1 COPYRIGHT
+
+Copyright 2025 Paul Johnson.
+
+=head1 LICENCE
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut

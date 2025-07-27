@@ -1,0 +1,19 @@
+# Dist::Zilla build artefacts
+.build/
+Perl-Critic-PJCJ-*/
+*.tar.gz
+
+# Development files
+.perl-version
+tags*
+tmp/
+cover_db/
+
+# Perl temporary files
+*.bak
+*.old
+*.tdy
+*~
+
+# OS generated files
+.DS_Store

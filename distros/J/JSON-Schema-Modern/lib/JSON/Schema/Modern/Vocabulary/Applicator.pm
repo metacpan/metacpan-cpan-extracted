@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Applicator;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Applicator vocabulary
 
-our $VERSION = '0.615';
+our $VERSION = '0.616';
 
 use 5.020;
 use Moo;
@@ -18,7 +18,9 @@ no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 no if "$]" >= 5.041009, feature => 'smartmatch';
 no feature 'switch';
-use List::Util 1.45 qw(any uniqstr);
+use List::Util 1.45 'uniqstr';
+use if "$]" < 5.041010, 'List::Util' => 'any';
+use if "$]" >= 5.041010, experimental => 'keyword_any';
 use Ref::Util 0.100 'is_plain_arrayref';
 use Sub::Install;
 use JSON::Schema::Modern::Utilities qw(is_type jsonp E A assert_keyword_type assert_pattern true is_elements_unique);
@@ -545,7 +547,7 @@ JSON::Schema::Modern::Vocabulary::Applicator - Implementation of the JSON Schema
 
 =head1 VERSION
 
-version 0.615
+version 0.616
 
 =head1 DESCRIPTION
 

@@ -14,6 +14,7 @@
 .shellcheckrc
 .typos.toml
 .yamllint
+CLAUDE.md
 Changes
 Contributors
 Cover.xs
@@ -74,6 +75,7 @@ lib/Devel/Cover/Report/Html_basic.pm
 lib/Devel/Cover/Report/Html_minimal.pm
 lib/Devel/Cover/Report/Html_subtle.pm
 lib/Devel/Cover/Report/Json.pm
+lib/Devel/Cover/Report/Nvim.pm
 lib/Devel/Cover/Report/Sort.pm
 lib/Devel/Cover/Report/Text.pm
 lib/Devel/Cover/Report/Text2.pm

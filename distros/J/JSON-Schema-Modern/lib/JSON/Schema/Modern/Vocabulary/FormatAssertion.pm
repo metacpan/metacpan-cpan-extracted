@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::FormatAssertion;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Format-Assertion vocabulary
 
-our $VERSION = '0.615';
+our $VERSION = '0.616';
 
 use 5.020;
 use Moo;
@@ -20,7 +20,8 @@ no if "$]" >= 5.041009, feature => 'smartmatch';
 no feature 'switch';
 use JSON::Schema::Modern::Utilities qw(get_type E A assert_keyword_type abort);
 use Feature::Compat::Try;
-use List::Util 'any';
+use if "$]" < 5.041010, 'List::Util' => 'any';
+use if "$]" >= 5.041010, experimental => 'keyword_any';
 use Ref::Util 0.100 'is_plain_arrayref';
 use Scalar::Util 'looks_like_number';
 use namespace::clean;
@@ -277,7 +278,7 @@ JSON::Schema::Modern::Vocabulary::FormatAssertion - Implementation of the JSON S
 
 =head1 VERSION
 
-version 0.615
+version 0.616
 
 =head1 DESCRIPTION
 

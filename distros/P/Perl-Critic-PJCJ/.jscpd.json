@@ -1,0 +1,16 @@
+{
+  "blame": false,
+  "gitignore": true,
+  "ignore": [
+    "**/var/project/**"
+  ],
+  "max-lines": 100000,
+  "max-size": 10000000,
+  "min-lines": 1,
+  "min-tokens": 1,
+  "mode": "mild",
+  "reporters": [
+    "console"
+  ],
+  "threshold": 0
+}

@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern; # git description: v0.614-3-gdd20f532
+package JSON::Schema::Modern; # git description: v0.615-9-g4af01d8e
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema using a JSON Schema
 # KEYWORDS: JSON Schema validator data validation structure specification
 
-our $VERSION = '0.615';
+our $VERSION = '0.616';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -21,7 +21,9 @@ no if "$]" >= 5.041009, feature => 'smartmatch';
 no feature 'switch';
 use Mojo::JSON ();  # for JSON_XS, MOJO_NO_JSON_XS environment variables
 use Carp qw(croak carp);
-use List::Util 1.55 qw(pairs first uniqint pairmap uniq any min);
+use List::Util 1.55 qw(pairs first uniqint pairmap uniq min);
+use if "$]" < 5.041010, 'List::Util' => 'any';
+use if "$]" >= 5.041010, experimental => 'keyword_any';
 use Ref::Util 0.100 qw(is_ref is_plain_hashref);
 use builtin::compat qw(refaddr load_module);
 use Mojo::URL;
@@ -1049,23 +1051,31 @@ use constant CACHED_METASCHEMAS => {
   'http://json-schema.org/draft-04/schema' => 'draft4/schema.json',
 };
 
+# simple runtime-wide cache of metaschema documentation objects that are sourced from disk
+my $metaschema_cache = {};
+
 # returns the same as _get_resource
 sub _get_or_load_resource ($self, $uri) {
   my $resource = $self->_get_resource($uri);
   return $resource if $resource;
 
   if (my $local_filename = $self->CACHED_METASCHEMAS->{$uri}) {
-    my $file = path(dist_dir('JSON-Schema-Modern'), $local_filename);
-    my $schema = $self->_json_decoder->decode($file->slurp_raw);
-    my $document = JSON::Schema::Modern::Document->new(schema => $schema, evaluator => $self);
+    my $document;
+    if (not $document = $metaschema_cache->{$local_filename}) {
+      my $file = path(dist_dir('JSON-Schema-Modern'), $local_filename);
+      my $schema = $self->_json_decoder->decode($file->slurp_raw);
+      my $_document = JSON::Schema::Modern::Document->new(schema => $schema, evaluator => $self);
 
-    # this should be caught by the try/catch in evaluate()
-    die JSON::Schema::Modern::Result->new(
-      output_format => $self->output_format,
-      valid => 0,
-      errors => [ $document->errors ],
-      exception => 1,
-    ) if $document->has_errors;
+      # this should be caught by the try/catch in evaluate()
+      die JSON::Schema::Modern::Result->new(
+        output_format => $self->output_format,
+        valid => 0,
+        errors => [ $_document->errors ],
+        exception => 1,
+      ) if $_document->has_errors;
+
+      $metaschema_cache->{$local_filename} = $document = $_document;
+    }
 
     # we have already performed the appropriate collision checks, so we bypass them here
     $self->_add_resources_unsafe(
@@ -1287,7 +1297,7 @@ JSON::Schema::Modern - Validate data against a schema using a JSON Schema
 
 =head1 VERSION
 
-version 0.615
+version 0.616
 
 =head1 SYNOPSIS
 
@@ -1738,6 +1748,8 @@ do not apply arithmetic operators to it -- or subsequent type checks on this val
 See L<https://spec.openapis.org/registry/format/> for a registry of known and useful formats; for
 compatibility reasons, avoid defining a format listed here with different semantics.
 
+Format definitions can be overridden with a new call to C<add_format_validation>.
+
 =head2 add_vocabulary
 
   $js->add_vocabulary('My::Custom::Vocabulary::Class');
@@ -1751,6 +1763,8 @@ L<vocabulary|JSON::Schema::Modern::Vocabulary/vocabulary> and
 L<keywords|JSON::Schema::Modern::Vocabulary/keywords> methods, as well as
 C<< _traverse_keyword_<keyword name> >> methods for each keyword. C<< _eval_keyword_<keyword name> >>
 methods are optional; when not provided, evaluation will always return a true result.
+
+Vocabularies cannot be redefined; subsequent calls to add the same vocabulary will do nothing.
 
 =head2 add_media_type
 
@@ -1797,6 +1811,8 @@ C<text/*> - passes strings through unchanged
 
 =back
 
+Media-type definitions can be overridden with a new call to C<add_media_type>.
+
 =head2 get_media_type
 
 Fetches a decoder sub for the indicated media type. Lookups are performed B<without case sensitivity>.
@@ -1818,6 +1834,8 @@ You can use it thusly:
 Takes an encoding name and a subref which takes a single scalar reference, which is expected to be
 a reference to a string, which SHOULD be a 7-bit or 8-bit string. Result values MUST be a scalar-reference
 to a string (which is then dereferenced for the C<contentMediaType> keyword).
+
+Encoding definitions can be overridden with a new call to C<add_encoding>.
 
 =for stopwords natively
 
@@ -2077,6 +2095,34 @@ UNTRUSTED SOURCES.>
 (In particular, see vulnerability
 L<perl5363delta/CVE-2023-47038-Write-past-buffer-end-via-illegal-user-defined-Unicode-property>,
 which was fixed in Perl releases 5.34.3, 5.36.3 and 5.38.1.)
+
+=head1 BUNDLED META-SCHEMAS
+
+These specification meta-schemas are bundled with this distribution and loaded as needed:
+
+=over 4
+
+=item *
+
+C<http://json-schema.org/draft-04/schema#>
+
+=item *
+
+C<http://json-schema.org/draft-06/schema#>
+
+=item *
+
+C<http://json-schema.org/draft-07/schema#>
+
+=item *
+
+C<https://json-schema.org/draft/2019-09/schema>
+
+=item *
+
+C<https://json-schema.org/draft/2020-12/schema>
+
+=back
 
 =head1 SEE ALSO
 

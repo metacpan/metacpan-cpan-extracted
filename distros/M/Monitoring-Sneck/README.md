@@ -163,6 +163,8 @@ The generated JSON/hash is as below in jpath notation.
 
 - .data.config :: The raw config file if told to include it.
 
+- $hash{data}{run_time} :: How long it took to run all checks.
+
 For the following `$name` is the name of the check ran.
 
 - .data.checks.$name :: A hash with info on the checks ran.
@@ -178,6 +180,8 @@ For the following `$name` is the name of the check ran.
 - .data.checks.$name.error :: Only present it died on a signal or
   could not be executed. Provides a brief description.
 
+- $hash{data}{checks}{$name}{run_time} :: How long it took to run the checks.
+
 For the following `$name` is the name of the debug check ran.
 
 - .data.debugs.$name :: A hash with info on the checks ran.
@@ -192,6 +196,8 @@ For the following `$name` is the name of the debug check ran.
 
 - .data.debugs.$name.error :: Only present it died on a signal or
   could not be executed. Provides a brief description.
+
+ - $hash{data}{checks}{$name}{run_time} :: How long it took to run the debug.
 
 ## INSTALLING
 

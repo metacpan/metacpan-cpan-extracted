@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Result;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Contains the result of a JSON Schema evaluation
 
-our $VERSION = '0.615';
+our $VERSION = '0.616';
 
 use 5.020;
 use Moo;
@@ -25,7 +25,9 @@ use JSON::Schema::Modern::Annotation;
 use JSON::Schema::Modern::Error;
 use JSON::Schema::Modern::Utilities qw(true false);
 use JSON::PP ();
-use List::Util 1.50 qw(any uniq all);
+use List::Util 1.45 'uniq';
+use if "$]" < 5.041010, 'List::Util' => qw(any all);
+use if "$]" >= 5.041010, experimental => qw(keyword_any keyword_all);
 use Carp 'croak';
 use builtin::compat qw(refaddr blessed);
 use Safe::Isa;
@@ -197,13 +199,13 @@ sub format ($self, $style, $formatted_annotations = undef) {
   }
 
   # TODO: support detailed, verbose ?
-  die 'unsupported output format';
+  croak 'unsupported output format';
 }
 
 sub count { $_[0]->valid ? $_[0]->annotation_count : $_[0]->error_count }
 
 sub combine ($self, $other, $swap) {
-  die 'wrong type for & operation' if not $other->$_isa(__PACKAGE__);
+  croak 'wrong type for & operation' if not $other->$_isa(__PACKAGE__);
 
   return $self if refaddr($other) == refaddr($self);
 
@@ -227,7 +229,7 @@ sub stringify ($self) {
 }
 
 sub TO_JSON ($self) {
-  die 'cannot produce JSON output for data_only format' if $self->output_format eq 'data_only';
+  croak 'cannot produce JSON output for data_only format' if $self->output_format eq 'data_only';
   $self->format($self->output_format);
 }
 
@@ -266,7 +268,7 @@ JSON::Schema::Modern::Result - Contains the result of a JSON Schema evaluation
 
 =head1 VERSION
 
-version 0.615
+version 0.616
 
 =head1 SYNOPSIS
 

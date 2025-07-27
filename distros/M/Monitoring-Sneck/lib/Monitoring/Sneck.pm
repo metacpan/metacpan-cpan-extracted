@@ -8,6 +8,7 @@ use Sys::Hostname qw(hostname);
 use IPC::Open3    qw(open3);
 use Symbol        qw(gensym);
 use IO::Select;
+use Time::HiRes;
 
 =head1 NAME
 
@@ -15,11 +16,11 @@ Monitoring::Sneck - a boopable LibreNMS JSON style SNMP extend for remotely runn
 
 =head1 VERSION
 
-Version 1.0.2
+Version 1.1.0
 
 =cut
 
-our $VERSION = '1.0.2';
+our $VERSION = '1.1.0';
 
 =head1 SYNOPSIS
 
@@ -131,9 +132,11 @@ The data section of the return hash is as below.
 
     - $hash{data}{time} :: Time since epoch.
 
-    - $hash{data}{time} :: The hostname the check was ran on.
+    - $hash{data}{hostname} :: The hostname the check was ran on.
 
     - $hash{data}{config} :: The raw config file if told to include it.
+
+    - $hash{data}{run_time} :: How long it took to run all checks.
 
 For below '$name' is the name of the check in question.
 
@@ -150,6 +153,8 @@ For below '$name' is the name of the check in question.
     - $hash{data}{checks}{$name}{error} :: Only present it died on a
       signal or could not be executed. Provides a brief description.
 
+    - $hash{data}{checks}{$name}{run_time} :: How long it took to run the checks.
+
 For below '$name' is the name of the debug checks in question.
 
     - $hash{data}{debugs}{$name} :: A hash with info on the checks ran.
@@ -164,6 +169,8 @@ For below '$name' is the name of the debug checks in question.
 
     - $hash{data}{debugs}{$name}{error} :: Only present it died on a
       signal or could not be executed. Provides a brief description.
+
+    - $hash{data}{checks}{$name}{run_time} :: How long it took to run the debug.
 
 =head1 METHODS
 
@@ -344,6 +351,8 @@ This runs the checks and returns the return hash.
 sub run {
 	my $self = $_[0];
 
+	my $run_start_time = Time::HiRes::time;
+
 	# if something went wrong with new, just return
 	if ( !$self->{good} ) {
 		return $self->{to_return};
@@ -355,6 +364,8 @@ sub run {
 	my @vars   = keys( %{ $self->{vars} } );
 	my @checks = keys( %{ $self->{checks} } );
 	foreach my $name (@checks) {
+		my $check_start_time = Time::HiRes::time;
+
 		my $type = 'checks';
 		if ( $name =~ /^\%/ ) {
 			$type = 'debugs';
@@ -426,16 +437,28 @@ sub run {
 				$self->{to_return}{data}{errored}++;
 				$self->{to_return}{data}{alert} = 1;
 			}
+
+			# add it to the alert string if it is a warning
+			if ( $exit_code == 1 || $exit_code == 2 || $exit_code == 3 ) {
+				$self->{to_return}{data}{alertString}
+				  = $self->{to_return}{data}{alertString} . $self->{to_return}{data}{checks}{$name}{output} . "\n";
+			}
 		} ## end if ( $type eq 'checks' )
 
-		# add it to the alert string if it is a warning
-		if ( $exit_code == 1 || $exit_code == 2 || $exit_code == 3 ) {
-			$self->{to_return}{data}{alertString}
-				= $self->{to_return}{data}{alertString} . $self->{to_return}{data}{checks}{$name}{output} . "\n";
-		}
+		# figure out how long the run took
+		my $check_stop_time=Time::HiRes::time;
+		my $check_time = $check_stop_time - $check_start_time;
+		# round to the 9th place to avoid scientific notation
+		$self->{to_return}{data}{$type}{$name}{run_time} = sprintf('%.9f', $check_time);
 	} ## end foreach my $name (@checks)
 
 	$self->{to_return}{data}{vars} = $self->{vars};
+
+	# figure out how long the run took
+	my $run_stop_time=Time::HiRes::time;
+	my $run_time = $run_stop_time - $run_start_time;
+	# round to the 9th place to avoid scientific notation
+	$self->{to_return}{data}{run_time} = sprintf('%.9f', $run_time);
 
 	return $self->{to_return};
 } ## end sub run

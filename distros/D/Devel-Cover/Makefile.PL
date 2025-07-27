@@ -19,8 +19,8 @@ use Data::Dumper        ();
 
 local $| = 1;
 
-my $Version  = "1.50";
-my $Latest_t = "5.040002";
+my $Version  = "1.51";
+my $Latest_t = "5.042000";
 my $Author   = 'paul@pjcj.net';
 my $Inc_str  = do {
   my %inc

@@ -23,7 +23,7 @@ use XSLoader;
 use Carp;
 
 use vars qw( $VERSION @ISA @EXPORT_OK %EXPORT_TAGS );
-$VERSION = "1.60";
+$VERSION = "1.61";
 @ISA     = qw( Exporter );
 XSLoader::load ("Text::CSV_XS", $VERSION);
 
@@ -3767,14 +3767,13 @@ Encodings can be stacked, as supported by C<binmode>:
 X<detect_bom>
 
 If  C<detect_bom>  is given, the method  L</header>  will be invoked on the
-opened stream to check if there is a BOM and set the encoding accordingly.
+opened stream to check if there is a  BOM and set the encoding accordingly.
+Note that the attribute L<C<headers>|/headers>  can be used to overrule the
+default behavior of how that method automatically sets the attribute.
 
 C<detect_bom> can be abbreviated to C<bom>.
 
 This is the same as setting L<C<encoding>|/encoding> to C<"auto">.
-
-Note that as the method  L</header> is invoked,  its default is to also set
-the headers.
 
 =head3 headers
 X<headers>
@@ -5085,7 +5084,7 @@ X<1012>
 The header line parsed in the L</header> contains an empty field.
 
 =item *
-1013 "INI - the header contains nun-unique fields"
+1013 "INI - the header contains non-unique fields"
 X<1013>
 
 The header line parsed in the  L</header>  contains at least  two identical
@@ -5302,8 +5301,11 @@ L<IO::File>,  L<IO::Handle>,  L<IO::Wrap>,  L<Text::CSV>,  L<Text::CSV_PP>,
 L<Text::CSV::Encoded>,     L<Text::CSV::Separator>,    L<Text::CSV::Slurp>,
 L<Spreadsheet::CSV> and L<Spreadsheet::Read>, and of course L<perl>.
 
-If you are using Raku,  have a look at C<Text::CSV> in the Raku ecosystem,
+If you are using Raku,  have a look at C<Text::CSV> in the  Raku ecosystem,
 offering the same features.
+
+A beautiful L<Love Letter|https://github.com/medialab/xan/blob/master/docs/LOVE_LETTER.md>
+to C<CSV> by the developers of L<xan|https://github.com/medialab/xan#readme>.
 
 =head3 non-perl
 
