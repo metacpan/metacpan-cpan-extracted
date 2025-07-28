@@ -1,5 +1,8 @@
 Revision history for WWW::YaCyBlacklist
 
+0.7       2025-07-28 02:42:58+02:00 Europe/Berlin
+         chomp not reliable with Windows files on Linux
+		 
 0.6       2025-07-20 18:45:50+02:00 Europe/Berlin
         faster check_url( )
         check_url( ) matches allways if protocoll is not http or ftp

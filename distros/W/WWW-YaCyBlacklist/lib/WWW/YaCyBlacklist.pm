@@ -5,7 +5,7 @@ package WWW::YaCyBlacklist;
 # ABSTRACT: a Perl module to parse and execute YaCy blacklists
 
 our $AUTHORITY = 'cpan:IBRAUN';
-$WWW::YaCyBlacklist::VERSION = '0.6';
+$WWW::YaCyBlacklist::VERSION = '0.7';
 
 use Moose;
 use Moose::Util::TypeConstraints;
@@ -31,7 +31,7 @@ has 'filename' => (
 has 'file_charset' => (
     is  => 'ro',
     isa => 'Str',
-    default => 'UTF-8', # YaCy files are encoded in ANSI
+    default => 'UTF-8',
     init_arg => undef,
 );
 
@@ -97,6 +97,10 @@ sub read_from_files {
     my @lines;
 
     grep { push( @lines, io( $_ )->encoding( $self->file_charset )->chomp->slurp ) } @files;
+
+    # chomp is not fully reliable with Windows files in Linux
+    grep { my $s = $_; $s =~ s/\r$//; $s } @lines;
+
     $self->read_from_array( @lines );
 }
 
@@ -206,7 +210,7 @@ WWW::YaCyBlacklist - a Perl module to parse and execute YaCy blacklists
 
 =head1 VERSION
 
-version 0.6
+version 0.7
 
 =head1 SYNOPSIS
 
@@ -232,7 +236,7 @@ version 0.6
 
     $ycb->sortorder( 1 );
     $ycb->sorting( 'alphabetical' );
-	$ycb->sortorder( '/path/to/new.black' );
+    $ycb->filename( '/path/to/new.black' );
     $ycb->store_list( );
 
 =head1 METHODS
@@ -297,11 +301,11 @@ Prints the current list to a file. Executes C<sort_list( )>.
 
 C<WWW::YaCyBlacklist> checks the path part including the leading separator C</>. This protects against regexp compiling errors with leading quantifiers. So do not something like C<host.tld/^path> although YaCy allows this.
 
-C<check_url( )> alway returns true if the protocol of the URL is not C<https?> of C<ftps?>.
+C<check_url( )> alway returns true if the protocol of the URL is not C<https?> or C<ftps?>.
 
 =head1 BUGS
 
-YaCy does not allow host patterns with to stars at the time being. C<WWW::YaCyBlacklist> does not check for this but simply executes. This is rather a YaCy bug.
+YaCy does not allow host patterns with two ore more stars at the time being. C<WWW::YaCyBlacklist> does not check for this but simply executes. This is rather a YaCy bug.
 
 If there is something you would like to tell me, there are different channels for you:
 

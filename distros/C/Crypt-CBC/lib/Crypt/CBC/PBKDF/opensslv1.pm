@@ -3,6 +3,7 @@ use strict;
 use base 'Crypt::CBC::PBKDF';
 use Digest::MD5 'md5';
 
+our $VERSION = '3.07';
 # options:
 # salt_len   => 8     default
 # key_len    => 32    default

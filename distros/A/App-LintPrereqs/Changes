@@ -1,3 +1,8 @@
+0.544   2024-12-21  Released-By: PERLANCAR; Urgency: medium
+
+        - Update prereq name Filename::* -> Filename::Type::*.
+
+
 0.543   2020-04-27  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

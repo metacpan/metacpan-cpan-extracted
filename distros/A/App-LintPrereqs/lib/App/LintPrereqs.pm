@@ -1,20 +1,16 @@
 package App::LintPrereqs;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-27'; # DATE
-our $DIST = 'App-LintPrereqs'; # DIST
-our $VERSION = '0.543'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 use Log::ger;
 
 use Config::IOD;
+use Exporter 'import';
 use Fcntl qw(:DEFAULT);
 use File::Find;
 use File::Which;
-use Filename::Backup qw(check_backup_filename);
+use Filename::Type::Backup qw(check_backup_filename);
 use IPC::System::Options 'system', -log=>1;
 use Module::CoreList::More;
 use Proc::ChildError qw(explain_child_error);
@@ -22,9 +18,13 @@ use Scalar::Util 'looks_like_number';
 use Sort::Sub qw(prereq_ala_perlancar);
 use Version::Util qw(version_gt version_ne);
 
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2024-12-21'; # DATE
+our $DIST = 'App-LintPrereqs'; # DIST
+our $VERSION = '0.544'; # VERSION
+
 our %SPEC;
-require Exporter;
-our @ISA       = qw(Exporter);
+
 our @EXPORT_OK = qw(lint_prereqs);
 
 # create a merged list of prereqs from any phase
@@ -151,7 +151,7 @@ sub _scan_prereqs {
 $SPEC{lint_prereqs} = {
     v => 1.1,
     summary => 'Check extraneous/missing/incorrect prerequisites in dist.ini',
-    description => <<'_',
+    description => <<'MARKDOWN',
 
 lint-prereqs can improve your prereqs specification in `dist.ini` by reporting
 prereqs that are extraneous (specified but unused), missing (used/required but
@@ -198,7 +198,7 @@ e.g.:
 then if there is a prereq specified less than the minimum versions,
 `lint-prereqs` will also complain.
 
-_
+MARKDOWN
     args => {
         perl_version => {
             schema => ['str*'],
@@ -218,7 +218,7 @@ _
             schema => ['str*', in=>['regular','lite','nqlite']],
             default => 'regular',
             summary => 'Which scanner to use',
-            description => <<'_',
+            description => <<'MARKDOWN',
 
 `regular` means <pm:Perl::PrereqScanner> which is PPI-based and is the slowest
 but has the most complete support for Perl syntax.
@@ -230,7 +230,7 @@ given some weird code.
 `nqlite` means <pm:Perl::PrereqScanner::NotQuiteLite> which is faster than
 `regular` but not as fast as `lite`.
 
-_
+MARKDOWN
         },
         lite => {
             schema => ['bool*'],
@@ -238,39 +238,39 @@ _
             summary => 'Use Perl::PrereqScanner::Lite instead of Perl::PrereqScanner',
             "summary.alt.bool.not" =>
                 'Use Perl::PrereqScanner instead of Perl::PrereqScanner::Lite',
-            description => <<'_',
+            description => <<'MARKDOWN',
 
 This option is deprecated and has been replaced by `scanner`.
 
 Lite is faster but it might still miss detecting some modules.
 
-_
+MARKDOWN
             tags => ['deprecated', 'hidden'],
         },
         core_prereqs => {
             schema => ['bool*'],
             default => 1,
             summary => 'Whether or not prereqs to core modules are allowed',
-            description => <<'_',
+            description => <<'MARKDOWN',
 
 If set to 0 (the default), will complain if there are prerequisites to core
 modules. If set to 1, prerequisites to core modules are required just like other
 modules.
 
-_
+MARKDOWN
         },
         fix => {
             schema => 'bool',
             summary => 'Attempt to automatically fix the errors',
             cmdline_aliases => {F=>{}},
-            description => <<'_',
+            description => <<'MARKDOWN',
 
 `lint-prereqs` can attempt to automatically fix the errors by
 adding/removing/moving prereqs in `dist.ini`. Not all errors can be
 automatically fixed. When modifying `dist.ini`, a backup in `dist.ini~` will be
 created.
 
-_
+MARKDOWN
         },
     },
 };
@@ -535,7 +535,7 @@ sub lint_prereqs {
 
     # check lumped modules
     {
-        no strict 'refs';
+        no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
         my %lumped_mods;
         for my $mod (keys %{$mods_from_ini{Any}}) {
             next unless $mod =~ /::Lumped$/;
@@ -694,7 +694,7 @@ App::LintPrereqs - Check extraneous/missing/incorrect prerequisites in dist.ini
 
 =head1 VERSION
 
-This document describes version 0.543 of App::LintPrereqs (from Perl distribution App-LintPrereqs), released on 2020-04-27.
+This document describes version 0.544 of App::LintPrereqs (from Perl distribution App-LintPrereqs), released on 2024-12-21.
 
 =head1 SYNOPSIS
 
@@ -707,7 +707,7 @@ This document describes version 0.543 of App::LintPrereqs (from Perl distributio
 
 Usage:
 
- lint_prereqs(%args) -> [status, msg, payload, meta]
+ lint_prereqs(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Check extraneousE<sol>missingE<sol>incorrect prerequisites in dist.ini.
 
@@ -810,12 +810,12 @@ C<regular> but not as fast as C<lite>.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -827,6 +827,41 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-LintPr
 
 Source repository is at L<https://github.com/perlancar/perl-App-LintPrereqs>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-LintPrereqs>
@@ -834,16 +869,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2020, 2019, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

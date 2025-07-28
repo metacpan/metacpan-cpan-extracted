@@ -1,5 +1,6 @@
 package Crypt::CBC::PBKDF;
 
+our $VERSION = '3.07';
 # just a virtual base class for passphrase=>key derivation functions
 use strict;
 use File::Basename 'dirname','basename';

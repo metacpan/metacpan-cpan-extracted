@@ -1,5 +1,29 @@
 Revision history for Perl extension App-Greple-pw
 
+1.01 2025-07-28T07:26:16Z
+
+    - Major migration from pw_option to Getopt::EX::Config system
+      - Unified configuration interface supporting multiple parameter formats
+      - Support for both command-line options (--parse-matrix) and config syntax (parse_matrix)
+      - Direct parameter assignment to PwBlock variables for better integration
+      
+    - Comprehensive test suite implementation
+      - Added t/Util.pm for greple integration testing
+      - Created 18 tests covering basic functionality, configuration, and options
+      - Test runner integration using git submodules
+      
+    - Enhanced documentation and user experience
+      - Improved module description: "Interactive password and ID information extractor"
+      - Added structured Key Features section highlighting security and usability
+      - Comprehensive configuration examples and browser integration documentation
+      - Hidden internal functions from user-facing documentation
+      
+    - Bug fixes and code improvements
+      - Fixed critical clipboard assignment vs comparison bug (= to eq)
+      - Fixed browser variable typo ($brouse to $browser) 
+      - Improved option naming consistency (underscores vs hyphens)
+      - Added proper data encapsulation for PwBlock parameter management
+
 1.00 2025-07-25T02:50:55Z
 
     - original version

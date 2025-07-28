@@ -1,7 +1,50 @@
 Perl Module Security Advisory
 
+========================================================================
+CVE-2025-2814                                        CPAN Security Group
+========================================================================
+
+         CVE ID:  CVE-2025-2814
+   Distribution:  Crypt-CBC
+       Versions:  from 1.21 through 3.04
+
+       MetaCPAN:  https://metacpan.org/dist/Crypt-CBC
+
+
+Crypt::CBC versions between 1.21 and 3.04 for Perl may use insecure
+rand() function for cryptographic functions
+
+Description
+-----------
+Crypt::CBC versions between 1.21 and 3.04 for Perl may use the rand()
+function as the default source of entropy, which is not
+cryptographically secure, for cryptographic functions.
+
+This issue affects operating systems where "/dev/urandom'" is
+unavailable.  In that case, Crypt::CBC will fallback to use the
+insecure rand() function.
+
+Problem types
+-------------
+CWE-338 Use of Cryptographically Weak Pseudo-Random Number Generator
+(PRNG)
+
+References
+----------
+https://perldoc.perl.org/functions/rand
+https://metacpan.org/dist/Crypt-CBC/source/lib/Crypt/CBC.pm#L777
+https://security.metacpan.org/docs/guides/random-data-for-security.html
+
+Credits
+-------
+Robert Rothenberg (RRWO), finder
+
+========================================================================
+CVE-2006-0898                                          MITRE Corporation
+========================================================================
 -------------------------------------------------------------------------------
    Title: Crypt::CBC ciphertext weakness when using certain block algorithms
+  CVE ID: CVE-2006-0898
 Severity: High
 Versions: All versions <= 2.16.
     Date: 16 February 2006

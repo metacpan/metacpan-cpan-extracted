@@ -3,6 +3,7 @@ use strict;
 use Carp 'croak';
 use base 'Crypt::CBC::PBKDF::opensslv1';
 
+our $VERSION = '3.07';
 # options:
 # key_len    => 32    default
 # iv_len     => 16    default

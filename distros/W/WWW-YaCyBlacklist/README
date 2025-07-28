@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.6
+    version 0.7
 
 SYNOPSIS
 
@@ -30,7 +30,7 @@ SYNOPSIS
     
         $ycb->sortorder( 1 );
         $ycb->sorting( 'alphabetical' );
-            $ycb->sortorder( '/path/to/new.black' );
+        $ycb->filename( '/path/to/new.black' );
         $ycb->store_list( );
 
 METHODS
@@ -100,13 +100,13 @@ OPERATIONAL NOTES
     allows this.
 
     check_url( ) alway returns true if the protocol of the URL is not
-    https? of ftps?.
+    https? or ftps?.
 
 BUGS
 
-    YaCy does not allow host patterns with to stars at the time being.
-    WWW::YaCyBlacklist does not check for this but simply executes. This is
-    rather a YaCy bug.
+    YaCy does not allow host patterns with two ore more stars at the time
+    being. WWW::YaCyBlacklist does not check for this but simply executes.
+    This is rather a YaCy bug.
 
     If there is something you would like to tell me, there are different
     channels for you:

@@ -50,7 +50,7 @@ foreach my $url (@urls) {
     #join("\n", @links) > io('C:/Users/Work/Documents/ingram/Perl/dzil/WWW-YaCyBlacklist/xt/links.txt');
     join("\n", $ycb->find_matches( @links )) > io('C:/Users/Work/Documents/ingram/Perl/dzil/WWW-YaCyBlacklist/xt/matched.txt');
 
-    is( scalar $ycb->find_matches( @links ), 72, "LinkExtor-$count" );
+    is( scalar $ycb->find_matches( @links ), 73, "LinkExtor-$count" );
 }
 
  # LinkExtor callback

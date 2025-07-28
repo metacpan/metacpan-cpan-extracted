@@ -1,5 +1,5 @@
 {
-   "abstract" : "Module to get password from file",
+   "abstract" : "Interactive password and ID information extractor for greple",
    "author" : [
       "Kazumasa Utashiro"
    ],
@@ -45,6 +45,7 @@
             "App::Greple" : "9.23",
             "Clipboard" : "0",
             "Getopt::EX" : "v2.2.2",
+            "Getopt::EX::Config" : "0.9904",
             "perl" : "v5.18.2"
          }
       },
@@ -60,7 +61,7 @@
       },
       "App::Greple::pw" : {
          "file" : "lib/App/Greple/pw.pm",
-         "version" : "1.00"
+         "version" : "1.01"
       }
    },
    "release_status" : "stable",
@@ -75,7 +76,7 @@
          "web" : "https://github.com/kaz-utashiro/greple-pw"
       }
    },
-   "version" : "1.00",
+   "version" : "1.01",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"

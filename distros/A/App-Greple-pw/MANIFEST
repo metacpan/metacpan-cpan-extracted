@@ -8,5 +8,11 @@ lib/App/Greple/PwBlock.pm
 lib/App/Greple/pw.pm
 minil.toml
 t/00_compile.t
+t/01_basic.t
+t/02_config.t
+t/03_options.t
+t/Util.pm
+t/runner/README.md
+t/runner/Runner.pm
 META.yml
 MANIFEST

@@ -1,26 +1,56 @@
 ---
-abstract: unknown
+abstract: 'Encrypt Data with Cipher Block Chaining Mode'
 author:
-  - unknown
+  - 'Lincoln Stein, lstein@cshl.org'
 build_requires:
-  ExtUtils::MakeMaker: '0'
+  Test: '0'
+  Test::More: '0'
+  lib: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
-license: unknown
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Crypt-CBC
-no_index:
-  directory:
-    - t
-    - inc
+provides:
+  Crypt::CBC:
+    file: lib/Crypt/CBC.pm
+    version: '3.07'
+  Crypt::CBC::PBKDF:
+    file: lib/Crypt/CBC/PBKDF.pm
+    version: '3.07'
+  Crypt::CBC::PBKDF::none:
+    file: lib/Crypt/CBC/PBKDF/none.pm
+    version: '3.07'
+  Crypt::CBC::PBKDF::opensslv1:
+    file: lib/Crypt/CBC/PBKDF/opensslv1.pm
+    version: '3.07'
+  Crypt::CBC::PBKDF::opensslv2:
+    file: lib/Crypt/CBC/PBKDF/opensslv2.pm
+    version: '3.07'
+  Crypt::CBC::PBKDF::pbkdf2:
+    file: lib/Crypt/CBC/PBKDF/pbkdf2.pm
+    version: '3.07'
+  Crypt::CBC::PBKDF::randomiv:
+    file: lib/Crypt/CBC/PBKDF/randomiv.pm
+    version: '3.07'
 requires:
   Crypt::Cipher::AES: '0'
   Crypt::PBKDF2: '0'
+  Crypt::URandom: '0'
   Digest::MD5: '0'
   Digest::SHA: '0'
-version: '3.04'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+  perl: '5.008'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Crypt-CBC
+  homepage: http://search.cpan.org/dist/Crypt-CBC/
+  repository: git://github.com/lstein/Lib-Crypt-CBC.git
+version: '3.07'
+x_generated_by_perl: v5.38.2
+x_maintainers:
+  - 'Timothy Legge <timlegge@gmail.com>'
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: Artistic-2.0
