@@ -26,7 +26,7 @@ WriteMakefile(
 		'Carp' => 0,
 		'Exporter' => 0,
 		'Module::Runtime' => 0,
-		'Params::Get' => 0,
+		'Params::Get' => 0.11,
 		'Text::Capitalize' => 0,
 	}, TEST_REQUIRES => {
 		'Getopt::Long' => 0,

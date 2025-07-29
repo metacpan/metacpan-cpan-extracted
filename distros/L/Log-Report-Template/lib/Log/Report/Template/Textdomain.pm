@@ -1,14 +1,14 @@
 # Copyrights 2017-2025 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.03.
+# Pod stripped from pm file by OODoc 2.02.
 # This code is part of distribution Log-Report-Template. Meta-POD processed
 # with OODoc into POD and HTML manual-pages.  See README.md
 # Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
-package Log::Report::Template::Textdomain;{
-our $VERSION = '1.01';
-}
+package Log::Report::Template::Textdomain;
+use vars '$VERSION';
+$VERSION = '1.02';
 
 use base 'Log::Report::Domain';
 
@@ -18,7 +18,8 @@ use strict;
 use Log::Report 'log-report-template';
 
 use Log::Report::Message ();
-use Scalar::Util qw(weaken);
+
+use Scalar::Util         qw(weaken);
 
 
 sub init($)
@@ -85,17 +86,28 @@ sub translateTo($)
 
 sub translationFunction($)
 {	my ($self, $service) = @_;
+	my $context = $service->context;
 
 	# Prepare as much and fast as possible, because it gets called often!
-	sub { # called with ($msgid, \%params)
-		$_[1]->{_stash} = $service->{CONTEXT}{STASH};
-		Log::Report::Message->fromTemplateToolkit($self, @_)->toString($self->lang);
+	sub { # called with ($msgid, @positionals, [\%params])
+		my $msgid  = shift;
+		my $params = @_ && ref $_[-1] eq 'HASH' ? pop @_ : {};
+		my $plural = $msgid =~ s/\|(.*)// ? $1 : undef;
+		if(defined $plural && ! defined $params->{_count})
+		{	@_ or error __x"no counting positional for '{msgid}'", msgid => $msgid;
+			$params->{_count} = shift;
+		}
+		@_ and error __x"superfluous positional parameters for '{msgid}'", msgid => $msgid;
+
+		Log::Report::Message->new(
+			_msgid => $msgid, _plural => $plural, _domain => $self,
+			%$params, _stash => $context->{STASH}, _expand => 1,
+		)->toString($self->lang);
 	};
 }
 
 sub translationFilter()
 {	my $self   = shift;
-	my $domain = $self->name;
 
 	# Prepare as much and fast as possible, because it gets called often!
 	# A TT filter can be either static or dynamic.  Dynamic filters need to
@@ -103,11 +115,27 @@ sub translationFilter()
 	# sub which does the real work.
 	sub {
 		my $context = shift;
-		my $pairs   = pop if @_ && ref $_[-1] eq 'HASH';
+		my $params  = @_ && ref $_[-1] eq 'HASH' ? pop @_ : {};
+		$params->{_count} = shift if @_;
+		$params->{_error} = 'too many' if @_;   # don't know msgid yet
+
 		sub { # called with $msgid (template container content) only, the
 			  # parameters are caught when the factory produces this sub.
-			$pairs->{_stash}  = $context->{STASH};
-			Log::Report::Message->fromTemplateToolkit($self, $_[0], $pairs)->toString($self->lang);
+			my $msgid  = shift;
+			my $plural = $msgid =~ s/\|(.*)// ? $1 : undef;
+			defined $plural || ! defined $params->{_count}
+				or error __x"message does not contain counting alternatives in '{msgid}'", msgid => $msgid;
+
+			! defined $plural || defined $params->{_count}
+				or error __x"no counting positional for '{msgid}'", msgid => $msgid;
+
+			! $params->{_error}
+				or error __x"superfluous positional parameters for '{msgid}'", msgid => $msgid;
+
+			Log::Report::Message->new(
+				_msgid => $msgid, _plural => $plural, _domain => $self,
+				%$params, _stash => $context->{STASH}, _expand => 1,
+			)->toString($self->lang);
 		}
 	};
 }

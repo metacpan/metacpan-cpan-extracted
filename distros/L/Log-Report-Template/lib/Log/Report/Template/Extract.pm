@@ -1,14 +1,14 @@
 # Copyrights 2017-2025 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.03.
+# Pod stripped from pm file by OODoc 2.02.
 # This code is part of distribution Log-Report-Lexicon. Meta-POD processed
 # with OODoc into POD and HTML manual-pages.  See README.md
 # Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
-package Log::Report::Template::Extract;{
-our $VERSION = '1.01';
-}
+package Log::Report::Template::Extract;
+use vars '$VERSION';
+$VERSION = '1.02';
 
 use base 'Log::Report::Extract';
 
@@ -45,13 +45,12 @@ sub process($@)
         or error __"need pattern to scan for, either via new() or process()";
 
     # Slurp the whole file
-    local *IN;
-    open IN, "<:encoding($charset)", $fn
+    open my $in, "<:encoding($charset)", $fn
         or fault __x"cannot read template from {fn}", fn => $fn;
 
     undef $/;
-    my $text = <IN>;
-    close IN;
+    my $text = $in->getline;
+    $in->close;
 
     my $domain  = $self->domain;
     $self->_reset($domain, $fn);
@@ -70,12 +69,11 @@ sub process($@)
 
 sub _no_escapes_in($$$$)
 {   my ($msgid, $plural, $fn, $linenr) = @_;
-    return if $msgid !~ /\&\w+\;/
-           && (defined $plural ? $plural !~ /\&\w+\;/ : 1);
+    return if $msgid !~ /\&\w+\;/ && (defined $plural ? $plural !~ /\&\w+\;/ : 1);
 	$msgid .= "|$plural" if defined $plural;
 
-    warning __x"msgid '{msgid}' contains html escapes, don't do that.  File {fn} line {linenr}"
-       , msgid => $msgid, fn => $fn, linenr => $linenr;
+    warning __x"msgid '{msgid}' contains html escapes, don't do that.  File {fn} line {linenr}",
+        msgid => $msgid, fn => $fn, linenr => $linenr;
 }
 
 sub scanTemplateToolkit($$$$)

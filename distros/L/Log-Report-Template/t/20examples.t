@@ -23,7 +23,7 @@ $templater->process(\'[% a = b; IF a %]YES[%END%]', {b => 1}, \$output)
 is $output, "YES", 'chain yes';
 
 $output = '';
-$templater->process(\'[% a = b; IF a %]YES[%ELSE%]NO[%END%]',{b => 0},\$output)
+$templater->process(\'[% a = b; IF a %]YES[%ELSE%]NO[%END%]', {b => 0}, \$output)
     or $templater->error;
 
 is $output, "NO", 'chain no';

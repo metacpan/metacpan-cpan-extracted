@@ -164,3 +164,10 @@ Revision history for Data-Roundtrip
         of digits to zero. This is a minor issue and spent more energy than
         necessary for it.
 
+0.30    2025-07-28 00:00
+        Added a new feature to allow perl2json() to
+        handle input (Perl) data structures which may
+        contain objects, with perl2json($data, {convert_blessed=>1}),
+        provided the object implements a TO_JSON() method.
+        Switched to Test::TempDir::Tiny in test files.
+        And removed taint mode from test '12-from-file.t'

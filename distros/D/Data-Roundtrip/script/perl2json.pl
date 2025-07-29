@@ -5,7 +5,7 @@ use warnings;
 
 use utf8;
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 binmode STDERR, ':encoding(UTF-8)';
 binmode STDOUT, ':encoding(UTF-8)';
@@ -68,7 +68,7 @@ perl2json.pl : convert a Perl data structure dump to JSON
 
 =head1 VERSION
 
-Version 0.29
+Version 0.30
 
 =head1 SYNOPSIS
 

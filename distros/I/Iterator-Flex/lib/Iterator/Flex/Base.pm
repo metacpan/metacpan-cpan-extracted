@@ -9,7 +9,7 @@ use warnings;
 
 use experimental qw( signatures postderef declared_refs );
 
-our $VERSION = '0.20';
+our $VERSION = '0.24';
 
 use Ref::Util;
 use Scalar::Util;
@@ -37,6 +37,11 @@ use overload
   '<>'     => sub ( $self, $, $ ) { &{$self}() },
   fallback => 0,
   bool     => sub { 1 },
+
+  # these are required for the perldb to not barf
+  # see https://github.com/Perl/perl5/issues/23486
+  eq    => sub { 0 },
+  q{""} => sub { q{} },
   ;
 
 # We separate constructor parameters into two categories:
@@ -462,7 +467,7 @@ Iterator::Flex::Base - Iterator object
 
 =head1 VERSION
 
-version 0.20
+version 0.24
 
 =head1 METHODS
 

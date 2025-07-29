@@ -1,3 +1,16 @@
+0.005 2025-07-29
+  [Requirement Changes]
+    * Require SPVM::IO::Socket::SSL 0.010.
+  [Changes]
+    * Support SSL.
+    * Remove SOCKS logic.
+    
+0.004 2025-07-29
+  [Changes]
+    * Support the redirect feature.
+    * Disable collecting the cookies temporalily.
+    * Disable keep-alive temporalily.
+    
 0.003 2025-07-05
   [Changes]
     Working on many classes.

@@ -7,10 +7,9 @@ use warnings;
 my $verbose = 0;
 
 #### nothing to change below
-use Data::Dump qw/pp/;
 use utf8;
 
-our $VERSION='0.29';
+our $VERSION='0.30';
 
 use Test::More;
 use Test2::Plugin::UTF8;

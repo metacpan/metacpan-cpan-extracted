@@ -1,4 +1,4 @@
-#!perl -T
+#!perl
 
 # this test was randomly being KILLed on CPAN test
 # machines (but not mine).
@@ -18,6 +18,10 @@
 #     $expected->[0] = '0.764232574944026'
 # in fix_scalar() we reduce the number of decimal digits, and hope for the best
 
+###################################################################
+#### NOTE env-var PERL_TEST_TEMPDIR_TINY_NOCLEANUP=1 will stop erasing tmp files
+###################################################################
+
 use 5.008;
 use strict;
 use warnings;
@@ -26,26 +30,23 @@ my $verbose = 0;
 my $DIAG_verbose = 0;
 
 #### nothing to change below
-use Data::Dump qw/pp/;
 use utf8;
 
-our $VERSION='0.29';
-
-use File::Temp;
-use File::Spec;
+our $VERSION='0.30';
 
 use Test::More;
 use Test2::Plugin::UTF8; # rids of the Wide Character in TAP message!
+use Test::TempDir::Tiny;
+use File::Spec;
 
 use Data::Random::Structure;
 use Data::Random::Structure::UTF8;
 
 use Data::Roundtrip qw/:all/;
 
-# use this for keeping all tempfiles while CLEANUP=>1
-# which is needed for deleting them all at the end
-$File::Temp::KEEP_ALL = 1;
-my $tmpdir = File::Temp::tempdir(CLEANUP=>1);
+# if for debug you change this make sure that it has path in it e.g. ./xyz
+my $tmpdir = tempdir(); # will be erased unless a BAIL_OUT or env var set
+ok(-d $tmpdir, "output dir exists");
 
 if( $DIAG_verbose > 0 ){ diag "calling randomiser ..."; }
 
@@ -99,9 +100,9 @@ for my $trial (1..2){
 	ok(defined($yaml_string), "yaml string created from perl data structure ('$perl_data_structure_name'/$trial).");
 
 	# write JSON to file
-	$outfile = File::Spec->catdir($tmpdir, 'out.json');
+	$outfile = File::Spec->catfile($tmpdir, 'out.json');
 	if( $DIAG_verbose > 0 ){ diag "opening out to file $outfile ..."; }
-	ok(open($FH, '>:utf8', $outfile), "open tmp file '${outfile}' for writing JSON string ('$perl_data_structure_name'/$trial).") or BAIL_OUT;
+	ok(open($FH, '>:encoding(UTF-8)', $outfile), "open tmp file '${outfile}' for writing JSON string ('$perl_data_structure_name'/$trial).") or BAIL_OUT;
 	if( $DIAG_verbose > 0 ){ diag "writing out to file $outfile ..."; }
 	print $FH $json_string;
 	if( $DIAG_verbose > 0 ){ diag "writing out to file $outfile OK"; }
@@ -118,9 +119,9 @@ for my $trial (1..2){
 	if( $DIAG_verbose > 0 ){ diag "calling is_deeply OK"; }
 
 	# write YAML data to file
-	$outfile = File::Spec->catdir($tmpdir, 'out.yaml');
+	$outfile = File::Spec->catfile($tmpdir, 'out.yaml');
 	if( $DIAG_verbose > 0 ){ diag "opening2 out to file $outfile ..."; }
-	ok(open($FH, '>:utf8', $outfile), "open tmp file '${outfile}' for writing yaml string ('$perl_data_structure_name'/$trial).") or BAIL_OUT;
+	ok(open($FH, '>:encoding(UTF-8)', $outfile), "open tmp file '${outfile}' for writing yaml string ('$perl_data_structure_name'/$trial).") or BAIL_OUT;
 	if( $DIAG_verbose > 0 ){ diag "opening2 out to file $outfile OK"; }
 	print $FH $yaml_string;
 	if( $DIAG_verbose > 0 ){ diag "printed out to file $outfile OK"; }
@@ -160,10 +161,7 @@ for my $trial (1..2){
 
 if( $DIAG_verbose > 0 ){ diag "ENDED the trials loop"; }
 
-# cleanup only on success
-diag "temp dir: '$tmpdir' ...";
-$File::Temp::KEEP_ALL = 0;
-File::Temp::cleanup();
+diag "temp dir: $tmpdir ..." if exists($ENV{'PERL_TEST_TEMPDIR_TINY_NOCLEANUP'}) && $ENV{'PERL_TEST_TEMPDIR_TINY_NOCLEANUP'}>0;
 
 if( $DIAG_verbose > 0 ){ diag "cleaned up"; }
 

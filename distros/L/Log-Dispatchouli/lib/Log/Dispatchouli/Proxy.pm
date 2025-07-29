@@ -1,6 +1,6 @@
 use v5.20;
 use warnings;
-package Log::Dispatchouli::Proxy 3.010;
+package Log::Dispatchouli::Proxy 3.011;
 # ABSTRACT: a simple wrapper around Log::Dispatch
 
 # Not dangerous.  Accepted without change.
@@ -42,7 +42,7 @@ sub _new ($class, $arg) {
   bless $guts => $class;
 }
 
-sub proxy ($self, $arg) {
+sub proxy ($self, $arg = undef) {
   $arg ||= {};
 
   my @proxy_ctx;
@@ -63,40 +63,40 @@ sub proxy ($self, $arg) {
   });
 }
 
-sub parent { $_[0]{parent} }
-sub logger { $_[0]{logger} }
+sub parent ($self) { $self->{parent} }
+sub logger ($self) { $self->{logger} }
 
-sub ident     { $_[0]{logger}->ident }
-sub config_id { $_[0]{logger}->config_id }
+sub ident     ($self) { $self->{logger}->ident }
+sub config_id ($self) { $self->{logger}->config_id }
 
-sub set_prefix   { $_[0]{prefix} = $_[1] }
-sub get_prefix   { $_[0]{prefix} }
-sub clear_prefix { undef $_[0]{prefix} }
-sub unset_prefix { $_[0]->clear_prefix }
+sub get_prefix   ($self)          { $self->{prefix} }
+sub set_prefix   ($self, $prefix) { $self->{prefix} = $prefix }
+sub clear_prefix ($self)          { undef $self->{prefix} }
+sub unset_prefix ($self)          { $self->clear_prefix }
 
-sub set_debug    { $_[0]{debug} = $_[1] ? 1 : 0 }
-sub clear_debug  { undef $_[0]{debug} }
+sub set_debug    ($self, $bool) { $self->{debug} = $bool ? 1 : 0 }
+sub clear_debug  ($self)        { undef $self->{debug} }
 
-sub get_debug {
-  return $_[0]{debug} if defined $_[0]{debug};
-  return $_[0]->parent->get_debug;
+sub get_debug ($self) {
+  return $self->{debug} if defined $self->{debug};
+  return $self->parent->get_debug;
 }
 
-sub is_debug { $_[0]->get_debug }
-sub is_info  { 1 }
-sub is_fatal { 1 }
+sub is_debug ($self) { $self->get_debug }
+sub is_info  ($) { 1 }
+sub is_fatal ($) { 1 }
 
-sub mute   { $_[0]{muted} = 1 }
-sub unmute { $_[0]{muted} = 0 }
+sub mute   ($self) { $self->{muted} = 1 }
+sub unmute ($self) { $self->{muted} = 0 }
 
-sub set_muted    { $_[0]{muted} = $_[1] ? 1 : 0 }
-sub clear_muted  { undef $_[0]{muted} }
+sub set_muted   ($self, $bool) { $self->{muted} = $bool ? 1 : 0 }
+sub clear_muted ($self)        { undef $self->{muted} }
 
-sub _get_local_muted { $_[0]{muted} }
+sub _get_local_muted ($self) { $self->{muted} }
 
-sub get_muted {
-  return $_[0]{muted} if defined $_[0]{muted};
-  return $_[0]->parent->get_muted;
+sub get_muted ($self) {
+  return $self->{muted} if defined $self->{muted};
+  return $self->parent->get_muted;
 }
 
 sub _get_all_prefix ($self, $arg) {
@@ -182,9 +182,9 @@ sub log_debug_event ($self, $event, $data) {
   return $self->log_event($event, $data);
 }
 
-sub info  { shift()->log(@_); }
-sub fatal { shift()->log_fatal(@_); }
-sub debug { shift()->log_debug(@_); }
+sub info  ($self, @rest) { $self->log(@rest); }
+sub fatal ($self, @rest) { $self->log_fatal(@rest); }
+sub debug ($self, @rest) { $self->log_debug(@rest); }
 
 use overload
   '&{}'    => sub { my ($self) = @_; sub { $self->log(@_) } },
@@ -205,7 +205,7 @@ Log::Dispatchouli::Proxy - a simple wrapper around Log::Dispatch
 
 =head1 VERSION
 
-version 3.010
+version 3.011
 
 =head1 DESCRIPTION
 

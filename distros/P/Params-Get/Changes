@@ -1,5 +1,8 @@
 Revision history for Params-Get
 
+0.11	Mon Jul 28 07:41:24 EDT 2025
+	get_params(undef, undef) now returns undef
+
 0.10	Fri Jul 25 11:37:24 EDT 2025
 	Improved handling of:
 		in main:

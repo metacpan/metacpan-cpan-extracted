@@ -1,0 +1,34 @@
+---
+abstract: 'Return a value optionally validated against a strict schema'
+author:
+  - 'Nigel Horne <njh@nigelhorne.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::DescribeMe: '0'
+  Test::Most: '0'
+  Test::Needs: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Return-Set
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Exporter: '0'
+  Params::Get: '0.11'
+  Params::Validate::Strict: '0.04'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/nigelhorne/Return-Set/issues
+  homepage: https://metacpan.org/pod/Return::Set
+  repository: git://github.com/nigelhorne/Return-Set.git
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

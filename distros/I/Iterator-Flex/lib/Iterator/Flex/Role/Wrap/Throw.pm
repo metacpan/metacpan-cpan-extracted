@@ -5,7 +5,7 @@ package Iterator::Flex::Role::Wrap::Throw;
 use strict;
 use warnings;
 
-our $VERSION = '0.20';
+our $VERSION = '0.24';
 
 use List::Util 'first';
 use Iterator::Flex::Utils qw( INPUT_EXHAUSTION PASSTHROUGH );
@@ -138,7 +138,7 @@ Iterator::Flex::Role::Wrap::Throw - Role to add throw on exhaustion to an iterat
 
 =head1 VERSION
 
-version 0.20
+version 0.24
 
 =head1 INTERNALS
 

@@ -13,7 +13,7 @@ Iterator::Flex::Manual::Authoring - How to write an iterator
 
 =head1 VERSION
 
-version 0.20
+version 0.24
 
 =head1 DESCRIPTION
 

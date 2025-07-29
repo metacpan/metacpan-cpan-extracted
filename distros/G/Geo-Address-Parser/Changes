@@ -1,5 +1,8 @@
 Revision history for Geo-Address-Parser
 
+0.03	Mon Jul 28 20:45:27 EDT 2025
+	Bump minimum version of Params::Get
+
 0.02	Thu Jul 24 19:55:35 EDT 2025
 	Use Params::Get
 	Strip extra whitespace

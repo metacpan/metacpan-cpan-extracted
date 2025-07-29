@@ -66,6 +66,7 @@ Throw
 Using
 Utils
 Wrap
+Zip
 djerius
 iarray
 icache

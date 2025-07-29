@@ -36,20 +36,16 @@ is $first, $f2;
 #dispatcher close => 'default';
 
 eval { $templater->addTextdomain(name => 'first') };
-is $@, "error: extension to domain 'first' already exists\n"
-  , 'no redefine';
+is $@, "error: extension to domain 'first' already exists\n", 'no redefine';
 
 eval { $templater->addTextdomain(name => 'error1', only_in_directory => '/tmp')};
-is $@, "error: directory /tmp not in INCLUDE_PATH, used by addTextdomain(only_in_directory)\n"
-  , 'outside INCLUDE_PATH';
+is $@, "error: directory /tmp not in INCLUDE_PATH, used by addTextdomain(only_in_directory)\n", 'outside INCLUDE_PATH';
 
 #eval { $templater->addTextdomain(name => 'error2') };
-#is $@, "error: textdomain 'error2' does not specify the lexicon directory\n"
-#  , 'no lexicon';
+#is $@, "error: textdomain 'error2' does not specify the lexicon directory\n", 'no lexicon';
 
 eval { $templater->addTextdomain(name => 'error3', lexicon => $lexicon) };
-is $@, "error: translation function 'loc' already in use by textdomain 'first'\n"
-  , 'same function again';
+is $@, "error: translation function 'loc' already in use by textdomain 'first'\n", 'same function again';
 
 
 ### Construct textdomain 'second'

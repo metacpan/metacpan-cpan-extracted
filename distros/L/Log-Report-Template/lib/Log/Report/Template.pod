@@ -14,7 +14,7 @@ Log::Report::Template - Template Toolkit with translations
   use Log::Report::Template;
   my $templater = Log::Report::Template->new(%config);
   $templater->addTextdomain(name => "Tic", lexicons => ...);
-  $templater->process('template_file.tt', \%vars);
+  $templater->process('template_file.tt', \%vars, \$output);
 
 =head1 DESCRIPTION
 
@@ -27,6 +27,7 @@ translation function (by default called C<loc()>) to your template text.
 That function will perform dark magic to collect the translation from
 translation tables, and fill in values.  For instance:
 
+  [% price = 3.14 %]
   <div>Price: [% price %]</div>          # no translation
   <div>[% loc("Price: {price}") %]</div> # translation optional
 
@@ -350,16 +351,66 @@ instance, a standard website implementation with some local extensions.
 The only way to get that to work, is by using different translation
 functions: one textdomain may use 'loc()', where an other uses 'L()'.
 
+=head3 Integration with Template::Toolkit
+
+Instead of Template, from Template::Toolkit, you use its extension
+L<Log::Report::Template|Log::Report::Template>.
+
+  # during initiation of the webserver, once in your script (before fork)
+  my $lexicons   = 'some-directory-for-translation-tables';
+  my $pots = Log::Report::Translator::POT->new(lexicons => $lexicons);
+
+  my $templater  = Log::Report::Template->new(...);
+  my $domain     = $templater->addTextdomain(
+      name     => $domainname,
+      function => 'loc',
+  );
+  $domain->configure(translator => $pots);
+
+  # part of the processing per page
+  $vars{translate_to} = 'nl_NL.utf8';
+  $templater->process($template, \%vars, \$output);
+
+When you use the same domain for both templates as source code, then be
+aware that there is only one place where you can configure the domain.
+This may be in the code.  When you use a separate domain for the templates,
+then you configure as shown above.
+
+=head3 Template::Toolkit in Dancer2
+
+When you use Dancer2, you need to connect the text domain with
+
+  my $domain = (engine 'template')->addTextdomain(
+      name       => 'isaas',
+      function   => 'loc',
+  );
+
+And in file C<config.ini>:
+
+  template: "TTLogReport"
+  engines:
+    template:
+      TTLogReport:
+
+This "TTLogReport" refers to module L<Dancer2::Template::TTLogReport|Dancer2::Template::TTLogReport>, which is
+part of distribution C<Log-Report>.
+
 =head2 Supported syntax
 
 =head3 Translation syntax
 
 Let say that your translation function is called 'loc', which is the
-default name.  Then, you can use that name as simple function:
+default name.  Then, you can use that name as simple function.
 
-  [% loc("msgid", key => value, ...) %]
-  [% loc('msgid', key => value, ...) %]
-  [% loc("msgid|plural", count, key => value, ...) %]
+In these examples, C<PAIRS> is a list of values to be inserted in the
+C<msgid> string. When the C<msgid> is specified with a C<plural> alternative,
+then a C<COUNTER> value is required to indicate which alternative is
+required.
+
+  [% loc("msgid", PAIRS) %]
+  [% loc('msgid', PAIRS) %]
+  [% loc("msgid|plural", COUNTER, PAIRS) %]
+  [% loc("msgid|plural", _count => COUNTER, PAIRS) %]
  
   [% INCLUDE
        title = loc('something')
@@ -368,15 +419,23 @@ default name.  Then, you can use that name as simple function:
 But also as filter.  Although filters and functions work differently
 internally in Template Toolkit, it is convenient to permit both syntaxes.
 
-  [% | loc(key => value, ...) %]msgid[% END %]
-  [% 'msgid' | loc(key => value) %]
-  [% "msgid" | loc(key => value) %]
+  [% | loc(PAIRS) %]msgid[% END %]
+  [% 'msgid' | loc(PAIRS) %]
+  [% "msgid" | loc(PAIRS) %]
+  
+  [% "msgid|plural" | loc(COUNTER, PAIRS) %]
+  [% "msgid|plural" | loc(_count => COUNTER, PAIRS) %]
+  [% FILTER loc %]msgid[% END %]
+  [% FILTER loc(COUNTER, PAIRS) %]msgid|plural[% END %]
 
 As examples
 
   [% loc("hi {n}", n => name) %]
   [% | loc(n => name) %]hi {n}[% END %]
   [% "hi {n}" | loc(n => name) %]
+  [% loc("one person|{_count} people", size) %]
+  [% | loc(size) %]one person|{_count} people[% END %]
+  [% 'one person|{_count} people' | loc(size) %]
 
 These syntaxes work exacly like translations with Log::Report for your
 Perl programs.  Compare this with:
@@ -539,8 +598,8 @@ tool or CPAN module.
 
 =head1 SEE ALSO
 
-This module is part of Log-Report-Template distribution version 1.01,
-built on June 02, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report-Template distribution version 1.02,
+built on July 29, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

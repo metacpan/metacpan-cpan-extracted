@@ -111,10 +111,10 @@ t/049-load-Ixchel__Action__sneck_config.t
 t/050-load-Ixchel__Action__sneck_install.t
 t/051-load-Ixchel__Action__snmp_install.t
 t/052-load-Ixchel__Action__snmp_service.t
+t/053-load-Ixchel__Action__lilith_config.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
-bin/.exists
 src_bin/ixchel
 share/templates/apt_proxy.tt
 share/templates/auto_cron.tt

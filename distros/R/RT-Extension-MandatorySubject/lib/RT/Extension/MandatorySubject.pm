@@ -9,11 +9,11 @@ RT::Extension::MandatorySubject - Enforce users to fill the subject when creatin
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 
 =head1 SYNOPSIS

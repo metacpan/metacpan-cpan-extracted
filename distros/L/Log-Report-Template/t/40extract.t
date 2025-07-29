@@ -32,7 +32,7 @@ _EXPECT
 
 chomp $expect_pos[-1];
 cmp_ok(scalar @expect_pos, '==', MSGIDS);
-my %expect_pos = map { ($_ => 1) } @expect_pos;
+my %expect_pos = map +($_ => 1), @expect_pos;
 $expect_pos{''} = 1;  # header
 
 BEGIN {
@@ -42,10 +42,10 @@ BEGIN {
 my $lexicon = tempdir CLEANUP => 1;
 
 my $extr = Log::Report::Template::Extract->new
- ( lexicon => $lexicon
- , domain  => 'my-domain'
- , pattern => 'TT2-loc'
- );
+  ( lexicon => $lexicon
+  , domain  => 'my-domain'
+  , pattern => 'TT2-loc'
+  );
 
 ok(defined $extr, 'created parser');
 isa_ok($extr, 'Log::Report::Template::Extract');

@@ -1,5 +1,7 @@
 #!/usr/bin/env perl
-# Check the extraction of po-tables from two separate domains
+# Check the extraction of po-tables from two separate domains merged
+# in the same template files.
+
 use warnings;
 use strict;
 

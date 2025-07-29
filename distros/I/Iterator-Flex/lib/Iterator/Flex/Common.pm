@@ -8,13 +8,14 @@ use warnings;
 
 use experimental qw( postderef signatures );
 
-our $VERSION = '0.20';
+our $VERSION = '0.24';
 
 use Exporter 'import';
 
 our @EXPORT_OK = qw[
   iterator iter iarray icycle icache
-  icat igather igrep imap iproduct iseq istack ifreeze thaw
+  icat igather igrep imap iproduct iseq istack ifreeze izip
+  thaw
 ];
 
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
@@ -450,6 +451,37 @@ sub ifreeze : prototype(&$@) ( $code, $iterable, $pars = {} ) {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+sub izip ( @args ) {
+    require Iterator::Flex::Zip;
+    Iterator::Flex::Zip->new( @args );
+}
+
+
+
+
+
+
+
+
+
+
+
+
 sub thaw ( $frozen, $pars = {} ) {
 
     my @steps = $frozen->@*;
@@ -496,7 +528,7 @@ __END__
 
 =pod
 
-=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory icat istack igather
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory icat igather istack izip
 
 =head1 NAME
 
@@ -504,7 +536,7 @@ Iterator::Flex::Common - Iterator Generators and Adapters
 
 =head1 VERSION
 
-version 0.20
+version 0.24
 
 =head1 SYNOPSIS
 
@@ -886,6 +918,30 @@ If C<$iterator> provides a C<prev> method.
 =back
 
 See L<Iterator::Flex::Manual::Serialization> for more information.
+
+=head2 izip
+
+  $iterator = izip( @iterables, ?\%pars );
+
+Return as a single element the next element from each of the iterables. The iterator is exhausted
+if any of the iterables is exhausted. The returned element may be either an array or a hash.
+See L<Iterator::Flex::Zip> for more details.
+
+The returned iterator supports the following methods:
+
+=over
+
+=item reset
+
+If all of the iterables support it.
+
+=item next
+
+=item freeze
+
+If all of the iterables support it.
+
+=back
 
 =head2 thaw
 

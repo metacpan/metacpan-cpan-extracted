@@ -15,7 +15,7 @@ Version 0.4.0
 
 =cut
 
-our $VERSION = '0.4.0';
+our $VERSION = '0.5.0';
 
 =head1 SYNOPSIS
 
@@ -127,7 +127,7 @@ sub get {
 			instances_rules     => {},
 			enable              => 0,
 			base_config         => 'https://raw.githubusercontent.com/quadrantsec/sagan/main/etc/sagan.yaml',
-			rules               => 'https://raw.githubusercontent.com/quadrantsec/sagan-rules/main/rules.yaml'
+			rules               => 'file:///usr/local/etc/sagan-rules.yaml'
 		},
 		meer => {
 			multi_instance => 0,

@@ -1,3 +1,8 @@
+0.003   2024-12-21  Released-By: PERLANCAR; Urgency: medium
+
+        - Update prereq name Filename::* -> Filename::Type::*.
+
+
 0.002   2022-11-16  Released-By: PERLANCAR
 
         - Add CLIs: manlist (list-manpages), manlistsect

@@ -35,7 +35,7 @@
             "Carp" : "0",
             "Exporter" : "0",
             "Module::Runtime" : "0",
-            "Params::Get" : "0",
+            "Params::Get" : "0.11",
             "Text::Capitalize" : "0",
             "perl" : "5.014000"
          }
@@ -68,6 +68,6 @@
          "x_repository" : "https://github.com/nigelhorne/Geo-Address-Parser"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,5 +1,11 @@
 Revision history for Perl extension Net::EANSearch.
 
+1.09  Mon Jul 28 19:27:00 2025
+	- fix the documentation
+
+1.08  Mon Jul 28 18:58:00 2025
+	- fix: default / first page is zero
+
 1.07  Tue Nov  5 11:00:00 2024
 	- add similarProductSearch()
 	- auto-retry API calls on 429 error code

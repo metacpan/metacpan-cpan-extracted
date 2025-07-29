@@ -31,6 +31,8 @@
 #define STOP   "stop"
 #define ONPROC "onprocessor" 
 
+extern void bless_into_proc(char* format, char** fields, ...);
+
 /* Solaris is an all-or-nothing deal, all this stuff comes out of 
    one structure, so we don't need to dick around with the format much */
 #if defined(PROC_FS)

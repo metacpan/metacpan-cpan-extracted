@@ -11,21 +11,46 @@ class TestCase::Online {
   
   our $RESULT : IntList;
   
+  static method test_https_tiny : int () {
+    
+    my $url = "https://google.com";
+    
+    my $ua = Mojo::UserAgent->new;
+    
+    $ua->set_max_redirects(20);
+    
+    my $res = $ua->get($url)->result;
+    
+    unless ($res->code == 200) {
+      return 0;
+    }
+    
+    my $body = $res->body;
+    
+    unless (Fn->contains($body, "<")) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
   static method test_http_tiny : int () {
     
     my $url = "http://google.com";
     
     my $ua = Mojo::UserAgent->new;
     
+    $ua->set_max_redirects(20);
+    
     my $res = $ua->get($url)->result;
     
-    my $body = $res->body;
-    
-    unless (Fn->contains($body, "www.google.com")) {
+    unless ($res->code == 200) {
       return 0;
     }
     
-    unless ($res->code == 200 || $res->code == 301) {
+    my $body = $res->body;
+    
+    unless (Fn->contains($body, "google")) {
       return 0;
     }
     

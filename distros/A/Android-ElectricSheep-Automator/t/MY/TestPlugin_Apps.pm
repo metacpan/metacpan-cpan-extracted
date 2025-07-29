@@ -1,8 +1,8 @@
-package MY::TestPlugin;
+package MY::TestPlugin_Apps;
 
 use lib ($FindBin::Bin, 'blib/lib');
 
-use parent 'Android::ElectricSheep::Automator::Plugins::Base';
+use parent 'Android::ElectricSheep::Automator::Plugins::Apps::Base';
 
 use Data::Roundtrip qw/perl2dump no-unicode-escape-permanently/;
 

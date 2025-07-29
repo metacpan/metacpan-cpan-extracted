@@ -1,5 +1,8 @@
 Revision history for Params-Validate-Strict
 
+0.04	Mon Jul 28 12:09:13 EDT 2025
+	Added arrayref, hashref and coderef as valid value types
+
 0.03	Mon Apr  7 07:42:43 EDT 2025
 	Use Params::Get
 

@@ -4,7 +4,7 @@ Data::Roundtrip - convert between Perl data structures, YAML and JSON with unico
 
 # VERSION
 
-Version 0.29
+Version 0.30
 
 # SYNOPSIS
 
@@ -223,7 +223,24 @@ a nested data structure, but not an object), it will return
 the equivalent JSON string. In `$optional_paramshashref`
 one can specify whether to escape unicode with
 `'escape-unicode' => 1`
-and/or prettify the returned result with `'pretty' => 1`.
+and/or prettify the returned result with `'pretty' => 1`
+and/or allow conversion of blessed objects with `'convert_blessed' => 1`.
+
+The latter is useful when the input (Perl) data structure
+contains Perl objects (blessed refs!). But in addition to
+setting it, each of the Perl objects (their class) must
+implement a `TO_JSON()` method which will simply convert
+the object into a Perl data structure. For example, if
+your object stores the important data in `$self->data`
+as a hash, then use this to return it
+
+    sub TO_JSON { shift->data }
+
+the converter will replace what is returned with the blessed
+object which does not know what to do with it.
+See [https://perldoc.perl.org/JSON::PP#2.-convert\_blessed-is-enabled-and-the-object-has-a-TO\_JSON-method.](https://perldoc.perl.org/JSON::PP#2.-convert_blessed-is-enabled-and-the-object-has-a-TO_JSON-method.)
+for more information.
+
 The output can be fed back to ["json2perl"](#json2perl)
 for getting the Perl variable back.
 
@@ -823,6 +840,6 @@ This is free software, licensed under:
 
 Hey! **The above document had some coding errors, which are explained below:**
 
-- Around line 1386:
+- Around line 1403:
 
     &#x3d;back doesn't take any parameters, but you said =back  Given an input string C&lt;$dumpstring>, which can have been produced by e.g. C&lt;perl2dump()> and is identical to L<Data::Dumper>'s C<Dumper()> output, it will roundtrip back to the same string, possibly with altered format via the parameters in C&lt;$optional\_paramshashref>.

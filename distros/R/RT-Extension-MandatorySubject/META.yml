@@ -22,4 +22,4 @@ no_index:
 resources:
   license: http://dev.perl.org/licenses/
   repository: git://git.home-dn.net/manu/RT-Extension-MandatorySubject.git
-version: 0.03
+version: 0.06

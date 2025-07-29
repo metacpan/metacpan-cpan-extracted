@@ -11,4 +11,12 @@ Revision history for Android-ADB-Automator
         Added 'adb-path-to-executable' parameter to the constructor of Automator.
 0.04    2025/04/29
         dump_current_screen_ui() sometimes could not find the dump to a device file, so checking if the file is there and repeating and sleeping for some iterations. Hopefully this fixes this issue.
-	Pod changes.
+        Pod changes.
+0.05    2025/07/28
+        Important change: this module now requires Data::Roundtrip to be at least v0.30. You will need to upgrade Data::Roundtrip if you have an older version before installing this module. If you can't then just change the dependency on Makefile.PL and hope for the best.
+        Important change: Android::ElectricSheep::Automator::Plugins has migrated to Android::ElectricSheep::Automator::Plugins::Apps
+        Added two new methods pgrep() and pidof() to search the process table of the device.
+        Added one new method Android::ElectricSheep::Automator::is_app_running() which checks if the specified app is running on the device.
+        Added one new method Android::ElectricSheep::Automator::Plugins::Apps::Base::is_app_running() which checks if the Viber app is running on the device.
+        Moved functionality for opening and closing an app into the Android::ElectricSheep::Automator::Plugins::Apps::Base (before they were in the Android::ElectricSheep::Automator::Plugins::Apps::Viber). Also moved appname() into the Base as well.
+        Pod changes.

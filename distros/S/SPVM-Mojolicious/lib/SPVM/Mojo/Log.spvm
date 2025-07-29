@@ -9,9 +9,42 @@ class Mojo::Log extends Mojo::EventEmitter {
   use Mojo::Log::Callback::Format;
   use Mojo::Log::Line;
   use IO::File;
+  use Sys::IO::Constant as IOC;
+  use Mojo::Log::Callback::Message;
+  use Time::HiRes;
+  
+  # Class Variables
+  
+  # Supported log levels
+  our $LEVEL : Hash of Int;
+  INIT {
+    $LEVEL = Hash->new({trace => 1, debug => 2, info => 3, warn => 4, error => 5, fatal => 6});
+  }
+  
+  # Systemd magic numbers
+  our $MAGIC : Hash of Int;
+  INIT {
+    $MAGIC = Hash->new({trace => 7, debug => 6, info => 5, warn => 4, error => 3, fatal => 2});
+  }
   
   # Fields
-  has format : rw Mojo::Log::Callback::Format;
+  has format : wo Mojo::Log::Callback::Format;
+  
+  method format : Mojo::Log::Callback::Format () {
+    
+    my $format = $self->{format};
+    
+    unless ($format) {
+      $format = [$this : Mojo::Log = $self] method : string ($time : double, $level : string, $message : string) {
+        return $this->_default($time, $level, $message);
+      };
+      $self->{format} = $format;
+    }
+    
+    return $format;
+    
+    
+  }
   
   has handle : wo IO::File;
   
@@ -35,26 +68,37 @@ class Mojo::Log extends Mojo::EventEmitter {
     return $handle;
   }
   
-  has history : List of Mojo::Log::Line;
+  has history_list : List of Mojo::Log::Line;
+  
+  method history : Mojo::Log::Line[] () {
+    return $self->{history_list}->to_array->(Mojo::Log::Line[]);
+  }
   
   has level : rw string;
   
-  has max_history_size : rw int;
+  has max_history_list_size : rw int;
   
   has path : rw string;
   
   has short : rw byte;
+  
+  has capturing : byte;
+  
+  # Undocumented Fields
+  has parent : Mojo::Log;
+  
+  has context : string;
   
   # Class Method
   static method new : Mojo::Log () {
     
     my $self = new Mojo::Log;
     
-    $self->{history} = List->new(new Mojo::Log::Line[0]);
+    $self->{history_list} = List->new(new Mojo::Log::Line[0]);
     
     $self->{level} = "trace";
     
-    $self->{max_history_size} = 10;
+    $self->{max_history_list_size} = 10;
     
     if (length (my $_ = Sys->env("MOJO_LOG_SHORT"))) {
       $self->{short} = (byte)$_;
@@ -62,6 +106,152 @@ class Mojo::Log extends Mojo::EventEmitter {
     
     return $self;
   }
+  
+  # Instance Methods
+  method append : void ($message : string) {
+    
+    my $handle = $self->handle;
+    
+    unless ($handle) {
+      return ;
+    }
+    
+    Sys->flock($handle->fileno, IOC->LOCK_EX);
+    
+    $handle->print($message);
+    
+    Sys->flock($handle->fileno, IOC->LOCK_UN);
+  }
+  
+  method context : Mojo::Log ($context : string) {
+    
+    my $content = Mojo::Log->new;
+    $content->{parent} = $self;
+    $content->{context} = $context;
+    $content->{level} = $self->{level};
+    
+    return $content;
+  }
+  
+  method debug : void ($message : object of string|Mojo::Log::Callback::Message) {
+    
+    if (2 >= $LEVEL->get_int($self->level)) {
+      $self->_log($message, "debug");
+    }
+  }
+  
+  method error : void ($message : object of string|Mojo::Log::Callback::Message) {
+    
+    if (5 >= $LEVEL->get_int($self->level)) {
+      $self->_log($message, "error");
+    }
+  }
+  
+  method fatal : void ($message : object of string|Mojo::Log::Callback::Message) {
+    
+    if (6 >= $LEVEL->get_int($self->level)) {
+      $self->_log($message, "fatal");
+    }
+  }
+  
+  method info : void ($message : object of string|Mojo::Log::Callback::Message) {
+    
+    if (3 >= $LEVEL->get_int($self->level)) {
+      $self->_log($message, "info");
+    }
+  }
+  
+  method trace : void ($message : object of string|Mojo::Log::Callback::Message) {
+    
+    if (1 >= $LEVEL->get_int($self->level)) {
+      $self->_log($message, "trace");
+    }
+  }
+  
+  method warn : void ($message : object of string|Mojo::Log::Callback::Message) {
+    
+    if (4 >= $LEVEL->get_int($self->level)) {
+      $self->_log($message, "warn");
+    }
+  }
+  
+  method is_level : int ($level : string) {
+    return $LEVEL->get_int($level) >= $LEVEL->get_int($self->level);
+  }
+  
+  # Private Instance Methods
+  private method _log : void ($message : object of string|Mojo::Log::Callback::Message, $level : string) {
+    
+    my $message_ : string;
+    if ($message isa string) {
+      $message_ = (string)$message;
+    }
+    elsif ($message isa Mojo::Log::Callback::Message) {
+      $message_ = $message->(Mojo::Log::Callback::Message)->();
+    }
+    else {
+      die "The message \$message must be a string or a Mojo::Log::Callback::Message object.";
+    }
+    
+    if (my $context = $self->{context}) {
+      $message_ .= " $context";
+    }
+    
+    ($self->{parent} // $self)->emit("message", $level, $message_);
+  }
+  
+  private method _message : void ($level : string, $message : string)  {
+    
+    my $max     = $self->max_history_list_size;
+    my $history_list = $self->{history_list};
+    
+    my $line = Mojo::Log::Line->new;
+    my $time = Time::HiRes->time;
+    $line->{time} = $time;
+    $line->{level} = $level;
+    $line->{message} = $message;
+    
+    $history_list->push($line);
+    
+    while ($history_list->length > $max) {
+      $history_list->shift;
+    }
+    
+    $self->append($self->format->($time, $level, $message));
+  }
+  
+  private method _default : string ($time : double, $level : string, $message : string) {
+    
+    my $tm = Sys->localtime((long)$time);
+    
+    my $fp = 0;
+    my $_ = Fn->split(".", $time);
+    if (@$_ > 1) {
+      $fp = (int)$_->[1];
+    }
+    my $sec_with_fp = (double)($tm->tm_sec . ".$fp");
+    
+    my $time_formatted = Fn->sprintf("%04d-%02d-%02d %02d:%02d:%08.5f", [(object)($tm->tm_year + 1900), $tm->tm_mon + 1, $tm->tm_mday, $tm->tm_hour, $tm->tm_min,
+      $sec_with_fp]);
+    
+    my $default_message = "[$time_formatted] [" . Sys->process_id . "] [$level] $message\n";
+    
+    return $default_message;
+  }
+  
+  private method _short : string ($time : double, $level : string, $message : string) {
+    
+    my $magic = "<" . $MAGIC->get_int("$level") . ">";
+    my $short = Fn->substr($level, 0, 1);
+    
+    my $short_message = "${magic}[" . Sys->process_id . "] [$short] $message\n";
+    
+    return $short_message;
+  }
+  
+  # TODO
+  # method capture;
+  
 }
 
 __END__

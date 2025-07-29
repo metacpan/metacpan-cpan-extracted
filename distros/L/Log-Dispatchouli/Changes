@@ -1,5 +1,12 @@
 Revision history for Log-Dispatchouli
 
+3.011     2025-07-28 11:43:33-04:00 America/New_York
+        - [ BREAKING CHANGE ]
+          This release converts all Logger methods to signatured-subs.  This
+          should not really break anything, unless methods are being called
+          erroneously, as strict arity checking will now notice the wrong
+          number of args.
+
 3.010     2025-07-16 09:04:21-04:00 America/New_York
         - add flog_messages and fmt_event, which return formatted strings
           without logging them

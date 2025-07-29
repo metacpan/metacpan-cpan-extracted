@@ -13,6 +13,8 @@ my $api = SPVM::api();
 
 my $start_memory_blocks_count = $api->get_memory_blocks_count();
 
+ok(SPVM::TestCase::Online->test_https_tiny);
+
 ok(SPVM::TestCase::Online->test_http_tiny);
 
 ok(SPVM::TestCase::Online->go_http_tiny);

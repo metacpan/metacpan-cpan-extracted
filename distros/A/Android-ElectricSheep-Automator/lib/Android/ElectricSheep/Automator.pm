@@ -7,7 +7,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use Mojo::Log;
 use Config::JSON::Enhanced;
@@ -43,7 +43,7 @@ use Android::ElectricSheep::Automator::ScreenLayout;
 use Android::ElectricSheep::Automator::XMLParsers;
 
 my $_DEFAULT_CONFIG = <<'EODC';
-</* $VERSION = '0.04'; */>
+</* $VERSION = '0.05'; */>
 </* comments are allowed */>
 </* and <% vars %> and <% verbatim sections %> */>
 {
@@ -563,6 +563,35 @@ sub search_app {
 	};
 }
 
+# It searches the process table (using pidof) for the
+# specified app name to check if it is running.
+# Inputs parameters:
+#   'appname' => an exact app name to find if it is running
+# It returns 1 if the specified app is running, 0 if it is not
+# It returns undef on failure.
+sub is_app_running {
+	my ($self, $params) = @_;
+	$params //= {};
+
+	my $parent = ( caller(1) )[3] || "N/A";
+	my $whoami = ( caller(0) )[3];
+	my $log = $self->log();
+	my $verbosity = $self->verbosity();
+
+	my $appname;
+	if( ! exists($params->{'appname'}) || ! defined($appname=$params->{'appname'}) ){ $log->error("${whoami} (via $parent), line ".__LINE__." : error, input parameter 'appname' was not specified. It can be an exact app name or an extended regular expression which Android's pgrep understands."); return undef }
+
+	my $res = $self->pidof({'name' => $appname});
+	if( ! defined $res ){ $log->error("${whoami} (via $parent), line ".__LINE__." : error, call to ".'pidof()'." has failed."); return undef }
+
+	# it returns undef on failure
+	# it returns -1 if it is not found in the process table
+	# it retuns >0 as the pid of the running app
+	#if( $res == -1 ){ return 0 } # no it is not running
+	if( $res =~ /^\d+$/ ){ return 1 } # yes it is running
+	return 0; # no it is not running
+}
+
 # Inputs parameters:
 #   'package' : required package name as a SCALAR (for an exact search)
 #     or a regex (qr//) object for regex search including case-insensitive.
@@ -777,6 +806,92 @@ sub close_app {
 	# but it will be easier to allow more apps in the future if
 	# we return a hash here
 	return { $found_app_name => $found_app_properties };
+}
+
+# returns pid (as a non-negative integer) of the specified app by its exact name
+# or -1 if nothing was matched in the process table.
+# on error it returns undef
+# Note: if you do not know the exact app name e.g. com.viber.voip
+# use pgrep()
+sub pidof {
+	my ($self, $params) = @_;
+	$params //= {};
+
+	my $parent = ( caller(1) )[3] || "N/A";
+	my $whoami = ( caller(0) )[3];
+	my $log = $self->log();
+	my $verbosity = $self->verbosity();
+
+	if( ! $self->is_device_connected() ){ $log->error("${whoami} (via $parent), line ".__LINE__." : error, you need to connect a device to the desktop and ALSO explicitly call ".'connect_device()'." before calling this."); return undef }
+
+	if( ! exists($params->{'name'}) || ! defined($params->{'name'}) ){ $log->error("${whoami} (via $parent), line ".__LINE__." : error, missing parameter 'name' is required, it must be the exact app name, if you do not have the exact name then use 'pgrep()'."); return undef }
+
+	my @cmd = ('pidof', $params->{'name'});
+	if( $verbosity > 0 ){ $log->info("${whoami} (via $parent), line ".__LINE__." : sending command to adb: @cmd") }
+	my $res = $self->adb->shell(@cmd);
+	if( ! defined $res ){ $log->error(join(" ", @cmd)."\n${whoami} (via $parent), line ".__LINE__." : error, above shell command has failed, got undefined result, most likely shell command did not run at all, this should not be happening."); return undef }
+
+	# if not found it exits with 1
+	if( $res->[0] == 1 ){ return -1 } # nothing matched
+
+	# an error
+	if( $res->[0] != 0 ){ $log->error(join(" ", @cmd)."\n${whoami} (via $parent), line ".__LINE__." : error, above shell command has failed, with:\nSTDOUT:\n".$res->[1]."\n\nSTDERR:\n".$res->[2]."\nEND."); return undef }
+
+	my $pid = $res->[1];
+	if( ! defined $pid ){ $log->error(join(" ", @cmd)."\n${whoami} (via $parent), line ".__LINE__." : error, above shell command has failed, because the result got back was undef:\nSTDOUT:\n".$res->[1]."\n\nSTDERR:\n".$res->[2]."\nEND."); return undef }
+	# this is not happening, it exits with 1
+	if( $pid =~ /^\s*$/ ){ return -1 } # nothing matched
+
+	# wrong pid format found
+	if( $pid !~ /^\s*(\d+)\s*$/m ){ $log->error(join(" ", @cmd)."\n${whoami} (via $parent), line ".__LINE__." : error, above shell command has failed, because the result got back was not a pid (as numbers+spaces) but '$pid':\nSTDOUT:\n".$res->[1]."\n\nSTDERR:\n".$res->[2]."\nEND."); return undef }
+	$pid = $1;
+	return $pid; # success, this is the pid
+}
+
+# returns an array of pids of the specified app(s) by part of its name,
+# There may be more than 1 items in the array if the specified part of its name
+# matches many apps.
+# on error it returns undef
+sub pgrep {
+	my ($self, $params) = @_;
+	$params //= {};
+
+	my $parent = ( caller(1) )[3] || "N/A";
+	my $whoami = ( caller(0) )[3];
+	my $log = $self->log();
+	my $verbosity = $self->verbosity();
+
+	if( ! $self->is_device_connected() ){ $log->error("${whoami} (via $parent), line ".__LINE__." : error, you need to connect a device to the desktop and ALSO explicitly call ".'connect_device()'." before calling this."); return undef }
+
+	if( ! exists($params->{'name'}) || ! defined($params->{'name'}) ){ $log->error("${whoami} (via $parent), line ".__LINE__." : error, missing parameter 'name' is required, it must be the exact app name, if you do not have the exact name then use 'pgrep()'."); return undef }
+
+	my $dont_show_command_name = (exists($params->{'dont-show-command-name'}) && defined($params->{'dont-show-command-name'}) && ($params->{'dont-show-command-name'}>0)) ? 1 : 0;
+	# -f will search the full command name
+	# -l will include the command name which is the default
+	my @cmdparams = ('-f');
+	push(@cmdparams, '-l') unless $dont_show_command_name;
+
+	my @cmd = ('pgrep', @cmdparams, $params->{'name'});
+	if( $verbosity > 0 ){ $log->info("${whoami} (via $parent), line ".__LINE__." : sending command to adb: @cmd") }
+	my $res = $self->adb->shell(@cmd);
+	if( ! defined $res ){ $log->error(join(" ", @cmd)."\n${whoami} (via $parent), line ".__LINE__." : error, above shell command has failed, got undefined result, most likely shell command did not run at all, this should not be happening."); return undef }
+	if( $res->[0] != 0 ){ $log->error(join(" ", @cmd)."\n${whoami} (via $parent), line ".__LINE__." : error, above shell command has failed, with:\nSTDOUT:\n".$res->[1]."\n\nSTDERR:\n".$res->[2]."\nEND."); return undef }
+
+	# we get something like "954\n995\n1217\n1372\n1392\n1642\n1741\n1856\n1898\n2549\n3236\n4456\n6570\n9245\n10115\n10746\n"
+
+	my $xx = $res->[1];
+	if( ! defined $xx ){ $log->error(join(" ", @cmd)."\n${whoami} (via $parent), line ".__LINE__." : error, above shell command has failed, because the result got back was undef:\nSTDOUT:\n".$res->[1]."\n\nSTDERR:\n".$res->[2]."\nEND."); return undef }
+
+	my @results;
+	while( $xx =~ /^\s*(\d+)(\s+(.+?))?\s*$/smg ){
+		push @results, {
+			'pid' => $1,
+			'command' => $2 // ''
+		};
+	}
+
+	return \@results; # success
+	# a list of pids, can have 0, 1 or more items
 }
 
 # it takes the position on screen to tap either as a
@@ -1854,7 +1969,7 @@ Android::ElectricSheep::Automator - Do Androids Dream of Electric Sheep? Smartph
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =head1 WARNING
 
@@ -1864,15 +1979,16 @@ Current distribution is extremely alpha. API may change.
 
 The present package fascilitates the control
 of a USB-debugging-enabled
-Android device, e.g. a smartphone,
-from a desktop computer using Perl.
-It's basically a thickishly thin wrapper
+Android device, e.g. a real smartphone,
+or an emulated (virtual) Android device,
+from your desktop computer using Perl.
+It's basically a thickishly-thin wrapper
 to the omnipotent Android Debug Bridge (adb)
 program.
 
 B<Note that absolutely nothing is
 installed on the connected device,
-neither any of its settings are modified>.
+neither any of its settings will be modified by this package>.
 See L</WILL ANYTHING BE INSTALLED ON THE DEVICE?>.
 
     use Android::ElectricSheep::Automator;
@@ -2212,6 +2328,58 @@ of the `ps` output.
 
 =back
 
+=item pidof($params)
+
+It returns the PID of the specified command name.
+The specified command name must match the app or command
+name exactly. B<Use C<pgrep()> if you want to match command
+names with a regular expression>.
+
+C<$params> is a HASH_REF which should contain:
+
+=over 4
+
+=item B<C<name>>
+
+the name of the process. It can be a command name,
+e.g. C<audioserver> or an app name e.g. C<android.hardware.vibrator-service.example>.
+
+=back
+
+It returns C<undef> on failure or the PID of the matched command on success.
+
+=back
+
+=item pgrep($params)
+
+It returns the PIDs matching the specified command or app
+name (which can be an extended regular expression that C<pgrep>
+understands). The returned array will contain zero, one or more
+hashes with keys C<pid> and C<command>. The former key is the pid of the command
+whose full name (as per the process table) will be under the latter key.
+Unless parameter C<dont-show-command-name> was set to C<1>.
+
+C<$params> is a HASH_REF which should contain:
+
+=over 4
+
+=item B<C<name>>
+
+the name of the process. It can be a command name,
+e.g. C<audioserver> or an app name e.g. C<android.hardware.vibrator-service.example>
+or part of these e.g. C<audio> or C<hardware> or an extended
+regular expression that Android's C<pgrep> understands, e.g.
+C<^com.+google.+mess>.
+
+=back
+
+It returns C<undef> on failure or an ARRAY_REF containing
+a HASH_REF of data for each command matched (under keys C<pid> and C<command>).
+The returned ARRAY_REF can contain 0, 1 or more items depending
+on what was matched.
+
+=back
+
 =item geofix($params)
 
 It fixes the geolocation of the device to the specified coordinates.
@@ -2264,6 +2432,30 @@ or C< E<lt>na E<gt> > if the provider failed to return valid output.
 
 =item B<C<last-location-string>> : the last location string, or
 C< E<lt>na E<gt> > if the provider failed to return valid output.
+
+=back
+
+=item is_app_running($params)
+
+It checks if the specified app is running on the device.
+The name of the app must be exact.
+Note that you can search for running apps / commands
+with extended regular expressions using C<pgrep()>
+
+C<$params> is a HASH_REF which should contain:
+
+=over 4
+
+=item B<C<appname>>
+
+the name of the app to check if it is running.
+It must be its exact name. Basically it checks the
+output of C<pidof()>.
+
+=back
+
+It returns C<undef> on failure,
+C<1> if the app is running or C<0> if the app is not running.
 
 =back
 
@@ -2796,6 +2988,17 @@ Record a video of the device's current screen and save to an MP4 file.
 
 C<< script/electric-sheep-dump-screen-video.pl --configfile config/myapp.conf --output video.mp4 --time-limit 30 >>
 
+=item B<C<script/electric-sheep-viber-send-message.pl>>
+
+Send a message using the Viber app.
+
+C<< script/electric-sheep-viber-send-message.pl --message 'hello%sthere' --recipient 'george' --configfile config/myapp.conf --device Pixel_2_API_30_x86_>>
+
+This one saves a lot of debugging information to C<debug> which can be used to
+deal with special cases or different versions of Viber:
+
+C<< script/electric-sheep-viber-send-message.pl --outbase debug --verbosity 1 --message 'hello%sthere' --recipient 'george' --configfile config/myapp.conf --device Pixel_2_API_30_x86_>>
+
 =back
 
 =head1 TESTING
@@ -2808,15 +3011,21 @@ device.
 
 The I<live tests> under C<xt/live>, initiated with
 C<make livetest>, require
-an Android device connected to your desktop (on which
-you installed this package and are doing the testing).
-This should be an emulator. It can be a real Android
+an Android device connected to your desktop on which
+you installed this package and on which you are doing the testing.
+This suffices to be an emulator. It can also be a real Android
 phone but testing
 with your smartphone is not a good idea, please do not do this,
 unless it is some phone which you do not store important data.
 
+So, prior to C<make livetest> make sure you have an android
+emulator up and running with, for example,
+C<emulator -avd Pixel_2_API_30_x86_> . See section
+L<Android Emulators> for how to install, list and run them
+buggers.
+
 Testing will not send any messages via the device's apps.
-E.g. the plugin L<Android::ElectricSheep::Automator::Plugins::Viber>
+E.g. the plugin L<Android::ElectricSheep::Automator::Plugins::Apps::Viber>
 will not send a message via Viber but it will mock it.
 
 The live tests will sometimes fail because, so far,
@@ -2887,7 +3096,7 @@ The targeted smartphone must have "USB Debugging" enabled
 via the "Developer mode".
 This is not
 to be confused with 'rooted' or 'jailbroken' modes, none of
-these are required for experimenting with the current modul.
+these are required for experimenting with the current module.
 
 In order to enable "USB Debugging", you need
 to set the smartphone to enter "Developer" mode by
@@ -2943,13 +3152,16 @@ Start a virtual device with C<emulator -avd Pixel_2_API_30_x86_>
 
 And hey, you have an android phone running on your
 desktop in its own space, able to access the network
-but not the telephone network.
+but not the telephone network (no SIM card).
 
 It is possible to create a virtual device
 from the command line.
 But perhaps it is easier if you download Android Studio
 from: L<https://developer.android.com/studio> and follow
-the setup there using the GUI. It will download all the
+the setup there using the GUI. You will need to do this just
+once for creating the device, you can then uninstall Android Studio.
+
+Android Studio will download all the
 required files and will create some Android Virtual
 Devices (the "emulators") for you. It will also be easy to
 update your stack in the future. Once you have done the above,

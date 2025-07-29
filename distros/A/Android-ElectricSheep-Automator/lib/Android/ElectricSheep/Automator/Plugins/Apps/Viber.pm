@@ -1,11 +1,11 @@
-package Android::ElectricSheep::Automator::Plugins::Viber;
+package Android::ElectricSheep::Automator::Plugins::Apps::Viber;
 
 use strict;
 use warnings;
 
 #use lib ($FindBin::Bin, 'blib/lib');
 
-use parent 'Android::ElectricSheep::Automator::Plugins::Base';
+use parent 'Android::ElectricSheep::Automator::Plugins::Apps::Base';
 
 use Time::HiRes qw/usleep/;
 use Data::Roundtrip qw/perl2dump no-unicode-escape-permanently/;
@@ -21,41 +21,6 @@ sub new {
 	$self->{'_private'}->{'appname'} = 'com.viber.voip';
 
 	return $self;
-}
-sub appname { return $_[0]->{'_private'}->{'appname'} }
-sub open_viber_app {
-	my ($self, $params) = @_;
-	my $parent = ( caller(1) )[3] || "N/A";
-	my $whoami = ( caller(0) )[3];
-	my $log = $self->log();
-	my $verbosity = $self->verbosity();
-
-	my $packagename = $self->appname;
-	my $ret = $self->mother->open_app({'package' => $packagename});
-	if( ! defined $ret ){
-		my $instapps = $self->mother->find_installed_apps();
-		if( defined $instapps ){
-			$log->error("All installed apps on current device:\n".join("\n  ".$_, sort keys %$instapps)."\n\n");
-		}
-		$log->error("${whoami} (via $parent), line ".__LINE__." : failed to open app '$packagename'.");
-		return undef
-	}
-	if( $verbosity > 0 ){ $log->info("${whoami} (via $parent), line ".__LINE__." : app '$packagename' is now opening ...") }
-	return $ret;
-}
-
-sub close_viber_app {
-	my ($self, $params) = @_;
-	my $parent = ( caller(1) )[3] || "N/A";
-	my $whoami = ( caller(0) )[3];
-	my $log = $self->log();
-	my $verbosity = $self->verbosity();
-
-	my $packagename = $self->appname;
-	my $ret = $self->mother->close_app({'package' => $packagename});
-	if( ! defined $ret ){ $log->error("${whoami} (via $parent), line ".__LINE__." : failed to close app '$packagename'."); return undef }
-	if( $verbosity > 0 ){ $log->info("${whoami} (via $parent), line ".__LINE__." : app '$packagename' is now closing ...") }
-	return $ret;
 }
 
 # keeps pressing the back-arrow at the top of the app to hopefully
@@ -264,11 +229,11 @@ sub send_message {
 
 =head1 NAME
 
-Android::ElectricSheep::Automator::Plugins::Viber - Control the Viber app from your desktop via the ElectricSheep Automator
+Android::ElectricSheep::Automator::Plugins::Apps::Viber - Control the Viber app from your desktop via the ElectricSheep Automator
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =head1 WARNING
 
@@ -279,9 +244,9 @@ Current distribution is extremely alpha. API may change.
 An L<Android::ElectricSheep::Automator> plugin which
 interacts with the Viber app from the desktop.
 
-    use Android::ElectricSheep::Automator::Plugins::Viber;
+    use Android::ElectricSheep::Automator::Plugins::Apps::Viber;
 
-    my $viber = Android::ElectricSheep::Automator::Plugins::Viber->new({
+    my $viber = Android::ElectricSheep::Automator::Plugins::Apps::Viber->new({
       'configfile' => $configfile,
       'verbosity' => 1,
       # we already have a device connected and ready to control
@@ -292,7 +257,10 @@ interacts with the Viber app from the desktop.
     $plugobj->mother->home_screen();
 
     # open the viber app
-    $plugobj->open_viber_app() or die
+    $plugobj->open_app() or die
+
+    # is the app running now?
+    $plugobj->is_app_running() or die
 
     $plugobj->send_message({
         'recipient' => 'My Notes', # some of your contacts
@@ -304,7 +272,7 @@ interacts with the Viber app from the desktop.
 
 =head2 new($params)
 
-Creates a new C<Android::ElectricSheep::Automator::Plugins::Viber> object. C<$params>
+Creates a new C<Android::ElectricSheep::Automator::Plugins::Apps::Viber> object. C<$params>
 is a hash reference used to pass initialization options. These options are
 passed onto the main constructor.
 Refer to the documentation of L<Android::ElectricSheep::Automator::new($params)> for
@@ -332,7 +300,7 @@ Here is an example configuration file to get you started:
 		}
 		</* config for our plugins (each can go to separate file also) */>
 	},
-	"Android::ElectricSheep::Automator::Plugins::Viber" : {
+	"Android::ElectricSheep::Automator::Plugins::Apps::Viber" : {
 	}
   }
 
@@ -343,19 +311,6 @@ yield in problems.
 =head1 METHODS
 
 =over 1
-
-=item open_viber_app()
-
-It opens the viber app.
-
-It returns C<undef> on failure or a hash of
-information about the app on success.
-
-=item close_viber_app()
-
-It closes the viber app. Whether it kills it
-or it puts it in the background or ... depends
-on the Android version.
 
 =item send_message($params)
 
@@ -438,7 +393,7 @@ automatically be notified of progress on your bug as I make changes.
 
 You can find documentation for this module with the perldoc command.
 
-    perldoc Android::ElectricSheep::Automator::Plugins::Viber
+    perldoc Android::ElectricSheep::Automator::Plugins::Apps::Viber
 
 
 You can also look for information at:
@@ -489,7 +444,7 @@ This is free software, licensed under:
 
 =cut
 
-1; # End of Android::ElectricSheep::Automator::Plugins::Viber
+1; # End of Android::ElectricSheep::Automator::Plugins::Apps::Viber
 
 
 1;

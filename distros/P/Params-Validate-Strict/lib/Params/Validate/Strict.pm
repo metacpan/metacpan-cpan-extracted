@@ -14,11 +14,11 @@ Params::Validate::Strict - Validates a set of parameters against a schema
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 SYNOPSIS
 
@@ -79,15 +79,15 @@ The schema can define the following rules for each parameter:
 
 =item * C<type>
 
-The data type of the parameter.  Valid types are C<string>, C<integer>, and C<number>.
+The data type of the parameter.  Valid types are C<string>, C<integer>, C<number>, C<hashref>, C<arrayref> and C<coderef>.
 
 =item * C<min>
 
-The minimum length (for strings) or value (for numbers).
+The minimum length (for strings), value (for numbers) or number of keys (for hashrefs).
 
 =item * C<max>
 
-The maximum length (for strings) or value (for numbers).
+The maximum length (for strings), value (for numbers) or number of keys (for hashrefs).
 
 =item * C<matches>
 
@@ -114,7 +114,7 @@ If the validation is successful, the function will return a reference to a new h
 
 sub validate_strict
 {
-	my $params = Params::Get::get_params(undef, @_);
+	my $params = Params::Get::get_params(undef, \@_);
 
 	my $schema = $params->{'schema'};
 	my $args = $params->{'args'};
@@ -187,7 +187,18 @@ sub validate_strict
 							croak(__PACKAGE__, "::validate_strict: Parameter '$key' must be a number");
 						}
 						$value = eval $value; # Coerce to number (be careful with eval)
-
+					} elsif($type eq 'arrayref') {
+						if(ref($value) ne 'ARRAY') {
+							croak(__PACKAGE__, "::validate_strict: Parameter '$key' must be an arrayref");
+						}
+					} elsif($type eq 'hashref') {
+						if(ref($value) ne 'HASH') {
+							croak(__PACKAGE__, "::validate_strict: Parameter '$key' must be an hashref");
+						}
+					} elsif($type eq 'coderef') {
+						if(ref($value) ne 'CODE') {
+							croak(__PACKAGE__, "::validate_strict: Parameter '$key' must be a coderef");
+						}
 					} else {
 						croak "validate_strict: Unknown type '$type'";
 					}
@@ -198,6 +209,20 @@ sub validate_strict
 						}
 						if(length($value) < $rule_value) {
 							croak("validate_strict: Parameter '$key' must be at least length $rule_value");
+						}
+					} elsif($rules->{'type'} eq 'arrayref') {
+						if(!defined($value)) {
+							next;	# Skip if array is undefined
+						}
+						if(scalar(@{$value}) < $rule_value) {
+							croak("validate_strict: Parameter '$key' must be at least length $rule_value");
+						}
+					} elsif($rules->{'type'} eq 'hashref') {
+						if(!defined($value)) {
+							next;	# Skip if hash is undefined
+						}
+						if(scalar(scalar(%{$value})) < $rule_value) {
+							croak("validate_strict: Parameter '$key' must have at least length $rule_value keys");
 						}
 					} elsif(($rules->{'type'} eq 'integer') || ($rules->{'type'} eq 'number')) {
 						if($value < $rule_value) {
@@ -213,6 +238,20 @@ sub validate_strict
 						}
 						if(length($value) > $rule_value) {
 							croak("validate_strict: Parameter '$key' must be no longer than $rule_value");
+						}
+					} elsif($rules->{'type'} eq 'arrayref') {
+						if(!defined($value)) {
+							next;	# Skip if string is undefined
+						}
+						if(scalar(@{$value}) > $rule_value) {
+							croak("validate_strict: Parameter '$key' must be no longer than $rule_value");
+						}
+					} elsif($rules->{'type'} eq 'hashref') {
+						if(!defined($value)) {
+							next;	# Skip if hash is undefined
+						}
+						if(scalar(scalar(%{$value})) > $rule_value) {
+							croak("validate_strict: Parameter '$key' must have no more than $rule_value keys");
 						}
 					} elsif(($rules->{'type'} eq 'integer') || ($rules->{'type'} eq 'number')) {
 						if($value > $rule_value) {

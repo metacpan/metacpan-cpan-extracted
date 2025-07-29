@@ -29,7 +29,7 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = '1.07';
+our $VERSION = '1.09';
 
 our $ALL_LANGUAGES = 99;
 our $ENGLISH = 1;
@@ -91,7 +91,7 @@ sub barcodePrefixSearch {
 	my $self = shift;
 	my $prefix = shift;
 	my $lang = shift || 1;
-	my $page = shift || 1;
+	my $page = shift || 0;
 
 	my $json_str = $self->_apiCall($self->{base_uri} . "&op=barcode-prefix-search&page=$page&language=$lang&prefix=$prefix");
 	my $json = decode_json($json_str);
@@ -102,7 +102,7 @@ sub productSearch {
 	my $self = shift;
 	my $kw = shift;
 	my $lang = shift || 1;
-	my $page = shift || 1;
+	my $page = shift || 0;
 
 	my $json_str = $self->_apiCall($self->{base_uri} . "&op=product-search&page=$page&language=$lang&name="
 		. URL::Encode::url_encode_utf8($kw));
@@ -114,7 +114,7 @@ sub similarProductSearch {
 	my $self = shift;
 	my $kw = shift;
 	my $lang = shift || 1;
-	my $page = shift || 1;
+	my $page = shift || 0;
 
 	my $json_str = $self->_apiCall($self->{base_uri} . "&op=similar-product-search&page=$page&language=$lang&name="
 		. URL::Encode::url_encode_utf8($kw));
@@ -127,7 +127,7 @@ sub categorySearch {
 	my $category = shift;
 	my $kw = shift;
 	my $lang = shift || 1;
-	my $page = shift || 1;
+	my $page = shift || 0;
 
 	my $json_str = $self->_apiCall($self->{base_uri} . "&op=category-search&category=$category"
 		. "&page=$page&language=$lang&name=" . URL::Encode::url_encode_utf8($kw));
@@ -233,7 +233,7 @@ Search for all EANs starting with a certain prefix.
 
 Optionally, you can specify a preferred language for the results.
 
-If there are many results, you may need to page through the results to retrieve them all. Page numbers start at 1.
+If there are many results, you may need to page through the results to retrieve them all. Page numbers start at 0.
 
 =item productSearch($name [, $language, $page])
 
@@ -242,7 +242,7 @@ If you get no results, you might want to try a similarProductSearch().
 
 Optionally, you can specify a preferred language for the results.
 
-If there are many results, you may need to page through the results to retrieve them all. Page numbers start at 1.
+If there are many results, you may need to page through the results to retrieve them all. Page numbers start at 0.
 
 =item similarProductSearch($name [, $language, $page])
 
@@ -251,7 +251,7 @@ You probably want to try an exact search (productSearch()) before you do a simil
 
 Optionally, you can specify a preferred language for the results.
 
-If there are many results, you may need to page through the results to retrieve them all. Page numbers start at 1.
+If there are many results, you may need to page through the results to retrieve them all. Page numbers start at 0.
 
 =item categorySearch($category, $name [, $language, $page])
 
@@ -259,7 +259,7 @@ Search a certain product category for a product name or keyword. See appendix C 
 
 Optionally, you can specify a preferred language for the results.
 
-If there are many results, you may need to page through the results to retrieve them all. Page numbers start at 1.
+If there are many results, you may need to page through the results to retrieve them all. Page numbers start at 0.
 
 =item issuingCountry($ean)
 

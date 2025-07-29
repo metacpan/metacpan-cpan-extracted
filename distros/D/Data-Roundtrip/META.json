@@ -36,6 +36,8 @@
             "Data::Dump::Filtered" : "0",
             "Data::Dumper" : "0",
             "Encode" : "3.0",
+            "Exporter" : "0",
+            "Getopt::Long" : "0",
             "JSON" : "4.0",
             "Unicode::Escape" : "v0.0.2",
             "YAML::PP" : "0",
@@ -45,16 +47,21 @@
       "test" : {
          "requires" : {
             "Benchmark" : "0",
+            "Data::Dump" : "0",
+            "Data::Dumper" : "0",
             "Data::Random::Structure" : "0",
             "Data::Random::Structure::UTF8" : "0.06",
+            "File::Basename" : "0",
             "File::Spec" : "0",
-            "File::Temp" : "0",
             "Test2::Plugin::UTF8" : "0",
             "Test::More" : "0",
             "Test::Pod" : "1.51",
             "Test::Script" : "1.28",
             "Test::Taint" : "0",
-            "YAML::PP" : "0"
+            "Test::TempDir::Tiny" : "0",
+            "YAML" : "0",
+            "YAML::PP" : "0",
+            "YAML::XS" : "0"
          }
       }
    },
@@ -70,6 +77,6 @@
          "web" : "https://github.com/hadjiprocopis/data-roundtrip"
       }
    },
-   "version" : "0.29",
+   "version" : "0.30",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

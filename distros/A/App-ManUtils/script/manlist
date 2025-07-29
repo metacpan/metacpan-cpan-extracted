@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-11-16'; # DATE
+our $DATE = '2024-12-21'; # DATE
 our $DIST = 'App-ManUtils'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/ManUtils/manlist",
@@ -38,7 +38,7 @@ manlist - List manpages
 
 =head1 VERSION
 
-This document describes version 0.002 of manlist (from Perl distribution App-ManUtils), released on 2022-11-16.
+This document describes version 0.003 of manlist (from Perl distribution App-ManUtils), released on 2024-12-21.
 
 =head1 SYNOPSIS
 
@@ -215,7 +215,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

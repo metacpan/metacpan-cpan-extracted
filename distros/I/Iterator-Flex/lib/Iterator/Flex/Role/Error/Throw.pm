@@ -5,7 +5,7 @@ package Iterator::Flex::Role::Error::Throw;
 use strict;
 use warnings;
 
-our $VERSION = '0.20';
+our $VERSION = '0.24';
 
 use Iterator::Flex::Utils qw( :default REG_GENERAL REG_GP_ERROR  );
 use Ref::Util;
@@ -60,7 +60,7 @@ Iterator::Flex::Role::Error::Throw - signal error by throwing
 
 =head1 VERSION
 
-version 0.20
+version 0.24
 
 =head1 METHODS
 

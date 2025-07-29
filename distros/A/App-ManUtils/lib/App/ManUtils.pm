@@ -6,9 +6,9 @@ use warnings;
 #use Log::Any::IfLOG '$log';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-11-16'; # DATE
+our $DATE = '2024-12-21'; # DATE
 our $DIST = 'App-ManUtils'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 our %SPEC;
 
@@ -58,7 +58,7 @@ sub manwhich {
     #    $sect = [map {/\Aman/ ? $_ : "man$_"} split /\s*,\s*/, $sect];
     #}
 
-    require Filename::Compressed;
+    require Filename::Type::Compressed;
 
     my @res;
     for my $dir (split /:/, ($ENV{MANPATH} // '')) {
@@ -71,7 +71,7 @@ sub manwhich {
             my @files = readdir($dh);
             for my $file (@files) {
                 next if $file eq '.' || $file eq '..';
-                my $chkres = Filename::Compressed::check_compressed_filename(
+                my $chkres = Filename::Type::Compressed::check_compressed_filename(
                     filename => $file,
                 );
                 my $name = $chkres ? $chkres->{uncompressed_filename} : $file;
@@ -142,7 +142,7 @@ sub manlist {
         }
     } else {
         # in the absence of 'apropos', list the man files. slooow.
-        require Filename::Compressed;
+        require Filename::Type::Compressed;
 
         for my $dir (split /:/, $ENV{MANPATH}) {
             next unless -d $dir;
@@ -154,7 +154,7 @@ sub manlist {
                 for my $file (@files) {
                     next if $file eq '.' || $file eq '..';
                     my $chkres =
-                        Filename::Compressed::check_compressed_filename(
+                        Filename::Type::Compressed::check_compressed_filename(
                             filename => $file,
                         );
                     my $name = $chkres ?
@@ -216,7 +216,7 @@ App::ManUtils - Utilities related to man(page)
 
 =head1 VERSION
 
-This document describes version 0.002 of App::ManUtils (from Perl distribution App-ManUtils), released on 2022-11-16.
+This document describes version 0.003 of App::ManUtils (from Perl distribution App-ManUtils), released on 2024-12-21.
 
 =head1 SYNOPSIS
 
@@ -375,7 +375,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

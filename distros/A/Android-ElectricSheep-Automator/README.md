@@ -4,7 +4,7 @@ Android::ElectricSheep::Automator - Do Androids Dream of Electric Sheep? Smartph
 
 # VERSION
 
-Version 0.04
+Version 0.05
 
 # WARNING
 
@@ -14,15 +14,16 @@ Current distribution is extremely alpha. API may change.
 
 The present package fascilitates the control
 of a USB-debugging-enabled
-Android device, e.g. a smartphone,
-from a desktop computer using Perl.
-It's basically a thickishly thin wrapper
+Android device, e.g. a real smartphone,
+or an emulated (virtual) Android device,
+from your desktop computer using Perl.
+It's basically a thickishly-thin wrapper
 to the omnipotent Android Debug Bridge (adb)
 program.
 
 **Note that absolutely nothing is
 installed on the connected device,
-neither any of its settings are modified**.
+neither any of its settings will be modified by this package**.
 See ["WILL ANYTHING BE INSTALLED ON THE DEVICE?"](#will-anything-be-installed-on-the-device).
 
     use Android::ElectricSheep::Automator;
@@ -323,6 +324,46 @@ Functions return back objects, ARRAY\_REF or HASH\_REF.
     of the \`ps\` output.
     - **`json`** : the above data converted into a JSON string.
 
+- pidof($params)
+
+    It returns the PID of the specified command name.
+    The specified command name must match the app or command
+    name exactly. **Use `pgrep()` if you want to match command
+    names with a regular expression**.
+
+    `$params` is a HASH\_REF which should contain:
+
+    - **`name`**
+
+        the name of the process. It can be a command name,
+        e.g. `audioserver` or an app name e.g. `android.hardware.vibrator-service.example`.
+
+    It returns `undef` on failure or the PID of the matched command on success.
+
+- pgrep($params)
+
+    It returns the PIDs matching the specified command or app
+    name (which can be an extended regular expression that `pgrep`
+    understands). The returned array will contain zero, one or more
+    hashes with keys `pid` and `command`. The former key is the pid of the command
+    whose full name (as per the process table) will be under the latter key.
+    Unless parameter `dont-show-command-name` was set to `1`.
+
+    `$params` is a HASH\_REF which should contain:
+
+    - **`name`**
+
+        the name of the process. It can be a command name,
+        e.g. `audioserver` or an app name e.g. `android.hardware.vibrator-service.example`
+        or part of these e.g. `audio` or `hardware` or an extended
+        regular expression that Android's `pgrep` understands, e.g.
+        `^com.+google.+mess`.
+
+    It returns `undef` on failure or an ARRAY\_REF containing
+    a HASH\_REF of data for each command matched (under keys `pid` and `command`).
+    The returned ARRAY\_REF can contain 0, 1 or more items depending
+    on what was matched.
+
 - geofix($params)
 
     It fixes the geolocation of the device to the specified coordinates.
@@ -366,6 +407,24 @@ Functions return back objects, ARRAY\_REF or HASH\_REF.
     or ` <na > ` if the provider failed to return valid output.
     - **`last-location-string`** : the last location string, or
     ` <na > ` if the provider failed to return valid output.
+
+- is\_app\_running($params)
+
+    It checks if the specified app is running on the device.
+    The name of the app must be exact.
+    Note that you can search for running apps / commands
+    with extended regular expressions using `pgrep()`
+
+    `$params` is a HASH\_REF which should contain:
+
+    - **`appname`**
+
+        the name of the app to check if it is running.
+        It must be its exact name. Basically it checks the
+        output of `pidof()`.
+
+    It returns `undef` on failure,
+    `1` if the app is running or `0` if the app is not running.
 
 - find\_current\_device\_properties($params)
 
@@ -848,6 +907,17 @@ For convenience, a few simple scripts are provided:
 
     `script/electric-sheep-dump-screen-video.pl --configfile config/myapp.conf --output video.mp4 --time-limit 30`
 
+- **`script/electric-sheep-viber-send-message.pl`**
+
+    Send a message using the Viber app.
+
+    `script/electric-sheep-viber-send-message.pl --message 'hello%sthere' --recipient 'george' --configfile config/myapp.conf --device Pixel_2_API_30_x86_>>`
+
+    This one saves a lot of debugging information to `debug` which can be used to
+    deal with special cases or different versions of Viber:
+
+    `script/electric-sheep-viber-send-message.pl --outbase debug --verbosity 1 --message 'hello%sthere' --recipient 'george' --configfile config/myapp.conf --device Pixel_2_API_30_x86_>>`
+
 # TESTING
 
 The normal tests under `t/`, initiated with `make test`,
@@ -858,15 +928,21 @@ device.
 
 The _live tests_ under `xt/live`, initiated with
 `make livetest`, require
-an Android device connected to your desktop (on which
-you installed this package and are doing the testing).
-This should be an emulator. It can be a real Android
+an Android device connected to your desktop on which
+you installed this package and on which you are doing the testing.
+This suffices to be an emulator. It can also be a real Android
 phone but testing
 with your smartphone is not a good idea, please do not do this,
 unless it is some phone which you do not store important data.
 
+So, prior to `make livetest` make sure you have an android
+emulator up and running with, for example,
+`emulator -avd Pixel_2_API_30_x86_` . See section
+["Android Emulators"](#android-emulators) for how to install, list and run them
+buggers.
+
 Testing will not send any messages via the device's apps.
-E.g. the plugin [Android::ElectricSheep::Automator::Plugins::Viber](https://metacpan.org/pod/Android%3A%3AElectricSheep%3A%3AAutomator%3A%3APlugins%3A%3AViber)
+E.g. the plugin [Android::ElectricSheep::Automator::Plugins::Apps::Viber](https://metacpan.org/pod/Android%3A%3AElectricSheep%3A%3AAutomator%3A%3APlugins%3A%3AApps%3A%3AViber)
 will not send a message via Viber but it will mock it.
 
 The live tests will sometimes fail because, so far,
@@ -937,7 +1013,7 @@ The targeted smartphone must have "USB Debugging" enabled
 via the "Developer mode".
 This is not
 to be confused with 'rooted' or 'jailbroken' modes, none of
-these are required for experimenting with the current modul.
+these are required for experimenting with the current module.
 
 In order to enable "USB Debugging", you need
 to set the smartphone to enter "Developer" mode by
@@ -988,13 +1064,16 @@ Start a virtual device with `emulator -avd Pixel_2_API_30_x86_`
 
 And hey, you have an android phone running on your
 desktop in its own space, able to access the network
-but not the telephone network.
+but not the telephone network (no SIM card).
 
 It is possible to create a virtual device
 from the command line.
 But perhaps it is easier if you download Android Studio
 from: [https://developer.android.com/studio](https://developer.android.com/studio) and follow
-the setup there using the GUI. It will download all the
+the setup there using the GUI. You will need to do this just
+once for creating the device, you can then uninstall Android Studio.
+
+Android Studio will download all the
 required files and will create some Android Virtual
 Devices (the "emulators") for you. It will also be easy to
 update your stack in the future. Once you have done the above,
@@ -1105,3 +1184,27 @@ This software is Copyright (c) 2025 by Andreas Hadjiprocopis.
 This is free software, licensed under:
 
     The Artistic License 2.0 (GPL Compatible)
+
+# POD ERRORS
+
+Hey! **The above document had some coding errors, which are explained below:**
+
+- Around line 2353:
+
+    '=item' outside of any '=over'
+
+- Around line 2383:
+
+    '=item' outside of any '=over'
+
+- Around line 2462:
+
+    '=item' outside of any '=over'
+
+- Around line 2995:
+
+    Unterminated C< ... > sequence
+
+- Around line 3000:
+
+    Unterminated C< ... > sequence

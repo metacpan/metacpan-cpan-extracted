@@ -4,7 +4,9 @@ Geo::Address::Parser - Lightweight country-aware address parser from flat text
 
 # VERSION
 
-Version 0.02
+Version 0.03
+
+# METHODS
 
 # SYNOPSIS
 
@@ -20,11 +22,23 @@ This module extracts address components from flat text input. It supports
 lightweight parsing for the US, UK, Canada, Australia, and New Zealand, using
 country-specific regular expressions.
 
-# METHODS
-
 ## new(country => $code)
 
 Creates a new parser for a specific country (US, UK, CA, AU, NZ).
+
+### FORMAL SPECIFICATION
+
+    [COUNTRY]
+
+    GeoAddressParserNew
+    ====================
+    country? : COUNTRY
+    supported : ℙ COUNTRY
+    parser! : Parser
+
+    supported = {US, UK, CA, AU, NZ}
+    country? ∈ supported
+    parser! = parserFor(country?)
 
 ## parse($text)
 
@@ -35,6 +49,26 @@ Parses a flat string and returns a hashref with the following fields:
 - city
 - region
 - country
+
+### FORMAL SPECIFICATION
+
+    [TEXT, COUNTRY, FIELD, VALUE]
+
+    GeoAddressParserState
+    ======================
+    country : COUNTRY
+    parser : COUNTRY ↛ (TEXT ↛ FIELD ↛ VALUE)
+
+    GeoAddressParserParse
+    ======================
+    ΔGeoAddressParserState
+    text? : TEXT
+    result! : FIELD ↛ VALUE
+
+    text? ≠ ∅
+    country ∈ dom parser
+    result! = (parser(country))(text?)
+    result!("country") = country
 
 # LICENCE AND COPYRIGHT
 

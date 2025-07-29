@@ -1,0 +1,244 @@
+Revision history for {{$dist->name}}
+
+{{$NEXT}}
+
+  [ENHANCEMENT]
+  
+    * new iterator, Iterator::Flex::Common/izip / Iterator::Flex::Zip
+
+0.20      2025-07-24 21:20:01-04:00 America/New_York
+
+  [ENHANCEMENT]
+
+    * iterators now have a drain method.
+
+    * New iterator adapter, Gather, allows for gathering selected
+      elements into a buffer, returning the buffer, repeating. see
+      Iterator::Flex::Common/igather, Iterator::Flex::Gather
+
+  [BUG FIX]
+
+    * iterator ->may() method always returned true; now it does what's
+      on the tin.
+
+    * several of the iterator wrappers had incorrect prototypes and didn't
+      pass all of their args to the iterator constructors.
+
+  [INTERNALS]
+
+    * Iterator state is now tracked in the iterator registry using
+      arrays instead of hashes.
+
+
+0.19      2025-06-19 12:19:18-04:00 America/New_York
+
+  [DOCUMENTATION]
+
+    * icat takes a list of iterables, not an arrayref
+
+0.18      2023-11-03 19:44:53-04:00 America/New_York
+
+    * add Stack and istack to iterate and manipulate a stack of iterators
+
+0.17      2023-10-30 23:13:49-04:00 America/New_York
+
+  [ENHANCEMENT]
+
+    * add Cat and icat to concatenate iterators
+
+0.16      2023-09-28 19:17:13-04:00 America/New_York
+
+  [ENHANCEMENT]
+
+    * document cache iterator's 'at' method (and make it work)
+
+0.15      2022-07-18 11:50:51-04:00 America/New_York
+
+  [BUG FIX]
+
+    * resolve RT#141012, always call overload::Method with three arguments. HVDS++
+
+    * sequences did not correctly handle exhaustion => 'throw' or
+      exhaustion => [ return => $sentinel ]
+
+    * some of the non-documented ways of handling input exhaustion didn't work
+      as expected.
+
+  [DOCUMENTATION]
+
+    * rework Iterator::Flex::Manual:Authoring
+
+    * iterator adaptors handling of input exhaustion from their input iterators
+      was not properly/fully documented.
+
+
+0.14      2021-10-06 15:00:47-04:00 America/New_York
+
+  [BUILD]
+
+    * require Role::Tiny >= 2.002004, or role composition doesn't work correctly.
+
+0.13      2021-10-06 11:24:26-04:00 America/New_York
+
+  [BUG FIX]
+
+    * incorrectly set %INC value to undef to register generated module; caused failures under
+      Perl >= 5.32
+
+  [DOCUMENTATION]
+
+    * updates
+
+
+0.12      2021-10-05 17:40:04-04:00 America/New_York
+
+    * First public release
+
+  [INCOMPATIBILITY]
+
+    * explicitly requires Perl v5.28
+    * yet another radical API change and refactoring. hopefully the
+      last!
+
+  [ENHANCEMENTS]
+
+    * lots of documentation. still not complete
+    * better handling of proxy iterators
+    * beginning of error handling
+
+
+  [TODO]
+
+    * icycle should handle any rewindable iterator, not just arrays
+
+
+0.11      2020-04-30 10:48:47-04:00 America/New_York
+
+  [INCOMPATIBILITY]
+
+    * explicitly requires Perl 5.10.0.
+
+  [API_CHANGE]
+
+    * native iterators must use the 'self' rather than 'set_self'
+      attributes to provide access to the closed-over self.
+
+  [REFACTOR]
+
+    * new iterator exhaustion model cleanly separates exhaustion
+      transition policies (return/throw) and handling imported
+      iterables' policies (pass through, replace).
+
+    * robust handling of imported iterables exhaustion sentinels or
+      exceptions.
+
+  [BUILD]
+
+    * now uses Module::Build::Tiny
+
+
+0.10      2018-09-16 18:21:49-04:00 America/New_York
+
+  [REFACTOR]
+
+    * Internal refactor to improve performance and simplify code
+
+    * Iterator classes are constructed directly without requiring
+      parsing of the attribute hash.
+
+    * Only existing class based iterators should/can be frozen.
+
+    * ITERATOR_BASE has been removed.  The idea was never thought completely
+      through. Still haven't worked out how to change base class for
+
+    * on-the-fly creation of iterators is now in Factory.
+
+
+0.09      2018-06-01 13:10:56-04:00 America/New_York
+
+  [BUG FIX]
+
+    * sequence iterator was not numerically stable for
+      real number sequences, as it used repeated sums
+      instead of a multiply.
+
+0.08      2018-05-18 15:12:15-04:00 America/New_York
+
+  [ENHANCEMENT]
+
+    * new iterator, Cycle/icycle, cycles through an array.
+
+
+0.07      2018-05-14 10:49:43-04:00 America/New_York
+
+  [BUG FIX]
+
+    * subsequent creation of iterators with a method
+      did not incorporate the method
+
+0.06      2018-05-07 12:21:27-04:00 America/New_York
+
+
+  [BUG FIX]
+
+    * method for detecting existing method roles was broken
+
+
+0.05      2018-05-07 12:21:27-04:00 America/New_York
+
+  [ENHANCEMENT]
+
+    * arbitrary methods may be added to iterator classes
+
+
+0.04      2018-05-04 17:21:15-04:00 America/New_York
+
+  [BUG FIXES]
+
+    * ifreeze properly handles exhausted predicates
+
+  [ENHANCEMENT]
+
+    * new iterator method "may", indicates if it and it's dependencies
+      support a method.
+
+    * more optimization; should make things faster (by some unknown amount)
+
+  [INTERNAL CHANGES]
+
+    * move implementation of iterators out of Flex and into
+      separate classes.
+
+
+
+0.03      2018-01-16 13:27:23-05:00 America/New_York
+
+  [ BUG FIX ]
+
+    * thawing an iproduct iterator with labeled iterator arguments was
+      borken.
+
+0.02      2018-01-16 13:27:23-05:00 America/New_York
+
+  [ ENHANCEMENTS ]
+
+    * new iterator functions: ifreeze, icache
+    * new ':all' export tag
+    * add support for current() method
+    * new spec on what prev/current/next return as function of iterator state
+
+
+  [ BUG FIXES ]
+
+
+    * iproduct needs dependent iterators to have memory of last and
+      current values when freezing.  rewind() is renamed to reset(),
+      and new rewind retains current/prev values.
+
+    * iterator states were always set to <active> when next was called.
+      now the state is updated to <active> only if it was <inactive>.
+
+
+0.01      2018-01-05 16:36:29-05:00 America/New_York
+
+* First release upon an unsuspecting world.

@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use experimental 'signatures';
 
-our $VERSION = '0.20';
+our $VERSION = '0.24';
 
 use Iterator::Flex::Factory;
 use Iterator::Flex::Utils qw[ THROW STATE EXHAUSTION :IterAttrs :IterStates ];
@@ -125,7 +125,7 @@ Iterator::Flex::Grep - Grep Iterator Class
 
 =head1 VERSION
 
-version 0.20
+version 0.24
 
 =head1 METHODS
 

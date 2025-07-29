@@ -1,5 +1,32 @@
 Revision history for Iterator-Flex
 
+0.24      2025-07-28 13:41:45 EDT
+
+  [BUGFIX]
+
+    * workaround perldb issues with blessed coderefs
+      (https://github.com/Perl/perl5/issues/23486 )
+
+0.23      2025-07-28 10:45:02 EDT
+
+  [TESTS]
+
+    * add missing test for Zip where insertions requested but not
+      actually needed.
+
+0.22      2025-07-27 00:38:09 EDT
+
+  [ENHANCEMENT]
+
+    * Zip now provides different ways of handling input iterators
+      which exhaust out of sequence.
+
+0.21      2025-07-25 16:06:53 EDT
+
+  [ENHANCEMENT]
+  
+    * new iterator, Iterator::Flex::Common/izip / Iterator::Flex::Zip
+
 0.20      2025-07-24 21:20:01-04:00 America/New_York
 
   [ENHANCEMENT]

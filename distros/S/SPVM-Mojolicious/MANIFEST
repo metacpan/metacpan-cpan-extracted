@@ -41,6 +41,8 @@ lib/SPVM/Mojo/Log.pm
 lib/SPVM/Mojo/Log.spvm
 lib/SPVM/Mojo/Log/Callback/Format.pm
 lib/SPVM/Mojo/Log/Callback/Format.spvm
+lib/SPVM/Mojo/Log/Callback/Message.pm
+lib/SPVM/Mojo/Log/Callback/Message.spvm
 lib/SPVM/Mojo/Log/Line.pm
 lib/SPVM/Mojo/Log/Line.spvm
 lib/SPVM/Mojo/Message.pm

@@ -3,6 +3,21 @@
 Unless noted otherwise, these changes where initiated and applied by
 Mark Overmeer.
 
+Simplify when this becomes available in the leading Dancer2 version:
+	https://github.com/PerlDancer/Dancer2/pull/1723
+
+version 1.02: Tue 29 Jul 09:55:57 CEST 2025
+
+	Changes:
+	- require Perl 5.16 (2012)
+
+	Fixes:
+	- using msgids with plural alternatives.
+	  reported by [Andy Beverley]
+
+	Improvements:
+	- documentation was pretty outdated.
+
 version 1.01: Mon  2 Jun 09:51:18 CEST 2025
 
 	Fixes:

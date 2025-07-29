@@ -1,0 +1,7 @@
+# Copyright (c) 2025 Yuki Kimoto
+# MIT License
+
+class Mojo::Log::Callback::Message : interface_t {
+  
+  required method : string ();
+}

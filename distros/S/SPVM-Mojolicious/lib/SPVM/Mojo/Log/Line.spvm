@@ -3,4 +3,20 @@
 
 class Mojo::Log::Line {
   
+  allow Mojo::Log;
+  
+  private static method new : Mojo::Log::Line () {
+    
+    my $self = new Mojo::Log::Line;
+    
+    return $self;
+  }
+  
+  # Fields
+  has time : double;
+  
+  has level : string;
+  
+  has message : string;
+  
 }

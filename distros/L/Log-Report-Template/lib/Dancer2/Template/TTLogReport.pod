@@ -132,12 +132,10 @@ be able to extend this module with your own templater, however.
           end_tag:   '%>'
           templater: Log::Report::Template  # default
 
-=encoding utf-8
-
 =head1 SEE ALSO
 
-This module is part of Log-Report-Template distribution version 1.01,
-built on June 02, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report-Template distribution version 1.02,
+built on July 29, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

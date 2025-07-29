@@ -16,11 +16,11 @@ Params::Get - Get the parameters to a subroutine in any way you want
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =cut
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 =head1 SYNOPSIS
 
@@ -130,6 +130,9 @@ sub get_params
 			if(Scalar::Util::blessed($args->[0])) {
 				return { $default => $args->[0] };
 			}
+		}
+		if(!defined($args->[0])) {
+			return;
 		}
 		if(ref($args->[0]) eq 'REF') {
 			$args->[0] = ${$args->[0]};

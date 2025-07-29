@@ -1,6 +1,6 @@
 use v5.20;
 use warnings;
-package Log::Dispatchouli 3.010;
+package Log::Dispatchouli 3.011;
 # ABSTRACT: a simple wrapper around Log::Dispatch
 
 # Not dangerous.  Accepted without change.
@@ -139,8 +139,8 @@ our @CARP_NOT = qw(Log::Dispatchouli::Proxy);
 #pod
 #pod =cut
 
-sub new {
-  my ($class, $arg) = @_;
+sub new ($class, $arg = undef) {
+  $arg ||= {};
 
   my $ident = $arg->{ident}
     or Carp::croak "no ident specified when using $class";
@@ -297,9 +297,7 @@ for my $dest (qw(out err)) {
   *{"enable_std$dest"} = $code;
 }
 
-sub setup_syslog_output {
-  my ($self, %arg) = @_;
-
+sub setup_syslog_output ($self, %arg) {
   require Log::Dispatch::Syslog;
   $self->{dispatcher}->add(
     Log::Dispatch::Syslog->new(
@@ -358,8 +356,7 @@ sub flog_messages ($self, @rest) {
   return $self->_flog_messages($arg, \@rest);
 }
 
-sub log {
-  my ($self, @rest) = @_;
+sub log ($self, @rest) {
   my $arg = _HASH0($rest[0]) ? shift(@rest) : {};
 
   my $message;
@@ -394,9 +391,7 @@ sub log {
 #pod
 #pod =cut
 
-sub log_fatal {
-  my ($self, @rest) = @_;
-
+sub log_fatal ($self, @rest) {
   my $arg = _HASH0($rest[0]) ? shift(@rest) : {}; # for future expansion
 
   local $arg->{level} = defined $arg->{level} ? $arg->{level} : 'error';
@@ -416,9 +411,7 @@ sub log_fatal {
 #pod
 #pod =cut
 
-sub log_debug {
-  my ($self, @rest) = @_;
-
+sub log_debug ($self, @rest) {
   return unless $self->is_debug;
 
   my $arg = _HASH0($rest[0]) ? shift(@rest) : {}; # for future expansion
@@ -495,7 +488,7 @@ sub log_debug {
 #pod
 #pod =cut
 
-sub _compute_proxy_ctx_kvstr_aref {
+sub _compute_proxy_ctx_kvstr_aref ($) {
   return [];
 }
 
@@ -508,9 +501,7 @@ sub fmt_event ($self, $type, $data) {
   return join q{ }, @$kv_aref;
 }
 
-sub log_event {
-  my ($self, $type, $data) = @_;
-
+sub log_event ($self, $type, $data) {
   return if $self->get_muted;
 
   my $message = $self->fmt_event($type, $data);
@@ -530,9 +521,7 @@ sub log_event {
 #pod
 #pod =cut
 
-sub log_debug_event {
-  my ($self, $type, $data) = @_;
-
+sub log_debug_event ($self, $type, $data) {
   return unless $self->get_debug;
 
   $self->log_event($type, $data);
@@ -547,9 +536,7 @@ sub log_debug_event {
 #pod
 #pod =cut
 
-sub set_debug {
-  return($_[0]->{debug} = $_[1] ? 1 : 0);
-}
+sub set_debug ($self, $bool) { $self->{debug} = $bool ? 1 : 0 }
 
 #pod =method get_debug
 #pod
@@ -558,7 +545,7 @@ sub set_debug {
 #pod
 #pod =cut
 
-sub get_debug { return $_[0]->{debug} }
+sub get_debug ($self) { return $self->{debug} }
 
 #pod =method clear_debug
 #pod
@@ -567,10 +554,10 @@ sub get_debug { return $_[0]->{debug} }
 #pod
 #pod =cut
 
-sub clear_debug { }
+sub clear_debug ($) { }
 
-sub mute   { $_[0]{muted} = 1 }
-sub unmute { $_[0]{muted} = 0 }
+sub mute   ($self) { $self->{muted} = 1 }
+sub unmute ($self) { $self->{muted} = 0 }
 
 #pod =method set_muted
 #pod
@@ -581,8 +568,8 @@ sub unmute { $_[0]{muted} = 0 }
 #pod
 #pod =cut
 
-sub set_muted {
-  return($_[0]->{muted} = $_[1] ? 1 : 0);
+sub set_muted ($self, $bool) {
+  return ($self->{muted} = $bool ? 1 : 0);
 }
 
 #pod =method get_muted
@@ -592,7 +579,7 @@ sub set_muted {
 #pod
 #pod =cut
 
-sub get_muted { return $_[0]->{muted} }
+sub get_muted ($self) { return $self->{muted} }
 
 #pod =method clear_muted
 #pod
@@ -601,7 +588,7 @@ sub get_muted { return $_[0]->{muted} }
 #pod
 #pod =cut
 
-sub clear_muted { }
+sub clear_muted ($) { }
 
 #pod =method get_prefix
 #pod
@@ -623,10 +610,10 @@ sub clear_muted { }
 #pod
 #pod =cut
 
-sub get_prefix   { return $_[0]->{prefix}  }
-sub set_prefix   { $_[0]->{prefix} = $_[1] }
-sub clear_prefix { $_[0]->unset_prefix     }
-sub unset_prefix { undef $_[0]->{prefix}   }
+sub get_prefix   ($self)          { return $self->{prefix}    }
+sub set_prefix   ($self, $prefix) { $self->{prefix} = $prefix }
+sub clear_prefix ($self)          { $self->unset_prefix       }
+sub unset_prefix ($self)          { undef $self->{prefix}     }
 
 #pod =method ident
 #pod
@@ -634,7 +621,7 @@ sub unset_prefix { undef $_[0]->{prefix}   }
 #pod
 #pod =cut
 
-sub ident { $_[0]{ident} }
+sub ident ($self) { $self->{ident} }
 
 #pod =method config_id
 #pod
@@ -645,7 +632,7 @@ sub ident { $_[0]{ident} }
 #pod
 #pod =cut
 
-sub config_id { $_[0]{config_id} }
+sub config_id ($self) { $self->{config_id} }
 
 #pod =head1 METHODS FOR SUBCLASSING
 #pod
@@ -656,7 +643,7 @@ sub config_id { $_[0]{config_id} }
 #pod
 #pod =cut
 
-sub string_flogger { 'String::Flogger' }
+sub string_flogger ($) { 'String::Flogger' }
 
 #pod =head2 env_prefix
 #pod
@@ -671,7 +658,7 @@ sub string_flogger { 'String::Flogger' }
 #pod
 #pod =cut
 
-sub env_prefix { return; }
+sub env_prefix ($) { return; }
 
 #pod =head2 env_value
 #pod
@@ -683,9 +670,7 @@ sub env_prefix { return; }
 #pod
 #pod =cut
 
-sub env_value {
-  my ($self, $suffix) = @_;
-
+sub env_value ($self, $suffix) {
   my @path = grep { defined } ($self->env_prefix, 'DISPATCHOULI');
 
   for my $prefix (@path) {
@@ -728,8 +713,7 @@ sub env_value {
 #pod
 #pod =cut
 
-sub new_tester {
-  my ($class, $arg) = @_;
+sub new_tester ($class, $arg = undef) {
   $arg ||= {};
 
   return $class->new({
@@ -751,11 +735,11 @@ sub new_tester {
 #pod
 #pod =cut
 
-sub events {
+sub events ($self) {
   Carp::confess "->events called on a logger not logging to self"
-    unless $_[0]->{events};
+    unless $self->{events};
 
-  return $_[0]->{events};
+  return $self->{events};
 }
 
 #pod =head2 clear_events
@@ -765,11 +749,11 @@ sub events {
 #pod
 #pod =cut
 
-sub clear_events {
+sub clear_events ($self) {
   Carp::confess "->events called on a logger not logging to self"
-    unless $_[0]->{events};
+    unless $self->{events};
 
-  @{ $_[0]->{events} } = ();
+  $self->{events}->@* = ();
   return;
 }
 
@@ -799,12 +783,11 @@ sub clear_events {
 #pod
 #pod =cut
 
-sub proxy_class {
+sub proxy_class ($) {
   return 'Log::Dispatchouli::Proxy';
 }
 
-sub proxy {
-  my ($self, $arg) = @_;
+sub proxy ($self, $arg = undef) {
   $arg ||= {};
 
   my $proxy = $self->proxy_class->_new({
@@ -832,8 +815,8 @@ sub proxy {
 #pod
 #pod =cut
 
-sub parent { $_[0] }
-sub logger { $_[0] }
+sub parent ($self) { $self }
+sub logger ($self) { $self }
 
 #pod =method dispatcher
 #pod
@@ -842,7 +825,7 @@ sub logger { $_[0] }
 #pod
 #pod =cut
 
-sub dispatcher   { $_[0]->{dispatcher} }
+sub dispatcher ($self) { $self->{dispatcher} }
 
 #pod =method stdio_dispatcher_class
 #pod
@@ -852,7 +835,7 @@ sub dispatcher   { $_[0]->{dispatcher} }
 #pod
 #pod =cut
 
-sub stdio_dispatcher_class {
+sub stdio_dispatcher_class ($self) {
   require Log::Dispatch::Screen;
   return 'Log::Dispatch::Screen';
 }
@@ -889,13 +872,13 @@ sub stdio_dispatcher_class {
 #pod
 #pod =cut
 
-sub is_debug { $_[0]->get_debug }
-sub is_info  { 1 }
-sub is_fatal { 1 }
+sub is_debug ($self) { $self->get_debug }
+sub is_info  ($) { 1 }
+sub is_fatal ($) { 1 }
 
-sub info  { shift()->log(@_); }
-sub fatal { shift()->log_fatal(@_); }
-sub debug { shift()->log_debug(@_); }
+sub info  ($self, @rest) { $self->log(@rest); }
+sub fatal ($self, @rest) { $self->log_fatal(@rest); }
+sub debug ($self, @rest) { $self->log_debug(@rest); }
 
 use overload
   '&{}'    => sub { my ($self) = @_; sub { $self->log(@_) } },
@@ -924,7 +907,7 @@ Log::Dispatchouli - a simple wrapper around Log::Dispatch
 
 =head1 VERSION
 
-version 3.010
+version 3.011
 
 =head1 SYNOPSIS
 

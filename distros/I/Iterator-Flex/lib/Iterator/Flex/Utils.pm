@@ -9,7 +9,7 @@ use warnings;
 
 use experimental 'signatures', 'postderef';
 
-our $VERSION = '0.20';
+our $VERSION = '0.24';
 
 use Scalar::Util qw( refaddr );
 use Ref::Util    qw( is_hashref );
@@ -47,6 +47,7 @@ use constant mk_indices REGISTRY_INDICES;
 use constant EXHAUSTION_ACTIONS => qw[ THROW RETURN PASSTHROUGH ];
 use constant mk_lc EXHAUSTION_ACTIONS;
 
+# these duplicate ITER_ATTRS. combine?
 use constant INTERFACE_PARAMETERS =>
   qw( CURRENT FREEZE METHODS NEXT PREV RESET REWIND STATE _DEPENDS _NAME _ROLES _SELF );
 use constant INTERFACE_PARAMETER_VALUES => map { lc $_ } INTERFACE_PARAMETERS;
@@ -158,7 +159,7 @@ Iterator::Flex::Utils - Internal utilities
 
 =head1 VERSION
 
-version 0.20
+version 0.24
 
 =head1 SUBROUTINES
 

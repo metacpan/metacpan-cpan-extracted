@@ -29,12 +29,12 @@ requires:
   Carp: '0'
   Exporter: '0'
   Module::Runtime: '0'
-  Params::Get: '0'
+  Params::Get: '0.11'
   Text::Capitalize: '0'
   perl: '5.014000'
 resources:
   bugtracker: https://github.com/nigelhorne/Geo-Address-Parser/issues
   homepage: https://metacpan.org/pod/Geo::Address::Parser
   repository: git://github.com/nigelhorne/Geo-Address-Parser.git
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -172,6 +172,8 @@ But in general, you can best use L<Log::Report::Template::translateTo()|Log::Rep
 This method returns a CODE which is able to handle a call for
 translation by Template Toolkit.
 
+=encoding utf-8
+
 =item $obj-E<gt>B<updateContext>(STRING|HASH|ARRAY|PAIRS)
 
 Inherited, see L<Log::Report::Domain/"Translating">
@@ -184,8 +186,8 @@ Extends L<"DETAILS" in Log::Report::Domain|Log::Report::Domain/"DETAILS">.
  
 =head1 SEE ALSO
 
-This module is part of Log-Report-Template distribution version 1.01,
-built on June 02, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report-Template distribution version 1.02,
+built on July 29, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

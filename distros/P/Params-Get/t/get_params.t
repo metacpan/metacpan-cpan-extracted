@@ -2,8 +2,9 @@
 
 use strict;
 use warnings;
-use Test::Most;
+
 use Params::Get qw(get_params);
+use Test::Most;
 
 use Error qw(:try);
 
@@ -134,5 +135,7 @@ is_deeply(get_params('string', 'Hello World'), { 'string' => 'Hello World' });
 is_deeply(get_params('string', \'Hello World'), { 'string' => 'Hello World' });
 
 diag(Data::Dumper->new([get_params('string', \'Hello World')])->Dump()) if($ENV{'TEST_VERBOSE'});
+
+ok(!defined(get_params(undef, undef)));
 
 done_testing();

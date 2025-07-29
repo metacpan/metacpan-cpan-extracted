@@ -2,6 +2,7 @@ Changes
 html/Callbacks/MandatorySubject/index.html/Initial
 html/Callbacks/MandatorySubject/SelfService/Create.html/BeforeCreate
 html/Callbacks/MandatorySubject/Ticket/Create.html/BeforeCreate
+html/Callbacks/MandatorySubject/Helpers/QuickCreate/Initial
 inc/Module/Install.pm
 inc/Module/Install/Base.pm
 inc/Module/Install/Can.pm

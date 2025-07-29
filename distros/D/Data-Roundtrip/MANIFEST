@@ -33,9 +33,9 @@ t/t-data/failing/test.yaml
 t/t-data/succeeding/test.json
 t/t-data/succeeding/test.pl
 t/t-data/succeeding/test.yaml
-xt/benchmarks/01-default-unicode-escaping.b
-xt/benchmarks/02-permanent-no-unicode-escaping.b
-xt/benchmarks/03-permanent-unicode-escaping.b
+xt/benchmarks/01-default-unicode-escaping.t
+xt/benchmarks/02-permanent-no-unicode-escaping.t
+xt/benchmarks/03-permanent-unicode-escaping.t
 xt/boilerplate.t
 xt/deficiencies/01-yaml-quotes-problem.t
 xt/deficiencies/02-yaml-pp-remedy.t

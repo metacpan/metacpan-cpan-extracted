@@ -1,4 +1,8 @@
 Revision history for RT-Extension-MandatorySubject
+0.06    Mon, 28 Jul 2025 16:18:54 +0200
+        Add missing mandatory check on QuickCreate (thanks Brad Embree)
+        This version is compatible with RT up to 6.0.0 at least
+
 0.05    Mon, 12 Dec 2011 14:11:11 +0100
         Upgrade build and install framework for RT4
 

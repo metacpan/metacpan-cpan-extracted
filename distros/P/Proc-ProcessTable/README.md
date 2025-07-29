@@ -2,7 +2,8 @@
 
 [![CircleCI](https://circleci.com/gh/jwbargsten/perl-proc-processtable/tree/master.svg?style=svg)](https://circleci.com/gh/jwbargsten/perl-proc-processtable/tree/master)
 
-Please use github or [rt.cpan.org](https://rt.cpan.org/Public/Dist/Display.html?Name=Proc-ProcessTable) to submit bugs and patches.
+Please use the [github issue tracker](https://github.com/jwbargsten/perl-proc-processtable/issues)
+to submit bugs and patches.
 
 ## MAINTENANCE STATUS
 

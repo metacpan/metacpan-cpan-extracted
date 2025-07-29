@@ -47,7 +47,7 @@ resources:
   bugtracker: https://github.com/rjbs/Log-Dispatchouli/issues
   homepage: https://github.com/rjbs/Log-Dispatchouli
   repository: https://github.com/rjbs/Log-Dispatchouli.git
-version: '3.010'
+version: '3.011'
 x_Dist_Zilla:
   perl:
     version: '5.040001'
@@ -350,7 +350,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '3.010'
+          tag: '3.011'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

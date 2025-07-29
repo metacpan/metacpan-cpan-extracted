@@ -394,7 +394,7 @@ sub threading {
 	if ( !defined( $self->{opts}{E} ) ) {
 		if ( !defined( $self->{config}{suricata}{auto_threading}{exclude} ) && $proc_count > 16 ) {
 			$exclude = 3;
-		} elsif (defined( $self->{config}{suricata}{auto_threading}{exclude} )) {
+		} elsif ( defined( $self->{config}{suricata}{auto_threading}{exclude} ) ) {
 			$exclude = $self->{config}{suricata}{auto_threading}{exclude};
 			if ( ref($exclude) ne '' && ref($exclude) ne 'SCALAR' ) {
 				die( '.suricata.auto_threading.execlude is of ref type "' . ref($exclude) . '" and not a scalar' );
@@ -444,31 +444,25 @@ sub threading {
 
 	my $threading = {
 		'set-cpu-affinity' => 'yes',
-		'cpu-affinity'     => [
-			{
-				'management-cpu-set' => {
-					mode => 'balanced',
-					cpu  => [],
-				}
+		'cpu-affinity'     => {
+			'management-cpu-set' => {
+				mode => 'balanced',
+				cpu  => [],
 			},
-			{
-				'receive-cpu-set' => {
-					mode => 'balanced',
-					cpu  => [],
-				}
+			'receive-cpu-set' => {
+				mode => 'balanced',
+				cpu  => [],
 			},
-			{
-				'worker-cpu-set' => {
-					mode => 'exclusive',
-					cpu  => [],
-				}
-			},
-		],
+			'worker-cpu-set' => {
+				mode => 'exclusive',
+				cpu  => [],
+			}
+		},
 	};
 
-	push( @{ $threading->{'cpu-affinity'}[0]{'management-cpu-set'}{cpu} }, @non_workers );
-	push( @{ $threading->{'cpu-affinity'}[1]{'receive-cpu-set'}{cpu} },    @non_workers );
-	push( @{ $threading->{'cpu-affinity'}[2]{'worker-cpu-set'}{cpu} },     @workers );
+	push( @{ $threading->{'cpu-affinity'}{'management-cpu-set'}{cpu} }, @non_workers );
+	push( @{ $threading->{'cpu-affinity'}{'receive-cpu-set'}{cpu} },    @non_workers );
+	push( @{ $threading->{'cpu-affinity'}{'worker-cpu-set'}{cpu} },     @workers );
 
 	return $threading;
 } ## end sub threading

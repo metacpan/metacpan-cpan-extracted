@@ -36,7 +36,8 @@ my %WriteMakefileArgs = (
         'Test::More' => '0',
 	'Test2::Plugin::UTF8' => '0', # rids of the Wide Character in TAP message!
 	'File::Spec' => '0',
-	'File::Temp' => '0',
+	'File::Basename' => '0',
+	'Test::TempDir::Tiny' => '0',
 	# this has problems with YAML_PARSE_ERR_INCONSISTENT_INDENTATION
 	# see https://github.com/ingydotnet/yaml-pm/issues/224
 	#'YAML' => '0',
@@ -44,7 +45,6 @@ my %WriteMakefileArgs = (
 	#'YAML::XS' => '0',
 	# this looks like the best choice right now
 	'YAML::PP' => '0',
-
         'Benchmark' => '0',
 	# WARNING (30.06.2023): CPAN tests fail when
 	# Data::Random is not installed in their system.
@@ -52,8 +52,13 @@ my %WriteMakefileArgs = (
 	# I guess Data::Random::Structure must declare this dependency.
 	'Data::Random::Structure' => '0',
 	'Data::Random::Structure::UTF8' => '0.06',
+	'Data::Dumper' => '0',
+	'Data::Dump' => '0',
+	'YAML' => '0',
+	'YAML::XS' => '0',
     },
     PREREQ_PM => {
+	'Exporter' => '0',
 	'Encode' => '3.0',
 	'JSON' => '4.0',
 	'Unicode::Escape' => '0.0.2',
@@ -61,12 +66,13 @@ my %WriteMakefileArgs = (
 	'Data::Dumper' => '0',
 	'Data::Dump' => '0',
 	'Data::Dump::Filtered' => '0',
+	'Getopt::Long' => '0',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Data-Roundtrip-*' },
     postamble => {
         DEFICIENCIES_FILES => 'xt/deficiencies/*.t',
-        BENCHMARK_FILES => 'xt/benchmarks/*.b',
+        BENCHMARK_FILES => 'xt/benchmarks/*.t',
     },
 	# Thanks to marto @ Perlmonks.org
 	# see https://perlmonks.org/?displaytype=displaycode;node_id=359256;part=1;abspart=1

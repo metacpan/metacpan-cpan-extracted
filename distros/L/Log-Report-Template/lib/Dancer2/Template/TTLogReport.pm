@@ -1,7 +1,7 @@
 # Copyrights 2017-2025 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.03.
+# Pod stripped from pm file by OODoc 2.02.
 # This code is part of distribution Log-Report-Template. Meta-POD processed
 # with OODoc into POD and HTML manual-pages.  See README.md
 # Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
@@ -11,9 +11,9 @@
 # Follow issue https://github.com/PerlDancer/Dancer2/issues/1722 to see whether
 # this module can be removd.
 
-package Dancer2::Template::TTLogReport;{
-our $VERSION = '1.01';
-}
+package Dancer2::Template::TTLogReport;
+use vars '$VERSION';
+$VERSION = '1.02';
 
 
 #XXX rework of Dancer2::Template::TemplateToolkit 1.1.2

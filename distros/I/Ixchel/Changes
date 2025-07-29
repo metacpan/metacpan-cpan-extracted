@@ -1,5 +1,8 @@
 Revision history for Ixchel
 
+0.13.0 2025-07-28/16:00
+		 - Update suricata_include for 8.0.0 for in regards to changes to threading
+
 0.12.2 2024-04-18/13:30
 		 - No config found and no --config means a empty hash is used.
 		 - Now --noConfig is respect.

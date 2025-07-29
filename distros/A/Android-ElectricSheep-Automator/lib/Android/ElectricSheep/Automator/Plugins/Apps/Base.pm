@@ -1,4 +1,4 @@
-package Android::ElectricSheep::Automator::Plugins::Base;
+package Android::ElectricSheep::Automator::Plugins::Apps::Base;
 
 # see also https://www.reddit.com/r/privacytoolsIO/comments/fit0tr/taking_almost_full_control_of_your_unrooted/
 # swipe adb shell input touchscreen swipe 300 1200 100 1200 100
@@ -7,7 +7,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use Mojo::Log;
 use Config::JSON::Enhanced;
@@ -40,7 +40,7 @@ my $_DEFAULT_CONFIG = <<'EODC';
 		}
 		</* config for our plugins (each can go to separate file also) */>
 	},
-	"Android::ElectricSheep::Automator::Plugins::Viber" : {
+	"Android::ElectricSheep::Automator::Plugins::Apps::Viber" : {
 	}
 }
 EODC
@@ -78,6 +78,54 @@ sub new {
 	if( $verbosity > 0 ){ $log->info("${whoami} (via $parent), line ".__LINE__." : done, success (verbosity is set to ".$self->verbosity." and cleanup to ".$self->cleanup.").") }
 
 	return $self;
+}
+
+sub is_app_running {
+	my ($self, $params) = @_;
+	my $parent = ( caller(1) )[3] || "N/A";
+	my $whoami = ( caller(0) )[3];
+	my $log = $self->log();
+	my $verbosity = $self->verbosity();
+
+	my $ret = $self->mother->is_app_running({'appname' => $self->appname});
+	if( ! defined $ret ){ $log->error("${whoami} (via $parent), line ".__LINE__." : error, call to ".'is_app_running()'." has failed."); return undef }
+	if( $verbosity > 0 ){ $log->info("${whoami} (via $parent), line ".__LINE__." : app '".$self->appname."' is ".($ret>0?"":"not")." running ...") }
+	return $ret;
+}
+sub appname { return $_[0]->{'_private'}->{'appname'} }
+sub open_app {
+	my ($self, $params) = @_;
+	my $parent = ( caller(1) )[3] || "N/A";
+	my $whoami = ( caller(0) )[3];
+	my $log = $self->log();
+	my $verbosity = $self->verbosity();
+
+	my $packagename = $self->appname;
+	my $ret = $self->mother->open_app({'package' => $packagename});
+	if( ! defined $ret ){
+		my $instapps = $self->mother->find_installed_apps();
+		if( defined $instapps ){
+			$log->error("All installed apps on current device:\n".join("\n  ".$_, sort keys %$instapps)."\n\n");
+		}
+		$log->error("${whoami} (via $parent), line ".__LINE__." : failed to open app '$packagename'.");
+		return undef
+	}
+	if( $verbosity > 0 ){ $log->info("${whoami} (via $parent), line ".__LINE__." : app '$packagename' is now opening ...") }
+	return $ret;
+}
+
+sub close_app {
+	my ($self, $params) = @_;
+	my $parent = ( caller(1) )[3] || "N/A";
+	my $whoami = ( caller(0) )[3];
+	my $log = $self->log();
+	my $verbosity = $self->verbosity();
+
+	my $packagename = $self->appname;
+	my $ret = $self->mother->close_app({'package' => $packagename});
+	if( ! defined $ret ){ $log->error("${whoami} (via $parent), line ".__LINE__." : failed to close app '$packagename'."); return undef }
+	if( $verbosity > 0 ){ $log->info("${whoami} (via $parent), line ".__LINE__." : app '$packagename' is now closing ...") }
+	return $ret;
 }
 
 sub adb { return $_[0]->{'_private'}->{'Android::ADB'} }
@@ -149,7 +197,7 @@ sub confighash {
 
 	# the confighash must contain a mother section: 'Android::ElectricSheep::Automator'
 	# and a child section,
-	# e.g. 'Android::ElectricSheep::Automator::Plugins::Viber'
+	# e.g. 'Android::ElectricSheep::Automator::Plugins::Apps::Viber'
 	# check for both here:
 	for ('Android::ElectricSheep::Automator', $self->child_class){
 		if( ! exists($m->{$_}) || ! defined($m->{$_}) || (ref($m->{$_})ne'HASH') ){ print STDERR perl2dump($m)."${whoami} (via $parent), line ".__LINE__." : error, configuration (see above) does not have key '$_' or its value is not a HASHref.\n"; return undef }
@@ -185,7 +233,7 @@ sub init {
 
 	if( exists($params->{'child-class'}) && defined($params->{'child-class'}) ){
 		$self->{'_private'}->{'child-class'} = $params->{'child-class'};
-	} else {  print STDERR "${whoami} (via $parent), line ".__LINE__." : error, input parameter 'child-class' was not specified, this is the Plugin class calling us, e.g. 'Android::ElectricSheep::Automator::Plugins::Viber'. At the moment this is not extracted from caller but needs to be specified explicitly by the caller (e.g. the Plugin class).\n"; return 1 }
+	} else {  print STDERR "${whoami} (via $parent), line ".__LINE__." : error, input parameter 'child-class' was not specified, this is the Plugin class calling us, e.g. 'Android::ElectricSheep::Automator::Plugins::Apps::Viber'. At the moment this is not extracted from caller but needs to be specified explicitly by the caller (e.g. the Plugin class).\n"; return 1 }
 
 	return 0 # success
 }
@@ -301,11 +349,11 @@ sub init_module_specific {
 
 =head1 NAME
 
-Android::ElectricSheep::Automator::Plugins::Base - The great new Android::ElectricSheep::Automator::Plugins::Base!
+Android::ElectricSheep::Automator::Plugins::Apps::Base - base class for our plugins
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 
 =head1 SYNOPSIS
@@ -313,13 +361,13 @@ Version 0.04
 This is the parent class of all L<Android::ElectricSheep::Automator>
 plugins. You do not need to override anything except perhaps the
 constructor if you are going to be needing extra input parameters
-to it. There is already one plugin provided L<Android::ElectricSheep::Automator::Plugins::Viber>
+to it. There is already one plugin provided L<Android::ElectricSheep::Automator::Plugins::Apps::Viber>
 which can serve as an example for creating new plugins.
 It is as simple as this:
 
-    package Android::ElectricSheep::Automator::Plugins::MyNewPlugin;
+    package Android::ElectricSheep::Automator::Plugins::Apps::MyNewPlugin;
 
-    use parent 'Android::ElectricSheep::Automator::Plugins::Base';
+    use parent 'Android::ElectricSheep::Automator::Plugins::Apps::Base';
 
     sub new {
             my ($class, $params) = @_;  
@@ -345,14 +393,15 @@ It is as simple as this:
 
 Then use the plugin as:
 
-   use Android::ElectricSheep::Automator::Plugins::MyNewPlugin;
-   my $vib = Android::ElectricSheep::Automator::Plugins::MyNewPlugin->new({
+   use Android::ElectricSheep::Automator::Plugins::Apps::MyNewPlugin;
+   my $vib = Android::ElectricSheep::Automator::Plugins::Apps::MyNewPlugin->new({
      configfile=>'config/plugins/viber.conf',
      'device-is-connected' => 1
    });
-   $vib->open_viber_app();
+   $vib->open_app();
+   $vib->is_app_running() or ...;
    $vib->send_message({recipient=>'My Notes', message=>'hello%sMonkees'});
-   $vib->close_viber_app();
+   $vib->close_app();
 
 =head1 AUTHOR
 
@@ -371,7 +420,7 @@ automatically be notified of progress on your bug as I make changes.
 
 You can find documentation for this module with the perldoc command.
 
-    perldoc Android::ElectricSheep::Automator::Plugins::Base
+    perldoc Android::ElectricSheep::Automator::Plugins::Apps::Base
 
 
 You can also look for information at:
@@ -407,4 +456,4 @@ This is free software, licensed under:
 
 =cut
 
-1; # End of Android::ElectricSheep::Automator::Plugins::Base
+1; # End of Android::ElectricSheep::Automator::Plugins::Apps::Base

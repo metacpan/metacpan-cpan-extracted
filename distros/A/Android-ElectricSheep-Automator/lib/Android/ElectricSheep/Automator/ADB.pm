@@ -4,7 +4,7 @@ use 5.014000;
 use strict;
 use warnings;
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 use Android::ElectricSheep::Automator::ADB::Device;
 use Carp;
@@ -70,26 +70,29 @@ sub run {
 	};
 	# WARNING: adb on error sometimes returns non-zero exit code
 	# but sometimes it exits normally with zero but there is
-	# an error which you can find in the STDOUT/STDERR but it is
-	# not a consistent message.
+	# an error which you can find in the STDOUT/STDERR.
+	# Unfortunately this is not a consistent message.
+	# For example:
 	#   adb shell xyz
 	# will set $? to 127
-	# but
-	# e.g. adb shell input keycombination 1 2
+	# but, e.g. this:
+	#   adb shell input keycombination 1 2
 	# will exit with $?=0 and print some error message!
 	# Searching for 'Error:' in STDERR is ok?
 	# TODO: this needs to be dealt with here.
-	if( (! $res) || $@ || ($err=~/\bError\: /) ){
+	my $exit_code = $? >> 8;
+	#if( (! $res) || $@ || ($err=~/\bError\: /) ){
+	if( ($exit_code > 0) || $@ || ($err=~/\bError\: /) ){
 		carp "STDERR:\n${err}\nOTHER INFO: $@\n\n"
 			.(($@=~/IPC::Run: .*timed out/)
 			  ?"\nWARNING: it looks like a timeout has occured.\n\n"
 			  :""
 			 )
-			.__PACKAGE__.'::run()'." : error, failed to execute command (see above for stderr): ".join(' ', @cmd)
+			.__PACKAGE__.'::run()'." : error, failed to execute command (see above for stderr), exit code was '${exit_code}': ".join(' ', @cmd)
 		; # end carp
-		return [1, $out, $err];
+		return [1, $out, $err, $exit_code];
 	}
-	return [0, $out, $err];
+	return [0, $out, $err, $exit_code];
 }
 
 sub start_server { shift->run('start-server') }

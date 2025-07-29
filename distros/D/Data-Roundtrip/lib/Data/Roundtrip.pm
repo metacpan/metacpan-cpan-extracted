@@ -4,7 +4,7 @@ use 5.008;
 use strict;
 use warnings;
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 # import params is just one 'no-unicode-escape-permanently'
 # if set, then unicode escaping will not happen at
@@ -76,7 +76,7 @@ BEGIN {
 	# these have now (v0.28) been removed from @dump: dump2perl dump2json dump2yaml dump2dump
 	# they need to be explicitly imported *individually*
 	# because of the danger that the eval() in dump2perl()
-	# poses. They can not imported with any EXPORT_TAG
+	# poses. They can not be imported with any EXPORT_TAG
 	my @explicit = qw{dump2perl dump2json dump2yaml dump2dump};
 	my @all = (@io, @json, @yaml, @dump);
 	@EXPORT_OK = (@all, @explicit);
@@ -139,33 +139,33 @@ sub	perl2json {
 	my $escape_unicode = exists($params->{'escape-unicode'}) && defined($params->{'escape-unicode'})
 		? $params->{'escape-unicode'} : 0
 	;
+	my $convert_blessed = exists($params->{'convert_blessed'}) && defined($params->{'convert_blessed'})
+		? $params->{'convert_blessed'} : 0
+	;
 	my $json_string;
 	# below we check $json_string after each time it is set because of eval{} and
 	# don't want to loose $@
+	my $encoder = JSON->new;
+	$encoder = $encoder->pretty if $pretty_printing;
+	# convert_blessed will allow when finding objects to
+	# ask them if they have a TO_JSON method which returns
+	# the object as a perl data structure which is then converted
+	# to JSON.
+	# for example if your object stores the important data you
+	# want to print in $self->{'data'}
+	# then sub TO_JSON { shift->{'data'} }
+	# see https://perldoc.perl.org/JSON::PP#2.-convert_blessed-is-enabled-and-the-object-has-a-TO_JSON-method.
+	$encoder = $encoder->convert_blessed if $convert_blessed;
 	if( $escape_unicode ){
-		if( $pretty_printing ){
-			$json_string = eval { JSON->new->utf8(1)->pretty->encode($pv) };
-			if( ! defined($json_string) ){ print STDERR "error, call to ".'JSON->new->utf8(1)->pretty->encode()'." has failed".((defined($@)&&($@!~/^\s*$/))?" with this exception:\n".$@:".")."\n"; return undef }
-		} else {
-			$json_string = eval { JSON->new->utf8(1)->encode($pv) };
-			if( ! defined($json_string) ){ print STDERR "error, call to ".'JSON->new->utf8(1)->encode()'." has failed".((defined($@)&&($@!~/^\s*$/))?" with this exception:\n".$@:".")."\n"; return undef }
-		}
+		$json_string = eval { $encoder->utf8(1)->encode($pv) };
+		if( ! defined($json_string) ){ print STDERR "error, call to ".'JSON->new->utf8(1)->encode()'." has failed".((defined($@)&&($@!~/^\s*$/))?" with this exception:\n".$@:".")."\n"; return undef }
 		if ( _has_utf8($json_string) ){
 			$json_string = Unicode::Escape::escape($json_string, 'utf8');
 			if( ! defined($json_string) ){ print STDERR "error, call to ".'Unicode::Escape::escape()'." has failed.\n"; return undef }
 		}
 	} else {
-		if( $pretty_printing ){
-			$json_string = eval { JSON->new->utf8(0)->pretty->encode($pv) };
-			if( ! defined($json_string) ){ print STDERR "error, call to ".'JSON->new->utf8(0)->pretty->encode()'." has failed".((defined($@)&&($@!~/^\s*$/))?" with this exception:\n".$@:".")."\n"; return undef }
-		} else {
-# cpan testers report:
-# https://www.cpantesters.org/cpan/report/1fba88ee-6bfa-1014-8b5d-8080f52666f1
-# cannot encode reference to scalar at C:\strawberry163\cpan\build\Data-Roundtrip-0.11-0\blib\lib/Data/Roundtrip.pm line 138.
-# following was line 138:
-			$json_string = eval { JSON->new->utf8(0)->encode($pv) };
-			if( ! defined($json_string) ){ print STDERR "error, call to ".'JSON->new->utf8(0)->encode()'." has failed".((defined($@)&&($@!~/^\s*$/))?" with this exception:\n".$@:".")."\n"; return undef }
-		}
+		$json_string = eval { $encoder->utf8(0)->encode($pv) };
+		if( ! defined($json_string) ){ print STDERR "error, call to ".'JSON->new->utf8(0)->pretty->encode()'." has failed".((defined($@)&&($@!~/^\s*$/))?" with this exception:\n".$@:".")."\n"; return undef }
 	}
 	# succeeded here
 	return $json_string
@@ -655,7 +655,7 @@ Data::Roundtrip - convert between Perl data structures, YAML and JSON with unico
 
 =head1 VERSION
 
-Version 0.29
+Version 0.30
 
 =head1 SYNOPSIS
 
@@ -894,7 +894,24 @@ a nested data structure, but not an object), it will return
 the equivalent JSON string. In C<$optional_paramshashref>
 one can specify whether to escape unicode with
 C<< 'escape-unicode' => 1 >>
-and/or prettify the returned result with C<< 'pretty' => 1 >>.
+and/or prettify the returned result with C<< 'pretty' => 1 >>
+and/or allow conversion of blessed objects with C<< 'convert_blessed' => 1 >>.
+
+The latter is useful when the input (Perl) data structure
+contains Perl objects (blessed refs!). But in addition to
+setting it, each of the Perl objects (their class) must
+implement a C<TO_JSON()> method which will simply convert
+the object into a Perl data structure. For example, if
+your object stores the important data in C<< $self->data >>
+as a hash, then use this to return it
+
+    sub TO_JSON { shift->data }
+
+the converter will replace what is returned with the blessed
+object which does not know what to do with it.
+See L<https://perldoc.perl.org/JSON::PP#2.-convert_blessed-is-enabled-and-the-object-has-a-TO_JSON-method.>
+for more information.
+
 The output can be fed back to L</json2perl>
 for getting the Perl variable back.
 

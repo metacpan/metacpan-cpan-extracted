@@ -1,18 +1,20 @@
 use ExtUtils::MakeMaker;
 
-use 5.010;
+use 5.016;
+use warnings;
+use strict;
 
-my $version = '1.01';
+my $version = '1.02';
 
-my %prereq  =
-  ( Test::More               => 0.86
-  , Scalar::Util             => 0
-  , Log::Report              => 1.40
-  , Log::Report::Lexicon     => 1.13
-  , Template                 => 2.26
-  , String::Print            => 0.91
-  , File::Find               => 0
-  );
+my %prereq  = (
+	'Test::More'              => 0.86,
+	'Scalar::Util'            => 0,
+	'Log::Report'             => 1.40,
+	'Log::Report::Lexicon'    => 1.13,
+	'Template'                => 2.26,
+	'String::Print'           => 0.91,
+	'File::Find'              => 0,
+);
 
 WriteMakefile
   ( NAME      => 'Log::Report::Template'
