@@ -70,6 +70,7 @@ my %WriteMakefileArgs = (
         'Storable::Improved'    => 'v0.1.3',
         'Sub::Util'             => '1.54',
         'Tie::Hash'             => '1.05',
+        'Time::HiRes'           => 0,
         'URI::Escape'           => '5.09',
         'URI::file'             => '5.09',
         'Wanted'                => 'v0.1.0',

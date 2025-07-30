@@ -134,7 +134,7 @@ BEGIN
             return( $self );
         };
     }
-    
+
     unless( defined( &DateTime::TimeZone::OffsetOnly::FREEZE ) )
     {
         *DateTime::TimeZone::OffsetOnly::FREEZE = sub
@@ -219,7 +219,7 @@ sub new
         $dt = shift( @_ );
     }
     my $opts = $this->_get_args_as_hash( @_ );
-    
+
     if( !defined( $dt ) )
     {
         # try-catch
@@ -363,7 +363,7 @@ sub op
 
             if( $@ )
             {
-                warn( "Your system is missing key timezone components. ${class} is reverting to UTC instead of local time zone.\n" );
+                warn( "Your system is missing key timezone components. ${class} is reverting to UTC instead of local time zone." );
                 $dt2 = DateTime->from_epoch( epoch => $other, time_zone => 'UTC' );
             }
         }
@@ -377,7 +377,7 @@ sub op
             };
             if( $@ )
             {
-                warn( "Error trying to set a DateTime object using ", ( $has_local_tz ? 'local' : 'UTC' ), " time zone\n" );
+                warn( "Error trying to set a DateTime object using ", ( $has_local_tz ? 'local' : 'UTC' ), " time zone" );
                 $dt2 = DateTime->from_epoch( epoch => $other, time_zone => 'UTC' );
             }
         }
@@ -393,7 +393,7 @@ sub op
         {
             $hash->{ $_ } = int( $hash->{ $_ } );
         }
-        
+
         if( $re->{tz_offset1} )
         {
             $offset = 3600 * $re->{tz_offset1};
@@ -401,7 +401,7 @@ sub op
             $offset *= -1 if( $re->{tz_sign} && $re->{tz_sign} ne '-' );
             $re->{tz_offset} = $re->{tz_sign} . $re->{tz_offset1} . $re->{tz_offset2};
         }
-        
+
         # try-catch
         local $@;
         eval
@@ -475,7 +475,7 @@ sub op_minus_plus
             return( $self->_make_my_own( $swap ? ( $other + $dt1 ) : ( $dt1 + $other ) ) );
         }
     }
-    
+
     my $v;
     $v = "$other" if( !ref( $other ) || ( ref( $other ) && overload::Method( $other => '""' ) ) );
     die( "\$other (", overload::StrVal( $other // '' ), ") is not a number, a DateTime, or a DateTime::Duration object!\n" ) if( !defined( $v ) || $v !~ /^(?:$RE{num}{real}|$RE{num}{int})$/ );
@@ -509,7 +509,7 @@ sub op_minus_plus
 
                 $has_local_tz = $@ ? 0 : 1;
                 $repo->set( $has_local_tz );
-    
+
                 if( $@ )
                 {
                     $clone->set_time_zone( 'UTC' );
@@ -665,7 +665,16 @@ sub TO_JSON
 
 # NOTE: DESTROY
 # Avoid getting caught by AUTOLOAD
-DESTROY {};
+DESTROY
+{
+    # <https://perldoc.perl.org/perlobj#Destructors>
+    CORE::local( $., $@, $!, $^E, $? );
+    CORE::return if( ${^GLOBAL_PHASE} eq 'DESTRUCT' );
+    my $self = CORE::shift( @_ );
+    CORE::return if( !CORE::defined( $self ) );
+    undef( $self->{dt} ) if( defined( $self->{dt} ) );
+    return( $self );
+};
 
 # NOTE: AUTOLOAD
 AUTOLOAD
@@ -861,7 +870,7 @@ sub __compare_overload
             return( $this + 0 );
         }
     };
- 
+
 #     return( DateTime->compare(
 #         $dt->clone->add_duration( $d1 ),
 #         $dt->clone->add_duration( $d2 )
@@ -905,7 +914,7 @@ sub __set_get_unit : lvalue
     my $unit = shift( @_ );
     my $dur  = $self->{interval};
     my $coderef = $dur->can( $unit );
-    
+
     my $update_value = sub
     {
         my $v = shift( @_ );
@@ -965,7 +974,7 @@ sub __set_get_unit : lvalue
             $self->_normalize_nanoseconds;
         }
     };
-    
+
     if( want( qw( LVALUE ASSIGN ) ) )
     {
         my( $v ) = want( 'ASSIGN' );
@@ -1055,10 +1064,19 @@ sub _make_my_own
     }
 }
 
+# NOTE: DESTROY
 DESTROY
 {
+    # <https://perldoc.perl.org/perlobj#Destructors>
+    CORE::local( $., $@, $!, $^E, $? );
+    my $self = CORE::shift( @_ );
+    CORE::return if( ${^GLOBAL_PHASE} eq 'DESTRUCT' );
+    CORE::return if( !CORE::defined( $self ) );
+    undef( $self->{interval} ) if( defined( $self->{interval} ) );
+    return( $self );
 };
 
+# NOTE: AUTOLOAD
 AUTOLOAD
 {
     my( $method ) = our $AUTOLOAD =~ /([^:]+)$/;

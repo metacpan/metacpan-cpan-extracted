@@ -3,8 +3,9 @@
 use Test2::V0;
 # use Test2::Tools::Basic;
 
-if (!$ENV{AUTHOR_TESTING}) {
-    skip_all( "Set the environment variable AUTHOR_TESTING to enable this test." );
+if( !exists( $ENV{AUTHOR_TESTING} ) || ( exists( $ENV{AUTHOR_TESTING} ) && int( $ENV{AUTHOR_TESTING} ) < 2 ) ) {
+    plan skip_all => 
+      "Set the environment variable AUTHOR_TESTING to enable this test.";
 }
 elsif (!eval { require Module::Signature; 1 }) {
     skip_all( "Next time around, consider installing Module::Signature, ".
@@ -17,7 +18,7 @@ elsif ( !-e 'SIGNATURE' )
 elsif ( -s 'SIGNATURE' == 0 ) {
     skip_all( "SIGNATURE file empty" );
 }
-elsif (!eval { require Socket; Socket::inet_aton('pool.sks-keyservers.net') }) {
+elsif (!eval { require Socket; Socket::inet_aton('keyserver.ubuntu.com') }) {
     skip_all( "Cannot connect to the keyserver to check module signature" );
 }
 else {

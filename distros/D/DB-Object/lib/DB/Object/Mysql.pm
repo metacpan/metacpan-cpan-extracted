@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Mysql.pm
-## Version v1.3.0
+## Version v1.4.0
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2025/03/09
+## Modified 2025/07/30
 ## All rights reserved
 ## 
 ## 
@@ -20,13 +20,12 @@ BEGIN
     use warnings;
     use parent qw( DB::Object );
     use vars qw(
-        $VERSION $CACHE_QUERIES $CACHE_SIZE $CONNECT_VIA $DB_ERRSTR @DBH 
+        $VERSION $CACHE_SIZE $CONNECT_VIA 
         $DEBUG $ERROR $MOD_PERL $USE_BIND $USE_CACHE $PLACEHOLDER_REGEXP
-        $DATATYPES_DICT $TABLE_CACHE
+        $DATATYPES_DICT
     );
     eval{ require DBD::mysql; };
     die( $@ ) if( $@ );
-    our $TABLE_CACHE = {};
     # <https://dev.mysql.com/doc/refman/8.0/en/data-types.html>
     # the 'constant' property in the dictionary hash is added in structure()
     # See also: SELECT DISTINCT(data_type) FROM information_schema.columns ORDER by data_type
@@ -262,20 +261,16 @@ BEGIN
     };
     # DBI->trace(5);
     our $PLACEHOLDER_REGEXP = qr/\?/;
-    our $VERSION = 'v1.3.0';
+    our $VERSION = 'v1.4.0';
 };
 
 use strict;
 use warnings;
-our $DB_ERRSTR     = '';
 our $DEBUG         = 0;
-our $CACHE_QUERIES = [];
 our $CACHE_SIZE    = 10;
-our $CACHE_TABLE   = {};
 our $USE_BIND      = 0;
 our $USE_CACHE     = 0;
 our $MOD_PERL      = 0;
-our @DBH           = ();
 our $CONNECT_VIA;
 if( $INC{ 'Apache/DBI.pm' } && 
     substr( $ENV{GATEWAY_INTERFACE}|| '', 0, 8 ) eq 'CGI-Perl' )
@@ -332,7 +327,7 @@ sub init
 {
     my $self = shift( @_ );
     $self->SUPER::init( @_ );
-    $self->{ 'driver' } = 'mysql';
+    $self->{driver} = 'mysql';
     return( $self );
 }
 # End of generic routines 
@@ -815,22 +810,26 @@ sub _placeholder_regexp { return( $PLACEHOLDER_REGEXP ) }
 # NOTE: DESTROY
 DESTROY
 {
-    my $self  = shift( @_ );
+    # <https://perldoc.perl.org/perlobj#Destructors>
+    CORE::local( $., $@, $!, $^E, $? );
+    CORE::return if( ${^GLOBAL_PHASE} eq 'DESTRUCT' );
+    my $self = CORE::shift( @_ );
+    CORE::return if( !CORE::defined( $self ) );
     my $class = ref( $self ) || $self;
     if( $self->{sth} )
     {
-        print( STDERR "DESTROY(): Terminating sth '$self' for query:\n$self->{query}\n" ) if( $DEBUG );
+        print( STDERR "DESTROY(): Terminating sth '$self' for query:\n$self->{query}\n" ) if( $DEBUG || $self->{debug} );
         $self->{sth}->finish();
     }
     elsif( $self->{dbh} && $class eq 'DB::Object' )
     {
         local( $SIG{__WARN__} ) = sub { };
         # $self->{ 'dbh' }->disconnect();
-        if( $DEBUG )
+        if( $DEBUG || $self->{debug} )
         {
-            my( $pack, $file, $line, $sub ) = ( caller( 0 ) )[ 0, 1, 2, 3 ];
-            my( $pack2, $file2, $line2, $sub2 ) = ( caller( 1 ) ) [ 0, 1, 2, 3 ];
-            print( STDERR "DESTROY database handle ($self) [$self->{ 'query' }]\ncalled within sub '$sub' ($sub2) from package '$pack' ($pack2) in file '$file' ($file2) at line '$line' ($line2).\n" );
+            my( $pack, $file, $line, $sub ) = ( caller(0) )[0, 1, 2, 3];
+            my( $pack2, $file2, $line2, $sub2 ) = ( caller(1) ) [0, 1, 2, 3];
+            print( STDERR "DESTROY database handle ($self) [$self->{query}]\ncalled within sub '$sub' ($sub2) from package '$pack' ($pack2) in file '$file' ($file2) at line '$line' ($line2).\n" );
         }
         $self->disconnect();
     }
@@ -843,14 +842,6 @@ DESTROY
         }
     }
 }
-
-END
-{
-    # foreach my $dbh ( @DBH )
-    # {
-    #     $dbh->disconnect();
-    # }
-};
 
 1;
 # NOTE: POD
@@ -943,7 +934,7 @@ DB::Object::Mysql - Mysql Database Object
     
 =head1 VERSION
 
-    v1.3.0
+    v1.4.0
 
 =head1 DESCRIPTION
 

@@ -41,7 +41,7 @@ local $SIG{QUIT} = \&_cleanup;
 local $SIG{SEGV} = \&_cleanup;
 local $SIG{TERM} = \&_cleanup;
 
-my $elem = DB::Object::Query::Element->new;
+my $elem = DB::Object::Query::Element->new( debug => $DEBUG );
 isa_ok( $elem, 'DB::Object::Query::Element' );
 
 # egrep -E '^sub ' ./lib/DB/Object/Query/Element.pm | perl -lnE 'my $m = [split(/\s+/, $_)]->[1]; say "can_ok( \$elem, ''$m'' );"'
@@ -63,10 +63,10 @@ SKIP:
     {
         my $con_params =
         {
-        db		=> ( $ENV{DB_DATABASE} || 'postgres' ),
-        host    => ( $ENV{DB_HOST} || 'localhost' ),
-        driver	=> 'Pg',
-        debug   => $DEBUG,
+            db		=> ( $ENV{DB_DATABASE} || 'postgres' ),
+            host    => ( $ENV{DB_HOST} || 'localhost' ),
+            driver	=> 'Pg',
+            debug   => $DEBUG,
         };
         $con_params->{conf_file} = $ENV{DB_CONF} if( exists( $ENV{DB_CONF} ) && $ENV{DB_CONF} );
         if( $^O eq 'MSWin32' )

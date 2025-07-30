@@ -161,7 +161,7 @@ sub new_from_header
     {
         defined( $_ ) ? do{ $parts[$i] .= $_ } : do{ $i++ };
     }
-    
+
     my $obj;
     if( $opts->{params_only} )
     {
@@ -198,7 +198,7 @@ sub new_from_header
             warn( ref( $self ), "::new_from_header(): Found undefined attribute while splitting fragment '", ( $frag // '' ), "' in header value '", ( $s // '' ), "'.\n" );
             next;
         }
-        
+
         $value =~ s/^\"|\"$//g if( defined( $value ) );
         # Check character string and length. Should not be more than 255 characters
         # https://datatracker.ietf.org/doc/html/rfc1341

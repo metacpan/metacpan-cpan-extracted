@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Promise - ~/lib/Promise/Me.pm
-## Version v0.5.0
+## Version v0.6.0
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/28
-## Modified 2024/09/05
+## Modified 2025/07/24
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -18,9 +18,12 @@ BEGIN
     use warnings;
     use warnings::register;
     use parent qw( Module::Generic );
-    use vars qw( $KIDS $DEBUG $FILTER_RE_FUNC_ARGS $FILTER_RE_SHARED_ATTRIBUTE 
-                 $RESULT_MEMORY_SIZE $SHARED_MEMORY_SIZE $SHARED $VERSION $SHARE_MEDIUM 
-                 $SHARE_FALLBACK $SHARE_AUTO_DESTROY $OBJECTS_REPO $EXCEPTION_CLASS $SERIALISER );
+    use vars qw(
+        $KIDS $DEBUG $FILTER_RE_FUNC_ARGS $FILTER_RE_SHARED_ATTRIBUTE 
+        $RESULT_MEMORY_SIZE $SHARED_MEMORY_SIZE $SHARED $VERSION $SHARE_MEDIUM 
+        $SHARE_FALLBACK $SHARE_AUTO_DESTROY $OBJECTS_REPO $EXCEPTION_CLASS $SERIALISER
+        $USE_THREADS_SHARED
+    );
     use curry;
     use Clone;
     use Errno;
@@ -28,11 +31,10 @@ BEGIN
     use Module::Generic::File::Cache v0.2.0;
     use Module::Generic::File::Mmap v0.1.1;
     use Module::Generic::SharedMemXS v0.1.0 qw( :all );
-    use Nice::Try v1.3.1;
     use POSIX qw( WNOHANG WIFEXITED WEXITSTATUS WIFSIGNALED );
     use PPI;
     use Scalar::Util;
-    use Want;
+    use Wanted;
     our $KIDS = {};
     our @EXPORT = qw( async await share unshare lock unlock );
     our @EXPORT_OK = qw( share unshare lock unlock );
@@ -70,7 +72,96 @@ BEGIN
     # our $val : shared = 'John';
     # our( $plop, @truc ) : shared = ( '2', qw( Pierre Paul ) );
     our $FILTER_RE_SHARED_ATTRIBUTE;
-    if( $INC{'threads.pm'} )
+    our $SHARED_MEMORY_SIZE = ( 64 * 1024 );
+    our $RESULT_MEMORY_SIZE = ( 512 * 1024 );
+    use constant SHARED_MEMORY_BLOCK => ( 64 * 1024 );
+    our $SHARED  = {};
+    our $SHARE_MEDIUM = Module::Generic::SharedMemXS->supported
+        ? 'memory'
+        : Module::Generic::File::Mmap->has_xs
+            ? 'mmap'
+            : 'file';
+    # If shared memory block is not supported, should we fall back to cache file?
+    our $SHARE_FALLBACK = 1;
+    our $SHARE_AUTO_DESTROY = 1;
+    # By default, Promise::Me implementation of shared variable using the 'shared' attribute takes precedence over threads
+    our $USE_THREADS_SHARED = 0;
+    # A repository of objects that is used by END and DESTROY to remove the shared
+    # space only when no proces is using it, since the processes run asynchronously
+    our $OBJECTS_REPO = [];
+    our $EXCEPTION_CLASS = 'Module::Generic::Exception';
+    our $SERIALISER = 'storable';
+    our $VERSION = 'v0.6.0';
+};
+
+use strict;
+use warnings;
+
+sub import
+{
+    my $class = shift( @_ );
+    my $hash = {};
+    for( my $i = 0; $i < scalar( @_ ); $i++ )
+    {
+        if( $_[$i] eq 'debug' || 
+            $_[$i] eq 'debug_code' || 
+            $_[$i] eq 'debug_file' ||
+            $_[$i] eq 'no_filter' )
+        {
+            $hash->{ $_[$i] } = $_[$i+1];
+            CORE::splice( @_, $i, 2 );
+            $i--;
+        }
+        # User does not want us to use Promise::Me shared variable using 'shared', but 'pshared' would still work though.
+        elsif( $_[$i] eq 'no_shared' )
+        {
+            $USE_THREADS_SHARED = 1;
+        }
+    }
+    $hash->{debug} = 0 if( !CORE::exists( $hash->{debug} ) );
+    $hash->{no_filter} = 0 if( !CORE::exists( $hash->{no_filter} ) );
+    $hash->{debug_code} = 0 if( !CORE::exists( $hash->{debug_code} ) );
+    Filter::Util::Call::filter_add( bless( $hash => ( ref( $class ) || $class ) ) );
+    my $caller = caller;
+    no strict 'refs';
+    for( qw( ARRAY HASH SCALAR ) )
+    {
+        *{"${caller}\::MODIFY_${_}_ATTRIBUTES"} = sub
+        {
+            my( $pack, $ref, $attr ) = @_;
+            {
+                if( ( $attr // '' ) eq 'Promise_shared' )
+                {
+                    my $type = lc( ref( $ref // '' ) );
+                    if( $type !~ /^(array|hash|scalar)$/ )
+                    {
+                        warn( "Unsupported variable type '$type': '$ref'\n" ) if( warnings::enabled() || $DEBUG );
+                        return;
+                    }
+                    &{"${class}\::share"}( $ref );
+                }
+            }
+            return;
+        };
+    }
+    $class->export_to_level( 1, @_ );
+}
+
+sub filter
+{
+    my( $self ) = @_ ;
+    my( $status, $last_line );
+    my $line = 0;
+    my $code = '';
+    if( $self->{no_filter} )
+    {
+        Filter::Util::Call::filter_del();
+        $status = 1;
+        return( $status );
+    }
+
+    # If the user has opted to use threads 'shared' and threads indeed has been loaded (otherwise, this would not work at all).
+    if( $USE_THREADS_SHARED && ( CORE::exists( $INC{'threads.pm'} ) && $INC{'threads.pm'} && CORE::exists( $INC{'threads/shared.pm'} ) && $INC{'threads/shared.pm'} ) )
     {
         $FILTER_RE_SHARED_ATTRIBUTE = qr{
             (
@@ -108,86 +199,7 @@ BEGIN
             \b(?:pshared|shared)\b
         }x;
     }
-    our $SHARED_MEMORY_SIZE = ( 64 * 1024 );
-    our $RESULT_MEMORY_SIZE = ( 512 * 1024 );
-    use constant SHARED_MEMORY_BLOCK => ( 64 * 1024 );
-    our $SHARED  = {};
-    our $SHARE_MEDIUM = Module::Generic::SharedMemXS->supported
-        ? 'memory'
-        : Module::Generic::File::Mmap->has_xs
-            ? 'mmap'
-            : 'file';
-    # If shared memory block is not supported, should we fall back to cache file?
-    our $SHARE_FALLBACK = 1;
-    our $SHARE_AUTO_DESTROY = 1;
-    # A repository of objects that is used by END and DESTROY to remove the shared
-    # space only when no proces is using it, since the processes run asynchronously
-    our $OBJECTS_REPO = [];
-    our $EXCEPTION_CLASS = 'Module::Generic::Exception';
-    our $SERIALISER = 'storable';
-    our $VERSION = 'v0.5.0';
-};
 
-use strict;
-use warnings;
-
-sub import
-{
-    my $class = shift( @_ );
-    my $hash = {};
-    for( my $i = 0; $i < scalar( @_ ); $i++ )
-    {
-        if( $_[$i] eq 'debug' || 
-            $_[$i] eq 'debug_code' || 
-            $_[$i] eq 'debug_file' ||
-            $_[$i] eq 'no_filter' )
-        {
-            $hash->{ $_[$i] } = $_[$i+1];
-            CORE::splice( @_, $i, 2 );
-            $i--;
-        }
-    }
-    $hash->{debug} = 0 if( !CORE::exists( $hash->{debug} ) );
-    $hash->{no_filter} = 0 if( !CORE::exists( $hash->{no_filter} ) );
-    $hash->{debug_code} = 0 if( !CORE::exists( $hash->{debug_code} ) );
-    Filter::Util::Call::filter_add( bless( $hash => ( ref( $class ) || $class ) ) );
-    my $caller = caller;
-    no strict 'refs';
-    for( qw( ARRAY HASH SCALAR ) )
-    {
-        *{"${caller}\::MODIFY_${_}_ATTRIBUTES"} = sub
-        {
-            my( $pack, $ref, $attr ) = @_;
-            {
-                if( $attr eq 'Promise_shared' )
-                {
-                    my $type = lc( ref( $ref ) );
-                    if( $type !~ /^(array|hash|scalar)$/ )
-                    {
-                        warnings::warn( "Unsupported variable type '$type': '$ref'\n" ) if( warnings::enabled() || $DEBUG );
-                        return;
-                    }
-                    &{"${class}\::share"}( $ref );
-                }
-            }
-            return;
-        };
-    }
-    $class->export_to_level( 1, @_ );
-}
-
-sub filter
-{
-    my( $self ) = @_ ;
-    my( $status, $last_line );
-    my $line = 0;
-    my $code = '';
-    if( $self->{no_filter} )
-    {
-        Filter::Util::Call::filter_del();
-        $status = 1;
-        return( $status );
-    }
     while( $status = Filter::Util::Call::filter_read() )
     {
         return( $status ) if( $status < 0 );
@@ -197,7 +209,7 @@ sub filter
             $last_line = $_;
             last;
         }
-        
+
         s{
             $FILTER_RE_FUNC_ARGS
         }
@@ -208,14 +220,14 @@ sub filter
             $args =~ s,(?<!\\)([\$\@\%\*]\w+),\\$1,g;
             "$func$args";
         }gexs;
-        
+
         s{
             $FILTER_RE_SHARED_ATTRIBUTE
         }
         {
             "${1}Promise_shared"
         }gsex;
-        
+
         s#(\b(?:share|lock|unlock|unshare)\b[[:blank:]\h]*(?!{)\(?[[:blank:]\h]*)(?=[mo\$\@\%])#$1\\#gs;
         $code .= $_;
         $_ = '';
@@ -224,8 +236,13 @@ sub filter
     unless( $status < 0 )
     {
         $code = ' ' . $code;
-        my $doc = PPI::Document->new( \$code, readonly => 1 ) || die( "Unable to parse: ", PPI::Document->errstr, "\n$code\n" );
-        if( $doc = $self->_parse( $doc ) )
+        my $doc;
+        # No need to parse this if the keyword 'async' is not even used anywhere.
+        if( CORE::index( $code, 'async' ) != -1 )
+        {
+            $doc = PPI::Document->new( \$code, readonly => 1 ) || die( "Unable to parse: ", PPI::Document->errstr, "\n$code\n" );
+        }
+        if( defined( $doc ) && ( $doc = $self->_parse( $doc ) ) )
         {
             $_ = $doc->serialize;
         }
@@ -340,7 +357,7 @@ sub init
     $self->{_shared_from} = $pack;
     push( @$OBJECTS_REPO, $self );
 
-#     unless( Want::want( 'OBJECT' ) )
+#     unless( Wanted::want( 'OBJECT' ) )
 #     {
 #         $self->no_more_chaining(1);
 #         $self->exec;
@@ -450,8 +467,6 @@ sub all
 
 sub args { return( shift->_set_get_array_as_object( 'args', @_ ) ); }
 
-sub timeout { return( shift->_set_get_scalar( 'timeout', @_ ) ); }
-
 sub async { return( Promise::Me->new( @_ ) ); }
 
 # Called as a function. Takes promise objects as arguments, possibly with an hash 
@@ -500,6 +515,7 @@ sub await
             my $rv = waitpid( $pid, POSIX::WNOHANG );
             if( $rv == 0 )
             {
+                # Child pid is still running, waiting for it.
             }
             elsif( $rv > 0 )
             {
@@ -557,10 +573,10 @@ sub catch
         return( $self->error( "catch() only accepts a code references. Value provided was '$code'." ) ) if( ref( $code ) ne 'CODE' );
         $self->add_reject_handler( $code );
     }
-    
+
     # Is there more chaining, or is this the end of the chain?
     # If the latter, we then start executing our codes
-    unless( Want::want( 'OBJECT' ) )
+    unless( Wanted::want( 'OBJECT' ) )
     {
         $self->no_more_chaining(1);
         $self->exec || return( $self->pass_error );
@@ -582,7 +598,7 @@ sub exec
     select((select(STDOUT), $|=1)[0]);
     select((select(STDERR), $|=1)[0]);
     $self->executed(1);
-    
+
     my $pid = fork();
     # Parent
     if( $pid )
@@ -593,9 +609,10 @@ sub exec
         POSIX::sigprocmask( POSIX::SIG_UNBLOCK, $sigset ) || 
             return( $self->error( "Cannot unblock SIGINT for fork: $!" ) );
         my $shm = $self->_set_shared_space() || return( $self->pass_error );
-        $shm->lock( LOCK_EX );
+        # Locking is done inside 'write'
+        # $shm->lock( LOCK_EX );
         $shm->write( $self->{shared} );
-        $shm->unlock;
+        # $shm->unlock;
         # If we are to wait for the child to exit, there is no CHLD signal handler
         if( $self->{wait} )
         {
@@ -633,15 +650,34 @@ sub exec
         $self->pid( $$ );
         $self->_set_shared_space() || return( $self->reject( $self->error ) );
         my $exception_class = $self->exception_class;
-        
-        try
+
+        my $args = $self->args;
+        my @rv;
+        # try-catch
+        local $@;
+        eval
         {
             # Possibly any arguments passed in the 'async sub some_routine'; or
             # Promise::Me->new( args => [@args] );
             local $_ = [ $self->curry::resolve, $self->curry::reject ];
-            my $args = $self->args;
             my $code = $self->{_code};
-            my @rv = @$args ? $code->( @$args ) : $code->();
+            @rv = @$args ? $code->( @$args ) : $code->();
+        };
+        if( $@ )
+        {
+            my $e = "$@";
+            $e =~ s/\r?\n$//gs;
+            if( Scalar::Util::blessed( $@ ) )
+            {
+                $self->reject( $@ );
+            }
+            else
+            {
+                $self->reject( Promise::Me::Exception->new( $e ) );
+            }
+        }
+        else
+        {
             # The code executed, returned a promise, so we use it and call the next 'then' 
             # in the chain with it.
             if( scalar( @rv ) && 
@@ -681,17 +717,6 @@ sub exec
             {
                 # $self->reject;
                 # The user already called reject, so we do nothing.
-            }
-        }
-        catch( $e )
-        {
-            if( Scalar::Util::blessed( $e ) )
-            {
-                $self->reject( $e );
-            }
-            else
-            {
-                $self->reject( Promise::Me::Exception->new( $e ) );
             }
         }
         exit(0);
@@ -765,7 +790,6 @@ sub lock
     $self = shift( @_ ) if( scalar( @_ ) && Scalar::Util::blessed( $_[0] ) && $_[0]->isa( 'Promise::Me' ) );
     my $type;
     $type = pop( @_ ) if( !ref( $_[-1] ) );
-    my $prefix = '[' . ( $self->is_child ? 'child' : 'parent' ) . ']';
     foreach my $ref ( @_ )
     {
         my $tied = tied( $ref );
@@ -813,10 +837,30 @@ sub reject
         $self->{_saved_values} = $vals;
         return( $self );
     }
-    try
+
+    my @rv;
+    # try-catch
+    local $@;
+    eval
     {
         local $_ = [ $self->curry::resolve, $self->curry::reject ];
-        my @rv = @$vals ? $code->( @$vals ) : $code->();
+        @rv = @$vals ? $code->( @$vals ) : $code->();
+    };
+    if( $@ )
+    {
+        if( Scalar::Util::blessed( $@ ) )
+        {
+            return( $self->reject( $@ ) );
+        }
+        else
+        {
+            my $e = "$@";
+            $e =~ s/\r?\n$//gs;
+            return( $self->reject( Promise::Me::Exception->new( $e ) ) );
+        }
+    }
+    else
+    {
         # The code returned another promise
         if( scalar( @rv ) && 
             Scalar::Util::blessed( $rv[0] ) && 
@@ -833,17 +877,6 @@ sub reject
         else
         {
             return( $self );
-        }
-    }
-    catch( $e )
-    {
-        if( Scalar::Util::blessed( $e ) )
-        {
-            return( $self->reject( $e ) );
-        }
-        else
-        {
-            return( $self->reject( Promise::Me::Exception->new( $e ) ) );
         }
     }
 }
@@ -865,11 +898,33 @@ sub resolve
         $self->{_saved_values} = $vals;
         return( $self );
     }
-    
-    try
+
+    my @rv;
+    # try-catch
+    local $@;
+    eval
     {
         local $_ = [ $self->curry::resolve, $self->curry::reject ];
-        my @rv = @$vals ? $code->( @$vals ) : $code->();
+        @rv = @$vals ? $code->( @$vals ) : $code->();
+    };
+    if( $@ )
+    {
+        my $ex;
+        if( Scalar::Util::blessed( $@ ) )
+        {
+            $ex = $@;
+        }
+        else
+        {
+            my $e = "$@";
+            $e =~ s/\r?\n$//gs;
+            $ex = Promise::Me::Exception->new( $e );
+        }
+        $self->result( $ex );
+        return( $self->reject( $ex ) );
+    }
+    else
+    {
         # It seems the user used the resolve or reject callbacks and returned, such as return( $resolve->() )
         # In which case, we do not save our promise object, because it would not make sense obviously.
         if( scalar( @rv ) && $self->_is_a( $rv[0] => 'Promise::Me' ) )
@@ -899,20 +954,6 @@ sub resolve
             return( $self );
         }
     }
-    catch( $e )
-    {
-        my $ex;
-        if( Scalar::Util::blessed( $e ) )
-        {
-            $ex = $e;
-        }
-        else
-        {
-            $ex = Promise::Me::Exception->new( $e );
-        }
-        $self->result( $ex );
-        return( $self->reject( $ex ) );
-    }
 }
 
 sub resolved { return( shift->_reject_resolve( 'resolved', @_ ) ); }
@@ -921,7 +962,6 @@ sub result
 {
     my $self = shift( @_ );
     my $shm = $self->shared_mem;
-    my $prefix = '[' . ( $self->is_child ? 'child' : 'parent' ) . ']';
     if( @_ )
     {
         # We need to save the result provided as a 1 reference variable
@@ -931,15 +971,15 @@ sub result
             my $hash = $shm->read;
             $hash = {} if( ref( $hash ) ne 'HASH' );
             $hash->{result} = $val;
-            $shm->lock( LOCK_EX );
+            # $shm->lock( LOCK_EX );
+            # locking is done inside the method 'write'
             $shm->write( $hash ) || return( $self->pass_error( $shm->error ) );
-            $shm->unlock;
+            # $shm->unlock;
             return( $hash );
         }
         else
         {
-            # $self->message_colour( 4, "${prefix}  <red>Shared memory object not found.</>" );
-            warnings::warn( "Shared space object not set or lost!\n" ) if( warnings::enabled() || $self->debug );
+            warn( "Shared space object not set or lost!\n" ) if( $self->_is_warnings_enabled || $self->debug );
         }
     }
     else
@@ -1023,10 +1063,10 @@ sub then
             }
         }
     }
-    
+
     # Is there more chaining, or is this the end of the chain?
     # If the latter, we then start executing our codes
-    unless( Want::want( 'OBJECT' ) || $self->executed )
+    unless( Wanted::want( 'OBJECT' ) || $self->executed )
     {
         $self->no_more_chaining(1);
         $self->exec || return( $self->pass_error );
@@ -1034,13 +1074,14 @@ sub then
     return( $self );
 }
 
+sub timeout { return( shift->_set_get_scalar( 'timeout', @_ ) ); }
+
 sub unlock
 {
     my $self;
     $self = shift( @_ ) if( scalar( @_ ) && Scalar::Util::blessed( $_[0] ) && $_[0]->isa( 'Promise::Me' ) );
     my $type;
     $type = pop( @_ ) if( !ref( $_[-1] ) );
-    my $prefix = '[' . ( $self->is_child ? 'child' : 'parent' ) . ']';
     foreach my $ref ( @_ )
     {
         my $tied = tied( $ref );
@@ -1095,7 +1136,7 @@ sub wait
 {
     my $self = shift( @_ );
     my @callinfo = caller;
-    
+
     # $prom->wait(1)
     # $prom->wait(0)
     if( @_ )
@@ -1104,11 +1145,11 @@ sub wait
     }
     # In chaining, without argument, we set this implicitly to true
     # $prom->then(sub{})->wait->catch(sub{})
-    elsif( Want::want( 'OBJECT' ) )
+    elsif( Wanted::want( 'OBJECT' ) )
     {
         $self->_set_get_boolean( 'wait', 1 );
     }
-    elsif( Want::want( 'VOID' ) || Want::want( 'SCALAR' ) )
+    elsif( Wanted::want( 'VOID' ) || Wanted::want( 'SCALAR' ) )
     {
         $self->_set_get_boolean( 'wait', 1 );
         $self->no_more_chaining(1);
@@ -1141,14 +1182,14 @@ sub _parse
 {
     my $self = shift( @_ );
     my $elem = shift( @_ );
-    $self->_browse( $elem ) if( $self->debug );
-    
+    $self->_browse( $elem ) if( $self->debug >= 6 );
+
     no warnings 'uninitialized';
     if( !Scalar::Util::blessed( $elem ) || !$elem->isa( 'PPI::Node' ) )
     {
         return( $self->_error( "Element provided to parse is not a PPI::Node object" ) );
     }
-    
+
     # Check for PPI statements that would have caught some unrelated statements before
     my $sts = $elem->find(sub
     {
@@ -1200,7 +1241,7 @@ sub _parse
             $st->__insert_after( $new ) || die( "Could not insert element of class '", $new->class, "' after former element of class '", $st->class, "'\n" );
         }
     }
-    
+
     my $ref = $elem->find(sub
     {
         my( $top, $this ) = @_;
@@ -1209,7 +1250,7 @@ sub _parse
     $ref ||= [];
     return( $self->_error( "Failed to find any async subroutines: $@" ) ) if( !defined( $ref ) );
     return if( !scalar( @$ref ) );
-    
+
     my $asyncs = [];
     foreach my $e ( @$ref )
     {
@@ -1304,7 +1345,7 @@ sub _parse
         # after is not our concern.
         $nl_braces->{open_before} = () = $before =~ /(\v)/g;
         my $open_spacer = ( "\n" x $nl_braces->{open_before} );
-        
+
         my $code  = qq{sub $name ${open_spacer}{ Promise::Me::async($name => sub $block, args => [\@_], use_async => 1); }};
         my $doc = PPI::Document->new( \$code, readonly => 1 ) || die( "Unable to parse: ", PPI::Document->errstr, "\n$code\n" );
         my $new = [$doc->children]->[0];
@@ -1328,14 +1369,19 @@ sub _reject_resolve
             my $hash = $shm->read;
             $hash = {} if( ref( $hash ) ne 'HASH' );
             $hash->{ $what } = $val;
-            $shm->lock( LOCK_EX );
+            # Locking is done inside 'write'
+            # $shm->lock( LOCK_EX );
             my $rv = $shm->write( $hash );
-            return( $self->error( "Unable to write data to shared space with serialiser '", ( $self->{serialiser} // '' ), "' using object (", overload::StrVal( $shm ), "): ", $shm->error ) ) if( !defined( $rv ) && $shm->error );
-            $shm->unlock;
+            if( !defined( $rv ) && $shm->error )
+            {
+                # $shm->unlock;
+                return( $self->error( "Unable to write data to shared space with serialiser '", ( $self->{serialiser} // '' ), "' using object (", overload::StrVal( $shm ), "): ", $shm->error ) );
+            }
+            # $shm->unlock;
         }
         else
         {
-            warnings::warn( "Shared space object not set or lost!\n" ) if( warnings::enabled() );
+            warn( "Shared space object not set or lost!" ) if( $self->_is_warnings_enabled );
         }
         $self->_set_get_boolean( $what, $val );
     }
@@ -1397,7 +1443,9 @@ sub _share_vars
     $opts->{use_cache_file} //= ( $opts->{medium} eq 'file' ? 1 : 0 );
     $opts->{use_mmap} //= ( $opts->{medium} eq 'mmap' ? 1 : 0 );
     $opts->{fallback} = $SHARE_FALLBACK if( !CORE::exists( $opts->{fallback} ) || !CORE::length( $opts->{fallback} ) );
-    
+
+    print( STDERR __PACKAGE__, "::_share_vars: Using medium '", ( $opts->{medium} // 'undef' ), "', and serialiser '", ( $SERIALISER // 'undef' ), "'.\n" ) if( $DEBUG >= 4 );
+
     my( $shm, $data );
     # By process id
     my $index = $$;
@@ -1405,7 +1453,7 @@ sub _share_vars
     {
         $SHARED->{ $index } = {};
     }
-    
+
     if( scalar( keys( %{$SHARED->{ $index }} ) ) )
     {
         print( STDERR __PACKAGE__, "::_share_vars: Re-using already shared variables.\n" ) if( $DEBUG >= 4 );
@@ -1427,15 +1475,15 @@ sub _share_vars
         print( STDERR __PACKAGE__, "::_share_vars: Initiating shared memory with key '$key'.\n" ) if( $DEBUG >= 4 );
         my $p =
         {
-        create  => 1,
-        # destroy => $SHARE_AUTO_DESTROY,
-        # Actually, we need to control when to remove the shared memory space, and
-        # this needs to happen when this module ends
-        destroy => 0,
-        key     => $key,
-        mode    => 0666,
-        # storable => 1,
-        # base64 => 1,
+            create  => 1,
+            # destroy => $SHARE_AUTO_DESTROY,
+            # Actually, we need to control when to remove the shared memory space, and
+            # this needs to happen when this module ends
+            destroy => 0,
+            key     => $key,
+            mode    => 0666,
+            # storable => 1,
+            # base64 => 1,
         };
         my $serialiser = $SERIALISER;
         $serialiser = lc( $serialiser ) if( defined( $serialiser ) );
@@ -1451,12 +1499,13 @@ sub _share_vars
             # $p->{sereal} = 1;
             $p->{serialiser} = 'sereal';
         }
-        
+
         my $size = $SHARED_MEMORY_SIZE;
         $p->{size} = $size if( defined( $size ) && CORE::length( $size ) && int( $size ) > 0 );
         if( $opts->{use_mmap} || 
             $opts->{medium} eq 'mmap' )
         {
+            print( STDERR __PACKAGE__, "::_share_vars: Using Mmap as medium.\n" ) if( $DEBUG >= 4 );
             my $s = Module::Generic::File::Mmap->new( %$p ) || 
                 return( __PACKAGE__->pass_error( Module::Generic::File::Mmap->error ) );
             $shm = $s->open || return( __PACKAGE__->pass_error( $s->error ) );
@@ -1464,18 +1513,21 @@ sub _share_vars
         elsif( ( Module::Generic::SharedMemXS->supported && !$opts->{use_cache_file} ) || 
                $opts->{medium} eq 'memory' )
         {
+            print( STDERR __PACKAGE__, "::_share_vars: Using memory as medium.\n" ) if( $DEBUG >= 4 );
             my $s = Module::Generic::SharedMemXS->new( %$p ) || return( __PACKAGE__->error( "Unable to create shared memory object: ", Module::Generic::SharedMemXS->error ) );
             $shm = $s->open;
             if( !$shm )
             {
                 if( $opts->{fallback} )
                 {
+                    print( STDERR __PACKAGE__, "::_share_vars: Failed to open shared memory segment: ", $s->error, "\nFalling back to cache file.\n" ) if( $DEBUG );
                     my $c = Module::Generic::File::Cache->new( %$p ) ||
                         return( __PACKAGE__->error( "Unable to create a shared cache file or a shared memory: ", Module::Generic::File::Cache->error ) );
                     $shm = $c->open || return( __PACKAGE__->error( "Unable to create a shared cache file: ", $c->error ) );
                 }
                 else
                 {
+                    print( STDERR __PACKAGE__, "::_share_vars: Failed to open shared memory segment. Fallback is not permitted. Failing now.\n" ) if( $DEBUG );
                     return( __PACKAGE__->error( "Unable to open shared memory object: ", $s->error ) );
                 }
             }
@@ -1487,6 +1539,7 @@ sub _share_vars
         # Fallback to cache file
         else
         {
+            print( STDERR __PACKAGE__, "::_share_vars: No medium specified. Falling back to cache file.\n" ) if( $DEBUG );
             my $c = Module::Generic::File::Cache->new( %$p ) ||
                 return( __PACKAGE__->error( "Unable to create a shared cache file: ", Module::Generic::File::Cache->error ) );
             $shm = $c->open || return( __PACKAGE__->error( "Unable to create a shared cache file: ", $c->error ) );
@@ -1494,29 +1547,32 @@ sub _share_vars
         $data = {};
     }
     print( STDERR __PACKAGE__, "::_share_vars: Shared object is '$shm' and id is '", $shm->id, "'.\n" ) if( $DEBUG >= 4 );
-    
+
     printf( STDERR "%s::_share_vars: Processing %d variables.\n", __PACKAGE__, scalar( @$vars ) ) if( $DEBUG >= 4 );
     my @objects = ();
+    my @clones  = ();
     foreach my $ref ( @$vars )
     {
         my $type = lc( ref( $ref ) );
         if( $type !~ /^(array|hash|scalar)$/ )
         {
-            warnings::warn( "Unsupported variable type '$type': '$ref'\n" ) if( warnings::enabled() || $DEBUG );
+            warn( "Unsupported variable type '$type': '$ref'" ) if( warnings::enabled() || $DEBUG );
             next;
         }
         my $addr = Scalar::Util::refaddr( $ref );
-        print( STDERR __PACKAGE__, "::_share_vars: Processing variable '$ref' with address '$addr'\n" ) if( $DEBUG >= 4 );
+        print( STDERR __PACKAGE__, "::_share_vars: Processing variable '$ref' of type '$type' with address '$addr'\n" ) if( $DEBUG >= 4 );
         my $pref =
         {
-        addr    => $addr,
-        # debug   => $self->debug,
-        debug   => 7,
-        shm     => $shm,
-        # value   => $ref,
+            addr    => $addr,
+            # debug   => $self->debug,
+            debug   => 7,
+            shm     => $shm,
+            # value   => $ref,
         };
-        
+
         my $clone = Clone::clone( $ref );
+        # Keep clone alive; prevent destruction
+        CORE::push( @clones, $clone );
         my $tied;
         if( $type eq 'array' )
         {
@@ -1531,21 +1587,26 @@ sub _share_vars
             $tied = tie( $$ref, 'Promise::Me::Share', $pref );
         }
 
-        CORE::defined( $tied ) || do
+        print( STDERR __PACKAGE__, "::_share_vars: tied object is '", ( $tied // 'undef' ), "'\n" ) if( $DEBUG >= 4 );
+        if( !CORE::defined( $tied ) )
         {
-            warnings::warn( "Unable to tie reference variable '$ref': $!\n" ) if( warnings::enabled() || $DEBUG );
+            warn( "Unable to tie reference variable '$ref': $!" ) if( warnings::enabled() || $DEBUG );
             next;
-        };
+        }
         $data->{ $addr } = $clone;
         push( @objects, $tied );
         $SHARED->{ $index }->{ $addr } = $ref;
     }
-    print( STDERR __PACKAGE__, "::_share_vars: Saving data to shared memory.\n" ) if( $DEBUG >= 6 );
-    $shm->lock( LOCK_EX );
-    $shm->write( $data ) || 
+    print( STDERR __PACKAGE__, "::_share_vars: Saving data to shared memory.\n" ) if( $DEBUG >= 4 );
+    # Locking is done inside 'write'
+    # $shm->lock( LOCK_EX );
+    if( !$shm->write( $data ) )
+    {
+        # $shm->unlock;
         return( __PACKAGE__->pass_error( $shm->error ) );
-    $shm->unlock;
-    print( STDERR __PACKAGE__, "::_share_vars: Done.\n" ) if( $DEBUG >= 6 );
+    }
+    # $shm->unlock;
+    print( STDERR __PACKAGE__, "::_share_vars: Done.\n" ) if( $DEBUG >= 4 );
     return( scalar( @objects ) > 1 ? @objects : $objects[0] );
 }
 
@@ -1580,7 +1641,7 @@ sub _set_shared_space
         # $p->{sereal} = 1;
         $p->{serialiser} = 'sereal';
     }
-    
+
     my $size = $self->result_shared_mem_size;
     $p->{size} = $size if( defined( $size ) && CORE::length( $size ) && int( $size ) > 0 );
     # If we are the child we do not destroy the shared memory, otherwise our parent 
@@ -1595,7 +1656,7 @@ sub _set_shared_space
     {
         $p->{destroy_semaphore} = 0;
     }
-    
+
     my $shm;
     if( $self->{use_mmap} || $self->{medium} eq 'mmap' )
     {
@@ -1608,7 +1669,7 @@ sub _set_shared_space
     {
         my $s = Module::Generic::SharedMemXS->new( %$p ) || return( $self->error( "Unable to create shared memory object: ", Module::Generic::SharedMemXS->error ) );
         $shm = $s->open;
-        
+
         if( !$shm )
         {
             if( $s->error->message =~ /No[[:blank:]\h]+space[[:blank:]\h]+left/i )
@@ -1653,7 +1714,7 @@ sub _set_shared_space
         }
     }
     $self->shared_mem( $shm );
-    
+
     if( $self->is_parent )
     {
         $shm->reset( {} );
@@ -1748,7 +1809,7 @@ END
 {
     package
         PPI::Element;
-    
+
     no warnings 'redefine';
     sub replace {
         my $self    = ref $_[0] ? shift : return undef;
@@ -1781,6 +1842,7 @@ BEGIN
     use strict;
     use warnings;
     use warnings::register;
+    warnings::register_categories( 'Promise::Me' );
     use parent qw( Module::Generic );
     use vars qw( $DEBUG $VERSION );
     use Module::Generic::SharedMemXS qw( :all );
@@ -1794,12 +1856,14 @@ sub TIEARRAY
     my $class = shift( @_ );
     my $opts  = $class->_get_args_as_hash( @_ );
     $opts->{type} = 'array';
-    my $self = $class->_tie( $opts ) || do
+    my $self = $class->_tie( $opts );
+    my $prefix = __PACKAGE__ . "::TIEARRAY [pid $$]";
+    if( !$self )
     {
-        print( STDERR __PACKAGE__, "::TIEARRAY: Failed to create object with given options.\n" ) if( $DEBUG );
-        warn( "Failed to create object with given options.\n" );
+        print( STDERR "$prefix: Failed to create object with given options.\n" ) if( $DEBUG );
+        warn( "Failed to create object with given options." );
         return;
-    };
+    }
     return( $self );
 }
 
@@ -1808,12 +1872,14 @@ sub TIEHASH
     my $class = shift( @_ );
     my $opts  = $class->_get_args_as_hash( @_ );
     $opts->{type} = 'hash';
-    my $self = $class->_tie( $opts ) || do
+    my $self = $class->_tie( $opts );
+    my $prefix = __PACKAGE__ . "::TIEHASH [pid $$]";
+    if( !$self )
     {
-        print( STDERR __PACKAGE__, "::TIEHASH: Failed to create object with given options.\n" ) if( $DEBUG );
-        warn( "Failed to create object with given options.\n" );
+        print( STDERR "$prefix: Failed to create object with given options.\n" ) if( $DEBUG );
+        warn( "Failed to create object with given options." );
         return;
-    };
+    }
     return( $self );
 }
 
@@ -1822,18 +1888,22 @@ sub TIESCALAR
     my $class = shift( @_ );
     my $opts  = $class->_get_args_as_hash( @_ );
     $opts->{type} = 'scalar';
-    my $self = $class->_tie( $opts ) || do
+    my $self = $class->_tie( $opts );
+    my $prefix = __PACKAGE__ . "::TIESCALAR [pid $$]";
+    if( !$self )
     {
-        print( STDERR __PACKAGE__, "::TIESCALAR: Failed to create object with given options.\n" ) if( $DEBUG );
-        warn( "Failed to create object with given options.\n" );
+        print( STDERR "$prefix: Failed to create object with given options.\n" ) if( $DEBUG );
+        warn( "Failed to create object with given options." );
         return;
-    };
+    }
     return( $self );
 }
 
 sub CLEAR
 {
     my $self = shift( @_ );
+    my $prefix = ref( $self ) . "::CLEAR [pid $$]";
+    print( STDERR "$prefix: clearing tied variable of type $self->{type}.\n" ) if( $DEBUG );
     my $locked = $self->locked;
     if( $self->{type} eq 'array' )
     {
@@ -1847,22 +1917,25 @@ sub CLEAR
     {
         $$self->{data} = \'';
     }
-    
+
     if( $locked & LOCK_EX )
     {
         $self->{_changed}++;
     }
     else
     {
+        print( STDERR "$prefix: unloading data.\n" ) if( $DEBUG );
         $self->unload( $self->{data} ) || return( $self->pass_error );
     }
-    return( 1 );
+    return(1);
 }
 
 sub DELETE
 {
     my $self = shift( @_ );
     my $key  = shift( @_ );
+    my $prefix = ref( $self ) . "::DELETE [pid $$]";
+    print( STDERR "$prefix: deleting key '$key' from tied variable of type $self->{type}.\n" ) if( $DEBUG );
     my $locked = $self->locked;
     unless( $locked )
     {
@@ -1877,13 +1950,14 @@ sub DELETE
     {
         $val = CORE::delete( $self->{data}->{ $key } );
     }
-    
+
     if( $locked & LOCK_EX )
     {
         $self->{_changed}++;
     }
     else
     {
+        print( STDERR "$prefix: unloading data.\n" ) if( $DEBUG );
         $self->unload( $self->{data} ) || return( $self->pass_error );
     }
     return( $val );
@@ -1893,6 +1967,8 @@ sub EXISTS
 {
     my $self = shift( @_ );
     my $key  = shift( @_ );
+    my $prefix = ref( $self ) . "::EXISTS [pid $$]";
+    print( STDERR "$prefix: checking if key '$key' exists in tied variable of type $self->{type}.\n" ) if( $DEBUG );
     my $locked = $self->locked;
     unless( $locked )
     {
@@ -1908,7 +1984,7 @@ sub EXISTS
     }
 }
 
-sub EXTEND { }
+sub EXTEND {}
 
 sub FETCH
 {
@@ -1917,6 +1993,8 @@ sub FETCH
     {
         die( "I am called from within my own package\n" );
     }
+    my $prefix = ref( $self ) . "::FETCH [pid $$]";
+    print( STDERR "$prefix: fetching the value of tied variable of type $self->{type}.\n" ) if( $DEBUG );
     my $locked = $self->locked;
     my $data;
     if( $locked || $self->{_iterating} )
@@ -1926,9 +2004,10 @@ sub FETCH
     }
     else
     {
+        print( STDERR "$prefix: loading data.\n" ) if( $DEBUG );
         $data = $self->load || return( $self->pass_error );
     }
-    
+
     my $val;
     if( $self->{type} eq 'array' )
     {
@@ -1950,9 +2029,12 @@ sub FETCH
 sub FETCHSIZE
 {
     my $self = shift( @_ );
+    my $prefix = ref( $self ) . "::FETCHSIZE [pid $$]";
+    print( STDERR "$prefix: fetching the size for the tied variable of type $self->{type}.\n" ) if( $DEBUG );
     my $locked = $self->locked;
     unless( $locked )
     {
+        print( STDERR "$prefix: loading data.\n" ) if( $DEBUG );
         $self->{data} = $self->load || return( $self->pass_error );
     }
     if( $self->{type} eq 'array' )
@@ -1972,9 +2054,12 @@ sub FETCHSIZE
 sub FIRSTKEY
 {
     my $self = shift( @_ );
+    my $prefix = ref( $self ) . "::FIRSTKEY [pid $$]";
+    print( STDERR "$prefix: fetching the first key for the tied variable of type $self->{type}.\n" ) if( $DEBUG );
     my $locked = $self->locked;
     unless( $locked )
     {
+        print( STDERR "$prefix: loading data.\n" ) if( $DEBUG );
         $self->{data} = $self->load || return( $self->pass_error );
     }
     my $reset = keys( %{$self->{data}} );
@@ -1986,6 +2071,8 @@ sub FIRSTKEY
 sub NEXTKEY
 {
     my $self = shift( @_ );
+    my $prefix = ref( $self ) . "::NEXTKEY [pid $$]";
+    print( STDERR "$prefix: fetching the next key for the tied variable of type $self->{type}.\n" ) if( $DEBUG );
     my $next = each( %{$self->{data}} );
     if( !defined( $next ) )
     {
@@ -2002,9 +2089,12 @@ sub NEXTKEY
 sub POP
 {
     my $self = shift( @_ );
+    my $prefix = ref( $self ) . "::POP [pid $$]";
+    print( STDERR "$prefix: removing the last entry from the tied variable of type $self->{type}.\n" ) if( $DEBUG );
     my $locked = $self->locked;
     unless( $locked )
     {
+        print( STDERR "$prefix: loading data.\n" ) if( $DEBUG );
         $self->{data} = $self->load || return( $self->pass_error );
     }
     my $val = pop( @{$self->{data}} );
@@ -2014,6 +2104,7 @@ sub POP
     }
     else
     {
+        print( STDERR "$prefix: unloading data.\n" ) if( $DEBUG );
         $self->unload( $self->{data} ) || return( $self->pass_error );
     }
     return( $val );
@@ -2022,9 +2113,12 @@ sub POP
 sub PUSH
 {
     my $self = shift( @_ );
+    my $prefix = ref( $self ) . "::PUSH [pid $$]";
+    print( STDERR "$prefix: adding a new value to the tied variable of type $self->{type}.\n" ) if( $DEBUG );
     my $locked = $self->locked;
     unless( $locked )
     {
+        print( STDERR "$prefix: loading data.\n" ) if( $DEBUG );
         $self->{data} = $self->load || return( $self->pass_error );
     }
     push( @{$self->{data}}, @_ );
@@ -2034,6 +2128,7 @@ sub PUSH
     }
     else
     {
+        print( STDERR "$prefix: unloading data.\n" ) if( $DEBUG );
         $self->unload( $self->{data} ) || return( $self->pass_error );
     }
 }
@@ -2041,9 +2136,12 @@ sub PUSH
 sub SCALAR
 {
     my $self = shift( @_ );
+    my $prefix = ref( $self ) . "::SCALAR [pid $$]";
+    print( STDERR "$prefix: called for the tied variable of type $self->{type}.\n" ) if( $DEBUG );
     my $locked = $self->locked;
     unless( $locked )
     {
+        print( STDERR "$prefix: loading data.\n" ) if( $DEBUG );
         $self->{data} = $self->load || return( $self->pass_error );
     }
     if( $self->{type} eq 'hash' )
@@ -2055,9 +2153,12 @@ sub SCALAR
 sub SHIFT
 {
     my $self = shift( @_ );
+    my $prefix = ref( $self ) . "::SHIFT [pid $$]";
+    print( STDERR "$prefix: removing the top value from the tied variable of type $self->{type}.\n" ) if( $DEBUG );
     my $locked = $self->locked;
     unless( $locked )
     {
+        print( STDERR "$prefix: loading data.\n" ) if( $DEBUG );
         $self->{data} = $self->load || return( $self->pass_error );
     }
     my $val = shift( @{$self->{data}} );
@@ -2075,10 +2176,13 @@ sub SHIFT
 sub SPLICE
 {
     my $self = shift( @_ );
+    my $prefix = ref( $self ) . "::SPLICE [pid $$]";
+    print( STDERR "$prefix: called for the tied variable of type $self->{type}.\n" ) if( $DEBUG );
     my( $offset, $length, @vals ) = @_;
     my $locked = $self->locked;
     unless( $locked )
     {
+        print( STDERR "$prefix: loading data.\n" ) if( $DEBUG );
         $self->{data} = $self->load || return( $self->pass_error );
     }
     my @values = splice( @{$self->{data}}, $offset, $length, @vals );
@@ -2088,6 +2192,7 @@ sub SPLICE
     }
     else
     {
+        print( STDERR "$prefix: unloading data.\n" ) if( $DEBUG );
         $self->unload( $self->{data} ) || return( $self->pass_error );
     }
     return( @values );
@@ -2096,12 +2201,15 @@ sub SPLICE
 sub STORE
 {
     my $self = shift( @_ );
+    my $prefix = ref( $self ) . "::STORE [pid $$]";
+    print( STDERR "$prefix: saving a value for the tied variable of type $self->{type}.\n" ) if( $DEBUG );
     my $locked = $self->locked;
     unless( $locked )
     {
+        print( STDERR "$prefix: loading data.\n" ) if( $DEBUG );
         $self->{data} = $self->load || return( $self->pass_error );
     }
-    
+
     if( $self->{type} eq 'array' )
     {
         my( $key, $val ) = @_;
@@ -2117,25 +2225,29 @@ sub STORE
         my $val = shift( @_ );
         $self->{data} = \$val;
     }
-    
+
     if( $locked & LOCK_EX )
     {
         $self->{_changed}++;
     }
     else
     {
+        print( STDERR "$prefix: unloading data.\n" ) if( $DEBUG );
         $self->unload( $self->{data} ) || return( $self->pass_error );
     }
-    return( 1 );
+    return(1);
 }
 
 sub STORESIZE
 {
     my $self = shift( @_ );
     my $len  = shift( @_ );
+    my $prefix = ref( $self ) . "::STORESIZE [pid $$]";
+    print( STDERR "$prefix: called for the tied variable of type $self->{type}.\n" ) if( $DEBUG );
     my $locked = $self->locked;
     unless( $locked )
     {
+        print( STDERR "$prefix: loading data.\n" ) if( $DEBUG );
         $self->{data} = $self->load || return( $self->pass_error );
     }
     $#{$self->{data}} = $len - 1;
@@ -2145,6 +2257,7 @@ sub STORESIZE
     }
     else
     {
+        print( STDERR "$prefix: unloading data.\n" ) if( $DEBUG );
         $self->unload( $self->{data} ) || return( $self->pass_error );
     }
     return( $len );
@@ -2153,9 +2266,12 @@ sub STORESIZE
 sub UNSHIFT
 {
     my $self = shift( @_ );
+    my $prefix = ref( $self ) . "::STORESIZE [pid $$]";
+    print( STDERR "$prefix: called for the tied variable of type $self->{type}.\n" ) if( $DEBUG );
     my $locked = $self->locked;
     unless( $locked )
     {
+        print( STDERR "$prefix: loading data.\n" ) if( $DEBUG );
         $self->{data} = $self->load || return( $self->pass_error );
     }
     my $val = unshift( @{$self->{data}}, @_ );
@@ -2165,6 +2281,7 @@ sub UNSHIFT
     }
     else
     {
+        print( STDERR "$prefix: unloading data.\n" ) if( $DEBUG );
         $self->unload( $self->{data} ) || return( $self->pass_error );
     }
     return( $val );
@@ -2184,23 +2301,24 @@ sub load
     my $sub  = [caller(1)]->[3];
     my $sh   = $self->shared ||
         return( $self->error( "No shared memory object found." ) );
+    my $prefix = ref( $self ) . "::load [pid $$]";
     my $repo = $sh->read;
     $repo = {} if( !defined( $repo ) || !CORE::length( $repo ) );
-    warn( "Warning only: I was expecting an hash reference from reading the shared memory repository, but instead got '", ( $repo // '' ), "'\n" ) if( ref( $repo ) ne 'HASH' && $self->_warnings_is_enabled );
+    warn( "Warning only: I was expecting an hash reference from reading the shared memory repository, but instead got '", ( $repo // '' ), "'" ) if( ref( $repo ) ne 'HASH' && $self->_warnings_is_enabled( 'Promise::Me' ) );
     my $addr = $self->addr || return( $self->error( "No variable address found!" ) );
     my $data = $repo->{ $addr };
     if( my $obj = tied( $self->{type} eq 'array' ? @$data : $self->{type} eq 'hash' ? @$data : $$data ) )
     {
         die( "Data received ($data) is tied to class '", ref( $obj ), "'!\n" );
     }
-    
+
     if( !ref( $data ) )
     {
-        warn( "Shared memory block with id '", $sh->id, "' -> addr '$addr' does not contain a reference: '$data' (called from package $info[0] in file $info[1] at line $info[2] from subroutine $sub)\n" );
+        warn( "Shared memory block with id '", $sh->id, "' -> addr '$addr' does not contain a reference: '$data' (called from package $info[0] in file $info[1] at line $info[2] from subroutine $sub)" );
     }
     elsif( lc( ref( $data ) ) ne $self->{type} )
     {
-        warn( "Data retrieved from shared memory with id '", $sh->id, "' -> addr '$addr' is expected to contain a reference of type '$self->{type}', but instead contains a reference of type '", lc( ref( $data ) ), "' (called from package $info[0] in file $info[1] at line $info[2] from subroutine $sub)\n" );
+        warn( "Data retrieved from shared memory with id '", $sh->id, "' -> addr '$addr' is expected to contain a reference of type '$self->{type}', but instead contains a reference of type '", lc( ref( $data ) ), "' (called from package $info[0] in file $info[1] at line $info[2] from subroutine $sub)" );
     }
     return( $data );
 }
@@ -2210,14 +2328,15 @@ sub lock
     my $self = shift( @_ );
     my $sh   = $self->shared ||
         return( $self->error( "No shared memory object found." ) );
+    my $prefix = ref( $self ) . "::lock [pid $$]";
     my $repo = $sh->read;
     $repo = {} if( !defined( $repo ) || !CORE::length( $repo ) );
-    warn( "Warning only: I was expecting an hash reference from reading the shared memory repository, but instead got '", ( $repo // '' ), "'\n" ) if( ref( $repo ) ne 'HASH' && $self->_warnings_is_enabled );
+    warn( "Warning only: I was expecting an hash reference from reading the shared memory repository, but instead got '", ( $repo // '' ), "'" ) if( ref( $repo ) ne 'HASH' && $self->_warnings_is_enabled( 'Promise::Me' ) );
     my $addr = $self->addr || return( $self->error( "No variable address found!" ) );
     $repo->{_lock} = {} if( !CORE::exists( $repo->{_lock} ) || ref( $repo->{_lock} ) ne 'HASH' );
     if( CORE::exists( $repo->{_lock}->{ $addr } ) )
     {
-        warnings::warn( "Variable '", $self->{value}, "' with address '$self->{addr}' is already locked by process (", $repo->{_lock}->{ $addr }, "). Is it us? ", ( $repo->{_lock}->{ $addr } == $$ ? 'Yes' : 'No' ), "\n" ) if( warnings::enabled() || $DEBUG );
+        warn( "Variable '", $self->{value}, "' with address '$self->{addr}' is already locked by process (", $repo->{_lock}->{ $addr }, "). Is it us? ", ( $repo->{_lock}->{ $addr } == $$ ? 'Yes' : 'No' ) ) if( $self->_warnings_is_enabled( 'Promise::Me' ) || $DEBUG );
         return( $self );
     }
     $repo->{_lock}->{ $addr } = $$;
@@ -2231,6 +2350,7 @@ sub locked
     my $self = shift( @_ );
     my $sh   = $self->shared ||
         return( $self->error( "No shared memory object found." ) );
+    my $prefix = ref( $self ) . "::locked [pid $$]";
     my $repo = $sh->read;
     $repo = {} if( !defined( $repo ) || !CORE::length( $repo ) );
     warn( "Warning only: I was expecting an hash reference from reading the shared memory repository, but instead got '", ( $repo // '' ), "'\n" ) if( ref( $repo ) ne 'HASH' && $self->_warnings_is_enabled );
@@ -2244,14 +2364,20 @@ sub remove
     my $self = shift( @_ );
     my $sh   = $self->shared ||
         return( $self->error( "No shared memory object found." ) );
+    my $prefix = ref( $self ) . "::remove [pid $$]";
     my $repo = $sh->read;
     $repo = {} if( !defined( $repo ) || !CORE::length( $repo ) );
-    warn( "Warning only: I was expecting an hash reference from reading the shared memory repository, but instead got '", ( $repo // '' ), "'\n" ) if( ref( $repo ) ne 'HASH' && $self->_warnings_is_enabled );
+    warn( "Warning only: I was expecting an hash reference from reading the shared memory repository, but instead got '", ( $repo // '' ), "'" ) if( ref( $repo ) ne 'HASH' && $self->_warnings_is_enabled( 'Promise::Me' ) );
     my $addr = $self->addr || return( $self->error( "No variable address found!" ) );
     CORE::delete( $repo->{ $addr } );
-    $sh->lock( LOCK_EX );
-    $sh->write( $repo ) || return( $self->pass_error( $sh->error ) );
-    $sh->unlock;
+    # Locking is done inside 'write'
+    # $sh->lock( LOCK_EX );
+    if( !$sh->write( $repo ) )
+    {
+        # $sh->unlock;
+        return( $self->pass_error( $sh->error ) )
+    }
+    # $sh->unlock;
     return( $self );
 }
 
@@ -2263,16 +2389,22 @@ sub unload
     my $self = shift( @_ );
     my $sh   = $self->shared ||
         return( $self->error( "No shared memory object found." ) );
+    my $prefix = ref( $self ) . "::unload [pid $$]";
     my $data = shift( @_ );
     my $addr = $self->addr || return( $self->error( "No variable address found!" ) );
     my $repo = $sh->read;
     $repo = {} if( !defined( $repo ) || !CORE::length( $repo ) );
-    warn( "Warning only: I was expecting an hash reference from reading the shared memory repository, but instead got '", ( $repo // '' ), "'\n" ) if( ref( $repo ) ne 'HASH' && $self->_warnings_is_enabled );
+    warn( "Warning only: I was expecting an hash reference from reading the shared memory repository, but instead got '", ( $repo // '' ), "'" ) if( ref( $repo ) ne 'HASH' && $self->_warnings_is_enabled( 'Promise::Me' ) );
     $repo->{ $addr } = $data;
-    $sh->lock( LOCK_EX );
+    # Locking is done inside 'write'
+    # $sh->lock( LOCK_EX );
     my $rv = $sh->write( $repo );
-    return( $self->error( "Unable to write to shared memory block with shared memory object $sh: ", $sh->error ) ) if( !defined( $rv ) );
-    $sh->unlock;
+    if( !defined( $rv ) )
+    {
+        # $sh->unlock;
+        return( $self->error( "Unable to write to shared memory block with shared memory object $sh: ", $sh->error ) );
+    }
+    # $sh->unlock;
     return( $self );
 }
 
@@ -2281,15 +2413,16 @@ sub unlock
     my $self = shift( @_ );
     my $sh   = $self->shared ||
         return( $self->error( "No shared memory object found." ) );
+    my $prefix = ref( $self ) . "::unlock [pid $$]";
     my $repo = $sh->read;
     $repo = {} if( !defined( $repo ) || !CORE::length( $repo ) );
-    warn( "Warning only: I was expecting an hash reference from reading the shared memory repository, but instead got '", ( $repo // '' ), "'\n" ) if( ref( $repo ) ne 'HASH' && $self->_warnings_is_enabled );
+    warn( "Warning only: I was expecting an hash reference from reading the shared memory repository, but instead got '", ( $repo // '' ), "'" ) if( ref( $repo ) ne 'HASH' && $self->_warnings_is_enabled( 'Promise::Me' ) );
     my $addr = $self->addr || return( $self->error( "No variable address found!" ) );
     if( $repo->{_lock}->{ $addr } != $$ )
     {
         return( $self->error( "Unable to remove the lock. This process ($$) is not the owner of the lock (", $repo->{_lock}->{ $addr }, ")." ) );
     }
-    
+
     # Credits to IPC::Shareable for the idea
     if( $self->{_changed} )
     {
@@ -2297,10 +2430,15 @@ sub unlock
         $self->{_changed} = 0;
     }
     CORE::delete( $repo->{_lock}->{ $addr } );
-    $sh->lock( LOCK_EX );
+    # Locking is done inside 'write'
+    # $sh->lock( LOCK_EX );
     my $rv = $sh->write( $repo );
-    return( $self->error( "Unable to write to shared memory with shared memory object $sh: ", $sh->error ) ) if( !defined( $rv ) );
-    $sh->unlock;
+    if( !defined( $rv ) )
+    {
+        # $sh->unlock;
+        return( $self->error( "Unable to write to shared memory with shared memory object $sh: ", $sh->error ) );
+    }
+    # $sh->unlock;
     return( $self );
 }
 
@@ -2311,6 +2449,7 @@ sub _tie
     return( $class->error( "No shared memory object provided." ) ) if( !CORE::exists( $opts->{shm} ) || !CORE::length( $opts->{shm} ) || !Scalar::Util::blessed( $opts->{shm} ) );
     return( $class->error( "No data type was provided for shared memory tie." ) ) if( !CORE::length( $opts->{type} ) || !CORE::length( $opts->{type} ) );
     return( $class->error( "Data type '$opts->{type}' is unsupported." ) ) if( $opts->{type} !~ /^(array|hash|scalar)$/i );
+    my $prefix = $class . "::_tie [pid $$]";
 #     if( !CORE::length( $opts->{type} ) && CORE::length( $opts->{value} ) )
 #     {
 #         return( $class->error( "Value provided ($opts->{value}) is not a reference!" ) ) if( !ref( $opts->{value} ) );
@@ -2319,14 +2458,13 @@ sub _tie
     $opts->{type} = lc( $opts->{type} );
     my $hash =
     {
-    # addr    => Scalar::Util::refaddr( $opts->{value} ),
-    addr    => $opts->{addr},
-    debug   => ( $opts->{debug} // 0 ),
-    shared  => $opts->{shm},
-    type    => $opts->{type},
+        addr    => $opts->{addr},
+        debug   => ( $opts->{debug} // 0 ),
+        shared  => $opts->{shm},
+        type    => $opts->{type},
     };
     my $self = bless( $hash => ( ref( $class ) || $class ) );
-    
+
     if( $opts->{type} eq 'scalar' )
     {
         $self->{data} = \'';
@@ -2519,7 +2657,7 @@ Promise::Me - Fork Based Promise with Asynchronous Execution, Async, Await and S
 
 =head1 VERSION
 
-    v0.5.0
+    v0.6.0
 
 =head1 DESCRIPTION
 
@@ -2666,15 +2804,15 @@ The options supported are:
 
 =over 4
 
-=item I<debug> integer
+=item C<debug> integer
 
 Sets the debug level. This can be quite verbose and will slow down the process, so use with caution.
 
-=item I<exception_class>
+=item C<exception_class>
 
 The exception class you want to use, so that L<Promise::Me> can properly detect it when it is return from the main callback and call L</reject>, passing the exception object as it sole parameter.
 
-=item I<medium>
+=item C<medium>
 
 This sets the medium type to use to share data between parent and child process. Possible values are: C<memory>, C<mmap> or C<file>
 
@@ -2682,7 +2820,7 @@ It defaults to the class variable C<$SHARE_MEDIUM>
 
 See also the related method L</medium>
 
-=item I<result_shared_mem_size> integer
+=item C<result_shared_mem_size> integer
 
 Sets the shared memory segment to store the asynchronous process results. This default to the value of the global variable C<$RESULT_MEMORY_SIZE>, which is by default 512K bytes, or if empty or not defined, the value of the constant C<Module::Generic::SharedMemXS::SHM_BUFSIZ>, which is 64K bytes.
 
@@ -2694,19 +2832,19 @@ By default, the value is set to the global variable C<$SERIALISER>, which defaul
 
 This value is passed to L<Module::Generic::File::Mmap>, L<Module::Generic::File::Cache>, or L<Module::Generic::SharedMemXS> depending on your choice of shared memory medium.
 
-=item I<shared_vars_mem_size> integer
+=item C<shared_vars_mem_size> integer
 
 Sets the shared memory segment to store the shared variable data, i.e. the ones declared with L</shared>. This defaults to the value of the global variable C<$SHARED_MEMORY_SIZE>, which is by default 64K bytes, or if empty or not defined, the value of the constant C<Module::Generic::SharedMemXS::SHM_BUFSIZ>, which is 64K bytes.
 
-=item I<tmpdir> string
+=item C<tmpdir> string
 
 The optional path to the temporary directory to use when you want to use file cache as a medium for shared data.
 
-=item I<timeout> integer
+=item C<timeout> integer
 
 Currently unused.
 
-=item I<use_cache_file>
+=item C<use_cache_file>
 
 Boolean. If true, L<Promise::Me> will use a cache file instead of shared memory block. If you are on system that do not support shared memory, L<Promise::Me> will automatically revert to L<Module::Generic::File::Cache> to handle data shared among processes.
 
@@ -2714,9 +2852,9 @@ You can use the global package variable C<$SHARE_MEDIUM> to set the default valu
 
 C<$SHARE_MEDIUM> value can be either C<memory> for shared memory, C<mmap> for cache mmap or C<file> for shared cache file.
 
-=item I<use_mmap>
+=item C<use_mmap>
 
-Boolean. If true, L<Promise::Me> will use a cache mmap file with L<Module::Generic::File::Mmap> instead of a shared memory block. However, please note that you need to have installed L<Cache::FastMmap> in order to use this.
+Boolean. If true, L<Promise::Me> will use a cache mmap file with L<Module::Generic::File::Mmap> instead of a shared memory block.
 
 You can use the global package variable C<$SHARE_MEDIUM> to set the default value for all object instantiation.
 
@@ -3188,9 +3326,9 @@ Otherwise the two keywords would conflict.
 
 =head1 SHARED MEMORY
 
-This module uses shared memory using L<Module::Generic::SharedMemXS>, or shared cache file using L<Module::Generic::File::Cache> if shared memory is not supported, or if the value of the global package variable C<$SHARE_MEDIUM> is set to C<file> instead of C<memory>. Alternatively you can also have L<Promise::Me> use cache mmap file by setting C<$SHARE_MEDIUM> to C<mmap>. This will have it use L<Module::Generic::File::Mmap>, but note that you will need to install L<Cache::FastMmap>
+This module uses shared memory using L<Module::Generic::SharedMemXS>, or shared cache file using L<Module::Generic::File::Cache> if shared memory is not supported, or if the value of the global package variable C<$SHARE_MEDIUM> is set to C<file> instead of C<memory>. Alternatively you can also have L<Promise::Me> use cache mmap file by setting C<$SHARE_MEDIUM> to C<mmap>. This will have it use L<Module::Generic::File::Mmap>
 
-The value of C<$SHARE_MEDIUM> is automatically initialised to C<memory> if the system, on which this module runs, supports L<IPC::SysV>, or C<mmap> if you have L<Cache::FastMmap> installed, or else to C<file>
+The value of C<$SHARE_MEDIUM> is automatically initialised to C<memory> if the system, on which this module runs, supports L<IPC::SysV>, or C<mmap>, or else to C<file>
 
 Shared memory is used for:
 
@@ -3212,7 +3350,7 @@ You can control how much shared memory is allocated for each by:
 
 If you use L<shared cache file|Module::Generic::File::Cache>, then not setting a size is ok. It will use the space on the filesystem as needed and obviously return an error if there is no space left.
 
-You can alternatively use L<Module::Generic::File::Mmap>, which has an API similar to L<Module::Generic::File::Cache>, but uses an mmap file instead of a simple cache file and rely on the XS module L<Cache::FastMmap>, and thus is faster.
+You can alternatively use L<Module::Generic::File::Mmap>, which has an API similar to L<Module::Generic::File::Cache>, but uses an mmap file instead of a simple cache file, and thus is faster.
 
 =back
 
@@ -3272,7 +3410,7 @@ Note that the serialiser used to serialise shared variable, is set only via this
 
 =head2 $SHARE_MEDIUM
 
-The value of C<$SHARE_MEDIUM> is automatically initialised to C<memory> if the system, on which this module runs, supports L<IPC::SysV>, or C<mmap> if you have L<Cache::FastMmap> installed, or else to C<file>
+The value of C<$SHARE_MEDIUM> is automatically initialised to C<memory> if the system, on which this module runs, supports L<IPC::SysV>, or C<mmap>, or else to C<file>
 
 =head2 $SHARED_MEMORY_SIZE
 
@@ -3283,6 +3421,65 @@ This is the size in bytes of the shared memory block used for sharing variables 
     share( $name, %prefs, @middle_names );
 
 See L</"SHARED VARIABLES">
+
+=head2 $USE_THREADS_SHARED
+
+    my $data : shared = '';
+    # Do some asynchronous activities with Promise::Me
+
+or
+
+    my $data : pshared = ''; # does the same thing, but avoid conflict with threads
+
+By default, C<Promise::Me> will recognise the variable attribute C<shared>, and handle it. However, when using L<threads>, this C<shared> pragma would also be used and recognised by L<threads> leading to a conflict. Setting C<$USE_THREADS_SHARED> to true, ensures that L<threads>'s C<shared> takes precedence, and C<Promise::Me> would stand down. By default, this is false.
+
+Also, instead of using C<shared>, you can use C<pshared>
+
+You can also set the value of C<$USE_THREADS_SHARED> upon import by using C<no_shared>
+
+    use Promise::Me 'no_shared'; # effectively sets $USE_THREADS_SHARED to true
+
+However, if you did:
+
+    use Promise::Me;
+    $Promise::Me::USE_THREADS_SHARED = 1;
+
+This would not work, because it would be too late. C<$USE_THREADS_SHARED> is used when the module is being loaded in the caller's namespace, so setting the variable after would be too late.
+
+=head1 SHARED VARIABLES
+
+C<Promise::Me> supports two attributes for shared variables:
+
+=over 4
+
+=item C<:shared>
+
+Shares variables across processes or threads. By default, or if C<$USE_THREADS_SHARED> is false, C<:shared> uses C<Promise::Me::Share> with shared memory (via L<Module::Generic::SharedMemXS>) and customisable serialisation (e.g., L<CBOR>, L<Sereal>). If C<no_shared> is specified and C<threads> is loaded, C<:shared> uses C<threads::shared>.
+
+=item C<:pshared>
+
+Always uses C<Promise::Me::Share> for sharing, regardless of C<threads> usage or the C<no_shared> option. This ensures consistent inter-process sharing with C<Promise::Me>’s mechanism.
+
+=back
+
+To avoid conflicts with dependencies that load C<threads> (e.g., under C<mod_perl>), use C<:pshared> or avoid C<no_shared>. If you explicitly use C<threads>, call C<Promise::Me> with C<no_shared> to prefer C<threads::shared> for C<:shared>.
+
+Example:
+
+    use Promise::Me;
+    my $result : shared = '';  # Uses Promise::Me::Share
+    my $promise = Promise::Me->new(sub
+    {
+        $result = "data from child";
+    });
+    await($promise);
+    print $result;  # Outputs: data from child
+
+    use threads;
+    use threads::shared;
+    use Promise::Me qw( no_shared );
+    my $result : shared = '';  # Uses threads::shared
+    my $promise : pshared = '';  # Uses Promise::Me::Share
 
 =head1 SERIALISATION
 

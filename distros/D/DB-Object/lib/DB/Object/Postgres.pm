@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Postgres.pm
-## Version v1.3.0
-## Copyright(c) 2024 DEGUEST Pte. Ltd.
+## Version v1.4.0
+## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2025/03/09
+## Modified 2025/07/30
 ## All rights reserved
 ## 
 ## 
@@ -21,9 +21,9 @@ BEGIN
     use parent qw( DB::Object );
     use version;
     use vars qw(
-        $VERSION $CACHE_QUERIES $CACHE_SIZE $CONNECT_VIA $DB_ERRSTR 
-        @DBH $DEBUG $ERROR $MOD_PERL $USE_BIND $USE_CACHE
-        $PLACEHOLDER_REGEXP $DATATYPES_DICT $TABLE_CACHE
+        $VERSION $CACHE_SIZE $CONNECT_VIA 
+        $DEBUG $ERROR $MOD_PERL $USE_BIND $USE_CACHE
+        $PLACEHOLDER_REGEXP $DATATYPES_DICT
     );
     use DBI;
     eval
@@ -32,7 +32,6 @@ BEGIN
         DBD::Pg->import( ':pg_types' );
     };
     die( $@ ) if( $@ );
-    our $TABLE_CACHE = {};
     # the 'constant' property in the dictionary hash is added in structure()
     # <https://www.postgresql.org/docs/13/datatype.html>
     our $DATATYPES_DICT =
@@ -461,7 +460,7 @@ BEGIN
         },
     };
     our $PLACEHOLDER_REGEXP = qr/(?:\?|\$(?<index>\d+))/;
-    our $VERSION = 'v1.3.0';
+    our $VERSION = 'v1.4.0';
 };
 
 use strict;
@@ -469,17 +468,11 @@ use warnings;
 # require DB::Object::Postgres::Statement;
 # require DB::Object::Postgres::Tables;
 # require DB::Object::Postgres::Lo;
-our $DB_ERRSTR     = '';
 our $DEBUG         = 0;
-our $CACHE_QUERIES = [];
 our $CACHE_SIZE    = 10;
-# The purpose of this cache is to store table object and avoid the penalty of reloading the structure of a table for every object generated.
-# Thus CACHE_TABLE is in no way an exhaustive list of existing table, but existing table object.
-our $CACHE_TABLE   = {};
 our $USE_BIND      = 0;
 our $USE_CACHE     = 0;
 our $MOD_PERL      = 0;
-our @DBH           = ();
 if( $INC{ 'Apache/DBI.pm' } && 
     substr( $ENV{ 'GATEWAY_INTERFACE' }|| '', 0, 8 ) eq 'CGI-Perl' )
 {
@@ -1658,7 +1651,11 @@ sub _placeholder_regexp { return( $PLACEHOLDER_REGEXP ) }
 # NOTE: DESTROY
 DESTROY
 {
-    my $self  = shift( @_ );
+    # <https://perldoc.perl.org/perlobj#Destructors>
+    CORE::local( $., $@, $!, $^E, $? );
+    CORE::return if( ${^GLOBAL_PHASE} eq 'DESTRUCT' );
+    my $self = CORE::shift( @_ );
+    CORE::return if( !CORE::defined( $self ) );
     my $class = ref( $self ) || $self;
     if( $self->{sth} )
     {
@@ -1686,15 +1683,6 @@ DESTROY
         }
     }
 }
-
-# NOTE: END
-END
-{
-    # foreach my $dbh ( @DBH )
-    # {
-    #     $dbh->disconnect();
-    # }
-};
 
 1;
 # NOTE: POD
@@ -1802,7 +1790,7 @@ DB::Object::Postgres - SQL API
     
 =head1 VERSION
 
-    v1.3.0
+    v1.4.0
 
 =head1 DESCRIPTION
 

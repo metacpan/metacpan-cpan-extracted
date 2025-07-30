@@ -1,5 +1,22 @@
 Revision history for Perl module Module::Generic
 
+v1.0.2 2025-07-30T08:35:32+0900
+    - Improved method _set_get_object_without_init in Module::Generic
+    - Added the option of specifying a format to _set_get_datetime, and improved the method
+    - Improved _parse_timestamp in Module::Generic
+    - Corrected a minor bug in callbacks for _set_get_array_as_object in Module::Generic
+    - Improved _set_get_boolean to allow specifying a boolean class
+    - Enhanced _set_get_number with standard optional constraints
+    - Added the method 'md5' (with an alias 'md5_checksum', and 'md5_hex') in Module::Generic::Hash
+    - Improved callbacks handling in _set_get* methods
+    - Improved Module::Generic::File::Cache by using Module::Generic::Global
+    - Improved methods open, lock, and unlock in Module::Generic::File
+    - Improved module Module::Generic::File::IO, added method locked and lock_state
+    - Corrected a bug in method _set_get_scalar_as_object in Module::Generic
+    - Corrected a bug in method as_string in embedded class Module::Generic::Global::Exception
+    - Improved object instantiation for Module::Generic::Global when controller is an overloaded string
+    - Corrected methods 'open', and 'key' in Module::Generic::SharedMem, and Module::Generic::SharedMemXS
+
 v1.0.1 2025-05-30T15:04:32+0900
     - Corrected unit test in t/11.finfo.t
 

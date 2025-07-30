@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/SQLite.pm
-## Version v1.1.3
+## Version v1.2.0
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2024/09/04
+## Modified 2025/07/30
 ## All rights reserved
 ## 
 ## 
@@ -19,9 +19,9 @@ BEGIN
     use strict;
     use warnings;
     use vars qw(
-        $VERSION $CACHE_QUERIES $CACHE_SIZE $CONNECT_VIA $DB_ERRSTR $ERROR $DEBUG
-        $USE_BIND $USE_CACHE $MOD_PERL @DBH
-        $PLACEHOLDER_REGEXP $DATATYPES_DICT $TABLE_CACHE
+        $VERSION $CACHE_SIZE $CONNECT_VIA $ERROR $DEBUG
+        $USE_BIND $USE_CACHE $MOD_PERL
+        $PLACEHOLDER_REGEXP $DATATYPES_DICT
     );
     use DBI qw( :sql_types );
     eval { require DBD::SQLite; };
@@ -32,7 +32,6 @@ BEGIN
     use DateTime::TimeZone;
     use DateTime::Format::Strptime;
     use Module::Generic::File qw( sys_tmpdir );
-    our $TABLE_CACHE = {};
     # <https://metacpan.org/pod/DBD::SQLite::Constants>
     # <https://www.sqlite.org/datatype3.html>
     # <https://metacpan.org/pod/DBD::SQLite::Constants#datatypes-(fundamental_datatypes)>
@@ -81,24 +80,18 @@ BEGIN
         };
     }
     our $PLACEHOLDER_REGEXP = qr/\?(?<index>\d+)/;
-    our $VERSION = 'v1.1.3';
+    our $VERSION = 'v1.2.0';
 };
 
 use strict;
 use warnings;
 # require DB::Object::SQLite::Statement;
 # require DB::Object::SQLite::Tables;
-our $DB_ERRSTR     = '';
 our $DEBUG         = 0;
-our $CACHE_QUERIES = [];
 our $CACHE_SIZE    = 10;
-# The purpose of this cache is to store table object and avoid the penalty of reloading the structure of a table for every object generated.
-# Thus CACHE_TABLE is in no way an exhaustive list of existing table, but existing table object.
-our $CACHE_TABLE   = {};
 our $USE_BIND      = 0;
 our $USE_CACHE     = 0;
 our $MOD_PERL      = 0;
-our @DBH           = ();
 if( $INC{ 'Apache/DBI.pm' } && 
     substr( $ENV{GATEWAY_INTERFACE}|| '', 0, 8 ) eq 'CGI-Perl' )
 {
@@ -873,10 +866,10 @@ sub _parse_timestamp
     my $error = 0;
     my $opt = 
     {
-    pattern     => '%Y-%m-%d %T',
-    locale      => 'en_GB',
-    time_zone   => $tz->name,
-    on_error    => sub{ $error++ },
+        pattern     => '%Y-%m-%d %T',
+        locale      => 'en_GB',
+        time_zone   => $tz->name,
+        on_error    => sub{ $error++ },
     };
     # 2019-06-19 23:23:57.000000000+0900
     # From PostgreSQL: 2019-06-20 11:02:36.306917+09
@@ -1307,7 +1300,11 @@ sub _year
 
 DESTROY
 {
-    my $self  = shift( @_ );
+    # <https://perldoc.perl.org/perlobj#Destructors>
+    CORE::local( $., $@, $!, $^E, $? );
+    CORE::return if( ${^GLOBAL_PHASE} eq 'DESTRUCT' );
+    my $self = CORE::shift( @_ );
+    CORE::return if( !CORE::defined( $self ) );
     my $class = ref( $self ) || $self;
     if( $self->{sth} )
     {
@@ -1429,7 +1426,7 @@ DB::Object::SQLite - DB Object SQLite Driver
     
 =head1 VERSION
 
-    v1.1.3
+    v1.2.0
 
 =head1 DESCRIPTION
 

@@ -153,7 +153,7 @@ sub callback
     {
         return( $self->error( "Callback provided is not a code reference. Provide an anonymous subroutine, or reference to an existing subroutine." ) );
     }
-    
+
     if( !defined( $code ) )
     {
         # undef is passed as an argument, so we remove the callback
@@ -207,7 +207,7 @@ sub capitalise
     my $small_re = CORE::join( '|', @small_words );
 
     my $apos = qr/ (?: ['’] [[:lower:]]* )? /x;
-    
+
     my $copy = $$self;
     return( $self->_new( $copy ) ) if( !CORE::defined( $copy ) );
     $copy =~ s{\A\s+}{};
@@ -319,7 +319,7 @@ sub error
         {
             $args->{message} = CORE::join( '', CORE::map( ref( $_ ) eq 'CODE' ? $_->() : $_, @_ ) );
         }
-        
+
         $args->{class} //= '';
         my $ex_class = CORE::length( $args->{class} )
             ? $args->{class}
@@ -515,7 +515,7 @@ sub pad
     {
         warn( "Number provided \"$n\" to pad string is not an integer.\n" ) if( $self->_warnings_is_enabled );
     }
-    
+
     if( $n < 0 )
     {
         $$self .= ( "$str" x CORE::abs( $n ) );
@@ -558,7 +558,7 @@ sub pass_error
     }
     # We set $ex_class only if the hash provided is a one-element hash and not an error-defining hash
     $ex_class = CORE::delete( $opts->{class} ) if( CORE::scalar( CORE::keys( %$opts ) ) == 1 && [CORE::keys( %$opts )]->[0] eq 'class' );
-    
+
     # called with no argument, most likely from the same class to pass on an error 
     # set up earlier by another method; or
     # with an hash containing just one argument class => 'Some::ExceptionClass'
@@ -589,7 +589,7 @@ sub pass_error
     {
         return( $self->error( @_ ) );
     }
-    
+
     if( want( 'OBJECT' ) )
     {
         # try-catch
@@ -919,7 +919,8 @@ sub DESTROY
     # <https://perldoc.perl.org/perlobj#Destructors>
     CORE::local( $., $@, $!, $^E, $? );
     CORE::return if( ${^GLOBAL_PHASE} eq 'DESTRUCT' );
-    my $self = CORE::shift( @_ ) || CORE::return;
+    my $self = CORE::shift( @_ );
+    CORE::return if( !CORE::defined( $self ) );
     if( my $obj = Module::Generic::Global->new( 'errors' => $self ) )
     {
         $obj->remove;

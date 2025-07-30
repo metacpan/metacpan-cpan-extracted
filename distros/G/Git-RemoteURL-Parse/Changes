@@ -1,5 +1,11 @@
 Revision history for Git-RemoteURL-Parse
 
-0.01    Date/time
-        First version, released on an unsuspecting world.
+0.02    2025/07/29
+
+     - Removed junk from Makefile.
+     - Improved POD.
+
+0.01    2025/07/28
+
+     - First version, released on an unsuspecting world.
 

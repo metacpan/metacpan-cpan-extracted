@@ -22,7 +22,7 @@ WriteMakefile(
 	PREREQ_PM => {
 		'Carp' => 0,
 		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
-		'Params::Get' => 0,
+		'Params::Get' => 0.11,
 	},
 	META_MERGE => {
 		resources => {

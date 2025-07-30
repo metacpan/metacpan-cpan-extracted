@@ -33,11 +33,11 @@ my %WriteMakefileArgs = (
         'DateTime'                      => '1.52',
         'DateTime::Format::Strptime'    => '1.77',
         'JSON'                          => '4.03',
-        'Module::Generic'               => 'v0.43.0',
+        'Module::Generic'               => 'v1.0.2',
         'Net::IDN::Encode'              => '2.500',
         'Scalar::Util'                  => '1.50',
         'URI::Escape'                   => '5.09',
-        'Want'                          => '0.29',
+        'Wanted'                        => 'v0.1.0',
     },
     TEST_REQUIRES =>
     {

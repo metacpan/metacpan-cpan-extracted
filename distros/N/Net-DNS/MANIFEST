@@ -136,6 +136,7 @@ t/05-CDS.t
 t/05-CERT.t
 t/05-CNAME.t
 t/05-CSYNC.t
+t/05-DELEG.t
 t/05-DHCID.t
 t/05-DNAME.t
 t/05-DNSKEY.t

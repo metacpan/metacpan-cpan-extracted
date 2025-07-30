@@ -2,10 +2,13 @@ Changes
 Dockerfile
 lib/App/rdapper.pm
 lib/App/rdapper/l10n.pm
+locale/de/LC_MESSAGES/rdapper.po
 locale/en/LC_MESSAGES/rdapper.mo
 locale/en/LC_MESSAGES/rdapper.po
 locale/fr/LC_MESSAGES/rdapper.mo
 locale/fr/LC_MESSAGES/rdapper.po
+locale/pt/LC_MESSAGES/rdapper.mo
+locale/pt/LC_MESSAGES/rdapper.po
 locale/rdapper.pot
 Makefile.PL
 MANIFEST			This list of files

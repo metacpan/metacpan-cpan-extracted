@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Changes file management - ~/lib/Changes/Group.pm
-## Version v0.2.0
+## Version v0.2.1
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/11/23
-## Modified 2022/12/09
+## Modified 2025/07/28
 ## All rights reserved
 ## 
 ## 
@@ -19,7 +19,7 @@ BEGIN
     use warnings::register;
     use parent qw( Module::Generic );
     use vars qw( $VERSION );
-    our $VERSION = 'v0.2.0';
+    our $VERSION = 'v0.2.1';
 };
 
 use strict;
@@ -53,7 +53,7 @@ sub add_change
         if( $elements->exists( $change ) )
         {
             $self->_load_class( 'overload' );
-            return( $self->error( "A very same change object (", overload::StrVal( $change ), ") is already registered." ) );
+            return( $self->error( "A very same change object (", $self->_str_val( $change ), ") is already registered." ) );
         }
     }
     else
@@ -83,7 +83,7 @@ sub as_string
         {
             $cache = $self->{raw};
         }
-        
+
         my $lines = $self->new_array( $cache->scalar );
         $self->elements->foreach(sub
         {
@@ -225,6 +225,15 @@ sub spacer { return( shift->reset(@_)->_set_get_scalar_as_object( 'spacer', @_ )
 
 sub type { return( shift->reset(@_)->_set_get_scalar_as_object( 'type', @_ ) ); }
 
+sub DESTROY
+{
+    # <https://perldoc.perl.org/perlobj#Destructors>
+    CORE::local( $., $@, $!, $^E, $? );
+    my $self = CORE::shift( @_ );
+    CORE::return if( !CORE::defined( $self ) );
+    CORE::return if( ${^GLOBAL_PHASE} eq 'DESTRUCT' );
+};
+
 1;
 # NOTE: POD
 __END__
@@ -252,7 +261,7 @@ Changes::Group - Group object class
 
 =head1 VERSION
 
-    v0.2.0
+    v0.2.1
 
 =head1 DESCRIPTION
 

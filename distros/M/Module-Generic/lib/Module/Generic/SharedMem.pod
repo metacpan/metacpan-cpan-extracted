@@ -12,7 +12,7 @@ Module::Generic::SharedMem - Shared Memory Manipulation
         my $shmem = Module::Generic::SharedMem->new( key => 'some_identifier' ) ||
             die( Module::Generic::SharedMem->error );
     }
-    
+
     my $shmem = Module::Generic::SharedMem->new(
         # Create if necessary, or re-use if already exists
         create => 1,
@@ -103,7 +103,7 @@ Module::Generic::SharedMem - Shared Memory Manipulation
 
 =head1 VERSION
 
-    v0.5.3
+    v0.5.4
 
 =head1 DESCRIPTION
 

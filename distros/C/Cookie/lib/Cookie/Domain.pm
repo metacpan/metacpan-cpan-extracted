@@ -21,7 +21,7 @@ BEGIN
     use Module::Generic::File qw( tempfile );
     use JSON;
     use Net::IDN::Encode ();
-    use Want;
+    use Wanted;
     use constant URL => 'https://publicsuffix.org/list/effective_tld_names.dat';
     # Properly formed domain name according to rfc1123
     our $DOMAIN_RE = qr/^

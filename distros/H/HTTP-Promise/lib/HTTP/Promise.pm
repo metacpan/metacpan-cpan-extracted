@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Asynchronous HTTP Request and Promise - ~/lib/HTTP/Promise.pm
-## Version v0.5.3
-## Copyright(c) 2024 DEGUEST Pte. Ltd.
+## Version v0.6.0
+## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/06
-## Modified 2025/03/09
+## Modified 2025/07/30
 ## All rights reserved.
 ## 
 ## 
@@ -60,7 +60,7 @@ BEGIN
     our $EXTENSION_VARY = 1;
     our $DEFAULT_MIME_TYPE = 'application/octet-stream';
     our $SERIALISER = $Promise::Me::SERIALISER;
-    our $VERSION = 'v0.5.3';
+    our $VERSION = 'v0.6.0';
 };
 
 use strict;
@@ -2097,7 +2097,7 @@ sub _read_body
     {
         # If this is a application/x-www-form-urlencoded type, we save it as such, and
         # the HTTP::Promise::Body::Form makes those data accessible as an hash object
-        if( $type eq TYPE_URL_ENCODED )
+        if( $type && $type eq TYPE_URL_ENCODED )
         {
             $body = $ent->new_body( form => $data ) ||
                 return( $self->pass_error( $ent->error ) ); 
@@ -2310,7 +2310,7 @@ HTTP::Promise - Asynchronous HTTP Request and Promise
 
 =head1 VERSION
 
-    v0.5.3
+    v0.6.0
 
 =head1 DESCRIPTION
 

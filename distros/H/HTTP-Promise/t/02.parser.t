@@ -187,6 +187,7 @@ subtest "request" => sub
     while( my( $message, $expected, $test ) = splice( @bad, 0, 3 ) )
     {
         diag( "Parsing request:\n${message}" ) if( $DEBUG );
+        no warnings;
         my $rv = HTTP::Promise::Parser->parse_request_pp( \$message );
         ok( !$rv, "Returned value for $test" );
         my $ex = HTTP::Promise::Parser->error;

@@ -34,7 +34,7 @@
          "requires" : {
             "Carp" : "0",
             "ExtUtils::MakeMaker" : "6.64",
-            "Params::Get" : "0"
+            "Params::Get" : "0.11"
          }
       },
       "test" : {
@@ -49,6 +49,6 @@
    },
    "release_status" : "stable",
    "resources" : {},
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

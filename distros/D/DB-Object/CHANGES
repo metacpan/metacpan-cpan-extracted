@@ -1,5 +1,8 @@
 Revision history for Perl module DB::Object
 
+v1.8.0 2025-07-30T11:25:58+0900
+    - Minor improvements and cleanup of code
+
 v1.7.0 2025-03-09T16:30:58+0900
     - Improved support for field to datetime objects and decoding json
     - Correcting an oversight in DB::Object::Query::format_statement when a value provided is a scalar reference.

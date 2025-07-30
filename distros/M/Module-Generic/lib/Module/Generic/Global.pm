@@ -18,8 +18,8 @@ BEGIN
     use warnings::register;
     use parent qw( Exporter );
     use vars qw(
-    $MOD_PERL $REPO $MUTEX $ERRORS $LOCKS $LOCK_MUTEX $DEBUG $PerlConfig
-    @EXPORT_OK %EXPORT_TAGS $VERSION
+        $MOD_PERL $REPO $MUTEX $ERRORS $LOCKS $LOCK_MUTEX $DEBUG $PerlConfig
+        @EXPORT_OK %EXPORT_TAGS $VERSION
     );
     use Config;
     use Scalar::Util ();
@@ -185,7 +185,11 @@ sub new
 {
     my $this = shift( @_ );
     my $ns   = shift( @_ ) || return( $this->error( "No namespace was provided." ) );
-    my $what = shift( @_ ) || return( $this->error( "No controller element was provided for this namespace $ns" ) );
+    my $what = shift( @_ );
+    unless( defined( $what ) && CORE::ref( $what ) )
+    {
+        return( $this->error( "No controller element was provided for this namespace $ns" ) ) if( !$what );
+    }
     my $opts = $this->_get_args_as_hash( @_ );
 
     my $ref = 
@@ -199,7 +203,7 @@ sub new
     my $self = bless( $ref => ( ref( $this ) || $this ) );
 
     # Special case if the context is 'system', and neither a class name, nor an object
-    if( "$what" eq 'system' )
+    if( do{ no warnings; "$what" eq 'system' } )
     {
         $self->{_key}  = 'system';
         $self->{_mode} = 'system';
@@ -285,7 +289,7 @@ sub error
     {
         my $msg = join( '', @_ );
         my $ex = Module::Generic::Global::Exception->new({ message => $msg, code => 500, skip_frames => 1 });
-        warn( $msg ) if( warnings::enabled() );
+        warn( $ex ) if( warnings::enabled() );
         $self->_lock_write( $ERRORS, delay => ERROR_DELAY ) || die( "Unable to get a lock on \$ERRORS" );
         $self->{_error} = $ex if( ref( $self ) );
         eval
@@ -398,6 +402,7 @@ sub lock
                 code => 503
             }) );
         }
+        # We return the value returned by CORE::lock, which, when it goes out of scopre in the caller's block, the lock also will be automatically removed.
         return( $rv );
     }
     elsif( $MUTEX )
@@ -677,7 +682,11 @@ sub _unlock
 
     sub DESTROY
     {
-        my $self = shift( @_ );
+        # <https://perldoc.perl.org/perlobj#Destructors>
+        CORE::local( $., $@, $!, $^E, $? );
+        CORE::return if( ${^GLOBAL_PHASE} eq 'DESTRUCT' );
+        my $self = CORE::shift( @_ );
+        CORE::return if( !CORE::defined( $self ) );
         return(1) unless( $self->{mutex} && ref( $self->{mutex} ) );
         $self->{mutex}->unlock;
         return(1);
@@ -862,7 +871,7 @@ sub _unlock
                 }
                 return( $i - 1 );
             };
-            
+
             $args->{skip_frames} = $error_start_frame->();
         }
 
@@ -925,7 +934,9 @@ sub _unlock
         my $self = shift( @_ );
         return( $self->{_cache} ) if( $self->{_cache} && !CORE::length( $self->{_reset} ) );
         my $str = $self->message;
-        if( $self->_can_overload( $str => '""' ) )
+        if( defined( $str ) && 
+            Scalar::Util::blessed( $str ) &&
+            overload::Method( $str => '""' ) )
         {
             use overloading;
             $str = "$str";
@@ -936,7 +947,7 @@ sub _unlock
         CORE::delete( $self->{_reset} );
         return( $str );
     }
-    
+
     sub caught 
     {
         my( $class, $e ) = @_;
@@ -946,15 +957,15 @@ sub _unlock
     }
 
     sub cause { return( shift->{cause} ); }
-    
+
     sub code { return( shift->{code} ); }
-    
+
     sub file { return( shift->{file} ); }
-    
+
     sub lang { return( shift->{lang} ); }
-    
+
     sub line { return( shift->{line} ); }
-    
+
     sub locale { return( shift->{locale} ); }
 
     sub message { return( shift->{message} ); }
@@ -990,7 +1001,14 @@ sub _unlock
     sub retry_after { return( shift->{retry_after} ); }
 
     sub subroutine { return( shift->{subroutine} ); }
-    
+
+    sub trace
+    {
+        my $self = shift( @_ );
+        $self->{trace} = shift( @_ ) if( @_ );
+        return( $self->{trace} );
+    }
+
     sub throw
     {
         my $self = shift( @_ );
@@ -1129,12 +1147,16 @@ This prepares a cleanup callback to empty the global variables when the Apache/m
 
 It takes an L<Apache2::RequestRec> as its sole argument.
 
+=head2 Pod::Coverage clear
+
 =head2 clear_error
 
     $repo->clear_error;
     Module::Generic::Global->clear_error;
 
 This clear the error for the current object, and the latest recorded error stored as a global variable.
+
+=head2 Pod::Coverage debug
 
 =head2 error
 
@@ -1190,13 +1212,15 @@ The value provided is serialised using L<Storable::Improved> before it is stored
 
 Returns true upon success, and upon error, return C<undef> in scalar context, or an empty list in list context.
 
-=head1 unlock
+=head2 unlock
 
     $repo->unlock;
 
 This is used to remove the lock set when under Apache2 ModPerl by using L<APR::ThreadRWLock/unlock>
 
 It is usually not necessary to call this explicitly, because when the lock set previously gets out of scope, it is automatically removed.
+
+=for Pod::Coverage USE_MUTEX
 
 =head1 CONSTANTS
 

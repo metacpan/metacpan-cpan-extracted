@@ -3,7 +3,7 @@ use warnings;
 
 package RT::Extension::AI;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 require RT::Extension::AI::Provider;
 require RT::Extension::AI::Provider::OpenAI;

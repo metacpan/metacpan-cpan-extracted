@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/SharedMem.pm
-## Version v0.5.3
+## Version v0.5.4
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/01/18
-## Modified 2025/04/30
+## Modified 2025/07/30
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -19,8 +19,7 @@ BEGIN
     use warnings::register;
     use parent qw( Module::Generic );
     use vars qw(
-        $SUPPORTED_RE $SYSV_SUPPORTED $SEMOP_ARGS $SHEM_REPO $ID2OBJ $N $HAS_B64
-        $SERIAL2SEMID
+        $SUPPORTED_RE $SYSV_SUPPORTED $SEMOP_ARGS $N $HAS_B64
     );
     use Config;
     use Errno qw( EINVAL EIDRM );
@@ -29,6 +28,7 @@ BEGIN
     # This is disruptive for everybody. Bad idea.
     # use JSON 4.03 qw( -convert_blessed_universally );
     use JSON 4.03;
+    use Module::Generic::Global ':const';
     use Storable::Improved ();
     use constant {
         SHM_BUFSIZ     =>  65536,
@@ -42,7 +42,6 @@ BEGIN
         LOCK_EX        =>  2,
         LOCK_NB        =>  4,
         LOCK_UN        =>  8,
-        HAS_THREADS    => $Config{useithreads},
     };
     # if( $^O =~ /^(?:Android|cygwin|dos|MSWin32|os2|VMS|riscos)/ )
     # Even better
@@ -115,40 +114,14 @@ EOT
     }
     # Credits IPC::SysV
     $N = do { my $foo = eval { pack "L!", 0 }; $@ ? '' : '!' };
-    # Array to maintain the order in which shared memory object were created, so they can
-    # be removed in that order
-    our( $SHEM_REPO, $ID2OBJ, $SERIAL2SEMID );
-    if( HAS_THREADS )
-    {
-        require threads;
-        require threads::shared;
-        threads->import();
-        threads::shared->import();
-    
-        my @repo :shared;
-        my %id2objs :shared;
-        my %serial2semid :shared;
 
-        $SHEM_REPO = \@repo;
-        $ID2OBJ = \%id2objs;
-        $SERIAL2SEMID = \%serial2semid;
-        *_threads_lock = \&CORE::lock;
-    }
-    else
-    {
-        $SHEM_REPO    = [];
-        $ID2OBJ       = {};
-        $SERIAL2SEMID = {};
-        *_threads_lock = sub{1}; # no-op
-    }
-    
     our @EXPORT_OK = qw(LOCK_EX LOCK_SH LOCK_NB LOCK_UN);
     our %EXPORT_TAGS = (
         all     => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
         lock    => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
         'flock' => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
     );
-    our $VERSION = 'v0.5.3';
+    our $VERSION = 'v0.5.4';
 };
 
 use v5.26.1;
@@ -260,7 +233,9 @@ sub exists
     my $serial;
     if( length( $opts->{key} ) )
     {
-        $serial = $self->_str2key( $opts->{key} );
+        my $key_val = $self->_verify_key( $opts->{key} ) ||
+            return( $self->pass_error );
+        $serial = $self->_str2key( $key_val );
         # $serial = $opts->{key};
     }
     else
@@ -351,8 +326,10 @@ sub key
     my $self = shift( @_ );
     if( @_ )
     {
-        $self->{key} = shift( @_ );
-        $self->{serial} = $self->_str2key( $self->{key} );
+        my $key = $self->_verify_key( shift( @_ ) ) ||
+            return( $self->pass_error );
+        $self->{key} = $key;
+        $self->{serial} = $self->_str2key( $key );
     }
     return( $self->{key} );
 }
@@ -438,14 +415,16 @@ sub open
     $opts->{size} = $self->size unless( length( $opts->{size} ) );
     $opts->{size} = int( $opts->{size} );
     $opts->{mode} //= '';
-    $opts->{key} //= '';
+    $opts->{key} //= $self->key // '';
     $opts->{semid} //= undef;
     no strict 'subs';
     my $serial;
     if( length( $opts->{key} ) )
     {
-        $serial = $self->_str2key( $opts->{key} ) || 
-            return( $self->error( "Cannot get serial from key '$opts->{key}': ", $self->error ) );
+        my $key_val = $self->_verify_key( $opts->{key} ) ||
+            return( $self->pass_error );
+        $serial = $self->_str2key( $key_val ) || 
+            return( $self->error( "Cannot get serial from key '", ( $self->_is_array( $key_val ) ? join( "', '", @$key_val ) : $key_val ), "': ", $self->error ) );
     }
     else
     {
@@ -466,7 +445,7 @@ sub open
         $create = $self->create;
     }
     my $flags = $self->flags( create => $create, ( $opts->{mode} =~ /^\d+$/ ? $opts->{mode} : () ) );
-    
+
     my $id;
     # try-catch
     local $@;
@@ -501,18 +480,20 @@ sub open
             return( $self->error( "Error while trying to get the shared memory id: $@" ) );
         }
     }
-    
+
     if( !defined( $id ) )
     {
         return( $self->error( "Unable to create shared memory id with key \"$serial\" and flags \"$flags\": $!" ) );
     }
     $self->serial( $serial );
-    
+
     my $semid;
     # try-catch
     local $@;
     eval
     {
+        my $serial2semid_repo = Module::Generic::Global->new( 'serial2semid' => CORE::ref( $self ), key => CORE::ref( $self ) );
+        my $serial2semid_hash = $serial2semid_repo->get // {};
         # The user passed it explicitly
         if( defined( $opts->{semid} ) )
         {
@@ -524,9 +505,9 @@ sub open
             $semid = $semaphore_id;
         }
         # The semaphore ID is stored in the global shared hash
-        elsif( !$create && CORE::exists( $SERIAL2SEMID->{ $serial } ) )
+        elsif( !$create && CORE::exists( $serial2semid_hash->{ $serial } ) )
         {
-            $semid = $SERIAL2SEMID->{ $serial };
+            $semid = $serial2semid_hash->{ $serial };
         }
         else
         {
@@ -538,8 +519,10 @@ sub open
             }
             if( defined( $semid ) && $create )
             {
-                &_threads_lock( $SERIAL2SEMID ) if( HAS_THREADS );
-                $SERIAL2SEMID->{ $serial } = $semid;
+                $serial2semid_repo->lock;
+                $serial2semid_hash->{ $serial } = $semid;
+                $serial2semid_repo->set( $serial2semid_hash );
+                $serial2semid_repo->unlock;
             }
         }
     };
@@ -556,44 +539,41 @@ sub open
     }
     if( !defined( $semid ) )
     {
-        return( $self->error( "Unable to get semaphore for key \"", ( $opts->{key} || $self->key ), "\" (serial \"$serial\", create=$create, flags=$flags): $!" ) );
+        return( $self->error( "Unable to get semaphore for key '", ( $self->_is_array( $opts->{key} ) ? join( "', '", @{$opts->{key}} ) : $opts->{key} ), "' (serial \"$serial\", create=$create, flags=$flags): $!" ) );
     }
-    
+
     my $new = $self->new(
-        key     => ( $opts->{key} || $self->key ),
+        key     => $opts->{key},
         debug   => $self->debug,
         mode    => $self->mode,
         destroy => $self->destroy,
         destroy_semaphore => $self->destroy_semaphore,
         _packing_method => $self->_packing_method,
-    ) || return( $self->error( "Cannot create object with key '", ( $opts->{key} || $self->key ), "': ", $self->error ) );
-    $new->key( $self->key );
+    ) || return( $self->error( "Cannot create object with key '", ( $self->_is_array( $opts->{key} ) ? join( "', '", @{$opts->{key}} ) : $opts->{key} ), "': ", $self->error ) );
+    # $new->key( $self->key );
     $new->serial( $serial );
     $new->id( $id );
     $new->semid( $semid );
 
-    {
-        &_threads_lock( $SHEM_REPO ) if( HAS_THREADS && is_shared( $SHEM_REPO ) );
-        &_threads_lock( $ID2OBJ ) if( HAS_THREADS && is_shared( $ID2OBJ ) );
-        CORE::push( @$SHEM_REPO, $id );
-        my $val;
-        if( HAS_THREADS )
-        {
-            $val = $self->serialise( $new, serialiser => 'Storable::Improved' ) ||
-                return( $self->pass_error );
-        }
-        else
-        {
-            $val = $new;
-        }
-        $ID2OBJ->{ $id } = $val;
-    }
+    # Array to maintain the order in which shared memory object were created, so they can
+    # be removed in that order
+    my $shem_repo = Module::Generic::Global->new( 'shem_repo' => CORE::ref( $self ), key => CORE::ref( $self ) );
+    my $id2obj_repo = Module::Generic::Global->new( 'id2obj' => CORE::ref( $self ), key => $id );
+    $shem_repo->lock;
+    my $all_shem = $shem_repo->get // [];
+    CORE::push( @$all_shem, $id );
+    $shem_repo->set( $all_shem );
+    $shem_repo->unlock;
+
+    $id2obj_repo->lock;
+    $id2obj_repo->set( $new );
+    $id2obj_repo->unlock;
 
     if( !defined( $new->op( @{$SEMOP_ARGS->{(LOCK_SH)}} ) ) )
     {
         return( $self->error( "Unable to set lock on semaphore: $!" ) );
     }
-    
+
     my $there = $new->stat( SEM_MARKER );
     $new->size( $opts->{size} );
     if( $there == SHM_EXISTS )
@@ -605,7 +585,7 @@ sub open
         $new->stat( SEM_MARKER, SHM_EXISTS ) ||
             return( $new->error( "Unable to set semaphore during object creation: ", $new->error ) );
     }
-    
+
     $new->op( @{$SEMOP_ARGS->{(LOCK_SH | LOCK_UN)}} );
     return( $new );
 }
@@ -702,7 +682,7 @@ sub read
             # Remove any possible remaining unwanted data
             substr( $buffer, $len, length( $buffer ), '' );
         }
-    
+
         # try-catch
         local $@;
         eval
@@ -749,7 +729,7 @@ sub read
     {
         $data = $buffer;
     }
-    
+
     if( scalar( @_ ) > 1 )
     {
         $_[1] = $data;
@@ -795,38 +775,27 @@ sub remove
     $self->removed( $rv ? 1 : 0 );
     if( $rv )
     {
-        &_threads_lock( $SHEM_REPO ) if( HAS_THREADS );
-        &_threads_lock( $ID2OBJ ) if( HAS_THREADS );
-        my @slices;
-        if( HAS_THREADS )
+        my $id2obj_repo = Module::Generic::Global->new( 'id2obj' => CORE::ref( $self ), key => $id );
+        $id2obj_repo->remove;
+        my $shem_repo = Module::Generic::Global->new( 'shem_repo' => CORE::ref( $self ), key => CORE::ref( $self ) );
+        $shem_repo->lock;
+        my $all_shem = $shem_repo->get // [];
+        my $modified = 0;
+        for( my $i = 0; $i < scalar( @$all_shem ); $i++ )
         {
-            share( @slices );
-        }
-        for( my $i = 0; $i < scalar( @$SHEM_REPO ); $i++ )
-        {
-            my $this_id = $SHEM_REPO->[$i];
+            my $this_id = $all_shem->[$i];
             if( $this_id eq $id )
             {
-                # slice is not supported on shared array, so we have to make a copy, and re-share it.
-                if( !HAS_THREADS )
-                {
-                    CORE::splice( @$SHEM_REPO, $i, 1 );
-                }
-                CORE::delete( $ID2OBJ->{ $this_id } );
+                CORE::splice( @$all_shem, $i, 1 );
+                $modified++;
                 last;
             }
-            # Re-build a new array, excluding the elements to splice
-            elsif( HAS_THREADS )
-            {
-                push( @slices, $SHEM_REPO->[$i] );
-            }
         }
-
-        # Did we rebuilt the shared array ?
-        if( scalar( @slices ) )
+        if( $modified )
         {
-            @$SHEM_REPO = @slices;
+            $shem_repo->set( $all_shem );
         }
+        $shem_repo->unlock;
         $self->id( undef() );
         $self->semid( undef() );
     }
@@ -841,6 +810,10 @@ sub remove_semaphore
     my $semid = shift( @_ ) || $self->semid;
     return( $self->error( "No semaphore id provided nor found for shared memory id '$id'. You must open the shared memory first to remove semaphore." ) ) if( !length( $semid // '' ) );
     my $serial = $self->serial;
+    my $serial2semid_repo = Module::Generic::Global->new( 'serial2semid' => CORE::ref( $self ), key => CORE::ref( $self ) );
+    $serial2semid_repo->lock;
+    my $serial2semid_hash = $serial2semid_repo->get // {};
+    my $repo_modified = 0;
     # Should we really remove this part ?
     # if( $semid eq '0' )
     # {
@@ -861,6 +834,7 @@ sub remove_semaphore
     };
     if( $@ )
     {
+        $serial2semid_repo->unlock;
         return( $self->error( "An error occurred while trying to remove semaphore with id '$semid' for shared memory segment with id '$id': $@" ) );
     }
     elsif( !defined( $rv ) || ( $rv == -1 && $! ) )
@@ -871,10 +845,10 @@ sub remove_semaphore
         {
             # Treat as success since semaphore is gone
             $rv = 1;
-            if( defined( $serial ) && CORE::exists( $SERIAL2SEMID->{ $serial } ) )
+            if( defined( $serial ) && CORE::exists( $serial2semid_hash->{ $serial } ) )
             {
-                &_threads_lock( $SERIAL2SEMID ) if( HAS_THREADS );
-                CORE::delete( $SERIAL2SEMID->{ $serial } );
+                CORE::delete( $serial2semid_hash->{ $serial } );
+                $repo_modified++;
             }
         }
         else
@@ -884,13 +858,15 @@ sub remove_semaphore
     }
     else
     {
-        if( defined( $serial ) && CORE::exists( $SERIAL2SEMID->{ $serial } ) )
+        if( defined( $serial ) && CORE::exists( $serial2semid_hash->{ $serial } ) )
         {
-            &_threads_lock( $SERIAL2SEMID ) if( HAS_THREADS );
-            CORE::delete( $SERIAL2SEMID->{ $serial } );
+            CORE::delete( $serial2semid_hash->{ $serial } );
+            $repo_modified++;
         }
         # return(1);
     }
+    $serial2semid_repo->set( $serial2semid_hash ) if( $repo_modified );
+    $serial2semid_repo->unlock;
     $self->removed_semaphore( $rv ? 1 : 0 );
     $self->semid( undef() );
     return( $rv ? 1 : 0 );
@@ -1122,11 +1098,11 @@ sub write
         }
         return( $self->error( "Unable to serialise ", CORE::length( $data ), " bytes of data using Storable with base64 set to '", ( $self->{base64} // '' ), ": ", $self->error ) ) if( !defined( $encoded ) );
     }
-    
+
     # Simple encapsulation
     # FYI: MG = Module::Generic
     substr( $encoded, 0, 0, 'MG[' . length( $encoded ) . ']' );
-    
+
     my $len = length( $encoded );
     if( $len > $size )
     {
@@ -1144,14 +1120,14 @@ sub write
         }
         $self->addr( $addr );
     }
-    
+
     $self->lock( LOCK_EX ) || return( $self->pass_error );
     # my $rv = shmwrite( $id, $encoded, 0, $len ) ||
     #     return( $self->error( "Unable to write to shared memory id '$id' with ${len} bytes of data encoded and memory size of $size: $!" ) );
     memwrite( $addr, $encoded, 0, $len ) ||
         return( $self->error( "Unable to write to shared memory address '$addr' using memwrite: $!" ) );
     $self->unlock;
-    
+
     # Detach the segment to avoid leaving it attached in the thread
     if( defined( $addr ) && !( Scalar::Util::looks_like_number( $addr ) && $addr == -1 ) )
     {
@@ -1182,7 +1158,7 @@ sub _decode_json
             {
                 return( \$this->{__scalar_gen_shm} );
             }
-            
+
             foreach my $k ( keys( %$this ) )
             {
                 next if( !ref( $this->{ $k } ) );
@@ -1199,7 +1175,7 @@ sub _decode_json
         }
         return( $this );
     };
-    
+
     my $result;
     # try-catch
     local $@;
@@ -1319,12 +1295,39 @@ sub _str2key
     }
 }
 
+sub _verify_key
+{
+    my( $self, $key ) = @_;
+    if( !defined( $key ) || !length( $key // '' ) )
+    {
+        # It's ok, _str2key will use IPC::SysV::IPC_PRIVATE then
+    }
+    elsif( !ref( $key ) || $self->_can_overload( $key => '""' ) )
+    {
+        $key = "$key";
+        if( !CORE::length( $key // '' ) )
+        {
+            return( $self->error( "An empty key was provided." ) );
+        }
+    }
+    elsif( $self->_is_array( $key ) )
+    {
+        # We use as-is
+    }
+    else
+    {
+        return( $self->error( "Key must be a string, but I got '", $self->_str_val( $key // 'undef' ), "'" ) );
+    }
+    return( $key );
+}
+
 sub DESTROY
 {
     # <https://perldoc.perl.org/perlobj#Destructors>
     CORE::local( $., $@, $!, $^E, $? );
     CORE::return if( ${^GLOBAL_PHASE} eq 'DESTRUCT' );
-    my $self = CORE::shift( @_ ) || CORE::return;
+    my $self = CORE::shift( @_ );
+    CORE::return if( !CORE::defined( $self ) );
     CORE::return unless( $self->{id} );
     $self->unlock;
     $self->detach;
@@ -1384,25 +1387,22 @@ sub THAW
 }
 
 # NOTE: END
-END
-{
-    foreach my $id ( @$SHEM_REPO )
-    {
-        my $s = $ID2OBJ->{ $id } || next;
-        if( HAS_THREADS )
-        {
-            $s = eval{ Storable::Improved::thaw( $s ) };
-            if( $@ )
-            {
-                warn( "Error deserialising object with Storable::Improved: $@" ) if( warnings::enabled() );
-                next;
-            }
-        }
-        next if( $s->removed || !$s->id || !$s->destroy );
-        $s->detach;
-        $s->remove;
-    }
-};
+# END
+# {
+#     my $shem_repo = Module::Generic::Global->new( 'shem_repo' => __PACKAGE__, key => __PACKAGE__ );
+#     $shem_repo->lock;
+#     my $all_shem = $shem_repo->get // [];
+#     foreach my $id ( @$all_shem )
+#     {
+#         my $id2obj_repo = Module::Generic::Global->new( 'id2obj' => __PACKAGE__, key => $id );
+#         my $s = $id2obj_repo->get || next;
+#         next if( $s->removed || !$s->id || !$s->destroy );
+#         $s->detach;
+#         $s->remove;
+#     }
+#     $shem_repo->unlock;
+#     $shem_repo->remove;
+# };
 
 # NOTE: Module::Generic::SharedStat class
 {
@@ -1411,7 +1411,7 @@ END
     use IPC::SysV;
     require IPC::SharedMem;
     our $VERSION = 'v0.1.0';
-    
+
     use constant UID    => 0;
     use constant GID    => 1;
     use constant CUID   => 2;
@@ -1431,7 +1431,7 @@ END
         my @vals = @_;
         return( bless( [ @vals ] => ref( $this ) || $this ) );
     }
-    
+
     sub unpack
     {
         my $self = shift( @_ );
@@ -1441,25 +1441,25 @@ END
         # my @unpacked = unpack( "i*", $data );
         return( $self->new( @$d ) );
     }
-    
+
     # time when the last attach was completed to the associated shared memory segment.
     sub atime { return( shift->[ATIME] ); }
 
     sub cgid { return( shift->[CGID] ); }
-    
+
     # process ID of the creator of the shared memory entry.
     sub cpid { return( shift->[CPID] ); }
 
     # time when the associated entry was created or changed.
     sub ctime { return( shift->[CTIME] ); }
-    
+
     sub cuid { return( shift->[CUID] ); }
 
     # time the last detach was completed on the associated shared memory segment.
     sub dtime { return( shift->[DTIME] ); }
 
     sub gid { return( shift->[GID] ); }
-    
+
     # process ID of the last process to attach or detach the shared memory segment.
     sub lpid { return( shift->[LPID] ); }
 
@@ -1521,7 +1521,7 @@ END
     use IPC::SysV;
     require IPC::Semaphore;
     our $VERSION = 'v0.1.0';
-    
+
     use constant UID => 0;
     use constant GID => 1;
     use constant CUID => 2;
@@ -1530,14 +1530,14 @@ END
     use constant CTIME => 5;
     use constant OTIME => 6;
     use constant NSEMS => 7;
-    
+
     sub new
     {
         my $this = shift( @_ );
         my @vals = @_;
         return( bless( [ @vals ] => ref( $this ) || $this ) );
     }
-    
+
     sub unpack
     {
         my $self = shift( @_ );
@@ -1547,20 +1547,20 @@ END
         my $d = IPC::Semaphore::stat->new->unpack( $data );
         return( $self->new( @$d ) );
     }
-    
+
     sub cgid { return( shift->[CGID] ); }
-    
+
     sub ctime { return( shift->[CTIME] ); }
-    
+
     sub cuid { return( shift->[CUID] ); }
 
     sub gid { return( shift->[GID] ); }
-    
+
     sub mode { return( shift->[MODE] ); }
-    
+
     # number of semaphores in the set associated with the semaphore entry.
     sub nsems { return( shift->[NSEMS] ); }
-    
+
     # time the last semaphore operation was completed on the set associated with the semaphore entry.
     sub otime { return( shift->[OTIME] ); }
 

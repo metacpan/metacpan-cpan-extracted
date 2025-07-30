@@ -412,6 +412,7 @@ subtest 'Additional functionality and edge cases' => sub
     }
 };
 
+# NOTE: Thread-safe operations
 subtest 'Thread-safe operations' => sub
 {
     SKIP:
@@ -424,23 +425,50 @@ subtest 'Thread-safe operations' => sub
         require threads;
         require threads::shared;
 
+        # Try common locales, fall back to C
+        my $locale;
+        for my $try (qw( en_US fr_FR de_DE C ))
+        {
+            my $rv = eval{ POSIX::setlocale( &POSIX::LC_ALL, $try ) };
+            if( defined( $rv ) && $rv eq $try )
+            {
+                $locale = $try;
+                last;
+            }
+        }
+        unless( $locale )
+        {
+            diag( "No suitable locale found, skipping format tests" ) if( $DEBUG );
+            $locale = 'C'; # Safe default
+        }
+        diag( "Using locale '$locale' for thread-safe operations test" ) if( $DEBUG );
+
         my @threads = map
         {
             threads->create(sub
             {
                 my $tid = threads->tid();
-                my $num = Module::Generic::Number->new( 1000, lang => 'fr_FR', debug => $DEBUG );
+                my $num = Module::Generic::Number->new( 1000, lang => $locale, debug => $DEBUG );
                 if( !defined( $num ) )
                 {
                     diag( "Thread $tid: Failed to create number object: ", Module::Generic::Number->error ) if( $DEBUG );
                     return(0);
                 }
                 $num += $tid;
-                my $formatted = $num->format;
-                if( !defined( $formatted ) )
+                if( !defined( $num ) )
                 {
-                    diag( "Thread $tid: Failed to format number: ", $num->error ) if( $DEBUG );
+                    diag( "Thread $tid: Failed to increment number: ", $num->error ) if( $DEBUG );
                     return(0);
+                }
+                # Only test format if locale is not C (to ensure locale-aware formatting)
+                if( $locale ne 'C' )
+                {
+                    my $formatted = $num->format;
+                    if( !defined( $formatted ) )
+                    {
+                        diag( "Thread $tid: Failed to format number: ", $num->error ) if( $DEBUG );
+                        return(0);
+                    }
                 }
                 return(1);
             });
@@ -453,6 +481,16 @@ subtest 'Thread-safe operations' => sub
         }
 
         ok( $success, 'All threads performed operations successfully' );
+        if( $locale ne 'C' )
+        {
+            my $num = Module::Generic::Number->new( 1000, lang => $locale, debug => $DEBUG );
+            my $formatted = $num->format;
+            ok( defined($formatted), "Number formatted successfully in locale '$locale'" );
+        }
+        else
+        {
+            ok( 1, 'Skipped format test due to C locale' );
+        }
     };
 };
 

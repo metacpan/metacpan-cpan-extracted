@@ -9,9 +9,9 @@ command -Mi18n \[ options \]
 
 # DESCRIPTION
 
-This module **i18n** provide an easy way to set locale environment
+This module **i18n** provides an easy way to set locale environment
 before executing arbitrary command.  Locale list is taken from the
-system by `locale -a` command.  Next list is a sample locales
+system by `locale -a` command.  The following list shows sample locales
 available on macOS 10.15 (Catalina).
 
     af_ZA    Afrikaans / South Africa
@@ -68,8 +68,8 @@ available on macOS 10.15 (Catalina).
     zh_HK    Chinese / Hong Kong
     zh_TW    Chinese / Taiwan, Province of China
 
-As for Japanese locale `ja_JP`, following options are defined by
-default, and set `LANG` environment as `ja_JP`.  Environment
+For Japanese locale `ja_JP`, the following options are defined by
+default, and set `LANG` environment to `ja_JP`.  The environment
 variable name can be changed by **env** option.
 
     LOCALE:     --ja_JP  (raw)
@@ -80,15 +80,15 @@ variable name can be changed by **env** option.
     TERRITORY:  --JP     (territory)
                 --jp     (territory_lc)
 
-Short language option (`--ja`) is defined in the alphabetical order
+Short language option (`--ja`) is defined in alphabetical order
 of the territory code, so the option `--en` is assigned to `en_AU`.
-But if the same territory name is found as language, it takes
+However, if the same territory name is found as language, it takes
 precedence; German is used in three locales (`de_AT`, `de_CH`,
 `de_DE`) but option `--de` is defined as `de_DE`.
 
 Territory options (`--JP` and `--jp`) are defined only when the same
-language option is not defined by other entry, and only single entry
-can be found for the territory.  Option for Switzerland is not defined
+language option is not defined by other entry, and only a single entry
+can be found for the territory.  Options for Switzerland are not defined
 because there are three entries (`de_CH`, `fr_CH`, `it_CH`).
 Territory option `--AM` is assigned to `hy_AM`, but language option
 `--am` is assigned to `am_ET`.
@@ -104,12 +104,12 @@ module declaration.
 - **dash**
 - **long**
 - **long\_lc**
-- **lang**
+- **language**
 - **territory**
 - **territory\_lc**
 
-    These parameter tells which option is defined.  All options are
-    enabled by default.  You can disable territory option like this:
+    These parameters tell which options are defined.  All options are
+    enabled by default.  You can disable territory options like this:
 
         command -Mi18n::setopt(territory=0,territory_lc=0)
 
@@ -129,8 +129,8 @@ module declaration.
 
 - **listopt**=_option_
 
-    Set the option to display option list and exit.  You can introduce a
-    new option **-l** to show available option list:
+    Set the option to display the option list and exit.  You can introduce a
+    new option **-l** to show the available option list:
 
         -Mi18n::setopt(listopt=-l)
 
@@ -141,6 +141,11 @@ module declaration.
 - **env**=_string_
 
     Specify environment variable name to be set.  Default is `LANG`.
+
+# DEPENDENCIES
+
+This module uses [Locale::Codes::Language](https://metacpan.org/pod/Locale%3A%3ACodes%3A%3ALanguage) and [Locale::Codes::Country](https://metacpan.org/pod/Locale%3A%3ACodes%3A%3ACountry)
+to provide language and country names for locale codes.
 
 # BUGS
 

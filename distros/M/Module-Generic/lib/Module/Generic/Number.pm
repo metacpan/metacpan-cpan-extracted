@@ -718,7 +718,7 @@ sub init
             }
         }
     }
-    
+
     # Convert Japanese double bytes numbers to regular digits.
     $num =~ tr/[\x{FF10}-\x{FF19}]＋ー/[0-9]+-/;
     if( $num !~ /^$NUMBER_RE$/ )
@@ -1293,7 +1293,7 @@ sub format_picture
     # Taken from Number::Format. Credit to William R. Ward
     $picture //= $opts->{picture};
     return( $self->error( "No picture was provided to format number." ) ) if( !CORE::defined( $picture ) || !CORE::length( "$picture" ) );
-    
+
     # Handle negative numbers
     my $neg_format = $self->neg_format->scalar;
     my( $neg_prefix ) = $neg_format =~ /^([^x]+)/;
@@ -1307,7 +1307,7 @@ sub format_picture
     $number = CORE::abs( $number ) if( $sign < 0 );
     $picture = $sign < 0 ? $neg_pic : $pos_pic;
     my $sign_prefix = $sign < 0 ? $neg_prefix : $pos_prefix;
-    
+
     # Split up the picture and return error if there is more than one $decimal_point
     my $decimal_point = $self->decimal->scalar;
     my( $pic_int, $pic_dec, @cruft ) = CORE::split( /\Q$decimal_point\E/, $picture );
@@ -1315,7 +1315,7 @@ sub format_picture
     $pic_dec = '' unless( defined( $pic_dec ) );
 
     return( $self->error( "Only one decimal separator permitted in picture" ) ) if( @cruft );
-    
+
     # Obtain precision from the length of the decimal part...
     # start with copying it
     my $precision = $pic_dec;

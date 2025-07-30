@@ -1,5 +1,9 @@
 Revision history for App-Sky
 
+0.8.0       2025-07-30
+    - Add the files' sections "overrides" feature
+        - override dest_upload_prefix and dest_upload_url_prefix
+
 0.6.0       2024-12-23
     - Populate an initial configuration file if it does not exist.
 

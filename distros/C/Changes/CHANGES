@@ -1,5 +1,8 @@
 Revision history for Perl module Changes
 
+v0.3.6 2025-07-28T14:03:23+0900
+    - Corrected minor issues in Changes::Version and Changes::Change
+
 v0.3.5 2023-10-11T16:32:50+0900
     - Corrected malformed signature for distribution release
 

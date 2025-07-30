@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Changes file management - ~/lib/Changes/Release.pm
-## Version v0.2.2
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v0.2.3
+## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/11/23
-## Modified 2023/09/19
+## Modified 2025/07/28
 ## All rights reserved
 ## 
 ## 
@@ -22,11 +22,10 @@ BEGIN
     use Changes::Group;
     use Changes::Version;
     use DateTime;
-    # use Nice::Try;
-    use Want;
+    use Wanted;
     our $VERSION_CLASS = 'Changes::Version';
     our $DEFAULT_DATETIME_FORMAT = '%FT%T%z';
-    our $VERSION = 'v0.2.2';
+    our $VERSION = 'v0.2.3';
 };
 
 use strict;
@@ -482,7 +481,7 @@ sub time_zone
     }
     if( !defined( $self->{time_zone} ) )
     {
-        if( Want::want( 'OBJECT' ) )
+        if( Wanted::want( 'OBJECT' ) )
         {
             require Module::Generic::Null;
             rreturn( Module::Generic::Null->new( wants => 'OBJECT' ) );
@@ -499,6 +498,15 @@ sub time_zone
 }
 
 sub version { return( shift->reset(@_)->_set_get_version( { field => 'version', class => $VERSION_CLASS }, @_ ) ); }
+
+sub DESTROY
+{
+    # <https://perldoc.perl.org/perlobj#Destructors>
+    CORE::local( $., $@, $!, $^E, $? );
+    my $self = CORE::shift( @_ );
+    CORE::return if( !CORE::defined( $self ) );
+    CORE::return if( ${^GLOBAL_PHASE} eq 'DESTRUCT' );
+};
 
 1;
 # NOTE: POD
@@ -548,7 +556,7 @@ Changes::Release - Release object class
 
 =head1 VERSION
 
-    v0.2.2
+    v0.2.3
 
 =head1 DESCRIPTION
 

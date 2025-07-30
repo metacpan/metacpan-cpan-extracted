@@ -4,7 +4,7 @@
       "Gavin Brown <gavin.brown@fastmail.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.72, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -33,6 +33,7 @@
       "runtime" : {
          "requires" : {
             "File::ShareDir" : "0",
+            "File::ShareDir::Install" : "0",
             "Getopt::Long" : "0",
             "JSON" : "0",
             "List::Util" : "1.33",
@@ -62,6 +63,6 @@
          "web" : "https://github.com/gbxyz/rdapper"
       }
    },
-   "version" : "1.17",
+   "version" : "1.18",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -62,7 +62,7 @@ sub cache_file
     if( @_ )
     {
         my $f = shift( @_ ) || return( $self->error( "No tables cache file path was provided." ) );
-        ## No change
+        # No change
         return( $f ) if( $f eq $self->{cache_file} );
         if( -e( $f ) )
         {
@@ -172,7 +172,7 @@ sub write
         $fh->autoflush(1);
         eval
         {
-            $tables_cache_file->lock( LOCK_SH );
+            $tables_cache_file->lock( LOCK_EX );
         };
         $fh->print( $j->encode( $hash ) ) || return( $self->error( "Unable to write data to tables cache file \"$tables_cache_file\": ", $tables_cache_file->error ) );
         eval

@@ -236,7 +236,7 @@ sub STORE
                 $this->STORE( splice( @items, 0, 2 ) );
             }
         }
-        
+
         #print( STDERR "STORE($caller)[enable=$self->{enable}] <- '$key' -> '$val'\n" );
         if( ref( $key ) && $self->{key_object} )
         {

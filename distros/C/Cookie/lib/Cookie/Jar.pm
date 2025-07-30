@@ -621,6 +621,7 @@ sub extract
                 };
             }
         }
+        $self->message( 3, "Adding cookie name '", $c->name, "'." ) if( $COOKIES_DEBUG );        
         $self->add( $c ) || return( $self->pass_error );
     }
     return( $self );

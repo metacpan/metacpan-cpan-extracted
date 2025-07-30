@@ -1,5 +1,9 @@
 Revision history for Perl module Promise::Me
 
+v0.6.0 2025-04-23T06:02:17+0900
+    - Improved module for thread safety
+    - Asynchronous exception handling improvement
+
 v0.5.0 2024-09-05T13:11:13+0900
     - Improved code
 

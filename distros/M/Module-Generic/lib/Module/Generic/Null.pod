@@ -46,7 +46,7 @@ In any other context, C<undef> is returned or an empty list.
 Without using L<Module::Generic::Null>, if you return simply undef, like:
 
     my $val = $object->return_false->[0];
-    
+
     sub return_false{ return }
 
 The above would trigger an error that the value returned by C<return_false> is not an array reference.
@@ -58,17 +58,17 @@ For example:
     my $val  = $this->call1;
     defined( $val ) || die( $this->error );
     # return undef)
-    
+
     # object context
     $val = $this->call1->call_again;
     defined( $val ) || die( $this->error );
     # $val is undefined
-    
+
     # hash reference context
     $val = $this->call1->fake->{name};
     defined( $val ) || die( $this->error );
     # $val is undefined
-    
+
     # array reference context
     $val = $this->call1->fake->[0];
     defined( $val ) || die( $this->error );

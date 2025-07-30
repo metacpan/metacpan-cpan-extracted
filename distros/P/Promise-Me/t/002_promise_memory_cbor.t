@@ -20,6 +20,7 @@ use strict;
 use warnings;
 # use warnings 'Promise::Me';
 $Test::Promise::Me::DEBUG = $DEBUG;
+$Promise::Me::DEBUG = $DEBUG;
 
 eval "use IPC::SharedMem 2.09;";
 plan( skip_all => "IPC::SharedMem 2.09 required for testing promise using shared memory" ) if( $@ );

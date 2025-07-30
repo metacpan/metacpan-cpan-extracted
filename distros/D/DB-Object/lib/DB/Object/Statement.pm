@@ -24,7 +24,7 @@ BEGIN
     use parent qw( DB::Object );
     use vars qw( $VERSION $DEBUG );
     use Class::Struct qw( struct );
-    use Want;
+    use Wanted;
     our $DEBUG = 0;
     our $VERSION = 'v0.7.0';
 };

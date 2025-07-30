@@ -28,11 +28,11 @@ my %WriteMakefileArgs = (
         'Encode'            => '3.19',
         # For cpanapi
         'Getopt::Class'     => 'v0.104.1',
-        'HTTP::Promise'     => 'v0.3.0',
+        'HTTP::Promise'     => 'v0.5.3',
         'IO::Handle'        => '1.51',
         # For cpanapi
         'JSON'              => '4.10',
-        'Module::Generic'   => 'v0.32.3',
+        'Module::Generic'   => 'v1.0.2',
         'Pod::Usage'        => '2.01',
         # For cpanapi
         'POSIX'             => '0',
@@ -47,7 +47,7 @@ my %WriteMakefileArgs = (
         'URI'               => '5.21',
         # Used for release information
         'URI::git'          => '0.02',
-        'Want'              => '0.29',
+        'Wanted'            => 'v0.1.0',
     },
     TEST_REQUIRES =>
     {

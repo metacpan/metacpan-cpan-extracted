@@ -3,11 +3,10 @@ package Android::ElectricSheep::Automator::Plugins::Apps::Viber;
 use strict;
 use warnings;
 
-#use lib ($FindBin::Bin, 'blib/lib');
-
 use parent 'Android::ElectricSheep::Automator::Plugins::Apps::Base';
 
 use Time::HiRes qw/usleep/;
+use Encode qw/encode_utf8 decode_utf8/;
 use Data::Roundtrip qw/perl2dump no-unicode-escape-permanently/;
 
 use Android::ElectricSheep::Automator::XMLParsers;
@@ -86,6 +85,9 @@ sub navigate_to_viber_home_activity {
 	return 0 # success
 }
 
+# "type" the specified message into 
+# the message will be sanitised in input_text(), spaces will be replaced with %s
+# unicode is not supported
 sub send_message {
 	my ($self, $params) = @_;
 	my $parent = ( caller(1) )[3] || "N/A";
@@ -187,7 +189,11 @@ sub send_message {
 	if( ! defined $boundstr ){ $log->error("${node}\n\n${whoami} (via $parent), line ".__LINE__." : error, above node does not have attribute 'bounds'."); return undef }
 	if( $boundstr !~ /\[\s*(\d+)\s*,\s*(\d+)\]\s*\[\s*(\d+)\s*,\s*(\d+)\]/ ){ $log->error("${whoami} (via $parent), line ".__LINE__." : error, failed to parse bounds string: '$boundstr'."); return undef }
 	$bounds = [[$1,$2],[$3,$4]];
+
 	# add the text in the node
+	# the message will be sanitised in input_text(), spaces will be replaced with %s
+	# unicode is not supported
+	# TODO: perhaps warn about unicode in message?
 	if( $self->mother->input_text({'bounds' => $bounds, 'text' => $message}) ){ $log->error("${whoami} (via $parent), line ".__LINE__." : error, failed to input text on ${boundstr}. Note that there may be a maximum length for the message. Your message was ".length($message)." chars long."); return undef }
 	sleep(1);
 
@@ -210,9 +216,11 @@ sub send_message {
 	if( ! defined $boundstr ){ $log->error("${node}\n\n${whoami} (via $parent), line ".__LINE__." : error, above node does not have attribute 'bounds'."); return undef }
 	if( $boundstr !~ /\[\s*(\d+)\s*,\s*(\d+)\]\s*\[\s*(\d+)\s*,\s*(\d+)\]/ ){ $log->error("${whoami} (via $parent), line ".__LINE__." : error, failed to parse bounds string: '$boundstr'."); return undef }
 	$bounds = [[$1,$2],[$3,$4]];
-	# click it
-	if( $verbosity > 0 ){ $log->info("To: '${recipient}'\nMessage:\n${message}\n--end message.\n${whoami} (via $parent), line ".__LINE__." : about to send the above message ...") }
+	# I know it does not support sending unicode to a textbox but ...
+	# TODO: check with a unicode recipient handle to see if this works
+	if( $verbosity > 0 ){ $log->info("To: '".Encode::decode_utf8($recipient)."'\nMessage:\n".Encode::decode_utf8($message)."\n--end message.\n${whoami} (via $parent), line ".__LINE__." : about to send the above message ...") }
 	if( $mock == 0 ){
+		# click it if not mocking
 		if( $self->mother->tap({'bounds' => $bounds}) ){ $log->error("${whoami} (via $parent), line ".__LINE__." : error, failed to tap on $bounds."); return undef }
 	} else {
 		$log->warn("${whoami} (via $parent), line ".__LINE__." : The 'Send' button was not clicked because mock is ON.")
@@ -233,7 +241,7 @@ Android::ElectricSheep::Automator::Plugins::Apps::Viber - Control the Viber app 
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =head1 WARNING
 

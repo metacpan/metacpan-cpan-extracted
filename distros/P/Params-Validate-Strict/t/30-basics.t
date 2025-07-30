@@ -129,9 +129,20 @@ subtest "Invalid Inputs" => sub {
 	my $validated_params9 = eval { validate_strict(schema => $schema, args => $args9, unknown_parameter_handler => 'die') };
 	like $@, qr/unknown/, 'Unknown parameter should fail';
 
-	my $args10 = { username => "user", age => "25", unknown => "val" }; # Unknown parameter and valid
+	my $args10 = { username => 'user', age => 25, unknown => 'val' }; # Unknown parameter and valid
 	my $validated_params10 = eval { validate_strict(schema => $schema, args => $args10, unknown_parameter_handler => 'die') };
 	like $@, qr/unknown/, 'Unknown parameter should fail with valid data';
+
+	# Intentionally passing a hashref with an extra key "other"
+	my $args11 = { value => 42, other => 'oops' };
+
+	# Simulate passing a schema only for 'value'
+	throws_ok( sub { validate_strict(schema => { type => 'integer' }, args => $args11) }, qr/Unknown parameter/, 'extra key rejection');
+
+	my $args12 = { number => ['a'] };
+	throws_ok {
+		validate_strict(args => $args12, schema => { number => 'integer' });
+	} qr/must be an integer/, 'Fails validation for non-scalar';
 };
 
 done_testing();

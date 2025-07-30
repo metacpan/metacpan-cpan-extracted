@@ -3,7 +3,7 @@ package Net::DNS::RR;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: RR.pm 2018 2025-07-01 11:57:43Z willem $)[2];
+our $VERSION = (qw$Id: RR.pm 2028 2025-07-22 16:52:42Z willem $)[2];
 
 
 =head1 NAME
@@ -174,20 +174,24 @@ my @core = qw(owner name type class ttl rdlength);
 sub _new_hash {
 	my $base = shift;
 
-	my %attribute = ( owner => '.', type => 'NULL' );
+	my %argument = ( owner => '.', type => 'NULL' );
+	my @attribute;
 	while ( my $key = shift ) {
-		$attribute{lc $key} = shift;
+		push @attribute, $key;
+		$argument{lc $key} = shift;
 	}
 
-	my ( $owner, $name, $type, $class, $ttl ) = delete @attribute{@core};
+	my ( $owner, $name, $type, $class, $ttl ) = delete @argument{@core};
 
-	my $self = $base->_subclass( $type, scalar(%attribute) );
+	my $self = $base->_subclass( $type, scalar(%argument) );
 	$self->owner( $name ? $name : $owner );
 	$self->class($class) if defined $class;			# optional CLASS
 	$self->ttl($ttl)     if defined $ttl;			# optional TTL
 
 	eval {
-		while ( my ( $attribute, $value ) = each %attribute ) {
+		foreach my $attribute (@attribute) {
+			my $value = $argument{lc $attribute};
+			next unless defined $value;
 			$self->$attribute( ref($value) eq 'ARRAY' ? @$value : $value );
 		}
 	};
@@ -338,7 +342,7 @@ sub string {
 	$last = join $tab, @core, "@rdata" unless scalar(@line);
 
 	$self->_annotation('no data') if $empty;
-	return join "\n\t", @line, _wrap( $last, map {"; $_"} $self->_annotation );
+	return join "\n\t", @line, _wrap( $last, $self->_annotation );
 }
 
 
@@ -715,8 +719,8 @@ sub _subclass {
 
 sub _annotation {
 	my ( $self, @note ) = @_;
-	$self->{annotation} = ["@note"] if scalar @note;
-	return wantarray ? @{$self->{annotation} || []} : ();
+	push @{$self->{annotation}}, "; @note", "\n" if scalar @note;
+	return wantarray ? @{delete( $self->{annotation} ) || []} : undef;
 }
 
 

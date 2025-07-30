@@ -2,7 +2,7 @@ package Net::DNS::Resolver::Base;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: Base.pm 2016 2025-02-27 15:27:42Z willem $)[2];
+our $VERSION = (qw$Id: Base.pm 2031 2025-07-28 13:52:18Z willem $)[2];
 
 
 #
@@ -27,7 +27,7 @@ our $VERSION = (qw$Id: Base.pm 2016 2025-02-27 15:27:42Z willem $)[2];
 
 use constant OS_SPEC => "Net::DNS::Resolver::$^O";
 use constant OS_UNIX => "Net::DNS::Resolver::UNIX";
-use constant OS_CONF => grep eval "require $_", OS_SPEC, OS_UNIX;	## no critic
+use constant OS_CONF => grep( eval "require $_", OS_SPEC ), OS_UNIX;	## no critic
 use base (OS_CONF)[0];
 
 

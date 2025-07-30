@@ -226,7 +226,7 @@ sub open
     'a'     => '>>',
     'a+'    => '+>>',
     };
-    
+
     my $pl_mode = $mode;
     if( index( $mode, ':' ) != -1 )
     {
@@ -276,7 +276,7 @@ sub open
         'a'     => O_APPEND,
         'a+'    => ( O_RDWR | O_APPEND ),
     };
-    
+
     # We set the bit for this glob, so fcntl works.
     if( $mode =~ /^(<|<\+|\+<|>|\+>|>>|\+>>|r|r\+|w|w\+|a|a\+)$/ )
     {
@@ -291,7 +291,7 @@ sub open
     {
         return( $self->error( "Unsupported mode '$mode'" ) );
     }
-    
+
     # If opened in read, even read/write mode, we position at the beginning of the string
     *$self->{sr}  = $ref;
     # We use the bits to check what the methods are allowed to do
@@ -344,7 +344,8 @@ sub DESTROY
     # <https://perldoc.perl.org/perlobj#Destructors>
     CORE::local( $., $@, $!, $^E, $? );
     CORE::return if( ${^GLOBAL_PHASE} eq 'DESTRUCT' );
-    my $self = CORE::shift( @_ ) || CORE::return;
+    my $self = CORE::shift( @_ );
+    CORE::return if( !CORE::defined( $self ) );
     $self->close;
 }
 

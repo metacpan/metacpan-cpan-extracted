@@ -1,19 +1,21 @@
 package App::ScanPrereqs;
 
-our $DATE = '2019-07-31'; # DATE
-our $VERSION = '0.005'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 use Log::ger;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2024-12-21'; # DATE
+our $DIST = 'App-ScanPrereqs'; # DIST
+our $VERSION = '0.006'; # VERSION
 
 our %SPEC;
 
 $SPEC{scan_prereqs} = {
     v => 1.1,
     summary => 'Scan files/directories for prerequisites',
-    description => <<'_',
+    description => <<'MARKDOWN',
 
 This is an alternative CLI to <pm:scan_prereqs>, with the following features:
 
@@ -32,7 +34,7 @@ Aside from <pm:Perl::PrereqScanner> you can also use
 
 * filter only core or non-core prerequisites.
 
-_
+MARKDOWN
     args => {
         files => {
             'x.name.is_plural' => 1,
@@ -46,7 +48,7 @@ _
             schema => ['str*', in=>['regular','lite','nqlite']],
             default => 'regular',
             summary => 'Which scanner to use',
-            description => <<'_',
+            description => <<'MARKDOWN',
 
 `regular` means <pm:Perl::PrereqScanner> which is PPI-based and is the slowest
 but has the most complete support for Perl syntax.
@@ -61,15 +63,15 @@ given some weird code.
 Read respective scanner's documentation for more details about the pro's and
 con's for each scanner.
 
-_
+MARKDOWN
         },
         perlver => {
             summary => 'Perl version to use when determining core/non-core',
-            description => <<'_',
+            description => <<'MARKDOWN',
 
 The default is the current perl version.
 
-_
+MARKDOWN
             schema => 'str*',
         },
         show_core => {
@@ -93,7 +95,7 @@ _
     ],
 };
 sub scan_prereqs {
-    require Filename::Backup;
+    require Filename::Type::Backup;
     require File::Find;
 
     my %args = @_;
@@ -130,7 +132,7 @@ sub scan_prereqs {
 
             return unless -f;
             my $path = "$File::Find::dir/$_";
-            if (Filename::Backup::check_backup_filename(filename=>$_)) {
+            if (Filename::Type::Backup::check_backup_filename(filename=>$_)) {
                 log_debug("Skipping backup file %s ...", $path);
                 return;
             }
@@ -214,7 +216,7 @@ App::ScanPrereqs - Scan files/directories for prerequisites
 
 =head1 VERSION
 
-This document describes version 0.005 of App::ScanPrereqs (from Perl distribution App-ScanPrereqs), released on 2019-07-31.
+This document describes version 0.006 of App::ScanPrereqs (from Perl distribution App-ScanPrereqs), released on 2024-12-21.
 
 =head1 SYNOPSIS
 
@@ -227,9 +229,9 @@ This document describes version 0.005 of App::ScanPrereqs (from Perl distributio
 
 Usage:
 
- scan_prereqs(%args) -> [status, msg, payload, meta]
+ scan_prereqs(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
-Scan files/directories for prerequisites.
+Scan filesE<sol>directories for prerequisites.
 
 Examples:
 
@@ -278,9 +280,11 @@ Arguments ('*' denotes required arguments):
 
 =item * B<files> => I<array[pathname]> (default: ["."])
 
+(No description)
+
 =item * B<perlver> => I<str>
 
-Perl version to use when determining core/non-core.
+Perl version to use when determining coreE<sol>non-core.
 
 The default is the current perl version.
 
@@ -309,16 +313,17 @@ Whether or not to show core prerequisites.
 
 Whether or not to show non-core prerequisites.
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -330,6 +335,35 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-ScanPr
 
 Source repository is at L<https://github.com/perlancar/perl-App-ScanPrereqs>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-ScanPrereqs>
@@ -337,16 +371,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2019, 2017 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

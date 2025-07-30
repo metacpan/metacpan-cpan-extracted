@@ -1,5 +1,10 @@
 Revision history for Params-Validate-Strict
 
+0.05	Tue Jul 29 08:24:59 EDT 2025
+	Bump the minimum version of Params::Get
+		https://www.cpantesters.org/cpan/report/9433e5e2-6c2f-11f0-8186-d3a6de164758
+	Fix counting of keys in a hash
+
 0.04	Mon Jul 28 12:09:13 EDT 2025
 	Added arrayref, hashref and coderef as valid value types
 

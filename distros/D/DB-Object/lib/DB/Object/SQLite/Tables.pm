@@ -29,11 +29,11 @@ BEGIN
     # NULL, INTEGER, REAL, TEXT, BLOB
     our $TYPE_TO_CONSTANT =
     {
-    qr/^(INT|INTEGER|TINYINT|SMALLINT|MEDIUMINT|BIGINT|UNSIGNED\s+BIG\s+INT|INT2|INT8)/ => { constant => '', name => 'SQLITE_INTEGER', type => 'integer' },
-    qr/^(CHARACTER\(\d+\)|VARCHAR\(\d+\)|VARYING\s+CHARACTER\(\d+\)|NCHAR\(\d+\)|NATIVE\s+CHARACTER\(\d+\)|NVARCHAR\(\d+\)|TEXT|CLOB)/  => { constant => '', name => 'SQLITE_TEXT', type => 'text' },
-    qr/^BLOB/                                               => { constant => '', name => 'SQLITE_BLOB', type => 'blob' },
-    qr/^(REAL|DOUBLE\s+DOUBLE\s+PRECISION|FLOAT)/           => { constant => '', name => 'SQLITE_FLOAT', type => 'float' },
-    qr/^(NUMERIC|DECIMAL\(\d+,\d+\)|BOOLEAN|DATETIME|DATE)/ => { constant => '', name => 'SQLITE_NULL', type => 'bool' },
+        qr/^(INT|INTEGER|TINYINT|SMALLINT|MEDIUMINT|BIGINT|UNSIGNED\s+BIG\s+INT|INT2|INT8)/ => { constant => '', name => 'SQLITE_INTEGER', type => 'integer' },
+        qr/^(CHARACTER\(\d+\)|VARCHAR\(\d+\)|VARYING\s+CHARACTER\(\d+\)|NCHAR\(\d+\)|NATIVE\s+CHARACTER\(\d+\)|NVARCHAR\(\d+\)|TEXT|CLOB)/  => { constant => '', name => 'SQLITE_TEXT', type => 'text' },
+        qr/^BLOB/                                               => { constant => '', name => 'SQLITE_BLOB', type => 'blob' },
+        qr/^(REAL|DOUBLE\s+DOUBLE\s+PRECISION|FLOAT)/           => { constant => '', name => 'SQLITE_FLOAT', type => 'float' },
+        qr/^(NUMERIC|DECIMAL\(\d+,\d+\)|BOOLEAN|DATETIME|DATE)/ => { constant => '', name => 'SQLITE_NULL', type => 'bool' },
     };
     our $DEBUG = 0;
     our $VERSION = 'v1.0.0';
@@ -342,12 +342,13 @@ sub unlock { return( shift->error( "Locking and unlocking of tables is unsupport
 # NOTE: sub _simple_exist is inherited from DB::Object
 # sub _simple_exist
 
+# NOTE: DESTROY
 DESTROY
 {
     # Do nothing
     # DB::Object::Tables are never destroyed.
     # They are just gateway to tables, and they are cached by DB::Object::table()
-    # print( STDERR "DESTROY'ing table $self ($self->{ 'table' })\n" );
+    # print( STDERR "DESTROY'ing table $self ($self->{table})\n" );
 };
 
 1;

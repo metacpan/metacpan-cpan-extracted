@@ -19,7 +19,7 @@ BEGIN
     use warnings;
     use parent qw( DB::Object::Query );
     use vars qw( $VERSION $DEBUG );
-    use Want;
+    use Wanted;
     our $VERSION = 'v0.3.1';
 };
 

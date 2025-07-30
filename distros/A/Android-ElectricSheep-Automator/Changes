@@ -19,4 +19,10 @@ Revision history for Android-ADB-Automator
         Added one new method Android::ElectricSheep::Automator::is_app_running() which checks if the specified app is running on the device.
         Added one new method Android::ElectricSheep::Automator::Plugins::Apps::Base::is_app_running() which checks if the Viber app is running on the device.
         Moved functionality for opening and closing an app into the Android::ElectricSheep::Automator::Plugins::Apps::Base (before they were in the Android::ElectricSheep::Automator::Plugins::Apps::Viber). Also moved appname() into the Base as well.
+	Added one more script script/electric-sheep-viber-send-message.pl
+        Pod changes.
+
+0.06    2025/07/29
+        Fixed script/*.pl not being installed.
+        input_text() now replaces spaces with %s automatically.
         Pod changes.

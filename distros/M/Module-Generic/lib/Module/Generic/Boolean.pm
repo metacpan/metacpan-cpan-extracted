@@ -17,10 +17,10 @@ BEGIN
     use common::sense;
     use vars qw( $true $false );
     use overload
-      "0+"     => sub{ ${$_[0]} },
-      "++"     => sub{ $_[0] = ${$_[0]} + 1 },
-      "--"     => sub{ $_[0] = ${$_[0]} - 1 },
-      fallback => 1;
+        "0+"     => sub{ ${$_[0]} },
+        "++"     => sub{ $_[0] = ${$_[0]} + 1 },
+        "--"     => sub{ $_[0] = ${$_[0]} - 1 },
+        fallback => 1;
     $true  = do{ bless( \( my $dummy = 1 ) => 'Module::Generic::Boolean' ) };
     $false = do{ bless( \( my $dummy = 0 ) => 'Module::Generic::Boolean' ) };
     our( $VERSION ) = 'v1.2.1';

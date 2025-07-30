@@ -2,8 +2,9 @@ package Params::Validate::Strict;
 
 use strict;
 use warnings;
+
 use Carp;
-use Params::Get;
+use Params::Get 0.11;
 
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(validate_strict);
@@ -14,11 +15,11 @@ Params::Validate::Strict - Validates a set of parameters against a schema
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head1 SYNOPSIS
 
@@ -221,7 +222,7 @@ sub validate_strict
 						if(!defined($value)) {
 							next;	# Skip if hash is undefined
 						}
-						if(scalar(scalar(%{$value})) < $rule_value) {
+						if(scalar(keys(%{$value})) < $rule_value) {
 							croak("validate_strict: Parameter '$key' must have at least length $rule_value keys");
 						}
 					} elsif(($rules->{'type'} eq 'integer') || ($rules->{'type'} eq 'number')) {
@@ -250,7 +251,7 @@ sub validate_strict
 						if(!defined($value)) {
 							next;	# Skip if hash is undefined
 						}
-						if(scalar(scalar(%{$value})) > $rule_value) {
+						if(scalar(keys(%{$value})) > $rule_value) {
 							croak("validate_strict: Parameter '$key' must have no more than $rule_value keys");
 						}
 					} elsif(($rules->{'type'} eq 'integer') || ($rules->{'type'} eq 'number')) {
@@ -299,6 +300,8 @@ Nigel Horne, C<< <njh at bandsman.co.uk> >>
 =item * L<Params::Get>
 
 =item * L<Params::Validate>
+
+=item * L<Return::Set>
 
 =back
 

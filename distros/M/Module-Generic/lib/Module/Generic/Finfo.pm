@@ -446,6 +446,8 @@ sub _datetime
             $repo->set( $has_local_tz );
             # unlocks automatically at end of scope.
         }
+        # Not strictly necessary
+        $repo->unlock;
     }
     else
     {

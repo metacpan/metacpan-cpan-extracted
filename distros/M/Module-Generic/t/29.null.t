@@ -22,7 +22,8 @@ use_ok( $class ) || BAIL_OUT( "Unable to load $class" );
 subtest 'Basic functionality' => sub
 {
     my $error = bless( { message => "Test error" }, 'Module::Generic::Exception' );
-    my $null = $class->new( $error, wants => 'OBJECT' );
+    # my $null = $class->new( wants => 'OBJECT' );
+    my $null = $class->new;
     isa_ok( $null, $class, 'Object creation' );
     # is( $null->has_error->message, "Test error", 'has_error stores error object' );
 
@@ -219,6 +220,7 @@ subtest 'Context with wants option' => sub
 
 subtest 'Thread-safe operations' => sub
 {
+    no warnings 'once';
     SKIP:
     {
         if( !$Config{useithreads} )

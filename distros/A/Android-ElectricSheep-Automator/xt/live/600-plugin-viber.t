@@ -9,7 +9,7 @@ use warnings;
 
 use utf8; # we have unicode strings in here
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use Test::More;
 use Test::More::UTF8;

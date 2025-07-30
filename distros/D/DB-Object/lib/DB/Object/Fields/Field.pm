@@ -51,7 +51,7 @@ BEGIN
         '~~'    => sub{ &_op_overload( @_, '@@' ) },
         fallback => 1,
     );
-    use Want;
+    use Wanted;
     our $VERSION = 'v1.2.0';
 };
 

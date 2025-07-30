@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Changes file management - ~/lib/Changes/Change.pm
-## Version v0.1.1
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v0.1.2
+## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/11/23
-## Modified 2023/09/19
+## Modified 2025/07/28
 ## All rights reserved
 ## 
 ## 
@@ -19,8 +19,7 @@ BEGIN
     use warnings::register;
     use parent qw( Module::Generic );
     use vars qw( $VERSION );
-    # use Nice::Try;
-    our $VERSION = 'v0.1.1';
+    our $VERSION = 'v0.1.2';
 };
 
 use strict;
@@ -191,6 +190,15 @@ sub text { return( shift->reset(@_)->_set_get_scalar_as_object( 'text', @_ ) ); 
 # We do not use the reset here, because just setting a wrap callback has no direct impact on the output
 sub wrapper { return( shift->_set_get_code( 'wrapper', @_ ) ); }
 
+sub DESTROY
+{
+    # <https://perldoc.perl.org/perlobj#Destructors>
+    CORE::local( $., $@, $!, $^E, $? );
+    my $self = CORE::shift( @_ );
+    CORE::return if( !CORE::defined( $self ) );
+    CORE::return if( ${^GLOBAL_PHASE} eq 'DESTRUCT' );
+};
+
 1;
 # NOTE: POD
 __END__
@@ -224,7 +232,7 @@ Changes::Change - Changes object class
 
 =head1 VERSION
 
-    v0.1.1
+    v0.1.2
 
 =head1 DESCRIPTION
 

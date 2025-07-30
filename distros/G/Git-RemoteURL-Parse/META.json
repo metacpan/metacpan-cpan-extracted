@@ -3,7 +3,7 @@
    "author" : [
       "Klaus Rindfrey <klausrin@cpan.org.eu>"
    ],
-   "dynamic_config" : 1,
+   "dynamic_config" : 0,
    "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
@@ -32,7 +32,10 @@
       },
       "runtime" : {
          "requires" : {
-            "perl" : "5.010"
+            "Exporter" : "1.6",
+            "perl" : "5.010",
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "test" : {
@@ -41,7 +44,21 @@
          }
       }
    },
+   "provides" : {
+      "Git::RemoteURL::Parse" : {
+         "file" : "lib/Git/RemoteURL/Parse.pm",
+         "version" : "0.02"
+      }
+   },
    "release_status" : "stable",
-   "version" : "0.01",
+   "resources" : {
+      "repository" : {
+         "type" : "git"
+      }
+   },
+   "version" : "0.02",
+   "x_bugtracker" : {
+      "web" : "perl-git-remoteurl-parse/issues"
+   },
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

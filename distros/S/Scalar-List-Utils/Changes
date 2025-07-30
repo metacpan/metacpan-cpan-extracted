@@ -1,3 +1,8 @@
+1.70 -- 2025-07-30
+	[CHANGES]
+	 * Reïnstate handling of apostrophy in package names, as it was added
+	   back to perl at version 5.41.6
+
 1.69 -- 2025-04-01
 	[CHANGES]
 	 * Always allow `isvstring` to be exported even on Perl 5.6, where it

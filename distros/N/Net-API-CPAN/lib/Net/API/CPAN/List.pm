@@ -20,7 +20,7 @@ BEGIN
     use vars qw( $VERSION );
     use Clone ();
     use HTTP::Promise;
-    use Want;
+    use Wanted;
     use constant {
         # Elastic Search default value.
         # See <https://www.elastic.co/guide/en/elasticsearch/reference/2.4/search-request-from-size.html>
@@ -96,7 +96,7 @@ sub get
     my $self = CORE::shift( @_ );
     my $pos  = @_ ? int( CORE::shift( @_ ) ) : ( $self->{_pos} || 0 );
     my $data = $self->items;
-    my $what = lc( Want::wantref );
+    my $what = lc( Wanted::wantref );
     if( !defined( $data->[ $pos ] ) )
     {
         if( $what eq 'object' || $what eq 'hash' )
@@ -468,7 +468,7 @@ sub next
     my $self = CORE::shift( @_ );
     $self->{_pos} = -1 if( !exists( $self->{_pos} ) );
     my $data = $self->items;
-    my $what = lc( Want::wantref );
+    my $what = lc( Wanted::wantref );
     my $val;
 #     if( $self->{_pos} + 1 < $data->length )
 #     {
@@ -584,7 +584,7 @@ sub pop
 {
     my $self = CORE::shift( @_ );
     my $data = $self->items;
-    my $what = lc( Want::wantref );
+    my $what = lc( Wanted::wantref );
     my $val  = $self->items->pop;
 
     if( !defined( $val ) )
@@ -609,7 +609,7 @@ sub prev
     my $self = CORE::shift( @_ );
     $self->{_pos} = -1 if( !exists( $self->{_pos} ) );
     my $data = $self->items;
-    my $what = lc( Want::wantref );
+    my $what = lc( Wanted::wantref );
     my $val;
     if( $self->{_pos} - 1 >= 0 )
     {
@@ -702,7 +702,7 @@ sub shift
 {
     my $self = CORE::shift( @_ );
     my $data = $self->items;
-    my $what = lc( Want::wantref );
+    my $what = lc( Wanted::wantref );
     my $val  = $self->items->shift;
 
 

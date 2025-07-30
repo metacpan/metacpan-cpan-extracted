@@ -1,5 +1,5 @@
 package App::Sky::Manager;
-$App::Sky::Manager::VERSION = '0.6.0';
+$App::Sky::Manager::VERSION = '0.8.0';
 use strict;
 use warnings;
 
@@ -11,10 +11,9 @@ use MooX 'late';
 
 use List::Util qw(first);
 
-use URI;
 use File::Basename qw(basename);
 
-use App::Sky::Module;
+use App::Sky::Module ();
 
 # For defined-or - "//".
 use 5.010;
@@ -88,6 +87,17 @@ sub _calc_target_dir
     }
 }
 
+sub _calc_overrides
+{
+    my ( $self, $args ) = @_;
+
+    my $sections = $self->_calc_site_conf($args)->{sections};
+
+    my $sect_name = $self->_calc_sect_name( $args, $sections );
+
+    return ( $sections->{$sect_name}->{overrides} || +{} );
+}
+
 sub _perform_upload_generic
 {
     my ( $self, $is_dir, $args ) = @_;
@@ -115,21 +125,20 @@ sub _perform_upload_generic
 
     my @dir = ( $is_dir ? ( is_dir => 1 ) : () );
 
+    my $fileargs = {
+        %$args,
+        basename => $bn,
+        @dir,
+    };
     return $backend->get_upload_results(
         {
-
+            overrides => $self->_calc_overrides( $fileargs, ),
             filenames => (
                 $is_dir
                 ? [ map { my $s = $_; $s =~ s#/+\z##ms; $s } @$filenames ]
                 : $filenames,
             ),
-            target_dir => $self->_calc_target_dir(
-                {
-                    %$args,
-                    basename => $bn,
-                    @dir,
-                }
-            ),
+            target_dir => $self->_calc_target_dir( $fileargs, ),
             @dir,
         }
     );
@@ -166,7 +175,7 @@ App::Sky::Manager - manager for the configuration.
 
 =head1 VERSION
 
-version 0.6.0
+version 0.8.0
 
 =head1 METHODS
 

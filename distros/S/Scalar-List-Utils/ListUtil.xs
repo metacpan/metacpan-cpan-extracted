@@ -1951,7 +1951,7 @@ PREINIT:
     STRLEN namelen;
     const char* nameptr = SvPV(name, namelen);
     int utf8flag = SvUTF8(name);
-#if PERL_VERSION_LT(5, 41, 3)
+#if PERL_VERSION_LT(5, 41, 3) || PERL_VERSION_GT(5, 41, 5)
     int quotes_seen = 0;
     bool need_subst = FALSE;
 #endif
@@ -1977,12 +1977,12 @@ PPCODE:
         if (s > nameptr && *s == ':' && s[-1] == ':') {
             end = s - 1;
             begin = ++s;
-#if PERL_VERSION_LT(5, 41, 3)
+#if PERL_VERSION_LT(5, 41, 3) || PERL_VERSION_GT(5, 41, 5)
             if (quotes_seen)
                 need_subst = TRUE;
 #endif
         }
-#if PERL_VERSION_LT(5, 41, 3)
+#if PERL_VERSION_LT(5, 41, 3) || PERL_VERSION_GT(5, 41, 5)
         else if (s > nameptr && *s != '\0' && s[-1] == '\'') {
             end = s - 1;
             begin = s;
@@ -1993,7 +1993,7 @@ PPCODE:
     }
     s--;
     if (end) {
-#if PERL_VERSION_LT(5, 41, 3)
+#if PERL_VERSION_LT(5, 41, 3) || PERL_VERSION_GT(5, 41, 5)
         SV* tmp;
         if (need_subst) {
             STRLEN length = end - nameptr + quotes_seen - (*end == '\'' ? 1 : 0);

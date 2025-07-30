@@ -159,6 +159,7 @@ sub wait
     return( shift( @_ ) );
 }
 
+# NOTE: DESTROY
 DESTROY
 {
     # Do nothing but existing so it is handled by this package

@@ -1,6 +1,6 @@
 
 <form
-    hx-get="/Helpers/AISuggestion/ProcessAIRequest"
+    hx-get="<% RT->Config->Get('WebPath') %>/Helpers/AISuggestion/ProcessAIRequest"
     hx-target="#ai-result"
     hx-swap="innerHTML"
     id="suggestionForm"

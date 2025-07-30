@@ -404,7 +404,7 @@ For example:
     my $array1 = Module::Generic::Array->new([qw( a b c )]);
     my $array2 = [qw( d e f )];
     my $array3 = $array1->concat( $array2 );
-    
+
     say @$array3;
     # a, b, c, d, e, f
 

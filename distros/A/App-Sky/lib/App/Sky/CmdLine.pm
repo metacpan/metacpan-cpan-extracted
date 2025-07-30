@@ -1,5 +1,5 @@
 package App::Sky::CmdLine;
-$App::Sky::CmdLine::VERSION = '0.6.0';
+$App::Sky::CmdLine::VERSION = '0.8.0';
 use strict;
 use warnings;
 use 5.020;
@@ -13,9 +13,9 @@ use MooX 'late';
 
 use Getopt::Long qw(GetOptionsFromArray);
 
-use App::Sky::Config::Validate;
-use App::Sky::Manager;
-use File::HomeDir;
+use App::Sky::Config::Validate ();
+use App::Sky::Manager          ();
+use File::HomeDir              ();
 
 use YAML::XS qw(LoadFile);
 
@@ -270,7 +270,7 @@ App::Sky::CmdLine - command line program
 
 =head1 VERSION
 
-version 0.6.0
+version 0.8.0
 
 =head1 METHODS
 

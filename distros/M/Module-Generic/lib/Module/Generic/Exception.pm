@@ -114,7 +114,7 @@ sub init
             }
             return( $i - 1 );
         };
-        
+
         $args->{skip_frames} = $error_start_frame->();
     }
 

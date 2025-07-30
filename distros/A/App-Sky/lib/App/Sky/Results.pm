@@ -1,12 +1,12 @@
 package App::Sky::Results;
-$App::Sky::Results::VERSION = '0.6.0';
+$App::Sky::Results::VERSION = '0.8.0';
 use strict;
 use warnings;
 
 
 use Carp ();
 
-use URI;
+use URI ();
 
 use Moo;
 use MooX 'late';
@@ -29,7 +29,7 @@ App::Sky::Results - results of an upload.
 
 =head1 VERSION
 
-version 0.6.0
+version 0.8.0
 
 =head1 METHODS
 

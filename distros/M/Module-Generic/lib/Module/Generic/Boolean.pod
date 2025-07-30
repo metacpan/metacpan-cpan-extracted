@@ -62,14 +62,6 @@ Returns the current boolean value (1 or 0) as a L<Module::Generic::Scalar> objec
 
 Returns true.
 
-=head2 true
-
-This returns a perl true value i.e. 1 or C<true> when added into L<JSON>
-
-=head2 false
-
-This returns a perl false value i.e. 0 or C<false> when added into L<JSON>
-
 =head2 is_bool
 
 Provided with a value and this returns true if it is a L<Module::Generic::Boolean> object
@@ -81,6 +73,14 @@ Provided with a value and this returns true if it is a L<Module::Generic::Boolea
 =head2 is_false
 
 Provided with a value and this returns true if it is a L<Module::Generic::Boolean> object and this is false.
+
+=head2 true
+
+This returns a perl true value i.e. 1 or C<true> when added into L<JSON>
+
+=head2 false
+
+This returns a perl false value i.e. 0 or C<false> when added into L<JSON>
 
 =head2 TO_JSON
 

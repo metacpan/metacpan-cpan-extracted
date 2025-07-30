@@ -1,14 +1,14 @@
-#!/usr/local/bin/perl
-use Test::More qw( no_plan );
-
+#!perl
 BEGIN
 {
-    use strict;
-    use File::Basename;
+	use strict;
+	use warnings;
+    use Test::More qw( no_plan );
+    select(($|=1,select(STDERR),$|=1)[1]);
     use DateTime;
     use DateTime::TimeZone;
     use DateTime::Format::Strptime;
-    use IO::File;
+    use Module::Generic::File qw( file );
 	our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
 
@@ -141,9 +141,9 @@ SKIP:
     isa_ok( $dbh, 'DB::Object::SQLite', "Checking object class ownership" );
     
     # Load schema
-    my $schemaFile = File::Spec->catdir( File::Basename::dirname(__FILE__), 'sqlite.sql' );
-    my $fh = IO::File->new( "<$schemaFile" ) || BAIL_OUT( "Unable to read the sqlite schema \"$schemaFile\": $1" );
-    $fh->binmode( ':utf8' );
+    my $schemaFile = file($0)->parent->child( 'sqlite.sql' );
+    my $fh = $schemaFile->open( '<', { binmode => 'utf-8' } ) ||
+        BAIL_OUT( "Unable to read the sqlite schema \"$schemaFile\": $1" );
     my $queries = [];
     my $def = {};
     my $sql = '';
@@ -216,10 +216,10 @@ SKIP:
         is( $tbl_exists, 1, "Checking existence of table customers with table_exists()" );
     }
     $str = $tbl->insert(
-    first_name => 'Paul',
-    last_name => 'Goldman',
-    email => 'paul@example.org',
-    active => 0,
+        first_name => 'Paul',
+        last_name => 'Goldman',
+        email => 'paul@example.org',
+        active => 0,
     )->as_string;
     my $expected = <<SQL;
 INSERT INTO customers (first_name, last_name, email, active) VALUES('Paul', 'Goldman', 'paul\@example.org', '0')

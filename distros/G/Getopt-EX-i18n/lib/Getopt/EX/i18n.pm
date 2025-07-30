@@ -1,7 +1,7 @@
 use v5.14;
 package Getopt::EX::i18n;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 use warnings;
 use Data::Dumper;
@@ -18,9 +18,9 @@ command -Mi18n [ options ]
 
 =head1 DESCRIPTION
 
-This module B<i18n> provide an easy way to set locale environment
+This module B<i18n> provides an easy way to set locale environment
 before executing arbitrary command.  Locale list is taken from the
-system by C<locale -a> command.  Next list is a sample locales
+system by C<locale -a> command.  The following list shows sample locales
 available on macOS 10.15 (Catalina).
 
     af_ZA    Afrikaans / South Africa
@@ -77,8 +77,8 @@ available on macOS 10.15 (Catalina).
     zh_HK    Chinese / Hong Kong
     zh_TW    Chinese / Taiwan, Province of China
 
-As for Japanese locale C<ja_JP>, following options are defined by
-default, and set C<LANG> environment as C<ja_JP>.  Environment
+For Japanese locale C<ja_JP>, the following options are defined by
+default, and set C<LANG> environment to C<ja_JP>.  The environment
 variable name can be changed by B<env> option.
 
     LOCALE:     --ja_JP  (raw)
@@ -89,15 +89,15 @@ variable name can be changed by B<env> option.
     TERRITORY:  --JP     (territory)
                 --jp     (territory_lc)
 
-Short language option (C<--ja>) is defined in the alphabetical order
+Short language option (C<--ja>) is defined in alphabetical order
 of the territory code, so the option C<--en> is assigned to C<en_AU>.
-But if the same territory name is found as language, it takes
+However, if the same territory name is found as language, it takes
 precedence; German is used in three locales (C<de_AT>, C<de_CH>,
 C<de_DE>) but option C<--de> is defined as C<de_DE>.
 
 Territory options (C<--JP> and C<--jp>) are defined only when the same
-language option is not defined by other entry, and only single entry
-can be found for the territory.  Option for Switzerland is not defined
+language option is not defined by other entry, and only a single entry
+can be found for the territory.  Options for Switzerland are not defined
 because there are three entries (C<de_CH>, C<fr_CH>, C<it_CH>).
 Territory option C<--AM> is assigned to C<hy_AM>, but language option
 C<--am> is assigned to C<am_ET>.
@@ -119,14 +119,14 @@ module declaration.
 
 =item B<long_lc>
 
-=item B<lang>
+=item B<language>
 
 =item B<territory>
 
 =item B<territory_lc>
 
-These parameter tells which option is defined.  All options are
-enabled by default.  You can disable territory option like this:
+These parameters tell which options are defined.  All options are
+enabled by default.  You can disable territory options like this:
 
     command -Mi18n::setopt(territory=0,territory_lc=0)
 
@@ -146,8 +146,8 @@ Show option list.
 
 =item B<listopt>=I<option>
 
-Set the option to display option list and exit.  You can introduce a
-new option B<-l> to show available option list:
+Set the option to display the option list and exit.  You can introduce a
+new option B<-l> to show the available option list:
 
     -Mi18n::setopt(listopt=-l)
 
@@ -160,6 +160,11 @@ Specify prefix string.  Default is C<-->.
 Specify environment variable name to be set.  Default is C<LANG>.
 
 =back
+
+=head1 DEPENDENCIES
+
+This module uses L<Locale::Codes::Language> and L<Locale::Codes::Country>
+to provide language and country names for locale codes.
 
 =head1 BUGS
 
@@ -243,10 +248,12 @@ Local::LocaleObj {
 	/^(?<name>(?<lang>[a-z][a-z])_(?<cc>[A-Z][A-Z]))/ or die;
 	$class->new(%+);
     }
-    use Getopt::EX::i18n::iso639 qw(%iso639);
-    use Getopt::EX::i18n::iso3361 qw(%iso3361);
-    sub lang_name { $iso639 {+shift->lang} || 'UNKNOWN' }
-    sub cc_name   { $iso3361{+shift->cc}   || 'UNKNOWN' }
+
+    use Locale::Codes::Language;
+    sub lang_name { code2language(+shift->lang) || 'UNKNOWN' }
+
+    use Locale::Codes::Country;
+    sub cc_name   { code2country(+shift->cc)   || 'UNKNOWN' }
 }
 
 sub finalize {

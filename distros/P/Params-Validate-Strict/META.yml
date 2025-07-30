@@ -25,7 +25,7 @@ no_index:
 requires:
   Carp: '0'
   ExtUtils::MakeMaker: '6.64'
-  Params::Get: '0'
+  Params::Get: '0.11'
 resources: {}
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

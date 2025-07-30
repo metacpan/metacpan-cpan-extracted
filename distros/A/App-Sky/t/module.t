@@ -7,8 +7,8 @@ use Test::More tests => 14;
 
 use Test::Differences (qw( eq_or_diff ));
 
-use App::Sky::Module;
-use App::Sky::Exception;
+use App::Sky::Module    ();
+use App::Sky::Exception ();
 
 {
     my $m = App::Sky::Module->new(

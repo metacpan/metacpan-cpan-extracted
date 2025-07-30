@@ -316,7 +316,7 @@ if( !eval
     $o->datetime = "plop";
 })
 {
-    is( $@->message, 'Value provided is not a datetime.', 'lvalue -> fatal error' );
+    like( $@->message, qr/Value provided is not a datetime./, 'lvalue -> fatal error' );
 }
 
 $now = DateTime->now;

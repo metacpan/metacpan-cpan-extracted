@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File/Cache.pm
-## Version v0.2.11
+## Version v0.3.0
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/03/16
-## Modified 2025/04/23
+## Modified 2025/07/25
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -17,29 +17,9 @@ BEGIN
     use warnings;
     use warnings::register;
     use parent qw( Module::Generic );
-    use vars qw( $CACHE_REPO $CACHE_TO_OBJECT $DEBUG $HAS_B64 );
-    use Config;
-    use constant HAS_THREADS => $Config{useithreads};
-    if( HAS_THREADS )
-    {
-        require threads;
-        require threads::shared;
-        threads->import();
-        threads::shared->import();
-        my @repo :shared;
-        my %objs :shared;
-        $CACHE_REPO = \@repo;
-        $CACHE_TO_OBJECT = \%objs;
-        *_threads_lock = \&CORE::lock;
-    }
-    else
-    {
-        # Hash of cache file to objects to maintain the shared cache file objects created
-        $CACHE_REPO = [];
-        $CACHE_TO_OBJECT = {};
-        *_threads_lock = sub{1}; # no-op
-    }
+    use vars qw( $DEBUG $HAS_B64 );
     use Data::UUID;
+    use Module::Generic::Global ':const';
     use Module::Generic::File qw( file sys_tmpdir );
     # use Nice::Try;
     # This is disruptive for everybody. Bad idea.
@@ -49,7 +29,7 @@ BEGIN
     # use Storable 3.25 ();
     use Storable::Improved v0.1.3;
     $DEBUG = 0;
-    our $VERSION = 'v0.2.11';
+    our $VERSION = 'v0.3.0';
 };
 
 use v5.26.1;
@@ -81,6 +61,7 @@ sub init
     $self->SUPER::init( @_ ) || return( $self->pass_error );
     my $tmpdir = $self->{tmpdir} || sys_tmpdir();
     $self->{_cache_dir} = $tmpdir->child( 'cache_file' );
+    $self->{_cache_dir}->debug( $self->debug );
     $self->{_cache_file} = '';
     $self->{id}         = undef();
     $self->{locked}     = 0;
@@ -231,6 +212,7 @@ sub open
         $cache_dir->makepath || return( $self->pass_error( $cache_dir->error ) );
     }
     my $fo = $cache_dir->child( $serial );
+    $fo->debug( $self->debug );
     my $cache_file = "$fo";
     my $io;
     if( $fo->exists )
@@ -291,23 +273,20 @@ sub open
     $new->id( $addr );
     $new->size( $opts->{size} );
     $new->{_cache_file} = $fo;
-    {
-        my $file2object_repo = $self->_get_file2object_repo || return( $self->pass_error );
-        &_threads_lock( $CACHE_REPO ) if( HAS_THREADS );
-        &_threads_lock( $file2object_repo ) if( HAS_THREADS );
-        my $val;
-        if( HAS_THREADS )
-        {
-            $val = $self->serialise( $new, serialiser => 'Storable::Improved' ) ||
-                return( $self->pass_error );
-        }
-        else
-        {
-            $val = $new;
-        }
-        CORE::push( @$CACHE_REPO, $val );
-        CORE::push( @$file2object_repo, $addr );
-    }
+    my $repo = Module::Generic::Global->new( 'cache' => CORE::ref( $self ), key => CORE::ref( $self ) );
+    my $file2obj_repo = Module::Generic::Global->new( 'file2object_repo' => CORE::ref( $self ), key => CORE::ref( $self ) );
+    $repo->lock;
+    my $repo_data = $repo->get // [];
+    CORE::push( @$repo_data, $new );
+    $repo->set( $repo_data );
+    $repo->unlock;
+    $file2obj_repo->lock;
+    my $f2o_data = $file2obj_repo->get // {};
+    $f2o_data->{ "$fo" } //= [];
+    # To keep memory size reasonable, we only store the object address and not the object itself.
+    CORE::push( @{$f2o_data->{ "$fo" }}, $addr );
+    $file2obj_repo->set( $f2o_data );
+    $file2obj_repo->unlock;
     return( $new );
 }
 
@@ -333,9 +312,13 @@ sub read
         $self->removed(1);
         return( '' );
     }
-    $file->lock;
+    $file->lock || return( $self->pass_error( $file->error ) );
     # Make sure we are at the top of the file
-    $file->seek(0,0) || return( $self->pass_error( $file->error ) );
+    if( !$file->seek(0,0) )
+    {
+        $file->unlock;
+        return( $self->pass_error( $file->error ) )
+    }
     my $buffer = '';
     my $bytes = $file->read( $buffer, $file->length );
     $file->unlock;
@@ -440,12 +423,16 @@ sub remove
     if( $rv )
     {
         my $fname = "$file";
-        &_threads_lock( $CACHE_TO_OBJECT ) if( HAS_THREADS );
-        CORE::delete( $CACHE_TO_OBJECT->{ $fname } );
+        my $file2obj_repo = Module::Generic::Global->new( 'file2object_repo' => CORE::ref( $self ), key => CORE::ref( $self ) );
+        $file2obj_repo->lock;
+        my $f2o_data = $file2obj_repo->get // {};
+        CORE::delete( $f2o_data->{ $fname } );
+        $file2obj_repo->set( $f2o_data );
+        $file2obj_repo->unlock;
         $self->{_cache_file} = '';
         $self->id( undef() );
     }
-    
+
     if( $self->{_cache_dir} && 
         $self->{_cache_dir}->exists && 
         $self->{_cache_dir}->is_empty )
@@ -472,9 +459,7 @@ sub reset
     my $file = $self->{_cache_file} ||
         return( $self->error( "No cache file is set yet. Have you first opened the cache file with open()?" ) );
     return( $self->error( "Cache file found in our object is not a Module::Generic::File object." ) ) if( !$self->_is_a( $file => 'Module::Generic::File' ) );
-    $file->lock( exclusive => 1 );
     $self->write( $default );
-    $file->unlock;
     return( $self );
 }
 
@@ -619,7 +604,7 @@ sub write
     # FYI: MG = Module::Generic
     # substr( $encoded, 0, 0, 'MG[' . length( $encoded ) . ']' );
 
-    $file->lock;
+    $file->lock( shared => 1 );
     $file->seek(0,0);
     $file->print( $encoded );
 
@@ -654,7 +639,7 @@ sub _decode_json
             {
                 return( \$this->{__scalar_gen_shm} );
             }
-            
+
             foreach my $k ( keys( %$this ) )
             {
                 next if( !ref( $this->{ $k } ) );
@@ -787,26 +772,6 @@ sub _fill
     return(1);
 }
 
-sub _get_file2object_repo
-{
-    my $self = shift( @_ );
-    my $cache_dir = $self->{_cache_dir} || return( $self->error( "Cache directory object is gone!" ) );
-    my $serial = $self->serial || return( $self->error( "No serial set." ) );
-    my $fo = $cache_dir->child( $serial );
-    my $cache_file = "$fo";
-    if( HAS_THREADS )
-    {
-        &_threads_lock( $CACHE_TO_OBJECT );
-        $CACHE_TO_OBJECT->{ $cache_file } //= do{ my @r :shared; \@r };
-    }
-    else
-    {
-        $CACHE_TO_OBJECT->{ $cache_file } //= [];
-    }
-    my $file2object_repo = $CACHE_TO_OBJECT->{ $cache_file };
-    return( $file2object_repo );
-}
-
 sub _packing_method { return( shift->_set_get_scalar( '_packing_method', @_ ) ); }
 
 sub _str2key
@@ -841,52 +806,48 @@ sub DESTROY
 {
     # <https://perldoc.perl.org/perlobj#Destructors>
     CORE::local( $., $@, $!, $^E, $? );
-    my $self = CORE::shift( @_ ) || CORE::return;
     CORE::return if( ${^GLOBAL_PHASE} eq 'DESTRUCT' );
+    my $self = CORE::shift( @_ );
+    CORE::return if( !CORE::defined( $self ) );
     CORE::return unless( CORE::exists( $self->{_cache_file} ) && CORE::defined( $self->{_cache_file} ) && CORE::length( $self->{_cache_file} ) );
     my $prefix = __PACKAGE__ . '::DESTROY';
-    my $cache_file = '';
+    my $cache_file;
     $cache_file = $self->{_cache_file} if( CORE::length( $self->{_cache_file} ) );
-    CORE::return if( !$self->_is_a( $cache_file => 'Module::Generic::File' ) );
+    CORE::return if( !defined( $cache_file ) || !$self->_is_a( $cache_file => 'Module::Generic::File' ) );
     my $fname = "$cache_file";
     print( STDERR "\t${prefix}: Destroying object with cache file \"${fname}\"\n" ) if( $DEBUG >= 4 );
     $self->unlock;
 
-    &_threads_lock( $CACHE_TO_OBJECT ) if( HAS_THREADS );
-    my $ref = $CACHE_TO_OBJECT->{ $fname };
-    if( ref( $ref // '' ) eq 'ARRAY' )
+    my $file2obj_repo = Module::Generic::Global->new( 'file2object_repo' => CORE::ref( $self ), key => CORE::ref( $self ) );
+    $file2obj_repo->lock;
+    my $f2o_data = $file2obj_repo->get;
+    if( defined( $f2o_data ) && ref( $f2o_data // '' ) eq 'HASH' )
     {
-        printf( STDERR "\t${prefix}: %d objects found for cache file \"${fname}\"\n", scalar( @$ref ) ) if( $DEBUG >= 4 );
-        my $addr = Scalar::Util::refaddr( $self );
-        my @slices;
-        if( HAS_THREADS )
+        my $ref = $f2o_data->{ $fname };
+
+        if( defined( $ref ) && ref( $ref // '' ) eq 'ARRAY' )
         {
-            share( @slices );
-        }
-        for( my $i = 0; $i <= $#$ref; $i++ )
-        {
-            if( $ref->[$i] eq $addr )
+            printf( STDERR "\t${prefix}: %d objects found for cache file \"${fname}\"\n", scalar( @$ref ) ) if( $DEBUG >= 4 );
+            my $addr = Scalar::Util::refaddr( $self );
+            for( my $i = 0; $i <= $#$ref; $i++ )
             {
-                if( !HAS_THREADS )
+                if( $ref->[$i] eq $addr )
                 {
                     splice( @$ref, $i, 1 );
                     $i--;
                 }
             }
-            else
+            if( !scalar( @$ref ) )
             {
-                push( @slices, $ref->[$i] );
+                CORE::delete( $f2o_data->{ $fname } );
             }
         }
-        if( !scalar( @$ref ) ||
-            ( HAS_THREADS && !scalar( @slices ) ) )
+        else
         {
-            CORE::delete( $CACHE_TO_OBJECT->{ $fname } );
+            CORE::delete( $f2o_data->{ $fname } );
         }
-    }
-    else
-    {
-        CORE::delete( $CACHE_TO_OBJECT->{ $fname } );
+        $file2obj_repo->set( $f2o_data );
+        $file2obj_repo->unlock;
     }
 
     # Are we expected to clean up and remove the cache file?
@@ -942,28 +903,17 @@ sub THAW
 # NOTE: END
 END
 {
-    return unless( defined( $CACHE_REPO ) && ref( $CACHE_REPO ) eq 'ARRAY' );
-    
-    my $prefix = __PACKAGE__ . '::END';
-    printf( STDERR "${prefix}: %d objects in repo to check.\n", scalar( @$CACHE_REPO ) ) if( $DEBUG >= 4 );
+    my $repo = Module::Generic::Global->new( 'cache' => __PACKAGE__, key => __PACKAGE__ );
+    my $repo_data = $repo->get;
+    return unless( defined( $repo_data ) && ref( $repo_data ) eq 'ARRAY' );
+    my $file2obj_repo = Module::Generic::Global->new( 'file2object_repo' => __PACKAGE__, key => __PACKAGE__ );
+    my $f2o_data = $file2obj_repo->get;
 
-    foreach my $this ( @$CACHE_REPO )
+    my $prefix = __PACKAGE__ . '::END';
+    printf( STDERR "${prefix}: %d objects in repo to check.\n", scalar( @$repo_data ) ) if( $DEBUG >= 4 );
+
+    foreach my $cache ( @$repo_data )
     {
-        my $cache;
-        if( HAS_THREADS )
-        {
-            $cache = eval{ Storable::Improved::thaw( $this ) };
-            if( $@ )
-            {
-                warn( "Error thawing object under threads: $@" ) if( warnings::enabled() );
-                print( STDERR "${prefix}: Error thawing object under threads: $@\n" ) if( $DEBUG >= 4 );
-                next;
-            }
-        }
-        else
-        {
-            $cache = $this;
-        }
         # Only allow the parent process to clean up
         my $pid = $cache->owner // '';
         next if( $pid ne $$ );
@@ -971,20 +921,25 @@ END
         if( !Scalar::Util::blessed( $cache // '' ) || 
             ref( $cache // '' ) ne 'Module::Generic::File::Cache' )
         {
-            warn( "${prefix}: Object found in object repo is not a Module::Generic::File::Cache object.\n" );
+            warn( "${prefix}: Object found in object repo is not a Module::Generic::File::Cache object." );
             next;
         }
-        elsif( !defined( $cache ) || !ref( $cache ) || ( Scalar::Util::blessed( $cache ) && !$cache->can( 'remove' ) ) )
+        elsif( !defined( $cache ) ||
+            !ref( $cache ) ||
+            ( Scalar::Util::blessed( $cache ) && !$cache->can( 'remove' ) ) )
         {
             next;
         }
         elsif( !Scalar::Util::blessed( $cache->{_cache_file} ) ||
-               ( Scalar::Util::blessed( $cache->{_cache_file} ) && !$cache->{_cache_file}->isa( 'Module::Generic::File' ) ) )
+               (
+                   Scalar::Util::blessed( $cache->{_cache_file} ) &&
+                   !$cache->{_cache_file}->isa( 'Module::Generic::File' )
+               ) )
         {
-            warn( "${prefix}: File object found in _cache_file (", overload::StrVal( $cache->{_cache_file} ), ") is actually not a Module::Generic::File, which is weird.\n" );
+            warn( "${prefix}: File object found in _cache_file (", overload::StrVal( $cache->{_cache_file} ), ") is actually not a Module::Generic::File, which is weird." );
             next;
         }
-        
+
         my $fname = "$cache->{_cache_file}";
         print( STDERR "\t${prefix}: Cache file is: \"", ( $fname // 'undef' ), "\"\n" ) if( $DEBUG >= 4 );
         next if( !length( $fname // '' ) );
@@ -997,15 +952,13 @@ END
         }
 
         # Check for other references to the same file
-        if( defined( $CACHE_TO_OBJECT ) && ref( $CACHE_TO_OBJECT ) eq 'HASH' )
+        if( defined( $f2o_data ) && ref( $f2o_data ) eq 'HASH' )
         {
-            &_threads_lock( $CACHE_TO_OBJECT ) if( HAS_THREADS );
-            if( exists( $CACHE_TO_OBJECT->{ $fname } ) )
+            if( exists( $f2o_data->{ $fname } ) )
             {
-                my $ref = $CACHE_TO_OBJECT->{ $fname } || next;
+                my $ref = $f2o_data->{ $fname } || next;
                 next if( ref( $ref ) ne 'ARRAY' );
                 printf( STDERR "\t${prefix}: %d objects associated with cache file \"${fname}\".\n", scalar( @$ref ) ) if( $DEBUG >= 4 );
-                &_threads_lock( $ref ) if( HAS_THREADS );
                 @$ref = grep{ CORE::length( $_ // '' ) && $_ != $id } @$ref;
                 # Only remove file if no one else is using it
                 unless( @$ref )
@@ -1015,7 +968,7 @@ END
                         print( STDERR "\t${prefix}: Removing cache file \"${fname}\"\n" ) if( $DEBUG >= 4 );
                         $cache->remove;
                     }
-                    delete( $CACHE_TO_OBJECT->{ $fname } );
+                    delete( $f2o_data->{ $fname } );
                 }
             }
         }
@@ -1050,7 +1003,7 @@ Module::Generic::File::Cache - File-based Cache
 
 =head1 VERSION
 
-    v0.2.11
+    v0.3.0
 
 =head1 DESCRIPTION
 

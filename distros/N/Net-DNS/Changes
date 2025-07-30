@@ -1,4 +1,13 @@
-$Id: Changes 2022 2025-07-04 13:03:53Z willem $                       -*-text-*-
+$Id: Changes 2034 2025-07-29 18:04:34Z willem $                       -*-text-*-
+
+
+**** 1.52 Jul 29, 2025
+
+	Refactor SVCB to avoid internal use of generic keyNN.
+	DELEG documentation and code improvement.
+
+Fix rt.cpan.org #168433
+	Bug in resolver base selection on non-Unix/Linux platforms
 
 
 **** 1.51 Jul 4, 2025

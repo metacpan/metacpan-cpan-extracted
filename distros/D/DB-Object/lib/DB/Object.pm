@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object.pm
-## Version v1.7.0
+## Version v1.8.0
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2025/03/09
+## Modified 2025/07/30
 ## All rights reserved
 ## 
 ## 
@@ -22,54 +22,45 @@ BEGIN
     use warnings::register;
     use parent qw( Module::Generic DBI );
     use vars qw(
-        $VERSION $AUTOLOAD @AVAILABLE_DATABASES $CACHE_DIR $CACHE_QUERIES $CACHE_SIZE 
-        $CACHE_TABLE $CONNECT_VIA $CONSTANT_QUERIES_CACHE $DB_ERRSTR @DBH $DRIVER2PACK 
-        $ERROR $DEBUG $MOD_PERL $QUERIES_CACHE $USE_BIND $USE_CACHE $PLACEHOLDER_REGEXP
+        $VERSION $AUTOLOAD $CACHE_DIR $CACHE_SIZE $CONNECT_VIA $DRIVER2PACK
+        $ERROR $DEBUG $MOD_PERL $USE_BIND $USE_CACHE $PLACEHOLDER_REGEXP
     );
     use Regexp::Common;
     use Scalar::Util qw( blessed );
-    use DateTime;
-    use DateTime::TimeZone;
-    use DateTime::Format::Strptime;
     use DB::Object::Cache::Tables;
     use DBI;
     use JSON;
     use Module::Generic::File qw( sys_tmpdir );
-    use Module::Generic::DateTime;
+    use Module::Generic::Global qw( :const );
     use POSIX ();
-    use Want;
+    use Wanted;
     our $PLACEHOLDER_REGEXP = qr/\b\?\b/;
-    our $VERSION = 'v1.7.0';
+    our $VERSION = 'v1.8.0';
 };
 
 use strict;
 use warnings;
 
-our $DB_ERRSTR     = '';
 our $DEBUG         = 0;
-# This is our system cache queries
-our $CACHE_QUERIES = [];
+# A global setting variable. This is not changed dynamically, and can be set by the user
 our $CACHE_SIZE    = 10;
-our $CACHE_TABLE   = {};
 our $USE_BIND      = 0;
 our $USE_CACHE     = 0;
 our $MOD_PERL      = 0;
-our @DBH           = ();
-our $CACHE_DIR       = '';
-our $CONSTANT_QUERIES_CACHE = {};
-# This is for the user convenience
-our $QUERIES_CACHE = {};
+# A global variable that can be set by the user to serve as a default value
+our $CACHE_DIR     = '';
 if( $INC{ 'Apache/DBI.pm' } && 
     substr( $ENV{GATEWAY_INTERFACE}|| '', 0, 8 ) eq 'CGI-Perl' )
 {
     $CONNECT_VIA = "Apache::DBI::connect";
     $MOD_PERL++;
 }
+# Global constant
 our $DRIVER2PACK = 
 {
-mysql  => 'DB::Object::Mysql',
-Pg     => 'DB::Object::Postgres',
-SQLite => 'DB::Object::SQLite',
+    mysql  => 'DB::Object::Mysql',
+    Pg     => 'DB::Object::Postgres',
+    SQLite => 'DB::Object::SQLite',
 };
 
 sub new
@@ -96,7 +87,6 @@ sub init
     $self->{unknown_field}     = 'ignore';
     $self->{_init_strict_use_sub} = 1;
     $self->Module::Generic::init( @_ ) || return( $self->pass_error );
-    # $self->{constant_queries_cache} = $DB::Object::CONSTANT_QUERIES_CACHE;
     return( $self );
 }
 
@@ -220,7 +210,7 @@ sub bind
     # Later, $dbh->bind( 'thingy' )->select->fetchrow_hashref()
     # When used like $table->bind; this means the user is setting the use bind option as a setting for all transactions, but
     # when used like $table->bind->select then the use bind option is only used for this transaction only and is reset after
-    $self->{bind} = Want::want('VOID') 
+    $self->{bind} = want('VOID') 
         ? 2 
         # Otherwise is it already set maybe?
         : $self->{bind} 
@@ -282,7 +272,13 @@ sub cache_query_get
 {
     my $self = shift( @_ );
     my $name = shift( @_ ) || return( $self->error( "No name for this query cache was provided." ) );
-    return( $QUERIES_CACHE->{ $name } );
+    my $base_class = $self->base_class;
+    # This is slightly confusing, but this is different from the other repository 'cache_queries', which is an array reference
+    my $repo = Module::Generic::Global->new( 'queries_cache' => $base_class ) ||
+        return( $self->pass_error( Module::Generic::Global->error ) );
+    my $cache = $repo->get // {};
+    return( $self->error( "The queries cache repository data is not an hash reference." ) ) if( ref( $cache ) ne 'HASH' );
+    return( $cache->{ $name } );
 }
 
 sub cache_query_set
@@ -290,7 +286,16 @@ sub cache_query_set
     my $self = shift( @_ );
     my $name = shift( @_ ) || return( $self->error( "No name for this query cache was provided." ) );
     my $sth  = shift( @_ ) || return( $self->error( "No statement handler was provided." ) );
-    return( $QUERIES_CACHE->{ $name } = $sth );
+    my $base_class = $self->base_class;
+    # This is slightly confusing, but this is different from the other repository 'cache_queries', which is an array reference
+    my $repo = Module::Generic::Global->new( 'queries_cache' => $base_class ) ||
+        return( $self->pass_error( Module::Generic::Global->error ) );
+    $repo->lock;
+    my $cache = $repo->get // {};
+    $cache->{ $name } = $sth;
+    $repo->set( $cache );
+    $repo->unlock;
+    return( $sth );
 }
 
 sub cache_table { return( shift->_set_get_boolean( 'cache_table', @_ ) ); }
@@ -412,9 +417,6 @@ sub connect
     $self->{opt} = $opt;
     my $dbh = $self->_dbi_connect || return( $that->pass_error( $self->error ) );
     $self->{dbh} = $dbh;
-    # If we are not running under mod_perl, cleanup the database object handle in case it was not shutdown
-    # using the DESTROY, but also the END block
-    push( @DBH, $dbh ) if( !$MOD_PERL );
     #$self->param(
     #  ## Do not allow SELECT that will take too long or too much resource, i.e. over 2Gb of data
     #  ## This is idiot proof mode
@@ -454,17 +456,27 @@ sub connect
     return( $self );
 }
 
-# sub constant_queries_cache { return( shift->_set_get_hash( 'constant_queries_cache', @_ ) ); }
-sub constant_queries_cache { return( $CONSTANT_QUERIES_CACHE ); }
+sub constant_queries_cache
+{
+    my $self = shift( @_ );
+    my $base_class = $self->base_class;
+    my $repo = Module::Generic::Global->new( 'constant_queries' => $base_class ) ||
+        return( $self->pass_error( Module::Generic::Global->error ) );
+    my $cache = $repo->get // {};
+    return( $cache );
+}
 
 sub constant_queries_cache_get
 {
     my( $self, $def ) = @_;
-    my $hash = $self->constant_queries_cache;
-    return( $self->error( "Parameter provided must be a hash, but I got '$def'." ) ) if( ref( $def ) ne 'HASH' );
+    my $base_class = $self->base_class;
+    my $repo = Module::Generic::Global->new( 'constant_queries' => $base_class ) ||
+        return( $self->pass_error( Module::Generic::Global->error ) );
+    my $hash = $repo->get // {};
+    return( $self->error( "Parameter provided must be a hash, but I got '", $self->_str_val( $def // 'undef' ), "'." ) ) if( !defined( $def ) || ref( $def // '' ) ne 'HASH' );
     foreach my $k ( qw( pack file line ) )
     {
-        return( $self->error( "Parameter \"$k\" is missing from the hash." ) ) if( !CORE::length( $def->{ $k } ) );
+        return( $self->error( "Parameter \"$k\" is missing from the hash." ) ) if( !CORE::length( $def->{ $k } // '' ) );
     }
     my $key = CORE::join( '|', @$def{qw( pack file line )} );
     my $ref = $hash->{ $key };
@@ -484,15 +496,27 @@ sub constant_queries_cache_get
 sub constant_queries_cache_set
 {
     my( $self, $def ) = @_;
-    my $hash = $self->constant_queries_cache;
+    my $base_class = $self->base_class;
+    my $repo = Module::Generic::Global->new( 'constant_queries' => $base_class ) ||
+        return( $self->pass_error( Module::Generic::Global->error ) );
+    $repo->lock;
+    my $hash = $repo->get // {};
     foreach my $k ( qw( pack file line query_object ) )
     {
-        return( $self->error( "Parameter \"$k\" is missing from the hash." ) ) if( !CORE::length( $def->{ $k } ) );
+        $repo->unlock;
+        return( $self->error( "Parameter \"$k\" is missing from the hash." ) ) if( !CORE::length( $def->{ $k } // '' ) );
     }
-    return( $self->error( "Provided query object is not a DB::Object::Query." ) ) if( !$self->_is_object( $def->{query_object} ) || !$def->{query_object}->isa( 'DB::Object::Query' ) );
-    $def->{ts} = ( CORE::stat( $def->{file} ) )[9];
+    if( !$self->_is_object( $def->{query_object} ) ||
+        !$def->{query_object}->isa( 'DB::Object::Query' ) )
+    {
+        $repo->unlock;
+        return( $self->error( "Provided query object is not a DB::Object::Query." ) );
+    }
+    $def->{ts} = [CORE::stat( $def->{file} )]->[9];
     my $key = CORE::join( '|', @$def{qw( pack file line )} );
     $hash->{ $key } = $def;
+    $repo->set( $hash );
+    $repo->unlock;
     return( $def );
 }
 
@@ -703,7 +727,7 @@ sub errstr(@)
     my $self = shift( @_ );
     if( !ref( $self ) )
     {
-        return( $DBI::errstr || $DB_ERRSTR );
+        return( $DBI::errstr );
     }
     elsif( defined( $self->{sth} ) && $self->{sth}->errstr() )
     {
@@ -1311,16 +1335,21 @@ sub use
     my $db   = shift( @_ );
     # No need to go further
     return( $self ) if( $db eq $self->{database} );
-    if( !@AVAILABLE_DATABASES )
+    my $repo = Module::Generic::Global->new( 'available_databases' => CORE::ref( $self ), key => CORE::ref( $self ) ) ||
+        return( $self->pass_error( Module::Generic::Global->error ) );
+    my $all_dbs = $repo->get;
+    if( !defined( $all_dbs ) || !$self->_is_array( $all_dbs ) )
     {
-        @AVAILABLE_DATABASES = $self->databases();
+        $all_dbs = [];
+        @$all_dbs = $self->databases();
+        $repo->set( $all_dbs );
     }
-    if( !scalar( grep{ /^$db$/ } @AVAILABLE_DATABASES ) )
+    if( !scalar( grep{ /^$db$/ } @$all_dbs ) )
     {
         return( $self->error( "The database '$db' does not exist." ) );
     }
     my $dbh = $base_class->connect( $db ) ||
-    return( $self->error( "Unable to connect to database '$db'." ) );
+        return( $self->error( "Unable to connect to database '$db'." ) );
     $self->param( 'multi_db' => 1 );
     $dbh->param( 'multi_db' => 1 );
     return( $dbh );
@@ -1361,8 +1390,9 @@ sub _cache_queries
     my $self = shift( @_ );
     my $base_class = $self->base_class;
     # DB::Object::CACHE_QUERIES, DB::Object::Postgres::CACHE_QUERIES, etc
-    no strict 'refs';
-    my $cachedb = ${"${base_class}\::CACHE_QUERIES"};
+    my $repo = Module::Generic::Global->new( 'cache_queries' => $base_class ) ||
+        return( $self->pass_error( Module::Generic::Global->error ) );
+    my $cachedb = $repo->get // [];
     return( $cachedb );
 }
 
@@ -1437,8 +1467,11 @@ sub _cache_this
     my $queries = '';
     my @saved   = ();
     # my $cachedb = ${"${base_class}\::CACHE_QUERIES"};
-    my $cachedb = $self->_cache_queries;
-    return( $self->error( "CACHE_QUERIES is not set in class $base_class" ) ) if( !$self->_is_array( $cachedb ) );
+    my $repo = Module::Generic::Global->new( 'cache_queries' => $base_class ) ||
+        return( $self->pass_error( Module::Generic::Global->error ) );
+    my $cachedb = $repo->get // [];
+    $repo->lock;
+    # return( $self->error( "The repository cache_queries is not set yet for class $base_class" ) ) if( !$self->_is_array( $cachedb ) );
     my $cache_size = scalar( @$cachedb );
     my $cached_sth = '';
     # If database object exists, this means this is a DB::Object::Tables object, otherwise a DB::Object object
@@ -1460,6 +1493,7 @@ sub _cache_this
                 last;
             }
         }
+        $repo->set( $cachedb );
     }
     my $sth;
     # We found a previous query exactly the same
@@ -1483,11 +1517,21 @@ sub _cache_this
         }
         if( scalar( keys( %$prepare_options ) ) )
         {
-            $sth = $self->prepare( $query, $prepare_options ) || return( $self->pass_error );
+            if( !( $sth = $self->prepare( $query, $prepare_options ) ) )
+            {
+                # Remove the lock, before we return an error
+                $repo->unlock;
+                return( $self->pass_error );
+            }
         }
         else
         {
-            $sth = $self->prepare( $query ) || return( $self->pass_error );
+            if( !( $sth = $self->prepare( $query ) ) )
+            {
+                # Remove the lock, before we return an error
+                $repo->unlock;
+                return( $self->pass_error )
+            }
         }
         # $sth = $self->prepare( $self->{ 'query' } ) ||
         # return( $self->error( "Error while preparing the query on table '$self->{ 'table' }':\n$self->{ 'query' }\n", $self->errstr() ) );
@@ -1503,6 +1547,9 @@ sub _cache_this
         {
             $self->{sth} = $sth;
         }
+        $repo->set( $cachedb );
+        # Unlocking normally is done automatically by Module::Generic::Global, but we make sure it is done now.
+        $repo->unlock;
     }
     #$sth->{query_object} = ( ref( $q ) && $q->isa( 'DB::Object::Query' ) ) ? $q : '';
     $sth->query_object( $q ) if( $self->_is_a( $q, 'DB::Object::Query' ) );
@@ -2248,21 +2295,25 @@ AUTOLOAD
 # NOTE: DESTROY
 DESTROY
 {
-    my $self  = shift( @_ );
+    # <https://perldoc.perl.org/perlobj#Destructors>
+    CORE::local( $., $@, $!, $^E, $? );
+    CORE::return if( ${^GLOBAL_PHASE} eq 'DESTRUCT' );
+    my $self = CORE::shift( @_ );
+    CORE::return if( !CORE::defined( $self ) );
     my $class = ref( $self ) || $self;
     if( $self->{sth} )
     {
-        print( STDERR "DESTROY(): Terminating sth '$self' for query:\n$self->{query}\n" ) if( $DEBUG );
+        print( STDERR "DESTROY(): Terminating sth '$self' for query:\n$self->{query}\n" ) if( $DEBUG || $self->{debug} );
         $self->{sth}->finish();
     }
     elsif( $self->{dbh} && $class =~ /^AI\:\:DB(?:\:\:(?:Postgres|Mysql|SQLite))?$/ )
     {
         local( $SIG{__WARN__} ) = sub { };
         # $self->{ 'dbh' }->disconnect();
-        if( $DEBUG )
+        if( $DEBUG || $self->{debug} )
         {
-            my( $pack, $file, $line, $sub ) = ( caller( 0 ) )[ 0, 1, 2, 3 ];
-            my( $pack2, $file2, $line2, $sub2 ) = ( caller( 1 ) ) [ 0, 1, 2, 3 ];
+            my( $pack, $file, $line, $sub ) = ( caller(0) )[0, 1, 2, 3];
+            my( $pack2, $file2, $line2, $sub2 ) = ( caller(1) ) [0, 1, 2, 3];
             print( STDERR "DESTROY database handle ($self) [$self->{ 'query' }]\ncalled within sub '$sub' ($sub2) from package '$pack' ($pack2) in file '$file' ($file2) at line '$line' ($line2).\n" );
         }
         $self->disconnect();
@@ -2276,14 +2327,6 @@ DESTROY
         }
     }
 }
-
-END
-{
-    # foreach my $dbh ( @DBH )
-    # {
-    #     $dbh->disconnect();
-    # }
-};
 
 # NOTE: package DB::Object::Operator
 package DB::Object::Operator;
@@ -2843,7 +2886,7 @@ In future release, other operators than C<=> will be implemented for C<JSON> and
 
 =head1 VERSION
 
-    v1.7.0
+    v1.8.0
 
 =head1 DESCRIPTION
 
@@ -3301,7 +3344,7 @@ Provided with a unique name, and this will return a cached statement object if i
 
 Provided with a unique name and a statement object (L<DB::Object::Statement>), and this will cache it.
 
-What this does simply is store the statement object in a global C<$QUERIES_CACHE> hash reference of identifier-statement object pairs.
+What this does simply is store the statement object in a global repository C<queries_cache> of identifier-statement object pairs. This is managed using L<Module::Generic::Global>
 
 It returns the statement object cached.
 
@@ -3379,7 +3422,7 @@ It instantiate a L<DB::Object::Cache::Tables> object to cache database tables an
 
 =head2 constant_queries_cache
 
-Returns the global value for C<$CONSTANT_QUERIES_CACHE>
+Returns the global repository of constant queries. This uses L<Module::Generic::Global>, and is thread-safe.
 
 This is used by L</constant_queries_cache_get> and L</constant_queries_cache_set>
 

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Changes file management - ~/lib/Changes.pm
-## Version v0.3.5
+## Version v0.3.6
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/12/09
-## Modified 2023/10/11
+## Modified 2025/07/28
 ## All rights reserved
 ## 
 ## 
@@ -22,7 +22,7 @@ BEGIN
     use Changes::Release;
     use Changes::Group;
     use Changes::Change;
-    # use Nice::Try;
+    use Wanted;
     # From version::regex
     our $VERSION_LAX_REGEX = qr/(?^x: (?^x:
         (?<has_v>v) (?<ver>(?^:[0-9]+) (?: (?^:\.[0-9]+)+ (?^:_[0-9]+)? )?)
@@ -49,7 +49,7 @@ BEGIN
     (?<r_tz_space>[[:blank:]\h]+)
     (?<r_tz>\S+)
     /x;
-    our $VERSION = 'v0.3.5';
+    our $VERSION = 'v0.3.6';
 };
 
 use strict;
@@ -797,25 +797,28 @@ sub parse
     return( $self );
 }
 
-sub preamble { return( shift->_set_get_scalar_as_object( { field => 'preamble', callbacks => 
-{
-    set => sub
+sub preamble { return( shift->_set_get_scalar_as_object({
+    field => 'preamble',
+    callbacks => 
     {
-        my( $self, $text ) = @_;
-        if( defined( $text ) && $text->defined )
+        set => sub
         {
-            unless( $text =~ /[\015\012]$/ms )
+            my( $self, $text ) = @_;
+            if( defined( $text ) && $text->defined )
             {
-                $text->append( $self->nl // "\n" );
+                unless( $text =~ /[\015\012]$/ms )
+                {
+                    $text->append( $self->nl // "\n" );
+                }
+                unless( $text =~ /[\015\012]{2,}$/ms )
+                {
+                    $text->append( $self->nl // "\n" );
+                }
             }
-            unless( $text =~ /[\015\012]{2,}$/ms )
-            {
-                $text->append( $self->nl // "\n" );
-            }
-        }
-        return( $text );
-   },
-} }, @_ ) ); }
+            return( $text );
+       },
+    }
+}, @_ ) ); }
 
 sub preset
 {
@@ -911,7 +914,7 @@ sub time_zone
     }
     if( !defined( $self->{time_zone} ) )
     {
-        if( Want::want( 'OBJECT' ) )
+        if( Wanted::want( 'OBJECT' ) )
         {
             require Module::Generic::Null;
             rreturn( Module::Generic::Null->new( wants => 'OBJECT' ) );
@@ -992,7 +995,7 @@ Changes - Changes file management
 
 =head1 VERSION
 
-    v0.3.5
+    v0.3.6
 
 =head1 DESCRIPTION
 

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Changes file management - ~/lib/Changes/Version.pm
-## Version v0.2.2
+## Version v0.2.3
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/12/01
-## Modified 2023/09/19
+## Modified 2025/07/28
 ## All rights reserved
 ## 
 ## 
@@ -20,7 +20,6 @@ BEGIN
     use parent qw( Module::Generic );
     use vars qw( $VERSION $VERSION_LAX_REGEX $DEFAULT_TYPE );
     use version ();
-    # use Nice::Try;
     # From version::regex
     # Comments in the regular expression below are taken from version::regex
     our $VERSION_LAX_REGEX = qr/
@@ -106,7 +105,7 @@ BEGIN
         'abs'   => \&_noop,
         'nomethod' => \&_noop,
     );
-    our $VERSION = 'v0.2.2';
+    our $VERSION = 'v0.2.3';
 };
 
 use strict;
@@ -761,6 +760,7 @@ sub type { return( shift->reset(@_)->_set_get_scalar_as_object({
                 # By default
                 $self->{qv} = 1;
             }
+            return( $self->{type} );
         }
     }
 }, @_ ) ); }
@@ -941,6 +941,7 @@ sub _compare
 {
     my( $left, $right, $swap ) = @_;
     my $class = ref( $left );
+    return(0) if( ${^GLOBAL_PHASE} eq 'DESTRUCT' );
     unless( $left->_is_a( $right => $class ) )
     {
         $right = $class->new( $right, debug => $left->debug );
@@ -953,11 +954,13 @@ sub _compare
     
     unless( _verify( $left ) )
     {
-        die( "Invalid version ", ( $swap ? 'format' : 'object ' . overload::StrVal( $left ) ), "." );
+        warn( "Invalid version for left argument: ", ( $swap ? 'format' : 'object ' . overload::StrVal( $left ) ), "." );
+        return(0);
     }
     unless( _verify( $right ) )
     {
-        die( "Invalid version ", ( $swap ? 'format' : 'object' . overload::StrVal( $right ) ), "." );
+        warn( "Invalid version for right argument: ", ( $swap ? 'format' : 'object' . overload::StrVal( $right ) ), "." );
+        return(0);
     }
     my $lv = $left->_version;
     my $rv = $right->_version;
@@ -1191,9 +1194,12 @@ sub _stringify
 sub _verify
 {
     my $self = shift( @_ );
-    if( defined( $self ) &&
-        Module::Generic->_is_a( $self => 'Changes::Version' ) &&
-        eval{ exists( $self->{_version} ) } &&
+    return(0) if( ${^GLOBAL_PHASE} eq 'DESTRUCT' );
+    unless( defined( $self ) && ref( $self ) eq 'Changes::Version' )
+    {
+        return(0);
+    }
+    if( eval{ exists( $self->{_version} ) } &&
         Module::Generic->_is_a( $self->{_version} => 'version' ) )
     {
         return(1);
@@ -1228,6 +1234,16 @@ sub _version
     }
     return( $self->{_version} );
 }
+
+sub DESTROY
+{
+    # <https://perldoc.perl.org/perlobj#Destructors>
+    CORE::local( $., $@, $!, $^E, $? );
+    my $self = CORE::shift( @_ );
+    CORE::return if( !CORE::defined( $self ) );
+    %$self = ();
+    CORE::return if( ${^GLOBAL_PHASE} eq 'DESTRUCT' );
+};
 
 1;
 # NOTE: POD
@@ -1285,7 +1301,7 @@ Changes::Version - Version string object class
 
 =head1 VERSION
 
-    v0.2.2
+    v0.2.3
 
 =head1 DESCRIPTION
 

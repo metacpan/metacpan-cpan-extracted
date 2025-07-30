@@ -1,7 +1,7 @@
 # This Makefile is for the RT::Extension::AI extension to perl.
 #
 # It was generated automatically by MakeMaker version
-# 7.70 (Revision: 77000) from the contents of
+# 7.74 (Revision: 77400) from the contents of
 # Makefile.PL. Don't edit this file, edit Makefile.PL instead.
 #
 #       ANY CHANGES MADE HERE WILL BE LOST!
@@ -16,13 +16,13 @@
 #     BUILD_REQUIRES => { ExtUtils::MakeMaker=>q[6.59] }
 #     CONFIGURE_REQUIRES => {  }
 #     DISTNAME => q[RT-Extension-AI]
-#     INSTALLARCHLIB => q[/Users/jbrandt/work/bps/rt6/local/plugins/RT-Extension-AI/lib]
-#     INSTALLSITEARCH => q[/Users/jbrandt/work/bps/rt6/local/man]
-#     INSTALLSITELIB => q[/Users/jbrandt/work/bps/rt6/local/plugins/RT-Extension-AI/lib]
-#     INSTALLSITEMAN1DIR => q[/Users/jbrandt/work/bps/rt6/local/man/man1]
-#     INSTALLSITEMAN3DIR => q[/Users/jbrandt/work/bps/rt6/local/man/man3]
+#     INSTALLARCHLIB => q[/home/brad/BPS/work/rts/rt6-plugin-testing/local/plugins/RT-Extension-AI/lib]
+#     INSTALLSITEARCH => q[/home/brad/BPS/work/rts/rt6-plugin-testing/local/man]
+#     INSTALLSITELIB => q[/home/brad/BPS/work/rts/rt6-plugin-testing/local/plugins/RT-Extension-AI/lib]
+#     INSTALLSITEMAN1DIR => q[/home/brad/BPS/work/rts/rt6-plugin-testing/local/man/man1]
+#     INSTALLSITEMAN3DIR => q[/home/brad/BPS/work/rts/rt6-plugin-testing/local/man/man3]
 #     INSTALLVENDORARCH => q[/usr/share/man]
-#     INSTALLVENDORLIB => q[/Users/jbrandt/work/bps/rt6/local/plugins/RT-Extension-AI/lib]
+#     INSTALLVENDORLIB => q[/home/brad/BPS/work/rts/rt6-plugin-testing/local/plugins/RT-Extension-AI/lib]
 #     INSTALLVENDORMAN1DIR => q[/usr/share/man/man1]
 #     INSTALLVENDORMAN3DIR => q[/usr/share/man/man3]
 #     LICENSE => q[gpl_2]
@@ -32,7 +32,7 @@
 #     PREREQ_PM => { ExtUtils::MakeMaker=>q[6.59] }
 #     SIGN => q[1]
 #     TEST_REQUIRES => {  }
-#     VERSION => q[0.02]
+#     VERSION => q[0.03]
 #     VERSION_FROM => q[lib/RT/Extension/AI.pm]
 #     dist => { PREOP=>q[$(PERL) -I. "-MModule::Install::Admin" -e "dist_preop(q($(DISTVNAME)))"] }
 #     realclean => { FILES=>q[MYMETA.yml] }
@@ -42,31 +42,31 @@
 
 # --- MakeMaker const_config section:
 
-# These definitions are from config.sh (via /Users/jbrandt/perl5/perlbrew/perls/perl-5.34.3/lib/5.34.3/darwin-2level/Config.pm).
+# These definitions are from config.sh (via /home/brad/perl5/perlbrew/perls/perl-5.34.0/lib/5.34.0/x86_64-linux/Config.pm).
 # They may have been overridden via Makefile.PL or on the command line.
 AR = ar
 CC = cc
-CCCDLFLAGS =  
-CCDLFLAGS =  
+CCCDLFLAGS = -fPIC
+CCDLFLAGS = -Wl,-E
 CPPRUN = cc  -E
-DLEXT = bundle
+DLEXT = so
 DLSRC = dl_dlopen.xs
 EXE_EXT = 
 FULL_AR = /usr/bin/ar
 LD = cc
-LDDLFLAGS =  -mmacosx-version-min=15.1 -bundle -undefined dynamic_lookup -fstack-protector-strong
-LDFLAGS =  -mmacosx-version-min=15.1 -fstack-protector-strong
-LIBC = 
+LDDLFLAGS = -shared -O2 -L/usr/local/lib -fstack-protector-strong
+LDFLAGS =  -fstack-protector-strong -L/usr/local/lib
+LIBC = libc-2.31.so
 LIB_EXT = .a
 OBJ_EXT = .o
-OSNAME = darwin
-OSVERS = 24.1.0
-RANLIB = ranlib
-SITELIBEXP = /Users/jbrandt/perl5/perlbrew/perls/perl-5.34.3/lib/site_perl/5.34.3
-SITEARCHEXP = /Users/jbrandt/perl5/perlbrew/perls/perl-5.34.3/lib/site_perl/5.34.3/darwin-2level
-SO = dylib
+OSNAME = linux
+OSVERS = 5.15.11-76051511-generic
+RANLIB = :
+SITELIBEXP = /home/brad/perl5/perlbrew/perls/perl-5.34.0/lib/site_perl/5.34.0
+SITEARCHEXP = /home/brad/perl5/perlbrew/perls/perl-5.34.0/lib/site_perl/5.34.0/x86_64-linux
+SO = so
 VENDORARCHEXP = /usr/share/man
-VENDORLIBEXP = /Users/jbrandt/work/bps/rt6/local/plugins/RT-Extension-AI/lib
+VENDORLIBEXP = /home/brad/BPS/work/rts/rt6-plugin-testing/local/plugins/RT-Extension-AI/lib
 
 
 # --- MakeMaker constants section:
@@ -75,11 +75,11 @@ DIRFILESEP = /
 DFSEP = $(DIRFILESEP)
 NAME = RT::Extension::AI
 NAME_SYM = RT_Extension_AI
-VERSION = 0.02
+VERSION = 0.03
 VERSION_MACRO = VERSION
-VERSION_SYM = 0_02
+VERSION_SYM = 0_03
 DEFINE_VERSION = -D$(VERSION_MACRO)=\"$(VERSION)\"
-XS_VERSION = 0.02
+XS_VERSION = 0.03
 XS_VERSION_MACRO = XS_VERSION
 XS_DEFINE_VERSION = -D$(XS_VERSION_MACRO)=\"$(XS_VERSION)\"
 INST_ARCHLIB = blib/arch
@@ -88,64 +88,62 @@ INST_BIN = blib/bin
 INST_LIB = blib/lib
 INST_MAN1DIR = blib/man1
 INST_MAN3DIR = blib/man3
-MAN1EXT = 0
-MAN3EXT = 0
+MAN1EXT = 1
+MAN3EXT = 3
 MAN1SECTION = 1
 MAN3SECTION = 3
 INSTALLDIRS = site
 DESTDIR = 
 PREFIX = $(SITEPREFIX)
-PERLPREFIX = /Users/jbrandt/perl5/perlbrew/perls/perl-5.34.3
-SITEPREFIX = /Users/jbrandt/perl5/perlbrew/perls/perl-5.34.3
+PERLPREFIX = /home/brad/perl5/perlbrew/perls/perl-5.34.0
+SITEPREFIX = /home/brad/perl5/perlbrew/perls/perl-5.34.0
 VENDORPREFIX = 
-INSTALLPRIVLIB = /Users/jbrandt/perl5/perlbrew/perls/perl-5.34.3/lib/5.34.3
+INSTALLPRIVLIB = /home/brad/perl5/perlbrew/perls/perl-5.34.0/lib/5.34.0
 DESTINSTALLPRIVLIB = $(DESTDIR)$(INSTALLPRIVLIB)
-INSTALLSITELIB = /Users/jbrandt/work/bps/rt6/local/plugins/RT-Extension-AI/lib
+INSTALLSITELIB = /home/brad/BPS/work/rts/rt6-plugin-testing/local/plugins/RT-Extension-AI/lib
 DESTINSTALLSITELIB = $(DESTDIR)$(INSTALLSITELIB)
-INSTALLVENDORLIB = /Users/jbrandt/work/bps/rt6/local/plugins/RT-Extension-AI/lib
+INSTALLVENDORLIB = /home/brad/BPS/work/rts/rt6-plugin-testing/local/plugins/RT-Extension-AI/lib
 DESTINSTALLVENDORLIB = $(DESTDIR)$(INSTALLVENDORLIB)
-INSTALLARCHLIB = /Users/jbrandt/work/bps/rt6/local/plugins/RT-Extension-AI/lib
+INSTALLARCHLIB = /home/brad/BPS/work/rts/rt6-plugin-testing/local/plugins/RT-Extension-AI/lib
 DESTINSTALLARCHLIB = $(DESTDIR)$(INSTALLARCHLIB)
-INSTALLSITEARCH = /Users/jbrandt/work/bps/rt6/local/man
+INSTALLSITEARCH = /home/brad/BPS/work/rts/rt6-plugin-testing/local/man
 DESTINSTALLSITEARCH = $(DESTDIR)$(INSTALLSITEARCH)
 INSTALLVENDORARCH = /usr/share/man
 DESTINSTALLVENDORARCH = $(DESTDIR)$(INSTALLVENDORARCH)
-INSTALLBIN = /Users/jbrandt/perl5/perlbrew/perls/perl-5.34.3/bin
+INSTALLBIN = /home/brad/perl5/perlbrew/perls/perl-5.34.0/bin
 DESTINSTALLBIN = $(DESTDIR)$(INSTALLBIN)
-INSTALLSITEBIN = /Users/jbrandt/perl5/perlbrew/perls/perl-5.34.3/bin
+INSTALLSITEBIN = /home/brad/perl5/perlbrew/perls/perl-5.34.0/bin
 DESTINSTALLSITEBIN = $(DESTDIR)$(INSTALLSITEBIN)
 INSTALLVENDORBIN = 
 DESTINSTALLVENDORBIN = $(DESTDIR)$(INSTALLVENDORBIN)
-INSTALLSCRIPT = /Users/jbrandt/perl5/perlbrew/perls/perl-5.34.3/bin
+INSTALLSCRIPT = /home/brad/perl5/perlbrew/perls/perl-5.34.0/bin
 DESTINSTALLSCRIPT = $(DESTDIR)$(INSTALLSCRIPT)
-INSTALLSITESCRIPT = /Users/jbrandt/perl5/perlbrew/perls/perl-5.34.3/bin
+INSTALLSITESCRIPT = /home/brad/perl5/perlbrew/perls/perl-5.34.0/bin
 DESTINSTALLSITESCRIPT = $(DESTDIR)$(INSTALLSITESCRIPT)
 INSTALLVENDORSCRIPT = 
 DESTINSTALLVENDORSCRIPT = $(DESTDIR)$(INSTALLVENDORSCRIPT)
-INSTALLMAN1DIR = none
+INSTALLMAN1DIR = /home/brad/perl5/perlbrew/perls/perl-5.34.0/man/man1
 DESTINSTALLMAN1DIR = $(DESTDIR)$(INSTALLMAN1DIR)
-INSTALLSITEMAN1DIR = /Users/jbrandt/work/bps/rt6/local/man/man1
+INSTALLSITEMAN1DIR = /home/brad/BPS/work/rts/rt6-plugin-testing/local/man/man1
 DESTINSTALLSITEMAN1DIR = $(DESTDIR)$(INSTALLSITEMAN1DIR)
 INSTALLVENDORMAN1DIR = /usr/share/man/man1
 DESTINSTALLVENDORMAN1DIR = $(DESTDIR)$(INSTALLVENDORMAN1DIR)
-INSTALLMAN3DIR = none
+INSTALLMAN3DIR = /home/brad/perl5/perlbrew/perls/perl-5.34.0/man/man3
 DESTINSTALLMAN3DIR = $(DESTDIR)$(INSTALLMAN3DIR)
-INSTALLSITEMAN3DIR = /Users/jbrandt/work/bps/rt6/local/man/man3
+INSTALLSITEMAN3DIR = /home/brad/BPS/work/rts/rt6-plugin-testing/local/man/man3
 DESTINSTALLSITEMAN3DIR = $(DESTDIR)$(INSTALLSITEMAN3DIR)
 INSTALLVENDORMAN3DIR = /usr/share/man/man3
 DESTINSTALLVENDORMAN3DIR = $(DESTDIR)$(INSTALLVENDORMAN3DIR)
 PERL_LIB =
-PERL_ARCHLIB = /Users/jbrandt/perl5/perlbrew/perls/perl-5.34.3/lib/5.34.3/darwin-2level
-PERL_ARCHLIBDEP = /Users/jbrandt/perl5/perlbrew/perls/perl-5.34.3/lib/5.34.3/darwin-2level
+PERL_ARCHLIB = /home/brad/perl5/perlbrew/perls/perl-5.34.0/lib/5.34.0/x86_64-linux
 LIBPERL_A = libperl.a
 FIRST_MAKEFILE = Makefile
 MAKEFILE_OLD = Makefile.old
 MAKE_APERL_FILE = Makefile.aperl
 PERLMAINCC = $(CC)
-PERL_INC = /Users/jbrandt/perl5/perlbrew/perls/perl-5.34.3/lib/5.34.3/darwin-2level/CORE
-PERL_INCDEP = /Users/jbrandt/perl5/perlbrew/perls/perl-5.34.3/lib/5.34.3/darwin-2level/CORE
-PERL = "/Users/jbrandt/perl5/perlbrew/perls/perl-5.34.3/bin/perl" "-Iinc"
-FULLPERL = "/Users/jbrandt/perl5/perlbrew/perls/perl-5.34.3/bin/perl" "-Iinc"
+PERL_INC = /home/brad/perl5/perlbrew/perls/perl-5.34.0/lib/5.34.0/x86_64-linux/CORE
+PERL = "/home/brad/perl5/perlbrew/perls/perl-5.34.0/bin/perl" "-Iinc"
+FULLPERL = "/home/brad/perl5/perlbrew/perls/perl-5.34.0/bin/perl" "-Iinc"
 ABSPERL = $(PERL)
 PERLRUN = $(PERL)
 FULLPERLRUN = $(FULLPERL)
@@ -158,9 +156,9 @@ PERM_DIR = 755
 PERM_RW = 644
 PERM_RWX = 755
 
-MAKEMAKER   = /Users/jbrandt/perl5/perlbrew/perls/perl-5.34.3/lib/site_perl/5.34.3/ExtUtils/MakeMaker.pm
-MM_VERSION  = 7.70
-MM_REVISION = 77000
+MAKEMAKER   = /home/brad/perl5/perlbrew/perls/perl-5.34.0/lib/site_perl/5.34.0/ExtUtils/MakeMaker.pm
+MM_VERSION  = 7.74
+MM_REVISION = 77400
 
 # FULLEXT = Pathname for extension directory (eg Foo/Bar/Oracle).
 # BASEEXT = Basename part of FULLEXT. May be just equal FULLEXT. (eg Oracle)
@@ -183,10 +181,8 @@ C_FILES  =
 O_FILES  = 
 H_FILES  = 
 MAN1PODS = 
-MAN3PODS = 
-
-# Where is the Config information that we are using/depend on
-CONFIGDEP = $(PERL_ARCHLIBDEP)$(DFSEP)Config.pm $(PERL_INCDEP)$(DFSEP)config.h
+MAN3PODS = lib/RT/Extension/AI.pm \
+	lib/RT/Extension/AI/Provider.pm
 
 # Where to build things
 INST_LIBDIR      = $(INST_LIB)/RT/Extension
@@ -202,7 +198,6 @@ INST_BOOT        =
 # Extra linker info
 EXPORT_LIST        = 
 PERL_ARCHIVE       = 
-PERL_ARCHIVEDEP    = 
 PERL_ARCHIVE_AFTER = 
 
 
@@ -212,10 +207,19 @@ TO_INST_PM = lib/RT/Action/AddTicketSentiment.pm \
 	lib/RT/Extension/AI/Provider.pm \
 	lib/RT/Extension/AI/Provider/Gemini.pm \
 	lib/RT/Extension/AI/Provider/OpenAI.pm
+PERL_ARCHLIBDEP = /home/brad/perl5/perlbrew/perls/perl-5.34.0/lib/5.34.0/x86_64-linux
+PERL_INCDEP = /home/brad/perl5/perlbrew/perls/perl-5.34.0/lib/5.34.0/x86_64-linux/CORE
+
+
+# Dependencies info
+PERL_ARCHIVEDEP    = 
+
+# Where is the Config information that we are using/depend on
+CONFIGDEP = $(PERL_ARCHLIBDEP)$(DFSEP)Config.pm $(PERL_INCDEP)$(DFSEP)config.h
 
 
 # --- MakeMaker platform_constants section:
-MM_Unix_VERSION = 7.70
+MM_Unix_VERSION = 7.74
 PERL_MALLOC_DEF = -DPERL_EXTMALLOC_DEF -Dmalloc=Perl_malloc -Dfree=Perl_mfree -Drealloc=Perl_realloc -Dcalloc=Perl_calloc
 
 
@@ -266,7 +270,7 @@ makemakerdflt : all
 
 
 # --- MakeMaker dist section:
-TAR = COPY_EXTENDED_ATTRIBUTES_DISABLE=1 COPYFILE_DISABLE=1 tar
+TAR = tar
 TARFLAGS = cvf
 ZIP = zip
 ZIPFLAGS = -r
@@ -281,7 +285,7 @@ RCS_LABEL = rcs -Nv$(VERSION_SYM): -q
 DIST_CP = best
 DIST_DEFAULT = tardist
 DISTNAME = RT-Extension-AI
-DISTVNAME = RT-Extension-AI-0.02
+DISTVNAME = RT-Extension-AI-0.03
 
 
 # --- MakeMaker macro section:
@@ -434,8 +438,12 @@ POD2MAN_EXE = $(PERLRUN) "-MExtUtils::Command::MM" -e pod2man "--"
 POD2MAN = $(POD2MAN_EXE)
 
 
-manifypods : pure_all config 
-	$(NOECHO) $(NOOP)
+manifypods : pure_all config  \
+	lib/RT/Extension/AI.pm \
+	lib/RT/Extension/AI/Provider.pm
+	$(NOECHO) $(POD2MAN) --section=$(MAN3SECTION) --perm_rw=$(PERM_RW) -u \
+	  lib/RT/Extension/AI.pm $(INST_MAN3DIR)/RT::Extension::AI.$(MAN3EXT) \
+	  lib/RT/Extension/AI/Provider.pm $(INST_MAN3DIR)/RT::Extension::AI::Provider.$(MAN3EXT) 
 
 
 
@@ -756,8 +764,8 @@ $(FIRST_MAKEFILE) : Makefile.PL $(CONFIGDEP)
 
 # --- MakeMaker makeaperl section ---
 MAP_TARGET    = perl
-FULLPERL      = "/Users/jbrandt/perl5/perlbrew/perls/perl-5.34.3/bin/perl"
-MAP_PERLINC   = "-Iblib/arch" "-Iblib/lib" "-I/Users/jbrandt/perl5/perlbrew/perls/perl-5.34.3/lib/5.34.3/darwin-2level" "-I/Users/jbrandt/perl5/perlbrew/perls/perl-5.34.3/lib/5.34.3"
+FULLPERL      = "/home/brad/perl5/perlbrew/perls/perl-5.34.0/bin/perl"
+MAP_PERLINC   = "-Iblib/arch" "-Iblib/lib" "-I/home/brad/perl5/perlbrew/perls/perl-5.34.0/lib/5.34.0/x86_64-linux" "-I/home/brad/perl5/perlbrew/perls/perl-5.34.0/lib/5.34.0"
 
 $(MAP_TARGET) :: $(MAKE_APERL_FILE)
 	$(MAKE) $(USEMAKEFILE) $(MAKE_APERL_FILE) $@
@@ -802,12 +810,12 @@ testdb_static test_static :: subdirs-test_static
 # --- MakeMaker ppd section:
 # Creates a PPD (Perl Package Description) for a binary distribution.
 ppd :
-	$(NOECHO) $(ECHO) '<SOFTPKG NAME="RT-Extension-AI" VERSION="0.02">' > RT-Extension-AI.ppd
+	$(NOECHO) $(ECHO) '<SOFTPKG NAME="RT-Extension-AI" VERSION="0.03">' > RT-Extension-AI.ppd
 	$(NOECHO) $(ECHO) '    <ABSTRACT>RT-Extension-AI Extension</ABSTRACT>' >> RT-Extension-AI.ppd
 	$(NOECHO) $(ECHO) '    <AUTHOR>Best Practical Solutions, LLC &lt;modules@bestpractical.com&gt;</AUTHOR>' >> RT-Extension-AI.ppd
 	$(NOECHO) $(ECHO) '    <IMPLEMENTATION>' >> RT-Extension-AI.ppd
 	$(NOECHO) $(ECHO) '        <PERLCORE VERSION="5,010001,0,0" />' >> RT-Extension-AI.ppd
-	$(NOECHO) $(ECHO) '        <ARCHITECTURE NAME="darwin-2level-5.34" />' >> RT-Extension-AI.ppd
+	$(NOECHO) $(ECHO) '        <ARCHITECTURE NAME="x86_64-linux-5.34" />' >> RT-Extension-AI.ppd
 	$(NOECHO) $(ECHO) '        <CODEBASE HREF="" />' >> RT-Extension-AI.ppd
 	$(NOECHO) $(ECHO) '    </IMPLEMENTATION>' >> RT-Extension-AI.ppd
 	$(NOECHO) $(ECHO) '</SOFTPKG>' >> RT-Extension-AI.ppd
@@ -816,7 +824,11 @@ ppd :
 # --- MakeMaker pm_to_blib section:
 
 pm_to_blib : $(FIRST_MAKEFILE) $(TO_INST_PM)
-	$(NOECHO) $(ABSPERLRUN) -MExtUtils::Install -e 'pm_to_blib({@ARGV}, '\''$(INST_LIB)/auto'\'', q[$(PM_FILTER)], '\''$(PERM_DIR)'\'')' -- \
+	$(NOECHO) $(ABSPERLRUN) -MExtUtils::Install -e '$$i=0; $$n=$$#ARGV; $$i++ until $$i > $$n or $$ARGV[$$i] eq q{--};' \
+	  -e 'die q{Failed to find -- in }.join(q{|},@ARGV) if $$i > $$n;' \
+	  -e '@parts=splice @ARGV,0,$$i+1;' \
+	  -e 'pop @parts; $$filter=join q{ }, map qq{"$$_"}, @parts;' \
+	  -e 'pm_to_blib({@ARGV}, '\''$(INST_LIB)/auto'\'', $$filter, '\''$(PERM_DIR)'\'')' -- $(PM_FILTER) -- \
 	  'lib/RT/Action/AddTicketSentiment.pm' 'blib/lib/RT/Action/AddTicketSentiment.pm' \
 	  'lib/RT/Action/AddTicketSummary.pm' 'blib/lib/RT/Action/AddTicketSummary.pm' \
 	  'lib/RT/Extension/AI.pm' 'blib/lib/RT/Extension/AI.pm' \
@@ -830,6 +842,12 @@ pm_to_blib : $(FIRST_MAKEFILE) $(TO_INST_PM)
 
 # here so even if top_targets is overridden, these will still be defined
 # gmake will silently still work if any are .PHONY-ed but nmake won't
+
+test_static ::
+	$(NOECHO) $(NOOP)
+
+test_dynamic ::
+	$(NOECHO) $(NOOP)
 
 static ::
 	$(NOECHO) $(NOOP)
@@ -866,12 +884,12 @@ distsign ::
 	cpansign -s
 
 install ::
-	$(NOECHO) $(PERL) -Ilib -I"/Users/jbrandt/work/bps/rt6/local/lib" -I"/Users/jbrandt/work/bps/rt6/lib" -Iinc -MModule::Install::RTx::Runtime -e"RTxPlugin()"
-	$(NOECHO) $(PERL) -MExtUtils::Install -e "install({q(etc), q($(DESTDIR)/Users/jbrandt/work/bps/rt6/local/plugins/RT-Extension-AI/etc), q(html), q($(DESTDIR)/Users/jbrandt/work/bps/rt6/local/plugins/RT-Extension-AI/html), q(lib), q($(DESTDIR)/Users/jbrandt/work/bps/rt6/local/plugins/RT-Extension-AI/lib), q(static), q($(DESTDIR)/Users/jbrandt/work/bps/rt6/local/plugins/RT-Extension-AI/static)})"
+	$(NOECHO) $(PERL) -Ilib -I"/home/brad/BPS/work/rts/rt6-plugin-testing/local/lib" -I"/home/brad/BPS/work/rts/rt6-plugin-testing/lib" -Iinc -MModule::Install::RTx::Runtime -e"RTxPlugin()"
+	$(NOECHO) $(PERL) -MExtUtils::Install -e "install({q(etc), q($(DESTDIR)/home/brad/BPS/work/rts/rt6-plugin-testing/local/plugins/RT-Extension-AI/etc), q(html), q($(DESTDIR)/home/brad/BPS/work/rts/rt6-plugin-testing/local/plugins/RT-Extension-AI/html), q(lib), q($(DESTDIR)/home/brad/BPS/work/rts/rt6-plugin-testing/local/plugins/RT-Extension-AI/lib), q(static), q($(DESTDIR)/home/brad/BPS/work/rts/rt6-plugin-testing/local/plugins/RT-Extension-AI/static)})"
 
 initdb ::
-	$(NOECHO) $(PERL) -Ilib -I"/Users/jbrandt/work/bps/rt6/local/lib" -I"/Users/jbrandt/work/bps/rt6/lib" -Iinc -MModule::Install::RTx::Runtime -e"RTxDatabase(qw(insert $(NAME) $(VERSION)))"
+	$(NOECHO) $(PERL) -Ilib -I"/home/brad/BPS/work/rts/rt6-plugin-testing/local/lib" -I"/home/brad/BPS/work/rts/rt6-plugin-testing/lib" -Iinc -MModule::Install::RTx::Runtime -e"RTxDatabase(qw(insert $(NAME) $(VERSION)))"
 
 initialize-database ::
-	$(NOECHO) $(PERL) -Ilib -I"/Users/jbrandt/work/bps/rt6/local/lib" -I"/Users/jbrandt/work/bps/rt6/lib" -Iinc -MModule::Install::RTx::Runtime -e"RTxDatabase(qw(insert $(NAME) $(VERSION)))"
+	$(NOECHO) $(PERL) -Ilib -I"/home/brad/BPS/work/rts/rt6-plugin-testing/local/lib" -I"/home/brad/BPS/work/rts/rt6-plugin-testing/lib" -Iinc -MModule::Install::RTx::Runtime -e"RTxDatabase(qw(insert $(NAME) $(VERSION)))"
 

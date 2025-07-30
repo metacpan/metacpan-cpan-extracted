@@ -45,6 +45,7 @@ sub runtest
     },
     {
         debug => $DEBUG,
+        medium => $medium,
         serialiser => $serialiser,
         ( $opts->{tmpdir} ? ( tmpdir => $opts->{tmpdir} ) : () ),
     });
@@ -57,6 +58,7 @@ sub runtest
         my $val = shift( @_ );
         is( $val, 'Test 1', 'then' );
         diag( "[$medium] -> [$serialiser]: My pid is '$$'" ) if( $DEBUG );
+        print( STDERR "[$medium] -> [$serialiser]: My pid is '$$'\n" ) if( $DEBUG );
         ok( $$ != $pid, 'then() executed in sub process' );
     });
 
@@ -98,6 +100,7 @@ sub runtest
         {
             print( STDERR "Concurrent promise 1 ($$), sleeping.\n" ) if( $DEBUG );
             diag( "Is \$result tied ? ", tied( $result ) ? 'Yes' : 'No', ". Value is -> '$result'" ) if( $DEBUG );
+            print( STDERR "Is \$result tied ? ", tied( $result ) ? 'Yes' : 'No', ". Value is -> '$result'\n" ) if( $DEBUG );
             # sleep(3);
             # sleep_tight(3);
             while( $lockfile->exists )
@@ -105,12 +108,14 @@ sub runtest
                 sleep_tight(0.5);
             }
             $result .= "concurrency 1\n";
-            my $file = $tmpfile->clone;
+            my $file = file( $tmpfile );
             diag( "Writing 'concurrency 1' to file $tmpfile and my pid is '$$' vs parent '$pid'" ) if( $DEBUG );
+            print( STDERR "Writing 'concurrency 1' to file $tmpfile and my pid is '$$' vs parent '$pid'\n" ) if( $DEBUG );
             $file->append( "concurrency 1\n" ) || do
             {
                 warn( "Error appending to file $file: ", $file->error, "\n" );
             };
+            print( STDERR "Concurrency 1: temporary file $file contains: ", $file->load_utf8, "\n" ) if( $DEBUG );
             return( $file );
         },
         {
@@ -120,6 +125,7 @@ sub runtest
         })->then(sub
         {
             diag( "[$medium] -> [$serialiser], [P1] Parameter received is '", overload::StrVal( $_[0] ), "'" ) if( $DEBUG );
+            print( STDERR "[$medium] -> [$serialiser], [P1] Parameter received is '", overload::StrVal( $_[0] ), "'\n" ) if( $DEBUG );
             isa_ok( $_[0], ['Module::Generic::File'], "[P1] PID $$: Value passed to then is an object file" );
             $_[0];
         })->catch(sub
@@ -137,10 +143,12 @@ sub runtest
             $result .= "concurrency 2\n";
             my $file = file( $tmpfile );
             diag( "[$medium] -> [$serialiser]: Appending 'concurrency 2' to $tmpfile and my pid is '$$' vs parent '$pid'" ) if( $DEBUG );
+            print( STDERR "[$medium] -> [$serialiser]: Appending 'concurrency 2' to $tmpfile and my pid is '$$' vs parent '$pid'\n" ) if( $DEBUG );
             $file->append( "concurrency 2\n" ) || do
             {
                 warn( "Error appending to file $file: ", $file->error, "\n" );
             };
+            print( STDERR "Concurrency 2: temporary file $file contains: ", $file->load_utf8, "\n" ) if( $DEBUG );
             $lockfile->remove;
             return( $file );
         },
@@ -152,7 +160,9 @@ sub runtest
         })->then(sub
         {
             diag( "[$medium] -> [$serialiser], [P2] Parameter received is '", overload::StrVal( $_[0] ), "'" ) if( $DEBUG );
+            print( STDERR "[$medium] -> [$serialiser], [P2] Parameter received is '", overload::StrVal( $_[0] ), "'\n" ) if( $DEBUG );
             diag( "[$medium] -> [$serialiser]: ", overload::StrVal( $_[0] ), " is not a blessed object." ) if( !defined( $_[0] ) || !Scalar::Util::blessed( $_[0] ) );
+            print( STDERR "[$medium] -> [$serialiser]: ", overload::StrVal( $_[0] ), " is not a blessed object.\n" ) if( $DEBUG && ( !defined( $_[0] ) || !Scalar::Util::blessed( $_[0] ) ) );
             isa_ok( $_[0], ['Module::Generic::File'], "[P2] PID $$: Value passed to then #1 is an object file" );
             $_[0];
         })->then(sub

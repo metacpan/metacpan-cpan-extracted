@@ -30,14 +30,14 @@ my %WriteMakefileArgs = (
         'Config'                => 0,
         'Errno'                 => 0,
     	'Filter::Util::Call'    => '1.59',
-        'Module::Generic'       => 'v0.37.5',
-        'Nice::Try'             => 'v1.3.12',
+        'Module::Generic'       => 'v1.0.2',
         'PPI'                   => '1.278',
         'POSIX'                 => 0,
         'Scalar::Util'          => '1.50',
         # 'Storable'      => '3.15',
         'Storable::Improved'    => 'v0.1.3',
-        'Want'                  => '0.29',
+        'Time::HiRes'           => 'v0.1.3',
+        'Wanted'                => 'v0.1.0',
     },
     TEST_REQUIRES =>
     {

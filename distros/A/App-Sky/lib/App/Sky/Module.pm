@@ -1,5 +1,5 @@
 package App::Sky::Module;
-$App::Sky::Module::VERSION = '0.6.0';
+$App::Sky::Module::VERSION = '0.8.0';
 use strict;
 use warnings;
 
@@ -9,13 +9,13 @@ use Carp ();
 use Moo;
 use MooX 'late';
 
-use URI;
+use URI            ();
 use File::Basename qw(basename);
 
 use List::MoreUtils qw( uniq );
 
-use App::Sky::Results;
-use App::Sky::Exception;
+use App::Sky::Results   ();
+use App::Sky::Exception ();
 
 has base_upload_cmd        => ( isa => 'ArrayRef[Str]', is => 'ro', );
 has dest_upload_prefix     => ( isa => 'Str',           is => 'ro', );
@@ -25,6 +25,8 @@ has dest_upload_url_prefix => ( isa => 'Str',           is => 'ro', );
 sub get_upload_results
 {
     my ( $self, $args ) = @_;
+
+    my $overrides = $args->{overrides} // {};
 
     my $is_dir = ( $args->{is_dir} // 0 );
 
@@ -55,12 +57,21 @@ sub get_upload_results
             upload_cmd => [
                 @{ $self->base_upload_cmd() },
                 @$filenames,
-                ( $self->dest_upload_prefix() . $target_dir ),
+                (
+                    (
+                        $overrides->{dest_upload_prefix}
+                            // $self->dest_upload_prefix()
+                    )
+                    . $target_dir
+                ),
             ],
             urls => [
                 URI->new(
-                          $self->dest_upload_url_prefix()
-                        . $target_dir
+                    (
+                        $overrides->{dest_upload_url_prefix}
+                            // $self->dest_upload_url_prefix()
+                    )
+                    . $target_dir
                         . basename( $filenames->[0] )
                         . ( $is_dir ? '/' : '' )
                 ),
@@ -83,7 +94,7 @@ App::Sky::Module - class that does the heavy lifting.
 
 =head1 VERSION
 
-version 0.6.0
+version 0.8.0
 
 =head1 METHODS
 
@@ -120,6 +131,8 @@ Returns a L<App::Sky::Results> reference containing:
 The upload command to execute (as an array reference of strings).
 
 =back
+
+Accepts an 'overrides' named parameter.
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

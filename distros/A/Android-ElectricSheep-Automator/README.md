@@ -4,7 +4,7 @@ Android::ElectricSheep::Automator - Do Androids Dream of Electric Sheep? Smartph
 
 # VERSION
 
-Version 0.05
+Version 0.06
 
 # WARNING
 
@@ -532,10 +532,18 @@ Functions return back objects, ARRAY\_REF or HASH\_REF.
 
 - input\_text($params)
 
-    It inputs the specified text into a text-input widget
-    at specified position. At first it taps at the widget's
+    It "`types`" the specified text into the specified position,
+    where a text-input widget is expected to exist.
+    At first it taps at the widget's
     location in order to get the focus. And then it enters
-    the text.
+    the text. You need to find the position of the desired
+    text-input widget by first getting the current screen UI
+    (using [dump\_current\_screen\_ui](https://metacpan.org/pod/dump_current_screen_ui)) and then using an XPath
+    selector to identify the desired widget by name/id/attributes.
+    See the source code of method `send_message()` in file
+    `lib/Android/ElectricSheep/Automator/Plugins/Apps/Viber.pm`
+    for how this is done for the message-sending text-input widget
+    of the Viber app.
 
     `$params` is a HASH\_REF which must contain `text`
     and one of the two position (of the text-edit widget)
@@ -1189,22 +1197,22 @@ This is free software, licensed under:
 
 Hey! **The above document had some coding errors, which are explained below:**
 
-- Around line 2353:
+- Around line 2362:
 
     '=item' outside of any '=over'
 
-- Around line 2383:
+- Around line 2392:
 
     '=item' outside of any '=over'
 
-- Around line 2462:
+- Around line 2471:
 
     '=item' outside of any '=over'
 
-- Around line 2995:
+- Around line 3012:
 
     Unterminated C< ... > sequence
 
-- Around line 3000:
+- Around line 3017:
 
     Unterminated C< ... > sequence

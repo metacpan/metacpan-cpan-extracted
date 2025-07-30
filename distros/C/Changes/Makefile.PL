@@ -28,8 +28,8 @@ my %WriteMakefileArgs = (
         'version'       => 0,
         'warnings'      => 0,
         'DateTime'      => '1.57',
-        'Module::Generic'    => 'v0.32.0',
-        'Want'          => '0.29',
+        'Module::Generic'   => 'v1.0.2',
+        'Wanted'        => 'v0.1.0',
     },
     TEST_REQUIRES =>
     {

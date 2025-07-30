@@ -125,7 +125,7 @@ Module::Generic::Hash - Hash Manipulation Object Class
 
 =head1 VERSION
 
-    v1.4.1
+    v1.5.0
 
 =head1 DESCRIPTION
 
@@ -397,6 +397,25 @@ For this to work properly, the code reference needs to return a key-value pair.
         my( $k, $v ) = @_;
         return( uc($k) => $v );
     }); # e.g., { FIRST_NAME => "John", LAST_NAME => "Doe" }
+
+=head2 md5
+
+    my $h = Module::Generic::Hash->new({ name => 'John Doe', age => 30 });
+    $h->md5; # 5930d8375b3aae2d2d063ad44142f297
+    $h->{location} = 'Tokyo';
+    $h->md5; # 1febee55cacfea22bb586dfc7eb61b7e
+
+Returns the MD5 checksum of the underlying hash reference, useful for detecting changes. This uses L<Digest::MD5>, which is a core perl module and loaded dynamically, and L<JSON::XS> (already a dependency), to ensure consistent checksums by sorting keys. It returns an error if those modules cannot be loaded.
+
+You can also call this method as C<md5_checksum>.
+
+=head2 md5_checksum
+
+This is an alias for L</md5>
+
+=head2 md5_hex
+
+This is an alias for L</md5>
 
 =head2 merge
 

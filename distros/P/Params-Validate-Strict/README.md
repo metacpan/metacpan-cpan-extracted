@@ -4,7 +4,7 @@ Params::Validate::Strict - Validates a set of parameters against a schema
 
 # VERSION
 
-Version 0.04
+Version 0.05
 
 # SYNOPSIS
 
@@ -94,6 +94,7 @@ Nigel Horne, `<njh at bandsman.co.uk>`
 
 - [Params::Get](https://metacpan.org/pod/Params%3A%3AGet)
 - [Params::Validate](https://metacpan.org/pod/Params%3A%3AValidate)
+- [Return::Set](https://metacpan.org/pod/Return%3A%3ASet)
 
 # SUPPORT
 

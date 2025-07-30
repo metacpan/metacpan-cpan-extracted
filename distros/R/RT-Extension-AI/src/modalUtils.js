@@ -250,7 +250,7 @@ export async function createSuggestionModal(
         const savedSelection = saveEditorSelection(editor);
         let modalHtml;
         try {
-            modalHtml = await loadModalContent('/Helpers/AISuggestion/ShowModal', {
+            modalHtml = await loadModalContent(RT.Config.WebHomePath + '/Helpers/AISuggestion/ShowModal', {
                 rawText: editorContent,
                 callType,
                 TicketId: getTicketIdFromUrl(window.location.href)

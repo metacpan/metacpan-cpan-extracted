@@ -748,17 +748,22 @@ subtest 'standard io' => sub
 # NOTE: File locking
 subtest 'File locking' => sub
 {
-    my $file = Module::Generic::File->tempfile( cleanup => 1 );
-    my $obj = $file->open( '+>', { lock => 1, exclusive => 1 }) || do
+    my $file = Module::Generic::File->tempfile( cleanup => 1, debug => $DEBUG );
+    my $obj = $file->open( '+>', { lock => 1, exclusive => 1 });
+    ok( $obj, "file is opened" );
+    SKIP:
     {
-        diag( "Failed to open: ", $file->error ) if( $DEBUG );
-        skip( 'Failed to open file', 3 );
+        if( !$obj )
+        {
+            diag( "Failed to open: ", $file->error ) if( $DEBUG );
+            skip( 'Failed to open file', 3 );
+        }
+        ok( $file->locked, 'File locked exclusively' );
+        $file->unlock;
+        ok( !$file->locked, 'File unlocked' );
+        $file->lock( shared => 1 );
+        ok( $file->locked, 'File locked shared' );
     };
-    ok( $file->locked, 'File locked exclusively' );
-    $file->unlock;
-    ok( !$file->locked, 'File unlocked' );
-    $file->lock( shared => 1 );
-    ok( $file->locked, 'File locked shared' );
 };
 
 # NOTE: Thread-safe file operations
@@ -840,23 +845,28 @@ subtest 'Thread-safe file operations' => sub
 subtest 'File locking' => sub
 {
     my $file = Module::Generic::File->tempfile( cleanup => 1 );
-    my $obj = $file->open( '+>', { lock => 1, exclusive => 1 }) || do
+    SKIP:
     {
-        diag( "Failed to open: ", $file->error ) if( $DEBUG );
-        skip( 'Failed to open file', 5 );
+        my $obj = $file->open( '+>', { lock => 1, exclusive => 1 });
+        ok( $obj, "file is opened" );
+        if( !$obj )
+        {
+            diag( "Failed to open: ", $file->error ) if( $DEBUG );
+            skip( 'Failed to open file', 5 );
+        }
+        ok( $file->locked, 'File locked exclusively' );
+        my $repo = Module::Generic::Global->new( 'fd_locks' => $file, key => $file->filepath );
+        # is( $repo->get, &Module::Generic::File::LOCK_EX, 'Shared lock state set' );
+        my $lock_state = $repo->get;
+        isa_ok( $lock_state, 'HASH', 'Shared lock state is a hashref' );
+        is( $lock_state->{flags}, LOCK_EX, 'Shared lock flags set' );
+        ok( $lock_state->{tid} >= 0, 'Lock owner thread ID' );
+        $file->unlock;
+        ok( !$file->locked, 'File unlocked' );
+        is( $repo->get, undef, 'Shared lock state cleared' );
+        # $file->lock( shared => 1 );
+        # ok( $file->locked, 'File locked shared' );
     };
-    ok( $file->locked, 'File locked exclusively' );
-    my $repo = Module::Generic::Global->new( 'fd_locks' => $file, key => $file->filepath );
-    # is( $repo->get, &Module::Generic::File::LOCK_EX, 'Shared lock state set' );
-    my $lock_state = $repo->get;
-    isa_ok( $lock_state, 'HASH', 'Shared lock state is a hashref' );
-    is( $lock_state->{flags}, LOCK_EX, 'Shared lock flags set' );
-    ok( $lock_state->{tid} >= 0, 'Lock owner thread ID' );
-    $file->unlock;
-    ok( !$file->locked, 'File unlocked' );
-    is( $repo->get, undef, 'Shared lock state cleared' );
-    # $file->lock( shared => 1 );
-    # ok( $file->locked, 'File locked shared' );
 };
 
 # NOTE: Concurrent locking
@@ -927,13 +937,22 @@ subtest 'Lock timeout' => sub
 {
     SKIP:
     {
+        diag( "Instantiating file No 1" );
         my $file = Module::Generic::File->tempfile( cleanup => 1, debug => $DEBUG );
+        diag( "Opening, and locking file No 1 $file" );
         my $obj = $file->open( '+>', { lock => 1, exclusive => 1 }) ||
             skip( "Failed to open $file: " . $file->error, 2 );
+        diag( "Instantiating file No 2" );
         my $f2 = Module::Generic::File->new( $file->filepath, debug => $DEBUG );
-        my $fh2 = $f2->open( '+>>', { lock => 1, exclusive => 1, timeout => 1 });
+        my $fh2;
+        {
+            # We silence warning, because Module::Generic::File would otherwise warn of the file being locked.
+            no warnings;
+            $fh2 = $f2->open( '+>>', { lock => 1, exclusive => 1, timeout => 1 });
+        }
         ok( !$fh2, 'Lock failed due to existing lock' );
         isa_ok( $f2->error, 'Module::Generic::Exception', 'Lock error' );
+        diag( "Closing file file No 1 $file" );
         $file->close;
     };
 };

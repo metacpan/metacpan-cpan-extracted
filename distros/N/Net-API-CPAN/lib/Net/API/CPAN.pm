@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Meta CPAN API - ~/lib/Net/API/CPAN.pm
-## Version v0.1.5
-## Copyright(c) 2023 DEGUEST Pte. Ltd.
+## Version v0.1.6
+## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2023/07/25
-## Modified 2024/10/28
+## Modified 2025/07/30
 ## All rights reserved
 ## 
 ## 
@@ -28,7 +28,7 @@ BEGIN
         METACPAN_CLIENTINFO_URI => 'https://clientinfo.metacpan.org',
     };
     our $MODULE_RE = qr/[a-zA-Z_][a-zA-Z0-9_]+(?:\:{2}[a-zA-Z0-9_]+)*/;
-    our $VERSION = 'v0.1.5';
+    our $VERSION = 'v0.1.6';
 };
 
 use strict;
@@ -2306,7 +2306,7 @@ Net::API::CPAN - Meta CPAN API
 
 =head1 VERSION
 
-    v0.1.5
+    v0.1.6
 
 =head1 DESCRIPTION
 

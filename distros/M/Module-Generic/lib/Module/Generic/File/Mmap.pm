@@ -201,7 +201,7 @@ sub open
         $create = $self->create;
     }
     my $flags = $self->flags( create => $create, ( $opts->{mode} =~ /^\d+$/ ? $opts->{mode} : () ) );
-    
+
     my $cache_dir = $self->{_cache_dir} || return( $self->error( "Cache directory object is gone!" ) );
     return( $self->error( "Cache directory is not a Module::Generic::File object!" ) ) if( !$self->_is_a( $cache_dir => 'Module::Generic::File' ) );
     if( $cache_dir->exists )
@@ -249,7 +249,7 @@ sub open
             return( $self->error( "Requested mode ($flags) require reading, but the cache file \"$cache_file\" does not exist yet." ) );
         }
     }
-    
+
     $self->serial( $serial );
     my $new = $self->new(
         key     => ( $opts->{key} || $self->key ),
@@ -357,13 +357,13 @@ sub read
     {
         $data = $buffer;
     }
-    
+
     # data decoded is not a reference and size was provided and is greater than 0
     if( !ref( $data ) && scalar( @_ ) > 2 && int( $_[2] ) > 0 )
     {
         $data = substr( $data, 0, $_[2] );
     }
-    
+
     if( scalar( @_ ) > 1 )
     {
         $_[1] = $data;
@@ -531,7 +531,7 @@ sub write
     # Simple encapsulation
     # FYI: MG = Module::Generic
     substr( $encoded, 0, 0, 'MG[' . length( $encoded ) . ']' );
-    
+
     # try-catch
     local $@;
     eval
@@ -569,7 +569,7 @@ sub _decode_json
             {
                 return( \$this->{__scalar_gen_shm} );
             }
-            
+
             foreach my $k ( keys( %$this ) )
             {
                 next if( !ref( $this->{ $k } ) );
@@ -586,7 +586,7 @@ sub _decode_json
         }
         return( $this );
     };
-    
+
     my $decoded;
     # try-catch
     local $@;
@@ -657,7 +657,7 @@ sub _encode_json
     };
     my $ref = $crawl->( $data );
     my $j = JSON->new->utf8->relaxed->allow_nonref->convert_blessed;
-    
+
     my $encoded;
     # try-catch
     local $@;
@@ -743,7 +743,7 @@ sub THAW
     {
         ( $cache_data, $cache_file ) = CORE::delete( @$hash{qw( __cache_data __cache_file )} );
     }
-    
+
     # Storable pattern requires to modify the object it created rather than returning a new one
     if( CORE::ref( $self ) )
     {

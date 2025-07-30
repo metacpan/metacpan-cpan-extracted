@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/SharedMemXS.pm
-## Version v0.3.2
+## Version v0.3.3
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 1970/01/01
-## Modified 2025/04/30
+## Modified 2025/07/30
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -19,7 +19,7 @@ BEGIN
     use warnings::register;
     use parent qw( Module::Generic );
     use vars qw(
-        $SUPPORTED_RE $SYSV_SUPPORTED $SEMOP_ARGS $SHEM_REPO $ID2OBJ $N $HAS_B64
+        $SUPPORTED_RE $SYSV_SUPPORTED $SEMOP_ARGS $N $HAS_B64
     );
     use Config;
     use File::Spec ();
@@ -27,6 +27,7 @@ BEGIN
     # This is disruptive for everybody. Bad idea.
     # use JSON 4.03 qw( -convert_blessed_universally );
     use JSON 4.03;
+    use Module::Generic::Global ':const';
     use Storable::Improved ();
     use constant {
         SHM_BUFSIZ     =>  65536,
@@ -40,7 +41,6 @@ BEGIN
         LOCK_EX        =>  2,
         LOCK_NB        =>  4,
         LOCK_UN        =>  8,
-        HAS_THREADS    => $Config{useithreads},
     };
     $SUPPORTED_RE = qr/IPC\/SysV/;
     if( $Config{extensions} =~ /$SUPPORTED_RE/ && 
@@ -105,37 +105,14 @@ EOT
     }
     # Credits IPC::SysV
     $N = do { my $foo = eval { pack "L!", 0 }; $@ ? '' : '!' };
-    # Array to maintain the order in which shared memory object were created, so they can
-    # be removed in that order
-    our( $SHEM_REPO, $ID2OBJ );
-    if( HAS_THREADS )
-    {
-        require threads;
-        require threads::shared;
-        threads->import();
-        threads::shared->import();
-    
-        my @repo :shared;
-        my %id2objs :shared;
 
-        $SHEM_REPO = \@repo;
-        $ID2OBJ = \%id2objs;
-        *_threads_lock = \&CORE::lock;
-    }
-    else
-    {
-        $SHEM_REPO    = [];
-        $ID2OBJ       = {};
-        *_threads_lock = sub{1}; # no-op
-    }
-    
     our @EXPORT_OK = qw(LOCK_EX LOCK_SH LOCK_NB LOCK_UN);
     our %EXPORT_TAGS = (
         all     => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
         lock    => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
         'flock' => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
     );
-    our $VERSION = 'v0.3.2';
+    our $VERSION = 'v0.3.3';
 };
 
 use v5.26.1;
@@ -279,12 +256,14 @@ sub exists
     my $key;
     if( length( $opts->{key} ) )
     {
-        $key = $self->_str2key( $opts->{key} );
+        my $key_val = $self->_verify_key( $opts->{key} ) ||
+            return( $self->pass_error );
+        $key = $self->_str2key( $key_val );
     }
     my $flags = $self->flags({ mode => 0644 });
     no strict 'subs';
     $flags = ( $flags ^ &IPC::SysV::IPC_CREAT );
-    
+
     my $shm;
     # try-catch
     local $@;
@@ -355,8 +334,10 @@ sub key
     my $self = shift( @_ );
     if( @_ )
     {
-        $self->{key} = shift( @_ );
-        $self->{serial} = $self->_str2key( $self->{key} );
+        my $key = $self->_verify_key( shift( @_ ) ) ||
+            return( $self->pass_error );
+        $self->{key} = $key;
+        $self->{serial} = $self->_str2key( $key );
     }
     return( $self->{key} );
 }
@@ -391,7 +372,7 @@ sub lock
     {
         return( $self->error( "Unable to set a lock: $@" ) );
     }
-    
+
     if( $rc )
     {
         $self->locked( $type );
@@ -427,8 +408,10 @@ sub open
     my $key;
     if( length( $opts->{key} ) )
     {
-        $key = $self->_str2key( $opts->{key} ) || 
-            return( $self->error( "Cannot get serial from key '$opts->{key}': ", $self->error ) );
+        my $key_val = $self->_verify_key( $opts->{key} ) ||
+            return( $self->pass_error );
+        $key = $self->_str2key( $key_val ) || 
+            return( $self->error( "Cannot get serial from key '", ( $self->_is_array( $key_val ) ? join( "', '", @$key_val ) : $key_val ), "': ", $self->error ) );
     }
     my $create = 0;
     if( $opts->{mode} eq 'w' || $opts->{key} =~ s/^>// )
@@ -444,7 +427,7 @@ sub open
         $create = $self->create;
     }
     my $flags = $self->flags( create => $create, ( $opts->{mode} =~ /^\d+$/ ? $opts->{mode} : () ) );
-    
+
     my $shm;
     # try-catch
     local $@;
@@ -457,12 +440,12 @@ sub open
     {
         return( $self->error( "Error instantiating a new IPC::SharedMem object: $@" ) );
     }
-    
+
     if( !defined( $shm ) )
     {
-        return( $self->error( "Unable to create shared memory block with key \"", ( $opts->{key} // '' ), "\" (", ( $key // '' ), ") and flags \"$flags\": $!" ) );
+        return( $self->error( "Unable to create shared memory block with key '", ( $self->_is_array( $opts->{key} ) ? join( "', '", @{$opts->{key}} ) : $opts->{key} ), "' (", ( $key // '' ), ") and flags \"$flags\": $!" ) );
     }
-    
+
     my $sem;
     # try-catch
     local $@;
@@ -474,10 +457,10 @@ sub open
     {
         return( $self->error( "Error instantiating a new IPC::Semaphore object: $@" ) );
     }
-    
+
     if( !defined( $sem ) )
     {
-        return( $self->error( "Unable to create semaphore with key \"", ( $opts->{key} // '' ), "\" (", ( $key // '' ), ") and flags \"$flags\": $!" ) );
+        return( $self->error( "Unable to create semaphore with key '", ( $self->_is_array( $opts->{key} ) ? join( "', '", @{$opts->{key}} ) : $opts->{key} ), "' (", ( $key // '' ), ") and flags \"$flags\": $!" ) );
     }
 
     my $new = $self->new(
@@ -486,7 +469,7 @@ sub open
         mode    => $self->mode,
         destroy => $self->destroy,
         _packing_method => $self->_packing_method,
-    ) || return( $self->error( "Cannot create object with key '", ( $opts->{key} || $self->key ), "': ", $self->error ) );
+    ) || return( $self->error( "Cannot create object with key '", ( $self->_is_array( $opts->{key} ) ? join( "', '", @{$opts->{key}} ) : $opts->{key} ), "': ", $self->error ) );
     $new->{base64} = $self->base64;
     $new->{size} = $opts->{size};
     $new->{flags} = $flags;
@@ -495,28 +478,25 @@ sub open
     $new->{_sem} = $sem;
     my $id = $new->id;
 
-    {
-        &_threads_lock( $SHEM_REPO ) if( HAS_THREADS && is_shared( $SHEM_REPO ) );
-        &_threads_lock( $ID2OBJ ) if( HAS_THREADS && is_shared( $ID2OBJ ) );
-        CORE::push( @$SHEM_REPO, $id );
-        my $val;
-        if( HAS_THREADS )
-        {
-            $val = $self->serialise( $new, serialiser => 'Storable::Improved' ) ||
-                return( $self->pass_error );
-        }
-        else
-        {
-            $val = $new;
-        }
-        $ID2OBJ->{ $id } = $val;
-    }
+    # Array to maintain the order in which shared memory object were created, so they can
+    # be removed in that order
+    my $shem_repo = Module::Generic::Global->new( 'shem_repo' => CORE::ref( $self ), key => CORE::ref( $self ) );
+    my $id2obj_repo = Module::Generic::Global->new( 'id2obj' => CORE::ref( $self ), key => $id );
+    $shem_repo->lock;
+    my $all_shem = $shem_repo->get // [];
+    CORE::push( @$all_shem, $id );
+    $shem_repo->set( $all_shem );
+    $shem_repo->unlock;
+
+    $id2obj_repo->lock;
+    $id2obj_repo->set( $new );
+    $id2obj_repo->unlock;
 
     if( !defined( $sem->op( @{$SEMOP_ARGS->{(LOCK_SH)}} ) ) )
     {
         return( $self->error( "Unable to set lock on sempahore: $!" ) );
     }
-    
+
     my $there = $new->stat( SEM_MARKER );
     if( defined( $there ) && $there == SHM_EXISTS )
     {
@@ -614,7 +594,7 @@ sub read
     {
         return( $self->error( "Error with \$shm->read: $@" ) );
     }
-    
+
     if( !defined( $buffer ) )
     {
         if( $! =~ /Invalid argument/ )
@@ -626,7 +606,7 @@ sub read
             return( $self->error( "Error reading from shared memory: $!" ) );
         }
     }
-    
+
     my $packing = $self->_packing_method;
     # NOTE: Get rid of nulls end padded only for CBOR::XS, but not for Sereal and Storable who know how to handle them
     my $data;
@@ -642,7 +622,7 @@ sub read
             # Remove any possible remaining unwanted data
             substr( $buffer, $len, length( $buffer ), '' );
         }
-        
+
         if( $packing eq 'json' )
         {
             # try-catch
@@ -716,7 +696,7 @@ sub read
     {
         $data = $buffer;
     }
-    
+
     if( scalar( @_ ) > 1 )
     {
         $_[1] = $data;
@@ -753,38 +733,25 @@ sub remove
     }
     if( $rv )
     {
-        &_threads_lock( $SHEM_REPO ) if( HAS_THREADS && is_shared( $SHEM_REPO ) );
-        &_threads_lock( $ID2OBJ ) if( HAS_THREADS && is_shared( $ID2OBJ ) );
-        my @slices;
-        if( HAS_THREADS )
+        my $id2obj_repo = Module::Generic::Global->new( 'id2obj' => CORE::ref( $self ), key => $id );
+        $id2obj_repo->remove;
+        my $shem_repo = Module::Generic::Global->new( 'shem_repo' => CORE::ref( $self ), key => CORE::ref( $self ) );
+        $shem_repo->lock;
+        my $all_shem = $shem_repo->get // [];
+        my $modified = 0;
+        for( my $i = 0; $i < scalar( @$all_shem ); $i++ )
         {
-            share( @slices );
-        }
-        for( my $i = 0; $i < scalar( @$SHEM_REPO ); $i++ )
-        {
-            my $this_id = $SHEM_REPO->[$i];
-            my $obj = $ID2OBJ->{ $this_id };
+            my $this_id = $all_shem->[$i];
             if( $this_id eq $id )
             {
-                # slice is not supported on shared array, so we have to make a copy, and re-share it.
-                if( !HAS_THREADS )
-                {
-                    CORE::splice( @$SHEM_REPO, $i, 1 );
-                }
-                CORE::delete( $ID2OBJ->{ $this_id } );
+                CORE::splice( @$all_shem, $i, 1 );
+                $modified++;
                 last;
             }
-            # Re-build a new array, excluding the elements to splice
-            elsif( HAS_THREADS )
-            {
-                push( @slices, $SHEM_REPO->[$i] );
-            }
         }
-
-        # Did we rebuilt the shared array ?
-        if( scalar( @slices ) )
+        if( $modified )
         {
-            @$SHEM_REPO = @slices;
+            $shem_repo->set( $all_shem );
         }
         $self->{_ipc_shared} = undef;
         $self->{_sem} = undef;
@@ -801,7 +768,7 @@ sub remove_semaphore
     my $semid = $sem->id;
     $self->unlock();
     my $rv;
-    
+
     # try-catch
     local $@;
     eval
@@ -812,7 +779,7 @@ sub remove_semaphore
     {
         return( $self->error( "Error removing semaphore object: $@" ) );
     }
-    
+
     if( !defined( $rv ) )
     {
         warn( "Warning only: could not remove the semaphore id \"$semid\" with IPC::SysV::IPC_RMID value '", &IPC::SysV::IPC_RMID, "': $!" ) if( $self->_warnings_is_enabled );
@@ -1099,7 +1066,7 @@ sub write
         }
         return( $self->error( "Unable to serialise ", CORE::length( $data ), " bytes of data using Storable with base64 set to '", ( $self->{base64} // '' ), ": ", $self->error ) ) if( !defined( $encoded ) );
     }
-    
+
     # Simple encapsulation
     # FYI: MG = Module::Generic
     substr( $encoded, 0, 0, 'MG[' . length( $encoded ) . ']' );
@@ -1120,7 +1087,7 @@ sub write
         }
         $self->{addr} = $addr;
     }
-    
+
     $self->lock( LOCK_EX ) || return( $self->pass_error );
     # my $rv = shmwrite( $id, $encoded, 0, $len ) ||
     #     return( $self->error( "Unable to write to shared memory id '$id' with ${len} bytes of data encoded and memory size of $size: $!" ) );
@@ -1161,7 +1128,7 @@ sub _decode_json
             {
                 return( \$this->{__scalar_gen_shm} );
             }
-            
+
             foreach my $k ( keys( %$this ) )
             {
                 next if( !ref( $this->{ $k } ) );
@@ -1178,7 +1145,7 @@ sub _decode_json
         }
         return( $this );
     };
-    
+
     my $result;
     # try-catch
     local $@;
@@ -1302,12 +1269,39 @@ sub _str2key
     }
 }
 
+sub _verify_key
+{
+    my( $self, $key ) = @_;
+    if( !defined( $key ) || !length( $key // '' ) )
+    {
+        # It's ok, _str2key will use IPC::SysV::IPC_PRIVATE then
+    }
+    elsif( !ref( $key ) || $self->_can_overload( $key => '""' ) )
+    {
+        $key = "$key";
+        if( !CORE::length( $key // '' ) )
+        {
+            return( $self->error( "An empty key was provided." ) );
+        }
+    }
+    elsif( $self->_is_array( $key ) )
+    {
+        # We use as-is
+    }
+    else
+    {
+        return( $self->error( "Key must be a string, but I got '", $self->_str_val( $key // 'undef' ), "'" ) );
+    }
+    return( $key );
+}
+
 sub DESTROY
 {
     # <https://perldoc.perl.org/perlobj#Destructors>
     CORE::local( $., $@, $!, $^E, $? );
     CORE::return if( ${^GLOBAL_PHASE} eq 'DESTRUCT' );
-    my $self = CORE::shift( @_ ) || CORE::return;
+    my $self = CORE::shift( @_ );
+    CORE::return if( !CORE::defined( $self ) );
     CORE::return unless( $self->{_ipc_shared} );
     my $shm = $self->{_ipc_shared};
     CORE::return if( $shm->id );
@@ -1393,7 +1387,7 @@ sub THAW
         {
             return( $self->error( "Error creating a new IPC::SharedMem object: $@" ) );
         }
-        
+
         my $sem;
         # try-catch
         local $@;
@@ -1405,7 +1399,7 @@ sub THAW
         {
             return( $self->error( "Error creating a new IPC::Semaphore object: $@" ) );
         }
-        
+
         if( !defined( $sem ) )
         {
             return( $self->error( "Unable to create semaphore with key \"", ( $key // '' ), "\" and flags \"$flags\": $!" ) );
@@ -1416,25 +1410,22 @@ sub THAW
 }
 
 # NOTE: END
-END
-{
-    foreach my $id ( @$SHEM_REPO )
-    {
-        my $s = $ID2OBJ->{ $id } || next;
-        if( HAS_THREADS )
-        {
-            $s = eval{ Storable::Improved::thaw( $s ) };
-            if( $@ )
-            {
-                warn( "Error deserialising object with Storable::Improved: $@" ) if( warnings::enabled() );
-                next;
-            }
-        }
-        next if( $s->removed || !$s->id || !$s->destroy );
-        $s->detach;
-        $s->remove;
-    }
-};
+# END
+# {
+#     my $shem_repo = Module::Generic::Global->new( 'shem_repo' => __PACKAGE__, key => __PACKAGE__ );
+#     $shem_repo->lock;
+#     my $all_shem = $shem_repo->get // [];
+#     foreach my $id ( @$all_shem )
+#     {
+#         my $id2obj_repo = Module::Generic::Global->new( 'id2obj' => __PACKAGE__, key => $id );
+#         my $s = $id2obj_repo->get || next;
+#         next if( $s->removed || !$s->id || !$s->destroy );
+#         $s->detach;
+#         $s->remove;
+#     }
+#     $shem_repo->unlock;
+#     $shem_repo->remove;
+# };
 
 1;
 # NOTE: POD
@@ -1454,7 +1445,7 @@ Module::Generic::SharedMemXS - Shared Memory Manipulation with XS API
         my $shmem = Module::Generic::SharedMemXS->new( key => 'some_identifier' ) ||
             die( Module::Generic::SharedMemXS->error );
     }
-    
+
     my $shmem = Module::Generic::SharedMemXS->new(
         # Create if necessary, or re-use if already exists
         create => 1,
@@ -1545,7 +1536,7 @@ Module::Generic::SharedMemXS - Shared Memory Manipulation with XS API
 
 =head1 VERSION
 
-    v0.3.2
+    v0.3.3
 
 =head1 DESCRIPTION
 

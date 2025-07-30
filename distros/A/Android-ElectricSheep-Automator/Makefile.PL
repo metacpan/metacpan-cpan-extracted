@@ -23,7 +23,16 @@ my %WriteMakefileArgs = (
     LICENSE          => 'artistic_2',
     MIN_PERL_VERSION => '5.006',
     EXE_FILES        => [
+	'script/electric-sheep-close-app.pl',
+	'script/electric-sheep-dump-current-location.pl',
+	'script/electric-sheep-dump-current-screen-ui.pl',
+	'script/electric-sheep-dump-screen-shot.pl',
+	'script/electric-sheep-dump-screen-video.pl',
+	'script/electric-sheep-emulator-geofix.pl',
+	'script/electric-sheep-find-installed-apps.pl',
+	'script/electric-sheep-find-running-processes.pl',
 	'script/electric-sheep-open-app.pl',
+	'script/electric-sheep-viber-send-message.pl',
     ],
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',

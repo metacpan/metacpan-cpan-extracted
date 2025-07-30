@@ -4,13 +4,13 @@ use strict;
 use warnings;
 
 use Test::More tests => 2;
-use File::Spec;
+use File::Spec ();
 
 use Test::Differences (qw( eq_or_diff ));
 
 use YAML::XS (qw( LoadFile ));
 
-use App::Sky::Config::Validate;
+use App::Sky::Config::Validate ();
 
 package main;
 

@@ -40,10 +40,10 @@
             "Email::Address::XS" : "1.05",
             "Encode" : "3.19",
             "Getopt::Class" : "v0.104.1",
-            "HTTP::Promise" : "v0.3.0",
+            "HTTP::Promise" : "v0.5.3",
             "IO::Handle" : "1.51",
             "JSON" : "4.10",
-            "Module::Generic" : "v0.32.3",
+            "Module::Generic" : "v1.0.2",
             "POSIX" : "0",
             "Pod::Usage" : "2.01",
             "Scalar::Util" : "0",
@@ -53,7 +53,7 @@
             "Term::ReadKey" : "2.38",
             "URI" : "5.21",
             "URI::git" : "0.02",
-            "Want" : "0.29",
+            "Wanted" : "v0.1.0",
             "constant" : "0",
             "curry" : "0",
             "open" : "0",
@@ -84,6 +84,6 @@
          "web" : "https://gitlab.com/jackdeguest/Net-API-CPAN"
       }
    },
-   "version" : "v0.1.5",
+   "version" : "v0.1.6",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

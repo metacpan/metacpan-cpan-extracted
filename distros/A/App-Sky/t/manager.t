@@ -3,11 +3,11 @@
 use strict;
 use warnings;
 
-use Test::More tests => 23;
+use Test::More tests => 26;
 
 use Test::Differences (qw( eq_or_diff ));
 
-use App::Sky::Manager;
+use App::Sky::Manager ();
 
 package ManagerTester;
 
@@ -93,6 +93,16 @@ package main;
                             code => {
                                 basename_re => q/\.(?:pl|pm|c|py)\z/,
                                 target_dir  => "Files/files/code/",
+                            },
+                            fedora => {
+                                basename_re => q/\.(?:spec|src\.rpm)\z/,
+                                overrides   => {
+                                    dest_upload_prefix =>
+                                        "fedorapeople.org:public_html/",
+                                    dest_upload_url_prefix =>
+                                        "https://fedorapeople.org/~shlomif/",
+                                },
+                                target_dir => "fedora/packages/",
                             },
                             music => {
                                 basename_re => q/\.(?:mp3|ogg|wav|aac|m4a)\z/,
@@ -210,6 +220,26 @@ package main;
         },
         'target_dir',
     );
+
+    # TEST*$test_upload_results
+    $tester->test_upload_results(
+        {
+            input => {
+                'filenames' => ['./foobar/docmake.spec'],
+            },
+            upload_cmd => [
+                qw(rsync -a -v --progress --inplace),
+                './foobar/docmake.spec',
+                'fedorapeople.org:public_html/fedora/packages/'
+            ],
+            urls => [
+                      "https://fedorapeople.org/~shlomif/"
+                    . "fedora/packages/"
+                    . "docmake.spec",
+            ],
+        },
+        'MyModule.pm',
+    );
 }
 
 {
@@ -286,4 +316,3 @@ package main;
         'trailing slash is removed on upload directory',
     );
 }
-

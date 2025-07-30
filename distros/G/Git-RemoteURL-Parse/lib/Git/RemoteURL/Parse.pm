@@ -7,7 +7,7 @@ use warnings;
 use Exporter 'import';
 our @EXPORT_OK = qw(parse_git_remote_url);
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 sub parse_git_remote_url {
     my ($url) = @_;
@@ -78,7 +78,7 @@ Git::RemoteURL::Parse - Parse and classify Git remote URLs (GitHub, GitLab)
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 
@@ -111,22 +111,41 @@ Supported URL formats include both HTTPS and SSH variants.
 
 =item * GitHub HTTPS:
 
-    https://github.com/user/repo.git
-    https://token@github.com/user/repo
+=over 4
+
+=item * C<https://github.com/user/repo.git>
+
+=item * C<https://token@github.com/user/repo>
+
+=back
 
 =item * GitHub SSH:
 
-    git@github.com:user/repo.git
-    git@gh-alias:user/repo
+=over 4
+
+=item * C<git@github.com:user/repo.git>
+
+=item * C<git@gh-alias:user/repo>
+
+=back
 
 =item * GitLab HTTPS:
 
-    https://gitlab.com/group/subgroup/repo.git
+=over 4
+
+=item * C<https://gitlab.com/group/subgroup/repo.git>
+
+=back
 
 =item * GitLab SSH:
 
-    git@gitlab.com:group/sub/repo.git
-    git@gl-alias:group1/group2/repo.git
+=over 4
+
+=item * C<git@gitlab.com:group/sub/repo.git>
+
+=item * C<git@gl-alias:group1/group2/repo.git>
+
+=back
 
 =back
 
@@ -135,8 +154,6 @@ Supported URL formats include both HTTPS and SSH variants.
 =over 4
 
 =item C<parse_git_remote_url(I<URL>)>
-
-    my $info = parse_git_remote_url($url);
 
 Takes a Git remote I<C<URL>> string and returns a hash reference with the following structure:
 
@@ -154,7 +171,7 @@ Takes a Git remote I<C<URL>> string and returns a hash reference with the follow
 
     {
         service    => 'gitlab',
-        group_path => 'group/subgroup/...',
+        group_path => 'GROUP/SUBGROUP/...',
         repo       => 'REPO_NAME',
     }
 

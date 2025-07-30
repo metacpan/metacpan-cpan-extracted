@@ -24,7 +24,7 @@ BEGIN
     use parent qw( DB::Object );
     use vars qw( $VERSION $DEBUG );
     use DB::Object::Fields;
-    use Want;
+    use Wanted;
     our $DEBUG = 0;
     our $VERSION = 'v1.0.1';
 };
@@ -251,9 +251,9 @@ sub delete
     # If the user wants to execute this, then we reset the query, 
     # but if the user wants to call other methods chained like as_string we don't do anything
     # CORE::delete( $self->{query_reset} ) if( !defined( wantarray() ) );
-    if( Want::want('VOID') || Want::want('OBJECT') )
+    if( want('VOID') || want('OBJECT') )
     {
-        CORE::delete( $self->{query_reset} ) if( Want::want('VOID') );
+        CORE::delete( $self->{query_reset} ) if( want('VOID') );
         # return( $q->select( @_ ) );
         # return( $q->select( @_ ) ) if( !defined( wantarray() ) );
         return( $q->delete( @_ ) );
@@ -426,9 +426,9 @@ sub insert
     # If the user wants to execute this, then we reset the query, 
     # but if the user wants to call other methods chained like as_string we don't do anything
     # CORE::delete( $self->{query_reset} ) if( !defined( wantarray() ) );
-    if( Want::want('VOID') || Want::want('OBJECT') )
+    if( want('VOID') || want('OBJECT') )
     {
-        CORE::delete( $self->{query_reset} ) if( Want::want('VOID') );
+        CORE::delete( $self->{query_reset} ) if( want('VOID') );
         # return( $q->select( @_ ) );
         # return( $q->select( @_ ) ) if( !defined( wantarray() ) );
         return( $q->insert( @_ ) );
@@ -502,48 +502,52 @@ sub new_index
     return( $this );
 }
 
-sub no_bind { return( shift->_set_get_boolean( { field => 'no_bind', callbacks =>
-{
-    set => sub
+sub no_bind { return( shift->_set_get_boolean({
+    field => 'no_bind',
+    callbacks =>
     {
-        my $self = shift( @_ );
-        my $val = shift( @_ );
-        return if( !$val );
-        my $q = $self->_reset_query;
-        my $where = $q->where();
-        my $group = $q->group();
-        my $order = $q->order();
-        my $limit = $q->limit();
-        my $binded_where = $q->binded_where;
-        my $binded_group = $q->binded_group;
-        my $binded_order = $q->binded_order;
-        my $binded_limit = $q->binded_limit;
-        # Replace the placeholders by their corresponding value
-        # and have them re-processed by their corresponding method
-        if( $where && @$binded_where )
+        set => sub
         {
-            $where =~ s/(=\s*\?)/"='" . quotemeta( $binded_where->[ $#+ ] ) . "'"/ge;
-            $self->where( $where );
-        }
-        if( $group && @$binded_group )
-        {
-            $group =~ s/(=\s*\?)/"='" . quotemeta( $binded_group->[ $#+ ] ) . "'"/ge;
-            $self->group( $group );
-        }
-        if( $order && @$binded_order )
-        {
-            $order =~ s/(=\s*\?)/"='" . quotemeta( $binded_order->[ $#+ ] ) . "'"/ge;
-            $self->order( $order );
-        }
-        if( $limit && @$binded_limit )
-        {
-            # $limit =~ s/(=\s*\?)/"='" . quotemeta( $binded_limit[ $#+ ] ) . "'"/ge;
-            $self->limit( @$binded_limit );
-        }
-        $q->reset_bind;
-        return( $self );
-    },
-} }, @_ ) ); }
+            my $self = shift( @_ );
+            my $val = shift( @_ );
+            return if( !defined( $val ) );
+            return( $val ) if( !$val );
+            my $q = $self->_reset_query;
+            my $where = $q->where();
+            my $group = $q->group();
+            my $order = $q->order();
+            my $limit = $q->limit();
+            my $binded_where = $q->binded_where;
+            my $binded_group = $q->binded_group;
+            my $binded_order = $q->binded_order;
+            my $binded_limit = $q->binded_limit;
+            # Replace the placeholders by their corresponding value
+            # and have them re-processed by their corresponding method
+            if( $where && @$binded_where )
+            {
+                $where =~ s/(=\s*\?)/"='" . quotemeta( $binded_where->[ $#+ ] ) . "'"/ge;
+                $self->where( $where );
+            }
+            if( $group && @$binded_group )
+            {
+                $group =~ s/(=\s*\?)/"='" . quotemeta( $binded_group->[ $#+ ] ) . "'"/ge;
+                $self->group( $group );
+            }
+            if( $order && @$binded_order )
+            {
+                $order =~ s/(=\s*\?)/"='" . quotemeta( $binded_order->[ $#+ ] ) . "'"/ge;
+                $self->order( $order );
+            }
+            if( $limit && @$binded_limit )
+            {
+                # $limit =~ s/(=\s*\?)/"='" . quotemeta( $binded_limit[ $#+ ] ) . "'"/ge;
+                $self->limit( @$binded_limit );
+            }
+            $q->reset_bind;
+            return( $val );
+        },
+    }
+}, @_ ) ); }
 
 sub null
 {
@@ -643,9 +647,9 @@ sub replace
     # If the user wants to execute this, then we reset the query, 
     # but if the user wants to call other methods chained like as_string we don't do anything
     # CORE::delete( $self->{query_reset} ) if( !defined( wantarray() ) );
-    if( Want::want('VOID') || Want::want('OBJECT') )
+    if( want('VOID') || want('OBJECT') )
     {
-        CORE::delete( $self->{query_reset} ) if( Want::want('VOID') );
+        CORE::delete( $self->{query_reset} ) if( want('VOID') );
         # return( $q->select( @_ ) );
         # return( $q->select( @_ ) ) if( !defined( wantarray() ) );
         return( $q->replace( @_ ) );
@@ -710,9 +714,9 @@ sub select
     # If the user wants to execute this, then we reset the query, 
     # but if the user wants to call other methods chained like as_string we don't do anything
     # CORE::delete( $self->{query_reset} ) if( !defined( wantarray() ) );
-    if( Want::want('VOID') || Want::want('OBJECT') )
+    if( want('VOID') || want('OBJECT') )
     {
-        CORE::delete( $self->{query_reset} ) if( Want::want('VOID') );
+        CORE::delete( $self->{query_reset} ) if( want('VOID') );
         # return( $q->select( @_ ) );
         # return( $q->select( @_ ) ) if( !defined( wantarray() ) );
         return( $q->select( @_ ) );
@@ -812,9 +816,9 @@ sub update
     # If the user wants to execute this, then we reset the query, 
     # but if the user wants to call other methods chained like as_string we don't do anything
     # CORE::delete( $self->{query_reset} ) if( !defined( wantarray() ) );
-    if( Want::want('VOID') || Want::want('OBJECT') )
+    if( want('VOID') || want('OBJECT') )
     {
-        CORE::delete( $self->{query_reset} ) if( Want::want('VOID') );
+        CORE::delete( $self->{query_reset} ) if( want('VOID') );
         # return( $q->select( @_ ) );
         # return( $q->select( @_ ) ) if( !defined( wantarray() ) );
         return( $q->update( @_ ) );
@@ -868,6 +872,7 @@ sub AUTOLOAD
     }
 };
 
+# NOTE: DESTROY
 sub DESTROY
 {
     # Do nothing

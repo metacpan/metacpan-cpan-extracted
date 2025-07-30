@@ -10,7 +10,7 @@ use lib ('blib/lib');
 use Getopt::Long qw(:config no_ignore_case);
 use Data::Roundtrip qw/perl2dump no-unicode-escape-permanently/;
 
-use Android::ElectricSheep::Automator::Plugins::Viber;
+use Android::ElectricSheep::Automator::Plugins::Apps::Viber;
 
 my $VERBOSITY = 0; # we need verbosity of 10 (max), so this is not used
 my ($DEVICE, %SENDPARS, $CONFIGFILE);
@@ -46,7 +46,7 @@ my $params = {
 if( defined $DEVICE ){ $params->{'device-serial'} = $DEVICE }
 else { $params->{'device-is-connected'} = 1 }
 
-my $client = Android::ElectricSheep::Automator::Plugins::Viber->new($params);
+my $client = Android::ElectricSheep::Automator::Plugins::Apps::Viber->new($params);
 if( ! defined($client) ){ die "$0 : failed to instantiate the automator." }
 
 # navigate to the home screen, get rid of previous tests rubbish

@@ -18,7 +18,7 @@ BEGIN
     use common::sense;
     use parent qw( Module::Generic );
     use vars qw( $VERSION );
-    use Want;
+    use Wanted;
     our $VERSION = 'v0.2.0';
 };
 
@@ -70,7 +70,7 @@ sub fo
         $fo = $self->query_object->table_object->fields( $f );
     }
     $self->{fo} = $fo if( defined( $fo ) );
-    return( $self->new_null ) if( !defined( $fo ) && Want::want( 'OBJECT' ) );
+    return( $self->new_null ) if( !defined( $fo ) && Wanted::want( 'OBJECT' ) );
     return( $fo );
 }
 
@@ -98,23 +98,28 @@ sub is_numbered
 }
 
 # The placeholder, such as ?, $2, ?2, or others supported by the driver
-sub placeholder { return( shift->_set_get_scalar_as_object( { field => 'placeholder', callbacks => {
-    set => sub
+sub placeholder { return( shift->_set_get_scalar_as_object({
+    field => 'placeholder',
+    callbacks => 
     {
-        # $val is a scalar object (Module::Generic::Scalar)
-        my( $self, $val ) = @_;
-        my $placeholder_re = $self->query_object->database_object->_placeholder_regexp;
-        if( defined( $val ) && "$val" =~ /^(?:$placeholder_re)$/ )
+        set => sub
         {
-            # Could be undef
-            $self->index( $+{index} );
-        }
-        else
-        {
-            $self->index( undef );
+            # $val is a scalar object (Module::Generic::Scalar)
+            my( $self, $val ) = @_;
+            my $placeholder_re = $self->query_object->database_object->_placeholder_regexp;
+            if( defined( $val ) && "$val" =~ /^(?:$placeholder_re)$/ )
+            {
+                # Could be undef
+                $self->index( $+{index} );
+            }
+            else
+            {
+                $self->index( undef );
+            }
+            return( $val );
         }
     }
-}}, @_ ) ); }
+}, @_ ) ); }
 
 sub query_object { return( shift->_set_get_object( 'query_object', 'DB::Object::Query', @_ ) ); }
 

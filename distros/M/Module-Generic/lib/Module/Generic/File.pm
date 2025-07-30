@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File.pm
-## Version v0.12.4
+## Version v0.13.0
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/20
-## Modified 2025/05/28
+## Modified 2025/07/25
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -34,6 +34,7 @@ BEGIN
     use Module::Generic::File::IO ();
     use Module::Generic::Global ':const';
     use Scalar::Util ();
+    use Time::HiRes qw( sleep );
     use URI ();
     use URI::file ();
     use Wanted;
@@ -142,7 +143,7 @@ BEGIN
     # Catching non-ascii characters: [^\x00-\x7F]
     # Credits to: File::Util
     $ILLEGAL_CHARACTERS = qr/[\x5C\/\|\015\012\t\013\*\"\?\<\:\>]/;
-    our $VERSION = 'v0.12.4';
+    our $VERSION = 'v0.13.0';
 };
 
 use v5.12.0;
@@ -297,7 +298,7 @@ sub append
         {
             $io = $self->open( $opts->{mode}, @_ ) || return( $self->pass_error );
         }
-        
+
         my $rv;
         eval
         {
@@ -308,7 +309,7 @@ sub append
             return( $self->error( "An unexpected error occured while trying to append ", CORE::length( ref( $data ) ? $$data : $data ), " bytes of data to file \"${file}\": $@" ) );
         }
         return( $self->error( "Unable to write ", CORE::length( ref( $data ) ? $$data : $data ), " bytes of data to file \"${file}\": $!" ) ) if( !$rv );
-        
+
         if( $opened )
         {
             if( defined( $pos ) )
@@ -339,7 +340,7 @@ sub as
     return( $self ) if( $os =~ /^(dos|mswin32|netware|symbian|win32)$/i && $currentOS =~ /^(dos|mswin32|netware|symbian|win32)$/i );
     local $URI::file::DEFAULT_AUTHORITY = undef;
     $opts->{volume} //= '';
-    
+
     my( $volume, $parent, $file ) = $self->_spec_splitpath( $self->filename );
     my @dirs   = $self->_spec_splitdir( $parent );
     my $new_dirs = $self->_spec_catdir( [ @dirs ], $os );
@@ -519,7 +520,7 @@ sub can_read
         {
             return( $self->error( "An error occurred while trying to check if we can read from ", ( $self->is_dir ? 'directory' : 'file handle for ' ), " \"${file}\": $@" ) );
         }
-        
+
         my $v = ( ( $flags == O_RDONLY ) || ( $flags & ( O_RDONLY | O_RDWR ) ) );
         $v++ unless( $flags & O_ACCMODE );
         $io->close unless( $opened );
@@ -726,15 +727,12 @@ sub close
     my $io = $self->opened || return( $self );
     my $fd = $io->fileno;
     $io->close;
-    if( CORE::defined( $fd ) )
-    {
-        # We use the file as the universal key, just like flock locks the file on its inode
-        my $repo_key = $self->filepath;
-        my $repo = Module::Generic::Global->new( 'fd_locks' => $self, key => $repo_key ) ||
-            die( Module::Generic::Global->error );
-        # Clear any lock state
-        $repo->remove;
-    }
+    # We use the file as the universal key, just like flock locks the file on its inode
+    my $repo_key = $self->filepath;
+    my $repo = Module::Generic::Global->new( 'fd_locks' => CORE::ref( $self ), key => "$repo_key" ) ||
+        return( $self->pass_error( Module::Generic::Global->error ) );
+    # Clear any lock state
+    $repo->remove;
     # Clear instance lock state
     $self->locked(0);
     $self->opened( undef );
@@ -821,7 +819,7 @@ sub collapse_dots
     $path = $opts->{separator} ? $u->file( $self->{os} || $^O ) : $u->path;
     my @new = ();
     my $len = CORE::length( $path );
-    
+
     # "If the input buffer begins with a prefix of "../" or "./", then remove that prefix from the input buffer"
     if( substr( $path, 0, 2 ) eq ".${sep}" )
     {
@@ -848,7 +846,7 @@ sub collapse_dots
     {
         return( $u );
     }
-    
+
     # -1 is used to ensure trailing blank entries do not get removed
     my @segments = CORE::split( "\Q$sep\E", $path, -1 );
     for( my $i = 0; $i < scalar( @segments ); $i++ )
@@ -1321,7 +1319,7 @@ sub filename
             $newfile = $resolved;
             $self->resolved(1);
         }
-        
+
         if( substr( $newfile, 0, 7 ) eq 'file://' )
         {
             $newfile = URI->new( $newfile )->file;
@@ -1347,7 +1345,7 @@ sub filename
         {
             $self->{filename} = Encode::decode_utf8( $self->{filename} );
         }
-        
+
         # It potentially does not exist
         my $finfo = $self->finfo( $newfile );
         if( !$finfo->exists )
@@ -1403,7 +1401,7 @@ sub find
             $skip->{ "$this" } = $this;
         }
     }
-    
+
     $p->{preprocess} = sub
     {
         my @files = @_;
@@ -1420,7 +1418,7 @@ sub find
         @files = sort( @files ) if( $opts->{sort} );
         return( @files );
     };
-    
+
     # try-catch
     local $@;
     eval
@@ -1465,7 +1463,7 @@ sub finfo
         $newfile = $self->filename;
         return( $self->error( "No file path set. This should not happen." ) ) if( !$newfile );
     }
-    
+
     if( defined( $newfile ) )
     {
         $self->{finfo} = Module::Generic::Finfo->new( $newfile, debug => $self->debug );
@@ -1580,7 +1578,7 @@ sub glob
                 @files = File::Glob::bsd_glob( ( ( $self->is_dir && defined( $pattern ) ) ? CORE::join( $OS2SEP->{ lc( $os ) }, $path, $pattern ) : $path ), ( ( defined( $flags ) && $flags != 0 ) ? $flags : () ) );
                 return( $self->error( "Error globbing with pattern '", ( defined( $pattern ) ? $pattern : $path ), "': $!" ) ) if( !scalar( @files ) && &File::Glob::GLOB_ERROR );
             }
-            
+
             if( $make_objects )
             {
                 for( my $i = 0; $i < scalar( @files ); $i++ )
@@ -1679,7 +1677,7 @@ sub is_empty
                 return( $self->pass_error );
             }
         }
-        
+
         while( defined( $elem = $io->read ) )
         {
             next if( $elem eq '.' || $elem eq '..' );
@@ -1771,7 +1769,7 @@ sub iterator
                 $e = $rv if( $rv );
             }
             $cb->( $e );
-        
+
             if( $e->is_dir && $opts->{recurse} )
             {
                 $crawl->( $e );
@@ -1870,7 +1868,7 @@ sub lines
     {
         $pos = $io->tell;
     }
-    
+
     # try-catch
     local $@;
     eval
@@ -1891,7 +1889,7 @@ sub lines
     {
         return( $self->error( "Unable to read file \"${file}\": $@" ) );
     }
-    
+
     $a = $self->new_array( \@lines );
     if( $opts->{chomp} )
     {
@@ -1999,7 +1997,7 @@ sub load
         }        
         return( $self->error( "Unable to open file \"$file\" in read mode: $!" ) ) if( !$fh );
     }
-    
+
     # try-catch
     local $@;
     eval
@@ -2010,7 +2008,7 @@ sub load
     {
         return( $self->error( "An error occured while trying to open and read file \"$file\": $@" ) );
     }
-    
+
     my $pos;
     if( $self->can_read )
     {
@@ -2062,7 +2060,7 @@ sub load
             return( $self->error( "An error occured while trying to open and read file \"$file\": $@" ) );
         }
     }
-    
+
     if( $opts->{want_object} || want( 'OBJECT' ) )
     {
         return( $self->new_scalar( \$buf ) );
@@ -2352,7 +2350,7 @@ sub load_csv
         }
         $expects = $opts->{expects};
     }
-    
+
     my $has_cols = scalar( @$cols );
     # Start the line counter
     my $n = $first_row ? 1 : 0;
@@ -2525,7 +2523,7 @@ sub load_perl
     {
         return( $self->error( "Error while loading ", $self->length, " bytes of perl data: $@" ) );
     }
-    
+
     if( !defined( $v ) && $@ )
     {
         return( $self->error( "Error while loading ", $self->length, " bytes of perl data: $@" ) );
@@ -2562,11 +2560,29 @@ sub lock
     unless( defined( $flags ) )
     {
         $flags = 0;
-        if( ( CORE::exists( $opts->{exclusive} ) && CORE::defined( $opts->{exclusive} ) && $opts->{exclusive} ) || ( CORE::exists( $opts->{mode} ) && CORE::defined( $opts->{mode} ) && $opts->{mode} eq 'exclusive' ) )
+        if( (
+                CORE::exists( $opts->{exclusive} ) &&
+                CORE::defined( $opts->{exclusive} ) &&
+                $opts->{exclusive}
+            ) ||
+            (
+                CORE::exists( $opts->{mode} ) &
+                CORE::defined( $opts->{mode} ) &&
+                $opts->{mode} eq 'exclusive'
+            ) )
         {
             $flags |= LOCK_EX;
         }
-        elsif( ( CORE::exists( $opts->{shared} ) && CORE::defined( $opts->{shared} ) && $opts->{shared} ) || ( CORE::exists( $opts->{mode} ) && CORE::defined( $opts->{mode} ) && $opts->{mode} eq 'shared' ) )
+        elsif( (
+                CORE::exists( $opts->{shared} ) &&
+                CORE::defined( $opts->{shared} ) &&
+                $opts->{shared}
+            ) ||
+            (
+                CORE::exists( $opts->{mode} ) &&
+                CORE::defined( $opts->{mode} ) &&
+                $opts->{mode} eq 'shared'
+            ) )
         {
             $flags |= LOCK_SH;
         }
@@ -2578,10 +2594,7 @@ sub lock
         $flags |= LOCK_UN if( $opts->{unlock} );
     }
     my $file = $self->filename;
-    my $io = $self->opened || return( $self->error({
-        message => "File is not opened yet. You must open the file \"${file}\" first to lock it.",
-        code => 400
-    }) );
+    my $io = $self->opened || return( $self->error( "File is not opened yet. You must open the file \"${file}\" first to lock it." ) );
     # perlport: "(VMS, RISC OS, VOS) Not implemented"
     return(1) if( $^O =~ /^(vms|riscos|vos)$/i );
     my $fd = $io->fileno;
@@ -2589,90 +2602,231 @@ sub lock
         message => "No file descriptor found for this filehandle.",
         code => 400
     }) ) if( !defined( $fd ) );
-    # $type = LOCK_EX if( !defined( $type ) );
     return( $self->unlock ) if( ( $flags & LOCK_UN ) );
-    # already locked
-    # return(1) if( $self->locked & $flags );
-    # If the lock is different, release it first
-    # $self->unlock if( $self->locked );
+    if( ( $flags & LOCK_EX ) && !$self->can_write )
+    {
+        return( $self->error({ message => "The file is not opened in write mode, but the flags '$flags' requires an exclusive lock, which only works with filehandle opened in write mode.", code => 500 }) );
+    }
+    elsif( ( $flags & LOCK_SH ) && !$self->can_read )
+    {
+        return( $self->error({ message => "The file is not opened in read mode, but the flags '$flags' requires a shared lock, which only works with filehandle opened in read or read/write mode.", code => 500 }) );
+    }
+    my $is_locked = $self->locked;
 
-    my $repo_key = $self->filepath;
-    my $repo = Module::Generic::Global->new( 'fd_locks' => $self, key => $repo_key ) ||
-        die( Module::Generic::Global->error );
-    my $current_state = $repo->get || {};
-    if( ref( $current_state ) eq 'HASH' )
+    my( $timeout, $wait_step );
+    if( CORE::exists( $opts->{timeout} ) && $opts->{timeout} =~ /^\d+(?:\.\d+)?$/ )
     {
-        if( CORE::exists( $current_state->{flags} ) && 
-            CORE::length( $current_state->{flags} // '' ) )
-        {
-            # Return undef with exception if already locked
-            if( $current_state->{flags} && ( $current_state->{flags} & $flags ) )
-            {
-                return( $self->error({
-                    message => "File \"$file\" is already locked with flags $current_state->{flags} by thread $current_state->{tid}.",
-                    # Locked
-                    code => 423
-                }) );
-            }
-            if( $current_state->{flags} )
-            {
-                # Release any existing lock
-                $self->unlock;
-            }
-        }
+        $timeout = $opts->{timeout};
     }
-    else
+    $wait_step = ( defined( $timeout ) && $timeout < 0.5 ) ? $timeout : 0.5;
+
+    # Credits:
+    # <https://stackoverflow.com/questions/6855796/what-else-can-i-do-sleep-when-the-sleep-cant-work-well-with-alarm>
+    my $sleep_tight = sub
     {
-        warn( "The stored value from our global shared repository for file locking is not an hash reference!" ) if( $self->_is_warnings_enabled );
-    }
-    $opts->{timeout} = 0 if( !defined( $opts->{timeout} ) || $opts->{timeout} !~ /^\d+$/ );
-    local $SIG{ALRM} = sub{ die( "timeout" ); };
-    alarm( $opts->{timeout} );
-    # try-catch
-    local $@;
-    my $rc;
-    eval
-    {
-        my $rv = $repo->lock;
-        if( !$rv )
+        my $end = Time::HiRes::time() + shift( @_ );
+        for(;;)
         {
-            warn( "Failed to acquire a shared lock for file $file: ", $repo->error ) if( $self->_is_warnings_enabled );
-        }
-        $rc = $io->flock( $flags );
-        if( $rc )
-        {
-            $repo->set({
-                flags => $flags,
-                tid => ( HAS_THREADS ? threads->tid() : 0 ),
-                timestamp => time(),
-            });
+            my $delta = $end - Time::HiRes::time();
+            last if( $delta <= 0 );
+            select( undef, undef, undef, $delta );
         }
     };
-    alarm(0);
-    if( $@ )
+
+    my $repo_key = "$file";
+    my $repo = Module::Generic::Global->new( 'fd_locks' => CORE::ref( $self ), key => $repo_key ) ||
+        return( $self->pass_error( Module::Generic::Global->error ) );
+    my $current_state = $repo->get || {};
+    if( $is_locked && ( !$current_state || ref( $current_state // '' ) ne 'HASH' ) )
     {
-        if( $@ =~ /timeout/i )
+        $current_state = $io->lock_state;
+    }
+    # If we have a current lock state, we use it first, as it provides great granularity, and allows us to take the proper steps.
+    if( ref( $current_state ) eq 'HASH' &&
+        CORE::exists( $current_state->{flags} ) )
+    {
+        # Double locking pitfall will result in hanging forever, so we handle it here gracefully.
+        # If this is not a thread process, and it is gone, we remove the lock repo, and try again.
+        if( $current_state->{tid} == 0 && 
+            $current_state->{pid} &&
+            !kill( 0, $current_state->{pid} ) )
         {
-            return( $self->error({
-                message => "Timed out after $opts->{timeout} seconds while attempting to set a lock on file \"$file\".",
-                # Gateway Timeout
-                code => 504
-            }) );
+            $repo->remove;
+            $self->unlock;
+        }
+        # A TTL has been provided by the user, and it has been reached.
+        elsif( $current_state->{timestamp} && 
+              defined( $current_state->{ttl} ) &&
+              $current_state->{ttl} =~ /^\d+$/ &&
+              ( $current_state->{timestamp} + $current_state->{ttl} ) < time() )
+        {
+            $repo->remove;
+            $self->unlock;
+        }
+        # The previous lock is a shared lock, and so is ours, so it will succeed. Let is play.
+        elsif( $current_state->{flags} &&
+            ( $current_state->{flags} & LOCK_SH ) &&
+            ( $flags & LOCK_SH ) )
+        {
+            # Ok, let the flock occur; it will work.
         }
         else
         {
-            return( $self->error({
-                message => "Unable to set a lock on file \"${file}\": $@",
-                code => 500,
-            }) );
+            if( $current_state->{pid} &&
+                $current_state->{pid} eq $$ )
+            {
+                # The previous lock was registered by our own process
+            }
+
+            # If a timeout has been set, and the flags do not include non-blocking, we wait and check if the lock has not been released in the meantime.
+            if( defined( $timeout ) && !( $flags & LOCK_NB ) )
+            {
+                my $lock_removed = 0;
+                my $now = Time::HiRes::time();
+                my $end   = $now + $timeout;
+                while( ( $now + $wait_step ) < $end )
+                {
+                    $current_state = $repo->get;
+                    if( !defined( $current_state ) ||
+                        (
+                            CORE::ref( $current_state // '' ) eq 'HASH' &&
+                            !scalar( keys( %$current_state ) )
+                        ) )
+                    {
+                        $repo->remove;
+                        $self->unlock;
+                        $lock_removed++;
+                        last;
+                    }
+                    $sleep_tight->( $wait_step );
+                    $now += $wait_step;
+                }
+
+                unless( $lock_removed )
+                {
+                    return( $self->error({
+                        message => "The file \"$file\" is locked after $timeout seconds timeout by process $current_state->{pid} in thread $current_state->{tid} from class " . $current_state->{caller}->[0] . ", and at line " . $current_state->{caller}->[2],
+                        # Request timeout
+                        code => 408,
+                    }) );
+                }
+            }
+            elsif( !( $flags & LOCK_NB ) )
+            {
+                return( $self->error({
+                    message => "The file \"$file\" is locked by process $current_state->{pid} in thread $current_state->{tid} from class " . $current_state->{caller}->[0] . ", and at line " . $current_state->{caller}->[2],
+                    # Resource is locked
+                    code => 423,
+                }) );
+            }
+            # If it has the non-blocking bit set, we let it play
         }
     }
 
-    return( $self->error({
-        message => "Unable to set a lock on file \"$file\": $!",
-        code => 500
-    }) ) if( !$rc );
+    # If non-blocking, fail immediately if not acquired
+    if( $flags & LOCK_NB )
+    {
+        my $rc = $io->flock( $flags );
+        # An error occurred
+        if( !defined( $rc ) && $io->error )
+        {
+            return( $self->pass_error( $io->error ) );
+        }
+        elsif( !$rc )
+        {
+            if( $!{EWOULDBLOCK} )
+            {
+                return( $self->error({
+                    message => "Another process with thread ID $current_state->{tid} and pid $current_state->{pid} already holds a lock on the file \"$file\" with flags $current_state->{flags}, and registered from class ", $current_state->{caller}->[0], " at line ", $current_state->{caller}->[2], ".",
+                    # Resource is locked
+                    code => 423
+                }) );
+            }
+            else
+            {
+                return( $self->error({
+                    message => "Non-blocking lock failed for file \"$file\": $!",
+                    # Resource is locked
+                    code => 423
+                }) );
+            }
+        }
+        my $caller = [caller];
+        $repo->set({
+            flags => $flags,
+            pid => $$,
+            tid => ( HAS_THREADS ? threads->tid() : 0 ),
+            timestamp => time(),
+            'caller' => $caller,
+            ( $opts->{ttl} ? ( ttl => $opts->{ttl} ) : () ),
+        });
+        $self->locked( $flags );
+        return( $self );
+    }
+
+    # If we have a timeout defined, we use the flags, possibly blocking, as-is, otherwise, we add the non-blocking bit to avoid hanging forever.
+    my $test_flags = defined( $timeout ) ? $flags : ( $flags | LOCK_NB );
+    # Defaults to 3 seconds timeout if none is specified, otherwise we would risk hanging forever.
+    $timeout //= 3;
+    # lock share = 1, exclusive = 2, unlock = 8, non-blocking = 4
+    # Avoid hanging forever.
+    local $SIG{ALRM} = sub{ die( "timeout" ); };
+    alarm( $timeout );
+    # try-catch
+    local $@;
+    my $rc = eval
+    {
+        $io->flock( $test_flags );
+    };
+    alarm(0);
+    if( $@ =~ /timeout/ )
+    {
+        return( $self->error({
+            message => "Timed out after $timeout seconds while attempting to set a lock on file \"$file\".",
+            # Gateway Timeout
+            code => 408
+        }) );
+    }
+    elsif( $@ )
+    {
+        my $e = $@;
+        $e =~ s/\r?\n$//gs;
+        return( $self->error({
+            message => "Unable to set a lock on file \"${file}\": $e",
+            # Resource is locked
+            code => 423
+        }) );
+    }
+    elsif( $!{EWOULDBLOCK} )
+    {
+        return( $self->error({
+            message => "Another process with thread ID $current_state->{tid} and pid $current_state->{pid} already holds a lock on the file \"$file\" with flags $current_state->{flags}, and registered from class ", $current_state->{caller}->[0], " at line ", $current_state->{caller}->[2], ".",
+            # Resource is locked
+            code => 423,
+        }) );
+    }
+    elsif( $rc )
+    {
+        # Successfully locked
+    }
+    else
+    {
+        return( $self->error({
+            message => "Unable to set a lock on file \"$file\": $!",
+            # Resource is locked
+            code => 423,
+        }) );
+    }
     $self->locked( $flags );
+    my $caller = [caller];
+    $repo->set({
+        flags => $flags,
+        pid => $$,
+        tid => ( HAS_THREADS ? threads->tid() : 0 ),
+        timestamp => time(),
+        'caller' => $caller,
+        ( $opts->{ttl} ? ( ttl => $opts->{ttl} ) : () ),
+    });
     return( $self );
 }
 
@@ -2680,40 +2834,12 @@ sub locked
 {
     my $self = shift( @_ );
     my $flags = $self->_set_get_scalar( 'locked', @_ );
-    $flags //= 0;
     # File is not opened, so it cannot be locked
+    # $fh is a Module::Generic::File::IO object
     my $fh = $self->opened || return(0);
     return( $flags ) if( scalar( @_ ) );
-    my $fd = $fh->fileno;
-    return( $self->error( "No file descriptor found for this filehandle." ) ) if( !defined( $fd ) );
-
-    # Check for forked child
-    my $pid_changed = ( CORE::length( $self->{pid} // '' ) && $self->{pid} != $$ );
-    my $should_check = HAS_THREADS || $pid_changed;
-
-    if( $should_check )
-    {
-        local $SIG{ALRM} = sub{ die( "lock timeout" ) };
-        alarm(1);
-        my $is_locked;
-        eval
-        {
-            $is_locked = !$fh->flock( LOCK_EX | LOCK_NB );
-        };
-        alarm(0);
-
-        if( $@ )
-        {
-            return( $self->error( "Unable to lock file (alarm) for descriptor $fd: $@" ) );
-        }
-        if( $is_locked )
-        {
-            # Return the flags used, but make sure to return true, but not 1, because 1 equates to shared lock in most system.
-            return( $flags || 0E0 ) if( $!{EWOULDBLOCK} );
-            return( $self->error( "Unable to lock the file \"", $self->filename, "\": $!" ) );
-        }
-    }
-    return( $flags );
+    my $rv = $fh->locked;
+    return( $rv );
 }
 
 sub max_recursion { return( shift->_set_get_number( 'max_recursion', @_ ) ); }
@@ -3064,7 +3190,7 @@ sub open
             return( $self->error( "Unable to open file \"${file}\" with mode '${mode}': $@" ) );
         }
         return( $self->error( "Unable to open file \"$file\": ", Module::Generic::File::IO->error ) ) if( !$io );
-        
+
         if( CORE::exists( $opts->{binmode} ) )
         {
             if( !defined( $opts->{binmode} ) || !CORE::length( $opts->{binmode} ) )
@@ -3119,7 +3245,7 @@ sub open
             $self->code(201); # created
         }
 
-        if( $opts->{lock} )
+        if( $opts->{lock} && !CORE::exists( $opts->{exclusive} ) && !CORE::exists( $opts->{shared} ) )
         {
             # 4 possibilities:
             # 1) regular open mode >, +>, >>, <, +<; or
@@ -3128,11 +3254,16 @@ sub open
             #    O_APPEND, O_ASYNC, O_CREAT, O_DEFER, O_EXCL, O_NDELAY, O_NONBLOCK, O_SYNC, O_TRUNC
             #    O_RDONLY, O_WRONLY, O_RDWR
             #    For example: O_WRONLY|O_APPEND
-            if( $mode eq '>' || $mode eq '+>' || 
-                $mode eq '>>' || $mode eq '+<' || 
-                $mode eq 'w' || $mode eq 'w+' || 
-                $mode eq 'r+' || $mode eq 'a' || 
-                $mode eq 'a+' )
+            if( $mode eq '>' ||
+                # $mode eq '+>' || 
+                # $mode eq '>>' || $mode eq '+<' || 
+                # $mode eq 'w' ||
+                $mode eq 'w'
+                # $mode eq 'w+' || 
+                # $mode eq 'r+' ||
+                # $mode eq 'a' || 
+                # $mode eq 'a+'
+            )
             {
                 $opts->{exclusive}++;
             }
@@ -3142,8 +3273,7 @@ sub open
             }
             elsif( $mode =~ /^\d+$/ )
             {
-                if( $mode & O_CREAT || $mode & O_APPEND || 
-                    $mode & O_EXCL || $mode & O_WRONLY )
+                if( $mode & ( O_CREAT | O_EXCL | O_WRONLY | O_RDWR ) )
                 {
                     $opts->{exclusive}++;
                 }
@@ -3355,7 +3485,7 @@ sub read
             {
                 return( $self->read( $opts ) );
             }
-        
+
             if( $opts->{as_object} )
             {
                 $f = $self->new( $f, base_dir => $self->filename ) || return( $self->pass_error );
@@ -3548,7 +3678,7 @@ sub rmtree
         return if( $opts->{max_files} > 0 && $files->length >= $opts->{max_files} );
         $files->push( $File::Find::name );
     };
-    
+
     # try-catch
     local $@;
     eval
@@ -3559,7 +3689,7 @@ sub rmtree
     {
         return( $self->error( "An unexpected error has occurred while trying to scan directory \"$dir\": $@" ) );
     }
-    
+
     my $total = $files->length;
     my $dirs_to_remove = $self->new_array;
     $files->for(sub
@@ -3572,9 +3702,9 @@ sub rmtree
             $files->return(-1);
         }
     });
-    
+
     my $prefix = $opts->{dry_run} ? '[DRY RUN]' : '[LIVE]';
-    
+
     # first, we remove all files we found with File::Find
     # then, we check those file path to derive their respective directory and we remove them as well
     # We start in reverse order to get the deepest files first
@@ -3622,7 +3752,7 @@ sub rmtree
             return( $self->error( "The following files could not be removed: ", $error_files->join( ', ' )->scalar ) );
         }
     }
-    
+
     my $cwd = $self->cwd;
     # If our current working directory is or contained by the one we want to remove, 
     # we chdir to the previous directory if any or default system one
@@ -3642,7 +3772,7 @@ sub rmtree
                 warnings::warn( "Unable to chdir to ", ( defined( $where ) ? "\"${where}\"" : 'default system location (if any)' ), ": $@\n" ) if( warnings::enabled() );
             }
         };
-        
+
         if( my $prev_cwd = $self->_prev_cwd )
         {
             $self->chdir( $prev_cwd ) || $go_there->( $prev_cwd );
@@ -3652,7 +3782,7 @@ sub rmtree
              $go_there->();
         }
     }
-    
+
     $dirs_to_remove->sort->reverse->foreach(sub
     {
         my $d = shift( @_ );
@@ -3735,7 +3865,7 @@ sub size
         {
             $total += -s( $File::Find::name ) if( -f( $File::Find::name ) );
         };
-        
+
         # try-catch
         local $@;
         eval
@@ -3807,7 +3937,7 @@ sub symlink
         }
         $this = $self->new( "$this", { os => $self->{os} } ) || return( $self->pass_error );
     }
-    
+
     return( $self->error( "There is already a file at \"${this}\"." ) ) if( $this->exists );
     my $file = $self->filepath;
     my $dest = $this->filepath;
@@ -3864,7 +3994,7 @@ sub tempfile
     {
         $opts->{suffix} = CORE::delete( $opts->{ext} );
     }
-    
+
     # $fname .= $opts->{suffix} if( CORE::defined( $opts->{suffix} ) && CORE::length( $opts->{suffix} ) && $opts->{suffix} =~ /^\.[\w\-\_]+$/ );
     if( CORE::defined( $opts->{suffix} ) && CORE::length( $opts->{suffix} ) && $opts->{suffix} =~ /^[\w\-\_\.]+$/ )
     {
@@ -3902,7 +4032,7 @@ sub tempfile
         return( $self->error( "Found an existing directory with the name just generated: \"$dir\". This should never happen." ) ) if( -e( $dir ) );
         CORE::mkdir( $dir ) || return( $self->error( "Unable to create temporary directory \"$dir\": $!" ) );
     }
-    
+
     unless( defined( $dir ) )
     {
         $dir = $sys_tmpdir;
@@ -3953,12 +4083,12 @@ sub tmpdir
     {
         $parent = $sys_tmpdir;
     }
-    
+
     unless( defined( $parent ) )
     {
         $parent = $sys_tmpdir;
     }
-    
+
     # Necessary contortion to accomodate systems like Windows that use 'volume'
     my( $vol, $basedir, $fname ) = $self->_spec_splitpath( $parent );
     my $dir  = $self->_spec_catpath( $vol, $self->_spec_catdir( [ $basedir, $fname ] ), $uuid->create_str );
@@ -4067,7 +4197,11 @@ sub unload
         return( $self->error( "File \"$file\" is opened, but not in write mode. Cannot unload data into it." ) );
     }
     $self->lock if( $opts->{lock} );
-    $io->print( ref( $data ) ? $$data : $data ) || return( $self->error( "Unable to print ", CORE::length( ref( $data ) ? $$data : $data ), " bytes of data to file \"${file}\": $!" ) );
+    if( !$io->print( ref( $data ) ? $$data : $data ) )
+    {
+        $self->unlock if( $opts->{lock} );
+        return( $self->error( "Unable to print ", CORE::length( ref( $data ) ? $$data : $data ), " bytes of data to file \"${file}\": $!" ) );
+    }
     $self->unlock if( $opts->{lock} );
     # close it if it were close before we opened it
     $io->close if( !$opened );
@@ -4172,6 +4306,7 @@ sub unload_csv
             };
             if( $@ )
             {
+                $self->unlock if( $opts->{lock} );
                 return( $self->error( "An error has occurred while trying to execute the callback for CSV line No $n: $@" ) );
             }
             elsif( !$row )
@@ -4213,6 +4348,7 @@ sub unload_csv
                 }
                 elsif( Scalar::Util::reftype( $headers ) ne 'ARRAY' )
                 {
+                    $self->unlock if( $opts->{lock} );
                     return( $self->error( "Invalid value provided for 'headers'. It can only be an array reference of headers or 'auto' (if the data is an array of hash reference)." ) );
                 }
 
@@ -4225,6 +4361,7 @@ sub unload_csv
                     };
                     if( $@ )
                     {
+                        $self->unlock if( $opts->{lock} );
                         return( $self->error( "Error writing the CSV headers to the file ${file}: $@" ) );
                     }
                     elsif( my $error = $csv->error_diag )
@@ -4247,6 +4384,7 @@ sub unload_csv
                 };
                 if( $@ )
                 {
+                    $self->unlock if( $opts->{lock} );
                     return( $self->error( "Error writing the CSV data for line $n to the file ${file}: $@" ) );
                 }
                 elsif( my $error = $csv->error_diag )
@@ -4267,6 +4405,7 @@ sub unload_csv
                 };
                 if( $@ )
                 {
+                    $self->unlock if( $opts->{lock} );
                     return( $self->error( "Error writing the CSV data for line $n to the file ${file}: $@" ) );
                 }
                 elsif( my $error = $csv->error_diag )
@@ -4282,6 +4421,7 @@ sub unload_csv
         $is_hash  = ref( $data->[0] // '' ) eq 'HASH';
         if( !$is_array && !$is_hash )
         {
+            $self->unlock if( $opts->{lock} );
             return( $self->error( "Data provided is neither an array reference nor an hash reference." ) );
         }
         elsif( $headers eq 'auto' )
@@ -4299,6 +4439,7 @@ sub unload_csv
         }
         elsif( Scalar::Util::reftype( $headers ) ne 'ARRAY' )
         {
+            $self->unlock if( $opts->{lock} );
             return( $self->error( "Invalid value provided for 'headers'. It can only be an array reference of headers or 'auto' (if the data is an array of hash reference)." ) );
         } 
 
@@ -4310,6 +4451,7 @@ sub unload_csv
             };
             if( $@ )
             {
+                $self->unlock if( $opts->{lock} );
                 return( $self->error( "Error writing the CSV headers to the file ${file}: $@" ) );
             }
             elsif( my $error = $csv->error_diag )
@@ -4328,6 +4470,7 @@ sub unload_csv
                 };
                 if( $@ )
                 {
+                    $self->unlock if( $opts->{lock} );
                     return( $self->error( "Error writing the CSV data at offset $i to the file ${file}: $@" ) );
                 }
             }
@@ -4349,6 +4492,7 @@ sub unload_csv
                 };
                 if( $@ )
                 {
+                    $self->unlock if( $opts->{lock} );
                     return( $self->error( "Error writing the CSV data at offset $i to the file ${file}: $@" ) );
                 }
                 elsif( my $error = $csv->error_diag )
@@ -4378,7 +4522,7 @@ sub unload_json
         sorted => 'canonical',
         sort => 'canonical',
     };
-    
+
     foreach my $opt ( keys( %$opts ) )
     {
         # We already save the data using the binmode utf8, so we do not want JSON to also encode it into utf8
@@ -4389,7 +4533,7 @@ sub unload_json
             warn( "Unknown JSON option '${opt}'\n" ) if( $self->_warnings_is_enabled );
             next;
         };
-        
+
         # try-catch
         local $@;
         eval
@@ -4462,63 +4606,58 @@ sub unlock
     return( $self ) if( !$self->locked );
     my $file = $self->filepath;
     my $io = $self->opened;
-    return( $self->error({
-        message => "File is not opened yet. You must open the file \"${file}\" first to unlock semaphore.",
-        code => 400
-    }) ) if( !$io );
-    return(1) if( $^O =~ /^(vms|riscos|vos)$/i );
+    return( $self->error( "File is not opened yet. You must open the file \"${file}\" first to unlock semaphore." ) ) if( !$io );
 
-    my $repo_key = $self->filepath;
-    my $repo = Module::Generic::Global->new( 'fd_locks' => $self, key => $repo_key ) ||
-        die( Module::Generic::Global->error );
+    my $repo_key = "$file";
+    my $repo = Module::Generic::Global->new( 'fd_locks' => CORE::ref( $self ), key => $repo_key ) ||
+        return( $self->pass_error( Module::Generic::Global->error ) );
+    my $rv = $repo->lock;
+    if( !$rv )
+    {
+        warn( "Failed to acquire a shared lock for file $file: ", $repo->error ) if( $self->_is_warnings_enabled );
+    }
+    my $current_state = $repo->get || {};
+    if( ref( $current_state ) eq 'HASH' &&
+        (
+            CORE::exists( $current_state->{tid} ) &&
+            $current_state->{tid} != ( HAS_THREADS ? threads->tid() : 0 )
+        ) ||
+        (
+            int( $current_state->{tid} ) == 0 &&
+            $current_state->{pid} != $$
+        ) )
+    {
+        warn( "Process $$ from thread ", ( HAS_THREADS ? threads->tid() : 0 ), " attempted to unlock file \"$file\" owned by thread $current_state->{tid} and pid $current_state->{pid} registered in class ", $current_state->{caller}->[0], " at line ", $current_state->{caller}->[2] ) if( $self->_is_warnings_enabled );
+    }
 
-    # my $flags = $self->locked | LOCK_UN;
-    # $flags ^= LOCK_NB if( $flags & LOCK_NB );
     my $flags = LOCK_UN;
     my $rc;
     # try-catch
     local $@;
     eval
     {
-        my $rv = $repo->lock;
-        if( !$rv )
-        {
-            warn( "Failed to acquire a shared lock for file $file: ", $repo->error ) if( $self->_is_warnings_enabled );
-        }
-        my $current_state = $repo->get || {};
-        if( ref( $current_state ) eq 'HASH' &&
-            CORE::exists( $current_state->{tid} ) &&
-            $current_state->{tid} != ( HAS_THREADS ? threads->tid() : 0 ) )
-        {
-            warn( "Thread ", ( HAS_THREADS ? threads->tid() : 0 ), " attempted to unlock file \"$file\" owned by thread $current_state->{tid}" ) if( $self->_is_warnings_enabled );
-        }
-
         $rc = $io->flock( $flags );
-        if( $rc )
-        {
-            # Clear lock flags
-            $repo->remove;
-        }
-        # The global repository lock gets destroyed automatically as it gets out of scope.
     };
     if( $@ )
     {
-        return( $self->error({
-            message => "Unable to unlock the file \"${file}\": $@",
-            code => 500
-        }) );
+        my $e = $@;
+        $e =~ s/\r?\n$//gs;
+        # Not strictly necessary
+        $repo->unlock;
+        return( $self->error({ message => "Unable to unlock file \"${file}\": $e", code => 500 }) );
     }
 
     if( $rc )
     {
         $self->locked(0);
+        $repo->unlock;
+        $repo->remove;
     }
     else
     {
-        return( $self->error({
-            message => "Unable to unlock the file \"${file}\" using flags '$flags': $!",
-            code => 500
-        }) );
+        # Not strictly necessary
+        $repo->unlock;
+        return( $self->error( "Unable to remove the lock from file \"${file}\" using flags '$flags': $!" ) );
     }
     return( $self );
 }
@@ -4590,7 +4729,7 @@ sub write
     return( $self->error( "File \"${file}\" is not opened with write permission." ) ) if( !$self->can_write );
     # Nothing to write was provided
     return( $self ) if( !scalar( @_ ) );
-    
+
     my $rv;
     # try-catch
     local $@;
@@ -4787,7 +4926,7 @@ sub _move_or_copy
                 }
                 # If $dest is a reference or an object, File::Copy will trigger its 
                 # own error which we will catch
-            
+
                 my( $vol, $path, $name ) = $self->_spec_splitpath( "$dest" );
                 $new_path = $dest = $self->_spec_catpath( $vol, $self->_spec_catdir( [ $path, $name ] ), $base );
                 return( $self->error( "There already exists a ", ( -d( $dest ) ? 'directory' : 'file' ), " \"${dest}\"." ) ) if( -e( $dest ) && ( !$opts->{overwrite} || !-d( $dest ) ) );
@@ -4820,7 +4959,7 @@ sub _move_or_copy
             return( $self->error( "An unexpected error occurred while trying to $what file \"${file}\" to \"${dest}\": $@" ) );
         }
         $code or return( $self->error( "Super weird. Could not find method '$what' in File::Copy!" ) );
-    
+
         $code->( $file, $dest ) || 
             return( $self->error( "Unable to $what file \"${file}\" to \"${dest}\": $!" ) );
     }
@@ -5045,7 +5184,7 @@ sub _standard_io
     my $io = IO::File->new;
     $io->fdopen( @$def{qw( fileno mode )} ) || 
         return( $self->error( "Unable to fdopen io \U${what}\E with fileno ", $def->{fileno}, " and option '", $def->{mode}, "': $!" ) );
-    
+
     if( CORE::exists( $opts->{binmode} ) )
     {
         if( !defined( $opts->{binmode} ) || !CORE::length( $opts->{binmode} ) )
@@ -5156,7 +5295,8 @@ sub DESTROY
     # <https://perldoc.perl.org/perlobj#Destructors>
     CORE::local( $., $@, $!, $^E, $? );
     CORE::return if( ${^GLOBAL_PHASE} eq 'DESTRUCT' );
-    my $self = shift( @_ ) || CORE::return;
+    my $self = CORE::shift( @_ );
+    CORE::return if( !CORE::defined( $self ) );
     my $file = $self->filepath;
     CORE::return unless( defined( $file ) );
     no warnings 'uninitialized';
@@ -5248,7 +5388,7 @@ sub TO_JSON { return( shift->filepath ); }
 {
     package
         IO::File;
-    
+
     sub flock { CORE::flock( shift( @_ ), shift( @_ ) ); }
 }
 
@@ -5262,7 +5402,7 @@ sub TO_JSON { return( shift->filepath ); }
         use warnings;
         use parent qw( Tie::Scalar );
     };
-    
+
     sub TIESCALAR
     {
         my $this = shift( @_ );
@@ -5290,7 +5430,7 @@ sub TO_JSON { return( shift->filepath ); }
         ${$$ref} = $opts;
         return( bless( $ref => $class ) );
     }
-    
+
     sub FETCH
     {
         my $self = shift( @_ );
@@ -5314,7 +5454,7 @@ sub TO_JSON { return( shift->filepath ); }
         $data =~ s/\0+$//g;
         return( $data );
     }
-    
+
     sub STORE
     {
         my $self = shift( @_ );
@@ -5340,6 +5480,7 @@ sub TO_JSON { return( shift->filepath ); }
         # This needs to be print and not syswrite, because we cannot mix syswrite and read/print
         if( !$fh->print( $_[0] ) )
         {
+            $parent->unlock;
             warn( "Unable to write ", CORE::length( $_[0] // '' ), " byte(s) to file \"", $parent->filename, "\": $!\n" );
             return;
         }
@@ -5354,13 +5495,17 @@ sub TO_JSON { return( shift->filepath ); }
         };
         CORE::delete( ${$$self}->{length} );
     }
-    
+
     sub DESTROY
     {
-        my $self = shift( @_ );
+        # <https://perldoc.perl.org/perlobj#Destructors>
+        CORE::local( $., $@, $!, $^E, $? );
+        CORE::return if( ${^GLOBAL_PHASE} eq 'DESTRUCT' );
+        my $self = CORE::shift( @_ );
+        CORE::return if( !CORE::defined( $self ) );
         undef( $self );
     }
-    
+
     sub message
     {
         my $self = shift( @_ );
@@ -5414,10 +5559,10 @@ Module::Generic::File - File Object Abstraction Class
     my $f = $d->child( "file.txt" )->touch;
     $f->code == 201 && say "Created!";
     say "File is empty" if( $f->is_empty );
-    
+
     my $file = tempfile();
     my $dir  = tempdir();
-    
+
     my $tmpname = $f->tmpname( suffix => '.txt' );
     my $f2 = $f->abs( $tmpname );
     my $sys_tmpdir = $f->sys_tmpdir;
@@ -5428,7 +5573,7 @@ Module::Generic::File - File Object Abstraction Class
     say "Can execute" if( $f->can_exec );
     $f->close if( $f->opened );
     say "File is ", $f->length, " bytes big.";
-    
+
     my $f = tempfile({ suffix => '.txt', auto_remove => 0 })->move( sys_tmpdir() );
     $f->open( '+>', { binmode => 'utf8' } );
     $f->seek(0,0);
@@ -5498,7 +5643,7 @@ Module::Generic::File - File Object Abstraction Class
         sep_char   => ',',
         quote_char => '"',
     ) || die( $file->error );
-    
+
     # Unload CSV data
     $file->unload_csv(
         $data,
@@ -5511,7 +5656,7 @@ Module::Generic::File - File Object Abstraction Class
 
 =head1 VERSION
 
-    v0.12.4
+    v0.13.0
 
 =head1 DESCRIPTION
 
@@ -6671,31 +6816,58 @@ This does the same as L</load>, but ensure the binmode used is C<:utf8> before p
 
 =head2 lock
 
-This method locks the file.
+    # Exports the same constant as Fcntl's flock
+    use Module::Generic::File qw( :flock );
+    $file->lock( LOCK_SH ); # lock share
+    # Do some coding
+    $file->unlock;
+
+or, using an hash or hash reference of options instead:
+
+    use Module::Generic::File;
+    # Shared lock with timeout
+    $file->lock( shared => 1, timeout => 2 ) || die( $file->error );
+    # Do some coding
+    $file->unlock;
+    # Exclusive non-blocking lock
+    $file->lock( exclusive => 1, non_blocking => 1 ) || warn( $file->error );
+
+This method locks the file using a combination of L<perlfunc/flock>, ensuring thread-safe and process-safe access via a shared repository (C<fd_locks>) managed by L<Module::Generic::Global>. Supports exclusive (C<LOCK_EX>) and shared (C<LOCK_SH>) locks, with optional non-blocking (C<LOCK_NB>) and timeout behavior. In blocking mode, it uses a non-blocking loop to retry until the lock is acquired or the timeout expires, avoiding indefinite waits. In non-blocking mode, fails immediately if the lock cannot be acquired.
 
 It takes either a numeric argument representing the flag bitwise, or a list or hash reference of optional parameters, such as:
+
+
+Accepts either a numeric bitwise flag (e.g., C<LOCK_EX | LOCK_NB>) or an hash or hash reference of options:
 
 =over 4
 
 =item * C<exclusive>
 
-This will add the bit of C<Fcntl::LOCK_EX>
+Enables an exclusive lock using the bit of C<Fcntl::LOCK_EX>
 
 =item * C<shared>
 
-This will add the bit of C<Fcntl::LOCK_SH>
+Enables a shared lock using the bit of C<Fcntl::LOCK_SH>
 
 =item * C<non_blocking> or C<nb>
 
-This will add the bit of C<Fcntl::LOCK_NB>
+Enables non-blocking mode using the bit of C<Fcntl::LOCK_NB>. Fails immediately if the lock cannot be acquired.
 
 =item * C<unlock>
 
-This will add the bit of C<Fcntl::LOCK_UN>
+Unlocks the file using the bit of C<Fcntl::LOCK_UN>
 
 =item * C<timeout>
 
-Takes an integer used to set an alarm for the lock. If a lock cannot be obtained before the timeout, an error is returned.
+A positive number (integer or decimal, e.g., C<5>, C<0.5>) specifying the maximum wait time in seconds. Uses a non-blocking retry loop with a wait step (minimum of C<timeout> or 0.1 seconds). Defaults to 5 seconds.
+
+=item * C<ttl>
+
+An optional positive integer specifying the lock’s time-to-live in seconds. If a lock’s age exceeds C<ttl>, it’s considered stale and removed, allowing reacquisition. Ignored if unset.
+
+=item * C<no_retry>
+
+If true, bypasses the retry loop, performing a single C<flock> call. Useful for applications like L<Promise::Me> requiring immediate lock attempts.
 
 =back
 
@@ -6825,7 +6997,7 @@ With fork:
     use Module::Generic::File qw( tempfile );
     use POSIX ();
     use Storable::Improved ();
-    
+
     my $file = tempfile({ unlink => 1 });
     $file->mmap( my $result, 10240, '+<' );
     # Block signal for fork
@@ -7489,7 +7661,7 @@ An array reference (or, an array object, such as L<Module::Generic::Array>) that
 =item * C<lock>
 
 Optional. Defaults to false.
- 
+
 If set to true, applies a lock to the file during writing to prevent concurrent modifications.
 
 =item * C<sep_char> or C<separator> or C<sep>

@@ -1,5 +1,11 @@
 Revision history for Getopt::EX -Mi18n module
 
+1.02 2025-07-29T10:39:06Z
+
+    - Replace custom ISO code modules with Locale::Codes
+    - Improve documentation clarity and correctness
+    - Add comprehensive test suite for i18n module
+
 1.01 2025-07-10T05:05:48Z
 
     - Added 'env' option to allow customizing the environment variable name

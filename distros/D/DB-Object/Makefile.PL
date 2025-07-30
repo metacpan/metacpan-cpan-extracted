@@ -34,14 +34,14 @@ my %WriteMakefileArgs = (
         'Fcntl'             => 0,
         'JSON'              => '4.10',
         'JSON::XS'          => '4.03',
-        'Module::Generic'   => 'v0.37.5',
+        'Module::Generic'   => 'v1.0.2',
         'Net::IP'           => '1.26',
         'POSIX'             => '1.53_01',
-        'Promise::Me'       => 'v0.5.0',
+        'Promise::Me'       => 'v0.6.0',
         'Regexp::Common'    => '2017060201',
         'Scalar::Util'      => '1.63',
         'URI'               => '5.16',
-        'Want'              => '0.29',
+        'Wanted'            => 'v0.1.0',
     },
     TEST_REQUIRES =>
     {

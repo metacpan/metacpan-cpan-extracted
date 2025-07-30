@@ -18,7 +18,7 @@ BEGIN
     use warnings;
     use parent qw( Net::API::CPAN::List );
     use vars qw( $VERSION );
-    use Want;
+    use Wanted;
     our $VERSION = 'v0.1.0';
 };
 

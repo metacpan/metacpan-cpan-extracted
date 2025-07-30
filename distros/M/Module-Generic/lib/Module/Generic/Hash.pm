@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Hash.pm
-## Version v1.4.1
-## Copyright(c) 2023 DEGUEST Pte. Ltd.
+## Version v1.5.0
+## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2025/05/28
+## Modified 2025/07/04
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -43,7 +43,7 @@ BEGIN
     );
     # Do we allow the use of object as hash keys?
     our $KEY_OBJECT = 0;
-    our( $VERSION ) = 'v1.4.1';
+    our( $VERSION ) = 'v1.5.0';
 };
 
 use strict;
@@ -56,7 +56,7 @@ sub new
 {
     my $that = shift( @_ );
     my $class = ref( $that ) || $that;
-    
+
     my %hash = ();
     # This enables access to the hash just like a real hash while still the user an call our object methods
     my $obj = tie( %hash, 'Module::Generic::TieHash', {
@@ -301,6 +301,32 @@ sub map_hash
     return( $self->new( {CORE::map( $code->( $_, $self->{ $_ } ), CORE::keys( %$self ) )} ) );
 }
 
+sub md5
+{
+    my $self = shift( @_ );
+    $self->_load_class( 'Digest::MD5' ) ||
+        return( $self->pass_error );
+    $self->_tie_object->enable(0);
+    my $data = $self->{data};
+    my $j = JSON->new->allow_nonref->canonical;
+    # try-catch
+    local $@;
+    my $json = eval{ $j->encode( $data ) };
+    if( $@ )
+    {
+        return( $self->error( "Unable to serialise the hash reference data to JSON: $@" ) );
+    }
+    my $checksum = Digest::MD5::md5_hex($json );
+    $self->_tie_object->enable(1);
+    return( $checksum );
+}
+
+{
+    no warnings 'once';
+    *md5_checksum = \&md5;
+    *md5_hex = \&md5;
+}
+
 sub merge
 {
     my $self = shift( @_ );
@@ -484,7 +510,8 @@ sub DESTROY
     # <https://perldoc.perl.org/perlobj#Destructors>
     CORE::local( $., $@, $!, $^E, $? );
     CORE::return if( ${^GLOBAL_PHASE} eq 'DESTRUCT' );
-    my $self = CORE::shift( @_ ) || CORE::return;
+    my $self = CORE::shift( @_ );
+    CORE::return if( !CORE::defined( $self ) );
     CORE::untie( %$self ) if( $self && CORE::tied( %$self ) );
 }
 

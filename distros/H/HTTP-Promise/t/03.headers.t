@@ -430,7 +430,10 @@ is( $h->authorization_basic, 'u:p' );
 is( j( $h->authorization_basic ), 'u|p' );
 is( $h->authorization, 'Basic dTpw' );
 
-$rv = $h->authorization_basic( 'u2:p' );
+{
+    no warnings;
+    $rv = $h->authorization_basic( 'u2:p' );
+}
 # diag( "Exepected error setting authorisation: ", $h->error ) if( $DEBUG && !defined( $rv ) );
 is( $rv, undef, 'authorization_basic failed' );
 like( $h->error->message, qr/Basic authorisation user name cannot contain/, 'authorization_basic failed message' );

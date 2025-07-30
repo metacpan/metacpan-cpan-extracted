@@ -1,0 +1,17 @@
+Changes
+Data/HexConverter.pm
+HexConverter.xs
+ignore.txt
+lib/Data/HexConverter.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/binary_to_hex.t
+t/hex_to_binary.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

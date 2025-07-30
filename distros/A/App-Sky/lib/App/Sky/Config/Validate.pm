@@ -1,5 +1,5 @@
 package App::Sky::Config::Validate;
-$App::Sky::Config::Validate::VERSION = '0.6.0';
+$App::Sky::Config::Validate::VERSION = '0.8.0';
 use strict;
 use warnings;
 
@@ -43,6 +43,23 @@ sub _validate_section
         }
     }
 
+OVER:
+    foreach my $string_key (qw( overrides ))
+    {
+        my $v = $sect_conf->{$string_key};
+        next OVER if !defined($v);
+        foreach my $kk (qw(dest_upload_prefix dest_upload_url_prefix))
+        {
+            my $s = $v->{$kk};
+            if (
+                not(
+                    defined($s) ? ( ( ref($s) eq '' ) && ( $s =~ m/\S/ ) ) : 1 )
+                )
+            {
+                die "$kk for section '$sect_name' is not a string.";
+            }
+        }
+    }
     return;
 }
 
@@ -127,7 +144,7 @@ App::Sky::Config::Validate - validate the configuration.
 
 =head1 VERSION
 
-version 0.6.0
+version 0.8.0
 
 =head1 METHODS
 

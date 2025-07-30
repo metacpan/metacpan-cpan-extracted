@@ -22,7 +22,7 @@ BEGIN
     use DB::Object::Query::Clause;
     use DB::Object::Query::Elements;
     use DB::Object::Query::Element;
-    use Want;
+    use Wanted;
     our $DEBUG = 0;
     our $VERSION = 'v0.7.3';
 };

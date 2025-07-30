@@ -7,7 +7,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use Mojo::Log;
 use Config::JSON::Enhanced;
@@ -43,7 +43,7 @@ use Android::ElectricSheep::Automator::ScreenLayout;
 use Android::ElectricSheep::Automator::XMLParsers;
 
 my $_DEFAULT_CONFIG = <<'EODC';
-</* $VERSION = '0.05'; */>
+</* $VERSION = '0.06'; */>
 </* comments are allowed */>
 </* and <% vars %> and <% verbatim sections %> */>
 {
@@ -929,7 +929,11 @@ sub tap {
 	return 0; # success
 }
 
-# returns 1 on failure, 0 on success
+# "type" the specified message into a text box expected to
+# be found on the specified position.
+# the message will be sanitised: spaces will be replaced with %s
+# unicode in text is not supported.
+# It returns 1 on failure, 0 on success
 # it needs that connect_device() to have been called prior to this call
 sub input_text {
 	my ($self, $params) = @_;
@@ -951,13 +955,18 @@ sub input_text {
 	# optional text, else we send just '' (but we clicked on it)
 	my $text = (exists($params->{'text'}) && defined($params->{'text'})) ? $params->{'text'} : '';
 
+	# sanitise the text a bit
+	# replace spaces with %s,
+	# also newlines seem not to be supported so replaces these as well
+	$text =~ s/[\n \t]/%s/g;
+
 	# first tap on the text edit widget at the specified coordinates to get focus
 	if( $self->tap($params) ){ $log->error("${whoami} (via $parent), line ".__LINE__." : error, failed to tap on the position of the recipient of the text input"); return 1 }
 	usleep(0.8);
 
 	# and send the text
 	# adb shell input text 'hello%sworld'
-	# does not support unicode and also spaces must be converted to %s
+	# does not support unicode and also spaces must be converted to %s (already have done this)
 	my @cmd = ('input', 'text', $text);
 	if( $verbosity > 0 ){ $log->info("${whoami} (via $parent), line ".__LINE__." : sending command to adb: @cmd") }
 	my $res = $self->adb->shell(@cmd);
@@ -1969,7 +1978,7 @@ Android::ElectricSheep::Automator - Do Androids Dream of Electric Sheep? Smartph
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =head1 WARNING
 
@@ -2580,10 +2589,18 @@ It returns C<0> on success, C<1> on failure.
 
 =item input_text($params)
 
-It inputs the specified text into a text-input widget
-at specified position. At first it taps at the widget's
+It "C<types>" the specified text into the specified position,
+where a text-input widget is expected to exist.
+At first it taps at the widget's
 location in order to get the focus. And then it enters
-the text.
+the text. You need to find the position of the desired
+text-input widget by first getting the current screen UI
+(using L<dump_current_screen_ui>) and then using an XPath
+selector to identify the desired widget by name/id/attributes.
+See the source code of method C<send_message()> in file
+C<lib/Android/ElectricSheep/Automator/Plugins/Apps/Viber.pm>
+for how this is done for the message-sending text-input widget
+of the Viber app.
 
 C<$params> is a HASH_REF which must contain C<text>
 and one of the two position (of the text-edit widget)

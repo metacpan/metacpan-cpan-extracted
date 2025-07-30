@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File/IO.pm
-## Version v0.1.6
+## Version v0.2.0
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/04/26
-## Modified 2025/05/28
+## Modified 2025/07/27
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -16,17 +16,18 @@ BEGIN
     use strict;
     use warnings;
     use warnings::register;
-    use Fcntl;
+    use Fcntl qw( :DEFAULT :flock :seek ); 
     use IO::File ();
     use parent qw( Module::Generic IO::File );
     use vars qw( $VERSION @EXPORT $THAW_REOPENS_FILE );
+    use Module::Generic::Global ':const';
     use Scalar::Util ();
     use Wanted;
     our @EXPORT = grep( /^(?:O_|F_GETFL|F_SETFL)/, @Fcntl::EXPORT );
     push( @EXPORT, @{$Fcntl::EXPORT_TAGS{flock}}, @{$Fcntl::EXPORT_TAGS{seek}} );
     our @EXPORT_OK = qw( wraphandle );
     our $THAW_REOPENS_FILE = 1;
-    our $VERSION = 'v0.1.6';
+    our $VERSION = 'v0.2.0';
 };
 
 use strict;
@@ -73,7 +74,7 @@ sub new
         }
         $rv or return( $this->error( "Unable to fdopen using file descriptor ${fileno} and mode ${mode}: $!" ) );
     }
-    
+
     *$self = { args => $args };
     if( Wanted::want( 'OBJECT' ) )
     {
@@ -143,7 +144,23 @@ sub can_write
     return( $flags & ( O_APPEND | O_WRONLY | O_CREAT | O_RDWR ) );
 }
 
-sub close { return( shift->_filehandle_method( 'close', @_ ) ); }
+sub close
+{
+    my $self = shift( @_ );
+    my $fd = $self->fileno;
+    my $rv = $self->_filehandle_method( 'close', @_ );
+    if( $rv && $fd )
+    {
+        my $repo_key = $fd;
+        my $repo = Module::Generic::Global->new( 'fd_locks' => CORE::ref( $self ), key => $repo_key ) ||
+            return( $self->pass_error( Module::Generic::Global->error ) );
+        # Clear any lock state
+        $repo->remove;
+        # Clear instance lock state
+        $self->locked(0);
+    }
+    return( $rv );
+}
 
 # sub constant { return( shift->_filehandle_method( 'constant', @_ ) ); }
 
@@ -186,16 +203,51 @@ sub flock
     my $self = shift( @_ );
     return( $self->error( 'usage: $io->flock( OPERATION );' ) ) if( scalar( @_ ) != 1 );
     my $op = shift( @_ );
-    my $rv;
+
+    my $fd = $self->fileno;
+    my $repo;
+    if( $fd )
+    {
+        my $repo_key = $fd;
+        $repo = Module::Generic::Global->new( 'fd_locks' => CORE::ref( $self ), key => $repo_key ) ||
+            return( $self->pass_error( Module::Generic::Global->error ) );
+        my $current_state = $repo->get;
+        # There is already a lock, and it is not an unlock operation, so we warn about it, and provides details.
+        if( !( $op & LOCK_UN ) &&
+            defined( $current_state ) &&
+            CORE::ref( $current_state // '' ) eq 'HASH' )
+        {
+            warn( "The process with thread ID $current_state->{tid} and pid $current_state->{pid} already holds a lock on the file handle with flags $current_state->{flags}, and registered from class ", $current_state->{caller}->[0], " at line ", $current_state->{caller}->[2], "." ) if( $self->_is_warnings_enabled );
+        }
+    }
     # try-catch
     local $@;
-    eval
+    my $rv = eval
     {
-        $rv = CORE::flock( *$self, $op );
+        CORE::flock( *$self, $op );
     };
     if( $@ )
     {
         return( $self->error( "An unexpected error occurred while trying to call flock with operation '$op': $@" ) );
+    }
+    if( $rv && defined( $repo ) )
+    {
+        if( $op & LOCK_UN )
+        {
+            $repo->remove;
+        }
+        else
+        {
+            # We possibly overwrite any previous lock information if the user executes a double lock, but at least we would have warned about it upper.
+            my $caller = [caller];
+            $repo->set({
+                flags => $op,
+                pid => $$,
+                tid => ( HAS_THREADS ? threads->tid() : 0 ),
+                timestamp => time(),
+                'caller' => $caller,
+            });
+        }
     }
     return( $rv );
 }
@@ -233,6 +285,79 @@ sub input_line_number { return( shift->_filehandle_method( 'input_line_number', 
 sub input_record_separator { return( shift->_filehandle_method( 'input_record_separator', @_ ) ); }
 
 sub ioctl { return( shift->_filehandle_method( 'ioctl', @_ ) ); }
+
+sub lock_state
+{
+    my $self = shift( @_ );
+    my $fd;
+    {
+        # There could be no file descriptor, and trying to access would trigger an error
+        no warnings;
+        $fd = $self->fileno;
+    }
+    if( $fd )
+    {
+        my $repo_key = $fd;
+        my $repo = Module::Generic::Global->new( 'fd_locks' => CORE::ref( $self ), key => $repo_key ) ||
+            return( $self->pass_error( Module::Generic::Global->error ) );
+        my $repo_data = $repo->get;
+        # undef is reserved for errors, so we return instead an empty string.
+        return( $repo_data // '' );
+    }
+    return( '' );
+}
+
+sub locked
+{
+    my $self = shift( @_ );
+    my $flags = $self->_set_get_scalar( 'locked', @_ );
+    # File is not opened, so it cannot be locked
+    $self->opened || return(0);
+    # Mutator mode, not checking
+    return( $flags ) if( scalar( @_ ) );
+    my $fd = $self->fileno;
+    return( $self->error( "No file descriptor found for this filehandle." ) ) if( !defined( $fd ) );
+    my $repo_key = $fd;
+    my $repo = Module::Generic::Global->new( 'fd_locks' => CORE::ref( $self ), key => $repo_key ) ||
+        return( $self->pass_error( Module::Generic::Global->error ) );
+    my $current_state = $repo->get;
+    # We first check if we have any fd locks repository data
+    if( defined( $current_state ) && CORE::ref( $current_state // '' ) eq 'HASH' )
+    {
+    	  # Here whatever $current_state->{pid} is, it necessarily has to be the same as $$ since Module::Generic::File::IO file descriptors change per process, and our key repo is a file descriptor.
+        return( $current_state->{flags} || 0E0 );
+    }
+
+    # We could not find any repository data, so we check using fcntl
+    # Try fcntl with F_GETLK (POSIX systems)
+    my $is_posix = ( $^O =~ /^(linux|darwin|freebsd|openbsd|netbsd|solaris|aix)$/i );
+    if( $is_posix )
+    {
+        # Exclusive lock probe
+        my $lock = pack( 'ssqqqq', F_WRLCK, SEEK_SET, 0, 0, 0, 0 );
+        my $rv = eval
+        {
+            $self->fcntl( F_GETLK, $lock );
+        };
+        if( $@ )
+        {
+            return( $self->error( "Unable to check lock status for file handle: $@" ) );
+        }
+
+        unless( defined( $rv ) )
+        {
+            return( $self->error( "Unable to check lock status for file handle: $!" ) );
+        }
+        my( $type ) = unpack( 's', $lock );
+        if( $type != F_UNLCK )
+        {
+            # Locked, return flags or true
+            return( $flags || 0E0 );
+        }
+    }
+    # Otherwise, simply return the state we have, which may be undef
+    return( $flags );
+}
 
 sub new_from_fd { return( shift->_filehandle_method( 'new_from_fd', @_ ) ); }
 
@@ -309,7 +434,7 @@ sub wraphandle
     {
         $fileno = CORE::fileno( $this );
     }
-    
+
     if( !defined( $fileno ) )
     {
         warn( "Cannot get a file descriptor from the filehandle (${this}) provided.\n" );
@@ -378,10 +503,11 @@ sub DESTROY
 {
     # <https://perldoc.perl.org/perlobj#Destructors>
     CORE::local( $., $@, $!, $^E, $? );
-    my $self = CORE::shift( @_ ) || CORE::return;
     CORE::return if( ${^GLOBAL_PHASE} eq 'DESTRUCT' );
+    my $self = CORE::shift( @_ );
+    CORE::return if( !CORE::defined( $self ) );
     # NOTE: Storable creates a dummy object as a SCALAR instead of GLOB, so we need to check.
-    $self->close if( ( Scalar::Util::reftype( $self ) // '' ) eq 'GLOB' );
+    $self->close if( ( Scalar::Util::reftype( $self ) // '' ) eq 'GLOB' && $self->opened );
 }
 
 sub FREEZE
@@ -458,9 +584,13 @@ Module::Generic::File::IO - File IO Object Wrapper
 
     use Module::Generic::File::IO;
     my $io = Module::Generic::File::IO->new || 
-        die( Module::Generic::File::IO->error, "\n" );
+        die( Module::Generic::File::IO->error );
+
+    my $io = Module::Generic::File::IO->new( 'file.txt', '>' ) || 
+        die( Module::Generic::File::IO->error );
+
     my $io = Module::Generic::File::IO->new( fileno => $fileno ) || 
-        die( Module::Generic::File::IO->error, "\n" );
+        die( Module::Generic::File::IO->error );
 
     use Module::Generic::File::IO qw( wraphandle );
     my $io = wraphandle( $fh );
@@ -468,11 +598,11 @@ Module::Generic::File::IO - File IO Object Wrapper
 
 =head1 VERSION
 
-    v0.1.6
+    v0.2.0
 
 =head1 DESCRIPTION
 
-This is a thin wrapper that inherits from L<IO::File> with the purpose of providing a uniform api in conformity with standard api call throughout the L<Module::Generic> modules family and to ensure call to any L<IO::File> will never die, but instead set an L<error|Module::Generic/error> and return C<undef>
+This is a thin wrapper that inherits from L<IO::File> with the purpose of providing a uniform api in conformity with standard api call throughout the L<Module::Generic> modules family and to ensure call to any L<IO::File> will never die, but instead set an L<error|Module::Generic/error> and return C<undef> in scalar context or an empty list in list context.
 
 Supported methods are rigorously the same as L<IO::File> and L<IO::Handle> on top of all the standard ones from L<Module::Generic>
 
@@ -497,6 +627,8 @@ A file descriptor. When this is provided, the newly created object will perform 
 A mode which will be used along with C<fileno> to fdopen the file descriptor. Possible values can be C<< < >>, C<< +< >>, C<< >+ >>, C<< +> >>, etc and C<r>, C<r+>, C<w>, C<w+>. C<a> and C<a+>
 
 =back
+
+See L<IO::File>, and L<perlfunc/open> for more information.
 
 =head1 FUNCTIONS
 
@@ -632,6 +764,18 @@ See L<IO::Handle/input_record_separator> for details
 =head2 ioctl
 
 See L<IO::Handle/ioctl> for details
+
+=head2 lock_state
+
+Returns an hash reference containing the state of the lock, if any, for the file handle.
+
+This data is set by L</flock>
+
+This method is mainly used by L<Module::Generic::File/lock>
+
+=head2 locked
+
+Check if the file handle is locked, and returns the associated flags if it is, or C<undef> otherwise.
 
 =head2 new_from_fd
 

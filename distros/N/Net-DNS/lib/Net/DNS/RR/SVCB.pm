@@ -2,7 +2,7 @@ package Net::DNS::RR::SVCB;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: SVCB.pm 2018 2025-07-01 11:57:43Z willem $)[2];
+our $VERSION = (qw$Id: SVCB.pm 2033 2025-07-29 18:03:07Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -82,7 +82,7 @@ sub _format_rdata {			## format rdata portion of RR string.
 	my $length = 2 + length $encode;
 	my @target = grep {length} split /(\S{32})/, unpack 'H*', $encode;
 	my $target = substr $self->{TargetName}->string, 0, 40;
-	push @rdata, join '', shift(@target), "\t; $target\n";
+	push @rdata, join '', shift(@target), "\t; $target\n" unless $target eq '.';
 	push @rdata, @target;
 
 	my $params = $self->{SvcParams} || [];
@@ -182,12 +182,10 @@ sub svcpriority {
 
 sub targetname {
 	my ( $self, @value ) = @_;				# uncoverable pod
-
-	for (@value) { $self->{TargetName} = Net::DNS::DomainName->new($_) }
-
+	$self->{TargetName} = Net::DNS::DomainName->new(@value) if @value;
 	my $target = $self->{TargetName} ? $self->{TargetName}->name : return;
-	return $target unless $self->{SvcPriority};
-	return ( $target eq '.' ) ? $self->owner : $target;
+	return $target unless $target eq '.';
+	return $self->{SvcPriority} ? $self->owner : undef;
 }
 
 
@@ -195,64 +193,63 @@ sub mandatory {				## mandatory=key1,port,...
 	my ( $self, @value ) = @_;
 	my @list = map { $keybyname{lc $_} || $_ } map { split /,/ } @value;
 	my @keys = map { /(\d+)$/ ? $1 : die( $self->type . qq[: unexpected "$_"] ) } @list;
-	return $self->key0( _integer16( sort { $a <=> $b } @keys ) );
+	return $self->_SvcParam( 0, _integer16( sort { $a <=> $b } @keys ) );
 }
 
 sub alpn {				## alpn=h3,h2,...
 	my ( $self, @value ) = @_;
-	return $self->key1( _string(@value) );
+	return $self->_SvcParam( 1, _string(@value) );
 }
 
 sub no_default_alpn {			## no-default-alpn	(Boolean)
 	my ( $self, @value ) = @_;				# uncoverable pod
-	return $self->key2() if defined wantarray;
-	return $self->key2( _boolean(@value) );
+	return $self->_SvcParam(2) if defined wantarray;
+	return $self->_SvcParam( 2, _boolean(@value) );
 }
 
 sub port {				## port=1234
 	my ( $self, @value ) = @_;
-	return $self->key3( map { _integer16($_) } @value );
+	return $self->_SvcParam( 3, map { _integer16($_) } @value );
 }
 
 sub ipv4hint {				## ipv4hint=192.0.2.1,...
 	my ( $self, @value ) = @_;
-	return $self->key4( _ipv4(@value) );
+	return $self->_SvcParam( 4, _ipv4(@value) );
 }
 
 sub ech {				## ech=base64
 	my ( $self, @value ) = @_;
-	return $self->key5( map { _base64($_) } @value );
+	return $self->_SvcParam( 5, map { _base64($_) } @value );
 }
 
 sub ipv6hint {				## ipv6hint=2001:DB8::1,...
 	my ( $self, @value ) = @_;
-	return $self->key6( _ipv6(@value) );
+	return $self->_SvcParam( 6, _ipv6(@value) );
 }
 
 sub dohpath {				## dohpath=/dns-query{?dns}
 	my ( $self, @value ) = @_;				# uncoverable pod
-	return $self->key7(@value);
+	return $self->_SvcParam( 7, map { substr _string($_), 1 } @value );
 }
 
 sub ohttp {				## ohttp
 	my ( $self, @value ) = @_;				# uncoverable pod
-	return $self->key8() if defined wantarray;
-	return $self->key8( _boolean(@value) );
+	return $self->_SvcParam(8) if defined wantarray;
+	return $self->_SvcParam( 8, _boolean(@value) );
 }
 
 sub tls_supported_groups {		## tls_supported_groups=29,23
 	my ( $self, @value ) = @_;				# uncoverable pod
-	return $self->key9( _integer16(@value) );
+	return $self->_SvcParam( 9, _integer16(@value) );
 }
 
 
 ########################################
 
 
-sub _presentation {			## represent octet string(s) using local charset
+sub _concatenate {			## concatenate octet string(s)
 	my @arg = @_;
-	my $raw = scalar(@arg) ? join( '', @arg ) : return ();	# concatenate arguments
-	return Net::DNS::Text->decode( \$raw, 0, length($raw) )->string;
+	return scalar(@arg) ? join( '', @arg ) : return ();
 }
 
 sub _boolean {
@@ -263,27 +260,27 @@ sub _boolean {
 
 sub _string {
 	my @arg = @_;
-	return _presentation( map { Net::DNS::Text->new($_)->encode() } @arg );
+	return _concatenate( map { Net::DNS::Text->new($_)->encode() } @arg );
 }
 
 sub _base64 {
 	my @arg = @_;
-	return _presentation( map { MIME::Base64::decode($_) } @arg );
+	return _concatenate( map { MIME::Base64::decode($_) } @arg );
 }
 
 sub _integer16 {
 	my @arg = @_;
-	return _presentation( map { pack( 'n', $_ ) } @arg );
+	return _concatenate( map { pack( 'n', $_ ) } @arg );
 }
 
 sub _ipv4 {
 	my @arg = @_;
-	return _presentation( map { Net::DNS::RR::A::address( {}, $_ ) } @arg );
+	return _concatenate( map { Net::DNS::RR::A::address( {}, $_ ) } @arg );
 }
 
 sub _ipv6 {
 	my @arg = @_;
-	return _presentation( map { Net::DNS::RR::AAAA::address( {}, $_ ) } @arg );
+	return _concatenate( map { Net::DNS::RR::AAAA::address( {}, $_ ) } @arg );
 }
 
 
@@ -304,6 +301,16 @@ sub AUTOLOAD {				## Dynamic constructor/accessor methods
 	return $self->$super(@argument) unless $method =~ /^key[0]*(\d+)$/i;
 	my $key = $1;
 
+	return $self->_SvcParam($key) unless @argument;
+	my $first = shift @argument;
+	my $value = defined $first ? Net::DNS::Text->new($first)->raw : $first;
+	return $self->_SvcParam( $key, $value, @argument );
+}
+
+
+sub _SvcParam {
+	my ( $self, $key, @argument ) = @_;
+
 	my $paramsref = $self->{SvcParams} || [];
 	my %svcparams = @$paramsref;
 
@@ -314,7 +321,7 @@ sub AUTOLOAD {				## Dynamic constructor/accessor methods
 		die( $self->type . qq[: invalid SvcParam "key$key"] )	if $key > 65534;
 		die( $self->type . qq[: unexpected "key$key" value] )	if scalar @argument;
 		delete $self->{rdata};
-		$svcparams{$key} = Net::DNS::Text->new("$arg")->raw if defined $arg;
+		$svcparams{$key} = $arg if defined $arg;
 		$self->{SvcParams} = [map { ( $_, $svcparams{$_} ) } sort { $a <=> $b } keys %svcparams];
 	} else {
 		die( $self->type . qq[: no value specified for "key$key"] ) unless defined wantarray;

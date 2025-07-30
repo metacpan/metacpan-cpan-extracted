@@ -664,6 +664,7 @@ sub unlock
     return( $sth );
 }
 
+# NOTE: DESTROY
 DESTROY
 {
     # Do nothing

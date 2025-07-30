@@ -141,7 +141,7 @@ sub callback
         warnings::warn( "Callback provided is not a code reference. Provide an anonymous subroutine, or reference to existing subroutine." ) if( warnings::enabled( 'Module::Generic::Array' ) );
         CORE::return;
     }
-    
+
     if( !defined( $code ) )
     {
         # undef is passed as an argument, so we remove the callback
@@ -1166,8 +1166,9 @@ sub DESTROY
 {
     # <https://perldoc.perl.org/perlobj#Destructors>
     CORE::local( $., $@, $!, $^E, $? );
-    my $self = CORE::shift( @_ ) || CORE::return;
     CORE::return if( ${^GLOBAL_PHASE} eq 'DESTRUCT' );
+    my $self = CORE::shift( @_ );
+    CORE::return if( !CORE::defined( $self ) );
 
     for my $namespace ( qw( errors return loaded_classes ) )
     {
@@ -1229,7 +1230,7 @@ sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
     };
 
     our $dummy_callback = sub{1};
-    
+
     sub TIEARRAY
     {
         my( $class, $opts ) = @_;
@@ -1251,7 +1252,7 @@ sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
             warnings::warn( "Code provided for the array remove callback is not a code reference.\n" ) if( warnings::enabled( 'Module::Generic::Array' ) || $opts->{debug} );
             CORE::return;
         }
-        
+
         my $ref =
         {
         callback_add => $opts->{add},
@@ -1262,7 +1263,7 @@ sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
         print( STDERR ( ref( $class ) || $class ), "::TIEARRAY: Using ", CORE::scalar( @{$ref->{data}} ), " elements in array vs ", CORE::scalar( @{$opts->{data}} ), " received via opts->data.\n" ) if( $ref->{debug} );
         CORE::return( bless( $ref => ( ref( $class ) || $class ) ) );
     }
-    
+
     sub CLEAR
     {
         my $self = shift( @_ );
@@ -1286,7 +1287,7 @@ sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
         CORE::return if( !defined( $rv ) );
         @{$self->{data}} = ();
     }
-    
+
     sub DELETE
     {
         my( $self, $key ) = @_;
@@ -1311,7 +1312,7 @@ sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
         CORE::return if( !defined( $rv ) );
         CORE::return( CORE::splice( @$data, $key, 1 ) );
     }
-    
+
     sub EXISTS
     {
         my( $self, $key ) = @_;
@@ -1319,26 +1320,26 @@ sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
         CORE::return(0) if( $key > $#$data || $key < 0 );
         CORE::return(1);
     }
-    
+
     sub EXTEND
     {
         my( $self, $count ) = @_;
         # This is an optional method, so we set it as a noop
     }
-    
+
     sub FETCH
     {
         my( $self, $index ) = @_;
         CORE::return( $self->{data}->[ $index ] );
     }
-    
+
     sub FETCHSIZE
     {
         my $self = shift( @_ );
         my $data = $self->{data};
         CORE::return( $#$data + 1 );
     }
-    
+
     sub POP
     {
         my $self = shift( @_ );
@@ -1362,7 +1363,7 @@ sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
         CORE::return if( !defined( $rv ) );
         CORE::return( CORE::splice( @$data, -1 ) );
     }
-    
+
     sub PUSH
     {
         my( $self, @values ) = @_;
@@ -1386,7 +1387,7 @@ sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
         CORE::return if( !defined( $rv ) );
         CORE::splice( @$data, ( $#$data + 1 ), 0, @values );
     }
-    
+
     sub SHIFT
     {
         my $self = shift( @_ );
@@ -1409,7 +1410,7 @@ sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
         CORE::return if( !defined( $rv ) );
         CORE::return( CORE::splice( @$data, 0, 1 ) );
     }
-    
+
     sub SPLICE
     {
         my( $self, $offset, $len, @values ) = @_;
@@ -1459,7 +1460,7 @@ sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
         CORE::return if( !defined( $rv ) );
         CORE::return( CORE::splice( @$data, $offset, $len, @values ) );
     }
-    
+
     sub STORE
     {
         my( $self, $index, $value ) = @_;
@@ -1482,7 +1483,7 @@ sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
         CORE::return if( !defined( $rv ) );
         $self->{data}->[ $index ] = $value;
     }
-    
+
     sub STORESIZE
     {
         my( $self, $count ) = @_;
@@ -1497,7 +1498,7 @@ sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
 #             CORE::splice( @$data, ( $count - 1 ) );
 #         }
     }
-    
+
     sub UNSHIFT
     {
         my( $self, @values ) = @_;
@@ -1522,13 +1523,13 @@ sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
         CORE::return if( !defined( $rv ) );
         CORE::return( CORE::splice( @$data, 0, 0, @values ) );
     }
-    
+
     sub UNTIE
     {
         my( $self, $ref_count ) = @_;
         # noop
     }
-    
+
     sub get_caller
     {
         my $self = shift( @_ );
@@ -1542,14 +1543,14 @@ sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
         }
         CORE::return( $info );
     }
-    
+
     sub has_callback
     {
         my $self = shift( @_ );
         CORE::return(1) if( ref( $self->{callback_add} ) eq 'CODE' || ref( $self->{callback_remove} ) eq 'CODE' );
         CORE::return(0);
     }
-    
+
     sub set_callback
     {
         my( $self, $what, $code ) = @_;
@@ -1576,7 +1577,7 @@ sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
         $self->{ "callback_${what}" } = $code;
         CORE::return(1);
     }
-    
+
     sub unset_callback
     {
         my( $self, $what ) = @_;

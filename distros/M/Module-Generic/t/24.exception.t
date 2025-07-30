@@ -15,6 +15,7 @@ BEGIN
 
 use strict;
 use warnings;
+no warnings 'once';
 
 subtest 'methods' => sub
 {

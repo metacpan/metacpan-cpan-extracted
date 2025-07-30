@@ -1,6 +1,6 @@
 <form
     id="translationForm"
-    hx-get="/Helpers/AISuggestion/ProcessAIRequest"
+    hx-get="<% RT->Config->Get('WebPath') %>/Helpers/AISuggestion/ProcessAIRequest"
     hx-target="#ai-result"
     hx-indicator="#spinner"
     hx-swap="innerHTML"
@@ -49,7 +49,7 @@
         <button
             type="submit"
             class="btn btn-primary px-4"
-            hx-post="/Helpers/AISuggestion/ProcessAIRequest"
+            hx-post="<% RT->Config->Get('WebPath') %>/Helpers/AISuggestion/ProcessAIRequest"
             hx-trigger="click"
             hx-target="#ai-result"
             hx-indicator="#spinner"
