@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = '0.017';
+our $VERSION = '0.018';
 
 use parent qw(CPANPLUS::Dist::Debora::Package);
 
@@ -731,7 +731,7 @@ sub _get_epoch {
 sub _get_version_with_epoch {
     my $self = shift;
 
-    my $version = $self->SUPER::version;
+    my $version = $self->version;
 
     my $epoch = $self->_get_epoch;
     if ($epoch) {
@@ -926,7 +926,7 @@ CPANPLUS::Dist::Debora::Package::Debian - Create Debian packages
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
 =head1 SYNOPSIS
 

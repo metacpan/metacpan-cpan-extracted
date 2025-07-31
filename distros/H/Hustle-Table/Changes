@@ -1,5 +1,10 @@
 Revision history for Perl extension Hustle::Table
 
+v0.7.1 2025-07-29
+  [fixes]
+    - Updated to use Template::Plex v0.9.0
+    - Fixed memory leak when generating dispatcher
+
 v0.7.0 2025-01-11
   [improvments]
     - Now will return multiple matches not just first match

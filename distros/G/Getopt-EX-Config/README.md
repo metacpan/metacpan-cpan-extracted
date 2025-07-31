@@ -15,7 +15,7 @@ Getopt::EX::Config - Getopt::EX module configuration interface
 
 # VERSION
 
-Version 0.9904
+Version 0.9905
 
 # DESCRIPTION
 
@@ -85,6 +85,11 @@ style option specifications.
 Then you can use module private option like this:
 
     example -Mcharcode --width --no-code --name=Benjy -- ...
+
+By default, option names with underscores are automatically aliased with
+dash equivalents. For example, if you specify `long_lc!`, both `--long_lc`
+and `--long-lc` will work. This conversion can be disabled by setting
+`$Getopt::EX::Config::REPLACE_UNDERSCORE` to 0.
 
 The reason why it is not necessary to specify the destination of the
 value is that the hash object is passed when calling the
@@ -175,6 +180,18 @@ for detail.
             $config->deal_with($argv,
                                "width!", "code!", "name=s");
         }
+
+# VARIABLES
+
+- **$REPLACE\_UNDERSCORE**
+
+    When set to true (default), option names with underscores are automatically
+    aliased with dash equivalents. For example, `long_lc!` becomes 
+    `long_lc|long-lc!`, allowing both `--long_lc` and `--long-lc` to work.
+
+    Set to false to disable this conversion:
+
+        $Getopt::EX::Config::REPLACE_UNDERSCORE = 0;
 
 # SEE ALSO
 

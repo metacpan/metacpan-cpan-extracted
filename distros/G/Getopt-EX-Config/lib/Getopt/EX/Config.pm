@@ -3,7 +3,9 @@ package Getopt::EX::Config;
 use v5.14;
 use warnings;
 
-our $VERSION = '0.9904';
+our $VERSION = '0.9905';
+
+our $REPLACE_UNDERSCORE = 1;
 
 use Data::Dumper;
 use Getopt::Long qw(GetOptionsFromArray);
@@ -55,6 +57,11 @@ sub getopt {
     my $obj = shift;
     my $argv = shift // [];
     return if @{ $argv } == 0;
+    
+    # Convert underscore options to underscore|dash format
+    @_ = map { ref($_) ? $_ : s/^(\w*_[\w_]*)/"$1|" . ($1 =~ s:_:-:gr)/er } @_
+        if $REPLACE_UNDERSCORE;
+    
     GetOptionsFromArray(
 	$argv,
 	$obj,
@@ -141,7 +148,7 @@ Getopt::EX::Config - Getopt::EX module configuration interface
 
 =head1 VERSION
 
-Version 0.9904
+Version 0.9905
 
 =head1 DESCRIPTION
 
@@ -212,6 +219,11 @@ style option specifications.
 Then you can use module private option like this:
 
     example -Mcharcode --width --no-code --name=Benjy -- ...
+
+By default, option names with underscores are automatically aliased with
+dash equivalents. For example, if you specify C<long_lc!>, both C<--long_lc>
+and C<--long-lc> will work. This conversion can be disabled by setting
+C<$Getopt::EX::Config::REPLACE_UNDERSCORE> to 0.
 
 The reason why it is not necessary to specify the destination of the
 value is that the hash object is passed when calling the
@@ -309,6 +321,22 @@ definition with that call.
         $config->deal_with($argv,
                            "width!", "code!", "name=s");
     }
+
+=back
+
+=head1 VARIABLES
+
+=over 7
+
+=item B<$REPLACE_UNDERSCORE>
+
+When set to true (default), option names with underscores are automatically
+aliased with dash equivalents. For example, C<long_lc!> becomes 
+C<long_lc|long-lc!>, allowing both C<--long_lc> and C<--long-lc> to work.
+
+Set to false to disable this conversion:
+
+    $Getopt::EX::Config::REPLACE_UNDERSCORE = 0;
 
 =back
 

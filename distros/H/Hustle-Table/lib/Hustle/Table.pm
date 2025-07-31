@@ -1,5 +1,5 @@
 package Hustle::Table;
-our $VERSION="v0.7.0";
+our $VERSION="v0.7.1";
 
 use strict;
 use warnings;
@@ -181,12 +181,14 @@ sub _prepare_online_cached {
         my $index=0;
         my $base={index=>0, item=>undef};
         my $sub=$self->load([$sub], $base);
-        map {
+        my @out=map {
           $base->{index}=$_;
           $base->{item}=$table->[$_];
           my $s=$sub->render;
           $s;
         } 0..$table->@*-2;
+        $sub->cleanup;
+        @out;
       }]}
 
 
@@ -201,10 +203,11 @@ sub _prepare_online_cached {
     return \@output;
 	} ';
 
-	my $top_level=Template::Plex->load([$template],{table=>$table, cache=>$cache, sub=>$sub_template});
-	my $s=$top_level->render;
-	my $ss=eval $s;
-	$ss;
+  my $top_level=Template::Plex->load([$template],{table=>$table, cache=>$cache, sub=>$sub_template});
+  my $s=$top_level->render;
+  $top_level->cleanup;
+  my $ss=eval $s;
+  $ss;
 }
 
 

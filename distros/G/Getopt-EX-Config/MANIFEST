@@ -6,6 +6,10 @@ README.md
 cpanfile
 lib/Getopt/EX/Config.pm
 minil.toml
+share/README.JA.md
+share/README.md
+share/getopt_ex_migrator.py
 t/00_compile.t
+t/01_underscore_dash.t
 META.yml
 MANIFEST

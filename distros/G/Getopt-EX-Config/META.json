@@ -4,7 +4,7 @@
       "Kazumasa Utashiro"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.25",
+   "generated_by" : "Minilla/v3.1.26",
    "license" : [
       "perl_5"
    ],
@@ -55,7 +55,7 @@
    "provides" : {
       "Getopt::EX::Config" : {
          "file" : "lib/Getopt/EX/Config.pm",
-         "version" : "0.9904"
+         "version" : "0.9905"
       }
    },
    "release_status" : "stable",
@@ -70,10 +70,10 @@
          "web" : "https://github.com/kaz-utashiro/Getopt-EX-Config"
       }
    },
-   "version" : "0.9904",
+   "version" : "0.9905",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.16",
+   "x_serialization_backend" : "JSON::PP version 4.06",
    "x_static_install" : 1
 }

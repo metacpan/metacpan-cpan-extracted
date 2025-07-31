@@ -23,24 +23,25 @@ Write a template:
 Use a template:
 
 ```perl
-    use Template::Plex;
+      use Template::Plex;
 
-    my $vars={
-            size=>"large",
-            slices=>8,
-            people=>[qw<Kim Sam Harry Sally>]
-    };
+      my $vars={
+              size=>"large",
+              slices=>8,
+              people=>[qw<Kim Sam Harry Sally>]
+      };
 
-    my $template= Template::Plex->load(\*DATA, $vars);
+      my $template= Template::Plex->load(\*DATA, $vars);
 
-    print $template->render;        
+      print $template->render;        
 
 
-    #OUTPUT
-    Dear Mr. Connery,
-    Ordered a large pizza with 8 slices to share between Kim, Sam, Harry,
-    Sally and myself.  That averages 1.6 slices each.     
-    
+
+      #OUTPUT
+      Dear Mr. Connery,
+      Ordered a large pizza with 8 slices to share between Kim, Sam, Harry,
+      Sally and myself.  That averages 1.6 slices each.     
+      
 ```
 
 Change values and render it again:
@@ -56,6 +57,12 @@ Change values and render it again:
     Dear Mr. Connery,
     Ordered a extra large pizza with 12 slices to share between Kim, Sam,
     Harry, Sally and myself.  That averages 2.4 slices each.
+```
+
+When the template is no longer needed:
+
+```
+$template->cleanup;
 ```
 
 # DESCRIPTION
@@ -970,6 +977,17 @@ hash containing field variables. `fields` is aliased into the template as
 
 Note that the lexically aliased variables setup in `load` are independent to
 the `%fields` variable and can both be used simultaneously in a template
+
+## cleanup
+
+```
+$template->cleanup;
+```
+
+After a template is no longer needed, this is called to release internal
+variables. Due to the complex relationship with aliasing, simply letting the
+variable going storing the template going out of scope will not destroy the
+template
 
 # SUB CLASSING
 

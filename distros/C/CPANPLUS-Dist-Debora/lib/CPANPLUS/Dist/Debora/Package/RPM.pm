@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = '0.017';
+our $VERSION = '0.018';
 
 use parent qw(CPANPLUS::Dist::Debora::Package);
 
@@ -336,10 +336,7 @@ URL:       [% $escape->($package->url) %]
 [%
 use Config;
 
-my $perl_version   = $Config{version};
-my $perl_vendorlib = $Config{installvendorlib};
-
-my $distdir = "$perl_vendorlib/auto/share/dist/CPANPLUS-Dist-Debora";
+my $perl_version = $Config{version};
 
 my $has_shared_objects = (@{$package->shared_objects} > 0);
 
@@ -574,7 +571,7 @@ CPANPLUS::Dist::Debora::Package::RPM - Create binary RPM packages
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
 =head1 SYNOPSIS
 

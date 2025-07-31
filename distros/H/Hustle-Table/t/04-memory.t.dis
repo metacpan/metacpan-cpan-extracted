@@ -1,0 +1,22 @@
+use strict;
+use warnings;
+
+use Hustle::Table;
+use Test::More;
+
+my $table=Hustle::Table->new;
+
+$table->add({matcher=>"a",value=>sub {}});
+$table->add({matcher=>"a",value=>sub {}});
+$table->add({matcher=>"a",value=>sub {}});
+$table->add({matcher=>"a",value=>sub {}});
+$table->add({matcher=>"a",value=>sub {}});
+$table->add({matcher=>"a",value=>sub {}});
+
+my $d;
+for(1..10000){
+  $d=$table->prepare_dispatcher;
+};
+
+ok defined $d;
+done_testing;

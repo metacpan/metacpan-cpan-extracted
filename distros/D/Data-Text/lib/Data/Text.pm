@@ -15,11 +15,11 @@ Data::Text - Class to handle text in an OO way
 
 =head1 VERSION
 
-Version 0.16
+Version 0.17
 
 =cut
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 use overload (
 	'==' => \&equal,
@@ -101,7 +101,7 @@ sub set {
 	my $params = Params::Get::get_params('text', @_);
 
 	if(!defined($params->{'text'})) {
-		Carp::carp(__PACKAGE__, ': no text given');
+		Carp::carp(__PACKAGE__, ': no text given to set()');
 		return;
 	}
 
@@ -154,7 +154,7 @@ sub append
 
 	# Check if text is provided
 	unless(defined $text) {
-		Carp::carp(__PACKAGE__, ': no text given');
+		Carp::carp(__PACKAGE__, ': no text given to append()');
 		return;
 	}
 
@@ -216,7 +216,7 @@ Converts the text to lowercase.
 =cut
 
 sub lowercase {
-	my $self = shift;
+	my $self = $_[0];
 
 	$self->{'text'} = lc($self->{'text'}) if(defined($self->{'text'}));
 
@@ -335,7 +335,7 @@ Replaces multiple words in the text.
 
     $dt->append('Hello World');
     $dt->replace({ 'Hello' => 'Goodbye', 'World' => 'Universe' });
-    print $dt->as_string(), "\n";	# Outputs "Goodbye dear world"
+    print $dt->as_string(), "\n";	# Outputs "Goodbye Universe"
 
 =cut
 
@@ -343,7 +343,7 @@ sub replace {
 	my ($self, $replacements) = @_;
 
 	if($self->{'text'} && (ref($replacements) eq 'HASH')) {
-		foreach my $search (keys %$replacements) {
+		foreach my $search (keys %{$replacements}) {
 			my $replace = $replacements->{$search};
 			$self->{'text'} =~ s/\b\Q$search\E\b/$replace/g;
 		}

@@ -1,4 +1,13 @@
 Revision history for Perl extension Template::Plex.
+v0.9.0 2025-07-29
+  [fixes]
+    - fixed incorrect element access is DESTROY method
+
+  [improvements]
+    - cleanup() method added to  Template::Plex to prevent memory leaks do to complex relationship with variables and aliasing.
+    - removed redundant variables
+    - template now tracks the cache it is stored in (if any) to aid in removal when cleanup() is called.
+    
 v0.8.0 2024-12-09
   [fixes]
     - immediate load/render only forces id to path/caller combo when undefined

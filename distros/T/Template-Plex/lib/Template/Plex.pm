@@ -3,7 +3,7 @@ package Template::Plex;
 use strict;
 use warnings;
 
-our $VERSION = 'v0.8.0';
+our $VERSION = 'v0.9.0';
 use feature qw<say refaliasing>;
 no warnings "experimental";
 
@@ -18,10 +18,10 @@ use constant::more DEBUG=>0;
 
 use constant::more {plex_=>0, meta_=>1, args_=>2, sub_=>3,
   package_=>4, init_done_flag_=>5, skip_=>6,
-	cache_=>7, slots_=>8, parent_=>9, default_result_=>10
+	cache_=>7, slots_=>8, parent_=>9, default_result_=>10, id_=>11, ref_cache_=>12
 };
 
-use constant::more KEY_COUNT=>default_result_ - plex_ +1;
+use constant::more KEY_COUNT=>ref_cache_ - plex_ +1;
 
 #Template::Plex::Internal uses the field name constants so import it AFTER
 #we define them
@@ -31,7 +31,7 @@ our %top_level_cache;
 sub new {
 	my ($package, $plex)=@_;
 	my $self=[];
-	$self->[plex_]=$plex;
+  #$self->[plex_]=$plex;
 	$self->[cache_]={};
   $self->[slots_]={};
 	bless $self, $package;
@@ -117,6 +117,9 @@ sub cache {
       }
       else {
         my $template=$self->load($path, $vars, %opts);
+        $template->[id_]=$id;
+        $template->[ref_cache_]=$self->[cache_];
+        
         $self->[cache_]{$id}//=$template;
       }
 		}
@@ -127,6 +130,8 @@ sub cache {
       }
       else {
         my $template=$self->load($path, $vars, %opts);
+        $template->[id_]=$id;
+        $template->[ref_cache_]=\%top_level_cache;
         $top_level_cache{$id}//=$template;
       }
 		}
@@ -163,9 +168,11 @@ sub immediate {
 }
 
 
-sub _plex_ {
-	$_[0][Template::Plex::plex_];
-}
+#########################################
+# sub _plex_ {                          #
+#         $_[0][Template::Plex::plex_]; #
+# }                                     #
+#########################################
 
 sub meta :lvalue { $_[0][Template::Plex::meta_]; }
 
@@ -399,12 +406,25 @@ sub parent {$_[0][parent_];}
 
 
 
-
+# the callee is reomved from refernece cache if an ID is present.
+# internal variables are released
+#
+sub cleanup {
+  #use Data::Dumper;
+  #say STDERR Dumper $_[0];
+  for($_[0][id_]//()){
+    delete $_[0][ref_cache_]{$_};
+  }
+  delete_package $_[0][meta_]{package};# if $_[0][package_];
+  $_[0]->@*=();
+  $_[0]=undef;
+}
 
 
 
 sub DESTROY {
-  delete_package $_[0][package_] if $_[0][package_];
+  #say STDERR "DESTROY";
+  delete_package $_[0][meta_]{package} if $_[0][meta_]{package};
 }
 
 #Internal testing use only

@@ -4,7 +4,7 @@
       "Andreas V\u00f6gele <voegelas@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -83,39 +83,39 @@
    "provides" : {
       "CPANPLUS::Dist::Debora" : {
          "file" : "lib/CPANPLUS/Dist/Debora.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       },
       "CPANPLUS::Dist::Debora::License" : {
          "file" : "lib/CPANPLUS/Dist/Debora/License.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       },
       "CPANPLUS::Dist::Debora::Package" : {
          "file" : "lib/CPANPLUS/Dist/Debora/Package.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       },
       "CPANPLUS::Dist::Debora::Package::Debian" : {
          "file" : "lib/CPANPLUS/Dist/Debora/Package/Debian.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       },
       "CPANPLUS::Dist::Debora::Package::Mageia" : {
          "file" : "lib/CPANPLUS/Dist/Debora/Package/Mageia.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       },
       "CPANPLUS::Dist::Debora::Package::RPM" : {
          "file" : "lib/CPANPLUS/Dist/Debora/Package/RPM.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       },
       "CPANPLUS::Dist::Debora::Package::Tar" : {
          "file" : "lib/CPANPLUS/Dist/Debora/Package/Tar.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       },
       "CPANPLUS::Dist::Debora::Pod" : {
          "file" : "lib/CPANPLUS/Dist/Debora/Pod.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       },
       "CPANPLUS::Dist::Debora::Util" : {
          "file" : "lib/CPANPLUS/Dist/Debora/Util.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       }
    },
    "release_status" : "stable",
@@ -130,8 +130,8 @@
          "web" : "https://github.com/voegelas/CPANPLUS-Dist-Debora"
       }
    },
-   "version" : "0.017",
-   "x_generated_by_perl" : "v5.40.1",
+   "version" : "0.018",
+   "x_generated_by_perl" : "v5.40.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.39",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }

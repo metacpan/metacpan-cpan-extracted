@@ -48,8 +48,8 @@ use Template::Plex::Internal qw<pl block jmap>;
 no warnings qw<syntax>;
 ";
 
-$out.='my $self=$plex;
-';
+#$out.='my $self=$plex;
+#';
 
 $out.= '	\my %fields=$href;
 ';
@@ -67,7 +67,10 @@ $out.='
 	my %cache;	#Stores code refs using caller as keys
 
 	sub clear {
-		%cache=();
+    for (keys %cache){
+      my $t=delete $cache{$_};
+      $t->cleanup;
+    }
 	}
 
         sub skip{
@@ -166,12 +169,13 @@ $out.='
 		my ($id, $path, $var, @opts)=@args;
 		#we want to cache based on the caller
 		$id//=$path.join "", caller;
-		my $template=$self->cache($id, $path,$var, @opts);
+		my $template=$self->cache($id, $path, $var, @opts);
 		if($template){
 			return $template->render($var);
 		}
 		"";
 	}
+
 
 
 	sub {
@@ -214,8 +218,11 @@ sub _prepare_template{
 	$plex->[Template::Plex::meta_]=\%opts;
 	$plex->[Template::Plex::args_]=$href;
 
+  my $self=$plex;
 	my $prog=&Template::Plex::Internal::bootstrap;
  	my $ref=eval $prog;
+  use Scalar::Util qw<weaken>;
+  weaken($self);
 	if($@ and !$ref){
     my $e=$@; #Save the error as require will nuke it
     require Error::Show;

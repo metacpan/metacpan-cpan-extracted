@@ -14,7 +14,7 @@ WriteMakefile(
 						#@{^CAPTURE}=> 5.26
 	PREREQ_PM => {
     "constant::more"=>0,
-		"Template::Plex"=>"v0.4.2",
+		"Template::Plex"=>"v0.9.0",
 	},
 	AUTHOR => 'Ruben Westerberg <drclaw@mac.com>',
 	LICENSE => 'mit',

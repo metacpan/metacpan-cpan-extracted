@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = '0.017';
+our $VERSION = '0.018';
 
 use Carp qw(croak);
 use Config;
@@ -528,6 +528,7 @@ sub _normalize_version {
     }
 
     $version =~ s{\A v}{}xms;    # Strip "v".
+    $version =~ s/[-_]/~/g;      # Handle release candidates.
 
     return $version;
 }
@@ -1237,7 +1238,7 @@ CPANPLUS::Dist::Debora::Package - Base class for package formats
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
 =head1 SYNOPSIS
 

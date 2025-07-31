@@ -1,5 +1,9 @@
 Revision history for Perl module Test::HTTPStatus
 
+2.11	Wed Jul 30 21:56:17 EDT 2025
+	Handle uninitialized variable
+		http://www.cpantesters.org/report/c4765a02-6a5c-11f0-bebe-d734df91eea4
+
 2.10	Thu Apr 17 07:52:28 EDT 2025
 	Fix GitHub URL (RT#163754 - SREZIC)
 	Fix http://www.cpantesters.org/cpan/report/37119888-165c-11f0-98b0-b3c3213a625c

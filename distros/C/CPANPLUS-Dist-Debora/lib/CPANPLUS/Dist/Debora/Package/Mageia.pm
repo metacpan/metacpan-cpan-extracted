@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = '0.017';
+our $VERSION = '0.018';
 
 use parent qw(CPANPLUS::Dist::Debora::Package::RPM);
 
@@ -49,7 +49,7 @@ CPANPLUS::Dist::Debora::Package::Mageia - Create binary RPM packages
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
 =head1 SYNOPSIS
 

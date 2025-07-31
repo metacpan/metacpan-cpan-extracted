@@ -4,7 +4,7 @@ Data::Text - Class to handle text in an OO way
 
 # VERSION
 
-Version 0.16
+Version 0.17
 
 # DESCRIPTION
 
@@ -110,7 +110,7 @@ Replaces multiple words in the text.
 
     $dt->append('Hello World');
     $dt->replace({ 'Hello' => 'Goodbye', 'World' => 'Universe' });
-    print $dt->as_string(), "\n";       # Outputs "Goodbye dear world"
+    print $dt->as_string(), "\n";       # Outputs "Goodbye Universe"
 
 ## appendconjunction
 

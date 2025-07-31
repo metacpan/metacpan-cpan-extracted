@@ -7,6 +7,7 @@ build_requires:
   Test::DescribeMe: '0'
   Test::Most: '0'
   Test::Needs: '0'
+  Test::Returns: '0'
   Test::Warnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -22,7 +23,7 @@ no_index:
     - t
     - inc
 requires:
-  DateTime::Format::Genealogy: '0'
+  DateTime::Format::Genealogy: '0.11'
   ExtUtils::MakeMaker: '6.64'
   Scalar::Util: '0'
   Term::ANSIColor: '0'
@@ -31,5 +32,5 @@ resources:
   bugtracker: https://github.com/nigelhorne/Date-Cmp/issues
   homepage: https://metacpan.org/pod/Date::Cmp
   repository: git://github.com/nigelhorne/Date-Cmp.git
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

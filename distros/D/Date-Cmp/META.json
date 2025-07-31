@@ -32,7 +32,7 @@
       },
       "runtime" : {
          "requires" : {
-            "DateTime::Format::Genealogy" : "0",
+            "DateTime::Format::Genealogy" : "0.11",
             "ExtUtils::MakeMaker" : "6.64",
             "Scalar::Util" : "0",
             "Term::ANSIColor" : "0",
@@ -44,6 +44,7 @@
             "Test::DescribeMe" : "0",
             "Test::Most" : "0",
             "Test::Needs" : "0",
+            "Test::Returns" : "0",
             "Test::Warnings" : "0"
          }
       }
@@ -63,6 +64,6 @@
          "x_repository" : "https://github.com/nigelhorne/Date-Cmp"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

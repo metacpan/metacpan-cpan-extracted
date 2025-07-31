@@ -1,5 +1,15 @@
 Revision history for Perl extension Getopt-EX-Config
 
+0.9905 2025-07-30T11:40:29Z
+
+    - Add automatic underscore-to-dash conversion in Config.pm
+      * Add REPLACE_UNDERSCORE variable to control conversion (default: enabled)
+      * Convert option specs like long_lc! to long_lc|long-lc!
+      * Add comprehensive test suite for conversion functionality
+      * Document the new variable and behavior
+
+    - Add experimental Getopt::EX::Config migration MCP server
+
 0.9904 2025-03-07T01:54:42Z
 
     - import config() function as a different name

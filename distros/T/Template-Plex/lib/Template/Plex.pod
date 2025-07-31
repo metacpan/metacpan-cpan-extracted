@@ -31,6 +31,7 @@ Use a template:
 	my $template= Template::Plex->load(\*DATA, $vars);
 
 	print $template->render;	
+  
 
 
 	#OUTPUT
@@ -51,6 +52,10 @@ Change values and render it again:
 	Dear Mr. Connery,
 	Ordered a extra large pizza with 12 slices to share between Kim, Sam,
 	Harry, Sally and myself.  That averages 2.4 slices each.
+
+When the template is no longer needed:
+
+  $template->cleanup;
 
 
 =head1 DESCRIPTION
@@ -923,6 +928,14 @@ C<%fields> which is directly accessible in the template
 Note that the lexically aliased variables setup in C<load> are independent to
 the C<%fields> variable and can both be used simultaneously in a template
 
+=head2 cleanup
+
+  $template->cleanup;
+
+After a template is no longer needed, this is called to release internal
+variables. Due to the complex relationship with aliasing, simply letting the
+variable going storing the template going out of scope will not destroy the
+template
 
 =head1 SUB CLASSING
 

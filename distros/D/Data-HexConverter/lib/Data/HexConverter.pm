@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Exporter qw(import);
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use XSLoader;
 XSLoader::load(__PACKAGE__, $VERSION);
@@ -28,6 +28,9 @@ Data::HexConverter - High performance hex string to binary converter
     my $binary  = Data::HexConverter::hex_to_binary($hex_ref);
     # $binary now contains "ABCD"
 
+	 my $hex = Data::HexConverter::binary_to_hex(\$binary);
+	 # $hex now contains "41424344"
+
 =head1 DESCRIPTION
 
 This module provides two functions, C<hex_to_binary> and
@@ -48,7 +51,7 @@ scalar implementation and emit a warning if SSSE3 is not available.
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
@@ -92,4 +95,3 @@ This is free software, licensed under:
 
 =cut
 
-=cut

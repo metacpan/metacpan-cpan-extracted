@@ -4,7 +4,7 @@ Date::Cmp - Compare two dates with approximate parsing support
 
 # VERSION
 
-Version 0.03
+Version 0.04
 
 # SYNOPSIS
 
@@ -22,7 +22,7 @@ Version 0.03
 This module provides a single function, `datecmp`, which compares two date strings
 or date-like objects, returning a numeric comparison similar to Perl's spaceship operator (`<=>`).
 
-The comparison is tolerant of approximate dates (e.g. "Abt. 1902", "BET 1830 AND 1832", "Oct/Nov/Dec 1950"),
+The comparison is tolerant of approximate dates (e.g., "Abt. 1902", "BET 1830 AND 1832", "Oct/Nov/Dec 1950"),
 partial dates (years only), and strings with common genealogy-style formats. It attempts to normalize
 and parse these into comparable values using [DateTime::Format::Genealogy](https://metacpan.org/pod/DateTime%3A%3AFormat%3A%3AGenealogy).
 
@@ -53,7 +53,8 @@ Parameters:
 
 # SUPPORTED FORMATS
 
-The function supports a variety of partial or approximate formats including:
+The function supports a variety of partial or approximate formats,
+including:
 
 - Exact dates (e.g. `1941-08-02`, `5/27/1872`)
 - Years only (e.g. `1828`)
@@ -67,6 +68,37 @@ The function supports a variety of partial or approximate formats including:
 In cases where a date cannot be parsed or compared meaningfully, diagnostic messages
 will be printed to STDERR, and the function may die with an error. Callbacks and
 stack traces are used to help identify parsing issues.
+
+## FORMAL SPECIFICATION
+
+    [DATESTR, DIAGMSG]
+
+    DATE ::= exact⟨year: ℕ⟩
+           | approx⟨year: ℕ⟩
+           | before⟨year: ℕ⟩
+           | after⟨year: ℕ⟩
+           | range⟨from: ℕ; to: ℕ⟩
+           | invalid
+
+    COMPARISON ::= lt | eq | gt | error
+
+    DateCmp
+    left?, right?: DATESTR
+    diagnostic!: ℙ DIAGMSG
+    result!: COMPARISON
+
+    ∀d: DATESTR @ validDate(d)
+
+    ≙
+    ∃ l, r: DATE •
+        l = parse(left?) ∧ r = parse(right?) ∧
+        (
+          (l = invalid ∨ r = invalid ⇒ result! = error) ∧
+          (l = r ⇒ result! = eq) ∧
+          (compare(l, r, diagnostic!) = -1 ⇒ result! = lt) ∧
+          (compare(l, r, diagnostic!) = 0 ⇒ result! = eq) ∧
+          (compare(l, r, diagnostic!) = 1 ⇒ result! = gt)
+        )
 
 # AUTHOR
 

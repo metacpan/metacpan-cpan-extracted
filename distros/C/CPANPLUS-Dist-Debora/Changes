@@ -1,5 +1,9 @@
 Revision history for CPANPLUS-Dist-Debora
 
+0.018  2025-07-30 11:31:29 CEST
+
+  - Handle release candidate versions
+
 0.017  2025-02-19 09:55:02 CET
 
   - Use localhost if Net::Domain::hostfqdn fails

@@ -1,0 +1,54 @@
+#!/usr/bin/perl
+
+# Copyright (c) 2024-2025 Löwenfelsen UG (haftungsbeschränkt)
+
+# licensed under Artistic License 2.0 (see LICENSE file)
+
+# ABSTRACT: module for interacting with SIRTX VM code
+
+use strict;
+use warnings;
+use v5.16;
+
+use Getopt::Long;
+use SIRTX::VM::Assembler;
+
+my %config = (
+    output      => undef,
+    dumpfile    => undef,
+);
+my $asm;
+
+{
+    my %opts;
+
+    $opts{'output|o=s'} = \$config{output};
+    $opts{'dumpfile=s'} = \$config{dumpfile};
+
+    $opts{'help|h'} = sub {
+        printf("Usage: %s [OPTIONS] -o output.vmv0 input.vmv0-asm\n", $0);
+        say '';
+        printf("OPTIONS:\n");
+        printf(" %s\n", $_) foreach sort keys %opts;
+        exit(0);
+    };
+
+    Getopt::Long::Configure('bundling');
+    GetOptions(%opts);
+}
+
+if (scalar(@ARGV) != 1) {
+    die "Error: Invalid number of input files. Need exactly one.\n";
+}
+
+if (!defined($config{output}) || !length($config{output})) {
+    die "Error: No output file given, use -o\n";
+}
+
+$asm = SIRTX::VM::Assembler->new(in => $ARGV[0], out => $config{output});
+
+$asm->run;
+
+$asm->dump($config{dumpfile}) if defined($config{dumpfile}) && length($config{dumpfile})
+
+#ll

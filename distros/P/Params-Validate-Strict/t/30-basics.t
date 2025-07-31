@@ -7,7 +7,7 @@ use Params::Validate::Strict qw(validate_strict);
 
 subtest 'Valid Inputs' => sub {
 	my $schema = {
-		username => { type => 'string', min => 3, max => 50 },
+		username => { type => 'string', min => 3, max => 50, nomatch => qr/\d/ },
 		age => { type => 'integer', min => 0, max => 150 },
 		email => { type => 'string', matches => qr/^[^@]+@[^@]+\.[^@]+$/ },
 		bio => { type => 'string', optional => 1 },
@@ -28,7 +28,7 @@ subtest 'Valid Inputs' => sub {
 		username => 'test_user',
 		age => '30',
 		email => 'test@example.com',
-		bio => "A test bio",
+		bio => 'A test bio',
 		price => "19.99",
 		quantity => "10",
 		password => 'P@$$wOrd123',
@@ -72,6 +72,12 @@ subtest 'Valid Inputs' => sub {
 	throws_ok { $validated_params3 = validate_strict(schema => $schema, args => $args3) }
 		qr /Required parameter '.+' is missing/,
 		'missing required parameter throws exception';
+
+	$schema = {
+		'number' => { 'type' => 'integer', 'memberof' => [998, 999, 1000] }
+	};
+	my $args4 = { number => 999 };
+	ok defined validate_strict(schema => $schema, args => $args4, unknown_parameter_handler => 'die');
 };
 
 subtest "Invalid Inputs" => sub {
@@ -93,7 +99,7 @@ subtest "Invalid Inputs" => sub {
 		name => 'string',
 	};
 
-	my $args1 = { username => "sh" }; # Too short
+	my $args1 = { username => 'sh' };	# Too short
 	my $validated_params1 = eval { validate_strict(schema => $schema, args => $args1) };
 	like $@, qr/username/, "Short username should fail";
 
@@ -143,6 +149,14 @@ subtest "Invalid Inputs" => sub {
 	throws_ok {
 		validate_strict(args => $args12, schema => { number => 'integer' });
 	} qr/must be an integer/, 'Fails validation for non-scalar';
+
+	my $args13 = { number => 997 };
+	$schema = {
+		'number' => { 'type' => 'integer', 'memberof' => [998, 999, 1000] }
+	};
+	throws_ok {
+		validate_strict(args => $args13, schema => $schema, unknown_parameter_handler => 'die')
+	} qr/is not a member of/, 'memberof detects when a number is not in the list';
 };
 
 done_testing();

@@ -6,7 +6,12 @@ use Test::Most tests => 11;	# Combines Test::More, Test::Exception, etc.
 use Test::NoWarnings;
 # use lib 'lib';	# Add the path to the module
 
-BEGIN { use_ok('Data::Text') }
+BEGIN {
+	delete $ENV{'LANG'};
+	delete $ENV{'LC_ALL'};
+
+	use_ok('Data::Text');
+}
 
 # Test new() and as_string()
 my $text = Data::Text->new('Hello');

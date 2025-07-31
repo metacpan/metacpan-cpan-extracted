@@ -29,6 +29,7 @@ SYNOPSIS
             my $template= Template::Plex->load(\*DATA, $vars);
 
             print $template->render;        
+  
 
 
             #OUTPUT
@@ -48,6 +49,10 @@ SYNOPSIS
             Dear Mr. Connery,
             Ordered a extra large pizza with 12 slices to share between Kim, Sam,
             Harry, Sally and myself.  That averages 2.4 slices each.
+
+    When the template is no longer needed:
+
+      $template->cleanup;
 
 DESCRIPTION
     "Template::Plex" facilitates the use of Perl (not embedded perl) as a
@@ -841,6 +846,14 @@ API
     Note that the lexically aliased variables setup in "load" are
     independent to the %fields variable and can both be used simultaneously
     in a template
+
+  cleanup
+      $template->cleanup;
+
+    After a template is no longer needed, this is called to release internal
+    variables. Due to the complex relationship with aliasing, simply letting
+    the variable going storing the template going out of scope will not
+    destroy the template
 
 SUB CLASSING
     Sub classing is as per the standard Perl "use parent". The object

@@ -6,7 +6,7 @@ package Date::Cmp;
 use strict;
 use warnings;
 
-use DateTime::Format::Genealogy;
+use DateTime::Format::Genealogy 0.11;
 use Scalar::Util;
 use Term::ANSIColor;
 
@@ -15,17 +15,19 @@ our @EXPORT_OK = qw(datecmp);
 
 our $dfg = DateTime::Format::Genealogy->new();
 
+=encoding utf-8
+
 =head1 NAME
 
 Date::Cmp - Compare two dates with approximate parsing support
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 SYNOPSIS
 
@@ -43,7 +45,7 @@ our $VERSION = '0.03';
 This module provides a single function, C<datecmp>, which compares two date strings
 or date-like objects, returning a numeric comparison similar to Perl's spaceship operator (C<< <=> >>).
 
-The comparison is tolerant of approximate dates (e.g. "Abt. 1902", "BET 1830 AND 1832", "Oct/Nov/Dec 1950"),
+The comparison is tolerant of approximate dates (e.g., "Abt. 1902", "BET 1830 AND 1832", "Oct/Nov/Dec 1950"),
 partial dates (years only), and strings with common genealogy-style formats. It attempts to normalize
 and parse these into comparable values using L<DateTime::Format::Genealogy>.
 
@@ -84,7 +86,8 @@ e.g. when comparing a range with equal endpoints.
 
 =head1 SUPPORTED FORMATS
 
-The function supports a variety of partial or approximate formats including:
+The function supports a variety of partial or approximate formats,
+including:
 
 =over 4
 
@@ -107,6 +110,37 @@ The function supports a variety of partial or approximate formats including:
 In cases where a date cannot be parsed or compared meaningfully, diagnostic messages
 will be printed to STDERR, and the function may die with an error. Callbacks and
 stack traces are used to help identify parsing issues.
+
+=head2 FORMAL SPECIFICATION
+
+    [DATESTR, DIAGMSG]
+
+    DATE ::= exact⟨year: ℕ⟩
+           | approx⟨year: ℕ⟩
+           | before⟨year: ℕ⟩
+           | after⟨year: ℕ⟩
+           | range⟨from: ℕ; to: ℕ⟩
+           | invalid
+
+    COMPARISON ::= lt | eq | gt | error
+
+    DateCmp
+    left?, right?: DATESTR
+    diagnostic!: ℙ DIAGMSG
+    result!: COMPARISON
+
+    ∀d: DATESTR @ validDate(d)
+
+    ≙
+    ∃ l, r: DATE •
+        l = parse(left?) ∧ r = parse(right?) ∧
+        (
+          (l = invalid ∨ r = invalid ⇒ result! = error) ∧
+          (l = r ⇒ result! = eq) ∧
+          (compare(l, r, diagnostic!) = -1 ⇒ result! = lt) ∧
+          (compare(l, r, diagnostic!) = 0 ⇒ result! = eq) ∧
+          (compare(l, r, diagnostic!) = 1 ⇒ result! = gt)
+        )
 
 =cut
 
@@ -151,7 +185,7 @@ sub datecmp
 		}
 	}
 
-	if((!ref($left)) && (!ref($right)) && ($left =~ /(\d{3,4})$/) && ($left !~ /^bet/i) && ($right !~ /^bet/i)) {
+	if((!ref($left)) && (!ref($right)) && ($left =~ /(\d{3,4})$/) && ($left !~ /^bet/i) && ($left !~ /\-/) && ($right !~ /^bet/i) && ($right !~ /\-/)) {
 		# Simple year test for fast comparison
 		my $yol = $1;
 		if($right =~ /(\d{3,4})$/) {
@@ -257,7 +291,8 @@ sub datecmp
 			} else {
 				if(ref($right)) {
 					$right = $right->year();
-				} elsif($right !~ /^\d{4}$/) {
+				}
+				if($right !~ /^\d{4}$/) {
 					my @r = $dfg->parse_datetime({ date => $right, quiet => 1 });
 					if(!defined($r[0])) {
 						if($right =~ /[\s\/](\d{4})$/) {
@@ -283,6 +318,11 @@ sub datecmp
 					}
 					$right = $r[0]->year();
 				}
+				# Comparing with a year only
+				if($right == $from) {
+					# '1802-1803' <=> '1802'
+					return 0;
+				}
 				if($right < $from) {
 					return 1;
 				}
@@ -294,6 +334,10 @@ sub datecmp
 				}
 				if(($right > $from) && ($right < $to)) {
 					# E.g. "BET 1900 AND 1902" <=> 1901
+					return 0;
+				}
+				if($right == $to) {
+					# E.g. "BET 1830 AND 1832" <=> 1832
 					return 0;
 				}
 				print STDERR "datecmp(): Can't compare $left with $right\n";
@@ -343,6 +387,9 @@ sub datecmp
 		}
 		if($right =~ /^(Abt|ca?)\.?\s+(.+)/i) {
 			$right = $2;
+		} elsif($right =~ /(.+?)\s?\?$/) {
+			# "1828 ?"
+			$right = $1;
 		} elsif(($right =~ /\//) && ($right =~ /^[a-z\/]+\s+(.+)/i)) {
 			# e.g. "Oct/Nov/Dec 1950"
 			$right = $1;
@@ -369,6 +416,11 @@ sub datecmp
 				}
 				return 0;
 			} else {
+				# Comparing with a year only
+				if($left == $to) {
+					# 1832 <=> BET 1830 AND 1832
+					return 0;
+				}
 				if(ref($left)) {
 					$left = $left->year();
 				}
