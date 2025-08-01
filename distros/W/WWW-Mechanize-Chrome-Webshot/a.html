@@ -1,0 +1,335 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>WWW::Mechanize::Chrome::Webshot - cheap and cheerful html2pdf converter, take a screenshot of rendered HTML, complete with CSS and Javascript</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:andreas@fedora.(none)" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#CONSTRUCTOR">CONSTRUCTOR</a>
+    <ul>
+      <li><a href="#new-params">new($params)</a></li>
+    </ul>
+  </li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#shoot-params">shoot($params)</a></li>
+      <li><a href="#shutdown">shutdown()</a></li>
+      <li><a href="#scroll_to_bottom">scroll_to_bottom()</a></li>
+      <li><a href="#scroll-w-h">scroll($w, $h)</a></li>
+      <li><a href="#mech_obj">mech_obj()</a></li>
+    </ul>
+  </li>
+  <li><a href="#SCRIPTS">SCRIPTS</a>
+    <ul>
+      <li><a href="#REQUIREMENTS">REQUIREMENTS</a></li>
+    </ul>
+  </li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#BUGS">BUGS</a></li>
+  <li><a href="#SUPPORT">SUPPORT</a></li>
+  <li><a href="#ACKNOWLEDGEMENTS">ACKNOWLEDGEMENTS</a></li>
+  <li><a href="#LICENSE-AND-COPYRIGHT">LICENSE AND COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>WWW::Mechanize::Chrome::Webshot - cheap and cheerful html2pdf converter, take a screenshot of rendered HTML, complete with CSS and Javascript</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>Version 0.01</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<p>This module provides <a href="#shoot-params">&quot;shoot($params)&quot;</a> which loads a specified URL or local file into a spawned, possibly headless, browser (thank you Corion for <a>WWW::Mechanize::Chrome</a>), waits for some settle time, optionally removes specified DOM elements (e.g. advertisements and consents), takes a screenshot of the rendered content and saves into the output file, as PDF or PNG, optionally adding any specified EXIF tags.</p>
+
+<p>At the same time, this functionality can be seen as a round-about way for converting HTML, complete with CSS and JS, to PDF or PNG. And that is no mean feat.</p>
+
+<p>Actually it&#39;s a mean hack.</p>
+
+<p>Did I say that it supports as much HTML, CSS and JS as the modern browser does?</p>
+
+<p>Here are some examples:</p>
+
+<pre><code>use WWW::Mechanize::Chrome::Webshot;
+
+my $shooter = WWW::Mechanize::Chrome::Webshot-&gt;new({
+  &#39;settle-time&#39; =&gt; 10,
+});
+$shooter-&gt;shoot({
+  &#39;output-filename&#39; =&gt; &#39;abc.png&#39;,
+  &#39;output-format&#39; =&gt; &#39;png&#39;, # optional if it can not be deduced
+  # or &#39;file:///A/B/C.html&#39; # &lt;&lt; use absolute filepath!
+  &#39;url&#39; =&gt; &#39;https://www.902.gr&#39;,
+  &#39;remove-DOM-elements&#39; =&gt; [
+    {&#39;element-xpathselector&#39; =&gt; &#39;//div[id=&quot;advertisments&quot;]&#39;},
+    {...}
+  ],
+  &#39;exif&#39; =&gt; [{&#39;created&#39; =&gt; &#39;by the shooter&#39;}, ...],
+});
+...</code></pre>
+
+<h1 id="CONSTRUCTOR">CONSTRUCTOR</h1>
+
+<h2 id="new-params"><code>new($params)</code></h2>
+
+<p>Creates a new <code>Android::ElectricSheep::Automator</code> object. <code>$params</code> is a hash reference used to pass initialization options which may or should include the following:</p>
+
+<dl>
+
+<dt id="confighash-or-configfile-or-configstring"><b><code>confighash</code></b> or <b><code>configfile</code></b> or <b><code>configstring</code></b></dt>
+<dd>
+
+<p>Optional, default will be used. The configuration file/hash/string holds configuration parameters and its format is &quot;enhanced&quot; JSON (see <a href="#use-Config::JSON::Enhanced">&quot;use Config::JSON::Enhanced&quot;</a>) which is basically JSON which allows comments between <code> &lt;/* </code> and <code> */&gt; </code>.</p>
+
+<p>Here is an example configuration file to get you started, this configuration is used as default when none is provided:</p>
+
+<pre><code>&lt;/* $VERSION = &#39;0.01&#39;; */&gt;
+&lt;/* comments are allowed */&gt;
+&lt;/* and &lt;% vars %&gt; and &lt;% verbatim sections %&gt; */&gt;
+{
+    &quot;debug&quot; : {
+            &quot;verbosity&quot; : 1,
+            &lt;/* cleanup temp files on exit */&gt;
+            &quot;cleanup&quot; : 1
+    },
+    &quot;logger&quot; : {
+            &lt;/* log to file if you uncomment this */&gt;
+            &lt;/* &quot;filename&quot; : &quot;...&quot; */&gt;
+    },
+    &quot;constructor&quot; : {
+            &lt;/* for slow connections */&gt;
+            &quot;settle-time&quot; : &quot;3&quot;,
+            &quot;resolution&quot; : &quot;1600x1200&quot;,
+            &quot;stop-on-error&quot; : &quot;0&quot;,
+            &quot;remove-dom-elements&quot; : []
+    },
+    &quot;WWW::Mechanize::Chrome&quot; : {
+            &quot;headless&quot; : &quot;1&quot;,
+            &quot;launch_arg&quot; : [
+                    &lt;/* this will change as per the &#39;resolution&#39; setting above */&gt;
+                    &quot;--window-size=600x800&quot;,
+                    &quot;--password-store=basic&quot;, &lt;/* do not ask me for stupid chrome account password */&gt;
+            &lt;/*     &quot;--remote-debugging-port=9223&quot;, */&gt;
+            &lt;/*     &quot;--enable-logging&quot;, */&gt;
+                    &quot;--disable-gpu&quot;,
+            &lt;/*     &quot;--no-sandbox&quot;, NO LONGER VALID */&gt;
+                    &quot;--ignore-certificate-errors&quot;,
+                    &quot;--disable-background-networking&quot;,
+                    &quot;--disable-client-side-phishing-detection&quot;,
+                    &quot;--disable-component-update&quot;,
+                    &quot;--disable-hang-monitor&quot;,
+                    &quot;--disable-save-password-bubble&quot;,
+                    &quot;--disable-default-apps&quot;,
+                    &quot;--disable-infobars&quot;,
+                    &quot;--disable-popup-blocking&quot;
+            ]
+    }
+}</code></pre>
+
+<p>All sections in the configuration are mandatory.</p>
+
+<p><code>confighash</code> is a hash of configuration options with structure as above and can be supplied to the constructor instead of the configuration file.</p>
+
+<p>If no configuration is specified, then a default configuration will be used. This is hardcoded in the source code.</p>
+
+</dd>
+<dt id="logger-or-logfile"><b><code>logger</code></b> or <b><code>logfile</code></b></dt>
+<dd>
+
+<p>Optional. Specify a logger object which adheres to <a>Mojo::Log</a>&#39;s API or a logfile to write log info into. It must implement methods <code>info()</code>, <code>error()</code>, <code>warn()</code>.</p>
+
+</dd>
+<dt id="verbosity"><b><code>verbosity</code></b></dt>
+<dd>
+
+<p>Optional. Verbosity level as an integer, default is 0, silent.</p>
+
+</dd>
+<dt id="cleanup"><b><code>cleanup</code></b></dt>
+<dd>
+
+<p>Optional. Cleanup all temporary files after exit. Default is 1 (yes). It is useful when debugging.</p>
+
+</dd>
+<dt id="settle-time"><b><code>settle-time</code></b></dt>
+<dd>
+
+<p>Optional. Seconds to wait between loading the specified URL and taking the screenshot. This is very important if target URL has lots to do or on a slow connection. Default is 2 seconds.</p>
+
+</dd>
+<dt id="resolution"><b><code>resolution</code></b></dt>
+<dd>
+
+<p>Optional. The size of the browser in <code>WxH</code> format. Default is 1600x1200.</p>
+
+</dd>
+<dt id="headless"><b><code>headless</code></b></dt>
+<dd>
+
+<p>Optional. When debugging you may find it useful to display the browser while it loads the URL. Set this to 1 if you want this. Default is 0 (yes, headless). Make sure you specify a huge <code>settle-time</code> with this because the browser will shutdown as soon as the screenshot is taken.</p>
+
+</dd>
+<dt id="remove-dom-elements"><b><code>remove-dom-elements</code></b></dt>
+<dd>
+
+<p>Optional. After the URL is loaded and settle time has passed, DOM elements can be removed. Annoyances like advertisements, consents, warnings can be zapped by specifying their XPath selectors. This is an ARRAY_REF of HASH_REF. Each HASH_REF is a selector for DOM elements to be zapped. See <a href="https://metacpan.org/pod/WWW::Mechanize::Chrome::DOMops#ELEMENT-SELECTORS">https://metacpan.org/pod/WWW::Mechanize::Chrome::DOMops#ELEMENT-SELECTORS</a> on the exact spec of the DOM selectors.</p>
+
+</dd>
+<dt id="WWW::Mechanize::Chrome"><b><code>WWW::Mechanize::Chrome</code></b></dt>
+<dd>
+
+<p>Optional. Specify any parameters to be passed on to the constructor of <a>WWW::Mechanize::Chrome</a>.</p>
+
+</dd>
+</dl>
+
+<h1 id="METHODS">METHODS</h1>
+
+<h2 id="shoot-params"><b><code>shoot($params)</code></b></h2>
+
+<p>It takes a screenshot of the specified URL as rendered by <a>WWW::Mechanize::Chrome</a> (usually headless) and saves it as an image to the specified file.</p>
+
+<p>Input parameters <code>$params</code>:</p>
+
+<ul>
+
+<li><p><b><code>url</code></b> specifies the target URL or URI pointing to a local file (e.g. <code>file:///A/B/C.html</code>, use absolute filepath).</p>
+
+</li>
+<li><p><b><code>remove-dom-elements</code></b> specifies DOM elements to be removed after the URL has been loaded and settle time has passed. Annoyances like advertisements, consents, warnings can be zapped by specifying their XPath selectors. This is an ARRAY_REF of HASH_REF. Each HASH_REF is a selector for DOM elements to be zapped. See <a href="https://metacpan.org/pod/WWW::Mechanize::Chrome::DOMops#ELEMENT-SELECTORS">https://metacpan.org/pod/WWW::Mechanize::Chrome::DOMops#ELEMENT-SELECTORS</a> on the exact spec of the DOM selectors. Note that a parameter with the same name can be specified in the constructor. If one is specified here, then the one specified in the constructor will be ignored, else, it will be used.</p>
+
+</li>
+<li><p><b><code>exif</code></b> optionally specify one or more EXIF tags to be inserted into the output image. If one is specified here, then any specified in the constructor will be ignored.</p>
+
+</li>
+</ul>
+
+<h2 id="shutdown"><b><code>shutdown()</code></b></h2>
+
+<p>It shutdowns the current <a>WWW::Mechanize::Chrome</a> object, if any.</p>
+
+<h2 id="scroll_to_bottom"><b><code>scroll_to_bottom()</code></b></h2>
+
+<p>It scrolls the browser&#39;s contents to the very bottom without changing its horizontal position.</p>
+
+<h2 id="scroll-w-h"><b><code>scroll($w, $h)</code></b></h2>
+
+<p>It scrolls the browser&#39;s screen by <code>$w</code> pixels in the horizontal direction and by <code>$h</code> pixels in the vertical direction.</p>
+
+<h2 id="mech_obj"><b><code>mech_obj()</code></b></h2>
+
+<p>It returns the currently used <a>WWW::Mechanize::Chrome</a> object.</p>
+
+<h1 id="SCRIPTS">SCRIPTS</h1>
+
+<p>For convenience, the following scripts are provided:</p>
+
+<dl>
+
+<dt id="script-www-mechanize-webshot.pl"><b><code>script/www-mechanize-webshot.pl</code></b></dt>
+<dd>
+
+<p>It will take a URL, load it, render it, optionally zap any specified DOM elements and save the rendered content into an output image:</p>
+
+<p>This will save the screenshot and also adds the specified exif data:</p>
+
+<p><code>script/www-mechanize-webshot.pl --url &#39;https://www.902.gr&#39; --resolution 2000x2000 --exif &#39;created&#39; &#39;bliako&#39; --output-filename &#39;902.png&#39; --settle-time 10</code></p>
+
+<p>Debug why the output is not what you expect, show the browser and let it live for huge settle time:</p>
+
+<p><code>script/www-mechanize-webshot.pl --no-headless --url &#39;https://www.902.gr&#39; --resolution 2000x2000 --output-filename &#39;902.png&#39; --settle-time 100000</code></p>
+
+<p>This will also remove specified DOM elements by tag name and XPath selector. Note that the output format will be deduced as PDF because of the filename:</p>
+
+<p><code>script/www-mechanize-webshot.pl --remove-dom-elements &#39;[{\&quot;element-tag\&quot;:\&quot;div\&quot;,\&quot;element-id\&quot;:\&quot;sickle-and-hammer\&quot;,\&quot;&amp;&amp;\&quot;:\&quot;1\&quot;},{\&quot;element-xpathselector\&quot;:\&quot;//div[id=ads]\&quot;}]&#39; --url &#39;https://www.902.gr&#39; --resolution 2000x2000 --exif &#39;created&#39; &#39;bliako&#39; --output-filename &#39;902.pdf&#39; --settle-time 10</code></p>
+
+<p>Explicitly save the output as PDF:</p>
+
+<p><code>script/www-mechanize-webshot.pl --url &#39;https://www.902.gr&#39; --resolution 2000x2000 --exif &#39;created&#39; &#39;bliako&#39; --output-filename &#39;tmpimg&#39; --output-format &#39;PDF&#39; --settle-time 10</code></p>
+
+</dd>
+</dl>
+
+<h2 id="REQUIREMENTS">REQUIREMENTS</h2>
+
+<p>This module requires that the Chrome browser is installed in your computer and can be found by <a>WWW::Mechanize::Chrome</a>.</p>
+
+<p>The browser will be run, usually headless -- so a headless desktop is fine, the first time you take a screenshot. It will only be re-spawned if you have shutdown the browser in the meantime. Exiting your script will shutdown the browser. And so, running a script again will re-spawn the browser (AFAIK).</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Andreas Hadjiprocopis, <code>&lt;bliako at cpan.org&gt;</code></p>
+
+<h1 id="BUGS">BUGS</h1>
+
+<p>Please report any bugs or feature requests to <code>bug-www-mechanize-chrome-webshot at rt.cpan.org</code>, or through the web interface at <a href="https://rt.cpan.org/NoAuth/ReportBug.html?Queue=WWW-Mechanize-Chrome-Webshot">https://rt.cpan.org/NoAuth/ReportBug.html?Queue=WWW-Mechanize-Chrome-Webshot</a>. I will be notified, and then you&#39;ll automatically be notified of progress on your bug as I make changes.</p>
+
+<h1 id="SUPPORT">SUPPORT</h1>
+
+<p>You can find documentation for this module with the perldoc command.</p>
+
+<pre><code>perldoc WWW::Mechanize::Chrome::Webshot</code></pre>
+
+<p>You can also look for information at:</p>
+
+<ul>
+
+<li><p>RT: CPAN&#39;s request tracker (report bugs here)</p>
+
+<p><a href="https://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-Mechanize-Chrome-Webshot">https://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-Mechanize-Chrome-Webshot</a></p>
+
+</li>
+<li><p>AnnoCPAN: Annotated CPAN documentation</p>
+
+<p><a href="http://annocpan.org/dist/WWW-Mechanize-Chrome-Webshot">http://annocpan.org/dist/WWW-Mechanize-Chrome-Webshot</a></p>
+
+</li>
+<li><p>CPAN Ratings</p>
+
+<p><a href="https://cpanratings.perl.org/d/WWW-Mechanize-Chrome-Webshot">https://cpanratings.perl.org/d/WWW-Mechanize-Chrome-Webshot</a></p>
+
+</li>
+<li><p>Search CPAN</p>
+
+<p><a href="https://metacpan.org/release/WWW-Mechanize-Chrome-Webshot">https://metacpan.org/release/WWW-Mechanize-Chrome-Webshot</a></p>
+
+</li>
+</ul>
+
+<h1 id="ACKNOWLEDGEMENTS">ACKNOWLEDGEMENTS</h1>
+
+<h1 id="LICENSE-AND-COPYRIGHT">LICENSE AND COPYRIGHT</h1>
+
+<p>Copyright 2019 Andreas Hadjiprocopis.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the terms of the the Artistic License (2.0). You may obtain a copy of the full license at:</p>
+
+<p><a href="http://www.perlfoundation.org/artistic_license_2_0">http://www.perlfoundation.org/artistic_license_2_0</a></p>
+
+<p>Any use, modification, and distribution of the Standard or Modified Versions is governed by this Artistic License. By using, modifying or distributing the Package, you accept this license. Do not use, modify, or distribute the Package, if you do not accept this license.</p>
+
+<p>If your Modified Version has been derived from a Modified Version made by someone other than you, you are nevertheless required to ensure that your Modified Version complies with the requirements of this license.</p>
+
+<p>This license does not grant you the right to use any trademark, service mark, tradename, or logo of the Copyright Holder.</p>
+
+<p>This license includes the non-exclusive, worldwide, free-of-charge patent license to make, have made, use, offer to sell, sell, import and otherwise transfer the Package with respect to any patent claims licensable by the Copyright Holder that are necessarily infringed by the Package. If you institute patent litigation (including a cross-claim or counterclaim) against any party alleging that the Package constitutes direct or contributory patent infringement, then this Artistic License to you shall terminate on the date that such litigation is filed.</p>
+
+<p>Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER AND CONTRIBUTORS &quot;AS IS&#39; AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES. THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</p>
+
+
+</body>
+
+</html>
+
+

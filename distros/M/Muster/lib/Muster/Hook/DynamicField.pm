@@ -1,12 +1,12 @@
 package Muster::Hook::DynamicField;
-$Muster::Hook::DynamicField::VERSION = '0.92';
+$Muster::Hook::DynamicField::VERSION = '0.93';
 =head1 NAME
 
 Muster::Hook::DynamicField - Muster hook for dynamic fields
 
 =head1 VERSION
 
-version 0.92
+version 0.93
 
 =head1 SYNOPSIS
 

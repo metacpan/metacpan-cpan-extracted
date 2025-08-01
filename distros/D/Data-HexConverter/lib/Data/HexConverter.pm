@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Exporter qw(import);
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use XSLoader;
 XSLoader::load(__PACKAGE__, $VERSION);
@@ -51,7 +51,7 @@ scalar implementation and emit a warning if SSSE3 is not available.
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 

@@ -9,7 +9,7 @@ use base qw(Exporter);
 
 use App::Wax;
 use File::Spec;
-use Method::Signatures::Simple;
+use Function::Parameters qw(fun method);
 use Test::Differences qw(eq_or_diff);
 use Test::TinyMocker qw(mock);
 use URI::Split qw(uri_split);
@@ -32,7 +32,7 @@ our @EXPORT_OK = qw(@DEFAULT @KEEP @TEMP @URL wax_is);
 # command we expect it to be translated into (string/arrayref) then calls wax
 # in test mode, which returns the translated command. passes if the latter
 # matches; otherwise, fails and displays a diff
-func wax_is ($args, $want) {
+fun wax_is ($args, $want) {
     my @args = ref($args) ? @$args : split(/\s+/, $args);
     my @want = ref($want) ? @$want : split(/\s+/, $want);
     my $wax  = App::Wax->new();

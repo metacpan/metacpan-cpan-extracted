@@ -1,5 +1,11 @@
 Revision history for LWP-UserAgent-Throttled
 
+0.14	Thu Jul 31 19:12:04 EDT 2025
+	Fix http://www.cpantesters.org/cpan/report/f1868102-19a3-11f0-98b0-b3c3213a625c
+	Don't run t/requests when NO_NETWORK_TESTING is set
+	Don't attempt network tests on smokers
+	Don't allow negative throttle values
+
 0.13	Fri Apr 11 08:28:00 EDT 2025
 	Improve testing on slower machines
 

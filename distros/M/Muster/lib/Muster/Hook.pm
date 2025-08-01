@@ -1,5 +1,5 @@
 package Muster::Hook;
-$Muster::Hook::VERSION = '0.92';
+$Muster::Hook::VERSION = '0.93';
 use Mojo::Base -base;
 use Muster::LeafFile;
 
@@ -13,7 +13,7 @@ Muster::Hook - Muster hook base class
 
 =head1 VERSION
 
-version 0.92
+version 0.93
 
 =head1 SYNOPSIS
 

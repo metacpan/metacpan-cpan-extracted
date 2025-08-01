@@ -52,11 +52,13 @@ YAML
 # 'plack': classes of type Plack::Request, Plack::Response
 # 'catalyst': classes of type Catalyst::Request, Catalyst::Response
 our @TYPES = qw(mojo lwp plack catalyst);
-our $TYPE;
+our $TYPE = 'mojo'; # safe default
 
 # Note: if you want your query parameters or uri fragment to be normalized, set them afterwards
 sub request ($method, $uri_string, $headers = [], $body_content = undef) {
-  die '$TYPE is not set' if not defined $TYPE;
+  die '$TYPE is not set at ', join(' line ', (caller)[1,2]), ".\n" if not defined $TYPE;
+  die 'Wide character in body content at ', join(' line ', (caller)[1,2]), ".\n"
+    if length $body_content and $body_content =~ /[^\x00-\xff]/;
 
   my $req;
   if ($TYPE eq 'lwp' or $TYPE eq 'plack' or $TYPE eq 'catalyst') {
@@ -103,14 +105,16 @@ sub request ($method, $uri_string, $headers = [], $body_content = undef) {
     $req->fix_headers;
   }
   else {
-    die '$TYPE '.$TYPE.' not supported';
+    die '$TYPE '.$TYPE.' not supported at ', join(' line ', (caller)[1,2]), ".\n";
   }
 
   return $req;
 }
 
 sub response ($code, $headers = [], $body_content = undef) {
-  die '$TYPE is not set' if not defined $TYPE;
+  die '$TYPE is not set at ', join(' line ', (caller)[1,2]), ".\n" if not defined $TYPE;
+  die 'Wide character in body content at ', join(' line ', (caller)[1,2]), ".\n"
+    if length $body_content and $body_content =~ /[^\x00-\xff]/;
 
   my $res;
   if ($TYPE eq 'lwp') {
@@ -149,14 +153,14 @@ sub response ($code, $headers = [], $body_content = undef) {
         and not defined $res->headers->header('Transfer-Encoding');
   }
   else {
-    die '$TYPE '.$TYPE.' not supported';
+    die '$TYPE '.$TYPE.' not supported at ', join(' line ', (caller)[1,2]), ".\n";
   }
 
   return $res;
 }
 
 sub uri ($uri_string, @path_parts) {
-  die '$TYPE is not set' if not defined $TYPE;
+  die '$TYPE is not set at ', join(' line ', (caller)[1,2]), ".\n" if not defined $TYPE;
 
   my $uri;
   if ($TYPE eq 'lwp' or $TYPE eq 'plack' or $TYPE eq 'catalyst') {
@@ -169,7 +173,7 @@ sub uri ($uri_string, @path_parts) {
     $uri->path->parts(\@path_parts) if @path_parts;
   }
   else {
-    die '$TYPE '.$TYPE.' not supported';
+    die '$TYPE '.$TYPE.' not supported at ', join(' line ', (caller)[1,2]), ".\n";
   }
 
   return $uri;
@@ -177,7 +181,7 @@ sub uri ($uri_string, @path_parts) {
 
 # sets query parameters on the request
 sub query_params ($request, $pairs) {
-  die '$TYPE is not set' if not defined $TYPE;
+  die '$TYPE is not set at ', join(' line ', (caller)[1,2]), ".\n" if not defined $TYPE;
 
   my $uri;
   if ($TYPE eq 'lwp') {
@@ -193,14 +197,14 @@ sub query_params ($request, $pairs) {
     # $request->_clear_parameters if $TYPE eq 'catalyst';  # might need this later
   }
   else {
-    die '$TYPE '.$TYPE.' not supported';
+    die '$TYPE '.$TYPE.' not supported at ', join(' line ', (caller)[1,2]), ".\n";
   }
 
   return $uri;
 }
 
 sub remove_header ($message, $header_name) {
-  die '$TYPE is not set' if not defined $TYPE;
+  die '$TYPE is not set at ', join(' line ', (caller)[1,2]), ".\n" if not defined $TYPE;
 
   if ($TYPE eq 'lwp') {
     $message->headers->remove_header($header_name);
@@ -213,7 +217,7 @@ sub remove_header ($message, $header_name) {
     delete $message->env->{uc $header_name =~ s/-/_/r} if $message->can('env');
   }
   else {
-    die '$TYPE '.$TYPE.' not supported';
+    die '$TYPE '.$TYPE.' not supported at ', join(' line ', (caller)[1,2]), ".\n";
   }
 }
 
@@ -236,7 +240,7 @@ sub to_str ($message) {
     return $message->status.' '.HTTP::Status::status_message($message->status);
   }
 
-  die 'unrecognized type '.ref($message);
+  die 'unrecognized type ', ref $message, ' at ', join(' line ', (caller)[1,2]), ".\n";
 }
 
 # create a Result object out of the document errors; suitable for stringifying
@@ -312,31 +316,31 @@ sub cmp_result ($got, $expected, $test_name) {
 }
 
 sub lives_result ($sub, $test_name) {
-  my $ok = ok(lives(\&$sub), $test_name);
-  if (not $ok) {
-    context_do {
-      my ($ctx, $result) = @_;
+  context_do {
+    my ($ctx, $result) = @_;
+    if (not $ctx->ok(lives(\&$sub), $test_name)) {
       my $method =
         # be less noisy for expected failures
         (grep $_->{todo}, Test2::API::test2_stack->top->{_pre_filters}->@*) ? 'note'
           : $ENV{AUTHOR_TESTING} || $ENV{AUTOMATED_TESTING} ? 'diag' : 'note';
       $ctx->$method("got result:\n".$encoder->encode($result));
-    } $@;
-  }
+    }
+  } $@;
 }
 
 sub die_result ($sub, $pattern, $test_name) {
   eval { $sub->() };
   my $result = $@;
   if (defined $result) {
-    like($result, $pattern, $test_name)
-    or context_do {
+    context_do {
       my ($ctx, $result) = @_;
-      my $method =
-        # be less noisy for expected failures
-        (grep $_->{todo}, Test2::API::test2_stack->top->{_pre_filters}->@*) ? 'note'
-          : $ENV{AUTHOR_TESTING} || $ENV{AUTOMATED_TESTING} ? 'diag' : 'note';
-      $ctx->$method("got result:\n".$encoder->encode($result));
+      if (not like($result, $pattern, $test_name)) {
+        my $method =
+          # be less noisy for expected failures
+          (grep $_->{todo}, Test2::API::test2_stack->top->{_pre_filters}->@*) ? 'note'
+            : $ENV{AUTHOR_TESTING} || $ENV{AUTOMATED_TESTING} ? 'diag' : 'note';
+        $ctx->$method("got result:\n".$encoder->encode($result));
+      }
     } $result;
   }
 }

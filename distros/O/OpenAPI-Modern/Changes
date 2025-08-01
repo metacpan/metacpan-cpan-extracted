@@ -1,5 +1,9 @@
 Revision history for OpenAPI-Modern
 
+0.089     2025-07-31 21:03:29Z
+          - internal changes to JSON::Schema::Modern::Document::OpenAPI with
+            how the evaluator object is stored and tracked
+
 0.088     2025-07-19 17:09:08Z
           - better type inference for serialized parameters (also looks inside
             the "allOf" keyword, respects keywords adjacent to "$ref", and now

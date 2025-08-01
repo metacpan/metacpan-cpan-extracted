@@ -55,7 +55,7 @@ subtest 'get_next_entry thorough tests' => sub {
 		$mock_resp->mock('is_success', sub { 1 });
 		$mock_resp->mock('content', sub {
 			if(($site eq 'http://example.com')) {
-				'{"pdf":"https://nigelhorne.com"}'
+				'{"pdf":"https://nigelhorne.com/foo.pdf"}'
 			} else {
 				'{"items":[{"url":"http://example.com","ocr_eng":"John Xyzzy"}],"totalItems":1,"itemsPerPage":1}'
 			}
@@ -71,7 +71,7 @@ subtest 'get_next_entry thorough tests' => sub {
 	});
 
 	can_ok($obj, 'get_next_entry');
-	is($obj->get_next_entry(), 'https://nigelhorne.com', 'Returns expected URL when match is found');
+	is($obj->get_next_entry(), 'https://nigelhorne.com/foo.pdf', 'Returns expected URL when match is found');
 	is($obj->get_next_entry(), undef, 'Returns undef when no more matches');
 };
 

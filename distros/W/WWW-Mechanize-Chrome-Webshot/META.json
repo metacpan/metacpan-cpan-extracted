@@ -1,0 +1,79 @@
+{
+   "abstract" : "cheap and cheerful html2pdf converter, take a screenshot of rendered HTML, complete with CSS and Javascript",
+   "author" : [
+      "Andreas Hadjiprocopis <bliako@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "WWW-Mechanize-Chrome-Webshot",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Authen::SASL" : "0",
+            "Config::JSON::Enhanced" : "0",
+            "Crypt::OpenSSL::AES" : "0",
+            "Data::Roundtrip" : "0",
+            "Encode" : "0",
+            "FindBin" : "0",
+            "HTTP::CookieJar::LWP" : "0",
+            "IO::Socket::SSL" : "0",
+            "Image::ExifTool" : "5.31",
+            "LWP::ConsoleLogger::Easy" : "0",
+            "Log::Log4perl" : "0",
+            "Mojo::Log" : "0",
+            "WWW::Mechanize::Chrome" : "0",
+            "WWW::Mechanize::Chrome::DOMops" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Cwd" : "0",
+            "Data::Roundtrip" : "0",
+            "File::Basename" : "0",
+            "File::Spec" : "0",
+            "FindBin" : "0",
+            "Image::ExifTool" : "0",
+            "Mojo::Log" : "0",
+            "Test::More" : "0",
+            "Test::More::UTF8" : "0",
+            "Test::TempDir::Tiny" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/hadjiprocopis/WWW-Mechanize-Chrome-Webshot/issues"
+      },
+      "homepage" : "https://metacpan.org/module/WWW::Mechanize::Chrome::Webshot",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/hadjiprocopis/WWW-Mechanize-Chrome-Webshot",
+         "web" : "https://github.com/hadjiprocopis/WWW-Mechanize-Chrome-Webshot"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

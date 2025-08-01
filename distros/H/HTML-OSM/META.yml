@@ -1,7 +1,7 @@
 ---
-abstract: 'A module to generate an interactive OpenStreetMap with customizable coordinates and zoom level.'
+abstract: 'Generate an interactive OpenStreetMap with customizable coordinates and zoom level'
 author:
-  - 'Nigel Horne <njh@bandsman.co.uk>'
+  - 'Nigel Horne <njh@nigelhorne.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
   File::Temp: '0'
@@ -18,7 +18,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.72, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
 license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -31,13 +31,13 @@ no_index:
 requires:
   CHI: '0'
   Carp: '0'
-  Config::Auto: '0'
   ExtUtils::MakeMaker: '6.64'
-  File::Slurp: '0'
   JSON::MaybeXS: '0'
   LWP::UserAgent: '0'
+  Object::Configure: '0'
+  Params::Get: '0'
   Scalar::Util: '0'
   Time::HiRes: '0'
 resources: {}
-version: '0.08'
+version: '0.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

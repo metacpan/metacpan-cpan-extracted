@@ -7,24 +7,24 @@ use warnings;
 
 use Carp;
 use CHI;
-use Config::Auto;
-use File::Slurp;
+use Object::Configure;
 use LWP::UserAgent;
 use JSON::MaybeXS;
+use Params::Get;
 use Scalar::Util;
 use Time::HiRes;
 
 =head1 NAME
 
-HTML::OSM - A module to generate an interactive OpenStreetMap with customizable coordinates and zoom level.
+HTML::OSM - Generate an interactive OpenStreetMap with customizable coordinates and zoom level
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =cut
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 =head1 SYNOPSIS
 
@@ -164,21 +164,10 @@ sub new
 	my $class = shift;
 
 	# Handle hash or hashref arguments
-	my %args;
-	if((@_ == 1) && (ref $_[0] eq 'HASH')) {
-		# If the first argument is a hash reference, dereference it
-		%args = %{$_[0]};
-	} elsif((scalar(@_) % 2) == 0) {
-		# If there is an even number of arguments, treat them as key-value pairs
-		%args = @_;
-	} else {
-		# If there is an odd number of arguments, treat it as an error
-		Carp::carp(__PACKAGE__, ': Invalid arguments passed to new()');
-		return;
-	}
+	my $params = Params::Get::get_params(undef, \@_) || {};
 
 	if(!defined($class)) {
-		if((scalar keys %args) > 0) {
+		if((scalar keys %{$params}) > 0) {
 			# Using HTML::OSM:new(), not HTML::OSM->new()
 			carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
 			return;
@@ -188,44 +177,37 @@ sub new
 		$class = __PACKAGE__;
 	} elsif(Scalar::Util::blessed($class)) {
 		# If $class is an object, clone it with new arguments
-		return bless { %{$class}, %args }, ref($class);
+		return bless { %{$class}, %{$params} }, ref($class);
 	}
 
-	# Load the configuration from a config file, if provided
-	if(exists($args{'config_file'}) && (my $config = Config::Auto::parse($args{'config_file'}))) {
-		# my $config = YAML::XS::LoadFile($args{'config_file'});
-		if($config->{$class}) {
-			$config = $config->{$class};
-		}
-		%args = (%{$config}, %args);
-	}
-
-	if($args{'coordinates'} && !ref($args{'coordinates'})) {
+	if($params->{'coordinates'} && !ref($params->{'coordinates'})) {
 		Carp::croak(__PACKAGE__, ': coordinates must be a reference to an array');
 	}
 
+	$params = Object::Configure::configure($class, $params);
+
 	# Set up caching (default to an in-memory cache if none provided)
-	my $cache = $args{cache} || CHI->new(
+	my $cache = $params->{cache} || CHI->new(
 		driver => 'Memory',
 		global => 1,
 		expires_in => '1 day',
 	);
 
 	# Set up rate-limiting: minimum interval between requests (in seconds)
-	my $min_interval = $args{min_interval} || 0;	# default: no delay
+	my $min_interval = $params->{min_interval} || 0;	# default: no delay
 
 	return bless {
 		cache => $cache,
-		coordinates => $args{coordinates} || [],
-		height => $args{'height'} || '400px',
-		host => $args{'host'} || 'nominatim.openstreetmap.org/search',
-		width => $args{'width'} || '600px',
-		zoom => $args{zoom} || 12,
+		coordinates => $params->{coordinates} || [],
+		height => $params->{'height'} || '400px',
+		host => $params->{'host'} || 'nominatim.openstreetmap.org/search',
+		width => $params->{'width'} || '600px',
+		zoom => $params->{zoom} || 12,
 		min_interval => $min_interval,
 		last_request => 0,	# Initialize last_request timestamp
 		css_url => 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
 		js_url => 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js',
-		%args
+		%{$params}
 	}, $class;
 }
 
@@ -261,12 +243,12 @@ sub add_marker
 
 	if(ref($_[0]) eq 'ARRAY') {
 		$point = shift;
-		$params = $self->_get_params(undef, @_);
+		$params = Params::Get::get_params(undef, \@_);
 		if(scalar(@{$point}) == 1) {
 			$point = @{$point}[0];
 		}
 	} else {
-		$params = $self->_get_params('point', @_);
+		$params = Params::Get::get_params('point', @_);
 		$point = $params->{'point'};
 	}
 
@@ -301,14 +283,15 @@ sub add_marker
 
 =head2 center
 
-Center the map at a given point. Returns 1 on success, 0 if the point could not be found.
+Center the map at a given point.
+Returns 1 on success, 0 if the point could not be found.
 
 =cut
 
 sub center
 {
 	my $self = shift;
-	my $params = $self->_get_params('point', @_);
+	my $params = Params::Get::get_params('point', \@_);
 	my $point = $params->{'point'};
 
 	my ($lat, $lon);
@@ -352,7 +335,7 @@ sub zoom
 	my $self = shift;
 
 	if(scalar(@_)) {
-		my $params = $self->_get_params('zoom', @_);
+		my $params = Params::Get::get_params('zoom', \@_);
 
 		Carp::croak(__PACKAGE__, 'invalid zoom') if($params->{'zoom'} =~ /\D/);
 		Carp::croak(__PACKAGE__, 'zoom must be positive') if($params->{'zoom'} < 0);
@@ -493,13 +476,13 @@ sub onload_render
 	my $js_url = $self->{'js_url'};
 
 	my $head = qq{
-			<link rel="stylesheet" href="$css_url" />
-			<script src="$js_url"></script>
-			<style>
-				#map { width: $width; height: $height; }
-				#search-box { margin: 10px; padding: 5px; }
-				#reset-button { margin: 10px; padding: 5px; cursor: pointer; }
-			</style>
+		<link rel="stylesheet" href="$css_url" />
+		<script src="$js_url"></script>
+		<style>
+			#map { width: $width; height: $height; }
+			#search-box { margin: 10px; padding: 5px; }
+			#reset-button { margin: 10px; padding: 5px; cursor: pointer; }
+		</style>
 	};
 
 	my $body = qq{
@@ -602,44 +585,9 @@ sub _validate
 	return 1;
 }
 
-# Helper routine to parse the arguments given to a function.
-# Processes arguments passed to methods and ensures they are in a usable format,
-#	allowing the caller to call the function in anyway that they want
-#	e.g. foo('bar'), foo(arg => 'bar'), foo({ arg => 'bar' }) all mean the same
-#	when called _get_params('arg', @_);
-sub _get_params
-{
-	shift;  # Discard the first argument (typically $self)
-	my $default = shift;
-
-	# Directly return hash reference if the first parameter is a hash reference
-	return $_[0] if(ref($_[0]) eq 'HASH');
-
-	my %rc;
-	my $num_args = scalar @_;
-
-	# Populate %rc based on the number and type of arguments
-	if(($num_args == 1) && (defined $default)) {
-		# %rc = ($default => shift);
-		return { $default => shift };
-	} elsif($num_args == 1) {
-		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], '()');
-	} elsif(($num_args == 0) && (defined($default))) {
-		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], "($default => \$val)");
-	} elsif(($num_args % 2) == 0) {
-		%rc = @_;
-	} elsif($num_args == 0) {
-		return;
-	} else {
-		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], '()');
-	}
-
-	return \%rc;
-}
-
 =head1 AUTHOR
 
-Nigel Horne, C<< <njh at bandsman.co.uk> >>
+Nigel Horne, C<< <njh at nigelhorne.com> >>
 
 =head1 BUGS
 
@@ -649,9 +597,7 @@ Nigel Horne, C<< <njh at bandsman.co.uk> >>
 
 =item * L<https://wiki.openstreetmap.org/wiki/API>
 
-=item * L<File::Slurp>
-
-=item * C<HTML::GoogleMaps::V3>
+=item * L<HTML::GoogleMaps::V3>
 
 Much of the interface to C<HTML::OSM> mimicks this for compatibility.
 

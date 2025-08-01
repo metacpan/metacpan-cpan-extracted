@@ -1,12 +1,12 @@
 package Muster::Hook::DeriveFields;
-$Muster::Hook::DeriveFields::VERSION = '0.92';
+$Muster::Hook::DeriveFields::VERSION = '0.93';
 =head1 NAME
 
 Muster::Hook::DeriveFields - Muster hook for field derivation
 
 =head1 VERSION
 
-version 0.92
+version 0.93
 
 =head1 DESCRIPTION
 

@@ -1,10 +1,10 @@
 {
    "abstract" : "Lookup in a database of wills",
    "author" : [
-      "Nigel Horne <njh@bandsman.co.uk>"
+      "Nigel Horne <njh@nigelhorne.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.74, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
@@ -53,6 +53,9 @@
             "LWP::UserAgent::WithCache" : "0",
             "Lingua::EN::NameCase" : "0",
             "Module::Info" : "0",
+            "Object::Configure" : "0.1",
+            "Params::Get" : "0",
+            "Return::Set" : "0",
             "Scalar::Util" : "0",
             "Test::HTTPStatus" : "0",
             "Try::Tiny" : "0",
@@ -62,12 +65,14 @@
       },
       "test" : {
          "requires" : {
+            "File::Temp" : "0",
             "IPC::System::Simple" : "0",
             "Test::Carp" : "0",
             "Test::DescribeMe" : "0",
             "Test::Most" : "0",
             "Test::Needs" : "0",
-            "Test::Warnings" : "0"
+            "Test::Warnings" : "0",
+            "YAML::Any" : "0"
          }
       }
    },
@@ -85,6 +90,6 @@
          "x_repository" : "https://github.com/nigelhorne/Genealogy-Wills"
       }
    },
-   "version" : "0.07",
+   "version" : "0.08",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -200,7 +200,7 @@ Please refer to C<PAR_TMPDIR>.
 
 =head1 SEE ALSO
 
-L<PAR>, L<PAR::Tutorial>, L<PAR::FAQ>
+L<PAR>, L<PAR::Tutorial>
 
 L<par.pl>, L<parl>, L<pp>
 

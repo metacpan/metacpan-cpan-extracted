@@ -69,6 +69,7 @@ my @include = qw(
   autodie
   JSON::PP
   HTTP::Headers::Fast::XS
+  Mojolicious::Controller::REST
   Cpanel::JSON::XS
   JSON::XS
   JSON::MaybeXS

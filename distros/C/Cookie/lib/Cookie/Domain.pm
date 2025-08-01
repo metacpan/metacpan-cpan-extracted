@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Cookies API for Server & Client - ~/lib/Cookie/Domain.pm
-## Version v0.1.6
+## Version v0.1.7
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/06
-## Modified 2024/02/13
+## Modified 2025/07/30
 ## You can use, copy, modify and  redistribute  this  package  and  associated
 ## files under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
@@ -40,7 +40,7 @@ BEGIN
             )*
         )
     $/x;
-    our $VERSION = 'v0.1.6';
+    our $VERSION = 'v0.1.7';
 };
 
 use strict;
@@ -612,7 +612,7 @@ sub suffixes { return( shift->_set_get_hash_as_mix_object( 'suffixes', @_ ) ); }
         use strict;
         use warnings;
         use parent qw( Module::Generic::Hash );
-        use Want;
+        use Wanted;
         our $VERSION = 'v0.1.0';
     };
     
@@ -668,7 +668,7 @@ Cookie::Domain - Domain Name Public Suffix Query Interface
 
 =head1 VERSION
 
-    v0.1.6
+    v0.1.7
 
 =head1 DESCRIPTION
 

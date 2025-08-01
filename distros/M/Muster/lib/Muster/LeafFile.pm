@@ -1,5 +1,5 @@
 package Muster::LeafFile;
-$Muster::LeafFile::VERSION = '0.92';
+$Muster::LeafFile::VERSION = '0.93';
 #ABSTRACT: Muster::LeafFile - a file in a Muster content tree
 =head1 NAME
 
@@ -7,7 +7,7 @@ Muster::LeafFile - a file in a Muster content tree
 
 =head1 VERSION
 
-version 0.92
+version 0.93
 
 =head1 SYNOPSIS
 

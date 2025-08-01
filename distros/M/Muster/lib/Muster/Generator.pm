@@ -1,5 +1,5 @@
 package Muster::Generator;
-$Muster::Generator::VERSION = '0.92';
+$Muster::Generator::VERSION = '0.93';
 # ABSTRACT: Muster::Generator - generates boilerplate for muster webapp
 
 =head1 NAME
@@ -8,7 +8,7 @@ Muster::Generator - generates boilerplate for muster webapp
 
 =head1 VERSION
 
-version 0.92
+version 0.93
 
 =cut
 

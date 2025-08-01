@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Document::OpenAPI;
 # ABSTRACT: One OpenAPI v3.1 document
 # KEYWORDS: JSON Schema data validation request response OpenAPI
 
-our $VERSION = '0.088';
+our $VERSION = '0.089';
 
 use 5.020;
 use utf8;
@@ -49,11 +49,6 @@ use constant DEFAULT_DIALECT => 'https://spec.openapis.org/oas/3.1/dialect/2024-
 use constant DEFAULT_BASE_METASCHEMA => 'https://spec.openapis.org/oas/3.1/schema-base/2024-11-14';
 use constant DEFAULT_METASCHEMA => 'https://spec.openapis.org/oas/3.1/schema/2024-11-14';
 
-# warning: this is weak_ref'd, so it may not exist after construction/traverse time
-has '+evaluator' => (
-  required => 1,
-);
-
 has '+schema' => (
   isa => HashRef,
 );
@@ -85,6 +80,9 @@ has _operationIds => (
 sub get_operationId_path { $_[0]->_operationIds->{$_[1]} }
 sub _add_operationId { $_[0]->_operationIds->{$_[1]} = Str->($_[2]) }
 
+# (probably) temporary, until the parent class evaluator is completely removed
+sub evaluator { die 'improper attempt to use of document evaluator' }
+
 # called by this class's base class constructor, in order to validate the integrity of the document
 # and identify all important details about this document, such as entity locations, referenceable
 # identifiers, operationIds, etc.
@@ -92,7 +90,7 @@ sub traverse ($self, $evaluator, $config_override = {}) {
   croak join(', ', sort keys %$config_override), ' not supported as a config override in traverse'
     if keys %$config_override;
 
-  $self->_add_vocab_and_default_schemas;
+  $self->_add_vocab_and_default_schemas($evaluator);
 
   my $schema = $self->schema;
   my $state = {
@@ -135,7 +133,7 @@ sub traverse ($self, $evaluator, $config_override = {}) {
       },
     },
   };
-  my $top_result = $self->evaluator->evaluate(
+  my $top_result = $evaluator->evaluate(
     $schema, $top_schema,
     {
       effective_base_uri => DEFAULT_METASCHEMA,
@@ -170,6 +168,7 @@ sub traverse ($self, $evaluator, $config_override = {}) {
     $json_schema_dialect //= DEFAULT_DIALECT;
 
     # traverse an empty schema with this metaschema uri to confirm it is valid
+    # (and add an entry in the evaluator's _metaschema_vocabulary_classes)
     my $check_metaschema_state = $evaluator->traverse({}, {
       metaschema_uri => $json_schema_dialect,
       initial_schema_uri => $self->canonical_uri->clone->fragment('/jsonSchemaDialect'),
@@ -185,7 +184,7 @@ sub traverse ($self, $evaluator, $config_override = {}) {
     $state->@{qw(spec_version vocabularies)} = $check_metaschema_state->@{qw(spec_version vocabularies)};
     $self->_set_json_schema_dialect($json_schema_dialect);
 
-    $self->_set_metaschema_uri($self->_dynamic_metaschema_uri($json_schema_dialect))
+    $self->_set_metaschema_uri($self->_dynamic_metaschema_uri($json_schema_dialect, $evaluator))
       if not $self->_has_metaschema_uri and $json_schema_dialect ne DEFAULT_DIALECT;
   }
 
@@ -200,7 +199,7 @@ sub traverse ($self, $evaluator, $config_override = {}) {
   # evaluate the document against its metaschema to find any errors, to identify all schema
   # resources within to add to the global resource index, and to extract all operationIds
   my (@json_schema_paths, @operation_paths, %bad_path_item_refs, @servers_paths);
-  my $result = $self->evaluator->evaluate(
+  my $result = $evaluator->evaluate(
     $schema, $self->metaschema_uri,
     {
       short_circuit => 1,
@@ -364,11 +363,13 @@ sub traverse ($self, $evaluator, $config_override = {}) {
 
 ######## NO PUBLIC INTERFACES FOLLOW THIS POINT ########
 
-sub _add_vocab_and_default_schemas ($self) {
-  my $js = $self->evaluator;
-  $js->add_vocabulary('JSON::Schema::Modern::Vocabulary::OpenAPI');
+# simple runtime-wide cache of metaschema document objects that are sourced from disk
+my $metaschema_cache = {};
 
-  $js->add_format_validation(int32 => +{
+sub _add_vocab_and_default_schemas ($self, $evaluator) {
+  $evaluator->add_vocabulary('JSON::Schema::Modern::Vocabulary::OpenAPI');
+
+  $evaluator->add_format_validation(int32 => +{
     type => 'number',
     sub => sub ($x) {
       require Math::BigInt; Math::BigInt->VERSION(1.999701);
@@ -379,7 +380,7 @@ sub _add_vocab_and_default_schemas ($self) {
     }
   });
 
-  $js->add_format_validation(int64 => +{
+  $evaluator->add_format_validation(int64 => +{
     type => 'number',
     sub => sub ($x) {
       require Math::BigInt; Math::BigInt->VERSION(1.999701);
@@ -390,22 +391,30 @@ sub _add_vocab_and_default_schemas ($self) {
     }
   });
 
-  $js->add_format_validation(float => +{ type => 'number', sub => sub ($x) { 1 } });
-  $js->add_format_validation(double => +{ type => 'number', sub => sub ($x) { 1 } });
-  $js->add_format_validation(password => +{ type => 'string', sub => sub ($) { 1 } });
+  $evaluator->add_format_validation(float => +{ type => 'number', sub => sub ($x) { 1 } });
+  $evaluator->add_format_validation(double => +{ type => 'number', sub => sub ($x) { 1 } });
+  $evaluator->add_format_validation(password => +{ type => 'string', sub => sub ($) { 1 } });
 
   foreach my $filename (DEFAULT_SCHEMAS->@*) {
-    my $document = $js->add_schema($js->_json_decoder->decode(path(dist_dir('OpenAPI-Modern'), $filename)->slurp_raw));
+    my $document;
+    if ($document = $metaschema_cache->{$filename}) {
+      $evaluator->add_document($document);
+    }
+    else {
+      my $file = path(dist_dir('OpenAPI-Modern'), $filename);
+      my $schema = $evaluator->_json_decoder->decode($file->slurp_raw);
+      $document = $evaluator->add_schema($schema);
+    }
 
     if ($document->canonical_uri =~ m{/\d{4}-\d{2}-\d{2}$}) {
       my $base = $`;
-      $js->add_document($base, $document) if $base =~ m{/schema$};
-      $js->add_document($base.'/latest', $document);
+      $evaluator->add_document($base, $document) if $base =~ m{/schema$};
+      $evaluator->add_document($base.'/latest', $document);
     }
   }
 
   # dirty hack! patch in support for $self, until v3.2
-  $js->{_resource_index}{'https://spec.openapis.org/oas/3.1/schema/2024-11-14'}{document}->schema->{properties}{'$self'} = {
+  $evaluator->{_resource_index}{'https://spec.openapis.org/oas/3.1/schema/2024-11-14'}{document}->schema->{properties}{'$self'} = {
     type => 'string',
     format => 'uri-reference',
     '$comment' => 'MUST NOT be empty, and MUST NOT contain a fragment',
@@ -420,7 +429,7 @@ sub _traverse_schema ($self, $state) {
   my $schema = $self->get($state->{schema_path});
   return if not is_plain_hashref($schema) or not keys %$schema;
 
-  my $subschema_state = $self->evaluator->traverse($schema, {
+  my $subschema_state = $state->{evaluator}->traverse($schema, {
     initial_schema_uri => canonical_uri($state),
     traversed_schema_path => $state->{traversed_schema_path}.$state->{schema_path},
     metaschema_uri => $self->json_schema_dialect,
@@ -464,22 +473,22 @@ sub _traverse_schema ($self, $state) {
 
 # given a jsonSchemaDialect uri, generate a new schema that wraps the standard OAD schema
 # to set the jsonSchemaDialect value for the #meta dynamic reference.
-sub _dynamic_metaschema_uri ($self, $json_schema_dialect) {
+sub _dynamic_metaschema_uri ($self, $json_schema_dialect, $evaluator) {
   $json_schema_dialect .= '';
   my $dialect_uri = 'https://custom-dialect.example.com/' . md5_hex($json_schema_dialect);
-  return $dialect_uri if $self->evaluator->_get_resource($dialect_uri);
+  return $dialect_uri if $evaluator->_get_resource($dialect_uri);
 
   # we use the definition of share/oas/schema-base.json but swap out the dialect reference.
-  my $schema = dclone($self->evaluator->_get_resource(DEFAULT_BASE_METASCHEMA)->{document}->schema);
+  my $schema = dclone($evaluator->_get_resource(DEFAULT_BASE_METASCHEMA)->{document}->schema);
   $schema->{'$id'} = $dialect_uri;
   $schema->{'$defs'}{dialect}{const} = $json_schema_dialect;
   $schema->{'$defs'}{schema}{'$ref'} = $json_schema_dialect;
 
-  $self->evaluator->add_document(
+  $evaluator->add_document(
     Mojo::URL->new($dialect_uri),
     JSON::Schema::Modern::Document->new(
       schema => $schema,
-      evaluator => $self->evaluator,
+      evaluator => $evaluator,
     ));
 
   return $dialect_uri;
@@ -489,10 +498,11 @@ sub _dynamic_metaschema_uri ($self, $json_schema_dialect) {
 
 # callback hook for Sereal::Decoder
 sub THAW ($class, $serializer, $data) {
+  delete $data->{evaluator};
   my $self = bless($data, $class);
 
-  foreach my $attr (qw(schema evaluator _entities)) {
-    die "serialization missing attribute '$attr': perhaps your serialized data was produced for an older version of $class?"
+  foreach my $attr (qw(schema _entities)) {
+    croak "serialization missing attribute '$attr': perhaps your serialized data was produced for an older version of $class?"
       if not exists $self->{$attr};
   }
 
@@ -513,16 +523,13 @@ JSON::Schema::Modern::Document::OpenAPI - One OpenAPI v3.1 document
 
 =head1 VERSION
 
-version 0.088
+version 0.089
 
 =head1 SYNOPSIS
 
-  use JSON::Schema::Modern;
   use JSON::Schema::Modern::Document::OpenAPI;
 
-  my $js = JSON::Schema::Modern->new;
   my $openapi_document = JSON::Schema::Modern::Document::OpenAPI->new(
-    evaluator => $js,
     canonical_uri => 'https://example.com/v1/api',
     schema => decode_json(<<JSON),
 {
@@ -569,11 +576,15 @@ The actual raw data representing the OpenAPI document. Required.
 
 =for stopwords metaschema schemas
 
-A L<JSON::Schema::Modern> object. Unlike in the parent class, this is B<REQUIRED>, because loaded
-vocabularies, metaschemas and resource identifiers must be stored here as they are discovered in the
-OpenAPI document. This is the object that will be used for subsequent evaluation of data against
+A L<JSON::Schema::Modern> object, which will be used for subsequent evaluation of data against
 schemas in the document, either manually or perhaps via a web framework plugin
 (see L<Mojo::Plugin::OpenAPI::Modern>).
+
+Optional, unless you are using custom metaschemas for your OpenAPI document or embedded JSON Schemas
+(in which case you should define the evaluator first and call L<JSON::Schema::Modern/add_schema> for
+each customization, before calling this constructor).
+
+This argument is not preserved by the constructor, so it is not available as an accessor.
 
 =head2 canonical_uri
 

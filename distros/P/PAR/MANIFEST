@@ -2,7 +2,6 @@ AUTHORS
 Changes
 lib/PAR.pm
 lib/PAR/Environment.pod
-lib/PAR/FAQ.pod
 lib/PAR/Heavy.pm
 lib/PAR/SetupProgname.pm
 lib/PAR/SetupTemp.pm

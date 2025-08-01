@@ -2,9 +2,11 @@
 
 use warnings;
 use strict;
-use Test::Most tests => 15;
+
+use Test::Most;
 use LWP::Protocol::https;
 use Test::Timer;
+use Test::RequiresInternet ('www.perl.org' => 'http');
 use IO::Socket::INET;
 
 BEGIN {
@@ -18,9 +20,9 @@ THROTTLE: {
 			PeerAddr => 'example.com:80',
 			Timeout => 2	# Set low to try to catch slow machines
 		);
-		skip 'Responsive machine and an Internet connection are required for testing', 13 unless($s);
+		skip 'Responsive machine and an Internet connection are required for testing' unless($s);
 
-		skip 'Time::HiRes::usleep required for testing throttling', 13 unless(&Time::HiRes::d_usleep);
+		skip 'Time::HiRes::usleep required for testing throttling' unless(&Time::HiRes::d_usleep);
 
 		diag('This will take some time because of sleeps');
 		diag('Some tests will fail on slower machines and connections');
@@ -62,7 +64,7 @@ THROTTLE: {
 		SKIP: {
 			if($timetaken >= 9) {
 				diag("timetaken = $timetaken. Not testing throttling");
-				skip("The system is too slow to run timing tests (timer = $timetaken)", 4);
+				skip("The system is too slow to run timing tests (timer = $timetaken)");
 			}
 			time_between(sub { $response = $ua->get('http://example.com/'); }, 1, 6, 'should be throttled to 2 seconds, not 10');
 			ok($response->is_success());
@@ -72,3 +74,5 @@ THROTTLE: {
 		}
 	}
 }
+
+done_testing();

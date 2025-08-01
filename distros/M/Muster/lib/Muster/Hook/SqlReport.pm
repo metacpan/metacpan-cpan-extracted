@@ -1,12 +1,12 @@
 package Muster::Hook::SqlReport;
-$Muster::Hook::SqlReport::VERSION = '0.92';
+$Muster::Hook::SqlReport::VERSION = '0.93';
 =head1 NAME
 
 Muster::Hook::SqlReport - Muster SQL-report directive
 
 =head1 VERSION
 
-version 0.92
+version 0.93
 
 =head1 DESCRIPTION
 
@@ -194,7 +194,7 @@ sub DESTROY {
 1;
 # =================================================================
 package SQLite::Work::Muster;
-$SQLite::Work::Muster::VERSION = '0.92';
+$SQLite::Work::Muster::VERSION = '0.93';
 use SQLite::Work;
 use Text::NeatTemplate;
 use POSIX;

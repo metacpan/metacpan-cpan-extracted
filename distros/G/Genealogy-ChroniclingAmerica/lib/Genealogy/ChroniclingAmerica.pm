@@ -4,11 +4,14 @@ package Genealogy::ChroniclingAmerica;
 use warnings;
 use strict;
 
+use Carp;
 use LWP::UserAgent;
 use JSON::MaybeXS;
+use Object::Configure;
+use Params::Get;
 use Scalar::Util;
+use Return::Set 0.02;
 use URI;
-use Carp;
 
 =head1 NAME
 
@@ -16,11 +19,11 @@ Genealogy::ChroniclingAmerica - Find URLs for a given person on the Library of C
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =head1 SYNOPSIS
 
@@ -43,7 +46,7 @@ our $VERSION = '0.05';
 
 =head1 DESCRIPTION
 
-The **Genealogy::ChroniclingAmerica** Perl module allows users to search for historical newspaper records from the **Chronicling America** archive,
+The **Genealogy::ChroniclingAmerica** module allows users to search for historical newspaper records from the **Chronicling America** archive,
 maintained by the Library of Congress.
 By providing a person's first name,
 last name,
@@ -119,97 +122,85 @@ sub new {
 	return unless(defined($class));
 
 	# Handle hash or hashref arguments
-	my %args;
-	if(ref($_[0]) eq 'HASH') {
-		%args = %{$_[0]};
-	} elsif(ref($_[0]) || !defined($_[0])) {
-		Carp::croak('Usage: ', __PACKAGE__, '->new(%args)');
-	} elsif((@_ % 2) == 0) {
-		%args = @_;
-	}
+	my $params = Params::Get::get_params(undef, \@_) || {};
 
-	if(!defined($class)) {
-		# Using Genealogy::ChroniclingAmerica->new(), not Genealogy::ChroniclingAmerica::new()
-		# carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
-		# return;
-
-		# FIXME: this only works when no arguments are given
-		$class = __PACKAGE__;
-	} elsif(Scalar::Util::blessed($class)) {
+	if(Scalar::Util::blessed($class)) {
 		# If $class is an object, clone it with new arguments
-		return bless { %{$class}, %args }, ref($class);
+		return bless { %{$class}, %{$params} }, ref($class);
 	}
 
-	unless($args{'firstname'}) {
-		Carp::croak('First name is not optional');
+	unless($params->{'firstname'}) {
+		Carp::croak('Firstname is not optional');
 		return;	# Don't know why this is needed, but it is
 	}
 
 	# Fail when the input is just a set of numbers
-	if($args{'firstname'} !~ /\D/) {
-		Carp::croak('Usage: ', __PACKAGE__, ": invalid input to new(), $args{firstname}");
+	if($params->{'firstname'} !~ /\D/) {
+		Carp::croak('Usage: ', __PACKAGE__, ": invalid input to new(), $params->{firstname}");
 		return;
 	}
 
-	unless(defined($args{'lastname'})) {
-		Carp::croak('Last name is not optional');
+	unless(defined($params->{'lastname'})) {
+		Carp::croak('Lastname is not optional');
 		return;
 	}
 
 	# Fail when the input is just a set of numbers
-	if($args{'lastname'} !~ /\D/) {
-		Carp::croak('Usage: ', __PACKAGE__, ": invalid input to new(), $args{lastname}");
+	if($params->{'lastname'} !~ /\D/) {
+		Carp::croak('Usage: ', __PACKAGE__, ": invalid input to new(), $params->{lastname}");
 		return;
 	}
 
-	unless($args{'state'}) {
+	unless($params->{'state'}) {
 		Carp::croak('State is not optional');
 		return;
 	}
 
-	if(length($args{'state'}) == 2) {
+	if(length($params->{'state'}) == 2) {
 		Carp::croak('State needs to be the full name');
 		return;
 	}
 
 	# Fail when the input contains a number
-	if($args{'state'} =~ /\d/) {
-		Carp::croak('Usage: ', __PACKAGE__, ": invalid input to new(), $args{state}");
+	if($params->{'state'} =~ /\d/) {
+		Carp::croak('Usage: ', __PACKAGE__, ": invalid input to new(), $params->{state}");
 		return;
 	}
 
-	my $ua = $args{'ua'} || LWP::UserAgent->new(agent => __PACKAGE__ . "/$VERSION");
-	$ua->env_proxy(1) unless($args{'ua'});
+	my $ua = $params->{'ua'} || LWP::UserAgent->new(agent => __PACKAGE__ . "/$VERSION");
+	$ua->env_proxy(1) unless($params->{'ua'});
+
+	$params = Object::Configure::configure($class, $params);
 
 	# Set up rate-limiting: minimum interval between requests (in seconds)
-	my $min_interval = $args{min_interval} || 0;	# default: no delay
+	my $min_interval = $params->{min_interval} || 0;	# default: no delay
 
 	my $rc = {
-		%args,
+		%{$params},
 		min_interval => $min_interval,
 		ua => $ua,
-		host => $args{'host'} || 'chroniclingamerica.loc.gov',
+		host => $params->{'host'} || 'chroniclingamerica.loc.gov',
 	};
 
-	my %query_parameters = ( 'format' => 'json', 'state' => ucfirst(lc($args{'state'})) );
+	my %query_parameters = ( 'format' => 'json', 'state' => ucfirst(lc($params->{'state'})) );
 	if($query_parameters{'state'} eq 'District of columbia') {
 		$query_parameters{'state'} = 'District of Columbia';
 	}
-	my $name = $args{'firstname'};
-	if($args{'middlename'}) {
-		$rc->{'name'} = "$name $args{middlename} $args{lastname}";
-		$name .= "=$args{middlename}";
+	my $name = $params->{'firstname'};
+	if($params->{'middlename'}) {
+		$rc->{'name'} = "$name $params->{middlename} $params->{lastname}";
+		$name .= '=' . $params->{middlename};
 	} else {
-		$rc->{'name'} = "$name $args{lastname}";
+		$rc->{'name'} = "$name $params->{lastname}";
 	}
-	$name .= "=$args{lastname}";
+	$name .= "=$params->{lastname}";
 
 	$query_parameters{'andtext'} = $name;
-	if($args{'date_of_birth'}) {
-		$query_parameters{'date1'} = $args{'date_of_birth'};
+	if($params->{'date_of_birth'}) {
+		$query_parameters{'date1'} = $params->{'date_of_birth'};
 	}
-	if($args{'date_of_death'}) {
-		$query_parameters{'date2'} = $args{'date_of_death'};
+	if($params->{'date_of_death'}) {
+		$query_parameters{'date2'} = $params->{'date_of_death'};
 	}
 
 	my $uri = URI->new("https://$rc->{host}/search/pages/results/");
@@ -318,12 +309,12 @@ sub get_next_entry
 	}
 
 	# Decode JSON response and return PDF data
-	return $self->{'json'}->decode($resp->content())->{'pdf'};
+	return Return::Set::set_return($self->{'json'}->decode($resp->content())->{'pdf'}, { type => 'string', 'min' => 5, matches => qr/\.pdf$/ });
 }
 
 =head1 AUTHOR
 
-Nigel Horne, C<< <njh at bandsman.co.uk> >>
+Nigel Horne, C<< <njh at nigelhorne.com> >>
 
 =head1 BUGS
 

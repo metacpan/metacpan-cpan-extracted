@@ -1,5 +1,14 @@
 Revision history for Perl extension App::Wax.
 
+2.5.0 - 2025-08-01
+
+    - update to work with perl v5.42
+    - bump the minimum perl version from 5.10 to 5.14
+    - replace deprecated Method::Signatures::Simple with Function::Parameters
+      (requires perl >= 5.14)
+    - fix broken mock in tests
+    - update dependencies
+
 2.4.1 - 2020-08-04
 
     - portability: fix test failures on Strawberry Perl (thanks, Alexandr Ciornii)

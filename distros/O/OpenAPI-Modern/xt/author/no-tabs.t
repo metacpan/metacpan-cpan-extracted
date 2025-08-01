@@ -26,7 +26,6 @@ my @files = (
     't/oas-vocabulary/discriminator.json',
     't/oas-vocabulary/formats.json',
     't/openapi-constructor.t',
-    't/operationIds.t',
     't/parameters.t',
     't/recursive_get.t',
     't/results/oas-vocabulary.txt',

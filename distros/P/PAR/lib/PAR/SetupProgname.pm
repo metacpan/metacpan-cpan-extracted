@@ -37,21 +37,22 @@ sub set_progname {
     $Progname = $0 if not defined $Progname;
 
     if (( () = File::Spec->splitdir($Progname) ) > 1 or !$ENV{PAR_PROGNAME}) {
-        if (open my $fh, $Progname) {
-            return if -s $fh;
-        }
-        if (-s "$Progname$Config{_exe}") {
-            $Progname .= $Config{_exe};
-            return;
+        my $name = $Progname;
+        if (-s $name) { $Progname = $name; return }
+        if ($Config{_exe}) {
+            $name = "$Progname$Config{_exe}";
+            if (-s $name) { $Progname = $name; return }
         }
     }
 
     foreach my $dir (split /\Q$Config{path_sep}\E/, $ENV{PATH}) {
         next if exists $ENV{PAR_TEMP} and $dir eq $ENV{PAR_TEMP};
-        my $name = File::Spec->catfile($dir, "$Progname$Config{_exe}");
-        if (-s $name) { $Progname = $name; last }
-        $name = File::Spec->catfile($dir, "$Progname");
-        if (-s $name) { $Progname = $name; last }
+        my $name = File::Spec->catfile($dir, $Progname);
+        if (-s $name) { $Progname = $name; return }
+        if ($Config{_exe}) {
+            $name = File::Spec->catfile($dir, "$Progname$Config{_exe}");
+            if (-s $name) { $Progname = $name; return }
+        }
     }
 }
 

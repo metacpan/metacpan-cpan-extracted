@@ -1,10 +1,10 @@
 # NAME
 
-HTML::OSM - A module to generate an interactive OpenStreetMap with customizable coordinates and zoom level.
+HTML::OSM - Generate an interactive OpenStreetMap with customizable coordinates and zoom level
 
 # VERSION
 
-Version 0.08
+Version 0.09
 
 # SYNOPSIS
 
@@ -149,7 +149,8 @@ It takes two optional arguments:
 
 ## center
 
-Center the map at a given point. Returns 1 on success, 0 if the point could not be found.
+Center the map at a given point.
+Returns 1 on success, 0 if the point could not be found.
 
 ## zoom
 
@@ -165,15 +166,14 @@ The second in the body where you want the map to appear.
 
 # AUTHOR
 
-Nigel Horne, `<njh at bandsman.co.uk>`
+Nigel Horne, `<njh at nigelhorne.com>`
 
 # BUGS
 
 # SEE ALSO
 
 - [https://wiki.openstreetmap.org/wiki/API](https://wiki.openstreetmap.org/wiki/API)
-- [File::Slurp](https://metacpan.org/pod/File%3A%3ASlurp)
-- `HTML::GoogleMaps::V3`
+- [HTML::GoogleMaps::V3](https://metacpan.org/pod/HTML%3A%3AGoogleMaps%3A%3AV3)
 
     Much of the interface to `HTML::OSM` mimicks this for compatibility.
 

@@ -6,6 +6,21 @@ use Getopt::Long;	# Technique inspired by IO::Lambda
 use ExtUtils::MakeMaker 6.64;	# 6.64 for TEST_REQUIRES
 use IO::Socket::INET;
 
+# Test for broken smokers that don't set AUTOMATED_TESTING
+if(my $reporter = $ENV{'PERL_CPAN_REPORTER_CONFIG'}) {
+	if($reporter =~ /smoker/i) {
+		warn 'AUTOMATED_TESTING added for you' if(!defined($ENV{'AUTOMATED_TESTING'}));
+		$ENV{'AUTOMATED_TESTING'} = 1;
+	}
+}
+
+if(defined($ENV{'GITHUB_ACTION'}) || defined($ENV{'CIRCLECI'}) || defined($ENV{'TRAVIS_PERL_VERSION'}) || defined($ENV{'APPVEYOR'})) {
+	# Prevent downloading and installing stuff
+	warn 'AUTOMATED_TESTING added for you' if(!defined($ENV{'AUTOMATED_TESTING'}));
+	$ENV{'AUTOMATED_TESTING'} = 1;
+	$ENV{'NO_NETWORK_TESTING'} = 1;
+}
+
 my $online_tests;
 
 if($ENV{'AUTHOR_TESTING'}) {
@@ -25,7 +40,7 @@ if($ENV{'AUTHOR_TESTING'}) {
 if($online_tests) {
 	open(my $enabled, '>', 't/online.enabled') || die "Can't touch t/online.enabled $!";
 	close($enabled) || die "Can't touch t/online.enabled $!";
-} else {
+} elsif(!$ENV{'AUTOMATED_TESTING'}) {
 	unlink('t/online.enabled');
 	print STDERR "NA: Genealogy::ChroniclingAmerica needs a permanent connexion to the Internet\n";
 	exit(0);
@@ -42,9 +57,9 @@ if($^O eq 'darwin') {
 
 WriteMakefile(
     NAME		=> 'Genealogy::ChroniclingAmerica',
-    AUTHOR		=> q{Nigel Horne <njh@bandsman.co.uk>},
+    AUTHOR		=> q{Nigel Horne <njh@nigelhorne.com>},
     VERSION_FROM	=> 'lib/Genealogy/ChroniclingAmerica.pm',
-    ABSTRACT_FROM       => 'lib/Genealogy/ChroniclingAmerica.pm',
+    ABSTRACT_FROM   => 'lib/Genealogy/ChroniclingAmerica.pm',
     ((defined($ExtUtils::MakeMaker::VERSION) &&
      ($ExtUtils::MakeMaker::VERSION >= 6.3002))
       ? ('LICENSE'=> 'GPL')
@@ -65,6 +80,9 @@ WriteMakefile(
 	'JSON::MaybeXS' => 0,
 	'LWP::Protocol::https' => 0,
 	'LWP::UserAgent' => 0,
+	'Object::Configure' => 0,
+	'Params::Get' => 0,
+	'Return::Set' => 0,
 	'Scalar::Util' => 0,
 	'URI' => 0
     }, dist => $dist,
@@ -90,6 +108,7 @@ WriteMakefile(
 
 sub are_online
 {
+	return 0 if($ENV{'NO_NETWORK_TESTING'} || $ENV{'CIRCLECI'} || $ENV{'TRAVIS_PERL_VERSION'} || $ENV{'AUTOMATED_TESTING'} || $ENV{'NONINTERACTIVE_TESTING'} || (!-t STDIN));
 	my $host = 'chroniclingamerica.loc.gov:443';
 
 	if($ENV{'https_proxy'} && ($ENV{'https_proxy'} =~ /^.+\/\/(\w+:\d+)$/)) {

@@ -6,6 +6,9 @@ use Carp;
 use Data::Reuse;
 use File::Spec;
 use Module::Info;
+use Object::Configure 0.10;
+use Params::Get;
+use Return::Set;
 use Scalar::Util;
 
 use Genealogy::Wills::wills;
@@ -16,11 +19,11 @@ Genealogy::Wills - Lookup in a database of wills
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =cut
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 =head1 SYNOPSIS
 
@@ -35,16 +38,24 @@ our $VERSION = '0.07';
 
 Creates a Genealogy::Wills object.
 
-Takes two optional arguments which can be hash, hash-ref or key-value pairs.
+Takes three optional arguments,
+which can be hash, hash-ref or key-value pairs.
 
 =over 4
 
-=item C<directory>
+=item * C<config_file>
+
+Points to a configuration file which contains the parameters to C<new()>.
+The file can be in any common format,
+including C<YAML>, C<XML>, and C<INI>.
+This allows the parameters to be set at run time.
+
+=item * C<directory>
 
 That is the directory containing obituaries.sql.
 If not given, the use the module's data directory.
 
-=item C<logger>
+=item * C<logger>
 
 An object to send log messages to
 
@@ -57,18 +68,10 @@ sub new
 	my $class = shift;
 
 	# Handle hash or hashref arguments
-	my %args;
-	if((@_ == 1) && (ref($_[0]) eq 'HASH')) {
-		%args = %{$_[0]};
-	} elsif((@_ % 2) == 0) {
-		%args = @_;
-	} else {
-		Carp::croak(__PACKAGE__, ': Invalid arguments passed to new()');
-		return;
-	}
+	my $params = Params::Get::get_params(undef, \@_);
 
 	if(!defined($class)) {
-		if((scalar keys %args) > 0) {
+		if((scalar keys %{$params}) > 0) {
 			# Using Genealogy::Wills::new(), not Genealogy::Wills->new()
 			carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
 			return;
@@ -78,24 +81,30 @@ sub new
 		$class = __PACKAGE__;
 	} elsif(Scalar::Util::blessed($class)) {
 		# clone the given object
-		return bless { %{$class}, %args }, ref($class);
+		if($params) {
+			return bless { %{$class}, %{$params} }, ref($class);
+		}
+		return bless $class, ref($class);
 	}
 
-	if(!defined((my $directory = ($args{'directory'} || $Database::Abstraction->{'directory'})))) {
+	# Load the configuration from a config file, if provided
+	$params = Object::Configure::configure($class, $params);
+
+	if(!defined((my $directory = ($params->{'directory'} || $Database::Abstraction->{'directory'})))) {
 		# If the directory argument isn't given, see if we can find the data
 		$directory ||= Module::Info->new_from_loaded(__PACKAGE__)->file();
 		$directory =~ s/\.pm$//;
-		$args{'directory'} = File::Spec->catfile($directory, 'data');
+		$params->{'directory'} = File::Spec->catfile($directory, 'data');
 	}
-	if(!-d $args{'directory'}) {
-		Carp::carp(__PACKAGE__, ': ', $args{'directory'}, ' is not a directory');
+	if(!-d $params->{'directory'}) {
+		Carp::carp(__PACKAGE__, ': ', $params->{'directory'}, ' is not a directory');
 		return;
 	}
 
 	# cache_duration can be overriden by the args
 	return bless {
 		cache_duration => '1 day',	# The database is updated daily
-		%args,
+		%{$params}
 	}, $class;
 }
 
@@ -119,7 +128,7 @@ Each record includes a formatted C<url> field.
 
 sub search {
 	my $self = shift;
-	my $params = $self->_get_params('last', @_);
+	my $params = Params::Get::get_params('last', @_);
 
 	if(!defined($params->{'last'})) {
 		Carp::carp("Value for 'last' is mandatory");
@@ -142,42 +151,8 @@ sub search {
 	my $will = $self->{'wills'}->fetchrow_hashref($params);
 	$will->{'url'} = 'https://' . $will->{'url'};
 	Data::Reuse::fixate(%{$will});
-	return $will;
-}
 
-# Helper routine to parse the arguments given to a function.
-# Processes arguments passed to methods and ensures they are in a usable format,
-#	allowing the caller to call the function in anyway that they want
-#	e.g. foo('bar'), foo(arg => 'bar'), foo({ arg => 'bar' }) all mean the same
-#	when called _get_params('arg', @_);
-sub _get_params
-{
-	shift;  # Discard the first argument (typically $self)
-	my $default = shift;
-
-	# Directly return hash reference if the first parameter is a hash reference
-	return $_[0] if(ref $_[0] eq 'HASH');
-
-	my %rc;
-	my $num_args = scalar @_;
-
-	# Populate %rc based on the number and type of arguments
-	if(($num_args == 1) && (defined $default)) {
-		# %rc = ($default => shift);
-		return { $default => shift };
-	} elsif($num_args == 1) {
-		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], '()');
-	} elsif(($num_args == 0) && (defined($default))) {
-		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], "($default => \$val)");
-	} elsif(($num_args % 2) == 0) {
-		%rc = @_;
-	} elsif($num_args == 0) {
-		return;
-	} else {
-		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], '()');
-	}
-
-	return \%rc;
+	return Return::Set($will, { 'type' => 'hashref', 'min' => 1 });
 }
 
 =head1 AUTHOR

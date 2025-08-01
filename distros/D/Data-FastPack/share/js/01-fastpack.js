@@ -61,6 +61,7 @@
           let name=args.inputs[i].id;
           let id=ns.n2e[name];
           if(id == undefined){
+            //id/code...  NOT FOUND... Register if payload has length!
             if(args.inputs[i].payload.length){
               //Update id tracking and lookup tables
               id=ns.free_id.pop()||ns.next_id++;
@@ -72,13 +73,24 @@
               buffer=new_arg.buffer;
             }
             else {
-              //Defined id, but no payload... unreg
-              // Message  with no payload is unreg
+              // No length in payload.. ignore
+            }
+          }
+          else {
+            if(args.inputs[i].payload.length==0){
+              //Defined id, but no payload... so this means name seen before and we need to  unreg
               delete ns.n2e[name];
               delete ns.i2e[id];
-              ns.free_id.push(id);
+              //Push free id as we are encoding side
+              ns.free_id.push(id); 
 
             }
+            else {
+              // No zero payload, .. normal message
+              
+            }
+          }
+
             //Translate
             ids[i]=id;
           }
@@ -89,7 +101,6 @@
         }
 
       }
-    }
 
     if(buffer){
       off=buffer.length;
@@ -206,7 +217,7 @@
               // No payload remove the id/name from the tables, do not pass on message
               delete ns.n2e[name];
               delete ns.i2e[id];
-              ns.free_id.push(id);
+              //ns.free_id.push(id);
             }
           }
         }

@@ -1,15 +1,15 @@
 package App::Wax;
 
-use 5.008008;
+use 5.014000;
 
 use Digest::SHA qw(sha1_hex);
 use File::Slurper qw(read_text write_text);
 use File::Spec;
 use File::Temp;
+use Function::Parameters qw(fun method);
 use Getopt::Long qw(GetOptionsFromArray :config posix_default require_order bundling no_auto_abbrev no_ignore_case);
 use IPC::System::Simple qw(EXIT_ANY $EXITVAL systemx);
 use LWP::UserAgent;
-use Method::Signatures::Simple;
 use MIME::Types;
 use Mouse;
 use Parallel::parallel_map qw(parallel_map);
@@ -23,12 +23,12 @@ use URI::Split qw(uri_split);
 #
 # XXX this declaration must be on a single line
 # https://metacpan.org/pod/version#How-to-declare()-a-dotted-decimal-version
-use version; our $VERSION = version->declare('v2.4.1');
+use version; our $VERSION = version->declare('v2.5.0');
 
 # defaults
 use constant {
     CACHE              => 0,
-    DEFAULT_USER_AGENT => 'Mozilla/5.0 (Windows NT 10.0; rv:78.0) Gecko/20100101 Firefox/78.0',
+    DEFAULT_USER_AGENT => 'Mozilla/5.0 (X11; Linux x86_64; rv:141.0) Gecko/20100101 Firefox/141.0',
     ENV_PROXY          => 1,
     ENV_USER_AGENT     => $ENV{WAX_USER_AGENT},
     EXTENSION          => qr/.(\.(?:(tar\.(?:bz|bz2|gz|lzo|Z))|(?:[ch]\+\+)|(?:\w+)))$/i,
@@ -82,7 +82,13 @@ has directory => (
     isa       => 'Str',
     predicate => 'has_directory',
     required  => 0,
-    trigger   => \&_check_directory,
+
+    # XXX hack for testing: we need to mock App::Wax::_check_directory in tests
+    # (to avoid touching the file system) but referencing \&_check_directory
+    # here would bind the subroutine reference at compile time *before* it gets
+    # mocked, so use this small indirection to ensure we resolve the
+    # App::Wax::_check_directory method at runtime instead
+    trigger => method ($dir, $old = undef) { $self->_check_directory($dir) },
 );
 
 has keep => (
@@ -136,21 +142,21 @@ has timeout => (
     is      => 'rw',
     isa     => 'Int',
     default => TIMEOUT,
-    trigger => method ($timeout) { $self->_lwp_user_agent->timeout($timeout) },
+    trigger => method ($timeout, $old = undef) { $self->_lwp_user_agent->timeout($timeout) },
 );
 
 has user_agent => (
     is      => 'rw',
     isa     => 'Str',
     default => USER_AGENT,
-    trigger => method ($user_agent) { $self->_lwp_user_agent->agent($user_agent) },
+    trigger => method ($user_agent, $old = undef) { $self->_lwp_user_agent->agent($user_agent) },
 );
 
 has verbose => (
     is      => 'rw',
     isa     => 'Bool',
     default => VERBOSE,
-    trigger => method ($verbose) { $| = 1 }, # unbuffer output
+    trigger => method ($verbose, $old = undef) { $| = 1 }, # unbuffer output
 );
 
 # log the path. if the directory doesn't exist, create it if its parent directory
@@ -167,22 +173,23 @@ method _check_directory ($dir) {
 }
 
 # lazy constructor for the default LWP::UserAgent instance
-method _build_lwp_user_agent {
+method _build_lwp_user_agent () {
     LWP::UserAgent->new(
         env_proxy => ENV_PROXY,
         timeout   => $self->timeout,
-        agent     => $self->user_agent
+        agent     => $self->user_agent,
+        send_te   => 0,
     )
 }
 
 # set `keep` to true if --cache or --mirror are set,
 # but raise an error if both are set
-method _check_keep {
-    if ($self->cache && $self->mirror) {
+method _check_keep ($keep, $old = undef) {
+    if ($keep && $self->cache && $self->mirror) {
         $self->log(ERROR => "--cache and --mirror can't be used together");
         exit E_INVALID_OPTIONS;
     } else {
-        $self->_set_keep(1);
+        $self->_set_keep($keep);
     }
 }
 
@@ -252,7 +259,7 @@ method download ($_url, $filename) {
 }
 
 # helper for `dump_command`: escape/quote a shell argument on POSIX shells
-func _escape ($arg) {
+fun _escape ($arg) {
     # https://stackoverflow.com/a/1250279
     # https://github.com/boazy/any-shell-escape/issues/1#issuecomment-36226734
     $arg =~ s!('{1,})!'"$1"'!g;

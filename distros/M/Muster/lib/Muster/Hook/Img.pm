@@ -1,12 +1,12 @@
 package Muster::Hook::Img;
-$Muster::Hook::Img::VERSION = '0.92';
+$Muster::Hook::Img::VERSION = '0.93';
 =head1 NAME
 
 Muster::Hook::Img - Muster image and thumbnailing directive
 
 =head1 VERSION
 
-version 0.92
+version 0.93
 
 =head1 DESCRIPTION
 

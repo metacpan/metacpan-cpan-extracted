@@ -17,8 +17,8 @@
 ]>
 <ISBNRangeMessage>
   <MessageSource>International ISBN Agency</MessageSource>
-  <MessageSerialNumber>b18d4172-dd2f-4f11-9e00-1d03a9736650</MessageSerialNumber>
-  <MessageDate>Wed, 23 Jul 2025 05:00:29 BST</MessageDate>
+  <MessageSerialNumber>49a279a3-8647-4efd-8e68-0112fcdea57c</MessageSerialNumber>
+  <MessageDate>Fri, 1 Aug 2025 05:06:53 BST</MessageDate>
   <EAN.UCCPrefixes>
     <EAN.UCC>
       <Prefix>978</Prefix>
@@ -349,7 +349,15 @@
           <Length>7</Length>
         </Rule>
         <Rule>
-          <Range>9169080-9195999</Range>
+          <Range>9169080-9191639</Range>
+          <Length>6</Length>
+        </Rule>
+        <Rule>
+          <Range>9191640-9195649</Range>
+          <Length>7</Length>
+        </Rule>
+        <Rule>
+          <Range>9195650-9195999</Range>
           <Length>6</Length>
         </Rule>
         <Rule>
@@ -8559,23 +8567,23 @@
       <Agency>Oman</Agency>
       <Rules>
         <Rule>
-          <Range>0000000-1999999</Range>
+          <Range>0000000-2999999</Range>
           <Length>1</Length>
         </Rule>
         <Rule>
-          <Range>2000000-4999999</Range>
+          <Range>3000000-4999999</Range>
           <Length>0</Length>
         </Rule>
         <Rule>
-          <Range>5000000-6499999</Range>
+          <Range>5000000-6999999</Range>
           <Length>2</Length>
         </Rule>
         <Rule>
-          <Range>6500000-9499999</Range>
+          <Range>7000000-8999999</Range>
           <Length>0</Length>
         </Rule>
         <Rule>
-          <Range>9500000-9999999</Range>
+          <Range>9000000-9999999</Range>
           <Length>3</Length>
         </Rule>
       </Rules>

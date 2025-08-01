@@ -1,3 +1,10 @@
+1.021  2025-07-31
+
+- use three-argument open() everywhere
+- PAR::FAQ is severely outdated, remove it
+- README: remove https://groups.google.com/g/perl.par
+  as an archive for par@perl.org (as it will not be updated anymore)
+
 1.020  2024-03-04
 
 - restructure _extract_inc(): always add XS DLLs in 

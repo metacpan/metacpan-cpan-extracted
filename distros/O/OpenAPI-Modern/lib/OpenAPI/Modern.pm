@@ -1,10 +1,10 @@
 use strictures 2;
-package OpenAPI::Modern; # git description: v0.087-8-g6c65e6c
+package OpenAPI::Modern; # git description: v0.088-15-gd468c2d
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI v3.1 document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI v3.1 Swagger HTTP request response
 
-our $VERSION = '0.088';
+our $VERSION = '0.089';
 
 use 5.020;
 use utf8;
@@ -22,7 +22,9 @@ no feature 'switch';
 use Carp 'croak';
 use Safe::Isa;
 use Ref::Util qw(is_plain_hashref is_plain_arrayref is_ref);
-use List::Util qw(first pairs none);
+use List::Util qw(first pairs);
+use if "$]" < 5.041010, 'List::Util' => 'any';
+use if "$]" >= 5.041010, experimental => 'keyword_any';
 use Scalar::Util 'looks_like_number';
 use builtin::compat 'indexed';
 use Feature::Compat::Try;
@@ -49,7 +51,6 @@ has openapi_document => (
   },
 );
 
-# held separately because $document->evaluator is a weak ref
 has evaluator => (
   is => 'ro',
   isa => InstanceOf['JSON::Schema::Modern'],
@@ -67,14 +68,11 @@ has debug => (
 around BUILDARGS => sub ($orig, $class, @args) {
   my $args = $class->$orig(@args);
 
-  if (exists $args->{openapi_document}) {
-    $args->{evaluator} = $args->{openapi_document}->evaluator;
-  }
-  else {
-    # construct document out of openapi_uri, openapi_schema (and evaluator if provided).
-    croak 'missing required constructor arguments: either openapi_document, or openapi_uri and openapi_schema'
-      if not exists $args->{openapi_uri} or not exists $args->{openapi_schema};
-  }
+  croak 'missing required constructor arguments: either openapi_document, or openapi_uri and openapi_schema'
+    if not exists $args->{openapi_document}
+      and (not exists $args->{openapi_uri} or not exists $args->{openapi_schema});
+
+  my $had_document = exists $args->{openapi_document};
 
   $args->{evaluator} //= JSON::Schema::Modern->new(validate_formats => 1, max_traversal_depth => 80);
 
@@ -83,6 +81,9 @@ around BUILDARGS => sub ($orig, $class, @args) {
     schema => $args->{openapi_schema},
     evaluator => $args->{evaluator},
   );
+
+  # add the OpenAPI vacabulary, formats and metaschemas to the evaluator if they weren't there already
+  $args->{openapi_document}->_add_vocab_and_default_schemas($args->{evaluator}) if $had_document;
 
   # if there were errors, this will die with a JSON::Schema::Modern::Result object
   $args->{evaluator}->add_document($args->{openapi_document});
@@ -567,13 +568,13 @@ sub recursive_get ($self, $uri_reference, $entity_type = undef) {
   my ($depth, $schema);
 
   while ($ref) {
-    die 'maximum evaluation depth exceeded' if $depth++ > $self->evaluator->max_traversal_depth;
+    croak 'maximum evaluation depth exceeded' if $depth++ > $self->evaluator->max_traversal_depth;
     my $uri = Mojo::URL->new($ref)->to_abs($base);
 
     my $schema_info = $self->evaluator->_fetch_from_uri($uri);
 
-    die('unable to find resource "', $uri, '"') if not $schema_info;
-    die sprintf('bad $ref to %s: not a%s "%s"', $schema_info->{canonical_uri}, ($entity_type =~ /^[aeiou]/ ? 'n' : ''), $entity_type)
+    croak 'unable to find resource "', $uri, '"' if not $schema_info;
+    croak sprintf('bad $ref to %s: not a%s "%s"', $schema_info->{canonical_uri}, ($entity_type =~ /^[aeiou]/ ? 'n' : ''), $entity_type)
       if $entity_type
         and $schema_info->{document}->get_entity_at_location($schema_info->{document_path}) ne $entity_type;
 
@@ -664,7 +665,7 @@ sub _match_uri ($self, $method, $uri, $path_template, $state) {
     # perldoc perlvar, @-: $n coincides with "substr $_, $-[n], $+[n] - $-[n]" if "$-[n]" is defined
     my @uri_capture_values = map
       Encode::decode('UTF-8', url_unescape(substr($full_uri, $-[$_], $+[$_]-$-[$_])),
-        Encode::FB_CROAK | Encode::LEAVE_SRC), 1 .. $#-;
+        Encode::DIE_ON_ERR), 1 .. $#-;
 
     # we have a match, so preserve our new $state values created via _resolve_ref
     %$state = %$local_state;
@@ -693,7 +694,7 @@ sub _match_uri ($self, $method, $uri, $path_template, $state) {
             schema_path => jsonp($state->{schema_path}, @$more_schema_path, $index, 'variables', $name),
             defined $base_schema_uri ? (initial_schema_uri => $base_schema_uri) : () },
           'server url value does not match any of the allowed values')
-        if none { $captures{$name} eq $_ } $server->{variables}{$name}{enum}->@*;
+        if not any { $captures{$name} eq $_ } $server->{variables}{$name}{enum}->@*;
     }
 
     return if not $valid;
@@ -854,7 +855,7 @@ sub _validate_parameter_content ($self, $state, $param_obj, $content_ref) {
 }
 
 sub _validate_body_content ($self, $state, $content_obj, $message) {
-  # strip charset from Content-Type
+  # strip media-type parameters (e.g. charset) from Content-Type
   my $content_type = (split(/;/, $message->headers->content_type//'', 2))[0] // '';
 
   return E({ %$state, data_path => $state->{data_path} =~ s{body}{header}r, keyword => 'content' },
@@ -888,10 +889,11 @@ sub _validate_body_content ($self, $state, $content_obj, $message) {
   # TODO: handle Content-Encoding header; https://github.com/OAI/OpenAPI-Specification/issues/2868
   my $content_ref = \ $message->body;
 
-  # decode the charset, for text content
-  if ($content_type =~ m{^text/} and my $charset = $message->content->charset) {
+  # use charset to decode text content
+  if ($content_type =~ m{^text/} and defined(my $charset = $message->content->charset)) {
     try {
-      $content_ref = \ Encode::decode($charset, $content_ref->$*, Encode::FB_CROAK | Encode::LEAVE_SRC);
+      # we don't use $message->text or Mojo::Util::decode because they don't die on failure
+      $content_ref = \ Encode::decode($charset, $content_ref->$*, Encode::DIE_ON_ERR);
     }
     catch ($e) {
       return E({ %$state, keyword => 'content', _schema_path_suffix => $media_type },
@@ -1102,7 +1104,7 @@ sub THAW ($class, $serializer, $data) {
   my $self = bless($data, $class);
 
   foreach my $attr (qw(openapi_document evaluator)) {
-    die "serialization missing attribute '$attr': perhaps your serialized data was produced for an older version of $class?"
+    croak "serialization missing attribute '$attr': perhaps your serialized data was produced for an older version of $class?"
       if not exists $self->{$attr};
   }
 
@@ -1123,7 +1125,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI v3.1 d
 
 =head1 VERSION
 
-version 0.088
+version 0.089
 
 =head1 SYNOPSIS
 
@@ -1285,7 +1287,10 @@ L</openapi_schema> B<MUST> be provided, and L</evaluator> will also be used if p
 =head2 evaluator
 
 The L<JSON::Schema::Modern> object to use for all URI resolution and JSON Schema evaluation.
-Ignored if L</openapi_document> is provided. Optional (a default is constructed when omitted).
+Optional (a default is constructed when omitted).
+
+This must be prepared in advance if custom metaschemas are to be used, as the evaluator is what
+holds the information about all available schemas.
 
 =head2 debug
 

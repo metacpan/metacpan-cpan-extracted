@@ -2,7 +2,7 @@ package Data::FastPack;
 use strict;
 use warnings;
 
-our $VERSION="v0.2.1";
+our $VERSION="v0.2.2";
 
 use feature ":all";
 no warnings "experimental";
@@ -84,7 +84,7 @@ sub encode_message {
     for(@$inputs){
       # NOTE: messages with "0" and 0 and undef are ignored
       if($_->[FP_MSG_ID]){
-        DEBUG and print STDERR __PACKAGE__ . "true value for message id\n";
+        #DEBUG and 
         my $name=$_->[FP_MSG_ID];
         # Convert to id if ns is present and ID is NOT 0
         my $id=$ns->[N2E]{$name};
@@ -97,11 +97,16 @@ sub encode_message {
             $ns->[N2E]{$name}=$id;
             $ns->[I2E]{$id}=$name;
 
-            DEBUG and print STDERR __PACKAGE__ . "encode registration\n";
+            DEBUG and print STDERR __PACKAGE__ . "encode registration $id $name\n";
             # encode definition into buffer
             $bytes+=encode_message $buf, [[$_->[FP_MSG_TIME], $id, $name ]];
           }
           else {
+          }
+        }
+        else {
+            
+          unless(defined $_->[FP_MSG_PAYLOAD]){
             DEBUG and print STDERR __PACKAGE__ . "payload is undefined... so we want to unregister\n";
             # A message with no payload is an unregistration
             # Remove the entry from the tabe
@@ -110,6 +115,7 @@ sub encode_message {
             delete $ns->[I2E]{$id};
             push $ns->[FREE_ID]->@*, $id;
           }
+
         }
         $_ids[$i++]=$id;
         #$_->[FP_MSG_ID]=$id;
@@ -124,10 +130,10 @@ sub encode_message {
     }
     $i=0;
     for(@$inputs){
-      $padding=((length $_->[FP_MSG_PAYLOAD])%8);
+      $padding=((length($_->[FP_MSG_PAYLOAD]//""))%8);
       $padding= 8-$padding  if $padding;
 
-      my $s=pack("d V V/a*", $_->[FP_MSG_TIME], $_ids[$i++], $_->[FP_MSG_PAYLOAD] );
+      my $s=pack("d V V/a*", $_->[FP_MSG_TIME], $_ids[$i++], $_->[FP_MSG_PAYLOAD]//"" );
       $tmp=$s.substr $pbuf, 0, $padding;
       $bytes+=length $tmp;
       $buf.=$tmp;
@@ -149,20 +155,6 @@ sub encode_message {
 
   }
 
-  ################################################################################################
-  # # Do normal encoding                                                                         #
-  # $i=0;                                                                                        #
-  #       for(@$inputs){                                                                         #
-  #               $padding=((length $_->[FP_MSG_PAYLOAD])%8);                                    #
-  #   $padding= 8-$padding  if $padding;                                                         #
-  #                                                                                              #
-  #               my $s=pack("d V V/a*", $_->[FP_MSG_TIME], $_ids[$i++], $_->[FP_MSG_PAYLOAD] ); #
-  #   $tmp=$s.substr $pbuf, 0, $padding;                                                         #
-  #   $bytes+=length $tmp;                                                                       #
-  #               $buf.=$tmp;                                                                    #
-  #   last if ++$processed == $limit;                                                            #
-  #       }                                                                                      #
-  ################################################################################################
   # Remove the messages from the input array
   splice @$inputs, 0, $processed;
   
@@ -261,7 +253,7 @@ sub decode_message {
           DEBUG and print STDERR __PACKAGE__ . " has NO payload.. un register and do no push to ouput\n";
           delete $ns->[N2E]{$name};
           delete $ns->[I2E]{$id};
-          push $ns->[FREE_ID]->@*, $id;
+          #push $ns->[FREE_ID]->@*, $id;
         }
       }
     }

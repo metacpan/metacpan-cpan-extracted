@@ -816,13 +816,13 @@ L<http://search.cpan.org/perldoc?PAR::Tutorial>
 
  push @INC, sub {
      my ($coderef, $filename) = @_;  # $coderef is \&my_sub
-     open my $fh, "wget ftp://example.com/$filename |";
+     open my $fh, "-|", "wget ftp://example.com/$filename";
      return $fh;	# using remote modules, indeed!
  };
 
 =item * Perl 5.8 let you open a file handle to a string, so we just use that:
 
-        open my $fh, '<', \($zip->memberNamed($filename)->contents);
+        open my $fh, "<", \($zip->memberNamed($filename)->contents);
         return $fh;
 
 =item * But Perl 5.6 does not have that, and I don't want to use temp files...

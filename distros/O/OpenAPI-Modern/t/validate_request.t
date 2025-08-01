@@ -1174,6 +1174,8 @@ YAML
     local $TODO = 'mojo will strip the content body when parsing a stringified request that lacks Content-Length'
       if $::TYPE eq 'lwp' or $::TYPE eq 'plack' or $::TYPE eq 'catalyst';
 
+    # this works without a charset because all characters fit into a single byte, essentially
+    # acting like latin1.
     $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'text/plain' ], 'éclair');
     remove_header($request, 'Content-Length');
 
@@ -1307,7 +1309,7 @@ YAML
   );
 
   $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'text/plain; charset=UTF-8' ],
-    chr(0xe9).'clair"}');
+    chr(0xe9).'clair');
   cmp_result(
     $openapi->validate_request($request)->TO_JSON,
     {

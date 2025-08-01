@@ -1,5 +1,10 @@
 Revision history for HTML-OSM
 
+0.09	Thu Jul 31 11:15:55 EDT 2025
+	Remove unused module: File::Slurp
+	Use Params::Get, Object::Configure
+	Don't test URLs on smokers
+
 0.08	Wed Apr  2 07:51:24 EDT 2025
 	Added css_url and js_url arguments to new()
 	Default Leaflet bumped from 1.7.1 to 1.9.4

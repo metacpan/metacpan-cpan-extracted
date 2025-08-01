@@ -4,7 +4,7 @@ LWP::UserAgent::Throttled - Throttle requests to a site
 
 # VERSION
 
-Version 0.13
+Version 0.14
 
 # SYNOPSIS
 
@@ -64,6 +64,8 @@ Redirects to other domains can confuse it, so you need to program those manually
 [LWP::UserAgent](https://metacpan.org/pod/LWP%3A%3AUserAgent)
 
 # SUPPORT
+
+This module is provided as-is without any warranty.
 
 You can find documentation for this module with the perldoc command.
 

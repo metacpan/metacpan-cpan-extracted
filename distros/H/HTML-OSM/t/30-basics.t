@@ -10,6 +10,21 @@ use Test::RequiresInternet ('nominatim.openstreetmap.org' => 'https');
 
 BEGIN { use_ok('HTML::OSM') }
 
+# Test for broken smokers that don't set AUTOMATED_TESTING
+if(my $reporter = $ENV{'PERL_CPAN_REPORTER_CONFIG'}) {
+	if($reporter =~ /smoker/i) {
+		diag('AUTOMATED_TESTING added for you') if(!defined($ENV{'AUTOMATED_TESTING'}));
+		$ENV{'AUTOMATED_TESTING'} = 1;
+	}
+}
+
+if(defined($ENV{'GITHUB_ACTION'}) || defined($ENV{'CIRCLECI'}) || defined($ENV{'TRAVIS_PERL_VERSION'}) || defined($ENV{'APPVEYOR'})) {
+	# Prevent downloading and installing stuff
+	diag('AUTOMATED_TESTING added for you') if(!defined($ENV{'AUTOMATED_TESTING'}));
+	$ENV{'AUTOMATED_TESTING'} = 1;
+	$ENV{'NO_NETWORK_TESTING'} = 1;
+}
+
 # Helper to silence warnings in error-checking tests
 local $SIG{__WARN__} = sub { };
 
@@ -81,8 +96,10 @@ my $osm_clone = $osm->new(zoom => 17);
 isa_ok($osm_clone, 'HTML::OSM', 'Cloned object is still HTML::OSM');
 is($osm_clone->{zoom}, 17, 'Cloned object has updated zoom');
 
-# HTTP Tests
-http_ok($osm->{'css_url'}, HTTP_OK);
-http_ok($osm->{'js_url'}, HTTP_OK);
+unless($ENV{'NO_NETWORK_TESTING'}) {
+	# HTTP Tests
+	http_ok($osm->{'css_url'}, HTTP_OK);
+	http_ok($osm->{'js_url'}, HTTP_OK);
+}
 
 done_testing();

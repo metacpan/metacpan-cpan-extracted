@@ -3,12 +3,28 @@
 use strict;
 use warnings;
 
-use Test::More tests => 10;
-use HTTP::Request;
-use HTTP::Response;
 use Time::HiRes;
+use Test::More;
+use HTTP::Request;
+use Test::RequiresInternet ('www.example.com' => 'http');
+use HTTP::Response;
 
 BEGIN { use_ok('LWP::UserAgent::Throttled') }
+
+# Test for broken smokers that don't set AUTOMATED_TESTING
+if(my $reporter = $ENV{'PERL_CPAN_REPORTER_CONFIG'}) {
+	if($reporter =~ /smoker/i) {
+		diag('AUTOMATED_TESTING added for you') if(!defined($ENV{'AUTOMATED_TESTING'}));
+		$ENV{'AUTOMATED_TESTING'} = 1;
+	}
+}
+
+if(defined($ENV{'GITHUB_ACTION'}) || defined($ENV{'CIRCLECI'}) || defined($ENV{'TRAVIS_PERL_VERSION'}) || defined($ENV{'APPVEYOR'})) {
+	# Prevent downloading and installing stuff
+	diag('AUTOMATED_TESTING added for you') if(!defined($ENV{'AUTOMATED_TESTING'}));
+	$ENV{'AUTOMATED_TESTING'} = 1;
+	$ENV{'NO_NETWORK_TESTING'} = 1;
+}
 
 # Create an instance of the throttled user agent
 my $ua = new_ok('LWP::UserAgent::Throttled');
@@ -33,10 +49,16 @@ my $mid_time = Time::HiRes::time();
 $ua->send_request($request2);
 my $end_time = Time::HiRes::time();
 
-cmp_ok(($mid_time - $start_time), '<', 1, 'First request sent immediately');
+unless($ENV{'AUTOMATED_TESTING'}) {
+	# I can't control the speed of smokers and CI environments
+	# http://www.cpantesters.org/cpan/report/f1868102-19a3-11f0-98b0-b3c3213a625c
+	cmp_ok(($mid_time - $start_time), '<', 1, 'First request sent immediately');
+}
 cmp_ok(($end_time - $mid_time), '>=', 2, 'Second request throttled correctly');
 
 # Test user agent assignment
 my $custom_ua = new_ok('LWP::UserAgent');
 $ua->ua($custom_ua);
 is($ua->ua(), $custom_ua, 'Custom user agent set correctly');
+
+done_testing();

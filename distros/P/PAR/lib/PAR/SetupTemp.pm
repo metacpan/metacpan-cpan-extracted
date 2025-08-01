@@ -56,7 +56,7 @@ sub set_par_temp_env {
           require Digest::SHA;
           my $ctx = Digest::SHA->new(1);
 
-          if ($ctx and open(my $fh, "<$PAR::SetupProgname::Progname")) {
+          if ($ctx and open(my $fh, "<", $PAR::SetupProgname::Progname)) {
               binmode($fh);
               $ctx->addfile($fh);
               close($fh);

@@ -1,5 +1,5 @@
 package Muster::Hooks;
-$Muster::Hooks::VERSION = '0.92';
+$Muster::Hooks::VERSION = '0.93';
 #ABSTRACT: Muster::Hooks - scanning and processing hooks
 =head1 NAME
 
@@ -7,7 +7,7 @@ Muster::Hooks - scanning and processing hooks
 
 =head1 VERSION
 
-version 0.92
+version 0.93
 
 =head1 DESCRIPTION
 

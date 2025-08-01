@@ -13,7 +13,7 @@ if($^O eq 'darwin') {
 
 WriteMakefile(
 	ABSTRACT_FROM	=> 'lib/HTML/OSM.pm',
-	AUTHOR => 'Nigel Horne <njh@bandsman.co.uk>',
+	AUTHOR => 'Nigel Horne <njh@nigelhorne.com>',
 	NAME => 'HTML::OSM',
 	VERSION_FROM => 'lib/HTML/OSM.pm', # finds $VERSION in the module
 	((defined($ExtUtils::MakeMaker::VERSION) && ($ExtUtils::MakeMaker::VERSION >= 6.3002))
@@ -22,11 +22,11 @@ WriteMakefile(
 	PREREQ_PM => {
 		'Carp' => 0,
 		'CHI' => 0,
-		'Config::Auto' => 0,
 		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
-		'File::Slurp' => 0,
 		'LWP::UserAgent' => 0,
 		'JSON::MaybeXS' => 0,
+		'Object::Configure' => 0,
+		'Params::Get' => 0,
 		'Scalar::Util' => 0,
 		'Time::HiRes' => 0
 	},

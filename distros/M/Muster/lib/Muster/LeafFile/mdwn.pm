@@ -1,5 +1,5 @@
 package Muster::LeafFile::mdwn;
-$Muster::LeafFile::mdwn::VERSION = '0.92';
+$Muster::LeafFile::mdwn::VERSION = '0.93';
 #ABSTRACT: Muster::LeafFile::mdwn - a Markdown file in a Muster content tree
 =head1 NAME
 
@@ -7,7 +7,7 @@ Muster::LeafFile::mdwn - a Markdown file in a Muster content tree
 
 =head1 VERSION
 
-version 0.92
+version 0.93
 
 =head1 DESCRIPTION
 

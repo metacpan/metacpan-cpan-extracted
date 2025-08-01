@@ -1,6 +1,12 @@
 Revision History for Muster
 ===========================
 
+v0.93 2025-08-01
+----------------
+
+* 2025-08-01 13:04:48 +1000
+  Major bug fix, dealing with race condition.
+
 v0.92 2024-11-13
 ----------------
 

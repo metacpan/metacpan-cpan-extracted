@@ -1,12 +1,12 @@
 package Muster::Hook::Counter;
-$Muster::Hook::Counter::VERSION = '0.92';
+$Muster::Hook::Counter::VERSION = '0.93';
 =head1 NAME
 
 Muster::Hook::Counter - Muster counter directives.
 
 =head1 VERSION
 
-version 0.92
+version 0.93
 
 =head1 DESCRIPTION
 

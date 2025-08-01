@@ -4,7 +4,7 @@
       "chocolateboy <chocolate@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -22,7 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::Differences" : "0.67",
+            "Test::Differences" : "0.72",
             "Test::TinyMocker" : "0.03"
          }
       },
@@ -34,17 +34,17 @@
       "runtime" : {
          "requires" : {
             "Digest::SHA" : "0",
-            "File::BaseDir" : "0.08",
-            "File::Slurper" : "0.012",
+            "File::BaseDir" : "0.09",
+            "File::Slurper" : "0.014",
+            "Function::Parameters" : "2.002005",
             "IPC::System::Simple" : "1.30",
-            "LWP" : "6.46",
-            "MIME::Types" : "2.17",
-            "Method::Signatures::Simple" : "1.07",
-            "Mouse" : "v2.5.10",
-            "Parallel::parallel_map" : "0.02",
-            "Try::Tiny" : "0.30",
-            "URI" : "1.76",
-            "perl" : "5.008008",
+            "LWP" : "6.79",
+            "MIME::Types" : "2.28",
+            "Mouse" : "v2.5.11",
+            "Parallel::parallel_map" : "0.03",
+            "Try::Tiny" : "0.32",
+            "URI" : "5.32",
+            "perl" : "5.014000",
             "version" : "0.77"
          }
       }
@@ -58,6 +58,6 @@
          "url" : "https://github.com/chocolateboy/wax"
       }
    },
-   "version" : "v2.4.1",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "v2.5.0",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -56,13 +56,13 @@ no_index:
 provides:
   JSON::Schema::Modern::Document::OpenAPI:
     file: lib/JSON/Schema/Modern/Document/OpenAPI.pm
-    version: '0.088'
+    version: '0.089'
   JSON::Schema::Modern::Vocabulary::OpenAPI:
     file: lib/JSON/Schema/Modern/Vocabulary/OpenAPI.pm
-    version: '0.088'
+    version: '0.089'
   OpenAPI::Modern:
     file: lib/OpenAPI/Modern.pm
-    version: '0.088'
+    version: '0.089'
 requires:
   Carp: '0'
   Digest::MD5: '0'
@@ -70,7 +70,7 @@ requires:
   Feature::Compat::Try: '0'
   File::ShareDir: '0'
   JSON::Schema::Modern: '0.603'
-  JSON::Schema::Modern::Document: '0.608'
+  JSON::Schema::Modern::Document: '0.616'
   JSON::Schema::Modern::Utilities: '0'
   JSON::Schema::Modern::Vocabulary: '0'
   List::Util: '0'
@@ -101,10 +101,10 @@ resources:
   bugtracker: https://github.com/karenetheridge/OpenAPI-Modern/issues
   homepage: https://github.com/karenetheridge/OpenAPI-Modern
   repository: https://github.com/karenetheridge/OpenAPI-Modern.git
-version: '0.088'
+version: '0.089'
 x_Dist_Zilla:
   perl:
-    version: '5.042000'
+    version: '5.043001'
   plugins:
     -
       class: Dist::Zilla::Plugin::Run::BeforeRelease
@@ -616,7 +616,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::EnsureLatestPerl
       config:
         Dist::Zilla::Plugin::EnsureLatestPerl:
-          Module::CoreList: '5.20250702'
+          Module::CoreList: '5.20250720'
       name: '@Author::ETHER/EnsureLatestPerl'
       version: '0.010'
     -
@@ -780,7 +780,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.088
+          tag: v0.089
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
@@ -983,7 +983,7 @@ x_Dist_Zilla:
 x_authority: cpan:ETHER
 x_breaks:
   Test::Mojo::Role::OpenAPI::Modern: '< 0.007'
-x_generated_by_perl: v5.42.0
+x_generated_by_perl: v5.43.1
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_static_install: 1

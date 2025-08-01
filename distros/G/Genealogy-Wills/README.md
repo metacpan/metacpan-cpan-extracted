@@ -4,7 +4,7 @@ Genealogy::Wills - Lookup in a database of wills
 
 # VERSION
 
-Version 0.07
+Version 0.08
 
 # SYNOPSIS
 
@@ -19,7 +19,15 @@ Version 0.07
 
 Creates a Genealogy::Wills object.
 
-Takes two optional arguments which can be hash, hash-ref or key-value pairs.
+Takes three optional arguments,
+which can be hash, hash-ref or key-value pairs.
+
+- `config_file`
+
+    Points to a configuration file which contains the parameters to `new()`.
+    The file can be in any common format,
+    including `YAML`, `XML`, and `INI`.
+    This allows the parameters to be set at run time.
 
 - `directory`
 

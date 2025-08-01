@@ -1,0 +1,22 @@
+a.html
+Changes
+config/myapp.conf
+lib/WWW/Mechanize/Chrome/Webshot.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+README.md
+script/www-mechanize-webshot.pl
+t/000-load.t
+t/100-instantiate-config-logger.t
+t/200-screenshot-local-site.t
+t/300-exif-local-site.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/t-data/html-site/content.html
+xt/boilerplate.t
+xt/live/100-zoom-earth.t
+xt/live/900-scripts.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

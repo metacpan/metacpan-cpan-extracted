@@ -82,7 +82,11 @@ Get the default key bindings for mpv:
 
 VERSION
 
-2.4.1
+2.5.0
+
+COMPATIBILITY
+
+- perl >= v5.14
 
 SEE ALSO
 
@@ -102,7 +106,7 @@ chocolateboy
 
 COPYRIGHT AND LICENSE
 
-Copyright (c) 2010-2020 by chocolateboy.
+Copyright (c) 2010-2025 by chocolateboy.
 
 This is free software; you can redistribute it and/or modify it under the terms of the Artistic License 2.0. [8]
 

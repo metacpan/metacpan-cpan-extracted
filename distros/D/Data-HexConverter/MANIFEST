@@ -1,5 +1,4 @@
 Changes
-Data/HexConverter.pm
 HexConverter.xs
 ignore.txt
 lib/Data/HexConverter.pm
