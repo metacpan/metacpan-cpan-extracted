@@ -5,9 +5,10 @@ use warnings;
 use 5.20.0;
 use experimental 'signatures';
 use Getopt::Long qw/:config bundling/;
-use Crypt::Sodium::XS::Base64 "BASE64_VARIANT_ORIGINAL";
+use Crypt::Sodium::XS::Base64 ":all";
 use Crypt::Sodium::XS::MemVault;
 use Crypt::Sodium::XS::ProtMem "PROTMEM_ALL_DISABLED";
+use Crypt::Sodium::XS::Util 'sodium_random_bytes';
 use Crypt::Sodium::XS::generichash ":all";
 use Crypt::Sodium::XS::pwhash ":all";
 use Crypt::Sodium::XS::sign ":all";
@@ -60,6 +61,7 @@ use File::Spec;
 
 # minisign clearly intended to support multiple algorithms but doesn't.
 # 'Ed' is referred to as "legacy" (non-pre-hashed) and 'ED' is pre-hashed.
+# now i'm confused. looking back, 'ED' is "legacy" (hashed) and 'Ed' is neither.
 my %sig_algs = (
   Ed => {
     name => 'ed25519',
@@ -91,6 +93,16 @@ my %kdf_algs = (
     salt_gen => \&pwhash_scryptsalsa208sha256_salt,
     kdf_gen => \&pwhash_scryptsalsa208sha256,
   },
+  # not supported upstream
+  # hopefully does not clash with later upstream choice
+  XA => {
+    name => 'argon2id',
+    saltbytes => pwhash_argon2id_SALTBYTES,
+    opslimit_default => pwhash_argon2id_OPSLIMIT_SENSITIVE,
+    memlimit_default => pwhash_argon2id_MEMLIMIT_SENSITIVE,
+    salt_gen => \&pwhash_argon2id_salt,
+    kdf_gen => \&pwhash_argon2id,
+  }
 );
 my %chk_algs = (
   B2 => {
@@ -102,7 +114,7 @@ my %chk_algs = (
 
 my $sig_alg_default = "Ed";
 my $sig_alg_hashed_default = "ED";
-my $kdf_alg_default = "Sc";
+my $kdf_alg_default = "XA";
 my $chk_alg_default = "B2";
 my $comment_prefix = "untrusted comment: ";
 my $default_comment = "signature from minisign secret key";
@@ -123,8 +135,8 @@ usage:
   actions:
     -G                generate a new key pair
     -H                require input to be prehashed
-    -S                sign files
     -V                verify that a signature is valid for a given file
+    -R                recreate a public key file from a secret key file
   options:
     -l                sign using the legacy format
     -m <file>         file to sign/verify
@@ -138,7 +150,7 @@ usage:
     -T                don't require nor add trusted comment (signify compat)
     -q                quiet mode, suppress output
     -Q                pretty quiet mode, only print the trusted comment
-    -R                recreate a public key file from a secret key file
+    -S                sign files
     -f                force. Combined with -G, overwrite a previous key pair
     -v                display version number
 EOUSAGE
@@ -226,7 +238,7 @@ sub unpack_sk_data($sk_blob) {
   # bleh, perl has to be 64-bit int here for 'Q'. :(
   my $header_fmt = "a6a${salt_len}Q<Q<"; # a6 ignores algorithms, parsed above
   my $header_chunk_len = 6 + $salt_len + 8 + 8;
-  my $key_fmt = "Q<a${sk_len}a${chk_len}";
+  my $key_fmt = "a8a${sk_len}a${chk_len}";
   my $key_len = 8 + $sk_len + $chk_len;
   my $total_len = $header_chunk_len + $key_len;
   die "invalid secret key blob (too short)" if $sk_blob->length < $total_len;
@@ -300,7 +312,8 @@ sub load_pk($path) {
 sub load_sk($path) {
   open(my $fh, "<:raw", $path) or die "$path: $!";
   my $sk_blob = Crypt::Sodium::XS::MemVault->new_from_fd(fileno($fh));
-  my $idx = $sk_blob->index("\n");
+  my $idx = $sk_blob->unlock->index("\n");
+  $sk_blob->lock;
   die "$path: invalid secret key file (missing comment)" unless defined($idx);
   my $comment = $sk_blob->extract(0, $idx, PROTMEM_ALL_DISABLED);
   die "$path: invalid public key file (comment should start '$comment_prefix')\n"
@@ -341,7 +354,7 @@ sub chk_sk($sk_data) {
 sub generate($opts) {
   my $pk_path = $opts->{pk_path};
   my $sk_path = $opts->{sk_path};
-  my $comment = $opts->{comment};
+  my $comment = 'untrusted comment: minisign public key';
   if ((-e $sk_path or $pk_path && -e $pk_path) and !$opts->{force}) {
     my $path = -e $sk_path ? $sk_path : $pk_path;
     die <<EODIE
@@ -359,12 +372,12 @@ EODIE
   my $key_num = sodium_random_bytes(8);
   my ($pk, $sk) = $sig_alg->{keypair_gen}->();
   my $pk_data = {
-    sig_alg => $sig_alg_hashed_default,
+    sig_alg => $sig_alg_default,
     key_num => $key_num,
     pk => $pk,
   };
   my $sk_data = {
-    sig_alg => $sig_alg_hashed_default,
+    sig_alg => $sig_alg_default,
     kdf_alg => $kdf_alg_default,
     chk_alg => $chk_alg_default,
     key_num => $key_num,
@@ -434,8 +447,7 @@ sub signify($sk_data, $opts, $msg_path) {
   my $trusted_comment = $opts->{trusted_comment};
   my $sig_alg;
   if ($opts->{legacy_sign}) {
-    # this is a hack. there's no support for alternate algorithms.
-    $sig_alg = $sig_algs{'Ed'};
+    $sig_alg = $sig_algs{'ED'};
   }
   else {
     $sig_alg = $sig_algs{$sk_data->{sig_alg}};
@@ -483,8 +495,8 @@ sub verify($pk_data, $opts) {
   my $quiet = $opts->{pretty_quiet} ? 2 : $opts->{quiet} ? 1 : 0;
   unless ($sig_data->{key_num} eq $pk_data->{key_num}) {
     # could just use 64 bit numbers everywhere but meh.
-    my $sig_num = unpack("Q<", $sig_data->{key_num});
-    my $pk_num = unpack("Q<", $pk_data->{key_num});
+    my $sig_num = unpack("a8", $sig_data->{key_num});
+    my $pk_num = unpack("a8", $pk_data->{key_num});
     warn "Signature key id in '$opts->{sig_path}' is $sig_num\n";
     warn "but the key id in the public key is $pk_num\n";
   }
@@ -725,6 +737,28 @@ They also include a second comment line, that cannot be modified without the
 secret key. Trusted comments can be used to add instructions or
 application-specific metadata (intended file name, timestamps, resource
 identifiers, version numbers to prevent downgrade attacks).
+
+=head1 DIFFERENCES FROM MINISIGN
+
+This program diverges from L<minisign|https://github.com/jedisct1/minisign> in
+two significant ways.
+
+=over 4
+
+=item *
+
+With the C<-T> flag, lack of a trusted comment can be ignored. This allows
+verifying signatures created with OpenBSD's
+L<signify|https://man.openbsd.org/signify> program.
+
+=item *
+
+Password hashing (for storage and use of secret keys) supports, and uses by
+default, argon2id. Upstream minisign always uses scryptsalsa208sha256. This
+program can use secret key files created with that algorithm, but will always
+use argon2id when creating key files.
+
+=back
 
 =head1 AUTHOR
 

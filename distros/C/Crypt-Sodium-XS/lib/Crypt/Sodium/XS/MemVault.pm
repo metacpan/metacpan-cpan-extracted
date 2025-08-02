@@ -133,30 +133,36 @@ Returns a L<Crypt::Sodium::XS::MemVault>: the decoded content of C<$base64>.
 
 =head2 new_from_file
 
-  my $mv = Crypt::Sodium::XS::MemVault->new_from_file($path, $flags);
+  my $mv = Crypt::Sodium::XS::MemVault->new_from_file($path, $size, $flags);
 
 C<$path> is a filesystem path.
+
+C<$size> is optional. It is the B<maximum> number of bytes to read from C<$fd>.
+If not provided or it numifies to 0, C<$fd> will be read until end-of-file.
 
 C<$flags> is optional. If not provided, the default is
 L<Crypt::Sodium::XS::ProtMem/protmem_flags_memvault_default>.
 
-Returns a L<Crypt::Sodium::XS::MemVault>: the slurped bytes from the file
-located at C<$path>.
+Returns a L<Crypt::Sodium::XS::MemVault>: the bytes read from the file located
+at C<$path>, B<up to> C<$size> bytes or until end-of-file if C<$size> is 0.
 
 Croaks on failure to open or read C<$path>.
 
 =head2 new_from_fd
 
-  my $mv = Crypt::Sodium::XS::MemVault->new_from_fd($fd, $flags);
+  my $mv = Crypt::Sodium::XS::MemVault->new_from_fd($fd, $size, $flags);
 
 C<$fd> is a file descriptor number. Note this is B<not> a perl file handle. You
 may need to use the C<fileno> function.
 
+C<$size> is optional. It is the B<maximum> number of bytes to read from C<$fd>.
+If not provided or it numifies to 0, C<$fd> will be read until end-of-file.
+
 C<$flags> is optional. If not provided, the default is
 L<Crypt::Sodium::XS::ProtMem/protmem_flags_memvault_default>.
 
-Returns a L<Crypt::Sodium::XS::MemVault>: the bytes from reading C<$fd> until
-end-of-file.
+Returns a L<Crypt::Sodium::XS::MemVault>: the bytes from read C<$fd>, B<up to>
+C<$size> bytes or until end-of-file if C<$size> is 0.
 
 =head1 METHODS
 

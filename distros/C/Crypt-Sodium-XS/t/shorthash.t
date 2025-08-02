@@ -7,11 +7,6 @@ use FindBin '$Bin';
 use lib "$Bin/lib";
 use Test::MemVault;
 
-unless (mlock_seems_available()) {
-  diag(mlock_warning());
-  disable_mlock();
-}
-
 my @adatas = (
   "i wish i was",
   "a little bit",

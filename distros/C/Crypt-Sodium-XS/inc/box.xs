@@ -82,7 +82,7 @@ SV * box_beforenm(SV * pk, SV * sk, SV * flags = &PL_sv_undef)
   STRLEN precalc_len;
   STRLEN pk_req_len;
   STRLEN sk_req_len;
-  unsigned int precalc_flags = g_protmem_flags_key_default;
+  unsigned int precalc_flags = g_protmem_default_flags_key;
   int ret;
   int (*func)(unsigned char *, const unsigned char *, const unsigned char *);
 
@@ -192,7 +192,7 @@ SV * box_decrypt( \
   STRLEN sk_req_len;
   STRLEN pk_req_len;
   STRLEN mac_len;
-  unsigned int msg_flags = g_protmem_flags_decrypt_default;
+  unsigned int msg_flags = g_protmem_default_flags_decrypt;
   int ret;
   int (*func)(unsigned char *, const unsigned char *,
               unsigned long long, const unsigned char *,
@@ -310,7 +310,7 @@ SV * box_decrypt_detached( \
   STRLEN nonce_req_len;
   STRLEN sk_req_len;
   STRLEN pk_req_len;
-  unsigned int msg_flags = g_protmem_flags_decrypt_default;
+  unsigned int msg_flags = g_protmem_default_flags_decrypt;
   int ret;
   int (*func)(unsigned char *, const unsigned char *,
               const unsigned char *, unsigned long long,
@@ -579,7 +579,7 @@ void box_keypair(SV * seed = &PL_sv_undef, SV * flags = &PL_sv_undef)
   unsigned char *pk_buf, *seed_buf;
   STRLEN seed_len, seed_req_len;
   STRLEN pk_len, sk_len;
-  unsigned int sk_flags = g_protmem_flags_key_default;
+  unsigned int sk_flags = g_protmem_default_flags_key;
 
   PPCODE:
   SvGETMAGIC(flags);
@@ -790,7 +790,7 @@ SV * box_seal_decrypt(SV * ciphertext, SV * pk, SV * sk, SV * flags = &PL_sv_und
   STRLEN pk_req_len;
   STRLEN sk_req_len;
   STRLEN seal_len;
-  unsigned int msg_flags = g_protmem_flags_decrypt_default;
+  unsigned int msg_flags = g_protmem_default_flags_decrypt;
   int ret;
   int (*func)(unsigned char *, const unsigned char *,
               unsigned long long, const unsigned char *,
@@ -899,7 +899,7 @@ SV * decrypt(SV * self, SV * ciphertext, SV * nonce, SV * flags = &PL_sv_undef)
   STRLEN nonce_len;
   STRLEN nonce_req_len;
   STRLEN mac_len;
-  unsigned int msg_flags = g_protmem_flags_decrypt_default;
+  unsigned int msg_flags = g_protmem_default_flags_decrypt;
   int ret;
   int (*func)(unsigned char *, const unsigned char *,
               unsigned long long, const unsigned char *,
@@ -987,7 +987,7 @@ SV * decrypt_detached(SV * self, SV * ciphertext, SV * mac, SV * nonce, SV * fla
   STRLEN nonce_len;
   STRLEN mac_req_len;
   STRLEN nonce_req_len;
-  unsigned int msg_flags = g_protmem_flags_decrypt_default;
+  unsigned int msg_flags = g_protmem_default_flags_decrypt;
   int ret;
   int (*func)(unsigned char *, const unsigned char *,
               const unsigned char *, unsigned long long,

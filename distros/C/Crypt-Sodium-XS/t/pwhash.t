@@ -3,8 +3,12 @@ use warnings;
 use Test::More;
 
 use Crypt::Sodium::XS::OO::pwhash;
+use FindBin '$Bin';
+use lib "$Bin/lib";
+use Test::MemVault;
 
 #FIXME: no pwhash_str testing?
+#FIXME: no testing with memvaults?
 
 my @passwords = (
   "Red horse butter on the jam",

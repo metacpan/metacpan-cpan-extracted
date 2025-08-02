@@ -7,13 +7,30 @@ use Crypt::Sodium::XS;
 
 _define_constants();
 
+my @types = qw(_decrypt _key _memvault _state);
+my @categories = qw(_mprotect _mlock _lock _memzero _malloc);
+my @functions;
+for my $type (@types) {
+  for my $category ('', @categories) {
+    push(@functions, "protmem_default_flags$type$category");
+  }
+}
+
+# previous function names, keep old code working. can remove in far future.
+*protmem_flags_memvault_default = *protmem_default_flags_memvault;
+*protmem_flags_key_default = *protmem_default_flags_key;
+*protmem_flags_decrypt_default = *protmem_default_flags_decrypt;
+*protmem_flags_state_default = *protmem_default_flags_state;
+
+push(@functions, qw(
+  protmem_flags_memvault_default
+  protmem_flags_key_default
+  protmem_flags_decrypt_default
+  protmem_flags_state_default
+));
+
 our %EXPORT_TAGS = (
-  functions => [qw[
-    protmem_flags_decrypt_default
-    protmem_flags_key_default
-    protmem_flags_memvault_default
-    protmem_flags_state_default
-  ]],
+  functions => \@functions,
   constants => [qw[
     PROTMEM_ALL_DISABLED
     PROTMEM_ALL_ENABLED
@@ -245,36 +262,80 @@ set all flags "categories". Consider carefully before using.
 Nothing is exported by default. The tag C<:functions> imports all
 L</FUNCTIONS>. The tag C<:all> imports everything.
 
-=head2 protmem_flags_key_default
+There are four functions to get or set all flags for the protected memory usage
+"categories": keys, decrypted data, (any other) memvaults, and multi-part
+states. These functions should be used to query the full set of flags for that
+category, but you should avoid using it to set flags this way. It is
+error-prone to put the set of flags together. Instead, use the
+protection-specific functions. See the next paragraph.
+
+In each of these four categories, there are functions to get or set flags for
+the five types of protections: mprotect, mlock, malloc, memzero, and conceptual
+locking. You should use these functions only to change flags, with the
+constants appropriate for the category.
+
+For mprotect flags, use L</MEMORY PROTECTION (mprotect) FLAGS>.
+
+For mlock flags, use L</MEMORY LOCKING (mlock) FLAGS>.
+
+For malloc flags, use L</MEMORY ALLOCATION (malloc) FLAGS>.
+
+For memzero flags, use L</MEMORY CLEANUP FLAGS>.
+
+For conceptual locking flags, use L</CONCEPTUAL LOCKING FLAGS>.
+
+=head2 protmem_default_flags_key
 
   my $flags = protmem_flags_key_default();
-  protmem_flags_key_default($new_flags);
+  my $old_flags = protmem_flags_key_default($new_flags);
 
 Get or set the default flags of L<Crypt::Sodium::XS::MemVault>s created to
 store secret keys, as well as opaque object states that contain key material.
 
 The default flags are L</PROTMEM_FLAGS_ALL_ENABLED>.
 
-=head2 protmem_flags_decrypt_default
+=head2 protmem_default_flags_key_mprotect
+
+=head2 protmem_default_flags_key_mlock
+
+=head2 protmem_default_flags_key_lock
+
+=head2 protmem_default_flags_key_memzero
+
+=head2 protmem_default_flags_key_malloc
+
+  my $mprotect_flags = protmem_default_flags_key_mprotect();
+  my $old_mprotect_flags = protmem_default_flags_key_mprotect($new_flags);
+
+For the related memory protection, get or set the default flags of
+L<Crypt::Sodium::XS::MemVault>s created to store secret keys, as well as opaque
+object states that contain key material.
+
+=head2 protmem_default_flags_decrypt
 
   my $flags = protmem_flags_decrypt_default();
-  protmem_flags_decrypt_default($new_flags);
+  my $old_flags = protmem_flags_decrypt_default($new_flags);
 
 Get or set the default flags of L<Crypt::Sodium::XS::MemVault>s created to
 store decrypted data.
 
 The default flags are L</PROTMEM_FLAGS_ALL_ENABLED>.
 
-=head2 protmem_flags_state_default
+=head2 protmem_default_flags_decrypt_mprotect
 
-  my $flags = protmem_flags_state_default();
-  protmem_flags_state_default($new_flags);
+=head2 protmem_default_flags_decrypt_mlock
 
-Get or set the default mprotect level of states created for multi-part
-interfaces which do not contain key material. The internal state is protected
-by the library based on this setting.
+=head2 protmem_default_flags_decrypt_lock
 
-The default flags are L</PROTMEM_FLAGS_ALL_ENABLED>.
+=head2 protmem_default_flags_decrypt_memzero
+
+=head2 protmem_default_flags_decrypt_malloc
+
+  my $mprotect_flags = protmem_default_flags_decrypt_mprotect();
+  my $old_mprotect_flags = protmem_default_flags_decrypt_mprotect($new_flags);
+
+For the related memory protection, get or set the default flags of
+L<Crypt::Sodium::XS::MemVault>s created to store decrypted data.
 
 =head2 protmem_flags_memvault_default
 
@@ -285,6 +346,46 @@ Get or set the default flags of explicitly-created
 L<Crypt::Sodium::XS::MemVault>s.
 
 The default flags are L</PROTMEM_FLAGS_ALL_ENABLED>.
+
+=head2 protmem_flags_memvault_default_mprotect
+=head2 protmem_flags_memvault_default_mlock
+=head2 protmem_flags_memvault_default_lock
+=head2 protmem_flags_memvault_default_memzero
+=head2 protmem_flags_memvault_default_malloc
+
+  my $mprotect_flags = protmem_default_flags_memvault_mprotect();
+  my $old_mprotect_flags = protmem_default_flags_memvault_mprotect($new_flags);
+
+For the related memory protection, get or set the default flags of
+explicitly-created L<Crypt::Sodium::XS::MemVault>s.
+
+=head2 protmem_default_flags_state
+
+  my $flags = protmem_flags_state_default();
+  protmem_flags_state_default($new_flags);
+
+Get or set the default mprotect level of states created for multi-part
+interfaces which do not contain key material. The internal state is protected
+by the library based on this setting.
+
+The default flags are L</PROTMEM_FLAGS_ALL_ENABLED>.
+
+=head2 protmem_default_flags_state_mprotect
+
+=head2 protmem_default_flags_state_mlock
+
+=head2 protmem_default_flags_state_lock
+
+=head2 protmem_default_flags_state_memzero
+
+=head2 protmem_default_flags_state_malloc
+
+  my $mprotect_flags = protmem_default_flags_state_mprotect();
+  my $old_mprotect_flags = protmem_default_flags_state_mprotect($new_flags);
+
+For the related memory protection, get or set the default mprotect level of
+states created for multi-part interfaces which do not contain key material. The
+internal state is protected by the library based on this setting.
 
 =head1 CONSTANTS
 

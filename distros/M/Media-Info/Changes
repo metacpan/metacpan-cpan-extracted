@@ -1,3 +1,8 @@
+0.134   2024-12-21  Released-By: PERLANCAR; Urgency: medium
+
+        - Update prereq name Filename::* -> Filename::Type::*.
+
+
 0.133   2020-07-29  Released-By: PERLANCAR; Urgency: medium
 
 	- Return filesize, mtime, ctime.

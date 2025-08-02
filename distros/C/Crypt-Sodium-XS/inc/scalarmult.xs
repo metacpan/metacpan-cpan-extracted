@@ -36,7 +36,7 @@ SV * scalarmult_keygen(SV * flags = &PL_sv_undef)
 
   PREINIT:
   protmem *new_pm;
-  unsigned int new_flags = g_protmem_flags_key_default;
+  unsigned int new_flags = g_protmem_default_flags_key;
 
   CODE:
   SvGETMAGIC(flags);
@@ -181,7 +181,7 @@ SV * scalarmult(SV * sk, SV * pk, SV * flags = &PL_sv_undef)
   STRLEN pk_len;
   STRLEN pk_req_len;
   STRLEN ss_len;
-  unsigned int sk_flags = g_protmem_flags_key_default;
+  unsigned int sk_flags = g_protmem_default_flags_key;
   int ret;
 
   CODE:

@@ -6,7 +6,7 @@ SV * new(SV * class, SV * bytes, SV * flags = &PL_sv_undef)
   protmem *new_pm;
   unsigned char *out_buf;
   STRLEN out_len;
-  unsigned int new_flags = g_protmem_flags_memvault_default;
+  unsigned int new_flags = g_protmem_default_flags_memvault;
 
   CODE:
   PERL_UNUSED_VAR(class);
@@ -39,7 +39,7 @@ SV * new_from_hex(SV * class, SV * hex, SV * flags = &PL_sv_undef)
   protmem *new_pm;
   char *hex_buf = NULL;
   STRLEN hex_len;
-  unsigned int new_flags = g_protmem_flags_memvault_default;
+  unsigned int new_flags = g_protmem_default_flags_memvault;
 
   CODE:
   PERL_UNUSED_VAR(class);
@@ -100,7 +100,7 @@ SV * new_from_base64( \
   char *b64_buf = NULL;
   STRLEN b64_len;
   STRLEN max_len;
-  unsigned int new_flags = g_protmem_flags_memvault_default;
+  unsigned int new_flags = g_protmem_default_flags_memvault;
 
   CODE:
   PERL_UNUSED_VAR(class);
@@ -166,23 +166,23 @@ SV * new_from_base64( \
 
 =for notes
 
-this is really only intended for reading secrets (keys). it will perform
-pretty badly, if at all, for larger files.
+this is only intended for reading secrets (keys) or data in limited block
+sizes.
 
 =cut
 
-SV * new_from_fd(SV * class, SV * file, SV * flags = &PL_sv_undef)
+SV * new_from_fd(SV * class, SV * file, STRLEN len = 0, SV * flags = &PL_sv_undef)
 
   ALIAS:
   new_from_file = 1
 
   PREINIT:
-  protmem *new_pm;
+  protmem *new_pm, *resize_pm;
   char *path_buf = NULL;
-  ssize_t r;
-  size_t b = 0;
+  ssize_t r = 0;
+  size_t b = 0, bufrem, lenrem = SIZE_MAX;
   STRLEN bufsize = MEMVAULT_READ_BUFSIZE;
-  unsigned int new_flags = g_protmem_flags_memvault_default;
+  unsigned int new_flags = g_protmem_default_flags_memvault;
   int fd;
 
   CODE:
@@ -205,6 +205,9 @@ SV * new_from_fd(SV * class, SV * file, SV * flags = &PL_sv_undef)
       fd = SvIV(file);
   }
 
+  if (len && len < bufsize)
+    bufsize = len;
+
   new_pm = protmem_init(aTHX_ bufsize, new_flags);
   if (new_pm == NULL) {
     if (ix == 1)
@@ -212,13 +215,11 @@ SV * new_from_fd(SV * class, SV * file, SV * flags = &PL_sv_undef)
     croak("new_from_fd|file: Failed to allocate protmem");
   }
 
-  /* r: current iteration read bytes */
-  /* b: current buffer read bytes */
+  /* r: iteration read bytes */
+  /* b: total buffer read bytes */
   /* sub-optimal for perfomance, but "safer" */
   for (;;) {
     if (b == bufsize) {
-      /* reallocate when buffer is filled */
-      protmem *resize_pm;
       bufsize *= 2;
       resize_pm = protmem_clone(aTHX_ new_pm, bufsize);
       protmem_free(aTHX_ new_pm);
@@ -229,25 +230,30 @@ SV * new_from_fd(SV * class, SV * file, SV * flags = &PL_sv_undef)
       }
       new_pm = resize_pm;
     }
-    r = read(fd, (char *)new_pm->pm_ptr + b, bufsize - b);
+    bufrem = bufsize - r;
+    if (len)
+      lenrem = len - b;
+    r = read(fd, new_pm->pm_ptr + b, lenrem < bufrem ? lenrem : bufrem);
     if (r < 0) {
       if (errno == EINTR)
         continue;
       if (ix == 1)
         close(fd);
       protmem_free(aTHX_ new_pm);
-      croak("new_from_fd|file: read error");
+      croak("new_from_fd|file: read error %d", errno);
     }
-    else if (r == 0)
-      break;
     b += r;
     new_pm->size = b;
+    if (r == 0)
+      break;
+    if (len && b == len)
+      break;
   }
 
   if (ix == 1)
     if (close(fd) < 0) {
       protmem_free(aTHX_ new_pm);
-      croak("new_from_fd|file: %s: close error", path_buf);
+      croak("new_from_fd|file: %s: close error %d", path_buf, errno);
     }
 
   if (protmem_release(aTHX_ new_pm, PROTMEM_FLAG_MPROTECT_RW) != 0) {
@@ -274,7 +280,7 @@ SV * new_from_ttyno( \
   char *prompt_buf;
   char *vbuf;
   int fd;
-  unsigned int new_flags = g_protmem_flags_key_default;
+  unsigned int new_flags = g_protmem_default_flags_key;
   STRLEN prompt_len;
   struct termios tattr;
   FILE *file;
@@ -311,20 +317,34 @@ SV * new_from_ttyno( \
     protmem_free(aTHX_ new_pm);
     croak("new_from_ttyno: Failed to prompt");
   }
-  if (fflush(stderr) == EOF)
-  croak("new_from_ttyno: Failed fflush (stderr)");
+  if (fflush(stderr) == EOF) {
+    fprintf(stderr, "\n");
+    croak("new_from_ttyno: Failed fflush (stderr)");
+  }
 
-  if (!isatty(fd) || tcgetattr(fd, &tattr) != 0)
+  if (!isatty(fd) || tcgetattr(fd, &tattr) != 0) {
+    fprintf(stderr, "\n");
     croak("new_from_ttyno: Failed tcgetattr (not a tty?)");
+  }
   tattr.c_lflag &= ~ECHO;
-  if (tcsetattr(fd, TCSAFLUSH, &tattr) != 0)
+  if (tcsetattr(fd, TCSAFLUSH, &tattr) != 0) {
+    fprintf(stderr, "\n");
     croak("new_from_ttyno: Failed tcsetattr");
+  }
 
-  if ((file = fdopen(fd, "r")) == NULL)
+  if ((file = fdopen(fd, "r")) == NULL) {
+    fprintf(stderr, "\n");
+    tattr.c_lflag |= ECHO;
+    tcsetattr(fd, TCSAFLUSH, &tattr);
     croak("new_from_ttyno: Failed fdopen");
+  }
 
-  if (setvbuf(file, vbuf, _IOLBF, 1024) != 0)
+  if (setvbuf(file, vbuf, _IOLBF, 1024) != 0) {
+    fprintf(stderr, "\n");
+    tattr.c_lflag |= ECHO;
+    tcsetattr(fd, TCSAFLUSH, &tattr);
     croak("new_from_ttyno: Failed to setvbuf");
+  }
 
   if (fgets((char *)new_pm->pm_ptr, 1024, file) == NULL)
     RETVAL = &PL_sv_undef;
@@ -338,7 +358,6 @@ SV * new_from_ttyno( \
       *nl_pos = '\0';
     new_pm->size = strlen(input_buf);
 
-    fprintf(stderr, "\n");
 
     if (new_pm->size == 0)
       fprintf(stderr, "(WARNING: empty)\n");
@@ -354,6 +373,7 @@ SV * new_from_ttyno( \
   setvbuf(file, NULL, _IOLBF, 0);
   sodium_free(vbuf);
 
+  fprintf(stderr, "\n");
   fflush(stderr);
   if (tcgetattr(fd, &tattr) != 0) {
     protmem_free(aTHX_ new_pm);
@@ -903,7 +923,7 @@ SV * from_base64( \
   char *self_buf = NULL;
   STRLEN self_len;
   STRLEN max_len;
-  unsigned int new_flags = g_protmem_flags_memvault_default;
+  unsigned int new_flags = g_protmem_default_flags_memvault;
 
   CODE:
   self_pm = protmem_get(aTHX_ self, MEMVAULT_CLASS);
@@ -964,7 +984,7 @@ SV * from_hex(SV * self, SV * flags = &PL_sv_undef)
   protmem *new_pm;
   char *self_buf = NULL;
   STRLEN self_len;
-  unsigned int new_flags = g_protmem_flags_memvault_default;
+  unsigned int new_flags = g_protmem_default_flags_memvault;
 
   CODE:
   self_pm = protmem_get(aTHX_ self, MEMVAULT_CLASS);
@@ -1151,10 +1171,11 @@ SV * pad(SV * self, STRLEN blocksize)
     pad_len -= buf_len & (blocksize - 1);
   else
     pad_len -= buf_len % blocksize;
+  pad_len += 1; /* for 0x80 */
 
-  if ((STRLEN)SIZE_MAX - buf_len - 1 <= pad_len)
+  if ((STRLEN)SIZE_MAX - buf_len <= pad_len)
     croak("pad: Pad exceeds SIZE_MAX");
-  padded_len = buf_len + pad_len + 1;
+  padded_len = buf_len + pad_len;
 
   if (protmem_grant(aTHX_ self_pm, PROTMEM_FLAG_MPROTECT_RO) != 0)
     croak("pad: Failed to grant self protmem RO");
@@ -1170,7 +1191,8 @@ SV * pad(SV * self, STRLEN blocksize)
     croak("pad: Failed to release self protmem RO");
   }
 
-  if (sodium_pad(&padded_len, realloc_pm->pm_ptr, buf_len, blocksize, padded_len) != 0) {
+  if (sodium_pad(&padded_len, realloc_pm->pm_ptr,
+                 buf_len, blocksize, padded_len) != 0) {
     /* should be impossible */
     protmem_free(aTHX_ realloc_pm);
     croak("BUG: pad: sodium_pad returned error");
@@ -1353,7 +1375,7 @@ SV * to_fd(SV * self, SV * file, int mode = 0600)
   /* r: remaining bytes to write */
   r = self_pm->size;
   for (;;) {
-    w = write(fd, (unsigned char *)self_pm->pm_ptr + t,
+    w = write(fd, self_pm->pm_ptr + t,
               r > MEMVAULT_WRITE_BUFSIZE ? MEMVAULT_WRITE_BUFSIZE : r);
     if (w < 0) {
       if (errno == EINTR)

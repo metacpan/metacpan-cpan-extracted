@@ -278,7 +278,7 @@ SV * sign_sk_to_curve25519(SV * sk, SV * flags = &PL_sv_undef)
   protmem *ed_pm;
   unsigned char *sk_buf;
   STRLEN sk_len;
-  unsigned int ed_flags = g_protmem_flags_key_default;
+  unsigned int ed_flags = g_protmem_default_flags_key;
 
   CODE:
   PERL_UNUSED_VAR(ix);
@@ -391,7 +391,7 @@ SV * sign_sk_to_seed(SV * sk, SV * flags = &PL_sv_undef)
   protmem *seed_pm;
   unsigned char *sk_buf;
   STRLEN sk_len;
-  unsigned int seed_flags = g_protmem_flags_key_default;
+  unsigned int seed_flags = g_protmem_default_flags_key;
 
   CODE:
   PERL_UNUSED_VAR(ix);
@@ -448,7 +448,7 @@ SV * sign_init(SV * flags = &PL_sv_undef)
 
   PREINIT:
   protmem *state_pm;
-  unsigned int state_flags = g_protmem_flags_state_default;
+  unsigned int state_flags = g_protmem_default_flags_state;
 
   CODE:
   SvGETMAGIC(flags);
@@ -495,7 +495,7 @@ void sign_keypair(SV * seed = &PL_sv_undef, SV * flags = &PL_sv_undef)
   unsigned char *pk_buf, *seed_buf;
   STRLEN seed_req_len, seed_len;
   STRLEN pk_len, sk_len;
-  unsigned int sk_flags = g_protmem_flags_key_default;
+  unsigned int sk_flags = g_protmem_default_flags_key;
 
   PPCODE:
   SvGETMAGIC(flags);
@@ -548,7 +548,7 @@ void sign_keypair(SV * seed = &PL_sv_undef, SV * flags = &PL_sv_undef)
       croak("sign_keypair: Invalid seed length: %lu", seed_len);
     }
 
-    sk_pm = protmem_init(aTHX_ sk_len, g_protmem_flags_key_default);
+    sk_pm = protmem_init(aTHX_ sk_len, g_protmem_default_flags_key);
     if (sk_pm == NULL) {
       Safefree(pk_buf);
       croak("sign_keypair: Failed to allocate protmem");
@@ -696,7 +696,7 @@ void sign_to_curve25519(SV * pk, SV * sk, SV * flags = &PL_sv_undef)
   unsigned char *pk_ed_buf;
   STRLEN pk_len;
   STRLEN sk_len;
-  unsigned int sk_flags = g_protmem_flags_key_default;
+  unsigned int sk_flags = g_protmem_default_flags_key;
 
   PPCODE:
   PERL_UNUSED_VAR(ix);

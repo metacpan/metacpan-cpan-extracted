@@ -194,7 +194,7 @@ SV * onetimeauth_init(SV *key, SV *flags = &PL_sv_undef)
   protmem *key_pm = NULL;
   unsigned char *key_buf;
   STRLEN key_len;
-  unsigned int state_flags = g_protmem_flags_key_default;
+  unsigned int state_flags = g_protmem_default_flags_key;
 
   CODE:
   SvGETMAGIC(flags);

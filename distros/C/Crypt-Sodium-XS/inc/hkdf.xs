@@ -66,7 +66,7 @@ SV * hkdf_sha256_extract( \
   STRLEN prk_len;
   STRLEN salt_len = 0;
   STRLEN ikm_len;
-  unsigned int prk_flags = g_protmem_flags_key_default;
+  unsigned int prk_flags = g_protmem_default_flags_key;
   int (*func)(unsigned char *,
               const unsigned char *, size_t, const unsigned char *, size_t);
 
@@ -186,7 +186,7 @@ SV * hkdf_sha256_expand( \
   else if (prk_pm)
     out_flags = prk_pm->flags;
   else
-    out_flags = g_protmem_flags_key_default;
+    out_flags = g_protmem_default_flags_key;
 
   out_pm = protmem_init(aTHX_ out_len, out_flags);
   if (out_pm == NULL)
@@ -226,7 +226,7 @@ SV * hkdf_sha256_extract_init(SV * salt = &PL_sv_undef, SV * flags = &PL_sv_unde
   protmem *state_pm;
   unsigned char *salt_buf = NULL;
   STRLEN salt_len = 0;
-  unsigned int state_flags = g_protmem_flags_state_default;
+  unsigned int state_flags = g_protmem_default_flags_state;
 
   CODE:
 #ifdef SODIUM_HAS_HKDF
@@ -317,7 +317,7 @@ SV * final(SV * self, SV * flags = &PL_sv_undef)
   PREINIT:
   protmem *state_pm;
   protmem *prk_pm;
-  unsigned int prk_flags = g_protmem_flags_key_default;
+  unsigned int prk_flags = g_protmem_default_flags_key;
 
   CODE:
 

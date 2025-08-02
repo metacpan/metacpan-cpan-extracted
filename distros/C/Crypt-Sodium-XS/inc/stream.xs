@@ -257,7 +257,7 @@ SV * stream_xor(SV * msg, SV * nonce, SV * key, SV * flags = &PL_sv_undef)
   unsigned char *nonce_buf;
   unsigned char *key_buf;
   unsigned char *ct_buf;
-  unsigned int new_flags = g_protmem_flags_decrypt_default;
+  unsigned int new_flags = g_protmem_default_flags_decrypt;
   STRLEN msg_len;
   STRLEN nonce_len;
   STRLEN key_len;
@@ -416,7 +416,7 @@ SV * stream_xor_ic(SV * msg, SV * nonce, UV ic, SV * key, SV * flags = &PL_sv_un
   unsigned char *nonce_buf;
   unsigned char *key_buf;
   unsigned char *ct_buf;
-  unsigned int new_flags = g_protmem_flags_decrypt_default;
+  unsigned int new_flags = g_protmem_default_flags_decrypt;
   STRLEN msg_len;
   STRLEN nonce_len;
   STRLEN key_len;
@@ -552,7 +552,7 @@ SV * stream_chacha20_ietf_xor_ic(SV * msg, SV * nonce, U32 ic, SV * key, SV * fl
   unsigned char *nonce_buf;
   unsigned char *key_buf;
   unsigned char *ct_buf;
-  unsigned int new_flags = g_protmem_flags_decrypt_default;
+  unsigned int new_flags = g_protmem_default_flags_decrypt;
   STRLEN msg_len;
   STRLEN nonce_len;
   STRLEN key_len;

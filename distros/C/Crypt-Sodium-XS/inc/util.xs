@@ -214,10 +214,11 @@ SV * sodium_pad(SV * buf, STRLEN blocksize)
     pad_len -= buf_len & (blocksize - 1);
   else
     pad_len -= buf_len % blocksize;
+  pad_len += 1; /* for 0x80 */
 
   if ((STRLEN)SIZE_MAX - buf_len - 1 <= pad_len)
     croak("sodium_pad: Pad exceeds SIZE_MAX");
-  padded_len = buf_len + pad_len + 1;
+  padded_len = buf_len + pad_len;
 
   Newx(padded_buf, padded_len + 1, unsigned char);
   if (padded_buf == NULL)
@@ -241,7 +242,7 @@ SV * sodium_random_bytes( \
 )
 
   PREINIT:
-  int mv_flags = g_protmem_flags_memvault_default;
+  int mv_flags = g_protmem_default_flags_memvault;
 
   CODE:
   if (out_len < 1)

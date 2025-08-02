@@ -13,7 +13,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,7 +22,7 @@ name: Dist-Zilla-Plugin-TemplateXS
 provides:
   Dist::Zilla::Plugin::TemplateXS:
     file: lib/Dist/Zilla/Plugin/TemplateXS.pm
-    version: '0.004'
+    version: '0.005'
 requires:
   Data::Section: '0.200002'
   Dist::Zilla::File::InMemory: '0'
@@ -38,7 +38,7 @@ requires:
 resources:
   bugtracker: https://github.com/Leont/dist-zilla-plugin-templatexs/issues
   repository: git://github.com/Leont/dist-zilla-plugin-templatexs.git
-version: '0.004'
-x_generated_by_perl: v5.40.1
+version: '0.005'
+x_generated_by_perl: v5.42.0
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

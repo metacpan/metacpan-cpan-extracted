@@ -85,7 +85,7 @@ SV * hash_init(SV * flags = &PL_sv_undef)
 
   PREINIT:
   protmem *state_pm;
-  unsigned int state_flags = g_protmem_flags_state_default;
+  unsigned int state_flags = g_protmem_default_flags_state;
 
   CODE:
   SvGETMAGIC(flags);

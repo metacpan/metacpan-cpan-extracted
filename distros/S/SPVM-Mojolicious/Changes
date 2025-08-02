@@ -1,3 +1,14 @@
+0.007 2025-08-02
+  [Changes]
+    * Improve asset classes.
+    * Improve cokkie classes.
+  [Document Changes]
+    * Add the documents for cookie classes.
+    * Add the documents for asset classes.
+0.006 2025-08-01
+  [Changes]
+    * Support chunk encoding in Mojo::UserAgent.
+    
 0.005 2025-07-29
   [Requirement Changes]
     * Require SPVM::IO::Socket::SSL 0.010.

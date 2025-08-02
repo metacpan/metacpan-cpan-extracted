@@ -1,5 +1,9 @@
 Revision history for Dist-Zilla-Plugin-TemplateXS
 
+0.005     2025-08-01 19:25:51+02:00 Europe/Brussels
+          - Add includes argument
+          - Change PROTOTYPES line to DISABLE
+
 0.004     2025-07-20 17:29:22+02:00 Europe/Brussels
           - Add prototypes_line attribute
 

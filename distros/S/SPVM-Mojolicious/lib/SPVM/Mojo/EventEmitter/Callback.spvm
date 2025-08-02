@@ -2,7 +2,7 @@
 # MIT License
 
 class Mojo::EventEmitter::Callback : interface_t {
-  version_from Mojo;
+  version_from Mojolicious;
   
   # Interface Methods
   method : void ($that : object, $arg1 : object = undef, $arg2 : object = undef, $arg3 : object = undef);

@@ -106,7 +106,7 @@ SV * kdf_derive( \
     if (SvOK(flags))
       new_key_flags = SvUV_nomg(flags);
     else
-      new_key_flags = g_protmem_flags_key_default;
+      new_key_flags = g_protmem_default_flags_key;
   }
 
   new_key_mv = protmem_init(aTHX_ new_key_len, new_key_flags);

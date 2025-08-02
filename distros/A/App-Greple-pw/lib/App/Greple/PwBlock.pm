@@ -7,6 +7,7 @@ use utf8;
 use List::Util qw(sum reduce);
 use Data::Dumper;
 use Getopt::EX::Colormap qw(colorize);
+use Getopt::EX::Config qw(config);
 
 sub new {
     my $class = shift;
@@ -55,16 +56,13 @@ sub orig   { $_[0]->{orig}   }
 sub masked { $_[0]->{masked} }
 sub matrix { $_[0]->{matrix} }
 
-our $parse_matrix = 1;
-our $parse_id = 1;
-our $parse_pw = 1;
 
 sub parse {
     my $obj = shift;
     $obj->{orig} = $obj->{masked} = shift;
-    $obj->parse_matrix if $parse_matrix;
-    $obj->parse_pw if $parse_pw;
-    $obj->parse_id if $parse_id;
+    $obj->parse_matrix if config('parse_matrix');
+    $obj->parse_pw if config('parse_pw');
+    $obj->parse_id if config('parse_id');
     $obj;
 }
     
@@ -78,46 +76,51 @@ sub make_pattern {
     qr{ ^\s*+ (?!@except) .*? (?:@match)\w*[:=]? [\ \t]* \K ( .* ) }mxi;
 }
 
-our @id_keys = (
-    qw(ID ACCOUNT USER CODE NUMBER URL),
-    qw(ユーザ アカウント コード 番号),
-    );
-our $id_chars = '[\w\.\-\@]';
-our $id_color = 'K/455';
-our $id_label_color = 'S;C/555';
+# Getopt::EX::Config support
+our $config = Getopt::EX::Config->new(
+    parse_matrix    => 1,
+    parse_id        => 1,
+    parse_pw        => 1,
+    id_keys         => join(' ', 
+        qw(ID ACCOUNT USER CODE NUMBER URL),
+        qw(ユーザ アカウント コード 番号),
+        ),
+    id_chars        => '[\w\.\-\@]',
+    id_color        => 'K/455',
+    id_label_color  => 'S;C/555',
+    pw_keys         => join(' ',
+        qw(PASS PIN),
+        qw(パス 暗証),
+        ),
+    pw_chars        => '\S',
+    pw_color        => 'K/545',
+    pw_label_color  => 'S;M/555',
+    pw_blackout     => 1,
+);
 
 sub parse_id {
     shift->parse_xx(
 	hash => 'id',
-	pattern => make_pattern(@id_keys),
-	chars => $id_chars,
+	pattern => make_pattern(split /\s+/, config('id_keys')),
+	chars => config('id_chars'),
 	start_label => '0',
 	label_format => '[%s]',
-	color => $id_color,
-	label_color => $id_label_color,
+	color => config('id_color'),
+	label_color => config('id_label_color'),
 	blackout => 0,
 	);
 }		   
 
-our @pw_keys = (
-    qw(PASS PIN),
-    qw(パス 暗証),
-    );
-our $pw_chars = '\S';
-our $pw_color = 'K/545';
-our $pw_label_color = 'S;M/555';
-our $pw_blackout = 1;
-
 sub parse_pw {
     shift->parse_xx(
 	hash => 'pw',
-	pattern => make_pattern({IGNORE => [ 'URL' ]}, @pw_keys),
-	chars => $pw_chars,
+	pattern => make_pattern({IGNORE => [ 'URL' ]}, split /\s+/, config('pw_keys')),
+	chars => config('pw_chars'),
 	start_label => 'a',
 	label_format => '[%s]',
-	color => $pw_color,
-	label_color => $pw_label_color,
-	blackout => $pw_blackout,
+	color => config('pw_color'),
+	label_color => config('pw_label_color'),
+	blackout => config('pw_blackout'),
 	);
 }		   
 
@@ -220,3 +223,201 @@ sub guess_matrix_area {
 }
 
 1;
+
+=encoding utf-8
+
+=head1 NAME
+
+App::Greple::PwBlock - Password and ID information block parser for greple
+
+=head1 SYNOPSIS
+
+    use App::Greple::PwBlock;
+    
+    # Create a new PwBlock object
+    my $pb = App::Greple::PwBlock->new($text);
+    
+    # Access parsed information
+    my $id = $pb->id('0');      # Get ID by label
+    my $pw = $pb->pw('a');      # Get password by label
+    my $cell = $pb->cell('A', 0); # Get matrix cell value
+    
+    # Configuration
+    use App::Greple::PwBlock qw(config);
+    config('id_keys', 'LOGIN EMAIL USER ACCOUNT');
+    config('pw_blackout', 0);
+
+=head1 DESCRIPTION
+
+B<App::Greple::PwBlock> is a specialized parser for extracting and managing 
+password and ID information from text blocks. It provides intelligent 
+pattern recognition for common credential formats and includes support 
+for random number matrices used by banking systems.
+
+The module uses L<Getopt::EX::Config> for centralized parameter management,
+allowing configuration of parsing behavior, display colors, and keyword 
+patterns.
+
+=head1 METHODS
+
+=over 4
+
+=item B<new>([I<text>])
+
+Creates a new PwBlock object. If I<text> is provided, it will be parsed
+immediately.
+
+    my $pb = App::Greple::PwBlock->new($credential_text);
+
+=item B<parse>(I<text>)
+
+Parses the given text to extract ID, password, and matrix information.
+This method is called automatically by B<new> if text is provided.
+
+    $pb->parse($text);
+
+=item B<id>(I<label>)
+
+Returns the ID value associated with the given label. Labels are assigned
+automatically during parsing (e.g., '0', '1', '2', ...).
+
+    my $username = $pb->id('0');
+
+=item B<pw>(I<label>)
+
+Returns the password value associated with the given label. Labels are 
+assigned automatically during parsing (e.g., 'a', 'b', 'c', ...).
+
+    my $password = $pb->pw('a');
+
+=item B<cell>(I<column>, I<row>)
+
+Returns the value from a matrix cell at the specified column and row.
+Useful for banking security matrices.
+
+    my $value = $pb->cell('E', 3);  # Column E, Row 3
+
+=item B<any>(I<label>)
+
+Returns any value (ID, password, or matrix cell) associated with the label.
+This is a convenient method that checks all types.
+
+    my $value = $pb->any('a');
+
+=item B<orig>()
+
+Returns the original unparsed text.
+
+=item B<masked>()
+
+Returns the text with passwords masked according to the B<pw_blackout> setting.
+
+=item B<matrix>()
+
+Returns a hash reference containing the parsed matrix data.
+
+=back
+
+=head1 CONFIGURATION
+
+This module uses L<Getopt::EX::Config> for parameter management. Configuration
+can be accessed using the B<config> function:
+
+    use App::Greple::PwBlock qw(config);
+
+=head2 Available Parameters
+
+=over 4
+
+=item B<parse_matrix> (boolean, default: 1)
+
+Enable or disable matrix parsing.
+
+=item B<parse_id> (boolean, default: 1)
+
+Enable or disable ID field parsing.
+
+=item B<parse_pw> (boolean, default: 1)
+
+Enable or disable password field parsing.
+
+=item B<id_keys> (string, default: "ID ACCOUNT USER CODE NUMBER URL ユーザ アカウント コード 番号")
+
+Space-separated list of keywords that identify ID fields.
+
+=item B<id_chars> (string, default: "[\w\.\-\@]")
+
+Regular expression character class for valid ID characters.
+
+=item B<id_color> (string, default: "K/455")
+
+Color specification for ID values in output.
+
+=item B<id_label_color> (string, default: "S;C/555")
+
+Color specification for ID labels in output.
+
+=item B<pw_keys> (string, default: "PASS PIN パス 暗証")
+
+Space-separated list of keywords that identify password fields.
+
+=item B<pw_chars> (string, default: "\S")
+
+Regular expression character class for valid password characters.
+
+=item B<pw_color> (string, default: "K/545")
+
+Color specification for password values in output.
+
+=item B<pw_label_color> (string, default: "S;M/555")
+
+Color specification for password labels in output.
+
+=item B<pw_blackout> (boolean, default: 1)
+
+When enabled, passwords are masked in the output for security.
+
+=back
+
+=head2 Configuration Examples
+
+    # Customize ID keywords
+    config('id_keys', 'LOGIN EMAIL USERNAME ACCOUNT');
+    
+    # Disable password masking
+    config('pw_blackout', 0);
+    
+    # Add custom password keywords
+    config('pw_keys', 'PASS PASSWORD PIN SECRET TOKEN');
+
+=head1 MATRIX SUPPORT
+
+The module can automatically detect and parse random number matrices 
+commonly used by banking systems for security:
+
+    | A B C D E F G H I J
+  --+--------------------
+  0 | Y W 0 B 8 P 4 C Z H
+  1 | M 0 6 I K U C 8 6 Z
+  2 | 7 N R E Y 1 9 3 G 5
+
+Access matrix values using:
+
+    my $value = $pb->cell('E', 3);  # Gets the value at column E, row 3
+
+=head1 SEE ALSO
+
+L<App::Greple::pw>, L<Getopt::EX::Config>
+
+=head1 AUTHOR
+
+Kazumasa Utashiro
+
+=head1 LICENSE
+
+Copyright (C) 2017-2025 Kazumasa Utashiro.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

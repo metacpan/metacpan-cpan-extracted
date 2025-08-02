@@ -7,7 +7,7 @@ Object::Configure - Runtime Configuration for an Object
 
 # VERSION
 
-0.11
+0.12
 
 # SYNOPSIS
 
@@ -113,14 +113,20 @@ More details to be written.
 
 Configure your class at runtime.
 
-Takes two arguments:
+Takes arguments:
 
 - `class`
 - `params`
 
     A hashref containing default parameters to be used in the constructor.
 
-Returns the new values for the constructor.
+- `carp_on_warn`
+
+    If set to 1, call `Carp:carp` on `warn()`.
+    This value is also read from the configuration file, which will take precendence.
+
+Returns a hash ref conntaining the new values for the constructor.
+The hash ref will have at least one element - the logger.
 
 Now you can set up a configuration file and environment variables to configure your object.
 

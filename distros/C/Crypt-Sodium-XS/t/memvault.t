@@ -11,11 +11,6 @@ use FindBin '$Bin';
 use lib "$Bin/lib";
 use Test::MemVault;
 
-unless (mlock_seems_available()) {
-  diag(mlock_warning());
-  disable_mlock();
-}
-
 # for older perl with older MIME::Base64:
 sub encode_base64url { (my $str = encode_base64($_[0], '')) =~ tr,+/=,-_,d; $str }
 
@@ -29,7 +24,7 @@ for my $mv_data (@mv_datas) {
   my $mv = Crypt::Sodium::XS::MemVault->new($mv_data);
   isa_ok($mv, "Crypt::Sodium::XS::MemVault");
   ok($mv->is_locked, "locked by default");
-  is($mv->length, length($mv_data), "correct length");
+  is($mv->size, length($mv_data), "correct length");
   eval { my $x = "$mv"; };
   like($@, qr/Unlock MemVault object before/, "cannot stringify locked bytes");
   eval { my $x = $mv->to_bytes; };
@@ -78,17 +73,17 @@ for my $mv_data (@mv_datas) {
   is($mv->extract(-5, 3), substr($mv_str, -5, 3), "extract -offset and +length");
   is($mv->extract(3, -3), substr($mv_str, 3, -3), "extract +offset and -length");
   is($mv->extract(-5, -3), substr($mv_str, -5, -3), "extract -offset and -length");
-  is($mv->extract(0, $mv->length + 1), substr($mv_str, 0, $mv->length + 1),
+  is($mv->extract(0, $mv->size + 1), substr($mv_str, 0, $mv->size + 1),
     "+length too big");
-  is($mv->extract(0, 0 - $mv->length - 1), substr($mv_str, 0, 0 - $mv->length - 1),
+  is($mv->extract(0, 0 - $mv->size - 1), substr($mv_str, 0, 0 - $mv->size - 1),
     "-length too small");
-  is($mv->extract(3, $mv->length + 1), substr($mv_str, 3, $mv->length + 1),
+  is($mv->extract(3, $mv->size + 1), substr($mv_str, 3, $mv->size + 1),
     "+offset +length too big");
-  is($mv->extract(3, 0 - $mv->length - 1), substr($mv_str, 3, 0 - $mv->length - 1),
+  is($mv->extract(3, 0 - $mv->size - 1), substr($mv_str, 3, 0 - $mv->size - 1),
     "+offset -length too small");
-  is($mv->extract(-3, $mv->length + 1), substr($mv_str, -3, $mv->length + 1),
+  is($mv->extract(-3, $mv->size + 1), substr($mv_str, -3, $mv->size + 1),
     "-offset +length too big");
-  is($mv->extract(-3, 0 - $mv->length - 1), substr($mv_str, -3, 0 - $mv->length - 1),
+  is($mv->extract(-3, 0 - $mv->size - 1), substr($mv_str, -3, 0 - $mv->size - 1),
     "-offset -length too small");
   eval { $mv->extract(100) };
   like($@, qr/Invalid offset/, "extract invalid offset (100)");
@@ -312,24 +307,38 @@ my $secret = "secret secrets are no fun...";
 my $tmpfile = File::Temp->new;
 print $tmpfile $secret;
 $tmpfile->flush;
-seek($tmpfile, 0, 0);
 
 $mv = Crypt::Sodium::XS::MemVault->new_from_file($tmpfile->filename);
 ok($mv->is_locked, "MemVault from file locked by default");
-is($mv->length, length($secret), "MemVault from file correct length");
+is($mv->size, length($secret), "MemVault from file correct length");
 is($mv->unlock, $secret, "MemVault from file correct data");
 
+$mv = Crypt::Sodium::XS::MemVault->new_from_file($tmpfile->filename, 16);
+ok($mv->is_locked, "MemVault from file, 16 bytes, locked by default");
+is($mv->size, 16, "MemVault from file, 16 bytes, correct length");
+is($mv->unlock, substr($secret, 0, 16), "MemVault from file, 16 bytes, correct data");
+
+$tmpfile->seek(0, 0);
 $mv = Crypt::Sodium::XS::MemVault->new_from_fd(fileno($tmpfile));
 is($mv->unlock, $secret, "MemVault from fd correct data");
+$tmpfile->seek(0, 0);
+$mv = Crypt::Sodium::XS::MemVault->new_from_fd(fileno($tmpfile), 16);
+is($mv->unlock, substr($secret, 0, 16), "MemVault from fd, 16 bytes correct data");
 
-my $large = scalar "X" x 1025;
-seek($tmpfile, 0, 0);
+print $tmpfile "X" x 4096;
+$tmpfile->flush;
+
+$mv = Crypt::Sodium::XS::MemVault->new_from_file($tmpfile->filename, 16);
+is($mv->size, 16, "16 byte MemVault from >bufsize file, correct length");
+is($mv->unlock, substr($secret, 0, 16), "16 byte MemVault from >bufsize file, correct data");
+
+my $large = scalar "Z" x 1025;
+$tmpfile = File::Temp->new;
 print $tmpfile $large;
 $tmpfile->flush;
-seek($tmpfile, 0, 0);
 
 $mv = Crypt::Sodium::XS::MemVault->new_from_file($tmpfile->filename);
-is($mv->length, 1025, "MemVault (1025) from file correct length");
+is($mv->size, 1025, "MemVault (1025) from file correct length");
 is($mv->unlock, $large, "MemVault (1025) from file correct data");
 
 $large = scalar "Y" x 2047;
@@ -337,15 +346,16 @@ $large = scalar "Y" x 2047;
 $mv = Crypt::Sodium::XS::MemVault->new($large);
 $mv->to_file($tmpfile->filename);
 $mv = Crypt::Sodium::XS::MemVault->new_from_file($tmpfile->filename);
-is($mv->length, 2047, "MemVault (2047) to file/from file correct length");
+is($mv->size, 2047, "MemVault (2047) to file/from file correct length");
 is($mv->unlock, $large, "MemVault (2047) roundtripped to file/from file");
 
 $large = scalar "Z" x 8193;
 
 $mv = Crypt::Sodium::XS::MemVault->new($large);
+$tmpfile = File::Temp->new;
 $mv->to_fd(fileno($tmpfile));
 $mv = Crypt::Sodium::XS::MemVault->new_from_file($tmpfile->filename);
-is($mv->length, 8193, "MemVault (8193) to file/from file correct length");
+is($mv->size, 8193, "MemVault (8193) to file/from file correct length");
 is($mv->unlock, $large, "MemVault (8193) roundtripped to fd/from file");
 
 {
@@ -369,6 +379,10 @@ $mv = Crypt::Sodium::XS::MemVault->new("fooba")->unlock;
 $x = $mv->pad(3);
 is($x->to_hex, "666f6f626180", "sodium_pad fooba blocksize 3");
 is($x->unpad(3)->to_hex, "666f6f6261", "sodium_unpad foobar blocksize 3");
+$mv = Crypt::Sodium::XS::MemVault->new("foobarz")->unlock;
+$x = $mv->pad(3);
+is($x->to_hex, "666f6f6261727a8000", "sodium_unpad foobar blocksize 3");
+is($x->unpad(3)->to_hex, "666f6f6261727a", "sodium_unpad foobar blocksize 3");
 
 
 done_testing();

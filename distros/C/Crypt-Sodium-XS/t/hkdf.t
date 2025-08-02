@@ -11,11 +11,6 @@ use FindBin '$Bin';
 use lib "$Bin/lib";
 use Test::MemVault;
 
-unless (mlock_seems_available()) {
-  diag(mlock_warning());
-  disable_mlock();
-}
-
 for my $alg (Crypt::Sodium::XS::OO::hkdf->primitives) {
   my $m = Crypt::Sodium::XS::OO::hkdf->new(primitive => $alg);
 

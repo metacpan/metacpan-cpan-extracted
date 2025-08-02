@@ -96,8 +96,6 @@
 
 #define MEMVAULT_CLASS ("Crypt::Sodium::XS::MemVault")
 
-#define SODIUM_MALLOC(size) (sodium_malloc(((size) + (size_t)63U) & ~(size_t)63U))
-
 #if IVSIZE < 8
 #define LESSTHAN64BITINT
 #endif
@@ -123,20 +121,20 @@ static char * SvPVbyte_nomg(pTHX_ SV *sv, STRLEN *len)
 #endif
 
 
-static unsigned int
-g_protmem_flags_state_default = PROTMEM_FLAG_MPROTECT_NOACCESS
+static U32
+g_protmem_default_flags_state = PROTMEM_FLAG_MPROTECT_NOACCESS
                               | PROTMEM_FLAG_MLOCK_STRICT;
 
-static unsigned int
-g_protmem_flags_memvault_default = PROTMEM_FLAG_MPROTECT_NOACCESS
+static U32
+g_protmem_default_flags_memvault = PROTMEM_FLAG_MPROTECT_NOACCESS
                               | PROTMEM_FLAG_MLOCK_STRICT
                               | PROTMEM_FLAG_LOCK_LOCKED;
-static unsigned int
-g_protmem_flags_key_default = PROTMEM_FLAG_MPROTECT_NOACCESS
+static U32
+g_protmem_default_flags_key = PROTMEM_FLAG_MPROTECT_NOACCESS
                                   | PROTMEM_FLAG_MLOCK_STRICT
                                   | PROTMEM_FLAG_LOCK_LOCKED;
-static unsigned int
-g_protmem_flags_decrypt_default = PROTMEM_FLAG_MPROTECT_NOACCESS
+static U32
+g_protmem_default_flags_decrypt = PROTMEM_FLAG_MPROTECT_NOACCESS
                                       | PROTMEM_FLAG_MLOCK_STRICT
                                       | PROTMEM_FLAG_LOCK_LOCKED;
 
@@ -172,7 +170,7 @@ static protmem * protmem_clone(pTHX_ protmem *cur_pm, size_t new_size) {
   if (cur_pm->flags & PROTMEM_FLAG_MALLOC_PLAIN)
     new_pm->pm_ptr = safemalloc(new_size);
   else
-    new_pm->pm_ptr = SODIUM_MALLOC(new_size);
+    new_pm->pm_ptr = sodium_malloc(new_size);
   if (new_pm->pm_ptr == NULL) {
     safefree(new_pm);
     return NULL;
@@ -299,7 +297,7 @@ static protmem * protmem_init(pTHX_ STRLEN size, int flags) {
   if (flags & PROTMEM_FLAG_MALLOC_PLAIN)
     pm->pm_ptr = safemalloc(size);
   else
-    pm->pm_ptr = SODIUM_MALLOC(size);
+    pm->pm_ptr = sodium_malloc(size);
   if (pm->pm_ptr == NULL) {
     safefree(pm);
     return NULL;
@@ -415,7 +413,7 @@ static SV * nonce_generate(pTHX_ STRLEN out_len, SV *base) {
 /* NB: croaks on failure */
 static SV * sv_keygen(pTHX_ STRLEN size, SV * flags) {
   protmem *key_pm;
-  unsigned int mv_flags = g_protmem_flags_key_default;
+  unsigned int mv_flags = g_protmem_default_flags_key;
 
   SvGETMAGIC(flags);
   if (SvOK(flags))

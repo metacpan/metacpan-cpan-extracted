@@ -1,8 +1,8 @@
 # Copyright (c) 2025 Yuki Kimoto
 # MIT License
 
-class Mojo::Asset {
-  version_from Mojo;
+class Mojo::Asset extends Mojo::EventEmitter {
+  version_from Mojolicious;
   
   # Fields
   has end_range : rw long;
@@ -10,9 +10,7 @@ class Mojo::Asset {
   has start_range : rw long;
   
   # Instance Methods
-  protected method init : void ($options : object[] = undef) {
-    
-    $self->{start_range} = -1;
+  protected method init : void () {
     
     $self->{end_range} = -1;
   }

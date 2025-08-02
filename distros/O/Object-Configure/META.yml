@@ -27,10 +27,12 @@ requires:
   Config::Abstraction: '0.32'
   ExtUtils::MakeMaker: '6.64'
   Log::Abstraction: '0.15'
+  Params::Get: '0'
+  Return::Set: '0'
   perl: '5.008'
 resources:
   bugtracker: https://github.com/nigelhorne/Object-Configure/issues
   homepage: https://metacpan.org/pod/Object::Configure
   repository: git://github.com/nigelhorne/Object-Configure.git
-version: 0.11
+version: 0.12
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

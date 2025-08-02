@@ -8,37 +8,59 @@ class Mojo::Asset::Memory extends Mojo::Asset {
   use IO;
   
   # Fields
-  has auto_upgrade : ro byte;
+  has auto_upgrade : rw byte;
   
-  has max_memory_size : ro int;
+  has max_memory_size : wo int;
   
-  has mtime : rw long;
+  method max_memory_size : int () {
+    
+    unless ($self->{max_memory_size} > -1) {
+      my $env_max_memory_size = length(my $_ = Sys->env("SPVM_MOJO_MAX_MEMORY_SIZE")) ? (int)$_ : -1;
+      
+      $self->{max_memory_size} = $env_max_memory_size;
+      
+      unless ($self->{max_memory_size} < -1) {
+        $self->{max_memory_size} = 262144;
+      }
+    }
+    
+    return $self->{max_memory_size};
+  }
   
+  has mtime : wo long;
+  
+  method mtime : long () {
+    
+    unless ($self->{mtime} > -1) {
+      $self->{mtime} = CommandInfo->BASETIME;
+    }
+    
+    return $self->{mtime};
+  }
+  
+  # Undocumented Fields
   has content_buffer : StringBuffer;
   
   has frozen : byte;
   
   # Class Methods
-  static method new : Mojo::Asset::Memory ($options : object[] = undef) {
+  static method new : Mojo::Asset::Memory () {
     
     my $self = new Mojo::Asset::Memory;
     
-    $self->init($options);
+    $self->init;
     
     return $self;
   }
   
-  method init : void ($options : object[] = undef) {
+  # Instance Methods
+  protected method init : void () {
     
     $self->SUPER::init;
     
-    my $options_h = Hash->new($options);
+    $self->{max_memory_size} = -1;
     
-    $self->{auto_upgrade} = (byte)$options_h->get_or_default_int("auto_upgrade", 0);
-    
-    $self->{max_memory_size} = $options_h->get_or_default_int("max_memory_size", 262144);
-    
-    $self->{mtime} = $options_h->get_or_default_long("mtime", CommandInfo->BASETIME);
+    $self->{mtime} = -1;
     
     $self->{content_buffer} = StringBuffer->new;
     
@@ -57,8 +79,7 @@ class Mojo::Asset::Memory extends Mojo::Asset {
     if ($self->auto_upgrade && ($self->size + length $chunk) > $self->max_memory_size) {
       my $file = Mojo::Asset::File->new;
       
-      # TODO
-      # $self->emit(upgrade => $file);
+      $self->emit(upgrade => $file);
       
       $self->{frozen} = 1;
       
@@ -99,7 +120,11 @@ class Mojo::Asset::Memory extends Mojo::Asset {
     return $pos;
   }
   
-  method get_chunk : string ($offset : long, $max : int = 131072) {
+  method get_chunk : string ($offset : long, $max : int = -1) {
+    
+    unless ($max > -1) {
+      $max = 131072;
+    }
     
     my $start = $self->start_range;
     

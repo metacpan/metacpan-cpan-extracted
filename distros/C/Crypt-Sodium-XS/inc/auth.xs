@@ -370,12 +370,12 @@ SV * auth_init(SV * key = &PL_sv_undef, SV * flags = &PL_sv_undef)
   protmem *key_pm = NULL;
   unsigned char *key_buf = NULL;
   STRLEN key_len = 0;
-  unsigned int state_flags = g_protmem_flags_key_default;
+  unsigned int state_flags = g_protmem_default_flags_key;
 
   CODE:
   SvGETMAGIC(key);
   if (SvOK(key)) {
-    state_flags = g_protmem_flags_key_default;
+    state_flags = g_protmem_default_flags_key;
     if (sv_derived_from(key, MEMVAULT_CLASS)) {
       key_pm = protmem_get(aTHX_ key, MEMVAULT_CLASS);
       key_buf = key_pm->pm_ptr;

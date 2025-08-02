@@ -1,6 +1,7 @@
 MODULE = Crypt::Sodium::XS PACKAGE = Crypt::Sodium::XS::ProtMem
 
 void _define_constants()
+
   PREINIT:
   HV *stash = gv_stashpv("Crypt::Sodium::XS::ProtMem", 0);
 
@@ -47,39 +48,78 @@ void _define_constants()
               newSVuv(PROTMEM_FLAG_MALLOC_PLAIN));
   XSRETURN_YES;
 
-void protmem_flags_memvault_default(SV * flags = &PL_sv_undef)
+void protmem_default_flags_memvault(SV * flags = &PL_sv_undef)
 
   ALIAS:
-  protmem_flags_key_default = 1
-  protmem_flags_decrypt_default = 2
-  protmem_flags_state_default = 3
+  protmem_default_flags_key = 1
+  protmem_default_flags_decrypt = 2
+  protmem_default_flags_state = 3
+  protmem_default_flags_memvault_mprotect = 4
+  protmem_default_flags_key_mprotect = 5
+  protmem_default_flags_decrypt_mprotect = 6
+  protmem_default_flags_state_mprotect = 7
+  protmem_default_flags_memvault_mlock = 8
+  protmem_default_flags_key_mlock = 9
+  protmem_default_flags_decrypt_mlock = 10
+  protmem_default_flags_state_mlock = 11
+  protmem_default_flags_key_lock = 12
+  protmem_default_flags_memvault_lock = 13
+  protmem_default_flags_decrypt_lock = 14
+  protmem_default_flags_state_lock = 15
+  protmem_default_flags_key_memzero = 16
+  protmem_default_flags_memvault_memzero = 17
+  protmem_default_flags_decrypt_memzero = 18
+  protmem_default_flags_state_memzero = 19
+  protmem_default_flags_key_malloc = 20
+  protmem_default_flags_memvault_malloc = 21
+  protmem_default_flags_decrypt_malloc = 22
+  protmem_default_flags_state_malloc = 23
 
   PREINIT:
-  unsigned int mv_flags;
-  unsigned int *global;
-  unsigned int old_flags;
+  U32 new_flags, old_flags, *global, mask = 0;
 
   PPCODE:
-  switch(ix) {
+  switch(ix % 4) {
     case 1:
-      global = &g_protmem_flags_key_default;
+      global = &g_protmem_default_flags_key;
       break;
     case 2:
-      global = &g_protmem_flags_decrypt_default;
+      global = &g_protmem_default_flags_decrypt;
       break;
     case 3:
-      global = &g_protmem_flags_state_default;
+      global = &g_protmem_default_flags_state;
       break;
     default:
-      global = &g_protmem_flags_memvault_default;
+      global = &g_protmem_default_flags_memvault;
+  }
+  if (ix > 3) {
+    if (ix <= 7)
+      mask = PROTMEM_FLAG_MPROTECT_MASK;
+    else if (ix <= 11)
+      mask = PROTMEM_FLAG_MLOCK_MASK;
+    else if (ix <= 15)
+      mask = PROTMEM_FLAG_LOCK_MASK;
+    else if (ix <= 19)
+      mask = PROTMEM_FLAG_MEMZERO_MASK;
+    else
+      mask = PROTMEM_FLAG_MALLOC_MASK;
   }
 
-  SvGETMAGIC(flags);
-  if (!SvOK(flags))
-    XSRETURN_UV(*global);
-
-  mv_flags = SvUV_nomg(flags);
-  /* TODO: check for invalid flags */
   old_flags = *global;
-  *global = mv_flags;
+  if (ix > 3)
+    old_flags &= mask;
+
+  SvGETMAGIC(flags);
+  if (SvOK(flags)) {
+    new_flags = SvUV_nomg(flags);
+    /* TODO: check for invalid flags */
+    if (ix <= 3)
+      *global = new_flags;
+    else {
+      *global &= ~mask;
+      new_flags &= mask;
+      *global |= new_flags;
+    }
+  }
+
   XSRETURN_UV(old_flags);

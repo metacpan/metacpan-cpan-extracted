@@ -7,28 +7,64 @@ use experimental 'signatures';
 
 use Crypt::Sodium::XS;
 use Crypt::Sodium::XS::MemVault;
-use Crypt::Sodium::XS::Util 'sodium_random_bytes';
-use Fcntl qw(O_CREAT O_EXCL O_TRUNC O_WRONLY);
+use Crypt::Sodium::XS::ProtMem 'protmem_flags_decrypt_default';
+use Crypt::Sodium::XS::Util qw(sodium_random_bytes);
+use Fcntl qw(O_CREAT O_EXCL O_TRUNC O_RDONLY O_RDWR O_WRONLY);
 use Getopt::Long qw(:config gnu_getopt);
 
-# version and a "constant" indicating primitive are just static until needed.
-my $file_version = 1;
-my $primitive_marker = 1;
-my $file_magic = pack('a4L<2', 'CSXS', $file_version, $primitive_marker);
-my $magic_len = 12;
+use constant CSXS_MAGIC_FORMAT => 'A4CCA2CCS<';
+use constant CSXS_MAGIC_LEN => 12;
+use constant CSXS_MAGIC_FIELDS => [qw[
+  magic_bytes
+  version
+  opts
+  reserved_1
+  hash_primitive
+  sstream_primitive
+  bufksize
+]];
+use constant CSXS_OPTFLAG_PAD_LAST_BLOCK => 1;
 
-my $pwhash = Crypt::Sodium::XS->pwhash;
+# csxs magic
+#  4 bytes "CSXS"
+#  1 bytes version
+#  1 bytes option flags
+#  2 bytes RESERVED
+#  1 bytes hash primitive
+#  1 bytes secretstream primitive
+#  2 bytes LE bufsize in kilobytes
+# algorithm-specific; but for the only ones supported:
+# 16 bytes pwhash salt
+#  8 bytes opslimit
+#  8 bytes memlimit
+# 24 bytes secretstream header
+#
+# 68 total
+
+# written blocks are 4096 bufsize + 17 abytes = 4113
+
+# opts flags
+# 00000000
+# ||||||||--- 1   use padding
+# |||||||---- 2   RESERVED
+# ||||||----- 4   RESERVED
+# |||||------ 8   RESERVED
+# ||||------- 16  RESERVED
+# |||-------- 32  RESERVED
+# ||--------- 64  RESERVED
+# |---------- 128 RESERVED
+
+# hardcoded primitives, can be added to in future with header values.
+my $pwhash = Crypt::Sodium::XS->pwhash(primitive => 'argon2id');
 my $sstream = Crypt::Sodium::XS->secretstream(primitive => 'xchacha20poly1305');
-my $bufsize = 4096;
-my $decrypt_bufsize = $bufsize + $sstream->ABYTES;
 
 sub usage {
   print STDERR "@_\n" if @_;
   print STDERR <<'EOUSAGE';
 usage:
   csxs-ppcrypt -h
-  csxs-ppcrypt -D [-o <outfile>] <infile>
-  csxs-ppcrypt -E [-o <outfile>] <infile>
+  csxs-ppcrypt -D [-f] <infile> <outfile>
+  csxs-ppcrypt -E [-f] [-p] <infile> <outfile>
 
   actions:
     -h        print this help message and exit
@@ -37,7 +73,7 @@ usage:
 
   options:
     -f        force; overwrite an existing <outfile>
-    -o        output file (default: <infile>.csxspp)
+    -p        pad; ISO/IEC 7816-4 padding on final block
   arguments:
     <infile>  path to input file, or '-' for stdin
     <outfile> path to output file, or '-' for stdout
@@ -46,9 +82,44 @@ EOUSAGE
   exit 0;
 }
 
+sub make_file_magic($opts) {
+  return +{
+    magic_bytes => 'CSXS',
+    version => 1,
+    opts => ($opts->{pad} ? CSXS_OPTFLAG_PAD_LAST_BLOCK : 0),
+    hash_primitive => 1,
+    sstream_primitive => 0,
+    bufksize => 4,
+  };
+}
+
+sub parse_file_magic($str) {
+  my %magic;
+  @magic{@{;CSXS_MAGIC_FIELDS}} = unpack(CSXS_MAGIC_FORMAT, $str);
+  return \%magic;
+}
+
+sub stringify_file_magic($magic) {
+  local $magic->{reserved_1} = "\0\0";
+  return pack(CSXS_MAGIC_FORMAT, @$magic{@{;CSXS_MAGIC_FIELDS}});
+}
+
+sub verify_file_magic($magic) {
+  die "invalid magic: bad magic bytes" unless $magic->{magic_bytes} eq 'CSXS';
+  die "invalid magic: incompatible version $magic->{version}" unless $magic->{version} == 1;
+  # only padding supported currently
+  die "invalid magic: invalid opts" if $magic->{opts} != 0 and $magic->{opts} != 1;
+  die "invalid magic: invalid hash primitive" if $magic->{hash_primitive} != 1;
+  die "invalid magic: invalid sstream primitive" if $magic->{sstream_primitive} != 0;
+  # hardcoded
+  $magic->{bufksize} ||= 4; # REMOVEME: legacy format did not have bufsize.
+  die "invalid magic: invalid bufsize" if $magic->{bufksize} != 4;
+  return $magic;
+}
+
 sub open_handles($opts) {
   my ($ifh, $ofh);
-  my ($infile, $outfile) = @{$opts}{infile outfile};
+  my ($infile, $outfile) = @{$opts}{qw{infile outfile}};
 
   if ($infile eq '-' and !$outfile) {
     die "reading from stdin requires -o <outfile>";
@@ -72,20 +143,25 @@ sub open_handles($opts) {
     $ifh = \*STDIN;
   }
   else {
-    open($ifh, "<", $infile) or die "open: $infile: $!";
+    if ($opts->{encrypt}) {
+      sysopen($ifh, $infile, O_RDONLY) or die "sysopen: $infile: $!";
+      binmode($ifh, ":raw") or die "binmode: $infile: $!";
+    }
+    else {
+      open($ifh, "<:raw", $infile) or die "open: $infile: $!";
+    }
   }
+
   my $omode = 0644;
   $omode = 0600 if $opts->{decrypt};
-
   if ($outfile eq '-') {
     $ofh = \*STDOUT;
   }
   else {
     my $flags = O_CREAT|O_TRUNC|O_WRONLY;
     $flags |= O_EXCL unless $opts->{force};
-    unless (sysopen($ofh, $outfile, $flags, $omode)) {
-      die "open: $outfile: $!";
-    }
+    sysopen($ofh, $outfile, $flags, $omode) or die "open: $outfile: $!";
+    binmode($ofh, ":raw") or die "binmode: $outfile: $!";
   }
   if ($opts->{encrypt} and !$opts->{force} and -t $ofh) {
     die "cowardly refusing to encrypt to a tty. use -f to override";
@@ -94,69 +170,85 @@ sub open_handles($opts) {
   return ($ifh, $ofh);
 }
 
-sub decrypt($ifh, $ofh, $pp) {
-  my ($buf, $r, $header);
+sub decrypt($ifh, $ofh, $opts) {
   # CSXS header
+  my $magic_len = CSXS_MAGIC_LEN;
   my $salt_len = $pwhash->SALTBYTES;
   my $header_len = $magic_len + $salt_len + 16; # opslimit 8 memlimit 8
-  $r = read($ifh, $header, $header_len);
+  my $r = read($ifh, my $header, $header_len);
   die "read: $!" unless defined($r);
   die "read: unexpected EOF reading header (expected: $header_len got: $r)" unless $r == $header_len;
   my ($magic, $salt, $opslimit, $memlimit) = unpack("a${magic_len}a${salt_len}Q<2", $header);
-  # equality comparison fine as only one version and primitive supported:
-  die "read: bad header (invalid magic)" unless $magic eq $file_magic;
+  $magic = verify_file_magic(parse_file_magic($magic));
   unless ($memlimit >= $pwhash->MEMLIMIT_MIN and $memlimit <= $pwhash->MEMLIMIT_MAX) {
-    die "read: bad header (invalid memlimit)";
+    die "read: bad header (invalid memlimit $memlimit)";
   }
   unless ($opslimit >= $pwhash->OPSLIMIT_MIN and $opslimit <= $pwhash->OPSLIMIT_MAX) {
-    die "read: bad header (invalid opslimit)";
+    die "read: bad header (invalid opslimit $memlimit)";
   }
-  my $key = $pwhash->pwhash($pp, $salt, $sstream->KEYBYTES, $opslimit, $memlimit);
+  my $key = $pwhash->pwhash($opts->{passphrase}, $salt, $sstream->KEYBYTES, $opslimit, $memlimit);
+
   # secretstream header
   $r = read($ifh, $header, $sstream->HEADERBYTES) or die "read: $!";
   die "read: $!" unless defined($r);
   die "read: short stream header" unless $r == $sstream->HEADERBYTES;
+
   my $stream_dec = $sstream->init_decrypt($header, $key);
-  my $eof;
-  do {
-    $r = read($ifh, $buf, $decrypt_bufsize);
-    die "read: $!" unless defined($r);
-    $eof = eof($ifh);
-    my ($plaintext, $tag) = $stream_dec->decrypt($buf);
-    if ($eof and $tag != $sstream->TAG_FINAL) {
-      die "missing end-of-stream at eof";
-    }
-    elsif (!$eof and $tag == $sstream->TAG_FINAL) {
+  my $tag = -1;
+  my $buf;
+  my $bufsize = $magic->{bufksize} * 1024;
+  my $decrypt_bufsize = $bufsize + $sstream->ABYTES;
+  while ($r = read($ifh, $buf, $decrypt_bufsize)) {
+    if ($tag == $sstream->TAG_FINAL) {
       die "extra data after end-of-stream";
     }
+    (my $plaintext, $tag) = $stream_dec->decrypt($buf);
+    if ($tag == $sstream->TAG_FINAL
+        && $magic->{opts} & CSXS_OPTFLAG_PAD_LAST_BLOCK) {
+      $plaintext = $plaintext->unpad($bufsize);
+    }
     $plaintext->to_fd(fileno($ofh));
-  } while !$eof;
+  }
+  die "read: $!" unless defined($r);
+  die "missing end-of-stream" unless $tag == $sstream->TAG_FINAL;
 }
 
-sub encrypt($ifh, $ofh, $pp) {
-  my ($buf, $r);
+sub encrypt($ifh, $ofh, $opts) {
   my $salt_len = $pwhash->SALTBYTES;
   my $salt = sodium_random_bytes($salt_len);
   # TODO: make memlimit/opslimit choosable. accept low, med*, high, or number
   my $opslimit = $pwhash->OPSLIMIT_MODERATE;
   my $memlimit = $pwhash->MEMLIMIT_MODERATE;
-  my $key = $pwhash->pwhash($pp, $salt, $sstream->KEYBYTES, $opslimit, $memlimit);
-  # print as static string because only one version and primitive supported
-  print $ofh $file_magic . pack("a${salt_len}Q<2", $salt, $opslimit, $memlimit) or die "write: $!";
+  my $key = $pwhash->pwhash($opts->{passphrase}, $salt, $sstream->KEYBYTES, $opslimit, $memlimit);
+  # write as static string because only one version and primitive supported
+  my $magic = make_file_magic($opts);
+  my $file_magic = stringify_file_magic($magic);
+  syswrite($ofh, $file_magic . pack("a${salt_len}Q<2", $salt, $opslimit, $memlimit)) or die "write: $!";
+
   my ($header, $stream_enc) = $sstream->init_encrypt($key);
-  print $ofh $header or die "write: $!";
-  my $eof;
-  do {
-    $r = read($ifh, $buf, $bufsize);
-    die "read: $!" unless defined($r);
-    $eof = eof($ifh);
-    my $tag = $sstream->TAG_MESSAGE;
-    $tag = $sstream->TAG_FINAL if $eof;
-    my $block = $stream_enc->encrypt($buf, $tag);
-    print $ofh $block or die "write: $!";
-    die "read: $!" unless defined($r);
-  } while !$eof;
-  die "read: $!" unless defined($r);
+  syswrite($ofh, $header) or die "write: $!";
+  my $fd = fileno($ifh);
+  # what follows is tricky. ugly. sorry.
+  # writing to output is "one buffer behind" reading from input. this is so the
+  # final tag and padding can be put on the last block.
+  my $bufsize = $magic->{bufksize} * 1024;
+  my $prev_buf = Crypt::Sodium::XS::MemVault->new_from_fd($fd, $bufsize, protmem_flags_decrypt_default());
+  while (1) {
+    last unless defined $prev_buf;
+    my $next_buf;
+    if ($prev_buf->size == $bufsize) {
+      $next_buf = Crypt::Sodium::XS::MemVault->new_from_fd($fd, $bufsize, protmem_flags_decrypt_default());
+      undef $next_buf unless $next_buf->size;
+    }
+    my $tag = $next_buf ? $sstream->TAG_MESSAGE : $sstream->TAG_FINAL;
+    my $this_buf = $next_buf ? $prev_buf
+                             : $opts->{pad} ? $prev_buf->pad($bufsize)
+                                            : $prev_buf;
+    undef $prev_buf;
+    my $block = $stream_enc->encrypt($this_buf, $tag);
+    syswrite($ofh, $block) or die "write: $!";
+    $prev_buf = $next_buf;
+  }
 }
 
 sub main(@argv) {
@@ -168,7 +260,7 @@ sub main(@argv) {
       encrypt|E
       force|f
       help|h
-      outfile|o=s
+      pad|p
       version|V
     ),
   ) or usage("Invalid options");
@@ -180,15 +272,17 @@ sub main(@argv) {
     usage("one (and only one) of -D or -E must be specified");
   }
 
-  my $infile = shift(@argv);
-  usage("missing <infile>") unless $infile;
+  $opts->{infile} = shift(@argv);
+  $opts->{outfile} = shift(@argv);
+  usage("missing <infile>") unless $opts->{infile};
+  usage("missing <infile>") unless $opts->{outfile};
   usage("too many arguments") if @argv;
-  $opts->{infile} = $infile;
 
   my ($ifh, $ofh) = open_handles($opts);
 
   # yes, this intentionally requires opening a controlling tty.
-  open(my $ttyfh, "+>", "/dev/tty") or die "open: /dev/tty: $!";
+  sysopen(my $ttyfh, "/dev/tty", O_RDWR) or die "sysopen: /dev/tty: $!";
+  binmode($ttyfh, ":raw") or die "binmode: $!";
   my $pp = Crypt::Sodium::XS::MemVault->new_from_ttyno(fileno($ttyfh), "Passphrase: ");
   if ($opts->{encrypt}) {
     my $pp_confirm = Crypt::Sodium::XS::MemVault->new_from_ttyno(fileno($ttyfh), "Passphrase (again): ");
@@ -198,12 +292,13 @@ sub main(@argv) {
   else {
     die "refusing to use empty passphrase" unless $pp->length;
   }
+  $opts->{passphrase} = $pp;
 
   if ($opts->{decrypt}) {
-    decrypt($ifh, $ofh, $pp);
+    decrypt($ifh, $ofh, $opts);
   }
   elsif ($opts->{encrypt}) {
-    encrypt($ifh, $ofh, $pp);
+    encrypt($ifh, $ofh, $opts);
   }
   close($ifh) or die "<infile>: close: $!";
   close($ofh) or die "<outfile>: close: $!";
@@ -223,12 +318,13 @@ csxs-ppcrypt -- simple passphrase-based encryption and decryption
 
 =head1 SYNOPSIS
 
-  csxs-ppcrypt -E myfile.txt
-  echo 'some output' | csxs-ppcrypt -E -o somefile.txt -
+  # suggested file name suffix ".csxpp"
+  csxs-ppcrypt -E myfile.txt myfile.txt.csxpp
+  echo 'some output' | csxs-ppcrypt -E - somefile.txt.csxpp
 
-  csxs-ppcrypt -D myfile.txt.csxspp
-  csxs-ppcrypt -D -o otherfile.txt somedir/somefile
-  csxs-ppcrypt -D -o - myfile.txt.csxpp
+  csxs-ppcrypt -D myfile.txt.csxspp -
+  csxs-ppcrypt -D somedir/somefile otherfile.txt
+  curl https://example.com/super_secret | csxs-ppcrypt -D - -
 
 =head1 DESCRIPTION
 
@@ -243,8 +339,8 @@ passphrase input using L<Crypt::Sodium::XS::pwhash>.
 =head1 USAGE
 
   csxs-ppcrypt -h
-  csxs-ppcrypt -D [-o <outfile>] <infile>
-  csxs-ppcrypt -E [-o <outfile>] <infile>
+  csxs-ppcrypt -D [-f] <infile> <outfile>
+  csxs-ppcrypt -E [-f] [-p] <infile> <outfile>
 
   actions:
     -h        print this help message and exit
@@ -253,7 +349,7 @@ passphrase input using L<Crypt::Sodium::XS::pwhash>.
 
   options:
     -f        force; overwrite an existing <outfile>
-    -o        output file (default: <infile>.csxspp)
+    -p        pad; ISO/IEC 7816-4 padding on final block
   arguments:
     <infile>  path to input file, or '-' for stdin
     <outfile> path to output file, or '-' for stdout
@@ -261,10 +357,12 @@ passphrase input using L<Crypt::Sodium::XS::pwhash>.
 =head1 FILE FORMAT
 
        4 bytes) magic value "CSXS"
-       4 bytes) version number, little-endian
-                placeholder, reserved for future use.
-       4 bytes) "primitives" (algorithms) bitflag, little-endian
-                placeholder, reserved for future use.
+       1 bytes) version number (currently always 1)
+       1 bytes) option flags
+       2 bytes) RESERVED
+       1 bytes) hash primitive id
+       1 bytes) secretstream primitive id
+       2 bytes) 'bufsize' (blocksize without auth tags) in kilobytes
       16 bytes) salt for pwhash
        8 bytes) opslimit for pwhash
        8 bytes) memlimit for pwhash
@@ -273,6 +371,7 @@ passphrase input using L<Crypt::Sodium::XS::pwhash>.
                 all have tag TAG_MESSAGE
   <=4113 bytes) 1 final block
                 must have tag TAG_FINAL
+                optionally padded to block size
 
          no further data is allowed.
 

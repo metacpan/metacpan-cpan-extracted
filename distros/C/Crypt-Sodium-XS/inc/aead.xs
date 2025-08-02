@@ -88,7 +88,7 @@ SV * aead_aes256gcm_beforenm(SV * key, SV * flags = &PL_sv_undef)
   protmem *key_pm = NULL;
   unsigned char *key_buf;
   STRLEN key_len;
-  unsigned int precalc_pm_flags = g_protmem_flags_key_default;
+  unsigned int precalc_pm_flags = g_protmem_default_flags_key;
 
   CODE:
   if (!has_aes256gcm)
@@ -163,7 +163,7 @@ SV * aead_chacha20poly1305_decrypt( \
   STRLEN adata_req_len;
   STRLEN nonce_req_len;
   STRLEN key_req_len;
-  unsigned int msg_flags = g_protmem_flags_decrypt_default;
+  unsigned int msg_flags = g_protmem_default_flags_decrypt;
   int ret;
   int (*func)(unsigned char *, unsigned long long *, unsigned char *,
               const unsigned char *, unsigned long long, const unsigned char *,
@@ -308,7 +308,7 @@ SV * aead_chacha20poly1305_decrypt_detached( \
   STRLEN adata_req_len;
   STRLEN nonce_req_len;
   STRLEN key_req_len;
-  unsigned int msg_flags = g_protmem_flags_decrypt_default;
+  unsigned int msg_flags = g_protmem_default_flags_decrypt;
   int ret;
   int (*func)(unsigned char *, unsigned char *, const unsigned char *,
               unsigned long long, const unsigned char *, const unsigned char *,
@@ -746,7 +746,7 @@ SV * decrypt( \
   STRLEN ct_len;
   STRLEN adata_len = 0;
   STRLEN nonce_len;
-  unsigned int msg_flags = g_protmem_flags_decrypt_default;
+  unsigned int msg_flags = g_protmem_default_flags_decrypt;
   int ret;
 
   CODE:
@@ -823,7 +823,7 @@ SV * decrypt_detached( \
   STRLEN mac_len;
   STRLEN adata_len = 0;
   STRLEN nonce_len;
-  unsigned int msg_flags = g_protmem_flags_decrypt_default;
+  unsigned int msg_flags = g_protmem_default_flags_decrypt;
   int ret;
 
   CODE:

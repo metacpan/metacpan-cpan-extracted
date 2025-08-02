@@ -2,9 +2,13 @@
 
 Dist::Zilla::Plugin::Test::MixedScripts - author tests to ensure there is no mixed Unicode
 
-# VERSION
+# SYNOPSIS
 
-version v0.1.4
+In the `dist.ini` add:
+
+```
+[Test::MixedScripts]
+```
 
 # DESCRIPTION
 
@@ -20,48 +24,71 @@ can operate a service on the first domain and attempt to fool developers into us
 This might be through a malicious patch submission, or even text from an email or web page that they have convinced a
 developer to copy and paste into their code.
 
-# CONFIGURATION OPTIONS
+# RECENT CHANGES
 
-## filename
+Changes for version v0.1.5(2025-08-01T15:44:57+01:00)
 
-This is the filename of the test to add. Defaults to `xt/author/mixed-unicode-scripts.t`.
+- Documentation
+    - Added overlooked credit to Changes.
+    - README is generated using Dist::Zilla::Plugin::UsefulReadmme.
+    - Added a SYNOPSIS.
+- Toolchain
+    - Fixed Dist::Zilla configuration. (@haarg)
 
-## finder
+See the `Changes` file for more details.
 
-This is the name of a `FileFinder` for finding files to check. The default value is `:InstallModules`, `:ExecFiles` (see also
-[Dist::Zilla::Plugin::ExecDir](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3APlugin%3A%3AExecDir)) and `:TestFiles`.
+# REQUIREMENTS
 
-This option can be used more than once.
+This module lists the following modules as runtime dependencies:
 
-Other predefined finders are listed in "default\_finders" in [Dist::Zilla::Role::FileFinderUser](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3ARole%3A%3AFileFinderUser).
-You can define your own with the [FileFinder::ByName plugin](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3APlugin%3A%3AFileFinder%3A%3AByName).
+- [Data::Section](https://metacpan.org/pod/Data%3A%3ASection) version 0.004 or later
+- [Dist::Zilla::File::InMemory](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3AFile%3A%3AInMemory)
+- [Dist::Zilla::Role::FileFinderUser](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3ARole%3A%3AFileFinderUser)
+- [Dist::Zilla::Role::FileGatherer](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3ARole%3A%3AFileGatherer)
+- [Dist::Zilla::Role::FileMunger](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3ARole%3A%3AFileMunger)
+- [Dist::Zilla::Role::PrereqSource](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3ARole%3A%3APrereqSource)
+- [Dist::Zilla::Role::TextTemplate](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3ARole%3A%3ATextTemplate)
+- [List::Util](https://metacpan.org/pod/List%3A%3AUtil) version 1.45 or later
+- [Moose](https://metacpan.org/pod/Moose)
+- [Moose::Util::TypeConstraints](https://metacpan.org/pod/Moose%3A%3AUtil%3A%3ATypeConstraints)
+- [Path::Tiny](https://metacpan.org/pod/Path%3A%3ATiny)
+- [Sub::Exporter::ForMethods](https://metacpan.org/pod/Sub%3A%3AExporter%3A%3AForMethods)
+- [namespace::autoclean](https://metacpan.org/pod/namespace%3A%3Aautoclean)
+- [perl](https://metacpan.org/pod/perl) version v5.16.0 or later
+- [warnings](https://metacpan.org/pod/warnings)
 
-## file
+# INSTALLATION
 
-This is a filename to also test, in addition to any files found earlier.
-
-This option can be repeated to specify multiple additional files.
-
-## exclude
-
-This is a regular expression of filenames to exclude.
-
-This option can be repeated to specify multiple patterns.
-
-## script
-
-This specifies the scripts to test for.  If none are specified, it defaults to the defaults for [Test::MixedScripts](https://metacpan.org/pod/Test%3A%3AMixedScripts).
-
-# KNOWN ISSUES
-
-The default ["finder"](#finder) does not include XS-related files. You will have to add them manually using the ["file"](#file) option,
-for example, in the `dist.ini`:
+The latest version of this module (along with any dependencies) can be installed from [CPAN](https://www.cpan.org) with the `cpan` tool that is included with Perl:
 
 ```
-[Test::MixedScripts]
-file = XS.xs
-file = XS.c
+cpan Dist::Zilla::Plugin::Test::MixedScripts
 ```
+
+You can also extract the distribution archive and install this module (along with any dependencies):
+
+```
+cpan .
+```
+
+You can also install this module manually using the following commands:
+
+```
+perl Makefile.PL
+make
+make test
+make install
+```
+
+If you are working with the source repository, then it may not have a `Makefile.PL` file.  But you can use the [Dist::Zilla](https://dzil.org/) tool in anger to build and install this module:
+
+```
+dzil build
+dzil test
+dzil install --install-command="cpan ."
+```
+
+For more information, see the `INSTALL` file included with this distribution.
 
 # SUPPORT
 
@@ -95,8 +122,6 @@ This code was based on [Dist::Zilla::Plugin::Test::EOL](https://metacpan.org/pod
 <xenoterracide@gmail.com> and Karen Etheridge <ether@cpan.org>.
 
 # CONTRIBUTOR
-
-Graham Knop <haarg@haarg.org>
 
 # COPYRIGHT AND LICENSE
 

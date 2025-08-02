@@ -2,7 +2,7 @@
 # MIT License
 
 class Mojo::Date {
-  version_from Mojo;
+  version_from Mojolicious;
   
   use Time::Local;
   use Sys;

@@ -1,5 +1,12 @@
 Revision history for Perl extension App-Greple-pw
 
+1.02 2025-08-01T23:05:47Z
+
+    - Optimized Getopt::EX::Config integration with reference-based parameter management
+    - Unified PwBlock configuration system with comprehensive POD documentation
+    - Enhanced parameter handling: id_keys/pw_keys converted to scalars for consistency
+    - Added complete API documentation for PwBlock module with configuration examples
+
 1.01 2025-07-28T07:26:16Z
 
     - Major migration from pw_option to Getopt::EX::Config system

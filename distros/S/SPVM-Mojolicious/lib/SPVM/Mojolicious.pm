@@ -1,6 +1,6 @@
 package SPVM::Mojolicious;
 
-our $VERSION = "0.005";
+our $VERSION = "0.007";
 
 1;
 
@@ -21,6 +21,14 @@ This framework is still in early development: there is no documentation yet and 
 =over 2
 
 =item * L<Mojo::UserAgent|SPVM::Mojo::UserAgent>
+
+=item * L<Mojo::Asset|SPVM::Mojo::Asset>
+
+=item * L<Mojo::Cookie|SPVM::Mojo::Cookie>
+
+=item * L<Mojo::Cookie::Request|SPVM::Mojo::Cookie::Request>
+
+=item * L<Mojo::Cookie::Response|SPVM::Mojo::Cookie::Response>
 
 =back
 

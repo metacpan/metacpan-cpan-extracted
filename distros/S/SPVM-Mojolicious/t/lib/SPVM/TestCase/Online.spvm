@@ -11,6 +11,101 @@ class TestCase::Online {
   
   our $RESULT : IntList;
   
+  static method one_get_request : int () {
+    
+    my $ua = Mojo::UserAgent->new;
+    
+    {
+      my $url = "http://www.google.com";
+      
+      my $res = $ua->get($url)->result;
+      
+      unless ($res->code == 200) {
+        return 0;
+      }
+      
+      unless (Fn->contains($res->body, "<html")) {
+        return 0;
+      }
+      
+    }
+    
+    return 1;
+  }
+  
+  static method one_get_request_https : int () {
+    
+    my $ua = Mojo::UserAgent->new;
+    
+    {
+      my $url = "https://www.google.com";
+      
+      my $res = $ua->get($url)->result;
+      
+      unless ($res->code == 200) {
+        return 0;
+      }
+      
+      unless (Fn->contains($res->body, "<html")) {
+        return 0;
+      }
+      
+    }
+    
+    return 1;
+  }
+  
+  static method one_get_request_redirect : int () {
+    
+    my $ua = Mojo::UserAgent->new;
+    
+    $ua->set_max_redirects(20);
+    
+    {
+      my $url = "http://google.com";
+      
+      my $res = $ua->get($url)->result;
+      
+      unless ($res->code == 200) {
+        return 0;
+      }
+      
+      unless (Fn->contains($res->body, "<html")) {
+        return 0;
+      }
+      
+    }
+    
+    return 1;
+  }
+  
+  static method test_keep_alive_no_redirect : int () {
+    
+    my $ua = Mojo::UserAgent->new;
+    
+    {
+      my $url = "http://google.com";
+      
+      my $res = $ua->get($url)->result;
+      
+      unless ($res->code == 301) {
+        return 0;
+      }
+    }
+    
+    {
+      my $url = "http://google.com";
+      
+      my $res = $ua->get($url)->result;
+      
+      unless ($res->code == 301) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
   static method test_https_tiny : int () {
     
     my $url = "https://google.com";
@@ -57,7 +152,7 @@ class TestCase::Online {
     return 1;
   }
   
-  static method go_http_tiny : int () {
+  static method go : int () {
     
     $RESULT = IntList->new;
     
@@ -85,9 +180,23 @@ class TestCase::Online {
       $RESULT->push(Fn->contains($body, "www.google.com"));
     });
     
+    Go->go(method : void () {
+      my $url = "https://google.com";
+      
+      my $ua = Mojo::UserAgent->new;
+      
+      $ua->set_max_redirects(20);
+      
+      my $res = $ua->get($url)->result;
+      
+      my $body = $res->body;
+      
+      $RESULT->push(Fn->contains($body, "</html>"));
+    });
+    
     Go->gosched;
     
-    unless (Array->equals_int($RESULT->to_array, [1, 1])) {
+    unless (Array->equals_int($RESULT->to_array, [1, 1, 1])) {
       return 0;
     }
     

@@ -1,16 +1,16 @@
 package Media::Info;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-07-29'; # DATE
-our $DIST = 'Media-Info'; # DIST
-our $VERSION = '0.133'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 
-require Exporter;
-our @ISA = qw(Exporter);
+use Exporter 'import';
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2024-12-21'; # DATE
+our $DIST = 'Media-Info'; # DIST
+our $VERSION = '0.134'; # VERSION
+
 our @EXPORT_OK = qw(
                        get_media_info
                );
@@ -18,14 +18,14 @@ our @EXPORT_OK = qw(
 our %SPEC;
 
 sub _type_from_name {
-    require Filename::Audio;
-    require Filename::Video;
-    require Filename::Image;
+    require Filename::Type::Audio;
+    require Filename::Type::Video;
+    require Filename::Type::Image;
     my $name = shift;
 
-    Filename::Video::check_video_filename(filename => $name) ? "video" :
-    Filename::Audio::check_audio_filename(filename => $name) ? "audio" :
-    Filename::Image::check_image_filename(filename => $name) ? "image" : "unknown";
+    Filename::Type::Video::check_video_filename(filename => $name) ? "video" :
+    Filename::Type::Audio::check_audio_filename(filename => $name) ? "audio" :
+    Filename::Type::Image::check_image_filename(filename => $name) ? "image" : "unknown";
 }
 
 $SPEC{get_media_info} = {
@@ -34,7 +34,7 @@ $SPEC{get_media_info} = {
     args => {
         media => {
             summary => 'Media file/URL',
-            description => <<'_',
+            description => <<'MARKDOWN',
 
 Note that not every backend can retrieve URL. At the time of this writing, only
 the Mplayer backend can.
@@ -45,8 +45,7 @@ Many fields will depend on the backend used. Common fields returned include:
 * `type_from_name`: either `image`, `audio`, `video`, or `unknown`. This
   is determined from filename (extension).
 
-
-_
+MARKDOWN
             schema  => 'str*',
             pos     => 0,
             req     => 1,
@@ -67,7 +66,7 @@ _
     },
 };
 sub get_media_info {
-    no strict 'refs';
+    no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
 
     my %args = @_;
 
@@ -149,7 +148,7 @@ Media::Info - Return information on media file/URL
 
 =head1 VERSION
 
-This document describes version 0.133 of Media::Info (from Perl distribution Media-Info), released on 2020-07-29.
+This document describes version 0.134 of Media::Info (from Perl distribution Media-Info), released on 2024-12-21.
 
 =head1 SYNOPSIS
 
@@ -188,7 +187,7 @@ L<Media::Info::Mplayer>, L<Media::Info::Ffmpeg>, L<Media::Info::Mediainfo>.
 
 Usage:
 
- get_media_info(%args) -> [status, msg, payload, meta]
+ get_media_info(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Return information on media fileE<sol>URL.
 
@@ -225,12 +224,12 @@ is determined from filename (extension).
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -241,14 +240,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Media-Info
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-Media-Info>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Media-Info>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
 
 =head1 SEE ALSO
 
@@ -261,11 +252,43 @@ of per-format one, and a simple functional interface instead of OO interface.
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2016, 2015, 2014, 2013 by perlancar@cpan.org.
+This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Media-Info>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

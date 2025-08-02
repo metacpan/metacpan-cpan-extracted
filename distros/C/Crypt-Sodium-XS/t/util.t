@@ -85,6 +85,8 @@ $y = sodium_pad("foobar", 15);
 is(unpack("H*", $y), "666f6f626172800000000000000000", "sodium_pad foobar blocksize 15");
 my $z = sodium_pad("fooba", 3);
 is(unpack("H*", $z), "666f6f626180", "sodium_pad fooba blocksize 3");
+$z = sodium_pad("foobarz", 3);
+is(unpack("H*", $z), "666f6f6261727a8000", "sodium_pad foobarz blocksize 3");
 $z = sodium_pad("foobar", 3);
 is(unpack("H*", $z), "666f6f626172800000", "sodium_pad foobar blocksize 3");
 is(unpack("H*", sodium_unpad($x, 16)), "666f6f626172", "sodium_unpad foobar blocksize 16");

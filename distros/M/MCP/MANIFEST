@@ -1,0 +1,26 @@
+.perltidyrc
+Changes
+examples/echo_http.pl
+examples/echo_stdio.pl
+lib/MCP.pm
+lib/MCP/Client.pm
+lib/MCP/Constants.pm
+lib/MCP/Server.pm
+lib/MCP/Server/Transport.pm
+lib/MCP/Server/Transport/HTTP.pm
+lib/MCP/Server/Transport/Stdio.pm
+lib/MCP/Tool.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/apps/lite_app.pl
+t/apps/mojolicious.png
+t/apps/stdio.pl
+t/lib/MCPStdioTest.pm
+t/lite_app.t
+t/pod.t
+t/pod_coverage.t
+t/stdio.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -7,11 +7,6 @@ use FindBin '$Bin';
 use lib "$Bin/lib";
 use Test::MemVault;
 
-unless (mlock_seems_available()) {
-  diag(mlock_warning());
-  disable_mlock();
-}
-
 my $scalarmult = Crypt::Sodium::XS->scalarmult(primitive => 'ed25519');
 my $curve25519 = Crypt::Sodium::XS->curve25519(primitive => 'ed25519');
 

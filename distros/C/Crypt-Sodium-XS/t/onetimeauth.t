@@ -7,11 +7,6 @@ use FindBin '$Bin';
 use lib "$Bin/lib";
 use Test::MemVault;
 
-unless (mlock_seems_available()) {
-  diag(mlock_warning());
-  disable_mlock();
-}
-
 my $msg = "Signed by me";
 
 #TODO: test cloning. test hashing memvault.

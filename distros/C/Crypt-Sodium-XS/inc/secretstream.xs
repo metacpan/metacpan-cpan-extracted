@@ -45,7 +45,7 @@ SV * secretstream_xchacha20poly1305_init_decrypt( \
   unsigned char *key_buf;
   STRLEN header_len;
   STRLEN key_len;
-  unsigned int state_flags = g_protmem_flags_key_default;
+  unsigned int state_flags = g_protmem_default_flags_key;
 
   CODE:
   SvGETMAGIC(flags);
@@ -106,7 +106,7 @@ void secretstream_xchacha20poly1305_init_encrypt(SV * key, SV * flags = &PL_sv_u
   unsigned char *key_buf;
   unsigned char *header_buf;
   STRLEN key_len;
-  unsigned int state_flags = g_protmem_flags_key_default;
+  unsigned int state_flags = g_protmem_default_flags_key;
 
   PPCODE:
   SvGETMAGIC(flags);
@@ -212,7 +212,7 @@ void decrypt( \
   unsigned char tag;
   STRLEN ct_len;
   STRLEN adata_len = 0;
-  unsigned int msg_flags = g_protmem_flags_decrypt_default;
+  unsigned int msg_flags = g_protmem_default_flags_decrypt;
   int ret;
 
   PPCODE:

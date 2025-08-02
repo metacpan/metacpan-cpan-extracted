@@ -55,7 +55,7 @@ SV * secretbox_decrypt( \
   STRLEN nonce_req_len;
   STRLEN key_req_len;
   STRLEN mac_len;
-  unsigned int msg_flags = g_protmem_flags_decrypt_default;
+  unsigned int msg_flags = g_protmem_default_flags_decrypt;
   int ret;
   int (*func)(unsigned char *, const unsigned char *,
               unsigned long long, const unsigned char *,
@@ -156,7 +156,7 @@ SV * secretbox_decrypt_detached( \
   STRLEN mac_req_len;
   STRLEN nonce_req_len;
   STRLEN key_req_len;
-  unsigned int msg_flags = g_protmem_flags_decrypt_default;
+  unsigned int msg_flags = g_protmem_default_flags_decrypt;
   int ret;
   int (*func)(unsigned char *, const unsigned char *,
               const unsigned char *, unsigned long long,

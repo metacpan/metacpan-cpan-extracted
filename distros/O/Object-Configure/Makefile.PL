@@ -34,6 +34,8 @@ WriteMakefile(
 		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
 		'Config::Abstraction' => 0.32,
 		'Log::Abstraction' => 0.15,
+		'Params::Get' => 0,
+		'Return::Set' => 0,
 	}, TEST_REQUIRES => {
 		'File::Temp' => 0,
 		'Test::DescribeMe' => 0,
@@ -41,9 +43,8 @@ WriteMakefile(
 		'Test::Needs' => 0,
 		'YAML::XS' => 0,
 	}, dist => $dist,
-	clean	 => {
-		FILES => 'Object-Configure-*',
-	}, META_MERGE => {	# https://perldoc.perl.org/CPAN::Meta::Spec
+	clean	 => { FILES => 'Object-Configure-*', },
+	META_MERGE => {	# https://perldoc.perl.org/CPAN::Meta::Spec
 		'meta-spec' => { version => 2 },
 		resources => {
 			homepage => 'https://metacpan.org/pod/Object::Configure',
@@ -60,5 +61,5 @@ WriteMakefile(
 			}
 		},
 	},
-	MIN_PERL_VERSION	=> '5.008'
+	MIN_PERL_VERSION => '5.008'
 );

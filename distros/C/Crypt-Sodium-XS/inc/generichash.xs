@@ -151,7 +151,7 @@ SV * generichash_blake2b_init_salt_personal( \
   STRLEN personal_len;
   STRLEN key_len = 0;
   HV *obj;
-  unsigned int pm_flags = g_protmem_flags_state_default;
+  unsigned int pm_flags = g_protmem_default_flags_state;
 
   CODE:
   if (out_len == 0)
@@ -328,7 +328,7 @@ SV * generichash_init( \
   unsigned char *key_buf = NULL;
   STRLEN key_len = 0;
   HV *obj;
-  unsigned int pm_flags = g_protmem_flags_state_default;
+  unsigned int pm_flags = g_protmem_default_flags_state;
 
   CODE:
   switch(ix) {

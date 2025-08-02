@@ -34,7 +34,7 @@ name: Dist-Zilla-Plugin-Test-MixedScripts
 provides:
   Dist::Zilla::Plugin::Test::MixedScripts:
     file: lib/Dist/Zilla/Plugin/Test/MixedScripts.pm
-    version: v0.1.4
+    version: v0.1.5
 requires:
   Data::Section: '0.004'
   Dist::Zilla::File::InMemory: '0'
@@ -54,7 +54,7 @@ requires:
 resources:
   bugtracker: https://github.com/robrwo/perl-Dist-Zilla-Plugin-Test-MixedScripts/issues
   repository: git://github.com/robrwo/perl-Dist-Zilla-Plugin-Test-MixedScripts.git
-version: v0.1.4
+version: v0.1.5
 x_authority: cpan:RRWO
 x_contributors:
   - 'Graham Knop <haarg@haarg.org>'

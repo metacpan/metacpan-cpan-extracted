@@ -1,4 +1,29 @@
-0.000032 Jul 24 2025
+0.000035 Aug 1 2025
+
+- BUGFIX: fix overread on new length parameter for memvault new_from_fd|file
+
+- a couple documentation changes are included
+
+0.000034 Aug 1 2025
+
+- protected memory functions were renamed to be more sensible.
+  backwards-compatability aliases are there so code won't break. new protected
+  memory flag functions added. see Crypt::Sodium::XS::ProtMem.
+
+- minor change to arguments in MemVault new_from_fd|new_from_file. now takes an
+  optional size argument before flags. pretty unlikely anyone was calling these
+  with flags before, but if so it needs updating.
+
+- update csxs-ppcrypt demo program. NOTE: arguments to this program have
+  changed. encryption format has been extended, but is backwards compatible.
+
+- fixes for pminisign demo program.
+
+- test cleanup, and always disable strict mlock in tests.
+
+- minor bugfixes and improvements
+
+0.000033 Jul 24 2025
 
 - kdf derive: use NV for id on platforms with less than 64-bit integers,
   allowing for 2 ** 53 - 1 ids.

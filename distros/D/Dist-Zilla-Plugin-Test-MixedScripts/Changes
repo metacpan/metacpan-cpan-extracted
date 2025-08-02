@@ -1,5 +1,16 @@
 Revision history for Dist-Zilla-Plugin-Test-MixedScripts:
 
+v0.1.5    2025-08-01 15:44:57+01:00 Europe/London
+  [Documentation]
+  - Added overlooked credit to Changes.
+
+  - README is generated using Dist::Zilla::Plugin::UsefulReadmme.
+
+  - Added a SYNOPSIS.
+
+  [Toolchain]
+  - Fixed Dist::Zilla configuration. (@haarg)
+
 v0.1.4    2025-07-25 09:16:56+01:00 Europe/London
   [Documentation]
   - Fixed minor typos.
@@ -13,8 +24,8 @@ v0.1.4    2025-07-25 09:16:56+01:00 Europe/London
 
   - Add POD spelling tests.
 
-  [Other]
-  - Fixed Dist::Zilla configuration. (GH#1, GH#5 @haarg)
+  [Toolchain]
+  - Fixed Dist::Zilla configuration. (GH#1, GH#5 @haarg and @ether)
 
 v0.1.3    2025-07-24 23:31:35+01:00 Europe/London
   [Documentation]

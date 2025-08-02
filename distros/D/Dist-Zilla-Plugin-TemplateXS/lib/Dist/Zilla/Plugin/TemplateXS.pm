@@ -1,5 +1,5 @@
 package Dist::Zilla::Plugin::TemplateXS;
-$Dist::Zilla::Plugin::TemplateXS::VERSION = '0.004';
+$Dist::Zilla::Plugin::TemplateXS::VERSION = '0.005';
 use Moose;
 with qw(Dist::Zilla::Role::FileGatherer Dist::Zilla::Role::TextTemplate);
 
@@ -13,7 +13,15 @@ use Sub::Exporter::ForMethods;
 use Data::Section 0.200002 { installer => Sub::Exporter::ForMethods::method_installer }, '-setup';
 use Dist::Zilla::File::InMemory;
 use Moose::Util::TypeConstraints;
-use MooseX::Types::Moose qw/Str Bool/;
+use MooseX::Types::Moose qw/Str Bool ArrayRef/;
+
+sub mvp_multivalue_args($class) {
+	return 'includes';
+}
+
+sub mvp_aliases($class) {
+	return { include => 'includes' };
+}
 
 has template => (
 	is	=> 'ro',
@@ -25,6 +33,15 @@ has style => (
 	is  => 'ro',
 	isa => enum(['MakeMaker', 'ModuleBuild']),
 	required => 1,
+);
+
+has includes => (
+	isa     => ArrayRef[Str],
+	traits  => ['Array'],
+	default => sub { [] },
+	handles => {
+		includes => 'elements',
+	},
 );
 
 has prototypes_line => (
@@ -51,17 +68,19 @@ sub filename($self, $name) {
 	}
 }
 
-sub content($self, $name) {
+sub gather_files($self) {
+	my $module = $self->zilla->name =~ s/-/::/gr;
+	my $filename = $self->filename($module);
+	my $includes = join "\n", map { qq{#include "$_"}} $self->includes;
+
 	my $template = $self->has_template ? path($self->template)->slurp_utf8 : ${ $self->section_data('Module.xs') };
-	return $self->fill_in_string($template, {
-		name            => $name,
+	my $content  = $self->fill_in_string($template, {
+		module          => $module,
+		includes        => $includes,
 		prototypes_line => $self->prototypes_line,
 	});
-}
 
-sub gather_files($self) {
-	my $name = $self->zilla->name =~ s/-/::/gr;
-	$self->add_file(Dist::Zilla::File::InMemory->new({ name => $self->filename($name), content => $self->content($name) }));
+	$self->add_file(Dist::Zilla::File::InMemory->new({ name => $filename, content => $content }));
 	return;
 }
 
@@ -81,13 +100,14 @@ Dist::Zilla::Plugin::TemplateXS - A simple xs-file-from-template plugin
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
  ; In your profile.ini
  [TemplateXS]
  style = MakeMaker
+ include = ppport.h
 
 =head1 DESCRIPTION
 
@@ -124,9 +144,11 @@ This contains the B<path> to the template that is to be used. If not set, a defa
  #include "perl.h"
  #include "XSUB.h"
  
- MODULE = {{ $name }}				PACKAGE = {{ $name }}
+ {{ $includes }}
 
-{{ if ($prototypes_line) { $OUT = "PROTOTYPES: DISABLED\n"; } }}
+ MODULE = {{ $module }}				PACKAGE = {{ $module }}
+
+{{ $prototypes_line ? 'PROTOTYPES: DISABLE\n' : '' }}
 
 =head1 AUTHOR
 
@@ -148,6 +170,8 @@ __[ Module.xs ]__
 #include "perl.h"
 #include "XSUB.h"
 
-MODULE = {{ $name }}				PACKAGE = {{ $name }}
+{{ $includes }}
 
-{{ if ($prototypes_line) { $OUT = "PROTOTYPES: DISABLE\n\n"; } }}
+MODULE = {{ $module }}				PACKAGE = {{ $module }}
+
+{{ $prototypes_line ? 'PROTOTYPES: DISABLE\n' : '' }}

@@ -4,28 +4,26 @@ use warnings;
 use Crypt::Sodium::XS::MemVault;
 use Crypt::Sodium::XS::ProtMem ':all';
 
-use Exporter 'import';
-
-our @EXPORT = qw(mlock_seems_available disable_mlock mlock_warning);
-
-# for testing availability before running tests
-
-my $available;
-sub mlock_seems_available {
-  return $available if defined $available;
-  $available = 1;
-  unless (eval q|Crypt::Sodium::XS::MemVault->new("X" x 4097); 1|) {
-    my $flags = protmem_flags_memvault_default();
-    $flags &= PROTMEM_MASK_MLOCK;
-    $flags |= PROTMEM_FLAGS_MLOCK_PERMISSIVE;
-    if (eval qq|Crypt::Sodium::XS::MemVault->new("X" x 4097, $flags); 1|) {
-      $available = 0;
+my $mlock_available;
+sub import {
+  unless (defined($mlock_available)) {
+    $mlock_available = 1;
+    unless (eval q|Crypt::Sodium::XS::MemVault->new("X" x 4097); 1|) {
+      my $flags = protmem_flags_memvault_default();
+      $flags &= PROTMEM_MASK_MLOCK;
+      $flags |= PROTMEM_FLAGS_MLOCK_PERMISSIVE;
+      if (eval qq|Crypt::Sodium::XS::MemVault->new("X" x 4097, $flags); 1|) {
+        $mlock_available = 0;
+      }
     }
+    warn mlock_warning() unless $mlock_available;
   }
-  return $available;
+  disable_mlock();
 }
 
+my $mlock_disabled;
 sub disable_mlock {
+  return if defined $mlock_disabled;
   my $flags = protmem_flags_key_default;
   $flags &= PROTMEM_MASK_MLOCK;
   $flags |= PROTMEM_FLAGS_MLOCK_PERMISSIVE;
@@ -42,6 +40,7 @@ sub disable_mlock {
   $flags &= PROTMEM_MASK_MLOCK;
   $flags |= PROTMEM_FLAGS_MLOCK_PERMISSIVE;
   protmem_flags_memvault_default($flags);
+  ++$mlock_disabled;
 }
 
 sub mlock_warning {

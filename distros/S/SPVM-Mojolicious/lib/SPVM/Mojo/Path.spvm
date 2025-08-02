@@ -2,7 +2,7 @@
 # MIT License
 
 class Mojo::Path {
-  version_from Mojo;
+  version_from Mojolicious;
   
   use Mojo::Util;
   use Re;

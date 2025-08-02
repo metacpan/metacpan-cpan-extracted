@@ -2,7 +2,7 @@
 # MIT License
 
 class Mojo::Asset::File extends Mojo::Asset {
-  version_from Mojo;
+  version_from Mojolicious;
   
   use Sys::IO::Constant as IOC;
   use File::Spec;
@@ -11,40 +11,25 @@ class Mojo::Asset::File extends Mojo::Asset {
   use Sys;
   
   # Fields
-  has cleanup : ro byte;
+  has cleanup : wo byte;
   
-  has path : ro string;
-  
-  has handle : ro IO::File;
-  
-  has tmpdir : string;
-  
-  # Class Methods
-  static method new : Mojo::Asset::File ($options : object[] = undef) {
+  method cleanup : int () {
     
-    my $self = new Mojo::Asset::File;
+    if ($self->{cleanup} < 0) {
+      return 0;
+    }
     
-    $self->init($options);
-    
-    return $self;
+    return $self->{cleanup};
   }
   
-  # Instance Methods
-  method init : void ($options : object[] = undef) {
+  has path : rw string;
+  
+  has handle : wo IO::File;
+  
+  method handle : IO::File () {
     
-    $self->SUPER::init;
-    
-    my $options_h = Hash->new($options);
-    
-    if ($options_h->exists("cleanup")) {
-      $self->{cleanup} = (byte)$options_h->get_int("cleanup");
-    }
-    else {
-      $self->{cleanup} = 1;
-    }
-    
-    my $path = $options_h->get_or_default_string("path", undef);
     my $handle = (IO::File)undef;
+    my $path = $self->path;
     if ($path) {
       if (Sys->e($path)) {
         $handle = IO->open("<", $path);
@@ -52,28 +37,65 @@ class Mojo::Asset::File extends Mojo::Asset {
       else {
         $handle = IO->open("+>>", $path);
       }
-      
-      $self->{path} = $path;
     }
     else {
-      $self->{tmpdir} = File::Spec->tmpdir;
       
-      my $tmp_file = File::Temp->new({DIR => $self->{tmpdir}, TEMPLATE => "mojo.tmp.XXXXXXXXXXXXXXXX", UNLINK => 0});
+      unless ($self->{cleanup} > -1) {
+        $self->{cleanup} = 1;
+      }
       
-      $self->{path} = $tmp_file->filename;
+      my $tmpdir= $self->tmpdir;
       
-      $handle = $tmp_file;
+      my $handle = File::Temp->new({DIR => $tmpdir, TEMPLATE => "mojo.tmp.XXXXXXXXXXXXXXXX", UNLINK => 0});
+      
+      $self->{path} = $handle->filename;
       
       $handle->open($self->{path}, "+>>");
     }
     
     $self->{handle} = $handle;
     
+    return $self->{handle};
+  }
+  
+  has tmpdir : wo string;
+  
+  method tmpdir : string () {
+    
+    unless ($self->{tmpdir}) {
+      my $env_tmpdir = length(my $_ = Sys->env("SPVM_MOJO_TMPDIR")) ? (int)$_ : -1;
+      
+      $self->{tmpdir} = $env_tmpdir;
+      
+      unless ($self->{tmpdir}) {
+        $self->{tmpdir} = File::Spec->tmpdir;
+      }
+    }
+    
+    return $self->{tmpdir};
+  }
+  
+  # Class Methods
+  static method new : Mojo::Asset::File () {
+    
+    my $self = new Mojo::Asset::File;
+    
+    $self->init;
+    
+    return $self;
+  }
+  
+  # Instance Methods
+  protected method init : void () {
+    
+    $self->SUPER::init;
+    
+    $self->{cleanup} = -1;
   }
   
   method add_chunk : Mojo::Asset::File ($chunk : string) {
     
-    my $handle = $self->{handle};
+    my $handle = $self->handle;
     
     $handle->write($chunk);
     
@@ -82,7 +104,7 @@ class Mojo::Asset::File extends Mojo::Asset {
   
   method contains : int ($string : string) {
     
-    my $handle = $self->{handle};
+    my $handle = $self->handle;
     
     my $start_range = $self->{start_range};
     
@@ -142,7 +164,11 @@ class Mojo::Asset::File extends Mojo::Asset {
     return -1;
   }
   
-  method get_chunk : string ($offset : long, $max : int = 131072) {
+  method get_chunk : string ($offset : long, $max : int = -1) {
+    
+    unless ($max > -1) {
+      $max = 131072;
+    }
     
     my $start_range = $self->{start_range};
     
@@ -150,7 +176,7 @@ class Mojo::Asset::File extends Mojo::Asset {
       $offset += $start_range;
     }
     
-    my $handle = $self->{handle};
+    my $handle = $self->handle;
     
     $handle->seek($offset, IOC->SEEK_SET);
     
@@ -188,7 +214,7 @@ class Mojo::Asset::File extends Mojo::Asset {
   
   method move_to : void ($file : string) {
     
-    my $handle = $self->{handle};
+    my $handle = $self->handle;
     
     $handle->close;
     $self->{handle} = undef;
@@ -197,12 +223,24 @@ class Mojo::Asset::File extends Mojo::Asset {
     
     File::Copy->move($path, $file);
     
-    $self->init({path => $file, cleanup => 0});
+    $self->set_path($file);
+    $self->set_cleanup(0);
+  }
+  
+  method mtime : long () {
+    
+    my $handle = $self->handle;
+    
+    my $stat = Sys->fstat($handle->fileno);
+    
+    my $mtime = $stat->mtime;
+    
+    return $mtime;
   }
   
   method size : long () {
     
-    my $handle = $self->{handle};
+    my $handle = $self->handle;
     
     my $fd = $handle->fileno;
     
@@ -215,7 +253,7 @@ class Mojo::Asset::File extends Mojo::Asset {
   
   method slurp : string () {
     
-    my $handle = $self->{handle};
+    my $handle = $self->handle;
     
     $handle->seek(0, IOC->SEEK_SET);
     
@@ -230,278 +268,3 @@ class Mojo::Asset::File extends Mojo::Asset {
   }
   
 }
-
-__END__
-
-package Mojo::Asset::File;
-use Mojo::Base 'Mojo::Asset';
-
-use Carp                  qw(croak);
-use Fcntl                 qw(SEEK_SET);
-use File::Spec::Functions ();
-use Mojo::File            qw(tempfile);
-
-has [qw(cleanup path)];
-has handle => sub {
-  my $self = shift;
-
-  # Open existing file
-  my $path = $self->path;
-  return Mojo::File->new($path)->open('<') if defined $path && -e $path;
-
-  $self->cleanup(1) unless defined $self->cleanup;
-
-  # Create a specific file
-  return Mojo::File->new($path)->open('+>>') if defined $path;
-
-  # Create a temporary file
-  my $file = tempfile DIR => $self->tmpdir, TEMPLATE => 'mojo.tmp.XXXXXXXXXXXXXXXX', UNLINK => 0;
-  $self->path($file->to_string);
-  return $file->open('+>>');
-};
-has tmpdir => sub { $ENV{MOJO_TMPDIR} || File::Spec::Functions::tmpdir };
-
-sub DESTROY {
-  my $self = shift;
-
-  return unless $self->cleanup && defined(my $path = $self->path);
-  if (my $handle = $self->handle) { close $handle }
-
-  # Only the process that created the file is allowed to remove it
-  Mojo::File->new($path)->remove if -w $path && ($self->{pid} // $$) == $$;
-}
-
-sub add_chunk {
-  my ($self, $chunk) = @_;
-  ($self->handle->syswrite($chunk) // -1) == length $chunk or croak "Can't write to asset: $!";
-  return $self;
-}
-
-sub contains {
-  my ($self, $str) = @_;
-
-  my $handle = $self->handle;
-  $handle->sysseek($self->start_range, SEEK_SET);
-
-  # Calculate window size
-  my $end  = $self->end_range // $self->size;
-  my $len  = length $str;
-  my $size = $len > 131072 ? $len : 131072;
-  $size = $end - $self->start_range if $size > $end - $self->start_range;
-
-  # Sliding window search
-  my $offset = 0;
-  my $start  = $handle->sysread(my $window, $len);
-  while ($offset < $end) {
-
-    # Read as much as possible
-    my $diff = $end - ($start + $offset);
-    my $read = $handle->sysread(my $buffer, $diff < $size ? $diff : $size);
-    $window .= $buffer;
-
-    # Search window
-    my $pos = index $window, $str;
-    return $offset + $pos if $pos >= 0;
-    return -1             if $read == 0 || ($offset += $read) == $end;
-
-    # Resize window
-    substr $window, 0, $read, '';
-  }
-
-  return -1;
-}
-
-sub get_chunk {
-  my ($self, $offset, $max) = @_;
-  $max //= 131072;
-
-  $offset += $self->start_range;
-  my $handle = $self->handle;
-  $handle->sysseek($offset, SEEK_SET);
-
-  my $buffer;
-  if (defined(my $end = $self->end_range)) {
-    return '' if (my $chunk = $end + 1 - $offset) <= 0;
-    $handle->sysread($buffer, $chunk > $max ? $max : $chunk);
-  }
-  else { $handle->sysread($buffer, $max) }
-
-  return $buffer;
-}
-
-sub is_file {1}
-
-sub move_to {
-  my ($self, $to) = @_;
-
-  # Windows requires that the handle is closed
-  close $self->handle;
-  delete $self->{handle};
-
-  # Move file and prevent clean up
-  Mojo::File->new($self->path)->move_to($to);
-  return $self->path($to)->cleanup(0);
-}
-
-sub mtime { (stat shift->handle)[9] }
-
-sub new {
-  my $file = shift->SUPER::new(@_);
-  $file->{pid} = $$;
-  return $file;
-}
-
-sub size { -s shift->handle }
-
-sub slurp {
-  my $handle = shift->handle;
-  $handle->sysseek(0, SEEK_SET);
-  my $ret = my $content = '';
-  while ($ret = $handle->sysread(my $buffer, 131072, 0)) { $content .= $buffer }
-  return defined $ret ? $content : croak "Can't read from asset: $!";
-}
-
-sub to_file {shift}
-
-1;
-
-=encoding utf8
-
-=head1 NAME
-
-Mojo::Asset::File - File storage for HTTP content
-
-=head1 SYNOPSIS
-
-  use Mojo::Asset::File;
-
-  # Temporary file
-  my $file = Mojo::Asset::File->new;
-  $file->add_chunk('foo bar baz');
-  say 'File contains "bar"' if $file->contains('bar') >= 0;
-  say $file->slurp;
-
-  # Existing file
-  my $file = Mojo::Asset::File->new(path => '/home/sri/foo.txt');
-  $file->move_to('/yada.txt');
-  say $file->slurp;
-
-=head1 DESCRIPTION
-
-L<Mojo::Asset::File> is a file storage backend for HTTP content.
-
-=head1 EVENTS
-
-L<Mojo::Asset::File> inherits all events from L<Mojo::Asset>.
-
-=head1 ATTRIBUTES
-
-L<Mojo::Asset::File> inherits all attributes from L<Mojo::Asset> and implements the following new ones.
-
-=head2 cleanup
-
-  my $bool = $file->cleanup;
-  $file    = $file->cleanup($bool);
-
-Delete L</"path"> automatically once the file is not used anymore.
-
-=head2 handle
-
-  my $handle = $file->handle;
-  $file      = $file->handle(IO::File->new);
-
-Filehandle, created on demand for L</"path">, which can be generated automatically and safely based on L</"tmpdir">.
-
-=head2 path
-
-  my $path = $file->path;
-  $file    = $file->path('/home/sri/foo.txt');
-
-File path used to create L</"handle">.
-
-=head2 tmpdir
-
-  my $tmpdir = $file->tmpdir;
-  $file      = $file->tmpdir('/tmp');
-
-Temporary directory used to generate L</"path">, defaults to the value of the C<MOJO_TMPDIR> environment variable or
-auto-detection.
-
-=head1 METHODS
-
-L<Mojo::Asset::File> inherits all methods from L<Mojo::Asset> and implements the following new ones.
-
-=head2 add_chunk
-
-  $file = $file->add_chunk('foo bar baz');
-
-Add chunk of data.
-
-=head2 contains
-
-  my $position = $file->contains('bar');
-
-Check if asset contains a specific string.
-
-=head2 get_chunk
-
-  my $bytes = $file->get_chunk($offset);
-  my $bytes = $file->get_chunk($offset, $max);
-
-Get chunk of data starting from a specific position, defaults to a maximum chunk size of C<131072> bytes (128KiB).
-
-=head2 is_file
-
-  my $bool = $file->is_file;
-
-True, this is a L<Mojo::Asset::File> object.
-
-=head2 move_to
-
-  $file = $file->move_to('/home/sri/bar.txt');
-
-Move asset data into a specific file and disable L</"cleanup">.
-
-=head2 mtime
-
-  my $mtime = $file->mtime;
-
-Modification time of asset.
-
-=head2 new
-
-  my $file = Mojo::Asset::File->new;
-  my $file = Mojo::Asset::File->new(path => '/home/sri/test.txt');
-  my $file = Mojo::Asset::File->new({path => '/home/sri/test.txt'});
-
-Construct a new L<Mojo::Asset::File> object.
-
-=head2 size
-
-  my $size = $file->size;
-
-Size of asset data in bytes.
-
-=head2 slurp
-
-  my $bytes = $file->slurp;
-
-Read all asset data at once.
-
-=head2 to_file
-
-  $file = $file->to_file;
-
-Does nothing but return the invocant, since we already have a L<Mojo::Asset::File> object.
-
-=head1 SEE ALSO
-
-L<Mojolicious>, L<Mojolicious::Guides>, L<https://mojolicious.org>.
-
-=cut
-}
-
-__END__
-
-TODO
-

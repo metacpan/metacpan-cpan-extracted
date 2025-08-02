@@ -36,7 +36,7 @@ void kx_keypair(SV * seed = &PL_sv_undef, SV * flags = &PL_sv_undef)
   protmem *sk_pm;
   SV *pk_sv;
   unsigned char *pk_buf;
-  unsigned int sk_flags = g_protmem_flags_key_default;
+  unsigned int sk_flags = g_protmem_default_flags_key;
 
   PPCODE:
   PERL_UNUSED_VAR(ix);
@@ -134,7 +134,7 @@ void kx_client_session_keys(SV * cpk, SV * csk, SV * spk, SV * flags = &PL_sv_un
   STRLEN cpk_len;
   STRLEN csk_len;
   STRLEN spk_len;
-  unsigned int key_flags = g_protmem_flags_key_default;
+  unsigned int key_flags = g_protmem_default_flags_key;
   int ret;
 
   PPCODE:
@@ -224,7 +224,7 @@ void kx_server_session_keys(SV * spk, SV * ssk, SV * cpk, SV * flags = &PL_sv_un
   STRLEN spk_len;
   STRLEN ssk_len;
   STRLEN cpk_len;
-  unsigned int key_flags = g_protmem_flags_key_default;
+  unsigned int key_flags = g_protmem_default_flags_key;
   int ret;
 
   PPCODE:

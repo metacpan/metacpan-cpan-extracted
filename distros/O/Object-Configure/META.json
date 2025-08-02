@@ -36,6 +36,8 @@
             "Config::Abstraction" : "0.32",
             "ExtUtils::MakeMaker" : "6.64",
             "Log::Abstraction" : "0.15",
+            "Params::Get" : "0",
+            "Return::Set" : "0",
             "perl" : "5.008"
          }
       },
@@ -64,6 +66,6 @@
          "x_repository" : "https://github.com/nigelhorne/Object-Configure"
       }
    },
-   "version" : 0.11,
+   "version" : 0.12,
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

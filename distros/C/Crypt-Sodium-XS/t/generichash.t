@@ -9,11 +9,6 @@ use FindBin '$Bin';
 use lib "$Bin/lib";
 use Test::MemVault;
 
-unless (mlock_seems_available()) {
-  diag(mlock_warning());
-  disable_mlock();
-}
-
 my $msg = join('', 'a' .. 'z');
 # needs testing differing salts/personals, and lengths greater than saltbytes.
 my $salt = 'a' x generichash_blake2b_SALTBYTES;

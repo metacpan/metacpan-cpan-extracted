@@ -26,7 +26,7 @@ with
   },
   'Dist::Zilla::Role::PrereqSource';
 
-our $VERSION = 'v0.1.4';
+our $VERSION = 'v0.1.5';
 
 
 has filename => (
@@ -153,9 +153,15 @@ Dist::Zilla::Plugin::Test::MixedScripts - author tests to ensure there is no mix
 
 =head1 VERSION
 
-version v0.1.4
+version v0.1.5
 
 =for stopwords Cushing Etheridge Florian Ragwitz Unicode
+
+=head1 SYNOPSIS
+
+In the F<dist.ini> add:
+
+    [Test::MixedScripts]
 
 =head1 DESCRIPTION
 

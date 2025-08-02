@@ -29,6 +29,8 @@ like($xs, qr/^MODULE = DZT::Minty::XS/m, "our new module has the package declara
 
 unlike($xs, qr/PROTOTYPES/, '');
 
+like($xs, qr/#include "ppport.h"/, '');
+
 my $distini = $tzil->slurp_file('mint/dist.ini');
 like($distini, qr/copyright_holder = A. U. Thor/, "copyright_holder in dist.ini");
 

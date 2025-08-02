@@ -265,7 +265,7 @@ SV * core_ed25519_scalar_add(SV * x, SV * y, SV * flags = &PL_sv_undef)
 
   PREINIT:
   protmem *new_pm, *x_pm = NULL, *y_pm = NULL;
-  unsigned int new_flags = g_protmem_flags_key_default;
+  unsigned int new_flags = g_protmem_default_flags_key;
   STRLEN new_len, x_len, x_req_len, y_len, y_req_len;
   unsigned char *x_buf, *y_buf;
 
@@ -376,7 +376,7 @@ SV * core_ed25519_scalar_complement(SV * s, SV * flags = &PL_sv_undef)
 
   PREINIT:
   protmem *new_pm, *s_pm = NULL;
-  unsigned int new_flags = g_protmem_flags_key_default;
+  unsigned int new_flags = g_protmem_default_flags_key;
   STRLEN new_len, s_len, s_req_len;
   unsigned char *s_buf;
 
@@ -464,7 +464,7 @@ SV * core_ed25519_scalar_random(SV * flags = &PL_sv_undef)
 
   PREINIT:
   protmem *new_pm;
-  unsigned int new_flags = g_protmem_flags_key_default;
+  unsigned int new_flags = g_protmem_default_flags_key;
   STRLEN new_len;
 
   CODE:

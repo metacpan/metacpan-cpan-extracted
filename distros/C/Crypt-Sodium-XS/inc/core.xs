@@ -289,7 +289,7 @@ SV * ed25519_scalar_add(SV * x, SV * y, SV * flags = &PL_sv_undef)
       x_req_len = crypto_core_ed25519_SCALARBYTES;
       y_req_len = crypto_core_ed25519_SCALARBYTES;
   }
-  new_flags = g_protmem_flags_key_default;
+  new_flags = g_protmem_default_flags_key;
   SvGETMAGIC(flags);
   if (SvOK(flags))
     new_flags = SvUV_nomg(flags);
@@ -398,7 +398,7 @@ SV * ed25519_scalar_complement(SV * s, SV * flags = &PL_sv_undef)
       new_len = crypto_core_ed25519_SCALARBYTES;
       s_req_len = crypto_core_ed25519_SCALARBYTES;
   }
-  new_flags = g_protmem_flags_key_default;
+  new_flags = g_protmem_default_flags_key;
   SvGETMAGIC(flags);
   if (SvOK(flags))
     new_flags = SvUV_nomg(flags);
@@ -469,7 +469,7 @@ SV * ed25519_scalar_random(SV * flags = &PL_sv_undef)
 
   PREINIT:
   protmem *new_pm;
-  unsigned int new_flags = g_protmem_flags_key_default;
+  unsigned int new_flags = g_protmem_default_flags_key;
   STRLEN new_len;
 
   CODE:
@@ -518,7 +518,7 @@ SV * hchacha20( \
   STRLEN cnst_len;
   STRLEN key_len;
   STRLEN input_len;
-  unsigned int new_key_flags = g_protmem_flags_key_default;
+  unsigned int new_key_flags = g_protmem_default_flags_key;
 
   CODE:
   if (sv_derived_from(key, MEMVAULT_CLASS)) {
@@ -542,7 +542,7 @@ SV * hchacha20( \
       croak("hchacha20: Invalid constant length");
   }
 
-  new_key_flags = g_protmem_flags_key_default;
+  new_key_flags = g_protmem_default_flags_key;
   SvGETMAGIC(flags);
   if (SvOK(flags))
     new_key_flags = SvUV_nomg(flags);

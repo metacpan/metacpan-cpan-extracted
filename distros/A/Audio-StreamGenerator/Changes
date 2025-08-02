@@ -1,5 +1,8 @@
 Revision history for Perl extension Audio::StreamGenerator.
 
+1.03 Fri Aug 01 2025
+    - Allow overriding length of fade for individual sources
+
 1.02 Fri Oct 14 2022
     - Do gradual volume adjustment in the skipped buffer
 

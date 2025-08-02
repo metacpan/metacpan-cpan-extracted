@@ -1,0 +1,75 @@
+---
+abstract: 'generate a README file with the useful bits'
+author:
+  - 'Robert Rothenberg <rrwo@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '7.22'
+  File::Spec: '0'
+  Module::Metadata: '1.000015'
+  Pod::Text: '0'
+  Test::DZil: '0'
+  Test::Deep: '0'
+  Test::MixedScripts: v0.3.0
+  Test::More: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - unicode
+  - security
+  - xtest
+  - extra
+  - tests
+  - author
+  - tests
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-UsefulReadme
+provides:
+  Dist::Zilla::Plugin::UsefulReadme:
+    file: lib/Dist/Zilla/Plugin/UsefulReadme.pm
+    version: v0.1.1
+  Pod::Weaver::Section::InstallationInstructions:
+    file: lib/Pod/Weaver/Section/InstallationInstructions.pm
+    version: v0.1.1
+  Pod::Weaver::Section::RecentChanges:
+    file: lib/Pod/Weaver/Section/RecentChanges.pm
+    version: v0.1.1
+  Pod::Weaver::Section::Requirements:
+    file: lib/Pod/Weaver/Section/Requirements.pm
+    version: v0.1.1
+recommends:
+  Pod::Weaver: '0'
+  Pod::Weaver::Section::Version: '0'
+requires:
+  CPAN::Changes::Parser: '0.500002'
+  Dist::Zilla: '6.003'
+  Hash::Ordered: '0.005'
+  List::Util: '1.33'
+  Module::Metadata: '1.000015'
+  Module::Runtime: '0'
+  Moose: '0'
+  MooseX::MungeHas: '0'
+  PPI::Token::Pod: '0'
+  Path::Tiny: '0'
+  Perl::PrereqScanner: '1.024'
+  Pod::Elemental: '0'
+  Pod::Simple: '3.23'
+  Pod::Weaver::Role::Section: '0'
+  Types::Common: '0'
+  experimental: '0'
+  namespace::autoclean: '0'
+  perl: v5.20.0
+resources:
+  bugtracker: https://github.com/robrwo/perl-Dist-Zilla-Plugin-UsefulReadme/issues
+  repository: git://github.com/robrwo/perl-Dist-Zilla-Plugin-UsefulReadme.git
+version: v0.1.1
+x_authority: cpan:RRWO
+x_generated_by_perl: v5.34.3
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -4,13 +4,13 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 use constant {
     MAXINT => 32767
 };
 
-sub debug {
+sub _debug {
     my ($self, $message) = @_;
     return unless $self->{debug};
     if (ref $self->{debug} eq 'CODE') {
@@ -24,7 +24,7 @@ sub debug {
 sub new {
     my ( $class, %args ) = @_;
 
-    my %defaults = (
+    my %self = (
         buffer_length_seconds       => 10,
         normal_fade_seconds         => 5,
         skip_fade_seconds           => 3,
@@ -33,6 +33,8 @@ sub new {
         max_vol_before_mix_fraction => 0.75,
         min_audible_vol_fraction    => 0.005,
         debug                       => 0,
+        skip_silence                => 1,
+        run_every_second            => undef
     );
 
     my @mandatory_keys = qw (
@@ -40,22 +42,15 @@ sub new {
         out_fh
     );
 
-    my @optional_keys = qw(
-        run_every_second
-        debug
-    );
-
     foreach my $key (@mandatory_keys) {
         croak "value for $key is missing" if !defined( $args{$key} );
     }
-    my %key_lookup = map { $_ => 1 } ( @mandatory_keys, @optional_keys );
+    my %key_lookup = map { $_ => 1 } ( @mandatory_keys, keys %self );
 
     foreach my $key ( keys %args ) {
-        croak "unknown argument '$key'"
-            if !defined( $key_lookup{$key} );
+        croak "unknown argument '$key'" if !defined( $key_lookup{$key} );
+        $self{$key} = $args{$key}
     }
-
-    my %self = ( %defaults, %args{ @mandatory_keys, @optional_keys } );
 
     bless \%self, $class;
 }
@@ -64,9 +59,9 @@ sub get_streamer {
     my ($self, $batch_length_seconds) = @_;
     my $batch_size = int(($batch_length_seconds || 1) * $self->{sample_rate});
 
-    $self->debug( "starting stream" );
+    $self->_debug( "starting stream" );
 
-    $self->{source} = $self->_do_get_new_source();
+    ($self->{source}, undef) = $self->_do_get_new_source();
     $self->{buffer} = [];
     $self->{skip}   = 0;
     my $eof = undef;
@@ -123,7 +118,7 @@ sub _mix {
         # Also, fade out the old track.
         #
         $self->{skip} = 0;
-        $self->debug( "shortening buffer for skip..." . scalar(@$buffer) );
+        $self->_debug( "shortening buffer for skip..." . scalar(@$buffer) );
         splice @$buffer, ( $self->{skip_fade_seconds} * $self->{sample_rate} );
 
         my $index = 0;
@@ -150,44 +145,51 @@ sub _mix {
         push (@skipped_buffer, splice(@$buffer, 0, $to_skip) ) if $to_skip > 0;
     }
 
-    # Open the new track. We are not going to read from it yet, but opening it now may give the child process some time to start up.
-    $self->{source} = $self->_do_get_new_source();
+    my $fade_seconds;
 
-    # Find the index of the last sample that is 'audible' (loud enough to hear) in the remaining buffer of the old source.
-    #
-    # The audio stream is a 'wave' expressed as a signed integer - so 0 is 'silence'.
-    # Use abs() to compare samples with value < 0 with those > 0
-    #
-    my $last_audible_sample_index;
+    # Open the new track. We are not going to read from it yet, but opening it now may give the child process some time to start up.
+    ($self->{source}, $fade_seconds) = $self->_do_get_new_source();
+
+    $fade_seconds //= $self->{normal_fade_seconds};
+
     my $audible_threshold      = MAXINT * $self->{min_audible_vol_fraction};
 
-    FIND_LAST_AUDIBLE: foreach my $index (reverse 0 .. $#$buffer) {
-        my $sample = $buffer->[$index];
-        foreach my $channel(0 .. $max_channel_index) {
-            if (abs($sample->[$channel]) >= $audible_threshold) {
-                $last_audible_sample_index = $index;
-                last FIND_LAST_AUDIBLE;
+    if ( $self->{skip_silence} ) {
+        # Find the index of the last sample that is 'audible' (loud enough to hear) in the remaining buffer of the old source.
+        #
+        # The audio stream is a 'wave' expressed as a signed integer - so 0 is 'silence'.
+        # Use abs() to compare samples with value < 0 with those > 0
+        #
+        my $last_audible_sample_index;
+
+        FIND_LAST_AUDIBLE: foreach my $index (reverse 0 .. $#$buffer) {
+            my $sample = $buffer->[$index];
+            foreach my $channel(0 .. $max_channel_index) {
+                if (abs($sample->[$channel]) >= $audible_threshold) {
+                    $last_audible_sample_index = $index;
+                    last FIND_LAST_AUDIBLE;
+                }
             }
+        }
+
+        if (defined $last_audible_sample_index) {
+            $self->_debug( "last audible sample index: $last_audible_sample_index of " . scalar( @$buffer ) );
+
+            # remove everything after the 'last audible' sample from the remaining buffer of the old source
+            # in other words, remove silence at the end of the track.
+            splice @$buffer, $last_audible_sample_index + 1
+        }
+        else {
+            $self->_debug( "no audible samples in buffer?! - buffer size is " . scalar(@$buffer));
+            @$buffer = ();
         }
     }
 
-    if (defined $last_audible_sample_index) {
-        $self->debug( "last audible sample index: $last_audible_sample_index of " . scalar( @$buffer ) );
-
-        # remove everything after the 'last audible' sample from the remaining buffer of the old source
-        # in other words, remove silence at the end of the track.
-        splice @$buffer, $last_audible_sample_index + 1
-    }
-    else {
-        $self->debug( "no audible samples in buffer?! - buffer size is " . scalar(@$buffer));
-        @$buffer = ();
-    }
-
     # We only want the mix to last normal_fade_seconds seconds. So skip the samples in the remaining old buffer that are too much.
-    $self->debug("buffer size before sizing down:" . scalar(@$buffer));
-    my $to_size_down = @$buffer - ($self->{normal_fade_seconds} * $self->{sample_rate});
+    $self->_debug("buffer size before sizing down:" . scalar(@$buffer));
+    my $to_size_down = @$buffer - ($fade_seconds * $self->{sample_rate});
     push(@skipped_buffer, splice(@$buffer, 0, $to_size_down) ) if $to_size_down > 0;
-    $self->debug("buffer size after sizing down:". scalar(@$buffer));
+    $self->_debug("buffer size after sizing down:". scalar(@$buffer));
 
 
     # Find the index of the last sample that is 'loud' (too loud to mix) in the remaining buffer of the old source.
@@ -205,18 +207,63 @@ sub _mix {
 
     # Skip everything up to and including the last loud sample
     if (defined $last_loud_sample_index) {
-        $self->debug( "last loud sample index: $last_loud_sample_index of " . scalar( @$buffer ) );
+        $self->_debug( "last loud sample index: $last_loud_sample_index of " . scalar( @$buffer ) );
         push(@skipped_buffer, splice(@$buffer, 0, $last_loud_sample_index + 1));
     }
     else {
-        $self->debug( "no loud samples in the old track");
+        $self->_debug( "no loud samples in the old track");
     }
 
-    # get as many samples from the new source as we have left from the old source,
-    # or in case of a very short new track, as many as possible.
     my @new_buffer;
-    $self->_get_samples(scalar @$buffer, \@new_buffer);
-    $self->_make_mixable(\@new_buffer);
+    my $new_buffer_read_count;
+
+    # Get as many samples from the new source as we have left from the old source,
+    # or in case of a very short new track, as many as possible.
+
+    # In case any silence is detected at the beginning of the new track, it is removed.
+    # If that happens, we need another read to get the desired amount of samples in the new buffer - hence the while loop here.
+
+    while ( @new_buffer < @$buffer ) {
+        $new_buffer_read_count++;
+
+        my $samples_to_get = @$buffer - @new_buffer;
+
+        $self->_debug( "reading from new buffer, read $new_buffer_read_count ; need $samples_to_get samples" );
+
+        my $len = $self->_get_samples( $samples_to_get, \@new_buffer );
+
+        if (!$len) {
+            $self->_debug( "zero samples received from new source" );
+            last
+        }
+
+        $self->_make_mixable(\@new_buffer);
+
+        if ( $self->{skip_silence} ) {
+            # Find the first 'audible' sample, so we can remove any silence at the start of the new track.
+            my $first_audible_sample_index;
+            FIND_FIRST_AUDIBLE: foreach my $index (0 .. $#new_buffer) {
+                my $sample = $new_buffer[$index];
+                foreach my $channel(0 .. $max_channel_index) {
+                    if (abs($sample->[$channel]) >= $audible_threshold) {
+                        $first_audible_sample_index = $index;
+                        last FIND_FIRST_AUDIBLE;
+                    }
+                }
+            }
+
+            if (!defined $first_audible_sample_index) {
+                $self->_debug( "no audible samples in new buffer" );
+                @new_buffer = ();
+            }
+            else {
+                $self->_debug( "first audible sample index in new buffer: $first_audible_sample_index" );
+                splice @new_buffer, 0, $first_audible_sample_index
+            }
+        }
+
+    }
+
 
     # If the new track is shorter than the remaining buffer of the old track
     # (so the new track is only a few seconds long), skip the extra samples in the old buffer.
@@ -238,7 +285,7 @@ sub _mix {
         # only log at full seconds - don't flood the log
         if ( defined $self->{debug} && !( $index % $self->{sample_rate} ) ) {
             my $full_second = $index / $self->{sample_rate};
-            $self->debug( "mixing second $full_second..." );
+            $self->_debug( "mixing second $full_second..." );
         }
 
         # Do the actual mix: simply add up the values of the samples of the old & new track.
@@ -259,13 +306,13 @@ sub _mix {
         }
     }
 
-    $self->debug( "done mixing" );
+    $self->_debug( "done mixing" );
     croak "unused samples left in the buffer of the new track after mixing - this should never happen!" if @new_buffer;
 
     # The next step will be volume adjustment, so skip everything up to (excluding) the first loud sample.
 
     my $to_skip = $first_loud_sample_index // @$buffer;
-    $self->debug("skipping $to_skip non-loud samples out of " . scalar(@$buffer) );
+    $self->_debug("skipping $to_skip non-loud samples out of " . scalar(@$buffer) );
 
     push @skipped_buffer, splice(@$buffer, 0, $to_skip);
 
@@ -288,7 +335,7 @@ sub _mix {
 
     foreach my $channel ( grep { $max[$_] > MAXINT } (0 .. $max_channel_index) ) {
 
-        # Calculate what is the fraction we need to multiply the samples in @$buffer with to ensure 
+        # Calculate what is the fraction we need to multiply the samples in @$buffer with to ensure
         # that the loudest sample will not be highter than MAXINT
         my $dst_fraction = MAXINT / $max[$channel];
 
@@ -297,7 +344,7 @@ sub _mix {
         # Calculate how much change per sample in @skipped_buffer is necessary to make a smooth/gradual (linear) volume change
         my $fraction_diff_per_sample = $fraction_diff / @skipped_buffer;
 
-        $self->debug( "channel $channel needs volume adjustment. dst_fraction is $dst_fraction ; fraction_diff is $fraction_diff ;" .
+        $self->_debug( "channel $channel needs volume adjustment. dst_fraction is $dst_fraction ; fraction_diff is $fraction_diff ;" .
             " skipped samples " . scalar(@skipped_buffer) . "; fraction_diff_per_sample $fraction_diff_per_sample" );
 
         # Gradually change the volume of the @skipped_buffer towards the volume we need
@@ -308,7 +355,7 @@ sub _mix {
         }
 
         # $current_fraction and $dst_fraction should now be very close to each other (there is some rounding difference)
-        $self->debug("current_fraction after processing skipped_buffer: $current_fraction ; dst_fraction: $dst_fraction");
+        $self->_debug("current_fraction after processing skipped_buffer: $current_fraction ; dst_fraction: $dst_fraction");
 
         # adjust the volume of the remaining buffer (everything from the first loud sample onwards) by multiplying it with the dst_fraction.
         foreach my $sample ( @$buffer ) {
@@ -504,6 +551,7 @@ The following options can be specified:
     sample_rate                     44100       no
     channels_amount                 2           no
     max_vol_before_mix_fraction     0.75        no
+    skip_silence                    1           no
     min_audible_vol_fraction        0.005       no
     debug                           0           no
 
@@ -514,39 +562,39 @@ The outgoing file handle - this is where the generated signed 16-bit little-endi
 Note that StreamGenerator has no notion of time - if you don't slow it down, it will process data as fast as it can - which is faster than your listeners are able to play the stream.
 On Icecast, this will cause listeners to be disconnected because they are "too far behind".
 
-This can be addressed by making sure that the out_fh process consumes the audio no faster than realtime.
+This can be addressed by making sure that the L</"out_fh"> process consumes the audio no faster than realtime.
 
-If you are using ffmpeg, you can achieve this with its '-re' option.
+If you are using ffmpeg, you can achieve this with its C<-re> option.
 
-Another possibility is to first pipe the data to a command like 'pv' to rate limit the data. An additional advantage of 'pv' is that it can also add a buffer between the StreamGenerator and the encoder, which can absorb any short delays that may occur when StreamGenerator is switching to a new track.
+Another possibility is to first pipe the data to a command like C<pv> to rate limit the data. An additional advantage of C<pv> is that it can also add a buffer between the StreamGenerator and the encoder, which can absorb any short delays that may occur when StreamGenerator is switching to a new track.
 
 Example:
 
     pv -q -L 176400 -B 3528000 | ffmpeg ...
 
-This will tell pv to be quiet (no output to STDERR), to allow a maximum throughput of 44100 samples per second * 2 bytes per sample * 2 channels = 176400 bytes per second, and keep a buffer of 176400 Bps * 20 seconds = 3528000 bytes
+This will tell C<pv> to be quiet (no output to STDERR), to allow a maximum throughput of 44100 samples per second * 2 bytes per sample * 2 channels = 176400 bytes per second, and keep a buffer of 176400 Bps * 20 seconds = 3528000 bytes
 
-The out_fh command is also the place where you could insert a sound processing solution like the command line version of L<Stereo tool|https://www.stereotool.com/> - just pipe the audio first to that tool, and from there to your encoder.
+The L</"out_fh"> command is also the place where you could insert a sound processing solution like the command line version of L<Stereo tool|https://www.stereotool.com/> - just pipe the audio first to that tool, and from there to your encoder.
 
 =head2 get_new_source
 
-Reference to a sub that will be called every time that a new source (audio file) is needed. Needs to return a readable filehandle that will output signed 16-bit little-endian PCM audio.
+Reference to a sub that will be called every time that a new source (audio file) is needed. Needs to return a readable filehandle that will output signed 16-bit little-endian PCM audio. Optionally, an amount of seconds can be returned as a second return value, to override the L</"normal_fade_seconds"> setting when mixing *to* the new source. 
 
 =head2 run_every_second
 
-This sub will be run after each second of playback, with the StreamGenerator object as an argument. This can be used to do things like updating a UI with the current playing position - or to call the skip() method if we need to skip to the next source.
+This sub will be run after each second of playback, with the StreamGenerator object as an argument. This can be used to do things like updating a UI with the current playing position - or to call the L</"skip"> method if we need to skip to the next source.
 
 =head2 normal_fade_seconds
 
-Amount of seconds that we want tracks to overlap. This is only the initial/max value - the mixing algorithm may decide to mix less seconds if the old track ends with loud samples.
+Amount of seconds that we want tracks to overlap. This is only the initial/max value - the mixing algorithm may decide to mix less seconds if the old track ends with loud samples. It can be overriden for individual sources by returning an amount of seconds as a second return value from L</"get_new_source">. 
 
 =head2 buffer_length_seconds
 
-Amount of seconds of the current track to keep in the buffer. Having this set to a higher value than normal_fade_seconds will ensure that there will be enough audio left to mix after removing silence at the end of the old track.
+Amount of seconds of the current track to keep in the buffer. Having this set to a higher value than L</"normal_fade_seconds"> will ensure that there will be enough audio left to mix after removing silence at the end of the old track.
 
 =head2 skip_fade_seconds
 
-When 'skipping' to the next song using the skip() method (for example, after a user clicked a "next song" button on some web interface), we mix less seconds than normally, simply because mixing 5+ seconds in the middle of the old track sounds pretty bad. This value has to be lower than normal_fade_seconds.
+When 'skipping' to the next song using the L</"skip"> method (for example, after a user clicked a "next song" button on some web interface), we mix less seconds than normally, simply because mixing 5+ seconds in the middle of the old track sounds pretty bad. This value has to be lower than L</"normal_fade_seconds">.
 
 =head2 sample_rate
 
@@ -561,13 +609,17 @@ Amount of audio channels, this is normally 2 (stereo).
 This tells StreamGenerator what the minimum volume of a 'loud' sample is. It is expressed as a fraction of the maximum volume.
 When mixing 2 tracks, StreamGenerator needs to find out what the last loud sample of the old track is so that it can start the next song immediately after that.
 
+=head2 skip_silence
+
+If enabled, audio softer than L</"min_audible_vol_fraction"> at the beginning of a track, and at the end of tracks (but within the last L</"buffer_length_seconds"> seconds) will be skipped.
+
 =head2 min_audible_vol_fraction
 
-Audio softer than this volume fraction at the end of a track (and within the buffer) will be skipped.
+Audio softer than this volume fraction at the end of a track (and within the buffer) or at the beginning of a track will be skipped, if skip_silence is enabled.
 
 =head2 debug
 
-Log debugging information. If the value is a code reference, the logs will be passed to that sub. Otherwise the value will be treated as a boolean. If true, logs will be printed to STDERR .
+Log debugging information. If the value is a code reference, the logs will be passed to that sub. Otherwise the value will be treated as a boolean. If true, logs will be printed to C<STDERR> .
 
 =head1 METHODS
 
@@ -589,35 +641,35 @@ Get an anonymous subroutine that will produce C<$sec_per_call> seconds of a stre
 
 C<$sec_per_call> is optional, and is by default C<1>.
 
-Use this method instead of L<stream> if you want to have more control over the streaming process, for example, running the streamer inside an event loop:
+Use this method instead of L</"stream"> if you want to have more control over the streaming process, for example, running the streamer inside an event loop:
 
     use Mojo::IOLoop;
 
     my $loop = Mojo::IOLoop->singleton;
-    my $streamer_sub = $streamer->get_streamer(0.25);
+    my $streamer_sub = $streamer->get_streamer(0.5);
 
-    $loop->recurring(0.1 => $streamer_sub);
+    $loop->recurring(0.05 => $streamer_sub);
     $loop->start;
 
-Note: event loop will be blocked for up to 0.25 seconds every time the timer is done.
+Note: event loop will be blocked for up to 0.5 seconds every time the timer is done. The timer/streamer ratio should be sizeable enough for the loop to run smoothly, including the mixing process. This may vary depending on the speed of the machine which is used to generate the stream.
 
 =head2 skip
 
     $streamer->skip();
 
-Skip to the next track without finishing the current one. This can be called from the "run_every_second" sub, for example after checking whether a 'skip' flag was set in a database, or whether a file exists.
+Skip to the next track without finishing the current one. This can be called from the L</"run_every_second"> sub, for example after checking whether a 'skip' flag was set in a database, or whether a file exists.
 
 =head2 get_elapsed_samples
 
     my $elapsed_samples = $streamer->get_elapsed_samples();
     print "$elapsed_samples played so far\r";
 
-Get the amount of played samples in the current track - this can be called from the "run_every_second" sub.
+Get the amount of played samples in the current track - this can be called from the L</"run_every_second"> sub.
 
 =head2 get_elapsed_seconds
 
     my $elapsed_seconds = $streamer->get_elapsed_seconds();
     print "now at position $elapsed_seconds of the current track\r";
 
-Get the amount of elapsed seconds in the current track - in other words the current position in the track. This equals to get_elapsed_samples/sample_rate .
+Get the amount of elapsed seconds in the current track - in other words the current position in the track. This equals to C<get_elapsed_samples / sample_rate > .
 
