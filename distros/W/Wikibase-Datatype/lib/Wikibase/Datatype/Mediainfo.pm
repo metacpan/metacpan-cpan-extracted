@@ -5,9 +5,10 @@ use warnings;
 
 use Error::Pure qw(err);
 use Mo qw(build default is);
-use Mo::utils qw(check_array_object check_number check_number_of_items);
+use Mo::utils qw(check_number check_number_of_items);
+use Mo::utils::Array qw(check_array_object);
 
-our $VERSION = 0.37;
+our $VERSION = 0.38;
 
 has descriptions => (
 	default => [],
@@ -53,21 +54,18 @@ sub BUILD {
 	my $self = shift;
 
 	# Check descriptions.
-	check_array_object($self, 'descriptions', 'Wikibase::Datatype::Value::Monolingual',
-		'Description');
+	check_array_object($self, 'descriptions', 'Wikibase::Datatype::Value::Monolingual');
 	check_number_of_items($self, 'descriptions', 'language', 'Description', 'language');
 
 	# Check labels.
-	check_array_object($self, 'labels', 'Wikibase::Datatype::Value::Monolingual',
-		'Label');
+	check_array_object($self, 'labels', 'Wikibase::Datatype::Value::Monolingual');
 	check_number_of_items($self, 'labels', 'language', 'Label', 'language');
 
 	# Check page id.
 	check_number($self, 'page_id');
 
 	# Check statements.
-	check_array_object($self, 'statements', 'Wikibase::Datatype::MediainfoStatement',
-		'MediainfoStatement');
+	check_array_object($self, 'statements', 'Wikibase::Datatype::MediainfoStatement');
 
 	return;
 }
@@ -240,19 +238,33 @@ Returns string.
 =head1 ERRORS
 
  new():
-         From Mo::utils::check_array_object():
-                 Description isn't 'Wikibase::Datatype::Value::Monolingual' object.
-                 Label isn't 'Wikibase::Datatype::Value::Monolingual' object.
-                 Parameter 'descriptions' must be a array.
-                 Parameter 'labels' must be a array.
-                 Parameter 'statements' must be a array.
-                 MediainfoStatement isn't 'Wikibase::Datatype::MediainfoStatement' object.
          From Mo::utils::check_page_id():
                  Parameter 'page_id' must a number.
+
          From Mo::utils::check_number_of_items():
                  Sitelink for site '%s' has multiple values.
                  Description for language '%s' has multiple values.
                  Label for language '%s' has multiple values.
+
+         From Mo::utils::Array::check_array_object():
+                 Parameter 'descriptions' must be a array.
+                         Value: %s
+                         Reference: %s
+                 Parameter 'descriptions' with array must contain 'Wikibase::Datatype::Value::Monolingual' objects.
+                         Value: %s
+                         Reference: %s
+                 Parameter 'labels' must be a array.
+                         Value: %s
+                         Reference: %s
+                 Parameter 'labels' with array must contain 'Wikibase::Datatype::Value::Monolingual' objects.
+                         Value: %s
+                         Reference: %s
+                 Parameter 'statements' must be a array.
+                         Value: %s
+                         Reference: %s
+                 Parameter 'statements' with array must contain 'Wikibase::Datatype::MediainfoStatement' objects.
+                         Value: %s
+                         Reference: %s
 
 =head1 EXAMPLE
 
@@ -445,7 +457,8 @@ Returns string.
 
 L<Error::Pure>,
 L<Mo>,
-L<Mo:utils>.
+L<Mo:utils>,
+L<Mo:utils::Utils>.
 
 =head1 SEE ALSO
 
@@ -475,6 +488,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.37
+0.38
 
 =cut

@@ -1,5 +1,9 @@
 ---
 
+0.999.7      2025-08-02
+   [Added]
+       * Beta releases (untagged releases) are now supported
+
 0.999.6      2025-07-21
    [Fixed]
        * Don't drop dependencies which are either not resolved by

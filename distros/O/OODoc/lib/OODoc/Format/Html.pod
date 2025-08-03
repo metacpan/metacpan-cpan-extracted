@@ -15,7 +15,7 @@ OODoc::Format::Html - Produce HTML pages using OODoc::Template
  my $doc = OODoc->new(...);
  $doc->createManual
    ( 'html'   # or 'OODoc::Format::Html'
-   , format_options => [show_examples => 'NO']
+   , show_examples => 'NO',
    );
 
 =head1 DESCRIPTION
@@ -30,6 +30,18 @@ Extends L<"DESCRIPTION" in OODoc::Format|OODoc::Format/"DESCRIPTION">.
 
 Extends L<"OVERLOADED" in OODoc::Format|OODoc::Format/"OVERLOADED">.
  
+=over 4
+
+=item overload: B<'==' and '!=' (numeric comparison)>
+
+Inherited, see L<OODoc::Object/"OVERLOADED">
+
+=item overload: B<'bool'>
+
+Inherited, see L<OODoc::Object/"OVERLOADED">
+
+=back
+
 =head1 METHODS
 
 Extends L<"METHODS" in OODoc::Format|OODoc::Format/"METHODS">.
@@ -40,9 +52,12 @@ Extends L<"Constructors" in OODoc::Format|OODoc::Format/"Constructors">.
  
 =over 4
 
-=item OODoc::Format::Html-E<gt>B<new>(%options)
+=item $class-E<gt>B<new>(%options)
+
+Inherited, see L<OODoc::Object/"Constructors">
 
  -Option         --Defined in     --Default
+  format           OODoc::Format    'html'
   html_meta_data                    ''
   html_root                         '/'
   html_stylesheet                   undef
@@ -53,6 +68,8 @@ Extends L<"Constructors" in OODoc::Format|OODoc::Format/"Constructors">.
   workdir          OODoc::Format    <required>
 
 =over 2
+
+=item format => 'pod*'|'html*'|PACKAGE
 
 =item html_meta_data => STRING
 
@@ -79,23 +96,28 @@ Adds a link to the stylesheet to the meta-data.
 
 =back
 
-=head2 Inheritance knowledge
-
-Extends L<"Inheritance knowledge" in OODoc::Format|OODoc::Format/"Inheritance knowledge">.
- 
-=over 4
-
-=item $obj-E<gt>B<extends>( [$object] )
-
-Inherited, see L<OODoc::Object/"Inheritance knowledge">
-
-=back
-
 =head2 Attributes
 
 Extends L<"Attributes" in OODoc::Format|OODoc::Format/"Attributes">.
  
 =over 4
+
+=item $obj-E<gt>B<filename>( [$filename] )
+
+The name of the documentation file which L<createManual()|OODoc::Format::Html/"Page generation"> is currently
+processing.
+
+=item $obj-E<gt>B<format>()
+
+Inherited, see L<OODoc::Format/"Attributes">
+
+=item $obj-E<gt>B<htmlRoot>()
+
+Without trailing slash.
+
+=item $obj-E<gt>B<jumpScript>()
+
+Z<>
 
 =item $obj-E<gt>B<manifest>()
 
@@ -105,9 +127,22 @@ Inherited, see L<OODoc::Format/"Attributes">
 
 Returns (optionally after setting) the $manual which is being processed.
 
+=item $obj-E<gt>B<markers>( [$filehandle] )
+
+The filehandle where L<createManual()|OODoc::Format::Html/"Page generation"> writes the 'mark's to: the jump
+points.
+
+=item $obj-E<gt>B<meta>()
+
+Returns a string with html for the page header block.
+
 =item $obj-E<gt>B<project>()
 
 Inherited, see L<OODoc::Format/"Attributes">
+
+=item $obj-E<gt>B<unique>()
+
+Inherited, see L<OODoc::Object/"Attributes">
 
 =item $obj-E<gt>B<version>()
 
@@ -119,36 +154,76 @@ Inherited, see L<OODoc::Format/"Attributes">
 
 =back
 
+=head2 Manual Repository
+
+Extends L<"Manual Repository" in OODoc::Format|OODoc::Format/"Manual Repository">.
+ 
+=over 4
+
+=item $obj-E<gt>B<addManual>($manual)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<findManual>($name)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<mainManual>($name)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<manuals>()
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<manualsForPackage>($name)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<packageNames>()
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<publicationIndex>()
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<publish>(\%options)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=back
+
 =head2 Page generation
 
 Extends L<"Page generation" in OODoc::Format|OODoc::Format/"Page generation">.
  
 =over 4
 
-=item $obj-E<gt>B<cleanup>($manual, STRING)
+=item $obj-E<gt>B<cleanup>($manual, $text, %options)
 
 Inherited, see L<OODoc::Format/"Page generation">
 
-=item $obj-E<gt>B<cleanupString>($manual, $object)
+=item $obj-E<gt>B<cleanupString>($manual, $object, %args)
 
-The general L<cleanup()|OODoc::Format/"Page generation"> is over eager: it turns all pieces of text
-into paragraphs.  So things, like names of chapters, are not paragraphs
-at all: these simple strings are to be cleaned from paragraph information.
+The general L<OODoc::Parser::cleanupHtml()|OODoc::Parser/"Producing manuals"> is over-eager: it turns
+all pieces of text into paragraphs.  So things, like names of chapters,
+are not paragraphs at all: these simple strings are to be cleaned from
+paragraph information.
 
 =item $obj-E<gt>B<createManual>(%options)
 
- -Option        --Defined in     --Default
-  append          OODoc::Format    undef
-  format_options  OODoc::Format    []
-  manual          OODoc::Format    <required>
-  project         OODoc::Format    <required>
-  template                         "html/manual/"
+Inherited, see L<OODoc::Format/"Page generation">
+
+ -Option  --Defined in     --Default
+  append    OODoc::Format    undef
+  manual    OODoc::Format    <required>
+  project   OODoc::Format    <required>
+  template                   "html/manual/"
 
 =over 2
 
 =item append => STRING|CODE
-
-=item format_options => ARRAY
 
 =item manual => MANUAL
 
@@ -159,9 +234,7 @@ at all: these simple strings are to be cleaned from paragraph information.
 A DIRECTORY containing all template files which have to be filled-in
 and copied per manual page created.  You may also specify an HASH
 of file- and directory names and format options for each of those files.
-These options overrule the general L<createManual(format_options)|OODoc::Format/"Page generation"> values
-and the defaults.  These options can be overruled by values specified
-in the template file.
+These options can be overruled by values specified in the template file.
 
 =back
 
@@ -179,6 +252,8 @@ Complex:
 
 =item $obj-E<gt>B<createOtherPages>(%options)
 
+Inherited, see L<OODoc::Format/"Page generation">
+
  -Option --Defined in     --Default
   process  OODoc::Format    qr/\.(s?html|cgi)$/
   source   OODoc::Format    "html/other/"
@@ -190,6 +265,10 @@ Complex:
 =item source => DIRECTORY
 
 =back
+
+=item $obj-E<gt>B<createPages>(%options)
+
+Inherited, see L<OODoc::Format/"Page generation">
 
 =item $obj-E<gt>B<expandTemplate>( $location, [$format] )
 
@@ -214,7 +293,7 @@ example: expanding template specification into files
  #   index.html show YES
  #   main.html show NO
 
-=item $obj-E<gt>B<link>( $manual, $object, [$text] )
+=item $obj-E<gt>B<link>( $manual, $object, [ ($html|undef), \%settings ] )
 
 Create the html for a link which refers to the $object.  The link will be
 shown somewhere in the $manual.  The $text is displayed as link, and defaults
@@ -256,10 +335,6 @@ Inherited, see L<OODoc::Format/"Page generation">
 
 Inherited, see L<OODoc::Format/"Page generation">
 
-=item $obj-E<gt>B<showStructureExpanded>(%options)
-
-Inherited, see L<OODoc::Format/"Page generation">
-
 =item $obj-E<gt>B<showStructureRefer>(%options)
 
 Inherited, see L<OODoc::Format/"Page generation">
@@ -286,6 +361,8 @@ Inherited, see L<OODoc::Format/"Page generation">
 
 =item $obj-E<gt>B<writeTable>()
 
+Z<>
+
  -Option--Default
   header  <required>
   output  <required>
@@ -306,11 +383,29 @@ is the header.
 
 =back
 
+=head2 Commonly used functions
+
+Extends L<"Commonly used functions" in OODoc::Format|OODoc::Format/"Commonly used functions">.
+ 
+=over 4
+
+=item $any-E<gt>B<filenameToPackage>($filename)
+
+Inherited, see L<OODoc::Object/"Commonly used functions">
+
+=item $any-E<gt>B<mkdirhier>($directory)
+
+Inherited, see L<OODoc::Object/"Commonly used functions">
+
+=back
+
 =head2 Template processing
 
 =over 4
 
-=item $obj-E<gt>B<format>(%options)
+=item $obj-E<gt>B<interpolate>(%options)
+
+Z<>
 
  -Option--Default
   manual  undef
@@ -323,13 +418,19 @@ is the header.
 
 =item $obj-E<gt>B<templateChapter>()
 
+Z<>
+
 =item $obj-E<gt>B<templateDate>($templ, $attrs, $if, $else)
+
+Z<>
 
 =item $obj-E<gt>B<templateDistribution>($templ, $attrs, $if, $else)
 
 The name of the distribution which contains the manual page at hand.
 
 =item $obj-E<gt>B<templateHref>($templ, $attrs, $if, $else)
+
+Z<>
 
 =item $obj-E<gt>B<templateIndex>($templ, $attrs, $if, $else)
 
@@ -375,7 +476,11 @@ example: use of the template tag "index"
 
 =item $obj-E<gt>B<templateInheritance>($templ, $attrs, $if, $else)
 
+Z<>
+
 =item $obj-E<gt>B<templateList>($templ, $attrs, $if, $else)
+
+Z<>
 
  -Option          --Default
   manual            <required>
@@ -406,6 +511,8 @@ in the tag parameter list, which is a pity.
 
 =item $obj-E<gt>B<templateManual>($templ, $attrs, $if, $else)
 
+Z<>
+
 =item $obj-E<gt>B<templateMeta>($templ, $attrs, $if, $else)
 
 ARGS is a reference to a hash with options.  ZONE contains the attributes
@@ -414,7 +521,15 @@ method, or extend its implementation.
 
 =item $obj-E<gt>B<templateName>($templ, $attrs, $if, $else)
 
+Z<>
+
+=item $obj-E<gt>B<templateProject>($templ, $attrs, $if, $else)
+
+Z<>
+
 =item $obj-E<gt>B<templateTitle>($templ, $attrs, $if, $else)
+
+Z<>
 
 =item $obj-E<gt>B<templateVersion>($templ, $attrs, $if, $else)
 
@@ -424,61 +539,13 @@ and otherwise the project total version.
 
 =back
 
-=head2 Commonly used functions
-
-Extends L<"Commonly used functions" in OODoc::Format|OODoc::Format/"Commonly used functions">.
- 
-=over 4
-
-=item $obj-E<gt>B<filenameToPackage>($filename)
-
-=item OODoc::Format::Html-E<gt>B<filenameToPackage>($filename)
-
-Inherited, see L<OODoc::Object/"Commonly used functions">
-
-=item $obj-E<gt>B<mkdirhier>($directory)
-
-=item OODoc::Format::Html-E<gt>B<mkdirhier>($directory)
-
-Inherited, see L<OODoc::Object/"Commonly used functions">
-
-=back
-
-=head2 Manual Repository
-
-Extends L<"Manual Repository" in OODoc::Format|OODoc::Format/"Manual Repository">.
- 
-=over 4
-
-=item $obj-E<gt>B<addManual>($manual)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<mainManual>($name)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<manuals>()
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<manualsForPackage>($name)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<packageNames>()
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=back
-
-=head1 DETAILS
-
 =head1 DIAGNOSTICS
 
 =over 4
 
 =item Error: cannot find chapter NAME in manual $name
+
+Z<>
 
 =item Error: cannot find template source $name
 
@@ -489,11 +556,19 @@ error is produced.
 
 =item Error: cannot write html manual to $filename: $!
 
+Z<>
+
 =item Error: cannot write html to $filename: $!
+
+Z<>
 
 =item Error: cannot write markers to $filename: $!
 
+Z<>
+
 =item Error: chapter NAME in manual $name has illegal shape
+
+Z<>
 
 =item Error: chapter without name in template $fn
 
@@ -502,9 +577,15 @@ erroneous, because it requires a chapter name.
 
 =item Error: chmod of $filename to $mode failed: $!
 
+Z<>
+
 =item Error: html source directory $source: $!
 
+Z<>
+
 =item Error: illegal value to show_sections: $show_sec
+
+Z<>
 
 =item Error: manual definition requires manual object
 
@@ -514,6 +595,8 @@ to L<manualsForPackage()|OODoc::Object/"Manual Repository"> or L<mainManual()|OO
 
 =item Warning: missing required chapter $name in $manual
 
+Z<>
+
 =item Error: no group named as attribute for index
 
 In your template file, an {index} statement is used without a chapter name
@@ -522,34 +605,53 @@ be built.
 
 =item Error: no group named as attribute for list
 
+Z<>
+
 =item Warning: no meaning for container $contained in chapter block
+
+Z<>
 
 =item Warning: no meaning for container $contained in index block
 
+Z<>
+
 =item Warning: no meaning for container $contained in list block
+
+Z<>
 
 =item Error: not a manual, so no automatic title in $template
 
+Z<>
+
 =item Error: not a manual, so no manual name for $template
+
+Z<>
 
 =item Error: not a manual, so no name for $template
 
+Z<>
+
 =item Error: unknown group $name as list attribute
 
+Z<>
+
 =item Warning: unknown subroutine type $type for $name in $manual
+
+Z<>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of OODoc distribution version 2.02,
-built on December 08, 2021. Website: F<http://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.00,
+built on August 02, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 
-Copyrights 2003-2021 by [Mark Overmeer]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the Artistic license.
-See F<http://dev.perl.org/licenses/artistic.html>
+This software is copyright (c) 2003-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

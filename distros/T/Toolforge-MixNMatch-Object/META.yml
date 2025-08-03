@@ -12,7 +12,7 @@ configure_requires:
   ExtUtils::MakeMaker: 6.59
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.19'
+generated_by: 'Module::Install version 1.21'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,10 +27,11 @@ no_index:
 requires:
   Mo: 0
   Mo::utils: 0.03
+  Mo::utils::Array: 0
   perl: 5.6.2
 resources:
   bugtracker: https://github.com/michal-josef-spacek/Toolforge-MixNMatch-Object/issues
   homepage: https://github.com/michal-josef-spacek/Toolforge-MixNMatch-Object
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Toolforge-MixNMatch-Object
-version: '0.03'
+version: '0.04'

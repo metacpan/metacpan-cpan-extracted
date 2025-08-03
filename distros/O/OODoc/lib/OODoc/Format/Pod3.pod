@@ -15,8 +15,10 @@ OODoc::Format::Pod3 - Produce POD pages using OODoc::Template
 
  my $doc = OODoc->new(...);
  $doc->create
-   ( 'pod3'   # or 'OODoc::Format::Pod3'
-   , format_options => [show_examples => 'NO']
+   ( pod3 =>   # or 'OODoc::Format::Pod3'
+     manual_options => [
+        show_examples => 'NO',
+     ],
    );
 
 =head1 DESCRIPTION
@@ -30,6 +32,18 @@ Extends L<"DESCRIPTION" in OODoc::Format::Pod|OODoc::Format::Pod/"DESCRIPTION">.
 
 Extends L<"OVERLOADED" in OODoc::Format::Pod|OODoc::Format::Pod/"OVERLOADED">.
  
+=over 4
+
+=item overload: B<'==' and '!=' (numeric comparison)>
+
+Inherited, see L<OODoc::Object/"OVERLOADED">
+
+=item overload: B<'bool'>
+
+Inherited, see L<OODoc::Object/"OVERLOADED">
+
+=back
+
 =head1 METHODS
 
 Extends L<"METHODS" in OODoc::Format::Pod|OODoc::Format::Pod/"METHODS">.
@@ -40,21 +54,30 @@ Extends L<"Constructors" in OODoc::Format::Pod|OODoc::Format::Pod/"Constructors"
  
 =over 4
 
-=item OODoc::Format::Pod3-E<gt>B<new>(%options)
+=item $class-E<gt>B<new>(%options)
 
-Inherited, see L<OODoc::Format/"METHODS">
+Inherited, see L<OODoc::Object/"Constructors">
+
+ -Option  --Defined in     --Default
+  format    OODoc::Format    'pod3'
+  manifest  OODoc::Format    undef
+  project   OODoc::Format    <required>
+  version   OODoc::Format    <required>
+  workdir   OODoc::Format    <required>
+
+=over 2
+
+=item format => 'pod*'|'html*'|PACKAGE
+
+=item manifest => OBJECT
+
+=item project => STRING
+
+=item version => STRING
+
+=item workdir => DIRECTORY
 
 =back
-
-=head2 Inheritance knowledge
-
-Extends L<"Inheritance knowledge" in OODoc::Format::Pod|OODoc::Format::Pod/"Inheritance knowledge">.
- 
-=over 4
-
-=item $obj-E<gt>B<extends>( [$object] )
-
-Inherited, see L<OODoc::Object/"Inheritance knowledge">
 
 =back
 
@@ -64,6 +87,10 @@ Extends L<"Attributes" in OODoc::Format::Pod|OODoc::Format::Pod/"Attributes">.
  
 =over 4
 
+=item $obj-E<gt>B<format>()
+
+Inherited, see L<OODoc::Format/"Attributes">
+
 =item $obj-E<gt>B<manifest>()
 
 Inherited, see L<OODoc::Format/"Attributes">
@@ -71,6 +98,10 @@ Inherited, see L<OODoc::Format/"Attributes">
 =item $obj-E<gt>B<project>()
 
 Inherited, see L<OODoc::Format/"Attributes">
+
+=item $obj-E<gt>B<unique>()
+
+Inherited, see L<OODoc::Object/"Attributes">
 
 =item $obj-E<gt>B<version>()
 
@@ -82,34 +113,69 @@ Inherited, see L<OODoc::Format/"Attributes">
 
 =back
 
+=head2 Manual Repository
+
+Extends L<"Manual Repository" in OODoc::Format::Pod|OODoc::Format::Pod/"Manual Repository">.
+ 
+=over 4
+
+=item $obj-E<gt>B<addManual>($manual)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<findManual>($name)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<mainManual>($name)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<manuals>()
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<manualsForPackage>($name)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<packageNames>()
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<publicationIndex>()
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<publish>(\%options)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=back
+
 =head2 Page generation
 
 Extends L<"Page generation" in OODoc::Format::Pod|OODoc::Format::Pod/"Page generation">.
  
 =over 4
 
-=item $obj-E<gt>B<cleanup>($manual, STRING)
+=item $obj-E<gt>B<cleanup>($manual, $text, %options)
 
 Inherited, see L<OODoc::Format/"Page generation">
 
-=item $obj-E<gt>B<cleanupPOD>($in, $out)
+=item $obj-E<gt>B<createManual>(%options)
 
 Inherited, see L<OODoc::Format::Pod/"Page generation">
 
-=item $obj-E<gt>B<createManual>(%options)
-
- -Option        --Defined in        --Default
-  append          OODoc::Format::Pod  ''
-  format_options  OODoc::Format       []
-  manual          OODoc::Format       <required>
-  project         OODoc::Format       <required>
-  template                            <in code>
+ -Option  --Defined in        --Default
+  append    OODoc::Format::Pod  ''
+  manual    OODoc::Format       <required>
+  project   OODoc::Format       <required>
+  template                      <in code>
 
 =over 2
 
 =item append => STRING|CODE
-
-=item format_options => ARRAY
 
 =item manual => MANUAL
 
@@ -127,11 +193,11 @@ by copying it to a file.
 
 Inherited, see L<OODoc::Format/"Page generation">
 
-=item $obj-E<gt>B<formatManual>(%options)
+=item $obj-E<gt>B<createPages>(%options)
 
-Inherited, see L<OODoc::Format::Pod/"Page generation">
+Inherited, see L<OODoc::Format/"Page generation">
 
-=item $obj-E<gt>B<link>( $manual, $object, [$text] )
+=item $any-E<gt>B<link>( $manual, $object, [$text, \%settings] )
 
 Inherited, see L<OODoc::Format::Pod/"Page generation">
 
@@ -175,10 +241,6 @@ Inherited, see L<OODoc::Format/"Page generation">
 
 Inherited, see L<OODoc::Format/"Page generation">
 
-=item $obj-E<gt>B<showStructureExpanded>(%options)
-
-Inherited, see L<OODoc::Format/"Page generation">
-
 =item $obj-E<gt>B<showStructureRefer>(%options)
 
 Inherited, see L<OODoc::Format/"Page generation">
@@ -203,6 +265,10 @@ Inherited, see L<OODoc::Format/"Page generation">
 
 Inherited, see L<OODoc::Format/"Page generation">
 
+=item $obj-E<gt>B<simplifyPod>($in, $out)
+
+Inherited, see L<OODoc::Format::Pod/"Page generation">
+
 =item $obj-E<gt>B<writeTable>()
 
 Inherited, see L<OODoc::Format::Pod/"Page generation">
@@ -215,53 +281,15 @@ Extends L<"Commonly used functions" in OODoc::Format::Pod|OODoc::Format::Pod/"Co
  
 =over 4
 
-=item $obj-E<gt>B<filenameToPackage>($filename)
-
-=item OODoc::Format::Pod3-E<gt>B<filenameToPackage>($filename)
+=item $any-E<gt>B<filenameToPackage>($filename)
 
 Inherited, see L<OODoc::Object/"Commonly used functions">
 
-=item $obj-E<gt>B<mkdirhier>($directory)
-
-=item OODoc::Format::Pod3-E<gt>B<mkdirhier>($directory)
+=item $any-E<gt>B<mkdirhier>($directory)
 
 Inherited, see L<OODoc::Object/"Commonly used functions">
 
 =back
-
-=head2 Manual Repository
-
-Extends L<"Manual Repository" in OODoc::Format::Pod|OODoc::Format::Pod/"Manual Repository">.
- 
-=over 4
-
-=item $obj-E<gt>B<addManual>($manual)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<mainManual>($name)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<manual>($name)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<manuals>()
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<manualsForPackage>($name)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<packageNames>()
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=back
-
-=head2 Template processing
 
 =head1 DETAILS
 
@@ -273,14 +301,11 @@ Extends L<"DETAILS" in OODoc::Format::Pod|OODoc::Format::Pod/"DETAILS">.
 
 =item Error: cannot read prelimary pod from $infn: $!
 
+Z<>
+
 =item Error: cannot write final pod to $outfn: $!
 
-=item Error: formatter does not know the version.
-
-=item Error: formatter has no project name.
-
-A formatter was created without a name specified for the project at
-hand.  This should be passed with L<new(project)|OODoc::Format/"METHODS">.
+Z<>
 
 =item Error: manual definition requires manual object
 
@@ -290,29 +315,25 @@ to L<manualsForPackage()|OODoc::Object/"Manual Repository"> or L<mainManual()|OO
 
 =item Warning: missing required chapter $name in $manual
 
-=item Error: no directory to put pod manual for $name in
-
-=item Error: no package name for pod production
-
-=item Error: no working directory specified.
-
-The formatter has to know where the output can be written.  This
-directory must be provided via L<new(workdir)|OODoc::Format/"METHODS">, but was not specified.
+Z<>
 
 =item Warning: unknown subroutine type $type for $name in $manual
+
+Z<>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of OODoc distribution version 2.02,
-built on December 08, 2021. Website: F<http://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.00,
+built on August 02, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 
-Copyrights 2003-2021 by [Mark Overmeer]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the Artistic license.
-See F<http://dev.perl.org/licenses/artistic.html>
+This software is copyright (c) 2003-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

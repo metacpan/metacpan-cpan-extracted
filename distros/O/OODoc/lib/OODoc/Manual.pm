@@ -1,15 +1,18 @@
-# Copyrights 2003-2021 by [Mark Overmeer].
-#  For other contributors see ChangeLog.
-# See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.02.
-# This code is part of perl distribution OODoc.  It is licensed under the
-# same terms as Perl itself: https://spdx.org/licenses/Artistic-2.0.html
+# This code is part of Perl distribution OODoc version 3.00.
+# The POD got stripped from this file by OODoc version 3.00.
+# For contributors see file ChangeLog.
 
-package OODoc::Manual;
-use vars '$VERSION';
-$VERSION = '2.02';
+# This software is copyright (c) 2003-2025 by Mark Overmeer.
 
-use base 'OODoc::Object';
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+# SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
+
+package OODoc::Manual;{
+our $VERSION = '3.00';
+}
+
+use parent 'OODoc::Object';
 
 use strict;
 use warnings;
@@ -18,7 +21,22 @@ use Log::Report    'oodoc';
 
 use OODoc::Text::Chapter;
 
-use List::Util 'first';
+use Scalar::Util  qw/blessed/;
+use List::Util    qw/first/;
+
+# Prefered order of all supported chapters
+my @chapter_names = qw/
+    Name
+    Inheritance
+    Synopsis
+    Description
+    Overload
+    Methods
+    Exports
+    Details
+    Diagnositcs
+    References
+/;
 
 
 use overload '""' => sub { shift->name };
@@ -29,83 +47,79 @@ use overload cmp  => sub {$_[0]->name cmp "$_[1]"};
 
 #-------------------------------------------
 
-
 sub init($)
 {   my ($self, $args) = @_;
     $self->SUPER::init($args) or return;
 
-    my $name = $self->{OP_package} = delete $args->{package}
+    my $name = $self->{OM_package} = delete $args->{package}
        or error __x"package name is not specified";
 
-    $self->{OP_source}   = delete $args->{source}
+    $self->{OM_source}   = delete $args->{source}
         or error __x"no source is specified for manual {name}", name => $name;
 
-    $self->{OP_version}  = delete $args->{version}
+    $self->{OM_version}  = delete $args->{version}
         or error __x"no version is specified for manual {name}", name => $name;
 
-    $self->{OP_distr}    = delete $args->{distribution}
+    $self->{OM_distr}    = delete $args->{distribution}
         or error __x"no distribution specified for manual {name}", name=> $name;
 
-    $self->{OP_parser}   = delete $args->{parser}    or panic;
-    $self->{OP_stripped} = delete $args->{stripped};
+    $self->{OM_parser}   = delete $args->{parser}    or panic;
+    $self->{OM_stripped} = delete $args->{stripped};
 
-    $self->{OP_pure_pod} = delete $args->{pure_pod} || 0;
-    $self->{OP_chapter_hash} = {};
-    $self->{OP_chapters}     = [];
-    $self->{OP_subclasses}   = [];
-    $self->{OP_realizers}    = [];
-    $self->{OP_extra_code}   = [];
-    $self->{OP_isa}          = [];
-
+    $self->{OM_pure_pod} = delete $args->{pure_pod} || 0;
+    $self->{OM_chapter_hash} = {};
+    $self->{OM_chapters}     = [];
+    $self->{OM_subclasses}   = [];
+    $self->{OM_realizers}    = [];
+    $self->{OM_extra_code}   = [];
+    $self->{OM_isa}          = [];
     $self;
 }
 
 #-------------------------------------------
 
-
-sub package() {shift->{OP_package}}
-
-
-sub parser() {shift->{OP_parser}}
+sub package() {$_[0]->{OM_package}}
 
 
-sub source() {shift->{OP_source}}
+sub parser() {$_[0]->{OM_parser}}
 
 
-sub version() {shift->{OP_version}}
+sub source() {$_[0]->{OM_source}}
 
 
-sub distribution() {shift->{OP_distr}}
+sub version() {$_[0]->{OM_version}}
 
 
-sub stripped() {shift->{OP_stripped}}
+sub distribution() {$_[0]->{OM_distr}}
 
 
-sub isPurePod() {shift->{OP_pure_pod}}
+sub stripped() {$_[0]->{OM_stripped}}
+
+
+sub isPurePod() {$_[0]->{OM_pure_pod}}
 
 #-------------------------------------------
-
 
 sub chapter($)
 {   my ($self, $it) = @_;
     $it or return;
 
-    ref $it
-        or return $self->{OP_chapter_hash}{$it};
+    blessed $it
+        or return $self->{OM_chapter_hash}{$it};
 
     $it->isa("OODoc::Text::Chapter")
         or panic "$it is not a chapter";
 
     my $name = $it->name;
-    if(my $old = $self->{OP_chapter_hash}{$name})
+    if(my $old = $self->{OM_chapter_hash}{$name})
     {   my ($fn,  $ln2) = $it->where;
         my ($fn2, $ln1) = $old->where;
         error __x"two chapters named {name} in {file} line {line1} and {line2}"
           , name => $name, file => $fn, line1 => $ln2, line2 => $ln1;
     }
 
-    $self->{OP_chapter_hash}{$name} = $it;
-    push @{$self->{OP_chapters}}, $it;
+    $self->{OM_chapter_hash}{$name} = $it;
+    push @{$self->{OM_chapters}}, $it;
     $it;
 }
 
@@ -113,32 +127,33 @@ sub chapter($)
 sub chapters(@)
 {   my $self = shift;
     if(@_)
-    {   $self->{OP_chapters}     = [ @_ ];
-        $self->{OP_chapter_hash} = { map { ($_->name => $_) } @_ };
+    {   $self->{OM_chapters}     = [ @_ ];
+        $self->{OM_chapter_hash} = { map +($_->name => $_), @_ };
     }
-    @{$self->{OP_chapters}};
+    @{$self->{OM_chapters}};
 }
 
 
 sub name()
 {   my $self    = shift;
-    return $self->{OP_name} if defined $self->{OP_name};
+    defined $self->{OM_name} and return $self->{OM_name};
 
     my $chapter = $self->chapter('NAME')
-        or error __x"no chapter NAME in scope of package {pkg} in file {file}"
-             , pkg => $self->package, file => $self->source;
+        or error __x"no chapter NAME in scope of package {pkg} in {file}", pkg => $self->package, file => $self->source;
 
     my $text   = $chapter->description || '';
-    $text =~ m/^\s*(\S+)\s*\-\s/
-        or error __x"the NAME chapter does not have the right format in {file}"
-             , file => $self->source;
+    $text =~ m/^\s*(\S+)\s*\-\s*(.+?)\s*$/
+        or error __x"the NAME chapter does not have the right format in {file}", file => $self->source;
 
-    $self->{OP_name} = $1;
+    $self->{OM_title} = $2;
+    $self->{OM_name}  = $1;
 }
 
 
+sub title() { $_[0]->name; $_[0]->{OM_title} }
 
-sub subroutines() { shift->all('subroutines') }
+
+sub subroutines() { $_[0]->all('subroutines') }
 
 
 sub subroutine($)
@@ -150,8 +165,8 @@ sub subroutine($)
 
     foreach my $part (@parts)
     {   foreach my $chapter ($part->chapters)
-        {   $sub = first {defined $_} $chapter->all(subroutine => $name);
-            return $sub if defined $sub;
+        {   $sub = first { defined $_ } $chapter->all(subroutine => $name);
+            defined $sub and return $sub;
         }
     }
 
@@ -161,9 +176,9 @@ sub subroutine($)
 
 sub examples()
 {   my $self = shift;
-    ( $self->all('examples')
-    , map {$_->examples} $self->subroutines
-    );
+      ( $self->all('examples')
+      , map $_->examples, $self->subroutines
+      );
 }
 
 
@@ -179,37 +194,35 @@ sub diagnostics(@)
         $select = qr/^(@select)$/i;
     }
 
-    grep {$_->type =~ $select} @diag;
+    grep $_->type =~ $select, @diag;
 }
-
 
 #-------------------------------------------
 
-
 sub superClasses(;@)
 {   my $self = shift;
-    push @{$self->{OP_isa}}, @_;
-    @{$self->{OP_isa}};
+    push @{$self->{OM_isa}}, @_;
+    @{$self->{OM_isa}};
 }
 
 
 sub realizes(;$)
 {   my $self = shift;
-    @_ ? ($self->{OP_realizes} = shift) : $self->{OP_realizes};
+    @_ ? ($self->{OM_realizes} = shift) : $self->{OM_realizes};
 }
 
 
 sub subClasses(;@)
 {   my $self = shift;
-    push @{$self->{OP_subclasses}}, @_;
-    @{$self->{OP_subclasses}};
+    push @{$self->{OM_subclasses}}, @_;
+    @{$self->{OM_subclasses}};
 }
 
 
 sub realizers(;@)
 {   my $self = shift;
-    push @{$self->{OP_realizers}}, @_;
-    @{$self->{OP_realizers}};
+    push @{$self->{OM_realizers}}, @_;
+    @{$self->{OM_realizers}};
 }
 
 
@@ -240,29 +253,28 @@ sub ownSubroutines
 
 #-------------------------------------------
 
-
 sub collectPackageRelations()
 {   my $self = shift;
     return () if $self->isPurePod;
 
     my $name = $self->package;
-    my %return;
+    my %tree;
 
-    # The @ISA / use base
+    # The @ISA / use base / use parent
     {  no strict 'refs';
-       $return{isa} = [ @{"${name}::ISA"} ];
+       $tree{isa} = [ @{"${name}::ISA"} ];
     }
 
     # Support for Object::Realize::Later
-    $return{realizes} = $name->willRealize if $name->can('willRealize');
+    $tree{realizes} = $name->willRealize if $name->can('willRealize');
 
-    %return;
+    %tree;
 }
 
 
 sub expand()
 {   my $self = shift;
-    return $self if $self->{OP_is_expanded};
+    $self->{OM_is_expanded} and return $self;
 
     #
     # All super classes must be expanded first.  Manuals for
@@ -270,10 +282,8 @@ sub expand()
     # classes which are external are ignored.
     #
 
-    my @supers  = reverse     # multiple inheritance, first isa wins
-                      grep ref,
-                          $self->superClasses;
-
+    # multiple inheritance, first isa wins
+    my @supers  = reverse grep ref, $self->superClasses;
     $_->expand for @supers;
 
     #
@@ -282,8 +292,8 @@ sub expand()
 
     my @chapters = $self->chapters;
 
-    my $merge_subsections = sub
-      { my ($section, $inherit) = @_;
+    my $merge_subsections = sub {
+        my ($section, $inherit) = @_;
         $section->extends($inherit);
         $section->subsections($self->mergeStructure
           ( this      => [ $section->subsections ]
@@ -292,10 +302,10 @@ sub expand()
           , container => $section
           ));
         $section;
-      };
+    };
 
-    my $merge_sections = sub
-      { my ($chapter, $inherit) = @_;
+    my $merge_sections = sub {
+        my ($chapter, $inherit) = @_;
         $chapter->extends($inherit);
         $chapter->sections($self->mergeStructure
           ( this      => [ $chapter->sections ]
@@ -304,7 +314,7 @@ sub expand()
           , container => $chapter
           ));
         $chapter;
-      };
+    };
 
     foreach my $super (@supers)
     {
@@ -347,7 +357,7 @@ sub expand()
         }
     }
 
-    while(my($name, $item) = each %extended)
+    while(my ($name, $item) = each %extended)
     {   next if $used{$name};
         push @{$location{$item->path}}, $item;
     }
@@ -358,15 +368,17 @@ sub expand()
         {   $section->setSubroutines(delete $location{$section->path});
             foreach my $subsect ($section->subsections)
             {   $subsect->setSubroutines(delete $location{$subsect->path});
+                foreach my $subsubsect ($subsect->subsubsections)
+                {   $subsubsect->setSubroutines(delete $location{$subsubsect->path});
+                }
             }
         }
     }
 
-    warning __x"section without location in {manual}: {section}"
-      , manual => $self, section => $_
-          for keys %location;
+    warning __x"section without location in {manual}: {section}", manual => $self, section => $_
+        for keys %location;
 
-    $self->{OP_is_expanded} = 1;
+    $self->{OM_is_expanded} = 1;
     $self;
 }
 
@@ -417,24 +429,24 @@ sub mostDetailedLocation($)
 {   my ($self, $thing) = @_;
 
     my $inherit = $thing->extends
-       or return $thing->path;
+        or return $thing->path;
 
     my $path1   = $thing->path;
     my $path2   = $self->mostDetailedLocation($inherit);
     my ($lpath1, $lpath2) = (length($path1), length($path2));
 
-    return $path1 if $path1 eq $path2;
+    return $path1
+        if $path1 eq $path2;
 
     return $path2
-       if $lpath1 < $lpath2 && substr($path2, 0, $lpath1+1) eq "$path1/";
+        if $lpath1 < $lpath2 && substr($path2, 0, $lpath1+1) eq "$path1/";
 
     return $path1
-       if $lpath2 < $lpath1 && substr($path1, 0, $lpath2+1) eq "$path2/";
+        if $lpath2 < $lpath1 && substr($path1, 0, $lpath2+1) eq "$path2/";
 
-    warning __x"subroutine '{name}' location conflict:\n  {p1} in {man1}\n  {p2} in {man2}"
-      , name => "$thing", p1 => $path1, man1 => $thing->manual
-      , p2 => $path2, man2 => $inherit->manual
-          if $self eq $thing->manual;
+    warning __x"subroutine '{name}' location conflict:\n  {p1} in {man1}\n  {p2} in {man2}",
+        name => "$thing", p1 => $path1, man1 => $thing->manual, p2 => $path2, man2 => $inherit->manual
+        if $self eq $thing->manual;
 
     $path1;
 }
@@ -493,8 +505,8 @@ sub createSuperSupers($)
       ? "   is an M<$package>\n"
       : "   is a M<$package>\n";
 
-    return $output
-        unless ref $package;  # only the name of the package is known
+    ref $package
+        or return $output;  # only the name of the package is known
 
     if(my $realizes = $package->realizes)
     {   $output .= $self->createSuperSupers($realizes);
@@ -512,23 +524,45 @@ sub createSuperSupers($)
     $output;
 }
 
-#-------------------------------------------
+sub publish($%)
+{	my ($self, $config, %args) = @_;
+	my $manual   = $config->{manual} = $self;
 
+	my $exporter = $config->{exporter};
+    $exporter->processingManual($manual);
+
+	my $p = $self->SUPER::publish($config);
+
+	my @ch;
+    foreach my $name (@chapter_names)
+    {   my $chapter  = $self->chapter(uc $name) or next;
+        push @ch, $chapter->publish($config)->{id};
+    }
+
+    $p->{name}         = $exporter->markupString($self->name);
+    $p->{title}        = $exporter->markupString($self->title);
+    $p->{package}      = $exporter->markup($self->package);
+    $p->{distribution} = $exporter->markup($self->distribution);
+    $p->{version}      = $exporter->markup($self->version);
+    $p->{is_pure_pod}  = $exporter->boolean($self->isPurePod);
+    $p->{chapters}     = \@ch;
+
+    $exporter->processingManual(undef);
+    $p;
+}
+
+#-------------------------------------------
 
 sub stats()
 {   my $self     = shift;
     my $chapters = $self->chapters || return;
     my $subs     = $self->ownSubroutines;
-    my $options  = map { $_->options } $self->ownSubroutines;
+    my $options  = map $_->options, $self->ownSubroutines;
     my $diags    = $self->diagnostics;
     my $examples = $self->examples;
-
     my $manual   = $self->name;
     my $package  = $self->package;
-    my $head
-      = $manual eq $package
-      ? "manual $manual"
-      : "manual $manual for $package";
+    my $head     = $manual eq $package ? "manual $manual" : "manual $manual for $package";
 
     <<STATS;
 $head
@@ -545,18 +579,15 @@ sub index()
 {   my $self  = shift;
     my @lines;
     foreach my $chapter ($self->chapters)
-    {  push @lines, $chapter->name;
-       foreach my $section ($chapter->sections)
-       {   push @lines, "  ".$section->name;
-           foreach ($section->subsections)
-           {   push @lines, "    ".$_->name;
-           }
-       }
+    {   push @lines, $chapter->name;
+        foreach my $section ($chapter->sections)
+        {   push @lines, "  ".$section->name;
+            push @lines, map "    ".$_->name, $section->subsections;
+        }
     }
     join "\n", @lines, '';
 }
 
 #-------------------------------------------
-
 
 1;

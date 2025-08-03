@@ -39,8 +39,8 @@ eval {
 		'datatype' => 'external-id',
 	);
 };
-is($EVAL_ERROR, "Alias isn't 'Wikibase::Datatype::Value::Monolingual' object.\n",
-	"Alias isn't 'Wikibase::Datatype::Value::Monolingual' object.");
+is($EVAL_ERROR, "Parameter 'aliases' with array must contain 'Wikibase::Datatype::Value::Monolingual' objects.\n",
+	"Parameter 'aliases' with array must contain 'Wikibase::Datatype::Value::Monolingual' objects (foo).");
 clean();
 
 # Test.
@@ -82,8 +82,8 @@ eval {
 		'descriptions' => ['foo'],
 	);
 };
-is($EVAL_ERROR, "Description isn't 'Wikibase::Datatype::Value::Monolingual' object.\n",
-	"Description isn't 'Wikibase::Datatype::Value::Monolingual' object.");
+is($EVAL_ERROR, "Parameter 'descriptions' with array must contain 'Wikibase::Datatype::Value::Monolingual' objects.\n",
+	"Parameter 'descriptions' with array must contain 'Wikibase::Datatype::Value::Monolingual' objects (foo).");
 clean();
 
 # Test.
@@ -113,8 +113,8 @@ eval {
 		'labels' => ['foo'],
 	);
 };
-is($EVAL_ERROR, "Label isn't 'Wikibase::Datatype::Value::Monolingual' object.\n",
-	"Label isn't 'Wikibase::Datatype::Value::Monolingual' object.");
+is($EVAL_ERROR, "Parameter 'labels' with array must contain 'Wikibase::Datatype::Value::Monolingual' objects.\n",
+	"Parameter 'labels' with array must contain 'Wikibase::Datatype::Value::Monolingual' objects (foo).");
 clean();
 
 # Test.
@@ -136,8 +136,8 @@ eval {
 		'statements' => ['foo'],
 	);
 };
-is($EVAL_ERROR, "Statement isn't 'Wikibase::Datatype::Statement' object.\n",
-	"Statement isn't 'Wikibase::Datatype::Statement' object.");
+is($EVAL_ERROR, "Parameter 'statements' with array must contain 'Wikibase::Datatype::Statement' objects.\n",
+	"Parameter 'statements' with array must contain 'Wikibase::Datatype::Statement' objects (foo).");
 clean();
 
 # Test.

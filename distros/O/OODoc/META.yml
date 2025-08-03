@@ -1,13 +1,14 @@
 ---
 abstract: 'Object Oriented Documentation'
 author:
-  - 'Mark Overmeer'
+  - 'Mark Overmeer <perl@overmeer.net>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Test::More: '0.47'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,12 +19,61 @@ no_index:
     - t
     - inc
 requires:
-  File::Slurp: '9999.12'
+  File::Basename: '0'
+  File::Copy: '0'
+  File::Find: '0'
+  File::Glob: '0'
+  File::Slurper: '0.014'
+  File::Spec: '0'
+  HTML::Entities: '0'
+  IO::File: '0'
+  JSON: '0'
+  List::Util: '0'
+  Log::Report: '0'
   OODoc::Template: '0.16'
-  Test::More: '0.47'
+  Pod::Escapes: '0'
+  Scalar::Util: '0'
+  Software::License: '0.103014'
 resources:
-  homepage: http://perl.overmeer.net/CPAN/
-  license: http://dev.perl.org/licenses/
+  X_licenses:
+    - http://dev.perl.org/licenses/
+  homepage: https://perl.overmeer.net/oodoc/
   repository: https://github.com/markov2/perl5-OODoc.git
-version: '2.02'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.011'
+version: '3.00'
+x_oodist:
+  email: perl@overmeer.net
+  first_year: 2003
+  generate:
+    -
+      format: pod3
+      podtail: PODTAIL.txt
+    -
+      docroot: /oodoc/html
+      format: html
+      publish: ../public_html/oodoc/htmlpkg
+      stylesheet: /oodoc/html/oodoc.css
+      templates: ./html
+      webpages: ../public_html/oodoc/html
+    -
+      export: website
+      include_manuals: ~
+      markup: html
+      publish: ../public_html/oodoc/doctree
+      serializer: json
+  include:
+    - ../OODoc-Template
+  license_holder: ~
+  parser:
+    pmhead: PMHEAD.txt
+    select: ~
+    skip_links: []
+    syntax: markov
+  raw:
+    publish: ../public_html/oodoc/raw
+  release:
+    publish: ../public_html/oodoc/source
+    readme: ~
+  tests: {}
+  use:
+    - ../Log-Report
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

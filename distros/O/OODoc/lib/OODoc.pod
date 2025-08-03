@@ -15,51 +15,21 @@ OODoc - object oriented production of software documentation
  my $doc = OODoc->new(distribution => 'My Name', version => '0.02');
  $doc->processFiles(workdir => $dest);
  $doc->prepare;
- $doc->create('pod', workdir => $dest);
- $doc->create('html', workdir => '/tmp/html');
+ $doc->formatter('pod', workdir => $dest)->createPages;
+ $doc->formatter('html', workdir => '/tmp/html')->createPages;
 
-or use the oodist script
+or use the C<oodist> script, included in this distribution (advised).
 
 =head1 DESCRIPTION
 
-OODoc stands for "Object Oriented Documentation": to produce manual-pages
-in HTML or the usual man-page UNIX format, describing Perl programs.
-The OO part of the name refers to two things: this module simplifies
-writing documentation for Object Oriented programs, and at the same time,
-it is Object Oriented itself: easily extensible.
+OODoc stands for "Object Oriented Documentation": to produce better
+manual-pages in HTML and perl's POD format than the standard offerings
+of the Perl tool-chain.
 
-Before you read any further, decide:
-
-=over 4
-
-=item 1
-
-to use your own modified version of the mkdist and mkdoc scripts, as provided
-in the examples which come with this module, or
-
-=item 2
-
-use the oodist, which is less flexible but much simpler, and only requires
-some additions to your Makefile.PL.
-
-=back
-
-OODoc has been used for small and for very large modules.  It can also
-be used to integrate manual-pages from many modules into one homogeneous
-set.
-
-The documentation syntax can be changed, by configuring the parser
-or adding a new one.  The L<OODoc::Parser::Markov|OODoc::Parser::Markov> parser understands POD
-and has additional logical markup tags.  See L<OODoc::Parser|OODoc::Parser> about what
-each parser needs to support.
-
-The output is produced by formatters.  The current implementation contains
-two POD formatters and one HTML formatter.  See L<OODoc::Format|OODoc::Format>.
-
-Do not forget to B<read> the L<DETAILS> section, later on this manual-page to
-get started.  Please contribute ideas.  Have a look at the main website
-of this project at L<http://perl.overmeer.net/oodoc/>.  That is also an
-example of the produced output.
+Do not forget to B<read> the L</DETAILS> section further down on this
+manual-page to get started.  Please contribute ideas.  Have a look at
+the main website of this project at L<http://perl.overmeer.net/oodoc/>.
+That is also an example of the produced html output.
 
 Extends L<"DESCRIPTION" in OODoc::Object|OODoc::Object/"DESCRIPTION">.
  
@@ -67,6 +37,18 @@ Extends L<"DESCRIPTION" in OODoc::Object|OODoc::Object/"DESCRIPTION">.
 
 Extends L<"OVERLOADED" in OODoc::Object|OODoc::Object/"OVERLOADED">.
  
+=over 4
+
+=item overload: B<'==' and '!=' (numeric comparison)>
+
+Inherited, see L<OODoc::Object/"OVERLOADED">
+
+=item overload: B<'bool'>
+
+Inherited, see L<OODoc::Object/"OVERLOADED">
+
+=back
+
 =head1 METHODS
 
 Extends L<"METHODS" in OODoc::Object|OODoc::Object/"METHODS">.
@@ -77,7 +59,9 @@ Extends L<"Constructors" in OODoc::Object|OODoc::Object/"Constructors">.
  
 =over 4
 
-=item OODoc-E<gt>B<new>(%options)
+=item $class-E<gt>B<new>(%options)
+
+Inherited, see L<OODoc::Object/"Constructors">
 
  -Option      --Default
   distribution  <required>
@@ -107,20 +91,10 @@ or C<VERSION> which contains a number.
 
 =back
 
-=head2 Inheritance knowledge
-
-Extends L<"Inheritance knowledge" in OODoc::Object|OODoc::Object/"Inheritance knowledge">.
- 
-=over 4
-
-=item $obj-E<gt>B<extends>( [$object] )
-
-Inherited, see L<OODoc::Object/"Inheritance knowledge">
-
-=back
-
 =head2 Attributes
 
+Extends L<"Attributes" in OODoc::Object|OODoc::Object/"Attributes">.
+ 
 =over 4
 
 =item $obj-E<gt>B<distribution>()
@@ -131,9 +105,53 @@ Returns the nice name for the distribution.
 
 Returns the general project description, by default the distribution name.
 
+=item $obj-E<gt>B<unique>()
+
+Inherited, see L<OODoc::Object/"Attributes">
+
 =item $obj-E<gt>B<version>()
 
 Returns the version string for the distribution.
+
+=back
+
+=head2 Manual Repository
+
+Extends L<"Manual Repository" in OODoc::Object|OODoc::Object/"Manual Repository">.
+ 
+=over 4
+
+=item $obj-E<gt>B<addManual>($manual)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<findManual>($name)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<mainManual>($name)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<manuals>()
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<manualsForPackage>($name)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<packageNames>()
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<publicationIndex>()
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<publish>(\%options)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
 
 =back
 
@@ -142,6 +160,8 @@ Returns the version string for the distribution.
 =over 4
 
 =item $obj-E<gt>B<processFiles>(%options)
+
+Z<>
 
  -Option      --Default
   distribution  <from main OODoc object>
@@ -152,7 +172,7 @@ Returns the version string for the distribution.
   skip_links    []
   source        '.'
   version       <from source directory or OODoc object>
-  workdir       <required>
+  workdir       undef
 
 =over 2
 
@@ -171,7 +191,7 @@ pods, tests, etc. before the new pod files are created.
 Include the string (which may consist of multiple lines) to each of the
 pm files.  This notice usually contains the copyright message.
 
-=item parser => CLASS|OBJECT
+=item parser => CLASS|$name|OBJECT
 
 The parser CLASS or OBJECT to be used to process the pages.
 
@@ -209,10 +229,9 @@ Specify the directory where the stripped pm-files and the pod files
 will be written to.  Probably the whole distribution is collected on
 that spot.
 
-If you do not want to create a distribution, you may
-specify C<undef> (still: you have to specify the option).  In this
-case, only the documentation in the files is consumed, and no files
-created.
+When the processed files are not part of this distribution, then
+then do not specify this option: knowledge is built, but not
+included in the release.
 
 =back
 
@@ -236,18 +255,18 @@ how they are related.
 =item $obj-E<gt>B<prepare>(%options)
 
 Add information to the documentation tree about inheritance relationships
-of the packages.  C<prepare> must be called between L<processFiles()|OODoc/"Parser">
-and L<create()|OODoc/"Formatter">.
+of the packages.  This C<prepare> must be called after the last
+L<processFiles()|OODoc/"Parser"> call, before the formatters are called.
 
 =back
 
-=head2 Formatter
+=head2 Main entries
 
 =over 4
 
-=item $obj-E<gt>B<create>($name|$class|$object, %options)
+=item $obj-E<gt>B<formatter>($name|$class|$object, %options)
 
-Create a manual for the set of manuals read so far.  The manuals are
+[2.03] Create a manual for the set of manuals read so far.  The manuals are
 produced by different formatters which produce one page at a time.
 Returned is the formatter which is used: it may contain useful information
 for you.
@@ -258,64 +277,18 @@ and C<html> representing L<OODoc::Format::Pod|OODoc::Format::Pod> and L<OODoc::F
 respectively), the name of a $class which needs to be instantiated,
 or an instantiated formatter.
 
- -Option          --Default
-  append            undef
-  format_options    []
-  manifest          <workdir>/MANIFEST
-  manual_format     []
-  manual_templates  undef
-  other_templates   undef
-  process_files     <formatter dependent>
-  select            undef
-  workdir           <required>
+You can also pass many options which are passed to L<OODoc::Format::createPages()|OODoc::Format/"Page generation">
+
+ -Option  --Default
+  manifest  <workdir>/MANIFEST
+  workdir   <required>
 
 =over 2
-
-=item append => STRING|CODE
-
-The value is passed on to L<OODoc::Format::createManual(append)|OODoc::Format/"Page generation">,
-but the behavior is formatter dependent.
-
-=item format_options => ARRAY
-
-Formatter dependent initialization options.  See the documentation of
-the formatter which will be used for the possible values.
 
 =item manifest => FILENAME|undef
 
 The names of the produced files are appended to this file.  When undef
 is given, no file will be written for this.
-
-=item manual_format => ARRAY
-
-Options passed to L<OODoc::Format::createManual(format_options)|OODoc::Format/"Page generation"> when
-a manual page has to be produced.  See the applicable formatter
-manual page for the possible flags and values.
-
-=item manual_templates => DIRECTORY
-
-Passed to L<OODoc::Format::createManual(template)|OODoc::Format/"Page generation">, and defines the
-location of the set of pages which has to be created for each manual
-page.  Some formatters do not support templates and the valid values
-are formatter dependent.
-
-=item other_templates => DIRECTORY
-
-Other files which have to be copied
-passed to L<OODoc::Format::createOtherPages(source)|OODoc::Format/"Page generation">.
-
-=item process_files => REGEXP
-
-Selects the files which are to be processed for special markup information.
-Other files, like image files, will be simply copied.  The value will be
-passed to L<OODoc::Format::createOtherPages(process)|OODoc::Format/"Page generation">.
-
-=item select => CODE|REGEXP
-
-Produce only the indicated manuals, which is useful in case of merging
-manuals from different distributions.  When a REGEXP is provided, it
-will be checked against the manual name.  The CODE reference will be
-called with a manual as only argument.
 
 =item workdir => DIRECTORY
 
@@ -336,73 +309,61 @@ Extends L<"Commonly used functions" in OODoc::Object|OODoc::Object/"Commonly use
  
 =over 4
 
-=item $obj-E<gt>B<filenameToPackage>($filename)
-
-=item OODoc-E<gt>B<filenameToPackage>($filename)
+=item $any-E<gt>B<filenameToPackage>($filename)
 
 Inherited, see L<OODoc::Object/"Commonly used functions">
 
-=item $obj-E<gt>B<mkdirhier>($directory)
-
-=item OODoc-E<gt>B<mkdirhier>($directory)
+=item $any-E<gt>B<mkdirhier>($directory)
 
 Inherited, see L<OODoc::Object/"Commonly used functions">
-
-=back
-
-=head2 Manual Repository
-
-Extends L<"Manual Repository" in OODoc::Object|OODoc::Object/"Manual Repository">.
- 
-=over 4
-
-=item $obj-E<gt>B<addManual>($manual)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<mainManual>($name)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<manual>($name)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<manuals>()
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<manualsForPackage>($name)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<packageNames>()
-
-Inherited, see L<OODoc::Object/"Manual Repository">
 
 =back
 
 =head1 DETAILS
 
-=head2 Why use OODoc in stead of POD
+=head2 OODoc
+
+The "OO" part of the name refers to two things: this module simplifies
+writing documentation for Object Oriented programs.  At the same time,
+it is Object Oriented itself: easily extensible.  It can be used to
+integrate manual-pages from many distributions into one homogeneous set.
+OODoc has been used for small single package upto very large sets of
+modules, like the MailBox suite.
+
+=head3 Adding logical markup
 
 POD (Perl's standard Plain Old Document format) has a very simple
 syntax.  POD is very simple to learn, and the produced manual pages
-look like normal Unix manual pages.  However, when you start writing
-larger programs, you start seeing the weaker sides of POD.
+look like standard Unix manual pages.  However, when you start writing
+larger programs, you start seeing the weaker aspects of POD.
 
 One of the main problems with POD is that is using a visual markup
 style: you specify information by how it must be presented to the
 viewer.  This in contrast with logical markup where you specify the
 information more abstract, and a visual representation is created by
-translation.  For instance in HTML defines a C<I > tag (visual markup
-italic) and C<EM> (logical markup emphasis, which will usually show
-as italic).
+an application.  For instance in HTML defines an C<I> tag as visual markup
+Italic, and C<EM> as logical markup for EMphasis, which will usually show
+in italic.
 
-The main disadvantage of visual markup is lost information: the
+The main disadvantage of visual markup is limited expression: the
 formatter of the manual page can not help the author of the documentation
-to produce more consistent manual pages.  This is not a problem for small
-distributions, but is much more needed when programs grow larger.
+to produce more consistent and complete manual pages.  This is not a
+problem for small distributions, but is much more needed when code
+grows larger.
+
+=head3 Application
+
+This module can be used directly, but you may also use the C<oodist>
+script which comes with this distribution.  That command will also help
+you with your whole distribution release process.
+
+The documentation syntax can be changed by configuring the provided
+parser or adding a new one.  The L<OODoc::Parser::Markov|OODoc::Parser::Markov> parser
+extends standard POD, which uses visual markup, with logical markup tags.
+
+The output is produced by formatters and exporters.  The current
+implementation contains three POD formatters, one HTML formatter,
+and a JSON exporter.
 
 =head2 How OODoc works
 
@@ -410,41 +371,70 @@ Like with POD, you simply mix your documentation with your code.  When
 the module is distributed, this information is stripped from the files
 by a I<parser>, and translated into an object tree.  This tree is then
 optimized: items combined, reorganized, etc, to collect all information
-required to produce useable manual pages.  Then, a I<formatter> is called
-to generate the manual pages.
+required to produce useable manual pages.
+
+Then, a I<formatter> is called to generate the manual pages in real
+POD or HTML.  You may also use an I<exporter> to serialize that tree
+(into JSON).
+
+  My-Dist -------+                      +--formatter--> POD
+  My-Other-Dist -|--parser--> DocTree --|--formatter--> HTML
+  Even-More -----+                      +--exporter---> JSON/HTML
 
 =head3 The parser
 
-The parser reads the package files, and (by default) strip them from all
-documentation.  The stripped files are written to a temporary directory
-which is used to create the module distribution.
+The parser reads the package files, and (by default) strips them from
+all documentation fragments.  The stripped C<pm> files are written to
+a temporary directory which is used to create the distribution release.
+Existing C<pod> files will also be consumed, but published untouched.
+
+The parser produces an object tree, which is a structured representation
+of the documentation.  That tree is parser independent, and organized
+by manual page.
 
 It is possible to use more than one parser for your documentation.  On
-this moment, there is only one parser implemented: the Markov parser,
-named after the author.  But you can add your own parser, if you want to. 
-Within one distribution, different files can be parsed by different parsers.
+this moment, there is only one parser implemented: the "Markov parser",
+named after the author.  You can add your own parser, if you prefer to. 
+Within one distribution, different files may be parsed by different parsers.
 
-The parser produces an object tree, which is a structured representation of
-the documentation.  The tree is parser independent, and organized by
-manual page.
-
-=head3 Collecting relations
+=head3 collecting relations
 
 The second phase of the manual page generation process figures out the
 relations between the manual pages.  It collects inheritance relations
-and other organizational information which is to be used by the
+and other organizational information, which is to be used by the
 manual page generators.
 
-=head3 The formatter
+Links are being checked.  The Markov parser let you refer to subroutines
+and even documented options within a sub.
+
+Information of super-classes is merged: sections, methods, method options
+and their defaults.  Methods are sorted by name per ((sub)sub)section.
+
+=head3 formatter
 
 The final phase can be called more than once: based on the same object
-tree, documents can be produced in various formats.  The initial
-implementation produces POD and HTML.
+tree, documents can be produced in various formats.  The current
+implementations produce POD and HTML.
 
-=head2 Getting Started from scratch
+More details in the L<OODoc::Format|OODoc::Format> base-class.
 
-To use OODoc, you need to create a scripts which helps you producing
-the distribution of your module.  The simpest script look like this:
+=head3 exporters
+
+You may also export the documentation tree to be used with your own
+separate application.  At this moment, that dump will be made in JSON
+with HTML-formatted text fragments only.
+
+More details in the L<OODoc::Export|OODoc::Export> base-class.
+
+=head2 Release process
+
+OODoc, as document generator, will need to be integrated into your
+software release process.
+
+=head3 do it yourself
+
+To use OODoc, you need a script which helps you producing
+the distribution of your module.  The simpest script looks like this:
 
  use OODoc;
  my $dist = '/tmp/abc';
@@ -453,48 +443,42 @@ the distribution of your module.  The simpest script look like this:
   , version      => '0.01'
   );
 
- $doc->processFiles(workdir => $dist);  # parsing
- $doc->prepare;                         # collecting
- $doc->create('pod', workdir => $dist); # formatting to POD
+ $doc->processFiles(...);  # parsing
+ $doc->prepare;            # collecting
+ $doc->formatter('pod', ...)->createPages(...);
+                           # formatting to POD
 
 The default parser will be used to process the files, see
 L<OODoc::Parser::Markov|OODoc::Parser::Markov> for its syntax.  The formatter is described
 in L<OODoc::Format::Pod|OODoc::Format::Pod>.  Once you have this working, you may decide
 to add options to the calls to adapt the result more to your own taste.
 
-=head2 Getting Started by Cloning
+=head3 use oodist
 
-A much easier way to start, is to simply pick one of the examples
-which are distributed with OODoc.  They come in three sizes: for a
-small module (mimetypes and orl), an average sized set-up (for OODoc
-itself), and a huge one (mailbox, over 140 packages).
+This distribution comes with a script named C<oodist>, which automates
+a most steps of your release process.  To start using OODoc with your
+existing distribution, simply run this:
 
-All examples are written by the same person, and therefore follow the
-same set-up.  Copy the files C<mkdoc>, C<mkdist> and C<MANIFEST.extra>
-plus the directory C<html> to the top directory of your distribution.
-Edit all the files, to contain the name of your module.
+=over 4
 
-It expects a C<MANIFEST> file to be present, like standard for Perl
-modules.  That file lists your own code, pod and additional files
-which need to be included in the release.  OODoc will extend this
-file with produced POD files.
+=item 1. go to the root of your module
 
-The demo-scripts use a C<version> file, which contains something like
-C<< $VERSION = 0.1 >>.  This is not required: you can specify to
-take a version from any file, in the traditional Perl way.  However,
-when you glue multiple modules together into one big HTML documentation
-website (see the mailbox example), then this separate file simplifies
-the production script.
+=item 2. run 'oodist'
 
-To test the document production,
-try (on UNIX/Linux)  C<<pod2man xyz.pod | man -l - >>
+=item 3. follow the instructions to configure OODoc
 
-To get a prepared distribution, use C<./mkdist 1>.  This will first
-produce all documentation, and then run C<make test> and C<make dist>.
-It generates two distributions: the C<module-version.tar.gz> which
-can be uploaded to CPAN, and the C<module-version-raw.tar.gz> which
-is for yourself.  The latter contains the whole setup which is used
-to generate the distribution, so the unprocessed files!
+=item 4. run 'oodist -v'
+
+=back
+
+This should take you more than a few minutes.  When the output looks fine,
+then start playing with the advantages of the Markov extended POD syntax.
+
+=head3 Checking the produced manual pages
+
+To test the document production for C<My::Module>, try (on UNIX/Linux)
+
+  pod2man $dist/lib/My/Module.pod | man -l -
 
 =head1 DIAGNOSTICS
 
@@ -506,6 +490,8 @@ The $parser class does not exist or produces compiler errors.
 
 =item Error: Cannot read version from file $fn: $!
 
+Z<>
+
 =item Error: Parser $parser could not be instantiated
 
 Something went wrong while starting the parser object.  Probably there is
@@ -516,15 +502,11 @@ an other error message which will tell you the exact cause.
 For some reason, a plain file from can not be copied from your source
 tree to the location where the distribution is made.
 
-=item Error: create requires a directory to write the manuals to
+=item Error: formatter requires a directory to write the manuals to
 
 You have to give a value to C<workdir>, which will be used as top directory
 for the produced output.  It does not matter whether there is already some
 stuff in that directory.
-
-=item Error: formatter $name has compilation errors: $@
-
-The formatter which is specified does not compile, so can not be used.
 
 =item Error: manual definition requires manual object
 
@@ -561,7 +543,9 @@ to a temporary directory.  The packages are first stripped from
 their pseudo doc, and then written to the same directory.  That
 directory will be the place where C<make dist> is run later.
 
-=item Error: the destribution must be specified
+=item Error: the distribution must be specified
+
+Z<>
 
 =item Error: there is no version defined for the source files
 
@@ -579,14 +563,15 @@ an ARRAY, regular expression, or a code reference.
 
 =head1 SEE ALSO
 
-This module is part of OODoc distribution version 2.02,
-built on December 08, 2021. Website: F<http://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.00,
+built on August 02, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 
-Copyrights 2003-2021 by [Mark Overmeer]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the Artistic license.
-See F<http://dev.perl.org/licenses/artistic.html>
+This software is copyright (c) 2003-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

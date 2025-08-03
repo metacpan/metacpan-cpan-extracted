@@ -1,2 +1,6 @@
+0.02 2025-08-02T23:22:21+02:00
+ - Fix DEPENDENCIES section in doc.
+ - Move check_array_object() to Mo::utils::Array.
+
 0.01 2025-07-05T21:07:05+02:00
  - First version.

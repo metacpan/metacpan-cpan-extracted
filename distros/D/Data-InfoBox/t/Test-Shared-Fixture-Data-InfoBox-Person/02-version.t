@@ -6,4 +6,4 @@ use Test::NoWarnings;
 use Test::Shared::Fixture::Data::InfoBox::Person;
 
 # Test.
-is($Test::Shared::Fixture::Data::InfoBox::Person::VERSION, 0.06, 'Version.');
+is($Test::Shared::Fixture::Data::InfoBox::Person::VERSION, 0.07, 'Version.');

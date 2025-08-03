@@ -1,15 +1,18 @@
-# Copyrights 2003-2021 by [Mark Overmeer].
-#  For other contributors see ChangeLog.
-# See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.02.
-# This code is part of perl distribution OODoc.  It is licensed under the
-# same terms as Perl itself: https://spdx.org/licenses/Artistic-2.0.html
+# This code is part of Perl distribution OODoc version 3.00.
+# The POD got stripped from this file by OODoc version 3.00.
+# For contributors see file ChangeLog.
 
-package OODoc::Text;
-use vars '$VERSION';
-$VERSION = '2.02';
+# This software is copyright (c) 2003-2025 by Mark Overmeer.
 
-use base 'OODoc::Object';
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+# SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
+
+package OODoc::Text;{
+our $VERSION = '3.00';
+}
+
+use parent 'OODoc::Object';
 
 use strict;
 use warnings;
@@ -17,16 +20,11 @@ use warnings;
 use Log::Report    'oodoc';
 
 
-use overload '=='   => sub {$_[0]->unique == $_[1]->unique}
-           , '!='   => sub {$_[0]->unique != $_[1]->unique}
-           , '""'   => sub {$_[0]->name}
-           , 'cmp'  => sub {$_[0]->name cmp "$_[1]"}
-           , 'bool' => sub {1};
+use overload
+    '""'   => sub {$_[0]->name},
+    'cmp'  => sub {$_[0]->name cmp "$_[1]"};
 
 #-------------------------------------------
-
-
-my $unique = 1;
 
 sub init($)
 {   my ($self, $args) = @_;
@@ -38,31 +36,25 @@ sub init($)
     $self->{OT_type}     = delete $args->{type} or panic;
 
     exists $args->{container}   # may be explicit undef
-        or panic "no text container specified for the {pkg} object"
-             , pkg => ref $self;
+        or panic "no text container specified for the {pkg} object", pkg => ref $self;
 
-    # may be undef
-    $self->{OT_container}= delete $args->{container};
-
+    $self->{OT_container}= delete $args->{container};    # may be undef initially
     $self->{OT_descr}    = delete $args->{description} || '';
     $self->{OT_examples} = [];
-    $self->{OT_unique}   = $unique++;
-
+    $self->{OT_extends}  = [];
     $self;
 }
 
 #-------------------------------------------
 
+sub name() { $_[0]->{OT_name} }
 
-sub name() {shift->{OT_name}}
 
-
-sub type() {shift->{OT_type}}
+sub type() { $_[0]->{OT_type} }
 
 
 sub description()
-{   my $text  = shift->{OT_descr};
-    my @lines = split /^/m, $text;
+{   my @lines = split /^/m, shift->{OT_descr};
     shift @lines while @lines && $lines[ 0] =~ m/^\s*$/;
     pop   @lines while @lines && $lines[-1] =~ m/^\s*$/;
     join '', @lines;
@@ -75,23 +67,30 @@ sub container(;$)
 }
 
 
-sub manual(;$)
-{   my $self = shift;
-    @_ ? $self->SUPER::manual(@_)
-       : $self->container->manual;
-}
-
-
-sub unique() {shift->{OT_unique}}
+sub linenr() { $_[0]->{OT_linenr} }
 
 
 sub where()
 {   my $self = shift;
-    ($self->manual->source, $self->{OT_linenr});
+    ( $self->manual->source, $self->linenr );
+}
+
+
+sub manual(;$)
+{   my $self = shift;
+    $self->container->manual;
+}
+
+
+sub extends(;$)
+{   my $self = shift;
+    my $ext  = $self->{OT_extends};
+    push @$ext, @_;
+
+    wantarray ? @$ext : $ext->[0];
 }
 
 #-------------------------------------------
-
 
 sub openDescription() { \shift->{OT_descr} }
 
@@ -100,7 +99,7 @@ sub findDescriptionObject()
 {   my $self   = shift;
     return $self if length $self->description;
 
-    my @descr = map { $_->findDescriptionObject } $self->extends;
+    my @descr = map $_->findDescriptionObject, $self->extends;
     wantarray ? @descr : $descr[0];
 }
 
@@ -114,7 +113,28 @@ sub example($)
 
 sub examples() { @{shift->{OT_examples}} }
 
-#-------------------------------------------
+sub publish($%)
+{   my ($self, $args) = @_;
+    my $exporter = $args->{exporter} or panic;
+	my $manual   = $args->{manual}   or panic;
 
+	my $p = $self->SUPER::publish($args);
+    $p->{type}      = $exporter->markup(lc $self->type);
+	$p->{inherited} = $exporter->boolean($manual->inherited($self));
+
+    if(my $name  = $self->name)
+    {   $p->{name} = $exporter->markupString($name);
+    }
+
+    my $descr    = $self->description // '';
+    $p->{intro}  = $exporter->markupBlock($descr)
+        if length $descr;
+
+    my @e        = map $_->publish($args)->{id}, $self->examples;
+    $p->{examples} = \@e if @e;
+	$p;
+}
+
+#-------------------------------------------
 
 1;

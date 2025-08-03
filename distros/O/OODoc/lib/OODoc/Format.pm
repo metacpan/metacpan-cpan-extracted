@@ -1,70 +1,147 @@
-# Copyrights 2003-2021 by [Mark Overmeer].
-#  For other contributors see ChangeLog.
-# See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.02.
-# This code is part of perl distribution OODoc.  It is licensed under the
-# same terms as Perl itself: https://spdx.org/licenses/Artistic-2.0.html
+# This code is part of Perl distribution OODoc version 3.00.
+# The POD got stripped from this file by OODoc version 3.00.
+# For contributors see file ChangeLog.
 
-package OODoc::Format;
-use vars '$VERSION';
-$VERSION = '2.02';
+# This software is copyright (c) 2003-2025 by Mark Overmeer.
 
-use base 'OODoc::Object';
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+# SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
+
+package OODoc::Format;{
+our $VERSION = '3.00';
+}
+
+use parent 'OODoc::Object';
 
 use strict;
 use warnings;
 
-use OODoc::Manifest;
 use Log::Report    'oodoc';
 
+use OODoc::Manifest ();
+
+our %formatters =
+  ( pod   => 'OODoc::Format::Pod'
+  , pod2  => 'OODoc::Format::Pod2'
+  , pod3  => 'OODoc::Format::Pod3'
+  , html  => 'OODoc::Format::Html'
+  , html2 => 'OODoc::Format::Html2'   # not (yet) included in the OODoc release
+  );
+
+
+sub new($%)
+{	my ($class, %args) = @_;
+
+    $class eq __PACKAGE__
+        or return $class->SUPER::new(%args);
+
+    my $format = $args{format}
+        or error __x"No formatter specified.";
+
+    my $pkg = $formatters{$format} || $format;
+
+    eval "require $pkg";
+    $@ and error __x"formatter {name} has compilation errors: {err}", name => $format, err => $@;
+
+    $pkg->new(%args);
+}
 
 sub init($)
 {   my ($self, $args) = @_;
+
     $self->SUPER::init($args) or return;
+    $self->{OF_format}   = delete $args->{format};
 
     my $name = $self->{OF_project} = delete $args->{project}
         or error __x"formatter knows no project name";
 
-    $self->{OF_version} = delete $args->{version}
+    $self->{OF_version}  = delete $args->{version}
         or error __x"formatter for {name} does not know the version", name => $name;
 
-    $self->{OF_workdir} = delete $args->{workdir}
+    $self->{OF_workdir}  = delete $args->{workdir}
         or error __x"no working directory specified for {name}", name => $name;
 
     $self->{OF_manifest} = delete $args->{manifest} || OODoc::Manifest->new;
-
     $self;
 }
 
-#-------------------------------------------
-
-
-sub project() {shift->{OF_project}}
-
-
-sub version() {shift->{OF_version}}
-sub workdir() {shift->{OF_workdir}}
-sub manifest() {shift->{OF_manifest}}
+sub publish { panic }
 
 #-------------------------------------------
+
+sub project() { $_[0]->{OF_project} }
+
+
+sub version()  { $_[0]->{OF_version} }
+sub workdir()  { $_[0]->{OF_workdir} }
+sub manifest() { $_[0]->{OF_manifest} }
+sub format()   { $_[0]->{OF_format} }
+
+#-------------------------------------------
+
+sub createPages(%)
+{   my ($self, %args) = @_;
+
+    my $sel = $args{select} || sub { 1 };
+    my $select = ref $sel eq 'CODE' ? $sel : sub { $_[0]->name =~ $sel };
+
+    # Manual knowledge is global
+
+    my $options = $args{manual_format} || [];
+    foreach my $package (sort $self->packageNames)
+    {
+        foreach my $manual ($self->manualsForPackage($package))
+        {   $select->($manual) or next;
+
+            unless($manual->chapters)
+            {   trace "  skipping $manual: no chapters";
+                next;
+            }
+
+            trace "  creating manual $manual with ".(ref $self);
+
+            $self->createManual
+              ( manual   => $manual
+              , template => $args{manual_templates}
+              , append   => $args{append}
+              , @$options
+              );
+        }
+    }
+
+    #
+    # Create other pages
+    #
+
+    trace "creating other pages";
+    $self->createOtherPages
+      ( source   => $args{other_templates}
+      , process  => $args{process_files}
+      );
+
+    1;
+}
 
 
 sub createManual(@) {panic}
 
 
-sub cleanup($$)
-{   my ($self, $manual, $string) = @_;
-    $manual->parser->cleanup($self, $manual, $string);
-}
+sub cleanup($$%) { ... }
 
 
 sub showChapter(@)
 {   my ($self, %args) = @_;
     my $chapter  = $args{chapter} or panic;
     my $manual   = $args{manual}  or panic;
-    my $show_ch  = $args{show_inherited_chapter}    || 'REFER';
-    my $show_sec = $args{show_inherited_section}    || 'REFER';
-    my $show_ssec= $args{show_inherited_subsection} || 'REFER';
+
+    my $show_inh = $args{show_inherited};
+    my $show_ch  = $args{show_inherited_chapter}    || $show_inh;
+    my $show_sec = $args{show_inherited_section}    || $show_inh;
+    my $show_ssec  = $args{show_inherited_subsection}    || $show_inh;
+    my $show_sssec = $args{show_inherited_subsubsection} || $show_inh;
+
+    my $show_examples = $args{show_examples} || 'EXPAND';
 
     if($manual->inherited($chapter))
     {    return $self if $show_ch eq 'NO';
@@ -72,38 +149,58 @@ sub showChapter(@)
          return $self;
     }
 
-    $self->showStructureExpand(%args, structure => $chapter);
+    $self->showStructureExpanded(%args, structure => $chapter,
+        show_examples => $args{show_chapter_examples} || $show_examples,
+    );
 
     foreach my $section ($chapter->sections)
     {   if($manual->inherited($section))
         {   next if $show_sec eq 'NO';
-            $self->showStructureRefer(%args, structure => $section), next
-                unless $show_sec eq 'REFER';
+            if($show_sec ne 'REFER')
+            {    $self->showStructureRefer(%args, structure => $section);
+                 next;
+            }
         }
 
-        $self->showStructureExpand(%args, structure => $section);
+        $self->showStructureExpanded(%args, structure => $section,
+            show_examples => $args{show_section_examples} || $show_examples,
+        );
 
         foreach my $subsection ($section->subsections)
         {   if($manual->inherited($subsection))
             {   next if $show_ssec eq 'NO';
-                $self->showStructureRefer(%args, structure=>$subsection), next
-                    unless $show_ssec eq 'REFER';
+                if($show_ssec ne 'REFER')
+                {   $self->showStructureRefer(%args, structure => $subsection);
+                    next;
+                }
             }
 
-            $self->showStructureExpand(%args, structure => $subsection);
+            $self->showStructureExpanded(%args, structure => $subsection,
+                show_examples => $args{show_subsection_examples} || $show_examples,
+            );
+
+            foreach my $subsubsection ($subsection->subsubsections)
+            {   if($manual->inherited($subsubsection))
+                {   next if $show_sssec eq 'NO';
+                    if($show_sssec ne 'REFER')
+                    {   $self->showStructureRefer(%args, structure => $subsubsection);
+                        next;
+                    }
+                }
+    
+                $self->showStructureExpanded(%args, structure => $subsubsection,
+                    show_examples => $args{show_subsubsection_examples} || $show_examples,
+                );
+            }
         }
     }
 }
-
-#-------------------------------------------
 
 
 sub showStructureExpanded(@) {panic}
 
 
 sub showStructureRefer(@) {panic}
-
-#-------------------------------------------
 
 sub chapterName(@)        {shift->showRequiredChapter(NAME        => @_)}
 sub chapterSynopsis(@)    {shift->showOptionalChapter(SYNOPSIS    => @_)}
@@ -117,18 +214,13 @@ sub chapterDetails(@)     {shift->showOptionalChapter(DETAILS     => @_)}
 sub chapterReferences(@)  {shift->showOptionalChapter(REFERENCES  => @_)}
 sub chapterCopyrights(@)  {shift->showOptionalChapter(COPYRIGHTS  => @_)}
 
-#-------------------------------------------
-
 
 sub showRequiredChapter($%)
 {   my ($self, $name, %args) = @_;
     my $manual  = $args{manual} or panic;
-    my $chapter = $manual->chapter($name);
 
-    unless(defined $chapter)
-    {   alert "missing required chapter $name in $manual";
-        return;
-    }
+    my $chapter = $manual->chapter($name)
+        or (alert "missing required chapter $name in $manual"), return;
 
     $self->showChapter(chapter => $chapter, %args);
 }
@@ -137,10 +229,7 @@ sub showRequiredChapter($%)
 sub showOptionalChapter($@)
 {   my ($self, $name, %args) = @_;
     my $manual  = $args{manual} or panic;
-
-    my $chapter = $manual->chapter($name);
-    return unless defined $chapter;
-
+    my $chapter = $manual->chapter($name) or return;
     $self->showChapter(chapter => $chapter, %args);
 }
 
@@ -171,9 +260,7 @@ sub showSubroutines(@)
 
     for(my $index=0; $index<@subs; $index++)
     {   my $subroutine = $subs[$index];
-        my $show = $manual->inherited($subroutine)
-                 ? $args{show_inherited_subs}
-                 : $args{show_described_subs};
+        my $show = $manual->inherited($subroutine) ? $args{show_inherited_subs} : $args{show_described_subs};
 
         $self->showSubroutine 
         ( %args
@@ -198,16 +285,16 @@ sub showSubroutine(@)
 
     my $use    = $args{show_subroutine} || 'EXPAND';
     my ($show_use, $expand)
-     = $use eq 'EXPAND' ? ('showSubroutineUse',  1)
-     : $use eq 'USE'    ? ('showSubroutineUse',  0)
-     : $use eq 'NAMES'  ? ('showSubroutineName', 0)
-     : $use eq 'NO'     ? (undef,                0)
-     : error __x"illegal value for show_subroutine: {value}", value => $use;
+      = $use eq 'EXPAND' ? ('showSubroutineUse',  1)
+      : $use eq 'USE'    ? ('showSubroutineUse',  0)
+      : $use eq 'NAMES'  ? ('showSubroutineName', 0)
+      : $use eq 'NO'     ? (undef,                0)
+      : error __x"illegal value for show_subroutine: {value}", value => $use;
 
     $self->$show_use(%args, subroutine => $subroutine)
-       if defined $show_use;
+        if defined $show_use;
 
-    return unless $expand;
+    $expand or return;
 
     $args{show_inherited_options} ||= 'USE';
     $args{show_described_options} ||= 'EXPAND';
@@ -220,18 +307,20 @@ sub showSubroutine(@)
     my $description = $subroutine->findDescriptionObject;
     my $show_descr  = 'showSubroutineDescription';
 
-       if(not $description || $descr eq 'NO') { $show_descr = undef }
+       if($descr eq 'NO') { $show_descr = undef }
     elsif($descr eq 'REFER')
     {   $show_descr = 'showSubroutineDescriptionRefer'
-           if $manual->inherited($description);
+           if $description && $manual->inherited($description);
     }
     elsif($descr eq 'DESCRIBED')
-         { $show_descr = undef if $manual->inherited($description) }
+    {   $show_descr = 'showSubroutineDescriptionRefer'
+           if $description && $manual->inherited($description);
+    }
     elsif($descr eq 'ALL') {;}
     else { error __x"illegal value for show_sub_description: {v}", v => $descr}
 
-    $self->$show_descr(%args, subroutine => $description)
-          if defined $show_descr;
+    $self->$show_descr(%args, subroutine => $description // $subroutine)
+        if defined $show_descr;
 
     #
     # Options
@@ -246,22 +335,19 @@ sub showSubroutine(@)
 
     my @opttab
      = $opttab eq 'NO'       ? ()
-     : $opttab eq 'DESCRIBED'? (grep {not $manual->inherits($_->[0])} @options)
-     : $opttab eq 'INHERITED'? (grep {$manual->inherits($_->[0])} @options)
+     : $opttab eq 'DESCRIBED'? (grep not $manual->inherits($_->[0]), @options)
+     : $opttab eq 'INHERITED'? (grep $manual->inherits($_->[0]), @options)
      : $opttab eq 'ALL'      ? @options
      : error __x"illegal value for show_option_table: {v}", v => $opttab;
 
-    $self->showOptionTable(%args, options => \@opttab)
-       if @opttab;
+    $self->showOptionTable(%args, options => \@opttab) if @opttab;
 
     # Option expanded
 
     my @optlist;
     foreach (@options)
     {   my ($option, $default) = @$_;
-        my $check
-          = $manual->inherited($option) ? $args{show_inherited_options}
-          :                               $args{show_described_options};
+        my $check = $manual->inherited($option) ? $args{show_inherited_options} : $args{show_described_options};
         push @optlist, $_ if $check eq 'USE' || $check eq 'EXPAND';
     }
 
@@ -306,30 +392,22 @@ sub showOptionTable(@)
     foreach (@$options)
     {   my ($option, $default) = @$_;
         my $optman = $option->manual;
-        my $link   = $manual->inherited($option)
-                   ? $self->link(undef, $optman)
-                   : '';
-        push @rows, [ $self->cleanup($manual, $option->name)
-                    , $link
-                    , $self->cleanup($manual, $default->value)
-                    ];
+        push @rows,
+          [ $self->cleanup($manual, $option->name, tag => 'option_name')
+          , ($manual->inherited($option) ? $self->link(undef, $optman) : '')
+          , $self->cleanup($manual, $default->value, tag => 'option_default')
+          ];
     }
 
-    my @header = ('Option', 'Defined in', 'Default');
-    unless(grep {length $_->[1]} @rows)
+    my @header  = ('Option', 'Defined in', 'Default');
+    unless(grep length $_->[1], @rows)
     {   # removed empty "defined in" column
         splice @$_, 1, 1 for @rows, \@header;
     }
 
     $output->print("\n");
-    $self->writeTable
-     ( output => $output
-     , header => \@header
-     , rows   => \@rows
-     , widths => [undef, 15, undef]
-     );
-
-    $self
+    $self->writeTable(output => $output, header => \@header, rows => \@rows, widths => [undef, 15, undef]);
+    $self;
 }
 
 
@@ -361,6 +439,6 @@ sub showOptionUse(@) {shift}
 
 sub showOptionExpand(@) {shift}
 
+#----------------------
 
 1;
-

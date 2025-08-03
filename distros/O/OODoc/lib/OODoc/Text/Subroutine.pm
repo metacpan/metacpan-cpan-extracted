@@ -1,15 +1,18 @@
-# Copyrights 2003-2021 by [Mark Overmeer].
-#  For other contributors see ChangeLog.
-# See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.02.
-# This code is part of perl distribution OODoc.  It is licensed under the
-# same terms as Perl itself: https://spdx.org/licenses/Artistic-2.0.html
+# This code is part of Perl distribution OODoc version 3.00.
+# The POD got stripped from this file by OODoc version 3.00.
+# For contributors see file ChangeLog.
 
-package OODoc::Text::Subroutine;
-use vars '$VERSION';
-$VERSION = '2.02';
+# This software is copyright (c) 2003-2025 by Mark Overmeer.
 
-use base 'OODoc::Text';
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+# SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
+
+package OODoc::Text::Subroutine;{
+our $VERSION = '3.00';
+}
+
+use parent 'OODoc::Text';
 
 use strict;
 use warnings;
@@ -33,7 +36,68 @@ sub init($)
     $self;
 }
 
-#-------------------------------------------
+sub _call($)
+{	my ($self, $exporter) = @_;
+    my $type       = $self->type;
+    my $unique     = $self->unique;
+    my $style      = $exporter->markupStyle;
+
+    my $name       = $exporter->markupString($self->name);
+    my $paramlist  = $exporter->markupString($self->parameters);
+
+	if($style eq 'html')
+    {   my $call       = qq[<b><a name="$unique">$name</a></b>];
+        $call         .= "(&nbsp;$paramlist&nbsp;)" if length $paramlist;
+
+        return
+            $type eq 'i_method' ? qq[\$obj-&gt;$call]
+          : $type eq 'c_method' ? qq[\$class-&gt;$call]
+          : $type eq 'ci_method'? qq[\$any-&gt;$call]
+          : $type eq 'overload' ? qq[overload: $call]
+          : $type eq 'function' ? qq[$call]
+          : $type eq 'tie'      ? $call
+          : panic "Type $type? for $call";
+    }
+
+    if($style eq 'pod')
+    {   my $params
+          = !length $paramlist ? '()'
+          : $paramlist =~ m/^[\[<]|[\]>]$/ ? "( $paramlist )"
+          :                      "($paramlist)";
+
+        return
+            $type eq 'i_method' ? qq[\$obj-E<gt>B<$name>$params]
+          : $type eq 'c_method' ? qq[\$class-E<gt>B<$name>$params]
+          : $type eq 'ci_method'? qq[\$any-E<gt>B<$name>$params]
+          : $type eq 'function' ? qq[B<$name>$params]
+          : $type eq 'overload' ? qq[overload: B<$name>]
+          : $type eq 'tie'      ? qq[B<$name>$params]
+          :    panic $type;
+	}
+
+    panic $style;
+}
+
+sub publish($)
+{   my ($self, $args) = @_;
+    my $exporter = $args->{exporter} or panic;
+
+    my $p      = $self->SUPER::publish($args);
+    $p->{call} = $self->_call($exporter);
+
+    my $opts   = $self->collectedOptions; # = [ [ $option, $default ], ... ]
+    if(keys %$opts)
+    {   my @options = map +[ map $_->publish($args)->{id}, @$_ ],
+            sort { $a->[0]->name cmp $b->[0]->name }
+                values %$opts;
+
+        $p->{options}= \@options;
+    }
+
+    my @d = map $_->publish($args)->{id}, $self->diagnostics;
+    $p->{diagnostics} = \@d if @d;
+    $p;
+}
 
 
 sub extends($)
@@ -57,10 +121,7 @@ sub extends($)
 
 #-------------------------------------------
 
-
 sub parameters() {shift->{OTS_param}}
-
-#-------------------------------------------
 
 
 sub location($)
@@ -80,21 +141,25 @@ sub location($)
             if substr($mypath, 0, length($superpath)+1) eq "$superpath/";
     }
     elsif(substr($superpath, 0, length($mypath)+1) eq "$mypath/")
-    {   if($superloc->isa("OODoc::Text::Chapter"))
-        {   return $self->manual
-                        ->chapter($superloc->name);
-        }
-        elsif($superloc->isa("OODoc::Text::Section"))
-        {   return $self->manual
-                        ->chapter($superloc->chapter->name)
-                        ->section($superloc->name);
-        }
-        else
-        {   return $self->manual
-                        ->chapter($superloc->chapter->name)
-                        ->section($superloc->section->name)
-                        ->subsection($superloc->name);
-        }
+    {   return $self->manual->chapter($superloc->name)
+            if $superloc->isa("OODoc::Text::Chapter");
+
+        my $chapter = $self->manual->chapter($superloc->chapter->name);
+
+        return $chapter->section($superloc->name)
+            if $superloc->isa("OODoc::Text::Section");
+
+        my $section = $chapter->section($superloc->section->name);
+
+        return $section->subsection($superloc->name)
+            if $superloc->isa("OODoc::Text::SubSection");
+
+        my $subsection = $section->subsection($superloc->subsection->name);
+
+        return $subsection->subsubsection($superloc->name)
+            if $superloc->isa("OODoc::Text::SubSubSection");
+
+        panic $superloc;
    }
 
    unless($manual->inherited($self))
@@ -115,7 +180,6 @@ sub path() { shift->container->path }
 
 #-------------------------------------------
 
-
 sub default($)
 {   my ($self, $it) = @_;
     ref $it
@@ -125,8 +189,6 @@ sub default($)
     $self->{OTS_defaults}{$name} = $it;
     $it;
 }
-
-#-------------------------------------------
 
 
 sub defaults() { values %{shift->{OTS_defaults}} }
@@ -141,7 +203,6 @@ sub option($)
     $self->{OTS_options}{$name} = $it;
     $it;
 }
-
 
 
 sub findOption($)
@@ -171,9 +232,9 @@ sub collectedOptions(@)
 {   my ($self, %args) = @_;
     my @extends   = $self->extends;
     my %options;
-    foreach ($self->extends)
-    {   my $options = $_->collectedOptions;
-        @options{ keys %$options } = values %$options;
+    foreach my $base ($self->extends)
+    {   my $options = $base->collectedOptions;
+        @options{keys %$options} = values %$options;
     }
 
     $options{$_->name}[0] = $_ for $self->options;
@@ -183,8 +244,7 @@ sub collectedOptions(@)
 
         unless(exists $options{$name})
         {   my ($fn, $ln) = $default->where;
-            warning __x"no option {name} for default in {file} line {line}"
-              , name => $name, file => $fn, line => $ln;
+            warning __x"no option {name} for default in {file} line {line}", name => $name, file => $fn, line => $ln;
             next;
         }
         $options{$name}[1] = $default;
@@ -195,14 +255,10 @@ sub collectedOptions(@)
         next if defined $options{$name}[1];
 
         my ($fn, $ln) = $option->where;
-        warning __x"no default for option {name} defined in {file} line {line}"
-          , name => $name, file => $fn, line => $ln;
+        warning __x"no default for option {name} defined in {file} line {line}", name => $name, file => $fn, line => $ln;
 
         my $default = $options{$name}[1] =
-        OODoc::Text::Default->new
-          ( name => $name, value => 'undef'
-          , subroutine => $self, linenr => $ln
-          );
+            OODoc::Text::Default->new(name => $name, value => 'undef', subroutine => $self, linenr => $ln);
 
         $self->default($default);
     }

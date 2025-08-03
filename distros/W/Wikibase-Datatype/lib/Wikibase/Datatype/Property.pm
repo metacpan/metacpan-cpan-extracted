@@ -4,9 +4,10 @@ use strict;
 use warnings;
 
 use Error::Pure qw(err);
-use List::Util qw(none);
+use List::Util 1.33 qw(none);
 use Mo qw(build default is);
-use Mo::utils qw(check_array_object check_number check_number_of_items check_required);
+use Mo::utils qw(check_number check_number_of_items check_required);
+use Mo::utils::Array qw(check_array_object);
 use Readonly;
 
 # Pairs data type and datatype.
@@ -27,7 +28,7 @@ Readonly::Hash our %DATA_TYPES => (
 	'wikibase-property' => 'Wikibase::Datatype::Value::Property',
 );
 
-our $VERSION = 0.37;
+our $VERSION = 0.38;
 
 has aliases => (
 	default => [],
@@ -82,8 +83,7 @@ sub BUILD {
 	my $self = shift;
 
 	# Check aliases.
-	check_array_object($self, 'aliases', 'Wikibase::Datatype::Value::Monolingual',
-		'Alias');
+	check_array_object($self, 'aliases', 'Wikibase::Datatype::Value::Monolingual');
 
 	# Check data type.
 	check_required($self, 'datatype');
@@ -92,21 +92,18 @@ sub BUILD {
 	}
 
 	# Check descriptions.
-	check_array_object($self, 'descriptions', 'Wikibase::Datatype::Value::Monolingual',
-		'Description');
+	check_array_object($self, 'descriptions', 'Wikibase::Datatype::Value::Monolingual');
 	check_number_of_items($self, 'descriptions', 'language', 'Description', 'language');
 
 	# Check labels.
-	check_array_object($self, 'labels', 'Wikibase::Datatype::Value::Monolingual',
-		'Label');
+	check_array_object($self, 'labels', 'Wikibase::Datatype::Value::Monolingual');
 	check_number_of_items($self, 'labels', 'language', 'Label', 'language');
 
 	# Check page id.
 	check_number($self, 'page_id');
 
 	# Check statements.
-	check_array_object($self, 'statements', 'Wikibase::Datatype::Statement',
-		'Statement');
+	check_array_object($self, 'statements', 'Wikibase::Datatype::Statement');
 
 	return;
 }
@@ -324,22 +321,42 @@ Returns string.
 =head1 ERRORS
 
  new():
-         From Mo::utils::check_array_object():
-                 Alias isn't 'Wikibase::Datatype::Value::Monolingual' object.
-                 Description isn't 'Wikibase::Datatype::Value::Monolingual' object.
-                 Label isn't 'Wikibase::Datatype::Value::Monolingual' object.
-                 Parameter 'aliases' must be a array.
-                 Parameter 'descriptions' must be a array.
-                 Parameter 'labels' must be a array.
-                 Parameter 'statements' must be a array.
-                 Statement isn't 'Wikibase::Datatype::Statement' object.
          From Mo::utils::check_page_id():
                  Parameter 'page_id' must a number.
+
          From Mo::utils::check_number_of_items():
                  Description for language '%s' has multiple values.
                  Label for language '%s' has multiple values.
+
          From Mo::utils::check_required():
                  Parameter 'datatype' is required.
+
+         From Mo::utils::check_array_object():
+                 Parameter 'aliases' must be a array.
+                         Value: %s
+                         Reference: %s
+                 Parameter 'aliases' with array must contain 'Wikibase::Datatype::Value::Monolingual' objects.
+                         Value: %s
+                         Reference: %s
+                 Parameter 'descriptions' must be a array.
+                         Value: %s
+                         Reference: %s
+                 Parameter 'descriptions' with array must contain 'Wikibase::Datatype::Value::Monolingual' objects.
+                         Value: %s
+                         Reference: %s
+                 Parameter 'labels' must be a array.
+                         Value: %s
+                         Reference: %s
+                 Parameter 'labels' with array must contain 'Wikibase::Datatype::Value::Monolingual' objects.
+                         Value: %s
+                         Reference: %s
+                 Parameter 'statements' must be a array.
+                         Value: %s
+                         Reference: %s
+                 Parameter 'statements' with array must contain 'Wikibase::Datatype::Statement' objects.
+                         Value: %s
+                         Reference: %s
+
          Parameter 'datatype' = '%s' isn't supported.
 
 =head1 EXAMPLE
@@ -466,6 +483,7 @@ L<Error::Pure>,
 L<List::Util>,
 L<Mo>,
 L<Mo:utils>,
+L<Mo:utils::Array>,
 L<Readonly>.
 
 =head1 SEE ALSO
@@ -496,6 +514,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.37
+0.38
 
 =cut

@@ -4,11 +4,12 @@ use strict;
 use warnings;
 
 use Mo qw(build default is);
-use Mo::utils qw(check_array_object check_isa);
+use Mo::utils 0.08 qw(check_isa);
+use Mo::utils::Array qw(check_array_object);
 use Mo::utils::IRI 0.02 qw(check_iri);
 use Mo::utils::Number qw(check_positive_natural);
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 has attachment => (
 	default => [],
@@ -291,25 +292,6 @@ Returns L<Data::OFN::Common::TimeMoment> instance.
 =head1 ERRORS
 
  new():
-         From Mo::utils::check_array_object():
-                 Digital object isn't 'Data::OFN::DigitalObject' object.
-                         Value: %s
-                         Reference: %s
-                 Description isn't 'Data::Text::Simple' object.
-                         Value: %s
-                         Reference: %s
-                 Name isn't 'Data::Text::Simple' object.
-                         Value: %s
-                         Reference: %s
-                 Parameter 'attachment' must be a array.
-                         Value: %s
-                         Reference: %s
-                 Parameter 'description' must be a array.
-                         Value: %s
-                         Reference: %s
-                 Parameter 'name' must be a array.
-                         Value: %s
-                         Reference: %s
          From Mo::utils::check_isa():
                  Parameter 'created' must be a 'Data::OFN::Common::TimeMoment' object.
                          Value: %s
@@ -323,6 +305,31 @@ Returns L<Data::OFN::Common::TimeMoment> instance.
                  Parameter 'updated' must be a 'Data::OFN::Common::TimeMoment' object.
                          Value: %s
                          Reference: %s
+
+         From Mo::utils::Array::check_array_object():
+                 Parameter 'attachment' must be a array.
+                         Value: %s
+                         Reference: %s
+                 Parameter 'attachment' with array must contain 'Data::OFN::DigitalObject' objects.
+                         Value: %s
+                         Reference: %s
+                 Parameter 'description' must be a array.
+                         Value: %s
+                         Reference: %s
+                 Parameter 'description' with array must contain 'Data::Text::Simple' objects.
+                         Value: %s
+                         Reference: %s
+                 Parameter 'name' must be a array.
+                         Value: %s
+                         Reference: %s
+                 Parameter 'name' with array must contain 'Data::Text::Simple' objects.
+                         Value: %s
+                         Reference: %s
+
+         From Mo::utils::IRI::check_iri():
+                 Parameter 'iri' doesn't contain valid IRI.
+                         Value: %s
+
          From Mo::utils::Number::check_positive_natural():
                  Parameter 'id' must be a positive natural number.
                          Value: %s
@@ -452,6 +459,7 @@ Returns L<Data::OFN::Common::TimeMoment> instance.
 
 L<Mo>,
 L<Mo::utils>,
+L<Mo::utils::Array>,
 L<Mo::utils::IRI>,
 L<Mo::utils::Number>.
 
@@ -473,6 +481,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.02
 
 =cut

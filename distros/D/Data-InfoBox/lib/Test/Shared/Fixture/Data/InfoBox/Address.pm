@@ -9,7 +9,7 @@ use Data::InfoBox::Item;
 use Data::Text::Simple;
 use Unicode::UTF8 qw(decode_utf8);
 
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 sub new {
 	my $class = shift;
@@ -129,6 +129,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.06
+0.07
 
 =cut

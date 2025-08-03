@@ -5,7 +5,7 @@ use English;
 use Error::Pure::Utils qw(clean err_msg_hr);
 use Mo::utils qw(check_array);
 use Test::MockObject;
-use Test::More 'tests' => 9;
+use Test::More 'tests' => 12;
 use Test::NoWarnings;
 
 # Test.
@@ -46,4 +46,19 @@ is($EVAL_ERROR, "Parameter 'key' must be a array.\n",
 $err_msg_hr = err_msg_hr();
 is($err_msg_hr->{'Reference'}, 'SCALAR', 'Test error parameter (Reference: SCALAR).');
 is($err_msg_hr->{'Value'}, 'undef', 'Test error parameter (Value: undef).');
+clean();
+
+# Test.
+my $mock = Test::MockObject->new;
+$self = {
+	'key' => $mock,
+};
+eval {
+	check_array($self, 'key');
+};
+is($EVAL_ERROR, "Parameter 'key' must be a array.\n",
+	"Parameter 'key' must be a array.");
+$err_msg_hr = err_msg_hr();
+is($err_msg_hr->{'Reference'}, 'Test::MockObject', 'Test error parameter (Reference: Test::MockObject).');
+isa_ok($err_msg_hr->{'Value'}, 'Test::MockObject');
 clean();

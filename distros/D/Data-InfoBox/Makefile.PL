@@ -21,7 +21,8 @@ recursive_author_tests('xt');
 requires 'Data::Icon' => 0;
 requires 'Data::Text::Simple' => 0;
 requires 'Mo' => 0;
-requires 'Mo::utils' => 0.21;
+requires 'Mo::utils' => 0.08;
+requires 'Mo::utils::Array' => 0;
 requires 'Mo::utils::URI' => 0.02;
 requires 'Unicode::UTF8' => 0;
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Data-InfoBox/issues';
@@ -35,7 +36,7 @@ test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 test_requires 'Unicode::UTF8' => 0;
 tests_recursive;
-version '0.06';
+version '0.07';
 
 # Run.
 WriteAll();

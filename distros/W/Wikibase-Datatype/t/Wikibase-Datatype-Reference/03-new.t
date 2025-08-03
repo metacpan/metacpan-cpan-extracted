@@ -37,6 +37,6 @@ eval {
 		'snaks' => ['bad'],
 	);
 };
-is($EVAL_ERROR, "Snak isn't 'Wikibase::Datatype::Snak' object.\n",
-	"Snak isn't 'Wikibase::Datatype::Snak' object.");
+is($EVAL_ERROR, "Parameter 'snaks' with array must contain 'Wikibase::Datatype::Snak' objects.\n",
+	"Parameter 'snaks' with array must contain 'Wikibase::Datatype::Snak' objects (bad).");
 clean();

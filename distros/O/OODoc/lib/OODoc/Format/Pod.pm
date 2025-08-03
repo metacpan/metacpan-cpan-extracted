@@ -1,28 +1,47 @@
-# Copyrights 2003-2021 by [Mark Overmeer].
-#  For other contributors see ChangeLog.
-# See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.02.
-# This code is part of perl distribution OODoc.  It is licensed under the
-# same terms as Perl itself: https://spdx.org/licenses/Artistic-2.0.html
+# This code is part of Perl distribution OODoc version 3.00.
+# The POD got stripped from this file by OODoc version 3.00.
+# For contributors see file ChangeLog.
 
-package OODoc::Format::Pod;
-use vars '$VERSION';
-$VERSION = '2.02';
+# This software is copyright (c) 2003-2025 by Mark Overmeer.
 
-use base 'OODoc::Format';
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+# SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
+
+package OODoc::Format::Pod;{
+our $VERSION = '3.00';
+}
+
+use parent 'OODoc::Format';
 
 use strict;
 use warnings;
 
 use Log::Report    'oodoc';
 
-use File::Spec   ();
-use List::Util   qw/max/;
-use Pod::Escapes qw/e2char/;
+use File::Spec::Functions qw/catfile/;
+use List::Util            qw/max/;
+use Pod::Escapes          qw/e2char/;
 
 
-sub link($$;$)
-{   my ($self, $manual, $object, $text) = @_;
+sub init($)
+{   my ($self, $args) = @_;
+    $args->{format} //= 'pod';
+    $self->SUPER::init($args);
+}
+
+#------------
+
+sub cleanup($$%)
+{   my ($self, $manual, $string, %args) = @_;
+    $manual->parser->cleanupPod($manual, $string, %args,
+		create_link => sub { $self->link(@_) },
+	);
+}
+
+
+sub link($$;$$)
+{   my ($any, $manual, $object, $text) = @_;
 
     $object = $object->subroutine if $object->isa('OODoc::Text::Option');
     $object = $object->subroutine if $object->isa('OODoc::Text::Default');
@@ -44,29 +63,25 @@ sub link($$;$)
 sub createManual($@)
 {   my ($self, %args) = @_;
     my $manual   = $args{manual} or panic;
-    my $options  = $args{format_options} || [];
+    my $podname  = $manual->source =~ s/\.pm$/.pod/r;
+    my $tmpname  = $podname . 't';
 
-    my $podname  = $manual->source;
-    $podname     =~ s/\.pm$/.pod/;
-    my $tmpname  =  $podname . 't';
+    my $tmpfile  = catfile $self->workdir, $tmpname;
+    my $podfile  = catfile $self->workdir, $podname;
 
-    my $tmpfile  = File::Spec->catfile($self->workdir, $tmpname);
-    my $podfile  = File::Spec->catfile($self->workdir, $podname);
+    open my $output, '>:encoding(utf8)', $tmpfile
+        or fault __x"cannot write prelimary pod manual to {file}", file => $tmpfile;
 
-    my $output  = IO::File->new($tmpfile, "w")
-        or fault __x"cannot write prelimary pod manual to {file}"
-            , file => $tmpfile;
-
-    $self->formatManual
+    $self->_formatManual
       ( manual => $manual
       , output => $output
       , append => $args{append}
-      , @$options
+      , %args
       );
 
     $output->close;
 
-    $self->cleanupPOD($tmpfile, $podfile);
+    $self->simplifyPod($tmpfile, $podfile);
     unlink $tmpfile;
 
     $self->manifest->add($podfile);
@@ -74,8 +89,7 @@ sub createManual($@)
     $self;
 }
 
-
-sub formatManual(@)
+sub _formatManual(@)
 {   my $self = shift;
     $self->chapterName(@_);
     $self->chapterInheritance(@_);
@@ -106,10 +120,10 @@ sub showAppend(@)
     $self;
 }
 
-sub showStructureExpand(@)
+sub showStructureExpanded(@)
 {   my ($self, %args) = @_;
 
-    my $examples = $args{show_chapter_examples} || 'EXPAND';
+    my $examples = $args{show_examples} || 'EXPAND';
     my $text     = $args{structure} or panic;
 
     my $name     = $text->name;
@@ -120,16 +134,15 @@ sub showStructureExpand(@)
     my $descr   = $self->cleanup($manual, $text->description);
     $output->print("\n=head$level $name\n\n$descr");
 
-    $self->showSubroutines(%args, subroutines => [$text->subroutines]);
-    $self->showExamples(%args, examples => [$text->examples])
+    $self->showSubroutines(%args, subroutines => [ $text->subroutines ]);
+    $self->showExamples(%args, examples => [ $text->examples ])
          if $examples eq 'EXPAND';
 
-    return $self;
+    $self;
 }
 
 sub showStructureRefer(@)
 {   my ($self, %args) = @_;
-
     my $text     = $args{structure} or panic;
 
     my $name     = $text->name;
@@ -148,13 +161,12 @@ sub chapterDescription(@)
     $self->showRequiredChapter(DESCRIPTION => %args);
 
     my $manual  = $args{manual} or panic;
-    my $details = $manual->chapter('DETAILS');
-
-    return $self unless defined $details;
+    my $details = $manual->chapter('DETAILS') // return $self;
 
     my $output  = $args{output} or panic;
     $output->print("\nSee L</DETAILS> chapter below\n");
     $self->showChapterIndex($output, $details, "   ");
+    $self;
 }
 
 sub chapterDiagnostics(@)
@@ -165,7 +177,7 @@ sub chapterDiagnostics(@)
     $self->showChapter(chapter => $diags, %args)
         if defined $diags;
 
-    my @diags   = map {$_->diagnostics} $manual->subroutines;
+    my @diags   = map $_->diagnostics, $manual->subroutines;
     return unless @diags;
 
     my $output  = $args{output} or panic;
@@ -181,7 +193,7 @@ sub chapterDiagnostics(@)
 
 sub showChapterIndex($$;$)
 {   my ($self, $output, $chapter, $indent) = @_;
-    $indent = '' unless defined $indent;
+    $indent //= '';
 
     foreach my $section ($chapter->sections)
     {   $output->print($indent, $section->name, "\n");
@@ -195,7 +207,7 @@ sub showChapterIndex($$;$)
 sub showExamples(@)
 {   my ($self, %args) = @_;
     my $examples = $args{examples} or panic;
-    return unless @$examples;
+    @$examples or return;
 
     my $manual    = $args{manual}  or panic;
     my $output    = $args{output}  or panic;
@@ -212,7 +224,7 @@ sub showExamples(@)
 sub showDiagnostics(@)
 {   my ($self, %args) = @_;
     my $diagnostics = $args{diagnostics} or panic;
-    return unless @$diagnostics;
+    @$diagnostics or return;
 
     my $manual    = $args{manual}  or panic;
     my $output    = $args{output}  or panic;
@@ -221,7 +233,7 @@ sub showDiagnostics(@)
     {   my $name    = $self->cleanup($manual, $diag->name);
         my $type    = $diag->type;
         $output->print("\n=item $type: $name\n\n");
-        $output->print($self->cleanup($manual, $diag->description));
+        $output->print($self->cleanup($manual, $diag->description || 'Z<>'));
         $output->print("\n");
     }
     $self;
@@ -278,16 +290,12 @@ sub subroutineUse($$)
     my $class      = $manual->package;
     my $use
       = $type eq 'i_method' ? qq[\$obj-E<gt>B<$name>$params]
-      : $type eq 'c_method' ? qq[$class-E<gt>B<$name>$params]
-      : $type eq 'ci_method'? qq[\$obj-E<gt>B<$name>$params\n]
-                            . qq[$class-E<gt>B<$name>$params]
+      : $type eq 'c_method' ? qq[\$class-E<gt>B<$name>$params]
+      : $type eq 'ci_method'? qq[\$any-E<gt>B<$name>$params]
       : $type eq 'function' ? qq[B<$name>$params]
       : $type eq 'overload' ? qq[overload: B<$name>]
       : $type eq 'tie'      ? qq[B<$name>$params]
-      :                       '';
-
-    length $use
-        or warn "WARNING: unknown subroutine type $type for $name in $manual";
+      :    panic $type;
 
     $use;
 }
@@ -299,15 +307,14 @@ sub showSubroutineName(@)
     my $output     = $args{output}     or panic;
     my $name       = $subroutine->name;
 
-    my $url
-     = $manual->inherited($subroutine)
-     ? "M<".$subroutine->manual."::$name>"
-     : "M<$name>";
+    my $url = $manual->inherited($subroutine)
+      ? "M<".$subroutine->manual."::$name>"
+      : "M<$name>";
 
     $output->print
-     ( $self->cleanup($manual, $url)
-     , ($args{last} ? ".\n" : ",\n")
-     );
+      ( $self->cleanup($manual, $url)
+      , ($args{last} ? ".\n" : ",\n")
+      );
 }
 
 sub showOptions(@)
@@ -324,9 +331,7 @@ sub showOptionUse(@)
     my $option = $args{option} or panic;
     my $manual = $args{manual}  or panic;
 
-    my $params = $option->parameters;
-    $params    =~ s/\s+$//;
-    $params    =~ s/^\s+//;
+    my $params = $option->parameters =~ s/\s+$//r =~ s/^\s+//r;
     $params    = " => ".$self->cleanup($manual, $params) if length $params;
 
     $output->print("=item $option$params\n\n");
@@ -343,9 +348,7 @@ sub showOptionExpand(@)
 
     my $where = $option->findDescriptionObject or return $self;
     my $descr = $self->cleanup($manual, $where->description);
-    $output->print("\n$descr\n\n")
-        if length $descr;
-
+    $output->print("\n$descr\n\n") if length $descr;
     $self;
 }
 
@@ -356,7 +359,7 @@ sub writeTable($@)
     my $head   = $args{header} or panic;
     my $output = $args{output} or panic;
     my $rows   = $args{rows}   or panic;
-    return unless @$rows;
+    @$rows or return;
 
     # Convert all elements to plain text, because markup is not
     # allowed in verbatim pod blocks.
@@ -381,13 +384,12 @@ sub writeTable($@)
     pop @w;   # ignore width of last column
 
     # Table head
-    my $headf  = " -".join("--", map { "\%-${_}s" } @w)."--%s\n";
+    my $headf  = " -".join("--", map "\%-${_}s", @w)."--%s\n";
     $output->printf($headf, @$head);
 
     # Table body
-    my $format = "  ".join("  ", map { "\%-${_}s" } @w)."  %s\n";
-    $output->printf($format, @$_)
-       for @rows;
+    my $format = "  ".join("  ", map "\%-${_}s", @w)."  %s\n";
+    $output->printf($format, @$_) for @rows;
 }
 
 
@@ -461,37 +463,39 @@ sub _removeMarkup($)
 
 sub showSubroutineDescription(@)
 {   my ($self, %args) = @_;
-    my $manual  = $args{manual}                   or panic;
-    my $subroutine = $args{subroutine}            or panic;
+    my $manual  = $args{manual}         or panic;
+    my $output  = $args{output}         or panic;
+    my $subroutine = $args{subroutine}  or panic;
 
+    # Z<> will cause an empty body when the description is missing, so there
+    # will be a blank line to the next sub description.
     my $text    = $self->cleanup($manual, $subroutine->description);
-    return $self unless length $text;
+    my $extends = $subroutine->extends;
+    my $refer   = $extends ? $extends->findDescriptionObject : undef;
+    $text     ||= $self->cleanup($manual, "Z<>\n") unless $refer;
 
-    my $output  = $args{output}                   or panic;
-    $output->print("\n", $text);
-
-    my $extends = $self->extends                  or return $self;
-    my $refer   = $extends->findDescriptionObject or return $self;
-    $self->showSubroutineDescriptionRefer(%args, subroutine => $refer);
+    $output->print("\n", $text) if length $text;
+    $output->print("Improves base, see ",$self->link($manual, $refer),"\n") if $refer;
 }
 
 sub showSubroutineDescriptionRefer(@)
 {   my ($self, %args) = @_;
-    my $manual  = $args{manual}                   or panic;
-    my $subroutine = $args{subroutine}            or panic;
-    my $output  = $args{output}                   or panic;
+    my $manual  = $args{manual}         or panic;
+    my $output  = $args{output}         or panic;
+    my $subroutine = $args{subroutine}  or panic;
     $output->print("\nInherited, see ",$self->link($manual, $subroutine),"\n");
 }
 
 sub showSubsIndex() {;}
 
 
-sub cleanupPOD($$)
+sub simplifyPod($$)
 {   my ($self, $infn, $outfn) = @_;
-    my $in = IO::File->new($infn, 'r')
+
+    open my $in, "<:encoding(utf8)", $infn
         or fault __x"cannot read prelimary pod from {file}", file => $infn;
 
-    my $out = IO::File->new($outfn, 'w')
+    open my $out, ">:encoding(utf8)", $outfn
         or fault __x"cannot write final pod to {file}", file => $outfn;
 
     my $last_is_blank = 1;
@@ -515,5 +519,6 @@ sub cleanupPOD($$)
     $self;
 }
 
+#----------------------------
 
 1;

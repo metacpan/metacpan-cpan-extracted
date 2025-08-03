@@ -31,8 +31,8 @@ eval {
 		'grammatical_features' => ['bad'],
 	);
 };
-is($EVAL_ERROR, "Grammatical feature isn't 'Wikibase::Datatype::Value::Item' object.\n",
-	"Grammatical feature isn't 'Wikibase::Datatype::Value::Item' object.");
+is($EVAL_ERROR, "Parameter 'grammatical_features' with array must contain 'Wikibase::Datatype::Value::Item' objects.\n",
+	"Parameter 'grammatical_features' with array must contain 'Wikibase::Datatype::Value::Item' objects (bad).");
 clean();
 
 # Test.
@@ -70,8 +70,8 @@ eval {
 		'representations' => ['bad'],
 	);
 };
-is($EVAL_ERROR, "Representation isn't 'Wikibase::Datatype::Value::Monolingual' object.\n",
-	"Representation isn't 'Wikibase::Datatype::Value::Monolingual' object.");
+is($EVAL_ERROR, "Parameter 'representations' with array must contain 'Wikibase::Datatype::Value::Monolingual' objects.\n",
+	"Parameter 'representations' with array must contain 'Wikibase::Datatype::Value::Monolingual' objects (bad).");
 clean();
 
 # Test.
@@ -105,8 +105,8 @@ eval {
 		'statements' => ['bad'],
 	);
 };
-is($EVAL_ERROR, "Statement isn't 'Wikibase::Datatype::Statement' object.\n",
-	"Statement isn't 'Wikibase::Datatype::Statement' object.");
+is($EVAL_ERROR, "Parameter 'statements' with array must contain 'Wikibase::Datatype::Statement' objects.\n",
+	"Parameter 'statements' with array must contain 'Wikibase::Datatype::Statement' objects (bad).");
 clean();
 
 # Test.

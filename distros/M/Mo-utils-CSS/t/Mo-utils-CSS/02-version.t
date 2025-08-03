@@ -6,4 +6,4 @@ use Test::More 'tests' => 2;
 use Test::NoWarnings;
 
 # Test.
-is($Mo::utils::CSS::VERSION, 0.12, 'Version.');
+is($Mo::utils::CSS::VERSION, 0.13, 'Version.');

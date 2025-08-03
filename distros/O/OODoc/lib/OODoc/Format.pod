@@ -23,7 +23,7 @@ A formater produces manual pages in some way or an other which contain
 (parts of) the module documentation.  Each formatter class is based on
 this OODoc::Format class, which should not be instantiated directly.
 By far most users will never explicitly create a formatter by themselves:
-it is created implicitly when L<OODoc::create()|OODoc/"Formatter"> is called on a L<OODoc|OODoc>
+it is created implicitly when L<OODoc::formatter()|OODoc/"Main entries"> is called on a L<OODoc|OODoc>
 object.
 
 Currently available formatters:
@@ -66,6 +66,18 @@ Extends L<"DESCRIPTION" in OODoc::Object|OODoc::Object/"DESCRIPTION">.
 
 Extends L<"OVERLOADED" in OODoc::Object|OODoc::Object/"OVERLOADED">.
  
+=over 4
+
+=item overload: B<'==' and '!=' (numeric comparison)>
+
+Inherited, see L<OODoc::Object/"OVERLOADED">
+
+=item overload: B<'bool'>
+
+Inherited, see L<OODoc::Object/"OVERLOADED">
+
+=back
+
 =head1 METHODS
 
 Extends L<"METHODS" in OODoc::Object|OODoc::Object/"METHODS">.
@@ -76,15 +88,22 @@ Extends L<"Constructors" in OODoc::Object|OODoc::Object/"Constructors">.
  
 =over 4
 
-=item OODoc::Format-E<gt>B<new>(%options)
+=item $class-E<gt>B<new>(%options)
+
+Inherited, see L<OODoc::Object/"Constructors">
 
  -Option  --Default
+  format    <required>
   manifest  undef
   project   <required>
   version   <required>
   workdir   <required>
 
 =over 2
+
+=item format => 'pod*'|'html*'|PACKAGE
+
+Select the formatter to be used.
 
 =item manifest => OBJECT
 
@@ -106,21 +125,15 @@ it will be created for you.
 
 =back
 
-=head2 Inheritance knowledge
+=head2 Attributes
 
-Extends L<"Inheritance knowledge" in OODoc::Object|OODoc::Object/"Inheritance knowledge">.
+Extends L<"Attributes" in OODoc::Object|OODoc::Object/"Attributes">.
  
 =over 4
 
-=item $obj-E<gt>B<extends>( [$object] )
+=item $obj-E<gt>B<format>()
 
-Inherited, see L<OODoc::Object/"Inheritance knowledge">
-
-=back
-
-=head2 Attributes
-
-=over 4
+Code for the format.
 
 =item $obj-E<gt>B<manifest>()
 
@@ -130,6 +143,10 @@ of created files.
 =item $obj-E<gt>B<project>()
 
 Returns the name of this project.
+
+=item $obj-E<gt>B<unique>()
+
+Inherited, see L<OODoc::Object/"Attributes">
 
 =item $obj-E<gt>B<version>()
 
@@ -143,33 +160,92 @@ the output files.
 
 =back
 
+=head2 Manual Repository
+
+Extends L<"Manual Repository" in OODoc::Object|OODoc::Object/"Manual Repository">.
+ 
+=over 4
+
+=item $obj-E<gt>B<addManual>($manual)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<findManual>($name)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<mainManual>($name)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<manuals>()
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<manualsForPackage>($name)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<packageNames>()
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<publicationIndex>()
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<publish>(\%options)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=back
+
 =head2 Page generation
 
 =over 4
 
-=item $obj-E<gt>B<cleanup>($manual, STRING)
+=item $obj-E<gt>B<cleanup>($manual, $text, %options)
 
-Takes the STRING and cleans it up to be in the right format for the
-current formatter.  The cleaning up is parser dependent, and therefore
-the parser of the manual is addressed to do the work.
+Takes the $text and cleans it up to be in the right format for the current
+output syntax.  The cleaning up is parser dependent, and therefore the
+parser of the manual is addressed to do the work.
+
+ -Option     --Default
+  create_link  <required>
+  tag          undef
+
+=over 2
+
+=item create_link => CODE
+
+This CODE reference is used to create an absolute link to a text
+fragment.  It is called with the manual and the object where is
+linked to (any L<OODoc::Text|OODoc::Text> object).  As third parameter,
+a string can be provided which should be displayed instead of the
+object name.  Finally, all %options are passed as settings, by
+reference to a HASH.
+
+=item tag => $word|\@words
+
+Tag the produced block with this word, when possible.  The HTML renderer
+will use this to add C<< class="@tags" >> to the resulting block, for
+instance.
+
+=back
 
 =item $obj-E<gt>B<createManual>(%options)
 
- -Option        --Default
-  append          undef
-  format_options  []
-  manual          <required>
-  project         <required>
-  template        undef
+Format a manual into the selected format.
+
+ -Option  --Default
+  append    undef
+  manual    <required>
+  project   <required>
+  template  undef
 
 =over 2
 
 =item append => STRING|CODE
-
-=item format_options => ARRAY
-
-An ARRAY which contains a list of options which are the defaults
-for formatting a chapter.
 
 =item manual => MANUAL
 
@@ -213,19 +289,75 @@ but only once.
 
 =back
 
+=item $obj-E<gt>B<createPages>(%options)
+
+Z<>
+
+ -Option          --Default
+  append            undef
+  manual_format     []
+  manual_templates  undef
+  other_templates   undef
+  process_files     <formatter dependent>
+  select            <all>
+
+=over 2
+
+=item append => STRING|CODE
+
+The value is passed on to L<createManual(append)|OODoc::Format/"Page generation">,
+but the behavior is formatter dependent.
+
+=item manual_format => ARRAY
+
+Options passed to L<createManual()|OODoc::Format/"Page generation"> when a manual page has to be produced.
+See the applicable formatter manual page for the possible flags and
+values.
+
+=item manual_templates => DIRECTORY
+
+Passed to L<createManual(template)|OODoc::Format/"Page generation">, and defines the
+location of the set of pages which has to be created for each manual
+page.  Some formatters do not support templates and the valid values
+are formatter dependent.
+
+=item other_templates => DIRECTORY
+
+Other files which have to be copied
+passed to L<createOtherPages(source)|OODoc::Format/"Page generation">.
+
+=item process_files => REGEXP
+
+Selects the files which are to be processed for special markup information.
+Other files, like image files, will be simply copied.  The value will be
+passed to L<createOtherPages(process)|OODoc::Format/"Page generation">.
+
+=item select => CODE|REGEXP
+
+Produce only the indicated manuals, which is useful in case of merging
+manuals from different distributions.  When a REGEXP is provided, it
+will be checked against the manual name.  The CODE reference will be
+called with a manual as only argument.
+
+=back
+
 =item $obj-E<gt>B<showChapter>(%options)
 
 You can pass all %options about formatting to this method.  They will passed
 to the related methods.  So: the list of options you can pass here is much
 longer: the combination of everything possible for all show* methods.
 
- -Option                    --Default
-  chapter                     <required>
-  manual                      <required>
-  output                      <required>
-  show_inherited_chapters     'REFER'
-  show_inherited_sections     'REFER'
-  show_inherited_subsections  'REFER'
+In the %option list, C<$BLOCK> can be C<chapter>, C<section>, C<subsection>,
+and C<subsubsection>.
+
+ -Option               --Default
+  chapter                <required>
+  manual                 <required>
+  output                 <required>
+  show_examples          'EXPAND'
+  show_examples_$block   <show_examples>
+  show_inherited         'REFER'
+  show_inherited_$block  <show_inherited>
 
 =over 2
 
@@ -235,18 +367,22 @@ longer: the combination of everything possible for all show* methods.
 
 =item output => FILE
 
-=item show_inherited_chapters => 'NO'|'REFER'|'EXPAND'
+=item show_examples => 'NO'|'EXPAND'
 
-=item show_inherited_sections => 'NO'|'REFER'|'EXPAND'
+=item show_examples_$block => 'NO'|'REFER'|'EXPAND'
+
+=item show_inherited => 'NO'|'REFER'|'EXPAND'
 
 REFER means that inherited sections are simply listed as reference
 to the manual page which describes it.
 
-=item show_inherited_subsections => 'NO'|'REFER'|'EXPAND'
+=item show_inherited_$block => 'NO'|'REFER'|'EXPAND'
 
 =back
 
 =item $obj-E<gt>B<showExamples>(%options)
+
+Z<>
 
  -Option  --Default
   examples  <required>
@@ -264,6 +400,8 @@ to the manual page which describes it.
 =back
 
 =item $obj-E<gt>B<showOptionExpand>(%options)
+
+Z<>
 
  -Option --Default
   default  <required>
@@ -285,6 +423,8 @@ to the manual page which describes it.
 
 =item $obj-E<gt>B<showOptionTable>(%options)
 
+Z<>
+
  -Option --Default
   manual   <required>
   options  <required>
@@ -301,6 +441,8 @@ to the manual page which describes it.
 =back
 
 =item $obj-E<gt>B<showOptionUse>(%options)
+
+Z<>
 
  -Option --Default
   default  <required>
@@ -321,6 +463,8 @@ to the manual page which describes it.
 =back
 
 =item $obj-E<gt>B<showOptionalChapter>($name, %options)
+
+Z<>
 
 =item $obj-E<gt>B<showOptions>(%options)
 
@@ -347,24 +491,15 @@ options which belong to the subroutine being displayed.
 
 =item $obj-E<gt>B<showRequiredChapter>($name, %options)
 
-=item $obj-E<gt>B<showStructureExpanded>(%options)
-
- -Option               --Default
-  show_chapter_examples  'EXPAND'
-
-=over 2
-
-=item show_chapter_examples => 'NO'|'EXPAND'
-
-The I<chapter examples> are all examples which are not subroutine
-related: examples which come at the end of a chapter, section, or
-subsection.
-
-=back
+Z<>
 
 =item $obj-E<gt>B<showStructureRefer>(%options)
 
+Z<>
+
 =item $obj-E<gt>B<showSubroutine>( <@> )
+
+Z<>
 
  -Option                --Default
   last                    0
@@ -420,6 +555,8 @@ file as well.
 
 =item $obj-E<gt>B<showSubroutineDescription>(%options)
 
+Z<>
+
  -Option    --Default
   manual      <required>
   output      <required>
@@ -436,6 +573,8 @@ file as well.
 =back
 
 =item $obj-E<gt>B<showSubroutineName>(%options)
+
+Z<>
 
  -Option    --Default
   last        0
@@ -457,6 +596,8 @@ file as well.
 
 =item $obj-E<gt>B<showSubroutineUse>(%options)
 
+Z<>
+
  -Option    --Default
   manual      <required>
   output      <required>
@@ -473,6 +614,8 @@ file as well.
 =back
 
 =item $obj-E<gt>B<showSubroutines>(%options)
+
+Z<>
 
  -Option                --Default
   manual                  <required>
@@ -521,49 +664,13 @@ Extends L<"Commonly used functions" in OODoc::Object|OODoc::Object/"Commonly use
  
 =over 4
 
-=item $obj-E<gt>B<filenameToPackage>($filename)
-
-=item OODoc::Format-E<gt>B<filenameToPackage>($filename)
+=item $any-E<gt>B<filenameToPackage>($filename)
 
 Inherited, see L<OODoc::Object/"Commonly used functions">
 
-=item $obj-E<gt>B<mkdirhier>($directory)
-
-=item OODoc::Format-E<gt>B<mkdirhier>($directory)
+=item $any-E<gt>B<mkdirhier>($directory)
 
 Inherited, see L<OODoc::Object/"Commonly used functions">
-
-=back
-
-=head2 Manual Repository
-
-Extends L<"Manual Repository" in OODoc::Object|OODoc::Object/"Manual Repository">.
- 
-=over 4
-
-=item $obj-E<gt>B<addManual>($manual)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<mainManual>($name)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<manual>($name)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<manuals>()
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<manualsForPackage>($name)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<packageNames>()
-
-Inherited, see L<OODoc::Object/"Manual Repository">
 
 =back
 
@@ -571,12 +678,18 @@ Inherited, see L<OODoc::Object/"Manual Repository">
 
 =over 4
 
+=item Error: formatter $name has compilation errors: $@
+
+The formatter which is specified does not compile, so can not be used.
+
 =item Error: formatter does not know the version.
+
+Z<>
 
 =item Error: formatter has no project name.
 
 A formatter was created without a name specified for the project at
-hand.  This should be passed with L<new(project)|OODoc::Format/"METHODS">.
+hand.  This should be passed with L<new(project)|OODoc::Format/"Constructors">.
 
 =item Error: manual definition requires manual object
 
@@ -586,25 +699,30 @@ to L<manualsForPackage()|OODoc::Object/"Manual Repository"> or L<mainManual()|OO
 
 =item Warning: missing required chapter $name in $manual
 
+Z<>
+
 =item Error: no working directory specified.
 
 The formatter has to know where the output can be written.  This
-directory must be provided via L<new(workdir)|OODoc::Format/"METHODS">, but was not specified.
+directory must be provided via L<new(workdir)|OODoc::Format/"Constructors">, but was not specified.
 
 =item Warning: unknown subroutine type $type for $name in $manual
+
+Z<>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of OODoc distribution version 2.02,
-built on December 08, 2021. Website: F<http://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.00,
+built on August 02, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 
-Copyrights 2003-2021 by [Mark Overmeer]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the Artistic license.
-See F<http://dev.perl.org/licenses/artistic.html>
+This software is copyright (c) 2003-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

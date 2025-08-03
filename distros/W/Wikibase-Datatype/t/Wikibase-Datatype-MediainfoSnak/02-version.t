@@ -6,4 +6,4 @@ use Test::NoWarnings;
 use Wikibase::Datatype::MediainfoSnak;
 
 # Test.
-is($Wikibase::Datatype::MediainfoSnak::VERSION, 0.37, 'Version.');
+is($Wikibase::Datatype::MediainfoSnak::VERSION, 0.38, 'Version.');

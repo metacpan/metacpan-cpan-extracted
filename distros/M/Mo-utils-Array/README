@@ -1,0 +1,223 @@
+NAME
+    Mo::utils::Array - Mo array utilities.
+
+SYNOPSIS
+     use Mo::utils::Array qw(check_array check_array_object check_array_required);
+
+     check_array($self, $key);
+     check_array_object($self, $key, $class);
+     check_array_required($self, $key);
+
+DESCRIPTION
+    Mo array utilities for checking of data objects.
+
+SUBROUTINES
+  "check_array"
+     check_array($self, $key);
+
+    *Since version 0.01.*
+
+    Check parameter defined by $key which is reference to array.
+
+    Put error if check isn't ok.
+
+    Returns undef.
+
+  "check_array_object"
+     check_array_object($self, $key, $class);
+
+    *Since version 0.01.*
+
+    Check parameter defined by $key which is reference to array with
+    instances of some object type ($class).
+
+    Put error if check isn't ok.
+
+    Returns undef.
+
+  "check_array_required"
+     check_array_required($self, $key);
+
+    *Since version 0.01.*
+
+    Check parameter defined by $key which is reference to array for at least
+    one value inside.
+
+    Put error if check isn't ok.
+
+    Returns undef.
+
+ERRORS
+     check_array():
+             Parameter '%s' must be a array.
+                     Value: %s
+                     Reference: %s
+
+     check_array_object():
+             Parameter '%s' must be a array.
+                     Value: %s
+                     Reference: %s
+             Parameter '%s' with array must contain '%s' objects.
+                     Value: %s
+                     Reference: %s
+
+     check_array_required():
+             Parameter '%s' is required.
+             Parameter '%s' must be a array.
+                     Value: %s
+                     Reference: %s
+             Parameter '%s' with array must have at least one item.
+
+EXAMPLE1
+     use strict;
+     use warnings;
+
+     use Mo::utils::Array qw(check_array);
+
+     my $self = {
+             'key' => ['foo'],
+     };
+     check_array($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output:
+     # ok
+
+EXAMPLE2
+     use strict;
+     use warnings;
+
+     use Error::Pure;
+     use Mo::utils::Array qw(check_array);
+
+     $Error::Pure::TYPE = 'Error';
+
+     my $self = {
+             'key' => 'foo',
+     };
+     check_array($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output like:
+     # #Error [..Array.pm:?] Parameter 'key' must be a array.
+
+EXAMPLE3
+     use strict;
+     use warnings;
+
+     use Mo::utils::Array qw(check_array_object);
+     use Test::MockObject;
+
+     my $self = {
+             'key' => [
+                     Test::MockObject->new,
+             ],
+     };
+     check_array_object($self, 'key', 'Test::MockObject');
+
+     # Print out.
+     print "ok\n";
+
+     # Output:
+     # ok
+
+EXAMPLE4
+     use strict;
+     use warnings;
+
+     use Error::Pure;
+     use Mo::utils::Array qw(check_array_object);
+
+     $Error::Pure::TYPE = 'Error';
+
+     my $self = {
+             'key' => [
+                     'foo',
+             ],
+     };
+     check_array_object($self, 'key', 'Test::MockObject');
+
+     # Print out.
+     print "ok\n";
+
+     # Output like:
+     # #Error [..Array.pm:?] Parameter 'key' with array must contain 'Test::MockObject' objects.
+
+EXAMPLE5
+     use strict;
+     use warnings;
+
+     use Mo::utils::Array qw(check_array_required);
+
+     my $self = {
+             'key' => ['value'],
+     };
+     check_array_required($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output:
+     # ok
+
+EXAMPLE6
+     use strict;
+     use warnings;
+
+     use Error::Pure;
+     use Mo::utils::Array qw(check_array_required);
+
+     $Error::Pure::TYPE = 'Error';
+
+     my $self = {
+             'key' => [],
+     };
+     check_array_required($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output like:
+     # #Error [..Array.pm:?] Parameter 'key' with array must have at least one item.
+
+DEPENDENCIES
+    Exporter, Error::Pure, Readonly, Scalar::Util.
+
+SEE ALSO
+    Mo  Micro Objects. Mo is less.
+
+    Mo::utils
+        Mo utilities.
+
+    Mo::utils::Hash
+        Mo hash utilities.
+
+    Mo::utils::Language
+        Mo language utilities.
+
+    Mo::utils::CSS
+        Mo CSS utilities.
+
+    Wikibase::Datatype::Utils
+        Wikibase datatype utilities.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Mo-utils-Array>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2025 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

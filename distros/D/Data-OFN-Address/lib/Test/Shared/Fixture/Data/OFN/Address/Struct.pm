@@ -8,7 +8,7 @@ use Class::Utils qw(split_params);
 use Data::Text::Simple;
 use Unicode::UTF8 qw(decode_utf8);
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 sub new {
 	my ($class, @params) = @_;

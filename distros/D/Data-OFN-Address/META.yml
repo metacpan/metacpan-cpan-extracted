@@ -32,6 +32,7 @@ requires:
   Error::Pure: 0
   Mo: 0
   Mo::utils: 0.31
+  Mo::utils::Array: 0
   Mo::utils::Number: 0
   Readonly: 0
   Unicode::UTF8: 0
@@ -41,4 +42,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Data-OFN-Address
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Data-OFN-Address
-version: '0.01'
+version: '0.02'

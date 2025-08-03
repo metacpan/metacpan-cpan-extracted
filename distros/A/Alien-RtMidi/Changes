@@ -1,5 +1,10 @@
 Revision history for perl module Alien::RtMidi
 
+
+0.09 2025-08-02
+
+  - Updated alienfile for caml.music.mcgill.ca URL change
+
 0.08 2025-01-20
 
   - Pull in patch from https://github.com/thestk/rtmidi/pull/322 to fix $device->msg

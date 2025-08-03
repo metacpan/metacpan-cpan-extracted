@@ -31,7 +31,8 @@ requires:
   Data::Icon: 0
   Data::Text::Simple: 0
   Mo: 0
-  Mo::utils: 0.21
+  Mo::utils: 0.08
+  Mo::utils::Array: 0
   Mo::utils::URI: 0.02
   Unicode::UTF8: 0
   perl: 5.8.0
@@ -40,4 +41,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Data-InfoBox
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Data-InfoBox
-version: '0.06'
+version: '0.07'

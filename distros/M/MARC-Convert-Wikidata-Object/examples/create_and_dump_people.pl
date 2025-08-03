@@ -25,9 +25,9 @@ p $obj;
 # Output:
 # MARC::Convert::Wikidata::Object::People  {
 #     parents: Mo::Object
-#     public methods (4):
-#         BUILD
-#         Mo::utils:
+#     public methods (5):
+#         BUILD, full_name
+#         Mo::utils::Array:
 #             check_array_object
 #         Mo::utils::Date:
 #             check_date, check_date_order

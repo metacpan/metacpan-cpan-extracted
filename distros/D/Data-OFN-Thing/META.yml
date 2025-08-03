@@ -30,7 +30,8 @@ no_index:
     - xt
 requires:
   Mo: 0
-  Mo::utils: 0.05
+  Mo::utils: 0.08
+  Mo::utils::Array: 0
   Mo::utils::IRI: 0.02
   Mo::utils::Number: 0
   perl: 5.8.0
@@ -39,4 +40,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Data-OFN-Thing
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Data-OFN-Thing
-version: '0.01'
+version: '0.02'

@@ -1,3 +1,8 @@
+0.32 2025-08-02T20:06:03+02:00
+ - Add test for check_array().
+ - Deprecate check_array* subroutines. Use Mo::utils::Array instead.
+ - Remove obsolete code from test.
+
 0.31 2025-07-05T16:17:27+02:00
  - Change check_strings() error parameter with possible parameters to form
    with quotes.

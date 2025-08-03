@@ -1,6 +1,16 @@
 
 === version history of OODoc::Template
 
+version 0.18: Sat  2 Aug 15:04:15 CEST 2025
+
+	Changes:
+	- load files with utf-8, always
+	- requires Perl 5.16
+
+	Improvements:
+	- converted to OODoc v3
+	- replace IO::File by open()
+
 version 0.17: Wed  8 Dec 13:25:11 CET 2021
 
 	Improvements:

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Error::Pure qw(err);
-use List::MoreUtils qw(none);
+use List::Util 1.33 qw(none);
 use Mo qw(build is);
 use Mo::utils qw(check_isa check_required);
 use Readonly;
@@ -35,7 +35,7 @@ Readonly::Array our @SNAK_TYPES => qw(
 	value
 );
 
-our $VERSION = 0.37;
+our $VERSION = 0.38;
 
 has datatype => (
 	is => 'ro',
@@ -260,7 +260,7 @@ Returns string.
 =head1 DEPENDENCIES
 
 L<Error::Pure>,
-L<List::MoreUtils>,
+L<List::Util>,
 L<Mo>,
 L<Mo::utils>,
 L<Readonly>,
@@ -298,6 +298,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.37
+0.38
 
 =cut

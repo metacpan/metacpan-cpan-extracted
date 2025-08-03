@@ -1,3 +1,10 @@
+0.07 2025-08-02T20:28:34+02:00
+ - Add missing ERRORS section in doc to InfoBox.
+ - Add tests.
+ - Add uri() value for Person fixture phone.
+ - Fix uri() method in Company fixture.
+ - Move check_array_object() to Mo::utils::Array.
+
 0.06 2025-03-02T22:24:29+01:00
  - Add fixtures for address, company and person.
 

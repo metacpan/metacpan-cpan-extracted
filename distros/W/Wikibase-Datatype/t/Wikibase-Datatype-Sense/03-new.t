@@ -28,8 +28,8 @@ eval {
 		'glosses' => ['bad'],
 	);
 };
-is($EVAL_ERROR, "Glosse isn't 'Wikibase::Datatype::Value::Monolingual' object.\n",
-	"Glosse isn't 'Wikibase::Datatype::Value::Monolingual' object.");
+is($EVAL_ERROR, "Parameter 'glosses' with array must contain 'Wikibase::Datatype::Value::Monolingual' objects.\n",
+	"Parameter 'glosses' with array must contain 'Wikibase::Datatype::Value::Monolingual' objects (bad).");
 clean();
 
 # Test.
@@ -67,6 +67,6 @@ eval {
 		'statements' => ['bad'],
 	);
 };
-is($EVAL_ERROR, "Statement isn't 'Wikibase::Datatype::Statement' object.\n",
-	"Statement isn't 'Wikibase::Datatype::Statement' object.");
+is($EVAL_ERROR, "Parameter 'statements' with array must contain 'Wikibase::Datatype::Statement' objects.\n",
+	"Parameter 'statements' with array must contain 'Wikibase::Datatype::Statement' objects (bad).");
 clean();

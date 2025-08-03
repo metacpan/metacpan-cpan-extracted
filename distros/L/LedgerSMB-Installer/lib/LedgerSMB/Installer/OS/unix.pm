@@ -1,4 +1,4 @@
-package LedgerSMB::Installer::OS::unix v0.999.6;
+package LedgerSMB::Installer::OS::unix v0.999.7;
 
 use v5.20;
 use experimental qw(signatures);
@@ -29,10 +29,17 @@ sub am_system_perl($self) {
     return ($^X eq '/usr/bin/perl');
 }
 
-sub prepare_installer_env($self, $config) {
-    $self->have_cmd('cpanm', 0);
+sub prepare_builder_env($self, $config) {
+    warn $log->warning( 'generic Unix/Linux support does not install required module build tools' );
+}
+
+sub prepare_extraction_env($self, $config) {
     $self->have_cmd('gzip');     # fatal, used by 'tar'
     $self->have_cmd('tar');      # fatal
+}
+
+sub prepare_installer_env($self, $config) {
+    $self->have_cmd('cpanm', 0);
     $self->have_cmd('make');     # fatal
 }
 

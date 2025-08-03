@@ -4,7 +4,7 @@
       "Patrick Galbraith <patg@patg.net>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.72, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -72,7 +72,7 @@
       "x_IRC" : "irc://irc.perl.org/#dbi",
       "x_MailingList" : "mailto:dbi-dev@perl.org"
    },
-   "version" : "5.012",
+   "version" : "5.013",
    "x_contributors" : [
       "Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>",
       "Alexandr Ciornii <alexchorny@gmail.com>",

@@ -404,8 +404,8 @@ EXAMPLE10
      # #Error [...CSS.pm:?] Parameter 'key' doesn't contain unit name.
 
 DEPENDENCIES
-    Error::Pure, Exporter, Graphics::ColorNames::CSS, List::Util, Mo::utils,
-    Mo::utils::Number::Utils, Readonly.
+    Error::Pure, Exporter, Graphics::ColorNames::CSS, List::Util,
+    Mo::utils::Array, Mo::utils::Number::Utils, Readonly.
 
 SEE ALSO
     Mo  Micro Objects. Mo is less.
@@ -433,5 +433,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.12
+    0.13
 

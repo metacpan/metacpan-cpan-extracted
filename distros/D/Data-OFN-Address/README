@@ -515,63 +515,65 @@ METHODS
 ERRORS
      new():
              From Mo::utils::check_array_object():
-                     Cadastral area name isn't 'Data::Text::Simple' object.
-                             Value: %s
-                             Reference: %s
-                     District name isn't 'Data::Text::Simple' object.
-                             Value: %s
-                             Reference: %s
-                     MOMC name isn't 'Data::Text::Simple' object.
-                             Value: %s
-                             Reference: %s
-                     MOP name isn't 'Data::Text::Simple' object.
-                             Value: %s
-                             Reference: %s
-                     Municipality name isn't 'Data::Text::Simple' object.
-                             Value: %s
-                             Reference: %s
-                     Municipality part name isn't 'Data::Text::Simple' object.
-                             Value: %s
-                             Reference: %s
-                     Street name isn't 'Data::Text::Simple' object.
-                             Value: %s
-                             Reference: %s
-                     Text isn't 'Data::Text::Simple' object.
-                             Value: %s
-                             Reference: %s
-                     VUSC name isn't 'Data::Text::Simple' object.
-                             Value: %s
-                             Reference: %s
                      Parameter 'cadastral_area_name' must be a array.
+                             Value: %s
+                             Reference: %s
+                     Parameter 'cadastral_area_name' with array must contain 'Data::Text::Simple' objects.
                              Value: %s
                              Reference: %s
                      Parameter 'district_name' must be a array.
                              Value: %s
                              Reference: %s
+                     Parameter 'district_name' with array must contain 'Data::Text::Simple' objects.
+                             Value: %s
+                             Reference: %s
                      Parameter 'momc_name' must be a array.
+                             Value: %s
+                             Reference: %s
+                     Parameter 'momc_name' with array must contain 'Data::Text::Simple' objects.
                              Value: %s
                              Reference: %s
                      Parameter 'mop_name' must be a array.
                              Value: %s
                              Reference: %s
+                     Parameter 'mop_name' with array must contain 'Data::Text::Simple' objects.
+                             Value: %s
+                             Reference: %s
                      Parameter 'municipality_name' must be a array.
+                             Value: %s
+                             Reference: %s
+                     Parameter 'municipality_name' with array must contain 'Data::Text::Simple' objects.
                              Value: %s
                              Reference: %s
                      Parameter 'municipality_part_name' must be a array.
                              Value: %s
                              Reference: %s
+                     Parameter 'municipality_part_name' with array must contain 'Data::Text::Simple' objects.
+                             Value: %s
+                             Reference: %s
                      Parameter 'street_name' must be a array.
+                             Value: %s
+                             Reference: %s
+                     Parameter 'street_name' with array must contain 'Data::Text::Simple' objects.
                              Value: %s
                              Reference: %s
                      Parameter 'text' must be a array.
                              Value: %s
                              Reference: %s
+                     Parameter 'text' with array must contain 'Data::Text::Simple' objects.
+                             Value: %s
+                             Reference: %s
                      Parameter 'vusc_name' must be a array.
                              Value: %s
                              Reference: %s
+                     Parameter 'vusc_name' with array must contain 'Data::Text::Simple' objects.
+                             Value: %s
+                             Reference: %s
+
              From Mo::utils::check_length_fix():
                      Parameter 'psc' has length different than '%s'.
                              Value: %s
+
              From Mo::utils::check_regexp():
                      Parameter 'address_place' does not match the specified regular expression.
                              String: %s
@@ -606,10 +608,12 @@ ERRORS
                      Parameter 'vusc' does not match the specified regular expression.
                              String: %s
                              Regexp: (?^:^https://linked\.cuzk\.cz/resource/ruian/vusc/\d+$)
+
              From Mo::utils::check_strings():
                      Parameter 'house_number_type' must be one of defined strings.
                              String: %s
                              Possible strings: 'č.p.', 'č.ev.'
+
              From Mo::utils::Number::check_positive_natural():
                      Parameter 'address_place_code' must be a positive natural number.
                              Value: %s
@@ -743,7 +747,8 @@ EXAMPLE
      # VUSC name: Moravskoslezský kraj (cs)
 
 DEPENDENCIES
-    Error::Pure Mo, Mo::utils, Readonly, Unicode::UTF8.
+    Error::Pure Mo, Mo::utils, Mo::utils::Array, Mo::utils::Number,
+    Readonly, Unicode::UTF8.
 
 REPOSITORY
     <https://github.com/michal-josef-spacek/Data-OFN-Address>
@@ -759,5 +764,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.01
+    0.02
 

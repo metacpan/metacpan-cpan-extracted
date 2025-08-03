@@ -26,7 +26,7 @@ OODoc::Template - Simple template system
 
 =head1 DESCRIPTION
 
-The C<OODoc::Template module> is a light-weight but powerful template
+This C<OODoc::Template> module is a light-weight but powerful template
 system, only providing display needs for applications, not behavior.
 Let's start with a promise: this module will never grow into a new
 programming language, as all the other template systems did over time.
@@ -66,9 +66,9 @@ will be very fast.
 
 =over 4
 
-=item OODoc::Template-E<gt>B<new>(OPTIONS)
+=item $class-E<gt>B<new>(%options)
 
-Create a new formatter object.  All OPTIONS are used as global set of
+Create a new formatter object.  All %options are used as global set of
 attributes, so used for each template processing started via this
 object.  Probably, it is a good habit to set the required changes
 of the predefined tags (like C<template> and C<search>) here.
@@ -104,14 +104,16 @@ call this method as often as you want without serious penalty.
 
 =over 4
 
-=item $obj-E<gt>B<allValuesFor>( TAG, [ATTRIBUTES, THEN, ELSE] )
+=item $obj-E<gt>B<allValuesFor>( $tag, [$attrs, $then, $else] )
 
-Collects all values related to TAG in all nestings of values.  The most
+Collects all values related to $tag in all nestings of values.  The most
 preferred is listed first.
 
-=item $obj-E<gt>B<defineMacro>(TAG, ATTRIBUTES, THEN, ELSE)
+=item $obj-E<gt>B<defineMacro>($tag, $attrs, $then, $else)
 
-=item $obj-E<gt>B<includeTemplate>(TAG, ATTRIBUTES, THEN, ELSE)
+Z<>
+
+=item $obj-E<gt>B<includeTemplate>($tag, $attrs, $then, $else)
 
 This is the implementation for the C<template> tag.
 
@@ -130,11 +132,11 @@ Add new level of values to the known list.  The data in the HASH is
 copied, and a reference to the copy returned.  The copy may be changed
 afterwards.
 
-=item $obj-E<gt>B<valueFor>( TAG, [ATTRIBUTES, THEN, ELSE] )
+=item $obj-E<gt>B<valueFor>( $tag, [$attrs, $then, $else] )
 
-Lookup the value for TAG in the known data.  See section L</values>
-about the way this is done.  The ATTRIBUTES (HASH of key-value pairs)
-and THEN/ELSE content text references are used when the TAG relates to
+Lookup the value for $tag in the known data.  See section L</values>
+about the way this is done.  The $attrs (HASH of key-value pairs)
+and $then/$else content text references are used when the $tag relates to
 a code reference which is to produce new values dynamicly.
 
 =back
@@ -527,14 +529,15 @@ The output is:
 
 =head1 SEE ALSO
 
-This module is part of OODoc-Template distribution version 0.17,
-built on December 08, 2021. Website: F<http://perl.overmeer.net/oodoc-template/>
+This module is part of OODoc-Template version 0.18,
+built on August 02, 2025. Website: F<http://perl.overmeer.net/oodoc-template/>
 
 =head1 LICENSE
 
-Copyrights 2003,2007-2021 by [Mark Overmeer]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the Artistic license.
-See F<http://dev.perl.org/licenses/artistic.html>
+This software is copyright (c) 2003-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

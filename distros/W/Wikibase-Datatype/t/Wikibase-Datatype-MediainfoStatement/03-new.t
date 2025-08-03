@@ -95,6 +95,6 @@ eval {
 		),
 	);
 };
-is($EVAL_ERROR, "Property mediainfo snak isn't 'Wikibase::Datatype::MediainfoSnak' object.\n",
-	"Property mediainfo snak isn't 'Wikibase::Datatype::MediainfoSnak' object.");
+is($EVAL_ERROR, "Parameter 'property_snaks' with array must contain 'Wikibase::Datatype::MediainfoSnak' objects.\n",
+	"Parameter 'property_snaks' with array must contain 'Wikibase::Datatype::MediainfoSnak' objects (bad).");
 clean();

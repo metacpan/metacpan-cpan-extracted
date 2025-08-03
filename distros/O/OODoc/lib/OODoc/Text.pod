@@ -37,19 +37,22 @@ Extends L<"OVERLOADED" in OODoc::Object|OODoc::Object/"OVERLOADED">.
  
 =over 4
 
-=item overload: B<'""' <$stringification>>
+=item overload: B<'""' (stringification)>
 
 Returned is the name of the text object.
 
-=item overload: B<'==' $and '!='>
+=item overload: B<'==' and '!=' (numeric comparison)>
 
-Numeric comparison is used to compare to objects whether they are
-identical.  String comparison is overloaded to compare the names
-of the objects.
+Inherited, see L<OODoc::Object/"OVERLOADED">
 
-=item overload: B<'cmp' <$string $comparison>>
+=item overload: B<'bool'>
 
-Names are compared.
+Inherited, see L<OODoc::Object/"OVERLOADED">
+
+=item overload: B<'cmp' (string comparison)>
+
+True when both object have same name.  Numeric comparison operators
+check whether it is the same object: subtilly different.
 
 =back
 
@@ -63,11 +66,13 @@ Extends L<"Constructors" in OODoc::Object|OODoc::Object/"Constructors">.
  
 =over 4
 
-=item OODoc::Text-E<gt>B<new>(%options)
+=item $class-E<gt>B<new>(%options)
+
+Inherited, see L<OODoc::Object/"Constructors">
 
  -Option     --Default
   container    <required>
-  description  ''
+  description  <empty string>
   linenr       <required>
   name         undef
   type         <required>
@@ -97,20 +102,10 @@ The type of this text element.  This is used for debugging only.
 
 =back
 
-=head2 Inheritance knowledge
-
-Extends L<"Inheritance knowledge" in OODoc::Object|OODoc::Object/"Inheritance knowledge">.
- 
-=over 4
-
-=item $obj-E<gt>B<extends>( [$object] )
-
-Inherited, see L<OODoc::Object/"Inheritance knowledge">
-
-=back
-
 =head2 Attributes
 
+Extends L<"Attributes" in OODoc::Object|OODoc::Object/"Attributes">.
+ 
 =over 4
 
 =item $obj-E<gt>B<container>( [$object] )
@@ -123,6 +118,20 @@ Only for chapters, this value will be undefined.
 
 Returns the description text for this object.  Nearly all objects
 contains some kind of introductory description.
+
+=item $obj-E<gt>B<extends>( [$object] )
+
+Close to all elements used within OODoc can have an inheritance relation.
+The returned object is extended by the current object.  Multiple inheritance
+is not supported here.
+
+=item $obj-E<gt>B<linenr>()
+
+Z<>
+
+=item $obj-E<gt>B<manual>()
+
+The manual of the text object is returned.
 
 =item $obj-E<gt>B<name>()
 
@@ -138,33 +147,54 @@ example:
 
 Returns the type name of this data object.
 
-=back
-
-=head2 Location
-
-=over 4
-
-=item $obj-E<gt>B<manual>( [$name] )
-
-Without a $name, the manual of the text object is returned. With a $name,
-the manual with that name is returned, even when that does not have a
-relation to the object: it calls L<OODoc::Object::manual()|OODoc::Object/"Manual Repository">.
-
 =item $obj-E<gt>B<unique>()
 
-Returns a unique id for this text item.  This is the easiest way to
-see whether two references to the same (overloaded) objects point to
-the same thing. The ids are numeric.
-
-example: 
-
- if($obj1->unique == $obj2->unique) {...}
- if($obj1 == $obj2) {...}   # same via overload
+Inherited, see L<OODoc::Object/"Attributes">
 
 =item $obj-E<gt>B<where>()
 
 Returns the source of the text item: the filename name and the line
 number of the start of it.
+
+=back
+
+=head2 Manual Repository
+
+Extends L<"Manual Repository" in OODoc::Object|OODoc::Object/"Manual Repository">.
+ 
+=over 4
+
+=item $obj-E<gt>B<addManual>($manual)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<findManual>($name)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<mainManual>($name)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<manuals>()
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<manualsForPackage>($name)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<packageNames>()
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<publicationIndex>()
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<publish>(\%options)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
 
 =back
 
@@ -205,45 +235,13 @@ Extends L<"Commonly used functions" in OODoc::Object|OODoc::Object/"Commonly use
  
 =over 4
 
-=item $obj-E<gt>B<filenameToPackage>($filename)
-
-=item OODoc::Text-E<gt>B<filenameToPackage>($filename)
+=item $any-E<gt>B<filenameToPackage>($filename)
 
 Inherited, see L<OODoc::Object/"Commonly used functions">
 
-=item $obj-E<gt>B<mkdirhier>($directory)
-
-=item OODoc::Text-E<gt>B<mkdirhier>($directory)
+=item $any-E<gt>B<mkdirhier>($directory)
 
 Inherited, see L<OODoc::Object/"Commonly used functions">
-
-=back
-
-=head2 Manual Repository
-
-Extends L<"Manual Repository" in OODoc::Object|OODoc::Object/"Manual Repository">.
- 
-=over 4
-
-=item $obj-E<gt>B<addManual>($manual)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<mainManual>($name)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<manuals>()
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<manualsForPackage>($name)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<packageNames>()
-
-Inherited, see L<OODoc::Object/"Manual Repository">
 
 =back
 
@@ -267,14 +265,15 @@ define the elements relative location.
 
 =head1 SEE ALSO
 
-This module is part of OODoc distribution version 2.02,
-built on December 08, 2021. Website: F<http://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.00,
+built on August 02, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 
-Copyrights 2003-2021 by [Mark Overmeer]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the Artistic license.
-See F<http://dev.perl.org/licenses/artistic.html>
+This software is copyright (c) 2003-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

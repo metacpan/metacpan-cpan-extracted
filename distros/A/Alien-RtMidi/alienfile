@@ -12,7 +12,7 @@ plugin 'PkgConfig' => (
 );
 
 share {
-    start_url 'https://www.music.mcgill.ca/~gary/rtmidi/release/';
+    start_url 'https://caml.music.mcgill.ca/~gary/rtmidi/release/';
     plugin 'Download' => (
         filter => qr/^rtmidi-${RTMIDI_MAJOR_VERSION}.*\.tar\.gz$/,
         version => qr/([0-9\.]+)/,

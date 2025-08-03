@@ -1,25 +1,36 @@
-# Copyrights 2003-2021 by [Mark Overmeer].
-#  For other contributors see ChangeLog.
-# See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.02.
-# This code is part of perl distribution OODoc.  It is licensed under the
-# same terms as Perl itself: https://spdx.org/licenses/Artistic-2.0.html
+# This code is part of Perl distribution OODoc version 3.00.
+# The POD got stripped from this file by OODoc version 3.00.
+# For contributors see file ChangeLog.
 
-package OODoc::Format::Pod2;
-use vars '$VERSION';
-$VERSION = '2.02';
+# This software is copyright (c) 2003-2025 by Mark Overmeer.
 
-use base qw/OODoc::Format::Pod OODoc::Format::TemplateMagic/;
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+# SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
+
+package OODoc::Format::Pod2;{
+our $VERSION = '3.00';
+}
+
+use parent 'OODoc::Format::Pod', 'OODoc::Format::TemplateMagic';
 
 use strict;
 use warnings;
 
 use Log::Report    'oodoc';
-use Template::Magic;
+use Template::Magic ();
 
-use File::Spec;
-use IO::Scalar;
+use File::Spec      ();
+use IO::Scalar      ();
 
+
+sub init($)
+{   my ($self, $args) = @_;
+    $args->{format} //= 'pod2';
+    $self->SUPER::init($args);
+}
+
+#------------
 
 my $default_template;
 {   local $/;
@@ -29,27 +40,24 @@ my $default_template;
 
 sub createManual(@)
 {   my ($self, %args) = @_;
-    $self->{O_template} = delete $args{template} || \$default_template;
+    $self->{OFP_template} = delete $args{template} || \$default_template;
     $self->SUPER::createManual(%args) or return;
 }
 
-sub formatManual(@)
+sub _formatManual(@)
 {   my ($self, %args) = @_;
     my $output    = delete $args{output};
 
     my %permitted =
-     ( chapter     => sub {$self->templateChapter(shift, \%args) }
-     , diagnostics => sub {$self->templateDiagnostics(shift, \%args) }
-     , append      => sub {$self->templateAppend(shift, \%args) }
-     , comment     => sub { '' }
-     );
+      ( chapter     => sub {$self->templateChapter(shift, \%args) }
+      , diagnostics => sub {$self->templateDiagnostics(shift, \%args) }
+      , append      => sub {$self->templateAppend(shift, \%args) }
+      , comment     => sub { '' }
+      );
 
-    my $template  = Template::Magic->new
-     ( { -lookups => \%permitted }
-     );
-
-    my $layout  = ${$self->{O_template}};        # Copy needed by template!
-    my $created = $template->output(\$layout);
+    my $template = Template::Magic->new({ -lookups => \%permitted });
+    my $layout   = ${$self->{OFP_template}};        # Copy needed by template!
+    my $created  = $template->output(\$layout);
     $output->print($$created);
 }
 
@@ -58,23 +66,18 @@ sub templateChapter($$)
 {   my ($self, $zone, $args) = @_;
     my $contained = $zone->content;
     defined $contained && length $contained
-        or warning __x"no meaning for container {c} in chapter block"
-             , c => $contained;
+        or warning __x"no meaning for container {c} in chapter block", c => $contained;
 
     my $attrs = $zone->attributes;
     my $name  = $attrs =~ s/^\s*(\w+)\s*\,?// ? $1 : undef;
 
-    unless(defined $name)
-    {   error __x"chapter without name in template.";
-        return '';
-    }
+    defined $name
+        or (error __x"chapter without name in template."), return '';
 
     my @attrs = $self->zoneGetParameters($attrs);
+
     my $out   = '';
-
-    $self->showOptionalChapter($name, %$args
-      , output => IO::Scalar->new(\$out), @attrs);
-
+    $self->showOptionalChapter($name, %$args, output => IO::Scalar->new(\$out), @attrs);
     $out;
 }
 
@@ -91,7 +94,6 @@ sub templateAppend($$)
     $self->showAppend(%$args, output => IO::Scalar->new(\$out));
     $out;
 }
-
 
 1;
 

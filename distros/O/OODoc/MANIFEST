@@ -6,13 +6,13 @@ README
 README-oodist.md
 README.md
 bin/oodist
-examples/mailbox.tar.gz
 examples/markov.pm
-examples/markov.pod
-examples/mimetypes.tar.gz
-examples/oodoc.tar.gz
 lib/OODoc.pm
 lib/OODoc.pod
+lib/OODoc/Export.pm
+lib/OODoc/Export.pod
+lib/OODoc/Export/JSON.pm
+lib/OODoc/Export/JSON.pod
 lib/OODoc/Format.pm
 lib/OODoc/Format.pod
 lib/OODoc/Format/Html.pm

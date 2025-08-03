@@ -26,7 +26,7 @@ Currently distributed parsers:
 
 =over 4
 
-=item * L<OODoc::Parser::Markov|OODoc::Parser::Markov>
+=item * L<OODoc::Parser::Markov|OODoc::Parser::Markov> (markov)
 
 The Markov parser understands standard POD, but adds logical markup tags
 and the C<M&lt;&gt;> links.
@@ -39,6 +39,18 @@ Extends L<"DESCRIPTION" in OODoc::Object|OODoc::Object/"DESCRIPTION">.
 
 Extends L<"OVERLOADED" in OODoc::Object|OODoc::Object/"OVERLOADED">.
  
+=over 4
+
+=item overload: B<'==' and '!=' (numeric comparison)>
+
+Inherited, see L<OODoc::Object/"OVERLOADED">
+
+=item overload: B<'bool'>
+
+Inherited, see L<OODoc::Object/"OVERLOADED">
+
+=back
+
 =head1 METHODS
 
 Extends L<"METHODS" in OODoc::Object|OODoc::Object/"METHODS">.
@@ -49,10 +61,13 @@ Extends L<"Constructors" in OODoc::Object|OODoc::Object/"Constructors">.
  
 =over 4
 
-=item OODoc::Parser-E<gt>B<new>(%options)
+=item $class-E<gt>B<new>(%options)
+
+Inherited, see L<OODoc::Object/"Constructors">
 
  -Option    --Default
   skip_links  undef
+  syntax      'markov'
 
 =over 2
 
@@ -62,19 +77,61 @@ The parser should not attempt to load modules which match the REGEXP
 or are equal or sub-namespace of STRING.  More than one of these
 can be passed in an ARRAY.
 
-=back
+=item syntax => PACKAGE|$name
 
 =back
 
-=head2 Inheritance knowledge
+=back
 
-Extends L<"Inheritance knowledge" in OODoc::Object|OODoc::Object/"Inheritance knowledge">.
+=head2 Attributes
+
+Extends L<"Attributes" in OODoc::Object|OODoc::Object/"Attributes">.
  
 =over 4
 
-=item $obj-E<gt>B<extends>( [$object] )
+=item $obj-E<gt>B<unique>()
 
-Inherited, see L<OODoc::Object/"Inheritance knowledge">
+Inherited, see L<OODoc::Object/"Attributes">
+
+=back
+
+=head2 Manual Repository
+
+Extends L<"Manual Repository" in OODoc::Object|OODoc::Object/"Manual Repository">.
+ 
+=over 4
+
+=item $obj-E<gt>B<addManual>($manual)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<findManual>($name)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<mainManual>($name)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<manuals>()
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<manualsForPackage>($name)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<packageNames>()
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<publicationIndex>()
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<publish>(\%options)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
 
 =back
 
@@ -107,18 +164,56 @@ platform dependend black hole is used (/dev/null on UNIX).
 
 =back
 
-=head2 Formatting text pieces
+=head2 Producing manuals
 
 After the manuals have been parsed into objects, the information can
 be formatted in various ways, for instance into POD and HTML.  However,
 the parsing is not yet complete: the structure has been decomposed 
 with L<parse()|OODoc::Parser/"Parsing a file">, but the text blocks not yet.  This is because the
-transformations which are needed are context dependent.  For each
-text section L<cleanup()|OODoc::Parser/"Formatting text pieces"> is called for the final touch.
+transformations which are needed are context dependent.
+
+For each text section L<cleanupPod()|OODoc::Parser/"Producing manuals"> or L<cleanupHtml()|OODoc::Parser/"Producing manuals"> is called
+for the final touch for the requested output markup.
 
 =over 4
 
-=item $obj-E<gt>B<cleanup>($formatter, $manual, STRING)
+=item $obj-E<gt>B<cleanupHtml>($manual, $text, %options)
+
+Translate the $text block, which is written in the parser specific
+syntax (which may resemble native Perl POD) into real Perl POD.
+
+ -Option     --Default
+  create_link  <required>
+  is_html      false
+
+=over 2
+
+=item create_link => CODE
+
+See L<OODoc::Format::cleanup(create_link)|OODoc::Format/"Page generation">.
+
+=item is_html => BOOLEAN
+
+Some changes will not be made when $is_html is C<true>, for instance,
+a "E<lt>" will stay that way, not being translated in a "E<amp>lt;".
+
+=back
+
+=item $obj-E<gt>B<cleanupPod>($manual, $text, %options)
+
+Translate the $text block, which is written in the parser specific
+syntax (which may resemble native Perl POD) into real Perl POD.
+
+ -Option     --Default
+  create_link  <required>
+
+=over 2
+
+=item create_link => CODE
+
+See L<OODoc::Format::cleanup(create_link)|OODoc::Format/"Page generation">.
+
+=back
 
 =item $obj-E<gt>B<skipManualLink>($package)
 
@@ -133,61 +228,19 @@ Extends L<"Commonly used functions" in OODoc::Object|OODoc::Object/"Commonly use
  
 =over 4
 
-=item $obj-E<gt>B<filenameToPackage>($filename)
-
-=item OODoc::Parser-E<gt>B<filenameToPackage>($filename)
+=item $any-E<gt>B<filenameToPackage>($filename)
 
 Inherited, see L<OODoc::Object/"Commonly used functions">
 
-=item $obj-E<gt>B<mkdirhier>($directory)
-
-=item OODoc::Parser-E<gt>B<mkdirhier>($directory)
+=item $any-E<gt>B<mkdirhier>($directory)
 
 Inherited, see L<OODoc::Object/"Commonly used functions">
-
-=back
-
-=head2 Manual Repository
-
-Extends L<"Manual Repository" in OODoc::Object|OODoc::Object/"Manual Repository">.
- 
-=over 4
-
-=item $obj-E<gt>B<addManual>($manual)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<mainManual>($name)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<manual>($name)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<manuals>()
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<manualsForPackage>($name)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<packageNames>()
-
-Inherited, see L<OODoc::Object/"Manual Repository">
 
 =back
 
 =head1 DIAGNOSTICS
 
 =over 4
-
-=item Error: The formatter type $class is not known for cleanup
-
-Text blocks have to get the finishing touch in the final formatting
-phase.  The parser has to fix the text block segments to create a
-formatter dependent output.  Only a few formatters are predefined.
 
 =item Error: manual definition requires manual object
 
@@ -199,14 +252,15 @@ to L<manualsForPackage()|OODoc::Object/"Manual Repository"> or L<mainManual()|OO
 
 =head1 SEE ALSO
 
-This module is part of OODoc distribution version 2.02,
-built on December 08, 2021. Website: F<http://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.00,
+built on August 02, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 
-Copyrights 2003-2021 by [Mark Overmeer]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the Artistic license.
-See F<http://dev.perl.org/licenses/artistic.html>
+This software is copyright (c) 2003-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

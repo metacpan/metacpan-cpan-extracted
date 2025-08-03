@@ -5,7 +5,7 @@ use Data::ExternalId;
 use Data::Person;
 use English;
 use Error::Pure::Utils qw(clean);
-use Test::More 'tests' => 6;
+use Test::More 'tests' => 7;
 use Test::NoWarnings;
 use Unicode::UTF8 qw(decode_utf8);
 
@@ -36,6 +36,16 @@ eval {
 };
 is($EVAL_ERROR, "Parameter 'external_ids' must be a array.\n",
 	"Parameter 'external_ids' must be a array (bad).");
+clean;
+
+# Test.
+eval {
+	Data::Person->new(
+		'external_ids' => ['bad'],
+	);
+};
+is($EVAL_ERROR, "Parameter 'external_ids' with array must contain 'Data::ExternalId' objects.\n",
+	"Parameter 'external_ids' with array must contain 'Data::ExternalId' objects (bad).");
 clean;
 
 # Test.

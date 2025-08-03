@@ -6,4 +6,4 @@ use Test::NoWarnings;
 use Test::Shared::Fixture::Wikibase::Datatype::Value::Lexeme::Wikidata::Dorota;
 
 # Test.
-is($Test::Shared::Fixture::Wikibase::Datatype::Value::Lexeme::Wikidata::Dorota::VERSION, 0.37, 'Version.');
+is($Test::Shared::Fixture::Wikibase::Datatype::Value::Lexeme::Wikidata::Dorota::VERSION, 0.38, 'Version.');

@@ -14,15 +14,14 @@ OODoc::Parser::Markov - Parser for the MARKOV syntax
 
 =head1 DESCRIPTION
 
-The Markov parser is named after the author, because the author likes to
-invite other people to write their own parser as well: every one has
-not only their own coding style, but also their own documentation
-wishes.
+The "Markov parser" is named after the author, because the author likes
+to invite other people to write their own parser as well: every one has
+not only their own coding style, but also their own documentation wishes.
 
-The task for the parser is to strip Perl package files into a code
-part and a documentation tree.  The code is written to a directory
-where the module distribution is built, the documenation tree is
-later formatted into manual pages.
+The task for the parser is to strip Perl package files into a code part
+and a documentation tree.  The code is written to a directory where the
+module distribution is built, the documenation tree is later formatted
+into manual pages.
 
 Extends L<"DESCRIPTION" in OODoc::Parser|OODoc::Parser/"DESCRIPTION">.
  
@@ -30,7 +29,21 @@ Extends L<"DESCRIPTION" in OODoc::Parser|OODoc::Parser/"DESCRIPTION">.
 
 Extends L<"OVERLOADED" in OODoc::Parser|OODoc::Parser/"OVERLOADED">.
  
+=over 4
+
+=item overload: B<'==' and '!=' (numeric comparison)>
+
+Inherited, see L<OODoc::Object/"OVERLOADED">
+
+=item overload: B<'bool'>
+
+Inherited, see L<OODoc::Object/"OVERLOADED">
+
+=back
+
 =head1 METHODS
+
+#--------------------------
 
 Extends L<"METHODS" in OODoc::Parser|OODoc::Parser/"METHODS">.
  
@@ -40,11 +53,14 @@ Extends L<"Constructors" in OODoc::Parser|OODoc::Parser/"Constructors">.
  
 =over 4
 
-=item OODoc::Parser::Markov-E<gt>B<new>(%options)
+=item $class-E<gt>B<new>(%options)
+
+Inherited, see L<OODoc::Object/"Constructors">
 
  -Option          --Defined in     --Default
   additional_rules                   []
   skip_links        OODoc::Parser    undef
+  syntax            OODoc::Parser    'markov'
 
 =over 2
 
@@ -56,19 +72,80 @@ rules.
 
 =item skip_links => ARRAY|REGEXP|STRING
 
-=back
+=item syntax => PACKAGE|$name
 
 =back
 
-=head2 Inheritance knowledge
+=back
 
-Extends L<"Inheritance knowledge" in OODoc::Parser|OODoc::Parser/"Inheritance knowledge">.
+=head2 Attributes
+
+Extends L<"Attributes" in OODoc::Parser|OODoc::Parser/"Attributes">.
  
 =over 4
 
-=item $obj-E<gt>B<extends>( [$object] )
+=item $obj-E<gt>B<currentManual>( [$manual] )
 
-Inherited, see L<OODoc::Object/"Inheritance knowledge">
+Returns the manual object which is currently being filled with data.
+With a new $manual, a new one is set.
+
+=item $obj-E<gt>B<inDoc>( [BOOLEAN] )
+
+When a BOOLEAN is specified, the status changes.  It returns the current
+status of the document reader.
+
+=item $obj-E<gt>B<rules>()
+
+Returns the ARRAY of active rules.  You may modify it.
+
+=item $obj-E<gt>B<setBlock>(REF-SCALAR)
+
+Set the scalar where the next documentation lines should be collected
+in.
+
+=item $obj-E<gt>B<unique>()
+
+Inherited, see L<OODoc::Object/"Attributes">
+
+=back
+
+=head2 Manual Repository
+
+Extends L<"Manual Repository" in OODoc::Parser|OODoc::Parser/"Manual Repository">.
+ 
+=over 4
+
+=item $obj-E<gt>B<addManual>($manual)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<findManual>($name)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<mainManual>($name)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<manuals>()
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<manualsForPackage>($name)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<packageNames>()
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<publicationIndex>()
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<publish>(\%options)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
 
 =back
 
@@ -77,11 +154,6 @@ Inherited, see L<OODoc::Object/"Inheritance knowledge">
 Extends L<"Parsing a file" in OODoc::Parser|OODoc::Parser/"Parsing a file">.
  
 =over 4
-
-=item $obj-E<gt>B<currentManual>( [$manual] )
-
-Returns the manual object which is currently being filled with data.
-With a new $manual, a new one is set.
 
 =item $obj-E<gt>B<findMatchingRule>($line)
 
@@ -96,12 +168,9 @@ example:
      $action->($parser, $match, $line);
   }
 
-=item $obj-E<gt>B<inDoc>( [BOOLEAN] )
-
-When a BOOLEAN is specified, the status changes.  It returns the current
-status of the document reader.
-
 =item $obj-E<gt>B<parse>(%options)
+
+Inherited, see L<OODoc::Parser/"Parsing a file">
 
  -Option      --Default
   distribution  <required>
@@ -140,36 +209,31 @@ Their arguments are:
  $parser->METHOD($match, $line, $file, $linenumber);
  CODE->($parser, $match, $line, $file, $linenumber);
 
-=item $obj-E<gt>B<setBlock>(REF-SCALAR)
-
-Set the scalar where the next documentation lines should be collected
-in.
-
-=back
-
-=head2 Formatting text pieces
-
-Extends L<"Formatting text pieces" in OODoc::Parser|OODoc::Parser/"Formatting text pieces">.
- 
-=over 4
-
-=item $obj-E<gt>B<cleanup>($formatter, $manual, STRING)
-
-Inherited, see L<OODoc::Parser/"Formatting text pieces">
-
-=item $obj-E<gt>B<skipManualLink>($package)
-
-Inherited, see L<OODoc::Parser/"Formatting text pieces">
-
 =back
 
 =head2 Producing manuals
 
+Extends L<"Producing manuals" in OODoc::Parser|OODoc::Parser/"Producing manuals">.
+ 
 =over 4
 
-=item $obj-E<gt>B<cleanupPod>($formatter, $manual, STRING)
+=item $obj-E<gt>B<cleanupHtml>($manual, $text, %options)
 
-=item $obj-E<gt>B<cleanupPodL>($formatter, $manual, $link)
+Inherited, see L<OODoc::Parser/"Producing manuals">
+
+=item $obj-E<gt>B<cleanupHtmlL>($manual, $link, \%options)
+
+Z<>
+
+=item $obj-E<gt>B<cleanupHtmlM>($manual, $link, \%options)
+
+Z<>
+
+=item $obj-E<gt>B<cleanupPod>($manual, $text, %options)
+
+Inherited, see L<OODoc::Parser/"Producing manuals">
+
+=item $obj-E<gt>B<cleanupPodL>($manual, $link, $args)
 
 The C<L> markups for C<OODoc::Parser::Markov> have the same syntax
 as standard POD has, however most standard pod-laters do no accept
@@ -177,7 +241,9 @@ links in verbatim blocks.  Therefore, the links have to be
 translated in their text in such a case.  The translation itself
 is done in by this method.
 
-=item $obj-E<gt>B<cleanupPodM>($formatter, $manual, $link)
+=item $obj-E<gt>B<cleanupPodM>($manual, $link, $args)
+
+Z<>
 
 =item $obj-E<gt>B<decomposeL>($manual, $link)
 
@@ -185,6 +251,12 @@ Decompose the L-tags.  These tags are described in L<perlpod>, but
 they will not refer to items: only headers.
 
 =item $obj-E<gt>B<decomposeM>($manual, $link)
+
+Z<>
+
+=item $obj-E<gt>B<skipManualLink>($package)
+
+Inherited, see L<OODoc::Parser/"Producing manuals">
 
 =back
 
@@ -194,58 +266,13 @@ Extends L<"Commonly used functions" in OODoc::Parser|OODoc::Parser/"Commonly use
  
 =over 4
 
-=item $obj-E<gt>B<cleanupHtml>( $formatter, $manual, STRING, [$is_html] )
-
-Some changes will not be made when $is_html is C<true>, for instance,
-a "E<lt>" will stay that way, not being translated in a "E<amp>lt;".
-
-=item $obj-E<gt>B<cleanupHtmlL>($formatter, $manual, $link)
-
-=item $obj-E<gt>B<cleanupHtmlM>($formatter, $manual, $link)
-
-=item $obj-E<gt>B<filenameToPackage>($filename)
-
-=item OODoc::Parser::Markov-E<gt>B<filenameToPackage>($filename)
+=item $any-E<gt>B<filenameToPackage>($filename)
 
 Inherited, see L<OODoc::Object/"Commonly used functions">
 
-=item $obj-E<gt>B<mkdirhier>($directory)
-
-=item OODoc::Parser::Markov-E<gt>B<mkdirhier>($directory)
+=item $any-E<gt>B<mkdirhier>($directory)
 
 Inherited, see L<OODoc::Object/"Commonly used functions">
-
-=back
-
-=head2 Manual Repository
-
-Extends L<"Manual Repository" in OODoc::Parser|OODoc::Parser/"Manual Repository">.
- 
-=over 4
-
-=item $obj-E<gt>B<addManual>($manual)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<mainManual>($name)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<manual>($name)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<manuals>()
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<manualsForPackage>($name)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<packageNames>()
-
-Inherited, see L<OODoc::Object/"Manual Repository">
 
 =back
 
@@ -323,6 +350,50 @@ general description of the subroutines.  You can use
 If you have defined an =option, you have to provide a =default for this
 option anywhere.  Use of =default for an option on a higher level will
 overrule the one in a subclass.
+
+=head3 Subroutine parameters
+
+The parser will turn this line
+
+  =c_method new %options
+
+into an L<OODoc::Text::Subroutine|OODoc::Text::Subroutine>, with C<name> set to C<new>, and
+C<%options> as parameter string.  The formatters and exporters will
+translate this subroutine call into
+
+  $class->new(%options)
+
+A more complex list of parameters, by convension, is a LIST of
+
+=over 4
+
+=item C<undef>: undef is accepted on this spot;
+
+=item C<$scalar>: a single value;
+
+=item C<%options>: a list of key-value pairs;
+
+=item C<\@array>: a reference to an ARRAY of values;
+
+=item C<\%hash>: a reference to a HASH;
+
+=item C<LIST>: a comma-separated sequence of values;
+
+=item C< [something] >: the parameter is optional; and
+
+=item C< ($scalar|\@array|undef) >: alternative parameters on that position.
+
+=back
+
+For instance:
+
+  =method scan $filename|$fh, $max_size, %options
+  =c_method new [$count], %options|\%options
+
+Shown as:
+
+  $obj->scan($filename|$fh, $max_size, %options);
+  $class->new([$count], %options|\%options);
 
 =head3 Include examples
 
@@ -453,7 +524,7 @@ with OODoc), the following happens:
  =c_method new OPTIONS
 
  package OODoc;
- use base 'OODoc::Object';
+ use parent 'OODoc::Object';
  =chapter METHODS
  =c_method new OPTIONS
 
@@ -515,10 +586,6 @@ B<. Example: how subroutines are documented>
 
 =over 4
 
-=item Warning: =cut does not terminate any doc in $file line $number
-
-There is no document to end here.
-
 =item Warning: Debugging remains in $filename line $number
 
 The author's way of debugging is by putting warn/die/carp etc on the
@@ -526,13 +593,9 @@ first position of a line.  Other lines in a method are always indented,
 which means that these debugging lines are clearly visible.  You may
 simply ingnore this warning.
 
-=item Warning: Manual $manual links to unknown entry "$item" in $manual
+=item Warning: Pod tag $tag does not terminate any doc in $file line $number
 
-=item Error: The formatter type $class is not known for cleanup
-
-Text blocks have to get the finishing touch in the final formatting
-phase.  The parser has to fix the text block segments to create a
-formatter dependent output.  Only a few formatters are predefined.
+There is no document to end here.
 
 =item Warning: You may have accidentally captured code in doc file $fn line $number
 
@@ -574,11 +637,17 @@ Probably you forgot to terminate it with a C<=cut>.
 
 =item Warning: empty L link in $manual
 
+Z<>
+
 =item Error: example outside chapter in $file line $number
 
 An example can belong to a subroutine, chapter, section, and subsection.
 Apparently, this example was found before the first chapter started in
 the file.
+
+=item Warning: manual $manual links to unknown entry "$item" in $manual
+
+Z<>
 
 =item Error: manual definition requires manual object
 
@@ -612,6 +681,8 @@ NAME... probably a difference in used cases.
 
 =item Warning: option "$name" unknow for $name() in $package, found in $manual
 
+Z<>
+
 =item Error: option $name outside subroutine in $file line $number
 
 An option is set, however there is not subroutine in scope (yet).
@@ -622,11 +693,13 @@ The shown $line is not in the right format: it should contain at least
 two words being the option name and an abstract description of possible
 values.
 
-=item Error: section `$name' outside chapter in $file line $number
+=item Error: section '$name' outside chapter in $file line $number
 
 Sections must be contained in chapters.
 
 =item Warning: subroutine $name is not defined by $package, found in $manual
+
+Z<>
 
 =item Error: subroutine $name outside chapter in $file line $number
 
@@ -634,12 +707,12 @@ Subroutine descriptions (method, function, tie, ...) can only be used
 within a restricted set of chapters.  You have not started any
 chapter yet.
 
-=item Error: subsection `$name' outside section in $file line $number
+=item Error: subsection '$name' outside section in $file line $number
 
 Subsections are only allowed in a chapter when it is nested within
 a section.
 
-=item Error: subsubsection `$name' outside subsection in $file line $number
+=item Error: subsubsection '$name' outside subsection in $file line $number
 
 Subsubsections are only allowed in a chapter when it is nested within
 a subsection.
@@ -660,14 +733,15 @@ is not always easy to find.
 
 =head1 SEE ALSO
 
-This module is part of OODoc distribution version 2.02,
-built on December 08, 2021. Website: F<http://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.00,
+built on August 02, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 
-Copyrights 2003-2021 by [Mark Overmeer]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the Artistic license.
-See F<http://dev.perl.org/licenses/artistic.html>
+This software is copyright (c) 2003-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

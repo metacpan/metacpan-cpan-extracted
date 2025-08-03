@@ -6,7 +6,7 @@ use warnings;
 use Mo qw(build is);
 use Mo::utils qw(check_required);
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 has count => (
 	is => 'ro',
@@ -121,6 +121,8 @@ Returns string.
 
 =head1 EXAMPLE
 
+=for comment filename=create_user_and_print_out.pl
+
  use strict;
  use warnings;
 
@@ -179,12 +181,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© Michal Josef Špaček 2020
+© Michal Josef Špaček 2020-2025
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

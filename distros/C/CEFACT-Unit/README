@@ -32,11 +32,12 @@ ERRORS
      new():
              From Class::Utils::set_params():
                      Unknown parameter '%s'.
-             From Mo::utils::check_array_object():
+
+             From Mo::utils::Array::check_array_object():
                      Parameter 'units' must be a array.
                              Value: %s
                              Reference: %s
-                     UN/CEFACT isn't 'Data::CEFACT::Unit' object.
+                     Parameter 'units' with array must contain 'Data::CEFACT::Unit' objects.
                              Value: %s
                              Reference: %s
 
@@ -69,7 +70,7 @@ EXAMPLE
 
 DEPENDENCIES
     Class::Utils, Data::CEFACT::Unit, File::Share, IO::File, List::Util,
-    Text::CSV_XS.
+    Mo::utils::Array, Text::CSV_XS.
 
 REPOSITORY
     <https://github.com/michal-josef-spacek/CEFACT-Unit>
@@ -85,5 +86,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.01
+    0.02
 

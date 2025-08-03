@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 use Mo qw(build is);
-use Mo::utils 0.21 qw(check_array_object check_array_required);
+use Mo::utils::Array qw(check_array_object check_array_required);
 
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 has items => (
 	is => 'ro',
@@ -74,6 +74,21 @@ Get list of items in info box.
 
 Returns reference to array with L<Data::InfoBox::Item> objects.
 
+=head1 ERRORS
+
+ new():
+         From Mo::utils::Array::check_array_object():
+                 Parameter 'items' must be a array.
+                         Value: %s
+                         Reference: %s
+                 Parameter 'items' with array must contain 'Data::InfoBox::Item' objects.
+                         Value: %s
+                         Reference: %s
+         From Mo::utils::Array::check_array_required():
+                 Parameter 'items' is required.
+                 Parameter 'items' with array must have at least one item.
+
+
 =head1 EXAMPLE
 
 =for comment filename=create_infobox_object_and_print.pl
@@ -114,7 +129,7 @@ Returns reference to array with L<Data::InfoBox::Item> objects.
 =head1 DEPENDENCIES
 
 L<Mo>,
-L<Mo::utils>.
+L<Mo::utils::Array>.
 
 =head1 SEE ALSO
 
@@ -152,6 +167,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.06
+0.07
 
 =cut

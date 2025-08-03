@@ -1,0 +1,5 @@
+0.01 2025-08-02T12:57:24+02:00
+ - Add test for finish coverage testing of check_array_object().
+ - Finish testing of check_array().
+ - First version. Copy check subroutines from Mo::utils.
+ - Rewrite error message for check_array_object().

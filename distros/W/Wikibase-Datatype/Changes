@@ -1,3 +1,13 @@
+0.38 2025-08-03T11:12:14+02:00
+ - Add Languages::all_term_languages_codes() subroutine.
+ - Add Term object.
+ - Add Utils::check_language_term() helper.
+ - Add tests for Languages.
+ - Add tests for Term.
+ - Fix ERRORS section for check_language() in doc.
+ - Move check_array_object() to Mo::utils::Array.
+ - Rewrite List::MoreUtils::none to List::Util.
+
 0.37 2025-01-05T11:40:52+01:00
  - Error message change: Rename error message for check_language() helper.
  - Add 'ak' language code used in Q111803082.

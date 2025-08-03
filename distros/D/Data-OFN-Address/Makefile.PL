@@ -23,6 +23,7 @@ requires 'Data::Text::Simple' => 0;
 requires 'Error::Pure' => 0;
 requires 'Mo' => 0;
 requires 'Mo::utils' => 0.31;
+requires 'Mo::utils::Array' => 0;
 requires 'Mo::utils::Number' => 0;
 requires 'Readonly' => 0;
 requires 'Unicode::UTF8' => 0;
@@ -36,7 +37,7 @@ test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 test_requires 'Unicode::UTF8' => 0;
 tests_recursive;
-version '0.01';
+version '0.02';
 
 # Run.
 WriteAll();

@@ -4,10 +4,10 @@ use strict;
 use warnings;
 
 use Mo qw(build default is);
-use Mo::utils 0.21 qw(check_array_object);
+use Mo::utils::Array qw(check_array_object);
 use Mo::utils::Date 0.04 qw(check_date check_date_order);
 
-our $VERSION = 0.13;
+our $VERSION = 0.14;
 
 has date_of_birth => (
 	is => 'ro',
@@ -60,7 +60,7 @@ sub BUILD {
 
 	check_date_order($self, 'date_of_birth', 'date_of_death');
 
-	check_array_object($self, 'external_ids', 'MARC::Convert::Wikidata::Object::ExternalId', 'External id');
+	check_array_object($self, 'external_ids', 'MARC::Convert::Wikidata::Object::ExternalId');
 
 	check_date($self, 'work_period_start');
 	check_date($self, 'work_period_end');
@@ -213,18 +213,20 @@ Returns string.
 =head1 ERRORS
 
  new():
-         From Mo::utils::check_array_object():
-                 External id isn't 'MARC::Convert::Wikidata::Object::ExternalId' object.
-                         Value: %s
-                         Reference: %s
+         From Mo::utils::Array::check_array_object():
                  Parameter 'external_ids' must be a array.
                          Value: %s
                          Reference: %s
+                 Parameter 'external_ids' with array must contain 'MARC::Convert::Wikidata::Object::ExternalId' objects.
+                         Value: %s
+                         Reference: %s
+
          From Mo::utils::Date::check_date():
                  Parameter 'date_of_birth' for date is in bad format.
                  Parameter 'date_of_birth' has year greater than actual year.
                  Parameter 'date_of_death' for date is in bad format.
                  Parameter 'date_of_death' has year greater than actual year.
+
          From Mo::utils::Date::check_date_order():
                  Parameter 'date_of_birth' has date greater or same as parameter 'date_of_death' date.
 
@@ -257,9 +259,9 @@ Returns string.
  # Output:
  # MARC::Convert::Wikidata::Object::People  {
  #     parents: Mo::Object
- #     public methods (4):
- #         BUILD
- #         Mo::utils:
+ #     public methods (5):
+ #         BUILD, full_name
+ #         Mo::utils::Array:
  #             check_array_object
  #         Mo::utils::Date:
  #             check_date, check_date_order
@@ -277,7 +279,7 @@ Returns string.
 =head1 DEPENDENCIES
 
 L<Mo>,
-L<Mo::utils>,
+L<Mo::utils::Array>,
 L<Mo::utils::Date>.
 
 =head1 SEE ALSO
@@ -308,6 +310,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.13
+0.14
 
 =cut

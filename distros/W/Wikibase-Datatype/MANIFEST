@@ -1,5 +1,6 @@
 Changes
 examples/all_language_codes.pl
+examples/all_term_language_codes.pl
 examples/check_datetime_fail.pl
 examples/check_datetime_success.pl
 examples/check_entity_fail.pl
@@ -22,6 +23,7 @@ examples/create_and_print_sense.pl
 examples/create_and_print_sitelink.pl
 examples/create_and_print_snak.pl
 examples/create_and_print_statement.pl
+examples/create_and_print_term.pl
 examples/create_and_print_value.pl
 examples/create_and_print_value_globecoordinate.pl
 examples/create_and_print_value_item.pl
@@ -167,6 +169,7 @@ lib/Wikibase/Datatype/Sense.pm
 lib/Wikibase/Datatype/Sitelink.pm
 lib/Wikibase/Datatype/Snak.pm
 lib/Wikibase/Datatype/Statement.pm
+lib/Wikibase/Datatype/Term.pm
 lib/Wikibase/Datatype/Utils.pm
 lib/Wikibase/Datatype/Value.pm
 lib/Wikibase/Datatype/Value/Globecoordinate.pm
@@ -375,6 +378,8 @@ t/Wikibase-Datatype-Item/13-statements.t
 t/Wikibase-Datatype-Item/14-title.t
 t/Wikibase-Datatype-Languages/01-use.t
 t/Wikibase-Datatype-Languages/02-version.t
+t/Wikibase-Datatype-Languages/03-all_language_codes.t
+t/Wikibase-Datatype-Languages/04-all_term_language_codes.t
 t/Wikibase-Datatype-Lexeme/01-use.t
 t/Wikibase-Datatype-Lexeme/02-version.t
 t/Wikibase-Datatype-Lexeme/03-new.t
@@ -460,14 +465,20 @@ t/Wikibase-Datatype-Statement/05-property_snaks.t
 t/Wikibase-Datatype-Statement/06-rank.t
 t/Wikibase-Datatype-Statement/07-references.t
 t/Wikibase-Datatype-Statement/08-snak.t
+t/Wikibase-Datatype-Term/01-use.t
+t/Wikibase-Datatype-Term/02-version.t
+t/Wikibase-Datatype-Term/03-new.t
+t/Wikibase-Datatype-Term/04-language.t
+t/Wikibase-Datatype-Term/05-value.t
 t/Wikibase-Datatype-Utils/01-use.t
 t/Wikibase-Datatype-Utils/02-version.t
 t/Wikibase-Datatype-Utils/03-check_datetime.t
 t/Wikibase-Datatype-Utils/04-check_entity.t
 t/Wikibase-Datatype-Utils/05-check_language.t
-t/Wikibase-Datatype-Utils/06-check_lexeme.t
-t/Wikibase-Datatype-Utils/07-check_property.t
-t/Wikibase-Datatype-Utils/08-check_sense.t
+t/Wikibase-Datatype-Utils/06-check_language_term.t
+t/Wikibase-Datatype-Utils/07-check_lexeme.t
+t/Wikibase-Datatype-Utils/08-check_property.t
+t/Wikibase-Datatype-Utils/09-check_sense.t
 t/Wikibase-Datatype-Value-Globecoordinate/01-use.t
 t/Wikibase-Datatype-Value-Globecoordinate/02-version.t
 t/Wikibase-Datatype-Value-Globecoordinate/03-new.t
@@ -672,6 +683,8 @@ xt/Wikibase-Datatype-Snak/01-pod_coverage.t
 xt/Wikibase-Datatype-Snak/02-pod.t
 xt/Wikibase-Datatype-Statement/01-pod_coverage.t
 xt/Wikibase-Datatype-Statement/02-pod.t
+xt/Wikibase-Datatype-Term/01-pod_coverage.t
+xt/Wikibase-Datatype-Term/02-pod.t
 xt/Wikibase-Datatype-Utils/01-pod_coverage.t
 xt/Wikibase-Datatype-Utils/02-pod.t
 xt/Wikibase-Datatype-Value-Globecoordinate/01-pod_coverage.t

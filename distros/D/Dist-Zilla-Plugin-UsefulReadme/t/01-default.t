@@ -6,6 +6,7 @@ use Test::Deep;
 use Test::DZil;
 
 use Path::Tiny qw( path );
+use Pod::Simple::Text 3.23;
 
 my $tzil = Builder->from_config(
     { dist_root => 'does-not-exist' },

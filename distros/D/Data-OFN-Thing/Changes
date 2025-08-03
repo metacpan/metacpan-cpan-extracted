@@ -1,2 +1,7 @@
+0.02 2025-08-02T22:19:54+02:00
+ - Add constructor tests.
+ - Add missing error message to doc.
+ - Move check_array_object() to Mo::utils::Array.
+
 0.01 2025-07-10T22:21:40+02:00
  - First version.

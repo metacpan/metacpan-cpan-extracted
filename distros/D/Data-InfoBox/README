@@ -34,6 +34,19 @@ METHODS
 
     Returns reference to array with Data::InfoBox::Item objects.
 
+ERRORS
+     new():
+             From Mo::utils::Array::check_array_object():
+                     Parameter 'items' must be a array.
+                             Value: %s
+                             Reference: %s
+                     Parameter 'items' with array must contain 'Data::InfoBox::Item' objects.
+                             Value: %s
+                             Reference: %s
+             From Mo::utils::Array::check_array_required():
+                     Parameter 'items' is required.
+                     Parameter 'items' with array must have at least one item.
+
 EXAMPLE
      use strict;
      use warnings;
@@ -69,7 +82,7 @@ EXAMPLE
      # Item 2: Second item
 
 DEPENDENCIES
-    Mo, Mo::utils.
+    Mo, Mo::utils::Array.
 
 SEE ALSO
     Data::InfoBox::Item
@@ -95,5 +108,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.06
+    0.07
 

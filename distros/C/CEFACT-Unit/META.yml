@@ -31,7 +31,7 @@ requires:
   File::Share: 0
   IO::File: 0
   List::Util: 1.33
-  Mo::utils: 0.21
+  Mo::utils::Array: 0
   Text::CSV_XS: 0
   perl: 5.6.2
 resources:
@@ -39,4 +39,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/CEFACT-Unit
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/CEFACT-Unit
-version: '0.01'
+version: '0.02'

@@ -5,9 +5,10 @@ use warnings;
 
 use Error::Pure qw(err);
 use Mo qw(build is);
-use Mo::utils qw(check_array_object check_required);
+use Mo::utils qw(check_required);
+use Mo::utils::Array qw(check_array_object);
 
-our $VERSION = 0.37;
+our $VERSION = 0.38;
 
 has snaks => (
 	is => 'ro',
@@ -18,7 +19,7 @@ sub BUILD {
 
 	check_required($self, 'snaks');
 
-	check_array_object($self, 'snaks', 'Wikibase::Datatype::Snak', 'Snak');
+	check_array_object($self, 'snaks', 'Wikibase::Datatype::Snak');
 
 	return;
 }
@@ -76,11 +77,12 @@ Returns reference to array of Wikibase::Datatype::Snak instances.
 =head1 ERRORS
 
  new():
-         From Mo::utils::check_array_object():
-                 Parameter 'snaks' must be a array.
-                 Snak isn't 'Wikibase::Datatype::Snak' object.
          From Mo::utils::check_required():
                  Parameter 'snaks' is required.
+
+         From Mo::utils::Array::check_array_object():
+                 Parameter 'snaks' must be a array.
+                 Parameter 'snaks' with array must contain 'Wikibase::Datatype::Snak' objects.
 
 =head1 EXAMPLE
 
@@ -127,7 +129,8 @@ Returns reference to array of Wikibase::Datatype::Snak instances.
 
 L<Error::Pure>,
 L<Mo>,
-L<Mo::utils>.
+L<Mo::utils>,
+L<Mo::utils::Array>.
 
 =head1 SEE ALSO
 
@@ -161,6 +164,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.37
+0.38
 
 =cut

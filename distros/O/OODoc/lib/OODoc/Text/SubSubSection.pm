@@ -1,15 +1,18 @@
-# Copyrights 2003-2021 by [Mark Overmeer].
-#  For other contributors see ChangeLog.
-# See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.02.
-# This code is part of perl distribution OODoc.  It is licensed under the
-# same terms as Perl itself: https://spdx.org/licenses/Artistic-2.0.html
+# This code is part of Perl distribution OODoc version 3.00.
+# The POD got stripped from this file by OODoc version 3.00.
+# For contributors see file ChangeLog.
 
-package OODoc::Text::SubSubSection;
-use vars '$VERSION';
-$VERSION = '2.02';
+# This software is copyright (c) 2003-2025 by Mark Overmeer.
 
-use base 'OODoc::Text::Structure';
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+# SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
+
+package OODoc::Text::SubSubSection;{
+our $VERSION = '3.00';
+}
+
+use parent 'OODoc::Text::Structure';
 
 use strict;
 use warnings;
@@ -33,6 +36,8 @@ sub findEntry($)
 {  my ($self, $name) = @_;
    $self->name eq $name ? $self : ();
 }
+
+sub nest() { }
 
 #--------------
 

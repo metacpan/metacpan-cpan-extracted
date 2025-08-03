@@ -1,4 +1,4 @@
-package LedgerSMB::Installer::OS::linux::fedora v0.999.6;
+package LedgerSMB::Installer::OS::linux::fedora v0.999.7;
 
 use v5.20;
 use experimental qw(signatures);
@@ -101,6 +101,30 @@ sub prepare_builder_env($self, $config) {
         $config->mark_pkgs_for_cleanup( [ '@c-development' ] );
         $self->pkg_install( [ '@c-development' ] );
     }
+}
+
+sub prepare_extraction_env($self, $config) {
+    my $dnf = $self->have_cmd( 'dnf' );
+    my @pkgs;
+    my ($tar_pkgs, ) = capture_stdout {
+        system( $dnf, 'repoquery', '--installed', '--queryformat', '%{name}', 'tar' );
+    };
+    my $have_tar = ($tar_pkgs =~ m/^tar/m);
+    unless ($have_make) {
+        push @pkgs, 'tar';
+    }
+    my ($gzip_pkgs, ) = capture_stdout {
+        system( $dnf, 'repoquery', '--installed', '--queryformat', '%{name}', 'gzip' );
+    };
+    my $have_gzip = ($gzip_pkgs =~ m/^gzip/m);
+    unless ($have_gzip) {
+        push @pkgs, 'gzip';
+    }
+    if (@pkgs) {
+        $config->mark_pkgs_for_cleanup( \@pkgs );
+        $self->pkg_install( \@pkgs );
+    }
+    $self->SUPER::prepare_extraction_env( $config );
 }
 
 sub prepare_installer_env($self, $config) {

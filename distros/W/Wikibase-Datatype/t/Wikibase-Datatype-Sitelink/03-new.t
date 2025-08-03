@@ -60,6 +60,6 @@ eval {
 		'title' => 'Main page',
 	);
 };
-is($EVAL_ERROR, "Badge isn't 'Wikibase::Datatype::Value::Item' object.\n",
-	"Badge isn't 'Wikibase::Datatype::Value::Item' object.");
+is($EVAL_ERROR, "Parameter 'badges' with array must contain 'Wikibase::Datatype::Value::Item' objects.\n",
+	"Parameter 'badges' with array must contain 'Wikibase::Datatype::Value::Item' objects (bad).");
 clean();

@@ -4,9 +4,10 @@ use strict;
 use warnings;
 
 use Mo qw(build default is);
-use Mo::utils qw(check_array_object check_number_of_items);
+use Mo::utils qw(check_number_of_items);
+use Mo::utils::Array qw(check_array_object);
 
-our $VERSION = 0.37;
+our $VERSION = 0.38;
 
 has glosses => (
 	default => [],
@@ -26,13 +27,11 @@ sub BUILD {
 	my $self = shift;
 
 	# Check glosses.
-	check_array_object($self, 'glosses', 'Wikibase::Datatype::Value::Monolingual',
-		'Glosse');
+	check_array_object($self, 'glosses', 'Wikibase::Datatype::Value::Monolingual');
 	check_number_of_items($self, 'glosses', 'language', 'Glosse', 'language');
 
 	# Check statements.
-	check_array_object($self, 'statements', 'Wikibase::Datatype::Statement',
-		'Statement');
+	check_array_object($self, 'statements', 'Wikibase::Datatype::Statement');
 
 	return;
 }
@@ -120,13 +119,14 @@ Returns reference to array with Wikibase::Datatype::Statement instances.
 =head1 ERRORS
 
  new():
-         From Mo::utils::check_array_object():
-                Glosse isn't 'Wikibase::Datatype::Value::Monolingual' object.
-                Parameter 'glosses' must be a array.
-                Parameter 'statements' must be a array.
-                Statement isn't 'Wikibase::Datatype::Statement' object.
          From Mo::utils::check_number_of_items():
                 Glosse for language '%s' has multiple values.
+
+         From Mo::utils::Array::check_array_object():
+                Parameter 'glosses' must be a array.
+                Parameter 'glosses' with array must contain 'Wikibase::Datatype::Value::Monolingual' objects.
+                Parameter 'statements' must be a array.
+                Parameter 'statements' with array must contain 'Wikibase::Datatype::Statement' objects.
 
 =head1 EXAMPLE
 
@@ -212,7 +212,8 @@ Returns reference to array with Wikibase::Datatype::Statement instances.
 =head1 DEPENDENCIES
 
 L<Mo>,
-L<Mo::utils>.
+L<Mo::utils>,
+L<Mo::utils::Array>.
 
 =head1 SEE ALSO
 
@@ -242,6 +243,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.37
+0.38
 
 =cut

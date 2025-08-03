@@ -6,17 +6,19 @@ use warnings;
 
 use DateTime;
 use Error::Pure qw(err);
-use List::Util qw(none);
-use Wikibase::Datatype::Languages qw(all_language_codes);
+use List::Util 1.33 qw(none);
+use Wikibase::Datatype::Languages qw(all_language_codes all_term_language_codes);
 use Readonly;
 
 Readonly::Array our @EXPORT_OK => qw(check_datetime check_entity check_language
-	check_lexeme check_property check_sense);
+	check_language_term check_lexeme check_property check_sense);
 
 our $SKIP_CHECK_LANG => 0;
+our $SKIP_CHECK_TERM_LANG => 0;
 our @LANGUAGE_CODES => ();
+our @TERM_LANGUAGE_CODES => ();
 
-our $VERSION = 0.37;
+our $VERSION = 0.38;
 
 sub check_datetime {
 	my ($self, $key) = @_;
@@ -98,6 +100,27 @@ sub check_language {
 	return;
 }
 
+sub check_language_term {
+	my ($self, $key) = @_;
+
+	if (! $SKIP_CHECK_TERM_LANG) {
+		my @term_language_codes;
+		my $error_message;
+		if (@TERM_LANGUAGE_CODES) {
+			@term_language_codes = @TERM_LANGUAGE_CODES;
+			$error_message = "Language code '".$self->{$key}."' isn't user defined terms language code.";
+		} else {
+			@term_language_codes = all_term_language_codes();
+			$error_message = "Language code '".$self->{$key}."' isn't code supported for terms by Wikibase.";
+		}
+		if (none { $_ eq $self->{$key} } @term_language_codes) {
+			err $error_message;
+		}
+	}
+
+	return;
+}
+
 sub check_lexeme {
 	my ($self, $key) = @_;
 
@@ -156,11 +179,12 @@ Wikibase::Datatype::Utils - Wikibase datatype utilities.
 
 =head1 SYNOPSIS
 
- use Wikibase::Datatype::Utils qw(check_datetime check_entity check_language check_lexeme check_property check_sense);
+ use Wikibase::Datatype::Utils qw(check_datetime check_entity check_language check_language_term check_lexeme check_property check_sense);
 
  check_datetime($self, $key);
  check_entity($self, $key);
  check_language($self, $key);
+ check_language_term($self, $key);
  check_lexeme($self, $key);
  check_property($self, $key);
  check_sense($self, $key);
@@ -177,11 +201,23 @@ Boolean variable to skip check of right language.
 
 Default value is 0, checking is working.
 
+=head2 C<$SKIP_CHECK_TERM_LANG>
+
+Boolean variable to skip check of right term language.
+
+Default value is 0, checking is working.
+
 =head2 C<@LANGUAGE_CODES>
 
 List of supported language codes defined by user.
 
 Default value is (), checking official language codes.
+
+=head2 C<@TERM_LANGUAGE_CODES>
+
+List of supported term language codes defined by user.
+
+Default value is (), checking official term language codes.
 
 =head1 SUBROUTINES
 
@@ -207,6 +243,14 @@ Returns undef.
  check_language($self, $key);
 
 Check parameter defined by C<$key> if it's ISO 639-1 language code and if language exists.
+
+Returns undef.
+
+=head2 C<check_language_term>
+
+ check_language_term($self, $key);
+
+Check parameter defined by C<$key> if it's language code for L<Wikibase::Datatype::Term> and if language exists.
 
 Returns undef.
 
@@ -255,6 +299,11 @@ Returns undef.
 
  check_language():
          Language code '%s' isn't code supported by Wikibase.
+         Language code '%s' isn't user defined language code."
+
+ check_language_term():
+         Language code '%s' isn't code supported for terms by Wikibase.
+         Language code '%s' isn't user defined terms language code.
 
  check_lexeme():
          Parameter '%s' must begin with 'L' and number after it.";
@@ -524,6 +573,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.37
+0.38
 
 =cut

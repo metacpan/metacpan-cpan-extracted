@@ -23,15 +23,19 @@ Extends L<"OVERLOADED" in OODoc::Text::Structure|OODoc::Text::Structure/"OVERLOA
  
 =over 4
 
-=item overload: B<'""' <$stringification>>
+=item overload: B<'""' (stringification)>
 
 Inherited, see L<OODoc::Text/"OVERLOADED">
 
-=item overload: B<'==' $and '!='>
+=item overload: B<'==' and '!=' (numeric comparison)>
 
-Inherited, see L<OODoc::Text/"OVERLOADED">
+Inherited, see L<OODoc::Object/"OVERLOADED">
 
-=item overload: B<'cmp' <$string $comparison>>
+=item overload: B<'bool'>
+
+Inherited, see L<OODoc::Object/"OVERLOADED">
+
+=item overload: B<'cmp' (string comparison)>
 
 Inherited, see L<OODoc::Text/"OVERLOADED">
 
@@ -51,11 +55,13 @@ Extends L<"Constructors" in OODoc::Text::Structure|OODoc::Text::Structure/"Const
 
 Inherited, see L<OODoc::Text::Structure/"Constructors">
 
-=item OODoc::Text::Chapter-E<gt>B<new>(%options)
+=item $class-E<gt>B<new>(%options)
+
+Inherited, see L<OODoc::Object/"Constructors">
 
  -Option     --Defined in            --Default
   container    OODoc::Text             new(manual)
-  description  OODoc::Text             ''
+  description  OODoc::Text             <empty string>
   level        OODoc::Text::Structure  1
   linenr       OODoc::Text             <required>
   manual                               undef
@@ -84,18 +90,6 @@ The manual in which this chapter is described.
 
 =back
 
-=head2 Inheritance knowledge
-
-Extends L<"Inheritance knowledge" in OODoc::Text::Structure|OODoc::Text::Structure/"Inheritance knowledge">.
- 
-=over 4
-
-=item $obj-E<gt>B<extends>( [$object] )
-
-Inherited, see L<OODoc::Object/"Inheritance knowledge">
-
-=back
-
 =head2 Attributes
 
 Extends L<"Attributes" in OODoc::Text::Structure|OODoc::Text::Structure/"Attributes">.
@@ -110,9 +104,21 @@ Inherited, see L<OODoc::Text/"Attributes">
 
 Inherited, see L<OODoc::Text/"Attributes">
 
+=item $obj-E<gt>B<extends>( [$object] )
+
+Inherited, see L<OODoc::Text/"Attributes">
+
 =item $obj-E<gt>B<level>()
 
 Inherited, see L<OODoc::Text::Structure/"Attributes">
+
+=item $obj-E<gt>B<linenr>()
+
+Inherited, see L<OODoc::Text/"Attributes">
+
+=item $obj-E<gt>B<manual>()
+
+Inherited, see L<OODoc::Text/"Attributes">
 
 =item $obj-E<gt>B<name>()
 
@@ -126,6 +132,54 @@ Inherited, see L<OODoc::Text::Structure/"Attributes">
 
 Inherited, see L<OODoc::Text/"Attributes">
 
+=item $obj-E<gt>B<unique>()
+
+Inherited, see L<OODoc::Object/"Attributes">
+
+=item $obj-E<gt>B<where>()
+
+Inherited, see L<OODoc::Text/"Attributes">
+
+=back
+
+=head2 Manual Repository
+
+Extends L<"Manual Repository" in OODoc::Text::Structure|OODoc::Text::Structure/"Manual Repository">.
+ 
+=over 4
+
+=item $obj-E<gt>B<addManual>($manual)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<findManual>($name)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<mainManual>($name)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<manuals>()
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<manualsForPackage>($name)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<packageNames>()
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<publicationIndex>()
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<publish>(\%options)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
 =back
 
 =head2 Location
@@ -138,21 +192,9 @@ Extends L<"Location" in OODoc::Text::Structure|OODoc::Text::Structure/"Location"
 
 Inherited, see L<OODoc::Text::Structure/"Location">
 
-=item $obj-E<gt>B<manual>( [$name] )
-
-Inherited, see L<OODoc::Text/"Location">
-
 =item $obj-E<gt>B<path>()
 
 Inherited, see L<OODoc::Text::Structure/"Location">
-
-=item $obj-E<gt>B<unique>()
-
-Inherited, see L<OODoc::Text/"Location">
-
-=item $obj-E<gt>B<where>()
-
-Inherited, see L<OODoc::Text/"Location">
 
 =back
 
@@ -218,45 +260,13 @@ Extends L<"Commonly used functions" in OODoc::Text::Structure|OODoc::Text::Struc
  
 =over 4
 
-=item $obj-E<gt>B<filenameToPackage>($filename)
-
-=item OODoc::Text::Chapter-E<gt>B<filenameToPackage>($filename)
+=item $any-E<gt>B<filenameToPackage>($filename)
 
 Inherited, see L<OODoc::Object/"Commonly used functions">
 
-=item $obj-E<gt>B<mkdirhier>($directory)
-
-=item OODoc::Text::Chapter-E<gt>B<mkdirhier>($directory)
+=item $any-E<gt>B<mkdirhier>($directory)
 
 Inherited, see L<OODoc::Object/"Commonly used functions">
-
-=back
-
-=head2 Manual Repository
-
-Extends L<"Manual Repository" in OODoc::Text::Structure|OODoc::Text::Structure/"Manual Repository">.
- 
-=over 4
-
-=item $obj-E<gt>B<addManual>($manual)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<mainManual>($name)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<manuals>()
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<manualsForPackage>($name)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<packageNames>()
-
-Inherited, see L<OODoc::Object/"Manual Repository">
 
 =back
 
@@ -292,14 +302,15 @@ to L<manualsForPackage()|OODoc::Object/"Manual Repository"> or L<mainManual()|OO
 
 =head1 SEE ALSO
 
-This module is part of OODoc distribution version 2.02,
-built on December 08, 2021. Website: F<http://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.00,
+built on August 02, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 
-Copyrights 2003-2021 by [Mark Overmeer]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the Artistic license.
-See F<http://dev.perl.org/licenses/artistic.html>
+This software is copyright (c) 2003-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

@@ -15,7 +15,7 @@ Readonly::Array our @EXPORT_OK => qw(check_angle check_array check_array_object
 	check_number_of_items check_number_range check_regexp check_required
 	check_string check_string_begin check_strings);
 
-our $VERSION = 0.31;
+our $VERSION = 0.32;
 
 sub check_angle {
 	my ($self, $key) = @_;
@@ -404,6 +404,7 @@ Returns undef.
 
  check_array($self, $key);
 
+B<This subroutine is deprecated. Use L<Mo::utils::Array::check_array()> instead.>
 I<Since version 0.06.>
 
 Check parameter defined by C<$key> which is reference to array.
@@ -416,6 +417,7 @@ Returns undef.
 
  check_array_object($self, $key, $class, $class_name);
 
+B<This subroutine is deprecated. Use L<Mo::utils::Array::check_array_object()> instead.>
 I<Since version 0.02. Described functionality since version 0.21.>
 
 Check parameter defined by C<$key> which is reference to array with instances
@@ -429,6 +431,7 @@ Returns undef.
 
  check_array_required($self, $key);
 
+B<This subroutine is deprecated. Use L<Mo::utils::Array::check_array_required()> instead.>
 I<Since version 0.18. Described functionality since version 0.19.>
 
 Check parameter defined by C<$key> which is reference to array for at least one
@@ -1612,6 +1615,10 @@ L<Scalar::Util>.
 
 Micro Objects. Mo is less.
 
+=item L<Mo::utils::Array>
+
+Mo array utilities.
+
 =item L<Mo::utils::Language>
 
 Mo language utilities.
@@ -1644,6 +1651,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.31
+0.32
 
 =cut

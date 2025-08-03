@@ -45,7 +45,8 @@ SUBROUTINES
   "check_array"
      check_array($self, $key);
 
-    *Since version 0.06.*
+    This subroutine is deprecated. Use Mo::utils::Array::check_array()
+    instead. *Since version 0.06.*
 
     Check parameter defined by $key which is reference to array.
 
@@ -56,7 +57,9 @@ SUBROUTINES
   "check_array_object"
      check_array_object($self, $key, $class, $class_name);
 
-    *Since version 0.02. Described functionality since version 0.21.*
+    This subroutine is deprecated. Use
+    Mo::utils::Array::check_array_object() instead. *Since version 0.02.
+    Described functionality since version 0.21.*
 
     Check parameter defined by $key which is reference to array with
     instances of some object type ($class). $class_name is used to error
@@ -69,7 +72,9 @@ SUBROUTINES
   "check_array_required"
      check_array_required($self, $key);
 
-    *Since version 0.18. Described functionality since version 0.19.*
+    This subroutine is deprecated. Use
+    Mo::utils::Array::check_array_required() instead. *Since version 0.18.
+    Described functionality since version 0.19.*
 
     Check parameter defined by $key which is reference to array for at least
     one value inside.
@@ -1115,6 +1120,9 @@ DEPENDENCIES
 SEE ALSO
     Mo  Micro Objects. Mo is less.
 
+    Mo::utils::Array
+        Mo array utilities.
+
     Mo::utils::Language
         Mo language utilities.
 
@@ -1138,5 +1146,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.31
+    0.32
 

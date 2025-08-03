@@ -1,24 +1,25 @@
-# Copyrights 2003,2007-2021 by [Mark Overmeer].
-#  For other contributors see ChangeLog.
-# See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.02.
-# This code is part of perl distribution OODoc-Template.  It is licensed under
-# the same terms as Perl itself: https://spdx.org/licenses/Artistic-2.0.html
+# This code is part of Perl distribution OODoc-Template version 0.18.
+# The POD got stripped from this file by OODoc version 3.00.
+# For contributors see file ChangeLog.
+
+# This software is copyright (c) 2003-2025 by Mark Overmeer.
+
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+# SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
+
+package OODoc::Template;{
+our $VERSION = '0.18';
+}
+
 
 use strict;
 use warnings;
 
-package OODoc::Template;
-use vars '$VERSION';
-$VERSION = '0.17';
-
-
 use Log::Report  'oodoc-template';
 
-use IO::File     ();
-use File::Spec   ();
-use Data::Dumper qw(Dumper);
-use Scalar::Util qw(weaken);
+use File::Spec::Functions qw/file_name_is_absolute canonpath catfile rel2abs/;
+use Scalar::Util          qw(weaken);
 
 my @default_markers = ('<!--{', '}-->', '<!--{/', '}-->');
 
@@ -195,8 +196,6 @@ sub defineMacro($$$$)
 sub valueFor($;$$$)
 {   my ($self, $tag, $attrs, $then, $else) = @_;
 
-#warn "Looking for $tag";
-#warn Dumper $self->{values};
     for(my $set = $self->{values}; defined $set; $set = $set->{NEXT})
     {   my $v = $set->{$tag};
 
@@ -315,15 +314,15 @@ sub loadFile($)
 {   my ($self, $relfn) = @_;
     my $absfn;
 
-    if(File::Spec->file_name_is_absolute($relfn))
-    {   my $fn = File::Spec->canonpath($relfn);
+    if(file_name_is_absolute $relfn)
+    {   my $fn = canonpath $relfn;
         $absfn = $fn if -f $fn;
     }
 
     unless($absfn)
-    {   my @srcs = map { @$_ } $self->allValuesFor('search');
+    {   my @srcs = map @$_, $self->allValuesFor('search');
         foreach my $dir (@srcs)
-        {   $absfn = File::Spec->rel2abs($relfn, $dir);
+        {   $absfn = rel2abs $relfn, $dir;
             last if -f $absfn;
             $absfn = undef;
         }
@@ -332,7 +331,7 @@ sub loadFile($)
     defined $absfn
         or return undef;
 
-    my $in = IO::File->new($absfn, 'r');
+    open my $in, '<:encoding(utf-8)', $absfn;
     unless(defined $in)
     {   my $source = $self->valueFor('source') || '??';
         fault __x"Cannot read from {fn} in {file}", fn => $absfn, file=>$source;
@@ -341,6 +340,7 @@ sub loadFile($)
     \(join '', $in->getlines);  # auto-close in
 }
 
+#---------------
 
 sub parse($@)
 {   my ($self, $template) = (shift, shift);
@@ -350,9 +350,7 @@ sub parse($@)
 
 sub parseTemplate($)
 {   my ($self, $template) = @_;
-
-    defined $template
-        or return undef;
+    defined $template or return undef;
 
     my $markers = $self->valueFor('markers');
 
@@ -395,7 +393,7 @@ sub parseTemplate($)
                           $markers->[1]
                           (.*)
                         !!xs)
-        {   # ELSE_$tag for backwards compat
+        {   # $else_$tag for backwards compat
             $else = $1;
         }
 
@@ -467,5 +465,6 @@ sub parseAttrs($)
     \%attrs;
 }
 
+#-----------------------
 
 1;

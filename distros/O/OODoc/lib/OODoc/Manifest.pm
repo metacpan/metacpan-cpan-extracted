@@ -1,22 +1,25 @@
-# Copyrights 2003-2021 by [Mark Overmeer].
-#  For other contributors see ChangeLog.
-# See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.02.
-# This code is part of perl distribution OODoc.  It is licensed under the
-# same terms as Perl itself: https://spdx.org/licenses/Artistic-2.0.html
+# This code is part of Perl distribution OODoc version 3.00.
+# The POD got stripped from this file by OODoc version 3.00.
+# For contributors see file ChangeLog.
 
-package OODoc::Manifest;
-use vars '$VERSION';
-$VERSION = '2.02';
+# This software is copyright (c) 2003-2025 by Mark Overmeer.
 
-use base 'OODoc::Object';
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+# SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
+
+package OODoc::Manifest;{
+our $VERSION = '3.00';
+}
+
+use parent 'OODoc::Object';
 
 use strict;
 use warnings;
 
-use IO::File;
-use File::Basename 'dirname';
 use Log::Report    'oodoc';
+
+use File::Basename 'dirname';
 
 
 use overload '@{}' => sub { [ shift->files ] };
@@ -24,14 +27,13 @@ use overload bool  => sub {1};
 
 #-------------------------------------------
 
-
 sub init($)
 {   my ($self, $args) = @_;
     $self->SUPER::init($args) or return;
 
     my $filename = $self->{OM_filename} = delete $args->{filename};
 
-    $self->{O_files} = {};
+    $self->{OM_files} = {};
     $self->read if defined $filename && -e $filename;
     $self->modified(0);
     $self;
@@ -39,15 +41,11 @@ sub init($)
 
 #-------------------------------------------
 
-
 sub filename() {shift->{OM_filename}}
 
 #-------------------------------------------
 
-
-sub files() { keys %{shift->{O_files}} }
-
-#-------------------------------------------
+sub files() { keys %{shift->{OM_files}} }
 
 
 sub add($)
@@ -55,29 +53,27 @@ sub add($)
     while(@_)
     {   my $add = $self->relative(shift);
         $self->modified(1) unless exists $self->{O_file}{$add};
-        $self->{O_files}{$add}++;
+        $self->{OM_files}{$add}++;
     }
     $self;
 }
 
 #-------------------------------------------
 
-
 sub read()
 {   my $self = shift;
     my $filename = $self->filename;
-    my $file = IO::File->new($filename, "r")
+
+    open my $file, "<:encoding(utf8)", $filename
        or fault __x"cannot read manifest file {file}", file => $filename;
 
     my @dist = $file->getlines;
     $file->close;
 
     s/\s+.*\n?$// for @dist;
-    $self->{O_files}{$_}++ foreach @dist;
+    $self->{OM_files}{$_}++ foreach @dist;
     $self;
 }
-
-#-------------------------------------------
 
 
 sub modified(;$)
@@ -85,15 +81,13 @@ sub modified(;$)
     @_ ? $self->{OM_modified} = @_ : $self->{OM_modified};
 }
 
-#-------------------------------------------
-
 
 sub write()
 {   my $self = shift;
     return unless $self->modified;
     my $filename = $self->filename || return $self;
 
-    my $file = IO::File->new($filename, "w")
+    open my $file, ">:encoding(utf8)", $filename
       or fault __x"cannot write manifest {file}", file => $filename;
 
     $file->print($_, "\n") foreach sort $self->files;
@@ -104,8 +98,6 @@ sub write()
 }
 
 sub DESTROY() { shift->write }
-
-#-------------------------------------------
 
 
 sub relative($)
@@ -122,13 +114,11 @@ sub relative($)
         return $filename;
     }
 
-    warn "WARNING: MANIFEST file ".$self->filename
-            . " lists filename outside (sub)directory: $filename\n";
+    warn "WARNING: MANIFEST file ".$self->filename." lists filename outside (sub)directory: $filename\n";
 
     $filename;
 }
 
 #-------------------------------------------
-
 
 1;

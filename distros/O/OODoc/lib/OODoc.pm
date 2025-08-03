@@ -1,28 +1,34 @@
-# Copyrights 2003-2021 by [Mark Overmeer].
-#  For other contributors see ChangeLog.
-# See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.02.
-# This code is part of perl distribution OODoc.  It is licensed under the
-# same terms as Perl itself: https://spdx.org/licenses/Artistic-2.0.html
+# This code is part of Perl distribution OODoc version 3.00.
+# The POD got stripped from this file by OODoc version 3.00.
+# For contributors see file ChangeLog.
 
-package OODoc;
-use vars '$VERSION';
-$VERSION = '2.02';
+# This software is copyright (c) 2003-2025 by Mark Overmeer.
 
-use base 'OODoc::Object';
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+# SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
+
+package OODoc;{
+our $VERSION = '3.00';
+}
+
+use parent 'OODoc::Object';
 
 use strict;
 use warnings;
 
+our $VERSION = '3.00';  # needed here for own release process
+
 use Log::Report    'oodoc';
 
-use OODoc::Manifest;
+use OODoc::Manifest ();
+use OODoc::Format   ();
 
-use File::Copy;
-use File::Spec;
-use File::Basename;
-use IO::File;
-use List::Util 'first';
+use File::Basename        qw/dirname/;
+use File::Copy            qw/copy move/;
+use File::Spec::Functions qw/catfile/;
+use List::Util            qw/first/;
+use Scalar::Util          qw/blessed/;
 
 
 sub init($)
@@ -30,21 +36,16 @@ sub init($)
 
     $self->SUPER::init($args) or return;
 
-    $self->{O_pkg}    = {};
-
-    my $distribution  = $self->{O_distribution} = delete $args->{distribution};
-    defined $distribution
+    my $distribution   = $self->{O_distribution} = delete $args->{distribution}
         or error __x"the produced distribution needs a project description";
 
     $self->{O_project} = delete $args->{project} || $distribution;
 
     my $version        = delete $args->{version};
     unless(defined $version)
-    {   my $fn         = -f 'version' ? 'version'
-                       : -f 'VERSION' ? 'VERSION'
-                       : undef;
+    {   my $fn         = -f 'version' ? 'version' : -f 'VERSION' ? 'VERSION' : undef;
         if(defined $fn)
-        {   my $v = IO::File->new($fn, 'r')
+        {   open my $v, "<", $fn
                 or fault __x"cannot read version from file {file}", file=> $fn;
             $version = $v->getline;
             $version = $1 if $version =~ m/(\d+\.[\d\.]+)/;
@@ -52,27 +53,25 @@ sub init($)
         }
     }
 
-    defined $version
-        or error __x"no version specified for distribution '{dist}'"
-              , dist  => $distribution;
+    $self->{O_version} = $version
+        or error __x"no version specified for distribution '{dist}'", dist  => $distribution;
 
-    $self->{O_version} = $version;
     $self;
 }
 
-#-------------------------------------------
-
-
-sub distribution() {shift->{O_distribution}}
-
-
-sub version() {shift->{O_version}}
-
-
-sub project() {shift->{O_project}}
+sub publish { panic }
 
 #-------------------------------------------
 
+sub distribution() { $_[0]->{O_distribution} }
+
+
+sub version() { $_[0]->{O_version} }
+
+
+sub project() { $_[0]->{O_project} }
+
+#-------------------------------------------
 
 sub selectFiles($@)
 {   my ($self, $files) = (shift, shift);
@@ -81,15 +80,15 @@ sub selectFiles($@)
       = ref $files eq 'Regexp' ? sub { $_[0] =~ $files }
       : ref $files eq 'CODE'   ? $files
       : ref $files eq 'ARRAY'  ? $files
-      : error __x"use regex, code reference or array for file selection";
+      :     error __x"use regex, code reference or array for file selection";
 
     return ($select, [])
         if ref $select eq 'ARRAY';
 
     my (@process, @copy);
     foreach my $fn (@_)
-    {   if($select->($fn)) {push @process, $fn}
-        else               {push @copy,    $fn}
+    {   if($select->($fn)) { push @process, $fn }
+        else               { push @copy,    $fn }
     }
 
     ( \@process, \@copy );
@@ -99,22 +98,18 @@ sub selectFiles($@)
 sub processFiles(@)
 {   my ($self, %args) = @_;
 
-    exists $args{workdir}
-        or error __x"requires a directory to write the distribution to";
-
     my $dest    = $args{workdir};
     my $source  = $args{source};
     my $distr   = $args{distribution} || $self->distribution;
 
     my $version = $args{version};
     unless(defined $version)
-    {   my $fn  = defined $source ? File::Spec->catfile($source, 'version')
-                :                   'version';
+    {   my $fn  = defined $source ? catfile($source, 'version') : 'version';
         $fn     = -f $fn          ? $fn
-                : defined $source ? File::Spec->catfile($source, 'VERSION')
+                : defined $source ? catfile($source, 'VERSION')
                 :                   'VERSION';
         if(defined $fn)
-        {   my $v = IO::File->new($fn, "r")
+        {   open my $v, '<', $fn
                 or fault __x"cannot read version from {file}", file => $fn;
             $version = $v->getline;
             $version = $1 if $version =~ m/(\d+\.[\d\.]+)/;
@@ -128,7 +123,7 @@ sub processFiles(@)
 
     my $notice = '';
     if($notice = $args{notice})
-    {   $notice =~ s/^(\#\s)?/# /mg;       # put comments if none
+    {   $notice =~ s/^([^#\n])/# $1/mg;       # put comments if none
     }
 
     #
@@ -138,14 +133,14 @@ sub processFiles(@)
 
     my $manfile
       = exists $args{manifest} ? $args{manifest}
-      : defined $source        ? File::Spec->catfile($source, 'MANIFEST')
+      : defined $source        ? catfile($source, 'MANIFEST')
       :                          'MANIFEST';
 
     my $manifest = OODoc::Manifest->new(filename => $manfile);
 
     my $manout;
     if(defined $dest)
-    {   my $manif = File::Spec->catfile($dest, 'MANIFEST');
+    {   my $manif = catfile $dest, 'MANIFEST';
         $manout   = OODoc::Manifest->new(filename => $manif);
         $manout->add($manif);
     }
@@ -164,13 +159,11 @@ sub processFiles(@)
 
     if(defined $dest)
     {   foreach my $filename (@$copy)
-        {   my $fn = defined $source ? File::Spec->catfile($source, $filename)
-                   :                   $filename;
+        {   my $fn = defined $source ? catfile($source, $filename) : $filename;
 
-            my $dn = File::Spec->catfile($dest, $fn);
+            my $dn = catfile $dest, $fn;
             unless(-f $fn)
-            {   warning __x"no file {file} to include in the distribution"
-                  , file => $fn;
+            {   warning __x"no file {file} to include in the distribution", file => $fn;
                 next;
             }
 
@@ -178,8 +171,7 @@ sub processFiles(@)
             {   $self->mkdirhier(dirname $dn);
 
                 copy $fn, $dn
-                   or fault __x"cannot copy distribution file {from} to {to}"
-                        , from => $fn, to => $dest;
+                    or fault __x"cannot copy distribution file {from} to {to}", from => $fn, to => $dest;
 
                 trace "  copied $fn to $dest";
             }
@@ -193,15 +185,15 @@ sub processFiles(@)
     #
 
     my $parser = $args{parser} || 'OODoc::Parser::Markov';
-    my $skip_links = delete $args{skip_links};
 
-    unless(ref $parser)
-    {   eval "require $parser";
-        error __x"cannot compile {pkg} class: {err}", pkg => $parser, err => $@
-            if $@;
+    unless(blessed $parser)
+    {   $parser = 'OODoc::Parser::Markov' if $parser eq 'markov';
 
-        $parser = $parser->new(skip_links => $skip_links)
-           or error __x"parser {name} could not be instantiated", name=>$parser;
+        eval "require $parser";
+        $@ and error __x"cannot compile {pkg} class: {err}", pkg => $parser, err => $@;
+
+        $parser = $parser->new(skip_links => delete $args{skip_links})
+            or error __x"parser {name} could not be instantiated", name=> $parser;
     }
 
     #
@@ -209,17 +201,16 @@ sub processFiles(@)
     #
 
     foreach my $filename (@$process)
-    {   my $fn = $source ? File::Spec->catfile($source, $filename) : $filename; 
+    {   my $fn = $source ? catfile($source, $filename) : $filename; 
 
         unless(-f $fn)
-        {   warning __x"no file {file} to include in the distribution"
-              , file => $fn;
+        {   warning __x"no file {file} to include in the distribution", file => $fn;
             next;
         }
 
         my $dn;
         if($dest)
-        {   $dn = File::Spec->catfile($dest, $fn);
+        {   $dn = catfile $dest, $fn;
             $self->mkdirhier(dirname $dn);
             $manout->add($dn);
         }
@@ -241,14 +232,10 @@ sub processFiles(@)
         }
     }
 
-    # Some general subtotals
-    trace $self->stats;
-
     $self;
 }
 
 #-------------------------------------------
-
 
 sub prepare(@)
 {   my ($self, %args) = @_;
@@ -275,8 +262,8 @@ sub prepare(@)
 
 
 sub getPackageRelations($)
-{   my $self = shift;
-    my @manuals  = $self->manuals;  # all
+{   my $self    = shift;
+    my @manuals = $self->manuals;  # all
 
     #
     # load all distributions (which are not loaded yet)
@@ -290,7 +277,7 @@ sub getPackageRelations($)
 
          eval "require $manual";
          warning __x"errors from {manual}: {err}", manual => $manual, err =>$@
-            if $@ && $@ !~ /can't locate/i && $@ !~ /attempt to reload/i;
+             if $@ && $@ !~ /can't locate/i && $@ !~ /attempt to reload/i;
     }
 
     info "detect inheritance relationships";
@@ -310,14 +297,14 @@ sub getPackageRelations($)
         {   my $isa = $self->mainManual($_) || $_;
 
             $manual->superClasses($isa);
-            $isa->subClasses($manual) if ref $isa;
+            $isa->subClasses($manual) if blessed $isa;
         }
 
         if(my $realizes = $uses{realizes})
         {   my $to  = $self->mainManual($realizes) || $realizes;
 
             $manual->realizes($to);
-            $to->realizers($manual) if ref $to;
+            $to->realizers($manual) if blessed $to;
         }
     }
 
@@ -326,91 +313,33 @@ sub getPackageRelations($)
 
 #-------------------------------------------
 
-
-our %formatters =
- ( pod   => 'OODoc::Format::Pod'
- , pod2  => 'OODoc::Format::Pod2'
- , pod3  => 'OODoc::Format::Pod3'
- , html  => 'OODoc::Format::Html'
- , html2 => 'OODoc::Format::Html2'
- );
-
-sub create($@)
+sub formatter($@)
 {   my ($self, $format, %args) = @_;
 
-    my $dest    = $args{workdir}
-       or error __x"create requires a directory to write the manuals to";
+    my $dest     = delete $args{workdir}
+        or error __x"formatter() requires a directory to write the manuals to";
 
-    #
     # Start manifest
-    #
 
-    my $manfile  = exists $args{manifest} ? $args{manifest}
-                 : File::Spec->catfile($dest, 'MANIFEST');
+    my $manfile  = delete $args{manifest} // catfile($dest, 'MANIFEST');
     my $manifest = OODoc::Manifest->new(filename => $manfile);
 
     # Create the formatter
 
-    unless(ref $format)
-    {   $format = $formatters{$format}
-            if exists $formatters{$format};
+    return $format
+        if blessed $format && $format->isa('OODoc::Format');
 
-        eval "require $format";
-        error __x"formatter {name} has compilation errors: {err}"
-          , name => $format, err => $@ if $@;
-
-        my $options    = delete $args{format_options} || [];
-
-        $format = $format->new
-          ( manifest    => $manifest
-          , workdir     => $dest
-          , project     => $self->distribution
-          , version     => $self->version
-          , @$options
-          );
-    }
-
-    #
-    # Create the manual pages
-    #
-
-    my $select = ! defined $args{select}     ? sub {1}
-               : ref $args{select} eq 'CODE' ? $args{select}
-               : sub { $_[0]->name =~ $args{select}};
-
-    foreach my $package (sort $self->packageNames)
-    {
-        foreach my $manual ($self->manualsForPackage($package))
-        {   next unless $select->($manual);
-
-            unless($manual->chapters)
-            {   trace "  skipping $manual: no chapters";
-                next;
-            }
-
-            trace "  creating manual $manual with ".(ref $format);
-
-            $format->createManual
-              ( manual         => $manual
-              , template       => $args{manual_templates}
-              , append         => $args{append}
-              , format_options => ($args{manual_format} || [])
-              );
-        }
-    }
-
-    #
-    # Create other pages
-    #
-
-    trace "creating other pages";
-    $format->createOtherPages
-     ( source   => $args{other_templates}
-     , process  => $args{process_files}
-     );
-
-    $format;
+    OODoc::Format->new(
+        %args,
+        format      => $format,
+        manifest    => $manifest,
+        workdir     => $dest,
+        project     => $self->distribution,
+        version     => $self->version,
+    );
 }
+
+sub create() { panic 'Interface change in 2.03: use $oodoc->formatter->createPages' }
 
 
 sub stats()
@@ -419,17 +348,16 @@ sub stats()
     my $manuals  = @manuals;
     my $realpkg  = $self->packageNames;
 
-    my $subs     = map {$_->subroutines} @manuals;
-    my @options  = map { map {$_->options} $_->subroutines } @manuals;
-    my $options  = @options;
-    my $examples = map {$_->examples}    @manuals;
-
-    my $diags    = map {$_->diagnostics} @manuals;
-    my $distribution   = $self->distribution;
+    my $subs     = map $_->subroutines, @manuals;
+    my @options  = map { map $_->options, $_->subroutines } @manuals;
+    my $options  = scalar @options;
+    my $examples = map $_->examples,    @manuals;
+    my $diags    = map $_->diagnostics, @manuals;
     my $version  = $self->version;
+    my $project  = $self->project;
 
     <<STATS;
-$distribution version $version
+Project $project contains:
   Number of package manuals: $manuals
   Real number of packages:   $realpkg
   documented subroutines:    $subs
@@ -440,6 +368,5 @@ STATS
 }
 
 #-------------------------------------------
-
 
 1;

@@ -1,3 +1,9 @@
+0.04 2025-08-03T10:26:14+02:00
+ - Move check_array_object() to Mo::utils::Array.
+ - Rename example files to better names.
+ - Update Module::Install to 1.21 version.
+ - Update copyright years.
+
 0.03 2020-12-20T02:28:15+01:00
  - Add documentation for User.
  - Add documentation for YearMonth.

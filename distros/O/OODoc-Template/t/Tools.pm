@@ -1,17 +1,10 @@
-# Copyrights 2003,2007-2021 by [Mark Overmeer].
-#  For other contributors see ChangeLog.
-# See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.02.
 use warnings;
 use strict;
 
 package Tools;
-use vars '$VERSION';
-$VERSION = '0.17';
-
 
 use OODoc::Template;
-use base 'Exporter';
+use parent 'Exporter';
 use Test::More;
 
 our @EXPORT = qw/do_process/;

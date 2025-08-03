@@ -1,4 +1,4 @@
-package LedgerSMB::Installer v0.999.6;
+package LedgerSMB::Installer v0.999.7;
 
 use v5.20;
 use experimental qw(signatures);
@@ -54,8 +54,10 @@ sub _boot($class, $args, $options) {
 sub _build_install_tree($class, $dss, $config, $installpath, $version) {
     my $archive = "ledgersmb-$version.tar.gz";
 
-    $log->info( "Creating installation path $installpath" );
-    make_path( $installpath ); # croaks on fatal errors
+    if (not -d $installpath ) {
+        $log->info( "Creating installation path $installpath" );
+        make_path( $installpath ); # croaks on fatal errors
+    }
 
     $log->info( "Downloading release tarball $archive" );
     $class->_download( $installpath, $version );
@@ -69,7 +71,7 @@ sub _build_install_tree($class, $dss, $config, $installpath, $version) {
                  $installpath,
                  no_same_owner => 1,
                  strip_components => 1 );
-    $config->cpanfile( File::Spec->catfile( $installpath, 'cpanfile' ) );
+    $config->cpanfile_path( File::Spec->catfile( $installpath, 'cpanfile' ) );
 
     $log->info( "Removing extracted release tarball" );
     remove_tree(               # croaks on fatal errors
@@ -81,20 +83,27 @@ sub _build_install_tree($class, $dss, $config, $installpath, $version) {
 sub _get_cpanfile($class, $config) {
     return $config->cpanfile if $config->cpanfile;
 
-    my $url =
-        sprintf("https://raw.githubusercontent.com/ledgersmb/LedgerSMB/refs/tags/%s/cpanfile",
-                $config->effective_version);
+    my $cpanfile;
+    if ($config->cpanfile_path) {
+        $cpanfile = $config->cpanfile_path;
+    }
+    else {
+        my $url =
+            sprintf("https://raw.githubusercontent.com/ledgersmb/LedgerSMB/refs/tags/%s/cpanfile",
+                    $config->effective_version);
 
-    my $response = $http->get( $url );
-    unless ($response->{success}) {
-        die $log->fatal("Unable to get '$url' from GitHub: $response->{content}");
+        my $response = $http->get( $url );
+        unless ($response->{success}) {
+            die $log->fatal("Unable to get '$url' from GitHub: $response->{content}");
+        }
+
+        my ($fh, $fn) = tempfile();
+        print $fh $response->{content};
+        $fh->flush;
+        $cpanfile = $fn;
     }
 
-    my ($fh, $fn) = tempfile();
-    print $fh $response->{content};
-    $fh->flush;
-
-    my $decl = Module::CPANfile->load( $fn );
+    my $decl = Module::CPANfile->load( $cpanfile );
     $config->cpanfile( $decl );
 
     return $decl;
@@ -227,10 +236,10 @@ sub _download($class, $installpath, $version) {
             });
 
         if ($r->{status} == 599) {
-            croak $log->fatal( "Unable to request $url/$fn: " . $r->{content} );
+            croak $log->fatal( "Unable to request $url$fn: " . $r->{content} );
         }
         elsif (not $r->{success}) {
-            croak $log->fatal( "Unable to request $url/$fn: $r->{status} - $r->{reason}" );
+            croak $log->fatal( "Unable to request $url$fn: $r->{status} - $r->{reason}" );
         }
     };
 
@@ -471,9 +480,15 @@ sub install($class, @args) {
         }
     }
 
+    ########################################################################################
+    #
+    #  Need to clean up on failure after this point! We have changed system state!
+    #
+    ########################################################################################
+    $dss->prepare_extraction_env( $config );
+    $class->_build_install_tree( $dss, $config, $config->installpath, $config->effective_version );
     my $prereqs = $class->_get_immediate_prereqs( $config );
     my $requirements = $prereqs->merged_requirements();
-
 
     unless  ($requirements->accepts_module( 'perl', $])) {
         # BAIL: No suitable Perl here...
@@ -484,12 +499,6 @@ sub install($class, @args) {
         die $log->fatal( "Not running a Perl version compliant with LedgerSMB " . $config->effective_version );
     }
 
-
-    ########################################################################################
-    #
-    #  Need to clean up on failure after this point! We're about to change system state!
-    #
-    ########################################################################################
     if ($config->effective_prepare_env) {
         $dss->prepare_builder_env( $config );
     }
@@ -643,7 +652,6 @@ sub install($class, @args) {
     if ($config->effective_prepare_env) {
         $dss->prepare_installer_env( $config );
     }
-    $class->_build_install_tree( $dss, $config, $config->installpath, $config->effective_version );
 
     ###TODO: ideally, we pass the immediate dependencies instead of the installation path;
     # that allows selection of specific features in a later iteration
@@ -659,6 +667,11 @@ sub install($class, @args) {
     $dss->cleanup_env($config);
 
     if ($rv) {
+        if (-e $config->installpath) {
+            $log->warning( "Cleaning up installation path" );
+            remove_tree $config->installpath;
+        }
+
         say "Failed to complete server installation.";
     }
     else {
@@ -697,7 +710,7 @@ sub run($class, $cmd, @args) {
     }
 
     if ($cmd eq 'compute') {
-        say $log->info( "Computing dependencies using installer version $INSTALLER_VERSION" );
+        say $log->info( "Computing dependencies using installer $INSTALLER_VERSION" );
         return $class->compute( @args );
     }
     elsif ($cmd eq 'download') {
@@ -707,7 +720,7 @@ sub run($class, $cmd, @args) {
         return $class->help( @args );
     }
     elsif ($cmd eq 'install') {
-        say $log->info( "Installing LedgerSMB using installer version $INSTALLER_VERSION" );
+        say $log->info( "Installing LedgerSMB using installer $INSTALLER_VERSION" );
         return $class->install( @args );
     }
     elsif ($cmd eq 'system-id') {

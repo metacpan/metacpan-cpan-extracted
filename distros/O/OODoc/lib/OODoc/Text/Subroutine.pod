@@ -16,7 +16,7 @@ OODoc::Text::Subroutine - collects information about one documented sub
 
 Perl has various things we can call "sub" (for "subroutine") one
 way or the other.  This object tries to store all types of them:
-methods, funtion, ties, and overloads. Actually, these are the
+methods, functions, ties, and overloads.  Actually, these are the
 most important parts of the documentation.  The share more than
 they differ.
 
@@ -28,15 +28,19 @@ Extends L<"OVERLOADED" in OODoc::Text|OODoc::Text/"OVERLOADED">.
  
 =over 4
 
-=item overload: B<'""' <$stringification>>
+=item overload: B<'""' (stringification)>
 
 Inherited, see L<OODoc::Text/"OVERLOADED">
 
-=item overload: B<'==' $and '!='>
+=item overload: B<'==' and '!=' (numeric comparison)>
 
-Inherited, see L<OODoc::Text/"OVERLOADED">
+Inherited, see L<OODoc::Object/"OVERLOADED">
 
-=item overload: B<'cmp' <$string $comparison>>
+=item overload: B<'bool'>
+
+Inherited, see L<OODoc::Object/"OVERLOADED">
+
+=item overload: B<'cmp' (string comparison)>
 
 Inherited, see L<OODoc::Text/"OVERLOADED">
 
@@ -52,11 +56,13 @@ Extends L<"Constructors" in OODoc::Text|OODoc::Text/"Constructors">.
  
 =over 4
 
-=item OODoc::Text::Subroutine-E<gt>B<new>(%options)
+=item $class-E<gt>B<new>(%options)
+
+Inherited, see L<OODoc::Object/"Constructors">
 
  -Option     --Defined in     --Default
   container    OODoc::Text      <required>
-  description  OODoc::Text      ''
+  description  OODoc::Text      <empty string>
   linenr       OODoc::Text      <required>
   name         OODoc::Text      undef
   parameters                    undef
@@ -74,19 +80,13 @@ Extends L<"Constructors" in OODoc::Text|OODoc::Text/"Constructors">.
 
 =item parameters => STRING
 
+The STRING which is found as description of the parameters which can be
+passed to the subroutine.  Although free format, there is a convertion
+which you can find in the manual page of the selected parser.
+
 =item type => STRING
 
 =back
-
-=back
-
-=head2 Inheritance knowledge
-
-Extends L<"Inheritance knowledge" in OODoc::Text|OODoc::Text/"Inheritance knowledge">.
- 
-=over 4
-
-=item $obj-E<gt>B<extends>( [$object] )
 
 =back
 
@@ -104,26 +104,15 @@ Inherited, see L<OODoc::Text/"Attributes">
 
 Inherited, see L<OODoc::Text/"Attributes">
 
-=item $obj-E<gt>B<name>()
+=item $obj-E<gt>B<extends>( [$object] )
+
+Subroutine documentation can overrule the documentation on a lower
+level, but only when that overruled subroutine is of the same type.
+Improves base, see L<OODoc::Text/"Attributes">
+
+=item $obj-E<gt>B<linenr>()
 
 Inherited, see L<OODoc::Text/"Attributes">
-
-=item $obj-E<gt>B<parameters>()
-
-The parameter list for the subroutine is returned as string.  The
-result may be C<undef> or empty.
-
-=item $obj-E<gt>B<type>()
-
-Inherited, see L<OODoc::Text/"Attributes">
-
-=back
-
-=head2 Location
-
-Extends L<"Location" in OODoc::Text|OODoc::Text/"Location">.
- 
-=over 4
 
 =item $obj-E<gt>B<location>($manual)
 
@@ -133,21 +122,74 @@ sub-routine's documentation and decides the best enclosing
 chapter, section and subsection.  Then return that object for the
 current manual.
 
-=item $obj-E<gt>B<manual>( [$name] )
+=item $obj-E<gt>B<manual>()
 
-Inherited, see L<OODoc::Text/"Location">
+Inherited, see L<OODoc::Text/"Attributes">
+
+=item $obj-E<gt>B<name>()
+
+Inherited, see L<OODoc::Text/"Attributes">
+
+=item $obj-E<gt>B<parameters>()
+
+The parameter list for the subroutine is returned as string.  The
+result may be C<undef> or empty.
 
 =item $obj-E<gt>B<path>()
 
 Returns the path of the text structure which contains this subroutine.
 
+=item $obj-E<gt>B<type>()
+
+Inherited, see L<OODoc::Text/"Attributes">
+
 =item $obj-E<gt>B<unique>()
 
-Inherited, see L<OODoc::Text/"Location">
+Inherited, see L<OODoc::Object/"Attributes">
 
 =item $obj-E<gt>B<where>()
 
-Inherited, see L<OODoc::Text/"Location">
+Inherited, see L<OODoc::Text/"Attributes">
+
+=back
+
+=head2 Manual Repository
+
+Extends L<"Manual Repository" in OODoc::Text|OODoc::Text/"Manual Repository">.
+ 
+=over 4
+
+=item $obj-E<gt>B<addManual>($manual)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<findManual>($name)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<mainManual>($name)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<manuals>()
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<manualsForPackage>($name)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<packageNames>()
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<publicationIndex>()
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<publish>(\%options)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
 
 =back
 
@@ -197,7 +239,7 @@ Inherited, see L<OODoc::Text/"Collected">
 
 =item $obj-E<gt>B<findOption>($name)
 
-Does a little more thorough job than L<option()|OODoc::Text::Subroutine/"Collected"> bu searching the inherited
+Does a little more thorough job than L<option()|OODoc::Text::Subroutine/"Collected"> by searching the inherited
 options for this subroutine as well.
 
 =item $obj-E<gt>B<openDescription>()
@@ -224,45 +266,13 @@ Extends L<"Commonly used functions" in OODoc::Text|OODoc::Text/"Commonly used fu
  
 =over 4
 
-=item $obj-E<gt>B<filenameToPackage>($filename)
-
-=item OODoc::Text::Subroutine-E<gt>B<filenameToPackage>($filename)
+=item $any-E<gt>B<filenameToPackage>($filename)
 
 Inherited, see L<OODoc::Object/"Commonly used functions">
 
-=item $obj-E<gt>B<mkdirhier>($directory)
-
-=item OODoc::Text::Subroutine-E<gt>B<mkdirhier>($directory)
+=item $any-E<gt>B<mkdirhier>($directory)
 
 Inherited, see L<OODoc::Object/"Commonly used functions">
-
-=back
-
-=head2 Manual Repository
-
-Extends L<"Manual Repository" in OODoc::Text|OODoc::Text/"Manual Repository">.
- 
-=over 4
-
-=item $obj-E<gt>B<addManual>($manual)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<mainManual>($name)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<manuals>()
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<manualsForPackage>($name)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<packageNames>()
-
-Inherited, see L<OODoc::Object/"Manual Repository">
 
 =back
 
@@ -298,14 +308,15 @@ be a part of the chapter).
 
 =head1 SEE ALSO
 
-This module is part of OODoc distribution version 2.02,
-built on December 08, 2021. Website: F<http://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.00,
+built on August 02, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 
-Copyrights 2003-2021 by [Mark Overmeer]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the Artistic license.
-See F<http://dev.perl.org/licenses/artistic.html>
+This software is copyright (c) 2003-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

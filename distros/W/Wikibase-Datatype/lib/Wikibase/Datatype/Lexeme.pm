@@ -5,10 +5,11 @@ use warnings;
 
 use Error::Pure qw(err);
 use Mo qw(build default is);
-use Mo::utils qw(check_array_object check_number);
+use Mo::utils qw(check_number);
+use Mo::utils::Array qw(check_array_object);
 use Wikibase::Datatype::Utils qw(check_entity);
 
-our $VERSION = 0.37;
+our $VERSION = 0.38;
 
 has forms => (
 	default => [],
@@ -67,12 +68,10 @@ sub BUILD {
 	my $self = shift;
 
 	# Check forms.
-	check_array_object($self, 'forms', 'Wikibase::Datatype::Form',
-		'Form');
+	check_array_object($self, 'forms', 'Wikibase::Datatype::Form');
 
 	# Check lemmas.
-	check_array_object($self, 'lemmas', 'Wikibase::Datatype::Value::Monolingual',
-		'Lemma');
+	check_array_object($self, 'lemmas', 'Wikibase::Datatype::Value::Monolingual');
 
 	# Check lexical category.
 	check_entity($self, 'lexical_category');
@@ -84,12 +83,10 @@ sub BUILD {
 	check_number($self, 'page_id');
 
 	# Check senses.
-	check_array_object($self, 'senses', 'Wikibase::Datatype::Sense',
-		'Sense');
+	check_array_object($self, 'senses', 'Wikibase::Datatype::Sense');
 
 	# Check statements.
-	check_array_object($self, 'statements', 'Wikibase::Datatype::Statement',
-		'Statement');
+	check_array_object($self, 'statements', 'Wikibase::Datatype::Statement');
 
 	return;
 }
@@ -305,18 +302,35 @@ Returns string.
 =head1 ERRORS
 
  new():
-         From Mo::utils::check_array_object():
-                 Form isn't 'Wikibase::Datatype::Form' object.
-                 Lemma isn't 'Wikibase::Datatype::Value::Monolingual' object.
-                 Parameter 'forms' must be a array.
-                 Parameter 'lemmas' must be a array.
-                 Parameter 'senses' must be a array.
-                 Parameter 'statements' must be a array.
-                 Sense isn't 'Wikibase::Datatype::Sense' object.
-                 Statement isn't 'Wikibase::Datatype::Statement' object.
          From Wikibase::Datatype::Utils::check_entity():
                  Parameter 'language' must begin with 'Q' and number after it.";
                  Parameter 'lexical_category' must begin with 'Q' and number after it.";
+
+         From Mo::utils::Array::check_array_object():
+                 Parameter 'forms' must be a array.
+                         Value: %s
+                         Reference: %s
+                 Parameter 'forms' with array must contain 'Wikibase::Datatype::Form' objects.
+                         Value: %s
+                         Reference: %s
+                 Parameter 'lemmas' must be a array.
+                         Value: %s
+                         Reference: %s
+                 Parameter 'lemmas' with array must contain 'Wikibase::Datatype::Value::Monolingual' objects.
+                         Value: %s
+                         Reference: %s
+                 Parameter 'senses' must be a array.
+                         Value: %s
+                         Reference: %s
+                 Parameter 'senses' with array must contain 'Wikibase::Datatype::Sense' objects.
+                         Value: %s
+                         Reference: %s
+                 Parameter 'statements' must be a array.
+                         Value: %s
+                         Reference: %s
+                 Parameter 'statements' with array must contain 'Wikibase::Datatype::Statement' objects.
+                         Value: %s
+                         Reference: %s
 
 =head1 EXAMPLE
 
@@ -495,6 +509,7 @@ Returns string.
 L<Error::Pure>,
 L<Mo>,
 L<Mo::utils>,
+L<Mo::utils::Array>,
 L<Wikibase::Datatype::Utils>.
 
 =head1 SEE ALSO
@@ -525,6 +540,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.37
+0.38
 
 =cut

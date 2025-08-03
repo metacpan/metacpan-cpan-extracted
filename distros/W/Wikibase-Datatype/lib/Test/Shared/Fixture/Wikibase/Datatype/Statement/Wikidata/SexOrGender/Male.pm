@@ -8,7 +8,7 @@ use Test::Shared::Fixture::Wikibase::Datatype::Reference::Wikidata::ReferenceURL
 use Test::Shared::Fixture::Wikibase::Datatype::Reference::Wikidata::VIAF;
 use Test::Shared::Fixture::Wikibase::Datatype::Snak::Wikidata::SexOrGender::Male;
 
-our $VERSION = 0.37;
+our $VERSION = 0.38;
 
 sub new {
 	my $class = shift;
@@ -165,6 +165,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.37
+0.38
 
 =cut

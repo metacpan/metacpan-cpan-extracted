@@ -1,0 +1,251 @@
+=encoding utf8
+
+=head1 NAME
+
+OODoc::Export::JSON - Dump the parsed docs into JSON
+
+=head1 INHERITANCE
+
+ OODoc::Export::JSON
+   is an OODoc::Export
+   is an OODoc::Object
+
+=head1 SYNOPSIS
+
+  my $doc = OODoc->new(...);
+  $doc->export('json');
+
+  my $exporter = OODoc::Export::JSON->new;
+
+=head1 DESCRIPTION
+
+Create a JSON dump or the parsed documentation, useful to work with dynamically
+generated web-pages.
+
+Extends L<"DESCRIPTION" in OODoc::Export|OODoc::Export/"DESCRIPTION">.
+ 
+=head1 OVERLOADED
+
+Extends L<"OVERLOADED" in OODoc::Export|OODoc::Export/"OVERLOADED">.
+ 
+=over 4
+
+=item overload: B<'==' and '!=' (numeric comparison)>
+
+Inherited, see L<OODoc::Object/"OVERLOADED">
+
+=item overload: B<'bool'>
+
+Inherited, see L<OODoc::Object/"OVERLOADED">
+
+=back
+
+=head1 METHODS
+
+Extends L<"METHODS" in OODoc::Export|OODoc::Export/"METHODS">.
+ 
+=head2 Constructors
+
+Extends L<"Constructors" in OODoc::Export|OODoc::Export/"Constructors">.
+ 
+=over 4
+
+=item $class-E<gt>B<new>(%options)
+
+Inherited, see L<OODoc::Object/"Constructors">
+
+ -Option    --Defined in     --Default
+  markup      OODoc::Export    <required>
+  serializer  OODoc::Export    'json'
+
+=over 2
+
+=item markup => $markup
+
+=item serializer => $name
+
+=back
+
+=back
+
+=head2 Attributes
+
+Extends L<"Attributes" in OODoc::Export|OODoc::Export/"Attributes">.
+ 
+=over 4
+
+=item $obj-E<gt>B<unique>()
+
+Inherited, see L<OODoc::Object/"Attributes">
+
+=back
+
+=head2 Manual Repository
+
+Extends L<"Manual Repository" in OODoc::Export|OODoc::Export/"Manual Repository">.
+ 
+=over 4
+
+=item $obj-E<gt>B<addManual>($manual)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<findManual>($name)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<mainManual>($name)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<manuals>()
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<manualsForPackage>($name)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<packageNames>()
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<publicationIndex>()
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<publish>(\%options)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=back
+
+=head2 Commonly used functions
+
+Extends L<"Commonly used functions" in OODoc::Export|OODoc::Export/"Commonly used functions">.
+ 
+=over 4
+
+=item $any-E<gt>B<filenameToPackage>($filename)
+
+Inherited, see L<OODoc::Object/"Commonly used functions">
+
+=item $any-E<gt>B<mkdirhier>($directory)
+
+Inherited, see L<OODoc::Object/"Commonly used functions">
+
+=back
+
+=head2 Atributes
+
+Extends L<"Atributes" in OODoc::Export|OODoc::Export/"Atributes">.
+ 
+=over 4
+
+=item $obj-E<gt>B<format>()
+
+Inherited, see L<OODoc::Export/"Atributes">
+
+=item $obj-E<gt>B<markupStyle>()
+
+Inherited, see L<OODoc::Export/"Atributes">
+
+=item $obj-E<gt>B<parser>()
+
+Inherited, see L<OODoc::Export/"Atributes">
+
+=item $obj-E<gt>B<serializer>()
+
+Inherited, see L<OODoc::Export/"Atributes">
+
+=back
+
+=head2 Output
+
+Extends L<"Output" in OODoc::Export|OODoc::Export/"Output">.
+ 
+=over 4
+
+=item $obj-E<gt>B<boolean>(BOOL)
+
+Inherited, see L<OODoc::Export/"Output">
+
+=item $obj-E<gt>B<markup>(STRING)
+
+Inherited, see L<OODoc::Export/"Output">
+
+=item $obj-E<gt>B<markupBlock>($text, %args)
+
+Inherited, see L<OODoc::Export/"Output">
+
+=item $obj-E<gt>B<markupString>($string, %args)
+
+Inherited, see L<OODoc::Export/"Output">
+
+=item $obj-E<gt>B<podChapters>($pod)
+
+Inherited, see L<OODoc::Export/"Output">
+
+=item $obj-E<gt>B<processingManual>($manual|undef)
+
+Inherited, see L<OODoc::Export/"Output">
+
+=item $obj-E<gt>B<tree>($doc, %options)
+
+Inherited, see L<OODoc::Export/"Output">
+
+=item $obj-E<gt>B<write>($filename|$filehandle, $publish, %options)
+
+Serialize the collected publishable data to the file.
+
+ -Option      --Default
+  pretty_print  false
+
+=over 2
+
+=item pretty_print => BOOLEAN
+
+Produce readible output.
+
+=back
+
+=back
+
+=head1 DETAILS
+
+Extends L<"DETAILS" in OODoc::Export|OODoc::Export/"DETAILS">.
+ 
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Error: Cannot write output to '$file': $!
+
+Z<>
+
+=item Error: Write errors to {file}: $!
+
+Z<>
+
+=item Error: manual definition requires manual object
+
+A call to L<addManual()|OODoc::Object/"Manual Repository"> expects a new manual object (a L<OODoc::Manual|OODoc::Manual>),
+however an incompatible thing was passed.  Usually, intended was a call
+to L<manualsForPackage()|OODoc::Object/"Manual Repository"> or L<mainManual()|OODoc::Object/"Manual Repository">.
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of OODoc version 3.00,
+built on August 02, 2025. Website: F<https://perl.overmeer.net/oodoc/>
+
+=head1 LICENSE
+
+For contributors see file ChangeLog.
+
+This software is copyright (c) 2003-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+

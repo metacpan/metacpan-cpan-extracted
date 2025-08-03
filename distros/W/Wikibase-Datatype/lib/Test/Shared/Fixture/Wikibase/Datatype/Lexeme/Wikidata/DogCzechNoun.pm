@@ -9,7 +9,7 @@ use Test::Shared::Fixture::Wikibase::Datatype::Sense::Wikidata::Dog;
 use Test::Shared::Fixture::Wikibase::Datatype::Statement::Wikidata::GrammaticalGender::Masculine;
 use Wikibase::Datatype::Value::Monolingual;
 
-our $VERSION = 0.37;
+our $VERSION = 0.38;
 
 sub new {
 	my $class = shift;
@@ -266,6 +266,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.37
+0.38
 
 =cut

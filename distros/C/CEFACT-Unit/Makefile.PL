@@ -24,7 +24,7 @@ requires 'Data::CEFACT::Unit' => 0;
 requires 'File::Share' => 0;
 requires 'IO::File' => 0;
 requires 'List::Util' => 1.33;
-requires 'Mo::utils' => 0.21;
+requires 'Mo::utils::Array' => 0;
 requires 'Text::CSV_XS' => 0;
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/CEFACT-Unit/issues';
 resources 'homepage' => 'https://github.com/michal-josef-spacek/CEFACT-Unit';
@@ -34,7 +34,7 @@ test_requires 'Error::Pure::Utils' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.01';
+version '0.02';
 
 # Run.
 WriteAll();

@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 use Mo qw(build default is);
-use Mo::utils qw(check_array_object);
+use Mo::utils::Array qw(check_array_object);
 
-our $VERSION = 0.37;
+our $VERSION = 0.38;
 
 has grammatical_features => (
 	default => [],
@@ -31,16 +31,13 @@ sub BUILD {
 	my $self = shift;
 
 	# Check grammatical features.
-	check_array_object($self, 'grammatical_features',
-		'Wikibase::Datatype::Value::Item', 'Grammatical feature');
+	check_array_object($self, 'grammatical_features', 'Wikibase::Datatype::Value::Item');
 
 	# Check representations.
-	check_array_object($self, 'representations',
-		'Wikibase::Datatype::Value::Monolingual', 'Representation');
+	check_array_object($self, 'representations', 'Wikibase::Datatype::Value::Monolingual');
 
 	# Check statements.
-	check_array_object($self, 'statements', 'Wikibase::Datatype::Statement',
-		'Statement');
+	check_array_object($self, 'statements', 'Wikibase::Datatype::Statement');
 
 	return;
 }
@@ -139,13 +136,25 @@ Returns reference to array of Wikibase::Datatype::Statement items.
 =head1 ERRORS
 
  new():
-         From Mo::utils::check_array_object():
-                 Grammatical feature isn't 'Wikibase::Datatype::Value::Item' object.
+         From Mo::utils::Array::check_array_object():
                  Parameter 'grammatical_features' must be a array.
+                         Value: %s
+                         Reference: %s
+                 Parameter 'grammatical_features' with array must contain 'Wikibase::Datatype::Value::Item' objects.
+                         Value: %s
+                         Reference: %s
                  Parameter 'representations' must be a array.
+                         Value: %s
+                         Reference: %s
+                 Parameter 'representations' with array must contain 'Wikibase::Datatype::Value::Monolingual' objects.
+                         Value: %s
+                         Reference: %s
                  Parameter 'statements' must be a array.
-                 Representation isn't 'Wikibase::Datatype::Value::Monolingual' object.
-                 Statement isn't 'Wikibase::Datatype::Statement' object.
+                         Value: %s
+                         Reference: %s
+                 Parameter 'statements' with array must contain 'Wikibase::Datatype::Statement' objects.
+                         Value: %s
+                         Reference: %s
 
 =head1 EXAMPLE
 
@@ -217,7 +226,7 @@ Returns reference to array of Wikibase::Datatype::Statement items.
 =head1 DEPENDENCIES
 
 L<Mo>,
-L<Mo::utils>.
+L<Mo::utils::Array>.
 
 =head1 SEE ALSO
 
@@ -247,6 +256,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.37
+0.38
 
 =cut

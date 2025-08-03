@@ -4,9 +4,10 @@ use strict;
 use warnings;
 
 use Mo qw(build default is);
-use Mo::utils 0.21 qw(check_array_object check_isa check_required);
+use Mo::utils 0.21 qw(check_isa check_required);
+use Mo::utils::Array qw(check_array_object);
 
-our $VERSION = 0.13;
+our $VERSION = 0.14;
 
 has author => (
 	is => 'ro',
@@ -32,7 +33,7 @@ sub BUILD {
 	check_isa($self, 'author', 'MARC::Convert::Wikidata::Object::People');
 
 	# Check external_ids.
-	check_array_object($self, 'external_ids', 'MARC::Convert::Wikidata::Object::ExternalId', 'External id');
+	check_array_object($self, 'external_ids', 'MARC::Convert::Wikidata::Object::ExternalId');
 
 	# Check title.
 	check_required($self, 'title');
@@ -141,17 +142,19 @@ Returns string.
 =head1 ERRORS
 
  new():
-         From Mo::utils::check_array_object():
-                 External id isn't 'MARC::Convert::Wikidata::Object::ExternalId' object.
-                         Value: %s
-                         Reference: %s
+         From Mo::utils::Array::check_array_object():
                  Parameter 'external_ids' must be a array.
                          Value: %s
                          Reference: %s
+                 Parameter 'external_ids' with array must contain 'MARC::Convert::Wikidata::Object::ExternalId' objects.
+                         Value: %s
+                         Reference: %s
+
          From Mo::utils::Date::check_isa():
                  Parameter 'author' must be a 'MARC::Convert::Wikidata::Object::People' object.
                          Value: %s
                          Reference: %s
+
          From Mo::utils::Date::check_required():
                          Parameter 'title' is required.
                  
@@ -189,10 +192,12 @@ Returns string.
  # Output:
  # MARC::Convert::Wikidata::Object::Work  {
  #     parents: Mo::Object
- #     public methods (3):
+ #     public methods (4):
  #         BUILD
  #         Mo::utils:
- #             check_array_object, check_isa
+ #             check_isa, check_required
+ #         Mo::utils::Array:
+ #             check_array_object
  #     private methods (0)
  #     internals: {
  #         author           MARC::Convert::Wikidata::Object::People,
@@ -207,7 +212,8 @@ Returns string.
 =head1 DEPENDENCIES
 
 L<Mo>,
-L<Mo::utils>.
+L<Mo::utils>,
+L<Mo::utils::Array>.
 
 =head1 SEE ALSO
 
@@ -237,6 +243,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.13
+0.14
 
 =cut

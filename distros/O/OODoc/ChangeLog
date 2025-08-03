@@ -2,6 +2,42 @@
 All changes where made by Mark Overmeer <perl@overmeer.net>, unless
 explicitly stated otherwise.
 
+TODO:
+	- add other Log::Report levels to diagnostics
+	- export inheritance as structure
+	- auto-markup sub parameters in text/oorestyle
+
+version 3.00: Sat  2 Aug 14:59:32 CEST 2025
+
+	Changes:
+	- $oodoc->create()  -->  $oodoc->formatter->createPages
+	- parameters to oodist and in the Makefile.PL via META
+	- $doc->manual($name) --> $doc->findManual($name)
+	- default licenses in PM and POD-tail via Software::License
+	- hide ::Pod*::formatManual()
+	- some changes to jump.cgi for html
+
+	Fixes:
+	- wrong place for section examples.
+	- warning on finding a second method with the same name.
+	- use block to declare $VERSION.  GitHUB pull #1 [Graham Knop]
+	- methods without description will be followed with a blank
+	  line anyway in the manual page.
+	- pod, pod2 and html formatters lost subsubsections.
+
+	Improvements:
+	- replace File::Slurp by File::Slurper.
+	- export documentation tree to JSON
+	- ::Parser::Markov errors and warnings use Log::Report
+	- replace glob() by bsd_glob()
+	- add .gitignore
+	- "use base" -> "use parent"
+	- extends() only works on OODoc::Text objects
+	- remove copyright lines from source, added at publish
+	- add DOCTYPE to html templates
+	- remove out-dated examples
+	- all objects have the unique attribute
+
 version 2.02: Wed  8 Dec 13:41:32 CET 2021
 
 	Fixes:

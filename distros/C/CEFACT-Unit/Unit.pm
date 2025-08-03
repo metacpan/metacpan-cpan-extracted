@@ -8,10 +8,10 @@ use Data::CEFACT::Unit;
 use File::Share ':all';
 use IO::File;
 use List::Util 1.33 qw(any);
-use Mo::utils 0.21 qw(check_array_object);
+use Mo::utils::Array qw(check_array_object);
 use Text::CSV_XS;
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 sub new {
 	my ($class, @params) = @_;
@@ -26,7 +26,7 @@ sub new {
 	set_params($self, @params);
 
 	# Init all units.
-	check_array_object($self, 'units', 'Data::CEFACT::Unit', 'UN/CEFACT unit');
+	check_array_object($self, 'units', 'Data::CEFACT::Unit');
 	if (! @{$self->{'units'}}) {
 		$self->_init;
 	}
@@ -142,11 +142,12 @@ Returns bool (0/1).
  new():
          From Class::Utils::set_params():
                  Unknown parameter '%s'.
-         From Mo::utils::check_array_object():
+
+         From Mo::utils::Array::check_array_object():
                  Parameter 'units' must be a array.
                          Value: %s
                          Reference: %s
-                 UN/CEFACT isn't 'Data::CEFACT::Unit' object.
+                 Parameter 'units' with array must contain 'Data::CEFACT::Unit' objects.
                          Value: %s
                          Reference: %s
 
@@ -187,6 +188,7 @@ L<Data::CEFACT::Unit>,
 L<File::Share>,
 L<IO::File>,
 L<List::Util>,
+L<Mo::utils::Array>,
 L<Text::CSV_XS>.
 
 =head1 REPOSITORY
@@ -207,6 +209,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.02
 
 =cut

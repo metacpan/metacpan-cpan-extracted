@@ -48,8 +48,8 @@ eval {
 		'descriptions' => ['foo'],
 	);
 };
-is($EVAL_ERROR, "Description isn't 'Wikibase::Datatype::Value::Monolingual' object.\n",
-	"Description isn't 'Wikibase::Datatype::Value::Monolingual' object.");
+is($EVAL_ERROR, "Parameter 'descriptions' with array must contain 'Wikibase::Datatype::Value::Monolingual' objects.\n",
+	"Parameter 'descriptions' with array must contain 'Wikibase::Datatype::Value::Monolingual' objects (foo).");
 clean();
 
 # Test.
@@ -77,8 +77,8 @@ eval {
 		'labels' => ['foo'],
 	);
 };
-is($EVAL_ERROR, "Label isn't 'Wikibase::Datatype::Value::Monolingual' object.\n",
-	"Label isn't 'Wikibase::Datatype::Value::Monolingual' object.");
+is($EVAL_ERROR, "Parameter 'labels' with array must contain 'Wikibase::Datatype::Value::Monolingual' objects.\n",
+	"Parameter 'labels' with array must contain 'Wikibase::Datatype::Value::Monolingual' objects (foo).");
 clean();
 
 # Test.
@@ -98,6 +98,6 @@ eval {
 		'statements' => ['foo'],
 	);
 };
-is($EVAL_ERROR, "MediainfoStatement isn't 'Wikibase::Datatype::MediainfoStatement' object.\n",
-	"MediainfoStatement isn't 'Wikibase::Datatype::MediainfoStatement' object.");
+is($EVAL_ERROR, "Parameter 'statements' with array must contain 'Wikibase::Datatype::MediainfoStatement' objects.\n",
+	"Parameter 'statements' with array must contain 'Wikibase::Datatype::MediainfoStatement' objects (foo).");
 clean();

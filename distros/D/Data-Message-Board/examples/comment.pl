@@ -3,8 +3,8 @@
 use strict;
 use warnings;
 
-use Data::Person;
 use Data::Message::Board::Comment;
+use Data::Person;
 use DateTime;
 use Unicode::UTF8 qw(decode_utf8 encode_utf8);
 

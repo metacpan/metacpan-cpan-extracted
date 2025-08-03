@@ -29,10 +29,12 @@ p $obj;
 # Output:
 # MARC::Convert::Wikidata::Object::Work  {
 #     parents: Mo::Object
-#     public methods (3):
+#     public methods (4):
 #         BUILD
 #         Mo::utils:
-#             check_array_object, check_isa
+#             check_isa, check_required
+#         Mo::utils::Array:
+#             check_array_object
 #     private methods (0)
 #     internals: {
 #         author           MARC::Convert::Wikidata::Object::People,

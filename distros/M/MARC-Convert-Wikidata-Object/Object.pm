@@ -4,14 +4,15 @@ use strict;
 use warnings;
 
 use Error::Pure qw(err);
-use List::MoreUtils qw(none);
+use List::Util 1.33 qw(none);
 use Mo qw(build default is);
-use Mo::utils 0.26 qw(check_array check_array_object check_isa check_number);
+use Mo::utils 0.26 qw(check_isa check_number);
+use Mo::utils::Array qw(check_array check_array_object);
 use Readonly;
 
 Readonly::Array our @COVERS => qw(hardback paperback);
 
-our $VERSION = 0.13;
+our $VERSION = 0.14;
 
 has authors => (
 	default => [],
@@ -163,20 +164,16 @@ sub BUILD {
 	my $self = shift;
 
 	# Check authors.
-	check_array_object($self, 'authors',
-		'MARC::Convert::Wikidata::Object::People', 'Author');
+	check_array_object($self, 'authors', 'MARC::Convert::Wikidata::Object::People');
 
 	# Check authors of introduction.
-	check_array_object($self, 'authors_of_afterword',
-		'MARC::Convert::Wikidata::Object::People', 'Author of afterword');
+	check_array_object($self, 'authors_of_afterword', 'MARC::Convert::Wikidata::Object::People');
 
 	# Check authors of introduction.
-	check_array_object($self, 'authors_of_introduction',
-		'MARC::Convert::Wikidata::Object::People', 'Author of introduction');
+	check_array_object($self, 'authors_of_introduction', 'MARC::Convert::Wikidata::Object::People');
 
 	# Check compilers.
-	check_array_object($self, 'compilers',
-		'MARC::Convert::Wikidata::Object::People', 'Compiler');
+	check_array_object($self, 'compilers', 'MARC::Convert::Wikidata::Object::People');
 
 	# Check cover.
 	if (defined $self->{'cover'} && none { $_ eq $self->{'cover'} } @COVERS) {
@@ -192,12 +189,10 @@ sub BUILD {
 	}
 
 	# Check cycles.
-	check_array_object($self, 'cycles',
-		'MARC::Convert::Wikidata::Object::Series', 'Book cycles');
+	check_array_object($self, 'cycles', 'MARC::Convert::Wikidata::Object::Series');
 
 	# Check directors.
-	check_array_object($self, 'directors',
-		'MARC::Convert::Wikidata::Object::People', 'Director');
+	check_array_object($self, 'directors', 'MARC::Convert::Wikidata::Object::People');
 
 	# Check dml id
 	check_number($self, 'dml');
@@ -206,45 +201,37 @@ sub BUILD {
 	check_isa($self, 'edition_of_work', 'MARC::Convert::Wikidata::Object::Work');
 
 	# Check editors.
-	check_array_object($self, 'editors',
-		'MARC::Convert::Wikidata::Object::People', 'Editor');
+	check_array_object($self, 'editors', 'MARC::Convert::Wikidata::Object::People');
 
 	# Check end_time.
 	check_number($self, 'end_time');
 
 	# Check external_ids.
-	check_array_object($self, 'external_ids', 'MARC::Convert::Wikidata::Object::ExternalId', 'External id');
+	check_array_object($self, 'external_ids', 'MARC::Convert::Wikidata::Object::ExternalId');
 
 	# Check illustrators.
-	check_array_object($self, 'illustrators',
-		'MARC::Convert::Wikidata::Object::People', 'Illustrator');
+	check_array_object($self, 'illustrators', 'MARC::Convert::Wikidata::Object::People');
 
 	# Check isbns.
-	check_array_object($self, 'isbns',
-		'MARC::Convert::Wikidata::Object::ISBN', 'ISBN');
+	check_array_object($self, 'isbns', 'MARC::Convert::Wikidata::Object::ISBN');
 
 	# Check languages.
 	check_array($self, 'languages');
 
 	# Check Kramerius systems.
-	check_array_object($self, 'krameriuses',
-		'MARC::Convert::Wikidata::Object::Kramerius', 'Kramerius');
+	check_array_object($self, 'krameriuses', 'MARC::Convert::Wikidata::Object::Kramerius');
 
 	# Check narrators.
-	check_array_object($self, 'narrators',
-		'MARC::Convert::Wikidata::Object::People', 'Narrator');
+	check_array_object($self, 'narrators', 'MARC::Convert::Wikidata::Object::People');
 
 	# Check photographers.
-	check_array_object($self, 'photographers',
-		'MARC::Convert::Wikidata::Object::People', 'Photographers');
+	check_array_object($self, 'photographers', 'MARC::Convert::Wikidata::Object::People');
 
 	# Check list of publishers.
-	check_array_object($self, 'publishers',
-		'MARC::Convert::Wikidata::Object::Publisher', 'Publisher');
+	check_array_object($self, 'publishers', 'MARC::Convert::Wikidata::Object::Publisher');
 
 	# Check series.
-	check_array_object($self, 'series',
-		'MARC::Convert::Wikidata::Object::Series', 'Book series');
+	check_array_object($self, 'series', 'MARC::Convert::Wikidata::Object::Series');
 
 	# Check start_time.
 	check_number($self, 'start_time');
@@ -757,44 +744,53 @@ Returns reference to array of MARC::Convert::Wikidata::Object::People instances.
 =head1 ERRORS
 
  new():
-         From Mo::utils::check_array_object():
-                 Author isn't 'MARC::Convert::Wikidata::Object::People' object.
-                 Author of afterword isn't 'MARC::Convert::Wikidata::Object::People' object.
-                 Author of introduction isn't 'MARC::Convert::Wikidata::Object::People' object.
-                 Book series isn't 'MARC::Convert::Wikidata::Object::Series' object.
-                 Book cover '%s' doesn't exist.
-                 Book cycle isn't 'MARC::Convert::Wikidata::Object::Series' object.
-                 Compiler isn't 'MARC::Convert::Wikidata::Object::People' object.
-                 Director isn't 'MARC::Convert::Wikidata::Object::People' object.
-                 Editor isn't 'MARC::Convert::Wikidata::Object::People' object.
-                 External id isn't 'MARC::Convert::Wikidata::Object::ExternalId' object.
-                 Illustrator isn't 'MARC::Convert::Wikidata::Object::People' object.
-                 Narrator isn't 'MARC::Convert::Wikidata::Object::People' object.
-                 Parameter 'authors' must be a array.
-                 Parameter 'authors_of_afterword' must be a array.
-                 Parameter 'authors_of_introduction' must be a array.
-                 Parameter 'compilers' must be a array.
-                 Parameter 'cycles' must be a array.
-                 Parameter 'directors' must be a array.
-                 Parameter 'editors' must be a array.
-                 Parameter 'end_time' must be a number.
-                 Parameter 'external_ids' must be a array.
-                 Parameter 'illustrators' must be a array.
-                 Parameter 'languages' must be a array.
-                 Parameter 'narrators' must be a array.
-                 Parameter 'publishers' must be a array.
-                 Parameter 'series' must be a array.
-                 Parameter 'start_time' must be a number.
-                 Parameter 'translators' must be a array.
-                 Publisher isn't 'MARC::Convert::Wikidata::Object::Publisher' object.
-                 Translator isn't 'MARC::Convert::Wikidata::Object::People' object.
+         Book cover '%s' doesn't exist.
+         Parameter 'end_time' must be a number.
+         Parameter 'start_time' must be a number.
          From Mo::utils::check_isa():
                  Parameter 'edition_of_work' must be a 'MARC::Convert::Wikidata::Object::Work' object.
                          Value: %s
                          Reference: %s
+
          From Mo::utils::check_number():
                  Parameter '%s' must a number.
                          Value: %s
+
+         From Mo::utils::Array::check_array():
+                 Parameter 'languages' must be a array.
+                         Value: %s
+                         Reference: %s
+                 Parameter 'subtitles' must be a array.
+                         Value: %s
+                         Reference: %s
+
+         From Mo::utils::Array::check_array_object():
+                 Parameter 'authors' must be a array.
+                 Parameter 'authors' with array must contain 'MARC::Convert::Wikidata::Object::People' objects.
+                 Parameter 'authors_of_afterword' must be a array.
+                 Parameter 'authors_of_afterword' with array must contain 'MARC::Convert::Wikidata::Object::People' objects.
+                 Parameter 'authors_of_introduction' must be a array.
+                 Parameter 'authors_of_introduction' with array must contain 'MARC::Convert::Wikidata::Object::People' objects.
+                 Parameter 'compilers' must be a array.
+                 Parameter 'compilers' with array must contain 'MARC::Convert::Wikidata::Object::People' objects.
+                 Parameter 'cycles' must be a array.
+                 Parameter 'cycles' with array must contain 'MARC::Convert::Wikidata::Object::Series' objects.
+                 Parameter 'directors' must be a array.
+                 Parameter 'directors' with array must contain 'MARC::Convert::Wikidata::Object::People' objects.
+                 Parameter 'editors' must be a array.
+                 Parameter 'editors' with array must contain 'MARC::Convert::Wikidata::Object::People' objects.
+                 Parameter 'external_ids' must be a array.
+                 Parameter 'external_ids' with array must contain 'MARC::Convert::Wikidata::Object::ExternalId' objects.
+                 Parameter 'illustrators' must be a array.
+                 Parameter 'illustrators' with array must contain 'MARC::Convert::Wikidata::Object::People' objects.
+                 Parameter 'narrators' must be a array.
+                 Parameter 'narrators' with array must contain 'MARC::Convert::Wikidata::Object::People' objects.
+                 Parameter 'publishers' must be a array.
+                 Parameter 'publishers' with array must contain 'MARC::Convert::Wikidata::Object::Publisher' objects.
+                 Parameter 'series' must be a array.
+                 Parameter 'series' with array must contain 'MARC::Convert::Wikidata::Object::Series' objects.
+                 Parameter 'translators' must be a array.
+                 Parameter 'translators' with array must contain 'MARC::Convert::Wikidata::Object::People' objects.
 
 =head1 EXAMPLE1
 
@@ -863,14 +859,16 @@ Returns reference to array of MARC::Convert::Wikidata::Object::People instances.
  # Output:
  # MARC::Convert::Wikidata::Object  {
  #     parents: Mo::Object
- #     public methods (8):
+ #     public methods (9):
  #         BUILD, full_name
  #         Error::Pure:
  #             err
- #         List::MoreUtils::XS:
+ #         List::Util:
  #             none
  #         Mo::utils:
- #             check_array, check_array_object, check_number
+ #             check_isa, check_number
+ #         Mo::utils::Array:
+ #             check_array, check_array_object
  #         Readonly:
  #             Readonly
  #     private methods (0)
@@ -900,9 +898,10 @@ Returns reference to array of MARC::Convert::Wikidata::Object::People instances.
 =head1 DEPENDENCIES
 
 L<Error::Pure>,
-L<List::MoreUtils>,
+L<List::Util>,
 L<Mo>,
 L<Mo::utils>,
+L<Mo::utils::Array>,
 L<Readonly>.
 
 =head1 SEE ALSO
@@ -933,6 +932,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.13
+0.14
 
 =cut

@@ -8,7 +8,7 @@ use Data::Message::Board::Comment;
 use Data::Person;
 use DateTime;
 
-our $VERSION = 0.01;
+our $VERSION = 0.06;
 
 sub new {
 	my $class = shift;
@@ -199,12 +199,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2024 Michal Josef Špaček
+© 2024-2025 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.06
 
 =cut

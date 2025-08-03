@@ -44,9 +44,11 @@ t/Data-InfoBox/04-items.t
 t/Test-Shared-Fixture-Data-InfoBox-Address/01-use.t
 t/Test-Shared-Fixture-Data-InfoBox-Address/02-version.t
 t/Test-Shared-Fixture-Data-InfoBox-Address/03-new.t
+t/Test-Shared-Fixture-Data-InfoBox-Address/04-items.t
 t/Test-Shared-Fixture-Data-InfoBox-Company/01-use.t
 t/Test-Shared-Fixture-Data-InfoBox-Company/02-version.t
 t/Test-Shared-Fixture-Data-InfoBox-Company/03-new.t
+t/Test-Shared-Fixture-Data-InfoBox-Company/04-items.t
 t/Test-Shared-Fixture-Data-InfoBox-Items/01-use.t
 t/Test-Shared-Fixture-Data-InfoBox-Items/02-version.t
 t/Test-Shared-Fixture-Data-InfoBox-Items/03-new.t
@@ -54,6 +56,7 @@ t/Test-Shared-Fixture-Data-InfoBox-Items/04-items.t
 t/Test-Shared-Fixture-Data-InfoBox-Person/01-use.t
 t/Test-Shared-Fixture-Data-InfoBox-Person/02-version.t
 t/Test-Shared-Fixture-Data-InfoBox-Person/03-new.t
+t/Test-Shared-Fixture-Data-InfoBox-Person/04-items.t
 t/Test-Shared-Fixture-Data-InfoBox-Street/01-use.t
 t/Test-Shared-Fixture-Data-InfoBox-Street/02-version.t
 t/Test-Shared-Fixture-Data-InfoBox-Street/03-new.t

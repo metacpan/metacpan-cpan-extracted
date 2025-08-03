@@ -132,8 +132,8 @@ eval {
 		'cadastral_area_name' => ['bad'],
 	);
 };
-is($EVAL_ERROR, "Cadastral area name isn't 'Data::Text::Simple' object.\n",
-	"Cadastral area name isn't 'Data::Text::Simple' object (bad).");
+is($EVAL_ERROR, "Parameter 'cadastral_area_name' with array must contain 'Data::Text::Simple' objects.\n",
+	"Parameter 'cadastral_area_name' with array must contain 'Data::Text::Simple' objects (bad).");
 clean();
 
 # Test.
@@ -143,8 +143,8 @@ eval {
 		'cadastral_area_name' => [$mock],
 	);
 };
-is($EVAL_ERROR, "Cadastral area name isn't 'Data::Text::Simple' object.\n",
-	"Cadastral area name isn't 'Data::Text::Simple' object (object).");
+is($EVAL_ERROR, "Parameter 'cadastral_area_name' with array must contain 'Data::Text::Simple' objects.\n",
+	"Parameter 'cadastral_area_name' with array must contain 'Data::Text::Simple' objects (object).");
 clean();
 
 # Test.
@@ -213,8 +213,8 @@ eval {
 		'momc_name' => ['bad'],
 	);
 };
-is($EVAL_ERROR, "MOMC name isn't 'Data::Text::Simple' object.\n",
-	"MOMC name isn't 'Data::Text::Simple' object (bad).");
+is($EVAL_ERROR, "Parameter 'momc_name' with array must contain 'Data::Text::Simple' objects.\n",
+	"Parameter 'momc_name' with array must contain 'Data::Text::Simple' objects (bad).");
 clean();
 
 # Test.
@@ -224,8 +224,8 @@ eval {
 		'momc_name' => [$mock],
 	);
 };
-is($EVAL_ERROR, "MOMC name isn't 'Data::Text::Simple' object.\n",
-	"MOMC name isn't 'Data::Text::Simple' object (object).");
+is($EVAL_ERROR, "Parameter 'momc_name' with array must contain 'Data::Text::Simple' objects.\n",
+	"Parameter 'momc_name' with array must contain 'Data::Text::Simple' objects (object).");
 clean();
 
 # Test.
@@ -244,8 +244,8 @@ eval {
 		'mop_name' => ['bad'],
 	);
 };
-is($EVAL_ERROR, "MOP name isn't 'Data::Text::Simple' object.\n",
-	"MOP name isn't 'Data::Text::Simple' object (bad).");
+is($EVAL_ERROR, "Parameter 'mop_name' with array must contain 'Data::Text::Simple' objects.\n",
+	"Parameter 'mop_name' with array must contain 'Data::Text::Simple' objects (bad).");
 clean();
 
 # Test.
@@ -255,8 +255,8 @@ eval {
 		'mop_name' => [$mock],
 	);
 };
-is($EVAL_ERROR, "MOP name isn't 'Data::Text::Simple' object.\n",
-	"MOP name isn't 'Data::Text::Simple' object (object).");
+is($EVAL_ERROR, "Parameter 'mop_name' with array must contain 'Data::Text::Simple' objects.\n",
+	"Parameter 'mop_name' with array must contain 'Data::Text::Simple' objects (object).");
 clean();
 
 # Test.
@@ -275,8 +275,8 @@ eval {
 		'municipality_name' => ['bad'],
 	);
 };
-is($EVAL_ERROR, "Municipality name isn't 'Data::Text::Simple' object.\n",
-	"Municipality name isn't 'Data::Text::Simple' object (bad).");
+is($EVAL_ERROR, "Parameter 'municipality_name' with array must contain 'Data::Text::Simple' objects.\n",
+	"Parameter 'municipality_part_name' with array must contain 'Data::Text::Simple' objects (bad).");
 clean();
 
 # Test.
@@ -286,8 +286,8 @@ eval {
 		'municipality_name' => [$mock],
 	);
 };
-is($EVAL_ERROR, "Municipality name isn't 'Data::Text::Simple' object.\n",
-	"Municipality name isn't 'Data::Text::Simple' object (object).");
+is($EVAL_ERROR, "Parameter 'municipality_name' with array must contain 'Data::Text::Simple' objects.\n",
+	"Parameter 'municipality_part_name' with array must contain 'Data::Text::Simple' objects (object).");
 clean();
 
 # Test.
@@ -306,8 +306,8 @@ eval {
 		'municipality_part_name' => ['bad'],
 	);
 };
-is($EVAL_ERROR, "Municipality part name isn't 'Data::Text::Simple' object.\n",
-	"Municipality part name isn't 'Data::Text::Simple' object (bad).");
+is($EVAL_ERROR, "Parameter 'municipality_part_name' with array must contain 'Data::Text::Simple' objects.\n",
+	"Parameter 'municipality_part_name' with array must contain 'Data::Text::Simple' objects (bad).");
 clean();
 
 # Test.
@@ -317,8 +317,8 @@ eval {
 		'municipality_part_name' => [$mock],
 	);
 };
-is($EVAL_ERROR, "Municipality part name isn't 'Data::Text::Simple' object.\n",
-	"Municipality part name isn't 'Data::Text::Simple' object (object).");
+is($EVAL_ERROR, "Parameter 'municipality_part_name' with array must contain 'Data::Text::Simple' objects.\n",
+	"Parameter 'municipality_part_name' with array must contain 'Data::Text::Simple' objects (object).");
 clean();
 
 # Test.
@@ -370,8 +370,8 @@ eval {
 		'street_name' => ['bad'],
 	);
 };
-is($EVAL_ERROR, "Street name isn't 'Data::Text::Simple' object.\n",
-	"Street name isn't 'Data::Text::Simple' object (bad).");
+is($EVAL_ERROR, "Parameter 'street_name' with array must contain 'Data::Text::Simple' objects.\n",
+	"Parameter 'street_name' with array must contain 'Data::Text::Simple' objects (bad).");
 clean();
 
 # Test.
@@ -381,8 +381,8 @@ eval {
 		'street_name' => [$mock],
 	);
 };
-is($EVAL_ERROR, "Street name isn't 'Data::Text::Simple' object.\n",
-	"Street name isn't 'Data::Text::Simple' object (object).");
+is($EVAL_ERROR, "Parameter 'street_name' with array must contain 'Data::Text::Simple' objects.\n",
+	"Parameter 'street_name' with array must contain 'Data::Text::Simple' objects (object).");
 clean();
 
 # Test.
@@ -391,8 +391,8 @@ eval {
 		'text' => ['bad'],
 	);
 };
-is($EVAL_ERROR, "Text isn't 'Data::Text::Simple' object.\n",
-	"Text isn't 'Data::Text::Simple' object (bad).");
+is($EVAL_ERROR, "Parameter 'text' with array must contain 'Data::Text::Simple' objects.\n",
+	"Parameter 'text' with array must contain 'Data::Text::Simple' objects (bad).");
 clean();
 
 # Test.
@@ -402,8 +402,8 @@ eval {
 		'text' => [$mock],
 	);
 };
-is($EVAL_ERROR, "Text isn't 'Data::Text::Simple' object.\n",
-	"Text isn't 'Data::Text::Simple' object (object).");
+is($EVAL_ERROR, "Parameter 'text' with array must contain 'Data::Text::Simple' objects.\n",
+	"Parameter 'text' with array must contain 'Data::Text::Simple' objects (object).");
 clean();
 
 # Test.
@@ -422,8 +422,8 @@ eval {
 		'vusc_name' => ['bad'],
 	);
 };
-is($EVAL_ERROR, "VUSC name isn't 'Data::Text::Simple' object.\n",
-	"VUSC name isn't 'Data::Text::Simple' object (bad).");
+is($EVAL_ERROR, "Parameter 'vusc_name' with array must contain 'Data::Text::Simple' objects.\n",
+	"Parameter 'vusc_name' with array must contain 'Data::Text::Simple' objects (bad).");
 clean();
 
 # Test.
@@ -433,6 +433,6 @@ eval {
 		'vusc_name' => [$mock],
 	);
 };
-is($EVAL_ERROR, "VUSC name isn't 'Data::Text::Simple' object.\n",
-	"VUSC name isn't 'Data::Text::Simple' object (object).");
+is($EVAL_ERROR, "Parameter 'vusc_name' with array must contain 'Data::Text::Simple' objects.\n",
+	"Parameter 'vusc_name' with array must contain 'Data::Text::Simple' objects (object).");
 clean();

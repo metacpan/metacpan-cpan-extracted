@@ -463,44 +463,53 @@ METHODS
 
 ERRORS
      new():
-             From Mo::utils::check_array_object():
-                     Author isn't 'MARC::Convert::Wikidata::Object::People' object.
-                     Author of afterword isn't 'MARC::Convert::Wikidata::Object::People' object.
-                     Author of introduction isn't 'MARC::Convert::Wikidata::Object::People' object.
-                     Book series isn't 'MARC::Convert::Wikidata::Object::Series' object.
-                     Book cover '%s' doesn't exist.
-                     Book cycle isn't 'MARC::Convert::Wikidata::Object::Series' object.
-                     Compiler isn't 'MARC::Convert::Wikidata::Object::People' object.
-                     Director isn't 'MARC::Convert::Wikidata::Object::People' object.
-                     Editor isn't 'MARC::Convert::Wikidata::Object::People' object.
-                     External id isn't 'MARC::Convert::Wikidata::Object::ExternalId' object.
-                     Illustrator isn't 'MARC::Convert::Wikidata::Object::People' object.
-                     Narrator isn't 'MARC::Convert::Wikidata::Object::People' object.
-                     Parameter 'authors' must be a array.
-                     Parameter 'authors_of_afterword' must be a array.
-                     Parameter 'authors_of_introduction' must be a array.
-                     Parameter 'compilers' must be a array.
-                     Parameter 'cycles' must be a array.
-                     Parameter 'directors' must be a array.
-                     Parameter 'editors' must be a array.
-                     Parameter 'end_time' must be a number.
-                     Parameter 'external_ids' must be a array.
-                     Parameter 'illustrators' must be a array.
-                     Parameter 'languages' must be a array.
-                     Parameter 'narrators' must be a array.
-                     Parameter 'publishers' must be a array.
-                     Parameter 'series' must be a array.
-                     Parameter 'start_time' must be a number.
-                     Parameter 'translators' must be a array.
-                     Publisher isn't 'MARC::Convert::Wikidata::Object::Publisher' object.
-                     Translator isn't 'MARC::Convert::Wikidata::Object::People' object.
+             Book cover '%s' doesn't exist.
+             Parameter 'end_time' must be a number.
+             Parameter 'start_time' must be a number.
              From Mo::utils::check_isa():
                      Parameter 'edition_of_work' must be a 'MARC::Convert::Wikidata::Object::Work' object.
                              Value: %s
                              Reference: %s
+
              From Mo::utils::check_number():
                      Parameter '%s' must a number.
                              Value: %s
+
+             From Mo::utils::Array::check_array():
+                     Parameter 'languages' must be a array.
+                             Value: %s
+                             Reference: %s
+                     Parameter 'subtitles' must be a array.
+                             Value: %s
+                             Reference: %s
+
+             From Mo::utils::Array::check_array_object():
+                     Parameter 'authors' must be a array.
+                     Parameter 'authors' with array must contain 'MARC::Convert::Wikidata::Object::People' objects.
+                     Parameter 'authors_of_afterword' must be a array.
+                     Parameter 'authors_of_afterword' with array must contain 'MARC::Convert::Wikidata::Object::People' objects.
+                     Parameter 'authors_of_introduction' must be a array.
+                     Parameter 'authors_of_introduction' with array must contain 'MARC::Convert::Wikidata::Object::People' objects.
+                     Parameter 'compilers' must be a array.
+                     Parameter 'compilers' with array must contain 'MARC::Convert::Wikidata::Object::People' objects.
+                     Parameter 'cycles' must be a array.
+                     Parameter 'cycles' with array must contain 'MARC::Convert::Wikidata::Object::Series' objects.
+                     Parameter 'directors' must be a array.
+                     Parameter 'directors' with array must contain 'MARC::Convert::Wikidata::Object::People' objects.
+                     Parameter 'editors' must be a array.
+                     Parameter 'editors' with array must contain 'MARC::Convert::Wikidata::Object::People' objects.
+                     Parameter 'external_ids' must be a array.
+                     Parameter 'external_ids' with array must contain 'MARC::Convert::Wikidata::Object::ExternalId' objects.
+                     Parameter 'illustrators' must be a array.
+                     Parameter 'illustrators' with array must contain 'MARC::Convert::Wikidata::Object::People' objects.
+                     Parameter 'narrators' must be a array.
+                     Parameter 'narrators' with array must contain 'MARC::Convert::Wikidata::Object::People' objects.
+                     Parameter 'publishers' must be a array.
+                     Parameter 'publishers' with array must contain 'MARC::Convert::Wikidata::Object::Publisher' objects.
+                     Parameter 'series' must be a array.
+                     Parameter 'series' with array must contain 'MARC::Convert::Wikidata::Object::Series' objects.
+                     Parameter 'translators' must be a array.
+                     Parameter 'translators' with array must contain 'MARC::Convert::Wikidata::Object::People' objects.
 
 EXAMPLE1
      use strict;
@@ -566,14 +575,16 @@ EXAMPLE1
      # Output:
      # MARC::Convert::Wikidata::Object  {
      #     parents: Mo::Object
-     #     public methods (8):
+     #     public methods (9):
      #         BUILD, full_name
      #         Error::Pure:
      #             err
-     #         List::MoreUtils::XS:
+     #         List::Util:
      #             none
      #         Mo::utils:
-     #             check_array, check_array_object, check_number
+     #             check_isa, check_number
+     #         Mo::utils::Array:
+     #             check_array, check_array_object
      #         Readonly:
      #             Readonly
      #     private methods (0)
@@ -601,7 +612,7 @@ EXAMPLE1
      # }
 
 DEPENDENCIES
-    Error::Pure, List::MoreUtils, Mo, Mo::utils, Readonly.
+    Error::Pure, List::Util, Mo, Mo::utils, Mo::utils::Array, Readonly.
 
 SEE ALSO
     MARC::Convert::Wikidata
@@ -621,5 +632,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.13
+    0.14
 

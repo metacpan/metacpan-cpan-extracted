@@ -4,10 +4,12 @@ author:
   - 'Mark Overmeer'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Test::More: '0.47'
+  Test::Pod: '1'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,8 +20,33 @@ no_index:
     - t
     - inc
 requires:
-  Log::Report: '0.992'
-  Test::More: '0.47'
-  Test::Pod: '1'
-version: '0.17'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.011'
+  File::Spec::Functions: '0'
+  Log::Report: '1.4'
+  Scalar::Util: '0'
+resources:
+  homepage: http://perl.overmeer.net/oodoc-template/
+  license: https://dev.perl.org/licenses/
+  repository: https://github.com/markov2/perl5-OODoc-Template.git
+version: 0.18
+x_oodist:
+  email: perl@overmeer.net
+  first_year: 2003
+  generate:
+    -
+      format: pod3
+      podtail: ~
+  include:
+    - ../OODoc
+  oodoc_version: 3
+  parser:
+    pmhead: ~
+    skip_links: []
+    syntax: markov
+  raw:
+    publish: ../public_html/oodoc-template/raw
+  release:
+    publish: ../public_html/oodoc-template/source
+  tests: {}
+  use:
+    - ../Log-Report
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -63,14 +63,16 @@ p $obj;
 # Output:
 # MARC::Convert::Wikidata::Object  {
 #     parents: Mo::Object
-#     public methods (8):
+#     public methods (9):
 #         BUILD, full_name
 #         Error::Pure:
 #             err
-#         List::MoreUtils::XS:
+#         List::Util:
 #             none
 #         Mo::utils:
-#             check_array, check_array_object, check_number
+#             check_isa, check_number
+#         Mo::utils::Array:
+#             check_array, check_array_object
 #         Readonly:
 #             Readonly
 #     private methods (0)

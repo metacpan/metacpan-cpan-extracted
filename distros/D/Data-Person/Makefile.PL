@@ -20,6 +20,7 @@ readme_from 'Person.pm';
 recursive_author_tests('xt');
 requires 'Mo' => 0;
 requires 'Mo::utils' => 0.21;
+requires 'Mo::utils::Array' => 0;
 requires 'Mo::utils::Email' => 0;
 requires 'Mo::utils::Number' => 0;
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Data-Person/issues';
@@ -32,7 +33,7 @@ test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 test_requires 'Unicode::UTF8' => 0;
 tests_recursive;
-version '0.05';
+version '0.06';
 
 # Run.
 WriteAll();

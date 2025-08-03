@@ -4,9 +4,10 @@ use strict;
 use warnings;
 
 use Mo qw(build default is);
-use Mo::utils 0.21 qw(check_array_object check_required);
+use Mo::utils 0.21 qw(check_required);
+use Mo::utils::Array qw(check_array_object);
 
-our $VERSION = 0.13;
+our $VERSION = 0.14;
 
 has external_ids => (
 	default => [],
@@ -29,7 +30,7 @@ sub BUILD {
 	my $self = shift;
 
 	# Check external_ids.
-	check_array_object($self, 'external_ids', 'MARC::Convert::Wikidata::Object::ExternalId', 'External id');
+	check_array_object($self, 'external_ids', 'MARC::Convert::Wikidata::Object::ExternalId');
 
 	# Check name.
 	check_required($self, 'name');
@@ -138,9 +139,16 @@ Returns string.
 =head1 ERRORS
 
  new():
-         External id isn't 'MARC::Convert::Wikidata::Object::ExternalId' object.
-         Parameter 'external_ids' must be a array.
-         Parameter 'name' is required.
+         From Mo::utils::Array::check_array_object():
+                 Parameter 'external_ids' must be a array.
+                         Value: %s
+                         Reference: %s
+                 Parameter 'external_ids' with array must contain 'MARC::Convert::Wikidata::Object::ExternalId' objects.
+                         Value: %s
+                         Reference: %s
+
+         From Mo::utils::check_required():
+                 Parameter 'name' is required.
 
 =head1 EXAMPLE1
 
@@ -170,10 +178,12 @@ Returns string.
  # Output:
  # MARC::Convert::Wikidata::Object::Publisher  {
  #     parents: Mo::Object
- #     public methods (2):
+ #     public methods (3):
  #         BUILD
  #         Mo::utils:
  #             check_required
+ #         Mo::utils::Array:
+ #             check_array_object
  #     private methods (0)
  #     internals: {
  #         external_ids   [
@@ -188,7 +198,8 @@ Returns string.
 =head1 DEPENDENCIES
 
 L<Mo>,
-L<Mo::utils>.
+L<Mo::utils>,
+L<Mo::utils::Array>.
 
 =head1 SEE ALSO
 
@@ -218,6 +229,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.13
+0.14
 
 =cut

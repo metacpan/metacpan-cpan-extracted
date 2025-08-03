@@ -24,10 +24,12 @@ p $obj;
 # Output:
 # MARC::Convert::Wikidata::Object::Publisher  {
 #     parents: Mo::Object
-#     public methods (2):
+#     public methods (3):
 #         BUILD
 #         Mo::utils:
 #             check_required
+#         Mo::utils::Array:
+#             check_array_object
 #     private methods (0)
 #     internals: {
 #         external_ids   [

@@ -19,7 +19,8 @@ perl_version 5.008;
 readme_from 'Thing.pm';
 recursive_author_tests('xt');
 requires 'Mo' => 0;
-requires 'Mo::utils' => 0.05;
+requires 'Mo::utils' => 0.08;
+requires 'Mo::utils::Array' => 0;
 requires 'Mo::utils::IRI' => 0.02;
 requires 'Mo::utils::Number' => 0;
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Data-OFN-Thing/issues';
@@ -34,7 +35,7 @@ test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 test_requires 'Unicode::UTF8' => 0;
 tests_recursive;
-version '0.01';
+version '0.02';
 
 # Run.
 WriteAll();

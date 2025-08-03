@@ -20,10 +20,10 @@ readme_from 'Object.pm';
 recursive_author_tests('xt');
 requires 'Business::ISBN' => 0;
 requires 'Error::Pure' => 0;
-requires 'List::MoreUtils' => 0;
-requires 'List::Util' => 0;
+requires 'List::Util' => 1.33;
 requires 'Mo' => 0;
 requires 'Mo::utils' => 0.26;
+requires 'Mo::utils::Array' => 0;
 requires 'Mo::utils::Date' => 0.04;
 requires 'Readonly' => 0;
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/MARC-Convert-Wikidata-Object/issues',
@@ -33,7 +33,7 @@ test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 test_requires 'Unicode::UTF8' => 0;
 tests_recursive;
-version '0.13';
+version '0.14';
 
 # Run.
 WriteAll();

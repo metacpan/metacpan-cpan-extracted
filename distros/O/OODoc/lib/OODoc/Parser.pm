@@ -1,25 +1,43 @@
-# Copyrights 2003-2021 by [Mark Overmeer].
-#  For other contributors see ChangeLog.
-# See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.02.
-# This code is part of perl distribution OODoc.  It is licensed under the
-# same terms as Perl itself: https://spdx.org/licenses/Artistic-2.0.html
+# This code is part of Perl distribution OODoc version 3.00.
+# The POD got stripped from this file by OODoc version 3.00.
+# For contributors see file ChangeLog.
 
-package OODoc::Parser;
-use vars '$VERSION';
-$VERSION = '2.02';
+# This software is copyright (c) 2003-2025 by Mark Overmeer.
 
-use base 'OODoc::Object';
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+# SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
+
+package OODoc::Parser;{
+our $VERSION = '3.00';
+}
+
+use parent 'OODoc::Object';
 
 use strict;
 use warnings;
 
 use Log::Report    'oodoc';
+
 use List::Util     'first';
 
+our %syntax_implementation = (
+    markov => 'OODoc::Parser::Markov',
+);
+
+#------------------
 
 #-------------------------------------------
 
+sub new(%)
+{   my ($class, %args) = @_;
+    return $class->SUPER::new(%args) unless $class eq __PACKAGE__;
+
+    my $syntax = delete $args{syntax} || 'markov';
+    my $pkg    = $syntax_implementation{$syntax} || $syntax;
+    eval "require $pkg" or die $@;
+    $pkg->new(%args);
+}
 
 sub init($)
 {   my ($self, $args) = @_;
@@ -35,11 +53,9 @@ sub init($)
 
 #-------------------------------------------
 
-
 sub parse(@) {panic}
 
 #-------------------------------------------
-
 
 sub skipManualLink($)
 {   my ($self, $package) = @_;
@@ -47,22 +63,12 @@ sub skipManualLink($)
 }
 
 
-sub cleanup($$$)
-{   my ($self, $formatter, $manual, $string) = @_;
+sub cleanupPod($$%) { ... }
 
-    return $self->cleanupPod($formatter, $manual, $string)
-       if $formatter->isa('OODoc::Format::Pod');
 
-    return $self->cleanupHtml($formatter, $manual, $string)
-       if $formatter->isa('OODoc::Format::Html')
-       || $formatter->isa('OODoc::Format::Html2');
+sub cleanupHtml($$%) { ... }
 
-    error __x"the formatter type {type} is not known for cleanup"
-      , type => ref $formatter;
-
-    $string;
-}
-
+#-------------------------------------------
 
 1;
 

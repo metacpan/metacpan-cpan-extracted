@@ -7,12 +7,12 @@ use Business::ISBN;
 use Error::Pure qw(err);
 use Mo qw(build is);
 use Mo::utils 0.08 qw(check_bool check_isa check_required);
-use List::Util qw(none);
+use List::Util 1.33 qw(none);
 use Readonly;
 
 Readonly::Array our @COVERS => qw(hardback paperback);
 
-our $VERSION = 0.13;
+our $VERSION = 0.14;
 
 has collective => (
 	is => 'ro',
@@ -294,6 +294,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.13
+0.14
 
 =cut

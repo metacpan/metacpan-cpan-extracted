@@ -7,7 +7,7 @@ use warnings;
 use Error::Pure qw(err);
 use Graphics::ColorNames::CSS;
 use List::Util 1.33 qw(any none);
-use Mo::utils 0.31 qw(check_array);
+use Mo::utils::Array qw(check_array);
 use Mo::utils::Number::Utils qw(sub_check_percent);
 use Readonly;
 
@@ -20,7 +20,7 @@ Readonly::Array our @BORDER_WIDTHS => qw(thin medium thick);
 Readonly::Array our @RELATIVE_LENGTHS => qw(em ex ch rem vw vh vmin vmax %);
 Readonly::Array our @COLOR_FUNC => qw(rgb rgba hsl hsla);
 
-our $VERSION = 0.12;
+our $VERSION = 0.13;
 
 sub check_array_css_color {
 	my ($self, $key) = @_;
@@ -748,7 +748,7 @@ L<Error::Pure>,
 L<Exporter>,
 L<Graphics::ColorNames::CSS>,
 L<List::Util>,
-L<Mo::utils>,
+L<Mo::utils::Array>,
 L<Mo::utils::Number::Utils>,
 L<Readonly>.
 
@@ -792,6 +792,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.12
+0.13
 
 =cut

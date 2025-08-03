@@ -100,8 +100,8 @@ eval {
 		),
 	);
 };
-is($EVAL_ERROR, "Property snak isn't 'Wikibase::Datatype::Snak' object.\n",
-	"Property snak isn't 'Wikibase::Datatype::Snak' object.");
+is($EVAL_ERROR, "Parameter 'property_snaks' with array must contain 'Wikibase::Datatype::Snak' objects.\n",
+	"Parameter 'property_snaks' with array must contain 'Wikibase::Datatype::Snak' objects (bad).");
 clean();
 
 # Test.
@@ -134,6 +134,6 @@ eval {
 		),
 	);
 };
-is($EVAL_ERROR, "Reference isn't 'Wikibase::Datatype::Reference' object.\n",
-	"Reference isn't 'Wikibase::Datatype::Reference' object.");
+is($EVAL_ERROR, "Parameter 'references' with array must contain 'Wikibase::Datatype::Reference' objects.\n",
+	"Parameter 'references' with array must contain 'Wikibase::Datatype::Reference' objects (bad).");
 clean();

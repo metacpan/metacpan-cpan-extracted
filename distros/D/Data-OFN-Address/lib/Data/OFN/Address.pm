@@ -5,8 +5,8 @@ use warnings;
 
 use Error::Pure qw(err);
 use Mo qw(build default is);
-use Mo::utils 0.31 qw(check_array_object check_length_fix check_regexp
-	check_strings);
+use Mo::utils 0.31 qw(check_length_fix check_regexp check_strings);
+use Mo::utils::Array qw(check_array_object);
 use Mo::utils::Number qw(check_positive_natural);
 use Readonly;
 use Unicode::UTF8 qw(decode_utf8);
@@ -16,7 +16,7 @@ Readonly::Array our @HOUSE_NUMBER_TYPES => (
 	decode_utf8('č.ev.'),
 );
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 has address_place => (
 	is => 'ro',
@@ -146,8 +146,7 @@ sub BUILD {
 		qr{^https://linked\.cuzk\.cz/resource/ruian/katastralni-uzemi/\d+$});
 
 	# Check cadastral_area_name.
-	check_array_object($self, 'cadastral_area_name', 'Data::Text::Simple',
-		'Cadastral area name');
+	check_array_object($self, 'cadastral_area_name', 'Data::Text::Simple');
 
 	# Check conscription_number.
 	check_positive_natural($self, 'conscription_number');
@@ -164,8 +163,7 @@ sub BUILD {
 		qr{^https://linked\.cuzk\.cz/resource/ruian/okres/\d+});
 
 	# Check district_name.
-	check_array_object($self, 'district_name', 'Data::Text::Simple',
-		'District name');
+	check_array_object($self, 'district_name', 'Data::Text::Simple');
 
 	# Check element_ruian.
 	check_regexp($self, 'element_ruian',
@@ -185,29 +183,28 @@ sub BUILD {
 		qr{^https://linked\.cuzk\.cz/resource/ruian/momc/\d+$});
 
 	# Check momc_name.
-	check_array_object($self, 'momc_name', 'Data::Text::Simple', 'MOMC name');
+	check_array_object($self, 'momc_name', 'Data::Text::Simple');
 
 	# Check mop.
 	check_regexp($self, 'mop',
 		qr{^https://linked\.cuzk\.cz/resource/ruian/mop/\d+$});
 
 	# Check mop_name.
-	check_array_object($self, 'mop_name', 'Data::Text::Simple', 'MOP name');
+	check_array_object($self, 'mop_name', 'Data::Text::Simple');
 
 	# Check municipality.
 	check_regexp($self, 'municipality',
 		qr{^https://linked\.cuzk\.cz/resource/ruian/obec/\d+$});
 
 	# Check municipality_name.
-	check_array_object($self, 'municipality_name', 'Data::Text::Simple',
-		'Municipality name');
+	check_array_object($self, 'municipality_name', 'Data::Text::Simple');
 
 	# Check municipality_part.
 	check_regexp($self, 'municipality_part',
 		qr{^https://linked\.cuzk\.cz/resource/ruian/cast-obce/\d+$});
 
 	# Check municipality_part_name.
-	check_array_object($self, 'municipality_part_name', 'Data::Text::Simple', 'Municipality part name');
+	check_array_object($self, 'municipality_part_name', 'Data::Text::Simple');
 
 	# Check psc.
 	check_length_fix($self, 'psc', 5);
@@ -218,18 +215,17 @@ sub BUILD {
 		qr{^https://linked\.cuzk\.cz/resource/ruian/ulice/\d+$});
 
 	# Check street_name.
-	check_array_object($self, 'street_name', 'Data::Text::Simple',
-		'Street name');
+	check_array_object($self, 'street_name', 'Data::Text::Simple');
 
 	# Check text.
-	check_array_object($self, 'text', 'Data::Text::Simple', 'Text');
+	check_array_object($self, 'text', 'Data::Text::Simple');
 
 	# Check vusc.
 	check_regexp($self, 'vusc',
 		qr{^https://linked\.cuzk\.cz/resource/ruian/vusc/\d+$});
 
 	# Check vusc_name.
-	check_array_object($self, 'vusc_name', 'Data::Text::Simple', 'VUSC name');
+	check_array_object($self, 'vusc_name', 'Data::Text::Simple');
 
 	return;
 }
@@ -797,63 +793,65 @@ Returns reference to array with L<Data::Text::Simple> instances.
 
  new():
          From Mo::utils::check_array_object():
-                 Cadastral area name isn't 'Data::Text::Simple' object.
-                         Value: %s
-                         Reference: %s
-                 District name isn't 'Data::Text::Simple' object.
-                         Value: %s
-                         Reference: %s
-                 MOMC name isn't 'Data::Text::Simple' object.
-                         Value: %s
-                         Reference: %s
-                 MOP name isn't 'Data::Text::Simple' object.
-                         Value: %s
-                         Reference: %s
-                 Municipality name isn't 'Data::Text::Simple' object.
-                         Value: %s
-                         Reference: %s
-                 Municipality part name isn't 'Data::Text::Simple' object.
-                         Value: %s
-                         Reference: %s
-                 Street name isn't 'Data::Text::Simple' object.
-                         Value: %s
-                         Reference: %s
-                 Text isn't 'Data::Text::Simple' object.
-                         Value: %s
-                         Reference: %s
-                 VUSC name isn't 'Data::Text::Simple' object.
-                         Value: %s
-                         Reference: %s
                  Parameter 'cadastral_area_name' must be a array.
+                         Value: %s
+                         Reference: %s
+                 Parameter 'cadastral_area_name' with array must contain 'Data::Text::Simple' objects.
                          Value: %s
                          Reference: %s
                  Parameter 'district_name' must be a array.
                          Value: %s
                          Reference: %s
+                 Parameter 'district_name' with array must contain 'Data::Text::Simple' objects.
+                         Value: %s
+                         Reference: %s
                  Parameter 'momc_name' must be a array.
+                         Value: %s
+                         Reference: %s
+                 Parameter 'momc_name' with array must contain 'Data::Text::Simple' objects.
                          Value: %s
                          Reference: %s
                  Parameter 'mop_name' must be a array.
                          Value: %s
                          Reference: %s
+                 Parameter 'mop_name' with array must contain 'Data::Text::Simple' objects.
+                         Value: %s
+                         Reference: %s
                  Parameter 'municipality_name' must be a array.
+                         Value: %s
+                         Reference: %s
+                 Parameter 'municipality_name' with array must contain 'Data::Text::Simple' objects.
                          Value: %s
                          Reference: %s
                  Parameter 'municipality_part_name' must be a array.
                          Value: %s
                          Reference: %s
+                 Parameter 'municipality_part_name' with array must contain 'Data::Text::Simple' objects.
+                         Value: %s
+                         Reference: %s
                  Parameter 'street_name' must be a array.
+                         Value: %s
+                         Reference: %s
+                 Parameter 'street_name' with array must contain 'Data::Text::Simple' objects.
                          Value: %s
                          Reference: %s
                  Parameter 'text' must be a array.
                          Value: %s
                          Reference: %s
+                 Parameter 'text' with array must contain 'Data::Text::Simple' objects.
+                         Value: %s
+                         Reference: %s
                  Parameter 'vusc_name' must be a array.
                          Value: %s
                          Reference: %s
+                 Parameter 'vusc_name' with array must contain 'Data::Text::Simple' objects.
+                         Value: %s
+                         Reference: %s
+
          From Mo::utils::check_length_fix():
                  Parameter 'psc' has length different than '%s'.
                          Value: %s
+
          From Mo::utils::check_regexp():
                  Parameter 'address_place' does not match the specified regular expression.
                          String: %s
@@ -888,10 +886,12 @@ Returns reference to array with L<Data::Text::Simple> instances.
                  Parameter 'vusc' does not match the specified regular expression.
                          String: %s
                          Regexp: (?^:^https://linked\.cuzk\.cz/resource/ruian/vusc/\d+$)
+
          From Mo::utils::check_strings():
                  Parameter 'house_number_type' must be one of defined strings.
                          String: %s
                          Possible strings: 'č.p.', 'č.ev.'
+
          From Mo::utils::Number::check_positive_natural():
                  Parameter 'address_place_code' must be a positive natural number.
                          Value: %s
@@ -1032,6 +1032,8 @@ Returns reference to array with L<Data::Text::Simple> instances.
 L<Error::Pure>
 L<Mo>,
 L<Mo::utils>,
+L<Mo::utils::Array>,
+L<Mo::utils::Number>,
 L<Readonly>,
 L<Unicode::UTF8>.
 
@@ -1053,6 +1055,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.02
 
 =cut

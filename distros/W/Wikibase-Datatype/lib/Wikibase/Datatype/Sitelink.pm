@@ -4,9 +4,10 @@ use strict;
 use warnings;
 
 use Mo qw(build default is);
-use Mo::utils qw(check_array_object check_required);
+use Mo::utils qw(check_required);
+use Mo::utils::Array qw(check_array_object);
 
-our $VERSION = 0.37;
+our $VERSION = 0.38;
 
 has badges => (
 	is => 'ro',
@@ -27,7 +28,7 @@ sub BUILD {
 	check_required($self, 'site');
 	check_required($self, 'title');
 
-	check_array_object($self, 'badges', 'Wikibase::Datatype::Value::Item', 'Badge');
+	check_array_object($self, 'badges', 'Wikibase::Datatype::Value::Item');
 
 	return;
 }
@@ -117,9 +118,14 @@ Returns string.
          From Mo::utils::check_required():
                  Parameter 'site' is required.
                  Parameter 'title' is required.
-         From Mo::utils::check_array_object():
-                 Badge isn't 'Wikibase::Datatype::Value::Item' object.
+
+         From Mo::utils::Array::check_array_object():
                  Parameter 'badges' must be a array.
+                         Value: %s
+                         Reference: %s
+                 Parameter 'badges' with array must contain 'Wikibase::Datatype::Value::Item' objects.
+                         Value: %s
+                         Reference: %s
 
 =head1 EXAMPLE
 
@@ -165,7 +171,8 @@ Returns string.
 =head1 DEPENDENCIES
 
 L<Mo>,
-L<Mo::utils>.
+L<Mo::utils>,
+L<Mo::utils::Array>.
 
 =head1 SEE ALSO
 
@@ -195,6 +202,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.37
+0.38
 
 =cut

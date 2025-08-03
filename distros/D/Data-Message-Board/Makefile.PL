@@ -22,6 +22,7 @@ requires 'Data::Person' => 0;
 requires 'DateTime' => 0;
 requires 'Mo' => 0;
 requires 'Mo::utils' => 0.28;
+requires 'Mo::utils::Array' => 0;
 requires 'Readonly' => 0;
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Data-Message-Board/issues';
 resources 'homepage' => 'https://github.com/michal-josef-spacek/Data-Message-Board';
@@ -34,7 +35,7 @@ test_requires 'Test::MockObject' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.01';
+version '0.06';
 
 # Run.
 WriteAll();

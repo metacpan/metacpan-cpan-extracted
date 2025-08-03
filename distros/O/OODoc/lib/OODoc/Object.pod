@@ -8,6 +8,7 @@ OODoc::Object - base class for all OODoc classes.
 
  OODoc::Object is extended by
    OODoc
+   OODoc::Export
    OODoc::Format
    OODoc::Manifest
    OODoc::Manual
@@ -26,13 +27,27 @@ for all of the other classes.
 
 =head1 OVERLOADED
 
+=over 4
+
+=item overload: B<'==' and '!=' (numeric comparison)>
+
+Numeric comparison is used to compare to objects whether they are
+identical.  String comparison is overloaded to compare the names
+of the objects.
+
+=item overload: B<'bool'>
+
+Always returns true: "exists".
+
+=back
+
 =head1 METHODS
 
 =head2 Constructors
 
 =over 4
 
-=item OODoc::Object-E<gt>B<new>(%options)
+=item $class-E<gt>B<new>(%options)
 
 Create a new object (instantiation).  All objects in OODoc are created
 the same way: they carry a list of key-value pairs as option.  For
@@ -44,35 +59,20 @@ options when used with many other method defined by OODoc.
 
 =back
 
-=head2 Inheritance knowledge
+=head2 Attributes
 
 =over 4
 
-=item $obj-E<gt>B<extends>( [$object] )
+=item $obj-E<gt>B<unique>()
 
-Close to all elements used within OODoc can have an inheritance relation.
-The returned object is extended by the current object.  Multiple inheritance
-is not supported here.
-
-=back
-
-=head2 Commonly used functions
-
-=over 4
-
-=item $obj-E<gt>B<filenameToPackage>($filename)
-
-=item OODoc::Object-E<gt>B<filenameToPackage>($filename)
+Returns a unique id for this text item.  This is the easiest way to
+see whether two references to the same (overloaded) objects point to
+the same thing. The ids are numeric.
 
 example: 
 
- print $self->filenameToPackage('Mail/Box.pm'); # prints Mail::Box
-
-=item $obj-E<gt>B<mkdirhier>($directory)
-
-=item OODoc::Object-E<gt>B<mkdirhier>($directory)
-
-Creates this $directory and all its non-existing parents.
+ if($obj1->unique == $obj2->unique) {...}
+ if($obj1 == $obj2) {...}   # same via overload
 
 =back
 
@@ -89,14 +89,14 @@ The $manual will be added to the list of known manuals.  The same package
 name can appear in more than one manual.  This OBJECT shall be of type
 L<OODoc::Manual|OODoc::Manual>.
 
+=item $obj-E<gt>B<findManual>($name)
+
+[3.00] Returns the manual with the specified name, or else C<undef>.
+
 =item $obj-E<gt>B<mainManual>($name)
 
 Returns the manual of the named package which contains the primar
 documentation for the code of the package $name.
-
-=item $obj-E<gt>B<manual>($name)
-
-Returns the manual with the specified name, or else C<undef>.
 
 =item $obj-E<gt>B<manuals>()
 
@@ -111,6 +111,33 @@ returned.
 =item $obj-E<gt>B<packageNames>()
 
 Returns the names of all defined packages.
+
+=item $obj-E<gt>B<publicationIndex>()
+
+Returns the collected objects for publication.
+
+=item $obj-E<gt>B<publish>(\%options)
+
+Extract the data of an object for export, and register it in the index.
+A HASH is returned which should get filled with useful data.
+
+=back
+
+=head2 Commonly used functions
+
+=over 4
+
+=item $any-E<gt>B<filenameToPackage>($filename)
+
+Z<>
+
+example: 
+
+ print $self->filenameToPackage('Mail/Box.pm'); # prints Mail::Box
+
+=item $any-E<gt>B<mkdirhier>($directory)
+
+Creates this $directory and all its non-existing parents.
 
 =back
 
@@ -138,14 +165,15 @@ to L<manualsForPackage()|OODoc::Object/"Manual Repository"> or L<mainManual()|OO
 
 =head1 SEE ALSO
 
-This module is part of OODoc distribution version 2.02,
-built on December 08, 2021. Website: F<http://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.00,
+built on August 02, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 
-Copyrights 2003-2021 by [Mark Overmeer]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the Artistic license.
-See F<http://dev.perl.org/licenses/artistic.html>
+This software is copyright (c) 2003-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

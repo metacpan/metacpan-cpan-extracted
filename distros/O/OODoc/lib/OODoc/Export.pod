@@ -1,0 +1,459 @@
+=encoding utf8
+
+=head1 NAME
+
+OODoc::Export - base-class for exporters
+
+=head1 INHERITANCE
+
+ OODoc::Export
+   is an OODoc::Object
+
+ OODoc::Export is extended by
+   OODoc::Export::JSON
+
+=head1 SYNOPSIS
+
+ my $doc = OODoc->new(...);
+ $doc->export('json');
+
+=head1 DESCRIPTION
+
+This base-class organizes export transformations which can be shared between
+serialization formats.
+
+Current serialization formats:
+
+=over 4
+
+=item L<OODoc::Export::JSON|OODoc::Export::JSON>
+
+=back
+
+Extends L<"DESCRIPTION" in OODoc::Object|OODoc::Object/"DESCRIPTION">.
+ 
+=head1 OVERLOADED
+
+Extends L<"OVERLOADED" in OODoc::Object|OODoc::Object/"OVERLOADED">.
+ 
+=over 4
+
+=item overload: B<'==' and '!=' (numeric comparison)>
+
+Inherited, see L<OODoc::Object/"OVERLOADED">
+
+=item overload: B<'bool'>
+
+Inherited, see L<OODoc::Object/"OVERLOADED">
+
+=back
+
+=head1 METHODS
+
+Extends L<"METHODS" in OODoc::Object|OODoc::Object/"METHODS">.
+ 
+=head2 Constructors
+
+Extends L<"Constructors" in OODoc::Object|OODoc::Object/"Constructors">.
+ 
+=over 4
+
+=item $class-E<gt>B<new>(%options)
+
+Inherited, see L<OODoc::Object/"Constructors">
+
+ -Option    --Default
+  markup      <required>
+  serializer  <required>
+
+=over 2
+
+=item markup => $markup
+
+Specifies the markup style for the output.  At the moment, only markup
+in 'html' is supported.  See accessor L<markupStyle()|OODoc::Export/"Atributes">.
+
+=item serializer => $name
+
+At the moment, only serializer 'json' is supported.
+
+=back
+
+=back
+
+=head2 Attributes
+
+Extends L<"Attributes" in OODoc::Object|OODoc::Object/"Attributes">.
+ 
+=over 4
+
+=item $obj-E<gt>B<unique>()
+
+Inherited, see L<OODoc::Object/"Attributes">
+
+=back
+
+=head2 Manual Repository
+
+Extends L<"Manual Repository" in OODoc::Object|OODoc::Object/"Manual Repository">.
+ 
+=over 4
+
+=item $obj-E<gt>B<addManual>($manual)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<findManual>($name)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<mainManual>($name)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<manuals>()
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<manualsForPackage>($name)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<packageNames>()
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<publicationIndex>()
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=item $obj-E<gt>B<publish>(\%options)
+
+Inherited, see L<OODoc::Object/"Manual Repository">
+
+=back
+
+=head2 Commonly used functions
+
+Extends L<"Commonly used functions" in OODoc::Object|OODoc::Object/"Commonly used functions">.
+ 
+=over 4
+
+=item $any-E<gt>B<filenameToPackage>($filename)
+
+Inherited, see L<OODoc::Object/"Commonly used functions">
+
+=item $any-E<gt>B<mkdirhier>($directory)
+
+Inherited, see L<OODoc::Object/"Commonly used functions">
+
+=back
+
+=head2 Atributes
+
+=over 4
+
+=item $obj-E<gt>B<format>()
+
+Z<>
+
+=item $obj-E<gt>B<markupStyle>()
+
+Z<>
+
+=item $obj-E<gt>B<parser>()
+
+Z<>
+
+=item $obj-E<gt>B<serializer>()
+
+The label for this serializer.
+
+=back
+
+=head2 Output
+
+=over 4
+
+=item $obj-E<gt>B<boolean>(BOOL)
+
+Z<>
+
+=item $obj-E<gt>B<markup>(STRING)
+
+The source string is to be considered as foreign to the input markup format,
+so no (pseudo-)POD.
+
+=item $obj-E<gt>B<markupBlock>($text, %args)
+
+Convert a block of text, which still contains markup.
+
+=item $obj-E<gt>B<markupString>($string, %args)
+
+Convert a line of text, which still contains markup.  This sometimes as some
+differences with a L<markupBlock()|OODoc::Export/"Output">.
+
+=item $obj-E<gt>B<podChapters>($pod)
+
+Z<>
+
+=item $obj-E<gt>B<processingManual>($manual|undef)
+
+Manual pages may be written in different syntaxes.  In the document tree,
+the main structure is parsed, but the text blocks are not: they are only
+processed at output time.  Calling this method sets the interpretation
+mode for text blocks.
+
+=item $obj-E<gt>B<tree>($doc, %options)
+
+Convert the documentation data in a beautiful tree.
+
+ -Option       --Default
+  distributions  +{}
+  exporter       <required>
+  manuals        undef
+  meta           +{ }
+  podtail        undef
+
+=over 2
+
+=item distributions => HASH
+
+Name to C<MYMETA.json> content mappings of project and used distributions.
+
+=item exporter => L<OODoc::Export|OODoc::Export>-object
+
+Manages the conversion from source markup for text into the requested
+markup (f.i. "markov" into "html").
+
+=item manuals => ARRAY
+
+Include only information for the manuals (specified as names).
+
+=item meta => HASH
+
+Key/string pairs with interesting additional data.
+
+=item podtail => POD
+
+The last chapters of any produced manual page, in POD syntax.
+
+=back
+
+=back
+
+=head1 DETAILS
+
+The exporters will each create the same data tree, but implement different serializations.
+
+In the following examples, magnifactured JSON dumps are shown.  Be aware the JSON
+does not sort fields, so your output looks less organized.
+
+=head2 the Tree
+
+The data-structure refers to a few capitalized comments:
+
+=over 4
+
+=item MARKUP
+
+The output markup used for text.  Currently only "html" is supported.
+
+=back
+
+=head3 root
+
+The root:
+
+  { "project": "MailBox",                      # MARKUP
+    "distribution": "Mail-Box",
+    "version": "4.01_12",
+
+    "generated_by" : {
+       "program": "oodist",
+       "program_version": "3.14",
+       "oodoc_version": "3.00",
+       "created": "2025-07-27 16:30"
+    },
+    "distributions": {
+       "Mail-Box": { ... },                    # META
+       "Mail-Message": { ... }                 # META
+    },
+    "manuals": {
+       "Mail::Message": "id42",                # REF
+       "Mail::Message::Field": "id1023",       # REF
+    },
+    "index": {
+       "id42": { ... }
+       "id1023": { ... }
+    },
+  }
+
+=head3 Distributions
+
+Each HASH in the C<distributions>, is a full copy of the C<MYMETA.json> for a
+distribution which belongs to the C<project> or is C<use>d by any distribution
+which is part of the project.
+
+Some of the important fields:
+
+  { "name": "Mail-Box",
+    "abstract": "Manage a mailbox",            # MARKUP
+    "version": "3.14"
+  }
+
+Take a look at the C<MYMETA.json> or C<META.json> for any module which is produced
+with OODoc, for instance OODoc itself at F<https://metacpan.org/XXX>
+
+=head3 Manual
+
+  { "id": REF,
+    "name": "Mail::Box",                       # MARKUP
+    "version": "3.14",                         # or undef
+    "title": "Manage a mailbox",               # MARKUP
+    "package": "lib/Mail/Box.pm",
+    "distribution": "Mail-Box",
+    "is_pure_pod": false,                      # BOOLEAN
+    "chapters": [ REF, ... ]
+  }
+
+The chapters are sorted logically, as they appear in traditional unix manual pages,
+with a few extensions.
+
+=head3 Nested blocks of text
+
+Manuals are a collection of chapters, which can contain sections, which may have
+subsections, which on their turn can carry subsubsections.  So: the manuals are
+a list of nested blocks.
+
+Each (text) block has same features:
+
+  { "id": REF,
+    "name": "Constructors",                    # MARKUP
+    "level": 2,
+    "type": "section",
+    "extends": REFERENCE,
+    "intro": "Intro to this section.",         # MARKUP
+    "examples": [ REF, ... ],
+    "subroutines": [ REF, ... ],
+    "nest": [ REF, ... ],                      # sub-blocks
+  }
+
+The examples, subroutines and nested blocks are to be kept in their order.
+
+The description and examples are about the content of the whole block.
+Subroutines will also have specific descriptions and examples.
+
+=head3 Subroutines
+
+There are a few types of subroutines:
+
+=over 4
+
+=item C<function>, the classical 'sub'
+
+=item C<i_method>, instance method (in the docs also as C<=method>)
+
+=item C<c_method>, class method
+
+=item C<ci_method>, both usable as class or instance method
+
+=item C<overload>, describes overloading
+
+=item C<tie>, tied interface
+
+=back
+
+Each subroutine looks like this:
+
+  { "id": REF,
+    "name": "producePages",                  # MARKUP
+    "call": "$obj->producePages()" ],        # MARKUP
+    "type": "i_method",
+    "intro": "Create the manual ...",        # MARKUP
+    "examples": [ REF, ... ],
+    "options: [ REF, ... ],
+    "diagnostics": [ REF, ... ],
+  }
+
+=head3 Options
+
+Most subroutine forms can have options.  They are passed as
+list sorted by name.
+
+  { "id": REF,
+    "name": "beautify",                      # MARKUP
+    "type": "option",
+    "params": "true|false",                  # MARKUP
+    "intro": "Make the output better"        # MARKUP
+  }
+
+The defaults look like this:
+
+  { "id": REF,
+    "name": "beautify",                      # MARKUP
+    "type": "default",
+    "value": "<true>",                       # MARKUP
+  }
+
+The option is required when the default value is C<< <required> >>.
+
+=head3 Examples
+
+Every block of text, and every subroutine can have a number of
+examples.  Examples do not always have a name.
+
+  { "id": REF,
+    "name": "how to produce pages",          # MARKUP
+    "type": "example",
+    "intro": "Like this"                     # MARKUP
+  }
+
+=head3 Diagnostics
+
+Most subroutine forms can have a list of diagnostics, which are
+sorted errors first, then by description text.  Other types of
+diagnostics will be added soon, to match the levels offered by
+Log::Report.
+
+  { "id": REF,
+    "type": "error" or "warning",
+    "name": "Missing ...",                  # MARKUP
+    "intro: "This error is shown when...",  # MARKUP
+    "subroutine": REF,
+  }
+
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Error: exporter $name has compilation errors: $err
+
+Z<>
+
+=item Error: exporter serializer '$name' is unknown.
+
+Z<>
+
+=item Error: manual definition requires manual object
+
+A call to L<addManual()|OODoc::Object/"Manual Repository"> expects a new manual object (a L<OODoc::Manual|OODoc::Manual>),
+however an incompatible thing was passed.  Usually, intended was a call
+to L<manualsForPackage()|OODoc::Object/"Manual Repository"> or L<mainManual()|OODoc::Object/"Manual Repository">.
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of OODoc version 3.00,
+built on August 02, 2025. Website: F<https://perl.overmeer.net/oodoc/>
+
+=head1 LICENSE
+
+For contributors see file ChangeLog.
+
+This software is copyright (c) 2003-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+

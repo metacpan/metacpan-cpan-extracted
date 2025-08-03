@@ -1,0 +1,61 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 882328dc1e10c7538e713268ead13bf1751e176c00cc9423ddc31964d7c43481 Array.pm
+SHA256 7e669d37c3842d9254ec7060083f1a39ecb6d0a1540dfbf552781afd2fb9f1aa Changes
+SHA256 553db1b292757f331d25abe52bd1b57c9deb4e4e9e2512fa4e9972c7b0f6a85f LICENSE
+SHA256 3e3b5aaaf53d3b5855393cc33bff8edb1b8188e224a3099d5430d91eaad653d2 MANIFEST
+SHA256 5d57c8a4cfa4499d847da14d66a608fe707f7db4def89830ae1190c12b76d6cc META.yml
+SHA256 37d553bfcbf7a1d0b6d514b6d356af426f3d31fc86f0ff223b32a9726018d4b0 Makefile.PL
+SHA256 f5841125f80f3a1abf6c1d63f52471e50a848cdd4b72baca4e158c3047787874 README
+SHA256 2bb117ff97dcc79aab16cefaa8358a381e24d6e47d5e7470996e21934c770aeb examples/check_array_fail.pl
+SHA256 95560b29c95a53e92029a178b10d36cfefbaf5758d5b6f51e03ebbad4e147138 examples/check_array_object_fail.pl
+SHA256 22821d6c4bdbc2eb7f57dcb8b5de4c7bdbaf2be80abed6ba629f7586a3c209b6 examples/check_array_object_ok.pl
+SHA256 3590e671554ff70d918d8b52c34644dd30725bdeb50cd497a815294668e04049 examples/check_array_ok.pl
+SHA256 0f2d5d7a71e67808547f9ebcdcc185f2cb2d036e1aeb5705ffdb787dcb5205aa examples/check_array_required_fail.pl
+SHA256 fec53a4a335287d5c81910d087aef66c53333775582978faf41867bfbc106237 examples/check_array_required_ok.pl
+SHA256 cd5397bbe618f5bbd4e12a33b0cf5d21114e771c2dbd0ce28e2135beb52c35a8 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 798836f9ccb8d204b1be31fc3835631f57e9d818b21a8f0d14bfcfb82ff4a72a inc/Module/Install/Base.pm
+SHA256 d64cd4c16f83c5baf11f64a44bea3a0abc060a49da5aba040f0eb01394bf75ab inc/Module/Install/Can.pm
+SHA256 65d7a6098bf3f829e8c1c2865476d3537aa6f0ad0ffc9149e10812c856529043 inc/Module/Install/Fetch.pm
+SHA256 70c4b77acab3ff51dfb318110369607cb109e1c319459249623b787cf3859750 inc/Module/Install/Makefile.pm
+SHA256 14556386168007ce913e669fc08a332ccdb6140246fd55a90c879b5190c1b57a inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 4c746c02c5cc19bed4c352e76205b4adff4c45ce8310d71294e1b83c059659c2 inc/Module/Install/Win32.pm
+SHA256 d3d9b4583243c470ae895defa4c44564485b53693cba1c50ab0320768f443e97 inc/Module/Install/WriteAll.pm
+SHA256 ed274a0e98ac36380370c07044dbab55ce30f4e6aeebb9f5e740a6252c0464c7 t/Mo-utils-Array/01-use.t
+SHA256 225b888a10aceca5894bdb116012cd34e69c6f2de0f9ff69dcc9ac6f276d4c18 t/Mo-utils-Array/02-version.t
+SHA256 6b77ba5983510f6987b0cf455c15d33f342887f36813633f42dfbe3f264fdbbf t/Mo-utils-Array/03-check_array.t
+SHA256 d2a532071f051a45e15302d800f10c61f385bab6e6c8e5fd8eb78bda88b52907 t/Mo-utils-Array/04-check_array_object.t
+SHA256 e6d934efbc3923baca42bb2614d937e2f1a990cb945d1679da83d24dcd4aa276 t/Mo-utils-Array/05-check_array_required.t
+SHA256 ea5016933871ef44ef6463caacd7bc6d3959b111cc925564f3ba627aefe4050d xt/Mo-utils-Array/01-pod_coverage.t
+SHA256 666ce74af1ad4798628d1e1e6affdd0b08f6a67512beda390c978eb2f8bd0633 xt/Mo-utils-Array/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAEBAwAdFiEE7CqvgROezncwcOKionze/HtIOPAFAmiN7yIACgkQonze/HtI
+OPDtuAv9GuiX+xYcmf7Ln5P7Le2W1us1qO7fFhU9ccfvmoFURF6GTR+PrhmAvao2
+5sf15orG+1x2q0pRSZ6mKfg5fMdczaNbQpKrJ/WpJY1q0qC9JDH0pd9llIzGsZoR
+MnJ2pRLnZOEMa+MCo82/DiQHfBG4mk6Ey5ygOwNOwu4Pnl97R+4mWxrfs0V9TfSb
+2pYW99H08bprG7+qlarJVQbO2zKs4Wx/+s4UpBOYhts/5jgox/HO7N9S/ZARbzO9
+ubqo8eEYQ2gcmHCosu/OTrraNPRw3LFOCEITy5LKc6X1HWT6lqWw2doCGa3mFgaf
+FvSV9GHs2ZXhwEWXVIlTvCAEx5jY7XBvmdRFqCOPG4rvqFuukEE/93WQcqXOhFgB
+w0FoyW8bSU4LsaGtp4ZtHN32201GoZfktOANab/z9oMaMmX/aWIhf5hFRLUDaPEc
+IVeD/yCYzffyTvM7oiAWJJgTNZ17ll8S46bbWAGhoRWzI6UrWK+3FmszLs/xrHNN
+AOWn9L62
+=9Yzk
+-----END PGP SIGNATURE-----

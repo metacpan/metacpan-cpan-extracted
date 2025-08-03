@@ -42,7 +42,7 @@ SUBROUTINES
 
 ERRORS
      check_array_unicode_block():
-             From Mo::utils::check_array():
+             From Mo::utils::Array::check_array():
                      Parameter '%s' must be a array.
                              Value: %s
                              Reference: %s
@@ -172,7 +172,8 @@ EXAMPLE6
      # #Error [..utils.pm:?] Parameter 'key' contains invalid Unicode script.
 
 DEPENDENCIES
-    Error::Pure, Exporter, List::Util, Mo::utils Readonly, Unicode::UCD.
+    Error::Pure, Exporter, List::Util, Mo::utils::Array Readonly,
+    Unicode::UCD.
 
 SEE ALSO
     Mo  Micro Objects. Mo is less.
@@ -191,5 +192,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.01
+    0.02
 

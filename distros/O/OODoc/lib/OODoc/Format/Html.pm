@@ -1,15 +1,18 @@
-# Copyrights 2003-2021 by [Mark Overmeer].
-#  For other contributors see ChangeLog.
-# See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.02.
-# This code is part of perl distribution OODoc.  It is licensed under the
-# same terms as Perl itself: https://spdx.org/licenses/Artistic-2.0.html
+# This code is part of Perl distribution OODoc version 3.00.
+# The POD got stripped from this file by OODoc version 3.00.
+# For contributors see file ChangeLog.
 
-package OODoc::Format::Html;
-use vars '$VERSION';
-$VERSION = '2.02';
+# This software is copyright (c) 2003-2025 by Mark Overmeer.
 
-use base 'OODoc::Format';
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+# SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
+
+package OODoc::Format::Html;{
+our $VERSION = '3.00';
+}
+
+use parent 'OODoc::Format';
 
 use strict;
 use warnings;
@@ -17,17 +20,19 @@ use warnings;
 use Log::Report     'oodoc';
 use OODoc::Template ();
 
-use IO::File        ();
-use File::Spec      ();
+use File::Spec::Functions qw/catfile catdir/;
 use File::Find      qw/find/;
 use File::Basename  qw/basename dirname/;
 use File::Copy      qw/copy/;
 use POSIX           qw/strftime/;
 use List::Util      qw/first/;
+use HTML::Entities  qw/encode_entities/;
 
 
 sub init($)
 {   my ($self, $args) = @_;
+	$args->{format} //= 'html';
+
     $self->SUPER::init($args) or return;
 
     my $html = delete $args->{html_root} || '/';
@@ -37,9 +42,8 @@ sub init($)
     $self->{OFH_jump} = delete $args->{jump_script} || "$html/jump.cgi";
 
     my $meta  = delete $args->{html_meta_data} || '';
-    if(my $ss = $self->{OFH_style} = delete $args->{html_stylesheet})
-    {   my $base = basename $ss;
-        $meta   .= qq[<link rel="STYLESHEET" href="/$base">];
+    if(my $ss = delete $args->{html_stylesheet})
+    {   $meta   .= qq[<link rel="STYLESHEET" href="$ss">];
     }
     $self->{OFH_meta} = $meta;
     $self;
@@ -47,43 +51,55 @@ sub init($)
 
 #-------------------------------------------
 
+sub jumpScript() { $_[0]->{OFH_jump} }
+sub htmlRoot()   { $_[0]->{OFH_html} }
+sub meta()       { $_[0]->{OFH_meta} }
 
-sub manual(;$) {my $s = shift; @_ ? $s->{OFH_manual}=shift : $s->{OFH_manual}}
+sub manual(;$)   { @_==2 ? $_[0]->{OFH_manual} = $_[1] : $_[0]->{OFH_manual} }
+sub markers(;$)  { @_==2 ? $_[0]->{OFH_mark} = $_[1] : $_[0]->{OFH_mark} }
+sub filename(;$) { @_==2 ? $_[0]->{OFH_fn}   = $_[1] : $_[0]->{OFH_fn}   }
 
 #-------------------------------------------
 
+sub cleanup($$%)
+{   my ($self, $manual, $string, %args) = @_;
+    $manual->parser->cleanupHtml($manual, $string, %args,
+        create_link => sub { $self->link(@_) },
+    );
+}
 
-sub cleanupString($$)
+
+sub cleanupString($$@)
 {   my $self = shift;
-    my $text = $self->cleanup(@_);
-    $text =~ s!</p>\s*<p>!<br>!gs;
-    $text =~ s!\</?p\>!!g;
-    $text;
+    $self->cleanup(@_)
+        =~ s!</p>\s*<p>!<br>!grs  # keep line-breaks
+        =~ s!<p\b.*?>!!gr         # remove paragraphing
+        =~ s!\</p\>!!gr;
 }
 
 
 sub link($$;$)
-{   my ($self, $manual, $object, $text) = @_;
-    $text = $object->name unless defined $text;
+{   my ($self, $manual, $object, $html, $settings) = @_;
+    $html //= encode_entities $object->name;
 
     my $jump;
     if($object->isa('OODoc::Manual'))
     {   (my $manname = $object->name) =~ s!\:\:!_!g;
-        $jump = "$self->{OFH_html}/$manname/index.html";
+        $jump = $self->htmlRoot . "/$manname/index.html";
     }
     else
     {   (my $manname = $manual->name) =~ s!\:\:!_!g;
-        $jump = $self->{OFH_jump}.'?'.$manname.'&'.$object->unique;
+        $jump = $self->jumpScript . "?$manname&". $object->unique;
     }
 
-    qq[<a href="$jump" target="_top">$text</a>];
+    qq[<a href="$jump" target="_top">$html</a>];
 }
 
 
 sub mark($$)
 {   my ($self, $manual, $id) = @_;
-    $manual =~ s/\:\:/_/g;
-    $self->{OFH_markers}->print("$id $manual $self->{OFH_filename}\n");
+	my @fields = ($id, $manual =~ s/\:\:/_/gr, $self->filename);
+    $self->markers->print(join(' ', @fields), "\n");
 }
 
 
@@ -91,25 +107,24 @@ sub createManual($@)
 {   my ($self, %args) = @_;
     my $verbose  = $args{verbose} || 0;
     my $manual   = $args{manual} or panic;
-    my $options  = $args{format_options} || [];
 
     # Location for the manual page files.
 
-    my $template = $args{template} || File::Spec->catdir('html', 'manual');
-    my %template = $self->expandTemplate($template, $options);
+    my $template = $args{template} || (catdir 'html', 'manual');
+    my %template = $self->expandTemplate($template, [ %args ]);
 
-    (my $manfile  = "$manual") =~ s!\:\:!_!g;
-    my $dest = File::Spec->catdir($self->workdir, $manfile);
+    my $manfile  = "$manual" =~ s!\:\:!_!gr;
+    my $dest = catdir $self->workdir, $manfile;
     $self->mkdirhier($dest);
 
     # File to trace markers must be open.
 
-    unless(defined $self->{OFH_markers})
-    {   my $markers = File::Spec->catdir($self->workdir, 'markers');
-        my $mark = IO::File->new($markers, 'w')
+    unless(defined $self->markers)
+    {   my $markers = catfile $self->workdir, 'markers';
+        open my $mark, ">:encoding(utf8)", $markers
             or fault __x"cannot write markers to {fn}", fn => $markers;
-        $self->{OFH_markers} = $mark;
-        $mark->print($self->{OFH_html}, "\n");
+        $self->markers($mark);
+        $mark->print($self->htmlRoot, "\n");
     }
 
     #
@@ -118,27 +133,23 @@ sub createManual($@)
 
     my $manifest = $self->manifest;
     while(my($raw, $options) = each %template)
-    {   my $cooked = File::Spec->catfile($dest, basename $raw);
+    {   my $cooked = catfile $dest, basename $raw;
 
         print "$manual: $cooked\n" if $verbose > 2;
         $manifest->add($cooked);
 
-        my $output  = IO::File->new($cooked, 'w')
+        open my $output, ">:encoding(utf8)", $cooked
             or fault __x"cannot write html manual to {fn}", fn => $cooked;
 
-        $self->{OFH_filename} = basename $raw;
+        $self->filename(basename $raw);
 
         $self->manual($manual);
-        $self->format
-          ( output      => $output
-          , template_fn => $raw
-          , @$options
-          );
+        $self->interpolate(output => $output, template_fn => $raw, @$options);
         $self->manual(undef);
         $output->close;
     }
 
-    delete $self->{OFH_filename};
+    $self->filename(undef);
     $self;
 }
 
@@ -146,25 +157,25 @@ sub createManual($@)
 sub createOtherPages(@)
 {   my ($self, %args) = @_;
 
-    my $verbose  = $args{verbose} || 0;
+    my $verbose = $args{verbose} || 0;
 
     #
     # Collect files to be processed
     #
 
-    my $source   = $args{source};
+    my $source  = $args{source};
     if(defined $source)
     {   -d $source
              or fault __x"html source directory {dir}", dir => $source;
     }
     else
-    {   $source = File::Spec->catdir("html", "other");
+    {   $source = catdir "html", "other";
         -d $source or return $self;
     }
 
-    my $process  = $args{process}  || qr/\.(s?html|cgi)$/;
+    my $process = $args{process} || qr/\.(?:s?html|cgi)$/;
 
-    my $dest = $self->workdir;
+    my $dest    = $self->workdir;
     $self->mkdirhier($dest);
 
     my @sources;
@@ -188,11 +199,11 @@ sub createOtherPages(@)
 
         if($raw =~ $process)
         {   $self->mkdirhier(dirname $cooked);
-            my $output  = IO::File->new($cooked, 'w')
+            open my $output, ">:encoding(utf8)", $cooked
                 or fault __x"cannot write html to {fn}", fn => $cooked;
 
             my $options = [];
-            $self->format
+            $self->interpolate
              ( manual      => undef
              , output      => $output
              , template_fn => $raw
@@ -201,15 +212,13 @@ sub createOtherPages(@)
             $output->close;
          }
          else
-         {   copy($raw, $cooked)
-                or fault __x"copy from {from} to {to} failed"
-                     , from => $raw, to => $cooked;
+         {   copy $raw, $cooked
+                or fault __x"copy from {from} to {to} failed", from => $raw, to => $cooked;
          }
 
          my $rawmode = (stat $raw)[2] & 07777;
          chmod $rawmode, $cooked
-             or fault __x"chmod of {fn} to {mode%o} failed"
-                  , fn => $cooked, mode => $rawmode;
+             or fault __x"chmod of {fn} to {mode%o} failed", fn => $cooked, mode => $rawmode;
     }
 
     $self;
@@ -231,8 +240,7 @@ sub expandTemplate($$)
     elsif(-d $loc)
     {   find( { no_chdir => 1,
                 wanted   => sub { my $fn = $File::Find::name;
-                                  push @result, $fn, $defaults
-                                     if -f $fn;
+                                  push @result, $fn, $defaults if -f $fn;
                                 }
               }, $loc
             );
@@ -243,26 +251,22 @@ sub expandTemplate($$)
     @result;
 }
 
-sub showStructureExpand(@)
+sub showStructureExpanded(@)
 {   my ($self, %args) = @_;
 
-    my $examples = $args{show_chapter_examples} || 'EXPAND';
+    my $examples = $args{show_examples} || 'EXPAND';
     my $text     = $args{structure} or panic;
 
     my $name     = $text->name;
     my $level    = $text->level +1;  # header level, chapter = H2
-    my $output   = $args{output}  or panic;
-    my $manual   = $args{manual}  or panic;
+    my $output   = $args{output} or panic;
+    my $manual   = $args{manual} or panic;
 
-    # Produce own chapter description
-
-    my $descr   = $self->cleanup($manual, $text->description);
+    my $descr   = $self->cleanup($manual, $text->description, tag => 'block_intro');
     my $unique  = $text->unique;
-    (my $id     = $name) =~ s/\W+/_/g;
+    my $id      = $name =~ s/\W+/_/gr;
 
-    $output->print(
-        qq[\n<h$level id="$id"><a name="$unique">$name</a></h$level>\n$descr]
-                  );
+    $output->print( qq[\n<h$level id="$id"><a name="$unique">$name</a></h$level>\n$descr] );
 
     $self->mark($manual, $unique);
 
@@ -275,14 +279,13 @@ sub showStructureExpand(@)
 
     if(defined $super)
     {   my $superman = $super->manual;   #  :-)
-        $output->print( "<p>See ", $self->link($superman, $super), " in "
-                      , $self->link(undef, $superman), "</p>\n");
+        $output->print( "<p>See ", $self->link($superman, $super), " in " , $self->link(undef, $superman), "</p>\n");
     }
 
     # Show the subroutines and examples.
 
-    $self->showSubroutines(%args, subroutines => [$text->subroutines]);
-    $self->showExamples(%args, examples => [$text->examples])
+    $self->showSubroutines(%args, subroutines => [ $text->subroutines ]);
+    $self->showExamples(%args, examples => [ $text->examples] )
          if $examples eq 'EXPAND';
 
     $self;
@@ -299,8 +302,7 @@ sub showStructureRefer(@)
     my $manual   = $args{manual}  or panic;
 
     my $link     = $self->link($manual, $text);
-    $output->print(
-       qq[\n<h$level id="$name"><a href="$link">$name</a><h$level>\n]);
+    $output->print( qq[\n<h$level id="$name"><a href="$link">$name</a><h$level>\n] );
     $self;
 }
 
@@ -331,14 +333,14 @@ sub showExamples(@)
     my $manual    = $args{manual}  or panic;
     my $output    = $args{output}  or panic;
 
-    $output->print( qq[<dl class="example">\n] );
+    $output->print( qq[<dl class="examples">\n] );
 
     foreach my $example (@$examples)
     {   my $name   = $example->name;
         my $descr  = $self->cleanup($manual, $example->description);
         my $unique = $example->unique;
         $output->print( <<EXAMPLE );
-<dt>&raquo;&nbsp;<a name="$unique">Example</a>: $name</dt>
+<dt>&raquo;&nbsp;<a name="$unique">example</a>: $name</dt>
 <dd>$descr</dd>
 EXAMPLE
 
@@ -352,7 +354,7 @@ EXAMPLE
 sub showDiagnostics(@)
 {   my ($self, %args) = @_;
     my $diagnostics = $args{diagnostics} or panic;
-    return unless @$diagnostics;
+    @$diagnostics or return undef;
 
     my $manual    = $args{manual}  or panic;
     my $output    = $args{output}  or panic;
@@ -362,11 +364,11 @@ sub showDiagnostics(@)
     foreach my $diag (sort @$diagnostics)
     {   my $name    = $diag->name;
         my $type    = $diag->type;
-        my $text    = $self->cleanup($manual, $diag->description);
+        my $text    = $self->cleanup($manual, $diag->description) || '&nbsp;';
         my $unique  = $diag->unique;
 
         $output->print( <<DIAG );
-<dt class="type">&raquo;&nbsp;$type: <a name="$unique">$name</a></dt>
+<dt>&raquo;&nbsp;$type: <a name="$unique">$name</a></dt>
 <dd>$text</dd>
 DIAG
 
@@ -397,32 +399,29 @@ sub showSubroutineUse(@)
     my $manual     = $args{manual}     or panic;
     my $output     = $args{output}     or panic;
 
-    my $type       = $subroutine->type;
-    my $name       = $self->cleanupString($manual, $subroutine->name);
-    my $paramlist  = $self->cleanupString($manual, $subroutine->parameters);
     my $unique     = $subroutine->unique;
-
-    my $class      = $manual->package;
-
-    my $call       = qq[<b><a name="$unique">$name</a></b>];
-    $call         .= "(&nbsp;$paramlist&nbsp;)" if length $paramlist;
     $self->mark($manual, $unique);
 
+    my $name       = $self->cleanupString($manual, $subroutine->name);
+    my $paramlist  = $self->cleanupString($manual, $subroutine->parameters);
+    my $call       = qq[<b><a name="$unique">$name</a></b>];
+    $call         .= "(&nbsp;$paramlist&nbsp;)" if length $paramlist;
+
+    my $type       = $subroutine->type;
     my $use
       = $type eq 'i_method' ? qq[\$obj-&gt;$call]
       : $type eq 'c_method' ? qq[\$class-&gt;$call]
-      : $type eq 'ci_method'? qq[\$obj-&gt;$call<br>\$class-&gt;$call]
+      : $type eq 'ci_method'? qq[\$any-&gt;$call]
       : $type eq 'overload' ? qq[overload: $call]
       : $type eq 'function' ? qq[$call]
       : $type eq 'tie'      ? $call
-      : warning("unknown subroutine type {type} for {name} in {manual}"
-             , type => $type, name => $name, manual => $manual);
+      : panic "Type $type? for $call";
 
     $output->print( <<SUBROUTINE );
-<div class="$type" id="$name">
+<div class="sub $type" id="$name">
 <dl>
-<dt class="sub_use">$use</dt>
-<dd class="sub_body">
+<dt>$use</dt>
+<dd>
 SUBROUTINE
 
     if($manual->inherited($subroutine))
@@ -451,10 +450,7 @@ sub showSubroutineName(@)
      ? "M<".$subroutine->manual."::$name>"
      : "M<$name>";
 
-    $output->print
-     ( $self->cleanupString($manual, $url)
-     , ($args{last} ? ".\n" : ",\n")
-     );
+    $output->print($self->cleanupString($manual, $url), ($args{last} ? ".\n" : ",\n"));
 }
 
 sub showOptions(@)
@@ -530,18 +526,20 @@ sub showSubroutineDescription(@)
 {   my ($self, %args) = @_;
     my $manual     = $args{manual}     or panic;
     my $subroutine = $args{subroutine} or panic;
+    my $output     = $args{output}     or panic;
 
     my $text       = $self->cleanup($manual, $subroutine->description);
-    return $self unless length $text;
+    my $extends    = $subroutine->extends;
+    if(my $refer = $extends ? $extends->findDescriptionObject : undef)
+    {   my $super  = $refer->manual;
+        my $link   = 'Improves base, see ' . $self->link($super, $refer) . ' in ' . $self->link(undef, $super) . "\n";
+        $text      = length $text ? $text =~ s#</p>$#<br />\n$link</p>#r : "<p>$link</p>";
+    }
+    else
+    {   $text     ||= '&nbsp;';
+    }
 
-    my $output     = $args{output}     or panic;
     $output->print($text);
-
-    my $extends    = $self->extends    or return $self;
-    my $refer      = $extends->findDescriptionObject or return $self;
-
-    $output->print("<br>\n");
-    $self->showSubroutineDescriptionRefer(%args, subroutine => $refer);
 }
 
 sub showSubroutineDescriptionRefer(@)
@@ -549,7 +547,7 @@ sub showSubroutineDescriptionRefer(@)
     my $manual     = $args{manual}     or panic;
     my $subroutine = $args{subroutine} or panic;
     my $output     = $args{output}     or panic;
-    $output->print("\nSee ", $self->link($manual, $subroutine), "\n");
+    $output->print("\n<p>See ", $self->link($manual, $subroutine), "</p>\n");
 }
 
 #----------------------
@@ -571,7 +569,7 @@ our %producers =
  , version     => 'templateVersion'
  );
 
-sub format(@)
+sub interpolate(@)
 {   my ($self, %args) = @_;
     my $output    = delete $args{output};
 
@@ -585,8 +583,7 @@ sub format(@)
           };
     }
 
-    $output->print(
-      scalar $template->processFile($args{template_fn}, \%permitted));
+    $output->print(scalar $template->processFile($args{template_fn}, \%permitted));
 }
 
 
@@ -600,8 +597,7 @@ sub templateTitle($$)
 {   my ($self, $templ, $attrs, $if, $else) = @_;
 
     my $manual = $self->manual
-        or error __x"not a manual, so no automatic title in {fn}"
-            , fn => scalar $templ->valueFor('template_fn');
+        or error __x"not a manual, so no automatic title in {fn}", fn => scalar $templ->valueFor('template_fn');
 
     my $name   = $self->cleanupString($manual, $manual->name);
     $name      =~ s/\<[^>]*\>//g;
@@ -613,10 +609,9 @@ sub templateManual($$)
 {   my ($self, $templ, $attrs, $if, $else) = @_;
 
     my $manual = $self->manual
-        or error __x"not a manual, so no manual name for {fn}"
-            , fn => scalar $templ->valueFor('template_fn');
+        or error __x"not a manual, so no manual name for {fn}", fn => scalar $templ->valueFor('template_fn');
 
-    $self->cleanupString($manual, $manual->name);
+    $self->cleanupString($manual, $manual->name, tag => 'manual_name');
 }
 
 
@@ -677,13 +672,14 @@ sub templateHref($$)
     my $path   = $path_lookup{$to}
         or error __x"missing path for {dest}", dest => $to;
 
-    qq[<a href="$self->{OFH_html}$path" target="$window">];
+	my $root   = $self->htmlRoot;
+    qq[<a href="$root$path" target="$window">];
 }
 
 
 sub templateMeta($$)
 {   my ($self, $templ, $attrs, $if, $else) = @_;
-    $self->{OFH_meta};
+    $self->meta;
 }
 
 
@@ -696,12 +692,7 @@ sub templateInheritance(@)
 
     my $buffer  = '';
     open my $out, '>', \$buffer;
-    $self->showChapter
-      ( %$attrs
-      , manual  => $self->manual
-      , chapter => $chapter
-      , output  => $out
-      );
+    $self->showChapter(%$attrs, manual => $self->manual, chapter => $chapter, output => $out);
     close $out;
 
     for($buffer)
@@ -722,8 +713,7 @@ sub templateChapter($$)
 
     my $name  = first { !/[a-z]/ } keys %$attrs;
     defined $name
-        or error __x"chapter without name in template {fn}"
-            , fn => scalar $templ->valueFor('template_fn');
+        or error __x"chapter without name in template {fn}", fn => scalar $templ->valueFor('template_fn');
 
     my $manual  = $self->manual;
     defined $manual or panic;
@@ -731,12 +721,7 @@ sub templateChapter($$)
 
     my $buffer  = '';
     open my $out, '>', \$buffer;
-    $self->showChapter
-      ( %$attrs
-      , manual  => $self->manual
-      , chapter => $chapter
-      , output  => $out
-      );
+    $self->showChapter(%$attrs, manual => $self->manual, chapter => $chapter, output => $out);
     close $out;
 
     $buffer;
@@ -746,25 +731,24 @@ sub templateChapter($$)
 sub templateIndex($$)
 {   my ($self, $templ, $attrs, $if, $else) = @_;
 
-    warning __x"no meaning for container {c} in list block", c => $if
-        if defined $if && length $if;
+    ! defined $if || ! length $if
+        or warning __x"no meaning for container {c} in list block", c => $if;
 
-    my $group  = first { !/[a-z]/ } keys %$attrs;
-    defined $group
+    my $group  = first { !/[a-z]/ } keys %$attrs
         or error __x"no group named as attribute for list";
 
     my $start  = $attrs->{starting_with} || 'ALL';
     my $types  = $attrs->{type}          || 'ALL';
 
     my $select = sub { @_ };
-    unless($start eq 'ALL')
+    if($start ne 'ALL')
     {   $start =~ s/_/[\\W_]/g;
         my $regexp = qr/^$start/i;
         $select    = sub { grep $_->name =~ $regexp, @_ };
     }
-    unless($types eq 'ALL')
-    {   my @take   = map { $_ eq 'method' ? '.*method' : $_ }
-                         split /[_|]/, $types;
+
+    if($types ne 'ALL')
+    {   my @take   = map { $_ eq 'method' ? '.*method' : $_ } split /[_|]/, $types;
         local $"   = ')|(';
         my $regexp = qr/^(@take)$/i;
         my $before = $select;
@@ -814,8 +798,7 @@ DIAG
         {   my $details  = $manual->chapter("DETAILS") or next;
             my @sections;
             foreach my $section ($details->sections)
-            {   my @subsect = grep !$manual->inherited($_) && $_->description
-                  , $section->subsections;
+            {   my @subsect = grep !$manual->inherited($_) && $_->description, $section->subsections;
                 push @sections, $section
                     if @subsect || $section->description;
             }
@@ -823,17 +806,14 @@ DIAG
             @sections || length $details->description
                 or next;
 
-            my $sections = join "\n"
-              , map { "<li>".$self->link($manual, $_)."</li>" }
-                    @sections;
+            my $sections = join "\n", map "<li>".$self->link($manual, $_)."</li>", @sections;
 
             push @rows, $self->link($manual, $details, "Details in $manual")
               . qq[\n<ul>\n$sections</ul>\n]
         }
     }
     elsif($group eq 'MANUALS')
-    {   @rows = map $self->link(undef, $_, $_->name)
-          , sort $select->($self->manuals);
+    {   @rows = map $self->link(undef, $_, $_->name), sort $select->($self->manuals);
     }
     else
     {   error __x"unknown group {name} as list attribute", name => $group;
@@ -869,8 +849,7 @@ sub templateList($$)
 
     my $selected = sub { @_ };
     unless($types eq 'ALL')
-    {   my @take   = map { $_ eq 'method' ? '.*method' : $_ }
-                         split /[_|]/, $types;
+    {   my @take   = map { $_ eq 'method' ? '.*method' : $_ } split /[_|]/, $types;
         local $"   = ')|(?:';
         my $regexp = qr/^(?:@take)$/;
         $selected  = sub { grep $_->type =~ $regexp, @_ };
@@ -891,11 +870,9 @@ sub templateList($$)
         my $show_sec = $attrs->{show_sections} || 'LINK';
         my @sections = $show_sec eq 'NO' ? () : $chapter->sections;
 
-        my @subs = $sorted->($selected->( @sections
-                                        ? $chapter->subroutines
-                                        : $chapter->all('subroutines')
-                                        )
-                             );
+        my @subs = $sorted->(
+            $selected->( @sections ? $chapter->subroutines : $chapter->all('subroutines'))
+        );
 
         $output  .= $self->link($manual, $chapter, $chapter->niceName); 
         my $count = @subs && $show_sub eq 'COUNT' ? ' ('.@subs.')' : '';
@@ -953,12 +930,7 @@ sub indexListSubroutines(@)
 {   my $self   = shift;
     my $manual = shift;
 
-    join ",\n"
-       , map { $self->link($manual, $_, $_) }
-            @_;
+    join ",\n", map $self->link($manual, $_, $_), @_;
 }
-
-#-------------------------------------------
-
 
 1;

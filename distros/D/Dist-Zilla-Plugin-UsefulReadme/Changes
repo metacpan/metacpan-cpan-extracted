@@ -1,5 +1,9 @@
 Release history for Dist-Zilla-Plugin-UsefulReadme:
 
+v0.1.2    2025-08-02 11:47:45+01:00 Europe/London
+  [Tests]
+  - Fix prerequisites for tests.
+
 v0.1.1    2025-08-01 18:12:49+01:00 Europe/London
   [Enhancements]
   - Pod::Weaver::Section::Requirements will refer uses to the `cpanfile` or `META.json/yml` files for the full list of

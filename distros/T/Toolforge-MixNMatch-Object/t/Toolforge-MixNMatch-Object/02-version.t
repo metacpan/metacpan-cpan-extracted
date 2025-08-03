@@ -6,4 +6,4 @@ use Test::NoWarnings;
 use Toolforge::MixNMatch::Object;
 
 # Test.
-is($Toolforge::MixNMatch::Object::VERSION, 0.03, 'Version.');
+is($Toolforge::MixNMatch::Object::VERSION, 0.04, 'Version.');

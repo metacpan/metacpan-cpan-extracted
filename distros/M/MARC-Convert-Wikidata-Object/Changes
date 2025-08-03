@@ -1,3 +1,7 @@
+0.14 2025-08-02T23:52:22+02:00
+ - Move check_array* to Mo::utils::Array.
+ - Rewrite to use of List::Util.
+
 0.13 2025-03-31T22:28:23+02:00
  - API change: Add 'covers' parameter.
  - Parameter 'cover' is deprecated.

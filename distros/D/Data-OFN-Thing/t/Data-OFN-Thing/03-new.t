@@ -7,7 +7,7 @@ use Data::Text::Simple;
 use DateTime;
 use English;
 use Error::Pure::Utils qw(clean);
-use Test::More 'tests' => 5;
+use Test::More 'tests' => 11;
 use Test::NoWarnings;
 use Unicode::UTF8 qw(decode_utf8);
 
@@ -74,6 +74,46 @@ isa_ok($obj, 'Data::OFN::Thing');
 # Test.
 eval {
 	Data::OFN::Thing->new(
+		'attachment' => 'bad',
+	);
+};
+is($EVAL_ERROR, "Parameter 'attachment' must be a array.\n",
+	"Parameter 'attachment' must be a array (bad).");
+clean();
+
+# Test.
+eval {
+	Data::OFN::Thing->new(
+		'attachment' => ['bad'],
+	);
+};
+is($EVAL_ERROR, "Parameter 'attachment' with array must contain 'Data::OFN::DigitalObject' objects.\n",
+	"Parameter 'attachment' with array must contain 'Data::OFN::DigitalObject' objects (bad).");
+clean();
+
+# Test.
+eval {
+	Data::OFN::Thing->new(
+		'description' => 'bad',
+	);
+};
+is($EVAL_ERROR, "Parameter 'description' must be a array.\n",
+	"Parameter 'description' must be a array (bad).");
+clean();
+
+# Test.
+eval {
+	Data::OFN::Thing->new(
+		'description' => ['bad'],
+	);
+};
+is($EVAL_ERROR, "Parameter 'description' with array must contain 'Data::Text::Simple' objects.\n",
+	"Parameter 'description' with array must contain 'Data::Text::Simple' objects (bad).");
+clean();
+
+# Test.
+eval {
+	Data::OFN::Thing->new(
 		'id' => 'bad',
 	);
 };
@@ -89,4 +129,24 @@ eval {
 };
 is($EVAL_ERROR, "Parameter 'iri' doesn't contain valid IRI.\n",
 	"Parameter 'iri' doesn't contain valid IRI (://foo).");
+clean();
+
+# Test.
+eval {
+	Data::OFN::Thing->new(
+		'name' => 'bad',
+	);
+};
+is($EVAL_ERROR, "Parameter 'name' must be a array.\n",
+	"Parameter 'name' must be a array (bad).");
+clean();
+
+# Test.
+eval {
+	Data::OFN::Thing->new(
+		'name' => ['bad'],
+	);
+};
+is($EVAL_ERROR, "Parameter 'name' with array must contain 'Data::Text::Simple' objects.\n",
+	"Parameter 'name' with array must contain 'Data::Text::Simple' objects (bad).");
 clean();
