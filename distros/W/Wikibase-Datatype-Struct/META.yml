@@ -54,7 +54,7 @@ requires:
   Readonly: 0
   URI: 0
   Wikibase::Datatype::Form: 0
-  Wikibase::Datatype::Item: 0
+  Wikibase::Datatype::Item: 0.39
   Wikibase::Datatype::Lexeme: 0
   Wikibase::Datatype::Mediainfo: 0
   Wikibase::Datatype::MediainfoSnak: 0
@@ -65,6 +65,7 @@ requires:
   Wikibase::Datatype::Sitelink: 0
   Wikibase::Datatype::Snak: 0.32
   Wikibase::Datatype::Statement: 0
+  Wikibase::Datatype::Term: 0.38
   Wikibase::Datatype::Value: 0.29
   Wikibase::Datatype::Value::Globecoordinate: 0
   Wikibase::Datatype::Value::Item: 0
@@ -81,4 +82,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Wikibase-Datatype-Struct
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Wikibase-Datatype-Struct
-version: '0.14'
+version: '0.15'

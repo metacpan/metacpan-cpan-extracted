@@ -25,7 +25,7 @@ requires 'List::Util' => 1.33;
 requires 'Readonly' => 0;
 requires 'URI' => 0;
 requires 'Wikibase::Datatype::Form' => 0;
-requires 'Wikibase::Datatype::Item' => 0;
+requires 'Wikibase::Datatype::Item' => 0.39;
 requires 'Wikibase::Datatype::Lexeme' => 0;
 requires 'Wikibase::Datatype::Mediainfo' => 0;
 requires 'Wikibase::Datatype::MediainfoSnak' => 0;
@@ -36,6 +36,7 @@ requires 'Wikibase::Datatype::Sense' => 0;
 requires 'Wikibase::Datatype::Sitelink' => 0;
 requires 'Wikibase::Datatype::Snak' => 0.32;
 requires 'Wikibase::Datatype::Statement' => 0;
+requires 'Wikibase::Datatype::Term' => 0.38;
 requires 'Wikibase::Datatype::Value' => 0.29;
 requires 'Wikibase::Datatype::Value::Globecoordinate' => 0;
 requires 'Wikibase::Datatype::Value::Item' => 0;
@@ -76,7 +77,7 @@ test_requires 'Wikibase::Datatype::Value::Sense' => 0.29;
 test_requires 'Wikibase::Datatype::Value::String' => 0;
 test_requires 'Wikibase::Datatype::Value::Time' => 0;
 tests_recursive;
-version '0.14';
+version '0.15';
 
 # Run.
 WriteAll();

@@ -4,7 +4,7 @@ WWW::Mechanize::Chrome::DOMops - Operations on the DOM loaded in Chrome
 
 # VERSION
 
-Version 0.11
+Version 0.12
 
 # SYNOPSIS
 

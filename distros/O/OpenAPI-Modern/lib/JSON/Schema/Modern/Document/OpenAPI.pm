@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Document::OpenAPI;
 # ABSTRACT: One OpenAPI v3.1 document
 # KEYWORDS: JSON Schema data validation request response OpenAPI
 
-our $VERSION = '0.089';
+our $VERSION = '0.090';
 
 use 5.020;
 use utf8;
@@ -45,9 +45,12 @@ use constant DEFAULT_SCHEMAS => [
   'strict-dialect.json',
 ];
 
-use constant DEFAULT_DIALECT => 'https://spec.openapis.org/oas/3.1/dialect/2024-10-25';
-use constant DEFAULT_BASE_METASCHEMA => 'https://spec.openapis.org/oas/3.1/schema-base/2024-11-14';
-use constant DEFAULT_METASCHEMA => 'https://spec.openapis.org/oas/3.1/schema/2024-11-14';
+# these are all pre-loaded, and also made available as s/<date>/latest/
+use constant DEFAULT_DIALECT => 'https://spec.openapis.org/oas/3.1/dialect/2024-11-10';
+use constant DEFAULT_BASE_METASCHEMA => 'https://spec.openapis.org/oas/3.1/schema-base/2025-02-13';
+use constant DEFAULT_METASCHEMA => 'https://spec.openapis.org/oas/3.1/schema/2025-02-13';
+use constant OAS_VOCABULARY => 'https://spec.openapis.org/oas/3.1/meta/2024-11-10';
+use constant OAS_VERSION => '3.1.1';
 
 has '+schema' => (
   isa => HashRef,
@@ -110,7 +113,7 @@ sub traverse ($self, $evaluator, $config_override = {}) {
     traverse => 1,
   };
 
-  # this is an abridged form of https://spec.openapis.org/oas/3.1/schema/2024-10-25
+  # this is an abridged form of https://spec.openapis.org/oas/3.1/schema/<date>
   # just to validate the parts of the document we need to verify before parsing jsonSchemaDialect
   # and switching to the real metaschema for this document
   state $top_schema = {
@@ -210,7 +213,7 @@ sub traverse ($self, $evaluator, $config_override = {}) {
         # properties are valid" etc
         '$dynamicRef' => sub ($, $schema, $state) {
           # Note that if we are using the default metaschema
-          # https://spec.openapis.org/oas/3.1/schema/2024-10-25, we will only find the root of each
+          # https://spec.openapis.org/oas/3.1/schema/<date>, we will only find the root of each
           # schema, not all subschemas. We will traverse each of these schemas later using
           # jsonSchemaDialect to find all subschemas and their $ids.
           push @json_schema_paths, $state->{data_path} if $schema->{'$dynamicRef'} eq '#meta';
@@ -406,15 +409,12 @@ sub _add_vocab_and_default_schemas ($self, $evaluator) {
       $document = $evaluator->add_schema($schema);
     }
 
-    if ($document->canonical_uri =~ m{/\d{4}-\d{2}-\d{2}$}) {
-      my $base = $`;
-      $evaluator->add_document($base, $document) if $base =~ m{/schema$};
-      $evaluator->add_document($base.'/latest', $document);
-    }
+    $evaluator->add_document($`.'/latest', $document)
+      if $document->canonical_uri =~ m{/\d{4}-\d{2}-\d{2}$};
   }
 
   # dirty hack! patch in support for $self, until v3.2
-  $evaluator->{_resource_index}{'https://spec.openapis.org/oas/3.1/schema/2024-11-14'}{document}->schema->{properties}{'$self'} = {
+  $evaluator->{_resource_index}{DEFAULT_METASCHEMA()}{document}->schema->{properties}{'$self'} = {
     type => 'string',
     format => 'uri-reference',
     '$comment' => 'MUST NOT be empty, and MUST NOT contain a fragment',
@@ -478,7 +478,8 @@ sub _dynamic_metaschema_uri ($self, $json_schema_dialect, $evaluator) {
   my $dialect_uri = 'https://custom-dialect.example.com/' . md5_hex($json_schema_dialect);
   return $dialect_uri if $evaluator->_get_resource($dialect_uri);
 
-  # we use the definition of share/oas/schema-base.json but swap out the dialect reference.
+  # we use the definition of https://spec.openapis.org/oas/3.1/schema-base/<date> but swap out the
+  # dialect reference.
   my $schema = dclone($evaluator->_get_resource(DEFAULT_BASE_METASCHEMA)->{document}->schema);
   $schema->{'$id'} = $dialect_uri;
   $schema->{'$defs'}{dialect}{const} = $json_schema_dialect;
@@ -523,7 +524,7 @@ JSON::Schema::Modern::Document::OpenAPI - One OpenAPI v3.1 document
 
 =head1 VERSION
 
-version 0.089
+version 0.090
 
 =head1 SYNOPSIS
 
@@ -559,10 +560,11 @@ Provides structured parsing of an OpenAPI document, suitable as the base for mor
 request and response validation, code generation or form generation.
 
 The provided document must be a valid OpenAPI document, as specified by the schema identified by
-L<https://spec.openapis.org/oas/3.1/schema-base/2024-10-25>
+L<https://spec.openapis.org/oas/3.1/schema-base/2025-02-13>
 and the L<OpenAPI v3.1.x specification|https://spec.openapis.org/oas/v3.1>.
 
 =for Pod::Coverage THAW DEFAULT_BASE_METASCHEMA DEFAULT_DIALECT DEFAULT_METASCHEMA DEFAULT_SCHEMAS
+OAS_VOCABULARY OAS_VERSION
 
 =head1 CONSTRUCTOR ARGUMENTS
 
@@ -601,7 +603,7 @@ The URI of the metaschema to use for all embedded L<JSON Schemas|https://json-sc
 document.
 
 Overrides the value of C<jsonSchemaDialect> in the document, or the specification default
-(C<https://spec.openapis.org/oas/3.1/dialect/base>).
+(C<https://spec.openapis.org/oas/3.1/dialect/2024-11-10>).
 
 If you specify your own dialect here or in C<jsonSchemaDialect>, then you need to add the
 vocabularies and schemas to the implementation yourself (see C<JSON::Schema::Modern/add_vocabulary>
@@ -615,7 +617,7 @@ entire document is not a JSON Schema).
 =head2 metaschema_uri
 
 The URI of the schema that describes the OpenAPI document itself. Defaults to
-L<https://spec.openapis.org/oas/3.1/schema-base/2024-10-25> when the json schema dialect is not
+L<https://spec.openapis.org/oas/3.1/schema-base/2025-02-13> when the json schema dialect is not
 changed; otherwise defaults to a dynamically generated metaschema that uses the correct
 value of C<jsonSchemaDialect>, so you don't need to write one yourself.
 

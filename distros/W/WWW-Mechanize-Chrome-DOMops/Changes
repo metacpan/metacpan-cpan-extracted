@@ -56,3 +56,5 @@ Revision history for WWW-Mechanize-Chrome-DOMops
 0.11    23-04-2025/14:00
         Added the headless option to launching mechanize in tests.
 
+0.12    08-04-2025/11:00
+        Changed the minimum required version of dependency Data::Roundtrip to 0.30 (instead of 0/any), in Makefile.PL, because older versions die on parsing malformed JSON which is part of the testing process. The new version of Data::Roundtrip does not die on malformed JSON but it fails.

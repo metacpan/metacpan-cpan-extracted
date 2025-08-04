@@ -6,15 +6,15 @@ use warnings;
 
 use Error::Pure qw(err);
 use Readonly;
-use Wikibase::Datatype::Item;
+use Wikibase::Datatype::Item 0.39;
 use Wikibase::Datatype::Struct::Language;
 use Wikibase::Datatype::Struct::Sitelink;
 use Wikibase::Datatype::Struct::Statement;
-use Wikibase::Datatype::Struct::Value::Monolingual;
+use Wikibase::Datatype::Struct::Term;
 
 Readonly::Array our @EXPORT_OK => qw(obj2struct struct2obj);
 
-our $VERSION = 0.14;
+our $VERSION = 0.15;
 
 sub obj2struct {
 	my ($obj, $base_uri) = @_;
@@ -39,7 +39,7 @@ sub obj2struct {
 			$struct_hr->{'aliases'}->{$alias->language} = [];
 		}
 		push @{$struct_hr->{'aliases'}->{$alias->language}},
-			Wikibase::Datatype::Struct::Language::obj2struct($alias);
+			Wikibase::Datatype::Struct::Term::obj2struct($alias);
 	}
 
 	# Claims.
@@ -52,7 +52,7 @@ sub obj2struct {
 	# Descriptions.
 	foreach my $desc (@{$obj->descriptions}) {
 		$struct_hr->{'descriptions'}->{$desc->language}
-			= Wikibase::Datatype::Struct::Language::obj2struct($desc);
+			= Wikibase::Datatype::Struct::Term::obj2struct($desc);
 	}
 
 	# Id.
@@ -63,7 +63,7 @@ sub obj2struct {
 	# Labels.
 	foreach my $label (@{$obj->labels}) {
 		$struct_hr->{'labels'}->{$label->language}
-			= Wikibase::Datatype::Struct::Language::obj2struct($label);
+			= Wikibase::Datatype::Struct::Term::obj2struct($label);
 	}
 	
 	# Last revision id.
@@ -111,7 +111,7 @@ sub struct2obj {
 	my $aliases_ar = [];
 	foreach my $lang (keys %{$struct_hr->{'aliases'}}) {
 		foreach my $alias_hr (@{$struct_hr->{'aliases'}->{$lang}}) {
-			push @{$aliases_ar}, Wikibase::Datatype::Struct::Language::struct2obj(
+			push @{$aliases_ar}, Wikibase::Datatype::Struct::Term::struct2obj(
 				$alias_hr,
 			);
 		}
@@ -120,7 +120,7 @@ sub struct2obj {
 	# Descriptions.
 	my $descriptions_ar = [];
 	foreach my $lang (keys %{$struct_hr->{'descriptions'}}) {
-		push @{$descriptions_ar}, Wikibase::Datatype::Struct::Language::struct2obj(
+		push @{$descriptions_ar}, Wikibase::Datatype::Struct::Term::struct2obj(
 			$struct_hr->{'descriptions'}->{$lang},
 		);
 	}
@@ -128,7 +128,7 @@ sub struct2obj {
 	# Labels.
 	my $labels_ar = [];
 	foreach my $lang (keys %{$struct_hr->{'labels'}}) {
-		push @{$labels_ar}, Wikibase::Datatype::Struct::Language::struct2obj(
+		push @{$labels_ar}, Wikibase::Datatype::Struct::Term::struct2obj(
 			$struct_hr->{'labels'}->{$lang},
 		);
 	}
@@ -236,7 +236,6 @@ Returns Wikibase::Datatype::Item instance.
  use Wikibase::Datatype::Statement;
  use Wikibase::Datatype::Struct::Item qw(obj2struct);
  use Wikibase::Datatype::Value::Item;
- use Wikibase::Datatype::Value::Monolingual;
  use Wikibase::Datatype::Value::String;
  use Wikibase::Datatype::Value::Time;
 
@@ -339,48 +338,48 @@ Returns Wikibase::Datatype::Item instance.
  # Main item.
  my $obj = Wikibase::Datatype::Item->new(
          'aliases' => [
-                 Wikibase::Datatype::Value::Monolingual->new(
+                 Wikibase::Datatype::Term->new(
                          'language' => 'cs',
                          'value' => 'Douglas Noël Adams',
                  ),
-                 Wikibase::Datatype::Value::Monolingual->new(
+                 Wikibase::Datatype::Term->new(
                          'language' => 'cs',
                          'value' => 'Douglas Noel Adams',
                  ),
-                 Wikibase::Datatype::Value::Monolingual->new(
+                 Wikibase::Datatype::Term->new(
                          'language' => 'cs',
                          'value' => 'Douglas N. Adams',
                  ),
-                 Wikibase::Datatype::Value::Monolingual->new(
+                 Wikibase::Datatype::Term->new(
                          'language' => 'en',
                          'value' => 'Douglas Noel Adams',
                  ),
-                 Wikibase::Datatype::Value::Monolingual->new(
+                 Wikibase::Datatype::Term->new(
                          'language' => 'en',
                          'value' => 'Douglas Noël Adams',
                  ),
-                 Wikibase::Datatype::Value::Monolingual->new(
+                 Wikibase::Datatype::Term->new(
                          'language' => 'en',
                          'value' => 'Douglas N. Adams',
                  ),
          ],
          'descriptions' => [
-                 Wikibase::Datatype::Value::Monolingual->new(
+                 Wikibase::Datatype::Term->new(
                          'language' => 'cs',
                          'value' => 'anglický spisovatel, humorista a dramatik',
                  ),
-                 Wikibase::Datatype::Value::Monolingual->new(
+                 Wikibase::Datatype::Term->new(
                          'language' => 'en',
                          'value' => 'English writer and humorist',
                  ),
          ],
          'id' => 'Q42',
          'labels' => [
-                 Wikibase::Datatype::Value::Monolingual->new(
+                 Wikibase::Datatype::Term->new(
                          'language' => 'cs',
                          'value' => 'Douglas Adams',
                  ),
-                 Wikibase::Datatype::Value::Monolingual->new(
+                 Wikibase::Datatype::Term->new(
                          'language' => 'en',
                          'value' => 'Douglas Adams',
                  ),
@@ -767,19 +766,19 @@ Returns Wikibase::Datatype::Item instance.
  #     private methods (1) : __ANON__ (Mo::build)
  #     internals: {
  #         aliases        [
- #             [0] Wikibase::Datatype::Value::Monolingual,
- #             [1] Wikibase::Datatype::Value::Monolingual,
- #             [2] Wikibase::Datatype::Value::Monolingual,
- #             [3] Wikibase::Datatype::Value::Monolingual
+ #             [0] Wikibase::Datatype::Term,
+ #             [1] Wikibase::Datatype::Term,
+ #             [2] Wikibase::Datatype::Term,
+ #             [3] Wikibase::Datatype::Term
  #         ],
  #         descriptions   [
- #             [0] Wikibase::Datatype::Value::Monolingual,
- #             [1] Wikibase::Datatype::Value::Monolingual
+ #             [0] Wikibase::Datatype::Term,
+ #             [1] Wikibase::Datatype::Term
  #         ],
  #         id             "Q42",
  #         labels         [
- #             [0] Wikibase::Datatype::Value::Monolingual,
- #             [1] Wikibase::Datatype::Value::Monolingual
+ #             [0] Wikibase::Datatype::Term,
+ #             [1] Wikibase::Datatype::Term
  #         ],
  #         lastrevid      534820,
  #         modified       "2020-12-02T13:39:18Z",
@@ -835,6 +834,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.14
+0.15
 
 =cut

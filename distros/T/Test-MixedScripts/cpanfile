@@ -39,8 +39,10 @@ on 'configure' => sub {
 };
 
 on 'develop' => sub {
+  requires "Dist::Zilla::Plugin::UsefulReadme" => "v0.1.2";
   requires "ExtUtils::Manifest" => "1.68";
   requires "Pod::Coverage::TrustPod" => "0";
+  requires "Pod::Markdown::Github" => "0";
   requires "Software::Security::Policy::Individual" => "0.10";
   requires "Test::CPAN::Changes" => "0.19";
   requires "Test::DistManifest" => "0";

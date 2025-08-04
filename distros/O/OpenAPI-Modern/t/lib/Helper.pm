@@ -32,15 +32,15 @@ use YAML::PP 0.005;
 use constant DEFAULT_DIALECT => JSON::Schema::Modern::Document::OpenAPI::DEFAULT_DIALECT;
 use constant DEFAULT_BASE_METASCHEMA => JSON::Schema::Modern::Document::OpenAPI::DEFAULT_BASE_METASCHEMA;
 use constant DEFAULT_METASCHEMA => JSON::Schema::Modern::Document::OpenAPI::DEFAULT_METASCHEMA;
-use constant OAS_VOCABULARY => 'https://spec.openapis.org/oas/3.1/meta/2024-10-25';
+use constant OAS_VOCABULARY => JSON::Schema::Modern::Document::OpenAPI::OAS_VOCABULARY;
 
 # technically all 3.1.x versions should be supported, but this is all we have tested for, and the
 # version of the schemas we're bundling.
-use constant OAS_VERSION => '3.1.1';
+use constant OAS_VERSION => JSON::Schema::Modern::Document::OpenAPI::OAS_VERSION;
 
-use constant OPENAPI_PREAMBLE => <<'YAML';
+use constant OPENAPI_PREAMBLE => <<"YAML";
 ---
-openapi: 3.1.1
+openapi: ${\ OAS_VERSION() }
 info:
   title: Test API
   version: 1.2.3

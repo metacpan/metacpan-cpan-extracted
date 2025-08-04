@@ -9,13 +9,13 @@ BEGIN {
 use strict;
 use warnings;
 
-# This test was generated with Dist::Zilla::Plugin::Test::MixedScripts v0.1.0.
+# This test was generated with Dist::Zilla::Plugin::Test::MixedScripts v0.1.5.
 
-use Test::More 1.302200;
+use Test2::Tools::Basic 1.302200;
 
 use Test::MixedScripts qw( file_scripts_ok );
 
-my @scxs = ( 'Common', 'Latin', 'Han' );
+my @scxs = (  );
 
 my @files = (
     'lib/MooX/Const.pm',
@@ -39,6 +39,7 @@ my @files = (
     't/author-pod-linkcheck.t',
     't/author-pod-syntax.t',
     't/author-portability.t',
+    't/etc/perlcritic.rc',
     't/lib/MooTest.pm',
     't/lib/MooTest/Strict.pm',
     't/lib/MooseTest.pm',

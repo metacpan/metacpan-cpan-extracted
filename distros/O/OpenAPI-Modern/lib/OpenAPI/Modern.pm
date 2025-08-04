@@ -1,10 +1,10 @@
 use strictures 2;
-package OpenAPI::Modern; # git description: v0.088-15-gd468c2d
+package OpenAPI::Modern; # git description: v0.089-11-gb2bc93b
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI v3.1 document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI v3.1 Swagger HTTP request response
 
-our $VERSION = '0.089';
+our $VERSION = '0.090';
 
 use 5.020;
 use utf8;
@@ -1125,7 +1125,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI v3.1 d
 
 =head1 VERSION
 
-version 0.089
+version 0.090
 
 =head1 SYNOPSIS
 
@@ -1517,12 +1517,19 @@ reloading them (perhaps by using a timestamp or checksum to determine if a fresh
 
 See also L<JSON::Schema::Modern/CACHING>.
 
+=head1 BUNDLED SCHEMA DOCUMENTS
+
+This distribution comes bundled with all the metaschema documents you need to build your application,
+or build custom schemas on top of. It aims to always use the latest versions of the documents; if
+you need earlier versions, you can find them at
+L<https://spec.openapis.org/#openapi-specification-schemas>.
+
 =head1 ON THE USE OF JSON SCHEMAS
 
 Embedded JSON Schemas, through the use of the C<schema> keyword, are fully draft2020-12-compliant,
 as per the spec, and implemented with L<JSON::Schema::Modern>. Unless overridden with the use of the
 L<jsonSchemaDialect|https://spec.openapis.org/oas/v3.1#specifying-schema-dialects> keyword, their
-metaschema is L<https://spec.openapis.org/oas/3.1/dialect/base>, which allows for use of the
+metaschema is L<https://spec.openapis.org/oas/3.1/dialect/2024-11-10>, which allows for use of the
 OpenAPI-specific keywords (C<discriminator>, C<xml>, C<externalDocs>, and C<example>), as defined in
 L<the specification/https://spec.openapis.org/oas/v3.1#schema-object>. Format validation is turned
 B<on>, and the use of content* keywords is off (see

@@ -145,7 +145,8 @@ SV * pwhash( \
   SV * salt, \
   STRLEN out_len = 0, \
   STRLEN opslimit = 0, \
-  STRLEN memlimit = 0 \
+  STRLEN memlimit = 0, \
+  U32 flags = 0 \
 )
 
   ALIAS:
@@ -154,23 +155,17 @@ SV * pwhash( \
   pwhash_scryptsalsa208sha256 = 3
 
   PREINIT:
-  protmem *pw_pm = NULL;
+  protmem *out_pm, *pw_pm = NULL;
   unsigned char *salt_buf;
   unsigned char *pw_buf;
-  unsigned char *out_buf;
   STRLEN salt_len;
   STRLEN pw_len;
   STRLEN salt_req_len;
-  int alg;
-  size_t out_min;
-  size_t out_max;
-  size_t opslimit_def;
-  size_t opslimit_min;
-  size_t opslimit_max;
-  size_t memlimit_def;
-  size_t memlimit_min;
-  size_t memlimit_max;
-  int ret;
+  int alg = 0, ret;
+  U32 new_flags = g_protmem_default_flags_key;
+  size_t out_min, out_max;
+  size_t opslimit_def, opslimit_min, opslimit_max;
+  size_t memlimit_def, memlimit_min, memlimit_max;
 
   CODE:
   switch(ix) {
@@ -222,6 +217,9 @@ SV * pwhash( \
       memlimit_max = crypto_pwhash_MEMLIMIT_MAX;
   }
 
+  if (flags)
+    new_flags = flags;
+
   if (out_len == 0)
     /* default out length identical to what the current string default uses */
     out_len = 32;
@@ -254,35 +252,37 @@ SV * pwhash( \
   else
     pw_buf = (unsigned char *)SvPVbyte(passphrase, pw_len);
 
-  Newx(out_buf, out_len + 1, unsigned char);
-  if (out_buf == NULL)
+  out_pm = protmem_init(aTHX_ out_len, new_flags);
+  if (out_pm == NULL)
     croak("pwhash: Failed to allocate protmem");
-  out_buf[out_len] = '\0';
 
   if (pw_pm && protmem_grant(aTHX_ pw_pm, PROTMEM_FLAG_MPROTECT_RO) != 0) {
-    Safefree(out_buf);
+    protmem_free(aTHX_ out_pm);
     croak("pwhash: Failed to grant passphrase protmem RO");
   }
 
   if (ix == 3)
-    ret = crypto_pwhash_scryptsalsa208sha256(out_buf, out_len, (char *)pw_buf,
+    ret = crypto_pwhash_scryptsalsa208sha256(out_pm->pm_ptr, out_len, (char *)pw_buf,
                                              pw_len, salt_buf, opslimit, memlimit);
   else
-    ret = crypto_pwhash(out_buf, out_len, (char *)pw_buf, pw_len,
+    ret = crypto_pwhash(out_pm->pm_ptr, out_len, (char *)pw_buf, pw_len,
                         salt_buf, opslimit, memlimit, alg);
 
   if (pw_pm && protmem_release(aTHX_ pw_pm, PROTMEM_FLAG_MPROTECT_RO) != 0) {
-    Safefree(out_buf);
+    protmem_free(aTHX_ out_pm);
+    croak("pwhash: Failed to release passphrase protmem RO");
+  }
+  if (protmem_release(aTHX_ out_pm, PROTMEM_FLAG_MPROTECT_RO) != 0) {
+    protmem_free(aTHX_ out_pm);
     croak("pwhash: Failed to release passphrase protmem RO");
   }
 
   if (ret != 0) {
-    Safefree(out_buf);
+    protmem_free(aTHX_ out_pm);
     croak("pwhash: pwhash failed (out of memory?)");
   }
 
-  RETVAL = newSV(0);
-  sv_usepvn_flags(RETVAL, (char *)out_buf, out_len, SV_HAS_TRAILING_NUL);
+  RETVAL = protmem_to_sv(aTHX_ out_pm, MEMVAULT_CLASS);
 
   OUTPUT:
   RETVAL

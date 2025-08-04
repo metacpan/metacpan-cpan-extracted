@@ -1,3 +1,14 @@
+0.000036 Aug 3 2025
+
+- important update: return protected memory from pwhash function. the output is
+  intended to be used as a secret, and this was an oversight in the original
+  implementation.
+
+- add new importable shortcut functions to memvault constructors
+
+- replace undocumented memvault new_from_ttyno constructor with new_from_tty.
+  this remains undocumented and not recommended for use pending further review.
+
 0.000035 Aug 1 2025
 
 - BUGFIX: fix overread on new length parameter for memvault new_from_fd|file

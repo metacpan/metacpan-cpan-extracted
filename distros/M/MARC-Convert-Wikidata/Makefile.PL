@@ -37,7 +37,7 @@ requires 'Readonly' => 0;
 requires 'Roman' => 0;
 requires 'Unicode::UTF8' => 0;
 requires 'URI' => 0;
-requires 'Wikibase::Datatype' => 0;
+requires 'Wikibase::Datatype' => 0.39;
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/MARC-Convert-Wikidata/issues',
 resources 'homepage' => 'https://github.com/michal-josef-spacek/MARC-Convert-Wikidata';
 resources 'repository' => 'git://github.com/michal-josef-spacek/MARC-Convert-Wikidata';
@@ -51,7 +51,7 @@ test_requires 'Test::NoWarnings' => 0;
 test_requires 'Test::Warn' => 0;
 test_requires 'Unicode::UTF8' => 0;
 tests_recursive;
-version '0.29';
+version '0.30';
 
 # Run.
 WriteAll();

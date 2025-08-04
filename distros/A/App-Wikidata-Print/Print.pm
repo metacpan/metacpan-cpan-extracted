@@ -10,7 +10,7 @@ use Unicode::UTF8 qw(encode_utf8);
 use Wikibase::API;
 use Wikibase::Datatype::Print;
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 # Constructor.
 sub new {
@@ -44,7 +44,7 @@ sub run {
 		print STDERR "\t-m mediawiki_site\tMediaWiki site (default is www.wikidata.org).\n";
 		print STDERR "\t-r\t\t\tWith references.\n";
 		print STDERR "\t--version\t\tPrint version.\n";
-		print STDERR "\twd_id\t\t\tWikidata id (qid or pid or lid).\n";
+		print STDERR "\twd_id\t\t\tWikidata id (qid or pid or lid or mid).\n";
 		return 1;
 	}
 	my $wd_id = $ARGV[0];
@@ -200,12 +200,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2021-2024 Michal Josef Špaček
+© 2021-2025 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

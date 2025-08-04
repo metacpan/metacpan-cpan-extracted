@@ -28,7 +28,7 @@ done_testing;
 
 __DATA__
 share/oas/LICENSE 7a3f5fcd4ca489b5555f5f92ec054a0a
-share/oas/dialect/base.schema.json cb0121edd8ec605f34d99b3ae53d7a3d
-share/oas/meta/base.schema.json 70176e6eb8dc888007ac05da90a1e07f
-share/oas/schema-base.json 7c9e5a9cf7cc88adc4057c03373641c6
-share/oas/schema.json 234071e79d67882e5cf81c2fcc82990b
+share/oas/dialect/base.schema.json 06cea984f8807c13e2916914251e22c3
+share/oas/meta/base.schema.json ecd6e7cbcc29cdabd9c445a2752fc394
+share/oas/schema-base.json a760010ee2c3260762106079c1dda1d0
+share/oas/schema.json 53dc35d01246a9d93c08090da2e97f5e

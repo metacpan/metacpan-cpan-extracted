@@ -4,6 +4,21 @@ use warnings;
 
 use Crypt::Sodium::XS;
 
+use Exporter 'import';
+
+our %EXPORT_TAGS = (
+  constructors => [qw[
+    mv_new
+    mv_from_base64
+    mv_from_fd
+    mv_from_file
+    mv_from_tty
+    mv_from_ttyno
+  ]],
+);
+$EXPORT_TAGS{all} = [ @{$EXPORT_TAGS{constructors}} ];
+our @EXPORT_OK = @{$EXPORT_TAGS{all}};
+
 use overload (
   fallback => 0,
   nomethod => \&_overload_nomethod,
@@ -35,6 +50,14 @@ use overload (
   '^=' => \&bitwise_xor_equals,
 );
 
+sub mv_new { __PACKAGE__->new(@_); }
+sub mv_from_base64 { __PACKAGE__->new_from_base64(@_); }
+sub mv_from_hex { __PACKAGE__->new_from_hex(@_); }
+sub mv_from_fd { __PACKAGE__->new_from_fd(@_); }
+sub mv_from_file { __PACKAGE__->new_from_file(@_); }
+sub mv_from_tty { __PACKAGE__->new_from_tty(@_); }
+sub mv_from_ttyno { __PACKAGE__->new_from_ttyno(@_); }
+
 1;
 
 __END__
@@ -48,7 +71,7 @@ Crypt::Sodium::XS::MemVault - Protected memory objects
 =head1 SYNOPSIS
 
   use Crypt::Sodium::XS;
-  use Crypt::Sodium::XS::MemVault;
+  use Crypt::Sodium::XS::MemVault ':constructors';
 
   my $key = Crypt::Sodium::XS->generichash->keygen;
   # keygen returns a Crypt::Sodium::XS::MemVault
@@ -56,13 +79,13 @@ Crypt::Sodium::XS::MemVault - Protected memory objects
   print "hex: ", $key->to_hex->unlock, "\n";
   print "base64: ", $key->to_base64->unlock, "\n";
 
-  my $key2 = Crypt::Sodium::XS::MemVault->new_from_file("/other/path");
+  my $key2 = mv_from_file("/other/path");
 
   if ($key1->memcmp($key2)) {
-    die "randomly generated key matches loaded key: impossible.";
+    die "randomly generated key matches loaded key: inconceivable!";
   }
 
-  my $mv = Crypt::Sodium::XS::MemVault->new("hello");
+  my $mv = mv_new("hello");
 
   my $extracted_data_mv = $mv->extract(1, 3); # "ell"
   print $extracted_data_mv->unlock, "\n";
@@ -163,6 +186,33 @@ L<Crypt::Sodium::XS::ProtMem/protmem_flags_memvault_default>.
 
 Returns a L<Crypt::Sodium::XS::MemVault>: the bytes from read C<$fd>, B<up to>
 C<$size> bytes or until end-of-file if C<$size> is 0.
+
+=head1 FUNCTIONS
+
+Nothing is exported by default. A C<:constructors> tag imports the
+L</CONSTRUCTOR FUNCTIONS>. A C<:all> tag imports everything.
+
+=head2 CONSTRUCTOR FUNCTIONS
+
+=head2 mv_new
+
+Shortcut to L</new>.
+
+=head2 mv_from_base64
+
+Shortcut to L</new_from_base64>.
+
+=head2 mv_from_hex
+
+Shortcut to L</new_from_hex>.
+
+=head2 mv_from_fd
+
+Shortcut to L</new_from_fd>.
+
+=head2 mv_from_file
+
+Shortcut to L</new_from_file>.
 
 =head1 METHODS
 

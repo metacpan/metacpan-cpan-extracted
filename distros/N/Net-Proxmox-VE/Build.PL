@@ -16,10 +16,10 @@ my %module_build_args = (
   },
   "dist_abstract" => "Pure Perl API for Proxmox Virtual Environment",
   "dist_author" => [
-    "Brendan Beveridge <brendan\@nodeintegration.com.au>, Dean Hamstead <dean\@fragfest.com.au>"
+    "Dean Hamstead <dean\@fragfest.com.au>"
   ],
   "dist_name" => "Net-Proxmox-VE",
-  "dist_version" => "0.40",
+  "dist_version" => "0.41",
   "license" => "mit",
   "module_name" => "Net::Proxmox::VE",
   "recursive_test_files" => 1,

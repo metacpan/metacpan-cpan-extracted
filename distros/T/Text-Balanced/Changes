@@ -1,5 +1,12 @@
 Revision history for Perl distribution Text-Balanced.
 
+2.07 2025-08-03
+
+    - Fix "uninitialized value $unkpos" warnings.  [michal-josef-spacek, PR#8]
+
+    - Removed dead cpanratings.perl.org link.  [peter.john.acklam@gmail.com,
+      CPAN RT#148045]
+
 2.06 2022-06-05
 
     - Released with no further code changes.
@@ -39,7 +46,7 @@ Revision history for Perl distribution Text-Balanced.
     - Fix extract_variable() not recognising ${var} end of string.  [Ed J, CPAN
       RT#70007]
 
-    - Fix string-comparing $@ causing exception.  [Ed J, CPAN RT#74994)
+    - Fix string-comparing $@ causing exception.  [Ed J, CPAN RT#74994]
 
     - Update documentation to correct CSV example.  [djerius@cpan.org, CPAN
       RT#140408]
@@ -54,7 +61,7 @@ Revision history for Perl distribution Text-Balanced.
 2.04 2020-12-11
 
     - Fixed INSTALLDIRS to account for the @INC reordering change in Perl 5.12.
-      See Perl RT#116479 for details.  (Text-Balanced entered the perl core in
+      See Perl GH#12722 for details.  (Text-Balanced entered the perl core in
       Perl 5.7.1 so that's what the lower bound of the check should strictly be,
       but since we only support Perl 5.8.1 and higher anyway we do not need to
       check the lower bound.  The upper bound is correctly Perl 5.11.0 since the

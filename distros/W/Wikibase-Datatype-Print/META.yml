@@ -21,7 +21,7 @@ build_requires:
   Wikibase::Cache: 0
   Wikibase::Cache::Backend::Basic: 0.03
   Wikibase::Datatype::Form: 0
-  Wikibase::Datatype::Item: 0
+  Wikibase::Datatype::Item: 0.39
   Wikibase::Datatype::Lexeme: 0
   Wikibase::Datatype::MediainfoSnak: 0
   Wikibase::Datatype::Reference: 0
@@ -65,4 +65,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Wikibase-Datatype-Print
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Wikibase-Datatype-Print
-version: '0.18'
+version: '0.19'

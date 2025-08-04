@@ -8,9 +8,9 @@ use List::Util qw(first);
 use Moo;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-11-06'; # DATE
+our $DATE = '2024-12-21'; # DATE
 our $DIST = 'Org-To-HTML'; # DIST
-our $VERSION = '0.236'; # VERSION
+our $VERSION = '0.237'; # VERSION
 
 has source_file => (is => 'rw'); # for informational purposes
 has include_tags => (is => 'rw');
@@ -161,7 +161,7 @@ Org::To::Base - Base class for Org exporters
 
 =head1 VERSION
 
-This document describes version 0.236 of Org::To::Base (from Perl distribution Org-To-HTML), released on 2023-11-06.
+This document describes version 0.237 of Org::To::Base (from Perl distribution Org-To-HTML), released on 2024-12-21.
 
 =head1 SYNOPSIS
 
@@ -263,7 +263,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2022, 2020, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

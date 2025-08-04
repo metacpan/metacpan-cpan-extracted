@@ -30,7 +30,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Data::Roundtrip" : "0",
+            "Data::Roundtrip" : "0.30",
             "Exporter" : "0",
             "String::Escape" : "0",
             "perl" : "5.006"
@@ -38,7 +38,7 @@
       },
       "test" : {
          "requires" : {
-            "Data::Roundtrip" : "0",
+            "Data::Roundtrip" : "0.30",
             "File::Spec" : "0",
             "FindBin" : "0",
             "Log::Log4perl" : "0",
@@ -50,6 +50,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.11",
+   "version" : "0.12",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

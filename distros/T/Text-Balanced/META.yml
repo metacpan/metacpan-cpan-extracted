@@ -12,7 +12,7 @@ configure_requires:
   strict: '0'
   warnings: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -44,5 +44,5 @@ requires:
   vars: '0'
 resources:
   repository: https://github.com/steve-m-hay/Text-Balanced
-version: '2.06'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: '2.07'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -10,6 +10,7 @@ build_requires:
   Test::More: 0
   Test::NoWarnings: 0
   Test::Shared::Fixture::Wikibase::Datatype::Item::Wikidata::Dog: 0.24
+  Test::Shared::Fixture::Wikibase::Datatype::Lexeme::Wikidata::DogCzechNoun: 0.19
   Test::Shared::Fixture::Wikibase::Datatype::Mediainfo::Commons::ImageOfHuman: 0.22
 configure_requires:
   ExtUtils::MakeMaker: 6.59
@@ -37,4 +38,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Wikibase-Datatype-Query
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Wikibase-Datatype-Query
-version: '0.03'
+version: '0.05'

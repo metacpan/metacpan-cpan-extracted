@@ -6,7 +6,7 @@ use 5.20.0;
 use experimental 'signatures';
 use Getopt::Long qw/:config bundling/;
 use Crypt::Sodium::XS::Base64 ":all";
-use Crypt::Sodium::XS::MemVault;
+use Crypt::Sodium::XS::MemVault ":constructors";
 use Crypt::Sodium::XS::ProtMem "PROTMEM_ALL_DISABLED";
 use Crypt::Sodium::XS::Util 'sodium_random_bytes';
 use Crypt::Sodium::XS::generichash ":all";
@@ -64,6 +64,7 @@ use File::Spec;
 # now i'm confused. looking back, 'ED' is "legacy" (hashed) and 'Ed' is neither.
 my %sig_algs = (
   Ed => {
+    id => 'Ed',
     name => 'ed25519',
     bytes => sign_ed25519_BYTES,
     pkbytes => sign_ed25519_PUBLICKEYBYTES,
@@ -73,6 +74,7 @@ my %sig_algs = (
     verify => \&sign_ed25519_verify,
   },
   ED => {
+    id => 'ED',
     name => 'ed25519 pre-hashed',
     bytes => sign_ed25519_BYTES,
     pkbytes => sign_ed25519_PUBLICKEYBYTES,
@@ -86,6 +88,7 @@ my %sig_algs = (
 );
 my %kdf_algs = (
   Sc => {
+    id => 'Sc',
     name => 'scrypt',
     saltbytes => pwhash_scryptsalsa208sha256_SALTBYTES,
     opslimit_default => pwhash_scryptsalsa208sha256_OPSLIMIT_SENSITIVE,
@@ -96,6 +99,7 @@ my %kdf_algs = (
   # not supported upstream
   # hopefully does not clash with later upstream choice
   XA => {
+    id => 'XA',
     name => 'argon2id',
     saltbytes => pwhash_argon2id_SALTBYTES,
     opslimit_default => pwhash_argon2id_OPSLIMIT_SENSITIVE,
@@ -106,6 +110,7 @@ my %kdf_algs = (
 );
 my %chk_algs = (
   B2 => {
+    id => 'B2',
     name => 'blake2b',
     bytes => generichash_blake2b_BYTES,
     init => \&generichash_blake2b_init,
@@ -147,7 +152,6 @@ usage:
     -x <sigfile>      signature file (default: <file>.minisig)
     -c <comment>      add a one-line untrusted comment
     -t <comment>      add a one-line trusted comment
-    -T                don't require nor add trusted comment (signify compat)
     -q                quiet mode, suppress output
     -Q                pretty quiet mode, only print the trusted comment
     -S                sign files
@@ -219,10 +223,10 @@ sub unpack_pk_data($pk_blob) {
 }
 
 # NB: $sk_blob must be a MemVault
-sub unpack_sk_data($sk_blob) {
+sub unpack_sk_data($sk_blob, $opts) {
   my $sk_data = {};
 
-  die "invalid secret key blob (too short)" if $sk_blob->length < 6;
+  die "invalid secret key blob (too short: ".$sk_blob->size.")" if $sk_blob->size < 6;
   @$sk_data{qw/sig_alg kdf_alg chk_alg/}
     = unpack("a2a2a2", $sk_blob->extract(0, 6, PROTMEM_ALL_DISABLED));
   my $sig_alg = $sig_algs{$sk_data->{sig_alg}}
@@ -241,7 +245,7 @@ sub unpack_sk_data($sk_blob) {
   my $key_fmt = "a8a${sk_len}a${chk_len}";
   my $key_len = 8 + $sk_len + $chk_len;
   my $total_len = $header_chunk_len + $key_len;
-  die "invalid secret key blob (too short)" if $sk_blob->length < $total_len;
+  die "invalid secret key blob (too short)" if $sk_blob->size < $total_len;
 
   my $header_chunk = $sk_blob->extract(0, $header_chunk_len, PROTMEM_ALL_DISABLED);
   my $key_chunk = $sk_blob->extract($header_chunk_len);
@@ -259,7 +263,8 @@ sub unpack_sk_data($sk_blob) {
   $sk_data->{sk} = $key_chunk->extract(8, $sk_len);
   print "deriving a key from the password and decrypting the secret key...\n";
   STDOUT->flush;
-  my $passwd = Crypt::Sodium::XS::MemVault->new_from_ttyno(fileno(*STDIN), "Passphrase: ");
+  my $passwd = mv_from_tty("Passphrase: ");
+  $passwd = $passwd->concat("\n") if $ENV{PMINISIGN_COMPATIBLE_SECRETKEY};
   $passwd = $kdf_alg->{kdf_gen}->($passwd, $sk_data->{salt}, $sig_alg->{skbytes},
                                   @$sk_data{qw/opslimit memlimit/});
   $sk_data->{sk}->bitwise_xor_equals($passwd);
@@ -285,7 +290,7 @@ sub load_sig($opts) {
       unless $trusted_comment =~ s/\A\Q$trusted_comment_prefix//;
     $full_sig = readline($fh) =~ s/[\r\n]+\z//r;
   }
-  elsif (!$opts->{no_trusted_comment}) {
+  elsif (!$ENV{PMINISIGN_NO_TRUSTED_COMMENT}) {
     die "$path: invalid sig file (missing trusted comment)\n";
   }
   my $sig_data = unpack_sig_data(sodium_base642bin($sig_blob, BASE64_VARIANT_ORIGINAL));
@@ -309,19 +314,16 @@ sub load_pk($path) {
   return unpack_pk_data(sodium_base642bin($pk_blob, BASE64_VARIANT_ORIGINAL));
 }
 
-sub load_sk($path) {
+sub load_sk($opts) {
+  my $path = $opts->{sk_path};
   open(my $fh, "<:raw", $path) or die "$path: $!";
-  my $sk_blob = Crypt::Sodium::XS::MemVault->new_from_fd(fileno($fh));
-  my $idx = $sk_blob->unlock->index("\n");
-  $sk_blob->lock;
-  die "$path: invalid secret key file (missing comment)" unless defined($idx);
-  my $comment = $sk_blob->extract(0, $idx, PROTMEM_ALL_DISABLED);
+  my $comment = readline($fh);
   die "$path: invalid public key file (comment should start '$comment_prefix')\n"
-    unless $comment =~ s/\A\Q$comment_prefix//;
-  $sk_blob = $sk_blob->extract($idx + 1);
-  my $sk_data = unpack_sk_data($sk_blob->from_base64(BASE64_VARIANT_ORIGINAL));
-  $sk_data->{comment} = $comment;
-  return $sk_data;
+    unless $comment and $comment =~ s/\A\Q$comment_prefix//;
+  my $sk_blob = readline($fh);
+  die "$path: missing secret key line" unless $sk_blob;
+  close($fh);
+  return unpack_sk_data(mv_from_base64($sk_blob, BASE64_VARIANT_ORIGINAL), $opts);
 }
 
 sub load_msg { # no sub signature; uses alias to first arg
@@ -367,7 +369,7 @@ EODIE
   }
   $comment =~ tr/\r\n/ /s;
   my $sig_alg = $sig_algs{$sig_alg_hashed_default};
-  my $kdf_alg = $kdf_algs{$kdf_alg_default};
+  my $kdf_alg = $kdf_algs{$ENV{PMINISIGN_COMPATIBLE_SECRETKEY} ? 'Sc' : $kdf_alg_default};
   my $chk_alg = $chk_algs{$chk_alg_default};
   my $key_num = sodium_random_bytes(8);
   my ($pk, $sk) = $sig_alg->{keypair_gen}->();
@@ -378,7 +380,7 @@ EODIE
   };
   my $sk_data = {
     sig_alg => $sig_alg_default,
-    kdf_alg => $kdf_alg_default,
+    kdf_alg => $kdf_alg->{id},
     chk_alg => $chk_alg_default,
     key_num => $key_num,
     sk => $sk,
@@ -386,11 +388,12 @@ EODIE
   $sk_data->{chk} = chk_sk($sk_data);
   print "Please enter a passphrase to protect the secret key.\n";
   STDOUT->flush;
-  my $pw = Crypt::Sodium::XS::MemVault->new_from_ttyno(fileno(*STDIN), "Passphrase: ");
-  my $pw_chk = Crypt::Sodium::XS::MemVault->new_from_ttyno(fileno(*STDIN), "Passphrase (one more time): ");
-  unless ($pw->length == $pw_chk->length and $pw eq $pw_chk) {
+  my $pw = mv_from_tty("Passphrase: ");
+  my $pw_chk = mv_from_tty("Passphrase (one more time): ");
+  unless ($pw->size == $pw_chk->size and $pw eq $pw_chk) {
     die "Passphrases don't match\n";
   }
+  $pw = $pw->concat("\n") if $ENV{PMINISIGN_COMPATIBLE_SECRETKEY};
   print "Deriving a key from the password in order to encrypt to secret key...\n";
   print "(this may take a few moments)...\n";
   my $pw_salt = $sk_data->{salt} = $kdf_alg->{salt_gen}->();
@@ -428,7 +431,7 @@ sub recreate($opts) {
     die "Public key '$pk_path' already exists."
       . "Use -f (force) if you wish to overwrite it.\n";
   }
-  my $sk_data = load_sk($sk_path);
+  my $sk_data = load_sk($opts);
   # depends on the fact secret key is really sk . pk
   my $pk_len = $sig_algs{$sk_data->{sig_alg}}->{pkbytes};
   my $pk_data = {
@@ -482,7 +485,7 @@ sub signify($sk_data, $opts, $msg_path) {
   open(my $fh, ">:raw", $sig_path) or die "$sig_path: $!";
   print $fh $comment, "\n";
   print $fh sodium_bin2base64(pack_sig_data($sig_data), BASE64_VARIANT_ORIGINAL), "\n";
-  unless ($opts->{no_trusted_comment}) {
+  unless ($ENV{PMINISIGN_NO_TRUSTED_COMMENT}) {
     my $trusted_sig = $sig_alg->{sign}->($sig_data->{sig}."$trusted_comment", $sk_data->{sk});
     print $fh "$trusted_comment_prefix$trusted_comment", "\n";
     print $fh sodium_bin2base64($trusted_sig, BASE64_VARIANT_ORIGINAL), "\n";
@@ -553,26 +556,26 @@ sub verify($pk_data, $opts) {
 sub main(@argv) {
   my $opts = {};
   Getopt::Long::GetOptionsFromArray(\@argv, $opts, qw(
-    help|h
-    version|v
-    generate|G
-    recreate|R
-    sign|S
-    verify|V
-    prehashed|H
-    legacy_sign|l
-    msg_path|m:s
-    print|o
-    pk_path|p:s
-    pk_b64|P:s
-    sk_path|s:s
-    sig_path|x:s
-    comment|c:s
-    trusted_comment|t:s
+              generate|G
+             prehashed|H
+                pk_b64|P:s
+          pretty_quiet|Q
+              recreate|R
+                  sign|S
     no_trusted_comment|T
-    quiet|q
-    pretty_quiet|Q
-    force|f
+                verify|V
+               comment|c:s
+                 force|f
+                  help|h
+           legacy_sign|l
+              msg_path|m:s
+                 print|o
+               pk_path|p:s
+               sk_path|s:s
+                 quiet|q
+       trusted_comment|t:s
+               version|v
+              sig_path|x:s
   )) or usage("Invalid options");
 
   usage() if $opts->{help};
@@ -598,7 +601,7 @@ sub main(@argv) {
   elsif ($opts->{sign}) {
     $opts->{sk_path} //= default_sk_path();
     usage("no file to sign provided") unless $opts->{msg_path};
-    my $sk_data = load_sk($opts->{sk_path});
+    my $sk_data = load_sk($opts);
     for my $path ($opts->{msg_path}, @argv) {
       signify($sk_data, $opts, $path);
     }
@@ -667,7 +670,6 @@ These options control the actions of pminisign.
     -x <sigfile>: Signature file (default: <file>.minisig)
     -c <comment>: Add a one-line untrusted comment
     -t <comment>: Add a one-line trusted comment
-    -T: Do not require (verifying) nor add (signing) trusted comment
     -l: Sign using the legacy format
     -q: Quiet mode, suppress output
     -H: Requires the input to be prehashed
@@ -738,27 +740,28 @@ secret key. Trusted comments can be used to add instructions or
 application-specific metadata (intended file name, timestamps, resource
 identifiers, version numbers to prevent downgrade attacks).
 
-=head1 DIFFERENCES FROM MINISIGN
+=head1 SIGNIFY COMPATABILITY
 
-This program diverges from L<minisign|https://github.com/jedisct1/minisign> in
-two significant ways.
+The environment variable C<PMINISIGN_NO_TRUSTED_COMMENT>, if set to any
+not-false string (not empty nor "0"), will cause L<pminisign> to ignore (when
+verifying signatures) and skip creation of (when signing) trusted comments.
+When set, L<pminisign> is compatible with the OpenBSD
+L<signify|https://man.openbsd.org/signify> utility.
 
-=over 4
+=head1 MINISIGN COMPATABILITY
 
-=item *
+The environment variable C<PMINISIGN_COMPATIBLE_SECRETKEY>, if set to any
+not-false string (not empty nor "0"), will cause L<pminisign> to use
+passphrases compatible with L<minisign|https://github.com/jedisct1/minisign>.
+This is required only for using any secret keys created by minisign, or to
+generate a key which can be used by minisign.
 
-With the C<-T> flag, lack of a trusted comment can be ignored. This allows
-verifying signatures created with OpenBSD's
-L<signify|https://man.openbsd.org/signify> program.
+B<WARNING>: Key compatability is a work in progress and does not yet function.
+Keys generated with minisign cannot currently be used with pminisign. Keys
+generated with pminisign cannot be used and will not be usable with minisign.
+This limitation will be fixed in a future release.
 
-=item *
-
-Password hashing (for storage and use of secret keys) supports, and uses by
-default, argon2id. Upstream minisign always uses scryptsalsa208sha256. This
-program can use secret key files created with that algorithm, but will always
-use argon2id when creating key files.
-
-=back
+=head1 SEE ALSO
 
 =head1 AUTHOR
 

@@ -7,7 +7,7 @@ use strict;
 use warnings;
 
 package Net::Proxmox::VE::Pools;
-$Net::Proxmox::VE::Pools::VERSION = '0.40';
+$Net::Proxmox::VE::Pools::VERSION = '0.41';
 use parent 'Exporter';
 
 use Net::Proxmox::VE::Exception;
@@ -127,7 +127,7 @@ Net::Proxmox::VE::Pools - Presents a pool object
 
 =head1 VERSION
 
-version 0.40
+version 0.41
 
 =head1 SYNOPSIS
 
@@ -239,7 +239,7 @@ L<Net::Proxmox::VE>
 
 =head1 AUTHOR
 
-Brendan Beveridge <brendan@nodeintegration.com.au>, Dean Hamstead <dean@fragfest.com.au>
+Dean Hamstead <dean@fragfest.com.au>
 
 =head1 COPYRIGHT AND LICENSE
 

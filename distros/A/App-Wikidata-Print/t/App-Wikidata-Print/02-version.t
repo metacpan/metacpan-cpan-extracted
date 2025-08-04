@@ -6,4 +6,4 @@ use Test::More 'tests' => 2;
 use Test::NoWarnings;
 
 # Test.
-is($App::Wikidata::Print::VERSION, 0.04, 'Version.');
+is($App::Wikidata::Print::VERSION, 0.05, 'Version.');

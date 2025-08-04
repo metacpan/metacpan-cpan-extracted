@@ -4,6 +4,8 @@ use Test::More;
 use MIME::Base64 'encode_base64';
 use File::Temp;
 
+use Crypt::Sodium::XS::Base64 ':all';
+use Crypt::Sodium::XS::MemVault ':all';
 use Crypt::Sodium::XS::ProtMem ':constants';
 use Crypt::Sodium::XS::Util 'sodium_random_bytes';
 use Crypt::Sodium::XS::secretbox qw/secretbox_KEYBYTES secretbox_keygen/;
@@ -39,6 +41,17 @@ for my $mv_data (@mv_datas) {
   ok(!$mv->clone->is_locked, "clone of unlocked MemVault !is_locked");
   like($mv->to_hex->unlock, qr/^[a-f0-9]+$/, "->to_hex format");
   ok($mv->lock->is_locked, "locking returns the locked MemVault");
+
+  $mv = mv_new($mv_data);
+  isa_ok($mv, "Crypt::Sodium::XS::MemVault");
+  ok($mv->is_locked, "mv_new locked by default");
+  is($mv->size, length($mv_data), "mv_new correct length");
+  is($mv->unlock->to_bytes, $mv_data, "mv_new constructor correct bytes");
+  $mv = mv_from_base64(encode_base64($mv_data), BASE64_VARIANT_ORIGINAL);
+  isa_ok($mv, "Crypt::Sodium::XS::MemVault");
+  ok($mv->is_locked, "new_from_base64 locked by default");
+  is($mv->size, length($mv_data), "new_from_base64 correct length");
+  is($mv->unlock->to_bytes, $mv_data, "new_from_base64 correct bytes");
 
   ok($mv eq $mv_data, "mv eq mv_data");
   ok($mv == $mv_data, "mv == mv_data");
@@ -149,9 +162,11 @@ for my $mv_data (@mv_datas) {
 
   my $mv_x_5 = $mv x 5;
   isa_ok($mv_x_5, "Crypt::Sodium::XS::MemVault");
-  ok($mv_x_5->is_locked, "repitition of locked MemVault is locked");
+  ok($mv_x_5->is_locked, "overloaded x: locked input, locked output");
+  $mv_x_5 = $mv->unlock x 5;
+  ok(!$mv_x_5->is_locked, "overloaded x: locked input, locked output");
 
-  is($mv_x_5->to_hex->unlock,
+  is($mv_x_5->to_hex,
     unpack("H*", "${mv_data}${mv_data}${mv_data}${mv_data}${mv_data}"), "mv x 5");
 }
 
@@ -309,9 +324,13 @@ print $tmpfile $secret;
 $tmpfile->flush;
 
 $mv = Crypt::Sodium::XS::MemVault->new_from_file($tmpfile->filename);
-ok($mv->is_locked, "MemVault from file locked by default");
-is($mv->size, length($secret), "MemVault from file correct length");
-is($mv->unlock, $secret, "MemVault from file correct data");
+isa_ok($mv, "Crypt::Sodium::XS::MemVault");
+ok($mv->is_locked, "new_from_file locked by default");
+is($mv->size, length($secret), "new_from_file correct length");
+is($mv->unlock, $secret, "new_from_file correct data");
+$mv = mv_from_file($tmpfile->filename);
+isa_ok($mv, "Crypt::Sodium::XS::MemVault");
+is($mv->unlock, $secret, "mv_from_file correct data");
 
 $mv = Crypt::Sodium::XS::MemVault->new_from_file($tmpfile->filename, 16);
 ok($mv->is_locked, "MemVault from file, 16 bytes, locked by default");
@@ -320,10 +339,13 @@ is($mv->unlock, substr($secret, 0, 16), "MemVault from file, 16 bytes, correct d
 
 $tmpfile->seek(0, 0);
 $mv = Crypt::Sodium::XS::MemVault->new_from_fd(fileno($tmpfile));
-is($mv->unlock, $secret, "MemVault from fd correct data");
+is($mv->unlock, $secret, "new_from_fd correct data");
+$tmpfile->seek(0, 0);
+$mv = mv_from_fd(fileno($tmpfile));
+is($mv->unlock, $secret, "mv_from_fd correct data");
 $tmpfile->seek(0, 0);
 $mv = Crypt::Sodium::XS::MemVault->new_from_fd(fileno($tmpfile), 16);
-is($mv->unlock, substr($secret, 0, 16), "MemVault from fd, 16 bytes correct data");
+is($mv->unlock, substr($secret, 0, 16), "new_from_fd, 16 bytes correct data");
 
 print $tmpfile "X" x 4096;
 $tmpfile->flush;

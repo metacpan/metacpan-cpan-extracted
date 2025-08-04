@@ -1,5 +1,12 @@
 Revision history for perl Net::Proxmox::VE
 
+0.41 2025-08-03
+- Add PVE API Token support
+- Renamed ENV variable for live testing to PROXMOX_USERPASS_TEST_URI
+- Fixed ::Exceptions.pm module and added Unit Tests
+- Add github actions (no changes to package)
+- Added a perlcritic policy (no changes to package)
+
 0.40 2025-05-02
 - Many POD updates
 - Cluster: Add get_cluster_nextid function

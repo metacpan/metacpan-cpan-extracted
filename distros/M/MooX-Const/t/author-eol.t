@@ -36,6 +36,7 @@ my @files = (
     't/author-pod-linkcheck.t',
     't/author-pod-syntax.t',
     't/author-portability.t',
+    't/etc/perlcritic.rc',
     't/lib/MooTest.pm',
     't/lib/MooTest/Strict.pm',
     't/lib/MooseTest.pm',

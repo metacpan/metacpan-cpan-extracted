@@ -1,3 +1,10 @@
+0.05 2025-08-03T13:00:43+02:00
+ - Add information about Mid to tool.
+ - Add information about print for structured data from Wikimedia Commons
+   to doc.
+ - Fix tool abstract in man page.
+ - Update copyright years.
+
 0.04 2024-06-21T15:10:12+02:00
  - Add contructor tests.
  - Fix example in doc.

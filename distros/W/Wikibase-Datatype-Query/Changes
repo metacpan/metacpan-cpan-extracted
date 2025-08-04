@@ -1,3 +1,15 @@
+0.05 2025-08-03T12:34:19+02:00
+ - Add query process for full statement defined by property in item.
+ - Regen MANIFEST file.
+ - Update copyright years.
+
+0.04 2024-11-12T09:02:57+01:00
+ - Add doc for query_lexeme() method.
+ - Add query process for lexeme (statements).
+ - Add tests for lexeme statement queries.
+ - Improve doc.
+ - Update copyright years.
+
 0.03 2023-10-30T11:58:55+01:00
  - Add query for alias.
  - Add test for Mediainfo object.

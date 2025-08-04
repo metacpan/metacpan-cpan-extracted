@@ -111,7 +111,7 @@ ERRORS
      new():
              From Class::Utils::set_params():
                      Unknown parameter '%s'.
-             From Mo::utils::check_array():
+             From Mo::utils::Array::check_array():
                      Parameter 'tags_after' must be a array.
                              Value: %s
                              Reference: %s
@@ -278,7 +278,7 @@ EXAMPLE2
      # Output screenshot is in images/ directory.
 
 DEPENDENCIES
-    Class::Utils, Error::Pure, List::Util, Mo::utils, Mo::utils::CSS,
+    Class::Utils, Error::Pure, List::Util, Mo::utils::Array, Mo::utils::CSS,
     Mo::utils::Language, Readonly, Tags::HTML, Tags::HTML::Messages.
 
 SEE ALSO
@@ -297,10 +297,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2021-2024 Michal Josef Špaček
+    © 2021-2025 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.13
+    0.14
 

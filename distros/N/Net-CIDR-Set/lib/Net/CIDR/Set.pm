@@ -2,9 +2,7 @@ package Net::CIDR::Set;
 
 # ABSTRACT: Manipulate sets of IP addresses
 
-use v5.6;
-
-use strict;
+use v5.14;
 use warnings;
 
 use Carp qw( croak confess );
@@ -15,7 +13,7 @@ use overload '""' => 'as_string';
 
 use namespace::autoclean;
 
-our $VERSION = '0.16';
+our $VERSION = '0.18';
 
 
 {
@@ -107,7 +105,7 @@ sub _encode {
 {
   for my $dele ( qw( _decode _nbits ) ) {
     no strict 'refs'; ## no critic (ProhibitNoStrict)
-    ( my $meth = $dele ) =~ s/^_//;
+    my $meth = $dele =~ s/^_//r;
     *{$dele} = sub {
       my $self = shift;
       my $cdr = $self->{coder} || croak "Don't know how to $meth yet";
@@ -438,7 +436,7 @@ Net::CIDR::Set - Manipulate sets of IP addresses
 
 =head1 VERSION
 
-version 0.16
+version 0.18
 
 =head1 SYNOPSIS
 
@@ -536,7 +534,7 @@ Merge the contents of other sets into this set.
 
 =head2 contains
 
-A synonmym for C<contains_all>.
+A synonym for C<contains_all>.
 
 =head2 contains_all
 
@@ -777,7 +775,12 @@ value is C<0> which provides the most general formatting.
 The development version is on github at L<https://github.com/robrwo/perl-Net-CIDR-Set>
 and may be cloned from L<git://github.com/robrwo/perl-Net-CIDR-Set.git>
 
-=head1 BUGS
+=head1 SUPPORT
+
+Only the latest version of this module will be supported.
+
+This module requires Perl v5.14 or later.
+Future releases may only support Perl versions released in the last ten (10) years.
 
 Please report any bugs or feature requests on the bugtracker website
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=Net-CIDR-Set>
@@ -788,8 +791,8 @@ feature.
 
 =head2 Reporting Security Vulnerabilities
 
-Security issues should not be reported on the bugtracker website. Please see F<SECURITY.md> for instructions how to
-report security vulnerabilities
+If the bug you are reporting has security implications which make it inappropriate to send to a public issue tracker,
+then see F<SECURITY.md> for instructions how to report security vulnerabilities.
 
 =head1 AUTHOR
 

@@ -9,46 +9,99 @@ no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 no if "$]" >= 5.041009, feature => 'smartmatch';
 no feature 'switch';
+use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 use Path::Tiny;
-use HTTP::Tiny;
+use Mojo::UserAgent;
 use YAML::PP;
 use Digest::MD5 'md5_hex';
 use JSON::Schema::Modern;
-
-# note: the latest versions can always be found at https://spec.openapis.org/
-# Once /latest links exist, we will pull from those instead, and use those names in code to ensure
-# we always use the latest files.
+use JSON::Schema::Modern::Document::OpenAPI;
 
 # see https://spec.openapis.org/#openapi-specification-schemas for the latest links
 
 my %files = (
   # metaschema for json schemas contained within openapi documents
-  'oas/dialect/base.schema.json' => 'https://spec.openapis.org/oas/3.1/dialect/2024-10-25',
+  'oas/dialect/base.schema.json' => JSON::Schema::Modern::Document::OpenAPI::DEFAULT_DIALECT,
 
   # vocabulary definition
-  'oas/meta/base.schema.json' => 'https://spec.openapis.org/oas/3.1/meta/2024-10-25',
+  'oas/meta/base.schema.json' => JSON::Schema::Modern::Document::OpenAPI::OAS_VOCABULARY,
 
   # openapi document schema + custom json schema dialect
-  'oas/schema-base.json' => 'https://spec.openapis.org/oas/3.1/schema-base/2024-11-14',
+  'oas/schema-base.json' => JSON::Schema::Modern::Document::OpenAPI::DEFAULT_BASE_METASCHEMA,
 
   # the main openapi document schema
-  'oas/schema.json' => 'https://spec.openapis.org/oas/3.1/schema/2024-11-14',
+  'oas/schema.json' => JSON::Schema::Modern::Document::OpenAPI::DEFAULT_METASCHEMA,
 
   'oas/LICENSE' => 'https://raw.githubusercontent.com/OAI/OpenAPI-Specification/main/LICENSE',
 );
 
+my $web_url = 'https://spec.openapis.org/';
+
+my $ua = Mojo::UserAgent->new;
+say "# fetching $web_url" if $ENV{DEBUG};
+my $res = $ua->get($web_url)->result;
+my %new_schemas = ();  # keys are existing OAS schema URIs, defined above in %files
+
+# check the website and find all files that are newer than what we've got
+foreach my $e ($res->dom->find('a[href]')->each) {
+  my $link = $e->{href};
+  next if $link !~ m{^/oas/3.1/[a-z-]+/\d{4}-\d{2}-\d{2}$};
+
+  $link = Mojo::URL->new($web_url)->path($link)->to_string; # normalize slashes
+
+  if (my ($existing) = grep +($link =~ m{^\Q${\ substr($_, 0, -10) }\E}), grep !/github/, values %files) {
+    $new_schemas{$existing} //= [];
+    push $new_schemas{$existing}->@*, $link if $existing lt $link;
+  }
+}
+
+# identify outdated schema files, and find all references to them in the repository
+if (my @outdated_schemas = grep +($new_schemas{$_}->@*), sort keys %new_schemas) {
+  warn join("\n", 'these outdated files should be updated (fix the hash in update-schemas and re-run):',
+    map +("$_ -> ".join(', ', sort $new_schemas{$_}->@*)), @outdated_schemas), "\n\n";
+
+  my $re = join('|', map "\Q$_\E", @outdated_schemas);
+  my @outdated_files = grep
+    +(path($_)->slurp_utf8 =~ $re && !exists $files{s!share/!!r}), split /\n/, `git ls-files`;
+  warn join("\n", 'all other files containing references to outdated files:', @outdated_files), "\n\n";
+
+  warn join("\n", 'run this repeatedly in order to find bad references:',
+    'ack -l \''.$re.'\' `git ls-files`'), "\n\n";
+}
+
+
+my $yaml = YAML::PP->new(boolean => 'JSON::PP');
+my $js = JSON::Schema::Modern->new(validate_formats => 1);
 my %checksums;
 
+# download fresh copies of our files, validate against their schemas and against our code
 foreach my $target (keys %files) {
-  my $source = $files{$target};
+  my $uri = $files{$target};
+
+  say "# fetching $uri to share/$target" if $ENV{DEBUG};
+  my $res = $ua->get($uri)->result;
+  die "Failed to fetch $uri", $res->code, " ", $res->message if $res->is_error;
+
   $target = path('share', $target);
   $target->parent->mkpath;
+  $target->spew_raw(my $content = $res->body);
+  $checksums{$target} = md5_hex($content);
 
-  my $response = HTTP::Tiny->new->get($source);
-  die "Failed to fetch $source: $response->{status} $response->{reason}" if not $response->{success};
+  next if $target =~ /LICENSE$/;
 
-  $target->spew_raw($response->{content});
-  $checksums{$target} = md5_hex($response->{content});
+  my $document = $js->add_schema($yaml->load_string($content));
+
+  say "# validating ", $document->canonical_uri if $ENV{DEBUG};
+  my $result = $document->validate;
+  die $js->_json_decoder->pretty->encode($result) if not $result->valid;
+
+  die 'for uri ', $document->schema->{'$id'}, ', mismatch between jsonSchemaDialect "',
+      $document->schema->{properties}{jsonSchemaDialect}{default},
+      '" and assumed default "',
+      JSON::Schema::Modern::Document::OpenAPI->DEFAULT_DIALECT, '"'
+    if exists((($document->schema->{properties}//{})->{jsonSchemaDialect}//{})->{default})
+      and $document->schema->{properties}{jsonSchemaDialect}{default}
+        ne JSON::Schema::Modern::Document::OpenAPI->DEFAULT_DIALECT;
 }
 
 # compute checksums and record them in the test
@@ -56,17 +109,3 @@ path('t/checksums.t')->edit_raw(sub {
   m/^__DATA__$/mg;
   $_ = substr($_, 0, pos()+1).join("\n", map $_.' '.$checksums{$_}, sort keys %checksums)."\n";
 });
-
-my $yaml = YAML::PP->new(boolean => 'JSON::PP');
-my $js = JSON::Schema::Modern->new(validate_formats => 1);
-$js->add_schema($files{$_} => $yaml->load_file('share/'.$_)) foreach grep /json$/, keys %files;
-
-foreach my $uri (values %files) {
-  next if $uri =~ /LICENSE$/;
-  print "# validating $uri\n" if $ENV{DEBUG};
-
-  my $document = $js->_fetch_from_uri($uri)->{document};
-  my $result = $js->evaluate($document->schema, $document->metaschema_uri);
-
-  die $js->_json_decoder->pretty->encode($result) if not $result->valid;
-}

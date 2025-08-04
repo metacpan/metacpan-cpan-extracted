@@ -6,7 +6,7 @@ use v5.20.0;
 use experimental 'signatures';
 
 use Crypt::Sodium::XS;
-use Crypt::Sodium::XS::MemVault;
+use Crypt::Sodium::XS::MemVault ':constructors';
 use Crypt::Sodium::XS::ProtMem 'protmem_flags_decrypt_default';
 use Crypt::Sodium::XS::Util qw(sodium_random_bytes);
 use Fcntl qw(O_CREAT O_EXCL O_TRUNC O_RDONLY O_RDWR O_WRONLY);
@@ -232,12 +232,12 @@ sub encrypt($ifh, $ofh, $opts) {
   # writing to output is "one buffer behind" reading from input. this is so the
   # final tag and padding can be put on the last block.
   my $bufsize = $magic->{bufksize} * 1024;
-  my $prev_buf = Crypt::Sodium::XS::MemVault->new_from_fd($fd, $bufsize, protmem_flags_decrypt_default());
+  my $prev_buf = mv_from_fd($fd, $bufsize, protmem_flags_decrypt_default());
   while (1) {
     last unless defined $prev_buf;
     my $next_buf;
     if ($prev_buf->size == $bufsize) {
-      $next_buf = Crypt::Sodium::XS::MemVault->new_from_fd($fd, $bufsize, protmem_flags_decrypt_default());
+      $next_buf = mv_from_fd($fd, $bufsize, protmem_flags_decrypt_default());
       undef $next_buf unless $next_buf->size;
     }
     my $tag = $next_buf ? $sstream->TAG_MESSAGE : $sstream->TAG_FINAL;
@@ -280,12 +280,9 @@ sub main(@argv) {
 
   my ($ifh, $ofh) = open_handles($opts);
 
-  # yes, this intentionally requires opening a controlling tty.
-  sysopen(my $ttyfh, "/dev/tty", O_RDWR) or die "sysopen: /dev/tty: $!";
-  binmode($ttyfh, ":raw") or die "binmode: $!";
-  my $pp = Crypt::Sodium::XS::MemVault->new_from_ttyno(fileno($ttyfh), "Passphrase: ");
+  my $pp = mv_from_tty("Passphrase: ");
   if ($opts->{encrypt}) {
-    my $pp_confirm = Crypt::Sodium::XS::MemVault->new_from_ttyno(fileno($ttyfh), "Passphrase (again): ");
+    my $pp_confirm = mv_from_tty("Passphrase (again): ");
     die "passphrases do not match" unless $pp->length == $pp_confirm->length and $pp eq $pp_confirm;
     undef $pp_confirm;
   }

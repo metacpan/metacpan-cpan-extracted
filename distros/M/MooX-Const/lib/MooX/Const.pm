@@ -19,7 +19,7 @@ use Types::Standard qw( is_CodeRef Value Object Ref );
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.6.3';
+our $VERSION = 'v0.6.4';
 
 
 sub import {
@@ -141,7 +141,7 @@ MooX::Const - Syntactic sugar for constant and write-once Moo attributes
 
 =head1 VERSION
 
-version v0.6.3
+version v0.6.4
 
 =head1 SYNOPSIS
 
@@ -254,12 +254,23 @@ L<Types::Const>
 
 L<Type::Tiny>
 
+=for Test::MixedScripts Common,Latin,Han
+
 =head1 SOURCE
 
 The development version is on github at L<https://github.com/robrwo/MooX-Const>
 and may be cloned from L<git://github.com/robrwo/MooX-Const.git>
 
-=head1 BUGS
+See F<CONTRIBUTING.md> for more information.
+
+=head1 SUPPORT
+
+Only the latest version of this module will be supported.
+
+This module requires Perl v5.14 or later.
+Future releases may only support Perl versions released in the last ten (10) years.
+
+=head2 Reporting Bugs and Submitting Feature Requests
 
 Please report any bugs or feature requests on the bugtracker website
 L<https://github.com/robrwo/MooX-Const/issues>
@@ -267,6 +278,9 @@ L<https://github.com/robrwo/MooX-Const/issues>
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
+
+If the bug you are reporting has security implications which make it inappropriate to send to a public issue tracker,
+then see F<SECURITY.md> for instructions how to report security vulnerabilities.
 
 =head1 AUTHOR
 

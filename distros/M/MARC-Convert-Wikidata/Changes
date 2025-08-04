@@ -1,3 +1,6 @@
+0.30 2025-08-03T13:09:26+02:00
+ - Update to new version of Wikibase::Datatype@0.39.
+
 0.29 2025-06-26T18:45:09+02:00
  - Add 'ignore_data_errors' parameter.
  - Add support for cze/slo book editions in description.

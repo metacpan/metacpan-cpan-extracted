@@ -49,11 +49,11 @@ requires:
   Roman: 0
   URI: 0
   Unicode::UTF8: 0
-  Wikibase::Datatype: 0
+  Wikibase::Datatype: 0.39
   perl: 5.6.2
 resources:
   bugtracker: https://github.com/michal-josef-spacek/MARC-Convert-Wikidata/issues
   homepage: https://github.com/michal-josef-spacek/MARC-Convert-Wikidata
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/MARC-Convert-Wikidata
-version: '0.29'
+version: '0.30'

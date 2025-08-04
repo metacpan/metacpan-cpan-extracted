@@ -31,6 +31,12 @@
    },
    "name" : "MooX-Const",
    "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "7.22",
+            "Module::Metadata" : "1.000015"
+         }
+      },
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
@@ -38,15 +44,18 @@
       },
       "develop" : {
          "requires" : {
+            "Dist::Zilla::Plugin::UsefulReadme" : "v0.1.2",
             "Pod::Coverage::TrustPod" : "0",
-            "Software::Security::Policy::Individual" : "0.10",
+            "Pod::Markdown::Github" : "0",
+            "Software::Security::Policy::Individual" : "0.11",
+            "Test2::Tools::Basic" : "1.302200",
             "Test::CleanNamespaces" : "0.15",
             "Test::EOF" : "0",
             "Test::EOL" : "0",
             "Test::Kwalitee" : "1.21",
             "Test::MinimumVersion" : "0",
-            "Test::MixedScripts" : "0",
-            "Test::More" : "1.302200",
+            "Test::MixedScripts" : "v0.3.0",
+            "Test::More" : "0.88",
             "Test::NoTabs" : "0",
             "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
@@ -83,7 +92,7 @@
          },
          "requires" : {
             "File::Spec" : "0",
-            "Module::Metadata" : "0",
+            "Module::Metadata" : "1.000015",
             "Moo" : "1.006000",
             "Test::More" : "0",
             "Test::Most" : "0",
@@ -97,7 +106,7 @@
    "provides" : {
       "MooX::Const" : {
          "file" : "lib/MooX/Const.pm",
-         "version" : "v0.6.3"
+         "version" : "v0.6.4"
       }
    },
    "release_status" : "stable",
@@ -112,7 +121,7 @@
          "web" : "https://github.com/robrwo/MooX-Const"
       }
    },
-   "version" : "v0.6.3",
+   "version" : "v0.6.4",
    "x_authority" : "cpan:RRWO",
    "x_contributors" : [
       "Kang-min Liu \u5289\u5eb7\u6c11 <gugod@gugod.org>"

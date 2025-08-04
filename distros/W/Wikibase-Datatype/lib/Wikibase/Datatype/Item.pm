@@ -7,9 +7,9 @@ use Error::Pure qw(err);
 use Mo qw(build default is);
 use Mo::utils qw(check_number check_number_of_items);
 use Mo::utils::Array qw(check_array_object);
-use Wikibase::Datatype::Value::Monolingual;
+use Wikibase::Datatype::Term;
 
-our $VERSION = 0.38;
+our $VERSION = 0.39;
 
 has aliases => (
 	default => [],
@@ -65,14 +65,14 @@ sub BUILD {
 	my $self = shift;
 
 	# Check aliases.
-	check_array_object($self, 'aliases', 'Wikibase::Datatype::Value::Monolingual');
+	check_array_object($self, 'aliases', 'Wikibase::Datatype::Term');
 
 	# Check descriptions.
-	check_array_object($self, 'descriptions', 'Wikibase::Datatype::Value::Monolingual');
+	check_array_object($self, 'descriptions', 'Wikibase::Datatype::Term');
 	check_number_of_items($self, 'descriptions', 'language', 'Description', 'language');
 
 	# Check labels.
-	check_array_object($self, 'labels', 'Wikibase::Datatype::Value::Monolingual');
+	check_array_object($self, 'labels', 'Wikibase::Datatype::Term');
 	check_number_of_items($self, 'labels', 'language', 'Label', 'language');
 
 	# If length of value is greater than 250, strip.
@@ -83,7 +83,7 @@ sub BUILD {
 			my $new_label = substr $labels[$i]->value, 0, 250;
 			my $new_language = $labels[$i]->language;
 			$strip_label = 1;
-			$labels[$i] = Wikibase::Datatype::Value::Monolingual->new(
+			$labels[$i] = Wikibase::Datatype::Term->new(
 				'language' => $new_language,
 				'value' => $new_label,
 			);
@@ -154,13 +154,13 @@ Returns instance of object.
 =item * C<aliases>
 
 Item aliases. Multiple per language.
-Reference to array with Wikibase::Datatype::Value::Monolingual instances.
+Reference to array with Wikibase::Datatype::Term instances.
 Parameter is optional.
 
 =item * C<descriptions>
 
 Item descriptions. One per language.
-Reference to array with Wikibase::Datatype::Value::Monolingual instances.
+Reference to array with Wikibase::Datatype::Term instances.
 Parameter is optional.
 
 =item * C<id>
@@ -172,7 +172,7 @@ Parameter is optional.
 
 Item descriptions. One per language. Check length of string (250) and strip it
 if it's longer.
-Reference to array with Wikibase::Datatype::Value::Monolingual instances.
+Reference to array with Wikibase::Datatype::Term instances.
 Parameter is optional.
 
 =item * C<lastrevid>
@@ -220,7 +220,7 @@ Parameter is optional.
 
 Get aliases.
 
-Returns reference to array with Wikibase::Datatype::Value::Monolingual instances.
+Returns reference to array with Wikibase::Datatype::Term instances.
 
 =head2 C<descriptions>
 
@@ -228,7 +228,7 @@ Returns reference to array with Wikibase::Datatype::Value::Monolingual instances
 
 Get descriptions.
 
-Returns reference to array with Wikibase::Datatype::Value::Monolingual instances.
+Returns reference to array with Wikibase::Datatype::Term instances.
 
 =head2 C<id>
 
@@ -244,7 +244,7 @@ Returns string.
 
 Get labels.
 
-Returns reference to array with Wikibase::Datatype::Value::Monolingual instances.
+Returns reference to array with Wikibase::Datatype::Term instances.
 
 =head2 C<lastrevid>
 
@@ -317,19 +317,19 @@ Returns string.
                  Parameter 'aliases' must be a array.
                          Value: %s
                          Reference: %s
-                 Parameter 'aliases' with array must contain 'Wikibase::Datatype::Value::Monolingual' objects.
+                 Parameter 'aliases' with array must contain 'Wikibase::Datatype::Term' objects.
                          Value: %s
                          Reference: %s
                  Parameter 'descriptions' must be a array.
                          Value: %s
                          Reference: %s
-                 Parameter 'descriptions' with array must contain 'Wikibase::Datatype::Value::Monolingual' objects.
+                 Parameter 'descriptions' with array must contain 'Wikibase::Datatype::Term' objects.
                          Value: %s
                          Reference: %s
                  Parameter 'labels' must be a array.
                          Value: %s
                          Reference: %s
-                 Parameter 'labels' with array must contain 'Wikibase::Datatype::Value::Monolingual' objects.
+                 Parameter 'labels' with array must contain 'Wikibase::Datatype::Term' objects.
                          Value: %s
                          Reference: %s
                  Parameter 'sitelinks' must be a array.
@@ -358,8 +358,8 @@ Returns string.
  use Wikibase::Datatype::Sitelink;
  use Wikibase::Datatype::Snak;
  use Wikibase::Datatype::Statement;
+ use Wikibase::Datatype::Term;
  use Wikibase::Datatype::Value::Item;
- use Wikibase::Datatype::Value::Monolingual;
  use Wikibase::Datatype::Value::String;
  use Wikibase::Datatype::Value::Time;
 
@@ -462,48 +462,48 @@ Returns string.
  # Main item.
  my $obj = Wikibase::Datatype::Item->new(
          'aliases' => [
-                 Wikibase::Datatype::Value::Monolingual->new(
+                 Wikibase::Datatype::Term->new(
                          'language' => 'cs',
                          'value' => decode_utf8('Douglas Noël Adams'),
                  ),
-                 Wikibase::Datatype::Value::Monolingual->new(
+                 Wikibase::Datatype::Term->new(
                          'language' => 'cs',
                          'value' => 'Douglas Noel Adams',
                  ),
-                 Wikibase::Datatype::Value::Monolingual->new(
+                 Wikibase::Datatype::Term->new(
                          'language' => 'cs',
                          'value' => 'Douglas N. Adams',
                  ),
-                 Wikibase::Datatype::Value::Monolingual->new(
+                 Wikibase::Datatype::Term->new(
                          'language' => 'en',
                          'value' => 'Douglas Noel Adams',
                  ),
-                 Wikibase::Datatype::Value::Monolingual->new(
+                 Wikibase::Datatype::Term->new(
                          'language' => 'en',
                          'value' => decode_utf8('Douglas Noël Adams'),
                  ),
-                 Wikibase::Datatype::Value::Monolingual->new(
+                 Wikibase::Datatype::Term->new(
                          'language' => 'en',
                          'value' => 'Douglas N. Adams',
                  ),
          ],
          'descriptions' => [
-                 Wikibase::Datatype::Value::Monolingual->new(
+                 Wikibase::Datatype::Term->new(
                          'language' => 'cs',
                          'value' => decode_utf8('anglický spisovatel, humorista a dramatik'),
                  ),
-                 Wikibase::Datatype::Value::Monolingual->new(
+                 Wikibase::Datatype::Term->new(
                          'language' => 'en',
                          'value' => 'English writer and humorist',
                  ),
          ],
          'id' => 'Q42',
          'labels' => [
-                 Wikibase::Datatype::Value::Monolingual->new(
+                 Wikibase::Datatype::Term->new(
                          'language' => 'cs',
                          'value' => 'Douglas Adams',
                  ),
-                 Wikibase::Datatype::Value::Monolingual->new(
+                 Wikibase::Datatype::Term->new(
                          'language' => 'en',
                          'value' => 'Douglas Adams',
                  ),
@@ -639,6 +639,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.38
+0.39
 
 =cut

@@ -1,5 +1,8 @@
 Revision history for OpenAPI-Modern
 
+0.090     2025-08-04 00:57:05Z
+          - update bundled schemas to their latest versions
+
 0.089     2025-07-31 21:03:29Z
           - internal changes to JSON::Schema::Modern::Document::OpenAPI with
             how the evaluator object is stored and tracked

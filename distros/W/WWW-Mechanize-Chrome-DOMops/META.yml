@@ -3,7 +3,7 @@ abstract: 'Operations on the DOM loaded in Chrome'
 author:
   - 'Andreas Hadjiprocopis <bliako@cpan.org>'
 build_requires:
-  Data::Roundtrip: '0'
+  Data::Roundtrip: '0.30'
   File::Spec: '0'
   FindBin: '0'
   Log::Log4perl: '0'
@@ -25,9 +25,9 @@ no_index:
     - t
     - inc
 requires:
-  Data::Roundtrip: '0'
+  Data::Roundtrip: '0.30'
   Exporter: '0'
   String::Escape: '0'
   perl: '5.006'
-version: '0.11'
+version: '0.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

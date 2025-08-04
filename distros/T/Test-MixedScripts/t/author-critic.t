@@ -11,5 +11,7 @@ BEGIN {
 use strict;
 use warnings;
 
-use Test::Perl::Critic (-profile => "t/etc/perlcritic.rc") x!! -e "t/etc/perlcritic.rc";
+use Test::Perl::Critic %{+{
+  "-profile" => "t/etc/perlcritic.rc",
+}};
 all_critic_ok();

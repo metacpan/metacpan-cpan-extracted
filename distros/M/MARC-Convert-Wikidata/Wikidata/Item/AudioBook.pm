@@ -5,12 +5,12 @@ use strict;
 use warnings;
 
 use Unicode::UTF8 qw(decode_utf8);
-use Wikibase::Datatype::Item;
+use Wikibase::Datatype::Item 0.39;
 use Wikibase::Datatype::Snak;
 use Wikibase::Datatype::Statement;
 use Wikibase::Datatype::Value::Item;
 
-our $VERSION = 0.29;
+our $VERSION = 0.30;
 
 sub wikidata {
 	my $self = shift;

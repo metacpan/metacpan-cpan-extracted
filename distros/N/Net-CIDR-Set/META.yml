@@ -27,25 +27,25 @@ name: Net-CIDR-Set
 provides:
   Net::CIDR::Set:
     file: lib/Net/CIDR/Set.pm
-    version: '0.16'
+    version: '0.18'
   Net::CIDR::Set::IPv4:
     file: lib/Net/CIDR/Set/IPv4.pm
-    version: '0.16'
+    version: '0.18'
   Net::CIDR::Set::IPv6:
     file: lib/Net/CIDR/Set/IPv6.pm
-    version: '0.16'
+    version: '0.18'
 requires:
   Carp: '0'
   namespace::autoclean: '0'
   overload: '0'
-  perl: v5.6.0
+  perl: v5.14.0
   strict: '0'
   warnings: '0'
 resources:
   Authority: cpan:RRWO
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Net-CIDR-Set
   repository: git://github.com/robrwo/perl-Net-CIDR-Set.git
-version: '0.16'
+version: '0.18'
 x_contributors:
   - 'Brian Gottreu <gottreu@cpan.org>'
   - 'Robert Rothenberg <rrwo@cpan.org>'

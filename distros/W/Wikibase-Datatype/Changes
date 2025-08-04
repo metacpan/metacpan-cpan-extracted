@@ -1,3 +1,9 @@
+0.39 2025-08-03T12:36:49+02:00
+ [API changes]
+ - Change possible objects for Item aliases/labels/description to use of
+   Term. It's because of different supported languages in these fields.
+   There is not possible 'und' (undefined) language.
+
 0.38 2025-08-03T11:12:14+02:00
  - Add Languages::all_term_languages_codes() subroutine.
  - Add Term object.

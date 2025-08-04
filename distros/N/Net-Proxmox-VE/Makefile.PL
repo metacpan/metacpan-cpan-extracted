@@ -8,7 +8,7 @@ use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Pure Perl API for Proxmox Virtual Environment",
-  "AUTHOR" => "Brendan Beveridge <brendan\@nodeintegration.com.au>, Dean Hamstead <dean\@fragfest.com.au>",
+  "AUTHOR" => "Dean Hamstead <dean\@fragfest.com.au>",
   "BUILD_REQUIRES" => {
     "Module::Build" => "0.28"
   },
@@ -42,7 +42,7 @@ my %WriteMakefileArgs = (
     "Test::Trap" => 0,
     "Test::Vars" => 0
   },
-  "VERSION" => "0.40",
+  "VERSION" => "0.41",
   "test" => {
     "TESTS" => "t/*.t"
   }

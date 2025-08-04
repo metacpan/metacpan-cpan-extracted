@@ -17,6 +17,7 @@ examples/create_and_print_snak.pl
 examples/create_and_print_snak_translated.pl
 examples/create_and_print_statement.pl
 examples/create_and_print_statement_translated.pl
+examples/create_and_print_term.pl
 examples/create_and_print_value.pl
 examples/create_and_print_value_globecoordinate.pl
 examples/create_and_print_value_item.pl
@@ -60,6 +61,7 @@ Print/Sense.pm
 Print/Sitelink.pm
 Print/Snak.pm
 Print/Statement.pm
+Print/Term.pm
 Print/Texts.pm
 Print/Utils.pm
 Print/Value.pm
@@ -110,6 +112,9 @@ t/Wikibase-Datatype-Print-Snak/03-print.t
 t/Wikibase-Datatype-Print-Statement/01-use.t
 t/Wikibase-Datatype-Print-Statement/02-version.t
 t/Wikibase-Datatype-Print-Statement/03-print.t
+t/Wikibase-Datatype-Print-Term/01-use.t
+t/Wikibase-Datatype-Print-Term/02-version.t
+t/Wikibase-Datatype-Print-Term/03-print.t
 t/Wikibase-Datatype-Print-Texts/01-use.t
 t/Wikibase-Datatype-Print-Texts/02-version.t
 t/Wikibase-Datatype-Print-Texts/03-text_keys.t
@@ -183,6 +188,8 @@ xt/Wikibase-Datatype-Print-Snak/01-pod_coverage.t
 xt/Wikibase-Datatype-Print-Snak/02-pod.t
 xt/Wikibase-Datatype-Print-Statement/01-pod_coverage.t
 xt/Wikibase-Datatype-Print-Statement/02-pod.t
+xt/Wikibase-Datatype-Print-Term/01-pod_coverage.t
+xt/Wikibase-Datatype-Print-Term/02-pod.t
 xt/Wikibase-Datatype-Print-Texts/01-pod_coverage.t
 xt/Wikibase-Datatype-Print-Texts/02-pod.t
 xt/Wikibase-Datatype-Print-Utils/01-pod_coverage.t

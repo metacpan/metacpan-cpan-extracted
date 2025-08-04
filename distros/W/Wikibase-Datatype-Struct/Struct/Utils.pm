@@ -10,7 +10,7 @@ use List::Util 1.33 qw(none);
 
 Readonly::Array our @EXPORT_OK => qw(obj_array_ref2struct struct2snaks_array_ref);
 
-our $VERSION = 0.14;
+our $VERSION = 0.15;
 
 sub obj_array_ref2struct {
 	my ($snaks_ar, $key, $base_uri, $snak_obj, $struct_snak_obj) = @_;
@@ -311,6 +311,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.14
+0.15
 
 =cut

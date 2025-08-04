@@ -12,7 +12,7 @@ use Scalar::Util qw(looks_like_number);
 Readonly::Array our @EXPORT_OK => qw(check_int check_natural check_number
 	check_percent check_positive_decimal check_positive_natural);
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 # ... -2, -1, 0, 1, 2, ...
 sub check_int {
@@ -532,6 +532,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.06
 
 =cut

@@ -26,7 +26,7 @@ subtest 'basic document validation' => sub {
       info => {
         title => 'my title',
         version => '1.2.3',
-        contact => { url => '/foo' },
+        contact => { url => 'ಠ_ಠ' },
       },
       map +($_ => 'not an object'), qw(servers security tags externalDocs),
     },
@@ -59,7 +59,7 @@ subtest 'basic document validation' => sub {
             instanceLocation => '/info/contact/url',
             keywordLocation => ignore,  # a $defs somewhere
             absoluteKeywordLocation => ignore,
-            error => 'not a valid uri string',
+            error => 'not a valid uri-reference string',
           },
           {
             instanceLocation => '/info/contact',
@@ -91,7 +91,7 @@ subtest 'basic document validation' => sub {
 '': object is missing property: webhooks
 '': no subschemas are valid
 '/externalDocs': got string, not object
-'/info/contact/url': not a valid uri string
+'/info/contact/url': not a valid uri-reference string
 '/info/contact': not all properties are valid
 '/info': not all properties are valid
 '/security': got string, not array

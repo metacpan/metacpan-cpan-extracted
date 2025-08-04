@@ -48,7 +48,9 @@ for my $alg (Crypt::Sodium::XS::OO::pwhash->primitives) {
     my $pass_len = length($password);
     for my $hash_len ($pass_len, 2*$pass_len) {
       my $hash = $m->pwhash($password, $salt, $hash_len);
-      ok(length($hash) == $hash_len, "got hash of $hash_len bytes for password ($alg)");
+      ok($hash->size == $hash_len, "got hash of $hash_len bytes for password ($alg)");
+      my $hash2 = $m->pwhash($password, $salt, $hash_len);
+      ok($hash->memcmp($hash2), "same passphrase, same salt, same output ($alg)");
     }
 
     my $str = $m->str($password);

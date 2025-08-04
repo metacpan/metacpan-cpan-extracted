@@ -16,7 +16,7 @@ our @EXPORT = (
 	'domops_wait_for_page_to_load'
 );
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use String::Escape qw/escape/;
 
@@ -807,7 +807,7 @@ WWW::Mechanize::Chrome::DOMops - Operations on the DOM loaded in Chrome
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =head1 SYNOPSIS
 

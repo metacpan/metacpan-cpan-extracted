@@ -5,8 +5,8 @@ use warnings;
 
 use Test::More; my $tests = 2; # used later
 use Test::Trap;
-if ( not $ENV{PROXMOX_TEST_URI} ) {
-    my $msg = 'This test sucks.  Set $ENV{PROXMOX_TEST_URI} to a real running proxmox to run.';
+if ( not $ENV{PROXMOX_USERPASS_TEST_URI} ) {
+    my $msg = 'This test sucks.  Set $ENV{PROXMOX_USERPASS_TEST_URI} to a real running proxmox to run.';
     plan( skip_all => $msg );
 } else {
     plan tests => $tests

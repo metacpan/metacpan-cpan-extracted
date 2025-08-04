@@ -7,7 +7,7 @@ use Class::Utils qw(set_params);
 use Error::Pure qw(err);
 use Scalar::Util qw(blessed);
 
-our $VERSION = 0.03;
+our $VERSION = 0.05;
 
 # Constructor.
 sub new {
@@ -37,6 +37,8 @@ sub query {
 	} elsif ($datatype->isa('Wikibase::Datatype::Mediainfo')) {
 		# XXX Provisional
 		return $self->query_item($datatype, $query_string);
+	} elsif ($datatype->isa('Wikibase::Datatype::Lexeme')) {
+		return $self->query_lexeme($datatype, $query_string);
 	} else {
 		err "Datatype doesn't supported.",
 			'Ref', (ref $datatype),
@@ -66,13 +68,17 @@ sub query_item {
 	} elsif ($query_string =~ m/^alias:?([\w\-]+)?$/ms) {
 		return $self->_query_text($item, $1, 'aliases');
 
+	# Description.
+	} elsif ($query_string =~ m/^description:?([\w\-]+)?$/ms) {
+		return $self->_query_text($item, $1, 'descriptions');
+
 	# Label.
 	} elsif ($query_string =~ m/^label:?([\w\-]+)?$/ms) {
 		return $self->_query_text($item, $1, 'labels');
 
-	# Description.
-	} elsif ($query_string =~ m/^description:?([\w\-]+)?$/ms) {
-		return $self->_query_text($item, $1, 'descriptions');
+	# Statement(s)
+	} elsif ($query_string =~ m/^statement:(P\d+)$/ms) {
+		return $self->_query_property_statement($item, $1);
 	} else {
 		err "Unsupported query string '$query_string'.";
 	}
@@ -80,24 +86,46 @@ sub query_item {
 	return;
 }
 
-sub _query_text {
-	my ($self, $item, $lang, $method) = @_;
+sub query_lexeme {
+	my ($self, $lexeme, $query_string) = @_;
+
+	if (! defined $lexeme) {
+		err "Lexeme is required.";
+	}
+	if (! blessed($lexeme) || ! $lexeme->isa('Wikibase::Datatype::Lexeme')) {
+		err "Item must be a 'Wikibase::Datatype::Lexeme' object.";
+	}
+
+	# Property.
+	if ($query_string =~ m/^P\d+$/ms) {
+		return $self->_query_property($lexeme, $query_string);
+
+	# Sense property.
+	} elsif ($query_string =~ m/^sense:(P\d+)$/ms) {
+		return $self->_query_sense($lexeme, $1);
+
+	# Form property.
+	} elsif ($query_string =~ m/^form:(P\d+)$/ms) {
+		return $self->_query_form($lexeme, $1);
+	
+	} else {
+		err "Unsupported query string '$query_string'.";
+	}
+
+	return;
+}
+
+sub _query_form {
+	my ($self, $lexeme, $query_string) = @_;
 
 	my @values;
-	foreach my $text (@{$item->$method}) {
-		if (defined $text->value) {
-			if (defined $lang) {
-				if ($text->language eq $lang) {
-					push @values, $text->value;
-				}
-			} else {
-				push @values, $text->value;
-			}
-		}
+	foreach my $form (@{$lexeme->forms}) {
+		push @values, $self->_query_property($form, $query_string);
 	}
 
 	return wantarray ? @values : $values[0];
 }
+
 
 sub _query_property {
 	my ($self, $item, $property) = @_;
@@ -126,6 +154,58 @@ sub _query_property {
 	return wantarray ? @values : $values[0];
 }
 
+sub _query_property_statement {
+	my ($self, $item, $pid) = @_;
+
+	my @values;
+	foreach my $statement (@{$item->statements}) {
+
+		# Skip deprecated if 'deprecated' parameters is on 0.
+		if (! $self->{'deprecated'} && $statement->rank eq 'deprecated') {
+			next;
+		}
+
+		my $snak = $statement->snak;
+		if ($snak->property ne $pid) {
+			next;
+		}
+
+		push @values, $statement;
+	}
+
+	return wantarray ? @values : $values[0];
+}
+
+sub _query_sense {
+	my ($self, $lexeme, $query_string) = @_;
+
+	my @values;
+	foreach my $sense (@{$lexeme->senses}) {
+		push @values, $self->_query_property($sense, $query_string);
+	}
+
+	return wantarray ? @values : $values[0];
+}
+
+sub _query_text {
+	my ($self, $item, $lang, $method) = @_;
+
+	my @values;
+	foreach my $text (@{$item->$method}) {
+		if (defined $text->value) {
+			if (defined $lang) {
+				if ($text->language eq $lang) {
+					push @values, $text->value;
+				}
+			} else {
+				push @values, $text->value;
+			}
+		}
+	}
+
+	return wantarray ? @values : $values[0];
+}
+
 1;
 
 __END__
@@ -143,8 +223,12 @@ Wikibase::Datatype::Query - Query class on Wikibase item.
  use Wikibase::Datatype::Query;
 
  my $obj = Wikibase::Datatype::Query->new;
- my $res = $obj->query($obj, $property);
- my $res = $obj->query_item($item_obj, $property);
+ my $res = $obj->query($obj, $query_string);
+ my @res = $obj->query($obj, $query_string);
+ my $res = $obj->query_item($item_obj, $query_string);
+ my @res = $obj->query_item($item_obj, $query_string);
+ my $res = $obj->query_lexeme($lexeme_obj, $query_string);
+ my @res = $obj->query_lexeme($lexeme_obj, $query_string);
 
 =head1 METHODS
 
@@ -169,19 +253,79 @@ Returns instance of object.
 
 =head2 C<query>
 
- my $res = $obj->query($obj, $property);
+ my $res = $obj->query($obj, $query_string);
+ my @res = $obj->query($obj, $query_string);
 
 Query L<Wikibase::Datatype> object for value.
+Supported C<$obj> objects are L<Wikibase::Datatype::Item>, L<Wikibase::Datatype::Lexeme>
+and L<Wikibase::Datatype::Mediainfo>.
 
-Returns value or undef.
+Returns value or undef in scalar context.
+Returns list of values in array context.
 
 =head2 C<query_item>
 
- my $res = $obj->query($item_obj, $property);
+ my $res = $obj->query($item_obj, $query_string);
+ my @res = $obj->query_item($item_obj, $query_string);
 
 Query L<Wikibase::Datatype::Item> item for value.
 
-Returns value or undef.
+Possible C<$query_string> values are:
+
+=over
+
+=item P\d+
+
+For property value.
+
+=item alias:.*
+
+For alias value.
+
+=item description:.*
+
+For description value.
+
+=item label:.*
+
+For label value.
+
+=item statement:P\d+
+
+For full property statements.
+
+=back
+
+Returns value or undef in scalar context.
+Returns list of values in array context.
+
+=head2 C<query_lexeme>
+
+ my $res = $obj->query_lexeme($lexeme_obj, $query_string);
+ my @res = $obj->query_lexeme($lexeme_obj, $query_string);
+
+Query L<Wikibase::Datatype::Lexeme> item for value.
+
+Possible C<$query_string> values are:
+
+=over
+
+=item P\d+
+
+For property value.
+
+=item form:P\d+
+
+For form property value.
+
+=item sense:P\d+
+
+For sense property value.
+
+=back
+
+Returns value or undef in scalar context.
+Returns list of values in array context.
 
 =head1 ERRORS
 
@@ -194,10 +338,16 @@ Returns value or undef.
          Parameter 'item' must be a 'Wikibase::Datatype::Item' object.
 
  query_item():
-         Parameter 'item' is required.
-         Parameter 'item' must be a 'Wikibase::Datatype::Item' object.
+         Item is required.
+         Item must be a 'Wikibase::Datatype::Item' or 'Wikibase::Datatype::Mediainfo' object.
+         Unsupported query string '%s'.
 
-=head1 EXAMPLE
+ query_lexeme():
+         Item must be a 'Wikibase::Datatype::Lexeme' object.
+         Lexeme is required.
+         Unsupported query string '%s'.
+
+=head1 EXAMPLE1
 
 =for comment filename=query_item.pl
 
@@ -219,6 +369,29 @@ Returns value or undef.
  # Output like:
  # Query for P31 property on Test::Shared::Fixture::Wikibase::Datatype::Item::Wikidata::Dog:
  # Q55983715
+
+=head1 EXAMPLE2
+
+=for comment filename=query_lexeme.pl
+
+ use strict;
+ use warnings;
+
+ use Test::Shared::Fixture::Wikibase::Datatype::Lexeme::Wikidata::DogCzechNoun;
+ use Wikibase::Datatype::Query;
+
+ my $obj = Wikibase::Datatype::Query->new;
+
+ my $item = Test::Shared::Fixture::Wikibase::Datatype::Lexeme::Wikidata::DogCzechNoun->new;
+
+ my $ret = $obj->query_lexeme($item, 'P5185');
+
+ print "Query for P5185 property on Test::Shared::Fixture::Wikibase::Datatype::Lexeme::Wikidata::DogCzechNoun:\n";
+ print $ret."\n";
+
+ # Output like:
+ # Query for P5185 property on Test::Shared::Fixture::Wikibase::Datatype::Lexeme::Wikidata::DogCzechNoun:
+ # Q499327
 
 =head1 DEPENDENCIES
 
@@ -248,12 +421,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2022-2023 Michal Josef Špaček
+© 2022-2025 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.05
 
 =cut

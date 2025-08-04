@@ -12,8 +12,10 @@ do { my $x = {
                       },
        'develop' => {
                       'requires' => {
+                                      'Dist::Zilla::Plugin::UsefulReadme' => 'v0.1.2',
                                       'ExtUtils::Manifest' => '1.68',
                                       'Pod::Coverage::TrustPod' => '0',
+                                      'Pod::Markdown::Github' => '0',
                                       'Software::Security::Policy::Individual' => '0.10',
                                       'Test::CPAN::Changes' => '0.19',
                                       'Test::DistManifest' => '0',

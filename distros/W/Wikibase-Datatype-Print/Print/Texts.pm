@@ -67,7 +67,7 @@ Readonly::Hash our %TEXTS => (
 	},
 );
 
-our $VERSION = 0.18;
+our $VERSION = 0.19;
 
 sub text_keys {
 	return sort keys %{$TEXTS{'en'}};

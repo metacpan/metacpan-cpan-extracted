@@ -9,6 +9,10 @@ use ExtUtils::MakeMaker;
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Syntactic sugar for constant and write-once Moo attributes",
   "AUTHOR" => "Robert Rothenberg <rrwo\@cpan.org>",
+  "BUILD_REQUIRES" => {
+    "ExtUtils::MakeMaker" => "7.22",
+    "Module::Metadata" => "1.000015"
+  },
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
@@ -28,7 +32,7 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
-    "Module::Metadata" => 0,
+    "Module::Metadata" => "1.000015",
     "Moo" => "1.006000",
     "Test::More" => 0,
     "Test::Most" => 0,
@@ -37,7 +41,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "v0.6.3",
+  "VERSION" => "v0.6.4",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -47,8 +51,9 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Carp" => 0,
   "Devel::StrictMode" => 0,
+  "ExtUtils::MakeMaker" => "7.22",
   "File::Spec" => 0,
-  "Module::Metadata" => 0,
+  "Module::Metadata" => "1.000015",
   "Moo" => "1.006000",
   "Scalar::Util" => 0,
   "Test::More" => 0,

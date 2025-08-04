@@ -7,7 +7,7 @@ use warnings;
 use Class::Utils qw(set_params split_params);
 use Error::Pure qw(err);
 use List::Util 1.33 qw(none);
-use Mo::utils 0.06 qw(check_array);
+use Mo::utils::Array qw(check_array);
 use Mo::utils::CSS 0.07 qw(check_css_unit);
 use Mo::utils::Language 0.05 qw(check_language_639_2);
 use Readonly;
@@ -15,7 +15,7 @@ use Tags::HTML::Messages;
 
 Readonly::Array our @FORM_METHODS => qw(post get);
 
-our $VERSION = 0.13;
+our $VERSION = 0.14;
 
 # Constructor.
 sub new {
@@ -400,7 +400,7 @@ Returns undef.
  new():
          From Class::Utils::set_params():
                  Unknown parameter '%s'.
-         From Mo::utils::check_array():
+         From Mo::utils::Array::check_array():
                  Parameter 'tags_after' must be a array.
                          Value: %s
                          Reference: %s
@@ -585,7 +585,7 @@ Returns undef.
 L<Class::Utils>,
 L<Error::Pure>,
 L<List::Util>,
-L<Mo::utils>,
+L<Mo::utils::Array>,
 L<Mo::utils::CSS>,
 L<Mo::utils::Language>,
 L<Readonly>,
@@ -618,12 +618,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2021-2024 Michal Josef Špaček
+© 2021-2025 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.13
+0.14
 
 =cut

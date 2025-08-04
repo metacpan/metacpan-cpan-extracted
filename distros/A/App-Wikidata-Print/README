@@ -1,5 +1,5 @@
 NAME
-    wd-print - Script to manipulate with Wikidata.org.
+    wd-print - Command line tool for print Wikidata item.
 
 SYNOPSIS
      wd-print [-h] [-l lang] [-m mediawiki_site] [-r] [--version] wd_id
@@ -19,6 +19,9 @@ ARGUMENTS
 
             MediaWiki site.
 
+            'commons.wikimedia.org' for query of Mid on Wikimedia Commons.
+            See EXAMPLE2.
+
             Default value is 'www.wikidata.org'.
 
     *       "-r"
@@ -31,9 +34,10 @@ ARGUMENTS
 
     *       "wd_id"
 
-            Identifier in Wikidata (qid or pid or lid).
+            Identifier in Wikidata (qid or pid or lid). Identifier in
+            Wikimedia Commons (mid).
 
-EXAMPLE
+EXAMPLE1
      wd-print -l en Q42
 
      # Output like:
@@ -592,6 +596,33 @@ EXAMPLE
      #   P1284: 00000020676 (normal)
      #   P4768: 212786 (normal)
 
+EXAMPLE2
+     wd-print -l cs -m commons.wikimedia.org M83307986
+
+     # Output like:
+     # Id: M83307986
+     # Titul: File:Dobřany - náměstí, 2.jpg
+     # NS: 6
+     # Id poslední revize: 958032307
+     # Datum změny: 2024-11-17T04:32:22Z
+     # Id stránky: 83307986
+     # Štítek: Náměstí T. G. M. v Dobřanech (cs)
+     # Výroky:
+     #   P6216: Q50423863 (normální)
+     #   P170: neznámá hodnota (normální)
+     #    P2699: https://commons.wikimedia.org/wiki/user:Jana_Hajkova
+     #    P4174: Jana Hajkova
+     #    P2093: Jana Hajkova
+     #   P571: 7 October 2019 (Q1985727) (normální)
+     #   P6789: 100 (normální)
+     #   P1259: (49.655428, 13.290846) (normální)
+     #   P6757: +0.000428 (Q11574) (normální)
+     #   P2151: +3.82 (Q174789) (normální)
+     #   P275: Q18199165 (normální)
+     #   P180: Q37173012 (normální)
+     #   P6790: +2.2 (normální)
+     #   P7482: Q66458942 (normální)
+
 REPOSITORY
     <https://github.com/michal-josef-spacek/App-Wikidata-Print>
 
@@ -601,10 +632,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2021-2024 Michal Josef Špaček
+    © 2021-2025 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.04
+    0.05
 

@@ -7,7 +7,7 @@ use strict;
 use warnings;
 
 package Net::Proxmox::VE;
-$Net::Proxmox::VE::VERSION = '0.40';
+$Net::Proxmox::VE::VERSION = '0.41';
 use HTTP::Headers;
 use HTTP::Request::Common qw(GET POST DELETE);
 use JSON::MaybeXS         qw(decode_json);
@@ -24,8 +24,42 @@ use Net::Proxmox::VE::Storage;
 # wip
 use Net::Proxmox::VE::Nodes;
 
-my $API2_BASE_URL = 'https://%s:%s/api2/json/';
+my $API2_BASE_URL    = 'https://%s:%s/api2/%s/';
+my $DEFAULT_FORMAT   = 'json';
+my $DEFAULT_PORT     = 8006;
+my $DEFAULT_REALM    = 'pam';
+my $DEFAULT_TIMEOUT  = 10;
+my $DEFAULT_USERNAME = 'root';
 
+
+sub _start_request {
+
+    my ( $self, $params ) = @_;
+
+    # Set up the request object
+    my $request = HTTP::Request->new();
+    $request->method( $params->{method} );
+    if ( defined $self->{ticket} ) {
+        $request->header(
+            'Cookie' => 'PVEAuthCookie=' . $self->{ticket}->{ticket} );
+
+        # all methods other than GET require the prevention token
+        # (i.e. anything that makes modification)
+        if ( $params->{method} ne 'GET' ) {
+            $request->header(
+                'CSRFPreventionToken' => $self->{ticket}->{CSRFPreventionToken}
+            );
+        }
+    }
+
+    if ( defined $self->{pveapitoken} ) {
+        $request->header(
+            'Authorization' => 'PVEAPIToken=' . $self->{pveapitoken} );
+    }
+
+    return $request;
+
+}
 
 sub action {
 
@@ -61,42 +95,32 @@ sub action {
         return unless $self->login();
     }
 
-    my $url = $self->url_prefix . $params{path};
+    my $url     = $self->url_prefix . $params{path};
+    my $request = $self->_start_request( \%params );
 
-    # Grab the useragent
+    # Grab useragent for convenience
     my $ua = $self->{ua};
-
-    # Set up the request object
-    my $request = HTTP::Request->new();
-    $request->uri($url);
-    $request->header( 'Cookie' => 'PVEAuthCookie=' . $self->{ticket}->{ticket} )
-      if defined $self->{ticket};
-
-    # all methods other than get require the prevention token
-    # (ie anything that makes modification)
-    unless ( $params{method} eq 'GET' ) {
-        $request->header(
-            'CSRFPreventionToken' => $self->{ticket}->{CSRFPreventionToken} );
-    }
 
     my $response;
     if ( $params{method} =~ m/^(PUT|POST)$/ ) {
-        $request->method( $params{method} );
+        $request->uri($url);
         my $content = join '&', map { $_ . '=' . $params{post_data}->{$_} }
           sort keys %{ $params{post_data} };
         $request->content($content);
         $response = $ua->request($request);
     }
-    elsif ( $params{method} =~ m/^(GET|DELETE)$/ ) {
-        $request->method( $params{method} );
+    if ( $params{method} =~ m/^(GET|DELETE)$/ ) {
         if ( %{ $params{post_data} } ) {
             my $qstring = join '&', map { $_ . '=' . $params{post_data}->{$_} }
               sort keys %{ $params{post_data} };
             $request->uri("$url?$qstring");
         }
+        else {
+            $request->uri($url);
+        }
         $response = $ua->request($request);
     }
-    else {
+    unless ( defined $response ) {
 
         # this shouldnt happen
         Net::Proxmox::VE::Exception->throw(
@@ -104,7 +128,7 @@ sub action {
     }
 
     if ( $response->is_success ) {
-        print "DEBUG: successful request: " . $request->as_string . "\n"
+        print 'DEBUG: successful request: ' . $request->as_string . "\n"
           if $self->{params}->{debug};
 
         my $data = decode_json( $response->decoded_content );
@@ -129,9 +153,9 @@ sub action {
 
     }
     else {
-        Net::Proxmox::VE::Exception->throw( "WARNING: request failed: "
+        Net::Proxmox::VE::Exception->throw( 'WARNING: request failed: '
               . $request->as_string . "\n"
-              . "WARNING: response status: "
+              . 'WARNING: response status: '
               . $response->status_line
               . "\n" );
     }
@@ -164,9 +188,14 @@ sub check_login_ticket {
 
     my $self = shift or return;
 
+    # API Tokens are always valid
+    return 1 if $self->{pveapitoken};
+
+    # Check we have a ticket loaded
     my $ticket = $self->{ticket} // return;
     return unless ref $ticket eq 'HASH';
 
+    # Check ticket appears valid
     my $is_valid =
          $ticket->{ticket}
       && $ticket->{CSRFPreventionToken}
@@ -175,7 +204,10 @@ sub check_login_ticket {
       && $self->{ticket_timestamp}
       && ( $self->{ticket_timestamp} + $self->{ticket_life} ) > time();
 
+    # Clear invalid ticket
     $self->clear_login_ticket unless $is_valid;
+
+    # Report if ticket seems valid
     return $is_valid;
 
 }
@@ -252,29 +284,34 @@ sub get {
 
 
 sub login {
+
     my $self = shift or return;
+
+    if ( defined $self->{pveapitoken} ) {
+        print "DEBUG: API Tokens are always logged in\n"
+          if $self->{params}->{debug};
+        return 1;
+    }
 
     # Prepare login request
     my $url = $self->url_prefix . 'access/ticket';
 
     # Perform login request
     my $request_time = time();
-    my $response     = $self->{ua}->post(
-        $url,
-        {
-            'username' => $self->{params}->{username} . '@'
-              . $self->{params}->{realm},
-            'password' => $self->{params}->{password},
-        },
-    );
+    my $data         = {
+        'username' => $self->{params}->{username} . '@'
+          . $self->{params}->{realm},
+        'password' => $self->{params}->{password},
+    };
+    my $response = $self->{ua}->post( $url, $data );
 
     if ( $response->is_success ) {
         my $login_ticket_data = decode_json( $response->decoded_content );
         $self->{ticket} = $login_ticket_data->{data};
 
-# We use request time as the time to get the json ticket is undetermined,
-# id rather have a ticket a few seconds shorter than have a ticket that incorrectly
-# says its valid for a couple more
+# We use the request time because the time to get the json ticket is undetermined.
+# It seems wiser to discard a ticket a few seconds before it expires rather than to incorrectly
+# continue using it after it has expired
         $self->{ticket_timestamp} = $request_time;
         print "DEBUG: login successful\n"
           if $self->{params}->{debug};
@@ -290,6 +327,64 @@ sub login {
     return;
 }
 
+
+sub _load_auth {
+
+    my ( $self, $params ) = @_;
+
+    if ( $params->{password}
+        and ( $params->{tokenid} or $params->{secret} ) )
+    {
+        Net::Proxmox::VE::Exception->throw(
+'Both password and API Token provided. Pleae pick one authentication method'
+        );
+    }
+
+    my $realm    = delete $params->{realm}    || $DEFAULT_REALM;
+    my $username = delete $params->{username} || $DEFAULT_USERNAME;
+
+    if ( $params->{password} ) {
+        my $password = delete $params->{password}
+          || Net::Proxmox::VE::Exception->throw('password param is required');
+        $self->{'params'}->{'password'} = $password;
+        $self->{'params'}->{'realm'}    = $realm;
+        $self->{'params'}->{'username'} = $username;
+        $self->{'ticket'}               = undef;
+        $self->{'ticket_timestamp'}     = undef;
+        $self->{'ticket_life'}          = 7200;        # 2 Hours
+        return 1;
+    }
+
+    if ( $params->{tokenid} and $params->{secret} ) {
+        my $tokenid = delete $params->{tokenid};
+        my $secret  = delete $params->{secret};
+        $self->{'pveapitoken'} =
+          sprintf( '%s@%s!%s=%s', $username, $realm, $tokenid, $secret );
+        return 1;
+    }
+
+    Net::Proxmox::VE::Exception->throw(
+            'Incomplete authentication credentials provided.'
+          . 'Either a password or tokenid and secret must be provided' );
+
+}
+
+sub _create_ua {
+
+    my ( $self, $params ) = @_;
+
+    my $ssl_opts = delete $params->{ssl_opts};
+    my %lwpUserAgentOptions;
+    if ($ssl_opts) {
+        $lwpUserAgentOptions{ssl_opts} = $ssl_opts;
+    }
+    my $ua = LWP::UserAgent->new(%lwpUserAgentOptions);
+    $ua->timeout( $self->{params}->{timeout} );
+    $self->{ua} = $ua;
+
+    return 1;
+
+}
 
 sub new {
 
@@ -307,56 +402,40 @@ sub new {
         %params = %{ $p[0] };
 
     }
-    elsif ( scalar @p % 2 != 0 ) {    # 'unless' is better than != but anyway
+    elsif ( scalar @p % 2 != 0 ) {
         Net::Proxmox::VE::Exception->throw(
             'new() called with an odd number of parameters');
 
     }
     else {
         %params = @p
-          or
-          Net::Proxmox::VE::Exception->throw('new() requires a hash for params');
+          or Net::Proxmox::VE::Exception->throw(
+            'new() requires a hash for params');
     }
 
-    my $host = delete $params{host}
+    my $debug = delete $params{debug};
+    my $host  = delete $params{host}
       || Net::Proxmox::VE::Exception->throw('host param is required');
-    my $password = delete $params{password}
-      || Net::Proxmox::VE::Exception->throw('password param is required');
-    my $port     = delete $params{port}     || 8006;
-    my $username = delete $params{username} || 'root';
-    my $realm    = delete $params{realm}    || 'pam';
-    my $debug    = delete $params{debug};
-    my $timeout  = delete $params{timeout} || 10;
-    my $ssl_opts = delete $params{ssl_opts};
-    Net::Proxmox::VE::Exception->throw(
-        'unknown parameters to new: ' . join( ', ', keys %params ) )
-      if keys %params;
+    my $port    = delete $params{port}    || $DEFAULT_PORT;
+    my $timeout = delete $params{timeout} || $DEFAULT_TIMEOUT;
 
     my $self->{params} = {
-        host     => $host,
-        password => $password,
-        port     => $port,
-        username => $username,
-        realm    => $realm,
-        debug    => $debug,
-        timeout  => $timeout,
-        ssl_opts => $ssl_opts,
+        debug   => $debug,
+        host    => $host,
+        port    => $port,
+        timeout => $timeout,
     };
 
-    $self->{'ticket'}           = undef;
-    $self->{'ticket_timestamp'} = undef;
-    $self->{'ticket_life'}      = 7200;    # 2 Hours
+    bless $self, $class;
 
-    my %lwpUserAgentOptions;
-    if ($ssl_opts) {
-        $lwpUserAgentOptions{ssl_opts} = $ssl_opts;
-    }
+    $self->_load_auth( \%params );
+    $self->_create_ua( \%params );
 
-    my $ua = LWP::UserAgent->new(%lwpUserAgentOptions);
-    $ua->timeout($timeout);
-    $self->{ua} = $ua;
+    Net::Proxmox::VE::Exception->throw(
+        'unknown parameters to new(): ' . join( ', ', keys %params ) )
+      if keys %params;
 
-    return bless $self, $class;
+    return $self;
 
 }
 
@@ -410,7 +489,8 @@ sub url_prefix {
     # Prepare prefix for request
     my $url_prefix = sprintf( $API2_BASE_URL,
         $self->{params}->{host},
-        $self->{params}->{port} );
+        $self->{params}->{port},
+        $DEFAULT_FORMAT);
 
     return $url_prefix;
 
@@ -431,12 +511,13 @@ Net::Proxmox::VE - Pure Perl API for Proxmox Virtual Environment
 
 =head1 VERSION
 
-version 0.40
+version 0.41
 
 =head1 SYNOPSIS
 
   use Net::Proxmox::VE;
 
+  # User+Password Authentication
   %args = (
       host     => 'proxmox.local.domain',
       password => 'barpassword',
@@ -449,15 +530,28 @@ version 0.40
 
   $host->login() or die ('Couldn\'t log in to proxmox host');
 
+  # API Token Authentication
+  %args = (
+      host     => 'proxmox.local.domain',
+      tokenid  => 'example',
+      secret   => 'uuid',
+      username => 'root', # optional
+      port     => 8006,   # optional
+      realm    => 'pam',  # optional
+  );
+
+  $host = Net::Proxmox::VE->new(%args);
+
 =head1 DESCRIPTION
 
-This Class provides a framework for talking to Proxmox VE 2.0 API instances including ticket headers required for authentication.
-You can use just the get/delete/put/post abstraction layer or use the api function methods.
-This class provides the building blocks for someone wanting to use
-Perl to talk to Proxmox PVE.
-It provides a get/put/post/delete abstraction layer as methods on top of Proxmox's REST API, while also handling the Login Ticket headers required for authentication.
+This Class provides a framework for talking to Proxmox VE REST API instances including ticket headers required
+for authentication. You can use just the get/delete/put/post abstraction layer or use the api function methods.
 
 Object representations of the Proxmox VE REST API are included in seperate modules.
+
+You can use either User+Password or API Tokens for authentication. See also L<https://pve.proxmox.com/wiki/User_Management>
+
+There is currently no support for 2FA (pull requests welcome).
 
 =head1 WARNING
 
@@ -678,7 +772,7 @@ L<http://pve.proxmox.com/pve-docs/api-viewer/index.html>
 
 =head1 AUTHOR
 
-Brendan Beveridge <brendan@nodeintegration.com.au>, Dean Hamstead <dean@fragfest.com.au>
+Dean Hamstead <dean@fragfest.com.au>
 
 =head1 COPYRIGHT AND LICENSE
 

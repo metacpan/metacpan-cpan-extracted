@@ -10,26 +10,20 @@
   <shortdesc>Pure Perl API for Proxmox Virtual Environment</shortdesc>
   <developer>
     <foaf:Person>
-      <foaf:name>Brendan Beveridge &lt;brendan@nodeintegration.com.au&gt;, Dean Hamstead</foaf:name>
+      <foaf:name>Dean Hamstead</foaf:name>
       <foaf:mbox rdf:resource="mailto:dean@fragfest.com.au" />
     </foaf:Person>
   </developer>
   <helper>
     <foaf:Person>
-      <foaf:name>damien</foaf:name>
-      <foaf:mbox rdf:resource="mailto:damien@FREEHILDEGARDEV.(none)" />
+      <foaf:name>Brendan Beveridge</foaf:name>
+      <foaf:mbox rdf:resource="mailto:brendan@nodeintegration.com.au" />
     </foaf:Person>
   </helper>
   <helper>
     <foaf:Person>
-      <foaf:name>Dean Hamstead</foaf:name>
-      <foaf:mbox rdf:resource="mailto:dean.hamstead@staples.com.au" />
-    </foaf:Person>
-  </helper>
-  <helper>
-    <foaf:Person>
-      <foaf:name>Dean Hamstead</foaf:name>
-      <foaf:mbox rdf:resource="mailto:dean.hamstead@winc.com.au" />
+      <foaf:name>Damien PIQUET</foaf:name>
+      <foaf:mbox rdf:resource="mailto:piqudam@gmail.com" />
     </foaf:Person>
   </helper>
   <helper>
@@ -52,12 +46,6 @@
   </helper>
   <helper>
     <foaf:Person>
-      <foaf:name>MartijnLievaart</foaf:name>
-      <foaf:mbox rdf:resource="mailto:github@rtij.nl" />
-    </foaf:Person>
-  </helper>
-  <helper>
-    <foaf:Person>
       <foaf:name>Martijn Lievaart</foaf:name>
       <foaf:mbox rdf:resource="mailto:m@rtij.nl" />
     </foaf:Person>
@@ -70,12 +58,6 @@
   </helper>
   <helper>
     <foaf:Person>
-      <foaf:name>mrproper</foaf:name>
-      <foaf:mbox rdf:resource="mailto:psynode@gmail.com" />
-    </foaf:Person>
-  </helper>
-  <helper>
-    <foaf:Person>
       <foaf:name>p5i</foaf:name>
       <foaf:mbox rdf:resource="mailto:petr.v.ilin@gmail.com" />
     </foaf:Person>
@@ -84,12 +66,6 @@
     <foaf:Person>
       <foaf:name>Peter Valdemar Mørch</foaf:name>
       <foaf:mbox rdf:resource="mailto:peter@morch.com" />
-    </foaf:Person>
-  </helper>
-  <helper>
-    <foaf:Person>
-      <foaf:name>PIQUET Damien</foaf:name>
-      <foaf:mbox rdf:resource="mailto:piqudam@gmail.com" />
     </foaf:Person>
   </helper>
   <helper>

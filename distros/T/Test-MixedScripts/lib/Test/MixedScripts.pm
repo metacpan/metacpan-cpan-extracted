@@ -20,7 +20,7 @@ use Test2::Util::DistFiles v0.2.0 qw( manifest_files is_perl_file );
 
 our @EXPORT_OK = qw( all_perl_files_scripts_ok file_scripts_ok );
 
-our $VERSION = 'v0.6.2';
+our $VERSION = 'v0.6.3';
 
 
 sub file_scripts_ok {
@@ -162,7 +162,7 @@ Test::MixedScripts - test text for mixed and potentially confusable Unicode scri
 
 =head1 VERSION
 
-version v0.6.2
+version v0.6.3
 
 =head1 SYNOPSIS
 
@@ -284,7 +284,16 @@ L<Detecting malicious Unicode|https://daniel.haxx.se/blog/2025/05/16/detecting-m
 The development version is on github at L<https://github.com/robrwo/perl-Test-MixedScripts>
 and may be cloned from L<git://github.com/robrwo/perl-Test-MixedScripts.git>
 
-=head1 BUGS
+See F<CONTRIBUTING.md> for more information.
+
+=head1 SUPPORT
+
+Only the latest version of this module will be supported.
+
+This module requires Perl v5.16 or later.  Future releases may only support Perl versions released in the last ten
+years.
+
+=head2 Reporting Bugs and Submitting Feature Requests
 
 Please report any bugs or feature requests on the bugtracker website
 L<https://github.com/robrwo/perl-Test-MixedScripts/issues>
@@ -293,10 +302,8 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
-=head2 Reporting Security Vulnerabilities
-
-Security issues should not be reported on the bugtracker website. Please see F<SECURITY.md> for instructions how to
-report security vulnerabilities
+If the bug you are reporting has security implications which make it inappropriate to send to a public issue tracker,
+then see F<SECURITY.md> for instructions how to report security vulnerabilities.
 
 =head1 AUTHOR
 

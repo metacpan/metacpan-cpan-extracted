@@ -7,7 +7,7 @@ use Test::More 'tests' => 14;
 use Test::NoWarnings;
 use Wikibase::Datatype::Item;
 use Wikibase::Datatype::Sitelink;
-use Wikibase::Datatype::Value::Monolingual;
+use Wikibase::Datatype::Term;
 
 # Test.
 my $obj = Wikibase::Datatype::Item->new;
@@ -19,19 +19,19 @@ eval {
 		'aliases' => ['foo'],
 	);
 };
-is($EVAL_ERROR, "Parameter 'aliases' with array must contain 'Wikibase::Datatype::Value::Monolingual' objects.\n",
-	"Parameter 'aliases' with array must contain 'Wikibase::Datatype::Value::Monolingual' objects (foo).");
+is($EVAL_ERROR, "Parameter 'aliases' with array must contain 'Wikibase::Datatype::Term' objects.\n",
+	"Parameter 'aliases' with array must contain 'Wikibase::Datatype::Term' objects (foo).");
 clean();
 
 # Test.
 eval {
 	Wikibase::Datatype::Item->new(
 		'descriptions' => [
-			Wikibase::Datatype::Value::Monolingual->new(
+			Wikibase::Datatype::Term->new(
 				'language' => 'en',
 				'value' => 'Description 1',
 			),
-			Wikibase::Datatype::Value::Monolingual->new(
+			Wikibase::Datatype::Term->new(
 				'language' => 'en',
 				'value' => 'Description 2',
 			),
@@ -45,7 +45,7 @@ clean();
 # Test.
 $obj = Wikibase::Datatype::Item->new(
 	'descriptions' => [
-		Wikibase::Datatype::Value::Monolingual->new(
+		Wikibase::Datatype::Term->new(
 			'language' => 'en',
 			'value' => 'Description 1',
 		),
@@ -59,19 +59,19 @@ eval {
 		'descriptions' => ['foo'],
 	);
 };
-is($EVAL_ERROR, "Parameter 'descriptions' with array must contain 'Wikibase::Datatype::Value::Monolingual' objects.\n",
-	"Parameter 'descriptions' with array must contain 'Wikibase::Datatype::Value::Monolingual' objects (foo).");
+is($EVAL_ERROR, "Parameter 'descriptions' with array must contain 'Wikibase::Datatype::Term' objects.\n",
+	"Parameter 'descriptions' with array must contain 'Wikibase::Datatype::Term' objects (foo).");
 clean();
 
 # Test.
 eval {
 	Wikibase::Datatype::Item->new(
 		'labels' => [
-			Wikibase::Datatype::Value::Monolingual->new(
+			Wikibase::Datatype::Term->new(
 				'language' => 'en',
 				'value' => 'Label 1',
 			),
-			Wikibase::Datatype::Value::Monolingual->new(
+			Wikibase::Datatype::Term->new(
 				'language' => 'en',
 				'value' => 'Label 2',
 			),
@@ -88,14 +88,14 @@ eval {
 		'labels' => ['foo'],
 	);
 };
-is($EVAL_ERROR, "Parameter 'labels' with array must contain 'Wikibase::Datatype::Value::Monolingual' objects.\n",
-	"Parameter 'labels' with array must contain 'Wikibase::Datatype::Value::Monolingual' objects (foo).");
+is($EVAL_ERROR, "Parameter 'labels' with array must contain 'Wikibase::Datatype::Term' objects.\n",
+	"Parameter 'labels' with array must contain 'Wikibase::Datatype::Term' objects (foo).");
 clean();
 
 # Test.
 $obj = Wikibase::Datatype::Item->new(
 	'labels' => [
-		Wikibase::Datatype::Value::Monolingual->new(
+		Wikibase::Datatype::Term->new(
 			'language' => 'en',
 			'value' => 'Label 1',
 		),

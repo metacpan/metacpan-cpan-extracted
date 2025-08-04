@@ -7,28 +7,28 @@ use warnings;
 use Test::Shared::Fixture::Wikibase::Datatype::Statement::Wikidata::GivenName::Douglas;
 use Test::Shared::Fixture::Wikibase::Datatype::Statement::Wikidata::InstanceOf::Human;
 use Test::Shared::Fixture::Wikibase::Datatype::Statement::Wikidata::SexOrGender::Male;
-use Wikibase::Datatype::Value::Monolingual;
+use Wikibase::Datatype::Term;
 
-our $VERSION = 0.38;
+our $VERSION = 0.39;
 
 sub new {
 	my $class = shift;
 
 	my @params = (
 		'aliases' => [
-			Wikibase::Datatype::Value::Monolingual->new(
+			Wikibase::Datatype::Term->new(
 				'language' => 'en',
 				'value' => 'Douglas Noel Adams',
 			),
 		],
 		'descriptions' => [
-			Wikibase::Datatype::Value::Monolingual->new(
+			Wikibase::Datatype::Term->new(
 				'language' => 'en',
 				'value' => 'English writer and humorist (1952-2001)',
 			),
 		],
 		'labels' => [
-			Wikibase::Datatype::Value::Monolingual->new(
+			Wikibase::Datatype::Term->new(
 				'language' => 'en',
 				'value' => 'Douglas Adams',
 			),
@@ -94,7 +94,7 @@ Returns instance of object.
 
 Get aliases.
 
-Returns reference to array with Wikibase::Datatype::Value::Monolingual instances.
+Returns reference to array with Wikibase::Datatype::Term instances.
 
 =head2 C<descriptions>
 
@@ -102,7 +102,7 @@ Returns reference to array with Wikibase::Datatype::Value::Monolingual instances
 
 Get descriptions.
 
-Returns reference to array with Wikibase::Datatype::Value::Monolingual instances.
+Returns reference to array with Wikibase::Datatype::Term instances.
 
 =head2 C<id>
 
@@ -118,7 +118,7 @@ Returns string.
 
 Get labels.
 
-Returns reference to array with Wikibase::Datatype::Value::Monolingual instances.
+Returns reference to array with Wikibase::Datatype::Term instances.
 
 =head2 C<lastrevid>
 
@@ -224,7 +224,7 @@ L<Test::Shared::Fixture::Wikibase::Datatype::Statement::Wikidata::GivenName::Dou
 L<Test::Shared::Fixture::Wikibase::Datatype::Statement::Wikidata::InstanceOf::Human>,
 L<Test::Shared::Fixture::Wikibase::Datatype::Statement::Wikidata::SexOrGender::Male>,
 L<Wikibase::Datatype::Item>,
-L<Wikibase::Datatype::Value::Monolingual>.
+L<Wikibase::Datatype::Term>.
 
 =head1 SEE ALSO
 
@@ -258,6 +258,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.38
+0.39
 
 =cut

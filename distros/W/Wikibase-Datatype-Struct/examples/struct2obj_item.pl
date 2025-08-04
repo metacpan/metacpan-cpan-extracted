@@ -113,19 +113,19 @@ p $obj;
 #     private methods (1) : __ANON__ (Mo::build)
 #     internals: {
 #         aliases        [
-#             [0] Wikibase::Datatype::Value::Monolingual,
-#             [1] Wikibase::Datatype::Value::Monolingual,
-#             [2] Wikibase::Datatype::Value::Monolingual,
-#             [3] Wikibase::Datatype::Value::Monolingual
+#             [0] Wikibase::Datatype::Term,
+#             [1] Wikibase::Datatype::Term,
+#             [2] Wikibase::Datatype::Term,
+#             [3] Wikibase::Datatype::Term
 #         ],
 #         descriptions   [
-#             [0] Wikibase::Datatype::Value::Monolingual,
-#             [1] Wikibase::Datatype::Value::Monolingual
+#             [0] Wikibase::Datatype::Term,
+#             [1] Wikibase::Datatype::Term
 #         ],
 #         id             "Q42",
 #         labels         [
-#             [0] Wikibase::Datatype::Value::Monolingual,
-#             [1] Wikibase::Datatype::Value::Monolingual
+#             [0] Wikibase::Datatype::Term,
+#             [1] Wikibase::Datatype::Term
 #         ],
 #         lastrevid      534820,
 #         modified       "2020-12-02T13:39:18Z",

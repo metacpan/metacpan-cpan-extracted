@@ -1,5 +1,6 @@
 Changes
 examples/query_item.pl
+examples/query_lexeme.pl
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
 inc/Module/Install/AuthorTests.pm
@@ -26,5 +27,9 @@ t/Wikibase-Datatype-Query/05-query_item-alias.t
 t/Wikibase-Datatype-Query/06-query_item-description.t
 t/Wikibase-Datatype-Query/07-query_item-label.t
 t/Wikibase-Datatype-Query/08-query_item-property.t
+t/Wikibase-Datatype-Query/09-query_item-statement.t
+t/Wikibase-Datatype-Query/10-query_lexeme-form_property.t
+t/Wikibase-Datatype-Query/11-query_lexeme-property.t
+t/Wikibase-Datatype-Query/12-query_lexeme-sense_property.t
 xt/Wikibase-Datatype-Query/01-pod_coverage.t
 xt/Wikibase-Datatype-Query/02-pod.t

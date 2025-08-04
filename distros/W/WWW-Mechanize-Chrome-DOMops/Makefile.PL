@@ -27,7 +27,7 @@ my %WriteMakefileArgs = (
     BUILD_REQUIRES => {
     },
     TEST_REQUIRES => {
-	'Data::Roundtrip' => '0',
+	'Data::Roundtrip' => '0.30',
 	'File::Spec' => '0',
 	'FindBin' => '0',
 	'Log::Log4perl' => '0',
@@ -37,7 +37,7 @@ my %WriteMakefileArgs = (
 	'WWW::Mechanize::Chrome' => '0',
     },
     PREREQ_PM => {
-	'Data::Roundtrip' => '0',
+	'Data::Roundtrip' => '0.30',
 	'String::Escape' => '0',
 	'Exporter' => '0',
     },

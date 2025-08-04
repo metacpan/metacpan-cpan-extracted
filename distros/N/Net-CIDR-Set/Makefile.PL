@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.006000;
+use 5.014000;
 
 use ExtUtils::MakeMaker;
 
@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Net-CIDR-Set",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.006000",
+  "MIN_PERL_VERSION" => "5.014000",
   "NAME" => "Net::CIDR::Set",
   "PREREQ_PM" => {
     "Carp" => 0,
@@ -33,7 +33,7 @@ my %WriteMakefileArgs = (
     "Module::Metadata" => "1.000015",
     "Test::More" => 0
   },
-  "VERSION" => "0.16",
+  "VERSION" => "0.18",
   "test" => {
     "TESTS" => "t/*.t"
   }

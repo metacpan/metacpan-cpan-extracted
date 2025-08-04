@@ -7,7 +7,7 @@ use strict;
 use warnings;
 
 package Net::Proxmox::VE::Exception;
-$Net::Proxmox::VE::Exception::VERSION = '0.40';
+$Net::Proxmox::VE::Exception::VERSION = '0.41';
 
 sub _new {
 
@@ -37,8 +37,8 @@ sub message { return shift->{message} }
 
 sub throw {
 
-    my $class = shift;
-    my $arg   = shift;
+    my ($class, $arg) = @_;
+    $class = ref $class || $class;
 
     my %args;
     if ( ref $arg ) {
@@ -51,7 +51,7 @@ sub throw {
     ( $args{package}, $args{file}, $args{line} ) = caller(0);
     $args{subroutine} = ( caller(1) )[3];
 
-    die $class->new(%args);
+    die $class->_new(%args);
 
 }
 
@@ -70,7 +70,7 @@ Net::Proxmox::VE::Exception - Functions for the 'cluster' portion of the API
 
 =head1 VERSION
 
-version 0.40
+version 0.41
 
 =head1 SYNOPSIS
 
@@ -128,7 +128,7 @@ L<Net::Proxmox::VE>
 
 =head1 AUTHOR
 
-Brendan Beveridge <brendan@nodeintegration.com.au>, Dean Hamstead <dean@fragfest.com.au>
+Dean Hamstead <dean@fragfest.com.au>
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -6,4 +6,4 @@ use Test::NoWarnings;
 use Wikibase::Datatype::Utils;
 
 # Test.
-is($Wikibase::Datatype::Utils::VERSION, 0.38, 'Version.');
+is($Wikibase::Datatype::Utils::VERSION, 0.39, 'Version.');

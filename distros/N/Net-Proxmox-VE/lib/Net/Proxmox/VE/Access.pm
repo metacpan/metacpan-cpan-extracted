@@ -7,7 +7,7 @@ use strict;
 use warnings;
 
 package Net::Proxmox::VE::Access;
-$Net::Proxmox::VE::Access::VERSION = '0.40';
+$Net::Proxmox::VE::Access::VERSION = '0.41';
 use parent 'Exporter';
 
 use Net::Proxmox::VE::Exception;
@@ -550,7 +550,7 @@ Net::Proxmox::VE::Access - Functions for the 'access' portion of the API
 
 =head1 VERSION
 
-version 0.40
+version 0.41
 
 =head1 SYNOPSIS
 
@@ -1082,7 +1082,7 @@ L<Net::Proxmox::VE>
 
 =head1 AUTHOR
 
-Brendan Beveridge <brendan@nodeintegration.com.au>, Dean Hamstead <dean@fragfest.com.au>
+Dean Hamstead <dean@fragfest.com.au>
 
 =head1 COPYRIGHT AND LICENSE
 

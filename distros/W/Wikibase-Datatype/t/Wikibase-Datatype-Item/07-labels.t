@@ -4,7 +4,7 @@ use warnings;
 use Test::More 'tests' => 4;
 use Test::NoWarnings;
 use Wikibase::Datatype::Item;
-use Wikibase::Datatype::Value::Monolingual;
+use Wikibase::Datatype::Term;
 
 # Test.
 my $obj = Wikibase::Datatype::Item->new;
@@ -20,7 +20,7 @@ my $abc = join '', ('a' .. 'z');
 my $input_value = $abc x 10;
 $obj = Wikibase::Datatype::Item->new(
 	'labels' => [
-		Wikibase::Datatype::Value::Monolingual->new(
+		Wikibase::Datatype::Term->new(
 			'language' => 'en',
 			'value' => $input_value,
 		),

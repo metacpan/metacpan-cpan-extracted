@@ -8,13 +8,13 @@ use Error::Pure qw(err);
 use Readonly;
 use Wikibase::Datatype::Print::Sitelink;
 use Wikibase::Datatype::Print::Statement;
+use Wikibase::Datatype::Print::Term;
 use Wikibase::Datatype::Print::Utils qw(defaults print_aliases print_descriptions
 	print_labels print_sitelinks print_statements);
-use Wikibase::Datatype::Print::Value::Monolingual;
 
 Readonly::Array our @EXPORT_OK => qw(print);
 
-our $VERSION = 0.18;
+our $VERSION = 0.19;
 
 sub print {
 	my ($obj, $opts_hr) = @_;
@@ -29,15 +29,15 @@ sub print {
 
 	# Label.
 	push @ret, print_labels($obj, $opts_hr,
-		\&Wikibase::Datatype::Print::Value::Monolingual::print);
+		\&Wikibase::Datatype::Print::Term::print);
 
 	# Description.
 	push @ret, print_descriptions($obj, $opts_hr,
-		\&Wikibase::Datatype::Print::Value::Monolingual::print);
+		\&Wikibase::Datatype::Print::Term::print);
 
 	# Aliases.
 	push @ret, print_aliases($obj, $opts_hr,
-		\&Wikibase::Datatype::Print::Value::Monolingual::print);
+		\&Wikibase::Datatype::Print::Term::print);
 
 	# Sitelinks.
 	push @ret, print_sitelinks($obj, $opts_hr,
@@ -103,8 +103,8 @@ Returns list of lines in array context.
  use Wikibase::Datatype::Sitelink;
  use Wikibase::Datatype::Snak;
  use Wikibase::Datatype::Statement;
+ use Wikibase::Datatype::Term;
  use Wikibase::Datatype::Value::Item;
- use Wikibase::Datatype::Value::Monolingual;
  use Wikibase::Datatype::Value::String;
  use Wikibase::Datatype::Value::Time;
 
@@ -207,48 +207,48 @@ Returns list of lines in array context.
  # Main item.
  my $obj = Wikibase::Datatype::Item->new(
          'aliases' => [
-                 Wikibase::Datatype::Value::Monolingual->new(
+                 Wikibase::Datatype::Term->new(
                          'language' => 'cs',
                          'value' => decode_utf8('Douglas Noël Adams'),
                  ),
-                 Wikibase::Datatype::Value::Monolingual->new(
+                 Wikibase::Datatype::Term->new(
                          'language' => 'cs',
                          'value' => 'Douglas Noel Adams',
                  ),
-                 Wikibase::Datatype::Value::Monolingual->new(
+                 Wikibase::Datatype::Term->new(
                          'language' => 'cs',
                          'value' => 'Douglas N. Adams',
                  ),
-                 Wikibase::Datatype::Value::Monolingual->new(
+                 Wikibase::Datatype::Term->new(
                          'language' => 'en',
                          'value' => 'Douglas Noel Adams',
                  ),
-                 Wikibase::Datatype::Value::Monolingual->new(
+                 Wikibase::Datatype::Term->new(
                          'language' => 'en',
                          'value' => decode_utf8('Douglas Noël Adams'),
                  ),
-                 Wikibase::Datatype::Value::Monolingual->new(
+                 Wikibase::Datatype::Term->new(
                          'language' => 'en',
                          'value' => 'Douglas N. Adams',
                  ),
          ],
          'descriptions' => [
-                 Wikibase::Datatype::Value::Monolingual->new(
+                 Wikibase::Datatype::Term->new(
                          'language' => 'cs',
                          'value' => decode_utf8('anglický spisovatel, humorista a dramatik'),
                  ),
-                 Wikibase::Datatype::Value::Monolingual->new(
+                 Wikibase::Datatype::Term->new(
                          'language' => 'en',
                          'value' => 'English writer and humorist',
                  ),
          ],
          'id' => 'Q42',
          'labels' => [
-                 Wikibase::Datatype::Value::Monolingual->new(
+                 Wikibase::Datatype::Term->new(
                          'language' => 'cs',
                          'value' => 'Douglas Adams',
                  ),
-                 Wikibase::Datatype::Value::Monolingual->new(
+                 Wikibase::Datatype::Term->new(
                          'language' => 'en',
                          'value' => 'Douglas Adams',
                  ),
@@ -308,8 +308,8 @@ L<Exporter>,
 L<Readonly>,
 L<Wikibase::Datatype::Print::Sitelink>,
 L<Wikibase::Datatype::Print::Statement>,
-L<Wikibase::Datatype::Print::Utils>,
-L<Wikibase::Datatype::Print::Value::Monolingual>.
+L<Wikibase::Datatype::Print::Term>,
+L<Wikibase::Datatype::Print::Utils>.
 
 =head1 SEE ALSO
 
@@ -339,6 +339,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.18
+0.19
 
 =cut

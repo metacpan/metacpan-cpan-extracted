@@ -18,7 +18,7 @@ our $SKIP_CHECK_TERM_LANG => 0;
 our @LANGUAGE_CODES => ();
 our @TERM_LANGUAGE_CODES => ();
 
-our $VERSION = 0.38;
+our $VERSION = 0.39;
 
 sub check_datetime {
 	my ($self, $key) = @_;
@@ -573,6 +573,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.38
+0.39
 
 =cut

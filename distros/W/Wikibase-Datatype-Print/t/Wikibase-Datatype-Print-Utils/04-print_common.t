@@ -11,8 +11,8 @@ use Wikibase::Datatype::Item;
 use Wikibase::Datatype::Print::Statement;
 use Wikibase::Datatype::Print::Texts qw(texts);
 use Wikibase::Datatype::Print::Utils qw(print_common);
-use Wikibase::Datatype::Print::Value::Monolingual;
-use Wikibase::Datatype::Value::Monolingual;
+use Wikibase::Datatype::Print::Term;
+use Wikibase::Datatype::Term;
 
 # Test.
 my $obj = Test::Shared::Fixture::Wikibase::Datatype::Form::Wikidata::DogCzechSingular->new;
@@ -32,11 +32,11 @@ is_deeply(
 # Test.
 $obj = Wikibase::Datatype::Item->new(
 	'aliases' => [
-		Wikibase::Datatype::Value::Monolingual->new(
+		Wikibase::Datatype::Term->new(
 			'language' => 'en',
 			'value' => 'dog',
 		),
-		Wikibase::Datatype::Value::Monolingual->new(
+		Wikibase::Datatype::Term->new(
 			'language' => 'cs',
 			'value' => 'pes',
 		),
@@ -44,7 +44,7 @@ $obj = Wikibase::Datatype::Item->new(
 );
 @ret = print_common($obj, { 'texts' => texts() },
 	'aliases',
-	\&Wikibase::Datatype::Print::Value::Monolingual::print,
+	\&Wikibase::Datatype::Print::Term::print,
 	'Aliases');
 is_deeply(
 	\@ret,
@@ -59,11 +59,11 @@ is_deeply(
 # Test.
 $obj = Wikibase::Datatype::Item->new(
 	'aliases' => [
-		Wikibase::Datatype::Value::Monolingual->new(
+		Wikibase::Datatype::Term->new(
 			'language' => 'en',
 			'value' => 'dog',
 		),
-		Wikibase::Datatype::Value::Monolingual->new(
+		Wikibase::Datatype::Term->new(
 			'language' => 'cs',
 			'value' => 'pes',
 		),
@@ -71,7 +71,7 @@ $obj = Wikibase::Datatype::Item->new(
 );
 @ret = print_common($obj, { 'texts' => texts(), },
 	'aliases',
-	\&Wikibase::Datatype::Print::Value::Monolingual::print,
+	\&Wikibase::Datatype::Print::Term::print,
 	'Aliases', sub { grep { $_->language eq 'cs' } @_ });
 is_deeply(
 	\@ret,
@@ -85,11 +85,11 @@ is_deeply(
 # Test.
 $obj = Wikibase::Datatype::Item->new(
 	'aliases' => [
-		Wikibase::Datatype::Value::Monolingual->new(
+		Wikibase::Datatype::Term->new(
 			'language' => 'en',
 			'value' => 'dog',
 		),
-		Wikibase::Datatype::Value::Monolingual->new(
+		Wikibase::Datatype::Term->new(
 			'language' => 'cs',
 			'value' => 'pes',
 		),
@@ -97,7 +97,7 @@ $obj = Wikibase::Datatype::Item->new(
 );
 @ret = print_common($obj, { 'texts' => texts() },
 	'aliases',
-	\&Wikibase::Datatype::Print::Value::Monolingual::print,
+	\&Wikibase::Datatype::Print::Term::print,
 	'Aliases', sub { grep { $_->language eq 'en' } @_ });
 is_deeply(
 	\@ret,
@@ -111,7 +111,7 @@ is_deeply(
 # Test.
 $obj = Wikibase::Datatype::Item->new(
 	'labels' => [
-		Wikibase::Datatype::Value::Monolingual->new(
+		Wikibase::Datatype::Term->new(
 			'language' => 'en',
 			'value' => 'label',
 		),
@@ -119,7 +119,7 @@ $obj = Wikibase::Datatype::Item->new(
 );
 @ret = print_common($obj, { 'texts' => texts() },
 	'labels',
-	\&Wikibase::Datatype::Print::Value::Monolingual::print,
+	\&Wikibase::Datatype::Print::Term::print,
 	'Label', sub { grep { $_->language eq 'en' } @_ }, 1);
 is_deeply(
 	\@ret,
@@ -132,7 +132,7 @@ is_deeply(
 # Test.
 $obj = Wikibase::Datatype::Item->new(
 	'labels' => [
-		Wikibase::Datatype::Value::Monolingual->new(
+		Wikibase::Datatype::Term->new(
 			'language' => 'en',
 			'value' => 'label',
 		),
@@ -140,7 +140,7 @@ $obj = Wikibase::Datatype::Item->new(
 );
 @ret = print_common($obj, { 'texts' => texts() },
 	'labels',
-	\&Wikibase::Datatype::Print::Value::Monolingual::print,
+	\&Wikibase::Datatype::Print::Term::print,
 	'Label', sub { grep { $_->language eq 'en' } @_ }, 0);
 is_deeply(
 	\@ret,
@@ -154,11 +154,11 @@ is_deeply(
 # Test.
 $obj = Wikibase::Datatype::Item->new(
 	'aliases' => [
-		Wikibase::Datatype::Value::Monolingual->new(
+		Wikibase::Datatype::Term->new(
 			'language' => 'en',
 			'value' => 'dog',
 		),
-		Wikibase::Datatype::Value::Monolingual->new(
+		Wikibase::Datatype::Term->new(
 			'language' => 'cs',
 			'value' => 'pes',
 		),
@@ -166,7 +166,7 @@ $obj = Wikibase::Datatype::Item->new(
 );
 eval {
 	print_common($obj, { 'texts' => texts() }, 'aliases',
-	\&Wikibase::Datatype::Print::Value::Monolingual::print,
+	\&Wikibase::Datatype::Print::Term::print,
 	'Aliases', undef, 1);
 };
 is($EVAL_ERROR, "Multiple values are printed to one line.\n",

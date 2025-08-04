@@ -5,12 +5,10 @@ CONTRIBUTORS
 Changes
 LICENSE
 MANIFEST
-MANIFEST.SKIP
 META.json
 META.yml
 Makefile.PL
 README
-README.pod
 TODO
 cpanfile
 doap.xml
@@ -29,9 +27,9 @@ lib/Net/Proxmox/VE/Nodes.pm
 lib/Net/Proxmox/VE/Pools.pm
 lib/Net/Proxmox/VE/Storage.pm
 t/00-compile.t
-t/00-load.t
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
+t/001-proxmox-ve-exception.t
 t/101-proxmox-ve-new.t
 t/120-proxmox-ve-access.t
 t/150-proxmox-ve-pools.t

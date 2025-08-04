@@ -268,6 +268,121 @@ SV * new_from_fd(SV * class, SV * file, STRLEN len = 0, SV * flags = &PL_sv_unde
   OUTPUT:
   RETVAL
 
+SV * new_from_tty( \
+  SV * class, \
+  SV * prompt = &PL_sv_undef, \
+  SV * flags = &PL_sv_undef \
+)
+
+  PREINIT:
+  protmem *new_pm;
+  char *prompt_buf;
+  char *vbuf;
+  int fd;
+  unsigned int new_flags = g_protmem_default_flags_key;
+  STRLEN prompt_len;
+  struct termios tattr;
+  FILE *file;
+
+  CODE:
+  PERL_UNUSED_VAR(class);
+
+  SvGETMAGIC(prompt);
+  if (SvOK(prompt))
+    /* prompt_len unused */
+    prompt_buf = SvPVbyte_nomg(prompt, prompt_len);
+  else
+    prompt_buf = "Password: ";
+
+  SvGETMAGIC(flags);
+  if (SvOK(flags))
+    new_flags = SvUV(flags);
+
+  new_pm = protmem_init(aTHX_ 1024, new_flags);
+  if (new_pm == NULL)
+    croak("new_from_tty: Failed to allocate protmem");
+
+  vbuf = sodium_malloc(1024);
+  if (vbuf == NULL)
+    croak("new_from_tty: Failed to allocate vbuf memory");
+
+  fd = open("/dev/tty", O_RDWR|O_CLOEXEC|O_NOCTTY);
+  if (fd < 0)
+    croak("new_from_tty: /dev/tty: open failed (%d)", errno);
+
+  if (fprintf(stderr, "%s", prompt_buf) == EOF) {
+    protmem_free(aTHX_ new_pm);
+    croak("new_from_tty: Failed to prompt");
+  }
+  if (fflush(stderr) == EOF) {
+    fprintf(stderr, "\n");
+    croak("new_from_tty: Failed fflush (stderr)");
+  }
+
+  if (!isatty(fd) || tcgetattr(fd, &tattr) != 0) {
+    fprintf(stderr, "\n");
+    croak("new_from_tty: Failed tcgetattr (not a tty?)");
+  }
+  tattr.c_lflag &= ~ECHO;
+  if (tcsetattr(fd, TCSAFLUSH, &tattr) != 0) {
+    fprintf(stderr, "\n");
+    croak("new_from_tty: Failed tcsetattr");
+  }
+
+  if ((file = fdopen(fd, "r")) == NULL) {
+    fprintf(stderr, "\n");
+    tattr.c_lflag |= ECHO;
+    tcsetattr(fd, TCSAFLUSH, &tattr);
+    croak("new_from_tty: Failed fdopen");
+  }
+
+  if (setvbuf(file, vbuf, _IOLBF, 1024) != 0) {
+    fprintf(stderr, "\n");
+    tattr.c_lflag |= ECHO;
+    tcsetattr(fd, TCSAFLUSH, &tattr);
+    croak("new_from_tty: Failed to setvbuf");
+  }
+
+  if (fgets((char *)new_pm->pm_ptr, 1024, file) == NULL)
+    RETVAL = &PL_sv_undef;
+  else {
+    char *input_buf = (char *)new_pm->pm_ptr;
+    char *nl_pos;
+
+    if ((nl_pos = strchr(input_buf, '\r')) != NULL)
+      *nl_pos = '\0';
+    if ((nl_pos = strchr(input_buf, '\n')) != NULL)
+      *nl_pos = '\0';
+    new_pm->size = strlen(input_buf);
+
+
+    if (new_pm->size == 0)
+      fprintf(stderr, "(WARNING: empty)\n");
+    else if (new_pm->size == 1023) {
+      /* warns even if input was exactly 1023. meh. */
+      fprintf(stderr, "(WARNING: truncated to 1023 characters)\n");
+    }
+
+    RETVAL = protmem_to_sv(aTHX_ new_pm, MEMVAULT_CLASS);
+  }
+
+  fprintf(stderr, "\n");
+  fflush(stderr);
+  if (tcgetattr(fd, &tattr) != 0) {
+    protmem_free(aTHX_ new_pm);
+    croak("new_from_tty: tcgetattr failed");
+  }
+  tattr.c_lflag |= ECHO;
+  if (tcsetattr(fd, TCSAFLUSH, &tattr) != 0) {
+    protmem_free(aTHX_ new_pm);
+    croak("new_from_tty: tcsetattr failed");
+  }
+  fclose(file);
+  sodium_free(vbuf);
+
+  OUTPUT:
+  RETVAL
+
 SV * new_from_ttyno( \
   SV * class, \
   SV * ttyno = &PL_sv_undef, \
@@ -364,13 +479,13 @@ SV * new_from_ttyno( \
     else if (new_pm->size == 1023) {
       /* warns even if input was exactly 1023. meh. */
       fprintf(stderr, "(WARNING: truncated to 1023 characters)\n");
-      fflush(file);
     }
 
     RETVAL = protmem_to_sv(aTHX_ new_pm, MEMVAULT_CLASS);
   }
 
-  setvbuf(file, NULL, _IOLBF, 0);
+  fflush(file);
+  setvbuf(file, NULL, _IOLBF, BUFSIZ); /* invalid */
   sodium_free(vbuf);
 
   fprintf(stderr, "\n");

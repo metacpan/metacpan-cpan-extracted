@@ -5,8 +5,12 @@ SYNOPSIS
      use Wikibase::Datatype::Query;
 
      my $obj = Wikibase::Datatype::Query->new;
-     my $res = $obj->query($obj, $property);
-     my $res = $obj->query_item($item_obj, $property);
+     my $res = $obj->query($obj, $query_string);
+     my @res = $obj->query($obj, $query_string);
+     my $res = $obj->query_item($item_obj, $query_string);
+     my @res = $obj->query_item($item_obj, $query_string);
+     my $res = $obj->query_lexeme($lexeme_obj, $query_string);
+     my @res = $obj->query_lexeme($lexeme_obj, $query_string);
 
 METHODS
   "new"
@@ -24,18 +28,61 @@ METHODS
     Returns instance of object.
 
   "query"
-     my $res = $obj->query($obj, $property);
+     my $res = $obj->query($obj, $query_string);
+     my @res = $obj->query($obj, $query_string);
 
-    Query Wikibase::Datatype object for value.
+    Query Wikibase::Datatype object for value. Supported $obj objects are
+    Wikibase::Datatype::Item, Wikibase::Datatype::Lexeme and
+    Wikibase::Datatype::Mediainfo.
 
-    Returns value or undef.
+    Returns value or undef in scalar context. Returns list of values in
+    array context.
 
   "query_item"
-     my $res = $obj->query($item_obj, $property);
+     my $res = $obj->query($item_obj, $query_string);
+     my @res = $obj->query_item($item_obj, $query_string);
 
     Query Wikibase::Datatype::Item item for value.
 
-    Returns value or undef.
+    Possible $query_string values are:
+
+    P\d+
+        For property value.
+
+    alias:.*
+        For alias value.
+
+    description:.*
+        For description value.
+
+    label:.*
+        For label value.
+
+    statement:P\d+
+        For full property statements.
+
+    Returns value or undef in scalar context. Returns list of values in
+    array context.
+
+  "query_lexeme"
+     my $res = $obj->query_lexeme($lexeme_obj, $query_string);
+     my @res = $obj->query_lexeme($lexeme_obj, $query_string);
+
+    Query Wikibase::Datatype::Lexeme item for value.
+
+    Possible $query_string values are:
+
+    P\d+
+        For property value.
+
+    form:P\d+
+        For form property value.
+
+    sense:P\d+
+        For sense property value.
+
+    Returns value or undef in scalar context. Returns list of values in
+    array context.
 
 ERRORS
      new():
@@ -47,10 +94,16 @@ ERRORS
              Parameter 'item' must be a 'Wikibase::Datatype::Item' object.
 
      query_item():
-             Parameter 'item' is required.
-             Parameter 'item' must be a 'Wikibase::Datatype::Item' object.
+             Item is required.
+             Item must be a 'Wikibase::Datatype::Item' or 'Wikibase::Datatype::Mediainfo' object.
+             Unsupported query string '%s'.
 
-EXAMPLE
+     query_lexeme():
+             Item must be a 'Wikibase::Datatype::Lexeme' object.
+             Lexeme is required.
+             Unsupported query string '%s'.
+
+EXAMPLE1
      use strict;
      use warnings;
 
@@ -70,6 +123,26 @@ EXAMPLE
      # Query for P31 property on Test::Shared::Fixture::Wikibase::Datatype::Item::Wikidata::Dog:
      # Q55983715
 
+EXAMPLE2
+     use strict;
+     use warnings;
+
+     use Test::Shared::Fixture::Wikibase::Datatype::Lexeme::Wikidata::DogCzechNoun;
+     use Wikibase::Datatype::Query;
+
+     my $obj = Wikibase::Datatype::Query->new;
+
+     my $item = Test::Shared::Fixture::Wikibase::Datatype::Lexeme::Wikidata::DogCzechNoun->new;
+
+     my $ret = $obj->query_lexeme($item, 'P5185');
+
+     print "Query for P5185 property on Test::Shared::Fixture::Wikibase::Datatype::Lexeme::Wikidata::DogCzechNoun:\n";
+     print $ret."\n";
+
+     # Output like:
+     # Query for P5185 property on Test::Shared::Fixture::Wikibase::Datatype::Lexeme::Wikidata::DogCzechNoun:
+     # Q499327
+
 DEPENDENCIES
     Class::Utils, Error::Pure, Scalar::Util.
 
@@ -86,10 +159,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2022-2023 Michal Josef Špaček
+    © 2022-2025 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.03
+    0.05
 

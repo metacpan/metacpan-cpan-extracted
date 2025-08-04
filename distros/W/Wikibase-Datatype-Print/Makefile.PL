@@ -42,7 +42,7 @@ test_requires 'Unicode::UTF8' => 0;
 test_requires 'Wikibase::Cache' => 0;
 test_requires 'Wikibase::Cache::Backend::Basic' => 0.03;
 test_requires 'Wikibase::Datatype::Form' => 0;
-test_requires 'Wikibase::Datatype::Item' => 0;
+test_requires 'Wikibase::Datatype::Item' => 0.39;
 test_requires 'Wikibase::Datatype::Lexeme' => 0;
 test_requires 'Wikibase::Datatype::MediainfoSnak' => 0;
 test_requires 'Wikibase::Datatype::Reference' => 0;
@@ -60,7 +60,7 @@ test_requires 'Wikibase::Datatype::Value::Sense' => 0.29;
 test_requires 'Wikibase::Datatype::Value::String' => 0;
 test_requires 'Wikibase::Datatype::Value::Time' => 0;
 tests_recursive;
-version '0.18';
+version '0.19';
 
 # Run.
 WriteAll();

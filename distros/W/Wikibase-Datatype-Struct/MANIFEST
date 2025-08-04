@@ -12,6 +12,7 @@ examples/obj2struct_sense.pl
 examples/obj2struct_sitelink.pl
 examples/obj2struct_snak.pl
 examples/obj2struct_statement.pl
+examples/obj2struct_term.pl
 examples/obj2struct_value.pl
 examples/obj2struct_value_globe_coordinate.pl
 examples/obj2struct_value_item.pl
@@ -35,6 +36,7 @@ examples/struct2obj_sense.pl
 examples/struct2obj_sitelink.pl
 examples/struct2obj_snak.pl
 examples/struct2obj_statement.pl
+examples/struct2obj_term.pl
 examples/struct2obj_value.pl
 examples/struct2obj_value_globe_coordinate.pl
 examples/struct2obj_value_item.pl
@@ -78,6 +80,7 @@ Struct/Sense.pm
 Struct/Sitelink.pm
 Struct/Snak.pm
 Struct/Statement.pm
+Struct/Term.pm
 Struct/Utils.pm
 Struct/Value.pm
 Struct/Value/Globecoordinate.pm
@@ -139,6 +142,10 @@ t/Wikibase-Datatype-Struct-Statement/01-use.t
 t/Wikibase-Datatype-Struct-Statement/02-version.t
 t/Wikibase-Datatype-Struct-Statement/03-obj2struct.t
 t/Wikibase-Datatype-Struct-Statement/04-struct2obj.t
+t/Wikibase-Datatype-Struct-Term/01-use.t
+t/Wikibase-Datatype-Struct-Term/02-version.t
+t/Wikibase-Datatype-Struct-Term/03-obj2struct.t
+t/Wikibase-Datatype-Struct-Term/04-struct2obj.t
 t/Wikibase-Datatype-Struct-Utils/01-use.t
 t/Wikibase-Datatype-Struct-Utils/02-version.t
 t/Wikibase-Datatype-Struct-Utils/03-obj_array_ref2struct.t
@@ -213,6 +220,8 @@ xt/Wikibase-Datatype-Struct-Snak/01-pod_coverage.t
 xt/Wikibase-Datatype-Struct-Snak/02-pod.t
 xt/Wikibase-Datatype-Struct-Statement/01-pod_coverage.t
 xt/Wikibase-Datatype-Struct-Statement/02-pod.t
+xt/Wikibase-Datatype-Struct-Term/01-pod_coverage.t
+xt/Wikibase-Datatype-Struct-Term/02-pod.t
 xt/Wikibase-Datatype-Struct-Utils/01-pod_coverage.t
 xt/Wikibase-Datatype-Struct-Utils/02-pod.t
 xt/Wikibase-Datatype-Struct-Value-Globecoordinate/01-pod_coverage.t

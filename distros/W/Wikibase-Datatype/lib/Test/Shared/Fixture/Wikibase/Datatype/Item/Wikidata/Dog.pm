@@ -9,61 +9,61 @@ use Test::Shared::Fixture::Wikibase::Datatype::Statement::Wikidata::NumberOfLimb
 use Unicode::UTF8 qw(decode_utf8);
 use Wikibase::Datatype::Sitelink;
 use Wikibase::Datatype::Statement;
+use Wikibase::Datatype::Term;
 use Wikibase::Datatype::Value::Item;
-use Wikibase::Datatype::Value::Monolingual;
 
-our $VERSION = 0.38;
+our $VERSION = 0.39;
 
 sub new {
 	my $class = shift;
 
 	my @params = (
 		'aliases' => [
-			Wikibase::Datatype::Value::Monolingual->new(
+			Wikibase::Datatype::Term->new(
 				'language' => 'cs',
 				'value' => decode_utf8('pes domácí'),
 			),
-			Wikibase::Datatype::Value::Monolingual->new(
+			Wikibase::Datatype::Term->new(
 				'language' => 'en',
 				'value' => 'domestic dog',
 			),
-			Wikibase::Datatype::Value::Monolingual->new(
+			Wikibase::Datatype::Term->new(
 				'language' => 'en',
 				'value' => 'Canis lupus familiaris',
 			),
-			Wikibase::Datatype::Value::Monolingual->new(
+			Wikibase::Datatype::Term->new(
 				'language' => 'en',
 				'value' => 'Canis familiaris',
 			),
-			Wikibase::Datatype::Value::Monolingual->new(
+			Wikibase::Datatype::Term->new(
 				'language' => 'en',
 				'value' => 'dogs',
 			),
-			Wikibase::Datatype::Value::Monolingual->new(
+			Wikibase::Datatype::Term->new(
 				'language' => 'en',
 				'value' => decode_utf8('🐶'),
 			),
-			Wikibase::Datatype::Value::Monolingual->new(
+			Wikibase::Datatype::Term->new(
 				'language' => 'en',
 				'value' => decode_utf8('🐕'),
 			),
 		],
 		'descriptions' => [
-			Wikibase::Datatype::Value::Monolingual->new(
+			Wikibase::Datatype::Term->new(
 				'language' => 'cs',
 				'value' => decode_utf8('domácí zvíře'),
 			),
-			Wikibase::Datatype::Value::Monolingual->new(
+			Wikibase::Datatype::Term->new(
 				'language' => 'en',
 				'value' => 'domestic animal',
 			),
 		],
 		'labels' => [
-			Wikibase::Datatype::Value::Monolingual->new(
+			Wikibase::Datatype::Term->new(
 				'language' => 'cs',
 				'value' => 'pes',
 			),
-			Wikibase::Datatype::Value::Monolingual->new(
+			Wikibase::Datatype::Term->new(
 				'language' => 'en',
 				'value' => 'dog',
 			),
@@ -136,7 +136,7 @@ Returns instance of object.
 
 Get aliases.
 
-Returns reference to array with Wikibase::Datatype::Value::Monolingual instances.
+Returns reference to array with Wikibase::Datatype::Term instances.
 
 =head2 C<descriptions>
 
@@ -144,7 +144,7 @@ Returns reference to array with Wikibase::Datatype::Value::Monolingual instances
 
 Get descriptions.
 
-Returns reference to array with Wikibase::Datatype::Value::Monolingual instances.
+Returns reference to array with Wikibase::Datatype::Term instances.
 
 =head2 C<id>
 
@@ -160,7 +160,7 @@ Returns string.
 
 Get labels.
 
-Returns reference to array with Wikibase::Datatype::Value::Monolingual instances.
+Returns reference to array with Wikibase::Datatype::Term instances.
 
 =head2 C<lastrevid>
 
@@ -260,8 +260,8 @@ L<Unicode::UTF8>,
 L<Wikibase::Datatype::Sitelink>,
 L<Wikibase::Datatype::Statement>,
 L<Wikibase::Datatype::Snak>,
-L<Wikibase::Datatype::Value::Item>,
-L<Wikibase::Datatype::Value::Monolingual>.
+L<Wikibase::Datatype::Term>,
+L<Wikibase::Datatype::Value::Item>.
 
 =head1 SEE ALSO
 
@@ -295,6 +295,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.38
+0.39
 
 =cut

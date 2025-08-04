@@ -7,7 +7,7 @@ use Mo qw(build is);
 use Mo::utils 0.01 qw(check_required);
 use Wikibase::Datatype::Utils qw(check_language_term);
 
-our $VERSION = 0.38;
+our $VERSION = 0.39;
 
 has language => (
 	is => 'ro',
@@ -171,6 +171,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.38
+0.39
 
 =cut

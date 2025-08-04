@@ -25,7 +25,7 @@ Usage: $script [-h] [-l lang] [-m mediawiki_site] [-r] [--version] wd_id
 	-m mediawiki_site	MediaWiki site (default is www.wikidata.org).
 	-r			With references.
 	--version		Print version.
-	wd_id			Wikidata id (qid or pid or lid).
+	wd_id			Wikidata id (qid or pid or lid or mid).
 END
 stderr_is(
 	sub {

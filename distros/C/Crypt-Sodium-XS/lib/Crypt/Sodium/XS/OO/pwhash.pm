@@ -277,7 +277,8 @@ It must be in the range of L</MEMLIMIT_MIN> to L</MEMLIMIT_MAX>, inclusive. If
 it is omitted or numifies to zero (undef, 0, ""), the default of
 L</MEMLIMIT_INTERACTIVE> will be used.
 
-Returns the output hash of C<$hash_size> bytes.
+Returns a L<Crypt::Sodium::XS::MemVault>: the output hash of C<$hash_size>
+bytes.
 
 =head2 salt
 

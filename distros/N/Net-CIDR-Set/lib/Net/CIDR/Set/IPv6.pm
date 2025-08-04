@@ -8,7 +8,7 @@ use namespace::autoclean;
 
 # ABSTRACT: Encode / decode IPv6 addresses
 
-our $VERSION = '0.16';
+our $VERSION = '0.18';
 
 sub new { bless \my $x, shift }
 
@@ -142,7 +142,7 @@ Net::CIDR::Set::IPv6 - Encode / decode IPv6 addresses
 
 =head1 VERSION
 
-version 0.16
+version 0.18
 
 =for Pod::Coverage new
 
@@ -157,7 +157,7 @@ version 0.16
 The development version is on github at L<https://github.com/robrwo/perl-Net-CIDR-Set>
 and may be cloned from L<git://github.com/robrwo/perl-Net-CIDR-Set.git>
 
-=head1 BUGS
+=head1 SUPPORT
 
 Please report any bugs or feature requests on the bugtracker website
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=Net-CIDR-Set>

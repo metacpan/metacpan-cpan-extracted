@@ -6,32 +6,32 @@ use warnings;
 
 use Test::Shared::Fixture::Wikibase::Datatype::Statement::Wikidata::SubjectLexeme::Dorota;
 use Test::Shared::Fixture::Wikibase::Datatype::Statement::Wikidata::InstanceOf::FemaleGivenName;
-use Wikibase::Datatype::Value::Monolingual;
+use Wikibase::Datatype::Term;
 
-our $VERSION = 0.38;
+our $VERSION = 0.39;
 
 sub new {
 	my $class = shift;
 
 	my @params = (
 		'aliases' => [
-			Wikibase::Datatype::Value::Monolingual->new(
+			Wikibase::Datatype::Term->new(
 				'language' => 'en',
 				'value' => 'Dorota (given name)',
 			),
-			Wikibase::Datatype::Value::Monolingual->new(
+			Wikibase::Datatype::Term->new(
 				'language' => 'en',
 				'value' => 'Dorota (first name)',
 			),
 		],
 		'descriptions' => [
-			Wikibase::Datatype::Value::Monolingual->new(
+			Wikibase::Datatype::Term->new(
 				'language' => 'en',
 				'value' => 'female given name',
 			),
 		],
 		'labels' => [
-			Wikibase::Datatype::Value::Monolingual->new(
+			Wikibase::Datatype::Term->new(
 				'language' => 'en',
 				'value' => 'Dorota',
 			),
@@ -96,7 +96,7 @@ Returns instance of object.
 
 Get aliases.
 
-Returns reference to array with Wikibase::Datatype::Value::Monolingual instances.
+Returns reference to array with Wikibase::Datatype::Term instances.
 
 =head2 C<descriptions>
 
@@ -104,7 +104,7 @@ Returns reference to array with Wikibase::Datatype::Value::Monolingual instances
 
 Get descriptions.
 
-Returns reference to array with Wikibase::Datatype::Value::Monolingual instances.
+Returns reference to array with Wikibase::Datatype::Term instances.
 
 =head2 C<id>
 
@@ -120,7 +120,7 @@ Returns string.
 
 Get labels.
 
-Returns reference to array with Wikibase::Datatype::Value::Monolingual instances.
+Returns reference to array with Wikibase::Datatype::Term instances.
 
 =head2 C<lastrevid>
 
@@ -225,7 +225,7 @@ Returns string.
 L<Test::Shared::Fixture::Wikibase::Datatype::Statement::Wikidata::SubjectLexeme::Dorota>,
 L<Test::Shared::Fixture::Wikibase::Datatype::Statement::Wikidata::InstanceOf::FemaleGivenName>,
 L<Wikibase::Datatype::Item>,
-L<Wikibase::Datatype::Value::Monolingual>.
+L<Wikibase::Datatype::Term>.
 
 =head1 SEE ALSO
 
@@ -259,6 +259,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.38
+0.39
 
 =cut
