@@ -191,7 +191,7 @@ This section applies to primitive ed25519 only.
 
 In order to prevent attacks using small subgroups, the scalarmult functions
 above clear lower bits of the scalar (C<$secret_key>). This may be indesirable
-to build protocols that requires C<$secret_key> to be invertible.
+to build protocols that require C<$secret_key> to be invertible.
 
 The noclamp variants of these functions do not clear these bits, and do not set
 the high bit either. These variants expect a scalar in the ]0..L[ range.

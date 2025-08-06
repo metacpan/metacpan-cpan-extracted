@@ -46,7 +46,6 @@
 <& /Elements/Header, Title => $title &>
 <div id="body" class="login-body">
 
-% if ( RT::Handle::cmp_version($RT::VERSION, '5.0.0') >= 0 ) {
 <& /Elements/ListActions, actions => \@actions &>
 
 <form action="Request.html" method="post" class="mx-auto max-width-sm">
@@ -59,46 +58,22 @@
 %     $title_box_title = loc("Enter your email address to reset your password");
 % }
 
-<&| /Widgets/TitleBox, title => $title_box_title, hideable => 0, content_class => 'mx-auto col-12', class => 'text-center' &>
-  <div class="form-row">
+<&| /Widgets/TitleBox, title => $title_box_title, hideable => 0, content_class => 'mx-auto col-12' &>
+  <div class="row mt-2">
 % if ( $Mode eq 'reset' ) {
       <p class="col-12 text-center"><i><&|/l&>RT can send you an email with a link that will allow you to reset your password.</&></i></p>
 % }
   </div>
-  <div class="form-row">
-    <div class="label col-3">
-      <&|/l&>Email address</&>:
-    </div>
-    <div class="value col-8">
-      <input type="text" class="form-control" name="Email" value="" />
-    </div>
-  </div>
-  <div class="form-row">
-    <div class="col-3"></div>
-    <div class="col-8 text-right">
-      <input class="button btn btn-primary form-control" type="submit" value="<%loc('Send it!')%>" />
-      <a class="btn btn-primary" href="<%$RT::WebURL|n%>"><&|/l&>Cancel</&></a>
-    </div>
-  </div>
+  <&| /Elements/LabeledValue, Label => loc('Email address') &>
+    <input type="text" class="form-control" name="Email" value="" />
+  </&>
+  <&| /Elements/LabeledValue, Label => '' &>
+    <a class="btn btn-primary float-start" href="<%$RT::WebURL|n%>"><&|/l&>Cancel</&></a>
+    <input class="btn btn-primary float-end" type="submit" value="<%loc('Send it!')%>" />
+  </&>
 </&>
 
 </form>
-% }
-% else {
-<h1><%$title%></h1>
-<& /Elements/ListActions, actions => \@actions  &>
-<p>
-% if ( $Mode eq 'create' ) {
-<&|/l&>Enter your email address to create a new account.</&>
-% } else {
-<&|/l&>RT can send you an email with a link that will allow you to reset your password.</&>
-% }
-<form method="post" action="Request.html">
-    <&|/l&>Email address</&>:<input name="Email" value="" />
-    <input type="submit" class="button" value="<%loc('Send it!')%>" />
-</form>
-    <a href="<%$RT::WebURL|n%>"><&|/l&>Back to Login</&></a>
-% }
 </div>
 
 <& /Elements/Footer, Menu => 0 &>

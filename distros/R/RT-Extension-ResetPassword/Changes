@@ -1,5 +1,8 @@
 Revision history for Perl module RT::Extension::ResetPassword
 
+2.00 2025-08-05
+ - Update for RT 6.0
+
 1.12 2021-04-28
  - Pass FindUsersWithPassword argument to paging URL
  - Support password set search for RT 4

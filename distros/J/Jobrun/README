@@ -1,0 +1,44 @@
+Jobrun
+
+This is a Perl module and script for running jobs in parallel.
+
+There may be many jobs defined, and they may be run in Parallel, up to N jobs at at time.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test (will appear to hang for 10 seconds, this is normal)
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Jobrun
+
+    Also see the README.md file.
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Jobrun
+
+    CPAN Ratings
+        https://cpanratings.perl.org/d/Jobrun
+
+    Search CPAN
+        https://metacpan.org/release/Jobrun
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2025 by Jared Still.
+
+This is free software, licensed under:
+
+  The MIT License.
+

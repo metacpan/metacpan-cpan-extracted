@@ -17,7 +17,8 @@ jobs:
       fail-fast: false
       matrix:
         cip:
-          - tag: "5.39"
+          - tag: "5.41"
+          - tag: "5.40"
           - tag: "5.38"
           - tag: "5.38-alpine3.16"
           - tag: "5.38-fedora36"
@@ -41,7 +42,7 @@ jobs:
       CIP_TAG: ${{ matrix.cip.tag }}
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Bootstrap CIP
         run: |
@@ -54,7 +55,7 @@ jobs:
           cip cache-key
 
       - name: Cache CPAN modules
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: ~/.cip
           key: ${{ runner.os }}-build-${{ steps.cache-key.outputs.key }}

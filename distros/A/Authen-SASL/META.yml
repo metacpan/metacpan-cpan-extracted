@@ -11,7 +11,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,54 +20,57 @@ name: Authen-SASL
 provides:
   Authen::SASL:
     file: lib/Authen/SASL.pm
-    version: '2.1800'
+    version: '2.1900'
   Authen::SASL::CRAM_MD5:
     file: lib/Authen/SASL/CRAM_MD5.pm
-    version: '2.1800'
+    version: '2.1900'
+    x_deprecated: 1
   Authen::SASL::EXTERNAL:
     file: lib/Authen/SASL/EXTERNAL.pm
-    version: '2.1800'
+    version: '2.1900'
   Authen::SASL::Perl:
     file: lib/Authen/SASL/Perl.pm
-    version: '2.1800'
+    version: '2.1900'
   Authen::SASL::Perl::ANONYMOUS:
     file: lib/Authen/SASL/Perl/ANONYMOUS.pm
-    version: '2.1800'
+    version: '2.1900'
   Authen::SASL::Perl::CRAM_MD5:
     file: lib/Authen/SASL/Perl/CRAM_MD5.pm
-    version: '2.1800'
+    version: '2.1900'
+    x_deprecated: 1
   Authen::SASL::Perl::DIGEST_MD5:
     file: lib/Authen/SASL/Perl/DIGEST_MD5.pm
-    version: '2.1800'
+    version: '2.1900'
+    x_deprecated: 1
   Authen::SASL::Perl::EXTERNAL:
     file: lib/Authen/SASL/Perl/EXTERNAL.pm
-    version: '2.1800'
+    version: '2.1900'
   Authen::SASL::Perl::GSSAPI:
     file: lib/Authen/SASL/Perl/GSSAPI.pm
-    version: '2.1800'
+    version: '2.1900'
   Authen::SASL::Perl::LOGIN:
     file: lib/Authen/SASL/Perl/LOGIN.pm
-    version: '2.1800'
+    version: '2.1900'
   Authen::SASL::Perl::OAUTHBEARER:
     file: lib/Authen/SASL/Perl/OAUTHBEARER.pm
-    version: '2.1800'
+    version: '2.1900'
   Authen::SASL::Perl::PLAIN:
     file: lib/Authen/SASL/Perl/PLAIN.pm
-    version: '2.1800'
+    version: '2.1900'
   Authen::SASL::Perl::XOAUTH2:
     file: lib/Authen/SASL/Perl/XOAUTH2.pm
-    version: '2.1800'
+    version: '2.1900'
 recommends:
   GSSAPI: '0'
 requires:
+  Crypt::URandom: '0'
   Digest::HMAC_MD5: '0'
-  Digest::MD5: '0'
   perl: v5.14.0
 resources:
-  bugtracker: https://github.com/gbarr/perl-authen-sasl/issues
-  homepage: https://github.com/gbarr/perl-authen-sasl/
-  repository: git://github.com/gbarr/perl-authen-sasl.git
-version: '2.1800'
+  bugtracker: https://github.com/perl-authen-sasl/perl-authen-sasl/issues
+  homepage: https://github.com/perl-authen-sasl/perl-authen-sasl/
+  repository: git://github.com/perl-authen-sasl/perl-authen-sasl.git
+version: '2.1900'
 x_contributors:
   - 'Aditya Garg <gargaditya08@live.com>'
   - 'Chris Ridd <chris.ridd@isode.com>'
@@ -77,9 +80,10 @@ x_contributors:
   - 'Paul Kranenburg <kranenburg@few.eur.nl>'
   - 'Pete Houston <githubdevteam@openstrike.co.uk>'
   - 'Peter Marschall <peter@adpm.de>'
+  - 'Robert Rothenberg <rrwo@cpan.org>'
   - 'Steven Lee <stevenwh.lee@gmail.com>'
   - 'Yann Kerherve <yann@cyberion.net>'
   - 'openstrike <git@openstrike.co.uk>'
 x_generated_by_perl: v5.38.2
-x_serialization_backend: 'YAML::Tiny version 1.74'
+x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

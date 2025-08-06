@@ -13,7 +13,7 @@ my $debugLevel=0;
 BEGIN {
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-    $VERSION     = '0.02';
+    $VERSION     = '0.03';
     @ISA         = qw(Exporter);
     @EXPORT      = qw();
     @EXPORT_OK   = qw(&pdebug &setDebugLevel &walk);
@@ -239,7 +239,7 @@ sub pdebug {
 
 =head1 new
 
- Given an arbitrary data structure, create a new object that can then be traversed by walk().
+ Given an arbitrary JSON data structure, create a new object that can then be traversed by walk().
 
  walk() will print all values and the string used to access them
 
@@ -325,7 +325,7 @@ sub new
 
 =head1 NAME
 
- Data::Ref::JSON 
+ Data::Ref::JSON - provide Perl reference code to access values in an arbitrary JSON data structure
 
 =head1 SYNOPSIS
 

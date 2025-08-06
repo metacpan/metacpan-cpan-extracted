@@ -57,7 +57,7 @@ use warnings;
 
 # version '...'
 our $version = 'v4.6.0';
-our $VERSION = '0.005005';
+our $VERSION = '0.005006';
 $VERSION = eval $VERSION;
 
 # authority '...'
@@ -140,6 +140,14 @@ BEGIN {
   Encode::Alias::define_alias( cp51949 => 'euc-kr'      );
 }
 
+# Allows the use of additional MIME names (stored in Encode::MIME::Name).
+BEGIN {
+  require Encode::MIME::Name;
+  $Encode::MIME::Name::MIME_NAME_OF{ cp932 } ||= 'Windows-31J';
+  $Encode::MIME::Name::MIME_NAME_OF{ cp949 } ||= 'Windows-949';
+  $Encode::MIME::Name::MIME_NAME_OF{ cp950 } ||= 'Big5';
+}
+
 # ------------------------------------------------------------------------
 # Class Definition -------------------------------------------------------
 # ------------------------------------------------------------------------
@@ -169,7 +177,7 @@ Access to low-level data structures such as I<CONSOLE_SCREEN_BUFFER_INFO> or
 I<INPUT_RECORD> is simplified by using the I<.NET> API. These low-level console
 structures are effectively managed by this module. 
 
-=item * B<Windows Console Extentions>:
+=item * B<Windows Console Extensions>:
 It provides an extended compatibility layer to the classic Windows Console API.
 The I<.NET> API provided in this module is well-known and thoroughly 
 documented, transforming the otherwise complex Windows Console API into a 
@@ -192,7 +200,7 @@ public class I<< Win32::Console::DotNet >>
 
 Object Hierarchy
 
-  Class::Accessor
+  UNIVERSAL
     Win32::Console::DotNet
 
 =cut
@@ -256,7 +264,7 @@ I<Returns>: I<true> if operand is boolean.
       || !ref($_[0]) && { 1 => 1, 0 => 1, '' => 1 }->{$_[0]};
   };
   if ( exists &Types::Standard::is_Bool ) {
-    no warnings 'redefine';
+    no warnings qw( redefine prototype );
     *is_Bool = \&Types::Standard::is_Bool;
   }
 
@@ -292,7 +300,7 @@ I<Returns>: I<true> if I<$value> is name of a valid package.
     return !!0;
   };
   if ( exists &Types::Standard::is_ClassName ) {
-    no warnings 'redefine';
+    no warnings qw( redefine prototype );
     *is_ClassName = \&Types::Standard::is_ClassName;
   }
 
@@ -320,7 +328,7 @@ I<Returns>: I<true> if I<$value> is a file handle.
       (blessed($_[0]) && $_[0]->isa('Tie::Handle'))
   }
   if ( exists &Types::Standard::is_FileHandle ) {
-    no warnings 'redefine';
+    no warnings qw( redefine prototype );
     *is_FileHandle = \&Types::Standard::is_FileHandle;
   }
 
@@ -340,7 +348,7 @@ I<Returns>: I<true> if I<$value> is blessed.
     goto &Scalar::Util::blessed;
   }
   if ( exists &Types::Standard::is_Object ) {
-    no warnings 'redefine';
+    no warnings qw( redefine prototype );
     *is_Object = \&Types::Standard::is_Object;
   }
 
@@ -360,7 +368,7 @@ I<Returns>: I<true> if I<$value> is a string.
     return defined($_[0]) && !ref($_[0]);
   }
   if ( exists &Types::Standard::is_Str ) {
-    no warnings 'redefine';
+    no warnings qw( redefine prototype );
     *is_Str = \&Types::Standard::is_Str;
   }
 
@@ -744,6 +752,20 @@ I<See also>: I<KEY_EVENT_RECORD> structure.
 
 =pod
 
+  use constant {
+    dwSizeX               => 0,
+    dwSizeY               => 1,
+    dwCursorPositionX     => 2,
+    dwCursorPositionY     => 3,
+    wAttributes           => 4,
+    srWindowLeft          => 5,
+    srWindowTop           => 6,
+    srWindowRight         => 7,
+    srWindowBottom        => 8,
+    dwMaximumWindowSizeX  => 9,
+    dwMaximumWindowSizeY  => 10,
+  };
+
 Constants for accessing the console screen buffer array which contains 
 information about a console screen buffer.
 
@@ -766,6 +788,11 @@ I<See also>: I<CONSOLE_SCREEN_BUFFER_INFO> structure.
   };
 
 =pod
+
+  use constant {
+    dwSize    => 0,
+    bVisible  => 1,
+  };
 
 Constants for accessing the console cursor info array which contains information 
 about the console cursor.
@@ -1945,7 +1972,7 @@ that is handled by the operating system.
 The attribute is I<true> if C<Ctrl+C> is treated as ordinary input; otherwise, 
 I<false>.
 
-I<Throws>: I<Exception> if unable to get or set the input mode of the console 
+I<Throws>: I<IOException> if unable to get or set the input mode of the console 
 input buffer.
 
 =cut
@@ -4080,11 +4107,6 @@ I<Returns>: the specified I<FileHandle>.
 
 =head2 Inheritance
 
-Methods inherited from class L<Class::Accessor>
-
-  new, accessor_name_for, mutator_name_for, make_accessor, make_ro_accessor, 
-  make_wo_accessor
-
 Methods inherited from class L<UNIVERSAL>
 
   can, DOES, isa, VERSION
@@ -4650,7 +4672,7 @@ The requirements necessary for the runtime are listed below:
 =item *
 
 2008, 2009 by Piotr Roszatycki E<lt>dexter@cpan.orgE<gt> (Code snippet from 
-L<constant:boolean>)
+L<constant::boolean>)
 
 =item *
 

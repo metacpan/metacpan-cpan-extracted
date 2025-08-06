@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-05-16'; # DATE
+our $DATE = '2025-08-02'; # DATE
 our $DIST = 'String-CommonPrefix'; # DIST
-our $VERSION = '0.020'; # VERSION
+our $VERSION = '0.021'; # VERSION
 
 use Exporter qw(import);
 
@@ -48,7 +48,7 @@ String::CommonSuffix - Return suffix common to all strings
 
 =head1 VERSION
 
-This document describes version 0.020 of String::CommonSuffix (from Perl distribution String-CommonPrefix), released on 2024-05-16.
+This document describes version 0.021 of String::CommonSuffix (from Perl distribution String-CommonPrefix), released on 2025-08-02.
 
 =head1 FUNCTIONS
 
@@ -94,7 +94,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024, 2014 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

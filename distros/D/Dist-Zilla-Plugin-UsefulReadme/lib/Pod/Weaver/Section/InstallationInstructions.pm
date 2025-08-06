@@ -15,38 +15,53 @@ use Pod::Elemental::Element::Pod5::Command;
 use Pod::Elemental::Element::Pod5::Ordinary;
 use Pod::Elemental::Element::Pod5::Region;
 use Pod::Elemental::Element::Pod5::Verbatim;
-use Types::Common qw( Enum NonEmptySimpleStr SimpleStr );
+use Types::Common qw( Bool Enum NonEmptySimpleStr SimpleStr );
 
 use experimental qw( lexical_subs postderef signatures );
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.1.2';
+our $VERSION = 'v0.4.1';
 
 
 has header => (
-    is      => 'lazy',
+    is      => 'rw',
     isa     => NonEmptySimpleStr,
     default => 'INSTALLATION',
 );
 
 
 has region => (
-    is      => 'lazy',
+    is      => 'rw',
     isa     => SimpleStr,
     default => '',
 );
 
 
 has builder => (
-    is        => 'ro',
+    is        => 'rw',
     isa       => Enum [qw( Makefile.PL Build.PL )],
     predicate => 1,
+);
+
+
+has all_modules => (
+    is      => 'rw',
+    isa     => Bool,
+    default => 0,
 );
 
 sub weave_section( $self, $document, $input ) {
 
     my $zilla = $input->{zilla};
+
+    if ( $zilla && !$self->all_modules ) {
+        return if $zilla->main_module->name ne $input->{filename};
+    }
+
+    if ( my $stash = $zilla ? $zilla->stash_named('%PodWeaver') : undef ) {
+        $stash->merge_stashed_config($self);
+    }
 
     # TODO change to work without zilla
     my $meta = Module::Metadata->new_from_file( $zilla->main_module->name );
@@ -186,16 +201,24 @@ Pod::Weaver::Section::InstallationInstructions - generate POD with installation 
 
 =head1 VERSION
 
-version v0.1.2
+version v0.4.1
 
 =head1 SYNOPSIS
 
-In the F<weaver.ini>
+In the F<weaver.ini>:
 
     [InstallationInstructions]
     header  = INSTALLATION
     builder = Makefile.PL
     region  = :readme
+
+Or in the F<dist.ini> for L<Dist::Zilla>:
+
+    [PodWeaver]
+    [%PodWeaver]
+    InstallationInstructions.header  = INSTALLATION
+    InstallationInstructions.builder = Makefile.PL
+    InstallationInstructions.region  = :readme
 
 =head1 DESCRIPTION
 
@@ -256,6 +279,12 @@ This indicates the kind of builder used, either C<Makefile.PL> from L<ExtUtils::
 L<Module::Build> and variants.
 
 If unset, it will attempt to guess.  If it cannot guess, the instructions will be omitted.
+
+=head2 all_modules
+
+When true, this section will be added to all modules in the distribution, and not just the main module.
+
+When false (default), this section will only be added to the main module.
 
 =for Pod::Coverage weave_section
 

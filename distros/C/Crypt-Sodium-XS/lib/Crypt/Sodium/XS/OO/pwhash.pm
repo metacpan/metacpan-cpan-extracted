@@ -264,8 +264,8 @@ random and does not need to be kept secret.
 
 C<$hash_size> is optional. It specifies the desired output hash size, in bytes.
 It must be in the range of L</BYTES_MIN> to L</BYTES_MAX>, inclusive. If it is
-omitted or numifies to zero (undef, 0, ""), the default of L</pwhash_STRBYTES>
-will be used.
+omitted or numifies to zero (undef, 0, ""), the default of L</STRBYTES> will be
+used.
 
 C<$opslimit> is optional. It specifies the cpu-hardness of generating the hash.
 It must be in the range of L</OPSLIMIT_MIN> to L</OPSLIMIT_MAX>, inclusive. If
@@ -308,7 +308,7 @@ Returns an ASCII encoded string into out, which includes:
 =over 4
 
 * the result of a memory-hard, CPU-intensive hash function applied to the
-  password passwd of length passwdlen
+  password
 
 * the automatically generated salt used for the previous computation
 

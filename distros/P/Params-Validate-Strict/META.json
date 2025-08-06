@@ -27,14 +27,15 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.64"
          }
       },
       "runtime" : {
          "requires" : {
             "Carp" : "0",
             "ExtUtils::MakeMaker" : "6.64",
-            "Params::Get" : "0.11"
+            "Params::Get" : "0.13",
+            "Scalar::Util" : "0"
          }
       },
       "test" : {
@@ -49,6 +50,6 @@
    },
    "release_status" : "stable",
    "resources" : {},
-   "version" : "0.06",
+   "version" : "0.08",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

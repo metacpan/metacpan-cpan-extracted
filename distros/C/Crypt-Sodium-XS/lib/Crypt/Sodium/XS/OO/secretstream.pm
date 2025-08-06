@@ -284,20 +284,31 @@ have to be secret and decryption with a different header would fail.
 
 A tag is attached to each message. That tag can be any of:
 
-* 0, or L</TAG_MESSAGE>: the most common tag, that doesn’t add any information
-  about the nature of the message.
+=over 4
 
-* L</TAG_FINAL>: indicates that the message marks the end of the stream, and
-  erases the secret key used to encrypt the previous sequence.
+=item 0, or L</TAG_MESSAGE>
 
-* L</TAG_PUSH>: indicates that the message marks the end of a set of messages,
-  but not the end of the stream. For example, a huge JSON string sent as
-  multiple chunks can use this tag to indicate to the application that the
-  string is complete and that it can be decoded. But the stream itself is not
-  closed, and more data may follow.
+The most common tag, that doesn’t add any information about the nature of the
+message.
 
-* L</TAG_REKEY>: “forget” the key used to encrypt this message and the previous
-  ones, and derive a new secret key.
+=item L</TAG_FINAL>
+
+Indicates that the message marks the end of the stream, and erases the secret
+key used to encrypt the previous sequence.
+
+=item L</TAG_PUSH>
+
+Indicates that the message marks the end of a set of messages, but not the end
+of the stream. For example, a huge JSON string sent as multiple chunks can use
+this tag to indicate to the application that the string is complete and that it
+can be decoded. But the stream itself is not closed, and more data may follow.
+
+=item L</TAG_REKEY>
+
+“Forget” the key used to encrypt this message and the previous ones, and derive
+a new secret key.
+
+=back
 
 A typical encrypted stream simply attaches 0 as a tag to all messages, except
 the last one which is tagged as TAG_FINAL.

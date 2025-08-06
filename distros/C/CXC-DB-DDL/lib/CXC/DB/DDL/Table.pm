@@ -6,7 +6,7 @@ use v5.26;
 use strict;
 use warnings;
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 use List::Util qw( any );
 use Ref::Util  qw( is_ref is_arrayref is_coderef is_plain_hashref);
@@ -524,7 +524,7 @@ CXC::DB::DDL::Table - A Table
 
 =head1 VERSION
 
-version 0.20
+version 0.21
 
 =head1 DESCRIPTION
 

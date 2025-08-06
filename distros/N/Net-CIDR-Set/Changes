@@ -1,5 +1,15 @@
 Revision history for Net-CIDR-Set
 
+0.19      2025-08-05 13:11:19+01:00 Europe/London
+  [Documentation]
+  - Fixed typos in documentation RT#168697 (thanks Thomas Eckardt).
+
+  - Removed the separate INSTALL file.
+
+  - Fixed the CONTRIBUTORS setion of the README.
+
+  - Added CONTRIBUTING.md file.
+
 0.18      2025-08-03 11:45:07+01:00 Europe/London
   [Documentation]
   - Fixed broken Pod::Weaver configuration.

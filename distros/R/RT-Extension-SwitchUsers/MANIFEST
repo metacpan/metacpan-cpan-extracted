@@ -7,9 +7,9 @@ etc/schema.Pg
 etc/schema.SQLite
 etc/upgrade/0.05/schema.Oracle
 etc/upgrade/0.08/acl.Pg
+html/Callbacks/RT-Extension-SwitchUsers/Elements/Header/PrivilegedMainNav
 html/Callbacks/RT-Extension-SwitchUsers/Elements/ShowTransaction/Default
 html/Callbacks/RT-Extension-SwitchUsers/Elements/ShowUser/Modify
-html/Callbacks/RT-Extension-SwitchUsers/Elements/Tabs/Privileged
 html/Tools/SwitchUsers.html
 inc/Module/Install.pm
 inc/Module/Install/Base.pm

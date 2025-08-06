@@ -13,10 +13,16 @@ my $tzil = Builder->from_config(
     {
         add_files => {
             path(qw( source dist.ini )) => simple_ini(
-                ['AutoPrereqs'],                                                                  #
-                ['GatherDir'],                                                                    #
+                ['AutoPrereqs'],    #
+                ['GatherDir'],      #
                 ['MakeMaker'],
-                [ 'UsefulReadme', { parser_class => 'Pod::Text', filename => 'ReadMe.txt' } ],    #
+                [
+                    'UsefulReadme',
+                    {
+                        parser_class => 'Pod::Text',     #
+                        filename     => 'ReadMe.txt',    #
+                    }
+                ],
             ),
             path(qw( source lib/DZT/Sample.pm)) => <<'MODULE',
 

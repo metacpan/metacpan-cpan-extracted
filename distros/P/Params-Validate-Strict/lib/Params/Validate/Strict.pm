@@ -5,6 +5,7 @@ use warnings;
 
 use Carp;
 use Params::Get 0.11;
+use Scalar::Util;
 
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(validate_strict);
@@ -15,11 +16,11 @@ Params::Validate::Strict - Validates a set of parameters against a schema
 
 =head1 VERSION
 
-Version 0.06
+Version 0.08
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 
 =head1 SYNOPSIS
 
@@ -80,11 +81,19 @@ The schema can define the following rules for each parameter:
 
 =item * C<type>
 
-The data type of the parameter.  Valid types are C<string>, C<integer>, C<number>, C<hashref>, C<arrayref> and C<coderef>.
+The data type of the parameter.  Valid types are C<string>, C<integer>, C<number>, C<hashref>, C<arrayref>, C<object> and C<coderef>.
+
+=item * C<can>
+
+The parameter must be an object which understands the method C<can>.
+
+=item * C<isa>
+
+The parameter must be an object of type C<isa>.
 
 =item * C<memberof>
 
-The value must be a member of the given arrayref.
+The parameter must be a member of the given arrayref.
 
 =item * C<min>
 
@@ -171,6 +180,12 @@ sub validate_strict
 			$rules = { type => $rules };
 		}
 
+		if((my $min = $rules->{'min'}) && (my $max = $rules->{'max'})) {
+			if($min > $max) {
+				croak(__PACKAGE__, "::validate_strict($key): min must be <= max ($min > $max)");
+			}
+		}
+
 		# Validate based on rules
 		if(ref($rules) eq 'HASH') {
 			foreach my $rule_name (keys %$rules) {
@@ -207,6 +222,10 @@ sub validate_strict
 					} elsif($type eq 'coderef') {
 						if(ref($value) ne 'CODE') {
 							croak(__PACKAGE__, "::validate_strict: Parameter '$key' must be a coderef");
+						}
+					} elsif($type eq 'object') {
+						if(!Scalar::Util::blessed($value)) {
+							croak(__PACKAGE__, "::validate_strict: Parameter '$key' must be an object");
 						}
 					} else {
 						croak "validate_strict: Unknown type '$type'";
@@ -294,6 +313,22 @@ sub validate_strict
 					my $res = $rule_value->($value);
 					unless ($res) {
 						croak "validate_strict: Parameter '$key' failed callback validation";
+					}
+				} elsif($rule_name eq 'isa') {
+					if($rules->{'type'} eq 'object') {
+						if(!$value->isa($rule_value)) {
+							croak(__PACKAGE__, "::validate_strict: Parameter '$key' must be an $rule_value object");
+						}
+					} else {
+						croak(__PACKAGE__, "::validate_strict: Parameter '$key' has meaningless isa value $rule_value");
+					}
+				} elsif($rule_name eq 'can') {
+					if($rules->{'type'} eq 'object') {
+						if(!$value->can($rule_value)) {
+							croak(__PACKAGE__, "::validate_strict: Parameter '$key' must an object that understands the $rule_value method");
+						}
+					} else {
+						croak(__PACKAGE__, "::validate_strict: Parameter '$key' has meaningless can value $rule_value");
 					}
 				} elsif($rule_name eq 'optional') {
 					# Already handled at the beginning of the loop

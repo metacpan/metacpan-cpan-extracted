@@ -1,3 +1,8 @@
+0.009   2025-06-24  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] Add shcompgen hint for renwd-cd.
+
+
 0.008   2021-11-16  Released-By: PERLANCAR; Urgency: medium
 
 	- [ux] Add renself as alias to renwd.

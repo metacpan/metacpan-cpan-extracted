@@ -8,7 +8,7 @@ use File::Basename qw(fileparse);
 use File::Which;
 use IO::File;
 
-our $VERSION = '2.01';
+our $VERSION = '2.02';
 
 # List of acceptable filename extensions
 our $SUFFIX =
@@ -26,17 +26,18 @@ sub load_file {
 	my $noheader = shift || 0;    # may not be present
 
 	# check that we have an empty table
-	if ( $self->last_row != 0 or $self->number_columns != 0 or $self->filename ) {
+	if ( $self->last_row != 0 or $self->number_columns != 0 ) {
 		confess 'FATAL: Cannot load file onto an existing data table!';
 	}
 
 	# open the file and load metadata
-	my $filename = $self->check_file($file);
-	unless ($filename) {
+	unless ( $self->filename ) {
+		$self->add_file_metadata($file);
+	}
+	unless ( $self->check_file ) {
 		carp "ERROR: file '$file' cannot be read or is empty!";
 		return;
 	}
-	$self->add_file_metadata($filename);
 	$self->open_to_read_fh or return;
 	$self->parse_headers($noheader);
 
@@ -69,11 +70,10 @@ sub load_file {
 }
 
 sub taste_file {
-	my $self     = shift;
-	my $file     = shift;
-	my $filename = $self->check_file($file) or return;
-	my $Taste    = $self->new;
-	$Taste->add_file_metadata($filename);
+	my ( $self, $file ) = @_;
+	my $Taste = $self->new;
+	$Taste->add_file_metadata($file);
+	$Taste->check_file      or return;
 	$Taste->open_to_read_fh or return;
 	$Taste->parse_headers;
 
@@ -412,8 +412,8 @@ sub parse_headers {
 
 						# assume interbase and region
 						$self->interbase(1);
-						unless ( defined $self->{'feature'} ) {
-							$self->{'feature'} = 'region';
+						unless ( $self->feature ) {
+							$self->feature('region');
 						}
 					}
 					else {
@@ -433,7 +433,7 @@ sub parse_headers {
 			### a Bed file
 			elsif ( $format =~ m/bed/i ) {
 
-				# check for a commented header line
+				# check for a commented header line first since these may be common
 				if ( $self->_commented_header_line($line) ) {
 					my @header_names = split /\t/, pop @{ $self->{'comments'} };
 					chomp $header_names[-1];
@@ -442,8 +442,8 @@ sub parse_headers {
 					# we will not enforce bed structure by setting the bed flag
 					# but will assume 0-based formatting
 					$self->interbase(1);
-					unless ( defined $self->{'feature'} ) {
-						$self->{'feature'} = 'region';
+					unless ( $self->feature ) {
+						$self->feature('region');
 					}
 				}
 				else {
@@ -477,7 +477,8 @@ sub parse_headers {
 				$self->add_sgr_metadata;
 			}
 
-			### standard text file with headers, i.e. everything else
+			### standard text file with assumed headers, i.e. everything else
+			# we know this because no columns have been set yet
 			unless ( $self->number_columns ) {
 
 				# check for a commented header line
@@ -491,7 +492,7 @@ sub parse_headers {
 					# we will do so now
 					chomp $line;
 					my @header_names = split /\t/, $line;
-					$self->add_standard_metadata( \@header_names, 0 );    # do not force
+					$self->add_standard_metadata( \@header_names );
 
 					# count as a header line
 					$header_line_count++;
@@ -526,7 +527,7 @@ sub parse_headers {
 
 		# adjust metadata
 		$header_line_count -= 1;
-		$self->{'headers'} = -1;    # special case, we never write headers here
+		$self->headers(0);
 	}
 
 	# Header sanity check
@@ -721,7 +722,19 @@ sub write_file {
 	}
 
 	# Verify and adjust filename extension if necessary for specific formats
-	if ( $extension =~ /(g[tf]f)/i ) {
+	if ( $extension =~ /(?: txt | tsv )/xi ) {
+		if ( not $self->headers ) {
+
+			# set headers to true for ordinary text or tsv files
+			# unless they appear to be self-named generic names
+			# this is a hack around preserving no column names when noheader was used
+			# only checking the first column, which may not be sufficient in some cases
+			unless ( $self->name(1) =~ /^Column\d+ \s \(.+/x ) {
+				$self->headers(1);
+			}
+		}
+	}
+	elsif ( $extension =~ /(?: g[tf]f )/xi ) {
 		if ( not $self->gff ) {
 
 			# let's set it to true and see if it passes verification
@@ -788,12 +801,6 @@ sub write_file {
 				$extension = $self->extension;
 			}
 		}
-	}
-	elsif ( $extension =~ /txt/i ) {
-
-		# plain old text file, sounds good to me
-		# make sure headers are enabled
-		$self->{'headers'} = 1 unless $self->{'headers'} == -1;    # original noheader
 	}
 
 	# determine format
@@ -1001,7 +1008,7 @@ sub write_file {
 	}
 
 	# Write the table column headers, skipping the first column
-	if ( $self->{'headers'} == 1 ) {
+	if ( $self->headers ) {
 		$fh->printf(
 			"%s\n",
 			join( "\t",
@@ -1022,7 +1029,7 @@ sub write_file {
 			# convert any non-value '.' to empty
 			# and print using a tab-delimited format
 			my @linedata =
-				map { q() if $_ eq '.' } @{ $self->{'data_table'}[$i] }[ 1 .. $n ];
+				map { $_ eq '.' ? q() : $_ } @{ $self->{'data_table'}[$i] }[ 1 .. $n ];
 			$fh->printf( "%s\n", join( "\t", @linedata ) );
 		}
 	}
@@ -1199,7 +1206,19 @@ sub open_to_write_fh {
 
 ### Subroutine to check for file existance
 sub check_file {
-	my ( $self, $filename ) = @_;
+	my $self = shift;
+	my $filename;
+	my $md;    # need to remember if filename came from arguments or metadata
+	if (@_) {
+		$filename = shift @_;
+		$md       = 0;
+	}
+	elsif ( $filename = $self->filename ) {
+		$md = 1;
+	}
+	else {
+		return;
+	}
 
 	# check for file existance
 	if ( -e $filename and -f _ and -r _ and -s _ ) {
@@ -1210,9 +1229,16 @@ sub check_file {
 	else {
 		# file name is either incomplete or non-existent
 		# try adding some common file extensions in case those are missing
-		foreach my $ext (qw(.gz .txt .txt.gz .bed .bed.gz)) {
+		foreach my $ext (qw(gz txt txt.gz bed bed.gz)) {
 			my $new_filename = sprintf "%s.%s", $filename, $ext;
 			if ( -e $new_filename and -f _ and -r _ and -s _ ) {
+				printf " WARNING: File '%s' does not exist, using '%s' instead\n",
+					$filename, $new_filename;
+				if ($md) {
+
+					# update metadata
+					$self->add_file_metadata($new_filename);
+				}
 				return $new_filename;
 			}
 		}
@@ -1328,12 +1354,10 @@ sub add_gff_metadata {
 
 	# set the metadata
 	$self->add_standard_metadata( $self->standard_column_names('gff'), $force );
-	$self->{'zerostart'} = 0;
-	unless ( $self->{1}{'name'} =~ /^#/ ) {
-		$self->{'headers'} = 0;
-	}
-	unless ( defined $self->{'feature'} ) {
-		$self->{'feature'} = 'region';
+	$self->interbase(0);
+	$self->headers(0);
+	unless ( $self->feature ) {
+		$self->feature('region');
 	}
 
 	return 1;
@@ -1361,7 +1385,7 @@ sub add_bed_metadata {
 	{
 		$self->{'bed'} = $column_count;
 		$self->format('bedGraph');
-		$names = $self->standard_column_names('bedGraph');
+		$names = $self->standard_column_names('bdg');
 	}
 	elsif ( $self->format =~ /bedpe/i or $self->extension =~ m/bedpe/i ) {
 		$self->{'bed'} = 0;    # this will bypass verification checks which would fail
@@ -1401,13 +1425,9 @@ sub add_bed_metadata {
 	$self->add_standard_metadata( $column_names, $force );
 
 	# add additional metadata
-	$self->{'zerostart'} = 1;
-	unless ( $self->{1}{'name'} =~ /^#/ ) {
-		$self->{'headers'} = 0;
-	}
-	unless ( defined $self->{'feature'} ) {
-		$self->{'feature'} = 'region';
-	}
+	$self->interbase(1);
+	$self->headers(0);
+	$self->feature('region');
 
 	return 1;
 }
@@ -1424,12 +1444,10 @@ sub add_peak_metadata {
 	my $column_names;
 	if ( $self->format =~ /narrow/i or $self->extension =~ /narrow/i ) {
 		$self->format('narrowPeak');
-		$self->bed($column_count);
 		$column_names = $self->standard_column_names('narrowpeak');
 	}
 	elsif ( $self->format =~ /broad/i or $self->extension =~ /broad/i ) {
 		$self->format('broadPeak');    # possibly redundant
-		$self->bed($column_count);
 		$column_names = $self->standard_column_names('broadpeak');
 	}
 	elsif ( $self->format =~ /gapped/i or $self->extension =~ /gapped/i ) {
@@ -1437,19 +1455,17 @@ sub add_peak_metadata {
 		$column_names = $self->standard_column_names('gappedpeak');
 	}
 	else {
+
+		# unrecognized peak format
 		return 0;
 	}
 	$self->add_standard_metadata( $column_names, $force );
 
 	# add additional metadata
-	$self->{'bed'}       = $column_count;
-	$self->{'zerostart'} = 1;
-	unless ( $self->{1}{'name'} =~ /^#/ ) {
-		$self->{'headers'} = 0;
-	}
-	unless ( defined $self->{'feature'} ) {
-		$self->{'feature'} = 'region';
-	}
+	$self->bed($column_count);
+	$self->interbase(1);
+	$self->headers(0);
+	$self->{'feature'} = 'region';
 
 	return 1;
 }
@@ -1487,18 +1503,18 @@ sub add_ucsc_metadata {
 		$column_names = $self->standard_column_names('ucsc10');
 	}
 	else {
+
+		# unrecognized format
 		return 0;
 	}
 	$self->add_standard_metadata( $column_names, $force );
 
 	# set additional metadata
-	$self->{'ucsc'}      = $column_count;
-	$self->{'zerostart'} = 1;
-	unless ( $self->{1}{'name'} =~ /^#/ ) {
-		$self->{'headers'} = 0;
-	}
-	unless ( defined $self->{'feature'} ) {
-		$self->{'feature'} = 'gene';
+	$self->ucsc($column_count);
+	$self->{'zerostart'} = 1;    # cannot use interbase method
+	$self->headers(0);
+	unless ( $self->feature ) {
+		$self->feature('gene');
 	}
 
 	return 1;
@@ -1517,12 +1533,8 @@ sub add_sgr_metadata {
 
 	# set additional metadata
 	$self->format('sgr');
-	unless ( $self->{1}{'name'} =~ /^#/ ) {
-		$self->{'headers'} = 0;
-	}
-	unless ( defined $self->{'feature'} ) {
-		$self->{'feature'} = 'region';
-	}
+	$self->headers(0);
+	$self->{'feature'} = 'region';
 
 	return 1;
 }
@@ -1530,11 +1542,6 @@ sub add_sgr_metadata {
 ### Internal subroutine to generate metadata for standard files
 sub add_standard_metadata {
 	my ( $self, $namelist, $force ) = @_;
-
-	# add first data table row of names
-	# the first column will always be blank to fake base 1 column indexing
-	$self->{'data_table'}->[0] ||= [];
-	$self->{'data_table'}->[0]->[0] = 'BLANK';
 
 	# we will define the columns based on
 	for my $i ( 0 .. $#{$namelist} ) {
@@ -1581,9 +1588,6 @@ sub add_standard_metadata {
 	if ( scalar @{$namelist} != $self->{'number_columns'} ) {
 		$self->{'number_columns'} = scalar @{$namelist};
 	}
-
-	# set headers flag to true - this may be reversed for specific file formats
-	$self->{'headers'} = 1;
 
 	return 1;
 }
@@ -2051,6 +2055,14 @@ Returns an anonymous array of standard file format column header names.
 Pass a value representing the file format. Values include gff, bed12, 
 bed6, bdg, narrowpeak, broadpeak, sgr, ucsc16, ucsc15, genepredext, 
 ucsc12, knowngene, ucsc11, genepred, ucsc10, refflat.
+
+=item fh
+
+Returns the underlying L<IO::File> file handle object.
+
+=item close_fh
+
+Closes the open file handle associated with the Data object.
 
 =back
 

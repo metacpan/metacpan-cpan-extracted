@@ -76,9 +76,10 @@ use Object::Pad;
 class ChordPro::Wx::Main :isa(ChordPro::Wx::Main_wxg);
 
 use ChordPro;	our $VERSION = $ChordPro::VERSION;
+use ChordPro::Files;
 use ChordPro::Paths;
 use ChordPro::Output::Common;
-use ChordPro::Utils qw( is_msw is_macos demarkup );
+use ChordPro::Utils qw( demarkup );
 
 use Wx qw[:everything];
 use Wx::Locale gettext => '_T';
@@ -198,12 +199,26 @@ method init( $options ) {
     $self->init_theme;
 
     if ( @ARGV ) {
-	my $arg = decode_utf8(shift(@ARGV));
-	if ( -d $arg ) {
-	    # This won't work on macOS packaged app.
+	use DDP;
+	use charnames ':full';
+	require _charnames;
+	push( @{$state{msgs}},
+	      "ARGV: " . np(@ARGV,
+			      show_unicode => 1,
+			      escape_chars => 'nonascii',
+			      unicode_charnames => 1 ) );
+	my $arg = shift(@ARGV);	# ignore rest
+	$arg = decode_utf8($arg);
+	push( @{$state{msgs}},
+	      'DECODED: ' . np($arg,
+			    show_unicode => 1,
+			    escape_chars => 'nonascii',
+			    unicode_charnames => 1 ) );
+
+	if ( fs_test( 'd', $arg ) ) {
 	    return 1 if $self->select_mode("sbexport")->open_dir($arg);
 	}
-	elsif ( ! -r $arg ) {
+	elsif ( !fs_test( 'r', $arg ) ) {
 	    return 1 if $self->select_mode("editor")->newfile($arg);
 	    Wx::MessageDialog->new( $self, "Error opening $arg",
 				    "File Open Error",
@@ -238,7 +253,7 @@ method init_recents() {
 	$ctl->Enable(1);
 	my $i = 0;
 	for my $file ( @$r ) {
-	    next unless -s $file;
+	    next unless fs_test( s => $file );
 	    last unless defined $file;
 	    $ctl->Append( basename($file) );
 	    $ctl->SetClientData( $i, $file );
@@ -270,7 +285,7 @@ method init_theme() {
     else {
 	$state{editortheme} = $preferences{editortheme};
     }
-    $self->log( 'I', "Using $state{editortheme} theme" );
+    push( @{$state{msgs}}, "Using $state{editortheme} theme" );
 }
 
 method get_preferences() {
@@ -388,6 +403,19 @@ method OnExportFolder($event) {
 }
 
 method OnIdle($event) {
+    # Cannot check from init. Do it here.
+    unless ( ChordPro::Wx::Config->Ok ) {
+	ChordPro::Wx::Config->SetOk;
+	my $md = Wx::MessageDialog->new
+	  ( undef,
+	    "Your Settings have been migrated.\n".
+	    "Some Settings may have been reset to default values.\n".
+	    "\n".
+	    "Sorry for the inconvenience.",
+	    "Check your Settings",
+	    Wx::wxOK|Wx::wxICON_WARNING|Wx::wxDIALOG_NO_PARENT );
+	$md->ShowModal;
+    }
     return if $self->{p_initial}->IsShown;
     my $mod = $self->{p_editor}->{t_editor}->IsModified;
     my $f = basename($state{windowtitle} // "ChordPro");

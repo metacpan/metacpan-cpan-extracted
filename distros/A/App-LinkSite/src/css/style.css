@@ -26,8 +26,9 @@ header {
 footer {
   margin-top: 3%;
   padding-top: 1%;
-  border-top: solid 1px black;
   padding-bottom: 1em;
+  border-top: solid 1px black;
+  text-align: center;
 }
 
 li a.text-decoration-none:hover {

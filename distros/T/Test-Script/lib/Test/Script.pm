@@ -1,14 +1,14 @@
 package Test::Script;
 
 # ABSTRACT: Basic cross-platform tests for scripts
-our $VERSION = '1.29'; # VERSION
+our $VERSION = '1.30'; # VERSION
 
 
 use 5.008001;
 use strict;
 use warnings;
 use Carp qw( croak );
-use Exporter;
+use Exporter ();
 use File::Spec;
 use File::Spec::Unix;
 use Probe::Perl;
@@ -44,7 +44,7 @@ our @EXPORT  = qw{
 };
 
 sub import {
-  my $self = shift;
+  my $class = shift;
   my $pack = caller;
   if(defined $_[0] && $_[0] =~ /^(?:no_plan|skip_all|tests)$/)
   {
@@ -65,8 +65,10 @@ sub import {
     }
     $ctx->release;
   }
-  foreach ( @EXPORT ) {
-    $self->export_to_level(1, $self, $_);
+  else
+  {
+    unshift @_, $class;
+    goto &Exporter::import;
   }
 }
 
@@ -504,7 +506,7 @@ Test::Script - Basic cross-platform tests for scripts
 
 =head1 VERSION
 
-version 1.29
+version 1.30
 
 =head1 SYNOPSIS
 
@@ -536,7 +538,7 @@ considered unacceptable.
 
 In doing so, it is hoped that B<Test::Script> can become a module that
 you can safely make a dependency of all your modules, without risking that
-your module won't on some platform because of the dependency.
+your module won't install on some platform because of the dependency.
 
 Where a clash exists between wanting more functionality and maintaining
 platform safety, this module will err on the side of platform safety.
@@ -877,7 +879,7 @@ John Karr (BRAINBUZ)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2006-2021 by Adam Kennedy.
+This software is copyright (c) 2006-2024 by Adam Kennedy.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -201,7 +201,7 @@ slightly different for consistency of this API.
 
 =head2 box_E<lt>primitiveE<gt>_decrypt_detached
 
-  my ($plaintext, $tag) = box_decrypt_detached(
+  my $plaintext = box_decrypt_detached(
     $ciphertext,
     $tag,
     $nonce,
@@ -416,7 +416,7 @@ Returns a L<Crypt::Sodium::XS::MemVault>: the decrypted plaintext.
 
 =item decrypt_detached
 
-  my $plaintext = $precalc->decrypt($ciphertext, $tag, $nonce, $flags);
+  my $plaintext = $precalc->decrypt_detached($ciphertext, $tag, $nonce, $flags);
 
 Croaks on decryption failure.
 

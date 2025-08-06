@@ -1,6 +1,10 @@
 [% CLEAR %]For Best results, make sure your terminal type supports 256 colors like
 'xterm-256color'
 
+[% BOX BRIGHT YELLOW,1,4,16,7,DEFAULT %]This is a text box drawn with the default frame[% ENDBOX %]
+[% BOX BRIGHT GREEN,17,6,16,6,THIN    %]This is a textbox drawn with a thin frame[% ENDBOX %]
+[% BOX BRIGHT RED,33,7,16,5,THICK     %]This is a tyextbox with a thick frame[% ENDBOX %]
+[% BOX PINK,49,8,17,5,ROUNDED         %]This is a textbox with a rounded frame[% ENDBOX %]
 [% RED           %]  .oooooo..o                                        oooo            [% RESET %]
 [% ORANGE        %] d8P'    `Y8                                        `888            [% RESET %]
 [% BRIGHT YELLOW %] Y88bo.       .oooo.   ooo. .oo.  .oo.   oo.ooooo.   888   .ooooo.  [% RESET %]

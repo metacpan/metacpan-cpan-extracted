@@ -28,17 +28,17 @@ use Pod::Elemental::Document;
 use Pod::Elemental::Transformer::Pod5;
 use Pod::Elemental::Transformer::Nester;
 use Pod::Elemental::Selectors;
-use Types::Common qw( ArrayRef Bool CodeRef Enum NonEmptyStr StrMatch );
+use Types::Common qw( ArrayRef Bool CodeRef Enum Maybe NonEmptyStr StrMatch );
 
 use experimental qw( lexical_subs postderef signatures );
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.1.2';
+our $VERSION = 'v0.4.1';
 
-sub mvp_multivalue_args { qw( sections ) }
+sub mvp_multivalue_args { qw( regions sections ) }
 
-sub mvp_aliases { return { section => 'sections', fallback => 'section_fallback' } }
+sub mvp_aliases { return { region => 'regions', section => 'sections', fallback => 'section_fallback' } }
 
 
 has source => (
@@ -68,6 +68,13 @@ has location => (
     is      => 'ro',
     isa     => Enum [qw(build root)],
     default => 'build',
+);
+
+
+has encoding => (
+    is      => 'ro',
+    isa     => NonEmptyStr,
+    default => 'utf8',
 );
 
 
@@ -142,33 +149,40 @@ has type => (
 
 has parser_class => (
     is => 'lazy',
-    isa => StrMatch[ qr/^[^\W\d]\w*(?:::\w+)*\z/as ], # based on Params::Util _CLASS;
+    isa => Maybe[ StrMatch[ qr/^[^\W\d]\w*(?:::\w+)*\z/as ] ], # based on Params::Util _CLASS;
     builder => sub($self) {
        return $CONFIG{ $self->type }{prereqs}[0];
     }
 );
 
 has _parser => (
-    is      => 'lazy',
-    isa     => CodeRef,
+    is       => 'lazy',
+    isa      => CodeRef,
     init_arg => undef,
-    builder => sub($self) {
+    builder  => sub($self) {
         my $prereqs = $CONFIG{ $self->type }{prereqs};
-        my $class = $self->parser_class;
-        if ($class ne $prereqs->[0]) {
-          use_module($class);
+        my $class   = $self->parser_class;
+        if ($class) {
+            if ( $class ne $prereqs->[0] ) {
+                use_module($class);
+            }
+            else {
+                foreach my $prereq ( pairs $prereqs->@* ) {
+                    use_module( $prereq->[0], $prereq->[1] );
+                }
+            }
+            return sub($pod) {
+                my $parser = $class->new();
+                $parser->output_string( \my $content );
+                $parser->parse_characters(1);
+                $parser->parse_string_document($pod);
+                return $content;
+            }
         }
         else {
-          foreach my $prereq ( pairs $prereqs->@* ) {
-            use_module( $prereq->[0], $prereq->[1] );
-          }
-        }
-        return sub($pod) {
-            my $parser = $class->new();
-            $parser->output_string( \my $content );
-            $parser->parse_characters(1);
-            $parser->parse_string_document($pod);
-            return $content;
+            return sub($pod) {
+                return $pod;
+            }
         }
     }
 );
@@ -179,6 +193,16 @@ has filename => (
     isa     => NonEmptyStr,
     builder => sub($self) {
         return $CONFIG{ $self->type }{filename};
+    }
+);
+
+
+has regions => (
+    is      => 'lazy',
+    isa     => ArrayRef [NonEmptyStr],
+    builder => sub($self) {
+        my @regions = qw( stopwords Pod::Coverage Test::MixedScripts );
+        return [ map { s/^://r } @regions, $CONFIG{ $self->type }{regions}->@* ];
     }
 );
 
@@ -267,12 +291,17 @@ sub _generate_raw_pod($self) {
     my $doc = Pod::Elemental->read_string($bytes);
     Pod::Elemental::Transformer::Pod5->new->transform_node($doc);
 
+    my %regions = map { $_ => 1 } $self->regions->@*;
+
     my $nester = Pod::Elemental::Transformer::Nester->new(
         {
             top_selector      => Pod::Elemental::Selectors::s_command('head1'),
             content_selectors => [
                 Pod::Elemental::Selectors::s_flat(),
                 Pod::Elemental::Selectors::s_command( [qw(head2 head3 head4 over item back pod cut)] ),
+                sub($para) {
+                    return $para && $para->isa("Pod::Elemental::Element::Pod5::Region") && $regions{ $para->format_name };
+                }
             ],
         },
     );
@@ -283,39 +312,59 @@ sub _generate_raw_pod($self) {
     for my $sec ( grep { Pod::Elemental::Selectors::s_command( head1 => $_ ) } @nodes ) {
         my $heading = fc( $sec->content );
         next if $sections->exists($heading);
-        $sections->set( $heading => $sec->as_pod_string );
+        $sections->set( $heading => [$sec] );
     }
 
     for my $readme ( grep { Pod::Elemental::Selectors::s_command( begin => $_ ) && $_->format_name =~ /^:?readme$/ } @nodes ) {
-        if ( my $found = first { Pod::Elemental::Selectors::s_command( head1 => $_ ) } $readme->children->@* ) {
+        my ( $found, @children ) = $readme->children->@*;
+
+        if ( Pod::Elemental::Selectors::s_command( head1 => $found ) ) {
             my $heading = fc( $found->content );
             next if $sections->exists($heading);
-            $sections->set( $heading => join( "", map { $_->as_pod_string } $readme->children->@* ) );
+            unshift @children, $found unless $heading =~ /\A(?:append|prepend):/;
+            $sections->set( $heading => \@children );
         }
     }
 
     my sub _get_section($heading) {
-
         if ( my $pod = $sections->get( fc $heading ) ) {
-            return $pod;
+            return $pod->@*;
         }
         elsif ( my ($re) = $heading =~ m|\A/(.+)/\z| ) {
             my $check = sub($key) { return $key =~ qr/\A(?:${re})\z/i };
             for my $key ( $sections->keys ) {
-                return $sections->get($key) if $check->($key);
+              if  ( $check->($key) ) {
+                if ( $pod = $sections->get($key) ) {
+                  return $pod->@*;
+                }
+              }
             }
         }
         elsif ( $self->section_fallback ) {
             my $method = sprintf( '_generate_pod_for_%s', lc( $heading =~ s/\W+/_/gr ) );
             if ( $self->can($method) ) {
-                return $self->$method;
+                my ($pod) = $self->$method or return;
+                if ( my $pre = $sections->get( "prepend:" . fc($heading) ) ) {
+                    unshift $pod->children->@*, $pre->@*;
+                }
+                if ( my $post = $sections->get( "append:" . fc($heading) ) ) {
+                    push $pod->children->@*, $post->@*;
+                }
+                return ($pod);
             }
         }
 
         return;
     }
 
-    return join( "", map { _get_section($_) } $self->sections->@* );
+    my $preamble = "=encoding " . $self->encoding . "\n";
+    return join(
+        "\n",
+        $preamble,                    #
+        map { $_->as_pod_string }     #
+          map { _get_section($_) }    #
+          $self->sections->@*
+    );
 }
 
 sub _fake_weaver_section( $self, $class, $args = { } ) {
@@ -333,9 +382,9 @@ sub _fake_weaver_section( $self, $class, $args = { } ) {
 
     my $weaver  = Pod::Weaver->new_with_default_config;
     my $section = $class->new( plugin_name => ref($self), weaver => $weaver, logger => $zilla->logger );
-    $section->weave_section( $doc, { zilla => $zilla, $args->%* } );
+    $section->weave_section( $doc, { zilla => $zilla, filename => $zilla->main_module->name, $args->%* } );
 
-    return $doc->as_pod_string;
+    return $doc->children->@*;
 }
 
 sub _generate_pod_for_version($self) {
@@ -352,7 +401,6 @@ sub _generate_pod_for_requirements($self) {
     return $self->_fake_weaver_section(
         "Pod::Weaver::Section::Requirements",
         {
-            filename     => $file->name,
             ppi_document => $self->ppi_document_for_file($file),
         }
     );
@@ -384,7 +432,7 @@ Dist::Zilla::Plugin::UsefulReadme - generate a README file with the useful bits
 
 =head1 VERSION
 
-version v0.1.2
+version v0.4.1
 
 =head1 SYNOPSIS
 
@@ -436,6 +484,12 @@ This is where the new F<README> will be saved.
 
 Allowed values are C<build> (default) or the distribution C<root>.
 
+=head2 encoding
+
+The encoding of the POD. Defaults to C<utf8>.  See L<Encode::Supported>.
+
+This was added in v0.2.0.
+
 =head2 section_fallback
 
 If one of the L</sections> does not exist in the POD, then generate one for the F<README>.
@@ -468,7 +522,7 @@ The default is equivalent to specifying
 The C<version>, C<requirements>, C<installation> and C<recent changes> sections are special.
 If they do not exist in the module POD, then default values will be used for them unless L</section_fallback> is false.
 
-This will also include C<=head1> sections in regions marked as C<readme>, normally used for L<Pod::Readme>:
+This will also include C<=head1> sections in L</regions> marked as C<readme>, normally used for L<Pod::Readme>:
 
     =begin :readme
 
@@ -477,6 +531,31 @@ This will also include C<=head1> sections in regions marked as C<readme>, normal
     This should only be visible in the README.
 
     =end :readme
+
+If you want to amend one of the generated fallback sections akin to L<Pod::Weaver::Plugin::AppendPrepend>, you must
+specify them inside of C<readme> regions.
+
+To append something to the end of a generated section:
+
+    =begin :readme
+
+    =head1 append:INSTALLATION
+
+    Remember to bring a towel.
+
+    =end :readme
+
+To prepend something to the beginning of a generated section:
+
+    =begin :readme
+
+    =head1 prepend:REQUIREMENTS
+
+    This requires L<libexample|http://www.example.org> to be installed on your system.
+
+    =end :readme
+
+Note that multiple append and prepend blocks must be in separate region blocks.
 
 =head2 type
 
@@ -495,6 +574,27 @@ This is the POD parser class, based on the L</type>.
 =head2 filename
 
 This is the filename to use, e.g. F<README> or F<REAME.md>.
+
+=head2 regions
+
+This is a list of regions inside of C<=for> or C<=begin/=end> paragraphs to be included in any sections.
+
+By default, it includes C<stopwords>, L<Pod::Coverage>, and L<Test::MixedScripts>.
+
+You may need to override this to include other region types, e.g.
+
+    type = markdown
+    region = markdown
+    region = stopwords
+    region = Pod::Coverage
+
+Note that this is not updated automatically from the L</type> because how regions are embedded in POD varies too widely
+to assume that it is always safe to include arbitrary regions with the same name.
+
+The C<readme> region is I<not> included since that has a special meaning to indicate sections that are included only in
+the F<README> file.
+
+This was added in v0.2.0.
 
 =for Pod::Coverage BUILD after_build after_release gather_files mvp_aliases mvp_multivalue_args prune_files register_prereqs
 

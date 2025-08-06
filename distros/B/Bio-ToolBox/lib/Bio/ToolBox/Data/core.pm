@@ -43,7 +43,7 @@ sub new {
 		'extension'         => q(),
 		'path'              => q(),
 		'comments'          => [],
-		'data_table'        => [],
+		'data_table'        => [ ['BLANK'] ],
 		'header_line_count' => 0,
 		'zerostart'         => 0,
 	);
@@ -1071,7 +1071,7 @@ sub feature_type {
 	if ( $self->chromo_column and $self->start_column ) {
 		$feature_type = 'coordinate';
 	}
-	elsif ($self->id_column
+	elsif ( $self->id_column
 		or ( $self->type_column and $self->name_column )
 		or ( $self->feature     and $self->name_column ) )
 	{
@@ -1231,6 +1231,14 @@ sub delete_comment {
 	else {
 		$self->{comments} = [];
 	}
+}
+
+sub headers {
+	my $self = shift;
+	if (@_) {
+		$self->{headers} = $_[0];
+	}
+	return $self->{headers};
 }
 
 sub vcf_headers {
@@ -1641,21 +1649,22 @@ sub score_column {
 	return $self->{column_indices}{score};
 }
 
-*zero_start = \&interbase;
-*zero_start if 0;    # avoid once warning
-
 sub interbase {
 	my $self = shift;
 	if (@_) {
 		my $i = $self->start_column;
 		my $n = $self->name($i);
-		if ( $_[0] eq '1' and lc $n eq 'start' ) {
+		if ( $_[0] == 1 ) {
 			$self->{zerostart} = 1;
-			$self->name( $i, 'Start0' );
+			if ( lc $n eq 'start' ) {
+				$self->name( $i, 'Start0' );
+			}
 		}
-		elsif ( $_[0] eq '0' and $n eq 'start0' ) {
+		elsif ( $_[0] == 0 ) {
 			$self->{zerostart} = 0;
-			$self->name( $i, 'Start' );
+			if ( lc $n eq 'start0' ) {
+				$self->name( $i, 'Start' );
+			}
 		}
 	}
 	return $self->{zerostart};
@@ -1837,6 +1846,10 @@ Adds a string to the list of comments to be included in the metadata.
 
 Deletes the indicated array index from the metadata comments array.
 
+=item headers
+
+Sets and returns a boolean value (0 or 1) on whether file has column headers.
+
 =item vcf_headers
 
 Partially parses VCF metadata header lines into a hash structure.
@@ -1889,6 +1902,11 @@ or transcription start column.
 Returns the index of the column that best represents the stop or end 
 column. 
 
+=item coord_column
+
+Returns the index of the column named "coordinate", if present, that
+contains the coordinate string, usually C<chromosome:start-end>.
+
 =item strand_column
 
 Returns the index of the column that best represents the strand.
@@ -1910,8 +1928,6 @@ column used in databases.
 
 Returns the index of the column that represents the Score 
 column in certain formats, such as GFF, BED, bedGraph, etc.
-
-=item zero_start
 
 =item interbase
 

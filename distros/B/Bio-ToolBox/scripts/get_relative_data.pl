@@ -33,7 +33,7 @@ eval {
 # served by separate database queries for each window.
 use constant DATASET_HASH_LIMIT => 4999;
 
-our $VERSION = '2.01';
+our $VERSION = '2.02';
 
 print
 	"\n A script to collect windowed data flanking a relative position of a feature\n\n";
@@ -161,6 +161,12 @@ if ($infile) {
 	{
 		$Data->feature($feature);
 	}
+
+	# set headers to true if file was explicitly not parsed
+	# since warnings will occur when we add columns and write to a file
+	if ( $parse == 0 ) {
+		$Data->headers(1);
+	}
 }
 else {
 	# generate a new file
@@ -186,11 +192,20 @@ my $startcolumn;    # this is now calculated separately for each dataset
 
 # Check output file name
 unless ($outfile) {
-	if ( $Data->basename ) {
-		$outfile = $Data->path . $Data->basename;
+	if ( $Data->filename ) {
+
+		# reuse the input filename and overwrite
+		$outfile = $Data->filename;
+	}
+	elsif ( $Data->basename ) {
+
+		# no filename but a basename is indicative of a parsed file
+		# so stick a txt extension on it, and write in current directory
+		$outfile = sprintf "%s.txt", $Data->basename;
 	}
 	else {
-		die " No output file provided!\n";
+		print STDERR " FATAL: No output file provided!\n";
+		exit 1;
 	}
 }
 

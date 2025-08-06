@@ -207,7 +207,7 @@ Returns an ASCII encoded string into out, which includes:
 =over 4
 
 * the result of a memory-hard, CPU-intensive hash function applied to the
-  password passwd of length passwdlen
+  password
 
 * the automatically generated salt used for the previous computation
 

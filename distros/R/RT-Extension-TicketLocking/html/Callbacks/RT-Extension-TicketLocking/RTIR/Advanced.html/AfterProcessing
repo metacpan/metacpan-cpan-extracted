@@ -1,0 +1,11 @@
+<%ARGS>
+$Ticket
+$results
+</%ARGS>
+
+<%INIT>
+return unless RT->Config->Get( 'DisplayAfterEdit', $session{'CurrentUser'} );
+return unless @$results;
+( undef, my $msg ) = $Ticket->Unlock;
+push @$results, $msg;
+</%INIT>

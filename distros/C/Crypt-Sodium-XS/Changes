@@ -1,3 +1,11 @@
+0.000037 Aug 5 2025
+
+- fix a potential under-allocation in generichash multipart state sizes
+
+- fix missing export of mv_from_hex in MemVault
+
+- minor bugfixes and improvements
+
 0.000036 Aug 3 2025
 
 - important update: return protected memory from pwhash function. the output is

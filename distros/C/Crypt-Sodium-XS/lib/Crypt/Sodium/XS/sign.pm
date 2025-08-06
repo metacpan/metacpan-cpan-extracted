@@ -152,13 +152,15 @@ Returns a multipart sign object. See L<MULTI-PART INTERFACE>.
 
 =head2 sign_E<lt>primitiveE<gt>_keypair
 
-  my ($public_key, $secret_key) = sign_keypair();
-  my ($public_key, $secret_key) = sign_keypair($seed);
+  my ($public_key, $secret_key) = sign_keypair($seed, $flags);
 
 C<$seed> is optional. It must be L</sign_SEEDBYTES> bytes. It may be a
 L<Crypt::Sodium::XS::MemVault>. Using the same seed will generate the same key
 pair, so it must be kept confidential. If omitted, a key pair is randomly
 generated.
+
+C<$flags> is optional. It is the flags used for the C<$secret_key>
+L<Crypt::Sodium::XS::MemVault>. See L<Crypt::Sodium::XS::ProtMem>.
 
 Returns a public key of L</sign_PUBLICKEYBYTES> bytes and a
 L<Crypt::Sodium::XS::MemVault>: a secret key of L</sign_SECRETKEYBYTES> bytes.

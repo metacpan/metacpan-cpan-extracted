@@ -1,5 +1,33 @@
 -----
 
+11.6.0    2025-08-05
+    [Breaking]
+       * Structure member 'resource' renamed to 'bandwidth' in upstream
+         protocol definition (aligning public API with protocol naming),
+         impacting, in Protocol::Sys::Virt::Remote::XDR:
+           * deserialize_domain_migrate_prepare_args
+           * serialize_domain_migrate_prepare_args
+           * deserialize_domain_migrate_perform_args
+           * serialize_domain_migrate_perform_args
+           * deserialize_domain_migrate_prepare2_args
+           * serialize_domain_migrate_prepare2_args
+           * deserialize_domain_migrate_prepare_tunnel_args
+           * serialize_domain_migrate_prepare_tunnel_args
+           * deserialize_domain_migrate_begin3_args
+           * serialize_domain_migrate_begin3_args
+           * deserialize_domain_migrate_prepare3_args
+           * serialize_domain_migrate_prepare3_args
+           * deserialize_domain_migrate_prepare_tunnel3_args
+           * serialize_domain_migrate_prepare_tunnel3_args
+           * deserialize_domain_migrate_perform3_args
+           * serialize_domain_migrate_perform3_args
+    [Changed]
+       * Updated to libvirt tag v11.5.0 (from 11.4.0)
+
+11.5.0    2025-07-11
+    [Changed]
+       * Updated to libvirt tag v11.5.0 (from 11.4.0)
+
 11.4.0    2025-06-04
     [Changed]
        * Updated to libvirt tag v11.4.0 (from 11.3.0)

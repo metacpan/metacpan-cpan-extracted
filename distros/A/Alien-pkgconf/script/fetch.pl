@@ -88,7 +88,7 @@ $url = do {
 
   my @list;
 
-  while($res->{content} =~ /\<a href=\"(pkgconf-([0-9\.]+)\.tar.*)\"/g)
+  while($res->{content} =~ /\>(pkgconf-([0-9\.]+)\.tar.*)\</g)
   {
     my $path = $1;
     my @version = split /\./, $2;

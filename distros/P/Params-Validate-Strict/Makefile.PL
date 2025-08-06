@@ -19,12 +19,14 @@ WriteMakefile(
 	((defined($ExtUtils::MakeMaker::VERSION) && ($ExtUtils::MakeMaker::VERSION >= 6.3002))
 		? ('LICENSE'=> 'GPL')
 		: ()),
-	PREREQ_PM => {
+	CONFIGURE_REQUIRES => {
+		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
+	}, PREREQ_PM => {
 		'Carp' => 0,
 		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
-		'Params::Get' => 0.11,
-	},
-	META_MERGE => {
+		'Params::Get' => 0.13,
+		'Scalar::Util' => 0,
+	}, META_MERGE => {
 		resources => {
 			repository => {
 				type => 'git',
@@ -35,8 +37,7 @@ WriteMakefile(
 				web => 'https://github.com/nigelhorne/Params-Validate-Strict/issues',
 			},
 		},
-	},
-	TEST_REQUIRES => {
+	}, TEST_REQUIRES => {
 		'Test::Compile' => 0,
 		'Test::DescribeMe' => 0,
 		'Test::Most' => 0,

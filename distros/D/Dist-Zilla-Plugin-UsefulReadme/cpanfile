@@ -28,6 +28,7 @@ on 'build' => sub {
 };
 
 on 'test' => sub {
+  requires "Dist::Zilla::Plugin::PodWeaver" => "0";
   requires "File::Spec" => "0";
   requires "Module::Metadata" => "1.000015";
   requires "Pod::Markdown" => "3.000";
@@ -36,9 +37,10 @@ on 'test' => sub {
   requires "Pod::Text" => "0";
   requires "Test::DZil" => "0";
   requires "Test::Deep" => "0";
-  requires "Test::MixedScripts" => "v0.3.0";
   requires "Test::More" => "0";
+  requires "open" => "0";
   requires "strict" => "0";
+  requires "utf8" => "0";
   requires "warnings" => "0";
 };
 
@@ -53,6 +55,7 @@ on 'configure' => sub {
 on 'develop' => sub {
   requires "Pod::Coverage::TrustPod" => "0";
   requires "Software::Security::Policy::Individual" => "0.10";
+  requires "Test2::Tools::Basic" => "1.302200";
   requires "Test::CPAN::Changes" => "0";
   requires "Test::CleanNamespaces" => "0.15";
   requires "Test::DistManifest" => "0";
@@ -60,6 +63,7 @@ on 'develop' => sub {
   requires "Test::EOL" => "0";
   requires "Test::Kwalitee" => "1.21";
   requires "Test::MinimumVersion" => "0";
+  requires "Test::MixedScripts" => "v0.3.0";
   requires "Test::More" => "0.88";
   requires "Test::NoTabs" => "0";
   requires "Test::Perl::Critic" => "0";

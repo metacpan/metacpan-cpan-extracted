@@ -194,7 +194,7 @@ SV * generichash_blake2b_init_salt_personal( \
   if (key_pm && protmem_grant(aTHX_ key_pm, PROTMEM_FLAG_MPROTECT_RO) != 0)
     croak("generichash_init_salt_personal: Failed to grant key protmem RO");
 
-  state_pm = protmem_init(aTHX_ sizeof(crypto_generichash_blake2b_state), pm_flags);
+  state_pm = protmem_init(aTHX_ crypto_generichash_blake2b_statebytes(), pm_flags);
   if (state_pm == NULL) {
     if (key_pm)
       protmem_release(aTHX_ key_pm, PROTMEM_FLAG_MPROTECT_RO);
@@ -371,7 +371,7 @@ SV * generichash_init( \
 
   switch(ix) {
     case 1:
-      state_pm = protmem_init(aTHX_ sizeof(crypto_generichash_blake2b_state), pm_flags);
+      state_pm = protmem_init(aTHX_ crypto_generichash_blake2b_statebytes(), pm_flags);
       if (state_pm == NULL) {
         if (key_pm)
           protmem_release(aTHX_ key_pm, PROTMEM_FLAG_MPROTECT_RO);
@@ -380,7 +380,7 @@ SV * generichash_init( \
       crypto_generichash_blake2b_init(state_pm->pm_ptr, key_buf, key_len, out_len);
       break;
     default:
-      state_pm = protmem_init(aTHX_ sizeof(crypto_generichash_state), pm_flags);
+      state_pm = protmem_init(aTHX_ crypto_generichash_statebytes(), pm_flags);
       if (state_pm == NULL) {
         if (key_pm)
           protmem_release(aTHX_ key_pm, PROTMEM_FLAG_MPROTECT_RO);

@@ -69,6 +69,7 @@
             "IPC::Open3" : "0",
             "JSON::MaybeXS" : "0",
             "Test::CPAN::Meta" : "0",
+            "Test::Exception" : "0",
             "Test::More" : "0",
             "Test::Trap" : "0",
             "Test::Vars" : "0"
@@ -78,31 +79,31 @@
    "provides" : {
       "Net::Proxmox::VE" : {
          "file" : "lib/Net/Proxmox/VE.pm",
-         "version" : "0.41"
+         "version" : "0.42"
       },
       "Net::Proxmox::VE::Access" : {
          "file" : "lib/Net/Proxmox/VE/Access.pm",
-         "version" : "0.41"
+         "version" : "0.42"
       },
       "Net::Proxmox::VE::Cluster" : {
          "file" : "lib/Net/Proxmox/VE/Cluster.pm",
-         "version" : "0.41"
+         "version" : "0.42"
       },
       "Net::Proxmox::VE::Exception" : {
          "file" : "lib/Net/Proxmox/VE/Exception.pm",
-         "version" : "0.41"
+         "version" : "0.42"
       },
       "Net::Proxmox::VE::Nodes" : {
          "file" : "lib/Net/Proxmox/VE/Nodes.pm",
-         "version" : "0.41"
+         "version" : "0.42"
       },
       "Net::Proxmox::VE::Pools" : {
          "file" : "lib/Net/Proxmox/VE/Pools.pm",
-         "version" : "0.41"
+         "version" : "0.42"
       },
       "Net::Proxmox::VE::Storage" : {
          "file" : "lib/Net/Proxmox/VE/Storage.pm",
-         "version" : "0.41"
+         "version" : "0.42"
       }
    },
    "release_status" : "stable",
@@ -117,7 +118,7 @@
          "web" : "https://github.com/djzort/proxmox-ve-api-perl"
       }
    },
-   "version" : "0.41",
+   "version" : "0.42",
    "x_author_pledge" : {
       "version" : 1
    },

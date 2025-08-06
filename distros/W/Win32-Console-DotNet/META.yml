@@ -11,7 +11,7 @@ build_requires:
   Time::HiRes: '0'
   autodie: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '6.64'
+  ExtUtils::MakeMaker: '6.56'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150010'
 license: mit
@@ -45,13 +45,13 @@ requires:
   Win32::Console: '0.10'
   Win32API::File: '0.1201'
   constant: '0'
-  namespace::clean: '0.27'
+  namespace::clean: '0.26'
   perl: '5.014'
   threads: '0'
   threads::shared: '0'
 resources:
   bugtracker: https://github.com/brickpool/Win32-Console-DotNet/issues
   repository: https://github.com/brickpool/Win32-Console-DotNet.git
-version: '0.005005'
+version: '0.005006'
 x_homepage: http://brickpool.de
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -14,7 +14,7 @@ use Types::Common::String qw( NonEmptyStr );
 use Moo;
 use experimental 'signatures', 'postderef', 'declared_refs', 'refaliasing';
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 use namespace::clean -except => [ 'has', '_tag_list', '_tags' ];
 
@@ -308,7 +308,7 @@ CXC::DB::DDL::Field - DDL Representation of a field
 
 =head1 VERSION
 
-version 0.20
+version 0.21
 
 =head1 OBJECT ATTRIBUTES
 

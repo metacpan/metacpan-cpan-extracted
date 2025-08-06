@@ -19,7 +19,7 @@ my %module_build_args = (
     "Dean Hamstead <dean\@fragfest.com.au>"
   ],
   "dist_name" => "Net-Proxmox-VE",
-  "dist_version" => "0.41",
+  "dist_version" => "0.42",
   "license" => "mit",
   "module_name" => "Net::Proxmox::VE",
   "recursive_test_files" => 1,
@@ -42,6 +42,7 @@ my %module_build_args = (
     "IPC::Open3" => 0,
     "JSON::MaybeXS" => 0,
     "Test::CPAN::Meta" => 0,
+    "Test::Exception" => 0,
     "Test::More" => 0,
     "Test::Trap" => 0,
     "Test::Vars" => 0
@@ -58,6 +59,7 @@ my %fallback_build_requires = (
   "JSON::MaybeXS" => 0,
   "Module::Build" => "0.28",
   "Test::CPAN::Meta" => 0,
+  "Test::Exception" => 0,
   "Test::More" => 0,
   "Test::Trap" => 0,
   "Test::Vars" => 0

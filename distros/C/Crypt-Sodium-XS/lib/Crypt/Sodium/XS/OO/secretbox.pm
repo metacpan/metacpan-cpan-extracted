@@ -74,7 +74,7 @@ Crypt::Sodium::XS::OO::secretbox - Secret key authenticated encryption
   # or use the shortcut
   # use Crypt::Sodium::XS;
   # my $sbox = Crypt::Sodium::XS->secretbox;
-  use Crypt::Sodium::XS "sodium_increment";
+  use Crypt::Sodium::XS::Util "sodium_increment";
 
   my $sk = $sbox->keygen;
   my $nonce = $sbox->nonce;

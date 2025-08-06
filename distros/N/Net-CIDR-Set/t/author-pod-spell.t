@@ -22,6 +22,7 @@ Andy
 Armstrong
 Brian
 CIDR
+Eckardt
 Gottreu
 IPv4
 IPv6
@@ -34,6 +35,7 @@ Rothenberg
 Set
 Stig
 Systems
+Thomas
 andy
 gottreu
 lib

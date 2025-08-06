@@ -1,5 +1,8 @@
 Revision history for RT-Extension-TicketLocking
 
+1.10 2025-08-05
+ - Support RTIR 6
+
 1.09 2022-03-31
  - Update tests for css class changes
 

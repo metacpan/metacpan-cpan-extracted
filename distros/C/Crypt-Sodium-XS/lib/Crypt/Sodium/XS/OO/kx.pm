@@ -71,14 +71,14 @@ key pairs
 
 =head1 DESCRIPTION
 
-Using L<Crypt::Sodium::XS::kx>, two parties can securely compute a set of
+Using L<Crypt::Sodium::XS::OO::kx>, two parties can securely compute a set of
 shared keys using their peer's public key and their own secret key.
 
 One party must act as the "client" side of communications. The other party must
 act as the "server" side of communications.
 
 The shared keys can be used used with symmetric encryption protocols such as
-L<Crypt::Sodium::XS::secretbox> and L<Crypt::Sodium::XS::aead>.
+L<Crypt::Sodium::XS::OO::secretbox> and L<Crypt::Sodium::XS::OO::aead>.
 
 =head1 CONSTRUCTOR
 

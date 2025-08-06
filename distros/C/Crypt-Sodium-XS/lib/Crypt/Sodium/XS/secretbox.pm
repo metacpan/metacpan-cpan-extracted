@@ -57,7 +57,7 @@ Crypt::Sodium::XS::secretbox - Secret key authenticated encryption
 =head1 SYNOPSIS
 
   use Crypt::Sodium::XS::secretbox ":default";
-  use Crypt::Sodium::XS "sodium_increment";
+  use Crypt::Sodium::XS::Util "sodium_increment";
 
   my $sk = secretbox_keygen();
   my $nonce = secretbox_nonce();

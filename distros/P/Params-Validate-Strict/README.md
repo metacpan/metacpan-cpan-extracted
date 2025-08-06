@@ -4,7 +4,7 @@ Params::Validate::Strict - Validates a set of parameters against a schema
 
 # VERSION
 
-Version 0.05
+Version 0.08
 
 # SYNOPSIS
 
@@ -55,7 +55,19 @@ The schema can define the following rules for each parameter:
 
 - `type`
 
-    The data type of the parameter.  Valid types are `string`, `integer`, `number`, `hashref`, `arrayref` and `coderef`.
+    The data type of the parameter.  Valid types are `string`, `integer`, `number`, `hashref`, `arrayref`, `object` and `coderef`.
+
+- `can`
+
+    The parameter must be an object which understands the method `can`.
+
+- `isa`
+
+    The parameter must be an object of type `isa`.
+
+- `memberof`
+
+    The parameter must be a member of the given arrayref.
 
 - `min`
 
@@ -68,6 +80,10 @@ The schema can define the following rules for each parameter:
 - `matches`
 
     A regular expression that the parameter value must match.
+
+- `nomatch`
+
+    A regular expression that the parameter value must not match.
 
 - `callback`
 

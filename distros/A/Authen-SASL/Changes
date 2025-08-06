@@ -1,5 +1,20 @@
 
-2.1800  TO BE RELEASED
+2.1900  2025-08-05
+  [Fixed]
+    - CVE-2025-40918 (Insecure source of randomness),
+      required addition of dependency on Crypt::URandom
+  [Changed]
+    - Modules Authen::SASL::Perl::CRAM_MD5, Authen::SASL::Perl::DIGEST_MD5
+      and Authen::SASL::CRAM_MD5 marked as deprecated based on the respective
+      RFC documents; thanks to @robrwo for the suggestion and @neustradamus
+      for the pointers to the documentation
+    - Update module metadata to point to the new 'perl-authen-sasl' org
+      on GitHub to which the modules moved
+    - Use VERSION declarations in 'package' statements, since our minimum
+      Perl version is 5.14 anyway
+
+
+2.1800  2025-04-25
   [Changed]
     - Minimum required Perl version 5.14+ (from 5.6.0);
       Digest::HMAC_MD5 was 5.8.1, making 5.8.1 the effective minimum

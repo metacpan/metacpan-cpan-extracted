@@ -182,7 +182,14 @@ sub generate_song ( $s ) {
 		    }
 		    elsif ( $elt->{name} eq "label" ) {
 			my $tag = $elt->{value};
-			$t .= ": " . $tag if $tag ne "";
+			if ( $variant eq "msp" ) {
+			    $tag =~ s/\s+/ /g;
+			    $t .= ": " . $tag if $tag ne "";
+			}
+			else {
+			    $tag =~ s/\n/\\n/g;
+			    $t .= " label=\"" . $tag . "\"" if $tag ne "";
+			}
 		    }
 
 		}
@@ -190,7 +197,7 @@ sub generate_song ( $s ) {
 		push( @s, $t );
 
 		if ( $ctx =~ /^abc$/ ) {
-		    if ( $elt->{id} && $variant eq "msp" ) {
+		    if ( $elt->{id} ) {
 			push( @s, @{$s->{assets}->{$elt->{id}}->{data}} );
 			next;
 		    }
@@ -409,13 +416,11 @@ sub generate_song ( $s ) {
 	require Image::Info;
 
 	# Slurp the image.
-	my $fd;
-	unless ( open( $fd, '<:raw', $url ) ) {
+	my $data = fs_blob($url);
+	unless ( defined $data ) {
 	    warn("$url: $!\n");
 	    next;
 	}
-	my $data = do { local $/; <$fd> };
-	close($fd);
 
 	# Get info.
 	my $info = Image::Info::image_info(\$data);

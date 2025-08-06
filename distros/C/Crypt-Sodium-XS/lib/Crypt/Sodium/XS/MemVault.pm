@@ -10,6 +10,7 @@ our %EXPORT_TAGS = (
   constructors => [qw[
     mv_new
     mv_from_base64
+    mv_from_hex
     mv_from_fd
     mv_from_file
     mv_from_tty

@@ -56,3 +56,8 @@
 1.17    Jul 20, 2025
 
         Added new option to -h output
+
+1.18    Jul 24, 2025
+
+        Changed the Tokens table in README.md to Github markup.
+		Added "dump" to the help for options.

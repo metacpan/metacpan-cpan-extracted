@@ -1,16 +1,16 @@
 {
-   "abstract" : "Walk a referenced arbitrary data structure and provide the reference to access values",
+   "abstract" : "unknown",
    "author" : [
       "Jared Still (jkstill@gmail.com)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "mit"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Data-Ref-JSON",
    "no_index" : {
@@ -32,11 +32,12 @@
       },
       "runtime" : {
          "requires" : {
-            "Test::Simple" : "0.44"
+            "Test::Simple" : "0.44",
+            "perl" : "5.006"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.02",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

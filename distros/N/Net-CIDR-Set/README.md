@@ -37,10 +37,13 @@ the first data that is added to it.
 
 # RECENT CHANGES
 
-Changes for version 0.18 (2025-08-03)
+Changes for version 0.19 (2025-08-05)
 
 - Documentation
-    - Fixed broken Pod::Weaver configuration.
+    - Fixed typos in documentation RT#168697 (thanks Thomas Eckardt).
+    - Removed the separate INSTALL file.
+    - Fixed the CONTRIBUTORS setion of the README.
+    - Added CONTRIBUTING.md file.
 
 See the `Changes` file for more details.
 
@@ -88,7 +91,7 @@ dzil test
 dzil install --install-command="cpan ."
 ```
 
-For more information, see the `INSTALL` file included with this distribution.
+For more information, see [How to install CPAN modules](https://www.cpan.org/modules/INSTALL.html).
 
 # SUPPORT
 
@@ -123,6 +126,11 @@ The current maintainer is Robert Rothenberg <rrwo@cpan.org>.
 The encode and decode routines were stolen en masse from Douglas Wilson's [Net::CIDR::Lite](https://metacpan.org/pod/Net%3A%3ACIDR%3A%3ALite).
 
 # CONTRIBUTORS
+
+- Thomas Eckardt <Thomas.Eckardt@thockar.com>
+- Brian Gottreu <gottreu@cpan.org>
+- Robert Rothenberg <rrwo@cpan.org>
+- Stig Palmquist <stigtsp@cpan.org>
 
 # COPYRIGHT AND LICENSE
 

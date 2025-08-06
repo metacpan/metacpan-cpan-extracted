@@ -4,7 +4,7 @@ use v5.26;
 use strict;
 use warnings;
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 # ABSTRACT: DDL for table creation, based on SQL::Translator::Schema
 
@@ -247,7 +247,8 @@ sub sql ( $self, $dbh, $opt ) {
     my $add_drop_table = !!0;
     # drop and create
     if ( $create == CREATE_ALWAYS ) {
-        $add_drop_table = !!1;
+        # if none of the tables exist, don't bother dropping them.
+        $add_drop_table = @existing;
     }
 
     # only create the missing tables
@@ -463,7 +464,7 @@ CXC::DB::DDL - DDL for table creation, based on SQL::Translator::Schema
 
 =head1 VERSION
 
-version 0.20
+version 0.21
 
 =head1 DESCRIPTION
 

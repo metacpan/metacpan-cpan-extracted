@@ -1,5 +1,12 @@
 Revision history for CXC-DB-DDL
 
+0.21      2025-08-05 11:54:55-04:00 America/New_York
+
+  [ENHANCEMENT]
+
+   * creating tables with CREATE_ALWAYS won't try and drop the tables
+     if none exist.
+
 0.20      2025-07-17 13:23:46-04:00 America/New_York
 
   [ENHANCEMENT]

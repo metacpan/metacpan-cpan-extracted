@@ -28,8 +28,11 @@ use Bio::ToolBox::db_helper qw(
 );
 use Bio::ToolBox::utility    qw(format_with_commas);
 use Bio::ToolBox::big_helper qw(
-	open_wig_to_bigwig_fh
+	check_wigToBigWig_version
+	get_wig_to_bigwig_app
 	generate_chromosome_file
+	open_wig_to_bigwig_fh
+	wig_to_bigwig_conversion
 );
 my $parallel;
 eval {
@@ -38,7 +41,7 @@ eval {
 	$parallel = 1;
 };
 
-our $VERSION = '2.01';
+our $VERSION = '2.02';
 
 print "\n This program will convert bam alignments to wig data\n";
 
@@ -120,31 +123,31 @@ GetOptions(
 	'first!'            => \$first_read,         # only take first read
 	'second!'           => \$second_read,        # only take second read
 	'fraction!'         => \$multi_hit_scale,    # scale by number of hits
-	'splfrac!'          => \$splice_scale,   # divide counts by number of spliced segments
-	'r|rpm!'            => \$rpm,            # calculate reads per million
-	'm|separate|mean!'  => \$do_mean,        # rpm scale separately
-	'scale=s'           => \@scale_values,   # user specified scale value
-	'chrnorm=f'         => \$chrnorm,        # chromosome-specific normalization
-	'chrapply=s'        => \$chrapply,       # chromosome-specific normalization regex
-	'K|chrskip=s'       => \$chr_exclude,    # regex for skipping chromosomes
+	'splfrac!'            => \$splice_scale, # divide counts by number of spliced segments
+	'r|rpm!'              => \$rpm,          # calculate reads per million
+	'm|separate|mean!'    => \$do_mean,      # rpm scale separately
+	'scale=s'             => \@scale_values, # user specified scale value
+	'chrnorm=f'           => \$chrnorm,      # chromosome-specific normalization
+	'chrapply=s'          => \$chrapply,     # chromosome-specific normalization regex
+	'K|chrskip=s'         => \$chr_exclude,  # regex for skipping chromosomes
 	'exclude|blacklist=s' => \$exclude_file, # file for skipping regions
-	'bin=i'             => \$bin_size,       # size for binning the data
-	'format=i'          => \$dec_precison,   # format to number of decimal positions
-	'b|bw!'             => \$bigwig,         # generate bigwig file
-	'bwapp=s'           => \$bwapp,          # utility to generate a bigwig file
-	'bdg!'              => \$do_bedgraph,    # write a bedgraph output
-	'fix!'              => \$do_fixstep,     # write a fixedStep output
-	'var!'              => \$do_varstep,     # write a varStep output
-	'nozero!'           => \$no_zero,        # do not write zero coverage
-	'z|gz!'             => \$gz,             # compress text output
-	'c|cpu=i'           => \$cpu,            # number of cpu cores to use
-	'intron=i'          => \$max_intron,     # maximum intron size to allow
-	'window=i'          => \$window,         # window size to control memory usage
-	'V|verbose!'        => \$verbose,        # print sample correlations
-	'temp=s'            => \$tempdir,        # directory to write temp files
-	'adapter=s'         => \$BAM_ADAPTER,    # explicitly set the adapter version
-	'h|help'            => \$help,           # request help
-	'v|version'         => \$print_version,  # print the version
+	'bin=i'               => \$bin_size,     # size for binning the data
+	'format=i'            => \$dec_precison, # format to number of decimal positions
+	'b|bw!'               => \$bigwig,       # generate bigwig file
+	'bwapp=s'             => \$bwapp,        # utility to generate a bigwig file
+	'bdg!'                => \$do_bedgraph,  # write a bedgraph output
+	'fix!'                => \$do_fixstep,   # write a fixedStep output
+	'var!'                => \$do_varstep,   # write a varStep output
+	'nozero!'             => \$no_zero,      # do not write zero coverage
+	'z|gz!'               => \$gz,           # compress text output
+	'c|cpu=i'             => \$cpu,          # number of cpu cores to use
+	'intron=i'            => \$max_intron,   # maximum intron size to allow
+	'window=i'            => \$window,       # window size to control memory usage
+	'V|verbose!'          => \$verbose,      # print sample correlations
+	'temp=s'              => \$tempdir,      # directory to write temp files
+	'adapter=s'           => \$BAM_ADAPTER,  # explicitly set the adapter version
+	'h|help'              => \$help,         # request help
+	'v|version'           => \$print_version,    # print the version
 ) or die " unrecognized option(s)!! please refer to the help documentation\n\n";
 
 # Print help
@@ -170,8 +173,9 @@ if ($print_version) {
 ### Check for requirements and set defaults
 # more global variables
 my (
-	$main_callback, $callback,  $wig_writer,    $outbase, $chromo_file,
-	$binpack,       $buflength, $coverage_dump, $coverage_sub
+	$main_callback, $callback, $wig_writer, $outbase,
+	$chromo_file,   $binpack,  $buflength,  $coverage_dump,
+	$coverage_sub,  $post_bw_convert
 );
 check_defaults();
 print " Writing temp files to $tempdir\n" if $verbose;
@@ -760,6 +764,35 @@ sub check_defaults {
 		$wig_writer = \&write_varstep;
 	}
 
+	# check bigWig utility
+	if ($bigwig) {
+		unless ($bwapp) {
+			$bwapp = get_wig_to_bigwig_app();
+		}
+		if ($bwapp) {
+			if ( check_wigToBigWig_version($bwapp) ) {
+
+				# we can write directly to utility
+				if ($verbose) {
+					print " $bwapp supports stdin, can write directly\n";
+				}
+				$post_bw_convert = 0;
+			}
+			else {
+				# we cannot write directly to utility
+				if ($verbose) {
+					print " $bwapp does not support stdin, will write temp wig file\n";
+				}
+				$post_bw_convert = 1;
+				$gz              = 0;
+			}
+		}
+		else {
+			print " No external bigWig utility available, writing wig\n";
+			$bigwig = 0;
+		}
+	}
+
 	# set the initial main callback for processing alignments
 	$main_callback =
 		  $fastpaired ? \&fast_pe_callback
@@ -952,15 +985,14 @@ sub process_exclusion_list {
 			or die "unable to read exclusion list file '$exclude_file'\n";
 		unless ( $Data->feature_type eq 'coordinate' ) {
 			printf
-			" WARNING! Exclusion list file '%s' does not have coordinates! Ignoring.\n",
+" WARNING! Exclusion list file '%s' does not have coordinates! Ignoring.\n",
 				$exclude_file;
 			return \%list_hash;
 		}
 		$Data->iterate(
 			sub {
 				my $row = shift;
-				push @{ $list_hash{ $row->seq_id } },
-					[ $row->start - 1, $row->end ]
+				push @{ $list_hash{ $row->seq_id } }, [ $row->start - 1, $row->end ]
 					if exists $list_hash{ $row->seq_id };
 			}
 		);
@@ -1405,11 +1437,9 @@ sub open_wig_file {
 	my ( $name, $do_bw ) = @_;
 
 	# open a bigWig file handle if requested
-	if ( $bigwig and $do_bw ) {
+	if ( $do_bw and $bigwig and not $post_bw_convert ) {
 		print " Writing directly to bigWig converter\n";
 		$name .= '.bw' unless $name =~ /\.bw$/;
-		$chromo_file = generate_chromosome_file( $sams[0], $chr_exclude )
-			unless $chromo_file;
 		my $fh = open_wig_to_bigwig_fh(
 			file      => $name,
 			chromo    => $chromo_file,
@@ -1973,18 +2003,18 @@ sub process_alignments_on_chromosome {
 
 	# generate data structure for callback
 	my $data = {
-		f          => [],
-		r          => [],
-		fpack      => q(),
-		rpack      => q(),
-		f_offset   => 0,
-		r_offset   => 0,
-		pair       => {},
-		exclusion  => undef,
-		f_count    => 0,
-		r_count    => 0,
-		sam        => $sam,
-		score      => 1,
+		f         => [],
+		r         => [],
+		fpack     => q(),
+		rpack     => q(),
+		f_offset  => 0,
+		r_offset  => 0,
+		pair      => {},
+		exclusion => undef,
+		f_count   => 0,
+		r_count   => 0,
+		sam       => $sam,
+		score     => 1,
 	};
 
 	# chromosome specific normalization
@@ -2222,8 +2252,19 @@ sub write_final_wig_file {
 			$r_total += $total if $strand eq 'r';
 		}
 	}
-	my @f_filelist = map { $files{$_}{f} } @seq_list;
-	my @r_filelist = map { $files{$_}{r} } @seq_list;
+
+	# put into sorted or original order
+	my ( @f_filelist, @r_filelist );
+	if ($bigwig) {
+
+		# UCSC utilities can be very particular about chromosome sort order
+		@f_filelist = map { $files{$_}{f} } sort { $a cmp $b } @seq_list;
+		@r_filelist = map { $files{$_}{r} } sort { $a cmp $b } @seq_list;
+	}
+	else {
+		@f_filelist = map { $files{$_}{f} } @seq_list;
+		@r_filelist = map { $files{$_}{r} } @seq_list;
+	}
 
 	# print total alignment summaries
 	if ( $r_total and $flip ) {
@@ -2236,6 +2277,10 @@ sub write_final_wig_file {
 	}
 	else {
 		printf " %s total $items\n", format_with_commas($f_total);
+	}
+
+	if ( $bigwig and not $chromo_file ) {
+		$chromo_file = generate_chromosome_file( $sams[0], $chr_exclude );
 	}
 
 	# write wig files with the appropriate wig writer
@@ -2445,7 +2490,25 @@ sub merge_wig_files {
 		unlink $file;
 	}
 	$fh->close;
-	print " Wrote file $filename1\n";
+
+	# convert using external utility if necessary
+	if ( $bigwig and $post_bw_convert ) {
+
+		my $final_bw = wig_to_bigwig_conversion(
+			wig       => $filename1,
+			chromo    => $chromo_file,
+			bwapppath => $bwapp,
+		);
+		if ($final_bw) {
+			print " Wrote file $final_bw\n";
+			unlink $filename1;
+		}
+
+		# error message already printed if conversion had failed
+	}
+	else {
+		print " Wrote file $filename1\n";
+	}
 }
 
 sub se_callback {

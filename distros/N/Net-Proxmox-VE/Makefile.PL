@@ -38,11 +38,12 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "JSON::MaybeXS" => 0,
     "Test::CPAN::Meta" => 0,
+    "Test::Exception" => 0,
     "Test::More" => 0,
     "Test::Trap" => 0,
     "Test::Vars" => 0
   },
-  "VERSION" => "0.41",
+  "VERSION" => "0.42",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -62,6 +63,7 @@ my %FallbackPrereqs = (
   "LWP::UserAgent" => 0,
   "Module::Build" => "0.28",
   "Test::CPAN::Meta" => 0,
+  "Test::Exception" => 0,
   "Test::More" => 0,
   "Test::Trap" => 0,
   "Test::Vars" => 0,

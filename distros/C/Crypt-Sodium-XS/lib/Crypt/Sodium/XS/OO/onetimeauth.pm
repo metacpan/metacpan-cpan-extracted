@@ -60,11 +60,11 @@ Crypt::Sodium::XS::OO::onetimeauth - Single-use secret key message authenticatio
 
 =head1 DESCRIPTION
 
-L<Crypt::Sodium::XS::onetimeauth> uses Poly1305, a Wegman-Carter authenticator
-designed by D. J. Bernstein. Poly1305 takes a 32-byte, one-time key and a
-message and produces a 16-byte tag that authenticates the message such that an
-attacker has a negligible chance of producing a valid tag for a inauthentic
-message.
+L<Crypt::Sodium::XS::OO::onetimeauth> uses Poly1305, a Wegman-Carter
+authenticator designed by D. J. Bernstein. Poly1305 takes a 32-byte, one-time
+key and a message and produces a 16-byte tag that authenticates the message
+such that an attacker has a negligible chance of producing a valid tag for a
+inauthentic message.
 
 Poly1305 keys have to be secret. An attacker can compute a valid authentication
 tag for any message, for any given key. The security of Poly1305 relies on the

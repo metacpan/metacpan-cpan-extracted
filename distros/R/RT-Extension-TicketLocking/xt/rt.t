@@ -42,17 +42,8 @@ sleep 5;    #Otherwise, we run the risk of getting "You have locked this ticket"
 $agent->follow_link_ok({text => 'History', n => '1'}, "Followed History link for Ticket #$id");
 $agent->content_like(qr{<div class="locked-by-you.*">\s*You have had this ticket locked for \d+ \w+\.\s*</div>}ims, "Ticket #$id still locked on History page");
 
-$agent->follow_link_ok({text => 'Basics', n => '1'}, "Followed Basics link for Ticket #$id");
-$agent->content_like(qr{<div class="locked-by-you.*">\s*You have had this ticket locked for \d+ \w+\.\s*</div>}ims, "Ticket #$id still locked on Basics page");
-
-$agent->follow_link_ok({text => 'Dates', n => '1'}, "Followed Dates link for Ticket #$id");
-$agent->content_like(qr{<div class="locked-by-you.*">\s*You have had this ticket locked for \d+ \w+\.\s*</div>}ims, "Ticket #$id still locked on Dates page");
-
 $agent->follow_link_ok({text => 'People', n => '1'}, "Followed People link for Ticket #$id");
 $agent->content_like(qr{<div class="locked-by-you.*">\s*You have had this ticket locked for \d+ \w+\.\s*</div>}ims, "Ticket #$id still locked on People page");
-
-$agent->follow_link_ok({text => 'Links', n => '1'}, "Followed Links link for Ticket #$id");
-$agent->content_like(qr{<div class="locked-by-you.*">\s*You have had this ticket locked for \d+ \w+\.\s*</div>}ims, "Ticket #$id still locked on Links page");
 
 $agent->follow_link_ok({text => 'Reminders', n => '1'}, "Followed Reminders link for Ticket #$id");
 $agent->content_like(qr{<div class="locked-by-you.*">\s*You have had this ticket locked for \d+ \w+\.\s*</div>}ims, "Ticket #$id still locked on Reminders page");

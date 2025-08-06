@@ -59,11 +59,11 @@ Crypt::Sodium::XS::OO::hash - SHA2 cryptographic hashing
 
 The SHA-256 and SHA-512 functions are provided for interoperability with other
 applications. If you are looking for a generic hash function and not
-specifically SHA-2, using L<Crypt::Sodium::XS::generichash> (BLAKE2b) might be
-a better choice.
+specifically SHA-2, using L<Crypt::Sodium::XS::OO::generichash> (BLAKE2b) might
+be a better choice.
 
 These functions are also not suitable for hashing passwords or deriving keys
-from passwords. Use L<Crypt::Sodium::XS::pwhash> instead.
+from passwords. Use L<Crypt::Sodium::XS::OO::pwhash> instead.
 
 These functions are not keyed and are thus deterministic. In addition, the
 untruncated versions are vulnerable to length extension attacks.

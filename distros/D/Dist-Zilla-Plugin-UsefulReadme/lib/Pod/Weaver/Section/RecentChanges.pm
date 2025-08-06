@@ -14,40 +14,47 @@ use Pod::Elemental::Element::Nested;
 use Pod::Elemental::Element::Pod5::Command;
 use Pod::Elemental::Element::Pod5::Ordinary;
 use Pod::Elemental::Element::Pod5::Region;
-use Types::Common qw( NonEmptySimpleStr SimpleStr );
+use Types::Common qw( Bool NonEmptySimpleStr SimpleStr );
 
 use experimental qw( lexical_subs postderef signatures );
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.1.2';
+our $VERSION = 'v0.4.1';
 
 
 has header => (
-    is      => 'lazy',
+    is      => 'rw',
     isa     => NonEmptySimpleStr,
     default => 'RECENT CHANGES',
 );
 
 
 has changelog => (
-    is      => 'lazy',
+    is      => 'rw',
     isa     => NonEmptySimpleStr,
     default => 'Changes',
 );
 
 
 has version => (
-    is      => 'lazy',
+    is      => 'rw',
     isa     => SimpleStr,
     default => '',
 );
 
 
 has region => (
-    is      => 'lazy',
+    is      => 'rw',
     isa     => SimpleStr,
     default => '',
+);
+
+
+has all_modules => (
+    is      => 'rw',
+    isa     => Bool,
+    default => 0,
 );
 
 sub weave_section( $self, $document, $input ) {
@@ -57,6 +64,10 @@ sub weave_section( $self, $document, $input ) {
     unless ($zilla) {
         $self->log_fatal("missing zilla argument");
         return;
+    }
+
+    if ( my $stash = $zilla ? $zilla->stash_named('%PodWeaver') : undef ) {
+        $stash->merge_stashed_config($self);
     }
 
     my $file = first { $_->name eq $self->changelog } $zilla->files->@* or return;
@@ -111,6 +122,8 @@ sub weave_section( $self, $document, $input ) {
 
     my $release = $changelog->find_release($version) or return;
 
+    my @entries = _release_to_pod($release) or return;
+
     my $text = "Changes for version " . $version;
     if ( my $date = $release->date ) {
         $text .= sprintf( ' (%s)', substr( $date, 0, 10 ) );
@@ -123,7 +136,7 @@ sub weave_section( $self, $document, $input ) {
             content  => $self->header,
             children => [
                 Pod::Elemental::Element::Pod5::Ordinary->new( { content => $text } ),
-                _release_to_pod($release),
+                @entries,
                 Pod::Elemental::Element::Pod5::Ordinary->new(
                     { content => sprintf( 'See the F<%s> file for more details.', $self->changelog ) }
                 )
@@ -164,7 +177,7 @@ Pod::Weaver::Section::RecentChanges - generate POD with the recent changes
 
 =head1 VERSION
 
-version v0.1.2
+version v0.4.1
 
 =head1 SYNOPSIS
 
@@ -174,6 +187,14 @@ In the F<weaver.ini>
     header    = RECENT CHANGES
     changelog = Changes
     region    = :readme
+
+Or in the F<dist.ini> for L<Dist::Zilla>:
+
+    [PodWeaver]
+    [%PodWeaver]
+    RecentChanges.header    = RECENT CHANGES
+    RecentChanges.changelog = Changes
+    RecentChanges.region    = :readme
 
 =head1 DESCRIPTION
 
@@ -205,6 +226,12 @@ When set to a non-empty string, the section will be embedded in a POD region, e.
     region = :readme
 
 to make the region available for L<Dist::Zilla::Plugin::UsefulReadme> or L<Pod::Readme>.
+
+=head2 all_modules
+
+When true, this section will be added to all modules in the distribution, and not just the main module.
+
+When false (default), this section will only be added to the main module.
 
 =for Pod::Coverage weave_section
 

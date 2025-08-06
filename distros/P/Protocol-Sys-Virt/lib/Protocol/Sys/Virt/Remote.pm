@@ -1,7 +1,7 @@
 ####################################################################
 #
 #     This file was generated using XDR::Parse version v0.3.1,
-#        XDR::Gen version 0.0.5 and LibVirt version v11.5.0
+#        XDR::Gen version 0.0.5 and LibVirt version v11.6.0
 #
 #      Don't edit this file, use the source template instead
 #
@@ -13,13 +13,13 @@
 use v5.14;
 use warnings;
 
-package Protocol::Sys::Virt::Remote v11.5.0;
+package Protocol::Sys::Virt::Remote v11.6.0;
 
 use Carp qw(croak);
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::Remote::XDR v11.5.0;
-use Protocol::Sys::Virt::Transport::XDR v11.5.0;
+use Protocol::Sys::Virt::Remote::XDR v11.6.0;
+use Protocol::Sys::Virt::Transport::XDR v11.6.0;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 my $transport = 'Protocol::Sys::Virt::Transport::XDR';
 
@@ -3051,9 +3051,9 @@ Protocol::Sys::Virt::Remote - Connect to remote libvirt daemon
 
 =head1 VERSION
 
-v11.5.0
+v11.6.0
 
-Based on LibVirt tag v11.5.0
+Based on LibVirt tag v11.6.0
 
 =head1 SYNOPSIS
 

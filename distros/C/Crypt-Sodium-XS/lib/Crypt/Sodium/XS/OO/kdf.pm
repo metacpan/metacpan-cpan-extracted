@@ -177,7 +177,7 @@ gives a limited range of use (application-specific strings might be likely to
 have the same first 8 bytes), it is recommended to use an arbitrary-length
 string as the input to a hash function (e.g.,
 L<Crypt::Sodium::XS::generichash/generichash> or
-L<Crypt::Sodium::XS::shorthash/shorthash>) and use the output has as
+L<Crypt::Sodium::XS::shorthash/shorthash>) and use the output hash as
 C<$context>.
 
 =head2 keygen

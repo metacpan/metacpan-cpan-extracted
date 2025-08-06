@@ -260,7 +260,7 @@ Defined by libsodium to be 0.
 
 =head2 KEYBYTES
 
-Returns the size, in bytes of a secret key (both PRK and subkey).
+Returns the size, in bytes, of a secret key (both PRK and subkey).
 
 =head1 MULTI-PART INTERFACE
 

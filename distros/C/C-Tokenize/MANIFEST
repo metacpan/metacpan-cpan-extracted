@@ -16,6 +16,7 @@ t/C-Tokenize.t
 t/cvar-re.t
 t/function-args.t
 t/include.t
+t/string.t
 t/strip-comments.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,4 +1,6 @@
-# Copyright (c) 2004 Peter Marschall <peter@adpm.de>. All rights reserved.
+# Copyright (c) 2004-2006 Peter Marschall <peter@adpm.de>.
+# Copyright (c) 2025 Aditya Garg <gargaditya08@live.com>.
+# All rights reserved.
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 
@@ -8,7 +10,7 @@ Authen::SASL::Perl -- Perl implementation of the SASL Authentication framework
 
 =head1 VERSION
 
-version 2.1800
+version 2.1900
 
 =head1 SYNOPSIS
 
@@ -100,6 +102,14 @@ in clear over the wire.
 Thus this mechanism should not be used without adequate security
 protection.
 
+=item OAUTHBEARER
+
+It is one of the methods for OAuth2.0 based authentication.
+Instead of a password, an OAUTHBEARER string is passed in a
+specific format, described in RFC5801 and RFC7628
+
+It is a newer and more secure method of authentication since it
+relies on tokens that have a limited lifespan.
 
 =item PLAIN
 
@@ -109,6 +119,18 @@ username and clear-text password combinations in SASL environments.
 
 Like LOGIN it sends the credentials in clear over the network
 and should not be used without sufficient security protection.
+
+=item XOAUTH2
+
+It is one of the methods for OAuth2.0 based authentication.
+It has been developed by Google but is used by other email providers
+like Outlook as well.
+Instead of a password, an XOAUTH2 string is passed in a
+specific format. It is documented by Google on:
+https://developers.google.com/workspace/gmail/imap/xoauth2-protocol
+
+It is a newer and more secure method of authentication since it
+relies on tokens that have a limited lifespan.
 
 =back
 
@@ -139,11 +161,19 @@ L<Authen::SASL::Perl::DIGEST_MD5>,
 L<Authen::SASL::Perl::EXTERNAL>,
 L<Authen::SASL::Perl::GSSAPI>,
 L<Authen::SASL::Perl::LOGIN>,
-L<Authen::SASL::Perl::PLAIN>
+L<Authen::SASL::Perl::OAUTHBEARER>,
+L<Authen::SASL::Perl::PLAIN>,
+L<Authen::SASL::Perl::XOAUTH2>
 
 =head1 AUTHOR
 
 Peter Marschall <peter@adpm.de>
+
+=head1 CONTRIBUTORS
+
+Aditya Garg <gargaditya08@live.com>
+
+Robert Rothenberg
 
 Please report any bugs, or post any suggestions, to the perl-ldap mailing list
 <perl-ldap@perl.org>
@@ -151,6 +181,9 @@ Please report any bugs, or post any suggestions, to the perl-ldap mailing list
 =head1 COPYRIGHT
 
 Copyright (c) 2004-2006 Peter Marschall.
+
+Copyright (c) 2025 Aditya Garg.
+
 All rights reserved. This document is distributed, and may be redistributed,
 under the same terms as Perl itself.
 

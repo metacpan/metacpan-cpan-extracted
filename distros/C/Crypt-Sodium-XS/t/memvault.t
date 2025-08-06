@@ -47,6 +47,11 @@ for my $mv_data (@mv_datas) {
   ok($mv->is_locked, "mv_new locked by default");
   is($mv->size, length($mv_data), "mv_new correct length");
   is($mv->unlock->to_bytes, $mv_data, "mv_new constructor correct bytes");
+  $mv = mv_from_hex(unpack("H*", $mv_data));
+  isa_ok($mv, "Crypt::Sodium::XS::MemVault");
+  ok($mv->is_locked, "new_from_hex locked by default");
+  is($mv->size, length($mv_data), "new_from_hex correct length");
+  is($mv->unlock->to_bytes, $mv_data, "new_from_hex correct bytes");
   $mv = mv_from_base64(encode_base64($mv_data), BASE64_VARIANT_ORIGINAL);
   isa_ok($mv, "Crypt::Sodium::XS::MemVault");
   ok($mv->is_locked, "new_from_base64 locked by default");

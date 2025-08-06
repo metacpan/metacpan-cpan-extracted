@@ -250,10 +250,22 @@ SV * new_from_fd(SV * class, SV * file, STRLEN len = 0, SV * flags = &PL_sv_unde
       break;
   }
 
+  /* naive heuristic whether it's worth re-allocating */
+  if (bufsize - b > MEMVAULT_READ_BUFSIZE) {
+    resize_pm = protmem_clone(aTHX_ new_pm, b);
+    protmem_free(aTHX_ new_pm);
+    if (resize_pm == NULL) {
+      if (ix == 1)
+        close(fd);
+      croak("new_from_fd|file: Failed to allocate final resize protmem");
+    }
+    new_pm = resize_pm;
+  }
+
   if (ix == 1)
     if (close(fd) < 0) {
       protmem_free(aTHX_ new_pm);
-      croak("new_from_fd|file: %s: close error %d", path_buf, errno);
+      croak("new_from_file: %s: close error %d", path_buf, errno);
     }
 
   if (protmem_release(aTHX_ new_pm, PROTMEM_FLAG_MPROTECT_RW) != 0) {

@@ -12,11 +12,10 @@ class ChordPro::Wx::SongbookExportPanel
 use Wx qw[:everything];
 use Wx::Locale gettext => "_T";
 
-use ChordPro::Utils qw(is_macos);
+use ChordPro::Files;
 use ChordPro::Wx::Config;
 use ChordPro::Wx::Utils;
 
-use Encode qw( decode_utf8 encode_utf8 );
 use File::LoadLines;
 use File::Basename;
 
@@ -54,6 +53,12 @@ method refresh() {
     $self->update_menubar( M_SONGBOOK );
 
     $state{have_webview} = ref($self->{webview}) eq 'Wx::WebView';
+
+    # Flush pending messages.
+    if ( $state{msgs} ) {
+	$self->log( 'I', $_ ) for @{$state{msgs}};
+	$state{msgs} = [];
+    }
     $self->log( 'I', "Using " .
 		( $state{have_webview}
 		  ? "embedded" : "external") . " PDF viewer" );
@@ -67,7 +72,7 @@ method refresh() {
     $self->{cb_stdcover}->SetValue($state{sbe_stdcover} // 1);
     $self->OnStdCoverChecked();
 
-    if ( $state{sbe_folder} && -d $state{sbe_folder} ) {
+    if ( $state{sbe_folder} && fs_test( d => $state{sbe_folder} ) ) {
 	$self->{dp_folder}->SetPath($state{sbe_folder});
 	$self->log( 'I', "Using folder " . $state{sbe_folder} );
 	$self->OnDirPickerChanged(undef);
@@ -149,13 +154,13 @@ method preview( $args, %opts ) {
 
     if ( $self->{cb_stdcover}->IsChecked ) {
 	push( @args, "--title",
-	      encode_utf8($self->{t_exporttitle}->GetValue // "") );
+	      $self->{t_exporttitle}->GetValue // "" );
 	if ( my $stitle = $self->{t_exportstitle}->GetValue ) {
-	    push( @args, "--subtitle", encode_utf8($stitle) );
+	    push( @args, "--subtitle", $stitle );
 	}
     }
     elsif ( my $cover = $self->{fp_cover}->GetPath ) {
-	push( @args, "--cover", encode_utf8($cover) );
+	push( @args, "--cover", $cover );
     }
     $self->prv->preview( \@args, %opts );
     $self->previewtooltip;
@@ -200,26 +205,23 @@ sub OnDirPickerChanged {
 	return;
     };
 
-    my @files;
-    my $src = "folder";
-    use File::Find qw(find);
     my $recurse = $self->{cb_recursive}->IsChecked;
-    find sub {
-	if ( -s && m/^[^.].*\.(cho|crd|chopro|chord|chordpro|pro)$/ ) {
-	    push( @files, $File::Find::name );
-	}
-	if ( -d && $File::Find::name ne $folder ) {
-	    $File::Find::prune = !$recurse;
-	    $self->{cb_recursive}->Enable;
-	}
-    }, $folder;
-    @files = map { decode_utf8( s;^\Q$folder\E/?;;r) } sort @files;
+    my $opts =
+      { filter => qr/^[^.].*\.(cho|crd|chopro|chord|chordpro|pro)$/i,
+	recurse => $recurse };
+    my $files = fs_find( $folder, $opts );
 
-    my $n = scalar(@files);
+    my $src = "folder";
+    my $n = scalar(@$files);
     my $msg = "Found $n ChordPro file" . ( $n == 1 ? "" : "s" ) . " in $src" .
       ( $self->{cb_recursive}->IsChecked ? "s" : "" );
     $self->{l_info}->SetLabel($msg);
     $self->log( 'S', $msg );
+    $self->{cb_recursive}->Enable( $opts->{subfolders} );
+
+    my @files = sort
+      map { $_->{name} =~ s;^\Q$folder\E/?;;; $_->{name} }
+      @$files;
 
     $self->{w_rearrange}->Set(\@files);
     $self->{w_rearrange}->Check($_,1) for 0..$#files;

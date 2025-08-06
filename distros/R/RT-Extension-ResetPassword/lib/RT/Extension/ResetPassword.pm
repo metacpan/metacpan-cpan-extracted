@@ -5,9 +5,7 @@ use warnings;
 
 use Digest::SHA qw(sha256_hex);
 
-our $VERSION = '1.12';
-
-RT->AddStyleSheets("resetpassword.css");
+our $VERSION = '2.00';
 
 sub CreateToken {
     my $user = shift;
@@ -102,7 +100,7 @@ and disable self-service features.
 
 =head1 RT VERSION
 
-Works with RT 4.0, 4.2, 4.4, 5.0
+Works with RT 6.0. For previous versions of RT install the latest 1.* version.
 
 =head1 INSTALLATION
 
@@ -116,24 +114,6 @@ Works with RT 4.0, 4.2, 4.4, 5.0
 
 May need root permissions
 
-=item Install Patches
-
-This is to enable searches for users with a password set.
-
-For RT 5 prior to 5.0.2, apply this:
-
-    patch -p1 -d /opt/rt5 < patches/user-admin-callbacks.patch
-
-For RT 4.4.4, apply this:
-
-    patch -p1 -d /opt/rt4 < patches/4.4.4-user-admin-callbacks.patch
-
-For RT 4 prior to 4.4.4, apply this:
-
-    patch -p1 -d /opt/rt4 < patches/4-user-admin-callbacks.patch
-
-See below for details.
-
 =item C<make initdb>
 
 Only run this the first time you install this module.
@@ -144,39 +124,19 @@ in your database.
 If you are upgrading this module, check for upgrading instructions
 in case changes need to be made to your database.
 
-=item Edit your F</opt/rt4/etc/RT_SiteConfig.pm>
+=item Edit your F</opt/rt6/etc/RT_SiteConfig.pm>
 
-If you are using RT 4.2 or greater, add this line:
+Add this line:
 
     Plugin('RT::Extension::ResetPassword');
 
-For RT 4.0, add this line:
-
-    Set(@Plugins, qw(RT::Extension::ResetPassword));
-
-or add C<RT::Extension::ResetPassword> to your existing C<@Plugins> line.
-
 =item Clear your mason cache
 
-    rm -rf /opt/rt4/var/mason_data/obj
+    rm -rf /opt/rt6/var/mason_data/obj
 
 =item Restart your webserver
 
 =back
-
-=head1 UPGRADING
-
-If you are upgrading from version 0.05, you will need to run C<make
-initdb> as documented in L<INSTALLATION> to install the Template used by
-this Extension.
-
-To run on RT 4.0 or 4.2, replace this line in the template:
-
-    { RT::Interface::Web::RequestENV('REMOTE_ADDR') }
-
-with this:
-
-    { $ENV{'REMOTE_ADDR'} }
 
 =head1 CONFIGURATION
 
@@ -292,7 +252,7 @@ or via the web at
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2012-2020 by Best Practical Solutions, LLC
+This software is Copyright (c) 2012-2025 by Best Practical Solutions, LLC
 
 This is free software, licensed under:
 

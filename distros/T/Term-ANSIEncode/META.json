@@ -40,6 +40,7 @@
             "List::Util" : "1.20",
             "Term::ANSIColor" : "0",
             "Term::ANSIScreen" : "0",
+            "Text::Wrap::Smart" : "0",
             "Time::HiRes" : "0",
             "charnames" : "0",
             "perl" : "5.020"
@@ -47,6 +48,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.17",
+   "version" : "1.19",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

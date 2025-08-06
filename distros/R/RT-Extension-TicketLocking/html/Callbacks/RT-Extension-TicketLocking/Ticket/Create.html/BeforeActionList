@@ -1,0 +1,8 @@
+<%INIT>
+my $ticket;
+if ( $ARGS{ARGSRef}->{Split} ) {
+    $ticket = RT::Ticket->new( $session{CurrentUser} );
+    $ticket->Load( $ARGS{ARGSRef}->{Split} );
+}
+$m->comp('/Elements/ShowLock', Ticket => $ticket, %{$ARGS{ARGSRef}});
+</%INIT>

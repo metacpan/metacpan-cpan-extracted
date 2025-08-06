@@ -17,6 +17,8 @@ use File::Temp ();
 use File::LoadLines;
 use feature 'state';
 
+use ChordPro::Files;
+use ChordPro::Paths;
 use ChordPro::Utils;
 use Text::ParseWords qw(shellwords);
 
@@ -33,7 +35,7 @@ sub ly2svg( $self, %args ) {
     my $svg  = File::Spec->catfile( $td, "tmp${imgcnt}.svg" );
 
     my $fd;
-    unless ( open( $fd, '>:utf8', $src ) ) {
+    unless ( $fd = fs_open( $src, '>:utf8' ) ) {
 	warn("Error in Lilypond embedding: $src: $!\n");
 	return;
     }
@@ -100,7 +102,8 @@ sub ly2svg( $self, %args ) {
 	$pw = $kv->{width};
     }
 
-    state $lilypond = findexe( "lilypond", "silent" );
+    my $program = $config->{delegates}->{ly}->{program} || "lilypond";
+    state $lilypond = CP->findexe( $program, silent => 1 );
     unless ( $lilypond ) {
 	warn("Error in Lilypond embedding: missing 'lilypond' tool.\n");
 	return;
@@ -117,12 +120,12 @@ sub ly2svg( $self, %args ) {
 	warn( sprintf( "Error in Lilypond embedding (ret = 0x%x)\n", $ret ) );
 	return;
     }
-    if ( ! -s "$im1.cropped.svg" ) {
+    if ( !fs_test( s => "$im1.cropped.svg" ) ) {
 	warn("Error in Lilypond embedding (no output?)\n");
 	return;
     }
 
-    warn("SVG: ", -s $svg, " bytes\n") if $config->{debug}->{ly};
+    warn("SVG: ", fs_test( s => $svg ), " bytes\n") if $config->{debug}->{ly};
     my $scale;
     my $design_scale;
     if ( $kv->{scale} != 1 ) {

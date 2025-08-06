@@ -358,8 +358,8 @@ Returns a nonce of L</NPUBBYTES> bytes.
 B<NOTE>: chacha20poly1305 and aes256gcm should *not* be used with only random
 nonces, as they have a short nonce and collisions are a risk. For those
 primitives, you can still generate a random nonce with this function, but you
-should then use L<Crypt::Sodium::XS/sodium_increment> to get a new nonce for
-each message.
+should then use L<Crypt::Sodium::XS::Util/sodium_increment> to get a new nonce
+for each message.
 
 =head2 ABYTES
 
@@ -381,7 +381,7 @@ Returns the size, in bytes, of a secret key.
 
   my $message_max_size = $aead->MESSAGEBYTES_MAX;
 
-Returns the size, in bytes, of the maximum size of any message to be encrypted.
+Returns the maxmimum size, in bytes, of any message to be encrypted.
 
 =head2 NPUBBYTES
 

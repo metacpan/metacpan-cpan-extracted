@@ -14,33 +14,40 @@ use Pod::Elemental::Element::Nested;
 use Pod::Elemental::Element::Pod5::Command;
 use Pod::Elemental::Element::Pod5::Ordinary;
 use Pod::Elemental::Element::Pod5::Region;
-use Types::Common qw( NonEmptySimpleStr SimpleStr );
+use Types::Common qw( Bool NonEmptySimpleStr SimpleStr );
 
 use experimental qw( lexical_subs postderef signatures );
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.1.2';
+our $VERSION = 'v0.4.1';
 
 
 has header => (
-    is      => 'lazy',
+    is      => 'rw',
     isa     => NonEmptySimpleStr,
     default => 'REQUIREMENTS',
 );
 
 
 has region => (
-    is      => 'lazy',
+    is      => 'rw',
     isa     => SimpleStr,
     default => '',
 );
 
 
 has metafile => (
-    is      => 'lazy',
+    is      => 'rw',
     isa     => SimpleStr,
     default => 'cpanfile',
+);
+
+
+has all_modules => (
+    is      => 'rw',
+    isa     => Bool,
+    default => 0,
 );
 
 sub weave_section( $self, $document, $input ) {
@@ -50,6 +57,10 @@ sub weave_section( $self, $document, $input ) {
     unless ($zilla) {
         $self->log_fatal("missing zilla argument");
         return;
+    }
+
+    if ( my $stash = $zilla ? $zilla->stash_named('%PodWeaver') : undef ) {
+        $stash->merge_stashed_config($self);
     }
 
     my $runtime = $zilla->prereqs->as_string_hash->{runtime}{requires};
@@ -151,17 +162,24 @@ Pod::Weaver::Section::Requirements - generate POD with the runtime requirements
 
 =head1 VERSION
 
-version v0.1.2
+version v0.4.1
 
 =for stopwords metafile
 
 =head1 SYNOPSIS
 
-In the F<weaver.ini>
+In the F<weaver.ini>:
 
     [Requirements]
     header = REQUIREMENTS
     region = :readme
+
+Or in the F<dist.ini> for L<Dist::Zilla>:
+
+    [PodWeaver]
+    [%PodWeaver]
+    Requirements.header = REQUIREMENTS
+    Requirements.region = :readme
 
 =head1 DESCRIPTION
 
@@ -184,6 +202,12 @@ to make the region available for L<Dist::Zilla::Plugin::UsefulReadme> or L<Pod::
 =head2 metafile
 
 A file that lists metadata about prerequisites. It defaults to C<cpanfile>.
+
+=head2 all_modules
+
+When true, this section will be added to all modules in the distribution, and not just the main module.
+
+When false (default), this section will only be added to the main module.
 
 =head1 KNOWN ISSUES
 

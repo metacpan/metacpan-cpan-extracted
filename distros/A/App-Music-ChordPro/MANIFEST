@@ -18,6 +18,7 @@ lib/ChordPro/Delegate/Lilypond.pm
 lib/ChordPro/Delegate/SVG.pm
 lib/ChordPro/Delegate/TextBlock.pm
 lib/ChordPro/Dumper.pm
+lib/ChordPro/Files.pm
 lib/ChordPro/Output/ChordPro.pm
 lib/ChordPro/Output/Common.pm
 lib/ChordPro/Output/Debug.pm
@@ -46,9 +47,6 @@ lib/ChordPro/Wx/FileDirPickerCtrl.pm
 lib/ChordPro/Wx/Main.pm
 lib/ChordPro/Wx/Main.wxg
 lib/ChordPro/Wx/Main_wxg.pm
-lib/ChordPro/Wx/NewSongDialog.pm
-lib/ChordPro/Wx/NewSongDialog.wxg
-lib/ChordPro/Wx/NewSongDialog_wxg.pm
 lib/ChordPro/Wx/PanelRole.pm
 lib/ChordPro/Wx/Preview.pm
 lib/ChordPro/Wx/RenderDialog.pm
@@ -67,6 +65,7 @@ lib/ChordPro/lib/JSON/Relaxed/Parser.pm
 lib/ChordPro/lib/SVGPDF.pm
 lib/ChordPro/lib/SVGPDF/CSS.pm
 lib/ChordPro/lib/SVGPDF/Circle.pm
+lib/ChordPro/lib/SVGPDF/Colour.pm
 lib/ChordPro/lib/SVGPDF/Contrib/Bogen.pm
 lib/ChordPro/lib/SVGPDF/Contrib/PathExtract.pm
 lib/ChordPro/lib/SVGPDF/Defs.pm
@@ -127,6 +126,7 @@ lib/ChordPro/res/config/brandtroemer.json
 lib/ChordPro/res/config/chordii.json
 lib/ChordPro/res/config/chordpro.json
 lib/ChordPro/res/config/config.schema
+lib/ChordPro/res/config/config.tmpl
 lib/ChordPro/res/config/dark.json
 lib/ChordPro/res/config/guitar-br.json
 lib/ChordPro/res/config/guitar-ly.json
@@ -191,8 +191,8 @@ lib/ChordPro/res/icons/wx-toolbar-back.png
 lib/ChordPro/res/icons/wx-toolbar-messages.png
 lib/ChordPro/res/icons/wx-toolbar-preferences.png
 lib/ChordPro/res/icons/wx-toolbar-preview.png
-lib/ChordPro/res/linux/chordpro.desktop
-lib/ChordPro/res/linux/chordpro.metainfo.xml
+lib/ChordPro/res/linux/org.chordpro.desktop
+lib/ChordPro/res/linux/org.chordpro.metainfo.xml
 lib/ChordPro/res/linux/chordpro.xml
 lib/ChordPro/res/linux/setup_desktop.sh
 lib/ChordPro/res/pod/A2Crd.pod
@@ -211,6 +211,7 @@ script/wxchordpro.pl
 t/00_basic.pl
 t/01_prereq.t
 t/02_load.t
+t/10_files.t
 t/100_basic.t
 t/101_directives.t
 t/101_empty.t

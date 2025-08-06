@@ -54,6 +54,7 @@ do { my $x = {
                                    'IPC::Open3' => '0',
                                    'JSON::MaybeXS' => '0',
                                    'Test::CPAN::Meta' => '0',
+                                   'Test::Exception' => '0',
                                    'Test::More' => '0',
                                    'Test::Trap' => '0',
                                    'Test::Vars' => '0'

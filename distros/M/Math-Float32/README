@@ -1,0 +1,9 @@
+#########################
+# Module Math::Float32 #
+#########################
+
+Perl interface to single precision (float, aka _Float32) arithmetic.
+
+Please report any bugs to https://github.com/sisyphus/math-float32/issues.
+
+

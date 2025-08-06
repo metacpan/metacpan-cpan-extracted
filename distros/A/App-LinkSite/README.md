@@ -67,7 +67,7 @@ can contain some of these.
 
 * **service:** The name of the social media network
 * **handle:** The handle you use on this social media network. This can be omitted if it's the same as the default handle you have set in the frontmatter
-* **url:** If the link to your social media account is particularly complex (and I'm looking at you, Mastodon) then you can just put the complete link here
+* **url:** If the link to your social media account is particularly complex (and I'm looking at you, Mastodon), then you can just put the complete link here. In most cases, you can omit this
 
 In many cases, you can just give a list of social media network names.
 
@@ -84,7 +84,7 @@ In many cases, you can just give a list of social media network names.
 This is a list of links that will be displayed below the social media icons.
 
 * **title:** The title to display for the link
-* **subtitle:** An optional subtitle for the link (displayed in smalled type below the title)
+* **subtitle:** An optional subtitle for the link (displayed in smaller type below the title)
 * **link:** The link itself
 * **new:** An optional flag to mark a link as new (`"new": 1`). This will display the link with a red "New" next to it
 

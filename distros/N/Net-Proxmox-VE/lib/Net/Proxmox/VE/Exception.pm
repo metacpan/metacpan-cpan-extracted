@@ -7,7 +7,7 @@ use strict;
 use warnings;
 
 package Net::Proxmox::VE::Exception;
-$Net::Proxmox::VE::Exception::VERSION = '0.41';
+$Net::Proxmox::VE::Exception::VERSION = '0.42';
 
 sub _new {
 
@@ -70,7 +70,7 @@ Net::Proxmox::VE::Exception - Functions for the 'cluster' portion of the API
 
 =head1 VERSION
 
-version 0.41
+version 0.42
 
 =head1 SYNOPSIS
 
@@ -132,7 +132,7 @@ Dean Hamstead <dean@fragfest.com.au>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2025 by Dean Hamstad.
+This software is Copyright (c) 2025 by Dean Hamstead.
 
 This is free software, licensed under:
 

@@ -1,0 +1,164 @@
+
+=pod
+
+=head1 NAME
+
+ Math::Float32 - perl interface to float (aka _Float32) floating point type.
+
+=head1 DESCRIPTION
+
+ Perform single precision (float) floating point arithmetic in perl.
+
+=head1 SYNOPSIS
+
+ Values can be assigned either as an IV (42), a PV ("1.41416456"), or
+ NV (1.41416456). The values held within a Math::Float32 object can be
+ interpolated by double-quoting the object :
+
+ my $val = '1.41416789012';
+ my $obj = Math::Float32->new($val);
+ print "$obj\n"; # prints 1.41416788.
+
+ All input values are effectively cast to a  float value, rounded
+ to nearest, with ties to even.
+
+ NOTE !!!!!!! :
+  If you want to assign a specific value (eg 1.96500000000000014e2)
+  it is better to assign it as a PV. It will then be rounded only
+  once to a  float. If you first assign that value to something else
+  (eg an NV), and then assign it to a Math::Float32 object, the
+  value can be rounded twice - firstly to an NV, and then rounded
+  again to a float.
+
+ The  float has 24 bits of precision.
+ Maximum finite value is 3.40282347e+38.
+ Minimum positive non-zero value is 1.40129846e-45.
+
+ In the below documentation, "$obj" refers to a Math::Float32 object,
+ "$iv" refers to an IV, "$nv" refers to an NV, and "$str" refers to a
+ string (PV), "$val" refers to a value in the form of one of the
+ preceding types.
+
+=head1 ASSIGNMENT FUNCTIONS
+
+    $obj = Math::Float32->new([$val]);
+    $obj = new([$val]);
+     Set $obj to a Math::Float32 object with value $val.
+     If $val is not provided, the $obj has the value NaN.
+     $val cab be an IV (integer), an NV (perl float), a PV or a
+     Math::Float32 object.
+
+     See the SYNOPSIS section (above) for some elaboration,
+     If necessay, $val will be rounded (to nearest, ties to even)
+     to fit into the single precision float type.
+
+    flt_set($obj, $val);
+     Set the value of $obj to the value specified by $val (rounded
+     to nearest, ties to even if necessary.)
+     $val can be any one of the types that new() accepts.
+
+    flt_set_nan($obj);
+     Set the value of $obj to NaN.
+
+    flt_set_inf($obj, $iv);
+     If $iv is greater than or equal to 0, then set $obj to +Inf.
+     Else set $obj to -Inf.
+
+    flt_set_zero($obj, $iv);
+     If $iv is greater than or equal to 0, then set $obj to 0.
+     Else set $obj to -0.
+
+=head1 ARITHMETIC
+
+ Arithmetic operations can be performed on a Math::Float32 object
+ by either IVs, NVs, PVs or other Math::Float32 objects.
+ The IV/NV/PV operands will first be converted to a single
+ precision value (rounded to nearest, ties to even).
+
+ All arithmetic is done via the overloading of the
+ '+', '-', '*', '/', '%', '**'/, '+=', '-=', '*=', '/=', '%=',
+ and '**=' operators.
+ The '%' and '%=' overloading calls the fmod function.
+
+ The 'log', 'exp', 'sqrt', 'abs' and 'int' functions are also
+ overloaded.
+
+=head1 COMPARISON
+
+ The following comparison operators are also overloaded :
+ '==', '!=', '>', '>=', '<', '<=' and '<=>'
+
+ Also, the following boolean operations:
+  '!' and 'bool'
+
+=head1 OUTPUT FUNCTIONS
+
+    $str = "$obj";
+     Set $str to the value of $obj in decimal scientific
+     notation (eg 1.234e-2). If this string is passed as
+     the argument to Math::Float32->new(), then the
+     returned object will hold the identical value to the
+     object from which the string was retrieved.  That is,
+     the condition:
+       (Math::Float32->new("$obj") == $obj)
+     will always be true (unless $obj is NaN, of course).
+
+    print $obj;
+    print "$obj";
+     Either form will display the string returned by the
+     interpolating of $obj.
+
+   $str = unpack_flt_hex($obj);
+    Unpack the  float encoding of the value held by $obj as a string
+    of hex characters.
+    For example, unpack 0, denorm min and +Inf:
+      print unpack_flt_hex(Math::Float32->new(0));         # 00000000
+      print unpack_flt_hex(Math::Float32->new('-0'));      # 80000000
+      print unpack_flt_hex(Math::Float32->new(2) ** -149); # 00000001
+      print unpack_flt_hex(Math::Float32->new(2) ** 128);  # 7F800000
+
+=head1 MISCELLANEOUS FUNCTIONS
+
+    $iv = is_flt_nan($obj);
+     Return 1 if the object holds a NaN. Else return 0.
+
+    $iv = is_flt_inf($obj);
+     Return 1 if the object holds a +Inf.
+     Return -1 if the object holds a -Inf.
+     Otherwise return 0.
+
+    $iv = is_flt_zero($obj);
+     Return 1 if the object holds a zero that is not -0.
+     Return -1 if the object holds a -0.
+     Otherwise return 0.
+
+   $nv = flt_to_NV($obj);
+    Return the value of $obj as an NV.
+    $nv then holds exactly the same value as $obj.
+
+   flt_nextabove($obj);
+    Increments the value in $obj by the smallest possible positive,
+    non-zero amount.
+
+   flt_nextbelow($obj);
+    Decrements the value in $obj by the smallest possible positive,
+    non-zero amount.
+
+   $iv = flt_signbit($obj);
+    Return 1 if the sign bit of $obj is set.
+    Else return 0.
+    If the sign bit is set, then the value held is either -NaN, -0,
+    or less than zero.
+    Otherwise, the value held is either NaN, 0, or greater than 0.
+
+=head1 LICENSE
+
+    This program is free software; you may redistribute it and/or
+    modify it under the same terms as Perl itself.
+    Copyright 2025 Sisyphus.
+
+=head1 AUTHOR
+
+    Sisyphus <sisyphus at(@) cpan dot (.) org>
+
+=cut

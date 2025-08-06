@@ -138,4 +138,23 @@ diag(Data::Dumper->new([get_params('string', \'Hello World')])->Dump()) if($ENV{
 
 ok(!defined(get_params(undef, undef)));
 
+{
+	package MyClass2;
+	use Params::Get qw(get_params);
+
+	sub new {
+		my $class = shift;
+		return bless {}, $class;
+	}
+
+	sub method {
+		my $self = shift;
+		my $params = get_params('bar', \@_);
+	}
+}
+
+$obj = MyClass2->new();
+throws_ok(sub { $obj->method() }, qr/Usage/, 'no args dies');
+lives_ok(sub { $obj->method('bar' => []) }, 'can pass in an empty array');
+
 done_testing();

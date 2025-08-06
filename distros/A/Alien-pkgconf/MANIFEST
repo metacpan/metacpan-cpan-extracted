@@ -1,5 +1,4 @@
 .github/workflows/linux.yml
-.github/workflows/macos.yml
 Changes
 INSTALL
 lib/Alien/pkgconf.pm

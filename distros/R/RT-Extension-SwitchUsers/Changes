@@ -1,5 +1,8 @@
 Revision history for RT-Extension-SwitchUsers
 
+1.00 2025-08-05
+ - Support RT 6
+
 0.08 2025-01-15
  - Add the missing acl.Pg to fix permission issue of new table
 

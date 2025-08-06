@@ -44,6 +44,22 @@ None, really. This is for testing.
 
 E. Xavier Ample <example@example.org>
 
+=begin :readme
+
+=head1 prepend:INSTALLATION
+
+This is something for before the installation.
+
+=end :readme
+
+=begin :readme
+
+=head1 append:INSTALLATION
+
+This is something that is after the installation.
+
+=end :readme
+
 =cut
 
 sub something() {
@@ -66,5 +82,9 @@ ok $file->exists, $file->basename . " exists";
 ok my $text = $file->slurp_raw, "has content";
 
 note $text;
+
+like $text, qr/INSTALLATION\n+\s*This is something for before the installation.\n/, "prepend";
+
+like $text, qr/\s*This is something that is after the installation.\n+AUTHOR\n/, "append";
 
 done_testing;

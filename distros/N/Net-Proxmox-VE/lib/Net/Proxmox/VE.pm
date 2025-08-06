@@ -7,7 +7,7 @@ use strict;
 use warnings;
 
 package Net::Proxmox::VE;
-$Net::Proxmox::VE::VERSION = '0.41';
+$Net::Proxmox::VE::VERSION = '0.42';
 use HTTP::Headers;
 use HTTP::Request::Common qw(GET POST DELETE);
 use JSON::MaybeXS         qw(decode_json);
@@ -511,7 +511,7 @@ Net::Proxmox::VE - Pure Perl API for Proxmox Virtual Environment
 
 =head1 VERSION
 
-version 0.41
+version 0.42
 
 =head1 SYNOPSIS
 
@@ -776,7 +776,7 @@ Dean Hamstead <dean@fragfest.com.au>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2025 by Dean Hamstad.
+This software is Copyright (c) 2025 by Dean Hamstead.
 
 This is free software, licensed under:
 

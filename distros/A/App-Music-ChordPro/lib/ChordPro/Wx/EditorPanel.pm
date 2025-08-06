@@ -12,13 +12,14 @@ class ChordPro::Wx::EditorPanel
 use Wx qw[:everything];
 use Wx::Locale gettext => '_T';
 
-use ChordPro::Utils qw( is_macos );
+use ChordPro::Files;
 use ChordPro::Wx::Config;
 use ChordPro::Wx::Utils;
-use ChordPro::Utils qw( max demarkup is_macos is_msw plural );
+use ChordPro::Utils qw( max demarkup plural );
 use ChordPro::Paths;
 
 use File::Basename;
+use File::LoadLines;
 
 # WhoamI
 field $panel :accessor = "editor";
@@ -57,6 +58,11 @@ method refresh() {
 
     $self->update_menubar( M_EDITOR );
 
+    # Flush pending messages.
+    if ( $state{msgs} ) {
+	$self->log( 'I', $_ ) for @{$state{msgs}};
+	$state{msgs} = [];
+    }
     $self->log( 'I', "Using " .
 		( $state{have_stc}
 		  ? "styled" : "basic") . " text editor" );
@@ -97,8 +103,8 @@ method refresh() {
 method openfile( $file, $checked=0, $actual=undef ) {
     $actual //= $file;
 
-    # File tests fail on Windows, so bypass when already checked.
-    unless ( $checked || -f -r $file ) {
+    # Bypass test when already checked. TODO?
+    unless ( $checked || fs_test( 'fr', $file ) ) {
 	$self->log( 'W',  "Error opening $file: $!",);
 	my $md = Wx::MessageDialog->new
 	  ( $self,
@@ -109,7 +115,13 @@ method openfile( $file, $checked=0, $actual=undef ) {
 	$md->Destroy;
 	return;
     }
-    unless ( $self->{t_editor}->LoadFile($file) ) {
+    if ( my $f = fs_load($file) ) {
+	# This has the (desired) sideeffect that all newlines
+	# are now \n .
+	$self->{t_editor}->SetText(join("\n",@$f)."\n");
+	$self->{t_editor}->DiscardEdits;
+    }
+    else {
 	$self->log( 'W',  "Error opening $file: $!",);
 	my $md = Wx::MessageDialog->new
 	  ( $self,
@@ -205,31 +217,15 @@ method newfile( $file = undef ) {
     my $file = $preferences{tmplfile};
     if ( $file && $preferences{enable_tmplfile} ) {
 	$self->log( 'I', "Loading template $file" );
-	if ( -f -r $file && $self->{t_editor}->LoadFile($file) ) {
+	if ( fs_test( fr => $file ) && $self->{t_editor}->LoadFile($file) ) {
 	    $content = "";
 	}
 	else {
 	    $self->log( 'E', "Cannot open template $file: $!" );
 	}
     }
-    elsif ( 1 ) {
-	$content = "{title: $title}";
-    }
     else {
-	require ChordPro::Wx::NewSongDialog;
-	unless ( $self->{d_newfile} ) {
-	    $self->{d_newfile} = ChordPro::Wx::NewSongDialog->new
-	      ( $self, wxID_ANY, $title );
-	    restorewinpos( $self->{d_newfile}, "newfile" );
-	    $self->{d_newfile}->set_title($title);
-	}
-	$self->{d_newfile}->refresh;
-	my $ret = $self->{d_newfile}->ShowModal;
-	savewinpos( $self->{d_newfile}, "newfile" );
-	if ( $ret == wxID_OK ) {
-	    $title = $self->{d_newfile}->get_title;
-	    $content = $self->{d_newfile}->get_meta;
-	}
+	$content = "{title: $title}";
     }
 
     for ( $self->{t_editor} ) {
@@ -308,9 +304,10 @@ method check_source_saved() {
 method save_file( $file = undef ) {
     while ( 1 ) {
 	unless ( defined $file && $file ne "" ) {
+	    my $cf = $state{currentfile} // "Untitled";
 	    my $fd = Wx::FileDialog->new
 	      ($self, _T("Choose output file"),
-	       "", $state{currentfile}//"",
+	       dirname($cf), basename($cf),
 	       "*".$preferences{chordproext},
 	       0|wxFD_SAVE|wxFD_OVERWRITE_PROMPT,
 	       wxDefaultPosition);
@@ -321,17 +318,28 @@ method save_file( $file = undef ) {
 	    $fd->Destroy;
 	}
 	return unless defined $file;
-	if ( $self->{t_editor}->SaveFile($file) ) {
+
+	# On macOS Catalina DMG STC seems to have problems saving.
+	my $fd = fs_open( $file, '>:utf8' );
+	$self->{t_editor}->ConvertEOLs(wxSTC_EOL_LF);
+	my $t = $self->{t_editor}->GetText;
+	# $self->log( 'I', ChordPro::Utils::as($t));
+	$t .= "\n" unless $t =~ /\n$/;
+	if ( $fd
+	     and print $fd $t
+	     and $fd->close ) {
 	    $self->{t_editor}->SetModified(0);
 	    $state{currentfile} = $file;
 	    $state{windowtitle} = $file;
 	    $self->log( 'S',  "Saved: $file" );
+	    use List::Util qw(uniq);
+	    @{$state{recents}} = uniq( $file, @{$state{recents}} );
 	    return;
 	}
 
 	my $md = Wx::MessageDialog->new
 	  ( $self,
-	    "Cannot save to $file",
+	    "Cannot save to $file\n$!",
 	    "Error saving file",
 	    0 | wxOK | wxICON_ERROR);
 	$md->ShowModal;
@@ -351,9 +359,9 @@ method preview( $args, %opts ) {
     # The text that we get from the editor can have CRLF line endings,
     # that on Windows will result in double line ends. Write with
     # 'raw' layer.
-    use Encode 'encode_utf8';
-    if ( open( $fd, '>:raw', $preview_cho )
-	 and print $fd ( encode_utf8($self->{t_editor}->GetText) )
+    require Encode;
+    if ( $fd = fs_open( $preview_cho, '>:raw' )
+	 and print $fd ( Encode::encode_utf8($self->{t_editor}->GetText) )
 	 and close($fd) ) {
 	$self->prv->preview( $args, %opts );
 	$self->previewtooltip;

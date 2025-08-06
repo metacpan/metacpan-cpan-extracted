@@ -86,4 +86,6 @@ ok my $text = $file->slurp_raw, "has content";
 
 note $text;
 
+like $text, qr/^SPORK\n+\s*This should only be visible in the README/m, ":readme section included";
+
 done_testing;

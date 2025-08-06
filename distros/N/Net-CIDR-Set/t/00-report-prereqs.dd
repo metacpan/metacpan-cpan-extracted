@@ -12,7 +12,7 @@ do { my $x = {
                       },
        'develop' => {
                       'requires' => {
-                                      'Dist::Zilla::Plugin::UsefulReadme' => 'v0.1.2',
+                                      'Dist::Zilla::Plugin::UsefulReadme' => 'v0.2.0',
                                       'Pod::Coverage::TrustPod' => '0',
                                       'Pod::Markdown::Github' => '0',
                                       'Software::Security::Policy::Individual' => '0.10',

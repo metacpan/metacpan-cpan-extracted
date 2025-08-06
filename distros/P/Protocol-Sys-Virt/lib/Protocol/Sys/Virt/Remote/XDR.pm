@@ -1,7 +1,7 @@
 ####################################################################
 #
 #     This file was generated using XDR::Parse version v0.3.1,
-#        XDR::Gen version 0.0.5 and LibVirt version v11.5.0
+#        XDR::Gen version 0.0.5 and LibVirt version v11.6.0
 #
 #      Don't edit this file, use the source template instead
 #
@@ -9,7 +9,7 @@
 #
 ####################################################################
 
-package Protocol::Sys::Virt::Remote::XDR v11.5.0;
+package Protocol::Sys::Virt::Remote::XDR v11.6.0;
 
 use constant {
     VIR_TYPED_PARAM_INT     => 1,
@@ -7085,15 +7085,15 @@ sub deserialize_domain_migrate_prepare_args {
     # my ($class, $value, $index, $input) = @_;
     $_[0]->deserialize_string( $_[1]->{dname}, $_[2], $_[3] );
 
-    # Deserializing field: 'resource'
+    # Deserializing field: 'bandwidth'
     # my ($class, $value, $index, $input) = @_;
     die "Input buffer too short"
         if ($input_length - $_[2]) < 8;
-    $_[1]->{resource} = unpack("Q>", substr( $_[3], $_[2] ));
+    $_[1]->{bandwidth} = unpack("Q>", substr( $_[3], $_[2] ));
     $_[2] += 8;
-    die "Out of bounds 'unsigned hyper': $_[1]->{resource}"
-        unless (0 <= $_[1]->{resource}
-                and $_[1]->{resource} <= 18446744073709551615);
+    die "Out of bounds 'unsigned hyper': $_[1]->{bandwidth}"
+        unless (0 <= $_[1]->{bandwidth}
+                and $_[1]->{bandwidth} <= 18446744073709551615);
 }
 # @_: ($class, $value, $index, $output) = @_;
 sub serialize_domain_migrate_prepare_args {
@@ -7126,18 +7126,18 @@ sub serialize_domain_migrate_prepare_args {
     # my ($class, $value, $index, $output) = @_;
     $_[0]->serialize_string( $_[1]->{dname}, $_[2], $_[3] );
 
-    # Serializing field: 'resource'
-    croak "Missing required input value 'resource'"
-        unless exists $_[1]->{resource};
+    # Serializing field: 'bandwidth'
+    croak "Missing required input value 'bandwidth'"
+        unless exists $_[1]->{bandwidth};
     # my ($class, $value, $index, $output) = @_;
     croak "Missing required input 'unsigned long' value"
-        unless defined $_[1]->{resource};
-    die "Out of bounds 'unsigned hyper': $_[1]->{resource}"
-        unless (0 <= $_[1]->{resource}
-                and $_[1]->{resource} <= 18446744073709551615);
-    die "Non-integer 'long' value given: $_[1]->{resource}"
-        unless int($_[1]->{resource}) == $_[1]->{resource};
-    substr( $_[3], $_[2] ) = pack("Q>", $_[1]->{resource});
+        unless defined $_[1]->{bandwidth};
+    die "Out of bounds 'unsigned hyper': $_[1]->{bandwidth}"
+        unless (0 <= $_[1]->{bandwidth}
+                and $_[1]->{bandwidth} <= 18446744073709551615);
+    die "Non-integer 'long' value given: $_[1]->{bandwidth}"
+        unless int($_[1]->{bandwidth}) == $_[1]->{bandwidth};
+    substr( $_[3], $_[2] ) = pack("Q>", $_[1]->{bandwidth});
     $_[2] += 8;
 }
 # @_: ($class, $value, $index, $input) = @_;
@@ -7236,15 +7236,15 @@ sub deserialize_domain_migrate_perform_args {
     # my ($class, $value, $index, $input) = @_;
     $_[0]->deserialize_string( $_[1]->{dname}, $_[2], $_[3] );
 
-    # Deserializing field: 'resource'
+    # Deserializing field: 'bandwidth'
     # my ($class, $value, $index, $input) = @_;
     die "Input buffer too short"
         if ($input_length - $_[2]) < 8;
-    $_[1]->{resource} = unpack("Q>", substr( $_[3], $_[2] ));
+    $_[1]->{bandwidth} = unpack("Q>", substr( $_[3], $_[2] ));
     $_[2] += 8;
-    die "Out of bounds 'unsigned hyper': $_[1]->{resource}"
-        unless (0 <= $_[1]->{resource}
-                and $_[1]->{resource} <= 18446744073709551615);
+    die "Out of bounds 'unsigned hyper': $_[1]->{bandwidth}"
+        unless (0 <= $_[1]->{bandwidth}
+                and $_[1]->{bandwidth} <= 18446744073709551615);
 }
 # @_: ($class, $value, $index, $output) = @_;
 sub serialize_domain_migrate_perform_args {
@@ -7304,18 +7304,18 @@ sub serialize_domain_migrate_perform_args {
     # my ($class, $value, $index, $output) = @_;
     $_[0]->serialize_string( $_[1]->{dname}, $_[2], $_[3] );
 
-    # Serializing field: 'resource'
-    croak "Missing required input value 'resource'"
-        unless exists $_[1]->{resource};
+    # Serializing field: 'bandwidth'
+    croak "Missing required input value 'bandwidth'"
+        unless exists $_[1]->{bandwidth};
     # my ($class, $value, $index, $output) = @_;
     croak "Missing required input 'unsigned long' value"
-        unless defined $_[1]->{resource};
-    die "Out of bounds 'unsigned hyper': $_[1]->{resource}"
-        unless (0 <= $_[1]->{resource}
-                and $_[1]->{resource} <= 18446744073709551615);
-    die "Non-integer 'long' value given: $_[1]->{resource}"
-        unless int($_[1]->{resource}) == $_[1]->{resource};
-    substr( $_[3], $_[2] ) = pack("Q>", $_[1]->{resource});
+        unless defined $_[1]->{bandwidth};
+    die "Out of bounds 'unsigned hyper': $_[1]->{bandwidth}"
+        unless (0 <= $_[1]->{bandwidth}
+                and $_[1]->{bandwidth} <= 18446744073709551615);
+    die "Non-integer 'long' value given: $_[1]->{bandwidth}"
+        unless int($_[1]->{bandwidth}) == $_[1]->{bandwidth};
+    substr( $_[3], $_[2] ) = pack("Q>", $_[1]->{bandwidth});
     $_[2] += 8;
 }
 # @_: ($class, $value, $index, $input) = @_;
@@ -7448,15 +7448,15 @@ sub deserialize_domain_migrate_prepare2_args {
     # my ($class, $value, $index, $input) = @_;
     $_[0]->deserialize_string( $_[1]->{dname}, $_[2], $_[3] );
 
-    # Deserializing field: 'resource'
+    # Deserializing field: 'bandwidth'
     # my ($class, $value, $index, $input) = @_;
     die "Input buffer too short"
         if ($input_length - $_[2]) < 8;
-    $_[1]->{resource} = unpack("Q>", substr( $_[3], $_[2] ));
+    $_[1]->{bandwidth} = unpack("Q>", substr( $_[3], $_[2] ));
     $_[2] += 8;
-    die "Out of bounds 'unsigned hyper': $_[1]->{resource}"
-        unless (0 <= $_[1]->{resource}
-                and $_[1]->{resource} <= 18446744073709551615);
+    die "Out of bounds 'unsigned hyper': $_[1]->{bandwidth}"
+        unless (0 <= $_[1]->{bandwidth}
+                and $_[1]->{bandwidth} <= 18446744073709551615);
 
     # Deserializing field: 'dom_xml'
     # my ($class, $value, $index, $input) = @_;
@@ -7493,18 +7493,18 @@ sub serialize_domain_migrate_prepare2_args {
     # my ($class, $value, $index, $output) = @_;
     $_[0]->serialize_string( $_[1]->{dname}, $_[2], $_[3] );
 
-    # Serializing field: 'resource'
-    croak "Missing required input value 'resource'"
-        unless exists $_[1]->{resource};
+    # Serializing field: 'bandwidth'
+    croak "Missing required input value 'bandwidth'"
+        unless exists $_[1]->{bandwidth};
     # my ($class, $value, $index, $output) = @_;
     croak "Missing required input 'unsigned long' value"
-        unless defined $_[1]->{resource};
-    die "Out of bounds 'unsigned hyper': $_[1]->{resource}"
-        unless (0 <= $_[1]->{resource}
-                and $_[1]->{resource} <= 18446744073709551615);
-    die "Non-integer 'long' value given: $_[1]->{resource}"
-        unless int($_[1]->{resource}) == $_[1]->{resource};
-    substr( $_[3], $_[2] ) = pack("Q>", $_[1]->{resource});
+        unless defined $_[1]->{bandwidth};
+    die "Out of bounds 'unsigned hyper': $_[1]->{bandwidth}"
+        unless (0 <= $_[1]->{bandwidth}
+                and $_[1]->{bandwidth} <= 18446744073709551615);
+    die "Non-integer 'long' value given: $_[1]->{bandwidth}"
+        unless int($_[1]->{bandwidth}) == $_[1]->{bandwidth};
+    substr( $_[3], $_[2] ) = pack("Q>", $_[1]->{bandwidth});
     $_[2] += 8;
 
     # Serializing field: 'dom_xml'
@@ -18016,15 +18016,15 @@ sub deserialize_domain_migrate_prepare_tunnel_args {
     # my ($class, $value, $index, $input) = @_;
     $_[0]->deserialize_string( $_[1]->{dname}, $_[2], $_[3] );
 
-    # Deserializing field: 'resource'
+    # Deserializing field: 'bandwidth'
     # my ($class, $value, $index, $input) = @_;
     die "Input buffer too short"
         if ($input_length - $_[2]) < 8;
-    $_[1]->{resource} = unpack("Q>", substr( $_[3], $_[2] ));
+    $_[1]->{bandwidth} = unpack("Q>", substr( $_[3], $_[2] ));
     $_[2] += 8;
-    die "Out of bounds 'unsigned hyper': $_[1]->{resource}"
-        unless (0 <= $_[1]->{resource}
-                and $_[1]->{resource} <= 18446744073709551615);
+    die "Out of bounds 'unsigned hyper': $_[1]->{bandwidth}"
+        unless (0 <= $_[1]->{bandwidth}
+                and $_[1]->{bandwidth} <= 18446744073709551615);
 
     # Deserializing field: 'dom_xml'
     # my ($class, $value, $index, $input) = @_;
@@ -18055,18 +18055,18 @@ sub serialize_domain_migrate_prepare_tunnel_args {
     # my ($class, $value, $index, $output) = @_;
     $_[0]->serialize_string( $_[1]->{dname}, $_[2], $_[3] );
 
-    # Serializing field: 'resource'
-    croak "Missing required input value 'resource'"
-        unless exists $_[1]->{resource};
+    # Serializing field: 'bandwidth'
+    croak "Missing required input value 'bandwidth'"
+        unless exists $_[1]->{bandwidth};
     # my ($class, $value, $index, $output) = @_;
     croak "Missing required input 'unsigned long' value"
-        unless defined $_[1]->{resource};
-    die "Out of bounds 'unsigned hyper': $_[1]->{resource}"
-        unless (0 <= $_[1]->{resource}
-                and $_[1]->{resource} <= 18446744073709551615);
-    die "Non-integer 'long' value given: $_[1]->{resource}"
-        unless int($_[1]->{resource}) == $_[1]->{resource};
-    substr( $_[3], $_[2] ) = pack("Q>", $_[1]->{resource});
+        unless defined $_[1]->{bandwidth};
+    die "Out of bounds 'unsigned hyper': $_[1]->{bandwidth}"
+        unless (0 <= $_[1]->{bandwidth}
+                and $_[1]->{bandwidth} <= 18446744073709551615);
+    die "Non-integer 'long' value given: $_[1]->{bandwidth}"
+        unless int($_[1]->{bandwidth}) == $_[1]->{bandwidth};
+    substr( $_[3], $_[2] ) = pack("Q>", $_[1]->{bandwidth});
     $_[2] += 8;
 
     # Serializing field: 'dom_xml'
@@ -22948,15 +22948,15 @@ sub deserialize_domain_migrate_begin3_args {
     # my ($class, $value, $index, $input) = @_;
     $_[0]->deserialize_string( $_[1]->{dname}, $_[2], $_[3] );
 
-    # Deserializing field: 'resource'
+    # Deserializing field: 'bandwidth'
     # my ($class, $value, $index, $input) = @_;
     die "Input buffer too short"
         if ($input_length - $_[2]) < 8;
-    $_[1]->{resource} = unpack("Q>", substr( $_[3], $_[2] ));
+    $_[1]->{bandwidth} = unpack("Q>", substr( $_[3], $_[2] ));
     $_[2] += 8;
-    die "Out of bounds 'unsigned hyper': $_[1]->{resource}"
-        unless (0 <= $_[1]->{resource}
-                and $_[1]->{resource} <= 18446744073709551615);
+    die "Out of bounds 'unsigned hyper': $_[1]->{bandwidth}"
+        unless (0 <= $_[1]->{bandwidth}
+                and $_[1]->{bandwidth} <= 18446744073709551615);
 }
 # @_: ($class, $value, $index, $output) = @_;
 sub serialize_domain_migrate_begin3_args {
@@ -22995,18 +22995,18 @@ sub serialize_domain_migrate_begin3_args {
     # my ($class, $value, $index, $output) = @_;
     $_[0]->serialize_string( $_[1]->{dname}, $_[2], $_[3] );
 
-    # Serializing field: 'resource'
-    croak "Missing required input value 'resource'"
-        unless exists $_[1]->{resource};
+    # Serializing field: 'bandwidth'
+    croak "Missing required input value 'bandwidth'"
+        unless exists $_[1]->{bandwidth};
     # my ($class, $value, $index, $output) = @_;
     croak "Missing required input 'unsigned long' value"
-        unless defined $_[1]->{resource};
-    die "Out of bounds 'unsigned hyper': $_[1]->{resource}"
-        unless (0 <= $_[1]->{resource}
-                and $_[1]->{resource} <= 18446744073709551615);
-    die "Non-integer 'long' value given: $_[1]->{resource}"
-        unless int($_[1]->{resource}) == $_[1]->{resource};
-    substr( $_[3], $_[2] ) = pack("Q>", $_[1]->{resource});
+        unless defined $_[1]->{bandwidth};
+    die "Out of bounds 'unsigned hyper': $_[1]->{bandwidth}"
+        unless (0 <= $_[1]->{bandwidth}
+                and $_[1]->{bandwidth} <= 18446744073709551615);
+    die "Non-integer 'long' value given: $_[1]->{bandwidth}"
+        unless int($_[1]->{bandwidth}) == $_[1]->{bandwidth};
+    substr( $_[3], $_[2] ) = pack("Q>", $_[1]->{bandwidth});
     $_[2] += 8;
 }
 # @_: ($class, $value, $index, $input) = @_;
@@ -23101,15 +23101,15 @@ sub deserialize_domain_migrate_prepare3_args {
     # my ($class, $value, $index, $input) = @_;
     $_[0]->deserialize_string( $_[1]->{dname}, $_[2], $_[3] );
 
-    # Deserializing field: 'resource'
+    # Deserializing field: 'bandwidth'
     # my ($class, $value, $index, $input) = @_;
     die "Input buffer too short"
         if ($input_length - $_[2]) < 8;
-    $_[1]->{resource} = unpack("Q>", substr( $_[3], $_[2] ));
+    $_[1]->{bandwidth} = unpack("Q>", substr( $_[3], $_[2] ));
     $_[2] += 8;
-    die "Out of bounds 'unsigned hyper': $_[1]->{resource}"
-        unless (0 <= $_[1]->{resource}
-                and $_[1]->{resource} <= 18446744073709551615);
+    die "Out of bounds 'unsigned hyper': $_[1]->{bandwidth}"
+        unless (0 <= $_[1]->{bandwidth}
+                and $_[1]->{bandwidth} <= 18446744073709551615);
 
     # Deserializing field: 'dom_xml'
     # my ($class, $value, $index, $input) = @_;
@@ -23167,18 +23167,18 @@ sub serialize_domain_migrate_prepare3_args {
     # my ($class, $value, $index, $output) = @_;
     $_[0]->serialize_string( $_[1]->{dname}, $_[2], $_[3] );
 
-    # Serializing field: 'resource'
-    croak "Missing required input value 'resource'"
-        unless exists $_[1]->{resource};
+    # Serializing field: 'bandwidth'
+    croak "Missing required input value 'bandwidth'"
+        unless exists $_[1]->{bandwidth};
     # my ($class, $value, $index, $output) = @_;
     croak "Missing required input 'unsigned long' value"
-        unless defined $_[1]->{resource};
-    die "Out of bounds 'unsigned hyper': $_[1]->{resource}"
-        unless (0 <= $_[1]->{resource}
-                and $_[1]->{resource} <= 18446744073709551615);
-    die "Non-integer 'long' value given: $_[1]->{resource}"
-        unless int($_[1]->{resource}) == $_[1]->{resource};
-    substr( $_[3], $_[2] ) = pack("Q>", $_[1]->{resource});
+        unless defined $_[1]->{bandwidth};
+    die "Out of bounds 'unsigned hyper': $_[1]->{bandwidth}"
+        unless (0 <= $_[1]->{bandwidth}
+                and $_[1]->{bandwidth} <= 18446744073709551615);
+    die "Non-integer 'long' value given: $_[1]->{bandwidth}"
+        unless int($_[1]->{bandwidth}) == $_[1]->{bandwidth};
+    substr( $_[3], $_[2] ) = pack("Q>", $_[1]->{bandwidth});
     $_[2] += 8;
 
     # Serializing field: 'dom_xml'
@@ -23275,15 +23275,15 @@ sub deserialize_domain_migrate_prepare_tunnel3_args {
     # my ($class, $value, $index, $input) = @_;
     $_[0]->deserialize_string( $_[1]->{dname}, $_[2], $_[3] );
 
-    # Deserializing field: 'resource'
+    # Deserializing field: 'bandwidth'
     # my ($class, $value, $index, $input) = @_;
     die "Input buffer too short"
         if ($input_length - $_[2]) < 8;
-    $_[1]->{resource} = unpack("Q>", substr( $_[3], $_[2] ));
+    $_[1]->{bandwidth} = unpack("Q>", substr( $_[3], $_[2] ));
     $_[2] += 8;
-    die "Out of bounds 'unsigned hyper': $_[1]->{resource}"
-        unless (0 <= $_[1]->{resource}
-                and $_[1]->{resource} <= 18446744073709551615);
+    die "Out of bounds 'unsigned hyper': $_[1]->{bandwidth}"
+        unless (0 <= $_[1]->{bandwidth}
+                and $_[1]->{bandwidth} <= 18446744073709551615);
 
     # Deserializing field: 'dom_xml'
     # my ($class, $value, $index, $input) = @_;
@@ -23335,18 +23335,18 @@ sub serialize_domain_migrate_prepare_tunnel3_args {
     # my ($class, $value, $index, $output) = @_;
     $_[0]->serialize_string( $_[1]->{dname}, $_[2], $_[3] );
 
-    # Serializing field: 'resource'
-    croak "Missing required input value 'resource'"
-        unless exists $_[1]->{resource};
+    # Serializing field: 'bandwidth'
+    croak "Missing required input value 'bandwidth'"
+        unless exists $_[1]->{bandwidth};
     # my ($class, $value, $index, $output) = @_;
     croak "Missing required input 'unsigned long' value"
-        unless defined $_[1]->{resource};
-    die "Out of bounds 'unsigned hyper': $_[1]->{resource}"
-        unless (0 <= $_[1]->{resource}
-                and $_[1]->{resource} <= 18446744073709551615);
-    die "Non-integer 'long' value given: $_[1]->{resource}"
-        unless int($_[1]->{resource}) == $_[1]->{resource};
-    substr( $_[3], $_[2] ) = pack("Q>", $_[1]->{resource});
+        unless defined $_[1]->{bandwidth};
+    die "Out of bounds 'unsigned hyper': $_[1]->{bandwidth}"
+        unless (0 <= $_[1]->{bandwidth}
+                and $_[1]->{bandwidth} <= 18446744073709551615);
+    die "Non-integer 'long' value given: $_[1]->{bandwidth}"
+        unless int($_[1]->{bandwidth}) == $_[1]->{bandwidth};
+    substr( $_[3], $_[2] ) = pack("Q>", $_[1]->{bandwidth});
     $_[2] += 8;
 
     # Serializing field: 'dom_xml'
@@ -23449,15 +23449,15 @@ sub deserialize_domain_migrate_perform3_args {
     # my ($class, $value, $index, $input) = @_;
     $_[0]->deserialize_string( $_[1]->{dname}, $_[2], $_[3] );
 
-    # Deserializing field: 'resource'
+    # Deserializing field: 'bandwidth'
     # my ($class, $value, $index, $input) = @_;
     die "Input buffer too short"
         if ($input_length - $_[2]) < 8;
-    $_[1]->{resource} = unpack("Q>", substr( $_[3], $_[2] ));
+    $_[1]->{bandwidth} = unpack("Q>", substr( $_[3], $_[2] ));
     $_[2] += 8;
-    die "Out of bounds 'unsigned hyper': $_[1]->{resource}"
-        unless (0 <= $_[1]->{resource}
-                and $_[1]->{resource} <= 18446744073709551615);
+    die "Out of bounds 'unsigned hyper': $_[1]->{bandwidth}"
+        unless (0 <= $_[1]->{bandwidth}
+                and $_[1]->{bandwidth} <= 18446744073709551615);
 }
 # @_: ($class, $value, $index, $output) = @_;
 sub serialize_domain_migrate_perform3_args {
@@ -23529,18 +23529,18 @@ sub serialize_domain_migrate_perform3_args {
     # my ($class, $value, $index, $output) = @_;
     $_[0]->serialize_string( $_[1]->{dname}, $_[2], $_[3] );
 
-    # Serializing field: 'resource'
-    croak "Missing required input value 'resource'"
-        unless exists $_[1]->{resource};
+    # Serializing field: 'bandwidth'
+    croak "Missing required input value 'bandwidth'"
+        unless exists $_[1]->{bandwidth};
     # my ($class, $value, $index, $output) = @_;
     croak "Missing required input 'unsigned long' value"
-        unless defined $_[1]->{resource};
-    die "Out of bounds 'unsigned hyper': $_[1]->{resource}"
-        unless (0 <= $_[1]->{resource}
-                and $_[1]->{resource} <= 18446744073709551615);
-    die "Non-integer 'long' value given: $_[1]->{resource}"
-        unless int($_[1]->{resource}) == $_[1]->{resource};
-    substr( $_[3], $_[2] ) = pack("Q>", $_[1]->{resource});
+        unless defined $_[1]->{bandwidth};
+    die "Out of bounds 'unsigned hyper': $_[1]->{bandwidth}"
+        unless (0 <= $_[1]->{bandwidth}
+                and $_[1]->{bandwidth} <= 18446744073709551615);
+    die "Non-integer 'long' value given: $_[1]->{bandwidth}"
+        unless int($_[1]->{bandwidth}) == $_[1]->{bandwidth};
+    substr( $_[3], $_[2] ) = pack("Q>", $_[1]->{bandwidth});
     $_[2] += 8;
 }
 # @_: ($class, $value, $index, $input) = @_;
@@ -34683,9 +34683,9 @@ Protocol::Sys::Virt::Remote::XDR - Constants and (de)serializers for remote serv
 
 =head1 VERSION
 
-v11.5.0
+v11.6.0
 
-Based on LibVirt tag v11.5.0
+Based on LibVirt tag v11.6.0
 
 =head1 SYNOPSYS
 

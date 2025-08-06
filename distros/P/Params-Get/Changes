@@ -1,5 +1,11 @@
 Revision history for Params-Get
 
+0.13	Mon Aug  4 16:59:56 EDT 2025
+	Back out 0.12, too much breakage
+
+0.12	Mon Aug  4 14:34:29 EDT 2025
+	Params::Get::get_params('list', []) now returns empty array
+
 0.11	Mon Jul 28 07:41:24 EDT 2025
 	get_params(undef, undef) now returns undef
 

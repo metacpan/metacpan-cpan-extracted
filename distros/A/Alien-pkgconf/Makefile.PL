@@ -32,7 +32,7 @@ my %args = (
     'Test::Alien'  => '0.08',
   },
   BUILD_REQUIRES => {
-    'HTTP::Tiny'           => '0.044',
+    'HTTP::Tiny'           => '0.055',
     'Archive::Tar'         => '2.24',
     'JSON::PP'             => '2.27400',
     # as of 1.2.1 upstream provides .gz

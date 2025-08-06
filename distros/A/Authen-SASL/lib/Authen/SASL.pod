@@ -4,7 +4,7 @@ Authen::SASL - SASL Authentication framework
 
 =head1 VERSION
 
-version 2.1800
+version 2.1900
 
 =head1 SYNOPSIS
 
@@ -202,7 +202,7 @@ succeeded by calling this method which returns a boolean value.
 
 There are three different ways in which a callback may be passed
 
-=over
+=over 4
 
 =item CODEREF
 
@@ -239,12 +239,12 @@ Graham Barr <gbarr@pobox.com>
 =head1 BUGS
 
 Please report any bugs, or any suggestions, in the GitHub project at
-L<https://github.com/gbarr/perl-authen-sasl/issues>.
+L<https://github.com/perl-authen-sasl/perl-authen-sasl/issues>.
 
 
 =head1 COPYRIGHT
 
-  Copyright (c) 2023 Erik Huelsmann
+  Copyright (c) 2023-2025 Erik Huelsmann
   Copyright (c) 1998-2005 Graham Barr.
 
 All rights reserved. This program is

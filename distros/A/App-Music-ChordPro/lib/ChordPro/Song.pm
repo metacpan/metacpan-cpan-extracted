@@ -13,6 +13,7 @@ use strict;
 use warnings;
 
 use ChordPro;
+use ChordPro::Files;
 use ChordPro::Paths;
 use ChordPro::Chords;
 use ChordPro::Chords::Appearance;
@@ -168,7 +169,7 @@ sub parse_song {
 	    for ( "prp", "json" ) {
 		( my $cf = $diag->{file} ) =~ s/\.\w+$/.$_/;
 		$cf .= ".$_" if $cf eq $diag->{file};
-		next unless -s $cf;
+		next unless fs_test( s => $cf );
 		warn("Config[song]: $cf\n") if $options->{verbose};
 		my $have = ChordPro::Config::get_config($cf);
 		push( @configs, $have->prep_configs($cf) );
@@ -1693,7 +1694,7 @@ sub dir_image {
 	    $opts{lc($k)} = $v;
 	}
 	elsif ( $k =~ /^(anchor)$/i
-		&& $v =~ /^(paper|page|column|float|line)$/ ) {
+		&& $v =~ /^(paper|page|allpages|column|float|line)$/ ) {
 	    $opts{lc($k)} = lc($v);
 	}
 	elsif ( $k =~ /^(align)$/i
@@ -2628,25 +2629,6 @@ sub dump {
 	}
     }
     ::dump($a);
-}
-
-unless ( caller ) {
-    require DDumper;
-    binmode STDERR => ':utf8';
-    ChordPro::Config::configurator();
-    my $s = ChordPro::Song->new;
-    $options->{settings}->{transpose} = 0;
-    for ( @ARGV ) {
-	if ( /^[a-z]/ ) {
-	    $options->{settings}->{transcode} = $_;
-	    next;
-	}
-#	DDumper::DDumper( $s->parse_chord($_) );
-	my ( undef, $i ) = $s->parse_chord($_);
-	warn("$_ => ", $i->name, " => ", $s->add_chord($i, $i->name eq 'D'), "\n" );
-	$xpose++;
-    }
-    DDumper::DDumper($s->{chordsinfo});
 }
 
 1;

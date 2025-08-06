@@ -1,5 +1,8 @@
 Revision history for perl Net::Proxmox::VE
 
+0.42 2025-08-03
+- Add Test::Exception to build requirements (GH#33)
+
 0.41 2025-08-03
 - Add PVE API Token support
 - Renamed ENV variable for live testing to PROXMOX_USERPASS_TEST_URI

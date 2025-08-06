@@ -4,6 +4,7 @@ use v5.26;
 
 package ChordPro;
 
+use ChordPro::Files;
 use ChordPro::Utils;
 use ChordPro::Chords;
 use ChordPro::Output::Common;
@@ -74,7 +75,7 @@ our $config;
 package ChordPro;
 
 use ChordPro::Paths;
-use Encode qw(decode decode_utf8 encode_utf8);
+use Encode qw(decode_utf8);
 
 sub import {
     # Add private library.
@@ -88,6 +89,11 @@ sub import {
 sub ::run {
     binmode(STDERR, ':utf8');
     binmode(STDOUT, ':utf8');
+    for ( @ARGV ) {
+	next if ref ne "";
+	$_ = decode_utf8($_);
+    }
+
     $options = app_setup( "ChordPro", $VERSION );
     $options->{trace}   = 1 if $options->{debug};
     $options->{verbose} = 1 if $options->{trace};
@@ -198,7 +204,7 @@ sub chordpro {
     foreach my $file ( @ARGV ) {
 	my $opts;
 	if ( $file =~ /^--((?:sub)?title)\s*(.*)/ ) {
-	    $options->{$1} = decode_utf8($2);
+	    $options->{$1} = $2;
 	    next;
 	}
 	if ( $file =~ /(^|\s)--(?:meta|config|define)\b/ ) {
@@ -286,8 +292,7 @@ sub chordpro {
     # array of lines to be written.
     if ( $res && @$res > 0 ) {
         if ( $of && $of ne "-" ) {
-            open( my $fd, '>', $of );
-	    binmode( $fd, ":utf8" );
+            my $fd = fs_open( $of, '>:utf8' );
 	    push( @$res, '' ) unless $res->[-1] eq '';
 	    print { $fd } ( join( "\n", @$res ) );
 	    close($fd);
@@ -963,10 +968,10 @@ sub app_setup {
                 foreach my $c ( @$_ ) {
 		    my $try = $c;
 		    # Check for resource names.
-		    if ( ! -r $try ) {
+		    if ( !fs_test( 'r', $try ) ) {
 			$try = CP->findcfg($c);
 		    }
-                    die("$c: $!\n") unless $try && -r $try;
+                    die("$c: $!\n") unless $try && fs_test( 'r', $try );
 		    $c = $try;
                 }
                 next;
@@ -975,7 +980,7 @@ sub app_setup {
 	    next if $clo->{nodefaultconfigs};
 	    next unless $configs{$config};
             $_ = [ $configs{$config} ];
-            undef($_) unless -r -f $_->[0];
+            undef($_) unless fs_test( 'fr', $_->[0] );
         }
     }
     # If no config was specified, and no default is available, force no.
@@ -983,17 +988,6 @@ sub app_setup {
         $clo->{"no$config"} = 1 unless $clo->{$config};
     }
     $clo->{nosongconfig} ||= $clo->{nodefaultconfigs};
-
-    # Decode command line strings.
-    # File names are dealt with elsewhere.
-    for ( qw(transcode title subtitle ) ) {
-	next unless defined $clo->{$_};
-	$clo->{$_} = decode_utf8($clo->{$_});
-    }
-    ####TODO: Should decode all, and remove filename exception.
-    for ( keys %{ $clo->{define} } ) {
-	$clo->{define}->{$_} = decode_utf8($clo->{define}->{$_});
-    }
 
     # Plug in command-line options.
     @{$options}{keys %$clo} = values %$clo;
@@ -1034,7 +1028,7 @@ sub app_setup {
 		next unless /\S/;
 		next if /^#/;
 		s/[\r\n]+$//;
-		push( @files, encode_utf8($_) );
+		push( @files, $_ );
 	    }
 	}
 	if ( @files ) {

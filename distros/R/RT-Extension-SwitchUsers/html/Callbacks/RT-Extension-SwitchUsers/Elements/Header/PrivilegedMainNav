@@ -1,0 +1,28 @@
+<%INIT>
+my @users = RT::Extension::SwitchUsers->GetUsersToSwitch();
+return unless @users;
+
+unless ( $session{'CurrentUser'}->HasRight( Right => 'ModifySelf', Object => RT->System ) ){
+    RT::Logger->warn("User " . $session{'CurrentUser'}->Name . " does not have ModifySelf. Unable to show Switch Users menu");
+    return;
+}
+
+my $switch_users = Menu->child( 'preferences' )->child(
+    switch_users => title => loc( 'Switch Users' ),
+    description  => loc( 'Switch current user to another' ),
+    path         => '/Tools/SwitchUsers.html',
+    sort_order   => 1.8,
+);
+
+for my $user ( @users ) {
+    next if $user->id == $session{CurrentUser}->id;
+    $switch_users->child(
+        ( "switch_user_" . $user->Name ) => title => loc( 'Switch to [_1]', $user->Name )
+          . ( $user->id == $users[ 0 ]->id ? ' (' . loc( 'Base User' ) . ')' : '' ),
+        path => '/Tools/SwitchUsers.html?SwitchUser=' . $user->id,
+        attributes   => {
+            'hx-boost' => 'false',
+        }
+    );
+}
+</%INIT>

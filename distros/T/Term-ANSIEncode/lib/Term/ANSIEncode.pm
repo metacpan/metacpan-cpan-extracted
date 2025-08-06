@@ -11,7 +11,7 @@ package Term::ANSIEncode;
 #                     Written By Richard Kelsch                       #
 #                  © Copyright 2025 Richard Kelsch                    #
 #                        All Rights Reserved                          #
-#                           Version 1.17                              #
+#                           Version 1.19                              #
 #######################################################################
 # This program is free software: you can redistribute it and/or       #
 # modify it under the terms of the GNU General Public License as      #
@@ -33,6 +33,7 @@ use strict;
 use Term::ANSIScreen qw( :cursor :screen );
 use Term::ANSIColor;
 use Time::HiRes qw( sleep );
+use Text::Wrap::Smart ':all';
 use utf8;
 use charnames();
 use constant {
@@ -45,7 +46,7 @@ use constant {
 binmode(STDOUT, ":encoding(UTF-8)");
 
 BEGIN {
-    our $VERSION = '1.17';
+    our $VERSION = '1.19';
 }
 
 sub ansi_output {
@@ -54,9 +55,13 @@ sub ansi_output {
     my $delay = shift;
 
     if (length($text) > 1) {
+		while ($text =~ /\[\%\s+BOX (.*?),(\d+),(\d+),(\d+),(\d+),(.*?)\s+\%\](.*?)\[\%\s+ENDBOX\s+\%\]/i) {
+			my $replace = $self->box($1,$2,$3,$4,$5,$6,$7);
+			$text =~ s/\[\%\s+BOX.*?\%\].*?\[\%\s+ENDBOX.*?\%\]/$replace/i;
+		}
         foreach my $string (keys %{ $self->{'ansi_sequences'} }) {
             if ($string =~ /CLEAR|CLS/i) {
-                my $ch = locate(1, 1) . cldown;
+                my $ch = locate(1,1) . cls;
                 $text =~ s/\[\%\s+$string\s+\%\]/$ch/gi;
             } else {
                 $text =~ s/\[\%\s+$string\s+\%\]/$self->{'ansi_sequences'}->{$string}/gi;
@@ -88,6 +93,63 @@ sub ansi_output {
         print $char;
     } ## end foreach my $count (0 .. $s_len)
 } ## end sub ansi_output
+
+sub box {
+	my $self   = shift;
+	my $color  = '[% ' . shift . ' %]';
+	my $x      = shift;
+	my $y      = shift;
+	my $w      = shift;
+	my $h      = shift;
+	my $type   = shift;
+	my $string = shift;
+
+	my $tl  = '╔';
+	my $tr  = '╗';
+	my $bl  = '╚';
+	my $br  = '╝';
+	my $mid = '═';
+	my $v   = '║';
+	if ($type =~ /THIN/i) {
+		$tl  = '┌';
+		$tr  = '┐';
+		$bl  = '└';
+		$br  = '┘';
+		$mid = '─';
+		$v   = '│';
+	} elsif ($type =~ /ROUND/i) {
+		$tl  = '╭';
+		$tr  = '╮';
+		$bl  = '╰';
+		$br  = '╯';
+		$mid = '─';
+		$v   = '│';
+	} elsif ($type =~ /THICK/i) {
+		$tl  = '┏';
+		$tr  = '┓';
+		$bl  = '┗';
+		$br  = '┛';
+		$mid = '━';
+		$v   = '┃';
+    }
+	my $text = '';
+	my $xx = $x;
+	my $yy = $y;
+    $text .= locate($yy++,$xx) . $color . $tl . $mid x ($w - 2) . $tr . '[% RESET %]';
+	foreach my $count (1 .. ($h - 2)) {
+		$text .= locate($yy++,$xx) . $color . $v . '[% RESET %]' . ' ' x ($w - 2) . $color . $v . '[% RESET %]';
+	}
+    $text .= locate($yy++,$xx) . $color . $bl . $mid x ($w - 2) . $br . '[% RESET %]' . $self->{'ansi_sequences'}->{'SAVE'};
+	$text .= locate($y+1,$x+1);
+	chomp(my @lines = fuzzy_wrap($string,($w - 3)));
+	$xx = $x+1;
+	$yy = $y+1;
+	foreach my $line (@lines) {
+		$text .= locate($yy++,$xx) . $line;
+	}
+	$text .= $self->{'ansi_sequences'}->{'RESTORE'};
+	return($text);
+}
 
 sub new {
     my $class = shift;
@@ -313,6 +375,10 @@ Use this version for a full list of symbols:
  REVERSE      = Reverse
  CROSSED OUT  = Crossed out
  DEFAULT FONT = Default font
+
+=head2 FRAMES
+
+ BOX & ENDBOX = Draw a frame
 
 =head2 COLORS
 

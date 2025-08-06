@@ -3,7 +3,7 @@ use warnings;
 
 package RT::Extension::SwitchUsers;
 
-our $VERSION = '0.08';
+our $VERSION = '1.00';
 
 use RT::User;
 use RT::SwitchedUserRealActor;
@@ -179,7 +179,7 @@ of user names (one name per line) that can be modified on admin user or
 
 =head1 RT VERSION
 
-Works with RT 5
+Works with RT 6. For previous versions of RT install the latest 0.* version.
 
 =head1 INSTALLATION
 
@@ -203,7 +203,7 @@ in your database.
 If you are upgrading this module, check for upgrading instructions
 in case changes need to be made to your database.
 
-=item Edit your F</opt/rt5/etc/RT_SiteConfig.pm>
+=item Edit your F</opt/rt6/etc/RT_SiteConfig.pm>
 
 Add this line:
 
@@ -222,7 +222,7 @@ switched users.
 
 =item Clear your mason cache
 
-    rm -rf /opt/rt5/var/mason_data/obj
+    rm -rf /opt/rt6/var/mason_data/obj
 
 =item Restart your webserver
 

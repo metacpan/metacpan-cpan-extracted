@@ -127,72 +127,29 @@ if ($show_form) {
 <& /Elements/Header, Title => $title &>
 <div id="body" class="login-body">
 
-% if ( RT::Handle::cmp_version($RT::VERSION, '5.0.0') >= 0 ) {
 <& /Elements/ListActions, actions => \@results &>
 
 % if ($show_form) {
 <form action="<%$id%>" method="post" class="mx-auto max-width-sm">
 
 <&| /Widgets/TitleBox, hideable => 0, content_class => 'mx-auto col-12' &>
-  <div class="form-row">
-    <div class="label col-3">
-      <&|/l&>New password</&>:
-    </div>
-    <div class="value col-8">
+    <&| /Elements/LabeledValue, Label => loc('New password') &>
       <input name="password" type="password" class="form-control" />
-    </div>
-  </div>
-
-  <div class="form-row">
-    <div class="label col-3">
-      <&|/l&>Retype Password</&>:
-    </div>
-    <div class="value col-8">
+    </&>
+    <&| /Elements/LabeledValue, Label => loc('Retype Password') &>
       <input type="password" class="form-control" name="password2" size="16" autocomplete="off" />
-    </div>
-  </div>
-
+    </&>
 </&>
-  <div class="form-row">
+  <div class="row mt-2">
     <div class="col-12">
-      <a class="btn btn-primary float-left" href="<%$RT::WebURL|n%>"><&|/l&>Back to Login</&></a>
-      <input class="button btn btn-primary form-control float-right" type="submit" value="<%loc('Change password')%>" />
+      <a class="btn btn-primary float-start" href="<%$RT::WebURL|n%>"><&|/l&>Back to Login</&></a>
+      <input class="btn btn-primary float-end" type="submit" value="<%loc('Change password')%>" />
     </div>
   </div>
 
 </form>
 % }
-% else {
-<div class="form-row">
-  <div class="col-12">
-    <a class="btn btn-primary float-left" href="<%$RT::WebURL|n%>"><&|/l&>Back to Login</&></a>
-  </div>
-</div>
-% }
-% }
-% else {
-<h1><%$title%></h1>
-<& /Elements/ListActions, actions => \@results  &>
-<p>
 
-
-% if ($show_form) {
-<form method="post" action="<%$id%>">
-<table>
-  <tr>
-    <td class="label"><label name="password"><&|/l&>New password</&>:</label></td>
-    <td class="value"><input name="password" type="password"></td>
-  </tr>
-  <tr>
-    <td class="label"><label name="password2"><&|/l&>Retype Password</&>:</label></td>
-    <td class="value"><input name="password2" type="password"></td>
-  </tr>
-</table>
-<input type ="submit" value ="<%loc('Change password')%>">
-</form>
-%}
-<a href="<%$RT::WebURL|n%>"><&|/l&>Back to Login</&></a>
-% }
 </div>
 
 <& /Elements/Footer, Menu => 0 &>

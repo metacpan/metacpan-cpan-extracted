@@ -37,6 +37,8 @@ __END__
 
 =pod
 
+=encoding utf8
+
 This example displays output similar to the following:
 
   Press any combination of CTL, ALT, and SHIFT, and a console key.

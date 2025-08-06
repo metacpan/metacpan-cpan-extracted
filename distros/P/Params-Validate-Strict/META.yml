@@ -10,7 +10,7 @@ build_requires:
   Test::Needs: '0'
   Test::Warnings: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
 license: open_source
@@ -25,7 +25,8 @@ no_index:
 requires:
   Carp: '0'
   ExtUtils::MakeMaker: '6.64'
-  Params::Get: '0.11'
+  Params::Get: '0.13'
+  Scalar::Util: '0'
 resources: {}
-version: '0.06'
+version: '0.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

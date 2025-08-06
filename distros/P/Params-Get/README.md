@@ -4,7 +4,16 @@ Params::Get - Get the parameters to a subroutine in any way you want
 
 # VERSION
 
-Version 0.11
+Version 0.13
+
+# DESCRIPTION
+
+Exports a single function, `get_params`, which returns a given value.
+If a validation schema is provided, the value is validated using
+[Params::Validate::Strict](https://metacpan.org/pod/Params%3A%3AValidate%3A%3AStrict).
+If validation fails, it croaks.
+
+When used hand-in-hand with [Return::Set](https://metacpan.org/pod/Return%3A%3ASet) you should be able to formally specify the input and output sets for a method.
 
 # SYNOPSIS
 
@@ -79,6 +88,7 @@ Sometimes giving an array ref rather than array fails.
 # SEE ALSO
 
 - [Params::Validate::Strict](https://metacpan.org/pod/Params%3A%3AValidate%3A%3AStrict)
+- [Return::Set](https://metacpan.org/pod/Return%3A%3ASet)
 
 # SUPPORT
 

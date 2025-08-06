@@ -1,3 +1,21 @@
+0.000
+
+    !Other improvements
+
+    - (Experimental) "allpages" anchor for images. Similar to the
+      "page" anchor, but the image is repeated on *every* page of the song.
+
+    - Lilypond delegate supports a property "program" to explicitly
+      designate the Lilypond program.
+
+    !Bug Fixes
+
+    - Some issues with Unicode filenames on Windows.
+    - Some issues with line endings on Windows.
+    - Fix image alignment with indent.
+    - Fix title swap even when using title-even format.
+    - Fix problems with save/restore settings on Windows.
+
 6.070 2024-12-25
 
     !Highlights

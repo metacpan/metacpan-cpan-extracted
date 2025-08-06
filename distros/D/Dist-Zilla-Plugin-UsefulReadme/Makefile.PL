@@ -40,6 +40,7 @@ my %WriteMakefileArgs = (
     "namespace::autoclean" => 0
   },
   "TEST_REQUIRES" => {
+    "Dist::Zilla::Plugin::PodWeaver" => 0,
     "File::Spec" => 0,
     "Module::Metadata" => "1.000015",
     "Pod::Markdown" => "3.000",
@@ -48,12 +49,13 @@ my %WriteMakefileArgs = (
     "Pod::Text" => 0,
     "Test::DZil" => 0,
     "Test::Deep" => 0,
-    "Test::MixedScripts" => "0.3.0",
     "Test::More" => 0,
+    "open" => 0,
     "strict" => 0,
+    "utf8" => 0,
     "warnings" => 0
   },
-  "VERSION" => "v0.1.2",
+  "VERSION" => "v0.4.1",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -63,6 +65,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "CPAN::Changes::Parser" => "0.500002",
   "Dist::Zilla" => "6.003",
+  "Dist::Zilla::Plugin::PodWeaver" => 0,
   "ExtUtils::MakeMaker" => "7.22",
   "File::Spec" => 0,
   "Hash::Ordered" => "0.005",
@@ -83,12 +86,13 @@ my %FallbackPrereqs = (
   "Pod::Weaver::Role::Section" => 0,
   "Test::DZil" => 0,
   "Test::Deep" => 0,
-  "Test::MixedScripts" => "0.3.0",
   "Test::More" => 0,
   "Types::Common" => 0,
   "experimental" => 0,
   "namespace::autoclean" => 0,
+  "open" => 0,
   "strict" => 0,
+  "utf8" => 0,
   "warnings" => 0
 );
 

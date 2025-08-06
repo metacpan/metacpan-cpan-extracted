@@ -279,7 +279,7 @@ The size, in bytes, of personalization strings.
 
   my $salt_len = $gh->SALTBYTES;
 
-=head2 generichash_blake2b_SALTBYTES
+The size, in bytes, of salts.
 
 =head2 salt_personal
 

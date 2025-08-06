@@ -46,10 +46,9 @@
 %# 
 %# END BPS TAGGED BLOCK }}}
 
-    <&|/Widgets/TitleBox, title => loc("Tickets locked by you") &>
+    <&|/Widgets/TitleBox, title => loc("Tickets locked by you"), @locks ? ( titleright_raw => q{<a href="index.html?UnlockAll=1">} . loc('Unlock All') . '</a>' ) : () &>
 % if(@locks) {
-    <a href="index.html?UnlockAll=1"><&|/l&>Unlock All</&></a>
-    <table border="0" cellspacing="0" cellpadding="1" width="100%" class="ticket-list">
+    <table class="ticket-list table <% RT->Config->Get('TableAccent') || '' %>">
 
 <%PERL>    
     my $expire_title;

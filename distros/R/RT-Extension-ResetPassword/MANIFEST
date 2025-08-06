@@ -30,5 +30,4 @@ patches/4-user-admin-callbacks.patch
 patches/4.4.4-user-admin-callbacks.patch
 patches/user-admin-callbacks.patch
 README
-static/css/resetpassword.css
 SIGNATURE                                Public-key signature (added by MakeMaker)

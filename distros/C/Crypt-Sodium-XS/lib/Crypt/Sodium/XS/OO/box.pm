@@ -175,7 +175,7 @@ of the nonces the risk of any random collisions is negligible. For some
 applications, if you wish to use nonces to detect missing messages or to ignore
 replayed messages, it is also acceptable to use a simple incrementing counter
 as a nonce. A better alternative for that use case is the
-L<Crypt::Sodium::XS::secretstream> API.
+L<Crypt::Sodium::XS::OO::secretstream> API.
 
 When doing so you must ensure that the same nonce can never be re-used (for
 example you may have multiple threads or even hosts generating messages using
@@ -184,7 +184,7 @@ the same key pairs).
 As stated above, senders can decrypt their own messages, and compute a valid
 authentication tag for any messages encrypted with a given shared secret key.
 This is generally not an issue for online protocols. If this is not acceptable,
-check out L</SEALED BOXES>, as well as L<Crypt::Sodium::XS::kx>.
+check out L</SEALED BOXES>, as well as L<Crypt::Sodium::XS::OO::kx>.
 
 =head1 CONSTRUCTOR
 
@@ -276,7 +276,7 @@ slightly different for consistency of this API.
 
 =head2 decrypt_detached
 
-  my ($plaintext, $tag) = $box->decrypt(
+  my $plaintext = $box->decrypt_detached(
     $ciphertext,
     $tag,
     $nonce,
@@ -532,7 +532,7 @@ Returns a L<Crypt::Sodium::XS::MemVault>: the decrypted plaintext.
 
 =item decrypt_detached
 
-  my $plaintext = $precalc->decrypt($ciphertext, $tag, $nonce, $flags);
+  my $plaintext = $precalc->decrypt_detached($ciphertext, $tag, $nonce, $flags);
 
 Croaks on decryption failure.
 

@@ -1,0 +1,15 @@
+<%ARGS>
+$ARGSRef
+$Actions
+</%ARGS>
+
+<%INIT>
+if ( $ARGSRef->{Split} ) {
+    my $ticket = RT::Ticket->new( $session{CurrentUser} );
+    $ticket->Load( $ARGSRef->{Split} );
+    if ( $ticket->Id && $ticket->Locked ) {
+        my ( $duration, $msg ) = $ticket->Unlock('Auto', 0);
+        push @$Actions, $msg;
+    }
+}
+</%INIT>

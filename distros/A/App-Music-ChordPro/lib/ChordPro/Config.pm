@@ -14,9 +14,9 @@ use feature qw( signatures state );
 no warnings "experimental::signatures";
 
 use ChordPro;
+use ChordPro::Files;
 use ChordPro::Paths;
 use ChordPro::Utils;
-use File::LoadLines;
 use File::Spec;
 use Scalar::Util qw(reftype);
 use List::Util qw(any);
@@ -268,10 +268,9 @@ sub get_config ( $file ) {
     $file = expand_tilde($file);
 
     if ( $file =~ /\.json$/i ) {
-        if ( open( my $fd, "<:raw", $file ) ) {
-            my $new = json_load( loadlines( $fd, { split => 0 } ), $file );
+        if ( my $lines = fs_load( $file, { split => 1, fail => "soft" } ) ) {
+            my $new = json_load( join( "\n", @$lines, '' ), $file );
             precheck( $new, $file );
-            close($fd);
             return __PACKAGE__->new($new);
         }
         else {
@@ -279,7 +278,7 @@ sub get_config ( $file ) {
         }
     }
     elsif ( $file =~ /\.prp$/i ) {
-        if ( -e -f -r $file ) {
+        if ( fs_test( efr => $file ) ) {
             require ChordPro::Config::Properties;
             my $cfg = Data::Properties->new;
             $cfg->parse_file($file);
@@ -505,7 +504,7 @@ sub config_final ( %args ) {
     # Load schema.
     my $schema = do {
 	my $schema = CP->findres( "config.schema", class => "config" );
-	my $data = loadlines( $schema, { split => 0 } );
+	my $data = fs_load( $schema, { split => 0 } );
 	$parser->decode($data);
     };
 
@@ -519,7 +518,7 @@ sub config_final ( %args ) {
 
     my $config = do {
 	my $config = CP->findres( "chordpro.json", class => "config" );
-	my $data = loadlines( $config, { split => 0 } );
+	my $data = fs_load( $config, { split => 0 } );
 	$parser->decode($data);
     };
 
@@ -538,15 +537,16 @@ sub convert_config ( $from, $to ) {
     # First find and process the schema.
     my $schema = CP->findres( "config.schema", class => "config" );
     my $o = { split => 0, fail => 'soft' };
-    my $data = loadlines( $schema, $o );
+    my $data = fs_load( $schema, $o );
     die("$schema: ", $o->{error}, "\n") if $o->{error};
     $schema = $parser->decode($data);
 
     # Then load the config to be converted.
     my $new;
-    $o = { split => 0, fail => 'soft' };
-    $data = loadlines( $from, $o );
+    $o = { split => 1, fail => 'soft' };
+    $data = fs_load( $from, $o );
     die("Cannot open config $from [", $o->{error}, "]\n") if $o->{error};
+    $data = join( "\n", @$data );
 
     if ( $data =~ /^\s*#/m ) {	# #-comments -> prp
 	require ChordPro::Config::Properties;
@@ -561,7 +561,7 @@ sub convert_config ( $from, $to ) {
     # And re-encode it using the schema.
     my $res = $parser->encode( data => $new, pretty => 1,
 			       nounicodeescapes => 1, schema => $schema );
-
+use DDP; p $res;
     # Add trailer.
     $res .= "\n// End of Config.\n";
 
@@ -888,6 +888,7 @@ sub hmerge( $left, $right, $path = "" ) {
             || $path eq "pdf.fontconfig."
             || $path =~ /^pdf\.(?:info|fonts)\./
             || $path =~ /^pdf\.formats\.\w+-even\./
+            || ( $path =~ /^pdf\.formats\./ && $key =~ /\w+-even$/ )
             || $path =~ /^meta\./
             || $path =~ /^delegates\./
             || $path =~ /^parser\.preprocess\./

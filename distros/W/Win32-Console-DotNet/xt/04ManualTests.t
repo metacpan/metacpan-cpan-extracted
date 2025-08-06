@@ -476,6 +476,8 @@ C<set AUTOMATED_TESTING=>).
 
 =item 5. Run C<prove> and follow the instructions in the command prompt.
 
+=back
+
 =head2 Instructions for Windows testers
 
 Test on Windows prints to console output, so in order to properly execute the 

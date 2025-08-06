@@ -1,7 +1,7 @@
 ####################################################################
 #
 #     This file was generated using XDR::Parse version v0.3.1
-#                   and LibVirt version v11.5.0
+#                   and LibVirt version v11.6.0
 #
 #      Don't edit this file, use the source template instead
 #
@@ -16,12 +16,12 @@ use experimental 'signatures';
 use Future::AsyncAwait;
 use Object::Pad;
 
-class Sys::Async::Virt::Domain v0.1.3;
+class Sys::Async::Virt::Domain v0.1.4;
 
 use Carp qw(croak);
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::Remote::XDR v0.1.3;
+use Protocol::Sys::Virt::Remote::XDR v0.1.4;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
 use constant {
@@ -590,6 +590,7 @@ use constant {
     EVENT_STARTED_RESTORED                                        => 2,
     EVENT_STARTED_FROM_SNAPSHOT                                   => 3,
     EVENT_STARTED_WAKEUP                                          => 4,
+    EVENT_STARTED_RECREATED                                       => 5,
     EVENT_SUSPENDED_PAUSED                                        => 0,
     EVENT_SUSPENDED_MIGRATED                                      => 1,
     EVENT_SUSPENDED_IOERROR                                       => 2,
@@ -611,6 +612,7 @@ use constant {
     EVENT_STOPPED_SAVED                                           => 4,
     EVENT_STOPPED_FAILED                                          => 5,
     EVENT_STOPPED_FROM_SNAPSHOT                                   => 6,
+    EVENT_STOPPED_RECREATED                                       => 7,
     EVENT_SHUTDOWN_FINISHED                                       => 0,
     EVENT_SHUTDOWN_GUEST                                          => 1,
     EVENT_SHUTDOWN_HOST                                           => 2,
@@ -992,10 +994,10 @@ async method pin_emulator($cpumap, $flags = 0) {
           flags => $flags // 0 } );
 }
 
-method _migrate_perform($cookie, $uri, $flags, $dname, $resource) {
+method _migrate_perform($cookie, $uri, $flags, $dname, $bandwidth) {
     return $_client->_call(
         $remote->PROC_DOMAIN_MIGRATE_PERFORM,
-        { dom => $_id, cookie => $cookie, uri => $uri, flags => $flags // 0, dname => $dname, resource => $resource }, empty => 1 );
+        { dom => $_id, cookie => $cookie, uri => $uri, flags => $flags // 0, dname => $dname, bandwidth => $bandwidth }, empty => 1 );
 }
 
 method abort_job() {
@@ -1927,7 +1929,7 @@ Sys::Async::Virt::Domain - Client side proxy to remote LibVirt domain
 
 =head1 VERSION
 
-v0.1.3
+v0.1.4
 
 =head1 SYNOPSIS
 
@@ -4310,6 +4312,8 @@ See documentation of L<virDomainUpdateDeviceFlags|https://libvirt.org/html/libvi
 
 =item EVENT_STARTED_WAKEUP
 
+=item EVENT_STARTED_RECREATED
+
 =item EVENT_SUSPENDED_PAUSED
 
 =item EVENT_SUSPENDED_MIGRATED
@@ -4351,6 +4355,8 @@ See documentation of L<virDomainUpdateDeviceFlags|https://libvirt.org/html/libvi
 =item EVENT_STOPPED_FAILED
 
 =item EVENT_STOPPED_FROM_SNAPSHOT
+
+=item EVENT_STOPPED_RECREATED
 
 =item EVENT_SHUTDOWN_FINISHED
 

@@ -3,10 +3,10 @@
 
 <& /Elements/ListActions, actions => \@results &>
 
-<form name="SwitchUsers" method="POST" action="<% RT->Config->Get('WebPath') %>/Tools/SwitchUsers.html">
-    <div class="form-row">
+<form hx-boost="false" name="SwitchUsers" method="POST" action="<% RT->Config->Get('WebPath') %>/Tools/SwitchUsers.html">
+    <div class="row mt-2 justify-content-center">
       <div class="col-auto">
-        <select name="SwitchUser" class="selectpicker">
+        <select name="SwitchUser" class="selectpicker form-select">
 % for my $user ( @users )  {
           <option <% $user->id == $session{'CurrentUser'}->id ? q{selected="selected"} : '' |n %> value="<% $user->id %>">
             <% $user->Name %>
@@ -45,7 +45,18 @@ if ( $SwitchUser ) {
             RT::Interface::Web::InstantiateNewSession();
             $session{CurrentUser} = RT::CurrentUser->new;
             $session{CurrentUser}->Load( $SwitchUser );
-            $session{WebExternallyAuthed} ||= $external_authed;
+            RT::Interface::Web::Session::Set(
+                Key   => 'CurrentUser',
+                Value => $session{'CurrentUser'},
+            );
+
+            if ( !$session{WebExternallyAuthed} ) {
+                $session{WebExternallyAuthed} = $external_authed;
+                RT::Interface::Web::Session::Set(
+                    Key   => 'WebExternallyAuthed',
+                    Value => $session{WebExternallyAuthed},
+                );
+            }
             my $current_user_name = $session{CurrentUser}->Name;
 
             # $users[0] is always the base user.
@@ -55,6 +66,10 @@ if ( $SwitchUser ) {
             else {
                 RT->Logger->warning("Switched user from $previous_user_name to $current_user_name");
                 $session{'SwitchUsers-BaseUser'} = $users[0]->id;
+                RT::Interface::Web::Session::Set(
+                    Key   => 'SwitchUsers-BaseUser',
+                    Value => $session{'SwitchUsers-BaseUser'},
+                );
             }
             push @results, loc( "Switched to user '[_1]'", $current_user_name );
         }

@@ -2,14 +2,12 @@
 
 use v5.26;
 use Object::Pad;
-use open ':std', IO => ':encoding(UTF-8)';
 
 class ChordPro::Wx::Config;
 
 our %state;
 our %preferences;
 
-use ChordPro::Utils qw( is_macos );
 use Ref::Util qw( is_hashref is_arrayref );
 
 use Exporter 'import';
@@ -19,12 +17,13 @@ my $cb;
 
 use Wx qw(:everything);
 use Wx::Locale gettext => '_T';
+use ChordPro::Files;
 use ChordPro::Paths;
-use Encode qw( decode_utf8 );
+use File::Basename qw(basename);
 
 use constant FONTSIZE => 12;
 
-use constant SETTINGS_VERSION => 2;
+use constant SETTINGS_VERSION => 3;
 
 # Legacy font numbers.
 my @fonts =
@@ -151,7 +150,7 @@ sub Setup( $class, $options ) {
     }
     else {
 	my $file;
-	if ( $ENV{XDG_CONFIG_HOME} && -d $ENV{XDG_CONFIG_HOME} ) {
+	if ( $ENV{XDG_CONFIG_HOME} && fs_test( d => $ENV{XDG_CONFIG_HOME} ) ) {
 	    $file =
 	      $ENV{XDG_CONFIG_HOME} . "/wxchordpro/wxchordpro";
 	}
@@ -162,8 +161,8 @@ sub Setup( $class, $options ) {
 	else {
 	    $file = "$ENV{HOME}/.wxchordpro";
 	}
-	unless ( -f $file ) {
-	    open( my $fd, '>', $file );
+	unless ( fs_test( f => $file ) ) {
+	    my $fd = fs_open( $file, '>' );
 	}
 	Wx::ConfigBase::Set
 	    ( $cb = Wx::FileConfig->new
@@ -174,6 +173,13 @@ sub Setup( $class, $options ) {
 	       wxCONFIG_USE_LOCAL_FILE,
 	     ));
     }
+}
+
+method Ok :common {
+    $preferences{settings_version} == SETTINGS_VERSION;
+}
+method SetOk :common {
+    $preferences{settings_version} = SETTINGS_VERSION;
 }
 
 # Load all data from the persistent data store into %state.
@@ -199,7 +205,7 @@ method Load :common {
     my %pp = $ggoon ? %prefs : ();
     while ( $ggoon ) {
 	my $cp = $cb->GetPath;
-	$cb->SetPath("/$group");
+	$cb->SetPath($group);
 
 	$state{$group} = [] if $group eq "recents";
 
@@ -251,7 +257,7 @@ method Load :common {
 	    }
 	    elsif ( $group eq "recents" ) {
 		push( @{$state{$group}}, $value )
-		  if -s $value;
+		  if fs_test( 's', $value );
 	    }
 	    else {
 		$state{$group}->{$entry} = $value;
@@ -277,7 +283,7 @@ method Load :common {
     if ( $preferences{settings_version}||1 < SETTINGS_VERSION ) {
 	for ( qw( windows sash ) ) {
 	    delete $state{$_};
-	    $cb->DeleteGroup("/$_");
+	    $cb->DeleteGroup($_);
 	}
 	if ( $preferences{pdfviewer} ) {
 	    $preferences{enable_pdfviewer} //= 1;
@@ -315,11 +321,12 @@ method Store :common {
 				     preferences | messages | recents |
 				     sash | songbookexport | windows
 				 )$ }x;
+	$cb->SetPath($cp);
 
 	# Re-write the recents. Array.
 	if ( $group eq "recents" && is_arrayref($v) ) {
-	    $cb->DeleteGroup("/$group");
-	    $cb->SetPath("/$group");
+	    $cb->DeleteGroup($group);
+	    $cb->SetPath($group);
 	    for ( my $i = 0; $i < @$v; $i++ ) {
 		last if $i >= MAXRECENTS;
 		$cb->Write( "$i", $v->[$i] );
@@ -330,7 +337,7 @@ method Store :common {
 	# Everything else are hash refs.
 	next unless is_hashref($v);
 
-	$cb->SetPath("/$group");
+	$cb->SetPath($group);
 	while ( my ( $k, $v ) = each %$v ) {
 	    if ( $group eq "preferences" ) {
 		if ( $k eq "editcolour" && is_hashref($v) ) {
@@ -366,28 +373,25 @@ sub setup_styles {
 
     my %stylelist;
     my @userstyles;
+    my $findopts = { filter => qr/^.*\.json$/i, recurse => 0 };
 
     # Collect standard style files (presets).
     for my $cfglib ( @{ CP->findresdirs("config") } ) {
-	next unless $cfglib && -d $cfglib;
-	opendir( my $dh, $cfglib );
-	foreach ( readdir($dh) ) {
-	    $_ = decode_utf8($_);
-	    next unless /^(.*)\.json$/;
-	    my $base = $1;
-	    $stylelist{$base} = $_;
+	next unless $cfglib && fs_test( d => $cfglib );
+	next unless my $entries = fs_find( $cfglib, $findopts );
+	foreach ( @$entries ) {
+	    my $base = basename( $_->{name}, ".json" );
+	    $stylelist{$base} = $_->{name};
 	}
     }
 
     # Add custom style presets. if appropriate.
     my $dir = $preferences{customlib};
     if ( $preferences{enable_customlib}
-	 && $dir && -d ( my $cfglib = "$dir/config" ) ) {
-	opendir( my $dh, $cfglib );
-	foreach ( readdir($dh) ) {
-	    $_ = decode_utf8($_);
-	    next unless /^(.*)\.json$/;
-	    my $base = $1;
+	 && $dir && fs_test( d => ( my $cfglib = "$dir/config" ) ) ) {
+	next unless my $entries = fs_find( $cfglib, $findopts );
+	foreach ( @$entries ) {
+	    my $base = basename( $_->{name}, ".json" );
 	    push( @userstyles, $base );
 	    delete $stylelist{$base};
 	}
@@ -405,13 +409,12 @@ sub setup_notations {
     my $notationlist = $state{notations};
     return $notationlist if $notationlist && @$notationlist;
     $notationlist = [ undef ];
+    my $findopts = { filter => qr/^.*\.json$/i, recurse => 0 };
     for my $cfglib ( @{ CP->findresdirs( "notes", class => "config" ) } ) {
-	next unless $cfglib && -d $cfglib;
-	opendir( my $dh, $cfglib );
-	foreach ( sort readdir($dh) ) {
-	    $_ = decode_utf8($_);
-	    next unless /^(.*)\.json$/;
-	    my $base = $1;
+	next unless $cfglib && fs_test( d => $cfglib );
+	next unless my $entries = fs_find( $cfglib, $findopts );
+	foreach ( @$entries ) {
+	    my $base = basename( $_->{name}, ".json" );
 	    $notationlist->[0] = "common", next
 	      if $base eq "common";
 	    push( @$notationlist, $base );
@@ -426,17 +429,16 @@ sub setup_tasks {
     my @libs = @{ CP->findresdirs("tasks") };
     my $dir = $preferences{customlib};
     push( @libs, "$dir/tasks" )
-      if $preferences{enable_customlib} && $dir && -d "$dir/tasks";
+      if $preferences{enable_customlib} && $dir && fs_test( d => "$dir/tasks" );
     my $did;
     my %dups;
+    my $findopts = { filter => qr/^.*\.(?:json|prp)$/i, recurse => 0 };
     for my $cfglib ( @libs ) {
-	next unless $cfglib && -d $cfglib;
-	opendir( my $dh, $cfglib );
-	foreach ( readdir($dh) ) {
-	    $_ = decode_utf8($_);
-	    next unless /^(.*)\.(?:json|prp)$/;
-	    my $base = $1;
-	    my $file = File::Spec->catfile( $cfglib, $_ );
+	next unless $cfglib && fs_test( d => $cfglib );
+	next unless my $entries = fs_find( $cfglib, $findopts );
+	foreach ( @$entries ) {
+	    my $base = basename( $_->{name}, ".json", ".prp" );
+	    my $file = File::Spec->catfile( $cfglib, $_->{name} );
 
 	    # Tentative title (description).
 	    ( my $desc = $base ) =~ s/_/ /g;
@@ -444,7 +446,7 @@ sub setup_tasks {
 	    # Peek in the first line.
 	    my $line;
 	    my $fd;
-	    open( $fd, '<:utf8', $file ) and
+	    $fd = fs_open( $file ) and
 	      $line = <$fd> and
 	      close($fd);
 	    if ( $line =~ m;(?://|\#)\s*(?:chordpro\s*)?task:\s*(.*);i ) {

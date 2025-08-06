@@ -6,7 +6,7 @@
                                                     
 
 
-This is the README for C::Tokenize version 0.18.
+This is the README for C::Tokenize version 0.19.
 
 C::Tokenize is a "module" for the Perl computer programming language, a
 library of computer code to install on a computer.  This document contains
@@ -42,12 +42,11 @@ comments from a C program.
 2. DOCUMENTATION
 
 You can read the documentation for the module online at the following
-websites:
+website:
 
-    * http://search.cpan.org/perldoc?C::Tokenize
     * http://metacpan.org/release/C-Tokenize
 
-(These links go to the latest version of the module.)
+(This link goes to the latest version of the module.)
 
 After installing the module, you can read the documentation on your
 computer using
@@ -68,11 +67,11 @@ If you have the App::cpanminus installer, you may prefer
 
     cpanm C::Tokenize
 
-To install the module from the source file, C-Tokenize-0.18.tar.gz, follow
+To install the module from the source file, C-Tokenize-0.19.tar.gz, follow
 this sequence of commands:
 
-    tar xfz C-Tokenize-0.18.tar.gz
-    cd C-Tokenize-0.18
+    tar xfz C-Tokenize-0.19.tar.gz
+    cd C-Tokenize-0.19
     perl Makefile.PL
     make
     make install
@@ -85,8 +84,8 @@ If you want to test the module before installing it, use "make test" after
 4. HELP
 
 To get help with the module, you can email the author, Ben Bullock, at
-<bkb@cpan.org>. If you think there is a problem in the module, you can
-report a bug at 
+<benkasminbullock@gmail.com>. If you think there is a problem in the
+module, you can report a bug at 
 
 <https://github.com/benkasminbullock/C-Tokenize/issues>,
 
@@ -97,6 +96,6 @@ repository on github at
 
 -----------------------------------------------------------------------------
 
-This README was written on Thu Feb 22 13:47:39 2018.
+This README was written on Tue Aug  5 18:15:17 2025.
 
 -----------------------------------------------------------------------------

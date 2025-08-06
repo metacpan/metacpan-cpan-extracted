@@ -8,7 +8,7 @@ use Module::Load;
 use Bio::ToolBox::Data;
 use Bio::ToolBox::SeqFeature;    # alternative to Bio::SeqFeature::Lite
 
-our $VERSION = '2.00';
+our $VERSION = '2.02';
 
 sub new {
 	my $class = shift;
@@ -25,7 +25,7 @@ sub new {
 	# determine file, format, and parser subclass
 	my $file     = $args{file}     || $args{table} || undef;
 	my $flavor   = $args{flavor}   || undef;
-	my $filetype = $args{filetype} || undef;
+	my $filetype = $args{filetype} || $args{'format'} || undef;
 	if ( not $flavor or not $filetype ) {
 		if ( $class =~ m/Bio::ToolBox::Parser::(\w+)/x ) {
 
@@ -260,12 +260,6 @@ sub filetype {
 	return shift->{filetype};
 }
 
-sub version {
-
-	# old method no longer used
-	return shift->filetype;
-}
-
 sub number_loaded {
 	my $self = shift;
 	return scalar keys %{ $self->{loaded} };
@@ -339,9 +333,6 @@ sub top_features {
 	return wantarray ? @features : \@features;
 }
 
-*get_feature_by_id = \&fetch;
-*get_feature_by_id if 0;    # avoid once warning
-
 sub fetch {
 	my ( $self, $id ) = @_;
 	return unless $id;
@@ -349,10 +340,6 @@ sub fetch {
 		$self->parse_file;
 	}
 	return $self->{loaded}{$id} || undef;
-}
-
-sub find_gene {
-	confess 'FATAL: The find_gene() method is deprecated. Please use fetch().';
 }
 
 1;
@@ -515,25 +502,44 @@ is L<Bio::SeqFeature::Lite>.
 
 These methods can be used to get or set values that modify the parser 
 behavior. These are Boolean methods; it sets and returns either 1 or 0.
-These are not always used by all subclasses.
+These are not always used by all subclasses. Check the documentation of
+the subclasses for specific information.
 
 =over 4
 
 =item do_gene
 
+Assemble multiple transcripts with the same gene ID into a gene object.
+
 =item do_exon
+
+Parse and include exons as subfeatures of transcript objects.
 
 =item do_cds
 
+Parse and include CDS features as subfeatures of transcript objects.
+
 =item do_utr
+
+Parse and include UTR features as subfeatures of transcript objects.
 
 =item do_codon
 
+Parse and include start and stop features as subfeatures of transcript objects.
+
 =item do_name
 
-=item do_share
+Automatically assign names to subfeatures.
+
+=item share
+
+Share subfeature objects between parent objects. If false, new objects will be
+generated, increasing memory requirements.
 
 =item simplify
+
+Simplify and parse only a subset of required attributes, and not all feature
+attributes.
 
 =back
 

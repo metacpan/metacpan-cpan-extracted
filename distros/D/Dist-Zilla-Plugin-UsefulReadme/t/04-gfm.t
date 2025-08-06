@@ -12,8 +12,8 @@ my $tzil = Builder->from_config(
     { dist_root => 'does-not-exist' },
     {
         add_files => {
-           path(qw( source INSTALL ))  => "How to install....",
-           path(qw( source Changes )) => << 'CHANGES',
+            path(qw( source INSTALL )) => "How to install....",
+            path(qw( source Changes )) => <<'CHANGES',
 Revision history for DZT-Sample:
 
 {{$NEXT}}
@@ -27,9 +27,15 @@ Revision history for DZT-Sample:
   - Initial version
 
 CHANGES
-           path(qw( source dist.ini )) =>
-             simple_ini( ['AutoPrereqs'], ['GatherDir'], ['MakeMaker'], ['CPANFile'], ['NextRelease'], [ 'UsefulReadme', { type => 'gfm' } ], ),
-           path(qw( source lib/DZT/Sample.pm)) => << 'MODULE',
+            path(qw( source dist.ini )) => simple_ini(
+                ['AutoPrereqs'],    #
+                ['GatherDir'],      #
+                ['MakeMaker'],      #
+                ['CPANFile'],       #
+                ['NextRelease'],    #
+                [ 'UsefulReadme', { type => 'gfm' } ],
+            ),
+            path(qw( source lib/DZT/Sample.pm)) => <<'MODULE',
 
 package DZT::Sample;
 use strict;

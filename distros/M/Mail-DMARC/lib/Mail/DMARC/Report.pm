@@ -2,7 +2,7 @@ package Mail::DMARC::Report;
 use strict;
 use warnings;
 
-our $VERSION = '1.20250610';
+our $VERSION = '1.20250805';
 
 use Carp;
 use IO::Compress::Gzip;
@@ -24,8 +24,7 @@ sub compress {
         gz  => \&IO::Compress::Gzip::gzip,    # 2013 draft
         zip => \&IO::Compress::Zip::zip,      # legacy format
     };
-# WARNING: changes here MAY require updates in SMTP::assemble_message
-#   my $cf = ( time > 1372662000 ) ? 'gz' : 'zip';    # gz after 7/1/13
+    # WARNING: changes here MAY require updates in SMTP::assemble_message
     my $cf = 'gz';
     $zipper->{$cf}->( $xml_ref, \$shrunk ) or croak "unable to compress: $!";
     return $shrunk;
@@ -90,7 +89,7 @@ Mail::DMARC::Report - A DMARC report interface
 
 =head1 VERSION
 
-version 1.20250610
+version 1.20250805
 
 =head1 DESCRIPTION
 

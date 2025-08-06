@@ -137,7 +137,7 @@ sub style_text( $self ) {
     my $stc = $self;
 
     # Scintilla uses byte indices.
-    use Encode;
+    require Encode;
     my $text  = Encode::encode_utf8($stc->GetText);
 
     my $style = sub {
@@ -244,9 +244,9 @@ package ChordPro::Wx::TextEditor;
 use parent qw( -norequire Wx::TextCtrl );
 
 use Wx ':everything';
+use ChordPro::Files;
 use ChordPro::Wx::Config;
 use ChordPro::Wx::Utils;
-use ChordPro::Utils qw( is_macos );
 
 sub new( $class, $parent, $id=undef ) {
 

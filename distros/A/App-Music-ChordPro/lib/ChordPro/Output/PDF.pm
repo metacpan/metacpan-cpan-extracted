@@ -12,7 +12,6 @@ package ChordPro::Output::PDF;
 
 use strict;
 use warnings;
-use Encode qw( encode_utf8 );
 use File::Temp ();
 use Storable qw(dclone);
 use List::Util qw(any);
@@ -25,6 +24,7 @@ use ChordPro::Output::Common
 use feature 'signatures';
 
 use ChordPro::Output::PDF::Writer;
+use ChordPro::Files;
 use ChordPro::Paths;
 use ChordPro::Utils;
 
@@ -405,10 +405,10 @@ sub generate_csv {
     # Create an MSPro compatible CSV for this PDF.
     push( @$book, [ "CSV", { meta => { tocpage => $page } } ] );
     my $csv = CP->sibling( $options->{output}, ext => ".csv" );
-    open( my $fd, '>:utf8', encode_utf8($csv) )
-      or die( encode_utf8($csv), ": $!\n" );
+    my $fd = fs_open( $csv, '>:utf8' )
+      or die( $csv, ": $!\n" );
 
-    warn("Generating CSV ", encode_utf8($csv), "...\n")
+    warn("Generating CSV $csv...\n")
       if  $config->{debug}->{csv} || $options->{verbose};
 
     $ps = $config->{pdf};
@@ -533,6 +533,8 @@ sub assets {
     my ( $id ) = @_;
     $assets->{$id};
 }
+# Images that go on all pages.
+my @allpages;
 
 use constant SIZE_ITEMS => [ qw( chord text chorus tab grid diagram
 				 toc title footer label ) ];
@@ -583,6 +585,7 @@ sub generate_song {
 
     $structured = ( $options->{'backend-option'}->{structure} // '' ) eq 'structured';
     $s->structurize if $structured;
+    @allpages = ();
 
     # Diagrams drawer.
     my $dd;
@@ -830,7 +833,7 @@ sub generate_song {
 		( $bgpdf, $pg ) = ( $1, $2 );
 	    }
 	    $fn = CP->findres($bgpdf);
-	    if ( $fn && -s -r $fn ) {
+	    if ( $fn && fs_test( rs => $fn ) ) {
 		$pg++ if $ps->{"even-odd-pages"} && !$rightpage;
 		$pr->importpage( $fn, $pg );
 	    }
@@ -848,6 +851,15 @@ sub generate_song {
 	$col = 0;
 	$vsp_ignorefirst = 1;
 	$col_adjust->();
+
+	# Render the 'allpages' images.
+	for ( @allpages ) {
+	    my %imageinfo = %$_;
+	    my $img = delete $imageinfo{img};
+	    my $x   = delete $imageinfo{x};
+	    my $y   = delete $imageinfo{y};
+	    $pr->add_object( $img, $x, $y, %imageinfo );
+	}
     };
 
     my $checkspace = sub {
@@ -1097,6 +1109,7 @@ sub generate_song {
 
 	if ( $elt->{type} eq "newpage" ) {
 	    $newpage->();
+	    showlayout($ps) if $ps->{showlayout} || $config->{debug}->{spacing};
 	    next;
 	}
 
@@ -2059,6 +2072,11 @@ sub imageline {
     my $img = $asset->{data};
     my $label = $opts->{label};
     my $anchor = $opts->{anchor} //= "float";
+    my $allpages = 0;
+    if ( $anchor eq "allpages" ) {
+	$anchor = "page";
+	$allpages = 1;
+    }
     my $width = $opts->{width};
     my $height = $opts->{height};
     my $avwidth  = $asset->{vwidth};
@@ -2170,13 +2188,14 @@ sub imageline {
     }
 
     if ( $anchor eq "float" ) {
+	# Note that with indent, the image is aligned to the indented area.
 	$align //= ( $opts->{center} // 1 ) ? "center" : "left";
 	# Note that image is placed aligned on $x.
 	if ( $align eq "center" ) {
-	    $x += ($pw - $ps->{_indent}) / 2;
+	    $x += $pw / 2;
 	}
 	elsif ( $align eq "right" ) {
-	    $x += $pw - $ps->{_indent};
+	    $x += $pw;
 	}
 	warn("Image $align: $_[1] -> $x\n") if $config->{debug}->{images};
     }
@@ -2269,6 +2288,20 @@ sub imageline {
 		     align  => $align,
 		     maybe href => $opts->{href},
 		   );
+
+    # For 'allpages' images, remember the calculated results.
+    if ( $allpages ) {
+	push( @allpages,
+	      { img => $img,
+		x => $x, y => $y,
+		xscale => $w/$img->width * $xtrascale,
+		yscale => $h/$img->height * $xtrascale,
+		border => $opts->{border} || 0,
+		valign => $opts->{valign} // "top",
+		align  => $align,
+		maybe href => $opts->{href},
+	      } );
+    }
 
     if ( $anchor eq "float" ) {
 	return ($h + ($oy//0)) * $xtrascale;
@@ -2824,7 +2857,7 @@ sub get_format {
 	$fmt = [ $fmt ] if @$fmt == 3 && !is_arrayref($fmt->[0]);
 
 	# Swap left/right for even pages.
-	if ( !$rightpage ) {
+	if ( !$rightpage && !$noswap ) {
 	    $_ = [ reverse @$_ ] for @$fmt;
 	}
 

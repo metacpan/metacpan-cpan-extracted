@@ -1,0 +1,9 @@
+<%ARGS>
+$Ticket
+$PassArguments => {}
+</%ARGS>
+
+<%INIT>
+my ($d) = $Ticket->Unlock;
+$PassArguments->{'Duration'} = $d unless $PassArguments->{'Duration'};
+</%INIT>

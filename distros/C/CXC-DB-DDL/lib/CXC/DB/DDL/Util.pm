@@ -7,7 +7,7 @@ use strict;
 use warnings;
 use experimental 'signatures', 'postderef', 'declared_refs';
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 use List::Util      qw( pairs first );
 use Sub::Util       qw( set_subname );
@@ -563,7 +563,7 @@ CXC::DB::DDL::Util - CXC::DB::DDL utilities
 
 =head1 VERSION
 
-version 0.20
+version 0.21
 
 =head1 SYNOPSIS
 

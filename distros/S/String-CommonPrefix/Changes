@@ -1,3 +1,8 @@
+0.021   2025-08-02  Released-By: PERLANCAR; Urgency: medium
+
+        - Add function: majority_prefix.
+
+
 0.020   2024-05-16  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

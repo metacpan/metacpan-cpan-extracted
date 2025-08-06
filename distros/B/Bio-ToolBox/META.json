@@ -28,7 +28,9 @@
          },
          "requires" : {
             "Bio::DB::Big" : "1",
+            "Bio::DB::BigFile" : "1.07",
             "Bio::DB::HTS" : "3.01",
+            "Bio::DB::Sam" : "1.36",
             "Bio::Root::Version" : "1.006924",
             "Config::Simple" : "4.58",
             "File::Which" : "1.17",
@@ -52,7 +54,7 @@
    "provides" : {
       "Bio::ToolBox" : {
          "file" : "lib/Bio/ToolBox.pm",
-         "version" : "2.01"
+         "version" : "2.02"
       },
       "Bio::ToolBox::Data" : {
          "file" : "lib/Bio/ToolBox/Data.pm",
@@ -68,7 +70,7 @@
       },
       "Bio::ToolBox::Data::Stream" : {
          "file" : "lib/Bio/ToolBox/Data/Stream.pm",
-         "version" : "2.00"
+         "version" : "2.02"
       },
       "Bio::ToolBox::Data::core" : {
          "file" : "lib/Bio/ToolBox/Data/core.pm",
@@ -76,7 +78,7 @@
       },
       "Bio::ToolBox::Data::file" : {
          "file" : "lib/Bio/ToolBox/Data/file.pm",
-         "version" : "2.01"
+         "version" : "2.02"
       },
       "Bio::ToolBox::GeneTools" : {
          "file" : "lib/Bio/ToolBox/GeneTools.pm",
@@ -84,7 +86,7 @@
       },
       "Bio::ToolBox::Parser" : {
          "file" : "lib/Bio/ToolBox/Parser.pm",
-         "version" : "2.00"
+         "version" : "2.02"
       },
       "Bio::ToolBox::Parser::bed" : {
          "file" : "lib/Bio/ToolBox/Parser/bed.pm",
@@ -104,11 +106,11 @@
       },
       "Bio::ToolBox::SeqFeature" : {
          "file" : "lib/Bio/ToolBox/SeqFeature.pm",
-         "version" : "2.00"
+         "version" : "2.02"
       },
       "Bio::ToolBox::big_helper" : {
          "file" : "lib/Bio/ToolBox/big_helper.pm",
-         "version" : "2.00"
+         "version" : "2.02"
       },
       "Bio::ToolBox::db_helper" : {
          "file" : "lib/Bio/ToolBox/db_helper.pm",
@@ -166,7 +168,7 @@
       },
       "Bio::ToolBox::utility" : {
          "file" : "lib/Bio/ToolBox/utility.pm",
-         "version" : "2.01"
+         "version" : "2.02"
       }
    },
    "release_status" : "stable",
@@ -178,6 +180,6 @@
          "url" : "https://github.com/tjparnell/biotoolbox"
       }
    },
-   "version" : "2.01",
+   "version" : "2.02",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

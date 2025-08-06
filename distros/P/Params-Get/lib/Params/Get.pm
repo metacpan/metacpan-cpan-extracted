@@ -16,11 +16,20 @@ Params::Get - Get the parameters to a subroutine in any way you want
 
 =head1 VERSION
 
-Version 0.11
+Version 0.13
 
 =cut
 
-our $VERSION = '0.11';
+our $VERSION = '0.13';
+
+=head1 DESCRIPTION
+
+Exports a single function, C<get_params>, which returns a given value.
+If a validation schema is provided, the value is validated using
+L<Params::Validate::Strict>.
+If validation fails, it croaks.
+
+When used hand-in-hand with L<Return::Set> you should be able to formally specify the input and output sets for a method.
 
 =head1 SYNOPSIS
 
@@ -154,6 +163,10 @@ sub get_params
 	}
 	if($num_args == 0) {
 		if(defined($default)) {
+			# if(defined($_[0]) && (ref($_[0]) eq 'ARRAY')) {
+				# FIXME
+				# return { $default => [] };
+			# }
 			# FIXME: No means to say that the default is optional
 			# Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], "($default => \$val)");
 			Carp::croak(Devel::Confess::longmess('Usage: ', __PACKAGE__, '->', (caller(1))[3], "($default => \$val)"));
@@ -163,7 +176,7 @@ sub get_params
 	if(($num_args == 2) && (ref($args->[1]) eq 'HASH')) {
 		if(defined($default)) {
 			if(scalar keys %{$args->[1]}) {
-				# Obj->new('foo', { 'key1' => 'val1 } - set foo to the mandatory first argument, and the rest are options
+				# Obj->new('foo', { 'key1' => 'val1' } - set foo to the mandatory first argument, and the rest are options
 				return {
 					$default => $args->[0],
 					%{$args->[1]}
@@ -198,6 +211,8 @@ Sometimes giving an array ref rather than array fails.
 =over 4
 
 =item * L<Params::Validate::Strict>
+
+=item * L<Return::Set>
 
 =back
 

@@ -352,6 +352,7 @@ delegates {
     type     : image
     module   : Lilypond
     handler  : ly2svg
+    program  : ""
     config   : default
 
     // The preamble is a list of lines inserted before the lilipond data,
@@ -1075,6 +1076,7 @@ debug {
   layout      : 0
   meta        : 0
   mma         : 0
+  pages       : 0
   paths       : 0
   pp          : 0
   spacing     : 0

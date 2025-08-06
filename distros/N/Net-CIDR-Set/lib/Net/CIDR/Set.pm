@@ -13,7 +13,7 @@ use overload '""' => 'as_string';
 
 use namespace::autoclean;
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 
 {
@@ -436,7 +436,7 @@ Net::CIDR::Set - Manipulate sets of IP addresses
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 SYNOPSIS
 
@@ -541,17 +541,17 @@ A synonym for C<contains_all>.
 Return true if the set contains all of the supplied addresses.
 Given this set:
 
-  my $set = Net::CIDR::Set->new('244.188.12.0/8');
+  my $set = Net::CIDR::Set->new('244.188.12.0/12');
 
 this condition is true:
 
-  if ( $set->contains_all('244.188.12.128/3') ) {
+  if ( $set->contains_all('244.188.12.128/32') ) {
     # ...
   }
 
 while this condition is false:
 
-  if ( $set->contains_all('244.188.12.0/12') ) {
+  if ( $set->contains_all('244.188.12.0/8') ) {
     # ...
   }
 
@@ -804,9 +804,13 @@ The encode and decode routines were stolen en masse from Douglas Wilson's L<Net:
 
 =head1 CONTRIBUTORS
 
-=for stopwords Brian Gottreu Robert Rothenberg Stig Palmquist
+=for stopwords Thomas Eckardt Brian Gottreu Robert Rothenberg Stig Palmquist
 
 =over 4
+
+=item *
+
+Thomas Eckardt <Thomas.Eckardt@thockar.com>
 
 =item *
 

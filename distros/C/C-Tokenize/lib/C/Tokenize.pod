@@ -30,7 +30,7 @@ produces output
     
 
 
-(This example is included as L<F<synopsis-cpp.pl>|https://fastapi.metacpan.org/source/BKB/C-Tokenize-0.18/examples/synopsis-cpp.pl> in the distribution.)  
+(This example is included as L<F<synopsis-cpp.pl>|https://fastapi.metacpan.org/source/BKB/C-Tokenize-0.19/examples/synopsis-cpp.pl> in the distribution.)  
 
     
     # Print all the comments in a C program:
@@ -60,12 +60,12 @@ produces output
     
 
 
-(This example is included as L<F<synopsis-comment.pl>|https://fastapi.metacpan.org/source/BKB/C-Tokenize-0.18/examples/synopsis-comment.pl> in the distribution.)  
+(This example is included as L<F<synopsis-comment.pl>|https://fastapi.metacpan.org/source/BKB/C-Tokenize-0.19/examples/synopsis-comment.pl> in the distribution.)  
 
 =head1 VERSION
 
-This documents version 0.18 of C::Tokenize corresponding
-to git commit L<cac6e4c67b2ddcd7b3fb030ebb367f124a33057c|https://github.com/benkasminbullock/C-Tokenize/commit/cac6e4c67b2ddcd7b3fb030ebb367f124a33057c> released on Thu Feb 22 13:47:15 2018 +0900.
+This documents version 0.19 of C::Tokenize corresponding
+to git commit L<98c04e11199496e4e99e4c6e3eb97b4efaf8636b|https://github.com/benkasminbullock/C-Tokenize/commit/98c04e11199496e4e99e4c6e3eb97b4efaf8636b> released on Tue Aug 5 18:14:49 2025 +0900.
 
 =head1 DESCRIPTION
 
@@ -155,7 +155,7 @@ produces output
     Include statement #include "that.h" includes file that.h.
 
 
-(This example is included as L<F<includes.pl>|https://fastapi.metacpan.org/source/BKB/C-Tokenize-0.18/examples/includes.pl> in the distribution.)  
+(This example is included as L<F<includes.pl>|https://fastapi.metacpan.org/source/BKB/C-Tokenize-0.19/examples/includes.pl> in the distribution.)  
 
 This was added in version 0.12 of C::Tokenize.
 
@@ -243,7 +243,7 @@ produces output
     & q is a C variable.
 
 
-(This example is included as L<F<cvar.pl>|https://fastapi.metacpan.org/source/BKB/C-Tokenize-0.18/examples/cvar.pl> in the distribution.)  
+(This example is included as L<F<cvar.pl>|https://fastapi.metacpan.org/source/BKB/C-Tokenize-0.19/examples/cvar.pl> in the distribution.)  
 
 Because in theory this can contain very complex things, this regex is
 somewhat heuristic and there are edge cases where it is known to
@@ -392,7 +392,7 @@ produces output
     int z;
 
 
-(This example is included as L<F<strip-comments.pl>|https://fastapi.metacpan.org/source/BKB/C-Tokenize-0.18/examples/strip-comments.pl> in the distribution.)  
+(This example is included as L<F<strip-comments.pl>|https://fastapi.metacpan.org/source/BKB/C-Tokenize-0.19/examples/strip-comments.pl> in the distribution.)  
 
 This function was moved to this module from L<XS::Check> in version
 0.14.
@@ -421,7 +421,7 @@ produces output
     }
 
 
-(This example is included as L<F<strip-json.pl>|https://fastapi.metacpan.org/source/BKB/C-Tokenize-0.18/examples/strip-json.pl> in the distribution.)  
+(This example is included as L<F<strip-json.pl>|https://fastapi.metacpan.org/source/BKB/C-Tokenize-0.19/examples/strip-json.pl> in the distribution.)  
 
 =head1 EXPORTS
 
@@ -498,12 +498,12 @@ See the discussion under L</$cvar_re>.
 
 =head1 AUTHOR
 
-Ben Bullock, <bkb@cpan.org>
+Ben Bullock, <benkasminbullock@gmail.com>
 
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2012-2018
+2012-2025
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

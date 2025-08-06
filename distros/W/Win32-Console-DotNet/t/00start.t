@@ -114,8 +114,6 @@ done_testing;
 
 __DATA__
 
-Class::Accessor
-Class::Method::Modifiers
 namespace::clean
 
 Devel::Assert

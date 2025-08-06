@@ -1,5 +1,14 @@
 -----
 
+0.1.4    2025-08-05
+   [Added]
+       * New constants:
+         * Sys::Async::Virt->BASELINE_CPU_IGNORE_HOST
+         * Sys::Async::Virt::Domain->EVENT_STARTED_RECREATED
+         * Sys::Async::Virt::Domain->EVENT_STOPPED_RECREATED
+   [Changed]
+       * Updated to libvirt tag v11.6.0 (from v11.5.0)
+
 0.1.3    2025-07-13
    [Changed]
        * Removed ':repr()' attributes from classes inheriting

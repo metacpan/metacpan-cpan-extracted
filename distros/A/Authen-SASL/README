@@ -19,6 +19,7 @@ build Authen::SASL:
     * Digest::MD5
     * JSON::PP
     * Test::More (for running tests only)
+  * Crypt::URandom
   * Digest::HMAC_MD5
   * GSSAPI (optional; for Kerberos v5 support)
 

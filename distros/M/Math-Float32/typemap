@@ -1,0 +1,19 @@
+mpq_t *            GMP_PTR
+mpz_t *            GMP_PTR
+mpf_t *            GMP_PTR
+mpc_t *            GMP_PTR
+mpfi_t *           GMP_PTR
+mpfr_t *           GMP_PTR
+gmp_randstate_t *  GMP_PTR
+__bf16 *           FLOAT16_PTR
+_Float16 *         FLOAT16_PTR
+float *            FLOAT32_PTR
+
+INPUT
+GMP_PTR
+            $var = INT2PTR($type, SvIVX(SvRV($arg)));
+FLOAT16_PTR
+            $var = INT2PTR($type, SvIVX(SvRV($arg)));
+FLOAT32_PTR
+            $var = INT2PTR($type, SvIVX(SvRV($arg)));
+

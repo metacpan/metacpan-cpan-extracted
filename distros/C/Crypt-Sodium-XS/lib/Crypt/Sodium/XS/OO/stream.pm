@@ -130,8 +130,8 @@ alternatives to L<Crypt::Sodium::XS::OO::secretbox>.
   my $stream = Crypt::Sodium::XS::OO::stream->new(primitive => 'xchacha20');
   my $stream = Crypt::Sodium::XS->stream;
 
-Returns a new secretstream object for the given primitive. If not given, the
-default primitive is C<default>.
+Returns a new stream object for the given primitive. If not given, the default
+primitive is C<default>.
 
 =head1 ATTRIBUTES
 

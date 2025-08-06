@@ -36,7 +36,7 @@ This was written as a successor to [Pod::Readme](https://metacpan.org/pod/Pod%3A
 
 # RECENT CHANGES
 
-Changes for version v0.1.2 (2025-08-02)
+Changes for version v0.4.1 (2025-08-06)
 
 - Tests
     - Fix prerequisites for tests.

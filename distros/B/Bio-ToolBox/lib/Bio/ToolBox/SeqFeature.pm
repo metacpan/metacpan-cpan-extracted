@@ -18,7 +18,7 @@ use constant {
 	SUBF  => 11,
 };
 
-our $VERSION = '2.00';
+our $VERSION = '2.02';
 
 #### Aliases ####
 # to maintain compatibility with Bio::SeqFeature::Lite and Bio::SeqFeatureI we
@@ -81,7 +81,12 @@ sub new {
 	{
 		# flip the coordinates around
 		( $self->[START], $self->[STOP] ) = ( $self->[STOP], $self->[START] );
-		$self->[STRND] *= -1;
+		if ( defined $self->[STRND] ) {
+			$self->[STRND] *= -1;
+		}
+		else {
+			$self->[STRND] = -1;
+		}
 	}
 
 	# additional options
@@ -807,6 +812,10 @@ third field in a GFF file.
 A shortcut method which can represent either "primary_tag:source_tag" or, 
 if no source_tag is defined, simply "primary_tag".
 
+=item method
+
+Old BioPerl compatibility function; alias to L<primary_tag>.
+
 =item name
 
 =item display_name
@@ -976,6 +985,15 @@ These methods export the SeqFeature object as a text string in the
 specified format. New line characters are included.
 
 =over 4
+
+=item version
+
+Old BioPerl compatibility function to set and retrieve GFF version. Only
+GFF3 is supported.
+
+=item gff3_string
+
+Alias to L<gff_string>.
 
 =item gff_string($recurse)
 

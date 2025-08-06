@@ -27,7 +27,7 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.64"
+            "ExtUtils::MakeMaker" : "6.56"
          }
       },
       "runtime" : {
@@ -54,7 +54,7 @@
             "Win32::Console" : "0.10",
             "Win32API::File" : "0.1201",
             "constant" : "0",
-            "namespace::clean" : "0.27",
+            "namespace::clean" : "0.26",
             "perl" : "5.014",
             "threads" : "0",
             "threads::shared" : "0"
@@ -82,7 +82,7 @@
          "web" : "https://github.com/brickpool/Win32-Console-DotNet"
       }
    },
-   "version" : "0.005005",
+   "version" : "0.005006",
    "x_homepage" : "http://brickpool.de",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

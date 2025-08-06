@@ -14,6 +14,7 @@ do { my $x = {
                       'requires' => {
                                       'Pod::Coverage::TrustPod' => '0',
                                       'Software::Security::Policy::Individual' => '0.10',
+                                      'Test2::Tools::Basic' => '1.302200',
                                       'Test::CPAN::Changes' => '0',
                                       'Test::CleanNamespaces' => '0.15',
                                       'Test::DistManifest' => '0',
@@ -21,6 +22,7 @@ do { my $x = {
                                       'Test::EOL' => '0',
                                       'Test::Kwalitee' => '1.21',
                                       'Test::MinimumVersion' => '0',
+                                      'Test::MixedScripts' => 'v0.3.0',
                                       'Test::More' => '0.88',
                                       'Test::NoTabs' => '0',
                                       'Test::Perl::Critic' => '0',
@@ -64,6 +66,7 @@ do { my $x = {
                                      'CPAN::Meta' => '2.120900'
                                    },
                    'requires' => {
+                                   'Dist::Zilla::Plugin::PodWeaver' => '0',
                                    'File::Spec' => '0',
                                    'Module::Metadata' => '1.000015',
                                    'Pod::Markdown' => '3.000',
@@ -72,9 +75,10 @@ do { my $x = {
                                    'Pod::Text' => '0',
                                    'Test::DZil' => '0',
                                    'Test::Deep' => '0',
-                                   'Test::MixedScripts' => 'v0.3.0',
                                    'Test::More' => '0',
+                                   'open' => '0',
                                    'strict' => '0',
+                                   'utf8' => '0',
                                    'warnings' => '0'
                                  }
                  }

@@ -190,6 +190,9 @@ L<Crypt::Sodium::XS::MemVault>. Using the same seed will generate the same key
 pair, so it must be kept confidential. If omitted, a key pair is randomly
 generated.
 
+C<$flags> is optional. It is the flags used for the C<$secret_key>
+L<Crypt::Sodium::XS::MemVault>. See L<Crypt::Sodium::XS::ProtMem>.
+
 Returns a public key of L</PUBLICKEYBYTES> bytes and a
 L<Crypt::Sodium::XS::MemVault>: a secret key of L</SECRETKEYBYTES> bytes.
 

@@ -20,7 +20,7 @@ sub main {
     return 1;
   }
 
-  eval {
+  try: eval {
     # Attempt to open output file.
     if ( my $writer = IO::File->new($args[1], 'w') ) {
       if ( my $reader = IO::File->new($args[0], 'r') ) {
@@ -36,7 +36,7 @@ sub main {
       }
     }
   };
-  if ( $@ ) {
+  catch: if ( $@ ) {
     my $errorWriter = Console->Error;
     $errorWriter->say($@);
     $errorWriter->say(usageText);

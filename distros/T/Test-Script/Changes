@@ -1,5 +1,10 @@
 Revision history for Perl extension Test-Script
 
+1.30      2025-08-04 14:01:25 -0600
+  - Documentation improvements (#42)
+  - Fix bug where implicit function export would happen regardless of which
+    functions were explicitly exported (gh#45, gh#46)
+
 1.29      2021-05-13 09:17:30 -0600
   - Production release identical to 1.28_01 release.
 

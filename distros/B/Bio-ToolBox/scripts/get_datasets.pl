@@ -26,7 +26,7 @@ eval {
 	$parallel = 1;
 };
 
-our $VERSION = '2.00';
+our $VERSION = '2.02';
 
 print "\n A program to collect data for a list of features\n\n";
 
@@ -167,6 +167,12 @@ if ($infile) {
 	{
 		$Data->feature($feature);
 	}
+
+	# set headers to true if file was explicitly not parsed
+	# since warnings will occur when we add columns and write to a file
+	if ( $parse == 0 ) {
+		$Data->headers(1);
+	}
 }
 elsif ($new) {
 
@@ -198,11 +204,20 @@ $Data->program("$PROGRAM_NAME, v $VERSION");
 
 # Check output file name
 unless ($outfile) {
-	if ( $Data->basename ) {
-		$outfile = $Data->path . $Data->basename;
+	if ( $Data->filename ) {
+
+		# reuse the input filename and overwrite
+		$outfile = $Data->filename;
+	}
+	elsif ( $Data->basename ) {
+
+		# no filename but a basename is indicative of a parsed file
+		# so stick a txt extension on it, and write in current directory
+		$outfile = sprintf "%s.txt", $Data->basename;
 	}
 	else {
-		die " No output file provided!\n";
+		print STDERR " FATAL: No output file provided!\n";
+		exit 1;
 	}
 }
 

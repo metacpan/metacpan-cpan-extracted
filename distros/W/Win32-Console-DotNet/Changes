@@ -1,9 +1,17 @@
 Revision history for Win32::Console::DotNet
 
-0.5.5   2025-06-17
+0.5.6   2025-07-24
+        - Bugfix Prototype mismatch warning if using 'Types::Standard'
+        - Add additional MIME names for cp932, cp949, cp950
+        - Update '30ConsoleEncoding.t' tolerate wrong GetConsoleCP on restore
+        - Update 'Makefile.PL' eumm-upgrade from Alexandr Ciornii
         - Update (POD) documentation
+        - Update Samples
+
+0.5.5   2025-06-17
         - Change from 'namespace::sweep' to 'namespace::clean'
         - Change to 'Old School Object Oriented Perl'
+        - Update (POD) documentation
 
 0.5.4   2025-02-18
         - Bugfix test case 'GetCursorPosition_Invoke_ReturnsExpected'
@@ -13,11 +21,11 @@ Revision history for Win32::Console::DotNet
         - Remove non dual modules as a dependency if part of >= perl 5.14.
 
 0.5.3   2024-09-09
-        - Remove 'Type::Nano' as a prerequisite (see 0.2)
         - Change from 'Class::Tiny/Class::Tiny::Antlers' to 'Class::Accessor'
         - Change replace '&Class::Tiny::Antlers::confess' with '&Carp::confess'
         - Change from 'PerlX::Assert' to 'Devel::Assert'
         - Update 'MakeFile.PL' reverts 'Platform::Windows' (see 0.5.1)
+        - Remove 'Type::Nano' as a prerequisite (see 0.2)
 
 0.5.2   2024-08-28
         - Update '34ThreadSafety.t' suppress warnings for redirected handles

@@ -13,15 +13,7 @@ use Exporter 'import';
 our @EXPORT;
 our @EXPORT_OK;
 
-################ Platforms ################
-
-use constant MSWIN => $^O =~ /MSWin|Windows_NT/i ? 1 : 0;
-
-sub is_msw ()   { MSWIN }
-sub is_macos () { $^O =~ /darwin/ }
-sub is_wx ()    { main->can("OnInit") }
-
-push( @EXPORT, qw( is_msw is_macos is_wx ) );
+use ChordPro::Files qw( is_msw is_macos );
 
 ################ Filenames ################
 
@@ -35,7 +27,7 @@ use constant BSD_GLOB_FLAGS => GLOB_NOCHECK | GLOB_QUOTE | GLOB_TILDE | GLOB_ERR
   | ($^O =~ m/\A(?:MSWin32|VMS|os2|dos|riscos)\z/ ? GLOB_NOCASE : 0);
 
 # File::Glob did not try %USERPROFILE% (set in Windows NT derivatives) for ~ before 5.16
-use constant WINDOWS_USERPROFILE => MSWIN && $] < 5.016;
+use constant WINDOWS_USERPROFILE => is_msw && $] < 5.016;
 
 sub expand_tilde ( $dir ) {
 
@@ -68,30 +60,6 @@ sub expand_tilde ( $dir ) {
 }
 
 push( @EXPORT, 'expand_tilde' );
-
-sub findexe ( $prog, $silent = 0 ) {
-    my @path;
-    if ( MSWIN ) {
-	$prog .= ".exe" unless $prog =~ /\.\w+$/;
-	@path = split( ';', $ENV{PATH} );
-	unshift( @path, '.' );
-    }
-    else {
-	@path = split( ':', $ENV{PATH} );
-    }
-    foreach ( @path ) {
-	my $try = "$_/$prog";
-	if ( -f -x $try ) {
-	    #warn("Found $prog in $_\n");
-	    return $try;
-	}
-    }
-    warn("Could not find $prog in ",
-	 join(" ", map { qq{"$_"} } @path), "\n") unless $silent;
-    return;
-}
-
-push( @EXPORT, 'findexe' );
 
 sub sys ( @cmd ) {
     warn("+ @cmd\n") if $::options->{trace};
@@ -629,5 +597,15 @@ sub propitems_re() {
 
 push( @EXPORT, "propitems_re" );
 push( @EXPORT_OK, "propitems" );
+
+# For debugging encoding problems.
+
+sub as( $s ) {
+    $s =~ s{ ( [^\x{20}-\x{7f}] ) }
+	   { join( '', map { sprintf '\x{%02x}', ord $_ } split //, $1) }gex;
+    return $s;
+}
+
+push( @EXPORT_OK, "as" );
 
 1;

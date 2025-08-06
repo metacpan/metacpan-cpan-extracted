@@ -3,7 +3,7 @@ NAME
     tickets
 
 RT VERSION
-    Works with RT 4 and 5.0.
+    Works with RT 5 and 6.0.
 
 DESCRIPTION
     Locks can be of several different types. Current types are:
@@ -97,19 +97,11 @@ INSTALLATION
     make install
         May need root permissions
 
-    Edit your /opt/rt5/etc/RT_SiteConfig.pm
-        If you are using RT 4.2 or greater, add this line:
-
+    Edit your /opt/rt6/etc/RT_SiteConfig.pm
             Plugin('RT::Extension::TicketLocking');
 
-        For RT 4.0, add this line:
-
-            Set(@Plugins, qw(RT::Extension::TicketLocking));
-
-        or add RT::Extension::TicketLocking to your existing @Plugins line.
-
     Clear your mason cache
-            rm -rf /opt/rt5/var/mason_data/obj
+            rm -rf /opt/rt6/var/mason_data/obj
 
     Restart your webserver
 
@@ -168,7 +160,7 @@ BUGS
         L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-TicketLocking>.
 
 COPYRIGHT
-    This extension is Copyright (C) 2007-2014 Best Practical Solutions, LLC.
+    This extension is Copyright (C) 2007-2025 Best Practical Solutions, LLC.
 
     This is free software, licensed under:
 

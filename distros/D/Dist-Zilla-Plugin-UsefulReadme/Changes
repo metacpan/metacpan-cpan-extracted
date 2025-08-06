@@ -1,5 +1,56 @@
 Release history for Dist-Zilla-Plugin-UsefulReadme:
 
+v0.4.1    2025-08-06 08:41:07+01:00 Europe/London
+  [Tests]
+  - Fix prerequisites for tests.
+
+v0.4.0    2025-08-05 17:11:19+01:00 Europe/London
+  [Enhancements]
+  - Pod::Weaver::Section::InstallationInstructions, Pod::Weaver::Section::RecentChanges and
+    Pod::Weaver::Section::Requirements only update the main module unless the newly added
+    all_modules option is true, GH#7.
+
+  - Pod::Weaver::Section::InstallationInstructions, Pod::Weaver::Section::RecentChanges and
+    Pod::Weaver::Section::Requirements can be configured bia the `dist.ini` file, GH#2.
+
+  [Bug Fixes]
+  - Pass the main_module filename to Pod::Weaver plugins.
+
+  - The heading is not dropped when including sections from :readme regions.
+
+  [Documentation]
+  - Reorganised Changes for consistency.
+
+v0.3.0    2025-08-05 13:14:54+01:00 Europe/London
+  [Enhancements]
+  - Add support for append/prepend to generated fallback sections, GH#3.
+
+  [Bug Fixes]
+  - Handle sections with "=for Test::MixedScripts".
+
+  [Tests]
+  - Added more author tests.
+
+v0.2.0    2025-08-04 17:05:24+01:00 Europe/London
+  [Enhancements]
+  - Extra "=pod" and "=cut" directives are removed from the returned POD.
+
+  - Added encoding option to configure the default text encoding.
+
+  - Added regions option to configure regions to include.
+
+  [Bug Fixes]
+  - No Recent Changes section will be added if there are no entries, GH#5.
+
+  - The "pod" type README now works.
+
+  - Handle sections with "=for stopwords" and "=for Pod::Coverage", GH#6.
+
+  [Other]
+  - Fixed prerequisites.
+
+  - Reformatted test scripts.
+
 v0.1.2    2025-08-02 11:47:45+01:00 Europe/London
   [Tests]
   - Fix prerequisites for tests.

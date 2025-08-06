@@ -1,5 +1,11 @@
 Revision history for Params-Validate-Strict
 
+0.08	Tue Aug  5 18:58:37 EDT 2025
+	Validate objects
+
+0.07	Tue Aug  5 10:43:55 EDT 2025
+	Validate that max > min in the schema
+
 0.06	Wed Jul 30 14:37:31 EDT 2025
 	Added the 'nomatch' and 'memberof' rules
 
