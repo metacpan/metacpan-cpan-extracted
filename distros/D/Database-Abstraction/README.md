@@ -15,7 +15,7 @@ Database::Abstraction - Read-only Database Abstraction Layer (ORM)
 
 # VERSION
 
-Version 0.27
+Version 0.28
 
 # DESCRIPTION
 
@@ -143,6 +143,16 @@ Therefore when given with no arguments you can get the current default values:
     my $defaults = Database::Abstraction::init();
     print $defaults->{'directory'}, "\n";
 
+## import
+
+The module can be initialised by the `use` directive.
+
+    use Database::Abstraction 'directory' => '/etc/data';
+
+or
+
+    use Database::Abstraction { 'directory' => '/etc/data' };
+
 ## new
 
 Create an object to point to a read-only database.
@@ -236,6 +246,10 @@ Use caching if that is available.
 
 Similar to selectall\_hashref but returns an array of hash references.
 
+## count
+
+Return the number items/rows matching the given criteria
+
 ## fetchrow\_hashref
 
 Returns a hash reference for a single row in a table.
@@ -323,6 +337,6 @@ This program is released under the following licence: GPL2.
 Usage is subject to licence terms.
 The licence terms of this software are as follows:
 Personal single user, single computer use: GPL2
-All other users (for example Commercial, Charity, Educational, Government)
+All other users (for example, Commercial, Charity, Educational, Government)
 must apply in writing for a licence for use from Nigel Horne at the
 above e-mail.

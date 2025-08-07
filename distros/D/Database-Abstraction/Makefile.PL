@@ -26,6 +26,7 @@ WriteMakefile(
 	TEST_REQUIRES => {
 		'DBD::CSV' => 0,
 		'DBD::XMLSimple' => 0.07,
+		'Fcntl' => 0,
 		'File::Spec' => 0,
 		'File::Temp' => 0,
 		'FindBin' => 0,
@@ -51,9 +52,9 @@ WriteMakefile(
 		'File::Spec' => 0,
 		'File::pfopen' => 0.03,
 		'File::Temp' => 0,
-		'Log::Abstraction' => 0.05,
+		'Log::Abstraction' => 0.24,
 		'Object::Configure' => 0,
-		'Params::Get' => 0,
+		'Params::Get' => 0.13,
 		'Scalar::Util' => 0,
 	}, dist => $dist,
 	clean		=> { FILES => 'Database-Abstraction-*' },
@@ -70,9 +71,10 @@ WriteMakefile(
 				web => 'https://github.com/nigelhorne/Database-Abstraction',
 				# license    => 'http://dev.perl.org/licenses/',
 			}, bugtracker => {
-				# web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Database-Abstraction',
-				web => 'https://github.com/nigelhorne/Database-Abstraction/issues',
-				url => 'https://github.com/nigelhorne/Database-Abstraction/issues',
+				web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Database-Abstraction',
+				url => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Database-Abstraction',
+				# web => 'https://github.com/nigelhorne/Database-Abstraction/issues',
+				# url => 'https://github.com/nigelhorne/Database-Abstraction/issues',
 				mailto => 'bug-Database-Abstraction@rt.cpan.org'
 			}
 		},

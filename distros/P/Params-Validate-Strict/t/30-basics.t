@@ -107,7 +107,7 @@ subtest "Invalid Inputs" => sub {
 				return $password =~ m/[a-z]/ && $password =~ m/[A-Z]/ && $password =~ m/[0-9]/;
 			},
 		},
-		name => 'string',
+		name => { 'type' => 'string', optional => 1 }
 	};
 
 	my $args1 = { username => 'sh' };	# Too short
@@ -118,7 +118,7 @@ subtest "Invalid Inputs" => sub {
 	my $validated_params2 = eval { validate_strict(schema => $schema, args => $args2) };
 	like $@, qr/username/, "Long username should fail";
 
-	my $args3 = { age => "-1" }; # Invalid age
+	my $args3 = { age => -1 }; # Invalid age
 	my $validated_params3 = eval { validate_strict(schema => $schema, args => $args3) };
 	like $@, qr/age/, 'Invalid age should fail';
 
@@ -126,7 +126,7 @@ subtest "Invalid Inputs" => sub {
 	my $validated_params4 = eval { validate_strict(schema => $schema, args => $args4) };
 	like $@, qr/email/, "Invalid email should fail";
 
-	my $args5 = { price => "-1" }; # Invalid price
+	my $args5 = { price => -1 }; # Invalid price
 	my $validated_params5 = eval { validate_strict(schema => $schema, args => $args5) };
 	like $@, qr/price/, "Invalid price should fail";
 
@@ -167,7 +167,7 @@ subtest "Invalid Inputs" => sub {
 	};
 	throws_ok {
 		validate_strict(args => $args13, schema => $schema, unknown_parameter_handler => 'die')
-	} qr/is not a member of/, 'memberof detects when a number is not in the list';
+	} qr/must be one of/, 'memberof detects when a number is not in the list';
 
 	$schema = {
 		'number' => { 'type' => 'integer', 'min' => 1000, 'max' => 995 }
@@ -182,7 +182,7 @@ subtest "Invalid Inputs" => sub {
 	my $args14 = { obj => new_ok('MyClass') };
 	throws_ok {
 		validate_strict(args => $args14, schema => $schema, unknown_parameter_handler => 'die')
-	} qr/must an object that understands the bar method/, 'validate min and max in the schema';
+	} qr/must be an object that understands the bar method/, 'validate min and max in the schema';
 };
 
 done_testing();

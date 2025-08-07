@@ -5,14 +5,18 @@ use Test::More;
 use Test::Deep;
 use Test::DZil;
 
+use List::Util;
 use Path::Tiny qw( path );
 use Pod::Markdown::Github;
+
+use experimental qw( postderef );
 
 my $tzil = Builder->from_config(
     { dist_root => 'does-not-exist' },
     {
         add_files => {
             path(qw( source INSTALL )) => "How to install....",
+            path(qw( source Build.PL )) => "",
             path(qw( source Changes )) => <<'CHANGES',
 Revision history for DZT-Sample:
 
@@ -81,6 +85,8 @@ MODULE
 $tzil->chrome->logger->set_debug(1);
 $tzil->build;
 
+ok( ( List::Util::any { $_->name eq "Makefile.PL" } $tzil->files->@* ), "has Makefile.PL too");
+
 # use DDP; p $tzil;
 
 my $file = path( $tzil->tempdir, "build", "README.md" );
@@ -88,6 +94,8 @@ my $file = path( $tzil->tempdir, "build", "README.md" );
 ok $file->exists, $file->basename . " exists";
 
 ok my $text = $file->slurp_raw, "has content";
+
+like $text, qr/^\s*perl Build\.PL\n\s*perl Build\nperl Build test\nperl Build install\n/m, "suggests Build.PL";
 
 note $text;
 

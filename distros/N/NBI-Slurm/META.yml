@@ -15,19 +15,19 @@ name: NBI-Slurm
 provides:
   NBI::Job:
     file: lib/NBI/Job.pm
-    version: v0.12.1
+    version: v0.14.0
   NBI::Opts:
     file: lib/NBI/Opts.pm
-    version: v0.12.1
+    version: v0.14.0
   NBI::Queue:
     file: lib/NBI/Queue.pm
-    version: v0.12.1
+    version: v0.14.0
   NBI::QueuedJob:
     file: lib/NBI/QueuedJob.pm
-    version: v0.12.1
+    version: v0.14.0
   NBI::Slurm:
     file: lib/NBI/Slurm.pm
-    version: v0.12.1
+    version: v0.14.0
 recommends:
   File::Which: '0'
 requires:
@@ -43,7 +43,7 @@ requires:
 resources:
   bugtracker: https://github.com/quadram-institute-bioscience/NBI-Slurm/issues
   repository: https://github.com/quadram-institute-bioscience/NBI-Slurm.git
-version: 0.12.1
+version: 0.14.0
 x_generated_by_perl: v5.38.2
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: MIT

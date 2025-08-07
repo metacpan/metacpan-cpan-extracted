@@ -1,6 +1,14 @@
+0.14.0  2025-06-30
+
+* Added `--gpu` in runjob
+
+0.13.0  2025-05-20
+
+* Added `whilejob`
+
 0.12.1  2025-02-25
 
-* Skip Windows tests for binaries (SLURM is a Linux thing after all)
+* SLURM is a Linux thing (no tests for Windows)
 
 0.12.0  2025-02-25
 

@@ -1,0 +1,115 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use App::ghmulti;
+
+App::ghmulti::run();
+
+
+__END__
+
+=pod
+
+=head1 NAME
+
+ghmulti - Helps when using multiple Github accounts with SSH keys
+
+
+=head1 SYNOPSIS
+
+   ghmulti [ -c GITHUB_URL [DIR] | -u [GITHUB_URL] ]
+   ghmulti --help | --version
+
+=head1 DESCRIPTION
+
+This script helps when using multiple Github accounts with SSH keys. First,
+you should read this gist
+L<https://gist.github.com/oanhnn/80a89405ab9023894df7> and follow the
+instructions.
+
+B<Note>: this script uses the B<git> command line tool, so B<git> must be
+installed and available via C<PATH>.
+
+To use this script, you need to add information in file F<~/.ssh/config> by
+adding comments like this:
+
+   Host github-foo
+   #  User: John Doe <jd@foomail.com>
+      HostName github.com
+      IdentityFile ~/.ssh/foo
+      IdentitiesOnly yes
+
+   Host github-bar
+   #  User: Mr. Smith <somename@blahmail.org> <ignored@mail> IGNORED STUFF
+      HostName github.com
+      IdentityFile ~/.ssh/bar
+      IdentitiesOnly yes
+
+   Host github-baz
+   #  User: <abc@blubb.eu>
+      HostName github.com
+      IdentityFile ~/.ssh/baz
+      IdentitiesOnly yes
+
+The script looks for C<Host> names beginning with C<github->. It assumes that
+the part after the hyphen is your username on github. E.g., in the example
+above the gibthub usernames are C<foo>, C<bar> and C<baz>.
+
+The next line must be a comment line beginning with C<User:> followed by an
+optional name (full name, may contain spaces) followed by an email address in
+angle brackets (a second email address and a string may follow, but they are
+ignored by this script). The script uses this data like this:
+
+  git config user.email EMAIL
+  git config user.name  FULLNAME
+
+If you did not specify a full name, the script uses your github user name instead.
+
+These are the variants of how you can use the script:
+
+=over
+
+=item * Without any arguments
+
+If you are in a git repo, the script sets the remote URL to use the SSH key
+and configures the email address and the username as described above.
+Otherwise the script terminates with an error state.
+
+=item * C<-c GITHUB_URL [DIR]>
+
+Checks whether the user name is in F<~/.ssh/config>. If this is not the case,
+the script aborts with an error message. Otherwise it works like C<git clone>,
+but also configures the repo as described above.
+
+=item * C<-u [GITHUB_URL]>
+
+Prints the github URL in the format needed to use your SSH keys. If
+I<C<GITHUB_URL>> is not specified, the script attempts to determine a URL via
+C<git remote get-url origin>.
+
+With this option, the script does not an configuration.
+
+=back
+
+Note: the options C<-c> and C<-u> are mutually exclusive!
+
+
+=head1 SEE ALSO
+
+L<App::ghmulti>,
+L<Git::RemoteURL::Parse>,
+L<GitHub::Config::SSH::UserData>
+
+Another solution: L<https://gist.github.com/harshith-21/37cb8b86396af15ddb3280f80e91801a>
+
+
+=head1 LICENSE AND COPYRIGHT
+
+This software is copyright (c) 2025 by Klaus Rindfrey.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+
+=cut
+

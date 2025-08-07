@@ -5,6 +5,7 @@ use Test::More;
 use Test::Deep;
 use Test::DZil;
 use Dist::Zilla::Plugin::PodWeaver;
+use Dist::Zilla::Stash::PodWeaver;
 
 use Path::Tiny qw( path );
 

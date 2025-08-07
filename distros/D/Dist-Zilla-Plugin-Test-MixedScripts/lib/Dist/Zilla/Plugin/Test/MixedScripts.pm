@@ -1,6 +1,6 @@
 package Dist::Zilla::Plugin::Test::MixedScripts;
 
-use v5.16;
+use v5.20;
 use warnings;
 
 # ABSTRACT: author tests to ensure there is no mixed Unicode
@@ -11,9 +11,12 @@ use List::Util 1.45 qw( uniqstr );
 use Path::Tiny;
 use Sub::Exporter::ForMethods 'method_installer';
 use Data::Section 0.004 { installer => method_installer }, '-setup';
+use Dist::Zilla::File::InMemory;
 use Moose::Util::TypeConstraints qw( role_type );
 
 use namespace::autoclean;
+
+use experimental qw( postderef signatures );
 
 with
   'Dist::Zilla::Role::FileGatherer',
@@ -26,7 +29,7 @@ with
   },
   'Dist::Zilla::Role::PrereqSource';
 
-our $VERSION = 'v0.1.5';
+our $VERSION = 'v0.2.0';
 
 
 has filename => (
@@ -72,21 +75,19 @@ has _file_obj => (
     isa => role_type('Dist::Zilla::Role::File'),
 );
 
-around dump_config => sub {
-    my ( $orig, $self ) = @_;
+around dump_config => sub( $orig, $self ) {
     my $config = $self->$orig;
     $config->{ +__PACKAGE__ } = {
         filename => $self->filename,
-        finder   => [ sort @{ $self->finder } ],
+        finder   => [ sort $self->finder->@* ],
         scripts  => [ $self->scripts ],
         blessed($self) ne __PACKAGE__ ? ( version => $VERSION ) : (),
     };
     return $config;
 };
 
-sub gather_files {
-    my $self = shift;
-    require Dist::Zilla::File::InMemory;
+sub gather_files($self) {
+
     $self->add_file(
         $self->_file_obj(
             Dist::Zilla::File::InMemory->new(
@@ -98,17 +99,16 @@ sub gather_files {
     return;
 }
 
-sub munge_files {
-    my $self = shift;
+sub munge_files($self) {
 
     # Based on Dist::Zilla::Plugin::GatherDir
     my $exclude = qr/\000/;
-    $exclude = qr/(?:$exclude)|$_/ for @{ $self->exclude };
+    $exclude = qr/(?:$exclude)|$_/ for $self->exclude->@*;
 
     my @filenames = map { path( $_->name )->relative('.')->stringify }
       grep { not( $_->can('is_bytes') and $_->is_bytes ) }
       grep { $_ !~ $exclude }
-      @{ $self->found_files };
+      $self->found_files->@*;
     push @filenames, $self->files;
     $self->log_debug( 'adding file ' . $_ ) for @filenames;
 
@@ -129,8 +129,7 @@ sub munge_files {
     return;
 }
 
-sub register_prereqs {
-    my $self = shift;
+sub register_prereqs($self) {
     $self->zilla->register_prereqs(
         {
             phase => 'develop',
@@ -153,7 +152,7 @@ Dist::Zilla::Plugin::Test::MixedScripts - author tests to ensure there is no mix
 
 =head1 VERSION
 
-version v0.1.5
+version v0.2.0
 
 =for stopwords Cushing Etheridge Florian Ragwitz Unicode
 
@@ -162,6 +161,9 @@ version v0.1.5
 In the F<dist.ini> add:
 
     [Test::MixedScripts]
+    ; authordep Test::MixedScripts
+    script = Latin
+    script = Common
 
 =head1 DESCRIPTION
 

@@ -10,10 +10,11 @@ build_requires:
   Test::DescribeMe: '0'
   Test::Most: '0'
   Test::Needs: '0'
+  Test::Returns: '0'
   Test::Warnings: '0'
   YAML::Any: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
 license: open_source
@@ -47,8 +48,8 @@ requires:
   LWP::UserAgent::WithCache: '0'
   Lingua::EN::NameCase: '0'
   Module::Info: '0'
-  Object::Configure: '0.1'
-  Params::Get: '0'
+  Object::Configure: '0.12'
+  Params::Get: '0.13'
   Return::Set: '0'
   Scalar::Util: '0'
   Test::HTTPStatus: '0'
@@ -59,5 +60,5 @@ resources:
   bugtracker: https://github.com/nigelhorne/Genealogy-Wills/issues
   homepage: https://sites.rootsweb.com/~obituary
   repository: git://github.com/nigelhorne/Genealogy-Wills.git
-version: '0.08'
+version: '0.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

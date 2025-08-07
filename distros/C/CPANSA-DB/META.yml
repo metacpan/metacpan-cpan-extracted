@@ -26,5 +26,5 @@ resources:
   bugtracker: https://github.com/briandfoy/cpan-security-advisory/issues
   homepage: https://github.com/briandfoy/cpan-security-advisory
   repository: https://github.com/briandfoy/cpan-security-advisory
-version: '20250731.002'
+version: '20250806.001'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,15 +1,17 @@
-#!perl -w
+#!perl -wT
 
 use strict;
 use FindBin qw($Bin);
 
 use lib 't/lib';
-use Test::Most tests => 7;
+use Test::Most tests => 8;
 
-use_ok('Database::test1');
-use_ok('Database::test2');
-
-Database::Abstraction::init({ directory => "$Bin/../data" });
+BEGIN {
+	use_ok('Database::Abstraction', 'directory' => "$Bin/../data");
+	# use_ok('Database::Abstraction', { 'directory' => "$Bin/../data" });
+	use_ok('Database::test1');
+	use_ok('Database::test2');
+}
 
 my $defaults = Database::Abstraction::init();
 cmp_ok($defaults->{'directory'}, 'eq', "$Bin/../data");

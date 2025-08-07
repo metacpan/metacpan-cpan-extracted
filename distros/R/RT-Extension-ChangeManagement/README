@@ -2,7 +2,8 @@ NAME
     RT-Extension-ChangeManagement - Change Management configuration for RT
 
 RT VERSION
-    Works with RT 5.
+    Works with RT 6. For previous versions of RT install the latest 0.*
+    version.
 
 INSTALLATION
     perl Makefile.PL
@@ -10,7 +11,7 @@ INSTALLATION
     make install
         May need root permissions
 
-    Edit your /opt/rt5/etc/RT_SiteConfig.pm
+    Edit your /opt/rt6/etc/RT_SiteConfig.pm
         Add this line:
 
             Plugin('RT::Extension::ChangeManagement');
@@ -20,7 +21,7 @@ INSTALLATION
         this twice, you may end up with duplicate data in your database.
 
     Clear your mason cache
-            rm -rf /opt/rt5/var/mason_data/obj
+            rm -rf /opt/rt6/var/mason_data/obj
 
     Restart your webserver
 
@@ -231,7 +232,7 @@ AUTHOR
     or via the web at
         http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-ChangeManagement
 LICENSE AND COPYRIGHT
-    This software is Copyright (c) 2022 by Best Practical Solutions, LLC.
+    This software is Copyright (c) 2025 by Best Practical Solutions, LLC.
 
     This is free software, licensed under:
 

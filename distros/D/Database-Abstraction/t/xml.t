@@ -8,7 +8,7 @@ use FindBin qw($Bin);
 use lib 't/lib';
 use Test::Most tests => 10;
 
-use_ok('Database::test3');
+BEGIN { use_ok('Database::test3') }
 
 my $test3 = new_ok('Database::test3' => [{
 	directory => "$Bin/../data",
@@ -23,14 +23,12 @@ cmp_ok(scalar(@rc), '==', 3, 'getting all the distinct entries works');
 
 @rc = $test3->entry();
 if($ENV{'TEST_VERBOSE'}) {
-	use Data::Dumper;
 	diag(Data::Dumper->new([\@rc])->Dump());
 }
 cmp_ok(scalar(@rc), '==', 3, 'getting all the entries works');
 
 my $rc = $test3->selectall_hashref();
 if($ENV{'TEST_VERBOSE'}) {
-	use Data::Dumper;
 	diag(Data::Dumper->new([$rc])->Dump());
 }
 
@@ -39,7 +37,6 @@ cmp_ok(scalar(@{$rc}), '==', 3, 'selectall_hashref returns all entries');
 @rc = $test3->selectall_hash('fr' => 'Deux');
 
 if($ENV{'TEST_VERBOSE'}) {
-	use Data::Dumper;
 	diag(Data::Dumper->new([\@rc])->Dump());
 }
 

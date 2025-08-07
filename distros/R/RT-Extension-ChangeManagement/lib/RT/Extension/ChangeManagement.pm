@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package RT::Extension::ChangeManagement;
 
-our $VERSION = '0.02';
+our $VERSION = '1.00';
 
 =head1 NAME
 
@@ -10,7 +10,7 @@ RT-Extension-ChangeManagement - Change Management configuration for RT
 
 =head1 RT VERSION
 
-Works with RT 5.
+Works with RT 6. For previous versions of RT install the latest 0.* version.
 
 =head1 INSTALLATION
 
@@ -24,7 +24,7 @@ Works with RT 5.
 
 May need root permissions
 
-=item Edit your F</opt/rt5/etc/RT_SiteConfig.pm>
+=item Edit your F</opt/rt6/etc/RT_SiteConfig.pm>
 
 Add this line:
 
@@ -37,7 +37,7 @@ you may end up with duplicate data in your database.
 
 =item Clear your mason cache
 
-    rm -rf /opt/rt5/var/mason_data/obj
+    rm -rf /opt/rt6/var/mason_data/obj
 
 =item Restart your webserver
 
@@ -298,7 +298,7 @@ href="http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-ChangeManage
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2022 by Best Practical Solutions, LLC.
+This software is Copyright (c) 2025 by Best Practical Solutions, LLC.
 
 This is free software, licensed under:
 

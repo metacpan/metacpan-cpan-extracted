@@ -4,7 +4,7 @@ Params::Validate::Strict - Validates a set of parameters against a schema
 
 # VERSION
 
-Version 0.08
+Version 0.10
 
 # SYNOPSIS
 
@@ -38,7 +38,8 @@ This function takes two mandatory arguments:
 
 - `schema`
 
-    A reference to a hash that defines the validation rules for each parameter.  The keys of the hash are the parameter names, and the values are either a string representing the parameter type or a reference to a hash containing more detailed rules.
+    A reference to a hash that defines the validation rules for each parameter.
+    The keys of the hash are the parameter names, and the values are either a string representing the parameter type or a reference to a hash containing more detailed rules.
 
 - `args`
 
@@ -55,7 +56,8 @@ The schema can define the following rules for each parameter:
 
 - `type`
 
-    The data type of the parameter.  Valid types are `string`, `integer`, `number`, `hashref`, `arrayref`, `object` and `coderef`.
+    The data type of the parameter.
+    Valid types are `string`, `integer`, `number`, `hashref`, `arrayref`, `object` and `coderef`.
 
 - `can`
 
@@ -87,11 +89,14 @@ The schema can define the following rules for each parameter:
 
 - `callback`
 
-    A code reference to a subroutine that performs custom validation logic. The subroutine should accept the parameter value as an argument and return true if the value is valid, false otherwise.
+    A code reference to a subroutine that performs custom validation logic.
+    The subroutine should accept the parameter value as an argument and return true if the value is valid, false otherwise.
 
 - `optional`
 
-    A boolean value indicating whether the parameter is optional. If true, the parameter is not required.  If false or omitted, the parameter is required.
+    A boolean value indicating whether the parameter is optional.
+    If true, the parameter is not required.
+    If false or omitted, the parameter is required.
 
 If a parameter is optional and its value is `undef`,
 validation will be skipped for that parameter.
@@ -100,9 +105,83 @@ If the validation fails, the function will `croak` with an error message describ
 
 If the validation is successful, the function will return a reference to a new hash containing the validated and (where applicable) coerced parameters.  Integer and number parameters will be coerced to their respective types.
 
+# MIGRATION FROM LEGACY VALIDATORS
+
+## From [Params::Validate](https://metacpan.org/pod/Params%3A%3AValidate)
+
+    # Old style
+    validate(@_, {
+        name => { type => SCALAR },
+        age  => { type => SCALAR, regex => qr/^\d+$/ }
+    });
+
+    # New style
+    validate_strict(
+        schema => {
+            name => 'string',
+            age  => { type => 'integer', min => 0 }
+        },
+        args => { @_ }
+    );
+
+## From [Type::Params](https://metacpan.org/pod/Type%3A%3AParams)
+
+    # Old style
+    my ($name, $age) = validate_positional \@_, Str, Int;
+
+    # New style - requires converting to named parameters first
+    my %args = (name => $_[0], age => $_[1]);
+    my $validated = validate_strict(
+        schema => { name => 'string', age => 'integer' },
+        args => \%args
+    );
+
 # AUTHOR
 
-Nigel Horne, `<njh at bandsman.co.uk>`
+Nigel Horne, `<njh at nigelhorne.com>`
+
+# FORMAL SPECIFICATION
+
+    [PARAM_NAME, VALUE, TYPE_NAME, CONSTRAINT_VALUE]
+
+    ValidationRule ::= SimpleType | ComplexRule
+
+    SimpleType ::= string | integer | number | arrayref | hashref | coderef | object
+
+    ComplexRule == [
+        type: TYPE_NAME;
+        min: ℕ₁;
+        max: ℕ₁;
+        optional: 𝔹;
+        matches: REGEX;
+        nomatch: REGEX;
+        memberof: seq VALUE;
+        callback: FUNCTION;
+        isa: TYPE_NAME;
+        can: METHOD_NAME
+    ]
+
+    Schema == PARAM_NAME ⇸ ValidationRule
+
+    Arguments == PARAM_NAME ⇸ VALUE
+
+    ValidatedResult == PARAM_NAME ⇸ VALUE
+
+    │ ∀ rule: ComplexRule • rule.min ≤ rule.max
+    │ ∀ schema: Schema; args: Arguments •
+    │   dom(validate_strict(schema, args)) ⊆ dom(schema) ∪ dom(args)
+
+    validate_strict: Schema × Arguments → ValidatedResult
+
+    ∀ schema: Schema; args: Arguments •
+      let result == validate_strict(schema, args) •
+        (∀ name: dom(schema) ∩ dom(args) •
+          name ∈ dom(result) ⇒
+          type_matches(result(name), schema(name))) ∧
+        (∀ name: dom(schema) •
+          ¬optional(schema(name)) ⇒ name ∈ dom(args))
+
+    type_matches: VALUE × ValidationRule → 𝔹
 
 # BUGS
 

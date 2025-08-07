@@ -2,7 +2,8 @@
 
 set -euo pipefail
 SOURCE_BIN=/nbi/software/testing/bin/nbi-slurm
-DEST_DIR=/nbi/software/testing/
+DEST_DIR="/nbi/software/testing/"
+DEST_DIR="/qib/research-projects/bioboxes/local/"
 SOURCE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
 
 if [[ ! -d "$DEST_DIR" ]];

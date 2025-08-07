@@ -6,29 +6,96 @@ class Mojo::URL {
   
   use StringBuffer;
   use Re;
-  use Mojo::URL;
   use Mojo::Parameters;
   use Mojo::Util;
   
   # Fields
+  has base : rw Mojo::URL;
+  
   has fragment : rw string;
-  
-  has scheme : rw string;
-  
-  has userinfo : rw string;
   
   has host : rw string;
   
   has port : rw int;
   
-  has path : Mojo::Path;
+  has scheme : rw string;
   
-  has auth : rw string;
+  has userinfo : rw string;
   
-  has base : rw Mojo::URL;
+  has path : rw Mojo::Path
+    
+    get {
+      
+      unless ($self->{path}) {
+        $self->{path} = Mojo::Path->new;
+      }
+      
+      my $path = $self->{path};
+      
+      return $path;
+    }
+    
+    set ($path : object of string|Mojo::Path) {
+      
+      unless ($path) {
+        die "The path \$path must be defined.";
+      }
+      
+      if ($path isa Mojo::Path) {
+        $self->{path} = (Mojo::Path)$path;
+      }
+      else {
+        unless ($self->{path}) {
+          $self->{path} = Mojo::Path->new;
+        }
+        
+        $self->{path}->merge((string)$path);
+      }
+      
+    }
+  ;
   
-  has query : Mojo::Parameters;
+  has query : rw Mojo::Parameters
+    get {
+      
+      unless ($self->{query}) {
+        $self->{query} = Mojo::Parameters->new;
+      }
+      
+      return $self->{query};
+    }
+    
+    set ($query_value : object of object[]|Mojo::Parameters)  {
+      
+      unless ($query_value) {
+        die "The query \$query_value must be defined.";
+      }
+      
+      unless ($self->{query}) {
+        $self->{query} = Mojo::Parameters->new;
+      }
+      
+      # Merge with hash
+      if (is_options $query_value) {
+        $self->{query}->merge($query_value);
+      }
+      
+      # Append array
+      elsif ($query_value isa object[]) {
+        $self->{query}->append($query_value);
+      }
+      
+      # New parameters
+      elsif ($query_value isa Mojo::Parameters) {
+        $self->{query} = (Mojo::Parameters)$query_value;
+      }
+      else {
+        die "The type query value \$query_value must be object[] or Mojo::Parameters.";
+      }
+    }
+  ;
   
+  # Class Methods
   static method new : Mojo::URL ($url : string = undef) {
     
     my $self = new Mojo::URL;
@@ -40,6 +107,7 @@ class Mojo::URL {
     return $self;
   }
   
+  # Instance Methods
   method clone : Mojo::URL () {
     
     my $clone = Mojo::URL->new;
@@ -182,7 +250,7 @@ class Mojo::URL {
       }
     }
   }
-
+  
   method password : string () {
     
     my $userinfo = "";
@@ -198,36 +266,6 @@ class Mojo::URL {
     return $password;
   }
   
-  method path : Mojo::Path () {
-    
-    unless ($self->{path}) {
-      $self->{path} = Mojo::Path->new;
-    }
-    
-    my $path = $self->{path};
-    
-    return $path;
-  }
-  
-  method set_path : void ($path : object of string|Mojo::Path) {
-    
-    unless ($path) {
-      die "The path \$path must be defined.";
-    }
-    
-    if ($path isa Mojo::Path) {
-      $self->{path} = (Mojo::Path)$path;
-    }
-    else {
-      unless ($self->{path}) {
-        $self->{path} = Mojo::Path->new;
-      }
-      
-      $self->{path}->merge((string)$path);
-    }
-    
-  }
-  
   method path_query : string () {
     
     my $query = $self->query->to_string;
@@ -241,9 +279,9 @@ class Mojo::URL {
     return $path_query;
   }
   
-  method set_path_query : void ($pq : string) {
+  method set_path_query : void ($pass_query : string) {
     
-    if (my $match = Re->m($pq, "^([^?#]*)(?:\?([^#]*))?")) {
+    if (my $match = Re->m($pass_query, "^([^?#]*)(?:\?([^#]*))?")) {
       if ($match->cap2) {
         $self->set_path(Mojo::Path->new($match->cap1));
         $self->set_query(Mojo::Parameters->new($match->cap2));
@@ -265,44 +303,8 @@ class Mojo::URL {
     return $protocol;
   }
   
-  method query : Mojo::Parameters () {
-    
-    unless ($self->{query}) {
-      $self->{query} = Mojo::Parameters->new;
-    }
-    
-    return $self->{query};
-  }
-  
-  method set_query : void ($query : object of string[]|Hash|Mojo::Parameters)  {
-    
-    unless ($query) {
-      die "The query \$query must be defined.";
-    }
-    
-    unless ($self->{query}) {
-      $self->{query} = Mojo::Parameters->new;
-    }
-    
-    # Merge with hash
-    if ($query isa Hash) {
-      $self->{query}->merge($query->(Hash)->to_array);
-    }
-    
-    # Append array
-    elsif ($query isa string[]) {
-      $self->{query}->append((string[])$query);
-    }
-    
-    # New parameters
-    elsif ($query isa Mojo::Parameters) {
-      $self->{query} = (Mojo::Parameters)$query;
-    }
-    
-  }
-  
   method to_abs : Mojo::URL ($base : Mojo::URL = undef) {
-
+    
     my $abs = $self->clone;
     
     if ($abs->is_abs) {
@@ -361,7 +363,22 @@ class Mojo::URL {
     return $self->_string(1);
   }
   
-  method _string : string ($unsafe : int) {
+  method username : string () {
+    
+    my $userinfo = "";
+    if ($self->userinfo) {
+      
+    }
+    
+    my $username = (string)undef;
+    if (my $match = Re->m($username, "^([^:]+)")) {
+      $username = $match->cap1;
+    }
+    
+    return $username;
+  }
+  
+  private method _string : string ($unsafe : int) {
     
     # Scheme
     my $url = "";
@@ -404,19 +421,4 @@ class Mojo::URL {
     return $url;
   }
   
-  method username : string () {
-    
-    my $userinfo = "";
-    if ($self->userinfo) {
-      
-    }
-    
-    my $username = (string)undef;
-    if (my $match = Re->m($username, "^([^:]+)")) {
-      $username = $match->cap1;
-    }
-    
-    return $username;
-  }
-
 }

@@ -18,7 +18,7 @@ unless ($meta) {
   # Do something such as environment check.
 }
 
-my %configure_and_runtime_requires = ('SPVM' => '0.990077');
+my %configure_and_runtime_requires = ('SPVM' => '0.990080');
 WriteMakefile(
   NAME => 'SPVM::Mojolicious',
   VERSION_FROM => 'lib/SPVM/Mojolicious.pm',
@@ -64,6 +64,7 @@ WriteMakefile(
     'SPVM::FindBin' => '0.035',
     'SPVM::Time::HiRes' => '0.005',
     'SPVM::IO::Socket::SSL' => '0.010',
+    'SPVM::Math' => '1.006',
   },
   TEST_REQUIRES => {
     

@@ -48,6 +48,10 @@ my %command_type = (
     'PassDelegate'              => 39,
     'InvokeDelegate'            => 40,
     'ConvertType'               => 41,
+    'AddEventListener'          => 42,
+    'PluginWrapper'             => 43,
+    'GetAsyncOperationResult'   => 44,
+
 );
 
 sub get_command_type {

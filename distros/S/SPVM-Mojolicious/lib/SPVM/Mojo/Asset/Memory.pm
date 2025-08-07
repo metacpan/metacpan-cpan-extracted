@@ -45,7 +45,7 @@ object.
 
 =head2 max_memory_size
 
-C<has max_memory_size : wo int;>
+C<has max_memory_size : rw int;>
 
 Maximum size in bytes of data to keep in memory before automatically upgrading to a L<Mojo::Asset::File|SPVM::Mojo::Asset::File> object,
 defaults to the value of the C<SPVM_MOJO_MAX_MEMORY_SIZE> environment variable or C<262144> (256KiB).

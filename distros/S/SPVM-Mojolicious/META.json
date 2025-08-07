@@ -1,5 +1,5 @@
 {
-   "abstract" : "Web Frame Work",
+   "abstract" : "Real-time web framework",
    "author" : [
       "Yuki Kimoto<kimoto.yuki@gmail.com>"
    ],
@@ -27,12 +27,12 @@
       },
       "configure" : {
          "requires" : {
-            "SPVM" : "0.990077"
+            "SPVM" : "0.990080"
          }
       },
       "runtime" : {
          "requires" : {
-            "SPVM" : "0.990077",
+            "SPVM" : "0.990080",
             "SPVM::Digest::SHA" : "0.065",
             "SPVM::File::Copy" : "0.022",
             "SPVM::File::Temp" : "0.026",
@@ -41,6 +41,7 @@
             "SPVM::IO::Socket::SSL" : "0.010",
             "SPVM::JSON" : "1.002",
             "SPVM::MIME::Base64" : "1.003",
+            "SPVM::Math" : "1.006",
             "SPVM::Mozilla::CA" : "0.001",
             "SPVM::Regex" : "0.246",
             "SPVM::Time::HiRes" : "0.005",
@@ -60,6 +61,6 @@
          "web" : "https://github.com/yuki-kimoto/SPVM-Mojolicious"
       }
    },
-   "version" : "0.007",
+   "version" : "0.009",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

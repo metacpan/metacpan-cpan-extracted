@@ -23,7 +23,9 @@ WriteMakefile(
 		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
 	}, PREREQ_PM => {
 		'Carp' => 0,
+		'Exporter' => 0,
 		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
+		'List::Util' => 0,
 		'Params::Get' => 0.13,
 		'Scalar::Util' => 0,
 	}, META_MERGE => {

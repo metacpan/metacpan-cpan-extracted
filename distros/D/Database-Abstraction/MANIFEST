@@ -23,6 +23,8 @@ t/chi.t
 t/comment-spelling.t
 t/csv.t
 t/csv_id.t
+t/db.t
+t/db_noentry.t
 t/eof.t
 t/eol.t
 t/init.t

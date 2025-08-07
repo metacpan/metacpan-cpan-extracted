@@ -1,5 +1,26 @@
 Revision history for Dist-Zilla-Plugin-Test-MixedScripts:
 
+v0.2.0    2025-08-06 17:02:57+01:00 Europe/London
+  [Incompatible Changes]
+  - Increased the minimum Perl version to v5.20, since that is what Dist::Zilla now requires.
+
+  [Documentation]
+  - Fixed errors in README.
+
+  - Removed separate INSTALL file.
+
+  - Updated SYNOPSIS.
+
+  [Tests]
+  - Moved author tests into the xt directory.
+
+  [Toolchain]
+  - Undid some changes to Dist::Zilla configuration.
+
+  - Set up GitHub workflow for testing.
+
+  - Ensure local-lib is not included in distribution.
+
 v0.1.5    2025-08-01 15:44:57+01:00 Europe/London
   [Documentation]
   - Added overlooked credit to Changes.

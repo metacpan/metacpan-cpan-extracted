@@ -40,9 +40,9 @@
             "File::Spec" : "0",
             "File::Temp" : "0",
             "File::pfopen" : "0.03",
-            "Log::Abstraction" : "0.05",
+            "Log::Abstraction" : "0.24",
             "Object::Configure" : "0",
-            "Params::Get" : "0",
+            "Params::Get" : "0.13",
             "Scalar::Util" : "0",
             "autodie" : "0",
             "boolean" : "0",
@@ -55,6 +55,7 @@
          "requires" : {
             "DBD::CSV" : "0",
             "DBD::XMLSimple" : "0.07",
+            "Fcntl" : "0",
             "File::Spec" : "0",
             "File::Temp" : "0",
             "FindBin" : "0",
@@ -73,8 +74,8 @@
    "resources" : {
       "bugtracker" : {
          "mailto" : "bug-Database-Abstraction@rt.cpan.org",
-         "web" : "https://github.com/nigelhorne/Database-Abstraction/issues",
-         "x_url" : "https://github.com/nigelhorne/Database-Abstraction/issues"
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Database-Abstraction",
+         "x_url" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Database-Abstraction"
       },
       "repository" : {
          "type" : "git",
@@ -83,6 +84,6 @@
          "x_repository" : "https://github.com/nigelhorne/Database-Abstraction"
       }
    },
-   "version" : "0.27",
+   "version" : "0.28",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -21,7 +21,7 @@ use experimental qw( lexical_subs postderef signatures );
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.4.1';
+our $VERSION = 'v0.4.2';
 
 
 has header => (
@@ -98,9 +98,11 @@ sub weave_section( $self, $document, $input ) {
     my @files = $zilla ? $zilla->files->@* : ();
 
     if ( !$builder && $zilla ) {
-
-        if ( my $type = first { $_->name =~ /\A(?:Build|Makefile)\.PL\z/ } @files ) {
-            $builder = $type->name;
+        for my $name ( qw( Build.PL Makefile.PL ) ) {
+            if ( my $type = first { $_->name eq $name } @files ) {
+                $builder = $name;
+                last;
+            }
         }
     }
 
@@ -201,7 +203,7 @@ Pod::Weaver::Section::InstallationInstructions - generate POD with installation 
 
 =head1 VERSION
 
-version v0.4.1
+version v0.4.2
 
 =head1 SYNOPSIS
 

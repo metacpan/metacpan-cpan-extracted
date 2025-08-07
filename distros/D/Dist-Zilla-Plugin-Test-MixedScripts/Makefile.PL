@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.016000;
+use 5.020000;
 
 use ExtUtils::MakeMaker;
 
@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Dist-Zilla-Plugin-Test-MixedScripts",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.016000",
+  "MIN_PERL_VERSION" => "5.020000",
   "NAME" => "Dist::Zilla::Plugin::Test::MixedScripts",
   "PREREQ_PM" => {
     "Data::Section" => "0.004",
@@ -33,6 +33,7 @@ my %WriteMakefileArgs = (
     "Moose::Util::TypeConstraints" => 0,
     "Path::Tiny" => 0,
     "Sub::Exporter::ForMethods" => 0,
+    "experimental" => 0,
     "namespace::autoclean" => 0,
     "warnings" => 0
   },
@@ -48,7 +49,7 @@ my %WriteMakefileArgs = (
     "Test::Warnings" => "0.009",
     "strict" => 0
   },
-  "VERSION" => "v0.1.5",
+  "VERSION" => "v0.2.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -78,6 +79,7 @@ my %FallbackPrereqs = (
   "Test::MixedScripts" => "0.3.0",
   "Test::More" => 0,
   "Test::Warnings" => "0.009",
+  "experimental" => 0,
   "namespace::autoclean" => 0,
   "strict" => 0,
   "warnings" => 0

@@ -8,13 +8,60 @@ class Mojo::Path {
   use Re;
   
   # Fields
+  has parts : virtual rw string[]
+    get {
+      return $self->parts_list->to_array;
+    }
+    
+    set {
+      unless ($_) {
+        die "The parts argument must be defined.";
+      }
+      $self->set_parts_list(StringList->new($_));
+    }
+  ;
+  
+  has parts_list : rw StringList
+    get {
+      $self->_parse;
+      return $self->{parts_list};
+    }
+    
+    set {
+      unless ($_) {
+        die "The parts_list argument must be defined.";
+      }
+      $self->{parts_list} = $_;
+      $self->{path} = undef;
+    }
+  ;
+  
+  has leading_slash : rw byte
+    get {
+      $self->_parse;
+      return $self->{leading_slash};
+    }
+    
+    set {
+      $self->_parse;
+      $self->{leading_slash} = (byte)$_;
+    }
+  ;
+  
+  has trailing_slash : rw byte
+    get {
+      $self->_parse;
+      return $self->{trailing_slash};
+    }
+    
+    set {
+      $self->_parse;
+      $self->{trailing_slash} = (byte)$_;
+    }
+  ;
+  
+  # Undocumented Fields
   has path : string;
-  
-  has parts_list : StringList;
-  
-  has leading_slash : byte;
-  
-  has trailing_slash : byte;
   
   # Class Methods
   static method new : Mojo::Path ($path_string : string = undef) {
@@ -28,6 +75,7 @@ class Mojo::Path {
     return $self;
   }
   
+  # Instance Methods
   method canonicalize : void () {
     
     $self->_parse;
@@ -92,54 +140,6 @@ class Mojo::Path {
     }
     
     return $abs_path;
-  }
-  
-  method leading_slash : int () {
-    $self->_parse;
-    return $self->{leading_slash};
-  }
-  
-  method set_leading_slash : void ($bool : int) {
-    $self->_parse;
-    $self->{leading_slash} = (byte)$bool;
-  }
-  
-  method trailing_slash : int () {
-    $self->_parse;
-    return $self->{trailing_slash};
-  }
-  
-  method set_trailing_slash : void ($bool : int) {
-    $self->_parse;
-    $self->{trailing_slash} = (byte)$bool;
-  }
-  
-  method parts : string[] () {
-    $self->_parse;
-    return $self->{parts_list}->to_array;
-  }
-  
-  method set_parts : void ($parts : string[]) {
-    $self->_parse;
-    $self->{parts_list} = StringList->new($parts);
-  }
-  
-  private method _parse : void (){
-    
-    my $parts_list = $self->{parts_list};
-    
-    unless ($parts_list) {
-      my $path_url_encoded = $self->{path};
-      $self->{path} = undef;
-      unless ($path_url_encoded) {
-        $path_url_encoded = "";
-      }
-      my $path = Mojo::Util->url_unescape($path_url_encoded);
-      $self->{leading_slash} = (byte)!!Re->s($path, "^/", "");
-      $self->{trailing_slash} = (byte)!!Re->s($path, "/$", "");
-      $self->{parts_list} = StringList->new(Fn->split("/", $path, -1));
-    }
-    
   }
   
   method contains : int ($string : string) {
@@ -241,4 +241,23 @@ class Mojo::Path {
     
     return $clone;
   }
+  
+  private method _parse : void (){
+    
+    my $parts_list = $self->{parts_list};
+    
+    unless ($parts_list) {
+      my $path_url_encoded = $self->{path};
+      $self->{path} = undef;
+      unless ($path_url_encoded) {
+        $path_url_encoded = "";
+      }
+      my $path = Mojo::Util->url_unescape($path_url_encoded);
+      $self->{leading_slash} = (byte)!!Re->s($path, "^/", "");
+      $self->{trailing_slash} = (byte)!!Re->s($path, "/$", "");
+      $self->{parts_list} = StringList->new(Fn->split("/", $path, -1));
+    }
+    
+  }
+  
 }

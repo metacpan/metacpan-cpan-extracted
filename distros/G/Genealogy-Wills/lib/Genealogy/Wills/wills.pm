@@ -10,11 +10,11 @@ Genealogy::Wills::wills - database driver for Genealogy::Wills
 
 =head1 VERSION
 
-Version 0.06
+Version 0.09
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.09';
 
 our @ISA = ('Database::Abstraction');
 

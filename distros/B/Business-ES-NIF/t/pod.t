@@ -4,9 +4,17 @@ use strict;
 use warnings FATAL => 'all';
 use Test::More;
 
-# Ensure a recent version of Test::Pod
-my $min_tp = 1.22;
-eval "use Test::Pod $min_tp";
-plan skip_all => "Test::Pod $min_tp required for testing POD" if $@;
+unless ( $ENV{RELEASE_TESTING} ) {
+  plan( skip_all => 'No test POD: set RELEASE_TESTING=1 to run this test' );
+}
 
-all_pod_files_ok();
+eval "use Test::Pod 1.52";
+plan skip_all => "Test::Pod 1.52 required for testing POD" if $@;
+
+eval "use Test::Pod::Coverage 1.10";
+plan skip_all => "Test::Pod::Coverage 1.10 required for testing POD coverage" if $@;
+
+eval "use Pod::Coverage 0.23";
+plan skip_all => "Pod::Coverage 0.23 required for testing POD coverage" if $@;
+
+all_pod_coverage_ok();

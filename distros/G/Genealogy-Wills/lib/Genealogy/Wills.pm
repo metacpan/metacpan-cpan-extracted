@@ -6,8 +6,8 @@ use Carp;
 use Data::Reuse;
 use File::Spec;
 use Module::Info;
-use Object::Configure 0.10;
-use Params::Get;
+use Object::Configure 0.12;
+use Params::Get 0.13;
 use Return::Set;
 use Scalar::Util;
 
@@ -19,11 +19,11 @@ Genealogy::Wills - Lookup in a database of wills
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =cut
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 =head1 SYNOPSIS
 

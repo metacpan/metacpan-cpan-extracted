@@ -1,8 +1,31 @@
 Release history for Dist-Zilla-Plugin-UsefulReadme:
 
+v0.4.2    2025-08-07 07:43:05+01:00 Europe/London
+  [Enhancements]
+  - Pod::Weaver::Section::Requirements also looks for `cpmfile` and `metafile` when no metafile is specified.
+
+  [Bug Fixes]
+  - Pod::Weaver::Section::InstallationInstructions consistently chooses Build.PL when that and Makefile.PL are
+    both present. GH#9.
+
+  [Documentation]
+  - Fixed wording in Changes.
+
+  [Tests]
+  - Fixed prerequisites for tests.
+
+  - Moved author tests into the xt directory.
+
+  - Add more author tests.
+
+  [Toolchain]
+  - Set up GitHub workflow for testing. (Thanks @atoomic)
+
+  - Ensure local-lib is not included in distribution.
+
 v0.4.1    2025-08-06 08:41:07+01:00 Europe/London
   [Tests]
-  - Fix prerequisites for tests.
+  - Fixed prerequisites for tests.
 
 v0.4.0    2025-08-05 17:11:19+01:00 Europe/London
   [Enhancements]

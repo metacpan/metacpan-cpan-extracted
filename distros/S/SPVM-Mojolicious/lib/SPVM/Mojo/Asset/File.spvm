@@ -11,69 +11,66 @@ class Mojo::Asset::File extends Mojo::Asset {
   use Sys;
   
   # Fields
-  has cleanup : wo byte;
-  
-  method cleanup : int () {
-    
-    if ($self->{cleanup} < 0) {
-      return 0;
+  has cleanup : rw byte
+    get {
+      if ($self->{cleanup} < 0) {
+        return 0;
+      }
+      
+      return $self->{cleanup};
     }
-    
-    return $self->{cleanup};
-  }
+  ;
   
   has path : rw string;
   
-  has handle : wo IO::File;
-  
-  method handle : IO::File () {
-    
-    my $handle = (IO::File)undef;
-    my $path = $self->path;
-    if ($path) {
-      if (Sys->e($path)) {
-        $handle = IO->open("<", $path);
+  has handle : rw IO::File
+    get {
+      my $handle = (IO::File)undef;
+      my $path = $self->path;
+      if ($path) {
+        if (Sys->e($path)) {
+          $handle = IO->open("<", $path);
+        }
+        else {
+          $handle = IO->open("+>>", $path);
+        }
       }
       else {
-        $handle = IO->open("+>>", $path);
+        
+        unless ($self->{cleanup} > -1) {
+          $self->{cleanup} = 1;
+        }
+        
+        my $tmpdir= $self->tmpdir;
+        
+        my $handle = File::Temp->new({DIR => $tmpdir, TEMPLATE => "mojo.tmp.XXXXXXXXXXXXXXXX", UNLINK => 0});
+        
+        $self->{path} = $handle->filename;
+        
+        $handle->open($self->{path}, "+>>");
       }
+      
+      $self->{handle} = $handle;
+      
+      return $self->{handle};
     }
-    else {
-      
-      unless ($self->{cleanup} > -1) {
-        $self->{cleanup} = 1;
-      }
-      
-      my $tmpdir= $self->tmpdir;
-      
-      my $handle = File::Temp->new({DIR => $tmpdir, TEMPLATE => "mojo.tmp.XXXXXXXXXXXXXXXX", UNLINK => 0});
-      
-      $self->{path} = $handle->filename;
-      
-      $handle->open($self->{path}, "+>>");
-    }
-    
-    $self->{handle} = $handle;
-    
-    return $self->{handle};
-  }
+  ;
   
-  has tmpdir : wo string;
-  
-  method tmpdir : string () {
-    
-    unless ($self->{tmpdir}) {
-      my $env_tmpdir = length(my $_ = Sys->env("SPVM_MOJO_TMPDIR")) ? (int)$_ : -1;
-      
-      $self->{tmpdir} = $env_tmpdir;
-      
+  has tmpdir : rw string
+    get {
       unless ($self->{tmpdir}) {
-        $self->{tmpdir} = File::Spec->tmpdir;
+        my $env_tmpdir = length(my $_ = Sys->env("SPVM_MOJO_TMPDIR")) ? (int)$_ : -1;
+        
+        $self->{tmpdir} = $env_tmpdir;
+        
+        unless ($self->{tmpdir}) {
+          $self->{tmpdir} = File::Spec->tmpdir;
+        }
       }
+      
+      return $self->{tmpdir};
     }
-    
-    return $self->{tmpdir};
-  }
+  ;
   
   # Class Methods
   static method new : Mojo::Asset::File () {

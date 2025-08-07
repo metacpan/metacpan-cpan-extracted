@@ -1,0 +1,20 @@
+Changes
+CONTRIBUTING.md
+lib/App/ghmulti.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+script/ghmulti
+SECURITY.md
+t/00-load.t
+t/01-version-help.t
+t/02-simple-tests.t
+t/ghmulti.t
+t/manifest.t
+t/pod-spell.t
+t/pod.t
+xt/boilerplate.t
+
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

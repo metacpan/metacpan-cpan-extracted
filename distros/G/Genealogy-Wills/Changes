@@ -1,5 +1,9 @@
 Revision history for Genealogy::Wills
 
+0.09	Wed Aug  6 08:29:26 EDT 2025
+	Bump minimum version of Params::Get
+	Use Test::Returns
+
 0.08	Thu Jul 31 07:34:52 EDT 2025
 	Fix http://www.cpantesters.org/cpan/report/b5e051e4-1e37-11f0-98b0-b3c3213a625c
 	Use Object::Configure, Params::Get, Return::Set

@@ -4,7 +4,7 @@ use strict;
 use FindBin qw($Bin);
 
 use lib 't/lib';
-use Test::Most tests => 10;
+use Test::Most tests => 11;
 use Test::NoWarnings;
 
 use_ok('Database::test5');
@@ -26,6 +26,7 @@ cmp_ok($res->{'Age'}, '==', 35, 'fetchrow_hashref');
 # Test fetching all records
 my @all_records = $test5->selectall_hash();
 diag(Data::Dumper->new([\@all_records])->Dump()) if($ENV{'TEST_VERBOSE'});
+cmp_ok($test5->count(), '==', 5, 'count returns 5');
 is(scalar @all_records, 5, 'Fetched all records');
 
 # Test fetching a specific record

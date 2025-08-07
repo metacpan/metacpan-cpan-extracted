@@ -5,10 +5,12 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 README.md
 t/30-basics.t
+t/40-more.t
 t/eof.t
 t/eol.t
 t/get.t
 t/pod-cm.t
+t/pod-spelling.t
 t/pod-synopsis.t
 t/pod.t
 t/vars.t

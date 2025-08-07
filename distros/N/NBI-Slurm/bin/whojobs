@@ -167,7 +167,7 @@ whojobs - List the users with active jobs, and the number of jobs in the cluster
 
 =head1 VERSION
 
-version 0.12.1
+version 0.14.0
 
 =head1 SYNOPSIS
 

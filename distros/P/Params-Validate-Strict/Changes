@@ -1,5 +1,17 @@
 Revision history for Params-Validate-Strict
 
+0.10	Wed Aug  6 20:40:12 EDT 2025
+	Allow args to be not given, will allow if everything is optional
+	Allow { arg => undef }
+
+0.09	Wed Aug  6 15:29:55 EDT 2025
+	Optimize conditional
+	Added missing dependencies
+	Safer numeric coercion
+	Use Scalar::Util::looks_like_number for number verification
+	Changed some of the messages
+	Documented migration from legacy validators
+
 0.08	Tue Aug  5 18:58:37 EDT 2025
 	Validate objects
 

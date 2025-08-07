@@ -187,8 +187,8 @@ push @ACL,
         CustomRole  => 'Change Implementor',
     };
 
-our @Attributes = (
-    { Name => 'SavedSearch',
+our @SavedSearches = (
+    { Name => 'Changes Scheduled, Next 7 Days',
       Description => 'Changes Scheduled, Next 7 Days', # loc
       Content     =>
       { Format =>  q{'<a href="__WebPath__/Ticket/Display.html?id=__id__">__id__</a>/TITLE:#',}
@@ -198,7 +198,7 @@ our @Attributes = (
         OrderBy  => 'due ASC',
       },
     },
-    { Name => 'SavedSearch',
+    { Name => 'Changes Deployed, Last 30 Days',
       Description => 'Changes Deployed, Last 30 Days', # loc
       Content     =>
       { Format =>  q{'<a href="__WebPath__/Ticket/Display.html?id=__id__">__id__</a>/TITLE:#',}
@@ -243,47 +243,43 @@ our @Final = sub {
     ($ret, $msg) = $group->AddMember( $root->PrincipalObj->Id );
     print "Could not load root user: $msg\n" unless $ret;
 
-    foreach my $right ( qw/SeeGroupDashboard ShowSavedSearches EditSavedSearches ModifyGroupDashboard/ ) {
+    foreach my $right ( qw/SeeGroupDashboard SeeGroupSavedSearch AdminGroupSavedSearch AdminGroupDashboard/ ) {
         ($ret, $msg) = $group->PrincipalObj->GrantRight( Right => $right, Object => $group );
         print "Failed to grant right $right: $msg\n" unless $ret;
     }
 
     my $dashboard = RT::Dashboard->new( RT->SystemUser );
-    ( $ret, $msg ) = $dashboard->Save(
+    ( $ret, $msg ) = $dashboard->Create(
         Name    => 'Change Management',
-        Privacy => 'RT::Group-'.$group->Id,
+        PrincipalId => $group->Id,
     );
 
     if ($ret) {
-        my @searches;
-        for my $search_desc ( 'Changes Scheduled, Next 7 Days', 'Changes Deployed, Last 30 Days' ) {
-            my $search = RT::Attribute->new( RT->SystemUser );
-            ( $ret, $msg ) = $search->LoadByCols(
-                Name        => 'SavedSearch',
-                Description => $search_desc,
-            );
-            if ($search && $ret) {
-                push @searches,
-                    {
-                    pane         => 'body',
-                    portlet_type => 'search',
-                    id           => $search->Id,
-                    description  => "Saved Search: $search_desc",
-                    privacy      => join( '-', ref( RT->System ), RT->System->Id ),
-                    };
-                } else {
-                    RT->Logger->error( "Could not load saved search '$search_desc': $msg" );
-                }
+        my @dashboard_elements;
+        for my $element ( 'Changes Scheduled, Next 7 Days', 'Changes Deployed, Last 30 Days' ) {
+            my $search = RT::SavedSearch->new( RT->SystemUser );
+            my ( $sret, $smsg ) = $search->LoadByCol( "Name", $element );
+            if ($sret) {
+                push @dashboard_elements, {
+                    'description'   => 'Ticket: '. $element,
+                    'portlet_type'  => 'search',
+                    'id'            => $search->Id,
+                };
+            } else {
+                RT->Logger->error("Couldn't load search $element: $smsg");
+            }
         }
-
-        my $panes = {
-            body => [
-                @searches,
-            ],
-        };
+        my @dashboard_config = [
+            {
+                'Layout'   => 'col-md-12',
+                'Elements' => [
+                    \@dashboard_elements
+                ]
+            }
+        ];
 
         # fill content
-        ( $ret, $msg ) = $dashboard->Update( Panes => $panes );
+        ( $ret, $msg ) = $dashboard->SetContent( { Elements => @dashboard_config } );
         if ( !$ret ) {
             RT->Logger->error("Couldn't update content for dashboard Change Management: $msg");
         }

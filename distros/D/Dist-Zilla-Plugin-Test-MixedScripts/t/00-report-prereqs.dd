@@ -12,18 +12,20 @@ do { my $x = {
                       },
        'develop' => {
                       'requires' => {
-                                      'Dist::Zilla::Plugin::UsefulReadme' => 'v0.1.0',
+                                      'Dist::Zilla::Plugin::UsefulReadme' => 'v0.4.1',
                                       'Pod::Coverage::TrustPod' => '0',
                                       'Pod::Markdown::Github' => '0',
+                                      'Pod::Wordlist' => '0',
                                       'Software::Security::Policy::Individual' => '0.10',
                                       'Test::CPAN::Changes' => '0',
                                       'Test::CleanNamespaces' => '0.15',
                                       'Test::DistManifest' => '0',
                                       'Test::EOF' => '0',
                                       'Test::EOL' => '0',
+                                      'Test::Fixme' => '0',
                                       'Test::Kwalitee' => '1.21',
                                       'Test::MinimumVersion' => '0',
-                                      'Test::More' => '0.88',
+                                      'Test::More' => '0.94',
                                       'Test::NoTabs' => '0',
                                       'Test::Perl::Critic' => '0',
                                       'Test::Pod' => '1.41',
@@ -32,7 +34,8 @@ do { my $x = {
                                       'Test::Portability::Files' => '0',
                                       'Test::Spelling' => '0.17',
                                       'Test::TrailingSpace' => '0.0203',
-                                      'Test::Vars' => '0.015'
+                                      'Test::Vars' => '0.015',
+                                      'strict' => '0'
                                     }
                     },
        'runtime' => {
@@ -49,8 +52,9 @@ do { my $x = {
                                       'Moose::Util::TypeConstraints' => '0',
                                       'Path::Tiny' => '0',
                                       'Sub::Exporter::ForMethods' => '0',
+                                      'experimental' => '0',
                                       'namespace::autoclean' => '0',
-                                      'perl' => 'v5.16.0',
+                                      'perl' => 'v5.20.0',
                                       'warnings' => '0'
                                     }
                     },

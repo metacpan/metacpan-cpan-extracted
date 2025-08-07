@@ -81,7 +81,7 @@ class Mojo::Cookie::Response extends Mojo::Cookie {
           }
         }
         elsif ($attr eq "expires") {
-          $cookie->{expires} = Mojo::Date->new($value // "")->epoch;
+          $cookie->{expires} = Mojo::Date->new($value // "")->epoch_sec;
         }
         elsif ($attr eq "httponly") {
           $cookie->{httponly} = 1;

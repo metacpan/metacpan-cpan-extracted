@@ -9,17 +9,45 @@ class Mojo::Parameters {
   use Sort;
   
   # Fields
+  has pairs : rw virtual string[]
+    get {
+      return $self->pairs_list->to_array;
+    }
+    
+    set {
+      unless ($_) {
+        die "The pairs argument must be defined.";
+      }
+      
+      $self->set_pairs_list(StringList->new($_));
+    }
+  ;
+  
+  has pairs_list : rw StringList
+    get {
+      $self->_parse;
+      return $self->{pairs_list};
+    }
+    
+    set {
+      unless ($_) {
+        die "The pairs_list argument must be defined.";
+      }
+      $self->{pairs_list} = $_;
+      $self->{string} = undef;
+    }
+  ;
+  
+  # Undocumented Fields
   has string : string;
   
-  has pairs_list : StringList;
-  
   # Class Methods
-  static method new : Mojo::Parameters ($string : string = undef) {
+  static method new : Mojo::Parameters ($params_value : object of string|object[] = undef) {
     
     my $self = new Mojo::Parameters;
     
-    if ($string) {
-      $self->parse($string);
+    if ($params_value) {
+      $self->parse($params_value);
     }
     
     return $self;
@@ -149,62 +177,6 @@ class Mojo::Parameters {
     return $keys;
   }
   
-  method pairs : string[] () {
-    
-    $self->_parse;
-    
-    return $self->{pairs_list}->to_array;
-  }
-  
-  method _parse : void () {
-    
-    my $string = $self->{string};
-    $self->{string} = undef;
-    
-    $self->{pairs_list} = StringList->new;
-    
-    my $pairs_list = $self->{pairs_list};
-    
-    if (length $string) {
-      for my $pair (@{Fn->split("&", $string)}) {
-        if (my $match = Re->m($pair, "^([^=]+)(?:=(.*))?$")) {
-          my $name = $match->cap1;
-          my $value = $match->cap2;
-          
-          my $name_ref = [$name];
-          Re->s($name_ref, ["\+", "g"], " ");
-          $name = $name_ref->[0];
-          
-          my $value_ref = [$value];
-          Re->s($value_ref, ["\+", "g"], " ");
-          $value = $value_ref->[0];
-          unless ($value) {
-            $value = "";
-          }
-          
-          $name  = Mojo::Util->url_unescape($name);
-          $value = Mojo::Util->url_unescape($value);
-          
-          $pairs_list->push($name);
-          $pairs_list->push($value);
-        }
-      }
-    }
-    
-  }
-  
-  method set_pairs : void ($pairs : string[])  {
-    
-    unless ($pairs) {
-      die "The paris \$pairs must be defined.";
-    }
-    
-    $self->{pairs_list} = StringList->new($pairs);
-    
-    $self->{string} = undef;
-    
-  }
-
   method param : string ($name : string) {
     
     my $every_param = $self->every_param($name);
@@ -241,10 +213,17 @@ class Mojo::Parameters {
     
   }
   
-  method parse : void ($string : string) {
+  method parse : void ($params_value : object of string|object[]) {
     
-    $self->{string} = $string;
-    
+    if ($params_value isa string) {
+      $self->{string} = (string)$params_value;
+    }
+    elsif ($params_value isa object[]) {
+      $self->append($params_value);
+    }
+    else {
+      die "The type of the parameter value \$params_value must be string or object[].";
+    }
   }
   
   method remove : void ($name : string) {
@@ -348,6 +327,43 @@ class Mojo::Parameters {
     }
     
     return Fn->join("&", $key_values_list->to_array);
+  }
+  
+  private method _parse : void () {
+    
+    my $string = $self->{string};
+    $self->{string} = undef;
+    
+    $self->{pairs_list} = StringList->new;
+    
+    my $pairs_list = $self->{pairs_list};
+    
+    if (length $string) {
+      for my $pair (@{Fn->split("&", $string)}) {
+        if (my $match = Re->m($pair, "^([^=]+)(?:=(.*))?$")) {
+          my $name = $match->cap1;
+          my $value = $match->cap2;
+          
+          my $name_ref = [$name];
+          Re->s($name_ref, ["\+", "g"], " ");
+          $name = $name_ref->[0];
+          
+          my $value_ref = [$value];
+          Re->s($value_ref, ["\+", "g"], " ");
+          $value = $value_ref->[0];
+          unless ($value) {
+            $value = "";
+          }
+          
+          $name  = Mojo::Util->url_unescape($name);
+          $value = Mojo::Util->url_unescape($value);
+          
+          $pairs_list->push($name);
+          $pairs_list->push($value);
+        }
+      }
+    }
+    
   }
   
 }

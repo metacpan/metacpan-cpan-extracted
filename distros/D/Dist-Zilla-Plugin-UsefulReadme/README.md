@@ -36,10 +36,21 @@ This was written as a successor to [Pod::Readme](https://metacpan.org/pod/Pod%3A
 
 # RECENT CHANGES
 
-Changes for version v0.4.1 (2025-08-06)
+Changes for version v0.4.2 (2025-08-07)
 
+- Enhancements
+    - Pod::Weaver::Section::Requirements also looks for \`cpmfile\` and \`metafile\` when no metafile is specified.
+- Bug Fixes
+    - Pod::Weaver::Section::InstallationInstructions consistently chooses Build.PL when that and Makefile.PL are both present. GH#9.
+- Documentation
+    - Fixed wording in Changes.
 - Tests
-    - Fix prerequisites for tests.
+    - Fixed prerequisites for tests.
+    - Moved author tests into the xt directory.
+    - Add more author tests.
+- Toolchain
+    - Set up GitHub workflow for testing. (Thanks @atoomic)
+    - Ensure local-lib is not included in distribution.
 
 See the `Changes` file for more details.
 

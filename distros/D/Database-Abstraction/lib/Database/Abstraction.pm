@@ -38,6 +38,7 @@ use Fcntl;	# For O_RDONLY
 use File::Spec;
 use File::pfopen 0.03;	# For $mode and list context
 use File::Temp;
+use Log::Abstraction 0.24;
 use Object::Configure;
 use Params::Get;
 # use Error::Simple;	# A nice idea to use this but it doesn't play well with "use lib"
@@ -52,11 +53,11 @@ Database::Abstraction - Read-only Database Abstraction Layer (ORM)
 
 =head1 VERSION
 
-Version 0.27
+Version 0.28
 
 =cut
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 =head1 DESCRIPTION
 
@@ -206,6 +207,32 @@ sub init
 	return \%defaults
 }
 
+=head2 import
+
+The module can be initialised by the C<use> directive.
+
+    use Database::Abstraction 'directory' => '/etc/data';
+
+or
+
+    use Database::Abstraction { 'directory' => '/etc/data' };
+
+=cut
+
+sub import
+{
+	my $pkg = shift;
+
+	if((scalar(@_) % 2) == 0) {
+		my %h = @_;
+		init(Object::Configure::configure($pkg, \%h));
+	} elsif((scalar(@_) == 1) && (ref($_[0]) eq 'HASH')) {
+		init(Object::Configure::configure($pkg, $_[0]));
+	} elsif(scalar(@_) > 0) {	# >= 3 would also work here
+		init(\@_);
+	}
+}
+
 =head2 new
 
 Create an object to point to a read-only database.
@@ -332,6 +359,10 @@ sub new {
 	# }, $class;
 
 	# Re-seen keys take precedence, so defaults come first
+	# print STDERR ">>>>>>>>>>>>>>>>>>>\n";
+	# print STDERR __LINE__, "\n";
+	# print STDERR $args{'id'} || 'undef';
+	# print STDERR "\n";
 	return bless {
 		no_entry => 0,
 		no_fixate => 0,
@@ -413,10 +444,12 @@ sub _open
 	if($dbh) {
 		$dbh->do('PRAGMA synchronous = OFF');
 		$dbh->do('PRAGMA cache_size = 65536');
+		$dbh->sqlite_busy_timeout(100000);	# 10s
 		$self->_debug("read in $table from SQLite $slurp_file");
 		$self->{'type'} = 'DBI';
 	} elsif($self->_is_berkeley_db(File::Spec->catfile($dir, "$dbname.db"))) {
 		$self->_debug("$table is a BerkeleyDB file");
+		$self->{'type'} = 'BerkeleyDB';
 	} else {
 		my $fin;
 		($fin, $slurp_file) = File::pfopen::pfopen($dir, $dbname, 'csv.gz:db.gz', '<');
@@ -770,6 +803,125 @@ sub selectall_hash
 	croak("$query: @query_args");
 }
 
+=head2	count
+
+Return the number items/rows matching the given criteria
+
+=cut
+
+sub count
+{
+	my $self = shift;
+	my $params = Params::Get::get_params(undef, @_);
+
+	if($self->{'berkeley'}) {
+		Carp::croak(ref($self), ': count is meaningless on a NoSQL database');
+	}
+
+	my $table = $self->{table} || ref($self);
+	$table =~ s/.*:://;
+
+	$self->_open() if((!$self->{$table}) && (!$self->{'data'}));
+
+	if($self->{'data'}) {
+		if(scalar(keys %{$params}) == 0) {
+			$self->_trace("$table: count fast track return");
+			if(ref($self->{'data'}) eq 'HASH') {
+				return scalar keys %{$self->{'data'}};
+			}
+			return scalar @{$self->{'data'}};
+		} elsif((scalar(keys %{$params}) == 1) && defined($params->{'entry'}) && !$self->{'no_entry'}) {
+			return $self->{'data'}->{$params->{'entry'}} ? 1 : 0;
+		}
+	}
+
+	my $query;
+	my $done_where = 0;
+
+	if(($self->{'type'} eq 'CSV') && !$self->{no_entry}) {
+		$query = "SELECT COUNT(*) FROM $table WHERE entry IS NOT NULL AND entry NOT LIKE '#%'";
+		$done_where = 1;
+	} elsif($self->{no_entry}) {
+		$query = "SELECT COUNT(*) FROM $table";
+	} else {
+		$query = "SELECT COUNT(entry) FROM $table";
+	}
+
+	my @query_args;
+	foreach my $c1(sort keys(%{$params})) {	# sort so that the key is always the same
+		my $arg = $params->{$c1};
+		if(ref($arg)) {
+			$self->_fatal("count $query: argument is not a string");
+			# throw Error::Simple("$query: argument is not a string: " . ref($arg));
+			croak("$query: argument is not a string: ", ref($arg));
+		}
+		if(!defined($arg)) {
+			my @call_details = caller(0);
+			# throw Error::Simple("$query: value for $c1 is not defined in call from " .
+				# $call_details[2] . ' of ' . $call_details[1]);
+			Carp::croak("$query: value for $c1 is not defined in call from ",
+				$call_details[2], ' of ', $call_details[1]);
+		}
+
+		my $keyword;
+		if($done_where) {
+			$keyword = 'AND';
+		} else {
+			$keyword = 'WHERE';
+			$done_where = 1;
+		}
+		if($arg =~ /\@/) {
+			$query .= " $keyword $c1 LIKE ?";
+		} else {
+			$query .= " $keyword $c1 = ?";
+		}
+		push @query_args, $arg;
+	}
+	if(!$self->{no_entry}) {
+		$query .= ' ORDER BY ' . $self->{'id'};
+	}
+
+	if(defined($query_args[0])) {
+		$self->_debug("count $query: ", join(', ', @query_args));
+	} else {
+		$self->_debug("count $query");
+	}
+
+	my $key;
+	my $c;
+	if($c = $self->{cache}) {
+		$key = $query;
+		$key =~ s/COUNT\((.+?)\)/$1/;
+		$key .= ' array';
+		if(defined($query_args[0])) {
+			$key .= ' ' . join(', ', @query_args);
+		}
+		if(my $rc = $c->get($key)) {
+			# Unlikely
+			$self->_debug('cache HIT');
+			return scalar @{$rc};	# We stored a ref to the array
+		}
+		$self->_debug('cache MISS');
+	} else {
+		$self->_debug('cache not used');
+	}
+
+	if(my $sth = $self->{$table}->prepare($query)) {
+		$sth->execute(@query_args) ||
+			# throw Error::Simple("$query: @query_args");
+			croak("$query: @query_args");
+
+		my $count = $sth->fetchrow_arrayref()->[0];
+
+		$sth->finish();
+
+		return $count;
+	}
+	$self->_warn("count failure on $query: @query_args");
+	# throw Error::Simple("$query: @query_args");
+	croak("$query: @query_args");
+}
+
 =head2	fetchrow_hashref
 
 Returns a hash reference for a single row in a table.
@@ -799,18 +951,24 @@ sub fetchrow_hashref {
 
 	$self->_open() if(!$self->{$table});
 
+	# ::diag($self->{'type'});
 	if($self->{'data'} && (!$self->{'no_entry'}) && (scalar keys(%{$params}) == 1) && defined($params->{'entry'})) {
 		$self->_debug('Fast return from slurped data');
 		return $self->{'data'}->{$params->{'entry'}};
 	}
 
 	if($self->{'berkeley'}) {
+		# print STDERR ">>>>>>>>>>>>\n";
+		# ::diag(Data::Dumper->new([$self->{'berkeley'}])->Dump());
 		if((!$self->{'no_entry'}) && (scalar keys(%{$params}) == 1) && defined($params->{'entry'})) {
 			return { entry => $self->{'berkeley'}->{$params->{'entry'}} };
 		}
 		my $id = $self->{'id'};
 		if($self->{'no_entry'} && (scalar keys(%{$params}) == 1) && defined($id) && defined($params->{$id})) {
-			return { $id => $self->{'berkeley'}->{$params->{$id}} };
+			if(my $rc = $self->{'berkeley'}->{$params->{$id}}) {
+				return { $params->{$id} => $rc }	# Return key->value as a hash pair
+			}
+			return;
 		}
 		Carp::croak(ref($self), ': fetchrow_hashref is meaningless on a NoSQL database');
 	}
@@ -1011,6 +1169,9 @@ sub AUTOLOAD {
 
 	# Allow the AUTOLOAD feature to be disabled
 	Carp::croak(__PACKAGE__, ": Unknown column $column") if(exists($self->{'auto_load'}) && boolean($self->{'auto_load'})->isFalse());
+
+	# Validate column name - only allow safe column name
+	Carp::croak(__PACKAGE__, ": Invalid column name: $column") unless $column =~ /^[a-zA-Z_][a-zA-Z0-9_]*$/;
 
 	my $table = $self->{table} || ref($self);
 	$table =~ s/.*:://;
@@ -1225,23 +1386,19 @@ sub DESTROY {
 
 # Determine whether a given file is a valid Berkeley DB file.
 # It combines a fast preliminary check with a more thorough validation step for accuracy.
-sub _is_berkeley_db
-{
+# It looks for the magic number at both byte 0 and byte 12
+# TODO: Combine _db_0 and _db_12 as they are very similar routines
+sub _is_berkeley_db {
 	my ($self, $file) = @_;
-	my $header;
 
 	# Step 1: Check magic number
-	if(open(my $fh, '<', $file)) {
-		read($fh, $header, 4);
-		close $fh;
-	} else {
-		return 0;
-	}
+	open my $fh, '<', $file or return 0;
+	binmode $fh;
 
-	$header = substr(unpack('H*', $header), 0, 4);
+	my $is_db = (($self->_is_berkeley_db_0($fh)) || ($self->_is_berkeley_db_12($fh)));
+	close $fh;
 
-	# Berkeley DB magic numbers
-	if($header eq '6000' || $header eq '0006') {
+	if($is_db) {
 		# Step 2: Attempt to open as Berkeley DB
 
 		require DB_File && DB_File->import();
@@ -1253,8 +1410,45 @@ sub _is_berkeley_db
 			return 1;	# Successfully identified as a Berkeley DB file
 		}
 	}
-
 	return 0;
+}
+
+# Determine whether a given file is a valid Berkeley DB file.
+# It combines a fast preliminary check with a more thorough validation step for accuracy.
+sub _is_berkeley_db_0
+{
+	my ($self, $fh) = @_;
+
+	# Read the first 4 bytes (magic number)
+	read($fh, my $magic_bytes, 4) == 4 or return 0;
+
+	# Unpack both big-endian and little-endian values
+	my $magic_be = unpack('N', $magic_bytes);	# Big-endian
+	my $magic_le = unpack('V', $magic_bytes);	# Little-endian
+
+	# Known Berkeley DB magic numbers (in both endian formats)
+	my %known_magic = map { $_ => 1 } (
+		0x00061561,	# Btree
+		0x00053162,	# Hash
+		0x00042253,	# Queue
+		0x00052444,	# Recno
+	);
+
+	return($known_magic{$magic_be} || $known_magic{$magic_le});
+}
+
+sub _is_berkeley_db_12
+{
+	my ($self, $fh) = @_;
+	my $header;
+
+	seek $fh, 12, 0 or return 0;
+	read($fh, $header, 4) or return 0;
+
+	$header = substr(unpack('H*', $header), 0, 4);
+
+	# Berkeley DB magic numbers
+	return($header eq '6115' || $header eq '1561');	# Btree
 }
 
 # Log and remember a message
@@ -1330,7 +1524,7 @@ This program is released under the following licence: GPL2.
 Usage is subject to licence terms.
 The licence terms of this software are as follows:
 Personal single user, single computer use: GPL2
-All other users (for example Commercial, Charity, Educational, Government)
+All other users (for example, Commercial, Charity, Educational, Government)
 must apply in writing for a licence for use from Nigel Horne at the
 above e-mail.
 

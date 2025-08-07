@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use lib 't/lib';
 
-use Test::Most tests => 21;
+use Test::Most tests => 22;
 use FindBin qw($Bin);
 use Test::Needs 'CHI';
 
@@ -43,6 +43,7 @@ CHI: {
 	cmp_ok(scalar $cache->get_keys(), '==', 1, 'cache hit');
 	cmp_ok(ref($rc), 'eq', 'HASH', 'fetchrow hashref returns a reference to a hash');
 	cmp_ok($rc->{'number'}, '==', 2, 'basic test works');
+	cmp_ok($test1->count(entry => 'two'), '==', 1, 'count works with a cache');
 
 	$rc = $test1->selectall_hashref();
 	cmp_ok(scalar $cache->get_keys(), '==', 2, 'cache miss');

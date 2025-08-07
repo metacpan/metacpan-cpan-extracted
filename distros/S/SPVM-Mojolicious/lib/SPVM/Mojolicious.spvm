@@ -2,5 +2,5 @@
 # MIT License
 
 class Mojolicious {
-  version "0.007";
+  version "0.009";
 }

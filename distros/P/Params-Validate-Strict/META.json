@@ -33,7 +33,9 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
+            "Exporter" : "0",
             "ExtUtils::MakeMaker" : "6.64",
+            "List::Util" : "0",
             "Params::Get" : "0.13",
             "Scalar::Util" : "0"
          }
@@ -50,6 +52,6 @@
    },
    "release_status" : "stable",
    "resources" : {},
-   "version" : "0.08",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

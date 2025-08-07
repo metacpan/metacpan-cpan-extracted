@@ -134,7 +134,7 @@ printpah - check for binary in your $PATH variable an nicely print the results
 
 =head1 VERSION
 
-version 0.12.1
+version 0.14.0
 
 =head1 SYNOPSIS
 

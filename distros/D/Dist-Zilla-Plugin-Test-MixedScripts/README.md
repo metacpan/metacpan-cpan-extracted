@@ -8,6 +8,9 @@ In the `dist.ini` add:
 
 ```
 [Test::MixedScripts]
+; authordep Test::MixedScripts
+script = Latin
+script = Common
 ```
 
 # DESCRIPTION
@@ -26,14 +29,20 @@ developer to copy and paste into their code.
 
 # RECENT CHANGES
 
-Changes for version v0.1.5(2025-08-01T15:44:57+01:00)
+Changes for version v0.2.0 (2025-08-06)
 
+- Incompatible Changes
+    - Increased the minimum Perl version to v5.20, since that is what Dist::Zilla now requires.
 - Documentation
-    - Added overlooked credit to Changes.
-    - README is generated using Dist::Zilla::Plugin::UsefulReadmme.
-    - Added a SYNOPSIS.
+    - Fixed errors in README.
+    - Removed separate INSTALL file.
+    - Updated SYNOPSIS.
+- Tests
+    - Moved author tests into the xt directory.
 - Toolchain
-    - Fixed Dist::Zilla configuration. (@haarg)
+    - Undid some changes to Dist::Zilla configuration.
+    - Set up GitHub workflow for testing.
+    - Ensure local-lib is not included in distribution.
 
 See the `Changes` file for more details.
 
@@ -53,9 +62,12 @@ This module lists the following modules as runtime dependencies:
 - [Moose::Util::TypeConstraints](https://metacpan.org/pod/Moose%3A%3AUtil%3A%3ATypeConstraints)
 - [Path::Tiny](https://metacpan.org/pod/Path%3A%3ATiny)
 - [Sub::Exporter::ForMethods](https://metacpan.org/pod/Sub%3A%3AExporter%3A%3AForMethods)
+- [experimental](https://metacpan.org/pod/experimental)
 - [namespace::autoclean](https://metacpan.org/pod/namespace%3A%3Aautoclean)
-- [perl](https://metacpan.org/pod/perl) version v5.16.0 or later
+- [perl](https://metacpan.org/pod/perl) version v5.20.0 or later
 - [warnings](https://metacpan.org/pod/warnings)
+
+See the `cpanfile` file for the full list of prerequisites.
 
 # INSTALLATION
 
@@ -88,7 +100,7 @@ dzil test
 dzil install --install-command="cpan ."
 ```
 
-For more information, see the `INSTALL` file included with this distribution.
+For more information, see [How to install CPAN modules](https://www.cpan.org/modules/INSTALL.html).
 
 # SUPPORT
 
@@ -122,6 +134,8 @@ This code was based on [Dist::Zilla::Plugin::Test::EOL](https://metacpan.org/pod
 <xenoterracide@gmail.com> and Karen Etheridge <ether@cpan.org>.
 
 # CONTRIBUTOR
+
+Graham Knop <haarg@haarg.org>
 
 # COPYRIGHT AND LICENSE
 

@@ -59,6 +59,7 @@ DumpFile($nofield_file, {
 	NotTheClass => { directory => $tempdir }
 });
 $obj = Genealogy::Wills->new(config_file => $nofield_file);
+
 ok($obj, 'Object created with config that lacks class key');
 like($obj->{directory}, qr/lib.Genealogy.Wills.data$/, 'Falls back to default if class key missing (uses directory directly)');
 

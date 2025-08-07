@@ -4,10 +4,11 @@ use strict;
 use warnings FATAL => 'all';
 use Test::More;
 
-plan tests => 1;
+my $CLASS = 'Business::ES::NIF';
 
-BEGIN {
-    use_ok( 'Business::ES::NIF' ) || print "Bail out!\n";
-}
+subtest 'Carga del módulo' => sub {
+  use_ok($CLASS) or bail_out("No se pudo cargar $CLASS");
+  ok($CLASS->VERSION, "$CLASS tiene versión definida");
+};
 
-diag( "Testing Business::ES::NIF $Business::ES::NIF::VERSION, Perl $], $^X" );
+done_testing;

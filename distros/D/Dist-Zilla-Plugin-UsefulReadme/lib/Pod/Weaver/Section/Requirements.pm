@@ -20,7 +20,7 @@ use experimental qw( lexical_subs postderef signatures );
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.4.1';
+our $VERSION = 'v0.4.2';
 
 
 has header => (
@@ -122,7 +122,7 @@ sub weave_section( $self, $document, $input ) {
     );
 
     my %files = map { $_->name => 1 } $zilla->files->@*;
-    my @metafiles = grep { $_ ne '' } ( $self->metafile, qw( cpanfile META.json META.yml ) );
+    my @metafiles = grep { $_ ne '' } ( $self->metafile, qw( cpmfile cpanfile metafile META.json META.yml ) );
     if ( my $file = first { $files{$_} } @metafiles ) {
         push $res->children->@*,
           Pod::Elemental::Element::Pod5::Ordinary->new(
@@ -162,7 +162,7 @@ Pod::Weaver::Section::Requirements - generate POD with the runtime requirements
 
 =head1 VERSION
 
-version v0.4.1
+version v0.4.2
 
 =for stopwords metafile
 

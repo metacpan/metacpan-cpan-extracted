@@ -37,17 +37,19 @@
       "develop" : {
          "requires" : {
             "Pod::Coverage::TrustPod" : "0",
+            "Pod::Wordlist" : "0",
             "Software::Security::Policy::Individual" : "0.10",
             "Test2::Tools::Basic" : "1.302200",
-            "Test::CPAN::Changes" : "0",
+            "Test::CPAN::Changes" : "0.19",
             "Test::CleanNamespaces" : "0.15",
             "Test::DistManifest" : "0",
             "Test::EOF" : "0",
             "Test::EOL" : "0",
+            "Test::Fixme" : "0",
             "Test::Kwalitee" : "1.21",
             "Test::MinimumVersion" : "0",
             "Test::MixedScripts" : "v0.3.0",
-            "Test::More" : "0.88",
+            "Test::More" : "0.96",
             "Test::NoTabs" : "0",
             "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
@@ -56,7 +58,9 @@
             "Test::Portability::Files" : "0",
             "Test::Spelling" : "0.17",
             "Test::TrailingSpace" : "0.0203",
-            "Test::Vars" : "0.015"
+            "Test::Vars" : "0.015",
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "runtime" : {
@@ -91,6 +95,7 @@
          },
          "requires" : {
             "Dist::Zilla::Plugin::PodWeaver" : "0",
+            "Dist::Zilla::Stash::PodWeaver" : "0",
             "File::Spec" : "0",
             "Module::Metadata" : "1.000015",
             "Pod::Markdown" : "3.000",
@@ -110,19 +115,19 @@
    "provides" : {
       "Dist::Zilla::Plugin::UsefulReadme" : {
          "file" : "lib/Dist/Zilla/Plugin/UsefulReadme.pm",
-         "version" : "v0.4.1"
+         "version" : "v0.4.2"
       },
       "Pod::Weaver::Section::InstallationInstructions" : {
          "file" : "lib/Pod/Weaver/Section/InstallationInstructions.pm",
-         "version" : "v0.4.1"
+         "version" : "v0.4.2"
       },
       "Pod::Weaver::Section::RecentChanges" : {
          "file" : "lib/Pod/Weaver/Section/RecentChanges.pm",
-         "version" : "v0.4.1"
+         "version" : "v0.4.2"
       },
       "Pod::Weaver::Section::Requirements" : {
          "file" : "lib/Pod/Weaver/Section/Requirements.pm",
-         "version" : "v0.4.1"
+         "version" : "v0.4.2"
       }
    },
    "release_status" : "stable",
@@ -136,7 +141,7 @@
          "web" : "https://github.com/robrwo/perl-Dist-Zilla-Plugin-UsefulReadme"
       }
    },
-   "version" : "v0.4.1",
+   "version" : "v0.4.2",
    "x_authority" : "cpan:RRWO",
    "x_generated_by_perl" : "v5.34.3",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",

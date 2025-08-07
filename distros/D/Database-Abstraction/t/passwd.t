@@ -9,7 +9,7 @@ use lib 't/lib';
 use Test::Most;
 
 if(-r '/etc/passwd') {
-	plan(tests => 4);
+	plan(tests => 5);
 
 	use_ok('MyLogger');
 	use_ok('Database::passwd');
@@ -18,6 +18,8 @@ if(-r '/etc/passwd') {
 	my $row = $passwd->fetchrow_hashref(name => 'root');
 
 	cmp_ok($row->{'uid'}, '==', 0, 'Root has UID 0');
+
+	cmp_ok($passwd->count(), '>', 0, 'Passwd is not empty');
 
 	diag(Data::Dumper->new([$row])->Dump()) if($ENV{'TEST_VERBOSE'});
 

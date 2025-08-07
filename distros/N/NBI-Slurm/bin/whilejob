@@ -1,0 +1,289 @@
+#!/usr/bin/env perl
+#ABSTRACT: Repeat a command while a job is running
+#PODNAME: whilejobs
+
+use v5.12;
+use warnings;
+use Getopt::Long;
+use FindBin qw($RealBin);
+use Data::Dumper;
+use Term::ANSIColor qw(:constants);
+
+# Add development library path if in dev mode
+if (-e "$RealBin/../dist.ini") {
+    say STDERR "[dev mode] Using local lib" if ($ENV{"DEBUG"});
+    use lib "$RealBin/../lib";
+} 
+
+use NBI::Slurm;
+use NBI::Queue;
+$Data::Dumper::Sortkeys = 1;
+
+# Command line options with defaults
+my $opt_jobid        = -1;
+my $opt_time_string  = "30s";
+my $opt_user         = $ENV{USER};
+my $opt_command      = '';
+my $opt_verbose_bool = 0;
+my $opt_debug_bool   = 0;
+my $opt_stderr_bool  = 0;
+# Check if this script is running as a job, save the job id if so
+my $self_job_id = $ENV{SLURM_JOB_ID} // undef;
+
+# Parse command line options
+my $gtopt = GetOptions(
+    'j|i|id|jobid=i' => \$opt_jobid,
+    't|time=s'       => \$opt_time_string,
+    'u|user=s'       => \$opt_user,
+    'stderr'         => \$opt_stderr_bool,
+    'verbose'        => \$opt_verbose_bool,
+    'version'        => sub { say "whilejob v", $NBI::Slurm::VERSION; exit },
+    'debug'          => \$opt_debug_bool,
+    'help'           => sub { usage(1) },  # Fixed: pass 1 to exit after help
+);
+
+my $redirect = $opt_stderr_bool ? '2>&1' : '2>/dev/null';
+
+# Check for command line parsing errors
+if (!$gtopt) {
+  usage(0);
+  print STDERR timelog("whilejob"), "Error in command line arguments\n";
+  exit;  
+}
+
+# Input validation
+my $interval_seconds = timestring_to_seconds($opt_time_string);
+my $command = join(' ', @ARGV);
+
+if ($opt_jobid < 0) {
+    usage(0);
+    print STDERR timelog("whilejob"), "Job ID must be a positive integer\n";
+    exit;
+}
+
+if ($command eq '') {
+    print STDERR timelog("whilejob"), "No command provided\n";
+    usage(0);
+}
+
+# Main monitoring loop
+while (1) {
+    my $queue;  # Declare outside eval block
+    
+    eval {
+        if ($opt_debug_bool) {
+            print STDERR timelog("whilejob"), "Debug mode: using SLURM job id $opt_jobid\n";
+        }
+        
+        # Create queue object to monitor specific job
+        $queue = NBI::Queue->new(
+            -username => $opt_user,
+            -jobid    => $opt_jobid,
+        );
+    };
+    
+    # Handle queue creation errors
+    if ($@) {
+        print STDERR timelog("whilejob"), "Not inside a SLURM cluster?\n";
+        if ($opt_verbose_bool or $opt_debug_bool) {
+            print STDERR timelog("whilejob"), "Error: $@\n";
+        }
+        last;
+    } elsif ($opt_debug_bool) {
+        print STDERR timelog("whilejob"), "Queue object created\n";
+    }
+    
+    # Get current job IDs
+    my @current_ids = @{$queue->ids()};
+
+    # Execute the user's command
+    my $output;
+    eval {
+        $output = `$command $redirect`;
+        my $exit_code = $? >> 8;
+        
+        if ($exit_code != 0) {
+            print STDERR RED, timelog("whilejob"), RESET, "Command failed with exit code $exit_code\n";
+            print STDERR $output if $output;
+        } 
+    };
+    
+    # Handle command execution errors
+    if ($@) {
+        print STDERR timelog("whilejob"), "Error executing command: $@\n";
+        last;
+    }
+
+    # print command's output
+    if ($opt_debug_bool or $opt_verbose_bool) {
+        print STDERR  GREEN, timelog("whilejob"), RESET, "Output:\n";
+    }
+    print $output ? "$output" : "<No output from command>\n";
+
+    # Check if job is still running
+    if (scalar @current_ids == 0) {
+        print STDERR YELLOW, timelog("whilejob"), RESET, "Job $opt_jobid has finished\n";
+        last;
+    } else {
+        if ($opt_verbose_bool) {
+            print STDERR YELLOW, timelog("whilejob"), RESET,  "Job $opt_jobid is still running\n";
+        }
+        print STDERR timelog("whilejob"), "Waiting for $interval_seconds seconds\n" if $opt_debug_bool;
+        sleep($interval_seconds);
+    }
+}
+
+# Convert time string (e.g., "30s", "5m") to seconds
+sub timestring_to_seconds {
+    my $time_string = shift;
+    my $seconds = 0;
+    
+    if ($time_string =~ /^(\d+)([smhd])$/) {
+        my $value = $1;
+        my $unit = $2;
+        
+        if ($unit eq 's') {
+            $seconds = $value;
+        } elsif ($unit eq 'm') {
+            $seconds = $value * 60;
+        } elsif ($unit eq 'h') {
+            $seconds = $value * 3600;
+        } elsif ($unit eq 'd') {
+            $seconds = $value * 86400;
+        }
+    } else {
+        die "Invalid time string format: '$time_string' (expected format: number followed by s/m/h/d)\n";
+    }
+    
+    return $seconds;
+}
+
+ 
+# Display usage information
+sub usage {
+    my $should_exit = shift // 0;
+    
+    say STDERR <<'END';
+
+Usage: whilejobs [options] "command"
+------------------------------------
+Execute a command repeatedly while a SLURM job is running
+
+Options:
+ -i, --id <job_id>      Job ID to monitor (REQUIRED)
+ -t, --time <time>      Interval between checks (default: 30s)
+                        Format: number + unit (s/m/h/d)
+                        Examples: 30s, 5m, 1h, 2d
+ -u, --user <username>  Username to check jobs for (default: current user)
+ --verbose              Show detailed output
+ --debug                Enable debug mode
+ --version              Show version information
+ --help                 Show this help message
+
+Examples:
+ whilejob -i 12345 "ls -la /scratch/output/"
+ whilejob -i 67890 -t 1m "tail -n 5 logfile.txt"
+ whilejob -i 54321 -u otheruser --verbose "df -h"
+
+END
+    
+    exit if $should_exit;
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+whilejobs - Repeat a command while a job is running
+
+=head1 VERSION
+
+version 0.14.0
+
+=head1 SYNOPSIS
+
+whilejobs [options] "command"
+
+=head1 DESCRIPTION
+
+This script repeatedly executes a command while a specific SLURM job is running.
+It's useful for monitoring job progress, checking output files, or performing
+maintenance tasks that should continue until a job completes.
+
+The script will:
+1. Check if the specified job is still running
+2. Execute the provided command
+3. Wait for the specified interval
+4. Repeat until the job finishes
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-i, --id <jobid>>
+
+Specify the SLURM job ID to monitor. This option is B<required>.
+
+=item B<-t, --time <time>>
+
+Specify the interval between checks. The default is 30 seconds.
+Format: number followed by unit (s=seconds, m=minutes, h=hours, d=days)
+Examples: "10s", "5m", "2h", "1d"
+
+=item B<-u, --user <username>>
+
+Specify the username to check jobs for. By default, uses the current user.
+
+=item B<--verbose>
+
+Display verbose output, including job status and command results.
+
+=item B<--debug>
+
+Enable debug mode with detailed diagnostic information.
+
+=item B<--version>
+
+Display version information and exit.
+
+=item B<--help>
+
+Display this help message and exit.
+
+=back
+
+=head1 EXAMPLES
+
+=over 4
+
+=item B<Monitor job output:>
+
+  whilejobs -i 12345 "tail -n 10 /scratch/job_output.log"
+
+=item B<Check disk usage every 5 minutes:>
+
+  whilejobs -i 67890 -t 5m "df -h /scratch"
+
+=item B<Monitor another user's job:>
+
+  whilejobs -i 54321 -u otheruser "ls -la /shared/results/"
+
+=back
+
+=head1 AUTHOR
+
+Andrea Telatin <proch@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2023-2025 by Andrea Telatin.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=cut

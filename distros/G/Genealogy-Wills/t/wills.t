@@ -3,6 +3,7 @@
 use strict;
 use Test::Most;
 use Test::Needs 'Test::HTTPStatus';
+use Test::Returns;
 use Test::Warnings;
 
 use lib 'lib';
@@ -33,16 +34,20 @@ SKIP: {
 		diag(Data::Dumper->new([\@cowells])->Dump());
 	}
 
-	ok(scalar(@cowells) >= 1);
+	returns_is(\@cowells, { 'type' => 'arrayref', 'min' => 1 });
+
 	is($cowells[0]->{'last'}, 'Cowell', 'Returned Cowells');
 	http_ok($cowells[0]->{'url'}, Test::HTTPStatus::HTTP_OK);
 
 	my @carltons = $search->search({ first => 'Stephen', last => 'Carlton', town => 'Ash, Kent, England' });
+
+	returns_is(\@carltons, { 'type' => 'arrayref', 'min' => 1 });
+
 	cmp_ok(scalar(@carltons), '==', 1, 'Stephen Carlton, Ash, Kent, England');
 	http_ok($carltons[0]->{'url'}, Test::HTTPStatus::HTTP_OK);
 
 	@carltons = $search->search(first => 'Stephen', last => 'Carlton');
-	cmp_ok(scalar(@carltons), '==', 4, 'Stephen Carlton');
+	returns_is(\@carltons, { 'type' => 'arrayref', 'min' => 4, 'max' => 4 }, 'Stephen Carlton');
 	http_ok($carltons[3]->{'url'}, Test::HTTPStatus::HTTP_OK);
 
 	if($ENV{'TEST_VERBOSE'}) {

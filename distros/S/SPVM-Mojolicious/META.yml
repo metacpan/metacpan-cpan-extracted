@@ -1,11 +1,11 @@
 ---
-abstract: 'Web Frame Work'
+abstract: 'Real-time web framework'
 author:
   - 'Yuki Kimoto<kimoto.yuki@gmail.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
-  SPVM: '0.990077'
+  SPVM: '0.990080'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
 license: mit
@@ -18,7 +18,7 @@ no_index:
     - t
     - inc
 requires:
-  SPVM: '0.990077'
+  SPVM: '0.990080'
   SPVM::Digest::SHA: '0.065'
   SPVM::File::Copy: '0.022'
   SPVM::File::Temp: '0.026'
@@ -27,6 +27,7 @@ requires:
   SPVM::IO::Socket::SSL: '0.010'
   SPVM::JSON: '1.002'
   SPVM::MIME::Base64: '1.003'
+  SPVM::Math: '1.006'
   SPVM::Mozilla::CA: '0.001'
   SPVM::Regex: '0.246'
   SPVM::Time::HiRes: '0.005'
@@ -34,5 +35,5 @@ requires:
   SPVM::Time::Piece: '0.003'
 resources:
   repository: https://github.com/yuki-kimoto/SPVM-Mojolicious.git
-version: '0.007'
+version: '0.009'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -5,11 +5,18 @@ use warnings FATAL => 'all';
 use Test::More;
 
 unless ( $ENV{RELEASE_TESTING} ) {
-    plan( skip_all => "Author tests not required for installation" );
+    plan( skip_all => 'Author test: set RELEASE_TESTING=1 to run this test' );
 }
 
-my $min_tcm = 0.9;
-eval "use Test::CheckManifest $min_tcm";
-plan skip_all => "Test::CheckManifest $min_tcm required" if $@;
+my $min_version = 0.9;
 
-ok_manifest();
+
+eval {
+    require Test::CheckManifest;
+    Test::CheckManifest->VERSION($min_version);
+    *main::ok_manifest = \&Test::CheckManifest::ok_manifest;
+    1;
+} or plan skip_all => "Test::CheckManifest $min_version required: $@";
+
+# Ya podemos usar ok_manifest
+ok_manifest({ verbose => 1 });

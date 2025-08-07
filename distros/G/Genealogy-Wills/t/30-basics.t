@@ -3,7 +3,8 @@ use warnings;
 
 use File::Temp qw(tempdir);
 use Genealogy::Wills;
-use Test::Most tests => 13;	# Define the number of tests
+use Test::Most tests => 14;	# Define the number of tests
+use Test::Returns;
 
 # Mock database
 BEGIN {
@@ -47,7 +48,7 @@ is($obj->{'directory'}, $temp_dir, 'Directory property set correctly');
 
 # Test search with valid parameters
 my @results = $obj->search(last => 'Smith');
-is(scalar(@results), 2, 'Search returned correct number of results');
+returns_is(\@results, { 'type' => 'arrayref', 'min' => 2, 'max' => 2 }, 'Search returned correct number of results');
 is($results[0]->{'first'}, 'John', 'First result matches expected value');
 like($results[0]->{'url'}, qr/^https:\/\//, 'URL in results is correctly formatted');
 
@@ -69,7 +70,7 @@ is($custom_obj->{'cache_duration'}, '2 days', 'Custom cache_duration property is
 
 	*Genealogy::Wills::wills::selectall_hashref = sub { [] };
 	my @no_results = $obj->search(last => 'Nonexistent');
-	is(scalar(@no_results), 0, 'Search with non-existent name returns no results');
+	returns_is(\@no_results, { 'type' => 'arrayref', 'min' => 0, 'max' => 0 }, 'Search with non-existent name returns no results');
 }
 
 # Test URL formatting
@@ -79,5 +80,6 @@ is($custom_obj->{'cache_duration'}, '2 days', 'Custom cache_duration property is
 		return [{ first => 'John', last => 'Smith', url => 'example.com/john_smith' }];
 	};
 	my @results = $obj->search(last => 'Smith');
+	returns_is(\@results, { 'type' => 'arrayref', 'min' => 1, 'max' => 1 }, 'Search returns correct number of results');
 	like($results[0]->{'url'}, qr/^https:\/\//, 'URL formatting correctly prepends https://');
 }

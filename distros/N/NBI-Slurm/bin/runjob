@@ -42,6 +42,8 @@ my $command;
 my $verbose;
 my $debug;
 my $run;
+my $gpu;
+my @slurm_options;
 GetOptions(
     'm|memory=s'    => \$memory,
     'c|cores|threads=i' => \$threads,
@@ -55,6 +57,8 @@ GetOptions(
     'after=s'       => \@afterok,
     'f|files=s'       => \my @files,
     'placeholder=s' => \$opt_placeholder,
+    'gpu'           => \$gpu,
+    'option=s'      => \@slurm_options,
     'verbose'       => \$verbose,
     'version'       => sub { say "runjob v", $NBI::Slurm::VERSION; exit },
     'debug'         => \$debug,
@@ -119,6 +123,12 @@ say STDERR "[DEBUG] Using $name as job name" if ($debug);
 
 my $afterok_string = defined $afterok[0] ? "-d afterok:" . join(":", @afterok) : undef;
 
+# Prepare additional SLURM options
+my @additional_opts = ();
+push @additional_opts, $afterok_string if defined $afterok_string;
+push @additional_opts, "--gres=gpu:1" if $gpu;
+push @additional_opts, @slurm_options if @slurm_options;
+
 # 
 if (not NBI::Slurm::valid_queue($queue)) {
     my @valid_queues = NBI::Slurm::queues('CAN FAIL');
@@ -145,7 +155,7 @@ my $opts = NBI::Opts->new(
     -tmpdir => $tmpdir,
     -email_address => $email_address,
     -email_type => $mail_type,
-    -opts => [$afterok_string],
+    -opts => \@additional_opts,
     -files => \@abs_files,
     -placeholder => $opt_placeholder,
 );
@@ -236,6 +246,8 @@ sub usage {
     -f, --files      Input files for array (either specify -f as many times as needed or
                      use a _quoted_ pattern like "*.fasta" to include multiple files)
     --placeholder    Placeholder for array input files [default: #FILE#]
+    --gpu            Request GPU resources (adds --gres=gpu:1)
+    --option VALUE   Additional SLURM options (can be used multiple times)
     --verbose        Verbose output
     --help           This help message
  ----------------------------------------------------------
@@ -339,7 +351,7 @@ runjob - Run a job in the cluster using NBI::Slurm
 
 =head1 VERSION
 
-version 0.12.1
+version 0.14.0
 
 =head1 SYNOPSIS
 
@@ -421,6 +433,14 @@ Enables debug mode, providing even more detailed information about the job setup
 
 Displays the version of the runjob script.
 
+=item B<--gpu>
+
+Requests GPU resources for the job by adding the SLURM option '--gres=gpu:1'. This allows the job to access GPU hardware on the cluster.
+
+=item B<--option> STR
+
+Specifies additional SLURM options to be passed directly to the job scheduler. This option can be used multiple times to add multiple custom SLURM directives. For example: '--option="--constraint=gpu"' or '--option="--exclusive"'.
+
 =item B<--help>
 
 Displays the help message for the script.
@@ -461,6 +481,14 @@ Running a job with multiple input files (use placeholder #FILE#):
 Using a custom placeholder for input files:
 
     runjob -f "*.fastq" --placeholder "FASTQ" -r "fastqc FASTQ"
+
+Submitting a GPU job:
+
+    runjob --gpu -r "python gpu_script.py"
+
+Adding custom SLURM options:
+
+    runjob --option="--constraint=intel" --option="--exclusive" -r "my_program"
 
 =cut
 

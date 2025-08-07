@@ -1,6 +1,7 @@
 #!perl -w
 
 use strict;
+use Data::Dumper;
 use FindBin qw($Bin);
 
 use lib 't/lib';
@@ -22,14 +23,12 @@ cmp_ok(scalar(@rc), '==', 3, 'getting all the distinct entries works');
 
 @rc = $test2->entry();
 if($ENV{'TEST_VERBOSE'}) {
-	use Data::Dumper;
 	diag(Data::Dumper->new([\@rc])->Dump());
 }
 cmp_ok(scalar(@rc), '==', 3, 'getting all the entries works');
 
 @rc = $test2->selectall_hash();
 if($ENV{'TEST_VERBOSE'}) {
-	use Data::Dumper;
 	diag(Data::Dumper->new([\@rc])->Dump());
 }
 

@@ -1,5 +1,13 @@
 Revision history for Database-Abstraction
 
+0.28	Wed Aug  6 19:46:59 EDT 2025
+	Added the import method
+	Fix determination of BerkeleyDB
+	Added BerkeleyDB test
+	Increase SQLite timeout
+	Added the count() method
+	AUTOLOAD - sanity check on the column name
+
 0.27	Sat Jun 14 20:56:27 EDT 2025
 	Use Object::Configure rather than Class::Debug
 

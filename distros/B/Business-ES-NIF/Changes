@@ -1,5 +1,10 @@
 Revision history for Business-ES-NIF
 
+0.13	Fix + Deps
+0.12	Class::XSAccessor
+0.11	dzil
+0.10	Fixes + t/
+0.09	CIFe / NIE / Provincias
 0.08	
 0.07	Fixes
 0.06	CIF digito control letra
@@ -9,5 +14,3 @@ Revision history for Business-ES-NIF
 0.02	Fixes
 0.01	First Version
 0.00    
-
-

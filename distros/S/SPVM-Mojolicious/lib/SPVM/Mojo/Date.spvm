@@ -6,8 +6,36 @@ class Mojo::Date {
   
   use Time::Local;
   use Sys;
+  use Math;
   
-  has epoch : rw long;
+  has epoch : virtual rw double
+    get {
+      my $epoch = (double)$self->epoch_sec;
+      
+      $epoch += (double)$self->{epoch_nsec} / 1_000_000_000;
+      
+      return $epoch;
+    }
+    set {
+      
+      $self->{epoch_sec} = (long)$_;
+      
+      my $fractional_part = $_ - Math->floor($_);
+      $self->{epoch_nsec} = (long)($fractional_part * 1_000_000_000.0 + 0.5);
+    }
+  ;
+  
+  has epoch_sec : rw long
+    get {
+      unless ($self->{epoch_sec} > -1) {
+        $self->{epoch_sec} = Sys->time;
+      }
+      
+      return $self->{epoch_sec};
+    }
+  ;
+  
+  has epoch_nsec : rw long;
   
   # Class Variables
   our $DAYS : string[];
@@ -26,26 +54,24 @@ class Mojo::Date {
   }
   
   # Class Methods
-  static method new : Mojo::Date ($date : string = undef) {
+  static method new : Mojo::Date ($date_value : object of string|Long = undef) {
     
     my $self = new Mojo::Date;
     
-    if ($date) {
-      $self->parse($date);
+    $self->{epoch_sec} = -1;
+    
+    if ($date_value isa string) {
+      $self->parse((string)$date_value);
     }
-    
-    return $self;
-  }
-  
-  static method new_from_epoch : Mojo::Date ($epoch : long) {
-    
-    my $self = new Mojo::Date;
-    
-    unless ($epoch >= 0) {
-      die "The epoch \$epoch must be a non-negative value.";
+    elsif ($date_value isa Long) {
+      
+      my $epoch_sec = (long)$date_value;
+      
+      $self->{epoch_sec} = $epoch_sec;
     }
-    
-    $self->{epoch} = $epoch;
+    else {
+      die "The type of the date value \$date_value must be string or Long.";
+    }
     
     return $self;
   }
@@ -54,8 +80,22 @@ class Mojo::Date {
   method parse : void ($date : string) {
     
     unless ($date) {
-      die "The HTTP date \$date must be defined.";
+      die "The date value \$date must be defined.";
     }
+    
+    # epoch_sec (784111777)
+    if (my $_ = Re->m($date, "^(\d+)$")) {
+      $self->{epoch_sec} = (long)$_->cap1;
+      $self->{epoch_nsec} = 0;
+      return;
+    }
+    elsif (my $_ = Re->m($date, "^(\d+)\.(\d+)$")) {
+      $self->{epoch_sec} = (long)$_->cap1;
+      $self->{epoch_nsec} = (long)$_->cap2 * 1_000_000_000;
+      return;
+    }
+    
+    my $epoch_nsec = 0L;
     
     my $rfc3339_re_pattern = ["^(\d+)-(\d+)-(\d+)\D+(\d+):(\d+):(\d+(?:\.\d+)?)(?:Z|([+-])(\d+):(\d+))?$", "i"];
     
@@ -84,7 +124,14 @@ class Mojo::Date {
       $day = (int)$match->cap3;
       $h = (int)$match->cap4;
       $m = (int)$match->cap5;
-      $s = (int)$match->cap6;
+      my $s_tmp = $match->cap6;
+      
+      if (my $_ = Re->m($s, "^(\d+)(?:\.(\d+))?$")) {
+        $s = (int)$_->cap1;
+        if (length $_->cap2) {
+          $epoch_nsec = (long)$_->cap2;
+        }
+      }
       
       if (length $match->cap7) {
         $offset = (((int)$match->cap8 * 3600) + ((int)$match->cap9 * 60));
@@ -116,32 +163,35 @@ class Mojo::Date {
     $tm->set_tm_min($m);
     $tm->set_tm_sec($s);
     
-    my $epoch = 0L;
-    eval { $epoch = Time::Local->timegm($tm); }
+    my $epoch_sec = 0L;
+    eval { $epoch_sec = Time::Local->timegm($tm); }
     
     if ($@) {
-      die "The HTTP date is invalid epoch time.";
+      die "The HTTP date is invalid epoch_sec time.";
     }
     
-    $epoch += $offset;
+    $epoch_sec += $offset;
     
-    unless ($epoch >= 0) {
-      die "The HTTP date is invalid epoch time and offset.";
+    unless ($epoch_sec >= 0) {
+      die "The HTTP date is invalid epoch_sec time and offset.";
     }
     
-    $self->{epoch} = $epoch;
+    $self->{epoch_sec} = $epoch_sec;
+    $self->{epoch_nsec} = $epoch_nsec;
   }
   
   method to_datetime : string () {
     
-    my $epoch = $self->{epoch};
+    my $epoch_sec = $self->{epoch_sec};
     
     # RFC 3339 (1994-11-06T08:49:37Z)
-    my $tm = Sys->gmtime($epoch);
-    my $string = Fn->sprintf("%04d-%02d-%02dT%02d:%02d:%02d", [(object)($tm->tm_year + 1900), $tm->tm_mon + 1, $tm->tm_mday, $tm->tm_hour, $tm->tm_min, $tm->tm_sec]);
+    my $tm = Sys->gmtime($epoch_sec);
+    my $string = Fn->sprintf("%04d-%02d-%02dT%02d:%02d:%02d.%09lld", [(object)($tm->tm_year + 1900), $tm->tm_mon + 1, $tm->tm_mday, $tm->tm_hour, $tm->tm_min, $tm->tm_sec]);
     
-    if (my $match = Re->m($epoch, "(\.\d+)$")) {
-      $string .= $match->cap1;
+    if ($self->{epoch_nsec} > 0) {
+      $string .= ".$self->{epoch_nsec}";
+      Re->s(my $_ = [$string], "0+$", "");
+      $string = $_->[0];
     }
     
     $string .= "Z";
@@ -151,12 +201,13 @@ class Mojo::Date {
   
   method to_string : string () {
     
-    my $epoch = $self->{epoch};
+    my $epoch_sec = $self->{epoch_sec};
     
     # RFC 7231 (Sun, 06 Nov 1994 08:49:37 GMT)
-    my $tm = Sys->gmtime($epoch);
+    my $tm = Sys->gmtime($epoch_sec);
     my $string = Fn->sprintf("%s, %02d %s %04d %02d:%02d:%02d GMT", [(object)$DAYS->[$tm->tm_wday], $tm->tm_mday, $MONTHS->[$tm->tm_mon], $tm->tm_year + 1900,  $tm->tm_hour, $tm->tm_min, $tm->tm_sec]);
     
     return $string;
   }
+  
 }

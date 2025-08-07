@@ -25,6 +25,7 @@ my %WriteMakefileArgs = (
     "bin/session",
     "bin/shelf",
     "bin/waitjobs",
+    "bin/whilejob",
     "bin/whojobs"
   ],
   "LICENSE" => "mit",
@@ -40,7 +41,7 @@ my %WriteMakefileArgs = (
     "Storable" => 0,
     "Text::ASCIITable" => "0.22"
   },
-  "VERSION" => "0.12.1",
+  "VERSION" => "0.14.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
