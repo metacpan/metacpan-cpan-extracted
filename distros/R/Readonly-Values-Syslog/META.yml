@@ -1,5 +1,5 @@
 ---
-abstract: 'Syslog Constants'
+abstract: 'RFC 3164 compliant syslog severity level constants'
 author:
   - 'Nigel Horne <njh@nigelhorne.com>'
 build_requires:
@@ -22,12 +22,15 @@ no_index:
     - t
     - inc
 requires:
+  Carp: '0'
+  Exporter: '0'
   ExtUtils::MakeMaker: '6.64'
   Readonly: '0'
   Readonly::Enum: '0'
-  perl: '5.008'
+  Scalar::Util: '0'
+  perl: '5.014'
 resources:
-  bugtracker: https://github.com/nigelhorne/Readonly-Values-Syslog/issues
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Readonly-Values-Syslog
   repository: git://github.com/nigelhorne/Readonly-Values-Syslog.git
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

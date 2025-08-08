@@ -34,7 +34,7 @@ do { my $x = {
                                       'Test::Portability::Files' => '0',
                                       'Test::Spelling' => '0.17',
                                       'Test::TrailingSpace' => '0.0203',
-                                      'Test::Vars' => '0.015',
+                                      'Test::Vars' => '0',
                                       'strict' => '0',
                                       'warnings' => '0'
                                     }

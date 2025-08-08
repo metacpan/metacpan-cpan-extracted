@@ -16,7 +16,7 @@ CGI::Info - Information about the CGI environment
 
 # VERSION
 
-Version 1.05
+Version 1.06
 
 # SYNOPSIS
 
@@ -108,6 +108,11 @@ It takes other optional parameters:
 - `max_upload_size`
 
     The maximum file size you can upload (-1 for no limit), the default is 512MB.
+
+The class can be configured at runtime using environments and configuration files,
+for example,
+setting `$ENV{'CGI__INFO__carp_on_warn'}` causes warnings to use [Carp](https://metacpan.org/pod/Carp).
+For more information about runtime configuration see [Object::Configure](https://metacpan.org/pod/Object%3A%3AConfigure).
 
 ## script\_name
 
@@ -567,6 +572,7 @@ things to happen.
 
 # SEE ALSO
 
+- [Object::Configure](https://metacpan.org/pod/Object%3A%3AConfigure)
 - [HTTP::BrowserDetect](https://metacpan.org/pod/HTTP%3A%3ABrowserDetect)
 - [https://github.com/mitchellkrogza/apache-ultimate-bad-bot-blocker](https://github.com/mitchellkrogza/apache-ultimate-bad-bot-blocker)
 

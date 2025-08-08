@@ -13,10 +13,6 @@ use Cwd;
 use File::chdir;
 use Capture::Tiny qw(capture);
 
-unless ( $ENV{RELEASE_TESTING} ) {
-    plan( skip_all => "Author tests not required for installation" );
-}
-
 my $Ghmulti_Scr = Cwd::abs_path(catfile(dirname(__FILE__), qw(.. script ghmulti)));
 
 {

@@ -6,7 +6,7 @@ use experimental qw( signatures );
 use File::Temp;
 use Sys::Export::Unix;
 use File::stat;
-use Fcntl qw( S_IFDIR S_IFREG S_IFLNK );
+use Fcntl qw( S_IFDIR S_IFREG S_IFLNK S_ISLNK );
 use autodie;
 
 # Set up some symlinks
@@ -18,7 +18,8 @@ mkdir "$tmp/usr";
 mkdir "$tmp/usr/local";
 mkdir "$tmp/usr/local/bin";
 mkfile "$tmp/usr/local/bin/script", "#! /bin/sh\n", 0755;
-symlink "./script", "$tmp/usr/local/bin/script2";
+skip_all "symlinks not supported on this host"
+   unless eval { symlink "./script", "$tmp/usr/local/bin/script2" };
 
 my $exporter= Sys::Export::Unix->new(src => $tmp, dst => File::Temp->newdir);
 note "exporter src: '".$exporter->src."' dst: '".$exporter->dst."'";
@@ -40,7 +41,9 @@ my @tests= (
 
 for (@tests) {
    ok( my $stat= lstat($exporter->dst_abs . $_->[0]), "$_->[0] exists" );
-   is( $stat->mode, $_->[1], "$_->[0] mode" );
+   my $mode= $stat->mode;
+   $mode |= 0777 if S_ISLNK($mode);
+   is( $mode, $_->[1], "$_->[0] mode" );
 }
 
 done_testing;

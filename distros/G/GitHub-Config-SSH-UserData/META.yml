@@ -7,6 +7,8 @@ build_requires:
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
+  File::Spec::Functions: '0'
+  autodie: '0'
 dynamic_config: 0
 generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -21,19 +23,15 @@ no_index:
 provides:
   GitHub::Config::SSH::UserData:
     file: lib/GitHub/Config/SSH/UserData.pm
-    version: '0.01'
+    version: '0.02'
 requires:
-  Carp: '0'
   Exporter: '1.6'
-  File::Spec::Functions: '0'
-  autodie: '0'
-  constant: '0'
   perl: '5.010'
   strict: '0'
   warnings: '0'
 resources:
   repository: https://github.com/klaus-rindfrey/perl-github-config-ssh-userdata.git
-version: '0.01'
+version: '0.02'
 x_bugtracker:
   web: https://github.com/klaus-rindfrey/perl-github-config-ssh-userdata/issues
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

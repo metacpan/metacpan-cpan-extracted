@@ -1,7 +1,7 @@
 package Sys::Export::Unix;
 
 # ABSTRACT: Export subsets of a UNIX system
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 
 use v5.26;
@@ -9,19 +9,15 @@ use warnings;
 use experimental qw( signatures );
 use Carp qw( croak carp );
 use Cwd qw( abs_path );
-use Fcntl qw( S_ISREG S_ISDIR S_ISLNK S_ISBLK S_ISCHR S_ISFIFO S_ISSOCK S_ISWHT 
-              S_IFREG S_IFDIR S_IFLNK S_IFBLK S_IFCHR S_IFIFO  S_IFSOCK S_IFMT );
 use Scalar::Util qw( blessed looks_like_number );
-use Sys::Export qw( :isa );
+use Sys::Export qw( :isa :stat_modes :stat_tests );
 use File::Temp ();
 use POSIX ();
 require Sys::Export::Exporter;
+our @CARP_NOT= qw( Sys::Export );
 our @ISA= qw( Sys::Export::Exporter );
 our $have_file_map= eval { require File::Map; };
 our $have_unix_mknod= eval { require Unix::Mknod; };
-my sub isa_hash   :prototype($) { ref $_[0] eq 'HASH' }
-my sub isa_array  :prototype($) { ref $_[0] eq 'ARRAY' }
-my sub isa_int    :prototype($) { looks_like_number($_[0]) && int($_[0]) == $_[0] }
 
 sub new {
    my $class= shift;
@@ -269,56 +265,74 @@ sub _build_dst_userdb($self) {
 
 sub add {
    my $self= shift;
-   my $add= ($self->{add} //= []);
+   # If called recursively, append to TODO list instead of immediately adding
+   if (ref $self->{add}) {
+      push @{ $self->{add} }, @_;
+      return $self;
+   }
+   my @add= @_;
+   local $self->{add}= \@add;
    my $dst_userdb;
-   push @$add, @_;
-   while (@$add) {
-      my $next= shift @$add;
+   while (@add) {
+      my $next= shift @add;
       my %file;
-      if (ref $next eq 'HASH') {
-         $self->{_log_debug}->("Exporting @{[ $next->{src_path}//'' ]} to $next->{name}")
-            if $self->{_log_debug};
+      if (isa_hash $next) {
          %file= %$next;
-      } elsif (ref $next eq 'ARRAY') {
-         %file= _attrs_from_array_notation(@$next);
+      } elsif (isa_array $next) {
+         %file= Sys::Export::expand_stat_shorthand(@$next);
       } else {
          $next =~ s,^/,,;
-         $self->{_log_debug}->("Exporting $next")
-            if $self->{_log_debug};
+         next unless length $next; # suppress exporting '/', if that happens for some reason
          @file{qw( dev ino mode nlink uid gid rdev size atime mtime ctime )}= lstat($self->{src_abs}.$next)
             or croak "lstat '$self->{src_abs}$next': $!";
-         # Remap the UID/GID if that feature was requested
-         @file{'uid','gid'}= $self->get_dst_uid_gid(@file{'uid','gid'}, " in source filesystem at '$next'")
-            if $self->{_user_rewrite_map} || $self->{_group_rewrite_map};
-         # If $next is itself a symlink, we want to export this name, and also the thing
+         $file{src_path}= $next;
+      }
+      $self->{_log_debug}->("Exporting".(defined $file{src_path}? " $file{src_path}" : '').(defined $file{name}? " to $file{name}":''))
+         if $self->{_log_debug};
+      # Translate src to dst if user didn't supply a 'name'
+      if (!defined $file{name}) {
+         my $src_path= $file{src_path};
+         defined $src_path or croak "Require 'name' (or 'src_path' to derive name)";
+
+         if (defined $file{uid} && defined $file{gid}) {
+            # Remap the UID/GID if that feature was requested
+            @file{'uid','gid'}= $self->get_dst_uid_gid(@file{'uid','gid'}, " in source filesystem at '$src_path'")
+               if $self->{_user_rewrite_map} || $self->{_group_rewrite_map};
+         }
+         defined $file{mode}
+            or croak "'mode' is required";
+         # If $src_path is itself a symlink, we want to export this name, and also the thing
          # it references.
          if (S_ISLNK($file{mode})) {
             # resolve symlinks in the path leading up to this symlink
-            my $parent= $next =~ s,[^/]+$,,r;
-            $next= $self->_src_abs_path($parent) . ($next =~ m,(/[^/]+)$,)[0]
+            my $parent= $src_path =~ s,[^/]+$,,r;
+            $src_path= $self->_src_abs_path($parent) . ($src_path =~ m,(/[^/]+)$,)[0]
                if length $parent;
             # add this symlink target to the paths to be exported
-            my $target= readlink($self->{src_abs}.$next);
+            my $target= readlink($self->{src_abs}.$src_path);
+            $target =~ s,/\./,/,g; # path cleanup.  Leave .. but eliminate referenbces to . directory
+            $target =~ s,^\./,,;
             my $full_target= $target =~ m,^/,? $target : $parent . $target;
             $self->{_log_debug}->("Symlink to '$target', queueing '$full_target'") if $self->{_log_debug};
-            unshift @$add, $full_target;
+            unshift @add, $full_target;
          } else {
             # Resolve symlinks within src/ to get the true identity of this file
-            my $abs= $self->_src_abs_path($next);
-            defined $abs or croak "Can't resolve absolute path of '$next'";
-            $self->{_log_debug}->("Resolved to '$abs'") if $self->{_log_debug} && $abs ne $next;
-            $next= $abs;
+            my $abs= $self->_src_abs_path($src_path);
+            defined $abs or croak "Can't resolve absolute path of '$src_path'";
+            $self->{_log_debug}->("Resolved to '$abs'") if $self->{_log_debug} && $abs ne $src_path;
+            $src_path= $abs;
          }
          # ignore repeat requests
-         if (exists $self->{src_path_set}{$next}) {
-            $self->{_log_debug}->("  (already exported '$next')") if $self->{_log_debug};
+         if (exists $self->{src_path_set}{$src_path}) {
+            $self->{_log_debug}->("  (already exported '$src_path')") if $self->{_log_debug};
             next;
          }
-         $file{src_path}= $next;
-         $file{data_path}= $self->{src_abs} . $next;
+         $file{src_path}= $src_path;
+         $file{data_path}= $self->{src_abs} . $src_path;
          $file{name}= $self->get_dst_for_src($next);
          $self->{src_path_set}{$next}= $file{name};
       }
+      $file{nlink} //= 1;
 
       if (defined $file{user} && !defined $file{uid}) {
          $dst_userdb //= ($self->{dst_userdb} //= $self->_build_dst_userdb);
@@ -364,8 +378,10 @@ sub add {
       else {
          my $dst_parent= $file{name} =~ s,/?[^/]+$,,r;
          if (length $dst_parent && !exists $self->{dst_path_set}{$dst_parent}) {
+            $self->{_log_debug}->("  parent dir '$dst_parent' is not exported yet") if $self->{_log_debug};
             # if writing to a real dir, check whether it already exists by some other means
             if ($self->_dst->can('dst_abs') && -d $self->_dst->dst_abs . $dst_parent) {
+               $self->{_log_debug}->("  ".$self->_dst->dst_abs . "$dst_parent already exists in the filesystem") if $self->{_log_debug};
                # no need to do anything, but record that we have it
                $self->{dst_path_set}{$dst_parent}= undef;
             }
@@ -376,8 +392,9 @@ sub add {
                # If no rewrites, src_parent is the same as dst_parent
                if (!$self->_has_rewrites) {
                   $src_parent //= $dst_parent;
+                  $self->{_log_debug}->("  will export $src_parent first") if $self->{_log_debug};
                }
-               elsif (!defined $src_parent || $self->get_dst_for_src($src_parent) ne $dst_parent) {
+               elsif (!length $src_parent || $self->get_dst_for_src($src_parent) ne $dst_parent) {
                   # No src_path means we don't have an origin for this file, so no official
                   # origin for its parent directory, either.  But, maybe a directory of the
                   # same name exists in src_path.
@@ -388,11 +405,14 @@ sub add {
                      && S_ISDIR($dir{mode})
                   ) {
                      $src_parent= \%dir;
+                     $self->{_log_debug}->("  will export $dst_parent first, using permissions from $self->{src_abs}$dst_parent") if $self->{_log_debug};
+
                   } else {
                      $src_parent= { name => $dst_parent, mode => (S_IFDIR | 0755) };
+                     $self->{_log_debug}->("  will export $dst_parent first, using default 0755 permissions") if $self->{_log_debug};
                   }
                }
-               unshift @$add, $src_parent, \%file;
+               unshift @add, $src_parent, \%file;
                next;
             }
          }
@@ -405,49 +425,76 @@ sub add {
       elsif (S_ISLNK($mode)) { $self->_export_symlink(\%file) }
       elsif (S_ISBLK($mode) || S_ISCHR($mode)) { $self->_export_devnode(\%file) }
       elsif (S_ISFIFO($mode)) { $self->_export_fifo(\%file) }
+      elsif (S_ISSOCK($mode)) { $self->_export_socket(\%file) }
+      elsif (S_ISWHT($mode)) { $self->_export_whiteout(\%file) }
       else {
-         croak "Can't export ".(S_ISSOCK($mode)? 'sockets' : S_ISWHT($mode)? 'whiteout entries' : '(unknown)')
-            .': "'.($file{src_path} // $file{data_path} // $file{name}).'"'
+         croak "Unhandled dir-ent type ".($mode & S_IFMT).' at "'.($file{src_path} // $file{data_path} // $file{name}).'"'
       }
    }
    $self;
 }
 
-our %_mode_alias= (
-   file => S_IFREG,
-   dir  => S_IFDIR,
-   sym  => S_IFLNK,
-   blk  => S_IFBLK,
-   chr  => S_IFCHR,
-   fifo => S_IFIFO,
-   sock => S_IFSOCK,
-);
-sub _attrs_from_array_notation {
-   my ($mode, $owner, $name)= (shift, shift, shift);
-   unless (isa_int $mode) {
-      $mode =~ /^(file|dir|sym|blk|chr|fifo|sock)(\d+)?\z/
-         or croak "Invalid mode '$mode': expected number, or prefix file/dir/sym/blk/chr/fifo/sock followed by octal permissions";
-      $mode= $_mode_alias{$1};
-      $mode |= oct($2 // ($mode == S_IFDIR? 0755 : 0644));
+
+my sub isa_filter { ref $_[0] eq 'Regexp' || ref $_[0] eq 'CODE' }
+sub src_find($self, @paths) {
+   my $filter;
+   # The filter must be either the first or last argument
+   if (isa_filter $paths[0]) {
+      $filter= shift @paths;
+   } elsif (isa_filter $paths[-1]) {
+      $filter= pop @paths;
    }
-   my %attrs= ( name => $name, mode => $mode );
-   my ($user,$group)= !defined $owner? (0,0) : split /:/, $owner;
-   $attrs{ isa_int($user)?  'uid' : 'user'  }= $user;
-   $attrs{ isa_int($group)? 'gid' : 'group' }= $group;
-   if (($mode & S_IFMT) == S_IFBLK || ($mode & S_IFMT) == S_IFCHR) {
-      @attrs{'major','minor'}= (shift, shift);
+   my ($src_abs, @ret, @todo, %seen)= ( $self->src_abs );
+   # If filter is a regexp-ref, upgrade it to a sub
+   if (ref $filter eq 'Regexp') {
+      my $qr= $filter;
+      $filter= sub { $_ =~ $qr };
    }
-   elsif (($mode & S_IFMT) == S_IFDIR) {
-      $attrs{data}= shift;
+   my $process= sub {
+      my %file= ( src_path => $_[0] );
+      local $_= $src_abs . $_[0];
+      return if $seen{$_}++; # within this call to src_find, don't return duplicates
+      if (@file{qw( dev ino mode nlink uid gid rdev size atime mtime ctime )}= lstat) {
+         my $is_dir= -d;
+         push @ret, \%file if length $_[0] && (!defined $filter || $filter->(\%file));
+         if ($is_dir && !delete $file{prune}) {
+            if (opendir my $dh, $src_abs . $_[0]) {
+               push @todo, [ length $_[0]? $_[0].'/' : '', $dh ];
+            } else {
+               carp "Can't open $_: $!";
+            }
+         }
+      } else {
+         carp "Can't stat $_: $!";
+      }
+   };
+   push @paths, '' unless @paths;
+   for my $path (@paths) {
+      $path //= '';
+      $path =~ s,^/,,; # remove leading slash
+      $process->($path);
+      while (@todo) {
+         my $ent= readdir $todo[-1][1];
+         if (!defined $ent) {
+            closedir $todo[-1][1];
+            pop @todo;
+         }
+         elsif ($ent ne '.' && $ent ne '..') {
+            $process->($todo[-1][0] . $ent);
+         }
+      }
    }
-   $attrs{nlink} //= 1;
-   return ( %attrs, @_ );
+   return @ret;
 }
 
 
-sub skip($self, $path) {
-   $path =~ s,^/,,;
-   $self->{src_path_set}{$path} //= undef;
+sub skip($self, @paths) {
+   for my $path (@paths) {
+      $path= $path->{src_path} // $path->{name}
+         // croak "Hashrefs passed to ->skip must include 'src_path' or 'name'"
+         if isa_hash $path;
+      $self->{src_path_set}{$path =~ s,^/,,r} //= undef;
+   }
    $self;
 }
 
@@ -455,6 +502,7 @@ sub skip($self, $path) {
 sub finish($self) {
    $self->_dst->finish;
    undef $self->{tmp}; # allow File::Temp to free tmp dir
+   $self;
 }
 
 
@@ -569,13 +617,13 @@ sub _export_elf_file($self, $file, $notes) {
             my $lib= $self->_resolve_src_library($_, $elf->{rpath}) // carp("Can't find lib $_ needed for $file->{src_path}");
             push @libs, $lib if $lib;
          }
-         push @{$self->{add}}, @libs;
+         $self->add(@libs);
       }
       if (length $elf->{interpreter}) {
          $elf->{interpreter} =~ s,^/,,;
          $self->_elf_interpreters->{$elf->{interpreter}}= 1;
          $interpreter= $elf->{interpreter};
-         push @{$self->{add}}, $interpreter;
+         $self->add($interpreter);
       }
       $self->{_log_debug}->("  interpreter = ".($interpreter//'').", libs = @libs")
          if $self->{_log_debug};
@@ -617,7 +665,7 @@ sub _export_script_file($self, $file, $notes) {
    # Make sure the interpreter is added, and also rewrite its path
    my ($interp)= ($file->{data} =~ m,^#!\s*(/\S+),)
       or return;
-   push @{$self->{add}}, $interp;
+   $self->add($interp);
 
    if ($self->_has_rewrites && length $file->{src_path}) {
       # rewrite the interpreter, if needed
@@ -727,11 +775,21 @@ sub _export_devnode($self, $file) {
       $file->{rdev_minor} //= $minor;
    }
    $self->_log_action(S_ISBLK($file->{mode})? 'BLK' : 'CHR', "$file->{rdev_major}:$file->{rdev_minor}", $file->{name});
-   $self->_dst->($file);
+   $self->_dst->add($file);
 }
 
 sub _export_fifo($self, $file) {
    $self->_log_action("FIO", "(fifo)", $file->{name});
+   $self->_dst->add($file);
+}
+
+sub _export_socket($self, $file) {
+   $self->_log_action("SOK", "(socket)", $file->{name});
+   $self->_dst->add($file);
+}
+
+sub _export_whiteout($self, $file) {
+   $self->_log_action("WHT", "(whiteout)", $file->{name});
    $self->_dst->add($file);
 }
 
@@ -771,7 +829,7 @@ sub _linux_major_minor($dev) {
    ( ($dev & 0xff) | (($dev >> 12) & 0xffffff00) )
 }
 sub _system_mknod($path, $mode, $major, $minor) {
-   my @args= ("mknod", "-m", sprintf("0%o", $mode & 0xFFF),
+   my @args= ("mknod", ($^O eq 'linux'? ("-m", sprintf("0%o", $mode & 0xFFF)) : ()),
       $path, S_ISBLK($mode)? "b":"c", $major, $minor);
    system(@args) == 0
       or croak "mknod @args failed";
@@ -779,8 +837,16 @@ sub _system_mknod($path, $mode, $major, $minor) {
 
 if ($have_unix_mknod) {
    eval q{
-      sub _mknod_or_die { Unix::Mknod::mknod($_[0], $_[1], Unix::Mknod::makedev($_[2], $_[3])) or Carp::croak("mknod($_[0]): $!") }
-      sub _dev_major_minor { Unix::Mknod::major($_[0]), Unix::Mknod::minor($_[0]) }
+      sub _mknod_or_die($path, $mode, $major, $minor) {
+         Unix::Mknod::mknod($path, $mode, Unix::Mknod::makedev($major, $minor))
+            or Carp::croak("mknod($path): $!");
+         my @stat= stat $path
+            or Carp::croak("mknod($path) failed silently");
+         # Sometimes mknod just creates a normal file when user lacks permission for device nodes
+         ($stat[2] & Fcntl::S_IFMT()) == ($mode & Fcntl::S_IFMT()) or do { unlink $path; Carp::croak("mknod failed to create mode $mode at $path"); };
+         1;
+      }
+      sub _dev_major_minor($dev) { Unix::Mknod::major($dev), Unix::Mknod::minor($dev) }
       1;
    } or die "$@";
 } else {
@@ -819,9 +885,9 @@ sub _patchelf($self, $path, @args) {
 {  no strict 'refs';
    delete @{"Sys::Export::Unix::"}{qw(
       croak carp abs_path blessed looks_like_number
-      isa_export_dst isa_exporter isa_group isa_user isa_userdb
-      S_ISREG S_ISDIR S_ISLNK S_ISBLK S_ISCHR S_ISFIFO S_ISSOCK S_ISWHT 
-      S_IFREG S_IFDIR S_IFLNK S_IFBLK S_IFCHR S_IFIFO  S_IFSOCK S_IFMT 
+      isa_export_dst isa_exporter isa_group isa_user isa_userdb S_IFMT
+      S_ISREG S_ISDIR S_ISLNK S_ISBLK S_ISCHR S_ISFIFO S_ISSOCK S_ISWHT
+      S_IFREG S_IFDIR S_IFLNK S_IFBLK S_IFCHR S_IFIFO  S_IFSOCK S_IFWHT
    )};
 }
 
@@ -1049,6 +1115,7 @@ Same semantics as L</rewrite_user> but for groups.
 
   $exporter->add($src_path, ...);
   $exporter->add(\%file_attrs, ...);
+  $exporter->add([ $name, $mode, $mode_specific_data, \%other_attrs ]);
 
 Add a source path (logically absolute with respect to C</src>) to the export.  This immediately
 copies the file to the destination, possibly rewriting paths within it, and then triggering a
@@ -1074,17 +1141,60 @@ If specified directly, file attributes are:
   size            # size, in bytes.  Can be ommitted if 'data' is present
   mtime           # modification time, as per stat
 
+You can also use the array notation described in L<Sys::Export/expand_file_stat_array>.
+
 If you don't specify src_path, path rewrites will not be applied to the contents of the file or
 symlink (on the assumption that you used paths relative to the destination).
 
 Returns C<$exporter> for chaining.
 
+=head2 src_find
+
+This is a helper function to build lists of source files.  It iterates the L</src> tree from
+a given subdirectory, passing each entry to a coderef filter.
+
+  @hashrefs= $exporter->src_find(@paths);
+  @hashrefs= $exporter->src_find($filter, @paths);
+  @hashrefs= $exporter->src_find(@paths, $filter);
+
+The filter can be a coderef or Regexp-ref.  Any other type is considered a path.  The filter
+function runs in the following environment:
+
+=over
+
+=item C<$_>
+
+the absolute path of the source file
+
+=item C<_>
+
+the result of C<lstat> on the absolute path of the source file (allowing file tests like -d
+or -f or -s without running a new stat() call)
+
+=item C<< $_[0] >>
+
+the hashref of stat attributes that will be returned by this function if the filter returns true
+
+=back
+
+The callback should return a boolean of whether to include the file in the result.  If it
+returns false for a directory, the directory will still be traversed.  If you want to prune a
+directory tree from being processed, set C<< $_[0]{prune} >> to a true value before returning.
+
+For a Regexp-ref, you are matching against the full absolute path within L</src>.
+If you want a regex to only apply to the relative path of a file, just write it as a sub like
+
+  sub { $_[0]{src_path} =~ /pattern/ }
+
 =head2 skip
 
-  $exporter->skip($src_path);
+  $exporter->skip(@paths);
+  $exporter->skip({ src_path => $path, ... });
 
 Inform the exporter that it should *not* perform any actions for the specified source path,
 presumably because you're handling that one specially in some other way.
+
+You may pass hashrefs generated by L</src_find>, which will include a C<src_path> field.
 
 =head2 finish
 
@@ -1142,7 +1252,7 @@ needed for that source ID.
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 AUTHOR
 

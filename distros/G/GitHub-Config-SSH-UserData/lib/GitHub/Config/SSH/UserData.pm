@@ -12,7 +12,7 @@ use Exporter 'import';
 
 use constant DEFAULT_CFG_FILE => catfile($ENV{HOME}, qw(.ssh config));
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 
 use Exporter 'import';
@@ -21,8 +21,11 @@ our @EXPORT_OK = qw(get_user_data_from_ssh_cfg);
 
 
 sub get_user_data_from_ssh_cfg {
+  croak("Wrong number of arguments") if !@_ || @_ > 2;
   my $user_name = shift;
   my $config_file = shift // DEFAULT_CFG_FILE;
+  croak("First argument must be a scalar (a string)") if ref($user_name);
+  croak("Second argument must be a scalar (a string)") if ref($config_file);
 
   open(my $hndl, '<', $config_file);
   my %seen;
@@ -64,7 +67,7 @@ GitHub::Config::SSH::UserData - Read user data from comments in ssh config file
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 
@@ -166,9 +169,18 @@ Klaus Rindfrey, C<< <klausrin at cpan.org.eu> >>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-github-config-ssh-userdata at rt.cpan.org>, or through
-the web interface at L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=GitHub-Config-SSH-UserData>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
+Please report any bugs or feature requests to C<bug-github-config-ssh-userdata
+at rt.cpan.org>, or through the web interface at
+L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=GitHub-Config-SSH-UserData>.
+I will be notified, and then you'll automatically be notified of progress on
+your bug as I make changes.
+
+
+=head1 SEE ALSO
+
+L<https://gist.github.com/oanhnn/80a89405ab9023894df7>
+
+L<App::ghmulti>, L<Git::RemoteURL::Parse>
 
 
 =head1 SUPPORT

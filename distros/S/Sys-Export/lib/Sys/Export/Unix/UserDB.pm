@@ -1,6 +1,7 @@
 package Sys::Export::Unix::UserDB;
+
 # ABSTRACT: Abstractions for Unix passwd/group/shadow files
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use v5.26;
 use warnings;
@@ -292,9 +293,15 @@ sub import_user($self, $name_or_obj, %attrs) {
       $attrs{gecos}= $pw->gecos if pw_has('gecos');
       $attrs{dir}= $pw->dir;
       $attrs{shell}= $pw->shell;
-      # FreeBSD has expire in seconds.  Linux has an expire field of days, in /etc/shadow, but
-      # pw_has('expire') is false on Linux.
-      $attrs{expire}= $pw->expire if pw_has('expire');
+      if (pw_has('expire')) {
+         # Normalize this field to epoch seconds, based on the current platform.
+         # FreeBSD has expire in seconds.  Linux has an expire field of days, in /etc/shadow, but
+         # all tests on Linux so far have had pw_has('expire') = false.
+         # getpwnam dies with 'not implemented' on Strawberry perl for Windows.
+         $attrs{expire_time}= $^O eq 'FreeBSD'? $pw->expire
+                            : $^O eq 'linux'?   _days_since_1970_to_time($pw->expire)
+                            : undef;
+      }
       # convert gid to group name
       my $gid= $pw->gid;
       if (my $grnam= getgrgid($gid)) {
@@ -519,7 +526,7 @@ package Sys::Export::Unix::UserDB::User {
    use experimental qw( signatures );
    our @CARP_NOT= qw( Sys::Export::Unix::UserDB );
    our %known_attrs= map +($_ => 1), qw( name uid passwd group groups comment gecos dir shell
-      quota pw_change_time pw_min_days pw_max_days pw_warn_days pw_inactive_days expire_time );
+      quota class pw_change_time pw_min_days pw_max_days pw_warn_days pw_inactive_days expire_time );
    sub new($class, %attrs) {
       my $self= bless {
             name   => delete $attrs{name},
@@ -703,6 +710,38 @@ The goal of this object is to extract user/group information from one system ima
 into another, with proper conflict detection and UID/GID management.  It can also import users
 and groups from the host via C<getpwnam>/C<getgrnam>.
 
+=head1 CONSTRUCTORS
+
+=head2 new
+
+  $udb= Sys::Export::Unix::UserDB->new(%options);
+
+=over
+
+=item auto_import
+
+The L</auto_import> attribute, which can be another UserDB, or any "true" value meaning to
+import from the host.
+
+=item valid_name_regex
+
+Affects the result of L</is_valid_name>, unless overridden in a subclass
+
+=item users
+
+Hashref of C<< { username => \%user_attrs } >> of users to be added.
+An arrayref of usernames can be used if you set C<auto_import>, in which case each name will
+be imported (but must exist in the auto_import source).  THis can also be an arrayref of
+User objects.
+
+=item groups
+
+Hashref of C<< { groupname => \%group_attrs } >> of groups to be added.
+An arrayref of group names can be used if you set C<auto_import>.  It can also be an arrayref
+of Group objects.
+
+=back
+
 =head1 ATTRIBUTES
 
 =head2 users
@@ -833,38 +872,6 @@ If L</auto_import> is enabled, this may first attempt to import the requested GI
 =head2 has_group
 
 Like L</group> but returns a boolean and doesn't attempt to C<auto_import>.
-
-=head1 CONSTRUCTOR
-
-=head2 new
-
-  $udb= Sys::Export::Unix::UserDB->new(%options);
-
-=over
-
-=item auto_import
-
-The L</auto_import> attribute, which can be another UserDB, or any "true" value meaning to
-import from the host.
-
-=item valid_name_regex
-
-Affects the result of L</is_valid_name>, unless overridden in a subclass
-
-=item users
-
-Hashref of C<< { username => \%user_attrs } >> of users to be added.
-An arrayref of usernames can be used if you set C<auto_import>, in which case each name will
-be imported (but must exist in the auto_import source).  THis can also be an arrayref of
-User objects.
-
-=item groups
-
-Hashref of C<< { groupname => \%group_attrs } >> of groups to be added.
-An arrayref of group names can be used if you set C<auto_import>.  It can also be an arrayref
-of Group objects.
-
-=back
 
 =head1 USER OBJECTS
 
@@ -1003,7 +1010,7 @@ Group password, which should never be used anyway.  Leave this C<undef> or C<'*'
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 AUTHOR
 

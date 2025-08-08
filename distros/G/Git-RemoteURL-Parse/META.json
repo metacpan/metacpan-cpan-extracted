@@ -27,7 +27,9 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec::Functions" : "0",
+            "autodie" : "0"
          }
       },
       "runtime" : {
@@ -47,18 +49,20 @@
    "provides" : {
       "Git::RemoteURL::Parse" : {
          "file" : "lib/Git/RemoteURL/Parse.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "repository" : {
-         "type" : "git"
+         "type" : "git",
+         "url" : "https://github.com/klaus-rindfrey/perl-git-remoteurl-parse.git",
+         "web" : "https://github.com/klaus-rindfrey/perl-git-remoteurl-parse.git"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_bugtracker" : {
-      "web" : "perl-git-remoteurl-parse/issues"
+      "web" : "https://github.com/klaus-rindfrey/perl-git-remoteurl-parse/issues"
    },
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

@@ -27,16 +27,14 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec::Functions" : "0",
+            "autodie" : "0"
          }
       },
       "runtime" : {
          "requires" : {
-            "Carp" : "0",
             "Exporter" : "1.6",
-            "File::Spec::Functions" : "0",
-            "autodie" : "0",
-            "constant" : "0",
             "perl" : "5.010",
             "strict" : "0",
             "warnings" : "0"
@@ -51,7 +49,7 @@
    "provides" : {
       "GitHub::Config::SSH::UserData" : {
          "file" : "lib/GitHub/Config/SSH/UserData.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -62,7 +60,7 @@
          "web" : "https://github.com/klaus-rindfrey/perl-github-config-ssh-userdata.git"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_bugtracker" : {
       "web" : "https://github.com/klaus-rindfrey/perl-github-config-ssh-userdata/issues"
    },

@@ -8,12 +8,13 @@ use strict;
 
 use boolean;
 use Carp;
-use Object::Configure 0.10;
+use Object::Configure 0.12;
 use File::Spec;
 use Log::Abstraction 0.10;
-use Params::Get;
+use Params::Get 0.13;
 use Params::Validate::Strict;
 use Net::CIDR;
+use Return::Set;
 use Scalar::Util;
 use Socket;	# For AF_INET
 use 5.008;
@@ -34,11 +35,11 @@ CGI::Info - Information about the CGI environment
 
 =head1 VERSION
 
-Version 1.05
+Version 1.06
 
 =cut
 
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 
 =head1 SYNOPSIS
 
@@ -135,6 +136,11 @@ The maximum file size you can upload (-1 for no limit), the default is 512MB.
 
 =back
 
+The class can be configured at runtime using environments and configuration files,
+for example,
+setting C<$ENV{'CGI__INFO__carp_on_warn'}> causes warnings to use L<Carp>.
+For more information about runtime configuration see L<Object::Configure>.
+
 =cut
 
 our $stdin_data;	# Class variable storing STDIN in case the class
@@ -169,6 +175,13 @@ sub new
 		# }
 		# # warn __PACKAGE__, ': expect is deprecated, use allow instead';
 		Carp::croak("$class: expect has been deprecated, use allow instead");
+	}
+
+	# Validate logger object has required methods
+	if(defined $params->{'logger'}) {
+		unless(Scalar::Util::blessed($params->{'logger'}) && $params->{'logger'}->can('info') && $params->{'logger'}->can('error')) {
+			Carp::croak("Logger must be an object with info() and error() methods");
+		}
 	}
 
 	# Return the blessed object
@@ -627,9 +640,10 @@ sub params {
 	my $content_type = $ENV{'CONTENT_TYPE'};
 	my %FORM;
 
-	use IO::Interactive;
-
 	if((!$ENV{'GATEWAY_INTERFACE'}) || (!$ENV{'REQUEST_METHOD'})) {
+		require IO::Interactive;
+		IO::Interactive->import();
+
 		if(@ARGV) {
 			@pairs = @ARGV;
 			if(defined($pairs[0])) {
@@ -779,26 +793,27 @@ sub params {
 
 			return \%FORM;
 		} elsif($content_type =~ /application\/json/i) {
+			require JSON::MaybeXS && JSON::MaybeXS->import() unless JSON::MaybeXS->can('parse_json');
+			# require JSON::MaybeXS;
+			# JSON::MaybeXS->import();
+
 			my $buffer;
+
 			if($stdin_data) {
 				$buffer = $stdin_data;
 			} else {
-				require JSON::MaybeXS && JSON::MaybeXS->import() unless JSON::MaybeXS->can('parse_json');
-				# require JSON::MaybeXS;
-				# JSON::MaybeXS->import();
-
 				if(read(STDIN, $buffer, $content_length) != $content_length) {
 					$self->_warn({
 						warning => 'read failed: something else may have read STDIN'
 					});
 				}
 				$stdin_data = $buffer;
-				# JSON::Parse::assert_valid_json($buffer);
-				# my $paramref = JSON::Parse::parse_json($buffer);
-				my $paramref = decode_json($buffer);
-				foreach my $key(keys(%{$paramref})) {
-					push @pairs, "$key=" . $paramref->{$key};
-				}
+			}
+			# JSON::Parse::assert_valid_json($buffer);
+			# my $paramref = JSON::Parse::parse_json($buffer);
+			my $paramref = decode_json($buffer);
+			foreach my $key(keys(%{$paramref})) {
+				push @pairs, "$key=" . $paramref->{$key};
 			}
 		} else {
 			my $buffer;
@@ -846,11 +861,13 @@ sub params {
 
 		next unless($key);
 
+		$key =~ s/\0//g;	# Strip encoded NUL byte poison
 		$key =~ s/%00//g;	# Strip NUL byte poison
 		$key =~ s/%([a-fA-F\d][a-fA-F\d])/pack("C", hex($1))/eg;
 		$key =~ tr/+/ /;
 		if(defined($value)) {
-			$value =~ s/%00//g;	# Strip NUL byte poison
+			$value =~ s/\0//g;	# Strip NUL byte poison
+			$value =~ s/%00//g;	# Strip encoded NUL byte poison
 			$value =~ s/%([a-fA-F\d][a-fA-F\d])/pack("C", hex($1))/eg;
 			$value =~ tr/+/ /;
 		} else {
@@ -919,7 +936,7 @@ sub params {
 			# if(($value =~ /(\%27)|(\')|(\-\-)|(\%23)|(\#)/ix) ||
 			if(($value =~ /(\%27)|(\')|(\%23)|(\#)/ix) ||
 			   ($value =~ /((\%3D)|(=))[^\n]*((\%27)|(\')|(\-\-)|(\%3B)|(;))/i) ||
-			   ($value =~ /\w*((\%27)|(\'))((\%6F)|o|(\%4F))((\%72)|r|(\%52))/ix) ||
+			   ($value =~ /\w*((\%27)|(\'))((\%6F)|o|(\%4F))((\%72)|r|(\%52))\s*(OR|AND|UNION|SELECT|--)/ix) ||
 			   ($value =~ /((\%27)|(\'))union/ix) ||
 			   ($value =~ /select[[a-z]\s\*]from/ix) ||
 			   ($value =~ /\sAND\s1=1/ix) ||
@@ -929,9 +946,9 @@ sub params {
 			   ($value =~ /exec(\s|\+)+(s|x)p\w+/ix)) {
 				$self->status(403);
 				if($ENV{'REMOTE_ADDR'}) {
-					$self->_warn($ENV{'REMOTE_ADDR'} . ": SQL injection attempt blocked for '$value'");
+					$self->_warn($ENV{'REMOTE_ADDR'} . ": SQL injection attempt blocked for '$key=$value'");
 				} else {
-					$self->_warn("SQL injection attempt blocked for '$value'");
+					$self->_warn("SQL injection attempt blocked for '$key=$value'");
 				}
 				return;
 			}
@@ -943,7 +960,7 @@ sub params {
 					} else {
 						$self->_warn("SQL injection attempt blocked for '$agent'");
 					}
-					return 1;
+					return;
 				}
 			}
 			if(($value =~ /((\%3C)|<)((\%2F)|\/)*[a-z0-9\%]+((\%3E)|>)/ix) ||
@@ -987,7 +1004,7 @@ sub params {
 
 	$self->{paramref} = \%FORM;
 
-	return \%FORM;
+	return Return::Set::set_return(\%FORM, { type => 'hashref', min => 1 });
 }
 
 =head2 param
@@ -1042,7 +1059,7 @@ sub param {
 	$self->{allow} = $allow if($allow);
 
 	if($params) {
-		return $params->{$field};
+		return Return::Set::set_return($params->{$field}, { type => 'string' });
 	}
 }
 
@@ -1577,7 +1594,7 @@ sub is_robot {
 		}
 		return 1;
 	}
-	if($agent =~ /.+bot|axios\/1\.6\.7|bytespider|ClaudeBot|Clickagy.Intelligence.Bot|msnptc|CriteoBot|is_archiver|backstreet|fuzz faster|linkfluence\.com|spider|scoutjet|gingersoftware|heritrix|dodnetdotcom|yandex|nutch|ezooms|plukkie|nova\.6scan\.com|Twitterbot|adscanner|Go-http-client|python-requests|Mediatoolkitbot|NetcraftSurveyAgent|Expanse|serpstatbot|DreamHost SiteMonitor|techiaith.cymru|trendictionbot|ias_crawler|WPsec|Yak\/1\.0|ZoominfoBot/i) {
+	if($agent =~ /.+bot|axios\/1\.6\.7|bidswitchbot|bytespider|ClaudeBot|Clickagy.Intelligence.Bot|msnptc|CriteoBot|is_archiver|backstreet|fuzz faster|linkfluence\.com|spider|scoutjet|gingersoftware|heritrix|dodnetdotcom|yandex|nutch|ezooms|plukkie|nova\.6scan\.com|Twitterbot|adscanner|Go-http-client|python-requests|Mediatoolkitbot|NetcraftSurveyAgent|Expanse|serpstatbot|DreamHost SiteMonitor|techiaith.cymru|trendictionbot|ias_crawler|WPsec|Yak\/1\.0|ZoominfoBot/i) {
 		$self->{is_robot} = 1;
 		return 1;
 	}
@@ -2110,6 +2127,9 @@ sub AUTOLOAD
 	# Ensure the method is called on the correct package object or a subclass
 	return unless((ref($self) eq __PACKAGE__) || (UNIVERSAL::isa((caller)[0], __PACKAGE__)));
 
+	# Validate method name - only allow safe parameter names
+	Carp::croak(__PACKAGE__, ": Invalid method name: $method") unless $method =~ /^[a-zA-Z_][a-zA-Z0-9_]*$/;
+
 	# Delegate to the param method
 	return $self->param($method);
 }
@@ -2131,6 +2151,8 @@ things to happen.
 =head1 SEE ALSO
 
 =over 4
+
+=item * L<Object::Configure>
 
 =item * L<HTTP::BrowserDetect>
 

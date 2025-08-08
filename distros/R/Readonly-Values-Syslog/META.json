@@ -1,5 +1,5 @@
 {
-   "abstract" : "Syslog Constants",
+   "abstract" : "RFC 3164 compliant syslog severity level constants",
    "author" : [
       "Nigel Horne <njh@nigelhorne.com>"
    ],
@@ -32,10 +32,13 @@
       },
       "runtime" : {
          "requires" : {
+            "Carp" : "0",
+            "Exporter" : "0",
             "ExtUtils::MakeMaker" : "6.64",
             "Readonly" : "0",
             "Readonly::Enum" : "0",
-            "perl" : "5.008"
+            "Scalar::Util" : "0",
+            "perl" : "5.014"
          }
       },
       "test" : {
@@ -51,8 +54,8 @@
    "resources" : {
       "bugtracker" : {
          "mailto" : "bug-Readonly-Values-Syslog@rt.cpan.org",
-         "web" : "https://github.com/nigelhorne/Readonly-Values-Syslog/issues",
-         "x_url" : "https://github.com/nigelhorne/Readonly-Values-Syslog/issues"
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Readonly-Values-Syslog",
+         "x_url" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Readonly-Values-Syslog"
       },
       "repository" : {
          "type" : "git",
@@ -61,6 +64,6 @@
          "x_repository" : "https://github.com/nigelhorne/Readonly-Values-Syslog"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

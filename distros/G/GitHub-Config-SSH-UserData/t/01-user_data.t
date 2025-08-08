@@ -11,8 +11,6 @@ use File::Basename;
 
 my $Test_Data_Dir = catdir(dirname(__FILE__), '01-test-data');
 
-ok(1);
-
 {
   my $test_cfg_file = catfile($Test_Data_Dir, 'cfg-01');
   note("Simple tests using $test_cfg_file");

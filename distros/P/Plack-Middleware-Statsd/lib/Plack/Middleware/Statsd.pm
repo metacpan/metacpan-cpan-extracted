@@ -22,7 +22,7 @@ use Try::Tiny;
 
 use experimental qw/ postderef signatures /;
 
-our $VERSION = 'v0.8.0';
+our $VERSION = 'v0.8.1';
 
 # Note: You may be able to omit the client if there is a client
 # defined in the environment hash at C<psgix.monitor.statsd>, and the
@@ -207,7 +207,7 @@ Plack::Middleware::Statsd - send statistics to statsd
 
 =head1 VERSION
 
-version v0.8.0
+version v0.8.1
 
 =head1 SYNOPSIS
 
@@ -519,7 +519,16 @@ L<PSGI>
 The development version is on github at L<https://github.com/robrwo/Plack-Middleware-Statsd>
 and may be cloned from L<git://github.com/robrwo/Plack-Middleware-Statsd.git>
 
-=head1 BUGS
+Please see F<CONTRIBUTING.md> for more information on how to contribute to this project.
+
+=head1 SUPPORT
+
+Only the latest version of this module will be supported.
+
+This module requires Perl v5.20 or later.
+Future releases may only support Perl versions released in the last ten (10) years.
+
+=head2 Reporting Bugs and Submitting Feature Requests
 
 Please report any bugs or feature requests on the bugtracker website
 L<https://github.com/robrwo/Plack-Middleware-Statsd/issues>
@@ -528,12 +537,8 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
-Please see F<CONTRIBUTING.md> for more information on how to contribute to this project.
-
-=head2 Reporting Security Vulnerabilities
-
-Security issues should not be reported on the bugtracker website. Please see F<SECURITY.md> for instructions how to
-report security vulnerabilities
+If the bug you are reporting has security implications which make it inappropriate to send to a public issue tracker,
+then see F<SECURITY.md> for instructions how to report security vulnerabilities.
 
 =head1 AUTHOR
 

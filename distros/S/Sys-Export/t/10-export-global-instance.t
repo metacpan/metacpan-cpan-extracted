@@ -17,8 +17,9 @@ ok( eval <<~'PL', 'example script' ) or diag $@;
    use Sys::Export -type => 'Unix', -src => $src, -dst => $dst;
    add '10-export-global-instance.t';
    add 'lib/Test2AndUtils.pm';
+   skip find qr/\.t$/;
+   add '04-stat-shorthand.t'; # should get ignored
    finish;
-   1;
    PL
 
 is($dst->method_calls,

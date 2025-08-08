@@ -1,5 +1,14 @@
 Release history for Dist-Zilla-Plugin-UsefulReadme:
 
+v0.4.3    2025-08-07 13:31:13+01:00 Europe/London
+  [Bug Fixes]
+  - Pod::Weaver::Section::Requirements also looks for `cpm.yml` and not `cpmfile` or `metafile`.
+
+  - Pod::Weaver::Section::RecentChanges and Pod::Weaver::Section::Requirements check the all_modules setting.
+
+  [Tests]
+  - Add more author tests.
+
 v0.4.2    2025-08-07 07:43:05+01:00 Europe/London
   [Enhancements]
   - Pod::Weaver::Section::Requirements also looks for `cpmfile` and `metafile` when no metafile is specified.

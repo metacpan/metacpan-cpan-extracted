@@ -1,5 +1,8 @@
 Revision history for Readonly-Values-Syslog - Syslog Constants
 
+0.04	Thu Aug  7 11:55:40 EDT 2025
+	Refactor
+
 0.03	Thu Jun 12 08:10:50 EDT 2025
 	Fix the manifest
 	Remove optional modules from TEST_REQUIRES

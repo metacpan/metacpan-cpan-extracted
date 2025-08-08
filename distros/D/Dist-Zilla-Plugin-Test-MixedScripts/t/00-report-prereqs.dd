@@ -12,12 +12,15 @@ do { my $x = {
                       },
        'develop' => {
                       'requires' => {
-                                      'Dist::Zilla::Plugin::UsefulReadme' => 'v0.4.1',
+                                      'Dist::Zilla::Plugin::UsefulReadme' => 'v0.4.3',
                                       'Pod::Coverage::TrustPod' => '0',
                                       'Pod::Markdown::Github' => '0',
                                       'Pod::Wordlist' => '0',
                                       'Software::Security::Policy::Individual' => '0.10',
-                                      'Test::CPAN::Changes' => '0',
+                                      'Test2::Require::AuthorTesting' => '0',
+                                      'Test2::V0' => '0',
+                                      'Test::CPAN::Changes' => '0.19',
+                                      'Test::CVE' => '0.11',
                                       'Test::CleanNamespaces' => '0.15',
                                       'Test::DistManifest' => '0',
                                       'Test::EOF' => '0',
@@ -25,7 +28,7 @@ do { my $x = {
                                       'Test::Fixme' => '0',
                                       'Test::Kwalitee' => '1.21',
                                       'Test::MinimumVersion' => '0',
-                                      'Test::More' => '0.94',
+                                      'Test::More' => '0.96',
                                       'Test::NoTabs' => '0',
                                       'Test::Perl::Critic' => '0',
                                       'Test::Pod' => '1.41',
@@ -35,7 +38,8 @@ do { my $x = {
                                       'Test::Spelling' => '0.17',
                                       'Test::TrailingSpace' => '0.0203',
                                       'Test::Vars' => '0.015',
-                                      'strict' => '0'
+                                      'strict' => '0',
+                                      'warnings' => '0'
                                     }
                     },
        'runtime' => {
@@ -54,8 +58,7 @@ do { my $x = {
                                       'Sub::Exporter::ForMethods' => '0',
                                       'experimental' => '0',
                                       'namespace::autoclean' => '0',
-                                      'perl' => 'v5.20.0',
-                                      'warnings' => '0'
+                                      'perl' => 'v5.20.0'
                                     }
                     },
        'test' => {
@@ -72,7 +75,8 @@ do { my $x = {
                                    'Test::MixedScripts' => 'v0.3.0',
                                    'Test::More' => '0',
                                    'Test::Warnings' => '0.009',
-                                   'strict' => '0'
+                                   'strict' => '0',
+                                   'warnings' => '0'
                                  }
                  }
      };

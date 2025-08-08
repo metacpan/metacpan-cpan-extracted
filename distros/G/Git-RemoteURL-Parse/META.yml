@@ -7,6 +7,8 @@ build_requires:
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
+  File::Spec::Functions: '0'
+  autodie: '0'
 dynamic_config: 0
 generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -21,14 +23,15 @@ no_index:
 provides:
   Git::RemoteURL::Parse:
     file: lib/Git/RemoteURL/Parse.pm
-    version: '0.02'
+    version: '0.03'
 requires:
   Exporter: '1.6'
   perl: '5.010'
   strict: '0'
   warnings: '0'
-resources: {}
-version: '0.02'
+resources:
+  repository: https://github.com/klaus-rindfrey/perl-git-remoteurl-parse.git
+version: '0.03'
 x_bugtracker:
-  web: perl-git-remoteurl-parse/issues
+  web: https://github.com/klaus-rindfrey/perl-git-remoteurl-parse/issues
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

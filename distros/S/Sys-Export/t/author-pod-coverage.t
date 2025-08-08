@@ -34,9 +34,9 @@ plan skip_all => 'All the modules we found were excluded from POD coverage test.
 plan tests => scalar @modules;
 
 my %trustme = (
-             'Sys::Export::Unix::WriteFS' => [
-                                               qr/S_I[FS]WHT/
-                                             ]
+             'Sys::Export' => [
+                                qr/S_I[FS]WHT/
+                              ]
            );
 
 my @also_private;

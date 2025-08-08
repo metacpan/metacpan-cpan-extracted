@@ -10,12 +10,13 @@ use autodie;
 # Set up some symlinks
 my $tmp= File::Temp->newdir;
 mkdir "$tmp/usr";
+skip_all "Can't symlink on this host"
+   unless eval { symlink "/usr/bin", "$tmp/bin" };
 mkdir "$tmp/usr/bin";
 mkdir "$tmp/usr/local";
 open my $out, '>', "$tmp/usr/local/datafile";
 $out->print("Just some data");
 $out->close;
-symlink "/usr/bin", "$tmp/bin";
 symlink "/bin", "$tmp/usr/local/bin";
 symlink "../bin", "$tmp/usr/local/sbin";
 

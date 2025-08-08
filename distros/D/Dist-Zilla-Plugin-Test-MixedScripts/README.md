@@ -29,20 +29,15 @@ developer to copy and paste into their code.
 
 # RECENT CHANGES
 
-Changes for version v0.2.0 (2025-08-06)
+Changes for version v0.2.1 (2025-08-07)
 
-- Incompatible Changes
-    - Increased the minimum Perl version to v5.20, since that is what Dist::Zilla now requires.
+- Enhancements
+    - Internal code improvements.
 - Documentation
-    - Fixed errors in README.
-    - Removed separate INSTALL file.
-    - Updated SYNOPSIS.
+    - Updated SUPPORT section to be consistent with minimum Perl version.
 - Tests
-    - Moved author tests into the xt directory.
-- Toolchain
-    - Undid some changes to Dist::Zilla configuration.
-    - Set up GitHub workflow for testing.
-    - Ensure local-lib is not included in distribution.
+    - Fix issues with author test configuration.
+    - Added more author tests.
 
 See the `Changes` file for more details.
 
@@ -65,7 +60,6 @@ This module lists the following modules as runtime dependencies:
 - [experimental](https://metacpan.org/pod/experimental)
 - [namespace::autoclean](https://metacpan.org/pod/namespace%3A%3Aautoclean)
 - [perl](https://metacpan.org/pod/perl) version v5.20.0 or later
-- [warnings](https://metacpan.org/pod/warnings)
 
 See the `cpanfile` file for the full list of prerequisites.
 
@@ -106,7 +100,7 @@ For more information, see [How to install CPAN modules](https://www.cpan.org/mod
 
 Only the latest version of this module will be supported.
 
-This module requires Perl v5.16 or later.  Future releases may only support Perl versions released in the last ten
+This module requires Perl v5.20 or later.  Future releases may only support Perl versions released in the last ten
 years.
 
 ## Reporting Bugs and Submitting Feature Requests

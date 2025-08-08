@@ -27,6 +27,7 @@ my %WriteMakefileArgs = (
     "Module::Runtime" => 0,
     "POSIX" => 0,
     "Scalar::Util" => 0,
+    "Socket" => 0,
     "Storable" => 0,
     "Symbol" => 0,
     "User::pwent" => 0,
@@ -45,7 +46,7 @@ my %WriteMakefileArgs = (
     "autodie" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -65,6 +66,7 @@ my %FallbackPrereqs = (
   "Module::Runtime" => 0,
   "POSIX" => 0,
   "Scalar::Util" => 0,
+  "Socket" => 0,
   "Storable" => 0,
   "Symbol" => 0,
   "Test2::Suite" => "0.000139",

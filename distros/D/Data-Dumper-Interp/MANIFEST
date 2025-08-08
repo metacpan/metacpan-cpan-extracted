@@ -11,6 +11,7 @@ README_how_to_report_bugs
 dist.ini
 lib/Data/Dumper/Interp.pm
 t/20_globalstuff.t
+t/25_importopts.t
 t/30_prelim.t
 t/35_pad.t
 t/40_Underscores.t

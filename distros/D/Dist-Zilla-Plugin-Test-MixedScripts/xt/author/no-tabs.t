@@ -10,8 +10,7 @@ my @files = (
     'lib/Dist/Zilla/Plugin/Test/MixedScripts.pm',
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
-    't/01-basic.t',
-    't/etc/perlcritic.rc'
+    't/01-basic.t'
 );
 
 notabs_ok($_) foreach @files;

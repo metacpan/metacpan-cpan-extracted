@@ -1,7 +1,6 @@
 package Dist::Zilla::Plugin::Test::MixedScripts;
 
 use v5.20;
-use warnings;
 
 # ABSTRACT: author tests to ensure there is no mixed Unicode
 
@@ -29,7 +28,7 @@ with
   },
   'Dist::Zilla::Role::PrereqSource';
 
-our $VERSION = 'v0.2.0';
+our $VERSION = 'v0.2.1';
 
 
 has filename => (
@@ -152,7 +151,7 @@ Dist::Zilla::Plugin::Test::MixedScripts - author tests to ensure there is no mix
 
 =head1 VERSION
 
-version v0.2.0
+version v0.2.1
 
 =for stopwords Cushing Etheridge Florian Ragwitz Unicode
 
@@ -234,7 +233,7 @@ for example, in the F<dist.ini>:
 
 Only the latest version of this module will be supported.
 
-This module requires Perl v5.16 or later.  Future releases may only support Perl versions released in the last ten
+This module requires Perl v5.20 or later.  Future releases may only support Perl versions released in the last ten
 years.
 
 =head2 Reporting Bugs and Submitting Feature Requests

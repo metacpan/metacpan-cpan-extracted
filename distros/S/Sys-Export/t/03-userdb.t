@@ -373,23 +373,31 @@ subtest 'roundtrip load and save' => sub {
 };
 
 subtest 'auto import from host' => sub {
+   my ($user0, $group0);
    # presume every host has a 'root' user and group
-   skip_all "This host doesn't have a root user?"
-      unless 0 == (getpwnam('root')//-1);
+   # This always throws an exception on Win32 "The getpwman function is unimplemented"
+   unless (eval {
+      $user0= getpwuid 0;
+      $group0= getgrgid 0;
+      0 == (getpwnam($user0)//-1) && 0 == (getgrnam($group0)//-1)
+   }) {
+      note "error checking uid/gid 0: $@";
+      skip_all "This host doesn't have a root user?";
+   }
 
    my $db = Sys::Export::Unix::UserDB->new(auto_import => 1);
-   is( $db->user('root'),
+   is( $db->user($user0),
       object {
          call uid => 0;
-         call group => 'root';
+         call group => $group0;
       },
-      'auto-loaded user "root"'
+      "auto-loaded user '$user0'"
    );
-   is( $db->group('root'),
+   is( $db->group($group0),
       object {
          call gid => 0;
       },
-      'auto-loaded group "root"'
+      "auto-loaded group '$group0'"
    );
 };
 

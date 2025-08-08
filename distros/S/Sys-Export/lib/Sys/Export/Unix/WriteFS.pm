@@ -1,7 +1,7 @@
 package Sys::Export::Unix::WriteFS;
 
-# ABSTRACT: Export target that writes files to a directory in the host filesystem
-our $VERSION = '0.001'; # VERSION
+# ABSTRACT: An export target that writes files to a directory in the host filesystem
+our $VERSION = '0.002'; # VERSION
 
 
 use v5.26;
@@ -10,16 +10,8 @@ use experimental qw( signatures );
 use Carp qw( croak carp );
 our @CARP_NOT= qw( Sys::Export::Unix );
 use Cwd qw( abs_path );
-use Fcntl qw( S_ISREG S_ISDIR S_ISLNK S_ISBLK S_ISCHR S_ISFIFO S_ISSOCK
-              S_IFREG S_IFDIR S_IFLNK S_IFBLK S_IFCHR S_IFIFO  S_IFSOCK S_IFMT );
-BEGIN { # Whiteout macros might not be defined
-   eval { Fcntl::S_IFWHT(); Fcntl->import(qw( S_ISWHT S_IFWHT )); 1 }
-   # default them to false, which code below handles at runtime
-   or eval 'sub S_ISWHT { 0 } sub S_IFWHT { 0 }';
-}
-my sub isa_hash   :prototype($) { ref $_[0] eq 'HASH' }
+use Sys::Export qw( :stat_modes :stat_tests isa_hash );
 require Sys::Export::Unix;
-our $have_unix_mknod= eval { require Unix::Mknod; };
 
 sub new {
    my $class= shift;
@@ -53,6 +45,7 @@ sub new {
 sub dst($self)          { $self->{dst} }
 sub dst_abs($self)      { $self->{dst_abs} }
 sub tmp($self)          { $self->{tmp} }
+sub on_collision($self) { $self->{on_collision} }
 
 # a hashref tracking files with link-count higher than 1, so that hardlinks can be preserved.
 # the keys are "$dev:$ino"
@@ -86,7 +79,8 @@ sub add($self, $file) {
         : S_ISLNK($mode)? $self->_add_symlink($file)
         : (S_ISBLK($mode) || S_ISCHR($mode))? $self->_add_devnode($file)
         : S_ISFIFO($mode)? $self->_add_fifo($file)
-        : croak "Can't export ".(S_ISSOCK($mode)? 'sockets' : S_ISWHT($mode)? 'whiteout entries' : '(unknown)')
+        : S_ISSOCK($mode)? $self->_add_socket($file)
+        : croak "Can't export ".(S_ISWHT($mode)? 'whiteout entries' : '(unknown)')
             .': "'.($file->{src_path} // $file->{data_path} // $file->{name}).'"'
 }
 
@@ -138,9 +132,9 @@ sub _croak_if_different($self, $file, $old) {
 
 # Compare file contents for equality
 sub _contents_same($file, $dst_abs) {
-   Sys::Export::Unix::_load_or_map_data($file->{data}, $file->{data_path})
+   Sys::Export::Unix::_load_or_map_file($file->{data}, $file->{data_path})
       unless defined $file->{data};
-   Sys::Export::Unix::_load_or_map_data(my $dst_data, $dst_abs);
+   Sys::Export::Unix::_load_or_map_file(my $dst_data, $dst_abs);
    return $file->{data} eq $dst_data;
 }
 
@@ -170,8 +164,9 @@ sub _add_file($self, $file) {
             or croak "link($already, $dst): $!";
          return !!1;
       }
-      $self->_link_map->{"$file->{dev}:$file->{ino}"}= $dst;
    }
+   # Record all file inodes in case a delayed hardlink is created by the caller
+   $self->_link_map->{"$file->{dev}:$file->{ino}"}= $dst;
    # The caller may have created data_path within our ->tmp directory.
    # If not, first write the data into a temp file there.
    if (!defined $tmp || substr($tmp, 0, length $self->tmp) ne $self->tmp) {
@@ -226,6 +221,15 @@ sub _add_fifo($self, $file) {
    my $dst_abs= $self->dst_abs . $file->{name};
    POSIX::mkfifo($dst_abs, $file->{mode})
       or croak "mkfifo($dst_abs): $!";
+   $self->_apply_stat($dst_abs, $file);
+}
+
+# Bind a socket (thus creating it) in ->dst
+sub _add_socket($self, $file) {
+   require Socket;
+   my $dst_abs= $self->dst_abs . $file->{name};
+   socket(my $s, Socket::AF_UNIX(), Socket::SOCK_STREAM(), 0) or die "socket: $!";
+   bind($s, Socket::pack_sockaddr_un($dst_abs)) or die "Failed to bind socket at $dst_abs: $!";
    $self->_apply_stat($dst_abs, $file);
 }
 
@@ -315,7 +319,7 @@ __END__
 
 =head1 NAME
 
-Sys::Export::Unix::WriteFS - Export target that writes files to a directory in the host filesystem
+Sys::Export::Unix::WriteFS - An export target that writes files to a directory in the host filesystem
 
 =head1 SYNOPSIS
 
@@ -328,6 +332,17 @@ exporter.
   );
 
 =head1 DESCRIPTION
+
+This module simply writes all exported files to the host's filesystem.  This is more-or-less
+the default that people use when building system images, but the downside is that it reqrires
+the build script to be run as root.  You can avoid this by using L<Sys::Export::CPIO> as an
+export target, which is able to write directory entries directly to the cpio archive, skipping
+any local filesystem writes.
+
+Note that this module tracks device and inode in order to preserve hard-links, though only
+entries with C<nlink> greater than 1 are considered.  To generate a hard link, specify a
+distinct C<dev> and C<ino> combination (and nlink greater than 1) and then repeat those
+parameters later in order to link to the previous file.
 
 =head1 CONSTRUCTORS
 
@@ -343,7 +358,7 @@ Required attributes:
 =item dst
 
 The root of the exported system.  This directory must exist, and should be empty unless you
-specify 'on_conflict'.
+specify 'on_collision'.
 
 =back
 
@@ -376,7 +391,7 @@ written to it:
     # dst_abs is the absolute path about to be written
     # fileinfo is the hash of file attributes passed to ->add
     # _ will be set to an lstat of $dst_abs
-    return $action; # 'ignore' or 'overwrite' or 'croak_if_different'
+    return $action; # 'ignore' or 'overwrite' or 'ignore_if_same'
   }
 
 =back
@@ -438,7 +453,7 @@ to directories since writing the contents of the directory would have changed th
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 AUTHOR
 

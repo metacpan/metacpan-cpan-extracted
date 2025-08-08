@@ -17,10 +17,12 @@ lib/Sys/Export/Unix/UserDB.pm
 lib/Sys/Export/Unix/WriteFS.pm
 t/02-cpio.t
 t/03-userdb.t
+t/04-stat-shorthand.t
 t/10-export-global-instance.t
 t/11-unix-src-abs-path.t
 t/20-unix-basic-copy.t
 t/21-unix-with-rewrites.t
+t/22-unix-src-find.t
 t/80-docker-alpine-initrd.t
 t/81-qemu-initrd.t
 t/author-pod-coverage.t

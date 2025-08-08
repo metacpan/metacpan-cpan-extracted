@@ -27,8 +27,8 @@ package
 package Data::Dumper::Interp;
 
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 997.999; }
-our $VERSION = '7.019'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2025-06-22'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '7.020'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2025-08-07'; # DATE from Dist::Zilla::Plugin::OurDate
 
 # Arrgh!  Moose forcibly enables experimental feature warnings!
 # So import Moose first and then adjust warnings...
@@ -115,64 +115,6 @@ sub _RestorePunct() {
 
 our $AUTOLOAD_debug;
 
-sub import {
-  my $class = shift;
-  my @args = @_;
-
-  my $exporting_default = (@args==0 or grep{ /:DEFAULT/ } @args);
-
-  our $Debug;
-  local $Debug = $Debug;
-  if (my $tag = first{ /^:debug/i } @args) {
-    @args = grep{ ! /^:debug/i } @args;
-    my $level = ($tag =~ /=(\d+)/ ? $1 : 1);
-    $AUTOLOAD_debug = $Debug = $level; # show generated code
-  }
-
-  if (grep{ /^:all$/i } @args) {
-    @args = grep{ ! /^:all$/i } @args;
-    # Generate all modifiers combinations as suffixes in alphabetical order.
-    my %already = map{$_ => 1} @args;
-    push @args, ":DEFAULT" unless $already{':DEFAULT'};
-    for my $v1 (qw/avis hvis vis ivis dvis/) { # avisl hvisl ?
-      for my $v2 ('1', '2', "") {
-        for my $v3 ('l', "") {
-          next if $v3 && $v1 !~ /^[ah]/; # 'l' only with avis or hvis
-          for my $v4 ('o', "") {
-            for my $v5 ('q', "") {
-              for my $v6 ('r', "") {
-                my $subname = $v1.$v2.$v3.$v4.$v5.$v6;
-                next if $already{$subname}++;
-                push @args, $subname;
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-
-  foreach my $subname (@args, ($exporting_default ? @EXPORT : ())) {
-    next unless $subname =~ /^[a-zA-Z]/a;  # skip :tag or $var
-    push @EXPORT_OK, $subname;
-    no strict 'refs';
-    if (defined(*$subname{CODE})) {
-      warn "# $subname ALREADY DEFINED\n" if ($Debug//0) > 1;
-    } else {
-      # Only generate a 'forward' stub to allow prototype checks.
-      # Subs actually called will be defined via AUTOLOAD
-      _generate_sub($subname, 1);
-    }
-  }
-
-  @args = (':null') if @_ && !@args;
-
-  warn "Passing to Exporter::import ",&_dbavis(@args),"\n"
-    if $Debug;
-
-  __PACKAGE__->export_to_level(1, $class, @args);
-}
-
 sub AUTOLOAD {  # invoked on call to undefined *method*
   our $AUTOLOAD;
   _SaveAndResetPunct();
@@ -252,6 +194,7 @@ sub _dbstrposn($$) {
 
 #################### Configuration Globals #################
 
+# Used by sub import() so must be declared first
 our ($Debug, $MaxStringwidth, $Truncsuffix, $Trunctailwidth, $Objects,
      $Refaddr, $Foldwidth, $Foldwidth1,
      $Useqq, $Quotekeys, $Sortkeys,
@@ -2153,6 +2096,84 @@ sub quotekey(_) { # Quote a hash key if not a valid bareword
             "\"$_[0]\""
 }
 
+# Must be declared after global like $Debug etc.
+sub import {
+  my $class = shift;
+  my @input_args = @_;
+
+  @input_args = (':DEFAULT') if @input_args == 0;
+
+  my $import_debug = $Debug;
+
+  my @args;
+  foreach (@input_args) {
+    if (/^:debug(.*)/) {
+      my $rhs = $1;
+      my $level = $rhs eq "" ? 1 : $rhs =~ /^=(\d+)$/ ? $1 : croak "INVALID import $_";
+      $import_debug = $AUTOLOAD_debug = $Debug = $level; # show generated code
+    }
+    elsif (/^:DEFAULT/) {
+      push @args, @EXPORT;
+    }
+    elsif (/^:all/) {
+      # Generate all modifier combinations as suffixes in alphabetical order.
+      my %already = map{$_ => 1} @args;
+      push @args, ":DEFAULT" unless $already{':DEFAULT'};
+      for my $v1 (qw/avis hvis vis ivis dvis/) { # avisl hvisl ?
+        for my $v2 ('1', '2', "") {
+          for my $v3 ('l', "") {
+            next if $v3 && $v1 !~ /^[ah]/; # 'l' only with avis or hvis
+            for my $v4 ('o', "") {
+              for my $v5 ('q', "") {
+                for my $v6 ('r', "") {
+                  my $subname = $v1.$v2.$v3.$v4.$v5.$v6;
+                  next if $already{$subname}++;
+                  push @args, $subname;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    elsif (/^:(Debug|MaxStringwidth|Truncsuffix|Trunctailwidth|Objects|Refaddr|Foldwidth|Foldwidth1|Useqq|Quotekeys|Sortkeys|Maxdepth|Maxrecurse|Deparse|Deepcopy)=(.*)/) {
+      # Set a global option variable
+      my ($name, $rhs) = ($1, $2);
+      if ($rhs !~ /^${quoted_re}$/) {
+        # ?? auto-quote non-numbers which don't look like Perl code??
+        # No, that would complicate the interface unnecessarily; make the
+        # user include quotes around strings e.g. ':Truncsuffix="(truncated)"'
+      }
+      eval "\$Data::Dumper::Interp::$name = $rhs";
+      croak "Error eval'ing import option $_\n$@" if $@;
+      warn "Eval'd $_\n" if $import_debug;
+    }
+    else {
+      push @args, $_; # a subname to generate and pass to Exporter
+    }
+  }
+
+  foreach my $subname (@args) {
+    next unless $subname =~ /^[a-zA-Z]/a;  # skip :tag or $var
+    push @EXPORT_OK, $subname;
+    no strict 'refs';
+    if (defined(*$subname{CODE})) {
+      warn "# $subname ALREADY DEFINED\n" if ($import_debug//0) > 1;
+    } else {
+      # Only generate a 'forward' stub to allow prototype checks.
+      # Subs actually called will be defined via AUTOLOAD
+      _generate_sub($subname, 1);
+    }
+  }
+
+  @args = (':null') if @_ && !@args;
+
+  warn "Passing to Exporter::import ",&_dbavis(@args),"\n"
+    if $import_debug;
+
+  __PACKAGE__->export_to_level(1, $class, @args);
+}
+
 package
   DB;
 
@@ -2497,7 +2518,14 @@ use them as methods and import only the C<visnew> function:
 (C<visnew> creates a new object.  Non-existent methods are auto-generated
 via the AUTOLOAD mechanism).
 
-=head2 Functions imported by default
+* To save memory, only stub declarations with prototypes are generated
+for imported functions.
+Bodies are generated when actually used via the AUTOLOAD mechanism.
+Use the C<:debug> import tag to see details.
+
+=head1 Import options
+
+By default the following are imported:
 
  ivis  dvis    vis  avis  hvis
  ivisq dvisq   visq avisq hvisq rvis rvisq
@@ -2505,6 +2533,15 @@ via the AUTOLOAD mechanism).
  visnew
  addrvis addrvisl
  u quotekey qsh qshlist qshpath
+
+Special import tags may be specified (e.g. in C<use Data::Dumper::Interp ... ;>):
+
+  :all - Imports function variations with all combinations of modifier letters
+         appended to the basic name in alphabetical order
+
+  :debug - Show functions/methods as they are generated
+
+  :OPTIONNAME=VALUE - Set global variable '$OPTIONNAME' to eval(VALUE).
 
 =for HIDE =head2 The :all import tag
 =for HIDE Z<> Z<>
@@ -2532,11 +2569,6 @@ via the AUTOLOAD mechanism).
 =for HIDE
 =for HIDE You could have used alternate names for the same function such as C<avis2ql>,
 =for HIDE C<q2avisl>, C<q_2_avis_l> etc. if called as methods or explicitly imported.
-
-* To save memory, only stub declarations with prototypes are generated
-for imported functions.
-Bodies are generated when actually used via the AUTOLOAD mechanism.
-The C<:debug> import tag prints messages chronicling this process.
 
 =head1 Showing Abbreviated Addresses
 

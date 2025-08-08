@@ -1,13 +1,14 @@
 package Sys::Export::Linux;
 
 # ABSTRACT: Export subsets of a Linux system
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 
 use v5.26;
 use warnings;
 use experimental qw( signatures );
 use parent 'Sys::Export::Unix';
+use Carp;
 
 
 sub add_passwd($self, %options) {
@@ -27,7 +28,30 @@ sub add_passwd($self, %options) {
 
 
 sub add_localtime($self, $tz_name) {
-   ...
+   if (exists $self->{dst_path_set}{"usr/share/zoneinfo/$tz_name"}
+      || ($self->_dst->can('dst_abs') && -f $self->_dst->dst_abs . $tz_name)
+   ) {
+      # zoneinfo is exported, and includes this timezone, so symlink to it
+      $self->add([ sym => "etc/localtime" => "../usr/share/zoneinfo/$tz_name" ]);
+   }
+   elsif (my ($path)= grep -e $_,
+      $self->src_abs . "usr/share/zoneinfo/$tz_name",
+      "/usr/share/zoneinfo/$tz_name"
+   ) {
+      # resolve symliks down to actual file
+      $path= abs_path($path) || croak "Broken symlink at $path";
+      $self->add([ file644 => 'etc/localtime', { data_path => $path } ]);
+   }
+   else {
+      croak "Can't find 'usr/share/zoneinfo/$tz_name' in destination, source, or host filesystem";
+   }
+}
+
+# Avoiding dependency on namespace::clean
+{  no strict 'refs';
+   delete @{"Sys::Export::Linux::"}{qw(
+      croak carp
+   )};
 }
 
 1;
@@ -87,12 +111,12 @@ so that pattern doesn't need a special helper method.
   $exporter->add_localtime($tz_name);
 
 Generate the symlink in C</etc/localtime>, *or* export the timezone file directly to that path
-if the system image lacks C</usr/local/zoneinfo>.
+if the system image lacks C</usr/share/zoneinfo>.
 
 Linux uses a symlink at C</etc/localtime> to point to a compiled zoneinfo file describing the
 current time zone.  You can simply export this symlink, but if you are building a minimal
 system image (like initrd) you might not be exporting the timezone database at
-C</usr/local/zoneinfo>.  In that case, you want the single timezone file copied to
+C</usr/share/zoneinfo>.  In that case, you want the single timezone file copied to
 C</etc/localtime>.
 
 This method looks for the zone file in your destination filesystem, and if not found there, it
@@ -101,7 +125,7 @@ can't find this timezone in any of those locations, it dies.
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 AUTHOR
 

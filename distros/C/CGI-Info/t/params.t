@@ -9,7 +9,16 @@ use MyLogger;
 
 eval 'use autodie qw(:all)';	# Test for open/close failures
 
-BEGIN { use_ok('CGI::Info') }
+my $has_test_returns;
+
+BEGIN {
+	use_ok('CGI::Info');
+	$has_test_returns = eval {
+		require Test::Returns;
+		Test::Returns->import(qw(returns_is));
+		1;
+	};
+}
 
 PARAMS: {
 	$ENV{'GATEWAY_INTERFACE'} = 'CGI/1.1';
@@ -20,6 +29,13 @@ PARAMS: {
 	ok(!defined($i->messages()));
 	ok($i->messages_as_string() eq '');
 	my %p = %{$i->params()};
+
+	SKIP: {
+		skip 'Test::Returns not installed', 1 unless $has_test_returns;
+
+		returns_is(\%p, { type => 'hashref', max => 1, min => 1 }, 'params returns a hash ref');
+	}
+
 	ok($p{foo} eq 'bar');
 	ok(!defined($p{fred}));
 	ok($i->as_string() eq 'foo=bar');
@@ -34,6 +50,13 @@ PARAMS: {
 	$ENV{'QUERY_STRING'} = 'foo=bar&fred=wilma';
 	$i = new_ok('CGI::Info');
 	%p = %{$i->params()};
+
+	SKIP: {
+		skip 'Test::Returns not installed', 1 unless $has_test_returns;
+
+		returns_is(\%p, { type => 'hashref', max => 2, min => 2 }, 'params returns a hash ref');
+	}
+
 	ok($p{foo} eq 'bar');
 	ok($p{fred} eq 'wilma');
 	ok($i->as_string() eq 'foo=bar; fred=wilma');
@@ -145,7 +168,8 @@ PARAMS: {
 	ok($p{foo} eq 'b ar');
 
 	$ENV{'REQUEST_METHOD'} = 'FOO';
-	$i = new_ok('CGI::Info');
+	local $ENV{'CGI__INFO__carp_on_warn'} = 1;
+	$i = CGI::Info->new();
 
 	local $SIG{__WARN__} = sub { die $_[0] };
 	eval { $i->params() };
@@ -225,7 +249,6 @@ EOF
 
 	$ENV{'REQUEST_METHOD'} = 'GET';
 	CGI::Info->reset();	# Force stdin re-read
-	$i = new_ok('CGI::Info');
 	$i = new_ok('CGI::Info' => [
 		upload_dir => $tmpdir
 	]);
@@ -428,7 +451,6 @@ EOF
 		upload_dir => $tmpdir
 	]);
 	eval { %p = $i->params() };
-	diag($@);
 	ok($@ =~ /Disallowing invalid filename/);
 	ok(defined($p{country}));
 	ok($p{country} eq '44');
@@ -529,6 +551,7 @@ EOF
 
 			sub new { bless { }, shift }
 			sub trace { }
+			sub debug { }
 			sub warn { shift; $mess = (ref($_[0]) eq 'ARRAY') ? join(' ', @{$_[0]}) : join(' ' , @_) }
 		}
 

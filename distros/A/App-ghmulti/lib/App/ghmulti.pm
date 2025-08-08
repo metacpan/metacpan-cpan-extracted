@@ -16,7 +16,7 @@ $Getopt::Std::STANDARD_HELP_VERSION = 1;
 
 use Pod::Usage;
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 
 sub run {
@@ -214,12 +214,12 @@ __END__
 
 =head1 NAME
 
-App::ghmulti - Helps when using multiple Github accounts with SSH keys.
+App::ghmulti - Helps when using multiple Github accounts with SSH keys
 
 
 =head1 VERSION
 
-Version 0.02
+Version 0.04
 
 
 =head1 SYNOPSIS
@@ -238,7 +238,7 @@ or
 
 =head1 DESCRIPTION
 
-Please read the documentation in the L<ghmulti> program. for more information
+Please read the documentation in the L<ghmulti> program for more information.
 
 B<Note>: this module uses the B<git> command line tool, so B<git> must be
 installed and available via C<PATH>.

@@ -1,0 +1,43 @@
+---
+abstract: 'Open Cloud Toolkit'
+author:
+  - 'John Summers <devp2000a@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.26, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: OcToolkit
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  OcToolkit:
+    file: lib/OcToolkit.pm
+    version: '1.02'
+requires:
+  File::Find::Rule: '0.34'
+  File::Path: '2.18'
+  File::Slurp: '9999.32'
+  JSON::PP: '4.06'
+  MIME::Base64: '3.16'
+  Template: '3.102'
+  Text::Diff: '1.45'
+  YAML: '1.31'
+  YAML::Safe: '0.82'
+  perl: v5.16.0
+version: '1.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

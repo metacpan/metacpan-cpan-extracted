@@ -34,8 +34,7 @@ my %WriteMakefileArgs = (
     "Path::Tiny" => 0,
     "Sub::Exporter::ForMethods" => 0,
     "experimental" => 0,
-    "namespace::autoclean" => 0,
-    "warnings" => 0
+    "namespace::autoclean" => 0
   },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
@@ -47,9 +46,10 @@ my %WriteMakefileArgs = (
     "Test::MixedScripts" => "0.3.0",
     "Test::More" => 0,
     "Test::Warnings" => "0.009",
-    "strict" => 0
+    "strict" => 0,
+    "warnings" => 0
   },
-  "VERSION" => "v0.2.0",
+  "VERSION" => "v0.2.1",
   "test" => {
     "TESTS" => "t/*.t"
   }

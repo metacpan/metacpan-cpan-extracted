@@ -76,7 +76,7 @@ on 'develop' => sub {
   requires "Test::Portability::Files" => "0";
   requires "Test::Spelling" => "0.17";
   requires "Test::TrailingSpace" => "0.0203";
-  requires "Test::Vars" => "0.015";
+  requires "Test::Vars" => "0";
   requires "strict" => "0";
   requires "warnings" => "0";
 };

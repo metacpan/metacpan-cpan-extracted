@@ -45,13 +45,12 @@ my %WriteMakefileArgs = (
     "Test::MockObject" => 0,
     "Test::More" => 0,
     "Test::Most" => 0,
-    "Test::Vars" => "0.015",
     "Test::Warnings" => 0,
     "lib" => 0,
     "strict" => 0,
     "utf8" => 0
   },
-  "VERSION" => "v0.8.0",
+  "VERSION" => "v0.8.1",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -77,7 +76,6 @@ my %FallbackPrereqs = (
   "Test::MockObject" => 0,
   "Test::More" => 0,
   "Test::Most" => 0,
-  "Test::Vars" => "0.015",
   "Test::Warnings" => 0,
   "Time::HiRes" => 0,
   "Try::Tiny" => 0,

@@ -8,7 +8,7 @@ use autodie;
 
 my $The_Module = 'Git::RemoteURL::Parse';
 my $PM_File = catfile('lib', split(/::/, "$The_Module.pm"));
-my $Git_URL = 'perl-' . join('-', split(/::/, lc($The_Module)));
+my $Git_URL = 'https://github.com/klaus-rindfrey/perl-' . join('-', split(/::/, lc($The_Module)));
 
 my $Version;
 open(my $h, '<', $PM_File);
@@ -22,45 +22,58 @@ close($h);
 die("VERSION not found in $PM_File") if !$Version;
 
 
-my %WriteMakefileArgs = (
-    NAME             => $The_Module,
-    AUTHOR           => q{Klaus Rindfrey <klausrin@cpan.org.eu>},
-    VERSION_FROM     => $PM_File,
-    ABSTRACT_FROM    => $PM_File,
-    LICENSE          => 'perl_5',
-    MIN_PERL_VERSION => '5.010',
-    CONFIGURE_REQUIRES => {
-        'ExtUtils::MakeMaker' => '0',
-    },
-    PREREQ_PM => {
-        'strict'   => 0,
-        'warnings' => 0,
-        'Exporter' => '1.6',
-    },
-    META_MERGE => {
-        "meta-spec" => { version => 2 },
-        dynamic_config => 0,
-        resources => {
-            repository => {
-                type => 'git',
-                url  => "$Git_URL.git",
-                web  => "$Git_URL.git",
-            },
-        },
-        bugtracker => {
-            web => "$Git_URL/issues"
-        },
-        provides => { $The_Module => {file => $PM_File,
-                                      version => $Version
-                                     },
+my %WriteMakefileArgs =
+  (
+   NAME             => $The_Module,
+   AUTHOR           => q{Klaus Rindfrey <klausrin@cpan.org.eu>},
+   VERSION_FROM     => $PM_File,
+   ABSTRACT_FROM    => $PM_File,
+   LICENSE          => 'perl_5',
+   MIN_PERL_VERSION => '5.010',
+   CONFIGURE_REQUIRES => {
+                          'autodie'               => '0',
+                          'ExtUtils::MakeMaker'   => '0',
+                          'File::Spec::Functions' => '0',
+                         },
+   PREREQ_PM => {
+                 'strict'   => 0,
+                 'warnings' => 0,
+                 'Exporter' => '1.6',
+                },
+   META_MERGE => {
+                  "meta-spec" => { version => 2 },
+                  dynamic_config => 0,
+                  resources => {
+                                repository => {
+                                               type => 'git',
+                                               url  => "$Git_URL.git",
+                                               web  => "$Git_URL.git",
+                                              },
+                               },
+                  bugtracker => {
+                                 web => "$Git_URL/issues"
+                                },
+                  provides => { $The_Module => {file => $PM_File,
+                                                version => $Version
+                                               },
+                              },
+                 },
+   TEST_REQUIRES => {
+                     'Test::More' => '0',
                     },
-    },
-    TEST_REQUIRES => {
-        'Test::More' => '0',
-    },
-    dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean => { FILES => join('-', split(/::/, lc($The_Module))) . '-' },
-);
+   dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+   clean => { FILES => join('-', split(/::/, $The_Module)) . '-*' },
+  );
+
+if ($ENV{AUTHOR_TESTING}) {
+  $WriteMakefileArgs{BUILD_REQUIRES} =
+    {
+     'Pod::Coverage'         => '0.23',
+     'Pod::Wordlist'         => '1.27',
+     'Test::Pod::Coverage'   => '1.10',
+     'Test::Spelling;'       => '0.25',
+    };
+}
 
 # Compatibility with old versions of ExtUtils::MakeMaker
 unless (eval { ExtUtils::MakeMaker->VERSION('6.64'); 1 }) {

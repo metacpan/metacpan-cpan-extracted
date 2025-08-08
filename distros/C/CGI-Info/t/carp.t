@@ -11,6 +11,7 @@ BEGIN { use_ok('CGI::Info') }
 
 CARP: {
 	local $ENV{'GATEWAY_INTERFACE'} = 'CGI/1.1';
+	local $ENV{'CGI__INFO__carp_on_warn'} = 1;
 
 	does_carp_that_matches(
 		sub {

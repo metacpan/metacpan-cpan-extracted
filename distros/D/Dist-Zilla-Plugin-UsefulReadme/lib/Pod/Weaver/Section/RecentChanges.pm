@@ -20,7 +20,7 @@ use experimental qw( lexical_subs postderef signatures );
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.4.2';
+our $VERSION = 'v0.4.3';
 
 
 has header => (
@@ -64,6 +64,10 @@ sub weave_section( $self, $document, $input ) {
     unless ($zilla) {
         $self->log_fatal("missing zilla argument");
         return;
+    }
+
+    if ( $zilla && !$self->all_modules ) {
+        return if $zilla->main_module->name ne $input->{filename};
     }
 
     if ( my $stash = $zilla ? $zilla->stash_named('%PodWeaver') : undef ) {
@@ -177,7 +181,7 @@ Pod::Weaver::Section::RecentChanges - generate POD with the recent changes
 
 =head1 VERSION
 
-version v0.4.2
+version v0.4.3
 
 =head1 SYNOPSIS
 

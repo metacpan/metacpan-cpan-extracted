@@ -21,10 +21,10 @@ my $Ghmulti_Scr = catdir(dirname(__FILE__), qw(.. script ghmulti));
 ok(-x $Ghmulti_Scr, "$Ghmulti_Scr is executable");
 
 # Run it with `perl ...` so tests will work on Windows as well.
-like(`perl $Ghmulti_Scr --version`,
+like(`$^X $Ghmulti_Scr --version`,
      qr/\bghmulti:\s*\Q$App::ghmulti::VERSION\E\b/,
      'Option --version');
 
-like(`perl $Ghmulti_Scr --help`,
+like(`$^X $Ghmulti_Scr --help`,
      qr/\bghmulti - Helps when using multiple Github accounts with SSH keys\b/,
      'Option --help');

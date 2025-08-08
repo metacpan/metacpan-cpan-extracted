@@ -1,0 +1,16 @@
+requires 'perl', '5.001006';
+requires 'JSON::PP', '4.06';
+requires 'Text::Diff', '1.45';
+requires 'Template', '3.102';
+requires 'File::Slurp', '9999.32';
+requires 'File::Find::Rule', '0.34';
+requires 'File::Path', '2.18';
+requires 'MIME::Base64', '3.16';
+requires 'YAML', '1.31';
+requires 'YAML::Safe', '0.82';
+
+on 'test' => sub {
+    requires 'Test::More', '0.98';
+};
+
+

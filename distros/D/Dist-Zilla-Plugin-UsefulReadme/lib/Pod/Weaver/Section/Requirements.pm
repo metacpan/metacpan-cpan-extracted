@@ -20,7 +20,7 @@ use experimental qw( lexical_subs postderef signatures );
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.4.2';
+our $VERSION = 'v0.4.3';
 
 
 has header => (
@@ -59,6 +59,10 @@ sub weave_section( $self, $document, $input ) {
         return;
     }
 
+    if ( $zilla && !$self->all_modules ) {
+        return if $zilla->main_module->name ne $input->{filename};
+    }
+
     if ( my $stash = $zilla ? $zilla->stash_named('%PodWeaver') : undef ) {
         $stash->merge_stashed_config($self);
     }
@@ -66,8 +70,6 @@ sub weave_section( $self, $document, $input ) {
     my $runtime = $zilla->prereqs->as_string_hash->{runtime}{requires};
 
     unless ($runtime) {
-      my $file = $input->{filename};
-
       my $scanner = Perl::PrereqScanner->new;
       my $prereqs = $scanner->scan_ppi_document($input->{ppi_document} );
 
@@ -122,7 +124,7 @@ sub weave_section( $self, $document, $input ) {
     );
 
     my %files = map { $_->name => 1 } $zilla->files->@*;
-    my @metafiles = grep { $_ ne '' } ( $self->metafile, qw( cpmfile cpanfile metafile META.json META.yml ) );
+    my @metafiles = grep { $_ ne '' } ( $self->metafile, qw( cpm.yml cpanfile META.json META.yml ) );
     if ( my $file = first { $files{$_} } @metafiles ) {
         push $res->children->@*,
           Pod::Elemental::Element::Pod5::Ordinary->new(
@@ -162,7 +164,7 @@ Pod::Weaver::Section::Requirements - generate POD with the runtime requirements
 
 =head1 VERSION
 
-version v0.4.2
+version v0.4.3
 
 =for stopwords metafile
 

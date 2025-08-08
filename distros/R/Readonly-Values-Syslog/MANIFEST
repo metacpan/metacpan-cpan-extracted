@@ -1,3 +1,4 @@
+bin/syslog-utils
 Changes
 lib/Readonly/Values/Syslog.pm
 LICENSE
@@ -11,6 +12,7 @@ t/eol.t
 t/pod-cm.t
 t/pod-synopsis.t
 t/pod.t
+t/syslog.t
 t/values.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

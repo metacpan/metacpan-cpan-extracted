@@ -6,9 +6,7 @@ use Test::Most tests => 39;
 use lib 't/lib';
 use MyLogger;
 
-BEGIN {
-	use_ok('CGI::Info');
-}
+BEGIN { use_ok('CGI::Info') }
 
 PARAM: {
 	# Initial sanity tests
@@ -35,7 +33,7 @@ PARAM: {
 			logger => MockLogger->new()
 		);
 
-		is_deeply($obj->param, { foo => 'bar', baz => 'qux' }, 'No arguments returns all params');
+		is_deeply($obj->param(), { foo => 'bar', baz => 'qux' }, 'No arguments returns all params');
 
 		is($obj->param('foo'), 'bar', 'Fetching allowed parameter "foo"');
 

@@ -44,12 +44,12 @@ ok($p{foo} eq 'bar,baz');
 $i = new_ok('CGI::Info' => [
 	allow => \%allowed,
 	# logger => sub { ($_[0]->{'level'} eq 'warn') && die @{$_[0]->{'message'}} }
+	carp_on_warn => 1
 ]);
 ok(!defined($i->params()));
 ok($i->as_string() eq '');
 local $SIG{__WARN__} = sub { die $_[0] };
 eval { $i->param('fred') };
-diag($@);
 ok($@ =~ /fred isn't in the allow list at/);
 
 $ENV{'QUERY_STRING'} = 'foo=123&fred=wilma';

@@ -8,7 +8,7 @@ use autodie;
 
 my $The_Module = 'App::ghmulti';
 my $PM_File = catfile('lib', split(/::/, "$The_Module.pm"));
-my $Git_URL = 'perl-' . join('-', split(/::/, lc($The_Module)));
+my $Git_URL = 'https://github.com/klaus-rindfrey/perl-' . join('-', split(/::/, lc($The_Module)));
 
 my $Version;
 open(my $h, '<', $PM_File);
@@ -22,65 +22,65 @@ close($h);
 die("VERSION not found in $PM_File") if !$Version;
 
 
-my %WriteMakefileArgs = (
-    NAME             => 'App::ghmulti',
-    AUTHOR           => q{Klaus Rindfrey <klausrin@cpan.org.eu>},
-    VERSION_FROM     => 'lib/App/ghmulti.pm',
-    ABSTRACT_FROM    => 'lib/App/ghmulti.pm',
-    EXE_FILES        => ['script/ghmulti'],
-    LICENSE          => 'perl_5',
-    MIN_PERL_VERSION => '5.010',
-    CONFIGURE_REQUIRES => {
-        'autodie'               => '0',
-        'ExtUtils::MakeMaker'   => '0',
-        'File::Spec::Functions' => '0',
+my %WriteMakefileArgs =
+  (
+   NAME               => 'App::ghmulti',
+   AUTHOR             => q{Klaus Rindfrey <klausrin@cpan.org.eu>},
+   VERSION_FROM       => 'lib/App/ghmulti.pm',
+   ABSTRACT_FROM      => 'lib/App/ghmulti.pm',
+   EXE_FILES          => ['script/ghmulti'],
+   LICENSE            => 'perl_5',
+   MIN_PERL_VERSION   => '5.010',
+   CONFIGURE_REQUIRES => {
+                          'autodie'               => '0',
+                          'ExtUtils::MakeMaker'   => '0',
+                          'File::Spec::Functions' => '0',
     },
-    TEST_REQUIRES => {
-        'Capture::Tiny' => '0.47',
-        'File::Basename' => '0',
-        'File::Spec::Functions' => '0',
-        'Test::More' => '0',
-        'Capture::Tiny' => '0.48',
-    },
-    PREREQ_PM => {
-        'Git::RemoteURL::Parse' => '0.02',
-        'GitHub::Config::SSH::UserData' => '0.01'
-    },
-    META_MERGE => {
-        "meta-spec" => { version => 2 },
-        dynamic_config => 0,
-        resources => {
-            repository => {
-                type => 'git',
-                url  => "$Git_URL.git",
-                web  => "$Git_URL.git",
-            },
-        },
-        bugtracker => {
-            web => "$Git_URL/issues"
-        },
-        provides => { $The_Module => {file => $PM_File,
-                                      version => $Version
-                                     },
-                      'ghmulti'   => {file => 'script/ghmulti', version => $Version}
+   TEST_REQUIRES => {
+                     'Capture::Tiny' => '0.47',
+                     'File::Basename' => '0',
+                     'File::Spec::Functions' => '0',
+                     'Test::More' => '0',
+                     'Capture::Tiny' => '0.48',
                     },
+   PREREQ_PM => {
+                 'Git::RemoteURL::Parse' => '0.02',
+                 'GitHub::Config::SSH::UserData' => '0.01'
+                },
+   META_MERGE => {
+                  "meta-spec" => { version => 2 },
+                  dynamic_config => 0,
+                  resources => {
+                                repository => {
+                                               type => 'git',
+                                               url  => "$Git_URL.git",
+                                               web  => "$Git_URL.git",
+                                              },
+                               },
+                  bugtracker => {
+                                 web => "$Git_URL/issues"
+                                },
+                  provides => { $The_Module => { file => $PM_File, version => $Version },
+                              },
     },
-    dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean => { FILES => join('-', split(/::/, $The_Module)) . '-*' },
-                        );
+   dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+   clean => { FILES => join('-', split(/::/, $The_Module)) . '-*' },
+  );
+
 if ($ENV{AUTHOR_TESTING}) {
-    $WriteMakefileArgs{BUILD_REQUIRES} = {
-        'Capture::Tiny' => '0.47',
-        'Cwd' => '0',
-        'File::Basename' => '0',
-        'File::Spec::Functions' => '0',
-        'File::Temp' => '0',
-        'File::chdir' => '0.1011',
-        'Pod::Wordlist' => '1.27',
-        'Test::CheckManifest' => '1.43',
-        'Test::More'  => '0',
-        'Test::Pod'       => 1.51,
-        'Test::Spelling;' => '0.25',
+  $WriteMakefileArgs{BUILD_REQUIRES} =
+    {
+     'Capture::Tiny'         => '0.47',
+     'Cwd'                   => '0',
+     'File::Basename'        => '0',
+     'File::Spec::Functions' => '0',
+     'File::Temp'            => '0',
+     'File::chdir'           => '0.1011',
+     'Pod::Wordlist'         => '1.27',
+     'Test::CheckManifest'   => '1.43',
+     'Test::More'            => '0',
+     'Test::Pod'             => 1.51,
+     'Test::Spelling;'       => '0.25',
     };
 }
 

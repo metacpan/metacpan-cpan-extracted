@@ -14,10 +14,10 @@ lib/Dist/Zilla/Plugin/Test/MixedScripts.pm
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
 t/01-basic.t
-t/etc/perlcritic.rc
 weaver.ini
 xt/author/clean-namespaces.t
 xt/author/critic.t
+xt/author/cve.t
 xt/author/eof.t
 xt/author/eol.t
 xt/author/minimum-version.t
@@ -27,7 +27,10 @@ xt/author/pod-linkcheck.t
 xt/author/pod-spell.t
 xt/author/pod-syntax.t
 xt/author/portability.t
+xt/etc/perlcritic.rc
+xt/release/cpan-changes.t
 xt/release/dist-manifest.t
 xt/release/fixme.t
 xt/release/kwalitee.t
 xt/release/trailing-space.t
+xt/release/unused-vars.t

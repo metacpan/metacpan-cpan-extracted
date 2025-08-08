@@ -5,6 +5,20 @@ use Test2AndUtils;
 use experimental qw( signatures );
 use Cwd 'getcwd';
 
+=head1 DESCRIPTION
+
+This test extracts executables (specifically busybox) from an Alpine docker container using a
+path_rewrite that allows the extracted binary to be executable from the directory we extracted
+it to.  Specifically, it rewrites the library path of the binary so that the libs (including
+ld-musl) can be found adjacent to that binary instead of looking in /lib of the host.
+
+Example Usage:
+
+  DOCKER_TESTS=1 DOCKER_TEST_IMAGE_NAME=test-sys-export \
+    prove -lv t/80-docker-alpine-initrd.t
+
+=cut
+
 # Docker access is equivalent to root access, so not enabled by default
 skip_all 'Set env DOCKER_TESTS=1 to run this test'
    unless $ENV{DOCKER_TESTS};
@@ -12,7 +26,9 @@ skip_all 'Set env DOCKER_TESTS=1 to run this test'
 skip_all 'No docker access, or unable to fetch alpine image'
    unless system('docker','pull','alpine') == 0;
 
-# Write out a script to be executed
+# If the user provided a docker image name, we can cache things into the image.
+# Otherwise we need to pass all of that into the 'run' command and perform the
+# package installs as part of the entrypoint.
 my $tmp= File::Temp->newdir;
 my @cmd;
 if ($ENV{DOCKER_TEST_IMAGE_NAME}) {
@@ -44,26 +60,23 @@ mkfile("$tmp/export.pl", <<~END_PL, 0755);
    #! /usr/bin/perl
    use v5.26;
    use warnings;
-   use FindBin;
    use lib "/opt/sys-export/lib";
-   use Sys::Export::Unix;
-   {
-      my \$exporter= Sys::Export::Unix->new(src => '/', dst => "/export", tmp => "\$FindBin::Bin/tmp");
-      \$exporter->rewrite_path("/", "$tmp/initrd/");
-      \$exporter->add('bin/busybox');
-   }
+   use Sys::Export -src => '/', -dst => "/export", -tmp => "/export$tmp/tmp";
+   rewrite_path "/" => "$tmp/initrd/";
+   add 'bin/busybox';
+   finish;
    END {
       # This is running as root inside the container.
       # Make sure we can delete these files from outside docker.
-      system("chgrp -R $gid \$FindBin::Bin/initrd");
-      system("chmod -R g+w \$FindBin::Bin/initrd");
+      system("chgrp -R $gid /export$tmp/initrd");
+      system("chmod -R g+w /export$tmp/initrd");
    }
    END_PL
 
 # Launch docker with volume at identical path of $tmp
 is( system(qw( docker run --init --rm -w / ),
    -v => getcwd().':/opt/sys-export',
-   -v => "$tmp:/export/$tmp",
+   -v => "$tmp:/export$tmp",
    @cmd
 ), 0, 'docker process succeeded' );
 

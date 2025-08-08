@@ -14,6 +14,7 @@ build_requires:
   Test::More: '0'
   Test::Warnings: '0.009'
   strict: '0'
+  warnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -34,7 +35,7 @@ name: Dist-Zilla-Plugin-Test-MixedScripts
 provides:
   Dist::Zilla::Plugin::Test::MixedScripts:
     file: lib/Dist/Zilla/Plugin/Test/MixedScripts.pm
-    version: v0.2.0
+    version: v0.2.1
 requires:
   Data::Section: '0.004'
   Dist::Zilla::File::InMemory: '0'
@@ -51,11 +52,10 @@ requires:
   experimental: '0'
   namespace::autoclean: '0'
   perl: v5.20.0
-  warnings: '0'
 resources:
   bugtracker: https://github.com/robrwo/perl-Dist-Zilla-Plugin-Test-MixedScripts/issues
   repository: git://github.com/robrwo/perl-Dist-Zilla-Plugin-Test-MixedScripts.git
-version: v0.2.0
+version: v0.2.1
 x_authority: cpan:RRWO
 x_contributors:
   - 'Graham Knop <haarg@haarg.org>'

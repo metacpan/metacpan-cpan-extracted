@@ -46,3 +46,4 @@ xt/release/dist-manifest.t
 xt/release/fixme.t
 xt/release/kwalitee.t
 xt/release/trailing-space.t
+xt/release/unused-vars.t

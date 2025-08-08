@@ -30,7 +30,13 @@ push @{ $messageBoxRichTextInitArguments->{extraPlugins} }, 'RtExtensionAi';
 
 # Add 'aiSuggestion' to the toolbar before sourceEditing
 my @temp_toolbar;
-foreach my $item ( @{$messageBoxRichTextInitArguments->{toolbar}} ){
+foreach my $item (
+    @{  ref $messageBoxRichTextInitArguments->{toolbar} eq 'HASH'
+        ? $messageBoxRichTextInitArguments->{toolbar}{items}
+        : $messageBoxRichTextInitArguments->{toolbar}
+     }
+    )
+{
     if ( $item eq 'sourceEditing' ) {
         push @temp_toolbar, 'aiSuggestion', 'sourceEditing';
     }
@@ -39,4 +45,9 @@ foreach my $item ( @{$messageBoxRichTextInitArguments->{toolbar}} ){
     }
 }
 
-@{$messageBoxRichTextInitArguments->{toolbar}} = @temp_toolbar;
+if ( ref $messageBoxRichTextInitArguments->{toolbar} eq 'HASH' ) {
+    @{$messageBoxRichTextInitArguments->{toolbar}{items}} = @temp_toolbar;
+}
+else {
+    @{$messageBoxRichTextInitArguments->{toolbar}} = @temp_toolbar;
+}

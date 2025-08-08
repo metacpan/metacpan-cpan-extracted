@@ -1,0 +1,109 @@
+#!/usr/bin/env perl
+# syslog-utils - Command line utilities for syslog levels
+
+use strict;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+use Readonly::Values::Syslog qw(:all);
+
+GetOptions(
+    'help|h'        => \my $help,
+    'list|l'        => \my $list,
+    'validate|v=s'  => \my $validate,
+    'convert|c=s'   => \my $convert,
+    'compare=s'     => \my @compare,
+) or pod2usage(2);
+
+pod2usage(1) if $help;
+
+if ($list) {
+    print "Available syslog levels:\n";
+    for my $level (get_all_syslog_numbers()) {
+        my $name = get_syslog_name($level);
+        my $desc = get_syslog_description($level);
+        printf "%d: %-12s - %s\n", $level, $name, $desc;
+    }
+    
+    print "\nAvailable aliases:\n";
+    my $aliases = get_all_syslog_aliases();
+    for my $alias (sort keys %$aliases) {
+        printf "%-12s -> %s\n", $alias, $aliases->{$alias};
+    }
+}
+
+if ($validate) {
+    if (is_valid_syslog_level($validate)) {
+        my $numeric = get_syslog_level($validate);
+        my $canonical = get_syslog_name($numeric);
+        print "Valid: '$validate' -> $numeric ($canonical)\n";
+        exit 0;
+    } else {
+        print "Invalid syslog level: '$validate'\n";
+        exit 1;
+    }
+}
+
+if ($convert) {
+    eval {
+        if (looks_like_number($convert)) {
+            my $name = get_syslog_name($convert);
+            print "$convert -> $name\n";
+        } else {
+            my $number = get_syslog_level($convert);
+            print "$convert -> $number\n";
+        }
+    };
+    if ($@) {
+        print "Conversion failed: $@";
+        exit 1;
+    }
+}
+
+if (@compare == 2) {
+    eval {
+        my $result = compare_syslog_levels($compare[0], $compare[1]);
+        my $op = $result < 0 ? '<' : $result > 0 ? '>' : '==';
+        print "$compare[0] $op $compare[1]\n";
+    };
+    if ($@) {
+        print "Comparison failed: $@";
+        exit 1;
+    }
+}
+
+__END__
+
+=head1 NAME
+
+syslog-utils - Command line utilities for syslog levels
+
+=head1 SYNOPSIS
+
+syslog-utils [options]
+
+=head1 OPTIONS
+
+=over 4
+
+=item --list, -l
+
+List all available syslog levels and aliases
+
+=item --validate, -v LEVEL
+
+Validate a syslog level name or number
+
+=item --convert, -c LEVEL
+
+Convert between syslog level names and numbers
+
+=item --compare LEVEL1 LEVEL2
+
+Compare two syslog levels
+
+=item --help, -h
+
+Show this help message
+
+=back

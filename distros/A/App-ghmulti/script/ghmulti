@@ -53,7 +53,7 @@ adding comments like this:
 
 The script looks for C<Host> names beginning with C<github->. It assumes that
 the part after the hyphen is your username on github. E.g., in the example
-above the gibthub usernames are C<foo>, C<bar> and C<baz>.
+above the github usernames are C<foo>, C<bar> and C<baz>.
 
 The next line must be a comment line beginning with C<User:> followed by an
 optional name (full name, may contain spaces) followed by an email address in

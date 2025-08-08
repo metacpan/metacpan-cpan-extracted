@@ -1,5 +1,36 @@
-2025-07-22 - Version 0.001
+2025-08-07 - Version 0.002
+  - API Changes:
+    - New Sys::Export::Unix->src_find is like File::Find specifically for
+      iterating files of the export source tree.
+    - New Sys::Export::find exported function calls 'exporter->src_find'
+    - Sys::Export exports functions 'find' and 'skip' by default now, if the
+      global exporter is being used.
+    - New Sys::Export::expand_stat_shorthand exported function converts
+      arrayrefs like '[ file644 => $name, $data ]' to the equivalent hashref
+      of stat parameters.
+    - Sys::Export::Unix->add now uses expand_stat_shorthand for its array
+      shorthand, which is a breaking change from previous.
+    - Sys::Export::Unix->add now allows hashrefs containing 'src_path' and
+      lacking 'name' as a way to ask for source-to-destination translation of
+      the path rather than exporting the attributes as-is.
+    - Sys::Export::Unix->skip can accept multiple arguments and they may be
+      hashrefs, like for ->add.
+    - When the unix exporter's $self->add is called in the middle of another
+      call to add, the file is queued to be added after control returns to the
+      top-level add call.  This lets subclasses queue dependencies without
+      messing with private object attributes.
+    - Sys::Export::CPIO has new attributes 'autoclose' and 'filename'
+  - Bug Fixes:
+    - Sys::Export::Unix::WriteFS can now create Socket directory entries
+    - CPIO archives now get properly terminated and flushed during ->finish
+    - Remove references to current dir "./" from paths to prevent misbehavior
+    - Detect failures in 'mknod' syscall
+    - Implemented ::Linux->add_localtime which was previously "..."
+    - Better support for running on non-Linux platforms, mostly in the tests
+  - Many documentation improvements
+  - More tests
 
+2025-07-22 - Version 0.001
   - Initial version, with functioning t/81-qemu-initrd.t to prove that
     the basics work.  But, it's a bit light on testing considering the
     overall number of features and potential use cases.

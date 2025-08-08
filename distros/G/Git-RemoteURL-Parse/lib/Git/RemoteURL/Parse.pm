@@ -7,7 +7,7 @@ use warnings;
 use Exporter 'import';
 our @EXPORT_OK = qw(parse_git_remote_url);
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 sub parse_git_remote_url {
     my ($url) = @_;
@@ -78,7 +78,7 @@ Git::RemoteURL::Parse - Parse and classify Git remote URLs (GitHub, GitLab)
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 
@@ -181,9 +181,15 @@ Returns C<undef> if the URL is not recognized as a valid GitHub or GitLab URL.
 
 =back
 
+
 =head1 AUTHOR
 
 Klaus Rindfrey, C<< <klausrin at cpan.org.eu> >>
+
+
+=head1 SEE ALSO
+
+L<App::ghmulti>
 
 
 =head1 BUGS
