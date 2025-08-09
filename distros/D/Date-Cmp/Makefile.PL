@@ -44,9 +44,10 @@ WriteMakefile(
 				web => 'https://github.com/nigelhorne/Date-Cmp'
 			}, bugtracker => {
 				mailto => 'bug-Date-Cmp@rt.cpan.org',
-				url => 'https://github.com/nigelhorne/Date-Cmp/issues',
-				# web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Date-Cmp',
-				web => 'https://github.com/nigelhorne/Date-Cmp/issues'
+				url => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Date-Cmp',
+				web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Date-Cmp',
+				# url => 'https://github.com/nigelhorne/Date-Cmp/issues',
+				# web => 'https://github.com/nigelhorne/Date-Cmp/issues'
 			}
 		},
 	},

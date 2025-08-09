@@ -6,57 +6,78 @@ use Test::More;
 
 use_ok 'idi';
 
-my $s = get_score();
+my $s = g();
 isa_ok $s, 'MIDI::Simple';
 
-e(0); # Turn off "play-on-end"
+diag 'Turn off "play-on-end"';
+e(0);
 
-b(100);
-is_deeply [$s->Score]->[-1], ['set_tempo', 0, 600000], 'b';
+subtest b => sub {
+  b(100);
+  is_deeply [$s->Score]->[-1], ['set_tempo', 0, 600000], 'b';
+};
 
-is $s->Channel, 0, 'c';
-c(1);
-is $s->Channel, 1, 'c';
+subtest c => sub {
+  is $s->Channel, 0, 'c';
+  c(1);
+  is $s->Channel, 1, 'c';
+};
 
-is $s->Duration, 96, 'd';
-d(32);
-is $s->Duration, 32, 'd';
+subtest c => sub {
+  is $s->Duration, 96, 'd';
+  d(32);
+  is $s->Duration, 32, 'd';
+};
 
-n(qw(qn C));
-is_deeply [$s->Score]->[-1], ['note', 0, 96, 1, 60, 64], 'n';
+subtest n => sub {
+  n(qw(qn C));
+  is_deeply [$s->Score]->[-1], ['note', 0, 96, 1, 60, 64], 'n';
+};
 
-r('qn');
+r('qn'); # add a rest to the score
 
-n(qw(qn C));
-is_deeply [$s->Score]->[-1], ['note', 96 * 2, 96, 1, 60, 64], 'n';
+subtest n => sub {
+  n(qw(qn C));
+  is_deeply [$s->Score]->[-1], ['note', 96 * 2, 96, 1, 60, 64], 'n';
+};
 
-is $s->Octave, 5, 'o';
-o(0);
-is $s->Octave, 0, 'o';
+subtest o => sub {
+  is $s->Octave, 5, 'o';
+  o(0);
+  is $s->Octave, 0, 'o';
+};
 
-p(qw(2 42));
-is_deeply [$s->Score]->[-1], ['patch_change', 96 * 3, 2, 42], 'p';
+subtest p => sub {
+  p(qw(2 42));
+  is_deeply [$s->Score]->[-1], ['patch_change', 96 * 3, 2, 42], 'p';
+};
 
-t('3/4');
-is_deeply [$s->Score]->[-1], ['time_signature', 96 * 3, 3, 2, 18, 8], 't';
+subtest t => sub {
+  t('3/4');
+  is_deeply [$s->Score]->[-1], ['time_signature', 96 * 3, 3, 2, 18, 8], 't';
+  t('6/8');
+  is_deeply [$s->Score]->[-1], ['time_signature', 96 * 3, 6, 3, 24, 8], 't';
+};
 
-t('6/8');
-is_deeply [$s->Score]->[-1], ['time_signature', 96 * 3, 6, 3, 24, 8], 't';
+subtest v => sub {
+  is $s->Volume, 64, 'v';
+  v(127);
+  is $s->Volume, 127, 'v';
+};
 
-is $s->Volume, 64, 'v';
-v(127);
-is $s->Volume, 127, 'v';
+subtest w => sub {
+  w();
+  my @got = glob 'idi*.mid';
+  like $got[0], qr/^idi-.{4}\.mid$/, 'w';
+  w('idi.mid');
+  ok -e 'idi.mid', 'w';
+  unlink 'idi.mid';
+};
 
-w();
-my @got = glob 'idi*.mid';
-like $got[0], qr/^idi-.{4}\.mid$/, 'w';
-
-w('idi.mid');
-ok -e 'idi.mid', 'w';
-unlink 'idi.mid';
-
-x('c2');
-is $s->Channel, 2, 'x';
+subtest x => sub {
+  x('c2');
+  is $s->Channel, 2, 'x';
+};
 
 #use Data::Dumper::Compact qw(ddc);
 #warn __PACKAGE__,' L',__LINE__,' ',ddc($s);

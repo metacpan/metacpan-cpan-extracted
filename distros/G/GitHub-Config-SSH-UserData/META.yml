@@ -3,8 +3,15 @@ abstract: 'Read user data from comments in ssh config file'
 author:
   - 'Klaus Rindfrey <klausrin@cpan.org.eu>'
 build_requires:
-  ExtUtils::MakeMaker: '0'
+  File::Basename: '0'
+  File::Spec::Functions: '0'
+  Pod::Coverage: '0.23'
+  Pod::Wordlist: '1.27'
+  Test::CheckManifest: '1.43'
   Test::More: '0'
+  Test::Pod::Coverage: '1.10'
+  strict: '0'
+  warnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec::Functions: '0'
@@ -23,15 +30,19 @@ no_index:
 provides:
   GitHub::Config::SSH::UserData:
     file: lib/GitHub/Config/SSH/UserData.pm
-    version: '0.02'
+    version: '0.03'
 requires:
+  Carp: '0'
   Exporter: '1.6'
+  File::Spec::Functions: '0'
+  autodie: '0'
+  constant: '0'
   perl: '5.010'
   strict: '0'
   warnings: '0'
 resources:
   repository: https://github.com/klaus-rindfrey/perl-github-config-ssh-userdata.git
-version: '0.02'
+version: '0.03'
 x_bugtracker:
   web: https://github.com/klaus-rindfrey/perl-github-config-ssh-userdata/issues
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

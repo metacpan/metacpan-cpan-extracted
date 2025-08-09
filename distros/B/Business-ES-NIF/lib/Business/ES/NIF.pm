@@ -3,12 +3,12 @@ package Business::ES::NIF;
 # ABSTRACT: Validate Spanish NIF, NIE and CIF numbers
 
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use strict;
 use warnings;
 
-use Class::XSAccessor { accessors => [qw(error extra nif status type provincia vies_check vies_error)] };
+use Class::XSAccessor { accessors => [qw(error extra nif status type iso3166 provincia VIES vies_check vies_error)] };
 
 
 use constant {
@@ -151,19 +151,13 @@ use constant PROVINCIAS => {
 			   };
 
 
-
 sub is_nie  { return shift->type eq 'NIE'  }
 sub is_nif  { return shift->type eq 'NIF'  }
 sub is_nife { return shift->type eq 'NIFe' }
 sub is_cif  { return shift->type eq 'CIF'  }
 sub is_cife { return shift->type eq 'CIFe' }
 
-sub _provincia {
-  my $codigo = shift;
-
-  return PROVINCIAS->{$codigo} if $codigo =~ /^[0-9]{2}$/;
-  return undef;
-}
+sub vat  { return 'ES' . shift->nif; }
 
 sub _check_cif {
   my ($sociedad,$inscripcion,$control) = @_;
@@ -189,13 +183,19 @@ sub _check_cif {
   return 1;
 }
 
+sub _check_nif {
+  my ($NIF,$DC) = @_;
+
+  return substr( NIF_LETRAS , $NIF % 23, 1) eq $DC ? 1 : 0;
+}
+
 sub _validate_cif {
   my ($self,$sociedad, $inscripcion, $control) = @_;
 
   $self->status(_check_cif($sociedad, $inscripcion, $control));
-  $self->provincia(_provincia(substr($inscripcion,0,2)));
+  $self->provincia( PROVINCIAS->{ substr($inscripcion,0,2) });
 
-  $self->type('CIF');
+  $self->type ('CIF');
   $self->extra( CIF_EXTRA->{ $sociedad } );
 }
 
@@ -204,14 +204,8 @@ sub _validate_cife {
 
   $self->status(_check_cif($sociedad, $inscripcion, $control));
 
-  $self->type('CIFe');
+  $self->type ('CIFe');
   $self->extra( CIFe_EXTRA->{ $sociedad } );
-}
-
-sub _check_nif {
-  my ($NIF,$DC) = @_;
-
-  return substr( NIF_LETRAS , $NIF % 23, 1) eq $DC ? 1 : 0;
 }
 
 sub _validate_nif {
@@ -219,7 +213,7 @@ sub _validate_nif {
 
   $self->status(_check_nif(shift,shift));
 
-  $self->type('NIF');
+  $self->type ('NIF');
   $self->extra('NIF');
 }
 
@@ -228,7 +222,7 @@ sub _validate_nife {
 
   $self->status(_check_nif(shift,shift));
 
-  $self->type('NIFe'); 
+  $self->type ('NIFe'); 
   $self->extra('NIF Especial (KLM)');
 }
 
@@ -239,17 +233,25 @@ sub _validate_nie {
 
   $self->status(_check_nif($NIF,$DC));
 
-  $self->type('NIE');
+  $self->type ('NIE');
   $self->extra('NIE');
+}
+
+sub _normalize_nif {
+  my $nif = shift;
+
+  $nif =~ tr/-. //d;
+  
+  return uc($nif);
 }
 
 
 sub new {
   my ($class, %args) = @_;
+  my $self = bless { }, $class;
 
-  my $self = { vies => $args{vies} // 0 };
-  
-  $self = bless $self, $class;
+  $self->VIES( defined $args{vies} ? 1 : 0 );
+  $self->iso3166( defined $args{iso3166} ? 1 : 0 );
 
   $self->set($args{nif}) if defined $args{nif};
   
@@ -260,9 +262,6 @@ sub new {
 sub set {
   my $self = shift;
   my $nif  = shift;
-  my $vies = shift // 0;
-
-  $self->{vies} = 1 if $vies;
 
   unless (defined $nif) {
     $self->status(0);
@@ -270,9 +269,13 @@ sub set {
     return;
   }
 
-  $nif =~ tr/-. //d;
+  if ($nif =~ /^ES(.*)$/) {
+    $self->iso3166(1);
+    $nif = $1;    
+  }
+  
+  $self->nif(_normalize_nif($nif));
 
-  $self->nif(uc($nif));
   $self->check;
 }
 
@@ -291,7 +294,7 @@ sub check {
   elsif ($nif =~ RE_CIFe) { $self->_validate_cife($1, $2, $3); }
 
   if ( $self->status ) {
-    $self->vies() if $self->{vies};
+    $self->_check_vies() if $self->VIES;
     return;
   }
   
@@ -302,7 +305,7 @@ sub check {
 }
 
 
-sub vies {
+sub _check_vies {
   my $self = shift;
   my $nif  = $self->nif;
   
@@ -321,21 +324,21 @@ sub vies {
   eval {
     require Business::Tax::VAT::Validation;
     
-    my $vat = Business::Tax::VAT::Validation->new();
+    my $VatValidation = Business::Tax::VAT::Validation->new();
     
-    unless ($vat) {
+    unless ($VatValidation) {
       die "Error Business::Tax::VAT::Validation";
     }
     
-    $self->vies_check($vat->check('ES' . $nif));
+    $self->vies_check($VatValidation->check($self->vat));
     
     unless ($self->vies_check) {
-      $self->vies_error( $vat->get_last_error() // 'Error desconocido en VIES');
+      $self->vies_error( $VatValidation->get_last_error() // 'Error VIES');
     }
   };
   
   if ($@) {
-    $self->vies_error("Error cargando validación VIES: $@");
+    $self->vies_error("Error VIES: $@");
     $self->vies_check(0);
   }
 
@@ -356,16 +359,19 @@ Business::ES::NIF - Validate Spanish NIF, NIE and CIF numbers
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =head1 SYNOPSIS
 
     use Business::ES::NIF;
 
-    my $NIF = Business::ES::NIF->new( nif => '01234567L' , vies => 0);
+    my $NIF = Business::ES::NIF->new( nif => '01234567L' , vies => 0 , iso3166 => 0 );
+
+    $NIF->VIES(1);
 
     $NIF->set('B01234567');
-    $NIF->set('B01234567',1); <= Check VIES ( Business::Tax::VAT::Validation )
+
+    $NIF->set('ESB012345670');
 
     $NIF->status();
 
@@ -407,13 +413,35 @@ Se puede activar la comprobacion sobre el VIES ( Business::Tax::VAT::Validation 
 
 =head2 status
 
+    my $status = $obj->status;
+
 =head2 provincia
 
-my $city = $obj->provincia;
+    my $city = $obj->provincia;
+
+=head2 iso3166
+
+Activa el formato de salida compatible con ISO 3166-1 alpha-2. Si está habilitado, el método C<nif()> devolverá el número fiscal precedido por "ES".
+
+Por defecto, C<iso3166> está desactivado.
+
+=head2 vat
+
+Devuelve en formato ISO3166 con prefijo "ES"
+
+    my $vat = $obj->vat;
+
+=head2 VIES
+
+Se fija a 1 para validar
 
 =head2 vies_check
 
+    my $ok = $nif->vies_check;
+
 =head2 vies_error
+
+  warn $nif->vies_error unless $nif->vies_check;
 
 =head2 type
 
@@ -479,9 +507,9 @@ Devuelve verdadero si el tipo detectado es un CIF especial (entidades del estado
 
 =head2 check
 
-=head2 vies
+=head2 _check_vies
 
-Valida el NIF contra el sistema europeo VIES. Devuelve 1 si es correcto, 0 si no lo es.
+Valida el NIF contra el sistema europeo VIES. Devuelve 1 si es correcto.
 
 =head1 AUTHOR
 

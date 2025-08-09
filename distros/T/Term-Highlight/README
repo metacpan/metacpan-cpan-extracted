@@ -1,4 +1,4 @@
-Highlight version 2.2.0
+Highlight version 2.3.0
 =======================
 
 INSTALLATION
@@ -15,7 +15,7 @@ This module and script do not require any additional packages.
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2008-2023 by A. Radkov
+Copyright (C) 2008-2025 by A. Radkov
 
 This is free software; you can redistribute it and/or modify it
 under the same terms as the Perl 5 programming language system itself.

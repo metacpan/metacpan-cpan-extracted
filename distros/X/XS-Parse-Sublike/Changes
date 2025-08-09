@@ -1,5 +1,10 @@
 Revision history for XS-Parse-Sublike
 
+0.38    2025-08-08
+        [BUGFIXES]
+         * Improvements to handling of anonymous parameters or missing
+           defaulting expressions in subroutine signature parsing (RT168812)
+
 0.37    2025-02-07
         [CHANGES]
          * Added `xps_signature_query_*()` API

@@ -9,17 +9,18 @@ use Moo;
 use strictures 2;
 use File::Slurper qw(read_binary);
 use File::Temp qw(tempfile);
+use MIDI::RtController ();
 use MIDI::Simple ();
 use Music::Tempo qw(bpm_to_ms);
 use namespace::clean;
-
 use Exporter qw(import);
 our @EXPORT = qw(
-    get_score
     b
     c
     d
     e
+    g
+    i
     n
     o
     p
@@ -30,7 +31,7 @@ our @EXPORT = qw(
     x
 );
 
-our $VERSION = '0.0305';
+our $VERSION = '0.0402';
 
 my $self;
 
@@ -74,10 +75,6 @@ sub END {
     }
 }
 
-sub get_score {
-    return $self->score;
-}
-
 sub b {
     my ($bpm) = @_;
     $self->score->set_tempo(bpm_to_ms($bpm) * 1000);
@@ -94,6 +91,15 @@ sub d {
 sub e {
     my ($value) = @_;
     $self->play($value);
+}
+
+sub g {
+    return $self->score;
+}
+
+sub i {
+    my $rtc = MIDI::RtController->new(input => $_[0], output => $_[1], verbose => 1);
+    $rtc->run;
 }
 
 sub n {
@@ -151,11 +157,15 @@ idi - Easy, command-line MIDI
 
 =head1 SYNOPSIS
 
-  $ perl -Midi -E'x(qw(c1 f o5)); n(qw(qn Cs)); n("F"); n("Ds"); n(qw(hn Gs_d1))' | timidity -
+  perl -Midi -E 'x(qw(c1 f o5)); n(qw(qn Cs)); n("F"); n("Ds"); n(qw(hn Gs_d1))' | timidity -Od -
+  # or with fluidsynth
 
   # Compare with:
-  $ perl -MMIDI::Simple -E'new_score; noop qw(c1 f o5); n qw(qn Cs); n "F"; n "Ds"; n qw(hn Gs_d1); write_score shift()' idi.mid
-  $ timidity idi.mid
+  perl -MMIDI::Simple -E 'new_score; noop qw(c1 f o5); n qw(qn Cs); n "F"; n "Ds"; n qw(hn Gs_d1); write_score shift()' idi.mid
+  timidity -Od idi.mid
+
+  # Control a MIDI device (uniquely named "usb") in real-time
+  perl -Midi -E 'i(@ARGV)' keyboard usb
 
 =head1 DESCRIPTION
 
@@ -193,9 +203,14 @@ Play at end
 
 Default: C<1>
 
-=head2 get_score
+=head2 g
 
 Return the L<MIDI::Simple> score object.
+
+=head2 i
+
+Invoke L<MIDI::RtController> to control the second argument with the
+first.
 
 =head2 n
 
@@ -284,7 +299,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Gene Boggs.
+This software is Copyright (c) 2022-2025 by Gene Boggs.
 
 This is free software, licensed under: The Artistic License 2.0 (GPL Compatible)
 

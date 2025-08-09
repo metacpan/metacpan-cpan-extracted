@@ -10,9 +10,9 @@ requires "Dist::Zilla::Role::PrereqSource" => "0";
 requires "Dist::Zilla::Role::TextTemplate" => "0";
 requires "List::Util" => "1.45";
 requires "Moose" => "0";
-requires "Moose::Util::TypeConstraints" => "0";
 requires "Path::Tiny" => "0";
 requires "Sub::Exporter::ForMethods" => "0";
+requires "Types::Common" => "0";
 requires "experimental" => "0";
 requires "namespace::autoclean" => "0";
 requires "perl" => "v5.20.0";
@@ -33,6 +33,7 @@ on 'test' => sub {
   requires "Test::More" => "0";
   requires "Test::Warnings" => "0.009";
   requires "strict" => "0";
+  requires "utf8" => "0";
   requires "warnings" => "0";
 };
 

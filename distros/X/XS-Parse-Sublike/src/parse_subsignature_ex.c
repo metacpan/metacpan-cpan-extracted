@@ -677,9 +677,9 @@ static void S_parse_sigelem(pTHX_ struct SignatureParsingContext *sigctx, U32 fl
     }
 
     LEAVE;
-
-    lex_read_space(0);
   }
+
+  lex_read_space(0);
 
   if(lex_peek_unichar(0) == ':') {
     if(!permit_attributes)
@@ -732,7 +732,14 @@ static void S_parse_sigelem(pTHX_ struct SignatureParsingContext *sigctx, U32 fl
     if(lex_consume("=") ||
         (default_if_undef = lex_consume("//=")) ||
         (default_if_false = lex_consume("||="))) {
-      OP *defexpr = parse_termexpr(0);
+      OP *defexpr = parse_termexpr(PARSE_OPTIONAL);
+      if(PL_parser->error_count)
+        croak("Expected a defaulting expression for optional parameter");
+      if(!paramctx.is_named && !paramctx.varop) {
+        /* We permit `= undef` and the blank `=` but nothing else */
+        if(defexpr && defexpr->op_type != OP_UNDEF)
+          croak("Unnamed positional parameters cannot have defaulting expressions");
+      }
 
       if(paramctx.is_named) {
         OP *assignop = newUNOP(OP_CUSTOM, 0, defexpr);
@@ -757,7 +764,7 @@ static void S_parse_sigelem(pTHX_ struct SignatureParsingContext *sigctx, U32 fl
         paramctx.op    = defop;
         paramctx.defop = defop;
       }
-      else {
+      else if(paramctx.varop) {
         U8 private = 0;
 #ifdef OPpARG_IF_UNDEF
         if(default_if_undef) private |= OPpARG_IF_UNDEF;
@@ -769,6 +776,9 @@ static void S_parse_sigelem(pTHX_ struct SignatureParsingContext *sigctx, U32 fl
            */
           yyerror("This Perl version cannot handle if_undef/if_false defaulting expressions on positional parameters");
 #endif
+
+        if(!defexpr)
+          defexpr = newOP(OP_UNDEF, OPf_WANT_SCALAR);
 
         OP *defop = (OP *)alloc_LOGOP(OP_ARGDEFELEM, defexpr, LINKLIST(defexpr));
         defop->op_targ = (PADOFFSET)sigctx->n_elems;
@@ -786,6 +796,7 @@ static void S_parse_sigelem(pTHX_ struct SignatureParsingContext *sigctx, U32 fl
         paramctx.op    = paramctx.varop;
         paramctx.defop = defop;
       }
+      /* else this is `= undef` on anonymous param; nothing to do */
     }
     else {
       if(sigctx->n_optelems)

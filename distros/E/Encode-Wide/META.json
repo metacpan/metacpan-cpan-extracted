@@ -1,5 +1,5 @@
 {
-   "abstract" : "Convert wide characters (Unicode) into HTML or XML-safe ASCII entities",
+   "abstract" : "Convert wide characters (Unicode, UTF-8, etc.) into HTML or XML-safe ASCII entities",
    "author" : [
       "Nigel Horne <njh@nigelhorne.com>"
    ],
@@ -34,7 +34,7 @@
          "requires" : {
             "Exporter" : "0",
             "HTML::Entities" : "0",
-            "Params::Get" : "0",
+            "Params::Get" : "0.13",
             "Term::ANSIColor" : "0",
             "perl" : "5.010000"
          }
@@ -43,7 +43,8 @@
          "requires" : {
             "Test::DescribeMe" : "0",
             "Test::Most" : "0",
-            "Test::Needs" : "0"
+            "Test::Needs" : "0",
+            "Test::Returns" : "0"
          }
       }
    },
@@ -51,8 +52,8 @@
    "resources" : {
       "bugtracker" : {
          "mailto" : "bug-Encode-Wide@rt.cpan.org",
-         "web" : "https://github.com/nigelhorne/Encode-Wide/issues",
-         "x_url" : "https://github.com/nigelhorne/Encode-Wide/issues"
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Encode-Wide",
+         "x_url" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Encode-Wide"
       },
       "homepage" : "https://metacpan.org/pod/Encode::Wide",
       "repository" : {
@@ -62,6 +63,6 @@
          "x_repository" : "https://github.com/nigelhorne/Encode-Wide"
       }
    },
-   "version" : 0.03,
+   "version" : 0.05,
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

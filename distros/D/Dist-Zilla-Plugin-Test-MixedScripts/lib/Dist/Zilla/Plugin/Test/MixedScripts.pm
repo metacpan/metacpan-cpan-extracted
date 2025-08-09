@@ -11,7 +11,7 @@ use Path::Tiny;
 use Sub::Exporter::ForMethods 'method_installer';
 use Data::Section 0.004 { installer => method_installer }, '-setup';
 use Dist::Zilla::File::InMemory;
-use Moose::Util::TypeConstraints qw( role_type );
+use Types::Common qw( ArrayRef ConsumerOf NonEmptySimpleStr );
 
 use namespace::autoclean;
 
@@ -28,7 +28,7 @@ with
   },
   'Dist::Zilla::Role::PrereqSource';
 
-our $VERSION = 'v0.2.1';
+our $VERSION = 'v0.2.2';
 
 
 has filename => (
@@ -45,7 +45,7 @@ sub mvp_aliases { return { file => 'files', script => 'scripts' } }
 
 
 has files => (
-    isa => 'ArrayRef[Str]',
+    isa => ArrayRef[NonEmptySimpleStr],
     traits => ['Array'],
     handles => { files => 'elements' },
     lazy => 1,
@@ -55,13 +55,13 @@ has files => (
 
 has exclude => (
     is      => 'ro',
-    isa     => 'ArrayRef',
+    isa => ArrayRef[NonEmptySimpleStr],
     default => sub { [] },
 );
 
 
 has scripts => (
-    isa     => 'ArrayRef[Str]',
+    isa => ArrayRef[NonEmptySimpleStr],
     traits  => ['Array'],
     handles => { scripts => 'elements' },
     lazy    => 1,
@@ -71,7 +71,7 @@ has scripts => (
 
 has _file_obj => (
     is  => 'rw',
-    isa => role_type('Dist::Zilla::Role::File'),
+    isa => ConsumerOf[ 'Dist::Zilla::Role::File' ],
 );
 
 around dump_config => sub( $orig, $self ) {
@@ -79,7 +79,7 @@ around dump_config => sub( $orig, $self ) {
     $config->{ +__PACKAGE__ } = {
         filename => $self->filename,
         finder   => [ sort $self->finder->@* ],
-        scripts  => [ $self->scripts ],
+        scripts  => [ sort $self->scripts ],
         blessed($self) ne __PACKAGE__ ? ( version => $VERSION ) : (),
     };
     return $config;
@@ -100,13 +100,12 @@ sub gather_files($self) {
 
 sub munge_files($self) {
 
-    # Based on Dist::Zilla::Plugin::GatherDir
-    my $exclude = qr/\000/;
-    $exclude = qr/(?:$exclude)|$_/ for $self->exclude->@*;
+    my $pattern = join("|", map { "(?:$_)" } '\000', $self->exclude->@* );
+    my $exclude = qr/(?:$pattern)/;
 
     my @filenames = map { path( $_->name )->relative('.')->stringify }
       grep { not( $_->can('is_bytes') and $_->is_bytes ) }
-      grep { $_ !~ $exclude }
+      grep { $_->name !~ $exclude }
       $self->found_files->@*;
     push @filenames, $self->files;
     $self->log_debug( 'adding file ' . $_ ) for @filenames;
@@ -121,7 +120,7 @@ sub munge_files($self) {
                 dist      => \( $self->zilla ),
                 plugin    => \$self,
                 filenames => [ sort @filenames ],
-                scripts   => [ uniqstr @scripts ],
+                scripts   => [ sort ( uniqstr( @scripts ) ) ],
             },
         )
     );
@@ -151,7 +150,7 @@ Dist::Zilla::Plugin::Test::MixedScripts - author tests to ensure there is no mix
 
 =head1 VERSION
 
-version v0.2.1
+version v0.2.2
 
 =for stopwords Cushing Etheridge Florian Ragwitz Unicode
 

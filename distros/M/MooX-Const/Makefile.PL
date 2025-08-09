@@ -2,12 +2,12 @@
 use strict;
 use warnings;
 
-use 5.014000;
+use 5.020000;
 
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Syntactic sugar for constant and write-once Moo attributes",
+  "ABSTRACT" => "Syntactic sugar for constant and write-once Moo(se) attributes",
   "AUTHOR" => "Robert Rothenberg <rrwo\@cpan.org>",
   "BUILD_REQUIRES" => {
     "ExtUtils::MakeMaker" => "7.22",
@@ -18,15 +18,17 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "MooX-Const",
   "LICENSE" => "artistic_2",
-  "MIN_PERL_VERSION" => "5.014000",
+  "MIN_PERL_VERSION" => "5.020000",
   "NAME" => "MooX::Const",
   "PREREQ_PM" => {
     "Carp" => 0,
     "Devel::StrictMode" => 0,
     "Moo" => "1.006000",
     "Scalar::Util" => 0,
+    "Type::Tiny" => 0,
     "Types::Const" => "0.3.3",
     "Types::Standard" => 0,
+    "experimental" => 0,
     "namespace::autoclean" => 0,
     "utf8" => 0
   },
@@ -34,6 +36,7 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "Module::Metadata" => "1.000015",
     "Moo" => "1.006000",
+    "MooseX::MungeHas" => 0,
     "Test::More" => 0,
     "Test::Most" => 0,
     "if" => 0,
@@ -41,7 +44,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "v0.6.4",
+  "VERSION" => "v0.7.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -55,11 +58,14 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "Module::Metadata" => "1.000015",
   "Moo" => "1.006000",
+  "MooseX::MungeHas" => 0,
   "Scalar::Util" => 0,
   "Test::More" => 0,
   "Test::Most" => 0,
+  "Type::Tiny" => 0,
   "Types::Const" => "0.3.3",
   "Types::Standard" => 0,
+  "experimental" => 0,
   "if" => 0,
   "lib" => 0,
   "namespace::autoclean" => 0,

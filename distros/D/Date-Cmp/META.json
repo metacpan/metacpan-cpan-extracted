@@ -53,8 +53,8 @@
    "resources" : {
       "bugtracker" : {
          "mailto" : "bug-Date-Cmp@rt.cpan.org",
-         "web" : "https://github.com/nigelhorne/Date-Cmp/issues",
-         "x_url" : "https://github.com/nigelhorne/Date-Cmp/issues"
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Date-Cmp",
+         "x_url" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Date-Cmp"
       },
       "homepage" : "https://metacpan.org/pod/Date::Cmp",
       "repository" : {
@@ -64,6 +64,6 @@
          "x_repository" : "https://github.com/nigelhorne/Date-Cmp"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

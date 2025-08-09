@@ -3,6 +3,7 @@ package MooseTest;
 use Moose;
 
 use MooX::Const;
+use MooseX::MungeHas;
 use Types::Standard -types;
 
 use namespace::autoclean;

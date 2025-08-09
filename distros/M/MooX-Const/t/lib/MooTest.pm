@@ -38,4 +38,9 @@ has bop => (
     default => sub { { x => 1 } },
 );
 
+has cr => (
+    is  => 'ro',
+    isa => sub { die "ouch" unless $_[0] && $_[0] !~ /^0/ },
+);
+
 1;

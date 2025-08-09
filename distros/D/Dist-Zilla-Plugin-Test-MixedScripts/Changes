@@ -1,5 +1,19 @@
 Revision history for Dist-Zilla-Plugin-Test-MixedScripts:
 
+v0.2.2    2025-08-08 14:09:20+01:00 Europe/London
+  [Enhancements]
+  - Internal code improvements.
+
+  [Bug Fixes]
+  - Fixed the `exclude` attribute.
+
+  - The `scripts` are sorted to ensure consistently generated test scripts.
+
+  [Tests]
+  - Added more tests.
+
+  - Internal code improvements.
+
 v0.2.1    2025-08-07 16:48:15+01:00 Europe/London
   [Enhancements]
   - Internal code improvements.

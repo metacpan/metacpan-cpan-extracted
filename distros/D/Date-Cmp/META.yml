@@ -29,8 +29,8 @@ requires:
   Term::ANSIColor: '0'
   perl: '5.008'
 resources:
-  bugtracker: https://github.com/nigelhorne/Date-Cmp/issues
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Date-Cmp
   homepage: https://metacpan.org/pod/Date::Cmp
   repository: git://github.com/nigelhorne/Date-Cmp.git
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

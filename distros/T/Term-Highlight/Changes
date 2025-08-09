@@ -1,6 +1,9 @@
 Revision history for Perl module Term::Highlight and script hl.
 
 
+2025/08/08 - Version 2.3.0 - add option '-ra' in the head of snippet arguments
+                to enable seamless usage of multiple snippets simultaneously.
+
 2023/05/09 - Version 2.2.0 - a new hl option -gitignore to skip not tracked or
                 ignored files in git repositories, effective in recursive grep.
 

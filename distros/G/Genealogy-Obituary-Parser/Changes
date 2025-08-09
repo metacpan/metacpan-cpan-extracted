@@ -1,0 +1,8 @@
+Revision history for Genealogy::Obituary::Parser
+
+0.02	Fri Aug  8 09:40:16 EDT 2025
+	Return DateTime and locations where possible
+	Rename to Genealogy::Obituary::Parser
+
+0.01	Thu Jun  5 15:10:27 EDT 2025
+        First draft

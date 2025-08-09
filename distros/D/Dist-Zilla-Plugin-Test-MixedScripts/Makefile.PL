@@ -30,9 +30,9 @@ my %WriteMakefileArgs = (
     "Dist::Zilla::Role::TextTemplate" => 0,
     "List::Util" => "1.45",
     "Moose" => 0,
-    "Moose::Util::TypeConstraints" => 0,
     "Path::Tiny" => 0,
     "Sub::Exporter::ForMethods" => 0,
+    "Types::Common" => 0,
     "experimental" => 0,
     "namespace::autoclean" => 0
   },
@@ -47,9 +47,10 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Warnings" => "0.009",
     "strict" => 0,
+    "utf8" => 0,
     "warnings" => 0
   },
-  "VERSION" => "v0.2.1",
+  "VERSION" => "v0.2.2",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -71,7 +72,6 @@ my %FallbackPrereqs = (
   "List::Util" => "1.45",
   "Module::Metadata" => "1.000015",
   "Moose" => 0,
-  "Moose::Util::TypeConstraints" => 0,
   "Path::Tiny" => 0,
   "Sub::Exporter::ForMethods" => 0,
   "Test2::V0" => 0,
@@ -79,9 +79,11 @@ my %FallbackPrereqs = (
   "Test::MixedScripts" => "0.3.0",
   "Test::More" => 0,
   "Test::Warnings" => "0.009",
+  "Types::Common" => 0,
   "experimental" => 0,
   "namespace::autoclean" => 0,
   "strict" => 0,
+  "utf8" => 0,
   "warnings" => 0
 );
 

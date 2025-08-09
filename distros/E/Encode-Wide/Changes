@@ -1,5 +1,12 @@
 Revision history for Encode::Wide
 
+0.05	Fri Aug  8 16:57:40 EDT 2025
+	Use tables to reduce the scanning of the input
+	Allow the input to be a ref to a string
+
+0.04	Tue Jul 22 20:42:18 EDT 2025
+	Trap &excl; in XML
+
 0.03	Sun Jul 20 11:22:05 EDT 2025
 	Added – (ndash) and U2018/U2019 encoding in wide_to_xml
 	Better debug message now dumps the errant bytes

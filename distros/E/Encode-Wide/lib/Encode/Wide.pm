@@ -8,7 +8,7 @@ use warnings;
 
 use Exporter qw(import);
 use HTML::Entities;
-use Params::Get;
+use Params::Get 0.13;
 use Term::ANSIColor;
 
 our @EXPORT_OK = qw(wide_to_html wide_to_xml);
@@ -27,15 +27,15 @@ our @EXPORT_OK = qw(wide_to_html wide_to_xml);
 
 =head1 NAME
 
-Encode::Wide - Convert wide characters (Unicode) into HTML or XML-safe ASCII entities
+Encode::Wide - Convert wide characters (Unicode, UTF-8, etc.) into HTML or XML-safe ASCII entities
 
 =head1 VERSION
 
-0.03
+0.05
 
 =cut
 
-our $VERSION = 0.03;
+our $VERSION = 0.05;
 
 =head1 SYNOPSIS
 
@@ -50,9 +50,13 @@ our $VERSION = 0.03;
 =head1 DESCRIPTION
 
 Encode::Wide provides functions for converting wide (Unicode) characters into ASCII-safe
-formats suitable for embedding in HTML or XML documents. It is especially useful
-when dealing with text containing accented or typographic characters that need
+formats suitable for embedding in HTML or XML documents.
+It is especially useful when dealing with text containing accented or typographic characters that need
 to be safely represented in markup.
+
+Other modules exist to do this,
+however they tend to have assumptions on the input,
+whereas this should work with UTF-8, Unicode, or anything that's common.
 
 The module offers two exportable functions:
 
@@ -60,8 +64,9 @@ The module offers two exportable functions:
 
 =item * C<wide_to_html(string => $text)>
 
-Converts Unicode characters in the input string to their named HTML entities if available,
-or hexadecimal numeric entities otherwise. Common characters such as `é`, `à`, `&`, `<`, `>` are
+Converts all non-ASCII characters in the input string to their named HTML entities if available,
+or hexadecimal numeric entities otherwise.
+Common characters such as `é`, `à`, `&`, `<`, `>` are
 converted to their standard HTML representations like `&eacute;`, `&agrave;`, `&amp;`, etc.
 
 =item * C<wide_to_xml(string => $text)>
@@ -84,8 +89,9 @@ Both functions accept a named parameter:
 
 =head1 ENCODING
 
-Input strings are expected to be valid UTF-8. If a byte string is passed, the module will attempt
-to decode it appropriately. Output is guaranteed to be pure ASCII.
+Input strings are expected to be valid UTF-8 or Unicode.
+If a byte string is passed, the module will attempt to decode it appropriately.
+Output is guaranteed to be pure ASCII.
 
 =head1 EXPORT
 
@@ -113,6 +119,10 @@ sub wide_to_html
 		die 'BUG: wide_to_html() string not set';
 	}
 
+	if(ref($string) eq 'SCALAR') {
+		$string = ${$string};
+	}
+
 	# print STDERR __LINE__, ": ($string)";
 	# print STDERR (sprintf '%v02X', $string);
 	# print STDERR "\n";
@@ -123,143 +133,185 @@ sub wide_to_html
 
 	$string = HTML::Entities::decode($string);
 	# $string =~ s/ & / &amp; /g;
-	$string =~ s/&ccaron;/č/g;	# I don't think HTML::Entities does this
-	$string =~ s/&zcaron;/ž/g;	# I don't think HTML::Entities does this
-	$string =~ s/&Scaron;/Š/g;	# I don't think HTML::Entities does this
+
+	# I don't think HTML::Entities does these
+	my %entity_map = (
+		'&ccaron;' => 'č',
+		'&zcaron;' => 'ž',
+		'&Scaron;' => 'Š',
+	);
+
+	$string =~ s{
+		# ([\x80-\x{10FFFF}])
+		(.)
+	}{
+		my $cp = $1;
+		exists $entity_map{$cp}
+			? $entity_map{$cp}
+			: $cp
+	}gex;
 
 	# Escape only if it's not already part of an entity
 	$string =~ s/&(?![A-Za-z#0-9]+;)/&amp;/g;
 
 	unless($params->{'keep_hrefs'}) {
-		$string =~ s/</&lt;/g;
-		$string =~ s/>/&gt;/g;
-		$string =~ s/"/&quot;/g;
+		%entity_map = (
+			'<' => '&lt;',
+			'>' => '&gt;',
+			'"' => '&quot;',
+		);
+		$string =~ s{(.)}{
+			my $cp = $1;
+			exists $entity_map{$cp}
+				? $entity_map{$cp}
+				: $cp
+		}gex;
 	}
-
-	$string =~ s/\xe2\x80\x9c/&quot;/g;	# “
-	$string =~ s/\xe2\x80\x9d/&quot;/g;	# ”
-	$string =~ s/“/&quot;/g;	# U+201C
-	$string =~ s/”/&quot;/g;	# U+201D
 
 	# $string =~ s/&db=/&amp;db=/g;
 	# $string =~ s/&id=/&amp;id=/g;
 
-	$string =~ s/\xe2\x80\x93/&ndash;/g;
-	$string =~ s/\xe2\x80\x94/&mdash;/g;
-	$string =~ s/\xe2\x80\x98/&apos;/g;	# ‘
-	$string =~ s/\xe2\x80\x99/&apos;/g;	# ’
-	$string =~ s/\xe2\x80\xA6/.../g;	# …
+	# Table of byte-sequences->entities
+	my @byte_map = (
+		['“', '&quot;'],	# U+201C
+		['”', '&quot;'],	# U+201D
+		["\xe2\x80\x9c", '&quot;'],	# “
+		["\xe2\x80\x9d", '&quot;'],	# ”
+		["\xe2\x80\x93", '&ndash;'],
+		["\xe2\x80\x94", '&mdash;'],
+		["\xe2\x80\x98", '&apos;'],	# ‘
+		["\xe2\x80\x99", '&apos;'],	# ’
+		["\xe2\x80\xA6", '...']	# …
+	);
+
+	$string = _sub_map(\$string, \@byte_map);
+
 	unless($params->{'keep_apos'}) {
 		# We can't combine since each char in the multi-byte matches, not the entire multi-byte
 		# $string =~ s/['‘’‘\x98]/&apos;/g;
-		$string =~ s/'/&apos;/g;
-		$string =~ s/‘/&apos;/g;
-		$string =~ s/’/&apos;/g;
-		$string =~ s/‘/&apos;/g;
-		$string =~ s/\x98/&apos;/g;
+		%entity_map = (
+			"'" => '&apos;',
+			'‘' => '&apos;',
+			'’' => '&apos;',
+			'‘' => '&apos;',
+			"\x98" => '&apos;',
+		);
+
+		$string =~ s{
+			# ([\x80-\x{10FFFF}])
+			(.)
+		}{
+			my $cp = $1;
+			exists $entity_map{$cp}
+				? $entity_map{$cp}
+				: $cp
+		}gex;
 	}
 
 	if($string !~ /[^[:ascii:]]/) {
 		return $string;
 	}
 
-	$string =~ s/\xc2\xa0/ /g;	# Non breaking space
-	$string =~ s/\xc2\xa3/&pound;/g;
-	$string =~ s/\xc2\xa9/&copy;/g;
-	$string =~ s/\xc2\xaa/&ordf;/g;	# ª
-	$string =~ s/\xc2\xab/&quot;/g;	# «
-	$string =~ s/\xc2\xae/&reg;/g;
-	$string =~ s/\xc2\xbb/&quot;/g;	# »
-	$string =~ s/\xc3\x81/&Aacute;/g;	# Á
-	$string =~ s/\xc3\x83/&Icirc;/g;	# Î
-	$string =~ s/\xc3\x9e/&THORN;/g;	# Þ
-	$string =~ s/\xc3\xa0/&agrave;/g;	# à
-	$string =~ s/\xc3\xa1/&aacute;/g;	# á
-	$string =~ s/\xc3\xa2/&acirc;/g;
-	$string =~ s/\xc3\xa4/&auml;/g;
-	$string =~ s/\xc3\xa9/&eacute;/g;
-	$string =~ s/\xc3\xad/&iacute;/g;	# í
-	$string =~ s/\xc3\xb0/&eth;/g;	# ð
-	$string =~ s/\xc3\xba/&uacute;/g;	# ú
-	$string =~ s/\xc3\xb4/&ocirc;/g;	# ô
-	$string =~ s/\xc3\xb6/&ouml;/g;
-	$string =~ s/\xc3\xb8/&oslash;/g;	# ø
-	$string =~ s/\xc5\xa1/&scaron;/g;
-	$string =~ s/\xc4\x8d/&ccaron;/g;
-	$string =~ s/\xc5\xbe/&zcaron;/g;
-	$string =~ s/\xc3\xa5/&aring;/g;	# å
-	$string =~ s/\xc3\xa7/&ccedil;/g;
-	$string =~ s/\xc3\xaf/&iuml;/g;	# ï
-	$string =~ s/\xc3\xb3/&oacute;/g;
-	$string =~ s/\xc3\x96/&Ouml;/g; # Ö
-	$string =~ s/\xc3\xa8/&egrave;/g;
-	$string =~ s/\xc3\x89/&Eacute;/g;
-	$string =~ s/\xc3\x9f/&szlig;/g;
-	$string =~ s/\xc3\xaa/&ecirc;/g;
-	$string =~ s/\xc3\xab/&euml;/g;
-	$string =~ s/\xc3\xae/&icirc;/g;
-	$string =~ s/\xc3\xbb/&ucirc;/g;
-	$string =~ s/\xc3\xbc/&uuml;/g; # ü
-	$string =~ s/\xc3\xbe/&thorn;/g;	# þ
-	$string =~ s/\xc5\x9b/&sacute;/g;
-	$string =~ s/\xc5\xa0/&Scaron;/g;
-	$string =~ s/\xe2\x80\x93/&ndash;/g;
-	$string =~ s/\xe2\x80\x94/&mdash;/g;
-	$string =~ s/\xc3\xb1/&ntilde;/g;	# ñ
-	$string =~ s/\xe2\x80\x9c/&quot;/g;
-	$string =~ s/\xe2\x80\x9d/&quot;/g;
-	$string =~ s/\xe2\x80\xa6/.../g;
-	$string =~ s/\xe2\x97\x8f/&#x25CF;/g;	# ●
+	@byte_map = (
+		["\xc2\xa0", ' '],	# Non breaking space
+		["\xc2\xa3", '&pound;'],
+		["\xc2\xa9", '&copy;'],
+		["\xc2\xae", '&reg;'],
+		["\xc3\xa2", '&acirc;'],
+		["\xc3\xa4", '&auml;'],
+		["\xc3\xa9", '&eacute;'],
+		["\xc2\xaa", '&ordf;'],	# ª
+		["\xc2\xab", '&quot;'],	# «
+		["\xc2\xbb", '&quot;'],	# »
+		["\xc3\x81", '&Aacute;'],	# Á
+		["\xc3\x83", '&Icirc;'],	# Î
+		["\xc3\x9e", '&THORN;'],	# Þ
+		["\xc3\xa0", '&agrave;'],	# à
+		["\xc3\xa1", '&aacute;'],	# á
+		["\xc3\xad", '&iacute;'],	# í
+		["\xc3\xb0", '&eth;'],	# ð
+		["\xc3\xba", '&uacute;'],	# ú
+		["\xc3\xb4", '&ocirc;'],	# ô
+		["\xc3\xb6", '&ouml;'],
+		["\xc3\xb8", '&oslash;'],	# ø
+		["\xc5\xa1", '&scaron;'],
+		["\xc4\x8d", '&ccaron;'],
+		["\xc5\xbe", '&zcaron;'],
+		["\xc3\xa5", '&aring;'],	# å
+		["\xc3\xa7", '&ccedil;'],
+		["\xc3\xaf", '&iuml;'],	# ï
+		["\xc3\xb3", '&oacute;'],
+		["\xc3\x96", '&Ouml;'], # Ö
+		["\xc3\xa8", '&egrave;'],
+		["\xc3\x89", '&Eacute;'],
+		["\xc3\x9f", '&szlig;'],
+		["\xc3\xaa", '&ecirc;'],
+		["\xc3\xab", '&euml;'],
+		["\xc3\xae", '&icirc;'],
+		["\xc3\xbb", '&ucirc;'],
+		["\xc3\xbc", '&uuml;'], # ü
+		["\xc3\xbe", '&thorn;'],	# þ
+		["\xc5\x9b", '&sacute;'],
+		["\xc5\xa0", '&Scaron;'],
+		["\xe2\x80\x93", '&ndash;'],
+		["\xe2\x80\x94", '&mdash;'],
+		["\xc3\xb1", '&ntilde;'],	# ñ
+		["\xe2\x80\x9c", '&quot;'],
+		["\xe2\x80\x9d", '&quot;'],
+		["\xe2\x80\xa6", '...'],
+		["\xe2\x97\x8f", '&#x25CF;'],	# ●
+		["\N{U+00A0}", ' '],
+		["\N{U+00A3}", '&pound;'],
+		["\N{U+00A9}", '&copy;'],
+		["\N{U+00AA}", '&ordf;'],	# ª
+		["\N{U+00AB}", '&quot;'],	# «
+		["\N{U+00AE}", '&reg;'],
+		["\N{U+00BB}", '&quot;'],	# »
+		["\N{U+00CE}", '&Icirc;'],	# Î
+		["\N{U+00DE}", '&THORN;'],	# Þ
+		["\N{U+0161}", '&scaron;'],
+		["\N{U+010D}", '&ccaron;'],
+		["\N{U+017E}", '&zcaron;'],
+		["\N{U+00C9}", '&Eacute;'],
+		["\N{U+00D6}", '&Ouml;'],	# Ö
+		["\N{U+00DF}", '&szlig;'],	# ß
+		["\N{U+00E1}", '&aacute;'],	# á
+		["\N{U+00E2}", '&acirc;'],
+		["\N{U+00E4}", '&auml;'],
+		["\N{U+00E5}", '&aring;'],	# å
+		["\N{U+00E7}", '&ccedil;'],	# ç
+		["\N{U+00E8}", '&egrave;'],
+		["\N{U+00E9}", '&eacute;'],
+		["\N{U+00ED}", '&iacute;'],	# í
+		["\N{U+00EE}", '&icirc;'],
+		["\N{U+00EF}", '&iuml;'],	# ï
+		["\N{U+00F0}", '&eth;'],	# ð
+		["\N{U+00F1}", '&ntilde;'],	# ñ
+		["\N{U+00F4}", '&ocirc;'],	# ô
+		["\N{U+00F6}", '&ouml;'],
+		["\N{U+00F8}", '&oslash;'],	# ø
+		["\N{U+00FA}", '&uacute;'],	# ú
+		["\N{U+00FC}", '&uuml;'],	# ü
+		["\N{U+00FE}", '&thorn;'],	# þ
+		["\N{U+00C1}", '&Aacute;'],	# Á
+		["\N{U+00C9}", '&Eacute;'],
+		["\N{U+00CA}", '&ecirc;'],
+		["\N{U+00EB}", '&euml;'],
+		["\N{U+00F3}", '&oacute;'],
+		["\N{U+015B}", '&sacute;'],
+		["\N{U+00FB}", '&ucirc;'],
+		["\N{U+0160}", '&Scaron;'],
+		["\N{U+2013}", '&ndash;'],
+		["\N{U+2014}", '&mdash;'],
+		["\N{U+2018}", '&quot;'],
+		["\N{U+2019}", '&quot;'],
+		["\N{U+201C}", '&quot;'],
+		["\N{U+201D}", '&quot;'],
+		["\N{U+2026}", '...'],	# …
+		["\N{U+25CF}", '&#x25CF;'],	# ●
+	);
 
-	$string =~ s/\N{U+00A0}/ /g;
-	$string =~ s/\N{U+00A3}/&pound;/g;
-	$string =~ s/\N{U+00A9}/&copy;/g;
-	$string =~ s/\N{U+00AA}/&ordf;/g;	# ª
-	$string =~ s/\N{U+00AB}/&quot;/g;	# «
-	$string =~ s/\N{U+00AE}/&reg;/g;
-	$string =~ s/\N{U+00BB}/&quot;/g;	# »
-	$string =~ s/\N{U+00CE}/&Icirc;/g;	# Î
-	$string =~ s/\N{U+00DE}/&THORN;/g;	# Þ
-	$string =~ s/\N{U+0161}/&scaron;/g;
-	$string =~ s/\N{U+010D}/&ccaron;/g;
-	$string =~ s/\N{U+017E}/&zcaron;/g;
-	$string =~ s/\N{U+00C9}/&Eacute;/g;
-	$string =~ s/\N{U+00D6}/&Ouml;/g;	# Ö
-	$string =~ s/\N{U+00DF}/&szlig;/g;	# ß
-	$string =~ s/\N{U+00E1}/&aacute;/g;	# á
-	$string =~ s/\N{U+00E2}/&acirc;/g;
-	$string =~ s/\N{U+00E4}/&auml;/g;
-	$string =~ s/\N{U+00E5}/&aring;/g;	# å
-	$string =~ s/\N{U+00E7}/&ccedil;/g;	# ç
-	$string =~ s/\N{U+00E8}/&egrave;/g;
-	$string =~ s/\N{U+00E9}/&eacute;/g;
-	$string =~ s/\N{U+00ED}/&iacute;/g;	# í
-	$string =~ s/\N{U+00EE}/&icirc;/g;
-	$string =~ s/\N{U+00EF}/&iuml;/g;	# ï
-	$string =~ s/\N{U+00F0}/&eth;/g;	# ð
-	$string =~ s/\N{U+00F1}/&ntilde;/g;	# ñ
-	$string =~ s/\N{U+00F4}/&ocirc;/g;	# ô
-	$string =~ s/\N{U+00F6}/&ouml;/g;
-	$string =~ s/\N{U+00F8}/&oslash;/g;	# ø
-	$string =~ s/\N{U+00FA}/&uacute;/g;	# ú
-	$string =~ s/\N{U+00FC}/&uuml;/g;	# ü
-	$string =~ s/\N{U+00FE}/&thorn;/g;	# þ
-	$string =~ s/\N{U+00C1}/&Aacute;/g;	# Á
-	$string =~ s/\N{U+00C9}/&Eacute;/g;
-	$string =~ s/\N{U+00CA}/&ecirc;/g;
-	$string =~ s/\N{U+00EB}/&euml;/g;
-	$string =~ s/\N{U+00F3}/&oacute;/g;
-	$string =~ s/\N{U+015B}/&sacute;/g;
-	$string =~ s/\N{U+00FB}/&ucirc;/g;
-	$string =~ s/\N{U+0160}/&Scaron;/g;
-	$string =~ s/\N{U+2013}/&ndash;/g;
-	$string =~ s/\N{U+2014}/&mdash;/g;
-	$string =~ s/\N{U+2018}/&quot;/g;
-	$string =~ s/\N{U+2019}/&quot;/g;
-	$string =~ s/\N{U+201C}/&quot;/g;
-	$string =~ s/\N{U+201D}/&quot;/g;
-	$string =~ s/\N{U+2026}/.../g;	# …
-	$string =~ s/\N{U+25CF}/&#x25CF;/g;	# ●
+	$string = _sub_map(\$string, \@byte_map);
 
 	# utf8::encode($string);
 	# $string =~ s/š/&scaron;/g;
@@ -306,50 +358,52 @@ sub wide_to_html
 	# $string =~ s/\N{U+0160}/&Scaron;/g;	# FIXME: also above
 	# $string =~ s/\N{U+2013}/-/g;
 
-	$string =~ s/Á/&Aacute;/g;
-	$string =~ s/å/&aring;/g;
-	$string =~ s/ª/&ordf;/g;
-	$string =~ s/š/&scaron;/g;
-	$string =~ s/Š/&Scaron;/g;
-	$string =~ s/č/&ccaron;/g;
-	$string =~ s/ž/&zcaron;/g;
-	$string =~ s/á/&aacute;/g;
-	$string =~ s/â/&acirc;/g;
-	$string =~ s/é/&eacute;/g;
-	$string =~ s/è/&egrave;/g;
-	$string =~ s/ç/&ccedil;/g;
-	$string =~ s/ê/&ecirc;/g;
-	$string =~ s/ë/&euml;/g;
-	$string =~ s/ð/&eth;/g;
-	$string =~ s/í/&iacute;/g;
-	$string =~ s/ï/&iuml;/g;
-	$string =~ s/Î/&Iicrc;/g;
-	$string =~ s/©/&copy;/g;
-	$string =~ s/®/&reg;/g;
-	$string =~ s/ó/&oacute;/g;
-	$string =~ s/ô/&ocirc;/g;
-	$string =~ s/ö/&ouml;/g;
-	$string =~ s/ø/&oslash;/g;
-	$string =~ s/ś/&sacute;/g;
-	$string =~ s/Þ/&THORN;/g;
-	$string =~ s/þ/&thorn;/g;
-	$string =~ s/û/&ucirc;/g;
-	$string =~ s/ü/&uuml;/g;
-	$string =~ s/ú/&uacute;/g;
-	$string =~ s/£/&pound;/g;
-	$string =~ s/ß/&szlig;/g;
-	$string =~ s/–/&ndash;/g;
-	$string =~ s/—/&mdash;/g;
-	$string =~ s/ñ/&ntilde;/g;
-	# See above
-	# $string =~ s/[“”«»]/&quot;/g;
-	$string =~ s/“/&quot;/g;
-	$string =~ s/”/&quot;/g;
-	$string =~ s/«/&quot;/g;
-	$string =~ s/»/&quot;/g;
-	$string =~ s/…/.../g;
-	$string =~ s/●/&#x25CF;/g;
-	$string =~ s/\x80$/ /;
+	@byte_map = (
+		[ 'Á', '&Aacute;' ],
+		[ 'å', '&aring;' ],
+		[ 'ª', '&ordf;' ],
+		[ 'š', '&scaron;' ],
+		[ 'Š', '&Scaron;' ],
+		[ 'č', '&ccaron;' ],
+		[ 'ž', '&zcaron;' ],
+		[ 'á', '&aacute;' ],
+		[ 'â', '&acirc;' ],
+		[ 'é', '&eacute;' ],
+		[ 'è', '&egrave;' ],
+		[ 'ç', '&ccedil;' ],
+		[ 'ê', '&ecirc;' ],
+		[ 'ë', '&euml;' ],
+		[ 'ð', '&eth;' ],
+		[ 'í', '&iacute;' ],
+		[ 'ï', '&iuml;' ],
+		[ 'Î', '&Iicrc;' ],
+		[ '©', '&copy;' ],
+		[ '®', '&reg;' ],
+		[ 'ó', '&oacute;' ],
+		[ 'ô', '&ocirc;' ],
+		[ 'ö', '&ouml;' ],
+		[ 'ø', '&oslash;' ],
+		[ 'ś', '&sacute;' ],
+		[ 'Þ', '&THORN;' ],
+		[ 'þ', '&thorn;' ],
+		[ 'û', '&ucirc;' ],
+		[ 'ü', '&uuml;' ],
+		[ 'ú', '&uacute;' ],
+		[ '£', '&pound;' ],
+		[ 'ß', '&szlig;' ],
+		[ '–', '&ndash;' ],
+		[ '—', '&mdash;' ],
+		[ 'ñ', '&ntilde;' ],
+		[ '“', '&quot;' ],
+		[ '”', '&quot;' ],
+		[ '«', '&quot;' ],
+		[ '»', '&quot;' ],
+		[ '…', '...' ],
+		[ '●', '&#x25CF;' ],
+		[ "\x80\$", ' ' ],
+	);
+
+	$string = _sub_map(\$string, \@byte_map);
 
 	# if($string =~ /^Maria\(/) {
 		# # print STDERR (unpack 'H*', $string);
@@ -406,6 +460,10 @@ sub wide_to_xml
 		die 'BUG: string not set';
 	}
 
+	if(ref($string) eq 'SCALAR') {
+		$string = ${$string};
+	}
+
 	# print STDERR __LINE__, ": ($string)";
 	# print STDERR (sprintf '%v02X', $string);
 	# print STDERR "\n";
@@ -419,21 +477,29 @@ sub wide_to_xml
 	# print STDERR __LINE__, ": ($string)\n";
 
 	# $string =~ s/&amp;/&/g;
-	$string =~ s/&ccaron;/č/g;	# I don't think HTML::Entities does this
-	$string =~ s/&zcaron;/ž/g;	# I don't think HTML::Entities does this
-	$string =~ s/&Scaron;/Š/g;	# I don't think HTML::Entities does this
+
+	# I don't think HTML::Entities does these
+	my %entity_map = (
+		'&ccaron;' => 'č',
+		'&zcaron;' => 'ž',
+		'&Scaron;' => 'Š',
+	);
+
+	$string =~ s{
+		# ([\x80-\x{10FFFF}])
+		(.)
+	}{
+		my $cp = $1;
+		exists $entity_map{$cp}
+			? $entity_map{$cp}
+			: $cp
+	}gex;
 
 	# Escape only if it's not already part of an entity
 	$string =~ s/&(?![A-Za-z#0-9]+;)/&amp;/g;
 
 	unless($params->{'keep_hrefs'}) {
-		# $string =~ s/</&lt;/g;
-		# $string =~ s/>/&gt;/g;
-		# $string =~ s/"/&quot;/g;
-		# $string =~ s/“/&quot;/g;	# U+201C
-		# $string =~ s/”/&quot;/g;	# U+201D
-
-		my %replacements = (
+		%entity_map = (
 			'<' => '&lt;',
 			'>' => '&gt;',
 			'"' => '&quot;',
@@ -441,68 +507,88 @@ sub wide_to_xml
 			'”' => '&quot;',	# U+201D
 		);
 
-		$string =~ s/([<>“”"])/$replacements{$1} || $1/eg;
+		$string =~ s{(.)}{
+			my $cp = $1;
+			exists $entity_map{$cp}
+				? $entity_map{$cp}
+				: $cp
+		}gex;
 	}
-
-	$string =~ s/\xe2\x80\x9c/&quot;/g;	# “
-	$string =~ s/\xe2\x80\x9d/&quot;/g;	# ”
-	$string =~ s/“/&quot;/g;	# U+201C
-	$string =~ s/”/&quot;/g;	# U+201D
 
 	# $string =~ s/‘/&apos;/g;
 	# $string =~ s/’/&apos;/g;
 	# $string =~ s/‘/&apos;/g;
 	# $string =~ s/‘/&apos;/g;
 	# $string =~ s/\x98/&apos;/g;
-	$string =~ s/\xe2\x80\x93/&ndash;/g;
-	$string =~ s/\xe2\x80\x94/&mdash;/g;
-	$string =~ s/\xe2\x80\x98/&apos;/g;	# ‘
-	$string =~ s/\xe2\x80\x99/&apos;/g;	# ’
-	$string =~ s/\xe2\x80\xA6/.../g;	# …
 	# $string =~ s/['‘’‘\x98]/&apos;/g;
-	$string =~ s/'/&apos;/g;
-	$string =~ s/‘/&apos;/g;
-	$string =~ s/’/&apos;/g;
-	$string =~ s/‘/&apos;/g;
-	$string =~ s/\x98/&apos;/g;
 
-	$string =~ s/&Aacute;/&#x0C1;/g;	# Á
-	$string =~ s/&aring;/&#x0E5;/g;	# å
-	$string =~ s/&ccaron;/&#x10D;/g;
-	$string =~ s/&agrave;/&#x0E0;/g;	# á
-	$string =~ s/&aacute;/&#x0E1;/g;	# á
-	$string =~ s/&acirc;/&#x0E2;/g;		# â
-	$string =~ s/&auml;/&#x0E4;/g;		# ä
-	$string =~ s/&ccedil;/&#x0E7;/g;	# ç
-	$string =~ s/&egrave;/&#x0E8;/g;
-	$string =~ s/&eacute;/&#x0E9;/g;
-	$string =~ s/&ecirc;/&#x0EA;/g;
-	$string =~ s/&euml;/&#x0EB;/g;	# euml
-	$string =~ s/&Icirc;/&#x0CE;/g;	# Î
-	$string =~ s/&Eacute;/&#x0C9;/g;
-	$string =~ s/&szlig;/&#x0DF;/g;	# ß
-	$string =~ s/&iacute;/&#xED;/g;	# í
-	$string =~ s/&icirc;/&#x0EE;/g;
-	$string =~ s/&iuml;/&#x0EF;/g;	# ï
-	$string =~ s/&eth;/&#x0F0;/g;	# ð
-	$string =~ s/&uacute;/&#0FA;/g;	# ú
-	$string =~ s/&uuml;/&#x0FC;/g;
-	$string =~ s/&scaron;/&#x161;/g;
-	$string =~ s/&oacute;/&#x0F3;/g;	# ó
-	$string =~ s/&ucirc;/&#x0F4;/g;
-	$string =~ s/&ouml;/&#x0F6;/g;
-	$string =~ s/&ordf;/&#x0AA;/g;	# ª
-	$string =~ s/&oslash;/&#x0F8;/g;	# ø
-	$string =~ s/&zcaron;/&#x17E;/g;
-	$string =~ s/&Scaron;/&#x160;/g;
-	$string =~ s/&THORN;/&#x0DE;/g;	# Þ
-	$string =~ s/&thorn;/&#x0FE;/g;	# þ
-	$string =~ s/&copy;/&#x0A9;/g;
-	$string =~ s/&reg;/&#x0AE;/g;
-	$string =~ s/&pound;/&#163;/g;
-	$string =~ s/&ntilde;/&#x0F1;/g;
-	$string =~ s/&mdash;/-/g;
-	$string =~ s/&ndash;/-/g;
+	# Table of byte-sequences->entities
+	my @byte_map = (
+		[ "\xe2\x80\x9c", '&quot;' ],	# “
+		[ "\xe2\x80\x9d", '&quot;' ],	# ”
+		[ '“', '&quot;' ],	# U+201C
+		[ '”', '&quot;' ],	# U+201D
+		[ "\xe2\x80\x93", '-' ],	# ndash
+		[ "\xe2\x80\x94", '-' ],	# mdash
+		[ "\xe2\x80\x98", '&apos;' ],	# ‘
+		[ "\xe2\x80\x99", '&apos;' ],	# ’
+		[ "\xe2\x80\xA6", '...' ],	# …
+		[ "'", '&apos;' ],
+		[ '‘', '&apos;' ],
+		[ '’', '&apos;' ],
+		[ '‘', '&apos;' ],
+		[ "\x98", '&apos;' ],
+	);
+
+	$string = _sub_map(\$string, \@byte_map);
+
+	%entity_map = (
+		'&copy;' => '&#x0A9;',
+		'&Aacute;' => '&#x0C1;',	# Á
+		'&ccaron;' => '&#x10D;',
+		'&agrave;' => '&#x0E0;',	# á
+		'&aacute;' => '&#x0E1;',	# á
+		'&acirc;' => '&#x0E2;',		# â
+		'&auml;' => '&#x0E4;',		# ä
+		'&aring;' => '&#x0E5;',	# å
+		'&ccedil;' => '&#x0E7;',	# ç
+		'&egrave;' => '&#x0E8;',
+		'&eacute;' => '&#x0E9;',
+		'&ecirc;' => '&#x0EA;',
+		'&euml;' => '&#x0EB;',	# euml
+		'&Icirc;' => '&#x0CE;',	# Î
+		'&Eacute;' => '&#x0C9;',
+		'&szlig;' => '&#x0DF;',	# ß
+		'&iacute;' => '&#xED;',	# í
+		'&icirc;' => '&#x0EE;',
+		'&iuml;' => '&#x0EF;',	# ï
+		'&eth;' => '&#x0F0;',	# ð
+		'&uacute;' => '&#0FA;',	# ú
+		'&uuml;' => '&#x0FC;',
+		'&scaron;' => '&#x161;',
+		'&oacute;' => '&#x0F3;',	# ó
+		'&ucirc;' => '&#x0F4;',
+		'&ouml;' => '&#x0F6;',
+		'&ordf;' => '&#x0AA;',	# ª
+		'&oslash;' => '&#x0F8;',	# ø
+		'&zcaron;' => '&#x17E;',
+		'&Scaron;' => '&#x160;',
+		'&THORN;' => '&#x0DE;',	# Þ
+		'&thorn;' => '&#x0FE;',	# þ
+		'&reg;' => '&#x0AE;',
+		'&pound;' => '&#163;',
+		'&ntilde;' => '&#x0F1;',
+		'&mdash;' => '-',
+		'&ndash;' => '-',
+		'&excl;' => '!',
+	);
+
+	$string =~ s{(.)}{
+		my $cp = $1;
+		exists $entity_map{$cp}
+			? $entity_map{$cp}
+			: $cp
+	}gex;
 
 	if($string !~ /[^[:ascii:]]/) {
 		return $string;
@@ -512,113 +598,118 @@ sub wide_to_xml
 	# print STDERR (sprintf '%v02X', $string);
 	# print STDERR "\n";
 
-	$string =~ s/\xc2\xa0/ /g;	# Non breaking space
-	$string =~ s/\xc2\xa3/&#x0A3;/g;	# £
-	$string =~ s/\xc2\xa9/&#x0A9;/g;
-	$string =~ s/\xc2\xaa/&#x0AA;/g;	# ª
-	$string =~ s/\xc2\xab/&quot;/g;	# «
-	$string =~ s/\xc2\xae/&#x0AE;/g;
-	$string =~ s/\xc3\x81/&#x0C1;/g;	# Á
-	$string =~ s/\xc3\x8e/&#x0CE;/g;	# Î
-	$string =~ s/\xc3\xa0/&#x0E0;/g;	# à
-	$string =~ s/\xc3\xa1/&#x0E1;/g;	# á
-	$string =~ s/\xc3\xa5/&#x0E5;/g;	# å
-	$string =~ s/\xc3\xa9/&#x0E9;/g;
-	$string =~ s/\xc3\xaf/&#x0EF;/g;	# ï
-	$string =~ s/\xc3\xb1/&#x0F1;/g;	# ntilde ñ
-	$string =~ s/\xc5\xa1/&#x161;/g;
-	$string =~ s/\xc4\x8d/&#x10D;/g;
-	$string =~ s/\xc5\xbe/&#x17E;/g;	# ž
-	$string =~ s/\xc3\x96/&#x0D6;/g;	# Ö
-	$string =~ s/\xc3\x9e/&#x0DE;/g;	# Þ
-	$string =~ s/\xc3\x9f/&#x0DF;/g;	# ß
-	$string =~ s/\xc3\xa2/&#x0E2;/g;	# â
-	$string =~ s/\xc3\xad/&#x0ED;/g;	# í
-	$string =~ s/\xc3\xa4/&#x0E4;/g;	# ä
-	$string =~ s/\xc3\xa7/&#x0E7;/g;	# ç
-	$string =~ s/\xc3\xb0/&#x0F0;/g;	# ð
-	$string =~ s/\xc3\xb3/&#x0F3;/g;	# ó
-	$string =~ s/\xc3\xb8/&#x0F8;/g;	# ø
-	$string =~ s/\xc3\xbc/&#x0FC;/g;	# ü
-	$string =~ s/\xc3\xbe/&#x0FE;/g;	# þ
-	$string =~ s/\xc3\xa8/&#x0E8;/g;	# è
-	$string =~ s/\xc3\xee/&#x0EE;/g;
-	$string =~ s/\xc3\xb4/&#x0F4;/g;	# ô
-	$string =~ s/\xc3\xb6/&#x0F6;/g;	# ö
-	$string =~ s/\xc3\x89/&#x0C9;/g;
-	$string =~ s/\xc3\xaa/&#x0EA;/g;
-	$string =~ s/\xc3\xab/&#x0EB;/g;	# eumlaut
-	$string =~ s/\xc3\xba/&#x0FA;/g;	# ú
-	$string =~ s/\xc3\xbb/&#x0BB;/g;	# û - ucirc
-	$string =~ s/\xc5\x9b/&#x15B;/g;	# ś - sacute
-	$string =~ s/\xc5\xa0/&#x160;/g;
-	$string =~ s/\xe2\x80\x93/-/g;
-	$string =~ s/\xe2\x80\x94/-/g;
-	$string =~ s/\xe2\x80\x9c/&quot;/g;
-	$string =~ s/\xe2\x80\x9d/&quot;/g;
-	$string =~ s/\xe2\x80\xa6/.../g;
-	$string =~ s/\xe2\x97\x8f/&#x25CF;/g;	# ●
-	$string =~ s/\xe3\xb1/&#x0F1;/g;	# ntilde ñ - what's this one?
+	@byte_map = (
+		["\xc2\xa0", ' '],	# Non breaking space
+		["\xc2\xa3", '&#x0A3;'],	# £
+		["\xc2\xa9", '&#x0A9;'],
+		["\xc2\xaa", '&#x0AA;'],	# ª
+		["\xc2\xab", '&quot;'],	# «
+		["\xc2\xae", '&#x0AE;'],
+		["\xc3\x81", '&#x0C1;'],	# Á
+		["\xc3\x8e", '&#x0CE;'],	# Î
+		["\xc3\xa0", '&#x0E0;'],	# à
+		["\xc3\xa1", '&#x0E1;'],	# á
+		["\xc3\xa5", '&#x0E5;'],	# å
+		["\xc3\xa9", '&#x0E9;'],
+		["\xc3\xaf", '&#x0EF;'],	# ï
+		["\xc3\xb1", '&#x0F1;'],	# ntilde ñ
+		["\xc5\xa1", '&#x161;'],
+		["\xc4\x8d", '&#x10D;'],
+		["\xc5\xbe", '&#x17E;'],	# ž
+		["\xc3\x96", '&#x0D6;'],	# Ö
+		["\xc3\x9e", '&#x0DE;'],	# Þ
+		["\xc3\x9f", '&#x0DF;'],	# ß
+		["\xc3\xa2", '&#x0E2;'],	# â
+		["\xc3\xad", '&#x0ED;'],	# í
+		["\xc3\xa4", '&#x0E4;'],	# ä
+		["\xc3\xa7", '&#x0E7;'],	# ç
+		["\xc3\xb0", '&#x0F0;'],	# ð
+		["\xc3\xb3", '&#x0F3;'],	# ó
+		["\xc3\xb8", '&#x0F8;'],	# ø
+		["\xc3\xbc", '&#x0FC;'],	# ü
+		["\xc3\xbe", '&#x0FE;'],	# þ
+		["\xc3\xa8", '&#x0E8;'],	# è
+		["\xc3\xee", '&#x0EE;'],
+		["\xc3\xb4", '&#x0F4;'],	# ô
+		["\xc3\xb6", '&#x0F6;'],	# ö
+		["\xc3\x89", '&#x0C9;'],
+		["\xc3\xaa", '&#x0EA;'],
+		["\xc3\xab", '&#x0EB;'],	# eumlaut
+		["\xc3\xba", '&#x0FA;'],	# ú
+		["\xc3\xbb", '&#x0BB;'],	# û - ucirc
+		["\xc5\x9b", '&#x15B;'],	# ś - sacute
+		["\xc5\xa0", '&#x160;'],
+		["\xe2\x80\x93", '-'],
+		["\xe2\x80\x94", '-'],
+		["\xe2\x80\x9c", '&quot;'],
+		["\xe2\x80\x9d", '&quot;'],
+		["\xe2\x80\xa6", '...'],
+		["\xe2\x97\x8f", '&#x25CF;'],	# ●
+		["\xe3\xb1", '&#x0F1;'],	# ntilde ñ - what's this one?
+
 	# $string =~ s/\xe4\x8d/&#x10D;/g;	# ? ACOM strangeness
 	# $string =~ s/\N{U+0161}/&#x161;/g;
 	# $string =~ s/\N{U+010D}/&#x10D;/g;
 	# $string =~ s/\N{U+00E9}/&#x0E9;/g;
 	# $string =~ s/\N{U+017E}/&#x17E;/g;
 
-	$string =~ s/\N{U+00A0}/ /g;
-	$string =~ s/\N{U+010D}/&#x10D;/g;
-	$string =~ s/\N{U+00AB}/&quot;/g;	# «
-	$string =~ s/\N{U+00AE}/&#x0AE;/g;	# ®
-	$string =~ s/\N{U+00C1}/&#x0C1;/g;	# Á
-	$string =~ s/\N{U+00CE}/&#x0CE;/g;	# Î
-	$string =~ s/\N{U+00DE}/&#x0DE;/g;	# Þ
-	$string =~ s/\N{U+00E4}/&#x0E4;/g;	# ä
-	$string =~ s/\N{U+00E5}/&#x0E5;/g;	# å
-	$string =~ s/\N{U+00EA}/&#x0EA;/g;
-	$string =~ s/\N{U+00ED}/&#x0ED;/g;
-	$string =~ s/\N{U+00EE}/&#x0EE;/g;
-	$string =~ s/\N{U+00FE}/&#x0FE;/g;	# þ
-	$string =~ s/\N{U+00C9}/&#x0C9;/g;
-	$string =~ s/\N{U+017E}/&#x17E;/g;	# ž
-	$string =~ s/\N{U+00D6}/&#x0D6;/g;	# Ö
-	$string =~ s/\N{U+00DF}/&#x0DF;/g;	# ß
-	$string =~ s/\N{U+00E1}/&#x0E1;/g;	# á - aacute
-	$string =~ s/\N{U+00E2}/&#x0E2;/g;
-	$string =~ s/\N{U+00E8}/&#x0E8;/g;	# è
-	$string =~ s/\N{U+00EF}/&#x0EF;/g;	# ï
-	$string =~ s/\N{U+00F0}/&#x0F0;/g;	# ð
-	$string =~ s/\N{U+00F1}/&#x0F1;/g;	# ñ
-	$string =~ s/\N{U+00F3}/&#x0F3;/g;	# ó
-	$string =~ s/\N{U+00F4}/&#x0F4;/g;	# ô
-	$string =~ s/\N{U+00F6}/&#x0F6;/g;	# ö
-	$string =~ s/\N{U+00F8}/&#x0F8;/g;	# ø
-	$string =~ s/\N{U+00FA}/&#x0FA;/g;	# ú
-	$string =~ s/\N{U+00FC}/&#x0FC;/g;	# ü
-	$string =~ s/\N{U+015B}/&#x15B;/g;	# ś
+		["\N{U+00A0}", ' '],
+		["\N{U+010D}", '&#x10D;'],
+		["\N{U+00AB}", '&quot;'],	# «
+		["\N{U+00AE}", '&#x0AE;'],	# ®
+		["\N{U+00C1}", '&#x0C1;'],	# Á
+		["\N{U+00CE}", '&#x0CE;'],	# Î
+		["\N{U+00DE}", '&#x0DE;'],	# Þ
+		["\N{U+00E4}", '&#x0E4;'],	# ä
+		["\N{U+00E5}", '&#x0E5;'],	# å
+		["\N{U+00EA}", '&#x0EA;'],
+		["\N{U+00ED}", '&#x0ED;'],
+		["\N{U+00EE}", '&#x0EE;'],
+		["\N{U+00FE}", '&#x0FE;'],	# þ
+		["\N{U+00C9}", '&#x0C9;'],
+		["\N{U+017E}", '&#x17E;'],	# ž
+		["\N{U+00D6}", '&#x0D6;'],	# Ö
+		["\N{U+00DF}", '&#x0DF;'],	# ß
+		["\N{U+00E1}", '&#x0E1;'],	# á - aacute
+		["\N{U+00E2}", '&#x0E2;'],
+		["\N{U+00E8}", '&#x0E8;'],	# è
+		["\N{U+00EF}", '&#x0EF;'],	# ï
+		["\N{U+00F0}", '&#x0F0;'],	# ð
+		["\N{U+00F1}", '&#x0F1;'],	# ñ
+		["\N{U+00F3}", '&#x0F3;'],	# ó
+		["\N{U+00F4}", '&#x0F4;'],	# ô
+		["\N{U+00F6}", '&#x0F6;'],	# ö
+		["\N{U+00F8}", '&#x0F8;'],	# ø
+		["\N{U+00FA}", '&#x0FA;'],	# ú
+		["\N{U+00FC}", '&#x0FC;'],	# ü
+		["\N{U+015B}", '&#x15B;'],	# ś
 	# print STDERR __LINE__, ": ($string)";
 	# print STDERR (sprintf '%v02X', $string);
 	# print STDERR "\n";
-	$string =~ s/\N{U+00E9}/&#x0E9;/g;
+		["\N{U+00E9}", '&#x0E9;'],
 	# print STDERR __LINE__, ": ($string)";
 	# print STDERR (sprintf '%v02X', $string);
 	# print STDERR "\n";
-	$string =~ s/\N{U+00E7}/&#x0E7;/g;	# ç
-	$string =~ s/\N{U+00EB}/&#x0EB;/g;	# ë
-	$string =~ s/\N{U+00FB}/&#x0FB;/g;	# û
-	$string =~ s/\N{U+0160}/&#x160;/g;
-	$string =~ s/\N{U+0161}/&#x161;/g;
-	$string =~ s/\N{U+00A9}/&#x0A9;/g;	# ©
+		["\N{U+00E7}", '&#x0E7;'],	# ç
+		["\N{U+00EB}", '&#x0EB;'],	# ë
+		["\N{U+00FB}", '&#x0FB;'],	# û
+		["\N{U+0160}", '&#x160;'],
+		["\N{U+0161}", '&#x161;'],
+		["\N{U+00A9}", '&#x0A9;'],	# ©
 	# print STDERR __LINE__, ": ($string)";
 	# print STDERR (sprintf '%v02X', $string);
 	# print STDERR "\n";
-	$string =~ s/\N{U+2013}/-/g;
-	$string =~ s/\N{U+2014}/-/g;
-	$string =~ s/\N{U+2018}/&quot;/g;
-	$string =~ s/\N{U+2019}/&quot;/g;
-	$string =~ s/\N{U+201C}/&quot;/g;
-	$string =~ s/\N{U+201D}/&quot;/g;
-	$string =~ s/\N{U+2026}/.../g;	# …
-	$string =~ s/\N{U+25CF}/&#x25CF;/g;	# ●
+		["\N{U+2013}", '-'],
+		["\N{U+2014}", '-'],
+		["\N{U+2018}", '&quot;'],
+		["\N{U+2019}", '&quot;'],
+		["\N{U+201C}", '&quot;'],
+		["\N{U+201D}", '&quot;'],
+		["\N{U+2026}", '...'],	# …
+		["\N{U+25CF}", '&#x25CF;'],	# ●
+	);
+
+	$string = _sub_map(\$string, \@byte_map);
 
 	# utf8::encode($string);
 	# $string =~ s/š/&s#x161;/g;
@@ -641,48 +732,52 @@ sub wide_to_xml
 	# utf8::decode($string);
 
 	# $string =~ s/['\x98]/&#039;/g;
-	$string =~ s/'/&#039;/g;
-	$string =~ s/\x98/&#039;/g;
-	$string =~ s/©/&#x0A9;/g;
-	$string =~ s/ª/&#x0AA;/g;
-	$string =~ s/®/&#x0AE;/g;
-	$string =~ s/å/&#x0E5;/g;
-	$string =~ s/š/&#x161;/g;
-	$string =~ s/č/&#x10D;/g;
-	$string =~ s/ž/&#x17E;/g;
-	$string =~ s/£/&#x0A3;/g;
-	$string =~ s/á/&#x0E1;/g;	# á
-	$string =~ s/â/&#x0E2;/g;
-	$string =~ s/ä/&#x0E4;/g;	# ä
-	$string =~ s/Á/&#x0C1;/g;	# Á
-	$string =~ s/Ö/&#x0D6;/g;
-	$string =~ s/ß/&#x0DF;/g;
-	$string =~ s/ç/&#x0E7;/g;
-	$string =~ s/è/&#x0E8;/g;
-	$string =~ s/é/&#x0E9;/g;
-	$string =~ s/ê/&#x0EA;/g;
-	$string =~ s/ë/&#x0EB;/g;
-	$string =~ s/í/&#x0ED;/g;
-	$string =~ s/ï/&#x0EF;/g;
-	$string =~ s/Î/&#x0CE;/g;	# Î
-	$string =~ s/Þ/&#x0DE;/g;	# Þ
-	$string =~ s/ð/&#x0F0;/g;	# ð
-	$string =~ s/ø/&#x0F8;/g;	# ø
-	$string =~ s/û/&#x0FB;/g;
-	$string =~ s/ñ/&#x0F1;/g;
-	$string =~ s/ú/&#x0FA;/g;
-	$string =~ s/ü/&#x0FC;/g;
-	$string =~ s/þ/&#x0FE;/g;	# þ
-	# $string =~ s/[“”«»]/&quot;/g;
-	$string =~ s/“/&quot;/g;
-	$string =~ s/”/&quot;/g;
-	$string =~ s/«/&quot;/g;
-	$string =~ s/»/&quot;/g;
-	$string =~ s/—/-/g;
-	$string =~ s/–/-/g;
-	$string =~ s/…/.../g;
-	$string =~ s/●/&#x25CF;/g;
-	$string =~ s/\x80$/ /;
+	@byte_map = (
+		["'", '&#039;'],
+		["\x98", '&#039;'],
+		['©', '&#x0A9;'],
+		['ª', '&#x0AA;'],
+		['®', '&#x0AE;'],
+		['å', '&#x0E5;'],
+		['š', '&#x161;'],
+		['č', '&#x10D;'],
+		['ž', '&#x17E;'],
+		['£', '&#x0A3;'],
+
+		['á', '&#x0E1;'],	# á
+		['â', '&#x0E2;'],
+		['ä', '&#x0E4;'],	# ä
+		['Á', '&#x0C1;'],	# Á
+		['Ö', '&#x0D6;'],
+		['ß', '&#x0DF;'],
+		['ç', '&#x0E7;'],
+		['è', '&#x0E8;'],
+		['é', '&#x0E9;'],
+		['ê', '&#x0EA;'],
+		['ë', '&#x0EB;'],
+		['í', '&#x0ED;'],
+		['ï', '&#x0EF;'],
+		['Î', '&#x0CE;'],	# Î
+		['Þ', '&#x0DE;'],	# Þ
+		['ð', '&#x0F0;'],	# ð
+		['ø', '&#x0F8;'],	# ø
+		['û', '&#x0FB;'],
+		['ñ', '&#x0F1;'],
+		['ú', '&#x0FA;'],
+		['ü', '&#x0FC;'],
+		['þ', '&#x0FE;'],	# þ
+		['“', '&quot;'],
+		['”', '&quot;'],
+		['«', '&quot;'],
+		['»', '&quot;'],
+		['—', '-'],
+		['–', '-'],
+		['…', '...'],
+		['●', '&#x25CF;'],
+		["\x80\$", ' '],
+	);
+
+	$string = _sub_map(\$string, \@byte_map);
 
 	# if($string =~ /^Maria\(/) {
 		# print STDERR (unpack 'H*', $string);
@@ -719,15 +814,45 @@ sub wide_to_xml
 	return $string;
 }
 
+sub _sub_map
+{
+	my $string = ${$_[0]};
+	my $byte_map = $_[1];
+
+	# Build an alternation sorted by longest sequence first
+	my $pattern = join '|',
+		map { quotemeta($_->[0]) }
+		sort { length $b->[0] <=> length $a->[0] }
+		@{$byte_map};
+
+	$string =~ s/($pattern)/do {
+		my $bytes = $1;
+		my ($pair) = grep { $_->[0] eq $bytes } @{$byte_map};
+		$pair->[1];
+	}/ge;
+
+	return $string;
+}
+
 =head1 SEE ALSO
 
 L<HTML::Entities>, L<Encode>, L<XML::Entities>, L<Unicode::Escape>.
 
 L<https://www.compart.com/en/unicode/>.
 
+=head1 SUPPORT
+
+This module is provided as-is without any warranty.
+
+Please report any bugs or feature requests to C<bug-encode-wide at rt.cpan.org>,
+or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Encode-Wide>.
+I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
 =head1 AUTHOR
 
-Nigel Horne <njh@nigelhorne.com>
+Nigel Horne, C<< <njh at nigelhorne.com> >>
 
 =head1 LICENCE AND COPYRIGHT
 

@@ -1,6 +1,6 @@
 # HOW TO CONTRIBUTE
 
-Thank you for considering contributing to Data-Enum.
+Thank you for considering contributing to MooX-Const.
 
 There are multiple ways that you can help with this project.
 

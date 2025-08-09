@@ -14,6 +14,12 @@ throws_ok {
 
 } qr/isa must be a Type::Tiny type/;
 
+lives_ok {
+
+    has a => ( is => 'const', isa => sub { die "ouch" unless $_[0] && $_[0] !~ /^0/ } );
+
+} "CodeRef isa are ok";
+
 throws_ok {
 
     has b => ( is => 'once', isa => Str );

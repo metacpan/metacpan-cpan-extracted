@@ -3,7 +3,7 @@
 use Term::Highlight ();
 
 ( $PROGNAME = $0 ) =~ s/.*\///;
-$VERSION = "2.2.0";
+$VERSION = "2.3.0";
 $TAGTYPE = "term";
 $RC_FILE = "$ENV{ HOME }/.hlrc";
 $SNIPPET_PTN = qr/^\s*snippet\s+(\S+)\s+(.*)/;
@@ -16,7 +16,7 @@ $HIDDEN_FILE_PTN = qr/^\..+/;
 
 sub PrintUsage
 {
-print << "EOHELP"
+print <<"EOHELP";
 $PROGNAME, version $VERSION. See man $PROGNAME for details.
 
 Usage: $PROGNAME [global-options] [--] [highlight-options [patterns] ...]
@@ -87,13 +87,14 @@ sub LoadSnippets
 {
     my ( $snippet ) = @_;
     return if exists $rcLoaded{ $snippet } && defined $rcLoaded;
-    my $rc = 0;
+    my ( $rc_open, $RC ) = ( 0, undef );
     my $RC_FILE_S = $RC_FILE . '_' . $snippet;
-    if ( exists $rcLoaded{ $snippet } || ( $rc = open ( RC, "< $RC_FILE_S" ) ) )
+    if ( exists $rcLoaded{ $snippet } ||
+                                ( $rc_open = open ( $RC, '<', $RC_FILE_S ) ) )
     {
         $rcLoaded{ $snippet } = 1;
     }
-    elsif ( defined $rcLoaded || ( $rc = open ( RC, "< $RC_FILE" ) ) )
+    elsif ( defined $rcLoaded || ( $rc_open = open ( $RC, '<', $RC_FILE ) ) )
     {
         $rcLoaded{ $snippet } = 0;
         $rcLoaded = 1;
@@ -102,9 +103,9 @@ sub LoadSnippets
     {
         $rcLoaded = 0;
     }
-    return unless $rc;
+    return unless $rc_open;
     my $command;
-    while ( <RC> )
+    while ( <$RC> )
     {
         if ( /\\$/o )
         {
@@ -155,7 +156,7 @@ sub LoadSnippets
         }
         $command = undef;
     }
-    close RC;
+    close $RC;
 }
 
 
@@ -248,6 +249,7 @@ while ( defined ( my $arg = shift ) )
                 shift @{ $Snippets{ $snippet } };
                 $UTF8Support = 1;
             }
+            unshift @{ $Snippets{ $snippet } }, '-ra';
             push @Hl_args, @{ $Snippets{ $snippet } }; last SWITCH_ARGS;
         }
         if ( $arg eq "--" )
@@ -328,16 +330,16 @@ if ( exists $ENV{ HL_CTXDELIM } && ! $GrepList && $CheckCtx )
 
 if ( $GrepRecursively && $Gitignore )
 {
-    if ( open( GIT_STATUS, 'git status --ignored -s 2>/dev/null|' ) )
+    if ( open ( my $GIT_STATUS, '-|', 'git status --ignored -s 2>/dev/null' ) )
     {
         require Cwd;
-        while ( <GIT_STATUS> )
+        while ( <$GIT_STATUS> )
         {
             my ( $mode, $file ) = split;
             $GitignoreList{ Cwd::abs_path( $file ) } = 1
                                             if $mode eq '??' || $mode eq '!!';
         }
-        close GIT_STATUS;
+        close $GIT_STATUS;
     }
 }
 
@@ -411,8 +413,8 @@ sub ProcessFile
     }
     elsif ( $UTF8Support )
     {
-        binmode( $FileHandle, ':utf8' );
-        binmode( STDOUT, ':utf8' ) unless $GrepList;
+        binmode( $FileHandle, ':encoding(UTF8)' );
+        binmode( STDOUT, ':encoding(UTF8)' ) unless $GrepList;
     }
     InitCtx if $CheckCtx;
     while ( <$FileHandle> )
@@ -523,7 +525,7 @@ sub VisitNode
         }
         return;
     }
-    unless ( open $FileHandle, "< $CurFile" )
+    unless ( open $FileHandle, '<', $CurFile )
     {
         Flush( *STDOUT );
         warn( "WARNING: Unable to open $CurFile: $!" );
@@ -561,7 +563,7 @@ else
         }
         else
         {
-            unless ( open $FileHandle, "< $File" )
+            unless ( open $FileHandle, '<', $File )
             {
                 Flush( *STDOUT );
                 warn( "WARNING: Unable to open $File: $!" );
@@ -833,7 +835,7 @@ Alexey Radkov <alexey.radkov@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2023 by A. Radkov.
+Copyright (C) 2008-2025 by A. Radkov.
 
 This is free software; you can redistribute it and/or modify it
 under the same terms as the Perl 5 programming language system itself.

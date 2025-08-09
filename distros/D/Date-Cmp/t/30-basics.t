@@ -79,4 +79,12 @@ is(datecmp(undef, '1900'), 0, 'undef left handled');
 is(datecmp('1900', undef), 0, 'undef right handled');
 is(datecmp(undef, undef), 0, 'both undef handled');
 
+my $bet_result = datecmp('BET 1830 AND 1832', '1831');
+my $dash_result = datecmp('1830-1832', '1831');
+cmp_ok($bet_result, '==', $dash_result, 'BET format and dash format should give same result');
+
+$bet_result = datecmp('1831', 'BET 1830 AND 1832');
+$dash_result = datecmp('1831', '1830-1832');
+cmp_ok($bet_result, '==', $dash_result, 'BET format and dash format should give same result');
+
 done_testing();

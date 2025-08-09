@@ -1,10 +1,10 @@
 # NAME
 
-Encode::Wide - Convert wide characters (Unicode) into HTML or XML-safe ASCII entities
+Encode::Wide - Convert wide characters (Unicode, UTF-8, etc.) into HTML or XML-safe ASCII entities
 
 # VERSION
 
-0.03
+0.05
 
 # SYNOPSIS
 
@@ -19,16 +19,21 @@ Encode::Wide - Convert wide characters (Unicode) into HTML or XML-safe ASCII ent
 # DESCRIPTION
 
 Encode::Wide provides functions for converting wide (Unicode) characters into ASCII-safe
-formats suitable for embedding in HTML or XML documents. It is especially useful
-when dealing with text containing accented or typographic characters that need
+formats suitable for embedding in HTML or XML documents.
+It is especially useful when dealing with text containing accented or typographic characters that need
 to be safely represented in markup.
+
+Other modules exist to do this,
+however they tend to have assumptions on the input,
+whereas this should work with UTF-8, Unicode, or anything that's common.
 
 The module offers two exportable functions:
 
 - `wide_to_html(string =` $text)>
 
-    Converts Unicode characters in the input string to their named HTML entities if available,
-    or hexadecimal numeric entities otherwise. Common characters such as \`é\`, \`à\`, \`&\`, \`<\`, \`>\` are
+    Converts all non-ASCII characters in the input string to their named HTML entities if available,
+    or hexadecimal numeric entities otherwise.
+    Common characters such as \`é\`, \`à\`, \`&\`, \`<\`, \`>\` are
     converted to their standard HTML representations like \`&amp;eacute;\`, \`&amp;agrave;\`, \`&amp;amp;\`, etc.
 
 - `wide_to_xml(string =` $text)>
@@ -45,8 +50,9 @@ Both functions accept a named parameter:
 
 # ENCODING
 
-Input strings are expected to be valid UTF-8. If a byte string is passed, the module will attempt
-to decode it appropriately. Output is guaranteed to be pure ASCII.
+Input strings are expected to be valid UTF-8 or Unicode.
+If a byte string is passed, the module will attempt to decode it appropriately.
+Output is guaranteed to be pure ASCII.
 
 # EXPORT
 
@@ -63,9 +69,19 @@ Optionally exportable:
 
 [https://www.compart.com/en/unicode/](https://www.compart.com/en/unicode/).
 
+# SUPPORT
+
+This module is provided as-is without any warranty.
+
+Please report any bugs or feature requests to `bug-encode-wide at rt.cpan.org`,
+or through the web interface at
+[http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Encode-Wide](http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Encode-Wide).
+I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
 # AUTHOR
 
-Nigel Horne <njh@nigelhorne.com>
+Nigel Horne, `<njh at nigelhorne.com>`
 
 # LICENCE AND COPYRIGHT
 

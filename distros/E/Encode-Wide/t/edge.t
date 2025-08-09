@@ -1,7 +1,8 @@
 use strict;
 use warnings;
-use Test::Most;
+
 use Encode::Wide qw(wide_to_html wide_to_xml);
+use Test::Most;
 
 my @tests = (
     {

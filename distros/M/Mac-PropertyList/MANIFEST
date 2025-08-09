@@ -48,7 +48,7 @@ t/parse_plist_fh.t
 t/pod.t
 t/pod_coverage.t
 t/read_binary.t
-t/round-trip.t
+t/round_trip.t
 t/round_trip_binary.t
 t/scalar.t
 t/string.t

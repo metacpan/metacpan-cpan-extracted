@@ -29,15 +29,16 @@ developer to copy and paste into their code.
 
 # RECENT CHANGES
 
-Changes for version v0.2.1 (2025-08-07)
+Changes for version v0.2.2 (2025-08-08)
 
 - Enhancements
     - Internal code improvements.
-- Documentation
-    - Updated SUPPORT section to be consistent with minimum Perl version.
+- Bug Fixes
+    - Fixed the \`exclude\` attribute.
+    - The \`scripts\` are sorted to ensure consistently generated test scripts.
 - Tests
-    - Fix issues with author test configuration.
-    - Added more author tests.
+    - Added more tests.
+    - Internal code improvements.
 
 See the `Changes` file for more details.
 
@@ -54,9 +55,9 @@ This module lists the following modules as runtime dependencies:
 - [Dist::Zilla::Role::TextTemplate](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3ARole%3A%3ATextTemplate)
 - [List::Util](https://metacpan.org/pod/List%3A%3AUtil) version 1.45 or later
 - [Moose](https://metacpan.org/pod/Moose)
-- [Moose::Util::TypeConstraints](https://metacpan.org/pod/Moose%3A%3AUtil%3A%3ATypeConstraints)
 - [Path::Tiny](https://metacpan.org/pod/Path%3A%3ATiny)
 - [Sub::Exporter::ForMethods](https://metacpan.org/pod/Sub%3A%3AExporter%3A%3AForMethods)
+- [Types::Common](https://metacpan.org/pod/Types%3A%3ACommon)
 - [experimental](https://metacpan.org/pod/experimental)
 - [namespace::autoclean](https://metacpan.org/pod/namespace%3A%3Aautoclean)
 - [perl](https://metacpan.org/pod/perl) version v5.20.0 or later

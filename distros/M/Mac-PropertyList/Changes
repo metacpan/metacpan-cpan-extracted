@@ -1,5 +1,8 @@
 Revision history for Perl module Mac::PropertyList
 
+1.605 2025-08-08T17:04:09Z
+	* Fix XML encoding/decoding to be compliant with plutil (Jess Robinson, GH #36)
+
 1.604 2025-07-23T23:09:47Z
 	* encode entities in writing (GH #35)
 

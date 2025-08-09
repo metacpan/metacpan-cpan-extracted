@@ -2,11 +2,15 @@ NAME
     idi - Easy, command-line MIDI
 
 SYNOPSIS
-      $ perl -Midi -E'x(qw(c1 f o5)); n(qw(qn Cs)); n("F"); n("Ds"); n(qw(hn Gs_d1))' | timidity -
+      perl -Midi -E 'x(qw(c1 f o5)); n(qw(qn Cs)); n("F"); n("Ds"); n(qw(hn Gs_d1))' | timidity -Od -
+      # or with fluidsynth
 
       # Compare with:
-      $ perl -MMIDI::Simple -E'new_score; noop qw(c1 f o5); n qw(qn Cs); n "F"; n "Ds"; n qw(hn Gs_d1); write_score shift()' idi.mid
-      $ timidity idi.mid
+      perl -MMIDI::Simple -E 'new_score; noop qw(c1 f o5); n qw(qn Cs); n "F"; n "Ds"; n qw(hn Gs_d1); write_score shift()' idi.mid
+      timidity -Od idi.mid
+
+      # Control a MIDI device (uniquely named "usb") in real-time
+      perl -Midi -E 'i(@ARGV)' keyboard usb
 
 DESCRIPTION
     Easy, command-line MIDI!
@@ -38,8 +42,11 @@ FUNCTIONS
 
     Default: 1
 
-  get_score
+  g
     Return the MIDI::Simple score object.
+
+  i
+    Invoke MIDI::RtController to control the second argument with the first.
 
   n
       n(@note_spec)
@@ -111,7 +118,7 @@ AUTHOR
     Gene Boggs <gene@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is Copyright (c) 2022 by Gene Boggs.
+    This software is Copyright (c) 2022-2025 by Gene Boggs.
 
     This is free software, licensed under: The Artistic License 2.0 (GPL
     Compatible)

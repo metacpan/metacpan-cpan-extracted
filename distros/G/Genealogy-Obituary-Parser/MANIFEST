@@ -1,0 +1,18 @@
+Changes
+lib/Genealogy/Obituary/Parser.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/00-load.t
+t/30-basics.t
+t/complex.t
+t/eof.t
+t/eol.t
+t/parse_obituary.t
+t/pod-cm.t
+t/pod-synopsis.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

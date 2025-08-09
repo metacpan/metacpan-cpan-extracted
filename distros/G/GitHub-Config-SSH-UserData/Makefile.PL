@@ -36,9 +36,13 @@ my %WriteMakefileArgs =
                           'File::Spec::Functions' => '0',
                          },
    PREREQ_PM => {
-                 'strict'   => 0,
-                 'warnings' => 0,
-                 'Exporter' => '1.6',
+                 'strict'                => '0',
+                 'warnings'              => '0',
+                 'autodie'               => '0',
+                 'Carp'                  => '0',
+                 'File::Spec::Functions' => '0',
+                 'Exporter'              => '1.6',
+                 'constant'              => '0',
                 },
    META_MERGE => {
                   "meta-spec" => { version => 2 },
@@ -59,7 +63,11 @@ my %WriteMakefileArgs =
                               },
                  },
    TEST_REQUIRES => {
-                     'Test::More' => '0',
+                     'strict'                => '0',
+                     'warnings'              => '0',
+                     'Test::More'            => '0',
+                     'File::Spec::Functions' => '0',
+                     'File::Basename'        => '0',
                     },
    dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
    clean => { FILES => join('-', split(/::/, $The_Module)) . '-*' },
@@ -70,6 +78,7 @@ if ($ENV{AUTHOR_TESTING}) {
     {
      'Pod::Coverage'         => '0.23',
      'Pod::Wordlist'         => '1.27',
+     'Test::CheckManifest'   => '1.43',
      'Test::Pod::Coverage'   => '1.10',
      'Test::Spelling;'       => '0.25',
     };

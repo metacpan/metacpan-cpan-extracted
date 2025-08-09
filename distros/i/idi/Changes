@@ -1,5 +1,15 @@
 Revision history for idi
 
+0.0402    2025-08-08 22:20:39 PDT
+    - Rename the get_score() function.
+
+0.0401    2025-08-08 19:58:58 PDT
+    - Fix an annoying synopsis typo.
+
+0.0400    2025-08-08 18:36:52 PDT
+    - Use subtests.
+    - Enable RtMIDI with the `i($in, $out)` function
+
 0.0305    2023-01-31 22:06:27 PST
     - Fix module imports.
 

@@ -1,9 +1,9 @@
 package MooX::Const;
 
-# ABSTRACT: Syntactic sugar for constant and write-once Moo attributes
+# ABSTRACT: Syntactic sugar for constant and write-once Moo(se) attributes
 
 use utf8;
-use v5.14;
+use v5.20;
 
 use Carp qw( croak );
 use Devel::StrictMode;
@@ -12,18 +12,20 @@ use Moo::Role ();
 use Scalar::Util qw/ blessed /;
 use Types::Const qw( Const );
 use Types::Standard qw( is_CodeRef Value Object Ref );
+use Type::Tiny;
 
 # RECOMMEND PREREQ: Types::Const v0.3.6
 # RECOMMEND PREREQ: Type::Tiny::XS
 # RECOMMEND PREREQ: MooX::TypeTiny
 
+use experimental qw( signatures );
+
 use namespace::autoclean;
 
-our $VERSION = 'v0.6.4';
+our $VERSION = 'v0.7.0';
 
 
-sub import {
-    my $class = shift;
+sub import(@) {
 
     my $target = caller;
 
@@ -33,7 +35,7 @@ sub import {
       : \&Moo::Role::_install_tracked;
 
     if ( my $has = $target->can('has') ) {
-        my $new_has = sub {
+        my $new_has = sub(@) {
             $has->( _process_has(@_) );
         };
         $installer->( $target, "has", $new_has );
@@ -41,8 +43,7 @@ sub import {
 
 }
 
-sub _process_has {
-    my ( $name, %opts ) = @_;
+sub _process_has( $name, %opts ) {
 
     my $strict = STRICT || ( $opts{strict} // 1 );
 
@@ -53,6 +54,10 @@ sub _process_has {
     if ($is && $is =~ /^(?:const|once)$/ ) {
 
         if ( my $isa = $opts{isa} ) {
+
+            if ( is_CodeRef($isa) ) {
+                $isa = Type::Tiny->new( parent => Value, constraint => $isa );
+            }
 
             unless ( blessed($isa) && $isa->isa('Type::Tiny') ) {
                 croak "isa must be a Type::Tiny type";
@@ -87,10 +92,10 @@ sub _process_has {
                     if ( my $next = $opts{coerce} ) {
 
                         if (is_CodeRef($next)) {
-                            $opts{coerce} = sub { $opts{isa}->coercion->( $next->( $_[0] ) ) };
+                            $opts{coerce} = sub($val) { $opts{isa}->coercion->( $next->($val) ) };
                         }
                         else {
-                            $opts{coerce} = sub { $opts{isa}->coercion->( $isa->coercion->( $_[0] ) ) };
+                            $opts{coerce} = sub($val) { $opts{isa}->coercion->( $isa->coercion->($val) ) };
                         }
                     }
                     else {
@@ -137,11 +142,13 @@ __END__
 
 =head1 NAME
 
-MooX::Const - Syntactic sugar for constant and write-once Moo attributes
+MooX::Const - Syntactic sugar for constant and write-once Moo(se) attributes
 
 =head1 VERSION
 
-version v0.6.4
+version v0.7.0
+
+=for stopwords backported const isa ro wo
 
 =head1 SYNOPSIS
 
@@ -172,9 +179,8 @@ It modifies the C<has> function to support "const" attributes.  These
 are read-only ("ro") attributes for references, where the underlying
 data structure has been set as read-only.
 
-This will return an error if there is no "isa", the "isa" is not a
-L<Type::Tiny> type, if it is not a reference, or if it is blessed
-object.
+This will return an error if there is no "isa", the "isa" is not a code reference (v0.7.0) or a L<Type::Tiny> type that
+is is not a reference, or a blessed object.
 
 Simple value types such as C<Int> or C<Str> are silently converted to
 read-only attributes.
@@ -226,16 +232,6 @@ test suite.
 
 It does not work with L<Mouse>. Pull requests are welcome.
 
-=head1 SUPPORT FOR OLDER PERL VERSIONS
-
-Since v0.6.0, the this module requires Perl v5.14 or later.
-
-Future releases may only support Perl versions released in the last ten years.
-
-If you need this module on Perl v5.10, please use one of the v0.5.x
-versions of this module.  Significant bug or security fixes may be
-backported to those versions.
-
 =head1 SEE ALSO
 
 <MooX::Readonly::Attribute>, which has similar functionality to this module.
@@ -267,7 +263,7 @@ See F<CONTRIBUTING.md> for more information.
 
 Only the latest version of this module will be supported.
 
-This module requires Perl v5.14 or later.
+This module requires Perl v5.20 or later.
 Future releases may only support Perl versions released in the last ten (10) years.
 
 =head2 Reporting Bugs and Submitting Feature Requests

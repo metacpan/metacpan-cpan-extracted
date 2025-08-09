@@ -76,4 +76,33 @@ EOF
       ':Attribute modified optree got invoked for named' );
 }
 
+# RT168812
+# In this file purely to ensure we use our version of parse_subsignature()
+{
+   is(
+      eval( 'afunc f01( $ = undef ) { }; 1' ) ? undef : $@,
+      undef,
+      'Function with anonymous parameter default expression as undef is permitted' );
+
+   like(
+      eval( 'afunc f02( $ = 123 ) { }' ) ? undef : $@,
+      qr/^Unnamed positional parameters cannot have defaulting expressions /,
+      'Function with anonymous parameter defaulting expression fails to parse' );
+
+   is(
+      eval( 'afunc f03( $x = ) { }; 1' ) ? undef : $@,
+      undef,
+      'Function with missing parameter default expression implies undef' );
+
+   is(
+      eval( 'afunc f04( $ = ) { }; 1' ) ? undef : $@,
+      undef,
+      'Function with missing unnamed parameter default expression implies undef' );
+
+   is(
+      eval( 'afunc f05( $= ) { }; 1' ) ? undef : $@,
+      undef,
+      'Function with missing unnamed parameter default expression implies undef' );
+}
+
 done_testing;

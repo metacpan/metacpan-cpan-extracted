@@ -6,5 +6,7 @@
 	<string>Less than &lt; Less than</string>
 	<string>Greater than &gt; Greater than</string>
 	<string>Quote &quot; Quote</string>
+	<string>Fancy character &#xED; Fancy character</string>
+	<string>Apostrophe &apos; Apostrophe</string>
 </array>
 </plist>

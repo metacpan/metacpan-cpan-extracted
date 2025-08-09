@@ -10,7 +10,6 @@ unless ( $ENV{RELEASE_TESTING} ) {
 
 my $min_version = 0.9;
 
-
 eval {
     require Test::CheckManifest;
     Test::CheckManifest->VERSION($min_version);
@@ -18,5 +17,4 @@ eval {
     1;
 } or plan skip_all => "Test::CheckManifest $min_version required: $@";
 
-# Ya podemos usar ok_manifest
 ok_manifest({ verbose => 1 });

@@ -12,6 +12,22 @@ use Data::Dumper;
 use HTML::Entities;
 use XML::Entities qw(decode_entities);
 
+BEGIN {
+	%HTML::Entities::char2entity = %{
+		# XML::Entities::Data::char2entity('all');
+		# We explicitly do not want *all* here. 'all' in the XML::Entities module
+		# is JUST PLAIN WRONG, as these are HTML entities that are NOT part of XML.
+
+		{
+			'&' => '&amp;',
+			'<' => '&lt;',
+			'>' => '&gt;',
+			"'" => "&apos;",
+			'"' => '&quot;',
+		}
+	};
+}
+
 use Exporter qw(import);
 
 our @EXPORT_OK = qw(
@@ -28,7 +44,7 @@ our %EXPORT_TAGS = (
 	'all' => \@EXPORT_OK,
 	);
 
-our $VERSION = '1.604';
+our $VERSION = '1.605';
 
 =encoding utf8
 
@@ -470,7 +486,7 @@ sub read_dict {
 		my $key;
 		while (not defined $key) {
 			if (s[^\s*<key>(.*?)</key>][]s) {
-				$key = $1;
+				$key = HTML::Entities::decode($1);
 				# Bring this back if you want this behavior:
 				# croak "Key is empty string!" if $key eq '';
 				}
@@ -811,7 +827,7 @@ sub as_basic_data {
 	}
 
 sub write_key   {
-	"<key>$_[1]</key>"
+	'<key>' . HTML::Entities::encode_entities($_[1]) . '</key>'
 	}
 
 sub write {
@@ -819,7 +835,7 @@ sub write {
 
 	my $string = $self->write_open . "\n";
 
-	foreach my $key ( $self->keys ) {
+	foreach my $key ( sort { $a cmp $b } $self->keys ) {
 		my $element = $self->{$key};
 
 		my $bit  = __PACKAGE__->write_key( $key ) . "\n";
@@ -964,7 +980,7 @@ sub write {
 
 	my $string = MIME::Base64::encode_base64($value);
 
-	$self->write_open . HTML::Entities::encode_entities($string) . $self->write_close;
+	$self->write_open . $string . $self->write_close;
 	}
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #

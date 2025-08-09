@@ -1,5 +1,8 @@
 Revision history for Date::Cmp
 
+0.05	Fri Aug  8 15:41:55 EDT 2025
+	Ensure datecmp('BET 1830 AND 1832', '1831') and datecmp('1830-1832', '1831') give the same result
+
 0.04	Wed Jul 30 20:46:29 EDT 2025
 	Set the minumum version of DateTime::Format::Genalogy to 0.11 to fix
 		https://www.cpantesters.org/cpan/report/ff105486-6c5d-1014-ac19-ce1abe40bcc7

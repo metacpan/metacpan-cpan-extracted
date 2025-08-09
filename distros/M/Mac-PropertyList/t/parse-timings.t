@@ -1,5 +1,8 @@
 #!/usr/bin/env perl
+use strict;
+use warnings;
 
+use vars qw(@plists);
 BEGIN { @plists = grep { /\Aentities\./ } grep { ! /json/ } glob( 'plists/*.plist' ); }
 my $debug = $ENV{PLIST_DEBUG} || 0;
 
@@ -68,13 +71,14 @@ subtest 'sanity' => sub {
 	use_ok $class;
 
 	$sub = $class->can( 'parse_plist' );
-	ok defined $sub, "$parse_fqname is defined";
+	ok defined $sub, 'parse_plist is defined';
 	} or do {
 		warn "sanity test failed. Continuing is pointless.";
 		done_testing();
 		exit 1;
 	};
 
+my %Skip;
 foreach my $file ( @plists ) {
 	subtest $file => sub {
 		next if exists $Skip{$file};

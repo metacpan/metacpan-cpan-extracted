@@ -23,11 +23,11 @@ Date::Cmp - Compare two dates with approximate parsing support
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head1 SYNOPSIS
 
@@ -46,8 +46,8 @@ This module provides a single function, C<datecmp>, which compares two date stri
 or date-like objects, returning a numeric comparison similar to Perl's spaceship operator (C<< <=> >>).
 
 The comparison is tolerant of approximate dates (e.g., "Abt. 1902", "BET 1830 AND 1832", "Oct/Nov/Dec 1950"),
-partial dates (years only), and strings with common genealogy-style formats. It attempts to normalize
-and parse these into comparable values using L<DateTime::Format::Genealogy>.
+partial dates (years only), and strings with common genealogy-style formats.
+It attempts to normalize and parse these into comparable values using L<DateTime::Format::Genealogy>.
 
 =head1 FUNCTIONS
 
@@ -172,7 +172,7 @@ sub datecmp
 
 	return 0 if($left eq $right);
 
-	if((!ref($left)) && (!ref($right)) && ($left =~ /\d{3,4}/) && ($right =~ /\d{3,4}/) && ($left !~ /^bet/i) && ($right !~ /^bet/i)) {
+	if((!ref($left)) && (!ref($right)) && ($left =~ /\d{3,4}/) && ($right =~ /\d{3,4}/) && ($left !~ /^bet/i) && ($left !~ /\-/) && ($right !~ /^bet/i) && ($right !~ /^\d{3,4}\-\d{3,4}$/)) {
 		if($left =~ /(\d{4})/) {
 			my $lyear = $1;
 			if($right =~ /(\d{4})/) {
@@ -197,7 +197,10 @@ sub datecmp
 	}
 
 	if(!ref($left)) {
-		if((!ref($right)) && ($left =~ /(^|[\s\/])\d{4}$/) && ($left !~ /^bet/i) && ($right !~ /^bet/i) && ($right =~ /(^|[\s\/,])(\d{4})$/)) {
+		# Remove terminating time
+		$left =~ s/T\d\d:\d\d:\d\d$//;
+
+		if((!ref($right)) && ($left =~ /(^|[\s\/])\d{4}$/) && ($left !~ /^bet/i) && ($left !~ /\-/) && ($right !~ /^bet/i) && ($right !~ /\-/) && ($right =~ /(^|[\s\/,])(\d{4})$/)) {
 			my $ryear = $2;
 			$left =~ /(^|[\s\/])(\d{4})$/;
 			my $lyear = $2;
@@ -234,6 +237,7 @@ sub datecmp
 			}
 			return 0;
 		}
+
 		if($left =~ /^(Abt|ca?)\.?\s+(.+)/i) {
 			$left = $2;
 		} elsif($left =~ /(.+?)\s?\?$/) {
@@ -244,7 +248,7 @@ sub datecmp
 			$left = $1;
 		}
 
-		if(($left =~ /^\d{3,4}/) && ($right =~ /^\d{3,4}/)) {
+		if(($left =~ /^\d{3,4}/) && ($left !~ /\-/) && ($right =~ /^\d{3,4}/) && ($right !~ /\-/)) {
 			# e.g. 1929/06/26 <=> 1939
 			$left =~ /^(\d{3,4})/;
 			my $start = $1;

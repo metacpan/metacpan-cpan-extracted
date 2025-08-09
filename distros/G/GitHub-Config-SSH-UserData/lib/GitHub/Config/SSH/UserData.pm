@@ -12,10 +12,8 @@ use Exporter 'import';
 
 use constant DEFAULT_CFG_FILE => catfile($ENV{HOME}, qw(.ssh config));
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
-
-use Exporter 'import';
 
 our @EXPORT_OK = qw(get_user_data_from_ssh_cfg);
 
@@ -67,7 +65,7 @@ GitHub::Config::SSH::UserData - Read user data from comments in ssh config file
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 
@@ -125,9 +123,9 @@ The following function can be exported on demand:
 
 =over
 
-=item C<get_user_data(I<USER_NAME>, I<SSH_CFG_FILE>)>
+=item C<get_user_data_from_ssh_cfg(I<USER_NAME>, I<SSH_CFG_FILE>)>
 
-=item C<get_user_data(I<USER_NAME>)>
+=item C<get_user_data_from_ssh_cfg(I<USER_NAME>)>
 
 The function scans file I<C<SSH_CFG_FILE>> (default is
 C<$ENV{HOME}/.ssh/config> and looks for C<Host github-I<USER_NAME>>. Then is

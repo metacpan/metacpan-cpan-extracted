@@ -1,8 +1,9 @@
 use strict;
 use warnings;
 
-use Test::Most;
 use Encode::Wide qw(wide_to_html wide_to_xml);
+use Test::Most;
+use Test::Returns;
 
 my @tests = (
 	{
@@ -52,17 +53,34 @@ my @tests = (
 foreach my $test (@tests) {
 	my $args = $test->{args} || {};
 	my $html = wide_to_html(string => $test->{input}, %{$args});
+
 	like $html, qr/^\P{Unassigned}*$/, "$test->{name} - HTML output is ASCII-safe";
 	is $html, $test->{html}, "$test->{name} - HTML correct output" if defined $test->{html};
+
+	returns_is($html, { type => 'string', 'min' => 1, nomatch => qr/[^[:ascii:]]/ });
+
+	$html = wide_to_html(string => \$test->{input}, %{$args});
+	is $html, $test->{html}, "$test->{name} - HTML correct output, given a ref to a string" if defined $test->{html};
+
+	undef $html;
 
 	my $xml = wide_to_xml(string => $test->{input}, %$args);
 	like $xml, qr/^\P{Unassigned}*$/, "$test->{name} - XML output is ASCII-safe";
 	is $xml, $test->{xml}, "$test->{name} - XML correct output" if defined $test->{xml};
+
+	$xml = wide_to_xml(string => \$test->{input}, %{$args});
+	is $xml, $test->{xml}, "$test->{name} - XML correct output, given a ref to a string" if defined $test->{xml};
+
+	returns_is($xml, { type => 'string', 'min' => 1, nomatch => qr/[^[:ascii:]]/ });
 }
 
 # Invalid input (undef string) should die
 throws_ok {
 	wide_to_html()
 } qr/^Usage:.+wide_to_html\(/, 'Missing string param throws';
+
+throws_ok {
+	wide_to_xml()
+} qr/^Usage:.+wide_to_xml\(/, 'Missing string param throws';
 
 done_testing();

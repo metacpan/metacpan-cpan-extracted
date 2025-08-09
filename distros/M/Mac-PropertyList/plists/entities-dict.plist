@@ -3,6 +3,6 @@
 <plist version="1.0">
 <dict>
 	<key>this &amp; that</key>
-	<string>&amp; &lt; &gt; &quot;</string>
+	<string>&amp; &lt; &gt; &quot; &#xED; &apos;</string>
 </dict>
 </plist>
