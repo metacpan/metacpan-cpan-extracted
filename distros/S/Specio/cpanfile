@@ -4,7 +4,6 @@
 requires "B" => "0";
 requires "Carp" => "0";
 requires "Clone" => "0";
-requires "Clone::Choose" => "0";
 requires "Clone::PP" => "0";
 requires "Devel::StackTrace" => "0";
 requires "Eval::Closure" => "0";

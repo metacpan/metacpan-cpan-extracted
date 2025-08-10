@@ -26,130 +26,130 @@ no_index:
 provides:
   Specio:
     file: lib/Specio.pm
-    version: '0.51'
+    version: '0.52'
   Specio::Coercion:
     file: lib/Specio/Coercion.pm
-    version: '0.51'
+    version: '0.52'
   Specio::Constraint::AnyCan:
     file: lib/Specio/Constraint/AnyCan.pm
-    version: '0.51'
+    version: '0.52'
   Specio::Constraint::AnyDoes:
     file: lib/Specio/Constraint/AnyDoes.pm
-    version: '0.51'
+    version: '0.52'
   Specio::Constraint::AnyIsa:
     file: lib/Specio/Constraint/AnyIsa.pm
-    version: '0.51'
+    version: '0.52'
   Specio::Constraint::Enum:
     file: lib/Specio/Constraint/Enum.pm
-    version: '0.51'
+    version: '0.52'
   Specio::Constraint::Intersection:
     file: lib/Specio/Constraint/Intersection.pm
-    version: '0.51'
+    version: '0.52'
   Specio::Constraint::ObjectCan:
     file: lib/Specio/Constraint/ObjectCan.pm
-    version: '0.51'
+    version: '0.52'
   Specio::Constraint::ObjectDoes:
     file: lib/Specio/Constraint/ObjectDoes.pm
-    version: '0.51'
+    version: '0.52'
   Specio::Constraint::ObjectIsa:
     file: lib/Specio/Constraint/ObjectIsa.pm
-    version: '0.51'
+    version: '0.52'
   Specio::Constraint::Parameterizable:
     file: lib/Specio/Constraint/Parameterizable.pm
-    version: '0.51'
+    version: '0.52'
   Specio::Constraint::Parameterized:
     file: lib/Specio/Constraint/Parameterized.pm
-    version: '0.51'
+    version: '0.52'
   Specio::Constraint::Role::CanType:
     file: lib/Specio/Constraint/Role/CanType.pm
-    version: '0.51'
+    version: '0.52'
   Specio::Constraint::Role::DoesType:
     file: lib/Specio/Constraint/Role/DoesType.pm
-    version: '0.51'
+    version: '0.52'
   Specio::Constraint::Role::Interface:
     file: lib/Specio/Constraint/Role/Interface.pm
-    version: '0.51'
+    version: '0.52'
   Specio::Constraint::Role::IsaType:
     file: lib/Specio/Constraint/Role/IsaType.pm
-    version: '0.51'
+    version: '0.52'
   Specio::Constraint::Simple:
     file: lib/Specio/Constraint/Simple.pm
-    version: '0.51'
+    version: '0.52'
   Specio::Constraint::Structurable:
     file: lib/Specio/Constraint/Structurable.pm
-    version: '0.51'
+    version: '0.52'
   Specio::Constraint::Structured:
     file: lib/Specio/Constraint/Structured.pm
-    version: '0.51'
+    version: '0.52'
   Specio::Constraint::Union:
     file: lib/Specio/Constraint/Union.pm
-    version: '0.51'
+    version: '0.52'
   Specio::Declare:
     file: lib/Specio/Declare.pm
-    version: '0.51'
+    version: '0.52'
   Specio::DeclaredAt:
     file: lib/Specio/DeclaredAt.pm
-    version: '0.51'
+    version: '0.52'
   Specio::Exception:
     file: lib/Specio/Exception.pm
-    version: '0.51'
+    version: '0.52'
   Specio::Exporter:
     file: lib/Specio/Exporter.pm
-    version: '0.51'
+    version: '0.52'
   Specio::Helpers:
     file: lib/Specio/Helpers.pm
-    version: '0.51'
+    version: '0.52'
   Specio::Library::Builtins:
     file: lib/Specio/Library/Builtins.pm
-    version: '0.51'
+    version: '0.52'
   Specio::Library::Numeric:
     file: lib/Specio/Library/Numeric.pm
-    version: '0.51'
+    version: '0.52'
   Specio::Library::Perl:
     file: lib/Specio/Library/Perl.pm
-    version: '0.51'
+    version: '0.52'
   Specio::Library::String:
     file: lib/Specio/Library/String.pm
-    version: '0.51'
+    version: '0.52'
   Specio::Library::Structured:
     file: lib/Specio/Library/Structured.pm
-    version: '0.51'
+    version: '0.52'
   Specio::Library::Structured::Dict:
     file: lib/Specio/Library/Structured/Dict.pm
-    version: '0.51'
+    version: '0.52'
   Specio::Library::Structured::Map:
     file: lib/Specio/Library/Structured/Map.pm
-    version: '0.51'
+    version: '0.52'
   Specio::Library::Structured::Tuple:
     file: lib/Specio/Library/Structured/Tuple.pm
-    version: '0.51'
+    version: '0.52'
   Specio::OO:
     file: lib/Specio/OO.pm
-    version: '0.51'
+    version: '0.52'
   Specio::PP:
     file: lib/Specio/PP.pm
-    version: '0.51'
+    version: '0.52'
   Specio::PartialDump:
     file: lib/Specio/PartialDump.pm
-    version: '0.51'
+    version: '0.52'
   Specio::Registry:
     file: lib/Specio/Registry.pm
-    version: '0.51'
+    version: '0.52'
   Specio::Role::Inlinable:
     file: lib/Specio/Role/Inlinable.pm
-    version: '0.51'
+    version: '0.52'
   Specio::Subs:
     file: lib/Specio/Subs.pm
-    version: '0.51'
+    version: '0.52'
   Specio::TypeChecks:
     file: lib/Specio/TypeChecks.pm
-    version: '0.51'
+    version: '0.52'
   Specio::XS:
     file: lib/Specio/XS.pm
-    version: '0.51'
+    version: '0.52'
   Test::Specio:
     file: lib/Test/Specio.pm
-    version: '0.51'
+    version: '0.52'
 recommends:
   Ref::Util: '0.112'
   Sub::Util: '1.40'
@@ -157,7 +157,6 @@ requires:
   B: '0'
   Carp: '0'
   Clone: '0'
-  Clone::Choose: '0'
   Clone::PP: '0'
   Devel::StackTrace: '0'
   Eval::Closure: '0'
@@ -185,7 +184,7 @@ resources:
   bugtracker: https://github.com/houseabsolute/Specio/issues
   homepage: https://metacpan.org/release/Specio
   repository: git://github.com/houseabsolute/Specio.git
-version: '0.51'
+version: '0.52'
 x_Dist_Zilla:
   perl:
     version: '5.040002'
@@ -554,7 +553,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.49.0
+          git_version: 2.50.1
           include_authors: 0
           include_releaser: 1
           order_by: name
@@ -763,7 +762,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::DROLSKY::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.49.0
+          git_version: 2.50.1
           repo_root: .
       name: '@DROLSKY/DROLSKY::Git::CheckFor::CorrectBranch'
       version: '1.22'
@@ -775,7 +774,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.49.0
+          git_version: 2.50.1
           repo_root: .
       name: '@DROLSKY/Git::CheckFor::MergeConflicts'
       version: '0.014'
@@ -809,7 +808,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.49.0
+          git_version: 2.50.1
           repo_root: .
       name: '@DROLSKY/Git::Check'
       version: '2.051'
@@ -833,7 +832,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.49.0
+          git_version: 2.50.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -846,11 +845,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.51
+          tag: v0.52
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.49.0
+          git_version: 2.50.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -864,7 +863,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.49.0
+          git_version: 2.50.1
           repo_root: .
       name: '@DROLSKY/Git::Push'
       version: '2.051'
@@ -894,7 +893,7 @@ x_Dist_Zilla:
             - (?^:.+)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.49.0
+          git_version: 2.50.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -908,7 +907,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.49.0
+          git_version: 2.50.1
           repo_root: .
       name: '@DROLSKY/Push version bump'
       version: '2.051'
@@ -1012,6 +1011,7 @@ x_Dist_Zilla:
     version: '6.033'
 x_authority: cpan:DROLSKY
 x_contributors:
+  - 'Andrew Rodland <andrewr@vimeo.com>'
   - 'Chris White <chrisw@leehayes.com>'
   - 'cpansprout <cpansprout@gmail.com>'
   - 'Graham Knop <haarg@haarg.org>'

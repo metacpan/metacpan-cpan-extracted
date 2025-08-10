@@ -1,4 +1,4 @@
-package LedgerSMB::Installer v0.999.7;
+package LedgerSMB::Installer v0.999.8;
 
 use v5.20;
 use experimental qw(signatures);
@@ -51,6 +51,31 @@ sub _boot($class, $args, $options) {
     return ($dss, $config);
 }
 
+my $signing_key_data = <<'KEY_DATA_END';
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+Comment: Hostname: fr.pgpkeys.eu
+Version: Hockeypuck 2.2.4
+
+xsBNBEYTN1ABCACuVLUCasiD4KnetfEHtMo+qDjKbcWauIkw/KU+gj8kN7Y+E3ye
+cLxtY1gJlZp0iIgnZ6aw7bPCleTXbBfXXbMyLs0+CN9cfCyXB5TU4nlh16or/vlE
+C+0WjEuD9Qznm805RXJGvIRPobXrxcO7aB7pT3NkKj2z//9D0w0uC+BDEl0uihZG
++fIbb2ihPWO/r9ghHhyMRTibSRye09owhVpr/5gYRFtvp7OsYHaLhUD3+WXPhGIZ
+U7YqBFRumDNR+S8EewuKj0CBxCtC+iSFyR/fNPh50FbtgqY/9qLmZa/u42oyjrCl
+TM+ALCM+PutEPVEIyVoO4jluoZ8yG4IFVxyxABEBAAHNZUxlZGdlclNNQiBDb3Jl
+IFRlYW0gKFRoaXMgaXMgdGhlIGtleSB1c2VkIGZvciBwYWNrYWdlIHNpZ25pbmcu
+KSA8bGVkZ2VyLXNtYi1jb3JlQGxpc3RzLmxlZGdlcnNtYi5vcmc+wsB2BBMBAgAg
+BQJGEzdQAhsDBgsJCAcDAgQVAggDBBYCAwECHgECF4AACgkQOaYpVY2grxAaDwgA
+kp2LZNyrZDom1tBwR3aisfYFkkiuFrUZUn+fYwr7wnkq06gpYGZrNgdcanSxjGoD
+wf2kMeCwWAD6sao824onboJWRi1LR3Q5RKIAvYBeLZ75/hYSy3JP/YLMl047IWcU
+CMaqZfmXPHvkOdUblPxCaKJM8c9Sb6KxGzu4BU2Y97TvQjn9xNbq4t7Pgpu5RORH
+Hp96V+kZXGxzQo0gCE+6dr1JFZeTKmTkGSvkchndn5UVLguLIg9kCxxcDiS7hmTx
+yB+b0+kPgRUb0YVp6QqFq7O8fvzhsW8sYopBJsbArODS2qeMiwPUnKs+7qkZg8Jd
+j2QoHZCY06NU6yvqq/CIt8JGBBARAgAGBQJIx9P/AAoJEHc352JrCredRJwAnRFe
+UDqpUCw368z/Ht6FDInXnC2kAJ995NXymKbQVg478EdOrJT8h1SPRA==
+=a/2y
+-----END PGP PUBLIC KEY BLOCK-----
+KEY_DATA_END
+
 sub _build_install_tree($class, $dss, $config, $installpath, $version) {
     my $archive = "ledgersmb-$version.tar.gz";
 
@@ -62,22 +87,24 @@ sub _build_install_tree($class, $dss, $config, $installpath, $version) {
     $log->info( "Downloading release tarball $archive" );
     $class->_download( $installpath, $version );
 
-    #$log->info( "Verifying tarball against gpg public key & signature" );
-    #$dss->verify_gpg( \@cmds, $archive )
-    #    if $verify;
+    $log->info( "Verifying tarball against gpg public key & signature" );
+    my $downloaded_tar = File::Spec->catfile( $installpath, $archive );
+    $dss->verify_sig( $installpath,
+                      $downloaded_tar,
+                      "$downloaded_tar.asc",
+                      $signing_key_data )
+        if $config->verify_sig;
 
     $log->info( "Extracting release tarball" );
-    $dss->untar( File::Spec->catfile( $installpath, $archive),
+    $dss->untar( $downloaded_tar,
                  $installpath,
                  no_same_owner => 1,
                  strip_components => 1 );
     $config->cpanfile_path( File::Spec->catfile( $installpath, 'cpanfile' ) );
 
     $log->info( "Removing extracted release tarball" );
-    remove_tree(               # croaks on fatal errors
-        map {
-            File::Spec->catfile( $installpath, $_ )
-        } ( $archive, "$archive.asc" ) );
+    # croaks on fatal errors:
+    remove_tree( $downloaded_tar, "$downloaded_tar.asc" );
 }
 
 sub _get_cpanfile($class, $config) {

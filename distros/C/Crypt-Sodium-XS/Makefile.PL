@@ -178,7 +178,7 @@ sub MY::postamble {
   my $min_build = $ENV{SODIUM_LIBRARY_MINIMAL} ? 'SODIUM_LIBRARY_MINIMAL=1' : '';
   return <<EOMAKE;
 $libsodium_dir/configure:
-	\$(TAR) -C '$src_dir' -xzf '$ENV{SODIUM_BUNDLED}'
+	cd '$src_dir' && \$(TAR) -xzf '$ENV{SODIUM_BUNDLED}'
 	rm -rf "$src_dir/libsodium-build"
 	mv "$src_dir/libsodium-"*/ "$src_dir/libsodium-build"
 $libsodium_dir/Makefile: $libsodium_dir/configure

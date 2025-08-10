@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 7;
+use Test::More;
 
 use FindBin;
 use lib "$FindBin::Bin/../lib";
@@ -11,11 +11,13 @@ use lib "$FindBin::Bin/../lib";
 eval "use Business::Tax::VAT::Validation 1.24";
 plan skip_all => "Business::Tax::VAT::Validation 1.24" if $@;
 
+eval { require LWP::Protocol::https; 1 } or do {
+  plan skip_all => "LWP::Protocol::https no disponible";
+};
+
 BEGIN { use_ok('Business::ES::NIF') || print "Bail out!\n"; }
 
 subtest 'VIES deshabilitado por defecto' => sub {
-  plan tests => 3;
-    
   my $nif = Business::ES::NIF->new(nif => '12345678Z');
     
   is($nif->vies_check, undef, "Sin vies_check cuando VIES deshabilitado");
@@ -25,8 +27,6 @@ subtest 'VIES deshabilitado por defecto' => sub {
 };
 
 subtest 'VIES con new()' => sub {
-  plan tests => 4;
-    
   my $nif = Business::ES::NIF->new(nif => '12345678Z', vies => 1);
     
   is($nif->VIES(),  1,         "VIES habilitado en constructor");
@@ -37,8 +37,6 @@ subtest 'VIES con new()' => sub {
 };
 
 subtest 'VIES no se ejecuta con documentos inválidos' => sub {
-  plan tests => 2;
-    
   my $nif = Business::ES::NIF->new(nif => 'INVALID123', vies => 1);
   
   is($nif->vies_check, undef   ,    "VIES no se ejecuta con documento inválido");
@@ -46,7 +44,6 @@ subtest 'VIES no se ejecuta con documentos inválidos' => sub {
 };
 
 subtest 'Manejo de errores VIES' => sub {
-  plan tests => 2;
   local @INC = ();
   
   my $nif = Business::ES::NIF->new(nif => '12345678Z', vies => 1);
@@ -56,8 +53,7 @@ subtest 'Manejo de errores VIES' => sub {
 };
 
 subtest 'VIES con diferentes tipos' => sub {
-  my @docs_test =  qw(12345678Z X1234567L A12345674);
-  plan tests    => scalar(@docs_test) * 2;
+  my @docs_test = qw(12345678Z X1234567L A12345674);
 
   for my $doc (@docs_test) {
     my $obj = Business::ES::NIF->new(nif => $doc, vies => 1);

@@ -3,8 +3,7 @@ package Specio::OO;
 use strict;
 use warnings;
 
-use Carp            qw( confess );
-use Clone::Choose   ();
+use Carp qw( confess );
 use List::Util 1.33 qw( all );
 use MRO::Compat;
 use Role::Tiny;
@@ -14,7 +13,7 @@ use Specio::Helpers     qw( perlstring );
 use Specio::PartialDump qw( partial_dump );
 use Specio::TypeChecks;
 
-our $VERSION = '0.51';
+our $VERSION = '0.52';
 
 use Exporter qw( import );
 
@@ -366,7 +365,7 @@ Specio::OO - A painfully poor reimplementation of Moo(se)
 
 =head1 VERSION
 
-version 0.51
+version 0.52
 
 =head1 DESCRIPTION
 

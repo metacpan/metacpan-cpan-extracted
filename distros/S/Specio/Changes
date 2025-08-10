@@ -1,3 +1,10 @@
+0.52     2025-08-09
+
+- Really made it possible to force Specio to use only pure Perl dependencies. The changes in 0.51
+  were incomplete, so lots of places still loaded the Clone (XS) module. Fixed by @arodland (Andrew
+  Rodland). GH #23.
+
+
 0.51     2025-06-19
 
 - Made it possible to force Specio to only use pure Perl dependencies by setting the

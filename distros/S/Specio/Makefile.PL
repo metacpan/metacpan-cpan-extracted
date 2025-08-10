@@ -23,7 +23,6 @@ my %WriteMakefileArgs = (
     "B" => 0,
     "Carp" => 0,
     "Clone" => 0,
-    "Clone::Choose" => 0,
     "Clone::PP" => 0,
     "Devel::StackTrace" => 0,
     "Eval::Closure" => 0,
@@ -57,7 +56,7 @@ my %WriteMakefileArgs = (
     "open" => 0,
     "utf8" => 0
   },
-  "VERSION" => "0.51",
+  "VERSION" => "0.52",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -67,7 +66,6 @@ my %FallbackPrereqs = (
   "B" => 0,
   "Carp" => 0,
   "Clone" => 0,
-  "Clone::Choose" => 0,
   "Clone::PP" => 0,
   "Devel::StackTrace" => 0,
   "Eval::Closure" => 0,

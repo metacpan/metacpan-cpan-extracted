@@ -11,6 +11,7 @@ add_stopwords(<DATA>);
 all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
 API
+Andrew
 AnyCan
 AnyDoes
 AnyIsa
@@ -73,6 +74,7 @@ PositiveOrZeroInt
 PositiveOrZeroNum
 RegexpRef
 Registry
+Rodland
 Role
 Rolsky
 Rolsky's
@@ -99,6 +101,7 @@ Vitaly
 White
 XS
 Yuval
+andrewr
 autarch
 boolification
 chrisw

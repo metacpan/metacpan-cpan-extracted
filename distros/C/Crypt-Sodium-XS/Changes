@@ -1,3 +1,7 @@
+0.000038 Aug 9 2025
+
+- Makefile.PL: remove use of -C option with tar for portability (solaris)
+
 0.000037 Aug 5 2025
 
 - fix a potential under-allocation in generichash multipart state sizes

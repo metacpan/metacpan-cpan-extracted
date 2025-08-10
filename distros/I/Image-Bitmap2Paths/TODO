@@ -1,0 +1,36 @@
+	cntBlobby is empty
+
+When updating a field, need to make a deep copy!
+
+Deal with $marked: it is a placeholder so far !!!
+	See CAVEATS in the docs.
+
+When we start a closed stroke at a MFork tip, we choose direction clockwise assuming the tip goes outside..  For .sdf, the direction
+(probably???) does not matter; but in general, should not we retry if the area is negative???
+		Probably does not matter, since we are going to un-close the stroke (by splitting) anyway later.
+
+What if due to punch-throughs, the area is non-positive even if direction is "correct"???
+		Probably does not matter, since we are going to un-close the stroke (by splitting) anyway later.
+
+When processing a closed stroke at a MFork tip, we do not close the stroke (may move a bit due to the best-fit of slopped lines).
+
+11,4 may get earlier than 4,11 in sorting in:
+  push @E, map [@$_,0], @edges{sort keys %edges};
+This would break the preference of clockwise direction.
+
+In ¤, the MTail is obsolete: one of the legs of its fork is alraedy ignored!  This leads to a complete mess of transversal.
+	(one way to detect is that we write
+		$nextEdge[$y2][$x2][($dir+($rot != -1)+4)%8] = (($rot == -1 ? 0 : 7))
+	 second time; so check that this is not needed!)
+
+
+==================== Analyse (very old) changes which are sometimes not beneficial
+
+	rcs diff -puwb -r1.146 -r1.157 ! | less
+With joints: versions 1.146 - 1.157 of hex_parse.pl of 2015/01/19-29.
+
+  Chunks before 759 (new) just add lookup for blobs.
+	922-1166 (new; added if(){}): check $pp for 'tail' (for cedilla), and adds code for 'Curve' to one for 'curve';
+			 $deg_corner; 'Rhombus-force'
+  	1221 (new) clears edges near blobs, and adds (when???) new edges.
+  Chunks after 1420 (new) not important.

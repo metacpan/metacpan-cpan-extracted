@@ -1,4 +1,4 @@
-package LedgerSMB::Installer::OS::linux::debian v0.999.7;
+package LedgerSMB::Installer::OS::linux::debian v0.999.8;
 
 use v5.20;
 use experimental qw(signatures);
@@ -127,7 +127,7 @@ sub prepare_builder_env($self, $config) {
 
 sub prepare_extraction_env($self, $config) {
     my ($have_deps, ) = capture_stdout {
-        system( qw( dpkg-query -W tar gzip ) );
+        system( qw( dpkg-query -W tar gzip gpg ) );
     };
     my @pkgs;
     unless (grep { m/tar/ } split(/\n/, $have_deps)) {
@@ -135,6 +135,11 @@ sub prepare_extraction_env($self, $config) {
     }
     unless (grep { m/gzip/ } split(/\n/, $have_deps)) {
         push @pkgs, 'gzip';
+    }
+    if ($config->verify_sig) {
+        unless (grep { m/gpg/ } split(/\n/, $have_deps)) {
+            push @pkgs, 'gpg';
+        }
     }
     if (@pkgs) {
         $config->mark_pkgs_for_cleanup( \@pkgs );

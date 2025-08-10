@@ -121,6 +121,129 @@ may be mixed.
 Various redirection operators reminiscent of those seen on common Unix and DOS
 command lines are provided.
 
+=head1 SIMPLE QUICKSTART
+
+Here's a quick guide to basic usage of using IPC::Run's C<run()> function.
+
+=head2 Capturing output and errors from an external command
+
+Say you want to run a command in your shell. We'll use C<ls> for
+simplicity, although there are far better ways to get a list of files, such
+as the C<glob()> function or the L<File::Find> module.
+
+The basic form of C<run()> has the command and its arguments passed as an
+arrayref in the first argument. The command cannot be a single string.
+
+    @cmd = [ 'ls', '-a', '-l', '-r', '-t' ];    # Yes
+    @cmd = ( 'ls -a -l -r -t' );                # No
+
+After the command, pass a scalar reference C<\$in> for the input to pass
+in, and scalar references C<\$out> and C<\$err> to receive the content of
+stdout and stderr.
+
+    use IPC::Run qw( run );
+
+    @cmd = qw( ls -l -a -r -t );
+    run( \@cmd, \$in, \$out, \$err ) or die $?;
+
+    print("\$err is ", length($err), " bytes long\n");
+    print($err, "\n");
+
+    print("\$out is ", length($out), " bytes long\n");
+    print($out, "\n");
+
+Running this will show something like:
+
+    $err is 0 bytes long
+
+    $out is 1410 bytes long
+    total 392
+    drwxr-xr-x    3 andy  staff     96 Mar 17 11:53 .github
+    -rw-r--r--    1 andy  staff    158 Mar 17 11:53 .gitignore
+    ... etc ...
+
+Note that C<$out> and C<$err> are always defined after a call to C<run()>,
+even if they receive no data.
+
+=head2 Passing input to the external program
+
+If you have input to pass in, put it in the C<$in> variables.  For example,
+to use the C<wc> command to count lines, words and characters in a block of
+text:
+
+    $in = <<'CARROLL';
+    'Twas brillig, and the slithy toves
+        Did gyre and gimble in the wabe:
+    All mimsy were the borogoves,
+        And the mome raths outgrabe.
+    CARROLL
+
+    @cmd = qw( wc );
+    run( \@cmd, \$in, \$out, \$err ) or die $?;
+    print "$out";
+
+This gives the output:
+
+           4      23     140
+
+=head2 Handling errors
+
+It's important to check the return code of C<run()> to see if the command
+ran successfully. C<run()> returns a boolean true on success, and false on
+failure. Note that this is the opposite of Perl's C<system()>, which
+returns 0 on success and a non-zero value on failures.
+
+For the specific subprocess error code, check C<$?> directly.
+
+    @cmd = qw( tar xzvf nonexistent.tar );
+    if ( !run( \@cmd, \$in, \$out, \$err ) ) {
+        print "\$? = $?\n";
+        print "err = $err\n";
+    }
+
+Running this gives:
+
+    $? = 256
+    err = tar: Error opening archive: Failed to open 'nonexistent.tar'
+
+If the program does not exist, then C<run()> will C<die> and won't return
+at all.  For example:
+
+    @cmd = qw( bogus-command );
+    my $rc = run( \@cmd, \$in, \$out, \$err );
+    print "run returned ", ($rc ? "true" : "false"), "\n";
+
+Running this doesn't make it to the C<print> statement.
+
+    Command 'bogus-command' not found in [ list of paths ] at program.pl line N.
+
+To handle the possibility of a non-existent program, call C<run()> inside
+an C<eval>.
+
+    my $rc;
+    eval { $rc = run( \@cmd, \$in, \$out, \$out ); 1; };
+    if ( !defined($rc) ) {
+        print "run died: $@\n";
+    }
+    else {
+        if ( $rc ) {
+            print "run returned true\n";
+        }
+        else {
+            print "run returned false\n";
+            print "\$? = $?\n";
+        }
+    }
+
+=head2 And beyond
+
+That's the basics of using C<run()> as a replacement for C<system()>. If you'd
+like to do more, such as having subprocesses communicate with each other,
+setting timeouts on long-running processes, kill running subprocesses,
+redirecting output, closing file descriptors and much much MUCH more, read on.
+
+=head1 THE DETAILS
+
 Before digging in to the details a few LIMITATIONS are important enough
 to be mentioned right up front:
 
@@ -157,8 +280,6 @@ under the hood:
                                       # the helper processes.
 
 =back
-
-We now return you to your regularly scheduled documentation.
 
 =head2 Harnesses
 
@@ -588,7 +709,7 @@ listing.
 This can make it hard to guarantee that your output parser won't be fooled
 into early termination of results.
 
-To help work around this, you can see if the program can alter it's 
+To help work around this, you can see if the program can alter its
 prompt, and use something you feel is never going to occur in actual
 practice.
 
@@ -625,7 +746,7 @@ Not prompting unless connected to a tty.
 
 Some programs don't prompt unless stdin or stdout is a tty.  See if you can
 turn prompting back on.  If not, see if you can come up with a command that
-you can issue after every real command and look for it's output, as
+you can issue after every real command and look for its output, as
 IPC::ChildSafe does.   There are two filters included with IPC::Run that
 can help with doing this: appender and chunker (see new_appender() and
 new_chunker()).
@@ -855,7 +976,7 @@ does the same basic thing as:
 The subroutine will be called each time some data is read from the child.
 
 The >pipe operator is different in concept than the other '>' operators,
-although it's syntax is similar:
+although its syntax is similar:
 
    $h = start \@cat, $in, '>pipe', \*OUT, '2>pipe', \*ERR;
    $in = "hello world\n";
@@ -1016,7 +1137,7 @@ use Exporter ();
 use vars qw{$VERSION @ISA @FILTER_IMP @FILTERS @API @EXPORT_OK %EXPORT_TAGS};
 
 BEGIN {
-    $VERSION = '20231003.0';
+    $VERSION = '20250809.0';
     @ISA     = qw{ Exporter };
 
     ## We use @EXPORT for the end user's convenience: there's only one function
@@ -1424,8 +1545,11 @@ sub _pty {
 sub _read {
     confess 'undef' unless defined $_[0];
     my $s = '';
-    my $r = POSIX::read( $_[0], $s, 10_000 );
-    croak "$!: read( $_[0] )" if not($r) and !$!{EINTR};
+    my $r;
+    do {
+        $r = POSIX::read( $_[0], $s, 10_000 );
+    } while ( !defined($r) && $!{EINTR} );
+    croak "$!: read( $_[0] )" unless defined($r);
     $r ||= 0;
     _debug "read( $_[0] ) = $r chars '$s'" if _debugging_data;
     return $s;
@@ -1446,13 +1570,20 @@ sub _spawn {
     croak "$! during fork" unless defined $kid->{PID};
 
     unless ( $kid->{PID} ) {
+        if ( $self->{_sigusr1_after_fork} ) {
+
+            # sleep 10ms to improve chance of parent starting read() before it
+            # handles the signal we're about to send.
+            select undef, undef, undef, 0.01;
+            kill 'USR1', getppid;
+        }
         ## _do_kid_and_exit closes sync_reader_fd since it closes all unwanted and
         ## unloved fds.
         $self->_do_kid_and_exit($kid);
     }
     _debug "fork() = ", $kid->{PID} if _debugging_details;
 
-    ## Wait for kid to get to it's exec() and see if it fails.
+    ## Wait for kid to get to its exec() and see if it fails.
     _close $self->{SYNC_WRITER_FD};
     my $sync_pulse = _read $sync_reader_fd;
     _close $sync_reader_fd;
@@ -1625,7 +1756,7 @@ The harness is then cleaned up.
 The doubled name indicates that this function may kill again and avoids
 colliding with the core Perl C<kill> function.
 
-Returns a 1 if the C<TERM> was sufficient, or a 0 if C<KILL> was 
+Returns undef if the C<TERM> was sufficient, or a 1 if C<KILL> was 
 required.  Throws an exception if C<KILL> did not permit the children
 to be reaped.
 
@@ -2749,7 +2880,7 @@ after building all of the pipes and launching (via fork()/exec(), or, maybe
 someday, spawn()) all the child processes.  It does not send or receive any
 data on the pipes, see pump() and finish() for that.
 
-You may call harness() and then pass it's result to start() if you like,
+You may call harness() and then pass its result to start() if you like,
 but you only need to if it helps you structure or tune your application.
 If you do call harness(), you may skip start() and proceed directly to
 pump.
@@ -2985,9 +3116,27 @@ sub _clobber {
 sub _select_loop {
     my IPC::Run $self = shift;
 
+    # With !defined $SIG{CHLD} (the default), Perl restarts any select() that
+    # SIGCHLD interrupts.  Install a no-op handler, to make select() terminate
+    # with EINTR, accelerating our reaction.  This doesn't help if SIGCHLD
+    # arrives just before the select() call; https://cr.yp.to/docs/selfpipe.html
+    # is a way to close that race condition.  It doesn't help on Windows, where
+    # we substitute a low timeout in zero-FD (timeout-only) select().  That
+    # spends CPU to achieve responsiveness.  We could do better there with a
+    # C-language module that calls OpenProcess(), WSAEventSelect(), and
+    # WaitForMultipleObjects().
+    #
+    # If non-IPC::Run code has installed a handler, via $SIG{CHLD} assignment or
+    # via POSIX::sigaction(), this statement takes no action, and the existing
+    # handler helps just like this one would.  The cap on $not_forever helps
+    # when non-IPC::Run code has blocked SIGCHLD, e.g. via POSIX::sigprocmask().
+    local $SIG{CHLD} = sub { }
+      unless defined $SIG{CHLD};
+
     my $io_occurred;
 
-    my $not_forever = 0.01;
+    my $min_select_timeout = 0.01;
+    my $not_forever        = $min_select_timeout;
 
   SELECT:
     while ( $self->pumpable ) {
@@ -3065,9 +3214,16 @@ sub _select_loop {
             ## No I/O will wake the select loop up, but we have children
             ## lingering, so we need to poll them with a short timeout.
             ## Otherwise, assume more input will be coming.
-            $timeout = $not_forever;
-            $not_forever *= 2;
-            $not_forever = 0.5 if $not_forever >= 0.5;
+
+            if ( !Win32_MODE || $self->{RIN} || $self->{WIN} || $self->{EIN} ) {
+                $timeout = $not_forever;
+                $not_forever *= 2;
+                $not_forever = 0.5 if $not_forever >= 0.5;
+            }
+            else {
+                # see above rationale for Windows-specific behavior
+                $timeout = $min_select_timeout;
+            }
         }
 
         ## Make sure we don't block forever in select() because inputs are
@@ -3083,9 +3239,14 @@ sub _select_loop {
             }
 
             ## Otherwise, assume more input will be coming.
-            $timeout = $not_forever;
-            $not_forever *= 2;
-            $not_forever = 0.5 if $not_forever >= 0.5;
+            if ( !Win32_MODE || $self->{RIN} || $self->{WIN} || $self->{EIN} ) {
+                $timeout = $not_forever;
+                $not_forever *= 2;
+                $not_forever = 0.5 if $not_forever >= 0.5;
+            }
+            else {
+                $timeout = $min_select_timeout;
+            }
         }
 
         _debug 'timeout=', defined $timeout ? $timeout : 'forever'
@@ -3161,7 +3322,7 @@ sub _select_loop {
         #   FILE:
         #      for my $pipe ( @pipes ) {
         #         ## Pipes can be shared among kids.  If another kid closes the
-        #         ## pipe, then it's {FD} will be undef.  Also, on Win32, pipes can
+        #         ## pipe, then its {FD} will be undef.  Also, on Win32, pipes can
         #	 ## be optimized to be files, in which case the FD is left undef
         #	 ## so we don't try to select() on it.
         #         if ( $pipe->{TYPE} =~ /^>/
@@ -3226,8 +3387,8 @@ sub _cleanup {
     ## _clobber modifies PIPES
     $self->_clobber( $self->{PIPES}->[0] ) while @{ $self->{PIPES} };
 
+    # reap kids
     for my $kid ( @{ $self->{KIDS} } ) {
-        _debug "cleaning up kid ", $kid->{NUM} if _debugging_details;
         if ( !length $kid->{PID} ) {
             _debug 'never ran child ', $kid->{NUM}, ", can't reap"
               if _debugging;
@@ -3236,14 +3397,15 @@ sub _cleanup {
                   if defined $op->{TFD} && !defined $op->{TEMP_FILE_HANDLE};
             }
         }
-        elsif ( !defined $kid->{RESULT} ) {
-            _debug 'reaping child ', $kid->{NUM}, ' (pid ', $kid->{PID}, ')'
-              if _debugging;
-            my $pid = waitpid $kid->{PID}, 0;
-            $kid->{RESULT} = $?;
-            _debug 'reaped ', $pid, ', $?=', $kid->{RESULT}
-              if _debugging;
+        else {
+            _waitpid( $kid, 0 );
         }
+    }
+
+    # OPS cleanup.  Kids may share an OPS object; search for "also to write".
+    # Example harness: run(['echo',1], '&', ['echo',2], '>', \$out).  Hence,
+    # this starts after the last reap.
+    for my $kid ( @{ $self->{KIDS} } ) {
 
         #      if ( defined $kid->{DEBUG_FD} ) {
         #	 die;
@@ -3253,7 +3415,7 @@ sub _cleanup {
         #         $kid->{DEBUG_FD} = undef;
         #      }
 
-        _debug "cleaning up filters" if _debugging_details;
+        _debug "cleaning up filters at kid ", $kid->{NUM} if _debugging_details;
         for my $op ( @{ $kid->{OPS} } ) {
             @{ $op->{FILTERS} } = grep {
                 my $filter = $_;
@@ -3447,59 +3609,74 @@ sub reap_nb {
     ## Oh, and this keeps us from reaping other children the process
     ## may have spawned.
     for my $kid ( @{ $self->{KIDS} } ) {
-        if (Win32_MODE) {
-            next if !defined $kid->{PROCESS} || defined $kid->{RESULT};
-            unless ( $kid->{PROCESS}->Wait(0) ) {
-                _debug "kid $kid->{NUM} ($kid->{PID}) still running"
-                  if _debugging_details;
-                next;
-            }
+        _waitpid( $kid, 1 );
+    }
+}
 
+# Support routine (non-method) for waitpid() or platform's equivalent.  Sets $?
+# and $_[0]->{RESULT} iff the kid exited.
+sub _waitpid {
+    my ( $kid, $nohang ) = @_;
+
+    if (Win32_MODE) {
+        require Win32::Process;
+
+        return if !defined $kid->{PROCESS} || defined $kid->{RESULT};
+        my $wait_timeout = $nohang ? 0 : Win32::Process::INFINITE();
+        unless ( $kid->{PROCESS}->Wait($wait_timeout) ) {
+            confess "kid $kid->{PID} still running after indefinite wait"
+              unless $nohang;
+            _debug "kid $kid->{NUM} ($kid->{PID}) still running"
+              if _debugging_details;
+            return;
+        }
+
+        _debug "kid $kid->{NUM} ($kid->{PID}) exited"
+          if _debugging;
+
+        my $native_result;
+        $kid->{PROCESS}->GetExitCode($native_result)
+          or croak "$! while GetExitCode()ing for Win32 process";
+
+        unless ( defined $native_result ) {
+            $kid->{RESULT} = "0 but true";
+            $? = $kid->{RESULT} = 0x0F;
+        }
+        else {
+            my $win32_full_result = $native_result << 8;
+            if ( $win32_full_result >> 8 != $native_result ) {
+
+                # !USE_64_BIT_INT build and exit code > 0xFFFFFF
+                require Math::BigInt;
+                $win32_full_result = Math::BigInt->new($native_result);
+                $win32_full_result->blsft(8);
+            }
+            $? = $kid->{RESULT} = $win32_full_result;
+        }
+    }
+    else {
+        return if !defined $kid->{PID} || defined $kid->{RESULT};
+        my $pid = waitpid $kid->{PID}, $nohang ? POSIX::WNOHANG() : 0;
+        unless ($pid) {
+            confess "kid $kid->{PID} still running after indefinite wait"
+              unless $nohang;
+            _debug "$kid->{NUM} ($kid->{PID}) still running"
+              if _debugging_details;
+            return;
+        }
+
+        if ( $pid < 0 ) {
+            _debug "No such process: $kid->{PID}\n" if _debugging;
+            $kid->{RESULT} = "unknown result, unknown PID";
+        }
+        else {
             _debug "kid $kid->{NUM} ($kid->{PID}) exited"
               if _debugging;
 
-            my $native_result;
-            $kid->{PROCESS}->GetExitCode($native_result)
-              or croak "$! while GetExitCode()ing for Win32 process";
-
-            unless ( defined $native_result ) {
-                $kid->{RESULT} = "0 but true";
-                $? = $kid->{RESULT} = 0x0F;
-            }
-            else {
-                my $win32_full_result = $native_result << 8;
-                if ( $win32_full_result >> 8 != $native_result ) {
-
-                    # !USE_64_BIT_INT build and exit code > 0xFFFFFF
-                    require Math::BigInt;
-                    $win32_full_result = Math::BigInt->new($native_result);
-                    $win32_full_result->blsft(8);
-                }
-                $? = $kid->{RESULT} = $win32_full_result;
-            }
-        }
-        else {
-            next if !defined $kid->{PID} || defined $kid->{RESULT};
-            my $pid = waitpid $kid->{PID}, POSIX::WNOHANG();
-            unless ($pid) {
-                _debug "$kid->{NUM} ($kid->{PID}) still running"
-                  if _debugging_details;
-                next;
-            }
-
-            if ( $pid < 0 ) {
-                _debug "No such process: $kid->{PID}\n" if _debugging;
-                $kid->{RESULT} = "unknown result, unknown PID";
-            }
-            else {
-                _debug "kid $kid->{NUM} ($kid->{PID}) exited"
-                  if _debugging;
-
-                confess "waitpid returned the wrong PID: $pid instead of $kid->{PID}"
-                  unless $pid == $kid->{PID};
-                _debug "$kid->{PID} returned $?\n" if _debugging;
-                $kid->{RESULT} = $?;
-            }
+            confess "waitpid returned the wrong PID: $pid instead of $kid->{PID}"
+              unless $pid == $kid->{PID};
+            _debug "$kid->{PID} returned $?\n" if _debugging;
+            $kid->{RESULT} = $?;
         }
     }
 }
@@ -3543,8 +3720,10 @@ sub finish {
 
     # We don't alter $self->{clear_ins}, start() and run() control it.
 
-    while ( $self->pumpable ) {
-        $self->_select_loop($options);
+    if ( %{ $self->{PTYS} } || @{ $self->{PIPES} } || @{ $self->{TIMERS} } ) {
+        while ( $self->pumpable ) {
+            $self->_select_loop($options);
+        }
     }
     $self->_cleanup;
 
@@ -4348,7 +4527,7 @@ closing the parent socket.
 
 Being a race condition, it's hard to reproduce, but I encountered it while
 testing this code on a drive share to a samba box.  In this case, it takes
-t/run.t a long time to spawn it's child processes (the parent hangs in the
+t/run.t a long time to spawn its child processes (the parent hangs in the
 first select for several seconds until the child emits any debugging output).
 
 I have not seen it on local drives, and can't reproduce it at will,

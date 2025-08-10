@@ -3,11 +3,11 @@ package Specio::Constraint::Structured;
 use strict;
 use warnings;
 
-our $VERSION = '0.51';
+our $VERSION = '0.52';
 
-use Clone ();
 use List::Util 1.33 qw( all );
 use Role::Tiny::With;
+use Specio qw( _clone );
 use Specio::OO;
 use Specio::TypeChecks qw( does_role );
 
@@ -16,7 +16,7 @@ with 'Specio::Constraint::Role::Interface';
 
 {
     ## no critic (Subroutines::ProtectPrivateSubs)
-    my $attrs = Clone::clone( Specio::Constraint::Role::Interface::_attrs() );
+    my $attrs = _clone( Specio::Constraint::Role::Interface::_attrs() );
     ## use critic
 
     $attrs->{parent}{isa}      = 'Specio::Constraint::Structurable';
@@ -56,7 +56,7 @@ Specio::Constraint::Structured - A class which represents structured constraints
 
 =head1 VERSION
 
-version 0.51
+version 0.52
 
 =head1 SYNOPSIS
 

@@ -3,7 +3,7 @@ package Business::ES::NIF;
 # ABSTRACT: Validate Spanish NIF, NIE and CIF numbers
 
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use strict;
 use warnings;
@@ -250,7 +250,7 @@ sub new {
   my ($class, %args) = @_;
   my $self = bless { }, $class;
 
-  $self->VIES( defined $args{vies} ? 1 : 0 );
+  $self->VIES(    defined $args{vies}    ? 1 : 0 );
   $self->iso3166( defined $args{iso3166} ? 1 : 0 );
 
   $self->set($args{nif}) if defined $args{nif};
@@ -359,7 +359,7 @@ Business::ES::NIF - Validate Spanish NIF, NIE and CIF numbers
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 SYNOPSIS
 
@@ -500,8 +500,6 @@ Devuelve verdadero si el tipo detectado es un CIF especial (entidades del estado
 =head2 set
 
     Set NIF
-
-    $vies = 1 | 0
 
 =head2 is_valid
 

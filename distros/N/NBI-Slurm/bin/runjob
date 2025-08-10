@@ -30,6 +30,7 @@ my $username = $ENV{USER};
 my $config = NBI::Slurm::load_config("$user_home_dir/.nbislurm.config");
 my $version = $NBI::Slurm::VERSION;
 my $queue = $config->{'queue'} // 'qib-short';
+my $gpuqueue = $config->{'gpuqueue'} // 'qib-gpu';
 my $threads = $config->{'threads'} // 1;
 my $memory = $config->{'memory'} // 8000;
 my $time = $config->{'time'} // "2h";
@@ -127,7 +128,10 @@ my $afterok_string = defined $afterok[0] ? "-d afterok:" . join(":", @afterok) :
 my @additional_opts = ();
 push @additional_opts, $afterok_string if defined $afterok_string;
 push @additional_opts, "--gres=gpu:1" if $gpu;
+
 push @additional_opts, @slurm_options if @slurm_options;
+
+$queue = $gpuqueue if $gpu;
 
 # 
 if (not NBI::Slurm::valid_queue($queue)) {
@@ -351,7 +355,7 @@ runjob - Run a job in the cluster using NBI::Slurm
 
 =head1 VERSION
 
-version 0.14.0
+version 0.15.0
 
 =head1 SYNOPSIS
 
@@ -489,8 +493,6 @@ Submitting a GPU job:
 Adding custom SLURM options:
 
     runjob --option="--constraint=intel" --option="--exclusive" -r "my_program"
-
-=cut
 
 =head1 AUTHOR
 

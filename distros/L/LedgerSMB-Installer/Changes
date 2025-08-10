@@ -1,5 +1,11 @@
 ---
 
+0.999.8      2025-08-09
+   [Added]
+       * Added GPG signature verification
+   [Fixed]
+       * Typo preventing installation on Fedora (and derivatives)
+
 0.999.7      2025-08-02
    [Added]
        * Beta releases (untagged releases) are now supported

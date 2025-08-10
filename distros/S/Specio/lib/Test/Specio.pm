@@ -3,7 +3,7 @@ package Test::Specio;
 use strict;
 use warnings;
 
-our $VERSION = '0.51';
+our $VERSION = '0.52';
 
 use IO::File;
 use Scalar::Util qw( blessed looks_like_number openhandle );
@@ -1298,7 +1298,7 @@ Test::Specio - Test helpers for Specio
 
 =head1 VERSION
 
-version 0.51
+version 0.52
 
 =head1 SYNOPSIS
 

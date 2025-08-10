@@ -2,6 +2,7 @@
 CODE_OF_CONDUCT.md
 CONTRIBUTING.md
 Changes
+GOVERNANCE.md
 INSTALL
 LICENSE
 MANIFEST
@@ -9,6 +10,8 @@ META.json
 META.yml
 Makefile.PL
 README.md
+SECURITY.md
+SUPPORT.md
 TODO.md
 cpanfile
 dev-bin/install-xt-tools.sh

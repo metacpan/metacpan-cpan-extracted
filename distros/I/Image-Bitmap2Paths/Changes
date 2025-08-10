@@ -1,0 +1,22 @@
+Revision history for Perl extension Image::Bitmap2Paths.
+
+0.01  Fri Jun  6 08:31:47 2025
+	- original version; created by h2xs 1.23 with options
+		-Xn Image::Bitmap2Paths
+
+      Factored out of the script hex_parse.pl v1.232.  With
+      examples/hex2font.pl produces the same results (on glyphs in
+      planes 0,1,e of unifont-16.0.04) with both output_sfd_char()
+      and output_human_readable().
+
+      The test suite and the docs are very rudimentary now.
+
+  script/hex2font.pl	The remaining part of hex_parse.pl.  Produces
+			identical output in the debugging and --sfd
+			modes.  (_test_encodes_line() not tested!)
+
+  t/Image-Bitmap2Paths.t	The minimal test suite.  So far only
+  				useful for the initial bootstrap of
+  				factoring out into two parts.  (The
+  				real testing happens by comparing
+  				the generated Unifont Smooth glyphs.)

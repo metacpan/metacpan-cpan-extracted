@@ -3,7 +3,7 @@ package Specio::XS;
 use strict;
 use warnings;
 
-our $VERSION = '0.51';
+our $VERSION = '0.52';
 
 use Clone qw( clone );
 

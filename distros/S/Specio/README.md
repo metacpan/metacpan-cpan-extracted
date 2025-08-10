@@ -4,7 +4,7 @@ Specio - Type constraints and coercions for Perl
 
 # VERSION
 
-version 0.51
+version 0.52
 
 # SYNOPSIS
 
@@ -434,6 +434,7 @@ Dave Rolsky <autarch@urth.org>
 
 # CONTRIBUTORS
 
+- Andrew Rodland <andrewr@vimeo.com>
 - Chris White <chrisw@leehayes.com>
 - cpansprout <cpansprout@gmail.com>
 - Graham Knop <haarg@haarg.org>
