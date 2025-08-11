@@ -5,7 +5,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 require XSLoader;
 XSLoader::load("Const::XS", $VERSION);
@@ -30,12 +30,11 @@ Const::XS - Facility for creating read-only scalars, arrays, hashes
 
 =head1 VERSION
 
-Version 1.01
+Version 1.02
 
 =cut
 
 =head1 SYNOPSIS
-
 
 	package MyApp::Constants;
 
@@ -74,7 +73,7 @@ The Const::XS module facilitates the creation of high-performance read-only vari
 
 =head2 const
 
-This is the one of five functions of this module. It takes a scalar, array or hash lvalue as the first argument, and a list of one or more values depending on the type of the first argument as the value for the variable. It will set the variable to that value and subsequently make it readonly. Arrays and hashes will be made deeply readonly.
+This is one of five functions of this module. It takes a scalar, array or hash lvalue as the first argument, and a list of one or more values depending on the type of the first argument as the value for the variable. It will set the variable to that value and subsequently make it readonly. Arrays and hashes will be made deeply readonly.
 
 	const my %factory => (
 		workers => 5,

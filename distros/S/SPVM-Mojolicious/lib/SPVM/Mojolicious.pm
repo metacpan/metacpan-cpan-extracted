@@ -1,6 +1,6 @@
 package SPVM::Mojolicious;
 
-our $VERSION = "0.009";
+our $VERSION = "0.010";
 
 1;
 
@@ -39,6 +39,10 @@ Most tests are not written.
 =item * L<Mojo::URL|SPVM::Mojo::URL>
 
 =item * L<Mojo::Date|SPVM::Mojo::Date>
+
+=item * L<Mojo::Collection|SPVM::Mojo::Collection>
+
+=item * L<Mojo::File|SPVM::Mojo::File>
 
 =back
 

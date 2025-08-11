@@ -1,5 +1,9 @@
 ---
 
+0.999.9      2025-08-10
+   [Fixed]
+       * 'gpg' invocation for signature validation
+
 0.999.8      2025-08-09
    [Added]
        * Added GPG signature verification

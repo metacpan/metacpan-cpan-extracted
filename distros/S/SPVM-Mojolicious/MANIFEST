@@ -13,6 +13,8 @@ lib/SPVM/Mojo/Asset/File.pm
 lib/SPVM/Mojo/Asset/File.spvm
 lib/SPVM/Mojo/Asset/Memory.pm
 lib/SPVM/Mojo/Asset/Memory.spvm
+lib/SPVM/Mojo/Collection.pm
+lib/SPVM/Mojo/Collection.spvm
 lib/SPVM/Mojo/Content.pm
 lib/SPVM/Mojo/Content.spvm
 lib/SPVM/Mojo/Content/MultiPart.pm
@@ -95,5 +97,6 @@ t/lib/SPVM/TestCase/Mojolicious.spvm
 t/lib/SPVM/TestCase/Online.spvm
 t/online.t
 t/webapp/basic.pl
+TODO.txt
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

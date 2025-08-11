@@ -26,7 +26,10 @@ t/07-blank-changes.t
 t/08-utf8.t
 t/09-pod.t
 t/10-stopwords.t
-t/11-pod-weaver-plugins.t
+t/11-pod-weaver-section-changes.t
+t/11-pod-weaver-section-installation.t
+t/11-pod-weaver-section-requirements.t
+t/21-pod-weaver-section-requirements.t
 weaver.ini
 xt/author/clean-namespaces.t
 xt/author/critic.t
@@ -34,6 +37,7 @@ xt/author/eof.t
 xt/author/eol.t
 xt/author/minimum-version.t
 xt/author/mixed-unicode-scripts.t
+xt/author/mojibake.t
 xt/author/no-tabs.t
 xt/author/pod-coverage.t
 xt/author/pod-linkcheck.t

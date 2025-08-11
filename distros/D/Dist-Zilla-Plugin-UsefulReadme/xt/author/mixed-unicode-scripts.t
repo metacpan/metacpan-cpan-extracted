@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-# This test was generated with Dist::Zilla::Plugin::Test::MixedScripts v0.1.5.
+# This test was generated with Dist::Zilla::Plugin::Test::MixedScripts v0.2.2.
 
 use Test2::Tools::Basic 1.302200;
 
@@ -26,7 +26,10 @@ my @files = (
     't/08-utf8.t',
     't/09-pod.t',
     't/10-stopwords.t',
-    't/11-pod-weaver-plugins.t'
+    't/11-pod-weaver-section-changes.t',
+    't/11-pod-weaver-section-installation.t',
+    't/11-pod-weaver-section-requirements.t',
+    't/21-pod-weaver-section-requirements.t'
 );
 
 file_scripts_ok($_, { scripts => \@scxs } ) for @files;

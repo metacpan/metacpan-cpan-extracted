@@ -34,7 +34,7 @@ my %WriteMakefileArgs = (
     "Sys::Hostname" => 0,
     "warnings" => 0
   },
-  "VERSION" => "2.001",
+  "VERSION" => "2.002",
   "test" => {
     "TESTS" => "t/*.t"
   }

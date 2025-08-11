@@ -20,7 +20,7 @@ use experimental qw( lexical_subs postderef signatures );
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.4.3';
+our $VERSION = 'v0.5.0';
 
 
 has header => (
@@ -32,7 +32,7 @@ has header => (
 
 has changelog => (
     is      => 'rw',
-    isa     => NonEmptySimpleStr,
+    isa     => SimpleStr,
     default => 'Changes',
 );
 
@@ -72,6 +72,20 @@ sub weave_section( $self, $document, $input ) {
 
     if ( my $stash = $zilla ? $zilla->stash_named('%PodWeaver') : undef ) {
         $stash->merge_stashed_config($self);
+    }
+
+    if ( my $next = first { $_->isa("Dist::Zilla::Plugin::NextRelease") } $zilla->plugins->@* ) {
+        my $filename = $next->update_filename;
+        if ( $self->changelog eq "" ) {
+            $self->changelog($filename);
+        }
+        elsif ( $self->changelog ne $filename ) {
+            $self->log_fatal("changelog is different file ${filename} used by NextRelease");
+        }
+    }
+
+    if ( $self->changelog eq "" ) {
+        $self->changelog("Changes");
     }
 
     my $file = first { $_->name eq $self->changelog } $zilla->files->@* or return;
@@ -181,7 +195,7 @@ Pod::Weaver::Section::RecentChanges - generate POD with the recent changes
 
 =head1 VERSION
 
-version v0.4.3
+version v0.5.0
 
 =head1 SYNOPSIS
 
@@ -214,6 +228,9 @@ The header to use. It defaults to "RECENT CHANGES".
 
 The name of the change log. It defaults to "Changes".
 
+If it is set to an empty string, and L<Dist::Zilla::Plugin::NextRelease> is used, then it will use the
+C<update_filename> from that plugin.
+
 =head2 version
 
 This is the release version to show.
@@ -240,6 +257,8 @@ When false (default), this section will only be added to the main module.
 =for Pod::Coverage weave_section
 
 =head1 SEE ALSO
+
+L<Dist::Zilla::Plugin::NextRelease>
 
 L<Pod::Weaver::Section::Changes>
 

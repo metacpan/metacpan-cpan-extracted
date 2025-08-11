@@ -1,4 +1,4 @@
-package LedgerSMB::Installer v0.999.8;
+package LedgerSMB::Installer v0.999.9;
 
 use v5.20;
 use experimental qw(signatures);
@@ -761,6 +761,44 @@ sub run($class, $cmd, @args) {
 
 
 1;
+
+=head1 NAME
+
+LedgerSMB::Installer - Installer for the LedgerSMB accounting web application
+
+=head1 DESCRIPTION
+
+=head1 MAINTAINER
+
+Erik Huelsmann
+
+=head1 AUTHOR
+
+Erik Huelsmann
+
+=head1 LICENSE
+
+Copyright 2025 Erik Huelsmann
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the “Software”), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+=cut
 
 __DATA__
 SCRIPT version CLONED

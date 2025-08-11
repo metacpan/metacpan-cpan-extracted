@@ -334,9 +334,17 @@ Username part of L</"userinfo">.
   # "isabel"
   Mojo::URL->new("http://isabel:s3cret@mojolicious.org")->username;
 
+=head1 See Also
+
+=over 2
+
+=item * L<SPVM::Mojolicious>
+
+=back
+
 =head1 Copyright & License
 
-Copyright (c) 2023 Yuki Kimoto
+Copyright (c) 2025 Yuki Kimoto
 
 MIT License
 

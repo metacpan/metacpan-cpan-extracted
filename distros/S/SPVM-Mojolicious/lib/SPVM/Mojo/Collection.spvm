@@ -1,0 +1,21 @@
+# Copyright (c) 2025 Yuki Kimoto
+# MIT License
+
+class Mojo::Collection extends List {
+  version_from Mojolicious;
+  
+  # Class Methods
+  static method new : Mojo::Collection ($array : object[] = undef, $capacity : int = -1) {
+    my $self = new Mojo::Collection;
+    
+    $self->init($array, $capacity);
+    
+    return $self;
+  }
+  
+  protected method init : void ($array : object[] = undef, $capacity : int = -1) {
+    
+    $self->SUPER::init($array, $capacity);
+  }
+  
+}

@@ -1,5 +1,30 @@
 Release history for Dist-Zilla-Plugin-UsefulReadme:
 
+v0.5.0    2025-08-10 11:40:46+01:00 Europe/London
+  [Enhancements]
+  - Pod::Weaver::Section::Requirements changelog can be blank, so that it will use the same file from the NextRelease
+    plugin.
+
+  - Added dump_config support, GH#10.
+
+  [Incompatabilities]
+  - Pod::Weaver::Section::Requirements no longer guesses the prerequisites automatically. The added guess_prereqs option
+    will enable this. This should only affect when it is not used with the UsefulReadme plugin. (Thanks @leont)
+
+  [Documentation]
+  - Pod::Weaver::Section::Requirements metafile notes how the attribute is used.
+
+  - Updated Changes with explicit acknowledgements.
+
+  [Other Changes]
+  - When registering itself as a development prerequsite, it will use v0.4.3 (baseline features and bug fixes) rather
+    than the current version.
+
+  [Tests]
+  - Add more tests.
+
+  - Explicitly declared Pod::Weaver as a test prerequsite.
+
 v0.4.3    2025-08-07 13:31:13+01:00 Europe/London
   [Bug Fixes]
   - Pod::Weaver::Section::Requirements also looks for `cpm.yml` and not `cpmfile` or `metafile`.
@@ -15,7 +40,7 @@ v0.4.2    2025-08-07 07:43:05+01:00 Europe/London
 
   [Bug Fixes]
   - Pod::Weaver::Section::InstallationInstructions consistently chooses Build.PL when that and Makefile.PL are
-    both present. GH#9.
+    both present. GH#9 (Thanks @leont)
 
   [Documentation]
   - Fixed wording in Changes.

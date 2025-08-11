@@ -1,0 +1,154 @@
+# TODO for SOCKS
+  
+class Mojo::UserAgent extends Mojo::EventEmitter {
+  
+  method connect : Mojo::Transaction::HTTP ($tx : Mojo::Transaction::HTTP)  {
+    
+    my $handle = (IO::Socket)undef;
+    
+    # Reuse connection
+    {
+      my $_ = $self->transactor->endpoint($tx);
+      my $proto = (string)$_->[0];
+      my $host = (string)$_->[1];
+      my $port = (int)$_->[2];
+      my $endpoint = "$proto:$host:$port";
+      
+      if ($handle = $self->_dequeue($endpoint)) {
+        if (&DEBUG) {
+          warn "-- Reusing connection ($proto://$host:$port)" ;
+        }
+        
+        unless ($tx->connection) {
+          $tx->set_kept_alive(1) ;
+        }
+        
+        $self->_process($tx);
+        
+        return $tx;
+      }
+    }
+    
+    # CONNECT request to proxy required
+    if (my $connect_tx = $self->_connect_proxy($tx)) {
+      return $connect_tx;
+    }
+    
+    my $t = $self->transactor;
+    
+    my $_ = $t->peer($tx);
+    my $proto = (string)$_->[0];
+    my $host = (string)$_->[1];
+    my $port = (int)$_->[2];
+    
+    unless ($proto eq "http" || $proto eq "https" || $proto eq "http+unix") {
+      die "Unsupported protocol: $proto";
+    }
+    
+    my $options_h = Hash->new;
+    $options_h->set(Timeout => $self->connect_timeout);
+    
+    if ($proto eq "http+unix") { $options_h->set(path => $host); }
+    else {
+      $options_h->set(address => $host);
+      $options_h->set(port => $port);
+    }
+    $options_h->set(socket_options => $self->socket_options);
+
+=pod TODO
+
+    # SOCKS
+    if ($proto eq "socks") {
+      $options_h->set(socks_address => $options_h->get_string("address"));
+      $options_h->set(socks_port => $options_h->get_int("socks_port"));
+      
+      my $_ = $t->endpoint($tx);
+      my $proto = (string)$_->[0];
+      my $host = (string)$_->[1];
+      my $port = (int)$_->[2];
+      
+      $options_h->set(address => $host);
+      $options_h->set(port => $port);
+      
+      my $tx_req = $tx->req;
+      $tx_req->set_via_proxy(0);
+      my $userinfo = $tx_req->proxy->userinf;
+      
+      if ($userinfo) {
+        my $_ = Fn->split(":", $userinfo);
+        my $socks_user = $_->[0];
+        my $socks_pass = $_->[1];
+        
+        $options_h->set(socks_user => $socks_user);
+        $options_h->set(socks_pass => $socks_pass);
+      }
+    }
+
+=cut
+
+    # TLS
+    my $tls = $proto eq "https";
+    
+    my $path = $options_h->get_string("path");
+    
+    # UNIX domain socket
+    if ($path) {
+      $options_h->set(Peer => $path);
+      
+      $handle = (IO::Socket)IO::Socket::UNIX->new($options_h->to_array);
+    }
+    
+    # IP socket
+    else {
+      $options_h->set(PeerAddr => $options_h->get_string("socks_address") // $options_h->get_string("address"));
+      $options_h->delete("socks_address");
+      $options_h->delete("address");
+      $options_h->set(PeerPort => &_port($options_h));
+      $options_h->delete("socks_port");
+      $options_h->delete("port");
+      
+      my $socket_options = (object[])$options_h->get("socket_options");
+      if ($socket_options) {
+        for (my $i = 0; $i < @$socket_options; $i += 2) {
+          my $key = (string)$socket_options->[$i];
+          my $value = $socket_options->[$i + 1];
+          $options_h->set($key => $value);
+        }
+      }
+      $options_h->delete("socket_options");
+      
+      if ($tls) {
+        $options_h->set(tls => $tls);
+        $options_h->set(tls_ca => $self->ca);
+        $options_h->set(tls_cert => $self->cert);
+        $options_h->set(tls_key => $self->key);
+        
+        $options_h->set(tls_options => $self->tls_options);
+        if ($self->insecure) {
+          my $tls_options = (object[])$options_h->get("tls_options") // new object[0];;
+          $tls_options = Fn->merge_options($tls_options, [(object)0x00]);
+          $options_h->set(tls_options => $tls_options);
+        }
+        
+        $options_h->delete("tls_options");
+        $options_h->delete("tls");
+        $options_h->delete("tls_ca");
+        $options_h->delete("tls_cert");
+        $options_h->delete("tls_key");
+        
+        $handle = (IO::Socket)IO::Socket::SSL->new($options_h->to_array);
+      }
+      else {
+        $handle = (IO::Socket)IO::Socket::IP->new($options_h->to_array);
+      }
+    }
+    
+    $self->{handle} = $handle;
+    
+    if (&DEBUG) {
+      warn "-- Connect ($proto://$host:$port)";
+    }
+    
+    return $tx;
+  }
+}

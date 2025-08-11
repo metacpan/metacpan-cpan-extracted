@@ -1,5 +1,11 @@
 Revision history for App::papersway
 
+2.002     2025-08-10 11:49:26+01:00 Europe/London
+    - Visually distinguish wide and non-wide windows in the status display.
+    - When resizing after floating, use pixel widths.
+    - Simplify technique used to reduce flickering when moving along the row
+      of windows.
+
 2.001     2025-04-28 10:16:43+08:00 Asia/Shanghai
     - Make 'other-column' not do anything when there is only a single column,
       regardless of whether that column itself is wide.

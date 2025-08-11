@@ -1,4 +1,4 @@
-package LedgerSMB::Installer::OS::unix v0.999.8;
+package LedgerSMB::Installer::OS::unix v0.999.9;
 
 use v5.20;
 use experimental qw(signatures);
@@ -101,30 +101,40 @@ sub untar($self, $tar, $target, %options) {
         if $options{no_same_owner};
     $log->debug( 'system(): ' . join(' ', map { "'$_'" } @cmd ) );
     system(@cmd) == 0
-        or croak $log->fatal( "Failure executing tar: $!" );
+        or croak $log->fatal( "Failure executing tar - exit code: $?" );
 }
 
 sub verify_sig($self, $installpath, $tar, $sig, $key) {
     my $tempdir = File::Spec->catdir( $installpath, 'tmp' );
-    make_path( $tempdir );
+    my $gpgdir  = File::Spec->catdir( $tempdir, 'gnupg' );
+    make_path( $tempdir, $gpgdir );
+    chmod( 0700, $gpgdir )
+        or warn $log->warning( "Unable to protect $gpgdir: $!" );
 
     my @cmd = (
         $self->{cmd}->{gpg},
         '--quiet',
+        '--homedir', $gpgdir,
+        '--no-autostart',
         '--batch',
+        '--no-tty',
         '--yes',
+        '--trust-model', 'always',
         '--no-default-keyring',
         '--keyring',
         File::Spec->catfile( $tempdir, 'verification-keyring.kbx' ),
         );
 
+    $log->trace( "Importing key:\n$key" );
+    $log->debug( 'system(): ' . join( ' ', map { "'$_'" } (@cmd, '--import') ) );
     open(my $fh, '|-', @cmd, '--import')
         or die "Can't open pipe to gpg for download verification: $!";
     print $fh $key;
     close($fh) or warn "Error closing pipe to gpg on key import: $!";
 
+    $log->debug( 'system(): ' . join( ' ', map { "'$_'" } (@cmd, '--verify', $sig, $tar) ) );
     system( @cmd, '--verify', $sig, $tar ) == 0
-        or croak $log->fatal( "Failure to verify gpg signature: $!" );
+        or croak $log->fatal( "Failure to verify gpg signature - exit code: $?" );
 
     remove_tree( $tempdir );
 

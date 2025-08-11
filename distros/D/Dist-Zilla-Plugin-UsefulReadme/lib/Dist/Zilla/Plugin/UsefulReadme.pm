@@ -34,7 +34,7 @@ use experimental qw( lexical_subs postderef signatures );
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.4.3';
+our $VERSION = 'v0.5.0';
 
 sub mvp_multivalue_args { qw( regions sections ) }
 
@@ -206,6 +206,18 @@ has regions => (
     }
 );
 
+around dump_config => sub( $orig, $self ) {
+    my $config = $self->$orig;
+    $config->{ +__PACKAGE__ } = {
+        (
+            map { $_ => $self->$_ }
+              qw( source phase location encoding section_fallback sections type parser_class filename regions )
+        ),
+        blessed($self) ne __PACKAGE__ ? ( version => $VERSION ) : (),
+    };
+    return $config;
+};
+
 sub gather_files($self) {
     my $filename = $self->filename;
 
@@ -232,7 +244,7 @@ sub register_prereqs($self) {
                 phase => 'develop',
                 type  => 'requires',
             },
-            ref($self) => $VERSION,
+            ref($self) => 'v0.4.3', # baseline features and bug fixes
             $prereqs->@*
         );
     }
@@ -371,7 +383,7 @@ sub _fake_weaver_section( $self, $class, $args = { } ) {
     # Note: ideally we would add these as development requirements but by the time this is run (after building or
     # release), the requirements have already been finalized.
 
-    # RECOMMEND PREREQ: Pod::Weaver
+    # RECOMMEND PREREQ: Pod::Weaver 4.016
     use_module("Pod::Weaver");
     use_module($class);
 
@@ -431,7 +443,7 @@ Dist::Zilla::Plugin::UsefulReadme - generate a README file with the useful bits
 
 =head1 VERSION
 
-version v0.4.3
+version v0.5.0
 
 =head1 SYNOPSIS
 

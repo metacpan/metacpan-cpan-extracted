@@ -6,32 +6,29 @@ package SPVM::Mojo::EventEmitter::Callback;
 
 =head1 Name
 
-SPVM::Mojo::EventEmitter::Callback - Short Description
+SPVM::Mojo::EventEmitter::Callback - Callback for Mojo::EventEmitter
 
 =head1 Description
 
-Mojo::EventEmitter::Callback interface in L<SPVM> has interface methods to do someting.
+Mojo::EventEmitter::Callback interface in L<SPVM> is the callback for L<Mojo::EventEmitter|SPVM::Mojo::EventEmitter> class.
 
 =head1 Usage
 
   interface Mojo::EventEmitter::Callback;
 
-=head1 Details
-
-
-
 =head1 Interface Methods
 
+C<required method : void ($that : object, $arg1 : object = undef, $arg2 : object = undef, $arg3 : object = undef);>
 
+A callback executed by L<Mojo::EventEmitter#emit|SPVM::Mojo::EventEmitter/"emit"> method.
 
+=head1 See Also
 
-=head1 Repository
+=over 2
 
+=item * L<SPVM::Mojolicious>
 
-
-=head1 Author
-
-Yuki Kimoto C<kimoto.yuki@gmail.com>
+=back
 
 =head1 Copyright & License
 

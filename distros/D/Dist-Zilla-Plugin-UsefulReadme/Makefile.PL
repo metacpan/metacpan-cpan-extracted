@@ -48,6 +48,7 @@ my %WriteMakefileArgs = (
     "Pod::Markdown::Github" => 0,
     "Pod::Simple::Text" => "3.23",
     "Pod::Text" => 0,
+    "Pod::Weaver" => "4.016",
     "Test::DZil" => 0,
     "Test::Deep" => 0,
     "Test::More" => 0,
@@ -56,7 +57,7 @@ my %WriteMakefileArgs = (
     "utf8" => 0,
     "warnings" => 0
   },
-  "VERSION" => "v0.4.3",
+  "VERSION" => "v0.5.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -85,6 +86,7 @@ my %FallbackPrereqs = (
   "Pod::Simple" => "3.23",
   "Pod::Simple::Text" => "3.23",
   "Pod::Text" => 0,
+  "Pod::Weaver" => "4.016",
   "Pod::Weaver::Role::Section" => 0,
   "Test::DZil" => 0,
   "Test::Deep" => 0,

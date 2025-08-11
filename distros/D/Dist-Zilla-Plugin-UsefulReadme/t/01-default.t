@@ -5,8 +5,11 @@ use Test::More;
 use Test::Deep;
 use Test::DZil;
 
+use List::Util qw( first );
 use Path::Tiny qw( path );
 use Pod::Simple::Text 3.23;
+
+use experimental qw( postderef );
 
 my $tzil = Builder->from_config(
     { dist_root => 'does-not-exist' },
@@ -86,5 +89,38 @@ note $text;
 like $text, qr/INSTALLATION\n+\s*This is something for before the installation.\n/, "prepend";
 
 like $text, qr/\s*This is something that is after the installation.\n+AUTHOR\n/, "append";
+
+my $plugin = first { $_->isa("Dist::Zilla::Plugin::UsefulReadme") } $tzil->plugins->@*;
+ok $plugin, "got plugin";
+
+cmp_deeply $plugin->dump_config, {
+    "Dist::Zilla::Plugin::UsefulReadme" => {
+        'sections' => [
+            'name',                                         #
+            'synopsis',                                     #
+            'description',                                  #
+            'recent changes',                               #
+            'requirements',                                 #
+            'installation',                                 #
+            '/support|bugs/',                               #
+            'source',                                       #
+            '/authors?/',                                   #
+            '/contributors?/',                              #
+            '/copyright|license|copyright and license/',    #
+            'see also'                                      #
+        ],
+        'parser_class'     => 'Pod::Simple::Text',
+        'source'           => 'lib/DZT/Sample.pm',
+        'location'         => 'build',
+        'type'             => 'text',
+        'filename'         => 'README',
+        'section_fallback' => 1,
+        'encoding'         => 'utf8',
+        'phase'            => 'build',
+        'regions'          => [ 'stopwords', 'Pod::Coverage', 'Test::MixedScripts' ]
+    }
+
+  },
+  "dump_config";
 
 done_testing;

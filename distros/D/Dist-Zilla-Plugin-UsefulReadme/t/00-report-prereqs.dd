@@ -25,6 +25,7 @@ do { my $x = {
                                       'Test::Kwalitee' => '1.21',
                                       'Test::MinimumVersion' => '0',
                                       'Test::MixedScripts' => 'v0.3.0',
+                                      'Test::Mojibake' => '0',
                                       'Test::More' => '0.96',
                                       'Test::NoTabs' => '0',
                                       'Test::Perl::Critic' => '0',
@@ -41,7 +42,7 @@ do { my $x = {
                     },
        'runtime' => {
                       'recommends' => {
-                                        'Pod::Weaver' => '0',
+                                        'Pod::Weaver' => '4.016',
                                         'Pod::Weaver::Section::Version' => '0'
                                       },
                       'requires' => {
@@ -78,6 +79,7 @@ do { my $x = {
                                    'Pod::Markdown::Github' => '0',
                                    'Pod::Simple::Text' => '3.23',
                                    'Pod::Text' => '0',
+                                   'Pod::Weaver' => '4.016',
                                    'Test::DZil' => '0',
                                    'Test::Deep' => '0',
                                    'Test::More' => '0',

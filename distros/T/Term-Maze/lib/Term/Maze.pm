@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 use Term::ReadKey;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 require XSLoader;
 XSLoader::load('Term::Maze', $VERSION);
@@ -45,7 +45,7 @@ Term::Maze - Mazes in the terminal
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 

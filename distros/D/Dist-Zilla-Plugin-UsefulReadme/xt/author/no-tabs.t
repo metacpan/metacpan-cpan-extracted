@@ -23,7 +23,10 @@ my @files = (
     't/08-utf8.t',
     't/09-pod.t',
     't/10-stopwords.t',
-    't/11-pod-weaver-plugins.t'
+    't/11-pod-weaver-section-changes.t',
+    't/11-pod-weaver-section-installation.t',
+    't/11-pod-weaver-section-requirements.t',
+    't/21-pod-weaver-section-requirements.t'
 );
 
 notabs_ok($_) foreach @files;

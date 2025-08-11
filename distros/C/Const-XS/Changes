@@ -88,3 +88,6 @@ Revision history for Const-XS
 
 1.01	2025-05-11
 	- remove the SvTYPE(val) == SVt_RV checks as this fails to make passed hash references readonly based on tests with Rope.
+
+1.02	2025-08-10
+	- Fix POD.

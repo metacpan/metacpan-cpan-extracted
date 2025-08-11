@@ -70,7 +70,8 @@ if ($i3status) {
     }
 }
 
-my (%paper_ws, $focused_ws, %col_rows, %col_wide, $caffe_id, $caffe_name);
+my (%paper_ws, $focused_ws, %output_widths,
+    %col_rows, %col_w, %col_wide, $caffe_id, $caffe_name);
 
 my $have_sway = !!$ENV{SWAYSOCK};
 my $wm_ipc_socket = $have_sway ? $ENV{SWAYSOCK} : $ENV{I3SOCK};
@@ -193,11 +194,14 @@ $wmipc->subscribe({
 	    $paper_ws{$e->{current}{id}}
 	      = { name => $e->{current}{name},
 		  ncols => $init_cols, cols => [],
-		  off_left => [], off_right => [], last_dir => 1 };
+		  off_left => [], off_right => [], last_dir => 1,
+		  output => $e->{current}{output} };
 	} elsif ($e->{change} eq "rename"
 		 && exists $paper_ws{$e->{current}{id}}) {
 	    $paper_ws{$e->{current}{id}}{name} = $e->{current}{name};
 	    signal_i3status();
+	} elsif ($e->{change} eq "move" && $e->{current}) {
+	    $paper_ws{$e->{current}{id}}{output} = $e->{current}{output};
 	} elsif ($e->{change} eq "empty" && $e->{current}) {
 	    delete $paper_ws{$e->{current}{id}};
 	    signal_i3status();
@@ -209,11 +213,14 @@ $wmipc->subscribe({
 # Move any previously-hidden containers to a fresh workspace for perusal.
 for_each_node {
     my $node = shift;
-    if ($node->{type} eq "workspace"
-	&& grep $_ eq $node->{name}, @all_workspaces) {
+    if ($node->{type} eq "output") {
+	$output_widths{$node->{name}} = $node->{rect}{width};
+    } elsif ($node->{type} eq "workspace"
+	     && grep $_ eq $node->{name}, @all_workspaces) {
 	my $entry = $paper_ws{$node->{id}}
 	  //= { name => $node->{name},
-		off_left => [], off_right => [], last_dir => 1 };
+		off_left => [], off_right => [], last_dir => 1,
+		output => $node->{output} };
 	sync_cols($node => $entry);
 	$entry->{ncols} = max $init_cols, scalar $entry->{cols}->@*;
     } elsif (grep $_ eq "caffeinated", $node->{marks}->@*) {
@@ -272,16 +279,24 @@ my $i3status_wrapper = $i3status && AnyEvent->io(
 	}
 
 	if ($focused_ws && exists $paper_ws{$focused_ws}) {
-	    sub nwin { join " ", ("\x{2021}")x$_[0] }
+	    # ⌗, ⋕ and 井 are possible alternatives to ‡‡.
+	    sub nwin { join " ", map +(widep($_) ? "\x{2021}"x2 : "\x{2021}"),
+			 @_ }
 
 	    my $ws    = $paper_ws{$focused_ws};
-	    my $left  = $ws->{off_left}->@*;
-	    my $right = $ws->{off_right}->@*;
+	    my @left  = $ws->{off_left}->@*;
+	    my @right = reverse $ws->{off_right}->@*;
+	    my @cols  = $ws->{cols}->@*;
 
-	    my $disp = sprintf "<b>%s</b>", nwin($ws->{ncols});
-	    $disp = sprintf "%s %s", nwin($left), $disp if $left;
-	    $disp = sprintf "%s %s", $disp, nwin($right) if $right;
-
+	    my $disp;
+	    if (!@left && !@right && (!@cols || !widep($cols[0]))) {
+		$disp = sprintf "<b>%s</b>",
+		  join " ", ("\x{2021}")x$ws->{ncols};
+	    } else {
+		$disp = sprintf "<b>%s</b>", nwin(@cols);
+		$disp = sprintf "%s %s", nwin(@left), $disp if @left;
+		$disp = sprintf "%s %s", $disp, nwin(@right) if @right;
+	    }
 	    unshift @$blocks,
 	      { name => "cols", markup => "pango", full_text => $disp };
 	}
@@ -350,6 +365,7 @@ sub sync_cols {
 	next unless $child_node->{type} eq "con";
 	push $entry->{cols}->@*, $child_node->{id};
 	$col_rows{$child_node->{id}} = $child_node->{nodes}->@*;
+	$col_w{$child_node->{id}} = $child_node->{rect}{width};
     }
 }
 
@@ -498,7 +514,7 @@ sub normalise_ws_cols {
 {
     # Simple class to batch up commands before sending them.
     package App::papersway::cmds;
-$App::papersway::cmds::VERSION = '2.001';
+$App::papersway::cmds::VERSION = '2.002';
 sub new {
 	bless { cmds => [], need_ignore => 0, need_signal => 0 } => shift
     };
@@ -1020,24 +1036,23 @@ sub hide_con {
     # Otherwise, Sway subsumes the rows to the hidden workspace and the
     # container with our known ID ceases to exist, s.t. we can't unhide it.
     #
-    # After enabling floating, resize the container to close to the size it
-    # will have when unhidden, assuming no ncols change.  This reduces
-    # observed flickering because the application has already rearranged its
-    # contents before the unfloat.
+    # After enabling floating, resize the container to close to the size we
+    # think it will have when unhidden.  This reduces observed flickering
+    # because the application has already rearranged its contents before the
+    # unfloat.  Our strategy is to use the last seen container width.  This is
+    # based on the idea that moving along the row of windows is much more
+    # frequent than opening and closing windows or changing ncols.
     #
     # There is still flickering with new containers are added to the row and
     # when containers in the row are closed.  What would seem to be going on
     # is that upon one of these events, other containers start resizing their
     # contents before we get a chance to push/pull containers.  We then do
     # that, and the other containers resize right back to where they were.
-    my $ws = $paper_ws{$focused_ws};
-    my $ppt = 100 / (widep($ws->{focused_col}) || $ws->{ncols});
-    # debugsay "calculated hide_con resize width %dppt", $ppt;
     sprintf +("[con_id=%s] ".join ", ",
 	      "floating enable",
-	      "resize set %dppt 100ppt",
+	      "resize set %dpx 100ppt",
 	      "move container to workspace %s"),
-		$_[0], $ppt, "*$_[0]*";
+		$_[0], $col_w{$_[0]}, "*$_[0]*";
 }
 
 sub show_con {
@@ -1072,7 +1087,7 @@ papersway - PaperWM-like scrollable tiling window management for Sway/i3wm
 
 =head1 VERSION
 
-version 2.001
+version 2.002
 
 =head1 SYNOPSIS
 

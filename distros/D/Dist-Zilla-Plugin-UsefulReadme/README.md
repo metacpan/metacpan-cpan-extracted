@@ -36,13 +36,21 @@ This was written as a successor to [Pod::Readme](https://metacpan.org/pod/Pod%3A
 
 # RECENT CHANGES
 
-Changes for version v0.4.3 (2025-08-07)
+Changes for version v0.5.0 (2025-08-10)
 
-- Bug Fixes
-    - Pod::Weaver::Section::Requirements also looks for \`cpm.yml\` and not \`cpmfile\` or \`metafile\`.
-    - Pod::Weaver::Section::RecentChanges and Pod::Weaver::Section::Requirements check the all\_modules setting.
+- Enhancements
+    - Pod::Weaver::Section::Requirements changelog can be blank, so that it will use the same file from the NextRelease plugin.
+    - Added dump\_config support, GH#10.
+- Incompatabilities
+    - Pod::Weaver::Section::Requirements no longer guesses the prerequisites automatically. The added guess\_prereqs option will enable this. This should only affect when it is not used with the UsefulReadme plugin. (Thanks @leont)
+- Documentation
+    - Pod::Weaver::Section::Requirements metafile notes how the attribute is used.
+    - Updated Changes with explicit acknowledgements.
+- Other Changes
+    - When registering itself as a development prerequsite, it will use v0.4.3 (baseline features and bug fixes) rather than the current version.
 - Tests
-    - Add more author tests.
+    - Add more tests.
+    - Explicitly declared Pod::Weaver as a test prerequsite.
 
 See the `Changes` file for more details.
 

@@ -20,7 +20,7 @@ use experimental qw( lexical_subs postderef signatures );
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.4.3';
+our $VERSION = 'v0.5.0';
 
 
 has header => (
@@ -50,6 +50,13 @@ has all_modules => (
     default => 0,
 );
 
+
+has guess_prereqs => (
+    is      => 'rw',
+    isa     => Bool,
+    default => 0,
+);
+
 sub weave_section( $self, $document, $input ) {
 
     my $zilla = $input->{zilla};
@@ -69,10 +76,9 @@ sub weave_section( $self, $document, $input ) {
 
     my $runtime = $zilla->prereqs->as_string_hash->{runtime}{requires};
 
-    unless ($runtime) {
+    if ( !$runtime && $self->guess_prereqs ) {
       my $scanner = Perl::PrereqScanner->new;
       my $prereqs = $scanner->scan_ppi_document($input->{ppi_document} );
-
       $runtime = $prereqs->as_string_hash;
     }
 
@@ -164,7 +170,7 @@ Pod::Weaver::Section::Requirements - generate POD with the runtime requirements
 
 =head1 VERSION
 
-version v0.4.3
+version v0.5.0
 
 =for stopwords metafile
 
@@ -205,11 +211,20 @@ to make the region available for L<Dist::Zilla::Plugin::UsefulReadme> or L<Pod::
 
 A file that lists metadata about prerequisites. It defaults to C<cpanfile>.
 
+If this file exists in the distribution, then the text will recommend that users see that file.
+
 =head2 all_modules
 
 When true, this section will be added to all modules in the distribution, and not just the main module.
 
 When false (default), this section will only be added to the main module.
+
+=head2 guess_prereqs
+
+If the runtime prerequisites are not available from L<Dist::Zilla>, then when this attribute is true, this plugin will
+use L<Perl::PrereqScanner> to guess the prerequisites.
+
+This was added in version v0.4.4, and is now false by default. (Previous versions guessed automatically.)
 
 =head1 KNOWN ISSUES
 

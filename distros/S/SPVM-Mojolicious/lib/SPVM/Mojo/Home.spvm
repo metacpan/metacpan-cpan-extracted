@@ -35,8 +35,6 @@ class Mojo::Home extends Mojo::File {
   
   method rel_file : Mojo::File ($rel_path : string) {
     
-    my $path = $self->{path};
-    
     my $child_file = $self->child(Fn->split("/", $rel_path));
     
     my $child = Mojo::Home->new;

@@ -7,39 +7,61 @@ class Mojo::File {
   use File::Temp;
   use File::Temp::Dir;
   use File::Spec;
+  use File::Basename;
+  use File::Copy;
+  use File::Find;
+  use File::Path;
   use Cwd;
+  use Mojo::Collection;
   
-  has path : object of string|File::Temp|File::Temp::Dir;
+  # Fields
+  has data : rw object of string|File::Temp|File::Temp::Dir;
   
   # Class Methods
-  static method new : Mojo::File ($path : object of string|string[]|File::Temp|File::Temp::Dir) {
+  static method new : Mojo::File ($data : object of string|string[]|File::Temp|File::Temp::Dir) {
     
     my $self = new Mojo::File;
     
-    if (!$path) {
-      $self->{path} = File::Spec->canonpath(Cwd->getcwd);
+    if (!$data) {
+      $self->{data} = File::Spec->canonpath(Cwd->getcwd);
     }
-    elsif ($path isa string || $path isa File::Temp || $path isa File::Temp::Dir) {
-      $self->{path} = $path;
+    elsif ($data isa string || $data isa File::Temp || $data isa File::Temp::Dir) {
+      $self->{data} = $data;
     }
-    elsif ($path isa string[]) {
-      my $pathes = (string[])$path;
-      for my $_ (@$pathes) {
+    elsif ($data isa string[]) {
+      my $dataes = (string[])$data;
+      for my $_ (@$dataes) {
         unless ($_) {
-          die "Invalid path";
+          die "Invalid data";
         }
       }
-      $self->{path} = File::Spec->catfile($pathes);
+      $self->{data} = File::Spec->catfile($dataes);
     }
     else {
-      die "The path \$path is an invalid type.";
+      die "The data \$data is an invalid type.";
     }
     
     return $self;
   }
   
-  static method path : Mojo::File ($path : object of string|string[]|File::Temp|File::Temp::Dir) {
-    return &new($path);
+  static method tempdir : Mojo::File ($options : object[] = undef) {
+    return &new(File::Temp->newdir($options));
+  }
+  
+  static method tempfile : Mojo::File ($options : object[] = undef) {
+    return &new(File::Temp->new($options));
+  }
+  
+  static method path : Mojo::File ($data : object of string|string[]|File::Temp|File::Temp::Dir) {
+    return &new($data);
+  }
+  
+  # Instance Methods
+  method basename : string () {
+    
+    my $basename = File::Basename->basename($self->to_string);
+    
+    return $basename;
   }
   
   method child : Mojo::File ($base_name : object of string|string[]) {
@@ -49,9 +71,258 @@ class Mojo::File {
     return $child;
   }
   
-  method to_array : string[] () {
+  method chmod : void ($mode : int) {
     
-    return File::Spec->splitdir($self->to_string);
+    Sys->chmod($mode, $self->to_string);
+  }
+  
+  method copy_to : Mojo::File ($to : string) {
+    
+    File::Copy->copy($self->to_string, $to);
+    
+    my $new_args = (object of string|string[])undef;
+    if (Sys->d($to)) {
+      $new_args = [$to, $self->basename];
+    }
+    else {
+      $new_args = $to;
+    }
+    my $new_file = Mojo::File->new($new_args);
+    
+    return $new_file;
+  }
+  
+  method dirname : Mojo::File () {
+    
+    my $dirname_file = Mojo::File->new(File::Basename->dirname($self->to_string));
+    
+    return $dirname_file;
+  }
+  
+  method extname : string () {
+    my $basename = $self->basename;
+    
+    if (my $_ = Re->m($basename, ".+\.([^.]+)$")) {
+      return $_->cap1;
+    }
+    else {
+      return "";
+    }
+  }
+  
+  method is_abs : int () {
+    return File::Spec->file_name_is_absolute($self->to_string);
+  }
+  
+  method list : Mojo::Collection ($options : object[] = undef) {
+    
+    my $options_h = Hash->new($options);
+    
+    my $path = $self->to_string;
+    
+    unless (Sys->d($path)) {
+      return Mojo::Collection->new;
+    }
+    
+    my $dh = IO->opendir($path);
+    
+    my $mojo_files_list = List->new(new Mojo::File[0]);
+    
+    my $files_list = StringList->new;
+    while (my $file = $dh->read) {
+      unless ($file ne "." && $file ne "..") {
+        next;
+      }
+      
+      unless ($options_h->get_int("hidden")) {
+        if (Re->m($file, "^\.")) {
+          next;
+        }
+      }
+      
+      $file = File::Spec->catfile([$path, $file]);
+      
+      unless ($options_h->get("dir")) {
+        if (Sys->d($file)) {
+          next;
+        }
+      }
+      
+      $files_list->push($file);
+    }
+    
+    my $files = $files_list->to_array;
+    
+    Sort->sort_string_asc($files);
+    
+    my $mojo_files = new Mojo::File[@$files];
+    
+    for (my $i = 0; $i < @$files; $i++) {
+      my $file = $files->[$i];
+      $mojo_files->[$i] = Mojo::File->new($file);
+    }
+    
+    return Mojo::Collection->new($mojo_files);
+  }
+  
+  method list_tree : Mojo::Collection ($options : object[] = undef) {
+    
+    my $options_h = Hash->new($options);
+    
+    my $path = $self->to_string;
+    
+    my $all = Hash->new;
+    
+    if (Sys->d($path)) {
+      my $wanted = [$options_h : Hash, $path : string, $all : Hash] method : void ($info : File::Find::Info) {
+        
+        my $name = $info->name;
+        
+        unless ($options_h->get_int("hidden")) {
+          if (Re->m($name, "^\.")) {
+            return;
+          }
+        }
+        
+        if ($options_h->get_int("max_depth")) {
+          my $rel = $name;
+          
+          Re->s(my $_ = [$rel], "^\Q$path\E/?", "");
+          $rel = $_->[0];
+          
+          if (@{File::Spec->splitdir($rel)} >= $options_h->get_int("max_depth")) {
+            $info->set_prune(1);
+          }
+        }
+        
+        if ($options_h->get_int("dir") || !Sys->d($name)) {
+          $all->set($name => 1);
+        }
+      };
+    }
+    
+    $all->delete($path);
+    
+    my $files = $all->keys;
+    
+    Sort->sort_string_asc($files);
+    
+    my $collection = Mojo::Collection->new(new Mojo::File[0]);
+    for my $file (@$files) {
+      
+      $file = File::Spec->canonpath($file);
+      
+      my $mojo_file = Mojo::File->new($file);
+      
+      $collection->push($mojo_file);
+    }
+    
+    return $collection;
+  }
+  
+  method lstat : Sys::IO::Stat () {
+    
+    my $lstat = Sys->lstat($self->to_string);
+    
+    return $lstat;
+  }
+  
+  method make_path : void ($options : object[] = undef) {
+    
+    File::Path->make_path($self->to_string, $options);
+  }
+  
+  method move_to : Mojo::File ($to : string) {
+    
+    my $path = $self->to_string;
+    
+    File::Copy->move($path, $to);
+    
+    my $new_args = (object of string|string[])undef;
+    if (Sys->d($to)) {
+      $new_args = [$to, File::Basename->basename($path)];
+    }
+    else {
+      $new_args = $to;
+    }
+    
+    my $mojo_file = Mojo::File->new($new_args);
+    
+    return $mojo_file;
+  }
+  
+  # TODO: interger mode
+  method open : IO::File ($mode : string) {
+    
+    my $handle = IO::File->new;
+    
+    $handle->open($self->to_string, $mode);
+    
+    return $handle;
+  }
+  
+  method realpath : Mojo::File () {
+    return Mojo::File->new(Cwd->realpath($self->to_string));
+  }
+  
+  method remove : void () {
+    
+    my $path = $self->to_string;
+    if (Sys->e($path)) {
+      Sys->unlink($path);
+    }
+  }
+  
+  method remove_tree : void () {
+    File::Path->remove_tree($self->to_string);;
+  }
+  
+  method sibling : Mojo::File ($base_name : object of string|string[]) {
+    
+    my $dirname = File::Basename->dirname($self->to_string);
+    
+    my $new_args = (string[])undef;
+    if ($base_name isa string[]) {
+      $new_args = Array->merge_string([$dirname], (string[])$base_name);
+    }
+    else {
+      $new_args = [$dirname, (string)$base_name];
+    }
+    
+    return Mojo::File->new($new_args);
+  }
+  
+  method slurp : string () {
+    
+    my $fh = IO->open("<", $self->to_string);
+    
+    my $content_buffer = StringBuffer->new;
+    my $buffer_length = 131072;
+    my $buffer = new_string_len($buffer_length);
+    
+    while (1) {
+      
+      my $length = $fh->read($buffer);
+      
+      if ($length == 0) {
+        last;
+      }
+      
+      $content_buffer->push($buffer, $length);
+    }
+    
+    return $content_buffer->to_string;
+  }
+  
+  method spew : void ($content : string) {
+    my $fh = IO->open(">", $self->to_string);
+    
+    $fh->write($content);
+  }
+  
+  method stat : Sys::IO::Stat () {
+  
+    return Sys->stat($self->to_string);
   }
   
   method to_abs : Mojo::File () {
@@ -61,34 +332,44 @@ class Mojo::File {
     return $abs;
   }
   
+  method to_array : string[] () {
+    
+    return File::Spec->splitdir($self->to_string);
+  }
+  
+  method to_rel : Mojo::File ($rel_file : string) {
+    return Mojo::File->new(File::Spec->abs2rel($self->to_string, $rel_file));
+  }
+  
   method to_string : string () {
     
-    my $string = (string)undef;
+    my $path = (string)undef;
     
-    my $path = $self->{path};
-    if ($path) {
-      if ($path isa string) {
-        $string = (string)$path;
+    my $data = $self->{data};
+    if ($data) {
+      if ($data isa string) {
+        $path = (string)$data;
       }
-      elsif ($path isa File::Temp) {
-        $string = $path->(File::Temp)->filename;
+      elsif ($data isa File::Temp) {
+        $path = $data->(File::Temp)->filename;
       }
-      elsif ($path isa File::Temp::Dir) {
-        $string = $path->(File::Temp::Dir)->dirname;
+      elsif ($data isa File::Temp::Dir) {
+        $path = $data->(File::Temp::Dir)->dirname;
       }
     }
     
-    return $string;
+    return $path;
   }
   
-  method open : IO::File ($mode : string) {
+  method touch : void () {
     
-    my $handle = IO::File->new;
+    my $path = $self->to_string;
     
-    $handle->open($self->to_string, $mode);
+    unless (Sys->e($path)) {
+      $self->open(">") ;
+    }
     
-    return $handle;
+    Sys->utime(-1, -1, $path);
   }
-
+  
 }
-
