@@ -14,7 +14,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.25, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.26, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -33,7 +33,7 @@ no_index:
 provides:
   Minilla:
     file: lib/Minilla.pm
-    version: v3.1.26
+    version: v3.1.27
   Minilla::CLI:
     file: lib/Minilla/CLI.pm
   Minilla::CLI::Build:
@@ -170,7 +170,7 @@ resources:
   bugtracker: https://github.com/tokuhirom/Minilla/issues
   homepage: https://github.com/tokuhirom/Minilla
   repository: https://github.com/tokuhirom/Minilla.git
-version: v3.1.26
+version: v3.1.27
 x_contributors:
   - 'Alex Kapranoff <alex@kapranoff.ru>'
   - 'Alex Kapranoff <kappa@yandex.ru>'
@@ -232,5 +232,5 @@ x_contributors:
   - 'tokuhirom <tokuhirom@gmail.com>'
   - 'vti <viacheslav.t@gmail.com>'
   - 'ysasaki <aloelight@gmail.com>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
 x_static_install: 1

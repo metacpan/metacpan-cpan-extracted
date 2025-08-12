@@ -1,5 +1,11 @@
 Revision history for Slack-BlockKit
 
+0.005     2025-08-12 19:03:50+10:00 Australia/Melbourne
+        - add Context, Image, and Markdown blocks
+
+0.004     2025-08-11 20:17:54+10:00 Australia/Melbourne
+        - add TO_JSON to BlockCollection
+
 0.003     2025-05-25 21:53:56-04:00 America/New_York
         - update dist metadata
 

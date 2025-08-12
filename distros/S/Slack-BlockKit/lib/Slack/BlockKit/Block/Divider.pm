@@ -1,4 +1,4 @@
-package Slack::BlockKit::Block::Divider 0.003;
+package Slack::BlockKit::Block::Divider 0.005;
 # ABSTRACT: a Block Kit "divider" block
 use Moose;
 use MooseX::StrictConstructor;
@@ -35,7 +35,7 @@ Slack::BlockKit::Block::Divider - a Block Kit "divider" block
 
 =head1 VERSION
 
-version 0.003
+version 0.005
 
 =head1 OVERVIEW
 

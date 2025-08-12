@@ -1,5 +1,5 @@
 package Devel::OverloadInfo;
-$Devel::OverloadInfo::VERSION = '0.007';
+$Devel::OverloadInfo::VERSION = '0.008';
 # ABSTRACT: introspect overloaded operators
 
 #pod =head1 DESCRIPTION
@@ -211,7 +211,7 @@ Devel::OverloadInfo - introspect overloaded operators
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 DESCRIPTION
 

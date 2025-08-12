@@ -2,31 +2,21 @@ package Daje::Workflow::Database;
 use Mojo::Base -base, -signatures;
 
 
-use Mojo::Loader qw(load_class);
+our $VERSION = "0.19";
 
 # NAME
 # ====
 #
-# Daje::Workflow::Database - It's the database migrate plugin for Daje::Workflow
+# Daje::Workflow::Database - It's the database migrate sql for Daje::Workflow
 #
 # SYNOPSIS
 # ========
 #
-#    use Daje::Workflow::Database;
-#
-#    push @{$migrations}, {class => 'Daje::Workflow::Database', name => 'workflow', migration => 2};
-#
-#    push @{$migrations}, {file => '/home/user/schema/users.sql', name => 'users'};
-#
-#    Daje::Workflow::Database->new(
-#         pg            => $pg,
-#         migrations    => $migrations,
-#     )->migrate();
 #
 # DESCRIPTION
 # ===========
 #
-# Daje::Workflow::Database is the Database migrate plugin for Daje::Workflow
+# Daje::Workflow::Database is the Database migrate sql for Daje::Workflow
 #
 # LICENSE
 # =======
@@ -42,38 +32,7 @@ use Mojo::Loader qw(load_class);
 # janeskil1525 E<lt>janeskil1525@gmail.comE<gt>
 #
 
-our $VERSION = "0.18";
 
-has 'pg';
-has 'migrations';
-
-sub migrate($self) {
-
-    my $length = scalar @{$self->migrations};
-    for (my $i = 0; $i < $length; $i++) {
-        if (exists @{$self->migrations}[$i]->{class}) {
-            my $cl = load_class @{$self->migrations}[$i]->{class};
-            $self->pg->migrations->name(
-                @{$self->migrations}[$i]->{name}
-            )->from_data(
-                @{$self->migrations}[$i]->{class},
-                @{$self->migrations}[$i]->{name}
-            )->migrate(
-                @{$self->migrations}[$i]->{migration}
-            );
-        } elsif (exists @{$self->migrations}[$i]->{file}) {
-            $self->pg->migrations->name(
-                @{$self->migrations}[$i]->{name}
-            )->from_file(
-                @{$self->migrations}[$i]->{file}
-            )->migrate(
-                @{$self->migrations}[$i]->{migration}
-            );
-        }
-    }
-
-    return 1;
-}
 
 1;
 __DATA__
@@ -192,6 +151,7 @@ CREATE INDEX idx_workflow_connections_workflow_fkey_connector_connector_fkey
 DROP TABLE workflow_connections;
 
 __END__
+
 
 
 

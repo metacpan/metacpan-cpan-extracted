@@ -107,7 +107,7 @@ DATA: {
 			$d = new_ok('Data::Text');
 			$d->set([]);
 		},
-		qr/^Usage:/
+		qr/Usage:\s/
 	);
 
 	does_croak_that_matches(
@@ -115,7 +115,7 @@ DATA: {
 			$d = new_ok('Data::Text');
 			$d->append([]);
 		},
-		qr/^Usage:/
+		qr/Usage:\s/
 	);
 
 	does_croak_that_matches(

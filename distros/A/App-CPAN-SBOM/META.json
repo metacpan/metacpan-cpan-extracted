@@ -1,0 +1,65 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "Giuseppe Di Terlizzi <gdt@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-CPAN-SBOM",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CPAN::Audit" : "0",
+            "Cpanel::JSON::XS" : "0",
+            "HTTP::Tiny" : "0",
+            "MIME::Base64" : "0",
+            "MetaCPAN::Client" : "0",
+            "SBOM::CycloneDX" : "0",
+            "URI::PackageURL" : "2.22",
+            "perl" : "5.016"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/giterlizzi/perl-App-CPAN-SBOM/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/giterlizzi/perl-App-CPAN-SBOM",
+         "web" : "https://github.com/giterlizzi/perl-App-CPAN-SBOM"
+      }
+   },
+   "version" : "1.03",
+   "x_purl" : "pkg:cpan/GDT/App-CPAN-SBOM",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

@@ -25,13 +25,14 @@ no_index:
     - inc
 requires:
   Carp: '0'
+  Encode: '0'
   Lingua::Conjunction: '0'
-  Params::Get: '0'
+  Params::Get: '0.13'
   Scalar::Util: '0'
   String::Util: '0'
   overload: '0'
 resources:
-  bugtracker: https://github.com/nigelhorne/Data-Text/issues
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Text
   repository: git://github.com/nigelhorne/Data-Text.git
-version: '0.17'
+version: '0.18'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

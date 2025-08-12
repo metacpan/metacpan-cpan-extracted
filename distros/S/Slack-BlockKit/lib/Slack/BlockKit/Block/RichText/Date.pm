@@ -1,4 +1,4 @@
-package Slack::BlockKit::Block::RichText::Date 0.003;
+package Slack::BlockKit::Block::RichText::Date 0.005;
 # ABSTRACT: a Block Kit rich text element for a formatted date
 
 use Moose;
@@ -111,7 +111,7 @@ Slack::BlockKit::Block::RichText::Date - a Block Kit rich text element for a for
 
 =head1 VERSION
 
-version 0.003
+version 0.005
 
 =head1 OVERVIEW
 

@@ -4,10 +4,12 @@ use warnings;
 use strict;
 
 use Carp;
+use Encode;
 use Lingua::Conjunction;
-use Params::Get;
+use Params::Get 0.13;
 use Scalar::Util;
 use String::Util;
+use utf8;
 
 =head1 NAME
 
@@ -15,11 +17,11 @@ Data::Text - Class to handle text in an OO way
 
 =head1 VERSION
 
-Version 0.17
+Version 0.18
 
 =cut
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 use overload (
 	'==' => \&equal,
@@ -115,7 +117,7 @@ sub set {
 		if(ref($params->{'text'}) eq 'ARRAY') {
 			if(scalar(@{$params->{'text'}}) == 0) {
 				Carp::carp(__PACKAGE__, ': no text given');
-				return;
+				return $self;
 			}
 			delete $self->{'text'};
 			foreach my $text(@{$params->{'text'}}) {
@@ -169,7 +171,10 @@ sub append
 	# Process if text is a reference
 	if(ref($text)) {
 		if(ref($text) eq 'ARRAY') {
-			return Carp::carp(__PACKAGE__, ': no text given') unless @{$text};
+			unless(@{$text}) {
+				Carp::carp(__PACKAGE__, ': no text given');
+				return
+			}
 			$self->append($_) for @{$text};
 			return $self;
 		}
@@ -182,11 +187,10 @@ sub append
 		Carp::carp(__PACKAGE__,
 			": attempt to add consecutive punctuation\n\tCurrent = '", $self->{'text'},
 			"' at $line of $file\n\tAppend = '", $text, "'");
-		return;
+	} else {
+		# Append text
+		$self->{'text'} .= $text;
 	}
-
-	# Append text
-	$self->{'text'} .= $text;
 
 	return $self;
 }
@@ -202,7 +206,9 @@ Converts the text to uppercase.
 sub uppercase {
 	my $self = shift;
 
+	Encode::_utf8_on($self->{'text'});	# Ensure characters like é are converted to É
 	$self->{'text'} = uc($self->{'text'}) if(defined($self->{'text'}));
+	Encode::_utf8_off($self->{'text'});
 
 	return $self;
 }
@@ -218,7 +224,9 @@ Converts the text to lowercase.
 sub lowercase {
 	my $self = $_[0];
 
+	Encode::_utf8_on($self->{'text'});	# Ensure characters like é are converted to É
 	$self->{'text'} = lc($self->{'text'}) if(defined($self->{'text'}));
+	Encode::_utf8_off($self->{'text'});
 
 	return $self;
 }
@@ -289,6 +297,8 @@ sub as_string {
 
 Returns the length of the text.
 
+This is actually the number of characters, not the number of bytes.
+
 =cut
 
 sub length {
@@ -298,7 +308,11 @@ sub length {
 		return 0;
 	}
 
-	return length($self->{'text'});
+	my $copy = $self->{'text'};
+
+	Encode::_utf8_on($copy);
+
+	return length($copy);
 }
 
 =head2	trim
@@ -333,9 +347,9 @@ sub rtrim {
 
 Replaces multiple words in the text.
 
-    $dt->append('Hello World');
-    $dt->replace({ 'Hello' => 'Goodbye', 'World' => 'Universe' });
-    print $dt->as_string(), "\n";	# Outputs "Goodbye Universe"
+    $d->append('Hello World');
+    $d->replace({ 'Hello' => 'Goodbye', 'World' => 'Universe' });
+    print $d->as_string(), "\n";	# Outputs "Goodbye Universe"
 
 =cut
 

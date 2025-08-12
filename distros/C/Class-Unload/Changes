@@ -1,5 +1,10 @@
 Revision history for Class-Unload
 
+0.12      2025-08-11 17:20:12+01:00 Europe/London
+
+        - Generate README.md in the repo
+        - Move git repository to Codeberg
+
 0.11      2017-06-22 17:41:44+01:00 Europe/London
 
         - No changes since 0.10-TRIAL

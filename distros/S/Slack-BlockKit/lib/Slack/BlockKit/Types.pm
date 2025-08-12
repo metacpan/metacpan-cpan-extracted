@@ -1,4 +1,4 @@
-package Slack::BlockKit::Types 0.003;
+package Slack::BlockKit::Types 0.005;
 # ABSTRACT: Moose type constraints used internally by Slack::Block Kit
 use v5.36.0;
 
@@ -13,6 +13,7 @@ use v5.36.0;
 use MooseX::Types -declare => [qw(
   RichTextBlocks
   ExpansiveElementList
+  ContextElementList
   Pixels
   RichTextArray
   RichTextStyle
@@ -34,6 +35,12 @@ subtype ExpansiveElementList, as ArrayRef[
     map {; class_type("Slack::BlockKit::Block::RichText::$_") }
       (qw( Channel Date Emoji Link Text User UserGroup ))
   ])
+];
+
+subtype ContextElementList, as ArrayRef[
+  # This should really be union-ed with Image, but we don't have an Image type,
+  # so there you go. -- rjbs, 2025-08-12
+  class_type("Slack::BlockKit::CompObj::Text"),
 ];
 
 subtype RichTextArray, as ArrayRef[
@@ -59,7 +66,7 @@ Slack::BlockKit::Types - Moose type constraints used internally by Slack::Block 
 
 =head1 VERSION
 
-version 0.003
+version 0.005
 
 =head1 OVERVIEW
 

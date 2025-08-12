@@ -1,4 +1,4 @@
-package Slack::BlockKit::Block::RichText::Quote 0.003;
+package Slack::BlockKit::Block::RichText::Quote 0.005;
 # ABSTRACT: a Block Kit rich text "quoted text" block
 
 use Moose;
@@ -64,7 +64,7 @@ Slack::BlockKit::Block::RichText::Quote - a Block Kit rich text "quoted text" bl
 
 =head1 VERSION
 
-version 0.003
+version 0.005
 
 =head1 OVERVIEW
 

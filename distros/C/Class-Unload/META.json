@@ -4,7 +4,7 @@
       "Dagfinn Ilmari Manns\u00e5ker <ilmari@ilmari.org>;"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -49,17 +49,18 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "bug-Class-Unload@rt.cpan.org",
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Class-Unload"
+         "mailto" : "bug-class-unload at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Class-Unload"
       },
-      "homepage" : "https://github.com/ilmari/Class-Unload",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/ilmari/Class-Unload.git",
-         "web" : "https://github.com/ilmari/Class-Unload"
+         "url" : "https://codeberg.org/ilmari/Class-Unload.git",
+         "web" : "https://codeberg.org/ilmari/Class-Unload"
       }
    },
-   "version" : "0.11",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+   "version" : "0.12",
+   "x_generated_by_perl" : "v5.42.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.39",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

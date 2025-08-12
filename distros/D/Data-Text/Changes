@@ -1,5 +1,10 @@
 Revision history for Data::Text
 
+0.18	Mon Aug 11 11:24:22 EDT 2025
+	Bump the version of Params::Get
+	Ensure length(), uppercase() and lowercase() do what you expect with UTF-8 characters
+	Don't break chaining on appending consecutive punctuation
+
 0.17	Wed Jul 30 20:56:36 EDT 2025
 	Fixed example - thanks to RSAVAGE
 	Fix http://www.cpantesters.org/report/48702a40-54e1-11f0-877b-a81a6e8775ea

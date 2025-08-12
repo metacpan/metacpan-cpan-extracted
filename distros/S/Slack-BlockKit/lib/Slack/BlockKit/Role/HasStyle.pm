@@ -1,4 +1,4 @@
-package Slack::BlockKit::Role::HasStyle 0.003;
+package Slack::BlockKit::Role::HasStyle 0.005;
 # ABSTRACT: a parameterized role for objects with styles
 
 use MooseX::Role::Parameterized;
@@ -78,7 +78,7 @@ Slack::BlockKit::Role::HasStyle - a parameterized role for objects with styles
 
 =head1 VERSION
 
-version 0.003
+version 0.005
 
 =head1 PERL VERSION
 

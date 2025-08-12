@@ -1,4 +1,4 @@
-package Slack::BlockKit::Block::RichText::User 0.003;
+package Slack::BlockKit::Block::RichText::User 0.005;
 # ABSTRACT: a Block Kit rich text element that mentions a @user
 
 use Moose;
@@ -58,7 +58,7 @@ Slack::BlockKit::Block::RichText::User - a Block Kit rich text element that ment
 
 =head1 VERSION
 
-version 0.003
+version 0.005
 
 =head1 OVERVIEW
 

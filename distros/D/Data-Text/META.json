@@ -33,8 +33,9 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
+            "Encode" : "0",
             "Lingua::Conjunction" : "0",
-            "Params::Get" : "0",
+            "Params::Get" : "0.13",
             "Scalar::Util" : "0",
             "String::Util" : "0",
             "overload" : "0"
@@ -55,8 +56,8 @@
    "resources" : {
       "bugtracker" : {
          "mailto" : "bug-Data-Text@rt.cpan.org",
-         "web" : "https://github.com/nigelhorne/Data-Text/issues",
-         "x_url" : "https://github.com/nigelhorne/Data-Text/issues"
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Text",
+         "x_url" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Text"
       },
       "repository" : {
          "type" : "git",
@@ -65,6 +66,6 @@
          "x_repository" : "https://github.com/nigelhorne/Data-Text"
       }
    },
-   "version" : "0.17",
+   "version" : "0.18",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

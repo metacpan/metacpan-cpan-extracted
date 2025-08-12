@@ -6,6 +6,7 @@ return bk_blocks(
   bk_header("Behold, the BlockKit"),
   "I imagine you will really like it.  But hey, I could be wrong.",
   bk_divider(),
+  bk_image('https://cdn2.thecatapi.com/images/EdHB5asUC.jpg', 'Cat!'),
   "Let us know, when you decode.",
   "We'll be here.",
 );

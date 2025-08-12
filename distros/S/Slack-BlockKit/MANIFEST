@@ -18,8 +18,11 @@ eg/samples/slack-obj
 eg/samples/snippet
 eg/samples/verbose
 lib/Slack/BlockKit.pm
+lib/Slack/BlockKit/Block/Context.pm
 lib/Slack/BlockKit/Block/Divider.pm
 lib/Slack/BlockKit/Block/Header.pm
+lib/Slack/BlockKit/Block/Image.pm
+lib/Slack/BlockKit/Block/Markdown.pm
 lib/Slack/BlockKit/Block/RichText.pm
 lib/Slack/BlockKit/Block/RichText/Channel.pm
 lib/Slack/BlockKit/Block/RichText/Date.pm

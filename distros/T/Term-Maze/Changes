@@ -6,5 +6,6 @@ Revision history for Term-Maze
 0.02    2025-08-10
 	- Fix deps.
 
-
+0.03 	2025-08-11
+	- Adds aze.pm so you can do - perl -Maze=40,20 - Thanks to TOBYINK for suggesting this.
 

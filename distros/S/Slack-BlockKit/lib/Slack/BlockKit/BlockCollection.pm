@@ -1,4 +1,4 @@
-package Slack::BlockKit::BlockCollection 0.003;
+package Slack::BlockKit::BlockCollection 0.005;
 # ABSTRACT: a collection of Block Kit blocks
 use Moose;
 
@@ -40,6 +40,10 @@ sub as_struct ($self) {
   return [ map {; $_->as_struct } $self->blocks ];
 }
 
+sub TO_JSON ($self) {
+  return $self->as_struct;
+}
+
 no Moose;
 no MooseX::Types::Moose;
 no Moose::Util::TypeConstraints;
@@ -57,7 +61,7 @@ Slack::BlockKit::BlockCollection - a collection of Block Kit blocks
 
 =head1 VERSION
 
-version 0.003
+version 0.005
 
 =head1 OVERVIEW
 

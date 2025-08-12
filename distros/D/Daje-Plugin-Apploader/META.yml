@@ -26,13 +26,14 @@ no_index:
 provides:
   Daje::Plugin::Apploader:
     file: lib/Daje/Plugin/Apploader.pm
-    version: '0.01'
+    version: '0.02'
 requires:
+  Mojo::Loader: '0'
   perl: v5.40.0
 resources:
   bugtracker: https://github.com/janeskil1525/Daje-Plugin-Apploader/issues
   homepage: https://github.com/janeskil1525/Daje-Plugin-Apploader
   repository: https://github.com/janeskil1525/Daje-Plugin-Apploader.git
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

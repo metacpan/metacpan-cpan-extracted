@@ -1,4 +1,4 @@
-package Slack::BlockKit::Block::RichText::Preformatted 0.003;
+package Slack::BlockKit::Block::RichText::Preformatted 0.005;
 # ABSTRACT: a Block Kit preformatted rich text element
 
 use Moose;
@@ -71,7 +71,7 @@ Slack::BlockKit::Block::RichText::Preformatted - a Block Kit preformatted rich t
 
 =head1 VERSION
 
-version 0.003
+version 0.005
 
 =head1 OVERVIEW
 

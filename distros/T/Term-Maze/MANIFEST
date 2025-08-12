@@ -1,5 +1,6 @@
 Changes
 ignore.txt
+lib/aze.pm
 lib/Term/Maze.pm
 lib/Term/Maze.xs
 Makefile.PL

@@ -1,9 +1,10 @@
 package OcToolkit;
-use v5.16;
+
+use v5.16; # or newer
 use strict;
 use warnings;
 
-our $VERSION = "1.02";
+our $VERSION = "1.03";
 
 use JSON::PP;
 use Text::Diff;
@@ -163,7 +164,8 @@ sub install{
     my $cluster   = $self->{config}->{cluster};
     my $namespace = $self->{config}->{namespace};
     print "\nInstalling Openshift components for instance: '$instance' in cluster: '$cluster' in namespace: '$namespace'\n";
-    # $self->_loopDir($self->{config}->{templates_tt_dir}, "tt", "_callOc", {_callOc => {{param1 : "value1"}, {param2 : "value2"} }}); # sent custom params
+    # sent custom params
+    # $self->_loopDir($self->{config}->{templates_tt_dir}, "tt", "_callOc", {_callOc => {{param1 : "value1"}, {param2 : "value2"} }});
     $self->_loopDir($self->{config}->{templates_yaml_dir}, "yaml", "_callOc") if $self->{omit} !~ /oc/;
     
     print qq^\n\nTo get build and deployment status run: $self->{cliCommand} get pods | grep Running | grep 'build\|deploy'\n\n^;
@@ -275,7 +277,8 @@ sub _callOc{
     my $templateName = $params->{templateName};
     my $customParams = $params->{params}->{$funcName[-1]};
 
-    return if (defined $self->{componentIsAllowed}) && (not $self->{componentIsAllowed}->($templateName, $dir, $self->{cluster}, $self->{instance}));
+    return if (defined $self->{componentIsAllowed}) && 
+              (not $self->{componentIsAllowed}->($templateName, $dir, $self->{cluster}, $self->{instance}));
 
     my $templateNameYaml = $templateName.".yaml";
     
@@ -340,7 +343,8 @@ sub _generateYaml{
 
     return if $dir =~ /init/ && $self->{omit} =~ /init/;
     return if (defined $self->{specificYamlFile}) && ($templateName !~ $self->{specificYamlFile});
-    return if (defined $self->{componentIsAllowed}) && (not $self->{componentIsAllowed}->($templateName, $dir, $self->{cluster}, $self->{instance}));
+    return if (defined $self->{componentIsAllowed}) && 
+              (not $self->{componentIsAllowed}->($templateName, $dir, $self->{cluster}, $self->{instance}));
     
     my $yamlText;
     my $templatesYamlPath = "$self->{config}->{templates_yaml_dir}/$dir";
@@ -572,7 +576,9 @@ sub _loopDir {
                 next;
             }
             my @fileArr = split('\.', $file);            
-            if(($injectedSubName eq "_generateYaml") && (not defined $fileArr[1]) && ($self->{config}->{allowed_clusters} !~ /$file/)){
+            if(($injectedSubName eq "_generateYaml") && 
+               (not defined $fileArr[1]) && 
+               ($self->{config}->{allowed_clusters} !~ /$file/)){
                 print "Warning : Unknown cluster: $file\n";
             }
             my $injectedSub = \&$injectedSubName;
@@ -783,6 +789,7 @@ OcToolkit - Open Cloud Toolkit
 Helm like tool for Openshift and Kubernetes with multi cluster support.
 See https://gitlab.com/code7143615/octoolkit/-/blob/master/README.md how to use this library in ocToolkit.pl script
 and use it as 'Helm-like' command line tool
+Feedback Page: https://gitlab.com/code7143615/octoolkit/-/issues/1
 
 =head1 LICENSE
 

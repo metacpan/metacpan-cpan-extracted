@@ -1,0 +1,43 @@
+Benchmark-MCE
+
+Benchmark::MCE - Perl multi-core benchmarking framework
+
+INSTALLATION
+
+Normally you would expect to use a package manager like cpanm to install as:
+
+    cpanm -n Benchmark::MCE
+
+(This assumes you have the perl package App::cpanminus on your system, as well
+as a C/make build environment - e.g. the "build-essential" apt package).
+
+To install this module manually, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+This, however requires several CPAN modules. See setup_dkbench for more details.
+
+SUPPORT AND DOCUMENTATION
+
+CPAN:
+    https://metacpan.org/release/Benchmark-MCE
+
+After installing, you can find documentation for this module with the
+perldoc command:
+
+    perldoc Benchmark::MCE
+
+Source code and issues on GitHub:
+    https://github.com/SpareRoom/Benchmark-MCE
+
+LICENSE AND COPYRIGHT
+
+This software is
+Copyright (c) 2021-2025 Dimitrios Kechagias.
+Copyright (c) 2025 SpareRoom.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

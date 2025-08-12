@@ -1,4 +1,4 @@
-package Slack::BlockKit::Role::Block 0.003;
+package Slack::BlockKit::Role::Block 0.005;
 # ABSTRACT: a Block Kit block object
 
 use Moose::Role;
@@ -59,7 +59,7 @@ Slack::BlockKit::Role::Block - a Block Kit block object
 
 =head1 VERSION
 
-version 0.003
+version 0.005
 
 =head1 OVERVIEW
 

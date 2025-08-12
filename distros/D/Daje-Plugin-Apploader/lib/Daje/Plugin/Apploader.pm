@@ -1,9 +1,9 @@
 package Daje::Plugin::Apploader;
-use Mojo::Base -base, -signatures;
+use Mojo::Base 'Mojolicious::Plugin', -signatures;
 use v5.40;
 
-use Mojo::Loader qw(load_class);
-
+use Mojo::Loader qw {load_class};
+use Daje::Database::Migrator;
 
 # NAME
 # ====
@@ -75,10 +75,13 @@ use Mojo::Loader qw(load_class);
 # janeskil1525 E<lt>janeskil1525@gmail.comE<gt>
 #
 
-our $VERSION = "0.01";
+our $VERSION = "0.02";
 
-sub register ($self, $app) {
-    $app->log->debug("Daje::Plugin::Signup::register start");
+sub register ($self, $app, $config) {
+
+    $app->log->debug("Daje::Plugin::Apploader::register start");
+    $self->_setup_database($app);
+    $app->log->debug("_setup_database done");
 
     try {
         my $pg = $app->pg;
@@ -91,6 +94,7 @@ sub register ($self, $app) {
             }
         }
 
+        $app->log->debug("plugin namespace done");
         if(exists $loadables->{namespaces}->{routes}) {
             my $length = scalar @{$loadables->{namespaces}->{routes}};
             for(my $i = 0; $i < $length; $i++) {
@@ -98,6 +102,7 @@ sub register ($self, $app) {
             }
         }
 
+        $app->log->debug("routes namespace done");
         if(exists $loadables->{plugin}) {
             my $length = scalar @{$loadables->{plugin}};
             for(my $i = 0; $i < $length; $i++) {
@@ -116,6 +121,7 @@ sub register ($self, $app) {
             }
         }
 
+        $app->log->debug("plugin loading done");
         if(exists $loadables->{helper}) {
             my $length = scalar @{$loadables->{helper}};
             for(my $i = 0; $i < $length; $i++) {
@@ -129,6 +135,7 @@ sub register ($self, $app) {
             }
         }
 
+        $app->log->debug("helper loading done");
         if(exists $loadables->{routes}) {
             my $length = scalar @{$loadables->{routes}};
             for(my $i = 0; $i < $length; $i++) {
@@ -136,11 +143,24 @@ sub register ($self, $app) {
             }
         }
 
+        $app->log->debug("route loading done");
         my $test = 1;
     } catch ($e) {
         my $error = $e;
         $app->log->fatal($e);
     }
+}
+
+sub _setup_database($self, $app) {
+
+    try {
+        Daje::Database::Migrator->new(
+            pg         => $app->pg,
+            migrations => $app->config('migrations'),
+        )->migrate();
+    } catch ($e) {
+        $app->log->error($e);
+    };
 }
 
 sub _plugin_options($self, $app, $name, $options) {

@@ -1,4 +1,4 @@
-package Slack::BlockKit::Block::RichText::Channel 0.003;
+package Slack::BlockKit::Block::RichText::Channel 0.005;
 # ABSTRACT: a Block Kit rich text element that mentions a #channel
 
 use Moose;
@@ -58,7 +58,7 @@ Slack::BlockKit::Block::RichText::Channel - a Block Kit rich text element that m
 
 =head1 VERSION
 
-version 0.003
+version 0.005
 
 =head1 OVERVIEW
 

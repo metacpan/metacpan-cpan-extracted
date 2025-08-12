@@ -1,4 +1,4 @@
-package Slack::BlockKit::CompObj::Text 0.003;
+package Slack::BlockKit::CompObj::Text 0.005;
 # ABSTRACT: a Block Kit "composition object" for text
 use Moose;
 use MooseX::StrictConstructor;
@@ -103,7 +103,7 @@ Slack::BlockKit::CompObj::Text - a Block Kit "composition object" for text
 
 =head1 VERSION
 
-version 0.003
+version 0.005
 
 =head1 OVERVIEW
 

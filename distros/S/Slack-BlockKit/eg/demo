@@ -53,7 +53,7 @@ if ($opt->perl) {
 } else {
   my $JSON = JSON::XS->new->canonical;
   $JSON = $JSON->pretty if $opt->pretty;
-  say $JSON->encode($blocks->as_struct);
+  say $JSON->encode({ blocks => $blocks->as_struct });
 }
 
 if ($opt->post) {

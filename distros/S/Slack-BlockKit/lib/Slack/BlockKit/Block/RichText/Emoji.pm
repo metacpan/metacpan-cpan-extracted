@@ -1,4 +1,4 @@
-package Slack::BlockKit::Block::RichText::Emoji 0.003;
+package Slack::BlockKit::Block::RichText::Emoji 0.005;
 # ABSTRACT: a Block Kit rich text element for a :colon_code: emoji
 
 use Moose;
@@ -54,7 +54,7 @@ Slack::BlockKit::Block::RichText::Emoji - a Block Kit rich text element for a :c
 
 =head1 VERSION
 
-version 0.003
+version 0.005
 
 =head1 OVERVIEW
 

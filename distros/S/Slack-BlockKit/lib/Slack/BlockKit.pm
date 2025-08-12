@@ -1,4 +1,4 @@
-package Slack::BlockKit 0.003;
+package Slack::BlockKit 0.005;
 # ABSTRACT: a toolkit for building Block Kit blocks for Slack
 
 #pod =head1 OVERVIEW
@@ -56,8 +56,11 @@ use Slack::BlockKit::Block::RichText::User;
 use Slack::BlockKit::Block::RichText::UserGroup;
 
 # Everything Else
+use Slack::BlockKit::Block::Context;
 use Slack::BlockKit::Block::Divider;
 use Slack::BlockKit::Block::Header;
+use Slack::BlockKit::Block::Image;
+use Slack::BlockKit::Block::Markdown;
 use Slack::BlockKit::Block::Section;
 use Slack::BlockKit::CompObj::Text;
 
@@ -75,7 +78,7 @@ Slack::BlockKit - a toolkit for building Block Kit blocks for Slack
 
 =head1 VERSION
 
-version 0.003
+version 0.005
 
 =head1 OVERVIEW
 

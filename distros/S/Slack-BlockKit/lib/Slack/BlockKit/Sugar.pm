@@ -1,4 +1,4 @@
-package Slack::BlockKit::Sugar 0.003;
+package Slack::BlockKit::Sugar 0.005;
 # ABSTRACT: sugar for building Block Kit structures easily (start here!)
 
 use v5.36.0;
@@ -96,7 +96,8 @@ use Sub::Exporter -setup => {
     qw( bold code italic strike ), # specialized richtext()
 
     # Other Things
-    qw( divider header mrkdwn text section )
+    qw( context divider header image markdown section ),
+    qw( mrkdwn text ),
   ],
 };
 
@@ -530,6 +531,42 @@ sub usergroup {
   });
 }
 
+#pod =func context
+#pod
+#pod   my $context = context(@text_objs_or_strings);
+#pod
+#pod This function returns a L<context object|Slack::BlockKit::Block::Context>.  You
+#pod can pass it a list of values, each of which is either a string or a L<text
+#pod object|Slack::BlockKit::CompObj::Text>.  Strings will be promoted to
+#pod C<mrkdwn>-type text objects.
+#pod
+#pod =cut
+
+sub context (@args) {
+  my @elements;
+
+  ARG: for my $arg (@args) {
+    if (builtin::blessed $arg) {
+      Carp::croak("non-Text section passed as argument to BlockKit context sugar")
+        unless $arg->isa('Slack::BlockKit::CompObj::Text');
+
+      push @elements, $arg;
+      next ARG;
+    }
+
+    if (ref $arg) {
+      Carp::croak("unblessed reference passed as argument to BlockKit context sugar");
+    }
+
+    push @elements, Slack::BlockKit::CompObj::Text->new({
+      type => 'mrkdwn',
+      text => $arg,
+    });
+  }
+
+  return Slack::BlockKit::Block::Context->new({ elements => \@elements });
+}
+
 #pod =func divider
 #pod
 #pod   my $divider = divider();
@@ -581,6 +618,46 @@ sub header ($arg) {
   return Slack::BlockKit::Block::Header->new({ text => text($arg) });
 }
 
+#pod =func image
+#pod
+#pod   my $image = image($url, $alt_text);
+#pod   # or
+#pod   my $image = image($url, $alt_text, \%arg);
+#pod
+#pod This function returns an L<image block object|Slack::BlockKit::Block::Image>
+#pod for the given URL, with the given alt text.
+#pod
+#pod The optional C<\%arg> parameter contains additional attributes to be passed to
+#pod the Image object constructor.
+#pod
+#pod =cut
+
+sub image ($url, $alt_text, $arg = undef) {
+  $arg //= {};
+
+  Slack::BlockKit::Block::Image->new({
+    %$arg,
+    image_url => $url,
+    alt_text  => $alt_text,
+  });
+}
+
+#pod =func markdown
+#pod
+#pod   my $text_obj = markdown($text_string);
+#pod
+#pod This returns a L<Markdown block object|Slack::BlockKit::CompObj::Text> with the
+#pod given string as its text.  Don't confuse this with C<mrkdwn>, which produces a
+#pod text composition object.
+#pod
+#pod =cut
+
+sub markdown ($text) {
+  Slack::BlockKit::Block::Markdown->new({
+    text => $text,
+  });
+}
+
 #pod =func section
 #pod
 #pod   my $section = section($text_obj);
@@ -591,8 +668,8 @@ sub header ($arg) {
 #pod
 #pod This function returns a L<section object|Slack::BlockKit::Block::Section>.  You
 #pod can pass it a text object, which will be used as the C<text> property of the
-#pod section.  You can pass it a string string, which will be promoted the a text
-#pod object and then used the same way.
+#pod section.  You can pass it a string, which will be promoted the a text object
+#pod and then used the same way.
 #pod
 #pod Otherwise, you'll have to pass a reference to a hash of argument that will be
 #pod passed to the section constructor.  If this function feels weird, it might just
@@ -624,8 +701,8 @@ sub section ($arg) {
 #pod   my $text_obj = mrkdown($text_string, \%arg);
 #pod
 #pod This returns a L<text composition object|Slack::BlockKit::CompObj::Text> with a
-#pod type of C<mrkdwn> and the given string string as its text.  The C<\%arg> option
-#pod is optional.  If given, it's extra parameters to pass to the text object
+#pod type of C<mrkdwn> and the given string as its text.  The C<\%arg> option is
+#pod optional.  If given, it's extra parameters to pass to the text object
 #pod constructor.
 #pod
 #pod For C<plain_text> text composition objects, see the C<text> function.
@@ -647,8 +724,8 @@ sub mrkdwn ($text, $arg=undef) {
 #pod   my $text_obj = text($text_string, \%arg);
 #pod
 #pod This returns a L<text composition object|Slack::BlockKit::CompObj::Text> with a
-#pod type of C<plain_text> and the given string string as its text.  The C<\%arg>
-#pod option is optional.  If given, it's extra parameters to pass to the text object
+#pod type of C<plain_text> and the given string as its text.  The C<\%arg> option is
+#pod optional.  If given, it's extra parameters to pass to the text object
 #pod constructor.
 #pod
 #pod For C<mrkdwn> text composition objects, see the C<mrkdwn> function.
@@ -679,7 +756,7 @@ Slack::BlockKit::Sugar - sugar for building Block Kit structures easily (start h
 
 =head1 VERSION
 
-version 0.003
+version 0.005
 
 =head1 OVERVIEW
 
@@ -976,6 +1053,15 @@ should be the alphanumeric Slack usergroup id, not a group name.
 If given, the C<%arg> hash is extra parameters to pass to the UserGroup
 constructor.
 
+=head2 context
+
+  my $context = context(@text_objs_or_strings);
+
+This function returns a L<context object|Slack::BlockKit::Block::Context>.  You
+can pass it a list of values, each of which is either a string or a L<text
+object|Slack::BlockKit::CompObj::Text>.  Strings will be promoted to
+C<mrkdwn>-type text objects.
+
 =head2 divider
 
   my $divider = divider();
@@ -1001,6 +1087,26 @@ Alternatively, you can pass in a text object (like you'd get from the
 C<text>) function or a reference to an hash of arguments.  That last form is
 mostly useful if you need to give the header a C<block_id>.
 
+=head2 image
+
+  my $image = image($url, $alt_text);
+  # or
+  my $image = image($url, $alt_text, \%arg);
+
+This function returns an L<image block object|Slack::BlockKit::Block::Image>
+for the given URL, with the given alt text.
+
+The optional C<\%arg> parameter contains additional attributes to be passed to
+the Image object constructor.
+
+=head2 markdown
+
+  my $text_obj = markdown($text_string);
+
+This returns a L<Markdown block object|Slack::BlockKit::CompObj::Text> with the
+given string as its text.  Don't confuse this with C<mrkdwn>, which produces a
+text composition object.
+
 =head2 section
 
   my $section = section($text_obj);
@@ -1011,8 +1117,8 @@ mostly useful if you need to give the header a C<block_id>.
 
 This function returns a L<section object|Slack::BlockKit::Block::Section>.  You
 can pass it a text object, which will be used as the C<text> property of the
-section.  You can pass it a string string, which will be promoted the a text
-object and then used the same way.
+section.  You can pass it a string, which will be promoted the a text object
+and then used the same way.
 
 Otherwise, you'll have to pass a reference to a hash of argument that will be
 passed to the section constructor.  If this function feels weird, it might just
@@ -1023,8 +1129,8 @@ be because the C<section> element in Block Kit is a bit weird.  Sorry!
   my $text_obj = mrkdown($text_string, \%arg);
 
 This returns a L<text composition object|Slack::BlockKit::CompObj::Text> with a
-type of C<mrkdwn> and the given string string as its text.  The C<\%arg> option
-is optional.  If given, it's extra parameters to pass to the text object
+type of C<mrkdwn> and the given string as its text.  The C<\%arg> option is
+optional.  If given, it's extra parameters to pass to the text object
 constructor.
 
 For C<plain_text> text composition objects, see the C<text> function.
@@ -1034,8 +1140,8 @@ For C<plain_text> text composition objects, see the C<text> function.
   my $text_obj = text($text_string, \%arg);
 
 This returns a L<text composition object|Slack::BlockKit::CompObj::Text> with a
-type of C<plain_text> and the given string string as its text.  The C<\%arg>
-option is optional.  If given, it's extra parameters to pass to the text object
+type of C<plain_text> and the given string as its text.  The C<\%arg> option is
+optional.  If given, it's extra parameters to pass to the text object
 constructor.
 
 For C<mrkdwn> text composition objects, see the C<mrkdwn> function.

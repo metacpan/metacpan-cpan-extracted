@@ -1,0 +1,15 @@
+Change history for App-CPAN-SBOM
+
+1.03 2025-08-11
+    - Added "DTRACK_*" env variables for CI/CD
+    - Improved BOM generation
+
+1.02 2025-06-05
+    - Added support for projects that use "cpanfile.snapshot" or "cpanfile"
+    - Added support for uploading BOM files to OWASP Dependency Track
+
+1.01 2025-03-14
+    - Added CPAN::Audit for populate vulnerabilities
+
+1.00 2025-03-10
+    - First release of App::CPAN::SBOM

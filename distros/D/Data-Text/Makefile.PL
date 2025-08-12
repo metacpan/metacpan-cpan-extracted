@@ -15,7 +15,7 @@ WriteMakefile(
 	NAME		=> 'Data::Text',
 	AUTHOR		=> q{Nigel Horne <njh@bandsman.co.uk>},
 	VERSION_FROM	=> 'lib/Data/Text.pm',
-	ABSTRACT_FROM	   => 'lib/Data/Text.pm',
+	ABSTRACT_FROM	=> 'lib/Data/Text.pm',
 	((defined($ExtUtils::MakeMaker::VERSION) &&
 	 ($ExtUtils::MakeMaker::VERSION >= 6.3002))
 	  ? ('LICENSE'=> 'GPL')
@@ -33,9 +33,10 @@ WriteMakefile(
 		'Test::Needs' => 0
 	}, PREREQ_PM => {
 		'Carp' => 0,
+		'Encode' => 0,
 		'Lingua::Conjunction' => 0,
 		'overload' => 0,
-		'Params::Get' => 0,
+		'Params::Get' => 0.13,
 		'Scalar::Util' => 0,
 		'String::Util' => 0
 	}, dist => $dist,
@@ -52,9 +53,10 @@ WriteMakefile(
 				web => 'https://github.com/nigelhorne/Data-Text',
 				repository => 'https://github.com/nigelhorne/Data-Text',
 			}, bugtracker => {
-				# web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Text',
-				web => 'https://github.com/nigelhorne/Data-Text/issues',
-				url => 'https://github.com/nigelhorne/Data-Text/issues',
+				web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Text',
+				url => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Text',
+				# web => 'https://github.com/nigelhorne/Data-Text/issues',
+				# url => 'https://github.com/nigelhorne/Data-Text/issues',
 				mailto => 'bug-Data-Text@rt.cpan.org'
 			}
 		},

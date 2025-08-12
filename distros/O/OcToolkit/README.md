@@ -42,6 +42,7 @@ OcToolkit - Open Cloud Toolkit
 Helm like tool for Openshift and Kubernetes with multi cluster support.
 See https://gitlab.com/code7143615/octoolkit/-/blob/master/README.md how to use this library in ocToolkit.pl script
 and use it as 'Helm-like' command line tool
+Feedback Page: https://gitlab.com/code7143615/octoolkit/-/issues/1
 
 # LICENSE
 

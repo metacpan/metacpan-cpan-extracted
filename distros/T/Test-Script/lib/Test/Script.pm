@@ -1,7 +1,7 @@
 package Test::Script;
 
 # ABSTRACT: Basic cross-platform tests for scripts
-our $VERSION = '1.30'; # VERSION
+our $VERSION = '1.31'; # VERSION
 
 
 use 5.008001;
@@ -64,6 +64,9 @@ sub import {
       $ctx->hub->plan('NO PLAN');
     }
     $ctx->release;
+    foreach ( @EXPORT ) {
+      $class->export_to_level(1, $class, $_);
+    }
   }
   else
   {
@@ -506,7 +509,7 @@ Test::Script - Basic cross-platform tests for scripts
 
 =head1 VERSION
 
-version 1.30
+version 1.31
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,5 @@
 package ExtUtils::HasCompiler;
-$ExtUtils::HasCompiler::VERSION = '0.023';
+$ExtUtils::HasCompiler::VERSION = '0.025';
 use strict;
 use warnings;
 
@@ -10,10 +10,10 @@ our %EXPORT_TAGS = (all => \@EXPORT_OK);
 use Config;
 use Carp 'carp';
 use File::Basename 'basename';
-use File::Spec::Functions qw/catfile catdir rel2abs/;
+use File::Spec::Functions qw/catfile catdir rel2abs curdir/;
 use File::Temp qw/tempdir tempfile/;
 
-my $tempdir = tempdir('HASCOMPILERXXXX', CLEANUP => 1, DIR => '.');
+my $tempdir = tempdir('HASCOMPILERXXXX', CLEANUP => 1, DIR => rel2abs(curdir));
 
 my $loadable_object_format = <<'END';
 #define PERL_NO_GET_CONTEXT
@@ -226,7 +226,7 @@ ExtUtils::HasCompiler - Check for the presence of a compiler
 
 =head1 VERSION
 
-version 0.023
+version 0.025
 
 =head1 SYNOPSIS
 
@@ -296,7 +296,7 @@ This will force the linktype to be either static or dynamic. Dynamic compilation
 
 =head1 AUTHOR
 
-Leon Timmermans <leont@cpan.org>
+Leon Timmermans <fawaka@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 

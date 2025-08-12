@@ -4,7 +4,7 @@ Data::Text - Class to handle text in an OO way
 
 # VERSION
 
-Version 0.17
+Version 0.18
 
 # DESCRIPTION
 
@@ -96,6 +96,8 @@ Returns the text as a string.
 
 Returns the length of the text.
 
+This is actually the number of characters, not the number of bytes.
+
 ## trim
 
 Removes leading and trailing spaces from the text.
@@ -108,9 +110,9 @@ Removes trailing spaces from the text.
 
 Replaces multiple words in the text.
 
-    $dt->append('Hello World');
-    $dt->replace({ 'Hello' => 'Goodbye', 'World' => 'Universe' });
-    print $dt->as_string(), "\n";       # Outputs "Goodbye Universe"
+    $d->append('Hello World');
+    $d->replace({ 'Hello' => 'Goodbye', 'World' => 'Universe' });
+    print $d->as_string(), "\n";        # Outputs "Goodbye Universe"
 
 ## appendconjunction
 
