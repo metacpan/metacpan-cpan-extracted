@@ -15,30 +15,30 @@ class Mojo::File {
   use Mojo::Collection;
   
   # Fields
-  has data : rw object of string|File::Temp|File::Temp::Dir;
+  has file : rw object of string|File::Temp|File::Temp::Dir;
   
   # Class Methods
-  static method new : Mojo::File ($data : object of string|string[]|File::Temp|File::Temp::Dir) {
+  static method new : Mojo::File ($file : object of string|string[]|File::Temp|File::Temp::Dir) {
     
     my $self = new Mojo::File;
     
-    if (!$data) {
-      $self->{data} = File::Spec->canonpath(Cwd->getcwd);
+    if (!$file) {
+      $self->{file} = File::Spec->canonpath(Cwd->getcwd);
     }
-    elsif ($data isa string || $data isa File::Temp || $data isa File::Temp::Dir) {
-      $self->{data} = $data;
+    elsif ($file isa string || $file isa File::Temp || $file isa File::Temp::Dir) {
+      $self->{file} = $file;
     }
-    elsif ($data isa string[]) {
-      my $dataes = (string[])$data;
-      for my $_ (@$dataes) {
+    elsif ($file isa string[]) {
+      my $filees = (string[])$file;
+      for my $_ (@$filees) {
         unless ($_) {
-          die "Invalid data";
+          die "Invalid file";
         }
       }
-      $self->{data} = File::Spec->catfile($dataes);
+      $self->{file} = File::Spec->catfile($filees);
     }
     else {
-      die "The data \$data is an invalid type.";
+      die "The file \$file is an invalid type.";
     }
     
     return $self;
@@ -52,8 +52,8 @@ class Mojo::File {
     return &new(File::Temp->new($options));
   }
   
-  static method path : Mojo::File ($data : object of string|string[]|File::Temp|File::Temp::Dir) {
-    return &new($data);
+  static method path : Mojo::File ($file : object of string|string[]|File::Temp|File::Temp::Dir) {
+    return &new($file);
   }
   
   # Instance Methods
@@ -251,8 +251,7 @@ class Mojo::File {
     return $mojo_file;
   }
   
-  # TODO: interger mode
-  method open : IO::File ($mode : string) {
+  method open : IO::File ($mode : object of string|Int) {
     
     my $handle = IO::File->new;
     
@@ -273,8 +272,8 @@ class Mojo::File {
     }
   }
   
-  method remove_tree : void () {
-    File::Path->remove_tree($self->to_string);;
+  method remove_tree : void ($options : object[] = undef) {
+    File::Path->remove_tree($self->to_string, $options);
   }
   
   method sibling : Mojo::File ($base_name : object of string|string[]) {
@@ -345,16 +344,16 @@ class Mojo::File {
     
     my $path = (string)undef;
     
-    my $data = $self->{data};
-    if ($data) {
-      if ($data isa string) {
-        $path = (string)$data;
+    my $file = $self->{file};
+    if ($file) {
+      if ($file isa string) {
+        $path = (string)$file;
       }
-      elsif ($data isa File::Temp) {
-        $path = $data->(File::Temp)->filename;
+      elsif ($file isa File::Temp) {
+        $path = $file->(File::Temp)->filename;
       }
-      elsif ($data isa File::Temp::Dir) {
-        $path = $data->(File::Temp::Dir)->dirname;
+      elsif ($file isa File::Temp::Dir) {
+        $path = $file->(File::Temp::Dir)->dirname;
       }
     }
     

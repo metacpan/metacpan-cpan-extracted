@@ -1,7 +1,38 @@
+
+1.91    2025-08-12    lichtkind
+-------
+    * = minor bug fix release
+    * ~ added aliases for renamed methods "add_value" and "set_value"
+    * ? POD syntax fixes
+    * ? rewrote parts of ::Color::Space POD
+
+1.9     2025-08-12    lichtkind
+-------
+    * = major feature release
+    * * added cluster and invert calculation method
+    * * added closest_name method
+    * * added support of 5 color spaces: NCol YUV CIELUV CIELCHab CIELCHuv,
+                                 rewrote CIEXYZ CIELAB
+    * + extended range definitions with explicit type names
+    * + color spaces can now define value precision,
+                                    value suffix ('%') and
+                                    value parsing regex
+    * ? added documentation for color space object and missing formats
+    * & moved code into Space::Format space attribute object class
+    * & removed Carp and Test::Warn as dependencies
+    * & moved color and color set calculators into own packages
+    * ~ reworked all calculator methods
+    * ~ renamed single color calculator method "blend" method to "mix"
+    * ~ renamed method "add" and "set" to "add_value" and "set_value"
+    * ~ renamed method "mix" argument "with" to "to"
+    * ~ renamed method "gradient" argument "dynamic" to "tilt"
+    * ~ default space of methods 'distance', 'mix' and 'gradient'
+        went from HSL to RGB, consistent with defaults (complement has to be HSL)
+
 1.71     2023-09-21    lichtkind
 -------
     * = doc fixes
-    * ? typos mispellings, boken sentence
+    * ? typos mispellings, broken sentences
     * ? added range def explanation
     * ? simplified HEADINGS
     * ? removed doc of deprecated methods
@@ -135,7 +166,8 @@
     * \ created own distro
     * ~ small POD fixes
 
-
-    * = new feature release
-    * * added color set method: bowl
-    * + added color spaces: XYZ, LAB
+TODO:
+  # add condition W + B < 100
+  # add oklab space
+  # add Cubehelix space
+  # - add gama crrection ?

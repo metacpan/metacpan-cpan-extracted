@@ -2,9 +2,9 @@ use 5.008003;
 
 package Sub::Delete;
 
-$VERSION = '1.00002';
+$VERSION = '1.00003';
 @EXPORT = delete_sub;
-use Exporter 5.57 'import';
+use Exporter 5.57 'import';
 use constant point0 => 0+$] eq 5.01;
 
 # This sub must come before any lexical vars.
@@ -44,7 +44,7 @@ sub delete_sub {
 	}
         delete $stash->{$key};
 	keys %imported_slots == 1 and exists $imported_slots{SCALAR}
-	 and !$imported_slots{SCALAR} and Internals'SvREFCNT $$glob =>== 1
+	 and !$imported_slots{SCALAR} and Internals::SvREFCNT $$glob =>== 1
 	 and !defined *$glob{IO} and !defined *$glob{FORMAT}
 	 and return; # empty glob
 	my $newglob = \*$globname;
@@ -70,7 +70,7 @@ Sub::Delete - Perl module enabling one to delete subroutines
 
 =head1 VERSION
 
-1.00002
+1.00003
 
 =head1 SYNOPSIS
 

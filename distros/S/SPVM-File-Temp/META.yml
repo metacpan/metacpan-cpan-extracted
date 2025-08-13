@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   SPVM: '0.990048'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,8 +22,9 @@ requires:
   SPVM::Errno: '0.07'
   SPVM::File::Path: '0.011001'
   SPVM::File::Spec: '0.086'
-  SPVM::IO: '0.235'
+  SPVM::IO: '0.238'
   SPVM::Sys: '0.513'
-resources: {}
-version: '0.027'
+resources:
+  repository: https://github.com/yuki-kimoto/SPVM-File-Temp.git
+version: '0.028'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

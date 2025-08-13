@@ -1,0 +1,11 @@
+Revision history for App-git_log_ch_usrdata
+
+0.02    2025/08/13
+
+      - Added CONTRIBUTING.md and SECURITY.md.
+      - Corrected POD.
+
+0.01    2025/08/12
+
+        First version, released on an unsuspecting world.
+

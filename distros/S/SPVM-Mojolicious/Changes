@@ -1,3 +1,10 @@
+0.011 2025-08-13
+  [Requirement Changes]
+    * Require SPVM::File::Path 0.014.
+  [Incompatible Changes]
+    * Improve Mojo::File with incompatible changes.
+  [Document Changes]
+    * Improve the document for Mojo::File class.
 0.010 2025-08-11
   [Changes]
     * Improve Mojo::EventEmitter.

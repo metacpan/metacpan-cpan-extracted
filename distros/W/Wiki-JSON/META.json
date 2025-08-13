@@ -1,0 +1,42 @@
+{
+   "abstract" : "Parse wiki-like articles to a data-structure transformable to JSON.",
+   "author" : [
+      "Sergio Iglesias <contact@owlcode.tech>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4234",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Wiki-JSON",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Cpanel::JSON::XS" : "0",
+            "Data::Dumper" : "0",
+            "Module::Build" : "0",
+            "Moo" : "0",
+            "Path::Tiny" : "0",
+            "Test::Most" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Wiki::JSON" : {
+         "file" : "lib/Wiki/JSON.pm",
+         "version" : "v0.0.7"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v0.0.7",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

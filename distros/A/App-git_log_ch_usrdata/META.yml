@@ -1,0 +1,39 @@
+---
+abstract: 'Change username and email address in git log'
+author:
+  - 'Klaus Rindfrey <klausrin@cpan.org.eu>'
+build_requires:
+  Capture::Tiny: '0.48'
+  ExtUtils::MakeMaker: '0'
+  File::Basename: '0'
+  File::Spec::Functions: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec::Functions: '0'
+  autodie: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-git_log_ch_usrdata
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  App::git_log_ch_usrdata:
+    file: lib/App/git_log_ch_usrdata.pm
+    version: '0.02'
+requires:
+  Git::RemoteURL::Parse: '0.02'
+  GitHub::Config::SSH::UserData: '0.01'
+  perl: '5.010'
+resources:
+  repository: https://github.com/klaus-rindfrey/perl-app-git_log_ch_usrdata.git
+version: '0.02'
+x_bugtracker:
+  web: https://github.com/klaus-rindfrey/perl-app-git_log_ch_usrdata/issues
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

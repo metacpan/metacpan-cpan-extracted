@@ -1,0 +1,10 @@
+kind: ImageStream
+apiVersion: image.openshift.io/v1
+metadata:
+  name: [% oc_config.instance_specific_name.api %]
+  namespace: [% namespace %]
+  labels:
+    app: [% oc_config.instance_specific_name.api %]
+spec:
+  lookupPolicy:
+    local: false

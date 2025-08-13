@@ -1,0 +1,17 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: [% oc_config.instance_specific_name.api_pdf_to_text_buffer %]
+  namespace: [% namespace %]
+  labels:
+    app: [% oc_config.instance_specific_name.api %]
+  finalizers:
+    - kubernetes.io/pvc-protection
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: [% oc_config.instance_specific_data.api.pdf_to_text_buffer_size %]
+  storageClassName: netapp-internal
+  volumeMode: Filesystem

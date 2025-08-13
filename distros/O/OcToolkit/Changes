@@ -1,8 +1,9 @@
 Revision history for Perl extension OcToolkit
 
-1.03 2025-08-11T14:41:16Z
+1.05 2025-08-13T07:55:48Z
 
     - original version 1.01
     - remove script comment from .pm file 1.02
     - feedback page 1.03
+    - examples in lib directory 1.05
 

@@ -1,0 +1,16 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: [% oc_config.instance_specific_name.public_ui_config %]
+  namespace: [% namespace %]
+  labels:
+    app: [% oc_config.instance_specific_name.public_ui %]
+data:
+  instance.json: |
+    {      
+      "api_url_service": "http://api-[% instance %]:3000",
+      "solr_url_service": "http://api-[% instance %]:3000/proxy/solr/",
+      "url": "https://[% oc_config.instance_specific_data.public_ui.url %]",
+      "display_console_logs": [% oc_config.instance_specific_data.public_ui.display_console_logs %],
+      "crawlerIP_blacklist": [ "xxx.yyy.zzz.www" ]
+    }

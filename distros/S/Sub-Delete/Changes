@@ -1,5 +1,21 @@
 Revision history for Sub::Delete
 
+1.00003     12 August 2025
+
+         - promote to stable; passes on 5.10.0 locally; no CPAN
+           Testers results
+
+1.00002_02  19 July 2025
+
+         - re-bundle the Test::More originally bundled with the
+           distribution. CPAN versions circa 2025 cause test of 'tie
+           $@' to erroneously fail on Perl 5.10.0.
+
+1.00002_01  22 February 2025
+         - unbundle Test::More
+         - replace q{'} with q{::} as package separator, as it is
+           use is deprecated as of Perl 5.38
+
 1.00002  18 April, 2010
          delete_sub no longer leaks messages into $@.
 

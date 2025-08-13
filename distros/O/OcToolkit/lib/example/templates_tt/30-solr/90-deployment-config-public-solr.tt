@@ -1,0 +1,104 @@
+kind: DeploymentConfig
+apiVersion: apps.openshift.io/v1
+metadata:
+  name: [% oc_config.instance_specific_name.solr_public %]
+  namespace: [% namespace %]
+  labels:
+    app: [% oc_config.instance_specific_name.solr_public %]
+spec:
+  strategy:
+    type: Rolling
+    rollingParams:
+      updatePeriodSeconds: 1
+      intervalSeconds: 1
+      timeoutSeconds: 600
+      maxUnavailable: 25%
+      maxSurge: 25%
+    resources: {}
+    activeDeadlineSeconds: 21600
+  triggers:
+    - type: ConfigChange
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+          - [% oc_config.instance_specific_name.solr_public %]
+        from:
+          kind: ImageStreamTag
+          namespace: [% namespace %]
+          name: [% oc_config.instance_specific_name.solr %]:latest
+  replicas: 1
+  revisionHistoryLimit: 10
+  test: false
+  selector:
+    app: [% oc_config.instance_specific_name.solr_public %]
+    deploymentconfig: [% oc_config.instance_specific_name.solr_public %]
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: [% oc_config.instance_specific_name.solr_public %]
+        deploymentconfig: [% oc_config.instance_specific_name.solr_public %]
+    spec:
+      volumes:
+        - name: solr-data
+          persistentVolumeClaim:
+            claimName: [% oc_config.instance_specific_name.solr_public_index %]
+        - name: [% oc_config.conf_volume %]
+          persistentVolumeClaim:
+            claimName: [% oc_config.conf_volume %]
+        - name: solr-log
+          persistentVolumeClaim:
+            claimName: [% oc_config.instance_specific_name.solr_public_log %]
+        - name: solr-logrotate
+          configMap:
+            name: [% oc_config.instance_specific_name.solr_logrotate %]
+            items:
+              - key: logrotate.conf
+                path: logrotate.conf
+            defaultMode: 420
+      containers:
+        - resources:
+            limits:
+              [% IF oc_config.instance_specific_data.solr_public.limits.cpu %]
+              cpu: '[% oc_config.instance_specific_data.solr_public.limits.cpu %]'
+              [% END %]
+              [% IF oc_config.instance_specific_data.solr_public.limits.memory %]
+              memory: [% oc_config.instance_specific_data.solr_public.limits.memory %]
+              [% END %]
+            requests:  
+              [% IF oc_config.instance_specific_data.solr_public.requests.cpu %]
+              cpu: '[% oc_config.instance_specific_data.solr_public.requests.cpu %]'
+              [% END %]
+              [% IF oc_config.instance_specific_data.solr_public.requests.memory %]
+              memory: [% oc_config.instance_specific_data.solr_public.requests.memory %]
+              [% END %]
+          terminationMessagePath: /dev/termination-log
+          name: [% oc_config.instance_specific_name.solr_public %]
+          env:
+            - name: SOLR_INSTANCE
+              value: public
+            - name: USERID
+              value: '1000210000'
+            - name: INSTANCE
+              value: [% instance %]
+          ports:
+            - containerPort: [% oc_config.solr_port %]
+              protocol: TCP
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: solr-data
+              mountPath: /opt/solr-data
+            - name: [% oc_config.conf_volume %]
+              mountPath: /opt/config
+            - name: solr-log
+              mountPath: /opt/solrLogs
+            - name: solr-logrotate
+              mountPath: /home/solr/logrotate.conf
+              subPath: logrotate.conf
+          terminationMessagePolicy: File
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      securityContext: {}
+      schedulerName: default-scheduler

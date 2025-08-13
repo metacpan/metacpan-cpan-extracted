@@ -97,7 +97,7 @@ SKIP:{
 }
 
 # Make sure ‘use vars’ info is preserved.
-{ package gred; *'chit = \$'chit } # use vars
+{ package gred; *::chit = \$::chit } # use vars
 sub chit;
 delete_sub 'chit';
 {

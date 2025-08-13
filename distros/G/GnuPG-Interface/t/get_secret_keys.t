@@ -87,7 +87,8 @@ TEST
         hex_id                   => 'ADB99D9C2E854A6B',
         creation_date            => 949813119,
         creation_date_string     => '2000-02-06',
-        usage_flags              => $gnupg->cmp_version($gnupg->version, '2.3.8') >= 0 ? 'er' : 'e',
+        usage_flags              => $gnupg->cmp_version( $gnupg->version, '2.4.0' ) > 0
+                                        && $gnupg->cmp_version( $gnupg->version, '2.4.6' ) < 0 ? 'er' : 'e',
         pubkey_data              => $subkey_pub_data,
       };
 

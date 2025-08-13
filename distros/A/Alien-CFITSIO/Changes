@@ -1,5 +1,12 @@
 Revision history for Alien-CFITSIO
 
+v4.6.2.5  2025-08-12 18:55:01-04:00 America/New_York
+
+  [BUILD]
+
+    * HEASARC url now requires a trailing /, otherwise it'll hang for
+      a while and then return an error.
+
 v4.6.2.4  2025-04-24 21:20:29-04:00 America/New_York
 
     * No changes, promote to stable.

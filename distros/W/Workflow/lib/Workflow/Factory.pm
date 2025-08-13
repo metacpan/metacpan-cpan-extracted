@@ -12,7 +12,7 @@ use Scalar::Util 'blessed';
 use Syntax::Keyword::Try;
 use Module::Runtime qw( require_module );
 
-$Workflow::Factory::VERSION = '2.05';
+$Workflow::Factory::VERSION = '2.06';
 
 # Extra action attribute validation is off by default for compatibility.
 our $VALIDATE_ACTION_CONFIG = 0;
@@ -346,17 +346,12 @@ sub create_workflow {
     $self->log->info( "Created history object ok" );
     $persister->commit_transaction;
 
-    my $state = $wf->_get_workflow_state();
-    if ( $state->autorun ) {
-        my $state_name = $state->state;
-        $self->log->info( "State '$state_name' marked to be run ",
-                          "automatically; executing that state/action..." );
-        $wf->_auto_execute_state($state);
-    }
-
     $self->associate_observers_with_workflow($wf);
     $self->_associate_transaction_observer_with_workflow($wf, $persister);
     $wf->notify_observers('create');
+
+    my $state = $wf->_get_workflow_state();
+    $wf->_maybe_autorun_state( $state );
 
     return $wf;
 }
@@ -840,7 +835,7 @@ Workflow::Factory - Generates new workflow and supporting objects
 
 =head1 VERSION
 
-This documentation describes version 2.05 of this package
+This documentation describes version 2.06 of this package
 
 =head1 SYNOPSIS
 

@@ -61,6 +61,7 @@ test/fake-gpg-v1
 test/fake-gpg-v2
 test/fake-pinentry.pl
 test/gpg.conf
+test/gpg1.conf
 test/key.1.asc
 test/new_secret.pgp
 test/passphrase
@@ -78,6 +79,7 @@ test/public_keys.pgp
 test/secret-keys/1.0.test
 test/secret-keys/1.1.test
 test/secret-keys/1.2.2.test
+test/secret-keys/1.2.4.5.test
 test/secret-keys/1.2.test
 test/secret-keys/2.0.test
 test/secret_keys.pgp

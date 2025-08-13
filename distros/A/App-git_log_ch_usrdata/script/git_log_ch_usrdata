@@ -1,0 +1,132 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use 5.010;
+
+use Getopt::Long qw(:config no_ignore_case auto_help auto_version);
+
+use Pod::Usage;
+
+our $VERSION = '1.01.00';
+
+my ($Old_Mail, $New_Mail, $New_User, $No_Credentials);
+
+GetOptions('old_email|oe=s'  => \$Old_Mail,
+           'new_email|ne=s'  => \$New_Mail,
+           'new_user|nu=s'   => \$New_User,
+           'no_credentials|nc' => \$No_Credentials
+          ) or pod2usage(2);
+
+$Old_Mail // die("'--old_email' missing.");
+$New_Mail // die("'--new_email' missing.");
+$New_User // die("'--new_user' missing.");
+
+my $Filter_Branch = <<"EOT";
+git filter-branch --env-filter '
+OLD_EMAIL="$Old_Mail"
+CORRECT_NAME="$New_User"
+CORRECT_EMAIL="$New_Mail"
+
+if [ "\$GIT_COMMITTER_EMAIL" = "\$OLD_EMAIL" ]
+then
+    export GIT_COMMITTER_NAME="\$CORRECT_NAME"
+    export GIT_COMMITTER_EMAIL="\$CORRECT_EMAIL"
+fi
+if [ "\$GIT_AUTHOR_EMAIL" = "\$OLD_EMAIL" ]
+then
+    export GIT_AUTHOR_NAME="\$CORRECT_NAME"
+    export GIT_AUTHOR_EMAIL="\$CORRECT_EMAIL"
+fi
+' --tag-name-filter cat -- --branches --tags
+EOT
+#Don't append a semicolon to the line above!
+
+my @Commands = ('echo "--- Correct local git history ---"',
+                $Filter_Branch,
+
+                'echo "--- Clean up local repo ---"',
+                'rm -rf .git/refs/original/',
+                'git reflog expire --expire=now --all',
+                'git gc --prune=now --aggressive',
+
+                'echo "--- push changes to github ---"',
+                "git push --force --tags origin 'refs/heads/*'",
+                $No_Credentials ? () : (
+                                        'echo "--- Set credentials ---"',
+                                        'git config credential.helper store',
+                                        "git config user.email $New_Mail",
+                                        "git config user.name \$New_User"
+                                       )
+               );
+
+
+# https://chatgpt.com/c/670d4141-4bf0-8010-97db-0ca53f5f122c
+
+
+foreach my $cmd (@Commands) {
+  chomp($cmd);
+  if ($cmd =~ /^echo /) {
+    print("\n\n");
+  } else {
+    my $cmd_msg = $cmd;
+    $cmd_msg =~ s/\n/\n          /sg;
+    print("Running:  $cmd_msg\n");
+  }
+  system($cmd) == 0 or die("$cmd --- failed: $!\n");
+}
+
+__END__
+
+=pod
+
+
+=head1 NAME
+
+  git_log_ch_usrdata - Change username and email address in git log
+
+=head1 SYNOPSIS
+
+  git_log_ch_usrdata --old_email OLD_EMAIL --new_email NEW_EMAIL  \
+                     --new_user NEW_USER [--no_credentials]
+
+  git_log_ch_usrdata --help | --version
+
+or, shorter:
+
+  git_log_ch_usrdata --oe OLD_EMAIL --ne NEW_EMAIL --nu NEW_USER [--nc]
+
+
+=head1 DESCRIPTION
+
+In case that you are using an incorrect username and/or email address in a Git
+repository, you can use this script to correct the Git log.
+
+Change to your git repo directory and run the script like this:
+
+  git_log_ch_usrdata --old_email OLD_EMAIL --new_email NEW_EMAIL --new_user NEW_USER
+
+The options can be written shorter like this:
+
+  git_log_ch_usrdata --oe OLD_EMAIL --ne NEW_EMAIL --nu NEW_USER
+
+By default, the script also stores I<C<NEW_EMAIL>> and I<C<NEW_USER>> via
+C<git config credential.helper store>. This can be switched off by specifying
+the B<C<--no_credentials>> (or B<C<--nc>>) option.
+
+
+=head1 SEE ALSO
+
+L<App::ghmulti>, L<App::git_log_ch_usrdata>
+
+
+=head1 LICENSE AND COPYRIGHT
+
+This software is copyright (c) 2025 by Klaus Rindfrey.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+
+=cut
+
+

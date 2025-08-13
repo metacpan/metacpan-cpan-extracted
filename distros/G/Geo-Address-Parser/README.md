@@ -4,7 +4,7 @@ Geo::Address::Parser - Lightweight country-aware address parser from flat text
 
 # VERSION
 
-Version 0.03
+Version 0.04
 
 # METHODS
 
@@ -21,6 +21,8 @@ Version 0.03
 This module extracts address components from flat text input. It supports
 lightweight parsing for the US, UK, Canada, Australia, and New Zealand, using
 country-specific regular expressions.
+
+The object can be configured using the methods described in [Object::Configure](https://metacpan.org/pod/Object%3A%3AConfigure).
 
 ## new(country => $code)
 

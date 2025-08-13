@@ -7,10 +7,10 @@ use warnings;
 
 use base qw( Alien::Base );
 
-our $VERSION = 'v4.6.2.4';
+our $VERSION = 'v4.6.2.5';
 
 BEGIN {
-    our $VERSION = 'v4.6.2.4'; # VERSION is automatically inserted at dist create time; need it at compile time
+    our $VERSION = 'v4.6.2.5'; # VERSION is automatically inserted at dist create time; need it at compile time
 }
 
 use constant CFITSIO_VERSION => do {
@@ -43,7 +43,7 @@ Alien::CFITSIO - Build and Install the CFITSIO library
 
 =head1 VERSION
 
-version v4.6.2.4
+version v4.6.2.5
 
 =head1 SYNOPSIS
 

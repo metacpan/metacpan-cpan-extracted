@@ -1,0 +1,48 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  labels:
+    run: crontabClusterInternVersion
+    app: specificTemplateinInternCluster
+  name: [% oc_config.instance_specific_name.cron_job_create_folders %]
+  namespace: [% namespace %]
+  selfLink: /apis/batch/v1/namespaces/mycompany/cronjobs/[% oc_config.instance_specific_name.cron_job_create_folders %]
+spec:
+  concurrencyPolicy: Allow
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    metadata:
+      creationTimestamp: null
+    spec:
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            run: crontab
+        spec:
+          containers:
+          - command:
+            - perl
+            - -f
+            - /archiveLogsCreateFolders[% instance_capitalized_first %].pl
+            image: image-registry.openshift-image-registry.svc:5000/[% namespace %]/[% oc_config.instance_specific_name.cron_jobs %]
+            imagePullPolicy: Always
+            name: [% oc_config.instance_specific_name.cron_job_create_folders %]
+            resources: {}
+            terminationMessagePath: /dev/termination-log
+            terminationMessagePolicy: File
+            volumeMounts:
+            - mountPath: /opt/Logs
+              name: logs-volume
+          dnsPolicy: ClusterFirst
+          restartPolicy: OnFailure
+          schedulerName: default-scheduler
+          securityContext: {}
+          terminationGracePeriodSeconds: 30
+          volumes:
+          - name: logs-volume
+            persistentVolumeClaim:
+              claimName: [% oc_config.log_volume %]
+  schedule: 50 23 31 12 *
+  successfulJobsHistoryLimit: 3
+  suspend: false

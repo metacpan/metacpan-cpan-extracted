@@ -1,3 +1,6 @@
+0.27	Sam Varshavchik  <mrsam@courier-mta.com>
+	cidrvalidate() bug fix.
+
 0.26    Sam Varshavchik  <mrsam@courier-mta.com>
 
 	cidrvalidate() should accept IPv6 addresses with one uncompressed

@@ -1,0 +1,121 @@
+kind: DeploymentConfig
+apiVersion: apps.openshift.io/v1
+metadata:
+  name: [% oc_config.instance_specific_name.api %]
+  namespace: [% namespace %]
+  labels:
+    app: [% oc_config.instance_specific_name.api %]
+spec:
+  strategy:
+    type: Rolling
+    rollingParams:
+      updatePeriodSeconds: 1
+      intervalSeconds: 1
+      timeoutSeconds: 1200
+      maxUnavailable: 25%
+      maxSurge: 25%
+    resources: {}
+    activeDeadlineSeconds: 21600
+  triggers:
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+          - [% oc_config.instance_specific_name.api %]
+        from:
+          kind: ImageStreamTag
+          namespace: [% namespace %]
+          name: [% oc_config.instance_specific_name.api %]:latest
+    - type: ConfigChange
+  replicas: 1
+  revisionHistoryLimit: 10
+  test: false
+  selector:
+    app: [% oc_config.instance_specific_name.api %]
+    deploymentconfig: [% oc_config.instance_specific_name.api %]
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: [% oc_config.instance_specific_name.api %]
+        deploymentconfig: [% oc_config.instance_specific_name.api %]
+    spec:
+      volumes:
+        - name: config-map-api-urls
+          configMap:
+            name: [% oc_config.api_urls_api_cm %]
+            items:
+              - key: urls.json
+                path: urls.json
+            defaultMode: 420
+        - name: secret-api-secret
+          secret:
+            secretName: [% oc_config.api_secret_s %]
+            items:
+              - key: secret.json
+                path: secret.json
+            defaultMode: 420
+        - name: volume-log
+          persistentVolumeClaim:
+            claimName: [% oc_config.log_volume %]
+        - name: volume-api-conf
+          persistentVolumeClaim:
+            claimName: [% oc_config.conf_volume %]
+        - name: volume-pdftotext-buffer
+          persistentVolumeClaim:
+            claimName: [% oc_config.instance_specific_name.api_pdf_to_text_buffer %]
+        - name: volume-doc-user-stats
+          persistentVolumeClaim:
+            claimName: [% oc_config.instance_specific_name.api_doc_user_stats %]
+      containers:
+        - resources:
+            limits:
+              [% IF oc_config.instance_specific_data.api.limits.cpu %]
+              cpu: '[% oc_config.instance_specific_data.api.limits.cpu %]'
+              [% END %]
+              [% IF oc_config.instance_specific_data.api.limits.memory %]
+              memory: [% oc_config.instance_specific_data.api.limits.memory %]
+              [% END %]
+            requests:  
+              [% IF oc_config.instance_specific_data.api.requests.cpu %]
+              cpu: '[% oc_config.instance_specific_data.api.requests.cpu %]'
+              [% END %]
+              [% IF oc_config.instance_specific_data.api.requests.memory %]
+              memory: [% oc_config.instance_specific_data.api.requests.memory %]
+              [% END %]
+          terminationMessagePath: /dev/termination-log
+          name: [% oc_config.instance_specific_name.api %]
+          env:
+            - name: API_CONFIG_PATH
+              value: /opt/config/API[% instance_capitalized_first %].json
+            - name: LOG_ARCHIVE_DIR_NAME
+              value: API[% instance_capitalized_first %]
+            - name: OPENSHIFT_CLUSTER
+              value: [% cluster_camelcase %]
+            - name: INSTANCE
+              value: [% instance %]
+          ports:
+            - containerPort: [% oc_config.api_port %]
+              protocol: TCP
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: config-map-api-urls
+              mountPath: /opt/config/urls.json
+              subPath: urls.json
+            - name: secret-api-secret
+              mountPath: /opt/config/secret.json
+              subPath: secret.json
+            - name: volume-log
+              mountPath: /opt/Logs
+            - name: volume-api-conf
+              mountPath: /opt/config
+            - name: volume-pdftotext-buffer
+              mountPath: /opt/pdfToTextBuffer
+            - name: volume-doc-user-stats
+              mountPath: /opt/docUserStatsArchive
+          terminationMessagePolicy: File
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      securityContext: {}
+      schedulerName: default-scheduler

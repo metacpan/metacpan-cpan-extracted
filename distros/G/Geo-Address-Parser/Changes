@@ -1,5 +1,9 @@
 Revision history for Geo-Address-Parser
 
+0.04	Tue Aug 12 08:16:22 EDT 2025
+	Use Return::Set, Test::Returns and Object::Configure
+	Allow Australia to be AU and New Zealand to be NZ
+
 0.03	Mon Jul 28 20:45:27 EDT 2025
 	Bump minimum version of Params::Get
 

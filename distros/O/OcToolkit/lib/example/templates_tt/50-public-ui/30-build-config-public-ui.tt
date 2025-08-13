@@ -1,0 +1,36 @@
+kind: BuildConfig
+apiVersion: build.openshift.io/v1
+metadata:
+  name: [% oc_config.instance_specific_name.public_ui %]
+  namespace: [% namespace %]
+  labels:
+    app: [% oc_config.instance_specific_name.public_ui %]
+spec:
+  nodeSelector: null
+  output:
+    to:
+      kind: ImageStreamTag
+      name: [% oc_config.instance_specific_name.public_ui %]:latest
+  resources: {}
+  successfulBuildsHistoryLimit: 5
+  failedBuildsHistoryLimit: 5
+  strategy:
+    type: Docker
+    dockerStrategy: {}
+  postCommit: {}
+  source:
+    type: Git
+    git:
+      uri: [% oc_config.git_repo.public_ui %]
+      ref: [% oc_config.instance_specific_data.public_ui.git_branch %]
+    sourceSecret:
+      name: [% oc_config.git_secret_name %]
+  triggers:
+    - type: ConfigChange
+    - github:
+        secret: [% secrets.item('build-config-trigger-github.txt') %]
+      type: GitHub
+    - generic:
+        secret: [% secrets.item('build-config-trigger-generic.txt') %]
+      type: Generic
+  runPolicy: Serial

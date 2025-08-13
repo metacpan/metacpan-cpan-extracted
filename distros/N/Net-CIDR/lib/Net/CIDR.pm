@@ -50,7 +50,7 @@ use Carp;
 
 );
 
-$VERSION = "0.26";
+$VERSION = "0.27";
 
 1;
 
@@ -1222,19 +1222,24 @@ sub _compress_ipv6 {
     # taken from IPv6::Address on CPAN
     my $str = shift;
     return '::' if($str eq '0:0:0:0:0:0:0:0');
+
+    # _ipv4to6, called from addr(), finds the longest sequence of
+    # consecutive 0s and replaces them with a ::, and only the first
+    # instance (if there were two or more sequences of the same length),
+    # we're carefully reproducing those semantics here.
     for(my $i=7;$i>1;$i--) {
             my $zerostr = join(':',split('','0'x$i));
             ###print "DEBUG: $str $zerostr \n";
-            if($str =~ /:$zerostr$/) {
-                    $str =~ s/:$zerostr$/::/;
+            if ($str =~ /^$zerostr:/) {
+                    $str =~ s/^$zerostr:/::/;
                     return $str;
             }
             elsif ($str =~ /:$zerostr:/) {
                     $str =~ s/:$zerostr:/::/;
                     return $str;
             }
-            elsif ($str =~ /^$zerostr:/) {
-                    $str =~ s/^$zerostr:/::/;
+            elsif($str =~ /:$zerostr$/) {
+                    $str =~ s/:$zerostr$/::/;
                     return $str;
             }
     }

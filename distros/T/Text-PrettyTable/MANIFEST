@@ -1,0 +1,14 @@
+Changes
+LICENSE
+Makefile.PL
+MANIFEST
+README
+META.yml
+META.json
+lib/Text/PrettyTable.pm
+t/00-compile.t
+t/01-static.t
+t/02-object.t
+t/03-function.t
+t/10-render.t
+t/11-special.t

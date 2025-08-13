@@ -26,7 +26,9 @@ WriteMakefile(
 		'Carp' => 0,
 		'Exporter' => 0,
 		'Module::Runtime' => 0,
-		'Params::Get' => 0.11,
+		'Object::Configure' => 0,
+		'Params::Get' => 0.13,
+		'Return::Set' => 0,
 		'Text::Capitalize' => 0,
 	}, TEST_REQUIRES => {
 		'Getopt::Long' => 0,
@@ -37,6 +39,7 @@ WriteMakefile(
 		'Test::DescribeMe' => 0,
 		'Test::Most' => 0,
 		'Test::Needs' => 0,
+		'Test::Returns' => 0,
 	}, dist => $dist,
 	clean => { FILES => 'Geo-Address-Parser-*' },
 	META_MERGE => {	# https://perldoc.perl.org/CPAN::Meta::Spec
@@ -51,9 +54,8 @@ WriteMakefile(
 				# license => 'http://dev.perl.org/licenses/',
 			}, bugtracker => {
 				mailto => 'bug-Geo-Address-Parser@rt.cpan.org',
-				url => 'https://github.com/nigelhorne/Geo-Address-Parser/issues',
-				# web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Address-Parser',
-				web => 'https://github.com/nigelhorne/Geo-Address-Parser/issues'
+				url => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Address-Parser',
+				web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Address-Parser',
 			}
 		},
 	},

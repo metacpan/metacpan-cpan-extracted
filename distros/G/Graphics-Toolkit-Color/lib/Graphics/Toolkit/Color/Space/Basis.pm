@@ -1,177 +1,137 @@
-use v5.12;
-use warnings;
 
-# logic of value hash keys for all color spacs
+# count and names of color space axis (short and long), space name = usr | prefix + axis initials
 
 package Graphics::Toolkit::Color::Space::Basis;
+use v5.12;
+use warnings;
+use Graphics::Toolkit::Color::Space::Util qw/is_nr/;
 
 sub new {
-    my ($pkg, $axis_names, $name_shortcuts, $prefix) = @_;
-    return unless ref $axis_names eq 'ARRAY';
-    return if defined $name_shortcuts and (ref $name_shortcuts ne 'ARRAY' or @$axis_names != @$name_shortcuts);
-    my @keys      = map {lc} @$axis_names;
-    my @shortcuts = map { _color_key_shortcut($_) } (defined $name_shortcuts) ? @$name_shortcuts : @keys;
-    return unless @keys > 0;
+    my ($pkg, $axis_long_names, $axis_short_names, $space_name, $alias_name) = @_;
+    return 'first argument (axis names) has to be an ARRAY reference' unless ref $axis_long_names eq 'ARRAY';
+    return 'amount of shortcut names have to match that of full names'
+        if defined $axis_short_names and (ref $axis_short_names ne 'ARRAY' or @$axis_long_names != @$axis_short_names);
 
-    my @iterator = 0 .. $#keys;
-    my %key_order      = map { $keys[$_] => $_ } @iterator;
-    my %shortcut_order = map { $shortcuts[$_] => $_ } @iterator;
-    bless { keys => [@keys], shortcuts => [@shortcuts],
-            key_order => \%key_order, shortcut_order => \%shortcut_order,
-            name => uc (join('', @shortcuts)), count => int @keys, iterator => \@iterator }
-}
+    my @axis_long_name = map {lc} @$axis_long_names;
+    my @axis_short_name = map { color_key_shortcut($_) } (defined $axis_short_names) ? @$axis_short_names : @axis_long_name;
+    return 'need some axis names to create a color space' unless @axis_long_name > 0;
+    return 'need same amount of axis short names and long names' unless @axis_long_name == @axis_short_name;
 
-sub keys     { @{$_[0]{'keys'}} }
-sub shortcuts{ @{$_[0]{'shortcuts'}} }
-sub iterator { @{$_[0]{'iterator'}} }
-sub count    {   $_[0]{'count'} }
-sub name     {   $_[0]{'name'} }
+    my @iterator         = 0 .. $#axis_long_name;
+    my %long_name_order  = map { $axis_long_name[$_] => $_ }  @iterator;
+    my %short_name_order = map { $axis_short_name[$_] => $_ } @iterator;
+    my $axis_initials    = uc join( '', @axis_short_name );
+    $space_name //= $axis_initials;
+    $alias_name //= '';
 
-sub key_pos      {  defined $_[1] ? $_[0]->{'key_order'}{ lc $_[1] } : undef}
-sub shortcut_pos {  defined $_[1] ? $_[0]->{'shortcut_order'}{ lc $_[1] } : undef }
-sub is_key       { (defined $_[1] and exists $_[0]->{'key_order'}{ lc $_[1] }) ? 1 : 0 }
-sub is_shortcut  { (defined $_[1] and exists $_[0]->{'shortcut_order'}{ lc $_[1] }) ? 1 : 0 }
-sub is_key_or_shortcut { $_[0]->is_key($_[1]) or $_[0]->is_shortcut($_[1]) }
-sub is_string {
-    my ($self, $string) = @_;
-    return 0 unless defined $string and not ref $string;
-    $string = lc $string;
-    my $name = lc $self->name;
-    return 0 unless index($string, $name.':') == 0;
-    my $nr = '\s*-?\d+(?:\.\d+)?\s*';
-    my $nrs = join(',', ('\s*-?\d+(?:\.\d+)?\s*') x $self->count);
-    ($string =~ /^$name:$nrs$/) ? 1 : 0;
+    bless { space_name => uc $space_name, alias_name => uc $alias_name,
+            axis_long_name => \@axis_long_name, axis_short_name => \@axis_short_name,
+            long_name_order => \%long_name_order, short_name_order => \%short_name_order,
+            axis_iterator => \@iterator }
 }
-sub is_css_string {
-    my ($self, $string) = @_;
-    return 0 unless defined $string and not ref $string;
-    $string = lc $string;
-    my $name = lc $self->name;
-    return 0 unless index($string, $name.'(') == 0;
-    my $nr = '\s*-?\d+(?:\.\d+)?\s*';
-    my $nrs = join(',', ('\s*-?\d+(?:\.\d+)?\s*') x $self->count);
-    ($string =~ /^$name\($nrs\)$/) ? 1 : 0;
+sub color_key_shortcut { lc substr($_[0], 0, 1) if defined $_[0] }
+
+#### getter ############################################################
+sub space_name       {   $_[0]{'space_name'}  }      # color space name
+sub alias_name       {   $_[0]{'alias_name'}  }      # alternative space name
+
+sub long_axis_names  { @{$_[0]{'axis_long_name'}}  } # axis full names
+sub short_axis_names { @{$_[0]{'axis_short_name'}} } # axis short names
+sub axis_iterator    { @{$_[0]{'axis_iterator'}} }   # counting all axis 0 .. -1
+sub axis_count   { int @{$_[0]{'axis_iterator'}} }   # amount of axis
+
+sub pos_from_long_axis_name  {  defined $_[1] ? $_[0]->{'long_name_order'}{ lc $_[1] } : undef }  # ~long_name  --> +pos
+sub pos_from_short_axis_name {  defined $_[1] ? $_[0]->{'short_name_order'}{ lc $_[1] } : undef } # ~short_name --> +pos
+
+#### predicates ########################################################
+sub is_name          {
+    return 0 if not defined $_[1];
+    return 1 if uc $_[1] eq $_[0]{'space_name'};
+    return 1 if $_[0]{'alias_name'} and uc $_[1] eq $_[0]{'alias_name'};
+    return 0;
 }
-sub is_array {
-    my ($self, $value_array) = @_;
-    (ref $value_array eq 'ARRAY' and @$value_array == $self->{'count'}) ? 1 : 0;
-}
-sub is_named_array {
-    my ($self, $value_array) = @_;
-    (ref $value_array eq 'ARRAY' and @$value_array == ($self->{'count'}+1)
-                                 and uc $value_array->[0] eq uc $self->name) ? 1 : 0;
-}
-sub is_hash {
+sub is_long_axis_name   { (defined $_[1] and exists $_[0]->{'long_name_order'}{ lc $_[1] }) ? 1 : 0 } # ~long_name  --> ?
+sub is_short_axis_name  { (defined $_[1] and exists $_[0]->{'short_name_order'}{ lc $_[1] }) ? 1 : 0 }# ~short_name --> ?
+sub is_axis_name        { $_[0]->is_long_axis_name($_[1]) or $_[0]->is_short_axis_name($_[1]) }       # ~name       --> ?
+sub is_hash {         # with all axis names as keys
     my ($self, $value_hash) = @_;
-    return 0 unless ref $value_hash eq 'HASH' and CORE::keys %$value_hash == $self->{'count'};
-    for (CORE::keys %$value_hash) {
-        return 0 unless $self->is_key_or_shortcut($_);
-    }
-    return 1;
+    $self->is_partial_hash( $value_hash ) and (keys %$value_hash == $self->axis_count);
 }
-sub is_partial_hash {
+sub is_partial_hash { # with some axis names as keys
     my ($self, $value_hash) = @_;
     return 0 unless ref $value_hash eq 'HASH';
-    my $key_count = CORE::keys %$value_hash;
-    return 0 unless $key_count and $key_count <= $self->{'count'};
-    for (CORE::keys %$value_hash) {
-        return 0 unless $self->is_key_or_shortcut($_);
+    my $key_count = keys %$value_hash;
+    my @axis_visited;
+    return 0 unless $key_count and $key_count <= $self->axis_count;
+    for my $axis_name (keys %$value_hash) {
+        return 0 unless $self->is_axis_name( $axis_name );
+        my $axis_pos = $self->pos_from_long_axis_name( $axis_name );
+        $axis_pos = $self->pos_from_short_axis_name( $axis_name ) unless defined $axis_pos;
+        $axis_visited[ $axis_pos ]++;
+        return 0 if $axis_visited[ $axis_pos ] > 1;
     }
     return 1;
 }
-
-########################################################################
-
-sub key_shortcut {
-    my ($self, $key) = @_;
-    return unless $self->is_key( $key );
-    ($self->shortcuts)[ $self->{'key_order'}{ lc $key } ];
+sub is_value_tuple { (ref $_[1] eq 'ARRAY' and @{$_[1]} == $_[0]->axis_count) ? 1 : 0 }
+sub is_number_tuple {
+    my ($self, $tuple) = @_;
+    return 0 unless $self->is_value_tuple( $tuple );
+    map { return 0 unless is_nr( $tuple->[$_] ) } $self->axis_iterator;
+    return 1;
 }
 
-sub list_value_from_key {
-    my ($self, $key, @values) = @_;
-    $key = lc $key;
-    return unless @values == $self->{'count'};
-    return unless exists $self->{'key_order'}{ $key };
-    return $values[ $self->{'key_order'}{ $key } ];
+#### converter #########################################################
+sub short_axis_name_from_long {
+    my ($self, $name) = @_;
+    return unless $self->is_long_axis_name( $name );
+    ($self->short_axis_names)[ $self->pos_from_long_axis_name( $name ) ];
+}
+sub long_axis_name_from_short {
+    my ($self, $name) = @_;
+    return unless $self->is_short_axis_name( $name );
+    ($self->long_axis_names)[ $self->pos_from_short_axis_name( $name ) ];
 }
 
-sub list_value_from_shortcut {
-    my ($self, $shortcut, @values) = @_;
-    $shortcut = lc $shortcut;
-    return unless @values == $self->{'count'};
-    return unless exists $self->{'shortcut_order'}{ $shortcut };
-    return $values[ $self->{'shortcut_order'}{ $shortcut } ];
+sub long_name_hash_from_tuple {
+    my ($self, $values) = @_;
+    return unless $self->is_value_tuple( $values );
+    return { map { $self->{'axis_long_name'}[$_] => $values->[$_]} $self->axis_iterator };
+}
+sub short_name_hash_from_tuple {
+    my ($self, $values) = @_;
+    return unless $self->is_value_tuple( $values );
+    return { map {$self->{'axis_short_name'}[$_] => $values->[$_]} $self->axis_iterator };
 }
 
-sub list_from_hash {
+sub tuple_from_hash {
     my ($self, $value_hash) = @_;
-    return undef unless ref $value_hash eq 'HASH' and CORE::keys %$value_hash == $self->{'count'};
-    my @values = (0) x $self->{'count'};
-    for my $value_key (CORE::keys %$value_hash) {
-        if    ($self->is_key( $value_key ))      { $values[ $self->{'key_order'}{ lc $value_key } ] = $value_hash->{ $value_key } }
-        elsif ($self->is_shortcut( $value_key )) { $values[ $self->{'shortcut_order'}{ lc $value_key } ] = $value_hash->{ $value_key } }
-        else                                     { return }
+    return unless $self->is_hash( $value_hash );
+    my @values = (0) x $self->axis_count;
+    for my $key (keys %$value_hash) {
+        if    ($self->is_long_axis_name( $key ))  { $values[ $self->pos_from_long_axis_name($key) ] = $value_hash->{ $key } }
+        elsif ($self->is_short_axis_name( $key )) { $values[ $self->pos_from_short_axis_name($key) ] = $value_hash->{ $key } }
+        else                                      { return "value of $key is missing" }
     }
-    return @values;
+    return \@values;
 }
-
-sub deformat_partial_hash {
+sub tuple_from_partial_hash {
     my ($self, $value_hash) = @_;
-    return unless ref $value_hash eq 'HASH';
-    my @keys_got = CORE::keys %$value_hash;
-    return unless @keys_got and @keys_got <= $self->{'count'};
-    my $result = {};
-    for my $key (@keys_got) {
-        if    ($self->is_key( $key ))     { $result->{ int $self->key_pos( $key ) } = $value_hash->{ $key } }
-        elsif ($self->is_shortcut( $key )){ $result->{ int $self->shortcut_pos( $key ) } = $value_hash->{ $key } }
-        else                              { return undef }
+    return unless $self->is_partial_hash( $value_hash );
+    my $values = [];
+    for my $key (keys %$value_hash) {
+        if    ( $self->is_long_axis_name( $key ) ) { $values->[$self->pos_from_long_axis_name($key) ] = $value_hash->{ $key } }
+        elsif ( $self->is_short_axis_name( $key )) { $values->[$self->pos_from_short_axis_name($key)] = $value_hash->{ $key } }
+        else                                       { return "value of $key is missing" }
     }
-    return $result;
+    return $values;
 }
-
-sub list_from_string {
-    my ($self, $string) = @_;
-    my @parts = split(/:/, $string);
-    return map {$_ + 0} split(/,/, $parts[1]);
+sub select_tuple_value_from_axis_name {
+    my ($self, $name, $values) = @_;
+    $name = lc $name;
+    return unless $self->is_value_tuple( $values );
+    return $values->[ $self->{'long_name_order'}{$name} ] if exists $self->{'long_name_order'}{$name};
+    return $values->[ $self->{'short_name_order'}{$name} ] if exists $self->{'short_name_order'}{$name};
+    undef;
 }
-
-sub list_from_css {
-    my ($self, $string) = @_;
-    1 until chop($string) eq ')';
-    my @parts = split(/\(/, $string);
-    return map {$_ + 0} split(/,/, $parts[1]);
-}
-
-sub key_hash_from_list {
-    my ($self, @values) = @_;
-    return unless @values == $self->{'count'};
-    return { map { $self->{'keys'}[$_] => $values[$_]} @{$self->{'iterator'}} };
-}
-
-sub shortcut_hash_from_list {
-    my ($self, @values) = @_;
-    return unless @values == $self->{'count'};
-    return { map {$self->{'shortcuts'}[$_] => $values[$_]} @{$self->{'iterator'}} };
-}
-
-sub named_array_from_list {
-    my ($self, @values) = @_;
-    return [lc $self->name, @values] if @values == $self->{'count'};
-}
-
-sub named_string_from_list {
-    my ($self, @values) = @_;
-    return unless @values == $self->{'count'};
-    lc( $self->name).': '.join(', ', @values);
-}
-
-sub css_string_from_list {
-    my ($self, @values) = @_;
-    return unless @values == $self->{'count'};
-    lc( $self->name).'('.join(',', @values).')';
-}
-
-sub _color_key_shortcut { lc substr($_[0], 0, 1) if defined $_[0] }
 
 1;

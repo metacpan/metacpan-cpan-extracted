@@ -60,6 +60,7 @@ subtest 'cidrvalidate' => sub {
 			2001:4860:4860:0:0:0:0:8888 2001:4860:4860::8888
 			2001:4860:4860:1:0:1:1:8888
 			2001:4860:4860:0:1:0:1:8888
+			0:0:4860:0:0:1:1:8888
 			);
 		foreach my $addr (@addrs) {
 			ok Net::CIDR::cidrvalidate($addr), "$addr validates";

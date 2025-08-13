@@ -1,3 +1,6 @@
+0.028 2025-05-06
+  [Requirement Changes]
+    * Require SPVM::IO 0.238.
 0.027 2025-05-06
   [Requirement Changes]
     * Require SPVM::File::Spec 0.086.

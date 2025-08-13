@@ -15,6 +15,7 @@ WriteMakefile(
          strict                           => 0,
 # for testing:
 	warnings   => 0,
+         'Test::More' => 0,
     },
     dist               => { COMPRESS => 'gzip -9f', SUFFIX => 'gz',
                             TAR => 'COPYFILE_DISABLE=1 tar' },

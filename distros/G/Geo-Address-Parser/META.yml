@@ -12,6 +12,7 @@ build_requires:
   Test::DescribeMe: '0'
   Test::Most: '0'
   Test::Needs: '0'
+  Test::Returns: '0'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
@@ -29,12 +30,14 @@ requires:
   Carp: '0'
   Exporter: '0'
   Module::Runtime: '0'
-  Params::Get: '0.11'
+  Object::Configure: '0'
+  Params::Get: '0.13'
+  Return::Set: '0'
   Text::Capitalize: '0'
   perl: '5.014000'
 resources:
-  bugtracker: https://github.com/nigelhorne/Geo-Address-Parser/issues
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Address-Parser
   homepage: https://metacpan.org/pod/Geo::Address::Parser
   repository: git://github.com/nigelhorne/Geo-Address-Parser.git
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -1,0 +1,9 @@
+[.]git
+Sub-Delete-.*
+MYMETA[.].*
+^blib
+^local
+pm_to_blib
+[.]bak$
+~$
+Makefile$

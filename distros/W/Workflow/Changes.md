@@ -1,5 +1,16 @@
 # Revision history for the Workflow Perl Distribution
 
+
+## 2.06 2025-08-12 bug fix release, update not required
+
+### Fixed
+
+- Autorun triggered upon workflow creation invoking non-existent method, PR [#258](https://github.com/perl-workflow/perl-workflow/pull/258)
+- Observers not notified of events triggered by autorun initial actions, issue [#259](https://github.com/perl-workflow/perl-workflow/pull/259)
+- Remove duplicated POD section from YAML config module, PR [#255](https://github.com/perl-workflow/perl-workflow/pull/255)
+- Missing 'autorun' value in 'completed' event, issue [#257](https://github.com/perl-workflow/perl-workflow/pull/257)
+- Clarified documentation and release notes on event changes between 1.62 and 2.x, issue [#257](https://github.com/perl-workflow/perl-workflow/pull/257)
+
 ## 2.05 2025-02-01 bug fix release, update not required
 
 ### Fixed
@@ -67,8 +78,8 @@
 - `Workflow` no longer calls `{commit,rollback}_transaction`; the factory has assumed this
   responsibility as it's the factory which is in charge of serializing workflows
 - `Workflow::Action->execute` must return a scalar value or undef (no references)
-- Renamed observer event `complete` to `executed`, changed arguments for `state change` an `executed`
-  observer events to be a hash a not positional arguments.
+- Renamed observer event `execute` to `completed`, changed arguments for `state change` and `completed`
+  observer events to be a hash (not positional arguments).
 
 ### Removed
 

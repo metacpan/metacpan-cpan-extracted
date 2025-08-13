@@ -1,57 +1,110 @@
 NAME
-    Graphics::Toolkit::Color - color palette constructor
+    Graphics::Toolkit::Color - calculate color (sets), IO many spaces and
+    formats
 
 SYNOPSIS
         use Graphics::Toolkit::Color qw/color/;
 
-        my $red = Graphics::Toolkit::Color->new('red'); # create color object
-        say $red->add( 'blue' => 255 )->name;           # add blue value: 'fuchsia'
-        my $blue = color( 0, 0, 255)->values('HSL');    # 240, 100, 50 = blue
-        $blue->blend( with => [HSL => 0,0,80], pos => 0.1);# mix blue with a little grey in HSL
-        $red->gradient( to => '#0000FF', steps => 10);  # 10 colors from red to blue
-        $red->complement( 3 );                          # get fitting red green and blue
+        my $red = Graphics::Toolkit::Color->new('red');  # create color object
+        say $red->add_value( 'blue' => 255 )->name;      # red + blue = 'fuchsia'
+        my @blue = color( 0, 0, 255)->values('HSL');     # 240, 100, 50 = blue
+        $red->mix( to => [HSL => 0,0,80], amount => 10); # mix red with a little grey
+        $red->gradient( to => '#0000FF', steps => 10);   # 10 colors from red to blue
+        my @base_triple = $red->complement( 3 );         # get fitting red green and blue
+
+DEPRECATION WARNING
+    Methods of the old API ( *string*, *rgb*, *red*, *green*, *blue*,
+    *rgb_hex*, *rgb_hash*, *hsl*, *hue*, *saturation*, *lightness*,
+    *hsl_hash*, *blend*, *blend_with*, *gradient_to*, *rgb_gradient_to*,
+    *hsl_gradient_to*, *complementary*) will be removed with release of
+    version 2.0.
 
 DESCRIPTION
-    ATTENTION: deprecated methods of the old API ( *string*, *rgb*, *red*,
-    *green*, *blue*, *rgb_hex*, *rgb_hash*, *hsl*, *hue*, *saturation*,
-    *lightness*, *hsl_hash*, *blend_with*, *gradient_to*, *rgb_gradient_to*,
-    *hsl_gradient_to*, *complementary*) will be removed on version 2.0.
-
     Graphics::Toolkit::Color, for short GTC, is the top level API of this
-    module and the only one a regular user should be concerned with. Its
-    main purpose is the creation of sets of related colors, such as
-    gradients, complements and others.
+    release and the only package a regular user should be concerned with.
+    Its main purpose is the creation of related colors or sets of them, such
+    as gradients, complements and others. But you can use it also to convert
+    and/or reformat color definitions.
 
-    GTC are read only color holding objects with no additional dependencies.
-    Create them in many different ways (see section "CONSTRUCTOR"). Access
-    its values via methods from section "GETTER". Measure differences with
-    the *distance* method. "SINGLE-COLOR" methods create one a object that
-    is related to the current one and "COLOR-SETS" methods will create a
-    host of color that are not only related to the current color but also
-    have relations between each other.
+    GTC are read only, color holding objects with no additional
+    dependencies. Create them in many different ways (see section
+    "CONSTRUCTOR"). Access its values via methods from section "GETTER".
+    Measure differences with the "distance" method. "SINGLE-COLOR" methods
+    create one new object that is related to the current one and
+    "COLOR-SETS" methods will create a group of colors, that are not only
+    related to the current color but also have relations between each other.
+    Error messages will appear as return values.
 
     While this module can understand and output color values in many spaces,
-    such as YIQ, HSL and many more, RGB is the (internal) primal one,
-    because GTC is about colors that can be shown on the screen, and these
-    are usually encoded in RGB.
-
-    Humans access colors on hardware level (eye) in RGB, on cognition level
-    in HSL (brain) and on cultural level (language) with names. Having easy
-    access to all three and some color math should enable you to get the
-    color palette you desire quickly.
+    such as *LAB*, *NCol*, *YIQ* and many more, *RGB* is the (internal),
+    primal one, because GTC is about colors that can be shown on the screen,
+    and these are usually encoded in *RGB*. Humans access colors on hardware
+    level (eye) in *RGB*, on cognition level in *HSL* (brain) and on
+    cultural level (language) with names. Having easy access to all of those
+    plus some color math and many formats should enable you to get the color
+    palette you desire quickly.
 
 CONSTRUCTOR
-    There are many options to create a color objects. In short you can
-    either use the name of a constant or provide values in one of several
-    "COLOR-SPACES" in Graphics::Toolkit::Color::Space::Hub, which also can
-    be formatted in many ways as described in this paragraph.
+    There are many options to create a color object. In short you can either
+    use the name of a constant (see "name") or provide values, which are
+    coordinates in one of several color spaces. The latter are also
+    understood in many formats. From now on any input that the constructor
+    method "new" accepts, is called a color definition.
+
+  new( [$r, $g, $b] )
+    takes a triplet of integer *RGB* values (red, green and blue : 0 ..
+    255). They can, but don't have to be put into an ARRAY reference (square
+    brackets). If you want to define a color by values from another color
+    space, you have to prepend the values with the name of a supported color
+    space. Out of range values will be corrected (clamped).
+
+        my $red = Graphics::Toolkit::Color->new(         255, 0, 0 );
+        my $red = Graphics::Toolkit::Color->new(        [255, 0, 0]); # does the same
+        my $red = Graphics::Toolkit::Color->new( 'RGB',  255, 0, 0 ); # named ARRAY syntax
+        my $red = Graphics::Toolkit::Color->new(  RGB => 255, 0, 0 ); # with fat comma
+        my $red = Graphics::Toolkit::Color->new([ RGB => 255, 0, 0]); # and brackets
+
+  new({ r => $r, g => $g, b => $b })
+    Hash with the keys "red", "green" and Cblue> does the same as shown in
+    previous paragraph, only more declarative. Casing of the key strings
+    will be normalised and all axis names can be substituted with short
+    ones, which are in most cases the first letters of the long name.
+
+        my $red = Graphics::Toolkit::Color->new( r => 255, g => 0, b => 0 );
+        my $red = Graphics::Toolkit::Color->new({r => 255, g => 0, b => 0}); # works too
+                            ... ->new( Red => 255, Green => 0, Blue => 0);   # also fine
+                  ... ->new( Hue => 0, Saturation => 100, Lightness => 50 ); # same color
+                      ... ->new( Hue => 0, whiteness => 0, blackness => 0 ); # still the same
+
+  new('rgb($r,$g,$b)')
+    String format that is supported by CSS (*css_string* format): it starts
+    with the case insensitive color space name (lower case is default),
+    followed by the comma separated values in round braces. The value
+    suffixes that are defined by the color space (*'%'* in case of *HSV*)
+    are optional.
+
+        my $red = Graphics::Toolkit::Color->new( 'rgb(255, 0, 0)' );
+        my $blue = Graphics::Toolkit::Color->new( 'hsv(240, 100%, 100%)' );
+
+  new('rgb: $r, $g, $b')
+    String format *named_string* (good for serialisation) that maximizes
+    readability.
+
+        my $red = Graphics::Toolkit::Color->new( 'rgb: 255, 0, 0' );
+        my $blue = Graphics::Toolkit::Color->new( 'HSV: 240, 100, 100' );
+
+  new('#rgb')
+    Color definitions in hexadecimal format as widely used in the web, are
+    also acceptable (*RGB* only).
+
+        my $color = Graphics::Toolkit::Color->new('#FF0000');
+        my $color = Graphics::Toolkit::Color->new('#f00');    # short works too
 
   new('name')
     Get a color by providing a name from the X11, HTML (CSS) or SVG standard
     or a Pantone report. UPPER or CamelCase will be normalized to lower case
     and inserted underscore letters ('_') will be ignored as perl does in
-    numbers (1_000 == 1000). All available names are listed under "NAMES" in
-    Graphics::Toolkit::Color::Name::Constant. (See also: "name")
+    numbers (1_000 == 1000). All available names are listed here .
 
         my $color = Graphics::Toolkit::Color->new('Emerald');
         my @names = Graphics::Toolkit::Color::Name::all(); # select from these
@@ -61,63 +114,22 @@ CONSTRUCTOR
     external module Graphics::ColorNames::* , which has to be installed
     separately. * is a placeholder for the pallet name, which might be:
     Crayola, CSS, EmergyC, GrayScale, HTML, IE, Mozilla, Netscape, Pantone,
-    PantoneReport, SVG, VACCC, Werner, Windows, WWW or X. In ladder case
-    Graphics::ColorNames::X has to be installed. You can get them all at
+    PantoneReport, SVG, VACCC, Werner, Windows, WWW or X. In latter case
+    *Graphics::ColorNames::X* has to be installed. You can get them all at
     once via Bundle::Graphics::ColorNames. The color name will be normalized
     as above.
 
         my $color = Graphics::Toolkit::Color->new('SVG:green');
-        my @s = Graphics::ColorNames::all_schemes();          # look up the installed
-
-  new('#rgb')
-    Color definitions in hexadecimal format as widely used in the web, are
-    also acceptable.
-
-        my $color = Graphics::Toolkit::Color->new('#FF0000');
-        my $color = Graphics::Toolkit::Color->new('#f00');    # works too
-
-  new( [$r, $g, $b] )
-    Triplet of integer RGB values (red, green and blue : 0 .. 255). Out of
-    range values will be corrected to the closest value in range.
-
-        my $red = Graphics::Toolkit::Color->new( 255, 0, 0 );
-        my $red = Graphics::Toolkit::Color->new([255, 0, 0]);        # does the same
-        my $red = Graphics::Toolkit::Color->new('RGB' => 255, 0, 0);  # named tuple syntax
-        my $red = Graphics::Toolkit::Color->new(['RGB' => 255, 0, 0]); # named ARRAY
-
-    The named array syntax of the last example, as any here following, work
-    for any supported color space.
-
-  new({ r => $r, g => $g, b => $b })
-    Hash with the keys 'r', 'g' and 'b' does the same as shown in previous
-    paragraph, only more declarative. Casing of the keys will be normalised
-    and only the first letter of each key is significant.
-
-        my $red = Graphics::Toolkit::Color->new( r => 255, g => 0, b => 0 );
-        my $red = Graphics::Toolkit::Color->new({r => 255, g => 0, b => 0}); # works too
-                            ... ->new( Red => 255, Green => 0, Blue => 0);   # also fine
-                  ... ->new( Hue => 0, Saturation => 100, Lightness => 50 ); # same color
-                      ... ->new( Hue => 0, whiteness => 0, blackness => 0 ); # still the same
-
-  new('rgb: $r, $g, $b')
-    String format (good for serialisation) that maximizes readability.
-
-        my $red = Graphics::Toolkit::Color->new( 'rgb: 255, 0, 0' );
-        my $blue = Graphics::Toolkit::Color->new( 'HSV: 240, 100, 100' );
-
-  new('rgb($r,$g,$b)')
-    Variant of string format that is supported by CSS.
-
-        my $red = Graphics::Toolkit::Color->new( 'rgb(255, 0, 0)' );
-        my $blue = Graphics::Toolkit::Color->new( 'hsv(240, 100, 100)' );
+        my @schemes = Graphics::ColorNames::all_schemes();      # look up the installed
 
   color
     If writing
 
         Graphics::Toolkit::Color->new( ...);
 
-    is too much typing for you or takes to much space, import the subroutine
-    "color", which takes all the same arguments as described above.
+    is too much typing work for you or takes up to much space in the code
+    file, import the subroutine "color", which accepts all the same
+    arguments as "new".
 
         use Graphics::Toolkit::Color qw/color/;
         my $green = color('green');
@@ -126,206 +138,304 @@ CONSTRUCTOR
 GETTER
     giving access to different parts of the objects data.
 
+  values
+    Returns the numeric values of the color, held by the object. The method
+    accepts five optional, named arguments: "in" (color space), "as"
+    (format), "range", "precision" and "suffix". In most cases, only the
+    first one is needed.
+
+    When given no arguments, the method returns a list with the integer
+    values: "red", "green" and "blue" in 0..255 range, since *RGB* is the
+    default color space of this module.
+
+    If one argument is provided, the values get converted into the given
+    color space. The same is done when using the named argument "in" (see
+    more behind the link). The also reoccurring argument "range" is
+    explained in its own section too. Please note you have to use the
+    "range" argument only, if you like to deviate from the value ranges
+    defined by the chosen color space.
+
+    The maybe most characteristic argument for this method is "as", which
+    enables the same formats the constructor method "new" accepts, since
+    *GTC* is built with the design principle of total serialisation -
+    meaning every output can be evaluated back into a color object and any
+    intput can be serialized into an output. To every format: "list"
+    (default), "named_array", "hash", "char_hash", "named_string",
+    "css_string", "array" (RGB only) and "hex_string" (RGB only) is an
+    example below. Format names are case insensitive. For more explanations,
+    please see: formats.
+
+    "precision" is more exotic but sometimes you need to escape the numeric
+    precision, set by a color spaces definition. For instance "LAB" values
+    will have maximally three decimals, no matter how precise the input was.
+    In case you prefer 4 decimals, just use "precision => 4". A zero means
+    no decimals and -1 stands for maximal precision - which can spit out
+    more decimals than you prefer. Different precisions per axis ([1,2,3])
+    are possible.
+
+    In same way you can atach a little string per value by ussing the
+    "suffix" aregument. Normally these are percentage signs but in some
+    spaces, where they appear by default you can surpress them by adding
+    "suffix => ''"
+
+        $blue->values();                                    # 0, 0, 255
+        $blue->values( in => 'RGB', as => 'list');          # 0, 0, 255 # explicit arguments
+        $blue->values(              as => 'array');         # [0, 0, 255] - RGB only
+        $blue->values( in => 'RGB', as => 'named_array');   # ['RGB', 0, 0, 255]
+        $blue->values( in => 'RGB', as => 'hash');          # { red => 0, green => 0, blue => 255}
+        $blue->values( in => 'RGB', as => 'char_hash');     # { r => 0, g => 0, b => 255}
+        $blue->values( in => 'RGB', as => 'named_string');  # 'rgb: 0, 0, 255'
+        $blue->values( in => 'RGB', as => 'css_string');    # 'rgb( 0, 0, 255)'
+        $blue->values(              as => 'hex_string');    # '#0000ff' - RGB only
+        $blue->values(           range => 2**16 );          # 0, 0, 65536
+        $blue->values('HSL');                               # 240, 100, 50
+        $blue->values( in => 'HSL',suffix => ['', '%','%']);# 240, '100%', '50%'
+        $blue->values( in => 'HSB',  as => 'hash')->{'hue'};# 240
+       ($blue->values( 'HSB'))[0];                          # 240
+        $blue->values( in => 'XYZ', range => 1, precision => 2);# normalized, 2 decimals max.
+
   name
-    String with normalized name (lower case without *'_'*) of the color as
-    in X11 or HTML (SVG) standard or the Pantone report. The name will be
-    found and filled in, even when the object was created numerical values.
-    If no color is found, "name" returns an empty string. All names are at:
-    "NAMES" in Graphics::Toolkit::Color::Name::Constant (See als:
+    Returns the normalized name (lower case, without *'_'*) of the color,
+    held by the object - even when the object was created with numerical
+    values. It returns an empty string when no color constant with the exact
+    same values was found in the *X11* or *HTML* (*SVG*) standard or the
+    *Pantone report*. If several constants have matching values, the
+    shortest name will be returned. All names are listed: here. (See also:
     "new('name')")
 
-  values
-    Returns the values of the color in given color space and format. It
-    accepts three named, optional arguments.
-
-    First argument is the name of a color space (named argument "in"). All
-    options are under: "COLOR-SPACES" in
-    Graphics::Toolkit::Color::Space::Hub The order of named arguments is of
-    course chosen by the user, but I call it the first (most important)
-    argument, because if you give the method only one value, it is assumed
-    to be the color space.
-
-    Second argument is the format (name: "as"). In short any SCALAR format
-    acceptable to the "CONSTRUCTOR" can also be reproduced by a getter
-    method and the numerical cases by this one. Not all formats are
-    available under all color spaces, but the always present options are:
-    "list" (default), "hash", "char_hash" and "array".
-
-    Third named argument is the range inside which the numerical values have
-    to be. RGB are normally between 0 .. 255 and CMYK between 0 .. 1
-    ('normal'). Only a range of 1 a.k.a. 'normal' displays decimals. There
-    are three syntax option to set the ranges. One value will be understood
-    as upper limit of all dimensions and zero being the lower one. If you
-    want to set the upper limits of all dimensions separately, you have to
-    deliver an ARRAY ref with the 3 or 4 upper limits. To also define the
-    lower boundary, you replace the number with an ARRAY ref containing the
-    lower and then the upper limit.
-
-        $blue->values();                               # get list in RGB: 0, 0, 255
-        $blue->values( in => 'RGB', as => 'list');     # same call
-        $blue->values( in => 'RGB', as => 'hash');     # { red => 0, green => 0, blue => 255}
-        $blue->values( in => 'RGB', as => 'char_hash');# { r => 0, g => 0, b => 255}
-        $blue->values( in => 'RGB', as => 'hex');      # '#00FFFF'
-        $color->values('HSL');                         # 240, 100, 50
-        $color->values( in => 'HSL', range => 1);      # 0.6666, 1, 0.5
-        $color->values( in => 'RGB', range => 2**16);  # values in RGB16
-        $color->values( in => 'HSB', as => 'hash')->{'hue'};  # how to get single values
-       ($color->values( 'HSB'))[0];                           # same, but shorter
+  closest_name
+    Returns in scalar context a color "name", which has the shortest
+    "distance" in RGB to the current color. In list context, you get
+    additionally the just mentioned distance as a second return value.
 
   distance
     Is a floating point number that measures the Euclidean distance between
-    two colors. One color is the calling object itself and the second (C2)
-    has to provided as a named argument (*to*), which is the only required
-    one. It ca come in the form of a second GTC object or any scalar color
-    definition *new* would accept. The *distance* is measured in HSL color
-    space unless told otherwise by the argument *in*. The third argument is
-    named *metric*. It's useful if you want to notice only certain
-    dimensions. Metric is the long or short name of that dimension or the
-    short names of several dimensions. They all have to come from one color
-    space and one shortcut letter can be used several times to heighten the
-    weight of this dimension. The last argument in named *range* and is a
-    range definition, unless you don't want to compute the distance with the
-    default ranges of the selected color space.
+    two colors, which represent two points in a color space. One color is
+    the calling object itself and the second one has to be provided as
+    either the only argument or the named argument "to", which is the only
+    required one.
 
-        my $d = $blue->distance( to => 'lapisblue' );              # how close is blue to lapis color?
-        $d = $blue->distance( to => 'airyblue', in => 'RGB', select => 'Blue'); # same amount of blue?
-        $d = $color->distance( to => $c2, in => 'HSL', select => 'hue' );                  # same hue?
-        # compute distance when with all value ranges 0 .. 1
-        $d = $color->distance( to => $c2, in => 'HSL', select => 'hue', range => 'normal' );
+    The "distance" is measured in *RGB* color space unless told otherwise by
+    the argument "in".
+
+    The third argument is named "select". It's useful if you want to regard
+    only certain dimensions (axis). For instance if you want to know only
+    the difference in brightness between two colors, you type "select =>
+    'lightness'" or "select => 'l'". This works of course only if you choose
+    *HSL* or something similar like *LAB* as color space. Long or short axis
+    names are accepted, but they all have to come from one color space. You
+    also can mention one axis several times for heightened emphasis on this
+    dimension.
+
+    The last argument is named "range", which can change the result
+    drasticly.
+
+        my $d = $blue->distance( 'lapisblue' );                 # how close is blue to lapis?
+        $d = $blue->distance( to => 'airyblue', select => 'b'); # have they the same amount of blue?
+        $d = $color->distance( to => $c2, in => 'HSL', select => 'hue' );  # same hue?
+        $d = $color->distance( to => $c2, range => 'normal' );  # distance with values in 0 .. 1 range
+        $d = $color->distance( to => $c2, select => [qw/r g b b/]); # double the weight of blue value differences
 
 SINGLE COLOR
-    construct colors that are related to the current object.
+    These methods generate one new color object that is related to the
+    calling object (invocant). You might expect that methods like
+    "set_value" change the values of the invocant, but GTC objects are as
+    mentioned in the "DESCRIPTION" read only. That supports a more
+    functional programming style as well as method stacking like:
 
-  set
-    Create a new object that differs in certain values defined in the
-    arguments as a hash.
+        $color->add_value( saturation => 5)->invert->mix( to => 'green');
 
-        $black->set( blue => 255 )->name;   # blue, same as #0000ff
-        $blue->set( saturation => 50 );     # pale blue, same as $blue->set( s => 50 );
+  set_value
+    Creates a new GTC color object that shares some values with the current
+    one, but differs in others. The altered values are provided as absoltue
+    numbers. If the resulting color will be outside of the given color
+    space, the values will be clamped so it will become a regular color of
+    that space.
 
-  add
-    Create a Graphics::Toolkit::Color object, by adding any RGB or HSL
-    values to current color. (Same rules apply for key names as in new -
-    values can be negative.) RGB and HSL can be combined, but please note
-    that RGB are applied first.
+    The axis of all supported color spaces have long and short names. For
+    instance *HSL* has *hue*, *sturation* and *lightness*. The short
+    equivalents are *h*, *s* and *l*. This method accepts these axis names
+    as named arguments and disregards if characters are written upper or
+    lower case. This method can not work, if you mix axis names from
+    different spaces or choose one axis more than once. One solvable issue
+    is when axis in different spaces have the same name. For instance *HSL*
+    and *HSV* have a *saturation* axis. To disambiguate you can add the
+    named argument "in".
 
-    If the first argument is a Graphics::Toolkit::Color object, than RGB
-    values will be added. In that case an optional second argument is a
-    factor (default = 1), by which the RGB values will be multiplied before
-    being added. Negative values of that factor lead to darkening of result
-    colors, but its not subtractive color mixing, since this module does not
-    support CMY color space. All RGB operations follow the logic of additive
-    mixing, and the result will be rounded (clamped), to keep it inside the
-    defined RGB space.
+        my $blue = $black->set_value( blue => 255 );              # same as #0000ff
+        my $pale_blue = $blue->set_value( saturation => 50 );        # ->( s => 50) works too
+        my $color = $blue->set_value( saturation => 50, in => 'HSV' );  # previous was HSL
+
+  add_value
+    Creates a new GTC color object that shares some values with the current
+    one, but differs in others. The altered values are provided relative to
+    the current ones. The rest works as described in "set_value". This
+    method was mainly created to get lighter, darker or more saturated
+    colors by using it like:
 
         my $blue = Graphics::Toolkit::Color->new('blue');
-        my $darkblue = $blue->add( Lightness => -25 );
-        my $blue2 = $blue->add( blue => 10 );        # this is bluer than blue
+        my $darkblue = $blue->add_value( Lightness => -25 );  # get a darker tone
+        my $blue2 = $blue->add_value( blue => 10 );           # bluer than blue ?
+        my $blue3 = $blue->add_value( l => 10, in => 'LAB' ); # lighter color according CIELAB
 
-  blend
-    Create a Graphics::Toolkit::Color object, that has the average values
-    between the calling object (color 1 - C1) and another color (C2).
+  mix
+    Create a new GTC object, that has the average values between the calling
+    object and another color (or several colors). It accepts three named
+    arguments: "to", "amount" and "in", but only the first one is required.
 
-    It takes three named arguments, only the first is required.
+    "to" works like in other methods, with the exception that it also
+    accepts an ARRAY ref (square brackets) with several color definitions.
 
-    1. The color C2 (scalar that is acceptable by the constructor: object,
-    string, ARRAY, HASH). The name of the argument is *with* (color is
-    blended with ...).
+    Per default *mix* computes a 50-50 (1:1) mix. In order to change that,
+    employ the "amount" argument, which is the weight the mixed in color(s)
+    get, counted in percentages. The remaining percentage to 100 is the
+    weight of the color, held by the caller object. This would be naturally
+    nothing, if the "amount" is greater than hundret, which is especially
+    something to consider, if mixing more than two colors. Then you provide
+    the argument "to" and "amount" with an array of colors and respectively
+    their amounts. Obviously both arrays MUST have the same length. If the
+    sum of amounts is greater than 100 the original color is ignored but the
+    weight ratios will be kept. You may actually give "amount" a scalar
+    value while mixing a list of colors. Then the amount is applied to every
+    color mentioned unter the "to" argument. In this case you go over the
+    sum of 100% very quickly.
 
-    2. Blend position is a floating point number, which defaults to 0.5.
-    (blending ratio of 1:1 ). 0 represents here C1 and 1 is pure C2. Numbers
-    below 0 and above 1 are possible, butlikely to be clamped to fit inside
-    the color space. Name of the argument is *pos*.
+        $blue->mix( 'silver');                                         # 50% silver, 50% blue
+        $blue->mix( to => 'silver', amount => 60 );                    # 60% silver, 40% blue
+        $blue->mix( to => [qw/silver green/], amount => [10, 20]);     # 10% silver, 20% green, 70% blue
+        $blue->mix( to => [qw/silver green/] );                        # 50% silver, 50% green
+        $blue->mix( to => {H => 240, S =>100, L => 50}, in => 'RGB' ); # teal
 
-    3. Color space name (default is *HSL* - all can be seen unter
-    "COLOR-SPACES" in Graphics::Toolkit::Color::Space::Hub). Name of the
-    argument is *in*.
+  invert
+    Computes the a new color object, where all values are inverted according
+    to the ranges of the chosen color space (see "in"). It takes only one
+    optional, positional argument, a space name.
 
-        # a little more silver than $color in the mix
-        $color->blend( with => 'silver', pos => 0.6 );
-        $color->blend({ with => 'silver', pos => 0.6 });             # works too!
-        $blue->blend( with => {H => 240, S =>100, L => 50}, in => 'RGB' ); # teal
+        my $black = $white->invert();         # to state the obvious
+        my $blue = $yellow->invert( 'LUV' );  # invert in LUV space
+        $yellow->invert( in => 'LUV' );       # would work too
 
 COLOR SETS
-    construct many interrelated color objects at once.
-
-  gradient
-    Creates a gradient (a list of colors that build a transition) between
-    current (C1) and a second, given color (C2) by named argument *to*.
-
-    The only required argument you have to give under the name *to* is C2.
-    Either as an Graphics::Toolkit::Color object or a scalar (name, hex,
-    HASH or ARRAY), which is acceptable to a "CONSTRUCTOR". This is the same
-    behaviour as in "distance".
-
-    An optional argument under the name *steps* sets the number of colors,
-    which make up the gradient (including C1 and C2). It defaults to 3.
-    Negative numbers will be rectified by "abs". These 3 color objects: C1,
-    C2 and a color in between, which is the same as the result of method
-    "blend".
-
-    Another optional argument under the name *dynamic* is a float number,
-    that defines the position of weight in the color transition from C1 to
-    C2. It defaults to zero which gives you a linear transition, meaning the
-    "distance" between neighbouring colors in the gradient is equal. If
-    $dynamic > 0, the weight is moved toward C1 and vice versa. The greater
-    $dynamic, the slower the color change is in the beginning of the
-    gradient and the faster at the end (C2).
-
-    The last optional argument named *in* defines the color space the
-    changes are computed in. It parallels the argument of the same name from
-    the method "blend" and "distance".
-
-        # we turn to grey
-        my @colors = $c->gradient( to => $grey, steps => 5, in => 'RGB');
-        # none linear gradient in HSL space :
-        @colors = $c1->gradient( to =>[14,10,222], steps => 10, dynamic => 3 );
+    construct several interrelated color objects at once.
 
   complement
-    Creates a set of complementary colors, which will be computed in *HSL*
-    color space. It accepts 4 optional, named arguments. Complementary
-    colors have a different *hue* value but same *saturation* and
-    *lightness*. Because they form a circle in HSL, they will be called in
-    this paragraph a circle.
+    Creates a set of complementary colors (GTC objects), which will be
+    computed in *HSL* color space. The method accepts three optional, named
+    arguments: "steps" and "tilt" and "target". But if none are provided,
+    THE (one) complementary color will be produced.
 
-    If you provide no names (just a single argument), the value is
-    understood as *steps*. *steps* is the amount (count) of complementary
-    colors, which defaults to 1 (giving you then THE complementary color).
-    If more than one color is requested, the result will contain the calling
-    object as the first color.
+    One singular, positional argument defines the number of produced colors,
+    same as the named argument "steps" would have. If you want to get
+    'triadic' colors, choose 3 as an argument for "steps" - 4 would get you
+    the 'tetradic' colors, .... and so on. The given color is always the
+    last in the row of produced complementary colors.
 
-    The second optional argument is *hue_tilt*, in short *h*, which defaults
-    to zero. When zero, the hue distance between all resulting colors on the
-    circle is the same. When not zero, the *hue_tilt* gets added (see "add")
-    to THE complementary color. The so computed color divides the circle in
-    a shorter and longer part. Both of these parts will now contain an equal
-    amount of result colors. The distribution will be computed in a way,
-    that there will be a place on the circle where the distance between
-    colors is the highest (let's call it Dmax) and one where it is the
-    lowest (Dmin). The distance between two colors increases or decreases
-    steadily. When *hue_tilt* is zero, the axis through Dmax and Dmin and
-    the axis through $self and C2 are orthogonal.
+    If you need split-complementary colors, just use the "tilt" argument,
+    which defaults to zero. Without any tilt, complementary colors are
+    equally distanced dots on a horizontal circle around the vertical,
+    central column in *HSL* space. In other words: complementary colors have
+    all the same 'saturation' (distance from the column) and 'lightness'
+    (height). They differ only in 'hue' (position on the circle). The given
+    color and its (THE) complement sit on opposite sides of the circle. The
+    greater the "tilt" amount, the more these colors (minus the given one)
+    will move on the circle toward THE complement and vice versa. What is
+    traditionally meant by split-complementary colors you will get here with
+    a "tilt" factor of around 3.42 and three "steps" or a "tilt" of 1.585
+    and four "steps" (depending on if you need THE complement also in your
+    set).
 
-    The third optional argument *saturation_tilt*, or short *s*, which also
-    defaults to zero. If the value differs from zero it gets added the color
-    on Dmax (last paragraph), subtracted on Dmin, changed accordingly in
-    between, so that the circle gets moved in direction Dmin. If you want to
-    move the circle in any other direction you have to give
-    *saturation_tilt* a HASH reference with 2 keys. First is *saturation* or
-    *s*, which is the value as described. Secondly *hue* or *h* rotates the
-    direction in which the circle will be moved. Please not, this will not
-    change the position of Dmin and Dmax, because it just defines the angle
-    between the Dmin-Dmax axis and the direction where the circle is moved.
+    To get an even greater variety of complementary colors, you can use
+    "target" argument and move around THE complement and thus shape the
+    circle in all three directions. "hue" (or "h") values move it circularly
+    "saturation" (or "s") move it away or negative values toward the central
+    column and "lightness" (or "l") move it up and down.
 
-    The fourth optional argument is *lightness_tilt* or *l*m which works
-    analogously to *saturation_tilt*. Only difference is that it tilts the
-    circle in the up-down direction, which is in HSL color space lightness.
+        my @colors = $c->complement( 4 );                       # 'tetradic' colors
+        my @colors = $c->complement( steps => 4, tilt => 4 );   # split-complementary colors
+        my @colors = $c->complement( steps => 3, tilt => { move => 2, target => {l => -10}} );
+        my @colors = $c->complement( steps => 3, tilt => { move => 2,
+                                                         target => { h => 20, s=> -5, l => -10 } });
 
-        my @colors = $c->complement( 4 );    # $self + 3 compementary (square) colors
-        my @colors = $c->complement( steps => 3, s => 20, l => -10 );
-        my @colors = $c->complement( steps => 3, hue_tilt => -40,
-                                         saturation_tilt => {saturation => 300, hue => -50},
-                                         lightness_tilt => {l => -10, hue => 30} );
+  gradient
+    Creates a gradient (a list of color objects that build a transition)
+    between the current color held by the object and a second color,
+    provided by the named argument "to", which is required. Optionally "to"
+    accepts an ARRAY ref (square braces) with a list of colors in order to
+    create the most fancy, custom and nonlinear gradients.
+
+    Also required is the named argument "steps", which is the gradient
+    length or count of colors, which are part of this gradient. Included in
+    there are the start color (given by this object) and end color (given
+    with "to").
+
+    The optional, floating point valued argument "tilt" makes the gradient
+    skewed toward one or the other end. Default is zero, which results in a
+    linear, uniform transition between start and stop. Greater values of the
+    argument let the color change rate start small, steadily getting bigger.
+    Negative values work vice versa. The bigger the absolute numeric value
+    the bigger the effect. Please have in mind that values over 2 result is
+    a very strong tilt.
+
+    Optional is the named argument "in" (color space - details behind link).
+
+        # we turn to grey
+        my @colors = $c->gradient( to => $grey, steps => 5);
+        # none linear gradient in HSL space :
+        @colors = $c1->gradient( to =>[14,10,222], steps => 10, tilt => 1, in => 'HSL' );
+        @colors = $c1->gradient( to =>['blue', 'brown', {h => 30, s => 44, l => 50}] );
+
+  cluster
+    Computes a set of colors that are all similar but not the same. The
+    method accepts three named arguments: "radius", "distance" and "in", of
+    which the first two are required.
+
+    The produced colors form a ball or cuboid in a color space around the
+    given color, depending on what the argument "radius" got. If it is a
+    single number, it will be a ball with the given radius. If it is an
+    ARRAY of values you get the a cuboid with the given dimensions.
+
+    The minimal distance between any two colors of a cluster is set by the
+    "distance" argument, which is computed the same way as the method
+    "distance". In a cuboid shaped cluster- the colors will form a cubic
+    grid - inside the ball shaped cluster they form a cuboctahedral grid,
+    which is packed tighter, but still obeys the minimal distance.
+
+        my @blues = $blue->cluster( radius => 4, distance => 0.3 );
+        my @c = $color->cluster( radius => [2,2,3], distance => 0.4, in => YUV );
+
+ARGUMENTS
+    Some named arguments of the above listed methods reappear in several
+    methods. Thus they are explained here once. Please note that you must
+    NOT wrap the named args in curly braces (HASH ref).
+
+  in
+    The named argument *in* expects the name of a color space as listed
+    here. The default color space in this module is *RGB*. Depending on the
+    chosen space, the results of all methods can be very different, since
+    colors are arranged there very differently and have different distances
+    to each other. Some colors might not even exist in some spaces.
+
+  range
+    Every color space comes with range definitions for its values. For
+    instance *red*, *green* and *blue* in *RGB* go usually from zero to 255
+    (0..255). In order to change that, many methods accept the named
+    argument "range". When only one interger value provided, it changes the
+    upper bound on all three axis and as lower bound is assumed zero. Let's
+    say you need *RGB16* values with a range of 0 .. 65536, then you type
+    "range =<gt" 65536> or "range =<gt" 2**16>.
+
+    If you provide an ARRAY ref you can change the upper bounds of all axis
+    individually and in order to change even the lower boundaries, use ARRAY
+    refs even inside that. For instance in "HSL" the "hue" is normally 0 ..
+    359 and the other two axis are 0 .. 100. In order to set "hue" to -100
+    .. 100 but keep the other two untouched you would have to insert: "range
+    =&gt; [[-100,100],100,100]".
+
+  to
+    This argument receives a second or target color. It may come in form of
+    another GTC object or a color definition that is acceptable to the
+    constructor. But it has to be a scalar (string or (HASH) reference), not
+    a value list or hash.
 
 SEE ALSO
     *   Color::Scheme
@@ -344,12 +454,13 @@ SEE ALSO
 
     *   Color::Similarity
 
-COPYRIGHT & LICENSE
-    Copyright 2022-2023 Herbert Breunung.
-
-    This program is free software; you can redistribute it and/or modify it
-    under same terms as Perl itself.
-
 AUTHOR
     Herbert Breunung, <lichtkind@cpan.org>
+
+COPYRIGHT
+    Copyright 2022-2025 Herbert Breunung.
+
+LICENSE
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
 

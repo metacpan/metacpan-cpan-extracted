@@ -1,21 +1,22 @@
-use v5.12;
-use warnings;
 
 # HSV color space specific code
 
 package Graphics::Toolkit::Color::Space::Instance::HSV;
-use Graphics::Toolkit::Color::Space::Util ':all';
-use Graphics::Toolkit::Color::Space;
+use v5.12;
+use warnings;
+use Graphics::Toolkit::Color::Space qw/min max/;
 
 my $hsv_def = Graphics::Toolkit::Color::Space->new( axis => [qw/hue saturation value/],
-                                                   range => [360, 100, 100],
-                                                    type => [qw/angle linear linear/]);
+                                                   range => [360, 100, 100], precision => 0,
+                                                    type => [qw/angular linear linear/],
+                                                 # suffix => ['', '%', '%'],
+                                                  );
 
    $hsv_def->add_converter('RGB', \&to_rgb, \&from_rgb );
 
 
 sub from_rgb {
-    my ($r, $g, $b) = @_;
+    my ($r, $g, $b) = @{$_[0]};
     my $vmin = min($r, $g, $b);
     my $v = my $vmax = max($r, $g, $b);
     return (0, 0, $v) if $vmax == $vmin;
@@ -29,7 +30,7 @@ sub from_rgb {
 }
 
 sub to_rgb {
-    my ($h, $s, $v) = @_;
+    my ($h, $s, $v) = @{$_[0]};
     return ($v, $v, $v) if $s == 0;
     my $hi = int( $h * 6 );
     my $f = ( $h * 6 ) - $hi;

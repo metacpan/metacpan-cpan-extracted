@@ -35,7 +35,9 @@
             "Carp" : "0",
             "Exporter" : "0",
             "Module::Runtime" : "0",
-            "Params::Get" : "0.11",
+            "Object::Configure" : "0",
+            "Params::Get" : "0.13",
+            "Return::Set" : "0",
             "Text::Capitalize" : "0",
             "perl" : "5.014000"
          }
@@ -49,7 +51,8 @@
             "Symbol" : "0",
             "Test::DescribeMe" : "0",
             "Test::Most" : "0",
-            "Test::Needs" : "0"
+            "Test::Needs" : "0",
+            "Test::Returns" : "0"
          }
       }
    },
@@ -57,8 +60,8 @@
    "resources" : {
       "bugtracker" : {
          "mailto" : "bug-Geo-Address-Parser@rt.cpan.org",
-         "web" : "https://github.com/nigelhorne/Geo-Address-Parser/issues",
-         "x_url" : "https://github.com/nigelhorne/Geo-Address-Parser/issues"
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Address-Parser",
+         "x_url" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Address-Parser"
       },
       "homepage" : "https://metacpan.org/pod/Geo::Address::Parser",
       "repository" : {
@@ -68,6 +71,6 @@
          "x_repository" : "https://github.com/nigelhorne/Geo-Address-Parser"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -2,7 +2,7 @@
 # MIT License
 
 class File::Temp extends IO::File {
-  version "0.027";
+  version "0.028";
   
   allow File::Temp::Dir;
   
@@ -148,11 +148,9 @@ class File::Temp extends IO::File {
       my $path = &_replace_XX($template_path);
       
       eval {
-        my $flags = IOC->O_CREAT | IOC->O_EXCL | IOC->O_RDWR;
+        my $int_open_mode = IOC->O_CREAT | IOC->O_EXCL | IOC->O_RDWR;
         my $fd = -1;
-        Sys->sysopen(\$fd, $path, $flags, $perms);
-        my $mode = "w+b";
-        $self->fdopen($fd, $mode);
+        $self->open($path, $int_open_mode, $perms);
       }
       
       unless ($@) {

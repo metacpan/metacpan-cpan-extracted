@@ -4,7 +4,7 @@ use v5.16; # or newer
 use strict;
 use warnings;
 
-our $VERSION = "1.03";
+our $VERSION = "1.05";
 
 use JSON::PP;
 use Text::Diff;
@@ -748,7 +748,7 @@ __END__
 
 =head1 NAME
 
-OcToolkit - Open Cloud Toolkit
+Open Cloud Toolkit - OcToolkit -  A Helm-like Perl module for managing Openshift and Kubernetes projects
 
 =head1 SYNOPSIS
 
@@ -786,9 +786,9 @@ OcToolkit - Open Cloud Toolkit
 
 =head1 DESCRIPTION
 
-Helm like tool for Openshift and Kubernetes with multi cluster support.
+Helm-like tool for Openshift and Kubernetes with multi cluster support.
 See https://gitlab.com/code7143615/octoolkit/-/blob/master/README.md how to use this library in ocToolkit.pl script
-and use it as 'Helm-like' command line tool
+and use it as 'Helm-like' command line tool.
 Feedback Page: https://gitlab.com/code7143615/octoolkit/-/issues/1
 
 =head1 LICENSE
@@ -797,6 +797,159 @@ Copyright (C) John Summers.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
+
+=head1 OVERVIEW
+
+OcToolkit (short for Open Cloud Toolkit) is a Perl module designed as a Helm-like toolkit for managing Openshift (and Kubernetes) projects, with added support for multi-cluster workflows.
+
+=head1 KEY FEATURES AND FUNCTIONALITY
+
+=head2 Initialization
+
+Creates a Perl object that wraps tools needed for templating (Template), JSON processing (JSON::PP), file handling, YAML parsing, and more.
+
+Default values for directories and commands (e.g., C<oc> or, in advanced mode, C<kubectl>) are configured in the constructor.
+
+=head2 Core Operations
+
+=over 4
+
+=item * B<install(instance)>
+
+Generates YAML manifests from templates and applies them via C<oc create> or C<oc apply> commands.
+
+=item * B<validate(instance)>
+
+Compares live cluster resources to offline templates using C<oc get>, computes diffs, and logs the status C<OK> or C<MODIFIED>.
+
+=item * B<upgrade(instance)>
+
+Deletes and recreates modified resources, handling some types like PersistentVolumeClaims cautiously.
+
+=item * B<backup(instance)> / B<backupWholeOCProject()>
+
+Backs up live cluster resources into YAML files, with optional clutter removal filters.
+
+=item * B<delete(instance)>
+
+Deletes resources based on generated YAML templates using C<oc delete>.
+
+=back
+
+=head2 Templating Engine
+
+Accepts Template Toolkit files (C<.tt>) and data configuration to generate deployment and other YAMLs.
+
+Organizes templates by directory (often prefixed numerically for order) and processes directories in sequence.
+
+=head2 Configurable Parameters & Extensibility
+
+Accepts a wide range of options such as:
+
+=over 4
+
+=item *
+
+C<namespace>
+
+=item *
+
+C<cluster>
+
+=item *
+
+C<componentDirs>
+
+=item *
+
+C<secretsDir>
+
+=item *
+
+C<urlPrefix>
+
+=item *
+
+... and others.
+
+=back
+
+Supports custom callback functions for:
+
+=over 4
+
+=item * B<removeClutter> / B<removeClutterBackup> - clean up resource output before diffing/backups
+
+=item * B<generateUrl> - dynamically generate service URLs
+
+=item * B<componentIsAllowed> - include/exclude components conditionally
+
+=item * B<addFlagValuesToConfig> - augment configuration data during processing
+
+=back
+
+=head2 Secrets Management
+
+Reads secrets from a C<secretsDir>, encodes them in base64, and embeds them into resource configurations.
+
+=head1 USAGE EXAMPLE
+
+Here's the typical flow from the module's documentation:
+
+    use OcToolkit;
+
+    my $ocObj = OcToolkit->new(
+        cluster            => $cluster,
+        ocConfigFile       => $ocConfigFile,
+        templatesTTDir     => "templates_tt",
+        templatesYamlDir   => "templates_yaml",
+        secretsDir         => "secrets",
+        # ... plus any advanced callbacks or settings
+    );
+
+    $ocObj->install('testInstance');
+    $ocObj->validate('testInstance');
+    $ocObj->upgrade('testInstance');
+    $ocObj->backup('production');
+    $ocObj->delete('devInstance');
+
+=head1 SUMMARY
+
+=over 4
+
+=item * B<Template-driven management>
+
+Converts templates into YAML and applies them via C<oc> commands.
+
+=item * B<Full lifecycle support>
+
+Can install, validate, upgrade, backup, and delete Openshift/Kubernetes resources.
+
+=item * B<Multi-cluster aware>
+
+Customizable per cluster and instance, with filtering support.
+
+=item * B<Extensible hooks and customization>
+
+Allows user-supplied callbacks for secret handling, URL generation, cleanup, and more.
+
+=item * B<Secret handling built in>
+
+Encodes and injects secrets at runtime securely.
+
+=back
+
+=head1 NOTE
+
+If you are intrested in 'ocToolkit' command line tool only as an end user, see link to Gitlab in Description
+
+=head1 CONCLUSION
+
+OcToolkit is a robust and flexible Perl-based alternative to Helm, offering templated deployment workflows with validation, backups, and multi-cluster capabilities.
+
+If you're familiar with Helm but prefer a Perl-centric, highly customizable tool, this could be a great fit.
+
+=cut
 
 =head1 AUTHOR
 

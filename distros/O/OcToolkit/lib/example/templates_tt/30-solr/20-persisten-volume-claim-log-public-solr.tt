@@ -1,0 +1,17 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: [% oc_config.instance_specific_name.solr_public_log %]
+  namespace: [% namespace %]
+  labels:
+    app: [% oc_config.instance_specific_name.solr_public %]
+  finalizers:
+    - kubernetes.io/pvc-protection
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: [% oc_config.instance_specific_data.solr_public.solr_public_log_size %]
+  storageClassName: netapp-internal
+  volumeMode: Filesystem

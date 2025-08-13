@@ -1,0 +1,153 @@
+{
+  "instance_specific_data": {
+    "solr_public": {
+      "prod": {
+        "limits": {
+          "memory": "16Gi"
+        },
+        "requests": {
+          "memory": "2Gi"
+        },
+        "solr_public_size": "30Gi",
+        "solr_public_log_size": "15Gi"
+      },
+      "test": {
+        "solr_public_size": "25Gi",
+        "solr_public_log_size": "500Mi"
+      },
+      "dev": {
+        "solr_public_size": "15Gi",
+        "solr_public_log_size": "500Mi"
+      }
+    },
+    "solr_admin": {
+      "prod": {
+        "limits": {
+          "memory": "12Gi"
+        },
+        "requests": {
+          "memory": "2Gi"
+        },
+        "solr_admin_size": "45Gi",
+        "solr_admin_log_size": "5Gi",
+        "git_branch": "main"
+      },
+      "test": {
+        "solr_admin_size": "30Gi",
+        "solr_admin_log_size": "500Mi",
+        "git_branch": "test"
+      },
+      "dev": {
+        "limits": {
+          "memory": "2Gi"
+        },
+        "requests": {
+          "memory": "1Gi"
+        },
+        "solr_admin_size": "19Gi",
+        "solr_admin_log_size": "500Mi",
+        "git_branch": "dev"
+      }
+    },
+    "api": {
+      "prod": {
+        "limits": {
+          "memory": "20Gi"
+        },
+        "requests": {
+          "memory": "4Gi"
+        },
+        "pdf_to_text_buffer_size": "20Gi",
+        "git_branch": "main"
+      },
+      "test": {
+        "limits": {
+          "cpu": "4",
+          "memory": "8Gi"
+        },
+        "requests": {
+          "cpu": "100m",
+          "memory": "2Gi"
+        },
+        "pdf_to_text_buffer_size": "3Gi",
+        "git_branch": "test"
+      },
+      "dev": {
+        "pdf_to_text_buffer_size": "3Gi",
+        "git_branch": "dev"
+      }
+    },
+    "public_ui": {
+      "prod": {
+        "display_console_logs": false,
+        "git_branch": "main",
+        "url": "my-company.net"
+      },
+      "test": {
+        "git_branch": "test",
+        "display_console_logs": true
+      },
+      "dev": {
+        "git_branch": "dev",
+        "display_console_logs": true
+      }
+    },
+    "cron_jobs": {
+      "prod": {
+        "git_branch": "main"
+      },
+      "test": {
+        "git_branch": "test"
+      },
+      "dev": {
+        "git_branch": "dev"
+      }
+    }
+  },
+  "instance_specific_name": {
+    "solr": "solr",
+    "solr_logrotate": "logrotate-solr",
+    "solr_admin": "admin-solr",
+    "solr_admin_log": "log-admin-solr",
+    "solr_admin_index": "index-admin-solr",
+    "solr_public": "public-solr",
+    "solr_public_log": "log-public-solr",
+    "solr_public_index": "index-public-solr",
+    "api": "api",
+    "api_doc_user_stats": "doc-user-stats-api",
+    "api_pdf_to_text_buffer": "pdf-to-text-buffer-api",
+    "public_ui_config": "config-public-ui",
+    "public_ui": "public-ui",
+    "cron_jobs": "cron-jobs",
+    "cron_job_crawler": "crawler",
+    "cron_job_create_folders": "create-folders"
+  },
+  "project": {
+    "name": "my-project-name",
+    "host": "my-company.com",
+    "default_cluster": "clusterIntern",
+    "allowed_clusters": "clusterIntern;clusterPublic",
+    "component_dirs": "init-project;init-api;solr;api;public-ui;cron-jobs",
+    "oc_resource_kinds": "PersistentVolumeClaim;StorageClass;VolumeSnapshot;ImageStream;BuildConfig;Deployment;DeploymentConfig;StatefulSet;Secret;ConfigMap;CronJob;Job;DaemonSet;ReplicaSet;ReplicationController;HorizontalPodAutoscaler;PodDisruptionBudget;Service;Route;Ingress;NetworkPolicy;ServiceAccount;ClusterRole;RoleBinding;ResourceQuota;LimitRange",
+    "cluster_ip_range": "172.30.202"
+  },
+  "git_repo": {
+    "solr": "ssh://git@gitlab.com/my-gitlab-project/solr.git",
+    "api": "ssh://git@gitlab.com/my-gitlab-project/api.git",
+    "public_ui": "ssh://git@gitlab.com/my-gitlab-project/publicUI.git",
+    "cron_jobs": "ssh://git@gitlab.com/my-gitlab-project/cronJobs.git"
+  },
+  "haproxy_router_timeout": "60000s",
+  "log_size": "140Gi",
+  "conf_size": "350Mi",
+  "conf_volume": "my-company-conf",
+  "log_volume": "my-company-log",
+  "solr": "solr",
+  "solr_port": 8983,
+  "api": "api",
+  "api_port": 3000,
+  "api_urls_api_cm": "urls-api",
+  "api_secret_s": "project-secret-api",
+  "public_ui_port": 8000,
+  "git_secret_name": "secret-git-ssh"
+}

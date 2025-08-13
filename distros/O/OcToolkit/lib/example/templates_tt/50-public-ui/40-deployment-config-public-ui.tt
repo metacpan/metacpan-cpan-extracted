@@ -1,0 +1,88 @@
+kind: DeploymentConfig
+apiVersion: apps.openshift.io/v1
+metadata:
+  name: [% oc_config.instance_specific_name.public_ui %]
+  namespace: [% namespace %]
+  labels:
+    app: [% oc_config.instance_specific_name.public_ui %]
+spec:
+  strategy:
+    type: Rolling
+    rollingParams:
+      updatePeriodSeconds: 1
+      intervalSeconds: 1
+      timeoutSeconds: 600
+      maxUnavailable: 25%
+      maxSurge: 25%
+    resources: {}
+    activeDeadlineSeconds: 21600
+  triggers:
+    - type: ConfigChange
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+          - [% oc_config.instance_specific_name.public_ui %]
+        from:
+          kind: ImageStreamTag
+          namespace: [% namespace %]
+          name: [% oc_config.instance_specific_name.public_ui %]:latest
+  replicas: 1
+  revisionHistoryLimit: 10
+  test: false
+  selector:
+    app: [% oc_config.instance_specific_name.public_ui %]
+    deploymentconfig: [% oc_config.instance_specific_name.public_ui %]
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: [% oc_config.instance_specific_name.public_ui %]
+        deploymentconfig: [% oc_config.instance_specific_name.public_ui %]
+    spec:
+      volumes:
+        - name: s-gitlab-uv-ssh-secret
+          secret:
+            secretName: [% oc_config.git_secret_name %]
+            items:
+              - key: ssh-privatekey
+                path: ssh-privatekey
+            defaultMode: 420
+        - name: cm-volume-public-ui-config
+          configMap:
+            name: [% oc_config.instance_specific_name.public_ui_config %]
+            defaultMode: 420
+        - name: log
+          persistentVolumeClaim:
+            claimName: [% oc_config.log_volume %]
+      containers:
+        - resources: {}
+          terminationMessagePath: /dev/termination-log
+          name: [% oc_config.instance_specific_name.public_ui %]
+          env:
+            - name: public_ui_url
+              value: https://[% oc_config.instance_specific_data.public_ui.url %]
+            - name: branch
+              value: [% oc_config.instance_specific_data.public_ui.git_branch %]
+            - name: INSTANCE
+              value: [% instance %]
+            - name: solr_public_service
+              value: https://[% oc_config.instance_specific_name.solr_public %]:[% oc_config.solr_port %]
+          ports:
+            - containerPort: [% oc_config.public_ui_port %]
+              protocol: TCP
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: s-gitlab-uv-ssh-secret
+              mountPath: /.ssh/id_rsa
+              subPath: ssh-privatekey
+            - name: cm-volume-public-ui-config
+              mountPath: /src/config
+            - name: log
+              mountPath: /opt/Logs
+          terminationMessagePolicy: File
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      securityContext: {}
+      schedulerName: default-scheduler

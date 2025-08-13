@@ -144,27 +144,4 @@ sub file_match
 
 
 
-# blank user_id_string and different validity for expired sig in GPG 2.2.x vs 1.x, 2.1
-sub get_expired_test_sig_params {
-    my $gnupg = shift;
-    my $version = $gnupg->version;
-
-    my %sig_params = (
-        date_string => '2000-03-16',
-        hex_id => '56FFD10A260C4FA3',
-        sig_class => 0x10,
-        algo_num => 17,
-        is_exportable => 1,
-    );
-    if ($gnupg->cmp_version($gnupg->version, '2.2') > 0) {
-        $sig_params{user_id_string} = '';
-        $sig_params{validity} = '?';
-    }
-    else {
-        $sig_params{user_id_string} = 'Frank J. Tobin <ftobin@neverending.org>',
-        $sig_params{validity} = '!';
-    }
-    return %sig_params
-}
-
 1;

@@ -1,0 +1,16 @@
+#!/usr/bin/env perl
+
+use v5.38.2;
+
+use strict;
+use warnings;
+
+use Path::Tiny;
+use Wiki::JSON;
+use Cpanel::JSON::XS qw/encode_json/;
+
+my $input = $ARGV[0] or die "You have to send an input file";
+
+$input = path($input);
+
+say encode_json(Wiki::JSON->new()->parse($input->slurp_utf8));

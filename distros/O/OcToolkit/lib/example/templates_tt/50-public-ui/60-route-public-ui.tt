@@ -1,0 +1,20 @@
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: [% oc_config.instance_specific_name.public_ui %]
+  namespace: [% namespace %]
+  labels:
+    app: [% oc_config.instance_specific_name.public_ui %]
+  annotations:
+    haproxy.router.openshift.io/timeout: 60000s
+spec:
+  host: [% oc_config.instance_specific_data.public_ui.url %]
+  to:
+    kind: Service
+    name: [% oc_config.instance_specific_name.public_ui %]
+    weight: 100
+  port:
+    targetPort: [% oc_config.public_ui_port %]-tcp
+  tls:
+    termination: edge
+  wildcardPolicy: None

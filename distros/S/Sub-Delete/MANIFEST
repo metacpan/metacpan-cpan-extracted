@@ -2,9 +2,11 @@ Changes
 lib/Sub/Delete.pm
 Makefile.PL
 MANIFEST
+MANIFEST.SKIP
+META.yml			Module meta-data (added by MakeMaker)
 README
 t/test.t
-t/Test/Builder/Module.pm
 t/Test/Builder.pm
+t/Test/Builder/Module.pm
 t/Test/More.pm
-META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,26 @@
+Text::PrettyTable README
+========================
+
+I couldn't find any module that was able to display a data structure
+in such a representation without requiring too many other modules.
+Text::PrettyTable does exactly that and it doesn't require anything.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+  None!
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2025 by Paul Seamons & Rob Brown
+
+This library is free software; you can redistribute it and/or
+modify it under the Perl Artistic License 2.0.

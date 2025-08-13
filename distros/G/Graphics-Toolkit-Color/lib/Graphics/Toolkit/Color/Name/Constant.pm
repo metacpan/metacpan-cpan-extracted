@@ -1,8 +1,9 @@
-use v5.12;
 
 # named colors from X11, HTML (SVG) standard and Pantone report
 
 package Graphics::Toolkit::Color::Name::Constant;
+use v5.12;
+use warnings;
 
 {
 # http://en.wikipedia.org/wiki/Web_colors#X11_color_names    # 2.6 MB
@@ -577,7 +578,7 @@ package Graphics::Toolkit::Color::Name::Constant;
     'emerald'             => [   0, 155, 119, 166, 100,  30 ],
     'tangerinetango'      => [ 221,  65,  36,   9,  73,  50 ],
     'honeysucle'          => [ 214,  80, 118, 343,  62,  58 ],
-    'turquoise'           => [  69, 184, 172, 174,  45,  50 ],
+#    'turquoise'           => [  69, 184, 172, 174,  45,  50 ],
     'mimosa'              => [ 239, 192,  80,  42,  83,  63 ],
     'blueizis'            => [  91,  94, 166, 238,  30,  50 ],
     'chilipepper'         => [ 155,  27,  48, 350,  70,  36 ],
@@ -595,7 +596,7 @@ package Graphics::Toolkit::Color::Name::Constant;
     'limpetshell'         => [ 152, 221, 222, 181,  51,  73 ],
     'lilacgrey'           => [ 152, 221, 222, 181,  51,  73 ],
     'icedcoffee'          => [ 177, 143, 106,  31,  31,  55 ],
-    'fiesta'              => [ 221,  65,  50,   5,  72,  53 ],
+#    'fiesta'              => [ 221,  65,  50,   5,  72,  53 ],
     'buttercup'           => [ 221,  65,  50,   5,  72,  53 ],
     'greenflash'          => [ 250, 224,  60,  52,  95,  61 ],
     'riverside'           => [  76, 106, 146, 214,  32,  44 ], # Fall
@@ -672,7 +673,7 @@ package Graphics::Toolkit::Color::Name::Constant;
     'eclipse'             => [  52,  49,  72, 248,  19,  24 ],
     'sweetcorn'           => [ 240, 234, 214,  46,  46,  89 ],
     'browngranite'        => [  97,  85,  80,  18,  10,  35 ],
-    'chilipepper'         => [ 155,  27,  48, 350,  70,  36 ],
+#    'chilipepper'         => [ 155,  27,  48, 350,  70,  36 ],
     'bikingred'           => [ 119,  33,  46, 351,  57,  30 ],
     'peachpink'           => [ 250, 154, 133,  11,  92,  75 ],
     'rockyroad'           => [  90,  62,  54,  13,  25,  28 ],
@@ -863,10 +864,10 @@ frenchblue, greenash, burntcoral, mint, amethystorchid, raspberrysorbet,
 inkwell, ultimategray, buttercream, desertmist, willow
 
 =for HTML <p>
-<img src="https://raw.githubusercontent.com/lichtkind/Chart/main/dev/function/color/table/color_table0.png" alt="color table 1">
-<img src="https://raw.githubusercontent.com/lichtkind/Chart/main/dev/function/color/table/color_table1.png" alt="color table 2">
-<img src="https://raw.githubusercontent.com/lichtkind/Chart/main/dev/function/color/table/color_table2.png" alt="color table 3">
-<img src="https://raw.githubusercontent.com/lichtkind/Chart/main/dev/function/color/table/color_table3.png" alt="color table 4">
+<img src="https://raw.githubusercontent.com/lichtkind/Graphics-Toolkit-Color/main/dev/POD/color_table0.png" alt="color table 1">
+<img src="https://raw.githubusercontent.com/lichtkind/Graphics-Toolkit-Color/main/dev/POD/color_table1.png" alt="color table 2">
+<img src="https://raw.githubusercontent.com/lichtkind/Graphics-Toolkit-Color/main/dev/POD/color_table2.png" alt="color table 3">
+<img src="https://raw.githubusercontent.com/lichtkind/Graphics-Toolkit-Color/main/dev/POD/color_table3.png" alt="color table 4">
 </p>
 
 =head1 COPYRIGHT & LICENSE

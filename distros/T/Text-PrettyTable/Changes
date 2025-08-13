@@ -1,0 +1,17 @@
+Revision history for Perl extension Text::PrettyTable.
+
+0.03  Tue 2025-08-13 04:00:00
+ - Documental changes only. No functional changes.
+ - Added more tests.
+ - Fix README instead of stock h2xs stub
+
+0.02  Tue 2025-08-12 17:00:00
+ - Import original version from paul@seamons.com
+ - Allow optional $args to override object settings.
+ - Add test suite.
+
+0.01  Sat 2025-08-09 13:39:22
+ - original version; created by (v1.23) h2xs -b 5.8.0 -Afn Text::PrettyTable
+
+0.00  Thu 2012-07-19 00:00:00 (SHARYANTO)
+ - First release, empty implementation

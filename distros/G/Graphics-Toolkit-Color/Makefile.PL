@@ -7,7 +7,7 @@ use 5.012000;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "color palette constructor",
+  "ABSTRACT" => "calculate color (sets), IO many spaces and formats",
   "AUTHOR" => "Herbert Breunung <lichtkind\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -17,14 +17,12 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.012000",
   "NAME" => "Graphics::Toolkit::Color",
   "PREREQ_PM" => {
-    "Carp" => "1.35",
     "Exporter" => 5
   },
   "TEST_REQUIRES" => {
-    "Test::More" => "1.3",
-    "Test::Warn" => "0.30"
+    "Test::More" => "1.3"
   },
-  "VERSION" => "1.71",
+  "VERSION" => "1.91",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -32,10 +30,8 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Carp" => "1.35",
   "Exporter" => 5,
-  "Test::More" => "1.3",
-  "Test::Warn" => "0.30"
+  "Test::More" => "1.3"
 );
 
 

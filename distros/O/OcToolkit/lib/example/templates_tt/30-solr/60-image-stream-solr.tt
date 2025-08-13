@@ -1,0 +1,21 @@
+kind: ImageStream
+apiVersion: image.openshift.io/v1
+metadata:
+  name: [% oc_config.instance_specific_name.solr %]
+  namespace: [% namespace %]
+  labels:
+    app: [% oc_config.instance_specific_name.solr %]
+spec:
+  lookupPolicy:
+    local: false
+  tags:
+    - name: latest
+      annotations:
+        openshift.io/imported-from: 'ubuntu:24.04'
+      from:
+        kind: DockerImage
+        name: 'ubuntu:24.04'
+      importPolicy:
+        importMode: Legacy
+      referencePolicy:
+        type: Source

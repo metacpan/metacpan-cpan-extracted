@@ -6,10 +6,10 @@ use warnings;
 
 use Carp;
 use Module::Runtime qw(use_module);
-use Params::Get 0.11;
+use Object::Configure;
+use Params::Get 0.13;
+use Return::Set;
 use Text::Capitalize 'capitalize_title';
-
-=encoding utf-8
 
 =head1 NAME
 
@@ -17,19 +17,23 @@ Geo::Address::Parser - Lightweight country-aware address parser from flat text
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 # Supported countries and their corresponding rule modules
 my %COUNTRY_MODULE = (
 	US => 'Geo::Address::Parser::Rules::US',
+	USA => 'Geo::Address::Parser::Rules::US',
 	UK => 'Geo::Address::Parser::Rules::UK',
 	CA => 'Geo::Address::Parser::Rules::CA',
+	'Canada' => 'Geo::Address::Parser::Rules::CA',
 	AU => 'Geo::Address::Parser::Rules::AU',
+	'AUSTRALIA' => 'Geo::Address::Parser::Rules::AU',
 	NZ => 'Geo::Address::Parser::Rules::NZ',
+	'NEW ZEALAND' => 'Geo::Address::Parser::Rules::NZ',
 );
 
 =head1 METHODS
@@ -42,11 +46,15 @@ my %COUNTRY_MODULE = (
 
     my $result = $parser->parse("Mastick Senior Center, 1525 Bay St, Alameda, CA");
 
+=encoding utf-8
+
 =head1 DESCRIPTION
 
 This module extracts address components from flat text input. It supports
 lightweight parsing for the US, UK, Canada, Australia, and New Zealand, using
 country-specific regular expressions.
+
+The object can be configured using the methods described in L<Object::Configure>.
 
 =head2 new(country => $code)
 
@@ -73,17 +81,31 @@ sub new {
 
 	my $params = Params::Get::get_params('country', \@_);
 
-	croak "Missing required 'country' parameter" unless $params->{country};
+	if(!defined($params->{country})) {
+		if($params->{'logger'}) {
+			$params->{'logger'}->warn("Missing required 'country' parameter");
+		}
+		croak("Missing required 'country' parameter");
+	}
 
-	my $country = uc $params->{'country'};
-	my $module = $COUNTRY_MODULE{$country} or croak "Unsupported country: $country";
+	$params = Object::Configure::configure($class, $params);
+
+	my $country = uc($params->{'country'});
+	my $module = $COUNTRY_MODULE{$country};
+	if(!defined($module)) {
+		if($params->{'logger'}) {
+			$params->{'logger'}->warn("Unsupported country: $country");
+		}
+		croak("Unsupported country: $country");
+	}
 
 	# Load the appropriate parser module dynamically
 	use_module($module);
 
 	return bless {
+		%{$params},
 		country => $country,
-		module => $module,
+		module => $module
 	}, $class;
 }
 
@@ -152,7 +174,8 @@ sub parse
 
 	$result->{'name'} = capitalize_title($result->{'name'}) if($result->{'name'});
 
-	return $result;
+	# Returns a hashref with at least two items: name and country
+	return Return::Set::set_return($result, { 'type' => 'hashref', 'min' => 2 });
 }
 
 =head1 LICENCE AND COPYRIGHT

@@ -16,7 +16,7 @@ my @FIELDS   = qw( id type description state last_update time_zone
 my @INTERNAL = qw( _factory _observers );
 __PACKAGE__->mk_accessors( @FIELDS, @INTERNAL );
 
-$Workflow::VERSION = '2.05';
+$Workflow::VERSION = '2.06';
 
 use constant NO_CHANGE_VALUE => 'NOCHANGE';
 
@@ -119,45 +119,63 @@ sub get_action_fields {
     return $action->fields;
 }
 
+sub _get_autorun_action_name {
+    my ( $self, $wf_state ) = @_;
+
+    my $action_name = '';
+    $self->log->is_info
+        && $self->log->info(
+        "State '", $wf_state->state, "' marked to be run ",
+        "automatically; executing that state/action..."
+        );
+
+    if ( $wf_state->may_stop() ) {
+        try {
+            $action_name = $wf_state->get_autorun_action_name($self);
+        }
+        catch { }
+    }
+    else {
+        $action_name = $wf_state->get_autorun_action_name($self);
+    }
+
+    if ( $action_name ) {
+        $self->log->is_debug
+            && $self->log->debug(
+            "Found action '$action_name' to execute in autorun state ",
+            $wf_state->state
+            );
+    }
+
+    return $action_name;
+}
+
+sub _maybe_autorun_state {
+    my ( $self, $wf_state, $running ) = @_;
+
+    my $run_notified = $running;
+    while ( $wf_state->autorun
+            and my $action_name = $self->_get_autorun_action_name( $wf_state ) ) {
+        $self->notify_observers( 'startup' )
+            if not $running;
+
+        $wf_state = $self->_execute_single_action( $action_name, !!1 );
+        $run_notified = !!1;
+    }
+
+    $self->notify_observers( 'finalize' )
+        if not $running and $run_notified;
+
+    return;
+}
+
 sub execute_action {
     my ( $self, $action_name, $action_args ) = @_;
 
     $self->notify_observers( 'startup' );
 
-    while ( $action_name ) {
-        my $wf_state =
-            $self->_execute_single_action( $action_name, $action_args );
-        $action_args = undef;
-
-        if ( not $wf_state->autorun ) {
-            last;
-        }
-        else {
-            $self->log->is_info
-                && $self->log->info(
-                "State '", $wf_state->state, "' marked to be run ",
-                "automatically; executing that state/action..."
-                );
-
-            if ( $wf_state->may_stop() ) {
-                try {
-                    $action_name = $wf_state->get_autorun_action_name($self);
-                }
-                catch { }
-            }
-            else {
-                $action_name = $wf_state->get_autorun_action_name($self);
-            }
-
-            if ( $action_name ) {
-                $self->log->is_debug
-                    && $self->log->debug(
-                    "Found action '$action_name' to execute in autorun state ",
-                    $wf_state->state
-                    );
-            }
-        }
-    }
+    my $wf_state = $self->_execute_single_action( $action_name, !!0, $action_args );
+    $self->_maybe_autorun_state( $wf_state, !!1 );
 
     $self->notify_observers( 'finalize' );
 
@@ -291,7 +309,7 @@ sub set {
 
 
 sub _execute_single_action {
-    my ( $self, $action_name, $action_args ) = @_;
+    my ( $self, $action_name, $is_autorun, $action_args ) = @_;
 
     # This checks the conditions behind the scenes, so there's no
     # explicit 'check conditions' step here
@@ -338,10 +356,22 @@ sub _execute_single_action {
         $self->log->is_info
             && $self->log->info("Saved workflow with possible new state ok");
 
-        $self->notify_observers( 'completed', { state => $old_state, action => $action_name });
+        $self->notify_observers(
+            'completed',
+            {
+                state => $old_state,
+                action => $action_name,
+                autorun => $is_autorun
+            });
 
         if ( $old_state ne $new_state ) {
-            $self->notify_observers( 'state change', { from => $old_state, action => $action_name, to => $new_state } );
+            $self->notify_observers(
+                'state change',
+                {
+                    from => $old_state,
+                    action => $action_name,
+                    to => $new_state
+                });
         }
 
         return $self->_get_workflow_state;
@@ -420,7 +450,7 @@ Workflow - Simple, flexible system to implement workflows
 
 =head1 VERSION
 
-This documentation describes version 2.05 of Workflow
+This documentation describes version 2.06 of Workflow
 
 =head1 SYNOPSIS
 

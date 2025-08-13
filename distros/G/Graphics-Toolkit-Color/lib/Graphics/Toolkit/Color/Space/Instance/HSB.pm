@@ -1,21 +1,20 @@
-use v5.12;
-use warnings;
 
 # HSB color space specific code
 
 package Graphics::Toolkit::Color::Space::Instance::HSB;
-use Graphics::Toolkit::Color::Space::Util ':all';
-use Graphics::Toolkit::Color::Space;
+use v5.12;
+use warnings;
+use Graphics::Toolkit::Color::Space qw/min max/;
 
 my $hsb_def = Graphics::Toolkit::Color::Space->new( axis => [qw/hue saturation brightness/],
-                                                   range => [360, 100, 100],
-                                                    type => [qw/angle linear linear/]);
+                                                   range => [360, 100, 100],  precision => 0,
+                                                    type => [qw/angular linear linear/],
+                                                  suffix => ['', '%', '%'], );
 
    $hsb_def->add_converter('RGB', \&to_rgb, \&from_rgb );
 
-
 sub from_rgb {
-    my ($r, $g, $b) = @_;
+    my ($r, $g, $b) = @{$_[0]};
     my $vmin = min($r, $g, $b);
     my $br = my $vmax = max($r, $g, $b);
     return (0, 0, $br) if $vmax == $vmin;
@@ -29,7 +28,7 @@ sub from_rgb {
 }
 
 sub to_rgb {
-    my ($h, $s, $b) = @_;
+    my ($h, $s, $b) = @{$_[0]};
     return ($b, $b, $b) if $s == 0;
     my $hi = int( $h * 6 );
     my $f = ( $h * 6 ) - $hi;

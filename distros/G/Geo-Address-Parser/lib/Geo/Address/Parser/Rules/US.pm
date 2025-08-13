@@ -5,39 +5,6 @@ use warnings;
 use Exporter 'import';
 our @EXPORT_OK = qw(parse_address);
 
-sub parse_address {
-    my ($class, $text) = @_;
-    return unless defined $text;
-
-    # Split by commas and trim whitespace
-    my @parts = map { s/^\s+|\s+$//gr } split /,/, $text;
-
-    my ($name, $street, $city, $region, $zip);
-
-    # Try to extract region + ZIP code from last part
-    if ($parts[-1] =~ /^([A-Z]{2})\s*(\d{5}(?:-\d{4})?)?$/) {
-        $region = $1;
-        $zip    = $2 // '';
-        pop @parts;
-    }
-
-    $city   = pop @parts if @parts;
-    $street = pop @parts if @parts;
-    $name   = join(', ', @parts) if @parts;
-
-    return {
-        name    => $name,
-        street  => $street,
-        city    => $city,
-        region  => $region,
-        zip     => $zip,
-    };
-}
-
-1;
-
-__END__
-
 =head1 NAME
 
 Geo::Address::Parser::Rules::US - Parsing rules for US addresses
@@ -67,3 +34,37 @@ Returns a hashref with keys:
 =back
 
 =cut
+
+sub parse_address {
+	my ($class, $text) = @_;
+
+	return unless defined $text;
+
+	# Split by commas and trim whitespace
+	my @parts = map { s/^\s+|\s+$//gr } split /,/, $text;
+
+	my ($name, $street, $city, $region, $zip);
+
+	# Try to extract region + ZIP code from last part
+	if ($parts[-1] =~ /^([A-Z]{2})\s*(\d{5}(?:-\d{4})?)?$/) {
+		$region = $1;
+		$zip = $2 // '';
+		pop @parts;
+	}
+
+	$city = pop @parts if @parts;
+	$street = pop @parts if @parts;
+	$name = join(', ', @parts) if @parts;
+
+	return {
+		name => $name,
+		street => $street,
+		city => $city,
+		region => $region,
+		zip	 => $zip,
+	};
+}
+
+1;
+
+__END__

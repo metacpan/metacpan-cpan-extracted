@@ -7,7 +7,7 @@ use Sort::Versions;
 
 use alienfile;
 
-our $VERSION = 'v4.6.2.4'; # VERSION
+our $VERSION = 'v4.6.2.5'; # VERSION
 
 # tie versions of this module and CFITSIO.  CFITSIO's code is very
 # backwards compatible, but their build configuration may break, which
@@ -51,7 +51,7 @@ plugin PkgConfig => (
 );
 
 share {
-    start_url 'https://heasarc.gsfc.nasa.gov/FTP/software/fitsio/c';
+    start_url 'https://heasarc.gsfc.nasa.gov/FTP/software/fitsio/c/';
     plugin Download => (
         filter  => qr/cfitsio-4.*[.]tar[.]gz/,
         version => qr/(\d+\.\d+\.\d+)[.]tar[.]gz$/,

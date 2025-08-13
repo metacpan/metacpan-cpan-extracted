@@ -15,7 +15,6 @@ TEST
     my $homedir = $gnupg->options->homedir();
     make_path($homedir, { mode => 0700 });
 
-    copy('test/gpg.conf', $homedir . '/gpg.conf');
 
     if ($gnupg->cmp_version($gnupg->version, '2.2') >= 0) {
         my $agentconf = IO::File->new( "> " . $homedir . "/gpg-agent.conf" );
@@ -43,6 +42,14 @@ TEST
         }
 
     }
+
+    if ($gnupg->cmp_version($gnupg->version, '2.4') >= 0) {
+        copy('test/gpg.conf', $homedir . '/gpg.conf');
+    }
+    else {
+        copy('test/gpg1.conf', $homedir . '/gpg.conf');
+    }
+
     reset_handles();
 
     my $pid = $gnupg->import_keys(command_args => [ 'test/public_keys.pgp', 'test/secret_keys.pgp', 'test/new_secret.pgp' ],

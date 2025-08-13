@@ -1,28 +1,32 @@
-use v5.12;
-use warnings;
 
 # HWB color space specific code
 
 package Graphics::Toolkit::Color::Space::Instance::HWB;
-use Graphics::Toolkit::Color::Space::Util ':all';
-use Graphics::Toolkit::Color::Space;
+use v5.12;
+use warnings;
+use Graphics::Toolkit::Color::Space qw/min max/;
 
 my $hwb_def = Graphics::Toolkit::Color::Space->new( axis => [qw/hue whiteness blackness/],
-                                                   range => [360, 100, 100],
-                                                    type => [qw/angle linear linear/]);
+                                                   range => [360, 100, 100], precision => 0,
+                                                    type => [qw/angular linear linear/],
+                                                  suffix => ['', '%', '%'],
+                                                  );
 
    $hwb_def->add_converter('RGB', \&to_rgb, \&from_rgb );
 
+ # add constraint W + B <= 100
 
 sub from_rgb {
-    my ($r, $g, $b) = @_;
+    my ($r, $g, $b) = @{$_[0]};
     my $vmax = max($r, $g, $b);
     my $white = my $vmin = min($r, $g, $b);
+    return (0,1,0) if $white == 1;
     my $black = 1 - ($vmax);
+    return (0,0,1) if $black == 1;
 
     my $d = $vmax - $vmin;
     my $s = $d / $vmax;
-    my $h =     ($d == 0) ? 0 :
+    my $h =    ($d == 0)  ? 0 :
             ($vmax == $r) ? (($g - $b) / $d + ($g < $b ? 6 : 0)) :
             ($vmax == $g) ? (($b - $r) / $d + 2)
                           : (($r - $g) / $d + 4);
@@ -31,7 +35,7 @@ sub from_rgb {
 
 
 sub to_rgb {
-    my ($h, $w, $b) = @_;
+    my ($h, $w, $b) = @{$_[0]};
     return (0, 0, 0) if $b == 1;
     return (1, 1, 1) if $w == 1;
     my $v = 1 - $b;
