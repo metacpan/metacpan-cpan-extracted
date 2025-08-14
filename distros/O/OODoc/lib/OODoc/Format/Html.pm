@@ -1,5 +1,5 @@
-# This code is part of Perl distribution OODoc version 3.00.
-# The POD got stripped from this file by OODoc version 3.00.
+# This code is part of Perl distribution OODoc version 3.01.
+# The POD got stripped from this file by OODoc version 3.01.
 # For contributors see file ChangeLog.
 
 # This software is copyright (c) 2003-2025 by Mark Overmeer.
@@ -9,7 +9,7 @@
 # SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
 
 package OODoc::Format::Html;{
-our $VERSION = '3.00';
+our $VERSION = '3.01';
 }
 
 use parent 'OODoc::Format';
@@ -428,7 +428,7 @@ SUBROUTINE
     {   my $defd    = $subroutine->manual;
         my $sublink = $self->link($defd, $subroutine, $name);
         my $manlink = $self->link($manual, $defd);
-        $output->print( qq[See $sublink in $manlink.<br>\n] );
+        $output->print( qq[Inherited from $sublink in $manlink.<br>\n] );
     }
     $self;
 }
@@ -547,7 +547,11 @@ sub showSubroutineDescriptionRefer(@)
     my $manual     = $args{manual}     or panic;
     my $subroutine = $args{subroutine} or panic;
     my $output     = $args{output}     or panic;
-    $output->print("\n<p>See ", $self->link($manual, $subroutine), "</p>\n");
+
+    my $defd       = $subroutine->manual;
+	my $sublink    = $self->link($defd, $subroutine);
+	my $manlink    = $self->link($manual, $defd);
+    $output->print("\n<p>See $sublink in $manlink</p>\n");
 }
 
 #----------------------

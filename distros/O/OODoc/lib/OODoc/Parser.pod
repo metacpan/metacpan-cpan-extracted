@@ -179,7 +179,7 @@ for the final touch for the requested output markup.
 
 =item $obj-E<gt>B<cleanupHtml>($manual, $text, %options)
 
-Translate the $text block, which is written in the parser specific
+Translate the C<$text> block, which is written in the parser specific
 syntax (which may resemble native Perl POD) into real Perl POD.
 
  -Option     --Default
@@ -194,14 +194,14 @@ See L<OODoc::Format::cleanup(create_link)|OODoc::Format/"Page generation">.
 
 =item is_html => BOOLEAN
 
-Some changes will not be made when $is_html is C<true>, for instance,
+Some changes will not be made when C<is_html> is C<true>, for instance,
 a "E<lt>" will stay that way, not being translated in a "E<amp>lt;".
 
 =back
 
 =item $obj-E<gt>B<cleanupPod>($manual, $text, %options)
 
-Translate the $text block, which is written in the parser specific
+Translate the C<$text> block, which is written in the parser specific
 syntax (which may resemble native Perl POD) into real Perl POD.
 
  -Option     --Default
@@ -215,9 +215,14 @@ See L<OODoc::Format::cleanup(create_link)|OODoc::Format/"Page generation">.
 
 =back
 
+=item $obj-E<gt>B<finalizeManual>($manual, %options)
+
+[3.01] The parser gets a last chance to work on C<$manual> documentation,
+after all documents have been collected and intergrated.
+
 =item $obj-E<gt>B<skipManualLink>($package)
 
-Returns true is the $package name matches one of the links to be
+Returns C<true> if the C<$package> name matches one of the links to be
 skipped, set by L<new(skip_links)|OODoc::Parser/"Constructors">.
 
 =back
@@ -252,8 +257,8 @@ to L<manualsForPackage()|OODoc::Object/"Manual Repository"> or L<mainManual()|OO
 
 =head1 SEE ALSO
 
-This module is part of OODoc version 3.00,
-built on August 02, 2025. Website: F<https://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.01,
+built on August 14, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 

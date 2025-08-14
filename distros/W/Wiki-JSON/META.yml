@@ -7,7 +7,7 @@ configure_requires:
   Module::Build: '0.42'
 dynamic_config: 1
 generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
-license: unknown
+license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -15,13 +15,15 @@ name: Wiki-JSON
 provides:
   Wiki::JSON:
     file: lib/Wiki/JSON.pm
-    version: v0.0.7
+    version: v0.0.9
 requires:
+  Const::Fast: '0'
   Cpanel::JSON::XS: '0'
   Data::Dumper: '0'
   Module::Build: '0'
   Moo: '0'
   Path::Tiny: '0'
   Test::Most: '0'
-version: v0.0.7
+  perl: v5.38.0
+version: v0.0.9
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

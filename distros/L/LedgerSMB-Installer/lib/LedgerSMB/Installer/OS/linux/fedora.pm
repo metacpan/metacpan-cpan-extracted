@@ -1,4 +1,4 @@
-package LedgerSMB::Installer::OS::linux::fedora v0.999.9;
+package LedgerSMB::Installer::OS::linux::fedora v0.999.10;
 
 use v5.20;
 use experimental qw(signatures);
@@ -167,7 +167,10 @@ sub _rm_installed($self, $pkgs) {
 }
 
 sub pkg_deps_latex($self) {
-    return ($self->_rm_installed([ qw(texlive-latex texlive-plain texlive-xetex) ]),
+    return ($self->_rm_installed([ qw(texlive-latex texlive-plain texlive-xetex
+                                      texlive-collection-basic
+                                      texlive-collection-latexextra
+                                      texlive-collection-fontsrecommended) ]),
             []);
 }
 

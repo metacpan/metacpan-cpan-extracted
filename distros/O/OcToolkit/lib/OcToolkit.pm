@@ -4,7 +4,7 @@ use v5.16; # or newer
 use strict;
 use warnings;
 
-our $VERSION = "1.05";
+our $VERSION = "1.06";
 
 use JSON::PP;
 use Text::Diff;
@@ -748,7 +748,7 @@ __END__
 
 =head1 NAME
 
-Open Cloud Toolkit - OcToolkit -  A Helm-like Perl module for managing Openshift and Kubernetes projects
+OcToolkit - Open Cloud Toolkit -  A Helm-like Perl module for managing Openshift and Kubernetes projects
 
 =head1 SYNOPSIS
 

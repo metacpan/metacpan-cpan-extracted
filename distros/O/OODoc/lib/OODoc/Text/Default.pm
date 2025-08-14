@@ -1,5 +1,5 @@
-# This code is part of Perl distribution OODoc version 3.00.
-# The POD got stripped from this file by OODoc version 3.00.
+# This code is part of Perl distribution OODoc version 3.01.
+# The POD got stripped from this file by OODoc version 3.01.
 # For contributors see file ChangeLog.
 
 # This software is copyright (c) 2003-2025 by Mark Overmeer.
@@ -9,7 +9,7 @@
 # SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
 
 package OODoc::Text::Default;{
-our $VERSION = '3.00';
+our $VERSION = '3.01';
 }
 
 use parent 'OODoc::Text';

@@ -169,7 +169,7 @@ Inherited, see L<OODoc::Format/"Page generation">
 
 =item $obj-E<gt>B<createManual>(%options)
 
-The %options are a collection of all options available to C<show*()> methods.
+The C<%options> are a collection of all options available to C<show*()> methods.
 Improves base, see L<OODoc::Format/"Page generation">
 
  -Option  --Defined in     --Default
@@ -209,8 +209,8 @@ Inherited, see L<OODoc::Format/"Page generation">
 
 =item $any-E<gt>B<link>( $manual, $object, [$text, \%settings] )
 
-Create the text for a link which refers to the $object.  The link will be
-shown somewhere in the $manual.  The $text will be displayed is stead
+Create the text for a link which refers to the C<$object>.  The link will be
+shown somewhere in the C<$manual>.  The C<$text> will be displayed is stead
 of the link path, when specified.
 
 =item $obj-E<gt>B<removeMarkup>(STRING)
@@ -260,7 +260,7 @@ Inherited, see L<OODoc::Format/"Page generation">
 
 Inherited, see L<OODoc::Format/"Page generation">
 
-=item $obj-E<gt>B<showSubroutine>( <@> )
+=item $obj-E<gt>B<showSubroutine>(%options)
 
 Inherited, see L<OODoc::Format/"Page generation">
 
@@ -282,13 +282,13 @@ Inherited, see L<OODoc::Format/"Page generation">
 
 =item $obj-E<gt>B<simplifyPod>($in, $out)
 
-The POD is produced in the specified $in filename, but may contain some
+The POD is produced in the specified C<$in> filename, but may contain some
 garbage, especially a lot of superfluous blanks lines.  Because it is
 quite complex to track double blank lines in the production process,
 we make an extra pass over the POD to remove it afterwards.  Other
 clean-up activities may be implemented later.
 
-=item $obj-E<gt>B<writeTable>()
+=item $obj-E<gt>B<writeTable>(%options)
 
 Z<>
 
@@ -341,7 +341,7 @@ Therefore, there are a few ways to adapt the output.
 
 =head3 Configuring with format options
 
-L<createManual()|OODoc::Format::Pod/"Page generation"> or L<OODoc::formatter()|OODoc/"Main entries">
+L<createManual()|OODoc::Format::Pod/"Page generation"> or L<OODoc::formatter()|OODoc/"Actions">
 can be used with a list of formatting options which are passed to
 L<showChapter()|OODoc::Format/"Page generation">.  This will help you to produce pages which have
 pre-planned changes in layout.
@@ -440,7 +440,7 @@ B<. Example: adding to a chapter's output>
 
 =head3 Configuring with OODoc::Template
 
-When using 'pod2' in stead of 'pod' when L<OODoc::formatter()|OODoc/"Main entries"> is called,
+When using 'pod2' in stead of 'pod' when L<OODoc::formatter()|OODoc/"Actions"> is called,
 the L<OODoc::Format::Pod2|OODoc::Format::Pod2> will be used.   It's nearly a drop-in
 replacement by its default behavior.  When you specify
 your own template file, every thing can be made.
@@ -511,8 +511,8 @@ Z<>
 
 =head1 SEE ALSO
 
-This module is part of OODoc version 3.00,
-built on August 02, 2025. Website: F<https://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.01,
+built on August 14, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 

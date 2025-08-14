@@ -1,7 +1,7 @@
 
 # NAME
 
-Open Cloud Toolkit - OcToolkit -  A Helm-like Perl module for managing Openshift and Kubernetes projects
+OcToolkit - Open Cloud Toolkit -  A Helm-like Perl module for managing Openshift and Kubernetes projects
 
 # SYNOPSIS
 

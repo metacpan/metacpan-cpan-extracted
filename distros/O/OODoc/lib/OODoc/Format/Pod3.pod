@@ -245,7 +245,7 @@ Inherited, see L<OODoc::Format/"Page generation">
 
 Inherited, see L<OODoc::Format/"Page generation">
 
-=item $obj-E<gt>B<showSubroutine>( <@> )
+=item $obj-E<gt>B<showSubroutine>(%options)
 
 Inherited, see L<OODoc::Format/"Page generation">
 
@@ -269,7 +269,7 @@ Inherited, see L<OODoc::Format/"Page generation">
 
 Inherited, see L<OODoc::Format::Pod/"Page generation">
 
-=item $obj-E<gt>B<writeTable>()
+=item $obj-E<gt>B<writeTable>(%options)
 
 Inherited, see L<OODoc::Format::Pod/"Page generation">
 
@@ -325,8 +325,8 @@ Z<>
 
 =head1 SEE ALSO
 
-This module is part of OODoc version 3.00,
-built on August 02, 2025. Website: F<https://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.01,
+built on August 14, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 

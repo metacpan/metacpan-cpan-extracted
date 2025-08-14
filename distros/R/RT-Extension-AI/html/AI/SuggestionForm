@@ -11,6 +11,8 @@
   <input type="hidden" name="callType" value="suggest_response">
 %if ( $TicketObj ) {
   <input type="hidden" class="hidden" name="id" value="<% $TicketObj->Id %>">
+% } elsif ( $QueueObj ) {
+<input type="hidden" class="hidden" name="QueueId" value="<% $QueueObj->Id %>">
 % }
     <div class="mb-3">
         <textarea
@@ -56,4 +58,5 @@ $callType  => ''
 $transFrom => ''
 $transTo   => ''
 $TicketObj => undef
+$QueueObj  => undef
 </%ARGS>

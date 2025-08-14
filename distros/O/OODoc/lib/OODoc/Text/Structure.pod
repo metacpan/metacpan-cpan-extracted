@@ -22,7 +22,7 @@ OODoc::Text::Structure - set of paragraphs with examples and subroutines
 
 =head1 DESCRIPTION
 
-The OODoc::Text::Structure class is used as base class for
+The L<OODoc::Text::Structure|OODoc::Text::Structure> class is used as base class for
 the L<OODoc::Text::Chapter|OODoc::Text::Chapter>, L<OODoc::Text::Section|OODoc::Text::Section>, and
 L<OODoc::Text::SubSection|OODoc::Text::SubSection> classes.  Each of these classes group some
 paragraphs of text, probably some examples and some subroutines: they
@@ -204,7 +204,7 @@ Inherited, see L<OODoc::Object/"Manual Repository">
 
 =item $obj-E<gt>B<findEntry>($name)
 
-Find the chapter, section or subsection with this $name.  The object found
+Find the chapter, section or subsection with this C<$name>.  The object found
 is returned.
 
 =item $obj-E<gt>B<path>()
@@ -212,10 +212,10 @@ is returned.
 Represent the location of this chapter, section, or subsection as
 one string, separated by slashes.
 
-example: 
+example: path expression
 
  print $subsect->path; 
-    # may print:  METHODS/Container/Search
+ # may print:  METHODS/Container/Search
 
 =back
 
@@ -225,17 +225,17 @@ Extends L<"Collected" in OODoc::Text|OODoc::Text/"Collected">.
  
 =over 4
 
-=item $obj-E<gt>B<all>($method, $parameters)
-
-Call the $method recursively on this object and all its sub-structures.
-For instance, when C<all> is called on a chapter, it first will call
-the $method on that chapter, than on all its sections and subsections.
-The $parameters are passed with each call.  The results of all calls is
-returned as list.
-
-=item $obj-E<gt>B<example>($object)
+=item $obj-E<gt>B<addExample>($object)
 
 Inherited, see L<OODoc::Text/"Collected">
+
+=item $obj-E<gt>B<all>($method, \%parameters)
+
+Call the C<$method> recursively on this object and all its sub-structures.
+For instance, when called on a chapter, it first will call the C<$method> on
+that chapter, than on all its sections, subsections, and subsubsections.
+The C<%parameters> are passed with each call.  The results of all calls is
+returned as LIST.
 
 =item $obj-E<gt>B<examples>()
 
@@ -247,11 +247,11 @@ Inherited, see L<OODoc::Text/"Collected">
 
 =item $obj-E<gt>B<isEmpty>()
 
-Return true if this text structure is only a place holder for something
-found in a super class.  Structured elements are created with
+Returns C<true> if this text structure is only a place holder for
+something found in a super class.  Structured elements are created with
 L<emptyExtension()|OODoc::Text::Structure/"Constructors"> on each sub-class pass the idea of order and to
-collect subroutines to be listed.  However, in some cases, nothing
-is to be listed after all, and in that case, this method returns C<true>.
+collect subroutines to be listed.  However, in some cases, nothing is
+to be listed after all, and in that case, this method returns C<true>.
 
 example: 
 
@@ -265,8 +265,8 @@ Inherited, see L<OODoc::Text/"Collected">
 
 =head2 Subroutines
 
-Each manual page structure element (chapter, section, and subsection)
-can contain a list of subroutine descriptions.
+Each manual page structure element (chapter, section, subsection, and
+subsubsection) can contain a list of subroutine descriptions.
 
 =over 4
 
@@ -275,7 +275,7 @@ can contain a list of subroutine descriptions.
 A subroutine (L<OODoc::Text::Subroutine|OODoc::Text::Subroutine> object) is added to the
 chapter, section, or subsection.
 
-=item $obj-E<gt>B<setSubroutines>(ARRAY)
+=item $obj-E<gt>B<setSubroutines>(\@subs)
 
 Sets the subroutines which are related to this text structure, replacing
 the preivous set.  This is used when the manual pages are expanded into
@@ -325,8 +325,8 @@ Z<>
 
 =head1 SEE ALSO
 
-This module is part of OODoc version 3.00,
-built on August 02, 2025. Website: F<https://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.01,
+built on August 14, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 

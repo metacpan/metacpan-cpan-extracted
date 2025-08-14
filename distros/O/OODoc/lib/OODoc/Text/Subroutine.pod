@@ -117,7 +117,7 @@ Inherited, see L<OODoc::Text/"Attributes">
 =item $obj-E<gt>B<location>($manual)
 
 Try to figure-out what the location for the subroutine is within the
-$manual page.  Have a look at all levels of extension for this
+C<$manual> page.  Have a look at all levels of extension for this
 sub-routine's documentation and decides the best enclosing
 chapter, section and subsection.  Then return that object for the
 current manual.
@@ -199,15 +199,19 @@ Extends L<"Collected" in OODoc::Text|OODoc::Text/"Collected">.
  
 =over 4
 
+=item $obj-E<gt>B<addExample>($object)
+
+Inherited, see L<OODoc::Text/"Collected">
+
 =item $obj-E<gt>B<collectedOptions>()
 
 Returns a list of option-default combinations on this subroutine.
 
 =item $obj-E<gt>B<default>($name|$object)
 
-In case of a $name, a default object for this method is looked up.  This
+In case of a C<$name>, a default object for this method is looked up.  This
 does not search through super classes, but solely which is defined with
-this subroutine.  When passed an $object of type OODoc::Text::Default
+this subroutine.  When passed an C<$object> of type L<OODoc::Text::Default|OODoc::Text::Default>
 that will be stored.
 
 =item $obj-E<gt>B<defaults>()
@@ -217,17 +221,13 @@ one manual.
 
 =item $obj-E<gt>B<diagnostic>($object)
 
-Add a new diagnostic message (a OODoc::Text::Diagnostic object) to the
+Add a new diagnostic message (a L<OODoc::Text::Diagnostic|OODoc::Text::Diagnostic> object) to the
 list already in this object.  You can not look for a message because
 these names are without use.
 
 =item $obj-E<gt>B<diagnostics>()
 
 Returns a list of all diagnostics.
-
-=item $obj-E<gt>B<example>($object)
-
-Inherited, see L<OODoc::Text/"Collected">
 
 =item $obj-E<gt>B<examples>()
 
@@ -248,9 +248,9 @@ Inherited, see L<OODoc::Text/"Collected">
 
 =item $obj-E<gt>B<option>($name|$object)
 
-In case of a $name, the option object for this method is looked up.  This
+In case of a C<$name>, the option object for this method is looked up.  This
 does not search through super classes, but solely which is defined with
-this subroutine.  When passed an $object of type OODoc::Text::Option
+this subroutine.  When passed an C<$object> of type L<OODoc::Text::Option|OODoc::Text::Option>
 that will be stored.
 
 =item $obj-E<gt>B<options>()
@@ -308,8 +308,8 @@ be a part of the chapter).
 
 =head1 SEE ALSO
 
-This module is part of OODoc version 3.00,
-built on August 02, 2025. Website: F<https://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.01,
+built on August 14, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 

@@ -1,0 +1,7 @@
+<%INIT>
+$Config->{OriginalMessageBoxRichTextInitArguments} = $Config->{MessageBoxRichTextInitArguments};
+</%INIT>
+
+<%ARGS>
+$Config
+</%ARGS>

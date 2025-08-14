@@ -15,7 +15,7 @@ WriteMakefile(
 	NAME		=> 'DateTime::Format::Genealogy',
 	AUTHOR		=> q{Nigel Horne <njh@bandsman.co.uk>},
 	VERSION_FROM	=> 'lib/DateTime/Format/Genealogy.pm',
-	ABSTRACT_FROM	   => 'lib/DateTime/Format/Genealogy.pm',
+	ABSTRACT_FROM	=> 'lib/DateTime/Format/Genealogy.pm',
 	((defined($ExtUtils::MakeMaker::VERSION) &&
 	 ($ExtUtils::MakeMaker::VERSION >= 6.3002))
 	  ? ('LICENSE'=> 'GPL')
@@ -41,6 +41,8 @@ WriteMakefile(
 		'Carp' => 0,
 		'DateTime::Format::Natural' => 0,
 		'Genealogy::Gedcom::Date' => 2.01,
+		'Params::Get' => 0.08,
+		'Readonly::Values::Months' => 0.02,
 		'Scalar::Util' => 0
 	}, dist => $dist,
 	clean		=> { FILES => 'DateTime-Format-Genealogy-*' },

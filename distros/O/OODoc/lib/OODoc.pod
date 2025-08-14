@@ -14,7 +14,7 @@ OODoc - object oriented production of software documentation
  use OODoc;
  my $doc = OODoc->new(distribution => 'My Name', version => '0.02');
  $doc->processFiles(workdir => $dest);
- $doc->prepare;
+ $doc->finalize;
  $doc->formatter('pod', workdir => $dest)->createPages;
  $doc->formatter('html', workdir => '/tmp/html')->createPages;
 
@@ -28,7 +28,7 @@ of the Perl tool-chain.
 
 Do not forget to B<read> the L</DETAILS> section further down on this
 manual-page to get started.  Please contribute ideas.  Have a look at
-the main website of this project at L<http://perl.overmeer.net/oodoc/>.
+the main website of this project at L<https://perl.overmeer.net/oodoc/>.
 That is also an example of the produced html output.
 
 Extends L<"DESCRIPTION" in OODoc::Object|OODoc::Object/"DESCRIPTION">.
@@ -65,7 +65,7 @@ Inherited, see L<OODoc::Object/"Constructors">
 
  -Option      --Default
   distribution  <required>
-  project       <distribution>
+  project       $distribution
   version       <from version or VERSION file>
 
 =over 2
@@ -84,8 +84,8 @@ or something which is nicer to read.
 
 The version number as automatically included in all packages after
 each package statement and on many places in the documentation. By
-default the current directory is searched for a file named C<version>
-or C<VERSION> which contains a number.
+default the current directory is searched for a file named F<version>
+or F<VERSION> which contains a number.
 
 =back
 
@@ -161,11 +161,11 @@ Inherited, see L<OODoc::Object/"Manual Repository">
 
 =item $obj-E<gt>B<processFiles>(%options)
 
-Z<>
+Extract the documentation from the selected files.
 
  -Option      --Default
   distribution  <from main OODoc object>
-  manifest      <source/>'MANIFEST'
+  manifest      "$source/MANIFEST"
   notice        ''
   parser        OODoc::Parser::Markov
   select        qr/\.(pod|pm)$/
@@ -198,8 +198,8 @@ The parser CLASS or OBJECT to be used to process the pages.
 =item select => ARRAY|REGEX|CODE
 
 The files which contain documentation to be processed.  You can provide
-a list of filenames as array reference, a REGEX which is used to select
-names from the manifest file, or a CODE reference which is used to
+a list of filenames as array reference, a C<REGEX> which is used to select
+names from the manifest file, or a C<CODE> reference which is used to
 select elements from the manifest (filename passed as first argument).
 Is your pod real pod or should it also be passed through the parser?
 
@@ -221,7 +221,9 @@ content is used as version value.  If these do not exist, then the
 main OODoc object needs to provide the version.
 
 To make C<Makefile.PL> option C<VERSION_FROM> to work with this
-seperate version file, that line should contain C<$VERSION = >.
+seperate version file, that line should contain something like
+
+   our $VERSION = 3.14;
 
 =item workdir => DIRECTORY
 
@@ -238,31 +240,20 @@ included in the release.
 =item $obj-E<gt>B<selectFiles>($which, LIST)
 
 Returns two array references: the first with files to process, and the second
-with files which do not need to be processed.  $which comes from
-L<processFiles(select)|OODoc/"Parser"> and the LIST are files from a manifest.
+with files which do not need to be processed.  C<$which> comes from
+L<processFiles(select)|OODoc/"Parser"> and the C<LIST> are files from a manifest.
 
 =back
 
-=head2 Preparation
+=head2 Actions
 
 =over 4
 
-=item $obj-E<gt>B<getPackageRelations>()
+=item $obj-E<gt>B<finalize>(%options)
 
-Compile all files which contain packages, and then try to find-out
-how they are related.
-
-=item $obj-E<gt>B<prepare>(%options)
-
-Add information to the documentation tree about inheritance relationships
-of the packages.  This C<prepare> must be called after the last
-L<processFiles()|OODoc/"Parser"> call, before the formatters are called.
-
-=back
-
-=head2 Main entries
-
-=over 4
+[3.01] After all documentation fragments have been read via L<processFiles()|OODoc/"Parser">,
+the pages need to be composed together.  For instance, inheritance and final
+cleanups are due here.
 
 =item $obj-E<gt>B<formatter>($name|$class|$object, %options)
 
@@ -272,29 +263,35 @@ Returned is the formatter which is used: it may contain useful information
 for you.
 
 The first, optional argument specifies the type of pages to be produced.
-This can be either a predefined $name (currently available are C<pod>
-and C<html> representing L<OODoc::Format::Pod|OODoc::Format::Pod> and L<OODoc::Format::Html|OODoc::Format::Html>
-respectively), the name of a $class which needs to be instantiated,
-or an instantiated formatter.
+This can be either a predefined C<$name> (currently available are C<pod>
+and C<html>, representing L<OODoc::Format::Pod|OODoc::Format::Pod> and L<OODoc::Format::Html|OODoc::Format::Html>
+respectively), the name of a C<$class> which needs to be instantiated,
+or an instantiated formatter C<$object>.
 
-You can also pass many options which are passed to L<OODoc::Format::createPages()|OODoc::Format/"Page generation">
+You can also pass many options which are passed to (the effective extension
+of) L<OODoc::Format::createPages()|OODoc::Format/"Page generation">.
 
  -Option  --Default
-  manifest  <workdir>/MANIFEST
+  manifest  workdir/MANIFEST
   workdir   <required>
 
 =over 2
 
 =item manifest => FILENAME|undef
 
-The names of the produced files are appended to this file.  When undef
+The names of the produced files are appended to this file content.  When C<undef>
 is given, no file will be written for this.
 
-=item workdir => DIRECTORY
+=item workdir => $directory
 
-The directory where the output is going to.
+The C<$directory> where the output is going to.
 
 =back
+
+=item $obj-E<gt>B<getPackageRelations>()
+
+Compile all files which contain packages, and then try to find-out
+how they are related.
 
 =item $obj-E<gt>B<stats>()
 
@@ -337,12 +334,12 @@ syntax.  POD is very simple to learn, and the produced manual pages
 look like standard Unix manual pages.  However, when you start writing
 larger programs, you start seeing the weaker aspects of POD.
 
-One of the main problems with POD is that is using a visual markup
-style: you specify information by how it must be presented to the
-viewer.  This in contrast with logical markup where you specify the
-information more abstract, and a visual representation is created by
-an application.  For instance in HTML defines an C<I> tag as visual markup
-Italic, and C<EM> as logical markup for EMphasis, which will usually show
+One of the main problems with POD is that is using a visual markup style:
+you specify information by how it must be presented to the viewer.
+This in contrast with logical markup where you specify the information
+more abstract, and a visual representation is created by an application.
+For instance, HTML defines an C<< <I> >> tag as visual markup Italic,
+and C<< <EM> >> as logical markup for EMphasis, which will usually show
 in italic.
 
 The main disadvantage of visual markup is limited expression: the
@@ -444,7 +441,7 @@ the distribution of your module.  The simpest script looks like this:
   );
 
  $doc->processFiles(...);  # parsing
- $doc->prepare;            # collecting
+ $doc->finalize(...);      # collecting
  $doc->formatter('pod', ...)->createPages(...);
                            # formatting to POD
 
@@ -456,16 +453,16 @@ to add options to the calls to adapt the result more to your own taste.
 =head3 use oodist
 
 This distribution comes with a script named C<oodist>, which automates
-a most steps of your release process.  To start using OODoc with your
-existing distribution, simply run this:
+most steps of your release process (to CPAN).  To start using OODoc with
+your existing distribution, simply run this:
 
 =over 4
 
-=item 1. go to the root of your module
+=item 1. go to the root directory of your module
 
 =item 2. run 'oodist'
 
-=item 3. follow the instructions to configure OODoc
+=item 3. follow the instructions to configure oodist
 
 =item 4. run 'oodist -v'
 
@@ -484,9 +481,9 @@ To test the document production for C<My::Module>, try (on UNIX/Linux)
 
 =over 4
 
-=item Error: Cannot compile $parser class
+=item Error: Cannot compile parser class
 
-The $parser class does not exist or produces compiler errors.
+The C<parser> class does not exist or produces compiler errors.
 
 =item Error: Cannot read version from file $fn: $!
 
@@ -494,7 +491,7 @@ Z<>
 
 =item Error: Parser $parser could not be instantiated
 
-Something went wrong while starting the parser object.  Probably there is
+Something went wrong while starting the C<$parser> object.  Probably there is
 an other error message which will tell you the exact cause.
 
 =item Error: cannot copy distribution file $fn to $dest: $!
@@ -504,7 +501,7 @@ tree to the location where the distribution is made.
 
 =item Error: formatter requires a directory to write the manuals to
 
-You have to give a value to C<workdir>, which will be used as top directory
+You have to provide a value to C<workdir>, which will be used as top directory
 for the produced output.  It does not matter whether there is already some
 stuff in that directory.
 
@@ -523,7 +520,7 @@ will be skipped for now, but may cause problems later on.
 
 Version information will be added to all packages and all manual
 pages.  You need to specify a version and be sure that it changes
-with each release, or create a file named C<version> or C<VERSION>
+with each release, or create a file named F<version> or F<VERSION>
 which contains that data.
 
 =item Error: problems compiling $code for package $name: $@
@@ -541,7 +538,7 @@ option is enforced to avoid the accidental omission of the parameter.
 When processing the manifest file, some files must be copied directly
 to a temporary directory.  The packages are first stripped from
 their pseudo doc, and then written to the same directory.  That
-directory will be the place where C<make dist> is run later.
+directory will be the place where C<< make dist >> is run later.
 
 =item Error: the distribution must be specified
 
@@ -550,7 +547,7 @@ Z<>
 =item Error: there is no version defined for the source files
 
 Each manual will need a version number.  There are various ways to
-specify one.  For instance, create a file named C<version> or C<VERSION>
+specify one.  For instance, create a file named F<version> or F<VERSION>
 in the top source directory of your distribution, or specify a version
 as argument to L<OODoc::new()|OODoc/"METHODS"> or L<OODoc::processFiles()|OODoc/"Parser">.
 
@@ -563,8 +560,8 @@ an ARRAY, regular expression, or a code reference.
 
 =head1 SEE ALSO
 
-This module is part of OODoc version 3.00,
-built on August 02, 2025. Website: F<https://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.01,
+built on August 14, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 

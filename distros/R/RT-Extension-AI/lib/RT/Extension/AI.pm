@@ -3,7 +3,7 @@ use warnings;
 
 package RT::Extension::AI;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 require RT::Extension::AI::Provider;
 require RT::Extension::AI::Provider::OpenAI;
@@ -61,7 +61,7 @@ in your database.
 If you are upgrading this module, check for upgrading instructions
 in case changes need to be made to your database.
 
-=item Edit your F</opt/rt5/etc/RT_SiteConfig.pm>
+=item Edit your F</opt/rt6/etc/RT_SiteConfig.pm>
 
 Add this line:
 
@@ -99,6 +99,7 @@ Here is a sample configuration with Gemini:
                 translate_content => 'Translate the provided text, maintaining accuracy and idiomatic expressions.',
                 autocomplete_text => 'Predict the next three words based on the input text without explanations.',
              },
+             editor_features => [ 'adjust_tone', 'suggest_response', 'translate_content', 'autocomplete_text' ],
           },
     );
 
@@ -128,6 +129,7 @@ Below shows a sample configuration with OpenAI:
                 translate_content => 'Translate the provided text, maintaining accuracy and idiomatic expressions.',
                 autocomplete_text => 'Predict the next three words based on the input text without explanations.',
             },
+            editor_features => [ 'adjust_tone', 'suggest_response', 'translate_content', 'autocomplete_text' ],
           },
     );
 

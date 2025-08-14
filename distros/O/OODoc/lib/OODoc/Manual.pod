@@ -201,8 +201,8 @@ Inherited, see L<OODoc::Object/"Manual Repository">
 
 =item $obj-E<gt>B<chapter>($name|$object)
 
-When a $name (a string) given, the chapter with that name is returned, or
-C<undef> when it is not known.  With an $object, that object is added to
+When a C<$name> (a string) given, the chapter with that name is returned, or
+C<undef> when it is not known.  With an C<$object>, that object is added to
 the list of chapters.
 
 =item $obj-E<gt>B<chapters>( [\@chapters] )
@@ -241,7 +241,7 @@ Returns the name of the manual, which is found in the NAME chapter.
 
 =item $obj-E<gt>B<subroutine>($name)
 
-Returns the subroutine with the specified $name as object reference.  When
+Returns the subroutine with the specified C<$name> as object reference.  When
 the manual is part of a package description which is spread over multiple
 manuals, then these other manuals will be searched as well.
 
@@ -266,8 +266,8 @@ example:
 
 =item $obj-E<gt>B<all>($method, $parameters)
 
-Call L<OODoc::Text::Structure::all()|OODoc::Text::Structure/"Collected"> on all chapters, passing the $method
-and $parameters.  In practice, this means that you can simply collect
+Call L<OODoc::Text::Structure::all()|OODoc::Text::Structure/"Collected"> on all chapters, passing the C<$method>
+and C<$parameters>.  In practice, this means that you can simply collect
 kinds of information from various parts within the manual page.
 
 example: 
@@ -280,7 +280,7 @@ Returns a list of manuals which contain extra code for this package.
 
 =item $obj-E<gt>B<inherited>($subroutine|$option)
 
-Returns whether the $subroutine or $option was defined by this manual page,
+Returns whether the C<$subroutine> or C<$option> was defined by this manual page,
 or inherited from it.
 
 =item $obj-E<gt>B<ownSubroutines>()
@@ -291,19 +291,19 @@ itself.  L<subroutines()|OODoc::Manual/"Collected"> returns them all.
 =item $obj-E<gt>B<realizers>( [$packages] )
 
 Returns a list of packages which can realize into this object
-using Object::Realize::Later magic.  When $packages (names or objects)
+using Object::Realize::Later magic.  When C<$packages> (names or objects)
 are specified, they are added first.
 
 =item $obj-E<gt>B<realizes>( [$package] )
 
 Returns the class into which this class can be realized.  This is
-a trick of the Object::Realize::Later module.  The $package (name or
+a trick of the Object::Realize::Later module.  The C<$package> (name or
 object) will be set first, if specified.
 
 =item $obj-E<gt>B<subClasses>( [$packages] )
 
 Returns the names of all sub-classes (extensions) of this package.
-When $packages (names or objects) are specified, they are first added
+When C<$packages> (names or objects) are specified, they are first added
 to the list.
 
 =item $obj-E<gt>B<superClasses>( [$packages] )
@@ -333,6 +333,12 @@ still has to be cleaned-up before inclusion.
 =item $obj-E<gt>B<expand>()
 
 Add the information of lower level manuals into this one.
+
+=item $obj-E<gt>B<finalize>(%options)
+
+[3.01] The manual processor gets a last chance to work on the document.
+
+All C<%options> are passed to L<OODoc::Parser::Markov::finalizeManual()|OODoc::Parser::Markov/"Producing manuals">.
 
 =item $obj-E<gt>B<mergeStructure>(%options)
 
@@ -378,8 +384,8 @@ gets ignored.
 
 =item $obj-E<gt>B<mostDetailedLocation>($object)
 
-The $object (a text element) is located in some subsection, section or
-chapter.  But the $object may also be an extension to a piece of
+The C<$object> (a text element) is located in some subsection, section or
+chapter.  But the C<$object> may also be an extension to a piece of
 documentation which is described in a super class with a location in
 more detail.  The most detailed location for the description is returned.
 
@@ -495,8 +501,8 @@ is not permitted.  Join the contents of both parts.
 
 =head1 SEE ALSO
 
-This module is part of OODoc version 3.00,
-built on August 02, 2025. Website: F<https://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.01,
+built on August 14, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 

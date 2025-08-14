@@ -21,9 +21,9 @@ OODoc::Format - base class for all OODoc formatters
 
 A formater produces manual pages in some way or an other which contain
 (parts of) the module documentation.  Each formatter class is based on
-this OODoc::Format class, which should not be instantiated directly.
+this L<OODoc::Format|OODoc::Format> class, which should not be instantiated directly.
 By far most users will never explicitly create a formatter by themselves:
-it is created implicitly when L<OODoc::formatter()|OODoc/"Main entries"> is called on a L<OODoc|OODoc>
+it is created implicitly when L<OODoc::formatter()|OODoc/"Actions"> is called on a L<OODoc|OODoc>
 object.
 
 Currently available formatters:
@@ -206,7 +206,7 @@ Inherited, see L<OODoc::Object/"Manual Repository">
 
 =item $obj-E<gt>B<cleanup>($manual, $text, %options)
 
-Takes the $text and cleans it up to be in the right format for the current
+Takes the C<$text> and cleans it up to be in the right format for the current
 output syntax.  The cleaning up is parser dependent, and therefore the
 parser of the manual is addressed to do the work.
 
@@ -222,7 +222,7 @@ This CODE reference is used to create an absolute link to a text
 fragment.  It is called with the manual and the object where is
 linked to (any L<OODoc::Text|OODoc::Text> object).  As third parameter,
 a string can be provided which should be displayed instead of the
-object name.  Finally, all %options are passed as settings, by
+object name.  Finally, all C<%options> are passed as settings, by
 reference to a HASH.
 
 =item tag => $word|\@words
@@ -343,11 +343,11 @@ called with a manual as only argument.
 
 =item $obj-E<gt>B<showChapter>(%options)
 
-You can pass all %options about formatting to this method.  They will passed
+You can pass all C<%options> about formatting to this method.  They will passed
 to the related methods.  So: the list of options you can pass here is much
 longer: the combination of everything possible for all show* methods.
 
-In the %option list, C<$BLOCK> can be C<chapter>, C<section>, C<subsection>,
+In the C<%options>, C<$BLOCK> can be C<chapter>, C<section>, C<subsection>,
 and C<subsubsection>.
 
  -Option               --Default
@@ -355,9 +355,9 @@ and C<subsubsection>.
   manual                 <required>
   output                 <required>
   show_examples          'EXPAND'
-  show_examples_$block   <show_examples>
+  show_examples_$BLOCK   <show_examples>
   show_inherited         'REFER'
-  show_inherited_$block  <show_inherited>
+  show_inherited_$BLOCK  <show_inherited>
 
 =over 2
 
@@ -369,14 +369,14 @@ and C<subsubsection>.
 
 =item show_examples => 'NO'|'EXPAND'
 
-=item show_examples_$block => 'NO'|'REFER'|'EXPAND'
+=item show_examples_$BLOCK => 'NO'|'REFER'|'EXPAND'
 
 =item show_inherited => 'NO'|'REFER'|'EXPAND'
 
 REFER means that inherited sections are simply listed as reference
 to the manual page which describes it.
 
-=item show_inherited_$block => 'NO'|'REFER'|'EXPAND'
+=item show_inherited_$BLOCK => 'NO'|'REFER'|'EXPAND'
 
 =back
 
@@ -468,7 +468,7 @@ Z<>
 
 =item $obj-E<gt>B<showOptions>(%options)
 
-The options shown are B<not> the %options passed as argument, but the
+The options shown are B<not> the C<%options> passed as argument, but the
 options which belong to the subroutine being displayed.
 
  -Option                --Default
@@ -497,12 +497,12 @@ Z<>
 
 Z<>
 
-=item $obj-E<gt>B<showSubroutine>( <@> )
+=item $obj-E<gt>B<showSubroutine>(%options)
 
-Z<>
+Show a single subroutine.
 
  -Option                --Default
-  last                    0
+  last                    false
   manual                  <required>
   output                  <selected filehandle>
   show_described_options  'EXPAND'
@@ -518,7 +518,7 @@ Z<>
 
 =item last => BOOLEAN
 
-=item manual => MANUAL
+=item manual => $manual
 
 =item output => FILE
 
@@ -714,8 +714,8 @@ Z<>
 
 =head1 SEE ALSO
 
-This module is part of OODoc version 3.00,
-built on August 02, 2025. Website: F<https://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.01,
+built on August 14, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 

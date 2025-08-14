@@ -25,7 +25,7 @@ OODoc::Text - text component as found in a manual
 
 The parsers (implemented in the L<OODoc::Parser|OODoc::Parser> classes) scan
 the documentation as written down by the author of the module, and
-build a tree of these OODoc::Text objects from it. Then, any formatter
+build a tree of these L<OODoc::Text|OODoc::Text> objects from it. Then, any formatter
 (implemented by the L<OODoc::Format|OODoc::Format> classes) can take this tree of text
 objects and convert it into manual pages.
 
@@ -202,15 +202,15 @@ Inherited, see L<OODoc::Object/"Manual Repository">
 
 =over 4
 
-=item $obj-E<gt>B<example>($object)
+=item $obj-E<gt>B<addExample>($object)
 
-Add a new example (a OODoc::Text::Example object) to the list already in
-this object.  You can not look for a specific because they have no real
-name (only a sequence number).
+Add a new example (an L<OODoc::Text::Example|OODoc::Text::Example> object) to the list already
+in this object.  You can not search for a specific example, because they
+have no real name (only a sequence number).
 
 =item $obj-E<gt>B<examples>()
 
-Returns a list of all examples contained in this text element.
+Returns a LIST of all examples contained in this text element.
 
 =item $obj-E<gt>B<findDescriptionObject>()
 
@@ -265,8 +265,8 @@ define the elements relative location.
 
 =head1 SEE ALSO
 
-This module is part of OODoc version 3.00,
-built on August 02, 2025. Website: F<https://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.01,
+built on August 14, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 

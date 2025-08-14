@@ -1,5 +1,5 @@
-# This code is part of Perl distribution OODoc version 3.00.
-# The POD got stripped from this file by OODoc version 3.00.
+# This code is part of Perl distribution OODoc version 3.01.
+# The POD got stripped from this file by OODoc version 3.01.
 # For contributors see file ChangeLog.
 
 # This software is copyright (c) 2003-2025 by Mark Overmeer.
@@ -9,7 +9,7 @@
 # SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
 
 package OODoc::Manual;{
-our $VERSION = '3.00';
+our $VERSION = '3.01';
 }
 
 use parent 'OODoc::Object';
@@ -238,11 +238,11 @@ sub extraCode()
 
 sub all($@)
 {   my $self = shift;
-    map { $_->all(@_) } $self->chapters;
+    map $_->all(@_), $self->chapters;
 }
 
 
-sub inherited($) {$_[0]->name ne $_[1]->manual->name}
+sub inherited($) { $_[0]->name ne $_[1]->manual->name }
 
 
 sub ownSubroutines
@@ -276,6 +276,8 @@ sub expand()
 {   my $self = shift;
     $self->{OM_is_expanded} and return $self;
 
+    trace "expand manual $self";
+
     #
     # All super classes must be expanded first.  Manuals for
     # extra code are considered super classes as well.  Super
@@ -287,7 +289,8 @@ sub expand()
     $_->expand for @supers;
 
     #
-    # Expand chapters, sections and subsections.
+    # Expand chapters, sections and subsections
+	# Subsubsections are not merged, IMO the better choice.
     #
 
     my @chapters = $self->chapters;
@@ -454,6 +457,10 @@ sub mostDetailedLocation($)
 
 sub createInheritance()
 {   my $self = shift;
+	my $has = $self->chapter('INHERITANCE');
+    return $has if defined $has;
+
+    trace "create inheritance for $self";
 
     if($self->name ne $self->package)
     {   # This is extra code....
@@ -549,6 +556,18 @@ sub publish($%)
 
     $exporter->processingManual(undef);
     $p;
+}
+
+
+sub finalize(%)
+{	my ($self, %args) = @_;
+
+    trace "finalize manual $self";
+
+	# Maybe the parser has still things to do
+	$self->parser->finalizeManual($self, %args);
+
+	$self;
 }
 
 #-------------------------------------------

@@ -8,11 +8,11 @@
       <div class="modal-body">
         <%perl>
           if ($callType eq 'translate_content') {
-              $m->comp('/AI/TranslateForm', rawText => $rawText, transFrom => $transFrom, transTo => $transTo, TicketObj => $TicketObj);
+              $m->comp('/AI/TranslateForm', rawText => $rawText, transFrom => $transFrom, transTo => $transTo, TicketObj => $TicketObj, QueueObj => $QueueObj);
           } elsif ($callType eq 'adjust_tone') {
-              $m->comp('/AI/AdjustToneForm', rawText => $rawText, callType => $callType, TicketObj => $TicketObj);
+              $m->comp('/AI/AdjustToneForm', rawText => $rawText, callType => $callType, TicketObj => $TicketObj, QueueObj => $QueueObj);
           } else {
-              $m->comp('/AI/SuggestionForm', rawText => $rawText, callType => $callType, TicketObj => $TicketObj);
+              $m->comp('/AI/SuggestionForm', rawText => $rawText, callType => $callType, TicketObj => $TicketObj, QueueObj => $QueueObj);
           }
         </%perl>
       </div>
@@ -29,4 +29,5 @@ $callType       => ''
 $transFrom      => ''
 $transTo        => ''
 $TicketObj      => undef
+$QueueObj       => undef
 </%ARGS>

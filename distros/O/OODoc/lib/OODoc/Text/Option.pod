@@ -189,7 +189,7 @@ Extends L<"Collected" in OODoc::Text|OODoc::Text/"Collected">.
  
 =over 4
 
-=item $obj-E<gt>B<example>($object)
+=item $obj-E<gt>B<addExample>($object)
 
 Inherited, see L<OODoc::Text/"Collected">
 
@@ -237,8 +237,8 @@ to L<manualsForPackage()|OODoc::Object/"Manual Repository"> or L<mainManual()|OO
 
 =head1 SEE ALSO
 
-This module is part of OODoc version 3.00,
-built on August 02, 2025. Website: F<https://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.01,
+built on August 14, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 

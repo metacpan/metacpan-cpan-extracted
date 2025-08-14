@@ -1,4 +1,4 @@
-package LedgerSMB::Installer::OS::linux::debian v0.999.9;
+package LedgerSMB::Installer::OS::linux::debian v0.999.10;
 
 use v5.20;
 use experimental qw(signatures);
@@ -201,7 +201,7 @@ sub _rm_installed($pkgs) {
 
 sub pkg_deps_latex($self) {
     return (_rm_installed([ qw(texlive-latex-recommended texlive-fonts-recommended
-                 texlive-plain-generic texlive-xetex) ]),
+                               texlive-plain-generic texlive-xetex texlive-latex-extra) ]),
             []);
 }
 

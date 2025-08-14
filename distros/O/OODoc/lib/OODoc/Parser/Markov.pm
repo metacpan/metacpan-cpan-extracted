@@ -1,5 +1,5 @@
-# This code is part of Perl distribution OODoc version 3.00.
-# The POD got stripped from this file by OODoc version 3.00.
+# This code is part of Perl distribution OODoc version 3.01.
+# The POD got stripped from this file by OODoc version 3.01.
 # For contributors see file ChangeLog.
 
 # This software is copyright (c) 2003-2025 by Mark Overmeer.
@@ -9,7 +9,7 @@
 # SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
 
 package OODoc::Parser::Markov;{
-our $VERSION = '3.00';
+our $VERSION = '3.01';
 }
 
 use parent 'OODoc::Parser';
@@ -32,7 +32,7 @@ use OODoc::Manual              ();
 
 use File::Spec;
 
-my $url_modsearch = "http://search.cpan.org/perldoc?";
+my $url_modsearch = 'https://metacpan.org/dist/';
 my $url_coderoot  = 'CODE';
 my @default_rules;
 
@@ -60,7 +60,7 @@ sub setBlock($)
 }
 
 
-sub inDoc(;$) { my $s = shift; @_ ? $s->{OPM_in_pod} = shift : $s->{OPM_in_pod} }
+sub inDoc(;$) { my $s = shift; @_ ? ($s->{OPM_in_pod} = shift) : $s->{OPM_in_pod} }
 
 
 sub currentManual(;$) { my $s = shift; @_ ? ($s->{OPM_manual} = shift) : $s->{OPM_manual} }
@@ -76,6 +76,7 @@ sub rules() { $_[0]->{OPM_rules} }
   , [ '=section'    => 'docSection'    ]
   , [ '=subsection' => 'docSubSection' ]
   , [ '=subsubsection' => 'docSubSubSection' ]
+
   , [ '=method'     => 'docSubroutine' ]
   , [ '=i_method'   => 'docSubroutine' ]
   , [ '=c_method'   => 'docSubroutine' ]
@@ -83,20 +84,25 @@ sub rules() { $_[0]->{OPM_rules} }
   , [ '=function'   => 'docSubroutine' ]
   , [ '=tie'        => 'docSubroutine' ]
   , [ '=overload'   => 'docSubroutine' ]
+
   , [ '=option'     => 'docOption'     ]
   , [ '=default'    => 'docDefault'    ]
   , [ '=requires'   => 'docRequires'   ]
   , [ '=example'    => 'docExample'    ]
   , [ '=examples'   => 'docExample'    ]
+
   , [ '=error'      => 'docDiagnostic' ]
   , [ '=warning'    => 'docDiagnostic' ]
   , [ '=notice'     => 'docDiagnostic' ]
+  , [ '=info'       => 'docDiagnostic' ]
+  , [ '=alert'      => 'docDiagnostic' ]
   , [ '=debug'      => 'docDiagnostic' ]
  
   # deprecated
   , [ '=head1'      => 'docChapter'    ]
   , [ '=head2'      => 'docSection'    ]
   , [ '=head3'      => 'docSubSection' ]
+  , [ '=head4'      => 'docSubSubSection' ]
  
   # problem spotter
   , [ qr/^(warn|die|carp|confess|croak)\s/ => 'debugRemains' ]
@@ -110,7 +116,7 @@ sub rules() { $_[0]->{OPM_rules} }
 
 sub rule($$)
 {   my ($self, $match, $action) = @_;
-    push @{$self->rules}, [$match, $action];
+    push @{$self->rules}, +[ $match, $action ];
     $self;
 }
 
@@ -156,11 +162,10 @@ sub parse(@)
     my $pure_pod = $input =~ m/\.pod$/;
     if($pure_pod)
     {   $manual = OODoc::Manual->new
-          ( package  => $self->filenameToPackage($input)
-          , pure_pod => 1
-          , source   => $input
-          , parser   => $self
-
+          ( package      => $self->filenameToPackage($input)
+          , pure_pod     => 1
+          , source       => $input
+          , parser       => $self
           , distribution => $distr
           , version      => $version
           );
@@ -220,7 +225,7 @@ sub parse(@)
         {   $self->$action($match, $line, $input, $ln)
                 or $out->print($line);
         }
-        elsif($line =~ m/^=(over|back|item|for|pod|begin|end|head4|encoding)\b/)
+        elsif($line =~ m/^=(over|back|item|for|pod|begin|end|encoding)\b/)
         {   ${$self->{OPM_block}} .= "\n". $line;
             $self->inDoc(1);
         }
@@ -297,7 +302,7 @@ sub docChapter($$$$)
 sub closeChapter()
 {   my $self = shift;
     my $chapter = delete $self->{OPM_chapter} or return;
-    $self->closeSection()->closeSubroutine();
+    $self->closeSection->closeSubroutine;
 }
 
 #-------------------------------------------
@@ -325,7 +330,7 @@ sub docSection($$$$)
 sub closeSection()
 {   my $self    = shift;
     my $section = delete $self->{OPM_section} or return $self;
-    $self->closeSubSection();
+    $self->closeSubSection;
 }
 
 #-------------------------------------------
@@ -395,21 +400,21 @@ sub docSubroutine($$$$)
     $line    =~ s/^\=(\w+)\s+//;
     my $type = $1;
 
-    my ($name, $params)
-     = $type eq 'overload' ? ($line, '')
-     :                       $line =~ m/^(\w*)\s*(.*?)\s*$/;
+    my ($name, $params) = $type eq 'overload' ? ($line, '') : $line =~ m/^(\w*)\s*(.*?)\s*$/;
 
     my $container = $self->{OPM_subsection} || $self->{OPM_section} || $self->{OPM_chapter}
         or error __x"subroutine {name} outside chapter in {file} line {line}", name => $name, file => $fn, line => $ln;
 
     $type    = 'i_method' if $type eq 'method';
-    my $sub  = $self->{OPM_subroutine} =
-       OODoc::Text::Subroutine->new(type => $type, name => $name, parameters => $params, linenr => $ln, container => $container);
+    my $sub  = $self->{OPM_subroutine} = OODoc::Text::Subroutine->new(type => $type, name => $name,
+		parameters => $params, linenr => $ln, container => $container);
 
     $self->setBlock($sub->openDescription);
     $container->addSubroutine($sub);
     $sub;
 }
+
+sub activeSubroutine() { $_[0]->{OPM_subroutine} }
 
 sub closeSubroutine()
 {   my $self = shift;
@@ -430,7 +435,7 @@ sub docOption($$$$)
     }
     my ($name, $parameters) = ($1, $2);
 
-    my $sub  = $self->{OPM_subroutine}
+    my $sub  = $self->activeSubroutine
         or error __x"option {name} outside subroutine in {file} line {line}", name => $name, file => $fn, line => $ln;
 
     my $option  = OODoc::Text::Option->new
@@ -459,7 +464,7 @@ sub docDefault($$$$)
 
     my ($name, $value) = ($1, $2);
 
-    my $sub = $self->{OPM_subroutine}
+    my $sub = $self->activeSubroutine
        or error __x"default for option {name} outside subroutine in {file} line {line}", name => $name, file => $fn, line => $ln;
 
     my $default = OODoc::Text::Default->new(name => $name, value => $value, linenr => $ln, subroutine => $sub);
@@ -497,7 +502,7 @@ sub docDiagnostic($$$$)
         return;
     }
 
-    my $sub  = $self->{OPM_subroutine}
+    my $sub  = $self->activeSubroutine
         or error __x"diagnostic {type} outside subroutine in {file} line {line}", type => $type, file => $fn, line => $ln;
 
     my $diag  = OODoc::Text::Diagnostic->new(type => ucfirst($type), name => $line, linenr => $ln, subroutine => $sub);
@@ -517,7 +522,7 @@ sub docExample($$$$)
     $line =~ s/^=examples?\s*//;
     $line =~ s/^\#.*//;
 
-    my $container = $self->{OPM_subroutine}
+    my $container = $self->activeSubroutine
                  || $self->{OPM_subsubsection}
                  || $self->{OPM_subsection}
                  || $self->{OPM_section}
@@ -529,7 +534,7 @@ sub docExample($$$$)
     my $example  = OODoc::Text::Example->new(name => ($line || ''), linenr => $ln, container => $container);
 
     $self->setBlock($example->openDescription);
-    $container->example($example);
+    $container->addExample($example);
     $example;
 }
 
@@ -644,7 +649,7 @@ sub decomposeL($$)
         }
 
         if($man !~ m/\(\d.*\)\s*$/)
-        {   (my $escaped = $man) =~ s/\W+/_/g;
+        {   my $escaped = $man =~ s/\W+/_/gr;
             $dest = "$url_modsearch$escaped";
         }
     }
@@ -680,6 +685,7 @@ sub cleanupPod($$$)
         undef $protect if $lines[$i] =~ m/^\s*$/ && $protect && $protect eq 'for';
         next if $protect;
 
+		$lines[$i] =~ s/\bP\<([^>]*)\>/C<$1>/g;
         $lines[$i] =~ s/\bM\<([^>]*)\>/$self->cleanupPodM($manual, $1, \%args)/ge;
 
         $lines[$i] =~ s/\bL\<([^>]*)\>/$self->cleanupPodL($manual, $1, \%args)/ge
@@ -696,7 +702,7 @@ sub cleanupPod($$$)
             }
         }
         else
-        {   $lines[$i] =~ s/^\\\=/\=/;
+        {   $lines[$i] =~ s/^\\\=/=/;
         }
 
         # Remove superfluous blanks
@@ -724,6 +730,22 @@ sub cleanupPodL($$$)
 {   my ($self, $manual, $link, $args) = @_;
     my ($toman, $to, $href, $text) = $self->decomposeL($manual, $link);
     $text;
+}
+
+sub _htmlReformat($$$$)
+{	my ($self, $manual, $key, $body, $args) = @_;
+	    $key eq 'B' ? "<b>$body</b>"
+	  : $key eq 'C' ? "<code>$body</code>"
+	  : $key eq 'E' ? "&$body;"
+      : $key eq 'F' ? qq{<i class="filename">$body</i>}
+	  : $key eq 'I' ? "<i>$body</i>"
+	  : $key eq 'L' ? $self->cleanupHtmlL($manual, $body, $args)
+	  : $key eq 'M' ? $self->cleanupHtmlM($manual, $body, $args)
+	  : $key eq 'P' ? qq{<tt class="parameter">$body</tt>}
+	  : $key eq 'S' ? $body =~ s/[ ]/&nbsp;/gr
+	  : $key eq 'X' ? ''
+	  : $key eq 'Z' ? '&ZeroWidthSpace;'
+	  : error __x"Unknown format key '{key}' in manual {manual}", key => $key, manual => $manual->name;
 }
 
 sub cleanupHtml($$$)
@@ -758,31 +780,22 @@ sub cleanupHtml($$$)
     {   unless($is_html)
         {   s#\&#\&amp;#g;
             s#(\s|^)\<([^>]+)\>#$1&lt;$2&gt;#g;
-            s#(?<!\b[LFCIBEMX])\<#&lt;#g;
+            s#(?<!\b[BCEFILSXMP])\<#&lt;#g;
             s#([=-])\>#$1\&gt;#g;
         }
-        s/\bM\<([^>]*)\>/$self->cleanupHtmlM($manual, $1, \%args)/ge;
-        s/\bL\<([^>]*)\>/$self->cleanupHtmlL($manual, $1, \%args)/ge;
-        s#\bI\<([^>]*)\>#<em>$1</em>#g;
-        s#\bB\<([^>]*)\>#<b>$1</b>#g;
-        s#\bE\<([^>]*)\>#\&$1;#g;
-        s#^\=over\s+\d+\s*#\n<ul>\n#gms;
-        s#(?:\A|\n)\=item\s*(?:\*\s*)?([^\n]*)#\n<li>$1<br />#gms;
-        s#(?:\A|\s*)\=back\b#\n</ul>#gms;
-        s#\bC\<([^>]*)\>#<code>$1</code>#g;  # introduces a '<', hence last
-        s#^=pod\b##gm;
+		s# \b ([A-Z]) (?: \<\<\s*(.*?)\s*\>\> | \<(.*?)\> ) #
+			$self->_htmlReformat($manual, $1, $+, \%args) #gxe;
 
-        # when F<> contains a URL, it will be used. However, when it
-        # contains a file, we cannot do anything with it yet.
-        s#\bF\<(\w+\://[^>]*)\>#<a href="$1">$1</a>#g;
-        s#\bF\<([^>]*)\>#<tt>$1</tt>#g;
+        s#^\=over(?:\s+\d+)?\s*$#\n<ul>\n#gms;
+        s#^\=item\s*(?:\*\s*)?([^\n]*)#\n<li>$1<br />#gms;
+        s#^\=back\b#\n</ul>#gms;
+        s#^\=pod\b##gm;
 
         my ($label, $level, $title);
         s#^\=head([1-6])\s*([^\n]*)#
-          ($title, $level) = ($1, $2);
-          $label = $title;
-          $label =~ s/\W+/_/g;
-          qq[<h$level class="$title"><a name="$label">$title</a></h$level>];
+			($title, $level) = ($1, $2);
+			$label = $title =~ s/\W+/_/gr;
+			qq[<h$level class="$title"><a name="$label">$title</a></h$level>];
          #ge;
 
         next if $is_html;
@@ -820,6 +833,150 @@ sub cleanupHtmlL($$$)
    : !defined $to  ? $text
    : ref $to       ? $args->{create_link}->($toman, $to, $text, $args)
    :                 qq[<a href="$to">$text</a>]
+}
+
+
+sub _collectParamsAllCaps($$$)
+{	my ($self, $params, $group, $string) = @_;
+	my @found = map +( $_ => $group ), $string =~ m! \b ([A-Z][A-Z\d]*) \b !gx;
+	+{ %$params, @found };
+}
+
+sub _collectParams($$$)
+{	my ($self, $params, $group, $string) = @_;
+	my @found = map +( $_ => $group ), $string =~ m!( [\$\@\%]\w+ )!gx;
+	+{ %$params, @found };
+}
+
+sub _markupSplit($)
+{	my ($self, $text) = @_;
+
+	split /
+		( \b[A-Z]\<\< .*? \>\>   # double angled markup
+		| \b[A-Z]\< .*? \>       # single angled markup
+		| ^ [ \t] [^\n]+         # document code blocks
+		)
+	/xms, $text;
+}
+
+sub _markupText($$%)
+{	my ($self, $text, $where, %args) = @_;
+
+	my @frags = $self->_markupSplit($text);
+	my @rewritten;
+
+	while(@frags)
+	{	my ($text, $markup) = (shift @frags, shift @frags);
+
+		if($args{make_m})
+		{	$text =~ s/ \b ( [A-Z]\w+ (?: \:\: [A-Z]\w+ )+ ) \b /M<$1>/gx;
+		}
+
+		if(my $c = $args{make_c})
+		{	foreach my $w (@$c)
+			{	$text =~ s/ \b (\Q$w\E) \b /C<$1>/gx;
+			}
+		}
+
+		if($args{make_p})
+		{	my $params = $args{params} || {};
+
+			# auto-P variable
+			$text =~ s! ( [\$\@\%]\w+ ) !
+				my $p = $1;
+			   	$params->{$p}
+			 	? "P<$p>"
+			 	: ((warning __x"In {where}, text uses unknown '{label}'", label => $p, where => $where), $p);
+			!gxe;
+
+			# auto-P capitals, like HASH
+
+			$text =~ s! ( \b[A-Z][A-Z\d]*\b ) !
+				my $p = $1;
+				$params->{$p} ? "P<$p>" : $p;
+			!gxe;
+		}
+
+		push @rewritten, $text;
+		push @rewritten, $markup if defined $markup;
+	}
+
+	join '', @rewritten;
+}
+
+sub autoMarkup($$%)
+{	my ($self, $manual, $struct, %args) = @_;
+	return if $manual->inherited($struct);
+
+	my $where = $manual->name . '/' . $struct->name;
+
+	my $text  = $struct->openDescription;
+	$$text    = $self->_markupText($$text, $where, %args,
+		make_m => $args{make_m} && ! ( $struct->type eq 'Chapter' && $struct->name eq 'NAME' ),
+	);
+
+	foreach my $example ($struct->examples)
+	{	my $ex  = $example->openDescription;
+		$$ex    = $self->_markupText($$ex, "an example in $where", %args);
+	}
+
+	foreach my $sub ($struct->subroutines)
+	{	next if $manual->inherited($sub);
+		my $w   = $manual->name . '::' . $sub->name;
+
+		my $params = +{};
+		if($sub->type =~ m!(_method$|^function$)!)
+		{	$params    = $self->_collectParams($params, call => $sub->parameters);
+	 		$params    = $self->_collectParamsAllCaps($params, call => $sub->parameters);
+		}
+
+		my @options = $sub->options;
+		!@options || $params->{'%options'}
+			or warning __x"In {where}, options but no call parameter %options", where => "$w()";
+
+		# Specifying possible %options without defining one is not a
+		# problem: maybe the extension uses them.
+		$params->{$_->name} = 'option' for @options;
+
+		my $st  = $sub->openDescription;
+		$$st    = $self->_markupText($$st, "$w()", %args, params => $params);
+
+		foreach my $option (@options)
+		{	next if $manual->inherited($option);
+			my $p   = $self->_collectParams($params, option => $option->parameters);
+			my $opt = $option->openDescription;
+			$$opt   = $self->_markupText($$opt, "$w(" . $option->name . ")", %args, params => $p);
+		}
+
+		foreach my $diag ($sub->diagnostics)
+		{	next if $manual->inherited($diag);
+			my $p   = $self->_collectParams($params, diag => $diag->name);
+			my $dt  = $diag->openDescription;
+			$$dt    = $self->_markupText($$dt, "$w(" . $diag->type . ")", %args, params => $p);
+		}
+
+		foreach my $example ($sub->examples)
+		{	my $p   = $self->_collectParams($params, example => $example->name);
+			my $ex  = $example->openDescription;
+			$$ex    = $self->_markupText($$ex, "$w(example)", %args, params => $p);
+		}
+	}
+
+	$self->autoMarkup($manual, $_, %args) for $struct->nest;
+}
+
+
+sub finalizeManual($%)
+{	my ($self, $manual, %args) = @_;
+	$self->SUPER::finalizeManual($manual, %args);
+
+	my %actions = (
+		make_p => exists $args{skip_auto_p} ? $args{skip_auto_p} : 1,
+		make_m => exists $args{skip_auto_m} ? $args{skip_auto_m} : 1,
+		make_c => $args{wrap_c} || [ qw/undef true false/ ],
+	);
+
+	$self->autoMarkup($manual, $_, %actions) for $manual->chapters;
 }
 
 #-------------------------------------------

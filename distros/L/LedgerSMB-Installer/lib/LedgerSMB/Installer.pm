@@ -1,4 +1,4 @@
-package LedgerSMB::Installer v0.999.9;
+package LedgerSMB::Installer v0.999.10;
 
 use v5.20;
 use experimental qw(signatures);
@@ -588,10 +588,6 @@ sub install($class, @args) {
             if (not $dss->pkg_can_install) {
                 die $log->fatal( "Missing 'latex' executable required for building 'LaTeX::Driver' module" );
             }
-
-            my ($run_deps, $build_deps) = $dss->pkg_deps_latex;
-            $config->mark_pkgs_for_cleanup( $build_deps );
-            push @extra_pkgs, $run_deps->@*, $build_deps->@*;
         }
     }
     elsif (eval { require LaTeX::Driver; 1; }) {
@@ -602,6 +598,16 @@ sub install($class, @args) {
     }
     else {
         $log->fatal( "Internal error: LaTeX::Driver not available and won't be installed, but build prereqs not checked?!?!" );
+    }
+    if ($dss->pkg_can_install) {
+        # installs LaTeX *and* styles required for standard templates
+        my ($run_deps, $build_deps) = $dss->pkg_deps_latex;
+        $config->mark_pkgs_for_cleanup( $build_deps );
+        push @extra_pkgs, $run_deps->@*, $build_deps->@*;
+    }
+    else {
+        ###TODO: figure out how to warn the user of minimal required
+        # styles configuration...
     }
 
     $log->info( "Checking for availability of XML::Parser" );
@@ -682,6 +688,10 @@ sub install($class, @args) {
 
     ###TODO: ideally, we pass the immediate dependencies instead of the installation path;
     # that allows selection of specific features in a later iteration
+    #
+    # Installs dependencies from cpanfile (because it respects dependency versions,
+    # which the simple list of dependencies does not); then installs the extra
+    # dependencies which were not satisfied from the list of unmapped_mods)
     $dss->cpanm_install( $config->installpath, $config->locallib, $unmapped_mods );
     $rv = 0;
 
@@ -781,7 +791,7 @@ Erik Huelsmann
 Copyright 2025 Erik Huelsmann
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the “Software”), to deal
+of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
 to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 copies of the Software, and to permit persons to whom the Software is

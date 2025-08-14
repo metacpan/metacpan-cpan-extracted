@@ -43,8 +43,6 @@ Inherited, see L<OODoc::Object/"OVERLOADED">
 
 =head1 METHODS
 
-#--------------------------
-
 Extends L<"METHODS" in OODoc::Parser|OODoc::Parser/"METHODS">.
  
 =head2 Constructors
@@ -87,11 +85,11 @@ Extends L<"Attributes" in OODoc::Parser|OODoc::Parser/"Attributes">.
 =item $obj-E<gt>B<currentManual>( [$manual] )
 
 Returns the manual object which is currently being filled with data.
-With a new $manual, a new one is set.
+With a new C<$manual>, a new one is set.
 
 =item $obj-E<gt>B<inDoc>( [BOOLEAN] )
 
-When a BOOLEAN is specified, the status changes.  It returns the current
+When a C<BOOLEAN> is specified, the status changes.  It returns the current
 status of the document reader.
 
 =item $obj-E<gt>B<rules>()
@@ -157,7 +155,7 @@ Extends L<"Parsing a file" in OODoc::Parser|OODoc::Parser/"Parsing a file">.
 
 =item $obj-E<gt>B<findMatchingRule>($line)
 
-Check the list of rules whether this $line matches one of them.  This
+Check the list of rules whether this C<$line> matches one of them.  This
 is an ordered evaluation.  Returned is the matched string and the required
 action.  If the line fails to match anything, an empty list is returned.
 
@@ -198,16 +196,16 @@ Block of text added in from of the output file.
 =item $obj-E<gt>B<rule>( <STRING|Regexp>, <$method|CODE> )
 
 Register a rule which will be applied to a line in the input file.  When
-a STRING is specified, it must start at the beginning of the line to be
+a C<STRING> is specified, it must start at the beginning of the line to be
 selected.  You may also specify a regular expression which will match
 on the line.
 
 The second argument is the action which will be taken when the line
-is selected.  Either the named $method or the CODE reference will be called.
+is selected.  Either the named C<$method> or the C<CODE> reference will be called.
 Their arguments are:
 
- $parser->METHOD($match, $line, $file, $linenumber);
- CODE->($parser, $match, $line, $file, $linenumber);
+  $parser->METHOD($match, $line, $file, $linenumber);
+  CODE->($parser, $match, $line, $file, $linenumber);
 
 =back
 
@@ -216,6 +214,11 @@ Their arguments are:
 Extends L<"Producing manuals" in OODoc::Parser|OODoc::Parser/"Producing manuals">.
  
 =over 4
+
+=item $obj-E<gt>B<autoMarkup>($manual, $chapter, \%options)
+
+Used via L<finalizeManual()|OODoc::Parser::Markov/"Producing manuals"> to apply automatic C<M>, C<P>, and C<C> markup
+tags.
 
 =item $obj-E<gt>B<cleanupHtml>($manual, $text, %options)
 
@@ -253,6 +256,33 @@ they will not refer to items: only headers.
 =item $obj-E<gt>B<decomposeM>($manual, $link)
 
 Z<>
+
+=item $obj-E<gt>B<finalizeManual>($manual, %options)
+
+In the last completion step of the manual, the parser will add some
+C<P> markings: the "this is a parameter" marking.  (But in the future
+it might do more)
+Improves base, see L<OODoc::Parser/"Producing manuals">
+
+ -Option     --Default
+  skip_auto_m  false
+  skip_auto_p  false
+  wrap_c       [ qw/undef true false/ ]
+
+=over 2
+
+=item skip_auto_m => BOOLEAN
+
+Skip the automatic generation of C<< M <> >> tags around packages
+names.
+
+=item skip_auto_p => BOOLEAN
+
+Do not add C<< P <> >> tags around variables automatically.
+
+=item wrap_c => ARRAY-of-WORDS
+
+=back
 
 =item $obj-E<gt>B<skipManualLink>($package)
 
@@ -324,6 +354,16 @@ You can use any name for a chapter, but the formatter expects certain
 names to be used: if you use a name which is not expected by the formatter,
 that documentation will be ignored.
 
+=head3 auto-markup
+
+Do not use the words C<undef>, C<true>, and C<false> in other sense then undefined,
+and boolean, because they will get automaticly wrapped in C<< C< > >> markup.
+
+Package names will automatically be wrapped in C<< M <> >> markup.
+
+Variables mentioned in subroutine parameter lists, diagnostics and as
+option parameter will automatically be wrapped in C<< P <> >> markup.
+
 =head3 Subroutines
 
 Perl has many kinds of subroutines, which are distinguished in the logical
@@ -357,8 +397,8 @@ The parser will turn this line
 
   =c_method new %options
 
-into an L<OODoc::Text::Subroutine|OODoc::Text::Subroutine>, with C<name> set to C<new>, and
-C<%options> as parameter string.  The formatters and exporters will
+into an L<OODoc::Text::Subroutine|OODoc::Text::Subroutine>, with attribute C<name> set to C<new>, and
+string C<%options> as parameter string.  The formatters and exporters will
 translate this subroutine call into
 
   $class->new(%options)
@@ -367,21 +407,21 @@ A more complex list of parameters, by convension, is a LIST of
 
 =over 4
 
-=item C<undef>: undef is accepted on this spot;
+=item C<undef>: C<undef> is accepted on this spot;
 
 =item C<$scalar>: a single value;
 
-=item C<%options>: a list of key-value pairs;
+=item C<@list>: a LIST of values;
+
+=item C<%options>: a LIST of key-value PAIRS;
 
 =item C<\@array>: a reference to an ARRAY of values;
 
 =item C<\%hash>: a reference to a HASH;
 
-=item C<LIST>: a comma-separated sequence of values;
+=item C<[something]>: the parameter is optional; and
 
-=item C< [something] >: the parameter is optional; and
-
-=item C< ($scalar|\@array|undef) >: alternative parameters on that position.
+=item C<($scalar|\@array|undef)>: alternative parameters on that position.
 
 =back
 
@@ -437,14 +477,64 @@ For comfort, all POD markups are supported as well
 
 =head2 Text markup
 
-Next to the structural markup, there is textual markup.  This markup
-is the same as POD defines in the perlpod manual page. For instance,
-E<lt>some codeE<gt> can be used to create visual markup as a code
-fragment.
+Besides above structural markup, there is text markup. The parser supports
+the standard formatting codes, explained in the C<perlpod> manual:
 
-One kind is added to the standard list: the C<M>.
+=over 4
 
-=head3 The M-link
+=item C<< BZ<><text> >>; bold text
+
+=item C<< CZ<><code> >>; code text, fixed font
+
+=item C<< EZ<><escape> >>; html entities
+
+=item C<< FZ<><filename> >>; filenames
+
+=item C<< IZ<><text> >>; italic text
+
+=item C<< LZ<><link> >>; link to text block or url
+
+=item C<< SZ<><text> >>; non-breaking spaces
+
+=item C<< XZ<><topic name> >>; link destination
+
+=item C<< ZZ<><> >>; null format code
+
+=back
+
+This parser adds two more:
+
+=over 4
+
+=item C<< MZ<><link> >>; link to subroutine and options
+
+=item C<< PZ<><name> >>; marks the parameter of the sub
+
+=back
+
+These two are defined in the next sections.
+
+=head3 The parameter marker C<P>
+
+Within the description of a function or method, you often refer to
+parameter or options of that element.  When you pick good names for
+these, then the description text can smoothly refer to them. Example:
+
+  =method changeTitle $manual, $title
+  Change the $title of this $manual without saving.
+
+The element description must contain C<%options> or C<\%options> when
+it has (inherited) options.
+
+In this example, the variables will get highlighted by the formatters
+automatically, unless they already have a style (like C<< CZ<><$title> >>).
+They will get marked-up with a C<< PZ<><$title> >>.  You may also do this
+explicitly:
+
+  =method changeTitle $manual, $title
+  Change the C<$title> of this C<$manual> without saving.
+
+=head3 The method link C<M>
 
 The C<M>-link can not be nested inside other text markup items.  It is used
 to refer to manuals, subroutines, and options.  You can use an C<L>-link
@@ -453,11 +543,11 @@ manual page while converting it to other manual formats.
 
 Syntax of the C<M>-link:
 
- M < OODoc::Object >
- M < OODoc::Object::new() >
- M < OODoc::Object::new(verbose) >
- M < new() >
- M < new(verbose) >
+ MZ<><OODoc::Object>
+ MZ<><OODoc::Object::new()>
+ MZ<><OODoc::Object::new(verbose)>
+ MZ<><new()>
+ MZ<><new(verbose)>
 
 These links refer to a manual page, a subroutine within a manual page, and
 an option of a subroutine respectively.  And then two abbreviations are
@@ -469,37 +559,33 @@ you may refer to inherited documentation as well.
 The standard POD defines a C<L> markup tag.  This can also be used with
 this Markov parser.
 
-The following syntaxes are supported:
+The following syntaxes are supported.  Below, C<block> can be any of a chapter,
+section, subsection, or subsubsection name.  Here, C<manual> refers to a (unix)
+manual page, might be a Perl module.
 
- L < manual >
- L < manual/section >
- L < manual/"section" >
- L < manual/subsection >
- L < manual/"subsection" >
- L < /section >
- L < /"section" >
- L < /subsection >
- L < /"subsection" >
- L < "section" >
- L < "subsection" >
- L < "subsubsection" >
- L < unix-manual >
- L < url >
+ LZ<><manual>
+ LZ<><manual/block>
+ LZ<><manual/"block">
+ LZ<></block>
+ LZ<></"block">
+ LZ<><"block">
+ LZ<><url>
 
-In the above, I<manual> is the name of a manual, I<section> the name of
-any section (in that manual, by default the current manual), and
-I<subsection> a subsection (in that manual, by default the current manual).
+All above can also carry an alternative text to be displayed with the link. For
+instance:
+
+ LZ<><text|manual/"block">
 
 The I<unix-manual> MUST be formatted with its chapter number, for instance
-C<cat(1)>, otherwise a link will be created.  See the following examples
+C<< MZ<><cat(1)> >>, otherwise a link will be created.  See the following examples
 in the html version of these manual pages:
 
- M < perldoc >              illegal: not in distribution
- L < perldoc >              manual perldoc
- L < perldoc(1perl) >       manual perldoc(1perl)
- M < OODoc::Object >        OODoc::Object
- L < OODoc::Object >        OODoc::Object
- L < OODoc::Object(3pm) >   manual OODoc::Object(3pm)
+ MZ<><perldoc>              illegal: not in distribution
+ LZ<><perldoc>              manual perldoc
+ LZ<><perldoc(1perl)>       manual perldoc(1perl)
+ MZ<><OODoc::Object>        OODoc::Object
+ LZ<><OODoc::Object>        OODoc::Object
+ LZ<><OODoc::Object(3pm)>   manual OODoc::Object(3pm)
 
 =head2 Grouping subroutines
 
@@ -601,7 +687,7 @@ There is no document to end here.
 
 Some keywords on the first position of a line are very common for code.
 However, code within doc should start with a blank to indicate pre-formatted
-lines.  This warning may be false.
+lines.  Rarely, this warning may be produced incorrectly.
 
 =item Error: cannot read document from $input: $!
 
@@ -623,7 +709,7 @@ be checked later.
 
 =item Warning: default line incorrect in $file line $number: $line
 
-The shown $line is not in the right format: it should contain at least
+The shown C<$line> is not in the right format: it should contain at least
 two words being the option name and the default value.
 
 =item Error: diagnostic $type outside subroutine in $file line $number
@@ -632,7 +718,7 @@ It is unclear to which subroutine this diagnostic message belongs.
 
 =item Warning: doc did not end in $input
 
-When the whole $input was parsed, the documentation part was still open.
+When the whole C<$input> was parsed, the documentation part was still open.
 Probably you forgot to terminate it with a C<=cut>.
 
 =item Warning: empty L link in $manual
@@ -674,12 +760,12 @@ work.
 
 =item Warning: no manual for $package (correct casing?)
 
-The manual for $package cannot be found.  If you have a module named this
+The manual for C<$package> cannot be found.  If you have a module named this
 way, this may indicate that the NAME chapter of the manual page in that
 module differs from the package name.  Often, this is a typo in the
 NAME... probably a difference in used cases.
 
-=item Warning: option "$name" unknow for $name() in $package, found in $manual
+=item Warning: option "$name" unknown for $call() in $package, found in $manual
 
 Z<>
 
@@ -689,7 +775,7 @@ An option is set, however there is not subroutine in scope (yet).
 
 =item Warning: option line incorrect in $file line $number: $line
 
-The shown $line is not in the right format: it should contain at least
+The shown C<$line> is not in the right format: it should contain at least
 two words being the option name and an abstract description of possible
 values.
 
@@ -733,8 +819,8 @@ is not always easy to find.
 
 =head1 SEE ALSO
 
-This module is part of OODoc version 3.00,
-built on August 02, 2025. Website: F<https://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.01,
+built on August 14, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 

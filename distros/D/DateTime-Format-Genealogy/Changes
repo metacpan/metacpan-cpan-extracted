@@ -1,5 +1,10 @@
 Revision history for DateTime::Format::Genealogy
 
+0.12	Wed Aug 13 08:23:37 EDT 2025
+	Use Params::Get
+	Use Readonly::Values::Months
+	Handle DJULIAN, DHEBREW and DFRENCH R in the data 
+
 0.11	Tue Feb 11 14:05:44 EST 2025
 	Handle "from xxx to yyy" as well as the more correct "bet xxx and yyy"
 	Added _get_params()
@@ -47,4 +52,4 @@ Revision history for DateTime::Format::Genealogy
 	Be more lenient with callers
 
 0.01	Tue Apr 10 17:30:46 EDT 2018
-        First release
+	First release

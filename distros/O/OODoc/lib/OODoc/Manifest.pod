@@ -57,9 +57,9 @@ Inherited, see L<OODoc::Object/"Constructors">
 
 =over 2
 
-=item filename => FILENAME
+=item filename => $filename
 
-The filename where the manifest is in.  When the name is not defined,
+The C<$filename> where the manifest is in.  When the name is not defined,
 the data will not be written.
 
 =back
@@ -128,7 +128,7 @@ Inherited, see L<OODoc::Object/"Manual Repository">
 
 =item $obj-E<gt>B<add>($filenames)
 
-Adds the $filenames to the manifest, doubles are ignored.
+Adds the C<$filenames> to the manifest, doubles are ignored.
 
 =item $obj-E<gt>B<files>()
 
@@ -152,7 +152,7 @@ Read the MANIFEST file.  The comments are stripped from the lines.
 
 Returns the name of the file relative to the location of the MANIFEST
 file.  The MANIFEST file should always be in top of the directory tree,
-so the $filename should be in the same directory and below.
+so the C<$filename> should be in the same directory and below.
 
 =item $obj-E<gt>B<write>()
 
@@ -202,8 +202,8 @@ to L<manualsForPackage()|OODoc::Object/"Manual Repository"> or L<mainManual()|OO
 
 =head1 SEE ALSO
 
-This module is part of OODoc version 3.00,
-built on August 02, 2025. Website: F<https://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.01,
+built on August 14, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 

@@ -15,6 +15,11 @@ if ( $ARGS{id} ) {
     my $TicketObj = LoadTicket($ARGS{id});
     $queue = $TicketObj->QueueObj->Name;
 }
+elsif ( $ARGS{QueueId} ) {
+    my $object = RT::Queue->new($session{CurrentUser});
+    $object->Load($ARGS{QueueId});
+    $queue = $object->__Value('Name');
+}
 
 my $result_payload;
 my $result_text;

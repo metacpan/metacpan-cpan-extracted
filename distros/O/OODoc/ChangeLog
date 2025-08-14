@@ -3,9 +3,31 @@ All changes where made by Mark Overmeer <perl@overmeer.net>, unless
 explicitly stated otherwise.
 
 TODO:
-	- add other Log::Report levels to diagnostics
 	- export inheritance as structure
-	- auto-markup sub parameters in text/oorestyle
+	- move "Manual Repository" from ::Object into separate object
+	- subs could not only list 'Inherited from', but also 'Extended by'
+	- in POD, group "Inherited" referenced subs?
+	- to fix: processFiles(select) default in HTML shows <>
+	- to fix: processFiles(parser) default in HTML not M<>
+
+version 3.01: Thu 14 Aug 11:14:20 CEST 2025
+
+	Changes:
+	- $doc->prepare() becomes $doc->finalize()
+
+	Fixes:
+	- parser html accept C<<...>> syntax
+	- parser html accept S<>, X<>, and Z<>
+	- parser F<url> must be L<url>
+	- parser F<> in italic
+
+	Improvements:
+	- parser add markup P<>
+	- parser more documentation
+	- link to metacpan.org, not search.cpan.org
+	- parser auto-P<>, auto-M<>, and auto-C<>
+	- add other Log::Report levels to diagnostics: info, notice, alert, failure
+	- documentation improvements
 
 version 3.00: Sat  2 Aug 14:59:32 CEST 2025
 

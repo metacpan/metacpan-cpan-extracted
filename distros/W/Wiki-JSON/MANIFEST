@@ -13,5 +13,6 @@ t/000004-template.t
 t/000005-bold-and-italic.t
 t/000006-list.t
 t/000007-url.t
+t/000008-images.t
 try.wiki
-Wiki-JSON-v0.0.2.tar.gz
+Changes

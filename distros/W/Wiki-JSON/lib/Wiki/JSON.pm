@@ -7,10 +7,16 @@ use warnings;
 
 use Moo;
 use Data::Dumper;
+use Const::Fast;
 
-our $VERSION = "0.0.7";
+our $VERSION = "0.0.9";
 
-my $LIST_ELEMENT_DELIMITER = "\n* ";
+const my $MAX_HX_SIZE                                           => 6;
+const my $EXTRA_CHARACTERS_BOLD_AND_ITALIC_WHEN_ITALIC          => 3;
+const my $LIST_ELEMENT_INTERRUPT_NUMBER_OF_CHARACTERS_TO_IGNORE => 3;
+const my $MINIMUM_LINK_SEARCH                                   => 3;
+const my $MINIMUM_TEMPLATE_SEARCH                               => 3;
+const my $LIST_ELEMENT_DELIMITER                                => "\n* ";
 
 sub parse( $self, $wiki_text ) {
     my @output;
@@ -337,16 +343,20 @@ sub _try_parse_nowiki( $self, $output, $wiki_text, $buffer, $i, $options ) {
         $wiki_text,
         $i, $buffer,
         sub ( $wiki_text, $i ) {
-            my $tag       = '</nowiki>';
-            my $next_word = substr $wiki_text, $i, length $tag;
-            if ( $tag ne $next_word ) {
-                return;
-            }
-            return $i + ( length $tag ) - 1;
+            return $self->_try_interrupt_nowiki( $wiki_text, $i );
         },
         { is_nowiki => 1 }
     );
     return ( 1, $i, $buffer );
+}
+
+sub _try_interrupt_nowiki( $self, $wiki_text, $i ) {
+    my $tag       = '</nowiki>';
+    my $next_word = substr $wiki_text, $i, length $tag;
+    if ( $tag ne $next_word ) {
+        return;
+    }
+    return $i + ( length $tag ) - 1;
 }
 
 sub _try_parse_italic( $self, $output, $wiki_text, $buffer, $i, $options ) {
@@ -368,7 +378,9 @@ sub _try_parse_italic( $self, $output, $wiki_text, $buffer, $i, $options ) {
         $options->{is_bold} = 1;
     }
     $i += $size_search;
-    $i += 3 if $is_bold_and_italic_single_step;
+    if ($is_bold_and_italic_single_step) {
+        $i += $EXTRA_CHARACTERS_BOLD_AND_ITALIC_WHEN_ITALIC;
+    }
     return $self->_recurse_pending_bold_or_italic( $output, $wiki_text, $i,
         $buffer, $options );
 
@@ -404,24 +416,36 @@ sub _try_parse_unordered_list( $self, $output, $wiki_text, $buffer, $i,
         $wiki_text,
         $i, $buffer,
         sub ( $wiki_text, $i ) {
-            my $searched    = "\n";
-            my $size_search = length $searched;
-            my $last_word   = substr $wiki_text, $i, $size_search;
-            if ( $last_word ne $searched ) {
+            if ( $self->_try_discard_interrupt_list( $wiki_text, $i ) ) {
                 return;
             }
-            $searched    = $LIST_ELEMENT_DELIMITER;
-            $size_search = length $searched;
-            $last_word   = substr $wiki_text, $i, $size_search;
-            if ( $last_word ne $searched ) {
-                return $i + $size_search - 3;
-            }
-            return;
+            return $self->_try_interrupt_list( $wiki_text, $i );
         },
         $options,
     );
     push @$output, $element;
     return ( 1, $i, $buffer, $options );
+}
+
+sub _try_interrupt_list( $self, $wiki_text, $i ) {
+    my $searched    = $LIST_ELEMENT_DELIMITER;
+    my $size_search = length $searched;
+    my $last_word   = substr $wiki_text, $i, $size_search;
+    if ( $last_word ne $searched ) {
+        return $i + $size_search -
+          $LIST_ELEMENT_INTERRUPT_NUMBER_OF_CHARACTERS_TO_IGNORE;
+    }
+    return;
+}
+
+sub _try_discard_interrupt_list( $self, $wiki_text, $i ) {
+    my $searched    = "\n";
+    my $size_search = length $searched;
+    my $last_word   = substr $wiki_text, $i, $size_search;
+    if ( $last_word ne $searched ) {
+        return 1;
+    }
+    return 0;
 }
 
 sub _save_before_new_element( $self, $output, $buffer, $options ) {
@@ -455,7 +479,9 @@ sub _try_parse_bold( $self, $output, $wiki_text, $buffer, $i, $options ) {
         $options->{is_italic} = 1;
     }
     $i += $size_search;
-    $i += 2 if $is_bold_and_italic_single_step;
+    if ($is_bold_and_italic_single_step) {
+        $i += 2;
+    }
     my @return =
       $self->_recurse_pending_bold_or_italic( $output, $wiki_text, $i, $buffer,
         $options );
@@ -508,7 +534,9 @@ sub _recurse_pending_bold_or_italic( $self, $output, $wiki_text, $i, $buffer,
             my $last_word   = substr $wiki_text, $i, $size_search;
             if ( $last_word eq $searched ) {
                 $options->{is_bold} = !$options->{is_bold};
-                $i++ if $options->{is_italic};
+                if ( $options->{is_italic} ) {
+                    $i++;
+                }
                 return $i + $size_search - 1;
             }
             $searched    = q/''/;
@@ -516,7 +544,9 @@ sub _recurse_pending_bold_or_italic( $self, $output, $wiki_text, $i, $buffer,
             $last_word   = substr $wiki_text, $i, $size_search;
             if ( $last_word eq $searched ) {
                 $options->{is_italic} = !$options->{is_italic};
-                $i++ if $options->{is_bold};
+                if ( $options->{is_bold} ) {
+                    $i++;
+                }
                 return $i + $size_search - 1;
             }
             return;
@@ -537,66 +567,76 @@ sub _recurse_pending_bold_or_italic( $self, $output, $wiki_text, $i, $buffer,
     return @return;
 }
 
-sub _try_parse_image( $self, $output, $wiki_text, $buffer, $i, $options ) {
-    my $searched    = '[[File:';
-    my $size_search = length $searched;
-    my $orig_size_search = $size_search;
-    my $last_word   = substr $wiki_text, $i, $size_search;
-    if ( $last_word ne $searched ) {
-        return ( 0, $i, $buffer );
-    }
-    my $valid_characters =
-qr/[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\-._~:\/?#@!\$&\'\(\)\*\+,;= ]/;
+sub _try_parse_image_find_url_size( $self,
+    $wiki_text, $valid_characters, $i, $size_search )
+{
     for ( $size_search = $size_search + 1 ; ; $size_search++ ) {
         my $last_word = substr $wiki_text, $i, $size_search;
-        if ( $last_word !~ /^\[\[File:$valid_characters+$/ ) {
+        if ( $last_word !~ /^\[\[File:$valid_characters+$/x ) {
             last;
         }
     }
+    return $size_search;
+}
+
+sub _try_parse_image( $self, $output, $wiki_text, $buffer, $i, $options ) {
+    my $searched         = '[[File:';
+    my $size_search      = length $searched;
+    my $orig_size_search = $size_search;
+    my $last_word        = substr $wiki_text, $i, $size_search;
+    if ( $last_word ne $searched ) {
+        return ( 0, $i, $buffer );
+    }
+    my $valid_characters = qr/[A-Za-z0-9\-._~:\/?#@!\$&\'\(\)\*\+,;=\ ]/x;
+    ($size_search) =
+      $self->_try_parse_image_find_url_size( $wiki_text, $valid_characters, $i,
+        $size_search );
     $size_search--;
     if ( $size_search < $orig_size_search + 1 ) {
         return ( 0, $i, $buffer );
     }
     $last_word = substr $wiki_text, $i, $size_search + 2;
-    if ( $last_word =~ /^\[\[File:($valid_characters+)\]\]$/ ) {
+    if ( $last_word =~ /^\[\[File:($valid_characters+)\]\]$/x ) {
         ( $output, $buffer ) =
           $self->_save_before_new_element( $output, $buffer, $options );
         push @$output,
           {
-            type  => 'image',
-            link  => $1,
+            type    => 'image',
+            link    => $1,
             caption => '',
             options => {},
           };
         return ( 1, $i + $size_search + 2, $buffer );
     }
-    $last_word = substr $wiki_text, $i, $size_search + 1;
-    if ( $last_word !~ /^\[\[File:($valid_characters+)\|/ ) {
+    my ( $got_link, $link ) =
+      $self->_try_parse_image_get_url( $wiki_text, $valid_characters, $i,
+        $size_search );
+    if ( !$got_link ) {
         return ( 0, $i, $buffer );
     }
-    my $link = $1;
 
     ( $output, $buffer ) =
       $self->_save_before_new_element( $output, $buffer, $options );
 
-    my $tmp_buffer = '';
-    my $is_caption = 0;
+    my $tmp_buffer      = '';
+    my $is_caption      = 0;
     my $element_options = {};
     my $caption;
     for ( $i = $i + $size_search + 1 ; $i < length $wiki_text ; $i++ ) {
-        my $searched    = ']]';
-        my $size_search = length $searched;
-        my $last_word   = substr $wiki_text, $i, $size_search;
-        if ( $searched eq $last_word ) {
-            ($caption) = $self->_try_parse_link_component($tmp_buffer, $caption, $element_options);
-            $tmp_buffer = '';
+        my $last_component;
+        ( $last_component, $caption, $tmp_buffer ) =
+          $self->_try_parse_image_parse_end( $wiki_text, $tmp_buffer, $i,
+            $caption, $element_options );
+        if ($last_component) {
             last;
         }
-        $searched = '|';
+        $searched    = '|';
         $size_search = length $searched;
         $last_word   = substr $wiki_text, $i, $size_search;
-        if ($searched eq $last_word) {
-            ($caption) = $self->_try_parse_link_component($tmp_buffer, $caption, $element_options);
+        if ( $searched eq $last_word ) {
+            ($caption) =
+              $self->_try_parse_link_component( $tmp_buffer, $caption,
+                $element_options );
             $tmp_buffer = '';
             next;
         }
@@ -604,15 +644,17 @@ qr/[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\-._~:\/?#@!\$
         ( $need_next, $i, $buffer ) =
           $self->_try_parse_nowiki( $output, $wiki_text, $buffer, $i,
             $options );
-        $is_caption = 1 if $need_next;
-        next if $need_next;
+        if ($need_next) {
+            $is_caption = 1;
+            next;
+        }
 
         $tmp_buffer .= substr $wiki_text, $i, 1;
     }
 
     my $template = {
-        type  => 'image',
-        link  => $link,
+        type    => 'image',
+        link    => $link,
         caption => $caption,
         options => $element_options,
     };
@@ -622,210 +664,334 @@ qr/[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\-._~:\/?#@!\$
     return ( 1, $i, $buffer );
 }
 
-sub _is_defined_image_format_exclusive($self, $element_options) {
+sub _try_parse_image_parse_end( $self, $wiki_text, $tmp_buffer, $i, $caption,
+    $element_options )
+{
+    my $searched    = ']]';
+    my $size_search = length $searched;
+    my $last_word   = substr $wiki_text, $i, $size_search;
+    if ( $searched eq $last_word ) {
+        ($caption) =
+          $self->_try_parse_link_component( $tmp_buffer, $caption,
+            $element_options );
+        $tmp_buffer = '';
+        return ( 1, $caption, $tmp_buffer );
+    }
+    return ( 0, $caption, $tmp_buffer );
+}
+
+sub _try_parse_image_get_url( $self, $wiki_text, $valid_characters, $i,
+    $size_search )
+{
+    my $last_word = substr $wiki_text, $i, $size_search + 1;
+    if ( $last_word =~ /^\[\[File:($valid_characters+)\|/x ) {
+        return ( 1, $1 );
+    }
+    return (0);
+}
+
+sub _is_defined_image_format_exclusive( $self, $element_options ) {
     for my $option (qw/frameless frame framed thumb thumbnail/) {
-        if (defined $element_options->{format}{$option}) {
+        if ( defined $element_options->{format}{$option} ) {
             return 1;
         }
     }
     return;
 }
 
-sub _try_parse_link_component($self, $tmp_buffer, $caption, $element_options) {
-    if ($tmp_buffer =~ /^border$/) {
-        $element_options->{format}{border} = 1; 
+sub _try_parse_link_component_formats ( $self, $tmp_buffer, $caption,
+    $element_options )
+{
+    if ( $tmp_buffer =~ /^border$/x ) {
+        $element_options->{format}{border} = 1;
         return $caption;
     }
-    if ($tmp_buffer =~ /^frameless$/) {
-        return $caption if $self->_is_defined_image_format_exclusive($element_options);
-        $element_options->{format}{frameless} = 1; 
+    if ( $tmp_buffer =~ /^frameless$/x ) {
+        return $caption
+          if $self->_is_defined_image_format_exclusive($element_options);
+        $element_options->{format}{frameless} = 1;
         return $caption;
     }
-    if ($tmp_buffer =~ /^frame$/) {
-        return $caption if $self->_is_defined_image_format_exclusive($element_options);
-        $element_options->{format}{frame} = 1; 
+    if ( $tmp_buffer =~ /^frame$/x ) {
+        return $caption
+          if $self->_is_defined_image_format_exclusive($element_options);
+        $element_options->{format}{frame} = 1;
         return $caption;
     }
-    if ($tmp_buffer =~ /^framed$/) {
-        return $caption if $self->_is_defined_image_format_exclusive($element_options);
-        $element_options->{format}{frame} = 1; 
+    if ( $tmp_buffer =~ /^framed$/x ) {
+        return $caption
+          if $self->_is_defined_image_format_exclusive($element_options);
+        $element_options->{format}{frame} = 1;
         return $caption;
     }
-    if ($tmp_buffer =~ /^thumb$/) {
-        return $caption if $self->_is_defined_image_format_exclusive($element_options);
-        $element_options->{format}{thumb} = 1; 
+    if ( $tmp_buffer =~ /^thumb$/x ) {
+        return $caption
+          if $self->_is_defined_image_format_exclusive($element_options);
+        $element_options->{format}{thumb} = 1;
         return $caption;
     }
-    if ($tmp_buffer =~ /^thumbnail$/) {
-        return $caption if $self->_is_defined_image_format_exclusive($element_options);
-        $element_options->{format}{thumb} = 1; 
+    if ( $tmp_buffer =~ /^thumbnail$/x ) {
+        return $caption
+          if $self->_is_defined_image_format_exclusive($element_options);
+        $element_options->{format}{thumb} = 1;
         return $caption;
     }
-    my $return_now;
-    ($return_now) = $self->_try_parse_image_resizing($tmp_buffer, $element_options);
-    return $caption if $return_now;
-    if ($tmp_buffer =~ /^left$/) {
-        return $caption if $self->_is_defined_image_halign_exclusive($element_options);
+    return;
+}
+
+sub _try_parse_link_component_halign( $self, $tmp_buffer, $caption,
+    $element_options )
+{
+    if ( $tmp_buffer =~ /^left$/x ) {
+        return $caption
+          if $self->_is_defined_image_halign_exclusive($element_options);
         $element_options->{halign} = 'left';
         return $caption;
     }
-    if ($tmp_buffer =~ /^right$/) {
-        return $caption if $self->_is_defined_image_halign_exclusive($element_options);
+    if ( $tmp_buffer =~ /^right$/x ) {
+        return $caption
+          if $self->_is_defined_image_halign_exclusive($element_options);
         $element_options->{halign} = 'right';
         return $caption;
-    }    
-    if ($tmp_buffer =~ /^center$/) {
-        return $caption if $self->_is_defined_image_halign_exclusive($element_options);
+    }
+    if ( $tmp_buffer =~ /^center$/x ) {
+        return $caption
+          if $self->_is_defined_image_halign_exclusive($element_options);
         $element_options->{halign} = 'center';
         return $caption;
     }
-    if ($tmp_buffer =~ /^none$/) {
-        return $caption if $self->_is_defined_image_halign_exclusive($element_options);
+    if ( $tmp_buffer =~ /^none$/x ) {
+        return $caption
+          if $self->_is_defined_image_halign_exclusive($element_options);
         $element_options->{halign} = 'none';
         return $caption;
     }
-    if ($tmp_buffer =~ /^baseline$/) {
-        return $caption if $self->_is_defined_image_valign_exclusive($element_options);
+    return;
+}
+
+sub _try_parse_link_component_valign( $self, $tmp_buffer, $caption,
+    $element_options )
+{
+    if ( $tmp_buffer =~ /^baseline$/x ) {
+        return $caption
+          if $self->_is_defined_image_valign_exclusive($element_options);
         $element_options->{valign} = 'baseline';
         return $caption;
     }
-    if ($tmp_buffer =~ /^sub$/) {
-        return $caption if $self->_is_defined_image_valign_exclusive($element_options);
+    if ( $tmp_buffer =~ /^sub$/x ) {
+        return $caption
+          if $self->_is_defined_image_valign_exclusive($element_options);
         $element_options->{valign} = 'sub';
         return $caption;
-    }    
-    if ($tmp_buffer =~ /^super$/) {
-        return $caption if $self->_is_defined_image_valign_exclusive($element_options);
+    }
+    if ( $tmp_buffer =~ /^super$/x ) {
+        return $caption
+          if $self->_is_defined_image_valign_exclusive($element_options);
         $element_options->{valign} = 'super';
         return $caption;
     }
-    if ($tmp_buffer =~ /^top$/) {
-        return $caption if $self->_is_defined_image_valign_exclusive($element_options);
+    if ( $tmp_buffer =~ /^top$/x ) {
+        return $caption
+          if $self->_is_defined_image_valign_exclusive($element_options);
         $element_options->{valign} = 'top';
         return $caption;
     }
-    if ($tmp_buffer =~ /^text-top$/) {
-        return $caption if $self->_is_defined_image_valign_exclusive($element_options);
+    if ( $tmp_buffer =~ /^text-top$/x ) {
+        return $caption
+          if $self->_is_defined_image_valign_exclusive($element_options);
         $element_options->{valign} = 'text-top';
         return $caption;
     }
-    if ($tmp_buffer =~ /^middle$/) {
-        return $caption if $self->_is_defined_image_valign_exclusive($element_options);
+    if ( $tmp_buffer =~ /^middle$/x ) {
+        return $caption
+          if $self->_is_defined_image_valign_exclusive($element_options);
         $element_options->{valign} = 'middle';
         return $caption;
     }
-    if ($tmp_buffer =~ /^bottom$/) {
-        return $caption if $self->_is_defined_image_valign_exclusive($element_options);
+    if ( $tmp_buffer =~ /^bottom$/x ) {
+        return $caption
+          if $self->_is_defined_image_valign_exclusive($element_options);
         $element_options->{valign} = 'bottom';
         return $caption;
     }
-    if ($tmp_buffer =~ /^text-bottom$/) {
-        return $caption if $self->_is_defined_image_valign_exclusive($element_options);
+    if ( $tmp_buffer =~ /^text-bottom$/x ) {
+        return $caption
+          if $self->_is_defined_image_valign_exclusive($element_options);
         $element_options->{valign} = 'text-bottom';
         return $caption;
     }
-    if (my ($link) = $tmp_buffer =~ /^link=(.*)$/) {
-        return $caption if defined $element_options->{link};
-        $element_options->{link} = $link;
-        return $caption;
-    }
-    if (my ($alt) = $tmp_buffer =~ /^alt=(.*)$/) {
-        return $caption if defined $element_options->{alt};
-        $element_options->{alt} = $alt;
-        return $caption;
-    }
-    if (my ($page) = $tmp_buffer =~ /^page=(\d+)$/) {
-        return $caption if defined $element_options->{page};
-        $element_options->{page} = $page;
-        return $caption;
-    }
-    if (my ($thumbtime) = $tmp_buffer =~ /^thumbtime=((?:\d+:)?(?:\d+:)\d+)$/) {
+    return;
+}
+
+sub _try_parse_link_component_extra_options_video_controls( $self, $tmp_buffer,
+    $caption, $element_options )
+{
+    if ( my ($thumbtime) =
+        $tmp_buffer =~ /^thumbtime=((?:\d+:)?(?:\d+:)\d+)$/x )
+    {
         return $caption if defined $element_options->{thumbtime};
         $element_options->{thumbtime} = $thumbtime;
         return $caption;
     }
-    if (my ($start) = $tmp_buffer =~ /^start=((?:\d+:)?(?:\d+:)\d+)$/) {
+    if ( my ($start) = $tmp_buffer =~ /^start=((?:\d+:)?(?:\d+:)\d+)$/x ) {
         return $caption if defined $element_options->{start};
         $element_options->{start} = $start;
         return $caption;
     }
-    if ($tmp_buffer =~ /^muted$/) {
+    if ( $tmp_buffer =~ /^muted$/x ) {
         return $caption if defined $element_options->{muted};
         $element_options->{muted} = 1;
         return $caption;
     }
-    if ($tmp_buffer =~ /^loop$/) {
+    if ( $tmp_buffer =~ /^loop$/x ) {
         return $caption if defined $element_options->{loop};
         $element_options->{loop} = 1;
         return $caption;
     }
-    if (my ($loosy) = $tmp_buffer =~ /^loosy=(.*)$/) {
-        return $caption if ($loosy ne 'false');
+    return;
+}
+
+sub _try_parse_link_component_extra_options( $self, $tmp_buffer, $caption,
+    $element_options )
+{
+    if ( my ($link) = $tmp_buffer =~ /^link=(.*)$/x ) {
+        return $caption if defined $element_options->{link};
+        $element_options->{link} = $link;
+        return $caption;
+    }
+    if ( my ($alt) = $tmp_buffer =~ /^alt=(.*)$/x ) {
+        return $caption if defined $element_options->{alt};
+        $element_options->{alt} = $alt;
+        return $caption;
+    }
+    if ( my ($page) = $tmp_buffer =~ /^page=(\d+)$/x ) {
+        return $caption if defined $element_options->{page};
+        $element_options->{page} = $page;
+        return $caption;
+    }
+    if ( my ($loosy) = $tmp_buffer =~ /^loosy=(.*)$/x ) {
+        return $caption if ( $loosy ne 'false' );
         return $caption if defined $element_options->{not_loosy};
         $element_options->{not_loosy} = 1;
         return $caption;
     }
-    if (my ($class_string) = $tmp_buffer =~ /^class=(.*)$/) {
+    if ( my ($class_string) = $tmp_buffer =~ /^class=(.*)$/x ) {
         return $caption if defined $element_options->{classes};
         $element_options->{classes} = [];
-        for my $class (split /\s+/, $class_string) {
-            push @{$element_options->{classes}}, $class;
+        for my $class ( split /\s+/x, $class_string ) {
+            push @{ $element_options->{classes} }, $class;
         }
         return $caption;
     }
+    my $return_video =
+      $self->_try_parse_link_component_extra_options_video_controls(
+        $tmp_buffer, $caption, $element_options );
+    return $return_video if defined $return_video;
+    return;
+}
 
-    if (!defined $caption) {
+sub _try_parse_link_component( $self, $tmp_buffer, $caption, $element_options )
+{
+    my $return_caption_format =
+      $self->_try_parse_link_component_formats( $tmp_buffer, $caption,
+        $element_options );
+    if ( defined $return_caption_format ) {
+        return $return_caption_format;
+    }
+    my $return_now;
+    ($return_now) =
+      $self->_try_parse_image_resizing( $tmp_buffer, $element_options );
+    return $caption if $return_now;
+    my $return_caption_halign =
+      $self->_try_parse_link_component_halign( $tmp_buffer, $caption,
+        $element_options );
+    return $return_caption_halign if defined $return_caption_halign;
+    my $return_caption_valign =
+      $self->_try_parse_link_component_valign( $tmp_buffer, $caption,
+        $element_options );
+    return $return_caption_valign if defined $return_caption_halign;
+    my $return_caption_extra =
+      $self->_try_parse_link_component_extra_options( $tmp_buffer, $caption,
+        $element_options );
+    return $return_caption_extra if defined $return_caption_extra;
+
+    if ( !defined $caption ) {
         return $tmp_buffer;
     }
     return $caption;
 }
 
-sub _is_defined_image_valign_exclusive($self, $element_options) {
-    if (defined $element_options->{valign}) {
+sub _is_defined_image_valign_exclusive( $self, $element_options ) {
+    if ( defined $element_options->{valign} ) {
         return 1;
     }
     return 0;
 }
 
-sub _is_defined_image_halign_exclusive($self, $element_options) {
-    if (defined $element_options->{halign}) {
+sub _is_defined_image_halign_exclusive( $self, $element_options ) {
+    if ( defined $element_options->{halign} ) {
         return 1;
     }
     return 0;
 }
 
-sub _is_defined_image_resizing_exclusive($self, $element_options) {
+sub _is_defined_image_resizing_exclusive( $self, $element_options ) {
     for my $option (qw/width height upright/) {
-        if (defined $element_options->{resize}{$option}) {
+        if ( defined $element_options->{resize}{$option} ) {
             return 1;
         }
     }
     return 0;
 }
 
-sub _try_parse_image_resizing($self, $tmp_buffer, $element_options) {
-    if (my ($width) = $tmp_buffer =~ /^(\d+)(?: |)px$/) {
-        return 1 if $self->_is_defined_image_resizing_exclusive($element_options);
-        $element_options->{resize}{width} = 0+$width;
+sub _try_parse_image_resizing( $self, $tmp_buffer, $element_options ) {
+    if ( my ($width) = $tmp_buffer =~ /^(\d+)(?:\ |)px$/x ) {
+        return 1
+          if $self->_is_defined_image_resizing_exclusive($element_options);
+        $element_options->{resize}{width} = 0 + $width;
         return 1;
     }
-    if (my ($height) = $tmp_buffer =~ /^x(\d+)(?: |)px$/) {
-        return 1 if $self->_is_defined_image_resizing_exclusive($element_options);
-        $element_options->{resize}{height} = 0+$height;
+    if ( my ($height) = $tmp_buffer =~ /^x(\d+)(?:\ |)px$/x ) {
+        return 1
+          if $self->_is_defined_image_resizing_exclusive($element_options);
+        $element_options->{resize}{height} = 0 + $height;
         return 1;
     }
-    if (my ($width, $height) = $tmp_buffer =~ /^(\d+)x(\d+)(?: |)px$/) {
-        return 1 if $self->_is_defined_image_resizing_exclusive($element_options);
-        $element_options->{resize}{width} = 0+$width;
-        $element_options->{resize}{height} = 0+$height;
+    if ( my ( $width, $height ) = $tmp_buffer =~ /^(\d+)x(\d+)(?:\ |)px$/x ) {
+        return 1
+          if $self->_is_defined_image_resizing_exclusive($element_options);
+        $element_options->{resize}{width}  = 0 + $width;
+        $element_options->{resize}{height} = 0 + $height;
         return 1;
     }
-    if (my ($upright) = $tmp_buffer =~ /^upright(?: |=)(\d+\.\d+)$/) {
-        return 1 if $self->_is_defined_image_resizing_exclusive($element_options);
+    if ( my ($upright) = $tmp_buffer =~ /^upright(?:\ |=)(\d+\.\d+)$/x ) {
+        return 1
+          if $self->_is_defined_image_resizing_exclusive($element_options);
         $element_options->{resize}{upright} = $upright;
         return 1;
     }
     return 0;
+}
+
+sub _try_parse_link_find_size_url( $self, $wiki_text, $valid_characters, $i ) {
+    my $size_search;
+    for ( $size_search = $MINIMUM_LINK_SEARCH ; ; $size_search++ ) {
+        my $last_word = substr $wiki_text, $i, $size_search;
+        if ( $last_word !~ /^\[\[$valid_characters+$/x ) {
+            last;
+        }
+    }
+    return $size_search;
+}
+
+sub _try_parse_link_try_determine_url( $self, $wiki_text, $valid_characters,
+    $i, $size_search )
+{
+    my $last_word = substr $wiki_text, $i, $size_search + 1;
+    if ( $last_word =~ /^\[\[($valid_characters+)\|/x ) {
+        return ( 1, $1 );
+    }
+    return (0);
 }
 
 sub _try_parse_link( $self, $output, $wiki_text, $buffer, $i, $options ) {
@@ -835,20 +1001,15 @@ sub _try_parse_link( $self, $output, $wiki_text, $buffer, $i, $options ) {
     if ( $last_word ne $searched ) {
         return ( 0, $i, $buffer );
     }
-    my $valid_characters =
-qr/[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\-._~:\/?#@!\$&\'\(\)\*\+,;= ]/;
-    for ( $size_search = 3 ; ; $size_search++ ) {
-        my $last_word = substr $wiki_text, $i, $size_search;
-        if ( $last_word !~ /^\[\[$valid_characters+$/ ) {
-            last;
-        }
-    }
+    my $valid_characters = qr/[A-Za-z0-9\-._~:\/?#@!\$&\'\(\)\*\+,;=\ ]/x;
+    $size_search =
+      $self->_try_parse_link_find_size_url( $wiki_text, $valid_characters, $i );
     $size_search--;
-    if ( $size_search < 3 ) {
+    if ( $size_search < $MINIMUM_LINK_SEARCH ) {
         return ( 0, $i, $buffer );
     }
     $last_word = substr $wiki_text, $i, $size_search + 2;
-    if ( $last_word =~ /^\[\[($valid_characters+)\]\]$/ ) {
+    if ( $last_word =~ /^\[\[($valid_characters+)\]\]$/x ) {
         ( $output, $buffer ) =
           $self->_save_before_new_element( $output, $buffer, $options );
         push @$output,
@@ -859,22 +1020,18 @@ qr/[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\-._~:\/?#@!\$
           };
         return ( 1, $i + $size_search + 2, $buffer );
     }
-    $last_word = substr $wiki_text, $i, $size_search + 1;
-    if ( $last_word !~ /^\[\[($valid_characters+)\|/ ) {
+    my ( $got_url, $link ) =
+      $self->_try_parse_link_try_determine_url( $wiki_text, $valid_characters,
+        $i, $size_search );
+    if ( !$got_url ) {
         return ( 0, $i, $buffer );
     }
-    my $link = $1;
 
     ( $output, $buffer ) =
       $self->_save_before_new_element( $output, $buffer, $options );
 
     for ( $i = $i + $size_search + 1 ; $i < length $wiki_text ; $i++ ) {
-        my $searched    = ']]';
-        my $size_search = length $searched;
-        my $last_word   = substr $wiki_text, $i, $size_search;
-        if ( $searched eq $last_word ) {
-            last;
-        }
+        last if $self->_try_parse_link_find_end_title( $wiki_text, $i );
         my $need_next;
         ( $need_next, $i, $buffer ) =
           $self->_try_parse_nowiki( $output, $wiki_text, $buffer, $i,
@@ -895,6 +1052,27 @@ qr/[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\-._~:\/?#@!\$
     return ( 1, $i, $buffer );
 }
 
+sub _try_parse_link_find_end_title( $self, $wiki_text, $i ) {
+    my $searched    = ']]';
+    my $size_search = length $searched;
+    my $last_word   = substr $wiki_text, $i, $size_search;
+    if ( $searched eq $last_word ) {
+        return 1;
+    }
+    return 0;
+}
+
+sub _try_parse_template_find_size_name_template( $self, $wiki_text, $i ) {
+    my $size_search;
+    for ( $size_search = $MINIMUM_TEMPLATE_SEARCH ; ; $size_search++ ) {
+        my $last_word = substr $wiki_text, $i, $size_search;
+        if ( $last_word !~ /^\{\{[a-zA-Z]+$/x ) {
+            last;
+        }
+    }
+    return $size_search;
+}
+
 sub _try_parse_template( $self, $output, $wiki_text, $buffer, $i, $options ) {
     my $searched    = '{{';
     my $size_search = length $searched;
@@ -902,18 +1080,14 @@ sub _try_parse_template( $self, $output, $wiki_text, $buffer, $i, $options ) {
     if ( $last_word ne $searched ) {
         return ( 0, $i, $buffer );
     }
-    for ( $size_search = 3 ; ; $size_search++ ) {
-        my $last_word = substr $wiki_text, $i, $size_search;
-        if ( $last_word !~ /^\{\{[a-zA-Z]+$/ ) {
-            last;
-        }
-    }
+    $size_search =
+      $self->_try_parse_template_find_size_name_template( $wiki_text, $i );
     $size_search--;
-    if ( $size_search < 3 ) {
+    if ( $size_search < $MINIMUM_TEMPLATE_SEARCH ) {
         return ( 0, $i, $buffer );
     }
     $last_word = substr $wiki_text, $i, $size_search + 2;
-    if ( $last_word =~ /^\{\{([a-zA-Z]+)}}$/ ) {
+    if ( $last_word =~ /^\{\{([a-zA-Z]+)}}$/x ) {
         ( $output, $buffer ) =
           $self->_save_before_new_element( $output, $buffer, $options );
         push @$output,
@@ -924,8 +1098,10 @@ sub _try_parse_template( $self, $output, $wiki_text, $buffer, $i, $options ) {
           };
         return ( 1, $i + $size_search + 2, $buffer );
     }
-    $last_word = substr $wiki_text, $i, $size_search + 1;
-    if ( $last_word !~ /^\{\{([a-zA-Z]+)\|/ ) {
+    my ( $got_template_name, $template_name ) =
+      $self->_try_parse_template_get_template_name( $wiki_text, $i,
+        $size_search );
+    if ( !$got_template_name ) {
         return ( 0, $i, $buffer );
     }
 
@@ -934,7 +1110,7 @@ sub _try_parse_template( $self, $output, $wiki_text, $buffer, $i, $options ) {
 
     my $template = {
         type          => 'template',
-        template_name => $1,
+        template_name => $template_name,
         output        => [],
     };
     $i += $size_search + 1;
@@ -943,17 +1119,30 @@ sub _try_parse_template( $self, $output, $wiki_text, $buffer, $i, $options ) {
         $wiki_text,
         $i, $buffer,
         sub ( $wiki_text, $i ) {
-            my $last_word = substr $wiki_text, $i, 2;
-            if ( $last_word ne "}}" ) {
-                return;
-            }
-            return $i + 1;
+            return $self->_try_parse_template_try_to_interrupt( $wiki_text,
+                $i );
         },
         { is_template => 1 }
     );
     push @$output, $template;
     return ( 1, $i, $buffer );
+}
 
+sub _try_parse_template_try_to_interrupt( $self, $wiki_text, $i ) {
+    my $last_word = substr $wiki_text, $i, 2;
+    if ( $last_word ne "}}" ) {
+        return;
+    }
+    return $i + 1;
+}
+
+sub _try_parse_template_get_template_name( $self, $wiki_text, $i, $size_search )
+{
+    my $last_word = substr $wiki_text, $i, $size_search + 1;
+    if ( $last_word =~ /^\{\{([a-zA-Z]+)\|/x ) {
+        return ( 1, $1 );
+    }
+    return (0);
 }
 
 sub _try_parse_header( $self, $output, $wiki_text, $buffer, $i, $options ) {
@@ -970,8 +1159,8 @@ sub _try_parse_header( $self, $output, $wiki_text, $buffer, $i, $options ) {
             last;
         }
         $matching++;
-        if ( $matching > 6 ) {
-            $matching = 6;
+        if ( $matching > $MAX_HX_SIZE ) {
+            $matching = $MAX_HX_SIZE;
             last;
         }
         if ( $i + $matching > length $wiki_text ) {
@@ -1010,7 +1199,7 @@ sub _try_parse_header( $self, $output, $wiki_text, $buffer, $i, $options ) {
         },
         { is_header => 1 }
     );
-    push @$output, $header;
+    push $output->@*, $header;
     return ( 1, $i, $buffer );
 }
 1;
@@ -1071,13 +1260,13 @@ moment.
 
     wiki2json file.wiki > output.json
 
-=head1 INSTANCE_METHODS
+=head1 INSTANCE METHODS
 
 =head2 new
 
     my $wiki_parser = Wiki::JSON->new;
 
-=head1 METHODS
+=head1 SUBROUTINES/METHODS
 
 =head2 parse
 
@@ -1097,7 +1286,7 @@ HashRefs can be classified by the key type which can be one of these:
 
 A header to be printed as h1..h6 in HTML, has the following fields:
 
-=over
+=over 4
 
 =item hx_level
 
@@ -1113,7 +1302,7 @@ An ArrayRef defined by the return from parse.
 
 A template thought for developer defined expansions of how some data shoudl be represented.
 
-=over
+=over 4
 
 =item template_name
 
@@ -1129,7 +1318,7 @@ An ArrayRef defined by the return from parse.
 
 A set of elements that must be represented as bold text.
 
-=over
+=over 4
 
 =item output
 
@@ -1141,7 +1330,7 @@ An ArrayRef defined by the return from parse.
 
 A set of elements that must be represented as italic text.
 
-=over
+=over 4
 
 =item output
 
@@ -1153,7 +1342,7 @@ An ArrayRef defined by the return from parse.
 
 A set of elements that must be represented as bold and italic text.
 
-=over
+=over 4
 
 =item output
 
@@ -1165,7 +1354,7 @@ An ArrayRef defined by the return from parse.
 
 A bullet point list.
 
-=over
+=over 4
 
 =item output
 
@@ -1177,7 +1366,7 @@ A ArrayRef of HashRefs from the type list_element.
 
 An element in a list, this element must not appear outside of the output element of a list.
 
-=over
+=over 4
 
 =item output
 
@@ -1189,7 +1378,7 @@ An ArrayRef defined by the return from parse.
 
 An URL or a link to other Wiki Article.
 
-=over
+=over 4
 
 =item link
 
@@ -1205,7 +1394,7 @@ The text that should be used while showing this URL to point the user where it i
 
 An Image, PDF, or Video.
 
-=over
+=over 4
 
 =item link
 
@@ -1221,19 +1410,45 @@ What to show the user if the image is requested to explain to the user what he i
 
 Undocumented by the moment.
 
-=head1 BUGS
+=head1 DEPENDENCIES
+
+The module will pull all the dependencies it needs on install, the minimum supported Perl is v5.38.2.
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+If your OS Perl is too old perlbrew can be used instead.
+
+=head1 BUGS AND LIMITATIONS
 
 The author thinks it is possible the parser hanging forever, use it in
 a subprocess the program can kill if it takes too long.
 
 The developer can use fork, waitpid, pipe, and non-blocking IO for that.
 
-=head1 LEGAL
+=head1 DIAGNOSTICS
 
-Copyright ©Sergiotarxz (2025)
+If a string halting forever this module is found, send it to me in the Github issue tracker.
+
+=head1 LICENSE AND COPYRIGHT
+
+    Copyright ©Sergiotarxz (2025)
+
+Licensed under the The GNU General Public License, Version 3, June 2007 L<http://www.gnu.org/licenses/gpl-3.0.txt>.
 
 You can use this software under the terms of the GPLv3 license or a new later
 version provided by the FSF or the GNU project.
+
+=head1 INCOMPATIBILITIES
+
+None known.
+
+=head1 VERSION
+
+0.0.x
+
+=head1 AUTHOR
+
+Sergio Iglesias
 
 =head1 SEE ALSO
 

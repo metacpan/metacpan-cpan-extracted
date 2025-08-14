@@ -10,6 +10,8 @@
 
 %if ( $TicketObj ) {
 <input type="hidden" class="hidden" name="id" value="<% $TicketObj->Id %>">
+% } elsif ( $QueueObj ) {
+<input type="hidden" class="hidden" name="QueueId" value="<% $QueueObj->Id %>">
 % }
   <div class="mb-3">
     <textarea
@@ -68,4 +70,5 @@
 <%ARGS>
 $rawText   => ''
 $TicketObj => undef
+$QueueObj  => undef
 </%ARGS>

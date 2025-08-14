@@ -4,7 +4,7 @@ DateTime::Format::Genealogy - Create a DateTime object from a Genealogy Date
 
 # VERSION
 
-Version 0.11
+Version 0.12
 
 # SYNOPSIS
 
@@ -29,10 +29,14 @@ If a date range is given, return a two-element array in array context, or undef 
 
 Returns undef if the date can't be parsed,
 is before AD100,
-is just a year or if it is an approximate date starting with "c", "ca" or "abt".
+is just a year or,
+if it is an approximate date starting with "c", "ca" or "abt".
 Can be called as a class or object method.
 
     my $dt = DateTime::Format::Genealogy->new()->parse_datetime('25 Dec 2022');
+
+Recognizes GEDCOM calendar escapes such as @#DJULIAN@, @#DHEBREW@, and @#DFRENCH R@,
+converting them to DateTime objects when the appropriate calendar modules are installed.
 
 Mandatory arguments:
 

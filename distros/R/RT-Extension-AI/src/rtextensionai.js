@@ -24,8 +24,12 @@ export default class RtExtensionAi extends CKEDITOR.Plugin {
         const editor = this.editor;
 
         if ( isAIEditorPage() ) {
-            this.addDropdown(editor);
-            this.addAutoComplete(editor);
+            if ( RT.AIEditorFeatures.some(item => ['adjust_tone', 'suggest_response', 'translate_content'].includes(item)) ) {
+                this.addDropdown(editor);
+            }
+            if ( RT.AIEditorFeatures.includes('autocomplete_text') ) {
+                this.addAutoComplete(editor);
+            }
         }
     }
 
@@ -35,10 +39,15 @@ export default class RtExtensionAi extends CKEDITOR.Plugin {
     addDropdown(editor) {
         editor.ui.componentFactory.add('aiSuggestion', (locale) => {
             const dropdownItems = new CKEDITOR.Collection();
-
-            dropdownItems.add(this.createDropdownItem('Adjust Tone/Voice', 'adjust_tone'));
-            dropdownItems.add(this.createDropdownItem('AI Suggestion', 'suggest_response'));
-            dropdownItems.add(this.createDropdownItem('Translate', 'translate_content'));
+            if ( RT.AIEditorFeatures.includes('adjust_tone') ) {
+                dropdownItems.add(this.createDropdownItem('Adjust Tone/Voice', 'adjust_tone'));
+            }
+            if ( RT.AIEditorFeatures.includes('suggest_response') ) {
+                dropdownItems.add(this.createDropdownItem('AI Suggestion', 'suggest_response'));
+            }
+            if ( RT.AIEditorFeatures.includes('translate_content') ) {
+                dropdownItems.add(this.createDropdownItem('Translate', 'translate_content'));
+            }
 
             const dropdownView = CKEDITOR.createDropdown(locale, CKEDITOR.DropdownButtonView);
 

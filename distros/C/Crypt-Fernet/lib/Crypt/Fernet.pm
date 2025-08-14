@@ -4,9 +4,7 @@ use 5.018002;
 use strict;
 use warnings;
 
-require Exporter;
-
-our @ISA = qw(Exporter);
+use Exporter 5.57 qw( import );
 
 # Items to export into callers namespace by default. Note: do not export
 # names by default without a very good reason. Use EXPORT_OK instead.
@@ -25,7 +23,7 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = '0.02';
+our $VERSION = '0.0304';
 
 our $FERNET_TOKEN_VERSION = pack("H*", '80');
 
@@ -39,6 +37,8 @@ sub fernet_decrypt { Crypt::Fernet::decrypt(@_) }
 
 
 use Crypt::CBC;
+use Crypt::Rijndael;
+use Crypt::URandom qw( urandom );
 use Digest::SHA qw(hmac_sha256);
 use MIME::Base64::URLSafe;
 
@@ -51,12 +51,11 @@ sub encrypt {
     my $b64decode_key = urlsafe_b64decode($key);
     my $signkey = substr $b64decode_key, 0, 16;
     my $encryptkey = substr $b64decode_key, 16, 16;
-    my $iv = Crypt::CBC->random_bytes(16);
+    my $iv = urandom(16);
     my $cipher = Crypt::CBC->new(-literal_key => 1,
                                  -key         => $encryptkey,
                                  -iv          => $iv,
                                  -keysize     => 16,
-                                 -blocksize   => 16,
                                  -padding     => 'standard',
                                  -cipher      => 'Rijndael',
                                  -header      => 'none',
@@ -84,7 +83,6 @@ sub decrypt {
                                  -key         => $encryptkey,
                                  -iv          => $iv,
                                  -keysize     => 16,
-                                 -blocksize   => 16,
                                  -padding     => 'standard',
                                  -cipher      => 'Rijndael',
                                  -header      => 'none',

@@ -62,7 +62,7 @@ test_year_has_num_of_holidays(2021, 15, 1);
 test_year_has_num_of_holidays(2022, 16, 0);
 test_year_has_num_of_holidays(2023, 16, 11);
 test_year_has_num_of_holidays(2024, 17+1, 10);
-test_year_has_num_of_holidays(2025, 17, 10);
+test_year_has_num_of_holidays(2025, 17, 11);
 
 DONE_TESTING:
 done_testing;

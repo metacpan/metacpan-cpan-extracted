@@ -1,20 +1,12 @@
-#!perl -wT
+#!perl -w
 
 use strict;
 use warnings;
+
+use Test::DescribeMe qw(author);
 use Test::Most;
+use Test::Needs { 'warnings::unused' => '0.04' };
 
-unless($ENV{AUTHOR_TESTING}) {
-	plan(skip_all => "Author tests not required for installation");
-}
-
-# eval 'use warnings::unused -global';
-eval 'use warnings::unused';
-
-if($@ || ($warnings::unused::VERSION < 0.04)) {
-	plan(skip_all => 'warnings::unused >= 0.04 needed for testing');
-} else {
-	use_ok('DateTime::Format::Genealogy');
-	new_ok('DateTime::Format::Genealogy');
-	plan tests => 2;
-}
+use_ok('DateTime::Format::Genealogy');
+new_ok('DateTime::Format::Genealogy');
+plan(tests => 2);

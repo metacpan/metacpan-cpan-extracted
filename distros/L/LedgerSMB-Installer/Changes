@@ -1,5 +1,16 @@
 ---
 
+0.999.10    TO BE RELEASED
+   [Changed]
+       * Install more LaTeX dependency packages on Debian and Federa
+   [Fixed]
+       * POD documentation error
+       * Install LaTeX dependencies, even when LaTeX::Driver is installed
+       * Take version requirement ranges into account when installing from
+         CPAN based on 'cpanfile'
+       * Invocation of 'grep'; accept return value 1 (no matching lines)
+         as successful command completion (instead of as an error)
+
 0.999.9      2025-08-10
    [Fixed]
        * 'gpg' invocation for signature validation

@@ -52,13 +52,13 @@ moment.
 
     wiki2json file.wiki > output.json
 
-# INSTANCE\_METHODS
+# INSTANCE METHODS
 
 ## new
 
     my $wiki_parser = Wiki::JSON->new;
 
-# METHODS
+# SUBROUTINES/METHODS
 
 ## parse
 
@@ -166,19 +166,45 @@ An Image, PDF, or Video.
 
 Undocumented by the moment.
 
-# BUGS
+# DEPENDENCIES
+
+The module will pull all the dependencies it needs on install, the minimum supported Perl is v5.38.2.
+
+# CONFIGURATION AND ENVIRONMENT
+
+If your OS Perl is too old perlbrew can be used instead.
+
+# BUGS AND LIMITATIONS
 
 The author thinks it is possible the parser hanging forever, use it in
 a subprocess the program can kill if it takes too long.
 
 The developer can use fork, waitpid, pipe, and non-blocking IO for that.
 
-# LEGAL
+# DIAGNOSTICS
 
-Copyright ©Sergiotarxz (2025)
+If a string halting forever this module is found, send it to me in the Github issue tracker.
+
+# LICENSE AND COPYRIGHT
+
+    Copyright ©Sergiotarxz (2025)
+
+Licensed under the The GNU General Public License, Version 3, June 2007 [http://www.gnu.org/licenses/gpl-3.0.txt](http://www.gnu.org/licenses/gpl-3.0.txt).
 
 You can use this software under the terms of the GPLv3 license or a new later
 version provided by the FSF or the GNU project.
+
+# INCOMPATIBILITIES
+
+None known.
+
+# VERSION
+
+0.0.x
+
+# AUTHOR
+
+Sergio Iglesias
 
 # SEE ALSO
 

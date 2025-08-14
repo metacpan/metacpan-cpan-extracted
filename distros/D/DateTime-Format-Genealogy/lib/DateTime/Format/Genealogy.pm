@@ -20,6 +20,8 @@ use namespace::clean;
 use Carp;
 use DateTime::Format::Natural;
 use Genealogy::Gedcom::Date 2.01;
+use Params::Get 0.08;
+use Readonly::Values::Months 0.02 qw(@short_month_names);
 use Scalar::Util;
 
 our %months = (
@@ -39,19 +41,17 @@ our %months = (
 	'December' => 'Dec'
 );
 
-our @months = ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec');
-
 =head1 NAME
 
 DateTime::Format::Genealogy - Create a DateTime object from a Genealogy Date
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =cut
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 =head1 SYNOPSIS
 
@@ -95,6 +95,7 @@ sub new
 		# If $class is an object, clone it with new arguments
 		return bless { %{$class}, %args }, ref($class);
 	}
+
 	# Return the blessed object
 	return bless { %args }, $class;
 }
@@ -107,10 +108,14 @@ If a date range is given, return a two-element array in array context, or undef 
 
 Returns undef if the date can't be parsed,
 is before AD100,
-is just a year or if it is an approximate date starting with "c", "ca" or "abt".
+is just a year or,
+if it is an approximate date starting with "c", "ca" or "abt".
 Can be called as a class or object method.
 
     my $dt = DateTime::Format::Genealogy->new()->parse_datetime('25 Dec 2022');
+
+Recognizes GEDCOM calendar escapes such as @#DJULIAN@, @#DHEBREW@, and @#DFRENCH R@,
+converting them to DateTime objects when the appropriate calendar modules are installed.
 
 Mandatory arguments:
 
@@ -152,10 +157,16 @@ sub parse_datetime {
 		return(__PACKAGE__->new()->parse_datetime($self));
 	}
 
-	my $params = $self->_get_params('date', @_);
+	my $params = Params::Get::get_params('date', @_);
 
 	if((!ref($params->{'date'})) && (my $date = $params->{'date'})) {
 		my $quiet = $params->{'quiet'};
+
+		# Detect GEDCOM calendar escape
+		my $calendar_type = 'DGREGORIAN';
+		if ($date =~ s/^@#D([A-Z ]+?)@\s*//) {
+			$calendar_type = 'D' . uc($1);  # normalise
+		}
 
 		# TODO: Needs much more sanity checking
 		if(($date =~ /^bef\s/i) || ($date =~ /^aft\s/i) || ($date =~ /^abt\s/i)) {
@@ -169,7 +180,7 @@ sub parse_datetime {
 		}
 		if($date =~ /^\s*(.+\d\d)\s*\-\s*(.+\d\d)\s*$/) {
 			if($date =~ /^(\d{4})\-(\d{2})\-(\d{2})$/) {
-				my $month = $months[$2 - 1];
+				my $month = ucfirst($short_month_names[$2 - 1]);
 				Carp::carp("Changing date '$date' to '$3 $month $1'") unless($quiet);
 				$date = "$3 $month $1";
 			} else {
@@ -199,6 +210,9 @@ sub parse_datetime {
 					return;
 				}
 			} elsif($date =~ /^(\d{1,2})\s+([A-Z]{4,}+)\.?\s+(\d{3,4})$/i) {
+				# FIXME: Doesn't include sept
+				# if(my $abbrev = $month_names_to_short{lc($2)}) {
+					# $abbrev = ucfirst($abbrev);
 				if(my $abbrev = $months{ucfirst(lc($2))}) {
 					$date = "$1 $abbrev $3";
 				} elsif($2 eq 'Janv') {
@@ -228,7 +242,13 @@ sub parse_datetime {
 			if(($date =~ /^\d/) && (my $d = $self->_date_parser_cached($date))) {
 				# D:T:Natural doesn't seem to work before AD100
 				return if($date =~ /\s\d{1,2}$/);
-				return $dfn->parse_datetime($d->{'canonical'});
+				my $rc = $dfn->parse_datetime($d->{'canonical'});
+
+				if($rc && $calendar_type ne 'DGREGORIAN') {
+					return _convert_calendar($rc, $calendar_type, $quiet);
+				}
+
+				return $rc;
 			}
 			if(($date !~ /^(Abt|ca?)/i) && ($date =~ /^[\w\s,]+$/)) {
 				# ACOM exports full month names and non-standard format dates e.g. U.S. format MMM, DD YYYY
@@ -253,7 +273,7 @@ sub parse_datetime {
 sub _date_parser_cached
 {
 	my $self = shift;
-	my $params = $self->_get_params('date', @_);
+	my $params = Params::Get::get_params('date', @_);
 	my $date = $params->{'date'};
 
 	Carp::croak('Usage: _date_parser_cached(date => $date)') unless defined $date;
@@ -284,39 +304,55 @@ sub _date_parser_cached
 	return;
 }
 
-# Helper routine to parse the arguments given to a function.
-# Processes arguments passed to methods and ensures they are in a usable format,
-#	allowing the caller to call the function in anyway that they want
-#	e.g. foo('bar'), foo(arg => 'bar'), foo({ arg => 'bar' }) all mean the same
-#	when called _get_params('arg', @_);
-sub _get_params
-{
-	shift;  # Discard the first argument (typically $self)
-	my $default = shift;
+sub _convert_calendar {
+	my ($dt, $calendar_type, $quiet) = @_;
 
-	# Directly return hash reference if the first parameter is a hash reference
-	return $_[0] if(ref($_[0]) eq 'HASH');
-
-	my %rc;
-	my $num_args = scalar @_;
-
-	# Populate %rc based on the number and type of arguments
-	if(($num_args == 1) && (defined $default)) {
-		# %rc = ($default => shift);
-		return { $default => shift };
-	} elsif($num_args == 1) {
-		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], '()');
-	} elsif(($num_args == 0) && (defined($default))) {
-		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], "($default => \$val)");
-	} elsif(($num_args % 2) == 0) {
-		%rc = @_;
-	} elsif($num_args == 0) {
-		return;
-	} else {
-		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], '()');
+	if($calendar_type eq 'DJULIAN') {
+		# In a Gedcom, DJULIAN refers to a date in the Julian calendar format, using the @#DJULIAN@ escape to indicate it
+		# Approximate historical offset
+		my $offset_days = _julian_to_gregorian_offset($dt->year);
+		return $dt->clone->add(days => $offset_days);
+	} elsif ($calendar_type eq 'DHEBREW') {
+		eval {
+			require DateTime::Calendar::Hebrew;
+			my $h = DateTime::Calendar::Hebrew->new(
+				year  => $dt->year,
+				month => $dt->month,
+				day   => $dt->day
+			);
+			return DateTime->from_object(object => $h);
+		};
+		Carp::carp("Hebrew calendar conversion failed: $@") if $@ && !$quiet;
+	} elsif ($calendar_type =~ /FRENCH R/) {
+		eval {
+			require DateTime::Calendar::FrenchRevolutionary;
+			my $f = DateTime::Calendar::FrenchRevolutionary->new(
+				year  => $dt->year,
+				month => $dt->month,
+				day   => $dt->day
+			);
+			return DateTime->from_object(object => $f);
+		};
+		Carp::carp("French Republican calendar conversion failed: $@") if $@ && !$quiet;
+	} else {	# e.g DROMAN
+		Carp::carp("Calendar type $calendar_type not supported") unless $quiet;
 	}
+	return $dt;
+}
 
-	return \%rc;
+sub _julian_to_gregorian_offset {
+	my $year = $_[0];
+
+	# The gap widened over centuries:
+	# 10 days from 5 Oct 1582 to 28 Feb 1700
+	# 11 days from 1 Mar 1700 to 28 Feb 1800
+	# 12 days from 1 Mar 1800 to 28 Feb 1900
+	# 13 days from 1 Mar 1900 onwards
+
+	return 10 if $year < 1700;
+	return 11 if $year < 1800;
+	return 12 if $year < 1900;
+	return 13;
 }
 
 1;

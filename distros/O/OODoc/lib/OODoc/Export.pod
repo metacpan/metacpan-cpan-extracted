@@ -259,6 +259,15 @@ The data-structure refers to a few capitalized comments:
 
 The output markup used for text.  Currently only "html" is supported.
 
+=item META
+
+Distribution meta-data, as provided by its F<MYMETA.json>.
+
+=item SAFE
+
+No HTML, but does never contain any HTML conflicting data.  Is
+does not contain links.
+
 =back
 
 =head3 root
@@ -266,14 +275,14 @@ The output markup used for text.  Currently only "html" is supported.
 The root:
 
   { "project": "MailBox",                      # MARKUP
-    "distribution": "Mail-Box",
-    "version": "4.01_12",
+    "distribution": "Mail-Box",                # SAFE
+    "version": "4.01_12",                      # SAFE
 
     "generated_by" : {
-       "program": "oodist",
-       "program_version": "3.14",
-       "oodoc_version": "3.00",
-       "created": "2025-07-27 16:30"
+       "program": "oodist",                    # SAFE
+       "program_version": "3.14",              # SAFE
+       "oodoc_version": "3.00",                # SAFE
+       "created": "2025-07-27 16:30"           # SAFE
     },
     "distributions": {
        "Mail-Box": { ... },                    # META
@@ -281,12 +290,12 @@ The root:
     },
     "manuals": {
        "Mail::Message": "id42",                # REF
-       "Mail::Message::Field": "id1023",       # REF
+       "Mail::Message::Field": "id1023"        # REF
     },
     "index": {
-       "id42": { ... }
+       "id42": { ... },
        "id1023": { ... }
-    },
+    }
   }
 
 =head3 Distributions
@@ -297,9 +306,9 @@ which is part of the project.
 
 Some of the important fields:
 
-  { "name": "Mail-Box",
+  { "name": "Mail-Box",                        # SAFE
     "abstract": "Manage a mailbox",            # MARKUP
-    "version": "3.14"
+    "version": "3.14"                          # SAFE
   }
 
 Take a look at the C<MYMETA.json> or C<META.json> for any module which is produced
@@ -311,8 +320,8 @@ with OODoc, for instance OODoc itself at F<https://metacpan.org/XXX>
     "name": "Mail::Box",                       # MARKUP
     "version": "3.14",                         # or undef
     "title": "Manage a mailbox",               # MARKUP
-    "package": "lib/Mail/Box.pm",
-    "distribution": "Mail-Box",
+    "package": "lib/Mail/Box.pm",              # SAFE
+    "distribution": "Mail-Box",                # SAFE
     "is_pure_pod": false,                      # BOOLEAN
     "chapters": [ REF, ... ]
   }
@@ -328,11 +337,11 @@ a list of nested blocks.
 
 Each (text) block has same features:
 
-  { "id": REF,
+  { "id": REF,                                 # SAFE
     "name": "Constructors",                    # MARKUP
-    "level": 2,
-    "type": "section",
-    "extends": REFERENCE,
+    "level": 2,                                # SAFE
+    "type": "section",                         # SAFE
+    "extends": REFERENCE,                      #XXX TODO
     "intro": "Intro to this section.",         # MARKUP
     "examples": [ REF, ... ],
     "subroutines": [ REF, ... ],
@@ -350,26 +359,26 @@ There are a few types of subroutines:
 
 =over 4
 
-=item C<function>, the classical 'sub'
+=item * C<function>, the classical 'sub'
 
-=item C<i_method>, instance method (in the docs also as C<=method>)
+=item * C<i_method>, instance method (in the docs also as C<=method>)
 
-=item C<c_method>, class method
+=item * C<c_method>, class method
 
-=item C<ci_method>, both usable as class or instance method
+=item * C<ci_method>, both usable as class or instance method
 
-=item C<overload>, describes overloading
+=item * C<overload>, describes overloading
 
-=item C<tie>, tied interface
+=item * C<tie>, tied interface
 
 =back
 
 Each subroutine looks like this:
 
-  { "id": REF,
+  { "id": REF,                               # SAFE
     "name": "producePages",                  # MARKUP
     "call": "$obj->producePages()" ],        # MARKUP
-    "type": "i_method",
+    "type": "i_method",                      # MARKUP
     "intro": "Create the manual ...",        # MARKUP
     "examples": [ REF, ... ],
     "options: [ REF, ... ],
@@ -381,18 +390,18 @@ Each subroutine looks like this:
 Most subroutine forms can have options.  They are passed as
 list sorted by name.
 
-  { "id": REF,
+  { "id": REF,                               # SAFE
     "name": "beautify",                      # MARKUP
-    "type": "option",
+    "type": "option",                        # SAFE
     "params": "true|false",                  # MARKUP
     "intro": "Make the output better"        # MARKUP
   }
 
 The defaults look like this:
 
-  { "id": REF,
+  { "id": REF,                               # SAFE
     "name": "beautify",                      # MARKUP
-    "type": "default",
+    "type": "default",                       # SAFE
     "value": "<true>",                       # MARKUP
   }
 
@@ -403,9 +412,9 @@ The option is required when the default value is C<< <required> >>.
 Every block of text, and every subroutine can have a number of
 examples.  Examples do not always have a name.
 
-  { "id": REF,
+  { "id": REF,                               # SAFE
     "name": "how to produce pages",          # MARKUP
-    "type": "example",
+    "type": "example",                       # SAFE
     "intro": "Like this"                     # MARKUP
   }
 
@@ -416,10 +425,10 @@ sorted errors first, then by description text.  Other types of
 diagnostics will be added soon, to match the levels offered by
 Log::Report.
 
-  { "id": REF,
-    "type": "error" or "warning",
-    "name": "Missing ...",                  # MARKUP
-    "intro: "This error is shown when...",  # MARKUP
+  { "id": REF,                               # SAFE
+    "type": "error"/"warning"/"info"...,     # SAFE
+    "name": "Missing ...",                   # MARKUP
+    "intro: "This error is shown when...",   # MARKUP
     "subroutine": REF,
   }
 
@@ -445,8 +454,8 @@ to L<manualsForPackage()|OODoc::Object/"Manual Repository"> or L<mainManual()|OO
 
 =head1 SEE ALSO
 
-This module is part of OODoc version 3.00,
-built on August 02, 2025. Website: F<https://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.01,
+built on August 14, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 

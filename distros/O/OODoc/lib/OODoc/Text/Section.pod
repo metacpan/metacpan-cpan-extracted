@@ -214,13 +214,13 @@ Extends L<"Collected" in OODoc::Text::Structure|OODoc::Text::Structure/"Collecte
  
 =over 4
 
-=item $obj-E<gt>B<all>($method, $parameters)
-
-Inherited, see L<OODoc::Text::Structure/"Collected">
-
-=item $obj-E<gt>B<example>($object)
+=item $obj-E<gt>B<addExample>($object)
 
 Inherited, see L<OODoc::Text/"Collected">
+
+=item $obj-E<gt>B<all>($method, \%parameters)
+
+Inherited, see L<OODoc::Text::Structure/"Collected">
 
 =item $obj-E<gt>B<examples>()
 
@@ -250,7 +250,7 @@ Extends L<"Subroutines" in OODoc::Text::Structure|OODoc::Text::Structure/"Subrou
 
 Inherited, see L<OODoc::Text::Structure/"Subroutines">
 
-=item $obj-E<gt>B<setSubroutines>(ARRAY)
+=item $obj-E<gt>B<setSubroutines>(\@subs)
 
 Inherited, see L<OODoc::Text::Structure/"Subroutines">
 
@@ -270,8 +270,8 @@ Inherited, see L<OODoc::Text::Structure/"Subroutines">
 
 =item $obj-E<gt>B<subsection>($name|$object)
 
-With a $name, the subsection within this section with that name is
-returned.  With an $object (which must be a L<OODoc::Text::SubSection|OODoc::Text::SubSection>),
+With a C<$name>, the subsection within this section with that name is
+returned.  With an C<$object> (which must be a L<OODoc::Text::SubSection|OODoc::Text::SubSection>),
 a new subsection is added to the end of the list.
 
 =item $obj-E<gt>B<subsections>( [$subsections] )
@@ -310,8 +310,8 @@ to L<manualsForPackage()|OODoc::Object/"Manual Repository"> or L<mainManual()|OO
 
 =head1 SEE ALSO
 
-This module is part of OODoc version 3.00,
-built on August 02, 2025. Website: F<https://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.01,
+built on August 14, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 

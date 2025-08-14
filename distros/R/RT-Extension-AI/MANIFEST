@@ -5,8 +5,10 @@ html/AI/AdjustToneForm
 html/AI/ModalContent
 html/AI/SuggestionForm
 html/AI/TranslateForm
+html/Callbacks/RT-Extension-AI/Elements/JavascriptConfig/Data
 html/Callbacks/RT-Extension-AI/Ticket/Create.html/FormStart
 html/Callbacks/RT-Extension-AI/Ticket/Update.html/FormStart
+html/Callbacks/RT-Extension-AI/Ticket/Widgets/Create/Message/AfterMessageBox
 html/Elements/AIJavascriptConfig
 html/Helpers/AISuggestion/ProcessAIRequest
 html/Helpers/AISuggestion/ShowModal

@@ -9,6 +9,8 @@
   <input type="hidden" name="callType" value="translate_content">
 %if ( $TicketObj ) {
   <input type="hidden" class="hidden" name="id" value="<% $TicketObj->Id %>">
+% } elsif ( $QueueObj ) {
+<input type="hidden" class="hidden" name="QueueId" value="<% $QueueObj->Id %>">
 % }
     <div class="mb-2">
         <label class="form-label small text-muted mb-1"><&|/l&>Translate From</&></label>
@@ -79,4 +81,5 @@ $rawText   => ''
 $transFrom => undef
 $transTo   => 'es'
 $TicketObj => undef
+$QueueObj  => undef
 </%ARGS>

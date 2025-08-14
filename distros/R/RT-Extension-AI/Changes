@@ -1,5 +1,12 @@
 Revision history for RT-Extension-AI
 
+0.05 2025-08-13
+ - Pass queue info to AI endpoints for ticket create page
+ - Support to customize AI editor features from config
+ - Exclude aiSuggestion toolbar menu if AI is not active for current queue
+ - Handle empty ticket id for suggestion modals
+ - Avoid coerced null string id for AI requests while creating ticket (thanks to Zach Kelly!)
+
 0.04 2025-08-07
  - Support RT 6.0.1
 

@@ -28,5 +28,5 @@ requires:
 resources:
   bugtracker: https://github.com/ledgersmb/ledgersmb-installer/issues
   repository: git://github.com/ledgersmb/ledgersmb-installer.git
-version: v0.999.9
+version: v0.999.10
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

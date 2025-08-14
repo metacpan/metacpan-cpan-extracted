@@ -4,12 +4,19 @@ $callType   => ''
 $transFrom  => 'en'
 $transTo    => 'es'
 $TicketId   => undef
+$QueueId    => undef
 </%ARGS>
 
 <%INIT>
 my $TicketObj;
 if ( $TicketId ) {
     $TicketObj = LoadTicket($TicketId);
+}
+
+my $QueueObj;
+if ( $QueueId ) {
+    $QueueObj = RT::Queue->new( $session{CurrentUser} );
+    $QueueObj->Load($QueueId);
 }
 
 my $modal_title;
@@ -34,5 +41,6 @@ if ($callType eq 'translate_content') {
   callType        => $callType,
   transFrom       => $transFrom,
   transTo         => $transTo,
-  TicketObj       => $TicketObj
+  TicketObj       => $TicketObj,
+  QueueObj        => $QueueObj,
 &>

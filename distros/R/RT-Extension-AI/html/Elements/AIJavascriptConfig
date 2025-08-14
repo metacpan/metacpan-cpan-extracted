@@ -1,5 +1,15 @@
 <script>
     window.RT_AI_ActiveForCurrentQueue = <% $AI_Active %>;
+    window.RT.AIEditorFeatures = <% JSON( $config->{editor_features} || [qw/adjust_tone suggest_response translate_content autocomplete_text/] ) |n %>;
+    if ( window.RT_AI_ActiveForCurrentQueue && window.RT.AIEditorFeatures.some(item => ['adjust_tone', 'suggest_response', 'translate_content'].includes(item)) ) {
+        RT.Config.MessageBoxRichTextInitArguments = structuredClone(RT.Config.OriginalMessageBoxRichTextInitArguments);
+    }
+    else if ( RT.Config.MessageBoxRichTextInitArguments.toolbar.items ) {
+        RT.Config.MessageBoxRichTextInitArguments.toolbar.items = RT.Config.MessageBoxRichTextInitArguments.toolbar.items.filter(item => item != 'aiSuggestion');
+    }
+    else {
+        RT.Config.MessageBoxRichTextInitArguments.toolbar = RT.Config.MessageBoxRichTextInitArguments.toolbar.filter(item => item != 'aiSuggestion');
+    }
 </script>
 <%init>
 my $config = RT->Config->Get('RT_AI_Provider');

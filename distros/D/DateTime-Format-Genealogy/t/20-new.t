@@ -34,7 +34,7 @@ subtest 'Create object with hashref arguments' => sub {
 subtest 'Clone object with new arguments' => sub {
 	my $original_obj = DateTime::Format::Genealogy->new(foo => 'bar');
 	my $cloned_obj = $original_obj->new(baz => 44);
-	
+
 	isa_ok($cloned_obj, 'DateTime::Format::Genealogy');
 	is($cloned_obj->{foo}, 'bar', 'Original attribute foo is preserved');
 	is($cloned_obj->{baz}, 44, 'New attribute baz is set correctly');

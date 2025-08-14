@@ -1,5 +1,5 @@
-# This code is part of Perl distribution OODoc version 3.00.
-# The POD got stripped from this file by OODoc version 3.00.
+# This code is part of Perl distribution OODoc version 3.01.
+# The POD got stripped from this file by OODoc version 3.01.
 # For contributors see file ChangeLog.
 
 # This software is copyright (c) 2003-2025 by Mark Overmeer.
@@ -9,7 +9,7 @@
 # SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
 
 package OODoc;{
-our $VERSION = '3.00';
+our $VERSION = '3.01';
 }
 
 use parent 'OODoc::Object';
@@ -17,7 +17,7 @@ use parent 'OODoc::Object';
 use strict;
 use warnings;
 
-our $VERSION = '3.00';  # needed here for own release process
+our $VERSION = '3.01';  # needed here for own release process
 
 use Log::Report    'oodoc';
 
@@ -54,7 +54,7 @@ sub init($)
     }
 
     $self->{O_version} = $version
-        or error __x"no version specified for distribution '{dist}'", dist  => $distribution;
+        or error __x"no version specified for distribution {dist}", dist  => $distribution;
 
     $self;
 }
@@ -237,28 +237,25 @@ sub processFiles(@)
 
 #-------------------------------------------
 
-sub prepare(@)
+sub finalize(%)
 {   my ($self, %args) = @_;
 
-    info "collect package relations";
+    info "* collect package relations";
     $self->getPackageRelations;
 
-    info "expand manual contents";
-    foreach my $manual ($self->manuals)
-    {   trace "  expand manual $manual";
-        $manual->expand;
-    }
+    info "* expand manual contents";
+    $_->expand for $self->manuals;
 
-    info "Create inheritance chapters";
-    foreach my $manual ($self->manuals)
-    {    next if $manual->chapter('INHERITANCE');
+    info "* create inheritance chapters";
+    $_->createInheritance for $self->manuals;
 
-         trace "  create inheritance for $manual";
-         $manual->createInheritance;
-    }
+	info "* finalize each manual";
+	$_->finalize(%args) for $self->manuals;
 
     $self;
 }
+
+sub prepare() { panic "OODoc 3.01 renamed prepare() into finalize." }
 
 
 sub getPackageRelations($)
@@ -311,7 +308,6 @@ sub getPackageRelations($)
     $self;
 }
 
-#-------------------------------------------
 
 sub formatter($@)
 {   my ($self, $format, %args) = @_;
@@ -356,7 +352,7 @@ sub stats()
     my $version  = $self->version;
     my $project  = $self->project;
 
-    <<STATS;
+    <<__STATS;
 Project $project contains:
   Number of package manuals: $manuals
   Real number of packages:   $realpkg
@@ -364,7 +360,7 @@ Project $project contains:
   documented options:        $options
   documented diagnostics:    $diags
   shown examples:            $examples
-STATS
+__STATS
 }
 
 #-------------------------------------------

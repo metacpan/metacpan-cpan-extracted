@@ -21,7 +21,7 @@ OODoc::Object - base class for all OODoc classes.
 
 =head1 DESCRIPTION
 
-Any object used in the OODoc module is derived from this OODoc::Object
+Any object used in the OODoc module is derived from this L<OODoc::Object|OODoc::Object>
 class.  This means that all functionality in this class is provided
 for all of the other classes.
 
@@ -37,7 +37,7 @@ of the objects.
 
 =item overload: B<'bool'>
 
-Always returns true: "exists".
+Always returns C<true>: "exists".
 
 =back
 
@@ -85,7 +85,7 @@ collection.
 
 =item $obj-E<gt>B<addManual>($manual)
 
-The $manual will be added to the list of known manuals.  The same package
+The C<$manual> will be added to the list of known manuals.  The same package
 name can appear in more than one manual.  This OBJECT shall be of type
 L<OODoc::Manual|OODoc::Manual>.
 
@@ -96,7 +96,7 @@ L<OODoc::Manual|OODoc::Manual>.
 =item $obj-E<gt>B<mainManual>($name)
 
 Returns the manual of the named package which contains the primar
-documentation for the code of the package $name.
+documentation for the code of the package C<$name>.
 
 =item $obj-E<gt>B<manuals>()
 
@@ -104,8 +104,8 @@ All manuals are returned.
 
 =item $obj-E<gt>B<manualsForPackage>($name)
 
-Returns a list package objects which are related to the specified $name.
-One $name can appear in more than one file, and therefore a list is
+Returns a list package objects which are related to the specified C<$name>.
+One C<$name> can appear in more than one file, and therefore a list is
 returned.
 
 =item $obj-E<gt>B<packageNames>()
@@ -137,7 +137,7 @@ example:
 
 =item $any-E<gt>B<mkdirhier>($directory)
 
-Creates this $directory and all its non-existing parents.
+Creates this C<$directory> and all its non-existing parents.
 
 =back
 
@@ -147,7 +147,7 @@ Creates this $directory and all its non-existing parents.
 
 =item Warning: Unknown option $name
 
-You have used the option with $name, which is not defined with the
+You have used the option with C<$name>, which is not defined with the
 instantiation (the C<new> method) of this object.
 
 =item Warning: Unknown options @names
@@ -165,8 +165,8 @@ to L<manualsForPackage()|OODoc::Object/"Manual Repository"> or L<mainManual()|OO
 
 =head1 SEE ALSO
 
-This module is part of OODoc version 3.00,
-built on August 02, 2025. Website: F<https://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.01,
+built on August 14, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 

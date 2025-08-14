@@ -1,4 +1,4 @@
-package LedgerSMB::Installer::OS::unix v0.999.9;
+package LedgerSMB::Installer::OS::unix v0.999.10;
 
 use v5.20;
 use experimental qw(signatures);
@@ -75,13 +75,22 @@ sub cpanm_install($self, $installpath, $locallib, $unmapped_mods) {
         '--metacpan',
         '--without-recommends',
         '--local-lib', $locallib,
-        $unmapped_mods->@*
         );
 
-    $log->debug( "system(): " . join(' ', map { "'$_'" } @cmd ) );
-
-    system(@cmd) == 0
+    # install dependencies from 'cpanfile' because that includes
+    # version range restrictions
+    my @deps_cmd = (@cmd, '--installdeps', $installpath);
+    $log->debug( "system(): " . join(' ', map { "'$_'" } @deps_cmd ) );
+    system(@deps_cmd) == 0
         or croak $log->fatal( "Failure running cpanm - exit code: $?" );
+
+    # only install modules which were not satisfied from cpanfile
+    # as fallback, because we're missing version range restrictions
+    my @mods_cmd = (@cmd, '--skip-satisfied', $unmapped_mods->@*);
+    $log->debug( "system(): " . join(' ', map { "'$_'" } @mods_cmd ) );
+    system(@mods_cmd) == 0
+        or croak $log->fatal( "Failure running cpanm - exit code: $?" );
+
     remove_tree( File::Spec->catdir( $installpath, 'tmp' ) );
 }
 

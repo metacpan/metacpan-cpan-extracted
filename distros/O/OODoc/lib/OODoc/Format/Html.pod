@@ -125,7 +125,7 @@ Inherited, see L<OODoc::Format/"Attributes">
 
 =item $obj-E<gt>B<manual>( [$manual] )
 
-Returns (optionally after setting) the $manual which is being processed.
+Returns (optionally after setting) the C<$manual> which is being processed.
 
 =item $obj-E<gt>B<markers>( [$filehandle] )
 
@@ -273,9 +273,9 @@ Inherited, see L<OODoc::Format/"Page generation">
 =item $obj-E<gt>B<expandTemplate>( $location, [$format] )
 
 Translate a filename, directory name or hash with file/directory names
-which are specified as $location for templates into hash of filenames
-names and related formatting options.  The $format is an array of options
-which can be overruled by values which the $location is specified as hash.
+which are specified as C<$location> for templates into hash of filenames
+names and related formatting options.  The C<$format> is an array of options
+which can be overruled by values which the C<$location> is specified as hash.
 
 example: expanding template specification into files
 
@@ -295,9 +295,9 @@ example: expanding template specification into files
 
 =item $obj-E<gt>B<link>( $manual, $object, [ ($html|undef), \%settings ] )
 
-Create the html for a link which refers to the $object.  The link will be
-shown somewhere in the $manual.  The $text is displayed as link, and defaults
-to the name of the $object.
+Create the html for a link which refers to the C<$object>.  The link will be
+shown somewhere in the C<$manual>.  The C<$html> is displayed as link, and defaults
+to the name of the C<$object>.
 
 =item $obj-E<gt>B<mark>($manual, $id)
 
@@ -339,7 +339,7 @@ Inherited, see L<OODoc::Format/"Page generation">
 
 Inherited, see L<OODoc::Format/"Page generation">
 
-=item $obj-E<gt>B<showSubroutine>( <@> )
+=item $obj-E<gt>B<showSubroutine>(%options)
 
 Inherited, see L<OODoc::Format/"Page generation">
 
@@ -359,7 +359,7 @@ Inherited, see L<OODoc::Format/"Page generation">
 
 Inherited, see L<OODoc::Format/"Page generation">
 
-=item $obj-E<gt>B<writeTable>()
+=item $obj-E<gt>B<writeTable>(%options)
 
 Z<>
 
@@ -432,7 +432,7 @@ The name of the distribution which contains the manual page at hand.
 
 Z<>
 
-=item $obj-E<gt>B<templateIndex>($templ, $attrs, $if, $else)
+=item $obj-E<gt>B<templateIndex>($templ, \%options, $if, $else)
 
 The I<index> template is called with one keyword, which tells the
 kind of index to be built.  Valid values are C<MANUALS>,
@@ -478,7 +478,7 @@ example: use of the template tag "index"
 
 Z<>
 
-=item $obj-E<gt>B<templateList>($templ, $attrs, $if, $else)
+=item $obj-E<gt>B<templateList>($templ, \%options, $if, $else)
 
 Z<>
 
@@ -549,7 +549,7 @@ Z<>
 
 =item Error: cannot find template source $name
 
-Somewhere was specified to use $name (a file or directory) as source
+Somewhere was specified to use C<$name> (a file or directory) as source
 for a template.  However, it does not seem to exist.  Unfortunately,
 the location where the source is specified is not known when the
 error is produced.
@@ -643,8 +643,8 @@ Z<>
 
 =head1 SEE ALSO
 
-This module is part of OODoc version 3.00,
-built on August 02, 2025. Website: F<https://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.01,
+built on August 14, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 

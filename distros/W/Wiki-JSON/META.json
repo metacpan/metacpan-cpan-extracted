@@ -6,7 +6,7 @@
    "dynamic_config" : 1,
    "generated_by" : "Module::Build version 0.4234",
    "license" : [
-      "unknown"
+      "gpl_3"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -21,22 +21,24 @@
       },
       "runtime" : {
          "requires" : {
+            "Const::Fast" : "0",
             "Cpanel::JSON::XS" : "0",
             "Data::Dumper" : "0",
             "Module::Build" : "0",
             "Moo" : "0",
             "Path::Tiny" : "0",
-            "Test::Most" : "0"
+            "Test::Most" : "0",
+            "perl" : "v5.38.0"
          }
       }
    },
    "provides" : {
       "Wiki::JSON" : {
          "file" : "lib/Wiki/JSON.pm",
-         "version" : "v0.0.7"
+         "version" : "v0.0.9"
       }
    },
    "release_status" : "stable",
-   "version" : "v0.0.7",
+   "version" : "v0.0.9",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

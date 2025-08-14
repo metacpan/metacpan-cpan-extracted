@@ -177,9 +177,6 @@ my $source  = realpath '.';
 my %distros = ($project => $meta);
 extract_manuals $source, $distdir, $config;  # produces $distdir
 
-info "** Merge the manuals into one documentation set";
-$doc->prepare;
-
 # Generate various products
 foreach my $gen (@{$config->{generate} || []})
 {
@@ -233,6 +230,10 @@ sub extract_manuals($$$)
 
 	info "** Extracting manuals from distributions";
 	extract_distro $source, release_dir => $outdir, config => $config, recurse => 1;
+
+	info "** Merge the manuals into one documentation set";
+	my $pconfig = $config->{parser};
+	$doc->finalize(%$pconfig);  # for the auto* config
 
 	info $doc->stats;
 }
@@ -855,9 +856,10 @@ sub config3()
 	  || ($meta->{author} && $meta->{author} =~ m/ \<(.*?)\>/ ? $1 : undef);
 
 	print <<__HEAD;
-This is an attempt to automatically convert you configuration parameters.
+# This is an attempt to automatically convert you configuration parameters.
+# More docs: https://github.com/markov2/perl5-OODoc/wiki/oodist-config
 
-# Use command 'oodist' to produce the documentation before the software release.
+# Use command 'oodist' to produce your whole software release.
 __HEAD
 
 	if($html_output) {
@@ -962,7 +964,7 @@ __TAIL
 
 sub merge3()
 {
-	print <<__MERGE
+	print <<__MERGE;
 
 WriteMakefile
 	...
@@ -980,7 +982,7 @@ WriteMakefile
 		prereqs => {
 			develop => {
 				requires => {
-					'OODoc' => '3.00',
+					'OODoc' => $OODoc::VERSION,
 				}
 			},
 			test => {
@@ -1011,6 +1013,9 @@ standard POD, do:
 
       $0 --config3
       (hint:  vi Makefile.PL   :r! oodist --config3)
+
+  ===> 2. Configure that template.  See the OODoc Wiki at
+          https://github.com/markov2/perl5-OODoc/wiki/oodist-config
 
   ===> 2. Merge the following into your "WriteMakefile" call in Makefile.PL
 

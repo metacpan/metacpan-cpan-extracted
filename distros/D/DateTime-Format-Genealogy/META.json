@@ -4,7 +4,7 @@
       "Nigel Horne <njh@bandsman.co.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
@@ -35,6 +35,8 @@
             "Carp" : "0",
             "DateTime::Format::Natural" : "0",
             "Genealogy::Gedcom::Date" : "2.01",
+            "Params::Get" : "0.08",
+            "Readonly::Values::Months" : "0.02",
             "Scalar::Util" : "0",
             "perl" : "5.006002"
          }
@@ -72,6 +74,6 @@
          "web" : "https://github.com/nigelhorne/DateTime-Format-Genealogy"
       }
    },
-   "version" : "0.11",
+   "version" : "0.12",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

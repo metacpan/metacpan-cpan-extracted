@@ -24,7 +24,7 @@ INSTALLATION
         If you are upgrading this module, check for upgrading instructions
         in case changes need to be made to your database.
 
-    Edit your /opt/rt5/etc/RT_SiteConfig.pm
+    Edit your /opt/rt6/etc/RT_SiteConfig.pm
         Add this line:
 
             Plugin('RT::Extension::AI');
@@ -58,6 +58,7 @@ CONFIGURATION
                     translate_content => 'Translate the provided text, maintaining accuracy and idiomatic expressions.',
                     autocomplete_text => 'Predict the next three words based on the input text without explanations.',
                  },
+                 editor_features => [ 'adjust_tone', 'suggest_response', 'translate_content', 'autocomplete_text' ],
               },
         );
 
@@ -87,6 +88,7 @@ CONFIGURATION
                     translate_content => 'Translate the provided text, maintaining accuracy and idiomatic expressions.',
                     autocomplete_text => 'Predict the next three words based on the input text without explanations.',
                 },
+                editor_features => [ 'adjust_tone', 'suggest_response', 'translate_content', 'autocomplete_text' ],
               },
         );
 

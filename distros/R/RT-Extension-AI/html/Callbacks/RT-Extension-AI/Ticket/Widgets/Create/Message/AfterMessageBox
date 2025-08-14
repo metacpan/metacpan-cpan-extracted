@@ -1,0 +1,5 @@
+<div class="d-none" id="ai-queue" data-id="<% $QueueObj->Id %>"></div>
+
+<%ARGS>
+$QueueObj
+</%ARGS>
