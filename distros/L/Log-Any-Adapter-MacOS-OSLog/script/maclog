@@ -1,0 +1,272 @@
+#!/usr/bin/env perl
+
+## no critic (Documentation::RequirePodAtEnd)
+
+=head1 NAME
+
+=for stopwords maclog macOS
+
+maclog - write to the macOS unified log from the command line
+
+=cut
+
+use 5.018;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+use Log::Any::Adapter;
+
+=head1 VERSION
+
+version 0.0.4
+
+=cut
+
+use version; our $VERSION = version->declare('v0.0.4'); ## no critic (ValuesAndExpressions::RequireConstantVersion)
+
+=head1 USAGE
+
+Simple version:
+
+    maclog --message 'Hello world!'
+
+All the bells and whistles:
+
+    maclog --subsystem com.phoenixtrap.maclog \
+           --level info                       \
+           --category general                 \
+           --format "Hello %s number %i"      \
+           --message 'world'                  \
+           --message 42
+
+Arbitrary number of message strings without B<--message>:
+
+    maclog --format "Hello %s number %i" -- world 42
+
+=head1 DESCRIPTION
+
+=for stopwords APIs
+
+This script provides an easy way to add entries to the macOS unified
+log from the command line, a feat normally reserved for users of Apple's
+Swift and Objective-C APIs.
+
+It is a thin wrapper around L<Log::Any::Adapter::MacOS::OSLog>.
+
+=head1 REQUIRED ARGUMENTS
+
+=over
+
+=item B<--subsystem>
+
+=for stopwords DNS
+
+The name of the subsystem field in the log entry in reverse DNS order.
+Defaults to C<com.phoenixtrap.maclog>.
+
+=cut
+
+my $subsystem = 'com.phoenixtrap.maclog';
+
+=item B<--level>
+
+The desired logging level. As this command script is a thin wrapper
+around L<Log::Any::Adapter::MacOS::OSLog>, it uses the following level
+names, mapped to corresponding macOS L<os_log(3)> levels:
+
+=over
+
+=item * trace: L<os_log_debug(3)>
+
+=item * debug: L<os_log_debug(3)>
+
+=item * info: L<os_log_info(3)>
+
+=item * notice: L<os_log_info(3)>
+
+=item * warning: L<os_log_fault(3)>
+
+=item * error: L<os_log_error(3)>
+
+=item * critical: L<os_log(3)>
+
+=item * alert: L<os_log(3)>
+
+=item * emergency: L<os_log(3)>
+
+=back
+
+Defaults to C<info>.
+
+=cut
+
+my $level = 'info';
+
+=item B<--category>
+
+The desired category field in the unified log entry.
+Note that this is B<not> related to
+L<Log::Any's notion of categories|Log::Any/CATEGORIES>.
+
+Defaults to C<general>.
+
+=cut
+
+my $category = 'general';
+
+=back
+
+=head1 OPTIONS
+
+=over
+
+=item B<--private>
+
+Redacts the log message.
+
+=cut
+
+my $private;
+
+=item B<--format>
+
+=for stopwords sprintf
+
+A L<sprintf|perlfunc/sprintf> format describing where and how to format
+individual message values.
+If no B<--format> is specified, message values will be joined together
+with spaces.
+
+=cut
+
+my $format;
+
+=item B<--message>
+
+Can be specified multiple times. Each B<--message> value will be filled
+into the corresponding formatting code in the B<format>.
+You may instead provide one or more message values at the end of the
+command preceded by C<-->.
+
+=cut
+
+my @message;
+
+=item B<--help>
+
+Prints helpful information about how to use this command script.
+
+=cut
+
+my $help;
+
+=item B<--man>
+
+Prints this command script's entire manual page.
+
+=cut
+
+my $man;
+
+=back
+
+=cut
+
+GetOptions(
+    'help|?'      => \$help,
+    'man'         => \$man,
+    'subsystem=s' => \$subsystem,
+    'level=s'     => \$level,
+    'private!'    => \$private,
+    'category=s'  => \$category,
+    'format:s'    => \$format,
+    'message:s'   => \@message,
+) or pod2usage(1);
+
+{
+    ## no critic (ControlStructures::ProhibitPostfixControls)
+    pod2usage(
+        -exitval  => 0,
+        -verbose  => 99,
+        -sections => 'USAGE',
+    ) if $help;
+    pod2usage( -exitval => 0, -verbose => 2 ) if $man;
+
+    @message = @ARGV unless @message;
+    pod2usage(1)     unless @message;
+}
+
+Log::Any::Adapter->set(
+    'MacOS::OSLog',
+    subsystem   => $subsystem,
+    level       => $level,
+    os_category => $category,
+    private     => $private,
+);
+my $log = Log::Any->get_logger();
+
+( @message > 1 ) && ( $format ||= join q{ }, ('%s') x @message );
+if ($format) {
+    $level = "${level}f";
+    unshift @message, $format;
+}
+$log->$level(@message);
+
+__END__
+
+=head1 DIAGNOSTICS
+
+The entire point of this command script is diagnostics. Use the macOS
+L<log(1)> command or the Console app to view the results.
+
+=head1 EXIT STATUS
+
+Exits 0 on success or viewing the help/manual page,
+1 if there is a problem with the command line arguments.
+Other exit values may occur if there is a problem with code execution.
+
+=head1 CONFIGURATION
+
+None.
+
+=head1 DEPENDENCIES
+
+=over
+
+=item * L<Log::Any::Adapter::MacOS::OSLog>
+
+=back
+
+=head1 INCOMPATIBILITIES
+
+Because this command script relies on the macOS unified logging system
+introduced in macOS Sierra version 10.12, it is incompatible with
+earlier versions of OS X, Mac OS X, the classic Mac OS, and all other
+non-Apple platforms (Microsoft Windows, Linux, other Unixes, etc.).
+
+=head1 BUGS AND LIMITATIONS
+
+Undoubtedly. Open an issue in the tracker.
+
+=head1 SUPPORT
+
+Source code and issue tracker:
+L<https://codeberg.org/mjgardner/perl-Log-Any-Adapter-MacOS-OSLog>
+
+=head1 SEE ALSO
+
+The Eclectic Light Company's C<blowhole> command line utility, available
+at L<https://eclecticlight.co/consolation-t2m2-and-log-utilities/>,
+performs a similar function but does not enable the user to change
+the subsystem or category.
+
+=head1 AUTHOR
+
+Mark Gardner <mjgardner@cpan.org>
+
+=head1 LICENSE AND COPYRIGHT
+
+This software is copyright (c) 2025 by Mark Gardner.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

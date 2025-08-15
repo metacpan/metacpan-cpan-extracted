@@ -63,11 +63,11 @@
    "provides" : {
       "OcToolkit" : {
          "file" : "lib/OcToolkit.pm",
-         "version" : "1.06"
+         "version" : "1.07"
       }
    },
    "release_status" : "stable",
-   "version" : "1.06",
+   "version" : "1.07",
    "x_serialization_backend" : "JSON::PP version 4.06",
    "x_static_install" : 1
 }

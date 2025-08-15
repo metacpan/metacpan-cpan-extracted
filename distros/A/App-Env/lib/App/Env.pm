@@ -6,11 +6,12 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 use Scalar::Util;
 use Storable ();
 use List::Util 1.33;
+use IO::File ();
 
 use Params::Validate ();
 
@@ -610,6 +611,9 @@ sub capture {
     my $self = shift;
     my @args = @_;
 
+    my $redirect;
+    $redirect = pop @args if 'HASH' eq ref $args[-1];
+
     local %ENV = %{$self};
 
     my $wantarray = wantarray;    ## no critic (Community::Wantarray)
@@ -617,12 +621,12 @@ sub capture {
     require Capture::Tiny;
     require IPC::System::Simple;
 
-    my ( $stdout, $stderr );
+    my $exit;
 
     my $sub
       = $self->_opt->{SysFatal}
-      ? sub { IPC::System::Simple::system( @args ) }
-      : sub { CORE::system( @args ) };
+      ? sub { $exit = IPC::System::Simple::system( @args ) }
+      : sub { $exit = CORE::system( @args ) };
 
     # Capture::Tiny::capture is prototyped as (&;@). App::Env
     # lazy-loads Capture::Tiny and thus nominally avoids the prototype
@@ -633,18 +637,35 @@ sub capture {
     # requires an explicit block or sub{}.  So, explicitly
     # ignore prototypes.
 
+
+    my @return;
     eval {
-        ## no critic (Subroutines::ProhibitAmpersandSigils,Community::AmpersandSubCalls )
-        if ( $wantarray ) {
-            ( $stdout, $stderr ) = &Capture::Tiny::capture( $sub );
+        ## no critic (AmpersandSigils,AmpersandSubCalls )
+
+        if ( $redirect ) {
+            my %redirect;
+            for my $stream ( 'stdout', 'stderr' ) {
+                next unless exists $redirect->{$stream};
+                my $handle = $redirect->{$stream};
+                $handle = IO::File->new( $handle, '>' )
+                  if ref $handle eq q{};
+                $redirect{$stream} = $handle;
+            }
+            &Capture::Tiny::capture( $sub, %redirect );
+            $return[0] = $exit;
+        }
+        elsif ( $wantarray ) {
+            @return = &Capture::Tiny::capture( $sub );
         }
         else {
-            $stdout = &Capture::Tiny::capture( $sub );
+            $return[0] = &Capture::Tiny::capture( $sub );
         }
         1;
     } // App::Env::_Util::croak( $@ );
 
-    return $wantarray ? ( $stdout, $stderr ) : $stdout;
+    ## no critic (EmptyReturn)
+    return if !defined $wantarray;
+    return $wantarray ? @return : $return[0];
 }
 
 #-------------------------------------------------------
@@ -693,7 +714,7 @@ App::Env - manage application specific environments
 
 =head1 VERSION
 
-version 1.04
+version 1.05
 
 =head1 SYNOPSIS
 
@@ -1330,17 +1351,47 @@ value.  It also avoid invoking a shell to run the command if possible.
 
 =item capture
 
-  $stdout = $env->capture( $command, @args );
-  ($stdout, $stderr) = $env->capture( $command, @args );
+Execute a command in the environment defined by B<$env> and returns or
+redirects the content of its standard output and error streams.
+Check the C<$?> variable for the exit value of the command.
 
-Execute the passed command in the environment defined by B<$env> and
-returns content of its standard output and (optionally) standard error
-streams.
+=over
+
+=item *
+
+Return the standard output stream
+
+  $stdout = $env->capture( $command, @args );
+
+=item *
+
+Return output, error and command exit value.
+
+  ($stdout, $stderro, $exit) = $env->capture( $command, @args );
+
+=item *
+
+Return exit value and redirect standard output or error streams.
+
+  $exit = $env->capture( $command, @args,
+                 { stdout => $out, stderr => $err }
+               );
+
+C<$out> and C<$err> may either by filehandles (e.g. L<IO::File>
+objects) or file names.
+
+=back
+
+For even more control of the output streams, consider calling
+L<Capture::Tiny/capture> directly, e.g.
+
+  my $exit;
+  capture { $exit = $env->system( $command, @args ) }
 
 If the B<SysFatal> flag is set for this environment,
 B<IPC::System::Simple::capture> is called, which will cause this
 method to throw an exception if the command returned a non-zero exit
-value.  It also avoid invoking a shell to run the command if possible.
+value.  It also avoids invoking a shell to run the command if possible.
 
 =item which
 

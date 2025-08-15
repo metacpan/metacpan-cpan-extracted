@@ -1,5 +1,5 @@
 package Plack::Middleware::OpenTelemetry;
-$Plack::Middleware::OpenTelemetry::VERSION = '0.242510';
+$Plack::Middleware::OpenTelemetry::VERSION = '0.252270';
 # ABSTRACT: Plack middleware to setup OpenTelemetry tracing
 
 use v5.36.0;
@@ -7,6 +7,7 @@ use strict;
 use warnings;
 use feature 'signatures';
 use parent qw(Plack::Middleware);
+use Plack;
 use Plack::Util::Accessor qw(resource_attributes include_client_errors);
 use OpenTelemetry -all;
 use OpenTelemetry::Constants qw( SPAN_KIND_SERVER SPAN_STATUS_ERROR SPAN_STATUS_OK );
@@ -38,7 +39,7 @@ sub call {
 
     my $resource;
     if (my $a = $self->resource_attributes) {
-        my $resource = OpenTelemetry::SDK::Resource->new()
+        $resource = OpenTelemetry::SDK::Resource->new()
           ->merge(OpenTelemetry::SDK::Resource->new(empty => 1, attributes => $a));
     }
 
@@ -136,13 +137,15 @@ sub set_status_code ($self, $span, $res) {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Plack::Middleware::OpenTelemetry - Plack middleware to setup OpenTelemetry spans
 
 =head1 VERSION
 
-version 0.242510
+version 0.252270
 
 =head1 SYNOPSIS
 

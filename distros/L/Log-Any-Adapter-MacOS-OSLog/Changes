@@ -1,0 +1,22 @@
+Revision history for perl distribution Log-Any-Adapter-MacOS-OSLog
+
+v0.0.4 2025-08-14
+
+ -  Promoting to stable release
+
+v0.0.3 2025-08-14
+
+ -  Added --private option to maclog
+ -  Added CONTRIBUTING.md guidelines
+
+v0.0.2 2025-08-14
+
+ -  Promoting to testing release
+ -  Kwalitee improvements:
+    - use GNU tar (gtar), installable via Homebrew, to eliminate
+      PAX headers
+    - Makefile.PL no longer executable
+
+v0.0.1 2025-08-13
+
+ - Initial release

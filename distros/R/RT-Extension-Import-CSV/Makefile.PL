@@ -6,7 +6,7 @@ license 'gpl_2';
 repository 'https://github.com/bestpractical/rt-extension-import-csv';
 
 requires_rt '5.0.0';
-rt_too_new '5.2.0';
+rt_too_new '6.2.0';
 requires 'Text::CSV_XS';
 requires 'Test::MockTime';
 

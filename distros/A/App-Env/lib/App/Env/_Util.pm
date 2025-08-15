@@ -6,7 +6,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 # need to distinguish between a non-existent module
 # and one which has compile errors.
@@ -231,7 +231,7 @@ App::Env::_Util - Utilities
 
 =head1 VERSION
 
-version 1.04
+version 1.05
 
 =for Pod::Coverage app_env_site
 croak

@@ -1,5 +1,8 @@
 Revision history for RT-Extension-Import-CSV
 
+0.04 2025-08-14
+- Update for RT 6.0
+
 0.03 2024-09-27
 - Allow migration of Told date field
 - Fix pod errors and documentation bugs

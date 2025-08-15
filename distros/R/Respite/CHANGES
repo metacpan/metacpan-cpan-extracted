@@ -1,0 +1,514 @@
+-----------------------------------------
+version 0.22 at 2025-08-13 17:00:00 +0000
+-----------------------------------------
+
+  Author: HookBot <hookbot@github.com>
+
+  Various distribution clean-ups.
+  Fix Run-Time Crashing:
+    Can't locate object method "load" via package
+    "config" at Respite/Common.pm line 22.
+  Optimization: Load JSON just-in-time.
+  Get rid of all Sub::Override hacks.
+  Support NPH (non-parsed headers) CGI too
+  Honor {_extra_headers} setting for CGI too
+
+-----------------------------------------
+version 0.21 at 2025-08-04 23:00:00 +0000
+-----------------------------------------
+
+  Author: HookBot <hookbot@github.com>
+
+  Match git repo with CPAN including build script.
+  Bump version to mark Distribution tweaks.
+  Port to also work with Perl v5.26 thru v5.34.
+  Convert POSIX::tmpnam() to File::Test->new.
+
+----------------------------------------
+version 0.2 at 2016-04-05 16:47:29 +0000
+----------------------------------------
+
+  Change: b15f02910337bb203638d0ddaaaecee969222e31
+  Author: Jason Hall <jayce@lug-nut.com>
+  Date : 2016-04-05 09:30:37 +0000
+
+    Merge pull request #15 from oaxlin/master
+
+    Minor updates.
+
+  Change: c5042b96422c023da483c4e85101e7e9e450af4e
+  Author: Jason Terry <jterry@bluehost.com>
+  Date : 2016-04-01 14:24:03 +0000
+
+    clean debug warn, explain $e when something fails
+
+  Change: 715b384f231ecb2a22d9861ec8e961c8b0fd75a5
+  Author: Jason Terry <jterry@bluehost.com>
+  Date : 2016-04-01 11:34:40 +0000
+
+    make 5.20 happy (remove duplicate my)
+
+  Change: 318e4399b8a72879fd620985cb6c80d8f9ef3536
+  Author: Jason Terry <jterry@bluehost.com>
+  Date : 2016-04-01 11:26:54 +0000
+
+    new tests for password an no password api calls, fix some bad var
+    names
+
+  Change: 7d983997c05335ed0de9a11e27dc546046a3fd19
+  Author: Jason Terry <jterry@bluehost.com>
+  Date : 2016-04-01 11:26:13 +0000
+
+    do not force a password, so we can test an api that does not have
+    auth
+
+  Change: d9707db72e822665d2600c5d52df313ae0b85497
+  Author: Jason Terry <jterry@bluehost.com>
+  Date : 2016-03-23 13:48:40 +0000
+
+    require auth when a password exists
+
+  Change: 373098ff71dc87ecb482027f39dbfeef7d3f5917
+  Author: Jason Terry <jterry@bluehost.com>
+  Date : 2016-03-23 10:18:36 +0000
+
+    Minor pod typo fixed
+
+  Change: 3257742ff581132b17b1c9eac016479f34caf973
+  Author: Jason Hall <jayce@lug-nut.com>
+  Date : 2015-12-17 23:16:07 +0000
+
+    Missing =over
+
+  Change: fc9e4482874331321c3571b147c075d42d56dad9
+  Author: Jason Hall <jayce@lug-nut.com>
+  Date : 2015-12-17 23:08:10 +0000
+
+    missing =back
+
+  Change: 96d4b413b6ce15f8626df834a1826135f4c42ed1
+  Author: Jason Hall <jayce@lug-nut.com>
+  Date : 2015-12-17 22:59:59 +0000
+
+    Add in PodSyntax again to begin testing in travis
+
+  Change: 624869bca6110add417c6a62157fab6b680dd8b6
+  Author: Jason Hall <jayce@bluehost.com>
+  Date : 2015-12-17 17:52:06 +0000
+
+    Pod syntax as well, needs some help
+
+  Change: 5d88db41539057b065277cf87ef4dac26203e1c8
+  Author: Jason Hall <jayce@bluehost.com>
+  Date : 2015-12-17 17:48:43 +0000
+
+    Pod coverage, we do want this later but we aren't that far yet
+
+  Change: c52c997e73476a0c02cdabdd43d32186b2cff60c
+  Author: Jason Hall <jayce@bluehost.com>
+  Date : 2015-12-17 17:43:46 +0000
+
+    Config::Cascading isn't used, and isnt' there
+
+  Change: 35d6d549886792be98a981102a1e5eedcb6f6fc9
+  Author: Jason Hall <jayce@bluehost.com>
+  Date : 2015-12-17 16:31:14 +0000
+
+    Temporarily turn off the autogen travis config so I can test the
+    encrypted token
+
+  Change: 89caab34d92f4e36bf301230c889e3c98230d5a5
+  Author: Jason Hall <jayce@lug-nut.com>
+  Date : 2015-12-17 15:31:25 +0000
+
+    Merge pull request #12 from jgoodman/expand-test-coverage
+
+    Expanding test coverage by calling hello method
+
+  Change: e1f1273d08e80ca3b97caea06307ca9e7a41e1c9
+  Author: Jason Hall <jayce@lug-nut.com>
+  Date : 2015-12-17 15:26:16 +0000
+
+    Merge pull request #13 from oaxlin/travisyml
+
+    update travis.yml
+
+  Change: e98b50a1ef40053297f481d2d8e15546564438fa
+  Author: Jason Terry <jterry@bluehost.com>
+  Date : 2015-12-17 15:22:19 +0000
+
+    update travis.yml
+
+  Change: ccf5f772f7a8bcbc97c0f2db17d52d55544e213c
+  Author: jgoodman@bluehost.com <jgoodman@bluehost.com>
+  Date : 2015-12-17 15:13:57 +0000
+
+    Added Prereqs / TestRequires to appropiately list which modules are
+    used for testing
+
+  Change: c77a917ef34cf4978147bbce178dd3b3dfd5436b
+  Author: Joshua Goodman <jgoodman1990@gmail.com>
+  Date : 2015-12-17 15:00:06 +0000
+
+    Expanding test coverage by calling hello method
+
+  Change: 079813c723da4301cd3bbfb99250f2bf5e88828d
+  Author: Jason Hall <jayce@bluehost.com>
+  Date : 2015-12-17 14:30:44 +0000
+
+    testing the testing
+
+  Change: 110be531737efdfe56d95e680602a2633337243d
+  Author: Jason Hall <jayce@bluehost.com>
+  Date : 2015-12-17 14:08:02 +0000
+
+    First travis config
+
+  Change: e7450a50b7c0d695e41658f8cff3f9fd761123bd
+  Author: Jason Hall <jayce@lug-nut.com>
+  Date : 2015-12-17 13:38:25 +0000
+
+    Merge pull request #11 from oaxlin/bulk_merge
+
+    Bulk merge
+
+  Change: 085e1bc335291e8f8c3eb7ae39f50617a1e4d844
+  Author: Jason Terry <jterry@bluehost.com>
+  Date : 2015-12-17 13:32:07 +0000
+
+    bluk merge recent changes into git
+
+  Change: b94fc593f89a50ca778ef17137ed6cacbc09b01c
+  Author: Jason T <oaxlin@gmail.com>
+  Date : 2015-04-04 10:52:51 +0000
+
+    Fix minor warning about undef value
+
+  Change: 3b5b4a847d76fcb8c75a1627675b2fac4174d4d2
+  Author: Jason Hall <jayce@lug-nut.com>
+  Date : 2015-04-03 10:16:31 +0000
+
+    Merge pull request #7 from jgoodman/load_script
+
+    test script if modules can compile
+
+  Change: b212cf5d6415d29ca8b432f6060bf7486eac3321
+  Author: Jason Hall <jayce@lug-nut.com>
+  Date : 2015-04-03 10:16:05 +0000
+
+    Merge pull request #10 from oaxlin/master
+
+    typo and debug fixes
+
+  Change: 475a6c723c011e45e90c0703afa920aa7d789da0
+  Author: Jason Hall <jayce@lug-nut.com>
+  Date : 2015-04-03 10:14:45 +0000
+
+    Merge pull request #8 from jgoodman/remove_debug_autodoc
+
+    Removed "use Debug;"
+
+  Change: b944ed079f6422bbe676715b2579310f47b2a89b
+  Author: Jason T <oaxlin@gmail.com>
+  Date : 2015-04-03 00:33:56 +0000
+
+    namespaces (plural)
+
+  Change: e0aa92d066b7bf1ae2af7b644cbffbe4d5c9c19a
+  Author: Jason T <oaxlin@gmail.com>
+  Date : 2015-04-02 23:09:37 +0000
+
+    oops typo when fixing typoes
+
+  Change: a64ce2986709b6291d99e4f63a48abd55c83bcfc
+  Author: Jason T <oaxlin@gmail.com>
+  Date : 2015-04-02 23:07:19 +0000
+
+    Respite not Repsite, and fix a few Debug lines
+
+  Change: be45c9dfcb512d9318fbda7c988311f942d9e625
+  Author: Jason Hall <jayce@lug-nut.com>
+  Date : 2015-03-30 09:14:53 +0000
+
+    Merge pull request #9 from oaxlin/master
+
+    It is good to SHARE(), and update unit test to expect the Respite
+    name
+
+  Change: b9eb95b08905cf788ecda72c3a1f1c4548c2e21d
+  Author: Jason Terry <jter@debian7-64>
+  Date : 2015-03-29 14:26:04 +0000
+
+    make perlcritic and dzil happy
+
+  Change: e00d9b9324abcd844befb7421bd5145cf78c0f45
+  Author: Jason T <oaxlin@gmail.com>
+  Date : 2015-03-29 11:23:37 +0000
+
+    It is good to SHARE(), and update unit test to expect the Respite
+    name
+
+  Change: b1ae3bee14f0c7747f3a0fc4c372766dee451bed
+  Author: jgoodman@bluehost.com <jgoodman@bluehost.com>
+  Date : 2015-03-27 22:07:01 +0000
+
+    Removed "use Debug;"
+
+  Change: 2831abddfd34a8d0f30cf40554cf341b0c46a225
+  Author: jgoodman@bluehost.com <jgoodman@bluehost.com>
+  Date : 2015-03-27 21:55:47 +0000
+
+    test script if modules can compile
+
+  Change: d646d61f20821253f1a1a59cb99cdc963fd84a0c
+  Author: Jason Hall <jayce@lug-nut.com>
+  Date : 2015-02-07 14:31:40 +0000
+
+    Merge pull request #6 from jgoodman/respite_server_test
+
+    Respite server test
+
+  Change: d6977b2c3c65cd2259dc54b29e1957d017631e97
+  Author: jgoodman@bluehost.com <jgoodman@bluehost.com>
+  Date : 2015-02-06 18:01:35 +0000
+
+    Implemented End module to be used for cleaning up .testlib directory
+
+  Change: e2ec5b1887f54d21510920186bc7ca01db98018f
+  Author: jgoodman@bluehost.com <jgoodman@bluehost.com>
+  Date : 2015-02-06 18:00:26 +0000
+
+    Basic unit tests and example demo for Respite::Server::Test
+
+  Change: ab4c1f563c5c4bd23b7a39d4c0a6e529079efd9b
+  Author: jgoodman@bluehost.com <jgoodman@bluehost.com>
+  Date : 2015-02-06 17:59:08 +0000
+
+    Module for spinning up a Respite::Server instance that can be used
+    for testing
+
+  Change: 31f67b5e85be92653e69184cd8106e4e7a0a49cf
+  Author: Jason Hall <jayce@lug-nut.com>
+  Date : 2015-02-06 16:16:42 +0000
+
+    Merge pull request #5 from jgoodman/add-unit-testing
+
+    Add unit testing
+
+  Change: 9c86ab2c5472379e4769ba0865ba8c54e7e1c5f0
+  Author: jgoodman@bluehost.com <jgoodman@bluehost.com>
+  Date : 2015-02-06 15:38:21 +0000
+
+    Unit tests for Respite::Base module.
+
+  Change: d1f78faa1706b7bee4290f9cb1b4c4ad1af2d9d3
+  Author: jgoodman@bluehost.com <jgoodman@bluehost.com>
+  Date : 2015-02-06 15:37:36 +0000
+
+    Updated word "cached" to "cache" for dispatch type.
+
+  Change: 2f946039323d8dd778bae50e3cb1ea6024f6ad6d
+  Author: jgoodman@bluehost.com <jgoodman@bluehost.com>
+  Date : 2015-02-06 15:31:31 +0000
+
+    Unit tests for Respite::Validate
+
+  Change: 4fdad660d6081da8223d71ee7bb288d4b2b8c560
+  Author: jgoodman@bluehost.com <jgoodman@bluehost.com>
+  Date : 2015-02-06 15:31:01 +0000
+
+    Adding canonical field so unit tests may pass.
+
+  Change: 0481a2c040e5ba54eb8d4ac678787c3d622f3a4f
+  Author: Jason Hall <jayce@jaycehall.com>
+  Date : 2014-08-29 19:39:29 +0000
+
+    Merge pull request #4 from mattmonsen/master
+
+    Move 1; above the __END__ comment
+
+  Change: eb5e9e1f802fa3997d00f2b8b53be155f8b07f0d
+  Author: Matt Monsen <matt@mattmonsen.com>
+  Date : 2014-08-29 18:52:04 +0000
+
+    Move 1; above the __END__ comment
+
+  Change: 76dcea9f5190399325d8a1baf4c43dad5e8ba4e5
+  Author: Jason (Jayce^) Hall <jayce@lug-nut.com>
+  Date : 2014-05-05 16:09:21 +0000
+
+    license blurb
+
+  Change: 281794e34de68cc4b519bdd098d9841790b5efba
+  Author: Jason (Jayce^) Hall <jayce@lug-nut.com>
+  Date : 2014-05-05 16:07:28 +0000
+
+    perl 5.80 would be interesting
+
+  Change: d87ecd4f7d5fdb1a124cdebd9de01d97d69e0541
+  Author: Jason (Jayce^) Hall <jayce@lug-nut.com>
+  Date : 2014-05-05 15:45:37 +0000
+
+    Adding in first config port, like Server and Client. Needs to be
+    finished, and probably simplified to one piece of code between the
+    three
+
+  Change: 46526a113aa5ec4755ac48583a0e88cc6df44842
+  Author: Jason (Jayce^) Hall <jayce@lug-nut.com>
+  Date : 2014-05-05 15:31:41 +0000
+
+    Merge branch 'oaxlin-master'
+
+  Change: da0e13aa87bea5bfc558d2a95d176c853d52c6cb
+  Author: Jason (Jayce^) Hall <jayce@lug-nut.com>
+  Date : 2014-05-05 15:30:33 +0000
+
+    Merge branch 'master' of https://github.com/oaxlin/Respite into
+    oaxlin-master
+
+    Conflicts:
+
+    dist.ini
+
+  Change: 9c39a07d2fef4e7b840cc4ce86402807483314bb
+  Author: Jason (Jayce^) Hall <jayce@lug-nut.com>
+  Date : 2014-05-05 15:27:07 +0000
+
+    Stubbed readme docs in the perldoc
+
+  Change: 0885e2f2c02c76e11ca72306bc1a95a9d79a5c9a
+  Author: Jason (Jayce^) Hall <jayce@lug-nut.com>
+  Date : 2014-05-05 15:23:54 +0000
+
+    More dist manipulation, cleanup into @Basic, and build the readme.md
+
+  Change: 3bdf1ccef2ceff9ec157392d7d61881d1848b0f7
+  Author: Jason Terry <jterry@jterry-mac.local>
+  Date : 2014-05-05 15:07:34 +0000
+
+    Make perlcritic happy with CommandLine.pm
+
+  Change: 87525d891ad0b8048d12c0be01c7d375ad8c95f8
+  Author: Jason (Jayce^) Hall <jayce@lug-nut.com>
+  Date : 2014-05-05 14:43:01 +0000
+
+    Merge branch 'master' of github.com:Jayceh/Respite
+
+  Change: df800945a4b7e828d64233db9d417e8767a8302e
+  Author: Jason Hall <jayce@jaycehall.com>
+  Date : 2014-05-05 14:42:44 +0000
+
+    Merge pull request #2 from oaxlin/master
+
+    Basic dzil stuff.
+
+  Change: fd13c64e712c540b578ca883061fe35735f352f7
+  Author: Jason Terry <jterry@jterry-mac.local>
+  Date : 2014-05-05 14:40:58 +0000
+
+    remove old version number from pod
+
+  Change: 9d347a9ad9e1ba9e7cc4ad65144291ed75be5d1e
+  Author: Jason Terry <jterry@jterry-mac.local>
+  Date : 2014-05-05 14:40:04 +0000
+
+    Cleanup perlcritic, and put in a version number.
+
+  Change: 42de498529f1fe6df1303be978e20dd1c374080e
+  Author: Jason Terry <jterry@jterry-mac.local>
+  Date : 2014-05-05 14:39:17 +0000
+
+    Flush out more of the basic dzil config
+
+  Change: eff8022c0ee07f160febc20b8acd2f40ef4fa0f6
+  Author: Jason (Jayce^) Hall <jayce@lug-nut.com>
+  Date : 2014-05-05 14:37:48 +0000
+
+    More deps
+
+  Change: 3d669449f71b10584bcc97644fbc8eeb6f729b3c
+  Author: Jason (Jayce^) Hall <jayce@lug-nut.com>
+  Date : 2014-05-05 14:33:20 +0000
+
+    initial checkin, has a first migration to Config::Cascading, likely a
+    little broken.
+
+  Change: ac43905340abf6914726fa0f8820e2175d8a8204
+  Author: Jason (Jayce^) Hall <jayce@lug-nut.com>
+  Date : 2014-05-05 12:22:53 +0000
+
+    First checkin, do note that it still leaves in a call to
+    $obj->config, which the base modules need to provide
+
+  Change: 85619d04fe6d1282592ba7bc6f95ca8d30c27446
+  Author: Jason Hall <jayce@jaycehall.com>
+  Date : 2014-05-05 12:18:09 +0000
+
+    Merge pull request #1 from fozzmoo/master
+
+    Properly organized files and added AutoDoc.pm stub
+
+  Change: 894d88e8bcaad2741b2a763fc8dcc9195c360acb
+  Author: Doran Barton <fozz@iodynamics.com>
+  Date : 2014-05-05 12:10:47 +0000
+
+    Properly organized files and added AutoDoc.pm stub
+
+  Change: 0087fc9d700215db9ece2a3bab6313f8cb168d0f
+  Author: Jason (Jayce^) Hall <jayce@lug-nut.com>
+  Date : 2014-05-05 11:51:54 +0000
+
+    First scrubbed version
+
+  Change: d90ed4e958415a17eeab4ecd5cb2da5642562200
+  Author: Jason (Jayce^) Hall <jayce@lug-nut.com>
+  Date : 2014-05-05 11:50:47 +0000
+
+    First scrubbed version. BH specifics removed, getting ready for
+    porting in generic versions.
+
+  Change: 4ae505fbcf663e30c4f6122566d3c044811a8ed7
+  Author: Jason (Jayce^) Hall <jayce@lug-nut.com>
+  Date : 2014-05-05 11:34:00 +0000
+
+    First release
+
+  Change: 2300f86c22dd27eafbd112543415b28913eeea0e
+  Author: Jason (Jayce^) Hall <jayce@lug-nut.com>
+  Date : 2014-05-05 11:32:17 +0000
+
+    First release of slightly scrubbed pods
+
+  Change: 791d53a7a044b9449ac39011999f803b8e8a2d0b
+  Author: Jason (Jayce^) Hall <jayce@lug-nut.com>
+  Date : 2014-05-05 11:31:28 +0000
+
+    Added first prereqs
+
+  Change: d529828faf177b01af508dddea43870661a4068c
+  Author: Jason (Jayce^) Hall <jayce@lug-nut.com>
+  Date : 2014-04-04 13:42:47 +0000
+
+    Rename changes
+
+  Change: 9810e6235b246c51a8798b3238e7254cbe290788
+  Author: Jason (Jayce^) Hall <jayce@lug-nut.com>
+  Date : 2014-04-04 13:42:26 +0000
+
+    Rename, and put the definition in the readme
+
+  Change: 6e8f2ee5966a73fea4eb59c20d285e054b55c219
+  Author: Jason (Jayce^) Hall <jayce@lug-nut.com>
+  Date : 2014-04-04 13:17:09 +0000
+
+    Add an initial dzil dist.ini file
+
+  Change: 06c98518ba46948fb660916b0380c1039824d7af
+  Author: Jason Hall <jayce@jaycehall.com>
+  Date : 2014-04-04 12:12:43 +0000
+
+    Initial commit
+
+================
+End of releases.
+================

@@ -6,7 +6,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 
 
@@ -39,7 +39,7 @@ App::Env::Null - return a snapshot of the current environment
 
 =head1 VERSION
 
-version 1.04
+version 1.05
 
 =head1 SYNOPSIS
 

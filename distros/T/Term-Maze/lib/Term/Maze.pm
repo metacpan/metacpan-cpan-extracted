@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 use Term::ReadKey;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 require XSLoader;
 XSLoader::load('Term::Maze', $VERSION);
@@ -17,12 +17,11 @@ sub run {
 	while (!$maze->at_exit) {
 		my $key = ReadKey(0);
 		next unless defined $key;
-		if ($key =~ m/^[wasd]$/){
+		if ($key =~ m/^[wasdhjkl]$/){
 			$maze->move_player($key);
 		}
 		$maze->refresh();
 	}
-
 	print "You win!\n";
 }
 
@@ -31,9 +30,8 @@ sub refresh {
 	print "\e[H\e[2J";
 	my $rows = $self->get_maze_with_player();
 	print "$_\n" for @$rows;
-	print "Use WASD to move. Reach the exit to win.\n";
+	print "Use WASD or HJKL to move. Reach the exit to win.\n";
 }
-
 
 1;
 
@@ -45,7 +43,7 @@ Term::Maze - Mazes in the terminal
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 

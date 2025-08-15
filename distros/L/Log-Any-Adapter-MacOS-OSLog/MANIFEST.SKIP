@@ -1,0 +1,6 @@
+#!include_default
+
+\blocal\b
+\bcpanfile\.snapshot\b
+\.bs$
+\.o$

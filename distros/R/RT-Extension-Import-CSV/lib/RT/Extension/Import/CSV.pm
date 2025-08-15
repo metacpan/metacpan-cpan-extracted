@@ -5,7 +5,7 @@ package RT::Extension::Import::CSV;
 use Text::CSV_XS;
 use Test::MockTime 'restore_time';
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 our( $CurrentRow, $CurrentLine, $UniqueFields );
 
@@ -377,7 +377,7 @@ sub _run_tickets {
         } elsif ($fieldname =~ /^(id|Creator|LastUpdated|Created|Queue|Requestor|Cc|AdminCc|SquelchMailTo|Type|Owner|
             Subject|Priority|InitialPriority|FinalPriority|Status|TimeEstimated|TimeWorked|TimeLeft|Starts|Due|MIMEObj|
             Comment|Correspond|MemberOf|Parents|Parent|Members|Member|Children|Child|HasMember|RefersTo|ReferredToBy|
-            DependsOn|DependedOnBy|Told)$/x) {
+            DependsOn|DependedOnBy|Told|Description)$/x) {
             # no-op, these are fine
         } else {
             $RT::Logger->warning(
@@ -1348,7 +1348,7 @@ the options that the importer can be run with.
 
 =head1 RT VERSION
 
-Works with RT 5.
+Works with RT 5 and RT 6.
 
 =head1 INSTALLATION
 
@@ -1362,7 +1362,7 @@ Works with RT 5.
 
 May need root permissions
 
-=item Edit your F</opt/rt5/etc/RT_SiteConfig.pm>
+=item Edit your F</opt/rt6/etc/RT_SiteConfig.pm>
 
 Add this line:
 
@@ -1370,7 +1370,7 @@ Add this line:
 
 =item Clear your mason cache
 
-    rm -rf /opt/rt5/var/mason_data/obj
+    rm -rf /opt/rt6/var/mason_data/obj
 
 =item Restart your webserver
 
@@ -1697,7 +1697,7 @@ Create a new file called F<ExcelImport.pm> with the following:
 
 Then run the import:
 
-    /opt/rt5/local/plugins/RT-Extension-Import-CSV/bin/rt-extension-import-csv \
+    /opt/rt6/local/plugins/RT-Extension-Import-CSV/bin/rt-extension-import-csv \
         --type ticket \
         --config ExcelImport.pm \
         --insert-update \
@@ -1732,7 +1732,7 @@ additional mapping is required.
 
 Importing is similar to the previous example:
 
-    /opt/rt5/local/plugins/RT-Extension-Import-CSV/bin/rt-extension-import-csv \
+    /opt/rt6/local/plugins/RT-Extension-Import-CSV/bin/rt-extension-import-csv \
         --type ticket \
         --config TabImport.pm \
         --insert-update \
@@ -1768,7 +1768,7 @@ F<UserImport.pm> containing the following:
 
 Then run the following:
 
-    /opt/rt5/local/plugins/RT-Extension-Import-CSV/bin/rt-extension-import-csv \
+    /opt/rt6/local/plugins/RT-Extension-Import-CSV/bin/rt-extension-import-csv \
         --type user \
         --config UserImport.pm \
         --insert \
@@ -1802,7 +1802,7 @@ Create F<ArticleImport.pm> with the following:
 
 You need to add C<--article-class> when running the import:
 
-    /opt/rt5/local/plugins/RT-Extension-Import-CSV/bin/rt-extension-import-csv \
+    /opt/rt6/local/plugins/RT-Extension-Import-CSV/bin/rt-extension-import-csv \
         --type article \
         --article-class General \
         --config ArticleImport.pm \
@@ -1861,7 +1861,7 @@ Create a new file called F<ZendeskUsers.pm>:
 Assuming the user export above produced a file named F<zendesk_users.csv>,
 run the import:
 
-    /opt/rt5/local/plugins/RT-Extension-Import-CSV/bin/rt-extension-import-csv \
+    /opt/rt6/local/plugins/RT-Extension-Import-CSV/bin/rt-extension-import-csv \
         --type user \
         --config ZendeskUsers.pm \
         --insert \
@@ -1898,7 +1898,7 @@ configuration:
 If tickets were exported to a file named F<zendesk_tickets.csv>, the
 following command will import tickets into your RT instance:
 
-    /opt/rt5/local/plugins/RT-Extension-Import-CSV/bin/rt-extension-import-csv \
+    /opt/rt6/local/plugins/RT-Extension-Import-CSV/bin/rt-extension-import-csv \
         --type ticket \
         --config ZendeskTickets.pm \
         --insert-update \
@@ -1924,7 +1924,7 @@ href="http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-Import-CSV">
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2024 by Best Practical LLC
+This software is Copyright (c) 2025 by Best Practical LLC
 
 This is free software, licensed under:
 

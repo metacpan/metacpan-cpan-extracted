@@ -13,6 +13,8 @@ local $ENV{no_proxy} = '*';
 BEGIN {
 	plan skip_all => "libcurl 7.16.0+ is required"
 		if Net::Curl::LIBCURL_VERSION_NUM < 0x071000;
+	plan skip_all => "gets stuck with libcurl 8.13.0+ :("
+		if Net::Curl::LIBCURL_VERSION_NUM >= 0x080d00;
 }
 
 my $server = Test::HTTP::Server->new;

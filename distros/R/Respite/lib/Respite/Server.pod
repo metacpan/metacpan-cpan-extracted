@@ -1,0 +1,155 @@
+=head1 NAME
+
+Respite::Server - generic Respite based Respite server
+
+$Id: Server.pod,v 1.5 2013/09/17 17:51:34 paul Exp $
+
+=head1 SYNOPSIS
+
+    # Net::Server::HTTP based PreFork server
+
+    # in bin/foo_server
+    # --------------------
+
+    #!/usr/bin/perl
+    use lib qw(../lib);
+    use Respite::Server;
+    Respite::Server->run_commandline(
+        # server_name  => "foo_server", # not needed if file name is correct
+        revision       => 1.1,
+        dispatch_class => 'Foo',
+        user           => 'paul',
+        group          => 'paul',
+        content_type   => 'text/plain',
+    );
+
+
+    package FooServer;
+    use base qw(Respite::Server);
+    sub server_name { 'foo_server' }
+    sub revision { 1.1 }
+    sub dispatch_class { 'Foo' }
+    sub handler { __PACKAGE__->modperlhandler(@_) } # for mod_perl only
+
+    use FooServer;
+    # FooServer->run; # do your own daemonization
+    FooServer->run_commandline; # full service daemon
+
+    # OR
+
+    use Respite::Server;
+    Respite::Server->run_commandline(
+        server_name => 'foo_server',
+        revision    => 1.1,
+        dispatch_class => 'Foo',
+    );
+
+
+    # CGI based script (mod_perl or not)
+
+    use FooServer;
+    FooServer->cgihandler();
+      # in apache conf
+      #       ScriptAlias /foo/ /var/www/cgi-bin/foo/
+
+
+    # mod_perl handler (apache conf)
+
+    # <Location /foo/>
+    #   SetHandler modperl
+    #   PerlResponseHandler FooServer
+    # </Location>
+
+=head1 CONFIGURATION
+
+Many options may be passed directly to new or to run_server.  However
+you can also set options via new_args (options used during new) and to
+server_args (options used when running under Net::Server::HTTP).
+
+=head1 OPTIONS
+
+=over 4
+
+=item access_log_file => $access_file,
+
+Defaults to /var/log/$server_name/$server_name.access_log
+
+=item api_meta
+
+Name of the class, or hashref describing the dispatch services.  See L<Respite::Base> for more
+information.
+
+=item group
+
+Defaults to cvs
+
+=item host
+
+Defaults to *
+
+=item log_file
+
+Defaults to /var/log/$server_name/$server_name.error_log
+
+=item no_ssl
+
+Defaults to false
+
+=item no_brand
+
+Defaults to undef.  If true, then a brand won't be looked for.  If the value is true but
+less than 0 (such as -1), then the brand will optionally be parsed (useful for systems
+optionally passing a brand).
+
+=item pass
+
+Password to use for signing
+
+Default nothing.  If not set, no signing is required.  If set, will be used as the default
+password in get_api_pass.  Additionally the password can be a hashref
+of values.
+
+     pass => '123qwe',
+     pass => {'127.0.0.1' => '123qwe', mybrand => '123qwe'},
+     pass => {'127.0.0.1' => {mybrand => '123qwe'}},
+
+=item pid_file
+
+Defaults to /var/run/$server_name/$server_name.pid
+
+=item port
+
+Defaults to 443 (80 if no_ssl is set)
+
+=item rootdir_server
+
+Defaults to $FindBin::RealBin
+
+=item server_name
+
+Must be set.  This name will be used to set the name of server path and various other pieces.
+
+=item server_type
+
+Defaults to PreFork.  Can be any Net::Server type.
+
+=item ssl_cert
+
+Defaults to $rootdir_server/conf/STAR.bluehost.com.crt
+
+=item ssl_key
+
+Defaults to $rootdir_server/conf/STAR.bluehost.com.key
+
+=item user
+
+Defaults to readonly
+
+=item warn_on_stdout
+
+Default false.  If true, inadvertent print to STDOUT will end up in the error log rather
+than breaking the client.
+
+=back
+
+=cut

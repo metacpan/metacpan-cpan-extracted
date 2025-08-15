@@ -1,0 +1,65 @@
+=head1 NAME
+
+Respite::CommandLine - Provide an easy way to get commandline abstraction of Respite::Base
+
+$Id: CommandLine.pod,v 1.4 2013/09/23 19:13:18 paul Exp $
+
+=head1 SYNOPSIS
+
+    use Respite::CommandLine;
+
+    # run under a local interface (on the server)
+    Respite::CommandLine->run({
+        api_meta => 'Some::Class',
+    });
+
+    # Also on the server
+    Respite::CommandLine->run({
+        api_meta => {  # will use Respite::Base
+            methods => {
+                foo => sub { return {FOO => 1} },
+            },
+        },
+    });
+
+
+    # run under a remote interface (on a client)
+    use Respite::CommandLine;
+    Respite::CommandLine->run({
+        api_meta => {
+            remote  => 1, # will use Respite::Client
+            service => 'foo',
+            host    => 'localhost',
+            brand   => 'test',
+            pass    => '-',
+            port    => 50000,
+            no_ssl  => 1,
+        },
+    });
+
+
+    # it is also possible to use this as a reusable service in other utilities
+    my $cmdclient = Respite::CommandLine->new({api_meta => {service => 'dist', port => 50905, host => 'example.com'}});
+    my $data = $cmdclient->run_method(hello => {foo => 1});
+
+    # will prompt for password
+    my $data = $cmdclient->run_method(hello => {test_auth => 1});
+
+=head1 OPTIONS
+
+=over 4
+
+=item api_meta
+
+May be a class name, or a hashref of information necessary for passing
+to Respite::Base or Respite::Client.  If it is a classname, it should be
+capable of handling run_method (typically should be a subclass of
+Respite::Base).  Otherwise the hashref should conform to the standards for
+Respite::Base.  If a api_meta contains a true value for "remote", then
+Respite::Client will be used instead.
+
+=back
+
+=cut
+
+

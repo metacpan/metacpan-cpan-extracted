@@ -8,10 +8,7 @@ use 5.006;
 use strict;
 use Class::Autouse ();
 
-our $VERSION;
-BEGIN {
-	$VERSION = '2.01';
-}
+our $VERSION = '2.02';
 
 # Anti-loop protection.
 # Maintain flags for "is the class in the process of loading"

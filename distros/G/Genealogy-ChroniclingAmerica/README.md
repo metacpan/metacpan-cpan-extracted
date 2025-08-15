@@ -4,7 +4,7 @@ Genealogy::ChroniclingAmerica - Find URLs for a given person on the Library of C
 
 # VERSION
 
-Version 0.05
+Version 0.07
 
 # SYNOPSIS
 
@@ -27,7 +27,7 @@ Version 0.05
 
 # DESCRIPTION
 
-The \*\*Genealogy::ChroniclingAmerica\*\* Perl module allows users to search for historical newspaper records from the \*\*Chronicling America\*\* archive,
+The **Genealogy::ChroniclingAmerica** module allows users to search for historical newspaper records from the **Chronicling America** archive,
 maintained by the Library of Congress.
 By providing a person's first name,
 last name,
@@ -35,7 +35,8 @@ and state,
 the module constructs and executes search queries,
 retrieving URLs to relevant newspaper pages in JSON format.
 It supports additional filters like date of birth and date of death,
-enforces \*\*rate-limiting\*\* to comply with API request limits,
+enforces **rate-limiting** to comply with API request limits,
+local caching,
 and includes robust error handling and validation.
 Ideal for genealogy research,
 this module streamlines access to historical newspaper archives with an easy-to-use interface.
@@ -68,6 +69,12 @@ not an abbreviation.
 
 Accepts the following optional arguments:
 
+- `cache`
+
+    A caching object.
+    If not provided,
+    an in-memory cache is created with a default expiration of one hour.
+
 - `middlename`
 - `date_of_birth`
 - `date_of_death`
@@ -75,6 +82,8 @@ Accepts the following optional arguments:
 - `ua` - An object that understands get and env\_proxy messages,
 such as [LWP::UserAgent::Throttled](https://metacpan.org/pod/LWP%3A%3AUserAgent%3A%3AThrottled).
 - `min_interval` - Amount to rate limit.
+Defaults to 3 seconds,
+inline with [https://libraryofcongress.github.io/data-exploration/loc.gov%20JSON%20API/Chronicling\_America/README.html#rate-limits](https://libraryofcongress.github.io/data-exploration/loc.gov%20JSON%20API/Chronicling_America/README.html#rate-limits)
 
 ## get\_next\_entry
 
@@ -82,7 +91,7 @@ Returns the next match as a URL.
 
 # AUTHOR
 
-Nigel Horne, `<njh at bandsman.co.uk>`
+Nigel Horne, `<njh at nigelhorne.com>`
 
 # BUGS
 
@@ -91,8 +100,9 @@ it should search again without the middle name.
 
 # SEE ALSO
 
-[https://github.com/nigelhorne/gedcom](https://github.com/nigelhorne/gedcom)
-[https://chroniclingamerica.loc.gov](https://chroniclingamerica.loc.gov)
+- [https://github.com/nigelhorne/gedcom](https://github.com/nigelhorne/gedcom)
+- [https://chroniclingamerica.loc.gov](https://chroniclingamerica.loc.gov)
+- [https://github.com/LibraryOfCongress/data-exploration](https://github.com/LibraryOfCongress/data-exploration)
 
 # SUPPORT
 
@@ -123,3 +133,15 @@ You can also look for information at:
 Copyright 2018-2025 Nigel Horne.
 
 This program is released under the following licence: GPL2
+
+# POD ERRORS
+
+Hey! **The above document had some coding errors, which are explained below:**
+
+- Around line 470:
+
+    '=item' outside of any '=over'
+
+- Around line 476:
+
+    You forgot a '=back' before '=head1'

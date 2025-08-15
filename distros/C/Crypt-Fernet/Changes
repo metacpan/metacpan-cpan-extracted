@@ -1,5 +1,10 @@
 Revision history for Perl extension Crypt::Fernet.
 
+0.0305    2025-08-15 10:25:35+01:00 Europe/London
+  - update to use Dist::Zilla::Plugin::OurPkgVersion to handle version number
+  - update to use Dist::Zilla::Plugin::ReadmeFromPod to handle README
+  - update to use Dist::Zilla::Plugin::NextRelease to handle CHANGE
+
 0.0304    2025-08-14 09:59:16+01:00 Europe/London
   - Fix Bug #168910: 
     - add Crypt::Rijndael to module

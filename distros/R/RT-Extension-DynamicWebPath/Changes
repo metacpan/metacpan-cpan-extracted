@@ -1,5 +1,8 @@
 Revision history for RT-Extension-DynamicWebPath
 
+0.04 2025-08-14
+ - Update for RT 6
+
 0.03 2023-10-03
  - Run PostLoadCheck of DynamicWebPath only once
 

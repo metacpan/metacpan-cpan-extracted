@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package RT::Extension::DynamicWebPath;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 my $post_load_check_ran;
 
@@ -40,7 +40,7 @@ This can be used to support different auth methods, e.g. "" for SSO and
 
 =head1 RT VERSION
 
-Works with RT 5
+Works with RT 5 and RT 6.
 
 =head1 INSTALLATION
 
@@ -54,7 +54,7 @@ Works with RT 5
 
 May need root permissions
 
-=item Edit your F</opt/rt5/etc/RT_SiteConfig.pm>
+=item Edit your F</opt/rt6/etc/RT_SiteConfig.pm>
 
 Add this line:
 
@@ -62,7 +62,7 @@ Add this line:
 
 =item Clear your mason cache
 
-    rm -rf /opt/rt5/var/mason_data/obj
+    rm -rf /opt/rt6/var/mason_data/obj
 
 =item Restart your webserver
 
@@ -88,7 +88,7 @@ changes by checking HTTP request URL.
 
 In apache config, add the following directive before normal setup:
 
-    ScriptAlias /rt /opt/rt5/sbin/rt-server.fcgi/
+    ScriptAlias /rt /opt/rt6/sbin/rt-server.fcgi/
 
 Also remember to turn off SSO for /rt, e.g.
 
@@ -114,7 +114,7 @@ href="http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-DynamicWebPa
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2022-2023 by Best Practical Solutions, LLC
+This software is Copyright (c) 2022-2025 by Best Practical Solutions, LLC
 
 This is free software, licensed under:
 

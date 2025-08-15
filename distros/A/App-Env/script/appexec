@@ -16,7 +16,7 @@ use App::Env;
 use List::Util 1.33 'any';
 use App::Env::_Util;
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 my $prog = basename( $0, '.pl' );
 
 my %ShellMap = (
@@ -272,7 +272,7 @@ appexec - execute a command under a specified environment
 
 =head1 VERSION
 
-version 1.04
+version 1.05
 
 =head1 SYNOPSIS
 

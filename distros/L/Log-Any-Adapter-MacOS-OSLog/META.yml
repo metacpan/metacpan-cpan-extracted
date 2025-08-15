@@ -1,0 +1,39 @@
+---
+abstract: "log to macOS' unified logging system"
+author:
+  - 'Mark Gardner <mjgardner@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '6.64'
+  Test2::V0: '0'
+  Test::Script: '1.05'
+  version: '0.77'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+  version: '0.77'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Log-Any-Adapter-MacOS-OSLog
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Log::Any::Adapter::MacOS::OSLog:
+    file: lib/Log/Any/Adapter/MacOS/OSLog.pm
+    version: v0.0.4
+requires:
+  FFI::Platypus: '2.00'
+  Log::Any::Adapter::Base: '0'
+  Log::Any::Adapter::Util: '0'
+  namespace::autoclean: '0'
+  perl: '5.018'
+resources:
+  bugtracker: https://codeberg.org/mjgardner/perl-Log-Any-Adapter-MacOS-OSLog/issues
+  license: https://codeberg.org/mjgardner/perl-Log-Any-Adapter-MacOS-OSLog/raw/branch/main/LICENSE
+  repository: https://codeberg.org/mjgardner/perl-Log-Any-Adapter-MacOS-OSLog.git
+version: v0.0.4
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

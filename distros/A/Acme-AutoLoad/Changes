@@ -1,5 +1,10 @@
 Revision history for Perl extension Acme::AutoLoad.
 
+0.09  Thu Aug 07 14:00 2025
+ - Handle new fastapi syntax.
+ - Add support for loading modules without needing to
+   know which main distribution it belongs to.
+
 0.08  Tue Aug 12 14:00 2020
  - Require special ENV for network tests.
  - Include self bootstrap loading test.

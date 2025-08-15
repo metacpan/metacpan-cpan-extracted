@@ -1,3 +1,9 @@
+0.252270 -- Thu Aug 14 23:22:12 -04 2025
+  - Fix variable shadowing bug in resource creation (thanks @abraxxa)
+  - Ensure Plack is loaded for resource version data (José Joaquín Atria)
+  - Fix pod encoding error (AnaTofuZ)
+  - Add some more realistic tests
+
 0.242510 -- Sat Sep 07 00:36:19 PDT 2024
   -  Spans are no longer automatically marked as OK by this
      instrumentation. This is inline with the specification.

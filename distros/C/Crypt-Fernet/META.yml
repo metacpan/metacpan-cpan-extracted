@@ -1,7 +1,7 @@
 ---
 abstract: 'Perl extension for Fernet (symmetric encryption)'
 author:
-  - 'Wan Leung Wong <wanleung@wanleung.com>'
+  - 'Wan Leung Wong <me@wanleung.com>'
 build_requires:
   Crypt::CBC: '0'
   Crypt::Rijndael: '0'
@@ -29,7 +29,7 @@ requires:
   perl: '5.018002'
   strict: '0'
   warnings: '0'
-version: '0.0304'
+version: '0.0305'
 x_generated_by_perl: v5.38.2
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

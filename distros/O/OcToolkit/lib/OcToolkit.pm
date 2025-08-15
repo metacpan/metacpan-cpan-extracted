@@ -4,7 +4,7 @@ use v5.16; # or newer
 use strict;
 use warnings;
 
-our $VERSION = "1.06";
+our $VERSION = "1.07";
 
 use JSON::PP;
 use Text::Diff;

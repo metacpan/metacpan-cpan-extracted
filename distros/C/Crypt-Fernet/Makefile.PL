@@ -8,7 +8,7 @@ use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Perl extension for Fernet (symmetric encryption)",
-  "AUTHOR" => "Wan Leung Wong <wanleung\@wanleung.com>",
+  "AUTHOR" => "Wan Leung Wong <me\@wanleung.com>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
@@ -35,7 +35,7 @@ my %WriteMakefileArgs = (
     "MIME::Base64::URLSafe" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.0304",
+  "VERSION" => "0.0305",
   "test" => {
     "TESTS" => "t/*.t"
   }

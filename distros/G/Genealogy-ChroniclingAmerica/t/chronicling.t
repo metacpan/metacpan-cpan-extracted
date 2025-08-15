@@ -5,7 +5,7 @@ use warnings;
 
 use Test::HTTPStatus;
 use Test::Most;
-use Test::RequiresInternet ('chroniclingamerica.loc.gov' => 'https');
+use Test::RequiresInternet ('www.loc.gov' => 'https');
 use Test::URI;
 
 BEGIN {
@@ -17,7 +17,7 @@ CHRONICLING: {
 		my $ca = Genealogy::ChroniclingAmerica->new({
 			'firstname' => 'ralph',
 			'lastname' => 'bixler',
-			'date_of_birth' => 1912,
+			'date_of_birth' => 1919,
 			'state' => 'Indiana',
 		});
 		ok(defined($ca));
@@ -26,13 +26,13 @@ CHRONICLING: {
 		my $count = 0;
 		while(my $link = $ca->get_next_entry()) {
 			diag($link);
-			uri_host_ok($link, 'chroniclingamerica.loc.gov');
+			uri_host_ok($link, 'tile.loc.gov');
 			http_ok($link, HTTP_OK);
 			ok($link =~ /\.pdf$/);
 			$count++;
 		}
 		ok(!defined($ca->get_next_entry()));
-		ok($count > 0);
+		cmp_ok($count, '>', 0, 'At least one match found');
 
 		$ca = Genealogy::ChroniclingAmerica->new(
 			'firstname' => 'mahalan',
@@ -50,7 +50,7 @@ CHRONICLING: {
 			'firstname' => 'katherine',
 			'lastname' => 'bixler',
 			'date_of_birth' => 1789,
-			'date_of_death' => 1963,
+			'date_of_death' => 1789,
 			'state' => 'Indiana',
 		});
 		ok(defined($ca));
@@ -72,7 +72,7 @@ CHRONICLING: {
 		$count = 0;
 		while(my $link = $ca->get_next_entry()) {
 			diag($link);
-			uri_host_ok($link, 'chroniclingamerica.loc.gov');
+			uri_host_ok($link, 'tile.loc.gov');
 			http_ok($link, HTTP_OK);
 			ok($link =~ /\.pdf$/);
 			$count++;

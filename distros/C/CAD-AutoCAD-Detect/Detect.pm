@@ -4,7 +4,7 @@ use base qw(Exporter);
 use strict;
 use warnings;
 
-use CAD::AutoCAD::Version;
+use CAD::Format::DWG::Version;
 use Error::Pure qw(err);
 use List::Util 1.33 qw(any);
 use Readonly;
@@ -12,7 +12,7 @@ use Readonly;
 # Constants.
 Readonly::Array our @EXPORT => qw(detect_dwg_file);
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 # Detect DWG file.
 sub detect_dwg_file {
@@ -28,7 +28,7 @@ sub detect_dwg_file {
 	$magic =~ s/\x00$//;
 
 	if ($read == 6 && (any { $_ eq $magic }
-		CAD::AutoCAD::Version->list_of_acad_identifiers)) {
+		CAD::Format::DWG::Version->list_of_dwg_identifiers)) {
 
 		return $magic;
 	} else {
@@ -78,6 +78,8 @@ Returns magic string or undef.
 
 =head1 EXAMPLE1
 
+=for comment filename=detect_dwg_file_fake.pl
+
  use strict;
  use warnings;
 
@@ -112,6 +114,8 @@ Returns magic string or undef.
 
 =head1 EXAMPLE2
 
+=for comment filename=detect_dwg_file.pl
+
  use strict;
  use warnings;
 
@@ -139,7 +143,7 @@ Returns magic string or undef.
 
 =head1 DEPENDENCIES
 
-L<CAD::AutoCAD::Version>,
+L<CAD::Format::DWG::Version>,
 L<Error::Pure>,
 L<Exporter>,
 L<List::Util>,
@@ -157,12 +161,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2020-2024 Michal Josef Špaček
+© 2020-2025 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

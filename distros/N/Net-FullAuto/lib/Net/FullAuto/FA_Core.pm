@@ -6513,7 +6513,6 @@ sub host_hash
             my $cmd=$Net::FullAuto::FA_Core::gbp->('mkdir').'mkdir -p '.
                     $m.'/var/db/Berkeley';
             my $stdout='';my $stderr='';
-	    print "WHAT IS COMMAND=$cmd<==\n";
             ($stdout,$stderr)=&pty_cmd($cmd,5);
             &handle_error($stderr) if $stderr;
          }
@@ -9429,7 +9428,7 @@ sub send_email
             if ($mail_port) {
                $transport=Email::Sender::Transport::SMTP->new({ 
                    host => $mail_server,
-                   prot => $mail_port 
+                   port => $mail_port 
                });
             } else {
                $transport=Email::Sender::Transport::SMTP->new({

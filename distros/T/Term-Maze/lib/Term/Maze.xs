@@ -123,6 +123,10 @@ CODE:
 		case 'a': dx = -1; break;
 		case 's': dy = 1; break;
 		case 'd': dx = 1; break;
+		case 'h': dx = -1; break;
+		case 'j': dy = 1; break;
+		case 'k': dy = -1; break;
+		case 'l': dx = 1; break;
 		default: XSRETURN_EMPTY;
 	}
 	nx = px + dx;

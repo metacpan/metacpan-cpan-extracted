@@ -258,13 +258,8 @@ sub get_curl_incdir
 	die "Cannot find curl/curl.h\n";
 }
 
-sub get_constants_symbols
+sub get_excluded_constants
 {
-	my $curlver = shift;
-	$curlver =~ s/libcurl\s+//;
-	$curlver =~ s/[^\d]*$//;
-	my $cver = eval "v$curlver";
-
 	my %ex;
 
 	open my $ein, "<", "inc/symbols-excluded"
@@ -274,7 +269,18 @@ sub get_constants_symbols
 		$ex{ $_ }++;
 	}
 
+	return \%ex;
+}
+
+sub get_constants_symbols
+{
+	my $curlver = shift;
+	$curlver =~ s/libcurl\s+//;
+	$curlver =~ s/[^\d]*$//;
+	my $cver = eval "v$curlver";
+
 	my %out;
+	my $ex = get_excluded_constants();
 
 	open my $fin, "<", "inc/symbols-in-versions"
 		or die "Cannot open symbols file: $!\n";
@@ -282,7 +288,7 @@ sub get_constants_symbols
 		next if /^[#\s]/;
 		my ( $sym, $in, $dep, $out ) = split /\s+/, $_;
 
-		next if $ex{ $sym };
+		next if $ex->{ $sym };
 
 		if ( $out ) {
 			my $vout = eval "v$out";
@@ -305,6 +311,8 @@ sub get_constants_headers
 {
 	my %syms;
 	my $cflags = shift;
+
+	my $ex = get_excluded_constants();
 
 	foreach my $curl_h ( @_ ) {
 		print "Reading $curl_h ($Config{cpprun} $cflags $curl_h)\n";
@@ -341,7 +349,7 @@ sub get_constants_headers
 
 	my @out;
 	foreach my $e (sort keys %syms) {
-		if ( $e =~ /(OBSOLETE|^CURL_DEPRECATED\z|^CURL_EXTERN|^CURL_IGNORE_DEPRECATION\z|^CURLOPTDEPRECATED\z|_LAST\z|_LASTENTRY\z|^CURL_FORMAT_OFF_T$|^CURL_ISOCPP$|^CURLOPT$)/ ) {
+		if ( $ex->{ $e } || $e =~ /(OBSOLETE|^CURL_EXTERN|_LAST\z|_LASTENTRY\z|^CURL_FORMAT_OFF_T$)/ ) {
 			next;
 		}
 		push @out, $e;

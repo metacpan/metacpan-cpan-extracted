@@ -27,17 +27,19 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.64"
          }
       },
       "runtime" : {
          "requires" : {
+            "CHI" : "0",
             "Carp" : "0",
+            "ExtUtils::MakeMaker" : "6.64",
             "JSON::MaybeXS" : "0",
             "LWP::Protocol::https" : "0",
             "LWP::UserAgent" : "0",
             "Object::Configure" : "0",
-            "Params::Get" : "0",
+            "Params::Get" : "0.13",
             "Return::Set" : "0",
             "Scalar::Util" : "0",
             "URI" : "0",
@@ -61,8 +63,8 @@
    "resources" : {
       "bugtracker" : {
          "mailto" : "bug-Genealogy-ChroniclingAmerica@rt.cpan.org",
-         "web" : "https://github.com/nigelhorne/Genealogy-ChroniclingAmerica/issues",
-         "x_url" : "https://github.com/nigelhorne/Genealogy-ChroniclingAmerica/issues"
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Genealogy-ChroniclingAmerica",
+         "x_url" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Genealogy-ChroniclingAmerica"
       },
       "homepage" : "https://chroniclingamerica.loc.gov",
       "repository" : {
@@ -72,6 +74,6 @@
          "x_repository" : "https://github.com/nigelhorne/Genealogy-ChroniclingAmerica"
       }
    },
-   "version" : "0.06",
+   "version" : "0.07",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -20,6 +20,18 @@
 #######################################################################
 
 
+2025-08-14  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000824 released
+
+        * Added more Crypt::CBC prerequisites to Makefile.PL
+
+2025-08-14  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000823 released
+
+        * Added three Crypt::CBC prerequisites to Makefile.PL
+
 2025-05-26  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000822 released

@@ -12,3 +12,4 @@
 \.orig$
 ^dev
 ^local
+^G(PATH|RTAGS|TAGS)

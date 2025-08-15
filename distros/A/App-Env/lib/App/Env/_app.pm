@@ -4,7 +4,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 use App::Env::_Util;
 
@@ -186,7 +186,7 @@ App::Env::_app
 
 =head1 VERSION
 
-version 1.04
+version 1.05
 
 =for Pod::Coverage cache
 cacheid

@@ -1,5 +1,14 @@
 Revision history for App-Env
 
+1.05      2025-08-14 13:11:28-04:00 America/New_York
+
+  [ENHANCEMENT]
+
+    * capture method:
+
+        * return exit value command
+        * redirect streams to filehandles or files
+
 1.04      2024-01-19 12:56:35-05:00 America/New_York
 
   [BUG FIX]
@@ -16,8 +25,6 @@ Revision history for App-Env
       include environment variables with illegal names.  Use the new
       AllowIllegalVariableNames option to true.
 
-
-  [ENHANCEMNT]
 
 1.02      2022-10-15 12:44:10-04:00 America/New_York
 

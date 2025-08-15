@@ -10,3 +10,4 @@ lib/Acme/AutoLoad.pm
 contrib/cwd_guard.pl
 contrib/hello_app.cgi
 META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

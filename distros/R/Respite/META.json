@@ -1,0 +1,60 @@
+{
+   "abstract" : "Representational State (Perl Iscool) Transfer Engine",
+   "author" : [
+      "Paul Seamons <paul\\@seamons.com>, Jason Hall <jayce@cpan.org>, Rob Brown <hookbot@github.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.60, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Respite",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CGI::Ex" : "0",
+            "Data::Debug" : "0",
+            "Digest::MD5" : "0",
+            "End" : "0",
+            "FindBin" : "0",
+            "IO::Interactive" : "0",
+            "IO::Socket::SSL" : "0",
+            "JSON" : "0",
+            "Net::Server" : "0",
+            "Scalar::Util" : "0",
+            "Text::PrettyTable" : "0.03",
+            "Throw" : "0",
+            "Time::HiRes" : "0",
+            "perl" : "5.008000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Deep" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : 0.22,
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

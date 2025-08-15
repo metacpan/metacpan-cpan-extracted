@@ -1,0 +1,148 @@
+#!/usr/bin/perl
+
+# This is the sample program at https://libraryofcongress.github.io/data-exploration/loc.gov%20JSON%20API/Chronicling_America/ChronAm-download_results.html
+# translated into Perl
+
+use strict;
+use warnings;
+
+use Data::Dumper;
+use LWP::UserAgent;
+use JSON;
+use URI;
+
+my $searchURL = 'https://www.loc.gov/collections/chronicling-america/?dl=page&end_date=1912-12-31&ops=PHRASE&qs=ralph+bixler&searchType=advanced&start_date=1912-01-01&';
+
+my $ua = LWP::UserAgent->new(
+	ssl_opts => {
+		verify_hostname => 1,
+		# SSL_ca_file => '/etc/ssl/certs/ca-certificates.crt',	# Linux
+		SSL_ca_file => '/opt/homebrew/etc/ca-certificates/cert.pem',	# MacOS
+	},
+	agent => 'Testing new LOC API'
+);
+
+# Create ids_list based on searchURL results
+my $ids_list = get_item_ids($searchURL, []);
+
+# Add 'fo=json' to the end of each row in ids_list
+my @ids;
+for my $id (@$ids_list) {
+	unless ($id =~ /&fo=json$/) {
+		$id .= '&fo=json';
+	}
+	push @ids, $id;
+}
+
+if(scalar(@ids)) {
+	# print "\nSuccess. Your API Search Query found ", scalar(@ids),
+		# " related newspaper pages. You may now continue.\n" if(scalar(@ids));
+	# print Data::Dumper->new([\@ids])->Dump();
+
+	for my $id (@$ids_list) {
+		print "Trying id $id\n";
+
+		my $response = $ua->get($id);
+
+		if($response->is_success && $response->header('Content-Type') =~ /json/) {
+			my $data = decode_json($response->decoded_content);
+			#print Data::Dumper->new([$data])->Dump();
+
+			foreach my $page(@{$data->{'page'}}) {
+				if($page->{'mimetype'} eq 'application/pdf') {
+					print $page->{'url'}, "\n";
+				}
+			}
+		} else {
+			print "There was a problem. Try running the script again, or check your searchURL.\n",
+				$response->status_line(), "\n";
+			die $response->decoded_content();
+		}
+	}
+}
+
+# Run P1 search and get a list of results
+sub get_item_ids {
+	my ($url, $items_ref, $conditional) = @_;
+	$items_ref ||= [];
+	$conditional ||= 'True';
+
+	# Check that the query URL is not an item or resource link
+	my @exclude = ("loc.gov/item", "loc.gov/resource");
+	for my $string (@exclude) {
+		if (index($url, $string) != -1) {
+			die 'Your URL points directly to an item or ',
+			  'resource page (you can tell because "item" ',
+			  'or "resource" is in the URL). Please use ',
+			  'a search URL instead. For example, instead ',
+			  'of "https://www.loc.gov/item/2009581123/", ',
+			  'try "https://www.loc.gov/maps/?q=2009581123".';
+		}
+	}
+
+	# Create URI object and add parameters
+	my $uri = URI->new($url);
+	$uri->query_form(
+		$uri->query_form,
+		fo => 'json',
+		c => 100,
+		at => 'results,pagination'
+	);
+
+	# print 'Trying ', $uri->as_string(), "\n";
+	# Make HTTP request
+	my $response = $ua->get($uri);
+
+	# Check that the API request was successful
+	if ($response->is_success && $response->header('Content-Type') =~ /json/) {
+
+		my $data = decode_json($response->decoded_content);
+		my $results = $data->{results};
+
+		for my $result (@$results) {
+			# Filter out anything that's a collection or web page
+			my $original_format = $result->{original_format} || [];
+			my $filter_out = 0;
+
+			# Check if original_format contains "collection" or "web page"
+			for my $format (@$original_format) {
+				if ($format =~ /collection/i || $format =~ /web page/i) {
+					$filter_out = 1;
+					last;
+				}
+			}
+
+			# Evaluate conditional (simplified - assumes 'True' means true)
+			if ($conditional ne 'True') {
+				$filter_out = 1;
+			}
+
+			unless ($filter_out) {
+				# Get the link to the item record
+				if (my $item = $result->{id}) {
+					# Filter out links to Catalog or other platforms
+					if ($item =~ /^http:\/\/www\.loc\.gov\/resource/) {
+						my $resource = $item; # Assign item to resource
+						push @$items_ref, $resource;
+					}
+					if ($item =~ /^http:\/\/www\.loc\.gov\/item/) {
+						push @$items_ref, $item;
+					}
+				}
+			}
+		}
+
+		# Repeat the loop on the next page, unless we're on the last page
+		if (defined $data->{pagination}->{next}) {
+			my $next_url = $data->{pagination}->{next};
+			get_item_ids($next_url, $items_ref, $conditional);
+		}
+
+		return $items_ref;
+	} else {
+		print "There was a problem. Try running the script again, or check your searchURL.\n",
+			$response->status_line(), "\n";
+		# return $items_ref;
+		die $response->decoded_content();
+	}
+}

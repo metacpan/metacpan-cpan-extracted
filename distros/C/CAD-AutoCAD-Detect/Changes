@@ -1,3 +1,9 @@
+0.05 2025-08-14T15:56:14+02:00
+ - Fix dependencies.
+ - Rename file examples to better names.
+ - Rewrite list of magic strings to CAD::Format::DWG::Version.
+ - Update copyright years.
+
 0.04 2024-01-01T22:55:16+01:00
  - Add test for improving of coverage.
  - Improve test message.

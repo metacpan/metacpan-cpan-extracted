@@ -1,5 +1,8 @@
 Revision history for Perl extension Class-Autouse
 
+2.02      2025-08-14 18:37:11Z
+        - distribution tooling updates
+
 2.01 Fri 3 Feb 2012
 	- Removing the use of "defined @array" deprecated in 5.16
 

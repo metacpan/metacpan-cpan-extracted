@@ -1,0 +1,213 @@
+=head1 NAME
+
+Respite::Client - Generic class for running remote services
+
+$Id: Client.pod,v 1.5 2014/02/26 19:30:38 dfackrell Exp $
+
+=head1 SYNOPSIS
+
+    use Respite::Client;
+    use Data::Debug;
+
+    my $client = Respite::Client->new({
+        service => 'foo',        # typically all that is required
+        host    => 'localhost',
+        pass    => '-',
+        port    => 50000,        # default 443
+        no_ssl  => 1,            # default is ssl
+        #no_sign => 1,           # turn off request signing
+        #no_trace => 1,          # turn off sending caller info
+        #no_brand => 1,          # respite does not require brand
+        flat    => 1,            # return flat hashref of results
+        ns      => '',           # optional prefixed namespace
+    });
+
+    debug $client->run_method(foo => {hey => 1});
+
+=head1 OPTIONS
+
+=over 4
+
+=item service_name (or service)
+
+This will be the name of the service used for this client.
+It will be used for looking up connection info
+in %config::config.  It will first look under ${name}_service and then
+$name (you can pass foo_service or foo in for the service and it will
+do the same thing).
+
+All of the remaining options will attempt to look in this remote info
+from the config.
+
+=item host
+
+Defaults to remote info host.
+
+=item port
+
+Defaults to remote info port, and then to 443.
+
+=item path
+
+Defaults to service_name with the _service removed from the end.
+
+=item flat
+
+By default, the results are blessed into the class returned by
+_result_class (default Respite::Client::Result).  If flat is set to true
+it will just return raw data from the request.
+
+If an error is returned and is true, the run_method response will die
+with the value set to the error.
+
+The flat argument is intended to make working with API::Client more seamless
+and close to RPC than the default API::Client behavior of returning
+a response object.
+
+The value can be set per request by passing _flat as an arg to run_method.
+
+=item ns
+
+No default.  If set, the value is added to the beginning of any
+requested methods, with an underscore.  For example, if ns is 'test'
+and we request the 'something' method, the resulting method name
+will be 'test_something'.
+
+=item utf8_encoded
+
+Default false.  When false, data passed should be properly utf8
+decoded (or have no utf8 data at all).  When true, data passed is
+assumed to be utf8 encoded meaning that it will need to be decoded
+before calling json->encode.
+
+Additionally, the true value can be a hashref of methods that need
+this treatment.  This is useful if you know some of your methods have
+utf8 data, while others do not.
+
+(Note: Conversely when the non-json transport is finalized, it will
+need to call decode_utf8 to make sure data is ready for the
+transport.)
+
+=back
+
+=head1 PROTOCOL
+
+The Respite::Client service is a JSON over HTTPS service though it does also
+support normal x-uri-encoded forms including multipart.
+
+The request should be a POST request with a content type of x-application/json.
+
+The request should be hashref (map or associative array) of properly encoded JSON.
+
+Several meta parameters may passed as part of the request.
+
+    _i  Remote IP   - IP of end user requestion action (defaults to REMOTE_ADDR)
+    _w  Remote user - Who is the initiator of the action, may be an admin user (defaults to REMOTE_USER)
+    _t  Token       - An auth compatible token (required for some admin tasks)
+    _c  Caller      - What remote code called this method (automatically added)
+
+The response will be a hashref of properly encoded JSON (a JSON object).  (Note:
+Some Respite methods may choose to return other content.  This will be noted in the
+meta information).
+
+Though not required, it is suggested that all Respites return a hash
+element named "error" if an error situation arrises.  Optionally the
+Respite service could return a http 500 or 400 class error and Respite::Client
+will translate that into a hashref with "error" set.  This allows all
+calling code to easily and consistently check for error conditions.
+
+=head1 DEBUG_Respite
+
+If the environment variable DEBUG_Respite is set, each time a request is made, the URL
+and headers will be output to STDERR via warn.
+
+    export DEBUG_Respite=1
+
+    # bare request
+    PROV=company_brand perl -Ilib -e 'use config; use Respite::Client; $c=Respite::Client->new({service => "service_name",no_sign=>1,no_trace=>1}); use Data::Debug; debug $c->hello'
+    DEBUG_Respite: Connected to https://localhost:50901/
+    POST /service_name/hello/company_brand HTTP/1.0
+    Host: localhost
+    Content-length: 28
+    Content-type: x-application/json
+
+    {"_i":"cmdline","_w":"paul"}
+
+
+    # with caller trace
+    PROV=company_brand perl -Ilib -e 'use config; use Respite::Client; $c=Respite::Client->new({service => "service_name",no_sign=>1}); use Data::Debug; debug $c->hello'
+
+    DEBUG_Respite: Connected to https://localhost:50901/
+    POST /service_name/hello/company_brand HTTP/1.0
+    Host: localhost
+    Content-length: 70
+    Content-type: x-application/json
+
+    {"_c":"main; -e; 1; Respite::Client::AUTOLOAD","_i":"cmdline","_w":"paul"}
+
+
+    # with method signing
+    PROV=company_brand perl -Ilib -e 'use config; use Respite::Client; $c=Respite::Client->new({service => "service_name"}); use Data::Debug; debug $c->hello'
+    DEBUG_Respite: Connected to https://localhost:50901/
+    POST /service_name/hello/company_brand HTTP/1.0
+    X-Respite-Auth: 28b771585f523c91ad555d7a956f0940:1368823114
+    Host: localhost
+    Content-length: 70
+    Content-type: x-application/json
+
+    {"_c":"main; -e; 1; Respite::Client::AUTOLOAD","_i":"cmdline","_w":"paul"}
+
+=head1 AUTHENTICATION
+
+At the top level, the incoming IP will be validated against a
+per-brand whitelist.  Additionally, each IP can have its own password
+specified.  It is up to the server to enforce this.  If a password is found
+during request it will be used to sign the generated arguments.  Signing
+can be turned off via the no_sign argument.  Some Respites may choose to allow
+a basic MD5 sum of the password rather than requiring siging the request.  In
+these cases the md5_pass configuration item should be set and the MD5 hex
+sum of the password should be sent in place of the signed sum.
+
+Various administrative methods require authentication beyond the brand
+password.  In these cases an token must be passed along.  The
+Respite::CommandLine library will request a token for you should
+authentication be required.
+
+=head1 METHOD SIGNING
+
+By default, the Respite::Client will send along a signed token in the X-Respite-Auth
+HTTP header.  This can be turned off by setting no_sign for the service.
+
+The following is the pseudo code for how a method token is generated
+
+     path    := 'service_name'        # typically the service name
+     method  := 'hello'
+     brand   := 'company_brand'
+     pass    := 'jdDU&9dk1S' # client specific config
+     time    := 1368823114   # system time
+     request := '{"_c":"main; -e; 1; Respite::Client::AUTOLOAD","_i":"cmdline","_w":"paul"}'
+
+     sum1    := md5(request)
+     url     := concat('/', path, '/', method, '/', brand)
+     secret  := concat(pass, ':', time, ':', url, ':', sum1)
+     sum2    := md5(secret)
+     token   := concat(sum2, ':', time)
+
+     token   == '28b771585f523c91ad555d7a956f0940:1368823114'
+
+This token should be sent in the X-Respite-Auth HTTP request header.
+
+If md5_pass is set and the server is set to allow md5_pass, then
+the X-Respite-Auth HTTP request header would be generated as follows
+
+     pass    := 'jdDU&9dk1S' # client specific config
+     token   := md5(pass)
+
+     token   == b39fc4d2b6ffb1a3cbe50598f14a9dbe
+
+Additionally, since the request itself is not signed when md5_pass is
+enabled, the server also supports passing the token along as part
+of the JSON request arguments under the x_api_auth key name.
+
+=cut
+

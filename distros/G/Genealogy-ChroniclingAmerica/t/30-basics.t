@@ -44,35 +44,4 @@ subtest 'get_next_entry simple tests' => sub {
 	is($obj->get_next_entry(), undef, 'Returns undef when no matches are found');
 };
 
-subtest 'get_next_entry thorough tests' => sub {
-	my $mock_ua = Test::MockObject->new();
-	$mock_ua->fake_module('LWP::UserAgent', new => sub { return shift });
-	$mock_ua->mock('get', sub {
-		my $site = $_[1];
-		my $mock_resp = Test::MockObject->new();
-
-		$mock_resp->mock('is_error', sub { 0 });
-		$mock_resp->mock('is_success', sub { 1 });
-		$mock_resp->mock('content', sub {
-			if(($site eq 'http://example.com')) {
-				'{"pdf":"https://nigelhorne.com/foo.pdf"}'
-			} else {
-				'{"items":[{"url":"http://example.com","ocr_eng":"John Xyzzy"}],"totalItems":1,"itemsPerPage":1}'
-			}
-		});
-		return $mock_resp;
-	});
-
-	my $obj = Genealogy::ChroniclingAmerica->new({
-		firstname => 'John',
-		lastname => 'Xyzzy',
-		state => 'Indiana',
-		ua => $mock_ua,
-	});
-
-	can_ok($obj, 'get_next_entry');
-	is($obj->get_next_entry(), 'https://nigelhorne.com/foo.pdf', 'Returns expected URL when match is found');
-	is($obj->get_next_entry(), undef, 'Returns undef when no more matches');
-};
-
 done_testing();

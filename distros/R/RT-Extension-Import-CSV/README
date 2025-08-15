@@ -42,7 +42,7 @@ DESCRIPTION
     options that the importer can be run with.
 
 RT VERSION
-    Works with RT 5.
+    Works with RT 5 and RT 6.
 
 INSTALLATION
     perl Makefile.PL
@@ -50,13 +50,13 @@ INSTALLATION
     make install
         May need root permissions
 
-    Edit your /opt/rt5/etc/RT_SiteConfig.pm
+    Edit your /opt/rt6/etc/RT_SiteConfig.pm
         Add this line:
 
             Plugin('RT::Extension::Import::CSV');
 
     Clear your mason cache
-            rm -rf /opt/rt5/var/mason_data/obj
+            rm -rf /opt/rt6/var/mason_data/obj
 
     Restart your webserver
 
@@ -360,7 +360,7 @@ EXAMPLES
 
     Then run the import:
 
-        /opt/rt5/local/plugins/RT-Extension-Import-CSV/bin/rt-extension-import-csv \
+        /opt/rt6/local/plugins/RT-Extension-Import-CSV/bin/rt-extension-import-csv \
             --type ticket \
             --config ExcelImport.pm \
             --insert-update \
@@ -394,7 +394,7 @@ EXAMPLES
 
     Importing is similar to the previous example:
 
-        /opt/rt5/local/plugins/RT-Extension-Import-CSV/bin/rt-extension-import-csv \
+        /opt/rt6/local/plugins/RT-Extension-Import-CSV/bin/rt-extension-import-csv \
             --type ticket \
             --config TabImport.pm \
             --insert-update \
@@ -429,7 +429,7 @@ EXAMPLES
 
     Then run the following:
 
-        /opt/rt5/local/plugins/RT-Extension-Import-CSV/bin/rt-extension-import-csv \
+        /opt/rt6/local/plugins/RT-Extension-Import-CSV/bin/rt-extension-import-csv \
             --type user \
             --config UserImport.pm \
             --insert \
@@ -463,7 +463,7 @@ EXAMPLES
 
     You need to add --article-class when running the import:
 
-        /opt/rt5/local/plugins/RT-Extension-Import-CSV/bin/rt-extension-import-csv \
+        /opt/rt6/local/plugins/RT-Extension-Import-CSV/bin/rt-extension-import-csv \
             --type article \
             --article-class General \
             --config ArticleImport.pm \
@@ -516,7 +516,7 @@ EXAMPLES
     Assuming the user export above produced a file named zendesk_users.csv,
     run the import:
 
-        /opt/rt5/local/plugins/RT-Extension-Import-CSV/bin/rt-extension-import-csv \
+        /opt/rt6/local/plugins/RT-Extension-Import-CSV/bin/rt-extension-import-csv \
             --type user \
             --config ZendeskUsers.pm \
             --insert \
@@ -552,7 +552,7 @@ EXAMPLES
     If tickets were exported to a file named zendesk_tickets.csv, the
     following command will import tickets into your RT instance:
 
-        /opt/rt5/local/plugins/RT-Extension-Import-CSV/bin/rt-extension-import-csv \
+        /opt/rt6/local/plugins/RT-Extension-Import-CSV/bin/rt-extension-import-csv \
             --type ticket \
             --config ZendeskTickets.pm \
             --insert-update \
@@ -569,7 +569,7 @@ AUTHOR
     or via the web at
         http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-Import-CSV
 LICENSE AND COPYRIGHT
-    This software is Copyright (c) 2024 by Best Practical LLC
+    This software is Copyright (c) 2025 by Best Practical LLC
 
     This is free software, licensed under:
 

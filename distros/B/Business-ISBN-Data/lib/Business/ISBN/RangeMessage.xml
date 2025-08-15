@@ -17,8 +17,8 @@
 ]>
 <ISBNRangeMessage>
   <MessageSource>International ISBN Agency</MessageSource>
-  <MessageSerialNumber>49a279a3-8647-4efd-8e68-0112fcdea57c</MessageSerialNumber>
-  <MessageDate>Fri, 1 Aug 2025 05:06:53 BST</MessageDate>
+  <MessageSerialNumber>cfe8e66f-d82f-4da3-acd0-7dde3e030366</MessageSerialNumber>
+  <MessageDate>Wed, 13 Aug 2025 04:55:23 BST</MessageDate>
   <EAN.UCCPrefixes>
     <EAN.UCC>
       <Prefix>978</Prefix>
@@ -1483,11 +1483,11 @@
       <Agency>Pakistan</Agency>
       <Rules>
         <Rule>
-          <Range>0000000-2999999</Range>
+          <Range>0000000-2799999</Range>
           <Length>0</Length>
         </Rule>
         <Rule>
-          <Range>3000000-3199999</Range>
+          <Range>2800000-3199999</Range>
           <Length>2</Length>
         </Rule>
         <Rule>
@@ -1495,11 +1495,11 @@
           <Length>0</Length>
         </Rule>
         <Rule>
-          <Range>5000000-5299999</Range>
+          <Range>5000000-5349999</Range>
           <Length>3</Length>
         </Rule>
         <Rule>
-          <Range>5300000-7399999</Range>
+          <Range>5350000-7399999</Range>
           <Length>0</Length>
         </Rule>
         <Rule>
@@ -4931,11 +4931,11 @@
           <Length>3</Length>
         </Rule>
         <Rule>
-          <Range>8000000-8249999</Range>
+          <Range>8000000-8049999</Range>
           <Length>0</Length>
         </Rule>
         <Rule>
-          <Range>8250000-9999999</Range>
+          <Range>8050000-9999999</Range>
           <Length>4</Length>
         </Rule>
       </Rules>
@@ -8763,8 +8763,12 @@
       <Agency>Korea, Republic</Agency>
       <Rules>
         <Rule>
-          <Range>0000000-2499999</Range>
+          <Range>0000000-2399999</Range>
           <Length>2</Length>
+        </Rule>
+        <Rule>
+          <Range>2400000-2499999</Range>
+          <Length>5</Length>
         </Rule>
         <Rule>
           <Range>2500000-5499999</Range>

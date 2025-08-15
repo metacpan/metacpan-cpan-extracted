@@ -1,8 +1,12 @@
 Build.PL
+CONTRIBUTING.md
 Changes
 LICENSE
+MANIFEST
 META.json
+META.yml
 README.md
+SECURITY.md
 cpanfile
 lib/OcToolkit.pm
 lib/example/Readme.txt
@@ -53,5 +57,4 @@ lib/example/templates_tt/60-cron-jobs/clusterIntern/30-cron-job-create-folders.t
 lib/example/templates_tt/60-cron-jobs/clusterPublic/30-cron-job-create-folders.tt
 minil.toml
 t/00_compile.t
-META.yml
-MANIFEST
+t/01_kwalitee.t

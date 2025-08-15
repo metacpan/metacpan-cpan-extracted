@@ -15,7 +15,8 @@ author_requires 'Test::Pod' => 0;
 author_requires 'Test::Pod::Coverage' => 0;
 license 'bsd';
 name 'CAD-AutoCAD-Detect';
-requires 'CAD::AutoCAD::Version' => 0;
+requires 'CAD::Format::DWG::Version' => 0;
+requires 'Error::Pure' => 0;
 requires 'List::Util' => 1.33;
 requires 'Readonly' => 0;
 requires 'perl' => '5.8.0';
@@ -30,7 +31,7 @@ test_requires 'File::Object' => 0.05;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.04';
+version '0.05';
 
 # Run.
 WriteAll();

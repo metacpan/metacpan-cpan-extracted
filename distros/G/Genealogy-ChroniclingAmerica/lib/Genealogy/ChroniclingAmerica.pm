@@ -1,14 +1,22 @@
 package Genealogy::ChroniclingAmerica;
 
-# https://chroniclingamerica.loc.gov/search/pages/results/?state=Indiana&andtext=james=serjeant&date1=1894&date2=1896&format=json
+# OLD API
+# https://chroniclingamerica.loc.gov/search/pages/results/?date1=1912&state=Indiana&format=json&andtext=ralph%3Dbixler
+
+# TODO: NEW API
+# https://libraryofcongress.github.io/data-exploration/loc.gov%20JSON%20API/Chronicling_America/README.html
+# https://libraryofcongress.github.io/data-exploration/loc.gov%20JSON%20API/Chronicling_America/ChronAm-download_results.html
+# https://www.loc.gov/collections/chronicling-america/?dl=page&end_date=1912-12-31&ops=PHRASE&qs=ralph+bixler&searchType=advanced&start_date=1912-01-01&fo=json
+
 use warnings;
 use strict;
 
 use Carp;
+use CHI;
 use LWP::UserAgent;
 use JSON::MaybeXS;
 use Object::Configure;
-use Params::Get;
+use Params::Get 0.13;
 use Scalar::Util;
 use Return::Set 0.02;
 use URI;
@@ -19,11 +27,11 @@ Genealogy::ChroniclingAmerica - Find URLs for a given person on the Library of C
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 =head1 SYNOPSIS
 
@@ -46,7 +54,7 @@ our $VERSION = '0.06';
 
 =head1 DESCRIPTION
 
-The **Genealogy::ChroniclingAmerica** module allows users to search for historical newspaper records from the **Chronicling America** archive,
+The B<Genealogy::ChroniclingAmerica> module allows users to search for historical newspaper records from the B<Chronicling America> archive,
 maintained by the Library of Congress.
 By providing a person's first name,
 last name,
@@ -54,7 +62,8 @@ and state,
 the module constructs and executes search queries,
 retrieving URLs to relevant newspaper pages in JSON format.
 It supports additional filters like date of birth and date of death,
-enforces **rate-limiting** to comply with API request limits,
+enforces B<rate-limiting> to comply with API request limits,
+local caching,
 and includes robust error handling and validation.
 Ideal for genealogy research,
 this module streamlines access to historical newspaper archives with an easy-to-use interface.
@@ -99,6 +108,12 @@ Accepts the following optional arguments:
 
 =over 4
 
+=item * C<cache>
+
+A caching object.
+If not provided,
+an in-memory cache is created with a default expiration of one hour.
+
 =item * C<middlename>
 
 =item * C<date_of_birth>
@@ -111,6 +126,8 @@ Accepts the following optional arguments:
 such as L<LWP::UserAgent::Throttled>.
 
 =item * C<min_interval> - Amount to rate limit.
+Defaults to 3 seconds,
+inline with L<https://libraryofcongress.github.io/data-exploration/loc.gov%20JSON%20API/Chronicling_America/README.html#rate-limits>
 
 =back
 
@@ -167,84 +184,107 @@ sub new {
 		return;
 	}
 
-	my $ua = $params->{'ua'} || LWP::UserAgent->new(agent => __PACKAGE__ . "/$VERSION");
-	$ua->env_proxy(1) unless($params->{'ua'});
+	my $ua = $params->{'ua'};
+	if(!defined($ua)) {
+		my $ssl_opts;
+		if(-r '/etc/ssl/certs/ca-certificates.crt') {	# Linux
+			$ssl_opts = {
+				'SSL_ca_file' => '/etc/ssl/certs/ca-certificates.crt',
+				verify_hostname => 1
+			}
+		} elsif(-r '/opt/homebrew/etc/ca-certificates/cert.pem') {	# MacOS
+			$ssl_opts = {
+				'SSL_ca_file' => '/opt/homebrew/etc/ca-certificates/cert.pem',
+				verify_hostname => 1
+			}
+		} else {
+			$ssl_opts = { verify_hostname => 0 };
+		}
+		$ua = LWP::UserAgent->new(
+			ssl_opts => $ssl_opts,
+			agent => __PACKAGE__ . "/$VERSION"
+		);
+		$ua->env_proxy(1);
+	}
 
 	$params = Object::Configure::configure($class, $params);
 
+	# Set up caching (default to an in-memory cache if none provided)
+	my $cache = $params->{cache} || CHI->new(
+		driver => 'Memory',
+		global => 1,
+		expires_in => '1 hour',
+	);
+
 	# Set up rate-limiting: minimum interval between requests (in seconds)
-	my $min_interval = $params->{min_interval} || 0;	# default: no delay
+	# From https://libraryofcongress.github.io/data-exploration/loc.gov%20JSON%20API/Chronicling_America/README.html#rate-limits
+	# Burst Limit: 20 requests per 1 minute, Block for 5 minutes
+	my $min_interval = $params->{min_interval} || 4;	# default: four second delay
 
 	my $rc = {
 		%{$params},
 		min_interval => $min_interval,
 		ua => $ua,
-		host => $params->{'host'} || 'chroniclingamerica.loc.gov',
+		host => $params->{'host'} || 'www.loc.gov',
+		path => 'collections/chronicling-america',
+		cache => $cache,
 	};
 
-	my %query_parameters = ( 'format' => 'json', 'state' => ucfirst(lc($params->{'state'})) );
-	if($query_parameters{'state'} eq 'District of columbia') {
-		$query_parameters{'state'} = 'District of Columbia';
+	my %query_parameters = ( 'fo' => 'json', 'location_state' => ucfirst(lc($params->{'state'})), 'ops' => 'PHRASE', 'searchType' => 'advanced' );
+	if($query_parameters{'location_state'} eq 'District of columbia') {
+		$query_parameters{'location_state'} = 'District of Columbia';
 	}
 	my $name = $params->{'firstname'};
 	if($params->{'middlename'}) {
 		$rc->{'name'} = "$name $params->{middlename} $params->{lastname}";
-		$name .= '=' . $params->{middlename};
+		$name .= '+' . $params->{middlename};
 	} else {
 		$rc->{'name'} = "$name $params->{lastname}";
 	}
-	$name .= "=$params->{lastname}";
+	$name .= "+$params->{lastname}";
 
-	$query_parameters{'andtext'} = $name;
+	$name =~ s/\s/+/g;
+
+	$query_parameters{'qs'} = $name;
 	if($params->{'date_of_birth'}) {
-		$query_parameters{'date1'} = $params->{'date_of_birth'};
+		$query_parameters{'start_date'} = $params->{'date_of_birth'};
 	}
 	if($params->{'date_of_death'}) {
-		$query_parameters{'date2'} = $params->{'date_of_death'};
+		$query_parameters{'end_date'} = $params->{'date_of_death'};
 	}
 
-	my $uri = URI->new("https://$rc->{host}/search/pages/results/");
+	# Just scanning for one year
+	$query_parameters{'start_date'} ||= $params->{'date_of_death'};
+	$query_parameters{'end_date'} ||= $params->{'date_of_birth'};
+
+	$query_parameters{'start_date'} .= '-01-01' if($query_parameters{'start_date'});
+	$query_parameters{'end_date'} .= '-12-31' if($query_parameters{'end_date'});
+
+	my $uri = URI->new("https://$rc->{host}/$rc->{path}");
 	$uri->query_form(%query_parameters);
 	my $url = $uri->as_string();
 	# ::diag(">>>>$url = ", $rc->{'name'});
 	# print ">>>>$url = ", $rc->{'name'}, "\n";
 
-	my $resp = $ua->get($url);
-
-	if($resp->is_error()) {
-		Carp::carp("API returned error on $url: ", $resp->status_line());
-		return;
-	}
-
-	unless($resp->is_success()) {
-		die $resp->status_line();
-	}
+	my $items = _get_items($ua, $url);
 
 	# Update last_request timestamp
 	$rc->{'last_request'} = time();
 
-	$rc->{'json'} = JSON::MaybeXS->new();
-	my $data;
-
-	eval { $data = $rc->{'json'}->decode($resp->content()) };
-
-	if($@) {
-		Carp::carp("Failed to parse JSON response: $@");
-		return;
-	}
-
-	# ::diag(Data::Dumper->new([$data])->Dump());
-
-	my $matches = $data->{'totalItems'};
-	if($data->{'itemsPerPage'} < $matches) {
-		$matches = $data->{'itemsPerPage'};
-	}
-
-	$rc->{'matches'} = $matches;
-	if($matches) {
-		$rc->{'query_parameters'} = \%query_parameters;
-		$rc->{'items'} = $data->{'items'};
+	if(scalar(@{$items})) {
+		# Add 'fo=json' to the end of each row
+		my @rc;
+		for my $item (@{$items}) {
+			unless($item->{'id'} =~ /&fo=json$/) {
+				$item->{'id'} .= '&fo=json';
+			}
+			push @rc, $item;
+		}
+		$rc->{'items'} = \@rc;
 		$rc->{'index'} = 0;
+		$rc->{'matches'} = scalar(@rc);
+	} else {
+		$rc->{'matches'} = 0;
 	}
 
 	return bless $rc, $class;
@@ -266,23 +306,13 @@ sub get_next_entry
 	# Retrieve the next entry and increment index
 	my $entry = $self->{'items'}->[$self->{'index'}++];
 
-	if(!defined($entry->{'url'})) {
-		return $self->get_next_entry();
-	}
-
-	# Clean up OCR text
-	my $text = $entry->{'ocr_eng'};
-
-	if(!defined($text)) {
-		return $self->get_next_entry();
-	}
-
-	$text =~ s/[\r\n]/ /g;
-	if($text !~ /$self->{'name'}/ims) {
-		return $self->get_next_entry();
-	}
-
 	# ::diag(Data::Dumper->new([$entry])->Dump());
+
+	# Create a cache key based on the location, date and time zone (might want to use a stronger hash function if needed)
+	my $cache_key = "loc:$entry->{id}";
+	if(my $cached = $self->{cache}->get($cache_key)) {
+		return $cached;
+	}
 
 	# Enforce rate-limiting: ensure at least min_interval seconds between requests.
 	my $now = time();
@@ -292,7 +322,12 @@ sub get_next_entry
 	}
 
 	# Make the API request
-	my $resp = $self->{'ua'}->get($entry->{'url'});
+	# ::diag(__LINE__);
+	# ::diag(Data::Dumper->new([$entry])->Dump());
+	# ::diag($entry->{'id'});
+	my $resp = $self->{'ua'}->get($entry->{'id'});
+	# ::diag(__LINE__);
+	# ::diag(Data::Dumper->new([$resp])->Dump());
 
 	# Update last_request timestamp
 	$self->{last_request} = time();
@@ -300,16 +335,125 @@ sub get_next_entry
 	# Handle error responses
 	if($resp->is_error()) {
 		# print 'got: ', $resp->content(), "\n";
-		Carp::carp("get_next_entry: API returned error on $entry->{url}: ", $resp->status_line());
+		Carp::carp("get_next_entry: API returned error on $entry->{id}: ", $resp->status_line()) unless($resp->code() == 404);
 		return;
 	}
 
 	unless($resp->is_success()) {
-		die $resp->status_line();
+		Carp::croak($resp->status_line());
 	}
 
-	# Decode JSON response and return PDF data
-	return Return::Set::set_return($self->{'json'}->decode($resp->content())->{'pdf'}, { type => 'string', 'min' => 5, matches => qr/\.pdf$/ });
+	my $data = decode_json($resp->decoded_content());
+
+	my $full_text = $data->{'full_text'};
+	if(!defined($full_text)) {
+		return $self->get_next_entry();
+	}
+
+	$full_text =~ s/[\r\n]/ /g;
+        if($full_text !~ /$self->{'name'}/ims) {
+                return $self->get_next_entry();
+        }
+
+	# ::diag(__LINE__);
+	# ::diag($data->{full_text});
+	foreach my $page(@{$data->{'page'}}) {
+		if($page->{'mimetype'} eq 'application/pdf') {
+			# Cache the result before returning it
+			$self->{'cache'}->set($cache_key, $page->{'url'});
+			return Return::Set::set_return($page->{'url'}, { type => 'string', 'min' => 5, matches => qr/\.pdf$/ });
+		}
+	}
+}
+
+# This is the sample code at https://libraryofcongress.github.io/data-exploration/loc.gov%20JSON%20API/Chronicling_America/ChronAm-download_results.html
+#	translated into Perl
+
+# Run P1 search and get a list of results
+sub _get_items
+{
+	my ($ua, $url, $items_ref, $conditional, $depth) = @_;
+
+	$items_ref ||= [];
+	$conditional ||= 'True';
+	$depth ||= 0;
+
+	# Check that the query URL is not an item or resource link
+	my @exclude = ('loc.gov/item', 'loc.gov/resource');
+	for my $string (@exclude) {
+		if (index($url, $string) != -1) {
+			Carp::croak('Your URL points directly to an item or ',
+			  'resource page (you can tell because "item" ',
+			  'or "resource" is in the URL). Please use ',
+			  'a search URL instead. For example, instead ',
+			  'of "https://www.loc.gov/item/2009581123/", ',
+			  'try "https://www.loc.gov/maps/?q=2009581123".');
+		}
+	}
+
+	# Create URI object and add parameters
+	my $uri = URI->new($url);
+	$uri->query_form(
+		$uri->query_form(),
+		fo => 'json',
+		c => 100,
+		at => 'results,pagination'
+	);
+
+	# Make HTTP request
+	# ::diag(__LINE__);
+	# ::diag($uri);
+	my $response = $ua->get($uri);
+
+	# Check that the API request was successful
+	if($response->is_success() && $response->header('Content-Type') && ($response->header('Content-Type') =~ /json/)) {
+		my $data = decode_json($response->decoded_content());
+		my $results = $data->{results};
+
+		for my $result(@{$results}) {
+			# Filter out anything that's a collection or web page
+			my $original_format = $result->{original_format} || [];
+			my $filter_out = 0;
+
+			# Check if original_format contains "collection" or "web page"
+			for my $format (@$original_format) {
+				if ($format =~ /collection/i || $format =~ /web page/i) {
+					$filter_out = 1;
+					last;
+				}
+			}
+
+			# Evaluate conditional (simplified - assumes 'True' means true)
+			if ($conditional ne 'True') {
+				$filter_out = 1;
+			}
+
+			unless ($filter_out) {
+				# Get the link to the item record
+				if (my $item = $result->{id}) {
+					# Filter out links to Catalog or other platforms
+					if ($item =~ /^http:\/\/www\.loc\.gov\/resource/) {
+						# my $resource = $item; # Assign item to resource
+						# push @$items_ref, $resource;
+						push @$items_ref, $result;
+					}
+					if ($item =~ /^http:\/\/www\.loc\.gov\/item/) {
+						push @$items_ref, $result;
+					}
+				}
+			}
+		}
+
+		# Repeat the loop on the next page, unless we're on the last page
+		# Put the $depth in case the end of list code doesn't work
+		if(($depth <= 10) && defined(my $next_url = $data->{pagination}->{next})) {
+			_get_items($ua, $next_url, $items_ref, $conditional, $depth + 1);
+		}
+
+		return $items_ref;
+	}
+	Carp::carp($url, ': ', $response->status_line());
+	return $items_ref;
 }
 
 =head1 AUTHOR
@@ -323,8 +467,11 @@ it should search again without the middle name.
 
 =head1 SEE ALSO
 
-L<https://github.com/nigelhorne/gedcom>
-L<https://chroniclingamerica.loc.gov>
+=item * L<https://github.com/nigelhorne/gedcom>
+
+=item * L<https://chroniclingamerica.loc.gov>
+
+=item * L<https://github.com/LibraryOfCongress/data-exploration>
 
 =head1 SUPPORT
 

@@ -1,4 +1,4 @@
-package Class::Autouse;
+package Class::Autouse; # git description: c42b80d
 
 # See POD at end of file for documentation
 
@@ -31,10 +31,10 @@ use constant DB    => !! $DB;
 use constant DEBUG => !! $DEBUG;
 print "Class::Autouse -> Debugging Activated.\n" if DEBUG;
 
+our $VERSION = '2.02';
+
 # Compile-time Initialisation and Optimisation
 BEGIN {
-	$VERSION = '2.01';
-
 	# Become an exporter so we don't get complaints when we act as a pragma.
 	# I don't fully understand the reason for this, but it works and I can't
 	# recall how to replicate the problem, so leaving it in to avoid any

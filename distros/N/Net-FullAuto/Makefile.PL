@@ -25,7 +25,7 @@
 #
 ################################################################
 
-our $VERSION='1.0000822';
+our $VERSION='1.0000824';
 
 #print `env`,"\n\n\n";
 
@@ -2569,8 +2569,6 @@ if (($^O ne 'MSWin32') && ($^O ne 'MSWin64') && !grep { /^GETBERK$/ } @ARGV) {
    }
    &fa_install_module('Term::Menus','install','Makefile');
    &fa_install_module('IO::String','install','Makefile');
-   &fa_install_module('Crypt::CBC','install','Makefile');
-   &fa_install_module('Crypt::DES','install','Makefile');
    &fa_install_module('Test::Manifest','install','Makefile');
    &fa_install_module('Crypt::Rijndael','install','Makefile');
    &fa_install_module('File::Remove','install','Makefile');
@@ -2625,6 +2623,22 @@ if (($^O ne 'MSWin32') && ($^O ne 'MSWin64') && !grep { /^GETBERK$/ } @ARGV) {
    &fa_install_module('URI::Escape::XS','install','Makefile');
    &fa_install_module('Proc::ProcessTable','install','Makefile');
    &fa_install_module('Data::Password::Check','install','Makefile');
+   &fa_install_module('Crypt::Cipher::AES','install','Makefile','0.087');
+   &fa_install_module('Digest::HMAC','install','Makefile');
+   &fa_install_module('Digest::SHA3','install','Makefile');
+   &fa_install_module('Type::Tiny','install','Makefile');
+   &fa_install_module('Types::Standard','install','Makefile');
+   &fa_install_module('Module::Implementation','install','Makefile');
+   &fa_install_module('Variable::Magic','install','Makefile');
+   &fa_install_module('B::Hooks::EndOfScope','install','Makefile');
+   &fa_install_module('Package::Stash','install','Makefile');
+   &fa_install_module('namespace::clean','install','Makefile');
+   &fa_install_module('namespace::autoclean','install','Makefile'); 
+   &fa_install_module('Digest::SHA3','install','Makefile');
+   &fa_install_module('Crypt::PBKDF2','install','Makefile');
+   &fa_install_module('Crypt::URandom','install','Makefile');
+   &fa_install_module('Crypt::CBC','install','Makefile');
+   &fa_install_module('Crypt::DES','install','Makefile');
    &fa_install_module('Crypt::GeneratePassword','install','Makefile');
    &fa_install_module('Archive::Zip','install','Makefile');
    &fa_install_module('CPAN::DistnameInfo','install','Makefile');

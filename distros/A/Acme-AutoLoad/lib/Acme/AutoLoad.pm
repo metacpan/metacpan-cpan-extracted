@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use base qw(Exporter);
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 our $last_fetched = "";
 our $lib = "lib";
@@ -46,11 +46,8 @@ sub fetch {
   $last_fetched = $url;
   if ($contents =~ m{The document has moved <a href="([^<>]+)">}) {
     my $bounce = $1;
-    if ($recurse->{$bounce} && $recurse->{$bounce} > 2) {
-      return $contents;
-    }
-    $recurse->{$bounce}++;
-    return fetch($bounce, $recurse) if $recurse->{total}++<20;
+    return $contents if ++$recurse->{$bounce} > 3;
+    return fetch($bounce, $recurse) if ++$recurse->{total} < 21;
   }
   return $contents;
 }
@@ -134,18 +131,21 @@ sub inc {
   mkbase($cache_file) or die "$cache_file: Unable to create! $!\n";
   shift @INC if $INC[0] eq \&ignore;
 
-  if ($f =~ m{^([\w/]+)\.pm}) {
-    my $dist = $1;
-    my $mod  = $1;
-    $f = "$1.pm";
+  if ($f =~ m{^(([\w/]+)\.pm)}) {
+    my $dist = my $mod = $2;
+    $f = $1;
     $dist =~ s{/+}{-}g;
     $mod  =~ s{/+}{::}g;
 
-    my $mapper = $ENV{AUTOLOAD_SRC} || "http://fastapi.metacpan.org/v1/release";
-    my $search = fetch("$mapper/$dist/");
+    my $mapper = $ENV{AUTOLOAD_SRC} || "http://fastapi.metacpan.org/v1/module";
+    my $search = fetch("$mapper/$mod/");
     warn "DEBUG: Probed: $last_fetched\n" if $ENV{AUTOLOAD_DEBUG};
-    if ($search =~ m{download_url.*?(\w+/[\w\d\-\.]+)\.tar.gz}) {
+    if ($search =~ m{download_url.*?(\w+/[\w\-\.]+)\.tar.gz}) {
       my $src = full("/source/$1/");
+      if ($search =~ m{"distribution"\s*:\s*"(.*?)"} && $dist ne $1) {
+        warn "DEBUG: Found module [$mod] as part of [$1] instead of [$dist]\n" if $ENV{AUTOLOAD_DEBUG};
+        $dist = $1;
+      }
       if (my $MANIFEST = fetch "$src/MANIFEST") {
         $src = $1 if $last_fetched =~ m{^(.*?)/+MANIFEST};
         if ($MANIFEST =~ m{^lib/}m) {
@@ -297,26 +297,6 @@ to save time for future invocations.
 This only works for Pure Perl CPAN modules at this time.
 If you use modules with XS or bytecode, you will probably have to truly install it first.
 
-=head2 5. Load Precedence
-
-You must always load the main distribution module first,
-even if you don't actually need to use that module anywhere.
-
-  # For example, if all you need is Net::DNS::Resolver
-  # You still have to load Net::DNS first.
-  use Net::DNS;
-  use Net::DNS::Resolver;
-
-=head2 6. Irregular Distros
-
-And for the same reason, those crazy distribution names that aren't really a module
-are more difficult to load on the fly. One workaround is with eval.
-
-  # For example, Mail::Cap is part of the MailTools distribution.
-  # But MailTools.pm doesn't exist, so you have to eval it.
-  BEGIN { eval { require MailTools; } }
-  use Mail::Cap;
-
 =head1 ENVIRONMENT VARIABLES
 
 There are a few ENV settings you can configure to customize the behavior of Acme::AutoLoad.
@@ -346,7 +326,7 @@ You can use AUTOLOAD_SRC to specify the mapper engine to ask where the latest lo
   # For example
   BEGIN { $ENV{AUTOLOAD_SRC} = "http://metacpan.org/release"; }
 
-The default is "http://fastapi.metacpan.org/v1/release" .
+The default is "http://fastapi.metacpan.org/v1/module"
 
 =head2 NETWORK_TEST_ACME_AUTOLOAD
 

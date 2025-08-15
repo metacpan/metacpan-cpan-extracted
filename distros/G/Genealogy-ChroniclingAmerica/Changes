@@ -1,5 +1,9 @@
 Revision history for Genealogy-ChroniclingAmerica
 
+0.07	Thu Aug 14 20:42:35 EDT 2025
+	New API at the L.O.C.
+	Added caching support
+
 0.06	Thu Jul 31 21:08:11 EDT 2025
 	Better handling of NO_NETWORK_TESTING
 	Allow object configure via Object::Configure
