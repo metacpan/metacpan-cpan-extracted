@@ -1,5 +1,5 @@
-# This code is part of Perl distribution OODoc version 3.01.
-# The POD got stripped from this file by OODoc version 3.01.
+# This code is part of Perl distribution OODoc version 3.02.
+# The POD got stripped from this file by OODoc version 3.02.
 # For contributors see file ChangeLog.
 
 # This software is copyright (c) 2003-2025 by Mark Overmeer.
@@ -8,8 +8,13 @@
 # the same terms as the Perl 5 programming language system itself.
 # SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
 
+#oodist: *** DO NOT USE THIS VERSION FOR PRODUCTION ***
+#oodist: This file contains OODoc-style documentation which will get stripped
+#oodist: during its release in the distribution.  You can use this file for
+#oodist: testing, however the code of this development version may be broken!
+
 package OODoc::Text::SubSection;{
-our $VERSION = '3.01';
+our $VERSION = '3.02';
 }
 
 use parent 'OODoc::Text::Structure';
@@ -19,71 +24,68 @@ use warnings;
 
 use Log::Report    'oodoc';
 
+#--------------------
 
 sub init($)
-{   my ($self, $args) = @_;
-    $args->{type}      ||= 'Subsection';
-    $args->{container} ||= delete $args->{section} or panic;
-    $args->{level}     ||= 3;
+{	my ($self, $args) = @_;
+	$args->{type}      ||= 'Subsection';
+	$args->{container} ||= delete $args->{section} or panic;
+	$args->{level}     ||= 3;
 
-    $self->SUPER::init($args) or return;
-    $self->{OTS_subsubsections} = [];
-    $self;
+	$self->SUPER::init($args) or return;
+	$self->{OTS_subsubsections} = [];
+	$self;
 }
 
 sub emptyExtension($)
-{   my ($self, $container) = @_;
-    my $empty = $self->SUPER::emptyExtension($container);
-    my @subsub = map $_->emptyExtension($empty), $self->subsubsections;
-    $empty->subsubsections(@subsub);
-    $empty;
+{	my ($self, $container) = @_;
+	my $empty = $self->SUPER::emptyExtension($container);
+	my @subsub = map $_->emptyExtension($empty), $self->subsubsections;
+	$empty->subsubsections(@subsub);
+	$empty;
 }
 
 sub findEntry($)
-{  my ($self, $name) = @_;
-   $self->name eq $name ? $self : ();
+{	my ($self, $name) = @_;
+	$self->name eq $name ? $self : ();
 }
 
-#-------------------------------------------
+#--------------------
 
-sub section() { shift->container }
+sub section() { $_[0]->container }
 
 
-sub chapter() { shift->section->chapter }
+sub chapter() { $_[0]->section->chapter }
 
 sub path()
-{   my $self = shift;
-    $self->section->path . '/' . $self->name;
+{	my $self = shift;
+	$self->section->path . '/' . $self->name;
 }
 
-#-------------------------------------------
+#--------------------
 
 sub subsubsection($)
-{   my ($self, $thing) = @_;
+{	my ($self, $thing) = @_;
 
-    if(ref $thing)
-    {   push @{$self->{OTS_subsubsections}}, $thing;
-        return $thing;
-    }
+	if(ref $thing)
+	{	push @{$self->{OTS_subsubsections}}, $thing;
+		return $thing;
+	}
 
-    first { $_->name eq $thing } $self->subsubsections;
+	first { $_->name eq $thing } $self->subsubsections;
 }
 
 
 sub subsubsections(;@)
-{   my $self = shift;
-    if(@_)
-    {   $self->{OTS_subsubsections} = [ @_ ];
-        $_->container($self) for @_;
-    }
+{	my $self = shift;
+	if(@_)
+	{	$self->{OTS_subsubsections} = [ @_ ];
+		$_->container($self) for @_;
+	}
 
-    @{$self->{OTS_subsubsections}};
+	@{$self->{OTS_subsubsections}};
 }
 
 *nest = \*subsubsections;
-
-#--------------------
-
-1;
 
 1;

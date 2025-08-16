@@ -17,6 +17,7 @@ do { my $x = {
                                       'Config::General' => '0',
                                       'Sys::Info::Base' => '0.7801',
                                       'Unix::Processors' => '0',
+                                      'parent' => '0',
                                       'perl' => '5.010'
                                     }
                     },

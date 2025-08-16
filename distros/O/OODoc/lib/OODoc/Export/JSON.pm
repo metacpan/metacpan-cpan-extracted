@@ -1,5 +1,5 @@
-# This code is part of Perl distribution OODoc version 3.01.
-# The POD got stripped from this file by OODoc version 3.01.
+# This code is part of Perl distribution OODoc version 3.02.
+# The POD got stripped from this file by OODoc version 3.02.
 # For contributors see file ChangeLog.
 
 # This software is copyright (c) 2003-2025 by Mark Overmeer.
@@ -8,8 +8,13 @@
 # the same terms as the Perl 5 programming language system itself.
 # SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
 
+#oodist: *** DO NOT USE THIS VERSION FOR PRODUCTION ***
+#oodist: This file contains OODoc-style documentation which will get stripped
+#oodist: during its release in the distribution.  You can use this file for
+#oodist: testing, however the code of this development version may be broken!
+
 package OODoc::Export::JSON;{
-our $VERSION = '3.01';
+our $VERSION = '3.02';
 }
 
 use parent 'OODoc::Export';
@@ -21,33 +26,33 @@ use Log::Report  'oodoc';
 
 use JSON   ();
 
+#--------------------
 
 sub new(%) { my $class = shift; $class->SUPER::new(serializer => 'json', @_) }
 
-#------------------
+#--------------------
 
 # Bleh: JSON has real true and false booleans :-(
 sub boolean($) { $_[1] ? $JSON::true : $JSON::false }
 
 
 sub write($$%)
-{   my ($self, $output, $data, %args) = @_;
+{	my ($self, $output, $data, %args) = @_;
 
-    my $fh;
-    if($output eq '-')
-    {   $fh = \*STDOUT;
-    }
-    else
-    {   open $fh, '>:raw', $output
-            or fault __x"Cannot write output to '{file}'", file => $output;
-    }
+	my $fh;
+	if($output eq '-')
+	{	$fh = \*STDOUT;
+	}
+	else
+	{	open $fh, '>:raw', $output
+			or fault __x"cannot write output to {file}", file => $output;
+	}
 
-    my $json = JSON->new->pretty($args{pretty_print});
-    $fh->print($json->encode($data));
+	my $json = JSON->new->pretty($args{pretty_print});
+	$fh->print($json->encode($data));
 
-    $output eq '-' || $fh->close
-        or fault __x"Write errors to {file}", file => $output;
-
+	$output eq '-' || $fh->close
+		or fault __x"write errors to {file}", file => $output;
 }
 
 1;

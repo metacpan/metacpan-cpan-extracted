@@ -15,6 +15,9 @@ use Carp;
 use Scalar::Util qw(blessed);
 
 use Data::Identifier v0.08;
+use File::Information;
+
+use parent 'Data::Identifier::Interface::Known';
 
 use constant { # Taken from Data::Identifier
     RE_UUID                         => qr/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/,
@@ -50,7 +53,7 @@ use constant { # Taken from Data::Identifier
     WK_TAGPOOL_POOL                 => '1f30649d-eb55-48cb-93d7-6d6fcba23909',
 };
 
-our $VERSION = v0.10;
+our $VERSION = v0.11;
 
 our %_digest_name_converter = ( # stolen from Data::URIID::Result
     fc('md5')   => 'md-5-128',
@@ -65,10 +68,15 @@ our %_digest_name_converter = ( # stolen from Data::URIID::Result
 );
 
 our %_digest_info_extra = (
-    'md-5-128'  => {rfc9530 => 'md5'},
-    'sha-1-160' => {rfc9530 => 'sha'},
-    'sha-2-256' => {rfc9530 => 'sha-256'},
-    'sha-2-512' => {rfc9530 => 'sha-512'},
+    'md-5-128'      => {rfc9530 => 'md5',       openpgp =>  1},
+    'ripemd-1-160'  => {                        openpgp =>  3},
+    'sha-1-160'     => {rfc9530 => 'sha',       openpgp =>  2},
+    'sha-2-224'     => {                        openpgp => 11},
+    'sha-2-256'     => {rfc9530 => 'sha-256',   openpgp =>  8},
+    'sha-2-384'     => {                        openpgp =>  9},
+    'sha-2-512'     => {rfc9530 => 'sha-512',   openpgp => 10},
+    'sha-3-256'     => {                        openpgp => 12},
+    'sha-3-512'     => {                        openpgp => 14},
 );
 
 my %_important_digests = map {$_ => 1} qw(sha-1-160 sha-3-512);
@@ -82,6 +90,7 @@ our %_mediatypes = ( # Copied from tags-universal
     'application/ogg'                                           => 'f4a4beee-e0f4-567a-ada4-a15d387a953c',
     'application/pdf'                                           => '03e6c035-e046-5b7e-a016-55b51c4836ea',
     'application/postscript'                                    => '85224b06-7548-5319-b635-4b37dc78880d',
+    'application/vnd.sirtx.vmv0'                                => 'f718f85b-6b41-53c0-9c66-8796df90c725',
     'application/vnd.debian.binary-package'                     => '026b4c07-00ab-581d-a493-73e0b9b1cff9',
     'application/vnd.oasis.opendocument.base'                   => '319de973-68e2-5a01-af87-6fe4a5b800c6',
     'application/vnd.oasis.opendocument.chart'                  => '271d085d-1a51-5795-86f5-e6849166cbf6',
@@ -142,6 +151,8 @@ my %_tagpool_relations = (
     tagpool_file_comment        => WK_TAGPOOL_COMMENT,
     tagpool_file_description    => WK_TAGPOOL_DESCRIPTION,
 );
+
+my @_stable_properties = qw(boring comment contentise description displayname fetchurl finalmode hidden inodeise ise mediatype oid pages readonly system size thumbnail title uri uuid writemode);
 
 my %_properties = (
     uuid        => {loader => \&_load_aggregate, sources => [qw(::Inode tagpool_file_uuid tagpool_directory_setting_tag uuid(xattr_utag_ise) uuid(store_inodeise) uuid(db_inode_tag) :self dev_disk_by_uuid tagpool_pool_uuid)], rawtype => 'uuid'},
@@ -384,6 +395,9 @@ sub property_info {
         my %properties = map {$_ => {
                 name => $_,
             }} keys %{$self->{properties}}, keys %_properties;
+
+        $properties{$_}{stable} = 1 foreach @_stable_properties;
+
         $self->{property_info} = \%properties;
     }
 
@@ -966,6 +980,25 @@ sub _load_fstore {
     }
 }
 
+# --- Overrides for Data::Identifier::Interface::Known ---
+
+
+sub _known_provider {
+    my ($pkg, $class, %opts) = @_;
+
+    croak 'Unsupported options passed' if scalar(keys %opts);
+
+    if ($class eq 'properties_name') {
+        return ([map {$_->{name}} $pkg->property_info], not_identifiers => 1);
+    }
+
+    if (ref $pkg) {
+        return $pkg->instance->_known_provider($class, %opts);
+    } else {
+        return File::Information->_known_provider($class, %opts);
+    }
+}
+
 1;
 
 __END__
@@ -980,11 +1013,13 @@ File::Information::Base - generic module for extracting information from filesys
 
 =head1 VERSION
 
-version v0.10
+version v0.11
 
 =head1 SYNOPSIS
 
     use File::Information;
+
+B<Note:> This package inherits from L<Data::Identifier::Interface::Known>.
 
 This is the base package for L<File::Information::Link>, L<File::Information::Inode>, and L<File::Information::Filesystem>.
 Common methods are documented in this file. Details (such as supported keys) are documented in the respective modules.
@@ -1184,6 +1219,10 @@ The return value is a hashref or an array of hashrefs which contain the followin
 
 The name of the property in universal tag format (the format used in this module).
 
+=item C<stable>
+
+Whether of not the property is considered stable API.
+
 =back
 
 =head2 digest
@@ -1356,6 +1395,25 @@ Arguments will be passed to said functions. However the object my cache the resu
 Therefore it is only allowed to pass arguments that are compatible with caching (if any exist).
 
 See L<File::Information/extractor>, and L<File::Information/db> for details.
+
+=head2 known
+
+    my @list = $obj->known($class [, %opts ] );
+
+This module implements L<Data::Identifier::Interface::Known/known>. See there for details.
+
+B<Note:>
+This interface does not guarantee any specific order.
+
+The following classes are supported. In addition the classes from L<File::Information/known> are supported.
+
+=over
+
+=item C<properties_name>
+
+Returns the names known by L</property_info>.
+
+=back
 
 =head1 AUTHOR
 

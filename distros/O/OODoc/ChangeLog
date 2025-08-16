@@ -3,12 +3,22 @@ All changes where made by Mark Overmeer <perl@overmeer.net>, unless
 explicitly stated otherwise.
 
 TODO:
-	- export inheritance as structure
 	- move "Manual Repository" from ::Object into separate object
 	- subs could not only list 'Inherited from', but also 'Extended by'
 	- in POD, group "Inherited" referenced subs?
-	- to fix: processFiles(select) default in HTML shows <>
-	- to fix: processFiles(parser) default in HTML not M<>
+
+version 3.02: Fri 15 Aug 14:52:20 CEST 2025
+
+	Fixes:
+	- option default now in auto-PMC scheme.
+
+	Improvements:
+	- oorestyle remove C<> and M<> where not needed.
+	- oorestyle default [] and {}
+	- apply oorestyle to OODoc
+	- remove "Commonly used functions" section
+	- html display of diagnostics
+	- export inheritance structure
 
 version 3.01: Thu 14 Aug 11:14:20 CEST 2025
 

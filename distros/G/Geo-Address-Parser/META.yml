@@ -39,5 +39,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Address-Parser
   homepage: https://metacpan.org/pod/Geo::Address::Parser
   repository: git://github.com/nigelhorne/Geo-Address-Parser.git
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

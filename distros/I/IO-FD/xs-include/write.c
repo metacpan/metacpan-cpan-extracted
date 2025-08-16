@@ -7,11 +7,11 @@ syswrite(fd,data, ...)
 	SV* data
 
 	INIT:
-		int ret;
+		ssize_t ret;
 		char *buf;
 		STRLEN max;//=SvCUR(data);
-		int len;
-		int offset;
+		size_t len;
+		long offset;
 	PPCODE:
     if(!SvOK(data)){
      Perl_warn(aTHX_ "%s", "IO::FD::syswrite called with use of uninitialized value");
@@ -83,11 +83,11 @@ SV*
 pwrite(fd, data, len, offset)
 	SV *fd
 	SV* data
-  int len;
-  int offset;
+  size_t len;
+  long offset;
 
 	INIT:
-		int ret;
+		ssize_t ret;
 		char *buf;
 		STRLEN max;//=SvCUR(data);
 	PPCODE:
@@ -126,9 +126,9 @@ syswrite2(fd,data)
 	SV* data
 
 	INIT:
-		int ret;
+		ssize_t ret;
 		char *buf;
-		int len;
+		size_t len;
 	PPCODE:
 
     if(SvOK(fd) && SvIOK(fd)){
@@ -165,13 +165,13 @@ SV*
 syswrite3(fd,data,len)
 	SV* fd
 	SV* data
-	int len
+	size_t len
 
 	INIT:
-		int ret;
+		ssize_t ret;
 		char *buf;
 		STRLEN max;//=SvCUR(data);
-		int offset=0;
+		long offset=0;
 	PPCODE:
 
     if(SvOK(fd) && SvIOK(fd)){
@@ -212,11 +212,11 @@ SV*
 syswrite4(fd,data,len,offset)
 	SV* fd
 	SV* data
-	int len
-	int offset
+	size_t len
+	long offset
 
 	INIT:
-		int ret;
+		ssize_t ret;
 		char *buf;
 		STRLEN max;//=SvCUR(data);
 	PPCODE:

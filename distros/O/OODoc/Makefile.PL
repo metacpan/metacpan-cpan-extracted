@@ -24,9 +24,9 @@ my %oodist = (
 		'../Log-Report',                       #O     included in the documentation.
 	],
 
-	parser => {                                #O  Describes the input files
+	parser => {
 		syntax       => 'markov',              #O  name or class.  'markov' supports plain pod as well
-		skip_links   => [                      #O  list of classes linked to, but not parser for the docs
+		skip_links   => [                      #O  list of classes linked to, but not parsed for the docs
 		],
 		pmhead       => 'PMHEAD.txt',          #O  lines to add to each stripped pm file
 		select       => undef,                 #O  filter filenames, default pod's and pm's in lib/

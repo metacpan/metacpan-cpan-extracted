@@ -17,7 +17,7 @@ OODoc::Object - base class for all OODoc classes.
 
 =head1 SYNOPSIS
 
- # Never instantiated directly.
+  # Never instantiated directly.
 
 =head1 DESCRIPTION
 
@@ -71,8 +71,8 @@ the same thing. The ids are numeric.
 
 example: 
 
- if($obj1->unique == $obj2->unique) {...}
- if($obj1 == $obj2) {...}   # same via overload
+  if($obj1->unique == $obj2->unique) {...}
+  if($obj1 == $obj2) {...}   # same via overload
 
 =back
 
@@ -123,34 +123,16 @@ A HASH is returned which should get filled with useful data.
 
 =back
 
-=head2 Commonly used functions
-
-=over 4
-
-=item $any-E<gt>B<filenameToPackage>($filename)
-
-Z<>
-
-example: 
-
- print $self->filenameToPackage('Mail/Box.pm'); # prints Mail::Box
-
-=item $any-E<gt>B<mkdirhier>($directory)
-
-Creates this C<$directory> and all its non-existing parents.
-
-=back
-
 =head1 DIAGNOSTICS
 
 =over 4
 
-=item Warning: Unknown option $name
+=item Error: Unknown object attribute '$name' for $pkg
 
 You have used the option with C<$name>, which is not defined with the
 instantiation (the C<new> method) of this object.
 
-=item Warning: Unknown options @names
+=item Error: Unknown object attributes for $pkg: '$names'
 
 You have used more than one option which is not defined to instantiate
 the object.
@@ -165,8 +147,8 @@ to L<manualsForPackage()|OODoc::Object/"Manual Repository"> or L<mainManual()|OO
 
 =head1 SEE ALSO
 
-This module is part of OODoc version 3.01,
-built on August 14, 2025. Website: F<https://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.02,
+built on August 15, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 

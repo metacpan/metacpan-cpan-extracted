@@ -19,11 +19,11 @@ default values which are each captured in a separate object as described
 in this manual page.
 
 Extends L<"DESCRIPTION" in OODoc::Text|OODoc::Text/"DESCRIPTION">.
- 
+
 =head1 OVERLOADED
 
 Extends L<"OVERLOADED" in OODoc::Text|OODoc::Text/"OVERLOADED">.
- 
+
 =over 4
 
 =item overload: B<'""' (stringification)>
@@ -47,11 +47,11 @@ Inherited, see L<OODoc::Text/"OVERLOADED">
 =head1 METHODS
 
 Extends L<"METHODS" in OODoc::Text|OODoc::Text/"METHODS">.
- 
+
 =head2 Constructors
 
 Extends L<"Constructors" in OODoc::Text|OODoc::Text/"Constructors">.
- 
+
 =over 4
 
 =item $class-E<gt>B<new>(%options)
@@ -94,7 +94,7 @@ The value which is related to this default.
 =head2 Attributes
 
 Extends L<"Attributes" in OODoc::Text|OODoc::Text/"Attributes">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<container>( [$object] )
@@ -146,7 +146,7 @@ Inherited, see L<OODoc::Text/"Attributes">
 =head2 Manual Repository
 
 Extends L<"Manual Repository" in OODoc::Text|OODoc::Text/"Manual Repository">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<addManual>($manual)
@@ -186,7 +186,7 @@ Inherited, see L<OODoc::Object/"Manual Repository">
 =head2 Collected
 
 Extends L<"Collected" in OODoc::Text|OODoc::Text/"Collected">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<addExample>($object)
@@ -207,22 +207,6 @@ Inherited, see L<OODoc::Text/"Collected">
 
 =back
 
-=head2 Commonly used functions
-
-Extends L<"Commonly used functions" in OODoc::Text|OODoc::Text/"Commonly used functions">.
- 
-=over 4
-
-=item $any-E<gt>B<filenameToPackage>($filename)
-
-Inherited, see L<OODoc::Object/"Commonly used functions">
-
-=item $any-E<gt>B<mkdirhier>($directory)
-
-Inherited, see L<OODoc::Object/"Commonly used functions">
-
-=back
-
 =head1 DIAGNOSTICS
 
 =over 4
@@ -237,8 +221,8 @@ to L<manualsForPackage()|OODoc::Object/"Manual Repository"> or L<mainManual()|OO
 
 =head1 SEE ALSO
 
-This module is part of OODoc version 3.01,
-built on August 14, 2025. Website: F<https://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.02,
+built on August 15, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 

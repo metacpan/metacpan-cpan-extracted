@@ -3,6 +3,7 @@ Changes
 lib/Geo/Address/Parser.pm
 lib/Geo/Address/Parser/Rules/AU.pm
 lib/Geo/Address/Parser/Rules/CA.pm
+lib/Geo/Address/Parser/Rules/IRL.pm
 lib/Geo/Address/Parser/Rules/NZ.pm
 lib/Geo/Address/Parser/Rules/UK.pm
 lib/Geo/Address/Parser/Rules/US.pm
@@ -17,6 +18,7 @@ t/ca.t
 t/cli.t
 t/eof.t
 t/eol.t
+t/irl.t
 t/nz.t
 t/pod-cm.t
 t/pod-coverage.t

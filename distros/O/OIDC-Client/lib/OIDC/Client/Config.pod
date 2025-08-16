@@ -16,9 +16,27 @@ the configuration entry names.
 
 =head1 ENTRIES
 
-=head2 store_mode
+=head2 default_provider
 
-Defines where the tokens are stored.
+Defines the provider name to use by the framework plugin when no one has
+been specified in the call to the C<oidc($provider)> method.
+
+=head2 authentication_error_path
+
+Relative path of the endpoint to which the browser is redirected if an error
+is returned by the provider during the callback to the application after
+an authentication attempt, if an error occurs when the token is retrieved
+in exchange for the code or if an error occurs when verifying the token.
+
+From the redirection endpoint, the error message is present in
+C<error_message> flash data.
+
+If this path is not configured, an L<OIDC::Client::Error::Authentication> error
+is thrown.
+
+=head2 provider."provider".store_mode
+
+Defines where the tokens are stored for this provider.
 
 Possible values (C<session> by default) :
 
@@ -35,19 +53,6 @@ This may be useful for an API which must validate the token
 in the C<Authorization> header for each request (Resource Server).
 
 =back
-
-=head2 authentication_error_path
-
-Relative path of the endpoint to which the browser is redirected if an error
-is returned by the provider during the callback to the application after
-an authentication attempt, if an error occurs when the token is retrieved
-in exchange for the code or if an error occurs when verifying the token.
-
-From the redirection endpoint, the error message is present in
-C<error_message> flash data.
-
-If this path is not configured, an L<OIDC::Client::Error::Authentication> error
-is thrown.
 
 =head2 provider."provider".proxy_detect
 
@@ -181,8 +186,7 @@ Clock skew of 1 minute
 
 =head2 provider."provider".claim_mapping
 
-Used to map the claims of an ID token to the I<identity> hashref
-and/or the user informations to an L<OIDC::Client::User> object.
+Used to map token claims or user information to an L<OIDC::Client::User> object.
 
 By default, no mapping is used.
 
@@ -300,33 +304,36 @@ endpoint is called.
 =head2 provider."provider".mocked_identity
 
 For local use only, bypasses the authentication flow by directly defining
-a mocked object representing an identity.
+a mocked object representing an L<OIDC::Client::Identity> object.
 
 Example:
 
     <mocked_identity>
-        login       DOEJ
-        lastname    Doe
-        firstname   John
-        email       john.doe@gmail.com
-        roles       MYAPP.ROLE1
-        roles       MYAPP.ROLE2
+        subject     DOEJ
+        token       abcd1234
+        <claims>
+            sub         DOEJ
+            lastName    Doe
+            firstName   John
+            email       john.doe@gmail.com
+            roles       MYAPP.ROLE1
+            roles       MYAPP.ROLE2
+        </claims>
     </mocked_identity>
 
-=head2 provider."provider".mocked_claims
+=head2 provider."provider".mocked_access_token
 
 For local use only, allows the verification of a token to be bypassed by directly
-defining a mocked object representing the claims.
+defining a mocked object representing an L<OIDC::Client::AccessToken> object.
+Also used when retrieving an L<OIDC::Client::AccessToken> object from the store.
 
 Example:
 
-    <mocked_claims>
-        sub         DOEJ
-        exp         123456
-        aud         MYAPP
-        scp         scope1
-        scp         scope2
-    </mocked_claims>
+    <mocked_access_token>
+        token       abcd1234
+        scopes      scope1
+        scopes      scope2
+    </mocked_access_token>
 
 =head2 provider."provider".mocked_userinfo
 

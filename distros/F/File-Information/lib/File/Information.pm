@@ -20,7 +20,9 @@ use File::Information::Inode;
 use File::Information::Filesystem;
 use File::Information::Tagpool;
 
-our $VERSION = v0.10;
+use parent 'Data::Identifier::Interface::Known';
+
+our $VERSION = v0.11;
 
 my $HAVE_FILE_VALUEFILE = eval {require File::ValueFile::Simple::Reader; 1;};
 my $HAVE_UNIX_MKNOD     = eval {require Unix::Mknod; 1;};
@@ -528,6 +530,23 @@ sub _filesystem_for {
     return $self->{filesystems}{$dev};
 }
 
+# --- Overrides for Data::Identifier::Interface::Known ---
+
+
+sub _known_provider {
+    my ($pkg, $class, %opts) = @_;
+    croak 'Unsupported options passed' if scalar(keys %opts);
+
+    if ($class eq 'lifecycles_name') {
+        return ([$pkg->lifecycles], not_identifiers => 1);
+    } elsif ($class eq 'digest_name') {
+        return ([map {$_->{name}} $pkg->digest_info], not_identifiers => 1);
+    }
+
+    return ([]) if $class eq ':all';
+    croak 'Unsupported class';
+}
+
 1;
 
 __END__
@@ -542,7 +561,7 @@ File::Information - generic module for extracting information from filesystems
 
 =head1 VERSION
 
-version v0.10
+version v0.11
 
 =head1 SYNOPSIS
 
@@ -558,6 +577,8 @@ version v0.10
 
     my $result                      = $obj->verify;
     my $passed                      = $result->has_passed;
+
+B<Note:> This package inherits from L<Data::Identifier::Interface::Known>.
 
 This module provides support to read/write properties of inodes (files) and links
 in a portable and compact way.
@@ -826,6 +847,33 @@ This can for example happen if the digest became unsafe after the release of the
 =item C<rfc9530>
 
 The name of the algorithm as per RFC 9530 if any.
+
+=item C<openpgp>
+
+The OpenPGP algorithm identifier.
+
+=back
+
+=head2 known
+
+    my @list = $instance->known($class [, %opts ] );
+
+This module implements L<Data::Identifier::Interface::Known/known>. See there for details.
+
+B<Note:>
+This interface does not guarantee any specific order.
+
+The following classes are supported:
+
+=over
+
+=item C<lifecycles_name>
+
+Returns the same values as L</lifecycles>.
+
+=item C<digest_name>
+
+Returns the names known by L</digest_info>.
 
 =back
 

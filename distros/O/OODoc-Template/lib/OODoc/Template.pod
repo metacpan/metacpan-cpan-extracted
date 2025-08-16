@@ -6,23 +6,23 @@ OODoc::Template - Simple template system
 
 =head1 SYNOPSIS
 
- use OODoc::Template;
- my $t = OODoc::Template->new;
+  use OODoc::Template;
+  my $t = OODoc::Template->new;
 
- my $template = ".....";  # usually read from file
- my %values   = ( a => 3 );
+  my $template = ".....";  # usually read from file
+  my %values   = ( a => 3 );
 
- # list context keeps parse tree as well
- my ($output, $tree) = $t->process($template, \%values);
+  # list context keeps parse tree as well
+  my ($output, $tree) = $t->process($template, \%values);
 
- # scalar context catches output in string
- my $output = $t->process($template, \%values);
- my $output = $t->process($tree, \%values);
- 
- # void context output to selected file-handle
- select OUTPUT;
- $t->process($template, \%values);
- $t->process($tree, \%values);
+  # scalar context catches output in string
+  my $output = $t->process($template, \%values);
+  my $output = $t->process($tree, \%values);
+
+  # void context output to selected file-handle
+  select OUTPUT;
+  $t->process($template, \%values);
+  $t->process($tree, \%values);
 
 =head1 DESCRIPTION
 
@@ -68,7 +68,7 @@ will be very fast.
 
 =item $class-E<gt>B<new>(%options)
 
-Create a new formatter object.  All %options are used as global set of
+Create a new formatter object.  All C<%options> are used as global set of
 attributes, so used for each template processing started via this
 object.  Probably, it is a good habit to set the required changes
 of the predefined tags (like C<template> and C<search>) here.
@@ -79,19 +79,21 @@ of the predefined tags (like C<template> and C<search>) here.
 
 =over 4
 
-=item $obj-E<gt>B<process>(STRING|SCALAR|ARRAY, HASH|PAIRS)
+=item $obj-E<gt>B<process>(STRING|SCALAR|ARRAY, \%params|%params)
 
-The template is passed as unprocessed SCALAR to the STRING, or
-an already parsed template (which is an ARRAY).  Values are
-passed as a HASH or list of PAIRS.
+The template is rendered inserting the C<%params>.
+
+With a C<STRING> or C<SCALAR> (reference to a string), the template will
+be parsed first with L<parseTemplate()|OODoc::Template/"Parsing">.  With an C<ARRAY>, this work
+has already been done.
 
 =item $obj-E<gt>B<processFile>(FILENAME, HASH|PAIRS)
 
-Process the content of the file with specified FILENAME.  The current
+Process the content of the file with specified C<FILENAME>.  The current
 value of the C<search> path is used as path to find it.  The returns
 behaves the same as L<process()|OODoc::Template/"Processing">.
 
-If the FILENAME is not found, then C<undef> is returned as output.
+If the C<FILENAME> is not found, then C<undef> is returned as output.
 However, then this method is used in VOID context, there is no output:
 then an error is raised in stead.
 
@@ -106,7 +108,7 @@ call this method as often as you want without serious penalty.
 
 =item $obj-E<gt>B<allValuesFor>( $tag, [$attrs, $then, $else] )
 
-Collects all values related to $tag in all nestings of values.  The most
+Collects all values related to C<$tag> in all nestings of values.  The most
 preferred is listed first.
 
 =item $obj-E<gt>B<defineMacro>($tag, $attrs, $then, $else)
@@ -126,17 +128,17 @@ if the file was not found.
 
 Remove one level of values.
 
-=item $obj-E<gt>B<pushValues>(HASH)
+=item $obj-E<gt>B<pushValues>(\%values)
 
-Add new level of values to the known list.  The data in the HASH is
+Add new level of C<%values> to the known list.  The data in the HASH is
 copied, and a reference to the copy returned.  The copy may be changed
 afterwards.
 
 =item $obj-E<gt>B<valueFor>( $tag, [$attrs, $then, $else] )
 
-Lookup the value for $tag in the known data.  See section L</values>
-about the way this is done.  The $attrs (HASH of key-value pairs)
-and $then/$else content text references are used when the $tag relates to
+Lookup the value for C<$tag> in the known data.  See section L</values>
+about the way this is done.  The C<$attrs> (HASH of key-value pairs)
+and C<$then>/C<$else> content text references are used when the C<$tag> relates to
 a code reference which is to produce new values dynamicly.
 
 =back
@@ -152,12 +154,12 @@ This method is deprecated.  Please use L<process()|OODoc::Template/"Processing">
 =item $obj-E<gt>B<parseAttrs>(STRING)
 
 Returns an ARRAY of PAIRS which will create the attributes for
-the called code fragments.  The STRING syntax is described in the
+the called code fragments.  The C<STRING> syntax is described in the
 DETAILS section of this manual page.
 
 =item $obj-E<gt>B<parseTemplate>(STRING)
 
-Try to understand the STRING. Returned is a reference to a tree which
+Try to understand the C<STRING>. Returned is a reference to a tree which
 needs to be called with the correct values.
 
 =back
@@ -182,33 +184,33 @@ to.
 
 the output is sent to the selected file-handle:
 
- use OODoc::Template;
- my $t = OODoc::Template->new;
+  use OODoc::Template;
+  my $t = OODoc::Template->new;
 
- my $template = ".....";  # usually read from file
- my %values   = ( a => 3 );
+  my $template = ".....";  # usually read from file
+  my %values   = ( a => 3 );
 
- open OUTPUT, ">", $filename or die;
- select OUTPUT;
+  open OUTPUT, ">", $filename or die;
+  select OUTPUT;
 
- $t->process($template, \%values);
+  $t->process($template, \%values);
 
 or
 
- $t->process($template, a => 3);
+  $t->process($template, a => 3);
 
 =item . SCALAR context
 
 the output is returned as string:
 
- my $output = $t->process($parsed, a => 13);
+  my $output = $t->process($parsed, a => 13);
 
 =item . LIST context
 
 now both the output as the parsed template are returned.  You can reuse
 the parsed templates, improving the performance enormously:
 
- my ($output, $parsed) = $t->process($template, a => 42);
+  my ($output, $parsed) = $t->process($template, a => 42);
 
 =back
 
@@ -218,13 +220,13 @@ When used in a website, you may want to produce the various templates
 once, before the processes get forked.  Just select the output to
 the null device, and then call all templates once.
 
-   my %top;
-   foreach my $lang ( qw/en nl de/ )
-   {   my ($output, $parsed) = $t->process($template, lang => $lang);
-       $top{$lang} = $parsed;
-   }
+  my %top;
+  foreach my $lang ( qw/en nl de/ )
+  {   my ($output, $parsed) = $t->process($template, lang => $lang);
+      $top{$lang} = $parsed;
+  }
 
-   print $t->process($top{nl}, a => 42);
+  print $t->process($top{nl}, a => 42);
 
 Some processing tricks will seriously hinder the caching of the parsed
 templates.  If you use DYNAMIC, then you are on your own.  If you use
@@ -237,13 +239,13 @@ The C<$template> string contains HTML with special comment blocks.  These
 special comment blocks are replaced by the specified C<values>.  The block
 can appear in two shapes (which may provided different output):
 
-   <!--{TAG ATTRIBUTES}-->
-      some text
-   <!--{/TAG}-->
+  <!--{TAG ATTRIBUTES}-->
+     some text
+  <!--{/TAG}-->
 
 or
 
-   <!--{TAG ATTRIBUTES}-->
+  <!--{TAG ATTRIBUTES}-->
 
 The first example shows a I<container>, the second a terminal tag.
 The TAG is one of the specified values. ATTRIBUTES are used when the
@@ -260,9 +262,9 @@ simple container.  When the container has values attached to is (always
 a HASH or ARRAY-of-HASHES filled with key-value pairs), the content
 is displayed.  So, a simple if-then looks like this:
 
- <!--{want_something ATTRIBUTES}-->
-   ...
- <!--{/want_something}-->
+  <!--{want_something ATTRIBUTES}-->
+    ...
+  <!--{/want_something}-->
 
 The optional ATTRIBUTES are extra values set when processing the
 container.  The pre-defined tag C<defined> can be used to only
@@ -271,28 +273,28 @@ set attributes: it's a no-op.
 You may decide to be more explicit in the if-then, by using the
 optional C<IF> keyword:
 
- <!--{IF want_something ATTRIBUTES}-->
-   ...
- <!--{/want_something}-->
+  <!--{IF want_something ATTRIBUTES}-->
+    ...
+  <!--{/want_something}-->
 
 When the TAG starts with C<<NOT >> or C<<NOT_>>, it is used to negate
 the boolean interpretation of the values returned by evaluating the tag:
 
- <!--{NOT want_something ATTRIBUTES}-->
-   ...
- <!--{/want_something}-->
+  <!--{NOT want_something ATTRIBUTES}-->
+    ...
+  <!--{/want_something}-->
 
 An if-then-else looks like this:
 
- <!--{want_something ATTRIBUTES}-->
-   ...
- <!--{ELSE want_something}-->
-   ...
- <!--{/want_something}-->
+  <!--{want_something ATTRIBUTES}-->
+    ...
+  <!--{ELSE want_something}-->
+    ...
+  <!--{/want_something}-->
 
 The C<want_something> tag must produce either a HASH or an ARRAY-of-HASHes
 or C<undef>, because that is what containers do.  Because of parser
-limitations, the 
+limitations, the
 
 =head2 Definition
 
@@ -307,36 +309,36 @@ produce a value.
 Attibutes are values which are used when the text which is to be inserted
 is produced dynamically.  Their syntax is like this:
 
- # attributes are optionally separated by comma's
- attrs:  attr , attrs
-       | attr attrs
+  # attributes are optionally separated by comma's
+  attrs:  attr , attrs
+        | attr attrs
 
- # a hash initiation syntax may be used, but single
- # barewords as well
- attr:   bareword
-       | bareword => " string " | bareword = " string "
-       | bareword => ' char* '  | bareword = ' char* '
-       | bareword => bareword   | bareword = bareword
-       | bareword => variable   | bareword = variable
+  # a hash initiation syntax may be used, but single
+  # barewords as well
+  attr:   bareword
+        | bareword => " string " | bareword = " string "
+        | bareword => ' char* '  | bareword = ' char* '
+        | bareword => bareword   | bareword = bareword
+        | bareword => variable   | bareword = variable
 
- string: ( char | variable ) *
+  string: ( char | variable ) *
 
- # pass value produced by other tag
- variable:
-         '$' tag
-       | '${' tag attrs '}'
+  # pass value produced by other tag
+  variable:
+          '$' tag
+        | '${' tag attrs '}'
 
 A string may contain variables, which are stringified.  This means that
 tags which produce hashes or arrays are not usuable to interpolate.
 
 B<. Example>
 
- <!--{section nr => 2, show_number, a => "monkey", chapter => $cnr}-->
- <!--{section nr=2 show_number a=monkey chapter=$cnr}-->
+  <!--{section nr => 2, show_number, a => "monkey", chapter => $cnr}-->
+  <!--{section nr=2 show_number a=monkey chapter=$cnr}-->
 
 The attributes result (internally) in a hash (of ARGS) which contains
 the keys C<nr>, C<show_number>, C<a>, and C<chapter> with respecively
-values C<2>, true, C<monkey>, and the looked-up value for C<cnr>.
+values C<2>, C<true>, C<monkey>, and the looked-up value for C<cnr>.
 
 =head3 values
 
@@ -345,7 +347,7 @@ a certain tag can not be found, the value is C<undef>.
 
 =over 4
 
-=item * undef
+=item * C<undef>
 
 When the value is C<undef> (explicitly or because it was not found),
 the container or terminator will be skipped.  The whole text simply
@@ -488,15 +490,15 @@ B<. Example: use of macro>
 
 A macro is used to define a piece of template, but apply it later.
 
- <!--{macro name="chapter"}-->
-    <h2><!--{title}--></h2>
- <!--{/macro}-->
+  <!--{macro name="chapter"}-->
+     <h2><!--{title}--></h2>
+  <!--{/macro}-->
 
- <!--{template macro="chapter" title="hi there!"}-->
+  <!--{template macro="chapter" title="hi there!"}-->
 
 B<. Example: use of template file>
 
- <!--{template file=$lang/header.txt alt=en/header.txt}->
+  <!--{template file=$lang/header.txt alt=en/header.txt}->
 
 =head2 White-space removal
 
@@ -515,22 +517,68 @@ B<. Example: of white-space removal>
 
 The template looks like this:
 
- The follow\
- ing error was\
+  The follow\
+  ing error was\
 
-  produced:
-     <!--{error}-->, \
-     <!--{errno}-->
+   produced:
+      <!--{error}-->, \
+      <!--{errno}-->
 
 The output is:
 
- The following error was produced:
-    No such file or directory, 2
+  The following error was produced:
+     No such file or directory, 2
+
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Fault: Cannot read from $fn in $file: $!
+
+Z<>
+
+=item Error: attribute error in '$tag'
+
+Z<>
+
+=item Error: cannot find macro $name
+
+Z<>
+
+=item Error: cannot find template file $file
+
+Z<>
+
+=item Error: cannot find template file $file
+
+Z<>
+
+=item Error: file or macro attribute required for template in $source
+
+Z<>
+
+=item Error: macro requires a name
+
+Z<>
+
+=item Error: macros cannot have an else part ($macro)
+
+Z<>
+
+=item Error: template is not a container
+
+Z<>
+
+=item Error: value for $tag is $value, must be single
+
+Z<>
+
+=back
 
 =head1 SEE ALSO
 
-This module is part of OODoc-Template version 0.18,
-built on August 02, 2025. Website: F<http://perl.overmeer.net/oodoc-template/>
+This module is part of OODoc-Template version 0.19,
+built on August 15, 2025. Website: F<http://perl.overmeer.net/oodoc-template/>
 
 =head1 LICENSE
 

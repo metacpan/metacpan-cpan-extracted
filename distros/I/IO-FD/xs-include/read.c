@@ -5,11 +5,11 @@ SV*
 sysread(fd, data, len, ...)
     SV* fd;
     SV* data
-		int len
+		size_t len
 		INIT:
-			int ret;
+			ssize_t ret;
 			char *buf;
-			int offset=0;
+			long offset=0;
 
     PPCODE:
 			//TODO: allow unspecified len and offset
@@ -24,8 +24,8 @@ sysread(fd, data, len, ...)
           offset=SvIOK(ST(3))?SvIV(ST(3)):0;
         }
 
-        int data_len=sv_len(data);
-        int request_len;
+        size_t data_len=sv_len(data);
+        size_t request_len;
         if(offset<0){
           offset=data_len-offset;
         }
@@ -69,11 +69,11 @@ SV*
 pread(fd, data, len, offset)
   SV *fd;
   SV *data;
-  int len
-  int offset;
+  size_t len
+  long offset;
 
 		INIT:
-			int ret;
+			ssize_t ret;
 			char *buf;
 
     PPCODE:
@@ -113,19 +113,19 @@ SV*
 sysread3(fd, data, len)
 		SV *fd;
 		SV* data
-		int len
+		size_t len
 
 		INIT:
-			int ret;
+			ssize_t ret;
 			char *buf;
-			int offset;
+			long offset;
 
 		PPCODE:
     if(SvOK(fd) &&SvIOK(fd)){
       if(SvREADONLY(data)){
         Perl_croak(aTHX_ "%s", PL_no_modify);
       }
-			int data_len=SvCUR(data);
+			size_t data_len=SvCUR(data);
 
 			//fprintf(stderr, "Length of buffer is: %d\n", data_len);
 			//fprintf(stderr, "Length of request is: %d\n",len);
@@ -162,11 +162,11 @@ SV*
 sysread4(fd, data, len, offset)
     SV* fd;
     SV* data
-    int len
-		int offset
+    size_t len
+		long offset
 
 		INIT:
-			int ret;
+			ssize_t ret;
 			char *buf;
 
       PPCODE:
@@ -176,8 +176,8 @@ sysread4(fd, data, len, offset)
         }
 
 #grow scalar to fit potental read
-        int data_len=sv_len(data);
-        int request_len;
+        long data_len=sv_len(data);
+        long request_len;
         if(offset<0){
           offset=data_len-offset;
         }

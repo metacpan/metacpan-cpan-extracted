@@ -14,7 +14,7 @@ OODoc::Parser - base class for all OODoc parsers.
 
 =head1 SYNOPSIS
 
- # Never instantiated directly.
+  # Never instantiated directly.
 
 =head1 DESCRIPTION
 
@@ -29,16 +29,16 @@ Currently distributed parsers:
 =item * L<OODoc::Parser::Markov|OODoc::Parser::Markov> (markov)
 
 The Markov parser understands standard POD, but adds logical markup tags
-and the C<M&lt;&gt;> links.
+and C<M> and C<P> links.
 
 =back
 
 Extends L<"DESCRIPTION" in OODoc::Object|OODoc::Object/"DESCRIPTION">.
- 
+
 =head1 OVERLOADED
 
 Extends L<"OVERLOADED" in OODoc::Object|OODoc::Object/"OVERLOADED">.
- 
+
 =over 4
 
 =item overload: B<'==' and '!=' (numeric comparison)>
@@ -54,11 +54,11 @@ Inherited, see L<OODoc::Object/"OVERLOADED">
 =head1 METHODS
 
 Extends L<"METHODS" in OODoc::Object|OODoc::Object/"METHODS">.
- 
+
 =head2 Constructors
 
 Extends L<"Constructors" in OODoc::Object|OODoc::Object/"Constructors">.
- 
+
 =over 4
 
 =item $class-E<gt>B<new>(%options)
@@ -86,7 +86,7 @@ can be passed in an ARRAY.
 =head2 Attributes
 
 Extends L<"Attributes" in OODoc::Object|OODoc::Object/"Attributes">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<unique>()
@@ -98,7 +98,7 @@ Inherited, see L<OODoc::Object/"Attributes">
 =head2 Manual Repository
 
 Extends L<"Manual Repository" in OODoc::Object|OODoc::Object/"Manual Repository">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<addManual>($manual)
@@ -151,14 +151,14 @@ the docs found in this file.
 
 =over 2
 
-=item input => FILENAME
+=item input => $file
 
-The name of the input file.
+The name of the input C<$file>.
 
-=item output => FILENAME
+=item output => $file
 
-Where to write the produced code to.  If no filename is specified, the
-platform dependend black hole is used (/dev/null on UNIX).
+Where to write the produced code to.  If no C<$file> is specified, the
+platform dependend black hole is used (F</dev/null> on UNIX).
 
 =back
 
@@ -168,7 +168,7 @@ platform dependend black hole is used (/dev/null on UNIX).
 
 After the manuals have been parsed into objects, the information can
 be formatted in various ways, for instance into POD and HTML.  However,
-the parsing is not yet complete: the structure has been decomposed 
+the parsing is not yet complete: the structure has been decomposed
 with L<parse()|OODoc::Parser/"Parsing a file">, but the text blocks not yet.  This is because the
 transformations which are needed are context dependent.
 
@@ -180,7 +180,8 @@ for the final touch for the requested output markup.
 =item $obj-E<gt>B<cleanupHtml>($manual, $text, %options)
 
 Translate the C<$text> block, which is written in the parser specific
-syntax (which may resemble native Perl POD) into real Perl POD.
+syntax into HTML.  This is a better quality HTML than the HTML
+produced from POD, as f.i. metacpan displays.
 
  -Option     --Default
   create_link  <required>
@@ -227,22 +228,6 @@ skipped, set by L<new(skip_links)|OODoc::Parser/"Constructors">.
 
 =back
 
-=head2 Commonly used functions
-
-Extends L<"Commonly used functions" in OODoc::Object|OODoc::Object/"Commonly used functions">.
- 
-=over 4
-
-=item $any-E<gt>B<filenameToPackage>($filename)
-
-Inherited, see L<OODoc::Object/"Commonly used functions">
-
-=item $any-E<gt>B<mkdirhier>($directory)
-
-Inherited, see L<OODoc::Object/"Commonly used functions">
-
-=back
-
 =head1 DIAGNOSTICS
 
 =over 4
@@ -257,8 +242,8 @@ to L<manualsForPackage()|OODoc::Object/"Manual Repository"> or L<mainManual()|OO
 
 =head1 SEE ALSO
 
-This module is part of OODoc version 3.01,
-built on August 14, 2025. Website: F<https://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.02,
+built on August 15, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 

@@ -9,7 +9,6 @@
 #include <unistd.h>
 #include <sys/stat.h>
 #include <sys/ioctl.h>
-#include <sys/socket.h>
 
 namespace tvision
 {

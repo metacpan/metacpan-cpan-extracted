@@ -242,11 +242,7 @@ void TFileInfoPane::draw()
         {
 
         char buf[32];
-#ifdef VVVVVVVVVVVVVVVVVVVVV
         ltoa( file_block.size, buf, 10 );
-#else
-        itoa( file_block.size, buf, 10 );
-#endif
         b.moveStr( size.x - 38, buf, color );
 
         time = (struct ftime *) &file_block.time;

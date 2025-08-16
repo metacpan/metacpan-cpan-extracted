@@ -4,11 +4,11 @@
 SV*
 sysseek(fd,offset,whence)
 	SV *fd;
-	int offset;
+	long offset;
 	int whence;
 
 	INIT:
-		int ret;
+		long ret;
 
 	CODE:
     if(SvOK(fd) && SvIOK(fd)){
@@ -147,7 +147,7 @@ fcntl(fd, cmd, arg)
 SV*
 ioctl(fd, request, arg)
 	SV *fd
-	int request
+	unsigned long request
 	int arg
 
 	ALIAS: sysioctl=1

@@ -90,7 +90,7 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = 'v0.3.9';
+our $VERSION = 'v0.3.11';
 
 use constant::more();
 #use constant();

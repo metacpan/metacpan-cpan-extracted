@@ -19,7 +19,7 @@ OODoc::Text - text component as found in a manual
 
 =head1 SYNOPSIS
 
- # Cannot be instantiated itself
+  # Cannot be instantiated itself
 
 =head1 DESCRIPTION
 
@@ -30,11 +30,11 @@ build a tree of these L<OODoc::Text|OODoc::Text> objects from it. Then, any form
 objects and convert it into manual pages.
 
 Extends L<"DESCRIPTION" in OODoc::Object|OODoc::Object/"DESCRIPTION">.
- 
+
 =head1 OVERLOADED
 
 Extends L<"OVERLOADED" in OODoc::Object|OODoc::Object/"OVERLOADED">.
- 
+
 =over 4
 
 =item overload: B<'""' (stringification)>
@@ -59,11 +59,11 @@ check whether it is the same object: subtilly different.
 =head1 METHODS
 
 Extends L<"METHODS" in OODoc::Object|OODoc::Object/"METHODS">.
- 
+
 =head2 Constructors
 
 Extends L<"Constructors" in OODoc::Object|OODoc::Object/"Constructors">.
- 
+
 =over 4
 
 =item $class-E<gt>B<new>(%options)
@@ -105,7 +105,7 @@ The type of this text element.  This is used for debugging only.
 =head2 Attributes
 
 Extends L<"Attributes" in OODoc::Object|OODoc::Object/"Attributes">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<container>( [$object] )
@@ -140,8 +140,8 @@ this name method.
 
 example: 
 
- print $text->name;
- print $text;   # via overload
+  print $text->name;
+  print $text;   # via overload
 
 =item $obj-E<gt>B<type>()
 
@@ -161,7 +161,7 @@ number of the start of it.
 =head2 Manual Repository
 
 Extends L<"Manual Repository" in OODoc::Object|OODoc::Object/"Manual Repository">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<addManual>($manual)
@@ -224,24 +224,8 @@ this object.
 
 example: 
 
- my $descr = $text->openDescription;
- $$descr  .= "add a line\n";
-
-=back
-
-=head2 Commonly used functions
-
-Extends L<"Commonly used functions" in OODoc::Object|OODoc::Object/"Commonly used functions">.
- 
-=over 4
-
-=item $any-E<gt>B<filenameToPackage>($filename)
-
-Inherited, see L<OODoc::Object/"Commonly used functions">
-
-=item $any-E<gt>B<mkdirhier>($directory)
-
-Inherited, see L<OODoc::Object/"Commonly used functions">
+  my $descr = $text->openDescription;
+  $$descr  .= "add a line\n";
 
 =back
 
@@ -255,18 +239,12 @@ A call to L<addManual()|OODoc::Object/"Manual Repository"> expects a new manual 
 however an incompatible thing was passed.  Usually, intended was a call
 to L<manualsForPackage()|OODoc::Object/"Manual Repository"> or L<mainManual()|OODoc::Object/"Manual Repository">.
 
-=item Error: no text container specified for the $type object
-
-Each text element is encapsulated by an other text element, except
-chapters.  A value must be known for this C<container> option to
-define the elements relative location.
-
 =back
 
 =head1 SEE ALSO
 
-This module is part of OODoc version 3.01,
-built on August 14, 2025. Website: F<https://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.02,
+built on August 15, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 

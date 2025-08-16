@@ -1,5 +1,9 @@
 Revision history for the TurboVision Perl extension.
 
+0.23	2025-06(?)-xx
+	- pack geometry manager, stolen from tcl/tk (not ready yet)
+	- TColorSelector
+
 0.22	2025-03-28
 	- should be ok on linux, cygwin
 

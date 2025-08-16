@@ -1,8 +1,8 @@
 package Sys::Info::Driver::Linux::OS;
-$Sys::Info::Driver::Linux::OS::VERSION = '0.7905';
+$Sys::Info::Driver::Linux::OS::VERSION = '0.7908';
 use strict;
 use warnings;
-use base qw( Sys::Info::Base );
+use parent qw( Sys::Info::Base );
 use POSIX ();
 use Cwd;
 use Carp qw( croak );
@@ -27,9 +27,29 @@ sub edition {
 }
 
 sub tz {
-    my $self = shift;
-    return if ! -e proc->{timezone};
-    chomp( my $rv = $self->slurp( proc->{timezone} ) );
+    my $self        = shift;
+    my $old_tz_file = proc->{timezone_old};
+    my $tz_file     = proc->{timezone};
+    my $rv;
+
+    if ( -e $tz_file ) {
+        if ( ! -l $tz_file ) {
+            die "The timezone file $tz_file is not a symbolic link!";
+        }
+        else {
+            my $name = readlink $tz_file;
+            my $junk = quotemeta '/usr/share/zoneinfo/';
+            $name =~ s{ \A $junk }{}xmsg;
+            $rv = $name;
+        }
+    }
+    elsif ( -e $old_tz_file ) {
+        $rv = chomp( my $rv = $self->slurp( $old_tz_file ) );
+    }
+    else {
+        # warn?
+    }
+
     return $rv;
 }
 
@@ -267,7 +287,7 @@ Sys::Info::Driver::Linux::OS
 
 =head1 VERSION
 
-version 0.7905
+version 0.7908
 
 =head1 SYNOPSIS
 
@@ -325,7 +345,7 @@ L<http://www.redhat.com/docs/manuals/linux/RHL-9-Manual/ref-guide/s1-proc-topfil
 
 =head1 AUTHOR
 
-Burak Gursoy <burak@cpan.org>
+Burak Gursoy
 
 =head1 COPYRIGHT AND LICENSE
 

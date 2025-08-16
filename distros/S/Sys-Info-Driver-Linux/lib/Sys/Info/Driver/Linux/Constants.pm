@@ -1,8 +1,8 @@
 package Sys::Info::Driver::Linux::Constants;
-$Sys::Info::Driver::Linux::Constants::VERSION = '0.7905';
+$Sys::Info::Driver::Linux::Constants::VERSION = '0.7908';
 use strict;
 use warnings;
-use base qw( Exporter );
+use parent qw( Exporter );
 
 # uptime
 use constant UP_TIME          => 0;
@@ -78,7 +78,7 @@ Sys::Info::Driver::Linux::Constants
 
 =head1 VERSION
 
-version 0.7905
+version 0.7908
 
 =head1 SYNOPSIS
 
@@ -96,7 +96,7 @@ None.
 
 =head1 AUTHOR
 
-Burak Gursoy <burak@cpan.org>
+Burak Gursoy
 
 =head1 COPYRIGHT AND LICENSE
 

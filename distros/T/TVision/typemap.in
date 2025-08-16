@@ -30,6 +30,7 @@
     TScrollBar
     TIndicator
     TEditor
+    TFileEditor
     TDialog
     TScreen
     TSItem
@@ -138,12 +139,14 @@ O_TKey
 	sv_bless($arg, gv_stashpv("TVision::TKey", GV_ADD));
     }
 {{{
-join '', map {"O_$_\n" . <<'EOS' . ($_ eq 'TButton'?<<'EOS':'')} @tclasses;
+join '', map {"O_$_\n" . <<'EOS' . ($_ eq 'TButton_xx'?<<'EOS':'') . ($_ eq 'TDesktop_xx'?<<'EOS':'')} @tclasses;
     AV *self = newAV();
     av_store(self, 0, newSVpvn((const char *)&$var, sizeof($var)));
     $arg = newRV_inc((SV*) self);
     sv_bless($arg, gv_stashpv("TVision::${\ ($type=~y/ *//dr)}", GV_ADD));
 EOS
-    av_store(self, 1, newSViv(cmd));  /*this cmd is very wrong here*/
+    av_store(self, 2, newSViv(cmd));  /*this cmd is very wrong here*/
+EOS
+    av_store(self, 1, newSVpv(".",0));
 EOS
 }}}

@@ -1,6 +1,0 @@
-#!/bin/sh
-
-dzil build --trial &&
-  mc cp \
-    Plack-Middleware-OpenTelemetry-0.240030-TRIAL.tar.gz \
-    ewr/ask/webtmp/2024/01/

@@ -3,6 +3,7 @@ use TVision (':commands', 'tnew');
 
 sub createFindDialog {
     my $d = tnew(TDialog=>[ 0, 0, 38, 12 ], "Find");
+    $d->[2] = '.dlg100';
     #$d->set_options ($d->get_options | ofCentered); # d->options |= ofCentered;
 
     my $control = tnew(TInputLine=>[3, 3, 32, 4], 80 );
@@ -28,6 +29,7 @@ sub createFindDialog {
 
 sub createReplaceDialog {
     my $d = tnew (TDialog=> [ 0, 0, 40, 16 ], "Replace" );
+    $d->[2] = '.dlg101';
 
     $d->set_options ($d->get_options | ofCentered); # d->options |= ofCentered;
 

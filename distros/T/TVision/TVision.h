@@ -28,6 +28,7 @@ static inline TWindow* sv2tv_a(SV *sv) {
     sv_bless(rself, gv_stashpv(pkg, GV_ADD))
 
 
+#ifndef _NO_TV
 class TVApp : public TApplication {
 public:
     TVApp();
@@ -37,3 +38,4 @@ public:
     virtual void getEvent(TEvent& event);
     virtual void idle();
 };
+#endif

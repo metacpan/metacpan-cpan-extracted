@@ -103,10 +103,10 @@ int vsnprintf( char _FAR *buffer, size_t size, const char _FAR *format,
 
 int stricmp( const char *s1, const char *s2 ) noexcept;
 int strnicmp( const char *s1, const char *s2, size_t maxlen ) noexcept;
-//v char *strupr(char *s) noexcept;
-//v char *itoa( int value, char *buffer, int radix ) noexcept;
-//v char *ltoa( long value, char *buffer, int radix ) noexcept;
-//v char *ultoa( ulong value, char *buffer, int radix ) noexcept;
+char *strupr(char *s) noexcept;
+char *itoa( int value, char *buffer, int radix ) noexcept;
+char *ltoa( long value, char *buffer, int radix ) noexcept;
+char *ultoa( ulong value, char *buffer, int radix ) noexcept;
 
 #endif // __BORLANDC__
 

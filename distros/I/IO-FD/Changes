@@ -1,4 +1,12 @@
 Revision history for Perl extension IO::FD.
+v0.3.11 2025-08-16
+  [fixes]
+    - fix offset and size types in read/write  functions
+
+v0.3.10 2024-12-03
+  [fixes]
+    - fix '&CORE::stat cannot be called directly at ' error ( and related)
+
 v0.3.9 2024-05-05
   [fixes]
     - Attempt to fix failing compilation on experimental routines (BSD)

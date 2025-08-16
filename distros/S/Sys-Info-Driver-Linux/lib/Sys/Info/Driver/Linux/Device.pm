@@ -1,5 +1,5 @@
 package Sys::Info::Driver::Linux::Device;
-$Sys::Info::Driver::Linux::Device::VERSION = '0.7905';
+$Sys::Info::Driver::Linux::Device::VERSION = '0.7908';
 use strict;
 use warnings;
 
@@ -17,11 +17,11 @@ Sys::Info::Driver::Linux::Device
 
 =head1 VERSION
 
-version 0.7905
+version 0.7908
 
 =head1 SYNOPSIS
 
-    use base qw( Sys::Info::Driver::Linux::Device );
+    use parent qw( Sys::Info::Driver::Linux::Device );
 
 =head1 DESCRIPTION
 
@@ -37,7 +37,7 @@ None.
 
 =head1 AUTHOR
 
-Burak Gursoy <burak@cpan.org>
+Burak Gursoy
 
 =head1 COPYRIGHT AND LICENSE
 

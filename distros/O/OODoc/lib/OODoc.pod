@@ -11,32 +11,33 @@ OODoc - object oriented production of software documentation
 
 =head1 SYNOPSIS
 
- use OODoc;
- my $doc = OODoc->new(distribution => 'My Name', version => '0.02');
- $doc->processFiles(workdir => $dest);
- $doc->finalize;
- $doc->formatter('pod', workdir => $dest)->createPages;
- $doc->formatter('html', workdir => '/tmp/html')->createPages;
+  use OODoc;
+  my $doc = OODoc->new(distribution => 'My Name', version => '0.02');
+  $doc->processFiles(workdir => $dest);
+  $doc->finalize;
+  $doc->formatter('pod', workdir => $dest)->createPages;
+  $doc->formatter('html', workdir => '/tmp/html')->createPages;
 
 or use the C<oodist> script, included in this distribution (advised).
 
 =head1 DESCRIPTION
 
-OODoc stands for "Object Oriented Documentation": to produce better
-manual-pages in HTML and perl's POD format than the standard offerings
-of the Perl tool-chain.
+"OODoc" stands for "Object Oriented Documentation": to create better
+manual-pages in HTML and Perl's POD format than produced by the standard
+offerings of the Perl tool-chain.
 
-Do not forget to B<read> the L</DETAILS> section further down on this
-manual-page to get started.  Please contribute ideas.  Have a look at
+Do not forget to B<read> the L</DETAILS> section (further down on this
+manual-page) to get started.  Please contribute ideas.  Have a look at
 the main website of this project at L<https://perl.overmeer.net/oodoc/>.
-That is also an example of the produced html output.
+That is also an example of the produced html output (we are working on
+nicer visuals)
 
 Extends L<"DESCRIPTION" in OODoc::Object|OODoc::Object/"DESCRIPTION">.
- 
+
 =head1 OVERLOADED
 
 Extends L<"OVERLOADED" in OODoc::Object|OODoc::Object/"OVERLOADED">.
- 
+
 =over 4
 
 =item overload: B<'==' and '!=' (numeric comparison)>
@@ -52,16 +53,19 @@ Inherited, see L<OODoc::Object/"OVERLOADED">
 =head1 METHODS
 
 Extends L<"METHODS" in OODoc::Object|OODoc::Object/"METHODS">.
- 
+
 =head2 Constructors
 
 Extends L<"Constructors" in OODoc::Object|OODoc::Object/"Constructors">.
- 
+
 =over 4
 
 =item $class-E<gt>B<new>(%options)
 
-Inherited, see L<OODoc::Object/"Constructors">
+Create this general manager object.  When you use the C<oodist> script,
+these parameters are read from the configuration in F<Makefile.PL>
+(actually F<MYMETA.json>).
+Improves base, see L<OODoc::Object/"Constructors">
 
  -Option      --Default
   distribution  <required>
@@ -76,7 +80,7 @@ The name of the package, as released on CPAN.
 
 =item project => STRING
 
-A short description of the distribution, as will be shown on many places
+A short description of the C<$distribution>, as will be shown on many places
 in the produced manual pages and code.  You can use the main package name,
 or something which is nicer to read.
 
@@ -94,7 +98,7 @@ or F<VERSION> which contains a number.
 =head2 Attributes
 
 Extends L<"Attributes" in OODoc::Object|OODoc::Object/"Attributes">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<distribution>()
@@ -118,7 +122,7 @@ Returns the version string for the distribution.
 =head2 Manual Repository
 
 Extends L<"Manual Repository" in OODoc::Object|OODoc::Object/"Manual Repository">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<addManual>($manual)
@@ -181,33 +185,33 @@ Extract the documentation from the selected files.
 Useful when more than one distribution is merged into one set of
 documentation.
 
-=item manifest => FILENAME
+=item manifest => $file
 
-The manifest file lists all files which belong to this distribution: packages,
+The MANIFEST C<$file> lists all files which belong to this distribution: packages,
 pods, tests, etc. before the new pod files are created.
 
-=item notice => STRING
+=item notice => $text
 
-Include the string (which may consist of multiple lines) to each of the
+Include the C<$text> (which may consist of multiple lines) to each of the
 pm files.  This notice usually contains the copyright message.
 
-=item parser => CLASS|$name|OBJECT
+=item parser => CLASS|$name|$parser
 
-The parser CLASS or OBJECT to be used to process the pages.
+The parser C<CLASS> or C<$parser> object to be used to process the pages.
 
 =item select => ARRAY|REGEX|CODE
 
 The files which contain documentation to be processed.  You can provide
 a list of filenames as array reference, a C<REGEX> which is used to select
-names from the manifest file, or a C<CODE> reference which is used to
-select elements from the manifest (filename passed as first argument).
+names from the MANIFEST file, or a C<CODE> reference which is used to
+select elements from the MANIFEST (filename passed as first argument).
 Is your pod real pod or should it also be passed through the parser?
 
 =item skip_links => ARRAY|STRING|REGEXP
 
 Passed to L<OODoc::Parser::new(skip_links)|OODoc::Parser/"Constructors">.
 
-=item source => DIRECTORY
+=item source => $directory
 
 The location where the files are located.  This is useful when you collect
 the documentation of other distributions into the main one.  Usually in
@@ -216,18 +220,18 @@ combination with an undefined value for C<workdir>.
 =item version => STRING
 
 The version of the distribution.  If not specified, the C<source>
-directory is scanned for a file named C<version> or C<VERSION>. The
+directory is scanned for a file named F<version> or F<VERSION>. The
 content is used as version value.  If these do not exist, then the
 main OODoc object needs to provide the version.
 
-To make C<Makefile.PL> option C<VERSION_FROM> to work with this
+To make F<Makefile.PL> option C<VERSION_FROM> to work with this
 seperate version file, that line should contain something like
 
-   our $VERSION = 3.14;
+  our $VERSION = 3.14;
 
-=item workdir => DIRECTORY
+=item workdir => $directory
 
-Specify the directory where the stripped pm-files and the pod files
+Specify the C<$directory> where the stripped pm-files and the pod files
 will be written to.  Probably the whole distribution is collected on
 that spot.
 
@@ -237,11 +241,12 @@ included in the release.
 
 =back
 
-=item $obj-E<gt>B<selectFiles>($which, LIST)
+=item $obj-E<gt>B<selectFiles>($filter, @files)
 
-Returns two array references: the first with files to process, and the second
-with files which do not need to be processed.  C<$which> comes from
-L<processFiles(select)|OODoc/"Parser"> and the C<LIST> are files from a manifest.
+Split the C<@files> into two sets: the first with C<@files> to process, and the second
+with C<@files> which do not need to be processed.  The selecting C<$filter> comes from
+L<processFiles(select)|OODoc/"Parser"> and the C<@files> are originally read from a F<MANIFEST>.
+Returned are two ARRAY (references).
 
 =back
 
@@ -293,26 +298,14 @@ The C<$directory> where the output is going to.
 Compile all files which contain packages, and then try to find-out
 how they are related.
 
+=item $any-E<gt>B<mkdirhier>($directory)
+
+Creates this C<$directory> and all its non-existing parents.
+
 =item $obj-E<gt>B<stats>()
 
 Returns a string which contains some statistics about the whole parsed
 document set.
-
-=back
-
-=head2 Commonly used functions
-
-Extends L<"Commonly used functions" in OODoc::Object|OODoc::Object/"Commonly used functions">.
- 
-=over 4
-
-=item $any-E<gt>B<filenameToPackage>($filename)
-
-Inherited, see L<OODoc::Object/"Commonly used functions">
-
-=item $any-E<gt>B<mkdirhier>($directory)
-
-Inherited, see L<OODoc::Object/"Commonly used functions">
 
 =back
 
@@ -391,7 +384,7 @@ by manual page.
 
 It is possible to use more than one parser for your documentation.  On
 this moment, there is only one parser implemented: the "Markov parser",
-named after the author.  You can add your own parser, if you prefer to. 
+named after the author.  You can add your own parser, if you prefer to.
 Within one distribution, different files may be parsed by different parsers.
 
 =head3 collecting relations
@@ -433,17 +426,17 @@ software release process.
 To use OODoc, you need a script which helps you producing
 the distribution of your module.  The simpest script looks like this:
 
- use OODoc;
- my $dist = '/tmp/abc';
- my $doc  = OODoc->new
-  ( distribution => 'E-mail handling'
-  , version      => '0.01'
+  use OODoc;
+  my $dist = '/tmp/abc';
+  my $doc  = OODoc->new(
+    distribution => 'E-mail handling',
+    version      => '0.01',
   );
 
- $doc->processFiles(...);  # parsing
- $doc->finalize(...);      # collecting
- $doc->formatter('pod', ...)->createPages(...);
-                           # formatting to POD
+  $doc->processFiles(...);  # parsing
+  $doc->finalize(...);      # collecting
+  $doc->formatter('pod', ...)->createPages(...);
+                            # formatting to POD
 
 The default parser will be used to process the files, see
 L<OODoc::Parser::Markov|OODoc::Parser::Markov> for its syntax.  The formatter is described
@@ -481,25 +474,60 @@ To test the document production for C<My::Module>, try (on UNIX/Linux)
 
 =over 4
 
-=item Error: Cannot compile parser class
-
-The C<parser> class does not exist or produces compiler errors.
-
-=item Error: Cannot read version from file $fn: $!
+=item Info: * collect package relations
 
 Z<>
 
-=item Error: Parser $parser could not be instantiated
+=item Info: * create inheritance chapters
 
-Something went wrong while starting the C<$parser> object.  Probably there is
-an other error message which will tell you the exact cause.
+Z<>
 
-=item Error: cannot copy distribution file $fn to $dest: $!
+=item Info: * expand manual contents
 
-For some reason, a plain file from can not be copied from your source
-tree to the location where the distribution is made.
+Z<>
 
-=item Error: formatter requires a directory to write the manuals to
+=item Info: * finalize each manual
+
+Z<>
+
+=item Error: cannot compile $pkg class: $err
+
+The C<$pkg> parser class does not exist or produces compiler errors.
+
+=item Fault: cannot copy distribution file $from to $to: $!
+
+For some reason, a plain file can not be copied C<$from> your source
+tree C<$to> the location where the distribution is made.
+
+=item Fault: cannot create $dir: $!
+
+Z<>
+
+=item Fault: cannot read distribution version from file $file: $!
+
+Z<>
+
+=item Fault: cannot read version from $file: $!
+
+A C<$file> named F<version> or F<VERSION> was found to contain the
+distribution version, but not accessible.
+
+=item Info: compiling all packages
+
+Z<>
+
+=item Info: detect inheritance relationships
+
+Z<>
+
+=item Warning: errors from $manual: $err
+
+Syntax error in your code, or a problem caused by stripping the file.
+You can run your test-scripts before the files get stripped as long
+as you do not use C<make test>, because that will try to produce
+manual-pages as well...
+
+=item Error: formatter() requires a directory to write the manuals to
 
 You have to provide a value to C<workdir>, which will be used as top directory
 for the produced output.  It does not matter whether there is already some
@@ -511,24 +539,22 @@ A call to L<addManual()|OODoc::Object/"Manual Repository"> expects a new manual 
 however an incompatible thing was passed.  Usually, intended was a call
 to L<manualsForPackage()|OODoc::Object/"Manual Repository"> or L<mainManual()|OODoc::Object/"Manual Repository">.
 
-=item Warning: no file $fn to include in the distribution
+=item Warning: no file $file to include in the distribution
 
-Probably your MANIFEST file lists this file which does not exist.  The file
-will be skipped for now, but may cause problems later on.
+Probably your MANIFEST file lists this C<$file> which does not exist.
+The C<$file> will be skipped for now, but may cause problems later on.
 
-=item Error: no version specified for distribution "$name"
+=item Error: no version specified for distribution $dist
 
 Version information will be added to all packages and all manual
 pages.  You need to specify a version and be sure that it changes
 with each release, or create a file named F<version> or F<VERSION>
 which contains that data.
 
-=item Error: problems compiling $code for package $name: $@
+=item Error: parser $name could not be instantiated
 
-Syntax error in your code, or a problem caused by stripping the file.
-You can run your test-scripts before the files get stripped as long
-as you do not use C<make test>, because that will try to produce
-manual-pages as well...
+Something went wrong while starting the parser object.  Probably there is
+an other error message which will tell you the exact cause.
 
 =item Error: requires a directory to write the distribution to
 
@@ -540,7 +566,7 @@ to a temporary directory.  The packages are first stripped from
 their pseudo doc, and then written to the same directory.  That
 directory will be the place where C<< make dist >> is run later.
 
-=item Error: the distribution must be specified
+=item Error: the produced distribution needs a project description
 
 Z<>
 
@@ -551,17 +577,17 @@ specify one.  For instance, create a file named F<version> or F<VERSION>
 in the top source directory of your distribution, or specify a version
 as argument to L<OODoc::new()|OODoc/"METHODS"> or L<OODoc::processFiles()|OODoc/"Parser">.
 
-=item Error: use regex, code reference or array for file selection
+=item Error: use regex, code reference or array for file selection, not $type
 
 The L<processFiles(select)|OODoc/"Parser"> option is not understood.  You may specify
-an ARRAY, regular expression, or a code reference.
+an ARRAY, regular expression, or a CODE reference.
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of OODoc version 3.01,
-built on August 14, 2025. Website: F<https://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.02,
+built on August 15, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 

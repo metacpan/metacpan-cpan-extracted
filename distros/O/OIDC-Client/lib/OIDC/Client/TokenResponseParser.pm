@@ -10,7 +10,7 @@ use OIDC::Client::TokenResponse;
 
 =head1 NAME
 
-OIDC::Client::TokenResponseParser
+OIDC::Client::TokenResponseParser - Token endpoint response parser
 
 =head1 DESCRIPTION
 

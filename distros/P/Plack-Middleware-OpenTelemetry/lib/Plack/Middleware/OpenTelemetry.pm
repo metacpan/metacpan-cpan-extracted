@@ -1,11 +1,11 @@
 package Plack::Middleware::OpenTelemetry;
-$Plack::Middleware::OpenTelemetry::VERSION = '0.252270';
+$Plack::Middleware::OpenTelemetry::VERSION = '0.252280';
 # ABSTRACT: Plack middleware to setup OpenTelemetry tracing
 
-use v5.36.0;
+use v5.30.0;
 use strict;
 use warnings;
-use feature 'signatures';
+use experimental 'signatures';
 use parent qw(Plack::Middleware);
 use Plack;
 use Plack::Util::Accessor qw(resource_attributes include_client_errors);
@@ -145,7 +145,7 @@ Plack::Middleware::OpenTelemetry - Plack middleware to setup OpenTelemetry spans
 
 =head1 VERSION
 
-version 0.252270
+version 0.252280
 
 =head1 SYNOPSIS
 
@@ -154,10 +154,62 @@ version 0.252270
       include_client_errors => 0;
   };
 
+  # With custom resource attributes
+  builder {
+    enable "Plack::Middleware::OpenTelemetry",
+      include_client_errors => 1,
+      resource_attributes => {
+        'service.version' => '1.0.0',
+        'deployment.environment' => 'production',
+      };
+  };
+
 =head1 DESCRIPTION
 
 C<Plack::Middleware::OpenTelemetry> will setup an C<OpenTelemetry>
 span for the request.
+
+The middleware automatically:
+
+=over
+
+=item * Creates OpenTelemetry spans for HTTP requests
+
+=item * Extracts W3C trace context from incoming requests
+
+=item * Sets standard HTTP semantic attributes following OpenTelemetry conventions
+
+=item * Handles both synchronous and streaming responses
+
+=item * Records exceptions and sets appropriate span status
+
+=back
+
+The following HTTP attributes are set on spans:
+
+=over
+
+=item * C<http.request.method> - HTTP method
+
+=item * C<http.response.status_code> - HTTP status code
+
+=item * C<client.address> - Client IP address
+
+=item * C<server.address> - Server hostname
+
+=item * C<url.full> - Full request URL
+
+=item * C<url.scheme> - URL scheme (http/https)
+
+=item * C<url.path> - URL path
+
+=item * C<url.query> - URL query string (if present)
+
+=item * C<user_agent.original> - User-Agent header
+
+=item * C<http.response.body.size> - Response body size
+
+=back
 
 =head1 PARAMETERS
 
@@ -167,6 +219,38 @@ span for the request.
 
 By default client errors (HTTP status 400-499) don't set span status to
 "error". Enable this option to include them as errors.
+
+=item resource_attributes
+
+Hash reference of custom resource attributes to add to the OpenTelemetry resource.
+These will be merged with the default resource attributes.
+
+Example:
+  enable "Plack::Middleware::OpenTelemetry",
+    resource_attributes => {
+      'service.version' => '1.0.0',
+      'deployment.environment' => 'production',
+    };
+
+=back
+
+=head1 ENVIRONMENT VARIABLES
+
+The middleware respects standard OpenTelemetry environment variables:
+
+=over
+
+=item OTEL_TRACES_EXPORTER
+
+Exporter type (console, otlp, etc.)
+
+=item OTEL_SERVICE_NAME
+
+Service name for spans
+
+=item OTEL_RESOURCE_ATTRIBUTES
+
+Additional resource attributes
 
 =back
 

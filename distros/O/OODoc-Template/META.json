@@ -61,7 +61,7 @@
          "web" : "https://github.com/markov2/perl5-OODoc-Template"
       }
    },
-   "version" : 0.18,
+   "version" : 0.19,
    "x_oodist" : {
       "email" : "perl@overmeer.net",
       "first_year" : 2003,

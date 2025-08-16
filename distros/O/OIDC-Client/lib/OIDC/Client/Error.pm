@@ -8,7 +8,7 @@ use namespace::autoclean;
 
 =head1 NAME
 
-OIDC::Client::Error
+OIDC::Client::Error - Base class of an error
 
 =head1 DESCRIPTION
 

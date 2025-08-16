@@ -1,22 +1,23 @@
 package Sys::Info::Driver::Linux;
-$Sys::Info::Driver::Linux::VERSION = '0.7905';
+$Sys::Info::Driver::Linux::VERSION = '0.7908';
 use strict;
 use warnings;
-use base qw( Exporter );
+use parent qw( Exporter );
 
 our @EXPORT = qw( proc );
 
 use constant proc => { ## no critic (NamingConventions::Capitalization)
-    loadavg  => '/proc/loadavg', # average cpu load
-    cpuinfo  => '/proc/cpuinfo', # cpu information
-    uptime   => '/proc/uptime',  # uptime file
-    version  => '/proc/version', # os version
-    meminfo  => '/proc/meminfo',
-    swaps    => '/proc/swaps',
-    fstab    => '/etc/fstab',    # for filesystem type of the current disk
-    resolv   => '/etc/resolv.conf',
-    timezone => '/etc/timezone',
-    issue    => '/etc/issue',
+    loadavg      => '/proc/loadavg', # average cpu load
+    cpuinfo      => '/proc/cpuinfo', # cpu information
+    uptime       => '/proc/uptime',  # uptime file
+    version      => '/proc/version', # os version
+    meminfo      => '/proc/meminfo',
+    swaps        => '/proc/swaps',
+    fstab        => '/etc/fstab',    # for filesystem type of the current disk
+    resolv       => '/etc/resolv.conf',
+    timezone_old => '/etc/timezone',
+    timezone     => '/etc/localtime',
+    issue        => '/etc/issue',
 };
 
 1;
@@ -33,7 +34,7 @@ Sys::Info::Driver::Linux
 
 =head1 VERSION
 
-version 0.7905
+version 0.7908
 
 =head1 SYNOPSIS
 
@@ -59,7 +60,7 @@ Automatically exported. Includes paths to several files.
 
 =head1 AUTHOR
 
-Burak Gursoy <burak@cpan.org>
+Burak Gursoy
 
 =head1 COPYRIGHT AND LICENSE
 

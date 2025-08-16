@@ -69,6 +69,7 @@ MODULE=TVision::TApplication PACKAGE=TVision::TApplication
 TDeskTop* deskTop(TVApp *tapp)
     CODE:
         RETVAL = tapp->deskTop;
+	// av_store(RETVALSV,1,newSVpv(".",0));
     OUTPUT:
 	RETVAL
 
@@ -101,7 +102,7 @@ EOS
 	TLabel(TRect r, TStringView aText, TView *aLink )
 	TButton(TRect r, char *title, int cmd, int flags)
 	TScrollBar(TRect r)
-        TColorSelector(TRect Bounds, int ASelType)
+        #TColorSelector(TRect Bounds, int ASelType) RETVAL = new TColorSelector( Bounds,  (TColorSelector::ColorSel)ASelType);
 	TIndicator(TRect r)
 	TInputLine(TRect r, int limit)
 	TMenuBar(TRect r, TSubMenu* &aMenu)
@@ -113,6 +114,7 @@ EOS
 	TMenuItem1(TStringView aName, TKey aKey, TMenu *aSubMenu, int aHelpCtx=hcNoContext, TMenuItem *aNext=0)
 	TSubMenu( TStringView nm, TKey key, int helpCtx = hcNoContext )
 	TEditor(TRect r, TScrollBar *sb1=0, TScrollBar *sb2=0, TIndicator *ind=0, int n=1000)
+	TEditWindow(TRect r, char *title, int num)
 	TWindow(TRect r, char *title, int num)
         TView(TRect r)
 	TDialog(TRect r, char *title)
@@ -265,6 +267,13 @@ EOS
 	void zoom()
 	void shutDown()
 
+      TFileEditor:
+	# error: invalid use of incomplete type 'class TFileEditor'
+        # int loadFile()
+        # int save()
+        # int saveAs()
+        # int saveFile()
+
       TEditor:
 	char bufChar( int a)
 	int bufPtr( int a)
@@ -279,12 +288,12 @@ EOS
 	#virtual void initBuffer();
 	#virtual TMenuItem& initContextMenu( TPoint );
 	int insertMultilineText( char *a, int b)
-	#Boolean insertBuffer( const char *, uint, uint, Boolean, Boolean );
+	int insertBuffer( char *c, int uint1, int uint2, int Boolean1, int Boolean2 )
 	int insertEOL( int Boolean )
 	#virtual Boolean insertFrom( TEditor * );
-	#Boolean insertText( const void *, uint, Boolean );
+	int insertText( void *cv, int uint, int Boolean )
 	void scrollTo( int x, int y)
-	#Boolean search( const char *, ushort );
+	int search(char *c, int ushort )
 	#virtual Boolean setBufSize( uint );
 	void setCmdState( int ushort, int Boolean )
 	void setSelect( int a, int b, int Boolean)
@@ -340,7 +349,7 @@ EOS
       TMenuItem:
         void append(TMenuItem *aNext)
       TGroup:
-        void insert(TWindow *what)
+        void xinsert(TWindow *what) self->insert(what);
 	void insertView(TView *p, TView *Target)
         void remove( TView *p )
         void removeView( TView *p )
@@ -415,6 +424,8 @@ EOS
 	int lockCount
 	int updateFlags
 	int keyState
+      TEditWindow:
+	TFileEditor *editor
       TWindow:
 	int flags
 	TRect zoomRect
@@ -489,7 +500,7 @@ MODULE=TVision::TCheckBoxes PACKAGE=TVision::TCheckBoxes
 
 TCheckBoxes* new(TRect r,  AV *_items)
     CODE:
-        int cnt = av_count(_items);
+        int cnt = av_len(_items);
 	//printf("items=%d\n",cnt);
         TSItem *tsit = 0;
 	for (int i=cnt-1; i>=0; i--) {
@@ -506,7 +517,7 @@ MODULE=TVision::TRadioButtons PACKAGE=TVision::TRadioButtons
 
 TRadioButtons* new(TRect r, AV *_items)
     CODE:
-        int cnt = av_count(_items);
+        int cnt = av_len(_items);
 	//printf("items=%d\n",cnt);
         TSItem *tsit = 0;
 	for (int i=cnt-1; i>=0; i--) {

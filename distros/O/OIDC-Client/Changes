@@ -1,5 +1,18 @@
 Changes for OIDC-Client distribution
 
+1.01 2025-08-15
+  - Fix merge from feature branch to main branch
+
+1.00 2025-08-15
+  Note : multiple breaking changes to the framework plugin class in this version
+  - get_valid_identity() replaces get_stored_identity(), get_stored_identity() still exists but returns the stored identity even if the identity has expired
+  - New classes OIDC::Client::Identity and OIDC::Client::AccessToken
+  - has_expired(), has_scope(), get_identity_expiration_time() and has_access_token_expired() methods have been moved to these new classes
+  - get_valid_identity() and get_stored_identity() now return an OIDC::Client::Identity object
+  - verify_token() and get_valid_access_token() now return an OIDC::Client::AccessToken object
+  - New methods for framework plugins : store_access_token(), get_stored_access_token() and delete_stored_data()
+  - The 'store_mode' configuration entry has been moved to the provider level. Its value can be different between providers
+
 0.11 2025-07-10
   - Gives more flexibility to the returned 'scope' and 'scp' claims as the 'scope' claim may sometimes be an array and not a string with space separators.
 

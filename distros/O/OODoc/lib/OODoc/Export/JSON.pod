@@ -23,11 +23,11 @@ Create a JSON dump or the parsed documentation, useful to work with dynamically
 generated web-pages.
 
 Extends L<"DESCRIPTION" in OODoc::Export|OODoc::Export/"DESCRIPTION">.
- 
+
 =head1 OVERLOADED
 
 Extends L<"OVERLOADED" in OODoc::Export|OODoc::Export/"OVERLOADED">.
- 
+
 =over 4
 
 =item overload: B<'==' and '!=' (numeric comparison)>
@@ -43,11 +43,11 @@ Inherited, see L<OODoc::Object/"OVERLOADED">
 =head1 METHODS
 
 Extends L<"METHODS" in OODoc::Export|OODoc::Export/"METHODS">.
- 
+
 =head2 Constructors
 
 Extends L<"Constructors" in OODoc::Export|OODoc::Export/"Constructors">.
- 
+
 =over 4
 
 =item $class-E<gt>B<new>(%options)
@@ -71,7 +71,7 @@ Inherited, see L<OODoc::Object/"Constructors">
 =head2 Attributes
 
 Extends L<"Attributes" in OODoc::Export|OODoc::Export/"Attributes">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<unique>()
@@ -83,7 +83,7 @@ Inherited, see L<OODoc::Object/"Attributes">
 =head2 Manual Repository
 
 Extends L<"Manual Repository" in OODoc::Export|OODoc::Export/"Manual Repository">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<addManual>($manual)
@@ -120,26 +120,10 @@ Inherited, see L<OODoc::Object/"Manual Repository">
 
 =back
 
-=head2 Commonly used functions
-
-Extends L<"Commonly used functions" in OODoc::Export|OODoc::Export/"Commonly used functions">.
- 
-=over 4
-
-=item $any-E<gt>B<filenameToPackage>($filename)
-
-Inherited, see L<OODoc::Object/"Commonly used functions">
-
-=item $any-E<gt>B<mkdirhier>($directory)
-
-Inherited, see L<OODoc::Object/"Commonly used functions">
-
-=back
-
 =head2 Atributes
 
 Extends L<"Atributes" in OODoc::Export|OODoc::Export/"Atributes">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<format>()
@@ -163,7 +147,7 @@ Inherited, see L<OODoc::Export/"Atributes">
 =head2 Output
 
 Extends L<"Output" in OODoc::Export|OODoc::Export/"Output">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<boolean>(BOOL)
@@ -214,16 +198,12 @@ Produce readible output.
 =head1 DETAILS
 
 Extends L<"DETAILS" in OODoc::Export|OODoc::Export/"DETAILS">.
- 
+
 =head1 DIAGNOSTICS
 
 =over 4
 
-=item Error: Cannot write output to '$file': $!
-
-Z<>
-
-=item Error: Write errors to {file}: $!
+=item Fault: cannot write output to $file: $!
 
 Z<>
 
@@ -233,12 +213,16 @@ A call to L<addManual()|OODoc::Object/"Manual Repository"> expects a new manual 
 however an incompatible thing was passed.  Usually, intended was a call
 to L<manualsForPackage()|OODoc::Object/"Manual Repository"> or L<mainManual()|OODoc::Object/"Manual Repository">.
 
+=item Fault: write errors to $file: $!
+
+Z<>
+
 =back
 
 =head1 SEE ALSO
 
-This module is part of OODoc version 3.01,
-built on August 14, 2025. Website: F<https://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.02,
+built on August 15, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 

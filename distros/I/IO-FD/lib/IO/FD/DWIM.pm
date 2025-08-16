@@ -112,10 +112,10 @@ sub syswrite:prototype($$@)
 
 
 sub stat($) 
-	{ref($_[0]) ? &CORE::stat : &IO::FD::stat; }
+	{ref($_[0]) ? stat $_[0] : &IO::FD::stat; }
 
 sub lstat($) 
-	{ref($_[0]) ? &CORE::lstat : &IO::FD::lstat; }
+	{ref($_[0]) ? lstat $_[0] : &IO::FD::lstat; }
 
 sub fcntl:prototype($$$) 
 	{ref($_[0]) ? &CORE::fcntl : &IO::FD::fcntl; }

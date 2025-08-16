@@ -22,7 +22,7 @@ requires:
 resources:
   bugtracker: http://github.com/abh/Plack-Middleware-OpenTelemetry/issues
   repository: git://github.com/abh/Plack-Middleware-OpenTelemetry.git
-version: '0.252270'
+version: '0.252280'
 x_generated_by_perl: v5.38.2
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: MIT

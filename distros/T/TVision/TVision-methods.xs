@@ -64,6 +64,7 @@ MODULE=TVision::TApplication PACKAGE=TVision::TApplication
 TDeskTop* deskTop(TVApp *tapp)
     CODE:
         RETVAL = tapp->deskTop;
+	// av_store(RETVALSV,1,newSVpv(".",0));
     OUTPUT:
 	RETVAL
 
@@ -106,13 +107,6 @@ MODULE=TVision::TScrollBar PACKAGE=TVision::TScrollBar
 TScrollBar* new(TRect r)
     CODE:
         RETVAL = new TScrollBar( r);
-    OUTPUT:
-	RETVAL
-
-MODULE=TVision::TColorSelector PACKAGE=TVision::TColorSelector
-TColorSelector* new(TRect Bounds, int ASelType)
-    CODE:
-        RETVAL = new TColorSelector( Bounds,  TColorSelector::ColorSel(ASelType));
     OUTPUT:
 	RETVAL
 
@@ -190,6 +184,13 @@ MODULE=TVision::TEditor PACKAGE=TVision::TEditor
 TEditor* new(TRect r, TScrollBar *sb1=0, TScrollBar *sb2=0, TIndicator *ind=0, int n=1000)
     CODE:
         RETVAL = new TEditor( r, sb1, sb2, ind,  n);
+    OUTPUT:
+	RETVAL
+
+MODULE=TVision::TEditWindow PACKAGE=TVision::TEditWindow
+TEditWindow* new(TRect r, char *title, int num)
+    CODE:
+        RETVAL = new TEditWindow( r, title,  num);
     OUTPUT:
 	RETVAL
 
@@ -668,6 +669,13 @@ int insertMultilineText(TEditor *self,char *a, int b)
         RETVAL
 
 
+int insertBuffer(TEditor *self,char *c, int uint1, int uint2, int Boolean1, int Boolean2)
+    CODE:
+        RETVAL = self->insertBuffer(c,  uint1,  uint2,  Boolean1,  Boolean2);
+    OUTPUT:
+        RETVAL
+
+
 int insertEOL(TEditor *self,int Boolean)
     CODE:
         RETVAL = self->insertEOL( Boolean);
@@ -675,9 +683,23 @@ int insertEOL(TEditor *self,int Boolean)
         RETVAL
 
 
+int insertText(TEditor *self,void *cv, int uint, int Boolean)
+    CODE:
+        RETVAL = self->insertText(cv,  uint,  Boolean);
+    OUTPUT:
+        RETVAL
+
+
 void scrollTo(TEditor *self,int x, int y)
     CODE:
         self->scrollTo( x,  y);
+
+
+int search(TEditor *self,char *c, int ushort)
+    CODE:
+        RETVAL = self->search(c,  ushort);
+    OUTPUT:
+        RETVAL
 
 
 void setCmdState(TEditor *self,int ushort, int Boolean)
@@ -912,7 +934,7 @@ void append(TMenuItem *self,TMenuItem *aNext)
         self->append(aNext);
 
 MODULE=TVision::TGroup PACKAGE=TVision::TGroup
-void insert(TGroup *self,TWindow *what)
+void xinsert(TGroup *self,TWindow *what)
     CODE:
         self->insert(what);
 
@@ -1231,6 +1253,17 @@ int get_keyState(TEditor *self)
 void set_keyState(TEditor *self, int val)
     CODE:
         self->keyState = val;
+
+MODULE=TVision::TEditWindow PACKAGE=TVision::TEditWindow
+TFileEditor* get_editor(TEditWindow *self)
+    CODE:
+        RETVAL = self->editor;
+    OUTPUT:
+        RETVAL
+
+void set_editor(TEditWindow *self, TFileEditor* val)
+    CODE:
+        self->editor = val;
 
 MODULE=TVision::TWindow PACKAGE=TVision::TWindow
 int get_flags(TWindow *self)
@@ -1656,7 +1689,7 @@ MODULE=TVision::TCheckBoxes PACKAGE=TVision::TCheckBoxes
 
 TCheckBoxes* new(TRect r,  AV *_items)
     CODE:
-        int cnt = av_count(_items);
+        int cnt = av_len(_items);
 	//printf("items=%d\n",cnt);
         TSItem *tsit = 0;
 	for (int i=cnt-1; i>=0; i--) {
@@ -1673,7 +1706,7 @@ MODULE=TVision::TRadioButtons PACKAGE=TVision::TRadioButtons
 
 TRadioButtons* new(TRect r, AV *_items)
     CODE:
-        int cnt = av_count(_items);
+        int cnt = av_len(_items);
 	//printf("items=%d\n",cnt);
         TSItem *tsit = 0;
 	for (int i=cnt-1; i>=0; i--) {

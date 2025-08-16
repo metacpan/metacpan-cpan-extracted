@@ -11,7 +11,7 @@ use OIDC::Client::Error::Provider;
 
 =head1 NAME
 
-OIDC::Client::ResponseParser
+OIDC::Client::ResponseParser - Provider response parser
 
 =head1 DESCRIPTION
 

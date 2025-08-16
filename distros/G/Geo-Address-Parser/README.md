@@ -4,7 +4,7 @@ Geo::Address::Parser - Lightweight country-aware address parser from flat text
 
 # VERSION
 
-Version 0.04
+Version 0.05
 
 # METHODS
 
@@ -22,7 +22,11 @@ This module extracts address components from flat text input. It supports
 lightweight parsing for the US, UK, Canada, Australia, and New Zealand, using
 country-specific regular expressions.
 
-The object can be configured using the methods described in [Object::Configure](https://metacpan.org/pod/Object%3A%3AConfigure).
+The class can be configured at runtime using environments and configuration files,
+for example,
+setting `$ENV{'GEO__ADDRESS__PARSER__carp_on_warn'}` causes warnings to use [Carp](https://metacpan.org/pod/Carp).
+For more information about runtime configuration,
+see [Object::Configure](https://metacpan.org/pod/Object%3A%3AConfigure).
 
 ## new(country => $code)
 
@@ -71,6 +75,20 @@ Parses a flat string and returns a hashref with the following fields:
     country ∈ dom parser
     result! = (parser(country))(text?)
     result!("country") = country
+
+# SUPPORT
+
+This module is provided as-is without any warranty.
+
+Please report any bugs or feature requests to `bug-geo-address-parser at rt.cpan.org`,
+or through the web interface at
+[http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Geo-Address-Parser](http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Geo-Address-Parser).
+I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+# SEE ALSO
+
+- [Object::Configure](https://metacpan.org/pod/Object%3A%3AConfigure)
 
 # LICENCE AND COPYRIGHT
 

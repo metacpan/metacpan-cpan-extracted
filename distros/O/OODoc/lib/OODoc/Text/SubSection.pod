@@ -13,8 +13,8 @@ OODoc::Text::SubSection - collects the text of one subsection within a section
 
 =head1 SYNOPSIS
 
- my $section = $subsection->section;
- my $chapter = $subsection->chapter;
+  my $section = $subsection->section;
+  my $chapter = $subsection->chapter;
 
 =head1 DESCRIPTION
 
@@ -23,11 +23,11 @@ hierarchies.  A subsection must be a part of a section, which is
 part of a chapter.
 
 Extends L<"DESCRIPTION" in OODoc::Text::Structure|OODoc::Text::Structure/"DESCRIPTION">.
- 
+
 =head1 OVERLOADED
 
 Extends L<"OVERLOADED" in OODoc::Text::Structure|OODoc::Text::Structure/"OVERLOADED">.
- 
+
 =over 4
 
 =item overload: B<'""' (stringification)>
@@ -51,11 +51,11 @@ Inherited, see L<OODoc::Text/"OVERLOADED">
 =head1 METHODS
 
 Extends L<"METHODS" in OODoc::Text::Structure|OODoc::Text::Structure/"METHODS">.
- 
+
 =head2 Constructors
 
 Extends L<"Constructors" in OODoc::Text::Structure|OODoc::Text::Structure/"Constructors">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<emptyExtension>($container)
@@ -100,7 +100,7 @@ The section in which this sub-section lives.
 =head2 Attributes
 
 Extends L<"Attributes" in OODoc::Text::Structure|OODoc::Text::Structure/"Attributes">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<container>( [$object] )
@@ -152,7 +152,7 @@ Inherited, see L<OODoc::Text/"Attributes">
 =head2 Manual Repository
 
 Extends L<"Manual Repository" in OODoc::Text::Structure|OODoc::Text::Structure/"Manual Repository">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<addManual>($manual)
@@ -192,7 +192,7 @@ Inherited, see L<OODoc::Object/"Manual Repository">
 =head2 Location
 
 Extends L<"Location" in OODoc::Text::Structure|OODoc::Text::Structure/"Location">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<chapter>()
@@ -216,7 +216,7 @@ Returns the section object for this subsection.
 =head2 Collected
 
 Extends L<"Collected" in OODoc::Text::Structure|OODoc::Text::Structure/"Collected">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<addExample>($object)
@@ -248,7 +248,7 @@ Inherited, see L<OODoc::Text/"Collected">
 =head2 Subroutines
 
 Extends L<"Subroutines" in OODoc::Text::Structure|OODoc::Text::Structure/"Subroutines">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<addSubroutine>($objects)
@@ -285,22 +285,6 @@ Returns a list of all subsubsections in this chapter.
 
 =back
 
-=head2 Commonly used functions
-
-Extends L<"Commonly used functions" in OODoc::Text::Structure|OODoc::Text::Structure/"Commonly used functions">.
- 
-=over 4
-
-=item $any-E<gt>B<filenameToPackage>($filename)
-
-Inherited, see L<OODoc::Object/"Commonly used functions">
-
-=item $any-E<gt>B<mkdirhier>($directory)
-
-Inherited, see L<OODoc::Object/"Commonly used functions">
-
-=back
-
 =head1 DIAGNOSTICS
 
 =over 4
@@ -315,8 +299,8 @@ to L<manualsForPackage()|OODoc::Object/"Manual Repository"> or L<mainManual()|OO
 
 =head1 SEE ALSO
 
-This module is part of OODoc version 3.01,
-built on August 14, 2025. Website: F<https://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.02,
+built on August 15, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 

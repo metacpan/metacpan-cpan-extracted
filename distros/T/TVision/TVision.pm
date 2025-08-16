@@ -1,5 +1,9 @@
 package TVision;
-our $VERSION="0.22";
+our $VERSION="0.24";
+
+use strict; # Sure. Good practice.
+# use warnings; # NO, the warnings.pm module is overbloated.
+
 =encoding utf-8
 =head1 NAME
 
@@ -10,8 +14,8 @@ TVision - Perl glue to the TurboVision library
     use TVision;
 
     my $tapp = tnew 'TVApp';
-    my $w = tnew 'TWindow', [1,1,120,15],'моё окно, товарищи',5;
-    my $b = tnew 'TButton', [1,1,30,3],'кнопка', 125, 0;
+    my $w = tnew 'TWindow', [1,1,120,15], 'моё окно, товарищи',5;
+    my $b = tnew 'TButton', [1,1,30,3], 'кнопка', 125, 0;
     my $checkboxes = tnew 'TCheckBoxes', [3,3,81,9], ['a'..'s'];
     my $e = tnew TInputLine => ([3,11,81,13],100);
     $tapp->deskTop->insert($w);
@@ -24,8 +28,14 @@ TVision - Perl glue to the TurboVision library
 The TVision package is a perl glue to the TurboVision library
 github.com/magiblot/tvision.
 
+TVision namespace contains subpakages of 2 types:
+* turbovision widgets (or 'controls') such as TButton, etc
+* and also some helper packages, these are:
+..........
+
 All the TVision::xxxx widgets are array refs, where first item at index 0
-holds address of the underlying C++ object, 2nd TBD TODO TBD
+holds address of the underlying C++ object, 2nd ($obj->[1]) generated widget name,
+3rd - its path.
 
 Some widgets (TButton) has 'num' key, which is usually small integer for the
 onCommand event. If 0 - then next availlable is taken.
@@ -33,6 +43,21 @@ onCommand event. If 0 - then next availlable is taken.
 TRect is array ref of 4 integers, which isn't always blessed to TVision::TRect.
 TPoint is array ref of 2 integers, which isn't always blessed to TVision::TPoint.
 TKey is array ref of 2 integers or just integer.
+
+=head1 Geometry managers
+
+Geometry manager tkpack stolen/hijacked from tcl/tk. In order for it to function
+properly, each widget gets its name ("path")
+TDesktop is '.', frame on it is .f, buttin on it could be named as .f.btn2, etc.
+Ideally widget's name is either specified by user, or generated on the fly at
+creation time.
+However we don't know who is widget's parent until it is "inserted" by the
+...->insert method.
+
+We hold widget's path in widget object, which is array ref, at item 2.
+
+Mapping of widget names to correspoiding objects is held in %TVision::names,
+widget paths in %TVision::paths.
 
 =cut
 
@@ -42,20 +67,33 @@ our @ISA = qw(Exporter DynaLoader);
 __PACKAGE__->bootstrap;
 
 
+my %widget_names_cnt;
 sub tnew($@) {
     my $class = shift;
     my $sub = \&{"TVision::$class\::new"};
-    return $sub->(@_);
+    my $w = $sub->(@_);
+    $w->[1] = lc($class) . ++$widget_names_cnt{$class};
+    $TVision::names{$w->[1]} = $w;
+    return $w;
 }
 
 sub TRect {
-    return [@_]; # could bless to proper package, but no actual need,
+    return [@_]; # could bless to proper package, but right now there is no actual need for that,
 }
 
-#TODO:
-#TSubMenu& operator + ( TSubMenu& s, TMenuItem& i ) noexcept;
-#TSubMenu& operator + ( TSubMenu& s1, TSubMenu& s2 ) noexcept;
-#TMenuItem& operator + ( TMenuItem& i1, TMenuItem& i2 ) noexcept;
+sub TPoint {
+    ...;
+    return [@_];
+}
+
+sub TVision::TGroup::insert($@) {
+    my ($self, $obj) = @_;
+    $self->xinsert($obj);
+    $obj->[2] = ($self->[2] eq '.' ? '' : $self->[2]) . ".$obj->[1]";
+    print "{$obj->[2]}";
+    $TVision::paths{$obj->[2]} = $self;
+}
+
 
 package TVision::WidgetWithOnCommand;
 # this isn't on classical turbovision, this package is the central place
@@ -341,6 +379,7 @@ package TVision::TDirListBox;
 package TVision::TDrawBuffer;
 package TVision::TDrawSurface;
 package TVision::TEditWindow;
+our @ISA = qw(TVision::TWindow);
 #class TEditWindow : public TWindow { 
 #public:
 #    TEditWindow( const TRect&, TStringView, int ) noexcept;
@@ -478,23 +517,24 @@ package TVision::TMemo;
 #    static TStreamable *build();
 #};
 package TVision::TFileEditor;
+our @ISA = qw(TVision::TEditor);
 #class TFileEditor : public TEditor { 
 #public: 
-#    char fileName[MAXPATH];
-#    TFileEditor( const TRect&, TScrollBar *, TScrollBar *, TIndicator *, TStringView) noexcept;
-#    virtual void doneBuffer();
-#    virtual void handleEvent( TEvent& );
-#    virtual void initBuffer();
-#    Boolean loadFile() noexcept;
-#    Boolean save() noexcept;
-#    Boolean saveAs() noexcept;
-#    Boolean saveFile() noexcept;
-#    virtual Boolean setBufSize( uint );
-#    virtual void shutDown();
-#    virtual void updateCommands();
-#    virtual Boolean valid( ushort );
-#    static const char * const _NEAR name;
-#    static TStreamable *build();
+#[ ]    char fileName[MAXPATH];
+#[ ]    TFileEditor( const TRect&, TScrollBar *, TScrollBar *, TIndicator *, TStringView) noexcept;
+#[ ]    virtual void doneBuffer();
+#[ ]    virtual void handleEvent( TEvent& );
+#[ ]    virtual void initBuffer();
+#[ ]    Boolean loadFile() noexcept;
+#[ ]    Boolean save() noexcept;
+#[ ]    Boolean saveAs() noexcept;
+#[ ]    Boolean saveFile() noexcept;
+#[ ]    virtual Boolean setBufSize( uint );
+#[ ]    virtual void shutDown();
+#[ ]    virtual void updateCommands();
+#[ ]    virtual Boolean valid( ushort );
+#[ ]    static const char * const _NEAR name;
+#[ ]    static TStreamable *build();
 #};
 
 package TVision::EventCodes;

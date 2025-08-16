@@ -23,7 +23,7 @@ my %WriteMakefileArgs = (
     "Syntax::Keyword::Dynamically" => 0,
     "parent" => "0.223"
   },
-  "VERSION" => "0.252270",
+  "VERSION" => "0.252280",
   "test" => {
     "TESTS" => "t/*.t"
   }

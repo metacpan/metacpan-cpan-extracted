@@ -1,5 +1,5 @@
 package Sys::Info::Driver::Linux::OS::Distribution;
-$Sys::Info::Driver::Linux::OS::Distribution::VERSION = '0.7905';
+$Sys::Info::Driver::Linux::OS::Distribution::VERSION = '0.7908';
 use strict;
 use warnings;
 
@@ -8,7 +8,7 @@ use constant STD_RELEASE_DIR => 'lsb-release.d';
 use constant DEBIAN_RELEASE  => 'os-release';
 use constant STD_ETC_DIR     => '/etc';
 
-use base qw( Sys::Info::Base );
+use parent qw( Sys::Info::Base );
 use Carp qw( croak );
 use Sys::Info::Driver::Linux;
 use Sys::Info::Driver::Linux::Constants qw( :all );
@@ -127,9 +127,12 @@ sub _probe_version {
                         ? $slot->{version_match}
                         : q{};
 
-    # There might be an override
-    local $self->{release_file} = $slot->{release}
-        if $slot->{release};
+    my $slot_release = $slot->{release}
+        ? ref $slot->{release} eq 'ARRAY' ? $slot->{release}[0] : $slot->{release}
+        : undef
+        ;
+
+    local $self->{release_file} = $slot_release if $slot_release;
 
     my $vrelease = $self->_get_file_info;
 
@@ -163,7 +166,22 @@ sub _probe_edition {
     my $raw_name = $self->raw_name;
     my $version  = $self->version;
     my $slot     = $CONF{$raw_name} || return;
-    my $edition  = exists $slot->{edition} ? $slot->{edition}{ $version } : undef;
+
+    my $int_version = int($version) . '.0';
+    my $edition;
+
+    if ( exists $slot->{edition} ) {
+        my $this_ve = $slot->{edition}{ $version };
+        if ( $this_ve ) {
+            $edition = $this_ve;
+        }
+        elsif ( my $this_ie = $slot->{edition}{$int_version} ) {
+            $edition = $this_ie;
+        }
+        else {
+            # warn?
+        }
+    }
 
     if ( ! $edition ) {
         if ( $version && $version !~ m{[0-9]}xms ) {
@@ -364,7 +382,7 @@ Sys::Info::Driver::Linux::OS::Distribution
 
 =head1 VERSION
 
-version 0.7905
+version 0.7908
 
 =head1 SYNOPSIS
 
@@ -434,7 +452,7 @@ and it's authors are:
 
 =head1 AUTHOR
 
-Burak Gursoy <burak@cpan.org>
+Burak Gursoy
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -29,6 +29,7 @@ TScroller*  O_TScroller
 TScrollBar*  O_TScrollBar
 TIndicator*  O_TIndicator
 TEditor*  O_TEditor
+TFileEditor*  O_TFileEditor
 TDialog*  O_TDialog
 TScreen*  O_TScreen
 TSItem*  O_TSItem
@@ -120,6 +121,8 @@ O_TIndicator
   $var = (TIndicator*)sv2tv_a($arg);
 O_TEditor
   $var = (TEditor*)sv2tv_a($arg);
+O_TFileEditor
+  $var = (TFileEditor*)sv2tv_a($arg);
 O_TDialog
   $var = (TDialog*)sv2tv_a($arg);
 O_TScreen
@@ -203,7 +206,6 @@ O_TButton
     av_store(self, 0, newSVpvn((const char *)&$var, sizeof($var)));
     $arg = newRV_inc((SV*) self);
     sv_bless($arg, gv_stashpv("TVision::${\ ($type=~y/ *//dr)}", GV_ADD));
-    av_store(self, 1, newSViv(cmd));  /*this cmd is very wrong here*/
 O_TMenu
     AV *self = newAV();
     av_store(self, 0, newSVpvn((const char *)&$var, sizeof($var)));
@@ -295,6 +297,11 @@ O_TIndicator
     $arg = newRV_inc((SV*) self);
     sv_bless($arg, gv_stashpv("TVision::${\ ($type=~y/ *//dr)}", GV_ADD));
 O_TEditor
+    AV *self = newAV();
+    av_store(self, 0, newSVpvn((const char *)&$var, sizeof($var)));
+    $arg = newRV_inc((SV*) self);
+    sv_bless($arg, gv_stashpv("TVision::${\ ($type=~y/ *//dr)}", GV_ADD));
+O_TFileEditor
     AV *self = newAV();
     av_store(self, 0, newSVpvn((const char *)&$var, sizeof($var)));
     $arg = newRV_inc((SV*) self);

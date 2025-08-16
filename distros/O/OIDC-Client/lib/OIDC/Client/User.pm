@@ -10,7 +10,7 @@ use List::Util qw(any);
 
 =head1 NAME
 
-OIDC::Client::User
+OIDC::Client::User - User class
 
 =head1 DESCRIPTION
 

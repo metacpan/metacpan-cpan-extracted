@@ -14,8 +14,8 @@ OODoc::Export - base-class for exporters
 
 =head1 SYNOPSIS
 
- my $doc = OODoc->new(...);
- $doc->export('json');
+  my $doc = OODoc->new(...);
+  $doc->export('json');
 
 =head1 DESCRIPTION
 
@@ -31,11 +31,11 @@ Current serialization formats:
 =back
 
 Extends L<"DESCRIPTION" in OODoc::Object|OODoc::Object/"DESCRIPTION">.
- 
+
 =head1 OVERLOADED
 
 Extends L<"OVERLOADED" in OODoc::Object|OODoc::Object/"OVERLOADED">.
- 
+
 =over 4
 
 =item overload: B<'==' and '!=' (numeric comparison)>
@@ -51,11 +51,11 @@ Inherited, see L<OODoc::Object/"OVERLOADED">
 =head1 METHODS
 
 Extends L<"METHODS" in OODoc::Object|OODoc::Object/"METHODS">.
- 
+
 =head2 Constructors
 
 Extends L<"Constructors" in OODoc::Object|OODoc::Object/"Constructors">.
- 
+
 =over 4
 
 =item $class-E<gt>B<new>(%options)
@@ -84,7 +84,7 @@ At the moment, only serializer 'json' is supported.
 =head2 Attributes
 
 Extends L<"Attributes" in OODoc::Object|OODoc::Object/"Attributes">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<unique>()
@@ -96,7 +96,7 @@ Inherited, see L<OODoc::Object/"Attributes">
 =head2 Manual Repository
 
 Extends L<"Manual Repository" in OODoc::Object|OODoc::Object/"Manual Repository">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<addManual>($manual)
@@ -130,22 +130,6 @@ Inherited, see L<OODoc::Object/"Manual Repository">
 =item $obj-E<gt>B<publish>(\%options)
 
 Inherited, see L<OODoc::Object/"Manual Repository">
-
-=back
-
-=head2 Commonly used functions
-
-Extends L<"Commonly used functions" in OODoc::Object|OODoc::Object/"Commonly used functions">.
- 
-=over 4
-
-=item $any-E<gt>B<filenameToPackage>($filename)
-
-Inherited, see L<OODoc::Object/"Commonly used functions">
-
-=item $any-E<gt>B<mkdirhier>($directory)
-
-Inherited, see L<OODoc::Object/"Commonly used functions">
 
 =back
 
@@ -212,16 +196,16 @@ Convert the documentation data in a beautiful tree.
   distributions  +{}
   exporter       <required>
   manuals        undef
-  meta           +{ }
+  meta           +{}
   podtail        undef
 
 =over 2
 
 =item distributions => HASH
 
-Name to C<MYMETA.json> content mappings of project and used distributions.
+Name to F<MYMETA.json> content mappings of project and used distributions.
 
-=item exporter => L<OODoc::Export|OODoc::Export>-object
+=item exporter => OODoc::Export-object
 
 Manages the conversion from source markup for text into the requested
 markup (f.i. "markov" into "html").
@@ -312,7 +296,7 @@ Some of the important fields:
   }
 
 Take a look at the C<MYMETA.json> or C<META.json> for any module which is produced
-with OODoc, for instance OODoc itself at F<https://metacpan.org/XXX>
+with OODoc, for instance OODoc itself at L<https://metacpan.org/XXX>
 
 =head3 Manual
 
@@ -323,11 +307,30 @@ with OODoc, for instance OODoc itself at F<https://metacpan.org/XXX>
     "package": "lib/Mail/Box.pm",              # SAFE
     "distribution": "Mail-Box",                # SAFE
     "is_pure_pod": false,                      # BOOLEAN
+    "inheritance": \%interitance,              # see below
     "chapters": [ REF, ... ]
   }
 
 The chapters are sorted logically, as they appear in traditional unix manual pages,
 with a few extensions.
+
+=head3 Inheritance
+
+The manual contains a details inheritance relationship structure, which MAY
+use the following fields:
+
+  { "extends": [ CLASS, ... ],                 # parent class(es)
+    "extended_by": [ CLASS, ... ],             # extension class(es)
+    "extra_code_for": PACKAGE,                 # package != filename
+    "extra_code_in": [ PACKAGE, ... ],         # dynamically loaded code
+    "realizes": CLASS,                         # see Object::Realize::Later
+    "realized_by": [ CLASS, ... ],             #   "
+  }
+
+Objects which extend Object::Realize::Later are placeholders, which can become
+real objects when they are used.  It's a beautiful trick, hence supported here.
+
+One of the most extensive uses of this structure is Mail::Message::Body.
 
 =head3 Nested blocks of text
 
@@ -450,12 +453,16 @@ A call to L<addManual()|OODoc::Object/"Manual Repository"> expects a new manual 
 however an incompatible thing was passed.  Usually, intended was a call
 to L<manualsForPackage()|OODoc::Object/"Manual Repository"> or L<mainManual()|OODoc::Object/"Manual Repository">.
 
+=item Error: only HTML markup is currently supported.
+
+Z<>
+
 =back
 
 =head1 SEE ALSO
 
-This module is part of OODoc version 3.01,
-built on August 14, 2025. Website: F<https://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.02,
+built on August 15, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 

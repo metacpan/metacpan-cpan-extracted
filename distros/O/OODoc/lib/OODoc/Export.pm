@@ -1,5 +1,5 @@
-# This code is part of Perl distribution OODoc version 3.01.
-# The POD got stripped from this file by OODoc version 3.01.
+# This code is part of Perl distribution OODoc version 3.02.
+# The POD got stripped from this file by OODoc version 3.02.
 # For contributors see file ChangeLog.
 
 # This software is copyright (c) 2003-2025 by Mark Overmeer.
@@ -8,8 +8,13 @@
 # the same terms as the Perl 5 programming language system itself.
 # SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
 
+#oodist: *** DO NOT USE THIS VERSION FOR PRODUCTION ***
+#oodist: This file contains OODoc-style documentation which will get stripped
+#oodist: during its release in the distribution.  You can use this file for
+#oodist: testing, however the code of this development version may be broken!
+
 package OODoc::Export;{
-our $VERSION = '3.01';
+our $VERSION = '3.02';
 }
 
 use parent 'OODoc::Object';
@@ -22,89 +27,89 @@ use Log::Report    'oodoc';
 use HTML::Entities qw/encode_entities/;
 use POSIX          qw/strftime/;
 
+our %exporters = (
+	json   => 'OODoc::Export::JSON',
+);
 
-our %exporters =
-  ( json   => 'OODoc::Export::JSON'
-  );
-
+#--------------------
 
 sub new(%)
-{   my $class = shift;
-    $class eq __PACKAGE__
-        or return $class->SUPER::new(@_);
+{	my ($class, %args) = @_;
 
-    my %args   = @_;
-    my $serial = $args{serializer} or panic;
+	$class eq __PACKAGE__
+		or return $class->SUPER::new(%args);
 
-    my $pkg    = $exporters{$serial}
-        or error __x"exporter serializer '{name}' is unknown.";
+	my $serial = $args{serializer} or panic;
 
-    eval "require $pkg";
-    $@ and error __x"exporter {name} has compilation errors: {err}", name => $serial, err => $@;
+	my $pkg    = $exporters{$serial}
+		or error __x"exporter serializer '{name}' is unknown.";
 
-    $pkg->new(%args);
+	eval "require $pkg";
+	$@ and error __x"exporter {name} has compilation errors: {err}", name => $serial, err => $@;
+
+	$pkg->new(%args);
 }
 
 sub init($)
-{   my ($self, $args) = @_;
-    $self->SUPER::init($args);
-    $self->{OE_serial} = delete $args->{serializer} or panic;
-    $self->{OE_markup} = delete $args->{markup}     or panic;
+{	my ($self, $args) = @_;
+	$self->SUPER::init($args);
+	$self->{OE_serial} = delete $args->{serializer} or panic;
+	$self->{OE_markup} = delete $args->{markup}     or panic;
 
 	$self->markupStyle eq 'html'   # avoid producing errors in every method
-        or error __x"only HTML markup is currently supported.";
+		or error __x"only HTML markup is currently supported.";
 
-    $self;
+	$self;
 }
 
-#------------------
+#--------------------
 
 sub serializer()  { $_[0]->{OE_serial} }
 sub markupStyle() { $_[0]->{OE_markup} }
 sub parser()      { $_[0]->{OE_parser} }
 sub format()      { $_[0]->{OE_format} }
 
-#------------------
+#--------------------
 
 sub tree($%)
-{   my ($self, $doc, %args)   = @_;
+{	my ($self, $doc, %args)   = @_;
 	$args{exporter}      = $self;
 
-    my $selected_manuals = $args{manuals};
-    my %need_manual      = map +($_ => 1), @{$selected_manuals || []};
-    my @podtail_chapters = $self->podChapters($args{podtail});
+	my $selected_manuals = $args{manuals};
+	my %need_manual      = map +($_ => 1), @{$selected_manuals || []};
+	my @podtail_chapters = $self->podChapters($args{podtail});
 
-    my %man;
-    foreach my $package (sort $doc->packageNames)
-    {
-        foreach my $manual ($doc->manualsForPackage($package))
-        {   !$selected_manuals || $need_manual{$manual} or next;
-            my $man = $manual->publish(\%args) or next;
+	my %man;
+	foreach my $package (sort $doc->packageNames)
+	{
+		foreach my $manual ($doc->manualsForPackage($package))
+		{	!$selected_manuals || $need_manual{$manual} or next;
+			my $man = $manual->publish(\%args) or next;
 
-            push @{$man->{chapters}}, @podtail_chapters;
-            $man{$manual->name} = $man->{id};
-        }
-    }
+			push @{$man->{chapters}}, @podtail_chapters;
+			$man{$manual->name} = $man->{id};
+		}
+	}
 
-    my $meta = $args{meta} || {};
-    my %meta = map +($_ => $self->markup($meta->{$_}) ), keys %$meta;
+	my $meta = $args{meta} || {};
+	my %meta = map +($_ => $self->markup($meta->{$_}) ), keys %$meta;
 
-     +{
-        project        => $self->markup($doc->project),
-        distribution   => $doc->distribution,
-        version        => $doc->version,
-        manuals        => \%man,
-        meta           => \%meta,
-        distributions  => $args{distributions} || {},
+	 +{
+		project        => $self->markup($doc->project),
+		distribution   => $doc->distribution,
+		version        => $doc->version,
+		manuals        => \%man,
+		meta           => \%meta,
+		distributions  => $args{distributions} || {},
 		index          => $self->publicationIndex,
 
-        generated_by   => {
+		generated_by   => {
 			program         => $0,
 			program_version => $main::VERSION // undef,
-            oodoc_version   => $OODoc::VERSION // 'devel',
-            created         => (strftime "%F %T", localtime),
-        },
-      };
+			oodoc_version   => $OODoc::VERSION // 'devel',
+			created         => (strftime "%F %T", localtime),
+		},
+	 };
 }
 
 sub publish { panic }
@@ -152,7 +157,7 @@ sub processingManual($)
 	$self->{OE_format}
 	  = $style eq 'html' ? $self->_formatterHtml($manual, $parser)
 	  : $style eq 'pod'  ? $self->_formatterPod($manual, $parser)
-	  : panic $style;
+	  :   panic $style;
 
 	$self;
 }
@@ -188,10 +193,11 @@ sub podChapters($)
 {	my ($self, $pod) = @_;
 	defined $pod && length $pod or return ();
 
-    my $parser = OODoc::Parser::Markov->new;  # supports plain POD
-    ...
+	my $parser = OODoc::Parser::Markov->new;  # supports plain POD
+	...
 }
 
 1;
 
 __END__
+#--------------------

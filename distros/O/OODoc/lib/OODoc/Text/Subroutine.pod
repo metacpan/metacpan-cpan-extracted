@@ -21,11 +21,11 @@ most important parts of the documentation.  The share more than
 they differ.
 
 Extends L<"DESCRIPTION" in OODoc::Text|OODoc::Text/"DESCRIPTION">.
- 
+
 =head1 OVERLOADED
 
 Extends L<"OVERLOADED" in OODoc::Text|OODoc::Text/"OVERLOADED">.
- 
+
 =over 4
 
 =item overload: B<'""' (stringification)>
@@ -49,11 +49,11 @@ Inherited, see L<OODoc::Text/"OVERLOADED">
 =head1 METHODS
 
 Extends L<"METHODS" in OODoc::Text|OODoc::Text/"METHODS">.
- 
+
 =head2 Constructors
 
 Extends L<"Constructors" in OODoc::Text|OODoc::Text/"Constructors">.
- 
+
 =over 4
 
 =item $class-E<gt>B<new>(%options)
@@ -93,7 +93,7 @@ which you can find in the manual page of the selected parser.
 =head2 Attributes
 
 Extends L<"Attributes" in OODoc::Text|OODoc::Text/"Attributes">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<container>( [$object] )
@@ -156,7 +156,7 @@ Inherited, see L<OODoc::Text/"Attributes">
 =head2 Manual Repository
 
 Extends L<"Manual Repository" in OODoc::Text|OODoc::Text/"Manual Repository">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<addManual>($manual)
@@ -196,14 +196,14 @@ Inherited, see L<OODoc::Object/"Manual Repository">
 =head2 Collected
 
 Extends L<"Collected" in OODoc::Text|OODoc::Text/"Collected">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<addExample>($object)
 
 Inherited, see L<OODoc::Text/"Collected">
 
-=item $obj-E<gt>B<collectedOptions>()
+=item $obj-E<gt>B<collectedOptions>(%options)
 
 Returns a list of option-default combinations on this subroutine.
 
@@ -260,22 +260,6 @@ one manual.
 
 =back
 
-=head2 Commonly used functions
-
-Extends L<"Commonly used functions" in OODoc::Text|OODoc::Text/"Commonly used functions">.
- 
-=over 4
-
-=item $any-E<gt>B<filenameToPackage>($filename)
-
-Inherited, see L<OODoc::Object/"Commonly used functions">
-
-=item $any-E<gt>B<mkdirhier>($directory)
-
-Inherited, see L<OODoc::Object/"Commonly used functions">
-
-=back
-
 =head1 DIAGNOSTICS
 
 =over 4
@@ -286,6 +270,14 @@ A call to L<addManual()|OODoc::Object/"Manual Repository"> expects a new manual 
 however an incompatible thing was passed.  Usually, intended was a call
 to L<manualsForPackage()|OODoc::Object/"Manual Repository"> or L<mainManual()|OODoc::Object/"Manual Repository">.
 
+=item Warning: no default for option $name defined in $file line $linenr
+
+Z<>
+
+=item Warning: no option $name for default in $file line $linenr
+
+Z<>
+
 =item Warning: subroutine $name extended by different type:
 
 Any description of a subroutine classifies it as method, tie, overload or
@@ -295,6 +287,14 @@ between these places.
 
 In very rare cases, this warning can be ignored, but usually these
 situation is errorneous of confusing for the users of the library.
+
+=item Warning: subroutine $name() extended by different type:\n  $type1 in $file1 line $line1\n  $type2 in $file2 line $line2
+
+Z<>
+
+=item Warning: subroutine $name() location conflict:\n  $path1 in $file1 line $line1\n  $path2 in $file2 line $line2
+
+Z<>
 
 =item Warning: subroutine $self location conflict: $here $super
 
@@ -308,8 +308,8 @@ be a part of the chapter).
 
 =head1 SEE ALSO
 
-This module is part of OODoc version 3.01,
-built on August 14, 2025. Website: F<https://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.02,
+built on August 15, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 

@@ -12,6 +12,7 @@ You can use the [OIDC::Client](https://metacpan.org/pod/OIDC::Client) module dir
 - builds the authorization URL
 - retrieves the provider metadata and JWK keys when the application is launched
 - gets the token(s) from the provider
+- includes a class for session management (token storage)
 - refreshes the access token
 - verifies a JWT token with support for automatic JWK key rotation
 - gets the user information from the *userinfo* endpoint

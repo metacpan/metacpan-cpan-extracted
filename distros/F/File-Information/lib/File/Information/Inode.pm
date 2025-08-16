@@ -20,7 +20,7 @@ use Fcntl qw(S_ISREG S_ISDIR S_ISLNK S_ISBLK S_ISCHR S_ISFIFO S_ISSOCK S_IWUSR S
 use Data::Identifier v0.08;
 use Data::Identifier::Generate;
 
-our $VERSION = v0.10;
+our $VERSION = v0.11;
 
 my $HAVE_XATTR              = eval {require File::ExtAttr; 1;};
 my $HAVE_FILE_VALUEFILE     = eval {require File::ValueFile::Simple::Reader; 1;};
@@ -794,6 +794,10 @@ sub _load_magic {
         my ($version, $format) = ($1, $2);
         $pv->{magic_valuefile_version} = {raw => $version};
         $pv->{magic_valuefile_format}  = {raw => $format} unless $format =~ /^!/;
+    } elsif ($data =~ /^\0([\x07-\x3f])VM\x0d\x0a\xc0\x0a/ && (ord($1) & 07) == 07) {
+        $media_type = 'application/vnd.sirtx.vmv0';
+    } elsif ($data =~ /^RIFF.{4}WEBPVP8/) {
+        $media_type = 'image/webp';
     } else {
         foreach my $magic (sort {length($b) <=> length($a)} keys %_magic_map) {
             if (substr($data, 0, length($magic)) eq $magic) {
@@ -987,7 +991,7 @@ File::Information::Inode - generic module for extracting information from filesy
 
 =head1 VERSION
 
-version v0.10
+version v0.11
 
 =head1 SYNOPSIS
 

@@ -1,3 +1,10 @@
+v0.11  2025-08-15Z
+    - Added support for vmv0 image files
+    - Implemented Data::Identifier::Interface::Known
+    - Added info on whether a property is considered stable API
+    - Added OpenPGP hash algorithm identifiers to digest info
+    - Added support to detect webp images
+
 v0.10  2025-06-01Z
     - Added opportunistic-nofollow to symlinks option
     - Fixed loading of thumbnails (which broke nofollow)

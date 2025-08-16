@@ -13,13 +13,10 @@ OODoc::Format::Pod3 - Produce POD pages using OODoc::Template
 
 =head1 SYNOPSIS
 
- my $doc = OODoc->new(...);
- $doc->create
-   ( pod3 =>   # or 'OODoc::Format::Pod3'
-     manual_options => [
-        show_examples => 'NO',
-     ],
-   );
+  my $doc = OODoc->new(...);
+  $doc->formatter('pod3')->createPages(
+     manual_options => [ show_examples => 'NO' ],
+  );
 
 =head1 DESCRIPTION
 
@@ -27,11 +24,11 @@ Create manual pages in the POD syntax, using the L<OODoc::Template|OODoc::Templa
 template system.
 
 Extends L<"DESCRIPTION" in OODoc::Format::Pod|OODoc::Format::Pod/"DESCRIPTION">.
- 
+
 =head1 OVERLOADED
 
 Extends L<"OVERLOADED" in OODoc::Format::Pod|OODoc::Format::Pod/"OVERLOADED">.
- 
+
 =over 4
 
 =item overload: B<'==' and '!=' (numeric comparison)>
@@ -47,11 +44,11 @@ Inherited, see L<OODoc::Object/"OVERLOADED">
 =head1 METHODS
 
 Extends L<"METHODS" in OODoc::Format::Pod|OODoc::Format::Pod/"METHODS">.
- 
+
 =head2 Constructors
 
 Extends L<"Constructors" in OODoc::Format::Pod|OODoc::Format::Pod/"Constructors">.
- 
+
 =over 4
 
 =item $class-E<gt>B<new>(%options)
@@ -84,7 +81,7 @@ Inherited, see L<OODoc::Object/"Constructors">
 =head2 Attributes
 
 Extends L<"Attributes" in OODoc::Format::Pod|OODoc::Format::Pod/"Attributes">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<format>()
@@ -116,7 +113,7 @@ Inherited, see L<OODoc::Format/"Attributes">
 =head2 Manual Repository
 
 Extends L<"Manual Repository" in OODoc::Format::Pod|OODoc::Format::Pod/"Manual Repository">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<addManual>($manual)
@@ -156,7 +153,7 @@ Inherited, see L<OODoc::Object/"Manual Repository">
 =head2 Page generation
 
 Extends L<"Page generation" in OODoc::Format::Pod|OODoc::Format::Pod/"Page generation">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<cleanup>($manual, $text, %options)
@@ -241,6 +238,10 @@ Inherited, see L<OODoc::Format/"Page generation">
 
 Inherited, see L<OODoc::Format/"Page generation">
 
+=item $obj-E<gt>B<showStructureExpanded>(%options)
+
+Inherited, see L<OODoc::Format/"Page generation">
+
 =item $obj-E<gt>B<showStructureRefer>(%options)
 
 Inherited, see L<OODoc::Format/"Page generation">
@@ -275,35 +276,39 @@ Inherited, see L<OODoc::Format::Pod/"Page generation">
 
 =back
 
-=head2 Commonly used functions
-
-Extends L<"Commonly used functions" in OODoc::Format::Pod|OODoc::Format::Pod/"Commonly used functions">.
- 
-=over 4
-
-=item $any-E<gt>B<filenameToPackage>($filename)
-
-Inherited, see L<OODoc::Object/"Commonly used functions">
-
-=item $any-E<gt>B<mkdirhier>($directory)
-
-Inherited, see L<OODoc::Object/"Commonly used functions">
-
-=back
-
 =head1 DETAILS
 
 Extends L<"DETAILS" in OODoc::Format::Pod|OODoc::Format::Pod/"DETAILS">.
- 
+
 =head1 DIAGNOSTICS
 
 =over 4
 
-=item Error: cannot read prelimary pod from $infn: $!
+=item Error: cannot link to a $package
 
 Z<>
 
-=item Error: cannot write final pod to $outfn: $!
+=item Fault: cannot read prelimary pod from $file: $!
+
+Z<>
+
+=item Fault: cannot write final pod to $file: $!
+
+Z<>
+
+=item Error: illegal show option choice: $value
+
+Z<>
+
+=item Error: illegal value for show_option_table: $value
+
+Z<>
+
+=item Error: illegal value for show_sub_description: $value
+
+Z<>
+
+=item Error: illegal value for show_subroutine: $value
 
 Z<>
 
@@ -313,11 +318,11 @@ A call to L<addManual()|OODoc::Object/"Manual Repository"> expects a new manual 
 however an incompatible thing was passed.  Usually, intended was a call
 to L<manualsForPackage()|OODoc::Object/"Manual Repository"> or L<mainManual()|OODoc::Object/"Manual Repository">.
 
-=item Warning: missing required chapter $name in $manual
+=item Error: missing required chapter $name in $manual
 
 Z<>
 
-=item Warning: unknown subroutine type $type for $name in $manual
+=item Fault: write to $file failed: $!
 
 Z<>
 
@@ -325,8 +330,8 @@ Z<>
 
 =head1 SEE ALSO
 
-This module is part of OODoc version 3.01,
-built on August 14, 2025. Website: F<https://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.02,
+built on August 15, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 

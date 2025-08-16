@@ -47,7 +47,7 @@ my %oodist   = (
 
 WriteMakefile
 	NAME       => 'OODoc::Template',
-	VERSION    => 0.18,
+	VERSION    => 0.19,
 	AUTHOR     => 'Mark Overmeer',
 	ABSTRACT   => 'Simple template system',
 	PREREQ_PM  => {

@@ -100,15 +100,15 @@ my $tapp = tnew 'TVApp';
 my $desktop = $tapp->deskTop;
 
 
-my @f = map {makeForm($_,$_, $data->[$_ % 4])} 1 .. 45;
-$desktop->insert($_) for @f;
+#TODO my @f = map {makeForm($_,$_, $data->[$_ % 4])} 1 .. 45;
+#$desktop->insert($_) for @f;
 
 $tapp->on_idle(my $sub = sub {
     $::e++;
     if ($::e % 10 == 0) {
-	$f[int(rand($#f))]->focus();
+#	$f[int(rand($#f))]->focus();
     }
-    if ($::e>500) {
+    if ($::e>50) {
 	$tapp->endModal(42+42+42+42+42);
     }
 });

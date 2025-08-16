@@ -1,8 +1,8 @@
 package Sys::Info::Driver::Linux::OS::Distribution::Conf;
-$Sys::Info::Driver::Linux::OS::Distribution::Conf::VERSION = '0.7905';
+$Sys::Info::Driver::Linux::OS::Distribution::Conf::VERSION = '0.7908';
 use strict;
 use warnings;
-use base qw( Exporter );
+use parent qw( Exporter );
 use Config::General ();
 
 our @EXPORT  = qw( %CONF );
@@ -46,21 +46,37 @@ our %CONF = Config::General::ParseConfig( -String => <<'RAW' );
            5.0  = lenny
            6.0  = squeeze
            7.0  = wheezy
+           8.0  = jessie
+           9.0  = stretch
+          10.0  = buster
+          11.0  = bullseye
+          12.0  = bookworm
+          13.0  = trixie
+          14.0  = forky
+          15.0  = duke
     </edition>
     # we get the version as "lenny/sid" for example
     <vfix>
-        buzz    = 1.1
-        rex     = 1.2
-        bo      = 1.3
-        hamm    = 2.0
-        slink   = 2.1
-        potato  = 2.2
-        woody   = 3.0
-        sarge   = 3.1
-        etch    = 4.0
-        lenny   = 5.0
-        squeeze = 6.0
-        wheezy  = 7.0
+        buzz     = 1.1
+        rex      = 1.2
+        bo       = 1.3
+        hamm     = 2.0
+        slink    = 2.1
+        potato   = 2.2
+        woody    = 3.0
+        sarge    = 3.1
+        etch     = 4.0
+        lenny    = 5.0
+        squeeze  = 6.0
+        wheezy   = 7.0
+        jessie   = 8.0
+        stretch  = 9.0
+        buster   = 10.0
+        bullseye = 11.0
+        bookworm = 12.0
+        trixie   = 13.0
+        forky    = 14.0
+        duke     = 15.0
     </vfix>
 </debian>
 
@@ -157,6 +173,7 @@ our %CONF = Config::General::ParseConfig( -String => <<'RAW' );
     version_match = Red Hat (?:Enterprise )?Linux (?:Server )release (.*) \(
     release = redhat-release
     release = redhat_version
+    release = centos-release
     use_codename_for_edition = 1
 </redhat>
 
@@ -255,7 +272,7 @@ Sys::Info::Driver::Linux::OS::Distribution::Conf
 
 =head1 VERSION
 
-version 0.7905
+version 0.7908
 
 =head1 SYNOPSIS
 
@@ -267,7 +284,7 @@ Sys::Info::Driver::Linux::OS::Distribution::Conf - Distro configuration
 
 =head1 AUTHOR
 
-Burak Gursoy <burak@cpan.org>
+Burak Gursoy
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -1,6 +1,11 @@
 
 === version history of OODoc::Template
 
+version 0.19: Fri 15 Aug 13:47:00 CEST 2025
+
+	Improvements:
+	- applied oorestyle from OODoc 3.02
+
 version 0.18: Sat  2 Aug 15:04:15 CEST 2025
 
 	Changes:

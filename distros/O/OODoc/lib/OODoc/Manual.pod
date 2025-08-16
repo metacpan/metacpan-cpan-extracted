@@ -11,14 +11,14 @@ OODoc::Manual - one manual about a package
 
 =head1 SYNOPSIS
 
- my $doc    = OODoc->new(...);
- my $manual = OODoc::Manual->new(name => ..., source => ...);
+  my $doc    = OODoc->new(...);
+  my $manual = OODoc::Manual->new(name => ..., source => ...);
 
- $doc->findManual($manual);
- my @manual = $doc->manualsForPackage('Mail::Box');
+  $doc->findManual($manual);
+  my @manual = $doc->manualsForPackage('Mail::Box');
 
- print $manual->name;
- print $manual->package;
+  print $manual->name;
+  print $manual->package;
 
 =head1 DESCRIPTION
 
@@ -26,11 +26,11 @@ The C<OODoc::Manual> object contains information of a singel manual page.
 More than one manual can be related to a single package.
 
 Extends L<"DESCRIPTION" in OODoc::Object|OODoc::Object/"DESCRIPTION">.
- 
+
 =head1 OVERLOADED
 
 Extends L<"OVERLOADED" in OODoc::Object|OODoc::Object/"OVERLOADED">.
- 
+
 =over 4
 
 =item overload: B<'==' and '!=' (numeric comparison)>
@@ -41,7 +41,7 @@ Inherited, see L<OODoc::Object/"OVERLOADED">
 
 Inherited, see L<OODoc::Object/"OVERLOADED">
 
-=item overload: B<cmp >
+=item overload: B<cmp>
 
 String comparison takes place between a manual name and another
 manual name which may be a manual object or any other string or
@@ -49,11 +49,11 @@ stringifyable object.
 
 example: 
 
- if($manual eq 'OODoc') ...
- if($man1 eq $man2) ...
- my @sorted = sort @manuals;    # implicit calls to cmp
+  if($manual eq 'OODoc') ...
+  if($man1 eq $man2) ...
+  my @sorted = sort @manuals;    # implicit calls to cmp
 
-=item overload: B<stringification >
+=item overload: B<stringification>
 
 Used in string context, a manual produces its name.
 
@@ -62,11 +62,11 @@ Used in string context, a manual produces its name.
 =head1 METHODS
 
 Extends L<"METHODS" in OODoc::Object|OODoc::Object/"METHODS">.
- 
+
 =head2 Constructors
 
 Extends L<"Constructors" in OODoc::Object|OODoc::Object/"Constructors">.
- 
+
 =over 4
 
 =item $class-E<gt>B<new>(%options)
@@ -77,7 +77,7 @@ Inherited, see L<OODoc::Object/"Constructors">
   distribution  <required>
   package       <required>
   parser        <required>
-  pure_pod      <false>
+  pure_pod      false
   source        <required>
   stripped      undef
   version       <required>
@@ -98,7 +98,7 @@ to be able to low-level format the text blocks.
 =item pure_pod => BOOLEAN
 
 Some documentation is stored in files which look like a module,
-but do not contain any code.  Their filenames usually end with C<.pod>.
+but do not contain any code.  Their filenames usually end with F<.pod>.
 
 =item source => STRING
 
@@ -118,7 +118,7 @@ The file where the stripped code is written to.
 =head2 Attributes
 
 Extends L<"Attributes" in OODoc::Object|OODoc::Object/"Attributes">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<distribution>()
@@ -158,7 +158,7 @@ Returns the version of this manual information.
 =head2 Manual Repository
 
 Extends L<"Manual Repository" in OODoc::Object|OODoc::Object/"Manual Repository">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<addManual>($manual)
@@ -233,7 +233,7 @@ useful for counting.
 
 example: 
 
- print scalar $manual->examples;
+  print scalar $manual->examples;
 
 =item $obj-E<gt>B<name>()
 
@@ -252,7 +252,7 @@ useful for counting.
 
 example: 
 
- print scalar $manual->subroutines;
+  print scalar $manual->subroutines;
 
 =item $obj-E<gt>B<title>()
 
@@ -272,7 +272,7 @@ kinds of information from various parts within the manual page.
 
 example: 
 
- my @diags = $manual->all('diagnostics');
+  my @diags = $manual->all('diagnostics');
 
 =item $obj-E<gt>B<extraCode>()
 
@@ -342,9 +342,9 @@ All C<%options> are passed to L<OODoc::Parser::Markov::finalizeManual()|OODoc::P
 
 =item $obj-E<gt>B<mergeStructure>(%options)
 
-Merge two lists of structured text objects: "this" list and "super" list.
-The "this" objects are defined on this level of inheritance, where the
-"super" objects are from an inheritence level higher (super class).
+Merge two lists of structured text objects: the C<this> and C<super> lists.
+The C<this> objects are defined on this level of inheritance, where the
+C<super> objects are from an inheritence level higher (super class).
 The combined list is returned, where the inherited objects are
 preferably included before the new ones.
 
@@ -355,8 +355,8 @@ kept as well as possible.
   container  <required>
   equal      sub {"$_[0]" eq "$_[1]"}
   merge      sub {$_[0]}
-  super      []
-  this       []
+  super      +[]
+  this       +[]
 
 =over 2
 
@@ -410,38 +410,23 @@ Returns a string which displays some stats about the manual.
 
 =back
 
-=head2 Commonly used functions
-
-Extends L<"Commonly used functions" in OODoc::Object|OODoc::Object/"Commonly used functions">.
- 
-=over 4
-
-=item $any-E<gt>B<filenameToPackage>($filename)
-
-Inherited, see L<OODoc::Object/"Commonly used functions">
-
-=item $any-E<gt>B<mkdirhier>($directory)
-
-Inherited, see L<OODoc::Object/"Commonly used functions">
-
-=back
-
 =head1 DIAGNOSTICS
 
 =over 4
 
-=item Error: No chapter NAME in scope of package $pkg in file $source
+=item Error: No chapter NAME in scope of package $pkg in $file
 
 Each documentation part requires a chapter "NAME" which starts with
 the manual name followed by a dash.  Apparently, this was not found
 in the indicated file.  This chapter description must be anywhere
 after the package statement leading the name-space.
 
-=item Error: The NAME chapter does not have the right format in $source
+=item Error: The NAME chapter does not have the right format in $file
 
 The NAME chapter is used to figure-out what name the manual page must
 have.  The standard format contains only one line, containing the
 manual's name, one dash ('-'), and then a brief explanation. For instance:
+
   =chapter NAME
   OODoc::Manual - one manual about a package
 
@@ -464,7 +449,7 @@ does not need to be the name of an existing file, but usually it will be.
 
 Z<>
 
-=item Warning: order conflict "$take" before "$insert" in $file line $number
+=item Warning: order conflict '$take' before '$insert' in $file line $linenr
 
 The order of the objects in a sub-class shall be the same as that of
 the super class, otherwise the result of merging of the information
@@ -474,6 +459,10 @@ received from both classes is undertermined.
 
 You try to instantiate a manual, but have not specified the name
 of the package which is described in this manual, which is required.
+
+=item Warning: section without location in $manual: $section
+
+Z<>
 
 =item Warning: subroutine $name location conflict: $here and $there
 
@@ -492,7 +481,11 @@ is not related to that of the same method in an other page.  For instance,
 in the first page it is listed in chapter "METHODS", and in the second
 in chapter "FUNCTIONS".
 
-=item Error: two chapters named $name in $filename line $ln1 and $ln2
+=item Warning: subroutine '$name' location conflict:\n  $p1 in $man1\n  $p2 in $man2
+
+Z<>
+
+=item Error: two chapters named $name in $file line $line1 and $line2
 
 The indicated file contains two chapters with the same name, which
 is not permitted.  Join the contents of both parts.
@@ -501,8 +494,8 @@ is not permitted.  Join the contents of both parts.
 
 =head1 SEE ALSO
 
-This module is part of OODoc version 3.01,
-built on August 14, 2025. Website: F<https://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.02,
+built on August 15, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 

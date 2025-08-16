@@ -16,13 +16,27 @@ use parent 'File::Information::Base';
 use Carp;
 use Scalar::Util qw(weaken);
 
-our $VERSION = v0.10;
+our $VERSION = v0.11;
 
 my %_properties = (
-    pdf_version     => {loader => \&_load_pdf},
-    pdf_pages       => {loader => \&_load_pdf},
-    odf_keywords    => {loader => \&_load_odf},
-    data_uriid_barcodes => {loader => \&_load_barcodes, rawtype => 'Data::URIID::Barcode'},
+    pdf_version             => {loader => \&_load_pdf},
+    pdf_pages               => {loader => \&_load_pdf},
+    odf_keywords            => {loader => \&_load_odf},
+    data_uriid_barcodes     => {loader => \&_load_barcodes, rawtype => 'Data::URIID::Barcode'},
+    vmv0_filesize           => {loader => \&_load_vmv0},
+    vmv0_section_pointer    => {loader => \&_load_vmv0},
+    vmv0_minimum_handles    => {loader => \&_load_vmv0},
+    vmv0_minimum_ram        => {loader => \&_load_vmv0},
+    vmv0_boundary_text      => {loader => \&_load_vmv0},
+    vmv0_boundary_load      => {loader => \&_load_vmv0},
+);
+
+my %_vmv0_code_P1_info = (
+    0 => 'vmv0_filesize',
+    2 => 'vmv0_minimum_handles',
+    3 => 'vmv0_minimum_ram',
+    4 => 'vmv0_boundary_text',
+    5 => 'vmv0_boundary_load',
 );
 
 my @_odf_medadata_keys = qw(title description subject creator language initial_creator editing_cycles editing_duration generator creation_date date);
@@ -238,6 +252,72 @@ sub _load_odf {
     }
 }
 
+sub _load_vmv0 {
+    my ($self, $key, %opts) = @_;
+    my $pv = ($self->{properties_values} //= {})->{current} //= {};
+
+    return if defined $self->{_loaded_vmv0};
+    $self->{_loaded_vmv0} = 1;
+
+    return unless $self->_check_mediatype(qw(application/vnd.sirtx.vmv0));
+
+    {
+        my $inode = $self->parent->inode;
+        my $data = $inode->peek(wanted => 1024);
+        my %section_pointer;
+
+        while (length($data)) {
+            my ($op0, $op1) = unpack('CC', substr($data, 0, 2, ''));
+            my $code  = ($op0 & 0370) >> 3;
+            my $P     = ($op0 & 0007) >> 0;
+            my $codeX = ($op1 & 0300) >> 6;
+            my $S     = ($op1 & 0070) >> 3;
+            my $T     = ($op1 & 0007) >> 0;
+            my $extra_as_num;
+            my $extra_len = 0;
+            my $extra;
+
+            last if $code != 0;
+            last if $P > 2;
+            last if $codeX != 0;
+
+            last if $op0 == 0 && $codeX == 0 && $S > 2; # last on non-opcode sections
+
+            $extra_len = ($T & 0x3) * 2;
+
+            $extra = substr($data, 0, $extra_len, '');
+
+            if ($extra_len == 0) {
+                $extra_as_num = 0;
+            } elsif ($extra_len == 2) {
+                $extra_as_num = unpack('n', $extra);
+            } elsif ($extra_len == 4) {
+                $extra_as_num = unpack('N', $extra);
+            }
+
+            if ($code == 0) {
+                if ($P == 1) {
+                    if ($codeX == 0) {
+                        if (defined $extra_as_num) {
+                            if (defined(my $f = $_vmv0_code_P1_info{$S})) {
+                                $pv->{$f} = {raw => $extra_as_num*2};
+                            } elsif ($S == 1) {
+                                $section_pointer{$extra_as_num*2} //= undef;
+                            }
+                        }
+                    }
+                }
+            }
+
+            #warn sprintf('[code=%u, P=%u; codeX=%u, S=%u, T=%u; extra_len=%u, extra_as_num=%s]', $code, $P, $codeX, $S, $T, $extra_len, $extra_as_num // '<undef>');
+        }
+
+        if (scalar keys %section_pointer) {
+            $pv->{vmv0_section_pointer} = [map {{raw => $_}} keys %section_pointer];
+        }
+    }
+}
+
 sub _load_image_info {
     my ($self, $key, %opts) = @_;
     my $pv = ($self->{properties_values} //= {})->{current} //= {};
@@ -372,7 +452,7 @@ File::Information::Deep - generic module for extracting information from filesys
 
 =head1 VERSION
 
-version v0.10
+version v0.11
 
 =head1 SYNOPSIS
 
@@ -397,7 +477,7 @@ before calling any L<File::Information::Base/get> or similar methods.
 
 =head2 parent
 
-    my File::Information::Base $parent = $editor->parent;
+    my File::Information::Base $parent = $deep->parent;
 
 Returns the parent that was used to create this object.
 

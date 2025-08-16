@@ -11,7 +11,7 @@ OODoc::Format::TemplateMagic - helpers to simplify use of Template::Magic
 
 =head1 SYNOPSIS
 
- # Never instantiated directly.
+  # Never instantiated directly.
 
 =head1 DESCRIPTION
 
@@ -27,17 +27,17 @@ attribute list.  The return is a list of key-value pairs with data.
 
 example: of valid arguments
 
- <!--{examples expand NO list ALL}-->   # old style
- <!--{examples expand => NO, list => ALL}-->
- <!--{examples expand => NO,
-         list => ALL}-->
+  <!--{examples expand NO list ALL}-->   # old style
+  <!--{examples expand => NO, list => ALL}-->
+  <!--{examples expand => NO,
+          list => ALL}-->
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of OODoc version 3.01,
-built on August 14, 2025. Website: F<https://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.02,
+built on August 15, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 

@@ -1,5 +1,16 @@
 Revision history for Perl extension Sys::Info::Driver::Linux.
 
+0.7908 2025-08-16 BURAK
+     - Fix for timezone / !6
+
+0.7907 2025-08-16 BURAK
+     - Fix for CentOS / !5
+
+0.7906 2025-08-16 BURAK
+     - Fix for "Can't open /etc/ARRAY(0xdeadbeef): No such file or directory at ..."
+     - Update Debian release names.
+     - Fallback to picking the edition from the integer versions list.
+
 0.7905 2018-12-31 BURAK
 
 0.7904 2018-12-27 BURAK

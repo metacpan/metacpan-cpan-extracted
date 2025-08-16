@@ -1,8 +1,8 @@
 package Sys::Info::Driver::Linux::Device::CPU;
-$Sys::Info::Driver::Linux::Device::CPU::VERSION = '0.7905';
+$Sys::Info::Driver::Linux::Device::CPU::VERSION = '0.7908';
 use strict;
 use warnings;
-use base qw(Sys::Info::Base);
+use parent qw(Sys::Info::Base);
 
 use Sys::Info::Driver::Linux;
 use Unix::Processors;
@@ -98,7 +98,7 @@ Sys::Info::Driver::Linux::Device::CPU
 
 =head1 VERSION
 
-version 0.7905
+version 0.7908
 
 =head1 SYNOPSIS
 
@@ -135,7 +135,7 @@ proc filesystem.
 
 =head1 AUTHOR
 
-Burak Gursoy <burak@cpan.org>
+Burak Gursoy
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -1,5 +1,5 @@
-# This code is part of Perl distribution OODoc version 3.01.
-# The POD got stripped from this file by OODoc version 3.01.
+# This code is part of Perl distribution OODoc version 3.02.
+# The POD got stripped from this file by OODoc version 3.02.
 # For contributors see file ChangeLog.
 
 # This software is copyright (c) 2003-2025 by Mark Overmeer.
@@ -8,8 +8,13 @@
 # the same terms as the Perl 5 programming language system itself.
 # SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
 
+#oodist: *** DO NOT USE THIS VERSION FOR PRODUCTION ***
+#oodist: This file contains OODoc-style documentation which will get stripped
+#oodist: during its release in the distribution.  You can use this file for
+#oodist: testing, however the code of this development version may be broken!
+
 package OODoc::Parser;{
-our $VERSION = '3.01';
+our $VERSION = '3.02';
 }
 
 use parent 'OODoc::Object';
@@ -19,47 +24,50 @@ use warnings;
 
 use Log::Report    'oodoc';
 
-use List::Util     'first';
+use List::Util     qw/first/;
+use Scalar::Util   qw/reftype/;
 
 our %syntax_implementation = (
-    markov => 'OODoc::Parser::Markov',
+	markov => 'OODoc::Parser::Markov',
 );
 
-#------------------
+#--------------------
 
-#-------------------------------------------
+#--------------------
 
 sub new(%)
-{   my ($class, %args) = @_;
-    return $class->SUPER::new(%args) unless $class eq __PACKAGE__;
+{	my ($class, %args) = @_;
 
-    my $syntax = delete $args{syntax} || 'markov';
-    my $pkg    = $syntax_implementation{$syntax} || $syntax;
-    eval "require $pkg" or die $@;
-    $pkg->new(%args);
+	$class eq __PACKAGE__
+		or return $class->SUPER::new(%args);
+
+	my $syntax = delete $args{syntax} || 'markov';
+	my $pkg    = $syntax_implementation{$syntax} || $syntax;
+	eval "require $pkg" or die $@;
+	$pkg->new(%args);
 }
 
 sub init($)
-{   my ($self, $args) = @_;
-    $self->SUPER::init($args) or return;
+{	my ($self, $args) = @_;
+	$self->SUPER::init($args) or return;
 
-    my $skip = delete $args->{skip_links} || [];
-    my @skip = map { ref $_ eq 'Regexp' ? $_ : qr/^\Q$_\E(?:\:\:|$)/ }
-        ref $skip eq 'ARRAY' ? @$skip : $skip;
-    $self->{skip_links} = \@skip;
+	my $skip = delete $args->{skip_links} || [];
+	my @skip = map { reftype $_ eq 'REGEXP' ? $_ : qr/^\Q$_\E(?:\:\:|$)/ }
+		reftype $skip eq 'ARRAY' ? @$skip : $skip;
 
-    $self;
+	$self->{skip_links} = \@skip;
+	$self;
 }
 
-#-------------------------------------------
+#--------------------
 
 sub parse(@) {panic}
 
-#-------------------------------------------
+#--------------------
 
 sub skipManualLink($)
-{   my ($self, $package) = @_;
-    (first { $package =~ $_ } @{$self->{skip_links}}) ? 1 : 0;
+{	my ($self, $package) = @_;
+	(first { $package =~ $_ } @{$self->{skip_links}}) ? 1 : 0;
 }
 
 
@@ -74,7 +82,4 @@ sub finalizeManual($)
 	$self;
 }
 
-#-------------------------------------------
-
 1;
-

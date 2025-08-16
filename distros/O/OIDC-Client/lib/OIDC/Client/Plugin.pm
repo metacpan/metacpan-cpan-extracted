@@ -12,6 +12,9 @@ use List::Util qw(any);
 use Module::Load qw(load);
 use Mojo::URL;
 use Try::Tiny;
+use OIDC::Client::AccessToken;
+use OIDC::Client::Identity;
+use OIDC::Client::Error;
 use OIDC::Client::Error::Authentication;
 use OIDC::Client::Error::Provider;
 
@@ -33,13 +36,6 @@ It contains all the methods available in the application.
 =cut
 
 enum 'RedirectType' => [qw/login logout/];
-enum 'StoreMode'    => [qw/session stash/];
-
-has 'store_mode' => (
-  is       => 'ro',
-  isa      => 'StoreMode',
-  required => 1,
-);
 
 has 'request_params' => (
   is       => 'ro',
@@ -233,10 +229,9 @@ to the state parameter sent with the authorize URL.
 From a code received from the provider, executes a request to get the token(s).
 
 Checks the ID token if present and stores the token(s) in the session by default or stash
-if preferred.
+depending on your configured C<store_mode> (see L<OIDC::Client::Config>).
 
-Returns the stored identity object (see L<get_stored_identity> method) for details
-of the returned object.
+Returns the stored L<OIDC::Client::Identity> object.
 
 The optional hash parameters are:
 
@@ -292,19 +287,21 @@ sub get_token {
     );
   }
 
-  if (my $access_token = $token_response->access_token) {
+  if ($token_response->access_token) {
     my $expires_at = $self->_get_expiration_time(token_response => $token_response);
-    $self->_store_access_token(
-      audience      => $self->client->audience,
-      access_token  => $access_token,
+    my $scopes     = $self->_get_values_from_space_delimited_string($token_response->scope);
+    my $access_token = OIDC::Client::AccessToken->new(
+      token         => $token_response->access_token,
       refresh_token => $token_response->refresh_token,
       token_type    => $token_response->token_type,
       expires_at    => $expires_at,
+      scopes        => $scopes,
     );
+    $self->store_access_token($access_token);
     $self->log_msg(debug => "OIDC: access token has been stored");
   }
 
-  return $self->_get_stored_identity();
+  return $self->get_stored_identity();
 }
 
 
@@ -314,13 +311,11 @@ sub get_token {
 
 Refreshes a token (usually because it has expired) for the default audience (token
 for the current application) or for the audience corresponding to a given alias
-(exchanged token for another application). Stores the new access token, replacing
-the old one.
+(exchanged token for another application).
 
-Returns the stored access token object. See L<get_valid_access_token> method for details
-of the returned object.
+Stores and returns a new L<OIDC::Client::AccessToken> object.
 
-Returns undef if no refresh token has been stored for the audience.
+Throws an error if no access token or no refresh token has been stored for the audience.
 
 The optional list parameters are:
 
@@ -344,33 +339,30 @@ sub refresh_token {
 
   $self->log_msg(debug => "OIDC: refreshing access token for audience $audience");
 
-  my $stored_token = $self->_get_stored_access_token($audience)
-    or croak("OIDC: no access token has been stored");
+  my $stored_access_token = $self->get_stored_access_token($audience_alias)
+    or OIDC::Client::Error->throw("OIDC: no access token has been stored");
 
-  my $refresh_token = $stored_token->{refresh_token};
-
-  unless ($refresh_token) {
-    $self->log_msg(debug => "OIDC: no refresh token has been stored");
-    return;
-  }
+  my $refresh_token = $stored_access_token->refresh_token
+    or OIDC::Client::Error->throw("OIDC: no refresh token has been stored");
 
   my $token_response = $self->client->get_token(
     grant_type    => 'refresh_token',
     refresh_token => $refresh_token,
   );
   my $expires_at = $self->_get_expiration_time(token_response => $token_response);
+  my $scopes     = $self->_get_values_from_space_delimited_string($token_response->scope);
 
-  $self->_store_access_token(
-    audience      => $audience,
-    access_token  => $token_response->access_token,
+  my $access_token = OIDC::Client::AccessToken->new(
+    token         => $token_response->access_token,
     refresh_token => $token_response->refresh_token,
     token_type    => $token_response->token_type,
     expires_at    => $expires_at,
+    scopes        => $scopes,
   );
-
+  $self->store_access_token($access_token, $audience_alias);
   $self->log_msg(debug => "OIDC: token has been refreshed and stored");
 
-  return $self->_get_stored_access_token($audience);
+  return $access_token;
 }
 
 
@@ -381,8 +373,7 @@ sub refresh_token {
 Exchange the access token received during the user's login, for an access token
 that is accepted by a different OIDC application and stores it.
 
-Returns the stored access token object (see L<get_valid_access_token> method) for details
-of the returned object.
+Stores and returns an L<OIDC::Client::AccessToken> object.
 
 The list parameters are:
 
@@ -402,67 +393,69 @@ sub exchange_token {
 
   $self->log_msg(debug => 'OIDC: exchanging token');
 
-  my $audience = $self->client->get_audience_for_alias($audience_alias)
-    or croak("OIDC: no audience for alias '$audience_alias'");
+  my $audience = $self->_get_audience_from_alias($audience_alias);
 
-  my $access_token = $self->get_valid_access_token()
-    or OIDC::Client::Error::Authentication->throw("OIDC: cannot retrieve a valid access token");
+  my $access_token = $self->get_valid_access_token();
 
   my $exchanged_token_response = $self->client->exchange_token(
-    token    => $access_token->{token},
+    token    => $access_token->token,
     audience => $audience,
   );
   my $expires_at = $self->_get_expiration_time(token_response => $exchanged_token_response);
+  my $scopes     = $self->_get_values_from_space_delimited_string($exchanged_token_response->scope);
 
-  $self->_store_access_token(
-    audience      => $audience,
-    access_token  => $exchanged_token_response->access_token,
-    refresh_token => $exchanged_token_response->refresh_token,
-    token_type    => $exchanged_token_response->token_type,
-    expires_at    => $expires_at,
+  my $exchanged_access_token = OIDC::Client::AccessToken->new(
+    token          => $exchanged_token_response->access_token,
+    refresh_token  => $exchanged_token_response->refresh_token,
+    token_type     => $exchanged_token_response->token_type,
+    expires_at     => $expires_at,
+    scopes         => $scopes,
   );
-
+  $self->store_access_token($exchanged_access_token, $audience_alias);
   $self->log_msg(debug => "OIDC: token has been exchanged and stored");
 
-  return $self->_get_stored_access_token($audience);
+  return $exchanged_access_token;
 }
 
 
 =head2 verify_token()
 
-  my $claims = $c->oidc->verify_token();
+  my $access_token = $c->oidc->verify_token();
 
 Verifies the JWT access token received in the Authorization header of the current request.
-Throws an exception if an error occurs. Otherwise, stores the token and returns the claims.
+Throws an exception if an error occurs. Otherwise, stores an L<OIDC::Client::AccessToken> object
+and returns the claims.
 
-To bypass the token verification in local environment, you can configure the C<mocked_claims>
-entry (hashref) to be returned by this method.
+To bypass the token verification in local environment, you can configure the C<mocked_access_token>
+entry (hashref) to be used to create an L<OIDC::Client::AccessToken> object that will be returned
+by this method.
 
 =cut
 
 sub verify_token {
   my $self = shift;
 
-  if ($self->is_base_url_local and my $mocked_claims = $self->client->config->{mocked_claims}) {
-    return $mocked_claims;
+  if ($self->is_base_url_local and my $mocked_access_token = $self->client->config->{mocked_access_token}) {
+    return OIDC::Client::AccessToken->new($mocked_access_token);
   }
 
   my $token = $self->get_token_from_authorization_header()
-    or croak("OIDC: no token in authorization header");
+    or OIDC::Client::Error->throw("OIDC: no token in authorization header");
 
   my $claims = $self->client->verify_token(token => $token);
 
   my $expires_at = $self->_get_expiration_time(claims => $claims);
   my $scopes     = $self->_get_scopes_from_claims($claims);
 
-  $self->_store_access_token(
-    audience     => $self->client->audience,
-    access_token => $token,
-    expires_at   => $expires_at,
-    scopes       => $scopes,
+  my $access_token = OIDC::Client::AccessToken->new(
+    token      => $token,
+    expires_at => $expires_at,
+    scopes     => $scopes,
+    claims     => $claims,
   );
+  $self->store_access_token($access_token);
 
-  return $claims;
+  return $access_token;
 }
 
 
@@ -489,31 +482,6 @@ sub get_token_from_authorization_header {
 }
 
 
-=head2 has_scope( $expected_scope )
-
-  my $has_scope = $c->oidc->has_scope($expected_scope);
-
-Returns whether a scope is present in the scopes of the stored access token.
-
-This method should only be invoked after a call to the L</"verify_token( %args )">
-method.
-
-=cut
-
-sub has_scope {
-  my $self = shift;
-  my ($expected_scope) = pos_validated_list(\@_, { isa => 'Str', optional => 0 });
-
-  my $stored_token = $self->get_valid_access_token()
-    or OIDC::Client::Error::Authentication->throw("OIDC: cannot retrieve a valid access token");
-
-  my $scopes = $stored_token->{scopes}
-    or return 0;
-
-  return any { $_ eq $expected_scope } @$scopes;
-}
-
-
 =head2 get_userinfo()
 
   my $userinfo = $c->oidc->get_userinfo();
@@ -534,12 +502,11 @@ sub get_userinfo {
     return $mocked_userinfo;
   }
 
-  my $stored_token = $self->get_valid_access_token()
-    or OIDC::Client::Error::Authentication->throw("OIDC: cannot retrieve a valid access token");
+  my $stored_access_token = $self->get_valid_access_token();
 
   return $self->client->get_userinfo(
-    access_token => $stored_token->{token},
-    token_type   => $stored_token->{token_type},
+    access_token => $stored_access_token->token,
+    token_type   => $stored_access_token->token_type,
   );
 }
 
@@ -552,13 +519,16 @@ Gets the user informations calling the provider (see L</"get_userinfo()">)
 and returns a user object (L<OIDC::Client::User> by default) from this user
 informations.
 
+The C<claim_mapping> configuration entry is used to map user information to
+user attributes.
+
 The optional list parameters are:
 
 =over 2
 
 =item user_class
 
-Class to be used to instantiate the user.
+Class to be used to instantiate the user object.
 Default to L<OIDC::Client::User>.
 
 =back
@@ -581,6 +551,8 @@ sub build_user_from_userinfo {
 
 Returns a user object (L<OIDC::Client::User> by default) based on provided claims.
 
+The C<claim_mapping> configuration entry is used to map claim keys to user attributes.
+
 This method can be useful, for example, if the access token is a JWT token that has just been
 verified with the L<verify_token()> method and already contains the relevant information
 without having to call the C<userinfo> endpoint.
@@ -595,7 +567,7 @@ Hashref of claims.
 
 =item user_class
 
-Optional class to be used to instantiate the user.
+Optional class to be used to instantiate the user object.
 Default to L<OIDC::Client::User>.
 
 =back
@@ -626,7 +598,12 @@ sub build_user_from_claims {
 
   my $user = $c->oidc->build_user_from_identity();
 
-Returns a user object (L<OIDC::Client::User> by default) from the stored identity.
+Returns a user object (L<OIDC::Client::User> by default) from the claims
+of the stored identity.
+
+The C<claim_mapping> configuration entry is used to map identity claim keys
+to user attributes.
+
 This method should only be invoked when an identity has been stored, i.e.
 when an authorisation flow has completed and an ID token has been returned
 by the provider.
@@ -637,7 +614,7 @@ The optional list parameters are:
 
 =item user_class
 
-Class to be used to instantiate the user.
+Class to be used to instantiate the user object.
 Default to L<OIDC::Client::User>.
 
 =back
@@ -649,15 +626,10 @@ sub build_user_from_identity {
   my ($user_class) = pos_validated_list(\@_, { isa => 'Str', default => 'OIDC::Client::User' });
   load($user_class);
 
-  my $identity = $self->_get_stored_identity()
-    or croak("OIDC: no identity has been stored");
+  my $identity = $self->get_stored_identity()
+    or OIDC::Client::Error->throw("OIDC: no identity has been stored");
 
-  my $role_prefix = $self->client->role_prefix;
-
-  return $user_class->new(
-    %$identity,
-    defined $role_prefix ? (role_prefix => $role_prefix) : (),
-  );
+  return $self->build_user_from_claims($identity->claims, $user_class);
 }
 
 
@@ -688,26 +660,11 @@ sub build_api_useragent {
   my $self = shift;
   my ($audience_alias) = pos_validated_list(\@_, { isa => 'Str', optional => 1 });
 
-  my $token;
-
-  if (defined $audience_alias) {
-    $token = try {
-      return $self->get_valid_access_token($audience_alias);
-    }
-    catch {
-      $self->log_msg(warning => "OIDC: error getting valid access token : $_");
-      return;
-    };
-    $token ||= $self->exchange_token($audience_alias);
-  }
-  else {
-    $token = $self->get_valid_access_token()
-      or OIDC::Client::Error::Authentication->throw("OIDC: cannot retrieve a valid access token");
-  }
+  my $access_token = $self->get_valid_access_token($audience_alias);
 
   return $self->client->build_api_useragent(
-    token      => $token->{token},
-    token_type => $token->{token_type},
+    token      => $access_token->token,
+    token_type => $access_token->token_type,
   );
 }
 
@@ -763,9 +720,9 @@ sub redirect_to_logout {
   my %args;
 
   if ($params{with_id_token} // $self->client->config->{logout_with_id_token}) {
-    my $identity = $self->_get_stored_identity()
-      or croak("OIDC: no identity has been stored");
-    $args{id_token} = $identity->{token};
+    my $identity = $self->get_stored_identity()
+      or OIDC::Client::Error->throw("OIDC: no identity has been stored");
+    $args{id_token} = $identity->token;
   }
 
   if (my $redirect_uri = $params{post_logout_redirect_uri} || $self->logout_redirect_uri) {
@@ -789,54 +746,21 @@ sub redirect_to_logout {
 }
 
 
-=head2 has_access_token_expired( $audience_alias )
-
-  my $has_expired = $c->oidc->has_access_token_expired( $audience_alias );
-
-Returns whether the stored access token for a specified audience has expired.
-
-The list parameters are:
-
-=over 2
-
-=item audience_alias
-
-Alias configured for the audience of the other application.
-
-=back
-
-=cut
-
-sub has_access_token_expired {
-  my $self = shift;
-  my ($audience_alias) = pos_validated_list(\@_, { isa => 'Maybe[Str]', optional => 1 });
-
-  my $audience = $audience_alias ? $self->client->get_audience_for_alias($audience_alias)
-                                 : $self->client->audience
-    or croak("OIDC: no audience for alias '$audience_alias'");
-
-  my $stored_token = $self->_get_stored_access_token($audience)
-    or croak("OIDC: no access token has been stored for audience '$audience'");
-
-  if ($self->client->has_expired($stored_token->{expires_at})) {
-    $self->log_msg(debug => "OIDC: access token has expired for audience '$audience'");
-    return 1;
-  }
-
-  return 0;
-}
-
-
 =head2 get_valid_access_token( $audience_alias )
 
-  my $stored_token = $c->oidc->get_valid_access_token( $audience_alias );
+  my $valid_access_token = $c->oidc->get_valid_access_token( $audience_alias );
 
-Returns a valid (not expired) token object (hashref) for the default audience
-or for the audience corresponding to a given alias.
+When an audience alias is specified and no access token has been stored for the audience,
+returns the execution of the L</"exchange_token( $audience_alias )"> method.
 
-Returns undef if no access token has been stored for the audience.
+Retrieves the stored L<OIDC::Client::AccessToken> object for the default audience
+(current application) or for the audience corresponding to the given alias.
 
-The token can be retrieved from the store or after a refresh.
+If this token has not expired, returns it, otherwise returns the execution
+of the L</"refresh_token( $audience_alias )"> method.
+
+If the refresh failed and the audience alias is specified, finally returns
+the execution of the L</"exchange_token( $audience_alias )"> method.
 
 The optional list parameters are:
 
@@ -848,35 +772,9 @@ Alias configured for the audience of the other application.
 
 =back
 
-Returns a hashref with the keys :
-
-=over 2
-
-=item token
-
-Access token (String)
-
-=item expires_at
-
-The expiration time of this access token (Integer timestamp)
-
-=item refresh_token
-
-Token to "refresh" the access token when it has expired (String)
-
-=item token_type
-
-Type of the token (String)
-
-=item scopes
-
-Token scopes (arrayref of strings). Present only after a call
-to the L</"verify_token( %args )"> method.
-
-=back
-
-In local environment, if the C<mocked_claims> entry (hashref) is configured,
-mocked token and scopes are returned.
+In local environment, if the C<mocked_access_token> entry (hashref) is configured,
+it is used to create an L<OIDC::Client::AccessToken> object that will be returned
+by this method.
 
 =cut
 
@@ -884,31 +782,70 @@ sub get_valid_access_token {
   my $self = shift;
   my ($audience_alias) = pos_validated_list(\@_, { isa => 'Maybe[Str]', optional => 1 });
 
-  my $audience = $audience_alias ? $self->client->get_audience_for_alias($audience_alias)
-                                 : $self->client->audience
-    or croak("OIDC: no audience for alias '$audience_alias'");
+  my $stored_access_token = $self->get_stored_access_token($audience_alias);
 
-  if ($self->is_base_url_local and my $mocked_claims = $self->client->config->{mocked_claims}) {
-    my $scopes = $self->_get_scopes_from_claims($mocked_claims);
-    return { token  => "mocked token for audience '$audience'",
-             scopes => $scopes };
+  unless ($stored_access_token) {
+    if ($audience_alias) {
+      return $self->exchange_token($audience_alias);
+    }
+    else {
+      OIDC::Client::Error->throw("OIDC: no access token has been stored");
+    }
   }
 
-  my $stored_token = $self->_get_stored_access_token($audience);
+  my $audience = $audience_alias ? $self->_get_audience_from_alias($audience_alias)
+                                 : $self->client->audience;
 
-  unless ($stored_token) {
-    $self->log_msg(debug => "OIDC: no access token has been stored for audience '$audience'");
-    return;
+  unless ($stored_access_token->expires_at) {
+    $self->log_msg(debug => "OIDC: no expiration time for the access token with '$audience' audience. Hoping it's still valid.");
+    return $stored_access_token;
   }
 
-  if ($self->client->has_expired($stored_token->{expires_at})) {
+  if ($stored_access_token->has_expired($self->client->config->{expiration_leeway})) {
     $self->log_msg(debug => "OIDC: access token has expired for audience '$audience'");
-    return $self->refresh_token($audience_alias);
+    return try {
+      $self->refresh_token($audience_alias);
+    }
+    catch {
+      $self->log_msg(debug => "OIDC: error refreshing access token for audience '$audience' : $_");
+      if ($audience_alias) {
+        $self->exchange_token($audience_alias);
+      }
+      else {
+        die $_;
+      }
+    };
   }
   else {
     $self->log_msg(debug => "OIDC: access token for audience '$audience' has been retrieved from store");
-    return $stored_token;
+    return $stored_access_token;
   }
+}
+
+
+=head2 get_valid_identity()
+
+  my $identity = $c->oidc->get_valid_identity();
+
+Executes the L</"get_stored_identity()"> method to get the stored
+L<OIDC::Client::Identity> object.
+
+Returns undef if no identity has been stored or if the stored identity has expired
+including the configured leeway.
+
+Otherwise, returns the stored L<OIDC::Client::Identity> object.
+
+=cut
+
+sub get_valid_identity {
+  my $self = shift;
+
+  my $stored_identity = $self->get_stored_identity()
+    or return;
+
+  return if $stored_identity->has_expired($self->client->config->{expiration_leeway});
+
+  return $stored_identity;
 }
 
 
@@ -916,62 +853,31 @@ sub get_valid_access_token {
 
   my $identity = $c->oidc->get_stored_identity();
 
-Returns undef if no identity has been stored or if the stored identity has expired
-including the configured leeway.
+Returns undef if no identity has been stored. Otherwise, returns the stored
+L<OIDC::Client::Identity> object, even if the identity has expired.
 
-Otherwise, returns the stored identity, a hashref with at least these keys :
-
-=over 2
-
-=item token
-
-Id token (String)
-
-=item subject
-
-Subject identifier (String)
-
-=item expires_at
-
-Expiration time (number of seconds since from 1970-01-01T00:00:00Z).
-By default, it comes directly from the C<exp> claim but if the C<identity_expires_in>
-configuration entry is specified, it is added to the current time (when the ID token
-is retrieved) to force an expiration time.
-
-=back
-
-If a claim mapping is configured in the C<claim_mapping> section, the claim names/values
-are present in the stored identity and therefore returned by this method.
+By default, the C<expires_at> attribute comes directly from the C<exp> claim but
+if the C<identity_expires_in> configuration entry is specified, it is added to the current
+time (when the ID token is retrieved) to force an expiration time.
 
 To bypass the OIDC flow in local environment, you can configure the C<mocked_identity>
-entry (hashref) to be returned by this method.
+entry (hashref) to be used to create an L<OIDC::Client::Identity> object that will
+be returned by this method.
 
 =cut
 
 sub get_stored_identity {
   my $self = shift;
 
-  my $identity = $self->_get_stored_identity()
-    or return;
-
-  if (my $expires_at = $identity->{expires_at}) {
-    return if $self->client->has_expired($expires_at);
-  }
-
-  return $identity;
-}
-
-
-sub _get_stored_identity {
-  my $self = shift;
-
   if ($self->is_base_url_local and my $mocked_identity = $self->client->config->{mocked_identity}) {
-    return $mocked_identity;
+    return OIDC::Client::Identity->new($mocked_identity);
   }
 
   my $provider = $self->client->provider;
+  my $identity = $self->_get_store()->{oidc}{provider}{$provider}{identity}
+    or return;
 
-  return $self->_store->{oidc}{provider}{$provider}{identity};
+  return OIDC::Client::Identity->new($identity);
 }
 
 
@@ -985,11 +891,12 @@ sub _store_identity {
 
   my $subject = $params{claims}->{sub};
   defined $subject
-    or croak("OIDC: the 'sub' claim is not defined");
+    or OIDC::Client::Error::Authentication->throw("OIDC: the 'sub' claim is not defined");
 
   my %identity = (
-    token   => $params{id_token},
     subject => $subject,
+    claims  => $params{claims},
+    token   => $params{id_token},
   );
 
   my $expires_in = $self->client->config->{identity_expires_in};
@@ -1003,75 +910,77 @@ sub _store_identity {
       or $self->log_msg(warning => "OIDC: no 'exp' claim in the ID token");
   }
 
-  foreach my $claim_name (keys %{ $self->client->claim_mapping }) {
-    $identity{$claim_name} //= $self->client->get_claim_value(
-      name     => $claim_name,
-      claims   => $params{claims},
-      optional => 1,
-    );
-  }
-
   my $provider = $self->client->provider;
 
-  $self->_store->{oidc}{provider}{$provider}{identity} = \%identity;
+  # not stored as Identity object because we can't rely on the session engine to preserve its type
+  $self->_get_store()->{oidc}{provider}{$provider}{identity} = \%identity;
 }
 
 
-=head2 get_identity_expiration_time()
+=head2 get_stored_access_token( $audience_alias )
 
-  my $expiration_time = $c->oidc->get_identity_expiration_time();
+  my $access_token = $c->oidc->get_stored_access_token();
 
-Returns the time (number of seconds since from 1970-01-01T00:00:00Z)
-when the stored identity expires including the configured leeway
-or undef if it doesn't expire.
+Returns the stored L<OIDC::Client::AccessToken> object for the specified audience alias,
+even if this token has expired.
+
+The optional list parameters are:
+
+=over 2
+
+=item audience_alias
+
+Alias configured for the audience of the other application.
+
+=back
+
+In local environment, if the C<mocked_access_token> entry (hashref) is configured,
+it is used to create an L<OIDC::Client::AccessToken> object that will be returned
+by this method.
 
 =cut
 
-sub get_identity_expiration_time {
+sub get_stored_access_token {
   my $self = shift;
+  my ($audience_alias) = pos_validated_list(\@_, { isa => 'Maybe[Str]', optional => 1 });
 
-  my $identity = $self->_get_stored_identity()
-    or croak("OIDC: no identity has been stored");
+  my $audience = $audience_alias ? $self->_get_audience_from_alias($audience_alias)
+                                 : $self->client->audience;
 
-  my $expires_at = $identity->{expires_at}
-    or return;
-
-  return $expires_at - ($self->client->config->{expiration_leeway} || 0);
-}
-
-
-sub _get_stored_access_token {
-  my $self = shift;
-  my ($audience) = pos_validated_list(\@_, { isa => 'Str', optional  => 0 });
-
-  my $provider = $self->client->provider;
-
-  return $self->_store->{oidc}{provider}{$provider}{access_token}{audience}{$audience};
-}
-
-
-sub _store_access_token {
-  my $self = shift;
-  my %params = validated_hash(
-    \@_,
-    audience      => { isa => 'Str', optional => 0 },
-    access_token  => { isa => 'Str', optional => 0 },
-    expires_at    => { isa => 'Maybe[Int]', optional => 1 },
-    refresh_token => { isa => 'Maybe[Str]', optional => 1 },
-    token_type    => { isa => 'Maybe[Str]', optional => 1 },
-    scopes        => { isa => 'ArrayRef[Str]', optional => 1 },
-  );
-
-  my $provider = $self->client->provider;
-
-  my %to_store = (
-    token => $params{access_token},
-  );
-  for (qw/ expires_at refresh_token token_type scopes /) {
-    $to_store{$_} = $params{$_} if defined $params{$_};
+  if ($self->is_base_url_local and my $mocked_access_token = $self->client->config->{mocked_access_token}) {
+    return OIDC::Client::AccessToken->new($mocked_access_token);
   }
 
-  $self->_store->{oidc}{provider}{$provider}{access_token}{audience}{$params{audience}} = \%to_store;
+  my $provider = $self->client->provider;
+
+  my $access_token = $self->_get_store()->{oidc}{provider}{$provider}{access_token}{audience}{$audience}
+    or return;
+
+  return OIDC::Client::AccessToken->new($access_token);
+}
+
+
+=head2 store_access_token( $access_token, $audience_alias )
+
+  $c->oidc->store_access_token($access_token);
+
+Stores an L<OIDC::Client::AccessToken> object in the session or stash depending
+on your configured C<store_mode> (see L<OIDC::Client::Config>).
+
+=cut
+
+sub store_access_token {
+  my $self = shift;
+  my ($access_token, $audience_alias) = pos_validated_list(\@_, { isa => 'OIDC::Client::AccessToken', optional => 0 },
+                                                                { isa => 'Maybe[Str]', optional => 1 });
+
+  my $provider = $self->client->provider;
+
+  my $audience = $audience_alias ? $self->_get_audience_from_alias($audience_alias)
+                                 : $self->client->audience;
+
+  # stored as a hashref because we can't rely on the session engine to preserve the object type
+  $self->_get_store()->{oidc}{provider}{$provider}{access_token}{audience}{$audience} = $access_token->to_hashref;
 }
 
 
@@ -1096,6 +1005,16 @@ sub _get_expiration_time {
 }
 
 
+sub _get_audience_from_alias {
+  my $self = shift;
+  my ($audience_alias) = pos_validated_list(\@_, { isa => 'Str', optional => 0 });
+
+  my $audience = $self->client->get_audience_for_alias($audience_alias)
+    or croak("OIDC: no audience for alias '$audience_alias'");
+
+  return $audience;
+}
+
 sub _get_scopes_from_claims {
   my $self = shift;
   my ($claims) = pos_validated_list(\@_, { isa => 'HashRef', optional => 0 });
@@ -1105,7 +1024,7 @@ sub _get_scopes_from_claims {
                                        : [];
 
   unless (ref $scopes) {
-    return [split(/\s+/, $scopes)];
+    return $self->_get_values_from_space_delimited_string($scopes);
   }
 
   return $scopes if ref $scopes eq 'ARRAY';
@@ -1114,10 +1033,16 @@ sub _get_scopes_from_claims {
   return [];
 }
 
+sub _get_values_from_space_delimited_string {
+  my $self = shift;
+  my ($str) = pos_validated_list(\@_, { isa => 'Maybe[Str]', optional => 0 });
+  return [ grep { $_ ne '' } split(/\s+/, $str // '') ];
+}
+
 
 sub _generate_uuid_string {
   my $self = shift;
-  return $self->uuid_generator->to_string($self->uuid_generator->create());
+  return $self->uuid_generator->create_str();
 }
 
 
@@ -1135,11 +1060,33 @@ sub _check_state_parameter {
 }
 
 
-sub _store {
+sub _get_store {
   my $self = shift;
 
-  return $self->store_mode eq 'session' ? $self->session
-                                        : $self->stash;
+  my $store_mode = $self->client->config->{store_mode} || 'session';
+
+  return $store_mode eq 'session' ? $self->session
+                                  : $self->stash;
+}
+
+
+=head2 delete_stored_data()
+
+  $c->oidc->delete_stored_data();
+
+Delete the tokens and other data stored in the session or stash depending
+on your configured C<store_mode> (see L<OIDC::Client::Config>).
+
+Note that only the data from the current provider is deleted.
+
+=cut
+
+sub delete_stored_data {
+  my $self = shift;
+
+  my $provider = $self->client->provider;
+
+  delete $self->_get_store()->{oidc}{provider}{$provider};
 }
 
 

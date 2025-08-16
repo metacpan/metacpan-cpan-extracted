@@ -1,0 +1,15 @@
+=head1 NAME
+
+Net::Respite::Validate - lighter weight port of CGI::Ex::Validate
+
+$Id: Validate.pod,v 1.5 2013/09/17 17:51:34 paul Exp $
+
+=head1 SYNOPSIS
+
+refer to CGI::EX::Validate
+
+=over
+
+=back
+
+=cut
