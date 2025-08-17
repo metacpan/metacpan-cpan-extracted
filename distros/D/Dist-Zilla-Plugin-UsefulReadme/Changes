@@ -1,5 +1,12 @@
 Release history for Dist-Zilla-Plugin-UsefulReadme:
 
+v0.5.1    2025-08-16 12:11:19+01:00 Europe/London
+  [Enhancements]
+  - Added add_prereqs option.
+
+  [Tests]
+  - Add more author tests.
+
 v0.5.0    2025-08-10 11:40:46+01:00 Europe/London
   [Enhancements]
   - Pod::Weaver::Section::Requirements changelog can be blank, so that it will use the same file from the NextRelease

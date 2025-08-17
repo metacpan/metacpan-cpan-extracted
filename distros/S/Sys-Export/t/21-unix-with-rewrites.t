@@ -29,6 +29,20 @@ $exporter->rewrite_path('/usr/local', '/opt/foo');
 $exporter->rewrite_path('/bin', '/opt/foo/bin');
 
 $exporter->add('usr/local/bin/script2');
+$exporter->add([ file => 'usr/share/mydata', <<DATA]);
+ID\tNAME
+1\tfoo
+2\tbar
+DATA
+$exporter->add([ file755 => 'usr/libexec/script3', <<SH]);
+#! /bin/sh
+exit 1;
+SH
+
+# verify that interpreter of script got rewritten, and that interpreter of script3 did not
+# because it was supplied literally rather than read from the source tree.
+like( slurp($exporter->dst_abs . 'opt/foo/bin/script'), qr{^#! /opt/foo/bin/sh\n}, 'rewrite script interpreter' );
+like( slurp($exporter->dst_abs . 'usr/libexec/script3'), qr{^#! /bin/sh\n}, 'no rewrite of script3 interpreter' );
 
 my @tests= (
   [ 'opt',                    (S_IFDIR|0755) ],
@@ -37,6 +51,8 @@ my @tests= (
   [ 'opt/foo/bin/sh',         (S_IFREG|0755) ],
   [ 'opt/foo/bin/script',     (S_IFREG|0755) ],
   [ 'opt/foo/bin/script2',    (S_IFLNK|0777) ],
+  [ 'usr/libexec/script3',    (S_IFREG|0755) ],
+  [ 'usr/share/mydata',       (S_IFREG|0644) ],
 );
 
 for (@tests) {

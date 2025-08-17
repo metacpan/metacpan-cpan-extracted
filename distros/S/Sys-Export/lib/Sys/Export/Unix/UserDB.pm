@@ -1,7 +1,7 @@
 package Sys::Export::Unix::UserDB;
 
 # ABSTRACT: Abstractions for Unix passwd/group/shadow files
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use v5.26;
 use warnings;
@@ -22,7 +22,8 @@ my sub isa_array  :prototype($) { ref $_[0] eq 'ARRAY' }
 my sub isa_int    :prototype($) { Scalar::Util::looks_like_number($_[0]) && int($_[0]) == $_[0] }
 
 
-sub new($class, %args) {
+sub new($class, @args) {
+   my %args= @args == 1 && isa_hash($args[0])? $args[0]->%* : @args;
    my $self = bless {
       users  => {},
       uids   => {},
@@ -60,7 +61,7 @@ sub new($class, %args) {
          croak "Option 'users' must be arrayref or hashref of user objects";
       }
    }
-   return bless $self, $class;
+   return $self;
 }
 
 
@@ -191,8 +192,8 @@ sub _slurp($name) {
 our @_linux_shadow_fields= qw( passwd pw_change_time pw_min_days pw_max_days pw_warn_days pw_inactive_days expire_time );
 
 # Unix time ignores leap seconds, so the conversion from seconds to days is simple division
-sub _time_to_days_since_1970($t) { !defined $t? undef : int($t / 86400) }
-sub _days_since_1970_to_time($d) { !defined $d? undef : $d * 86400; }
+sub _time_to_days_since_1970($t) { !length $t? undef : int($t / 86400) }
+sub _days_since_1970_to_time($d) { !length $d? undef : $d * 86400; }
 
 sub _parse_linux_passwd_format($self, $files) {
    my @users;
@@ -277,7 +278,8 @@ sub _generate_linux_passwd_format($self, %options) {
 
 
 sub import_user($self, $name_or_obj, %attrs) {
-   if (ref($name_or_obj) && ref($name_or_obj)->isa('Sys::Export::Unix::UserDB::User')) {
+   ref $name_or_obj or length $name_or_obj or croak "Attempt to import empty username";
+   if (isa_hash($name_or_obj) || isa_user($name_or_obj)) {
       %attrs= ( %$name_or_obj, %attrs );
    } elsif (keys %attrs) {
       $attrs{name}= "$name_or_obj";
@@ -355,7 +357,8 @@ sub import_user($self, $name_or_obj, %attrs) {
 
 
 sub import_group($self, $name_or_obj, %attrs) {
-   if (isa_hash($name_or_obj) || isa_user($name_or_obj)) {
+   ref $name_or_obj or length $name_or_obj or croak "Attempt to import empty username";
+   if (isa_hash($name_or_obj) || isa_group($name_or_obj)) {
       %attrs= ( %$name_or_obj, %attrs );
    } elsif (keys %attrs) {
       $attrs{name}= "$name_or_obj";
@@ -421,14 +424,15 @@ sub add_group($self, $name_or_obj, %attrs) {
 
 
 sub user($self, $spec) {
+   length $spec or return undef;
    my $u= isa_int $spec? $self->{uids}{$spec} : $self->{users}{$spec};
    if (!$u && $self->auto_import) {
       if (isa_userdb $self->auto_import) {
-         $u= $self->auto_import->user($spec);
-         $u= eval { $self->import_user($u) } if $u;
+         my $peer_u= $self->auto_import->user($spec) // return undef;
+         $u= eval { $self->import_user($peer_u) } or warn $@;
       } else {
-         my $name= isa_int $spec? getpwuid($spec) : $spec;
-         $u= eval { $self->import_user($name) } || warn $@ if length $name;
+         my $name= isa_int $spec? (getpwuid($spec) // return undef) : $spec;
+         $u= eval { $self->import_user($name) } or warn $@;
       }
    }
    $u;
@@ -439,14 +443,15 @@ sub has_user($self, $spec) {
 }
 
 sub group($self, $spec) {
+   length $spec or return undef;
    my $g= isa_int $spec? $self->{gids}{$spec} : $self->{groups}{$spec};
    if (!$g && $self->auto_import) {
       if (isa_userdb $self->auto_import) {
-         $g= $self->auto_import->group($spec);
-         $g= eval { $self->import_group($g) } if $g;
+         my $peer_g= $self->auto_import->group($spec) // return undef;
+         $g= eval { $self->import_group($peer_g) } or warn $@;
       } else {
-         my $name= isa_int $spec? getgrgid($spec) : $spec;
-         $g= eval { $self->import_group($name) } || warn $@ if length $name;
+         my $name= isa_int $spec? (getgrgid($spec) // return undef) : $spec;
+         $g= eval { $self->import_group($name) } or warn $@;
       }
    }
    $g;
@@ -538,8 +543,8 @@ package Sys::Export::Unix::UserDB::User {
       croak "User 'uid' is required" unless defined $self->{uid};
       unless (defined $self->{group}) {
          # pull primary group from first element of list if not provided
-         if (isa_array $self->{groups}) {
-            $self->{group}= $self->{groups}[0];
+         if (isa_array $attrs{groups}) {
+            $self->{group}= $attrs{groups}[0];
          }
          croak "User primary 'group' is required" unless length $self->{group};
       }
@@ -1010,7 +1015,7 @@ Group password, which should never be used anyway.  Leave this C<undef> or C<'*'
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 AUTHOR
 

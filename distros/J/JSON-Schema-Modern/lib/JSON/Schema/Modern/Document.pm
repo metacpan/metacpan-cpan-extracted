@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Document;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: One JSON Schema document
 
-our $VERSION = '0.616';
+our $VERSION = '0.617';
 
 use 5.020;
 use Moo;
@@ -25,7 +25,7 @@ use Ref::Util 0.100 'is_plain_hashref';
 use builtin::compat 'refaddr';
 use Safe::Isa 1.000008;
 use MooX::TypeTiny;
-use Types::Standard 1.016003 qw(InstanceOf HashRef Str Map Dict ArrayRef Enum ClassName Undef Slurpy Optional);
+use Types::Standard 1.016003 qw(InstanceOf HashRef Str Map Dict ArrayRef Enum ClassName Undef Slurpy Optional Bool);
 use Types::Common::Numeric 'PositiveOrZeroInt';
 use namespace::clean;
 
@@ -60,13 +60,6 @@ has metaschema_uri => (
   # default not defined here, but might be defined in a subclass
 );
 
-# TODO: remove, after OpenAPI::Modern and JSON::Schema::Modern::Document::OpenAPI stop using it
-has evaluator => (
-  is => 'rwp',
-  isa => InstanceOf['JSON::Schema::Modern'],
-  weak_ref => 1,
-);
-
 # "A JSON Schema resource is a schema which is canonically identified by an absolute URI."
 # https://json-schema.org/draft/2020-12/json-schema-core.html#rfc.section.4.3.5
 my $path_type = Str->where('m{^(?:/|$)}');  # JSON pointer relative to the document root
@@ -79,10 +72,10 @@ has resource_index => (
       specification_version => Enum[qw(draft4 draft6 draft7 draft2019-09 draft2020-12)],
       # the vocabularies used when evaluating instance data against schema
       vocabularies => ArrayRef[ClassName->where(q{$_->DOES('JSON::Schema::Modern::Vocabulary')})],
-      configs => HashRef,
       anchors => Optional[HashRef[Dict[
         canonical_uri => (InstanceOf['Mojo::URL'])->where(q{not defined $_->fragment or substr($_->fragment, 0, 1) eq '/'}),
         path => $path_type,
+        dynamic => Optional[Bool],
       ]]],
       Slurpy[HashRef[Undef]],  # no other fields allowed
     ]],
@@ -163,9 +156,9 @@ sub BUILD ($self, $args) {
   # note! not a clone! Please don't change canonical_uri in-place.
   $self->_set_original_uri($self->canonical_uri);
 
+  # this should extract all identifiers and entities, and set canonical_uri, metaschema_uri
   my $state = $self->traverse(
-    # TODO: remove evaluator attribute, after OpenAPI::Modern and JSMDO stop using it.
-    $args->{evaluator} // $self->_set_evaluator(JSON::Schema::Modern->new),
+    $args->{evaluator} // JSON::Schema::Modern->new,
     $args->{specification_version} ? +{ $args->%{specification_version} } : (),
   );
 
@@ -188,13 +181,9 @@ sub BUILD ($self, $args) {
   $self->_add_resource($self->original_uri.'' => {
       path => '',
       canonical_uri => $self->canonical_uri,
-      specification_version => $state->{spec_version},
-      vocabularies => $state->{vocabularies},
-      configs => $state->{configs},
+      $state->%{qw(specification_version vocabularies)},
     })
   if not $seen_root;
-
-  $self->_add_entity_location($_, 'schema') foreach $state->{subschemas}->@*;
 }
 
 # a subclass's method will override this one
@@ -222,11 +211,13 @@ sub traverse ($self, $evaluator, $config_override = {}) {
   $self->_set_canonical_uri($state->{initial_schema_uri});
   $self->_set_metaschema_uri($state->{metaschema_uri});
 
+  $self->_add_entity_location($_, 'schema') foreach $state->{subschemas}->@*;
+
   return $state;
 }
 
 sub validate ($self, $evaluator = undef) {
-  $evaluator //= JSON::Schema::Modern->new;
+  $evaluator //= JSON::Schema::Modern->new(validate_formats => 1);
   return $evaluator->evaluate($self->schema, $self->metaschema_uri);
 }
 
@@ -235,7 +226,7 @@ sub FREEZE ($self, $serializer) { +{ %$self } }
 
 # callback hook for Sereal::Decoder
 sub THAW ($class, $serializer, $data) {
-  # TODO: delete $data->{evaluator};  when JSMDO stops using it
+  delete $data->{evaluator};
 
   my $self = bless($data, $class);
 
@@ -262,7 +253,7 @@ JSON::Schema::Modern::Document - One JSON Schema document
 
 =head1 VERSION
 
-version 0.616
+version 0.617
 
 =head1 SYNOPSIS
 
@@ -426,7 +417,9 @@ This class can be subclassed to describe documents of other types, which follow 
 (has a document-level identifier and may contain internal referenceable identifiers). The overall
 document itself may not be a JSON Schema, but it may contain JSON Schemas internally. Referenceable
 entities may or may not be JSON Schemas. As long as the C<traverse> method is implemented and the
-C<$state> object is respected, any other functionality may be contained by this subclass.
+C<$state> object is respected, any other functionality may be contained by this subclass. The
+C<traverse> method is responsible for finding any identifiers within the document, setting
+L</canonical_uri> and L</metaschema_uri>, and finding any C<$ref>abble entities within the document.
 
 To date, there is one subclass of JSON::Schema::Modern::Document:
 L<JSON::Schema::Modern::Document::OpenAPI>, which contains entities of type C<schema> as well as

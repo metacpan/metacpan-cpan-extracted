@@ -1,5 +1,9 @@
 Revision history for RT-Extension-TOTPMFA
 
+0.12 Sat Aug 16 2025
+ - Allow installation on RT 6.0.x (elacour - #8).
+ - Adjust login session updating for RT 6 (paierh - #9).
+
 0.10 Fri May 16 2025
  - Allow QR code to be shown inline (elacour - PR #6).
  - Localisation support added (elacour - PR #4).

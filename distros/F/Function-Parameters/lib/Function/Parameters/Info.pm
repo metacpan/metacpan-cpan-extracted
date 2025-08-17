@@ -1,4 +1,4 @@
-package Function::Parameters::Info 2.002005;
+package Function::Parameters::Info 2.002006;
 
 use v5.14.0;
 use warnings;

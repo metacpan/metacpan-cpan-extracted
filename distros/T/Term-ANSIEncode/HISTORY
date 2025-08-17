@@ -24,3 +24,6 @@ this is the result of that idea.  (Term::)ANSIEncode is the result.
 
 All code relating to sockets and networking were converted to simple "print"
 statements.  This makes pipes etc, easy to do.
+
+I use this utility myself for making colorful banners for various servers I
+work with.

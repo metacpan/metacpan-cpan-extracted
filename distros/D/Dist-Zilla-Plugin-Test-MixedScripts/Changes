@@ -1,5 +1,16 @@
 Revision history for Dist-Zilla-Plugin-Test-MixedScripts:
 
+v0.2.3    2025-08-16 11:39:14+01:00 Europe/London
+  [Enhancements]
+  - Internal code improvements.
+
+  [Tests]
+  - Use Dumper instead of explain for test diagnostics.
+
+  - Add more author tests.
+
+  - Cleaned up cut-and-paste from other tests.
+
 v0.2.2    2025-08-08 14:09:20+01:00 Europe/London
   [Enhancements]
   - Internal code improvements.

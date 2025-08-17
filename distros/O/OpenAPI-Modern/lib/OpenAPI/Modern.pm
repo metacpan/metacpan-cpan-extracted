@@ -1,10 +1,10 @@
 use strictures 2;
-package OpenAPI::Modern; # git description: v0.089-11-gb2bc93b
+package OpenAPI::Modern; # git description: v0.090-12-g36d07d0
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI v3.1 document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI v3.1 Swagger HTTP request response
 
-our $VERSION = '0.090';
+our $VERSION = '0.091';
 
 use 5.020;
 use utf8;
@@ -328,7 +328,7 @@ sub validate_response ($self, $response, $options = {}) {
 
 sub find_path ($self, $options, $state = {}) {
   # there are many $state fields used by JSM that we do not set here because we do not use them for
-  # OpenAPI validation, such as document, document_path, vocabularies, spec_version, configs
+  # OpenAPI validation, such as document, document_path, vocabularies, specification_version
   $state->{data_path} //= '';
   $state->{initial_schema_uri} = $self->openapi_uri;   # the canonical URI as of the start or last $id, or the last traversed $ref
   $state->{traversed_schema_path} = '';    # the accumulated traversal path as of the start, or last $id, or up to the last traversed $ref
@@ -1056,8 +1056,8 @@ sub _convert_request ($request) {
     return $req->error({ message => 'unknown type '.ref($request) });
   }
 
-  # we could call $req->fix_headers here to add a missing Content-Length, but proper requests from
-  # the network should always have it set.
+  # we could call $req->fix_headers here to add a missing Content-Length or Host, but proper
+  # requests from the network should always have these set.
 
   warn 'parse error when converting '.ref($request) if not $req->is_finished;
   return $req;
@@ -1125,7 +1125,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI v3.1 d
 
 =head1 VERSION
 
-version 0.090
+version 0.091
 
 =head1 SYNOPSIS
 

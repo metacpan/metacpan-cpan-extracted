@@ -145,13 +145,13 @@ subtest 'missing arguments' => sub {
 
   lives_result(
     sub {
-      my $evaluator = JSON::Schema::Modern->new(collect_annotations => 1);
+      my $js = JSON::Schema::Modern->new(collect_annotations => 1);
       my $openapi = OpenAPI::Modern->new(
         openapi_document => JSON::Schema::Modern::Document::OpenAPI->new(
           canonical_uri => 'openapi.yaml',
           schema => $minimal_schema,
         ),
-        evaluator => $evaluator,
+        evaluator => $js,
       );
       is($openapi->openapi_uri, 'openapi.yaml', 'got uri out of object');
       cmp_deeply($openapi->openapi_schema, $minimal_schema, 'got schema out of object');

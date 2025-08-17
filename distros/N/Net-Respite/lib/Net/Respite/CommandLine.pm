@@ -149,7 +149,7 @@ sub print_data {
             print Data::Dumper::Dumper($_) for $ENV{'SHOW_META'} ? $meta : (), $args, $data;
         }
     } else {
-        my $p = PrettyTable->new({auto_collapse => 1});
+        my $p = Text::PrettyTable->new({auto_collapse => 1});
         if ($ENV{'SHOW_META'}) {
             print "Meta:\n";
             print $p->tablify($meta);

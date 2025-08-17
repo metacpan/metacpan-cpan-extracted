@@ -52,6 +52,7 @@
             "Test::Fixme" : "0",
             "Test::Kwalitee" : "1.21",
             "Test::MinimumVersion" : "0",
+            "Test::Mojibake" : "0",
             "Test::More" : "0.96",
             "Test::NoTabs" : "0",
             "Test::Perl::Critic" : "0",
@@ -90,9 +91,9 @@
             "CPAN::Meta" : "2.120900"
          },
          "requires" : {
+            "Data::Dumper" : "2.154",
             "File::Spec" : "0",
             "File::pushd" : "0",
-            "FindBin" : "0",
             "Module::Metadata" : "1.000015",
             "Test2::V0" : "0",
             "Test::DZil" : "0",
@@ -108,7 +109,7 @@
    "provides" : {
       "Dist::Zilla::Plugin::Test::MixedScripts" : {
          "file" : "lib/Dist/Zilla/Plugin/Test/MixedScripts.pm",
-         "version" : "v0.2.2"
+         "version" : "v0.2.3"
       }
    },
    "release_status" : "stable",
@@ -122,7 +123,7 @@
          "web" : "https://github.com/robrwo/perl-Dist-Zilla-Plugin-Test-MixedScripts"
       }
    },
-   "version" : "v0.2.2",
+   "version" : "v0.2.3",
    "x_authority" : "cpan:RRWO",
    "x_contributors" : [
       "Graham Knop <haarg@haarg.org>"

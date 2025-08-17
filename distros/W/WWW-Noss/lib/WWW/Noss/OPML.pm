@@ -2,7 +2,7 @@ package WWW::Noss::OPML;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 sub _read_outline {
 

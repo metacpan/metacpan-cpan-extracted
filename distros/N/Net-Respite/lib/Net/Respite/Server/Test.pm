@@ -90,7 +90,15 @@ sub setup_test_server {
         exit;
     }
 
+    my $client_pid = $$;
     $client->{'_test_ender'} = end {
+        diag("Client object ending: pid=[$$] port=[$port]");
+
+        if ($client_pid != $$) {
+            diag("ORIGPID[$client_pid]!=CURRPID[$$] Refusing to stop server on port [$port]! Running setup_test_server() while an old client object still exists can trigger this phantom cleanup on the OLD client object when the child request from the NEW server completes, especially for the Fork personality.");
+            return;
+        }
+
         diag("Process list") if $verbose;
         $server->__ps;
 

@@ -123,4 +123,13 @@ cmp_deeply $plugin->dump_config, {
   },
   "dump_config";
 
+cmp_deeply $tzil->distmeta->{prereqs}{develop}{requires},
+  superhashof(
+    {
+        "Dist::Zilla::Plugin::UsefulReadme" => "v0.4.3",
+        "Pod::Simple::Text"                 => '3.23',
+    }
+  ),
+  "add_prereqs";
+
 done_testing;

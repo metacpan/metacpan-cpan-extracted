@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Base role for JSON Schema vocabulary classes
 
-our $VERSION = '0.616';
+our $VERSION = '0.617';
 
 use 5.020;
 use Moo::Role;
@@ -82,15 +82,12 @@ sub eval_subschema_at_uri ($class, $data, $schema, $state, $uri) {
 
   return $state->{evaluator}->_eval_subschema($data, $schema_info->{schema},
     +{
-      $schema_info->{configs}->%*,
       %$state,
       # keyword is assumed to be json pointer-encoded (if a suffix path is needed), so we just concat
       traversed_schema_path => $state->{traversed_schema_path}.$state->{schema_path}.'/'.$state->{keyword},
       initial_schema_uri => $schema_info->{canonical_uri},
-      document => $schema_info->{document},
-      spec_version => $schema_info->{specification_version},
+      $schema_info->%{qw(document specification_version vocabularies)},
       schema_path => '',
-      vocabularies => $schema_info->{vocabularies},
     });
 }
 
@@ -108,7 +105,7 @@ JSON::Schema::Modern::Vocabulary - Base role for JSON Schema vocabulary classes
 
 =head1 VERSION
 
-version 0.616
+version 0.617
 
 =head1 SYNOPSIS
 

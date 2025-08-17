@@ -24,7 +24,7 @@ my %WriteMakefileArgs = (
     "File::Spec::Functions" => 0,
     "File::Temp" => 0,
     "IPC::Open3" => 0,
-    "Module::Runtime" => 0,
+    "List::Util" => 0,
     "POSIX" => 0,
     "Scalar::Util" => 0,
     "Socket" => 0,
@@ -46,7 +46,7 @@ my %WriteMakefileArgs = (
     "autodie" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -63,7 +63,7 @@ my %FallbackPrereqs = (
   "File::stat" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "Module::Runtime" => 0,
+  "List::Util" => 0,
   "POSIX" => 0,
   "Scalar::Util" => 0,
   "Socket" => 0,

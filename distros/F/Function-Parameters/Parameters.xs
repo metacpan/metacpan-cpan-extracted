@@ -314,9 +314,7 @@ static OpGuard op_guard_transfer(OpGuard *p) {
 }
 
 static OP *op_guard_relinquish(OpGuard *p) {
-    OP *o = p->op;
-    op_guard_init(p);
-    return o;
+    return op_guard_transfer(p).op;
 }
 
 static void op_guard_update(OpGuard *p, OP *o) {
@@ -2124,6 +2122,7 @@ static int parse_fun(pTHX_ Sentinel sen, OP **pop, const char *keyword_ptr, STRL
             {
                 OP *const init_op = cur->init.op;
                 if (init_op->op_type == OP_UNDEF && !(init_op->op_flags & OPf_KIDS)) {
+                    op_free(op_guard_relinquish(&cur->init));
                     continue;
                 }
             }
@@ -2226,7 +2225,9 @@ static int parse_fun(pTHX_ Sentinel sen, OP **pop, const char *keyword_ptr, STRL
 
             {
                 OP *const init = cur->init.op;
-                if (!(init->op_type == OP_UNDEF && !(init->op_flags & OPf_KIDS))) {
+                if (init->op_type == OP_UNDEF && !(init->op_flags & OPf_KIDS)) {
+                    op_free(op_guard_relinquish(&cur->init));
+                } else {
                     switch (cur->cond) {
                         case ICOND_DEFINED:
                             expr = newLOGOP(OP_DOR, 0, expr, op_guard_relinquish(&cur->init));

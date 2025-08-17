@@ -1,4 +1,26 @@
 -----------------------------------------
+version 0.25 at 2025-08-16 23:59:00 +0000
+-----------------------------------------
+
+  Author: Rob Brown <hookbot@github.com>
+
+  Fixed race condition where setup_test_server is called with an old client still in scope.
+  Fix Server->__ps to show all processes.
+  Make 30-Server show port for better diagnostics.
+
+  Author: Jason Terry <jterry@bluehost.com>
+
+  JTerry patch to ensure one client/server is being used at a time.
+
+-----------------------------------------
+version 0.24 at 2025-08-15 21:30:00 +0000
+-----------------------------------------
+
+  Author: Rob Brown <hookbot@github.com>
+
+  Fix run-time crash in CommandLine.pm
+
+-----------------------------------------
 version 0.23 at 2025-08-15 20:00:00 +0000
 -----------------------------------------
 

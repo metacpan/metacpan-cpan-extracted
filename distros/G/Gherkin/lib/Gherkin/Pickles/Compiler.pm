@@ -1,5 +1,5 @@
 package Gherkin::Pickles::Compiler;
-$Gherkin::Pickles::Compiler::VERSION = '33.1.0';
+$Gherkin::Pickles::Compiler::VERSION = '34.0.0';
 use strict;
 use warnings;
 use Scalar::Util qw(reftype);

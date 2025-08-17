@@ -1,7 +1,7 @@
 package Sys::Export::ELF;
 
 # ABSTRACT: Unpack various data structures of an ELF binary
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 
 use v5.26;
@@ -253,7 +253,7 @@ file (via L<File::Map>) and actually avoid mapping the whole file.
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 AUTHOR
 

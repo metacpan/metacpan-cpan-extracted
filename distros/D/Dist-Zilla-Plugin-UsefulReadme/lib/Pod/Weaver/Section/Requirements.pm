@@ -20,7 +20,7 @@ use experimental qw( lexical_subs postderef signatures );
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.5.0';
+our $VERSION = 'v0.5.1';
 
 
 has header => (
@@ -170,7 +170,7 @@ Pod::Weaver::Section::Requirements - generate POD with the runtime requirements
 
 =head1 VERSION
 
-version v0.5.0
+version v0.5.1
 
 =for stopwords metafile
 

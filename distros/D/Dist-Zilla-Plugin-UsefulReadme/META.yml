@@ -7,6 +7,8 @@ build_requires:
   Dist::Zilla::Stash::PodWeaver: '0'
   ExtUtils::MakeMaker: '7.22'
   File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
   Module::Metadata: '1.000015'
   Pod::Markdown: '3.000'
   Pod::Markdown::Github: '0'
@@ -40,16 +42,16 @@ name: Dist-Zilla-Plugin-UsefulReadme
 provides:
   Dist::Zilla::Plugin::UsefulReadme:
     file: lib/Dist/Zilla/Plugin/UsefulReadme.pm
-    version: v0.5.0
+    version: v0.5.1
   Pod::Weaver::Section::InstallationInstructions:
     file: lib/Pod/Weaver/Section/InstallationInstructions.pm
-    version: v0.5.0
+    version: v0.5.1
   Pod::Weaver::Section::RecentChanges:
     file: lib/Pod/Weaver/Section/RecentChanges.pm
-    version: v0.5.0
+    version: v0.5.1
   Pod::Weaver::Section::Requirements:
     file: lib/Pod/Weaver/Section/Requirements.pm
-    version: v0.5.0
+    version: v0.5.1
 recommends:
   Pod::Weaver: '4.016'
   Pod::Weaver::Section::Version: '0'
@@ -75,7 +77,7 @@ requires:
 resources:
   bugtracker: https://github.com/robrwo/perl-Dist-Zilla-Plugin-UsefulReadme/issues
   repository: git://github.com/robrwo/perl-Dist-Zilla-Plugin-UsefulReadme.git
-version: v0.5.0
+version: v0.5.1
 x_authority: cpan:RRWO
 x_generated_by_perl: v5.34.3
 x_serialization_backend: 'YAML::Tiny version 1.76'

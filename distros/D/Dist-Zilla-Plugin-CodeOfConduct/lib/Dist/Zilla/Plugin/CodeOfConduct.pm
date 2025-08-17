@@ -19,7 +19,7 @@ use namespace::autoclean;
 
 use experimental qw( postderef signatures );
 
-our $VERSION = 'v0.1.0';
+our $VERSION = 'v0.1.1';
 
 
 
@@ -113,9 +113,11 @@ Dist::Zilla::Plugin::CodeOfConduct - add a Code of Conduct to a distribution
 
 =head1 VERSION
 
-version v0.1.0
+version v0.1.1
 
 =head1 SYNOPSIS
+
+In the F<dist.ini>:
 
     [CodeOfConduct]
     -version = v0.4.0

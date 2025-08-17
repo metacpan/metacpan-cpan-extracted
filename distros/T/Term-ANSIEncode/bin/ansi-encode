@@ -79,50 +79,19 @@ my $text = <<'VERSION';
 ║[% B_BLACK %][% RED %]       ╱ ____ ╲[% BRIGHT YELLOW %]│ │╲  │[% GREEN %]____) │[% BRIGHT BLUE %]_│ │_  [% BRIGHT WHITE %]│ │____│ │ │ │ (_│ (_) │ (_│ │  __╱      [% RESET %]║
 ║[% B_BLACK %][% RED %]      ╱_╱    ╲_╲[% BRIGHT YELLOW %]_│ ╲_│[% GREEN %]_____╱[% BRIGHT BLUE %]│_____│ [% BRIGHT WHITE %]│______│_│ │_│╲___╲___╱ ╲__,_│╲___│      [% RESET %]║
 ╠═════════════════════════════════════════════════════════════════════════════╣
-║[% B_ANSI52 %]                         Written By [% BRIGHT YELLOW %]Richard Kelsch[% RESET %][% B_ANSI52 %]                           [% RESET %]║
-║[% B_ANSI52 %]                       Copyright ©[% GREEN %]2025 [% BRIGHT YELLOW %]Richard Kelsch[% RESET %][% B_ANSI52 %]                        [% RESET %]║
-║[% B_ANSI52 %]                            All Rights Reserved                              [% RESET %]║
-║[% B_ANSI52 %]                               Version [% GREEN %]XXXX[% RESET %][% B_ANSI52 %]                                  [% RESET %]║
-╠═════════════════════════════════════════════════════════════════════════════╣
-║                                                                             ║
-║                                                                             ║
-║                                                                             ║
-║                                                                             ║
-║                                                                             ║
-║                                                                             ║
-║                                                                             ║
-║                                                                             ║
-║                                                                             ║
-║                                                                             ║
-║                                                                             ║
-║                                                                             ║
+║[% B_ANSI17 %]                         Written By [% BRIGHT YELLOW %]Richard Kelsch[% RESET %][% B_ANSI17 %]                           [% RESET %]║
+║[% B_ANSI17 %]                       Copyright ©[% GREEN %]2025 [% BRIGHT YELLOW %]Richard Kelsch[% RESET %][% B_ANSI17 %]                        [% RESET %]║
+║[% B_ANSI17 %]                            All Rights Reserved                              [% RESET %]║
+║[% B_ANSI17 %]                   GNU General Public License version 3                      [% RESET %]║
+║[% B_ANSI17 %]                               Version [% GREEN %]XXXX[% RESET %][% B_ANSI17 %]                                  [% RESET %]║
 ╚═════════════════════════════════════════════════════════════════════════════╝
-
 
 VERSION
 
 $text =~ s/XXXX/$VERSION/gs;
 
-my $text2 = <<'SECOND';
-║ [% CYAN %]This program is free software: you can redistribute it and/or modify it    [% RESET %] ║
-║ [% CYAN %]under the terms of the GNU General Public License as published by the Free [% RESET %] ║
-║ [% CYAN %]Software Foundation, either version 3 of the License, or (at your option)  [% RESET %] ║
-║ [% CYAN %]any later version.                                                         [% RESET %] ║
-
-║ [% CYAN %]This program is distributed in the hope that it will be useful, but WITHOUT[% RESET %] ║
-║ [% CYAN %]ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or      [% RESET %] ║
-║ [% CYAN %]FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for  [% RESET %] ║
-║ [% CYAN %]more details.                                                              [% RESET %] ║
-
-║ [% CYAN %]You should have received a copy of the GNU General Public License along    [% RESET %] ║
-║ [% CYAN %]with this program.  If not, see:  [% PINK %]<http://www.gnu.org/licenses/>.          [% RESET %] ║
-
-
-SECOND
-
 my $ansi = ($full) ? Term::ANSIEncode->new('mode' => 'full') : Term::ANSIEncode->new('mode' => 'short');
 
-# print Dumper($ansi);exit;
 ###
 my $small = <<'SMALL';
 [% CLEAR %]╔═════════════════════════════════════════════════════════════════════════╗
@@ -155,7 +124,7 @@ my $small = <<'SMALL';
 ║     -[% PINK %]u[% RESET %] or --[% PINK %]unicode[% RESET %] [search]                                            ║
 ║         Show available symbols and character tokens by unicode          ║
 ║                                                                         ║
-║     -[% PINK %]d[% RESET %] or --[% PINK %]dump[% RESET %] [search]     ║
+║     -[% PINK %]d[% RESET %] or --[% PINK %]dump[% RESET %] [search]                                               ║
 ║         Dump available sysmbols                                         ║
 ║                                                                         ║
 ║     -[% PINK %]f[% RESET %] or --[% PINK %]full[% RESET %]                                                        ║
@@ -290,8 +259,6 @@ $to =~ s/\[\% GREYDIENT \%\]/$greydient/g;
 if ($version) {
     $| = 1;
     $ansi->ansi_output($text, 0);
-    locate(14, 1);
-    $ansi->ansi_output($text2, 0.0005);
 } elsif ($help) {
     $| = 1;
     $ansi->ansi_output($small, 0);
@@ -299,7 +266,13 @@ if ($version) {
     $ansi->ansi_output($to, 0);
 } elsif ($Dump) {
     my $temp  = "\n\n";
-    my @names = (sort(keys %{ $ansi->{'characters'}->{'NAME'} }));
+    my @names;
+    my $search = pop(@ARGV);
+    if (defined($search) && $search ne '') {
+        @names = grep(/$search/i, (sort(keys %{ $ansi->{'characters'}->{'NAME'} })));
+    } else {
+        @names = (sort(keys %{ $ansi->{'characters'}->{'NAME'} }));
+    }
     while (scalar(@names)) {
         my $name = shift(@names);
         $temp .= $ansi->{'characters'}->{'NAME'}->{$name} . ' ';
@@ -606,4 +579,3 @@ Makes a solid blank line, the full width of the screen with the selected backgro
  HORIZONTAL RULE BRIGHT WHITE    = A solid line of bright white background
 
 =cut
-

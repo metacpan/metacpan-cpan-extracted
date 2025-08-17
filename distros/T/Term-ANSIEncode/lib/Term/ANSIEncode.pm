@@ -11,7 +11,7 @@ package Term::ANSIEncode;
 #                     Written By Richard Kelsch                       #
 #                  © Copyright 2025 Richard Kelsch                    #
 #                        All Rights Reserved                          #
-#                           Version 1.19                              #
+#                           Version 1.20                              #
 #######################################################################
 # This program is free software: you can redistribute it and/or       #
 # modify it under the terms of the GNU General Public License as      #
@@ -46,7 +46,7 @@ use constant {
 binmode(STDOUT, ":encoding(UTF-8)");
 
 BEGIN {
-    our $VERSION = '1.19';
+    our $VERSION = '1.20';
 }
 
 sub ansi_output {

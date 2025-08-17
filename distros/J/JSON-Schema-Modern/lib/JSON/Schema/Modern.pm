@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern; # git description: v0.615-9-g4af01d8e
+package JSON::Schema::Modern; # git description: v0.616-16-g27f0ba00
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema using a JSON Schema
 # KEYWORDS: JSON Schema validator data validation structure specification
 
-our $VERSION = '0.616';
+our $VERSION = '0.617';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -224,7 +224,7 @@ sub add_document {
     $uri_string = Mojo::URL->new($uri_string)->to_abs($base_uri)->to_string if length $base_uri;
 
     my $new_resource = {
-      $doc_resource->%{qw(path specification_version vocabularies configs)},
+      $doc_resource->%{qw(path specification_version vocabularies)},
       document => $document,
     };
 
@@ -235,7 +235,8 @@ sub add_document {
     foreach my $anchor (keys (($doc_resource->{anchors}//{})->%*)) {
       use autovivification 'store';
       $new_resource->{anchors}{$anchor} = {
-        path => $doc_resource->{anchors}{$anchor}{path},
+        $doc_resource->{anchors}{$anchor}->%{path},
+        (map +($_->[1] ? @$_ : ()), [ $doc_resource->{anchors}{$anchor}->%{dynamic} ]),
         canonical_uri => length $base_uri
           ? Mojo::URL->new($doc_resource->{anchors}{$anchor}{canonical_uri})->to_abs($base_uri)
           : $doc_resource->{anchors}{$anchor}{canonical_uri},
@@ -313,11 +314,10 @@ sub traverse ($self, $schema_reference, $config_override = {}) {
     initial_schema_uri => $initial_uri,     # the canonical URI as of the start of this method or last $id
     traversed_schema_path => $initial_path, # the accumulated traversal path as of the start or last $id
     schema_path => '',                      # the rest of the path, since the start of this method or last $id
-    spec_version => $spec_version,
+    specification_version => $spec_version,
     errors => [],
     identifiers => {},
     subschemas => [],
-    configs => {},
     callbacks => $config_override->{callbacks} // {},
     evaluator => $self,
     traverse => 1,
@@ -326,7 +326,7 @@ sub traverse ($self, $schema_reference, $config_override = {}) {
   my $valid = 1;
 
   try {
-    # determine the initial value of spec_version and vocabularies, so we have something to start
+    # determine the initial value of specification_version and vocabularies, so we have something to start
     # with in _traverse_subschema().
     # a subsequent "$schema" keyword can still change these values, and it is always processed
     # first, so the override is skipped if the keyword exists in the schema
@@ -335,7 +335,7 @@ sub traverse ($self, $schema_reference, $config_override = {}) {
         : $config_override->{metaschema_uri}) // $self->METASCHEMA_URIS->{$spec_version};
 
     if (my $metaschema_info = $self->_get_metaschema_vocabulary_classes($state->{metaschema_uri})) {
-      $state->@{qw(spec_version vocabularies)} = @$metaschema_info;
+      $state->@{qw(specification_version vocabularies)} = @$metaschema_info;
     }
     else {
       # metaschema has not been processed for vocabularies yet...
@@ -385,7 +385,6 @@ sub evaluate ($self, $data, $schema_reference, $config_override = {}) {
     schema_path => '',                  # the rest of the path, since the start of evaluation or last $id or $ref
     errors => [],
     depth => 0,
-    configs => {},
   };
 
   # resolve locations against this for errors and annotations, if locations are not already absolute
@@ -418,15 +417,12 @@ sub evaluate ($self, $data, $schema_reference, $config_override = {}) {
     $state = +{
       %$state,
       initial_schema_uri => $schema_info->{canonical_uri}, # the canonical URI as of the start of evaluation, or last $id or $ref
-      document => $schema_info->{document},   # the ::Document object containing this schema
+      $schema_info->%{qw(document specification_version vocabularies)},
       dynamic_scope => [ $schema_info->{canonical_uri} ],
       annotations => [],
       seen => {},
-      spec_version => $schema_info->{specification_version},
-      vocabularies => $schema_info->{vocabularies},
       callbacks => $config_override->{callbacks} // {},
       evaluator => $self,
-      $schema_info->{configs}->%*,
       (map {
         my $val = $config_override->{$_} // $self->$_;
         defined $val ? ( $_ => $val ) : ()
@@ -491,6 +487,7 @@ sub validate_schema ($self, $schema, $config_override = {}) {
 
   return $result if not $result->valid;
 
+  # the traversal pass will validate all constraints that weren't handled by the metaschema
   my $state = $self->traverse($schema, $config_override);
   return JSON::Schema::Modern::Result->new(
     output_format => $self->output_format,
@@ -608,9 +605,9 @@ sub _traverse_subschema ($self, $schema, $state) {
     for (my $keyword_index = 0;
         $keyword_index < ($keyword_list //= do {
           use autovivification qw(fetch store);
-          $vocabulary_cache->{$state->{spec_version}}{$vocabulary}{traverse} //= [
+          $vocabulary_cache->{$state->{specification_version}}{$vocabulary}{traverse} //= [
             map [ $_ => $vocabulary->can('_traverse_keyword_'.($_ =~ s/^\$//r)) ],
-              $vocabulary->keywords($state->{spec_version})
+              $vocabulary->keywords($state->{specification_version})
           ];
         })->@*;
         $keyword_index++) {
@@ -618,12 +615,12 @@ sub _traverse_subschema ($self, $schema, $state) {
       next if not exists $schema->{$keyword};
 
       # keywords adjacent to $ref are not evaluated before draft2019-09
-      next if $keyword ne '$ref' and exists $schema->{'$ref'} and $state->{spec_version} =~ /^draft[467]$/;
+      next if $keyword ne '$ref' and exists $schema->{'$ref'} and $state->{specification_version} =~ /^draft[467]$/;
 
       delete $unknown_keywords{$keyword};
       $state->{keyword} = $keyword;
 
-      my $old_spec_version = $state->{spec_version};
+      my $old_spec_version = $state->{specification_version};
       my $error_count = $state->{errors}->@*;
 
       if (not $sub->($vocabulary, $schema, $state)) {
@@ -636,7 +633,7 @@ sub _traverse_subschema ($self, $schema, $state) {
         if $error_count != $state->{errors}->@*;
 
       # a keyword changed the keyword list for this vocabulary; re-fetch the list before continuing
-      undef $keyword_list if $state->{spec_version} ne $old_spec_version;
+      undef $keyword_list if $state->{specification_version} ne $old_spec_version;
 
       if (my $callback = $state->{callbacks}{$keyword}) {
         $error_count = $state->{errors}->@*;
@@ -661,11 +658,11 @@ sub _traverse_subschema ($self, $schema, $state) {
   }
 
   # check for previously-supported but now removed keywords
-  foreach my $keyword (sort keys $removed_keywords{$state->{spec_version}}->%*) {
+  foreach my $keyword (sort keys $removed_keywords{$state->{specification_version}}->%*) {
     next if not exists $schema->{$keyword};
     my $message ='no-longer-supported "'.$keyword.'" keyword present (at location "'
       .canonical_uri($state).'")';
-    if (my $alternates = $removed_keywords{$state->{spec_version}}->{$keyword}) {
+    if (my $alternates = $removed_keywords{$state->{specification_version}}->{$keyword}) {
       my @list = map '"'.$_.'"', @$alternates;
       @list = ((map $_.',', @list[0..$#list-1]), $list[-1]) if @list > 2;
       splice(@list, -1, 0, 'or') if @list > 1;
@@ -740,9 +737,9 @@ sub _eval_subschema ($self, $data, $schema, $state) {
     for (my $keyword_index = 0;
         $keyword_index < ($keyword_list //= do {
           use autovivification qw(fetch store);
-          $vocabulary_cache->{$state->{spec_version}}{$vocabulary}{evaluate} //= [
+          $vocabulary_cache->{$state->{specification_version}}{$vocabulary}{evaluate} //= [
             map [ $_ => $vocabulary->can('_eval_keyword_'.($_ =~ s/^\$//r)) ],
-              $vocabulary->keywords($state->{spec_version})
+              $vocabulary->keywords($state->{specification_version})
           ];
         })->@*;
         $keyword_index++) {
@@ -750,13 +747,13 @@ sub _eval_subschema ($self, $data, $schema, $state) {
       next if not exists $schema->{$keyword};
 
       # keywords adjacent to $ref are not evaluated before draft2019-09
-      next if $keyword ne '$ref' and exists $schema->{'$ref'} and $state->{spec_version} =~ /^draft[467]$/;
+      next if $keyword ne '$ref' and exists $schema->{'$ref'} and $state->{specification_version} =~ /^draft[467]$/;
 
       delete $unknown_keywords{$keyword};
       $state->{keyword} = $keyword;
 
       if ($sub) {
-        my $old_spec_version = $state->{spec_version};
+        my $old_spec_version = $state->{specification_version};
         my $error_count = $state->{errors}->@*;
 
         try {
@@ -778,7 +775,7 @@ sub _eval_subschema ($self, $data, $schema, $state) {
         }
 
         # a keyword changed the keyword list for this vocabulary; re-fetch the list before continuing
-        undef $keyword_list if $state->{spec_version} ne $old_spec_version;
+        undef $keyword_list if $state->{specification_version} ne $old_spec_version;
       }
 
       if (my $callback = ($state->{callbacks}//{})->{$keyword}) {
@@ -821,7 +818,7 @@ sub _eval_subschema ($self, $data, $schema, $state) {
     $state->{seen_data_properties}{jsonp($state->{data_path}, $_)} |= 1 foreach @evaluated_properties;
   }
 
-  if ($valid and $state->{collect_annotations} and $state->{spec_version} !~ /^draft(?:7|2019-09)$/) {
+  if ($valid and $state->{collect_annotations} and $state->{specification_version} !~ /^draft(?:7|2019-09)$/) {
     annotate_self(+{ %$state, keyword => $_, _unknown => 1 }, $schema)
       foreach sort keys %unknown_keywords;
   }
@@ -846,8 +843,8 @@ has _resource_index => (
       anchors => Optional[HashRef[Dict[
         canonical_uri => (InstanceOf['Mojo::URL'])->where(q{not defined $_->fragment or substr($_->fragment, 0, 1) eq '/'}),
         path => $path_type,
+        dynamic => Optional[Bool],
       ]]],
-      configs => HashRef,
       Slurpy[HashRef[Undef]],  # no other fields allowed
     ]],
 );
@@ -888,7 +885,7 @@ sub _add_resource ($self, @kvs) {
   }
 }
 
-# $vocabulary uri (not its $id!) => [ spec_version, class ]
+# $vocabulary uri (not its $id!) => [ specification_version, class ]
 has _vocabulary_classes => (
   is => 'bare',
   isa => HashRef[
@@ -928,7 +925,7 @@ sub add_vocabulary ($self, $classname) {
   }
 }
 
-# $schema uri => [ spec_version, [ vocab classes, in evaluation order ] ].
+# $schema uri => [ specification_version, [ vocab classes, in evaluation order ] ].
 has _metaschema_vocabulary_classes => (
   is => 'bare',
   isa => HashRef[
@@ -1051,7 +1048,7 @@ use constant CACHED_METASCHEMAS => {
   'http://json-schema.org/draft-04/schema' => 'draft4/schema.json',
 };
 
-# simple runtime-wide cache of metaschema documentation objects that are sourced from disk
+# simple runtime-wide cache of metaschema document objects that are sourced from disk
 my $metaschema_cache = {};
 
 # returns the same as _get_resource
@@ -1099,7 +1096,6 @@ sub _get_or_load_resource ($self, $uri) {
 # - document_path: the path relative to the document root for this schema
 # - specification_version: the specification version that applies to this schema
 # - vocabularies: the vocabularies to use when considering schema keywords
-# - configs: the config overrides to set when considering schema keywords
 # creates a Document and adds it to the resource index, if not already present.
 sub _fetch_from_uri ($self, $uri_reference) {
   $uri_reference = Mojo::URL->new($uri_reference) if not is_schema($uri_reference);
@@ -1149,7 +1145,7 @@ sub _fetch_from_uri ($self, $uri_reference) {
       schema => $subschema,
       canonical_uri => $canonical_uri,
       document_path => $document_path,
-      $closest_resource->[1]->%{qw(document specification_version vocabularies configs)}, # reference, not copy
+      $closest_resource->[1]->%{qw(document specification_version vocabularies)}, # reference, not copy
     };
   }
   else {  # we are following a URI with a plain-name fragment
@@ -1158,7 +1154,7 @@ sub _fetch_from_uri ($self, $uri_reference) {
       schema => $resource->{document}->get($subresource->{path}),
       canonical_uri => $subresource->{canonical_uri}, # this is *not* the anchor-containing URI
       document_path => $subresource->{path},
-      $resource->%{qw(document specification_version vocabularies configs)}, # reference, not copy
+      $resource->%{qw(document specification_version vocabularies)}, # reference, not copy
     };
   }
 }
@@ -1297,7 +1293,7 @@ JSON::Schema::Modern - Validate data against a schema using a JSON Schema
 
 =head1 VERSION
 
-version 0.616
+version 0.617
 
 =head1 SYNOPSIS
 
@@ -1551,7 +1547,7 @@ C<traversed_schema_path>: adjusts the accumulated path as of the start of evalua
 
 =item *
 
-C<initial_schema_uri>: adjusts the recorded absolute keyword location as of the start of evaluation
+C<initial_schema_uri>: adjusts the recorded absolute keyword location of the start of evaluation
 
 =item *
 

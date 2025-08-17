@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-# This test was generated with Dist::Zilla::Plugin::Test::MixedScripts v0.1.5.
+# This test was generated with Dist::Zilla::Plugin::Test::MixedScripts v0.2.3.
 
 use Test2::Tools::Basic 1.302200;
 

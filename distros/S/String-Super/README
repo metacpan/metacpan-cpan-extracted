@@ -1,0 +1,17 @@
+String::Super
+--------
+
+This allows you to compact a list of strings into a superstring that contains all the strings,
+however is generally shorter than all substrings concatenated.
+
+Pre-Requirements
+----------------
+
+On Debian:
+$ apt-get install libdist-zilla-plugins-cjm-perl libdist-zilla-plugin-git-perl libdist-zilla-plugin-repository-perl libdist-zilla-plugin-podweaver-perl
+
+
+Building
+--------
+$ dzil build
+$ dzil install

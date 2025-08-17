@@ -62,7 +62,6 @@ subtest 'evaluate a document' => sub {
         document => shallow($document),
         specification_version => 'draft2020-12',
         vocabularies => $vocabularies{'draft2020-12'},
-        configs => {},
       },
     },
     'resource index from the document is copied to the main object',
@@ -119,7 +118,6 @@ subtest 'evaluate a uri' => sub {
           document => isa('JSON::Schema::Modern::Document'),
           specification_version => 'draft2019-09',
           vocabularies => $vocabularies{'draft2019-09'},
-          configs => {},
         }
       ),
       METASCHEMA,
@@ -238,7 +236,7 @@ subtest 'add a schema associated with a uri' => sub {
     'cannot use a uri with a fragment',
   );
 
-  cmp_deeply(
+  cmp_result(
     my $document = $js->add_schema(
       'https://foo.com',
       { '$id' => 'https://bar.com', allOf => [ false, true ] },
@@ -252,7 +250,6 @@ subtest 'add a schema associated with a uri' => sub {
             canonical_uri => str('https://bar.com'),
             specification_version => 'draft2020-12',
             vocabularies => $vocabularies{'draft2020-12'},
-            configs => {},
           },
         ],
         canonical_uri => [ str('https://bar.com') ],
@@ -349,7 +346,6 @@ subtest 'add a schema associated with a uri' => sub {
         document => shallow($document),
         specification_version => 'draft2020-12',
         vocabularies => $vocabularies{'draft2020-12'},
-        configs => {},
       } ), qw(https://foo.com https://bar.com https://bloop.com)
     },
     'now the document is available as all three uris, with the same canonical_uri',
@@ -365,7 +361,7 @@ subtest 'multiple anonymous schemas' => sub {
     'evaluate an anonymous schema',
   );
 
-  cmp_deeply([ keys $js->{_resource_index}->%* ], [ '' ], 'one resource is indexed');
+  cmp_result([ keys $js->{_resource_index}->%* ], [ '' ], 'one resource is indexed');
 
   cmp_result(
     $js->evaluate(2, { minimum => 2 })->TO_JSON,
@@ -373,13 +369,13 @@ subtest 'multiple anonymous schemas' => sub {
     'evaluate another anonymous schema',
   );
 
-  cmp_deeply([ keys $js->{_resource_index}->%* ], [ '' ], 'still only one resource is indexed');
+  cmp_result([ keys $js->{_resource_index}->%* ], [ '' ], 'still only one resource is indexed');
 };
 
 subtest 'add a document without associating it with a uri' => sub {
   my $js = JSON::Schema::Modern->new;
 
-  cmp_deeply(
+  cmp_result(
     $js->add_document(
       my $document = JSON::Schema::Modern::Document->new(
         schema => { '$id' => 'https://bar.com', allOf => [ false, true ] },
@@ -393,7 +389,6 @@ subtest 'add a document without associating it with a uri' => sub {
             canonical_uri => str('https://bar.com'),
             specification_version => 'draft2020-12',
             vocabularies => $vocabularies{'draft2020-12'},
-            configs => {},
           },
         ],
         canonical_uri => [ str('https://bar.com') ],
@@ -411,7 +406,6 @@ subtest 'add a document without associating it with a uri' => sub {
         document => shallow($document),
         specification_version => 'draft2020-12',
         vocabularies => $vocabularies{'draft2020-12'},
-        configs => {},
       },
     },
     'document only added under its canonical uri',
@@ -421,7 +415,7 @@ subtest 'add a document without associating it with a uri' => sub {
 subtest 'add a schema without a uri' => sub {
   my $js = JSON::Schema::Modern->new;
 
-  cmp_deeply(
+  cmp_result(
     my $document = $js->add_schema(
       { '$id' => 'https://bar.com', allOf => [ false, true ] },
     ),
@@ -434,7 +428,6 @@ subtest 'add a schema without a uri' => sub {
             canonical_uri => str('https://bar.com'),
             specification_version => 'draft2020-12',
             vocabularies => $vocabularies{'draft2020-12'},
-            configs => {},
           },
         ],
         canonical_uri => [ str('https://bar.com') ],
@@ -452,7 +445,6 @@ subtest 'add a schema without a uri' => sub {
         document => shallow($document),
         specification_version => 'draft2020-12',
         vocabularies => $vocabularies{'draft2020-12'},
-        configs => {},
       },
     },
     'document only added under its canonical uri',
@@ -629,7 +621,6 @@ subtest 'register a document against multiple uris, with absolute root uri' => s
         do { %more_configs = (
           specification_version => 'draft2020-12',
           vocabularies => $vocabularies{'draft2020-12'},
-          configs => {},
         ) },
         anchors => {
           my_anchor => {
@@ -780,7 +771,6 @@ subtest 'register a document against multiple uris, with relative root uri' => s
         do { %more_configs = (
           specification_version => 'draft2020-12',
           vocabularies => $vocabularies{'draft2020-12'},
-          configs => {},
         ) },
         anchors => {
           my_anchor => {
@@ -955,7 +945,6 @@ subtest 'register a document against multiple uris, with no root uri' => sub {
         do { %more_configs = (
           specification_version => 'draft2020-12',
           vocabularies => $vocabularies{'draft2020-12'},
-          configs => {},
         ) },
         anchors => {
           my_anchor => {

@@ -1,6 +1,6 @@
 package Sys::Export::Exporter;
 
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 # ABSTRACT: base class for exporters, only used for 'isa' checks
 
 use v5.26;
@@ -46,7 +46,7 @@ and the following methods:
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 AUTHOR
 

@@ -1,6 +1,6 @@
 package Sys::Export;
 
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 # ABSTRACT: Export a subset of an OS file tree, for chroot/initrd
 
 use v5.26;
@@ -105,7 +105,7 @@ sub isa_group      :prototype($) { blessed($_[0]) && $_[0]->isa('Sys::Export::Un
 
 
 sub _parse_major_minor_data($attrs, $data) {
-   @{$attrs}{'major','minor'}= isa_array $data? @$data : split(/[,:]/, $data);
+   @{$attrs}{'rdev_major','rdev_minor'}= isa_array $data? @$data : split(/[,:]/, $data);
 }
 our %_mode_alias= (
    file => [ S_IFREG,  sub { 0666 & ~umask } ],
@@ -163,8 +163,7 @@ Sys::Export - Export a subset of an OS file tree, for chroot/initrd
 
 =head1 SYNOPSIS
 
-  use Sys::Export::CPIO;
-  use Sys::Export -src => '/', -dst => Sys::Export::CPIO->new("initrd.cpio");
+  use Sys::Export -src => '/', -dst => [ CPIO => "initrd.cpio" ];
   
   rewrite_path '/sbin'     => '/bin';
   rewrite_path '/usr/sbin' => '/bin';
@@ -393,7 +392,7 @@ C<< 0666 & ~umask >> for others.
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 AUTHOR
 

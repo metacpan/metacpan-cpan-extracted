@@ -376,6 +376,23 @@ dialog_info_feed() {
 
 }
 
+dialog_open_feed() {
+
+    dialog_open_feed_err="$(mktemp)"
+
+    wnoss open "$1" 2> "$dialog_open_feed_err"
+
+    if [ "$?" != '0' ]
+    then
+        dialog \
+            --title "Failed to open $1" \
+            --msgbox "$(cat "$dialog_open_feed_err")" 0 0
+    fi
+
+    rm -f "$dialog_open_feed_err"
+
+}
+
 dialog_select_feed() {
 
     dialog_select_feed_tmpsel="$(mktemp)"
@@ -387,6 +404,7 @@ dialog_select_feed() {
             --ok-label 'Select' \
             --menu 'Please select an action to perform.' 0 0 0 \
             'Posts'       "View all posts in $1" \
+            'Open'        "Open $1's homepage in a browser" \
             'Mark Read'   "Mark all posts in $1 as read" \
             'Mark Unread' "Mark all posts in $1 as unread" \
             'Update'      "Update $1" \
@@ -402,6 +420,9 @@ dialog_select_feed() {
         case "$(cat "$dialog_select_feed_tmpsel")" in
             'Posts')
                 dialog_posts "$1"
+            ;;
+            'Open')
+                dialog_open_feed "$1"
             ;;
             'Mark Read')
                 dialog_mark_read "$1"

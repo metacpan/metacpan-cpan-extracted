@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-# This test was generated with Dist::Zilla::Plugin::Test::MixedScripts v0.2.2.
+# This test was generated with Dist::Zilla::Plugin::Test::MixedScripts v0.2.3.
 
 use Test2::Tools::Basic 1.302200;
 
@@ -29,6 +29,7 @@ my @files = (
     't/11-pod-weaver-section-changes.t',
     't/11-pod-weaver-section-installation.t',
     't/11-pod-weaver-section-requirements.t',
+    't/12-add_prereqs.t',
     't/21-pod-weaver-section-requirements.t'
 );
 

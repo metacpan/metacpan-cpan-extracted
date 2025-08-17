@@ -43,6 +43,8 @@ my %WriteMakefileArgs = (
     "Dist::Zilla::Plugin::PodWeaver" => 0,
     "Dist::Zilla::Stash::PodWeaver" => 0,
     "File::Spec" => 0,
+    "IO::Handle" => 0,
+    "IPC::Open3" => 0,
     "Module::Metadata" => "1.000015",
     "Pod::Markdown" => "3.000",
     "Pod::Markdown::Github" => 0,
@@ -57,7 +59,7 @@ my %WriteMakefileArgs = (
     "utf8" => 0,
     "warnings" => 0
   },
-  "VERSION" => "v0.5.0",
+  "VERSION" => "v0.5.1",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -72,6 +74,8 @@ my %FallbackPrereqs = (
   "ExtUtils::MakeMaker" => "7.22",
   "File::Spec" => 0,
   "Hash::Ordered" => "0.005",
+  "IO::Handle" => 0,
+  "IPC::Open3" => 0,
   "List::Util" => "1.33",
   "Module::Metadata" => "1.000015",
   "Module::Runtime" => 0,

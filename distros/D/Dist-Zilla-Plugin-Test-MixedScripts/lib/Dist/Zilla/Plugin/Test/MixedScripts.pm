@@ -28,7 +28,7 @@ with
   },
   'Dist::Zilla::Role::PrereqSource';
 
-our $VERSION = 'v0.2.2';
+our $VERSION = 'v0.2.3';
 
 
 has filename => (
@@ -91,7 +91,7 @@ sub gather_files($self) {
         $self->_file_obj(
             Dist::Zilla::File::InMemory->new(
                 name    => $self->filename,
-                content => ${ $self->section_data('__TEST__') },
+                content => $self->section_data('__TEST__')->$*,
             )
         )
     );
@@ -150,7 +150,7 @@ Dist::Zilla::Plugin::Test::MixedScripts - author tests to ensure there is no mix
 
 =head1 VERSION
 
-version v0.2.2
+version v0.2.3
 
 =for stopwords Cushing Etheridge Florian Ragwitz Unicode
 

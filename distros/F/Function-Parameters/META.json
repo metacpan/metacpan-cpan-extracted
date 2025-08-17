@@ -4,7 +4,7 @@
       "Lukas Mai <l.mai@web.de>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -77,6 +77,6 @@
          "web" : "https://codeberg.org/mauke/Function-Parameters"
       }
    },
-   "version" : "2.002005",
+   "version" : "2.002006",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

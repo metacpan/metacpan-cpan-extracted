@@ -1,16 +1,16 @@
-Changes
 ANSI-Encode.png
+AUTHOR
 bin/ansi-encode
-t/00-sample.t
+Changes
+examples/sample.ans
+examples/banner.vt
+HISTORY
 ignore.txt
 lib/Term/ANSIEncode.pm
 Makefile.PL
 MANIFEST
 README.md
+t/00-sample.t
 VERSION
-AUTHOR
-HISTORY
-examples/sample.ans
-examples/banner.vt
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

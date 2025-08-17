@@ -26,7 +26,6 @@ my $schema = {
   components => {
     schemas => {
       Foo => {
-        #'$schema' => [],
         blah => 'unrecognized keyword!',
       },
       Bar => {

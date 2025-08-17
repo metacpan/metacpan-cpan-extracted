@@ -31,6 +31,8 @@ on 'test' => sub {
   requires "Dist::Zilla::Plugin::PodWeaver" => "0";
   requires "Dist::Zilla::Stash::PodWeaver" => "0";
   requires "File::Spec" => "0";
+  requires "IO::Handle" => "0";
+  requires "IPC::Open3" => "0";
   requires "Module::Metadata" => "1.000015";
   requires "Pod::Markdown" => "3.000";
   requires "Pod::Markdown::Github" => "0";
@@ -55,11 +57,15 @@ on 'configure' => sub {
 };
 
 on 'develop' => sub {
+  requires "File::Spec" => "0";
+  requires "IO::Handle" => "0";
+  requires "IPC::Open3" => "0";
   requires "Pod::Coverage::TrustPod" => "0";
   requires "Pod::Wordlist" => "0";
   requires "Software::Security::Policy::Individual" => "0.10";
   requires "Test2::Tools::Basic" => "1.302200";
   requires "Test::CPAN::Changes" => "0.19";
+  requires "Test::CPAN::Meta" => "0";
   requires "Test::CleanNamespaces" => "0.15";
   requires "Test::DistManifest" => "0";
   requires "Test::EOF" => "0";
@@ -79,6 +85,7 @@ on 'develop' => sub {
   requires "Test::Spelling" => "0.17";
   requires "Test::TrailingSpace" => "0.0203";
   requires "Test::Vars" => "0";
+  requires "Test::Version" => "1";
   requires "strict" => "0";
   requires "warnings" => "0";
 };

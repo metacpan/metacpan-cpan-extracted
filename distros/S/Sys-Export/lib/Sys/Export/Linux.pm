@@ -1,28 +1,31 @@
 package Sys::Export::Linux;
 
 # ABSTRACT: Export subsets of a Linux system
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 
 use v5.26;
 use warnings;
 use experimental qw( signatures );
 use parent 'Sys::Export::Unix';
+use Cwd 'abs_path';
 use Carp;
 
 
 sub add_passwd($self, %options) {
    # If the dst_userdb hasn't been created, create it by filtering the src_userdb by which
    # group and user ids have been seen during the export.
-   my $db= $self->dst_userdb;
-   unless ($db) {
-      $db= Sys::Export::Unix::UserDB->new(
-         auto_import => ($self->{src_userdb} //= $self->_build_src_userdb),
-      );
-      $db->group($_) for keys $self->dst_gid_used->%*;
-      $db->user($_) for keys $self->dst_uid_used->%*;
-   };
-   $db->save($self);
+   my $db= $self->dst_userdb // Sys::Export::Unix::UserDB->new(
+      auto_import => ($self->{src_userdb} //= $self->_build_src_userdb),
+   );
+   $db->group($_) for keys $self->dst_gid_used->%*;
+   $db->user($_) for keys $self->dst_uid_used->%*;
+   $db->save(\my %contents);
+   my $etc_path= $options{etc_path} // 'etc';
+   $self->add([ dir755  => "$etc_path", { uid => 0, gid => 0 }]);
+   $self->add([ file644 => "$etc_path/passwd", $contents{passwd}, { uid => 0, gid => 0 }]);
+   $self->add([ file600 => "$etc_path/shadow", $contents{shadow}, { uid => 0, gid => 0 }]);
+   $self->add([ file644 => "$etc_path/group",  $contents{group},  { uid => 0, gid => 0 }]);
    $self;
 }
 
@@ -34,12 +37,10 @@ sub add_localtime($self, $tz_name) {
       # zoneinfo is exported, and includes this timezone, so symlink to it
       $self->add([ sym => "etc/localtime" => "../usr/share/zoneinfo/$tz_name" ]);
    }
-   elsif (my ($path)= grep -e $_,
-      $self->src_abs . "usr/share/zoneinfo/$tz_name",
-      "/usr/share/zoneinfo/$tz_name"
-   ) {
-      # resolve symliks down to actual file
-      $path= abs_path($path) || croak "Broken symlink at $path";
+   elsif (defined (my $src_path= $self->_src_abs_path("usr/share/zoneinfo/$tz_name"))) {
+      $self->add([ file644 => 'etc/localtime', { data_path => $self->src_abs . $src_path } ]);
+   }
+   elsif (defined (my $path= abs_path("/usr/share/zoneinfo/$tz_name"))) {
       $self->add([ file644 => 'etc/localtime', { data_path => $path } ]);
    }
    else {
@@ -86,7 +87,7 @@ See C<Sys::Export::Unix> for the list of core attributes and methods.
 
 =head2 add_passwd
 
-  $exporter->add_passwd; # no options yet
+  $exporter->add_passwd(%options)
 
 This method writes the Linux password files ( C<< /etc/passwd >>, C<< /etc/group >>,
 C<< /etc/shadow >> ) either according to the contents of L<Sys::Export::Unix/dst_userdb>
@@ -105,6 +106,16 @@ If you actually just want to copy the entire source user database files, you cou
   $exporter->add(qw( /etc/passwd /etc/group /etc/shadow ));
 
 so that pattern doesn't need a special helper method.
+
+Options:
+
+=over
+
+=item etc_path
+
+Specify an alternative directory to '/etc' to write the files
+
+=back
 
 =head2 add_localtime
 
@@ -125,7 +136,7 @@ can't find this timezone in any of those locations, it dies.
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 AUTHOR
 

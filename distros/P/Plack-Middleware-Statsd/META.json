@@ -34,7 +34,10 @@
       },
       "develop" : {
          "requires" : {
-            "Dist::Zilla::Plugin::UsefulReadme" : "v0.4.2",
+            "Dist::Zilla::Plugin::UsefulReadme" : "v0.4.3",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
             "Pod::Coverage::TrustPod" : "0",
             "Pod::Markdown::Github" : "0",
             "Software::Security::Policy::Individual" : "0.10",
@@ -42,6 +45,7 @@
             "Test2::Tools::Basic" : "1.302200",
             "Test2::V0" : "0",
             "Test::CPAN::Changes" : "0.19",
+            "Test::CPAN::Meta" : "0",
             "Test::CVE" : "0.11",
             "Test::DistManifest" : "0",
             "Test::EOF" : "0",
@@ -50,6 +54,7 @@
             "Test::Kwalitee" : "1.21",
             "Test::MinimumVersion" : "0",
             "Test::MixedScripts" : "v0.3.0",
+            "Test::Mojibake" : "0",
             "Test::More" : "0.96",
             "Test::NoTabs" : "0",
             "Test::Perl::Critic" : "0",
@@ -59,6 +64,7 @@
             "Test::Portability::Files" : "0",
             "Test::TrailingSpace" : "0.0203",
             "Test::Vars" : "0",
+            "Test::Version" : "1",
             "strict" : "0"
          }
       },
@@ -89,6 +95,8 @@
             "File::Spec" : "0",
             "HTTP::Request" : "0",
             "HTTP::Request::Common" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
             "Module::Metadata" : "1.000015",
             "Plack::Builder" : "0",
             "Plack::MIME" : "0",
@@ -110,7 +118,7 @@
    "provides" : {
       "Plack::Middleware::Statsd" : {
          "file" : "lib/Plack/Middleware/Statsd.pm",
-         "version" : "v0.8.1"
+         "version" : "v0.8.2"
       }
    },
    "release_status" : "stable",
@@ -125,7 +133,7 @@
          "web" : "https://github.com/robrwo/Plack-Middleware-Statsd"
       }
    },
-   "version" : "v0.8.1",
+   "version" : "v0.8.2",
    "x_authority" : "cpan:RRWO",
    "x_generated_by_perl" : "v5.34.3",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",

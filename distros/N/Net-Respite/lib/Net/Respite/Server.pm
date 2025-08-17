@@ -640,7 +640,7 @@ sub __tail_error {
 
 sub __ps {
     my $name = shift->server_name;
-    my $out = join '', grep {$_ =~ $name && $_ !~ /\b(?:$$|watch|ps)\b/} `ps auwx`;
+    my $out = join '', grep {$_ =~ $name && $_ !~ /\b(?:watch|ps)\b/} `ps auwx`;
     warn $out || "No processes found\n";
 }
 

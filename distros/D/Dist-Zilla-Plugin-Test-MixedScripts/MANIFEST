@@ -22,6 +22,7 @@ xt/author/cve.t
 xt/author/eof.t
 xt/author/eol.t
 xt/author/minimum-version.t
+xt/author/mojibake.t
 xt/author/no-tabs.t
 xt/author/pod-coverage.t
 xt/author/pod-linkcheck.t

@@ -1,5 +1,12 @@
 Revision history for Plack-Middleware-Statsd
 
+v0.8.2    2025-08-16 12:11:31+01:00 Europe/London
+  [Documentation]
+  - Removed redundant section.
+
+  [Tests]
+  - Added more author tests.
+
 v0.8.1    2025-08-07 13:09:52+01:00 Europe/London
   [Documentation]
   - Added SUPPORT section and merged BUGS into it.

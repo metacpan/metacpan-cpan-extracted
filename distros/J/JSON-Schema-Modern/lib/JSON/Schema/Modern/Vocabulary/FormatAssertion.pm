@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::FormatAssertion;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Format-Assertion vocabulary
 
-our $VERSION = '0.616';
+our $VERSION = '0.617';
 
 use 5.020;
 use Moo;
@@ -202,7 +202,7 @@ sub keywords ($class, $spec_version) {
   sub _get_default_format_validation ($class, $state, $format) {
     # all core formats are of type string (so far)
     return { type => 'string', sub => $formats->{$format} }
-      if grep $format eq $_, $formats_by_spec_version{$state->{spec_version}}->@*
+      if grep $format eq $_, $formats_by_spec_version{$state->{specification_version}}->@*
         and $formats->{$format};
   }
 }
@@ -278,7 +278,7 @@ JSON::Schema::Modern::Vocabulary::FormatAssertion - Implementation of the JSON S
 
 =head1 VERSION
 
-version 0.616
+version 0.617
 
 =head1 DESCRIPTION
 

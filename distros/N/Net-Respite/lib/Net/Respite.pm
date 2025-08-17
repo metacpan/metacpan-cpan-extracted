@@ -1,6 +1,6 @@
 package Net::Respite;
 
-our $VERSION = 0.23;
+our $VERSION = 0.25;
 
 1;
 

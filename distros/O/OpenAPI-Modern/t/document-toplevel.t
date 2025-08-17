@@ -17,7 +17,6 @@ use Helper;
 subtest 'basic construction' => sub {
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
-    evaluator => my $js = JSON::Schema::Modern->new,
     schema => {
       openapi => OAS_VERSION,
       info => {
@@ -37,7 +36,6 @@ subtest 'basic construction' => sub {
         specification_version => 'draft2020-12',
         vocabularies => bag(map 'JSON::Schema::Modern::Vocabulary::'.$_,
           qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated OpenAPI)),
-        configs => {},
       },
     },
     'the document itself is recorded as a resource',
@@ -49,7 +47,6 @@ subtest 'top level document checks' => sub {
     sub {
       JSON::Schema::Modern::Document::OpenAPI->new(
         canonical_uri => 'http://localhost:1234/api',
-        evaluator => JSON::Schema::Modern->new,
         schema => 1,
       );
     },
@@ -60,7 +57,6 @@ subtest 'top level document checks' => sub {
 
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
-    evaluator => my $js = JSON::Schema::Modern->new,
     schema => {},
   );
   cmp_result(
@@ -84,7 +80,6 @@ subtest 'top level document checks' => sub {
 
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
-    evaluator => $js,
     schema => {
       openapi => OAS_VERSION,
       info => {},
@@ -117,7 +112,6 @@ ERRORS
 
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
-    evaluator => $js,
     schema => {
       openapi => '2.1.3',
     },
@@ -145,7 +139,6 @@ ERRORS
 
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
-    evaluator => $js,
     schema => {
       openapi => OAS_VERSION,
       info => {
@@ -181,7 +174,6 @@ ERRORS
 
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
-    evaluator => $js,
     schema => {
       openapi => OAS_VERSION,
       info => {
@@ -220,7 +212,6 @@ ERRORS
 
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
-    evaluator => $js,
     schema => {
       openapi => OAS_VERSION,
       info => {
@@ -251,6 +242,7 @@ ERRORS
   );
 
 
+  my $js = JSON::Schema::Modern->new;
   $js->add_schema({
     '$id' => 'https://metaschema/with/wrong/spec',
     '$vocabulary' => {
@@ -326,7 +318,6 @@ ERRORS
         document => shallow($doc),
         vocabularies => bag(map 'JSON::Schema::Modern::Vocabulary::'.$_,
           qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated OpenAPI)),
-        configs => {},
       },
       # the oas vocabulary, and the dialect that uses it
       DEFAULT_DIALECT() => {
@@ -336,11 +327,11 @@ ERRORS
         document => ignore,
         vocabularies => bag(map 'JSON::Schema::Modern::Vocabulary::'.$_,
           qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated)),
-        configs => {},
         anchors => {
           meta => {
             path => '',
             canonical_uri => str(DEFAULT_DIALECT),
+            dynamic => 1,
           },
         },
       },
@@ -351,11 +342,11 @@ ERRORS
         document => ignore,
         vocabularies => bag(map 'JSON::Schema::Modern::Vocabulary::'.$_,
           qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated)),
-        configs => {},
         anchors => {
           meta => {
             path => '',
             canonical_uri => str(OAS_VOCABULARY),
+            dynamic => 1,
           },
         },
       },
@@ -409,7 +400,6 @@ ERRORS
         specification_version => 'draft2020-12',
         document => shallow($doc),
         vocabularies => [ map 'JSON::Schema::Modern::Vocabulary::'.$_, qw(Core Applicator) ],
-        configs => {},
       },
       'https://mymetaschema' => {
         canonical_uri => str('https://mymetaschema'),
@@ -418,7 +408,6 @@ ERRORS
         document => shallow($mymetaschema_doc),
         vocabularies => bag(map 'JSON::Schema::Modern::Vocabulary::'.$_,
           qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated)),
-        configs => {},
       },
     }),
     'dialect resources are properly stored on the evaluator',
@@ -462,7 +451,6 @@ ERRORS
         specification_version => 'draft2020-12',
         document => shallow($doc),
         vocabularies => [ map 'JSON::Schema::Modern::Vocabulary::'.$_, qw(Core Applicator) ],
-        configs => {},
       },
       'https://mymetaschema' => {
         canonical_uri => str('https://mymetaschema'),
@@ -471,7 +459,6 @@ ERRORS
         document => shallow($mymetaschema_doc),
         vocabularies => bag(map 'JSON::Schema::Modern::Vocabulary::'.$_,
           qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated)),
-        configs => {},
       },
       $doc->metaschema_uri => {
         canonical_uri => str($doc->metaschema_uri),
@@ -480,11 +467,11 @@ ERRORS
         document => ignore,
         vocabularies => bag(map 'JSON::Schema::Modern::Vocabulary::'.$_,
           qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated)),
-        configs => {},
         anchors => {
           meta => {
             path => '/$defs/schema',
             canonical_uri => str($doc->metaschema_uri.'#/$defs/schema'),
+            dynamic => 1,
           },
         },
       },
@@ -519,7 +506,6 @@ ERRORS
         specification_version => 'draft2020-12',
         vocabularies => bag(map 'JSON::Schema::Modern::Vocabulary::'.$_,
           qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated OpenAPI)),
-        configs => {},
       },
     },
     'resource is properly indexed',
@@ -552,7 +538,6 @@ ERRORS
         specification_version => 'draft2020-12',
         vocabularies => bag(map 'JSON::Schema::Modern::Vocabulary::'.$_,
           qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated OpenAPI)),
-        configs => {},
       },
     },
     'resource is properly indexed',
@@ -562,7 +547,6 @@ ERRORS
   # relative $self, relative original_uri - $self is resolved with original_uri
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'foo/api.json',
-    evaluator => $js,
     schema => {
       openapi => OAS_VERSION,
       info => {
@@ -585,7 +569,6 @@ ERRORS
         specification_version => 'draft2020-12',
         vocabularies => bag(map 'JSON::Schema::Modern::Vocabulary::'.$_,
           qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated OpenAPI)),
-        configs => {},
       },
     },
     'resource is properly indexed',
@@ -595,7 +578,6 @@ ERRORS
   # absolute $self, relative original_uri - $self is used as is
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'foo/api.json',
-    evaluator => $js,
     schema => {
       openapi => OAS_VERSION,
       info => {
@@ -618,7 +600,6 @@ ERRORS
         specification_version => 'draft2020-12',
         vocabularies => bag(map 'JSON::Schema::Modern::Vocabulary::'.$_,
           qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated OpenAPI)),
-        configs => {},
       },
     },
     'resource is properly indexed',

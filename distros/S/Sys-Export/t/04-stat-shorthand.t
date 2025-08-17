@@ -13,8 +13,8 @@ subtest explicit_permissions => sub {
                                     { mode => S_IFREG|0644, name => "test", data_path => "test2" } ],
       [ [ sym777  => "foo",  "bar"  ], { mode => S_IFLNK|0777, name => "foo",  data => "bar"  } ],
       [ [ dir755  => "bin"          ], { mode => S_IFDIR|0755, name => "bin",  } ],
-      [ [ blk644  => "sda",  [8,0]  ], { mode => S_IFBLK|0644, name => "sda",  major => 8, minor => 0 } ],
-      [ [ chr644  => "null", "1,3"  ], { mode => S_IFCHR|0644, name => "null", major => 1, minor => 3 } ],
+      [ [ blk644  => "sda",  [8,0]  ], { mode => S_IFBLK|0644, name => "sda",  rdev_major => 8, rdev_minor => 0 } ],
+      [ [ chr644  => "null", "1,3"  ], { mode => S_IFCHR|0644, name => "null", rdev_major => 1, rdev_minor => 3 } ],
       [ [ fifo644 => "queue"        ], { mode => S_IFIFO|0644, name => "queue" } ],
       [ [ sock644 => "service.sock" ], { mode => S_IFSOCK|0644,name => "service.sock" } ],
    );
@@ -35,8 +35,8 @@ subtest umask_permissions => sub {
                                     { mode => S_IFREG|0644, name => "test", data_path => "test2" } ],
       [ [ sym  => "foo",  "bar"  ], { mode => S_IFLNK|0777, name => "foo",  data => "bar"  } ],
       [ [ dir  => "bin"          ], { mode => S_IFDIR|0755, name => "bin",  } ],
-      [ [ blk  => "sda",  [8,0]  ], { mode => S_IFBLK|0644, name => "sda",  major => 8, minor => 0 } ],
-      [ [ chr  => "null", "1,3"  ], { mode => S_IFCHR|0644, name => "null", major => 1, minor => 3 } ],
+      [ [ blk  => "sda",  [8,0]  ], { mode => S_IFBLK|0644, name => "sda",  rdev_major => 8, rdev_minor => 0 } ],
+      [ [ chr  => "null", "1,3"  ], { mode => S_IFCHR|0644, name => "null", rdev_major => 1, rdev_minor => 3 } ],
       [ [ fifo => "queue"        ], { mode => S_IFIFO|0644, name => "queue" } ],
       [ [ sock => "service.sock" ], { mode => S_IFSOCK|0644,name => "service.sock" } ],
    );

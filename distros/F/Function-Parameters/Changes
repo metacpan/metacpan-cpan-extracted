@@ -1,7 +1,14 @@
 Revision history for Function-Parameters
 
+2.002006  2025-08-16
+          - Fix a parse-time memory leak with undef or default initializers
+            ('fun ($x = undef)' or 'fun ($ =)'). This leak mostly manifests as
+            noise from memory checkers because non-leaked ops aren't freed
+            anyway while perl is still running.
+          - Update bugtracker info in README.
+
 2.002005  2025-01-19
-          - When debugging, skip over invisible (generated) parameter
+          - When debugging (perl -d), skip over invisible (generated) parameter
             initialization code even if single-step mode is active.
           - Move repository and bugtracker to <https://codeberg.org>.
 

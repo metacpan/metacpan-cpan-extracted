@@ -1,3 +1,18 @@
+2025-08-16 - Version 0.003
+  - API Changes:
+    - Much more flexible DWIM on ->add method, such as specifying name and
+      src_path and still getting automatic stat attributes added.
+      Whether or not it rewrites now depends solely on presence of src_path.
+    - Add missing accessors for ::Unix
+       - on_collision
+       - src_userdb
+       - dst_userdb
+    - Sys::Export -dst parameter may now be an arrayref [CPIO => $filename]
+      for easy access to specify cpio output.
+  - Bug fixes:
+    - Too numerous to list.  But especially Linux->add_passwd and
+      ->add_localtime are working as intended now.
+
 2025-08-07 - Version 0.002
   - API Changes:
     - New Sys::Export::Unix->src_find is like File::Find specifically for

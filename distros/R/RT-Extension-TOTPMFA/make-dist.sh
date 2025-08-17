@@ -41,7 +41,7 @@ resources:
 version: '${VERSION}'
 x_module_install_rtx_version: '0.44'
 x_requires_rt: 5.0.0
-x_rt_too_new: 5.2.0
+x_rt_too_new: 6.1.0
 EOF
 
 set -e

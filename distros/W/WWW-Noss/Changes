@@ -1,5 +1,13 @@
 Revision history for noss (WWW::Noss)
 
+1.07  Aug 16 2025
+  - Add help command: Print documentation for a specific command.
+  - Change formatting of usage message.
+  - Change manual formatting.
+  - New behavior for the open command: When not given a post ID to open, open's
+    the feed's homepage URL instead.
+  - Fix documentation errors.
+
 1.06  Jul 25 2025
   - Drastically speed up list command.
   - Drastically speed up update and reload commands.
@@ -15,7 +23,7 @@ Revision history for noss (WWW::Noss)
     performance improvements and drastically simplify its dependency tree.
   - Add dependency to Time::Piece.
   - Improved reading Atom post content elements.
-  - export no longer exports shel:// and file:// feeds by default. This can be
+  - export no longer exports shell:// and file:// feeds by default. This can be
     re-enabled with the --export-special option.
   - Added --list-limit option to list command: Limit the number of posts that
     are returned by the list command.

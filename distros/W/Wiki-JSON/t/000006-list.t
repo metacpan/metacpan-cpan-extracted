@@ -11,77 +11,70 @@ use_ok 'Wiki::JSON';
 
 # I refuse to implement multiple levels of lists.
 {
-    my $parsed = Wiki::JSON->new->parse(q/hola:
+    my $parsed = Wiki::JSON->new->parse(
+        q/hola:
 * hola<br>hola
 * adios
 * hey
-end of list/);
+end of list/
+    );
 
-#        print Data::Dumper::Dumper($parsed);
+    #        print Data::Dumper::Dumper($parsed);
     is_deeply $parsed, [
         'hola:',
         {
-            type => 'unordered_list',
+            type   => 'unordered_list',
             output => [
                 {
-                    type => 'list_element',
-                    output => [
-                        'hola',
-                        'hola',
-                    ],
+                    type   => 'list_element',
+                    output => [ 'hola', 'hola', ],
                 },
                 {
-                    type => 'list_element',
-                    output => [
-                        'adios',
-                    ],
+                    type   => 'list_element',
+                    output => [ 'adios', ],
                 },
                 {
-                    type => 'list_element',
-                    output => [
-                        'hey',
-                    ],
+                    type   => 'list_element',
+                    output => [ 'hey', ],
                 },
 
             ],
         },
         'end of list',
-    ], 'Simple list test';
+      ],
+      'Simple list test';
 }
 
 {
-    my $parsed = Wiki::JSON->new->parse(q/hola:
+    my $parsed = Wiki::JSON->new->parse(
+        q/hola:
 * hola<br>hola
 * adios
 * hey '''bold'''
-end of list/);
+end of list/
+    );
 
-#        print Data::Dumper::Dumper($parsed);
+#            print Data::Dumper::Dumper($parsed);
     is_deeply $parsed, [
         'hola:',
         {
-            type => 'unordered_list',
+            type   => 'unordered_list',
             output => [
                 {
-                    type => 'list_element',
-                    output => [
-                        'hola',
-                        'hola',
-                    ],
+                    type   => 'list_element',
+                    output => [ 'hola', 'hola', ],
                 },
                 {
-                    type => 'list_element',
-                    output => [
-                        'adios',
-                    ],
+                    type   => 'list_element',
+                    output => [ 'adios', ],
                 },
                 {
-                    type => 'list_element',
+                    type   => 'list_element',
                     output => [
                         'hey ',
                         {
-                            type => 'bold',
-                            output => [ 'bold' ],
+                            type   => 'bold',
+                            output => ['bold'],
                         }
                     ],
                 },
@@ -89,43 +82,78 @@ end of list/);
             ],
         },
         'end of list',
-    ], 'List works fine with bold';
+      ],
+      'List works fine with bold';
 }
 
 {
-    my $parsed = Wiki::JSON->new->parse(q/hola:
+    my $parsed = Wiki::JSON->new->parse(
+        q/hola:
 * hola<br>hola
 * adios
-* hey/);
+* hey/
+    );
 
-#        print Data::Dumper::Dumper($parsed);
+    #        print Data::Dumper::Dumper($parsed);
     is_deeply $parsed, [
         'hola:',
         {
-            type => 'unordered_list',
+            type   => 'unordered_list',
             output => [
                 {
-                    type => 'list_element',
-                    output => [
-                        'hola',
-                        'hola',
-                    ],
+                    type   => 'list_element',
+                    output => [ 'hola', 'hola', ],
                 },
                 {
-                    type => 'list_element',
-                    output => [
-                        'adios',
-                    ],
+                    type   => 'list_element',
+                    output => [ 'adios', ],
                 },
                 {
-                    type => 'list_element',
-                    output => [
-                        'hey',
-                    ],
+                    type   => 'list_element',
+                    output => [ 'hey', ],
                 },
 
             ],
         },
-    ], 'A list can end being just a list';
+      ],
+      'A list can end being just a list';
+}
+
+{
+    my $parsed = Wiki::JSON->new->parse(
+        q/* one
+* three [[Xinadi Legend]] xd
+* two/
+    );
+    print Data::Dumper::Dumper($parsed);
+    is_deeply $parsed, [
+        {
+            type   => 'unordered_list',
+            output => [
+                {
+                    type   => 'list_element',
+                    output => [ 'one', ],
+                },
+                {
+                    type   => 'list_element',
+                    output => [
+                        'three ',
+                        {
+                            type  => 'link',
+                            title => 'Xinadi Legend',
+                            link  => 'Xinadi Legend',
+                        },
+                        ' xd',
+                    ],
+                },
+                {
+                    type   => 'list_element',
+                    output => [ 'two', ],
+                },
+
+            ],
+        },
+      ],
+      'Parsing embedded elements works fine';
 }
 done_testing();

@@ -26,7 +26,7 @@ my %WriteMakefileArgs = (
     "Cucumber::Messages" => ">= v22.0.0, < v29.0.0",
     "Data::UUID" => 0,
     "Getopt::Long" => "2.58",
-    "List::Util" => "1.69"
+    "List::Util" => "1.70"
   },
   "TEST_REQUIRES" => {
     "Path::Class" => 0,
@@ -34,7 +34,7 @@ my %WriteMakefileArgs = (
     "Test2::V0" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "33.1.0",
+  "VERSION" => "34.0.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -47,7 +47,7 @@ my %FallbackPrereqs = (
   "Cucumber::Messages" => ">= v22.0.0, < v29.0.0",
   "Data::UUID" => 0,
   "Getopt::Long" => "2.58",
-  "List::Util" => "1.69",
+  "List::Util" => "1.70",
   "Path::Class" => 0,
   "Test2::Tools::ClassicCompare" => 0,
   "Test2::V0" => 0,

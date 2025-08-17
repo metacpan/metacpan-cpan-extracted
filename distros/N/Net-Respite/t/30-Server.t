@@ -11,49 +11,56 @@ ok(defined &setup_test_server, "setup_test_server imported");
 ok(eval { require config }, "fake config module ready");
 ok(eval { require Bam }, "fake Bam module ready");
 
-my ($client, $server) = setup_test_server({
+my ($client, $server, $resp, $e);
+($client, $server) = setup_test_server({
     service  => 'bam', # necessary because we directly subclassed Net::Respite::Server
     api_meta => 'Bam',    # ditto
     client_utf8_encoded => 1,
     flat => 1,
     no_ssl => 1,
+    brand => 'me1',
     # no password
 });
 
-my ($client2, $server2) = setup_test_server({
+ok($client, "Got client no pass port $client->{port}");
+ok($server, "Got server no pass port $server->{port}");
+
+$resp = eval { $client->foo };
+is($resp->{'BAR'}, 1, 'Call api method foo, server no pass, client no pass') or diag(explain($resp));
+
+$client->{'pass'} = 'fred';
+$resp = eval { $client->foo };
+$e = $@;
+is($resp->{'BAR'}, 1, 'Call api method foo, server no pass, client uses pass') or diag(explain([$e,$resp]));
+
+$client = $server = undef; # blow away the old server
+
+
+($client, $server) = setup_test_server({
     service  => 'bam', # necessary because we directly subclassed Net::Respite::Server
     api_meta => 'Bam',    # ditto
     client_utf8_encoded => 1,
     flat => 1,
     no_ssl => 1,
     allow_auth_basic => 1,
+    brand => 'me2',
     pass => 'fred',
 });
 
-ok($client, 'Got client');
-ok($server, 'Got server');
-ok($client2, 'Got client2');
-ok($server2, 'Got server2');
+ok($client, "Got client uses pass port $client->{port}");
+ok($server, "Got server uses pass port $server->{port}");
 
-my $resp = eval { $client->foo };
-is($resp->{'BAR'}, 1, 'Call api method foo, server no pass, client no pass') or diag(explain($resp));
-
-$client->{'pass'} = 'fred';
-$resp = eval { $client->foo };
-my $e = $@;
-is($resp->{'BAR'}, 1, 'Call api method foo, server no pass, client uses pass') or diag(explain([$e,$resp]));
-
-$resp = eval { $client2->foo };
+$resp = eval {$client->foo };
 $e = $@;
 is($resp->{'BAR'}, 1, 'Call api method foo, server uses pass, client uses pass') or diag(explain([$e,$resp]));
 
-delete $client2->{'pass'};
-$resp = eval { $client2->foo };
+delete $client->{'pass'};
+$resp = eval { $client->foo };
 $e = $@;
 cmp_ok($e, '=~', 'Invalid client auth', 'Call api method foo, server uses pass, client no pass') or diag(explain([$e,$resp]));
 
-$client2->{'pass'} = 'not correct';
-$resp = eval { $client2->foo };
+$client->{'pass'} = 'not correct';
+$resp = eval { $client->foo };
 $e = $@;
 cmp_ok($e, '=~', 'Invalid client auth', 'Call api method foo, server uses pass, client bad pass') or diag(explain([$e,$resp]));
 
@@ -92,7 +99,7 @@ __END__
 
 =head1 NAME
 
-Net::Respite::Base.pm.t
+30-Server.t
 
 =head1 DEVEL
 

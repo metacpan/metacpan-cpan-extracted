@@ -1,4 +1,4 @@
-package Function::Parameters 2.002005;
+package Function::Parameters 2.002006;
 
 use v5.14.0;
 use warnings;
@@ -1796,11 +1796,8 @@ L<C<perldoc>|perldoc> command.
 You can also look for information at
 L<https://metacpan.org/pod/Function::Parameters>.
 
-To see a list of open bugs, visit
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=Function-Parameters>.
-
-To report a new bug, send an email to
-C<bug-Function-Parameters [at] rt.cpan.org>.
+To see a list of open bugs or report a new bug, visit
+L<https://codeberg.org/mauke/Function-Parameters/issues>.
 
 =head1 SEE ALSO
 

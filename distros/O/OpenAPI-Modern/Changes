@@ -1,5 +1,9 @@
 Revision history for OpenAPI-Modern
 
+0.091     2025-08-16 20:52:35Z
+          - various internal changes to adjust for changes in
+            JSON::Schema::Modern 0.617
+
 0.090     2025-08-04 00:57:05Z
           - update bundled schemas to their latest versions
 

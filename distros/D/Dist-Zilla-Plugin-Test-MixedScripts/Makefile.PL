@@ -37,9 +37,9 @@ my %WriteMakefileArgs = (
     "namespace::autoclean" => 0
   },
   "TEST_REQUIRES" => {
+    "Data::Dumper" => "2.154",
     "File::Spec" => 0,
     "File::pushd" => 0,
-    "FindBin" => 0,
     "Module::Metadata" => "1.000015",
     "Test2::V0" => 0,
     "Test::DZil" => 0,
@@ -50,7 +50,7 @@ my %WriteMakefileArgs = (
     "utf8" => 0,
     "warnings" => 0
   },
-  "VERSION" => "v0.2.2",
+  "VERSION" => "v0.2.3",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -58,6 +58,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Data::Dumper" => "2.154",
   "Data::Section" => "0.004",
   "Dist::Zilla::File::InMemory" => 0,
   "Dist::Zilla::Role::FileFinderUser" => 0,
@@ -68,7 +69,6 @@ my %FallbackPrereqs = (
   "ExtUtils::MakeMaker" => "7.22",
   "File::Spec" => 0,
   "File::pushd" => 0,
-  "FindBin" => 0,
   "List::Util" => "1.45",
   "Module::Metadata" => "1.000015",
   "Moose" => 0,

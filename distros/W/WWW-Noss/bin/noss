@@ -12,9 +12,39 @@ $noss->run;
 
 noss - RSS/Atom feed reader and aggregator
 
-=head1 USAGE
+=head1 SYNOPSIS
 
-  noss [global options] command [command options] [arguments] ...
+B<noss> command syntax:
+
+  noss <command> [options] [arguments]
+
+Commands:
+
+  update    Fetch and reload feeds
+  reload    Reload cached feeds
+  read      Read post in pager
+  open      Open feed or post URL in browser
+  cat       Print post to stdout
+  list      List and filter posts
+  unread    List unread posts
+  mark      Mark posts as read or unread
+  post      View post information
+  feeds     List feeds
+  groups    List feed groups
+  clean     Clean up obsolete files and data
+  export    Export feed list as OPML
+  import    Import feed list from OPML
+  help      View documentation for a noss command
+
+Global options:
+
+  -c|--config=<file>       Specify path to configuration file
+  -D|--data=<dir>          Specify path to data directory
+  -f|--feeds=<file>        Specify path to feeds file
+  -z|--time-format=<fmt>   Specify default strftime format for time strings
+
+  -h|--help      Print usage message
+  -v|--version   Print version and copyright information
 
 =head1 DESCRIPTION
 
@@ -37,7 +67,7 @@ distinguish posts from each other.
 Posts in B<noss> are identified via two pieces of information: the name of the
 feed they're in and their unique ID within that feed. When reading a post,
 like with either the C<read> or C<open> command, you would typically supply
-the command with the feed name and post ID to refer to that specifc post.
+the command with the feed name and post ID to refer to that specific post.
 
   # Read post #1 in the PlanetDebian feed
   noss read PlanetDebian 1
@@ -46,7 +76,7 @@ To determine the feed and ID of a post, the C<list> command can be used to query
 the post database for a list of posts that conform to whatever search parameters
 are provided (like title containing a string, content matching a regex, being
 tagged with a specific tag, etc.). The C<post> command can also be used to query
-more detailed post information than the C<list> command provides for a specifc
+more detailed post information than the C<list> command provides for a specific
 post. Consult the documentation for the C<list> and C<post> commands in the
 L</"COMMANDS"> section of this manual.
 
@@ -277,19 +307,16 @@ available to a feed and group are available to C<default>.
 
 =head1 COMMANDS
 
-=over 4
+=head2 update
 
-=item B<update> [I<feed>|I<group>] ...
+  noss update [feed|group] ...
 
 Fetch and reload feeds. Whenever a new feed is added to B<noss>'s feed list,
 this command can be used to load it into B<noss>'s database.
 
 If no specific feeds or groups are specified, all feeds are updated.
 
-See the L</"CAVEATS"> section of this manual for some warnings to keep in mind
-when using this command.
-
-C<update> has the following options:
+B<update> has the following options:
 
 =over 4
 
@@ -299,7 +326,7 @@ Only update feeds that are not present in the database.
 
 =item B<--non-defaults>
 
-When running C<update> with no arguments, update all feeds, even those that
+When running B<update> with no arguments, update all feeds, even those that
 are configured to not be updated by default.
 
 =item B<--downloads>=I<num>
@@ -337,7 +364,7 @@ Can also be configured via the C<timeout> configuration field.
 
 =item B<--proxy>=[I<protocol>://]I<host>[:I<port>]
 
-Specify the proxy server to use. If I<protocol> is not specified, defaults
+Specify the proxy server to use. If a protocol is not specified, defaults
 as a C<http://> proxy. If no port number is specified, defaults to C<1000>.
 
 Can also be configured via the C<proxy> configuration field.
@@ -350,20 +377,24 @@ Can also be configured via the C<proxy_user> configuration field.
 
 =back
 
-=item B<reload> [I<feed>|I<group>] ...
+=head2 reload
+
+  noss reload [feed|group] ...
 
 Reload cached feeds. Useful for when you make changes to a feed's configuration
 and want B<noss> to recognize the changes. If no feeds are specified, reloads
 all cached feeds.
 
-C<reload> has no unique options.
+B<reload> has no unique options.
 
-=item B<read> I<feed> [I<post>]
+=head2 read
 
-Read the specified post's contents in I<feed> via a pager. If I<post> is not
-specified, reads the latest unread post in I<feed>.
+  noss read <feed> [post]
 
-C<read> has the following options:
+Read the specified post's contents from the specified feed via a pager. If no
+specific post is provided, the latest unread post in the feed is selected.
+
+B<read> has the following options:
 
 =over 4
 
@@ -495,17 +526,21 @@ contents.
 
 =back
 
-=item B<cat> I<feed> [I<post>]
+=head2 cat
+
+  noss cat <feed> [post]
 
 Prints the specified post to F<stdout>. This command is basically just an alias
-to C<read --stdout>. If I<post> is not specified, prints the latest unread post.
+to C<read --stdout>. If no post is specified, prints the latest unread post.
 
 This command has the same options as the C<read> command.
 
-=item B<open> I<feed> [I<post>]
+=head2 open
 
-Open the specified post's link in I<feed> via a web browser. If I<post> is not
-specified, opens the latest unread post in I<feed>.
+  noss open <feed> <post>
+  noss open <feed>
+
+Open the URL of the specified feed or post in a web browser.
 
 C<open> has the following options:
 
@@ -513,7 +548,7 @@ C<open> has the following options:
 
 =item B<--browser>=I<command>
 
-Use the specified command as the browser to use for opening the post's URL.
+Use the specified command as the browser to use for opening the URL.
 Defaults to L<lynx(1)>.
 
 Can also be configured via the C<BROWSER> environment variable and
@@ -525,7 +560,9 @@ Do not mark post as read.
 
 =back
 
-=item B<list> [I<feed>|I<group>] ...
+=head2 list
+
+  noss list [feed|group] ...
 
 List posts from specified feeds. When listing posts, B<noss> displays the
 post's read status, the name of the feed
@@ -534,15 +571,15 @@ listed on a single line, which should make it easy to process in a pipeline.
 
 If no feeds or groups are specified, all feeds are searched.
 
-C<list> has the following options:
+B<list> has the following options:
 
 =over 4
 
 =item B<--title>=I<target>
 
-Only list posts containing the string I<target> in their title. If I<target>
-starts and ends with a forward slash (C</>), C<list> will interpret it as a
-Perl regex and search for posts whose titles match the given regex.
+Only list posts containing the specified target string in their title. If the
+string starts and ends with a forward slash (C</>), B<list> will interpret it
+as a Perl regex and search for posts whose titles match the given regex.
 
 =item B<--tag>=I<tag>
 
@@ -556,10 +593,10 @@ and C<unread>.
 
 =item B<--content>=I<target>
 
-Only list posts containing the string I<target> in their HTML content. If
-I<target> starts and ends with a forward slash (C</>), C<list> will interpret
+Only list posts containing the specified target string in their HTML content. If
+the string starts and ends with a forward slash (C</>), B<list> will interpret
 it as a Perl regex and search for posts that match the given regex. This
-option can be used multiple times to specify multiple diffrent targets.
+option can be used multiple times to specify multiple different targets.
 
 =item B<--sort>=I<method>
 
@@ -606,15 +643,18 @@ for how formatting works and list of valid formatting codes.
 
 =back
 
-=item B<unread> [I<feed>|I<group>] ...
+=head2 unread
 
-Similar to the C<list> command, except only shows unread posts.
+  noss unread [feed|group] ...
 
-This command has the same options as the C<list> command.
+Similar to the list command, except only shows unread posts.
 
-=item B<mark> I<status> I<feed>|I<group> [I<post>] ...
+This command has the same options as the list command.
 
-=item B<mark> --all I<status>
+=head2 mark
+
+  noss mark <status> <feed|group> [posts] ...
+  noss mark --all <status>
 
 Mark the given posts in the specified feeds as C<read> or C<unread>.
 
@@ -633,7 +673,9 @@ Mark all posts in every feed as read or unread.
 
 =back
 
-=item B<post> I<feed> I<post>
+=head2 post
+
+  noss post <feed> <post>
 
 View the post information for the specified post.
 
@@ -644,12 +686,14 @@ This command has the following options:
 =item B<--post-format>=I<fmt>
 
 Specify the format to use for printing post information. Consult the
-documentation for the C<read> command's C<--read-format> option for information
+documentation for the read command's C<--read-format> option for information
 on how formatting works and a list of valid formatting codes.
 
 =back
 
-=item B<feeds> [I<feed>|I<group>] ...
+=head2 feeds
+
+   noss feeds [feed|group] ...
 
 View feed information for specified feeds and/or groups. If no feeds are
 specified, prints information for all feeds.
@@ -665,7 +709,7 @@ Only print feed names, not additional feed info.
 =item B<--feeds-format>=I<fmt>
 
 Specify the format to use for printing feed information. Consult the
-documentation for the C<read> command's C<--read-format> option for information
+documentation for the read command's C<--read-format> option for information
 on how format strings are processed.
 
 The following format codes are available:
@@ -686,7 +730,7 @@ The feed's link.
 
 =item %t
 
-THe feed's title
+The feed's title
 
 =item %u
 
@@ -742,7 +786,9 @@ The same as their post formatting counterparts.
 
 =back
 
-=item B<groups> [I<group>] ...
+=head2 groups
+
+  noss groups [groups] ...
 
 View group information. If no groups are specified, prints information for all
 groups.
@@ -757,13 +803,17 @@ Only print group names, not additional group info.
 
 =back
 
-=item B<clean>
+=head2 clean
+
+  noss clean
 
 Cleans up obsolete cache files and database data.
 
 This command has no unique options.
 
-=item B<export> [I<opml>]
+=head2 export
+
+  noss export [opml]
 
 Export feed list as an OPML file for transferring feed data to another feed
 reader. If no output file is specified, the OPML will be written directly to
@@ -779,12 +829,14 @@ Do not try to generate feed group structures in the exported OPML.
 
 =item B<--export-special>
 
-By default, C<export> does not export feeds that use special B<noss>-specific
-URLs like C<shel://> or C<file://> feeds. This option disables that behavior.
+By default, B<export> does not export feeds that use special B<noss>-specific
+URLs like C<shell://> or C<file://> feeds. This option disables that behavior.
 
 =back
 
-=item B<import> I<opml> [I<json>]
+=head2 import
+
+  noss import <opml> [json]
 
 Import feed list from an OPML file. Will write the feed list as a JSON file
 which can be used by B<noss>. Writes the feed file to I<json> if specified,
@@ -800,7 +852,14 @@ Do no try to import feed groups from the OPML.
 
 =back
 
-=back
+=head2 help
+
+  noss help [command]
+
+Print documentation for the specified command. If no command is specified, the
+B<noss> manual will be printed instead.
+
+This command has no unique options.
 
 =head1 GLOBAL OPTIONS
 
@@ -862,7 +921,7 @@ B<noss> will look for a configuration file in the following locations:
 
 =over 4
 
-=item Path specifed by the C<-c>|C<--config> option
+=item Path specified by the C<-c>|C<--config> option
 
 =item F<C<$NOSS_CONFIG>>
 
@@ -929,8 +988,7 @@ the C<read> command's C<--pager> option.
 
 =item "B<browser>": "I<command>"
 
-The command to use for opening post URLs via the C<open> command. See
-also the C<open> command's C<--browser> option.
+The command to use for opening URLs.
 
 =item "B<sort>": "I<method>"
 
@@ -1022,7 +1080,7 @@ Default pager to use for the C<read> command.
 
 =item BROWSER
 
-Default browser to use for the C<open> command.
+Default browser to use for opening URLs.
 
 =back
 

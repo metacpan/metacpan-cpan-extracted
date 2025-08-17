@@ -20,7 +20,6 @@ my $yamlpp = YAML::PP->new(boolean => 'JSON::PP');
 subtest 'basic document validation' => sub {
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
-    evaluator => my $js = JSON::Schema::Modern->new,
     schema => {
       openapi => OAS_VERSION,
       info => {
@@ -102,10 +101,8 @@ ERRORS
 
   memory_cycle_ok($doc, 'no leaks in the document object');
 
-
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
-    evaluator => $js,
     schema => {
       openapi => OAS_VERSION,
       info => {
@@ -182,7 +179,6 @@ YAML
 
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
-    evaluator => my $js = JSON::Schema::Modern->new,
     schema => $yamlpp->load_string($yaml),
   );
 
@@ -204,7 +200,6 @@ YAML
 
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
-    evaluator => $js = JSON::Schema::Modern->new,
     schema => $yamlpp->load_string($yaml =~ s/operation_id_[a-z]/operation_id_dupe/gr),
   );
 
@@ -243,7 +238,6 @@ ERRORS
 subtest 'bad subschemas' => sub {
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
-    evaluator => my $js = JSON::Schema::Modern->new,
     schema => {
       $yamlpp->load_string(OPENAPI_PREAMBLE)->%*,
       jsonSchemaDialect => DEFAULT_DIALECT,
@@ -291,7 +285,6 @@ ERRORS
 subtest 'identify subschemas and other entities' => sub {
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
-    evaluator => my $js = JSON::Schema::Modern->new,
     schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 components:
   schemas:
@@ -376,7 +369,6 @@ YAML
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
     metaschema_uri => 'https://spec.openapis.org/oas/3.1/schema/latest',  # needed to override $schema
-    evaluator => $js = JSON::Schema::Modern->new,
     schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 components:
   schemas:
@@ -465,7 +457,6 @@ YAML
         specification_version => 'draft2020-12',
         vocabularies => bag(map 'JSON::Schema::Modern::Vocabulary::'.$_,
           qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated OpenAPI)),
-        configs => {},
         anchors => {
           anchor1 => {
             path => '/components/schemas/anchor1',
@@ -483,7 +474,6 @@ YAML
         specification_version => 'draft2020-12',
         vocabularies => bag(map 'JSON::Schema::Modern::Vocabulary::'.$_,
           qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated OpenAPI)),
-        configs => {},
       },
       'http://localhost:1234/gamma' => {
         path => '/components/schemas/beta_schema/not',
@@ -491,7 +481,6 @@ YAML
         specification_version => 'draft2019-09',
         vocabularies => bag(map 'JSON::Schema::Modern::Vocabulary::'.$_,
           qw(Core Applicator Validation FormatAnnotation Content MetaData)), # overridden "$schema" keyword
-        configs => {},
       },
       'http://localhost:1234/parameter1_id' => {
         path => '/components/parameters/my_param1/schema',
@@ -499,7 +488,6 @@ YAML
         specification_version => 'draft2020-12',
         vocabularies => bag(map 'JSON::Schema::Modern::Vocabulary::'.$_,
           qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated OpenAPI)),
-        configs => {},
         anchors => {
           anchor3 => {
             path => '/components/parameters/my_param1/schema/properties/foo',
@@ -513,7 +501,6 @@ YAML
         specification_version => 'draft2020-12',
         vocabularies => bag(map 'JSON::Schema::Modern::Vocabulary::'.$_,
           qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated OpenAPI)),
-        configs => {},
       },
       'http://localhost:1234/pathItem0_param_id' => {
         path => '/components/pathItems/path0/parameters/0/schema',
@@ -521,7 +508,6 @@ YAML
         specification_version => 'draft2020-12',
         vocabularies => bag(map 'JSON::Schema::Modern::Vocabulary::'.$_,
           qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated OpenAPI)),
-        configs => {},
       },
       'http://localhost:1234/pathItem0_get_param_id' => {
         path => '/components/pathItems/path0/get/parameters/0/schema',
@@ -529,7 +515,6 @@ YAML
         specification_version => 'draft2020-12',
         vocabularies => bag(map 'JSON::Schema::Modern::Vocabulary::'.$_,
           qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated OpenAPI)),
-        configs => {},
       },
       'http://localhost:1234/pathItem0_get_requestBody_id' => {
         path => '/components/pathItems/path0/get/requestBody/content/media_type_1/schema',
@@ -537,7 +522,6 @@ YAML
         specification_version => 'draft2020-12',
         vocabularies => bag(map 'JSON::Schema::Modern::Vocabulary::'.$_,
           qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated OpenAPI)),
-        configs => {},
       },
       map +('http://localhost:1234/pathItem0_get_responses'.$_.'_id' => {
         path => '/components/pathItems/path0/get/responses/200/content/media_type_'.$_.'/schema',
@@ -545,7 +529,6 @@ YAML
         specification_version => 'draft2020-12',
         vocabularies => bag(map 'JSON::Schema::Modern::Vocabulary::'.$_,
           qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated OpenAPI)),
-        configs => {},
       }), 2..3,
     },
     'subschema resources are correctly identified in the document',
@@ -617,7 +600,6 @@ YAML
 
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
-    evaluator => my $js = JSON::Schema::Modern->new,
     schema => {
       $yamlpp->load_string(OPENAPI_PREAMBLE)->%*,
       %$servers,
@@ -722,7 +704,6 @@ ERRORS
 subtest 'disallowed fields adjacent to $refs in path-items' => sub {
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
-    evaluator => my $js = JSON::Schema::Modern->new,
     schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo/alpha: {}
@@ -734,7 +715,6 @@ YAML
 
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
-    evaluator => $js,
     schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 components:
   callbacks:

@@ -9,7 +9,7 @@ use LWP::UserAgent;
 
 package RT::Extension::TOTPMFA;
 
-our $VERSION = '0.10';
+our $VERSION = '0.12';
 
 =head1 NAME
 
@@ -523,7 +523,16 @@ sub MFALogin {
 
     }
 
-    $Session->{'TOTPMFAValidUntil'} = time + $Settings->{'Duration'};
+    if (RT::Interface::Web::Session->can('Set')) {
+        # From RT 6 we update the session via a function.
+        RT::Interface::Web::Session::Set(
+            Key   => 'TOTPMFAValidUntil',
+            Value => time + $Settings->{'Duration'}
+        );
+    } else {
+        $Session->{'TOTPMFAValidUntil'} = time + $Settings->{'Duration'};
+    }
+
     return (1, '');
 }
 

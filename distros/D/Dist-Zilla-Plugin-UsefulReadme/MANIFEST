@@ -29,10 +29,13 @@ t/10-stopwords.t
 t/11-pod-weaver-section-changes.t
 t/11-pod-weaver-section-installation.t
 t/11-pod-weaver-section-requirements.t
+t/12-add_prereqs.t
 t/21-pod-weaver-section-requirements.t
 weaver.ini
+xt/00-compile.t
 xt/author/clean-namespaces.t
 xt/author/critic.t
+xt/author/distmeta.t
 xt/author/eof.t
 xt/author/eol.t
 xt/author/minimum-version.t
@@ -44,6 +47,7 @@ xt/author/pod-linkcheck.t
 xt/author/pod-spell.t
 xt/author/pod-syntax.t
 xt/author/portability.t
+xt/author/test-version.t
 xt/etc/perlcritic.rc
 xt/release/cpan-changes.t
 xt/release/dist-manifest.t

@@ -26,6 +26,7 @@ my @files = (
     't/11-pod-weaver-section-changes.t',
     't/11-pod-weaver-section-installation.t',
     't/11-pod-weaver-section-requirements.t',
+    't/12-add_prereqs.t',
     't/21-pod-weaver-section-requirements.t'
 );
 

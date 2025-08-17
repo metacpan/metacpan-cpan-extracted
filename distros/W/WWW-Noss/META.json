@@ -4,7 +4,7 @@
       "Samuel Young <samyoung12788@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
@@ -45,6 +45,7 @@
             "List::Util" : "1.33",
             "POSIX" : "0",
             "Parallel::ForkManager" : "v0.7.6",
+            "Pod::Usage" : "0",
             "Time::Piece" : "0",
             "XML::LibXML" : "1.70",
             "perl" : "5.016"
@@ -69,6 +70,6 @@
          "web" : "https://codeberg.org/1-1sam/noss"
       }
    },
-   "version" : "1.06",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "1.07",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

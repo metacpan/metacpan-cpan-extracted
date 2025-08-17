@@ -1,7 +1,7 @@
 package Sys::Export::Unix::WriteFS;
 
 # ABSTRACT: An export target that writes files to a directory in the host filesystem
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 
 use v5.26;
@@ -45,7 +45,11 @@ sub new {
 sub dst($self)          { $self->{dst} }
 sub dst_abs($self)      { $self->{dst_abs} }
 sub tmp($self)          { $self->{tmp} }
-sub on_collision($self) { $self->{on_collision} }
+
+sub on_collision($self, @value) {
+   $self->{on_collision}= $value[0] if @value;
+   $self->{on_collision}
+}
 
 # a hashref tracking files with link-count higher than 1, so that hardlinks can be preserved.
 # the keys are "$dev:$ino"
@@ -166,7 +170,8 @@ sub _add_file($self, $file) {
       }
    }
    # Record all file inodes in case a delayed hardlink is created by the caller
-   $self->_link_map->{"$file->{dev}:$file->{ino}"}= $dst;
+   $self->_link_map->{"$file->{dev}:$file->{ino}"}= $dst
+      if defined $file->{dev} && defined $file->{ino};
    # The caller may have created data_path within our ->tmp directory.
    # If not, first write the data into a temp file there.
    if (!defined $tmp || substr($tmp, 0, length $self->tmp) ne $self->tmp) {
@@ -453,7 +458,7 @@ to directories since writing the contents of the directory would have changed th
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 AUTHOR
 

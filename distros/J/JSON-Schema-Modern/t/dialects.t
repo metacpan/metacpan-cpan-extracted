@@ -1099,7 +1099,6 @@ subtest '$vocabulary syntax' => sub {
         map 'JSON::Schema::Modern::Vocabulary::'.$_,
           qw(Core Validation FormatAnnotation Applicator Content MetaData Unevaluated),
       ],
-      configs => {},
     },
     'metaschemas are not saved on the resource',
   );
@@ -1322,7 +1321,7 @@ subtest 'custom metaschemas, without custom vocabularies' => sub {
     allOf => [ { '$ref' => 'https://json-schema.org/draft/2019-09/schema' } ],
   });
 
-  cmp_deeply(
+  cmp_result(
     $metaschema_document,
     methods(
       canonical_uri => str('http://localhost:1234/my-meta-schema'),
@@ -1664,7 +1663,7 @@ subtest 'custom metaschemas, with custom vocabularies' => sub {
     { valid => true },
     'validation succeeds because "minimum" never gets run',
   );
-  cmp_deeply(
+  cmp_result(
     $js->{_resource_index}{$id}{document},
     methods(
       canonical_uri => str($id),
@@ -1683,7 +1682,6 @@ subtest 'custom metaschemas, with custom vocabularies' => sub {
         map 'JSON::Schema::Modern::Vocabulary::'.$_,
           qw(Core Applicator),
       ],
-      configs => {},
     },
     'determined vocabularies to use for this schema',
   );

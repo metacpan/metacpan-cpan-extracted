@@ -1,4 +1,5 @@
 #!/usr/bin/env perl
+# vim: set ts=8 sts=2 sw=2 tw=100 et ft=perl :
 use strict;
 use warnings;
 use 5.020;
@@ -20,16 +21,18 @@ use JSON::Schema::Modern::Document::OpenAPI;
 # see https://spec.openapis.org/#openapi-specification-schemas for the latest links
 
 my %files = (
-  # metaschema for json schemas contained within openapi documents
+  # metaschema for json schemas contained within openapi documents:
+  # standard json schema (presently draft2020-12) + OAD vocabulary
   'oas/dialect/base.schema.json' => JSON::Schema::Modern::Document::OpenAPI::DEFAULT_DIALECT,
 
-  # vocabulary definition
+  # OAD vocabulary definition
   'oas/meta/base.schema.json' => JSON::Schema::Modern::Document::OpenAPI::OAS_VOCABULARY,
 
-  # openapi document schema + custom json schema dialect
+  # openapi document schema that forces the use of the json schema dialect (no $schema overrides
+  # permitted)
   'oas/schema-base.json' => JSON::Schema::Modern::Document::OpenAPI::DEFAULT_BASE_METASCHEMA,
 
-  # the main openapi document schema
+  # the main openapi document schema, with permissive (unvalidated) json schemas
   'oas/schema.json' => JSON::Schema::Modern::Document::OpenAPI::DEFAULT_METASCHEMA,
 
   'oas/LICENSE' => 'https://raw.githubusercontent.com/OAI/OpenAPI-Specification/main/LICENSE',
@@ -40,6 +43,8 @@ my $web_url = 'https://spec.openapis.org/';
 my $ua = Mojo::UserAgent->new;
 say "# fetching $web_url" if $ENV{DEBUG};
 my $res = $ua->get($web_url)->result;
+die "Failed to fetch $web_url", $res->code, " ", $res->message if $res->is_error;
+
 my %new_schemas = ();  # keys are existing OAS schema URIs, defined above in %files
 
 # check the website and find all files that are newer than what we've got
@@ -49,20 +54,19 @@ foreach my $e ($res->dom->find('a[href]')->each) {
 
   $link = Mojo::URL->new($web_url)->path($link)->to_string; # normalize slashes
 
-  if (my ($existing) = grep +($link =~ m{^\Q${\ substr($_, 0, -10) }\E}), grep !/github/, values %files) {
+  if (my ($existing) = grep !/github/ && $link =~ m{^\Q${\substr($_, 0, -10)}\E}, values %files) {
     $new_schemas{$existing} //= [];
     push $new_schemas{$existing}->@*, $link if $existing lt $link;
   }
 }
 
 # identify outdated schema files, and find all references to them in the repository
-if (my @outdated_schemas = grep +($new_schemas{$_}->@*), sort keys %new_schemas) {
+if (my @outdated_schemas = grep $new_schemas{$_}->@*, sort keys %new_schemas) {
   warn join("\n", 'these outdated files should be updated (fix the hash in update-schemas and re-run):',
     map +("$_ -> ".join(', ', sort $new_schemas{$_}->@*)), @outdated_schemas), "\n\n";
 
   my $re = join('|', map "\Q$_\E", @outdated_schemas);
-  my @outdated_files = grep
-    +(path($_)->slurp_utf8 =~ $re && !exists $files{s!share/!!r}), split /\n/, `git ls-files`;
+  my @outdated_files = grep !exists $files{s!share/!!r} && path($_)->slurp_utf8 =~ $re, split /\n/, `git ls-files`;
   warn join("\n", 'all other files containing references to outdated files:', @outdated_files), "\n\n";
 
   warn join("\n", 'run this repeatedly in order to find bad references:',
@@ -84,7 +88,7 @@ foreach my $target (keys %files) {
 
   $target = path('share', $target);
   $target->parent->mkpath;
-  $target->spew_raw(my $content = $res->body);
+  $target->spew_utf8(my $content = $res->text);
   $checksums{$target} = md5_hex($content);
 
   next if $target =~ /LICENSE$/;

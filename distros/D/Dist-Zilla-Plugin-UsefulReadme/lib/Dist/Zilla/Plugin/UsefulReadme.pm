@@ -34,7 +34,7 @@ use experimental qw( lexical_subs postderef signatures );
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.5.0';
+our $VERSION = 'v0.5.1';
 
 sub mvp_multivalue_args { qw( regions sections ) }
 
@@ -206,6 +206,13 @@ has regions => (
     }
 );
 
+
+has add_prereqs => (
+    is      => 'ro',
+    isa     => Bool,
+    default => 1,
+);
+
 around dump_config => sub( $orig, $self ) {
     my $config = $self->$orig;
     $config->{ +__PACKAGE__ } = {
@@ -237,6 +244,8 @@ sub gather_files($self) {
 }
 
 sub register_prereqs($self) {
+
+    return unless $self->add_prereqs;
 
     if ( my $prereqs = $CONFIG{ $self->type }{prereqs} ) {
         $self->zilla->register_prereqs(
@@ -443,7 +452,7 @@ Dist::Zilla::Plugin::UsefulReadme - generate a README file with the useful bits
 
 =head1 VERSION
 
-version v0.5.0
+version v0.5.1
 
 =head1 SYNOPSIS
 
@@ -606,6 +615,11 @@ The C<readme> region is I<not> included since that has a special meaning to indi
 the F<README> file.
 
 This was added in v0.2.0.
+
+=head2 add_prereqs
+
+Add this plugin and modules additional modules needed for the L</type> or L</sections> as developer requirements.
+Defaults to true.
 
 =for Pod::Coverage BUILD after_build after_release gather_files mvp_aliases mvp_multivalue_args prune_files register_prereqs
 

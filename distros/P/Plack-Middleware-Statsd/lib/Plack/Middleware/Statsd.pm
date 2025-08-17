@@ -22,7 +22,7 @@ use Try::Tiny;
 
 use experimental qw/ postderef signatures /;
 
-our $VERSION = 'v0.8.1';
+our $VERSION = 'v0.8.2';
 
 # Note: You may be able to omit the client if there is a client
 # defined in the environment hash at C<psgix.monitor.statsd>, and the
@@ -207,7 +207,7 @@ Plack::Middleware::Statsd - send statistics to statsd
 
 =head1 VERSION
 
-version v0.8.1
+version v0.8.2
 
 =head1 SYNOPSIS
 
@@ -499,12 +499,6 @@ L<HTTP::Status>, then the metrics may not be logged for that reponse.
 This does not add a wrapper around the C<psgix.informational>
 callback.  If you are making use of it in your code, then you will
 need to add metrics logging yourself.
-
-=head1 SUPPORT FOR OLDER PERL VERSIONS
-
-Since v0.7.0, the this module requires Perl v5.20 or later.
-
-Future releases may only support Perl versions released in the last ten years.
 
 =head1 SEE ALSO
 

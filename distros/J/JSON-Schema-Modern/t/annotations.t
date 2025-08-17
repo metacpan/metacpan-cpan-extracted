@@ -52,7 +52,7 @@ my $initial_state = {
   data_path => '',
   schema_path => '',
   traversed_schema_path => '',
-  spec_version => 'draft2019-09',
+  specification_version => 'draft2019-09',
   vocabularies => [
     (map load_module($_),
       map 'JSON::Schema::Modern::Vocabulary::'.$_, qw(Applicator Validation MetaData)),
@@ -1276,18 +1276,6 @@ subtest 'collect_annotations and unevaluated keywords' => sub {
   my $doc_items = $js->add_schema('prefixItems.json', { prefixItems => [ true ] });
 
   my $doc_properties = $js->add_schema('properties.json', { properties => { foo => true } });
-
-  cmp_result(
-    $js->_get_resource('prefixItems.json')->{configs},
-    {},
-    'items.json does not need collect_annotations => 1 to evaluate itself',
-  );
-
-  cmp_result(
-    $js->_get_resource('properties.json')->{configs},
-    {},
-    'properties.json does not need collect_annotations => 1 to evaluate itself',
-  );
 
   cmp_result(
     $js->evaluate(

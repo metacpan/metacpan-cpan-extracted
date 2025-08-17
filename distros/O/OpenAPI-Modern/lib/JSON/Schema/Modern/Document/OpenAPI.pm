@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Document::OpenAPI;
 # ABSTRACT: One OpenAPI v3.1 document
 # KEYWORDS: JSON Schema data validation request response OpenAPI
 
-our $VERSION = '0.090';
+our $VERSION = '0.091';
 
 use 5.020;
 use utf8;
@@ -104,9 +104,8 @@ sub traverse ($self, $evaluator, $config_override = {}) {
     errors => [],
     evaluator => $evaluator,
     identifiers => {},
-    configs => {},
     # note that this is the JSON Schema specification version, not OpenAPI
-    spec_version => $evaluator->SPECIFICATION_VERSION_DEFAULT,
+    specification_version => $evaluator->SPECIFICATION_VERSION_DEFAULT,
     vocabularies => [],
     subschemas => [],
     depth => 0,
@@ -136,6 +135,7 @@ sub traverse ($self, $evaluator, $config_override = {}) {
       },
     },
   };
+
   my $top_result = $evaluator->evaluate(
     $schema, $top_schema,
     {
@@ -170,8 +170,8 @@ sub traverse ($self, $evaluator, $config_override = {}) {
     # these Schema Objects."
     $json_schema_dialect //= DEFAULT_DIALECT;
 
-    # traverse an empty schema with this metaschema uri to confirm it is valid
-    # (and add an entry in the evaluator's _metaschema_vocabulary_classes)
+    # traverse an empty schema with this metaschema uri to confirm it is valid, and add an entry in
+    # the evaluator's _metaschema_vocabulary_classes
     my $check_metaschema_state = $evaluator->traverse({}, {
       metaschema_uri => $json_schema_dialect,
       initial_schema_uri => $self->canonical_uri->clone->fragment('/jsonSchemaDialect'),
@@ -184,7 +184,7 @@ sub traverse ($self, $evaluator, $config_override = {}) {
       return $state;
     }
 
-    $state->@{qw(spec_version vocabularies)} = $check_metaschema_state->@{qw(spec_version vocabularies)};
+    $state->@{qw(specification_version vocabularies)} = $check_metaschema_state->@{qw(specification_version vocabularies)};
     $self->_set_json_schema_dialect($json_schema_dialect);
 
     $self->_set_metaschema_uri($self->_dynamic_metaschema_uri($json_schema_dialect, $evaluator))
@@ -194,9 +194,8 @@ sub traverse ($self, $evaluator, $config_override = {}) {
   $state->{identifiers}{$state->{initial_schema_uri}} = {
     path => '',
     canonical_uri => $state->{initial_schema_uri},
-    specification_version => $state->{spec_version},
+    specification_version => $state->{specification_version},
     vocabularies => $state->{vocabularies}, # reference, not copy
-    configs => {},
   };
 
   # evaluate the document against its metaschema to find any errors, to identify all schema
@@ -448,8 +447,8 @@ sub _traverse_schema ($self, $state) {
     my $new = $subschema_state->{identifiers}{$new_uri};
 
     if (not is_equal(
-        { canonical_uri => $new->{canonical_uri}.'', map +($_ => $new->{$_}), qw(path specification_version vocabularies configs) },
-        { canonical_uri => $existing->{canonical_uri}.'', map +($_ => $existing->{$_}), qw(path specification_version vocabularies configs) })) {
+        { canonical_uri => $new->{canonical_uri}.'', map +($_ => $new->{$_}), qw(path specification_version vocabularies) },
+        { canonical_uri => $existing->{canonical_uri}.'', map +($_ => $existing->{$_}), qw(path specification_version vocabularies) })) {
       ()= E({ %$state, schema_path => $new->{path} },
         'duplicate canonical uri "%s" found (original at path "%s")',
         $new_uri, $existing->{path});
@@ -471,8 +470,10 @@ sub _traverse_schema ($self, $state) {
   }
 }
 
-# given a jsonSchemaDialect uri, generate a new schema that wraps the standard OAD schema
+# Given a jsonSchemaDialect uri, generate a new schema that wraps the standard OAD schema
 # to set the jsonSchemaDialect value for the #meta dynamic reference.
+# This metaschema does not allow subschemas to select their own $schema; for that, you
+# should construct your own, based on DEFAULT_BASE_METASCHEMA.
 sub _dynamic_metaschema_uri ($self, $json_schema_dialect, $evaluator) {
   $json_schema_dialect .= '';
   my $dialect_uri = 'https://custom-dialect.example.com/' . md5_hex($json_schema_dialect);
@@ -524,7 +525,7 @@ JSON::Schema::Modern::Document::OpenAPI - One OpenAPI v3.1 document
 
 =head1 VERSION
 
-version 0.090
+version 0.091
 
 =head1 SYNOPSIS
 

@@ -32,11 +32,8 @@ SUPPORT AND DOCUMENTATION
     You can also look for information at
     <https://metacpan.org/pod/Function::Parameters>.
 
-    To see a list of open bugs, visit
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Function-Parameters>.
-
-    To report a new bug, send an email to "bug-Function-Parameters [at]
-    rt.cpan.org".
+    To see a list of open bugs or report a new bug, visit
+    <https://codeberg.org/mauke/Function-Parameters/issues>.
 
 COPYRIGHT & LICENSE
 

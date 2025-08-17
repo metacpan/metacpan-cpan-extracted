@@ -2,7 +2,7 @@ package WWW::Noss;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 use Cwd;
 use Getopt::Long qw(GetOptionsFromArray);
@@ -12,6 +12,7 @@ use File::Spec;
 use File::Temp qw(tempfile);
 use List::Util qw(max);
 use POSIX qw(strftime);
+use Pod::Usage;
 
 use JSON;
 
@@ -25,58 +26,10 @@ use WWW::Noss::Lynx qw(lynx_dump);
 use WWW::Noss::OPML;
 use WWW::Noss::TextToHtml qw(escape_html);
 
-$0 = basename($0);
-
 my $PRGNAM = 'noss';
 my $PRGVER = $VERSION;
 
-# TODO: At some point, switch to Cpanel::JSON::XS
-# TODO: Add help command
 # TODO: Command to view unread post information? (what feeds are unread, how many unread, etc.)
-# TODO: Simplify config reading code
-
-my $HELP = <<"HERE";
-Usage:
-  $0 [global options] cmd [cmd options] [args] ...
-
-Commands:
-  update    Fetch and reload feeds
-  reload    Reload cached feeds
-  read      Read post in pager
-  open      Open post link in browser
-  cat       Print post to stdout
-  list      List and filter posts
-  unread    List unread posts
-  mark      Mark posts as read/unread
-  post      View post information
-  feeds     List feeds
-  groups    List feed groups
-  clean     Clean up obsolete files and database data
-  export    Export feed list as OPML
-  import    Import feed list from OPML
-
-Global Options:
-  -c|--config=<file>        Specify path to configuration file
-  -D|--data=<dir>           Specify path to data directory
-  -f|--feeds=<file>         Specify path to feeds file
-  -z|--time-format=I<fmt>   Specify default strftime format for time strings
-
-  -h|--help      Print this usage message
-  -v|--version   Print $PRGNAM version/copyright info
-
-Consult the $PRGNAM(1) manual for more extensive documentation.
-HERE
-
-my $VER_MSG = <<"HERE";
-$PRGNAM - $PRGVER
-
-Copyright (C) 2025 Samuel Young
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-HERE
 
 my %COMMANDS = (
     'update'   => \&update,
@@ -93,6 +46,7 @@ my %COMMANDS = (
     'clean'    => \&clean,
     'export'   => \&export_opml,
     'import'   => \&import_opml,
+    'help'     => \&help,
 );
 
 my $DOT_LOCAL  = File::Spec->catfile(home, '.local/share');
@@ -250,6 +204,44 @@ my $DEFAULT_FEED_FMT = <<'HERE';
   Unread:  %U/%p
 
 HERE
+
+sub _HELP  {
+
+    my ($fh, $rt) = @_;
+
+    pod2usage(
+        -exitval => 'NOEXIT',
+        -verbose => 99,
+        -sections => 'SYNOPSIS',
+        -output => \$fh,
+    );
+
+    if (defined $rt) {
+        exit $rt;
+    }
+
+}
+
+sub _VER {
+
+    my ($fh, $rt) = @_;
+
+    print { $fh } <<"HERE";
+$PRGNAM - $PRGVER
+
+Copyright (C) 2025 Samuel Young
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+HERE
+
+    if (defined $rt) {
+        exit $rt;
+    }
+
+}
 
 sub _set_z_fmt {
 
@@ -1215,37 +1207,37 @@ sub open_post {
 
     my $id = shift @{ $self->{ Args } };
 
-    my $post;
+    my $url;
 
-    if (defined $id) {
-        $post = $self->{ DB }->post($feed_name, $id);
-        unless (defined $post) {
-            die "'$feed_name:$id' does not exist\n";
+    if (not defined $id) {
+        my $feed_info = $self->{ DB }->feed($feed_name);
+        if (not defined $feed_info) {
+            die "$feed_name does not exist in noss's database, perhaps try running the update command?\n";
+        }
+        $url = $feed_info->{ link };
+        if (not defined $url) {
+            die "$feed_name does not have a homepage URL\n";
         }
     } else {
-        $post = $self->{ DB }->first_unread($feed_name);
-        unless (defined $post) {
-            say "$feed_name has no unread posts, please manually specify a post ID";
-            return 1;
+        my $post = $self->{ DB }->post($feed_name, $id);
+        if (not defined $post) {
+            die "'$feed_name:$id' does not exist\n";
         }
-        unless (defined $post->{ link }) {
-            die "First unread post in $feed_name ($post->{ nossid }) has no post link, please manually specify a post ID\n";
+        $url = $post->{ link };
+        if (not defined $url) {
+            die "Cannot open $feed_name:$id: Has no post URL\n";
         }
     }
 
-    unless (defined $post->{ link }) {
-        die "Cannot open $feed_name:$post->{ nossid }: Has no post link\n";
-    }
-
-    system "$self->{ Browser } $post->{ link }";
+    system "$self->{ Browser } $url";
 
     unless ($? >> 8 == 0) {
-        die "Failed to open $post->{ link } with $self->{ Browser }\n";
+        die "Failed to open $url with $self->{ Browser }\n";
     }
 
-    unless ($self->{ NoMark }) {
-        $self->{ DB }->mark('read', $feed_name, $post->{ nossid })
-            or die "Failed to mark '$feed_name:$post->{ nossid }' as read";
+    if (defined $id and not $self->{ NoMark }) {
+        $self->{ DB }->mark('read', $feed_name, $id)
+            or die "Failed to mark '$feed_name:$id' as read";
         $self->{ DB }->commit;
     }
 
@@ -1302,9 +1294,8 @@ sub look {
         return 1;
     }
 
-    # TODO: Only calculate this stuff if we're not using list-format
     my $idlen   = length($self->{ DB }->largest_id(@feeds) // 0);
-    my $feedlen = max( map { length } @feeds) // 1;
+    my $feedlen = max(map { length } @feeds) // 1;
 
     my $fmt = $self->{ ListFmt } // ("%s %-$feedlen" . "f %$idlen" ."i  %t");
     my $fmtsub = _fmt($fmt, \%POST_FMT_CODES);
@@ -1669,6 +1660,42 @@ sub import_opml {
 
 }
 
+sub help {
+
+    my ($self) = @_;
+
+    my $cmd = shift @{ $self->{ Args } };
+
+    if (not defined $cmd) {
+        pod2usage(
+            -exitval => 'NOEXIT',
+            -verbose => 99,
+            -sections => [
+                'NAME', 'SYNOPSIS', 'DESCRIPTION', 'COMMANDS',
+                'GLOBAL OPTIONS', 'CONFIGURATION', 'ENVIRONMENT'
+            ],
+            -output  => \*STDOUT,
+        );
+        return 1;
+    }
+
+    $cmd = lc $cmd;
+
+    if (not exists $COMMANDS{ $cmd }) {
+        die "'$cmd' is not a command\n";
+    }
+
+    pod2usage(
+        -exitval  => 'NOEXIT',
+        -verbose  => 99,
+        -sections => "COMMANDS/$cmd",
+        -output   => \*STDOUT,
+    );
+
+    return 1;
+
+}
+
 sub init {
 
     my ($class, @argv) = @_;
@@ -1784,14 +1811,13 @@ sub init {
         'no-groups'       => \$self->{ NoGroups },
         'export-special'  => \$self->{ ExportSpec },
         # misc
-        'help|h'    => sub { print $HELP;    exit 0 },
-        'version|v' => sub { print $VER_MSG; exit 0 },
-    ) or die $HELP;
+        'help|h'    => sub { _HELP(*STDOUT, 0) },
+        'version|v' => sub { _VER(*STDOUT, 0)  },
+    ) or _HELP(*STDERR, 1);
 
     bless $self, $class;
 
-    $self->{ Cmd } = shift @argv
-        // die $HELP;
+    $self->{ Cmd } = shift @argv or _HELP(*STDERR, 0);
 
     unless (exists $COMMANDS{ $self->{ Cmd } }) {
         die "'$self->{ Cmd }' is not a valid command\n";
@@ -2001,6 +2027,10 @@ Method implementing the C<export> command.
 =item $noss->import_opml()
 
 Method implementing the C<import> command.
+
+=item $noss->help()
+
+Method implementing the C<help> command.
 
 =back
 

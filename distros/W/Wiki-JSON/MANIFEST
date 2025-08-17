@@ -1,5 +1,7 @@
 Build.PL
+Changes
 lib/Wiki/JSON.pm
+lib/Wiki/JSON/Parser.pm
 LICENSE
 MANIFEST			This list of files
 META.json
@@ -15,4 +17,3 @@ t/000006-list.t
 t/000007-url.t
 t/000008-images.t
 try.wiki
-Changes

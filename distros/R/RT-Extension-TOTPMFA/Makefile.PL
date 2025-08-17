@@ -14,7 +14,7 @@ requires('Crypt::CBC');
 requires('LWP::UserAgent');
 
 requires_rt '5.0.0';
-rt_too_new '5.2.0';
+rt_too_new '6.1.0';
 
 sign;
 WriteAll;

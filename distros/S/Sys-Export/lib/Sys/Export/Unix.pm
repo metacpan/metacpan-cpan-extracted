@@ -1,7 +1,7 @@
 package Sys::Export::Unix;
 
 # ABSTRACT: Export subsets of a UNIX system
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 
 use v5.26;
@@ -10,6 +10,7 @@ use experimental qw( signatures );
 use Carp qw( croak carp );
 use Cwd qw( abs_path );
 use Scalar::Util qw( blessed looks_like_number );
+use List::Util qw( max );
 use Sys::Export qw( :isa :stat_modes :stat_tests );
 use File::Temp ();
 use POSIX ();
@@ -33,6 +34,15 @@ sub new {
    defined $attrs{dst} or croak "Require 'dst' attribute";
    if (isa_export_dst $attrs{dst}) {
       $attrs{_dst}= $attrs{dst};
+   } elsif (isa_array $attrs{dst}) {
+      my @spec= @{$attrs{dst}};
+      my $type= shift @spec;
+      if (uc $type eq 'CPIO') {
+         require Sys::Export::CPIO;
+         $attrs{_dst}= Sys::Export::CPIO->new(@spec);
+      } else {
+         croak "Unknown -dst type '$type'";
+      }
    } else {
       my $dst_abs= abs_path($attrs{dst} =~ s,(?<=[^/])$,/,r)
          or croak "dst directory '$attrs{dst}' does not exist";
@@ -50,6 +60,14 @@ sub new {
       if $attrs{_dst}->can('tmp');
    # otherwise use system tmp dir
    $attrs{tmp} //= File::Temp->newdir;
+
+   # Upgrade src_userdb and dst_userdb if provided as hashrefs
+   for (qw( src_userdb dst_userdb )) {
+      if (defined $attrs{$_} && !isa_userdb($attrs{$_})) {
+         require Sys::Export::Unix::UserDB;
+         $attrs{$_}= Sys::Export::Unix::UserDB->new($attrs{$_});
+      }
+   }
 
    my $self= bless \%attrs, $class;
 
@@ -75,6 +93,8 @@ sub src_path_set($self) { $self->{src_path_set} //= {} }
 sub dst_path_set($self) { $self->{dst_path_set} //= {} }
 sub dst_uid_used($self) { $self->{dst_uid_used} //= {} }
 sub dst_gid_used($self) { $self->{dst_gid_used} //= {} }
+sub src_userdb($self)   { $self->{src_userdb} }
+sub dst_userdb($self)   { $self->{dst_userdb} }
 
 
 sub path_rewrite_regex($self) {
@@ -95,6 +115,12 @@ sub _elf_interpreters($self) { $self->{elf_interpreters} //= {} }
 
 sub DESTROY($self, @) {
    $self->finish if $self->{_delayed_apply_stat};
+}
+
+
+sub on_collision($self, @value) {
+   $self->{on_collision}= $value[0] if @value;
+   $self->{on_collision}
 }
 
 
@@ -134,7 +160,14 @@ sub _build_log_fn($self, $dest) {
 
 sub _log_action($self, $verb, $src, $dst, @notes) {
    if ($self->{_log_info}) {
-      $self->{_log_info}->(sprintf "%3s %-20s -> %s", $verb, $src, $dst);
+      # Track the width of the previous 10 filenames to provide easy-to-read consistent indenting
+      my $widths= ($self->{_log_name_widths} //= []);
+      unshift @$widths, length($src);
+      pop @$widths if @$widths > 10;
+      my $width= max(24, @$widths);
+      # Then round width to a multiple of 8
+      $width= ($width + 7) & ~7;
+      $self->{_log_info}->(sprintf "%3s %-*s -> %s", $verb, $width, $src, $dst);
       $self->{_log_info}->(sprintf "     %s", $_) for @notes;
    }
 }
@@ -165,7 +198,7 @@ sub _has_rewrites($self) {
 #   * readlink fails
 # Un-intuitively, this returns a string without a leading '/' because that's what I need below.
 sub _chroot_abs_path($self, $root, $path) {
-   my @base= split '/', $root;
+   my @base= $root eq '/'? ('') : split '/', $root;
    my @abs= @base;
    my @parts= grep length && $_ ne '.', split '/', $path;
    my $lim= 256;
@@ -196,6 +229,13 @@ sub _chroot_abs_path($self, $root, $path) {
 
 sub _src_abs_path($self, $path) {
    $self->_chroot_abs_path($self->{src_abs}, $path);
+}
+sub _src_parent_abs_path($self, $path) {
+   # Determine the final path component, ignoring '.'
+   my @path= grep length && $_ ne '.', split '/', $path;
+   return $path[0] // '' unless @path > 1;
+   my $parent= $self->_src_abs_path(join '/', @path[0 .. $#path - 1]);
+   return defined $parent? "$parent/$path[-1]" : undef;
 }
 
 
@@ -243,6 +283,7 @@ sub rewrite_group($self, $src, $dst) {
 
 sub _build_src_userdb($self) {
    # The default source UserDB pulls from src/etc/passwd and auto_imports users from the host
+   require Sys::Export::Unix::UserDB;
    my $udb= Sys::Export::Unix::UserDB->new(auto_import => 1);
    $udb->load($self->src_abs . 'etc')
       if -f $self->src_abs . 'etc/passwd';
@@ -251,6 +292,7 @@ sub _build_src_userdb($self) {
 
 sub _build_dst_userdb($self) {
    # The default dest UserDB uses any dst/etc/passwd and auto_imports users from src_userdb
+   require Sys::Export::Unix::UserDB;
    my $udb= Sys::Export::Unix::UserDB->new(
       auto_import => ($self->{src_userdb} //= $self->_build_src_userdb)
    );
@@ -281,56 +323,52 @@ sub add {
       } elsif (isa_array $next) {
          %file= Sys::Export::expand_stat_shorthand(@$next);
       } else {
-         $next =~ s,^/,,;
-         next unless length $next; # suppress exporting '/', if that happens for some reason
-         @file{qw( dev ino mode nlink uid gid rdev size atime mtime ctime )}= lstat($self->{src_abs}.$next)
-            or croak "lstat '$self->{src_abs}$next': $!";
-         $file{src_path}= $next;
+         %file= ( src_path => $next );
       }
       $self->{_log_debug}->("Exporting".(defined $file{src_path}? " $file{src_path}" : '').(defined $file{name}? " to $file{name}":''))
          if $self->{_log_debug};
       # Translate src to dst if user didn't supply a 'name'
-      if (!defined $file{name}) {
+      if (!defined $file{name} || !defined $file{mode}) {
          my $src_path= $file{src_path};
-         defined $src_path or croak "Require 'name' (or 'src_path' to derive name)";
-
-         if (defined $file{uid} && defined $file{gid}) {
-            # Remap the UID/GID if that feature was requested
-            @file{'uid','gid'}= $self->get_dst_uid_gid(@file{'uid','gid'}, " in source filesystem at '$src_path'")
-               if $self->{_user_rewrite_map} || $self->{_group_rewrite_map};
-         }
-         defined $file{mode}
-            or croak "'mode' is required";
-         # If $src_path is itself a symlink, we want to export this name, and also the thing
-         # it references.
-         if (S_ISLNK($file{mode})) {
-            # resolve symlinks in the path leading up to this symlink
-            my $parent= $src_path =~ s,[^/]+$,,r;
-            $src_path= $self->_src_abs_path($parent) . ($src_path =~ m,(/[^/]+)$,)[0]
-               if length $parent;
-            # add this symlink target to the paths to be exported
-            my $target= readlink($self->{src_abs}.$src_path);
-            $target =~ s,/\./,/,g; # path cleanup.  Leave .. but eliminate referenbces to . directory
-            $target =~ s,^\./,,;
-            my $full_target= $target =~ m,^/,? $target : $parent . $target;
-            $self->{_log_debug}->("Symlink to '$target', queueing '$full_target'") if $self->{_log_debug};
-            unshift @add, $full_target;
-         } else {
-            # Resolve symlinks within src/ to get the true identity of this file
-            my $abs= $self->_src_abs_path($src_path);
-            defined $abs or croak "Can't resolve absolute path of '$src_path'";
-            $self->{_log_debug}->("Resolved to '$abs'") if $self->{_log_debug} && $abs ne $src_path;
-            $src_path= $abs;
-         }
+         defined $src_path or croak(defined $file{mode}? "Require src_path to determine 'mode'" : "Require 'name' (or 'src_path' to derive name)");
          # ignore repeat requests
-         if (exists $self->{src_path_set}{$src_path}) {
+         if (exists $self->{src_path_set}{$src_path} && !defined $file{name}) {
             $self->{_log_debug}->("  (already exported '$src_path')") if $self->{_log_debug};
             next;
          }
-         $file{src_path}= $src_path;
-         $file{data_path}= $self->{src_abs} . $src_path;
-         $file{name}= $self->get_dst_for_src($next);
-         $self->{src_path_set}{$next}= $file{name};
+         # Need to immediately abs-path the parent dir of this path in case src_path follows
+         # symlinks through absolute paths, e.g. "/usr/bin/mount", if /usr/bin is a symlink to
+         # "/bin" rather than "../bin" it will fail whenever ->src is not pointed to '/'.
+         my $real_src_path= $file{real_src_path} // $self->_src_parent_abs_path($src_path);
+         if (!defined $real_src_path) {
+            $self->{_log_debug}->("Couldn't resolve real path for '$src_path'") if $self->{_log_debug};
+         } elsif ($real_src_path ne $src_path) {
+            $self->{_log_debug}->("Resolved to '$real_src_path'") if $self->{_log_debug};
+            # ignore repeat requests
+            if (exists $self->{src_path_set}{$real_src_path}) {
+               $self->{src_path_set}{$src_path}= $self->{src_path_set}{$real_src_path};
+               $self->{_log_debug}->("  (already exported '$real_src_path')") if $self->{_log_debug};
+               next;
+            }
+         }
+         # If mode wasn't supplied, get it from src filesystem
+         if (!defined $file{mode}) {
+            my %stat;
+            @stat{qw( dev ino mode nlink uid gid rdev size atime mtime ctime )}= lstat($self->{src_abs}.$real_src_path)
+               or croak "lstat '$self->{src_abs}$real_src_path': $!";
+            %file= ( %stat, %file );
+         }
+
+         if (defined $file{uid} || defined $file{gid}) {
+            # Remap the UID/GID if that feature was requested
+            @file{'uid','gid'}= $self->get_dst_uid_gid($file{uid}//0, $file{gid}//0, " in source filesystem at '$src_path'")
+               if $self->{_user_rewrite_map} || $self->{_group_rewrite_map};
+         }
+         $file{src_path}= $real_src_path;
+         $file{data_path} //= $self->{src_abs} . $real_src_path;
+         $file{name} //= $self->get_dst_for_src($real_src_path);
+         $self->{src_path_set}{$real_src_path}= $file{name};
+         $self->{src_path_set}{$src_path}= $file{name} if $real_src_path ne $src_path;
       }
       $file{nlink} //= 1;
 
@@ -575,13 +613,13 @@ sub _export_file($self, $file) {
    }
    if (!defined $prev) {
       # Load the data, unless already provided
-      unless (exists $file->{data}) {
+      unless (defined $file->{data}) {
          defined $file->{data_path}
             or croak "For regular files, must specify ->{data} or ->{data_path}";
          _load_or_map_file($file->{data}, $file->{data_path});
       }
       my @notes;
-      # Check for ELF signature
+      # Check for ELF signature or script-interpreter
       if (substr($file->{data}, 0, 4) eq "\x7fELF") {
          $self->_export_elf_file($file, \@notes);
       } elsif ($file->{data} =~ m,^#!\s*/,) {
@@ -663,25 +701,27 @@ sub _export_elf_file($self, $file, $notes) {
 
 sub _export_script_file($self, $file, $notes) {
    # Make sure the interpreter is added, and also rewrite its path
-   my ($interp)= ($file->{data} =~ m,^#!\s*(/\S+),)
+   my ($interp)= ($file->{data} =~ m,^#!\s*/(\S+),)
       or return;
    $self->add($interp);
 
    if ($self->_has_rewrites && length $file->{src_path}) {
       # rewrite the interpreter, if needed
       my $rre= $self->path_rewrite_regex;
-      if ($interp =~ s/^$rre/$self->{path_rewrite_map}{$1}/e) {
+      if ($interp =~ s,^$rre,$self->{path_rewrite_map}{$1},e) {
          # note file->{data} could be a read-only memory map
-         my $data= delete($file->{data}) =~ s/^(#!\s*)(\S+)/$1$interp/r;
+         my $data= delete($file->{data}) =~ s,^(#!\s*)(\S+),$1/$interp,r;
          $file->{data}= $data;
+         push @$notes, '+rewrite interpreter';
       }
       # Scan the source for paths that need rewritten
       if ($file->{data} =~ $rre) {
          # Rewrite paths in shell scripts, but only warn about others.
          # Rewriting perl scripts would basically require a perl parser...
          if ($interp =~ m,/(bash|ash|dash|sh)$,) {
-            my $rewritten= $self->_rewrite_shell(delete $file->{data});
-            $file->{data}= $rewritten;
+            my ($interp_line, $body)= split "\n", $file->{data}, 2;
+            $body= $self->_rewrite_shell($body, $interp_line);
+            $file->{data}= "$interp_line\n$body";
             push @$notes, '+rewrite paths';
          } else {
             warn "$file->{src_path} is a script referencing a rewritten path, but don't know how to process it\n";
@@ -691,7 +731,7 @@ sub _export_script_file($self, $file, $notes) {
    }
 }
 
-sub _rewrite_shell($self, $contents) {
+sub _rewrite_shell($self, $contents, $interpreter) {
    my $rre= $self->path_rewrite_regex;
    # only replace path matches when following certain characters which
    # indicate the start of a path.
@@ -709,6 +749,26 @@ sub _export_symlink($self, $file) {
          or croak "Symlink must contain 'data' or 'data_path'";
       defined( $file->{data}= readlink($file->{data_path}) )
          or croak "readlink($file->{data_path}): $!";
+      # Symlink referenced a source file, so also export the symlink target
+      # If target is relative and the data_path wasn't inside the src_abs tree, then not
+      # sensible to export it.
+      if ($file->{data} !~ m,^/, and substr($file->{data_path}, 0, length $self->{src_abs}) ne $self->{src_abs}) {
+         $self->{_log_debug}->("Symlink $file->{name} read from $file->{data_path} which is outside $self->{src_abs}; not adding symlink target $file->{data}")
+            if $self->{_log_debug};
+      }
+      else {
+         # make relative path absolute
+         my $target= $file->{data} =~ m,^/,? $file->{data}
+                   : (substr($file->{data_path}, length $self->{src_abs}) =~ s,[^/]*\z,,r) . $file->{data};
+         my $abs_target= $self->_src_parent_abs_path($target);
+         # Only queue it if it exists.  Exporting dangling symlinks is not an error
+         if (defined $abs_target && lstat $self->{src_abs} . $abs_target) {
+            $self->{_log_debug}->("Queueing target '$target' of symlink '$file->{name}'") if $self->{_log_debug};
+            $self->add($target);
+         } else {
+            $self->{_log_debug}->("Symlink '$file->{name}' target '$target' doesn't exist") if $self->{_log_debug};
+         }
+      }
    }
 
    if ($self->_has_rewrites && length $file->{src_path}) {
@@ -764,7 +824,7 @@ sub _export_symlink($self, $file) {
       }
    }
 
-   $self->_log_action('SYM', $file->{data}, $file->{name});
+   $self->_log_action('SYM', '"'.$file->{data}.'"', $file->{name});
    $self->_dst->add($file);
 }
 
@@ -984,18 +1044,8 @@ themselves up.
 
 =item on_collision
 
-Specifies what to do if there is a name collision in the destination.  The default (undef)
-causes an exception unless the existing file is identical to the one that would be written.
-
-Setting this to 'overwrite' will unconditionally replace files as it runs.  Setting it to
-'ignore' will silently ignore collisions and leave the existing file in place.
-Setting it to a coderef will provide you with the path and content thata was about to be
-written to it:
-
-  on_collision => sub ($exporter, $fileinfo, $prev_src_path) {
-    # src_path is relative to $exporter->src
-    # dst_path is relative to $exporter->dst
-    # content_ref is a scalar ref with the new contents of the file, possibly rewritten
+Specifies what to do if there is a name collision in the destination.  See attribute
+L</on_collision>.
 
 =item log
 
@@ -1071,6 +1121,22 @@ The set of numeric group IDs which have been written to dst.
 
 A regex that matches the longest prefix of a source path having a rewrite rule.
 
+=head2 on_collision
+
+Specifies what to do if there is a name collision in the destination.  The default (undef)
+causes an exception unless the existing file is identical to the one that would be written.
+
+Setting this to 'overwrite' will unconditionally replace files as it runs.  Setting it to
+'ignore' will silently ignore collisions and leave the existing file in place.
+Setting it to a coderef will provide you with the path and content that was about to be
+written to it:
+
+  $exporter->on_collision(sub ($dst_path, $fileinfo) {
+    # dst_path is the relative-to-dst-root path about to be written
+    # fileinfo is the hash of file attributes passed to ->add
+    return $action; # 'ignore' or 'overwrite' or 'ignore_if_same'
+  }
+
 =head2 log
 
   $exporter->log('info');
@@ -1117,20 +1183,28 @@ Same semantics as L</rewrite_user> but for groups.
   $exporter->add(\%file_attrs, ...);
   $exporter->add([ $name, $mode, $mode_specific_data, \%other_attrs ]);
 
-Add a source path (logically absolute with respect to C</src>) to the export.  This immediately
-copies the file to the destination, possibly rewriting paths within it, and then triggering a
-copy of any libraries or interpreters it depends on.
+Add one or more source paths (relative to C</src>) or full file specifications to the export.
+This immediately copies the file to the destination, also triggering a copy of any interpreters
+or libraries it depends on which weren't already added.
 
-If specified directly, file attributes are:
+Any item with a C<src_path> attribute will be translated according to L</rewrite_path>,
+L</rewrite_user>, and L</rewrite_group>.  This includes generating the 'name' attribute and also
+rewriting the contents of files and symlinks.
+If it is missing attributes, they will be filled-in with a call to C<lstat>.
+
+Any item without a C<src_path> is assumed to be already rewritten by the user, and must specify
+at least attributes C<name> and C<mode>.
+
+The file attributes are:
 
   name            # destination path relative to destination root
   src_path        # source path relative to source root, no leading '/'
   data            # literal data content of file (must be bytes, not unicode)
-  data_path       # absolute path of file to load 'data' from
-  dev             # device, from stat
+  data_path       # absolute path of file to load 'data' from, not limited to src dir
+  dev             # device of origin, as per lstat
   dev_major       # major(dev), if you know it and don't know 'dev'
   dev_minor       # minor(dev), if you know it and don't know 'dev'
-  ino             # inode, from stat
+  ino             # inode, from stat.  used with 'dev' for hardlink tracking
   mode            # permissions and type, as per stat
   nlink           # number of hard links
   uid             # user id
@@ -1142,9 +1216,8 @@ If specified directly, file attributes are:
   mtime           # modification time, as per stat
 
 You can also use the array notation described in L<Sys::Export/expand_file_stat_array>.
-
-If you don't specify src_path, path rewrites will not be applied to the contents of the file or
-symlink (on the assumption that you used paths relative to the destination).
+Array-notation provides a C<name> attribute rather than a C<src_path>, so those do no get
+rewritten.
 
 Returns C<$exporter> for chaining.
 
@@ -1252,7 +1325,7 @@ needed for that source ID.
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 AUTHOR
 
