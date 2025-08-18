@@ -15,10 +15,14 @@ use Carp;
 use Encode ();
 use Fcntl qw(SEEK_SET SEEK_CUR SEEK_END);
 
+use String::Super;
+
 use SIRTX::VM::RegisterFile;
 use SIRTX::VM::Opcode;
 
-our $VERSION = v0.01;
+use parent 'Data::Identifier::Interface::Userdata';
+
+our $VERSION = v0.02;
 
 my %_escapes = (
     '\\' => '\\',
@@ -44,6 +48,10 @@ my %_header_ids = (
     text    => 4,
     trailer => 5,
 );
+
+my @_section_order = qw(header init text rodata trailer);
+my @_section_text  = qw(header init text);
+my @_section_load  = (@_section_text, qw(rodata));
 
 my %_synthetic = (
     mul             => [['"out"' => 'undef', reg => 1, '"arg"' => 'undef'] => ['user*' => 2] => [
@@ -78,9 +86,25 @@ my %_synthetic = (
                             ['open_context*', \2],
                             ['call*', \2, \1],
                         ]],
+    transfer        => [[reg => 1, string => 2] => ['user*' => 3] => [
+                            ['open', \3, \2],
+                            ['transfer', \1, \3],
+                        ]],
+    control         => [[reg => 1, [qw(reg sni:)] => 2, string => 3] => ['user*' => 4] => [
+                            ['open', \4, \3],
+                            ['control', \1, \2, \4],
+                        ]],
     '.autosectionstart' => [['"header"' => 1] => [] => [
                             ['.section', \1, '"VM\\r\\n\\xc0\\n"'],
-                            ['filesize', 'size$out$']
+                            ['filesize', 'size$out$'],
+                            ['text_boundary', 'end$boundary$text'],
+                            ['load_boundary', 'end$boundary$load'],
+                            (map {['section_pointer', 'section$'.$_.'//section$header']} @_section_order),
+                        ],
+                        ['"rodata"' => 1] => [] => [
+                            ['.section', \1],
+                            ['.rodata'], # INTERNAL COMMAND, NOT FOR DOCS!
+                            ['.align', 2],
                         ],
                         [any => 1] => [] => [
                             ['.section', \1]
@@ -90,6 +114,16 @@ my %_synthetic = (
                             ['.endsection']
                         ]],
 );
+
+my %_section_order_bad;
+
+{
+    my @got;
+    foreach my $section (reverse @_section_order) {
+        $_section_order_bad{$section} = {map {$_ => 1} @got};
+        push(@got, $section);
+    }
+}
 
 
 sub new {
@@ -103,11 +137,14 @@ sub new {
             regmap_last_used_c  => 0,
             regmap_last_used    => {},
             regmap_mapped       => {},
+            sections            => {},
             pushback            => [],
             settings    => {
                 synthetic_auto_unref    => 1,
                 regmap_auto             => undef,
             },
+            rodata              => String::Super->new,
+            alias_rodata_idx    => {},
         }, $pkg);
 
     {
@@ -162,13 +199,53 @@ sub run {
     };
 
     {
+        my $boundary = 0;
+
+        foreach my $section (@_section_text) {
+            my $s = $self->{aliases}{'end$inner$section$'.$section} // next;
+            $boundary = $s->[-1] if $boundary < $s->[-1];
+        }
+
+        if ($boundary & 1) {
+            if (defined($self->{aliases}{'size$out$'}) && $self->{aliases}{'size$out$'}[-1] > $boundary) {
+                $boundary++;
+            } else {
+                croak sprintf('Error: Text boundary has odd size and output size is invalid/too low');
+            }
+        }
+
+        push(@{$self->{aliases}{'boundary$text'} //= []}, 0);
+        push(@{$self->{aliases}{'end$boundary$text'} //= []}, $boundary);
+    }
+
+    {
+        my $boundary = 0;
+
+        foreach my $section (@_section_load) {
+            my $s = $self->{aliases}{'end$inner$section$'.$section} // next;
+            $boundary = $s->[-1] if $boundary < $s->[-1];
+        }
+
+        if ($boundary & 1) {
+            if (defined($self->{aliases}{'size$out$'}) && $self->{aliases}{'size$out$'}[-1] > $boundary) {
+                $boundary++;
+            } else {
+                croak sprintf('Error: Load boundary has odd size and output size is invalid/too low');
+            }
+        }
+
+        push(@{$self->{aliases}{'boundary$load'} //= []}, 0);
+        push(@{$self->{aliases}{'end$boundary$load'} //= []}, $boundary);
+    }
+
+    {
         my $pushback = $self->{pushback};
 
         $self->{pushback} = []; # reset
 
         foreach my $entry (@{$pushback}) {
             $self->{out}->seek($entry->{pos}, SEEK_SET);
-            $self->_proc_parts($entry->{parts}, $entry->{opts});
+            $self->_proc_parts($entry->{parts}, $entry->{opts}, undef, 1);
         }
     }
 
@@ -340,6 +417,17 @@ sub _reg_alloc_phy {
     return $reg;
 }
 
+sub _autostring_allocate {
+    my ($self, $str) = @_;
+    state $autostring = 0;
+    my $key = sprintf('autostring$%u', $autostring++);
+
+    $self->{alias_rodata_idx}{$key} = $self->{rodata}->add_blob($str);
+    push(@{$self->{aliases}{'size$'.$key} //= []}, length($str));
+
+    return $key;
+}
+
 sub _pushback {
     my ($self, %opts) = @_;
     push(@{$self->{pushback}}, \%opts);
@@ -394,7 +482,7 @@ sub _proc_input {
 }
 
 sub _proc_parts {
-    my ($self, $parts, $opts, $autodie) = @_;
+    my ($self, $parts, $opts, $autodie, $allow_alts) = @_;
     my $out = $self->{out};
     my ($cmd, @args) = @{$parts};
     my $was_return;
@@ -404,9 +492,22 @@ sub _proc_parts {
 
     if ($cmd ne '.pushname' && $cmd ne '.popname') {
         foreach my $part (@{$parts}) {
+            my @alts;
+
             next unless $part =~ /^[a-z0-9]*\$/;
 
-            $part = $self->{aliases}{$part}[-1] if defined $self->{aliases}{$part};
+            @alts = split(m#//#, $part);
+
+            if ($allow_alts) {
+                foreach my $alt (@alts) {
+                    if (defined $self->{aliases}{$alt}) {
+                        $part = $self->{aliases}{$alt}[-1];
+                        last;
+                    }
+                }
+            } else {
+                $part = $self->{aliases}{$alts[0]}[-1] if defined $self->{aliases}{$alts[0]};
+            }
         }
     }
 
@@ -444,6 +545,37 @@ sub _proc_parts {
             $last = $c;
         }
         $self->_set_alignment(1);
+    } elsif ($cmd eq '.string' && scalar(@args) >= 2) {
+        my $key = 'string$'.$args[0];
+        my $catted = '';
+        foreach my $str (@args[1..$#args]) {
+            $catted .= $self->_parse_string($str);
+        }
+        $self->{alias_rodata_idx}{$key} = $self->{rodata}->add_blob($catted);
+        push(@{$self->{aliases}{'size$'.$key} //= []}, length($catted));
+    } elsif ($cmd eq 'open' && scalar(@args) == 2 && $self->_get_value_type($args[0]) eq 'reg' && $self->_get_value_type($args[1]) eq 'string') {
+        my $key = $self->_autostring_allocate($self->_parse_string($args[1]));
+        $self->_proc_parts(['substr', $args[0], 'program_text', $key, 'end$'.$key], $opts);
+    } elsif ($cmd eq 'byte_transfer' && scalar(@args) == 2 && $self->_get_value_type($args[0]) eq 'reg' && $self->_get_value_type($args[1]) eq 'string') {
+        my $key = $self->_autostring_allocate($self->_parse_string($args[1]));
+        my $reg = $self->_reg_alloc_phy('user*');
+
+        $self->_proc_parts(['substr', $reg, 'program_text', $key, 'end$'.$key], $opts);
+        $self->_proc_parts(['byte_transfer', $args[0], $reg, 'size$'.$key], $opts);
+        $self->_proc_parts(['unref', $reg], $opts) if $self->{settings}{synthetic_auto_unref};
+    } elsif ($cmd eq '.rodata' && scalar(@args) == 0) { # INTERNAL COMMAND! NOT FOR DOCS!
+        my $aliases = $self->{aliases};
+        my $rodata = $self->{rodata};
+        my $base = $out->tell;
+        print $out $rodata->result;
+        $self->_set_alignment(1);
+        foreach my $key (keys %{$self->{alias_rodata_idx}}) {
+            my $idx = $self->{alias_rodata_idx}{$key};
+            my $offset = $rodata->offset(index => $idx) + $base;
+            my $size = $aliases->{'size$'.$key}[-1];
+            push(@{$aliases->{$key} //= []}, $offset);
+            push(@{$aliases->{'end$'.$key} //= []}, $offset + $size) if defined $size;
+        }
     } elsif ($cmd eq '.include') {
         foreach my $arg (@args) {
             my $fh = $self->_open_file($self->_parse_string($arg));
@@ -505,6 +637,13 @@ sub _proc_parts {
             croak sprintf('Invalid section: line %s: section %s', $opts->{line}, $args[0]);
         }
 
+        if (defined(my $bad = $_section_order_bad{$args[0]})) {
+            foreach my $key (@_section_order) {
+                next unless defined $self->{sections}{$key};
+                croak sprintf('Invalid section: line %s: section %s must not follow section %s', $opts->{line}, $args[0], $key) if defined $bad->{$key};
+            }
+        }
+
         if (scalar(@args) == 2) {
             $extra = $self->_parse_string($args[1]);
             my $l = length($extra);
@@ -524,6 +663,8 @@ sub _proc_parts {
 
         $self->_write_opcode(SIRTX::VM::Opcode->new(%tpl, T => $T, extra => $extra));
         $self->_save_position('inner$section$'.$args[0]);
+
+        $self->{sections}{$args[0]} = {};
     } elsif ($cmd eq '.endsection' && scalar(@args) == 0 && defined(my $section = $self->{current}{section})) {
         my $section_suffix = 'section$'.$section->{name};
         $self->_save_endposition('inner$'.$section_suffix);
@@ -565,6 +706,8 @@ sub _proc_parts {
                 $rf->register_temperature($reg, SIRTX::VM::Register::TEMPERATURE_COLD());
             } elsif ($attr eq 'lukewarm') {
                 $rf->register_temperature($reg, SIRTX::VM::Register::TEMPERATURE_LUKEWARM());
+            } elsif ($attr eq 'volatile') {
+                # No-op
             } else {
                 croak sprintf('Invalid register attribute: line %s: register %s: attribute: %s', $opts->{line}, $reg, $attr);
             }
@@ -617,10 +760,14 @@ sub _proc_parts {
                     } else {
                         my $t = $self->_get_value_type($val);
                         if (ref $type) {
+                            my $found;
+                            inner:
                             foreach my $tw (@{$type}) {
-                                next outer if $t ne $tw && !($t =~ /:$/ && $tw eq 'id');
+                                next inner if $t ne $tw && !($t =~ /:$/ && $tw eq 'id');
+                                $found = 1;
                                 last;
                             }
+                            next outer unless $found;
                         } else {
                             next outer if $t ne $type && !($t =~ /:$/ && $type eq 'id');
                         }
@@ -779,6 +926,8 @@ sub _parse_id {
     }
 }
 
+1;
+
 __END__
 
 =pod
@@ -791,7 +940,7 @@ SIRTX::VM::Assembler - module for assembling SIRTX VM code
 
 =head1 VERSION
 
-version v0.01
+version v0.02
 
 =head1 SYNOPSIS
 
@@ -800,6 +949,10 @@ version v0.01
     my SIRTX::VM::Assembler $asm = SIRTX::VM::Assembler->new(in => $infile, out => $outfile);
 
     $asm->run;
+
+This package inherits from L<Data::Identifier::Interface::Userdata>.
+
+The syntax for the input files is described in details at L<https://sirtx.keep-cool.org/vm.html>.
 
 =head1 METHODS
 

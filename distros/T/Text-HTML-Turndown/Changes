@@ -1,3 +1,6 @@
+0.07 2025-08-17
+    * Add helper shorthand function C<html2markdown>
+
 0.06 2025-04-12
     * Don't generate Markdown for empty links as in
       <a href="https://example.com"></a>

@@ -7,13 +7,14 @@ use warnings;
 use Carp;	# Import Carp for warnings
 use Config::Abstraction 0.25;
 use Data::Dumper;
-use Email::Simple;
-use Email::Sender::Simple qw(sendmail);
-use Email::Sender::Transport::SMTP;
-use Params::Get 0.05;	# Import Params::Get for parameter handling
-use Readonly::Values::Syslog 0.02;
-use Sys::Syslog 0.28;	# Import Sys::Syslog for syslog support
+use Params::Get 0.13;	# Import Params::Get for parameter handling
+use POSIX qw(strftime);
+use Readonly::Values::Syslog 0.03;
+use Return::Set;
 use Scalar::Util 'blessed';	# Import Scalar::Util for object reference checking
+use Sys::Syslog 0.28;	# Import Sys::Syslog for syslog support
+
+=encoding utf-8
 
 =head1 NAME
 
@@ -21,11 +22,11 @@ Log::Abstraction - Logging Abstraction Layer
 
 =head1 VERSION
 
-0.24
+0.25
 
 =cut
 
-our $VERSION = 0.24;
+our $VERSION = 0.25;
 
 =head1 SYNOPSIS
 
@@ -93,19 +94,13 @@ A logger can be one or more of:
 
 =item * a code reference
 
-=item * an array reference
-
-=item * a file path
-
-=item * a file descriptor
-
 =item * an object
 
 =item * a hash of options
 
 =item * sendmail - send higher priority messages to an email address
 
-=over
+To send an e-mail you need L<require Email::Simple>, L<require Email::Sender::Simple> and L<Email::Sender::Transport::SMTP>.
 
 =item * array - a reference to an array
 
@@ -115,10 +110,32 @@ A logger can be one or more of:
 
 =back
 
-=back
-
 Defaults to L<Log::Log4perl>.
-In that case the argument 'verbose' to new() will raise the logging level.
+In that case,
+the argument 'verbose' to new() will raise the logging level.
+
+=item * C<format>
+
+The format of the message.
+Expands:
+
+=over
+
+=item * %callstack%
+
+=item * %level%
+
+=item * %class%
+
+=item * %message%
+
+=item * %timestamp%
+
+=%item * %env_foo%
+
+Replaces with C<$ENV{foo}>
+
+=back
 
 =item * C<syslog>
 
@@ -236,16 +253,68 @@ sub new {
 	}, $class;
 }
 
+=head2 _sanitize_email_header
+
+    my $clean_value = _sanitize_email_header($raw_value);
+
+Internal routine to remove carriage return and line feed characters from an email header value to prevent header injection or formatting issues.
+
+=over 4
+
+=item * Input
+
+Takes a single scalar value, typically a string representing an email header field.
+
+=item * Behavior
+
+If the input is undefined, returns `undef`. Otherwise, removes all newline characters (`\n`), carriage returns (`\r`), and CRLF pairs from the string.
+
+=item * Output
+
+Returns the sanitized string with CR/LF characters removed.
+
+=back
+
+=head3 FORMAL SPECIFICATION
+
+If the input is undefined (∅), the output is also undefined (∅).
+
+If the input is defined, the result is a defined string with CR and LF characters removed.
+
+    [CHAR]
+
+    CR, LF : CHAR
+    CR == '\r'
+    LF == '\n'
+
+    STRING == seq CHAR
+
+    SanitizeEmailHeader
+        raw?: STRING
+        sanitized!: STRING
+        -------------------------------------------------
+        sanitized! = [ c : raw? | c ≠ CR ∧ c ≠ LF ]
+
+=cut
+
+sub _sanitize_email_header {
+	my $value = $_[0];
+
+	return unless defined $value;
+	$value =~ s/\r\n?|\n//g;	# Remove CR/LF characters
+
+	return Return::Set::set_return($value, { type => 'string', 'matches' => qr /^[^\r\n]*$/ });
+}
+
 # Internal method to log messages. This method is called by other logging methods.
 # $logger->_log($level, @messages);
 # $logger->_log($level, \@messages);
 
-sub _log
-{
+sub _log {
 	my ($self, $level, @messages) = @_;
 
 	if(!UNIVERSAL::isa((caller)[0], __PACKAGE__)) {
-		Carp::croak('Illegal Operation: This method can only be called by a subclass or ourself');
+		Carp::croak('Illegal Operation: _log is a private method');
 	}
 
 	if(!defined($syslog_values{$level})) {
@@ -267,12 +336,14 @@ sub _log
 	chomp($str);
 
 	# Push the message to the internal messages array
-	push @{$self->{messages}}, { level => $level, message => join('', @messages) };
+	push @{$self->{messages}}, { level => $level, message => $str };
 
-	my $class = blessed($self) || '';
+	my $class = blessed($self) || $self;
 	if($class eq __PACKAGE__) {
 		$class = '';
 	}
+
+	my $timestamp = strftime "%Y-%m-%d %H:%M:%S", localtime;
 
 	if(my $logger = $self->{'logger'}) {
 		if(ref($logger) eq 'CODE') {
@@ -287,7 +358,7 @@ sub _log
 			});
 		} elsif(ref($logger) eq 'ARRAY') {
 			# If logger is an array reference, push the log message to the array
-			push @{$logger}, { level => $level, message => join('', @messages) };
+			push @{$logger}, { level => $level, message => $str };
 		} elsif(ref($logger) eq 'HASH') {
 			if(my $file = $logger->{'file'}) {
 				# if($file =~ /^([-\@\w.\/\\]+)$/) {
@@ -297,13 +368,22 @@ sub _log
 					Carp::croak(ref($self), ": Invalid file name: $file");
 				}
 				if(open(my $fout, '>>', $logger->{'file'})) {
-					print $fout uc($level), "> $class ", (caller(1))[1], ' ', (caller(1))[2], " $str\n" or
-						Carp::croak(ref($self), ": Can't write to $file: $!");
+					my $format = $self->{'format'} || '%level%> [%timestamp%] %class% %callstack% %message%';
+					my $ulevel = uc($level);
+					my $callstack = (caller(1))[1] . ' ' . (caller(1))[2];
+
+					$format =~ s/%level%/$ulevel/g;
+					$format =~ s/%class%/$class/g;
+					$format =~ s/%message%/$str/g;
+					$format =~ s/%callstack%/$callstack/g;
+					$format =~ s/%timestamp%/$timestamp/g;
+					$format =~ s/%env_(\w+)%/$ENV{$1}/g;
+					print $fout "$format\n" or Carp::croak(ref($self), ": Can't write to $file: $!");
 					close $fout;
 				}
 			}
 			if(my $array = $logger->{'array'}) {
-				push @{$array}, { level => $level, message => join('', @messages) };
+				push @{$array}, { level => $level, message => $str };
 			}
 			if($logger->{'sendmail'}->{'to'}) {
 				# Send an email
@@ -311,15 +391,23 @@ sub _log
 				if((!defined($logger->{'sendmail'}->{'level'})) ||
 				   ($syslog_values{$level} <= $syslog_values{$logger->{'sendmail'}->{'level'}})) {
 					eval {
+						require Email::Simple;
+						require Email::Sender::Simple;
+						require Email::Sender::Transport::SMTP;
+
+						Email::Simple->import();
+						Email::Sender::Simple->import('sendmail');
+						Email::Sender::Transport::SMTP->import();
+
 						my $email = Email::Simple->new('');
-						$email->header_set('to', $logger->{'sendmail'}->{'to'});
+						$email->header_set('to', _sanitize_email_header($logger->{'sendmail'}->{'to'}));
 						if(my $from = $logger->{'sendmail'}->{'from'}) {
-							$email->header_set('from', $from);
+							$email->header_set('from', _sanitize_email_header($from));
 						} else {
 							$email->header_set('from', 'noreply@localhost');
 						}
 						if(my $subject = $logger->{'sendmail'}->{'subject'}) {
-							$email->header_set('subject', $subject);
+							$email->header_set('subject', _sanitize_email_header($subject));
 						}
 						$email->body_set(join(' ', @messages));
 
@@ -369,22 +457,38 @@ sub _log
 					}
 				}
 			}
-				
+
 			if(my $fout = $logger->{'fd'}) {
-				print $fout uc($level), "> $class ", (caller(1))[1], ' ', (caller(1))[2], " $str\n" or
-					die "ref($self): Can't write to file descriptor: $!";
+				my $format = $self->{'format'} || '%level%> [%timestamp%] %class% %callstack% %message%';
+				my $ulevel = uc($level);
+				my $callstack = (caller(1))[1] . ' ' . (caller(1))[2];
+
+				$format =~ s/%level%/$ulevel/g;
+				$format =~ s/%class%/$class/g;
+				$format =~ s/%message%/$str/g;
+				$format =~ s/%callstack%/$callstack/g;
+				$format =~ s/%timestamp%/$timestamp/g;
+				$format =~ s/%env_(\w+)%/$ENV{$1}/g;
+
+				print $fout "$format\n" or Carp::croak(ref($self), ": Can't write to file descriptor: $!");
 			} elsif((!$logger->{'file'}) && (!$logger->{'syslog'}) && (!$logger->{'sendmail'})) {
 				croak(ref($self), ": Don't know how to deal with the $level message");
 			}
 		} elsif(!ref($logger)) {
 			# If logger is a file path, append the log message to the file
 			if(open(my $fout, '>>', $logger)) {
-				print $fout uc($level),
-					"> $class ",
-					(caller(1))[1],
-					' (',
-					(caller(1))[2],
-					"): $str\n";
+				my $format = $self->{'format'} || '%level%> [%timestamp%] %class% %callstack% %message%';
+				my $ulevel = uc($level);
+				my $callstack = (caller(1))[1] . ' ' . (caller(1))[2];
+
+				$format =~ s/%level%/$ulevel/g;
+				$format =~ s/%class%/$class/g;
+				$format =~ s/%message%/$str/g;
+				$format =~ s/%callstack%/$callstack/g;
+				$format =~ s/%timestamp%/$timestamp/g;
+				$format =~ s/%env_(\w+)%/$ENV{$1}/g;
+
+				print $fout "$format\n" or Carp::croak(ref($self), ": Can't write to $logger: $!");
 				close $fout;
 			}
 		} elsif(Scalar::Util::blessed($logger)) {
@@ -402,7 +506,7 @@ sub _log
 			croak(ref($self), ": configuration error, no handler written for the $level message");
 		}
 	} elsif($self->{'array'}) {
-		push @{$self->{'array'}}, { level => $level, message => join('', @messages) };
+		push @{$self->{'array'}}, { level => $level, message => $str };
 	}
 
 	if($self->{'file'}) {
@@ -417,25 +521,53 @@ sub _log
 		}
 
 		if(open(my $fout, '>>', $file)) {
+			my $ulevel = uc($level);
+			my $callstack = (caller(1))[1] . ' ' . (caller(1))[2];
+			my $format;
+
 			if(blessed($self) eq __PACKAGE__) {
-				print $fout uc($level), '> ', (caller(1))[1], '(', (caller(1))[2], ") $str\n" or
-					die "ref($self): Can't write to ", $self->{'file'}, ": $!";
+				$format = $self->{'format'} || '%level%> [%timestamp%] %callstack% %message%';
 			} else {
-				print $fout uc($level), '> ', blessed($self) || '', ' ', (caller(1))[1], '(', (caller(1))[2], ") $str\n" or
-					die "ref($self): Can't write to ", $self->{'file'}, ": $!";
+				$format = $self->{'format'} || '%level%> [%timestamp%] %class% %callstack% %message%';
 			}
+
+			$format =~ s/%level%/$ulevel/g;
+			$format =~ s/%class%/$class/g;
+			$format =~ s/%message%/$str/g;
+			$format =~ s/%callstack%/$callstack/g;
+			$format =~ s/%timestamp%/$timestamp/g;
+			$format =~ s/%env_(\w+)%/$ENV{$1}/g;
+
+			print $fout "$format\n" or Carp::croak("ref($self): Can't write to ", $self->{'file'}, ": $!");
 			close $fout;
 		}
 	}
 	if(my $fout = $self->{'fd'}) {
-		print $fout uc($level), '> ', blessed($self) || '', ' ', (caller(1))[1], '(', (caller(1))[2], ") $str\n" or
-			croak(ref($self), ": Can't write to file descriptor: $!");
+		my $ulevel = uc($level);
+		my $callstack = (caller(1))[1] . ' ' . (caller(1))[2];
+		my $format;
+
+		if(blessed($self) eq __PACKAGE__) {
+			$format = $self->{'format'} || '%level%> [%timestamp%] %callstack% %message%';
+		} else {
+			$format = $self->{'format'} || '%level%> [%timestamp%] %class% %callstack% %message%';
+		}
+
+		$format =~ s/%level%/$ulevel/g;
+		$format =~ s/%class%/$class/g;
+		$format =~ s/%message%/$str/g;
+		$format =~ s/%callstack%/$callstack/g;
+		$format =~ s/%timestamp%/$timestamp/g;
+		$format =~ s/%env_(\w+)%/$ENV{$1}/g;
+
+		print $fout "$format\n" or Carp::croak(ref($self), ": Can't write to file descriptor: $!");
 	}
 }
 
 =head2 level
 
-Get/set the minimum level to log at
+Get/set the minimum level to log at.
+Returns the current level, as an integer.
 
 =cut
 
@@ -450,20 +582,34 @@ sub level
 		}
 		$self->{'level'} = $syslog_values{$level};
 	}
-	return $self->{'level'};
+	return Return::Set::set_return($self->{'level'}, { 'type' => 'integer', 'min' => 0, 'max' => 7 });
+}
+
+=head2	is_debug
+
+Are we at a debug level that will emit debug messages?
+For compatability with L<Log::Any>.
+
+=cut
+
+sub is_debug
+{
+	my $self = $_[0];
+
+	return ($self->{'level'} && ($self->{'level'} >= $DEBUG)) ? 1 : 0;
 }
 
 =head2 messages
 
-Return all the messages emmitted so far
+Return all the messages emitted so far
 
 =cut
 
 sub messages
 {
-	my $self = shift;
+	my $self = $_[0];
 
-	return $self->{'messages'};
+	return [ @{$self->{messages}} ];	# Return a shallow copy
 }
 
 =head2 debug
@@ -602,8 +748,9 @@ sub _high_priority
 
 # Destructor to close syslog connection
 sub DESTROY {
-	my $self = shift;
-	if ($self->{_syslog_opened}) {
+	my $self = $_[0];
+
+	if($self->{_syslog_opened}) {
 		closelog();
 		delete $self->{_syslog_opened};
 	}
@@ -611,7 +758,7 @@ sub DESTROY {
 
 =head1 AUTHOR
 
-Nigel Horne C< <njh@nigelhorne.com> >
+Nigel Horne C<njh@nigelhorne.com>
 
 =head1 SUPPORT
 

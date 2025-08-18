@@ -1,5 +1,13 @@
 Revision history for RT-Authen-OAuth
 
+0.14 2025-08-18
+ - Make it work with RT 6.0(thanks to Rob Lister!)
+ - Support checking/syncing groups for providers returning group membership(thanks to Rob Lister!)
+ - Fix broken image link if no LoginPageButton defined(thanks to Rob Lister!)
+ - Use a sane default for OAuthRedirect(thanks to Andrew Ruthven!)
+ - Add sample config for Authentik(Thanks to Andrew Ruthven!)
+ - Tweak document(Thanks to Andrew Ruthven!)
+
 0.13 2025-02-11
  - Support result key in the response of protected_resource
  - Add more debug info

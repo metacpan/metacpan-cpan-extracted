@@ -25,23 +25,6 @@ auto-detected.  Operations are driven by the data-types.
 
 =head2 Constructors
 
-=over 4
-
-=item Math::Formula::Type-E<gt>B<new>( $token|undef, [$value] )
-
-The object is a blessed ARRAY.  On the first spot is the $token.  On the
-second spot might be the decoded value of the token, in internal Perl
-representation.  When no $token is passed (value C<undef> is explicit), then
-you MUST provide a $value.  The token will be generated on request.
-
-example: 
-
-  my $node = MF::BOOLEAN->new('true');    # value will be '1'
-  my $node = MF::BOOLEAN->new(undef, 1);  # token will be 'true'
-  my $node = MF::DATETIME->new(undef, DateTime->now);
-
-=back
-
 =head2 MF::Formula::Type
 
 The following methods and features are supported for any Type defined on this page.
@@ -53,13 +36,13 @@ All types can be converted into a string:
 All types may provide B<attributes> (calls) for objects of that type.  Those
 get inherited (of course).  For instance:
 
-   02:03:04.hour   => INTEGER 2
+  02:03:04.hour   => INTEGER 2
 
 =over 4
 
 =item $obj-E<gt>B<cast>($type)
 
-Type-convert a typed object into an object with a different type.  Sometimes, the 
+Type-convert a typed object into an object with a different type.  Sometimes, the
 represented value changes a little bit, but usually not.
 
 Any Type can be cast into a MF::STRING. Read the documentation for other types to
@@ -76,12 +59,6 @@ Returns the token in string form.  This may be a piece of text as parsed
 from the expression string, or generated when the token is computed from
 the value.
 
-=item $obj-E<gt>B<value>()
-
-Where L<token()|Math::Formula::Type/"MF::Formula::Type"> returns a string representation of the instance, the
-C<value()> produces its translation into internal Perl values or objects,
-ready to be involved in computations.
-
 =back
 
 =head2 MF::BOOLEAN, a truth value
@@ -92,7 +69,7 @@ Booleans implement the prefix operator "C<+>", and infix operators 'C<and>',
 'C<or>', and 'C<xor>'.
 
 The weird infix operator C<< -> >> implements an 'if-then', which can also be
-used as substitute.  When the left-side of the arrow is true, then the right
+used as substitute.  When the left-side of the arrow is C<true>, then the right
 side is returned.
 
 When left of the C<< -> >> is a possitive regular expression match C<< =~ >>,
@@ -165,9 +142,9 @@ String operations:
 
 Attributes:
 
-   "abc".length       => INTEGER  3
-   "".is_empty        => BOOLEAN true   # only white-space
-   "ABC".lower        => STRING "abc", lower-case using utf8 folding
+  "abc".length       => INTEGER  3
+  "".is_empty        => BOOLEAN true   # only white-space
+  "ABC".lower        => STRING "abc", lower-case using utf8 folding
 
 =head2 MF::INTEGER, a long whole number
 
@@ -211,7 +188,7 @@ B<. Example: of integers>
   + 2          => INTEGER   2      # prefix op
   - 2          -> INTEGER   -2     # prefix op
   - -2         -> INTEGER   2      # prefix op, negative int
-  
+
   1 + 2        => INTEGER   3      # infix op
   5 - 9        -> INTEGER   -4     # infix op
   3 * 4        => INTEGER   12
@@ -316,7 +293,7 @@ An subtract (C<->) from a date produces a duration.
 
 You may also add a time to a date, forming a datetime.  Those may be in different
 time-zones.  You may also numerically compare dates, but only when they are not
-in the same timezone, this will return false.
+in the same timezone, this will return C<false>.
 
 B<. Example: for date>
 
@@ -501,10 +478,14 @@ Attributes on names
 
 =over 4
 
-=item Math::Formula::Type-E<gt>B<validated>($string, $where)
+=item $class-E<gt>B<validated>($string, $where)
 
-Create a MF::NAME from a $string which needs to be validated for being a valid
-name.  The $where will be used in error messages when the $string is invalid.
+Create a MF::NAME from a C<$string> which needs to be validated for being a valid
+name.  The C<$where> will be used in error messages when the C<$string> is invalid.
+
+=item $obj-E<gt>B<value>()
+
+Z<>
 
 =back
 
@@ -527,6 +508,14 @@ B<. Example: of patterns>
   "abc" unlike "b"   => BOOLEAN true
   "abc" unlike "*b*" => BOOLEAN true
   "abc" unlike "*c"  => BOOLEAN false
+
+=over 4
+
+=item $class-E<gt>B<new>( $token|undef, [$value] )
+
+Z<>
+
+=back
 
 =head2 MF::REGEXP, Regular expression
 
@@ -554,16 +543,51 @@ Returns the regular expression as compiled object (qr).
 
 The used of this type is explained in L<Math::Formula::Context|Math::Formula::Context>.
 
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Error: Illegal name '$name' in '$where'
+
+Z<>
+
+=item Warning: cannot convert qr back to pattern, do $regexp
+
+Z<>
+
+=item Warning: cannot find attribute '$attr' for $class '$token'
+
+Z<>
+
+=item Error: cannot find prefx operator '$op' on a $child
+
+Z<>
+
+=item Error: cannot match infix operator '$op' for ($left -> $right)
+
+Z<>
+
+=item Error: name '$name' cannot be used as value.
+
+Z<>
+
+=item Error: rvalue name '$name' for operator '$op' is not a formula
+
+Z<>
+
+=back
+
 =head1 SEE ALSO
 
-This module is part of Math-Formula distribution version 0.16,
-built on March 14, 2023. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Math-Formula version 0.17,
+built on August 17, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2023 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2023-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

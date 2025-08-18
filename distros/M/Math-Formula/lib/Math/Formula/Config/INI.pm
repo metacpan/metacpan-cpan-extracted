@@ -1,12 +1,23 @@
-# Copyrights 2023 by [Mark Overmeer <markov@cpan.org>].
-#  For other contributors see ChangeLog.
-# See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.03.
-package Math::Formula::Config::INI;
-use vars '$VERSION';
-$VERSION = '0.16';
+# This code is part of Perl distribution Math-Formula version 0.17.
+# The POD got stripped from this file by OODoc version 3.03.
+# For contributors see file ChangeLog.
 
-use base 'Math::Formula::Config';
+# This software is copyright (c) 2023-2025 by Mark Overmeer.
+
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+# SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
+
+#oodist: *** DO NOT USE THIS VERSION FOR PRODUCTION ***
+#oodist: This file contains OODoc-style documentation which will get stripped
+#oodist: during its release in the distribution.  You can use this file for
+#oodist: testing, however the code of this development version may be broken!
+
+package Math::Formula::Config::INI;{
+our $VERSION = '0.17';
+}
+
+use parent 'Math::Formula::Config';
 
 use warnings;
 use strict;
@@ -20,8 +31,9 @@ use Config::INI::Reader  ();
 use Math::Formula::Context ();
 use Math::Formula          ();
 
+#--------------------
 
-#----------------------
+#--------------------
 
 sub save($%)
 {	my ($self, $context, %args) = @_;
@@ -85,8 +97,7 @@ sub load($%)
 
 	my $read  = Config::INI::Reader->read_file($fn);
 	my $attrs = $self->_set_decode($read->{_});
-	Math::Formula::Context->new(name => $name,
-		%$attrs,
+	Math::Formula::Context->new(name => $name, %$attrs,
 		formulas => $self->_set_decode($read->{formulas}),
 	);
 }
@@ -115,6 +126,6 @@ sub _unpack($$)
 	: MF::STRING->new(undef, $encoded);
 }
 
-#----------------------
+#--------------------
 
 1;

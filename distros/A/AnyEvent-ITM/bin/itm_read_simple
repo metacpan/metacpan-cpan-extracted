@@ -46,34 +46,34 @@ our @colors = (
   'blue on_bright_white',
 );
 
-my $file = shift or die qq{usage: $0 filename};
-open my $fh, '<', $file or die qq{can't open file: $file};
+my $file = shift or die qq{usage: $0 filename [command]};
+my $buf = '';
 my $cv = AE::cv;
-my $handle = create_handle();
+my $handle = AnyEvent::ITM->handle($file, sub {
+  my ( $handle, $itm ) = @_;
+  return unless ref($itm) eq 'ITM::Instrumentation';
+  $buf .= $itm->payload;
 
-sub create_handle {
-  new AnyEvent::Handle
-  fh => $fh,
-  on_error => sub {
-    my ($handle, $fatal, $message) = @_;
-    $handle->destroy;
-    undef $handle;
-    $cv->send("$fatal: $message");
-  },
-  on_eof => sub {
-    $handle->destroy;
-    undef $handle;
-    $handle = create_handle();
-  },
-  on_read => sub {
-    my $handle = shift;
-    $handle->push_read(itm => sub {
-      my ($handle, $itm) = @_;
-      if (ref $itm eq 'ITM::Instrumentation') {
-        print colored($itm->payload,$colors[$itm->source]);
-      }
-    });
-  };
+  # emit complete lines (handles \n and \r\n)
+  while ((my $lf = index($buf, "\n")) != -1) {
+    my $line = substr($buf, 0, $lf);
+    $line =~ s/\r$//;               # strip CR in CRLF
+    AnyEvent::ITM::_print_ts('>',$line);
+    substr($buf, 0, $lf+1) = '';    # drop emitted + newline
+  }
+}, $cv);
+
+$cv->cb(sub {
+  my $cv = shift;
+  AnyEvent::ITM::_print_ts('>',$buf) if length $buf;   # flush trailing partial line
+  $buf = '';
+  warn $cv->recv;
+});
+
+my $cmd;
+
+if (scalar @ARGV > 0) {
+  $cmd = AnyEvent::ITM->_run_cmd(@ARGV);
 }
 
 warn $cv->recv;
@@ -82,17 +82,23 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 itm_read_simple - Simple ITM Reader
 
 =head1 VERSION
 
-version 0.003
+version 0.100
 
 =head1 SYNOPSIS
 
   itm_read_simple openocd.itmlog
+
+or directly run openocd with it:
+
+  itm_read_simple openocd.itmlog openocd -c "program main.bin verify reset 0x08000000; reset run;"
 
 In the openocd.cfg (for a 72MHz ARM)
 
@@ -107,8 +113,6 @@ Best is to make a fifo for the exchange (more stable)
 
 Displays ITM/SWO Debugging data in colored form.
 
-=encoding utf8
-
 =head1 SUPPORT
 
 Repository
@@ -119,6 +123,20 @@ Repository
 Issue Tracker
 
   https://github.com/Getty/p5-anyevent-itm/issues
+
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+
+=head1 SUPPORT
+
+=head2 Source Code
+
+The code is open to the world, and available for you to hack on. Please feel free to browse it and play
+with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
+from your repository :)
+
+L<https://github.com/Getty/p5-anyevent-itm>
+
+  git clone https://github.com/Getty/p5-anyevent-itm.git
 
 =head1 AUTHOR
 

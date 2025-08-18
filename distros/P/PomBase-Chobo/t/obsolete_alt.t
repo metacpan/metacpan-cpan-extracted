@@ -22,4 +22,4 @@ my ($stdout, $stderr, $exit) = capture {
 $parser->parse(filename => 't/data/mini_go.obo',
                ontology_data => $ontology_data);
 
-is ($ontology_data->get_terms(), 4);
+is ($ontology_data->get_terms(), 5);

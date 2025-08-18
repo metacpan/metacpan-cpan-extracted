@@ -24,6 +24,8 @@ DumpFile($config_file, {
 # Create object using the config_file
 my $obj = Log::Abstraction->new(config_file => $config_file);
 
+cmp_ok($obj->is_debug(), '==', 0, 'is_debug is not set');
+
 ok($obj, 'Object was created successfully');
 isa_ok($obj, 'Log::Abstraction');
 cmp_ok($obj->{'script_name'}, 'eq', 'foo', 'read script_name from config');

@@ -1,4 +1,4 @@
-package Text::HTML::CollapseWhitespace 0.06;
+package Text::HTML::CollapseWhitespace 0.07;
 use 5.020;
 use experimental 'signatures';
 use stable 'postderef';

@@ -1,24 +1,27 @@
 package XML::Sig::OO;
 
-our $VERSION="0.008";
+our $VERSION="0.010";
 
+BEGIN {
+use Crypt::OpenSSL::VerifyX509;
+use Crypt::OpenSSL::X509;
+}
 use Modern::Perl;
 use Moo;
 use MooX::Types::MooseLike::Base qw(:all);
 use MIME::Base64;
 use XML::LibXML;
 use XML::LibXML::XPathContext;
-use Crypt::OpenSSL::X509;
 use Crypt::OpenSSL::RSA;
 use Crypt::OpenSSL::Bignum;
 use Crypt::OpenSSL::DSA;
-use Crypt::OpenSSL::VerifyX509;
 use Digest::SHA   qw(sha1);
 use Ref::Util qw( is_plain_hashref);
 use Data::Result;
 use Carp qw(croak);
 use Scalar::Util qw(looks_like_number);
 use namespace::clean;
+use Data::Dumper;
 use constant TRANSFORM_EXC_C14N          => 'http://www.w3.org/2001/10/xml-exc-c14n#';
 use constant TRANSFORM_EXC_C14N_COMMENTS => 'http://www.w3.org/2001/10/xml-exc-c14n#WithComments';
 
@@ -160,9 +163,22 @@ Optional, used to validate X509 certs.
 =cut
 
 has cacert=>(
-  is=>'ro',
+  is=>'rw',
   isa=>sub { my ($f)=@_; croak "cacert must be a readable file" unless defined($f) && -r $f },
   required=>0,
+  clearer=>1,
+);
+
+=item * nocacheck=>0|1
+
+Turns off ca cert checking.. this may not always be possible!
+
+=cut
+
+has nocacheck=>(
+  default=>0,
+  is=>'rw',
+  isa=>Bool,
 );
 
 =item * build_parser=>sub { return XML::LibXML->new() }
@@ -1105,13 +1121,14 @@ sub verify_x509_sig {
 
   my $x509=$self->clean_x509($string);
   my $cert=Crypt::OpenSSL::X509->new_from_string($x509);
+  #my $cert=Crypt::OpenSSL::X509->new_from_string($string);
 
-  if(defined($self->cacert)) {
+  if(!$self->nocacheck && defined($self->cacert)) {
     my $ca=Crypt::OpenSSL::VerifyX509->new($self->cacert);
     my $result;
     eval {$result=new_false Data::Result("Could not verify the x509 cert against ".$self->cacert) unless $ca->verify($cert)};
     if($@) {
-      return new_false Data::Result("Error using cert file: ".$self->cacert."error was: $@");
+      return new_false Data::Result("Error using cert file: ".$self->cacert." error was: $@");
     }
     return $result if defined($result);
   }
@@ -1509,7 +1526,7 @@ sub load_rsa_string {
   my ($self,$str)=@_;
   my $rsaKey = Crypt::OpenSSL::RSA->new_private_key( $str );
   return new_false Data::Result("Failed to parse rsa key") unless $rsaKey;
-  $rsaKey->use_pkcs1_padding();
+  #$rsaKey->use_pkcs1_padding();
   return new_true Data::Result({cert=>$rsaKey,type=>'rsa'});
 }
 

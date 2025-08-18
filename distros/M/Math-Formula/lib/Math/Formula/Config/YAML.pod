@@ -28,18 +28,18 @@ and module C<boolean.pm>.  They are not in the dependencies of this packages, be
 we do not want to add complications to the main code.
 
 Extends L<"DESCRIPTION" in Math::Formula::Config|Math::Formula::Config/"DESCRIPTION">.
- 
+
 =head1 METHODS
 
 Extends L<"METHODS" in Math::Formula::Config|Math::Formula::Config/"METHODS">.
- 
+
 =head2 Constructors
 
 Extends L<"Constructors" in Math::Formula::Config|Math::Formula::Config/"Constructors">.
- 
+
 =over 4
 
-=item Math::Formula::Config::YAML-E<gt>B<new>(%options)
+=item $class-E<gt>B<new>(%options)
 
 Inherited, see L<Math::Formula::Config/"Constructors">
 
@@ -48,7 +48,7 @@ Inherited, see L<Math::Formula::Config/"Constructors">
 =head2 Attributes
 
 Extends L<"Attributes" in Math::Formula::Config|Math::Formula::Config/"Attributes">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<directory>()
@@ -64,12 +64,13 @@ Inherited, see L<Math::Formula::Config/"Attributes">
 =head2 Actions
 
 Extends L<"Actions" in Math::Formula::Config|Math::Formula::Config/"Actions">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<load>($name, %options)
 
 Load a L<Math::Formula::Context|Math::Formula::Context> for a yml file.
+Improves base, see L<Math::Formula::Config/"Actions">
 
  -Option  --Default
   filename  <directory/$name.yml>
@@ -80,13 +81,14 @@ Load a L<Math::Formula::Context|Math::Formula::Context> for a yml file.
 
 =back
 
-=item $obj-E<gt>B<save>($context, %args)
+=item $obj-E<gt>B<save>($context, %options)
 
-Serialize the $context to YAML files, as storage or to be edited by hand.
+Serialize the C<$context> to YAML files, as storage or to be edited by hand.
 This is a useful method when default configuration templates need to be generated.
+Improves base, see L<Math::Formula::Config/"Actions">
 
  -Option  --Default
-  filename  C<< $context->name .yml>
+  filename  $context->name .yml
 
 =over 2
 
@@ -110,7 +112,7 @@ document (but are not yet supported).
 
 On Perl, you will need YAML::XS to be able to treat booleans
 correctly.  For instance, C<YAML.pm> will create a string with content
-'true' without quotes... which makes it a boolean.
+'C<true>' without quotes... which makes it a boolean.
 
 B<. Example>
 
@@ -132,16 +134,43 @@ B<. Example>
   string: 'true'
   ---
 
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Fault: Error on close while saving '$name' to $file: $!
+
+Z<>
+
+=item Error: Save directory '$dir' does not exist
+
+Z<>
+
+=item Error: Save directory required
+
+Z<>
+
+=item Fault: Trying to save context '$name' to $file: $!
+
+Z<>
+
+=item Warning: cannot (yet) save CODE, skipped '$name'
+
+Z<>
+
+=back
+
 =head1 SEE ALSO
 
-This module is part of Math-Formula distribution version 0.16,
-built on March 14, 2023. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Math-Formula version 0.17,
+built on August 17, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2023 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2023-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

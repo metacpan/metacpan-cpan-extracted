@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 40;
+use Test::More tests => 41;
 use Test::Deep;
 
 use lib qw(t/lib);
@@ -20,7 +20,7 @@ $chobo->read_obo(filename => 't/data/mini_go.obo');
 
 $chobo->chado_store();
 
-is($ontology_data->get_terms(), 3);
+is($ontology_data->get_terms(), 4);
 
 my $cyanidin_name =
   qq|cyanidin 3-O-glucoside-(2"-O-xyloside) 6''-O-acyltransferase activity|;
@@ -43,7 +43,13 @@ cmp_deeply([
               name => 'molecular_function', id => 'GO:0003674',
               definition => 'Elemental activities, such as catalysis or binding, describing the actions of a gene product at the molecular level. A given gene product may exhibit one or more molecular functions.' },
             { name => $cyanidin_name, id => 'GO:0102583',
-              definition => $cyanidin_def }]);
+              definition => $cyanidin_def },
+             {
+               name => 'output_of',
+               id => 'RO:0002353',
+               definition => 'The output of something',
+             },
+           ]);
 
 
 my $sth = $fake_handle->prepare("select cvterm_id, definition, name, cv_id from cvterm order by name");
@@ -66,6 +72,8 @@ my $narrow_term = $sth->fetchrow_hashref();
 is ($narrow_term->{name}, 'narrow');
 my $obsolete_term = $sth->fetchrow_hashref();
 is ($obsolete_term->{name}, 'obsolete repairosome (obsolete GO:0000108)');
+my $output_of_term = $sth->fetchrow_hashref();
+is ($output_of_term->{name}, 'output_of');
 my $pombase_gene_id_term = $sth->fetchrow_hashref();
 is ($pombase_gene_id_term->{name}, 'pombase_gene_id');
 my $replaced_by_term = $sth->fetchrow_hashref();
@@ -194,7 +202,7 @@ $chobo->read_obo(filename => 't/data/mini_pro.obo');
 
 $chobo->chado_store();
 
-is($ontology_data->get_terms(), 2);
+is($ontology_data->get_terms(), 3);
 
 $sth = $fake_handle->prepare("select cvterm_id, definition, name, cv_id from cvterm order by name");
 $sth->execute();

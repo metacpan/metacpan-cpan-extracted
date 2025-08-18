@@ -14,7 +14,9 @@ use warnings;
 use Carp;
 use Scalar::Util qw(looks_like_number);
 
-our $VERSION = v0.01;
+use parent 'Data::Identifier::Interface::Userdata';
+
+our $VERSION = v0.02;
 
 my %_die_raen = (code => 0, P => 7, codeX => 0, S => 2, T => 4+1, is_return => 1);
 
@@ -47,6 +49,12 @@ my %_simple_opcodes = (
     autodie         => [\@_simple_0 => {code => 0, P => 7, codeX => 0, S => 2, T => 4+0, is_autodie => 1}],
 
     filesize        => [[int_half => 'extra[]'] => {code => 0, P => 1, codeX => 0, S => 0, T => 0+1}],
+    section_pointer => [[int_half => 'extra[]'] => {code => 0, P => 1, codeX => 0, S => 1, T => 0+1}],
+    minimum_handles => [[int_half => 'extra[]'] => {code => 0, P => 1, codeX => 0, S => 2, T => 0+1}],
+    minimum_memory  => [[int_half => 'extra[]'] => {code => 0, P => 1, codeX => 0, S => 3, T => 0+1}],
+    text_boundary   => [[int_half => 'extra[]'] => {code => 0, P => 1, codeX => 0, S => 4, T => 0+1}],
+    load_boundary   => [[int_half => 'extra[]'] => {code => 0, P => 1, codeX => 0, S => 5, T => 0+1}],
+
     rjump           => [[int      => 'extra[]'] => {code => 0, P => 7, codeX => 0, S => 4, T => 0+1}],
 
     unref           => [\@_simple_1 => {code => 0, codeX => 1, S => 0, T => 0+0}],
@@ -477,7 +485,7 @@ SIRTX::VM::Opcode - module for single SIRTX VM opcodes
 
 =head1 VERSION
 
-version v0.01
+version v0.02
 
 =head1 SYNOPSIS
 
@@ -486,6 +494,8 @@ version v0.01
     my SIRTX::VM::Opcode $opcode = SIRTX::VM::Opcode->new(...);
 
     $opcode->write($out);
+
+This package inherits from L<Data::Identifier::Interface::Userdata>.
 
 =head1 METHODS
 

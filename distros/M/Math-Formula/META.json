@@ -4,7 +4,7 @@
       "Mark Overmeer <markov@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -30,9 +30,13 @@
             "ExtUtils::MakeMaker" : "0"
          }
       },
+      "develop" : {
+         "requires" : {
+            "OODoc" : "3.02"
+         }
+      },
       "runtime" : {
          "requires" : {
-            "Config::INI" : "0.025",
             "Cpanel::JSON::XS" : "4.35",
             "DateTime" : "0",
             "DateTime::Duration" : "0",
@@ -48,20 +52,47 @@
             "YAML::XS" : "0.81",
             "boolean" : "0.46"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "1",
+            "Test::Pod" : "1"
+         }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "homepage" : "http://perl.overmeer.net/CPAN/",
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ],
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/markov2/perl5-Math-Formula.git",
          "web" : "https://github.com/markov2/perl5-Math-Formula"
       }
    },
-   "version" : "0.16",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "0.17",
+   "x_oodist" : {
+      "email" : "markov@cpan.org",
+      "first_year" : 2023,
+      "generate" : [
+         {
+            "format" : "pod3",
+            "podtail" : null
+         }
+      ],
+      "include" : [],
+      "oodoc_version" : 3.03,
+      "parser" : {
+         "pmhead" : null,
+         "skip_links" : [
+            "MF"
+         ],
+         "syntax" : "markov"
+      },
+      "release" : {
+         "publish" : "../public_html/math-formula/source"
+      },
+      "tests" : {},
+      "use" : []
+   },
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

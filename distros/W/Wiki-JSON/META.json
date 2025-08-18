@@ -28,20 +28,24 @@
             "Moo" : "0",
             "Path::Tiny" : "0",
             "Test::Most" : "0",
-            "perl" : "v5.38.0"
+            "perl" : "v5.16.3"
          }
       }
    },
    "provides" : {
       "Wiki::JSON" : {
          "file" : "lib/Wiki/JSON.pm",
-         "version" : "v0.0.11"
+         "version" : "v0.0.21"
+      },
+      "Wiki::JSON::Contributing" : {
+         "file" : "lib/Wiki/JSON/Contributing.pm"
       },
       "Wiki::JSON::Parser" : {
          "file" : "lib/Wiki/JSON/Parser.pm"
       }
    },
    "release_status" : "stable",
-   "version" : "v0.0.11",
+   "resources" : {},
+   "version" : "v0.0.21",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -13,7 +13,9 @@ use warnings;
 
 use Carp;
 
-our $VERSION = v0.01;
+use parent 'Data::Identifier::Interface::Userdata';
+
+our $VERSION = v0.02;
 
 1;
 
@@ -29,11 +31,13 @@ SIRTX::VM - module for interacting with SIRTX VM code
 
 =head1 VERSION
 
-version v0.01
+version v0.02
 
 =head1 SYNOPSIS
 
     use SIRTX::VM;
+
+This package inherits from L<Data::Identifier::Interface::Userdata>.
 
 =head1 METHODS
 

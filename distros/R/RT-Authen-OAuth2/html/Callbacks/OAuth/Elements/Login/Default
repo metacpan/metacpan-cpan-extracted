@@ -4,6 +4,15 @@ return unless RT->Config->Get('EnableOAuth2');
 <div id="authen-oauth-login">
 % my $next_state = $session{NextPage}->{$ARGS{next} || ''};
 % $next_state = $next_state->{url} if ref $next_state;
-<span class="input"><a
-href="<%RT->Config->Get('WebPath')%>/NoAuth/OAuth<% $next_state ?  "?next=$next_state" : "" %>"><img src="<% RT->Config->Get('WebPath') . RT::Authen::OAuth2::IDPLoginButtonImage() %>" alt="<% loc('Log in using OAuth 2') %>" /></a></span>
-</div>
+% my $LoginButtonImage = RT::Authen::OAuth2::IDPLoginButtonImage() || '';
+% my $IDPName = RT::Authen::OAuth2::IDPName();
+
+<span class="input">
+% if ($LoginButtonImage ne '') {
+<a href="<%RT->Config->Get('WebPath')%>/NoAuth/OAuth<% $next_state ?  "?next=$next_state" : "" %>">
+<img src="<% RT->Config->Get('WebPath') . $LoginButtonImage %>" alt="<% loc('Log in using OAuth 2') %> (<%$IDPName%>)" />
+% } else {
+<a class="btn btn-primary button" href="<%RT->Config->Get('WebPath')%>/NoAuth/OAuth<% $next_state ?  "?next=$next_state" : "" %>">
+<% loc('Log in using OAuth 2') %> (<%$IDPName%>)
+% }
+</a></span></div>

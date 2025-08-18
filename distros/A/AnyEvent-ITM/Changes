@@ -1,9 +1,25 @@
 ==================================================
-Changes from 1745-02-09 00:00:00 +0000 to present.
+Changes from 1751-11-03 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.003 at 2018-11-24 23:39:23 +0000
+version 0.100 at 2025-08-17 22:40:12 +0000
+------------------------------------------
+
+  Change: ad774d462c65e89d1aa8c785dc10cbdf79ea8764
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2025-08-18 00:39:45 +0000
+
+    Adding command feature and removing travis 
+
+  Change: 9d7bae94bf09050dce71f604f1d7223e472698f9
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2019-08-25 20:29:13 +0000
+
+    New .travis.yml 
+
+------------------------------------------
+version 0.003 at 2018-11-24 23:39:12 +0000
 ------------------------------------------
 
   Change: e2f314fc6d53baa88bb42eff86560a27987f6095

@@ -9,7 +9,6 @@ use Math::Formula::Context ();
 use Test::More;
 
 my $expr = Math::Formula->new(test => 1);
-
 is_deeply $expr->_tokenize('mark'),       [ MF::NAME->new('mark') ];
 is_deeply $expr->_tokenize('_mark_42'),   [ MF::NAME->new('_mark_42') ];
 
@@ -36,5 +35,12 @@ is $context->run('not exists green_man')->token, 'true';
 is $context->run('live // green_man')->value, 42, 'default, not needed';
 is $context->run('green_man // live')->value, 42, '... needed';
 is $context->run('green_man // missing // no_not_here // 13')->value, 13, '... into constant';
+
+### James Wright rt.cpan.org #168753
+
+my $ctx = Math::Formula::Context->new(name => 'ctx');
+$ctx->add({ length => 3, width => 4, height => 5 });
+$ctx->addFormula( volume => 'length * width * height');
+is $ctx->evaluate('volume')->value, 60, 'rvalue name';
 
 done_testing;

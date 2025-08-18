@@ -19,7 +19,7 @@ use Data::URIID::Colour;
 
 use parent qw(Data::Identifier::Interface::Userdata Data::Identifier::Interface::Subobjects Data::Identifier::Interface::Known);
 
-our $VERSION = v0.01;
+our $VERSION = v0.02;
 
 my %_abstract_names_to_ise = (
     black    => 'fade296d-c34f-4ded-abd5-d9adaf37c284',
@@ -165,6 +165,13 @@ my %_palette = (
         orange      => '#e34911',
         _other      => ['#1b528c', '#1c1c1c', '#1d1d1d', '#272727', '#2b2b2b', '#3296ff', '#336698', '#4b7ca8', '#4c444f', '#5a5a5a', '#6698cb', '#6a70d4', '#798ecb', '#cb2009', '#e6e6e6', '#eaeaea', '#fdfdfd'],
     },
+    wfw_default => {
+        black       => '#000000',
+        white       => '#ffffff',
+        blue        => '#000080',
+        grey        => '#c0c0c0',
+        _other      => ['#808080'],
+    },
 );
 
 {
@@ -292,7 +299,7 @@ sub new {
             if (defined(my $for = $opts{'for_'.$key})) {
                 unless (defined $self->{origin}) {
                     require Digest;
-                    my $v = unpack('L', Digest->new('SHA-1')->add($for)->digest) & 0xFFFFFF;
+                    my $v = unpack('L', Digest->new('SHA-1')->add($key)->add(':')->add($for)->digest) & 0xFFFFFF;
                     my $palette = $self->{palette}{_all};
                     $v = $palette->[$v % scalar(@{$palette})];
                     $self->{specific} = $self->{origin} = Data::URIID::Colour->new(rgb => $v);
@@ -414,7 +421,7 @@ sub _colour_getter {
     }
 
     if (defined(my $val = $self->{$key})) {
-        return $val->as($as);
+        return $val->as($as, extractor => $self->extractor);
     }
 
     return $value_default if $exists_default;
@@ -504,7 +511,7 @@ Data::Displaycolour - Work with display colours
 
 =head1 VERSION
 
-version v0.01
+version v0.02
 
 =head1 SYNOPSIS
 

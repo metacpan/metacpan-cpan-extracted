@@ -1,11 +1,21 @@
-# Copyrights 2023 by [Mark Overmeer <markov@cpan.org>].
-#  For other contributors see ChangeLog.
-# See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.03.
+# This code is part of Perl distribution Math-Formula version 0.17.
+# The POD got stripped from this file by OODoc version 3.03.
+# For contributors see file ChangeLog.
 
-package Math::Formula::Context;
-use vars '$VERSION';
-$VERSION = '0.16';
+# This software is copyright (c) 2023-2025 by Mark Overmeer.
+
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+# SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
+
+#oodist: *** DO NOT USE THIS VERSION FOR PRODUCTION ***
+#oodist: This file contains OODoc-style documentation which will get stripped
+#oodist: during its release in the distribution.  You can use this file for
+#oodist: testing, however the code of this development version may be broken!
+
+package Math::Formula::Context;{
+our $VERSION = '0.17';
+}
 
 
 use warnings;
@@ -14,6 +24,7 @@ use strict;
 use Log::Report 'math-formula';
 use Scalar::Util qw/blessed/;
 
+#--------------------
 
 sub new(%) { my $class = shift; (bless {}, $class)->init({@_}) }
 
@@ -36,9 +47,9 @@ sub init($)
 	my $now;
 	$self->{MFC_attrs} = {
 		ctx_name       => $node,
-		ctx_version    => $self->_default(version => 'MF::STRING',   $args->{version}, "1.00"),
-		ctx_created    => $self->_default(created => 'MF::DATETIME', $args->{created}, $now = DateTime->now),
-		ctx_updated    => $self->_default(updated => 'MF::DATETIME', $args->{updated}, $now //= DateTime->now),
+		ctx_version    => $self->_default(version => 'MF::STRING',    $args->{version}, "1.00"),
+		ctx_created    => $self->_default(created => 'MF::DATETIME',  $args->{created}, $now = DateTime->now),
+		ctx_updated    => $self->_default(updated => 'MF::DATETIME',  $args->{updated}, $now //= DateTime->now),
 		ctx_mf_version => $self->_default(mf_version => 'MF::STRING', $args->{mf_version}, $Math::Formula::VERSION),
 	};
 
@@ -63,12 +74,12 @@ sub _index()
 	  };
 }
 
-#--------------
+#--------------------
 
 sub name             { $_[0]->{MFC_name} }
 sub lead_expressions { $_[0]->{MFC_lead} }
 
-#--------------
+#--------------------
 
 sub attribute($)
 {	my ($self, $name) = @_;
@@ -76,7 +87,7 @@ sub attribute($)
 	Math::Formula->new($name => $def);
 }
 
-#--------------
+#--------------------
 #XXX example with fragment
 
 sub add(@)
@@ -154,7 +165,7 @@ sub addFragment($;$)
 
 sub fragment($) { $_[0]->{MFC_frags}{$_[1]} }
 
-#-------------------
+#--------------------
 
 sub evaluate($$%)
 {	my ($self, $name) = (shift, shift);
@@ -170,8 +181,7 @@ sub evaluate($$%)
 
 	my $claims = $self->{MFC_claims};
 	! $claims->{$name}++
-		or error __x"recursion in expression '{name}' at {context}",
-			name => $name, context => $self->name;
+		or error __x"recursion in expression '{name}' at {context}", name => $name, context => $self->name;
 
 	my $result = $form->evaluate($self, @_);
 
@@ -206,6 +216,6 @@ sub _captures() { $_[0]{MFC_capts} }
 
 sub capture($) { $_[0]->_captures->[$_[1]] }
 
-#--------------
+#--------------------
 
 1;

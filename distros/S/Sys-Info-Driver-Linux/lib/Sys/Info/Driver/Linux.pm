@@ -1,5 +1,5 @@
 package Sys::Info::Driver::Linux;
-$Sys::Info::Driver::Linux::VERSION = '0.7908';
+$Sys::Info::Driver::Linux::VERSION = '0.7909';
 use strict;
 use warnings;
 use parent qw( Exporter );
@@ -18,6 +18,7 @@ use constant proc => { ## no critic (NamingConventions::Capitalization)
     timezone_old => '/etc/timezone',
     timezone     => '/etc/localtime',
     issue        => '/etc/issue',
+    scaling_cur_freq => '/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq',
 };
 
 1;
@@ -34,7 +35,7 @@ Sys::Info::Driver::Linux
 
 =head1 VERSION
 
-version 0.7908
+version 0.7909
 
 =head1 SYNOPSIS
 

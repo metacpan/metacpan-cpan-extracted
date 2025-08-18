@@ -1,5 +1,9 @@
 Revision history for Data::Money
 
+0.21  2025-08-17 MANWAR
+      - Proposed patch for issue #10.
+      Fixed incorrect character encoding in as_string()
+
 0.20  2022-07-04 MANWAR
       - Updated link to bugtracker and to homepage, thanks @szabgab.
       - Added .gitignore thanks @szabgab.

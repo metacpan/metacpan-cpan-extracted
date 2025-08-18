@@ -12,41 +12,123 @@ class Mojo::Headers {
   use StringBuffer;
   use Mojo::Cookie::Request;
   use Mojo::Cookie::Response;
+  use Mojo::Util;
   
-  # Enumerations
-  enum {
-    MAX_LINE_SIZE_DEFAULT = 8192,
-    MAX_LINES_DEFAULT = 100,
+  # Class Variables
+  our $NAMES : Hash of string;
+  INIT {
+    $NAMES = Hash->new;
+    
+    my $names = [
+      "Accept",
+      "Accept-Charset",
+      "Accept-Encoding",
+      "Accept-Language",
+      "Accept-Ranges",
+      "Access-Control-Allow-Origin",
+      "Allow",
+      "Authorization",
+      "Cache-Control",
+      "Connection",
+      "Content-Disposition",
+      "Content-Encoding",
+      "Content-Language",
+      "Content-Length",
+      "Content-Location",
+      "Content-Range",
+      "Content-Security-Policy",
+      "Content-Type",
+      "Cookie",
+      "DNT",
+      "Date",
+      "ETag",
+      "Expect",
+      "Expires",
+      "Host",
+      "If-Modified-Since",
+      "If-None-Match",
+      "Last-Modified",
+      "Link",
+      "Location",
+      "Origin",
+      "Proxy-Authenticate",
+      "Proxy-Authorization",
+      "Range",
+      "Sec-WebSocket-Accept",
+      "Sec-WebSocket-Extensions",
+      "Sec-WebSocket-Key",
+      "Sec-WebSocket-Protocol",
+      "Sec-WebSocket-Version",
+      "Server",
+      "Server-Timing",
+      "Set-Cookie",
+      "Status",
+      "Strict-Transport-Security",
+      "TE",
+      "Trailer",
+      "Transfer-Encoding",
+      "Upgrade",
+      "User-Agent",
+      "Vary",
+      "WWW-Authenticate",
+    ];
+    
+    for my $name (@$names) {
+      $NAMES->set(Fn->lc($name) => $name);
+    }
+  }
+  
+  # Hop-by-hop headers
+  our $HOP_BY_HOP : string[];
+  INIT {
+    $HOP_BY_HOP = [
+      "Connection",
+      "Keep-Alive",
+      "Proxy-Authenticate",
+      "Proxy-Authorization",
+      "TE",
+      "Trailer",
+      "Transfer-Encoding",
+      "Upgrade",
+    ];
+    
+    for (my $i = 0; $i < @$HOP_BY_HOP; $i++) {
+      $HOP_BY_HOP->[$i] = Fn->lc($HOP_BY_HOP->[$i]);
+    }
   }
   
   # Fields
-  has headers_h : Hash;
-  
-  has max_line_size : wo int;
-  
-  method max_line_size : int () {
-    
-    if ($self->{max_line_size} < 0) {
-      $self->{max_line_size} = &MAX_LINE_SIZE_DEFAULT;
+  has max_line_size : rw int
+    get {
+      unless ($self->{max_line_size} > -1) {
+        $self->{max_line_size} = length (my $_ = Sys->env("SPVM_MOJO_MAX_LINE_SIZE")) ? (int)$_ : -1;
+        
+        unless ($self->{max_line_size} > -1) {
+          $self->{max_line_size} = 8192;
+        }
+      }
+      
+      return $self->{max_line_size};
     }
-    
-    return $self->{max_line_size};
-  }
+  ;
   
-  has max_lines : wo int;
-  
-  method max_lines : int () {
-    
-    if ($self->{max_lines} < 0) {
-      $self->{max_lines} = &MAX_LINES_DEFAULT;
+  has max_lines : rw int
+    get {
+      unless ($self->{max_lines} > -1) {
+        $self->{max_lines} = length (my $_ = Sys->env("SPVM_MOJO_MAX_LINES")) ? (int)$_ : -1;
+        
+        unless ($self->{max_lines} > -1) {
+          $self->{max_lines} = 100;
+        }
+      }
+      
+      return $self->{max_lines};
     }
-    
-    return $self->{max_lines};
-  }
-  
-  method max_lines_default : int () { return 100; }
+  ;
   
   # Undocumented Fields
+  has headers_h : Hash of string[];
+  
   has state : string;
   
   has limit : byte;
@@ -72,40 +154,55 @@ class Mojo::Headers {
   }
   
   # Instance Methods
-  method add : void ($name : string, $value : string) {
+  method add : void ($name : string, $value : object of string|Stringable|string[]) {
     
     unless ($name) {
-      die "\$name must be defined.";
+      die "The name \$name must be defined.";
     }
     
-    unless ($value) {
-      die "\$value must be defined.";
+    my $values = (string[])undef;
+    if (!$value) {
+      $values = [(string)$value];
+    }
+    elsif ($value isa string) {
+      $values = [(string)$value];
+    }
+    elsif ($value isa string[]) {
+      $values = (string[])$value;
+    }
+    elsif ($value isa Stringable) {
+      $values = [$value->(Stringable)->to_string];
     }
     
-    if (Re->m($name, "[\x0d\x0a]")) {
-      die "Invalid characters in the $name header.";
+    for my $value (@$values) {
+      
+      unless ($value) {
+        die "The value \$value must be defined.";
+      }
+      
+      if (Re->m($value, "[\x0d\x0a]")) {
+        die "Invalid characters in the $name header.";
+      }
+      
+      my $key = Fn->lc($name);
+      
+      my $new_values = (string[])undef;
+      if (my $cur_values = (string[])$self->{headers_h}->get($key)) {
+        $new_values = Array->merge_string($cur_values, [$value]);
+      }
+      else {
+        $new_values = [$value];
+      }
+      
+      $self->{headers_h}->set($key, $new_values);
     }
-    
-    if (Re->m($value, "[\x0d\x0a]")) {
-      die "Invalid characters in the value of the $name header.";
-    }
-    
-    my $key = Fn->lc($name);
-    
-    my $new_value = (string)undef;
-    if (my $cur_value = $self->{headers_h}->get_string($key)) {
-      $new_value = "$cur_value, $value";
-    }
-    else {
-      $new_value = $value;
-    }
-    
-    $self->{headers_h}->set($key, $new_value);
   }
   
   method append : void ($name : string, $value : string) {
     
-    $self->add($name, $value);
+    my $old = $self->header($name);
+    
+    $self->set_header($name => $old ? "$old, $value" : $value);
   }
   
   method clone : Mojo::Headers () {
@@ -115,7 +212,7 @@ class Mojo::Headers {
     copy_fields $clone, $self, Mojo::Headers;
     
     for my $_ (@{$self->{headers_h}->keys}) {
-      $clone->{headers_h}->set($_ => $self->{headers_h}->get_string($_));
+      $clone->{headers_h}->set($_ => $self->{headers_h}->get($_));
     }
     
     $clone->{buffer} = $self->{buffer}->clone;
@@ -125,15 +222,17 @@ class Mojo::Headers {
   
   method dehop : void () {
     
-    my $hop_by_hop = ["connection", "keep-alive", "proxy-authenticate", "proxy-authorization", "te trailer", "transfer-encoding upgrade"];
-    
-    for my $header (@$hop_by_hop) {
+    for my $header (@$HOP_BY_HOP) {
       $self->{headers_h}->delete($header);
     }
   }
   
-  # TODO: Currently a header value is managed as a string if it has multiple values.
-  # method every_header : string[] ($name : string) {}
+  method every_header : string[] ($name : string) {
+    
+    my $values = (string[])$self->{headers_h}->get(Fn->lc($name)) // new string[0];
+    
+    return $values;
+  }
   
   method from_hash : Mojo::Headers ($hash : Hash) {
     
@@ -178,12 +277,17 @@ class Mojo::Headers {
     
     my $key = Fn->lc($name);
     
-    my $value = $self->{headers_h}->get_string($key);
+    my $values = (string[])$self->{headers_h}->get($key);
     
-    return $value;
+    if ($values) {
+      return Fn->join(", ", $values);
+    }
+    else {
+      return undef;
+    }
   }
   
-  method set_header : void ($name : string, $value : string) {
+  method set_header : void ($name : string, $value : object of string|Stringable|string[]) {
     
     $self->remove($name);
     
@@ -200,8 +304,51 @@ class Mojo::Headers {
     return $buffer->to_string;
   }
   
-  # TODO
-  # mthod links
+  method links : Hash of Hash of string () {
+    
+    my $header = $self->link // "";
+    my $data   = (Hash of Hash of string)Hash->new;
+    while (1) {
+      if (my $r = Re->s(my $_ = [$header], "^[,\s]*<(.+?)>", "")) {
+        $header = $_->[0];
+        
+        my $m = $r->match;
+        my $target = $m->cap1;
+        my $params_and_header = Mojo::Util->header_params($header);
+        my $params = (Hash)$params_and_header->[0];
+        $header = (string)$params_and_header->[1];
+        
+        if (my $rel = $params->get_string("rel")) {
+          unless ($data->get($rel)) {
+            my $params_h = (Hash of string)$params->clone;
+            $params_h->set("link" => $target);
+            $data->set($rel => $params_h);
+          }
+        }
+      }
+    }
+    
+    return $data;
+  }
+  
+  method set_links : void ($links : object[]) {
+    
+    die "The links \$links must be defined.";
+    
+    my $links_h = Hash->new($links);
+    
+    my $keys = $links_h->keys;
+    
+    Sort->sort_string_asc($keys);
+    
+    my $string_links_list = StringList->new;
+    
+    for my $_ (@$keys) {
+      my $string_link = "<" . $links_h->get_string($_) . ">; rel=\"$_\"}";
+    }
+    
+    $self->set_link(Fn->join(", ", $string_links_list->to_array));
+  }
   
   method names : string[] () {
     
@@ -221,10 +368,6 @@ class Mojo::Headers {
     my $size    = $self->max_line_size;
     my $lines   = $self->max_lines;
     
-    # TODO: This is not needed. For SPVM or SPVM::Regex bug
-    # $self->{state} = "finished"; removes $buffer if this line does not exists
-    my $buffer_tmp = $buffer;
-    
     my $offset = 0;
     while (1) {
       
@@ -235,10 +378,6 @@ class Mojo::Headers {
       }
       
       my $line_buffer = StringBuffer->new($_->match->cap1);
-      
-      # TODO: This is not needed. For SPVM or SPVM::Regex bug
-      # $self->{state} = "finished"; removes $line_buffer if this line does not exists
-      my $line_buffer_tmp = $line_buffer;
       
       # Check line size limit
       if ($offset > $size || $headers->length >= $lines) {
@@ -297,6 +436,43 @@ class Mojo::Headers {
     }
   }
   
+  method referer : string () { return $self->referrer; }
+  
+  method set_referer : void ($value : object of string|Stringable|string[]) { $self->set_referrer($value); }
+  
+  method referrer : string () { return $self->header("Referer"); }
+  
+  method set_referrer : void ($value : object of string|Stringable|string[]) { $self->set_header(Referer => $value); }
+  
+  method remove : void ($name : string) {
+    
+    unless ($name) {
+      die "The name \$name must be defined";
+    }
+    
+    my $key = Fn->lc($name);
+    
+    $self->{headers_h}->delete($key);
+  }
+  
+  method to_hash : Hash ($multi : int = 0) {
+    
+    my $hash = Hash->new;
+    
+    if ($multi) {
+      for my $name (@{$self->names}) {
+        $hash->set($name => $self->{headers_h}->get(Fn->lc($name)));
+      }
+    }
+    else {
+      for my $name (@{$self->names}) {
+        $hash->set($name => $self->header($name));
+      }
+    }
+    
+    return $hash;
+  }
+  
   method to_string : string () {
     
     my $names = $self->names;
@@ -316,36 +492,6 @@ class Mojo::Headers {
     return $string;
   }
   
-  method referer : string () { return $self->referrer; }
-  
-  method set_referer : void ($value : string) { $self->set_referrer($value); }
-  
-  method referrer : string () { return $self->header("Referer"); }
-  
-  method set_referrer : void ($value : string) { $self->set_header(Referer => $value); }
-  
-  method remove : void ($name : string) {
-    
-    unless ($name) {
-      die "The name \$name must be defined";
-    }
-    
-    my $key = Fn->lc($name);
-    
-    $self->{headers_h}->delete($key);
-  }
-  
-  method to_hash : Hash () {
-    
-    my $hash = Hash->new;
-    
-    for my $name (@{$self->names}) {
-      $hash->set($name => $self->header($name));
-    }
-    
-    return $hash;
-  }
-  
   method accept : string () {
 
     my $value = $self->header("accept");
@@ -353,7 +499,7 @@ class Mojo::Headers {
     return $value;
   }
 
-  method set_accept : void ($value : string) {
+  method set_accept : void ($value : object of string|Stringable|string[]) {
     
     $self->set_header("accept" => $value);
   }
@@ -365,7 +511,7 @@ class Mojo::Headers {
     return $value;
   }
 
-  method set_accept_charset : void ($value : string) {
+  method set_accept_charset : void ($value : object of string|Stringable|string[]) {
 
     $self->set_header("accept-charset" => $value);
   }
@@ -377,7 +523,7 @@ class Mojo::Headers {
     return $value;
   }
 
-  method set_accept_encoding : void ($value : string) {
+  method set_accept_encoding : void ($value : object of string|Stringable|string[]) {
 
     $self->set_header("accept-encoding" => $value);
   }
@@ -389,7 +535,7 @@ class Mojo::Headers {
     return $value;
   }
 
-  method set_accept_language : void ($value : string) {
+  method set_accept_language : void ($value : object of string|Stringable|string[]) {
 
     $self->set_header("accept-language" => $value);
   }
@@ -401,7 +547,7 @@ class Mojo::Headers {
     return $value;
   }
 
-  method set_accept_ranges : void ($value : string) {
+  method set_accept_ranges : void ($value : object of string|Stringable|string[]) {
 
     $self->set_header("accept-ranges" => $value);
   }
@@ -413,7 +559,7 @@ class Mojo::Headers {
     return $value;
   }
 
-  method set_access_control_allow_origin : void ($value : string) {
+  method set_access_control_allow_origin : void ($value : object of string|Stringable|string[]) {
 
     $self->set_header("access-control-allow-origin" => $value);
   }
@@ -425,7 +571,7 @@ class Mojo::Headers {
     return $value;
   }
 
-  method set_allow : void ($value : string) {
+  method set_allow : void ($value : object of string|Stringable|string[]) {
 
     $self->set_header("allow" => $value);
   }
@@ -437,7 +583,7 @@ class Mojo::Headers {
     return $value;
   }
 
-  method set_authorization : void ($value : string) {
+  method set_authorization : void ($value : object of string|Stringable|string[]) {
 
     $self->set_header("authorization" => $value);
   }
@@ -449,7 +595,7 @@ class Mojo::Headers {
     return $value;
   }
 
-  method set_cache_control : void ($value : string) {
+  method set_cache_control : void ($value : object of string|Stringable|string[]) {
 
     $self->set_header("cache-control" => $value);
   }
@@ -461,7 +607,7 @@ class Mojo::Headers {
     return $value;
   }
 
-  method set_connection : void ($value : string) {
+  method set_connection : void ($value : object of string|Stringable|string[]) {
 
     $self->set_header("connection" => $value);
   }
@@ -473,7 +619,7 @@ class Mojo::Headers {
     return $value;
   }
 
-  method set_content_disposition : void ($value : string) {
+  method set_content_disposition : void ($value : object of string|Stringable|string[]) {
 
     $self->set_header("content-disposition" => $value);
   }
@@ -485,7 +631,7 @@ class Mojo::Headers {
     return $value;
   }
 
-  method set_content_encoding : void ($value : string) {
+  method set_content_encoding : void ($value : object of string|Stringable|string[]) {
 
     $self->set_header("content-encoding" => $value);
   }
@@ -497,7 +643,7 @@ class Mojo::Headers {
     return $value;
   }
 
-  method set_content_language : void ($value : string) {
+  method set_content_language : void ($value : object of string|Stringable|string[]) {
 
     $self->set_header("content-language" => $value);
   }
@@ -509,7 +655,7 @@ class Mojo::Headers {
     return $value;
   }
 
-  method set_content_length : void ($value : string) {
+  method set_content_length : void ($value : object of string|Stringable|string[]) {
 
     $self->set_header("content-length" => $value);
   }
@@ -521,7 +667,7 @@ class Mojo::Headers {
     return $value;
   }
 
-  method set_content_location : void ($value : string) {
+  method set_content_location : void ($value : object of string|Stringable|string[]) {
 
     $self->set_header("content-location" => $value);
   }
@@ -533,7 +679,7 @@ class Mojo::Headers {
     return $value;
   }
 
-  method set_content_range : void ($value : string) {
+  method set_content_range : void ($value : object of string|Stringable|string[]) {
 
     $self->set_header("content-range" => $value);
   }
@@ -545,7 +691,7 @@ class Mojo::Headers {
     return $value;
   }
 
-  method set_content_security_policy : void ($value : string) {
+  method set_content_security_policy : void ($value : object of string|Stringable|string[]) {
 
     $self->set_header("content-security-policy" => $value);
   }
@@ -557,7 +703,7 @@ class Mojo::Headers {
     return $value;
   }
 
-  method set_content_type : void ($value : string) {
+  method set_content_type : void ($value : object of string|Stringable|string[]) {
 
     $self->set_header("content-type" => $value);
   }
@@ -569,7 +715,7 @@ class Mojo::Headers {
     return $value;
   }
 
-  method set_cookie : void ($value : string) {
+  method set_cookie : void ($value : object of string|Stringable|string[]) {
 
     $self->set_header("cookie" => $value);
   }
@@ -581,7 +727,7 @@ class Mojo::Headers {
     return $value;
   }
 
-  method set_dnt : void ($value : string) {
+  method set_dnt : void ($value : object of string|Stringable|string[]) {
 
     $self->set_header("dnt" => $value);
   }
@@ -593,7 +739,7 @@ class Mojo::Headers {
     return $value;
   }
 
-  method set_date : void ($value : string) {
+  method set_date : void ($value : object of string|Stringable|string[]) {
 
     $self->set_header("date" => $value);
   }
@@ -605,7 +751,7 @@ class Mojo::Headers {
     return $value;
   }
 
-  method set_etag : void ($value : string) {
+  method set_etag : void ($value : object of string|Stringable|string[]) {
 
     $self->set_header("etag" => $value);
   }
@@ -617,7 +763,7 @@ class Mojo::Headers {
     return $value;
   }
 
-  method set_expect : void ($value : string) {
+  method set_expect : void ($value : object of string|Stringable|string[]) {
 
     $self->set_header("expect" => $value);
   }
@@ -629,7 +775,7 @@ class Mojo::Headers {
     return $value;
   }
 
-  method set_expires : void ($value : string) {
+  method set_expires : void ($value : object of string|Stringable|string[]) {
 
     $self->set_header("expires" => $value);
   }
@@ -641,7 +787,7 @@ class Mojo::Headers {
     return $value;
   }
 
-  method set_host : void ($value : string) {
+  method set_host : void ($value : object of string|Stringable|string[]) {
 
     $self->set_header("host" => $value);
   }
@@ -653,7 +799,7 @@ class Mojo::Headers {
     return $value;
   }
 
-  method set_if_modified_since : void ($value : string) {
+  method set_if_modified_since : void ($value : object of string|Stringable|string[]) {
 
     $self->set_header("if-modified-since" => $value);
   }
@@ -665,7 +811,7 @@ class Mojo::Headers {
     return $value;
   }
 
-  method set_if_none_match : void ($value : string) {
+  method set_if_none_match : void ($value : object of string|Stringable|string[]) {
 
     $self->set_header("if-none-match" => $value);
   }
@@ -677,7 +823,7 @@ class Mojo::Headers {
     return $value;
   }
 
-  method set_last_modified : void ($value : string) {
+  method set_last_modified : void ($value : object of string|Stringable|string[]) {
 
     $self->set_header("last-modified" => $value);
   }
@@ -689,7 +835,7 @@ class Mojo::Headers {
     return $value;
   }
 
-  method set_link : void ($value : string) {
+  method set_link : void ($value : object of string|Stringable|string[]) {
 
     $self->set_header("link" => $value);
   }
@@ -701,7 +847,7 @@ class Mojo::Headers {
     return $value;
   }
 
-  method set_location : void ($value : string) {
+  method set_location : void ($value : object of string|Stringable|string[]) {
 
     $self->set_header("location" => $value);
   }
@@ -713,7 +859,7 @@ class Mojo::Headers {
     return $value;
   }
 
-  method set_origin : void ($value : string) {
+  method set_origin : void ($value : object of string|Stringable|string[]) {
 
     $self->set_header("origin" => $value);
   }
@@ -725,7 +871,7 @@ class Mojo::Headers {
     return $value;
   }
 
-  method set_proxy_authenticate : void ($value : string) {
+  method set_proxy_authenticate : void ($value : object of string|Stringable|string[]) {
 
     $self->set_header("proxy-authenticate" => $value);
   }
@@ -737,7 +883,7 @@ class Mojo::Headers {
     return $value;
   }
 
-  method set_proxy_authorization : void ($value : string) {
+  method set_proxy_authorization : void ($value : object of string|Stringable|string[]) {
 
     $self->set_header("proxy-authorization" => $value);
   }
@@ -749,7 +895,7 @@ class Mojo::Headers {
     return $value;
   }
 
-  method set_range : void ($value : string) {
+  method set_range : void ($value : object of string|Stringable|string[]) {
 
     $self->set_header("range" => $value);
   }
@@ -761,7 +907,7 @@ class Mojo::Headers {
     return $value;
   }
 
-  method set_sec_websocket_accept : void ($value : string) {
+  method set_sec_websocket_accept : void ($value : object of string|Stringable|string[]) {
 
     $self->set_header("sec-websocket-accept" => $value);
   }
@@ -773,7 +919,7 @@ class Mojo::Headers {
     return $value;
   }
 
-  method set_sec_websocket_extensions : void ($value : string) {
+  method set_sec_websocket_extensions : void ($value : object of string|Stringable|string[]) {
 
     $self->set_header("sec-websocket-extensions" => $value);
   }
@@ -785,7 +931,7 @@ class Mojo::Headers {
     return $value;
   }
 
-  method set_sec_websocket_key : void ($value : string) {
+  method set_sec_websocket_key : void ($value : object of string|Stringable|string[]) {
 
     $self->set_header("sec-websocket-key" => $value);
   }
@@ -797,7 +943,7 @@ class Mojo::Headers {
     return $value;
   }
 
-  method set_sec_websocket_protocol : void ($value : string) {
+  method set_sec_websocket_protocol : void ($value : object of string|Stringable|string[]) {
 
     $self->set_header("sec-websocket-protocol" => $value);
   }
@@ -809,7 +955,7 @@ class Mojo::Headers {
     return $value;
   }
 
-  method set_sec_websocket_version : void ($value : string) {
+  method set_sec_websocket_version : void ($value : object of string|Stringable|string[]) {
 
     $self->set_header("sec-websocket-version" => $value);
   }
@@ -821,7 +967,7 @@ class Mojo::Headers {
     return $value;
   }
 
-  method set_server : void ($value : string) {
+  method set_server : void ($value : object of string|Stringable|string[]) {
 
     $self->set_header("server" => $value);
   }
@@ -833,7 +979,7 @@ class Mojo::Headers {
     return $value;
   }
 
-  method set_server_timing : void ($value : string) {
+  method set_server_timing : void ($value : object of string|Stringable|string[]) {
 
     $self->set_header("server-timing" => $value);
   }
@@ -845,7 +991,7 @@ class Mojo::Headers {
     return $value;
   }
 
-  method set_set_cookie : void ($value : string) {
+  method set_set_cookie : void ($value : object of string|Stringable|string[]) {
 
     $self->set_header("set-cookie" => $value);
   }
@@ -857,7 +1003,7 @@ class Mojo::Headers {
     return $value;
   }
 
-  method set_status : void ($value : string) {
+  method set_status : void ($value : object of string|Stringable|string[]) {
 
     $self->set_header("status" => $value);
   }
@@ -869,7 +1015,7 @@ class Mojo::Headers {
     return $value;
   }
 
-  method set_strict_transport_security : void ($value : string) {
+  method set_strict_transport_security : void ($value : object of string|Stringable|string[]) {
 
     $self->set_header("strict-transport-security" => $value);
   }
@@ -881,7 +1027,7 @@ class Mojo::Headers {
     return $value;
   }
 
-  method set_te : void ($value : string) {
+  method set_te : void ($value : object of string|Stringable|string[]) {
 
     $self->set_header("te" => $value);
   }
@@ -893,7 +1039,7 @@ class Mojo::Headers {
     return $value;
   }
 
-  method set_trailer : void ($value : string) {
+  method set_trailer : void ($value : object of string|Stringable|string[]) {
 
     $self->set_header("trailer" => $value);
   }
@@ -905,7 +1051,7 @@ class Mojo::Headers {
     return $value;
   }
 
-  method set_transfer_encoding : void ($value : string) {
+  method set_transfer_encoding : void ($value : object of string|Stringable|string[]) {
 
     $self->set_header("transfer-encoding" => $value);
   }
@@ -917,7 +1063,7 @@ class Mojo::Headers {
     return $value;
   }
 
-  method set_upgrade : void ($value : string) {
+  method set_upgrade : void ($value : object of string|Stringable|string[]) {
 
     $self->set_header("upgrade" => $value);
   }
@@ -929,7 +1075,7 @@ class Mojo::Headers {
     return $value;
   }
 
-  method set_user_agent : void ($value : string) {
+  method set_user_agent : void ($value : object of string|Stringable|string[]) {
 
     $self->set_header("user-agent" => $value);
   }
@@ -941,7 +1087,7 @@ class Mojo::Headers {
     return $value;
   }
 
-  method set_vary : void ($value : string) {
+  method set_vary : void ($value : object of string|Stringable|string[]) {
 
     $self->set_header("vary" => $value);
   }
@@ -953,7 +1099,7 @@ class Mojo::Headers {
     return $value;
   }
 
-  method set_www_authenticate : void ($value : string) {
+  method set_www_authenticate : void ($value : object of string|Stringable|string[]) {
 
     $self->set_header("www-authenticate" => $value);
   }

@@ -22,3 +22,9 @@ comment: Category=organism-modification. Requested by=PomBase.
 synonym: "Spom-hht1/InitMet-" EXACT PRO-short-label [PRO:DAN]
 is_a: PR:000000001
 property_value: pombase_gene_id SPAC1834.04
+
+
+[Typedef]
+id: output_of
+name: output_of
+def: "The output of something"

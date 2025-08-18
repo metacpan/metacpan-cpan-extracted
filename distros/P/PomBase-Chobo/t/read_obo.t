@@ -91,7 +91,7 @@ my $dodgy_term_ontology_data = PomBase::Chobo::OntologyData->new();
 $parser->parse(filename => 't/data/mini_go.obo',
                ontology_data => $dodgy_term_ontology_data);
 
-is ($dodgy_term_ontology_data->get_terms(), 3);
+is ($dodgy_term_ontology_data->get_terms(), 4);
 
 my @dodgy_terms = sort map {
   $_->{name}
@@ -102,6 +102,7 @@ cmp_deeply(\@dodgy_terms,
              'cyanidin 3-O-glucoside-(2"-O-xyloside) 6\'\'-O-acyltransferase activity',
              'molecular_function',
              'obsolete repairosome',
+             'output_of',
            ]);
 
 

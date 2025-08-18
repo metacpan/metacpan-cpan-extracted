@@ -1,6 +1,29 @@
-0.0.7 Wed Aug 13 19:18:14 2025 +0200
-    - Fixing Kwalitee issues
+0.0.21 Mon Aug 18 09:49:57 2025 +0200
+    - Adding Contributing.pm
 
-0.0.7 Wed Aug 13 03:02:14 2025 +0200
-    - Fixing documentation
+0.0.20 Mon Aug 18 09:15:10 2025 +0200
+    - Avoiding entirely empty text
 
+0.0.19 Mon Aug 18 07:02:10 2025 +0200
+    - signatures module ditched
+
+0.0.18 Mon Aug 18 06:27:07 2025 +0200
+    - Set bugtracker and repository
+
+0.0.17 Mon Aug 18 06:19:00 2025 +0200
+    - Fixing pre and trailing spaces in headers
+
+0.0.16 Mon Aug 18 03:51:45 2025 +0200
+    - Adding tests before releasing
+
+0.0.15 Mon Aug 18 03:51:45 2025 +0200
+    - Improving Changelog
+
+0.0.14 Mon Aug 18 03:46:01 2025 +0200
+    - Removing executable flag Build.PL
+
+0.0.13 Mon Aug 18 03:22:24 2025 +0200
+    - Decreasing minimum perl to 5.16.3
+
+0.0.12 Sun Aug 17 16:18:39 2025 +0200
+    - Testing further lists and fixing errors related to element expansion inside of the same line of a list.

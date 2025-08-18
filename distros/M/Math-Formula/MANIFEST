@@ -1,7 +1,6 @@
 ChangeLog
 MANIFEST
 Makefile.PL
-README
 README.md
 lib/Math/Formula.pm
 lib/Math/Formula.pod

@@ -2,6 +2,17 @@
 
 All changes made by Mark Overmeer, unless explicitly stated otherwise.
 
+version 0.17: Sun Aug 17 09:13:41 PM CEST 2025
+
+	Fixes:
+	- name as rvalue
+	  [James Wright] rt.cpan.org #168753
+
+	Improvements:
+	- convert to OODoc 3.02
+	- apply oorestyle
+	- prototype of infix()
+
 version 0.16: Tue 14 Mar 09:32:45 CET 2023
 
 	Fixes:

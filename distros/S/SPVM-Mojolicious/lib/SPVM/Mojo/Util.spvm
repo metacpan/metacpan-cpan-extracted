@@ -332,7 +332,7 @@ class Mojo::Util {
     return "\"$str\"";
   }
   
-  method header_params : object[] ($value : string){
+  static method header_params : object[] ($value : string){
     
     my $params = Hash->new;
     my $offset = 0;

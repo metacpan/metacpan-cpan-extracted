@@ -1,4 +1,4 @@
-use v5.38.2;
+use v5.16.3;
 
 use strict;
 use warnings;
@@ -6,6 +6,7 @@ use warnings;
 use lib 'lib';
 
 use Test::Most;
+use signatures;
 
 use_ok 'Wiki::JSON';
 
@@ -42,13 +43,11 @@ use_ok 'Wiki::JSON';
         {
             'type'   => 'hx',
             'output' => [
-                ' ',
                 {
                     'output'        => [ 'hola', 'adios' ],
                     'type'          => 'template',
                     'template_name' => 'stub'
                 },
-                ' '
             ],
             'hx_level' => 3
         }
@@ -66,13 +65,13 @@ use_ok 'Wiki::JSON';
         {
             'type'   => 'hx',
             'output' => [
-                ' Hola: ',
+                'Hola: ',
                 {
                     'output'        => [ 'hola', 'adios' ],
                     'type'          => 'template',
                     'template_name' => 'stub'
                 },
-                ' :Mundo '
+                ' :Mundo'
             ],
             'hx_level' => 3
         }

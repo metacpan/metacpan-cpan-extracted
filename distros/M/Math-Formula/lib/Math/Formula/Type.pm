@@ -1,28 +1,41 @@
-# Copyrights 2023 by [Mark Overmeer <markov@cpan.org>].
-#  For other contributors see ChangeLog.
-# See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.03.
+# This code is part of Perl distribution Math-Formula version 0.17.
+# The POD got stripped from this file by OODoc version 3.03.
+# For contributors see file ChangeLog.
+
+# This software is copyright (c) 2023-2025 by Mark Overmeer.
+
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+# SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
+
+#oodist: *** DO NOT USE THIS VERSION FOR PRODUCTION ***
+#oodist: This file contains OODoc-style documentation which will get stripped
+#oodist: during its release in the distribution.  You can use this file for
+#oodist: testing, however the code of this development version may be broken!
+
 use warnings;
 use strict;
 use v5.16;  # fc
 
-package Math::Formula::Type;
-use vars '$VERSION';
-$VERSION = '0.16';
+package Math::Formula::Type;{
+our $VERSION = '0.17';
+}
 
 use base 'Math::Formula::Token';
 
 #!!! The declarations of all other packages in this file are indented to avoid
 #!!! indexing by CPAN.
 
-use Log::Report 'math-formula', import => [ qw/warning error __x/ ];
+use Log::Report 'math-formula',
+	import => [ qw/warning error __x/ ];
 
 # Object is an ARRAY. The first element is the token, as read from the formula
 # or constructed from a computed value.  The second is a value, which can be
 # used in computation.  More elements are type specific.
 
+#--------------------
 
-#-----------------
+#--------------------
 
 sub cast($)
 {	my ($self, $to, $context) = @_;
@@ -33,11 +46,11 @@ sub cast($)
 	undef;
 }
 
+
 # token() is implemented in de base-class ::Token, but documented here
 
-
 # Returns a value as result of a calculation.
-# nothing to compute for most types: simply itself
+# Nothing to compute for most types: simply itself.
 sub compute { $_[0] }
 
 
@@ -48,25 +61,32 @@ sub _value { $_[1] }
 sub collapsed($) { $_[0]->token =~ s/\s+/ /gr =~ s/^ //r =~ s/ $//r }
 
 sub prefix()
-{   my ($self, $op, $context) = @_;
-
-	error __x"cannot find prefx operator '{op}' on a {child}",
-		op => $op, child => ref $self;
+{	my ($self, $op, $context) = @_;
+	error __x"cannot find prefx operator '{op}' on a {child}", op => $op, child => ref $self;
 }
 
 sub attribute {
-	warning __x"cannot find attribute '{attr}' for {class} '{token}'",
-		attr => $_[1], class => ref $_[0], token => $_[0]->token;
+	warning __x"cannot find attribute '{attr}' for {class} '{token}'", attr => $_[1], class => ref $_[0], token => $_[0]->token;
 	undef;
 }
 
-sub infix($@)
-{   my $self = shift;
+sub infix(@)
+{	my $self = shift;
 	my ($op, $right, $context) = @_;
 
-	if($op eq '.' && $right->isa('MF::NAME'))
-	{	if(my $attr = $self->attribute($right->token))
-		{	return ref $attr eq 'CODE' ? $attr->($self, @_) : $attr;
+	if($right->isa('MF::NAME'))
+	{	my $token = $right->token;
+		if($op eq '.')
+		{	if(my $attr = $self->attribute($token))
+			{	return ref $attr eq 'CODE' ? $attr->($self, @_) : $attr;
+			}
+		}
+		else
+		{	defined $context->formula($token)
+				or error __x"rvalue name '{name}' for operator '{op}' is not a formula", name => $token, op => $op;
+
+			my $value = $context->evaluate($token);
+			return $self->infix($op, $value, $context);
 		}
 	}
 
@@ -78,7 +98,7 @@ sub infix($@)
 		op => $op, left => ref $self, right => ref $right;
 }
 
-#-----------------
+#--------------------
 
 package
 	MF::BOOLEAN;
@@ -101,21 +121,22 @@ sub prefix($)
 	$self->SUPER::prefix($op, $context);
 }
 
-sub infix($$$)
+sub infix(@)
 {	my $self = shift;
 	my ($op, $right, $context) = @_;
 
 	if(my $r = $right->isa('MF::BOOLEAN') ? $right : $right->cast('MF::BOOLEAN', $context))
 	{	# boolean values are 0 or 1, never undef
-		my $v = $op eq 'and' ? ($self->value and $r->value)
-	  		  : $op eq  'or' ? ($self->value  or $r->value)
-	  		  : $op eq 'xor' ? ($self->value xor $r->value)
-	  		  : undef;
+		my $v
+		  = $op eq 'and' ? ($self->value and $r->value)
+		  : $op eq  'or' ? ($self->value  or $r->value)
+		  : $op eq 'xor' ? ($self->value xor $r->value)
+		  : undef;
 
 		return MF::BOOLEAN->new(undef, $v) if defined $v;
 	}
 	elsif($op eq '->')
-	{   $self->value or return undef;   # case false
+	{	$self->value or return undef;   # case false
 		my $result = $right->compute($context);
 		$context->setCaptures([]);      # do not leak captures
 		return $result;
@@ -127,7 +148,7 @@ sub infix($$$)
 sub _token($) { $_[1] ? 'true' : 'false' }
 sub _value($) { $_[1] eq 'true' }
 
-#-----------------
+#--------------------
 
 package
 	MF::STRING;
@@ -138,9 +159,9 @@ use Unicode::Collate ();
 my $collate = Unicode::Collate->new;  #XXX which options do we need?
 
 sub new($$@)
-{   my ($class, $token, $value) = (shift, shift, shift);
-    ($token, $value) = (undef, $$token) if ref $token eq 'SCALAR';
-    $class->SUPER::new($token, $value, @_);
+{	my ($class, $token, $value) = (shift, shift, shift);
+	($token, $value) = (undef, $$token) if ref $token eq 'SCALAR';
+	$class->SUPER::new($token, $value, @_);
 }
 
 sub _token($) { '"' . ($_[1] =~ s/[\"]/\\$1/gr) . '"' }
@@ -150,7 +171,7 @@ sub _value($)
 
 	  substr($token, 0, 1) eq '"' ? $token =~ s/^"//r =~ s/"$//r =~ s/\\([\\"])/$1/gr
 	: substr($token, 0, 1) eq "'" ? $token =~ s/^'//r =~ s/'$//r =~ s/\\([\\'])/$1/gr
-	: $token;  # from code
+	:    $token;  # from code
 }
 
 sub cast($)
@@ -161,7 +182,7 @@ sub cast($)
 	: $self->SUPER::cast($to);
 }
 
-sub infix($$$)
+sub infix(@)
 {	my $self = shift;
 	my ($op, $right, $context) = @_;
 
@@ -185,8 +206,10 @@ sub infix($$$)
 	elsif($op eq 'like' || $op eq 'unlike')
 	{	# When expr is CODE, it may produce a qr// instead of a pattern.
 		my $r = $right->isa('MF::PATTERN') || $right->isa('MF::REGEXP') ? $right : $right->cast('MF::PATTERN', $context);
-		my $v = ! $r ? undef
-			  : $op eq 'like' ? $self->value =~ $r->regexp : $self->value !~ $r->regexp;
+		my $v
+		  = ! $r ? undef
+		  : $op eq 'like' ? $self->value =~ $r->regexp
+		  :   $self->value !~ $r->regexp;
 		return MF::BOOLEAN->new(undef, $v) if $r;
 	}
 	elsif($op eq 'cmp')
@@ -205,7 +228,7 @@ my %string_attrs = (
 
 sub attribute($) { $string_attrs{$_[1]} || $_[0]->SUPER::attribute($_[1]) }
 
-#-----------------
+#--------------------
 
 package
 	MF::INTEGER;
@@ -227,7 +250,7 @@ sub prefix($)
 	: $self->SUPER::prefix($op, $context);
 }
 
-sub infix($$$)
+sub infix(@)
 {	my $self = shift;
 	my ($op, $right, $context) = @_;
 
@@ -238,11 +261,12 @@ sub infix($$$)
 		if $right->isa('MF::TIMEZONE');  # mis-parse
 
 	if($right->isa('MF::INTEGER') || $right->isa('MF::FLOAT'))
-	{   my $v = $op eq '+' ? $self->value + $right->value
-			  : $op eq '-' ? $self->value - $right->value
-			  : $op eq '*' ? $self->value * $right->value
-			  : $op eq '%' ? $self->value % $right->value
-			  : undef;
+	{	my $v
+		  = $op eq '+' ? $self->value + $right->value
+		  : $op eq '-' ? $self->value - $right->value
+		  : $op eq '*' ? $self->value * $right->value
+		  : $op eq '%' ? $self->value % $right->value
+		  : undef;
 		return ref($right)->new(undef, $v) if defined $v;
 
 		return MF::INTEGER->new(undef, $self->value <=> $right->value)
@@ -277,11 +301,11 @@ sub _value($)
 }
 
 my %int_attrs = (
-   abs => sub { $_[0]->value < 0 ? MF::INTEGER->new(undef, - $_[0]->value) : $_[0] },
+	abs => sub { $_[0]->value < 0 ? MF::INTEGER->new(undef, - $_[0]->value) : $_[0] },
 );
 sub attribute($) { $int_attrs{$_[1]} || $_[0]->SUPER::attribute($_[1]) }
 
-#-----------------
+#--------------------
 
 package
 	MF::FLOAT;
@@ -306,7 +330,7 @@ sub prefix($$)
 	: $self->SUPER::prefix($op, $context)
 }
 
-sub infix($$$)
+sub infix(@)
 {	my $self = shift;
 	my ($op, $right, $context) = @_;
 
@@ -318,12 +342,13 @@ sub infix($$$)
 
 	if($right->isa('MF::FLOAT') || $right->isa('MF::INTEGER'))
 	{	# Perl will upgrade the integers
-		my $v = $op eq '+' ? $self->value + $right->value
-			  : $op eq '-' ? $self->value - $right->value
-			  : $op eq '*' ? $self->value * $right->value
-			  : $op eq '%' ? $self->value % $right->value
-			  : $op eq '/' ? $self->value / $right->value
-			  : undef;
+		my $v
+		  = $op eq '+' ? $self->value + $right->value
+		  : $op eq '-' ? $self->value - $right->value
+		  : $op eq '*' ? $self->value * $right->value
+		  : $op eq '%' ? $self->value % $right->value
+		  : $op eq '/' ? $self->value / $right->value
+		  : undef;
 		return MF::FLOAT->new(undef, $v) if defined $v;
 
 		return MF::INTEGER->new(undef, $self->value <=> $right->value)
@@ -337,14 +362,14 @@ sub infix($$$)
 #sub attribute($) { $float_attrs{$_[1]} || $_[0]->SUPER::attribute($_[1]) }
 
 
-#-----------------
+#--------------------
 
 package
 	MF::DATETIME;
 
 use base 'Math::Formula::Type';
 use DateTime ();
- 
+
 sub _match {
 	  '[12][0-9]{3} \- (?:0[1-9]|1[012]) \- (?:0[1-9]|[12][0-9]|3[01]) T '
 	. '(?:[01][0-9]|2[0-3]) \: [0-5][0-9] \: (?:[0-5][0-9]) (?:\.[0-9]+)?'
@@ -362,8 +387,7 @@ sub _value($)
 	$ /x or return;
 
 	my $tz_offset = $8 // '+0000';  # careful with named matches :-(
-	my @args = ( year => $1, month => $2, day => $3, hour => $4, minute => $5, second => $6,
-		nanosecond => ($7 // 0) * 1_000_000_000 );
+	my @args = (year => $1, month => $2, day => $3, hour => $4, minute => $5, second => $6, nanosecond => ($7 // 0) * 1_000_000_000);
 	my $tz = DateTime::TimeZone::OffsetOnly->new(offset => $tz_offset);
 
 	DateTime->new(@args, time_zone => $tz);
@@ -375,12 +399,12 @@ sub _to_time($)
 
 sub cast($)
 {	my ($self, $to) = @_;
-		$to eq 'MF::TIME' ? MF::TIME->new(undef, _to_time($_[0]->value))
-	  : $to eq 'MF::DATE' ? MF::DATE->new(undef, $_[0]->value->clone)
-	  : $self->SUPER::cast($to);
+	  $to eq 'MF::TIME' ? MF::TIME->new(undef, _to_time($_[0]->value))
+	: $to eq 'MF::DATE' ? MF::DATE->new(undef, $_[0]->value->clone)
+	: $self->SUPER::cast($to);
 }
 
-sub infix($$$@)
+sub infix(@)
 {	my $self = shift;
 	my ($op, $right, $context) = @_;
 
@@ -424,10 +448,10 @@ my %dt_attrs = (
 );
 
 sub attribute($)
-{	   $dt_attrs{$_[1]} || $MF::DATE::date_attrs{$_[1]} || $_[0]->SUPER::attribute($_[1]);
+{	$dt_attrs{$_[1]} || $MF::DATE::date_attrs{$_[1]} || $_[0]->SUPER::attribute($_[1]);
 }
 
-#-----------------
+#--------------------
 
 package
 	MF::DATE;
@@ -458,7 +482,7 @@ sub _value($)
 }
 
 sub cast($)
-{   my ($self, $to) = @_;
+{	my ($self, $to) = @_;
 	if($to eq 'MF::INTEGER')
 	{	# In really exceptional cases, an integer expression can be mis-detected as DATE
 		bless $self, 'MF::INTEGER';
@@ -475,7 +499,7 @@ sub cast($)
 	$self->SUPER::cast($to);
 }
 
-sub infix($$@)
+sub infix(@)
 {	my $self = shift;
 	my ($op, $right, $context) = @_;
 
@@ -496,8 +520,7 @@ sub infix($$@)
 	if($op eq '+' || $op eq '-')
 	{	my $r = $right->isa('MF::DURATION') ? $right : $right->cast('MF::DURATION', $context);
 		! $r || $r->token !~ m/T.*[1-9]/
-			or error __x"only duration with full days with DATE, found '{value}'",
-				value => $r->token;
+			or error __x"only duration with full days with DATE, found '{value}'", value => $r->token;
 
 		my $dt = $self->value->clone;
 		my $v = $op eq '+' ? $dt->add_duration($right->value) : $dt->subtract_duration($right->value);
@@ -511,8 +534,7 @@ sub infix($$@)
 
 		# It is probably a configuration issue when you configure this.
 		$ld ne $rd || ($ltz //'') eq ($rtz //'')
-			or warning __x"dates '{first}' and '{second}' do not match on timezone",
-				first => $self->token, second => $r->token;
+			or warning __x"dates '{first}' and '{second}' do not match on timezone", first => $self->token, second => $r->token;
 
 		return MF::INTEGER->new(undef, $ld cmp $rd);
 	}
@@ -521,20 +543,20 @@ sub infix($$@)
 }
 
 our %date_attrs = (
-   year     => sub { MF::INTEGER->new(undef, $_[0]->value->year)  },
-   month    => sub { MF::INTEGER->new(undef, $_[0]->value->month) },
-   day      => sub { MF::INTEGER->new(undef, $_[0]->value->day) },
-   timezone => sub { MF::TIMEZONE->new($_[0]->value->time_zone->name) },
+	year     => sub { MF::INTEGER->new(undef, $_[0]->value->year)  },
+	month    => sub { MF::INTEGER->new(undef, $_[0]->value->month) },
+	day      => sub { MF::INTEGER->new(undef, $_[0]->value->day) },
+	timezone => sub { MF::TIMEZONE->new($_[0]->value->time_zone->name) },
 );
 sub attribute($) { $date_attrs{$_[1]} || $_[0]->SUPER::attribute($_[1]) }
 
-#-----------------
+#--------------------
 
 package
 	MF::TIME;
 use base 'Math::Formula::Type';
 
-use constant GIGA => 1_000_000_000; 
+use constant GIGA => 1_000_000_000;
 
 sub _match { '(?:[01][0-9]|2[0-3]) \: [0-5][0-9] \: (?:[0-5][0-9]) (?:\.[0-9]+)?' }
 
@@ -573,7 +595,7 @@ sub _sec_diff($$)
 	+{ hour => $hrs, minute => $min, second => $sec, nanosecond => $ns};
 }
 
-sub infix($$@)
+sub infix(@)
 {	my $self = shift;
 	my ($op, $right, $context) = @_;
 
@@ -592,7 +614,7 @@ sub infix($$@)
 		}
 
 		if(my $r = $right->isa('MF::DURATION') ? $right : $right->cast('MF::DURATION', $context))
-	 	{	my (undef, $hours, $mins, $secs, $ns) =
+		{	my (undef, $hours, $mins, $secs, $ns) =
 				$r->value->in_units(qw/days hours minutes seconds nanoseconds/);
 
 			my $dur  = $hours * 3600 + $mins * 60 + $secs;
@@ -605,7 +627,7 @@ sub infix($$@)
 	$self->SUPER::infix(@_);
 }
 
-#-----------------
+#--------------------
 
 package
 	MF::TIMEZONE;
@@ -652,13 +674,13 @@ our %tz_attrs = (
 sub attribute($) { $tz_attrs{$_[1]} || $_[0]->SUPER::attribute($_[1]) }
 
 sub prefix($$)
-{   my ($self, $op, $context) = @_;
-		$op eq '+' ? $self
-	  : $op eq '-' ? MF::TIMEZONE->new(undef, - $self->value)
-	  : $self->SUPER::prefix($op, $context);
+{	my ($self, $op, $context) = @_;
+	  $op eq '+' ? $self
+	: $op eq '-' ? MF::TIMEZONE->new(undef, - $self->value)
+	: $self->SUPER::prefix($op, $context);
 }
 
-sub infix($$@)
+sub infix(@)
 {	my $self = shift;
 	my ($op, $right, $context) = @_;
 
@@ -672,7 +694,7 @@ sub infix($$@)
 	$self->SUPER::infix(@_);
 }
 
-#-----------------
+#--------------------
 
 package
 	MF::DURATION;
@@ -699,13 +721,13 @@ sub _value($)
 }
 
 sub prefix($$)
-{   my ($self, $op, $context) = @_;
-		$op eq '+' ? $self
-	  : $op eq '-' ? MF::DURATION->new('-' . $self->token)
-	  : $self->SUPER::prefix($op, $context);
+{	my ($self, $op, $context) = @_;
+	  $op eq '+' ? $self
+	: $op eq '-' ? MF::DURATION->new('-' . $self->token)
+	:   $self->SUPER::prefix($op, $context);
 }
 
-sub infix($$@)
+sub infix(@)
 {	my $self = shift;
 	my ($op, $right, $context) = @_;
 
@@ -740,7 +762,7 @@ my %dur_attrs = (
 
 sub attribute($) { $dur_attrs{$_[1]} || $_[0]->SUPER::attribute($_[1]) }
 
-#-----------------
+#--------------------
 
 package
 	MF::NAME;
@@ -751,15 +773,15 @@ use Log::Report 'math-formula', import => [ qw/error __x/ ];
 my $pattern = '[_\p{Alpha}][_\p{AlNum}]*';
 sub _match() { $pattern }
 
-sub value($) { error __x"name '{name}' cannot be used as value.", name => $_[0]->token }
+
+sub value() { error __x"name '{name}' cannot be used as value.", name => $_[0]->token }
 
 
 sub validated($$)
 {	my ($class, $name, $where) = @_;
 
 	$name =~ qr/^$pattern$/o
-		or error __x"Illegal name '{name}' in '{where}'",
-			name => $name =~ s/[^_\p{AlNum}]/ϴ/gr, where => $where;
+		or error __x"Illegal name '{name}' in '{where}'", name => $name =~ s/[^_\p{AlNum}]/ϴ/gr, where => $where;
 
 	$class->new($name);
 }
@@ -808,17 +830,18 @@ sub infix(@)
 }
 
 
-#-----------------
+#--------------------
 
 package
-	MF::PATTERN; 
+	MF::PATTERN;
 use base 'MF::STRING';
 
 use Log::Report 'math-formula', import => [ qw/warning __x/ ];
 
+
 sub _token($) {
 	warning __x"cannot convert qr back to pattern, do {regexp}", regexp => $_[1];
-    "pattern meaning $_[1]";
+	"pattern meaning $_[1]";
 }
 
 sub _from_string($)
@@ -851,7 +874,7 @@ sub _to_regexp($)
 
 sub regexp() { $_[0][2] //= _to_regexp($_[0]->value) }
 
-#-----------------
+#--------------------
 
 package
 	MF::REGEXP;
@@ -866,11 +889,11 @@ sub _from_string($)
 sub regexp
 {	my $self = shift;
 	return $self->[2] if defined $self->[2];
-	my $value = $self->value =~ s!/!\\/!gr;
+	my $value  = $self->value =~ s!/!\\/!gr;
 	$self->[2] = qr/$value/xu;
 }
 
-#-----------------
+#--------------------
 
 package
 	MF::FRAGMENT;
@@ -881,15 +904,14 @@ use Log::Report 'math-formula', import => [ qw/panic error __x/ ];
 sub name    { $_[0][0] }
 sub context { $_[0][1] }
 
-sub infix($$@)
+sub infix(@)
 {	my $self = shift;
 	my ($op, $right, $context) = @_;
 	my $name = $right->token;
 
 	if($op eq '#' && $right->isa('MF::NAME'))
 	{	my $fragment = $self->context->fragment($name)
-			or error __x"cannot find fragment '{name}' in '{context}'",
-				name => $name, context => $context->name;
+			or error __x"cannot find fragment '{name}' in '{context}'", name => $name, context => $context->name;
 
 		return $fragment;
 	}

@@ -1,5 +1,5 @@
 package Sys::Info::Driver::Linux::Device::CPU;
-$Sys::Info::Driver::Linux::Device::CPU::VERSION = '0.7908';
+$Sys::Info::Driver::Linux::Device::CPU::VERSION = '0.7909';
 use strict;
 use warnings;
 use parent qw(Sys::Info::Base);
@@ -23,9 +23,22 @@ sub identify {
         my @raw = split m{\n\n}xms,
                         $self->trim( $self->slurp( proc->{cpuinfo} ) );
         $self->{META_DATA} = [];
+        my $device_model;
         foreach my $e ( @raw ) {
+            my %i = $self->_parse_cpuinfo($e);
+            if ( $i{__meta_key} ) {
+                $device_model = $i{Model};
+                next;
+            }
             push @{ $self->{META_DATA} },
-                  { $self->_parse_cpuinfo($e), architecture => $arch };
+                  { %i, architecture => $arch };
+        }
+
+        if ( $device_model ) {
+            for my $e ( @{ $self->{META_DATA} } ) {
+                $e->{__device_model} = $device_model;
+                $e->{model}        ||= $device_model;
+            }
         }
     }
 
@@ -60,18 +73,30 @@ sub _parse_cpuinfo {
         $cpu{$k} = $v;
     }
 
+    if ( $cpu{Model} && $cpu{Revision} && $cpu{Serial} ) {
+        return %cpu, __meta_key => 1;
+    }
+
     my @flags = $cpu{flags} ? (split /\s+/xms, $cpu{flags}) : ();
     my %flags = map { $_ => 1 } @flags;
     my $up    = Unix::Processors->new;
     my $name  = $cpu{'model name'};
     $name     =~ s[ \s{2,} ][ ]xms if $name;
 
+    my $cpu_freq_file = proc->{scaling_cur_freq};
+
+    my $speed = $cpu{'cpu MHz'};
+
+    if ( ! $speed && -e $cpu_freq_file ) {
+        $speed = $self->trim( $self->slurp( $cpu_freq_file ) );
+    }
+
     return(
         processor_id                 => $cpu{processor},
         data_width                   => $flags{lm} ? '64' : '32', # guess
         address_width                => $flags{lm} ? '64' : '32', # guess
         bus_speed                    => undef,
-        speed                        => $cpu{'cpu MHz'},
+        speed                        => $speed,
         name                         => $name || q{},
         family                       => $cpu{'cpu family'},
         manufacturer                 => $cpu{vendor_id},
@@ -98,7 +123,7 @@ Sys::Info::Driver::Linux::Device::CPU
 
 =head1 VERSION
 
-version 0.7908
+version 0.7909
 
 =head1 SYNOPSIS
 

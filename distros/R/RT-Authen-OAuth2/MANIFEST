@@ -28,5 +28,7 @@ META.yml
 README
 static/css/rt-authen-oauth2.css
 static/images/btn_auth0_signin.png
+static/images/btn_authentik_signin.png
+static/images/btn_authentik_signin.svg
 static/images/btn_google_signin_dark_normal_web.png
 SIGNATURE                                Public-key signature (added by MakeMaker)

@@ -18,7 +18,20 @@ my $build = Module::Build->new(
         'Cpanel::JSON::XS' => 0,
         'Path::Tiny'       => 0,
         'Const::Fast'      => 0,
-        'perl'             => 'v5.38.0',
+        'perl'             => 'v5.16.3',
+    },
+    meta_add => {
+        resources => {
+            bugtracker => {
+                web => 'https://github.com/sergiotarxz/Perl-Wiki-JSON/issues',
+                mailto => 'sergioxz@cpan.org',
+            },
+            repository => {
+                url  => 'git://github.com/sergiotarxz/Perl-Wiki-JSON.git',
+                web  => 'https://github.com/sergiotarxz/Perl-Wiki-JSON',
+                type => 'git',
+            },
+        }
     },
     script_files => [ 'scripts/wiki2json', ]
 );

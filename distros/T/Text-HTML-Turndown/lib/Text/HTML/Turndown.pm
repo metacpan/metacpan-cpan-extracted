@@ -1,8 +1,9 @@
-package Text::HTML::Turndown 0.06;
+package Text::HTML::Turndown 0.07;
 use 5.020;
 use Moo 2;
 use experimental 'signatures';
 use stable 'postderef';
+use Exporter 'import';
 use XML::LibXML;
 use List::Util 'reduce', 'max';
 use List::MoreUtils 'first_index';
@@ -12,6 +13,10 @@ use Module::Load 'load';
 use Text::HTML::Turndown::Rules;
 use Text::HTML::Turndown::Node;
 use Text::HTML::CollapseWhitespace 'collapseWhitespace';
+use Text::HTML::ExtractInfo 'extract_info';
+use Text::FrontMatter::YAML;
+
+our @EXPORT_OK = ('html2markdown');
 
 =head1 NAME
 
@@ -515,9 +520,42 @@ sub use( $self, $plugin ) {
 
 1;
 
+=head1 FUNCTIONS
+
+=head2 C<< html2markdown >>
+
+    use Text::HTML::Turndown 'html2markdown';
+    my $frontmatter = html2markdown( $html, %frontmatter_defaults );
+    say $frontmatter->document_string;
+
+Converts an HTML string to a L<Text::FrontMatter::YAML> object.
+The HTML string is assumed to contain UTF-8 octets.
+
+=cut
+
+sub html2markdown( $html, %keys ) {
+    my $tree = XML::LibXML->new->parse_html_string(
+          $html,
+          { recover => 2, encoding => 'UTF-8' }
+    );
+
+    my $frontmatter = extract_info(
+        $tree,
+        #maybe url => $url,
+    );
+
+    my $convert = Text::HTML::Turndown->new();
+    my $markdown = $convert->turndown($tree);
+
+    my $tfm = Text::FrontMatter::YAML->new(
+        frontmatter_hashref => { %keys, $frontmatter->%* },
+        data_text => $markdown,
+    );
+
+    return $tfm
+}
+
 =head1 MARKDOWN FLAVOURS / FEATURES
-
-
 
 =head1 COMPATIBILITY
 

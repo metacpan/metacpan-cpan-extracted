@@ -1,12 +1,23 @@
-# Copyrights 2023 by [Mark Overmeer <markov@cpan.org>].
-#  For other contributors see ChangeLog.
-# See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.03.
-package Math::Formula::Config::YAML;
-use vars '$VERSION';
-$VERSION = '0.16';
+# This code is part of Perl distribution Math-Formula version 0.17.
+# The POD got stripped from this file by OODoc version 3.03.
+# For contributors see file ChangeLog.
 
-use base 'Math::Formula::Config';
+# This software is copyright (c) 2023-2025 by Mark Overmeer.
+
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+# SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
+
+#oodist: *** DO NOT USE THIS VERSION FOR PRODUCTION ***
+#oodist: This file contains OODoc-style documentation which will get stripped
+#oodist: during its release in the distribution.  You can use this file for
+#oodist: testing, however the code of this development version may be broken!
+
+package Math::Formula::Config::YAML;{
+our $VERSION = '0.17';
+}
+
+use parent 'Math::Formula::Config';
 
 use warnings;
 use strict;
@@ -14,34 +25,35 @@ use strict;
 use Log::Report 'math-formula';
 
 use YAML::XS qw/Dump Load/;
-use boolean ();
-use File::Slurper 'read_binary';
+use boolean       ();
+use File::Slurper qw/read_binary/;
 
 # It is not possible to use YAML.pm, because it cannot produce output where
 # boolean true and a string with content 'true' can be distinguished.
 
 use Scalar::Util 'blessed';
 
+#--------------------
 
-#----------------------
+#--------------------
 
 sub save($%)
 {	my ($self, $context, %args) = @_;
 	my $name  = $context->name;
 
- 	local $YAML::XS::Boolean = "boolean";
+	local $YAML::XS::Boolean = "boolean";
 	my $index = $context->_index;
 
 	my $fn = $self->path_for($args{filename} || "$name.yml");
 	open my $fh, '>:encoding(utf8)', $fn
-		or fault __x"Trying to save context '{name}' to {fn}", name => $name, fn => $fn;
+		or fault __x"Trying to save context '{name}' to {file}", name => $name, file => $fn;
 
 	$fh->print(Dump $self->_set($index->{attributes}));
 	$fh->print(Dump $self->_set($index->{formulas}));
 	$fh->print(Dump $self->_set($index->{fragments}));
 
 	$fh->close
-		or fault __x"Error on close while saving '{name}' to {fn}", name => $name, fn => $fn;
+		or fault __x"Error on close while saving '{name}' to {file}", name => $name, file => $fn;
 }
 
 sub _set($)
@@ -93,8 +105,7 @@ sub load($%)
 	my ($attributes, $forms, $frags) = Load(read_binary $fn);
 
 	my $attrs = $self->_set_decode($attributes);
-	Math::Formula::Context->new(name => $name,
-		%$attrs,
+	Math::Formula::Context->new(name => $name, %$attrs,
 		formulas => $self->_set_decode($forms),
 	);
 }
@@ -127,6 +138,6 @@ sub _unpack($$)
 	: MF::STRING->new(undef, $encoded);
 }
 
-#----------------------
+#--------------------
 
 1;

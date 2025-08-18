@@ -15,6 +15,8 @@ Math::Formula - expressions on steroids
   $context->add( { size => '42k', header => '324', total => 'size + header' });
   my $total   = $context->value('total');
 
+  my age = $context->value('(#system.now.date - 1966-04-05).years');
+
   # To build connectors to objects in your program, interfaces.
   # See Math::Formula::Context.
   my $formula = Math::Formula->new(size => \&own_sub, %options);
@@ -45,21 +47,21 @@ B<Interested?> Read more in the L</"DETAILS"> section below.
 
 =over 4
 
-=item Math::Formula-E<gt>B<new>($name, $expression, %options)
+=item $class-E<gt>B<new>($name, $expression, %options)
 
-The expression needs a $name.  Expressions can refer to each other via this name.
+The expression needs a C<$name>.  Expressions can refer to each other via this name.
 
-The $expression is usually a (utf8) string, which will get parsed and
-evaluated on demand.  The $expression may also be a prepared node (any
-<Math::Formula::Type> object).
+The C<$expression> is usually a (utf8) string, which will get parsed and
+evaluated on demand.  The C<$expression> may also be a prepared node (any
+<L<Math::Formula::Type|Math::Formula::Type>> object).
 
-As special hook, you may also provide a CODE as $expression.  This will
+As special hook, you may also provide a CODE as C<$expression>.  This will
 be called as
 
   $expression->($context, $this_formula, %options);
 
 Optimally, the expression returns any L<Math::Formula::Type|Math::Formula::Type> object.  Otherwise,
-auto-detection of the computed result kicks in.  The %options are passed to
+auto-detection of the computed result kicks in.  The C<%options> are passed to
 L<evaluate()|Math::Formula/"Running">  More details below in L<Math::Formula::Context/"CODE as expression">.
 
  -Option --Default
@@ -69,7 +71,7 @@ L<evaluate()|Math::Formula/"Running">  More details below in L<Math::Formula::Co
 
 =item returns => $type
 
-Enforce that the type produced by the calculation of this $type.  Otherwise, it may
+Enforce that the type produced by the calculation of this C<$type>.  Otherwise, it may
 be different when other people are permitted to configure the formulas... people can
 make mistakes.
 
@@ -96,7 +98,7 @@ Set when the expression promises to produce a certain type.
 
 =item $obj-E<gt>B<tree>($expression)
 
-Returns the Abstract Syntax Tree of the $expression. Some of the types
+Returns the Abstract Syntax Tree of the C<$expression>. Some of the types
 are only determined at the first run, for optimal laziness.  Used for
 debugging purposes only.
 
@@ -108,7 +110,7 @@ debugging purposes only.
 
 =item $obj-E<gt>B<evaluate>( [ $context, %options ] )
 
-Calculate the value for this expression given the $context.  The Context groups the expressions
+Calculate the value for this expression given the C<$context>.  The Context groups the expressions
 together so they can refer to each other.  When the expression does not contain Names, than you
 may go without context.
 
@@ -119,7 +121,7 @@ may go without context.
 
 =item expect => $type
 
-When specified, the result will be of the expected $type or C<undef>.  This overrules
+When specified, the result will be of the expected C<$type> or C<undef>.  This overrules
 L<new(returns)|Math::Formula/"Constructors">.  Without either, the result type depends on the evaluation of the
 expression.
 
@@ -127,7 +129,7 @@ expression.
 
 =item $obj-E<gt>B<toType>($data)
 
-Convert internal Perl data into a Math::Formula internal types.  For most
+Convert internal Perl data into a L<Math::Formula|Math::Formula> internal types.  For most
 times, this guess cannot go wrong. In other cases a mistake is not problematic.
 
 In a small number of cases, auto-detection may break: is C<'true'> a
@@ -148,7 +150,7 @@ in configuring its settings.  Very simple example:
   # In a back-up script, configured in JSON
   "daily_backups"  : "/var/tmp/backups/daily",
   "weekly_backups" : "/var/tmp/backups/weekly",
-  
+
   # With Math::Formula::Config::JSON
   "backup_dir"     : "/var/tmp/backups/",
   "daily_backups"  : "= backup_dir ~ 'daily'",
@@ -279,16 +281,51 @@ smaller, equal, larger.
 String comparison uses L<Unicode::Collate>, which might be a bit expensive,
 but at least a better attempt to order UTF-8 correctly.
 
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Error: expression '$name', expected ':' in '?:', but got '$token'
+
+Z<>
+
+=item Error: expression '$name', expected infix operator but found '$type'
+
+Z<>
+
+=item Error: expression '$name', failed at '$where'
+
+Z<>
+
+=item Error: expression '$name', infix operator '$op' requires right-hand argument
+
+Z<>
+
+=item Error: expression '$name', monadic '$op' not followed by anything useful
+
+Z<>
+
+=item Error: expression '$name', parenthesis do not match
+
+Z<>
+
+=item Error: not an expression (string needs \\ ) for '$data'
+
+Z<>
+
+=back
+
 =head1 SEE ALSO
 
-This module is part of Math-Formula distribution version 0.16,
-built on March 14, 2023. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Math-Formula version 0.17,
+built on August 17, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2023 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2023-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

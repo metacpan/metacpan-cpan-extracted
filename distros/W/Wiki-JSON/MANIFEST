@@ -2,6 +2,7 @@ Build.PL
 Changes
 lib/Wiki/JSON.pm
 lib/Wiki/JSON/Parser.pm
+lib/Wiki/JSON/Contributing.pm
 LICENSE
 MANIFEST			This list of files
 META.json

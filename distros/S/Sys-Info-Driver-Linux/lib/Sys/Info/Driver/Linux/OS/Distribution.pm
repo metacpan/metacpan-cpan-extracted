@@ -1,5 +1,5 @@
 package Sys::Info::Driver::Linux::OS::Distribution;
-$Sys::Info::Driver::Linux::OS::Distribution::VERSION = '0.7908';
+$Sys::Info::Driver::Linux::OS::Distribution::VERSION = '0.7909';
 use strict;
 use warnings;
 
@@ -382,7 +382,7 @@ Sys::Info::Driver::Linux::OS::Distribution
 
 =head1 VERSION
 
-version 0.7908
+version 0.7909
 
 =head1 SYNOPSIS
 

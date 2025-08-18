@@ -1,4 +1,4 @@
-use v5.38.2;
+use v5.16.3;
 
 use strict;
 use warnings;
@@ -63,5 +63,23 @@ use_ok 'Wiki::JSON';
         },
         '. It is cool.',
     ], 'Simple url test with text wrapping it and a nowiki caption';
+}
+{
+    my $parsed = Wiki::JSON->new->parse(q/[[Funny Article]] [[Not Funny Article]]/);
+
+#    print Data::Dumper::Dumper($parsed);
+    is_deeply $parsed, [
+        {
+            type => 'link',
+            link => 'Funny Article',
+            title => 'Funny Article',
+        },
+        ' ',
+        {
+            type => 'link',
+            link => 'Not Funny Article',
+            title => 'Not Funny Article',
+        }
+    ], 'URLs spaciated between them';
 }
 done_testing;

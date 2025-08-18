@@ -32,6 +32,8 @@ my ($fh, $filename) = tempfile();
 $logger = Log::Abstraction->new($filename);
 $logger->level('debug');
 
+cmp_ok($logger->is_debug(), '==', 1, 'is_debug is set');
+
 $logger->debug('File debug message');
 $logger->info('File info message');
 
@@ -44,9 +46,9 @@ like($log_lines[0], qr/File debug message/, 'Logged correct debug message to fil
 like($log_lines[1], qr/INFO> /, 'Logged info message to file');
 like($log_lines[1], qr/File info message/, 'Logged correct info message to file');
 
-# As above but with the file argument
+# As above but with the file argument, and changing the output format
 ($fh, $filename) = tempfile();
-$logger = Log::Abstraction->new(logger => { file => $filename }, level => 'debug');
+$logger = Log::Abstraction->new(logger => { file => $filename }, level => 'debug', format => '<%level%!! %message%');
 
 $logger->debug('File debug message2');
 $logger->info('File info message2');
@@ -55,9 +57,9 @@ open $log_fh, '<', $filename or die "Could not open log file: $!";
 @log_lines = <$log_fh>;
 close $log_fh;
 
-like($log_lines[0], qr/DEBUG> /, 'Logged debug message to file');
+like($log_lines[0], qr/<DEBUG!! /, 'Logged debug message to file');
 like($log_lines[0], qr/File debug message2/, 'Logged correct debug message to file');
-like($log_lines[1], qr/INFO> /, 'Logged info message to file');
+like($log_lines[1], qr/<INFO!! /, 'Logged info message to file');
 like($log_lines[1], qr/File info message2/, 'Logged correct info message to file');
 
 # As above but by default debug and info aren't stashed
@@ -86,9 +88,9 @@ open($log_fh, '<', $filename) or die "Could not open log file: $!";
 @log_lines = <$log_fh>;
 close $log_fh;
 
-like($log_lines[0], qr/DEBUG> Log::Abstraction/, 'Logged debug message to file descriptor');
+like($log_lines[0], qr/DEBUG>\s/, 'Logged debug message to file descriptor');
 like($log_lines[0], qr/File debug message/, 'Logged correct debug message to file descriptor');
-like($log_lines[1], qr/INFO> Log::Abstraction/, 'Logged info message to file descriptor');
+like($log_lines[1], qr/INFO>\s/, 'Logged info message to file descriptor');
 like($log_lines[1], qr/File info message/, 'Logged correct info message to file descriptor');
 
 # Test logging to a code reference
@@ -115,13 +117,13 @@ is_deeply(
 		{
 			class => 'Log::Abstraction',
 			file => 't/30-basics.t',
-			line => 98,	# Adjust line number if needed
+			line => 100,	# Adjust line number if needed
 			level => 'debug',
 			message => ['Code debug message']
 		}, {
 			class => 'Log::Abstraction',
 			file => 't/30-basics.t',
-			line => 99,	# Adjust line number if needed
+			line => 101,	# Adjust line number if needed
 			level => 'info',
 			message => ['Code info message']
 		}
@@ -146,6 +148,8 @@ $logger = Log::Abstraction->new({ logger => \@log_array, level => 'debug' });
 $logger->debug('This ', 'is ', 'a ', 'list');
 $logger->warn('This ', 'is ', 'another ', 'list');
 $logger->warn(warning => ['This ', 'is ', 'a ', 'ref ', 'to ', 'a ', 'list']);
+
+throws_ok(sub { $logger->_log('warn', 'should not be logged') }, qr/private method/, '_log is private method');
 
 diag(Data::Dumper->new([\@log_array])->Dump()) if($ENV{'TEST_VERBOSE'});
 

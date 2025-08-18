@@ -19,6 +19,17 @@ Text::HTML::Turndown - convert HTML to Markdown
 
 This is an adapation of the `turndown` libraries.
 
+# FUNCTIONS
+
+## `html2markdown`
+
+    use Text::HTML::Turndown 'html2markdown';
+    my $frontmatter = html2markdown( $html, %frontmatter_defaults );
+    say $frontmatter->document_string;
+
+Converts an HTML string to a [Text::FrontMatter::YAML](https://metacpan.org/pod/Text%3A%3AFrontMatter%3A%3AYAML) object.
+The HTML string is assumed to contain UTF-8 octets.
+
 # MARKDOWN FLAVOURS / FEATURES
 
 # COMPATIBILITY

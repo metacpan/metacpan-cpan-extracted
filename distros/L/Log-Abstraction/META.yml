@@ -10,6 +10,7 @@ build_requires:
   Test::Mockingbird: '0'
   Test::Most: '0'
   Test::Needs: '0'
+  Test::Returns: '0'
   YAML::XS: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -28,13 +29,12 @@ requires:
   Carp: '0'
   Config::Abstraction: '0.25'
   Data::Dumper: '0'
-  Email::Sender::Simple: '0'
-  Email::Sender::Transport::SMTP: '0'
-  Email::Simple: '0'
   ExtUtils::MakeMaker: '6.64'
   Log::Log4perl: '0'
-  Params::Get: '0.05'
-  Readonly::Values::Syslog: '0.02'
+  POSIX: '0'
+  Params::Get: '0.13'
+  Readonly::Values::Syslog: '0.03'
+  Return::Set: '0'
   Scalar::Util: '0'
   Sys::Syslog: '0.28'
   perl: '5.008'
@@ -42,5 +42,5 @@ resources:
   bugtracker: https://github.com/nigelhorne/Log-Abstraction/issues
   homepage: https://metacpan.org/pod/Log::Abstraction
   repository: git://github.com/nigelhorne/Log-Abstraction.git
-version: 0.24
+version: 0.25
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

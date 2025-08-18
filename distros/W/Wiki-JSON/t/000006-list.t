@@ -1,4 +1,4 @@
-use v5.38.2;
+use v5.16.3;
 
 use strict;
 use warnings;
@@ -122,10 +122,47 @@ end of list/
 {
     my $parsed = Wiki::JSON->new->parse(
         q/* one
+* two
+* three [[Xinadi Legend]] xd/
+    );
+#    print Data::Dumper::Dumper($parsed);
+    is_deeply $parsed, [
+        {
+            type   => 'unordered_list',
+            output => [
+                {
+                    type   => 'list_element',
+                    output => [ 'one', ],
+                },
+                {
+                    type   => 'list_element',
+                    output => [ 'two', ],
+                },
+                {
+                    type   => 'list_element',
+                    output => [
+                        'three ',
+                        {
+                            type  => 'link',
+                            title => 'Xinadi Legend',
+                            link  => 'Xinadi Legend',
+                        },
+                        ' xd',
+                    ],
+                },
+
+            ],
+        },
+      ],
+      'Parsing embedded elements works fine';
+}
+{
+    my $parsed = Wiki::JSON->new->parse(
+        q/* one
 * three [[Xinadi Legend]] xd
 * two/
     );
-    print Data::Dumper::Dumper($parsed);
+#    print Data::Dumper::Dumper($parsed);
     is_deeply $parsed, [
         {
             type   => 'unordered_list',
@@ -144,6 +181,44 @@ end of list/
                             link  => 'Xinadi Legend',
                         },
                         ' xd',
+                    ],
+                },
+                {
+                    type   => 'list_element',
+                    output => [ 'two', ],
+                },
+
+            ],
+        },
+      ],
+      'Parsing embedded elements works fine';
+}
+{
+    my $parsed = Wiki::JSON->new->parse(
+        q/* one
+* three [[Xinadi Legend]] xd<br>xd
+* two/
+    );
+#    print Data::Dumper::Dumper($parsed);
+    is_deeply $parsed, [
+        {
+            type   => 'unordered_list',
+            output => [
+                {
+                    type   => 'list_element',
+                    output => [ 'one', ],
+                },
+                {
+                    type   => 'list_element',
+                    output => [
+                        'three ',
+                        {
+                            type  => 'link',
+                            title => 'Xinadi Legend',
+                            link  => 'Xinadi Legend',
+                        },
+                        ' xd',
+                        'xd',
                     ],
                 },
                 {

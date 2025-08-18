@@ -1,5 +1,5 @@
 package Sys::Info::Driver::Linux::OS;
-$Sys::Info::Driver::Linux::OS::VERSION = '0.7908';
+$Sys::Info::Driver::Linux::OS::VERSION = '0.7909';
 use strict;
 use warnings;
 use parent qw( Sys::Info::Base );
@@ -61,8 +61,15 @@ sub meta {
 
     my $cpu   = Sys::Info::Device->new('CPU');
     my $arch  = ($cpu->identify)[0]->{architecture};
+    my $model = ($cpu->identify)[0]->{model};
     my %mem   = $self->_parse_meminfo;
     my @swaps = $self->_parse_swap;
+
+    my $system_type = sprintf '%s based Computer%s',
+                                $arch,
+                                (  $model ? ". $model" : '' ),
+                        ;
+
     my %info;
 
     $info{manufacturer}              = $self->{OSVERSION}{MANUFACTURER};
@@ -73,10 +80,10 @@ sub meta {
     $info{install_date}              = $self->{OSVERSION}{RAW}{BUILD_DATE};
     $info{boot_device}               = undef;
 
-    $info{physical_memory_total}     = $mem{MemTotal};
-    $info{physical_memory_available} = $mem{MemFree};
-    $info{page_file_total}           = $mem{SwapTotal};
-    $info{page_file_available}       = $mem{SwapFree};
+    $info{physical_memory_total}     = $mem{MemTotal}  * 1024;
+    $info{physical_memory_available} = $mem{MemFree}   * 1024;
+    $info{page_file_total}           = $mem{SwapTotal} * 1024;
+    $info{page_file_available}       = $mem{SwapFree}  * 1024;
 
     # windows specific
     $info{windows_dir}               = undef;
@@ -84,8 +91,7 @@ sub meta {
 
     $info{system_manufacturer}       = undef;
     $info{system_model}              = undef;
-    $info{system_type}               = sprintf '%s based Computer', $arch;
-
+    $info{system_type}               = $system_type;
     $info{page_file_path}            = join ', ', map { $_->{Filename} } @swaps;
 
     return %info;
@@ -287,7 +293,7 @@ Sys::Info::Driver::Linux::OS
 
 =head1 VERSION
 
-version 0.7908
+version 0.7909
 
 =head1 SYNOPSIS
 

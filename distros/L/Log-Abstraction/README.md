@@ -4,7 +4,7 @@ Log::Abstraction - Logging Abstraction Layer
 
 # VERSION
 
-0.24
+0.25
 
 # SYNOPSIS
 
@@ -67,18 +67,34 @@ The following arguments can be provided:
     A logger can be one or more of:
 
     - a code reference
-    - an array reference
-    - a file path
-    - a file descriptor
     - an object
     - a hash of options
     - sendmail - send higher priority messages to an email address
-        - array - a reference to an array
-        - fd - containing a file descriptor to log to
-        - file - containing the filename
+
+        To send an e-mail you need ["require Email::Simple"](#require-email-simple), ["require Email::Sender::Simple"](#require-email-sender-simple) and [Email::Sender::Transport::SMTP](https://metacpan.org/pod/Email%3A%3ASender%3A%3ATransport%3A%3ASMTP).
+
+    - array - a reference to an array
+    - fd - containing a file descriptor to log to
+    - file - containing the filename
 
     Defaults to [Log::Log4perl](https://metacpan.org/pod/Log%3A%3ALog4perl).
-    In that case the argument 'verbose' to new() will raise the logging level.
+    In that case,
+    the argument 'verbose' to new() will raise the logging level.
+
+- `format`
+
+    The format of the message.
+    Expands:
+
+    - %callstack%
+    - %level%
+    - %class%
+    - %message%
+    - %timestamp%
+
+        &#x3d;%item \* %env\_foo%
+
+        Replaces with `$ENV{foo}`
 
 - `syslog`
 
@@ -97,13 +113,57 @@ Clone existing objects with or without modifications:
 
     my $clone = $logger->new();
 
+## \_sanitize\_email\_header
+
+    my $clean_value = _sanitize_email_header($raw_value);
+
+Internal routine to remove carriage return and line feed characters from an email header value to prevent header injection or formatting issues.
+
+- Input
+
+    Takes a single scalar value, typically a string representing an email header field.
+
+- Behavior
+
+    If the input is undefined, returns \`undef\`. Otherwise, removes all newline characters (\`\\n\`), carriage returns (\`\\r\`), and CRLF pairs from the string.
+
+- Output
+
+    Returns the sanitized string with CR/LF characters removed.
+
+### FORMAL SPECIFICATION
+
+If the input is undefined (∅), the output is also undefined (∅).
+
+If the input is defined, the result is a defined string with CR and LF characters removed.
+
+    [CHAR]
+
+    CR, LF : CHAR
+    CR == '\r'
+    LF == '\n'
+
+    STRING == seq CHAR
+
+    SanitizeEmailHeader
+        raw?: STRING
+        sanitized!: STRING
+        -------------------------------------------------
+        sanitized! = [ c : raw? | c ≠ CR ∧ c ≠ LF ]
+
 ## level
 
-Get/set the minimum level to log at
+Get/set the minimum level to log at.
+Returns the current level, as an integer.
+
+## is\_debug
+
+Are we at a debug level that will emit debug messages?
+For compatability with [Log::Any](https://metacpan.org/pod/Log%3A%3AAny).
 
 ## messages
 
-Return all the messages emmitted so far
+Return all the messages emitted so far
 
 ## debug
 
@@ -153,7 +213,7 @@ Helper to handle important messages.
 
 # AUTHOR
 
-Nigel Horne ` <njh@nigelhorne.com` >
+Nigel Horne `njh@nigelhorne.com`
 
 # SUPPORT
 

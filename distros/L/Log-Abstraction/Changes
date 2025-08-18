@@ -1,5 +1,13 @@
 Revision history for Log-Abstraction
 
+0.25	Sun Aug 17 20:41:38 EDT 2025
+	Added is_debug for consistency with Log::Any
+	Use Return::Set to assert return values within specification
+	Sanitize the e-mail headers
+	Started to add format argument to new()
+	Don't close fd that were passed in
+	Only load the mail modules when needed
+
 0.24	Sat Jul 19 16:52:41 EDT 2025
 	Added the ability to send an email for higher priority messages
 	Only load Log::Log4perl when needed

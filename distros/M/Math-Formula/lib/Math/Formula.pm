@@ -1,15 +1,21 @@
-# Copyrights 2023 by [Mark Overmeer <markov@cpan.org>].
-#  For other contributors see ChangeLog.
-# See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.03.
-#!/usr/bin/env perl
-#
-# This code will be run incredabily fast, hence is tries to avoid copying etc.  It
-# is not always optimally readible when your Perl skills are poor.
+# This code is part of Perl distribution Math-Formula version 0.17.
+# The POD got stripped from this file by OODoc version 3.03.
+# For contributors see file ChangeLog.
 
-package Math::Formula;
-use vars '$VERSION';
-$VERSION = '0.16';
+# This software is copyright (c) 2023-2025 by Mark Overmeer.
+
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+# SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
+
+#oodist: *** DO NOT USE THIS VERSION FOR PRODUCTION ***
+#oodist: This file contains OODoc-style documentation which will get stripped
+#oodist: during its release in the distribution.  You can use this file for
+#oodist: testing, however the code of this development version may be broken!
+
+package Math::Formula;{
+our $VERSION = '0.17';
+}
 
 
 use warnings;
@@ -17,13 +23,15 @@ use strict;
 use utf8;
 
 use Log::Report 'math-formula';
-use Scalar::Util qw/blessed/;
 
-use Math::Formula::Token;
-use Math::Formula::Type;
+use Math::Formula::Token ();
+use Math::Formula::Type  ();
 
+use Scalar::Util         qw/blessed/;
 
-#--------------------------
+#--------------------
+
+#--------------------
 
 sub new(%)
 {	my ($class, $name, $expr, %self) = @_;
@@ -49,7 +57,7 @@ sub init($)
 	$self;
 }
 
-#--------------------------
+#--------------------
 
 sub name()       { $_[0]->{MSBE_name} }
 sub expression() { $_[0]->{MSBE_expr} }
@@ -98,7 +106,7 @@ sub _tokenize($)
 
 	$s =~ m/ ^
 	(?: \s*
-	  (?| \# (?: \s [^\n\r]+ | $ ) \
+	(?| \# (?: \s [^\n\r]+ | $ ) \
 		| ( true\b | false\b )	(?{ push @t, MF::BOOLEAN->new($+) })
 		| ( \" (?: \\\" | [^"] )* \" )
 							(?{ push @t, MF::STRING->new($+) })
@@ -119,7 +127,7 @@ sub _tokenize($)
 		| $
 		| (.+)				(?{ error __x"expression '{name}', failed at '{where}'",
 								name => $self->name, where => $+ })
-	  )
+	)
 	)+ \z /sxo;
 
 	! $parens_open
@@ -160,7 +168,7 @@ sub _build_ast($$)
 
 			my $next  = $self->_build_ast($t, $prio)
 				or error __x"expression '{name}', monadic '{op}' not followed by anything useful",
-				    name => $self->name, op => $op;
+					name => $self->name, op => $op;
 
 			$first = MF::PREFIX->new($op, $next);
 			redo PROGRESS;
@@ -176,14 +184,12 @@ sub _build_ast($$)
 				$next = MF::OPERATOR->new('+');
 			}
 			else
-			{	error __x"expression '{name}', expected infix operator but found '{type}'",
-					name => $self->name, type => ref $next;
+			{	error __x"expression '{name}', expected infix operator but found '{type}'", name => $self->name, type => ref $next;
 			}
 		}
 
 		my $op = $next->token;
-		@$t or error __x"expression '{name}', infix operator '{op}' requires right-hand argument",
-				name => $self->name, op => $op;
+		@$t or error __x"expression '{name}', infix operator '{op}' requires right-hand argument", name => $self->name, op => $op;
 
 		my ($next_prio, $assoc) = MF::OPERATOR->find($op);
 
@@ -213,7 +219,7 @@ sub _build_ast($$)
 	}
 }
 
-#--------------------------
+#--------------------
 
 sub evaluate($)
 {	my ($self, $context, %args) = @_;
@@ -231,6 +237,7 @@ sub evaluate($)
 }
 
 
+
 my %_match = map { my $match = $_->_match; ( $_ => qr/^$match$/x ) }
 	qw/MF::DATETIME MF::TIME MF::DATE MF::DURATION/;
 
@@ -245,20 +252,19 @@ sub toType($)
 
 	my $match = sub { my $type = shift; my $match = $type->_match; qr/^$match$/ };
 
-	return 
-		ref $data eq 'SCALAR'            ? MF::STRING->new($data)
-	  : $data =~ /^[+-]?[0-9]+$/         ? MF::INTEGER->new(undef, $data)
-	  : $data =~ /^[+-]?[0-9]+\./        ? MF::FLOAT->new(undef, $data)
-	  : $data =~ /^(?:true|false)$/      ? MF::BOOLEAN->new($data)
-	  : ref $data eq 'Regexp'            ? MF::REGEXP->new(undef, $data)
-	  : $data =~ $_match{'MF::DATETIME'} ? MF::DATETIME->new($data)
-	  : $data =~ $_match{'MF::TIME'}     ? MF::TIME->new($data)
-	  : $data =~ $_match{'MF::DATE'}     ? MF::DATE->new($data)
-	  : $data =~ $_match{'MF::DURATION'} ? MF::DURATION->new($data)
-	  : $data =~ /^(['"]).*\1$/          ? MF::STRING->new($data)
-	  : error __x"not an expression (string needs \\ ) for '{data}'", data => $data;
+	  ref $data eq 'SCALAR'            ? MF::STRING->new($data)
+	: $data =~ /^[+-]?[0-9]+$/         ? MF::INTEGER->new(undef, $data)
+	: $data =~ /^[+-]?[0-9]+\./        ? MF::FLOAT->new(undef, $data)
+	: $data =~ /^(?:true|false)$/      ? MF::BOOLEAN->new($data)
+	: ref $data eq 'Regexp'            ? MF::REGEXP->new(undef, $data)
+	: $data =~ $_match{'MF::DATETIME'} ? MF::DATETIME->new($data)
+	: $data =~ $_match{'MF::TIME'}     ? MF::TIME->new($data)
+	: $data =~ $_match{'MF::DATE'}     ? MF::DATE->new($data)
+	: $data =~ $_match{'MF::DURATION'} ? MF::DURATION->new($data)
+	: $data =~ /^(['"]).*\1$/          ? MF::STRING->new($data)
+	:   error __x"not an expression (string needs \\ ) for '{data}'", data => $data;
 }
 
-#--------------------------
+#--------------------
 
 1;

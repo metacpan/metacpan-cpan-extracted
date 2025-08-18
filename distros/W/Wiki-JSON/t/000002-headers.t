@@ -1,4 +1,4 @@
-use v5.38.2;
+use v5.16.3;
 
 use strict;
 use warnings;
@@ -17,7 +17,7 @@ use_ok 'Wiki::JSON';
         is_deeply $parsed,
           [
             {
-                'output'   => [' hola '],
+                'output'   => ['hola'],
                 'hx_level' => $i,
                 'type'     => 'hx'
             },
@@ -34,7 +34,7 @@ use_ok 'Wiki::JSON';
         is_deeply $parsed,
           [
             {
-                'output'   => [' hola '],
+                'output'   => ['hola'],
                 'hx_level' => $i,
                 'type'     => 'hx'
             },
@@ -52,7 +52,7 @@ use_ok 'Wiki::JSON';
         is_deeply $parsed,
           [
             {
-                'output'   => [' hola '],
+                'output'   => ['hola'],
                 'hx_level' => $i,
                 'type'     => 'hx'
             },
@@ -72,7 +72,7 @@ hola' );
         is_deeply $parsed,
           [
             {
-                'output'   => [' hola '],
+                'output'   => ['hola'],
                 'hx_level' => $i,
                 'type'     => 'hx'
             },
@@ -95,7 +95,7 @@ hola' );
           [
             'hola ',
             {
-                'output'   => [' hola '],
+                'output'   => ['hola'],
                 'hx_level' => 3,
                 'type'     => 'hx'
             },
@@ -118,7 +118,7 @@ hola' );
         is_deeply $parsed,
           [
             {
-                'output'   => [' hola '],
+                'output'   => ['hola'],
                 'hx_level' => 3,
                 'type'     => 'hx'
             },
@@ -142,7 +142,7 @@ hola' );
           [
             'hola ',
             {
-                'output'   => [' hola '],
+                'output'   => ['hola'],
                 'hx_level' => 1,
                 'type'     => 'hx'
             },

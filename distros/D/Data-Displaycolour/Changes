@@ -1,3 +1,8 @@
+v0.02  2025-08-18Z
+    - Fixed encoding in example CGI
+    - Added palette: wfw_default
+    - Force a Data::URIID instance to be present when converting types
+
 v0.01  2025-06-16Z
     - Initial release and basic API
     - No database support yet

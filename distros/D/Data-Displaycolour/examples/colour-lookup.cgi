@@ -13,22 +13,32 @@ use Data::Identifier::Wellknown 'colour';
 use Data::Displaycolour;
 use Template;
 use CGI::Simple;
+use Encode qw(find_encoding);
 
 my $cgi = CGI::Simple->new;
 my $tt = Template->new;
 my @for_keys = qw(name username displayname text email);
+
+binmode(STDOUT, ':utf8');
 
 print "Content-type: text/html\x0D\x0A";
 print "\x0D\x0A";
 
 my %query = map {$_ => scalar($cgi->param($_))} (map {'for_'.$_} @for_keys), qw(palette);
 
+{
+    my $utf8 = find_encoding('UTF-8');
+    foreach my $value (values %query) {
+        $value = $utf8->decode($value) if defined $value;
+    }
+}
+
 $query{palette} ||= 'v0';
 
 my $dc = Data::Displaycolour->new(%query);
 
 $tt->process(\*DATA, {
-        cgi => $cgi,
+        param => sub { $query{$_[0]} },
         for_keys => \@for_keys,
         palettes => [sort Data::Displaycolour->known('palettes')],
         palette => $query{palette},
@@ -85,7 +95,7 @@ td {
             </select>
             [% FOREACH key IN for_keys %]
             <label for="for_[% key | html %]">[% key | html %]</label>
-            <input type="text" id="for_[% key | html %]" name="for_[% key | html %]" value="[% cgi.param("for_$key") | html %]">
+            <input type="text" id="for_[% key | html %]" name="for_[% key | html %]" value="[% param("for_$key") | html %]">
             [% END %]
 
             <div>

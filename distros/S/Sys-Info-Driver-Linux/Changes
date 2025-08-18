@@ -1,5 +1,11 @@
 Revision history for Perl extension Sys::Info::Driver::Linux.
 
+0.7909 2025-08-18 BURAK
+     - Fix mem stats.
+     - Fix CPU speed collection.
+     - Fix number of cores.
+     - Detect RPi model.
+
 0.7908 2025-08-16 BURAK
      - Fix for timezone / !6
 

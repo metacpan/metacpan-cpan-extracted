@@ -1,2 +1,12 @@
+v0.02  2025-08-17Z
+    - Added support for Data::Identifier::Interface::Userdata
+    - Added .regattr keyword volatile (currently a dummy)
+    - Check section order in output
+    - Added support for text_boundary, and load_boundary and emit them with calculated values
+    - Added additional directives: minimum_handles, minimum_memory, and .string
+    - Added new synthetic forms of: open, transfer, byte_transfer, and control
+    - Added experimental $x//$y syntax
+    - Added support for section_pointer and emit them with section offsets
+
 v0.01  2025-07-30Z
     - Initial release

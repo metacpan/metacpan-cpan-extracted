@@ -1,6 +1,6 @@
 package Data::Money;
 
-$Data::Money::VERSION   = '0.20';
+$Data::Money::VERSION   = '0.21';
 $Data::Money::AUTHORITY = 'cpan:GPHAT';
 
 =head1 NAME
@@ -9,10 +9,11 @@ Data::Money - Money/currency with formatting and overloading.
 
 =head1 VERSION
 
-Version 0.20
+Version 0.21
 
 =cut
 
+use utf8;
 use 5.006;
 use Moo;
 use namespace::clean;
@@ -23,7 +24,7 @@ use Data::Money::BaseException::MismatchCurrencyType;
 use Data::Money::BaseException::ExcessivePrecision;
 use Data::Money::BaseException::InvalidCurrencyCode;
 use Data::Money::BaseException::InvalidCurrencyFormat;
-use Locale::Currency::Format;
+use Locale::Currency::Format qw/:default/;
 use Locale::Currency qw(code2currency);
 
 use overload
@@ -329,7 +330,7 @@ sub stringify {
     my $format = shift || $self->format;
 
     ## funky eval to get string versions of constants back into the values
-    eval '$format = Locale::Currency::Format::' .  $format;
+    eval '$format = Locale::Currency::Format::' . $format;
 
     my $code = $self->code;
     Data::Money::BaseException::InvalidCurrencyCode->throw(
@@ -339,7 +340,7 @@ sub stringify {
         unless (_is_CurrencyCode($code));
 
     my $utf8 = _to_utf8(
-        Locale::Currency::Format::currency_format($code, $self->absolute->as_float, $format)
+        currency_format($code, $self->absolute->as_float, $format)
     );
 
     if ($self->value < 0) {
@@ -579,8 +580,7 @@ sub _to_utf8 {
     my $value = shift;
 
     if ($] >= 5.008) {
-        use Encode;
-        decode('UTF-8', $value);
+        utf8::decode($value);
     };
 
     return $value;

@@ -15,7 +15,9 @@ use Carp;
 
 use SIRTX::VM::Register;
 
-our $VERSION = v0.01;
+use parent 'Data::Identifier::Interface::Userdata';
+
+our $VERSION = v0.02;
 
 my @_register_templates = (
     # user:
@@ -213,11 +215,13 @@ SIRTX::VM::RegisterFile - module for interacting with SIRTX VM code
 
 =head1 VERSION
 
-version v0.01
+version v0.02
 
 =head1 SYNOPSIS
 
     use SIRTX::VM::RegisterFile;
+
+This package inherits from L<Data::Identifier::Interface::Userdata>.
 
 =head1 METHODS
 

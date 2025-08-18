@@ -3,7 +3,8 @@
 use strict;
 use warnings;
 
-use Email::Sender::Transport::SMTP;
+use Test::Needs 'Email::Sender::Transport::SMTP';
+
 use Test::Mockingbird;
 use Test::Most;
 
@@ -30,7 +31,9 @@ Test::Mockingbird::mock('Email::Sender::Transport::SMTP', 'send_email', sub {
 	$called++;
 	isa_ok($email, 'Email::Abstract', 'Email is correct object');
 	like($email->as_string(), qr/Info message/, 'Message body looks correct');
-	like($email->get_header('Subject'), qr/Subject/, 'Subject line is correct');
+	ok($email->get_header('Subject') eq 'Subject', 'Subject line is correct');
+	ok($email->get_header('From') eq 'logger@example.com');
+	ok($email->get_header('To') eq 'alerts@example.com');
 
 	return 1;
 });

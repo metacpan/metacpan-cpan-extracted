@@ -1,12 +1,12 @@
 NAME
     RT-Authen-OAuth2 - External authentication for OAuth 2 sources, like
-    Google, Twitter, GitHub, etc.
+    Google, X, Authentik, okta, GitHub, etc.
 
 DESCRIPTION
     External authentication for OAuth2 sources.
 
 RT VERSION
-    Works with RT 4.4 and 5
+    Works with RT 4.4, 5, and 6.0
 
 DEPENDENCIES
     Requires Net::OAuth2::Profile::WebServer
@@ -22,7 +22,27 @@ INSTALLATION
 
             Plugin('RT::Authen::OAuth2');
 
-    Add / Edit OAuth2 configs found in OAuth2_Config.pm
+        Add (at least) configuration options:
+
+            Set($OAuthIDP, 'your_idp_name');
+
+            Set(%OAuthIDPSecrets,
+                'your_idp_name' => {
+                    client_id => '.....',
+                    client_secret => '.....',
+                },
+            );
+
+            Set(%OAuthIDPOptions,
+                ...
+            );
+
+            - Plus any additional options needed for specific IDPs.
+
+            - See OAuth2_Config.pm / perldoc OAuth2_Config.pm for examples and additional options.
+
+            OAuth2_Config.pm includes working examples for google, auth0, okta and authentik.
+
     Clear your mason cache
             rm -rf /opt/rt4/var/mason_data/obj
 
@@ -64,6 +84,9 @@ METHODS
   IDPLoginButtonImage()
         Returns the appropriate login button image for the active OAuth 2
         server. This is displayed on the RT login page.
+
+  IDPName()
+        Returns the name configured for the active OAuth 2 provider.
 
   LogOutURL()
         Returns the appropriate logout URL active OAuth 2 server.

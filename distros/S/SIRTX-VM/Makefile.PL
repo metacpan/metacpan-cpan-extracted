@@ -18,16 +18,18 @@ my %WriteMakefileArgs = (
   "NAME" => "SIRTX::VM",
   "PREREQ_PM" => {
     "Carp" => "1.35",
+    "Data::Identifier" => "0.16.0",
     "Encode" => "3.19",
     "Fcntl" => "1.15",
-    "Getopt::Long" => "2.52"
+    "Getopt::Long" => "2.52",
+    "String::Super" => "0.1.0"
   },
   "TEST_REQUIRES" => {
     "Test::Exception" => "0.30",
     "Test::More" => "1.3",
     "Test::Warn" => "0.30"
   },
-  "VERSION" => "v0.01",
+  "VERSION" => "v0.02",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -36,9 +38,11 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => "1.35",
+  "Data::Identifier" => "0.16.0",
   "Encode" => "3.19",
   "Fcntl" => "1.15",
   "Getopt::Long" => "2.52",
+  "String::Super" => "0.1.0",
   "Test::Exception" => "0.30",
   "Test::More" => "1.3",
   "Test::Warn" => "0.30"

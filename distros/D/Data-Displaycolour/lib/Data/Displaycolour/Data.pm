@@ -18,7 +18,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = v0.01;
+our $VERSION = v0.02;
 
 my %_extra_data = (
     red      => [qw(fire feuer america amerika fox vixen fuchs), "f\N{U+00FC}chsin"],
@@ -545,7 +545,7 @@ Data::Displaycolour::Data - Work with display colours (internal data)
 
 =head1 VERSION
 
-version v0.01
+version v0.02
 
 =head1 SYNOPSIS
 

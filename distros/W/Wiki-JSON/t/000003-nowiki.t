@@ -1,4 +1,4 @@
-use v5.38.2;
+use v5.16.3;
 
 use strict;
 use warnings;
@@ -46,7 +46,7 @@ hola'
         'hola',
         {
             'output' =>
-              [' This is how titles are made: === hola === Cool isn\'t it? '],
+              ['This is how titles are made: === hola === Cool isn\'t it?'],
             'hx_level' => 3,
             'type'     => 'hx'
         },

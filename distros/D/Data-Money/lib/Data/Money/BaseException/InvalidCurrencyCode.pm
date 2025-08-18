@@ -1,6 +1,6 @@
 package Data::Money::BaseException::InvalidCurrencyCode;
 
-$Data::Money::BaseException::InvalidCurrencyCode::VERSION   = '0.20';
+$Data::Money::BaseException::InvalidCurrencyCode::VERSION   = '0.21';
 $Data::Money::BaseException::InvalidCurrencyCode::AUTHORITY = 'cpan:GPHAT';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Data::Money::BaseException::InvalidCurrencyCode - Exception handle for 'invalid 
 
 =head1 VERSION
 
-Version 0.20
+Version 0.21
 
 =cut
 

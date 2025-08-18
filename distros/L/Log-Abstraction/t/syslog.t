@@ -21,7 +21,6 @@ my $called = 0;
 Test::Mockingbird::mock('Sys::Syslog', 'syslog', sub {
 	my ($priority, $format, @args) = @_;
 
-	
 	$called++;
 	cmp_ok($format, 'eq', 'Info message', 'Message body looks correct');
 

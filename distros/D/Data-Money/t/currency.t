@@ -1,3 +1,4 @@
+use utf8;
 use Test::More;
 use strict;
 use warnings;
@@ -33,6 +34,11 @@ use Data::Money;
     my $cad = Data::Money->new(code => 'CAD', value => 1);
     cmp_ok($cad->as_string, 'eq', '$1.00', 'CAD formatting');
     is_sane_utf8($m->as_string);
+
+    my $enc = Data::Money->new(code => 'GBP', value => 12.34);
+    my $length = length($enc->as_string);
+    ok($length == 6);
+    ok(substr($enc, 0, 1) eq "\x{a3}");
 };
 
 ## unknown code

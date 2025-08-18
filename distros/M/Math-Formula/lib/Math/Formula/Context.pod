@@ -26,9 +26,9 @@ values; in this case, it runs the right expressions.
 
 =over 4
 
-=item Math::Formula::Context-E<gt>B<new>(%options)
+=item $class-E<gt>B<new>(%options)
 
-Many of the %options make sense when this context is reloaded for file.
+Many of the C<%options> make sense when this context is reloaded for file.
 
  -Option          --Default
   formula           []
@@ -87,30 +87,34 @@ The following attributes are currently defined:
 
 =item $obj-E<gt>B<attribute>($name)
 
+Returns the L<Math::Formula|Math::Formula> object for the attribute C<$name>.
+
 =back
 
 =head2 Formula and Fragment management
 
 =over 4
 
-=item $obj-E<gt>B<add>(LIST)
+=item $obj-E<gt>B<add>(($name => $value, %options)|@objects|\%configs)
 
 Add one or more items to the context.
 
-When a LIST is used and the first argument is a name, then the data is
-used to create a $formula or fragment (when the name starts with a '#').  
+When the first argument is a C<$name>, then the C<$value> and C<%options> are
+used to create a formula or fragment (when the name starts with a '#')
+via L<Math::Formula::new()|Math::Formula/"Constructors">.
 
-Otherwise, the LIST is a sequence of prepared formulas and fragments,
-or a HASH with 
+Otherwise formula- and fragment C<@objects> can be passed.  It is also
+possible to pass a HASH of C<%configs> to defined multiple formulas at the
+same time.
 
 example: :
 
   $context->add(wakeup => '07:00:00', returns => 'MF::TIME');
   $context->add(fruit  => \'apple', returns => 'MF::TIME');
-  
+
   my $form = Math::Formula->new(wakeup => '07:00:00', returns => 'MF::TIME');
   $context->add($form, @more_forms, @fragments, @hashes);
-  
+
   my %library = (
     breakfast => 'wakeup + P2H',
 	to_work   => 'PT10M',    # mind the 'T': minutes not months
@@ -119,11 +123,12 @@ example: :
   );
   $context->add($form, \%library, $frag);
 
-=item $obj-E<gt>B<addFormula>(LIST)
+=item $obj-E<gt>B<addFormula>($name, $value, %options)
 
-Add a single formula to this context.  The formula is returned.
+Add a single formula to this context.  The formula is created via L<Math::Formula::new()|Math::Formula/"Constructors">, passing
+all C<%options>, and then returned.
 
-example: of addFormula
+example: of addFormula()
 
 Only the 3rd and 4th line of the examples below are affected by C<new(lead_expressions)>:
 only in those cases it is unclear whether we speak about a STRING or an expression.  But,
@@ -141,16 +146,16 @@ inconveniently, those are popular choices.
 
 =item $obj-E<gt>B<addFragment>( [$name], $fragment )
 
-A $fragment is simply a different Context.  Fragments are addressed via the '#'
+A C<$fragment> is simply a different Context.  Fragments are addressed via the '#'
 operator.
 
 =item $obj-E<gt>B<formula>($name)
 
-Returns the formula with this specified name.
+Returns the L<Math::Formula|Math::Formula> object with this specified name.
 
 =item $obj-E<gt>B<fragment>($name)
 
-Returns the fragment (context) with $name.  This is not sufficient to switch
+Returns the fragment (context) with C<$name>.  This is not sufficient to switch
 between contexts, which is done during execution.
 
 =back
@@ -166,14 +171,14 @@ zero, where the capture indicators start at one.
 
 =item $obj-E<gt>B<evaluate>($name, %options)
 
-Evaluate the expression with the $name.  Returns a types object, or C<undef>
-when not found.  The %options are passed to L<Math::Formula::evaluate()|Math::Formula/"Running">.
+Evaluate the expression with the C<$name>.  Returns a types object, or C<undef>
+when not found.  The C<%options> are passed to L<Math::Formula::evaluate()|Math::Formula/"Running">.
 
 =item $obj-E<gt>B<run>($expression, %options)
 
 Single-shot an expression: the expression will be run in this context but
 not get a name.  A temporary L<Math::Formula|Math::Formula> object is created and
-later destroyed.  The %options are passed to L<Math::Formula::evaluate()|Math::Formula/"Running">.
+later destroyed.  The C<%options> are passed to L<Math::Formula::evaluate()|Math::Formula/"Running">.
 
  -Option--Default
   name    <caller's filename and linenumber>
@@ -195,7 +200,7 @@ expression.  This method sets those strings when the arrow operator is applied.
 
 =item $obj-E<gt>B<value>($expression, %options)
 
-First run the $expression, then return the value of the returned type object.
+First run the C<$expression>, then return the value of the returned type object.
 All options are passed to L<run()|Math::Formula::Context/"Runtime">.
 
 =back
@@ -213,24 +218,24 @@ which can be selected with L<new(lead_expressions)|Math::Formula::Context/"Const
 I<The default behavior>: when C<lead_expressions> is the empty string,
 then expressions have no leading flag, so the following can be used:
 
-   text_field => \"string"
-   text_field => \'string'
-   text_field => \$string
-   text_field => '"string"'
-   text_field => "'string'"
-   text_field => "'$string'"   <-- unsafe quotes?
-   expr_field => '1 + 2 * 3'
+  text_field => \"string"
+  text_field => \'string'
+  text_field => \$string
+  text_field => '"string"'
+  text_field => "'string'"
+  text_field => "'$string'"   <-- unsafe quotes?
+  expr_field => '1 + 2 * 3'
 
 I<Alternatively>, L<new(lead_expressions)|Math::Formula::Context/"Constructors"> can be anything.  For instance,
 easy to remember is C<=>. In that case, the added data can look like
 
-   text_field => \"string"
-   text_field => \'string'
-   text_field => \$string
-   text_field => "string"
-   text_field => 'string'
-   text_field => $string       <-- unsafe quotes?
-   expr_field => '= 1 + 2 * 3'
+  text_field => \"string"
+  text_field => \'string'
+  text_field => \$string
+  text_field => "string"
+  text_field => 'string'
+  text_field => $string       <-- unsafe quotes?
+  expr_field => '= 1 + 2 * 3'
 
 Of course, this introduces the security risk in the C<$string> case, which might
 carry a C<=> by accident.  So: although usable, refrain from using that form
@@ -243,8 +248,8 @@ I<The third solution> for this problem, is that your application exactly knows
 which fields are formula, and which fields are plain strings.  For instance, my
 own application is XML based.  I have defined
 
- <let name="some-field1" string="string content" />
- <let name="some-field2" be="expression content" />
+  <let name="some-field1" string="string content" />
+  <let name="some-field2" be="expression content" />
 
 =head2 Creating an interface to an object (fragment)
 
@@ -333,7 +338,7 @@ The CODE reference returns either an B<explicit type> or a guessed type.
 When the type is explicit, you MUST decide whether the data is a "token"
 (in normalized string representation) or a "value" (internal data format).
 
-Math::Formula's internal types are bless ARRAYs with (usually) two fields.
+L<Math::Formula|Math::Formula>'s internal types are bless ARRAYs with (usually) two fields.
 The first is the I<token>, the second the I<value>.  When the token is
 known, but the value is needed, the token will get parsed.  And vice
 versa: the token can be generated from the value when required.
@@ -368,20 +373,47 @@ can be returned.  These are the types with examples for tokens and values:
   MF::REGEXP    '"a.b"'  qr//     qr/^a.b$/
   MF::FRAGMENT  'toe'             ::Context-object
 
-When you decide to be lazy, Math::Formula will attempt to auto-detect the
+When you decide to be lazy, L<Math::Formula|Math::Formula> will attempt to auto-detect the
 type.  This is helped by the fact that operator will cast types which they
 need, for instance MF::FLOAT to MF::INTEGER or the reverse.
 
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Error: context requires a name
+
+Z<>
+
+=item Error: formula declaration '$name' not understood
+
+Z<>
+
+=item Warning: no formula '$name' in $context
+
+Z<>
+
+=item Error: recursion in expression '$name' at $context
+
+Z<>
+
+=item Error: unexpected value for '$name' in #$context
+
+Z<>
+
+=back
+
 =head1 SEE ALSO
 
-This module is part of Math-Formula distribution version 0.16,
-built on March 14, 2023. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Math-Formula version 0.17,
+built on August 17, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2023 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2023-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

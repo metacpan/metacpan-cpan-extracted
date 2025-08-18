@@ -23,8 +23,12 @@ t/00-load.t
 t/01-turndown.t
 t/02-turndown-gfm.t
 t/03-extractinfo.t
+t/04-encode-entities.t
+t/05-html2markdown.t
+t/entities.html
 t/index-gfm.html
 t/index.html
+t/spam-test.mail
 testrules.yml
 xt/99-changes.t
 xt/99-compile.t

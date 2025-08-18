@@ -35,12 +35,6 @@ A parser for a subset of a mediawiki-like syntax, quirks include some
 supposedly inline elements are parsed multi-line like headers, templates\*,
 italic and bolds.
 
-# DESCRIPTION
-
-A parser for a subset of a mediawiki-like syntax, quirks include some
-supposedly inline elements are parsed multi-line like headers, templates\*,
-italic and bolds.
-
 Lists are only one level and not everything in mediawiki is supported by the
 moment.
 
@@ -168,7 +162,7 @@ Undocumented by the moment.
 
 # DEPENDENCIES
 
-The module will pull all the dependencies it needs on install, the minimum supported Perl is v5.38.2.
+The module will pull all the dependencies it needs on install, the minimum supported Perl is v5.16.3, although latest versions are mostly tested for 5.38.2
 
 # CONFIGURATION AND ENVIRONMENT
 

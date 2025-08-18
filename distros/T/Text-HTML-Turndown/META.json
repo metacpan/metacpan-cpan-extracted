@@ -33,6 +33,7 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
+            "Exporter" : "0",
             "File::Basename" : "0",
             "List::MoreUtils" : "0",
             "List::Util" : "0",
@@ -67,7 +68,7 @@
          "web" : "https://github.com/Corion/Text-HTML-Turndown"
       }
    },
-   "version" : "0.06",
+   "version" : "0.07",
    "x_serialization_backend" : "JSON::PP version 4.07",
    "x_static_install" : 1
 }

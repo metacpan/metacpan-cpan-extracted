@@ -1,3 +1,8 @@
+0.012 2025-08-18
+  [Requirement Changes]
+    * Require SPVM 0.990081.
+  [Document Changes]
+    * Improve the document for Mojo::Headers class.
 0.011 2025-08-13
   [Requirement Changes]
     * Require SPVM::File::Path 0.014.

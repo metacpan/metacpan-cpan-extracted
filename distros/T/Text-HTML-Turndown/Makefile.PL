@@ -51,6 +51,7 @@ my %module = (
 
     PREREQ_PM => {
         'experimental'        => '0.034',
+        'Exporter'            => 0,
         'PerlX::Maybe'        => 0,
 
         'Carp'                => 0,
