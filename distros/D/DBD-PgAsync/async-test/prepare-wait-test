@@ -75,7 +75,7 @@ sub dbh_connect
                                 AutoCommit => 1,
                                 RaiseError => 1,
                                 pg_server_prepare => 1,
-                                pg_async_connect => 1});
+                                pg_use_async => 1 });
     do {
         $rc = $dbh->pg_continue_connect();
         msg('continue async connect %d', $rc);
@@ -113,7 +113,7 @@ sub print_pages
 
     DBI->trace(15);
     $dbh = dbh_connect('../../pg-conn');
-    $sth = $dbh->prepare('select cmd, whatis from whatis where section = ? order by cmd', { pg_async => 1, pg_prepare_now => 1 });
+    $sth = $dbh->prepare('select cmd, whatis from whatis where section = ? order by cmd', { pg_prepare_now => 1 });
     wait_for_query($dbh);
 
     for (SECS) {

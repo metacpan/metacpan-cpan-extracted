@@ -99,6 +99,8 @@ sub generate_song ( $s ) {
 	    next if $used{$k};
 	    next if $k =~ /^(?:title|subtitle|songindex|key_.*|chords|numchords)$/;
 	    next if $k =~ /^_/;
+	    next if $k =~ /\./;
+	    next if $k =~ /^bookmark/;
 	    push( @s, map { +"{meta: $k ".fq($_)."}" } @{ $s->{meta}->{$k} } );
 	}
     }
@@ -147,7 +149,7 @@ sub generate_song ( $s ) {
 
     if ( $s->{spreadimage} && $variant eq "msp" ) {
 	my $a = $s->{assets}->{$s->{spreadimage}->{id}};
-	if ( $a->{delegate} =~ /^abc$/i ) {
+	if ( $a->{delegate} =~ /^abc$/i && !$a->{uri} ) {
 	    push( @s, "{start_of_" . lc($a->{delegate}) . "}",
 		  @{$a->{data}},
 		  "{end_of_" . lc($a->{delegate}) . "}" );

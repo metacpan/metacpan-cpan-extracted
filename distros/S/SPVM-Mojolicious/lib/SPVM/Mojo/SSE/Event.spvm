@@ -1,0 +1,72 @@
+# Copyright (c) 2025 Yuki Kimoto
+# MIT License
+
+class Mojo::SSE::Event {
+  version_from Mojolicious;
+  
+  # Class Variables
+  our $SPLIT_RE : string;
+  INIT {
+    $SPLIT_RE = "(?:\x0d\x0a|(?<!\x0d)\x0a|\x0d(?!\x0a))";
+  }
+  
+  # Fields
+  has id : rw string;
+  
+  has type : rw string;
+  
+  has texts : rw string[];
+  
+  has text : virtual rw string
+    get {
+      my $texts = $self->{texts};
+      
+      if (@$texts) {
+        return Fn->join("\x0d\x0a", $texts);
+      }
+      else {
+        return undef;
+      }
+    }
+    set {
+      if ($_) {
+        $self->{texts} = Re->split($SPLIT_RE, $_);
+      }
+      else {
+        $self->{texts} = undef;
+      }
+    }
+  ;
+  
+  has comments : rw string[];
+  
+  has comment : virtual rw string
+    get {
+      my $comments = $self->{comments};
+      
+      if (@$comments) {
+        return Fn->join("\x0d\x0a", $comments);
+      }
+      else {
+        return undef;
+      }
+    }
+    set {
+      if ($_) {
+        $self->{comments} = Re->split($SPLIT_RE, $_);
+      }
+      else {
+        $self->{comments} = undef;
+      }
+    }
+  ;
+  
+  # Class Methods
+  static method new : Mojo::SSE::Event () {
+    
+    my $self = new Mojo::SSE::Event;
+    
+    return $self;
+  }
+  
+}

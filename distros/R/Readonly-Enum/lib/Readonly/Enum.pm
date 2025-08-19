@@ -5,8 +5,9 @@ use v5.10;
 use strict;
 use warnings;
 
-use version 0.77; our $VERSION = version->declare("v0.1.4");
+use version 0.77; our $VERSION = version->declare('v0.1.5');
 
+use Carp;
 use Scalar::Readonly qw/ readonly_on /;
 
 =head1 NAME
@@ -40,14 +41,11 @@ and interpolated in strings.
 
 Unlike L<enum>, only integers are supported in this version.
 
-=head1 STATUS
-
-This module is no longer maintained. See L<Const::Exporter> for
-similar functionality.
-
 =head1 AUTHOR
 
 Robert Rothenberg C<rrwo@cpan.org>.
+
+Current Maintainer, Nigel Horne, C<< <njh at nigelhorne.com> >>
 
 =head1 LICENSE AND COPYRIGHT
 
@@ -91,24 +89,26 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =cut
 
-sub Readonly::Enum {
+sub Readonly::Enum
+{
+	my @vals  = grep { defined $_ } @_;
 
-    my @vals  = grep { defined $_ } @_;
+	my $i;
 
-    my $i = 0;
+	my $start = 0;
 
-    my $start = 0;
+	for($i = 0; $i < @_; $i++) {
+		last if defined $_[$i];
 
-    for($i=0; $i<@_; $i++) {
+		$start = @vals ? (shift @vals) : ++$start;
 
-	last if defined $_[$i];
+		Carp::croak('Initial values must be defined integers') unless(defined $start && $start =~ /^-?\d+\z/);
 
-	$start = @vals ? (shift @vals) : ++$start;
+		readonly_on($_[$i] = $start);
+	}
 
-	readonly_on($_[$i] = $start);
+	Carp::croak('Too many initial values') if(scalar(@vals));
 
-    }
 }
-
 
 1;

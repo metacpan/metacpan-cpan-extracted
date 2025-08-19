@@ -3,19 +3,31 @@ abstract: 'A lyrics and chords formatting program'
 author:
   - 'Johan Vromans <jvromans@squirrel.nl>'
 build_requires:
-  ExtUtils::MakeMaker: '0'
+  Data::Printer: '1.001001'
+  File::Copy: '2.32'
+  File::HomeDir: '1.004'
+  File::LoadLines: '1.047'
+  HarfBuzz::Shaper: '0.026'
+  IPC::Run3: '0.049'
+  Image::Info: '1.41'
   JSON::PP: '2.27203'
-  Object::Pad: '0.78'
-  PDF::API2: '2.043'
+  JSON::XS: '4.03'
+  JavaScript::QuickJS: '0.18'
+  LWP::Protocol::https: '6.14'
+  List::Util: '1.46'
+  Mozilla::CA: '20230801'
+  Object::Pad: '0.818'
+  PDF::API2: '2.045'
+  Pod::Usage: '2.03'
   Ref::Util: '0.204'
   Scalar::Util: '1.63'
   Storable: '3.08'
-  String::Interpolate::Named: '1.01'
-  Test::More: '0'
+  String::Interpolate::Named: '1.06'
+  Text::Layout: '0.045'
 configure_requires:
   ExtUtils::MakeMaker: '7.24'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -44,16 +56,17 @@ no_index:
 provides:
   App::Music::ChordPro:
     file: lib/ChordPro.pm
-    version: v6.70.7
+    version: v6.80.0
   chordpro:
     file: script/chordpro
-    version: v6.70.7
+    version: v6.80.0
 requires:
   Data::Printer: '1.001001'
   File::Copy: '2.32'
   File::HomeDir: '1.004'
   File::LoadLines: '1.047'
   HarfBuzz::Shaper: '0.026'
+  IPC::Run3: '0.049'
   Image::Info: '1.41'
   JSON::PP: '2.27203'
   JSON::XS: '4.03'
@@ -61,19 +74,19 @@ requires:
   LWP::Protocol::https: '6.14'
   List::Util: '1.46'
   Mozilla::CA: '20230801'
-  Object::Pad: '0.78'
-  PDF::API2: '2.043'
+  Object::Pad: '0.818'
+  PDF::API2: '2.045'
   Pod::Usage: '2.03'
   Ref::Util: '0.204'
   Scalar::Util: '1.63'
   Storable: '3.08'
-  String::Interpolate::Named: '1.03'
-  Text::Layout: '0.038'
+  String::Interpolate::Named: '1.06'
+  Text::Layout: '0.045'
   perl: '5.026'
 resources:
   bugtracker: https://github.com/ChordPro/chordpro/issues
   homepage: https://chordpro.org
   license: https://dev.perl.org/licenses/
   repository: git://github.com/ChordPro/chordpro.git
-version: v6.070.7
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: v6.080.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

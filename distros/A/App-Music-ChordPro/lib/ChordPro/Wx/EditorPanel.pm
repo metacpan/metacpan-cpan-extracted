@@ -18,9 +18,6 @@ use ChordPro::Wx::Utils;
 use ChordPro::Utils qw( max demarkup plural );
 use ChordPro::Paths;
 
-use File::Basename;
-use File::LoadLines;
-
 # WhoamI
 field $panel :accessor = "editor";
 
@@ -87,7 +84,6 @@ method refresh() {
     $self->previewtooltip;
     $self->messagestooltip;
     $self->{t_editor}->SetModified($mod);
-    $self->{bmb_preview}->SetFocus;
 
     $self->refresh_messages;
 
@@ -97,7 +93,7 @@ method refresh() {
 	Wx::Event::EVT_STC_CLIPBOARD_PASTE( $self, $self->{t_editor}->GetId,
 					    $self->can("OnClipBoardPaste") );
     }
-
+    $self->set_focus;
 }
 
 method openfile( $file, $checked=0, $actual=undef ) {
@@ -167,7 +163,7 @@ method openfile( $file, $checked=0, $actual=undef ) {
     }
     else {
 	my $n = $self->{t_editor}->GetLineCount;
-	$self->{l_status}->SetLabel(basename($file));
+	$self->{l_status}->SetLabel(fn_basename($file));
 	$self->{l_status}->SetToolTip($file);
 	$self->log( 'S', "Loaded: $file (" . plural($n, " line") . ")");
     }
@@ -268,7 +264,7 @@ method check_source_saved() {
     if ( $state{currentfile} ) {
 	my $md = Wx::MessageDialog->new
 	  ( $self,
-	    "File " . basename($state{currentfile}) . " has been changed.\n".
+	    "File " . fn_basename($state{currentfile}) . " has been changed.\n".
 	    "Do you want to save your changes?",
 	    "File has changed",
 	    0 | wxCANCEL | wxYES_NO | wxYES_DEFAULT | wxICON_QUESTION );
@@ -307,7 +303,7 @@ method save_file( $file = undef ) {
 	    my $cf = $state{currentfile} // "Untitled";
 	    my $fd = Wx::FileDialog->new
 	      ($self, _T("Choose output file"),
-	       dirname($cf), basename($cf),
+	       fn_dirname($cf), fn_basename($cf),
 	       "*".$preferences{chordproext},
 	       0|wxFD_SAVE|wxFD_OVERWRITE_PROMPT,
 	       wxDefaultPosition);
@@ -372,6 +368,9 @@ method preview( $args, %opts ) {
 }
 
 method check_preview_saved() {
+    # Do not ask for preview save. It's regenerated easily.
+    return 1;
+
     return 1 unless $self->prv && $self->prv->unsaved_preview;
 
     my $md = Wx::MessageDialog->new
@@ -470,19 +469,49 @@ method update_preferences() {
     $self->refresh;
 }
 
+method set_focus {
+    $self->{t_editor}->SetFocus;
+}
+
 ################ Event Handlers (alphabetic order) ################
+
+method OnInsertSymbol($event) {
+    unless ( $preferences{enable_insert_symbols} ) {
+	my $md = Wx::MessageDialog->new
+	  ( undef,
+	    "Inserting special symbols introduces the risk that you can ".
+	    "insert symbols that are visible on the screen, but are not ".
+	    "supported by the fonts that are used for the PDF output.\n".
+	    "So these symbols may clobber your output.\n".
+	    "\n".
+	    "Keep this operation disabled?",
+	    "Advanced operation warning",
+	    wxYES_NO|wxICON_WARNING|wxDIALOG_NO_PARENT );
+	return unless $md->ShowModal == wxID_NO;
+	$preferences{enable_insert_symbols} = 1;
+
+    }
+    my $ctrl = $self->{t_editor};
+    state $sym = "\x{2665}";
+    my $d = Wx::SymbolPickerDialog->new( $sym, "", "", $self );
+    if ( $d->ShowModal == wxID_OK ) {
+	$ctrl->AddText( $sym = $d->GetSymbol );
+    }
+}
 
 method OnA2Crd($event) {
 
     my $ctrl = $self->{t_editor};
     my ( $from, $to ) = $ctrl->GetSelection;
     my $have_selection = $from != $to;
+    $ctrl->ConvertEOLs(wxSTC_EOL_LF);
     my $text = $have_selection ? $ctrl->GetSelectedText : $ctrl->GetText;
 
     require ChordPro::A2Crd;
     $::options->{nosysconfig} = 1;
     $::options->{nouserconfig} = 1;
     $::options->{noconfig} = 1;
+    $::options->{fragment} = $have_selection;
 
     # Often text that is pasted from web has additional newlines.
     $text =~ s/^\n+//;
@@ -539,6 +568,9 @@ method OnCharAdded( $event ) {
 	    $stc->CharRightExtend if length($nl) == 2;
 	    $stc->ReplaceSelection("}" . $nl);
 	}
+	elsif ( $ln > 1 && $stc->GetLine($ln-1) =~ /^\{\s*start_of_(\w+).*\}$/ ) {
+	    $stc->InsertText( -1, "\n{end_of_$1}" );
+	}
     }
 
     elsif ( $key eq ord(" ") || $key eq ord(":") || $key eq ord("}") ) {
@@ -555,7 +587,7 @@ method OnCharAdded( $event ) {
     }
 }
 
-method OnClearAnnotations($event) {
+method OnClearDiagnosticFlags($event) {
     return unless $state{have_stc};
     $self->{t_editor}->AnnotationClearAll;
 }
@@ -582,6 +614,8 @@ method OnCloseSection($event) {
 		$closed = "";
 		next;
 	    }
+	    $stc->AddText( $self->nl )
+	      if $stc->GetColumn($stc->GetCurrentPos);
 	    $stc->AddText( "{$1end_of_$2}" . $self->nl );
 	    $did++;
 	    last;
@@ -591,6 +625,8 @@ method OnCloseSection($event) {
 		$closed = "";
 		next;
 	    }
+	    $stc->AddText( $self->nl )
+	      if $stc->GetColumn($stc->GetCurrentPos);
 	    $stc->AddText( "{$1eo$2}" . $self->nl );
 	    $did++;
 	    last;
@@ -716,6 +752,10 @@ method OnInsertVerse($event) {
 
 method OnInsertGrid($event) {
     $self->embrace_section("grid");
+}
+
+method OnInsertTab($event) {
+    $self->embrace_section("tab");
 }
 
 method OnInsertSection($event) {

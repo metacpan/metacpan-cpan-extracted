@@ -62,7 +62,6 @@ sub OnInit( $self ) {
 
 use Wx qw[:everything];
 use ChordPro::Wx::Utils;
-use File::Basename;
 
 # Synchronous system call. Used in ChordPro::Utils module.
 sub ::sys { Wx::ExecuteArgs( \@_, wxEXEC_SYNC | wxEXEC_HIDE_CONSOLE ); }
@@ -88,7 +87,6 @@ use ChordPro::Wx::Config;
 use ChordPro::Wx::Utils;
 
 use Encode qw(decode_utf8);
-use File::Basename;
 
 method log( $level, $msg ) {
     $msg =~ s/\n+$//;
@@ -194,26 +192,27 @@ method init( $options ) {
     $self->SetStatusBar(undef);
     $self->get_preferences;
     $self->setup_menubar;
+    $self->setup_statusbar;
     Wx::Event::EVT_SYS_COLOUR_CHANGED( $self,
 				       $self->can("OnSysColourChanged") );
     $self->init_theme;
 
     if ( @ARGV ) {
-	use DDP;
+	# use DDP;
 	use charnames ':full';
 	require _charnames;
 	push( @{$state{msgs}},
 	      "ARGV: " . np(@ARGV,
 			      show_unicode => 1,
 			      escape_chars => 'nonascii',
-			      unicode_charnames => 1 ) );
+			      unicode_charnames => 1 ) ) if 0;
 	my $arg = shift(@ARGV);	# ignore rest
 	$arg = decode_utf8($arg);
 	push( @{$state{msgs}},
 	      'DECODED: ' . np($arg,
 			    show_unicode => 1,
 			    escape_chars => 'nonascii',
-			    unicode_charnames => 1 ) );
+			    unicode_charnames => 1 ) ) if 0;
 
 	if ( fs_test( 'd', $arg ) ) {
 	    return 1 if $self->select_mode("sbexport")->open_dir($arg);
@@ -255,7 +254,7 @@ method init_recents() {
 	for my $file ( @$r ) {
 	    next unless fs_test( s => $file );
 	    last unless defined $file;
-	    $ctl->Append( basename($file) );
+	    $ctl->Append( fn_basename($file) );
 	    $ctl->SetClientData( $i, $file );
 	    $i++;
 	}
@@ -355,6 +354,13 @@ method check_saved() {
     1;
 }
 
+method setup_statusbar() {
+    # Add statusbar.
+    return unless $preferences{expert};
+    $self->{f_main_statusbar} = $self->CreateStatusBar(1);
+    $self->{f_main_statusbar}->SetStatusWidths(-1);
+}
+
 ################ Event handlers (alphabetic order) ################
 
 # This method is called from the helper panels.
@@ -418,7 +424,7 @@ method OnIdle($event) {
     }
     return if $self->{p_initial}->IsShown;
     my $mod = $self->{p_editor}->{t_editor}->IsModified;
-    my $f = basename($state{windowtitle} // "ChordPro");
+    my $f = fn_basename($state{windowtitle} // "ChordPro");
     if ( is_macos ) {
 	wxTheApp->GetTopWindow->OSXSetModified($mod);
     }
@@ -430,8 +436,22 @@ method OnIdle($event) {
 
     if ( $state{mode} eq "editor") {
 	my $t = $self->{p_editor}->{t_editor}->GetText;
+
 	if ( $t =~ /^\{\s*t(?:itle)?[: ]+([^\}]*)\}/m ) {
 	    $self->{p_editor}->{l_status}->SetLabel(demarkup($1));
+	}
+
+	if ( $state{editchanged}
+	     && $self->{p_editor}->{sw_lr}->IsSplit ) {
+
+	    if ( $state{have_webview}
+		 && $preferences{enable_htmlviewer} ) {
+		$self->{p_editor}->preview([]);
+		$state{editchanged} = 0;
+	    }
+	    else {
+		# Preview is no longer actual -- how to signal?
+	    }
 	}
     }
 
@@ -447,7 +467,9 @@ method OnHelp_Config($event) {
 
 method OnHelp_Example($event) {
     $self->select_mode("editor");
-    $self->{p_editor}->openfile( CP->findres( "swinglow.cho",
+    $self->{p_editor}->openfile( CP->findres( $preferences{expert}
+					      ? "mollymalone.cho"
+					      : "swinglow.cho",
 					      class => "examples" ),
 				 1, " example.cho " );
 }
@@ -503,7 +525,7 @@ method OnOpen($event) {
     my $fd = Wx::FileDialog->new
       ( $self,
 	_T("Choose ChordPro file"),
-	dirname($state{recents}[0]//""),
+	fn_dirname($state{recents}[0]//""),
 	"",
 	$state{ffilters},
 	wxFD_OPEN|wxFD_FILE_MUST_EXIST );
@@ -528,6 +550,7 @@ method OnPreferences($event) {
     # The Settings dialog operates on the current $preferences.
     my $ret = $self->{d_prefs}->ShowModal;
     savewinpos( $self->{d_prefs}, "prefs" );
+    $state{panel}->set_focus unless $state{mode} eq "initial";
     return unless $ret == wxID_OK;
 
     # $preferences may have changed.

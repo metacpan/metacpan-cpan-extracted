@@ -1,0 +1,68 @@
+{
+   "abstract" : "A Perl module for improving grammar using an external API.",
+   "author" : [
+      "Nigel Horne <njh@nigelhorne.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Readonly-Enum",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "ExtUtils::MakeMaker" : "6.64",
+            "Scalar::Readonly" : "0",
+            "perl" : "5.010",
+            "version" : "0.77"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::DescribeMe" : "0",
+            "Test::Most" : "0",
+            "Test::Needs" : "0",
+            "Test::Warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Readonly-Enum@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Readonly-Enum",
+         "x_url" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Readonly-Enum"
+      },
+      "homepage" : "https://metacpan.org/pod/Readonly::Enum",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/nigelhorne/Readonly-Enum.git",
+         "web" : "https://github.com/robrwo/Readonly-Enum",
+         "x_repository" : "https://github.com/robrwo/Readonly-Enum"
+      }
+   },
+   "version" : "v0.1.5",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

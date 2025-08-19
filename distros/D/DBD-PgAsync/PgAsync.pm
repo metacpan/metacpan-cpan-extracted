@@ -19,7 +19,7 @@ use 5.008001;
 {
     package DBD::PgAsync;
 
-    use version; our $VERSION = qv('0.7.2');
+    use version; our $VERSION = qv('0.8.0');
 
     use DBI 1.614 ();
     use Exporter ();
@@ -174,6 +174,7 @@ use 5.008001;
             DBD::PgAsync::db->install_method('pg_server_trace');
             DBD::PgAsync::db->install_method('pg_server_untrace');
             DBD::PgAsync::db->install_method('pg_type_info');
+            DBD::PgAsync::db->install_method('pg_deallocs_queued');
 
             DBD::PgAsync::st->install_method('pg_cancel');
             DBD::PgAsync::st->install_method('pg_result');
@@ -1710,12 +1711,9 @@ This documents version 0.5 of the DBD::PgAsync module
 =head1 DESCRIPTION
 
 DBD::PgAsync is a fork of the DBD::Pg PostgreSQL database driver
-module intended to have complete support for the libpq asynchronous
-interface. In particular, this means support for asynchronous connect
-and asynchronous prepare and without hidden synchronous operations as
-in the DBD::Pg pg_cancel method or the SQL statements transparently
-issued to start/ initialize a new transaction when AutoCommit is
-disabled.
+module intended to have more complete support for the libpq
+asynchronous interface. Details are documented in the I<Asynchronous
+Mode> section below.
 
 =head1 MODULE DOCUMENTATION
 
@@ -2834,6 +2832,11 @@ The value returned indicates the current state:
 
 Additional information on why a handle is not valid can be obtained by using the
 L</pg_ping> method.
+
+When asynchronous mode is enabled (C<pg_use_async> is 1), a return
+value of 1 means the test query was successfully sent to the
+server. The actual result of the ping will become available as return
+value of C<pg_result> after the test query has finished.
 
 =head3 B<pg_ping>
 
@@ -4151,197 +4154,133 @@ created after the one being released are also destroyed.
 
   $dbh->pg_release("mysavepoint");
 
-=head2 Asynchronous Queries
+=head2 Asynchronous Mode
 
-B<This documents the legacy DBD::Pg async interface. For versions of
-DBD::PgAsync E<gt>= 0.6, it's recommend to pass the attribute
-C<pg_use_async> to C<DBI-E<gt>connect> instead. This will cause all
-operations where support for this has been implemented to be performed
-asynchronously unless a C<pg_async> attribute with value C<0> is used
-to disable this.
+The database handle attribute C<pg_use_async> which may either be
+passed as attribute to C<connect> or enabled (or disabled) at a later
+time can be used to switch a database handle to I<asynchronous
+mode>. Operations which require communication with the database server
+will then no longer block until a reply was received but return
+immediately after sending the request. This affects the following
+operations:
 
-B<Presently, this means connect, prepare, all explicit query executions,
-the operations necessary to start or end a transaction and the savepoint
-methods will be performed asynchronously.>
+=over
 
-It is possible to send a query to the backend and have your script do other work while the query is
-running on the backend. Both queries sent by the L</do> method, and by the L</execute> method can be
-sent asynchronously. The basic usage is as follows:
+=item * the C<connect> method
 
-  print "Async do() example:\n";
-  $dbh->do("SELECT long_running_query()", {pg_async => PG_ASYNC});
-  do_something_else();
-  {
-    if ($dbh->pg_ready()) {
-      $res = $dbh->pg_result();
-      print "Result of do(): $res\n";
-    }
-    print "Query is still running...\n";
-    if (cancel_request_received) {
-      $dbh->pg_cancel();
-    }
-    sleep 1;
-    redo;
-  }
+=item * the C<prepare> method
 
-  print "Async prepare/execute example:\n";
-  $sth = $dbh->prepare("SELECT long_running_query(1)", {pg_async => PG_ASYNC});
-  $sth->execute();
+=item * the query execution methods C<do> and C<execute>
 
-  do_something_else();
+=item * the C<commit> and C<rollback> methods for terminating a
+transaction
 
-  if (!$sth->pg_ready) {
-    do_another_thing();
-  }
+=item * the C<ping> and C<pg_ping> methods
 
-  ## We wait until it is done, and get the result:
-  $res = $dbh->pg_result();
+=item * the methods for manageing savepoints
 
-=back
-
-=head3 Asynchronous Methods
-
-=over 4
-
-=item B<pg_cancel>
-
-Database-level method which sends a request to cancel the currently running asynchronous query to the server.
-Returns true if the request was sent, false otherwise. The result of the query still needs to be
-determined in the ordinary way. If the query was actually cancelled, C<pg_result>) will return zero and SQLSTATE
-will be 57014.
-
-B<WARNING>: a successful cancellation may leave the database in an unusable state,
-so you may need to ROLLBACK or ROLLBACK TO a savepoint. As of version 2.17.0 of DBD::PgAsync, rollbacks are
-not done automatically.
-
-  $result = $dbh->pg_cancel();
-
-=item B<pg_ready>
-
-This method can be called as a database handle method or (for convenience) as a statement handle method. Both simply
-see if a previously issued asynchronous query has completed yet. It returns true if the statement has finished, in which
-case you should then call the L</pg_result> method. Calls to C<pg_ready()> should only be used when you have other
-things to do while the query is running. If you simply want to wait until the query is done, do not call pg_ready()
-over and over, but simply call the pg_result() method.
-
-  my $time = 0;
-  while (!$dbh->pg_ready) {
-    print "Query is still running. Seconds: $time\n";
-    $time++;
-    sleep 1;
-  }
-  $result = $dbh->pg_result;
-
-=item B<pg_result>
-
-This database handle method returns the results of a previously issued asynchronous query. If the query is still
-running, this method will wait until it has finished. The result returned is the number of rows: the same thing
-that would have been returned by the asynchronous L</do> or L</execute> if it had been called without an asynchronous flag.
-
-  $result = $dbh->pg_result;
+=item * automatically triggered deallocation of prepared statements
 
 =back
 
 =head3 Asynchronous Connect
 
-Passing a true value for the attribute pg_async_connect to the DBI
-connect method, eg,
+When connecting asynchronously, the C<pg_continue_connect> method must
+be used to continue the connection establishment process until success
+or failure has been established. The method returns one of the
+following values
 
-  $dbh = DBI->connect('dbi:PgAsync:...', $username, $password,
-                      { pg_async_connect => 1 });
+=over
 
-starts an asynchronous connect. The B<pg_continue_connect> method must
-be used afterwards to complete the connection establishment process. If
-the attribute is present but its value is false, an ordinarty
-synchronous connect will be done instead.
+=item * -2 if establishing the connection failed
 
-=head3 Asychronous Prepare
+=item * -1 if no asynchronous connect is in progress
 
-When the C<pg_prepare_now> attributes is used together with
-C<pg_async> for a B<prepare> call, an asychronous server-side prepare
-will be initiated. The B<pg_db_ready> and B<pg_result> method can be
-used to wait for the result of that without actually executing the
-query. 
+=item * 0 to indicate that the connection was established
 
-=head3 Asynchronous Examples
+=item * 1 to indicates that it's waiting for data to read
 
-Here are some working examples of asynchronous queries. Note that we'll use the B<pg_sleep> function to emulate a
-long-running query.
+=item * 2 to indicate that it wants to write data
 
-  use strict;
-  use warnings;
-  use Time::HiRes 'sleep';
-  use DBD::PgAsync ':async';
+=back
 
-  my $dbh = DBI->connect('dbi:PgAsync:dbname=postgres', 'postgres', '', {AutoCommit=>0,RaiseError=>1});
+The C<pg_socket> database handle
+attribute can be used to determine the number of a file descriptor
+which can be used together with C<select> (or equivalent) to determine
+when to call C<pg_continue_connect> for the next time. The actual file
+descriptor number returned by C<pg_socket> may have changed after
+each call to C<pg_continue_connect>.
 
-  ## Kick off a long running query on the first database:
-  my $sth = $dbh->prepare("SELECT pg_sleep(?)", {pg_async => PG_ASYNC});
-  $sth->execute(5);
+=head3 Waiting for Query Results
 
-  ## While that is running, do some other things
-  print "Your query is processing. Thanks for waiting\n";
-  check_on_the_kids(); ## Expensive sub, takes at least three seconds.
+The C<pg_result> method waits for the result of an asychronous query
+and makes it available in the ordinary way afterwards. It returns
+either
 
-  while (!$dbh->pg_ready) {
-    check_on_the_kids();
-    ## If the above function returns quickly for some reason, we add a small sleep
-    sleep 0.1;
-  }
+=over
 
-  print "The query has finished. Gathering results\n";
-  my $result = $sth->pg_result;
-  print "Result: $result\n";
-  my $info = $sth->fetchall_arrayref();
+=item * -2 to signal that an error occurred
 
-Without asynchronous queries, the above script would take about 8 seconds to run: five seconds waiting
-for the execute to finish, then three for the check_on_the_kids() function to return. With asynchronous
-queries, the script takes about 6 seconds to run, and gets in two iterations of check_on_the_kids in
-the process.
+=item * 0 for a statements which neither affected nor returned any
+rows or got cancelled
 
-Here's an example showing the ability to cancel a long-running query. Imagine two replica databases in
-different geographic locations over a slow network. You need information as quickly as possible, so
-you query both at once. When you get an answer, you tell the other one to stop working on your query,
-as you don't need it anymore.
+=item * the number of rows in the result for statements returning rows
 
-  use strict;
-  use warnings;
-  use Time::HiRes 'sleep';
-  use DBD::PgAsync ':async';
+=item * the number of rows affected by a DML statement
 
-  my $dbhrep1 = DBI->connect('dbi:PgAsync:dbname=postgres;host=replica1', 'postgres', '', {AutoCommit=>0,RaiseError=>1});
-  my $dbhrep2 = DBI->connect('dbi:PgAsync:dbname=postgres;host=replica2', 'postgres', '', {AutoCommit=>0,RaiseError=>1});
+=back
 
-  $SQL = "SELECT count(*) FROM largetable WHERE flavor='blueberry'";
+On its own, the
+method just blocks until the result was received. The C<pg_ready>
+method can be used to avoid this. When called, it'll read whatever
+data is available from the connection to the server and return either
 
-  my $sth1 = $dbhrep1->prepare($SQL, {pg_async => PG_ASYNC});
-  my $sth2 = $dbhrep2->prepare($SQL, {pg_async => PG_ASYNC});
+=over
 
-  $sth1->execute();
-  $sth2->execute();
+=item * -2 if some error occurred
 
-  my $winner;
-  while (!defined $winner) {
-    if ($sth1->pg_ready) {
-      $winner = 1;
-    }
-    elsif ($sth2->pg_ready) {
-      $winner = 2;
-    }
-    Time::HiRes::sleep 0.05;
-  }
+=item * -1 if no query was running
 
-  my $count;
-  if ($winner == 1) {
-    $sth2->pg_cancel();
-    $sth1->pg_result();
-    $count = $sth1->fetchall_arrayref()->[0][0];
-  }
-  else {
-    $sth1->pg_cancel();
-    $sth2->pg_result();
-    $count = $sth2->fetchall_arrayref()->[0][0];
-  }
+=item * 0 if the query hasn't finished yet
+
+=item * 1 when the query has finished
+
+=back
+
+The C<pg_socket> database handle attribute can be used to determine
+the number of a file descriptor which can be used together with C<select>
+(or equivalent) to determine when C<pg_ready> should be called for the next
+time.
+
+=head3 Prepare and Execute
+
+An asychnronous C<prepare> may immediately be followed by an
+asynchronous C<execute> using the same statement handle. The return
+value of C<pg_db_ready> will then indicate that the query has finished
+once both the C<prepare> and the C<execute> completed.
+
+=head3 Cancelling Queries
+
+The C<pg_cancel> method makes an attempt to cancel a running
+asynchronous query. After calling it, the code should wait for a
+result in the way described above under I<Waiting for Query
+Results>. This may either yield an ordinary query result if the query
+had already finished by the time the cancel request was received or
+cause C<pg_result> to return 0 and set the database handle
+SQLSTATE to 57014.
+
+=head3 Deallocation of Prepared Statements
+
+In asychronous mode, asynchronous requests will be used to deallocate
+prepared statements once they're no longer needed. These will
+piggyback on ordinary statement executions via C<do> or
+C<execute>. There's usually no need to worry about this but
+it will become visible when I<DBI> tracing is enabled.
+
+=head3 Code Examples
+
+Some examples for using asychronous mode can be found in the various
+test scripts in the I<async-test> subdirectory.
 
 =head2 Array support
 

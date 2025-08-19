@@ -71,6 +71,6 @@
          "x_repository" : "https://github.com/nigelhorne/Geo-Address-Parser"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

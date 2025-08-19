@@ -27,7 +27,7 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.64"
          }
       },
       "runtime" : {
@@ -41,7 +41,7 @@
             "File::Temp" : "0",
             "File::pfopen" : "0.03",
             "Log::Abstraction" : "0.24",
-            "Object::Configure" : "0",
+            "Object::Configure" : "0.12",
             "Params::Get" : "0.13",
             "Scalar::Util" : "0",
             "autodie" : "0",
@@ -84,6 +84,6 @@
          "x_repository" : "https://github.com/nigelhorne/Database-Abstraction"
       }
    },
-   "version" : "0.28",
+   "version" : "0.29",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

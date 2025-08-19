@@ -90,20 +90,52 @@ enum {
 };
 
 enum {
-    AA_OK,
-    AA_ERROR,
-    AA_CANCELLED
+    AA_OK = 0,
+    AA_ERR = -1,
+    AA_CANCELLED = -2
 };
 
 enum {
+    DEALLOC_QUOTA = 2,
     TEMP_STH = 8
 };
 
 enum {
-    STMT_ERR,
-    STMT_SENT,
-    STMT_DONE
+    STMT_ERR = -2,
+    STMT_SENT = -1
 };
+
+enum {
+    FREE_A = 1,
+    FREE_R = 2,
+    NON_FATAL = 4
+};
+
+static char *pgres_names[] = {
+#define n_(n) [n] = #n
+
+    n_(PGRES_BAD_RESPONSE),
+    n_(PGRES_COMMAND_OK),
+    n_(PGRES_COPY_BOTH),
+    n_(PGRES_COPY_IN),
+    n_(PGRES_COPY_OUT),
+    n_(PGRES_EMPTY_QUERY),
+    n_(PGRES_FATAL_ERROR),
+    n_(PGRES_NONFATAL_ERROR),
+    n_(PGRES_PIPELINE_ABORTED),
+    n_(PGRES_PIPELINE_SYNC),
+    n_(PGRES_SINGLE_TUPLE),
+    n_(PGRES_TUPLES_OK)
+
+#undef n_
+};
+
+static inline char *pgres_2_name(int status)
+{
+    if (status < 0 || status >= sizeof(pgres_names) / sizeof(*pgres_names))
+        return "UNKNOWN";
+    return pgres_names[status];
+}
 
 static void pg_error(pTHX_ SV *h, int error_num, const char *error_msg);
 static void pg_warn (void * arg, const char * message);
@@ -119,9 +151,13 @@ static PGTransactionStatusType pg_db_txn_status (pTHX_ imp_dbh_t *imp_dbh);
 static int pg_db_start_txn (pTHX_ SV *dbh, imp_dbh_t *imp_dbh);
 static void pg_db_detect_client_encoding_utf8(pTHX_ imp_dbh_t *imp_dbh);
 
-static int do_stmt(SV *dbh, char const *sql, int want_async,
-                   void (*after_query)(int, imp_dbh_t *, void *), void *arg,
-                   char *caller);
+/* will arrange for Safefree(arg) to be called after the result handler ran */
+static long do_stmt(SV *dbh, char const *sql, int want_async,
+                    async_result_handler *, void *arg,
+                    char *caller);
+
+static long handle_query_result(PGresult *, int, SV *, imp_dbh_t *, void *);
+static PGresult *handle_next_result_set(imp_dbh_t *);
 
 /* ================================================================== */
 void dbd_init (dbistate_t *dbistate)
@@ -131,18 +167,28 @@ void dbd_init (dbistate_t *dbistate)
 }
 
 /* ================================================================== */
-static void add_async_action(char *arg,
-                             char *(*action)(imp_dbh_t *, char *),
-                             void (*after)(imp_dbh_t *),
-                             imp_dbh_t *imp_dbh)
+
+/**  auxiliary facilities */
+/*** low-level async action management */
+static void add_async_action(async_doit *doit, void *doit_arg,
+                             async_result_handler *handle_result, void *result_handler_arg,
+                             unsigned flags, imp_dbh_t *imp_dbh)
 {
     async_action_t *aa;
 
     Newx(aa, 1, async_action_t);
     aa->p = NULL;
-    aa->arg = arg;
-    aa->action = action;
-    aa->after = after;
+
+    if (!imp_dbh->aa_first && doit) {
+        doit(imp_dbh, doit_arg);
+        aa->action.doit = NULL;
+    } else
+        aa->action.doit = doit;
+    aa->action.arg = doit_arg;
+
+    aa->result.handle = handle_result;
+    aa->result.arg = result_handler_arg;
+    aa->flags = flags;
 
     *imp_dbh->aa_pp = aa;
     imp_dbh->aa_pp = &aa->p;
@@ -158,6 +204,8 @@ static void async_action_done(imp_dbh_t *imp_dbh)
     imp_dbh->aa_first = aa->p;
     if (!imp_dbh->aa_first) imp_dbh->aa_pp = &imp_dbh->aa_first;
 
+    if (aa->flags & FREE_A) Safefree(aa->action.arg);
+    if (aa->flags & FREE_R) Safefree(aa->result.arg);
     Safefree(aa);
 }
 
@@ -167,7 +215,7 @@ static void async_action_cleanup(imp_dbh_t *imp_dbh)
 
     imp_sth = imp_dbh->async_sth;
     if (imp_sth)
-        if (8 == imp_sth->async_flag) {
+        if (TEMP_STH == imp_sth->async_flag) {
             Safefree(imp_sth->statement);
             Safefree(imp_sth);
         } else
@@ -178,7 +226,9 @@ static void async_action_cleanup(imp_dbh_t *imp_dbh)
     while (imp_dbh->aa_first) async_action_done(imp_dbh);
 }
 
+/***  async action execution */
 static void async_action_error(SV *h, imp_dbh_t *imp_dbh,
+                               int status,
                                char *our_call, char *pq_call)
 {
     dTHX;
@@ -189,69 +239,55 @@ static void async_action_error(SV *h, imp_dbh_t *imp_dbh,
     async_action_cleanup(imp_dbh);
 
     TRACE_PQERRORMESSAGE;
-    pg_error(aTHX_ h, PGRES_FATAL_ERROR, PQerrorMessage(imp_dbh->conn));
+    pg_error(aTHX_ h, status, PQerrorMessage(imp_dbh->conn));
     if (TEND_slow) TRC(DBILOGFP, "%sEnd %s (error: %s failed)\n",
                        THEADER_slow, our_call, pq_call);
 }
 
-static int pqtype_from_sth(imp_sth_t *imp_sth)
-{
-    if (imp_sth->prepare_name) return PQTYPE_PREPARED;
-    if (imp_sth->numphs) return PQTYPE_PARAMS;
-    return PQTYPE_EXEC;
-}
-
-static char *send_async_query(imp_dbh_t *imp_dbh, imp_sth_t *imp_sth)
-{
-    dTHX;
-    char *pg_call;
-    int ret;
-
-    imp_sth->async_status = STH_ASYNC;
-
-    switch (pqtype_from_sth(imp_sth)) {
-    case PQTYPE_PREPARED:
-        pg_call = "PQsendQueryPrepared";
-
-        TRACE_PQSENDQUERYPREPARED;
-        ret = PQsendQueryPrepared(imp_dbh->conn,
-                                  imp_sth->prepare_name, imp_sth->numphs,
-                                  imp_sth->PQvals, imp_sth->PQlens, imp_sth->PQfmts,
-                                  0);
-        break;
-
-    case PQTYPE_PARAMS:
-        pg_call = "PQsendQueryParams";
-
-        TRACE_PQSENDQUERYPARAMS;
-        ret = PQsendQueryParams(imp_dbh->conn,
-                                imp_sth->statement, imp_sth->numphs, imp_sth->PQoids,
-                                imp_sth->PQvals, imp_sth->PQlens, imp_sth->PQfmts,
-                                0);
-        break;
-
-    case PQTYPE_EXEC:
-        pg_call = "PQsendQuery";
-
-        TRACE_PQSENDQUERY;
-        ret = PQsendQuery(imp_dbh->conn, imp_sth->statement);
-    }
-
-    return ret ? NULL : pg_call;
-}
-
-static int handle_async_action(SV *h, imp_dbh_t *imp_dbh, char *our_call)
+static long handle_async_action(PGresult *res, SV *h, imp_dbh_t *imp_dbh, char *our_call)
 {
     async_action_t *aa;
+    long rc;
     imp_sth_t *imp_sth;
     char *pq_call;
+    int status;
     dTHX;
 
     if (TRACE5_slow) TRC(DBILOGFP, "%sHandling aa action\n", THEADER_slow);
+    aa = imp_dbh->aa_first;
+
+    status = _sqlstate(aTHX_ imp_dbh, res);
+    switch (status) {
+    case PGRES_FATAL_ERROR:
+        if (strcmp(imp_dbh->sqlstate, SQLST_CANCELLED) == 0) {
+            async_action_cleanup(imp_dbh);
+            return AA_CANCELLED;
+        }
+
+    case PGRES_BAD_RESPONSE:
+    case PGRES_NONFATAL_ERROR:
+        if (TRACE5_slow)
+            TRC(DBILOGFP, "%sError status is %s (%d)\n",
+                THEADER_slow, pgres_2_name(status), status);
+
+        if (aa->flags & NON_FATAL) {
+            warn_nocontext("aa action marked non-fatal had status %s (%d)",
+                           pgres_2_name(status), status);
+            aa = NULL;
+            break;
+        }
+
+        async_action_error(h, imp_dbh, status, our_call, "PQgetResult");
+        return AA_ERR;
+    }
+
+    rc = 0;
+    if (aa && aa->result.handle)
+        rc = aa->result.handle(res, status, h, imp_dbh, aa->result.arg);
+    async_action_done(imp_dbh);
 
     aa = imp_dbh->aa_first;
-    if (aa->after) aa->after(imp_dbh);
-    async_action_done(imp_dbh);
+    if (!aa) return rc;
 
     imp_sth = imp_dbh->async_sth;
     if (STH_ASYNC_CANCELLED == imp_sth->async_status) {
@@ -262,61 +298,317 @@ static int handle_async_action(SV *h, imp_dbh_t *imp_dbh, char *our_call)
         return AA_CANCELLED;
     }
 
-    pq_call = NULL;
-    aa = imp_dbh->aa_first;
-    if (aa) 
-        pq_call = aa->action(imp_dbh, aa->arg);
-    else {
-        imp_sth = imp_dbh->async_sth;
-        pq_call = send_async_query(imp_dbh, imp_sth);
-
-        if (!pq_call && TEMP_STH == imp_sth->async_flag){
-            if (TRACE5_slow) TRC(DBILOGFP, "%sFreeing temp sth\n", THEADER_slow);
-
-            Safefree(imp_sth->statement);
-            Safefree(imp_sth);
-
-            imp_dbh->async_sth = NULL;
-        }
-    }
-
+    pq_call = aa->action.doit(imp_dbh, aa->action.arg);
     if (pq_call) {
-        async_action_error(h, imp_dbh, our_call, pq_call);
-        return AA_ERROR;
+        async_action_error(h, imp_dbh, PGRES_FATAL_ERROR, our_call, pq_call);
+        return AA_ERR;
     }
 
     return AA_OK;
 }
 
-static char *aa_send_query(imp_dbh_t *imp_dbh, char *qry)
+/***  async action handler routines */
+static int pqtype_from_sth(imp_sth_t *imp_sth)
+{
+    if (imp_sth->prepare_name) return PQTYPE_PREPARED;
+    if (imp_sth->numphs) return PQTYPE_PARAMS;
+    return PQTYPE_EXEC;
+}
+
+static char *send_async_query(imp_dbh_t *imp_dbh, void *p)
+{
+    dTHX;
+    char *pg_call;
+    imp_sth_t *imp_sth;
+    int ret;
+
+    imp_sth = p;
+    imp_sth->async_status = STH_ASYNC;
+
+    switch (pqtype_from_sth(imp_sth)) {
+    case PQTYPE_PREPARED:
+        if (TRACE5_slow)
+            TRC(DBILOGFP, "%sSending prepared %s\n", THEADER_slow, imp_sth->prepare_name);
+
+        pg_call = "PQsendQueryPrepared";
+
+        TRACE_PQSENDQUERYPREPARED;
+        ret = PQsendQueryPrepared(imp_dbh->conn,
+                                  imp_sth->prepare_name, imp_sth->numphs,
+                                  imp_sth->PQvals, imp_sth->PQlens, imp_sth->PQfmts,
+                                  0);
+        break;
+
+    case PQTYPE_PARAMS:
+        if (TRACE5_slow)
+            TRC(DBILOGFP, "%sSending %s\n", THEADER_slow, imp_sth->statement);
+
+        pg_call = "PQsendQueryParams";
+
+        TRACE_PQSENDQUERYPARAMS;
+        ret = PQsendQueryParams(imp_dbh->conn,
+                                imp_sth->statement, imp_sth->numphs, imp_sth->PQoids,
+                                imp_sth->PQvals, imp_sth->PQlens, imp_sth->PQfmts,
+                                0);
+        break;
+
+    case PQTYPE_EXEC:
+        if (TRACE5_slow)
+            TRC(DBILOGFP, "%sSending %s\n", THEADER_slow, imp_sth->statement);
+
+        pg_call = "PQsendQuery";
+
+        TRACE_PQSENDQUERY;
+        ret = PQsendQuery(imp_dbh->conn, imp_sth->statement);
+    }
+
+    return ret ? NULL : pg_call;
+}
+
+static long handle_query_result(PGresult *result, int status, SV *h, imp_dbh_t *imp_dbh,
+                                void *p)
+{
+    dTHX;
+    imp_sth_t *imp_sth;
+    char *cmdStatus;
+    int n_fields;
+    long rows;
+
+    imp_dbh->copystate = 0;
+    rows = 0;
+    imp_sth = imp_dbh->async_sth;
+    if (!imp_sth) imp_sth = p;
+
+    if (TRACE5_slow) TRC(DBILOGFP, "%sStatus is %s(%d)\n",
+                         THEADER_slow, pgres_2_name(status), status);
+
+    switch (status) {
+    case PGRES_TUPLES_OK:
+        TRACE_PQNTUPLES;
+        rows = PQntuples(result);
+
+        TRACE_PQNFIELDS;
+        n_fields = PQnfields(result);
+
+        if (TRACE5_slow) TRC(DBILOGFP, "%sfields=%d, tuples=%ld\n",
+                             THEADER_slow, n_fields, rows);
+
+        if (imp_sth) {
+            imp_sth->cur_tuple = 0;
+            DBIc_NUM_FIELDS(imp_sth) = n_fields;
+            DBIc_ACTIVE_on(imp_sth);
+        }
+
+        break;
+
+    case PGRES_COMMAND_OK:
+        /* non-select statement */
+        TRACE_PQCMDSTATUS;
+        cmdStatus = PQcmdStatus(result);
+        if (0 == strncmp(cmdStatus, "INSERT", 6)) {
+            /* INSERT(space)oid(space)numrows */
+            for (rows=8; cmdStatus[rows-1] != ' '; rows++) {
+            }
+            rows = atol(cmdStatus + rows);
+        }
+        else if (0 == strncmp(cmdStatus, "MOVE", 4)) {
+            rows = atol(cmdStatus + 5);
+        }
+        else if (0 == strncmp(cmdStatus, "DELETE", 6)
+                 || 0 == strncmp(cmdStatus, "UPDATE", 6)
+                 || 0 == strncmp(cmdStatus, "SELECT", 6)) {
+            rows = atol(cmdStatus + 7);
+        }
+        else if (0 == strncmp(cmdStatus, "MERGE", 5)) {
+            rows = atol(cmdStatus + 6);
+        }
+
+        if (!rows) {
+            /* No rows affected, but check for change of state */
+            TRACE_PQTRANSACTIONSTATUS;
+            if (PQTRANS_IDLE == PQtransactionStatus(imp_dbh->conn)) {
+                imp_dbh->done_begin = DBDPG_FALSE;
+                /* If begin_work has been called, turn AutoCommit back on and BegunWork off */
+                if (DBIc_has(imp_dbh, DBIcf_BegunWork)!=0) {
+                    DBIc_set(imp_dbh, DBIcf_AutoCommit, 1);
+                    DBIc_set(imp_dbh, DBIcf_BegunWork, 0);
+                }
+            }
+        }
+
+        break;
+
+    case PGRES_COPY_OUT:
+    case PGRES_COPY_IN:
+    case PGRES_COPY_BOTH:
+        /* Copy Out/In data transfer in progress */
+        imp_dbh->copystate = status;
+        imp_dbh->copybinary = PQbinaryTuples(result);
+        rows = -1;
+        break;
+
+        /*
+          This is necessary despite the error handling code in
+          handle_async_action because this routine is also used for
+          handling the results of synchronous queries by pg_quickexec
+          and dbd_st_execute.
+        */
+    case PGRES_EMPTY_QUERY:
+    case PGRES_BAD_RESPONSE:
+    case PGRES_NONFATAL_ERROR:
+        rows = -2;
+        TRACE_PQERRORMESSAGE;
+        pg_error(aTHX_ h, status, PQerrorMessage(imp_dbh->conn));
+        break;
+
+    case PGRES_FATAL_ERROR:
+        if (strcmp(imp_dbh->sqlstate, SQLST_CANCELLED) == 0) {
+            async_action_cleanup(imp_dbh);
+            rows = 0;
+            break;
+        }
+
+    default:
+        rows = -2;
+        TRACE_PQERRORMESSAGE;
+        pg_error(aTHX_ h, status, PQerrorMessage(imp_dbh->conn));
+    }
+
+    return rows;
+}
+
+static char *aa_send_query(imp_dbh_t *imp_dbh, void *qry)
 {
     dTHX;
     int ret;
 
     if (TRACE5_slow) TRC(DBILOGFP, "%sSending aa query '%s'\n",
-                         THEADER_slow, qry);
+                         THEADER_slow, (char *)qry);
 
     TRACE_PQSENDQUERY;
     ret = PQsendQuery(imp_dbh->conn, qry);
     return ret ? NULL : "PQsendQuery";
 }
 
-static void aa_after_begin(imp_dbh_t *imp_dbh)
+static long after_begin(PGresult *unused0, int status, SV *h, imp_dbh_t *imp_dbh,
+                           void *unused1)
 {
+    if (PGRES_COMMAND_OK != status)
+        warn_nocontext("unexpected status after begin: %d(%s)", status, pgres_2_name(status));
+
     imp_dbh->done_begin = DBDPG_TRUE;
+    return 0;
 }
 
-static void aa_after_prepare(imp_dbh_t *imp_dbh)
+static long after_prepare(PGresult *unused0, int status, SV *h, imp_dbh_t *imp_dbh,
+                          void *unused1)
 {
     imp_sth_t *imp_sth;
+
+    if (PGRES_COMMAND_OK != status)
+        warn_nocontext("unexpected status after prepare: %d(%s)", status, pgres_2_name(status));
 
     ++imp_dbh->prepare_number;
 
     imp_sth = imp_dbh->async_sth;
     imp_sth->prepared_by_us = DBDPG_TRUE;
-    imp_sth->async_status = STH_ASYNC;
+    if (STH_ASYNC_PREPARE == imp_sth->async_status) /* a cancel might have changed this */
+        imp_sth->async_status = STH_ASYNC;
+
+    return 0;
 }
 
+/***  async deallocate */
+#if PGLIBVERSION >= 170000
+static char *send_close_prepared(imp_dbh_t *imp_dbh, void *arg)
+{
+    dTHX;
+    int rc;
+
+    TRACE_PQSENDCLOSEPREPARED;
+    rc = PQsendClosePrepared(imp_dbh->conn, arg);
+    return rc ? NULL : "PQsendClosePrepared";
+}
+#endif
+
+static void do_dealloc(imp_dbh_t *imp_dbh, char *name)
+{
+    dTHX;
+    PGresult *res;
+    int status;
+
+#if PGLIBVERSION >= 170000
+    char *aa_name;
+
+    if (TRACE5_slow)
+        TRC(DBILOGFP, "%sPQclosePrepared %s\n", THEADER_slow, name);
+
+    if (imp_dbh->use_async) {
+        aa_name = savepv(name);
+        add_async_action(send_close_prepared, aa_name, NULL, NULL,
+                         FREE_A | NON_FATAL, imp_dbh);
+        return;
+    }
+
+    TRACE_PQCLOSEPREPARED;
+    res = PQclosePrepared(imp_dbh->conn, name);
+#else
+#define DEALLOC "deallocate "
+    char *stmt;
+    unsigned n_len;
+
+    if (TRACE5_slow)
+        TRC(DBILOGFP, "%sDeallocating %s\n", THEADER_slow, name);
+
+    n_len = strlen(name);
+    stmt = safemalloc(sizeof(DEALLOC) + n_len);
+    sprintf(stmt, "%s%s", DEALLOC, name);
+
+    if (imp_dbh->use_async) {
+        add_async_action(aa_send_query, stmt, NULL, NULL,
+                         FREE_A | NON_FATAL, imp_dbh);
+        return;
+    }
+
+    TRACE_PQEXEC;
+    res = PQexec(imp_dbh->conn, stmt);
+    Safefree(stmt);
+#undef DEALLOC
+#endif
+
+    status = PQresultStatus(res);
+    if (PGRES_COMMAND_OK != status)
+        warn_nocontext("Unexpected result of dealloc %s: %s(%d)",
+                       name, pgres_2_name(status), status);
+
+    TRACE_PQCLEAR;
+    PQclear(res);
+}
+
+static void do_pending_deallocs(imp_dbh_t *imp_dbh)
+{
+    dTHX;
+    dealloc_t *d0, *d1;
+    unsigned quota;
+
+    quota = DEALLOC_QUOTA;
+    d1 = imp_dbh->deallocs;
+    while ((d0 = d1, d0) && quota) {
+        if (TRACE5_slow) TRC(DBILOGFP, "%sStarting dealloc of %s\n",
+                             THEADER_slow, d0->name);
+        do_dealloc(imp_dbh, d0->name);
+
+        d1 = d0->p;
+        safefree(d0->name);
+        safefree(d0);
+
+        --quota;
+    }
+
+    imp_dbh->deallocs = d0;
+}
+
+/**  database driver proper plus some extensions */
 /* ================================================================== */
 static int want_async_connect(pTHX_ SV *attrs)
 {
@@ -405,6 +697,7 @@ int dbd_db_login6 (SV * dbh, imp_dbh_t * imp_dbh, char * dbname, char * uid, cha
 
     imp_dbh->aa_first = NULL;
     imp_dbh->aa_pp = &imp_dbh->aa_first;
+    imp_dbh->deallocs = NULL;
 
     if (TSTART_slow) {
         TRC(DBILOGFP, "%sBegin dbd_db_login6\n", THEADER_slow);
@@ -814,6 +1107,32 @@ static ExecStatusType _sqlstate(pTHX_ imp_dbh_t * imp_dbh, PGresult * result)
 
 
 /* ================================================================== */
+static long handle_ping_result(PGresult *result, int status, SV *h, imp_dbh_t *imp_dbh,
+                               void *unused)
+{
+    dTHX;
+    PGTransactionStatusType tstatus;
+
+    if (PGRES_EMPTY_QUERY != status) {
+        /* As a safety measure, check PQstatus as well */
+        if (CONNECTION_BAD == PQstatus(imp_dbh->conn)) {
+            if (TEND_slow) TRC(DBILOGFP, "%sEnd dbd_pg_ping (PQstatus returned CONNECTION_BAD)\n", THEADER_slow);
+            return -4;
+        }
+
+        if (TEND_slow) TRC(DBILOGFP, "%sEnd handle_ping_result: unexpected query status %d\n",
+                           THEADER_slow, status);
+        return -3;
+    }
+
+
+    tstatus = pg_db_txn_status(aTHX_ imp_dbh);
+
+    if (TEND_slow) TRC(DBILOGFP, "%sEnd handle_ping_result, tstatus %d\n",
+                       THEADER_slow, tstatus);
+    return 1 + tstatus;
+}
+
 int dbd_db_ping (SV * dbh)
 {
     dTHX;
@@ -821,6 +1140,7 @@ int dbd_db_ping (SV * dbh)
     PGTransactionStatusType tstatus;
     ExecStatusType          status;
     PGresult              * result;
+    int rc;
 
     if (TSTART_slow) TRC(DBILOGFP, "%sBegin dbd_db_ping\n", THEADER_slow);
 
@@ -831,40 +1151,38 @@ int dbd_db_ping (SV * dbh)
 
     tstatus = pg_db_txn_status(aTHX_ imp_dbh);
     if (TRACE5_slow) TRC(DBILOGFP, "%sdbd_db_ping txn_status is %d\n", THEADER_slow, tstatus);
+    switch (tstatus) {
+    case PQTRANS_IDLE:
+    case PQTRANS_INTRANS:
+    case PQTRANS_INERROR:
+        break;
 
-    if (tstatus >= PQTRANS_UNKNOWN) { /* Unknown, so we err on the side of "bad" */
+    case PQTRANS_ACTIVE:
+        return 2;
+
+    default:
         if (TEND_slow) TRC(DBILOGFP, "%sEnd dbd_pg_ping (result: -2 unknown/bad)\n", THEADER_slow);
         return -2;
     }
 
-    /* No matter what state we are in, send an empty query to the backend */
+    if (imp_dbh->use_async) {
+        rc = PQsendQuery(imp_dbh->conn, "/* flabasel */");
+        if (!rc) return -3;
+
+        imp_dbh->async_status = DBH_ASYNC;
+        add_async_action(NULL, NULL, handle_ping_result, NULL, 0,
+                         imp_dbh);
+        return 1;
+    }
+
     result = PQexec(imp_dbh->conn, "/* DBD::Pg ping test v3.18.0 */");
     status = PQresultStatus(result);
+    rc = handle_ping_result(result, status, dbh, imp_dbh, NULL);
     PQclear(result);
-    if (PGRES_FATAL_ERROR == status) {
-        /* Something very bad, usually indicating the backend is gone */
-        return -3;
-    }
 
-    /* We expect to see an empty query most times */
-    if (PGRES_EMPTY_QUERY == status) {
-        if (TEND_slow) TRC(DBILOGFP, "%sEnd dbd_pg_ping (PGRES_EMPTY_QUERY)\n", THEADER_slow);
-        return 1+tstatus;
-        /* 0=idle 1=active 2=intrans 3=inerror 4=unknown */
-    }
-
-    /* As a safety measure, check PQstatus as well */
-    if (CONNECTION_BAD == PQstatus(imp_dbh->conn)) {
-        if (TEND_slow) TRC(DBILOGFP, "%sEnd dbd_pg_ping (PQstatus returned CONNECTION_BAD)\n", THEADER_slow);
-        return -4;
-    }
-
-    if (TEND_slow) TRC(DBILOGFP, "%sEnd dbd_pg_ping\n", THEADER_slow);
-
-    return 1+tstatus;
-
-} /* end of dbd_db_ping */
- 
+    if (TEND_slow) TRC(DBILOGFP, "%sEnd dbd_pg_ping (result: %d)\n", THEADER_slow, rc);
+    return rc;
+}
 
 /* ================================================================== */
 static PGTransactionStatusType pg_db_txn_status (pTHX_ imp_dbh_t * imp_dbh)
@@ -945,6 +1263,9 @@ static int pg_db_rollback_commit (pTHX_ SV * dbh, imp_dbh_t * imp_dbh, int actio
         status = PQsendQuery(imp_dbh->conn, action ? "commit" : "rollback");
         status = status ? PGRES_COMMAND_OK : PGRES_FATAL_ERROR;
 
+        add_async_action(NULL, NULL, handle_query_result, NULL, 0,
+                         imp_dbh);
+
         /*
           Code in DBI.xs DBI_dispatch function will try to "fix" the state
           if a driver didn't set BegunWork to off and AutoCommit to on
@@ -1008,6 +1329,7 @@ int dbd_db_rollback (SV * dbh, imp_dbh_t * imp_dbh)
 int dbd_db_disconnect (SV * dbh, imp_dbh_t * imp_dbh)
 {
     dTHX;
+    int x;
 
     if (TSTART_slow) TRC(DBILOGFP, "%sBegin dbd_db_disconnect\n", THEADER_slow);
 
@@ -1018,9 +1340,14 @@ int dbd_db_disconnect (SV * dbh, imp_dbh_t * imp_dbh)
     
     if (NULL != imp_dbh->conn) {
         /* Attempt a rollback */
+        x = imp_dbh->use_async;
+        imp_dbh->use_async = 0;
+
         if (0 != dbd_db_rollback(dbh, imp_dbh) && TRACE5_slow)
             TRC(DBILOGFP, "%sdbd_db_disconnect: AutoCommit=off -> rollback\n", THEADER_slow);
-        
+
+        imp_dbh->use_async = x;
+
         TRACE_PQFINISH;
         PQfinish(imp_dbh->conn);
         imp_dbh->conn = NULL;
@@ -1046,6 +1373,7 @@ int dbd_db_disconnect (SV * dbh, imp_dbh_t * imp_dbh)
 void dbd_db_destroy (SV * dbh, imp_dbh_t * imp_dbh)
 {
     dTHX;
+    dealloc_t *d0, *d1;
 
     if (TSTART_slow) TRC(DBILOGFP, "%sBegin dbd_db_destroy\n", THEADER_slow);
 
@@ -1077,6 +1405,14 @@ void dbd_db_destroy (SV * dbh, imp_dbh_t * imp_dbh)
     sv_free((SV *)imp_dbh->savepoints);
     Safefree(imp_dbh->sqlstate);
     while (imp_dbh->aa_first) async_action_done(imp_dbh);
+
+    d1 = imp_dbh->deallocs;
+    while (d0 = d1, d0) {
+        d1 = d1->p;
+
+        safefree(d0->name);
+        safefree(d0);
+    }
 
     DBIc_IMPSET_off(imp_dbh);
 
@@ -1985,7 +2321,7 @@ SV * pg_db_pg_notifies (SV * dbh, imp_dbh_t * imp_dbh)
     av_push(ret, payloadsv);
 
     TRACE_PQFREEMEM;
-     PQfreemem(notify);
+    PQfreemem(notify);
 
     retsv = newRV_inc(sv_2mortal((SV*)ret));
 
@@ -2012,6 +2348,7 @@ int dbd_st_prepare_sv (SV * sth, imp_sth_t * imp_sth, SV * statement_sv, SV * at
         croak ("Cannot prepare empty statement");
 
     /* Set default values for this statement handle */
+    imp_sth->async_flag        = 0;
     imp_sth->placeholder_type  = PLACEHOLDER_NONE;
     imp_sth->numsegs           = 0;
     imp_sth->numphs            = 0;
@@ -2042,7 +2379,6 @@ int dbd_st_prepare_sv (SV * sth, imp_sth_t * imp_sth, SV * statement_sv, SV * at
     imp_sth->number_iterations = 0;
 
     /* We inherit some preferences from the database handle */
-    imp_sth->async_flag       = imp_dbh->use_async;
     imp_sth->server_prepare   = imp_dbh->server_prepare;
     imp_sth->switch_prepared  = imp_dbh->switch_prepared;
     imp_sth->prepare_now      = imp_dbh->prepare_now;
@@ -2800,13 +3136,15 @@ static int pg_st_prepare_statement (pTHX_ SV * sth, imp_sth_t * imp_sth)
         imp_sth->result = NULL;
     }
 
-    if (imp_sth->async_flag & PG_ASYNC) {
+    if (imp_dbh->use_async || imp_sth->async_flag & PG_ASYNC) {
         TRACE_PQSENDPREPARE;
         status = PQsendPrepare(imp_dbh->conn, imp_sth->prepare_name, statement, params,
                                imp_sth->PQoids);
-        if (status) 
+        if (status) {
             imp_sth->async_status = STH_ASYNC_PREPARE;
-        else {
+            add_async_action(NULL, NULL, after_prepare, NULL, 0,
+                             imp_dbh);
+        } else {
             status = PGRES_FATAL_ERROR;
             _fatal_sqlstate(aTHX_ imp_dbh);
         }
@@ -3435,13 +3773,15 @@ static void pg_db_detect_client_encoding_utf8(pTHX_ imp_dbh_t *imp_dbh) {
 }
 
 /* ================================================================== */
-static int do_stmt(SV *dbh, char const *sql, int want_async,
-                   void (*after_query)(int, imp_dbh_t *, void *), void *arg,
-                   char *caller)
+static long do_stmt(SV *dbh, char const *sql, int want_async,
+                    async_result_handler *res_handler, void *arg,
+                    char *caller)
 {
     dTHX;
     D_imp_dbh(dbh);
+    PGresult *result;
     imp_sth_t *sth;
+    long rows;
     int want_begin, status;
 
     if (NULL == imp_dbh->conn) {
@@ -3496,41 +3836,32 @@ static int do_stmt(SV *dbh, char const *sql, int want_async,
                     return STMT_ERR;
                 }
             }
+
+            do_pending_deallocs(imp_dbh);
         }
     }
 
     /* Asynchronous commands get kicked off and return undef */
     if (want_async) {
         if (TRACE4_slow) TRC(DBILOGFP, "%sGoing asychronous with %s\n", THEADER_slow, caller);
+        do_pending_deallocs(imp_dbh);
+
         if (want_begin) {
-            aa_send_query(imp_dbh, "begin");
-            add_async_action(NULL, NULL, aa_after_begin, imp_dbh);
-            if (imp_dbh->txn_read_only) add_async_action("set transaction read only",
-                                                         aa_send_query, NULL, imp_dbh);
-
-            Newxz(sth, 1, imp_sth_t);
-            sth->async_flag = 8;
-            sth->async_status = STH_ASYNC;
-            sth->statement = savepv(sql);
-
-            imp_dbh->async_sth = sth;
-        } else {
-            TRACE_PQSENDQUERY;
-            if (! PQsendQuery(imp_dbh->conn, sql)) {
-                if (TRACE4_slow) TRC(DBILOGFP, "%sPQsendQuery failed\n", THEADER_slow);
-                _fatal_sqlstate(aTHX_ imp_dbh);
-
-                TRACE_PQERRORMESSAGE;
-                pg_error(aTHX_ dbh, status, PQerrorMessage(imp_dbh->conn));
-                if (TEND_slow) TRC(DBILOGFP, "%sEnd %s (error: PQsendQuery failed)\n",
-                                   THEADER_slow, caller);
-                return STMT_ERR;
-            }
+            add_async_action(aa_send_query, "begin", after_begin, NULL, 0,
+                             imp_dbh);
+            if (imp_dbh->txn_read_only) add_async_action(aa_send_query, "set transaction read only",
+                                                         NULL, NULL, 0, imp_dbh);
         }
 
+        Newxz(sth, 1, imp_sth_t);
+        sth->async_flag = TEMP_STH;
+        sth->async_status = STH_ASYNC;
+        sth->statement = savepv(sql);
+        imp_dbh->async_sth = sth;
+        add_async_action(send_async_query, sth, res_handler, arg, FREE_R,
+                         imp_dbh);
+
         imp_dbh->async_status = DBH_ASYNC;
-        imp_dbh->after_async.cb = after_query;
-        imp_dbh->after_async.arg = arg;
 
         if (TEND_slow) TRC(DBILOGFP, "%sEnd %s (async)\n", THEADER_slow, caller);
         return STMT_SENT;
@@ -3549,21 +3880,17 @@ static int do_stmt(SV *dbh, char const *sql, int want_async,
     if (TSQL) TRC(DBILOGFP, "%s;\n\n", sql);
 
     TRACE_PQEXEC;
-    imp_dbh->last_result = PQexec(imp_dbh->conn, sql);
+    result = imp_dbh->last_result = PQexec(imp_dbh->conn, sql);
     imp_dbh->result_clearable = DBDPG_TRUE;
+    status = _sqlstate(aTHX_ imp_dbh, imp_dbh->last_result);
 
-    if (after_query)
-        switch (PQresultStatus(imp_dbh->last_result)) {
-        case PGRES_BAD_RESPONSE:
-        case PGRES_FATAL_ERROR:
-            after_query(0, imp_dbh, arg);
-            break;
+    rows = 0;
+    if (res_handler) {
+        rows = res_handler(result, status, dbh, imp_dbh, arg);
+        Safefree(arg);
+    }
 
-        default:
-            after_query(1, imp_dbh, arg);
-        }
-
-    return STMT_DONE;
+    return rows;
 }
 
 long pg_quickexec (SV * dbh, const char * sql, const int asyncflag)
@@ -3571,16 +3898,14 @@ long pg_quickexec (SV * dbh, const char * sql, const int asyncflag)
     dTHX;
     D_imp_dbh(dbh);
     ExecStatusType          status = PGRES_FATAL_ERROR; /* Assume the worst */
-    PGTransactionStatusType txn_status;
     char *                  cmdStatus = NULL;
     long                    rows = 0;
-    int                     rc;
 
     if (TSTART_slow) TRC(DBILOGFP, "%sBegin pg_quickexec (query: %s async: %d async_status: %d)\n",
             THEADER_slow, sql, asyncflag, imp_dbh->async_status);
 
-    rc = do_stmt(dbh, sql, asyncflag, NULL, NULL, "pg_quickexec");
-    switch (rc) {
+    rows = do_stmt(dbh, sql, asyncflag, handle_query_result, NULL, "pg_quickexec");
+    switch (rows) {
     case STMT_ERR:
         return -2;
 
@@ -3588,83 +3913,8 @@ long pg_quickexec (SV * dbh, const char * sql, const int asyncflag)
         return 0;
     }
 
-    status = _sqlstate(aTHX_ imp_dbh, imp_dbh->last_result);
-
-    imp_dbh->copystate = 0; /* Assume not in copy mode until told otherwise */
-
-    if (TRACE4_slow) TRC(DBILOGFP, "%sGot a status of %d\n", THEADER_slow, status);
-    switch ((int)status) {
-    case PGRES_TUPLES_OK:
-        TRACE_PQNTUPLES;
-        rows = PQntuples(imp_dbh->last_result);
-        break;
-    case PGRES_COMMAND_OK:
-        /* non-select statement */
-        TRACE_PQCMDSTATUS;
-        cmdStatus = PQcmdStatus(imp_dbh->last_result);
-        /* If the statement indicates a number of rows, we want to return that */
-        /* Note: COPY and FETCH do not currently reach here, although they return numbers */
-        if (0 == strncmp(cmdStatus, "INSERT", 6)) {
-            /* INSERT(space)oid(space)numrows */
-            for (rows=8; cmdStatus[rows-1] != ' '; rows++) {
-            }
-            rows = atol(cmdStatus + rows);
-        }
-        else if (0 == strncmp(cmdStatus, "MOVE", 4)) {
-            rows = atol(cmdStatus + 5);
-        }
-        else if (0 == strncmp(cmdStatus, "DELETE", 6)
-               || 0 == strncmp(cmdStatus, "UPDATE", 6)
-               || 0 == strncmp(cmdStatus, "SELECT", 6)) {
-            rows = atol(cmdStatus + 7);
-        }
-        else if (0 == strncmp(cmdStatus, "MERGE", 5)) {
-            rows = atol(cmdStatus + 6);
-        }
-        break;
-    case PGRES_COPY_OUT:
-    case PGRES_COPY_IN:
-    case PGRES_COPY_BOTH:
-        /* Copy Out/In data transfer in progress */
-        imp_dbh->copystate = status;
-        imp_dbh->copybinary = PQbinaryTuples(imp_dbh->last_result);
-        rows = -1;
-        break;
-    case PGRES_EMPTY_QUERY:
-    case PGRES_BAD_RESPONSE:
-    case PGRES_NONFATAL_ERROR:
-        rows = -2;
-        TRACE_PQERRORMESSAGE;
-        pg_error(aTHX_ dbh, status, PQerrorMessage(imp_dbh->conn));
-        break;
-    case PGRES_FATAL_ERROR:
-    default:
-        rows = -2;
-        TRACE_PQERRORMESSAGE;
-        pg_error(aTHX_ dbh, status, PQerrorMessage(imp_dbh->conn));
-        break;
-    }
-
-    if (NULL == imp_dbh->last_result) {
-        if (TEND_slow) TRC(DBILOGFP, "%sEnd pg_quickexec (no result)\n", THEADER_slow);
-        return -2;
-    }
-
-    TRACE_PQTRANSACTIONSTATUS;
-    txn_status = PQtransactionStatus(imp_dbh->conn);
-
-    if (PQTRANS_IDLE == txn_status) {
-        imp_dbh->done_begin = DBDPG_FALSE;
-        imp_dbh->copystate=0;
-        /* If begin_work has been called, turn AutoCommit back on and BegunWork off */
-        if (DBIc_has(imp_dbh, DBIcf_BegunWork)!=0) {
-            DBIc_set(imp_dbh, DBIcf_AutoCommit, 1);
-            DBIc_set(imp_dbh, DBIcf_BegunWork, 0);
-        }
-    }
-
     if (TEND_slow) TRC(DBILOGFP, "%sEnd pg_quickexec (rows: %ld, txn_status: %d)\n",
-                  THEADER_slow, rows, txn_status);
+                       THEADER_slow, rows, PQtransactionStatus(imp_dbh->conn));
     return rows;
 
 } /* end of pg_quickexec */
@@ -3692,7 +3942,8 @@ long dbd_st_execute (SV * sth, imp_sth_t * imp_sth)
     PQExecType    pqtype = PQTYPE_UNKNOWN;
     long          power_of_ten;
     char *        stmt;
-    
+    int use_async;
+
     if (TSTART_slow) TRC(DBILOGFP, "%sBegin dbd_st_execute\n", THEADER_slow);
     
     if (NULL == imp_dbh->conn) {
@@ -3722,6 +3973,8 @@ long dbd_st_execute (SV * sth, imp_sth_t * imp_sth)
         imp_sth->all_bound = DBDPG_TRUE;
     }
 
+    use_async = imp_dbh->use_async || imp_sth->async_flag & PG_ASYNC;
+
     switch (imp_dbh->async_status) {
     case DBH_NO_ASYNC:
         break;
@@ -3731,11 +3984,8 @@ long dbd_st_execute (SV * sth, imp_sth_t * imp_sth)
         croak("Must wait for async connect to finish before issuing commands");
 
     default:
-        if (imp_sth == imp_dbh->async_sth
-            && STH_ASYNC_PREPARE == imp_sth->async_status) {
-            add_async_action(NULL, NULL, aa_after_prepare, imp_dbh);
+        if (use_async && imp_sth == imp_dbh->async_sth && STH_ASYNC_PREPARE == imp_sth->async_status)
             break;
-        }
 
         croak("Must wait for async query to finish before issuing more commands");
     }
@@ -3743,7 +3993,7 @@ long dbd_st_execute (SV * sth, imp_sth_t * imp_sth)
     /* If not autocommit, start a new transaction */
     want_begin = 0;
     if (!imp_dbh->done_begin && !DBIc_has(imp_dbh, DBIcf_AutoCommit)) {
-        if (imp_sth->async_flag & PG_ASYNC)
+        if (use_async)
             want_begin = 1;
         else {
             status = _result(aTHX_ imp_dbh, "begin");
@@ -3773,7 +4023,7 @@ long dbd_st_execute (SV * sth, imp_sth_t * imp_sth)
       deleted implicitly the next time pg_db_result is
       called.
     */
-    if (imp_sth->result && !(imp_sth->async_flag & PG_ASYNC)) {
+    if (imp_sth->result && !use_async) {
         TRACE_PQCLEAR;
         PQclear(imp_sth->result);
         imp_sth->result = NULL;
@@ -3807,7 +4057,9 @@ long dbd_st_execute (SV * sth, imp_sth_t * imp_sth)
        5. There are no placeholders
        6. pg_server_prepare is false
     */
-    if (!imp_sth->is_dml
+    if (NULL != imp_sth->prepare_name)
+        pqtype = PQTYPE_PREPARED;
+    else if (!imp_sth->is_dml
         || imp_sth->has_default
         || imp_sth->has_current
         || imp_sth->direct
@@ -3815,16 +4067,11 @@ long dbd_st_execute (SV * sth, imp_sth_t * imp_sth)
         || !imp_sth->server_prepare
         )
         pqtype = PQTYPE_EXEC;
-    else if (NULL != imp_sth->prepare_name) {
-        pqtype = PQTYPE_PREPARED;
-    }
-    else if (0==imp_sth->switch_prepared || imp_sth->number_iterations < imp_sth->switch_prepared) {
+    else if (0==imp_sth->switch_prepared || imp_sth->number_iterations < imp_sth->switch_prepared)
         pqtype = PQTYPE_PARAMS;
-    }
-    else {
+    else
         pqtype = PQTYPE_PREPARED;
-    }
-    
+
     if (TRACE4_slow) TRC(DBILOGFP, "%sWill use %s\n", 
                          THEADER_slow,
                          pq_x_calls[pqtype][(imp_sth->async_flag & PG_ASYNC) != 0]);
@@ -3904,6 +4151,7 @@ long dbd_st_execute (SV * sth, imp_sth_t * imp_sth)
     }
     
     /* Run one of PQexec (or PQsendQuery), PQexecParams (or PQsendQueryParams), PQexecPrepared (or PQsendQueryPrepared) */
+    do_pending_deallocs(imp_dbh);
 
     if (PQTYPE_EXEC == pqtype) { /* PQexec or PQsendQuery */
         Safefree(imp_sth->statement);
@@ -3930,14 +4178,7 @@ long dbd_st_execute (SV * sth, imp_sth_t * imp_sth)
         if (TSQL)
             TRC(DBILOGFP, "%s;\n\n", stmt);
 
-        if (imp_sth->async_flag & PG_ASYNC) {
-            if (!want_begin) {
-                TRACE_PQSENDQUERY;
-                ret = PQsendQuery(imp_dbh->conn, stmt);
-            }
-        }
-        else {
-
+        if (!use_async) {
             /* Free the last_result as needed, even if happens to be owned by us */
             if (imp_dbh->last_result && imp_dbh->result_clearable) {
                 TRACE_PQCLEAR;
@@ -4021,16 +4262,7 @@ long dbd_st_execute (SV * sth, imp_sth_t * imp_sth)
 
         if (TRACE5_slow) TRC(DBILOGFP, "%sRunning %s\n", THEADER_slow, stmt);
 
-        if (imp_sth->async_flag & PG_ASYNC) {
-            if (!want_begin) {
-                TRACE_PQSENDQUERYPARAMS;
-                ret = PQsendQueryParams
-                    (imp_dbh->conn, stmt, imp_sth->numphs,
-                     imp_sth->PQoids, imp_sth->PQvals, imp_sth->PQlens, imp_sth->PQfmts, 0);
-            }
-        }
-        else {
-
+        if (!use_async) {
             /* Free the last_result as needed, even if happens to be owned by us */
             if (imp_dbh->last_result && imp_dbh->result_clearable) {
                 TRACE_PQCLEAR;
@@ -4068,8 +4300,6 @@ long dbd_st_execute (SV * sth, imp_sth_t * imp_sth)
                 if (TEND_slow) TRC(DBILOGFP, "%sEnd dbd_st_execute (error)\n", THEADER_slow);
                 return -2;
             }
-            if (STH_ASYNC_PREPARE == imp_sth->async_status)
-                add_async_action(NULL, NULL, aa_after_prepare, imp_dbh);
         } else if (STH_ASYNC_PREPARE == imp_sth->async_status) {
             if (TRACE5_slow) TRC(DBILOGFP, "%swaiting for async preprare to complete (%s)\n",
                                  THEADER_slow, imp_sth->prepare_name);
@@ -4101,16 +4331,7 @@ long dbd_st_execute (SV * sth, imp_sth_t * imp_sth)
                 TRC(DBILOGFP, ");\n\n");
             }
 
-            if (imp_sth->async_flag & PG_ASYNC) {
-                if (!want_begin) {
-                    TRACE_PQSENDQUERYPREPARED;
-                    ret = PQsendQueryPrepared
-                        (imp_dbh->conn, imp_sth->prepare_name, imp_sth->numphs,
-                         imp_sth->PQvals, imp_sth->PQlens, imp_sth->PQfmts, 0);
-                }
-            }
-            else {
-
+            if (!use_async) {
                 /* Free the last_result as needed, even if happens to be owned by us */
                 if (imp_dbh->last_result && imp_dbh->result_clearable) {
                     TRACE_PQCLEAR;
@@ -4139,115 +4360,35 @@ long dbd_st_execute (SV * sth, imp_sth_t * imp_sth)
             }
         }
     } /* end new-style prepare */
-        
-    /* Some form of PQexec* or PQsend* has been run at this point */
 
     /* If running asynchronously, we don't stick around for the result */
-    if (imp_sth->async_flag & PG_ASYNC) {
+    if (use_async) {
         if (want_begin) {
-            if (!imp_dbh->aa_first) {
-                aa_send_query(imp_dbh, "begin");
-                add_async_action(NULL, NULL, aa_after_begin, imp_dbh);
-            } else
-                add_async_action("begin", aa_send_query, aa_after_begin, imp_dbh);
+            add_async_action(aa_send_query, "begin", after_begin, NULL, 0,
+                             imp_dbh);
 
             if (imp_dbh->txn_read_only)
-                add_async_action("set transaction read only", aa_send_query,
-                                 NULL, imp_dbh);
+                add_async_action(aa_send_query, "set transaction read only",
+                                 NULL, NULL, 0, imp_dbh);
         }
+
+        add_async_action(send_async_query, imp_sth, handle_query_result, NULL, 0, imp_dbh);
 
         if (TRACEWARN_slow) TRC(DBILOGFP, "%sEarly return for async query\n", THEADER_slow);
         imp_sth->async_status = STH_ASYNC;
         imp_dbh->async_sth = imp_sth;
+
         imp_dbh->async_status = DBH_ASYNC;
         if (TEND_slow) TRC(DBILOGFP, "%sEnd dbd_st_execute (async)\n", THEADER_slow);
         return 0;
     }
 
+    /* Some form of PQexec* or PQsend* has been run at this point */
+
     status = _sqlstate(aTHX_ imp_dbh, imp_sth->result);
+    ret = handle_query_result(imp_sth->result, status, sth, imp_dbh, imp_sth);
 
-    imp_dbh->copystate = 0; /* Assume not in copy mode until told otherwise */
-
-    if (PGRES_TUPLES_OK == status) {
-        TRACE_PQNFIELDS;
-        num_fields = PQnfields(imp_sth->result);
-        imp_sth->cur_tuple = 0;
-        DBIc_NUM_FIELDS(imp_sth) = num_fields;
-        DBIc_ACTIVE_on(imp_sth);
-        TRACE_PQNTUPLES;
-        ret = PQntuples(imp_sth->result);
-        if (TRACE5_slow) TRC(DBILOGFP,
-                        "%sStatus was PGRES_TUPLES_OK, fields=%d, tuples=%ld\n",
-                        THEADER_slow, num_fields, ret);
-    }
-    else if (PGRES_COMMAND_OK == status) {
-        /* non-select statement */
-        char *cmdStatus = NULL;
-        bool gotrows = DBDPG_FALSE;
-
-        if (TRACE5_slow)
-            TRC(DBILOGFP, "%sStatus was PGRES_COMMAND_OK\n", THEADER_slow);
-
-        if (imp_sth->result) {
-            TRACE_PQCMDSTATUS;
-            cmdStatus = PQcmdStatus(imp_sth->result);
-            if (0 == strncmp(cmdStatus, "INSERT", 6)) {
-                /* INSERT(space)oid(space)numrows */
-                for (ret=8; cmdStatus[ret-1] != ' '; ret++) {
-                }
-                ret = atol(cmdStatus + ret);
-                gotrows = DBDPG_TRUE;
-            }
-            else if (0 == strncmp(cmdStatus, "MOVE", 4)) {
-                ret = atol(cmdStatus + 5);
-                gotrows = DBDPG_TRUE;
-            }
-            else if (0 == strncmp(cmdStatus, "DELETE", 6)
-                     || 0 == strncmp(cmdStatus, "UPDATE", 6)
-                     || 0 == strncmp(cmdStatus, "SELECT", 6)) {
-                ret = atol(cmdStatus + 7);
-                gotrows = DBDPG_TRUE;
-            }
-            else if (0 == strncmp(cmdStatus, "MERGE", 5)) {
-                ret = atol(cmdStatus + 6);
-                gotrows = DBDPG_TRUE;
-            }
-        }
-        if (!gotrows) {
-            /* No rows affected, but check for change of state */
-            TRACE_PQTRANSACTIONSTATUS;
-            if (PQTRANS_IDLE == PQtransactionStatus(imp_dbh->conn)) {
-                imp_dbh->done_begin = DBDPG_FALSE;
-                /* If begin_work has been called, turn AutoCommit back on and BegunWork off */
-                if (DBIc_has(imp_dbh, DBIcf_BegunWork)!=0) {
-                    DBIc_set(imp_dbh, DBIcf_AutoCommit, 1);
-                    DBIc_set(imp_dbh, DBIcf_BegunWork, 0);
-                }
-            }
-            if (TEND_slow) TRC(DBILOGFP, "%sEnd dbd_st_execute (OK, no rows)\n", THEADER_slow);
-            return 0;
-        }
-    }
-    else if (PGRES_COPY_OUT == status || PGRES_COPY_IN == status || PGRES_COPY_BOTH == status) {
-        if (TRACE5_slow)
-            TRC(DBILOGFP, "%sStatus was PGRES_COPY_%s\n",
-                THEADER_slow, PGRES_COPY_OUT == status ? "OUT" : PGRES_COPY_IN == status ? "IN" : "BOTH");
-        /* Copy Out/In data transfer in progress */
-        imp_dbh->copystate = status;
-        imp_dbh->copybinary = PQbinaryTuples(imp_sth->result);
-        if (TEND_slow) TRC(DBILOGFP, "%sEnd dbd_st_execute (COPY)\n", THEADER_slow);
-        return -1;
-    }
-    else {
-        if (TRACE5_slow) TRC(DBILOGFP, "%sInvalid status returned (%d)\n", THEADER_slow, status);
-        TRACE_PQERRORMESSAGE;
-        pg_error(aTHX_ sth, status, PQerrorMessage(imp_dbh->conn));
-        if (TEND_slow) TRC(DBILOGFP, "%sEnd dbd_st_execute (error: bad status)\n", THEADER_slow);
-        return -2;
-    }
-    
     /* store the number of affected rows */
-    
     imp_sth->rows = ret;
 
     if (TEND_slow) TRC(DBILOGFP, "%sEnd dbd_st_execute (rows: %ld)\n", THEADER_slow, ret);
@@ -4473,11 +4614,14 @@ int dbd_st_finish (SV * sth, imp_sth_t * imp_sth)
 static int pg_st_deallocate_statement (pTHX_ SV * sth, imp_sth_t * imp_sth)
 {
     D_imp_dbh_from_sth;
+#if 0
     char                    tempsqlstate[6];
     char *                  stmt;
     int                     status;
     PGTransactionStatusType tstatus;
-    
+#endif
+    dealloc_t *dealloc;
+
     if (TSTART_slow) TRC(DBILOGFP, "%sBegin pg_st_deallocate_statement\n", THEADER_slow);
 
     if (imp_dbh->skip_deallocate) {
@@ -4489,7 +4633,17 @@ static int pg_st_deallocate_statement (pTHX_ SV * sth, imp_sth_t * imp_sth)
         if (TEND_slow) TRC(DBILOGFP, "%sEnd pg_st_deallocate_statement (0)\n", THEADER_slow);
         return 0;
     }
-    
+
+    Newx(dealloc, 1, dealloc_t);
+    dealloc->name = imp_sth->prepare_name;
+    imp_sth->prepare_name = NULL;
+    dealloc->p = imp_dbh->deallocs;
+    imp_dbh->deallocs = dealloc;
+
+    if (TRACE5_slow)
+        TRC(DBILOGFP, "%sQueued %s for dealloc\n", THEADER_slow, dealloc->name);
+
+#if 0
     tempsqlstate[0] = '\0';
 
     /* What is our status? */
@@ -4561,6 +4715,7 @@ static int pg_st_deallocate_statement (pTHX_ SV * sth, imp_sth_t * imp_sth)
     if (tempsqlstate[0]) {
         strncpy(imp_dbh->sqlstate, tempsqlstate, 6);
     }
+#endif
 
     if (TEND_slow) TRC(DBILOGFP, "%sEnd pg_st_deallocate_statement\n", THEADER_slow);
     return 0;
@@ -5159,7 +5314,7 @@ void pg_db_pg_server_untrace (SV * dbh)
 
 /* ================================================================== */
 static int savepoint_action(SV * dbh, imp_dbh_t * imp_dbh, char *cmd, char *savepoint,
-                            void (*done)(int, imp_dbh_t *, void *), char *caller)
+                            async_result_handler *res_handler, char *caller)
 {
     dTHX;
     unsigned need;
@@ -5179,7 +5334,7 @@ static int savepoint_action(SV * dbh, imp_dbh_t * imp_dbh, char *cmd, char *save
     need = strlen(cmd) + strlen(savepoint) + 2;
     action = alloca(need);
     sprintf(action, "%s %s", cmd, savepoint);
-    rc = do_stmt(dbh, action, imp_dbh->use_async, done, savepoint,
+    rc = do_stmt(dbh, action, imp_dbh->use_async, res_handler, savepoint,
                  caller);
     switch (rc) {
     case STMT_ERR:
@@ -5201,12 +5356,15 @@ static int savepoint_action(SV * dbh, imp_dbh_t * imp_dbh, char *cmd, char *save
     return 1;
 }
 
-static void after_savepoint(int success, imp_dbh_t *imp_dbh, void *arg)
+static long after_savepoint(PGresult *unused, int status, SV *h, imp_dbh_t *imp_dbh, void *arg)
 {
     dTHX;
 
-    if (success) av_push(imp_dbh->savepoints, newSVpv(arg, 0));
-    safefree(arg);
+    if (PGRES_COMMAND_OK != status)
+        warn_nocontext("unexpected status after savepoint: %d(%s)", status, pgres_2_name(status));
+
+    av_push(imp_dbh->savepoints, newSVpv(arg, 0));
+    return 0;
 }
 
 int pg_db_savepoint (SV * dbh, imp_dbh_t * imp_dbh, char * savepoint)
@@ -5243,12 +5401,15 @@ static int have_savepoint(imp_dbh_t *imp_dbh, char const *savepoint)
 
 
 /* ================================================================== */
-static void after_release(int success, imp_dbh_t *imp_dbh, void *arg)
+static long after_release(PGresult *unused, int status, SV *h, imp_dbh_t *imp_dbh, void *arg)
 {
     dTHX;
 
-    if (success) pg_db_free_savepoints_to(aTHX_ imp_dbh, arg);
-    safefree(arg);
+    if (PGRES_COMMAND_OK != status)
+        warn_nocontext("unexpected status after releasep: %d(%s)", status, pgres_2_name(status));
+
+    pg_db_free_savepoints_to(aTHX_ imp_dbh, arg);
+    return 0;
 }
 
 int pg_db_rollback_to(SV * dbh, imp_dbh_t * imp_dbh, char *savepoint)
@@ -5769,16 +5930,44 @@ int dbd_st_blob_read (SV * sth, imp_sth_t * imp_sth, int lobjId, long offset, lo
 /* 
    Return the result of an asynchronous query, waiting if needed
 */
+static PGresult *handle_next_result_set(imp_dbh_t *imp_dbh)
+{
+    dTHX;
+    PGresult *r0, *r1;
+
+    /*
+      For a query containing a single statement, exactly one PGresult
+      object followed by a null pointer will be returned. The
+      transaction status associated with the connection will indicate
+      that a command is presently active until this null pointer has
+      been dequeued.
+
+      For multiple results, the function below is functionally
+      identical to the original DBD::Pg implementation in
+      pg_db_result, just with less churn (ie, it won't set rows and
+      fields values in control structures which will end up being
+      overwritten if another result needs to be processed).
+    */
+
+    TRACE_PQGETRESULT;
+    r0 = PQgetResult(imp_dbh->conn);
+    while (r1 = PQgetResult(imp_dbh->conn), r1) {
+        if (TRACE5_slow) TRC(DBILOGFP, "%sDiscarding intermediate result\n", THEADER_slow);
+        TRACE_PQCLEAR;
+        PQclear(r0);
+
+        r0 = r1;
+    }
+
+    return r0;
+}
+
 long pg_db_result (SV *h, imp_dbh_t *imp_dbh)
 {
     dTHX;
     PGresult *result;
     ExecStatusType status = PGRES_FATAL_ERROR;
     long rows = 0;
-    char *cmdStatus = NULL;
-    imp_sth_t *imp_sth;
-    void (*after_async)(int, imp_dbh_t *, void *);
-    void *arg;
 
     if (TSTART_slow) TRC(DBILOGFP, "%sBegin pg_db_result\n", THEADER_slow);
 
@@ -5797,105 +5986,26 @@ long pg_db_result (SV *h, imp_dbh_t *imp_dbh)
         return -2;
     }
 
-    imp_dbh->copystate = 0; /* Assume not in copy mode until told otherwise */
+    while (1) {
+        result = handle_next_result_set(imp_dbh);
+        rows = handle_async_action(result, h, imp_dbh, "pg_db_result");
+        if (!imp_dbh->aa_first) break;
 
-    TRACE_PQGETRESULT;
-    while ((result = PQgetResult(imp_dbh->conn)) != NULL) {
-        /* TODO: Better multiple result-set handling */
-        status = _sqlstate(aTHX_ imp_dbh, result);
-        switch ((int)status) {
-        case PGRES_TUPLES_OK:
-            TRACE_PQNTUPLES;
-            rows = PQntuples(result);
+        TRACE_PQCLEAR;
+        PQclear(result);
 
-            if (NULL != imp_dbh->async_sth) {
-                imp_dbh->async_sth->cur_tuple = 0;
-                TRACE_PQNFIELDS;
-                DBIc_NUM_FIELDS(imp_dbh->async_sth) = PQnfields(result);
-                DBIc_ACTIVE_on(imp_dbh->async_sth);
-            }
-
-            break;
-        case PGRES_COMMAND_OK:
-            if (imp_dbh->aa_first) {
-                TRACE_PQCLEAR;
-                PQclear(result);
-
-                TRACE_PQGETRESULT;
-                result = PQgetResult(imp_dbh->conn);
-                if (result) croak("cannot handle intermediate queries with more than one result");
-
-                rows = handle_async_action(h, imp_dbh, "pg_db_result");
-                if (AA_ERROR == rows) {
-                    rows = -2;
-                    break;
-                }
-                if (AA_CANCELLED == rows) {
-                    rows = 0;
-                    break;
-                }
-
-                continue;
-            }
-
-            /* async prepare */
-            imp_sth = imp_dbh->async_sth;
-            if (imp_sth && STH_ASYNC_PREPARE == imp_sth->async_status) {
-                imp_sth->prepared_by_us = DBDPG_TRUE;
-                ++imp_dbh->prepare_number;
-                break;
-            }
-
-            /* non-select statement */
-            TRACE_PQCMDSTATUS;
-            cmdStatus = PQcmdStatus(result);
-            if (0 == strncmp(cmdStatus, "INSERT", 6)) {
-                /* INSERT(space)oid(space)numrows */
-                for (rows=8; cmdStatus[rows-1] != ' '; rows++) {
-                }
-                rows = atol(cmdStatus + rows);
-            }
-            else if (0 == strncmp(cmdStatus, "MOVE", 4)) {
-                rows = atol(cmdStatus + 5);
-            }
-            else if (0 == strncmp(cmdStatus, "DELETE", 6)
-                     || 0 == strncmp(cmdStatus, "UPDATE", 6)
-                     || 0 == strncmp(cmdStatus, "SELECT", 6)) {
-                rows = atol(cmdStatus + 7);
-            }
-            else if (0 == strncmp(cmdStatus, "MERGE", 5)) {
-                rows = atol(cmdStatus + 6);
-            }
-            break;
-        case PGRES_COPY_OUT:
-        case PGRES_COPY_IN:
-        case PGRES_COPY_BOTH:
-            /* Copy Out/In data transfer in progress */
-            imp_dbh->copystate = status;
-            imp_dbh->copybinary = PQbinaryTuples(result);
-            rows = -1;
-            break;
-        case PGRES_EMPTY_QUERY:
-        case PGRES_BAD_RESPONSE:
-        case PGRES_NONFATAL_ERROR:
+        if (AA_ERR == rows) {
             rows = -2;
-            TRACE_PQERRORMESSAGE;
-            pg_error(aTHX_ h, status, PQerrorMessage(imp_dbh->conn));
-            break;
-        case PGRES_FATAL_ERROR:
-            if (strcmp(imp_dbh->sqlstate, SQLST_CANCELLED) == 0) {
-                async_action_cleanup(imp_dbh);
-                rows = 0;
-                break;
-            }
-
-        default:
-            rows = -2;
-            TRACE_PQERRORMESSAGE;
-            pg_error(aTHX_ h, status, PQerrorMessage(imp_dbh->conn));
             break;
         }
+        if (AA_CANCELLED == rows) {
+            rows = -1;
+            break;
+        }
+    }
 
+    switch (rows) {
+    default:
         if (NULL != imp_dbh->async_sth) {
             /* Free the last_result as needed */
             if (imp_dbh->last_result && imp_dbh->result_clearable) {
@@ -5923,27 +6033,27 @@ long pg_db_result (SV *h, imp_dbh_t *imp_dbh)
             TRACE_PQCLEAR;
             PQclear(result);
         }
+        break;
+
+    case -1:
+        rows = -2;
+        break;
+
+    case -2:
+        rows = 0;
     }
 
     if (NULL != imp_dbh->async_sth) {
         imp_dbh->async_sth->rows = rows;
         imp_dbh->async_sth->async_status = STH_NO_ASYNC;
+
+        imp_dbh->async_sth = NULL;
     }
     imp_dbh->async_status = DBH_NO_ASYNC;
-
-    after_async = imp_dbh->after_async.cb;
-    if (after_async) {
-        imp_dbh->after_async.cb = NULL;
-        arg = imp_dbh->after_async.arg;
-        imp_dbh->after_async.arg = NULL;
-
-        after_async(rows >= 0, imp_dbh, arg);
-    }
 
     if (TEND_slow) TRC(DBILOGFP, "%sEnd pg_db_result (rows: %ld)\n", THEADER_slow, rows);
     return rows;
 } /* end of pg_db_result */
-
 
 /* ================================================================== */
 /* 
@@ -5955,87 +6065,61 @@ long pg_db_result (SV *h, imp_dbh_t *imp_dbh)
    0 if the query is still running
    -2 for other errors
 */
-static int pg_db_ready_error(SV *h, imp_dbh_t *imp_dbh, char *pq_call)
+static inline int pg_db_ready_core(SV *h, imp_dbh_t *imp_dbh)
 {
-    async_action_error(h, imp_dbh, "pg_db_ready", pq_call);
-    return -2;
-}
-
-static int handle_between_result(imp_dbh_t *imp_dbh)
-{
-    PGresult *result;
-    int ret, status;
     dTHX;
+    PGresult *res;
+    int rc;
 
-    status = PGRES_COMMAND_OK;
-    TRACE_PQGETRESULT;
-    while ((result = PQgetResult(imp_dbh->conn))) {
-        ret = _sqlstate(aTHX_ imp_dbh, result);
-        if (PGRES_COMMAND_OK != ret) status = ret;
+    TRACE_PQISBUSY;
+    if (PQisBusy(imp_dbh->conn)) return 0;
+    if (!imp_dbh->aa_first->p) return 1;
 
-        PQclear(result);
+    res = handle_next_result_set(imp_dbh);
+    rc = handle_async_action(res, h, imp_dbh, "pg_db_ready");
+    TRACE_PQCLEAR;
+    PQclear(res);
+
+    switch (rc) {
+    case AA_ERR:
+        return -1;
+
+    case AA_CANCELLED:
+        imp_dbh->async_status = DBH_ASYNC_CANCELLING;
+        return 1;
     }
 
-    return status;
+    return 0;
 }
 
 int pg_db_ready(SV *h, imp_dbh_t *imp_dbh)
 {
     char *pg_call;
+    PGresult *res;
     int rc;
     dTHX;
 
     if (TSTART_slow) TRC(DBILOGFP, "%sBegin pg_db_ready (async status: %d)\n",
                          THEADER_slow, imp_dbh->async_status);
 
-    switch (imp_dbh->async_status) {
-    case DBH_NO_ASYNC:
+    if (DBH_ASYNC != imp_dbh->async_status) {
         pg_error(aTHX_ h, PGRES_FATAL_ERROR, "No asynchronous query is running\n");
         if (TEND_slow) TRC(DBILOGFP, "%sEnd pg_db_ready (error: no async)\n", THEADER_slow);
-        return -1;
-
-    case DBH_ASYNC_CONNECT:
-    case DBH_ASYNC_CONNECT_POLL:
-        if (TRACE5_slow) TRC(DBILOGFP, "%snot yet connected\n", THEADER_slow);
-        if (TEND_slow) TRC(DBILOGFP, "%sEnd pg_db_ready (error: not connected)\n", THEADER_slow);
         return -1;
     }
 
     strcpy(imp_dbh->sqlstate, "00000");
 
     TRACE_PQCONSUMEINPUT;
-    if (!PQconsumeInput(imp_dbh->conn))
-        return pg_db_ready_error(h, imp_dbh, "PQconsumeInput");
-
-    rc = 0;
-    TRACE_PQISBUSY;
-    if (!PQisBusy(imp_dbh->conn)) {
-        rc = 1;
-
-        if (imp_dbh->aa_first) {
-            rc = handle_between_result(imp_dbh);
-            if (PGRES_COMMAND_OK != rc) return pg_db_ready_error(h, imp_dbh, 
-                                                                 STH_ASYNC_PREPARE == imp_dbh->async_sth->async_status ?
-                                                                 "PQsendPrepare" : "PQsendQuery");
-
-            rc = handle_async_action(h, imp_dbh, "pg_db_ready");
-            switch (rc) {
-            case AA_OK:
-                rc = 0;
-                break;
-
-            case AA_ERROR:
-                rc = -2;
-                break;
-
-            case AA_CANCELLED:
-                rc = 1;
-                imp_dbh->async_status = DBH_ASYNC_CANCELLING;
-            }
-        }
+    if (!PQconsumeInput(imp_dbh->conn)) {
+        async_action_error(h, imp_dbh, PGRES_FATAL_ERROR,
+                           "PQconsumeInput", "pg_db_ready");
+        return -2;
     }
 
-    if (TEND_slow) TRC(DBILOGFP, "%sEnd pg_db_ready\n", THEADER_slow);
+    rc = pg_db_ready_core(h,imp_dbh);
+    if (TEND_slow) TRC(DBILOGFP, "%sEnd pg_db_ready (status %d)\n",
+                       THEADER_slow, rc);
     return rc;
 } /* end of pg_db_ready */
 

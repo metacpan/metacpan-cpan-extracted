@@ -39,8 +39,8 @@ use File::Spec;
 use File::pfopen 0.03;	# For $mode and list context
 use File::Temp;
 use Log::Abstraction 0.24;
-use Object::Configure;
-use Params::Get;
+use Object::Configure 0.12;
+use Params::Get 0.13;
 # use Error::Simple;	# A nice idea to use this but it doesn't play well with "use lib"
 use Scalar::Util;
 
@@ -53,11 +53,11 @@ Database::Abstraction - Read-only Database Abstraction Layer (ORM)
 
 =head1 VERSION
 
-Version 0.28
+Version 0.29
 
 =cut
 
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 
 =head1 DESCRIPTION
 
@@ -443,7 +443,10 @@ sub _open
 	}
 	if($dbh) {
 		$dbh->do('PRAGMA synchronous = OFF');
-		$dbh->do('PRAGMA cache_size = 65536');
+		$dbh->do('PRAGMA cache_size = -4096');	# Use 4MB cache - negative = KB)
+		$dbh->do('PRAGMA journal_mode = OFF');	# Read-only, no journal needed
+		$dbh->do('PRAGMA temp_store = MEMORY');	# Store temp data in RAM
+		$dbh->do('PRAGMA mmap_size = 1048576');	# Use 1MB memory-mapped I/O
 		$dbh->sqlite_busy_timeout(100000);	# 10s
 		$self->_debug("read in $table from SQLite $slurp_file");
 		$self->{'type'} = 'DBI';
@@ -557,7 +560,7 @@ sub _open
 
 					$self->_debug('slurp in');
 
-					my @data = @{xsv_slurp(
+					my $dataref = xsv_slurp(
 						shape => 'aoh',
 						text_csv => {
 							sep_char => $sep_char,
@@ -569,23 +572,23 @@ sub _open
 						},
 						# string => \join('', grep(!/^\s*(#|$)/, <DATA>))
 						file => $slurp_file
-					)};
-					@data = grep { $_->{$self->{'id'}} !~ /^\s*#/ } grep { defined($_->{$self->{'id'}}) } @data;
+					);
 
-					# $self->{'data'} = @data;
+					# Ignore blank lines or lines starting with # in the CSV file
+					my @data = grep { $_->{$self->{'id'}} !~ /^\s*#/ } grep { defined($_->{$self->{'id'}}) } @{$dataref};
+
 					if($self->{'no_entry'}) {
 						# Not keyed, will need to scan each entry
-						my $i = 0;
-						$self->{'data'} = ();
-						while(my $d = shift @data) {
-							$self->{'data'}[$i++] = $d;
-						}
+						$self->{'data'} = @data;
 					} else {
 						# keyed on the $self->{'id'} (default: "entry") column
-						# Ignore blank lines or lines starting with # in the CSV file
 						while(my $d = shift @data) {
 							$self->{'data'}->{$d->{$self->{'id'}}} = $d;
 						}
+						# Don't use this code, for some reason it doesn't work - not sure why yet
+						# Build hash directly from the filtered array, better to use map to avoid data copy
+						#	and enclose in { } to ensure it's a hash ref
+						# $self->{'data'} = { map { $_->{$self->{'id'}} => $_ } @data };
 					}
 				}
 			}
@@ -665,7 +668,7 @@ Use caching if that is available.
 sub selectall_hashref {
 	my $self = shift;
 
-	my @rc = $self->selectall_hash(@_);
+	my @rc = grep { defined $_ } $self->selectall_hash(@_);
 	Data::Reuse::fixate(@rc) if(!$self->{'no_fixate'});
 	return \@rc;
 }
@@ -737,7 +740,7 @@ sub selectall_hash
 			$keyword = 'WHERE';
 			$done_where = 1;
 		}
-		if($arg =~ /\@/) {
+		if($arg =~ /[%_]/) {
 			$query .= " $keyword $c1 LIKE ?";
 		} else {
 			$query .= " $keyword $c1 = ?";
@@ -760,7 +763,7 @@ sub selectall_hash
 	my $key;
 	my $c;
 	if($c = $self->{cache}) {
-		$key = $query;
+		$key = ref($self) . '::' . $query;
 		if(wantarray) {
 			$key .= ' array';
 		}
@@ -769,7 +772,7 @@ sub selectall_hash
 		}
 		if(my $rc = $c->get($key)) {
 			$self->_debug('cache HIT');
-			return @{$rc};	# We stored a ref to the array
+			return wantarray ? @{$rc} : $rc;	# We stored a ref to the array
 
 			# This use of a temporary variable is to avoid
 			#	"Implicit scalar context for array in return"
@@ -786,17 +789,17 @@ sub selectall_hash
 			# throw Error::Simple("$query: @query_args");
 			croak("$query: @query_args");
 
-		my @rc;
+		my $rc;
 		while(my $href = $sth->fetchrow_hashref()) {
 			# FIXME: Doesn't store in the cache
 			return $href if(!wantarray);
-			push @rc, $href;
+			push @{$rc}, $href;
 		}
 		if($c && wantarray) {
-			$c->set($key, \@rc, $self->{'cache_duration'});	# Store a ref to the array
+			$c->set($key, $rc, $self->{'cache_duration'});	# Store a ref to the array
 		}
 
-		return @rc;
+		return $rc ? @{$rc} : undef;
 	}
 	$self->_warn("selectall_hash failure on $query: @query_args");
 	# throw Error::Simple("$query: @query_args");
@@ -870,7 +873,7 @@ sub count
 			$keyword = 'WHERE';
 			$done_where = 1;
 		}
-		if($arg =~ /\@/) {
+		if($arg =~ /[%_]/) {
 			$query .= " $keyword $c1 LIKE ?";
 		} else {
 			$query .= " $keyword $c1 = ?";
@@ -890,7 +893,7 @@ sub count
 	my $key;
 	my $c;
 	if($c = $self->{cache}) {
-		$key = $query;
+		$key = ref($self) . '::' . $query;
 		$key =~ s/COUNT\((.+?)\)/$1/;
 		$key .= ' array';
 		if(defined($query_args[0])) {
@@ -1002,7 +1005,7 @@ sub fetchrow_hashref {
 				$keyword = 'WHERE';
 				$done_where = 1;
 			}
-			if($arg =~ /\@/) {
+			if($arg =~ /[%_]/) {
 				$query .= " $keyword $c1 LIKE ?";
 			} else {
 				$query .= " $keyword $c1 = ?";
@@ -1025,14 +1028,14 @@ sub fetchrow_hashref {
 	} else {
 		$self->_debug("fetchrow_hashref $query");
 	}
-	my $key;
+	my $key = ref($self) . '::';
 	if(defined($query_args[0])) {
 		if(wantarray) {
-			$key = 'array ';
+			$key .= 'array ';
 		}
-		$key = "fetchrow $query " . join(', ', @query_args);
+		$key .= "fetchrow $query " . join(', ', @query_args);
 	} else {
-		$key = "fetchrow $query";
+		$key .= "fetchrow $query";
 	}
 	my $c;
 	if($c = $self->{cache}) {
@@ -1325,22 +1328,19 @@ sub AUTOLOAD {
 		$self->_debug("AUTOLOAD $query");
 	}
 	my $cache;
-	my $key;
+	my $key = ref($self) . '::';
 	if($cache = $self->{cache}) {
 		if(wantarray) {
-			$key = 'array ';
+			$key .= 'array ';
 		}
 		if(defined($args[0])) {
-			$key = "fetchrow $query " . join(', ', @args);
+			$key .= "fetchrow $query " . join(', ', @args);
 		} else {
-			$key = "fetchrow $query";
+			$key .= "fetchrow $query";
 		}
 		if(my $rc = $cache->get($key)) {
 			$self->_debug('cache HIT');
-			if(wantarray) {
-				return @{$rc};	# We stored a ref to the array
-			}
-			return $rc;
+			return wantarray ? @{$rc} : $rc;	# We stored a ref to the array
 		}
 		$self->_debug('cache MISS');
 	} else {

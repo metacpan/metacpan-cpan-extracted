@@ -4,7 +4,7 @@ use v5.16; # or newer
 use strict;
 use warnings;
 
-our $VERSION = "1.07";
+our $VERSION = "1.08";
 
 use JSON::PP;
 use Text::Diff;
@@ -555,7 +555,7 @@ sub _loopDir {
         
         my @fileArray;
         if((defined $self->{sortType}) && ($self->{sortType}) eq "alphabetic"){
-            foreach my $file (sort { lc $templates->{$dir}->{$a} cmp  lc $templates->{$dir}->{$b} } keys %{$templates->{$dir}}){
+            foreach my $file (sort { lc $templates->{$dir}->{$a} cmp lc $templates->{$dir}->{$b} } keys %{$templates->{$dir}}){
                 push @fileArray, $file;
             }
         }else{
@@ -951,8 +951,8 @@ If you're familiar with Helm but prefer a Perl-centric, highly customizable tool
 
 =cut
 
-=head1 AUTHOR
+=head1 AUTHOR(S)
 
-John Summers E<lt>devp2000a@gmail.comE<gt>
+Open Cloud Toolkit(ocToolkit) team E<lt>devp2000a@gmail.comE<gt>
 
 =cut

@@ -3,15 +3,19 @@
 # FIXME: Slurping mode fails on this
 
 use strict;
+use warnings;
+
+use File::Spec;
 use FindBin qw($Bin);
+use Test::Most tests => 10;
 
 use lib 't/lib';
-use Test::Most tests => 10;
 
 BEGIN { use_ok('Database::test3') }
 
+my $directory = File::Spec->catfile($Bin, File::Spec->updir(), 't', 'data');
 my $test3 = new_ok('Database::test3' => [{
-	directory => "$Bin/../data",
+	directory => $directory,
 	max_slurp_size => 1	# force to not use slurp and therefore to use SQL
 }]);
 

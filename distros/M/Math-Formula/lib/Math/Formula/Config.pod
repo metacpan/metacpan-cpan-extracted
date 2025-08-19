@@ -25,11 +25,11 @@ The following serialization formats are supported:
 
 =over 4
 
-=item * JSON L<Math::Formula::Config::JSON|Math::Formula::Config::JSON>
+=item * JSON via L<Math::Formula::Config::JSON|Math::Formula::Config::JSON>
 
-=item * YAML L<Math::Formula::Config::YAML|Math::Formula::Config::YAML>
+=item * YAML via L<Math::Formula::Config::YAML|Math::Formula::Config::YAML>
 
-=item * INI  L<Math::Formula::Config::INI|Math::Formula::Config::INI>
+=item * INI  via L<Math::Formula::Config::INI|Math::Formula::Config::INI>
 
 =back
 
@@ -113,8 +113,8 @@ Z<>
 
 =head1 SEE ALSO
 
-This module is part of Math-Formula version 0.17,
-built on August 17, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Math-Formula version 0.18,
+built on August 19, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

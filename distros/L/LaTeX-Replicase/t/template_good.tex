@@ -1,0 +1,107 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[papersize={210mm,297mm}, nohead, nofoot, top=10mm, bottom=10mm, outer=10mm, inner=10mm]{geometry}
+
+% \usepackage[T2A]{fontenc}
+% \usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+
+% Useful packages
+\usepackage{amsmath}
+\usepackage{color}
+\usepackage{url}
+
+\title{
+SPECIFY Title ! %%%V: myTitle
+}
+
+\author{ %%%VAR: Authors
+SPECIFY Author(s) !
+%%%END:
+}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+%%%VAR: myAbstract
+SPECIFY Abstract !
+%%%END:
+\end{abstract}
+
+\section{Tables}
+
+\begin{table}[!ht]
+  \caption{ %%%VAR: myCaption
+SPECIFY Caption !
+%%%END:
+}
+  \tabcolsep=2mm 
+  \centering
+  \begin{tabular}[t]{clcrc}
+c0 & c1 & c2 & c3 & c4 \\
+%%%VAR: myTable_array
+%%%SKIP: \\
+%%%SKIP: \hline
+%%%CASE1: \hline
+%%%CASE1: \color{green}
+%%%CASE2: \scriptsize
+%%%CASE3: \footnotesize\color{blue}
+%%%CASE4: \large\color{red}
+\rule{0mm}{1.5em} %%%ADD:
+  SPECIFY VALUE 0! %%%V:0
+
+ & %%%ADD:
+%%%CASE1: \large
+~ %%%CASE5:
+  SPECIFY VALUE 1! %%%V:1
+
+ & %%%ADD:
+%%%CASE1: \multicolumn{2}{c}{
+  SPECIFY VALUE 2! %%%V:2
+
+ & %%%ADD:
+%%%CASE1: \color{green}
+%%%CASE2: \scriptsize
+  SPECIFY VALUE 3! %%%V:3
+
+%%%CASE1: }
+ & %%%ADD:
+  SPECIFY VALUE 4! %%%V:4
+%%%CASE5:\\ \cline{3-4}
+%%%SKIP: ~
+
+%%%END:
+\\
+\hline
+  \end{tabular}
+\end{table}
+
+\begin{center}
+
+\begin{tabbing}
+%%%VAR: myTable_hash
+%%%SKIP: \\
+   SPECIFY VALUE 'A'! %%%V: A
+ \= %%%ADD:
+   SPECIFY VALUE 'B'! %%%V: B
+ \= %%%ADD:
+   SPECIFY VALUE 'C'! %%%V: C
+ \= %%%ADD:
+   SPECIFY VALUE 'D'! %%%V: D
+ \= %%%ADD:
+   SPECIFY VALUE 'E'! %%%V: E
+%%%END:
+\end{tabbing}
+
+\end{center}
+
+SPECIFY NoNameI ! %%%V: NoNameI
+
+\mbox{
+%%%VAR: NoNameII
+SPECIFY VALUE NoNameII !
+%%%END:
+}
+
+\end{document}
+

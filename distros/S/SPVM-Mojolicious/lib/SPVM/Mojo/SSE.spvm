@@ -1,0 +1,86 @@
+# Copyright (c) 2025 Yuki Kimoto
+# MIT License
+
+class Mojo::SSE {
+  version_from Mojolicious;
+  
+  use Mojo::SSE::Event;
+  
+  use Regex;
+  
+  our $SPLIT_RE : string;
+  INIT {
+    $SPLIT_RE = "(?:\x0d\x0a|(?<!\x0d)\x0a|\x0d(?!\x0a))";
+  }
+  
+  static method build_event : string ($event : Mojo::SSE::Event) {
+    
+    my $texts = $event->texts;
+    my $comments = $event->comments;
+    
+    my $parts = StringList->new;
+    if (@$comments) {
+      for my $_ (@$comments) {
+        $parts->push(": $_");
+      }
+    }
+    else {
+      my $type = $event->type;
+      if ($type) {
+        $parts->push("event: $type");
+      }
+      
+      if ($texts) {
+        for my $_ (@$texts) {
+          $parts->push("data: $_");
+        }
+      }
+      
+      my $id = $event->id;
+      
+      if ($id) {
+        $parts->push("id: $id");
+      }
+    }
+    
+    return Fn->join("\x0d\x0a", Array->merge_string($parts->to_array, ["", ""]));
+  }
+  
+  static method parse_event : Mojo::SSE::Event ($buffer_ref : string[]) {
+    
+    my $event = Mojo::SSE::Event->new;
+    $event->set_type("message");
+    $event->set_text("");
+    
+    while (my $_ = Re->s($buffer_ref, ["^(.*?)(?:(?:\x0d\x0a|(?<!\x0d)\x0a|\x0d(?!\x0a)){2})", "s"], "")) {
+      
+      my $match = $_->match;
+      
+      my $lines = $match->cap1;
+      
+      # Skip comments
+      if (Re->m($lines, "^\s*:")) {
+        next;
+      }
+      
+      my $first = 0;
+      for my $line (@{Re->split($SPLIT_RE, $lines)}) {
+        if    (my $match = Re->m($line, "^event(?::\s*(\S.*))?$")) {
+          $event->set_type($match->cap1 // "message");
+        }
+        elsif (my $match = Re->m($line, "^data(?::\s*(.*))?$")) {
+          my $text = $event->text;
+          $event->set_text($text . ($first++ ? "\n" : "") . ($match->cap1 // ""));
+        }
+        elsif (my $match = Re->m($line, "^id(?::\s*(.*))?$")) {
+          $event->set_id($match->cap1);
+        }
+      }
+      
+      return $event;
+    }
+    
+    return undef;
+  }
+  
+}

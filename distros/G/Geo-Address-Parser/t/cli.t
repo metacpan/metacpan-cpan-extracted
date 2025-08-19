@@ -24,7 +24,7 @@ diag("STDERR:\n$err") if $err;
 
 like($out, qr/"city"\s*:\s*"Auckland"/, 'Output includes city');
 like($out, qr/"postcode"\s*:\s*"1010"/, 'Output includes postcode');
-like($out, qr/"street"\s*:\s*"1 Museum Circuit"/, 'Output includes street');
+like($out, qr/"road"\s*:\s*"1 Museum Circuit"/, 'Output includes road');
 like($out, qr/"suburb"\s*:\s*"Parnell"/, 'Output includes suburb');
 like($out, qr/"name"\s*:\s*"Auckland Museum"/, 'Output includes name');
 

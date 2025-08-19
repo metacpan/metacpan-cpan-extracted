@@ -738,6 +738,7 @@ SKIP: {
     eval {
         # This statement will block indefinitely because of the 'FOR UPDATE' clause,
         # so we set up an alarm to cancel it after 2 seconds.
+
         my $sthl = $dbh2->prepare('SELECT * FROM dbd_pg_test WHERE id = ? FOR UPDATE');
         $sthl->{RaiseError} = 1;
 
@@ -752,7 +753,7 @@ SKIP: {
     };
     # restore original signal handler
     POSIX::sigaction(SIGALRM,$oldaction);
-    like ($@, qr/execute failed/, 'cancel');
+    is ($dbh2->state(), '57014', $t);
     $dbh2->disconnect();
 }
 

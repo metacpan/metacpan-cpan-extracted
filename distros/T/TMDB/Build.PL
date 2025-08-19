@@ -40,9 +40,9 @@ my $builder = Module::Build->new(
     meta_merge         => {
         keywords  => [qw(movies movie themoviedb tmdb api metadata imdb)],
         resources => {
-            bugtracker => 'https://github.com/mithun/perl-tmdb/issues',
-            repository => 'git://github.com/mithun/perl-tmdb.git',
-            homepage   => 'https://github.com/mithun/perl-tmdb',
+            bugtracker => 'https://github.com/davorg/perl-tmdb/issues',
+            repository => 'git://github.com/davorg/perl-tmdb.git',
+            homepage   => 'https://github.com/davorg/perl-tmdb',
         },
     },
 );
@@ -57,9 +57,9 @@ warn <<"COMPAT_MSG";
         !! NOTE !!
 
         TMDB-v0.04 and higher uses TheMoviDB API version '/3'. This brings
-        some significant differences both to the API and the interface this module
-        provides, along with updated dependencies for this distribution. If you like to
-        continue to use v2.1 API, you can continue to use
+        some significant differences both to the API and the interface this
+        module provides, along with updated dependencies for this distribution.
+        If you like to continue to use v2.1 API, you can continue to use
         TMDB-0.03x [ https://metacpan.org/release/MITHUN/TMDB-0.03/ ].
 
 COMPAT_MSG

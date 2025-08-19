@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Math-Formula version 0.17.
+# This code is part of Perl distribution Math-Formula version 0.18.
 # The POD got stripped from this file by OODoc version 3.03.
 # For contributors see file ChangeLog.
 
@@ -18,7 +18,7 @@ use strict;
 use v5.16;  # fc
 
 package Math::Formula::Type;{
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 }
 
 use base 'Math::Formula::Token';

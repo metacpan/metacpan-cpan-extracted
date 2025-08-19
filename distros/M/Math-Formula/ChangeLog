@@ -2,11 +2,20 @@
 
 All changes made by Mark Overmeer, unless explicitly stated otherwise.
 
+version 0.18: Tue 19 Aug 11:35:11 CEST 2025
+
+	Fixes:
+	- do not run json tests when Cpanel::JSON::XS is not installed.
+	  rt#168964 [Slaven Rezic]
+
+	Improvements:
+	- minor doc visualization tweeks.
+
 version 0.17: Sun Aug 17 09:13:41 PM CEST 2025
 
 	Fixes:
 	- name as rvalue
-	  [James Wright] rt.cpan.org #168753
+	  rt.cpan.org #168753 [James Wright]
 
 	Improvements:
 	- convert to OODoc 3.02

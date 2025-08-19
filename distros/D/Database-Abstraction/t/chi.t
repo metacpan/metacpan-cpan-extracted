@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use lib 't/lib';
 
+use File::Spec;
 use Test::Most tests => 22;
 use FindBin qw($Bin);
 use Test::Needs 'CHI';
@@ -16,9 +17,10 @@ CHI: {
 	my $cache = CHI->new(driver => 'RawMemory', global => 1);
 	$cache->on_set_error('die');
 	$cache->on_get_error('die');
+	my $directory = File::Spec->catfile($Bin, File::Spec->updir(), 't', 'data');
 	my $test1 = new_ok('Database::test1' => [{
 		cache => $cache,
-		directory => "$Bin/../data",
+		directory => $directory,
 		logger => new_ok('MyLogger'),
 		max_slurp_size => 0,	# force to not use slurp and therefore to use SQL and cache
 	}]);

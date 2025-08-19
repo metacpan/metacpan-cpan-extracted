@@ -9,7 +9,8 @@ use Test::Most tests => 9;
 
 use_ok('Database::test2');
 
-my $test2 = new_ok('Database::test2' => [directory => "$Bin/../data"]);
+my $directory = File::Spec->catfile($Bin, File::Spec->updir(), 't', 'data');
+my $test2 = new_ok('Database::test2' => [directory => $directory]);
 
 cmp_ok($test2->number('third'), 'eq', '3rd', 'PSV AUTOLOAD works found');
 is($test2->number('four'), undef, 'PSV AUTOLOAD works not found');

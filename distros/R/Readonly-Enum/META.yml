@@ -1,32 +1,35 @@
 ---
-abstract: 'enumerated scalar values'
+abstract: 'A Perl module for improving grammar using an external API.'
 author:
-  - 'Robert Rothenberg C<rrwo@cpan.org>.'
-  - 'Robert Rothenberg <rrwo@cpan.org>'
+  - 'Nigel Horne <njh@nigelhorne.com>'
 build_requires:
-  ExtUtils::MakeMaker: 6.59
-  Test::More: 0
+  ExtUtils::MakeMaker: '0'
+  Test::DescribeMe: '0'
+  Test::Most: '0'
+  Test::Needs: '0'
+  Test::Warnings: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.59
-  Module::Install: 0
-distribution_type: module
+  ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
-generated_by: 'Module::Install version 1.06'
-license: artistic2
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
+license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Readonly-Enum
 no_index:
   directory:
-    - inc
     - t
+    - inc
 requires:
-  Scalar::Readonly: 0
-  perl: 5.01
-  version: 0.77
+  Carp: '0'
+  ExtUtils::MakeMaker: '6.64'
+  Scalar::Readonly: '0'
+  perl: '5.010'
+  version: '0.77'
 resources:
-  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Readonly-Enum
-  license: http://www.perlfoundation.org/artistic_license_2_0
-  repository: git://github.com/robrwo/Readonly-Enum.git
-version: 0.001004
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Readonly-Enum
+  homepage: https://metacpan.org/pod/Readonly::Enum
+  repository: git://github.com/nigelhorne/Readonly-Enum.git
+version: v0.1.5
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -1,5 +1,13 @@
 Revision history for Iterator-Flex
 
+0.25      2025-08-18 14:27:59 EDT
+
+  [BUG FIX]
+
+    * Zip claimed it supported rewind, but didn't, resulting in an inscrutable run
+      time error
+
+
 0.24      2025-07-28 13:41:45 EDT
 
   [BUGFIX]

@@ -23,7 +23,9 @@ WriteMakefile(
 	'DEFINE' => '',	# e.g., '-DHAVE_SOMETHING'
 	'INC' => '',	# e.g., '-I/usr/include/other'
 	PL_FILES	=> {},
-	TEST_REQUIRES => {
+	CONFIGURE_REQUIRES => {
+		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
+	}, TEST_REQUIRES => {
 		'DBD::CSV' => 0,
 		'DBD::XMLSimple' => 0.07,
 		'Fcntl' => 0,
@@ -53,7 +55,7 @@ WriteMakefile(
 		'File::pfopen' => 0.03,
 		'File::Temp' => 0,
 		'Log::Abstraction' => 0.24,
-		'Object::Configure' => 0,
+		'Object::Configure' => 0.12,
 		'Params::Get' => 0.13,
 		'Scalar::Util' => 0,
 	}, dist => $dist,

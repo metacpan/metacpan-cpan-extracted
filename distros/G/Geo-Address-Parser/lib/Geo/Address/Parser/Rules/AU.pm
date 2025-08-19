@@ -17,7 +17,7 @@ sub parse_address {
 
 	my @parts = map { s/^\s+|\s+$//gr } split /,/, $text;
 
-	my ($name, $street, $suburb, $state, $postcode);
+	my ($name, $road, $suburb, $state, $postcode);
 
 	# Match state + postcode at end
 	if ($parts[-1] =~ /$state_re\s*$postcode_re/) {
@@ -31,12 +31,12 @@ sub parse_address {
 	}
 
 	$suburb = pop @parts if @parts;
-	$street = pop @parts if @parts;
+	$road = pop @parts if @parts;
 	$name = join(', ', @parts) if @parts;
 
 	return {
 		name => $name,
-		street => $street,
+		road => $road,
 		suburb => $suburb,
 		region => $state,
 		postcode => $postcode,
@@ -53,7 +53,7 @@ Geo::Address::Parser::Rules::AU - Parsing rules for Australian addresses
 
 =head1 DESCRIPTION
 
-Parses a flat Australian address string into components: name, street, suburb, state, postcode.
+Parses a flat Australian address string into components: name, road, suburb, state, postcode.
 
 =head1 EXPORTS
 
@@ -65,7 +65,7 @@ Returns a hashref with keys:
 
 =item * name
 
-=item * street
+=item * road
 
 =item * suburb
 

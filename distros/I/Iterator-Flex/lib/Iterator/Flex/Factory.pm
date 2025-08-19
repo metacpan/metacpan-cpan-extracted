@@ -8,7 +8,7 @@ use warnings;
 
 use experimental qw( signatures declared_refs refaliasing);
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 use Ref::Util        ();
 use Role::Tiny       ();
@@ -396,7 +396,7 @@ Iterator::Flex::Factory - Create on-the-fly Iterator::Flex classes/objects
 
 =head1 VERSION
 
-version 0.24
+version 0.25
 
 =head1 CLASS METHODS
 

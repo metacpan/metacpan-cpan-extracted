@@ -16,7 +16,7 @@ use_ok('Database::test1');
 
 # Test handling of HASH or HASHREF arguments
 {
-	my $directory = File::Spec->catfile($Bin, File::Spec->updir(), 'data');
+	my $directory = File::Spec->catfile($Bin, File::Spec->updir(), 't', 'data');
 
 	my $obj = Database::test1->new({ key1 => 'value1', key2 => 'value2', directory => $directory });
 	is($obj->{key1}, 'value1', 'HASHREF argument unpacked correctly');

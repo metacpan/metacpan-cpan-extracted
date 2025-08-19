@@ -69,7 +69,7 @@
          "web" : "https://github.com/markov2/perl5-Math-Formula"
       }
    },
-   "version" : "0.17",
+   "version" : "0.18",
    "x_oodist" : {
       "email" : "markov@cpan.org",
       "first_year" : 2023,
@@ -87,6 +87,9 @@
             "MF"
          ],
          "syntax" : "markov"
+      },
+      "raw" : {
+         "publish" : "../public_html/math-formula/raw"
       },
       "release" : {
          "publish" : "../public_html/math-formula/source"

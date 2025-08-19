@@ -6,15 +6,18 @@ use FindBin qw($Bin);
 use lib 't/lib';
 use Test::Most tests => 8;
 
+my $directory;
+
 BEGIN {
-	use_ok('Database::Abstraction', 'directory' => "$Bin/../data");
-	# use_ok('Database::Abstraction', { 'directory' => "$Bin/../data" });
+	$directory = File::Spec->catfile($Bin, File::Spec->updir(), 't', 'data');
+	use_ok('Database::Abstraction', 'directory' => $directory);
+	# use_ok('Database::Abstraction', { 'directory' => $directory });
 	use_ok('Database::test1');
 	use_ok('Database::test2');
 }
 
 my $defaults = Database::Abstraction::init();
-cmp_ok($defaults->{'directory'}, 'eq', "$Bin/../data");
+cmp_ok($defaults->{'directory'}, 'eq', $directory);
 
 my $test1 = new_ok('Database::test1');
 my $test2 = new_ok('Database::test2');

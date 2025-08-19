@@ -9,6 +9,7 @@ our %state;
 our %preferences;
 
 use Ref::Util qw( is_hashref is_arrayref );
+use List::Util qw(uniq);
 
 use Exporter 'import';
 our @EXPORT = qw( %state %preferences );
@@ -22,7 +23,6 @@ use ChordPro::Paths;
 use File::Basename qw(basename);
 
 use constant FONTSIZE => 12;
-
 use constant SETTINGS_VERSION => 3;
 
 # Legacy font numbers.
@@ -120,14 +120,21 @@ my %prefs =
    enable_pdfviewer   => undef,
    pdfviewer   => "",
 
-   # Preferences w/o UI.
-   chordproext => ".chordpro",	# for Nick
-   dumpstate => 0,
-   expert => 0,
+   # HTML Viewer.
+   enable_htmlviewer => undef,
 
+   # Insert spec chars.
+   enable_insert_symbols => 0,
+
+   # Preferences w/o UI.
+   chordproext	=> ".chordpro",	# for Nick
+   dumpstate	=> 0,
+   expert	=> 0,
+   advanced	=> 0,
   );
 
 use constant MAXRECENTS => 10;
+my $config_root = "/";
 
 # Establish a connection with the persistent data store.
 
@@ -146,7 +153,8 @@ sub Setup( $class, $options ) {
     }
     elsif ( $^O =~ /^mswin/i ) {
 	$cb = Wx::ConfigBase::Get;
-	$cb->SetPath("/wxchordpro");
+	$config_root = "/wxchordpro";
+	$cb->SetPath($config_root);
     }
     else {
 	my $file;
@@ -172,6 +180,10 @@ sub Setup( $class, $options ) {
 	       '',
 	       wxCONFIG_USE_LOCAL_FILE,
 	     ));
+    }
+
+    unless ( $cb->Exists("preferences") ) { # new
+	$cb->Write("/preferences/settings_version", SETTINGS_VERSION );
     }
 }
 
@@ -201,6 +213,7 @@ method Load :common {
 	       recents => [],
 	     );
 
+    $cb->SetPath($config_root);
     my ( $ggoon, $group, $gindex ) = $cb->GetFirstGroup;
     my %pp = $ggoon ? %prefs : ();
     while ( $ggoon ) {
@@ -280,15 +293,14 @@ method Load :common {
     }
     delete $ENV{CHORDPRO_LIB};
 
-    if ( $preferences{settings_version}||1 < SETTINGS_VERSION ) {
+    if ( $preferences{settings_version} < SETTINGS_VERSION ) {
 	for ( qw( windows sash ) ) {
 	    delete $state{$_};
 	    $cb->DeleteGroup($_);
 	}
-	if ( $preferences{pdfviewer} ) {
-	    $preferences{enable_pdfviewer} //= 1;
-	}
     }
+    $preferences{enable_pdfviewer} //= 0;
+    $preferences{enable_htmlviewer} //= 0;
     $cb->Flush;
 
     # Collect from the environment.
@@ -298,10 +310,7 @@ method Load :common {
     setup_tasks();
 
     # For convenience.
-    my @ext = qw( cho crd chopro chord chordpro pro );
-    my $lst = "*." . join(",*.",@ext);
-    $state{ffilters} = "ChordPro files ($lst)|" . $lst =~ s/,/;/gr .
-      (is_macos ? ";*.txt" : "|All files|*.*");
+    setup_filters();
 
     if ( $preferences{dumpstate} ) {
 	use DDP; p %state;
@@ -312,8 +321,10 @@ method Load :common {
 
 method Store :common {
 
-    my $cp = $cb->GetPath;
+    my $cp = $config_root;
     $preferences{settings_version} = SETTINGS_VERSION;
+    $cb->DeleteAll;
+    $cb->SetPath($cp);
 
     while ( my ( $group, $v ) = each %state ) {
 
@@ -325,7 +336,7 @@ method Store :common {
 
 	# Re-write the recents. Array.
 	if ( $group eq "recents" && is_arrayref($v) ) {
-	    $cb->DeleteGroup($group);
+	    # $cb->DeleteGroup($group);
 	    $cb->SetPath($group);
 	    for ( my $i = 0; $i < @$v; $i++ ) {
 		last if $i >= MAXRECENTS;
@@ -357,7 +368,7 @@ method Store :common {
 	    }
 	    else {
 		warn("Preferences: Undefined value for $k\n");
-		$cb->DeleteEntry($k);
+		# $cb->DeleteEntry($k);
 	    }
 	}
     }
@@ -458,6 +469,15 @@ sub setup_tasks {
 	}
     }
     $state{tasks} = \@tasks;
+}
+
+sub setup_filters() {
+    my $lst = "*." .
+      join( ",*.",
+	    uniq( substr($preferences{chordproext},1),
+		  qw( cho crd chopro chord chordpro pro ) ) );
+    $state{ffilters} = "ChordPro files ($lst)|" . $lst =~ s/,/;/gr .
+      (is_macos ? ";*.txt" : "|All files|*.*");
 }
 
 1;

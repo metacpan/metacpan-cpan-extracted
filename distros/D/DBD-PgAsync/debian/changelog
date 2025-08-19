@@ -1,3 +1,13 @@
+libdbd-pg-async-perl (0.8) unstable; urgency=medium
+
+  * support asychronous ping
+  * support asychronous deallocation of prepared statements
+  * make pg_use_async work as intended for statements prepared with
+    pg_use_async off and executed with pg_use_async on
+  * never use PQexec for an already prepared statement
+
+ -- Rainer Weikusat <rweikusat@talktalk.net>  Mon, 18 Aug 2025 16:54:18 +0100
+
 libdbd-pg-async-perl (0.7.2) unstable; urgency=medium
 
   * fixed a bug in dbd_st_execute which prevented an already prepared

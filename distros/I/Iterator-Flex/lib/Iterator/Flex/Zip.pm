@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use experimental 'signatures', 'declared_refs';
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 use Iterator::Flex::Factory;
 use Iterator::Flex::Utils qw[ THROW STATE EXHAUSTION :IterAttrs :IterStates ];
@@ -208,6 +208,7 @@ sub construct ( $class, $state ) {
         },
 
         ( +RESET )    => sub { @value = () },
+        ( +REWIND )   => sub { @value = () },
         ( +_DEPENDS ) => \@iterators,
     );
 
@@ -380,7 +381,7 @@ Iterator::Flex::Zip - Zip Iterator Class
 
 =head1 VERSION
 
-version 0.24
+version 0.25
 
 =head1 METHODS
 

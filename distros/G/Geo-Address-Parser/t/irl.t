@@ -12,7 +12,7 @@ my @tests = (
 		input => '123 Main Street, Dublin 2, D02 Y006, Ireland',
 		expect => {
 			name => undef,
-			street => '123 Main Street',
+			road => '123 Main Street',
 			city => 'Dublin 2',
 			region => undef,
 			postal_code => 'D02 Y006',
@@ -23,7 +23,7 @@ my @tests = (
 		expect => {
 			name => 'The Mill House',
 			city => 'Ballynahinch',
-			street => undef,
+			road => undef,
 			region => 'Galway',
 			postal_code => undef,
 			country => 'Ireland',
@@ -32,7 +32,7 @@ my @tests = (
 		input => "45 O'Connell Road, Limerick, Co. Limerick",
 		expect => {
 			name => undef,
-			street => "45 O'Connell Road",
+			road => "45 O'Connell Road",
 			city => 'Limerick',
 			region => 'Limerick',
 			postal_code => undef,
@@ -42,7 +42,7 @@ my @tests = (
 		input => '12 High Street, Dublin 8, Ireland',
 		expect => {
 			name => undef,
-			street => '12 High Street',
+			road => '12 High Street',
 			city => 'Dublin 8',
 			region => undef,
 			postal_code => undef,
@@ -56,7 +56,7 @@ foreach my $t (@tests) {
 
 	cmp_deeply($parsed, $t->{expect}, "$t->{input} parsed correctly");
 
-	foreach my $field (qw(name street city region postal_code country)) {
+	foreach my $field (qw(name road city region postal_code country)) {
 		is(
 			(defined $parsed->{$field} ? $parsed->{$field} : undef),
 			(defined $t->{expect}{$field} ? $t->{expect}{$field} : undef),

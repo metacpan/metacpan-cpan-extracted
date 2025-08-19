@@ -15,7 +15,6 @@ use ChordPro::Paths;
 use ChordPro::Wx::Config;
 use ChordPro::Wx::Utils;
 use File::Basename;
-use File::Spec;
 
 BUILD ( $parent, $id, $title ) {
     $self->refresh;
@@ -24,6 +23,8 @@ BUILD ( $parent, $id, $title ) {
     Wx::Event::EVT_SYS_COLOUR_CHANGED( $self,
 				       $self->can("OnSysColourChanged") );
     # Do not DeletePage until we're sure none of the widgets are referenced.
+    $self->{nb_preferences}->RemovePage(5)
+      unless $preferences{expert};
     $self->{nb_preferences}->RemovePage(4)
       unless $preferences{pdfviewer};
 
@@ -133,6 +134,9 @@ method fetch_prefs() {
     $self->{fp_tmplfile}->SetPath($preferences{tmplfile})
       if $preferences{tmplfile};
 
+    # Preferred filename extension.
+    $self->{t_prefext}->SetValue( $preferences{chordproext} );
+
     # Editor.
     $self->{fp_editor}->SetSelectedFont( Wx::Font->new($preferences{editfont}) );
     $self->prefs2colours;
@@ -183,6 +187,9 @@ method fetch_prefs() {
       if $preferences{pdfviewer};
     $self->{t_pdfviewer}->Enable($self->{cb_pdfviewer}->IsChecked);
 
+    # HTML Viewer.
+    $self->{cb_htmlviewer}->SetValue($preferences{enable_htmlviewer});
+
     $self->enablecustom;
     $state{_prefs} = clone(\%preferences);
 
@@ -225,6 +232,9 @@ method store_prefs() {
     # New song template.
     $preferences{enable_tmplfile} = $self->{cb_tmplfile}->IsChecked;
     $preferences{tmplfile}        = $self->{fp_tmplfile}->GetPath;
+
+    # Preferred filename extension.
+    $preferences{chordproext} = $self->{t_prefext}->GetValue;
 
     # Editor.
     $preferences{editfont} = $self->{fp_editor}->GetSelectedFont->GetNativeFontInfoDesc;
@@ -270,6 +280,9 @@ method store_prefs() {
     # PDF Viewer.
     $preferences{enable_pdfviewer} = $self->{cb_pdfviewer}->IsChecked;
     $preferences{pdfviewer} = $self->{t_pdfviewer}->GetValue;
+
+    # HTML Viewer.
+    $preferences{enable_htmlviewer} = $self->{cb_htmlviewer}->IsChecked;
 
     # use DDP; p %preferences, as => "Stored";
 }
@@ -402,12 +415,12 @@ method _OnCreateConfig( $event, $fn = undef ) {
 	$fd->Destroy;
     }
     use File::Copy;
-    my $cfg = File::Spec->catfile( CP->findresdirs("config")->[-1],
-				   $state{expert}
-				   ? "chordpro.json"
-				   : "config.tmpl" );
+    my $cfg = fn_catfile( CP->findresdirs("config")->[-1],
+			  $state{expert}
+			  ? "chordpro.json"
+			  : "config.tmpl" );
     if ( fs_copy( $cfg, $fn ) ) {
-	$self->{fp_customconfig}->SetPath( File::Spec->rel2abs($fn) );
+	$self->{fp_customconfig}->SetPath( fn_rel2abs($fn) );
     }
     else {
 	my $md = Wx::MessageDialog->new
@@ -457,6 +470,14 @@ method OnSkipStdCfg($event) {
 
 method OnPresets($event) {
     $self->{ch_presets}->Enable( $self->{cb_presets}->GetValue );
+    $event->Skip;
+}
+
+method OnPrefExtChanged($event) {
+    $preferences{chordproext} = $self->{t_prefext}->GetValue;
+    $preferences{chordproext} =~ s;^\.*(\w+)?$;sprintf(".%s",$1//substr($state{_prefs}{chordproext},1));e
+      && $self->{t_prefext}->ChangeValue($preferences{chordproext});
+    ChordPro::Wx::Config::setup_filters();
     $event->Skip;
 }
 
@@ -597,6 +618,8 @@ method OnMessagesFontPickerChanged($event) {
 
 method OnPDFViewer($event) {
     $self->{t_pdfviewer}->Enable( $self->{cb_pdfviewer}->GetValue );
+}
+method OnHTMLViewer($event) {
 }
 
 # System

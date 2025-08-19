@@ -75,7 +75,7 @@ sub dbh_connect
                                 AutoCommit => 0,
                                 RaiseError => 1,
                                 pg_server_prepare => 1,
-                                pg_async_connect => 1});
+                                pg_use_async => 1});
     $dbh->{ReadOnly} = 1;
 
     do {
@@ -97,8 +97,7 @@ sub dbh_connect
     DBI->trace(15);
     $dbh = dbh_connect('../../pg-conn');
     
-#    $sth = $dbh->prepare('select cmd, whatis from whatis where section = ? order by cmd', { pg_async => 1, pg_prepare_now => 1 });
-    $sth = $dbh->prepare('select pg_sleep(?)', { pg_async => 1, pg_prepare_now => 1 });
+    $sth = $dbh->prepare('select pg_sleep(?)', { pg_prepare_now => 1 });
     $sth->execute(10);
     $dbh->pg_cancel();
     wait_for_query($dbh);

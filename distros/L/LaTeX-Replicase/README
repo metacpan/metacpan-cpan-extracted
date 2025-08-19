@@ -1,0 +1,42 @@
+LaTeX-Replicase version 0.03
+============================
+
+The module provides the necessary subroutines to generate 
+Russian wording of numerals from numerical values (unsigned integer and 0).
+The methods implemented in this module, are all 
+focused on knowledge of Russian grammar.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+or
+   sudo make install
+
+If you have root on a Unix system it is enough to run this command:
+
+   cpan LaTeX::Replicase
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Test::More
+Test::More::UTF8
+Test::Pod
+File::Basename
+File::Path
+Digest::MD5
+Carp
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2025 by Alessandro Gorohovski
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.

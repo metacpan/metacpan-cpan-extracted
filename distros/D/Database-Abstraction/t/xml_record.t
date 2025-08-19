@@ -8,7 +8,8 @@ use Test::Most tests => 2;
 
 use_ok('Database::test6');
 
-my $test6 = new_ok('Database::test6' => [directory => "$Bin/../data"]);
+my $directory = File::Spec->catfile($Bin, File::Spec->updir(), 't', 'data');
+my $test6 = new_ok('Database::test6' => [directory => $directory]);
 
 my @foo = $test6->selectall_hashref();
 

@@ -21,7 +21,7 @@ Math::Formula::Config::JSON - load/save formulas to file
 
 Save and load a L<Math::Formula::Context|Math::Formula::Context> to JSON files.
 
-You need to have installed B<Cpanel::JSON::XS>.  That module is not in the
+You need to B<have installed Cpanel::JSON::XS>.  That module is not in the
 dependencies of this packages, because we do not want to add complications
 to the main code.
 
@@ -101,29 +101,29 @@ Save under a different filename than derived from the name of the context.
 =head1 DETAILS
 
 JSON seems to be everyone's favorite serialization syntax, nowadays.  It natively
-supports integers, floats, booleans, and strings.  Formulas get a leading '='
-(not yet configurable).
+supports integers, floats, booleans, and strings.  Formulas get a leading C<=>
+(not configurable (yet)).
 
 B<. Example>
 
-{
-  "created" : "2023-02-28T16:30:27+0000",
-  "formulas" : {
-     "expr1" : "=1 + 2 * 3",
-     "expr2" : "=\"abc\".size + 3k; returns='MF::INTEGER'",
-     "fakes" : false,
-     "float" : 3.14,
-     "int" : 42,
-     "longer" : "abc def yes no",
-     "no_quotes" : "abc",
-     "some_truth" : true,
-     "string" : "true"
-  },
-  "mf_version" : "",
-  "name" : "test",
-  "updated" : "2023-02-28T16:30:27+0000",
-  "version" : 1.0
-}
+  {
+    "created" : "2023-02-28T16:30:27+0000",
+    "formulas" : {
+       "expr1" : "=1 + 2 * 3",
+       "expr2" : "=\"abc\".size + 3k; returns='MF::INTEGER'",
+       "fakes" : false,
+       "float" : 3.14,
+       "int" : 42,
+       "longer" : "abc def yes no",
+       "no_quotes" : "abc",
+       "some_truth" : true,
+       "string" : "true"
+    },
+    "mf_version" : "",
+    "name" : "test",
+    "updated" : "2023-02-28T16:30:27+0000",
+    "version" : 1.0
+  }
 
 =head1 DIAGNOSTICS
 
@@ -153,8 +153,8 @@ Z<>
 
 =head1 SEE ALSO
 
-This module is part of Math-Formula version 0.17,
-built on August 17, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Math-Formula version 0.18,
+built on August 19, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

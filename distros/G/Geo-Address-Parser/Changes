@@ -1,6 +1,10 @@
 Revision history for Geo-Address-Parser
 
-0.05
+0.06	Mon Aug 18 11:36:54 EDT 2025
+	US rule now says state not region
+	Changed 'street' to 'road' for greater compatibility with Geo::Coder::Free
+
+0.05	Mon Aug 16 11:34:44 EDT 2025
 	Allow GB as a synonym for UK
 	Refactored the UK rules
 	Added Geo::Address::Parser::Rules::IRL for Irish addresses

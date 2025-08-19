@@ -16,7 +16,6 @@ use feature qw( signatures );
 no warnings "experimental::signatures";
 use utf8;
 use Carp;
-use File::Spec;
 use File::Temp ();
 use File::LoadLines;
 use feature 'state';
@@ -72,7 +71,7 @@ sub abc2svg( $song, %args ) {
     }
 
     state $td = File::Temp::tempdir( CLEANUP => !$config->{debug}->{abc} );
-    my $cfg = $config->{delegates}->{abc};
+    my $cfg = { %{$config->{delegates}->{abc} } };
 
     # External tools usually process a default.abc.
     warn("ABC: Using config \"default.abc\".\n")
@@ -83,10 +82,10 @@ sub abc2svg( $song, %args ) {
     # Prepare names for temporary files.
     state $imgcnt = 0;
     $imgcnt++;
-    my $src  = File::Spec->catfile( $td, "tmp${imgcnt}.abc" );
-    my $svg  = File::Spec->catfile( $td, "tmp${imgcnt}.svg" );
-    my $out  = File::Spec->catfile( $td, "tmp${imgcnt}.out" );
-    my $err  = File::Spec->catfile( $td, "tmp${imgcnt}.err" );
+    my $src  = fn_catfile( $td, "tmp${imgcnt}.abc" );
+    my $svg  = fn_catfile( $td, "tmp${imgcnt}.svg" );
+    my $out  = fn_catfile( $td, "tmp${imgcnt}.out" );
+    my $err  = fn_catfile( $td, "tmp${imgcnt}.err" );
 
     # Get rid of as much space as possible.
     # Jean-François Moine:
@@ -106,7 +105,7 @@ sub abc2svg( $song, %args ) {
 	"%%stretchlast 0",
 	"%%trimsvg 1",
 	"%%staffsep 0",
-	@{ $cfg->{preamble} } );
+	@{ $cfg->{preamble}//[] } );
 
     for ( keys(%{$elt->{opts}}) ) {
 
@@ -159,6 +158,10 @@ sub abc2svg( $song, %args ) {
     }
     for ( @data ) {
 	$prep->{abc}->($_) if $prep->{abc};
+	print $fd $_, "\n";
+	warn($_, "\n") if DEBUG > 1;
+    }
+    for ( @{ $cfg->{postamble}//[] } ) {
 	print $fd $_, "\n";
 	warn($_, "\n") if DEBUG > 1;
     }

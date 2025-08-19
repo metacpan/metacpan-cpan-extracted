@@ -101,9 +101,10 @@ Save under a different filename than derived from the name of the context.
 
 =head1 DETAILS
 
-According to L<https://en.wikipedia.org/wiki/INI_file>, INI files only support strings
-and numbers.  To stay as close as possible to that description, everything else is
-put between double quotes (also the booleans).
+L<According to Wikipedia|https://en.wikipedia.org/wiki/INI_file>, INI files only
+support strings and numbers.  To stay as close as possible to that
+description, everything else is put between double quotes (also the
+booleans).
 
 Only the quoted data may contain attributes.
 
@@ -143,8 +144,8 @@ Z<>
 
 =head1 SEE ALSO
 
-This module is part of Math-Formula version 0.17,
-built on August 17, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Math-Formula version 0.18,
+built on August 19, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

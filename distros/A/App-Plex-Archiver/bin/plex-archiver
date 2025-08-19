@@ -1,0 +1,274 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use v5.10;
+use Getopt::Long qw( :config no_ignore_case bundling );
+use Pod::Usage;
+use File::Path qw( make_path );
+use File::Spec qw( catfile );
+use File::HomeDir;
+use File::Find;
+use TMDB;
+use Data::Dumper;
+use App::Plex::Archiver qw( title_from_filename copy_file get_tmbd_api_key get_tmdb_info );
+
+
+use Readonly;
+use IO::Prompter;
+
+Readonly my %MEDIA_EXT => map { $_ => 1 } qw( mp4 avi mkv mov );
+
+
+sub ask_yes_or_no { prompt(-yn, @_); }  ## no critic (Subroutines::RequireArgUnpacking)
+sub get_input     { prompt((shift // ""), -prefill => (shift // "")); }
+
+
+
+
+
+
+
+
+
+
+#------------------------------------------------------------------------------
+# MAIN
+#------------------------------------------------------------------------------
+
+#----------------------------
+# Command line options
+#----------------------------
+my $source_dir;
+my $destination_dir;
+my $help    = 0;
+my $man     = 0;
+my $debug   = 0;
+my $move    = 0;
+my $dry_run = 0;
+my $api_key_filename = "";
+
+GetOptions(
+    'source-dir|s=s'    => \$source_dir,
+    'destination-d|d=s' => \$destination_dir,
+    'help|h|?'          => \$help,
+    'move|M+'           => \$move,
+    'man|m'             => \$man,
+    'debug|D+'          => \$debug,
+    'dry-run|n+'        => \$dry_run,
+    'api-key|a=s'
+) or pod2usage(2);
+
+print("Debug level is '$debug'\n") if ($debug);
+
+pod2usage(1) if $help;
+pod2usage(-exitval => 0, -verbose => 2) if $man;
+
+#----------------------------
+# Make sure directories exist
+#----------------------------
+
+unless ($source_dir && $destination_dir) {
+    print("Error: Both --source-dir and --destination-dir are required.\n\n");
+    pod2usage(1);
+}
+
+unless (-d "$source_dir") {
+  print("Error: '$source_dir' must be an existing directory.\n\n");
+  pod2usage(1);
+}
+
+unless (-d "$destination_dir") {
+  my $create_dest = ask_yes_or_no("Destination directory '$destination_dir' does not exist. Do you wish to create it? ");
+  if ($create_dest) {
+    printf("Creating desitnation directory '%s'...", $destination_dir);
+    if ($dry_run) {
+      say " SKIPPED [DRY RUN]";
+    } else {
+      eval {
+        make_path($destination_dir);
+      };
+      die("Failed to create path '$destination_dir': $@") if ($@);
+      say " DONE!";
+    }
+  }
+}
+
+#----------------------------
+# Prepare for TMDB queries
+#----------------------------
+my ($error, $tmdb_api_key) = get_tmbd_api_key($api_key_filename, $debug);
+
+if ($error) {
+  print("Error: $error\n");
+  pod2usage(1);
+}
+
+my $tmdb;
+eval {
+  $tmdb = TMDB->new(
+    apikey => $tmdb_api_key,
+    lang   => "en",
+    debug => ($debug >= 2),
+  );
+};
+die("Failed to create TMDB object: $@") if ($@);
+
+#----------------------------
+# Iterate through files
+#----------------------------
+# First, open the source directory
+opendir(my $source_dh, $source_dir) or die "Cannot open directory '$source_dir': $!\n";
+
+if ($debug) {
+  printf(
+    "\nLooking for files with the following extensions: '%s'\n",
+    join("', '", sort(keys(%MEDIA_EXT))),
+  );
+}
+
+my @matched;
+find(
+    sub {
+        return unless -f $_;               # files only
+        return unless /\.(\w+)$/;          # capture extension
+        my $ext = lc $1;                   # normalise case
+        push @matched, $File::Find::name if $MEDIA_EXT{$ext};
+    },
+    $source_dir                                     # start directory (current dir)
+);
+
+
+# Loop through each entry in the directory
+SOURCE_LOOP: for my $entry (sort { lc($a) cmp lc($b) } @matched) {
+  # Extract just the filename
+  $entry =~ m{(?:\\|/)? (?<filename>[^\\/]+)$}x;
+  my $short_name = $+{filename};
+  $short_name =~ /\.(?<ext>\w+)$/;
+  my $ext  = $+{ext};
+
+  # Process the file
+  print("Processing media file '$short_name'\n");
+
+  my $title = get_input("Movie title: ", title_from_filename($entry));
+
+  print("Movie title is '$title'\n") if ($debug);
+
+  my $new_name = $title;
+  my ($tmdb_id, $release_year) = get_tmdb_info($tmdb, $title, $debug);
+  if ($tmdb_id) {
+    if ($release_year) {
+      $new_name .= " ($release_year)";
+    }
+    $new_name .= " {tmdb-$tmdb_id}";
+  }
+  my $new_dest_dir = File::Spec->catdir($destination_dir, $new_name);
+  my $new_filename = $new_name . '.' . $ext;
+  my $new_dest_filename = File::Spec->catfile($new_dest_dir, $new_filename);
+
+
+  # Make the new destination directory
+  if ($dry_run) {
+    say "DRY RUN: Make directory '$new_dest_dir'";
+  } else {
+    eval {
+      make_path($new_dest_dir);
+    };
+    die("Failed to create path '$new_dest_dir': $@") if ($@);
+  }
+
+  my $action = ($move ? "Moving" : "Copying");
+  printf("%s original file '%s' to '%s'...", $action, $entry, $new_dest_filename);
+  if ($dry_run) {
+    say " SKIPPED [DRY RUN]";
+  } else {
+    copy_file($entry, $new_dest_filename, $move);
+    say " DONE!";
+  }
+}
+
+exit(1);
+
+__END__
+
+# Script Documentation
+
+#
+# --- Script Documentation (POD) ---
+#
+# This documentation provides the content for the --help and --man options.
+#
+
+=head1 NAME
+
+plex-archiver - A script to archive Plex media files.
+
+=head1 SYNOPSIS
+
+plex-archiver --source-dir /path/to/plex/media --destination-dir /path/to/archive [options]
+
+ Options:
+   --source-dir      The directory containing the Plex media to be archived.
+   --destination-dir The directory where the media will be archived.
+   --move            Move files (delete source after copy).
+   --api-key         TMDB API key filename.
+   --dry-run         Dry run; do not make any changes.
+   --help            Show this help message.
+   --man             Display the full documentation.
+
+=head1 DESCRIPTION
+
+B<plex-archiver> is a command-line tool designed to facilitate the archiving of media files from a Plex Media Server. The script identifies media files within a specified source directory and moves them to a designated archive location. This is particularly useful for managing storage space by moving older or less frequently accessed media to a secondary storage device.
+
+The core functionality will involve scanning the source directory, identifying files that meet certain criteria (to be implemented), and then safely transferring them to the destination directory.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--api-key> I<API_KEY_FILENAME>
+
+Specifies the file that contains the TMDB API key to use for retrieving details from the TMDB API.
+
+=item B<--move>
+
+Specifies if the files should be moved to the new destination. This deletes the files from the source
+directory after copying to the new destination.
+
+=item B<--dry-run>
+
+Say waht would happen without creating directories or copying / moving files.
+
+=item B<--source-dir>
+
+Specifies the full path to the directory containing the Plex media files that are candidates for archiving. This is a mandatory option.
+
+=item B<--destination-dir>
+
+Specifies the full path to the directory where the selected media files will be moved. This is a mandatory option.
+
+=item B<--help>
+
+Prints a brief help message summarizing the command-line options and exits.
+
+=item B<--man>
+
+Displays the complete manual page for the script, providing detailed information about its usage, description, and options.
+
+=back
+
+=head1 EXAMPLES
+
+=over 4
+
+=item To archive media from '/movies' to '/plex-media/movies':
+
+  plex-archiver --source-dir /movies --destination-dir /plex-media/movies
+
+=item To archive media from '/movies' to '/plex-media/movies' and deleting:
+
+  plex-archiver --move --source-dir /movies --destination-dir /plex-media/movies
+
+=back
+
+=cut

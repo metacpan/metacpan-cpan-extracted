@@ -5,7 +5,7 @@ package Iterator::Flex::Role::Exhaustion::Throw;
 use strict;
 use warnings;
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 use Ref::Util;
 use Iterator::Flex::Utils qw( :default REG_GENERAL REG_GP_EXHAUSTION );
@@ -61,7 +61,7 @@ Iterator::Flex::Role::Exhaustion::Throw - signal exhaustion by setting exhausted
 
 =head1 VERSION
 
-version 0.24
+version 0.25
 
 =head1 METHODS
 

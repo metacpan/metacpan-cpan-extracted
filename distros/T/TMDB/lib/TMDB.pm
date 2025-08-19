@@ -10,7 +10,7 @@ use Carp qw(croak carp);
 #######################
 # VERSION
 #######################
-our $VERSION = '1.2.2';
+our $VERSION = '1.2.3';
 
 #######################
 # LOAD CPAN MODULES
@@ -478,9 +478,11 @@ L<https://github.com/mithun/perl-tmdb/issues>
 
 Mithun Ayachit C<mithun@cpan.org>
 
+Recent updates by Dave Cross C<dave@perlhacks.com>
+
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2015, Mithun Ayachit. All rights reserved.
+Copyright (c) 2015-2025, Mithun Ayachit. All rights reserved.
 
 This module is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself. See L<perlartistic>.

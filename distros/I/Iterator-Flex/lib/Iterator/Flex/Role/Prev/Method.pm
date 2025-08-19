@@ -5,7 +5,7 @@ package Iterator::Flex::Role::Prev::Method;
 use strict;
 use warnings;
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 use Role::Tiny;
 
@@ -49,7 +49,7 @@ Iterator::Flex::Role::Prev::Method - Implement C<prev> as a method
 
 =head1 VERSION
 
-version 0.24
+version 0.25
 
 =head1 METHODS
 

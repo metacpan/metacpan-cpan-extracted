@@ -166,6 +166,6 @@ OcToolkit is a robust and flexible Perl-based alternative to Helm, offering temp
 
 If you're familiar with Helm but prefer a Perl-centric, highly customizable tool, this could be a great fit.
 
-# AUTHOR
+# AUTHOR(S)
 
-John Summers <devp2000a@gmail.com>
+Open Cloud Toolkit(ocToolkit) team <devp2000a@gmail.com>

@@ -17,7 +17,7 @@ sub parse_address {
 
     my @parts = map { s/^\s+|\s+$//gr } split /,/, $text;
 
-    my ($name, $street, $city, $province, $postal);
+    my ($name, $road, $city, $province, $postal);
 
     # Check for province + postal code in last part
     if ($parts[-1] =~ /$province_re\s*$postal_re/) {
@@ -32,12 +32,12 @@ sub parse_address {
     }
 
     $city   = pop @parts if @parts;
-    $street = pop @parts if @parts;
+    $road = pop @parts if @parts;
     $name   = join(', ', @parts) if @parts;
 
     return {
         name     => $name,
-        street   => $street,
+        road   => $road,
         city     => $city,
         region   => $province,
         postcode => $postal,
@@ -54,7 +54,7 @@ Geo::Address::Parser::Rules::CA - Parsing rules for Canadian addresses
 
 =head1 DESCRIPTION
 
-Parses a flat Canadian address string into components: name, street, city, province, postal code.
+Parses a flat Canadian address string into components: name, road, city, province, postal code.
 
 =head1 EXPORTS
 
@@ -66,7 +66,7 @@ Returns a hashref with keys:
 
 =item * name
 
-=item * street
+=item * road
 
 =item * city
 

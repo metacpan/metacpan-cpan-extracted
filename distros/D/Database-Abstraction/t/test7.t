@@ -10,7 +10,8 @@ use Test::Most tests => 4;
 
 use_ok('Database::test7');
 
-my $test7 = new_ok('Database::test7' => [directory => "$Bin/../data"]);
+my $directory = File::Spec->catfile($Bin, File::Spec->updir(), 't', 'data');
+my $test7 = new_ok('Database::test7' => [directory => $directory]);
 
 my @sections = $test7->section({ entry => 'A7' });
 if($ENV{'TEST_VERBOSE'}) {

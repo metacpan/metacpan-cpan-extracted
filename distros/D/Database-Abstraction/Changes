@@ -1,5 +1,13 @@
 Revision history for Database-Abstraction
 
+0.29	Mon Aug 18 21:42:25 EDT 2025
+	Moved the test data from data to t/data
+	Fixed wildcard usage determination
+	Optimise SQLite Pragmas
+	Removed data copy when slurping XML with no_entry set
+	Selectall_hashref - remove data copy
+	Reduce chance of cache key name clash
+
 0.28	Wed Aug  6 19:46:59 EDT 2025
 	Added the import method
 	Fix determination of BerkeleyDB

@@ -18,7 +18,7 @@ if (! $dbh) {
     plan skip_all => 'Connection to database failed, cannot continue testing';
 }
 
-plan tests => 79;
+plan tests => 96;
 
 isnt ($dbh, undef, 'Connect to database for async testing');
 
@@ -236,7 +236,7 @@ SKIP: {
     $t=q{Database method pg_result returns 0 after query was cancelled};
     $dbh->pg_cancel();
     $res = $dbh->pg_result();
-    is (0+$res, 0, $t);
+    ok (defined($res) && (0 + $res == 0), $t);
 } ## end of pg_sleep skip
 
 $t=q{Method execute() works when prepare has PG_ASYNC flag};
@@ -492,11 +492,153 @@ is ($res, 2, $t);
     is (scalar(@b), 0, $t);
 
     $$dbh{pg_use_async} = 0;
+    $$dbh{AutoCommit} = 1;
 
     #
     # no tests for async release as that 100% the same code
     # as rollback_to
     #
+}
+
+{
+    my $rc;
+
+    $$dbh{pg_use_async} = 1;
+    $$dbh{AutoCommit} = 0;
+
+    $dbh->do('select 123');
+
+    $t=q{pg_ping returns 2 when async query is active};
+    is ($dbh->pg_ping(), 2, $t);
+
+    $dbh->pg_result();
+
+    $t=q{Dbh async status is 1 after async ping};
+    $rc = $dbh->pg_ping();
+    is ($$dbh{pg_async_status}, 1, $t);
+
+    $t=q{Async pg_ping returned 1};
+    is ($rc, 1, $t);
+
+    $t=q{Database method pg_result works after async ping};
+    eval {
+        $rc = $dbh->pg_result();
+    };
+    is ($@, q{}, $t);
+
+    $t=q{Async ping result is 3 when idle in txn};
+    is ($rc, 3, $t);
+
+    $$dbh{pg_use_async} = 0;
+    $$dbh{AutoCommit} = 1;
+}
+
+{
+    $t=q{Sychronous rollback on disconnect even if async mode is enabled};
+
+    my ($dbh2, $dbh3, $rc);
+
+    $dbh2 = $dbh->clone();
+    $dbh3 = $dbh2->clone();
+
+    $dbh2->do('create table t (x int)');
+
+    $$dbh3{AutoCommit} = 0;
+    $dbh3->do('insert into t (x) values (1)');
+
+    $$dbh3{pg_use_async} = 0;
+    $dbh3->disconnect();
+
+    $rc = $dbh2->do('select * from t');
+    is (0 + $rc, 0, $t);
+}
+
+{
+    $t=q{pg_ready works without prep statements};
+    $$dbh{pg_use_async} = 1;
+    my $sth = $dbh->prepare('select 123');
+    $sth->execute();
+    1 until $dbh->pg_ready();
+    my $rows = $dbh->pg_result();
+    is ($rows, 1, $t);
+
+    my $row = $sth->fetchrow_arrayref();
+    is_deeply ($row, ['123'], $t);
+
+    $$dbh{pg_use_async} = 0;
+}
+
+{
+    $t=q{pg_ready works with prep statements};
+    $$dbh{pg_use_async} = 1;
+    $$dbh{AutoCommit} = 0;
+    $$dbh{ReadOnly} = 1;
+
+    my $sth = $dbh->prepare('select 123');
+    $sth->execute();
+    1 until $dbh->pg_ready();
+    my $rows = $dbh->pg_result();
+    is ($rows, 1, $t);
+
+    my $row = $sth->fetchrow_arrayref();
+    is_deeply ($row, ['123'], $t);
+
+    $$dbh{pg_use_async} = 0;
+    $$dbh{ReadOnly} = 0;
+    $$dbh{AutoCommit} = 1;
+}
+
+{
+    #
+    # test async execute of non-async statements when pg_use_async is true
+    #
+
+    my $sth = $dbh->prepare('select 123');
+
+    $$dbh{pg_use_async} = 1;
+    $sth->execute();
+    is($$sth{pg_async_status}, 1, 'sth async status is 1 after execute when use_async was set');
+    is($$dbh{pg_async_status}, 1, 'dbh async status is 1 after execute when use_async was set');
+
+    eval {
+        $dbh->pg_ready();
+    };
+    is ($@, q{}, 'Database method pg_ready works after execute when use_async was set');
+
+    eval {
+        $dbh->pg_result();
+    };
+    is ($@, q{}, 'Database method pg_result works after execute when use_async was set');
+
+    $$dbh{pg_use_async} = 0;
+}
+
+{
+    my $sth1 = $dbh->prepare('select name from pg_prepared_statements', { pg_prepare_now => 1 });
+    my $sth2 = $dbh->prepare('select statement from pg_prepared_statements', { pg_prepare_now => 1 });
+    my $sth3 = $dbh->prepare('select count(*) from pg_prepared_statements', { pg_prepare_now => 1 });
+    my ($prepd0, $prepd1);
+    my ($queued0, $queued1);
+
+    $sth3->execute();
+    $prepd0 = $sth3->fetchrow_arrayref()->[0];
+
+    $$dbh{pg_use_async} = 1;
+
+    $queued0 = $dbh->pg_deallocs_queued();
+    $sth1 = $sth2 = undef;
+    $queued1 = $dbh->pg_deallocs_queued();
+    is ($queued1, $queued0 + 2, '# of queued deallocs increased as expected');
+
+    $sth3->execute();
+    $queued0 = $dbh->pg_deallocs_queued();
+    is ($queued0, $queued1 - 2, '# of queued deallocs decreased as expected');
+
+    $dbh->pg_result();
+    $prepd1 = $sth3->fetchrow_arrayref()->[0];
+    is ($prepd1, $prepd0 - 2, '# of prepared statements decreased as expected');
+
+    $$dbh{pg_use_async} = 0;
 }
 
 $dbh->do('DROP TABLE dbd_pg_test5');

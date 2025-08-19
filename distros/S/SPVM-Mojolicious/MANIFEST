@@ -57,6 +57,10 @@ lib/SPVM/Mojo/Parameters.pm
 lib/SPVM/Mojo/Parameters.spvm
 lib/SPVM/Mojo/Path.pm
 lib/SPVM/Mojo/Path.spvm
+lib/SPVM/Mojo/SSE.pm
+lib/SPVM/Mojo/SSE.spvm
+lib/SPVM/Mojo/SSE/Event.pm
+lib/SPVM/Mojo/SSE/Event.spvm
 lib/SPVM/Mojo/Transaction.pm
 lib/SPVM/Mojo/Transaction.spvm
 lib/SPVM/Mojo/Transaction/HTTP.pm

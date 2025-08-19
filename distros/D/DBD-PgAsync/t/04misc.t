@@ -312,7 +312,7 @@ PQexec
 PQresultStatus
 PQresultErrorField
 PQntuples
-PQtransactionStatus
+PQnfields
 PQtransactionStatus
 PQclear
 PQexec

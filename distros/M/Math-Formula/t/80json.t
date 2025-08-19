@@ -11,8 +11,8 @@ use Test::More;
 my $dir;
 
 BEGIN {
-	eval "require JSON";
-	$@ and plan skip_all => 'no JSON package installed';
+	eval "require Cpanel::JSON::XS";
+	$@ and plan skip_all => 'Cpanel::JSON::XS package not installed';
 
 	$dir = 'save.json';
 	-d $dir or mkdir $dir

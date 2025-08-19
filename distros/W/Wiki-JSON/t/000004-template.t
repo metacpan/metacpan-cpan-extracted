@@ -6,7 +6,6 @@ use warnings;
 use lib 'lib';
 
 use Test::Most;
-use signatures;
 
 use_ok 'Wiki::JSON';
 

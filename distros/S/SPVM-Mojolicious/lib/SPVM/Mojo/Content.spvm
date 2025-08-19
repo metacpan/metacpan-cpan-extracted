@@ -7,6 +7,8 @@ class Mojo::Content extends Mojo::EventEmitter {
   allow Mojo::Transaction::HTTP;
   
   use Native::MethodCall;
+  use Mojo::SSE;
+  use Mojo::SSE::Event;
   
   # Class Variables
   our $BOUNDARY_RE : Regex;
@@ -15,33 +17,49 @@ class Mojo::Content extends Mojo::EventEmitter {
   }
   
   # Fields
-  has auto_decompress : wo byte;
-  method auto_decompress : int () {
-    my $_ = $self->{auto_decompress};
-    if ($_ < 0) {
-      die "auto_decompress field is not yet specified.";
-    }
-    return $_;
-  }
+  has auto_decompress : rw byte;
   
-  has auto_relax : wo byte;
-  method auto_relax : int () {
-    my $_ = $self->{auto_relax};
-    if ($_ < 0) {
-      die "auto_relax field is not yet specified.";
-    }
-    return $_;
-  }
+  has auto_relax : rw byte;
   
-  has relaxed : ro byte;
+  has relaxed : rw byte;
   
   has skip_body : rw byte;
   
-  has headers : rw Mojo::Headers;
+  has headers : rw Mojo::Headers
+    get {
+      $self->{headers} //= Mojo::Headers->new;
+      
+      return $self->{headers};
+    }
+  ;
   
-  has max_buffer_size : ro int;
+  has max_buffer_size : rw int
+    get {
+      unless ($self->{max_buffer_size} > -1) {
+        $self->{max_buffer_size} = length (my $_ = Sys->env("SPVM_MOJO_MAX_BUFFER_SIZE")) ? (int)$_ : -1;
+        
+        unless ($self->{max_buffer_size} > -1) {
+          $self->{max_buffer_size} = 262144;
+        }
+      }
+      
+      return $self->{max_buffer_size};
+    }
+  ;
   
-  has max_leftover_size : ro int;
+  has max_leftover_size : rw int
+    get {
+      unless ($self->{max_leftover_size} > -1) {
+        $self->{max_leftover_size} = length (my $_ = Sys->env("SPVM_MOJO_MAX_BUFFER_SIZE")) ? (int)$_ : -1;
+        
+        unless ($self->{max_leftover_size} > -1) {
+          $self->{max_leftover_size} = 262144;
+        }
+      }
+      
+      return $self->{max_leftover_size};
+    }
+  ;
   
   # Undocumented Fields
   has body_buffer : string;
@@ -82,12 +100,12 @@ class Mojo::Content extends Mojo::EventEmitter {
   
   has body : byte;
   
+  has sse : byte;
+  
   # Instance Methods
   protected method init : void ($options : object[] = undef) {
     
     my $options_h = Hash->new($options);
-    
-    $self->{headers} = Mojo::Headers->new;
     
     if ($options_h->exists("max_buffer_size")) {
       my $max_buffer_size = $options_h->get_int("max_buffer_size");
@@ -245,13 +263,17 @@ class Mojo::Content extends Mojo::EventEmitter {
     return !!$self->{limit};
   }
   
-  method is_multipart : int () { die "Not implemented"; }
+  method is_multipart : int () { return 0; }
   
   method is_parsing_body : int () {
     
     my $state = $self->{state} // "";
     
     return $state eq "body";
+  }
+  
+  method is_sse : int () {
+    return ($self->headers->content_type // "") eq "text/event-stream";
   }
   
   method leftovers : string () {
@@ -360,7 +382,7 @@ class Mojo::Content extends Mojo::EventEmitter {
     return $progress;
   }
   
-  method write : void ($chunk : string, $cb : Mojo::EventEmitter::Callback) {
+  method write : void ($chunk : string = undef, $cb : Mojo::EventEmitter::Callback = undef) {
     
     $self->{dynamic} = 1;
     
@@ -378,7 +400,7 @@ class Mojo::Content extends Mojo::EventEmitter {
     
   }
   
-  method write_chunk : void ($chunk : string, $cb : Mojo::EventEmitter::Callback) {
+  method write_chunk : void ($chunk : string = undef, $cb : Mojo::EventEmitter::Callback = undef) {
     
     unless ($self->{chunked}) {
       $self->headers->set_transfer_encoding("chunked");
@@ -401,7 +423,39 @@ class Mojo::Content extends Mojo::EventEmitter {
     
   }
   
-  method _build_chunk : string ($chunk : string) {
+  method write_sse : void ($event : Mojo::SSE::Event, $cb : Mojo::EventEmitter::Callback) {
+    
+    unless ($self->{sse}) {
+      $self->headers->set_content_type("text/event-stream");
+    }
+    
+    $self->{sse} = 1;
+    
+    unless ($event) {
+      $self->write;
+      return;
+    }
+    
+    $self->write(Mojo::SSE->build_event($event), $cb);
+  }
+  
+  protected method _parse_until_body : void ($chunk : string) {
+    
+    $self->{raw_size} += length($chunk = $chunk // "");
+    $self->{pre_buffer} //= "";
+    $self->{pre_buffer} .= $chunk;
+    
+    $self->{state} = $self->{state} // "headers";
+    if ($self->{state} eq "headers") {
+      $self->_parse_headers;
+    }
+    
+    if ($self->{state} ne "headers" && !$self->{body}++) {
+      $self->emit("body");
+    }
+  }
+  
+  private method _build_chunk : string ($chunk : string) {
     
     # End
     unless (length $chunk) {
@@ -474,7 +528,7 @@ class Mojo::Content extends Mojo::EventEmitter {
     
   }
   
-  method _headers : void () {
+  private method _headers : void () {
     
     if ($self->{header_buffer}) {
       return;
@@ -538,7 +592,7 @@ class Mojo::Content extends Mojo::EventEmitter {
     }
   }
   
-  method _parse_chunked_trailing_headers : void () {
+  private method _parse_chunked_trailing_headers : void () {
     
     my $pre_buffer = $self->{pre_buffer};
     $self->{pre_buffer} = undef;
@@ -560,7 +614,7 @@ class Mojo::Content extends Mojo::EventEmitter {
     }
   }
   
-  method _parse_headers : void () {
+  private method _parse_headers : void () {
     
     my $headers = $self->headers;
     my $pre_buffer = $self->{pre_buffer};
@@ -578,20 +632,4 @@ class Mojo::Content extends Mojo::EventEmitter {
     
   }
 
-  protected method _parse_until_body : void ($chunk : string) {
-    
-    $self->{raw_size} += length($chunk = $chunk // "");
-    $self->{pre_buffer} //= "";
-    $self->{pre_buffer} .= $chunk;
-    
-    $self->{state} = $self->{state} // "headers";
-    if ($self->{state} eq "headers") {
-      $self->_parse_headers;
-    }
-    
-    if ($self->{state} ne "headers" && !$self->{body}++) {
-      $self->emit("body");
-    }
-  }
-  
 }

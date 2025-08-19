@@ -4,7 +4,7 @@
       "Mithun Ayachit <mithun@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4232",
+   "generated_by" : "Module::Build version 0.4234",
    "keywords" : [
       "movies",
       "movie",
@@ -51,58 +51,58 @@
    "provides" : {
       "TMDB" : {
          "file" : "lib/TMDB.pm",
-         "version" : "v1.2.2"
+         "version" : "v1.2.3"
       },
       "TMDB::Collection" : {
          "file" : "lib/TMDB/Collection.pm",
-         "version" : "v1.2.1"
+         "version" : "v1.2.3"
       },
       "TMDB::Company" : {
          "file" : "lib/TMDB/Company.pm",
-         "version" : "v1.2.1"
+         "version" : "v1.2.3"
       },
       "TMDB::Config" : {
          "file" : "lib/TMDB/Config.pm",
-         "version" : "v1.2.1"
+         "version" : "v1.2.3"
       },
       "TMDB::Genre" : {
          "file" : "lib/TMDB/Genre.pm",
-         "version" : "v1.2.1"
+         "version" : "v1.2.3"
       },
       "TMDB::Movie" : {
          "file" : "lib/TMDB/Movie.pm",
-         "version" : "v1.2.1"
+         "version" : "v1.2.3"
       },
       "TMDB::Person" : {
          "file" : "lib/TMDB/Person.pm",
-         "version" : "v1.2.1"
+         "version" : "v1.2.3"
       },
       "TMDB::Search" : {
          "file" : "lib/TMDB/Search.pm",
-         "version" : "v1.2.1"
+         "version" : "v1.2.3"
       },
       "TMDB::Session" : {
          "file" : "lib/TMDB/Session.pm",
-         "version" : "v1.2.1"
+         "version" : "v1.2.3"
       },
       "TMDB::TV" : {
          "file" : "lib/TMDB/TV.pm",
-         "version" : "v1.2.1"
+         "version" : "v1.2.3"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/mithun/perl-tmdb/issues"
+         "web" : "https://github.com/davorg/perl-tmdb/issues"
       },
-      "homepage" : "https://github.com/mithun/perl-tmdb",
+      "homepage" : "https://github.com/davorg/perl-tmdb",
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
       "repository" : {
-         "url" : "git://github.com/mithun/perl-tmdb.git"
+         "url" : "git://github.com/davorg/perl-tmdb.git"
       }
    },
-   "version" : "v1.2.2",
+   "version" : "v1.2.3",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

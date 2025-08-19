@@ -12,7 +12,6 @@ use warnings;
 use feature qw( signatures );
 no warnings "experimental::signatures";
 use utf8;
-use File::Spec;
 use File::Temp ();
 use File::LoadLines;
 use feature 'state';
@@ -25,14 +24,38 @@ use Text::ParseWords qw(shellwords);
 sub DEBUG() { $config->{debug}->{ly} }
 
 sub ly2svg( $self, %args ) {
+
+=for later
+
+    my $elt = $args{elt};
+    my $ctl = { %{ $::config->{delegates}->{$elt->{context}} } };
+
+    $ctl->{program} ||= "lilypond";
+    $ctl->{input} = "argfile";
+    $ctl->{result} = "\%{tmpbase}.cropped.svg";
+    $ctl->{args} =  [ "-dno-point-and-click", "--svg", "--silent",
+		      "--output",  "\%{tmpbase}"
+		    ];
+    $ctl->{align} = "left";
+    unshift( @{ $ctl->{preamble} },
+	     "#(ly:set-option 'crop #t)" );
+
+    use ChordPro::Delegate::Program;
+    ChordPro::Delegate::Program::_cmd2image( $self, $ctl, %args );
+}
+
+sub _ly2svg( $self, %args ) {
+
+=cut
+
     my ( $elt, $pw ) = @args{qw(elt pagewidth)};
 
     state $imgcnt = 0;
     state $td = File::Temp::tempdir( CLEANUP => !$config->{debug}->{ly} );
 
     $imgcnt++;
-    my $src  = File::Spec->catfile( $td, "tmp${imgcnt}.ly" );
-    my $svg  = File::Spec->catfile( $td, "tmp${imgcnt}.svg" );
+    my $src  = fn_catfile( $td, "tmp${imgcnt}.ly" );
+    my $svg  = fn_catfile( $td, "tmp${imgcnt}.svg" );
 
     my $fd;
     unless ( $fd = fs_open( $src, '>:utf8' ) ) {
@@ -158,7 +181,7 @@ sub options( $data ) {
 
     my @pre;
     my @data = @$data;
-    while ( @$data ) {
+    while ( @data ) {
 	last if $data[0] =~ /^[%\\]/; # LP data
 	push( @pre, shift(@data) );
     }

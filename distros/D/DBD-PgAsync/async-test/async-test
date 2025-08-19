@@ -75,7 +75,7 @@ sub dbh_connect
                                 AutoCommit => 0,
                                 RaiseError => 1,
                                 pg_server_prepare => 1,
-                                pg_async_connect => 1});
+                                pg_use_async => 1});
     $dbh->{ReadOnly} = 1;
 
     do {
@@ -115,11 +115,10 @@ sub print_pages
     
     DBI->trace(15);
     $dbh = dbh_connect('../../pg-conn');
-    $sth = $dbh->prepare('select cmd, whatis from whatis where section = ? order by cmd', { pg_async => 1 });
+    $sth = $dbh->prepare('select cmd, whatis from whatis where section = ? order by cmd');
 
     for (SECS) {
         $sth->execute($_);
-#        $dbh->do("select cmd, whatis from whatis where section = '$_' order by cmd", { pg_async => 1 });
         wait_for_query($dbh);
 
         print_pages($_, $sth);

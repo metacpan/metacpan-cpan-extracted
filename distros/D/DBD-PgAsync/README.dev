@@ -159,6 +159,8 @@ async-test/cancel-test - test script for async cancel
 
 async-test/prepare-wait-test - test script for waiting for an async prepare
 
+async-test/ping-test - test script for sync ping
+
 async-test/xact-test - test script for async commit/ rollback
 
 dbdpg_test_postgres_versions.pl - Run the test suite against multiple versions of

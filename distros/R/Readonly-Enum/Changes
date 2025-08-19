@@ -1,5 +1,11 @@
 Revision history of Readonly-Enum
 
+v0.1.5	Mon Aug 18 13:42:49 EDT 2025
+	Added hardening - check values are numeric and that there aren't too many of them
+	New maintainer - NHORNE
+	Removed unnecessary dependency from Makefile.PL.
+	Fixed license in Makefile.PL to make CPANTS happy.
+
 v0.1.4  2014-02-23
 
         - Added STATUS section about this module being deprecated.
@@ -24,6 +30,3 @@ v0.1.2	2013-08-29
 v0.1.1  2013-08-29
 
   	- Initial release on CPAN.
-
-
-

@@ -9,6 +9,17 @@
 // ALL CONFIGURATION SETTINGS ARE COMMENTED OUT WITH A LEADING "# ".
 // IF YOU WANT TO CHANGE A CONFIGURATION SETTING, REMOVE THE "# " FIRST.
 
+/**************** For GUI ****************/
+
+// Type of config: config, style, style_mod, instrument, task...
+config.type : config
+
+// Title for menus, choices, if applicable.
+config.title : "User Config"
+
+// Main ChordPro config.
+config.description : "User config settings for ChordPro."
+
 // General settings, often changed by configs and command line.
 
 // Chords parsing strategy.
@@ -31,9 +42,6 @@ settings.strict : true
 // Suppress chords.
 // Command line: -l (--lyrics-only)
 # settings.lyrics-only : false
-
-// Memorize the chords from sections.
-# settings.memorize : false
 
 // Chords inline instead of above.
 // May be a string containing pretext %s posttext.
@@ -77,13 +85,19 @@ settings.strict : true
 // does not have the glyphs.
 # settings.truesf : false
 
+// Substitute delta for maj7 in chord names.
+// Will fallback to the ChordProSymbols font if the selected chord font
+// does not have the glyphs.
+# maj7delta : false
+
 // Indent for wrapped lines. Actual indent is the stringwidth.
 # settings.wrapindent : x
 
 // Consider text flowed.
 # settings.flowtext : false
 
-// Metadata.
+/**************** Metadata ****************/
+
 // For these keys you can use {meta key ...} as well as {key ...}.
 // Important: "title" and "subtitle" must always be in this list.
 
@@ -103,8 +117,11 @@ settings.strict : true
 // Split data on separator.
 # metadata.autosplit : true
 
-// Date formats. Format is a strftime template.
+/**************** Date formats. Format is a strftime template ****************/
+
 # dates.today.format : "%A, %B %e, %Y"
+
+/**************** User info ****************/
 
 // Short user name.
 # user.name : ""
@@ -113,7 +130,8 @@ settings.strict : true
 # user.fullname : ""
 
 
-// User defined chords (placeholder).
+/**************** User defined chords (placeholder) ****************/
+
 // This is an array of hashes, one for each chord.
 // Each hash should contain the following fields:
 //   "name":    name of the chord
@@ -127,7 +145,7 @@ settings.strict : true
 // Example: Alternative for Bes chord.
 # chords: [ { name: Bes, frets: [ 1 1 3 3 3 1 ], fingers: [ 1 1 2 3 4 1 ] } ]
 
-// Format to show chord names. May contain markup
+/**************** Format to show chord names. May contain marku ****************/
 
 // Format string for rendering common chord names.
 # chord-formats.common : "%{root|%{}%{qual|%{}}%{ext|%{}}%{bass|/%{}}|%{name}}"
@@ -138,7 +156,7 @@ settings.strict : true
 // Format string for rendering nashville chord names.
 # chord-formats.nashville : "%{root|%{}%{qual|<sup>%{}</sup>}%{ext|<sup>%{}</sup>}%{bass|/<sub>%{}</sub>}|%{name}}"
 
-// Shows selected or all chord diagrams at end.
+/**************** Shows selected or all chord diagrams at end ****************/
 
 // "all": shows all chords
 // "user": shows user defined chords only
@@ -152,7 +170,7 @@ settings.strict : true
 // are considered trivial.
 # diagrams.suppress : [ C F G A E Am ]
 
-// Settings for PDF output.
+/**************** Settings for PDF output ****************/
 
 // PDF Properties. Arbitrary key/values may be added.
 // Note that the context for substitutions is the first song.
@@ -339,10 +357,20 @@ settings.strict : true
 # pdf.diagrams.dotsize : 0.8
 
 // Thickness of bars, fraction of dot width.
+pdf.barwidth : 0.8
+
+// Thickness of bars, fraction of dot width.
 # pdf.diagrams.barwidth : 0.8
 
 // Show finger settings, if available.
 # pdf.diagrams.fingers : true
+
+// Text to show the fret base, if greater than one.
+// "%s" will be replaced by the actual fret base number.
+pdf.diagrams.fretbasetext : %s
+
+// Position for the fret base, left (default) or right.
+pdf.diagrams.fretbaseposition : left
 
 // Appearance of chord diagrams for keyboards.
 // A keyboard diagram consists of a number of keys.
@@ -407,35 +435,52 @@ settings.strict : true
 // Colour of the volta.
 # pdf.grids.volta.color : blue
 
-// Even/odd pages (1), odd/even (-1) or odd (0).
-# pdf.even-odd-pages : 1
+// Dual (odd/even) pages when set to true.
+// False means all pages will be the same (odd, right)
+// With dual pages, all the parts of the songbook (covers,
+// tables of contents, etc.) are always aligned to a right page.
+# pdf.songbook.dual-pages : true
 
-// Align songs to even/odd pages. When greater than 1, force alignment.
-# pdf.pagealign-songs : 1
+// With dual pages, align individual tables of content
+// to right pages by inserting a blank filler page.
+// Values are true, false, or "song". In the latter case the
+// pagealign settings for songs are used for the tables of contents.
+# pdf.songbook.align-tocs : true
 
-// How to reorder pages.
-// Sort pages by "title", "subtitle", "2page", "compact", "desc".
-// "sort-pages" is a comma separated list of the options above.
-// title  : sort pages alphabetically by title.
-// subtitle : sort pages alphabetically by subtitle. If this is
-//          used together with title, only title is used.
-// 2page :  make sure songs with even pages are placed on even
-//          pages, so most. if not all, of the song is visible
-//          in a normal book without needing to turn a page.
-//          A blank page is added to align.
-// compact: implies 2page - instead of adding a blank page,
-//          an odd-paged song is moved in front of this song to achieve
-//          even page alignment.
-//          Note: this option requires extra processing time since
-//          the songbook has to be processed twice.
-// desc :   modifier to sort descending.
-# pdf.sort-pages : ""
+// With dual pages, all songs will start on a right.
+// A blank filler page is inserted if needed for alignment.
+// If false, no alignment takes place, all pages follow
+// each other.
+# pdf.songbook.align-songs : true
+
+// If true, all songs will start on left pages instead of right pages.
+# pdf.songbook.align-songs-spread : false
+
+// If true, filler pages will have headings and footers
+// as if they were part of the song.
+# pdf.songbook.align-songs-extend : false
+
+// Sort songs by "title" or "subtitle".
+// title    : sort songs ascending by title.
+// subtitle : sort songs ascending by subtitle.
+// Put a minus sign before the value to obtain descending order.
+# pdf.songbook.sort-songs : false
+
+// If true, the order of the songs is adjusted to make the
+// songbook as compact as possible, while each of the songs
+// require minimal page turns.
+// Note: this option requires extra processing time since
+// the songbook has to be processed twice.
+# pdf.songbook.compact-songs : false
+
+// PDF file to add as cover page(s).
+# pdf.songbook.cover : false
 
 // PDF file to add as front matter.
-# pdf.front-matter : ""
+# pdf.songbook.front-matter : false
 
 // PDF file to add as back matter.
-# pdf.back-matter : ""
+# pdf.songbook.back-matter : false
 
 // Formats.
 // Pages have two title elements and one footer element. They also
@@ -501,15 +546,6 @@ settings.strict : true
 # pdf.formats.first.background : ""
 
 // Filler pages (for alignment) are empty by default.
-
-// Three-part title format specification, left, center, right.
-# pdf.formats.filler.title : [ "" "" "" ]
-
-// Three-part title format specification, left, center, right.
-# pdf.formats.filler.subtitle : [ "" "" "" ]
-
-// Three-part title format specification, left, center, right.
-# pdf.formats.filler.footer : [ "" "" "" ]
 
 // Background page.
 # pdf.formats.filler.background : ""
@@ -579,6 +615,16 @@ settings.strict : true
 # pdf.fontconfig.monospace.italic     : Courier-Oblique
 # pdf.fontconfig.monospace.bolditalic : Courier-BoldOblique
 
+# pdf.fontconfig.muse.           : MuseJazzText.otf
+# pdf.fontconfig.muse.bold       : MuseJazzText.otf
+# pdf.fontconfig.muse.italic     : MuseJazzText.otf
+# pdf.fontconfig.muse.bolditalic : MuseJazzText.otf
+
+# pdf.fontconfig.musejazztext.           : MuseJazzText.otf
+# pdf.fontconfig.musejazztext.bold       : MuseJazzText.otf
+# pdf.fontconfig.musejazztext.italic     : MuseJazzText.otf
+# pdf.fontconfig.musejazztext.bolditalic : MuseJazzText.otf
+
 // "fonts" maps output elements to fonts as defined in "fontconfig".
 // The elements can have a background colour associated.
 // Colours are "#RRGGBB" or predefined names like "black", "white",
@@ -615,17 +661,13 @@ settings.strict : true
 # pdf.fonts.chordfingers.numbercolor : background
 
 // Font for typesetting comment text.
-# pdf.fonts.comment.name       : Sans
-# pdf.fonts.comment.size       : 12
-# pdf.fonts.comment.background : foreground-light
+# pdf.fonts.comment : "sans 12; background=foreground-light"
 
 // Font for typesetting italised comment text.
 # pdf.fonts.comment_italic : "Helvetica-Oblique 12"
 
 // Font for typesetting boxed comment text.
-# pdf.fonts.comment_box.name  : Sans
-# pdf.fonts.comment_box.size  : 12
-# pdf.fonts.comment_box.frame : 1
+# pdf.fonts.comment_box : "sans 12; frame=1"
 
 // Font for typesetting tabs.
 # pdf.fonts.tab : "mono 10"
@@ -636,7 +678,7 @@ settings.strict : true
 // Font for typesetting grids.
 # pdf.fonts.grid : "sans 10"
 
-// Settings for A2Crd (input) frontend.
+/**************** Settings for A2Crd (input) frontend ****************/
 
 // Treat leading lyrics lines as title/subtitle lines.
 # a2crd.infer-titles : true
@@ -647,7 +689,17 @@ settings.strict : true
 // Tab stop width for tab expansion. Set to zero to disable.
 # a2crd.tabstop : 8
 
-// Settings for the parser/preprocessor.
+/**************** Settings for the markup processor ****************/
+
+// Shortcodes allow user defined markup, e.g. <foo>...</foo>.
+// With shortcode
+//    heavy :  "weight='bold' size='large'"
+// each occurrence of <heavy>...</heavy> will be replaced by
+// <span weight='bold' size='large'>...</span>.
+# markup.shortcodes {}
+
+/**************** Settings for the parser/preprocessor ****************/
+
 // For selected lines, you can specify a series of 
 // { "target" : "xxx", "replace" : "yyy" }
 // Every occurrence of "xxx" will be replaced by "yyy".
@@ -657,3 +709,8 @@ settings.strict : true
 # parser.preprocess.directive : []
 # parser.preprocess.songline  : []
 
+// For the exceptional case you need brackets [] in your lyrics or annotations.
+// These characters are replaced by normal brackets **after** chord analysis.
+// E.g. parser.altbrackets: "«»"
+// Use wisely. Better still, do not use this.
+# parser.altbrackets : null

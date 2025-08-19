@@ -33,7 +33,7 @@ use constant MSWIN => $^O =~ /MSWin|Windows_NT/i ? 1 : 0;
 
 sub is_msw ()   { MSWIN }
 sub is_macos () { $^O =~ /darwin/ }
-sub is_wx ()    { main->can("OnInit") }
+sub is_wx ()    { defined($Wx::wxVERSION) }
 
 push( @EXPORT, qw( is_msw is_macos is_wx ) );
 
@@ -216,11 +216,11 @@ sub fs_load( $name, $opts = {} ) {
 
     my $ret;
     eval {
-	if ( is_ref($name) ) {
+	if ( is_ref($name) || $name =~ m;^\w\w+:; ) {
 	    $ret = loadlines( $name, $opts );
 	}
 	else {
-	    my $fd = fs_open($name);
+	    my $fd = $name eq '-' ? \*STDIN : fs_open($name);
 	    $ret = loadlines( $fd, $opts );
 	    $opts->{_filesource} = $name;
 	}
@@ -228,8 +228,8 @@ sub fs_load( $name, $opts = {} ) {
     return $ret unless $@;
 
     my $msg = $@;
+    die( "$msg\n" ) unless $opts->{fail} eq "soft";
     $msg = $1 if $msg =~ /^\Q$name\E: (.*)$/;
-    die( "$msg\n" ) unless $opts->{fail} ne "soft";
     $opts->{error} = $msg;
     return;
 }
@@ -239,5 +239,80 @@ sub fs_blob( $name, $opts = {} ) {
 }
 
 push( @EXPORT, qw(fs_load fs_blob) );
+
+################ File::Spec functions ################
+
+# Adapted from File::Spec::Functions 3.75.
+
+# Function fn_catfile = File::Spec->catfile, etc.
+
+use File::Spec;
+require File::Spec::Unix;
+
+my @funcs =
+  qw( canonpath
+      catdir
+      catfile
+      curdir
+      rootdir
+      updir
+      is_absolute
+      splitpath
+      catpath
+      path
+      devnull
+      tmpdir
+      splitdir
+      abs2rel
+      rel2abs
+      case_tolerant
+   );
+push( @EXPORT, map { "fn_$_" } @funcs );
+
+my %udeps = ( canonpath	      => [],
+	      catdir	      => [ qw(canonpath) ],
+	      catfile	      => [ qw(canonpath catdir) ],
+	      case_tolerant   => [],
+	      curdir	      => [],
+	      devnull	      => [],
+	      rootdir	      => [],
+	      updir	      => [],
+);
+
+foreach my $meth ( @funcs ) {
+    $meth = 'file_name_is_absolute' if $meth eq 'is_absolute';
+    my $sub = File::Spec->can($meth);
+    no strict 'refs';
+    if ( exists( $udeps{$meth} )
+	 && $sub == File::Spec::Unix->can($meth)
+	 && !( grep { File::Spec->can($_) != File::Spec::Unix->can($_) }
+	            @{$udeps{$meth} } )
+	 && defined( &{"File::Spec::Unix::_fn_$meth"} ) ) {
+        *{"fn_$meth"} = \&{"File::Spec::Unix::_fn_$meth"};
+    }
+    else {
+	$meth = 'is_absolute' if $meth eq 'file_name_is_absolute';
+        *{"fn_$meth"} = sub { &$sub( 'File::Spec', @_) };
+    }
+}
+
+################ File::Basename functions ################
+
+# For now, use File:Basename functions.
+# Refine to File::Spec functions later.
+
+use File::Basename ();
+
+sub fn_basename( $fullname, @suffixlist ) {
+    File::Basename::basename( $fullname, @suffixlist );
+}
+
+push( @EXPORT, "fn_basename" );
+
+sub fn_dirname( $fullname ) {
+    File::Basename::dirname( $fullname );
+}
+
+push( @EXPORT, "fn_dirname" );
 
 1;

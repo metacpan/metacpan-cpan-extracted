@@ -11,6 +11,7 @@ requires 'YAML::Safe', '0.82';
 
 on 'test' => sub {
     requires 'Test::More', '0.98';
+    requires 'Test::Kwalitee', '1.28';
 };
 
 

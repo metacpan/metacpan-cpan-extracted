@@ -1,5 +1,13 @@
 Changes for the DBD::PgAsync module
 
+--- 08/12/2025 rweikusat@talkalkt.net ---
+
+    - asynchronous ping
+    - asynchronous deallocation of prepared statements
+    - make pg_use_async work as intended for statements prepared while
+      it was still off but turned on before an execute
+    - never use PQexec for an already prepared statement
+
 --- 07/21/2025 rweikusat@talktalk.net ---
 
     - fixed a bug in dbd_st_execute which prevented the use of an

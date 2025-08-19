@@ -13,7 +13,7 @@ Geo::Address::Parser::Rules::UK - Parsing rules for UK addresses
 
 =head1 DESCRIPTION
 
-Parses a flat UK address string into components: name, street, city, and postcode.
+Parses a flat UK address string into components: name, road, city, and postcode.
 
 =head1 EXPORTS
 
@@ -25,7 +25,7 @@ Returns a hashref with keys:
 
 =item * name
 
-=item * street
+=item * road
 
 =item * city
 
@@ -80,7 +80,7 @@ sub parse_address {
 	my @parts = map { s/^\s+|\s+$//gr } split /,/, $text;
 	@parts = grep { length $_ } @parts;
 
-	my ($name, $street, $city, $county, $postcode, $country);
+	my ($name, $road, $city, $county, $postcode, $country);
 
 	# Remove trailing country if present
 	if(@parts && exists $uk_countries{$parts[-1]}) {
@@ -104,11 +104,11 @@ sub parse_address {
 		$city = pop @parts;
 	}
 
-	# Determine street and name
+	# Determine road and name
 	if(@parts) {
-		# Heuristic: if first remaining token contains a number, treat it as street
+		# Heuristic: if first remaining token contains a number, treat it as road
 		if($parts[-1] =~ /\d/) {
-			$street = pop @parts;
+			$road = pop @parts;
 		}
 	}
 
@@ -117,7 +117,7 @@ sub parse_address {
 
 	return {
 		name => $name,
-		street => $street,
+		road => $road,
 		city => $city,
 		county => $county,
 		postcode => $postcode,

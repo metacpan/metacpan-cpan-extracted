@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use experimental 'signatures';
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 use Iterator::Flex::Factory;
 use Iterator::Flex::Utils qw( RETURN EXHAUSTION :IterAttrs :ExhaustedMethods );
@@ -157,7 +157,7 @@ Iterator::Flex::Freeze - Freeze an iterator after every next
 
 =head1 VERSION
 
-version 0.24
+version 0.25
 
 =head1 METHODS
 

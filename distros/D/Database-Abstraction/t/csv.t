@@ -3,13 +3,15 @@
 use strict;
 use FindBin qw($Bin);
 
-use lib 't/lib';
+use File::Spec;
 use Test::Most tests => 22;
 use Test::NoWarnings;
 
+use lib 't/lib';
 use_ok('Database::test1');
 
-my $test1 = new_ok('Database::test1' => ["$Bin/../data"]);
+my $directory = File::Spec->catfile($Bin, File::Spec->updir(), 't', 'data');
+my $test1 = new_ok('Database::test1' => [$directory]);
 
 cmp_ok($test1->number('two'), '==', 2, 'CSV AUTOLOAD works found');
 is($test1->number('four'), undef, 'CSV AUTOLOAD works not found');

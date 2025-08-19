@@ -1,0 +1,6 @@
+Revision history for Perl extension LaTeX::Replicase.
+
+0.03  Fri Aug 15 16:11:41 2025
+	- original version; created by h2xs 1.23 with options
+		-XAn LaTeX::Replicase
+

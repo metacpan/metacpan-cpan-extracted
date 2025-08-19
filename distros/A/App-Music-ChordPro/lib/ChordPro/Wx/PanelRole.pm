@@ -15,8 +15,6 @@ use ChordPro::Utils qw( demarkup plural );
 use ChordPro::Wx::Config;
 use ChordPro::Wx::Utils;
 
-use File::Basename;
-
 # Either Wx::WebView or Wx::StaticText.
 field $wv			:accessor;
 
@@ -285,7 +283,7 @@ method OnMessagesSave($event) {
     my $fd = Wx::FileDialog->new
       ( $self,
 	_T("Choose file to save in"),
-	dirname($file), basename($file),
+	fn_dirname($file), fn_basename($file),
 	"*",
 	wxFD_SAVE|wxFD_OVERWRITE_PROMPT );
 
@@ -329,6 +327,7 @@ method previewtooltip() {
 	$self->{bmb_preview}->SetToolTip(_T("Generate and show a new preview"));
 	$mi->Check(0);
     }
+    $self->panel_focus;
 }
 
 method messagestooltip() {
@@ -343,6 +342,18 @@ method messagestooltip() {
 	$mi->Check(0);
     }
     $self->{w_infobar}->Dismiss if $self->{w_infobar}->IsShown;
+    $self->panel_focus;
+    $self->panel_linenums( $mi->IsChecked );
+}
+
+method panel_focus() {
+    return unless UNIVERSAL::can( $state{panel}, "set_focus" );
+    $state{panel}->set_focus;
+}
+
+method panel_linenums( $b ) {
+    return unless UNIVERSAL::can( $state{panel}, "showlinenumbers" );
+    $state{panel}->showlinenumbers($b);
 }
 
 1;

@@ -86,7 +86,7 @@ method refresh() {
     setup_messages_ctxmenu($self);
     $self->previewtooltip;
     $self->messagestooltip;
-    $self->{bmb_preview}->SetFocus;
+    $self->set_focus;
 }
 
 method save_preferences() {
@@ -111,6 +111,39 @@ method open_dir($dir) {
     $self->{t_exporttitle}->SetValue( $state{sbe_title} );
     $self->{t_exportstitle}->SetValue( $state{sbe_subtitle} );
     $self->OnDirPickerChanged;
+}
+
+method load_filelist($files) {
+    my $file = shift( @$files );
+    my @files;
+    my $dir = fn_dirname( fn_rel2abs( $file ) );
+    for ( @$files ) {
+	next unless $_;
+	next if m;^(#|//);;
+	if ( /--title(?:=|\s+)(.*)/ ) {
+	    $self->{t_exporttitle}->SetValue($1);
+	    $self->{cb_stdcover}->SetValue(1);
+	}
+	elsif ( /--subtitle(?:=|\s+)(.*)/ ) {
+	    $self->{t_exportstitle}->SetValue($1);
+	}
+	elsif ( /--cover(?:=|\s+)(.*)/ ) {
+	    $self->{fp_cover}->SetPath($1);
+	    $self->{cb_stdcover}->SetValue(0);
+	}
+	else {
+	    push( @files, $_ );
+	}
+    }
+    $self->{dp_folder}->SetPath($dir);
+    $self->{w_rearrange}->Set(\@files);
+    $self->{w_rearrange}->Check($_,1) for 0..$#files;
+    $self->{sz_rearrange}->Layout;
+    $state{sbe_folder} = $dir;
+    $state{sbe_files} = \@files;
+    $self->OnStdCoverChecked(undef);
+    $self->log( 'I', "Loaded file list from $file" );
+    return 1;
 }
 
 method preview( $args, %opts ) {
@@ -170,6 +203,9 @@ method preview( $args, %opts ) {
 method check_source_saved() { 1 }
 
 method check_preview_saved() {
+    # Do not ask for preview save. It's regenerated easily.
+    return 1;
+
     return 1 unless $self->prv && $self->prv->unsaved_preview;
 
     my $md = Wx::MessageDialog->new
@@ -184,6 +220,10 @@ method check_preview_saved() {
     $self->prv->discard, return 1 if $ret == wxID_NO; # don't save
     return $self->prv->save;
     1;
+}
+
+method set_focus {
+    $self->{dp_folder}->SetFocus;
 }
 
 ################ Event handlers ################
@@ -248,13 +288,7 @@ sub OnFilelistOpen {
        wxDefaultPosition);
     my $ret = $md->ShowModal;
     if ( $ret == wxID_OK ) {
-	my $file = $md->GetPath;
-	my @files = loadlines($file);
-	$self->{w_rearrange}->Set(\@files);
-	$self->{w_rearrange}->Check($_,1) for 0..$#files;
-	$self->{sz_rearrange}->Layout;
-	$state{sbe_files} = \@files;
-	$self->log( 'I', "Loaded file list from $file" );
+	$self->load_filelist( $md->GetPath );
     }
     $md->Destroy;
 }
@@ -304,8 +338,8 @@ sub OnRearrangeDown {
 
 sub OnRearrangeDSelect {
     my ($self, $event) = @_;
-    my $file = join( "/", $state{sbe_folder},
-		     $state{sbe_files}->[$self->{w_rearrange}->GetSelection] );
+    my $file = fn_catfile( $state{sbe_folder},
+			   $state{sbe_files}->[$self->{w_rearrange}->GetSelection] );
     return unless $self->GetParent->{p_editor}->openfile($file);
     $self->prv and $self->prv->discard;
     $state{from_songbook} = 1 + $self->{w_rearrange}->GetSelection;

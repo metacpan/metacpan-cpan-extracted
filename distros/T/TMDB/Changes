@@ -1,5 +1,10 @@
 Version History for TMDB
-Mithun Ayachit
+Mithun Ayachit / Dave Cross
+
+1.2.3
+
+-   Fix version numbers broken in previous release
+-   Switch to davorg's repo
 
 1.2.2
 

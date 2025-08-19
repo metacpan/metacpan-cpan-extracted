@@ -13,7 +13,7 @@ Geo::Address::Parser::Rules::IRL - Parsing rules for Irish addresses
 
 =head1 DESCRIPTION
 
-Parses a flat Irish address string into components: name, street, city, and postcode.
+Parses a flat Irish address string into components: name, road, city, and postcode.
 
 =head1 EXPORTS
 
@@ -25,7 +25,7 @@ Returns a hashref with keys:
 
 =item * name
 
-=item * street
+=item * road
 
 =item * city
 
@@ -35,7 +35,7 @@ Returns a hashref with keys:
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 # heuristics for detecting building/venue names
 my $BUILDING_RE = qr/\b(?:house|hall|mill|centre|center|museum|church|hotel|inn|club|school|library|theatre)\b/i;
@@ -84,53 +84,53 @@ sub parse_address {
 	}
 
 	# Prepare result fields
-	my ($name, $street, $city);
+	my ($name, $road, $city);
 	my $n = scalar @parts;
 
 	if ($n == 0) {
 		# nothing left; return at least country/postal if present
 		return {
 			name => undef,
-			street => undef,
+			road => undef,
 			city => undef,
 			region => $region,
 			postal_code => $postal_code,
 			country => 'Ireland',
 		};
 	} elsif ($n == 1) {
-		# Single token: assume it's a street/locality
-		$street = capitalize_title(lc $parts[0]);
+		# Single token: assume it's a road/locality
+		$road = capitalize_title(lc $parts[0]);
 		$city = undef;
 	} elsif ($n == 2) {
 		# Two tokens — ambiguous: decide if first is a building name
 		if ($parts[0] =~ $BUILDING_RE) {
 			$name = capitalize_title(lc $parts[0]);
-			$street = capitalize_title(lc $parts[1]);  # treat locality as street too
-			$city = $street;
+			$road = capitalize_title(lc $parts[1]);  # treat locality as road too
+			$city = $road;
 		} else {
-			# likely "street, city"
-			$street = capitalize_title(lc $parts[0]);
+			# likely "road, city"
+			$road = capitalize_title(lc $parts[0]);
 			$city = capitalize_title(lc $parts[1]);
 		}
 	} else { # n >= 3
-		# typical: [maybe-building-name..., street, city]
+		# typical: [maybe-building-name..., road, city]
 		$city = capitalize_title(lc $parts[-1]);
-		$street = capitalize_title(lc $parts[-2]);
+		$road = capitalize_title(lc $parts[-2]);
 
 		# everything before that is the name (may be empty)
 		my @name_parts = @parts[0 .. $n - 3];
 		$name = join(', ', map { capitalize_title(lc $_) } @name_parts) if @name_parts;
 	}
 
-	undef $street if($street eq $city);
+	undef $road if($road eq $city);
 
 	# Fix Irish O' prefixes — e.g., O'connell => O'Connell
-	$street =~ s/\bO'([a-z])/"O'" . uc($1)/ge if($street);
+	$road =~ s/\bO'([a-z])/"O'" . uc($1)/ge if($road);
 
 	# Final result
 	my %result = (
 		name => $name,
-		street => $street,
+		road => $road,
 		city => $city,
 		region => $region,
 		postal_code => $postal_code,

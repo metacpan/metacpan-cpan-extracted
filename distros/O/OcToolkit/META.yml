@@ -1,8 +1,9 @@
 ---
 abstract: 'Open Cloud Toolkit -  A Helm-like Perl module for managing Openshift and Kubernetes projects'
 author:
-  - 'John Summers <devp2000a@gmail.com>'
+  - (S)
 build_requires:
+  Test::Kwalitee: '1.28'
   Test::More: '0.98'
 configure_requires:
   Module::Build::Tiny: '0.035'
@@ -26,7 +27,7 @@ no_index:
 provides:
   OcToolkit:
     file: lib/OcToolkit.pm
-    version: '1.07'
+    version: '1.08'
 requires:
   File::Find::Rule: '0.34'
   File::Path: '2.18'
@@ -38,6 +39,8 @@ requires:
   YAML: '1.31'
   YAML::Safe: '0.82'
   perl: v5.16.0
-version: '1.07'
+version: '1.08'
+x_contributors:
+  - 'John Summers <devp2000a@gmail.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

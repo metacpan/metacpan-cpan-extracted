@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Math-Formula version 0.17.
+# This code is part of Perl distribution Math-Formula version 0.18.
 # The POD got stripped from this file by OODoc version 3.03.
 # For contributors see file ChangeLog.
 
@@ -14,7 +14,7 @@
 #oodist: testing, however the code of this development version may be broken!
 
 package Math::Formula::Config;{
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 }
 
 

@@ -414,12 +414,13 @@ AUTHOR
 
 Mithun Ayachit mithun@cpan.org
 
+Recent updates by Dave Cross dave@perlhacks.com
 
 
 LICENSE AND COPYRIGHT
 
 
-Copyright (c) 2015, Mithun Ayachit. All rights reserved.
+Copyright (c) 2015-2025, Mithun Ayachit. All rights reserved.
 
 This module is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself. See [perlartistic][].

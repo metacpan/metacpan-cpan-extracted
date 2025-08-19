@@ -900,6 +900,23 @@ pg_cancel(dbh)
     D_imp_dbh(dbh);
     ST(0) = pg_db_cancel(dbh, imp_dbh) ? &PL_sv_yes : &PL_sv_no;
 
+unsigned
+pg_deallocs_queued(dbh)
+    SV *dbh
+    PREINIT:
+        dealloc_t *d;
+        unsigned n;
+    CODE:
+        D_imp_dbh(dbh);
+        n = 0;
+        d = imp_dbh->deallocs;
+        while (d) {
+            ++n;
+            d = d->p;
+        }
+        RETVAL = n;
+    OUTPUT:
+        RETVAL
 
 # -- end of DBD::PgAsync::db
 

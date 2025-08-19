@@ -3,7 +3,7 @@ use ExtUtils::MakeMaker;
 
 use 5.016;
 
-my $version = '0.17';
+my $version = '0.18';
 
 # Use command 'oodist' to produce your whole software release.
 my $git      = "https://github.com/markov2/perl5-Math-Formula";
@@ -28,6 +28,10 @@ my %oodist   = (
 	},
 
 	tests    => {
+	},
+
+	raw  => {
+		publish        => "$publish/raw",
 	},
 
 	release  => {

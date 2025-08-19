@@ -1,0 +1,17 @@
+requires 'File::HomeDir';
+requires 'File::Slurp';
+requires 'IO::Prompter';
+requires 'Lingua::EN::Titlecase';
+requires 'Readonly';
+requires 'TMDB';
+test_requires 'Test::CPAN::Changes';
+test_requires 'Test::DistManifest';
+test_requires 'Test::Kwalitee';
+test_requires 'Test::MinimumVersion';
+test_requires 'Test::Mojibake';
+test_requires 'Test::NoTabs';
+test_requires 'Test::Pod::Coverage';
+test_requires 'Test::Pod';
+test_requires 'Test::Synopsis';
+test_requires 'Test::Vars';
+test_requires 'Test::Version';

@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.38'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4232, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 keywords:
   - movies
   - movie
@@ -25,34 +25,34 @@ name: TMDB
 provides:
   TMDB:
     file: lib/TMDB.pm
-    version: v1.2.2
+    version: v1.2.3
   TMDB::Collection:
     file: lib/TMDB/Collection.pm
-    version: v1.2.1
+    version: v1.2.3
   TMDB::Company:
     file: lib/TMDB/Company.pm
-    version: v1.2.1
+    version: v1.2.3
   TMDB::Config:
     file: lib/TMDB/Config.pm
-    version: v1.2.1
+    version: v1.2.3
   TMDB::Genre:
     file: lib/TMDB/Genre.pm
-    version: v1.2.1
+    version: v1.2.3
   TMDB::Movie:
     file: lib/TMDB/Movie.pm
-    version: v1.2.1
+    version: v1.2.3
   TMDB::Person:
     file: lib/TMDB/Person.pm
-    version: v1.2.1
+    version: v1.2.3
   TMDB::Search:
     file: lib/TMDB/Search.pm
-    version: v1.2.1
+    version: v1.2.3
   TMDB::Session:
     file: lib/TMDB/Session.pm
-    version: v1.2.1
+    version: v1.2.3
   TMDB::TV:
     file: lib/TMDB/TV.pm
-    version: v1.2.1
+    version: v1.2.3
 requires:
   Encode: '0'
   HTTP::Tiny: '0.016'
@@ -64,9 +64,9 @@ requires:
   Params::Validate: '1.03'
   URI::Encode: '0.05'
 resources:
-  bugtracker: https://github.com/mithun/perl-tmdb/issues
-  homepage: https://github.com/mithun/perl-tmdb
+  bugtracker: https://github.com/davorg/perl-tmdb/issues
+  homepage: https://github.com/davorg/perl-tmdb
   license: http://dev.perl.org/licenses/
-  repository: git://github.com/mithun/perl-tmdb.git
-version: v1.2.2
+  repository: git://github.com/davorg/perl-tmdb.git
+version: v1.2.3
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
