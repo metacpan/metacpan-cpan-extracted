@@ -11,7 +11,6 @@ package Term::ANSIEncode;
 #                     Written By Richard Kelsch                       #
 #                  © Copyright 2025 Richard Kelsch                    #
 #                        All Rights Reserved                          #
-#                           Version 1.20                              #
 #######################################################################
 # This program is free software: you can redistribute it and/or       #
 # modify it under the terms of the GNU General Public License as      #
@@ -29,11 +28,6 @@ package Term::ANSIEncode;
 #######################################################################
 
 use strict;
-
-use Term::ANSIScreen qw( :cursor :screen );
-use Term::ANSIColor;
-use Time::HiRes qw( sleep );
-use Text::Wrap::Smart ':all';
 use utf8;
 use charnames();
 use constant {
@@ -43,10 +37,15 @@ use constant {
     NO    => 0,
 };
 
+use Term::ANSIScreen qw( :cursor :screen );
+use Term::ANSIColor;
+use Time::HiRes qw( sleep );
+use Text::Wrap::Smart ':all';
+
 binmode(STDOUT, ":encoding(UTF-8)");
 
 BEGIN {
-    our $VERSION = '1.20';
+    our $VERSION = 1.23;
 }
 
 sub ansi_output {
@@ -279,12 +278,26 @@ sub new {
         }
     } ## end foreach my $count (0 .. 255)
 
+	# 20D0 - 20EF
+	# 2100 - 218B
+	# 2190 - 23FF
+	# 2500 - 27FF
+	# 2900 - 2BFE
+	# 3001 - 3030
+	# 1F300 - 1F5FF
+	# 1F600 - 1F64F
+	# 1F680 - 1F6F8
+	# 1F780 - 1F7D8
+	# 1F800 - 1F8B1
+	# 1F900 - 1F997
+	# 1F9D0 - 1F9E6
+
     # Generate symbols
 	my $start = 0x2400;
 	my $finish = 0x2605;
 	if ($self->{'mode'} =~ /full|long/i) {
 		$start  = 0x2010;
-		$finish = 0x2B59;
+		$finish = 0x2BFF;
 	}
 
 	my $name = charnames::viacode(0x1F341); # Maple Leaf

@@ -4,16 +4,24 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 
-my @dirs;
+# Test for broken smokers that don't set AUTOMATED_TESTING
+if(my $reporter = $ENV{'PERL_CPAN_REPORTER_CONFIG'}) {
+	if($reporter =~ /smoker/i) {
+		warn 'AUTOMATED_TESTING added for you';
+		$ENV{'AUTOMATED_TESTING'} = 1;
+	}
+}
 
 if(defined($ENV{'GITHUB_ACTION'}) || defined($ENV{'CIRCLECI'}) || defined($ENV{'TRAVIS_PERL_VERSION'}) || defined($ENV{'APPVEYOR'})) {
 	# Prevent downloading and installing stuff
 	warn 'AUTOMATED_TESTING added for you' if(!defined($ENV{'AUTOMATED_TESTING'}));
 	$ENV{'AUTOMATED_TESTING'} = 1;
 	$ENV{'NO_NETWORK_TESTING'} = 1;
-} elsif(!$ENV{'NO_NETWORK_TESTING'}) {
-	push @dirs, 'lib/Genealogy/Obituary/Lookup/data';
 }
+
+my @dirs = (
+	'lib/Genealogy/Obituary/Lookup/data'
+);
 
 # FIXME: AUTOMATED_TESTING - create the empty directory in blib
 foreach my $dir(@dirs) {
@@ -43,8 +51,9 @@ my $prereqs = {
 	'File::Spec' => 0,
 	'File::Temp' => 0,
 	'Module::Info' => 0,
-	'Object::Configure' => 0.10,
-	'Params::Get' => 0.04,
+	'Object::Configure' => 0.12,
+	'Params::Get' => 0.13,
+	'Return::Set' => 0,
 	'Scalar::Util' => 0,
 	'Text::CSV' => 0,
 	'YAML::XS' => 0,
@@ -84,7 +93,9 @@ WriteMakefile(
 	'DEFINE' => '',     # e.g., '-DHAVE_SOMETHING'
 	'INC' => '',	# e.g., '-I/usr/include/other'
 	PL_FILES => (defined($ENV{'AUTOMATED_TESTING'}) ? {} : {'bin/create_db.PL' => 'bin/create_db'}),
-	TEST_REQUIRES => {
+	CONFIGURE_REQUIRES => {
+		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
+	}, TEST_REQUIRES => {
 		'FindBin' => 0,
 		'File::Temp' => 0,
 		'Test::Carp' => 0,
@@ -100,7 +111,7 @@ WriteMakefile(
 	dist => $dist,
 	clean => { FILES => 'Genealogy-Obituary-Lookup-*' },
 	realclean => {
-		FILES => 'Genealogy-Obituary-Lookup-* lib/Genealogy/Obituary-Lookup/data'
+		FILES => 'Genealogy-Obituary-Lookup-* lib/Genealogy/Obituary/Lookup/data'
 	},
 	# META_ADD => {
 		# provides => {}

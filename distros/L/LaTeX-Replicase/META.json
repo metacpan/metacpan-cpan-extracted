@@ -35,6 +35,7 @@
             "Carp" : "0",
             "Digest::MD5" : "2.59",
             "File::Basename" : "2.86",
+            "File::Compare" : "1.00",
             "File::Path" : "2.18",
             "Test::More" : "0.98",
             "Test::More::UTF8" : "0.05",
@@ -44,6 +45,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.03",
+   "version" : "0.031",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,5 +1,5 @@
-LaTeX-Replicase version 0.03
-============================
+LaTeX-Replicase version 0.031
+=============================
 
 The module provides the necessary subroutines to generate 
 Russian wording of numerals from numerical values (unsigned integer and 0).
@@ -30,6 +30,7 @@ Test::More::UTF8
 Test::Pod
 File::Basename
 File::Path
+File::Compare
 Digest::MD5
 Carp
 

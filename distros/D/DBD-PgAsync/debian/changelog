@@ -1,3 +1,10 @@
+libdbd-pg-async-perl (0.8.1) unstable; urgency=medium
+
+  * use prototypes for quote/ dequote function pointers in types.h for C23
+    compliance 
+
+ -- Rainer Weikusat <rweikusat@talktalk.net>  Tue, 19 Aug 2025 14:20:43 +0100
+
 libdbd-pg-async-perl (0.8) unstable; urgency=medium
 
   * support asychronous ping

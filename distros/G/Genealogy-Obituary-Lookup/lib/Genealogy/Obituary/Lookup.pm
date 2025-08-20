@@ -8,8 +8,9 @@ use Data::Reuse;
 use File::Spec;
 use Genealogy::Obituary::Lookup::obituaries;
 use Module::Info;
-use Object::Configure 0.10;
-use Params::Get 0.04;
+use Object::Configure 0.12;
+use Params::Get 0.13;
+use Return::Set;
 use Scalar::Util;
 
 use constant URLS => {
@@ -24,11 +25,18 @@ Genealogy::Obituary::Lookup - Lookup an obituary
 
 =head1 VERSION
 
-Version 0.18
+Version 0.19
 
 =cut
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
+
+# Class-level constants
+use constant {
+	DEFAULT_CACHE_DURATION => '1 day',	# The database is updated daily
+	MIN_LAST_NAME_LENGTH   => 1,
+	MAX_LAST_NAME_LENGTH   => 100,
+};
 
 =head1 SYNOPSIS
 
@@ -98,22 +106,28 @@ sub new
 	# Load the configuration from a config file, if provided
 	%args = %{Object::Configure::configure($class, \%args)};
 
-	my $directory = $args{'directory'} || $Database::Abstraction{'defaults'}{'directory'};
-	if(!defined($directory)) {
+	if(!defined(my $directory = ($args{'directory'} || $Genealogy::Obituary::Lookup::obituaries->{'directory'}))) {
 		# If the directory argument isn't given, see if we can find the data
 		$directory = Module::Info->new_from_loaded($class)->file();
 		$directory =~ s/\.pm$//;
 		$args{'directory'} = File::Spec->catfile($directory, 'data');
 	}
 
-	if(!-d $directory) {
-		Carp::carp("$class: $directory is not a directory");
+	unless((-d $args{'directory'}) && (-r $args{'directory'})) {
+		Carp::carp("$class: $args{directory} is not a directory");
 		return;
+	}
+
+	# Validate logger object has required methods
+	if(defined $args{'logger'}) {
+		unless(Scalar::Util::blessed($args{'logger'}) && $args{'logger'}->can('info') && $args{'logger'}->can('error')) {
+			Carp::croak("Logger must be an object with info() and error() methods");
+		}
 	}
 
 	# cache_duration can be overridden by the args
 	return bless {
-		cache_duration => '1 day',	# The database is updated daily
+		cache_duration => DEFAULT_CACHE_DURATION,
 		%args,
 	}, $class;
 }
@@ -149,10 +163,14 @@ sub search
 	my $self = shift;
 	my $params = Params::Get::get_params('last', @_);
 
-	if(!defined($params->{'last'})) {
+	# Validate required parameters thoroughly
+	unless((defined($params->{'last'})) && (length($params->{'last'}) > 0)) {
 		Carp::carp("Value for 'last' is mandatory");
 		return;
 	}
+
+	# Sanitize input to prevent SQL injection
+	$params->{'last'} =~ s/[^\w\s\-']//g;	# Allow only word chars, spaces, hyphens, apostrophes
 
 	$self->{'obituaries'} ||= Genealogy::Obituary::Lookup::obituaries->new(no_entry => 1, no_fixate => 1, %{$self});
 
@@ -161,17 +179,21 @@ sub search
 	}
 
 	if(wantarray) {
-		my @obituaries = @{$self->{'obituaries'}->selectall_hashref($params)};
-		foreach my $obit(@obituaries) {
-			$obit->{'url'} = _create_url($obit);
+		if(my $obituaries = $self->{'obituaries'}->selectall_hashref($params)) {
+			foreach my $obit(@{$obituaries}) {
+				$obit->{'url'} = _create_url($obit) if(defined($obit));
+			}
+			my @rc = grep { defined $_ } @{$obituaries};
+			Data::Reuse::fixate(@rc);
+			return @rc;
 		}
-		Data::Reuse::fixate(@obituaries);
-		return @obituaries;
+		return;
 	}
 	if(defined(my $obit = $self->{'obituaries'}->fetchrow_hashref($params))) {
 		$obit->{'url'} = _create_url($obit);
 		Data::Reuse::fixate(%{$obit});
-		return $obit;
+
+		return Return::Set::set_return($obit, { 'type' => 'hashref', 'min' => 1 });
 	}
 	return;	# undef
 }

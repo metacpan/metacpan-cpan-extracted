@@ -4,7 +4,7 @@
       "Gianni Ceccarelli <dakkar@thenautilus.net>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "agpl_3"
    ],
@@ -66,9 +66,9 @@
          "web" : "https://www.thenautilus.net/cgit/xscreensaver-dbus/"
       }
    },
-   "version" : "1.0.5",
-   "x_generated_by_perl" : "v5.32.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.23",
+   "version" : "1.0.6",
+   "x_generated_by_perl" : "v5.40.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "AGPL-3.0"
 }
 

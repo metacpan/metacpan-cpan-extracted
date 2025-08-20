@@ -27,7 +27,7 @@ my %WriteMakefileArgs = (
     "Moose" => 0,
     "PerlX::Maybe" => 0,
     "Sub::Exporter::ForMethods" => 0,
-    "Test::CVE" => 0,
+    "Test::CVE" => "0.10",
     "Types::Common" => 0,
     "experimental" => 0,
     "namespace::autoclean" => 0
@@ -45,7 +45,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "v0.1.0",
+  "VERSION" => "v0.1.2",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -66,7 +66,7 @@ my %FallbackPrereqs = (
   "PerlX::Maybe" => 0,
   "Sub::Exporter::ForMethods" => 0,
   "Test2::V0" => 0,
-  "Test::CVE" => 0,
+  "Test::CVE" => "0.10",
   "Test::DZil" => 0,
   "Test::More" => 0,
   "Test::Warnings" => "0.009",

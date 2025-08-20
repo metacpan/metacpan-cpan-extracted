@@ -27,7 +27,7 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.64"
          }
       },
       "runtime" : {
@@ -53,8 +53,9 @@
             "LWP::UserAgent::WithCache" : "0",
             "Lingua::EN::NameCase" : "0",
             "Module::Info" : "0",
-            "Object::Configure" : "0.1",
-            "Params::Get" : "0.04",
+            "Object::Configure" : "0.12",
+            "Params::Get" : "0.13",
+            "Return::Set" : "0",
             "Scalar::Util" : "0",
             "Text::CSV" : "0",
             "Try::Tiny" : "0",
@@ -94,6 +95,6 @@
          "x_repository" : "https://github.com/nigelhorne/Genealogy-Obituary-Lookup"
       }
    },
-   "version" : "0.18",
+   "version" : "0.19",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

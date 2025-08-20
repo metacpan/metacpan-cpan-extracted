@@ -1,24 +1,36 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2012-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2012-2024 -- leonerd@leonerd.org.uk
 
-package Struct::Dumb;
+package Struct::Dumb 0.15;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.14';
 
 use Carp;
 
-use Scalar::Util qw( refaddr );
+use Scalar::Util qw( blessed refaddr );
 
 # 'overloading.pm' was only added in 5.10
 # Before that we can't easily implement forbidding of @{} overload, so lets not
 use constant HAVE_OVERLOADING => eval { require overloading };
 
 use constant HAVE_FEATURE_CLASS => defined eval { require feature; $feature::feature{class} };
+
+BEGIN {
+   if( HAVE_FEATURE_CLASS ) {
+      my $ok = eval <<'EOF';
+         { use experimental 'class'; class Struct::Dumb::Struct { }; }
+         1
+EOF
+
+      die $@ unless $ok;
+   }
+   else {
+      eval "{ package Struct::Dumb::Struct; }";
+   }
+}
 
 =head1 NAME
 
@@ -281,6 +293,7 @@ sub _build_class_for_classical
    }
 
    no strict 'refs';
+   *{"${pkg}::ISA"} = [ 'Struct::Dumb::Struct' ];
    *{"${pkg}::$_"} = $subs{$_} for keys %subs;
 }
 
@@ -317,20 +330,38 @@ sub _build_class_for_feature_class
 
    my @fieldcode = map {
       my $name = $_;
-      my $var = "\$$name";
+      die "Field names are not permitted to contain ( or ) chars" if $name =~ m/[()]/;
 
-      "  field $var :param = undef;",
-      "  method $name$lvalue { \@_ and croak \"$pkg->$name invoked with arguments\"; $var }",
+      # Mangle the field name until it has only valid identifiers
+      # TODO: If someone tries to name a field  foo_xDDbar  then it might
+      # conflict with a mangled one.
+      my $var = '$' . $name =~ s/^(\P{ID_Start})/sprintf "_x%X", ord $1/er
+                            =~ s/(\P{ID_Continue})/sprintf "_x%X", ord $1/ger;
+
+      if( $var eq '$'.$name ) {
+         "  field $var :param = undef;",
+         "  method $name$lvalue { \@_ and croak \"$pkg->$name invoked with arguments\"; $var }",
+      }
+      else {
+         my $qname = quotemeta $name;
+         my $qqname = $name =~ s/"/\\"/gr;
+         "  field $var :param($name) = undef;",
+         "  { no strict 'refs'; *{\"${pkg}::${qname}\"} = method$lvalue { \@_ and croak \"$pkg->$qqname invoked with argument\"; $var } }",
+      }
    } @$fields;
 
    my $code = join( "\n",
       "use experimental 'class';",
-      "class $pkg {",
+      "class $pkg :isa(Struct::Dumb::Struct) {",
       "  use Carp;",
       @fieldcode,
       "}", "" );
 
-   eval "$code; 1" or die $@;
+   unless( eval "$code; 1" ) {
+      my $e = $@;
+      $e =~ s/at \(eval \d+\) line \d+/"at eval() in ".__FILE__." line ".__LINE__/eg;
+      die $e;
+   }
 }
 
 =head2 struct
@@ -375,6 +406,56 @@ C<:lvalue> attribute.
 Takes the same options as L</struct>.
 
 =cut
+
+=head2 dumper_info
+
+   my $info = Struct::Dumb::dumper_info( $struct );
+
+I<Since version 0.15.>
+
+This function takes any instance of a Struct::Dumb-style struct and returns a
+hashref with the keys C<named>, C<fields>, and C<values>. "named" is a
+boolean, which is true if the struct uses a named constructor. "fields" is an
+arrayref giving the names of the struct's fields. "values" is an arrayref
+giving the values for those fields in corresponding order.
+
+This is just meant for tools like pretty printers to be able to inspect
+structures. We can't stop you from using it for nefarious purposes, but please
+don't.
+
+If the given C<$struct> is not an instance of a known class, an exception will
+be raised.
+
+This function is not exported.
+
+=cut
+
+sub dumper_info
+{
+   my ( $struct ) = @_;
+
+   my $class = blessed $struct;
+
+   unless( defined $class and $struct->isa( 'Struct::Dumb::Struct' ) ) {
+      croak "Struct::Dumb::dumper_info invoked with non-struct argument: $struct";
+   }
+
+   # Perl drops the leading `main::` in `main::StructName` so if there's no
+   # `::` we'll have to put it back
+   $class =~ m/::/ or $class = "main::$class";
+   my $meta = $_STRUCT_PACKAGES{$class};
+
+   unless( $meta ) {
+       confess "Struct::Dumb::dumper_info encountered unknown struct class $class (this should not happen!)";
+   }
+
+   my $fields = $meta->{fields};
+   return {
+      named  => !!$meta->{named},
+      fields => [ @$fields ],
+      values => [ map {; scalar $struct->$_ } @$fields ],
+   };
+}
 
 =head1 DATA::DUMP FILTER
 
@@ -441,17 +522,16 @@ sub maybe_apply_datadump_filter
 
    Data::Dump::Filtered::add_dump_filter( sub {
       my ( $ctx, $obj ) = @_;
-      return undef unless my $meta = $_STRUCT_PACKAGES{ $ctx->class };
+      return undef unless $_STRUCT_PACKAGES{ $ctx->class };
 
-      my $fields = $meta->{fields};
+      my $dump = dumper_info( $obj );
+
       return {
          dump => sprintf "%s(%s)", $ctx->class,
             join ", ", map {
-               my $field = $fields->[$_];
-
-               ( $meta->{named} ? "$field => " : "" ) .
-               Data::Dump::dump($obj->$field)
-            } 0 .. $#$fields
+               ( $dump->{named} ? "$dump->{fields}[$_] => " : "" ) .
+               Data::Dump::dump($dump->{values}[$_]),
+            } 0 .. $#{$dump->{fields}},
       };
    });
 }

@@ -1,4 +1,22 @@
 Release history for Dist-Zilla-Plugin-Test-CVE:
 
+v0.1.2    2025-08-19 17:20:41+01:00 Europe/London
+  [Enhancements]
+  - Internal code improvements.
+
+  [Documentation]
+  - Added a discussion of the risks associated with the use/misuse of Test::CVE in the SECURITY CONSIDERATIONS.
+
+  - Include SECURITY CONSIDERATIONS in the README.
+
+v0.1.1    2025-08-19 12:43:28+01:00 Europe/London
+  [Bug Fixes]
+  - Addded missing pragma to explicitly enable postderef.
+
+  - Specified minimum version of Test::CVE.
+
+  [Toolchain]
+  - Added GitHub Workflow for testing.
+
 v0.1.0    2025-08-18 21:31:01+01:00 Europe/London
   - Initial prototype published on CPAN.

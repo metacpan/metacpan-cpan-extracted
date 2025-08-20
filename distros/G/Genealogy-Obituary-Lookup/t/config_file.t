@@ -49,9 +49,9 @@ my ($badfh, $badfile) = tempfile();
 print $badfh "--- Just a list\n- foo\n- bar\n";
 close $badfh;
 
-throws_ok {
-	Genealogy::Obituary::Lookup->new(config_file => $badfile, config_dirs => ['']);
-} qr /Can't load configuration from/, 'Throws error if config is not a hashref';
+lives_ok {
+	Genealogy::Obituary::Lookup->new(config_file => $badfile);
+} 'Runs OK if config is not a hashref';
 
 # Config file exists but has no key for the class
 my $nofield_file = File::Spec->catdir($tempdir, 'nokey.yml');

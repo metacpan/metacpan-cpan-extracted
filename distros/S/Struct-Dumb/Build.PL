@@ -1,3 +1,4 @@
+use v5;
 use strict;
 use warnings;
 
@@ -5,6 +6,9 @@ use Module::Build;
 
 my $build = Module::Build->new(
    module_name => 'Struct::Dumb',
+   requires => {
+      'perl' => '5.014',
+   },
    test_requires => {
       'Test2::V0' => 0,
    },

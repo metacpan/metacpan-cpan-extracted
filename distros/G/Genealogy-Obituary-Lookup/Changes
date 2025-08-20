@@ -1,5 +1,12 @@
 Revision history for Genealogy::Obituary::Lookup
 
+0.19	Tue Aug 19 19:59:45 EDT 2025
+	Look in the correct place for the default directory
+	Validate last name
+	Use Return::Set
+	search(): remove undefined elements from the array
+	Reduce the number of copies
+
 0.18	Sat Jul  5 21:28:33 EDT 2025
 	Updated the MANIFEST with the new module name (Fixes Github#9)
 

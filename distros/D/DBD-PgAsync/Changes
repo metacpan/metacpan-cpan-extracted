@@ -1,5 +1,9 @@
 Changes for the DBD::PgAsync module
 
+--- 08/19/2025 rweikusat@talktalk.net ---
+
+     - use prototypes for quote/ dequote function pointers for C23 compliance
+
 --- 08/12/2025 rweikusat@talkalkt.net ---
 
     - asynchronous ping

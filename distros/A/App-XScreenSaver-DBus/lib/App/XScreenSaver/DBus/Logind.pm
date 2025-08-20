@@ -6,7 +6,7 @@ use curry;
 use Net::DBus;
 use IPC::Run;
 use Log::Any;
-our $VERSION = '1.0.5'; # VERSION
+our $VERSION = '1.0.6'; # VERSION
 # ABSTRACT: implements the logind "inhibitor locks" and "session lock" protocols
 
 
@@ -70,12 +70,23 @@ sub _inhibit($self) {
     return;
 }
 
+sub _uninhibit($self) {
+    return unless $self->inhibit_fd;
+
+    # logind/dbus gives us a file *descriptor* (i.e. a number),
+    # but `close` wants a file *handle*; this `open` creates the
+    # handle without opening extra descriptors
+    open my $fh, '+<&=', $self->inhibit_fd;
+    close $fh;
+    $self->_set_inhibit_fd(undef);
+}
+
 sub _going_to_sleep($self,$before) {
     if ($before) {
         $self->log->debug('locking');
         $self->_xscreensaver_command('-suspend');
         $self->log->debug('locked');
-        $self->_set_inhibit_fd(undef);
+        $self->_uninhibit();
     }
     else {
         $self->log->debug('woken up');
@@ -120,7 +131,7 @@ App::XScreenSaver::DBus::Logind - implements the logind "inhibitor locks" and "s
 
 =head1 VERSION
 
-version 1.0.5
+version 1.0.6
 
 =head1 SYNOPSIS
 

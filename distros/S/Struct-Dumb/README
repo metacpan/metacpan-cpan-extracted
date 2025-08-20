@@ -142,6 +142,27 @@ FUNCTIONS
 
     Takes the same options as "struct".
 
+ dumper_info
+
+       my $info = Struct::Dumb::dumper_info( $struct );
+
+    Since version 0.15.
+
+    This function takes any instance of a Struct::Dumb-style struct and
+    returns a hashref with the keys named, fields, and values. "named" is a
+    boolean, which is true if the struct uses a named constructor. "fields"
+    is an arrayref giving the names of the struct's fields. "values" is an
+    arrayref giving the values for those fields in corresponding order.
+
+    This is just meant for tools like pretty printers to be able to inspect
+    structures. We can't stop you from using it for nefarious purposes, but
+    please don't.
+
+    If the given $struct is not an instance of a known class, an exception
+    will be raised.
+
+    This function is not exported.
+
 DATA::DUMP FILTER
 
     Since version 0.10.

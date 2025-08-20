@@ -1,5 +1,18 @@
 Revision history for Struct-Dumb
 
+0.15    2025-08-19
+        [CHANGES]
+         * Added `dumper_info` helper function
+           (thanks Ricardo Signes <rjbs@semiotic.systems>) 
+         * Make sure to only set `:lvalue` on generated accesor methods for
+           lvalue fields
+         * General style updates for Perl v5.14+
+
+        [BUGFIXES]
+         * Allow field names that are not valid Perl identifiers even when
+           using Perl 5.38+ (RT150958)
+         * More helpful error message if `eval()` fails (RT146412)
+
 0.14    2023-02-11
         [CHANGES]
          * Updates to `feature 'class'` support, using `:param` instead of

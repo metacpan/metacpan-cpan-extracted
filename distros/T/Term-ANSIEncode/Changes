@@ -66,3 +66,12 @@
 
         Updated the options for the ansi-encode script, as well as
         the banner.vt file used with Makefile.PL
+
+1.21    Aug 15, 2025
+
+        Help and symbol output overhaul and more Unicode characters when
+		--full is used.
+
+1.23    Aug 19, 2025
+
+        More visual improvements with options output

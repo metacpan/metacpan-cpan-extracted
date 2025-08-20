@@ -70,7 +70,7 @@
             "Moose" : "0",
             "PerlX::Maybe" : "0",
             "Sub::Exporter::ForMethods" : "0",
-            "Test::CVE" : "0",
+            "Test::CVE" : "0.10",
             "Types::Common" : "0",
             "experimental" : "0",
             "namespace::autoclean" : "0",
@@ -99,7 +99,7 @@
    "provides" : {
       "Dist::Zilla::Plugin::Test::CVE" : {
          "file" : "lib/Dist/Zilla/Plugin/Test/CVE.pm",
-         "version" : "v0.1.0"
+         "version" : "v0.1.2"
       }
    },
    "release_status" : "stable",
@@ -113,7 +113,7 @@
          "web" : "https://github.com/robrwo/perl-Dist-Zilla-Plugin-Test-CVE"
       }
    },
-   "version" : "v0.1.0",
+   "version" : "v0.1.2",
    "x_authority" : "cpan:RRWO",
    "x_generated_by_perl" : "v5.34.3",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",

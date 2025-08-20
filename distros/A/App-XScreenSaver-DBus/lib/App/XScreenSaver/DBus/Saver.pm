@@ -7,7 +7,7 @@ use Log::Any;
 use Try::Tiny;
 use IPC::Run;
 use App::XScreenSaver::DBus::SaverProxy;
-our $VERSION = '1.0.5'; # VERSION
+our $VERSION = '1.0.6'; # VERSION
 # ABSTRACT: implements the "idle inhibition" protocol
 
 
@@ -166,7 +166,7 @@ App::XScreenSaver::DBus::Saver - implements the "idle inhibition" protocol
 
 =head1 VERSION
 
-version 1.0.5
+version 1.0.6
 
 =head1 SYNOPSIS
 

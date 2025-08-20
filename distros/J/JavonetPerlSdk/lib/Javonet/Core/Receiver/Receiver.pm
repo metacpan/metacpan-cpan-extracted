@@ -18,9 +18,17 @@ BEGIN {
 
 use lib "$perlLibDirJavonet";
 use lib "$perlLibDirDeps";
+#use Nice::Try; Try-catch statement causes unhandler exception in c++
 use aliased 'Javonet::Core::Interpreter::Interpreter' => 'Interpreter';
 use aliased 'Javonet::Sdk::Core::RuntimeLogger' => 'RuntimeLogger';
-#
+use aliased 'Javonet::Core::Exception::ExceptionSerializer' => 'ExceptionSerializer';
+use aliased 'Javonet::Sdk::Core::PerlCommand' => 'PerlCommand';
+use aliased 'Javonet::Sdk::Core::PerlCommandType' => 'Javonet::Sdk::Core::PerlCommandType';
+use aliased 'Javonet::Sdk::Core::RuntimeLib' => 'Javonet::Sdk::Core::RuntimeLib';
+use aliased 'Javonet::Core::Protocol::CommandSerializer' => 'CommandSerializer';
+#use aliased 'Javonet::Core::Exception::Exception' => 'Exception';
+
+
 sub heart_beat {
     my ($self, $message_byte_array_ref) = @_;
     my @response_byte_array = (49, 48);
@@ -30,8 +38,19 @@ sub heart_beat {
 sub send_command {
     my ($self, $message_byte_array_ref) = @_;
     my @message_byte_array = @$message_byte_array_ref;
-    my @response_byte_array = Javonet::Core::Interpreter::Interpreter->process(\@message_byte_array);
+    my @response_byte_array;
+#    try {
+        @response_byte_array = Javonet::Core::Interpreter::Interpreter->process(\@message_byte_array);
+#    }
+#    catch ( $e ) {
+#        my $exception = Exception->new($e);
+#        my $exception_command = Javonet::Core::Exception::ExceptionSerializer->serialize($exception);
+#        @response_byte_array = CommandSerializer->serialize($exception_command, 0);
+#    };
+
     return \@response_byte_array;
+
+
 }
 
 sub get_runtime_info {

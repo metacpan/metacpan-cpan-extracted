@@ -6,7 +6,7 @@ use warnings;
 use Test2::Require::AuthorTesting;
 
 use Test2::V0;
-use Test::CVE;
+use Test::CVE 0.10;
 
 has_no_cves(
   author => 1,

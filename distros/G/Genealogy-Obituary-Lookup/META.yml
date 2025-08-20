@@ -15,7 +15,7 @@ build_requires:
   Test::NoWarnings: '0'
   YAML::XS: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
 license: open_source
@@ -49,8 +49,9 @@ requires:
   LWP::UserAgent::WithCache: '0'
   Lingua::EN::NameCase: '0'
   Module::Info: '0'
-  Object::Configure: '0.1'
-  Params::Get: '0.04'
+  Object::Configure: '0.12'
+  Params::Get: '0.13'
+  Return::Set: '0'
   Scalar::Util: '0'
   Text::CSV: '0'
   Try::Tiny: '0'
@@ -62,5 +63,5 @@ resources:
   bugtracker: https://github.com/nigelhorne/Genealogy-Obituary-Lookup/issues
   homepage: https://metacpan.org/pod/Genealogy::Obituary::Lookup
   repository: git://github.com/nigelhorne/Genealogy-Obituary-Lookup.git
-version: '0.18'
+version: '0.19'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

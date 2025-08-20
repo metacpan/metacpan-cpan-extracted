@@ -1,3 +1,4 @@
+.editorconfig
 Build.PL
 Changes
 lib/Struct/Dumb.pm
@@ -14,4 +15,5 @@ t/04named.t
 t/05predicate.t
 t/10data-dump.t
 t/11data-dump-late.t
+t/90rt150958.t
 t/99pod.t

@@ -12,12 +12,12 @@ use Data::Section 0.004 { installer => method_installer }, '-setup';
 use Dist::Zilla ();
 use Dist::Zilla::File::InMemory;
 use PerlX::Maybe qw( maybe );
-use Test::CVE ();
+use Test::CVE 0.10 ();
 use Types::Common qw( ConsumerOf NonEmptyStr HashRef );
 
 use namespace::autoclean;
 
-use experimental qw( signatures );
+use experimental qw( postderef signatures );
 
 with qw(
   Dist::Zilla::Role::FileGatherer
@@ -26,7 +26,7 @@ with qw(
   Dist::Zilla::Role::PrereqSource
 );
 
-our $VERSION = 'v0.1.0';
+our $VERSION = 'v0.1.2';
 
 
 
@@ -87,7 +87,7 @@ sub gather_files($self) {
         $self->_file_obj(
             Dist::Zilla::File::InMemory->new(
                 name    => $self->filename,
-                content => ${ $self->section_data('__TEST__') },
+                content => $self->section_data('__TEST__')->$*,
             )
         )
     );
@@ -134,8 +134,6 @@ sub register_prereqs($self) {
 
 __PACKAGE__->meta->make_immutable;
 
-1;
-
 =pod
 
 =encoding UTF-8
@@ -150,7 +148,7 @@ Dist::Zilla::Plugin::Test::CVE - add tests for known CVEs
 
 =head1 VERSION
 
-version v0.1.0
+version v0.1.2
 
 =head1 SYNOPSIS
 
@@ -167,6 +165,8 @@ In the F<dist.ini>:
 
 This is a L<Dist::Zilla> plugin to add L<Test::CVE> author tests to a distribution for known CVEs.
 
+Note that this module is I<experimental>.  See L</SECURITY CONSIDERATIONS>.
+
 =head1 CONFIGURATION OPTIONS
 
 =head2 filename
@@ -179,6 +179,16 @@ All other options are passed to L<Test::CVE>.
 
 This will only identify known CVEs in list dependencies.
 It may not identify CVEs in undeclared prerequisites or deep prerequisites.
+
+The results from running L<Test::CVE> on a CPAN distribution may or may not be useful.
+
+If there is a fix available for a CVE, then authors can update the minimum version of that prerequisite.
+
+If there is no fix, then authors may have no choice but to add the issue to the C<skip> list.
+There is the risk that authors will forget about skipped security issues if they remain unfixed for a long time.
+
+There is also a risk that authors may add issues to the C<skip> list if this test blocks a release,
+and then forget to remove the issue when a fix is released.
 
 =head1 SUPPORT
 
@@ -227,7 +237,7 @@ use warnings;
 {{ $author }}
 
 use Test2::V0;
-use Test::CVE;
+use Test::CVE 0.10;
 
 has_no_cves{{ $args_perl }};
 

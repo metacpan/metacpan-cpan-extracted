@@ -61,6 +61,7 @@ t/functionalTests/RuntimeContext.t
 t/functionalTests/SdkExceptionHelper.t
 t/unitTests/CommandDeserializer.t
 t/unitTests/CommandSerializer.t
+t/unitTests/ExceptionSerializer.t
 t/unitTests/Receiver.t
 t/unitTests/TypeDeserializer.t
 t/unitTests/TypeSerializer.t

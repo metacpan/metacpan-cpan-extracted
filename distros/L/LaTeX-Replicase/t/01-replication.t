@@ -15,7 +15,7 @@ use utf8;
 use Test::More tests => 12;
 use Test::More::UTF8;
 use Digest::MD5;
-
+use File::Path;
 
 BEGIN { use_ok('LaTeX::Replicase') }; ### Test 1
 use LaTeX::Replicase qw(:all);
@@ -79,16 +79,31 @@ to make widely accessible a wealth of mined data on chimeric RNAs, with easy-to-
 my $file = 't/template_good.tex';
 my $ofile = 't/ready_good.tex';
 
+unlink $ofile;
 my $msg = replication( $file, $info, ofile => $ofile, def => 1, ignore => 1 ) // [];
 
 is( @$msg, 0, "Test #2: '$file'");
 
-
 ###Test 3
-open (my $fh, '<', $ofile) or die "Can't open '$ofile': $!";
-binmode ($fh);
-is( Digest::MD5->new->addfile($fh)->hexdigest, '526a81de57c3ca8618d31d46c40fdc31', "Test #3: MD5SUM of '$ofile'");
-close $fh;
+open OFILE, $ofile or die "Can't open '$ofile': $!";
+$msg = [];
+while(<OFILE>) {
+	s/\s+$//;
+	push @$msg, $_;
+}
+close OFILE;
+
+open TFILE, 't/template_test.tex' or die "Can't open 't/template_test.tex': $!";
+my $msg_ref3 = [];
+while(<TFILE>) {
+	s/\s+$//;
+	push @$msg_ref3, $_;
+}
+close TFILE;
+
+is_deeply( $msg, $msg_ref3, "Test #3: Check '$ofile' body");
+
+unlink $ofile;
 
 ###Test 6
 my $outdir = 't/tmp';
@@ -97,11 +112,22 @@ $msg = replication( $file, $info, outdir => $outdir, def => 1, utf8 => 1, ignore
 is( @$msg, 0, "Test #6: OUTDIR");
 
 ###Test 7
-open ($fh, '<', "$outdir/template_good.tex") or die "Can't open '$outdir/template_good.tex': $!";
-binmode ($fh);
-is( Digest::MD5->new->addfile($fh)->hexdigest, '526a81de57c3ca8618d31d46c40fdc31', "Test #7: MD5SUM of OUTDIR dor '$file'");
-close $fh;
+# open ($fh, '<', "$outdir/template_good.tex") or die "Can't open '$outdir/template_good.tex': $!";
+# binmode ($fh);
+# is( Digest::MD5->new->addfile($fh)->hexdigest, '526a81de57c3ca8618d31d46c40fdc31', "Test #7: MD5SUM of OUTDIR '$file'");
+# close $fh;
 
+open OFILE, "$outdir/template_good.tex" or die "Can't open '$outdir/template_good.tex': $!";
+$msg = [];
+while(<OFILE>) {
+	s/\s+$//;
+	push @$msg, $_;
+}
+close OFILE;
+
+is_deeply( $msg, $msg_ref3, "Test #7: Check OUTDIR of '$outdir/template_good.tex' body");
+
+unlink $ofile;
 
 ###Test 8
 $msg = replication( $file, $info, ofile => $ofile, def => 1, debug => 1 ) // [];
@@ -160,6 +186,9 @@ is_deeply( $msg, $msg_ref, "Test #5: unknown %%%VARs");
 
 
 ###Test 11
+$file = 't/template_good.tex';
+$ofile = 't/ready_good.tex';
+
 $msg = replication( $file, $info, ofile => $ofile, def => 1, silent =>1, debug => 1 ) // [];
 
 my $msg_ref2 = [
@@ -192,12 +221,26 @@ is_deeply( $msg, $msg_ref2, "Test #11: unknown %%%VARs with DEBUG");
 
 
 ###Test 9
-$msg = replication( $file, $info, ofile => $file, silent =>1, debug => 0 ) // [];
+my $newfile = "t/$$.tex";
+open IFILE, $file or die $!;
+open OFILE, ">$newfile" or die $!;
+print OFILE <IFILE>;
+close OFILE;
+close IFILE;
 
-is( $msg->[0], "!!! ERROR#3: Input (template) & output files match. Can't overwrite template file!", "Test #9: INFILE == OUTFILE");
+$msg = replication( $newfile, $info, ofile => $newfile, silent =>1, debug => 0 ) // [];
+
+unlink $newfile;
+
+my $msg_ref9 = [
+	"!!! ERROR#3: Input (template) & output files match. Can't overwrite template file!",
+];
+
+is_deeply( $msg, $msg_ref9, "Test #9: INFILE == OUTFILE");
+
 
 ###Test 10
-$msg = replication( $file, {}, ofile => $file, silent =>1 ) // [];
+$msg = replication( $file, {}, ofile => $file, silent =>1, debug => 0 ) // [];
 
 is( $msg->[0], "!!! ERROR#2: EMPTY data!", "Test #10: EMPTY data");
 
@@ -215,16 +258,26 @@ $info = {
 			myTable_array => {
 				0 => ['00', '01', '02', '03', '04',], # row 0
 			},
+			myTable_hash => [ # custom user variable ARRAY-HASH
+				{A=>'00', B=>'01', C=>'02', D=>'03', E=>'04',}, # row 0
+			],
 		},
 	};
 
-$msg = replication( $file, $info, ofile => $ofile, silent =>1 ) // [];
+$msg = replication( $file, $info, ofile => $ofile, silent =>1, debug => 0 ) // [];
 
-# is( $msg->[0], "!!! ERROR#2: EMPTY data!", "Test #12:");
+my $msg_ref12 = [
+	'~~> WARNING#2: Unknown SCALAR or ARRAY %%%VAR:myTable_array',
+	'~~> WARNING#3: unknown SCALAR tag = 0',
+	'~~> WARNING#3: unknown SCALAR tag = 1',
+	'~~> WARNING#3: unknown SCALAR tag = 2',
+	'~~> WARNING#3: unknown SCALAR tag = 3',
+	'~~> WARNING#3: unknown SCALAR tag = 4',
+	'~~> WARNING#3: unknown SCALAR tag = NoNameI',
+	'~~> WARNING#2: Unknown SCALAR or ARRAY %%%VAR:NoNameII',
+];
 
-$md5 = Digest::MD5->new;
-for( @$msg ) {
-	$md5->add($_);
-}
-is( $md5->hexdigest, 'b9fa29a73c2d2d23873b0cfea888476d', "Test #12: wrong ARRAY");
+is_deeply( $msg, $msg_ref12, "Test #12: wrong ARRAY");
 
+unlink $ofile;
+rmtree('t/tmp');

@@ -4,3 +4,5 @@ Revision history for Perl extension LaTeX::Replicase.
 	- original version; created by h2xs 1.23 with options
 		-XAn LaTeX::Replicase
 
+0.031 Fri Aug 19 09:09:09 2025
+	- Fixed tests for MSWIN32

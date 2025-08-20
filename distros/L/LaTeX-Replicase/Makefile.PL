@@ -17,6 +17,7 @@ WriteMakefile(
 		'Test::Pod'          => '1.22',
 		'File::Basename'     => '2.86',
 		'File::Path'         => '2.18',
+		'File::Compare'      => '1.00',
 		'Digest::MD5'        => '2.59',
 		'Carp'               => '0',
     },

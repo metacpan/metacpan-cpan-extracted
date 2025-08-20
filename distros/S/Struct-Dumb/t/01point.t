@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use Test2::V0;
@@ -13,6 +13,8 @@ struct Point => [qw( x y )];
 
 my $point = Point(10, 20);
 ok( ref $point, '$point is a ref' );
+
+isa_ok( $point, 'Struct::Dumb::Struct' );
 
 can_ok( $point, "x" );
 
@@ -61,5 +63,13 @@ is( $point + 0, refaddr $point,
 
 like( "$point", qr/^main::Point=Struct::Dumb\(0x[0-9a-fA-F]+\)$/,
     'Point stringifies to something sensible' );
+
+is( Struct::Dumb::dumper_info( $point ),
+   {
+      named  => F(),
+      fields => [qw( x y )],
+      values => [ 10, 30 ],
+   },
+   'Struct::Dumb::dumper_info returns metadata and field values' );
 
 done_testing;

@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -19,6 +19,11 @@
             "Module::Build" : "0.4004"
          }
       },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.014"
+         }
+      },
       "test" : {
          "requires" : {
             "Test2::V0" : "0"
@@ -28,7 +33,7 @@
    "provides" : {
       "Struct::Dumb" : {
          "file" : "lib/Struct/Dumb.pm",
-         "version" : "0.14"
+         "version" : "0.15"
       }
    },
    "release_status" : "stable",
@@ -37,6 +42,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.14",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "0.15",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

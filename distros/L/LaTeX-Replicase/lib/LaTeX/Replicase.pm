@@ -7,6 +7,7 @@ use utf8;
 
 use File::Basename qw(fileparse);
 use File::Path qw(make_path);
+use File::Compare;
 use Carp;
 
 require Exporter;
@@ -21,7 +22,7 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw( );
 
-our $VERSION = '0.03';
+our $VERSION = '0.031';
 our $DEBUG; $DEBUG = 0 unless defined $DEBUG;
 our @logs;
 
@@ -35,7 +36,7 @@ sub replication {
 
 push @logs, "--> Check '$ifile' file" if $DEBUG;
 
-	if( ! -e( $ifile ) or -z( $ifile ) ) {
+	unless( -s $ifile ) {
 		$_ = "!!! ERROR#1: '$ifile' does NOT exist or is EMPTY!";
 		$op{silent} or carp $_;
 
@@ -71,9 +72,12 @@ push @logs, "--> Check '$ifile' file" if $DEBUG;
 push @logs, "--> Using '$ofile' file as output" if $DEBUG;
 
 	# new file must be different
-	if( $^O ne 'MSWin32'
-		and ! -z $ofile
-		and join(',', stat $ifile) eq join(',', stat $ofile)
+	if( -s $ofile
+		and (
+			( $ifile eq $ofile and compare( $ifile, $ofile ) == 0 )
+			or
+			( join(',', stat $ifile) eq join(',', stat $ofile) )
+		)
 	) {
 		$_= "!!! ERROR#3: Input (template) & output files match. Can't overwrite template file!";
 		$op{silent} or carp $_;
@@ -106,7 +110,6 @@ push @logs, "--> Open '$ofile'" if $DEBUG;
 		return \@logs;
 	};
 
-#	my $i = 0; # index of column (variable) in  table of input $data
 	my $key;
 	my @columns;
 
@@ -135,7 +138,6 @@ push @logs, "--> Open '$ofile'" if $DEBUG;
 				&_var_output( $fh, $data->{ $key }, $set->{ $key }, \@columns, \%op );
 
 				# Clear the VAR-structure for the next external variable
-#				$i = 0;
 				undef $key;
 				@columns = ();
 				next;
@@ -205,7 +207,6 @@ push @logs, '--> Found %%%VAR:'. $k if $DEBUG;
 				}
 
 				@columns = (); # JIC
-#				$i = 0;
 			}
 			elsif( $DEBUG or ! $op{ignore} ) {
 				push @logs, '~~> WARNING#2: Unknown SCALAR or ARRAY %%%VAR:'. $k;
@@ -393,6 +394,7 @@ Usage examples:
 
 =item 1.
 Using C<replication()> with default options.
+
 The following pseudo-code extract demonstrates this:
 
 =over 6
@@ -402,17 +404,17 @@ Fragment of the original (source) TeX file with fillable fields
 C<myParam>, C<myTable_array>, and C<myTable_hash>:
 
   SPECIFY VALUE of myParam! %%%V: myParam -- substitutes Variable
-  
+
   etc...
-  
+
   \begin{tcolorbox}
-  
+
   \rule{0mm}{4.5em}%%%VAR: myParam -- substitutes Variable as well
   ...
   ... SPECIFY VALUE of myParam!
   ...
   %%%END:
-  
+
   \end{tcolorbox}
 
 
@@ -427,45 +429,56 @@ C<myParam>, C<myTable_array>, and C<myTable_hash>:
   %%%CASE2: ...
   %%%CASE3: ...
    SPECIFY VALUE 0! %%%V:0
+
    & %%%ADD: %add " &\n" at beginning of value in the 1st column without any conditions for all rows
   %%%CASE1: ...
   %%%CASE2: ...
   SPECIFY VALUE 1! %%%V:1
+
    & %%%ADD:
   %%%CASE1: ...
   %%%CASE2: ...
   SPECIFY VALUE 2! %%%V:2
+
    & %%%ADD:
   %%%CASE1: ...
   %%%CASE2: ...
   SPECIFY VALUE 3! %%%V:3
+
    & %%%ADD:
   SPECIFY VALUE 4! %%%V:4
+
   \\%%%ADD:
   \midrule%%%ADD:
   %%%CASE5: ...
   ...
-  VALUE 0 & VALUE 1 & VALUE 2 & VALUE 3 & VALUE 4
+  VALUE 0 & VALUE 1 & VALUE 2 & VALUE 3 & VALUE 4 % All of this will be replaced until %%%END:
   \\
   \midrule
   ...
   %%%END:
-  
+
   \end{tabular}
-  
+
   ...
   \begin{tabbing}
   %%%VAR: myTable_hash
+
   %%%SKIP: \\
      SPECIFY VALUE 'A'! %%%V: A
+
    \= %%%ADD:
      SPECIFY VALUE 'B'! %%%V: B
+
    \= %%%ADD:
      SPECIFY VALUE 'C'! %%%V: C
+
    \= %%%ADD:
      SPECIFY VALUE 'D'! %%%V: D
+
    \= %%%ADD:
      SPECIFY VALUE 'E'! %%%V: E
+
   %%%END:
   \end{tabbing}
 
@@ -489,11 +502,11 @@ Data to fill TeX file (see above):
           {A=>30, B=>31, C=>32, D=>33, E=>34,}, # row 3
         ],
       },
-      
+
       cases => { # optional auxiliary data section
         myTable_array => {
           0 => { # table row 0
-            3 => [1, 2], # extract from document %%%CASE1: and %%%CASE2: for 3-rd column of table
+            3 => [1, 2], # extract from document %%%CASE1: and %%%CASE2: for 3-rd table column
             #...
           },
           2 => { # table row 2
@@ -506,47 +519,48 @@ Data to fill TeX file (see above):
         },
         myTable_hash => {
           1 => { # table row 1
-            B => 1, # extract %%%CASE1: for 'B' key (1-st column)
-            A => [1, 3], # extract %%%CASE1: and %%%CASE3: for 'A' key (0-th column)
+            B => 1, # extract %%%CASE1: for 'B' key (1-st position)
+            A => [1, 3], # extract %%%CASE1: and %%%CASE3: for 'A' key (0-th position)
             #...
           },
           0 => { # table row 0
             B => 2, # extract %%%CASE2:
-            C => [1, 2], # extract %%%CASE1: and %%%CASE2:
+            C => [1, 2], # extract %%%CASE1: and %%%CASE2: for 'C' key (2-nd position)
             #...
           },
         },
-  
+
       },
-  
+
   };
-  
+
   my $msg = replication( $file, $info );
 
 =back
 
 A new TeX C<base_file> from the template C<$file> filled with data from C<$info> will be created in
-B<random subdirectory> of current directory. File name of source C<$file> can be absolute,
+B<random subdirectory> (its name is stored in C<$$> variable) of current directory.
+File name of source C<$file> can be absolute,
 i.e. with a full path (include directories and subdirectories).
 C<base_file> name is extracted (same) from source C<$file>.
-Under no circumstances will source C<$file> be overwritten (except MSWin32) by new C<base_file>.
+Under no circumstances will source C<$file> be overwritten by new C<base_file>.
 
 =item 2.
-Using C<outdir> option, and with other default options:
+Using C<outdir> option:
 
   my $msg = replication( $file, $info, outdir => $target_dir );
 
 A new C<$file> will be created in C<$target_dir> directory.
 
 =item 3.
-Using C<ofile> option, and with other default options:
+Using C<ofile> option:
 
   my $msg = replication( $file, $info, ofile => $ofile );
 
 A new C<$ofile> will be created.
 C<ofile> option suppresses (eliminates) C<outdir> option, i.e.
 file name of C<$ofile> can be absolute.
-Under no circumstances will source C<$file> be overwritten (except MSWin32) by new C<$ofile>.
+Under no circumstances will source C<$file> be overwritten by new C<$ofile>.
 
 =item 4.
 Set the C<$DEBUG> package variable to enable debugging messages (global debug mode):
@@ -594,7 +608,7 @@ It can be nested in an ARRAY or HASH C<%%%VAR:> tag,
 but in SCALAR C<%%%VAR:> it will not work and will be discarded.
 
 =item *
-B< C<%%%VAR: variable_name> > is 訄 start of full form of regular (SCALAR) or complex (ARRAY, HASH) I<variable_name>,
+B< C<%%%VAR: variable_name> > is start of full form of regular (SCALAR) or complex (ARRAY, HASH) I<variable_name>,
 preserving preceding TeX up to %%%VAR: but completely replacing everything up to first C<%%%END:> tag inclusive.
 
   Blah, blah, \ldots blah. %%%VAR: myParam
@@ -623,7 +637,7 @@ The following tags can be located within the block limited by ARRAY and HASH C<%
 =item *
 B< C<%%%V: key|index> > with setting of C<key> (in case of HASH C<%%%VAR:>, i.e. C<%%%V: keyA>, C<%%%V:keyB>, etc.)
 or C<index> (in case ARRAY C<%%%VAR:>, i.e. C<%%%V:0>, C<%%%V:1>, C<%%%V:2>, etc.).
-Here C<keys> or C<indexes> are columns of the table being created (filled).
+Here C<keys> or C<indexes> are columns (or positions) of the table (filled area) being created.
 
 
 =item *
@@ -642,14 +656,14 @@ Or, if C<%%%ADD:> is located at the very beginning of line, then after it to the
 
   %%%ADD: Tail blah, blah, \ldots
 
-this text will be added (before or after ): C<Tail blah, blah, \ldots>.
+this text will be added: C<Tail blah, blah, \ldots>.
 
-If there is no following C<%%%V:> tag, text is output B<at the end of all> C<keys> or C<indexes> (columns)
-each table row, B<before (or after)> text of all C<%%%CASE:> tags (if exists).
+If the following C<%%%V:> tag is not present, then the text is output B<at the end of all> C<keys> or C<indexes> (columns)
+each table row, B<before (or after)> text-blocks of all C<%%%CASE:> tags (if exists).
 
 =item *
-B< C<%%%SKIP:> > similar to C<%%%ADD:> for all lines (records) of C<%%%VAR: variable_name>
-B<except the first column of first record> or after B<the last column of last record>.
+B< C<%%%SKIP:> > similar to C<%%%ADD:> for all lines (records)
+B<except the first column of first record> or B<after the last column of last record> (if exists).
 
 
 =item *
@@ -665,7 +679,7 @@ There can be as many C<%%%CASE[\d+]:> tags as you like.
 
 If C<%%%CASE[\d+]:> tags within the same C<%%%V:> have the same C<[\d+]> index, their texts are merged.
 
-C<%%%CASE[\d+]:> tags are only valid when following C<%%%V:> tag exists and is defined.
+C<%%%CASE[\d+]:> tags are only valid when following C<%%%V:> tag exists and is defined in the input C<data>.
 
 If there is no following C<%%%V:> tag, text is output at the end of all C<keys> or C<indexes> (columns)
 each table row. In the additional settings C<cases> hash these C<%%%CASE[\d+]:> must correspond 
@@ -688,14 +702,14 @@ LaTeX::Replicase provides this subroutine:
 
 =head2 replication( $file, $info [, %facultative_options ] )
 
-Creates a new file from the specified TeX C<$file>, which is a template.
+Creates a new output file from the specified TeX C<$file>, which is a template.
 C<$info> hash is used to fill template.
 
 File name of source C<$file> can be absolute,
 i.e. with a full path (include directories and subdirectories).
 
-A new file name is extracted (same) from source C<$file>.
-Under no circumstances will source C<$file> be overwritten by the new one (except MSWin32).
+The output file name is extracted (the same) from the source C<$file>.
+Under no circumstances will source C<$file> be overwritten by the new one.
 
 When C<replication> processes a C<$file> it identifies tags and replaces them with the result of whatever 
 the tag represents (e.g. variable value for  %%%V: or from %%%VAR: to %%%END:). Anything outside the tag(s),
@@ -719,30 +733,36 @@ A new C<$ofile> will be created.
 C<ofile> option suppresses (eliminates) C<outdir> option, i.e.
 file name of C<$ofile> can be absolute.
 
-=item C<def> 
-option specifies ignoring undefined values and associated structures (C<%%%CASEn:> and C<%%%ADD:>)
+=item C<utf8>
 
-  my $msg = replication( $file, $info, def =>1 );
-
-This option is useful, for example, for creating merged cells in tables (using \multicolumn command).
-
-=item C<utf8> 
-option specifies the template and output files' character encoding as utf8:
+This option specifies the template and output files' character encoding as utf8:
 
   my $msg = replication( $file, $info, utf8 =>1 );
 
+=item C<def>
+
+This option specifies B<discarding> (ignoring) C<undefined> values and associated structures (C<%%%CASEn:> and C<%%%ADD:>),
+i.e. B<take into account> only C<defined> values.
+
+  my $msg = replication( $file, $info, def =>1 );
+
+This option is useful, for example, for creating merged cells in tables (using C<\multicolumn> LaTeX-command).
+This option applies to all incoming data.
+
 =item C<ignore> 
-silently ignore undefined C<%%%V:> and/or C<%%%VAR:> tags:
+
+This option specifies silently ignore undefined B<name|key|index> of C<%%%V:> and C<%%%VAR:> tags:
 
   my $msg = replication( $file, $info, ignore =>1 );
 
-=item C<silent> 
+=item C<silent>
 silent mode of operation:
 
   my $msg = replication( $file, $info, silent =>1 );
 
-=item C<debug> 
-sets local debug mode:
+=item C<debug>
+
+This option sets local debug mode:
 
   my $msg = replication( $file, $info, debug =>1 );
   if( ! $msg ) {
@@ -758,7 +778,7 @@ Another way is to set the C<$DEBUG> package variable to enable debugging message
 
 =back
 
-C<replication> returns C<undef> or a reference to an error message(s) array on failure.
+C<replication> returns C<undef> or a reference to an error (and/or debug) message(s) array.
 
 =head1 EXPORT
 
