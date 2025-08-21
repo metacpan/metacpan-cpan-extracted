@@ -20,7 +20,7 @@ sub from_rgb {
                                [ 0.5     , -0.418688, -0.081312 ]], @$rgb);
     $yuv[1] += 0.5;
     $yuv[2] += 0.5;
-    return @yuv;
+    return \@yuv;
 }
 
 
@@ -31,7 +31,7 @@ sub to_rgb {
     my (@rgb) =  mult_matrix3([[ 1,  0       ,  1.402   ],
                                [ 1, -0.344136, -0.714136],
                                [ 1,  1.772   ,  0       ]], @$yuv);
-    return @rgb;
+    return \@rgb;
 }
 
 $yuv_def;

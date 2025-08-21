@@ -1,4 +1,4 @@
-# Copyrights 2001-2020 by [Mark Overmeer].
+# Copyrights 2001-2025 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
@@ -8,7 +8,7 @@
 
 package Mail::Transport::Exim;
 use vars '$VERSION';
-$VERSION = '3.005';
+$VERSION = '3.006';
 
 use base 'Mail::Transport::Send';
 
@@ -20,13 +20,11 @@ use Carp;
 
 sub init($)
 {   my ($self, $args) = @_;
-
     $args->{via} = 'exim';
 
     $self->SUPER::init($args) or return;
 
-    $self->{MTS_program}
-      = $args->{proxy}
+    $self->{MTS_program} = $args->{proxy}
      || ( -x '/usr/sbin/exim4' ? '/usr/sbin/exim4' : undef)
      || $self->findBinary('exim', '/usr/exim/bin')
      || return;
@@ -34,26 +32,25 @@ sub init($)
     $self;
 }
 
-#------------------------------------------
-
 
 sub trySend($@)
 {   my ($self, $message, %args) = @_;
 
     my $from = $args{from} || $message->sender;
     $from    = $from->address if ref $from && $from->isa('Mail::Address');
-    my @to   = map {$_->address} $self->destinations($message, $args{to});
+    my @to   = map $_->address, $self->destinations($message, $args{to});
 
     my $program = $self->{MTS_program};
-    if(open(MAILER, '|-')==0)
+    my $mailer;
+    if(open($mailer, '|-')==0)
     {   { exec $program, '-i', '-f', $from, @to; }  # {} to avoid warning
         $self->log(NOTICE => "Errors when opening pipe to $program: $!");
         exit 1;
     }
 
-    $self->putContent($message, \*MAILER, undisclosed => 1);
+    $self->putContent($message, $mailer, undisclosed => 1);
 
-    unless(close MAILER)
+    unless($mailer->close)
     {   $self->log(ERROR => "Errors when closing Exim mailer $program: $!");
         $? ||= $!;
         return 0;
@@ -61,7 +58,5 @@ sub trySend($@)
 
     1;
 }
-
-#------------------------------------------
 
 1;

@@ -2,7 +2,7 @@
 
 use v5.12;
 use warnings;
-use Test::More tests => 156;
+use Test::More tests => 142;
 BEGIN { unshift @INC, 'lib', '../lib'}
 
 #### basic object construction #########################################
@@ -43,6 +43,7 @@ $space = Graphics::Toolkit::Color::Space->new(axis => [qw/AAA BBB CCC DDD/], nam
 is( ref $space,     $module, 'created color space just with axis names and space name');
 is( $space->name,    'NAME', 'got given space name back');
 is( $space->alias,       '', 'no space anme alias this time');
+is( $space->is_linear,          1,  'per default spaces are linear');
 is( $space->is_name('name'),    1,  'can ask if given name is right');
 is( $space->is_name('abcd'),    0,  'axis initials are not a space name');
 is( $space->is_name(''),        0,  'empty string can never be a space name');
@@ -152,24 +153,12 @@ is( $val->[2],                    10, 'third value correct');
 is( $val->[3],                0.1111, 'fourth value correct');
 
 #### format ############################################################
-is( $space->has_format('bbb'), 0, 'vector name is not a format');
-is( $space->has_format('c'),   0, 'vector sigil is not  a format');
-is( $space->has_format('list'),1, 'list is a format');
-is( $space->has_format('hash'),1, 'hash is a format');
-is( $space->has_format('char_hash'),1, 'char_hash is a format');
 is( ref $space->format([1,2,3,4], 'hash'), 'HASH', 'formatted values into a hash');
 is( int($space->format([1,2,3,4], 'list')),     4, 'got long enough list of values');
 is( $space->format([1,2,3,4], 'bbb'),          '', 'got no value by key name');
 is( $space->format([1,2,3,4], 'AAA'),          '', 'got no value by uc key name');
 is( $space->format([1,2,3,4], 'c'),            '', 'got no value by shortcut name');
 is( $space->format([1,2,3,4], 'D'),            '', 'got no value by uc shortcut name');
-is( $space->has_format('str'),                  0, 'formatter not yet inserted');
-
-my $c = $space->add_formatter('str', sub { $_[1][0] .':'. $_[1][1] .':'. $_[1][2] .':'. $_[1][3]});
-is( ref $c,                               'CODE', 'formatter code accepted');
-is( $space->has_format('str'),                 1, 'formatter inserted');
-my $str = $space->format([1,2,3,4], 'str');
-is( $str,                                 '1:2:3:4', 'inserted formatter works');
 
 my $fval = $space->deformat({a => 1, b => 2, c => 3, d => 4});
 is( int @$fval,    4, 'deformatter recognized char hash');
@@ -190,23 +179,12 @@ is( $fval,  undef, 'char hash with bad key got ignored');
 $fval = $space->deformat({aaa => 1, bbb => 2, ccc => 3, dd => 4});
 is( $fval,  undef, 'char hash with bad key got ignored');
 
-is( $space->has_deformat('str'),                0, 'deformatter not yet inserted');
-my $dc = $space->add_deformatter('str', sub { [split ':', $_[1]] });
-is( ref $dc, 'CODE', 'deformatter code accepted');
-is( $space->has_deformat('str'),                1, 'deformatter accessible');
-$fval = $space->deformat('1:2:3:4');
-is( int @$fval,  4, 'self made deformatter recognized str');
-is( $fval->[0],  1, 'first value correctly deformatted');
-is( $fval->[1],  2, 'second value correctly deformatted');
-is( $fval->[2],  3, 'third value correctly deformatted');
-is( $fval->[3],  4, 'fourth value correctly deformatted');
-
 #### convert ###########################################################
 my @converter = $space->converter_names;
 is( $space->can_convert('RGB'),   0, 'converter not yet inserted');
 is( int @converter,               0, 'no converter names known');
-my $h = $space->add_converter('RGB', sub { $_[0][0]+.1, $_[0][1]-.1, $_[0][2]+.1, $_[0][3]-.1},
-                                     sub { $_[0][0]-.1, $_[0][1]+.1, $_[0][2]-.1, $_[0][3]+.1} );
+my $h = $space->add_converter('RGB', sub { [$_[0][0]+.1, $_[0][1]-.1, $_[0][2]+.1, $_[0][3]-.1 ]},
+                                     sub { [$_[0][0]-.1, $_[0][1]+.1, $_[0][2]-.1, $_[0][3]+.1 ]} );
 is( ref $h, 'HASH', 'converter code accepted');
 is( $space->can_convert('RGB'),   1, 'converter inserted');
 @converter = $space->converter_names;
@@ -214,13 +192,15 @@ is( int @converter,               1, 'one converter name is known');
 is( $converter[0],            'RGB', 'correct converter name is known');
 
 $val = $space->convert_to( 'RGB', [0,0.1,0.2,0.3]);
-is( int @$val,      4, 'could convert to RGB');
+is( ref $val, 'ARRAY', 'could convert to RGB');
+is( int @$val,      4, 'right number of values');
 is( $val->[0],    0.1, 'first value correctly converted');
 is( $val->[1],      0, 'second value correctly converted');
 is( $val->[2],    0.3, 'third value correctly converted');
 is( $val->[3],    0.2, 'fourth value correctly converted');
 $val = $space->convert_from('rgb', [0.1, 0, 0.3, .2]);
-is( int @$val,    4, 'could deconvert from RGB, even if space spelled in lower case');
+is( ref $val, 'ARRAY', 'could deconvert to RGB, even if space spelled in lower case');
+is( int @$val,      4, 'right number of values');
 is( $val->[0],    0, 'first value correctly deconverted');
 is( $val->[1],  0.1, 'second value correctly deconverted');
 is( $val->[2],  0.2, 'third value correctly deconverted');

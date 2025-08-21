@@ -9,8 +9,8 @@ use Mojolicious::Lite;
 # client server routes
 get('/protected' => sub {
       my $c = shift;
-      if (my $identity = $c->oidc->get_stored_identity()) {
-        $c->render(text => $identity->{subject} . ' is authenticated');
+      if (my $identity = $c->oidc->get_valid_identity()) {
+        $c->render(text => $identity->subject . ' is authenticated');
       }
       else {
         $c->oidc->redirect_to_authorize();
@@ -63,8 +63,8 @@ post('/token' => sub {
 my $mock_oidc_client = Test::MockModule->new('OIDC::Client');
 $mock_oidc_client->redefine('kid_keys' => sub { {} });
 
-my $mock_plugin = Test::MockModule->new('OIDC::Client::Plugin');
-$mock_plugin->redefine('_generate_uuid_string' => sub { 'fake_uuid' });
+my $mock_data_uuid = Test::MockModule->new('Data::UUID');
+$mock_data_uuid->redefine('create_str' => sub { 'fake_uuid' });
 
 plugin 'OIDC' => {
   authentication_error_path => '/error/401',

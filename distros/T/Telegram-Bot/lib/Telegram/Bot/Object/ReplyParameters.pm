@@ -1,5 +1,5 @@
 package Telegram::Bot::Object::ReplyParameters;
-$Telegram::Bot::Object::ReplyParameters::VERSION = '0.027';
+$Telegram::Bot::Object::ReplyParameters::VERSION = '0.028';
 # ABSTRACT: The base class for Telegram 'ReplyParameters' type objects
 
 
@@ -28,7 +28,7 @@ Telegram::Bot::Object::ReplyParameters - The base class for Telegram 'ReplyParam
 
 =head1 VERSION
 
-version 0.027
+version 0.028
 
 =head1 DESCRIPTION
 

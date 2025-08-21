@@ -11,7 +11,7 @@ use warnings;
 #	_check_if_exif_tags_exist_in_image
 #);
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Log::Log4perl qw(:easy);
 # >= v5.31 which supports EXIF for png files
@@ -29,7 +29,7 @@ use WWW::Mechanize::Chrome::DOMops qw/
 
 # a basic default configuration file in enhanced JSON (see L<Config::JSON::Enhanced>)
 my $DEFAULT_CONFIGSTRING = <<'EOCS';
-</* $VERSION = '0.02'; */>
+</* $VERSION = '0.03'; */>
 </* comments are allowed */>
 </* and <% vars %> and <% verbatim sections %> */>
 {
@@ -96,7 +96,10 @@ sub	new {
 			'resolution' => '1000,1002', # not x but , !!!
 			'stop-on-error' => 0,
 			'remove-dom-elements' => [],
-			'exif' => {},
+			# this is a global exif metadata to be set
+			# each time we shoot() UNLESSS shoot()'s
+			# params have their own, in which case this is not used:
+			'exif' => undef,
 			# this may be instantiated lazily,
 			# when needed as mech is expensive to load
 			# or it can be passed on to us via the constructor
@@ -131,9 +134,10 @@ sub	blank_browser { $_[0]->mech_obj->get('about:blank'); $_[0]->mech_obj->sleep(
 
 # hits the page, waits for some settle-time, removes some elements from the DOM,
 # if asked, that obstruct the shot, e.g. banners and dumps the browser's window
-# to a PNG file (whose filename must be supplied as input param).
+# to a PNG or PDF file (whose filename must be supplied as input param).
+# NOTE: PDF output does not seem to contain the whole browser content!
 # optional 'remove-dom-elements' overwrites the self if any
-# optional 'exif' parameter specifies tag/value pairs to be inserted as
+# optional 'exif' parameter (as hash) specifies tag/value pairs to be inserted as
 # metadata into the final output image
 # { k => v, ... }
 # exif tagnames have restrictions: no unicode, no spaces, not ':'
@@ -188,7 +192,7 @@ sub	shoot {
 	}
 	if( defined $exif ){
 		# check that the exif data format is valid : { k => v, ... }
-		if( ref($exif)ne'HASH' ){ print STDERR "$whoami (via $parent), line ".__LINE__." : error, 'exif' parameter expects a HASH of tagname => tagvalue, not ".ref($exif).".\n"; return 0; }
+		if( ref($exif)ne'HASH' ){ print STDERR "$whoami (via $parent), line ".__LINE__." : error, 'exif' parameter expects a HASH of tagname => tagvalue pairs, not ".ref($exif).".\n"; return 0; }
 	}
 
 	# here we can check if we have a mech instantiated or not
@@ -368,12 +372,14 @@ sub	launch_mech_obj {
         	Log::Log4perl->easy_init(Log::Log4perl::Level::to_priority('ERROR'));
 	}
 
+	if( $verbos > 2 ){ print STDOUT perl2dump(\%my_mech_params)."$whoami (via $parent), line ".__LINE__." : instantiating a WWW::Mechanize::Chrome object with above parameters ...\n" }
 	$self->{'_private'}->{'WWW::Mechanize::Chrome-object'} = WWW::Mechanize::Chrome->new(%my_mech_params);
 	if( ! defined $self->{'_private'}->{'WWW::Mechanize::Chrome-object'} ){ print STDERR "_create_mech_obj() : call to ".'WWW::Mechanize::Chrome->new()'." with params:\n".perl2dump(%my_mech_params)."\n---end mech launch params\n    has failed, parameters to this sub (launch_mech_obj) are:\n".perl2dump($params)."\n---- end of sub parameters.\n"; return undef }
 	# at this stage the my_mech_params are different, appended by W::M::C !!!
 	# --no-sandbox exists there too!
 
-	# now that we have a mech we need to re-do the verbosity thing to fix the mech obj too
+	# now that we have a mech we need to re-do the verbosity thing
+	# to fix the mech obj too, after we created it above:
 	$verbos = $self->verbosity($self->verbosity);
 
 	if( $verbos > 0 ){ print "$whoami (via $parent), line ".__LINE__." : launched ".'WWW::Mechanize::Chrome'." with the following parameters:\n".perl2dump(\%my_mech_params)."\n--- end mech launch parameters\n"; }
@@ -691,7 +697,7 @@ sub init {
 	} elsif( exists($confighash->{'constructor'}) && exists($confighash->{'constructor'}->{'resolution'}) && defined($confighash->{'constructor'}->{'resolution'}) ){
 		$v = $confighash->{'constructor'}->{'resolution'};
 	} else {
-		$v = '1024x768'; # default
+		$v = '1600x1200'; # default
 	}
 	$v =~ s/x/,/; # !!!!!!
 	$_[0]->{'_private'}->{'resolution'} = $v; # it has no setter, because no point to change res midstream
@@ -722,6 +728,14 @@ sub init {
 		$v = 0; # default
 	}
 	$self->{'_private'}->{'remove-dom-elements'} = $v;
+
+	# do we have exif data? This will be overwritten by any
+	# 'exif' specified in the shoot()
+	if( exists($params->{'exif'}) && defined($params->{'exif'}) ){
+		# check that the exif data format is valid : { k => v, ... }
+		if( ref($params->{'exif'})ne'HASH' ){ print STDERR "$whoami (via $parent), line ".__LINE__." : error, 'exif' parameter expects a HASH of tagname => tagvalue pairs, not ".ref($params->{'exif'}).".\n"; return 1; }
+		$self->{'_private'}->{'exif'} = $params->{'exif'};
+	}
 
 	# do we have a recycled mech object passed on to us?
 	# in this case we will reuse it and not instantiate a fresh one:
@@ -846,7 +860,7 @@ WWW::Mechanize::Chrome::Webshot - cheap and cheerful html2pdf converter, take a 
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 
@@ -876,28 +890,35 @@ Here are some examples:
     });
     $shooter->shoot({
       'output-filename' => 'abc.png',
-      'output-format' => 'png', # optional if it can not be deduced
-      # or 'file:///A/B/C.html' # << use absolute filepath!
+      # optional unless it can not be deduced from filename
+      'output-format' => 'png', # pdf
+
+      # URL or local file, e.g. 'file:///A/B/C.html'
+      # !!! BUT USE ABSOLUTE FILEPATH in uri
       'url' => 'https://www.902.gr',
+
+      # remove irritating DOM elements cluttering our view...
       'remove-DOM-elements' => [
         {'element-xpathselector' => '//div[id="advertisments"]'},
         {...}
       ],
-      'exif' => [{'created' => 'by the shooter'}, ...],
-    });
+
+      # optionally add exif metadata to the output image
+      'exif' => {'created' => 'by the shooter', 'tag2' => 'hehe', ...},
+    }) or die;
     ...
 
 =head1 CONSTRUCTOR
 
 =head2 C<new($params)>
 
-Creates a new C<Android::ElectricSheep::Automator> object. C<$params>
+Creates a new C<WWW::Mechanize::Chrome::Webshot> object. C<$params>
 is a hash reference used to pass initialization options which may
 or should include the following:
 
 =over 4
 
-=item B<C<confighash>> or B<C<configfile>> or B<C<configstring>>
+=item * B<C<confighash>> or B<C<configfile>> or B<C<configstring>>
 
 Optional, default will be used. The configuration file/hash/string holds
 configuration parameters and its format is "enhanced" JSON
@@ -960,38 +981,43 @@ instead of the configuration file.
 If no configuration is specified, then a default
 configuration will be used. This is hardcoded in the source code.
 
-=item B<C<logger>> or B<C<logfile>>
+=item * B<C<logger>> or B<C<logfile>>
 
 Optional. Specify a logger object which adheres
 to L<Mojo::Log>'s API or a logfile to write
 log info into. It must implement methods C<info()>, C<error()>, C<warn()>.
 
-=item B<C<verbosity>>
+=item * B<C<verbosity>>
 
 Optional. Verbosity level as an integer, default is 0, silent.
 
 
-=item B<C<cleanup>>
+=item * B<C<cleanup>>
 
 Optional. Cleanup all temporary files after exit. Default is 1 (yes). It is useful when debugging.
 
-=item B<C<settle-time>>
+=item * B<C<settle-time>>
 
 Optional. Seconds to wait between loading the specified URL and taking the screenshot.
 This is very important if target URL has lots to do or on a slow connection. Default is 2 seconds.
 
-=item B<C<resolution>>
+=item * B<C<resolution>>
 
-Optional. The size of the browser in C<WxH> format. Default is 1600x1200.
+Optional. Specify the size of the
+mechanized browser in the form C<WxH>. Ideally,
+this should set the size of the output image. Default
+value is C<1600x1200>.
 
-=item B<C<headless>>
+=item * B<C<headless>>
 
 Optional. When debugging you may find it useful to display the browser while
-it loads the URL. Set this to 1 if you want this. Default is 0 (yes, headless).
-Make sure you specify a huge C<settle-time> with this because the browser will
-shutdown as soon as the screenshot is taken.
+it loads the URL. Set this to C<0> if you want this.
+Default is 1 (yes, headless, the browser window does not show).
+I am not sure if the browser dies soon after the mechanized browser object
+goes out of scope. You may want to place a C<sleep($long_time);>
+before that in order to inspect its contents at your leisure.
 
-=item B<C<remove-dom-elements>>
+=item * B<C<remove-dom-elements>>
 
 Optional. After the URL is loaded and settle time has passed, DOM elements can
 be removed. Annoyances like advertisements, consents, warnings can be
@@ -999,10 +1025,17 @@ zapped by specifying their XPath selectors. This is an ARRAY_REF of HASH_REF.
 Each HASH_REF is a selector for DOM elements to be zapped. See L<https://metacpan.org/pod/WWW::Mechanize::Chrome::DOMops#ELEMENT-SELECTORS>
 on the exact spec of the DOM selectors.
 
-=item B<C<WWW::Mechanize::Chrome>>
+=item * B<C<exif>>
+
+Optional. Specify one or more EXIF tags to be
+inserted into the output image as a HASH_REF of tag/value pairs
+each time L</shoot($params)> is called. This value will be overwritten
+if C<$params> (of L</shoot($params)>) contains its own C<exif> parameter.
+
+=item * B<C<WWW::Mechanize::Chrome>>
 
 Optional. Specify any parameters to be passed on to the
-constructor of L<WWW::Mechanize::Chrome>.
+constructor of L<WWW::Mechanize::Chrome> as a HASH_REF of parameters.
 
 =back
 
@@ -1014,14 +1047,16 @@ It takes a screenshot of the specified URL as
 rendered by L<WWW::Mechanize::Chrome> (usually headless)
 and saves it as an image to the specified file.
 
+It returns C<0> on failure, C<1> on success.
+
 Input parameters C<$params>:
 
 =over 4
 
-=item * B<C<url>> specifies the target URL or URI pointing
+=item * B<C<url>>: specifies the target URL or even a URI pointing
 to a local file (e.g. C<file:///A/B/C.html>, use absolute filepath).
 
-=item * B<C<remove-dom-elements>> specifies DOM elements to
+=item * B<C<remove-dom-elements>>: specifies DOM elements to
 be removed after the URL has been loaded and settle time has passed.
 Annoyances like advertisements, consents, warnings can be
 zapped by specifying their XPath selectors. This is an ARRAY_REF of HASH_REF.
@@ -1031,9 +1066,11 @@ name can be specified in the constructor. If one is specified here,
 then the one specified in the constructor will be ignored, else, it will
 be used.
 
-=item * B<C<exif>> optionally specify one or more EXIF tags to be
-inserted into the output image. If one is specified here, then
-any specified in the constructor will be ignored.
+=item * B<C<exif>>: optionally specify one or more EXIF tags to be
+inserted into the output image as a HASH_REF of tag/value pairs.
+If B<C<exif>> data is specified here, then
+any exif data specified in the constructor will be ignored. This works
+well for both PNG and PDF output images.
 
 =back
 
@@ -1062,7 +1099,7 @@ For convenience, the following scripts are provided:
 
 =over 2
 
-=item B<C<script/www-mechanize-webshot.pl>>
+=item * B<C<script/www-mechanize-webshot.pl>>
 
 It will take a URL, load it, render it, optionally zap any
 specified DOM elements and save the rendered content into

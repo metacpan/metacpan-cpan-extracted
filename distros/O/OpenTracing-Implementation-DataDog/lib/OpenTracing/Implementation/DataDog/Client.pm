@@ -39,7 +39,7 @@ agent.
 
 
 
-our $VERSION = 'v0.47.1';
+our $VERSION = 'v0.47.2';
 
 use English;
 
@@ -437,7 +437,7 @@ sub to_struct {
     my $span = shift;
     
     my $context = $span->get_context();
-    
+
     my %meta_data = (
         _fixup_span_tags( $span->get_tags ),
         $context->get_baggage_items,
@@ -768,7 +768,6 @@ sub _span_buffer_threshold_reached {
     
     return $self->_span_buffer_size >= $self->span_buffer_threshold
 }
-
 
 
 # DEMOLISH

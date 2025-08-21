@@ -61,11 +61,14 @@ get('/userinfo' => sub {
 
 my $mock_oidc_client = Test::MockModule->new('OIDC::Client');
 $mock_oidc_client->redefine('kid_keys'    => sub { {} });
-$mock_oidc_client->redefine('has_expired' => sub { 0 });
+
+my $mock_access_token = Test::MockModule->new('OIDC::Client::AccessToken');
+$mock_access_token->redefine('has_expired' => sub { 0 });
 
 plugin 'OIDC' => {
   provider => {
     my_provider => {
+      store_mode   => 'stash',
       id           => 'my_id',
       issuer       => 'my_issuer',
       secret       => 'my_secret',

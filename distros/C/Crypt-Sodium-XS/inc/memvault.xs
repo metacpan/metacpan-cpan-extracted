@@ -171,7 +171,7 @@ sizes.
 
 =cut
 
-SV * new_from_fd(SV * class, SV * file, STRLEN len = 0, SV * flags = &PL_sv_undef)
+SV * new_from_fd(SV * class, SV * file, STRLEN maxlen = 0, SV * flags = &PL_sv_undef)
 
   ALIAS:
   new_from_file = 1
@@ -179,9 +179,9 @@ SV * new_from_fd(SV * class, SV * file, STRLEN len = 0, SV * flags = &PL_sv_unde
   PREINIT:
   protmem *new_pm, *resize_pm;
   char *path_buf = NULL;
-  ssize_t r = 0;
-  size_t b = 0, bufrem, lenrem = SIZE_MAX;
-  STRLEN bufsize = MEMVAULT_READ_BUFSIZE;
+  ssize_t bytes_read = 0;
+  size_t bytes_total = 0, pmrem;
+  STRLEN pmsize = MEMVAULT_READ_BUFSIZE;
   unsigned int new_flags = g_protmem_default_flags_memvault;
   int fd;
 
@@ -205,23 +205,23 @@ SV * new_from_fd(SV * class, SV * file, STRLEN len = 0, SV * flags = &PL_sv_unde
       fd = SvIV(file);
   }
 
-  if (len && len < bufsize)
-    bufsize = len;
+  if (maxlen && maxlen < pmsize)
+    pmsize = maxlen;
 
-  new_pm = protmem_init(aTHX_ bufsize, new_flags);
+  new_pm = protmem_init(aTHX_ pmsize, new_flags);
   if (new_pm == NULL) {
     if (ix == 1)
       close(fd);
     croak("new_from_fd|file: Failed to allocate protmem");
   }
 
-  /* r: iteration read bytes */
-  /* b: total buffer read bytes */
   /* sub-optimal for perfomance, but "safer" */
   for (;;) {
-    if (b == bufsize) {
-      bufsize *= 2;
-      resize_pm = protmem_clone(aTHX_ new_pm, bufsize);
+    if (bytes_total == pmsize) {
+      pmsize *= 2;
+      if (maxlen && maxlen < pmsize)
+        pmsize = maxlen;
+      resize_pm = protmem_clone(aTHX_ new_pm, pmsize);
       protmem_free(aTHX_ new_pm);
       if (resize_pm == NULL) {
         if (ix == 1)
@@ -230,11 +230,10 @@ SV * new_from_fd(SV * class, SV * file, STRLEN len = 0, SV * flags = &PL_sv_unde
       }
       new_pm = resize_pm;
     }
-    bufrem = bufsize - r;
-    if (len)
-      lenrem = len - b;
-    r = read(fd, new_pm->pm_ptr + b, lenrem < bufrem ? lenrem : bufrem);
-    if (r < 0) {
+
+    pmrem = pmsize - bytes_total;
+    bytes_read = read(fd, new_pm->pm_ptr + bytes_total, CSXS_MIN(pmrem, MEMVAULT_READ_BUFSIZE));
+    if (bytes_read < 0) {
       if (errno == EINTR)
         continue;
       if (ix == 1)
@@ -242,17 +241,17 @@ SV * new_from_fd(SV * class, SV * file, STRLEN len = 0, SV * flags = &PL_sv_unde
       protmem_free(aTHX_ new_pm);
       croak("new_from_fd|file: read error %d", errno);
     }
-    b += r;
-    new_pm->size = b;
-    if (r == 0)
+    bytes_total += bytes_read;
+    new_pm->size = bytes_total;
+    if (bytes_read == 0)
       break;
-    if (len && b == len)
+    if (maxlen && bytes_total == maxlen)
       break;
   }
 
   /* naive heuristic whether it's worth re-allocating */
-  if (bufsize - b > MEMVAULT_READ_BUFSIZE) {
-    resize_pm = protmem_clone(aTHX_ new_pm, b);
+  if (pmsize - bytes_total > MEMVAULT_READ_BUFSIZE) {
+    resize_pm = protmem_clone(aTHX_ new_pm, bytes_total);
     protmem_free(aTHX_ new_pm);
     if (resize_pm == NULL) {
       if (ix == 1)

@@ -1,5 +1,5 @@
 package Telegram::Bot::Object::MessageEntity;
-$Telegram::Bot::Object::MessageEntity::VERSION = '0.027';
+$Telegram::Bot::Object::MessageEntity::VERSION = '0.028';
 # ABSTRACT: The base class for Telegram 'MessageEntity' type objects
 
 
@@ -33,7 +33,7 @@ Telegram::Bot::Object::MessageEntity - The base class for Telegram 'MessageEntit
 
 =head1 VERSION
 
-version 0.027
+version 0.028
 
 =head1 DESCRIPTION
 

@@ -78,8 +78,20 @@ sub add_constraint {
     $self->{'constraint'}{$name} = {checker => $checker, remedy => $remedy, error => $error_msg};
 }
 
-#### getter (defaults) #################################################
+#### getter ############################################################
 sub basis           { $_[0]{'basis'}}
+sub is_linear {     # overall linear space ?
+    my ($self) = @_;
+    map { return 0 if $self->{'type'}[$_] != 1 } $self->basis->axis_iterator;
+    return 1;
+}
+
+sub is_int_valued { # all ranges int valued ?
+    my ($self) = @_;
+    map { return 0 if $self->{'precision'}[$_] != 0 } $self->basis->axis_iterator;
+    return 1;
+}
+
 sub is_axis_numeric {
     my ($self, $axis_nr) = @_;
     return 0 if not defined $axis_nr or not exists $self->{'type'}[$axis_nr];

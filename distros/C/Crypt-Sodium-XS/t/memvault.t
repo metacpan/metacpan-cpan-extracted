@@ -322,6 +322,7 @@ is($mv->to_hex, "020100", "overloaded ^= mutates");
 $mv2 = Crypt::Sodium::XS::MemVault->new("\x03\x03\x03")->unlock;
 $mv->bitwise_xor_equals($mv2);
 is($mv->to_hex, "010203", "xor_equals method with memvault arg");
+undef $mv2;
 
 my $secret = "secret secrets are no fun...";
 my $tmpfile = File::Temp->new;
@@ -359,31 +360,14 @@ $mv = Crypt::Sodium::XS::MemVault->new_from_file($tmpfile->filename, 16);
 is($mv->size, 16, "16 byte MemVault from >bufsize file, correct length");
 is($mv->unlock, substr($secret, 0, 16), "16 byte MemVault from >bufsize file, correct data");
 
-my $large = scalar "Z" x 1025;
-$tmpfile = File::Temp->new;
-print $tmpfile $large;
-$tmpfile->flush;
-
-$mv = Crypt::Sodium::XS::MemVault->new_from_file($tmpfile->filename);
-is($mv->size, 1025, "MemVault (1025) from file correct length");
-is($mv->unlock, $large, "MemVault (1025) from file correct data");
-
-$large = scalar "Y" x 2047;
-
-$mv = Crypt::Sodium::XS::MemVault->new($large);
-$mv->to_file($tmpfile->filename);
-$mv = Crypt::Sodium::XS::MemVault->new_from_file($tmpfile->filename);
-is($mv->size, 2047, "MemVault (2047) to file/from file correct length");
-is($mv->unlock, $large, "MemVault (2047) roundtripped to file/from file");
-
-$large = scalar "Z" x 8193;
-
-$mv = Crypt::Sodium::XS::MemVault->new($large);
-$tmpfile = File::Temp->new;
-$mv->to_fd(fileno($tmpfile));
-$mv = Crypt::Sodium::XS::MemVault->new_from_file($tmpfile->filename);
-is($mv->size, 8193, "MemVault (8193) to file/from file correct length");
-is($mv->unlock, $large, "MemVault (8193) roundtripped to fd/from file");
+for my $size (1025, 2047, 36863) {
+  $tmpfile = File::Temp->new;
+  print $tmpfile "X" x $size;
+  $tmpfile->flush;
+  $mv = Crypt::Sodium::XS::MemVault->new_from_file($tmpfile->filename);
+  is($mv->size, $size, "MemVault ($size) from file correct length");
+  is($mv->unlock, "X" x $size, "MemVault ($size) from file correct data");
+}
 
 {
   local $1;

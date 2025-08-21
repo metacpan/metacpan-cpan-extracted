@@ -4,12 +4,11 @@
 package Graphics::Toolkit::Color::Space::Hub;
 use v5.12;
 use warnings;
-use Carp;
 
 #### internal space loading ############################################
 our $default_space_name = 'RGB';
 my @search_order = ($default_space_name,
-                   qw/CMY CMYK HSL HSV HSB HWB NCol YIQ YUV/, # missing: CubeHelix OKLAB Hunterlab
+                   qw/CMY CMYK HSL HSV HSB HWB NCol YIQ YUV/,
                    qw/CIEXYZ CIELAB CIELUV CIELCHab CIELCHuv/);
 my %space_obj;
 add_space( require "Graphics/Toolkit/Color/Space/Instance/$_.pm" ) for @search_order;
@@ -23,6 +22,7 @@ sub get_space          { (defined $_[0] and exists $space_obj{ uc $_[0] }) ? $sp
 sub try_get_space {
     my $name = shift || $default_space_name;
     my $space = get_space( $name );
+    return $name if ref $name eq 'Graphics::Toolkit::Color::Space' and is_space_name( $name->name );
     return (ref $space) ? $space
                         : "$name is an unknown color space, try one of: ".(join ', ', all_space_names());
 }
@@ -158,6 +158,25 @@ sub deformat_partial_hash { # convert partial hash into
         return wantarray ? ($values, $color_space->name) : $values;
     }
     return undef;
+}
+
+sub distance { # @c1 @c2 -- ~space ~select @range --> +
+    my ($values_a, $values_b, $space_name, $select_axis, $range) = @_;
+    my $color_space = try_get_space( $space_name );
+    return $color_space unless ref $color_space;
+    $values_a = convert( $values_a, $space_name, 'normal' );
+    $values_b = convert( $values_b, $space_name, 'normal' );
+    my $delta = $color_space->delta( $values_a, $values_b );
+    $delta = $color_space->denormalize_delta( $delta, $range );
+    if (defined $select_axis){
+        $select_axis = [$select_axis] unless ref $select_axis;
+        my @selected_values = grep {defined $_}
+                              map {$color_space->select_tuple_value_from_name($_, $delta) } @$select_axis;
+        $delta = \@selected_values;
+    }
+    my $d = 0;
+    $d += $_ * $_ for @$delta;
+    return sqrt $d;
 }
 
 1;
@@ -314,7 +333,7 @@ Is a more human readable variant of the L<HWB> space with an altered
 B<hue> values, that consists of a letter and two digits.
 The letter demarks one of the six areas around the rainbow. B<R> is I<Red>,
 B<Y> (I<Yellow>), B<G> (I<Green>), B<C> (I<Cyan>), B<B> (I<Blue>),
-B<M> (I<Magenta). The two digits after this letter are an angular value,
+B<M> (I<Magenta>). The two digits after this letter are an angular value,
 measuring the distance between the pure color (as stated by the letter)
 and the described color (toward the next color on the rainbow).
 The B<whiteness> and B<blackness> axis have integer values with the
@@ -416,34 +435,38 @@ as definition of every dimension.
 
 =head1 FORMATS
 
-These formats are available in all color spaces.
+Unless stated otherwise, these formats are available in all color spaces.
 
 =head2 list
 
-Is the default format and the only one not containing the name of the
-color space. This is why it can only work for the default space (RGB).
+A list of values, the first being the name of the color space. The name
+can be omitted, if it is the default color space (L</RGB>).
+Default format of the output method "values".
 
     (10, 20, 30)
     ('XYZ', 15, 3.53, 37.1)
 
 =head2 named_array
 
-Basically the same with squared brackets around.
+The same with squared brackets around.
 
     [RGB => 10, 20, 30]
 
 
 =head2 named_string
 
-Same inside a string.
+Same inside a quotes.
 
     'RGB: 10, 20, 30'
 
 =head2 css_string
 
-Strings for usage in CSS, SVG files and alike.
+Strings for usage in CSS, SVG files and alike. Here are commas optional.
+There are to spots where space is not allowed: 1. Between the the space
+name and opening bracket and between axis value and value suffix (here '%').
 
     'rgb(10, 20, 30)'
+    'hsl(10  20%  30%)'
 
 =head2 hex_string
 

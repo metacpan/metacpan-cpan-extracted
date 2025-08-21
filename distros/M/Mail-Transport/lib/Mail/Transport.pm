@@ -1,4 +1,4 @@
-# Copyrights 2001-2020 by [Mark Overmeer].
+# Copyrights 2001-2025 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
@@ -8,7 +8,7 @@
 
 package Mail::Transport;
 use vars '$VERSION';
-$VERSION = '3.005';
+$VERSION = '3.006';
 
 use base 'Mail::Reporter';
 
@@ -37,34 +37,25 @@ my %mailers =
 sub new(@)
 {   my $class = shift;
 
-    return $class->SUPER::new(@_)
-        unless $class eq __PACKAGE__ || $class eq "Mail::Transport::Send";
+    $class eq __PACKAGE__ || $class eq "Mail::Transport::Send"
+		or return $class->SUPER::new(@_);
 
-    #
     # auto restart by creating the right transporter.
-    #
 
-    my %args  = @_;
-    my $via   = lc($args{via} || '')
+    my %args = @_;
+    my $via  = lc($args{via} || '')
         or croak "No transport protocol provided";
 
-    $via      = 'Mail::Transport'.$mailers{$via}
-       if exists $mailers{$via};
-
+    $via     = 'Mail::Transport'.$mailers{$via} if exists $mailers{$via};
     eval "require $via";
-    return undef if $@;
-
-    $via->new(@_);
+    $@ ? undef : $via->new(@_);
 }
 
 sub init($)
 {   my ($self, $args) = @_;
-
     $self->SUPER::init($args);
 
-    $self->{MT_hostname}
-       = defined $args->{hostname} ? $args->{hostname} : 'localhost';
-
+    $self->{MT_hostname} = $args->{hostname} // 'localhost';
     $self->{MT_port}     = $args->{port};
     $self->{MT_username} = $args->{username};
     $self->{MT_password} = $args->{password};
@@ -76,13 +67,11 @@ sub init($)
     if(my $exec = $args->{executable} || $args->{proxy})
     {   $self->{MT_exec} = $exec;
 
-        $self->log(WARNING => "Avoid program abuse: specify an absolute path for $exec.")
-           unless File::Spec->file_name_is_absolute($exec);
+        File::Spec->file_name_is_absolute($exec)
+            or $self->log(WARNING => "Avoid program abuse: specify an absolute path for $exec.");
 
-        unless(-x $exec)
-        {   $self->log(WARNING => "Executable $exec does not exist.");
-            return undef;
-        }
+        -x $exec
+            or $self->log(WARNING => "Executable $exec does not exist."), return undef;
     }
 
     $self;
@@ -102,8 +91,7 @@ sub retry()
 }
 
 
-my @safe_directories
-   = qw(/usr/local/bin /usr/bin /bin /sbin /usr/sbin /usr/lib);
+my @safe_directories = qw(/usr/local/bin /usr/bin /bin /sbin /usr/sbin /usr/lib);
 
 sub findBinary($@)
 {   my ($self, $name) = (shift, shift);

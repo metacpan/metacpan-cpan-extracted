@@ -1,0 +1,16 @@
+Changes
+lib/Time/Left.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+README.md
+t/00-load.t
+t/01-basic.t
+t/02-overload.t
+t/03-clock.t
+t/04-examples.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

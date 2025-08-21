@@ -25,10 +25,10 @@ like( $blue->complement( target => {hue => 2, gamma => 2}),    qr/GTC method/,  
 
 @colors = $red->complement( );
 is( int @colors,                        1,    'default is THE complement');
-is( $colors[0]->name,              'aqua',    'which got computed correctly');
+is( $colors[0]->name,              'cyan',    'which got computed correctly');
 @colors = $red->complement( steps => 1);
 is( int @colors,                        1,    'same with named argument');
-is( $colors[0]->name,              'aqua',    'result still good');
+is( $colors[0]->name,              'cyan',    'result still good');
 @colors = $red->complement( steps => 3);
 is( int @colors,                        3,    'got triadic colors');
 is( $colors[0]->name,              'lime',    'first is full green (lime)');

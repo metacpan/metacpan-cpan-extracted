@@ -85,7 +85,7 @@ sub cluster { # :values, +radius @+|+distance, :space --> @:values
                 map {[@good_values, ($corner_value + ($_ * $color_distance))]} 0 .. 2 * $colors_in_direction;
             } @result_values;
         }
-    } else {                   # ball shaped cluster (FCC)
+    } else {                    # ball shaped cluster (FCC)
         my $layer_distance = sqrt( 2 * $color_distance * $color_distance ) / 2;
         for my $layer_nr (0 .. $cluster_radius / $layer_distance){
             my $layer_height = $layer_nr * $layer_distance;
@@ -116,7 +116,7 @@ sub cluster { # :values, +radius @+|+distance, :space --> @:values
                             [$x1, $y2, $layer_z_dn], [$x2, $y2, $layer_z_dn];
                     }
                 }
-            } else { # even layer of cuboctahedral packing
+            } else {            # even layer of cuboctahedral packing
                 my $grid_row_count = int $radius_in_colors;
                 my @grid = ($grid_row_count);
                 $grid[$grid_row_count] = 0;

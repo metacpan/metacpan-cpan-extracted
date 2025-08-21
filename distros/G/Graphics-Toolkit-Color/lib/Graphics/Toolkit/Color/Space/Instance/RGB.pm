@@ -13,7 +13,7 @@ my $rgb_def = Graphics::Toolkit::Color::Space->new( axis => [qw/red green blue/]
    $rgb_def->add_formatter(        'array', sub { $_[1] } );
    $rgb_def->add_deformatter(      'array', sub { $_[1] } );
 
-sub pass { @{$_[0]} }
+sub pass { $_[0] }
 
 sub hex_from_rgb { uc sprintf("#%02x%02x%02x", @{$_[1]} ) } # translate [ r, g, b ]     --> #000000
 sub rgb_from_hex {                                          # translate #000000 or #000 --> [ r, g, b ]

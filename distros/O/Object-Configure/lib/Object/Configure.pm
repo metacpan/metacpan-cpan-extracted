@@ -5,8 +5,8 @@ use warnings;
 
 use Carp;
 use Config::Abstraction 0.32;
-use Log::Abstraction 0.15;
-use Params::Get;
+use Log::Abstraction 0.25;
+use Params::Get 0.13;
 use Return::Set;
 
 =head1 NAME
@@ -15,11 +15,11 @@ Object::Configure - Runtime Configuration for an Object
 
 =head1 VERSION
 
-0.12
+0.13
 
 =cut
 
-our $VERSION = 0.12;
+our $VERSION = 0.13;
 
 =head1 SYNOPSIS
 
@@ -79,7 +79,6 @@ To control behavior at runtime, C<Object::Configure> supports loading settings f
 A minimal example of a config file (C<~/.conf/local.conf>) might look like:
 
    [My__Module]
-
    logger.file = /var/log/mymodule.log
 
 The C<configure()> function will read this file,

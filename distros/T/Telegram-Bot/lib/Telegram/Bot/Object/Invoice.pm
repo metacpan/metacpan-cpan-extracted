@@ -1,5 +1,5 @@
 package Telegram::Bot::Object::Invoice;
-$Telegram::Bot::Object::Invoice::VERSION = '0.027';
+$Telegram::Bot::Object::Invoice::VERSION = '0.028';
 # ABSTRACT: The base class for Telegram 'Invoice' type objects
 
 
@@ -30,7 +30,7 @@ Telegram::Bot::Object::Invoice - The base class for Telegram 'Invoice' type obje
 
 =head1 VERSION
 
-version 0.027
+version 0.028
 
 =head1 DESCRIPTION
 

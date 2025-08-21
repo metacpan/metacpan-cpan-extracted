@@ -1,5 +1,5 @@
 package Telegram::Bot::Object::InlineQuery;
-$Telegram::Bot::Object::InlineQuery::VERSION = '0.027';
+$Telegram::Bot::Object::InlineQuery::VERSION = '0.028';
 # ABSTRACT: The base class for Telegram 'Invoice' type objects
 
 
@@ -52,7 +52,7 @@ Telegram::Bot::Object::InlineQuery - The base class for Telegram 'Invoice' type 
 
 =head1 VERSION
 
-version 0.027
+version 0.028
 
 =head1 DESCRIPTION
 
@@ -61,7 +61,7 @@ attributes available for L<Telegram::Bot::Object::InlineQuery> objects.
 
 =head1 METHODS
 
-=head2
+=head2 reply
 
 A convenience method to reply to an inline query with an array of Perl objects.
 
@@ -95,9 +95,9 @@ Pass the offset that a client should send in the next query with the same text t
 
 A JSON-serialized object describing a button to be shown above inline query results
 
-=over
+=back
 
-=over
+=back
 
 Will return true.
 

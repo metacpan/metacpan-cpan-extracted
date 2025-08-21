@@ -2,7 +2,7 @@
 
 use v5.12;
 use warnings;
-use Test::More tests => 178;
+use Test::More tests => 183;
 
 BEGIN { unshift @INC, 'lib', '../lib'}
 my $module = 'Graphics::Toolkit::Color::Space::Shape';
@@ -50,6 +50,8 @@ is( ref Graphics::Toolkit::Color::Space::Shape->new( $basis, undef, undef, undef
 #### arg eval + getter #################################################
 $shape = Graphics::Toolkit::Color::Space::Shape->new( $basis, ['angular','linear','no']);
 is( ref $shape,  $module, 'created shape with all axis types');
+is( $shape->is_linear,          0, 'space has none linear axis');
+is( $shape->is_int_valued,      0, 'per default space have full precision');
 is( $shape->is_axis_numeric(0), 1, 'first dimension is numeric');
 is( $shape->is_axis_numeric(1), 1, 'second dimension is numeric');
 is( $shape->is_axis_numeric(2), 0, 'third dimension is not numeric');
@@ -57,6 +59,8 @@ is( $shape->is_axis_numeric(3), 0, 'there is no fourth dimension ');
 
 $shape = Graphics::Toolkit::Color::Space::Shape->new( $basis, undef, [[0,1],[-1,1],[1,10]]);
 is( ref $shape,  $module, 'created shape with most complex range definition');
+is( $shape->is_linear,          1, 'per default spaces are linear');
+is( $shape->is_int_valued,      0, 'per default space have full precision');
 is( $shape->is_axis_numeric(0), 1, 'default to numeric axis on first dimension');
 is( $shape->is_axis_numeric(1), 1, 'default to numeric axis on second dimension');
 is( $shape->is_axis_numeric(2), 1, 'default to numeric axis on third dimension');
@@ -217,6 +221,8 @@ is( $r->[2], 20.33, 'rounded with precision 2');
 
 $bshape = Graphics::Toolkit::Color::Space::Shape->new( $basis, ['angular', 'circular', 0], [[-5,5],[-5,5],[-5,5]], [0,1,-1]);
 $tr = $bshape->clamp( [-.1, 1.123, 2.54], ['normal',2,[-1,4]]);
+is( $bshape->is_int_valued, 0, 'not all axis are int valued');
+
 is( int @$tr,    3, 'clamp kept right amount of values');
 is( $tr->[0],  0.9, 'rotated value to int');
 is( $tr->[1],  1.123, 'left second value untouched');

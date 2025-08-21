@@ -19,19 +19,19 @@ sub from_rgb {
     my ($r, $g, $b) = @{$_[0]};
     my $vmin = min($r, $g, $b);
     my $v = my $vmax = max($r, $g, $b);
-    return (0, 0, $v) if $vmax == $vmin;
+    return ([0, 0, $v]) if $vmax == $vmin;
 
     my $d = $vmax - $vmin;
     my $s = $d / $vmax;
     my $h = ($vmax == $r) ? (($g - $b) / $d + ($g < $b ? 6 : 0)) :
             ($vmax == $g) ? (($b - $r) / $d + 2)
                           : (($r - $g) / $d + 4);
-    return ($h/6, $s, $v);
+    return ([$h/6, $s, $v]);
 }
 
 sub to_rgb {
     my ($h, $s, $v) = @{$_[0]};
-    return ($v, $v, $v) if $s == 0;
+    return ([$v, $v, $v]) if $s == 0;
     my $hi = int( $h * 6 );
     my $f = ( $h * 6 ) - $hi;
     my $p = $v * (1 -  $s );
@@ -43,6 +43,7 @@ sub to_rgb {
             : ($hi == 4) ? ($t, $p, $v)
             : ($hi == 5) ? ($v, $p, $q)
             :              ($v, $t, $p);
+    return \@rgb;
 }
 
 $hsv_def;

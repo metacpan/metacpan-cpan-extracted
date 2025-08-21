@@ -9,7 +9,7 @@ use warnings;
 
 #use utf8;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Test::More;
 use Test::More::UTF8;
@@ -164,7 +164,7 @@ $client->shutdown;
 
 # try with a config string
 my $configstring = <<'EOCS';
-</* $VERSION = '0.02'; */>
+</* $VERSION = '0.03'; */>
 </* comments are allowed */>
 </* and <% vars %> and <% verbatim sections %> */>
 {

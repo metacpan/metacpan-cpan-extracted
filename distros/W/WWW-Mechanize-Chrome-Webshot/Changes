@@ -4,3 +4,6 @@ Revision history for WWW-Mechanize-Chrome-Webshot
         First version, released on an unsuspecting world.
 0.02    2025/08/01
         Pod fixes.
+0.03    2025/08/21
+        Modified t/300-exif-local-site.t to verify correct exif metadata insertion to both PNG and PDF output images.
+        Pod fixes.

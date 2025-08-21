@@ -1,5 +1,5 @@
 package Telegram::Bot::Object::LoginUrl;
-$Telegram::Bot::Object::LoginUrl::VERSION = '0.027';
+$Telegram::Bot::Object::LoginUrl::VERSION = '0.028';
 # ABSTRACT: The base class for Telegram 'LoginUrl' type objects
 
 
@@ -28,7 +28,7 @@ Telegram::Bot::Object::LoginUrl - The base class for Telegram 'LoginUrl' type ob
 
 =head1 VERSION
 
-version 0.027
+version 0.028
 
 =head1 DESCRIPTION
 

@@ -7,7 +7,7 @@ use warnings;
 use Test::More;
 use Test::More::UTF8;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 BEGIN {
     use_ok( 'WWW::Mechanize::Chrome::Webshot' ) || print "Bail out!\n";

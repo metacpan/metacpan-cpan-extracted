@@ -1,4 +1,14 @@
 
+1.92    2025-08-20    lichtkind
+-------
+    * = minor feature release
+    * + methods "name" and "closest_name" work on any scheme from Graphics::ColorNames
+    * ~ extended "CSS_string" format, commas are now optional
+    * ~ no space between axis value and suffix allowed
+    * ~ color space "CIELCHuv" got alias name "LCHuv"
+    * & converter value IO moved to standard tuple format
+    * ? POD syntax fixes
+
 1.91    2025-08-12    lichtkind
 -------
     * = minor bug fix release
@@ -9,8 +19,8 @@
 1.9     2025-08-12    lichtkind
 -------
     * = major feature release
-    * * added cluster and invert calculation method
-    * * added closest_name method
+    * * added "cluster" and "invert" calculation method
+    * * added "closest_name" method
     * * added support of 5 color spaces: NCol YUV CIELUV CIELCHab CIELCHuv,
                                  rewrote CIEXYZ CIELAB
     * + extended range definitions with explicit type names
@@ -166,8 +176,3 @@
     * \ created own distro
     * ~ small POD fixes
 
-TODO:
-  # add condition W + B < 100
-  # add oklab space
-  # add Cubehelix space
-  # - add gama crrection ?

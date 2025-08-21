@@ -17,8 +17,8 @@ sub index :Path :Args(0) {
 sub protected : Global {
   my ( $self, $c ) = @_;
 
-  if (my $identity = $c->oidc->get_stored_identity()) {
-      $c->response->body($identity->{subject} . ' is authenticated');
+  if (my $identity = $c->oidc->get_valid_identity()) {
+      $c->response->body($identity->subject . ' is authenticated');
   }
   else {
       $c->oidc->redirect_to_authorize();

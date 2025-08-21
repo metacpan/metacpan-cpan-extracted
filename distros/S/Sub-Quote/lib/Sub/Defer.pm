@@ -2,7 +2,7 @@ package Sub::Defer;
 use strict;
 use warnings;
 
-our $VERSION = '2.006008';
+our $VERSION = '2.006009';
 $VERSION =~ tr/_//d;
 
 use Exporter ();

@@ -21,7 +21,7 @@ use Data::Roundtrip qw/perl2dump no-unicode-escape-permanently/;
 
 use WWW::Mechanize::Chrome::Webshot qw/_check_if_exif_tags_exist_in_image/;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 my $VERBOSITY = 0; # we need verbosity of 10 (max), so this is not used
 my $CLEANUP = (exists($ENV{'PERL_TEST_TEMPDIR_TINY_NOCLEANUP'}) && ($ENV{'PERL_TEST_TEMPDIR_TINY_NOCLEANUP'}>0)) ? 1 : 0;

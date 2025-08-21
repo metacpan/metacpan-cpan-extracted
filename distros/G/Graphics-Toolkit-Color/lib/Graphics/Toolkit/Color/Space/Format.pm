@@ -1,6 +1,6 @@
 
-# conversion of value tuples (ARRAY) into different string and other formats
-# format is IO, read and writing value definitions, form is of a single value
+# bidirectional conversion of value tuples (ARRAY) into different string and other formats
+# values themself can have space dependant extra shape, suffixes, etc.
 
 package Graphics::Toolkit::Color::Space::Format;
 use v5.12;
@@ -8,7 +8,8 @@ use warnings;
 
 my $number_form = '-?(?:\d+|\d+\.\d+|\.\d+)';
 
-sub new { # -, $::Basis, ~|@~suffix --> _
+#### constructor and name space API ####################################
+sub new { # -, $:Basis -- ~|@~val_form, , ~|@~suffix --> :_
     my ($pkg, $basis, $value_form, $prefix, $suffix) = @_;
     return 'First argument has to be an Color::Space::Basis reference !'
         unless ref $basis eq 'Graphics::Toolkit::Color::Space::Basis';
@@ -37,8 +38,10 @@ sub new { # -, $::Basis, ~|@~suffix --> _
            named_string => sub { $_[0]->named_string_from_tuple($_[1]) },     #  'rgb: 1, 2, 3'
              css_string => sub { $_[0]->css_string_from_tuple($_[1]) },       #  'rgb(1,2,3)'
     );
-    bless { basis => $basis, suffix => $suffix, value_form => $value_form ,
-            format => \%formats, deformat => \%deformats, pre => '', post => ''}
+    bless { basis => $basis, deformatter => \%deformats, formatter => \%formats,
+            value_form => $value_form, prefix => $prefix, suffix => $suffix,
+            value_numifier => { into_numric => '', from_numeric => '' },
+          }
 }
 
 sub create_suffix_list {
@@ -51,32 +54,33 @@ sub create_suffix_list {
     return $suffix;
 }
 
-sub get_suffix {
-    my ($self, $suffix) = @_;
-    return $self->{'suffix'} unless defined $suffix;
-    create_suffix_list( $self->{'basis'}, $suffix );
+sub add_formatter   {
+    my ($self, $format, $code) = @_;
+    return if not defined $format or ref $format or ref $code ne 'CODE';
+    return if $self->has_formatter( $format );
+    $self->{'formatter'}{ $format } = $code;
+}
+sub add_deformatter {
+    my ($self, $format, $code) = @_;
+    return if not defined $format or ref $format or ref $code ne 'CODE';
+    return if $self->has_deformatter( $format );
+    $self->{'deformatter'}{ lc $format } = $code;
+}
+sub set_value_numifier {
+    my ($self, $pre_code, $post_code) = @_;
+    return 0 if ref $pre_code ne 'CODE' or ref $post_code ne 'CODE';
+    $self->{'value_numifier'}{'into_numric'} = $pre_code;
+    $self->{'value_numifier'}{'from_numeric'} = $post_code;
 }
 
 #### public API: formatting value tuples ###############################
 sub basis           { $_[0]{'basis'}}
-sub has_format      { (defined $_[1] and exists $_[0]{'format'}{ lc $_[1] }) ? 1 : 0 }
-sub has_deformat    { (defined $_[1] and exists $_[0]{'deformat'}{ lc $_[1] }) ? 1 : 0 }
-sub add_formatter   {
-    my ($self, $format, $code) = @_;
-    return if not defined $format or ref $format or ref $code ne 'CODE';
-    return if $self->has_format( $format );
-    $self->{'format'}{ $format } = $code;
-}
-sub add_deformatter {
-    my ($self, $format, $code) = @_;
-    return if not defined $format or ref $format or exists $self->{'deformat'}{$format} or ref $code ne 'CODE';
-    $self->{'deformat'}{ lc $format } = $code;
-}
-sub set_value_formatter {
-    my ($self, $pre_code, $post_code) = @_;
-    return 0 if ref $pre_code ne 'CODE' or ref $post_code ne 'CODE';
-    $self->{'pre'} = $pre_code;
-    $self->{'post'} = $post_code;
+sub has_formatter   { (defined $_[1] and exists $_[0]{'formatter'}{ lc $_[1] }) ? 1 : 0 }
+sub has_deformatter { (defined $_[1] and exists $_[0]{'deformatter'}{ lc $_[1] }) ? 1 : 0 }
+sub get_suffix {
+    my ($self, $suffix) = @_;
+    return $self->{'suffix'} unless defined $suffix;
+    create_suffix_list( $self->{'basis'}, $suffix );
 }
 
 sub deformat {
@@ -84,13 +88,14 @@ sub deformat {
     return undef unless defined $color;
     $suffix = $self->get_suffix( $suffix );
     return $suffix unless ref $suffix;
-    for my $format_name (keys %{$self->{'deformat'}}){
-        my $deformatter = $self->{'deformat'}{$format_name};
+    for my $format_name (sort keys %{$self->{'deformatter'}}){
+        my $deformatter = $self->{'deformatter'}{$format_name};
         my $values = $deformatter->( $self, $color );
         next unless ref $values;
-        $values = $self->check_number_values( $values );
+        $values = $self->check_raw_value_format( $values );
         next unless ref $values;
         $values = $self->remove_suffix($values, $suffix);
+        next unless ref $values;
         return wantarray ? ($values, $format_name) : $values;
     }
     return undef;
@@ -98,59 +103,73 @@ sub deformat {
 sub format {
     my ($self, $values, $format, $suffix, $prefix) = @_;
     return '' unless $self->basis->is_value_tuple( $values );
-    return '' unless $self->has_format( $format );
+    return '' unless $self->has_formatter( $format );
     $suffix = $self->get_suffix( $suffix );
     return $suffix unless ref $suffix;
     $values = $self->add_suffix( $values, $suffix );
-    $self->{'format'}{ lc $format }->($self, $values);
+    $self->{'formatter'}{ lc $format }->($self, $values);
 }
 
-#### helper ############################################################
+#### work methods ######################################################
 sub remove_suffix { # and unnecessary white space
     my ($self, $values, $suffix) = @_;
     return unless $self->basis->is_value_tuple( $values );
     $suffix = $self->get_suffix( $suffix );
     return $suffix unless ref $suffix;
-    if (ref $self->{'pre'}){
-        $values = $self->{'pre'}->($values);
+    $values = [@$values]; # loose ref and side effects
+    if (ref $self->{'value_numifier'}{'into_numric'}){
+        $values = $self->{'value_numifier'}{'into_numric'}->($values);
         return unless $self->basis->is_value_tuple( $values );
     }
     local $/ = ' ';
     chomp $values->[$_] for $self->basis->axis_iterator;
-    [ map { eval $_ }
-      map { ($self->{'suffix'}[$_] and substr( $values->[$_], - length($self->{'suffix'}[$_])) eq $self->{'suffix'}[$_])
-          ? (substr( $values->[$_], 0, length($values->[$_]) - length($self->{'suffix'}[$_])))
-          : $values->[$_]                                                                     } $self->basis->axis_iterator ];
+    for my $axis_index ($self->basis->axis_iterator){
+        next unless $suffix->[ $axis_index ];
+        my $val_length = length $values->[ $axis_index ];
+        my $suf_length = length $suffix->[ $axis_index ];
+        $values->[$axis_index] = substr($values->[$axis_index], 0, $val_length - $suf_length)
+            if substr( $values->[$axis_index], - $suf_length) eq $suffix->[ $axis_index ]
+            and substr( $values->[$axis_index], - ($suf_length+1),1) ne ' ';
+    }
+    return $values;
 }
 sub add_suffix {
     my ($self, $values, $suffix) = @_;
     return unless $self->basis->is_value_tuple( $values );
     $suffix = $self->get_suffix( $suffix );
     return $suffix unless ref $suffix; # has to be array or error message
-    if (ref $self->{'post'}){
-        $values = $self->{'post'}->($values);
+    $values = [@$values]; # loose ref and side effects
+    if (ref $self->{'value_numifier'}{'from_numeric'}){
+        $values = $self->{'value_numifier'}{'from_numeric'}->($values);
         return unless $self->basis->is_value_tuple( $values );
     }
-    [ map { ($suffix->[$_] and substr( $values->[$_], - length $suffix->[$_]) ne $suffix->[$_])
-                  ? $values->[$_] . $suffix->[$_] : $values->[$_]                              } $self->basis->axis_iterator ];
-}
-
-sub check_number_values {
-    my ($self, $values) = @_;
-    return 0 if ref $values ne 'ARRAY';
-    return 0 if @$values != $self->basis->axis_count;
-    my @re = $self->_value_regex();
-    for my $i ($self->basis->axis_iterator){
-        return 0 unless $values->[$i] =~ /^$re[$i]$/;
+    local $/ = ' ';
+    chomp $values->[$_] for $self->basis->axis_iterator;
+    for my $axis_index ($self->basis->axis_iterator){
+        next unless $suffix->[ $axis_index ];
+        my $val_length = length $values->[ $axis_index ];
+        my $suf_length = length $suffix->[ $axis_index ];
+        $values->[$axis_index] .= $suffix->[ $axis_index ]
+            if substr( $values->[$axis_index], - $suf_length) ne $suffix->[ $axis_index ];
     }
     return $values;
 }
 
-sub _value_regex {
-    my ($self, $match) = @_;
-    (defined $match and $match)
-        ? (map {'\s*('.$self->{'value_form'}[$_].'\s*(?:'.quotemeta($self->{'suffix'}[$_]).')?)\s*' } $self->basis->axis_iterator)
-        : (map {'\s*' .$self->{'value_form'}[$_].'\s*(?:'.quotemeta($self->{'suffix'}[$_]).')?\s*' } $self->basis->axis_iterator);
+sub check_raw_value_format {
+    my ($self, $values) = @_;
+    return 0 if ref $values ne 'ARRAY';
+    return 0 if @$values != $self->basis->axis_count;
+    my @re = $self->get_value_regex();
+    for my $axis_index ($self->basis->axis_iterator){
+        return 0 unless $values->[$axis_index] =~ /^$re[$axis_index]$/;
+    }
+    return $values;
+}
+
+sub get_value_regex {
+    my ($self) = @_;
+    map {'\s*('.$self->{'value_form'}[$_].'(?:'.quotemeta($self->{'suffix'}[$_]).')?)\s*' } # quotemeta
+        $self->basis->axis_iterator;
 }
 
 #### converter: format --> values ######################################
@@ -158,31 +177,37 @@ sub tuple_from_named_string {
     my ($self, $string) = @_;
     return 0 unless defined $string and not ref $string;
     my $name = $self->basis->space_name;
-    $string =~ /^\s*$name:\s*(\s*[^:]+\s*)\s*$/i;
+    $string =~ /^\s*$name:\s*(\s*[^:]+)\s*$/i;
     my $match = $1;
     unless ($match){
         my $name = $self->basis->alias_name;
         return 0 unless $name;
-        $string =~ /^\s*$name:\s*(\s*[^:]+\s*)\s*$/i;
+        $string =~ /^\s*$name:\s*(\s*[^:]+)\s*$/i;
         $match = $1;
     }
     return 0 unless $match;
-    return [split(',', $match)];
+    local $/ = ' ';
+    chomp $match;
+    return [split(/\s*,\s*/, $match)] if index($match, ',') > -1;
+    return [split(/\s+/,     $match)];
 }
 sub tuple_from_css_string {
     my ($self, $string) = @_;
     return 0 unless defined $string and not ref $string;
     my $name = $self->basis->space_name;
-    $string =~ /^\s*$name\s*\(\s*([^)]+)\s*\)\s*$/i;
+    $string =~ /^\s*$name\(\s*([^)]+)\s*\)\s*$/i;
     my $match = $1;
     unless ($match){
         my $name = $self->basis->alias_name;
         return 0 unless $name;
-        $string =~ /^\s*$name\s*\(\s*([^)]+)\s*\)\s*$/i;
+        $string =~ /^\s*$name\(\s*([^)]+)\s*\)\s*$/i;
         $match = $1;
     }
     return 0 unless $match;
-    return [split(',', $match)];
+    local $/ = ' ';
+    chomp $match;
+    return [split(/\s*,\s*/, $match)] if index($match, ',') > -1;
+    return [split(/\s+/,     $match)];
 }
 sub tuple_from_named_array {
     my ($self, $array) = @_;

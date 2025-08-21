@@ -1,5 +1,5 @@
 package Telegram::Bot::Object::ForceReply;
-$Telegram::Bot::Object::ForceReply::VERSION = '0.027';
+$Telegram::Bot::Object::ForceReply::VERSION = '0.028';
 # ABSTRACT: The base class for Telegram 'ForceReply' type objects
 
 
@@ -28,7 +28,7 @@ Telegram::Bot::Object::ForceReply - The base class for Telegram 'ForceReply' typ
 
 =head1 VERSION
 
-version 0.027
+version 0.028
 
 =head1 DESCRIPTION
 

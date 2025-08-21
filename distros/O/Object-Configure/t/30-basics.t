@@ -21,12 +21,14 @@ BEGIN { use_ok('Object::Configure') }
 # === Test using a configuration file ===
 
 # Create a temporary config file
-my ($fh, $filename) = tempfile();
+my ($fh, $filename) = tempfile(SUFFIX => '.yml');
 print $fh <<'EOF';
+---
 My__Module:
   logger:
     file: foo.log
     level: debug
+    format: "%level%> %callstack% %message%"
 EOF
 close $fh;
 
@@ -57,9 +59,10 @@ unlink 'foo.log';
 # === Test using environment variables ===
 
 ($fh, $filename) = tempfile();
+close $fh;
 $ENV{'My__Module__logger__file'} = $filename;
 $ENV{'My__Module__logger__level'} = 'debug';
-close $fh;
+$ENV{'My__Module__logger__format'} = '%level%> %callstack% %message%';
 
 my $obj_with_env = My::Module->new();
 

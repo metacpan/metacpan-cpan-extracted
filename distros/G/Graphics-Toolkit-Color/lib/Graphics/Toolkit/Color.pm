@@ -1,8 +1,8 @@
 
-# public user level API: computing color (sets), measure, IO for many formats and spaces
+# public user level API: docs, help and arg cleaning
 
 package Graphics::Toolkit::Color;
-our $VERSION = '1.91';
+our $VERSION = '1.92';
 
 use v5.12;
 use warnings;
@@ -163,7 +163,8 @@ EOH
     }
     my $range_def = $color_space->shape->try_check_range_definition( $arg->{'range'} );
     return $range_def unless ref $range_def;
-    $self->{'values'}->distance( $target_color->{'values'}, $color_space, $arg->{'select'}, $range_def);
+    Graphics::Toolkit::Color::Space::Hub::distance(
+        $self->{'values'}->normalized, $target_color->{'values'}->normalized, $color_space->name ,$arg->{'select'}, $range_def );
 }
 
 ## single color creation methods #######################################
@@ -366,8 +367,8 @@ Graphics::Toolkit::Color - calculate color (sets), IO many spaces and formats
 
 Methods of the old API ( I<string>, I<rgb>, I<red>,
 I<green>, I<blue>, I<rgb_hex>, I<rgb_hash>, I<hsl>, I<hue>, I<saturation>,
-I<lightness>, I<hsl_hash>, I<blend>, I<blend_with>, I<gradient_to>,
-I<rgb_gradient_to>, I<hsl_gradient_to>, I<complementary>)
+I<lightness>, I<hsl_hash>, I<add>, I<set>, I<blend>, I<blend_with>,
+I<gradient_to>, I<rgb_gradient_to>, I<hsl_gradient_to>, I<complementary>)
 will be removed with release of version 2.0.
 
 =head1 DESCRIPTION
@@ -378,19 +379,20 @@ Its main purpose is the creation of related colors or sets of them,
 such as gradients, complements and others. But you can use it also to
 convert and/or reformat color definitions.
 
-GTC are read only, color holding objects with no additional dependencies.
-Create them in many different ways (see section L</CONSTRUCTOR>).
+GTC are read only, one color representing objects with no additional
+dependencies. Create them in many different ways (see L</CONSTRUCTOR>).
 Access its values via methods from section L</GETTER>.
 Measure differences with the L</distance> method. L</SINGLE-COLOR>
 methods create one new object that is related to the current one and
 L</COLOR-SETS> methods will create a group of colors, that are not
 only related to the current color but also have relations between each other.
-Error messages will appear as return values.
+Error messages will appear as return values instead of the expected result.
 
-While this module can understand and output color values in many spaces,
-such as I<LAB>, I<NCol>, I<YIQ> and many more, I<RGB> is the (internal),
-primal one, because GTC is about colors that can be shown on the screen,
-and these are usually encoded in I<RGB>.
+While this module can understand and output color values to many
+L<color spaces|Graphics::Toolkit::Color::Space::Hub/COLOR-SPACES>,
+L<color spaces|Graphics::Toolkit::Color::Space::Hub/RGB>
+is the (internal) primal one, because GTC is about colors that can be
+shown on the screen, and these are usually encoded in I<RGB>.
 Humans access colors on hardware level (eye) in I<RGB>, on cognition level
 in I<HSL> (brain) and on cultural level (language) with names.
 Having easy access to all of those plus some color math and many formats
@@ -409,6 +411,20 @@ From now on any input that the constructor method C<new> accepts,
 is called a B<color definition>.
 
 
+=head2 new({ r => $r, g => $g, b => $b })
+
+Most clear, flexible and longest input format: a hash with long or short
+axis names as keys with fitting values. This can be C<red>, C<green> and
+C<blue> or C<r>, C<g> and C<b> or names from any other color space.
+Upper or lower case doesnt matter.
+
+    my $red = Graphics::Toolkit::Color->new( r => 255, g => 0, b => 0 );
+    my $red = Graphics::Toolkit::Color->new({r => 255, g => 0, b => 0}); # works too
+                        ... ->new( Red => 255, Green => 0, Blue => 0);   # also fine
+              ... ->new( Hue => 0, Saturation => 100, Lightness => 50 ); # same color
+                  ... ->new( Hue => 0, whiteness => 0, blackness => 0 ); # still the same
+
+
 =head2 new( [$r, $g, $b] )
 
 takes a triplet of integer I<RGB> values (red, green and blue : 0 .. 255).
@@ -422,20 +438,6 @@ Out of range values will be corrected (clamped).
     my $red = Graphics::Toolkit::Color->new( 'RGB',  255, 0, 0 ); # named ARRAY syntax
     my $red = Graphics::Toolkit::Color->new(  RGB => 255, 0, 0 ); # with fat comma
     my $red = Graphics::Toolkit::Color->new([ RGB => 255, 0, 0]); # and brackets
-
-
-=head2 new({ r => $r, g => $g, b => $b })
-
-Hash with the keys C<red>, C<green> and Cblue> does the same as shown in
-previous paragraph, only more declarative. Casing of the key strings will
-be normalised and all axis names can be substituted with short ones, which
-are in most cases the first letters of the long name.
-
-    my $red = Graphics::Toolkit::Color->new( r => 255, g => 0, b => 0 );
-    my $red = Graphics::Toolkit::Color->new({r => 255, g => 0, b => 0}); # works too
-                        ... ->new( Red => 255, Green => 0, Blue => 0);   # also fine
-              ... ->new( Hue => 0, Saturation => 100, Lightness => 50 ); # same color
-                  ... ->new( Hue => 0, whiteness => 0, blackness => 0 ); # still the same
 
 
 =head2 new('rgb($r,$g,$b)')
@@ -470,10 +472,10 @@ also acceptable (I<RGB> only).
 
 =head2 new('name')
 
-Get a color by providing a name from the X11, HTML (CSS) or SVG standard
-or a Pantone report. UPPER or CamelCase will be normalized to lower case
-and inserted underscore letters ('_') will be ignored as perl does in
-numbers (1_000 == 1000). All available names are listed
+Get a color object by providing a name from the X11, HTML (CSS) or SVG
+scheme or a Pantone report. UPPER or CamelCase will be normalized to
+lower case and inserted underscore letters ('_') will be ignored as perl
+does in numbers (1_000 == 1000). All available names are listed
 L<here | Graphics::Toolkit::Color::Name::Constant/NAMES>.
 
     my $color = Graphics::Toolkit::Color->new('Emerald');
@@ -484,7 +486,7 @@ L<here | Graphics::Toolkit::Color::Name::Constant/NAMES>.
 
 Get a color by name from a specific scheme or standard as provided by an
 external module L<Graphics::ColorNames>::* , which has to be installed
-separately. * is a placeholder for the pallet name, which might be:
+separately. * is a placeholder for the scheme name, which might be:
 Crayola, CSS, EmergyC, GrayScale, HTML, IE, Mozilla, Netscape, Pantone,
 PantoneReport, SVG, VACCC, Werner, Windows, WWW or X. In latter case
 I<Graphics::ColorNames::X> has to be installed. You can get them all at
@@ -573,13 +575,25 @@ they appear by default you can surpress them by adding C<suffix =E<gt> ''>
 
 =head2 name
 
-Returns the normalized name (lower case, without I<'_'>) of the color,
+Returns the normalized name (lower case, without I<'_'>) of the color
 held by the object - even when the object was created with numerical values.
 It returns an empty string when no color constant with the exact same values
-was found in the I<X11> or I<HTML> (I<SVG>) standard or the I<Pantone report>.
-If several constants have matching values, the shortest name will be returned.
-All names are listed: L<here|Graphics::Toolkit::Color::Name::Constant/NAMES>.
-(See also: L</new('name')>)
+was found in the I<X11> or I<HTML> (I<SVG>) scheme or the I<Pantone report>.
+If several constants have matching values, the most well known name, which
+is in most cases also the shortest will be returned.
+All names from the internal , default color scheme are listed
+L<here|Graphics::Toolkit::Color::Name::Constant/NAMES>.
+These are the same who can be used with L</new('name')>.
+
+Alternatively you may provide the name of a color scheme as the only,
+positional, optional argument. Then only that color scheme (as used in
+L</new('scheme:color')>) will be searched, if there is a color with the
+exact same values. That name will be the returned, otherwise you get an
+empty string. If the values doesnt have to match exactly, try the next method.
+
+    $blue->name();                                   # 'blue'
+    $blue->name('SVG');                              # 'blue'
+    $blue->name([qw/CSS X/]);                        # 'blue'
 
 
 =head2 closest_name
@@ -588,6 +602,12 @@ Returns in scalar context a color L</name>, which has the shortest
 L</distance> in RGB to the current color.
 In list context, you get additionally the just mentioned distance
 as a second return value.
+
+As with the previous method, one positional, optional argument is the color schme.
+
+    my $name = $red_like->closest_name;              # closest name in default scheme
+    my $name = $red_like->closest_name('HTML');      # closest HTML constant
+    ($red_name, $distance) = $red_like->closest_name;
 
 
 =head2 distance
@@ -599,7 +619,8 @@ either the only argument or the named argument L</to>, which is the only
 required one.
 
 The C<distance> is measured in I<RGB> color space unless told otherwise
-by the argument L</in>.
+by the argument L</in>. Please use the I<CIELAB> or I<CIELUV> space, if
+you are interested in getting a result that matches the human perception.
 
 The third argument is named C<select>. It's useful if you want to regard
 only certain dimensions (axis). For instance if you want to know only
@@ -832,14 +853,14 @@ to 255 (0..255). In order to change that, many methods accept the named
 argument C<range>. When only one interger value provided, it changes the
 upper bound on all three axis and as lower bound is assumed zero.
 Let's say you need I<RGB16> values with a range of 0 .. 65536,
-then you type C<range =<gt> 65536> or C<range =<gt> 2**16>.
+then you type C<< range => 65536 >> or C<< range => 2**16 >>.
 
 If you provide an ARRAY ref you can change the upper bounds of all axis
 individually and in order to change even the lower boundaries, use ARRAY
 refs even inside that. For instance in C<HSL> the C<hue> is normally
 0 .. 359 and the other two axis are 0 .. 100. In order to set C<hue>
 to -100 .. 100 but keep the other two untouched you would have to insert:
-C<range =&gt; [[-100,100],100,100]>.
+C<< range => [[-100,100],100,100] >>.
 
 
 =head2 to

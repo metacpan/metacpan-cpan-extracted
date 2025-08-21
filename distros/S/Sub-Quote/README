@@ -71,7 +71,7 @@ SUBROUTINES
       This captures the warnings set. If not specified, the warnings from
       the calling code will be used.
 
-    "%^H"
+    "hintshash"
       The value of "%^H" to use for the code being evaluated. This captures
       additional pragma settings. If not specified, the value from the
       calling code will be used if possible (on perl 5.10+).

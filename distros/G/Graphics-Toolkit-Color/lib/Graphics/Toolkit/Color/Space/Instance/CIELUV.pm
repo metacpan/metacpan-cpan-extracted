@@ -33,7 +33,7 @@ sub from_xyz {
     my $u = 13 * $l * ($u_color - $u_white);
     my $v = 13 * $l * ($v_color - $v_white);
 
-    return ( $l / 100 , ($u+134) / 354, ($v+140) / 262 );
+    return ([ $l / 100 , ($u+134) / 354, ($v+140) / 262 ]);
 }
 
 
@@ -56,7 +56,7 @@ sub to_xyz {
     my $z = ($color_mix - $x - (15 * $y)) / 3;
     my $XYZ = [$x, $y, $z];
 
-    return map { $XYZ->[$_] / $D65[$_] } 0 .. 2;
+    return [ map { $XYZ->[$_] / $D65[$_] } 0 .. 2 ];
 }
 
 $luv_def;

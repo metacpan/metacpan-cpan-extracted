@@ -4,7 +4,7 @@ WWW::Mechanize::Chrome::Webshot - cheap and cheerful html2pdf converter, take a 
 
 # VERSION
 
-Version 0.02
+Version 0.03
 
 # SYNOPSIS
 
@@ -34,22 +34,29 @@ Here are some examples:
     });
     $shooter->shoot({
       'output-filename' => 'abc.png',
-      'output-format' => 'png', # optional if it can not be deduced
-      # or 'file:///A/B/C.html' # << use absolute filepath!
+      # optional unless it can not be deduced from filename
+      'output-format' => 'png', # pdf
+
+      # URL or local file, e.g. 'file:///A/B/C.html'
+      # !!! BUT USE ABSOLUTE FILEPATH in uri
       'url' => 'https://www.902.gr',
+
+      # remove irritating DOM elements cluttering our view...
       'remove-DOM-elements' => [
         {'element-xpathselector' => '//div[id="advertisments"]'},
         {...}
       ],
-      'exif' => [{'created' => 'by the shooter'}, ...],
-    });
+
+      # optionally add exif metadata to the output image
+      'exif' => {'created' => 'by the shooter', 'tag2' => 'hehe', ...},
+    }) or die;
     ...
 
 # CONSTRUCTOR
 
 ## `new($params)`
 
-Creates a new `Android::ElectricSheep::Automator` object. `$params`
+Creates a new `WWW::Mechanize::Chrome::Webshot` object. `$params`
 is a hash reference used to pass initialization options which may
 or should include the following:
 
@@ -136,14 +143,19 @@ or should include the following:
 
 - **`resolution`**
 
-    Optional. The size of the browser in `WxH` format. Default is 1600x1200.
+    Optional. Specify the size of the
+    mechanized browser in the form `WxH`. Ideally,
+    this should set the size of the output image. Default
+    value is `1600x1200`.
 
 - **`headless`**
 
     Optional. When debugging you may find it useful to display the browser while
-    it loads the URL. Set this to 1 if you want this. Default is 0 (yes, headless).
-    Make sure you specify a huge `settle-time` with this because the browser will
-    shutdown as soon as the screenshot is taken.
+    it loads the URL. Set this to `0` if you want this.
+    Default is 1 (yes, headless, the browser window does not show).
+    I am not sure if the browser dies soon after the mechanized browser object
+    goes out of scope. You may want to place a `sleep($long_time);`
+    before that in order to inspect its contents at your leisure.
 
 - **`remove-dom-elements`**
 
@@ -153,10 +165,17 @@ or should include the following:
     Each HASH\_REF is a selector for DOM elements to be zapped. See [https://metacpan.org/pod/WWW::Mechanize::Chrome::DOMops#ELEMENT-SELECTORS](https://metacpan.org/pod/WWW::Mechanize::Chrome::DOMops#ELEMENT-SELECTORS)
     on the exact spec of the DOM selectors.
 
+- **`exif`**
+
+    Optional. Specify one or more EXIF tags to be
+    inserted into the output image as a HASH\_REF of tag/value pairs
+    each time ["shoot($params)"](#shoot-params) is called. This value will be overwritten
+    if `$params` (of ["shoot($params)"](#shoot-params)) contains its own `exif` parameter.
+
 - **`WWW::Mechanize::Chrome`**
 
     Optional. Specify any parameters to be passed on to the
-    constructor of [WWW::Mechanize::Chrome](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3AChrome).
+    constructor of [WWW::Mechanize::Chrome](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3AChrome) as a HASH\_REF of parameters.
 
 # METHODS
 
@@ -166,11 +185,13 @@ It takes a screenshot of the specified URL as
 rendered by [WWW::Mechanize::Chrome](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3AChrome) (usually headless)
 and saves it as an image to the specified file.
 
+It returns `0` on failure, `1` on success.
+
 Input parameters `$params`:
 
-- **`url`** specifies the target URL or URI pointing
+- **`url`**: specifies the target URL or even a URI pointing
 to a local file (e.g. `file:///A/B/C.html`, use absolute filepath).
-- **`remove-dom-elements`** specifies DOM elements to
+- **`remove-dom-elements`**: specifies DOM elements to
 be removed after the URL has been loaded and settle time has passed.
 Annoyances like advertisements, consents, warnings can be
 zapped by specifying their XPath selectors. This is an ARRAY\_REF of HASH\_REF.
@@ -179,9 +200,11 @@ on the exact spec of the DOM selectors. Note that a parameter with the same
 name can be specified in the constructor. If one is specified here,
 then the one specified in the constructor will be ignored, else, it will
 be used.
-- **`exif`** optionally specify one or more EXIF tags to be
-inserted into the output image. If one is specified here, then
-any specified in the constructor will be ignored.
+- **`exif`**: optionally specify one or more EXIF tags to be
+inserted into the output image as a HASH\_REF of tag/value pairs.
+If **`exif`** data is specified here, then
+any exif data specified in the constructor will be ignored. This works
+well for both PNG and PDF output images.
 
 ## **`shutdown()`**
 

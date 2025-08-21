@@ -1,5 +1,9 @@
 Release history for Catalyst-Authentication-Store-Htpasswd
 
+1.019     2025-08-20 17:36:50Z
+   - fix CVE-2025-40920
+     by using Crypt::SysRandom to generate nonces instead of Data::UUID
+
 1.018     2017-06-28 00:28:23Z
    - removed optional prereqs from metadata (added in 1.017)
 
@@ -85,17 +89,17 @@ Release history for Catalyst-Authentication-Store-Htpasswd
 1.003  2008-09-11
    - Add ability to override the realm name presented for authentication
      when calling $c->authenticate. Documentation and tests for this.
-   - Clean up documentation of options inherited from 
+   - Clean up documentation of options inherited from
      Catalyst::Authentication::Credential::Password.
-   - Added an example of calling methods in the credential module from a 
+   - Added an example of calling methods in the credential module from a
      controller to the POD.
-   - Tests for the authorization_required_message configuration parameter. 
+   - Tests for the authorization_required_message configuration parameter.
    - Document use_uri_for configuration option
-   - Document domain option (passed through from $c->authenticate) and add 
+   - Document domain option (passed through from $c->authenticate) and add
      tests for this option.
 
 1.002  2008-09-03
-   - Fix the assumptions that the password field is named password when doing 
+   - Fix the assumptions that the password field is named password when doing
      digest auth.
 
 1.001  2008-09-02
@@ -108,7 +112,7 @@ Release history for Catalyst-Authentication-Store-Htpasswd
 1.000  2008-09-01
    - Rename to remove Plugin from namespace. This is a pretty breaking change,
      as lots of things work differently with the new auth refactor.
-   - Pull out some functionality which I think is better in other 
+   - Pull out some functionality which I think is better in other
      modules (realms/stores). With the auth refactor, this module didn't need
      to do so much. If anyone misses any of the functionality, please yell at
      me and I'll put it back.

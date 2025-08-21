@@ -15,9 +15,9 @@ SYNOPSIS
 DEPRECATION WARNING
     Methods of the old API ( *string*, *rgb*, *red*, *green*, *blue*,
     *rgb_hex*, *rgb_hash*, *hsl*, *hue*, *saturation*, *lightness*,
-    *hsl_hash*, *blend*, *blend_with*, *gradient_to*, *rgb_gradient_to*,
-    *hsl_gradient_to*, *complementary*) will be removed with release of
-    version 2.0.
+    *hsl_hash*, *add*, *set*, *blend*, *blend_with*, *gradient_to*,
+    *rgb_gradient_to*, *hsl_gradient_to*, *complementary*) will be removed
+    with release of version 2.0.
 
 DESCRIPTION
     Graphics::Toolkit::Color, for short GTC, is the top level API of this
@@ -26,23 +26,22 @@ DESCRIPTION
     as gradients, complements and others. But you can use it also to convert
     and/or reformat color definitions.
 
-    GTC are read only, color holding objects with no additional
-    dependencies. Create them in many different ways (see section
-    "CONSTRUCTOR"). Access its values via methods from section "GETTER".
-    Measure differences with the "distance" method. "SINGLE-COLOR" methods
-    create one new object that is related to the current one and
-    "COLOR-SETS" methods will create a group of colors, that are not only
-    related to the current color but also have relations between each other.
-    Error messages will appear as return values.
+    GTC are read only, one color representing objects with no additional
+    dependencies. Create them in many different ways (see "CONSTRUCTOR").
+    Access its values via methods from section "GETTER". Measure differences
+    with the "distance" method. "SINGLE-COLOR" methods create one new object
+    that is related to the current one and "COLOR-SETS" methods will create
+    a group of colors, that are not only related to the current color but
+    also have relations between each other. Error messages will appear as
+    return values instead of the expected result.
 
-    While this module can understand and output color values in many spaces,
-    such as *LAB*, *NCol*, *YIQ* and many more, *RGB* is the (internal),
-    primal one, because GTC is about colors that can be shown on the screen,
-    and these are usually encoded in *RGB*. Humans access colors on hardware
-    level (eye) in *RGB*, on cognition level in *HSL* (brain) and on
-    cultural level (language) with names. Having easy access to all of those
-    plus some color math and many formats should enable you to get the color
-    palette you desire quickly.
+    While this module can understand and output color values to many color
+    spaces, color spaces is the (internal) primal one, because GTC is about
+    colors that can be shown on the screen, and these are usually encoded in
+    *RGB*. Humans access colors on hardware level (eye) in *RGB*, on
+    cognition level in *HSL* (brain) and on cultural level (language) with
+    names. Having easy access to all of those plus some color math and many
+    formats should enable you to get the color palette you desire quickly.
 
 CONSTRUCTOR
     There are many options to create a color object. In short you can either
@@ -50,6 +49,18 @@ CONSTRUCTOR
     coordinates in one of several color spaces. The latter are also
     understood in many formats. From now on any input that the constructor
     method "new" accepts, is called a color definition.
+
+  new({ r => $r, g => $g, b => $b })
+    Most clear, flexible and longest input format: a hash with long or short
+    axis names as keys with fitting values. This can be "red", "green" and
+    "blue" or "r", "g" and "b" or names from any other color space. Upper or
+    lower case doesnt matter.
+
+        my $red = Graphics::Toolkit::Color->new( r => 255, g => 0, b => 0 );
+        my $red = Graphics::Toolkit::Color->new({r => 255, g => 0, b => 0}); # works too
+                            ... ->new( Red => 255, Green => 0, Blue => 0);   # also fine
+                  ... ->new( Hue => 0, Saturation => 100, Lightness => 50 ); # same color
+                      ... ->new( Hue => 0, whiteness => 0, blackness => 0 ); # still the same
 
   new( [$r, $g, $b] )
     takes a triplet of integer *RGB* values (red, green and blue : 0 ..
@@ -63,18 +74,6 @@ CONSTRUCTOR
         my $red = Graphics::Toolkit::Color->new( 'RGB',  255, 0, 0 ); # named ARRAY syntax
         my $red = Graphics::Toolkit::Color->new(  RGB => 255, 0, 0 ); # with fat comma
         my $red = Graphics::Toolkit::Color->new([ RGB => 255, 0, 0]); # and brackets
-
-  new({ r => $r, g => $g, b => $b })
-    Hash with the keys "red", "green" and Cblue> does the same as shown in
-    previous paragraph, only more declarative. Casing of the key strings
-    will be normalised and all axis names can be substituted with short
-    ones, which are in most cases the first letters of the long name.
-
-        my $red = Graphics::Toolkit::Color->new( r => 255, g => 0, b => 0 );
-        my $red = Graphics::Toolkit::Color->new({r => 255, g => 0, b => 0}); # works too
-                            ... ->new( Red => 255, Green => 0, Blue => 0);   # also fine
-                  ... ->new( Hue => 0, Saturation => 100, Lightness => 50 ); # same color
-                      ... ->new( Hue => 0, whiteness => 0, blackness => 0 ); # still the same
 
   new('rgb($r,$g,$b)')
     String format that is supported by CSS (*css_string* format): it starts
@@ -101,10 +100,10 @@ CONSTRUCTOR
         my $color = Graphics::Toolkit::Color->new('#f00');    # short works too
 
   new('name')
-    Get a color by providing a name from the X11, HTML (CSS) or SVG standard
-    or a Pantone report. UPPER or CamelCase will be normalized to lower case
-    and inserted underscore letters ('_') will be ignored as perl does in
-    numbers (1_000 == 1000). All available names are listed here .
+    Get a color object by providing a name from the X11, HTML (CSS) or SVG
+    scheme or a Pantone report. UPPER or CamelCase will be normalized to
+    lower case and inserted underscore letters ('_') will be ignored as perl
+    does in numbers (1_000 == 1000). All available names are listed here .
 
         my $color = Graphics::Toolkit::Color->new('Emerald');
         my @names = Graphics::Toolkit::Color::Name::all(); # select from these
@@ -112,7 +111,7 @@ CONSTRUCTOR
   new('scheme:color')
     Get a color by name from a specific scheme or standard as provided by an
     external module Graphics::ColorNames::* , which has to be installed
-    separately. * is a placeholder for the pallet name, which might be:
+    separately. * is a placeholder for the scheme name, which might be:
     Crayola, CSS, EmergyC, GrayScale, HTML, IE, Mozilla, Netscape, Pantone,
     PantoneReport, SVG, VACCC, Werner, Windows, WWW or X. In latter case
     *Graphics::ColorNames::X* has to be installed. You can get them all at
@@ -195,18 +194,37 @@ GETTER
         $blue->values( in => 'XYZ', range => 1, precision => 2);# normalized, 2 decimals max.
 
   name
-    Returns the normalized name (lower case, without *'_'*) of the color,
+    Returns the normalized name (lower case, without *'_'*) of the color
     held by the object - even when the object was created with numerical
     values. It returns an empty string when no color constant with the exact
-    same values was found in the *X11* or *HTML* (*SVG*) standard or the
-    *Pantone report*. If several constants have matching values, the
-    shortest name will be returned. All names are listed: here. (See also:
-    "new('name')")
+    same values was found in the *X11* or *HTML* (*SVG*) scheme or the
+    *Pantone report*. If several constants have matching values, the most
+    well known name, which is in most cases also the shortest will be
+    returned. All names from the internal , default color scheme are listed
+    here. These are the same who can be used with "new('name')".
+
+    Alternatively you may provide the name of a color scheme as the only,
+    positional, optional argument. Then only that color scheme (as used in
+    "new('scheme:color')") will be searched, if there is a color with the
+    exact same values. That name will be the returned, otherwise you get an
+    empty string. If the values doesnt have to match exactly, try the next
+    method.
+
+        $blue->name();                                   # 'blue'
+        $blue->name('SVG');                              # 'blue'
+        $blue->name([qw/CSS X/]);                        # 'blue'
 
   closest_name
     Returns in scalar context a color "name", which has the shortest
     "distance" in RGB to the current color. In list context, you get
     additionally the just mentioned distance as a second return value.
+
+    As with the previous method, one positional, optional argument is the
+    color schme.
+
+        my $name = $red_like->closest_name;              # closest name in default scheme
+        my $name = $red_like->closest_name('HTML');      # closest HTML constant
+        ($red_name, $distance) = $red_like->closest_name;
 
   distance
     Is a floating point number that measures the Euclidean distance between
@@ -216,7 +234,8 @@ GETTER
     required one.
 
     The "distance" is measured in *RGB* color space unless told otherwise by
-    the argument "in".
+    the argument "in". Please use the *CIELAB* or *CIELUV* space, if you are
+    interested in getting a result that matches the human perception.
 
     The third argument is named "select". It's useful if you want to regard
     only certain dimensions (axis). For instance if you want to know only
@@ -422,14 +441,14 @@ ARGUMENTS
     argument "range". When only one interger value provided, it changes the
     upper bound on all three axis and as lower bound is assumed zero. Let's
     say you need *RGB16* values with a range of 0 .. 65536, then you type
-    "range =<gt" 65536> or "range =<gt" 2**16>.
+    "range => 65536" or "range => 2**16".
 
     If you provide an ARRAY ref you can change the upper bounds of all axis
     individually and in order to change even the lower boundaries, use ARRAY
     refs even inside that. For instance in "HSL" the "hue" is normally 0 ..
     359 and the other two axis are 0 .. 100. In order to set "hue" to -100
     .. 100 but keep the other two untouched you would have to insert: "range
-    =&gt; [[-100,100],100,100]".
+    => [[-100,100],100,100]".
 
   to
     This argument receives a second or target color. It may come in form of

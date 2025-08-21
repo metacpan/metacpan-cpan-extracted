@@ -22,7 +22,7 @@ sub from_rgb {
                                     [0.2115, -0.5227,  0.3112]], @$rgb);
     $i = ($i + $i_max) / $i_range_size;
     $q = ($q + $q_max) / $q_range_size;
-    return ($y, $i, $q);
+    return [$y, $i, $q];
 }
 
 
@@ -31,9 +31,9 @@ sub to_rgb {
     my ($yiq) = shift;
     $yiq->[1] = $yiq->[1] * $i_range_size - $i_max;
     $yiq->[2] = $yiq->[2] * $q_range_size - $q_max;
-    return mult_matrix3([[1,   0.95605,   0.620755],
-                         [1,  -0.272052, -0.647206],
-                         [1,  -1.1067,    1.70442 ]], @$yiq);
+    return [ mult_matrix3([[1,   0.95605,   0.620755],
+                           [1,  -0.272052, -0.647206],
+                           [1,  -1.1067,    1.70442 ]], @$yiq) ];
 }
 
 $yiq_def;

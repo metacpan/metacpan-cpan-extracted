@@ -12,9 +12,9 @@ my $space = eval "require $module";
 is( not($@), 1, 'could load the module');
 is( ref $space, 'Graphics::Toolkit::Color::Space', 'got tight return value by loading module');
 is( $space->name,                      'CIELCHUV', 'color space name is CIELCHuv');
+is( $space->alias,                        'LCHUV', 'color space has alias name: LCHuv');
 is( $space->is_name('CIELCHuv'),                1, 'color space name CIELCHuv is correct');
-is( $space->alias,                             '', 'color space has no alias name');
-is( $space->is_name('CIELCHuv'),                1, 'acknowledge name CIELCHuv');
+is( $space->is_name('LCHuv'),                   1, 'color space name LCHuv is correct');
 is( $space->is_name('LCH'),                     0, 'LCH is given for another space');
 is( $space->axis_count,                         3, 'color space has 3 dimensions');
 

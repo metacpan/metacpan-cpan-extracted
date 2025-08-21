@@ -1,5 +1,9 @@
 Revision history for Object::Configure - Runtime Configuration for an Object
 
+0.13	Wed Aug 20 09:39:00 EDT 2025
+	Ensure it works with Log::Abstraction 0.25 and bump to use that
+		Also fixes https://github.com/nigelhorne/Object-Configure/issues/2
+
 0.12	Fri Aug  1 08:20:23 EDT 2025
 	Use Return::Set
 	Allow carp_on_warn to be read from the configuration file, and change the default to 0

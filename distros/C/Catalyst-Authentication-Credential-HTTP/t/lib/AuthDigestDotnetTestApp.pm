@@ -12,7 +12,7 @@ $digest_pass->add('Mufasa2:testrealm@host.com:Circle Of Life');
         Mufasa2 => { pass         => $digest_pass->hexdigest, },
 );
 __PACKAGE__->config(
-    cache => {
+    'Plugin::Cache' => {
         backend => {
             class => 'Cache::FileCache',
         },

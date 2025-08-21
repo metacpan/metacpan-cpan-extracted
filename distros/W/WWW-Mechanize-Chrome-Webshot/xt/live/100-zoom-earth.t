@@ -20,7 +20,7 @@ use lib ($FindBin::Bin, 'blib/lib');
 
 use WWW::Mechanize::Chrome::Webshot;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 my $VERBOSITY = 10; # we need verbosity of 10 (max), so this is not used
 my $CLEANUP = (exists($ENV{'PERL_TEST_TEMPDIR_TINY_NOCLEANUP'}) && ($ENV{'PERL_TEST_TEMPDIR_TINY_NOCLEANUP'}>0)) ? 1 : 0;
@@ -140,11 +140,12 @@ my $metadata = {
 	'Bb' => 'ελληνικά',
 	'Cc' => 'agglika',
 };
-$shooter->shoot({
+my $r = $shooter->shoot({
 	'output-filename' => $tmpfile,
 	'url' => $URL,
 	'exif' => $metadata
 });
+is($r, 1, 'shoot()'." : called and got good result.") or BAIL_OUT;
 ok(-f $tmpfile, "$tmpfile contains the screenshot") or BAIL_OUT("no screenshot was created, something seriously wrong.");
 ok(! -z $tmpfile, "$tmpfile contains some bytes") or BAIL_OUT("no data in screenshot file, something seriously wrong.");
 

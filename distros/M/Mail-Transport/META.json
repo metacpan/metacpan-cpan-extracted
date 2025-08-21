@@ -4,7 +4,7 @@
       "Mark Overmeer"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -54,6 +54,6 @@
          "web" : "https://github.com/markov2/perl5-Mail-Transport"
       }
    },
-   "version" : "3.005",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "3.006",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

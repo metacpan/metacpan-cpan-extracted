@@ -1,5 +1,5 @@
 package Telegram::Bot::Object::Video;
-$Telegram::Bot::Object::Video::VERSION = '0.027';
+$Telegram::Bot::Object::Video::VERSION = '0.028';
 # ABSTRACT: The base class for Telegram 'Video' object.
 
 
@@ -35,7 +35,7 @@ Telegram::Bot::Object::Video - The base class for Telegram 'Video' object.
 
 =head1 VERSION
 
-version 0.027
+version 0.028
 
 =head1 DESCRIPTION
 

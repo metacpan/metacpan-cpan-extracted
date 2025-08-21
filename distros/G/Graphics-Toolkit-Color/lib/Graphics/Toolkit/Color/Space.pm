@@ -41,6 +41,9 @@ sub select_tuple_value_from_name { shift->basis->select_tuple_value_from_axis_na
 
 ########################################################################
 sub shape              { $_[0]{'shape'} }
+sub is_linear          { shift->shape->is_linear() }          #                                    --> ?
+sub is_in_linear_bounds{ shift->shape->is_in_linear_bounds(@_)}#@+values                           --> ?
+sub is_equal           { shift->shape->is_equal( @_ ) }       # @+val_a, @+val_b -- @+precision    --> ?
 sub round              { shift->shape->round( @_ ) }          # @+values -- @+precision            --> @+rvals       # result values
 sub clamp              { shift->shape->clamp( @_ ) }          # @+values -- @+range                --> @+rvals       # result values
 sub check_value_shape  { shift->shape->check_value_shape( @_)}# @+values -- @+range, @+precision   --> @+values|!~   # errmsg
@@ -48,19 +51,15 @@ sub normalize          { shift->shape->normalize(@_)}         # @+values -- @+ra
 sub denormalize        { shift->shape->denormalize(@_)}       # @+values -- @+range                --> @+rvals|!~
 sub denormalize_delta  { shift->shape->denormalize_delta(@_)} # @+values -- @+range                --> @+rvals|!~
 sub delta              { shift->shape->delta( @_ ) }          # @+val_a, @+val_b                   --> @+rvals|      # on normalized values
-sub is_equal           { shift->shape->is_equal( @_ ) }       # @+val_a, @+val_b -- @+precision    --> ?
-sub is_in_linear_bounds{ shift->shape->is_in_linear_bounds(@_)}#@+values                           --> ?
 sub add_constraint     { shift->shape->add_constraint(@_)}    # ~name, ~error, &checker, &remedy   --> %constraint
 
 ########################################################################
 sub form               { $_[0]{'format'} }
 sub format             { shift->form->format(@_) }            # @+values, ~format_name -- @~suffix --> $*color
 sub deformat           { shift->form->deformat(@_) }          # $*color                -- @~suffix --> @+values, ~format_name
-sub has_format         { shift->form->has_format(@_) }        # ~format_name                       --> ?
-sub has_deformat       { shift->form->has_deformat(@_) }      # ~format_name                       --> ?
 sub add_formatter      { shift->form->add_formatter(@_) }     # ~format_name, &formatter           --> &?
 sub add_deformatter    { shift->form->add_deformatter(@_) }   # ~format_name, &deformatter         --> &?
-sub set_value_formatter{ shift->form->set_value_formatter(@_)}# &pre_formatter, &post_formatter    --> &?
+sub set_value_numifier { shift->form->set_value_numifier(@_)} # &reader, &writer                   --> &?
 
 #### conversion ########################################################
 sub converter_names      { keys %{  $_[0]{'convert'} } }
@@ -89,12 +88,12 @@ sub add_converter {
 sub convert_to { # convert value tuple from this space into another
     my ($self, $space_name, $values) = @_;
     return unless $self->is_value_tuple( $values ) and defined $space_name and $self->can_convert( $space_name );
-    return [$self->{'convert'}{ uc $space_name }{'to'}->( $values )];
+    return $self->{'convert'}{ uc $space_name }{'to'}->( $values );
 }
 sub convert_from { # convert value tuple from another space into this
     my ($self, $space_name, $values) = @_;
     return unless ref $values eq 'ARRAY' and defined $space_name and $self->can_convert( $space_name );
-    return [ $self->{'convert'}{ uc $space_name }{'from'}->( $values ) ];
+    return $self->{'convert'}{ uc $space_name }{'from'}->( $values );
 }
 
 sub converter_normal_states {
@@ -140,6 +139,7 @@ of the same class, they can be treated the same from the outside.
     $def->add_formatter(   'name',   sub {...} );
     $def->add_deformatter( 'name',   sub {...} );
     $def->add_constraint(  'name', 'error', sub {...}, sub {} );
+    $def->set_value_formatter( sub {...}, sub {...}, )
 
 
 =head1 DESCRIPTION
@@ -231,15 +231,25 @@ normal ranges but outside of this constraint. 3. a CODE ref of a routine
 that gets a tuple and gives a perly true if the constraint was violated.
 4. another routine that can remedy violating values.
 
+=head2 set_value_formatter
+
+This method was introduced for the I<NCol> space, where one value is
+partially represented by letters. When reading a I<NCol> color definition
+from an input, this value has to be translated into a number, so it
+can be then processed as other numerical values. That will be done by
+the first routine, given by this method. The second routine does just
+the translation back, when the values has to become an output.
+
+
+=head1 AUTHOR
+
+Herbert Breunung, <lichtkind@cpan.org>
+
 =head1 COPYRIGHT & LICENSE
 
 Copyright 2023-25 Herbert Breunung.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
-
-=head1 AUTHOR
-
-Herbert Breunung, <lichtkind@cpan.org>
 
 =cut

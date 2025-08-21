@@ -38,7 +38,7 @@ my %WriteMakefileArgs = (
         'FindBin' => '0',
         'Cwd' => '0',
         'File::Basename' => '0',
-	'Data::Roundtrip' => '0',
+	'Data::Roundtrip' => '0.30',
 	'Image::ExifTool' => '0',
     },
     PREREQ_PM => {
@@ -46,19 +46,15 @@ my %WriteMakefileArgs = (
 	'FindBin' => '0',
 	'Mojo::Log' => '0',
 	'WWW::Mechanize::Chrome' => '0',
-	'WWW::Mechanize::Chrome::DOMops' => '0',
-	'Data::Roundtrip' => '0',
+	'WWW::Mechanize::Chrome::DOMops' => '0.12',
+	'Data::Roundtrip' => '0.30',
 	'Encode' => '0',
 	'Image::ExifTool' => '5.31', # which supports EXIF for png files
 	'Log::Log4perl' => '0',
-	'IO::Socket::SSL' => '0',
-	'Crypt::OpenSSL::AES' => '0',
-	'Authen::SASL' => '0',
-	'HTTP::CookieJar::LWP' => '0',
-	'LWP::ConsoleLogger::Easy' => '0',
+	'Getopt::Long' => '0', # scripts using it
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean => { FILES => [ 'WWW-Mechanize-Chrome-Webshot-*', '.test-script-*'] },
+    clean => { FILES => [ 'WWW-Mechanize-Chrome-Webshot-*', '.test-script-*', 'tmp'] },
     postamble => {
         LIVE_FILES => 'xt/live/*.t'
     },

@@ -18,8 +18,8 @@ my $mock_oidc_client = Test::MockModule->new('OIDC::Client');
 $mock_oidc_client->redefine('kid_keys' => sub { {} });
 $mock_oidc_client->redefine('user_agent' => $provider_app->ua);
 
-my $mock_plugin = Test::MockModule->new('OIDC::Client::Plugin');
-$mock_plugin->redefine('_generate_uuid_string' => sub { 'fake_uuid' });
+my $mock_data_uuid = Test::MockModule->new('Data::UUID');
+$mock_data_uuid->redefine('create_str' => sub { 'fake_uuid' });
 
 require Catalyst::Test;
 Catalyst::Test->import('MyCatalystApp');

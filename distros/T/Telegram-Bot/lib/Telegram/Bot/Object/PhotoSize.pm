@@ -1,5 +1,5 @@
 package Telegram::Bot::Object::PhotoSize;
-$Telegram::Bot::Object::PhotoSize::VERSION = '0.027';
+$Telegram::Bot::Object::PhotoSize::VERSION = '0.028';
 # ABSTRACT: The base class for Telegram message 'PhotoSize' type.
 
 
@@ -30,7 +30,7 @@ Telegram::Bot::Object::PhotoSize - The base class for Telegram message 'PhotoSiz
 
 =head1 VERSION
 
-version 0.027
+version 0.028
 
 =head1 DESCRIPTION
 

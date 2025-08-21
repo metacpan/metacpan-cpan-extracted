@@ -1,0 +1,39 @@
+Time-Left
+
+Simple object model for time limits.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Time::Left
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Time-Left
+
+    CPAN Ratings
+        https://cpanratings.perl.org/d/Time-Left
+
+    Search CPAN
+        https://metacpan.org/release/Time-Left
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2025 by Brett Watson.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

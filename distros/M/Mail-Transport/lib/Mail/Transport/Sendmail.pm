@@ -1,4 +1,4 @@
-# Copyrights 2001-2020 by [Mark Overmeer].
+# Copyrights 2001-2025 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
@@ -8,7 +8,7 @@
 
 package Mail::Transport::Sendmail;
 use vars '$VERSION';
-$VERSION = '3.005';
+$VERSION = '3.006';
 
 use base 'Mail::Transport::Send';
 
@@ -20,30 +20,26 @@ use Carp;
 
 sub init($)
 {   my ($self, $args) = @_;
-
     $args->{via} = 'sendmail';
 
     $self->SUPER::init($args) or return;
 
-    $self->{MTS_program}
-      = $args->{proxy}
-     || $self->findBinary('sendmail')
-     || return;
-
+    $self->{MTS_program} = $args->{proxy} || $self->findBinary('sendmail') || return;
     $self->{MTS_opts} = $args->{sendmail_options} || [];
     $self;
 }
 
 #------------------------------------------
 
-
 sub trySend($@)
 {   my ($self, $message, %args) = @_;
 
     my $program = $self->{MTS_program};
-    if(open(MAILER, '|-')==0)
-    {   my $options = $args{sendmail_options} || [];
-        my @to = map {$_->address} $self->destinations($message, $args{to});
+    my $mailer;
+    if(open($mailer, '|-')==0)
+    {   # Child process is sendmail binary
+        my $options = $args{sendmail_options} || [];
+        my @to = map $_->address, $self->destinations($message, $args{to});
 
         # {} to avoid warning about code after exec
         {  exec $program, '-i', @{$self->{MTS_opts}}, @$options, @to; }
@@ -52,9 +48,10 @@ sub trySend($@)
         exit 1;
     }
  
-    $self->putContent($message, \*MAILER, undisclosed => 1);
+    # Parent process is the main program, still
+    $self->putContent($message, $mailer, undisclosed => 1);
 
-    unless(close MAILER)
+    unless($mailer->close)
     {   $self->log(NOTICE => "Errors when closing sendmail mailer $program: $!");
         $? ||= $!;
         return 0;
@@ -62,7 +59,5 @@ sub trySend($@)
 
     1;
 }
-
-#------------------------------------------
 
 1;

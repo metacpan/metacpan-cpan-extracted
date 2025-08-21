@@ -1,5 +1,5 @@
 package Telegram::Bot::Object::InlineKeyboardButton;
-$Telegram::Bot::Object::InlineKeyboardButton::VERSION = '0.027';
+$Telegram::Bot::Object::InlineKeyboardButton::VERSION = '0.028';
 # ABSTRACT: The base class for Telegram 'InlineKeyboardButton' type objects
 
 
@@ -39,7 +39,7 @@ Telegram::Bot::Object::InlineKeyboardButton - The base class for Telegram 'Inlin
 
 =head1 VERSION
 
-version 0.027
+version 0.028
 
 =head1 DESCRIPTION
 

@@ -23,7 +23,7 @@ sub from_xyz {
     my $l = (1.16 * $xyz[1]) - 0.16;
     my $a = ($xyz[0] - $xyz[1] + 1) / 2;
     my $b = ($xyz[1] - $xyz[2] + 1) / 2;
-    return ($l, $a, $b);
+    return ([$l, $a, $b]);
 }
 
 sub to_xyz {
@@ -32,7 +32,7 @@ sub to_xyz {
     my $fx = $fy - 1 + ($lab->[1] * 2);
     my $fz = $fy + 1 - ($lab->[2] * 2);
     my @xyz = map {my $f3 = $_** 3; ($f3 > $eta) ? $f3 : (( 116 * $_ - 16 ) / $kappa) } $fx, $fy, $fz;
-    return @xyz;
+    return \@xyz;
 }
 
 $lab_def;

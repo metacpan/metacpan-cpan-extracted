@@ -38,6 +38,9 @@ BEGIN {
     ;
 
     $v and
+      # Scalar::Util breaks on 5.42 if its Perl/XS parts see inconsistent perl
+      # versions, so load it now before it gets pulled in by Test::More below
+      (require Scalar::Util),
       ($v = sprintf "%.6f", $v),
       (my $t = $v + 0),
       (Internals::SvREADONLY($], 0)),

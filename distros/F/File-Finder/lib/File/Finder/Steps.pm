@@ -1,6 +1,6 @@
 package File::Finder::Steps;
 
-our $VERSION = 0.53;
+our $VERSION = '1.00';
 
 use strict;
 
@@ -52,6 +52,9 @@ allows you to chain steps together to form a formula.
 As in I<find>, the default operator is "and", and short-circuiting is
 performed.
 
+Note: the C<user>, C<nouser>, C<group>, C<nogroup>, and C<ls> methods
+are not available on Win32 systems.
+
 =over
 
 =item or
@@ -78,9 +81,9 @@ For example:
 
   my $big_or_old = File::Finder
     ->type('f')
-    ->left
-      ->size("+100")->or->mtime("+90")
-    ->right;
+      ->left
+        ->size("+100")->or->mtime("+90")
+      ->right;
   find($big_or_old->ls, "/tmp");
 
 You need parens because the "or" operator is lower precedence than
@@ -155,7 +158,7 @@ needed for its side effects, but shouldn't affect the rest of the
 
 =cut
 
-sub comma { return "comma" }	# gnu extension
+sub comma { return "comma" } # gnu extension
 
 =item follow
 
@@ -219,7 +222,7 @@ sub perm {
     return sub {
       ((stat _)[2] & $perm) == $perm;
     };
-  } elsif ($perm =~ s/^\+//) {	# gnu extension
+  } elsif ($perm =~ s/^\+//) { # gnu extension
     $perm = oct($perm) if $perm =~ /^0/;
     return sub {
       ((stat _)[2] & $perm);
@@ -294,6 +297,8 @@ sub user {
   my $self = shift;
   my $user = shift;
 
+  croak 'user not supported on this platform' if $^O eq 'MSWin32';
+
   my $uid = ($user =~ /^\d+\z/) ? $user : _user_to_uid($user);
   die "bad user $user" unless defined $uid;
 
@@ -312,6 +317,8 @@ sub group {
   my $self = shift;
   my $group = shift;
 
+  croak 'group not supported on this platform' if $^O eq 'MSWin32';
+
   my $gid = ($group =~ /^\d+\z/) ? $group : _group_to_gid($group);
   die "bad group $gid" unless defined $gid;
 
@@ -327,6 +334,7 @@ True if the entry doesn't belong to any known user.
 =cut
 
 sub nouser {
+  croak 'nouser not supported on this platform' if $^O eq 'MSWin32';
   return sub {
     CORE::not defined _uid_to_user((stat _)[4]);
   }
@@ -339,6 +347,7 @@ True if the entry doesn't belong to any known group.
 =cut
 
 sub nogroup {
+  croak 'nogroup not supported on this platform' if $^O eq 'MSWin32';
   return sub {
     CORE::not defined _gid_to_group((stat _)[5]);
   }
@@ -471,7 +480,7 @@ Yeah, it'd be trivial for me to add a no_chdir method.  Soon.
 
 sub exec {
   my $self = shift;
-  my @command = @_;
+  my @command = @ _;
 
   return sub {
     my @mapped = @command;
@@ -494,7 +503,7 @@ otherwise true.
 
 sub ok {
   my $self = shift;
-  my @command = @_;
+  my @command = @ _;
 
   return sub {
     my @mapped = @command;
@@ -560,7 +569,7 @@ sub eval {
   ## if this is another File::Finder object... then cheat:
   $eval = $eval->as_wanted if UNIVERSAL::can($eval, "as_wanted");
 
-  return $eval;			# just reuse the coderef
+  return $eval; # just reuse the coderef
 }
 
 =item depth
@@ -583,6 +592,7 @@ C<STDOUT> (without forking), and returns true.
 =cut
 
 sub ls {
+  croak 'ls not supported on this platform' if $^O eq 'MSWin32';
   return \&_ls;
 }
 
@@ -619,7 +629,7 @@ sub ffr {
 
   no warnings;
   local *File::Find::find = sub {
-    my ($options) = @_;
+    my ($options) = @ _;
     for (my ($k, $v) = each %$options) {
       if ($k eq "wanted") {
   	$their_wanted = $v;
@@ -628,7 +638,7 @@ sub ffr {
       }
     }
   };
-  $ffr_object->in("/DUMMY");	# boom!
+  $ffr_object->in("/DUMMY"); # boom!
   croak "no wanted defined" unless defined $their_wanted;
   return $their_wanted;
 }
@@ -649,13 +659,14 @@ sub contains {
   my $self = shift;
   my $pat = shift;
   return sub {
-    open my $f, "<$_" or return 0;
+    open my $f, "<" . $_ or return 0;
     while (<$f>) {
       return 1 if /$pat/;
     }
     return 0;
   };
 }
+
 
 =back
 
@@ -710,7 +721,7 @@ Copyright (C) 2003,2004 by Randal L. Schwartz,
 Stonehenge Consulting Services, Inc.
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.8.2 or,
+it under the same terms as Perl itself, either Perl version 5.8.2 or, 
 at your option, any later version of Perl 5 you may have available.
 
 =cut
@@ -718,7 +729,7 @@ at your option, any later version of Perl 5 you may have available.
 ## utility subroutines
 
 sub _n {
-  my ($prefix, $arg, $value) = @_;
+  my ($prefix, $arg, $value) = @ _;
   if ($prefix eq "+") {
     $value > $arg;
   } elsif ($prefix eq "-") {

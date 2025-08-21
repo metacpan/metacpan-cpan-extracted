@@ -2,7 +2,7 @@
 
 use v5.12;
 use warnings;
-use Test::More tests => 62;
+use Test::More tests => 63;
 
 BEGIN { unshift @INC, 'lib', '../lib'}
 my $module = 'Graphics::Toolkit::Color::Space::Instance::HSL';
@@ -53,7 +53,8 @@ is( $hsl->[2],   100,   'clamped down(L) value');;
 
 
 $hsl = $space->convert_from( 'RGB', [0, 0, 0]);
-is( int @$hsl,                    3, 'convert black from RGB to HSL');
+is( ref $hsl,               'ARRAY', 'convert black from RGB to HSL');
+is( int @$hsl,                    3, 'tight amount of values');
 is( round_decimals($hsl->[0], 5), 0, 'right hue');
 is( round_decimals($hsl->[1], 5), 0, 'right saturation');
 is( round_decimals($hsl->[2], 5), 0, 'right lightness');

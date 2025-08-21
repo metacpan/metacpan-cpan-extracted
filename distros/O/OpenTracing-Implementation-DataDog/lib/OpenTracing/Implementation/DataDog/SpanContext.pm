@@ -6,7 +6,7 @@ OpenTracing::Implementation::DataDog::SpanContext - A DataDog Implementation
 
 =cut
 
-our $VERSION = 'v0.47.1';
+our $VERSION = 'v0.47.2';
 
 
 =head1 SYNOPSIS
@@ -38,9 +38,12 @@ use OpenTracing::Implementation::DataDog::Utils qw/random_bigint/;
 
 use Sub::Trigger::Lock;
 use Types::Common::String qw/NonEmptyStr/;
-use Types::Standard qw/InstanceOf Maybe/;
+use Types::Standard qw/Any InstanceOf Maybe/;
 
 
+my $BigInt = (InstanceOf['Math::BigInt'])->plus_coercions(
+    Any, sub { Math::BigInt->new($_) },
+);
 
 =head1 DESCRIPTION
 
@@ -59,30 +62,40 @@ compliant implementation with DataDog specific extentions
 
 =head2 C<trace_id>
 
-DataDog requires this to be a unsigned 64-bit integer
+DataDog requires this to be an unsigned 64-bit integer
 
 =cut
 
 has '+trace_id' => (
-    is =>'ro',
-    should => InstanceOf['Math::BigInt'],
-    default => sub{ random_bigint() }
+    is      =>'ro',
+    isa     => $BigInt,
+    coerce  => 1,
+    default => sub { random_bigint() },
 );
 
+around with_trace_id => sub {
+    my ($orig, $self, $id) = @_;
+    $orig->($self, $BigInt->coerce($id));
+};
 
 
 =head2 C<span_id>
 
-DataDog requires this to be a unsigned 64-bit integer
+DataDog requires this to be an unsigned 64-bit integer
 
 =cut
 
 has '+span_id' => (
-    is =>'ro',
-    should => InstanceOf['Math::BigInt'],
+    is      =>'ro',
+    isa     => $BigInt,
+    coerce  => 1,
     default => sub{ random_bigint() }
 );
 
+around with_span_id => sub {
+    my ($orig, $self, $id) = @_;
+    $orig->($self, $BigInt->coerce($id));
+};
 
 
 =head1 DATADOG SPECIFIC ATTRIBUTES

@@ -25,7 +25,7 @@ sub from_lab {
     my $c = sqrt( ($a**2) + ($b**2));
     my $h = atan2($b, $a);
     $h += $TAU if $h < 0;
-    return ($lab->[0], $c / 539, $h / $TAU);
+    return ([$lab->[0], $c / 539, $h / $TAU]);
 }
 
 
@@ -33,7 +33,7 @@ sub to_lab {
     my ($lch) = shift;
     my $a = $lch->[1] * cos($lch->[2] * $TAU) * 539;
     my $b = $lch->[1] * sin($lch->[2] * $TAU) * 539;
-    return ($lch->[0], ($a+500) / 1000, ($b+200) / 400 );
+    return ([$lch->[0], ($a+500) / 1000, ($b+200) / 400 ]);
 }
 
 $hcl_def;

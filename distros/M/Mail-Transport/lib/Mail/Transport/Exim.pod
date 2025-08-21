@@ -83,6 +83,18 @@ specify the path, using L<new(proxy)|Mail::Transport/"METHODS">.
 
 =back
 
+=head2 Attributes
+
+Extends L<"Attributes" in Mail::Transport::Send|Mail::Transport::Send/"Attributes">.
+ 
+=over 4
+
+=item $obj-E<gt>B<logSettings>()
+
+Inherited, see L<Mail::Reporter/"Attributes">
+
+=back
+
 =head2 Sending mail
 
 Extends L<"Sending mail" in Mail::Transport::Send|Mail::Transport::Send/"Sending mail">.
@@ -161,10 +173,6 @@ Inherited, see L<Mail::Reporter/"Error handling">
 
 Inherited, see L<Mail::Reporter/"Error handling">
 
-=item $obj-E<gt>B<logSettings>()
-
-Inherited, see L<Mail::Reporter/"Error handling">
-
 =item $obj-E<gt>B<notImplemented>()
 
 Inherited, see L<Mail::Reporter/"Error handling">
@@ -210,8 +218,7 @@ correctly.
 
 =item Warning: Message has no destination
 
-It was not possible to figure-out where the message is intended to go
-to.
+It was not possible to figure-out where the message is intended to go to.
 
 =item Error: Package $package does not implement $method.
 
@@ -240,12 +247,12 @@ found in the message itself about the destination.
 
 =head1 SEE ALSO
 
-This module is part of Mail-Transport distribution version 3.005,
-built on July 22, 2020. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Transport distribution version 3.006,
+built on August 21, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2020 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2001-2025 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

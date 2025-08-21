@@ -5,7 +5,7 @@ sub _clean_eval { eval $_[0] }
 use strict;
 use warnings;
 
-our $VERSION = '2.006008';
+our $VERSION = '2.006009';
 $VERSION =~ tr/_//d;
 
 use Sub::Defer qw(defer_sub);
@@ -61,7 +61,7 @@ BEGIN {
       "\b" => "\\b",
       "\a" => "\\a",
       "\e" => "\\e",
-      (map +($_ => "\\$_"), qw(" \ $ @)),
+      (map +($_ => "\\$_"), qw(" \\ $ @)),
     );
     *_perlstring = sub {
       my $value = shift;
@@ -501,7 +501,7 @@ The value of L<< C<${^WARNING_BITS}> | perlvar/${^WARNING_BITS} >> to use for
 the code being evaluated.  This captures the L<warnings> set.  If not specified,
 the warnings from the calling code will be used.
 
-=item C<%^H>
+=item C<hintshash>
 
 The value of L<< C<%^H> | perlvar/%^H >> to use for the code being evaluated.
 This captures additional pragma settings.  If not specified, the value from the

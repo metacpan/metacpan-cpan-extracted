@@ -1,5 +1,5 @@
 package Telegram::Bot::Brain;
-$Telegram::Bot::Brain::VERSION = '0.027';
+$Telegram::Bot::Brain::VERSION = '0.028';
 # ABSTRACT: A base class to make your very own Telegram bot
 
 
@@ -207,10 +207,8 @@ sub editMessageText {
 sub sendPhoto {
   my $self = shift;
   my $args = shift || {};
-  my $send_args = {};
 
   croak "no chat_id supplied" unless $args->{chat_id};
-  $send_args->{chat_id} = $args->{chat_id};
 
   # photo can be a string (which might be either a URL for telegram servers
   # to fetch, or a file_id string) or a file on disk to upload - we need
@@ -218,15 +216,12 @@ sub sendPhoto {
   # request
   croak "no photo supplied" unless $args->{photo};
   if (-e $args->{photo}) {
-    $send_args->{photo} = { photo => { file => $args->{photo} } };
-  }
-  else {
-    $send_args->{photo} = $args->{photo};
+    $args->{photo} = { file => $args->{photo} };
   }
 
   my $token = $self->token || croak "no token?";
   my $url = "https://api.telegram.org/bot${token}/sendPhoto";
-  my $api_response = $self->_post_request($url, $send_args);
+  my $api_response = $self->_post_request($url, $args);
 
   return Telegram::Bot::Object::Message->create_from_hash($api_response, $self);
 }
@@ -510,7 +505,7 @@ Telegram::Bot::Brain - A base class to make your very own Telegram bot
 
 =head1 VERSION
 
-version 0.027
+version 0.028
 
 =head1 SYNOPSIS
 

@@ -15,7 +15,6 @@ my $provider_app = require "$Bin/lib/MyProviderApp/app.pl";
 
 my $mock_oidc_client = Test::MockModule->new('OIDC::Client');
 $mock_oidc_client->redefine('kid_keys'    => sub { {} });
-$mock_oidc_client->redefine('has_expired' => sub { 0 });
 $mock_oidc_client->redefine('user_agent'  => $provider_app->ua);
 $mock_oidc_client->redefine('decode_jwt' => sub {
   {
@@ -26,6 +25,9 @@ $mock_oidc_client->redefine('decode_jwt' => sub {
     'nonce' => 'fake_uuid',
   }
 });
+
+my $mock_access_token = Test::MockModule->new('OIDC::Client::AccessToken');
+$mock_access_token->redefine('has_expired' => sub { 0 });
 
 require Catalyst::Test;
 Catalyst::Test->import('MyCatalystApp');

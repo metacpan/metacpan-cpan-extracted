@@ -14,7 +14,7 @@ my $fuchsia_rgb = Graphics::Toolkit::Color::Values->new_from_tuple([255,0,256], 
 is( ref $fuchsia_rgb,               $module,  'created values object from normalized RGB values');
 is( $fuchsia_rgb->{'source_values'},     '',  'object source are RGB values');
 is( $fuchsia_rgb->{'source_space_name'}, '',  'not from any other space');
-is( $fuchsia_rgb->name,           'fuchsia',  'color has name "fuchsia"');
+is( $fuchsia_rgb->name,           'magenta',  'color has name "magenta"');
 is( ref $fuchsia_rgb->{'rgb'},      'ARRAY',  'RGB tuple is an ARRAY');
 is( @{$fuchsia_rgb->{'rgb'}},             3,  'RGB tuple has three values');
 is( $fuchsia_rgb->{'rgb'}[0],             1,  'violet has a maximal red color');
@@ -45,7 +45,7 @@ is( $fuchsia_cmy->{'source_values'}[0],        0,  'cyan value is right');
 is( $fuchsia_cmy->{'source_values'}[1],        1,  'magenta value is right');
 is( $fuchsia_cmy->{'source_values'}[2],        0,  'yellow value is right');
 is( $fuchsia_cmy->{'source_space_name'},   'CMY',  'cource space is correct');
-is( $fuchsia_cmy->name,                'fuchsia',  'color has name "fuchsia"');
+is( $fuchsia_cmy->name,                'magenta',  'color has name "magenta"');
 is( $fuchsia_cmy->{'rgb'}[0],                  1,  'violet(fuchsia) has a maximal red color');
 is( $fuchsia_cmy->{'rgb'}[1],                  0,  'violet(fuchsia) has a no green color');
 is( $fuchsia_cmy->{'rgb'}[2],                  1,  'violet(fuchsia) has a maximal blue color');
@@ -57,7 +57,7 @@ my $fuchsia_array = Graphics::Toolkit::Color::Values->new_from_any_input([255, 0
 is( ref $fuchsia_array,               $module,  'object from regular RGB tuple');
 is( $fuchsia_array->{'source_values'},     '',  'object source are RGB values');
 is( $fuchsia_array->{'source_space_name'}, '',  'not from any other space');
-is( $fuchsia_array->name,           'fuchsia',  'color has name "fuchsia"');
+is( $fuchsia_array->name,           'magenta',  'color has name "magenta"');
 is( $fuchsia_array->{'rgb'}[0],             1,  'violet has a maximal red color');
 is( $fuchsia_array->{'rgb'}[1],             0,  'violet has a no green color');
 is( $fuchsia_array->{'rgb'}[2],             1,  'violet has a maximal blue color, because it was clamped');
@@ -96,11 +96,11 @@ is( $black->name,                   'black',  'created black from CSS string in 
 my $white = Graphics::Toolkit::Color::Values->new_from_any_input(['hsv', 0, 0, 100 ]);
 is( $white->name,                   'white',  'created white from named ARRAY in HSV');
 
-my ($hname, $hd) = $blue_hwb->closest_name_and_distance(2);
+my ($hname, $hd) = $blue_hwb->closest_name_and_distance();
 is( $hname,                 'blue',  'closest name to "blue" is the same as name');
 is( $hd,                         0,  'no distance to closest name');
-my ($cname, $cd) = $fuchsia_cmy->closest_name_and_distance(2);
-is( $cname,                 'fuchsia',  'closest name to "fuchsia" is same as name');
+my ($cname, $cd) = $fuchsia_cmy->closest_name_and_distance();
+is( $cname,                 'magenta',  'closest name to "magenta" is same as name');
 is( $cd,                            0,  'no distance to closest name');
 
 exit 0;

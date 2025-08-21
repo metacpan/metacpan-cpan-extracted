@@ -2,7 +2,7 @@
 
 use v5.12;
 use warnings;
-use Test::More tests => 40;
+use Test::More tests => 61;
 
 BEGIN { unshift @INC, 'lib', '../lib' }
 my $module = 'Graphics::Toolkit::Color::Space::Util';
@@ -40,13 +40,40 @@ is( $rmod->(-3, 2),                 -1,     'int mod with negative dividend');
 is( $rmod->(3, -2),                  1,     'int mod with negative divisor');
 is( $rmod->(-3, -2),                -1,     'int mod with negative divisor');
 
-my $min = \&Graphics::Toolkit::Color::Space::Util::min;
-my $max = \&Graphics::Toolkit::Color::Space::Util::max;
-
-is( $min->(1,2,3),       1  ,        'simple minimum');
+my $min  = \&Graphics::Toolkit::Color::Space::Util::min;
+is( $min->(),                 undef,     'undef is default for min');
+is( $min->(1,2),                  1,     'min works in trivial example');
+is( $min->(2,1),                  1,     "element order doesn't matter");
+is( $min->(1,1,1),                1,     'min selects from existing');
+is( $min->(0,1,2),                0,     'no issues with zero');
+is( $min->(-3,1,-1, 2,-1),       -3,     'same vlues do not confuse');
 is( $min->(-1.1,2,3),   -1.1,        'negative minimum');
-is( $max->(1,2,3),         3,        'simple maximum');
+
+my $max  = \&Graphics::Toolkit::Color::Space::Util::max;
+is( $max->(),                 undef,     'undef is default for max');
+is( $max->(1,2),                  2,     'min works in trivial example');
+is( $max->(2,1),                  2,     "element order doesn't matter");
+is( $max->(1,1,1),                1,     'min selects from existing');
+is( $max->(-3,1,-1, 2,-1),        2,     'same vlues do not confuse');
+is( $max->(-1,-10, 0, -2),        0,     'no issues with zero');
 is( $max->(-1,2,10E3), 10000,        'any syntax maximum');
+
+my $uniq = \&Graphics::Toolkit::Color::Space::Util::uniq;
+is( $uniq->(),                undef,     'undef is default for uniq');
+my @list = $uniq->(1,2,3,4);
+is( int @list,                    4,     'passed normal lsit with uniq elements');
+is( $list[0],                     1,     'first element right');
+is( $list[1],                     2,     'second element right');
+is( $list[2],                     3,     'third element right');
+is( $list[3],                     4,     'uniq doesnt chang order');
+@list = $uniq->(5,2,5,2,5);
+is( int @list,                    2,     'deleted all none uniq elements');
+is( $list[0],                     5,     'first element right');
+is( $list[1],                     2,     'second element right');
+@list = $uniq->(0,0,0,0);
+is( int @list,                    1,     'dleted all none uniq elements');
+is( $list[0],                     0,     'no issues with zero');
+
 
 my $MM = \&Graphics::Toolkit::Color::Space::Util::mult_matrix3;
 my @rv = $MM->([[1,2,3],[1,2,3],[1,2,3],], 0,0,0);

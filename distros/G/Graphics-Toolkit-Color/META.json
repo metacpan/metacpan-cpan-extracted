@@ -47,111 +47,111 @@
    "provides" : {
       "Graphics::Toolkit::Color" : {
          "file" : "lib/Graphics/Toolkit/Color.pm",
-         "version" : "1.91"
+         "version" : "1.92"
       },
       "Graphics::Toolkit::Color::Name" : {
          "file" : "lib/Graphics/Toolkit/Color/Name.pm",
-         "version" : "1.91"
+         "version" : "1.92"
       },
       "Graphics::Toolkit::Color::Name::Constant" : {
          "file" : "lib/Graphics/Toolkit/Color/Name/Constant.pm",
-         "version" : "1.91"
+         "version" : "1.92"
       },
       "Graphics::Toolkit::Color::Name::Scheme" : {
          "file" : "lib/Graphics/Toolkit/Color/Name/Scheme.pm",
-         "version" : "1.91"
+         "version" : "1.92"
       },
       "Graphics::Toolkit::Color::SetCalculator" : {
          "file" : "lib/Graphics/Toolkit/Color/SetCalculator.pm",
-         "version" : "1.91"
+         "version" : "1.92"
       },
       "Graphics::Toolkit::Color::Space" : {
          "file" : "lib/Graphics/Toolkit/Color/Space.pm",
-         "version" : "1.91"
+         "version" : "1.92"
       },
       "Graphics::Toolkit::Color::Space::Basis" : {
          "file" : "lib/Graphics/Toolkit/Color/Space/Basis.pm",
-         "version" : "1.91"
+         "version" : "1.92"
       },
       "Graphics::Toolkit::Color::Space::Format" : {
          "file" : "lib/Graphics/Toolkit/Color/Space/Format.pm",
-         "version" : "1.91"
+         "version" : "1.92"
       },
       "Graphics::Toolkit::Color::Space::Hub" : {
          "file" : "lib/Graphics/Toolkit/Color/Space/Hub.pm",
-         "version" : "1.91"
+         "version" : "1.92"
       },
       "Graphics::Toolkit::Color::Space::Instance::CIELAB" : {
          "file" : "lib/Graphics/Toolkit/Color/Space/Instance/CIELAB.pm",
-         "version" : "1.91"
+         "version" : "1.92"
       },
       "Graphics::Toolkit::Color::Space::Instance::CIELCHab" : {
          "file" : "lib/Graphics/Toolkit/Color/Space/Instance/CIELCHab.pm",
-         "version" : "1.91"
+         "version" : "1.92"
       },
       "Graphics::Toolkit::Color::Space::Instance::CIELCHuv" : {
          "file" : "lib/Graphics/Toolkit/Color/Space/Instance/CIELCHuv.pm",
-         "version" : "1.91"
+         "version" : "1.92"
       },
       "Graphics::Toolkit::Color::Space::Instance::CIELUV" : {
          "file" : "lib/Graphics/Toolkit/Color/Space/Instance/CIELUV.pm",
-         "version" : "1.91"
+         "version" : "1.92"
       },
       "Graphics::Toolkit::Color::Space::Instance::CIEXYZ" : {
          "file" : "lib/Graphics/Toolkit/Color/Space/Instance/CIEXYZ.pm",
-         "version" : "1.91"
+         "version" : "1.92"
       },
       "Graphics::Toolkit::Color::Space::Instance::CMY" : {
          "file" : "lib/Graphics/Toolkit/Color/Space/Instance/CMY.pm",
-         "version" : "1.91"
+         "version" : "1.92"
       },
       "Graphics::Toolkit::Color::Space::Instance::CMYK" : {
          "file" : "lib/Graphics/Toolkit/Color/Space/Instance/CMYK.pm",
-         "version" : "1.91"
+         "version" : "1.92"
       },
       "Graphics::Toolkit::Color::Space::Instance::HSB" : {
          "file" : "lib/Graphics/Toolkit/Color/Space/Instance/HSB.pm",
-         "version" : "1.91"
+         "version" : "1.92"
       },
       "Graphics::Toolkit::Color::Space::Instance::HSL" : {
          "file" : "lib/Graphics/Toolkit/Color/Space/Instance/HSL.pm",
-         "version" : "1.91"
+         "version" : "1.92"
       },
       "Graphics::Toolkit::Color::Space::Instance::HSV" : {
          "file" : "lib/Graphics/Toolkit/Color/Space/Instance/HSV.pm",
-         "version" : "1.91"
+         "version" : "1.92"
       },
       "Graphics::Toolkit::Color::Space::Instance::HWB" : {
          "file" : "lib/Graphics/Toolkit/Color/Space/Instance/HWB.pm",
-         "version" : "1.91"
+         "version" : "1.92"
       },
       "Graphics::Toolkit::Color::Space::Instance::NCol" : {
          "file" : "lib/Graphics/Toolkit/Color/Space/Instance/NCol.pm",
-         "version" : "1.91"
+         "version" : "1.92"
       },
       "Graphics::Toolkit::Color::Space::Instance::RGB" : {
          "file" : "lib/Graphics/Toolkit/Color/Space/Instance/RGB.pm",
-         "version" : "1.91"
+         "version" : "1.92"
       },
       "Graphics::Toolkit::Color::Space::Instance::YIQ" : {
          "file" : "lib/Graphics/Toolkit/Color/Space/Instance/YIQ.pm",
-         "version" : "1.91"
+         "version" : "1.92"
       },
       "Graphics::Toolkit::Color::Space::Instance::YUV" : {
          "file" : "lib/Graphics/Toolkit/Color/Space/Instance/YUV.pm",
-         "version" : "1.91"
+         "version" : "1.92"
       },
       "Graphics::Toolkit::Color::Space::Shape" : {
          "file" : "lib/Graphics/Toolkit/Color/Space/Shape.pm",
-         "version" : "1.91"
+         "version" : "1.92"
       },
       "Graphics::Toolkit::Color::Space::Util" : {
          "file" : "lib/Graphics/Toolkit/Color/Space/Util.pm",
-         "version" : "1.91"
+         "version" : "1.92"
       },
       "Graphics::Toolkit::Color::Values" : {
          "file" : "lib/Graphics/Toolkit/Color/Values.pm",
-         "version" : "1.91"
+         "version" : "1.92"
       }
    },
    "release_status" : "stable",
@@ -162,7 +162,7 @@
          "web" : "https://github.com/lichtkind/Graphics-Color-Toolkit"
       }
    },
-   "version" : "1.91",
+   "version" : "1.92",
    "x_generated_by_perl" : "v5.34.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

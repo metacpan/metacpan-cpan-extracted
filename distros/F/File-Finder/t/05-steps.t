@@ -65,37 +65,41 @@ is_deeply([File::Finder->eval(sub { stat('/') })->type('f')->in(qw(.))],
 	  [fin(sub { -f }, '.')],
 	  'all files even after messing with _ pseudo handle');
 
-is_deeply([File::Finder->user($<)->in(qw(.))],
-	  [fin(sub { -o }, '.')],
-	  'owned');
+SKIP: {
+  skip 'user/group tests not supported on this platform', 8 if $^O eq 'MSWin32';
 
-is_deeply([File::Finder->not->user($<)->in(qw(.))],
-	  [fin(sub { not -o }, '.')],
-	  'not owned');
+  is_deeply([File::Finder->user($<)->in(qw(.))],
+	    [fin(sub { -o }, '.')],
+	    'owned');
 
-is_deeply([File::Finder->group(0+$()->in(qw(.))],
-	  [fin(sub { $( == (stat)[5] }, '.')],
-	  'group');
+  is_deeply([File::Finder->not->user($<)->in(qw(.))],
+	    [fin(sub { not -o }, '.')],
+	    'not owned');
 
-is_deeply([File::Finder->not->group(0+$()->in(qw(.))],
-	  [fin(sub { $( != (stat)[5] }, '.')],
-	  'not group');
+  is_deeply([File::Finder->group(0+$()->in(qw(.))],
+	    [fin(sub { $( == (stat)[5] }, '.')],
+	    'group');
 
-is_deeply([File::Finder->nouser->in(qw(.))],
-	  [fin(sub { not defined getpwuid((stat)[4]) }, '.')],
-	  'nouser');
+  is_deeply([File::Finder->not->group(0+$()->in(qw(.))],
+	    [fin(sub { $( != (stat)[5] }, '.')],
+	    'not group');
 
-is_deeply([File::Finder->not->nouser->in(qw(.))],
-	  [fin(sub { defined getpwuid((stat)[4]) }, '.')],
-	  'not nouser');
+  is_deeply([File::Finder->nouser->in(qw(.))],
+	    [fin(sub { not defined getpwuid((stat)[4]) }, '.')],
+	    'nouser');
 
-is_deeply([File::Finder->nogroup->in(qw(.))],
-	  [fin(sub { not defined getgrgid((stat)[5]) }, '.')],
-	  'nogroup');
+  is_deeply([File::Finder->not->nouser->in(qw(.))],
+	    [fin(sub { defined getpwuid((stat)[4]) }, '.')],
+	    'not nouser');
 
-is_deeply([File::Finder->not->nogroup->in(qw(.))],
-	  [fin(sub { defined getgrgid((stat)[5]) }, '.')],
-	  'not nogroup');
+  is_deeply([File::Finder->nogroup->in(qw(.))],
+	    [fin(sub { not defined getgrgid((stat)[5]) }, '.')],
+	    'nogroup');
+
+  is_deeply([File::Finder->not->nogroup->in(qw(.))],
+	    [fin(sub { defined getgrgid((stat)[5]) }, '.')],
+	    'not nogroup');
+}
 
 is_deeply([File::Finder->links('-2')->in(qw(.))],
 	  [fin(sub { (stat)[3] < 2 }, '.')],

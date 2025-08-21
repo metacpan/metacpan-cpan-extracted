@@ -29,4 +29,6 @@
 \bcover_db\b
 
 ### LOCAL ###
-^OLD/
+.git\b
+.gitignore
+

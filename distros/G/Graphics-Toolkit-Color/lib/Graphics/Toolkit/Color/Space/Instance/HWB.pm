@@ -20,9 +20,9 @@ sub from_rgb {
     my ($r, $g, $b) = @{$_[0]};
     my $vmax = max($r, $g, $b);
     my $white = my $vmin = min($r, $g, $b);
-    return (0,1,0) if $white == 1;
+    return ([0,1,0]) if $white == 1;
     my $black = 1 - ($vmax);
-    return (0,0,1) if $black == 1;
+    return ([0,0,1]) if $black == 1;
 
     my $d = $vmax - $vmin;
     my $s = $d / $vmax;
@@ -30,18 +30,18 @@ sub from_rgb {
             ($vmax == $r) ? (($g - $b) / $d + ($g < $b ? 6 : 0)) :
             ($vmax == $g) ? (($b - $r) / $d + 2)
                           : (($r - $g) / $d + 4);
-    return ($h/6, $white, $black);
+    return ([$h/6, $white, $black]);
 }
 
 
 sub to_rgb {
     my ($h, $w, $b) = @{$_[0]};
-    return (0, 0, 0) if $b == 1;
-    return (1, 1, 1) if $w == 1;
+    return ([0, 0, 0]) if $b == 1;
+    return ([1, 1, 1]) if $w == 1;
     my $v = 1 - $b;
     my $s = 1 - ($w / $v);
     $s = 0 if $s < 0;
-    return ($v, $v, $v) if $s == 0;
+    return ([$v, $v, $v]) if $s == 0;
 
     my $hi = int( $h * 6 );
     my $f = ( $h * 6 ) - $hi;
@@ -54,6 +54,7 @@ sub to_rgb {
             : ($hi == 4) ? ($t, $p, $v)
             : ($hi == 5) ? ($v, $p, $q)
             :              ($v, $t, $p);
+    return \@rgb;
 }
 
 $hwb_def;

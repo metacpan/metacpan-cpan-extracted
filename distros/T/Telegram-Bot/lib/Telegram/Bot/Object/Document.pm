@@ -1,5 +1,5 @@
 package Telegram::Bot::Object::Document;
-$Telegram::Bot::Object::Document::VERSION = '0.027';
+$Telegram::Bot::Object::Document::VERSION = '0.028';
 # ABSTRACT: The base class for Telegram 'Document' objects
 
 
@@ -33,7 +33,7 @@ Telegram::Bot::Object::Document - The base class for Telegram 'Document' objects
 
 =head1 VERSION
 
-version 0.027
+version 0.028
 
 =head1 DESCRIPTION
 

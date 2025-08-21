@@ -29,6 +29,9 @@
 
 #include <sodium.h>
 
+#define CSXS_MIN(a,b) (((a) <= (b)) ? (a) : (b))
+#define CSXS_MAX(a,b) (((a) >= (b)) ? (a) : (b))
+
 /* likely needs backing off and preprocessor around supported features. "for
  * now"... */
 /* 1.0.18: major: 10 minor: 3 */
@@ -434,9 +437,6 @@ static SV * sv_keygen(pTHX_ STRLEN size, SV * flags) {
 }
 
 =for TODO
-
-add an optional "wipe" argument to encrypt functions. wipe incoming plaintext
-when set.
 
 there is a metric boatload (or two) of error handling in this code that needs
 cleaning up. the whole thing could do with a re-factor already. very much

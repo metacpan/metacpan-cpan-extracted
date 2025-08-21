@@ -80,11 +80,12 @@ if ($ENV{SODIUM_LIBRARY_MINIMAL}) {
 }
 
 $eumm_args{INC} = '';
-$eumm_args{INC} .= "-Wall -Wextra " if $ENV{AUTHOR_MODE};
+$eumm_args{LIBS} = '';
+$eumm_args{INC} = "-Wall -Wextra" if $ENV{AUTHOR_MODE};
 
 if (exists $ENV{SODIUM_LIBS} || exists $ENV{SODIUM_INC}) {
-  $eumm_args{INC} = " $ENV{SODIUM_INC} " if $ENV{SODIUM_INC};
-  $eumm_args{LIBS} = " $ENV{SODIUM_LIBS} " if $ENV{SODIUM_LIBS};
+  $eumm_args{INC} .= " $ENV{SODIUM_INC} " if $ENV{SODIUM_INC};
+  $eumm_args{LIBS} .= " $ENV{SODIUM_LIBS} " if $ENV{SODIUM_LIBS};
   my $cmd = "$Config{cc} $eumm_args{INC} $cflags $eumm_args{LIBS}";
   unless (_c_compile_test($test_sodium_src, $cmd)) {
     die <<EODIE;
@@ -101,7 +102,7 @@ else {
     }
   }
   elsif (_c_compile_test($test_sodium_src, "$Config{cc} $cflags -lsodium")) {
-    $ENV{SODIUM_LIBS} = $eumm_args{LIBS} = " -lsodium ";
+    $eumm_args{LIBS} .= " -lsodium ";
   }
   else {
     warn <<EOWARN;

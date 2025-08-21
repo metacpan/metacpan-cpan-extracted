@@ -33,15 +33,15 @@ my $struct = Client->new->to_struct( $test_span );
 
 cmp_deeply(
     $struct => {
-        trace_id   => 87359,
-        span_id    => 49603,
+        trace_id   => Math::BigInt->new(87359),
+        span_id    => Math::BigInt->new(49603),
         type       => "custom",
         service    => "srvc name",
         resource   => "rsrc name",
         env        => "test envr",
         hostname   => 'test host',
         version    => 'test vers',
-        parent_id  => 54365,
+        parent_id  => Math::BigInt->new(54365),
         name       => "oprt name",
         start      => 52750000000, # nano seconds
         duration   => 30750000000, # nano seconds

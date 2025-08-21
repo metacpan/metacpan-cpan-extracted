@@ -1,4 +1,4 @@
-package Catalyst::Authentication::Credential::HTTP; # git description: v1.017-2-g36df161
+package Catalyst::Authentication::Credential::HTTP; # git description: 84b9551
 # ABSTRACT: HTTP Basic and Digest authentication for Catalyst
 
 use base qw/Catalyst::Authentication::Credential::Password/;
@@ -25,7 +25,7 @@ __PACKAGE__->mk_accessors(qw/
     broken_dotnet_digest_without_query_string
 /);
 
-our $VERSION = '1.018';
+our $VERSION = '1.019';
 
 sub new {
     my ($class, $config, $app, $realm) = @_;
@@ -380,7 +380,7 @@ package # hide from PAUSE
 
 use strict;
 use base qw[ Class::Accessor::Fast ];
-use Data::UUID 0.11 ();
+use Crypt::SysRandom;
 
 __PACKAGE__->mk_accessors(qw[ nonce nonce_count qop opaque algorithm ]);
 
@@ -388,14 +388,19 @@ sub new {
     my $class = shift;
     my $self  = $class->SUPER::new(@_);
 
-    $self->nonce( Data::UUID->new->create_b64 );
-    $self->opaque( Data::UUID->new->create_b64 );
+    $self->nonce( $self->_generate_nonce );
+    $self->opaque( $self->_generate_nonce );
     $self->qop('auth,auth-int');
     $self->nonce_count('0x0');
     $self->algorithm('MD5');
 
     return $self;
 }
+
+sub _generate_nonce {
+    return unpack('H*', Crypt::SysRandom::random_bytes(20));
+}
+
 
 1;
 
@@ -411,7 +416,7 @@ Catalyst::Authentication::Credential::HTTP - HTTP Basic and Digest authenticatio
 
 =head1 VERSION
 
-version 1.018
+version 1.019
 
 =head1 SYNOPSIS
 
@@ -692,7 +697,7 @@ L<C<#catalyst> on C<irc.perl.org>|irc://irc.perl.org/#catalyst>.
 
 =head1 CONTRIBUTORS
 
-=for stopwords Tomas Doran Karen Etheridge Sascha Kiefer Devin Austin Ronald J Kimball Jess Robinson Ton Voon J. Shirley Brian Cassidy Jonathan Rockway
+=for stopwords Tomas Doran Karen Etheridge Sascha Kiefer Alexander Hartmaier Devin Austin Jess Robinson Ronald J Kimball Ton Voon Brian Cassidy Graham Knop Jonathan Rockway J. Shirley Robert Rothenberg
 
 =over 4
 
@@ -710,15 +715,19 @@ Sascha Kiefer <esskar@cpan.org>
 
 =item *
 
+Alexander Hartmaier <abraxxa@cpan.org>
+
+=item *
+
 Devin Austin <devin.austin@gmail.com>
 
 =item *
 
-Ronald J Kimball <rjk@linguist.dartmouth.edu>
+Jess Robinson <cpan@desert-island.me.uk>
 
 =item *
 
-Jess Robinson <cpan@desert-island.me.uk>
+Ronald J Kimball <rjk@linguist.dartmouth.edu>
 
 =item *
 
@@ -734,15 +743,23 @@ Ton Voon <ton.voon@opsera.com>
 
 =item *
 
-J. Shirley <jshirley+cpan@gmail.com>
-
-=item *
-
 Brian Cassidy <bricas@cpan.org>
 
 =item *
 
+Graham Knop <haarg@haarg.org>
+
+=item *
+
 Jonathan Rockway <jon@jrock.us>
+
+=item *
+
+J. Shirley <jshirley+cpan@gmail.com>
+
+=item *
+
+Robert Rothenberg <rrwo@cpan.org>
 
 =back
 

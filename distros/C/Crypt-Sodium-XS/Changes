@@ -1,3 +1,7 @@
+0.000039 Aug 21 2025
+
+- fix new_from_fd and new_from_file. test added.
+
 0.000038 Aug 9 2025
 
 - Makefile.PL: remove use of -C option with tar for portability (solaris)
