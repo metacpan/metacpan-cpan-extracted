@@ -61,8 +61,6 @@ class Mojo::Cookie::Response extends Mojo::Cookie {
       $cookie->{name} = $name;
       $cookie->{value} = $value // "";
       
-      $cookie->{expires} = -1;
-      
       for (my $j = 2; $j < @$tree; $j += 2) {
         my $name = $pairs->[$j];
         my $value = $pairs->[$j + 1];
@@ -118,9 +116,8 @@ class Mojo::Cookie::Response extends Mojo::Cookie {
     my $cookie = Fn->join("=", [$name, Re->m($value, "[,;\" ]") ? Mojo::Util->quote($value) : $value]);
     
     # "expires"
-    my $expires = $self->expires;
-    if ($expires >= 0) {
-      $cookie .= "; expires=" . Mojo::Date->new($expires)->to_string;
+    if (exists $self->{expires}) {
+      $cookie .= "; expires=" . Mojo::Date->new($self->{expires})->to_string;
     }
     
     # "domain"

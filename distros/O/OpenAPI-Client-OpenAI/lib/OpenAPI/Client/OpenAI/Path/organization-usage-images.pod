@@ -13,6 +13,9 @@ This document describes the API endpoint at C</organization/usage/images>.
 
 =head2 C<GET /organization/usage/images>
 
+Images
+
+
 Get images usage details for the organization.
 
 

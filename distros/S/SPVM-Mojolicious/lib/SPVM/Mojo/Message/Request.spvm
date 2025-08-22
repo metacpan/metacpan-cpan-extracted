@@ -8,23 +8,88 @@ class Mojo::Message::Request extends Mojo::Message {
   use Digest::SHA;
   use Mojo::Cookie::Request;
   use Mojo::URL;
+  use Hash;
+  
+  # Class Variables
+  our $seed : string;
+  
+  our $counter : int;
   
   # Fields
-  has env : rw Hash of string;
+  has env : rw Hash of string
+    get {
+      unless (exists $self->{env}) {
+        $self->{env} = Hash->new;
+      }
+      
+      return $self->{env};
+    }
+  ;
   
-  has method : rw string;
+  has method : rw string
+    get {
+      unless (exists $self->{method}) {
+        $self->{method} = "GET";
+      }
+      
+      return $self->{method};
+    }
+  ;
   
   has proxy : rw Mojo::URL;
   
   has reverse_proxy : rw byte;
   
-  has url : rw Mojo::URL;
+  has url : rw Mojo::URL
+    get {
+      unless (exists $self->{url}) {
+        $self->{url} = Mojo::URL->new;
+      }
+      
+      return $self->{url};
+    }
+  ;
   
-  has request_id : int;
+  has request_id : rw string
+    get {
+      unless (exists $self->{request_id}) {
+        $seed    = Sys->process_id . Sys->time . Sys->rand;
+        $counter = (int)Sys->rand(0xffffff);
+        
+        my $b64 = Fn->substr(Digest::SHA->sha1_base64($seed . ($counter = ($counter + 1) % 0xffffff)), 0, 12);
+        
+        Re->s(my $_ = [$b64], "+", "-");
+        $b64 = $_->[0];
+        
+        Re->s(my $_ = [$b64], "/", "_");
+        $b64 = $_->[0];
+        
+        $self->{request_id} = $b64;
+      }
+      
+      return $self->{request_id};
+    }
+  ;
   
-  has trusted_proxies : rw string[];
+  has trusted_proxies : rw string[]
+    get {
+      unless (exists $self->{trusted_proxies}) {
+        $self->{trusted_proxies} = new string[0];
+      }
+      
+      return $self->{trusted_proxies};
+    }
+  ;
   
-  has via_proxy : rw byte;
+  has via_proxy : rw byte
+    get {
+      unless (exists $self->{via_proxy}) {
+        $self->{via_proxy} = 1;
+      }
+      
+      return $self->{via_proxy};
+    }
+  ;
   
   # Undocumented Fields
   has params : Mojo::Parameters;
@@ -32,33 +97,14 @@ class Mojo::Message::Request extends Mojo::Message {
   has start_buffer : string;
   
   # Class Methods
-  static method new : Mojo::Message::Request ($options : object[] = undef) {
-    
-    my $options_h = Hash->new($options);
+  static method new : Mojo::Message::Request () {
     
     my $self = new Mojo::Message::Request;
-    
-    $self->SUPER::init;
-    
-    $self->{method} = $options_h->get_or_default_string("method", undef);
-    
-    my $url = (Mojo::URL)$options_h->get_or_default("url", undef);
-    $self->{url} = $url // Mojo::URL->new;
-    
-    $self->{content} = Mojo::Content::Single->new;
-    
-    my $headers = (Mojo::Headers)$options_h->get_or_default("headers", undef);
-    if ($headers) {
-      $self->content->set_headers($headers);
-    }
-    
-    for my $name (@{$options_h->keys}) {
-      die "The \"$name\" option is not available.";
-    }
     
     return $self;
   }
   
+  # Instance Methods
   method clone : Mojo::Message::Request () {
     
     # Dynamic requests cannot be cloned
@@ -127,9 +173,7 @@ class Mojo::Message::Request extends Mojo::Message {
     # We have a (hopefully) full request-line
     my $_ = Re->m($start_line, "^(\S+)\s+(\S+)\s+HTTP\/(\d\.\d)$");
     unless ($_) {
-      $self->set_error(Hash->new({message => "Bad request start-line"}));
-      
-      return 0;
+      die "Bad request start-line";
     }
     
     my $method = $_->cap1;
@@ -292,9 +336,9 @@ class Mojo::Message::Request extends Mojo::Message {
     
   }
   
-  static method _basic : string ($proxy_authorization : string) { $proxy_authorization && (my $_ = Re->m($proxy_authorization, "Basic (.+)$")) ? Mojo::Util->b64_decode($_->cap1) : undef; }
+  private static method _basic : string ($proxy_authorization : string) { $proxy_authorization && (my $_ = Re->m($proxy_authorization, "Basic (.+)$")) ? Mojo::Util->b64_decode($_->cap1) : undef; }
   
-  method _parse_env : void ($env : Hash of string) {
+  private method _parse_env : void ($env : Hash of string) {
     
     # Bypass normal message parser
     $self->{state} = "cgi";
@@ -387,7 +431,7 @@ class Mojo::Message::Request extends Mojo::Message {
     }
   }
   
-  method _start_line : void () {
+  private method _start_line : void () {
     
     if ($self->{start_buffer}) {
       return;

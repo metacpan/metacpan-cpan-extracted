@@ -13,6 +13,9 @@ This document describes the API endpoint at C</organization/usage/completions>.
 
 =head2 C<GET /organization/usage/completions>
 
+Completions
+
+
 Get completions usage details for the organization.
 
 

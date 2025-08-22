@@ -13,6 +13,9 @@ This document describes the API endpoint at C</evals/{eval_id}/runs/{run_id}>.
 
 =head2 C<DELETE /evals/{eval_id}/runs/{run_id}>
 
+Delete eval run
+
+
 Delete an eval run.
 
 
@@ -87,6 +90,9 @@ Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-
 =back
 
 =head2 C<GET /evals/{eval_id}/runs/{run_id}>
+
+Get an eval run
+
 
 Get an evaluation run by ID.
 
@@ -285,6 +291,9 @@ Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-
 =back
 
 =head2 C<POST /evals/{eval_id}/runs/{run_id}>
+
+Cancel eval run
+
 
 Cancel an ongoing evaluation run.
 

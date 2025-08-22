@@ -9,6 +9,7 @@ use PLS::Parser::Index;
 use PLS::Parser::Pod::Package;
 use PLS::Parser::Pod::Subroutine;
 use PLS::Parser::Pod::Builtin;
+use PLS::Parser::Pod::Variable;
 
 =head1 NAME
 
@@ -50,8 +51,9 @@ sub new
         if ($ok)
         {
             $self->{result} = $request->{params};
-            $self->{result}{documentation} = {kind => 'markdown', value => ${$pod->{markdown}}};
-        }
+            $self->{result}{documentation} =
+              {kind => 'markdown', value => ${$pod->{markdown}}};
+        } ## end if ($ok)
     } ## end elsif ($kind == 7)
     elsif ($kind == 3 or $kind == 21)
     {
@@ -73,8 +75,9 @@ sub new
         else
         {
             $subroutine = $request->{params}{label};
-            $package    = $request->{params}{data} if (ref $request->{params}{data} eq 'ARRAY');
-        }
+            $package    = $request->{params}{data}
+              if (ref $request->{params}{data} eq 'ARRAY');
+        } ## end else[ if ($request->{params}...)]
 
         my $pod = PLS::Parser::Pod::Subroutine->new(index => $index, packages => $package, subroutine => $subroutine);
         my $ok  = $pod->find();

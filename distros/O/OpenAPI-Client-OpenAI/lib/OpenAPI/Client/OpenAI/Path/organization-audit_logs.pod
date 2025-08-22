@@ -13,6 +13,9 @@ This document describes the API endpoint at C</organization/audit_logs>.
 
 =head2 C<GET /organization/audit_logs>
 
+List audit logs
+
+
 List user actions and configuration changes within this organization.
 
 
@@ -39,7 +42,7 @@ Type: C<array>
 
 
 
-=item * C<event_types[]> (in query) (Optional) - Return only events with a `type` in one of these values. For example, `project.created`. For all options, see the documentation for the [audit log object](/docs/api-reference/audit-logs/object).
+=item * C<event_types[]> (in query) (Optional) - Return only events with a `type` in one of these values. For example, `project.created`. For all options, see the documentation for the [audit log object](https://platform.openai.com/docs/api-reference/audit-logs/object).
 
 Type: C<array>
 

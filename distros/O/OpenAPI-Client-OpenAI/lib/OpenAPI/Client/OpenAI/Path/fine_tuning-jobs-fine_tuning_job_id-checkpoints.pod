@@ -13,6 +13,9 @@ This document describes the API endpoint at C</fine_tuning/jobs/{fine_tuning_job
 
 =head2 C<GET /fine_tuning/jobs/{fine_tuning_job_id}/checkpoints>
 
+List fine-tuning checkpoints
+
+
 List checkpoints for a fine-tuning job.
 
 

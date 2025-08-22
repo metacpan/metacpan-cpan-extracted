@@ -12,7 +12,7 @@ class Mojo::Content::Single extends Mojo::Content {
   # Fields
   has asset : rw Mojo::Asset
     get {
-      unless ($self->{asset}) {
+      unless (exists $self->{asset}) {
         my $asset = Mojo::Asset::Memory->new;
         $asset->set_auto_upgrade(1);
         $self->{asset} = $asset;
@@ -24,7 +24,7 @@ class Mojo::Content::Single extends Mojo::Content {
   
   has auto_upgrade : rw byte
     get {
-      unless ($self->{auto_upgrade} > -1) {
+      unless (exists $self->{auto_upgrade}) {
         $self->{auto_upgrade} = 1;
       }
       
@@ -41,8 +41,6 @@ class Mojo::Content::Single extends Mojo::Content {
   static method new : Mojo::Content::Single () {
     
     my $self = new Mojo::Content::Single;
-    
-    $self->{auto_upgrade} = -1;
     
     $self->init;
     

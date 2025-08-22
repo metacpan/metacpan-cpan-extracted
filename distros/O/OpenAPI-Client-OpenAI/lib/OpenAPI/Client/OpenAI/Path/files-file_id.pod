@@ -13,6 +13,9 @@ This document describes the API endpoint at C</files/{file_id}>.
 
 =head2 C<DELETE /files/{file_id}>
 
+Delete file
+
+
 Delete a file.
 
 
@@ -58,6 +61,9 @@ Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-
 =back
 
 =head2 C<GET /files/{file_id}>
+
+Retrieve file
+
 
 Returns information about a specific file.
 

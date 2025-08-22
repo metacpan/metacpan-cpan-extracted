@@ -14,13 +14,16 @@ use File::Temp;
 use IO::Async::Function;
 use IO::Async::Loop;
 use IO::Async::Process;
+use List::Util qw(first);
+use PPI;
 use Path::Tiny;
 use Perl::Critic;
-use PPI;
+use Perl::Critic::PolicyParameter;
 use URI;
 
 use PLS::Parser::Pod;
 use PLS::Server::State;
+use PLS::Util;
 
 =head1 NAME
 
@@ -117,12 +120,12 @@ sub get_compilation_errors
         $path = $temp->filename;
         $future->on_done(sub { unlink $temp });
 
-        my $source_text = Encode::encode_utf8($$source);
+        my $source_text = Encode::encode('UTF-8', ${$source});
 
         print {$temp} $source_text;
         close $temp;
 
-        open $fh, '<', \$source_text;
+        open $fh, '<', \$source_text or return [];
     } ## end if (ref $source eq 'SCALAR'...)
     else
     {
@@ -208,7 +211,7 @@ sub get_compilation_errors
         }
 
         @loadfile = (-e => $code);
-    } ## end else [ if (not length $suffix...)]
+    } ## end else[ if (not length $suffix...)]
 
     my @diagnostics;
 
@@ -219,7 +222,7 @@ sub get_compilation_errors
             on_read => sub {
                 my ($stream, $buffref, $eof) = @_;
 
-                while ($$buffref =~ s/^(.*)\n//)
+                while (${$buffref} =~ s/^(.*)\n//)
                 {
                     my $line = $1;
 
@@ -242,7 +245,7 @@ sub get_compilation_errors
                             {
                                 $area .= "\n";
 
-                                while ($$buffref =~ s/^(.*\n)//)
+                                while (${$buffref} =~ s/^(.*\n)//)
                                 {
                                     $area .= $1;
                                     last if ($1 =~ /"$/);
@@ -264,7 +267,7 @@ sub get_compilation_errors
                           };
                     } ## end if (my ($error, $file,...))
 
-                } ## end while ($$buffref =~ s/^(.*)\n//...)
+                } ## end while (${$buffref} =~ s/^(.*)\n//...)
 
                 return 0;
             }
@@ -275,7 +278,7 @@ sub get_compilation_errors
 
                 # Discard STDOUT, otherwise it might interfere with the server execution.
                 # This can happen if there is a BEGIN block that prints to STDOUT.
-                $$buffref = '';
+                ${$buffref} = '';
                 return 0;
             }
         },
@@ -293,17 +296,30 @@ sub get_perlcritic_errors
 {
     my ($source, $path) = @_;
 
-    my ($profile) = glob $PLS::Server::State::CONFIG->{perlcritic}{perlcriticrc};
-    undef $profile if (not length $profile or not -f $profile or not -r $profile);
+    my ($profile) = PLS::Util::resolve_workspace_relative_path($PLS::Server::State::CONFIG->{perlcritic}{perlcriticrc});
 
-    return $perlcritic_function->call(args => [$profile, $source, $path]);
+    if (not length $profile)
+    {
+        ($profile) = glob $PLS::Server::State::CONFIG->{perlcritic}{perlcriticrc};
+    }
+
+    if (not length $profile or not -f $profile or not -r $profile)
+    {
+        undef $profile;
+    }
+
+    my ($perltidyrc) = PLS::Util::resolve_workspace_relative_path($PLS::Server::State::CONFIG->{perltidy}{perltidyrc});
+
+    return $perlcritic_function->call(args => [$profile, $source, $path, $perltidyrc]);
 } ## end sub get_perlcritic_errors
 
 sub run_perlcritic
 {
-    my ($profile, $source, $path) = @_;
+    my ($profile, $source, $path, $perltidyrc) = @_;
 
     my $critic = Perl::Critic->new(-profile => $profile);
+    _set_perltidyrc_path_for_perltidy_policy($critic, $perltidyrc);
+
     my %args;
     $args{filename} = $path if (ref $source eq 'SCALAR');
     my $doc        = PPI::Document->new($source, %args);
@@ -324,10 +340,10 @@ sub run_perlcritic
     {
         my $severity = $severity_map{$violation->severity};
 
-        my $doc = URI->new();
-        $doc->scheme('https');
-        $doc->authority('metacpan.org');
-        $doc->path('pod/' . $violation->policy);
+        my $uri = URI->new();
+        $uri->scheme('https');
+        $uri->authority('metacpan.org');
+        $uri->path('pod/' . $violation->policy);
 
         push @diagnostics,
           {
@@ -337,7 +353,7 @@ sub run_perlcritic
                      },
             message         => $violation->description,
             code            => $violation->policy,
-            codeDescription => {href => $doc->as_string},
+            codeDescription => {href => $uri->as_string},
             severity        => $severity,
             source          => 'perlcritic'
           };
@@ -375,8 +391,8 @@ sub run_podchecker
     return unless (eval { require Pod::Checker; 1 });
 
     my $errors = '';
-    open my $ofh, '>', \$errors;
-    open my $ifh, '<', $source;
+    open my $ofh, '>', \$errors or return;
+    open my $ifh, '<', $source  or return;
 
     my $line_lengths = get_line_lengths($ifh);
     seek $ifh, 0, Fcntl::SEEK_SET;
@@ -406,5 +422,33 @@ sub run_podchecker
 
     return @diagnostics;
 } ## end sub run_podchecker
+
+sub _set_perltidyrc_path_for_perltidy_policy
+{
+    my ($critic, $perltidyrc) = @_;
+
+    if (not length $perltidyrc or not -f $perltidyrc)
+    {
+        return;
+    }
+
+    my $policy = first { $_->isa('Perl::Critic::Policy::CodeLayout::RequireTidyCode') } $critic->config->policies;
+
+    if (not $policy)
+    {
+        return;
+    }
+
+    my ($parameter) = first { $_->get_name() eq 'perltidyrc' } map { Perl::Critic::PolicyParameter->new($_) } $policy->supported_parameters;
+
+    if (not $parameter)
+    {
+        return;
+    }
+
+    $parameter->parse_and_validate_config_value($policy, {perltidyrc => $perltidyrc});
+
+    return;
+} ## end sub _set_perltidyrc_path_for_perltidy_policy
 
 1;

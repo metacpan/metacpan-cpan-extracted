@@ -54,7 +54,7 @@ formTools = {
             const old_id = source_copy.id;
             source_copy.id = 'formtools-element-' + area.dataset.pageId + '-' + Date.now();
             jQuery(source_copy).attr('ondragenter', 'formTools.dragenter(event);');
-            jQuery(source_copy).find('a.edit').attr('data-target', '#' + source_copy.id + '-modal' );
+            jQuery(source_copy).find('a.edit').attr('data-bs-target', '#' + source_copy.id + '-modal' );
             if ( sibling ) {
                 area.insertBefore(source_copy, sibling);
             }
@@ -87,8 +87,6 @@ formTools = {
                 input.attr('id', source_copy.id + input.attr('id').replace(/^template-/, ''));
             });
 
-            // combobox dropdown icon doesn't work after drag&drop, hide it for now
-            modal_copy.find('.combobox-container .input-group-append').hide();
             modal_copy.find('select').addClass('selectpicker');
             initializeSelectElements(modal_copy.get(0));
         }
@@ -118,7 +116,15 @@ formTools = {
 
                 const alignment = form.find(':input[name=alignment]').val();
                 value.alignment = alignment;
-                value.html = '<' + wrapper + ( alignment ? ' class="text-' + alignment.toLowerCase() + '"' : '' ) + '>' + content + '</' + wrapper + '>';
+                let wrapper_class = alignment ? ' class="text-' + alignment.toLowerCase() : '';
+                if ( wrapper == 'p' ) {
+                    // add margin class so p is spaced like other elements
+                    wrapper_class += alignment ? ' mt-3 mb-2' : ' class="mt-3 mb-2';
+                }
+                if ( wrapper_class.length > 0 ) {
+                    wrapper_class += '"';
+                }
+                value.html = '<' + wrapper + wrapper_class + '>' + content + '</' + wrapper + '>';
             }
             else {
                 value.html = content;

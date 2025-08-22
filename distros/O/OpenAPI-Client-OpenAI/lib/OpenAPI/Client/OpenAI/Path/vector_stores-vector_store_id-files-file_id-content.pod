@@ -13,6 +13,9 @@ This document describes the API endpoint at C</vector_stores/{vector_store_id}/f
 
 =head2 C<GET /vector_stores/{vector_store_id}/files/{file_id}/content>
 
+Retrieve vector store file content
+
+
 Retrieve the parsed contents of a vector store file.
 
 

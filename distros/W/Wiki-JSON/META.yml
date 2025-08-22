@@ -4,7 +4,7 @@ author:
   - 'Sergio Iglesias <contact@owlcode.tech>'
 build_requires: {}
 configure_requires:
-  Module::Build: '0.42'
+  Module::Build: '0'
 dynamic_config: 1
 generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: gpl
@@ -15,7 +15,7 @@ name: Wiki-JSON
 provides:
   Wiki::JSON:
     file: lib/Wiki/JSON.pm
-    version: v0.0.22
+    version: v0.0.23
   Wiki::JSON::Contributing:
     file: lib/Wiki/JSON/Contributing.pm
   Wiki::JSON::Parser:
@@ -29,6 +29,8 @@ requires:
   Path::Tiny: '0'
   Test::Most: '0'
   perl: v5.16.3
-resources: {}
-version: v0.0.22
+resources:
+  bugtracker: https://github.com/sergiotarxz/Perl-Wiki-JSON/issues
+  repository: https://github.com/sergiotarxz/Perl-Wiki-JSON
+version: v0.0.23
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

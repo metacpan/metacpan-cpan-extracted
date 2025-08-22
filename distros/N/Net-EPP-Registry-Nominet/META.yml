@@ -27,5 +27,5 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Net-EPP-Registry-Nominet
   repository: git://gitlab.com/openstrike/nominet-epp.git
-version: '0.11'
+version: '0.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -5,6 +5,7 @@ MANIFEST			This list of files
 Perlsac-rwsac-0.01.tar.gz
 Perlsac-rwsac-0.03.tar.gz
 Perlsac-rwsac-0.04.tar.gz
+Perlsac-rwsac-0.05.tar.gz
 README.pod
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

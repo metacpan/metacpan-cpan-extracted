@@ -13,6 +13,9 @@ This document describes the API endpoint at C</uploads>.
 
 =head2 C<POST /uploads>
 
+Create upload
+
+
 Creates an intermediate L<Upload|https://platform.openai.com/docs/api-reference/uploads/object> object
 that you can add L<Parts|https://platform.openai.com/docs/api-reference/uploads/part-object> to.
 Currently, an Upload can accept at most 8 GB in total and expires after an
@@ -53,6 +56,14 @@ C<createUpload>
       
 
       
+      
+Example:
+
+    {
+       "expires_after" : null
+    }
+
+
              
 
 =head3 Responses

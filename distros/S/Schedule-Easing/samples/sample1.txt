@@ -1,0 +1,6 @@
+Very basic usage example.  This shows what would happen with the give log file if each line arrived at the specified time.
+
+perl ./sample1.pl
+
+[1755488026] ERROR logging failure for order 4762096, will retry from logger.pm line 323
+[1755488059] ERROR invalid type in request, handler.pm line 19

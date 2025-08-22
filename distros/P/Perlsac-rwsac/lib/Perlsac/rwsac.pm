@@ -3,7 +3,7 @@ package Perlsac::rwsac ;
 use strict ;
 use warnings ;
 
-our $VERSION = 0.05 ;
+our $VERSION = 0.06 ;
 
 our @map ;
 $map[0] = "delta" ;
@@ -333,11 +333,16 @@ Manual install:
     use Perlsac::rwsac ;
     
     my %h = Perlsac::rwsac::rsac("example.sac") ;
-    
+
+		my $b = $h{b} ;
+		my $npts = $h{npts} ;
+		my $delta = $h{delta} ;
+
+		my @t = Perlsac::rwsac::calt($b,$npts,$delta) ;
+   
     for (my $n=0; $n<$h{npts}; $n++){
-        print "$h{t}[$n] $h{d}[$n]\n" ;
+        print "$t[$n] $h{d}[$n]\n" ;
     }
-    
 
 2. Dividing data by 'depmax' in headers and writing a new sac file.
 
@@ -379,6 +384,11 @@ Manual install:
     $h{d} = [@ys] ;
    
     &Perlsac::rwsac::wsac('triangle.sac',%h) ;
+
+=head1 Limitations
+1. Type of files (IFTYPE and LEVEN) are not be well addressed yet.
+
+
 
 =cut
 

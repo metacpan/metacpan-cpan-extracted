@@ -13,10 +13,10 @@ This document describes the API endpoint at C</containers/{container_id}/files/{
 
 =head2 C<GET /containers/{container_id}/files/{file_id}/content>
 
+Retrieve container file content
+
+
 Retrieve Container File Content
-
-
-Retrieves a container file content.
 
 
 

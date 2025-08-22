@@ -13,6 +13,9 @@ This document describes the API endpoint at C</moderations>.
 
 =head2 C<POST /moderations>
 
+Create moderation
+
+
 Classifies if text and/or image inputs are potentially harmful. Learn
 more in the L<moderation guide|https://platform.openai.com/docs/guides/moderation>.
 
@@ -57,14 +60,6 @@ available models L<here|https://platform.openai.com/docs/models#moderation>.
 
 =back
       
-      
-Example:
-
-    {
-       "model" : "omni-moderation-2024-09-26"
-    }
-
-
              
 
 =head3 Responses

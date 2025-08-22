@@ -13,6 +13,9 @@ This document describes the API endpoint at C</responses/{response_id}/input_ite
 
 =head2 C<GET /responses/{response_id}/input_items>
 
+List input items
+
+
 Returns a list of input items for a given response.
 
 
@@ -55,13 +58,6 @@ Allowed values: C<asc, desc>
 
 
 =item * C<after> (in query) (Optional) - An item ID to list items after, used in pagination.
-
-
-Type: C<string>
-
-
-
-=item * C<before> (in query) (Optional) - An item ID to list items before, used in pagination.
 
 
 Type: C<string>

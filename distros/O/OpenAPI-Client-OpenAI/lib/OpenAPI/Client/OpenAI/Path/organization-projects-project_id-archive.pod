@@ -13,6 +13,9 @@ This document describes the API endpoint at C</organization/projects/{project_id
 
 =head2 C<POST /organization/projects/{project_id}/archive>
 
+Archive project
+
+
 Archives a project in the organization. Archived projects cannot be used or updated.
 
 

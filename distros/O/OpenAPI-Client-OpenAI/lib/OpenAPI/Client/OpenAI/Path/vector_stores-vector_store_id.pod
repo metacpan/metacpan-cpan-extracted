@@ -13,6 +13,9 @@ This document describes the API endpoint at C</vector_stores/{vector_store_id}>.
 
 =head2 C<DELETE /vector_stores/{vector_store_id}>
 
+Delete vector store
+
+
 Delete a vector store.
 
 
@@ -58,6 +61,9 @@ Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-
 =back
 
 =head2 C<GET /vector_stores/{vector_store_id}>
+
+Retrieve vector store
+
 
 Retrieves a vector store.
 
@@ -121,6 +127,9 @@ Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-
 =back
 
 =head2 C<POST /vector_stores/{vector_store_id}>
+
+Modify vector store
+
 
 Modifies a vector store.
 

@@ -13,6 +13,9 @@ This document describes the API endpoint at C</vector_stores>.
 
 =head2 C<GET /vector_stores>
 
+List vector stores
+
+
 Returns a list of vector stores.
 
 
@@ -95,6 +98,9 @@ Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-
 =back
 
 =head2 C<POST /vector_stores>
+
+Create vector store
+
 
 Create a vector store.
 

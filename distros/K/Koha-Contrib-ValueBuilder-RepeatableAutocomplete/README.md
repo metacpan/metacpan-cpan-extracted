@@ -4,7 +4,7 @@ Koha::Contrib::ValueBuilder::RepeatableAutocomplete - Repeatable autcomplete val
 
 # VERSION
 
-version 1.004
+version 1.005
 
 # SYNOPSIS
 

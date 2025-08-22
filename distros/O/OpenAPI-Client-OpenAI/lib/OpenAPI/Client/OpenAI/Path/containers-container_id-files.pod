@@ -13,10 +13,10 @@ This document describes the API endpoint at C</containers/{container_id}/files>.
 
 =head2 C<GET /containers/{container_id}/files>
 
+List container files
+
+
 List Container files
-
-
-Lists container files.
 
 
 
@@ -94,12 +94,12 @@ Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-
 
 =head2 C<POST /containers/{container_id}/files>
 
+Create container file
+
+
 Create a Container File
 
 You can send either a multipart/form-data request with the raw file content, or a JSON request with a file ID.
-
-
-Creates a container file.
 
 
 

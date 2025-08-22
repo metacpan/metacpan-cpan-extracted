@@ -13,6 +13,9 @@ This document describes the API endpoint at C</batches/{batch_id}/cancel>.
 
 =head2 C<POST /batches/{batch_id}/cancel>
 
+Cancel batch
+
+
 Cancels an in-progress batch. The batch will be in status C<cancelling> for up to 10 minutes, before changing to C<cancelled>, where it will have partial results (if any) available in the output file.
 
 

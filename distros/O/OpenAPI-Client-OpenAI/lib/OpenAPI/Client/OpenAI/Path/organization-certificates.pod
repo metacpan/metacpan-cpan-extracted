@@ -13,6 +13,9 @@ This document describes the API endpoint at C</organization/certificates>.
 
 =head2 C<GET /organization/certificates>
 
+List organization certificates
+
+
 List uploaded certificates for this organization.
 
 
@@ -86,6 +89,9 @@ Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-
 =back
 
 =head2 C<POST /organization/certificates>
+
+Upload certificate
+
 
 Upload a certificate to the organization. This does B<not> automatically activate the certificate.
 

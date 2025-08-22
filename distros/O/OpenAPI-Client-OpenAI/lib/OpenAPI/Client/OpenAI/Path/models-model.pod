@@ -13,6 +13,9 @@ This document describes the API endpoint at C</models/{model}>.
 
 =head2 C<DELETE /models/{model}>
 
+Delete a fine-tuned model
+
+
 Delete a fine-tuned model. You must have the Owner role in your organization to delete a model.
 
 
@@ -58,6 +61,9 @@ Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-
 =back
 
 =head2 C<GET /models/{model}>
+
+Retrieve model
+
 
 Retrieves a model instance, providing basic information about the model such as the owner and permissioning.
 

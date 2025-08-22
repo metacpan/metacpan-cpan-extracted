@@ -10,7 +10,7 @@
 
 % if ( RT->Config->Get('FormToolsEnableGroups') ) {
   <&| /Elements/LabeledValue, Label => loc('Group') &>
-    <select name="Group" id="Group" class="form-control selectpicker">
+    <select name="Group" id="Group" class="form-select selectpicker">
 % foreach my $group ( @groups ) {
       <option value="<% $group %>" <% $group eq $content->{group} ? 'selected' : '' %>><% $group %></option>
 % }

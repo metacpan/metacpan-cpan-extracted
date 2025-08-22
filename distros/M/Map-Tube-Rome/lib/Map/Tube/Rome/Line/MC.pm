@@ -15,32 +15,32 @@ Map::Tube::Rome::Line::MC - Rome Subway Map: Linea C.
 
 Rome Subway Map: Linea C
 
-    +-------------------------------+-------------------------------------------+
-    | Station Name                  | Connected To                              |
-    +-------------------------------+-------------------------------------------+
-    | Monte Compatri-Pantano        | Graniti                                   |
-    | Graniti                       | Monte Compatri-Pantano, Finocchio         |
-    | Finocchio                     | Graniti, Bolognetta                       |
-    | Bolognetta                    | Finocchio, Borghesiana                    |
-    | Borghesiana                   | Bolognetta, Due Leoni - Fontana Candida   |
-    | Due Leoni - Fontana Candida   | Borghesiana, Grotte Celoni                |
-    | Grotte Celoni                 | Due Leoni - Fontana Candida, Torre Gaia   |
-    | Torre Gaia                    | Grotte Celoni, Torre Angela               |
-    | Torre Angela                  | Torre Gaia, Torrenova                     |
-    | Torrenova                     | Torre Angela, Giardinetti                 |
-    | Giardinetti                   | Torrenova, Torre Maura                    |
-    | Torre Maura                   | Giardinetti, Torre Spaccata               |
-    | Torre Spaccata                | Torre Maura, Alessandrino                 |
-    | Alessandrino                  | Torre Spaccata, Parco di Centocelle       |
-    | Parco di Centocelle           | Alessandrino, Mirti                       |
-    | Mirti                         | Parco di Centocelle, Gardenie             |
-    | Gardenie                      | Mirti, Teano                              |
-    | Teano                         | Gardenie, Malatesta                       |
-    | Malatesta                     | Teano, Pigneto                            |
-    | Pigneto                       | Malatesta, Lodi                           |
-    | Lodi                          | Pigneto, San Giovanni                     |
-    | San Giovanni                  | Lodi                                      |
-    +-------------------------------+-------------------------------------------+
+    .-----------------------------------------------------------------------.
+    | Station Name                | Connected To                            |
+    +-----------------------------+-----------------------------------------+
+    | Monte Compatri-Pantano      | Graniti                                 |
+    | Graniti                     | Monte Compatri-Pantano, Finocchio       |
+    | Finocchio                   | Graniti, Bolognetta                     |
+    | Bolognetta                  | Finocchio, Borghesiana                  |
+    | Borghesiana                 | Bolognetta, Due Leoni - Fontana Candida |
+    | Due Leoni - Fontana Candida | Borghesiana, Grotte Celoni              |
+    | Grotte Celoni               | Due Leoni - Fontana Candida, Torre Gaia |
+    | Torre Gaia                  | Grotte Celoni, Torre Angela             |
+    | Torre Angela                | Torre Gaia, Torrenova                   |
+    | Torrenova                   | Torre Angela, Giardinetti               |
+    | Giardinetti                 | Torrenova, Torre Maura                  |
+    | Torre Maura                 | Giardinetti, Torre Spaccata             |
+    | Torre Spaccata              | Torre Maura, Alessandrino               |
+    | Alessandrino                | Torre Spaccata, Parco di Centocelle     |
+    | Parco di Centocelle         | Alessandrino, Mirti                     |
+    | Mirti                       | Parco di Centocelle, Gardenie           |
+    | Gardenie                    | Mirti, Teano                            |
+    | Teano                       | Gardenie, Malatesta                     |
+    | Malatesta                   | Teano, Pigneto                          |
+    | Pigneto                     | Malatesta, Lodi                         |
+    | Lodi                        | Pigneto, San Giovanni                   |
+    | San Giovanni                | Re di Roma, Manzoni, Lodi               |
+    '-----------------------------+-----------------------------------------'
 
 =head1 NOTE
 
@@ -88,7 +88,7 @@ Giuseppe Di Terlizzi <gdt@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Giuseppe Di Terlizzi <gdt@cpan.org>.
+This software is copyright (c) 2024-2025 by Giuseppe Di Terlizzi <gdt@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

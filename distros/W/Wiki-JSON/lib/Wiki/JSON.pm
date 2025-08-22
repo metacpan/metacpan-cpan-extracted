@@ -10,7 +10,7 @@ use Data::Dumper;
 use Const::Fast;
 use Wiki::JSON::Parser;
 
-our $VERSION = "0.0.22";
+our $VERSION = "0.0.23";
 
 const my $MAX_HX_SIZE                                           => 6;
 const my $EXTRA_CHARACTERS_BOLD_AND_ITALIC_WHEN_ITALIC          => 3;

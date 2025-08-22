@@ -13,10 +13,10 @@ This document describes the API endpoint at C</organization/admin_api_keys/{key_
 
 =head2 C<DELETE /organization/admin_api_keys/{key_id}>
 
+Delete admin API key
+
+
 Delete an organization admin API key
-
-
-Delete the specified admin API key.
 
 
 
@@ -67,10 +67,10 @@ Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-
 
 =head2 C<GET /organization/admin_api_keys/{key_id}>
 
+Retrieve admin API key
+
+
 Retrieve a single organization API key
-
-
-Get details for a specific organization API key by its ID.
 
 
 

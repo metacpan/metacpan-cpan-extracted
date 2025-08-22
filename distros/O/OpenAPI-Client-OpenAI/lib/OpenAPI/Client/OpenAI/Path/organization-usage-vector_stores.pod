@@ -13,6 +13,9 @@ This document describes the API endpoint at C</organization/usage/vector_stores>
 
 =head2 C<GET /organization/usage/vector_stores>
 
+Vector stores
+
+
 Get vector stores usage details for the organization.
 
 

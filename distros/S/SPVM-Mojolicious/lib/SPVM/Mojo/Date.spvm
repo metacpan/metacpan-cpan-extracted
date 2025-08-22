@@ -27,7 +27,7 @@ class Mojo::Date {
   
   has epoch_sec : rw long
     get {
-      unless ($self->{epoch_sec} > -1) {
+      unless (exists $self->{epoch_sec}) {
         $self->{epoch_sec} = Sys->time;
       }
       
@@ -57,8 +57,6 @@ class Mojo::Date {
   static method new : Mojo::Date ($date_value : object of string|Long = undef) {
     
     my $self = new Mojo::Date;
-    
-    $self->{epoch_sec} = -1;
     
     if ($date_value isa string) {
       $self->parse((string)$date_value);

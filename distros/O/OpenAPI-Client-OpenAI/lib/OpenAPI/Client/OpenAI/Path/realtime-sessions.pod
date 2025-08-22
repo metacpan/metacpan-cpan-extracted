@@ -13,6 +13,9 @@ This document describes the API endpoint at C</realtime/sessions>.
 
 =head2 C<POST /realtime/sessions>
 
+Create session
+
+
 Create an ephemeral API token for use in client-side applications with the
 Realtime API. Can be configured with the same session parameters as the
 C<session.update> client event.
@@ -99,7 +102,7 @@ Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-
       "tracing": "auto",
       "max_response_output_tokens": 200,
       "client_secret": {
-        "value": "ek_abc123", 
+        "value": "ek_abc123",
         "expires_at": 1234567890
       }
     }

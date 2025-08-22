@@ -1,6 +1,6 @@
-Net::EPP::Registry::Nominet 0.11
+Net::EPP::Registry::Nominet 0.12
 
-Released: 22nd July 2024
+Released: 21st August 2025
 
 
 INSTALLATION
@@ -42,7 +42,8 @@ compatible interface to Net::EPP::Simple so far as is practical.
 NEW SINCE LAST PRODUCTION VERSION
 ---------------------------------
 
-Test suite: remove abuse counter tests on domain check (RT 154437)
+Minor documentation fixes
+Remove the now obsolete testssl constructor parameter (GL issue #3)
 
 See the Changes file for a complete history.
 
@@ -66,7 +67,7 @@ https://www.perlconsultancy.com/modules/Net-EPP-Registry-Nominet.shtml
 COPYRIGHT
 ---------
 
-This software is copyright © 2013-2024 by Pete Houston. It is released
+This software is copyright © 2013-2025 by Pete Houston. It is released
 under the Artistic Licence (version 2) and the GNU General Public Licence
 (version 2).
 

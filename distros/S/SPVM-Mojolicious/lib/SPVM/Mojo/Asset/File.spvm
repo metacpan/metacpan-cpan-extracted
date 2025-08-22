@@ -13,10 +13,6 @@ class Mojo::Asset::File extends Mojo::Asset {
   # Fields
   has cleanup : rw byte
     get {
-      if ($self->{cleanup} < 0) {
-        return 0;
-      }
-      
       return $self->{cleanup};
     }
   ;
@@ -37,7 +33,7 @@ class Mojo::Asset::File extends Mojo::Asset {
       }
       else {
         
-        unless ($self->{cleanup} > -1) {
+        unless (exists $self->{cleanup}) {
           $self->{cleanup} = 1;
         }
         
@@ -58,14 +54,8 @@ class Mojo::Asset::File extends Mojo::Asset {
   
   has tmpdir : rw string
     get {
-      unless ($self->{tmpdir}) {
-        my $env_tmpdir = length(my $_ = Sys->env("SPVM_MOJO_TMPDIR")) ? (int)$_ : -1;
-        
-        $self->{tmpdir} = $env_tmpdir;
-        
-        unless ($self->{tmpdir}) {
-          $self->{tmpdir} = File::Spec->tmpdir;
-        }
+      unless (exists $self->{tmpdir}) {
+        $self->{tmpdir} = length(my $_ = Sys->env("SPVM_MOJO_TMPDIR")) ? (string)$_ : File::Spec->tmpdir;
       }
       
       return $self->{tmpdir};
@@ -77,19 +67,10 @@ class Mojo::Asset::File extends Mojo::Asset {
     
     my $self = new Mojo::Asset::File;
     
-    $self->init;
-    
     return $self;
   }
   
   # Instance Methods
-  protected method init : void () {
-    
-    $self->SUPER::init;
-    
-    $self->{cleanup} = -1;
-  }
-  
   method add_chunk : Mojo::Asset::File ($chunk : string) {
     
     my $handle = $self->handle;
@@ -112,9 +93,12 @@ class Mojo::Asset::File extends Mojo::Asset {
     $handle->seek($start_range, IOC->SEEK_SET);
     
     my $end = 0;
-    my $end_range = $self->{end_range};
-    if ($end_range < 0) {
+    my $end_range = -1L;
+    if (exists $self->{end_range}) {
       $end_range = $self->size;
+    }
+    else {
+      $end_range = $self->{end_range};
     }
     
     my $len  = length $string;

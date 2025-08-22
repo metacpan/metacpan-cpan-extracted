@@ -13,10 +13,10 @@ This document describes the API endpoint at C</containers/{container_id}>.
 
 =head2 C<DELETE /containers/{container_id}>
 
+Delete a container
+
+
 Delete Container
-
-
-Delete a container.
 
 
 
@@ -49,10 +49,10 @@ OK
 
 =head2 C<GET /containers/{container_id}>
 
+Retrieve container
+
+
 Retrieve Container
-
-
-Retrieves a container.
 
 
 

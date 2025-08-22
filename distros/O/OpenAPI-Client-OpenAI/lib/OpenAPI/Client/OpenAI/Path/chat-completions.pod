@@ -13,6 +13,9 @@ This document describes the API endpoint at C</chat/completions>.
 
 =head2 C<GET /chat/completions>
 
+List Chat Completions
+
+
 List stored Chat Completions. Only Chat Completions that have been stored
 with the C<store> parameter set to C<true> will be returned.
 
@@ -137,6 +140,9 @@ Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-
 =back
 
 =head2 C<POST /chat/completions>
+
+Create chat completion
+
 
 B<Starting a new project?> We recommend trying L<Responses|https://platform.openai.com/docs/api-reference/responses> 
 to take advantage of the latest OpenAI platform features. Compare

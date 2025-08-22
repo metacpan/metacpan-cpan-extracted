@@ -4,6 +4,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME         => 'MathML::Entities',
     VERSION_FROM => 'lib/MathML/Entities.pm', # finds $VERSION
+    LICENSE      => 'perl',
     AUTHOR       => 'Jacques Distler (distler@golem.ph.utexas.edu)',
     ABSTRACT     => 'Convert XHTML+MathML named entities to numeric character refs or utf-8 characters.',
     PREREQ_PM    => {

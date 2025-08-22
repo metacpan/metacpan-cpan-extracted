@@ -13,6 +13,9 @@ This document describes the API endpoint at C</organization/usage/embeddings>.
 
 =head2 C<GET /organization/usage/embeddings>
 
+Embeddings
+
+
 Get embeddings usage details for the organization.
 
 

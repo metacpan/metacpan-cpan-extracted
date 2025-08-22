@@ -13,6 +13,9 @@ This document describes the API endpoint at C</organization/usage/moderations>.
 
 =head2 C<GET /organization/usage/moderations>
 
+Moderations
+
+
 Get moderations usage details for the organization.
 
 

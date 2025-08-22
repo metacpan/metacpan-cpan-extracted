@@ -13,6 +13,9 @@ This document describes the API endpoint at C</vector_stores/{vector_store_id}/f
 
 =head2 C<GET /vector_stores/{vector_store_id}/file_batches/{batch_id}/files>
 
+List vector store files in a batch
+
+
 Returns a list of vector store files in a batch.
 
 

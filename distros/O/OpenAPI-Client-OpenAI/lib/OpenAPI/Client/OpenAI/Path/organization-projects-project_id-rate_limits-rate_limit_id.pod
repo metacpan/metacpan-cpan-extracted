@@ -13,6 +13,9 @@ This document describes the API endpoint at C</organization/projects/{project_id
 
 =head2 C<POST /organization/projects/{project_id}/rate_limits/{rate_limit_id}>
 
+Modify project rate limit
+
+
 Updates a project rate limit.
 
 

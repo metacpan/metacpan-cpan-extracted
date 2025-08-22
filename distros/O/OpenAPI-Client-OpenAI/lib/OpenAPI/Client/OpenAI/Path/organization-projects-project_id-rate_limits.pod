@@ -13,6 +13,9 @@ This document describes the API endpoint at C</organization/projects/{project_id
 
 =head2 C<GET /organization/projects/{project_id}/rate_limits>
 
+List project rate limits
+
+
 Returns the rate limits per model for a project.
 
 

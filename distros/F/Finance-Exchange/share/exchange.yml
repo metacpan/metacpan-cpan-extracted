@@ -162,7 +162,7 @@ BM_OTC:
 BMF:
   currency: BRL
   delay_amount: '1440'
-  display_name: Borsa de Mercadorias Future Exchange
+  display_name: Brazilian Mercantile & Futures Exchange
   market_times:
     dst:
       daily_close: 18h55m
@@ -548,7 +548,7 @@ FSE_OTC:
 HKF:
   currency: HKD
   delay_amount: '1440'
-  display_name: Hong Kong Future Exchange
+  display_name: Hong Kong Futures Exchange
   market_times:
     partial_trading:
       standard_close: 4h
@@ -639,7 +639,7 @@ ICE_LIFFE:
 IDM:
   currency: EUR
   delay_amount: '1440'
-  display_name: Borsa Italiana Future Exchange
+  display_name: Borsa Italiana Futures Exchange
   market_times:
     dst:
       daily_close: 15h40m
@@ -754,7 +754,7 @@ KSE:
       daily_close: 9h30m
       daily_open: 6h
       daily_settlement: 12h30m
-  symbol: KRX
+  symbol: KSE
   trading_days: sun_thru_thu
   trading_timezone: Asia/Kuwait
 LSE:
@@ -811,7 +811,7 @@ MICEX:
 MEFF:
   currency: EUR
   delay_amount: '1440'
-  display_name: Marid Future Exchange
+  display_name: Madrid Futures Exchange
   market_times:
     dst:
       daily_close: 18h
@@ -828,7 +828,7 @@ MEFF:
 MOF:
   currency: USD
   delay_amount: '1440'
-  display_name: Russian future Exchange
+  display_name: Russian Futures Exchange
   market_times:
     partial_trading: ~
     standard:
@@ -864,7 +864,7 @@ NASDAQ:
 NASDAQ_OTC:
   currency: USD
   delay_amount: '0'
-  display_name: NASDAQ_OTC
+  display_name: NASDAQ OTC Market
   market_times:
     dst:
       daily_close: 20h
@@ -1152,6 +1152,109 @@ RANDOM_NOCTURNE:
   symbol: RANDOM_NOCTURNE
   trading_days: everyday
   trading_timezone: UTC
+RSI_CRYPTO:
+  delay_amount: '0'
+  display_name: Crypto RSI
+  market_times:
+    partial_trading: {}
+    standard:
+      daily_open: 0s
+      daily_close: 23h59m59s
+      daily_settlement: 23h59m59s
+  symbol: RSI_CRYPTO
+  trading_days: everyday
+  trading_timezone: UTC
+RSI_FOREX_EURUSD:
+  currency: USD
+  delay_amount: '0'
+  display_name: EUR/USD RSI
+  market_times:
+    dst:
+      daily_open: 0s
+      daily_close: 23h59m59s
+      daily_settlement: 23h59m59s
+      friday_close: 20h55m
+    partial_trading:
+      dst_open: 21h35m
+      dst_close: 23h59m59s
+      standard_open: 22h35m
+      standard_close: 23h59m59s
+    standard:
+      daily_open: 0s
+      daily_close: 23h59m59s
+      daily_settlement: 23h59m59s
+      friday_close: 21h55m
+  symbol: RSI_FOREX_EURUSD
+  trading_days: sun_thru_fri
+  trading_timezone: America/New_York
+RSI_FOREX_GBPUSD:
+  currency: USD
+  delay_amount: '0'
+  display_name: GBP/USD RSI
+  market_times:
+    dst:
+      daily_open: 0s
+      daily_close: 23h59m59s
+      daily_settlement: 23h59m59s
+      friday_close: 20h55m
+    partial_trading:
+      dst_open: 21h35m
+      dst_close: 23h59m59s
+      standard_open: 22h35m
+      standard_close: 23h59m59s
+    standard:
+      daily_open: 0s
+      daily_close: 23h59m59s
+      daily_settlement: 23h59m59s
+      friday_close: 21h55m
+  symbol: RSI_FOREX_GBPUSD
+  trading_days: sun_thru_fri
+  trading_timezone: America/New_York
+RSI_FOREX_USDJPY:
+  currency: USD
+  delay_amount: '0'
+  display_name: USD/JPY RSI
+  market_times:
+    dst:
+      daily_open: 0s
+      daily_close: 23h59m59s
+      daily_settlement: 23h59m59s
+      friday_close: 20h55m
+    partial_trading:
+      dst_open: 22h05m
+      dst_close: 23h59m59s
+      standard_open: 23h05m
+      standard_close: 23h59m59s
+    standard:
+      daily_open: 0s
+      daily_close: 23h59m59s
+      daily_settlement: 23h59m59s
+      friday_close: 21h55m
+  symbol: RSI_FOREX_USDJPY
+  trading_days: sun_thru_fri
+  trading_timezone: America/New_York
+RSI_METAL:
+  delay_amount: '0'
+  display_name: Metals RSI
+  market_times:
+    dst:
+      daily_open: 0s
+      daily_close: 23h59m59s
+      daily_settlement: 23h59m59s
+      friday_close: 19h45m
+    partial_trading:
+      dst_open: 22h05m
+      dst_close: 23h59m59s
+      standard_open: 23h05m
+      standard_close: 23h59m59s
+    standard:
+      daily_open: 0s
+      daily_close: 23h59m59s
+      daily_settlement: 23h59m59s
+      friday_close: 20h45m
+  symbol: RSI_METAL
+  trading_days: sun_thru_fri
+  trading_timezone: America/New_York
 RTS:
   currency: USD
   delay_amount: '15'
@@ -1168,7 +1271,7 @@ RTS:
 SAS:
   currency: SAR
   delay_amount: '1440'
-  display_name: Saudi Arabic Exchange
+  display_name: Saudi Exchange
   market_times:
     partial_trading: {}
     standard:
@@ -1196,7 +1299,7 @@ SES:
 SFE:
   currency: AUD
   delay_amount: '1440'
-  display_name: Sydney Future Exchange
+  display_name: Sydney Futures Exchange
   market_times:
     dst:
       afternoon_open: 6h30m

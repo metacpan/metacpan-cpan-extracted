@@ -1,4 +1,4 @@
-# Copyright (c) 2023 [--user-name]
+# Copyright (c) 2023 Yuki Kimoto
 # MIT License
 
 class Mojo::Message extends Mojo::EventEmitter {
@@ -13,51 +13,48 @@ class Mojo::Message extends Mojo::EventEmitter {
   use Mojo::Parameters;
   use Mojo::Upload;
   use JSON;
+  use Mojo::Content::MultiPart;
   
   # Fields
-  has content : ro Mojo::Content;
-  
-  has max_line_size : wo int;
-  
-  method max_line_size : int () {
-    
-    unless ($self->{max_line_size} > -1) {
-      my $env_max_line_size = length(my $_ = Sys->env("SPVM_MOJO_MAX_LINE_SIZE")) ? (int)$_ : -1;
-      
-      $self->{max_line_size} = $env_max_line_size;
-      
-      unless ($self->{max_line_size} > -1) {
-        $self->{max_line_size} = 8192;
+  has content : rw Mojo::Content
+    get {
+      unless (exists $self->{content}) {
+        $self->{content} = Mojo::Content::Single->new;
       }
+      
+      return $self->{content};
     }
-    
-    return $self->{max_line_size};
-  }
+  ;
   
-  has max_message_size : wo int;
-  
-  method max_message_size : int () {
-    
-    unless ($self->{max_message_size} > -1) {
-      my $env_max_message_size = length(my $_ = Sys->env("SPVM_MOJO_MAX_MESSAGE_SIZE")) ? (int)$_ : -1;
-      
-      $self->{max_message_size} = $env_max_message_size;
-      
-      unless ($self->{max_message_size} > -1) {
-        $self->{max_message_size} = $self->MAX_MESSAGE_SIZE_DEFAULT;
+  has max_line_size : rw int
+    get {
+      unless (exists $self->{max_line_size}) {
+        $self->{max_line_size} = length(my $_ = Sys->env("SPVM_MOJO_MAX_LINE_SIZE")) ? (int)$_ : 8192;
       }
+      
+      return $self->{max_line_size};
     }
-    
-    return $self->{max_message_size};
-  }
+  ;
   
-  protected method MAX_MESSAGE_SIZE_DEFAULT : int () {
-    return 16777216;
-  }
+  has max_message_size : rw int
+    get {
+      unless (exists $self->{max_message_size}) {
+        $self->{max_message_size} = length(my $_ = Sys->env("SPVM_MOJO_MAX_MESSAGE_SIZE")) ? (int)$_ : 16777216;
+      }
+      
+      return $self->{max_message_size};
+    }  
+  ;
   
-  has version : ro string;
-  
-  has error : ro Hash;
+  has version : rw string
+    get {
+      unless (exists $self->{version}) {
+        $self->{version} = "1.1";
+      }
+      
+      return $self->{version};
+    }
+  ;
   
   # Undocumented Fields
   has state : string;
@@ -82,25 +79,11 @@ class Mojo::Message extends Mojo::EventEmitter {
   has content_buffer : rw StringBuffer;
   
   # Instance Methods
-  protected method init : void ($options : object[] = undef) {
-    
-    my $options_h = Hash->new($options);
-    
-    $self->{version} //= "1.1";
-    
-    $self->{max_message_size} = -1;
-    
-    $self->{max_line_size} = -1;
-    
-    $self->{content} = Mojo::Content::Single->new;
+  protected method init : void () {
     
     $self->{_cache} = Hash->new;
     
     $self->{buffer} = "";
-  }
-  
-  method content_v0 : string () {
-    return $self->{content_buffer}->to_string;
   }
   
   method body : string () {
@@ -120,7 +103,6 @@ class Mojo::Message extends Mojo::EventEmitter {
       $asset->add_chunk($body);
       $content->set_asset($asset);
     }
-    
   }
   
   method body_params : Mojo::Parameters () {
@@ -146,10 +128,6 @@ class Mojo::Message extends Mojo::EventEmitter {
     }
     
     return $params;
-  }
-  
-  method _parse_formdata : object[] ($upload : int = 0) {
-    
   }
   
   method body_size : int () {
@@ -178,13 +156,6 @@ class Mojo::Message extends Mojo::EventEmitter {
   }
   
   method cookies : Mojo::Cookie[] () { die "Not implemented."; }
-  
-  method set_error : void ($error : Hash) {
-    
-    $self->{error} = $error;
-    
-    $self->finish;
-  }
   
   method every_cookie : Mojo::Cookie[] ($name : string) {
     return (Mojo::Cookie[])$self->_cache("cookies", 1, $name);
@@ -279,10 +250,6 @@ class Mojo::Message extends Mojo::EventEmitter {
   
   method parse : void ($chunk : string) {
     
-    if ($self->{error}) {
-      return;
-    }
-    
     $self->{raw_size} += length $chunk;
     
     $self->{buffer} .= $chunk;
@@ -343,9 +310,8 @@ class Mojo::Message extends Mojo::EventEmitter {
     }
   }
   
-  method _limit : void ($message : string) {
+  private method _limit : void ($message : string) {
     ++$self->{limit};
-    $self->set_error(Hash->new({message => $message}));
     die $message;
   }
   
@@ -379,19 +345,71 @@ class Mojo::Message extends Mojo::EventEmitter {
     
     my $uploads = List->new(new Mojo::Upload[0]);
     for my $data (@{$self->_parse_formdata(1)}) {
-      my $upload = Mojo::Upload->new({
-        name     => $data->(object[])->[0],
-        filename => $data->(object[])->[2],
-        asset    => $data->(object[])->[1]->(Mojo::Content::Single)->asset,
-        headers  => $data->(object[])->[1]->(Mojo::Content)->headers
-      });
+      my $upload = Mojo::Upload->new;
+      $upload->set_name($data->(object[])->[0]->(string));
+      $upload->set_filename($data->(object[])->[2]->(string));
+      $upload->set_asset($data->(object[])->[1]->(Mojo::Content::Single)->asset);
+      $upload->set_headers($data->(object[])->[1]->(Mojo::Content)->headers);
       $uploads->push($upload);
     }
     
     return $uploads->to_array->(Mojo::Upload[]);
   }
   
-  method _build : string ($method : string) {
+  private method _parse_formdata : object[] ($upload : int = 0) {
+    
+    my $formdata = (List of string|Mojo::Content)List->new;
+    my $content = $self->content;
+    unless ($content->is_multipart) {
+      return $formdata->to_array;
+    }
+    
+    # Check all parts recursively
+    my $parts = (List of Mojo::Content)List->new(new Mojo::Content[0]);
+    $parts->push($content);
+    
+    while (my $part = (Mojo::Content)$parts->shift) {
+      
+      if ($part->is_multipart) {
+        $parts->unshift_($part->(Mojo::Content::MultiPart)->parts);
+        next;
+      }
+      
+      my $disposition = $part->headers->content_disposition;
+      unless ($disposition) {
+        next;
+      }
+      
+      my $filename = (string)undef;
+      if (my $m = Re->m($disposition, "[; ]filename=\"((?:\\\\\"|[^\"])*)\"")) {;
+        $filename = $m->cap1;
+      }
+      
+      if ($upload && !$filename || !$upload && $filename) {
+        next;
+      }
+      
+      my $name = (string)undef;
+      if (my $m = Re->m($disposition, "[; ]name=\"((?:\\\\\"|[^;\"])*)\"")) {
+        $name = $m->cap1;
+      }
+      
+      if (!$name) {
+        next;
+      }
+      
+      my $part_string = (string)undef;
+      unless ($upload) {
+        $part_string = $part->(Mojo::Content::Single)->asset->slurp;
+      }
+      
+      $formdata->push([(object)$name, $part_string, $filename]);
+    }
+    
+    return $formdata->to_array;
+  }
+  
+  private method _build : string ($method : string) {
     
     my $buffer = StringBuffer->new;
     my $offset = 0;
@@ -427,7 +445,7 @@ class Mojo::Message extends Mojo::EventEmitter {
     return $buffer->to_string;
   }
   
-  method _cache : object ($method : string, $all : int, $name : string) {
+  private method _cache : object ($method : string, $all : int, $name : string) {
     
     # Cache objects by name
     my $caches = (Hash)$self->{_cache}->get($method);

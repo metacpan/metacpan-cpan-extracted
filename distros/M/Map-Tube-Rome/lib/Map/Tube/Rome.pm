@@ -8,7 +8,7 @@ use File::ShareDir qw(dist_file);
 use Moo;
 use namespace::autoclean;
 
-$Map::Tube::Rome::VERSION   = '1.01';
+$Map::Tube::Rome::VERSION   = '1.02';
 $Map::Tube::Rome::AUTHORITY = 'cpan:GDT';
 
 has json => (is => 'ro', default => sub { dist_file('Map-Tube-Rome', 'rome-map.json') });
@@ -137,7 +137,7 @@ Giuseppe Di Terlizzi <gdt@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Giuseppe Di Terlizzi <gdt@cpan.org>.
+This software is copyright (c) 2024-2025 by Giuseppe Di Terlizzi <gdt@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

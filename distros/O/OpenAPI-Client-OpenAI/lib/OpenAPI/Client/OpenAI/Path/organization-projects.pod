@@ -13,6 +13,9 @@ This document describes the API endpoint at C</organization/projects>.
 
 =head2 C<GET /organization/projects>
 
+List projects
+
+
 Returns a list of projects.
 
 
@@ -79,6 +82,9 @@ Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-
 =back
 
 =head2 C<POST /organization/projects>
+
+Create project
+
 
 Create a new project in the organization. Projects can be created and archived, but cannot be deleted.
 

@@ -15,10 +15,10 @@ For detailed information about each path and its usage, please refer to the link
 
 =over
 
-=item * C<GET> - Returns a list of assistants.
+=item * C<GET> - List assistants
 
 
-=item * C<POST> - Create an assistant with a model and instructions.
+=item * C<POST> - Create assistant
 
 
 =back
@@ -29,13 +29,13 @@ See L<OpenAPI::Client::OpenAI::Path::assistants> for more details.
 
 =over
 
-=item * C<DELETE> - Delete an assistant.
+=item * C<DELETE> - Delete assistant
 
 
-=item * C<GET> - Retrieves an assistant.
+=item * C<GET> - Retrieve assistant
 
 
-=item * C<POST> - Modifies an assistant.
+=item * C<POST> - Modify assistant
 
 
 =back
@@ -46,7 +46,7 @@ See L<OpenAPI::Client::OpenAI::Path::assistants-assistant_id> for more details.
 
 =over
 
-=item * C<POST> - Generates audio from the input text.
+=item * C<POST> - Create speech
 
 
 =back
@@ -57,7 +57,7 @@ See L<OpenAPI::Client::OpenAI::Path::audio-speech> for more details.
 
 =over
 
-=item * C<POST> - Transcribes audio into the input language.
+=item * C<POST> - Create transcription
 
 
 =back
@@ -68,7 +68,7 @@ See L<OpenAPI::Client::OpenAI::Path::audio-transcriptions> for more details.
 
 =over
 
-=item * C<POST> - Translates audio into English.
+=item * C<POST> - Create translation
 
 
 =back
@@ -79,10 +79,10 @@ See L<OpenAPI::Client::OpenAI::Path::audio-translations> for more details.
 
 =over
 
-=item * C<GET> - List your organization's batches.
+=item * C<GET> - List batch
 
 
-=item * C<POST> - Creates and executes a batch from an uploaded file of requests
+=item * C<POST> - Create batch
 
 
 =back
@@ -93,7 +93,7 @@ See L<OpenAPI::Client::OpenAI::Path::batches> for more details.
 
 =over
 
-=item * C<GET> - Retrieves a batch.
+=item * C<GET> - Retrieve batch
 
 
 =back
@@ -104,7 +104,7 @@ See L<OpenAPI::Client::OpenAI::Path::batches-batch_id> for more details.
 
 =over
 
-=item * C<POST> - Cancels an in-progress batch. The batch will be in status C<cancelling> for up to 10 minutes, before changing to C<cancelled>, where it will have partial results (if any) available in the output file.
+=item * C<POST> - Cancel batch
 
 
 =back
@@ -115,24 +115,10 @@ See L<OpenAPI::Client::OpenAI::Path::batches-batch_id-cancel> for more details.
 
 =over
 
-=item * C<GET> - List stored Chat Completions. Only Chat Completions that have been stored
-with the C<store> parameter set to C<true> will be returned.
+=item * C<GET> - List Chat Completions
 
 
-=item * C<POST> - B<Starting a new project?> We recommend trying L<Responses|https://platform.openai.com/docs/api-reference/responses> 
-to take advantage of the latest OpenAI platform features. Compare
-L<Chat Completions with Responses|https://platform.openai.com/docs/guides/responses-vs-chat-completions?api-mode=responses>.
-
-================================================================================
-Creates a model response for the given chat conversation. Learn more in the
-L<text generation|https://platform.openai.com/docs/guides/text-generation>, L<vision|https://platform.openai.com/docs/guides/vision>,
-and L<audio|https://platform.openai.com/docs/guides/audio> guides.
-
-Parameter support can differ depending on the model used to generate the
-response, particularly for newer reasoning models. Parameters that are only
-supported for reasoning models are noted below. For the current state of 
-unsupported parameters in reasoning models, 
-L<refer to the reasoning guide|https://platform.openai.com/docs/guides/reasoning>.
+=item * C<POST> - Create chat completion
 
 
 =back
@@ -143,17 +129,13 @@ See L<OpenAPI::Client::OpenAI::Path::chat-completions> for more details.
 
 =over
 
-=item * C<DELETE> - Delete a stored chat completion. Only Chat Completions that have been
-created with the C<store> parameter set to C<true> can be deleted.
+=item * C<DELETE> - Delete chat completion
 
 
-=item * C<GET> - Get a stored chat completion. Only Chat Completions that have been created
-with the C<store> parameter set to C<true> will be returned.
+=item * C<GET> - Get chat completion
 
 
-=item * C<POST> - Modify a stored chat completion. Only Chat Completions that have been
-created with the C<store> parameter set to C<true> can be modified. Currently,
-the only supported modification is to update the C<metadata> field.
+=item * C<POST> - Update chat completion
 
 
 =back
@@ -164,9 +146,7 @@ See L<OpenAPI::Client::OpenAI::Path::chat-completions-completion_id> for more de
 
 =over
 
-=item * C<GET> - Get the messages in a stored chat completion. Only Chat Completions that
-have been created with the C<store> parameter set to C<true> will be
-returned.
+=item * C<GET> - Get chat messages
 
 
 =back
@@ -177,7 +157,7 @@ See L<OpenAPI::Client::OpenAI::Path::chat-completions-completion_id-messages> fo
 
 =over
 
-=item * C<POST> - Creates a completion for the provided prompt and parameters.
+=item * C<POST> - Create completion
 
 
 =back
@@ -188,10 +168,10 @@ See L<OpenAPI::Client::OpenAI::Path::completions> for more details.
 
 =over
 
-=item * C<GET> - List Containers
+=item * C<GET> - List containers
 
 
-=item * C<POST> - Create Container
+=item * C<POST> - Create container
 
 
 =back
@@ -202,10 +182,10 @@ See L<OpenAPI::Client::OpenAI::Path::containers> for more details.
 
 =over
 
-=item * C<DELETE> - Delete Container
+=item * C<DELETE> - Delete a container
 
 
-=item * C<GET> - Retrieve Container
+=item * C<GET> - Retrieve container
 
 
 =back
@@ -216,12 +196,10 @@ See L<OpenAPI::Client::OpenAI::Path::containers-container_id> for more details.
 
 =over
 
-=item * C<GET> - List Container files
+=item * C<GET> - List container files
 
 
-=item * C<POST> - Create a Container File
-
-You can send either a multipart/form-data request with the raw file content, or a JSON request with a file ID.
+=item * C<POST> - Create container file
 
 
 =back
@@ -232,10 +210,10 @@ See L<OpenAPI::Client::OpenAI::Path::containers-container_id-files> for more det
 
 =over
 
-=item * C<DELETE> - Delete Container File
+=item * C<DELETE> - Delete a container file
 
 
-=item * C<GET> - Retrieve Container File
+=item * C<GET> - Retrieve container file
 
 
 =back
@@ -246,18 +224,74 @@ See L<OpenAPI::Client::OpenAI::Path::containers-container_id-files-file_id> for 
 
 =over
 
-=item * C<GET> - Retrieve Container File Content
+=item * C<GET> - Retrieve container file content
 
 
 =back
 
 See L<OpenAPI::Client::OpenAI::Path::containers-container_id-files-file_id-content> for more details.
 
+=head2 C</conversations>
+
+=over
+
+=item * C<POST> - Create a conversation
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::conversations> for more details.
+
+=head2 C</conversations/{conversation_id}>
+
+=over
+
+=item * C<DELETE> - Delete a conversation
+
+
+=item * C<GET> - Retrieve a conversation
+
+
+=item * C<POST> - Update a conversation
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::conversations-conversation_id> for more details.
+
+=head2 C</conversations/{conversation_id}/items>
+
+=over
+
+=item * C<GET> - List items
+
+
+=item * C<POST> - Create items
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::conversations-conversation_id-items> for more details.
+
+=head2 C</conversations/{conversation_id}/items/{item_id}>
+
+=over
+
+=item * C<DELETE> - Delete an item
+
+
+=item * C<GET> - Retrieve an item
+
+
+=back
+
+See L<OpenAPI::Client::OpenAI::Path::conversations-conversation_id-items-item_id> for more details.
+
 =head2 C</embeddings>
 
 =over
 
-=item * C<POST> - Creates an embedding vector representing the input text.
+=item * C<POST> - Create embeddings
 
 
 =back
@@ -268,12 +302,10 @@ See L<OpenAPI::Client::OpenAI::Path::embeddings> for more details.
 
 =over
 
-=item * C<GET> - List evaluations for a project.
+=item * C<GET> - List evals
 
 
-=item * C<POST> - Create the structure of an evaluation that can be used to test a model's performance.
-An evaluation is a set of testing criteria and the config for a data source, which dictates the schema of the data used in the evaluation. After creating an evaluation, you can run it on different models and model parameters. We support several types of graders and datasources.
-For more information, see the L<Evals guide|https://platform.openai.com/docs/guides/evals>.
+=item * C<POST> - Create eval
 
 
 =back
@@ -284,13 +316,13 @@ See L<OpenAPI::Client::OpenAI::Path::evals> for more details.
 
 =over
 
-=item * C<DELETE> - Delete an evaluation.
+=item * C<DELETE> - Delete an eval
 
 
-=item * C<GET> - Get an evaluation by ID.
+=item * C<GET> - Get an eval
 
 
-=item * C<POST> - Update certain properties of an evaluation.
+=item * C<POST> - Update an eval
 
 
 =back
@@ -301,10 +333,10 @@ See L<OpenAPI::Client::OpenAI::Path::evals-eval_id> for more details.
 
 =over
 
-=item * C<GET> - Get a list of runs for an evaluation.
+=item * C<GET> - Get eval runs
 
 
-=item * C<POST> - Kicks off a new run for a given evaluation, specifying the data source, and what model configuration to use to test. The datasource will be validated against the schema specified in the config of the evaluation.
+=item * C<POST> - Create eval run
 
 
 =back
@@ -315,13 +347,13 @@ See L<OpenAPI::Client::OpenAI::Path::evals-eval_id-runs> for more details.
 
 =over
 
-=item * C<DELETE> - Delete an eval run.
+=item * C<DELETE> - Delete eval run
 
 
-=item * C<GET> - Get an evaluation run by ID.
+=item * C<GET> - Get an eval run
 
 
-=item * C<POST> - Cancel an ongoing evaluation run.
+=item * C<POST> - Cancel eval run
 
 
 =back
@@ -332,7 +364,7 @@ See L<OpenAPI::Client::OpenAI::Path::evals-eval_id-runs-run_id> for more details
 
 =over
 
-=item * C<GET> - Get a list of output items for an evaluation run.
+=item * C<GET> - Get eval run output items
 
 
 =back
@@ -343,7 +375,7 @@ See L<OpenAPI::Client::OpenAI::Path::evals-eval_id-runs-run_id-output_items> for
 
 =over
 
-=item * C<GET> - Get an evaluation run output item by ID.
+=item * C<GET> - Get an output item of an eval run
 
 
 =back
@@ -354,18 +386,10 @@ See L<OpenAPI::Client::OpenAI::Path::evals-eval_id-runs-run_id-output_items-outp
 
 =over
 
-=item * C<GET> - Returns a list of files.
+=item * C<GET> - List files
 
 
-=item * C<POST> - Upload a file that can be used across various endpoints. Individual files can be up to 512 MB, and the size of all files uploaded by one organization can be up to 100 GB.
-
-The Assistants API supports files up to 2 million tokens and of specific file types. See the L<Assistants Tools guide|https://platform.openai.com/docs/assistants/tools> for details.
-
-The Fine-tuning API only supports C<.jsonl> files. The input also has certain required formats for fine-tuning L<chat|https://platform.openai.com/docs/api-reference/fine-tuning/chat-input> or L<completions|https://platform.openai.com/docs/api-reference/fine-tuning/completions-input> models.
-
-The Batch API only supports C<.jsonl> files up to 200 MB in size. The input also has a specific required L<format|https://platform.openai.com/docs/api-reference/batch/request-input>.
-
-Please L<contact us|https://help.openai.com/> if you need to increase these storage limits.
+=item * C<POST> - Upload file
 
 
 =back
@@ -376,10 +400,10 @@ See L<OpenAPI::Client::OpenAI::Path::files> for more details.
 
 =over
 
-=item * C<DELETE> - Delete a file.
+=item * C<DELETE> - Delete file
 
 
-=item * C<GET> - Returns information about a specific file.
+=item * C<GET> - Retrieve file
 
 
 =back
@@ -390,7 +414,7 @@ See L<OpenAPI::Client::OpenAI::Path::files-file_id> for more details.
 
 =over
 
-=item * C<GET> - Returns the contents of the specified file.
+=item * C<GET> - Retrieve file content
 
 
 =back
@@ -401,7 +425,7 @@ See L<OpenAPI::Client::OpenAI::Path::files-file_id-content> for more details.
 
 =over
 
-=item * C<POST> - Run a grader.
+=item * C<POST> - Run grader
 
 
 =back
@@ -412,7 +436,7 @@ See L<OpenAPI::Client::OpenAI::Path::fine_tuning-alpha-graders-run> for more det
 
 =over
 
-=item * C<POST> - Validate a grader.
+=item * C<POST> - Validate grader
 
 
 =back
@@ -423,14 +447,10 @@ See L<OpenAPI::Client::OpenAI::Path::fine_tuning-alpha-graders-validate> for mor
 
 =over
 
-=item * C<GET> - B<NOTE:> This endpoint requires an L<admin API key|../admin-api-keys>.
-
-Organization owners can use this endpoint to view all permissions for a fine-tuned model checkpoint.
+=item * C<GET> - List checkpoint permissions
 
 
-=item * C<POST> - B<NOTE:> Calling this endpoint requires an L<admin API key|../admin-api-keys>.
-
-This enables organization owners to share fine-tuned models with other projects in their organization.
+=item * C<POST> - Create checkpoint permissions
 
 
 =back
@@ -441,9 +461,7 @@ See L<OpenAPI::Client::OpenAI::Path::fine_tuning-checkpoints-fine_tuned_model_ch
 
 =over
 
-=item * C<DELETE> - B<NOTE:> This endpoint requires an L<admin API key|../admin-api-keys>.
-
-Organization owners can use this endpoint to delete a permission for a fine-tuned model checkpoint.
+=item * C<DELETE> - Delete checkpoint permission
 
 
 =back
@@ -454,14 +472,10 @@ See L<OpenAPI::Client::OpenAI::Path::fine_tuning-checkpoints-fine_tuned_model_ch
 
 =over
 
-=item * C<GET> - List your organization's fine-tuning jobs
+=item * C<GET> - List fine-tuning jobs
 
 
-=item * C<POST> - Creates a fine-tuning job which begins the process of creating a new model from a given dataset.
-
-Response includes details of the enqueued job including job status and the name of the fine-tuned models once complete.
-
-L<Learn more about fine-tuning|https://platform.openai.com/docs/guides/model-optimization>
+=item * C<POST> - Create fine-tuning job
 
 
 =back
@@ -472,9 +486,7 @@ See L<OpenAPI::Client::OpenAI::Path::fine_tuning-jobs> for more details.
 
 =over
 
-=item * C<GET> - Get info about a fine-tuning job.
-
-L<Learn more about fine-tuning|https://platform.openai.com/docs/guides/model-optimization>
+=item * C<GET> - Retrieve fine-tuning job
 
 
 =back
@@ -485,7 +497,7 @@ See L<OpenAPI::Client::OpenAI::Path::fine_tuning-jobs-fine_tuning_job_id> for mo
 
 =over
 
-=item * C<POST> - Immediately cancel a fine-tune job.
+=item * C<POST> - Cancel fine-tuning
 
 
 =back
@@ -496,7 +508,7 @@ See L<OpenAPI::Client::OpenAI::Path::fine_tuning-jobs-fine_tuning_job_id-cancel>
 
 =over
 
-=item * C<GET> - List checkpoints for a fine-tuning job.
+=item * C<GET> - List fine-tuning checkpoints
 
 
 =back
@@ -507,7 +519,7 @@ See L<OpenAPI::Client::OpenAI::Path::fine_tuning-jobs-fine_tuning_job_id-checkpo
 
 =over
 
-=item * C<GET> - Get status updates for a fine-tuning job.
+=item * C<GET> - List fine-tuning events
 
 
 =back
@@ -518,7 +530,7 @@ See L<OpenAPI::Client::OpenAI::Path::fine_tuning-jobs-fine_tuning_job_id-events>
 
 =over
 
-=item * C<POST> - Pause a fine-tune job.
+=item * C<POST> - Pause fine-tuning
 
 
 =back
@@ -529,7 +541,7 @@ See L<OpenAPI::Client::OpenAI::Path::fine_tuning-jobs-fine_tuning_job_id-pause> 
 
 =over
 
-=item * C<POST> - Resume a fine-tune job.
+=item * C<POST> - Resume fine-tuning
 
 
 =back
@@ -540,7 +552,7 @@ See L<OpenAPI::Client::OpenAI::Path::fine_tuning-jobs-fine_tuning_job_id-resume>
 
 =over
 
-=item * C<POST> - Creates an edited or extended image given one or more source images and a prompt. This endpoint only supports C<gpt-image-1> and C<dall-e-2>.
+=item * C<POST> - Create image edit
 
 
 =back
@@ -551,7 +563,7 @@ See L<OpenAPI::Client::OpenAI::Path::images-edits> for more details.
 
 =over
 
-=item * C<POST> - Creates an image given a prompt. L<Learn more|https://platform.openai.com/docs/guides/images>.
+=item * C<POST> - Create image
 
 
 =back
@@ -562,7 +574,7 @@ See L<OpenAPI::Client::OpenAI::Path::images-generations> for more details.
 
 =over
 
-=item * C<POST> - Creates a variation of a given image. This endpoint only supports C<dall-e-2>.
+=item * C<POST> - Create image variation
 
 
 =back
@@ -573,7 +585,7 @@ See L<OpenAPI::Client::OpenAI::Path::images-variations> for more details.
 
 =over
 
-=item * C<GET> - Lists the currently available models, and provides basic information about each one such as the owner and availability.
+=item * C<GET> - List models
 
 
 =back
@@ -584,10 +596,10 @@ See L<OpenAPI::Client::OpenAI::Path::models> for more details.
 
 =over
 
-=item * C<DELETE> - Delete a fine-tuned model. You must have the Owner role in your organization to delete a model.
+=item * C<DELETE> - Delete a fine-tuned model
 
 
-=item * C<GET> - Retrieves a model instance, providing basic information about the model such as the owner and permissioning.
+=item * C<GET> - Retrieve model
 
 
 =back
@@ -598,8 +610,7 @@ See L<OpenAPI::Client::OpenAI::Path::models-model> for more details.
 
 =over
 
-=item * C<POST> - Classifies if text and/or image inputs are potentially harmful. Learn
-more in the L<moderation guide|https://platform.openai.com/docs/guides/moderation>.
+=item * C<POST> - Create moderation
 
 
 =back
@@ -610,10 +621,10 @@ See L<OpenAPI::Client::OpenAI::Path::moderations> for more details.
 
 =over
 
-=item * C<GET> - List organization API keys
+=item * C<GET> - List all organization and project API keys.
 
 
-=item * C<POST> - Create an organization admin API key
+=item * C<POST> - Create admin API key
 
 
 =back
@@ -624,10 +635,10 @@ See L<OpenAPI::Client::OpenAI::Path::organization-admin_api_keys> for more detai
 
 =over
 
-=item * C<DELETE> - Delete an organization admin API key
+=item * C<DELETE> - Delete admin API key
 
 
-=item * C<GET> - Retrieve a single organization API key
+=item * C<GET> - Retrieve admin API key
 
 
 =back
@@ -638,7 +649,7 @@ See L<OpenAPI::Client::OpenAI::Path::organization-admin_api_keys-key_id> for mor
 
 =over
 
-=item * C<GET> - List user actions and configuration changes within this organization.
+=item * C<GET> - List audit logs
 
 
 =back
@@ -649,12 +660,10 @@ See L<OpenAPI::Client::OpenAI::Path::organization-audit_logs> for more details.
 
 =over
 
-=item * C<GET> - List uploaded certificates for this organization.
+=item * C<GET> - List organization certificates
 
 
-=item * C<POST> - Upload a certificate to the organization. This does B<not> automatically activate the certificate.
-
-Organizations can upload up to 50 certificates.
+=item * C<POST> - Upload certificate
 
 
 =back
@@ -665,9 +674,7 @@ See L<OpenAPI::Client::OpenAI::Path::organization-certificates> for more details
 
 =over
 
-=item * C<POST> - Activate certificates at the organization level.
-
-You can atomically and idempotently activate up to 10 certificates at a time.
+=item * C<POST> - Activate certificates for organization
 
 
 =back
@@ -678,9 +685,7 @@ See L<OpenAPI::Client::OpenAI::Path::organization-certificates-activate> for mor
 
 =over
 
-=item * C<POST> - Deactivate certificates at the organization level.
-
-You can atomically and idempotently deactivate up to 10 certificates at a time.
+=item * C<POST> - Deactivate certificates for organization
 
 
 =back
@@ -691,17 +696,13 @@ See L<OpenAPI::Client::OpenAI::Path::organization-certificates-deactivate> for m
 
 =over
 
-=item * C<DELETE> - Delete a certificate from the organization.
-
-The certificate must be inactive for the organization and all projects.
+=item * C<DELETE> - Delete certificate
 
 
-=item * C<GET> - Get a certificate that has been uploaded to the organization.
-
-You can get a certificate regardless of whether it is active or not.
+=item * C<GET> - Get certificate
 
 
-=item * C<POST> - Modify a certificate. Note that only the name can be modified.
+=item * C<POST> - Modify certificate
 
 
 =back
@@ -712,7 +713,7 @@ See L<OpenAPI::Client::OpenAI::Path::organization-certificates-certificate_id> f
 
 =over
 
-=item * C<GET> - Get costs details for the organization.
+=item * C<GET> - Costs
 
 
 =back
@@ -723,10 +724,10 @@ See L<OpenAPI::Client::OpenAI::Path::organization-costs> for more details.
 
 =over
 
-=item * C<GET> - Returns a list of invites in the organization.
+=item * C<GET> - List invites
 
 
-=item * C<POST> - Create an invite for a user to the organization. The invite must be accepted by the user before they have access to the organization.
+=item * C<POST> - Create invite
 
 
 =back
@@ -737,10 +738,10 @@ See L<OpenAPI::Client::OpenAI::Path::organization-invites> for more details.
 
 =over
 
-=item * C<DELETE> - Delete an invite. If the invite has already been accepted, it cannot be deleted.
+=item * C<DELETE> - Delete invite
 
 
-=item * C<GET> - Retrieves an invite.
+=item * C<GET> - Retrieve invite
 
 
 =back
@@ -751,10 +752,10 @@ See L<OpenAPI::Client::OpenAI::Path::organization-invites-invite_id> for more de
 
 =over
 
-=item * C<GET> - Returns a list of projects.
+=item * C<GET> - List projects
 
 
-=item * C<POST> - Create a new project in the organization. Projects can be created and archived, but cannot be deleted.
+=item * C<POST> - Create project
 
 
 =back
@@ -765,10 +766,10 @@ See L<OpenAPI::Client::OpenAI::Path::organization-projects> for more details.
 
 =over
 
-=item * C<GET> - Retrieves a project.
+=item * C<GET> - Retrieve project
 
 
-=item * C<POST> - Modifies a project in the organization.
+=item * C<POST> - Modify project
 
 
 =back
@@ -779,7 +780,7 @@ See L<OpenAPI::Client::OpenAI::Path::organization-projects-project_id> for more 
 
 =over
 
-=item * C<GET> - Returns a list of API keys in the project.
+=item * C<GET> - List project API keys
 
 
 =back
@@ -790,10 +791,10 @@ See L<OpenAPI::Client::OpenAI::Path::organization-projects-project_id-api_keys> 
 
 =over
 
-=item * C<DELETE> - Deletes an API key from the project.
+=item * C<DELETE> - Delete project API key
 
 
-=item * C<GET> - Retrieves an API key in the project.
+=item * C<GET> - Retrieve project API key
 
 
 =back
@@ -804,7 +805,7 @@ See L<OpenAPI::Client::OpenAI::Path::organization-projects-project_id-api_keys-k
 
 =over
 
-=item * C<POST> - Archives a project in the organization. Archived projects cannot be used or updated.
+=item * C<POST> - Archive project
 
 
 =back
@@ -815,7 +816,7 @@ See L<OpenAPI::Client::OpenAI::Path::organization-projects-project_id-archive> f
 
 =over
 
-=item * C<GET> - List certificates for this project.
+=item * C<GET> - List project certificates
 
 
 =back
@@ -826,9 +827,7 @@ See L<OpenAPI::Client::OpenAI::Path::organization-projects-project_id-certificat
 
 =over
 
-=item * C<POST> - Activate certificates at the project level.
-
-You can atomically and idempotently activate up to 10 certificates at a time.
+=item * C<POST> - Activate certificates for project
 
 
 =back
@@ -839,8 +838,7 @@ See L<OpenAPI::Client::OpenAI::Path::organization-projects-project_id-certificat
 
 =over
 
-=item * C<POST> - Deactivate certificates at the project level. You can atomically and 
-idempotently deactivate up to 10 certificates at a time.
+=item * C<POST> - Deactivate certificates for project
 
 
 =back
@@ -851,7 +849,7 @@ See L<OpenAPI::Client::OpenAI::Path::organization-projects-project_id-certificat
 
 =over
 
-=item * C<GET> - Returns the rate limits per model for a project.
+=item * C<GET> - List project rate limits
 
 
 =back
@@ -862,7 +860,7 @@ See L<OpenAPI::Client::OpenAI::Path::organization-projects-project_id-rate_limit
 
 =over
 
-=item * C<POST> - Updates a project rate limit.
+=item * C<POST> - Modify project rate limit
 
 
 =back
@@ -873,10 +871,10 @@ See L<OpenAPI::Client::OpenAI::Path::organization-projects-project_id-rate_limit
 
 =over
 
-=item * C<GET> - Returns a list of service accounts in the project.
+=item * C<GET> - List project service accounts
 
 
-=item * C<POST> - Creates a new service account in the project. This also returns an unredacted API key for the service account.
+=item * C<POST> - Create project service account
 
 
 =back
@@ -887,10 +885,10 @@ See L<OpenAPI::Client::OpenAI::Path::organization-projects-project_id-service_ac
 
 =over
 
-=item * C<DELETE> - Deletes a service account from the project.
+=item * C<DELETE> - Delete project service account
 
 
-=item * C<GET> - Retrieves a service account in the project.
+=item * C<GET> - Retrieve project service account
 
 
 =back
@@ -901,10 +899,10 @@ See L<OpenAPI::Client::OpenAI::Path::organization-projects-project_id-service_ac
 
 =over
 
-=item * C<GET> - Returns a list of users in the project.
+=item * C<GET> - List project users
 
 
-=item * C<POST> - Adds a user to the project. Users must already be members of the organization to be added to a project.
+=item * C<POST> - Create project user
 
 
 =back
@@ -915,13 +913,13 @@ See L<OpenAPI::Client::OpenAI::Path::organization-projects-project_id-users> for
 
 =over
 
-=item * C<DELETE> - Deletes a user from the project.
+=item * C<DELETE> - Delete project user
 
 
-=item * C<GET> - Retrieves a user in the project.
+=item * C<GET> - Retrieve project user
 
 
-=item * C<POST> - Modifies a user's role in the project.
+=item * C<POST> - Modify project user
 
 
 =back
@@ -932,7 +930,7 @@ See L<OpenAPI::Client::OpenAI::Path::organization-projects-project_id-users-user
 
 =over
 
-=item * C<GET> - Get audio speeches usage details for the organization.
+=item * C<GET> - Audio speeches
 
 
 =back
@@ -943,7 +941,7 @@ See L<OpenAPI::Client::OpenAI::Path::organization-usage-audio_speeches> for more
 
 =over
 
-=item * C<GET> - Get audio transcriptions usage details for the organization.
+=item * C<GET> - Audio transcriptions
 
 
 =back
@@ -954,7 +952,7 @@ See L<OpenAPI::Client::OpenAI::Path::organization-usage-audio_transcriptions> fo
 
 =over
 
-=item * C<GET> - Get code interpreter sessions usage details for the organization.
+=item * C<GET> - Code interpreter sessions
 
 
 =back
@@ -965,7 +963,7 @@ See L<OpenAPI::Client::OpenAI::Path::organization-usage-code_interpreter_session
 
 =over
 
-=item * C<GET> - Get completions usage details for the organization.
+=item * C<GET> - Completions
 
 
 =back
@@ -976,7 +974,7 @@ See L<OpenAPI::Client::OpenAI::Path::organization-usage-completions> for more de
 
 =over
 
-=item * C<GET> - Get embeddings usage details for the organization.
+=item * C<GET> - Embeddings
 
 
 =back
@@ -987,7 +985,7 @@ See L<OpenAPI::Client::OpenAI::Path::organization-usage-embeddings> for more det
 
 =over
 
-=item * C<GET> - Get images usage details for the organization.
+=item * C<GET> - Images
 
 
 =back
@@ -998,7 +996,7 @@ See L<OpenAPI::Client::OpenAI::Path::organization-usage-images> for more details
 
 =over
 
-=item * C<GET> - Get moderations usage details for the organization.
+=item * C<GET> - Moderations
 
 
 =back
@@ -1009,7 +1007,7 @@ See L<OpenAPI::Client::OpenAI::Path::organization-usage-moderations> for more de
 
 =over
 
-=item * C<GET> - Get vector stores usage details for the organization.
+=item * C<GET> - Vector stores
 
 
 =back
@@ -1020,7 +1018,7 @@ See L<OpenAPI::Client::OpenAI::Path::organization-usage-vector_stores> for more 
 
 =over
 
-=item * C<GET> - Lists all of the users in the organization.
+=item * C<GET> - List users
 
 
 =back
@@ -1031,13 +1029,13 @@ See L<OpenAPI::Client::OpenAI::Path::organization-users> for more details.
 
 =over
 
-=item * C<DELETE> - Deletes a user from the organization.
+=item * C<DELETE> - Delete user
 
 
-=item * C<GET> - Retrieves a user by their identifier.
+=item * C<GET> - Retrieve user
 
 
-=item * C<POST> - Modifies a user's role in the organization.
+=item * C<POST> - Modify user
 
 
 =back
@@ -1048,13 +1046,7 @@ See L<OpenAPI::Client::OpenAI::Path::organization-users-user_id> for more detail
 
 =over
 
-=item * C<POST> - Create an ephemeral API token for use in client-side applications with the
-Realtime API. Can be configured with the same session parameters as the
-C<session.update> client event.
-
-It responds with a session object, plus a C<client_secret> key which contains
-a usable ephemeral API token that can be used to authenticate browser clients
-for the Realtime API.
+=item * C<POST> - Create session
 
 
 =back
@@ -1065,13 +1057,7 @@ See L<OpenAPI::Client::OpenAI::Path::realtime-sessions> for more details.
 
 =over
 
-=item * C<POST> - Create an ephemeral API token for use in client-side applications with the
-Realtime API specifically for realtime transcriptions. 
-Can be configured with the same session parameters as the C<transcription_session.update> client event.
-
-It responds with a session object, plus a C<client_secret> key which contains
-a usable ephemeral API token that can be used to authenticate browser clients
-for the Realtime API.
+=item * C<POST> - Create transcription session
 
 
 =back
@@ -1082,13 +1068,7 @@ See L<OpenAPI::Client::OpenAI::Path::realtime-transcription_sessions> for more d
 
 =over
 
-=item * C<POST> - Creates a model response. Provide L<text|https://platform.openai.com/docs/guides/text> or
-L<image|https://platform.openai.com/docs/guides/images> inputs to generate L<text|https://platform.openai.com/docs/guides/text>
-or L<JSON|https://platform.openai.com/docs/guides/structured-outputs> outputs. Have the model call
-your own L<custom code|https://platform.openai.com/docs/guides/function-calling> or use built-in
-L<tools|https://platform.openai.com/docs/guides/tools> like L<web search|https://platform.openai.com/docs/guides/tools-web-search>
-or L<file search|https://platform.openai.com/docs/guides/tools-file-search> to use your own data
-as input for the model's response.
+=item * C<POST> - Create a model response
 
 
 =back
@@ -1099,10 +1079,10 @@ See L<OpenAPI::Client::OpenAI::Path::responses> for more details.
 
 =over
 
-=item * C<DELETE> - Deletes a model response with the given ID.
+=item * C<DELETE> - Delete a model response
 
 
-=item * C<GET> - Retrieves a model response with the given ID.
+=item * C<GET> - Get a model response
 
 
 =back
@@ -1113,9 +1093,7 @@ See L<OpenAPI::Client::OpenAI::Path::responses-response_id> for more details.
 
 =over
 
-=item * C<POST> - Cancels a model response with the given ID. Only responses created with
-the C<background> parameter set to C<true> can be cancelled. 
-L<Learn more|https://platform.openai.com/docs/guides/background>.
+=item * C<POST> - Cancel a response
 
 
 =back
@@ -1126,7 +1104,7 @@ See L<OpenAPI::Client::OpenAI::Path::responses-response_id-cancel> for more deta
 
 =over
 
-=item * C<GET> - Returns a list of input items for a given response.
+=item * C<GET> - List input items
 
 
 =back
@@ -1137,7 +1115,7 @@ See L<OpenAPI::Client::OpenAI::Path::responses-response_id-input_items> for more
 
 =over
 
-=item * C<POST> - Create a thread.
+=item * C<POST> - Create thread
 
 
 =back
@@ -1148,7 +1126,7 @@ See L<OpenAPI::Client::OpenAI::Path::threads> for more details.
 
 =over
 
-=item * C<POST> - Create a thread and run it in one request.
+=item * C<POST> - Create thread and run
 
 
 =back
@@ -1159,13 +1137,13 @@ See L<OpenAPI::Client::OpenAI::Path::threads-runs> for more details.
 
 =over
 
-=item * C<DELETE> - Delete a thread.
+=item * C<DELETE> - Delete thread
 
 
-=item * C<GET> - Retrieves a thread.
+=item * C<GET> - Retrieve thread
 
 
-=item * C<POST> - Modifies a thread.
+=item * C<POST> - Modify thread
 
 
 =back
@@ -1176,10 +1154,10 @@ See L<OpenAPI::Client::OpenAI::Path::threads-thread_id> for more details.
 
 =over
 
-=item * C<GET> - Returns a list of messages for a given thread.
+=item * C<GET> - List messages
 
 
-=item * C<POST> - Create a message.
+=item * C<POST> - Create message
 
 
 =back
@@ -1190,13 +1168,13 @@ See L<OpenAPI::Client::OpenAI::Path::threads-thread_id-messages> for more detail
 
 =over
 
-=item * C<DELETE> - Deletes a message.
+=item * C<DELETE> - Delete message
 
 
-=item * C<GET> - Retrieve a message.
+=item * C<GET> - Retrieve message
 
 
-=item * C<POST> - Modifies a message.
+=item * C<POST> - Modify message
 
 
 =back
@@ -1207,10 +1185,10 @@ See L<OpenAPI::Client::OpenAI::Path::threads-thread_id-messages-message_id> for 
 
 =over
 
-=item * C<GET> - Returns a list of runs belonging to a thread.
+=item * C<GET> - List runs
 
 
-=item * C<POST> - Create a run.
+=item * C<POST> - Create run
 
 
 =back
@@ -1221,10 +1199,10 @@ See L<OpenAPI::Client::OpenAI::Path::threads-thread_id-runs> for more details.
 
 =over
 
-=item * C<GET> - Retrieves a run.
+=item * C<GET> - Retrieve run
 
 
-=item * C<POST> - Modifies a run.
+=item * C<POST> - Modify run
 
 
 =back
@@ -1235,7 +1213,7 @@ See L<OpenAPI::Client::OpenAI::Path::threads-thread_id-runs-run_id> for more det
 
 =over
 
-=item * C<POST> - Cancels a run that is C<in_progress>.
+=item * C<POST> - Cancel a run
 
 
 =back
@@ -1246,7 +1224,7 @@ See L<OpenAPI::Client::OpenAI::Path::threads-thread_id-runs-run_id-cancel> for m
 
 =over
 
-=item * C<GET> - Returns a list of run steps belonging to a run.
+=item * C<GET> - List run steps
 
 
 =back
@@ -1257,7 +1235,7 @@ See L<OpenAPI::Client::OpenAI::Path::threads-thread_id-runs-run_id-steps> for mo
 
 =over
 
-=item * C<GET> - Retrieves a run step.
+=item * C<GET> - Retrieve run step
 
 
 =back
@@ -1268,7 +1246,7 @@ See L<OpenAPI::Client::OpenAI::Path::threads-thread_id-runs-run_id-steps-step_id
 
 =over
 
-=item * C<POST> - When a run has the C<status: "requires_action"> and C<required_action.type> is C<submit_tool_outputs>, this endpoint can be used to submit the outputs from the tool calls once they're all completed. All outputs must be submitted in a single request.
+=item * C<POST> - Submit tool outputs to run
 
 
 =back
@@ -1279,23 +1257,7 @@ See L<OpenAPI::Client::OpenAI::Path::threads-thread_id-runs-run_id-submit_tool_o
 
 =over
 
-=item * C<POST> - Creates an intermediate L<Upload|https://platform.openai.com/docs/api-reference/uploads/object> object
-that you can add L<Parts|https://platform.openai.com/docs/api-reference/uploads/part-object> to.
-Currently, an Upload can accept at most 8 GB in total and expires after an
-hour after you create it.
-
-Once you complete the Upload, we will create a
-L<File|https://platform.openai.com/docs/api-reference/files/object> object that contains all the parts
-you uploaded. This File is usable in the rest of our platform as a regular
-File object.
-
-For certain C<purpose> values, the correct C<mime_type> must be specified. 
-Please refer to documentation for the 
-L<supported MIME types for your use case|https://platform.openai.com/docs/assistants/tools/file-search#supported-files>.
-
-For guidance on the proper filename extensions for each purpose, please
-follow the documentation on L<creating a
-File|https://platform.openai.com/docs/api-reference/files/create>.
+=item * C<POST> - Create upload
 
 
 =back
@@ -1306,7 +1268,7 @@ See L<OpenAPI::Client::OpenAI::Path::uploads> for more details.
 
 =over
 
-=item * C<POST> - Cancels the Upload. No Parts may be added after an Upload is cancelled.
+=item * C<POST> - Cancel upload
 
 
 =back
@@ -1317,13 +1279,7 @@ See L<OpenAPI::Client::OpenAI::Path::uploads-upload_id-cancel> for more details.
 
 =over
 
-=item * C<POST> - Completes the L<Upload|https://platform.openai.com/docs/api-reference/uploads/object>. 
-
-Within the returned Upload object, there is a nested L<File|https://platform.openai.com/docs/api-reference/files/object> object that is ready to use in the rest of the platform.
-
-You can specify the order of the Parts by passing in an ordered list of the Part IDs.
-
-The number of bytes uploaded upon completion must match the number of bytes initially specified when creating the Upload object. No Parts may be added after an Upload is completed.
+=item * C<POST> - Complete upload
 
 
 =back
@@ -1334,11 +1290,7 @@ See L<OpenAPI::Client::OpenAI::Path::uploads-upload_id-complete> for more detail
 
 =over
 
-=item * C<POST> - Adds a L<Part|https://platform.openai.com/docs/api-reference/uploads/part-object> to an L<Upload|https://platform.openai.com/docs/api-reference/uploads/object> object. A Part represents a chunk of bytes from the file you are trying to upload. 
-
-Each Part can be at most 64 MB, and you can add Parts until you hit the Upload maximum of 8 GB.
-
-It is possible to add multiple Parts in parallel. You can decide the intended order of the Parts when you L<complete the Upload|https://platform.openai.com/docs/api-reference/uploads/complete>.
+=item * C<POST> - Add upload part
 
 
 =back
@@ -1349,10 +1301,10 @@ See L<OpenAPI::Client::OpenAI::Path::uploads-upload_id-parts> for more details.
 
 =over
 
-=item * C<GET> - Returns a list of vector stores.
+=item * C<GET> - List vector stores
 
 
-=item * C<POST> - Create a vector store.
+=item * C<POST> - Create vector store
 
 
 =back
@@ -1363,13 +1315,13 @@ See L<OpenAPI::Client::OpenAI::Path::vector_stores> for more details.
 
 =over
 
-=item * C<DELETE> - Delete a vector store.
+=item * C<DELETE> - Delete vector store
 
 
-=item * C<GET> - Retrieves a vector store.
+=item * C<GET> - Retrieve vector store
 
 
-=item * C<POST> - Modifies a vector store.
+=item * C<POST> - Modify vector store
 
 
 =back
@@ -1380,7 +1332,7 @@ See L<OpenAPI::Client::OpenAI::Path::vector_stores-vector_store_id> for more det
 
 =over
 
-=item * C<POST> - Create a vector store file batch.
+=item * C<POST> - Create vector store file batch
 
 
 =back
@@ -1391,7 +1343,7 @@ See L<OpenAPI::Client::OpenAI::Path::vector_stores-vector_store_id-file_batches>
 
 =over
 
-=item * C<GET> - Retrieves a vector store file batch.
+=item * C<GET> - Retrieve vector store file batch
 
 
 =back
@@ -1402,7 +1354,7 @@ See L<OpenAPI::Client::OpenAI::Path::vector_stores-vector_store_id-file_batches-
 
 =over
 
-=item * C<POST> - Cancel a vector store file batch. This attempts to cancel the processing of files in this batch as soon as possible.
+=item * C<POST> - Cancel vector store file batch
 
 
 =back
@@ -1413,7 +1365,7 @@ See L<OpenAPI::Client::OpenAI::Path::vector_stores-vector_store_id-file_batches-
 
 =over
 
-=item * C<GET> - Returns a list of vector store files in a batch.
+=item * C<GET> - List vector store files in a batch
 
 
 =back
@@ -1424,10 +1376,10 @@ See L<OpenAPI::Client::OpenAI::Path::vector_stores-vector_store_id-file_batches-
 
 =over
 
-=item * C<GET> - Returns a list of vector store files.
+=item * C<GET> - List vector store files
 
 
-=item * C<POST> - Create a vector store file by attaching a L<File|https://platform.openai.com/docs/api-reference/files> to a L<vector store|https://platform.openai.com/docs/api-reference/vector-stores/object>.
+=item * C<POST> - Create vector store file
 
 
 =back
@@ -1438,13 +1390,13 @@ See L<OpenAPI::Client::OpenAI::Path::vector_stores-vector_store_id-files> for mo
 
 =over
 
-=item * C<DELETE> - Delete a vector store file. This will remove the file from the vector store but the file itself will not be deleted. To delete the file, use the L<delete file|https://platform.openai.com/docs/api-reference/files/delete> endpoint.
+=item * C<DELETE> - Delete vector store file
 
 
-=item * C<GET> - Retrieves a vector store file.
+=item * C<GET> - Retrieve vector store file
 
 
-=item * C<POST> - Update attributes on a vector store file.
+=item * C<POST> - Update vector store file attributes
 
 
 =back
@@ -1455,7 +1407,7 @@ See L<OpenAPI::Client::OpenAI::Path::vector_stores-vector_store_id-files-file_id
 
 =over
 
-=item * C<GET> - Retrieve the parsed contents of a vector store file.
+=item * C<GET> - Retrieve vector store file content
 
 
 =back
@@ -1466,7 +1418,7 @@ See L<OpenAPI::Client::OpenAI::Path::vector_stores-vector_store_id-files-file_id
 
 =over
 
-=item * C<POST> - Search a vector store for relevant chunks based on a query and file attributes filter.
+=item * C<POST> - Search vector store
 
 
 =back

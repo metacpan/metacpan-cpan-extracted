@@ -13,6 +13,9 @@ This document describes the API endpoint at C</vector_stores/{vector_store_id}/f
 
 =head2 C<DELETE /vector_stores/{vector_store_id}/files/{file_id}>
 
+Delete vector store file
+
+
 Delete a vector store file. This will remove the file from the vector store but the file itself will not be deleted. To delete the file, use the L<delete file|https://platform.openai.com/docs/api-reference/files/delete> endpoint.
 
 
@@ -64,6 +67,9 @@ Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-
 =back
 
 =head2 C<GET /vector_stores/{vector_store_id}/files/{file_id}>
+
+Retrieve vector store file
+
 
 Retrieves a vector store file.
 
@@ -132,6 +138,9 @@ Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-
 =back
 
 =head2 C<POST /vector_stores/{vector_store_id}/files/{file_id}>
+
+Update vector store file attributes
+
 
 Update attributes on a vector store file.
 

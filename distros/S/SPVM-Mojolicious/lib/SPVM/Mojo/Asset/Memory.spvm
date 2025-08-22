@@ -12,14 +12,8 @@ class Mojo::Asset::Memory extends Mojo::Asset {
   
   has max_memory_size : rw int
     get {
-      unless ($self->{max_memory_size} > -1) {
-        my $env_max_memory_size = length(my $_ = Sys->env("SPVM_MOJO_MAX_MEMORY_SIZE")) ? (int)$_ : -1;
-        
-        $self->{max_memory_size} = $env_max_memory_size;
-        
-        unless ($self->{max_memory_size} < -1) {
-          $self->{max_memory_size} = 262144;
-        }
+      unless (exists $self->{max_memory_size}) {
+        $self->{max_memory_size} = length(my $_ = Sys->env("SPVM_MOJO_MAX_MEMORY_SIZE")) ? (int)$_ : 262144;
       }
       
       return $self->{max_memory_size};
@@ -28,7 +22,7 @@ class Mojo::Asset::Memory extends Mojo::Asset {
   
   has mtime : rw long
     get {
-      unless ($self->{mtime} > -1) {
+      unless (exists $self->{mtime}) {
         $self->{mtime} = CommandInfo->BASETIME;
       }
       
@@ -54,14 +48,7 @@ class Mojo::Asset::Memory extends Mojo::Asset {
   # Instance Methods
   protected method init : void () {
     
-    $self->SUPER::init;
-    
-    $self->{max_memory_size} = -1;
-    
-    $self->{mtime} = -1;
-    
     $self->{content_buffer} = StringBuffer->new;
-    
   }
   
   method add_chunk : Mojo::Asset ($chunk : string) {

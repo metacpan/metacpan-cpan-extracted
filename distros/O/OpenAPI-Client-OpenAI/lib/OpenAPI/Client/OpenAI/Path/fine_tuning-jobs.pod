@@ -13,6 +13,9 @@ This document describes the API endpoint at C</fine_tuning/jobs>.
 
 =head2 C<GET /fine_tuning/jobs>
 
+List fine-tuning jobs
+
+
 List your organization's fine-tuning jobs
 
 
@@ -78,6 +81,9 @@ Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-
 =back
 
 =head2 C<POST /fine_tuning/jobs>
+
+Create fine-tuning job
+
 
 Creates a fine-tuning job which begins the process of creating a new model from a given dataset.
 

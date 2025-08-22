@@ -28,7 +28,7 @@ use constant EPP_XMLNS	=> 'urn:ietf:params:xml:ns:epp-1.0';
 use vars qw($Error $Code $Message);
 
 BEGIN {
-	our $VERSION = '0.11';
+	our $VERSION = '0.12';
 }
 
 # file-scoped lexicals
@@ -61,7 +61,7 @@ service
 	) or die ('Could not login to EPP server: ', $Net::EPP::Registry::Nominet::Message);
 
 	my $dom = 'foo.co.uk';
-	
+
 	if ($epp->check_domain($dom) == 1) {
 		print "Domain $dom is available\n" ;
 	} else {
@@ -112,12 +112,10 @@ exceptions:
 
 =over
 
-=item * If C<test> or C<ote> is set but C<testssl> is not, C<port>
-defaults to 8700
-
 =item * C<host> will be set to the appropriate endpoint. Specify C<ote>
-with value 1 to connect to the OT&E endpoint, C<test> with value 1 for
-the testbed endpoint and none of these for the standard live endpoint.
+with a true value to connect to the OT&E endpoint, C<test> with a true
+value for the testbed endpoint and none of these for the standard live
+endpoint.
 
 =item * C<timeout> defaults to 5 (seconds).
 
@@ -153,43 +151,28 @@ sub new {
 	# to use with old version of Net::EPP.
 	$params{dom}		 = 1;
 
+	carp 'Nominet only supports port 700 these days - using that instead.'
+		if $params{port} && $params{port} != 700;
+	carp 'The testssl parameter is deprecated. ' .
+		'From August 2025 all connections use TLS.'
+		if exists $params{testssl};
+	$params{port} = 700; # Only option from August 2025
+	$params{ssl}  = 1;   # Only option from August 2025
+
 	if (defined $params{debug}) { $Debug = $params{debug}; }
-	if ($params{test} and $params{test} == 1) {
-		# Use test server
-		if ($params{testssl} and $params{testssl} == 1) {
-			$params{port} = 700;
-			$params{ssl}  =   1;
-		} else {
-			$params{port} = 8700;
-			$params{ssl}  = undef;
-		}
-		$params{host} = $Host{test};
-	} elsif ($params{ote} and $params{ote} == 1) {
-		# Use OT&E server
-		if ($params{testssl} and $params{testssl} == 1) {
-			$params{port} = 700;
-			$params{ssl}  =   1;
-		} else {
-			$params{port} = 8700;
-			$params{ssl}  = undef;
-		}
-		$params{host} = $Host{ote};
-	} else {
-		# Use live server
-		$params{port} = 700;
-		$params{ssl}  =   1;
-		$params{host} = $Host{prod};
-	}
+	$params{host} =
+		$params{test} ? $Host{test} :
+		$params{ote}  ? $Host{ote}  :
+		$Host{prod};
+
 	warn "Connecting to $params{host}:$params{port}\n" if $Debug;
 	$params{timeout}	= (int($params{timeout} || 0) > 0 ? $params{timeout} : 5);
-	if ($params{ssl}) {
-		if ($params{verify}) {
-			$params{SSL_ca_file}      ||= $params{ca_file};
-			$params{SSL_ca_path}      ||= $params{ca_path};
-			$params{SSL_verify_mode}  =   0x01;
-		} else {
-			$params{SSL_verify_mode}  =   0x00;
-		}
+	if ($params{verify}) {
+		$params{SSL_ca_file}      ||= $params{ca_file};
+		$params{SSL_ca_path}      ||= $params{ca_path};
+		$params{SSL_verify_mode}  =   0x01;
+	} else {
+		$params{SSL_verify_mode}  =   0x00;
 	}
 	if ($params{ssl} and $params{ciphers}) {
 		$params{SSL_cipher_list} = $params{ciphers};
@@ -360,8 +343,9 @@ The availability checks work similarly to L<Net::EPP::Simple> except
 that in list context they return an array with up to three elements.
 The first element is the
 availability indicator as before (0 if provisioned, 1 if available,
-undef on error). The second element is the abuse counter which shows
-how many more such checks you may run.
+undef on error). The second element is the abuse counter which used to
+show how many more such checks you may run but is now always zero
+because that automated restriction has been removed.
 The third element gives the reason for the lack of availability, if any.
 
 These two extra fields are only relevant for check_domain and will always
@@ -533,7 +517,7 @@ sub unrenew {
 	$frame->getCommandNode->appendChild ($elem);
 
 	if (my $response = $self->_send_frame ($frame)) {
-	
+
 		# Results not necessarily returned by EPP in the same order.
 		# Construct a hash ref with domains as keys and expiry dates as
 		# values
@@ -1331,8 +1315,8 @@ The interface for querying domains, contacts and hosts is the same as
 for L<Net::EPP::Simple> with the addendum that authinfo is not used at
 Nominet so can be ignored. The interface is simply:
 
-	my $domhash = $epp->domain_info($domainname);
-	my $fulldomhash = $epp->domain_info($domainname, undef, $follow);
+	my $domhash = $epp->domain_info ($domainname);
+	my $fulldomhash = $epp->domain_info ($domainname, undef, $follow);
 	my $conthash = $epp->contact_info ($contid);
 	my $hosthash = $epp->host_info ($hostname);
 
@@ -1536,14 +1520,22 @@ Each entry in the arrayref is itself a hashref with these keys:
 
 =over
 
-=item C<registrar-tag> is the tag name to use in release actions, etc.
+=item C<registrar-tag>
 
-=item C<name> is the name of the registrar for display purposes
+is the tag name to use in release actions, etc.
 
-=item C<trad-name> is the trading name of the registrar (may be empty
+=item C<name>
+
+is the name of the registrar for display purposes
+
+=item C<trad-name>
+
+is the trading name of the registrar (may be empty
 string)
 
-=item C<handshake> is "Y" if they require handshakes on transfer
+=item C<handshake>
+
+is "Y" if they require handshakes on transfer
 or "N" otherwise
 
 =back
@@ -1738,8 +1730,9 @@ running (ie. good enough FAPP).
 
 	my $almost_unique_id = $epp->random_id (16);
 
-The length defaults to 16 if not supplied. RFC 5730 specifies that this
-is the maximum length for a contact ID.
+The length defaults to 16 if not supplied. L<RFC
+5730|https://tools.ietf.org/html/rfc5730> specifies that this is the
+maximum length for a contact ID.
 
 =cut
 
@@ -1897,7 +1890,7 @@ Pete Houston <cpan@openstrike.co.uk>
 
 =head1 Licence
 
-This software is copyright © 2013-2024 by Pete Houston. It is released
+This software is copyright © 2013-2025 by Pete Houston. It is released
 under the Artistic Licence (version 2) and the
 GNU General Public Licence (version 2).
 

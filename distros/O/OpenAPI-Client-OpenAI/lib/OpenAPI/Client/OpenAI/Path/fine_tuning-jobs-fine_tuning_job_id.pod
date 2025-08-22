@@ -13,6 +13,9 @@ This document describes the API endpoint at C</fine_tuning/jobs/{fine_tuning_job
 
 =head2 C<GET /fine_tuning/jobs/{fine_tuning_job_id}>
 
+Retrieve fine-tuning job
+
+
 Get info about a fine-tuning job.
 
 L<Learn more about fine-tuning|https://platform.openai.com/docs/guides/model-optimization>

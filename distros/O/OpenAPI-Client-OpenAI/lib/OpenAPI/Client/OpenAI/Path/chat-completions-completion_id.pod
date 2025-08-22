@@ -13,6 +13,9 @@ This document describes the API endpoint at C</chat/completions/{completion_id}>
 
 =head2 C<DELETE /chat/completions/{completion_id}>
 
+Delete chat completion
+
+
 Delete a stored chat completion. Only Chat Completions that have been
 created with the C<store> parameter set to C<true> can be deleted.
 
@@ -59,6 +62,9 @@ Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-
 =back
 
 =head2 C<GET /chat/completions/{completion_id}>
+
+Get chat completion
+
 
 Get a stored chat completion. Only Chat Completions that have been created
 with the C<store> parameter set to C<true> will be returned.
@@ -142,6 +148,9 @@ Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-
 =back
 
 =head2 C<POST /chat/completions/{completion_id}>
+
+Update chat completion
+
 
 Modify a stored chat completion. Only Chat Completions that have been
 created with the C<store> parameter set to C<true> can be modified. Currently,

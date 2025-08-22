@@ -15,37 +15,37 @@ Map::Tube::Rome::Line::MA - Rome Subway Map: Linea A.
 
 Rome Subway Map: Linea A
 
-    +-----------------------------------------+-------------------------------------------------------------------------+
-    | Station Name                            | Connected To                                                            |
-    +-----------------------------------------+-------------------------------------------------------------------------+
-    | Anagnina                                | Cinecittà                                                               |
-    | Cinecittà                               | Anagnina, Subaugusta                                                    |
-    | Subaugusta                              | Cinecittà, Giulio Agricola                                              |
-    | Giulio Agricola                         | Subaugusta, Lucio Sestio                                                |
-    | Lucio Sestio                            | Giulio Agricola, Numidio Quadrato                                       |
-    | Numidio Quadrato                        | Lucio Sestio, Porta Furba Quadraro                                      |
-    | Porta Furba Quadraro                    | Numidio Quadrato, Arco di Travertino                                    |
-    | Arco di Travertino                      | Porta Furba Quadraro, Colli Albani - Parco Appia Antica                 |
-    | Colli Albani - Parco Appia Antica       | Arco di Travertino, Furio Camillo                                       |
-    | Furio Camillo                           | Colli Albani - Parco Appia Antica, Ponte Lungo                          |
-    | Ponte Lungo                             | Furio Camillo, Re di Roma                                               |
-    | Re di Roma                              | Ponte Lungo, San Giovanni                                               |
-    | San Giovanni                            | Re di Roma, Manzoni                                                     |
-    | Manzoni                                 | San Giovanni, Vittorio Emanuele                                         |
-    | Vittorio Emanuele                       | Manzoni, Termini                                                        |
-    | Termini                                 | Vittorio Emanuele, Repubblica - Teatro dell'Opera                       |
-    | Repubblica - Teatro dell'Opera          | Termini, Barberini - Fontana di Trevi                                   |
-    | Barberini - Fontana di Trevi            | Repubblica - Teatro dell'Opera, Spagna                                  |
-    | Spagna                                  | Barberini - Fontana di Trevi, Flaminio - Piazza del Popolo              |
-    | Flaminio - Piazza del Popolo            | Spagna, Lepanto                                                         |
-    | Lepanto                                 | Flaminio - Piazza del Popolo, Ottaviano - San Pietro - Musei Vaticani   |
-    | Ottaviano - San Pietro - Musei Vaticani | Lepanto, Cipro                                                          |
-    | Cipro                                   | Ottaviano San Pietro - Musei Vaticani, Valle Aurelia                    |
-    | Valle Aurelia                           | Cipro, Baldo degli Ubaldi                                               |
-    | Baldo degli Ubaldi                      | Valle Aurelia, Cornelia                                                 |
-    | Cornelia                                | Baldo degli Ubaldi, Battistini                                          |
-    | Battistini                              | Cornelia                                                                |
-    +-----------------------------------------+-------------------------------------------------------------------------+
+    .-----------------------------------------------------------------------------------------------------------------------.
+    | Station Name                             | Connected To                                                               |
+    +------------------------------------------+----------------------------------------------------------------------------+
+    | Anagnina                                 | Cinecittà                                                                  |
+    | Cinecittà                                | Anagnina, Subaugusta                                                       |
+    | Subaugusta                               | Cinecittà, Giulio Agricola - Parco degli Acquedotti                        |
+    | Giulio Agricola - Parco degli Acquedotti | Subaugusta, Lucio Sestio                                                   |
+    | Lucio Sestio                             | Giulio Agricola - Parco degli Acquedotti, Numidio Quadrato                 |
+    | Numidio Quadrato                         | Lucio Sestio, Porta Furba Quadraro                                         |
+    | Porta Furba Quadraro                     | Numidio Quadrato, Arco di Travertino                                       |
+    | Arco di Travertino                       | Porta Furba Quadraro, Colli Albani - Parco Appia Antica                    |
+    | Colli Albani - Parco Appia Antica        | Arco di Travertino, Furio Camillo                                          |
+    | Furio Camillo                            | Colli Albani - Parco Appia Antica, Ponte Lungo                             |
+    | Ponte Lungo                              | Furio Camillo, Re di Roma                                                  |
+    | Re di Roma                               | Ponte Lungo, San Giovanni                                                  |
+    | San Giovanni                             | Re di Roma, Manzoni, Lodi                                                  |
+    | Manzoni                                  | San Giovanni, Vittorio Emanuele                                            |
+    | Vittorio Emanuele                        | Manzoni, Termini                                                           |
+    | Termini                                  | Vittorio Emanuele, Repubblica - Teatro dell'Opera, Castro Pretorio, Cavour |
+    | Repubblica - Teatro dell'Opera           | Termini, Barberini - Fontana di Trevi                                      |
+    | Barberini - Fontana di Trevi             | Repubblica - Teatro dell'Opera, Spagna                                     |
+    | Spagna                                   | Barberini - Fontana di Trevi, Flaminio - Piazza del Popolo                 |
+    | Flaminio - Piazza del Popolo             | Spagna, Lepanto                                                            |
+    | Lepanto                                  | Flaminio - Piazza del Popolo, Ottaviano - San Pietro - Musei Vaticani      |
+    | Ottaviano - San Pietro - Musei Vaticani  | Lepanto, Cipro                                                             |
+    | Cipro                                    | Ottaviano - San Pietro - Musei Vaticani, Valle Aurelia                     |
+    | Valle Aurelia                            | Cipro, Baldo degli Ubaldi                                                  |
+    | Baldo degli Ubaldi                       | Valle Aurelia, Cornelia                                                    |
+    | Cornelia                                 | Baldo degli Ubaldi, Battistini                                             |
+    | Battistini                               | Cornelia                                                                   |
+    '------------------------------------------+----------------------------------------------------------------------------'
 
 =head1 NOTE
 
@@ -96,7 +96,7 @@ Giuseppe Di Terlizzi <gdt@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Giuseppe Di Terlizzi <gdt@cpan.org>.
+This software is copyright (c) 2024-2025 by Giuseppe Di Terlizzi <gdt@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

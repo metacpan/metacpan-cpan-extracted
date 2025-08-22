@@ -13,6 +13,9 @@ This document describes the API endpoint at C</assistants/{assistant_id}>.
 
 =head2 C<DELETE /assistants/{assistant_id}>
 
+Delete assistant
+
+
 Delete an assistant.
 
 
@@ -58,6 +61,9 @@ Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-
 =back
 
 =head2 C<GET /assistants/{assistant_id}>
+
+Retrieve assistant
+
 
 Retrieves an assistant.
 
@@ -123,6 +129,9 @@ Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-
 
 =head2 C<POST /assistants/{assistant_id}>
 
+Modify assistant
+
+
 Modifies an assistant.
 
 
@@ -160,6 +169,18 @@ ID of the model to use. You can use the L<List models|https://platform.openai.co
 
 =over 4
       
+=item * C<gpt-5>
+
+=item * C<gpt-5-mini>
+
+=item * C<gpt-5-nano>
+
+=item * C<gpt-5-2025-08-07>
+
+=item * C<gpt-5-mini-2025-08-07>
+
+=item * C<gpt-5-nano-2025-08-07>
+
 =item * C<gpt-4.1>
 
 =item * C<gpt-4.1-mini>

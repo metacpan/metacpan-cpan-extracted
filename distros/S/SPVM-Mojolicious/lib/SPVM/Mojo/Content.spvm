@@ -27,7 +27,9 @@ class Mojo::Content extends Mojo::EventEmitter {
   
   has headers : rw Mojo::Headers
     get {
-      $self->{headers} //= Mojo::Headers->new;
+      unless (exists $self->{headers}) {
+        $self->{headers} = Mojo::Headers->new;
+      }
       
       return $self->{headers};
     }
@@ -35,12 +37,8 @@ class Mojo::Content extends Mojo::EventEmitter {
   
   has max_buffer_size : rw int
     get {
-      unless ($self->{max_buffer_size} > -1) {
-        $self->{max_buffer_size} = length (my $_ = Sys->env("SPVM_MOJO_MAX_BUFFER_SIZE")) ? (int)$_ : -1;
-        
-        unless ($self->{max_buffer_size} > -1) {
-          $self->{max_buffer_size} = 262144;
-        }
+      unless (exists $self->{max_buffer_size}) {
+        $self->{max_buffer_size} = length (my $_ = Sys->env("SPVM_MOJO_MAX_BUFFER_SIZE")) ? (int)$_ : 262144;
       }
       
       return $self->{max_buffer_size};
@@ -49,12 +47,8 @@ class Mojo::Content extends Mojo::EventEmitter {
   
   has max_leftover_size : rw int
     get {
-      unless ($self->{max_leftover_size} > -1) {
-        $self->{max_leftover_size} = length (my $_ = Sys->env("SPVM_MOJO_MAX_BUFFER_SIZE")) ? (int)$_ : -1;
-        
-        unless ($self->{max_leftover_size} > -1) {
-          $self->{max_leftover_size} = 262144;
-        }
+      unless (exists $self->{max_leftover_size}) {
+        $self->{max_leftover_size} = length (my $_ = Sys->env("SPVM_MOJO_MAX_BUFFER_SIZE")) ? (int)$_ : 262144;
       }
       
       return $self->{max_leftover_size};

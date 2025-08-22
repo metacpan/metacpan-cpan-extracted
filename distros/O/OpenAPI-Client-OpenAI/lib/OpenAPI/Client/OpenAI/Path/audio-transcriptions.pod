@@ -13,6 +13,9 @@ This document describes the API endpoint at C</audio/transcriptions>.
 
 =head2 C<POST /audio/transcriptions>
 
+Create transcription
+
+
 Transcribes audio into the input language.
 
 
@@ -56,11 +59,11 @@ ID of the model to use. The options are C<gpt-4o-transcribe>, C<gpt-4o-mini-tran
 Example:
 
     {
-       "include[]" : [
+       "include" : [
           null
        ],
        "model" : "gpt-4o-transcribe",
-       "timestamp_granularities[]" : [
+       "timestamp_granularities" : [
           null
        ]
     }

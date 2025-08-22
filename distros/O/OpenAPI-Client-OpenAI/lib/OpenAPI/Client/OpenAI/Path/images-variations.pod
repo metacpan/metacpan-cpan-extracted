@@ -13,6 +13,9 @@ This document describes the API endpoint at C</images/variations>.
 
 =head2 C<POST /images/variations>
 
+Create image variation
+
+
 Creates a variation of a given image. This endpoint only supports C<dall-e-2>.
 
 
@@ -52,7 +55,6 @@ The model to use for image generation. Only C<dall-e-2> is supported at this tim
 Example:
 
     {
-       "model" : "dall-e-2",
        "n" : 1,
        "response_format" : "url",
        "size" : "1024x1024",

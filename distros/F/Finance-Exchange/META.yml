@@ -36,7 +36,7 @@ no_index:
 provides:
   Finance::Exchange:
     file: lib/Finance/Exchange.pm
-    version: '0.03'
+    version: '0.04'
 requires:
   Clone: '0'
   File::ShareDir: '0'
@@ -47,9 +47,10 @@ resources:
   bugtracker: https://github.com/deriv-com/perl-Finance-Exchange/issues
   homepage: https://github.com/deriv-com/perl-Finance-Exchange
   repository: https://github.com/deriv-com/perl-Finance-Exchange.git
-version: '0.03'
+version: '0.04'
 x_authority: cpan:DERIV
 x_contributors:
+  - 'Hafiz <hafiz@regentmarkets.com>'
   - 'Jun Bon <junbon@binary.com>'
   - 'Md Masud Rana <masud@regentmarkets.com>'
   - 'Jean-Yves Sireau <jy@binary.com>'
@@ -57,11 +58,12 @@ x_contributors:
   - 'Tom Molesworth <tom@binary.com>'
   - 'Yng Shan <yngshan@binary.com>'
   - 'evgeny-deriv <86405841+evgeny-deriv@users.noreply.github.com>'
-  - 'chylli-binary <52912308+chylli-binary@users.noreply.github.com>'
-  - 'chylli-deriv <chylli@deriv.com>'
   - 'mukesh-deriv <85932084+mukesh-deriv@users.noreply.github.com>'
+  - 'chylli-binary <52912308+chylli-binary@users.noreply.github.com>'
   - 'Arun Venkataraman <arun@regentmarkets.com>'
+  - 'Hafiz <142492342+hafiz-deriv@users.noreply.github.com>'
   - 'Hossein Shahsahebi <67314444+hossein-binary@users.noreply.github.com>'
+  - 'LQ <qiangliu@deriv.com>'
   - 'Raunak Kathuria <raunakkathuria@gmail.com>'
   - 'stanly-binary <stanly@binary.com>'
 x_generated_by_perl: v5.26.2

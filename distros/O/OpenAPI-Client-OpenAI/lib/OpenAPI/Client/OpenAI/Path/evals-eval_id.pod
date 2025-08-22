@@ -13,6 +13,9 @@ This document describes the API endpoint at C</evals/{eval_id}>.
 
 =head2 C<DELETE /evals/{eval_id}>
 
+Delete an eval
+
+
 Delete an evaluation.
 
 
@@ -81,6 +84,9 @@ Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-
 =back
 
 =head2 C<GET /evals/{eval_id}>
+
+Get an eval
+
 
 Get an evaluation by ID.
 
@@ -156,6 +162,9 @@ Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-
 =back
 
 =head2 C<POST /evals/{eval_id}>
+
+Update an eval
+
 
 Update certain properties of an evaluation.
 

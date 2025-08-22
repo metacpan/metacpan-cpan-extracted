@@ -13,6 +13,9 @@ This document describes the API endpoint at C</organization/projects/{project_id
 
 =head2 C<DELETE /organization/projects/{project_id}/api_keys/{key_id}>
 
+Delete project API key
+
+
 Deletes an API key from the project.
 
 
@@ -85,6 +88,9 @@ Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-
 =back
 
 =head2 C<GET /organization/projects/{project_id}/api_keys/{key_id}>
+
+Retrieve project API key
+
 
 Retrieves an API key in the project.
 

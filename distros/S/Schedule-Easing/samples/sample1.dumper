@@ -1,0 +1,27 @@
+[
+	{
+		name=>'Invalid type errors',
+		type=>'numeric',
+		match=>qr/ERROR invalid type.*line (?<value>\d+)/,
+		begin=>0.00,
+		final=>1.00,
+		tsA=>1755487800,
+		tsB=>1755489160,
+		ymin=>0,
+		ymax=>500,
+	},
+	{
+		name=>'Logging failure',
+		type=>'md5',
+		match=>qr/ERROR logging failure for order (?<digest>\d+)/,
+		begin=>0.00,
+		final=>1.00,
+		tsA=>1755487800,
+		tsB=>1755489160,
+	},
+	{
+		name=>'Ignore stock messages',
+		type=>'block',
+		match=>qr/(.*(?:INFO|WARNING) stock.*)/,
+	},
+]

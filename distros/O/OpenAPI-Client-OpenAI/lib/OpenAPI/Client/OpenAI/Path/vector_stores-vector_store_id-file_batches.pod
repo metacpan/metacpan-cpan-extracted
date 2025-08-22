@@ -13,6 +13,9 @@ This document describes the API endpoint at C</vector_stores/{vector_store_id}/f
 
 =head2 C<POST /vector_stores/{vector_store_id}/file_batches>
 
+Create vector store file batch
+
+
 Create a vector store file batch.
 
 

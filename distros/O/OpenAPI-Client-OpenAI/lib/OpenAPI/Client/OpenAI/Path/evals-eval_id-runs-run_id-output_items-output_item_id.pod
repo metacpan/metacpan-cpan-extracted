@@ -13,6 +13,9 @@ This document describes the API endpoint at C</evals/{eval_id}/runs/{run_id}/out
 
 =head2 C<GET /evals/{eval_id}/runs/{run_id}/output_items/{output_item_id}>
 
+Get an output item of an eval run
+
+
 Get an evaluation run output item by ID.
 
 

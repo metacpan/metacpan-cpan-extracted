@@ -13,6 +13,9 @@ This document describes the API endpoint at C</threads/{thread_id}/messages>.
 
 =head2 C<GET /threads/{thread_id}/messages>
 
+List messages
+
+
 Returns a list of messages for a given thread.
 
 
@@ -27,7 +30,7 @@ C<listMessages>
 
 =over 4
 
-=item * C<thread_id> (in path) (Required) - The ID of the [thread](/docs/api-reference/threads) the messages belong to.
+=item * C<thread_id> (in path) (Required) - The ID of the [thread](https://platform.openai.com/docs/api-reference/threads) the messages belong to.
 
 Type: C<string>
 
@@ -109,6 +112,9 @@ Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-
 
 =head2 C<POST /threads/{thread_id}/messages>
 
+Create message
+
+
 Create a message.
 
 
@@ -123,7 +129,7 @@ C<createMessage>
 
 =over 4
 
-=item * C<thread_id> (in path) (Required) - The ID of the [thread](/docs/api-reference/threads) to create a message for.
+=item * C<thread_id> (in path) (Required) - The ID of the [thread](https://platform.openai.com/docs/api-reference/threads) to create a message for.
 
 Type: C<string>
 

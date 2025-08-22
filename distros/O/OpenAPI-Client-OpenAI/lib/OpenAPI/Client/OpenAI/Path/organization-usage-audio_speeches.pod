@@ -13,6 +13,9 @@ This document describes the API endpoint at C</organization/usage/audio_speeches
 
 =head2 C<GET /organization/usage/audio_speeches>
 
+Audio speeches
+
+
 Get audio speeches usage details for the organization.
 
 

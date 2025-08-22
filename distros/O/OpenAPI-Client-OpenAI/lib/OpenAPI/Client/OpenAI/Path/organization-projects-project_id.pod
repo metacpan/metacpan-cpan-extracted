@@ -13,6 +13,9 @@ This document describes the API endpoint at C</organization/projects/{project_id
 
 =head2 C<GET /organization/projects/{project_id}>
 
+Retrieve project
+
+
 Retrieves a project.
 
 
@@ -66,6 +69,9 @@ Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-
 =back
 
 =head2 C<POST /organization/projects/{project_id}>
+
+Modify project
+
 
 Modifies a project in the organization.
 

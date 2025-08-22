@@ -1,5 +1,14 @@
 Revision history for Perl module MathML::Entities
 
+0.19 Thu Aug 21 23:46:00 2025
+    - Fix whiffed build
+
+0.18 Thu Aug 21 21:46:00 2025
+    - Bring up-to-date with
+      XML Entity definitions for Characters (3rd Edition)
+      (W3C Recommendation 7 March 2023_
+      https://www.w3.org/TR/xml-entity-names/
+
 0.17 Wed Nov 18 01:55:00 2009
     - Bring up-to-date with
       XML Entity definitions for Characters

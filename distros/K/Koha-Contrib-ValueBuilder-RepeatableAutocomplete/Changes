@@ -1,5 +1,12 @@
 Changes for Koha::Contrib::ValueBuilder::RepeatableAutocomplete
 
+1.005     2025-08-21 15:16:29+02:00
+
+    - show a JS alert if there is no free target subfield
+    - rework RDA data structure
+    - show an addon label
+
+
 1.004     2023-06-05 12:08:06+02:00
     - add more RDA Creator / Other Agent values from
       https://wiki.dnb.de/download/attachments/106042227/AH-017.pdf

@@ -9,7 +9,7 @@ class Mojo::Content::MultiPart extends Mojo::Content {
   use Mojo::Content::Single;
   
   # Fields
-  has parts : Mojo::Content[];
+  has parts : rw Mojo::Content[];
   
   # Undocumented Fields
   has last_len : int;

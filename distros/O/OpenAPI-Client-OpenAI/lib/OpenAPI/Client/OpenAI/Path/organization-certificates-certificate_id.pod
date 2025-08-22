@@ -13,6 +13,9 @@ This document describes the API endpoint at C</organization/certificates/{certif
 
 =head2 C<DELETE /organization/certificates/{certificate_id}>
 
+Delete certificate
+
+
 Delete a certificate from the organization.
 
 The certificate must be inactive for the organization and all projects.
@@ -54,6 +57,9 @@ Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-
 =back
 
 =head2 C<GET /organization/certificates/{certificate_id}>
+
+Get certificate
+
 
 Get a certificate that has been uploaded to the organization.
 
@@ -119,6 +125,9 @@ Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-
 =back
 
 =head2 C<POST /organization/certificates/{certificate_id}>
+
+Modify certificate
+
 
 Modify a certificate. Note that only the name can be modified.
 

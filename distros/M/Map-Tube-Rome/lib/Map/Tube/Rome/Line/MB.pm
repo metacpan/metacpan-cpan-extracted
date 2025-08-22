@@ -15,36 +15,36 @@ Map::Tube::Rome::Line::MB - Rome Subway Map: Linea B.
 
 Rome Subway Map: Linea B
 
-    +---------------------------+---------------------------------------------------+
-    | Station Name              | Connected To                                      |
-    +---------------------------+---------------------------------------------------+
-    | Rebibbia                  | Ponte Mammolo                                     |
-    | Ponte Mammolo             | Santa Maria del Soccorso, Rebibbia                |
-    | Santa Maria del Soccorso  | Ponte Mammolo, Pietralata                         |
-    | Pietralata                | Santa Maria del Soccorso, Monti Tiburtini         |
-    | Monti Tiburtini           | Pietralata, Quintiliani                           |
-    | Quintiliani               | Monti Tiburtini, Tiburtina                        |
-    | Tiburtina                 | Quintiliani, Bologna                              |
-    | Bologna                   | Policlinico, Tiburtina, Sant'Agnese/Annibaliano   |
-    | Policlinico               | Castro Pretorio, Bologna                          |
-    | Castro Pretorio           | Termini, Policlinico                              |
-    | Jonio                     | Conca d'Oro                                       |
-    | Conca d'Oro               | Jonio, Libia                                      |
-    | Libia                     | Conca d'Oro, Sant'Agnese/Annibaliano              |
-    | Sant'Agnese/Annibaliano   | Libia, Bologna                                    |
-    | Termini                   | Castro Pretorio, Cavour                           |
-    | Cavour                    | Termini, Colosseo                                 |
-    | Colosseo                  | Cavour, Circo Massimo                             |
-    | Circo Massimo             | Colosseo, Piramide                                |
-    | Piramide                  | Circo Massimo, Garbatella                         |
-    | Garbatella                | Piramide, Basilica San Paolo                      |
-    | Basilica San Paolo        | Garbatella, Marconi                               |
-    | Marconi                   | Basilica San Paolo, EUR Magliana                  |
-    | EUR Magliana              | Marconi, EUR Palasport                            |
-    | EUR Palasport             | EUR Magliana, EUR Fermi                           |
-    | EUR Fermi                 | EUR Palasport, Laurentina                         |
-    | Laurentina                | EUR Fermi                                         |
-    +---------------------------+---------------------------------------------------+
+    .-------------------------------------------------------------------------------------------------------.
+    | Station Name             | Connected To                                                               |
+    +--------------------------+----------------------------------------------------------------------------+
+    | Rebibbia                 | Ponte Mammolo                                                              |
+    | Ponte Mammolo            | Santa Maria del Soccorso, Rebibbia                                         |
+    | Santa Maria del Soccorso | Ponte Mammolo, Pietralata                                                  |
+    | Pietralata               | Santa Maria del Soccorso, Monti Tiburtini                                  |
+    | Monti Tiburtini          | Pietralata, Quintiliani                                                    |
+    | Quintiliani              | Monti Tiburtini, Tiburtina                                                 |
+    | Tiburtina                | Quintiliani, Bologna                                                       |
+    | Bologna                  | Policlinico, Tiburtina, Sant'Agnese/Annibaliano                            |
+    | Policlinico              | Castro Pretorio, Bologna                                                   |
+    | Castro Pretorio          | Termini, Policlinico                                                       |
+    | Jonio                    | Conca d'Oro                                                                |
+    | Conca d'Oro              | Jonio, Libia                                                               |
+    | Libia                    | Conca d'Oro, Sant'Agnese/Annibaliano                                       |
+    | Sant'Agnese/Annibaliano  | Libia, Bologna                                                             |
+    | Termini                  | Vittorio Emanuele, Repubblica - Teatro dell'Opera, Castro Pretorio, Cavour |
+    | Cavour                   | Termini, Colosseo                                                          |
+    | Colosseo                 | Cavour, Circo Massimo                                                      |
+    | Circo Massimo            | Colosseo, Piramide                                                         |
+    | Piramide                 | Circo Massimo, Garbatella                                                  |
+    | Garbatella               | Piramide, Basilica San Paolo                                               |
+    | Basilica San Paolo       | Garbatella, Marconi                                                        |
+    | Marconi                  | Basilica San Paolo, EUR Magliana                                           |
+    | EUR Magliana             | Marconi, EUR Palasport                                                     |
+    | EUR Palasport            | EUR Magliana, EUR Fermi                                                    |
+    | EUR Fermi                | EUR Palasport, Laurentina                                                  |
+    | Laurentina               | EUR Fermi                                                                  |
+    '--------------------------+----------------------------------------------------------------------------'
 
 =head1 NOTE
 
@@ -92,7 +92,7 @@ Giuseppe Di Terlizzi <gdt@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Giuseppe Di Terlizzi <gdt@cpan.org>.
+This software is copyright (c) 2024-2025 by Giuseppe Di Terlizzi <gdt@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

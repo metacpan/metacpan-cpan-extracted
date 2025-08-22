@@ -69,24 +69,20 @@ sub handle_response
     my $index = PLS::Parser::Index->new();
     my @inc;
 
-    # Replace $ROOT_PATH with actual workspace paths in inc
     if (exists $config->{inc} and ref $config->{inc} eq 'ARRAY')
     {
         foreach my $inc (@{$config->{inc}})
         {
-            foreach my $folder (@{$index->workspace_folders})
-            {
-                my $interpolated = $inc =~ s/\$ROOT_PATH/$folder/gr;
-                push @inc, $interpolated;
-            }
-        } ## end foreach my $inc (@{$config->...})
+            push @inc, PLS::Util::resolve_workspace_relative_path($inc, $index->workspace_folders, 1);
+        }
 
-        $config->{inc} = [List::Util::uniq sort @inc];
+        $config->{inc} = [List::Util::uniq @inc];
     } ## end if (exists $config->{inc...})
 
     if (exists $config->{syntax}{perl} and length $config->{syntax}{perl})
     {
-        PLS::Parser::Pod->set_perl_exe($config->{syntax}{perl});
+        my ($perl) = glob $config->{syntax}{perl};
+        PLS::Parser::Pod->set_perl_exe($perl);
     }
 
     if (exists $config->{syntax}{args} and ref $config->{syntax}{args} eq 'ARRAY' and scalar @{$config->{syntax}{args}})

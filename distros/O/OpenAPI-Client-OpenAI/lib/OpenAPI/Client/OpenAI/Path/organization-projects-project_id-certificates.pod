@@ -13,6 +13,9 @@ This document describes the API endpoint at C</organization/projects/{project_id
 
 =head2 C<GET /organization/projects/{project_id}/certificates>
 
+List project certificates
+
+
 List certificates for this project.
 
 

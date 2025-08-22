@@ -13,6 +13,9 @@ This document describes the API endpoint at C</vector_stores/{vector_store_id}/s
 
 =head2 C<POST /vector_stores/{vector_store_id}/search>
 
+Search vector store
+
+
 Search a vector store for relevant chunks based on a query and file attributes filter.
 
 

@@ -1,6 +1,6 @@
 package SPVM::Mojolicious;
 
-our $VERSION = "0.013";
+our $VERSION = "0.014";
 
 1;
 
@@ -25,6 +25,10 @@ Most tests are not written.
 =item * L<Mojo::UserAgent|SPVM::Mojo::UserAgent>
 
 =item * L<Mojo::Asset|SPVM::Mojo::Asset>
+
+=item * L<Mojo::Asset::File|SPVM::Mojo::Asset::File>
+
+=item * L<Mojo::Asset::Memory|SPVM::Mojo::Asset::Memory>
 
 =item * L<Mojo::Cookie|SPVM::Mojo::Cookie>
 
@@ -55,6 +59,14 @@ Most tests are not written.
 =item * L<Mojo::Content::Single|SPVM::Mojo::Content::Single>
 
 =item * L<Mojo::Content::MultiPart|SPVM::Mojo::Content::MultiPart>
+
+=item * L<Mojo::Message|SPVM::Mojo::Message>
+
+=item * L<Mojo::Message::Request|SPVM::Mojo::Message::Request>
+
+=item * L<Mojo::Message::Response|SPVM::Mojo::Message::Response>
+
+=item * L<Mojo::Upload|SPVM::Mojo::Upload>
 
 =back
 

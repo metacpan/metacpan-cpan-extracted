@@ -14,9 +14,10 @@ use strict;
 use warnings FATAL => 'recursion';
 
 use Test::More;
+use Test::Warn;
 
 if (defined $ENV{NOMTAG} and defined $ENV{NOMPASS}) {
-	plan tests => 44;
+	plan tests => 48;
 } else {
 	plan skip_all => 'Cannot connect without NOMTAG and NOMPASS';
 }
@@ -97,6 +98,17 @@ for my $host (@hosts) {
 	is ($res, 0, "Existent host check: $host");
 }
 
+ok ($epp->logout(), 'Logout');
+
+warning_is {
+	$epp = new_ok ('Net::EPP::Registry::Nominet', [ ote => 1,
+		user => $ENV{NOMTAG}, pass => $ENV{NOMPASS},
+		debug => $ENV{DEBUG_TEST} || 0, testssl => 0] )
+	}
+	{carped => 'The testssl parameter is deprecated. ' .
+		'From August 2025 all connections use TLS.'},
+	'Carped about presence of testssl param';
+ok defined ($epp), 'Logged in anyway';
 ok ($epp->logout(), 'Logout');
 
 exit;

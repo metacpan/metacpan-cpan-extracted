@@ -13,10 +13,10 @@ This document describes the API endpoint at C</containers/{container_id}/files/{
 
 =head2 C<DELETE /containers/{container_id}/files/{file_id}>
 
+Delete a container file
+
+
 Delete Container File
-
-
-Delete a container file.
 
 
 
@@ -55,10 +55,10 @@ OK
 
 =head2 C<GET /containers/{container_id}/files/{file_id}>
 
+Retrieve container file
+
+
 Retrieve Container File
-
-
-Retrieves a container file.
 
 
 

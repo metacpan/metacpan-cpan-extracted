@@ -13,6 +13,9 @@ This document describes the API endpoint at C</organization/projects/{project_id
 
 =head2 C<DELETE /organization/projects/{project_id}/users/{user_id}>
 
+Delete project user
+
+
 Deletes a user from the project.
 
 
@@ -86,6 +89,9 @@ Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-
 
 =head2 C<GET /organization/projects/{project_id}/users/{user_id}>
 
+Retrieve project user
+
+
 Retrieves a user in the project.
 
 
@@ -145,6 +151,9 @@ Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-
 =back
 
 =head2 C<POST /organization/projects/{project_id}/users/{user_id}>
+
+Modify project user
+
 
 Modifies a user's role in the project.
 

@@ -1,8 +1,7 @@
-Revision history for Finance::Calendar
+Revision history for Finance-Exchange
 
-0.05      2023-06-26 05:56:22+00:00 UTC
-
-    - Fix bug for next_open_at for markets with late openings
+0.06      2025-08-22 03:56:07+00:00 UTC
+    - Adjusts Sunday opening and Friday closing times for RSI exchanges
 
 0.04      2023-03-12 13:31:25+00:00 UTC
     - add next_open_at

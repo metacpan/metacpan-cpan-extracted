@@ -1,0 +1,73 @@
+=pod
+
+=head1 Planned functionality
+
+=head2 Documentation
+
+Documentation is incomplete.
+
+=head2 Script uses C<Easing::Stream>
+
+Script is currently linewise, but should be updated to leverage C<Easing::Stream>.
+
+=head2 Script timestamps option
+
+C<schedule-easing.pl --timestamps> should work.
+
+=head2 Function support
+
+Functions are available but the configuration does not currently support specifying functions other than Linear for easing.
+
+=head2 Expiration warnings
+
+The C<expired> and C<warnExpired> behaviors may not be consistent.
+
+=head2 Check option
+
+The C<check> option is not supported in C<schedule-easing.pl> nor within the modules.
+
+=head1 Tests
+
+All of the following need tests reviewed:
+
+=over
+
+=item - C<Easing::schedule>, C<Easing::init>
+
+=item - C<Easing::Ease>
+
+=item - C<Easing::Block>
+
+=item - C<Easing::Stream>
+
+=item - MD5 edge cases
+
+=back
+
+=head1 To Review
+
+=head2 C<Schedule::Easing::Stream>, C<alarm()>, and C<clock>
+
+See the comment about the single-use alarm() and how the C<clock> setting overlaps with the timing of batch processing.
+
+=head2 Reducing messages over time
+
+Behavior when C<beginE<gt>final> is undefined/untested.  There may be situations where message reduction is desirable, such as when messages will be removed prior to other cleanup/refactoring/deprecation efforts.
+
+=head2 Item weighting
+
+All line/messages have the same weight.  Message weighting may be a property of content on the line itself, however.  Proposed to collect weights with a regexp, and use a configured total weight for scheduling.  This would be separate than a function, though it may be implemented as a score modification function per line.
+
+=head2 Value gaps
+
+Both MD5 and Numeric can suffer from notable value gaps.  Currently that requires separate configurations.
+
+=head2 Sets
+
+This library isn't really designed for ongoing rotation though I<sets of names>, such as oncall rotations or words, such as the names of the days of the week.  Preselection via modular arithmetic is a much simpler solution.  Additional examples of name-based scheduling are needed before considering this as an easing option.
+
+=head2 Rolling increasing window
+
+Windows of the form 1, 2, 3, ..., followed by "1 and 2", then "2 and 3", ..., then "1 and 2 and 3".  These can likely be achieved with MD5 using multiple digest captures.
+
+=cut

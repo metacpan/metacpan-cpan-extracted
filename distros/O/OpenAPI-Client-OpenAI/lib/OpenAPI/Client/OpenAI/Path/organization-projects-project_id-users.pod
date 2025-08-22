@@ -13,6 +13,9 @@ This document describes the API endpoint at C</organization/projects/{project_id
 
 =head2 C<GET /organization/projects/{project_id}/users>
 
+List project users
+
+
 Returns a list of users in the project.
 
 
@@ -100,6 +103,9 @@ Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-
 =back
 
 =head2 C<POST /organization/projects/{project_id}/users>
+
+Create project user
+
 
 Adds a user to the project. Users must already be members of the organization to be added to a project.
 

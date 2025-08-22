@@ -13,6 +13,9 @@ This document describes the API endpoint at C</responses>.
 
 =head2 C<POST /responses>
 
+Create a model response
+
+
 Creates a model response. Provide L<text|https://platform.openai.com/docs/guides/text> or
 L<image|https://platform.openai.com/docs/guides/images> inputs to generate L<text|https://platform.openai.com/docs/guides/text>
 or L<JSON|https://platform.openai.com/docs/guides/structured-outputs> outputs. Have the model call
@@ -62,62 +65,6 @@ OK
 
 Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
 
-    {
-       "created_at" : 1741476777,
-       "error" : null,
-       "id" : "resp_67ccd3a9da748190baa7f1570fe91ac604becb25c45c1d41",
-       "incomplete_details" : null,
-       "instructions" : null,
-       "max_output_tokens" : null,
-       "metadata" : {},
-       "model" : "gpt-4o-2024-08-06",
-       "object" : "response",
-       "output" : [
-          {
-             "content" : [
-                {
-                   "annotations" : [],
-                   "text" : "The image depicts a scenic landscape with a wooden boardwalk or pathway leading through lush, green grass under a blue sky with some clouds. The setting suggests a peaceful natural area, possibly a park or nature reserve. There are trees and shrubs in the background.",
-                   "type" : "output_text"
-                }
-             ],
-             "id" : "msg_67ccd3acc8d48190a77525dc6de64b4104becb25c45c1d41",
-             "role" : "assistant",
-             "status" : "completed",
-             "type" : "message"
-          }
-       ],
-       "parallel_tool_calls" : true,
-       "previous_response_id" : null,
-       "reasoning" : {
-          "effort" : null,
-          "summary" : null
-       },
-       "status" : "completed",
-       "store" : true,
-       "temperature" : 1,
-       "text" : {
-          "format" : {
-             "type" : "text"
-          }
-       },
-       "tool_choice" : "auto",
-       "tools" : [],
-       "top_p" : 1,
-       "truncation" : "disabled",
-       "usage" : {
-          "input_tokens" : 328,
-          "input_tokens_details" : {
-             "cached_tokens" : 0
-          },
-          "output_tokens" : 52,
-          "output_tokens_details" : {
-             "reasoning_tokens" : 0
-          },
-          "total_tokens" : 380
-       },
-       "user" : null
-    }
 
 
 

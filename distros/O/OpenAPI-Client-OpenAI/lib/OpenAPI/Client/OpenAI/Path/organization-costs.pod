@@ -13,6 +13,9 @@ This document describes the API endpoint at C</organization/costs>.
 
 =head2 C<GET /organization/costs>
 
+Costs
+
+
 Get costs details for the organization.
 
 

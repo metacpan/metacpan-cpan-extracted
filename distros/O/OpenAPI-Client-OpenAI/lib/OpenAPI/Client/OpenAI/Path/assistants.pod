@@ -13,6 +13,9 @@ This document describes the API endpoint at C</assistants>.
 
 =head2 C<GET /assistants>
 
+List assistants
+
+
 Returns a list of assistants.
 
 
@@ -140,6 +143,9 @@ Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-
 
 =head2 C<POST /assistants>
 
+Create assistant
+
+
 Create an assistant with a model and instructions.
 
 
@@ -171,6 +177,18 @@ ID of the model to use. You can use the L<List models|https://platform.openai.co
 
 =over 4
       
+=item * C<gpt-5>
+
+=item * C<gpt-5-mini>
+
+=item * C<gpt-5-nano>
+
+=item * C<gpt-5-2025-08-07>
+
+=item * C<gpt-5-mini-2025-08-07>
+
+=item * C<gpt-5-nano-2025-08-07>
+
 =item * C<gpt-4.1>
 
 =item * C<gpt-4.1-mini>

@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 use strict;
 use warnings;
@@ -7,6 +7,7 @@ use File::Which qw(which);
 use File::Copy;
 use File::Basename qw(dirname);
 use Data::Dumper;
+use Getopt::Long;
 
 ########################################################################
 sub create_modulino_name {
@@ -21,8 +22,51 @@ sub create_modulino_name {
 }
 
 ########################################################################
+sub usage {
+########################################################################
+  print <<'END_OF_USAGE';
+usage: create-modulino.pl options
+
+Options
+-------
+-h, --help     help
+-m, --module   module name
+-b, --bindir   executable directory
+-d, --destdir  optional prefix for installation
+-a, --alias    alias or symbolic link name
+
+Example:
+
+ create-modulino.pl -b /usr/local/bin -a find-requires -m Module::ScanDeps::FindRequires
+
+END_OF_USAGE
+
+  return 0;
+}
+
+########################################################################
 sub main {
 ########################################################################
+  my @option_specs = qw(
+    bindir=s
+    destdir=s
+    alias=s
+    module=s
+    help
+  );
+
+  my %options;
+
+  GetOptions( \%options, @option_specs );
+
+  my $module = $options{module};
+
+  if ( $options{help} ) {
+    exit usage();
+  }
+
+  die "--module is a require option\n"
+    if !$module;
 
   my $path = which 'modulino';
 
@@ -31,22 +75,25 @@ sub main {
 
   my $executable_path = dirname $path;
 
-  my $modulino_name = create_modulino_name( shift @ARGV );
+  my $bindir = $options{bindir} // $executable_path;
 
-  if ( -e "$path/$modulino_name" ) {
-    unlink "$path/$modulino_name";
+  my $destdir = $options{destdir} // q{};
+
+  my $alias = $options{alias};
+
+  my $modulino_name = create_modulino_name( $options{module} );
+  my $modulino_path = sprintf '%s%s/%s', $destdir, $bindir, $modulino_name;
+
+  if ( -e "$modulino_path" ) {
+    unlink "$modulino_path";
   }
 
-  print {*STDERR} Dumper( [ path => $path, modulino => "$path/$modulino_name" ] );
+  copy( $path, "$modulino_path" );
 
-  copy( $path, "$executable_path/$modulino_name" );
+  chmod oct('0755'), "$modulino_path";
 
-  chmod oct('0755'), "$executable_path/$modulino_name";
-
-  my $link_name = shift @ARGV;
-
-  if ($link_name) {
-    symlink "$executable_path/$modulino_name", "$executable_path/$link_name";
+  if ($alias) {
+    symlink "$modulino_path", "$destdir$bindir/$alias";
   }
 
   return 0;

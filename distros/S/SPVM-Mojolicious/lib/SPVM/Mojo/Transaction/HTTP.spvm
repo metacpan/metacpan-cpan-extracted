@@ -206,9 +206,7 @@ class Mojo::Transaction::HTTP extends Mojo::Transaction {
     
     my $req = $self->req;
     
-    unless ($req->error) {
-      $req->parse($chunk);
-    }
+    $req->parse($chunk);
     
     if ($req->is_finished && !$self->{handled}++) {
       $self->emit("request");

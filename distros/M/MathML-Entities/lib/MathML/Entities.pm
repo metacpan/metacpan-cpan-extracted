@@ -1,10 +1,10 @@
 # MathML::Entitities
 #
-# Copyright, Jacques Distler 2005-2009.
+# Copyright, Jacques Distler 2005-2025.
 # All Rights Reserved.
 # Licensed under the Perl Artistic License.
 #
-# Version: 0.17
+# Version: 0.19
 
 package MathML::Entities;
 
@@ -13,7 +13,7 @@ require Exporter;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw( name2numbered name2utf8 );
-our $VERSION = '0.17';
+our $VERSION = '0.19';
 
 our %ENTITIES = (
 	'Alpha' => '&#x0391;',
@@ -1892,7 +1892,7 @@ our %ENTITIES = (
 	'NotExists' => '&#x02204;',
 	'NotGreater' => '&#x0226F;',
 	'NotGreaterEqual' => '&#x02271;',
-	'NotGreaterFullEqual' => '&#x02266;&#x00338;',
+	'NotGreaterFullEqual' => '&#x02267;&#x00338;',
 	'NotGreaterGreater' => '&#x0226B;&#x00338;',
 	'NotGreaterLess' => '&#x02279;',
 	'NotGreaterSlantEqual' => '&#x02A7E;&#x00338;',

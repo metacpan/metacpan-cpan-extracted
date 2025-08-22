@@ -1,0 +1,26 @@
+#!/usr/bin/env perl
+use v5.36.0;
+use lib 'lib';
+use utf8;
+
+binmode *STDOUT, ':encoding(UTF-8)';
+binmode *STDERR, ':encoding(UTF-8)';
+
+use Data::Printer;
+
+use Struct::Dumb;
+
+struct Point => [ qw( x y ) ];
+
+struct Point3D => [qw( x y z )], named_constructor => 1;
+
+my $data = [
+  Point(1, 2),
+  Point3D(x => 10, y => -20, z => "ten"),
+];
+
+sub pp ($label, $value) {
+  p $value, as => $label, caller_message_newline => 0;
+}
+
+pp(data => $data);

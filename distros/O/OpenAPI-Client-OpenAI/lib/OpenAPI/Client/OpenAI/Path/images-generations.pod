@@ -13,6 +13,9 @@ This document describes the API endpoint at C</images/generations>.
 
 =head2 C<POST /images/generations>
 
+Create image
+
+
 Creates an image given a prompt. L<Learn more|https://platform.openai.com/docs/guides/images>.
 
 
@@ -57,15 +60,16 @@ Example:
 
     {
        "background" : "transparent",
-       "model" : "gpt-image-1",
        "moderation" : "low",
        "n" : 1,
        "output_compression" : 100,
        "output_format" : "png",
+       "partial_images" : 1,
        "prompt" : "A cute baby sea otter",
        "quality" : "medium",
        "response_format" : "url",
        "size" : "1024x1024",
+       "stream" : false,
        "style" : "vivid",
        "user" : "user-1234"
     }
@@ -111,6 +115,13 @@ Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-
         }
       }
     }
+
+
+
+=item * C<text/event-stream>
+
+Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+
 
 
 =back

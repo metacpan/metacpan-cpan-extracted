@@ -13,6 +13,9 @@ This document describes the API endpoint at C</fine_tuning/checkpoints/{fine_tun
 
 =head2 C<GET /fine_tuning/checkpoints/{fine_tuned_model_checkpoint}/permissions>
 
+List checkpoint permissions
+
+
 B<NOTE:> This endpoint requires an L<admin API key|../admin-api-keys>.
 
 Organization owners can use this endpoint to view all permissions for a fine-tuned model checkpoint.
@@ -96,6 +99,9 @@ Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-
 =back
 
 =head2 C<POST /fine_tuning/checkpoints/{fine_tuned_model_checkpoint}/permissions>
+
+Create checkpoint permissions
+
 
 B<NOTE:> Calling this endpoint requires an L<admin API key|../admin-api-keys>.
 

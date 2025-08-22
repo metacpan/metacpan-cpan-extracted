@@ -13,6 +13,9 @@ This document describes the API endpoint at C</completions>.
 
 =head2 C<POST /completions>
 
+Create completion
+
+
 Creates a completion for the provided prompt and parameters.
 
 

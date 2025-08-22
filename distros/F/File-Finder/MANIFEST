@@ -4,6 +4,8 @@ lib/File/Finder/Steps.pm
 Makefile.PL
 MANIFEST
 MANIFEST.SKIP
+MYMETA.json
+MYMETA.yml
 README
 t/01-core.t
 t/02-basic-logic.t

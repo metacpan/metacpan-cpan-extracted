@@ -8,7 +8,7 @@ use base qw(Exporter);
 
 ## no exports
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 use Carp qw(croak);
 

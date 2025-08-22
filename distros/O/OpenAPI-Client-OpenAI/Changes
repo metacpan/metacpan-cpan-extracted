@@ -1,5 +1,36 @@
 Revision history for OpenAPI-Client-OpenAI
 
+0.24    2025-08-22
+
+        - Model Updates: Added support for new `gpt-5` series models, including
+        `gpt-5`, `gpt-5-mini`, and `gpt-5-nano`, across various API endpoints like
+        Assistants and Chat Completions.
+        - Conversations API Introduction: A new top-level `/conversations` endpoint has
+        been added to create, retrieve, update, and delete conversations and their
+        items. This provides a new way to manage and persist conversation state. The
+        previous `/embeddings` endpoint has been removed to accommodate this new
+        feature.
+        - Images API Streaming: The Images API now supports streaming for both image
+        generation (`/images/generations`) and editing (`/images/edits`). New
+        parameters such as `input_fidelity` and `partial_images` have also been
+        introduced for more control over image results.
+        - Documentation and Code Examples: Replaced all Kotlin code examples with Java
+        examples across the entire API specification. Endpoint summaries have been
+        standardized for conciseness, with longer explanations moved into the
+        `description` field. Additionally, internal documentation links have been
+        updated to absolute URLs.
+        - File API Enhancements: The organizational file storage limit has been
+        increased to 1 TB. A new `expires_after` parameter allows setting an expiration
+        policy upon file creation.
+        - Responses API Updates: A new `conversation` parameter has been added to
+        manage conversation state more effectively. The `user` parameter is now
+        deprecated in favor of `safety_identifier` and `prompt_cache_key` for better
+        user identification and caching. A `verbosity` parameter has also been added to
+        control response conciseness.
+        - Other API Updates: The Batch API now includes an `output_expires_after`
+        parameter to manage the lifecycle of output files. Many schema definitions have
+        been updated from `oneOf` to the more flexible `anyOf`.
+
 0.23    2025-07-03
         - Version number bump to replace bad PAUSE upload. No functional change.
 
@@ -8,25 +39,25 @@ Revision history for OpenAPI-Client-OpenAI
         - Audio API Updates: The audio text-to-speech model is updated to
           gpt-4o-mini-tts, and the audio transcription model is updated to
           gpt-4o-transcribe, with the addition of a streaming option for the
-          [cite_start]transcription api. [cite: 1]
+          transcription api.
         - Chat Completions Enhancements: Introduces new features for the Chat
           Completions API, including the ability to list, retrieve, update, and delete
-          [cite_start]chat completions. [cite: 1] Support for metadata filtering is added, and the
-          [cite_start]documentation clarifies parameter support across different models. [cite: 1]
+          chat completions.  Support for metadata filtering is added, and the
+          documentation clarifies parameter support across different models. 
         - Realtime API Expansion: Adds a new endpoint for creating realtime
           transcription sessions and incorporates C# examples for both audio generation
-          [cite_start]and transcription. [cite: 1, 19]
+          and transcription.
         - Responses API Improvements:  Significant updates to the Responses
           API, with a focus on enhanced tool usage, including web search and file search,
-          [cite_start]and the ability to stream responses. [cite: 19] The API now also supports including image
-          [cite_start]URLs in the input and provides detailed usage information. [cite: 5, 19]
+          and the ability to stream responses. The API now also supports including image
+          URLs in the input and provides detailed usage information.
         - Fine-tuning API Updates: Introduces new endpoints for managing
           fine-tuning checkpoints and their permissions, enabling organization owners to
-          [cite_start]share and control access to fine-tuned models. [cite: 1, 2] Metadata is now supported for
-          [cite_start]fine-tuning jobs. [cite: 1]
+          share and control access to fine-tuned models. Metadata is now supported for
+          fine-tuning jobs. 
         - Other Updates:  Minor documentation improvements and clarifications
           across various API endpoints and parameters, including updates to model
-          [cite_start]descriptions and available tools. [cite: 1]
+          descriptions and available tools. 
 
 0.21    2025-04-11
         - Added examples to the docs, along with allowed models for each path.

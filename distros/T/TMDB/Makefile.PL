@@ -13,6 +13,7 @@ WriteMakefile
                    'Net::SSLeay' => '1.49',
                    'Object::Tiny' => '1.03',
                    'Params::Validate' => '1.03',
+                   'Test::MockObject' => 0,
                    'Test::More' => 0,
                    'URI::Encode' => '0.05',
                    'version' => 0

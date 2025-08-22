@@ -169,13 +169,40 @@ METHODS - TRADING TIMES RELATED.
  regularly_adjusts_trading_hours_on
 
     Returns a hashref of special-case changes that may apply on specific
-    trading days. Currently, this applies on Fridays only:
+    trading days. Currently, this applies on: - Sundays (for RSI exchanges
+    opening times) - Fridays (for closing times).
 
-      * for forex or metals
+    exchange - a Finance::Exchange instance
 
-    Example:
+    when - a Date::Utility instance
 
-     $calendar->regularly_adjusts_trading_hours_on('FOREX', time);
+    Examples:
+
+        # Friday closing adjustment for FOREX
+        my $changes = $calendar->regularly_adjusts_trading_hours_on(
+            Finance::Exchange->create_exchange('FOREX'),
+            Date::Utility->new('2023-02-17')  # Friday
+        );
+        # Returns a hashref with adjusted closing time on Fridays:
+        # {
+        #     'daily_close' => {
+        #         'to' => '20h55m',
+        #         'rule' => 'Fridays'
+        #     }
+        # }
+    
+        # Sunday opening adjustment for RSI exchanges
+        my $changes = $calendar->regularly_adjusts_trading_hours_on(
+            Finance::Exchange->create_exchange('RSI_FOREX_EURUSD'),
+            Date::Utility->new('2023-02-12')  # Sunday
+        );
+        # Returns a hashref with adjusted opening time on Sundays:
+        # {
+        #     'daily_open' => {
+        #         'to' => '22h35m',
+        #         'rule' => 'Sundays'  # or 'Sundays (DST)' if in DST
+        #     }
+        # }
 
  closes_early_on
 

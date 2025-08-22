@@ -1,3 +1,11 @@
+0.12 2025-08-21
+
+    - Minor documentation fixes
+
+0.11_01 2025-08-19
+
+    - Remove the now obsolete testssl constructor parameter (GL issue #3)
+
 0.11 2024-07-22
 
     - No changes from 0.10_01

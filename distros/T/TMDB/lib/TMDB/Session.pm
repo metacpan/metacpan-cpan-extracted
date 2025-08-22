@@ -21,7 +21,7 @@ use Object::Tiny qw(apikey apiurl lang debug client encoder json);
 #######################
 # VERSION
 #######################
-our $VERSION = '1.2.3';
+our $VERSION = '1.3.0';
 
 #######################
 # PACKAGE VARIABLES
@@ -110,6 +110,8 @@ sub talk {
     # Build Call
     my $url
       = $self->apiurl . '/' . $args->{method} . '?api_key=' . $self->apikey;
+    # add language by default
+    $args->{params}->{language} = $self->lang unless (exists $args->{params}->{language});
     if ( $args->{params} ) {
         foreach
           my $param ( sort { lc $a cmp lc $b } keys %{ $args->{params} } )

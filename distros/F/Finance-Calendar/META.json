@@ -87,25 +87,26 @@
    "provides" : {
       "Finance::Calendar" : {
          "file" : "lib/Finance/Calendar.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/binary-com/perl-Finance-Calendar/issues"
+         "web" : "https://github.com/deriv-com/perl-Finance-Calendar/issues"
       },
-      "homepage" : "https://github.com/binary-com/perl-Finance-Calendar",
+      "homepage" : "https://github.com/deriv-com/perl-Finance-Calendar",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/binary-com/perl-Finance-Calendar.git",
-         "web" : "https://github.com/binary-com/perl-Finance-Calendar"
+         "url" : "https://github.com/deriv-com/perl-Finance-Calendar.git",
+         "web" : "https://github.com/deriv-com/perl-Finance-Calendar"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_authority" : "cpan:DERIV",
    "x_contributors" : [
       "Jun Bon <junbon@binary.com>",
+      "Hafiz <hafiz@regentmarkets.com>",
       "Shahrizal Shaari <shahrizal@binary.com>",
       "Tom Molesworth <tom@binary.com>",
       "Jean-Yves Sireau <jy@binary.com>",
@@ -113,6 +114,7 @@
       "Arash <61218785+arash-binary@users.noreply.github.com>",
       "Arun Venkataraman <arun@regentmarkets.com>",
       "chylli-deriv <52912308+chylli-deriv@users.noreply.github.com>",
+      "mukesh-deriv <85932084+mukesh-deriv@users.noreply.github.com>",
       "qiangliu <52957232+qiangliu-binary@users.noreply.github.com>",
       "Tanvir Faisal <126654333+tanvir-deriv@users.noreply.github.com>",
       "yngshan-binary <yngshan@binary.com>"

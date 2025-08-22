@@ -13,6 +13,9 @@ This document describes the API endpoint at C</audio/translations>.
 
 =head2 C<POST /audio/translations>
 
+Create translation
+
+
 Translates audio into English.
 
 

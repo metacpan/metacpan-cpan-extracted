@@ -67,6 +67,7 @@ WriteMakefile(
     'SPVM::Time::HiRes' => '0.005',
     'SPVM::IO::Socket::SSL' => '0.010',
     'SPVM::Math' => '1.006',
+    'SPVM::Digest::SHA' => '0.065',
   },
   TEST_REQUIRES => {
     

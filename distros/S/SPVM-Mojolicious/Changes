@@ -1,3 +1,9 @@
+0.014 2025-08-22
+  [Requirement Changes]
+    * Require SPVM::Digest::SHA 0.065.
+  [Changes]
+    * Improve Mojo::Message classes.
+    * Improve Mojo::Upload class.
 0.013 2025-08-19
   [Changes]
     * Add Mojo::SSE.

@@ -18,3 +18,4 @@ t/000006-list.t
 t/000007-url.t
 t/000008-images.t
 try.wiki
+CONTRIBUTING.md

@@ -13,6 +13,9 @@ This document describes the API endpoint at C</organization/usage/audio_transcri
 
 =head2 C<GET /organization/usage/audio_transcriptions>
 
+Audio transcriptions
+
+
 Get audio transcriptions usage details for the organization.
 
 

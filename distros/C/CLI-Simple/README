@@ -1,0 +1,13 @@
+See README.md for details on CLI::Simple usage.
+
+To install:
+
+ tar xfvz CLI-Simple-1.0.1.tar.gz
+ cd CLI_Simple-1.0.1
+ perl Makefile.PL
+ make && make test && make install
+
+To report issues:
+
+Visit http://github.com/rlauer6/perl-CLI-Simple/issues
+

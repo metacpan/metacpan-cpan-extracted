@@ -21,6 +21,7 @@ my $builder = Module::Build->new(
     configure_requires => { 'Module::Build' => 0.38 },
     build_requires     => {
         'Test::More' => 0,
+        'Test::MockObject' => 0,
         'version'    => 0,
     },
     requires => {

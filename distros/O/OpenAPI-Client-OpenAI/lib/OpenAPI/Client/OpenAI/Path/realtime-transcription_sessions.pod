@@ -13,6 +13,9 @@ This document describes the API endpoint at C</realtime/transcription_sessions>.
 
 =head2 C<POST /realtime/transcription_sessions>
 
+Create transcription session
+
+
 Create an ephemeral API token for use in client-side applications with the
 Realtime API specifically for realtime transcriptions. 
 Can be configured with the same session parameters as the C<transcription_session.update> client event.

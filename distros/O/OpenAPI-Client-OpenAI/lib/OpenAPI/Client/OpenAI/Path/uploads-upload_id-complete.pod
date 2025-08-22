@@ -13,6 +13,9 @@ This document describes the API endpoint at C</uploads/{upload_id}/complete>.
 
 =head2 C<POST /uploads/{upload_id}/complete>
 
+Complete upload
+
+
 Completes the L<Upload|https://platform.openai.com/docs/api-reference/uploads/object>. 
 
 Within the returned Upload object, there is a nested L<File|https://platform.openai.com/docs/api-reference/files/object> object that is ready to use in the rest of the platform.

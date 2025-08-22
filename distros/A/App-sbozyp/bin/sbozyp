@@ -6,7 +6,7 @@ use v5.34.0; # The Perl version on Slackware 15.0 (sbozyp's min supported versio
 
 package Sbozyp;
 
-our $VERSION = '0.2.2';
+our $VERSION = '0.3.2';
 
 use File::Basename qw(basename dirname);
 use File::Temp;
@@ -21,7 +21,6 @@ $SIG{INT} = sub { die "\nsbozyp: got a SIGINT ... going down!\n" };
 our %CONFIG = (
     # defaults
     TMPDIR => '/tmp',
-    CLEANUP => 1,
     REPO_ROOT => '/var/lib/sbozyp/SBo',
     #REPO_NAME => REPO_PRIMARY
 );
@@ -48,6 +47,7 @@ sub main {
     my $cmd_main;
     if    ($cmd =~ /^(?:--help|-h)$/)    { print $help_msg      ; return        }
     elsif ($cmd =~ /^(?:--version|-V)$/) { print $VERSION, "\n" ; return        }
+    elsif ($cmd =~ /^(?:build|bu)$/)     { $cmd_main = \&build_command_main     }
     elsif ($cmd =~ /^(?:install|in)$/)   { $cmd_main = \&install_command_main   }
     elsif ($cmd =~ /^(?:null|nu)$/)      { $cmd_main = \&null_command_main      }
     elsif ($cmd =~ /^(?:query|qr)$/)     { $cmd_main = \&query_command_main     }
@@ -74,6 +74,46 @@ sub main {
             #                     COMMANDS                     #
             ####################################################
 
+sub build_command_main {
+    my $usage = command_usage('build');
+    my $help_msg = command_help_msg('build');
+    sbozyp_getopts(
+        \@_,
+        'h|help' => \my $opt_help,
+        'f'      => \my $opt_force,
+        'i'      => \my $opt_noninteractive
+    );
+    if ($opt_help) { print $help_msg ; return }
+    @_ >= 1 or die "$usage\n";
+    i_am_root_or_die('the build command requires root');
+    my @pkgs = map { $_ = pkg($_) } @_;
+    if (not $opt_noninteractive) {
+        my $error_msg = '';
+        while (1) {
+            clear_terminal();
+            if ($error_msg) { print "$error_msg\n\n"; $error_msg = '' };
+            print "sbozyp: are you sure you want to build packages: @{[map { q(').$_->{PKGNAME}.q(') } @pkgs]}? y/n\n";
+            print '  -> ';
+            my $decision = <STDIN>;
+            $decision =~ s/^\s+|\s+$//g; # remove leading and trailing whitespace
+            if    ($decision =~ /^y(?:es)?$/i) { last   }
+            elsif ($decision =~ /^no?$/i)      { return }
+            else {
+                $error_msg = "invalid input: '$decision'";
+            }
+        }
+    }
+    for my $pkg (@pkgs) {
+        if (my $slackware_pkg = built_slackware_pkg($pkg)) {
+            unless ($opt_force) {
+                print "sbozyp: existing package for '$pkg->{PKGNAME}' found at '$slackware_pkg'\n";
+                next;
+            }
+        }
+        build_slackware_pkg($pkg);
+    }
+}
+
 sub install_command_main {
     my $usage = command_usage('install');
     my $help_msg = command_help_msg('install');
@@ -82,6 +122,7 @@ sub install_command_main {
         'h|help' => \my $opt_help,
         'f'      => \my $opt_force,
         'i'      => \my $opt_noninteractive,
+        'k'      => \my $opt_keeppackage,
         'n'      => \my $opt_nodeps
     );
     if ($opt_help) { print $help_msg ; return }
@@ -98,9 +139,9 @@ sub install_command_main {
     if (@queue) {
         @queue = manage_install_queue_ui(@queue) unless $opt_noninteractive;
         for my $pkg (@queue) {
-            my $slackware_pkg = build_slackware_pkg($pkg);
+            my $slackware_pkg = built_slackware_pkg($pkg) // build_slackware_pkg($pkg);
             install_slackware_pkg($slackware_pkg);
-            if ($CONFIG{CLEANUP}) { sbozyp_unlink($slackware_pkg) }
+            sbozyp_unlink($slackware_pkg) unless $opt_keeppackage;
         }
     } else {
         print "sbozyp: all packages (and their deps) requested for installation are up to date, invoke with -f option to force installation\n"
@@ -196,16 +237,14 @@ sub remove_command_main {
             print '  -> ';
             my $decision = <STDIN>;
             $decision =~ s/^\s+|\s+$//g; # remove leading and trailing whitespace
-            if ($decision =~ /^y(?:es)?$/i) {
-                remove_slackware_pkg($_->{PRGNAM}) for @pkgs;
-                last;
-            } elsif ($decision =~ /^no?$/i) {
-                last;
-            } else {
+            if    ($decision =~ /^y(?:es)?$/i) { last   }
+            elsif ($decision =~ /^no?$/i)      { return }
+            else {
                 $error_msg = "invalid input: '$decision'";
             }
         }
-    } else { remove_slackware_pkg($_->{PRGNAM}) for @pkgs }
+    }
+    remove_slackware_pkg($_->{PRGNAM}) for @pkgs;
 }
 
 sub search_command_main {
@@ -216,6 +255,7 @@ sub search_command_main {
         'h|help' => \my $opt_help,
         'c'      => \my $opt_casesensitive,
         'n'      => \my $opt_matchcategory,
+        'p'      => \my $opt_prgnam
     );
     if ($opt_help) { print $help_msg ; return }
     @_ == 1 or die "$usage\n";
@@ -225,7 +265,10 @@ sub search_command_main {
         $opt_matchcategory ? $_ =~ $regex : basename($_) =~ $regex;
     } all_pkgnames();
     if (@matches) {
-        print $_, "\n" for @matches;
+        if ($opt_prgnam) {
+            @matches = sort map { $_ = basename($_) } @matches;
+        }
+        print $_, "\n" for @matches
     } else {
         sbozyp_die("no packages match the regex '$regex_arg'");
     }
@@ -320,17 +363,17 @@ sub pkg_installed_and_up_to_date {
 }
 
 sub all_categories {
-    my @categories = sort map {
+    state @all_categories = sort map {
         basename($_);
     } sbozyp_qx("find '$CONFIG{REPO_ROOT}/$CONFIG{REPO_NAME}' -mindepth 1 -maxdepth 1 -type d -not -path '*/.*'");
-    return @categories
+    return @all_categories
 }
 
 sub all_pkgnames {
-    my @pkgnames = sort map {
+    state @all_pkgnames = sort map {
         my ($pkgname) = $_ =~ m,/([^/]+/[^/]+)$,;
     } sbozyp_qx("find '$CONFIG{REPO_ROOT}/$CONFIG{REPO_NAME}' -mindepth 2 -maxdepth 2 -type d -not -path '*/.*'");
-    return @pkgnames;
+    return @all_pkgnames;
 }
 
 sub find_pkgname { # if $prgnam is a pkgname then just return it back
@@ -788,6 +831,16 @@ sub manage_install_queue_ui {
     return wantarray ? @pkg_queue : \@pkg_queue;
 }
 
+sub install_slackware_pkg {
+    my ($slackware_pkg) = @_;
+    sbozyp_system("upgradepkg --reinstall --install-new '$slackware_pkg'");
+}
+
+sub remove_slackware_pkg {
+    my ($slackware_pkg) = @_;
+    sbozyp_system("removepkg '$slackware_pkg'");
+}
+
 sub build_slackware_pkg {
     my ($pkg) = @_;
     local $ENV{OUTPUT} = $CONFIG{TMPDIR}; # all SlackBuilds use the $OUTPUT env var to determine output pkg location
@@ -805,14 +858,10 @@ sub build_slackware_pkg {
     return $slackware_pkg;
 }
 
-sub install_slackware_pkg {
-    my ($slackware_pkg) = @_;
-    sbozyp_system("upgradepkg --reinstall --install-new '$slackware_pkg'");
-}
-
-sub remove_slackware_pkg {
-    my ($slackware_pkg) = @_;
-    sbozyp_system("removepkg '$slackware_pkg'");
+sub built_slackware_pkg {
+    my ($pkg) = @_;
+    my $output = $CONFIG{TMPDIR};
+    return [ glob "$output/$pkg->{PRGNAM}*$pkg->{VERSION}*_SBo*" ]->[0];
 }
 
 # versioncmp() is copy and pasted directly from the Sort::Versions CPAN module.
@@ -894,19 +943,22 @@ Every command has its own options, these are just the global ones:
 Commands are:
 
  install|in          Install or upgrade packages
- null|nu             Do nothing, useful in conjunction with -C or -S opts
+ build|bu            Build but don't install packages
  query|qr            Query for information about a package
  remove|rm           Remove packages
  search|se           Search for a package using a Perl regex
+ null|nu             Do nothing, useful in conjunction with -C or -S opts
 
 Examples:
 
  sbozyp --help
  sbozyp --version
+ sbozyp install --help
  sbozyp install -S -R $REPO -f xclip system/password-store
+ sbozyp build -f mu
  sbozyp query -q password-store
  sbozyp remove xclip password-store
- sbozyp search system/.+
+ sbozyp search -n system/.+
  sbozyp -R $REPO -C null
 
 =head1 CONFIGURATION
@@ -958,23 +1010,41 @@ The directory used for placing working files.
 
 Defaults to C<TMPDIR=/tmp>.
 
-=head3 CLEANUP
-
-If C<0> then keep built packages after installation. If C<1> then remove them.
-
 =head1 COMMANDS
+
+=head2 BUILD
+
+ Usage: sbozyp <build|bu> [-h] <pkgname...>
+
+Build but don't install packages.
+
+Options are:
+
+ -h|--help           Print help message
+ -f                  Force rebuild the package even if it's already built
+ -i                  No confirmation prompt
+
+Examples:
+
+ sbozyp build --help
+ sbozyp bu password-store
+ sbozyp bu -f password-store
+ sbozyp bu -f -i system/password-store
+ sbozyp -S -R $REPO bu password-store
+ sbozyp bu -i system/password-store xclip mu
 
 =head2 INSTALL
 
  Usage: sbozyp <install|in> [-h] [-f] [-i] [-n] <pkgname...>
 
-Install or upgrade packages
+Install or upgrade packages.
 
 Options are:
 
  -h|--help           Print help message
  -f                  Force installation even if package is already up to date
- -i                  Non-interactive (DANGEROUS)
+ -i                  No interactive prompt
+ -k                  Keep the built package (resides in TMPDIR)
  -n                  Do not install package dependencies
 
 Examples:
@@ -982,7 +1052,7 @@ Examples:
  sbozyp install --help
  sbozyp in password-store
  sbozyp in xclip mu password-store
- sbozyp in system/password-store
+ sbozyp in -k system/password-store
  sbozyp in -f -i -n password-store
  sbozyp -S -R $REPO in -f password-store
  sbozyp in $(sbozyp -S qr -u | cut -d' ' -f1) ### upgrade all packages
@@ -991,8 +1061,8 @@ Examples:
 
  Usage: sbozyp <null|nu> [-h]
 
-Do nothing, useful if you just want to re-clone (with global -C option) or
-sync (with global -S option) your repository.
+Do nothing. Useful if you just want to re-clone (with global -C option) or
+sync (with global -S option) a repository.
 
 Options are:
 
@@ -1009,7 +1079,7 @@ Examples:
 
  Usage: sbozyp <query|qr> [-h] [-a] [-d] [-i] [-p] [-q] [-r] [-s] [-u] PKGNAME?
 
-Query for package related information
+Query for package related information.
 
 If only PKGNAME and no options are provided, this command will drop you into an
 interactive prompt for viewing PKGNAME's files.
@@ -1041,12 +1111,12 @@ Examples:
 
  Usage: sbozyp <remove|rm> [-h] [-i] <pkgname...>
 
-Remove packages
+Remove packages.
 
 Options are:
 
  -h|--help           Print help message
- -i                  Non-interactive (DANGEROUS)
+ -i                  No confirmation prompt
 
 Examples:
 
@@ -1059,19 +1129,20 @@ Examples:
 
  Usage: sbozyp <search|se> [-h] [-c] [-n] <regex>
 
-Search for a package using a Perl regex
+Search for a package using a Perl regex.
 
 Options are:
 
  -h|--help           Print help message
  -c                  Match case sensitive
  -n                  Match against CATEGORY/PRGNAM instead of just PRGNAM
+ -p                  Print just the PRGNAM of matched packages
 
 Examples:
 
  sbozyp search --help
  sbozyp se password-store
- sbozyp se password.+
+ sbozyp se -p password.+
  sbozyp se -c -n system/.+
  sbozyp -S -R $REPO se password-store
 
@@ -1084,6 +1155,8 @@ Nicholas Hubbard (nicholashubbard@posteo.net)
 =over 4
 
 =item * Kat Nguyen
+
+=item * pghvlaans
 
 =back
 

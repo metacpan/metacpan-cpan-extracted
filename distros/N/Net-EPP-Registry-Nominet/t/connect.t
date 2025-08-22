@@ -67,7 +67,7 @@ SKIP: {
 }
 
 SKIP: {
-	skip "NOMTAG/NOMPASS not set", 36 unless (defined $ENV{NOMTAG} and defined $ENV{NOMPASS});
+	skip "NOMTAG/NOMPASS not set", 36 unless (defined $ENV{NOMTAG} && defined $ENV{NOMPASS} && defined $epp);
 
 	isnt ($epp->login ($ENV{NOMTAG}, $ENV{NOMPASS}), undef, 'Login with good credentials');
 
@@ -105,7 +105,6 @@ SKIP: {
 	$epp->logout;
 	$newargs{login}    = 0;
 	$newargs{verify}   = 1;
-	$newargs{testssl}  = 1;
 	$newargs{ca_file}  = '/foo';
 	warnings_exist { $epp = Net::EPP::Registry::Nominet->new (%newargs); }
 		[qr/^No greeting returned: cannot continue/,

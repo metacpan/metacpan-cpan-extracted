@@ -13,10 +13,10 @@ This document describes the API endpoint at C</organization/admin_api_keys>.
 
 =head2 C<GET /organization/admin_api_keys>
 
+List all organization and project API keys.
+
+
 List organization API keys
-
-
-Retrieve a paginated list of organization admin API keys.
 
 
 
@@ -89,10 +89,10 @@ Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-
 
 =head2 C<POST /organization/admin_api_keys>
 
+Create admin API key
+
+
 Create an organization admin API key
-
-
-Create a new admin-level API key for the organization.
 
 
 

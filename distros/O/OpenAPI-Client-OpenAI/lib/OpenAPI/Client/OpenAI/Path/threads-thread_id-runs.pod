@@ -13,6 +13,9 @@ This document describes the API endpoint at C</threads/{thread_id}/runs>.
 
 =head2 C<GET /threads/{thread_id}/runs>
 
+List runs
+
+
 Returns a list of runs belonging to a thread.
 
 
@@ -102,6 +105,9 @@ Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-
 
 =head2 C<POST /threads/{thread_id}/runs>
 
+Create run
+
+
 Create a run.
 
 
@@ -124,7 +130,7 @@ Type: C<string>
 
 =item * C<include[]> (in query) (Optional) - A list of additional fields to include in the response. Currently the only supported value is `step_details.tool_calls[*].file_search.results[*].content` to fetch the file search result content.
 
-See the [file search tool documentation](/docs/assistants/tools/file-search#customizing-file-search-settings) for more information.
+See the [file search tool documentation](https://platform.openai.com/docs/assistants/tools/file-search#customizing-file-search-settings) for more information.
 
 
 Type: C<array>
@@ -148,6 +154,18 @@ The ID of the L<Model|https://platform.openai.com/docs/api-reference/models> to 
 
 =over 4
       
+=item * C<gpt-5>
+
+=item * C<gpt-5-mini>
+
+=item * C<gpt-5-nano>
+
+=item * C<gpt-5-2025-08-07>
+
+=item * C<gpt-5-mini-2025-08-07>
+
+=item * C<gpt-5-nano-2025-08-07>
+
 =item * C<gpt-4.1>
 
 =item * C<gpt-4.1-mini>
@@ -237,7 +255,6 @@ Example:
              ]
           }
        ],
-       "model" : "gpt-4o",
        "temperature" : 1,
        "tools" : [
           null

@@ -13,6 +13,9 @@ This document describes the API endpoint at C</organization/certificates/deactiv
 
 =head2 C<POST /organization/certificates/deactivate>
 
+Deactivate certificates for organization
+
+
 Deactivate certificates at the organization level.
 
 You can atomically and idempotently deactivate up to 10 certificates at a time.

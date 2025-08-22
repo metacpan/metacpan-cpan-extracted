@@ -13,6 +13,9 @@ This document describes the API endpoint at C</files>.
 
 =head2 C<GET /files>
 
+List files
+
+
 Returns a list of files.
 
 
@@ -95,7 +98,10 @@ Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-
 
 =head2 C<POST /files>
 
-Upload a file that can be used across various endpoints. Individual files can be up to 512 MB, and the size of all files uploaded by one organization can be up to 100 GB.
+Upload file
+
+
+Upload a file that can be used across various endpoints. Individual files can be up to 512 MB, and the size of all files uploaded by one organization can be up to 1 TB.
 
 The Assistants API supports files up to 2 million tokens and of specific file types. See the L<Assistants Tools guide|https://platform.openai.com/docs/assistants/tools> for details.
 
@@ -127,6 +133,14 @@ C<createFile>
       
 
       
+      
+Example:
+
+    {
+       "expires_after" : null
+    }
+
+
              
 
 =head3 Responses

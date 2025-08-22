@@ -13,6 +13,9 @@ This document describes the API endpoint at C</threads/{thread_id}/runs/{run_id}
 
 =head2 C<GET /threads/{thread_id}/runs/{run_id}>
 
+Retrieve run
+
+
 Retrieves a run.
 
 
@@ -27,7 +30,7 @@ C<getRun>
 
 =over 4
 
-=item * C<thread_id> (in path) (Required) - The ID of the [thread](/docs/api-reference/threads) that was run.
+=item * C<thread_id> (in path) (Required) - The ID of the [thread](https://platform.openai.com/docs/api-reference/threads) that was run.
 
 Type: C<string>
 
@@ -100,6 +103,9 @@ Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-
 
 =head2 C<POST /threads/{thread_id}/runs/{run_id}>
 
+Modify run
+
+
 Modifies a run.
 
 
@@ -114,7 +120,7 @@ C<modifyRun>
 
 =over 4
 
-=item * C<thread_id> (in path) (Required) - The ID of the [thread](/docs/api-reference/threads) that was run.
+=item * C<thread_id> (in path) (Required) - The ID of the [thread](https://platform.openai.com/docs/api-reference/threads) that was run.
 
 Type: C<string>
 

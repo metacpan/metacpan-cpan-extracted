@@ -23,16 +23,12 @@ class Mojo::URL {
   has userinfo : rw string;
   
   has path : rw Mojo::Path
-    
     get {
-      
-      unless ($self->{path}) {
+      unless (exists $self->{path}) {
         $self->{path} = Mojo::Path->new;
       }
       
-      my $path = $self->{path};
-      
-      return $path;
+      return $self->{path};
     }
     
     set ($path : object of string|Mojo::Path) {
@@ -58,7 +54,7 @@ class Mojo::URL {
   has query : rw Mojo::Parameters
     get {
       
-      unless ($self->{query}) {
+      unless (exists $self->{query}) {
         $self->{query} = Mojo::Parameters->new;
       }
       

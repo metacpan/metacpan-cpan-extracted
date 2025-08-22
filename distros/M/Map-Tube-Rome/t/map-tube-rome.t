@@ -24,4 +24,4 @@ SKIP: {
 done_testing;
 
 __DATA__
-Route 1|Anagnina|Arco di Travertino|Anagnina,Cinecittà,Subaugusta,Giulio Agricola,Lucio Sestio,Numidio Quadrato,Porta Furba Quadraro,Arco di Travertino
+Route 1|Anagnina|Arco di Travertino|Anagnina,Cinecittà,Subaugusta,Giulio Agricola - Parco degli Acquedotti,Lucio Sestio,Numidio Quadrato,Porta Furba Quadraro,Arco di Travertino

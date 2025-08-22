@@ -13,6 +13,9 @@ This document describes the API endpoint at C</uploads/{upload_id}/cancel>.
 
 =head2 C<POST /uploads/{upload_id}/cancel>
 
+Cancel upload
+
+
 Cancels the Upload. No Parts may be added after an Upload is cancelled.
 
 

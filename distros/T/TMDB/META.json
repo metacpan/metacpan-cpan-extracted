@@ -25,6 +25,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
+            "Test::MockObject" : "0",
             "Test::More" : "0",
             "version" : "0"
          }
@@ -51,43 +52,43 @@
    "provides" : {
       "TMDB" : {
          "file" : "lib/TMDB.pm",
-         "version" : "v1.2.3"
+         "version" : "v1.3.0"
       },
       "TMDB::Collection" : {
          "file" : "lib/TMDB/Collection.pm",
-         "version" : "v1.2.3"
+         "version" : "v1.3.0"
       },
       "TMDB::Company" : {
          "file" : "lib/TMDB/Company.pm",
-         "version" : "v1.2.3"
+         "version" : "v1.3.0"
       },
       "TMDB::Config" : {
          "file" : "lib/TMDB/Config.pm",
-         "version" : "v1.2.3"
+         "version" : "v1.3.0"
       },
       "TMDB::Genre" : {
          "file" : "lib/TMDB/Genre.pm",
-         "version" : "v1.2.3"
+         "version" : "v1.3.0"
       },
       "TMDB::Movie" : {
          "file" : "lib/TMDB/Movie.pm",
-         "version" : "v1.2.3"
+         "version" : "v1.3.0"
       },
       "TMDB::Person" : {
          "file" : "lib/TMDB/Person.pm",
-         "version" : "v1.2.3"
+         "version" : "v1.3.0"
       },
       "TMDB::Search" : {
          "file" : "lib/TMDB/Search.pm",
-         "version" : "v1.2.3"
+         "version" : "v1.3.0"
       },
       "TMDB::Session" : {
          "file" : "lib/TMDB/Session.pm",
-         "version" : "v1.2.3"
+         "version" : "v1.3.0"
       },
       "TMDB::TV" : {
          "file" : "lib/TMDB/TV.pm",
-         "version" : "v1.2.3"
+         "version" : "v1.3.0"
       }
    },
    "release_status" : "stable",
@@ -103,6 +104,6 @@
          "url" : "git://github.com/davorg/perl-tmdb.git"
       }
    },
-   "version" : "v1.2.3",
+   "version" : "v1.3.0",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

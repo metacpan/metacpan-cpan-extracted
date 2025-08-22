@@ -79,10 +79,10 @@
 
 %               if ( $item eq 'p' ) {
                   <&| /Elements/LabeledValue, Label => loc("Alignment") &>
-                    <select name="alignment" class="form-control">
-                      <option value="left"><% loc('Left') %></option>
+                    <select name="alignment" class="form-select">
+                      <option value="start"><% loc('Left') %></option>
                       <option value="center"><% loc('Center') %></option>
-                      <option value="right"><% loc('Right') %></option>
+                      <option value="end"><% loc('Right') %></option>
                     </select>
                   </&>
 %               }
@@ -493,9 +493,9 @@
 %                     if ( ($item->{wrapper} // '') eq 'p' ) {
                       <&| /Elements/LabeledValue, Label => loc("Alignment") &>
                         <select name="alignment" class="form-select selectpicker">
-                          <option value="left" <% lc($item->{alignment} // '') eq 'left' ? 'selected' : '' %>><% loc('Left') %></option>
+                          <option value="start" <% lc($item->{alignment} // '') =~ /left|start/ ? 'selected' : '' %>><% loc('Left') %></option>
                           <option value="center" <% lc($item->{alignment} // '') eq 'center' ? 'selected' : '' %>><% loc('Center') %></option>
-                          <option value="right" <% lc($item->{alignment} // '') eq 'right' ? 'selected' : '' %>><% loc('Right') %></option>
+                          <option value="end" <% lc($item->{alignment} // '') =~ /right|end/ ? 'selected' : '' %>><% loc('Right') %></option>
                         </select>
                       </&>
 %                     }

@@ -63,11 +63,11 @@ DIRFILESEP = /
 DFSEP = $(DIRFILESEP)
 NAME = OpenAPI::Client::OpenAI
 NAME_SYM = OpenAPI_Client_OpenAI
-VERSION = 0.23
+VERSION = 0.24
 VERSION_MACRO = VERSION
-VERSION_SYM = 0_23
+VERSION_SYM = 0_24
 DEFINE_VERSION = -D$(VERSION_MACRO)=\"$(VERSION)\"
-XS_VERSION = 0.23
+XS_VERSION = 0.24
 XS_VERSION_MACRO = XS_VERSION
 XS_DEFINE_VERSION = -D$(XS_VERSION_MACRO)=\"$(XS_VERSION)\"
 INST_ARCHLIB = blib/arch
@@ -189,6 +189,10 @@ MAN3PODS = lib/OpenAPI/Client/OpenAI.pm \
 	lib/OpenAPI/Client/OpenAI/Path/containers-container_id-files.pod \
 	lib/OpenAPI/Client/OpenAI/Path/containers-container_id.pod \
 	lib/OpenAPI/Client/OpenAI/Path/containers.pod \
+	lib/OpenAPI/Client/OpenAI/Path/conversations-conversation_id-items-item_id.pod \
+	lib/OpenAPI/Client/OpenAI/Path/conversations-conversation_id-items.pod \
+	lib/OpenAPI/Client/OpenAI/Path/conversations-conversation_id.pod \
+	lib/OpenAPI/Client/OpenAI/Path/conversations.pod \
 	lib/OpenAPI/Client/OpenAI/Path/embeddings.pod \
 	lib/OpenAPI/Client/OpenAI/Path/evals-eval_id-runs-run_id-output_items-output_item_id.pod \
 	lib/OpenAPI/Client/OpenAI/Path/evals-eval_id-runs-run_id-output_items.pod \
@@ -320,6 +324,10 @@ TO_INST_PM = lib/OpenAPI/Client/OpenAI.pm \
 	lib/OpenAPI/Client/OpenAI/Path/containers-container_id-files.pod \
 	lib/OpenAPI/Client/OpenAI/Path/containers-container_id.pod \
 	lib/OpenAPI/Client/OpenAI/Path/containers.pod \
+	lib/OpenAPI/Client/OpenAI/Path/conversations-conversation_id-items-item_id.pod \
+	lib/OpenAPI/Client/OpenAI/Path/conversations-conversation_id-items.pod \
+	lib/OpenAPI/Client/OpenAI/Path/conversations-conversation_id.pod \
+	lib/OpenAPI/Client/OpenAI/Path/conversations.pod \
 	lib/OpenAPI/Client/OpenAI/Path/embeddings.pod \
 	lib/OpenAPI/Client/OpenAI/Path/evals-eval_id-runs-run_id-output_items-output_item_id.pod \
 	lib/OpenAPI/Client/OpenAI/Path/evals-eval_id-runs-run_id-output_items.pod \
@@ -491,7 +499,7 @@ RCS_LABEL = rcs -Nv$(VERSION_SYM): -q
 DIST_CP = best
 DIST_DEFAULT = tardist
 DISTNAME = OpenAPI-Client-OpenAI
-DISTVNAME = OpenAPI-Client-OpenAI-0.23
+DISTVNAME = OpenAPI-Client-OpenAI-0.24
 
 
 # --- MakeMaker macro section:
@@ -665,6 +673,10 @@ manifypods : pure_all config  \
 	lib/OpenAPI/Client/OpenAI/Path/containers-container_id-files.pod \
 	lib/OpenAPI/Client/OpenAI/Path/containers-container_id.pod \
 	lib/OpenAPI/Client/OpenAI/Path/containers.pod \
+	lib/OpenAPI/Client/OpenAI/Path/conversations-conversation_id-items-item_id.pod \
+	lib/OpenAPI/Client/OpenAI/Path/conversations-conversation_id-items.pod \
+	lib/OpenAPI/Client/OpenAI/Path/conversations-conversation_id.pod \
+	lib/OpenAPI/Client/OpenAI/Path/conversations.pod \
 	lib/OpenAPI/Client/OpenAI/Path/embeddings.pod \
 	lib/OpenAPI/Client/OpenAI/Path/evals-eval_id-runs-run_id-output_items-output_item_id.pod \
 	lib/OpenAPI/Client/OpenAI/Path/evals-eval_id-runs-run_id-output_items.pod \
@@ -779,6 +791,10 @@ manifypods : pure_all config  \
 	  lib/OpenAPI/Client/OpenAI/Path/containers-container_id-files.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::containers-container_id-files.$(MAN3EXT) \
 	  lib/OpenAPI/Client/OpenAI/Path/containers-container_id.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::containers-container_id.$(MAN3EXT) \
 	  lib/OpenAPI/Client/OpenAI/Path/containers.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::containers.$(MAN3EXT) \
+	  lib/OpenAPI/Client/OpenAI/Path/conversations-conversation_id-items-item_id.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::conversations-conversation_id-items-item_id.$(MAN3EXT) \
+	  lib/OpenAPI/Client/OpenAI/Path/conversations-conversation_id-items.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::conversations-conversation_id-items.$(MAN3EXT) \
+	  lib/OpenAPI/Client/OpenAI/Path/conversations-conversation_id.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::conversations-conversation_id.$(MAN3EXT) \
+	  lib/OpenAPI/Client/OpenAI/Path/conversations.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::conversations.$(MAN3EXT) \
 	  lib/OpenAPI/Client/OpenAI/Path/embeddings.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::embeddings.$(MAN3EXT) \
 	  lib/OpenAPI/Client/OpenAI/Path/evals-eval_id-runs-run_id-output_items-output_item_id.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::evals-eval_id-runs-run_id-output_items-output_item_id.$(MAN3EXT) \
 	  lib/OpenAPI/Client/OpenAI/Path/evals-eval_id-runs-run_id-output_items.pod $(INST_MAN3DIR)/OpenAPI::Client::OpenAI::Path::evals-eval_id-runs-run_id-output_items.$(MAN3EXT) \
@@ -979,7 +995,7 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) 'resources:' >> META_new.yml
 	$(NOECHO) $(ECHO) '  bugtracker: https://github.com/nferraz/perl-openapi-client-openai/issues' >> META_new.yml
 	$(NOECHO) $(ECHO) '  repository: https://github.com/nferraz/perl-openapi-client-openai.git' >> META_new.yml
-	$(NOECHO) $(ECHO) 'version: '\''0.23'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) 'version: '\''0.24'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) 'x_serialization_backend: '\''CPAN::Meta::YAML version 0.018'\''' >> META_new.yml
 	-$(NOECHO) $(MV) META_new.yml $(DISTVNAME)/META.yml
 	$(NOECHO) $(ECHO) Generating META.json
@@ -1054,7 +1070,7 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '         "web" : "https://github.com/nferraz/perl-openapi-client-openai"' >> META_new.json
 	$(NOECHO) $(ECHO) '      }' >> META_new.json
 	$(NOECHO) $(ECHO) '   },' >> META_new.json
-	$(NOECHO) $(ECHO) '   "version" : "0.23",' >> META_new.json
+	$(NOECHO) $(ECHO) '   "version" : "0.24",' >> META_new.json
 	$(NOECHO) $(ECHO) '   "x_serialization_backend" : "JSON::PP version 4.16"' >> META_new.json
 	$(NOECHO) $(ECHO) '}' >> META_new.json
 	-$(NOECHO) $(MV) META_new.json $(DISTVNAME)/META.json
@@ -1364,7 +1380,7 @@ testdb_static :: static pure_all
 # --- MakeMaker ppd section:
 # Creates a PPD (Perl Package Description) for a binary distribution.
 ppd :
-	$(NOECHO) $(ECHO) '<SOFTPKG NAME="OpenAPI-Client-OpenAI" VERSION="0.23">' > OpenAPI-Client-OpenAI.ppd
+	$(NOECHO) $(ECHO) '<SOFTPKG NAME="OpenAPI-Client-OpenAI" VERSION="0.24">' > OpenAPI-Client-OpenAI.ppd
 	$(NOECHO) $(ECHO) '    <ABSTRACT>A client for the OpenAI API</ABSTRACT>' >> OpenAPI-Client-OpenAI.ppd
 	$(NOECHO) $(ECHO) '    <AUTHOR>Nelson Ferraz &lt;nferraz@gmail.com&gt;</AUTHOR>' >> OpenAPI-Client-OpenAI.ppd
 	$(NOECHO) $(ECHO) '    <IMPLEMENTATION>' >> OpenAPI-Client-OpenAI.ppd
@@ -1406,6 +1422,10 @@ pm_to_blib : $(FIRST_MAKEFILE) $(TO_INST_PM)
 	  'lib/OpenAPI/Client/OpenAI/Path/containers-container_id-files.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/containers-container_id-files.pod' \
 	  'lib/OpenAPI/Client/OpenAI/Path/containers-container_id.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/containers-container_id.pod' \
 	  'lib/OpenAPI/Client/OpenAI/Path/containers.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/containers.pod' \
+	  'lib/OpenAPI/Client/OpenAI/Path/conversations-conversation_id-items-item_id.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/conversations-conversation_id-items-item_id.pod' \
+	  'lib/OpenAPI/Client/OpenAI/Path/conversations-conversation_id-items.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/conversations-conversation_id-items.pod' \
+	  'lib/OpenAPI/Client/OpenAI/Path/conversations-conversation_id.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/conversations-conversation_id.pod' \
+	  'lib/OpenAPI/Client/OpenAI/Path/conversations.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/conversations.pod' \
 	  'lib/OpenAPI/Client/OpenAI/Path/embeddings.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/embeddings.pod' \
 	  'lib/OpenAPI/Client/OpenAI/Path/evals-eval_id-runs-run_id-output_items-output_item_id.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/evals-eval_id-runs-run_id-output_items-output_item_id.pod' \
 	  'lib/OpenAPI/Client/OpenAI/Path/evals-eval_id-runs-run_id-output_items.pod' 'blib/lib/OpenAPI/Client/OpenAI/Path/evals-eval_id-runs-run_id-output_items.pod' \

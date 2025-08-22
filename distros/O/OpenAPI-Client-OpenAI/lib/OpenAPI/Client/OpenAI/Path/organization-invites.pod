@@ -13,6 +13,9 @@ This document describes the API endpoint at C</organization/invites>.
 
 =head2 C<GET /organization/invites>
 
+List invites
+
+
 Returns a list of invites in the organization.
 
 
@@ -73,6 +76,9 @@ Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-
 =back
 
 =head2 C<POST /organization/invites>
+
+Create invite
+
 
 Create an invite for a user to the organization. The invite must be accepted by the user before they have access to the organization.
 

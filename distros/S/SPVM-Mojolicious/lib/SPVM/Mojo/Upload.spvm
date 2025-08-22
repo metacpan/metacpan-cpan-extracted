@@ -5,16 +5,16 @@ class Mojo::Upload {
   version_from Mojolicious;
   
   # Fields
-  has asset : ro Mojo::Asset;
+  has asset : rw Mojo::Asset;
   
-  has filename : ro string;
+  has filename : rw string;
   
-  has headers : ro Mojo::Headers;
+  has headers : rw Mojo::Headers;
   
-  has name : ro string;
+  has name : rw string;
   
   # Class Methods
-  static method new : Mojo::Upload ($options : object[] = undef) {
+  static method new : Mojo::Upload () {
     
     my $self = new Mojo::Upload;
     

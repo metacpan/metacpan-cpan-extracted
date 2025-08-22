@@ -13,6 +13,9 @@ This document describes the API endpoint at C</batches>.
 
 =head2 C<GET /batches>
 
+List batch
+
+
 List your organization's batches.
 
 
@@ -76,6 +79,9 @@ Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-
 
 =head2 C<POST /batches>
 
+Create batch
+
+
 Creates and executes a batch from an uploaded file of requests
 
 
@@ -100,6 +106,14 @@ C<createBatch>
       
 
       
+      
+Example:
+
+    {
+       "output_expires_after" : null
+    }
+
+
              
 
 =head3 Responses

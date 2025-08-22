@@ -1,4 +1,4 @@
-# Please read the sbozyp.conf(5) man page for detailed information about this
+# Please read the sbozyp man page for detailed information about this
 # configuration file.
 
 # The location to store our local copies of the SBo repository
@@ -6,9 +6,6 @@
 
 ### Directory used to contain working files specific to sbozyp.
 # TMPDIR=/tmp
-
-### By default built packages are removed after install. Set to 0 to keep them around.
-# CLEANUP=1
 
 ### REPOS
 REPO_PRIMARY=15.0

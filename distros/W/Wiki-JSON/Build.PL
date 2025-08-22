@@ -1,5 +1,6 @@
 #!/usr/bin/env perl
 use Module::Build;
+use CPAN::Meta;
 
 my $home = $ENV{HOME};
 
@@ -20,17 +21,13 @@ my $build = Module::Build->new(
         'Const::Fast'      => 0,
         'perl'             => 'v5.16.3',
     },
-    meta_add => {
+    configure_requires => {
+        'Module::Build' => 0,
+    },
+    meta_merge => {
         resources => {
-            bugtracker => {
-                web => 'https://github.com/sergiotarxz/Perl-Wiki-JSON/issues',
-                mailto => 'sergioxz@cpan.org',
-            },
-            repository => {
-                url  => 'git://github.com/sergiotarxz/Perl-Wiki-JSON.git',
-                web  => 'https://github.com/sergiotarxz/Perl-Wiki-JSON',
-                type => 'git',
-            },
+            bugtracker => 'https://github.com/sergiotarxz/Perl-Wiki-JSON/issues',
+            repository => 'https://github.com/sergiotarxz/Perl-Wiki-JSON',
         }
     },
     script_files => [ 'scripts/wiki2json', ]

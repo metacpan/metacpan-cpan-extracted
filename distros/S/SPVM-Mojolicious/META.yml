@@ -38,5 +38,5 @@ requires:
   SPVM::Time::Piece: '0.003'
 resources:
   repository: https://github.com/yuki-kimoto/SPVM-Mojolicious.git
-version: '0.013'
+version: '0.014'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,35 @@
+{
+	"version" : "0.1.0",
+	"name"    : "Schedule::Easing",
+	"author"  : "Brian Blackmore",
+	"abstract": "Stateless, stable selection of events with increased frequency during a schedule",
+	"license" : ["gpl_3"],
+	"prereqs" : {
+		"configure": {
+			"requires": {
+				"Module::Build::Tiny": "0.040"
+			}
+		},
+		"test": {
+			"requires": {
+				"Test::More": "1.302109"
+			}
+		},
+		"runtime": {
+			"requires": {
+				"perl": "5.16.3",
+				"Carp": "1.22",
+				"Digest::MD5": "2.53",
+				"Scalar::Util": "1.39"
+			}
+		}
+	},
+	"resources": {
+		"bugtracker": {"web":"https://github.com/blb8/perl-schedule-easing/issues"},
+		"repository": {"url":"git://github.com/blb8/perl-schedule-easing.git"}
+	},
+	"meta-spec": {"url":"http://search.cpan.org/perldoc?CPAN::Meta::Spec","version":"2"},
+	"dynamic_config": 1,
+	"generated_by": "Brian Blackmore",
+	"release_status": "stable"
+}

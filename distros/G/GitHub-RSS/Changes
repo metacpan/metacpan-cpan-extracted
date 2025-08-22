@@ -1,3 +1,9 @@
+0.05 2025-08-22
+    * Skip empty rows if Github shows these
+    * Add "sub_issues_summary" column
+    * Add "types" column
+    * Add "issue_dependencies_summary" column
+
 0.04 2023-07-21
     * Don't resurrect old comments, even if the issue has been updated recently
     * Various build and test suite upgrades

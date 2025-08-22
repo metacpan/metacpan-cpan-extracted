@@ -13,6 +13,9 @@ This document describes the API endpoint at C</audio/speech>.
 
 =head2 C<POST /audio/speech>
 
+Create speech
+
+
 Generates audio from the input text.
 
 

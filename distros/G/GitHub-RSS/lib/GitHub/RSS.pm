@@ -14,7 +14,7 @@ use JSON;
 
 use Data::Dumper;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head1 NAME
 
@@ -238,6 +238,10 @@ sub fetch_issue_comments( $self, $issue_number,
 
 sub write_data( $self, $table, @rows) {
     my @columns = sort keys %{ $rows[0] };
+    if( ! @columns ) {
+        # we have an empty row?!
+        return;
+    };
     my $statement = sprintf q{replace into "%s" (%s) values (%s)},
                         $table,
                         join( ",", map qq{"$_"}, @columns ),

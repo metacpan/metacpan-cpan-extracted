@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 2 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 2;
 
 my @module_files = (
     'Koha/Contrib/ValueBuilder/RepeatableAutocomplete.pm',
@@ -58,7 +58,6 @@ for my $lib (@module_files)
 
 
 
-is(scalar(@warnings), 0, 'no warnings found')
-    or diag 'got warnings: ', ( Test::More->can('explain') ? Test::More::explain(\@warnings) : join("\n", '', @warnings) ) if $ENV{AUTHOR_TESTING};
+# no warning checks;
 
 

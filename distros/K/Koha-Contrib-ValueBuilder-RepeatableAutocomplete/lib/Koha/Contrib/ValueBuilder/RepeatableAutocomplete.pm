@@ -5,7 +5,7 @@ use JSON qw(to_json);
 
 # ABSTRACT: Repeatable autcomplete value-builder for Koha
 
-our $VERSION = '1.004'; # VERSION
+our $VERSION = '1.005'; # VERSION
 
 sub build_builder_inline {
     my $class = shift;
@@ -29,14 +29,21 @@ function Focus[% function_name %](event) {
     var inputField = $(event.target);
     var currentVal = inputField.val();
     var field      = inputField.attr('id').replace(/_subfield_.*$/,'');
-    var target     = $(inputField.closest('ul').find('input[id^="' + field + '_subfield_[% target %]"]')[0]);
 
     inputField.autocomplete({
         source: dropdown,
         minLength: [% minlength %],
         select: function( event, ui ) {
             event.preventDefault();
-            inputField.val( ui.item.label );
+
+            var target = $(inputField.closest('ul').find('input[id^="' + field + '_subfield_4"]').filter((idx, input) => { return $(input).val() == ""; }));
+            if (target.length == 0) {
+                alert("Kein freies Feld '[% target %]' vorhanden");
+                inputField.val('');
+                return;
+            }
+
+            inputField.val( ui.item.clean_label || ui.item.label );
             target.val( ui.item.value );
             inputField.autocomplete('destroy');
             inputField.blur();
@@ -93,7 +100,13 @@ function Focus[% function_name %](event) {
             inputField.val( ui.item.label );
 
             targetMap.forEach( function(element) {
-                var target = $(inputField.closest('ul').find('input[id^="' + field + '_subfield_' + element.subfield + '"]')[0]);
+                var target = $(inputField.closest('ul').find('input[id^="' + field + '_subfield_' + element.subfield + '"]').filter((idx, input) => { return $(input).val() == ""; }))
+                if (target.length == 0) {
+                    alert("Kein freies Feld '[% target %]' vorhanden");
+                    inputField.val('');
+                    return;
+                }
+
                 switch (element.type) {
                     case 'selected':
                         target.val( ui.item[element.key] );
@@ -146,7 +159,7 @@ Koha::Contrib::ValueBuilder::RepeatableAutocomplete - Repeatable autcomplete val
 
 =head1 VERSION
 
-version 1.004
+version 1.005
 
 =head1 SYNOPSIS
 
