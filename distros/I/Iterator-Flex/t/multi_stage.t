@@ -5,48 +5,48 @@ use Data::Dump 'pp';
 
 use Iterator::Flex::Common qw[ igrep imap iarray ];
 
-subtest "basic" => sub {
+subtest 'basic' => sub {
 
     my $iter = igrep { $_ >= 12 } imap { $_ + 2 } iarray( [ 0, 10, 20 ] );
 
-    subtest "object properties" => sub {
+    subtest 'object properties' => sub {
 
-        isa_ok( $iter, ['Iterator::Flex::Base'], "correct parent class" );
-        can_ok( $iter, [ 'reset', ], "has reset" );
-        is( $iter->can( 'freeze' ), undef, "can't freeze" );
+        isa_ok( $iter, ['Iterator::Flex::Base'], 'correct parent class' );
+        can_ok( $iter, [ 'reset', ], 'has reset' );
+        is( $iter->can( 'freeze' ), undef, 'can not freeze' );
     };
 
-    subtest "values" => sub {
+    subtest 'values' => sub {
         my @values;
         push @values, <$iter>;
         push @values, <$iter>;
-        is( $iter->next, undef,      "iterator exhausted" );
-        is( \@values,    [ 12, 22 ], "values are correct" )
+        is( $iter->next, undef,      'iterator exhausted' );
+        is( \@values,    [ 12, 22 ], 'values are correct' )
           or diag pp( \@values );
     };
 };
 
-subtest "reset" => sub {
+subtest 'reset' => sub {
 
     my $iter = igrep { $_ >= 10 } imap { $_ + 2 } iarray( [ 0, 10, 20 ] );
 
-    subtest "values" => sub {
+    subtest 'values' => sub {
         my @values;
         push @values, <$iter>;
         push @values, <$iter>;
-        is( $iter->next, undef,      "iterator exhausted" );
-        is( \@values,    [ 12, 22 ], "values are correct" )
+        is( $iter->next, undef,      'iterator exhausted' );
+        is( \@values,    [ 12, 22 ], 'values are correct' )
           or diag pp( \@values );
     };
 
-    try_ok { $iter->reset } "reset";
+    try_ok { $iter->reset } 'reset';
 
-    subtest "rewound values" => sub {
+    subtest 'rewound values' => sub {
         my @values;
         push @values, <$iter>;
         push @values, <$iter>;
-        is( $iter->next, undef,      "iterator exhausted" );
-        is( \@values,    [ 12, 22 ], "values are correct" )
+        is( $iter->next, undef,      'iterator exhausted' );
+        is( \@values,    [ 12, 22 ], 'values are correct' )
           or diag pp( \@values );
     };
 

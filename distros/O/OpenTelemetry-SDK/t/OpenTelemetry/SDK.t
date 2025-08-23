@@ -15,7 +15,9 @@ require OpenTelemetry::SDK;
 my $tracer_provider_mock = mock 'OpenTelemetry::SDK::Trace::TracerProvider';
 my         $require_mock = mock 'Module::Runtime';
 
-my ( $propagator, $tracer_provider );
+my $propagator      = my $original_propagator      = OpenTelemetry->propagator;
+my $tracer_provider = my $original_tracer_provider = OpenTelemetry->tracer_provider;
+
 my $mock = mock OpenTelemetry => override => [
     propagator => sub :lvalue {
         sentinel
@@ -29,174 +31,300 @@ my $mock = mock OpenTelemetry => override => [
     },
 ];
 
-after_each Clear => sub { $propagator = $tracer_provider = undef };
-
-it 'Can be disabled' => sub {
-    local %ENV = ( OTEL_SDK_DISABLED => 1 );
-    OpenTelemetry::SDK->import;
-    is $tracer_provider, U, 'Leaves tracer provider unchanged';
+after_each Clear => sub {
+    $propagator      = $original_propagator;
+    $tracer_provider = $original_tracer_provider;
 };
 
-it 'Dies on broken modules' => sub {
-    local %ENV = (
-        OTEL_TRACES_EXPORTER => 'console',
-        OTEL_PROPAGATORS     => 'baggage',
-    );
-
-    my $orig = \&Module::Runtime::require_module;
-    $require_mock->override(
-        require_module => sub ($) {
-            goto $orig
-                if $_[0] !~ /^OpenTelemetry/
-                || $_[0] =~ /^OpenTelemetry::X/;
-            die 'oops';
-        },
-    );
-
-    like dies { OpenTelemetry::SDK->import },
-        qr/^Error configuring 'baggage' propagator: oops/;
-
-    $require_mock->reset_all;
-};
-
-it 'Dies on errors during import' => sub {
-    my $orig = \&OpenTelemetry::SDK::config;
-    my $die = mock 'OpenTelemetry::SDK' => override => [
-        config => sub {
-            goto $orig if $_[0] eq 'SDK_DISABLED';
-            die 'boom';
-        },
-    ];
-
-    like dies { OpenTelemetry::SDK->import },
-        qr/^Unexpected error initialising OpenTelemetry::SDK: boom/;
-};
-
-describe 'Propagators' => sub {
-    describe 'Valid input' => sub {
-        my ( $env, @keys );
-
-        case None => sub {
-            $env  = 'none';
-            @keys = ();
-        };
-
-        case Baggage => sub {
-            $env  = 'baggage';
-            @keys = qw( baggage );
-        };
-
-        case TraceContext => sub {
-            $env  = 'tracecontext';
-            @keys = qw( traceparent tracestate );
-        };
-
-        case Default => sub {
-            $env  = '';
-            @keys = qw( traceparent tracestate baggage );
-        };
-
-        it 'Works' => sub {
-            local %ENV = (
-                OTEL_TRACES_EXPORTER => 'console',
-                OTEL_PROPAGATORS     => $env,
-            );
-
-            no_messages { OpenTelemetry::SDK->import };
-
-            is $propagator, object {
-                prop isa => 'OpenTelemetry::Propagator::Composite';
-                call_list keys => \@keys;
-            }, 'Installed correct propagator';
-        };
+describe Import => sub {
+    it 'Can be disabled' => sub {
+        local %ENV = ( OTEL_SDK_DISABLED => 1 );
+        OpenTelemetry::SDK->import;
+        ref_is $tracer_provider, $original_tracer_provider,
+            'Leaves tracer provider unchanged';
     };
 
-    tests 'Unknown propagator' => sub {
+    it 'Dies on broken modules' => sub {
         local %ENV = (
             OTEL_TRACES_EXPORTER => 'console',
-            OTEL_PROPAGATORS     => 'foo',
+            OTEL_PROPAGATORS     => 'baggage',
         );
 
-        is messages { OpenTelemetry::SDK->import }, [
-            [ warning => OpenTelemetry => match qr/Unknown propagator 'foo'/ ],
-        ], 'Logged unknown propagator';
+        my $orig = \&Module::Runtime::require_module;
+        $require_mock->override(
+            require_module => sub ($) {
+                goto $orig
+                    if $_[0] !~ /^OpenTelemetry/
+                    || $_[0] =~ /^OpenTelemetry::X/;
+                die 'oops';
+            },
+        );
 
-        is $propagator, object {
-            prop isa => 'OpenTelemetry::Propagator::Composite';
-            call_list keys => [];
-        }, 'Ignored unknown propagator';
+        like dies { OpenTelemetry::SDK->import },
+            qr/^Error configuring 'baggage' propagator: oops/;
+
+        $require_mock->reset_all;
+    };
+
+    it 'Dies on errors during import' => sub {
+        my $orig = \&OpenTelemetry::SDK::config;
+        my $die = mock 'OpenTelemetry::SDK' => override => [
+            config => sub {
+                goto $orig if $_[0] eq 'SDK_DISABLED';
+                die 'boom';
+            },
+        ];
+
+        like dies { OpenTelemetry::SDK->import },
+            qr/^Unexpected error initialising OpenTelemetry::SDK: boom/;
     };
 };
 
-describe 'Span processors' => sub {
-    my ( $env, $processor, $exporter, @keys );
+describe Propagators => sub {
+    describe Environment => sub {
+        describe Valid => sub {
+            my ( $class, @keys );
 
-    before_all Mock => sub {
-        $tracer_provider_mock->override(
-            new => sub {
-                mock {} => track => 1;
-            },
-        );
-    };
+            case None => sub {
+                $class = 'None';
+                @keys  = ();
+            };
 
-    after_all 'Clear mock' => sub {
-        $tracer_provider_mock->reset_all;
-    };
+            case Baggage => sub {
+                $class = 'Baggage';
+                @keys  = qw( baggage );
+            };
 
-    describe Valid => sub {
+            case TraceContext => sub {
+                $class = 'TraceContext';
+                @keys  = qw( traceparent tracestate );
+            };
 
-        case Console => sub {
-            $env       = 'console';
-            $exporter  = 'OpenTelemetry::SDK::Exporter::Console';
-            $processor = 'OpenTelemetry::SDK::Trace::Span::Processor::Simple';
+            case Default => sub {
+                $class = '';
+                @keys  = qw( traceparent tracestate baggage );
+            };
+
+            it 'Works' => { flat => 1 } => sub {
+                local %ENV = (
+                    OTEL_TRACES_EXPORTER => 'console',
+                    OTEL_PROPAGATORS     => lc $class,
+                );
+
+                no_messages { OpenTelemetry::SDK->configure_propagators };
+
+                $class ||= 'Composite';
+                is $propagator, object {
+                    prop isa => 'OpenTelemetry::Propagator::' . $class;
+                    call_list keys => \@keys;
+                }, 'Installed correct propagator';
+            };
         };
 
-        it 'Works' => sub {
-            local %ENV = ( OTEL_TRACES_EXPORTER => $env );
+        tests Invalid => sub {
+            local %ENV = (
+                OTEL_TRACES_EXPORTER => 'console',
+                OTEL_PROPAGATORS     => 'foo',
+            );
 
-            no_messages { OpenTelemetry::SDK->import };
+            is messages { OpenTelemetry::SDK->configure_propagators } => [
+                [ warning => OpenTelemetry => match qr/Unknown propagator 'foo'/ ],
+            ], 'Logged unknown propagator';
 
-            my ($tracker) = mocked $tracer_provider;
-            is $tracker->call_tracking, [
+            ref_is $propagator, $original_propagator,
+                'Ignored unknown propagator';
+        };
+    };
+
+    describe Programmatic => sub {
+        class Local::Propagator::Good :isa(OpenTelemetry::Propagator::None) {}
+        class Local::Propagator::Bad {}
+
+        describe Valid => sub {
+            my (@args, $check);
+
+            case Blessed => sub {
+                @args  = Local::Propagator::Good->new;
+                $check = 'Local::Propagator::Good';
+            };
+
+            case Named => sub {
+                @args  = 'baggage';
+                $check = 'OpenTelemetry::Propagator::Baggage';
+            };
+
+            case Mixed => sub {
+                @args  = ( 'tracecontext', undef, Local::Propagator::Good->new );
+                $check = 'OpenTelemetry::Propagator::Composite';
+            };
+
+            it 'Works' => { flat => 1 } => sub {
+                local %ENV = ( OTEL_PROPAGATORS => 'none' );
+
+                no_messages {
+                    my $propagator = OpenTelemetry::SDK
+                        ->configure_propagators(@args);
+
+                    is $propagator, object {
+                        prop isa => $check;
+                    }, 'Installed correct propagator';
+                };
+            };
+        };
+
+        describe Invalid => sub {
+            my (@args, $check);
+
+            case Blessed => sub {
+                @args  = Local::Propagator::Bad->new;
+                $check = match qr/^Attempted to configure a 'Local::Propagator::Bad'/;
+            };
+
+            case Named => sub {
+                @args  = 'baggggage';
+                $check = match qr/^Unknown propagator 'baggggage'/;
+            };
+
+            it 'Works' => { flat => 1 } => sub {
+                local %ENV = ( OTEL_PROPAGATORS => 'none' );
+
+                is messages {
+                    my $propagator = OpenTelemetry::SDK
+                        ->configure_propagators(@args);
+
+                    ref_is $propagator, $original_propagator,
+                        'Propagator is untouched';
+                } => [
+                    [ warning => OpenTelemetry => $check ],
+                ];
+            };
+        };
+    };
+};
+
+describe TracerProvider => sub {
+    describe Environment => sub {
+        before_all Mock => sub {
+            $tracer_provider_mock->override(
+                new => sub { mock {} => track => 1 },
+            );
+        };
+
+        after_all 'Clear mock' => sub {
+            $tracer_provider_mock->reset_all;
+        };
+
+        my ( $env, $calls, $messages );
+
+        case Console => sub {
+            $env   = 'console';
+            $messages = [];
+            $calls = [
                 {
                     sub_name => 'add_span_processor',
                     sub_ref  => D,
                     args     => [
                         D,
                         object {
-                            prop isa  => $processor;
+                            prop isa  => 'OpenTelemetry::SDK::Trace::Span::Processor::Simple';
                             call sub {
-                                Object::Pad::MOP::Class->for_class($processor)
+                                Object::Pad::MOP::Class->for_class( ref $_[0] )
                                     ->get_field('$exporter')
-                                    ->value(shift);
+                                    ->value($_[0]);
                             } => object {
-                                prop isa => $exporter;
-                            }
-                        }
+                                prop isa => 'OpenTelemetry::SDK::Exporter::Console';
+                            };
+                        },
                     ],
-                }
-            ], 'Installed correct exporter and processor';
+                },
+            ];
+        };
+
+        case None => sub {
+            $env = 'none';
+            $calls = $messages = [];
+        };
+
+        case Unknown => sub {
+            $env = 'foo';
+            $messages = [
+                [ warning => OpenTelemetry => match qr/Unknown exporter 'foo'/ ],
+            ];
+            $calls = [];
+        };
+
+        it 'Works' => { flat => 1 } => sub {
+            local %ENV = ( OTEL_TRACES_EXPORTER => $env );
+
+            is messages {
+                OpenTelemetry::SDK->configure_tracer_provider;
+            } => $messages, 'Logged expected messages';
+
+            my ($tracker) = mocked $tracer_provider;
+            is $tracker->call_tracking, $calls,
+                'Installed correct exporter and processor';
         };
     };
 
-    tests None => sub {
+    describe Programmatic => sub {
         local %ENV = ( OTEL_TRACES_EXPORTER => 'none' );
 
-        no_messages { OpenTelemetry::SDK->import };
+        my ( @args, $messages, $return, $calls );
 
-        my ($tracker) = mocked $tracer_provider;
-        is $tracker->call_tracking, [], 'Ignored processor';
-    };
+        tests 'Bad provider' => sub {
+            is messages {
+                my $provider = OpenTelemetry::SDK
+                    ->configure_tracer_provider(mock);
 
-    tests Unknown => sub {
-        local %ENV = ( OTEL_TRACES_EXPORTER => 'foo' );
+                is $provider => object {
+                    prop isa => 'OpenTelemetry::SDK::Trace::TracerProvider';
+                } => 'Returns expected provider';
+            } => [
+                [
+                    'warning',
+                    'OpenTelemetry',
+                    match qr/Attempted to configure .* but it does not implement/,
+                ],
+            ];
+        };
 
-        is messages { OpenTelemetry::SDK->import }, [
-            [ warning => OpenTelemetry => match qr/Unknown exporter 'foo'/ ],
-        ], 'Logged unknown exporter';
+        tests 'Unblessed provider' => sub {
+            is messages {
+                my $provider = OpenTelemetry::SDK
+                    ->configure_tracer_provider('oops');
 
-        my ($tracker) = mocked $tracer_provider;
-        is $tracker->call_tracking, [], 'Ignored processor';
+                is $provider => object {
+                    prop isa => 'OpenTelemetry::SDK::Trace::TracerProvider';
+                } => 'Returns expected provider';
+            } => [
+                [
+                    'warning',
+                    'OpenTelemetry',
+                    match qr/was not a blessed reference: oops/,
+                ],
+            ];
+        };
+
+        tests 'Good provider' => sub {
+            class Local::Provider::Good {
+                field @calls :reader;
+                method tracer             { push @calls, 'tracer' }
+                method force_flush        { push @calls, 'force_flush' }
+                method shutdown           { push @calls, 'shutdown' }
+                method add_span_processor { push @calls, 'add_span_processor' }
+            }
+
+            no_messages {
+                my $provider = OpenTelemetry::SDK
+                    ->configure_tracer_provider(Local::Provider::Good->new);
+                is $provider => object {
+                    prop isa => 'Local::Provider::Good';
+                } => 'Returns expected provider';
+
+                is [ $provider->calls ], ['add_span_processor'],
+                    'Configured provider';
+           }, 'Logged expected messages';
+       };
     };
 };
 

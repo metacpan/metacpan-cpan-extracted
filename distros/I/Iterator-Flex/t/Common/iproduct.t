@@ -28,39 +28,39 @@ sub _test_values {
         [ undef,    undef ],
     )[ $begin .. $end ];
 
-    is( \@values, \@expected, "values are correct" )
+    is( \@values, \@expected, 'values are correct' )
       or diag pp( \@values );
 }
 
-subtest "basic" => sub {
+subtest 'basic' => sub {
 
-    subtest "unlabeled iterators" => sub {
+    subtest 'unlabeled iterators' => sub {
         my $iter = iproduct( [ 0, 1 ], [ 2, 3 ] );
 
-        subtest "object properties" => sub {
+        subtest 'object properties' => sub {
 
             my @methods = ( 'rewind', 'freeze' );
-            isa_ok( $iter, ['Iterator::Flex::Base'], "correct parent class" );
-            can_ok( $iter, \@methods, join( ' ', "has", @methods ) );
+            isa_ok( $iter, ['Iterator::Flex::Base'], 'correct parent class' );
+            can_ok( $iter, \@methods, join( ' ', 'has', @methods ) );
         };
 
-        subtest "values" => sub {
+        subtest 'values' => sub {
 
             _test_values( $iter );
-            is( $iter->next, undef, "iterator exhausted" );
-            ok( $iter->is_exhausted, "iterator exhausted (officially)" );
+            is( $iter->next, undef, 'iterator exhausted' );
+            ok( $iter->is_exhausted, 'iterator exhausted (officially)' );
         };
 
     };
 
-    subtest "labeled iterators" => sub {
+    subtest 'labeled iterators' => sub {
         my $iter = iproduct( a => [ 0, 1 ], b => [ 2, 3 ] );
 
-        subtest "values" => sub {
+        subtest 'values' => sub {
             my @values = map { [ $iter->current, $iter->next ] } 1 .. 6;
 
-            is( $iter->next, undef, "iterator exhausted" );
-            ok( $iter->is_exhausted, "iterator exhausted (officially)" );
+            is( $iter->next, undef, 'iterator exhausted' );
+            ok( $iter->is_exhausted, 'iterator exhausted (officially)' );
 
             is(
                 \@values,
@@ -72,7 +72,7 @@ subtest "basic" => sub {
                     [ { a => 1, b => 3 }, undef ],
                     [ undef,              undef ],
                 ],
-                "values are correct"
+                'values are correct'
             ) or diag pp( \@values );
 
         };
@@ -82,25 +82,25 @@ subtest "basic" => sub {
 };
 
 
-subtest "rewind" => sub {
+subtest 'rewind' => sub {
 
     my $iter = iproduct( [ 0, 1 ], [ 2, 3 ] );
 
     drain( $iter, 4 );
 
-    is( $iter->next, undef, "iterator exhausted" );
-    ok( $iter->is_exhausted, "iterator exhausted (officially)" );
+    is( $iter->next, undef, 'iterator exhausted' );
+    ok( $iter->is_exhausted, 'iterator exhausted (officially)' );
 
-    try_ok { $iter->rewind } "rewind";
+    try_ok { $iter->rewind } 'rewind';
 
 
     _test_values( $iter );
-    is( $iter->next, undef, "iterator exhausted" );
-    ok( $iter->is_exhausted, "iterator exhausted (officially)" );
+    is( $iter->next, undef, 'iterator exhausted' );
+    ok( $iter->is_exhausted, 'iterator exhausted (officially)' );
 
 };
 
-subtest "only one" => sub {
+subtest 'only one' => sub {
 
     my $iter = iproduct( [1], [ 2, 3 ] );
 
@@ -114,41 +114,41 @@ subtest "only one" => sub {
             item [ [ 1, 3 ], undef ];
             end;
         },
-        "values are correct"
+        'values are correct'
     ) or diag pp( \@values );
 
 
 };
 
-subtest "freeze" => sub {
+subtest 'freeze' => sub {
 
     my $freeze;
 
-    subtest "unlabeled" => sub {
+    subtest 'unlabeled' => sub {
 
-        subtest "setup iter and pull some values" => sub {
+        subtest 'setup iter and pull some values' => sub {
             my $iter = iproduct( [ 0, 1 ], [ 2, 3 ] );
 
             _test_values( $iter, 2, 0, 1 );
 
-            try_ok { $freeze = $iter->freeze } "freeze iterator";
+            try_ok { $freeze = $iter->freeze } 'freeze iterator';
         };
 
-        subtest "thaw" => sub {
+        subtest 'thaw' => sub {
             my $iter;
-            try_ok { $iter = thaw( $freeze ) } "thaw iterator";
+            try_ok { $iter = thaw( $freeze ) } 'thaw iterator';
 
             _test_values( $iter, 4, 2, 5 );
 
-            is( $iter->next, undef, "iterator exhausted" );
-            ok( $iter->is_exhausted, "iterator exhausted (officially)" );
+            is( $iter->next, undef, 'iterator exhausted' );
+            ok( $iter->is_exhausted, 'iterator exhausted (officially)' );
         };
 
     };
 
-    subtest "labeled" => sub {
+    subtest 'labeled' => sub {
 
-        subtest "setup iter and pull some values" => sub {
+        subtest 'setup iter and pull some values' => sub {
             my $iter = iproduct( a => [ 0, 1 ], b => [ 2, 3 ] );
 
             my @values = map { [ $iter->current, $iter->next ] } 1 .. 2;
@@ -156,16 +156,16 @@ subtest "freeze" => sub {
             is(
                 \@values,
                 [ [ undef, { a => 0, b => 2 } ], [ { a => 0, b => 2 }, { a => 0, b => 3 } ], ],
-                "values are correct"
+                'values are correct'
             ) or diag pp( \@values );
 
 
-            try_ok { $freeze = $iter->freeze } "freeze iterator";
+            try_ok { $freeze = $iter->freeze } 'freeze iterator';
         };
 
-        subtest "thaw" => sub {
+        subtest 'thaw' => sub {
             my $iter;
-            try_ok { $iter = thaw( $freeze ) } "thaw iterator";
+            try_ok { $iter = thaw( $freeze ) } 'thaw iterator';
 
             my @values = map { [ $iter->current, $iter->next ] } 3 .. 6;
 
@@ -177,12 +177,12 @@ subtest "freeze" => sub {
                     [ { a => 1, b => 3 }, undef ],
                     [ undef,              undef ],
                 ],
-                "values are correct"
+                'values are correct'
             ) or diag pp( \@values );
 
 
-            is( $iter->next, undef, "iterator exhausted" );
-            ok( $iter->is_exhausted, "iterator exhausted (officially)" );
+            is( $iter->next, undef, 'iterator exhausted' );
+            ok( $iter->is_exhausted, 'iterator exhausted (officially)' );
         };
 
     };

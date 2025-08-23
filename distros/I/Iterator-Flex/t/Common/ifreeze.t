@@ -32,42 +32,42 @@ sub _test_values {
 
     my @expected = ( @{ $p{expected} } )[ $p{begin} .. $p{end} ];
 
-    is( \@values, \@expected, "values are correct" )
+    is( \@values, \@expected, 'values are correct' )
       or diag pp( \@values, \@expected );
 }
 
 
-subtest "basic" => sub {
+subtest 'basic' => sub {
 
     my $iter = ifreeze {} iseq( 3 );
 
-    subtest "object properties" => sub {
+    subtest 'object properties' => sub {
 
         my @methods = ( 'rewind', 'prev', 'reset', 'current' );
-        isa_ok( $iter, ['Iterator::Flex::Base'], "correct parent class" );
-        can_ok( $iter, \@methods, join( ' ', "has", @methods ) );
+        isa_ok( $iter, ['Iterator::Flex::Base'], 'correct parent class' );
+        can_ok( $iter, \@methods, join( ' ', 'has', @methods ) );
     };
 
     _test_values( $iter );
-    is( $iter->next, undef, "iterator exhausted" );
-    ok( $iter->is_exhausted, "iterator exhausted (officially)" );
+    is( $iter->next, undef, 'iterator exhausted' );
+    ok( $iter->is_exhausted, 'iterator exhausted (officially)' );
 
 };
 
-subtest "reset" => sub {
+subtest 'reset' => sub {
 
     my $iter = ifreeze {} iseq( 3 );
 
     drain( $iter, 4 );
 
-    try_ok { $iter->reset } "reset";
+    try_ok { $iter->reset } 'reset';
 
     _test_values( $iter );
-    is( $iter->next, undef, "iterator exhausted" );
-    ok( $iter->is_exhausted, "iterator exhausted (officially)" );
+    is( $iter->next, undef, 'iterator exhausted' );
+    ok( $iter->is_exhausted, 'iterator exhausted (officially)' );
 };
 
-subtest "serialize" => sub {
+subtest 'serialize' => sub {
 
     my @freeze;
 
@@ -75,11 +75,11 @@ subtest "serialize" => sub {
 
     drain( $iter, 4 );
 
-    is( scalar @freeze, 5, "number of frozen states" );
+    is( scalar @freeze, 5, 'number of frozen states' );
 
     for ( 0 .. 4 ) {
         subtest(
-            "thaw state $_" => sub {
+            'thaw state $_' => sub {
                 my $idx = shift;
                 _test_values(
                     thaw( $freeze[$idx] ),
@@ -93,12 +93,12 @@ subtest "serialize" => sub {
 
 };
 
-subtest "downstream can't freeze" => sub {
+subtest 'downstream can not freeze' => sub {
     my $err = dies {
         ifreeze {} igrep { %_ / 2 } iseq( 3 )
     };
-    isa_ok( $err, ['Iterator::Flex::Failure::parameter'], "parameter exception" );
-    like( "$err", qr/must provide a freeze method/, "correct message" );
+    isa_ok( $err, ['Iterator::Flex::Failure::parameter'], 'parameter exception' );
+    like( "$err", qr/must provide a freeze method/, 'correct message' );
 };
 
 done_testing;

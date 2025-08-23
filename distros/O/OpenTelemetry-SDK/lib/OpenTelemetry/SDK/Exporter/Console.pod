@@ -32,12 +32,43 @@ that module's documentation for details on the behaviours it provides.
 =head2 new
 
     $exporter = OpenTelemetry::SDK::Exporter::Console->new(
-        handle => $handle // *STDERR,
+        handle  => $handle     // *STDERR,
+        encoder => sub { ... } // \&Data::Dumper::Dumper || \&encode_json,
     );
 
 Create a new exporter. Takes an optional C<handle> parameter which will be
 used as the target for printing. By default, this will be set to standard
 error.
+
+It also takes an C<encoder> parameter that can be set to a code reference
+to be used for encoding the telemetry data before printing it to the handle.
+The encoder will be called with a hash reference representing the nested
+data to export, and it should return a string serialising that data.
+
+If no encoder is provided, the exporter will default to using
+L<Data::Dumper/Dumper>. This default can be modified by setting the
+C<OTEL_PERL_EXPORTER_CONSOLE_FORMAT> environment variable. Currently, the
+only supported value is C<json>, in which case the data will be encoded
+with L<JSON::MaybeXS/encode>.
+
+The behaviour of the default encoder can be further configured by specifying
+options following a comma after the name of the encoder. These options should
+be a list of comma-separated key-value pairs, where the key and the value
+are separated with an equal sign (eg. C<foo=1,bar=2>). Any spaces will be
+taken as part of the keys or values they fall into. The resulting pairs will
+be passed directly as arguments to L<JSON::MaybeXS/new> or L<Data::Dumper> as
+appropriate.
+
+The default configuration for L<Data::Dumper> is equivalent to setting
+this variable to C<data-dumper,Indent=0,Terse=1,Sortkeys=1>. The one for
+L<JSON::MaybeXS> is equivalent to setting it to C<json,canonical=1,utf8=1>.
+When using a custom configuration, take note that user-provided values are
+I<added> to these instead of replacing them.
+
+As an example, this means that if you wanted to use non-canonical JSON
+encoding, you'd have to set the following variables:
+
+    OTEL_PERL_EXPORTER_CONSOLE_FORMAT=json,canonical=0
 
 =head1 SEE ALSO
 

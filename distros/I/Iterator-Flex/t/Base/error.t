@@ -28,8 +28,8 @@ subtest 'return' => sub {
             'Iterator::Flex::Failure::Error',
         );
 
-        ok( $iter->is_error, "error flag" );
-        is( \@got, [ 1 .. 4 ], "got data" );
+        ok( $iter->is_error, 'error flag' );
+        is( \@got, [ 1 .. 4 ], 'got data' );
 
     };
 

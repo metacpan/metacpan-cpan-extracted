@@ -4,7 +4,7 @@
       "Nicholas Hubbard <nicholashubbard@posteo.net>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
@@ -45,6 +45,6 @@
          "url" : "https://github.com/NicholasBHubbard/sbozyp"
       }
    },
-   "version" : "v0.3.2",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "v0.4.2",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

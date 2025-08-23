@@ -10,6 +10,71 @@ use Test::Most;
 use_ok 'Wiki::JSON';
 
 {
+    my $parsed_html = Wiki::JSON->new->pre_html(q/'''bold''': hola/);
+
+    #    print Data::Dumper::Dumper($parsed);
+    is_deeply $parsed_html,
+    [
+        Wiki::JSON::HTML->_open_html_element(
+        'article', 0, { class => 'wiki-article' }
+        ),
+        Wiki::JSON::HTML->_open_html_element('p'),
+        Wiki::JSON::HTML->_open_html_element('b'),
+        'bold',
+        Wiki::JSON::HTML->_close_html_element('b'),
+        ': hola',
+        Wiki::JSON::HTML->_close_html_element('p'),
+        Wiki::JSON::HTML->_close_html_element('article'),
+    ],
+      'Simple bold test html starting with bold';
+}
+
+{
+    my $parsed_html = Wiki::JSON->new->pre_html(q/hola: '''bold''': hola/);
+
+    #    print Data::Dumper::Dumper($parsed);
+    is_deeply $parsed_html,
+    [
+        Wiki::JSON::HTML->_open_html_element(
+        'article', 0, { class => 'wiki-article' }
+        ),
+        Wiki::JSON::HTML->_open_html_element('p'),
+        'hola: ',
+        Wiki::JSON::HTML->_open_html_element('b'),
+        'bold',
+        Wiki::JSON::HTML->_close_html_element('b'),
+        ': hola',
+        Wiki::JSON::HTML->_close_html_element('p'),
+        Wiki::JSON::HTML->_close_html_element('article'),
+    ],
+      'Simple bold test html';
+}
+
+{
+    my $parsed_html = Wiki::JSON->new->pre_html(q/hola: '''''bold and italic''': italic''/);
+
+    #    print Data::Dumper::Dumper($parsed);
+    is_deeply $parsed_html,
+    [
+        Wiki::JSON::HTML->_open_html_element(
+        'article', 0, { class => 'wiki-article' }
+        ),
+        Wiki::JSON::HTML->_open_html_element('p'),
+        'hola: ',
+        Wiki::JSON::HTML->_open_html_element('b'),
+        Wiki::JSON::HTML->_open_html_element('i'),
+        'bold and italic',
+        Wiki::JSON::HTML->_close_html_element('i'),
+        Wiki::JSON::HTML->_close_html_element('b'),
+        Wiki::JSON::HTML->_open_html_element('i'),
+        ': italic',
+        Wiki::JSON::HTML->_close_html_element('i'),
+        Wiki::JSON::HTML->_close_html_element('p'),
+        Wiki::JSON::HTML->_close_html_element('article'),
+    ],
+      'Cursed bold and italic test html';
+}
+{
     my $parsed = Wiki::JSON->new->parse(q/hola: '''bold''': hola/);
 
     #    print Data::Dumper::Dumper($parsed);

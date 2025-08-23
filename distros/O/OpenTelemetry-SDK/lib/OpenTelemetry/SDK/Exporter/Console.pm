@@ -3,7 +3,7 @@ use Object::Pad ':experimental(init_expr)';
 
 package OpenTelemetry::SDK::Exporter::Console;
 
-our $VERSION = '0.027';
+our $VERSION = '0.028';
 
 class OpenTelemetry::SDK::Exporter::Console
     :does(OpenTelemetry::Exporter)
@@ -13,8 +13,46 @@ class OpenTelemetry::SDK::Exporter::Console
 
     use feature 'say';
 
-    field $handle :param = \*STDERR;
+    field $encoder :param //= undef;
+    field $handle  :param = \*STDERR;
     field $stopped;
+
+    ADJUST {
+        $encoder //= do {
+            my ( $format, @options ) = split /,/,
+                $ENV{OTEL_PERL_EXPORTER_CONSOLE_FORMAT} // 'data-dumper';
+
+            my %options = map split( /=/, $_, 2 ), @options;
+
+            if ( lc $format eq 'json' ) {
+                require JSON::MaybeXS;
+                my $json = JSON::MaybeXS->new(
+                    # Defaults
+                    canonical => 1,
+                    utf8      => 1,
+
+                    # User overrides
+                    %options,
+                );
+
+                sub { $json->encode(@_) };
+            }
+            else {
+                sub {
+                    require Data::Dumper;
+
+                    # Defaults
+                    local $Data::Dumper::Indent   = 0;
+                    local $Data::Dumper::Terse    = 1;
+                    local $Data::Dumper::Sortkeys = 1;
+
+                    my $dumper = Data::Dumper->new([@_]);
+                    $dumper->$_( $options{$_} ) for keys %options;
+                    $dumper->Dump;
+                };
+            }
+        };
+    }
 
     my sub dump_event ($event) {
         {
@@ -51,15 +89,11 @@ class OpenTelemetry::SDK::Exporter::Console
     method export ( $spans, $timeout = undef ) {
         return TRACE_EXPORT_FAILURE if $stopped;
 
-        require Data::Dumper;
-        local $Data::Dumper::Indent   = 0;
-        local $Data::Dumper::Terse    = 1;
-        local $Data::Dumper::Sortkeys = 1;
 
         for my $span (@$spans) {
             my $resource = $span->resource;
 
-            say $handle Data::Dumper::Dumper({
+            my $encoded = $encoder->({
                 attributes            => $span->attributes,
                 end_timestamp         => $span->end_timestamp,
                 events                => [ map dump_event($_), $span->events ],
@@ -79,6 +113,8 @@ class OpenTelemetry::SDK::Exporter::Console
                 trace_id              => $span->hex_trace_id,
                 trace_state           => $span->trace_state->to_string,
             });
+            chomp $encoded;
+            say $handle $encoded;
         }
 
         TRACE_EXPORT_SUCCESS;

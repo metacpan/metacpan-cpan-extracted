@@ -9,18 +9,18 @@ sub iterator {
 }
 
 sub test_values ( $iter ) {
-    subtest "values" => sub {
-        is( [ map { <$iter> } 1 .. 7 ], [ 0, 10, 20, 30, 40, 50, 60 ], "values are correct" );
+    subtest 'values' => sub {
+        is( [ map { <$iter> } 1 .. 7 ], [ 0, 10, 20, 30, 40, 50, 60 ], 'values are correct' );
         is( $iter->next,                U(),                           'beyond is undef' );
-        is( $iter->is_exhausted,        T(),                           "iterator exhausted" );
+        is( $iter->is_exhausted,        T(),                           'iterator exhausted' );
     };
 }
 
 
 my $iter = iterator();
 
-subtest "object properties" => sub {
-    isa_ok( $iter, ['Iterator::Flex::Base'], "correct parent class" );
+subtest 'object properties' => sub {
+    isa_ok( $iter, ['Iterator::Flex::Base'], 'correct parent class' );
     can_ok( $iter, ['reset'],  'can reset' );
     can_ok( $iter, ['rewind'], 'can rewind' );
 };
@@ -28,15 +28,15 @@ subtest "object properties" => sub {
 test_values( $iter );
 my $prev = $iter->prev;
 
-subtest "rewind" => sub {
+subtest 'rewind' => sub {
     $iter->rewind;
-    is( $iter->prev, $prev, "wrapped prev" );
+    is( $iter->prev, $prev, 'wrapped prev' );
     test_values( $iter );
 };
 
-subtest "reset" => sub {
+subtest 'reset' => sub {
     $iter->reset;
-    is( $iter->prev, U(), "wrapped prev" );
+    is( $iter->prev, U(), 'wrapped prev' );
     test_values( $iter );
 };
 

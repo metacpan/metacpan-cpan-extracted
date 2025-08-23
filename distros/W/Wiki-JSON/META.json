@@ -25,9 +25,11 @@
             "Cpanel::JSON::XS" : "0",
             "Data::Dumper" : "0",
             "Module::Build" : "0",
+            "Mojolicious" : "0",
             "Moo" : "0",
             "Path::Tiny" : "0",
             "Test::Most" : "0",
+            "Test::Warnings" : "0",
             "perl" : "v5.16.3"
          }
       }
@@ -35,10 +37,13 @@
    "provides" : {
       "Wiki::JSON" : {
          "file" : "lib/Wiki/JSON.pm",
-         "version" : "v0.0.23"
+         "version" : "v0.0.24"
       },
       "Wiki::JSON::Contributing" : {
          "file" : "lib/Wiki/JSON/Contributing.pm"
+      },
+      "Wiki::JSON::HTML" : {
+         "file" : "lib/Wiki/JSON/HTML.pm"
       },
       "Wiki::JSON::Parser" : {
          "file" : "lib/Wiki/JSON/Parser.pm"
@@ -53,6 +58,6 @@
          "url" : "https://github.com/sergiotarxz/Perl-Wiki-JSON"
       }
    },
-   "version" : "v0.0.23",
+   "version" : "v0.0.24",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,3 +1,21 @@
+0.000019  2025-08-22 16:17:34-07:00 America/Los_Angeles
+
+    - Add report test
+
+0.000018  2025-08-22 15:08:58-07:00 America/Los_Angeles
+
+    - Fix improper use of roles
+
+0.000017  2025-08-22 14:40:01-07:00 America/Los_Angeles
+
+    - Add more context for conflation methods
+
+0.000016  2025-08-22 12:01:33-07:00 America/Los_Angeles
+
+    - Fix #25, add Carp::Always to test and develop deps
+    - Fix #26, Add Parallel::Runner to deps, fix interface.t when db is missing
+    - Fix #27, Fix upsert with multiple fields
+
 0.000015  2025-06-13 17:37:50-07:00 America/Los_Angeles
 
     - Make it possible to add DB info after prepaing the orm/schema

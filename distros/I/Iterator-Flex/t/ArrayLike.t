@@ -40,94 +40,94 @@ sub _test_values {
 
     my @expected = ( @{ $p{expected} } )[ $p{begin} .. $p{end} ];
 
-    is( \@values, \@expected, "values are correct" ) or diag pp( \@values );
+    is( \@values, \@expected, 'values are correct' ) or diag pp( \@values );
 }
 
-subtest "basic" => sub {
+subtest 'basic' => sub {
 
     my $iter = ArrayLike( 0, 10, 20 );
 
-    subtest "object properties" => sub {
+    subtest 'object properties' => sub {
 
         my @methods = ( 'rewind', 'prev', 'current' );
-        isa_ok( $iter, ['Iterator::Flex::Base'], "correct parent class" );
-        can_ok( $iter, \@methods, join( ' ', "has", @methods ) );
+        isa_ok( $iter, ['Iterator::Flex::Base'], 'correct parent class' );
+        can_ok( $iter, \@methods, join( ' ', 'has', @methods ) );
     };
 
-    subtest "values" => sub {
+    subtest 'values' => sub {
         _test_values( $iter );
-        is( $iter->next, undef, "iterator exhausted" );
-        ok( $iter->is_exhausted, "iterator exhausted (officially)" );
+        is( $iter->next, undef, 'iterator exhausted' );
+        ok( $iter->is_exhausted, 'iterator exhausted (officially)' );
     };
 };
 
-subtest "reset" => sub {
+subtest 'reset' => sub {
 
 
-    subtest "fully drain iterator" => sub {
+    subtest 'fully drain iterator' => sub {
         my $iter = ArrayLike( 0, 10, 20 );
 
         drain( $iter, 3 );
 
-        try_ok { $iter->reset } "reset";
+        try_ok { $iter->reset } 'reset';
 
         _test_values( $iter );
-        is( $iter->next, undef, "iterator exhausted" );
-        ok( $iter->is_exhausted, "iterator exhausted (officially)" );
+        is( $iter->next, undef, 'iterator exhausted' );
+        ok( $iter->is_exhausted, 'iterator exhausted (officially)' );
     };
 
-    subtest "partially drain iterator" => sub {
+    subtest 'partially drain iterator' => sub {
         my $iter = ArrayLike( 0, 10, 20 );
 
         <$iter>;
 
-        try_ok { $iter->reset } "reset";
+        try_ok { $iter->reset } 'reset';
 
         _test_values( $iter );
-        is( $iter->next, undef, "iterator exhausted" );
-        ok( $iter->is_exhausted, "iterator exhausted (officially)" );
+        is( $iter->next, undef, 'iterator exhausted' );
+        ok( $iter->is_exhausted, 'iterator exhausted (officially)' );
     };
 };
 
-subtest "rewind" => sub {
+subtest 'rewind' => sub {
 
 
-    subtest "fully drain iterator" => sub {
+    subtest 'fully drain iterator' => sub {
         my $iter = ArrayLike( 0, 10, 20 );
 
         drain( $iter, 3 );
 
-        is( [ $iter->prev, $iter->current ], [ 20, undef ], "prev/current before rewind" );
+        is( [ $iter->prev, $iter->current ], [ 20, undef ], 'prev/current before rewind' );
 
-        try_ok { $iter->rewind } "rewind";
+        try_ok { $iter->rewind } 'rewind';
 
-        is( [ $iter->prev, $iter->current ], [ 20, undef ], "prev/current after rewind" );
+        is( [ $iter->prev, $iter->current ], [ 20, undef ], 'prev/current after rewind' );
 
         _test_values( $iter,
             expected =>
               [ [ 20, undef, 0 ], [ undef, 0, 10 ], [ 0, 10, 20 ], [ 10, 20, undef ], [ 20, undef, undef ], ],
         );
-        is( $iter->next, undef, "iterator exhausted" );
-        ok( $iter->is_exhausted, "iterator exhausted (officially)" );
+        is( $iter->next, undef, 'iterator exhausted' );
+        ok( $iter->is_exhausted, 'iterator exhausted (officially)' );
     };
 
-    subtest "partially drain iterator" => sub {
+    subtest 'partially drain iterator' => sub {
         my $iter = ArrayLike( 0, 10, 20 );
 
         <$iter> for 1 .. 2;
 
-        is( [ $iter->prev, $iter->current ], [ 0, 10 ], "prev/current before rewind" );
+        is( [ $iter->prev, $iter->current ], [ 0, 10 ], 'prev/current before rewind' );
 
-        try_ok { $iter->rewind } "rewind";
+        try_ok { $iter->rewind } 'rewind';
 
-        is( [ $iter->prev, $iter->current ], [ 0, 10 ], "prev/current after rewind" );
+        is( [ $iter->prev, $iter->current ], [ 0, 10 ], 'prev/current after rewind' );
 
         _test_values( $iter,
             expected =>
               [ [ 0, 10, 0 ], [ 10, 0, 10 ], [ 0, 10, 20 ], [ 10, 20, undef ], [ 20, undef, undef ], ], );
 
-        is( $iter->next, undef, "iterator exhausted" );
-        ok( $iter->is_exhausted, "iterator exhausted (officially)" );
+        is( $iter->next, undef, 'iterator exhausted' );
+        ok( $iter->is_exhausted, 'iterator exhausted (officially)' );
     };
 };
 
@@ -143,20 +143,20 @@ subtest 'exhaustion' => sub {
 
         drain( $iter, 3, 22 );
         ok( $iter->is_exhausted, 'drained' );
-        is( $iter->prev, 2,  "prev value" );
-        is( $iter->next, 22, "next value" );
+        is( $iter->prev, 2,  'prev value' );
+        is( $iter->next, 22, 'next value' );
     };
 
     subtest 'throw' => sub {
 
         my $iter = Iterator::Flex::ArrayLike->new( MyArray->new( @array ), { exhaustion => 'throw' } );
 
-        ok( dies { drain( $iter, 3 ) }, "threw" );
+        ok( dies { drain( $iter, 3 ) }, 'threw' );
 
         ok( $iter->is_exhausted, 'drained' );
-        is( $iter->prev, 2, "prev value" );
+        is( $iter->prev, 2, 'prev value' );
 
-        ok( dies { $iter->next }, "next throws" );
+        ok( dies { $iter->next }, 'next throws' );
     };
 
 };

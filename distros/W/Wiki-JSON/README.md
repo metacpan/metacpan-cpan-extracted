@@ -60,6 +60,43 @@ moment.
 
 Parses the wiki format into a serializable to JSON or YAML Perl data structure.
 
+## pre\_html
+
+    my $template_callbacks = {
+        generate_elements => sub {
+            my ( $template, $options, $parse_sub, $open_html_element_sub,
+                $close_html_element_sub )
+              = @_;
+            my @dom;
+            if ( $element->{template_name} eq 'stub' ) {
+                push @dom,
+                  $open_html_element_sub->( 'span', 0, { style => 'color: red;' } );
+                push @dom, @{ $element->{output} };
+                push @dom, $close_html_element_sub->('span');
+            }
+            return \@dom;
+        },
+        is_inline => sub {
+            my ($template) = @_;
+            if ($template->{template_name} eq 'stub') {
+                return 1;
+            }
+            if ($template->{template_name} eq 'videoplayer') {
+                return 0;
+            }
+        }
+    };
+
+    my $structure = $wiki_parser->pre_html($wiki_string, $template_callbacks);
+
+Retrieves an ArrayRef containing just HashRefs without nesting describing how HTML tags should be open and closed for a wiki text.
+
+(Do not use yet, not enough tested)
+
+### template\_callbacks
+
+An optional hashref containing any or both of this two keys pointing to subrefs
+
 # RETURN FROM METHODS
 
 ## parse

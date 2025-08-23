@@ -750,6 +750,31 @@ subtest 'Delayed jobs' => sub {
   $worker->unregister;
 };
 
+subtest 'Task limits' => sub {
+  my $id     = $minion->enqueue('foo');
+  my $id2    = $minion->enqueue('foo');
+  my $id3    = $minion->enqueue('bar');
+  my $id4    = $minion->enqueue('baz');
+  my $id5    = $minion->enqueue('bar');
+  my $worker = $minion->worker->register;
+  ok my $job = $worker->dequeue(0, {tasks => ['foo', 'bar', 'baz']}), 'job dequeued';
+  is $job->id, $id, 'right id';
+  ok $job->finish,                                   'job finished';
+  ok $job = $worker->dequeue(0, {tasks => ['bar']}), 'job dequeued';
+  is $job->id, $id3, 'right id';
+  ok $job->finish,                                          'job finished';
+  ok $job = $worker->dequeue(0, {tasks => ['bar', 'baz']}), 'job dequeued';
+  is $job->id, $id4, 'right id';
+  ok $job->finish,                                          'job finished';
+  ok $job = $worker->dequeue(0, {tasks => ['bar', 'baz']}), 'job dequeued';
+  is $job->id, $id5, 'right id';
+  ok $job->finish,                                                 'job finished';
+  ok $job = $worker->dequeue(0, {tasks => ['foo', 'bar', 'baz']}), 'job dequeued';
+  is $job->id, $id2, 'right id';
+  ok $job->finish, 'job finished';
+  $worker->unregister;
+};
+
 subtest 'Events' => sub {
   my ($enqueue, $pid_start, $pid_stop);
   my ($failed, $finished) = (0, 0);
@@ -1407,6 +1432,7 @@ subtest 'Worker remote control commands' => sub {
   my @commands;
   $_->add_command(test_id => sub { push @commands, shift->id }) for $worker, $worker2;
   $worker->add_command(test_args => sub { shift and push @commands, [@_] })->register;
+  $worker2->add_command(test_status => sub { $_[0]->status->{test} = $_[1] });
   ok $minion->broadcast('test_id', [], [$worker->id]),               'sent command';
   ok $minion->broadcast('test_id', [], [$worker->id, $worker2->id]), 'sent command';
   $worker->process_commands->register;
@@ -1417,10 +1443,12 @@ subtest 'Worker remote control commands' => sub {
   ok $minion->broadcast('test_whatever'),                                      'sent command';
   ok $minion->broadcast('test_args', [23], []),                                'sent command';
   ok $minion->broadcast('test_args', [1, [2], {3 => 'three'}], [$worker->id]), 'sent command';
+  ok $minion->broadcast('test_status', ['works']),                             'sent command';
   $_->process_commands for $worker, $worker2;
   is_deeply \@commands, [$worker->id, [23], [1, [2], {3 => 'three'}], $worker2->id], 'right structure';
+  is $worker2->status->{test}, 'works', 'right status';
   $_->unregister for $worker, $worker2;
-  ok !$minion->broadcast('test_id', []), 'command not sent';
+  ok !$minion->broadcast('test_id'), 'command not sent';
 };
 
 subtest 'Single process worker' => sub {

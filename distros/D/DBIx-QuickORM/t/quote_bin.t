@@ -23,7 +23,7 @@ do_for_all_dbs {
     };
 
     my $uuid = DBIx::QuickORM::Type::UUID->new;
-    my $uuid_bin = DBIx::QuickORM::Type::UUID::qorm_deflate($uuid, 'binary');
+    my $uuid_bin = DBIx::QuickORM::Type::UUID::qorm_deflate($uuid, affinity => 'binary');
 
     ok(my $orm = orm('my_orm')->connect, "Got a connection");
     my $s = $orm->handle('example');
@@ -37,7 +37,7 @@ do_for_all_dbs {
     ref_is($s->one({uuid => $uuid_bin}), $row, "Found a by UUID binary");
 
     my $uuid2 = DBIx::QuickORM::Type::UUID->new;
-    my $uuid2_bin = DBIx::QuickORM::Type::UUID::qorm_deflate($uuid, 'binary');
+    my $uuid2_bin = DBIx::QuickORM::Type::UUID::qorm_deflate($uuid, affinity => 'binary');
 
     $row->update({uuid => $uuid2});
     $row->refresh;

@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use experimental qw( signatures declared_refs refaliasing );
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 
 use Iterator::Flex::Utils qw( RETURN STATE EXHAUSTION :IterAttrs :IterStates );
 use Iterator::Flex::Factory;
@@ -14,6 +14,21 @@ use parent 'Iterator::Flex::Base';
 use List::Util 'all';
 
 use namespace::clean;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -71,6 +86,7 @@ sub construct ( $class, $state ) {
     # transform into iterators if required.
     my @stack
       = map { Iterator::Flex::Factory->to_iterator( $_, { ( +EXHAUSTION ) => RETURN } ) } @depends;
+    my @snapshot = @stack;
 
     # --- cargo cult??
     # my $value;
@@ -82,6 +98,15 @@ sub construct ( $class, $state ) {
     my %params = (
 
         ( +_SELF ) => \$self,
+
+        ( +RESET ) => sub {
+            $prev  = $current = undef;
+            @stack = @snapshot;
+        },
+
+        ( +REWIND ) => sub {
+            @stack = @snapshot;
+        },
 
         ( +STATE ) => \$iterator_state,
 
@@ -116,19 +141,27 @@ sub construct ( $class, $state ) {
 
         ( +_ROLES ) => [],
 
-        ( +_DEPENDS ) => \@stack,
+        ( +_DEPENDS ) => \@snapshot,
 
         ( +METHODS ) => {
             push => sub ( $, @iters ) {
                 push @stack,
                   map { Iterator::Flex::Factory->to_iterator( $_, { ( +EXHAUSTION ) => RETURN } ) } @iters;
+                $self->_clear_state;
             },
-            pop     => sub ($) { return CORE::pop( @stack ); },
+            pop => sub ($) {
+                return CORE::pop( @stack );
+            },
             unshift => sub ( $, @iters ) {
                 unshift @stack,
                   map { Iterator::Flex::Factory->to_iterator( $_, { ( +EXHAUSTION ) => RETURN } ) } @iters;
+                $self->_clear_state;
             },
             shift => sub ($) { return CORE::shift( @stack ); },
+
+            snapshot => sub ($) {
+                @snapshot = @stack;
+            },
         },
 
     );
@@ -141,6 +174,8 @@ sub construct ( $class, $state ) {
 __PACKAGE__->_add_roles( qw[
       State::Closure
       Next::ClosedSelf
+      Rewind::Closure
+      Reset::Closure
       Current::Closure
       Prev::Closure
 ] );
@@ -161,7 +196,7 @@ __END__
 
 =pod
 
-=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory unshifting
 
 =head1 NAME
 
@@ -169,20 +204,32 @@ Iterator::Flex::Stack - An iterator which concatenates a set of iterators
 
 =head1 VERSION
 
-version 0.25
+version 0.26
 
 =head1 METHODS
 
 =head2 new
 
-  $iterator = Iterator::Flex::Stack->new( $iterable1, $iterable2, ..., ?\%pars );
+  $iterator = Iterator::Flex::Stack->new( @iterables, ..., ?\%pars );
 
 Returns an iterator which manages a stack of iterators.  The iterator
 supports the L<pop>, L<push>, L<shift>, L<unshift> methods, which have
-same API as the Perl builtin subroutines.
+the same API as the Perl builtin subroutines.
 
-It returns the next value from the iterator at the top of the stack.
-Iterators are popped when they are exhausted.
+If the stack iterator is exhausted, pushing (or unshifting) a new
+iterator onto it will reset the state to the
+L<Iteration|/Iterator::Flex::Manual::Overview/Iteration State>
+state. The C<current> and C<prev> methods will return The next
+L</next> operation will retrieve the first element from the data
+stream,
+
+It also provides a L<snapshot> method, which records the iterators 
+in the stack.  This snapshot is used when the C<rewind> or C<reset>
+methods are called.  An initial snapshot is taken when the iterator
+is first constructed.
+
+The iterator returns the next value from the iterator at the top of
+the stack.  Iterators are popped when they are exhausted.
 
 The iterables are converted into iterators via
 L<Iterator::Flex::Factory/to_iterator> if required.
@@ -201,8 +248,8 @@ The iterator supports the following capabilities:
 =back
 
 Because the nature of the iterators on the stack may vary, the
-C<reset>, C<rewind> and C<freeze> methods may throw at runtime if an
-iterator on the stack does not support the required facilities.
+C<reset> and C<rewind> methods may throw at runtime if an iterator on
+the stack does not support the required facilities.
 
 =head1 INTERNALS
 

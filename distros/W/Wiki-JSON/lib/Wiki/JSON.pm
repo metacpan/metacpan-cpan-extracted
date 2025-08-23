@@ -9,8 +9,9 @@ use Moo;
 use Data::Dumper;
 use Const::Fast;
 use Wiki::JSON::Parser;
+use Wiki::JSON::HTML;
 
-our $VERSION = "0.0.23";
+our $VERSION = "0.0.24";
 
 const my $MAX_HX_SIZE                                           => 6;
 const my $EXTRA_CHARACTERS_BOLD_AND_ITALIC_WHEN_ITALIC          => 3;
@@ -22,6 +23,14 @@ const my $LIST_ELEMENT_DELIMITER                                => "\n* ";
 sub parse {
     my ( $self, $wiki_text ) = @_;
     return Wiki::JSON::Parser->new->parse($wiki_text);
+}
+
+sub pre_html {
+    my ($self, $wiki_text, $template_callbacks) = @_;
+    $template_callbacks //= {};
+    $template_callbacks->{is_inline} //= sub { return 1; };
+    $template_callbacks->{generate_elements} //= sub {};
+    return Wiki::JSON::HTML->new->pre_html_json($wiki_text, $template_callbacks);
 }
 1;
 
@@ -88,6 +97,43 @@ moment.
     my $structure = $wiki_parser->parse($wiki_string);
 
 Parses the wiki format into a serializable to JSON or YAML Perl data structure.
+
+=head2 pre_html
+
+    my $template_callbacks = {
+        generate_elements => sub {
+            my ( $template, $options, $parse_sub, $open_html_element_sub,
+                $close_html_element_sub )
+              = @_;
+            my @dom;
+            if ( $element->{template_name} eq 'stub' ) {
+                push @dom,
+                  $open_html_element_sub->( 'span', 0, { style => 'color: red;' } );
+                push @dom, @{ $element->{output} };
+                push @dom, $close_html_element_sub->('span');
+            }
+            return \@dom;
+        },
+        is_inline => sub {
+            my ($template) = @_;
+            if ($template->{template_name} eq 'stub') {
+                return 1;
+            }
+            if ($template->{template_name} eq 'videoplayer') {
+                return 0;
+            }
+        }
+    };
+
+    my $structure = $wiki_parser->pre_html($wiki_string, $template_callbacks);
+
+Retrieves an ArrayRef containing just HashRefs without nesting describing how HTML tags should be open and closed for a wiki text.
+
+(Do not use yet, not enough tested)
+
+=head3 template_callbacks
+
+An optional hashref containing any or both of this two keys pointing to subrefs
 
 =head1 RETURN FROM METHODS
 

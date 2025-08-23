@@ -21,6 +21,7 @@ lib/Minion/Command/minion/worker.pm
 lib/Minion/Guide.pod
 lib/Minion/Iterator.pm
 lib/Minion/Job.pm
+lib/Minion/Util.pm
 lib/Minion/Worker.pm
 lib/Mojolicious/Plugin/Minion.pm
 lib/Mojolicious/Plugin/Minion/Admin.pm
@@ -63,6 +64,7 @@ lib/Mojolicious/Plugin/Minion/resources/templates/minion/workers.html.ep
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
+MANIFEST.bak
 MANIFEST.SKIP
 README.md
 t/backend.t
@@ -79,5 +81,6 @@ t/pg_lite_app.t
 t/pg_worker.t
 t/pod.t
 t/pod_coverage.t
+t/util.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

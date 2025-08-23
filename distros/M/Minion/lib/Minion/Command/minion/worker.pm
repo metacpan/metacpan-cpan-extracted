@@ -16,7 +16,8 @@ sub run {
     'D|dequeue-timeout=i'    => \$status->{dequeue_timeout},
     'I|heartbeat-interval=i' => \$status->{heartbeat_interval},
     'j|jobs=i'               => \$status->{jobs},
-    'q|queue=s'              => \my @queues,
+    'L|limit=s' => sub { $_[1] =~ /^(\S+)=(\d+)$/ ? ($status->{limits}{$1} = $2) : warn "Invalid limit option: $_[1]" },
+    'q|queue=s' => \my @queues,
     'R|repair-interval=i'    => \$status->{repair_interval},
     's|spare=i'              => \$status->{spare},
     'S|spare-min-priority=i' => \$status->{spare_min_priority};
@@ -50,6 +51,7 @@ Minion::Command::minion::worker - Minion worker command
     ./myapp.pl minion worker
     ./myapp.pl minion worker -m production -I 15 -C 5 -R 3600 -j 10
     ./myapp.pl minion worker -q important -q default
+    ./myapp.pl minion worker -L foo=2 -L bar=5
 
   Options:
     -C, --command-interval <seconds>     Worker remote control command interval,
@@ -65,6 +67,8 @@ Minion::Command::minion::worker - Minion worker command
                                          parallel in forked worker processes
                                          (not including spare processes),
                                          defaults to 4
+    -L, --limit <name>=<number>          Limit number of jobs for a specific
+                                         task
     -m, --mode <name>                    Operating mode for your application,
                                          defaults to the value of
                                          MOJO_MODE/PLACK_ENV or "development"
@@ -122,7 +126,7 @@ from anywhere in the network, by broadcasting the following remote control comma
 
 Instruct one or more workers to change the number of jobs to perform concurrently. Setting this value to C<0> will
 effectively pause the worker. That means all current jobs will be finished, but no new ones accepted, until the number
-is increased again.
+is increased again. Note that L</"spare"> might need to be adjusted if high priority jobs should be paused as well.
 
 =head2 kill
 
@@ -131,6 +135,15 @@ is increased again.
 
 Instruct one or more workers to send a signal to a job that is currently being performed. This command will be ignored
 by workers that do not have a job matching the id. That means it is safe to broadcast this command to all workers.
+
+=head2 spare
+
+  $ ./myapp.pl minion job -b spare -a '[1]'
+  $ ./myapp.pl minion job -b spare -a '[1]' 23
+
+Instruct one or more workers to change the number of spare worker processes to reserve for high priority jobs. Setting
+this value to C<0> will effectively disable the feature, this is required to pause the worker. That means all current
+high priority jobs will be finished, but no new ones accepted, until the number is increased again.
 
 =head2 stop
 

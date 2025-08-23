@@ -5,7 +5,7 @@ package Iterator::Flex::Role::Next::ClosedSelf;
 use strict;
 use warnings;
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 
 use Ref::Util;
 use Scalar::Util;
@@ -64,7 +64,7 @@ Iterator::Flex::Role::Next::ClosedSelf - Role for closure iterator which closes 
 
 =head1 VERSION
 
-version 0.25
+version 0.26
 
 =head1 METHODS
 

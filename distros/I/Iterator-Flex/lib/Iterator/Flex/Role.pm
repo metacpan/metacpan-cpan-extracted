@@ -5,7 +5,7 @@ package Iterator::Flex::Role;
 use strict;
 use warnings;
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 
 use Role::Tiny;
 use experimental 'signatures';
@@ -92,7 +92,7 @@ Iterator::Flex::Role - Iterator Methods to add Iterator::Flex Iterator modifiers
 
 =head1 VERSION
 
-version 0.25
+version 0.26
 
 =head1 METHODS
 

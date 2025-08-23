@@ -255,6 +255,7 @@ type=>"string",
 duplicate=>"left",
 accessor=>"",
 prefix=>"search"
+package=>caller
 ```
 
 Supported options during importing include:
@@ -361,6 +362,15 @@ eg
 
   my $pos=my_searcher_...
 ```
+
+### package
+
+```perl
+package=>STRING
+```
+
+From v0.2.0. The package which the generated subrouteines will be scoped to. If
+not provided it is set the calling package.
 
 ## Anonymous Subroutines
 

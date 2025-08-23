@@ -6,7 +6,7 @@ use v5.34.0; # The Perl version on Slackware 15.0 (sbozyp's min supported versio
 
 package Sbozyp;
 
-our $VERSION = '0.3.2';
+our $VERSION = '0.4.2';
 
 use File::Basename qw(basename dirname);
 use File::Temp;
@@ -32,18 +32,19 @@ sub main {
     my @argv = @_;
     my $usage = command_usage('main');
     my $help_msg = command_help_msg('main');
-    # Process global options
+    # process global options
     Getopt::Long::Configure('pass_through'); # pass_through to ignore the command options
-    sbozyp_getopts( # global options use uppercase while command options use lowercase
+    sbozyp_getopts(
         \@argv,
         '-C'   => \my $opt_clone,
         '-F=s' => \my $opt_configfile,
         '-R=s' => \my $opt_reponame,
-        '-S'   => \my $opt_sync
+        '-S'   => \my $opt_sync,
+        '-T'   => \my $opt_noinit
     );
     Getopt::Long::Configure('nopass_through');
-    my $cmd = shift(@argv) or die "$usage\n";
     # determine the command main function
+    my $cmd = shift(@argv) or die "$usage\n";
     my $cmd_main;
     if    ($cmd =~ /^(?:--help|-h)$/)    { print $help_msg      ; return        }
     elsif ($cmd =~ /^(?:--version|-V)$/) { print $VERSION, "\n" ; return        }
@@ -54,9 +55,11 @@ sub main {
     elsif ($cmd =~ /^(?:remove|rm)$/)    { $cmd_main = \&remove_command_main    }
     elsif ($cmd =~ /^(?:search|se)$/)    { $cmd_main = \&search_command_main    }
     else                                 { sbozyp_die("invalid command '$cmd'") }
-    # setup environment
+    # set the configuration
     parse_config_file($opt_configfile); # mutates the global %CONFIG
     set_repo_name_or_die($opt_reponame // $CONFIG{REPO_PRIMARY});
+    # initialize the environment
+    return if ($opt_noinit and !repo_is_cloned());
     sbozyp_mkdir("$CONFIG{REPO_ROOT}/$CONFIG{REPO_NAME}", $CONFIG{TMPDIR});
     if ($opt_clone or !repo_is_cloned()) {
         i_am_root_or_die('need root to clone repo');
@@ -299,7 +302,7 @@ sub pkg {
         MD5SUM          => [split ' ', $info{MD5SUM}],
         DOWNLOAD_x86_64 => [split ' ', $info{DOWNLOAD_x86_64}],
         MD5SUM_x86_64   => [split ' ', $info{MD5SUM_x86_64}],
-        REQUIRES        => [grep { $_ ne '%README%' } split(' ', $info{REQUIRES})], # removes potential %README% specifier
+        REQUIRES        => [grep { $_ ne '%README%' and find_pkgname($_) } split(' ', $info{REQUIRES})], # removes %README% specifier and non-existent packages
         HAS_EXTRA_DEPS  => scalar(grep { $_ eq '%README%' } split(' ', $info{REQUIRES})),
         ARCH_UNSUPPORTED  => do {
             my @urls = split(' ', arch() eq 'x86_64' ? $info{DOWNLOAD_x86_64} : $info{DOWNLOAD});
@@ -658,7 +661,7 @@ sub clone_repo {
     }
     my $repo_git_branch = repo_git_branch();
     my $repo_git_url = repo_git_url();
-    sbozyp_system('git', 'clone', '--branch', $repo_git_branch, $repo_git_url, $local_git_repo);
+    sbozyp_system('git', 'clone', '--branch', $repo_git_branch, '--single-branch', $repo_git_url, $local_git_repo);
 }
 
 sub sync_repo {
@@ -935,17 +938,18 @@ and the SlackBuilds.org repository.
 
 Every command has its own options, these are just the global ones:
 
- -C                  Re-clone repository before running the command
+ -C                  Re-clone SBo repository before running the command
  -F FILE             Use FILE as the configuration file
- -R REPO_NAME        Use repository REPO_NAME instead of REPO_PRIMARY
- -S                  Sync repository before running the command
+ -R REPO_NAME        Use SBo repository REPO_NAME instead of REPO_PRIMARY
+ -S                  Sync SBo repository before running the command
+ -T                  Exit if the SBo repository hasn't been cloned yet
 
-Commands are:
+Commands:
 
  install|in          Install or upgrade packages
  build|bu            Build but don't install packages
- query|qr            Query for information about a package
  remove|rm           Remove packages
+ query|qr            Query for information about a package
  search|se           Search for a package using a Perl regex
  null|nu             Do nothing, useful in conjunction with -C or -S opts
 
@@ -955,9 +959,9 @@ Examples:
  sbozyp --version
  sbozyp install --help
  sbozyp install -S -R $REPO -f xclip system/password-store
- sbozyp build -f mu
- sbozyp query -q password-store
+ sbozyp -T build -f mu
  sbozyp remove xclip password-store
+ sbozyp query -q password-store
  sbozyp search -n system/.+
  sbozyp -R $REPO -C null
 
@@ -1012,30 +1016,9 @@ Defaults to C<TMPDIR=/tmp>.
 
 =head1 COMMANDS
 
-=head2 BUILD
-
- Usage: sbozyp <build|bu> [-h] <pkgname...>
-
-Build but don't install packages.
-
-Options are:
-
- -h|--help           Print help message
- -f                  Force rebuild the package even if it's already built
- -i                  No confirmation prompt
-
-Examples:
-
- sbozyp build --help
- sbozyp bu password-store
- sbozyp bu -f password-store
- sbozyp bu -f -i system/password-store
- sbozyp -S -R $REPO bu password-store
- sbozyp bu -i system/password-store xclip mu
-
 =head2 INSTALL
 
- Usage: sbozyp <install|in> [-h] [-f] [-i] [-n] <pkgname...>
+ Usage: sbozyp <install|in> [-h] [-f] [-i] [-k] [-n] <pkgname...>
 
 Install or upgrade packages.
 
@@ -1057,23 +1040,44 @@ Examples:
  sbozyp -S -R $REPO in -f password-store
  sbozyp in $(sbozyp -S qr -u | cut -d' ' -f1) ### upgrade all packages
 
-=head2 NULL
+=head2 BUILD
 
- Usage: sbozyp <null|nu> [-h]
+ Usage: sbozyp <build|bu> [-h] [-f] [-i] <pkgname...>
 
-Do nothing. Useful if you just want to re-clone (with global -C option) or
-sync (with global -S option) a repository.
+Build but don't install packages.
 
 Options are:
 
  -h|--help           Print help message
+ -f                  Force rebuild the package even if it's already built
+ -i                  No confirmation prompt
 
 Examples:
 
- sbozyp null --help
- sbozyp nu
- sbozyp -R $REPO -S nu
- sbozyp -S nu
+ sbozyp build --help
+ sbozyp bu password-store
+ sbozyp bu -f password-store
+ sbozyp bu -f -i system/password-store
+ sbozyp -S -R $REPO bu password-store
+ sbozyp bu -i system/password-store xclip mu
+
+=head2 REMOVE
+
+ Usage: sbozyp <remove|rm> [-h] [-i] <pkgname...>
+
+Remove packages.
+
+Options are:
+
+ -h|--help           Print help message
+ -i                  No confirmation prompt
+
+Examples:
+
+ sbozyp remove --help
+ sbozyp rm xclip mu system/password-store
+ sbozyp rm -i password-store
+ sbozyp -S -R $REPO rm password-store
 
 =head2 QUERY
 
@@ -1107,27 +1111,9 @@ Examples:
  sbozyp qr -u
  sbozyp -S -R $REPO qr password-store
 
-=head2 REMOVE
-
- Usage: sbozyp <remove|rm> [-h] [-i] <pkgname...>
-
-Remove packages.
-
-Options are:
-
- -h|--help           Print help message
- -i                  No confirmation prompt
-
-Examples:
-
- sbozyp remove --help
- sbozyp rm xclip mu system/password-store
- sbozyp rm -i password-store
- sbozyp -S -R $REPO rm password-store
-
 =head2 SEARCH
 
- Usage: sbozyp <search|se> [-h] [-c] [-n] <regex>
+ Usage: sbozyp <search|se> [-h] [-c] [-n] [-p] <regex>
 
 Search for a package using a Perl regex.
 
@@ -1145,6 +1131,24 @@ Examples:
  sbozyp se -p password.+
  sbozyp se -c -n system/.+
  sbozyp -S -R $REPO se password-store
+
+=head2 NULL
+
+ Usage: sbozyp <null|nu> [-h]
+
+Do nothing. Useful if you just want to re-clone (with global -C option) or
+sync (with global -S option) a repository.
+
+Options are:
+
+ -h|--help           Print help message
+
+Examples:
+
+ sbozyp null --help
+ sbozyp nu
+ sbozyp -R $REPO -S nu
+ sbozyp -S nu
 
 =head1 AUTHOR
 

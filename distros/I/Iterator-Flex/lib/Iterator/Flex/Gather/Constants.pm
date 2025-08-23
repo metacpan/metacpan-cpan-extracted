@@ -5,7 +5,7 @@ package Iterator::Flex::Gather::Constants;
 use strict;
 use warnings;
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 
 use Exporter 'import';
 
@@ -55,7 +55,7 @@ Iterator::Flex::Gather::Constants - Constants for Gather
 
 =head1 VERSION
 
-version 0.25
+version 0.26
 
 =head1 INTERNALS
 

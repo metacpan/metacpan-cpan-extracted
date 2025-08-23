@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use experimental 'signatures';
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 
 use Iterator::Flex::Utils qw( STATE THROW EXHAUSTION :IterAttrs :IterStates );
 use Iterator::Flex::Factory;
@@ -14,6 +14,9 @@ use Ref::Util;
 use parent 'Iterator::Flex::Base';
 
 use namespace::clean;
+
+
+
 
 
 
@@ -58,6 +61,7 @@ sub construct ( $class, $state ) {
     $src
       = Iterator::Flex::Factory->to_iterator( $src, { ( +EXHAUSTION ) => THROW } );
 
+    my @values;
     my $self;
     my $iterator_state;
 
@@ -71,21 +75,25 @@ sub construct ( $class, $state ) {
         ( +NEXT ) => sub {
             return $self->signal_exhaustion if $iterator_state == IterState_EXHAUSTED;
 
-            my $ret = eval {
-                my $value = $src->();
-                local $_ = $value;
-                $code->();
-            };
-            if ( $@ ne q{} ) {
-                die $@
-                  unless Ref::Util::is_blessed_ref( $@ )
-                  && $@->isa( 'Iterator::Flex::Failure::Exhausted' );
-                return $self->signal_exhaustion;
+            ## no critic( Until )
+            until ( @values ) {
+                @values = eval {
+                    my $value = $src->();
+                    local $_ = $value;
+                    $code->();
+                };
+                if ( $@ ne q{} ) {
+                    die $@
+                      unless Ref::Util::is_blessed_ref( $@ )
+                      && $@->isa( 'Iterator::Flex::Failure::Exhausted' );
+                    return $self->signal_exhaustion;
+                }
             }
-            return $ret;
+            return shift @values;
         },
 
-        ( +RESET )    => sub { },
+        ( +RESET )    => sub { @values = () },
+        ( +REWIND )   => sub { @values = () },
         ( +_DEPENDS ) => $src,
     };
 }
@@ -94,9 +102,8 @@ sub construct ( $class, $state ) {
 __PACKAGE__->_add_roles( qw[
       State::Closure
       Next::ClosedSelf
-      Rewind::Closure
       Reset::Closure
-      Current::Closure
+      Rewind::Closure
 ] );
 
 1;
@@ -123,7 +130,7 @@ Iterator::Flex::Map - Map Iterator Class
 
 =head1 VERSION
 
-version 0.25
+version 0.26
 
 =head1 METHODS
 
@@ -132,7 +139,8 @@ version 0.25
   $iterator = Ierator::Flex::Map->new( $coderef, $iterable, ?\%pars );
 
 Returns an iterator equivalent to running C<map> on C<$iterable> with
-the specified code.
+the specified code.  If C<$coderef> returns a list, the elements will
+be returned singly.
 
 C<CODE> is I<not> run if C<$iterable> is exhausted.
 
@@ -148,6 +156,8 @@ The iterator supports the following capabilities:
 =item next
 
 =item reset
+
+=item rewind
 
 =back
 

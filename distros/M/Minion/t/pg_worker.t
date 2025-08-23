@@ -40,6 +40,43 @@ subtest 'Basics' => sub {
   is_deeply $minion->job($id)->info->{result}, {just => 'works!'}, 'right result';
 };
 
+subtest 'Task limit' => sub {
+  $minion->add_task(
+    $_ => sub {
+      my $job = shift;
+      $job->finish({just => 'works!'});
+    }
+  ) for qw(foo bar baz);
+  my $worker = $minion->worker;
+  $worker->status->{dequeue_timeout} = 0;
+  $worker->status->{limits}          = {foo => 0};
+  $worker->status->{jobs}            = 1;
+  $worker->on(
+    dequeue => sub {
+      my ($worker, $job) = @_;
+      return unless $job->task eq 'baz';
+      $job->on(reap => sub { kill 'INT', $$ });
+    }
+  );
+  my $id  = $minion->enqueue('foo');
+  my $id2 = $minion->enqueue('bar');
+  my $id3 = $minion->enqueue('baz');
+  $worker->run;
+  is_deeply $minion->job($id)->info->{state},  'inactive', 'right state';
+  is_deeply $minion->job($id2)->info->{state}, 'finished', 'right state';
+  is_deeply $minion->job($id3)->info->{state}, 'finished', 'right state';
+};
+
+subtest 'Remote control commands (pause before shutdown)' => sub {
+  my $worker = $minion->worker->register;
+  $minion->broadcast('jobs',  [0]);
+  $minion->broadcast('spare', [0]);
+  $worker->on(busy => sub { kill 'INT', $$ });
+  $worker->run;
+  is $worker->status->{jobs},  0, 'jobs updated';
+  is $worker->status->{spare}, 0, 'spare updated';
+};
+
 subtest 'Clean up event loop' => sub {
   my $timer = 0;
   Mojo::IOLoop->recurring(0 => sub { $timer++ });

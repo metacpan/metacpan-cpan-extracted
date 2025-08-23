@@ -77,6 +77,7 @@ my @files = (
     't/Common/iarray.t',
     't/Common/icache.t',
     't/Common/icat.t',
+    't/Common/ichain.t',
     't/Common/icycle.t',
     't/Common/ifreeze.t',
     't/Common/igather.t',

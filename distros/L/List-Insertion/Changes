@@ -1,4 +1,12 @@
 Revision history for Perl extension List::Insertion.
+v0.2.1 2025-08-23
+  [fixes]
+    - latest Tempalte::Plex to prevent template memory leak
+  [improvements]
+    - default target package from import caller is used sub routine generation
+    - target package can be supplied for resolving package variables
+    - updated pod 
+
 v0.1.4 2024-01-10
   [maintenance]
     - Updated to work with latest Template::Plex (v0.7.0)

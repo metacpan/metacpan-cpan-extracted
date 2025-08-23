@@ -2,7 +2,9 @@ package DBIx::QuickORM::Type::JSON;
 use strict;
 use warnings;
 
-our $VERSION = '0.000015';
+our $VERSION = '0.000019';
+
+use DBIx::QuickORM::Util qw/parse_conflate_args/;
 
 use Carp qw/croak/;
 use Scalar::Util qw/reftype blessed/;
@@ -18,27 +20,28 @@ my $CJSON = Cpanel::JSON::XS->new->utf8(1)->convert_blessed(1)->allow_nonref(1)-
 sub CJSON { $CJSON }
 
 sub qorm_inflate {
-    my $in = pop;
+    my $params = parse_conflate_args(@_);
+    my $val    = $params->{value} or return undef;
+    my $class  = $params->{class} // __PACKAGE__;
 
-    return $in if ref($in);
-    return decode_json($in);
+    return $val if ref($val);
+    return decode_json($val);
 }
 
 sub qorm_deflate {
-    my $affinity = pop;
-    my $in       = pop;
-    my $class    = shift || __PACKAGE__;
+    my $params   = parse_conflate_args(@_);
+    my $val      = $params->{value}    or return undef;
+    my $affinity = $params->{affinity} or croak "Could not determine affinity";
+    my $class    = $params->{class} // __PACKAGE__;
 
-    return $in unless ref($in);
-
-    if (blessed($in)) {
-        my $r = reftype($in) // '';
-        if    ($r eq 'HASH')  { $in = {%$in} }
-        elsif ($r eq 'ARRAY') { $in = [@$in] }
-        else                  { die "Not sure what to do with $in" }
+    if (blessed($val)) {
+        my $r = reftype($val) // '';
+        if    ($r eq 'HASH')  { $val = {%$val} }
+        elsif ($r eq 'ARRAY') { $val = [@$val] }
+        else                  { die "Not sure what to do with $val" }
     }
 
-    return $class->JSON->encode($in);
+    return $class->JSON->encode($val);
 }
 
 sub qorm_compare {

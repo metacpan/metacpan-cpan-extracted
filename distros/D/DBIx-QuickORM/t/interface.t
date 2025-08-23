@@ -1,5 +1,11 @@
 use Test2::V0 -target => 'DBIx::QuickORM';
 
+BEGIN {
+    eval { require DBD::mysql;   1 } or do { $INC{'DBD/mysql.pm'}   = __FILE__ };
+    eval { require DBD::MariaDB; 1 } or do { $INC{'DBD/MariaDB.pm'} = __FILE__ };
+    eval { require DBD::Pg;      1 } or do { $INC{'DBD/Pg.pm'}      = __FILE__ };
+}
+
 {
     package DBIx::QuickORM::DB::Fake;
     $INC{'DBIx/QuickORM/DB/Fake.pm'} = __FILE__;

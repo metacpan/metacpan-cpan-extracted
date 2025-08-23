@@ -5,7 +5,7 @@ package Iterator::Flex::Role::Rewind::Method;
 use strict;
 use warnings;
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 
 use Role::Tiny;
 
@@ -62,7 +62,7 @@ Iterator::Flex::Role::Rewind::Method - Implement C<rewind> as a method
 
 =head1 VERSION
 
-version 0.25
+version 0.26
 
 =head1 METHODS
 

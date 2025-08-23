@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use feature qw/state/;
 
-our $VERSION = '0.000015';
+our $VERSION = '0.000019';
 
 use Carp qw/confess croak carp/;
 use Sub::Util qw/set_subname/;
@@ -614,12 +614,19 @@ sub _do_binds {
         my @args;
         if ($type eq 'field') {
             my $affinity = $source->field_affinity($field, $dialect);
+            my %conflate_args = (
+                affinity => $affinity,
+                field    => $field,
+                dialect  => $dialect,
+                source   => $source,
+                value    => $val,
+            );
 
             if (blessed($val) && $val->DOES('DBIx::QuickORM::Role::Type')) {
-                $val = $val->qorm_deflate($affinity);
+                $val = $val->qorm_deflate(%conflate_args);
             }
             elsif (my $type = $source->field_type($field)) {
-                $val = $type->qorm_deflate($val, $affinity);
+                $val = $type->qorm_deflate(%conflate_args);
             }
 
             if ($quote_bin && $affinity eq 'binary') {

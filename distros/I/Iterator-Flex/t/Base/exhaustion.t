@@ -25,8 +25,8 @@ subtest 'return' => sub {
             push @got, $data;
         }
 
-        ok( $iter->is_exhausted, "exhausted flag" );
-        is( \@got, [ 1 .. 10 ], "got data" );
+        ok( $iter->is_exhausted, 'exhausted flag' );
+        is( \@got, [ 1 .. 10 ], 'got data' );
     };
 
 
@@ -40,8 +40,8 @@ subtest 'return' => sub {
             push @got, $data;
         }
 
-        ok( $iter->is_exhausted, "exhausted flag" );
-        is( \@got, [ 1 .. 10 ], "got data" );
+        ok( $iter->is_exhausted, 'exhausted flag' );
+        is( \@got, [ 1 .. 10 ], 'got data' );
 
     };
 
@@ -56,8 +56,8 @@ subtest 'return' => sub {
             push @got, $data;
         }
 
-        ok( $iter->is_exhausted, "exhausted flag" );
-        is( \@got, [ 1 .. 9 ], "got data" );
+        ok( $iter->is_exhausted, 'exhausted flag' );
+        is( \@got, [ 1 .. 9 ], 'got data' );
 
     };
 
@@ -72,8 +72,8 @@ subtest 'return' => sub {
             push @got, $data;
         }
 
-        ok( $iter->is_exhausted, "exhausted flag" );
-        is( \@got, [ 1 .. 10 ], "got data" );
+        ok( $iter->is_exhausted, 'exhausted flag' );
+        is( \@got, [ 1 .. 10 ], 'got data' );
     };
 
     subtest 'reference => passthrough' => sub {
@@ -93,8 +93,8 @@ subtest 'return' => sub {
             push @got, $data;
         }
 
-        ok( $iter->is_exhausted, "exhausted flag" );
-        is( \@got, [ 1 .. 10 ], "got data" );
+        ok( $iter->is_exhausted, 'exhausted flag' );
+        is( \@got, [ 1 .. 10 ], 'got data' );
     };
 
 
@@ -113,11 +113,11 @@ subtest 'return' => sub {
                 while ( @got <= $len and my $data = $iter->next ) { push @got, $data }
             },
             ['Iterator::Flex::Failure::Exhausted'],
-            "exhaustion"
+            'exhaustion'
         );
 
-        ok( $iter->is_exhausted, "exhausted flag" );
-        is( \@got, [ 1 .. 10 ], "got data" );
+        ok( $iter->is_exhausted, 'exhausted flag' );
+        is( \@got, [ 1 .. 10 ], 'got data' );
 
     };
 
@@ -130,7 +130,7 @@ subtest 'throw' => sub {
         my $len = my @data = ( 1 .. 10 );
         my @got;
         my $iter = iterator {
-            die( "exhausted" ) if $data[0] == 9;
+            die( 'exhausted' ) if $data[0] == 9;
             shift @data;
         }
         {
@@ -145,8 +145,8 @@ subtest 'throw' => sub {
             'iterate to exhaustion'
         );
 
-        ok( $iter->is_exhausted, "exhausted flag" );
-        is( \@got, [ 1 .. 8 ], "got data" );
+        ok( $iter->is_exhausted, 'exhausted flag' );
+        is( \@got, [ 1 .. 8 ], 'got data' );
 
     };
 
@@ -155,7 +155,7 @@ subtest 'throw' => sub {
         my $len = my @data = ( 1 .. 10 );
         my @got;
         my $iter = iterator {
-            die( "exhausted" ) if $data[0] == 9;
+            die( 'exhausted' ) if $data[0] == 9;
             shift @data;
         }
         { input_exhaustion => 'throw' };
@@ -165,11 +165,11 @@ subtest 'throw' => sub {
                 while ( @got <= $len and my $data = $iter->next ) { push @got, $data }
             },
             qr/exhausted/,
-            "exhaustion"
+            'exhaustion'
         );
 
-        ok( $iter->is_exhausted, "exhausted flag" );
-        is( \@got, [ 1 .. 8 ], "got data" );
+        ok( $iter->is_exhausted, 'exhausted flag' );
+        is( \@got, [ 1 .. 8 ], 'got data' );
     };
 
     subtest 'class' => sub {
@@ -194,11 +194,11 @@ subtest 'throw' => sub {
                     }
                 },
                 ['Iterator::Flex::Failure::Exhausted'],
-                "exhaustion"
+                'exhaustion'
             );
 
-            ok( $iter->is_exhausted, "exhausted flag" );
-            is( \@got, [ 1 .. 8 ], "got data" );
+            ok( $iter->is_exhausted, 'exhausted flag' );
+            is( \@got, [ 1 .. 8 ], 'got data' );
 
         };
 
@@ -207,7 +207,7 @@ subtest 'throw' => sub {
             my $len = my @data = ( 1 .. 10, undef );
             my @got;
             my $iter = iterator {
-                die( "died" ) if $data[0] == 9;
+                die( 'died' ) if $data[0] == 9;
                 shift @data;
             }
             {
@@ -222,11 +222,11 @@ subtest 'throw' => sub {
                     }
                 },
                 qr/died/,
-                "died"
+                'died'
             );
 
-            ok( !$iter->is_exhausted, "exhausted flag" );
-            is( \@got, [ 1 .. 8 ], "got data" );
+            ok( !$iter->is_exhausted, 'exhausted flag' );
+            is( \@got, [ 1 .. 8 ], 'got data' );
 
         };
 
@@ -240,7 +240,7 @@ subtest 'throw' => sub {
             my $len = my @data = ( 1 .. 10, undef );
             my @got;
             my $iter = iterator {
-                die( "exhausted" ) if $data[0] == 9;
+                die( 'exhausted' ) if $data[0] == 9;
                 shift @data;
             }
             {
@@ -255,11 +255,11 @@ subtest 'throw' => sub {
                     }
                 },
                 ['Iterator::Flex::Failure::Exhausted'],
-                "exhaustion"
+                'exhaustion'
             );
 
-            ok( $iter->is_exhausted, "exhausted flag" );
-            is( \@got, [ 1 .. 8 ], "got data" );
+            ok( $iter->is_exhausted, 'exhausted flag' );
+            is( \@got, [ 1 .. 8 ], 'got data' );
 
         };
 
@@ -268,7 +268,7 @@ subtest 'throw' => sub {
             my $len = my @data = ( 1 .. 10, undef );
             my @got;
             my $iter = iterator {
-                die( "died" ) if $data[0] == 9;
+                die( 'died' ) if $data[0] == 9;
                 shift @data;
             }
             {
@@ -283,11 +283,11 @@ subtest 'throw' => sub {
                     }
                 },
                 qr/died/,
-                "died"
+                'died'
             );
 
-            ok( !$iter->is_exhausted, "exhausted flag" );
-            is( \@got, [ 1 .. 8 ], "got data" );
+            ok( !$iter->is_exhausted, 'exhausted flag' );
+            is( \@got, [ 1 .. 8 ], 'got data' );
 
         };
 
@@ -301,7 +301,7 @@ subtest 'throw' => sub {
             my $len = my @data = ( 1 .. 10, undef );
             my @got;
             my $iter = iterator {
-                die( "exhausted" ) if $data[0] == 9;
+                die( 'exhausted' ) if $data[0] == 9;
                 shift @data;
             }
             {
@@ -316,11 +316,11 @@ subtest 'throw' => sub {
                     }
                 },
                 ['Iterator::Flex::Failure::Exhausted'],
-                "exhaustion"
+                'exhaustion'
             );
 
-            ok( $iter->is_exhausted, "exhausted flag" );
-            is( \@got, [ 1 .. 8 ], "got data" );
+            ok( $iter->is_exhausted, 'exhausted flag' );
+            is( \@got, [ 1 .. 8 ], 'got data' );
 
         };
 
@@ -329,7 +329,7 @@ subtest 'throw' => sub {
             my $len = my @data = ( 1 .. 10, undef );
             my @got;
             my $iter = iterator {
-                die( "died" ) if $data[0] == 9;
+                die( 'died' ) if $data[0] == 9;
                 shift @data;
             }
             {
@@ -344,11 +344,11 @@ subtest 'throw' => sub {
                     }
                 },
                 qr/died/,
-                "died"
+                'died'
             );
 
-            ok( !$iter->is_exhausted, "exhausted flag" );
-            is( \@got, [ 1 .. 8 ], "got data" );
+            ok( !$iter->is_exhausted, 'exhausted flag' );
+            is( \@got, [ 1 .. 8 ], 'got data' );
 
         };
 

@@ -24,7 +24,7 @@ sub drain {
 
     my $ctx = context();
 
-    is( $cnt, $max, "not enough or too few iterations" );
+    is( $cnt, $max, 'not enough or too few iterations' );
 
     $ctx->release;
 

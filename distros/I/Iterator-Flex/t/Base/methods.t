@@ -20,8 +20,8 @@ my $iter = iterator {
 };
 
 
-is( $iter->next, 10, "first value" );
-is( $iter->now,  9,  "method call" );
+is( $iter->next, 10, 'first value' );
+is( $iter->now,  9,  'method call' );
 
 # creating another now method should succeed
 ok(
@@ -38,7 +38,7 @@ ok(
     'reuse method name'
 ) or note $@;
 
-can_ok( $iter, ['now'], "method created for second iterator" );
+can_ok( $iter, ['now'], 'method created for second iterator' );
 
 # What about Now?
 ok(
@@ -55,7 +55,7 @@ ok(
     'reuse method name'
 ) or note $@;
 
-can_ok( $iter, ['Now'], "method created for mixed case iterator" );
+can_ok( $iter, ['Now'], 'method created for mixed case iterator' );
 
 
 done_testing;

@@ -23,52 +23,52 @@ sub _test_values {
 
     my @expected = ( @{ $p{expected} } )[ $p{begin} .. $p{end} ];
 
-    is( \@values, \@expected, "values are correct" ) or diag pp( \@values );
+    is( \@values, \@expected, 'values are correct' ) or diag pp( \@values );
 }
 
-subtest "basic" => sub {
+subtest 'basic' => sub {
 
     my $iter = icycle( [ 0, 10, 20 ] );
 
-    subtest "object properties" => sub {
+    subtest 'object properties' => sub {
 
         my @methods = ( 'rewind', 'freeze', 'prev', 'current' );
-        isa_ok( $iter, ['Iterator::Flex::Base'], "correct parent class" );
-        can_ok( $iter, \@methods, join( ' ', "has", @methods ) );
+        isa_ok( $iter, ['Iterator::Flex::Base'], 'correct parent class' );
+        can_ok( $iter, \@methods, join( ' ', 'has', @methods ) );
     };
 
-    subtest "values" => sub {
+    subtest 'values' => sub {
         _test_values( $iter );
     };
 };
 
-subtest "reset" => sub {
+subtest 'reset' => sub {
 
 
-    subtest "partially drain iterator" => sub {
+    subtest 'partially drain iterator' => sub {
         my $iter = icycle( [ 0, 10, 20 ] );
 
         <$iter>;
 
-        try_ok { $iter->reset } "reset";
+        try_ok { $iter->reset } 'reset';
 
         _test_values( $iter );
     };
 };
 
-subtest "rewind" => sub {
+subtest 'rewind' => sub {
 
 
-    subtest "partially drain iterator" => sub {
+    subtest 'partially drain iterator' => sub {
         my $iter = icycle( [ 0, 10, 20 ] );
 
         <$iter> for 1 .. 2;
 
-        is( [ $iter->prev, $iter->current ], [ 0, 10 ], "prev/current before rewind" );
+        is( [ $iter->prev, $iter->current ], [ 0, 10 ], 'prev/current before rewind' );
 
-        try_ok { $iter->rewind } "rewind";
+        try_ok { $iter->rewind } 'rewind';
 
-        is( [ $iter->prev, $iter->current ], [ 0, 10 ], "prev/current after rewind" );
+        is( [ $iter->prev, $iter->current ], [ 0, 10 ], 'prev/current after rewind' );
 
         _test_values( $iter,
             expected => [ [ 0, 10, 0 ], [ 10, 0, 10 ], [ 0, 10, 20 ], [ 10, 20, 0 ], [ 20, 0, 10 ], ], );
@@ -76,7 +76,7 @@ subtest "rewind" => sub {
 };
 
 
-subtest "freeze" => sub {
+subtest 'freeze' => sub {
 
     my @values;
     my $freeze;
@@ -85,12 +85,12 @@ subtest "freeze" => sub {
         my $iter = icycle( [ 0, 10, 20 ] );
         _test_values( $iter, npull => 1, begin => 0, end => 0 );
 
-        try_ok { $freeze = $iter->freeze } "freeze iterator";
+        try_ok { $freeze = $iter->freeze } 'freeze iterator';
     }
 
     {
         my $iter;
-        try_ok { $iter = thaw( $freeze ) } "thaw iterator";
+        try_ok { $iter = thaw( $freeze ) } 'thaw iterator';
 
         _test_values( $iter, npull => 4, begin => 1, end => 4 );
     };

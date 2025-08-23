@@ -59,6 +59,7 @@ lib/DBIx/QuickORM/Type/JSON.pm
 lib/DBIx/QuickORM/Type/UUID.pm
 lib/DBIx/QuickORM/Util.pm
 lib/DBIx/QuickORM/Util/HashBase.pm
+t/00-report.t
 t/aside.t
 t/aside/mysql.sql
 t/aside/postgresql.sql

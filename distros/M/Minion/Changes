@@ -1,4 +1,12 @@
 
+11.0 2025-08-21
+  - Minion::Backend::Pg now requires PostgreSQL 13.
+  - Removed experimetnal status from lax dependency support.
+  - Added support for task limits.
+  - Added Minion::Util module.
+  - Added spare remote control command, this allows workers to be paused again by combining jobs and spare.
+  - Fixed a problem where remote control commands would not immediately update the worker status.
+
 10.31 2024-09-21
   - Restore old repair behavior for job dependencies without performance loss. (HEM42)
 

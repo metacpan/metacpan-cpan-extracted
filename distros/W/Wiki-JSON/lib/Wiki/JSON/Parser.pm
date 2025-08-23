@@ -42,8 +42,8 @@ sub _search_interrupt {
 
 sub _insert_into_output {
     die 'Wrong number of arguments' if scalar @_ != 3;
-    my ($self, $output, $buffer) = @_;
-    if ($buffer =~ /^$/) {
+    my ( $self, $output, $buffer ) = @_;
+    if ( $buffer =~ /^$/ ) {
         $buffer = '';
         return ($buffer);
     }
@@ -55,7 +55,7 @@ sub _insert_into_output {
 sub _break_lines_template {
     my ( $self, $output, $buffer, $current_char, $i ) = @_;
     if ( $current_char eq "|" ) {
-        ($buffer) = $self->_insert_into_output($output, $buffer);
+        ($buffer) = $self->_insert_into_output( $output, $buffer );
         return ( 1, $buffer, $i );
     }
     return ( 0, $buffer, $i );
@@ -63,10 +63,6 @@ sub _break_lines_template {
 
 sub _break_lines {
     my ( $self, $output, $buffer, $i, $current_char, $options ) = @_;
-    if ( $options->{is_template} ) {
-        return $self->_break_lines_template( $output, $buffer, $current_char,
-            $i );
-    }
     if ( $options->{is_unordered_list} ) {
         return ( 0, $buffer, $i );
     }
@@ -77,7 +73,7 @@ sub _break_lines {
 sub _break_lines_on_newline {
     my ( $self, $output, $buffer, $current_char, $i ) = @_;
     if ( $current_char eq "\n" ) {
-        ($buffer) = $self->_insert_into_output($output, $buffer);
+        ($buffer) = $self->_insert_into_output( $output, $buffer );
         return ( 1, $buffer, $i );
     }
     return ( 0, $buffer, $i );
@@ -90,7 +86,7 @@ sub _if_interrupted {
             $options );
     }
     if ( !$options->{is_nowiki} ) {
-        ($buffer) = $self->_insert_into_output($output, $buffer);
+        ($buffer) = $self->_insert_into_output( $output, $buffer );
     }
     return ($buffer);
 }
@@ -125,7 +121,7 @@ sub _if_interrupted_unordered_list {
 sub _insert_list_appending_if_possible {
     my ( $self, $output, $buffer, $options ) = @_;
     if ( defined $self->current_list_output ) {
-        push @{$self->current_list_output}, $buffer;
+        push @{ $self->current_list_output }, $buffer;
         $buffer = '';
         return ($buffer);
     }
@@ -139,22 +135,18 @@ sub _insert_new_list_element_after_asterisk {
     my $searched    = $LIST_ELEMENT_DELIMITER;
     my $size_search = length $searched;
     if ( length $buffer ) {
-        if ( $options->{'br_found'} || $options->{element_found} ) {
-            say 'happened';
-            ($buffer) =
-              $self->_insert_list_appending_if_possible( $output, $buffer,
-                $options );
-            $options->{element_found} = 0;
-        }
-        else {
-            ($buffer) =
-              $self->_insert_list_element_never_appending( $output, $buffer, );
-        }
+        ($buffer) =
+          $self->_insert_list_appending_if_possible( $output, $buffer,
+            $options );
+        $options->{element_found} = 0;
     }
     delete $options->{br_found};
     delete $options->{element_found};
     $buffer = '';
     $i += $size_search;
+    push @$output, { type => 'list_element', output => [] };
+    $self->current_list_output( $output->[-1]{output} );
+    $buffer = '';
     return ( $i, $buffer, );
 }
 
@@ -195,7 +187,7 @@ sub _unordered_list_pre_syntax_parsing_newline_logic_br {
         $options->{'br_found'} = 1;
         if ( length $buffer ) {
             if ( defined $self->current_list_output ) {
-                push @{$self->current_list_output}, $buffer;
+                push @{ $self->current_list_output }, $buffer;
             }
             else {
                 push @$output, { type => 'list_element', output => [$buffer] };
@@ -338,7 +330,7 @@ sub _parse_in_array {
                     $buffer );
                 next;
             }
-            ($buffer) = $self->_insert_into_output($output, $buffer);
+            ($buffer) = $self->_insert_into_output( $output, $buffer );
         }
         $buffer = '';
     }
@@ -442,6 +434,7 @@ sub _try_parse_unordered_list {
         },
         $options,
     );
+    @{$element->{output}} = grep { @{$_->{output}} } @{$element->{output}};
     push @$output, $element;
     return ( 1, $i, $buffer, $options );
 }
@@ -471,17 +464,18 @@ sub _try_discard_interrupt_list {
 
 sub _save_before_new_element {
     my ( $self, $output, $buffer, $options ) = @_;
-    if ( !length $buffer ) {
-        return ( $output, $buffer );
-    }
     if ( $options->{is_unordered_list} ) {
-
-        push @$output, { type => 'list_element', output => [] };
+        if (length $buffer || !@$output ) {
+            push @$output, { type => 'list_element', output => [] };
+        }
         $output = $output->[-1]{output};
         $self->current_list_output($output);
         $options->{element_found} = 1;
     }
-    ($buffer) = $self->_insert_into_output($output, $buffer);
+    if ( !length $buffer ) {
+        return ( $output, $buffer );
+    }
+    ($buffer) = $self->_insert_into_output( $output, $buffer );
     return ( $output, $buffer );
 }
 
@@ -1122,7 +1116,7 @@ sub _try_parse_template {
             template_name => $1,
             output        => [],
           };
-        return ( 1, $i + $size_search + 2, $buffer );
+        return ( 1, $i + $size_search + 1, $buffer );
     }
     my ( $got_template_name, $template_name ) =
       $self->_try_parse_template_get_template_name( $wiki_text, $i,
@@ -1139,18 +1133,39 @@ sub _try_parse_template {
         template_name => $template_name,
         output        => [],
     };
-    $i += $size_search + 1;
-    ( $i, $buffer ) = $self->_parse_in_array(
-        $template->{output},
-        $wiki_text,
-        $i, $buffer,
-        sub {
-            my ( $wiki_text, $i ) = @_;
-            return $self->_try_parse_template_try_to_interrupt( $wiki_text,
-                $i );
-        },
-        { is_template => 1 }
-    );
+    my $current_buffer = '';
+    my $needs_arg = 0;
+    for ( $i += $size_search + 1 ; $i < length $wiki_text ; $i++ ) {
+        my $searched    = '|';
+        my $size_search = length $searched;
+        my $last_word   = substr $wiki_text, $i, $size_search;
+        if ( $searched eq $last_word ) {
+            push @{ $template->{output} }, $current_buffer;
+            $current_buffer = '';
+            $needs_arg = 1;
+            next;
+        }
+        $needs_arg = 0;
+        $searched    = '}}';
+        $size_search = length $searched;
+        $last_word   = substr $wiki_text, $i, $size_search;
+        if ( $searched eq $last_word ) {
+            push @{ $template->{output} }, $current_buffer;
+            $current_buffer = '';
+            $i += 1;
+            last;
+        }
+        my $needs_next;
+        ( $needs_next, $i, $current_buffer ) =
+          $self->_try_parse_nowiki( $template->{output}, $wiki_text,
+            $current_buffer, $i, {} );
+        next if $needs_next;
+        $current_buffer .= substr $wiki_text, $i, 1;
+    }
+    if (length $current_buffer || $needs_arg) {
+        push @{ $template->{output} }, $current_buffer;
+        $current_buffer = '';
+    }
     push @$output, $template;
     return ( 1, $i, $buffer );
 }
@@ -1229,19 +1244,21 @@ sub _try_parse_header {
         },
         { is_header => 1 }
     );
-    if (scalar @{$header->{output}}) {
-        if (!ref $header->{output}[0]) {
-            ($header->{output}[0]) = $header->{output}[0] =~ /^\s*(.*?)$/;
-            if (!$header->{output}[0]) {
-                @{$header->{output}} = splice @{$header->{output}}, 1;
+    if ( scalar @{ $header->{output} } ) {
+        if ( !ref $header->{output}[0] ) {
+            ( $header->{output}[0] ) = $header->{output}[0] =~ /^\s*(.*?)$/;
+            if ( !$header->{output}[0] ) {
+                @{ $header->{output} } = splice @{ $header->{output} }, 1;
             }
         }
-        my $last_index = -1 + scalar @{$header->{output}};
+        my $last_index   = -1 + scalar @{ $header->{output} };
         my $last_element = $header->{output}[$last_index];
-        if (defined $last_element && !ref $last_element) {
-            ($header->{output}[$last_index]) = $header->{output}[$last_index] =~ /^(.*?)\s*$/;
-            if (!$header->{output}[$last_index]) {
-                @{$header->{output}} = splice @{$header->{output}}, 0, $last_index;
+        if ( defined $last_element && !ref $last_element ) {
+            ( $header->{output}[$last_index] ) =
+              $header->{output}[$last_index] =~ /^(.*?)\s*$/;
+            if ( !$header->{output}[$last_index] ) {
+                @{ $header->{output} } = splice @{ $header->{output} }, 0,
+                  $last_index;
             }
         }
     }

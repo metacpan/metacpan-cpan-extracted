@@ -2,7 +2,7 @@ package DBIx::QuickORM::Role::Async;
 use strict;
 use warnings;
 
-our $VERSION = '0.000015';
+our $VERSION = '0.000019';
 
 use Time::HiRes qw/sleep/;
 use Role::Tiny;

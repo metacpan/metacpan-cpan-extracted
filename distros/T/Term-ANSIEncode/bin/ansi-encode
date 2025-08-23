@@ -47,6 +47,7 @@ use List::Util qw(max);
 # use Data::Dumper::Simple;$Data::Dumper::Terse=TRUE;$Data::Dumper::Indent=TRUE;$Data::Dumper::Useqq=TRUE;$Data::Dumper::Deparse=TRUE;$Data::Dumper::Quotekeys=TRUE;$Data::Dumper::Trailingcomma=TRUE;$Data::Dumper::Sortkeys=TRUE;$Data::Dumper::Purity=TRUE;$Data::Dumper::Deparse=TRUE;
 
 binmode(STDOUT, ":encoding(UTF-8)");
+binmode(STDIN, ":encoding(UTF-8)");
 
 our $VERSION = $Term::ANSIEncode::VERSION;
 
@@ -64,14 +65,14 @@ GetOptions(
     'version'   => \$version,
     'help'      => \$help,
     'tokens'    => \$tokens,
-	'rawtokens' => \$rawtokens,
+    'rawtokens' => \$rawtokens,
     'colors'    => \$colors,
     'symbols'   => \$symbols,
     'full'      => \$full,
     'dump'      => \$Dump,
     'unicode'   => \$unicode,
 );
-
+###
 my $text = <<'VERSION';
 [% CLEAR %][% ORANGE %]╔═════════════════════════════════════════════════════════════════════════════╗[% RESET %]
 [% ORANGE %]║[% B_BLACK %][% RED %]               [% BRIGHT YELLOW %] _   _ [% GREEN %] _____ [% BRIGHT BLUE %]_____  [% BRIGHT WHITE %] ______                     _            [% RESET %][% ORANGE %]║[% RESET %]
@@ -90,7 +91,7 @@ my $text = <<'VERSION';
 [% ORANGE %]╚═════════════════════════════════════════════════════════════════════════════╝[% RESET %]
 
 VERSION
-
+###
 $text =~ s/XXXX/$VERSION/gs;
 
 my $ansi = ($full) ? Term::ANSIEncode->new('mode' => 'full') : Term::ANSIEncode->new('mode' => 'short');
@@ -137,12 +138,13 @@ my $small = <<'SMALL';
 ║         Loads the full symbol table.  It will slow down initialization. ║
 ╚═════════════════════════════════════════════════════════════════════════╝
 SMALL
-
+###
 my $greydient = '';    # Yes, the spelling is intentional
 foreach my $c (0 .. 23) {
     $greydient .= "[% B_GREY$c %] ";
 }
 $greydient .= '[% RESET %]';
+###
 my $to = <<'TOKENS';
 [% CLEAR %]Tokens have to be encapsulated inside [% TOKEN %] (the TOKEN must be
 surrounded by at least one space on each side.  Colors beyond the standard 8
@@ -260,6 +262,7 @@ NOTE:  Use "less -r" to view ANSI in "less"
 
 TOKENS
 ###
+
 $to =~ s/\[\% GREYDIENT \%\]/$greydient/g;
 
 if ($version) {
@@ -271,27 +274,27 @@ if ($version) {
 } elsif ($tokens) {
     $ansi->ansi_output($to, 0);
 } elsif ($rawtokens) {
-	print "\n╔",'═' x 131, "╗\n";
-	$ansi->ansi_output('║[% B_BLACK %][% BRIGHT YELLOW %]' . ' ' x 46 . 'THE FOLLOWING ARE THE AVAILABLE TOKENS' . ' ' x 47 . "[% RESET %]║\n", 0);
-	print '╠', '═' x 32, '╦', '═' x 32, '╦', '═' x 32, '╦', '═' x 32, '╣', "\n";
-	printf('║ %-31s║ %-31s║ %-31s║ %-31s║','ANSI0 - ANSI231','B_ANSI0 - B_ANSI231','GREY0 - GREY28', 'B_GREY0 - B_GREY28');
-	print "\n║";
-	my $width = 4;
-	my $count = 1;
-	foreach my $token (sort(keys %{$ansi->{'ansi_sequences'}})) {
-		next if ($token =~ /ANSI|GREY/);
-		printf(' %-31s', $token);
-	    $count++;
-		if ($count > $width) {
-			$count = 1;
-			print "║\n║";
-		} else {
-			print '║';
-		}
-	}
-	print "\r╚", '═' x 32, '╩', '═' x 32, '╩', '═' x 32, '╩', '═' x 32, '╝', "\n\n";
+    print "\n╔", '═' x 131, "╗\n";
+    $ansi->ansi_output('║[% B_BLACK %][% BRIGHT YELLOW %]' . ' ' x 46 . 'THE FOLLOWING ARE THE AVAILABLE TOKENS' . ' ' x 47 . "[% RESET %]║\n", 0);
+    print '╠', '═' x 32, '╦', '═' x 32, '╦', '═' x 32, '╦', '═' x 32, '╣', "\n";
+    printf('║ %-31s║ %-31s║ %-31s║ %-31s║', 'ANSI0 - ANSI231', 'B_ANSI0 - B_ANSI231', 'GREY0 - GREY28', 'B_GREY0 - B_GREY28');
+    print "\n║";
+    my $width = 4;
+    my $count = 1;
+    foreach my $token (sort(keys %{ $ansi->{'ansi_sequences'} })) {
+        next if ($token =~ /ANSI|GREY/);
+        printf(' %-31s', $token);
+        $count++;
+        if ($count > $width) {
+            $count = 1;
+            print "║\n║";
+        } else {
+            print '║';
+        }
+    } ## end foreach my $token (sort(keys...))
+    print "\r╚", '═' x 32, '╩', '═' x 32, '╩', '═' x 32, '╩', '═' x 32, '╝', "\n\n";
 } elsif ($Dump) {
-    my $temp  = "\n\n";
+    my $temp = "\n\n";
     my @names;
     my $search = pop(@ARGV);
     if (defined($search) && $search ne '') {
@@ -379,14 +382,14 @@ if ($version) {
     $temp .= '[% ANSI52 %]╰───────┴─' . '─' x $size . '─╯[% RESET %]' . "\n\n";
     $ansi->ansi_output($temp, 0);
 } elsif ($colors) {
-    my $grey = '[% GREY8 %]';
-    my $off  = '[% RESET %]';
-	my $string = '';
+    my $grey   = '[% GREY8 %]';
+    my $off    = '[% RESET %]';
+    my $string = '';
     $string .= "\n" . '[% BRIGHT WHITE %] ANSI Colors and GREY colors (requires a terminal with 256 color support for all colors)' . $off . "\n";
     $string .= $grey . '╭────┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──╮' . $off . "\n";
     $string .= $grey . '│' . $off . 'ANSI';
     foreach my $i (0 .. 35) {
-        $string .= $grey . '│' . $off . sprintf('%02d',$i);
+        $string .= $grey . '│' . $off . sprintf('%02d', $i);
     }
     $string .= $grey . "│\n├────┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┤$off\n";
     $string .= sprintf('%s│%s %3d%s│%s', $grey, $off, 0, $grey, $off);
@@ -410,11 +413,15 @@ if ($version) {
         }
     } ## end foreach my $i (0 .. 6)
     $string .= "\n" . $grey . '╰────┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──╯' . $off . "\n";
-	$ansi->ansi_output($string,0);
-} else { # Output file to STDOUT
+    $ansi->ansi_output($string, 0);
+} else {    # Output file to STDOUT
     my $file = $ARGV[0];
     if (defined($file) && -e $file) {
-        $text = do { local (@ARGV, $/) = $file; <> };
+		my $size = -s $file;
+		open(my $FILE,'<',$file);
+		binmode($FILE, ":encoding(UTF-8)");
+		read($FILE, my $text, $size);
+		close($FILE);
         $ansi->ansi_output($text, 0);
     } else {
         $| = 1;
@@ -425,6 +432,7 @@ if ($version) {
 exit;
 
 __END__
+
 =head1 NAME
 
 ANSI Encode

@@ -49,7 +49,7 @@ do_for_all_dbs {
     my $s = $con->handle('example');
 
     my $a_uuid = DBIx::QuickORM::Type::UUID->new;
-    my $uuid_bin = DBIx::QuickORM::Type::UUID::qorm_deflate($a_uuid, 'binary');
+    my $uuid_bin = DBIx::QuickORM::Type::UUID::qorm_deflate($a_uuid, affinity => 'binary');
 
     my $x_row = $s->insert({name => 'x', uuid => DBIx::QuickORM::Type::UUID->new, data => {name => 'x'}});
 
@@ -148,8 +148,8 @@ do_for_all_dbs {
     }
 
     my $b_uuid = DBIx::QuickORM::Type::UUID->new;
-    $uuid_bin = DBIx::QuickORM::Type::UUID::qorm_deflate($b_uuid, 'binary');
-    my $b_row  = $s->insert({name => 'b', uuid => DBIx::QuickORM::Type::UUID->qorm_deflate($b_uuid, 'binary'), data => {name => 'b'}});
+    $uuid_bin = DBIx::QuickORM::Type::UUID::qorm_deflate($b_uuid, affinity => 'binary');
+    my $b_row  = $s->insert({name => 'b', uuid => DBIx::QuickORM::Type::UUID->qorm_deflate($b_uuid, affinity => 'binary'), data => {name => 'b'}});
     $b_row = undef; $b_row = $s->one(name => 'b');
     is(
         $b_row->stored_data,

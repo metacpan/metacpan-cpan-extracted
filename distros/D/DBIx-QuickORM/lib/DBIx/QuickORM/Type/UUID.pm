@@ -2,10 +2,12 @@ package DBIx::QuickORM::Type::UUID;
 use strict;
 use warnings;
 
-our $VERSION = '0.000015';
+our $VERSION = '0.000019';
 
 use Role::Tiny::With qw/with/;
 with 'DBIx::QuickORM::Role::Type';
+
+use DBIx::QuickORM::Util qw/parse_conflate_args/;
 
 use Scalar::Util qw/blessed/;
 use UUID qw/uuid7 parse unparse/;
@@ -14,35 +16,35 @@ use Carp qw/croak/;
 sub new { uuid7() }
 
 sub qorm_inflate {
-    my $in = pop;
-    my $class = shift // __PACKAGE__;
+    my $params = parse_conflate_args(@_);
+    my $val    = $params->{value} or return undef;
+    my $class  = $params->{class} // __PACKAGE__;
 
-    return undef unless defined $in;
+    return undef unless defined $val;
 
-    return $class->looks_like_uuid($in) // $class->looks_like_bin($in) // croak "'$in' does not look like a UUID";
+    return $class->looks_like_uuid($val) // $class->looks_like_bin($val) // croak "'$val' does not look like a UUID";
 }
 
 sub qorm_deflate {
-    my $affinity = pop;
-    my $in = pop;
-    my $class = shift // __PACKAGE__;
+    my $params   = parse_conflate_args(@_);
+    my $val      = $params->{value}    or return undef;
+    my $affinity = $params->{affinity} or croak "Could not determine affinity";
+    my $class    = $params->{class} // __PACKAGE__;
 
-    return undef unless defined $in;
-
-    if (my $uuid = $class->looks_like_uuid($in)) {
+    if (my $uuid = $class->looks_like_uuid($val)) {
         return $uuid if $affinity eq 'string';
 
         my $b;
-        parse($in, $b);
+        parse($val, $b);
         return $b;
     }
 
-    if (my $uuid = $class->looks_like_bin($in)) {
-        return $in if $affinity eq 'binary';
+    if (my $uuid = $class->looks_like_bin($val)) {
+        return $val if $affinity eq 'binary';
         return $uuid;
     }
 
-    croak "'$in' does not look like a uuid";
+    croak "'$val' does not look like a uuid";
 }
 
 sub qorm_compare {

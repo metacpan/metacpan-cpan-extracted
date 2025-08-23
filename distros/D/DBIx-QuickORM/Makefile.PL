@@ -62,6 +62,8 @@ my %WriteMakefileArgs = (
     "parent" => 0
   },
   "TEST_REQUIRES" => {
+    "Carp::Always" => 0,
+    "Parallel::Runner" => 0,
     "Test2::Require::Module" => 0,
     "Test2::Tools::QuickDB" => "0.000037",
     "Test2::Tools::Subtest" => 0,
@@ -70,7 +72,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "ok" => 0
   },
-  "VERSION" => "0.000015",
+  "VERSION" => "0.000019",
   "test" => {
     "TESTS" => "t/*.t t/handle/*.t"
   }
@@ -78,6 +80,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => 0,
+  "Carp::Always" => 0,
   "Class::Method::Modifiers" => 0,
   "Cpanel::JSON::XS" => 0,
   "DBD::SQLite" => 0,
@@ -91,6 +94,7 @@ my %FallbackPrereqs = (
   "List::Util" => 0,
   "Module::Pluggable" => 0,
   "POSIX" => 0,
+  "Parallel::Runner" => 0,
   "Role::Tiny" => 0,
   "Role::Tiny::With" => 0,
   "SQL::Abstract" => "2.000001",

@@ -2,7 +2,7 @@ package DBIx::QuickORM::Role::Row;
 use strict;
 use warnings;
 
-our $VERSION = '0.000015';
+our $VERSION = '0.000019';
 
 use Carp qw/croak/;
 use List::Util qw/zip/;
@@ -43,6 +43,13 @@ sub display {
     my $self = shift;
     my $source = $self->source;
     return $source->source_orm_name . "(" . join(', ' => $self->primary_key_value_list) . ")";
+}
+
+sub conflate_args {
+    my $self = shift;
+    my ($field, $val) = @_;
+
+    return (field => $field, value => $val, source => $self->source, dialect => $self->dialect, affinity => $self->field_affinity($field));
 }
 
 #####################

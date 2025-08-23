@@ -76,4 +76,106 @@ is $exporter->export([$span]), TRACE_EXPORT_FAILURE,
 
 is $out, '', 'Nothing exported on failure';
 
+subtest Encoder => sub {
+    subtest Environment => sub {
+        open my $handle, '>', \my $out or die $!;
+
+        local $ENV{OTEL_PERL_EXPORTER_CONSOLE_FORMAT} = 'json';
+        my $exporter = CLASS->new( handle => $handle );
+
+        is $exporter->export( [$span], 100 ), TRACE_EXPORT_SUCCESS,
+            'Exporting is successful';
+
+        is $out, ( <<~'DUMP' =~ s/\n//gr . "\n" ), 'Exported span';
+        {"attributes":{"foo":123},"dropped_attributes":0,"dropped_e
+        vents":0,"dropped_links":0,"end_timestamp":null,"events":[{
+        "attributes":{"event":123},"dropped_attributes":0,"name":"e
+        vent","timestamp":123456789}],"instrumentation_scope":{"nam
+        e":"test","version":""},"kind":1,"links":[{"attributes":{"l
+        ink":123},"dropped_attributes":0,"span_id":"010101010101010
+        1","trace_id":"01010101010101010101010101010101"}],"name":"
+        test-span","parent_span_id":"0000000000000000","resource":{
+        },"span_id":"0101010101010101","start_timestamp":123456789.
+        1234,"status":{"code":0,"description":""},"trace_flags":0,"
+        trace_id":"01010101010101010101010101010101","trace_state":
+        ""}
+        DUMP
+    };
+
+    subtest 'Environment with args' => sub {
+        open my $handle, '>', \my $out or die $!;
+
+        local $ENV{OTEL_PERL_EXPORTER_CONSOLE_FORMAT}
+            = 'json,pretty=1,space_after=1';
+
+        my $exporter = CLASS->new( handle => $handle );
+
+        is $exporter->export( [$span], 100 ), TRACE_EXPORT_SUCCESS,
+            'Exporting is successful';
+
+        is $out, <<~'DUMP', 'Exported span';
+            {
+               "attributes" : {
+                  "foo" : 123
+               },
+               "dropped_attributes" : 0,
+               "dropped_events" : 0,
+               "dropped_links" : 0,
+               "end_timestamp" : null,
+               "events" : [
+                  {
+                     "attributes" : {
+                        "event" : 123
+                     },
+                     "dropped_attributes" : 0,
+                     "name" : "event",
+                     "timestamp" : 123456789
+                  }
+               ],
+               "instrumentation_scope" : {
+                  "name" : "test",
+                  "version" : ""
+               },
+               "kind" : 1,
+               "links" : [
+                  {
+                     "attributes" : {
+                        "link" : 123
+                     },
+                     "dropped_attributes" : 0,
+                     "span_id" : "0101010101010101",
+                     "trace_id" : "01010101010101010101010101010101"
+                  }
+               ],
+               "name" : "test-span",
+               "parent_span_id" : "0000000000000000",
+               "resource" : {},
+               "span_id" : "0101010101010101",
+               "start_timestamp" : 123456789.1234,
+               "status" : {
+                  "code" : 0,
+                  "description" : ""
+               },
+               "trace_flags" : 0,
+               "trace_id" : "01010101010101010101010101010101",
+               "trace_state" : ""
+            }
+            DUMP
+    };
+
+    subtest Parameter => sub {
+        open my $handle, '>', \my $out or die $!;
+
+        my $exporter = CLASS->new(
+            handle  => $handle,
+            encoder => sub { 'boop' },
+        );
+
+        is $exporter->export( [$span], 100 ), TRACE_EXPORT_SUCCESS,
+            'Exporting is successful';
+
+        is $out, "boop\n", 'Exported span';
+    };
+};
+
 done_testing;

@@ -274,8 +274,30 @@ subtest rewind => sub {
     is( $iter->next, [ 0,  30, 70 ], '1' );
     is( $iter->next, [ 10, 40, 80 ], '2' );
 
-    ok( lives { $iter->rewind }, 'rewind method succeedss' )
+    ok( lives { $iter->rewind }, 'rewind method succeeds' )
       or note $@;
+
+    is( $iter->current, [ 10, 40, 80 ], 'current' );
+
+    is( $iter->next, [ 0, 30, 70 ], '1' );
+
+};
+
+subtest reset => sub {
+
+    my @a = ( 0,  10, 20 );
+    my @b = ( 30, 40, 50, 60 );
+    my @c = ( 70, 80, 90 );
+
+    my $iter = izip \@a, \@b, \@c;
+
+    is( $iter->next, [ 0,  30, 70 ], '1' );
+    is( $iter->next, [ 10, 40, 80 ], '2' );
+
+    ok( lives { $iter->reset }, 'reset method succeeds' )
+      or note $@;
+
+    is( $iter->current, undef, 'current' );
 
     is( $iter->next, [ 0, 30, 70 ], '1' );
 

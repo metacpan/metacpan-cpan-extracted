@@ -1,6 +1,7 @@
 Build.PL
 Changes
 lib/Wiki/JSON.pm
+lib/Wiki/JSON/HTML.pm
 lib/Wiki/JSON/Parser.pm
 lib/Wiki/JSON/Contributing.pm
 LICENSE

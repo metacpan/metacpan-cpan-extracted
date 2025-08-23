@@ -18,7 +18,7 @@ _sbozyp_command_prefix() {
         ((i++))
     done
 
-    printf "%s %s" "$repo_opt" "$config_file_opt";
+    printf "%s %s %s" "-T" "$repo_opt" "$config_file_opt";
 }
 
 _sbozyp_config_file() {

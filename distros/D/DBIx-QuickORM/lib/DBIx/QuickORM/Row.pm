@@ -11,7 +11,7 @@ use DBIx::QuickORM::Util qw/column_key/;
 use DBIx::QuickORM::Affinity();
 use DBIx::QuickORM::Link();
 
-our $VERSION = '0.000015';
+our $VERSION = '0.000019';
 
 use DBIx::QuickORM::Connection::RowData qw{
     STORED
@@ -263,7 +263,7 @@ sub _inflated_field {
     return $val if ref($val);    # Inflated already
 
     if (my $type = $self->source->field_type($field)) {
-        return $from->{$field} = $type->qorm_inflate($val);
+        return $from->{$field} = $type->qorm_inflate($self->conflate_args($field, $val));
     }
 
     return $from->{$field};
@@ -279,11 +279,11 @@ sub _raw_field {
     return undef unless exists $from->{$field};
     my $val = $from->{$field};
 
-    return $val->qorm_deflate($self->field_affinity($field))
+    return $val->qorm_deflate($self->conflate_args($field, $val))
         if blessed($val) && $val->can('qorm_deflate');
 
     if (my $type = $self->source->field_type($field)) {
-        return $type->qorm_deflate($val, $self->field_affinity($field));
+        return $type->qorm_deflate($self->conflate_args($field, $val));
     }
 
     return $val;

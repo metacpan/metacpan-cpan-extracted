@@ -8,7 +8,7 @@ use Template::Plex;
 use Data::Combination;
 
 
-our $VERSION = 'v0.1.4';
+our $VERSION = 'v0.2.1';
 
 sub make_search;
 
@@ -37,6 +37,7 @@ sub import {
     $spec->{prefix}//="search";
     $spec->{type}//="string";
     $spec->{duplicate}//="left";
+    $spec->{package}//=$package;
 
     my ($sub,$code)=make_search $spec;
     *{$package."::".$spec->{name}}=$sub if $sub;
@@ -53,6 +54,7 @@ my \$lower;
 my \$upper;
 
 sub {
+package $package;
 my (\$key, \$array)=\@_;
 	\$lower = 0;
   \$upper = \@\$array;
@@ -112,6 +114,7 @@ sub make_search {
   $options->{type}//="string";
   $options->{accessor}//="";
   $options->{prefix}//="search";
+  $options->{package}//=caller;
 
   # Attempt to normalise values
   # 
@@ -135,8 +138,9 @@ sub make_search {
   die  "Unsupported value for type field: $options->{accessor}. Must be post dereference/method call ->..."
     unless $options->{accessor} eq "" or $options->{accessor}=~/^->/;
 
-  my $template=Template::Plex->load( [$template_base], {condition=>\%condition, update=>\%update, accessor=>$options->{accessor}}, inject=>['use feature "signatures";']);
+  my $template=Template::Plex->load( [$template_base], {condition=>\%condition, update=>\%update, accessor=>$options->{accessor}, package=>$options->{package}}, inject=>['use feature "signatures";']);
   my $code_str=$template->render({duplicate =>$options->{duplicate}, type=>$options->{type}});
+  $template->cleanup;
 
   #use feature "say";
   #use Error::Show;

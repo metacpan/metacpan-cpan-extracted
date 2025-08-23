@@ -8,13 +8,13 @@ use warnings;
 
 use experimental qw( postderef signatures );
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 
 use Exporter 'import';
 
 our @EXPORT_OK = qw[
   iterator iter iarray icycle icache
-  icat igather igrep imap iproduct iseq istack ifreeze izip
+  icat ichain igather igrep imap iproduct iseq istack ifreeze izip
   thaw
 ];
 
@@ -175,10 +175,18 @@ sub icache ( $iterable, $pars = {} ) {
 
 
 
+
+
+
+
+
 sub icat ( @args ) {
     require Iterator::Flex::Cat;
     Iterator::Flex::Cat->new( @args );
 }
+
+sub ichain;
+*ichain = \&icat;
 
 
 
@@ -396,6 +404,11 @@ sub iseq {
 
 
 
+
+
+
+
+
 sub istack ( @args ) {
     require Iterator::Flex::Stack;
     Iterator::Flex::Stack->new( @args );
@@ -528,7 +541,8 @@ __END__
 
 =pod
 
-=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory icat igather istack izip
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory icat ichain igather
+istack izip
 
 =head1 NAME
 
@@ -536,7 +550,7 @@ Iterator::Flex::Common - Iterator Generators and Adapters
 
 =head1 VERSION
 
-version 0.25
+version 0.26
 
 =head1 SYNOPSIS
 
@@ -693,11 +707,16 @@ The returned iterator supports the following methods:
 
 =head2 icat
 
+=head2 ichain
+
   $iterator = icat( @iterables, ?\%pars );
+  $iterator = ichain( @iterables, ?\%pars );
 
 Concatenate the iterables.  As each iterator is exhausted, the next
 one is queried for its values.  See L<Iterator::Flex::Cat> for more
 details.
+
+C<ichain> is an alias for C<icat>.
 
 The returned iterator supports the following methods:
 
@@ -874,7 +893,8 @@ The iterator supports the following methods:
 A stack of iterables.  It returns the next value from the iterator at
 the top of the stack.  Iterators are popped when they are exhausted.
 It supports C<push>, C<pop>, C<shift>, and C<unshift> methods, which
-have same API as the Perl builtin subroutines.  See
+have same API as the Perl builtin subroutines, as well as a
+C<snapshot> method used in conjunction with rewind and reset.  See
 L<Iterator::Flex::Stack> for more details.
 
 The returned iterator supports the following methods:
@@ -886,6 +906,10 @@ The returned iterator supports the following methods:
 =item prev
 
 =item current
+
+=item rewind
+
+=item reset
 
 =back
 

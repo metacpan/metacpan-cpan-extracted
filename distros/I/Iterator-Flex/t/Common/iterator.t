@@ -30,8 +30,8 @@ sub test {
             push @got, $data;
         }
 
-        ok( $iterator->is_exhausted, "exhausted flag" );
-        is( \@got, [ 1 .. 10 ], "got data" );
+        ok( $iterator->is_exhausted, 'exhausted flag' );
+        is( \@got, [ 1 .. 10 ], 'got data' );
 
     };
 
@@ -49,7 +49,7 @@ sub test {
 
         my ( $label, $compare, $value ) = @$sentinel;
 
-        subtest "input exhaustion: sentinel is a $label" => sub {
+        subtest 'input exhaustion: sentinel is a $label' => sub {
             my $len = my @data = ( 1 .. 10 );
             my @got;
             my $iterator = iterator { shift( @data ) // $value }
@@ -60,13 +60,13 @@ sub test {
                 last if $compare->( $data, $value );
                 push @got, $data;
             }
-            ok( $iterator->is_exhausted, "exhausted flag" );
-            is( \@got, [ 1 .. 10 ], "got data" );
+            ok( $iterator->is_exhausted, 'exhausted flag' );
+            is( \@got, [ 1 .. 10 ], 'got data' );
         };
 
     }
 
-    subtest "input exhaustion: throw" => sub {
+    subtest 'input exhaustion: throw' => sub {
         my $len = my @data = ( 1 .. 10 );
         my @got;
         my $iterator = iterator { shift( @data ) // die }
@@ -80,8 +80,8 @@ sub test {
             last if !defined $data;
             push @got, $data;
         }
-        ok( $iterator->is_exhausted, "exhausted flag" );
-        is( \@got, [ 1 .. 10 ], "got data" );
+        ok( $iterator->is_exhausted, 'exhausted flag' );
+        is( \@got, [ 1 .. 10 ], 'got data' );
     };
 
 
@@ -100,8 +100,8 @@ sub test {
         };
 
         isa_ok( $err, 'Iterator::Flex::Failure::Exhausted' );
-        ok( $iterator->is_exhausted, "exhausted flag" );
-        is( \@got, [ 1 .. 10 ], "got data" );
+        ok( $iterator->is_exhausted, 'exhausted flag' );
+        is( \@got, [ 1 .. 10 ], 'got data' );
     };
 
 
@@ -118,7 +118,7 @@ sub test {
             push @got, $data;
         }
 
-        is( \@got, [ 1 .. 10 ], "first run" );
+        is( \@got, [ 1 .. 10 ], 'first run' );
 
         $iterator->rewind;
 
@@ -127,8 +127,8 @@ sub test {
             push @got, $data;
         }
 
-        ok( $iterator->is_exhausted, "exhausted flag" );
-        is( \@got, [ 1 .. 10 ], "after rewind" );
+        ok( $iterator->is_exhausted, 'exhausted flag' );
+        is( \@got, [ 1 .. 10 ], 'after rewind' );
 
     };
 

@@ -1,8 +1,9 @@
 package Minion::Worker;
 use Mojo::Base 'Mojo::EventEmitter';
 
-use Carp       qw(croak);
-use Mojo::Util qw(steady_time);
+use Carp         qw(croak);
+use Minion::Util qw(desired_tasks);
+use Mojo::Util   qw(steady_time);
 
 has [qw(commands status)] => sub { {} };
 has [qw(id minion)];
@@ -34,10 +35,13 @@ sub new {
 sub process_commands {
   my $self = shift;
 
+  my $called = 0;
   for my $command (@{$self->minion->backend->receive($self->id)}) {
     next unless my $cb = $self->commands->{shift @$command};
     $self->$cb(@$command);
+    $called++;
   }
+  $self->register if $called;
 
   return $self;
 }
@@ -56,6 +60,7 @@ sub run {
   $status->{dequeue_timeout}    //= 5;
   $status->{heartbeat_interval} //= 300;
   $status->{jobs}               //= 4;
+  $status->{limits}             //= {};
   $status->{queues} ||= ['default'];
   $status->{performed}       //= 0;
   $status->{repair_interval} //= 21600;
@@ -74,9 +79,10 @@ sub run {
 
   # Remote control commands need to validate arguments carefully
   my $commands = $self->commands;
-  local $commands->{jobs} = sub { $status->{jobs} = $_[1] if ($_[1] // '') =~ /^\d+$/ };
-  local $commands->{kill} = \&_kill;
-  local $commands->{stop} = sub { $self->_kill('KILL', $_[1]) };
+  local $commands->{jobs}  = sub { $status->{jobs} = $_[1] if ($_[1] // '') =~ /^\d+$/ };
+  local $commands->{kill}  = \&_kill;
+  local $commands->{spare} = sub { $status->{spare} = $_[1] if ($_[1] // '') =~ /^\d+$/ };
+  local $commands->{stop}  = sub { $self->_kill('KILL', $_[1]) };
 
   eval { $self->_work until $self->{finished} && !@{$self->{jobs}} };
   my $err = $@;
@@ -127,8 +133,10 @@ sub _work {
   elsif ($status->{jobs} <= @$jobs) { @extra = (min_priority => $status->{spare_min_priority}) }
 
   # Try to get more jobs
+  my $tasks = desired_tasks($status->{limits}, [keys %{$self->minion->tasks}], [map { $_->task } @$jobs]);
+  return unless @$tasks;
   my ($max, $queues) = @{$status}{qw(dequeue_timeout queues)};
-  my $job = $self->emit('wait')->dequeue($max => {queues => $queues, @extra});
+  my $job = $self->emit('wait')->dequeue($max => {queues => $queues, tasks => $tasks, @extra});
   push @$jobs, $job->start if $job;
 }
 
@@ -293,6 +301,12 @@ Do not dequeue jobs with a lower priority.
   queues => ['important']
 
 One or more queues to dequeue jobs from, defaults to C<default>.
+
+=item tasks
+
+  tasks => ['foo', 'bar'] 
+
+One or more tasks to dequeue jobs from, defaults to all tasks.
 
 =back
 

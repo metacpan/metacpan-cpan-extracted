@@ -17,6 +17,12 @@ OpenTelemetry::SDK - An implementation of the OpenTelemetry SDK for Perl
     use OpenTelemetry::Integration qw( HTTP::Tiny );
 
     # You can also configure some parts of the SDK manually
+    # like passing in your own tracer provider...
+    OpenTelemetry::SDK->configure_tracer_provider(
+        Local::TracerProvider->new( ... ),
+    );
+
+    # ... or adding custom processors to the existing one
     OpenTelemetry->tracer_provider->add_span_processor(
         OpenTelemetry::SDK::Trace::Span::Processor::Simple->new(
             exporter => OpenTelemetry::SDK::Exporter::Console->new,
@@ -61,6 +67,61 @@ is clear that "OpenTelemetry implementations MUST NOT
 throw unhandled exceptions at runtime" it explicitly states that the SDK
 "MAY I<fail fast> and cause the application to fail on initialization". This
 is the only scenario in which the SDK will potentially terminate a program.
+
+=head2 Programmatic Configuration
+
+L<OpenTelemetry::SDK> offers some means to configure it programmatically.
+The methods described in this section are the same that would normally get
+called when importing the SDK.
+
+=head3 configure_propagators
+
+    $propagator = OpenTelemetry::SDK->configure_propagators(
+        @propagators,
+    );
+
+This method takes a list of propagators, or propagator slugs, and configures
+them as the global propagators. If no arguments are passed in, then a
+default set of slugs will be read from the L</OTEL_PROPAGATORS> environment
+variable.
+
+Arguments to this method can be any of the names that could be set in that
+environment, or instances of propagators that I<do> the
+L<OpenTelemetry::Propagator> role. Any names that are not recognised, or
+objects that do not consume that role will be ignored.
+
+If after all the validation multiple valid propagators are present, they
+will be wrapped in a L<OpenTelemetry::Propagator::Composite>.
+
+This method returns the globally installed propagator.
+
+=head3 configure_tracer_provider
+
+    $provider = OpenTelemetry::SDK->configure_tracer_provider(
+        $provider // undef, # Optional
+    );
+
+This method optionally takes an instance of a tracer provider and configures
+it with the appropriate span processors and exporters. The provider passed as
+an argument must implement the tracer provider API. If it does not, it will
+be ignored and a warning will be logged.
+
+This method is useful if you want to apply the default configuration to a
+custom tracer provider. If you want to customise this even further, you can
+skip this method entirely and create your own pipelines:
+
+    my $exporter  = My::Exporter->new( ... );
+    my $processor = My::Processor->new( exporter => $exporter, ... );
+    my $provider  = My::Provider->new( ... );
+    $provider->add_span_processor($processor);
+    OpenTelemetry->trace_provider = $provider;
+
+If no argument is set, the provider will default to an internally constructed
+L<OpenTelemetry::SDK::Trace::TracerProvider>.
+
+This method returns the globally installed provider.
+
+=head2 Environment Variables
 
 The remainder of this section lists the environment variables that are
 supported by the SDK and the way they are interpreted.

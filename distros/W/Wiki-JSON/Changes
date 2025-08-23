@@ -1,3 +1,9 @@
+0.0.24 Sat Aug 23 09:48:32 2025 +0200
+    - pre_html preliminar support (Do not use yet, not enough tested)
+    - Fixing templates errors and inconsistencies
+    - Fixing critical errors in element expansion inside list
+    - Lots of new tests to ensure consistency
+
 0.0.23 Thu Aug 21 21:12:02 2025 +0200
     - Metadata fixed
     - Adding CONTRIBUTING.md to MANIFEST

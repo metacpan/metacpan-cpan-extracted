@@ -1,5 +1,10 @@
 Revision history for OpenTelemetry-SDK
 
+0.028     2025-08-22 22:24:54 BST
+
+    * Add initial support for programmatic configuration
+    * Add support for custom formats in console exporter
+
 0.027     2025-05-08 08:50:57 BST
 
     * Switch to the internal logger added to OpenTelemetry v0.030.

@@ -1,11 +1,26 @@
-0.3.2  2025-08-21
+0.4.2  2025-08-22
 
    - Documentation upgrades
+
+0.4.1  2025-08-22
+
+   - Ignore non-existent package dependencies (issue #17)
+
+0.4.0  2025-08-22
+
+   - Use git '--single-branch' opt when cloning SBo repo
+   - Add global '-T' flag to do nothing if SBo repo hasn't been cloned
+   - Update shell completion to not perform repo cloning (via -T option)
+   - Documentation upgrades
+
+0.3.2  2025-08-21
+
    - Added build command
    - Added '-k' option to the install command to keep built package
    - Removed CLEANUP configuration file option
    - Added '-p' option to search command to print just package PRGNAMs
    - Added shell completion for bash and zsh
+   - Documentation upgrades
 
 0.2.2  2025-01-15
 

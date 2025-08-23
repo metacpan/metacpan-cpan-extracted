@@ -1,5 +1,25 @@
 Revision history for Iterator-Flex
 
+0.26      2025-08-22 16:04:52 EDT
+
+  [ENHANCEMENT]
+
+    * Stack now supports reset and rewind, with caveats and extra
+      knobs
+
+    * the drain method takes an optional number of elements to drain
+
+    * imap now properly handles subs which return lists
+
+    * imap supports 'rewind'
+
+  [BUG FIX]
+
+    * Zip 'rewind' was actually a 'reset'. Now it's truly 'rewind'.
+
+    * Map was under the impression it supported 'current', but it
+      doesn't.
+
 0.25      2025-08-18 14:27:59 EDT
 
   [BUG FIX]

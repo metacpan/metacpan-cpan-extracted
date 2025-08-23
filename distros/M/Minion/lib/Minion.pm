@@ -21,7 +21,7 @@ has missing_after                  => 1800;
 has [qw(remove_after stuck_after)] => 172800;
 has tasks                          => sub { {} };
 
-our $VERSION = '10.31';
+our $VERSION = '11.0';
 
 sub add_task {
   my ($self, $name, $task) = @_;
@@ -370,6 +370,9 @@ Broadcast remote control command to one or more workers.
   # Broadcast "jobs" command to pause worker 23
   $minion->broadcast('jobs', [0], [23]);
 
+  # Broadcast "spare" command to disable the feature on all workers
+  $minion->broadcast('spare', [0]);
+
 =head2 class_for_task
 
   my $class = $minion->class_for_task('foo');
@@ -414,7 +417,7 @@ Job is valid for this many seconds (from now) before it expires.
   lax => 1
 
 Existing jobs this job depends on may also have transitioned to the C<failed> state to allow for it to be processed,
-defaults to C<false>. Note that this option is B<EXPERIMENTAL> and might change without warning!
+defaults to C<false>.
 
 =item notes
 

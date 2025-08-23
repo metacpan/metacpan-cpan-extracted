@@ -2,11 +2,11 @@ package DBIx::QuickORM::Util;
 use strict;
 use warnings;
 
-our $VERSION = '0.000015';
+our $VERSION = '0.000019';
 
 use Data::Dumper;
 use Scalar::Util qw/blessed/;
-use Carp qw/croak/;
+use Carp qw/croak confess/;
 
 use Module::Pluggable sub_name => '_find_mods';
 BEGIN {
@@ -24,6 +24,7 @@ our @EXPORT_OK = qw{
     clone_hash_of_objs
     column_key
     debug
+    parse_conflate_args
 };
 
 sub column_key { return join ', ' => sort @_ }
@@ -126,6 +127,58 @@ sub debug {
     return $out if defined wantarray;
     print $out;
 }
+
+sub parse_conflate_args {
+    my ($proto, %params);
+    $proto = shift if @_ % 2;
+
+    if (!blessed($_[0]) && eval { $_[0]->does('DBIx::QuickORM::Role::Type') ? 1 : 0 }) {
+        (@params{qw/class value/}) = (shift(@_), shift(@_));
+        %params = (%params, @_);
+    }
+    else {
+        %params = @_;
+    }
+
+    if ($proto) {
+        if (blessed($proto)) {
+            $params{value} //= $proto;
+        }
+        else {
+            my $ref = ref($proto);
+            my $is_class;
+            if ($ref) {
+                $is_class = 0;
+            }
+            else {
+                my $file = "$proto.pm";
+                $file =~ s{::}{/}g;
+                $is_class = $INC{$file} ? 1 : 0;
+            }
+
+            if ($is_class) {
+                $params{class} //= $proto;
+            }
+            else {
+                $params{value} //= $proto;
+            }
+        }
+    }
+
+    confess "'value' argument must be present unless called on an instance of a type class" unless exists $params{value};
+
+    $params{class} //= blessed($params{value}) // caller;
+
+    return \%params if $params{affinity};
+
+    my $source  = $params{source}  // return \%params;
+    my $dialect = $params{dialect} // return \%params;
+    my $field   = $params{field}   // return \%params;
+    $params{affinity} = $source->field_affinity($field, $dialect);
+
+    return \%params;
+}
+
 
 1;
 

@@ -9,7 +9,7 @@ use warnings;
 
 use experimental qw( signatures postderef declared_refs );
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 
 use Ref::Util;
 use Scalar::Util;
@@ -423,15 +423,31 @@ sub set_error ( $self ) {
 
 
 
-sub drain ( $self ) {
+
+
+
+sub drain ( $self, $n = undef ) {
 
     my @values;
 
     eval {
-        while ( 1 ) {
-            my $value = $self->next;
-            last if $self->is_exhausted;
-            push @values, $value;
+        if ( $n ) {
+            while ( $n-- ) {
+                push @values, $self->next;
+                if ( $self->is_exhausted ) {
+                    pop @values;
+                    last;
+                }
+            }
+        }
+        else {
+            while ( 1 ) {
+                push @values, $self->next;
+                if ( $self->is_exhausted ) {
+                    pop @values;
+                    last;
+                }
+            }
         }
         1;
     } or do {
@@ -467,7 +483,7 @@ Iterator::Flex::Base - Iterator object
 
 =head1 VERSION
 
-version 0.25
+version 0.26
 
 =head1 METHODS
 
@@ -559,11 +575,14 @@ It does I<not> signal error.
 
 =head2 drain
 
-   \@values = $iter->drain;
+   \@values = $iter->drain( ?$nelem );
 
 drains the iterator by repeatedly calling C<<$iter->next> until the
 iterator is exhausted.  C<$iter> will I<not> throw if it signals
 exhaustion by throwing.
+
+If C<$nelem> is provided, it will return no more than C<$nelem> at a
+time.
 
 =head1 INTERNALS
 

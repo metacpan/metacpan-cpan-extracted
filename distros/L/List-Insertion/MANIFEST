@@ -4,10 +4,10 @@ Changes
 lib/List/Insertion.pm
 lib/List/Insertion.pod
 LICENSE
-List-Insertion-v0.1.0.tar
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
+none/List::Insertion.3
 README
 README.md
 t/List-Insertion.t

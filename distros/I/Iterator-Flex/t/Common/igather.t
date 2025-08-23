@@ -76,7 +76,7 @@ subtest 'synopsis' => sub {
 
 };
 
-subtest "exhaustion" => sub {
+subtest 'exhaustion' => sub {
 
     my $iter = igather {
         my ( undef, $state ) = @_;

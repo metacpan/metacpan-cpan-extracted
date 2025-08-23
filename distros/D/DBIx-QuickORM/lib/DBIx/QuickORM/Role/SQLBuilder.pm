@@ -2,7 +2,7 @@ package DBIx::QuickORM::Role::SQLBuilder;
 use strict;
 use warnings;
 
-our $VERSION = '0.000015';
+our $VERSION = '0.000019';
 
 use Role::Tiny;
 

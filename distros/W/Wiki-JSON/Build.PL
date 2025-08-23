@@ -20,13 +20,16 @@ my $build = Module::Build->new(
         'Path::Tiny'       => 0,
         'Const::Fast'      => 0,
         'perl'             => 'v5.16.3',
+        'Mojolicious'      => 0,
+        'Test::Warnings'   => 0,
     },
     configure_requires => {
         'Module::Build' => 0,
     },
     meta_merge => {
         resources => {
-            bugtracker => 'https://github.com/sergiotarxz/Perl-Wiki-JSON/issues',
+            bugtracker =>
+              'https://github.com/sergiotarxz/Perl-Wiki-JSON/issues',
             repository => 'https://github.com/sergiotarxz/Perl-Wiki-JSON',
         }
     },
