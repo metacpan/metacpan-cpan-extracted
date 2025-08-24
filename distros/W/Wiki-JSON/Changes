@@ -1,3 +1,23 @@
+0.0.29 Sun Aug 24 08:37:01 2025 +0200
+    - Improving warning inside inline
+    - Warning on unterminated bold or italic
+    - Tests for new and old warnings
+
+0.0.28 Sun Aug 24 08:05:08 2025 +0200
+    - Fixing href can contain spaces not escaped
+    - Fixing <br> after anchor when text goes after anchor in inline context.
+
+0.0.27 Sun Aug 24 07:16:55 2025 +0200
+    - Adding pdf support
+    - Adding support of selecting the starting pdf page
+
+0.0.26 Sun Aug 24 06:46:03 2025 +0200
+    - Adding video support
+
+0.0.25 Sat Aug 23 19:12:25 2025 +0200
+    - Improving the parser of images fixing bugs related to captions
+    - Parsing images to html supported.
+
 0.0.24 Sat Aug 23 09:48:32 2025 +0200
     - pre_html preliminar support (Do not use yet, not enough tested)
     - Fixing templates errors and inconsistencies

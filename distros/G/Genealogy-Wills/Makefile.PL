@@ -12,6 +12,13 @@ if(my $reporter = $ENV{'PERL_CPAN_REPORTER_CONFIG'}) {
 	}
 }
 
+if(defined($ENV{'GITHUB_ACTION'}) || defined($ENV{'CIRCLECI'}) || defined($ENV{'TRAVIS_PERL_VERSION'}) || defined($ENV{'APPVEYOR'})) {
+	# Prevent downloading and installing stuff
+	warn 'AUTOMATED_TESTING added for you' if(!defined($ENV{'AUTOMATED_TESTING'}));
+	$ENV{'AUTOMATED_TESTING'} = 1;
+	$ENV{'NO_NETWORK_TESTING'} = 1;
+}
+
 my @dirs = (
 	'lib/Genealogy/Wills/data'
 );
@@ -30,13 +37,14 @@ foreach my $dir(@dirs) {
 
 my $prereqs = {
 	'autodie' => 0,
+	'constant' => 0,
 	'Carp' => 0,
 	'Data::Reuse' => 0,
 	'Database::Abstraction' => 0.04,
 	'DBD::SQLite' => 0,
 	'DBD::SQLite::Constants' => 0,
 	'Error::Simple' => 0,
-	'ExtUtils::MakeMaker' => 6.64,	# 6.64 for TEST_REQUIRES
+	'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
 	'File::Basename' => 0,
 	'File::pfopen' => 0,
 	'File::Slurp' => 0,
@@ -45,6 +53,7 @@ my $prereqs = {
 	'Module::Info' => 0,
 	'Object::Configure' => 0.12,
 	'Params::Get' => 0.13,
+	'Params::Validate::Strict' => 0.09,
 	'Return::Set' => 0,
 	'Scalar::Util' => 0
 };
@@ -101,7 +110,9 @@ WriteMakefile(
 	dist => $dist,
 	clean => { FILES => 'Genealogy-Wills-*' },
 	realclean => {
-		FILES => 'Genealogy-Wills-* lib/Genealogy/Wills/data'
+		# This would seem logical, but it will break "make && make test" even though you don't call "make realclean"
+		# FILES => 'Genealogy-Wills-* lib/Genealogy/Wills/data'
+		FILES => 'Genealogy-Wills-*'
 	},
 	# META_ADD => {
 		# provides => {}
@@ -116,9 +127,9 @@ WriteMakefile(
 				repository => 'https://github.com/nigelhorne/Genealogy-Wills',
 			},
 			bugtracker => {
-				# web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Genealogy-Wills',
-				# mailto => 'bug-Genealogy-Wills@rt.cpan.org'
-				web => 'https://github.com/nigelhorne/Genealogy-Wills/issues',
+				url => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Genealogy-Wills',
+				web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Genealogy-Wills',
+				# web => 'https://github.com/nigelhorne/Genealogy-Wills/issues',
 				mailto => 'bug-Genealogy-Wills@rt.cpan.org'
 			}, homepage => 'https://sites.rootsweb.com/~obituary',
 		},

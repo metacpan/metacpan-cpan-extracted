@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use Schedule::Easing;
-use Test::More tests=>3;
+use Test::More tests=>4;
 
 # TOTEST:  messages that match no {match} entry (should always be included)
 
@@ -220,6 +220,56 @@ subtest 'numeric'=>sub {
 };
 
 
+subtest 'Other'=>sub {
+	plan tests=>7;
+	my $easing=Schedule::Easing->new(
+		warnExpired=>0,
+		schedule=>[],
+	);
+	is_deeply([$easing->matches(events=>["hi\n"])],["hi\n"],'Empty schedule');
+	#
+	$easing=Schedule::Easing->new(
+		warnExpired=>0,
+		schedule=>[
+			{
+				type=>'numeric',
+				name=>'Quick test',
+				match=>qr/(?<value>\d+)/,
+				begin=>0,
+				final=>1,
+				tsA=>0,
+				tsB=>10,
+				ymin=>1,
+				ymax=>10,
+			}
+		],
+	);
+	is_deeply([$easing->matches(ts=>0,events=>[{message=>'5',key=>1}])],[],                   'Event hash, ts<p');
+	is_deeply([$easing->matches(ts=>5,events=>[{message=>'5',key=>1}])],[{message=>5,key=>1}],'Event hash, ts==p');
+	is_deeply([$easing->matches(ts=>0,events=>[['5','key',1]])],[],           'Event array, ts<p');
+	is_deeply([$easing->matches(ts=>5,events=>[['5','key',1]])],[[5,'key',1]],'Event array, ts==p');
+	#
+	$easing=Schedule::Easing->new(
+		warnExpired=>0,
+		schedule=>[
+			{
+				type=>'numeric',
+				name=>'Quick test',
+				match=>qr/(?<value>\d+)/,
+				begin=>0,
+				final=>1,
+				tsA=>0,
+				tsB=>10,
+				ymin=>1,
+				ymax=>10,
+				shape=>'power',
+				shapeopt=>[2],
+			}
+		],
+	);
+	is_deeply([$easing->matches(ts=>5,events=>[5])],[], 'Shape power, ts==5');
+	is_deeply([$easing->matches(ts=>8,events=>[5])],[5],'Shape power, ts==8');
+};
 
 
 

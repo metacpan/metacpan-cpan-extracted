@@ -1,8 +1,10 @@
 package Schedule::Easing::Block;
 
+use strict;
+use warnings;
 use parent qw/Schedule::Easing::Ease/;
 
-our $VERSION='0.1.0';
+our $VERSION='0.1.1';
 
 sub _default_keys {
 	my ($self)=@_;

@@ -334,6 +334,9 @@ sub _parse_in_array {
         }
         $buffer = '';
     }
+    if ($options->{is_bold} || $options->{is_italic}) {
+        warn 'Detected bold or italic unterminated syntax';
+    }
     return ( $i, $buffer );
 }
 
@@ -434,7 +437,8 @@ sub _try_parse_unordered_list {
         },
         $options,
     );
-    @{$element->{output}} = grep { @{$_->{output}} } @{$element->{output}};
+    @{ $element->{output} } =
+      grep { @{ $_->{output} } } @{ $element->{output} };
     push @$output, $element;
     return ( 1, $i, $buffer, $options );
 }
@@ -465,7 +469,7 @@ sub _try_discard_interrupt_list {
 sub _save_before_new_element {
     my ( $self, $output, $buffer, $options ) = @_;
     if ( $options->{is_unordered_list} ) {
-        if (length $buffer || !@$output ) {
+        if ( length $buffer || !@$output ) {
             push @$output, { type => 'list_element', output => [] };
         }
         $output = $output->[-1]{output};
@@ -720,37 +724,37 @@ sub _try_parse_link_component_formats {
     my ( $self, $tmp_buffer, $caption, $element_options ) = @_;
     if ( $tmp_buffer =~ /^border$/x ) {
         $element_options->{format}{border} = 1;
-        return $caption;
+        return 1;
     }
     if ( $tmp_buffer =~ /^frameless$/x ) {
-        return $caption
+        return 1
           if $self->_is_defined_image_format_exclusive($element_options);
         $element_options->{format}{frameless} = 1;
-        return $caption;
+        return 1;
     }
     if ( $tmp_buffer =~ /^frame$/x ) {
-        return $caption
+        return 1
           if $self->_is_defined_image_format_exclusive($element_options);
         $element_options->{format}{frame} = 1;
-        return $caption;
+        return 1;
     }
     if ( $tmp_buffer =~ /^framed$/x ) {
-        return $caption
+        return 1
           if $self->_is_defined_image_format_exclusive($element_options);
         $element_options->{format}{frame} = 1;
-        return $caption;
+        return 1;
     }
     if ( $tmp_buffer =~ /^thumb$/x ) {
-        return $caption
+        return 1
           if $self->_is_defined_image_format_exclusive($element_options);
         $element_options->{format}{thumb} = 1;
-        return $caption;
+        return 1;
     }
     if ( $tmp_buffer =~ /^thumbnail$/x ) {
-        return $caption
+        return 1
           if $self->_is_defined_image_format_exclusive($element_options);
         $element_options->{format}{thumb} = 1;
-        return $caption;
+        return 1;
     }
     return;
 }
@@ -842,24 +846,24 @@ sub _try_parse_link_component_extra_options_video_controls {
     if ( my ($thumbtime) =
         $tmp_buffer =~ /^thumbtime=((?:\d+:)?(?:\d+:)\d+)$/x )
     {
-        return $caption if defined $element_options->{thumbtime};
+        return 1 if defined $element_options->{thumbtime};
         $element_options->{thumbtime} = $thumbtime;
-        return $caption;
+        return 1;
     }
     if ( my ($start) = $tmp_buffer =~ /^start=((?:\d+:)?(?:\d+:)\d+)$/x ) {
-        return $caption if defined $element_options->{start};
+        return 1 if defined $element_options->{start};
         $element_options->{start} = $start;
-        return $caption;
+        return 1;
     }
     if ( $tmp_buffer =~ /^muted$/x ) {
-        return $caption if defined $element_options->{muted};
+        return 1 if defined $element_options->{muted};
         $element_options->{muted} = 1;
-        return $caption;
+        return 1;
     }
     if ( $tmp_buffer =~ /^loop$/x ) {
-        return $caption if defined $element_options->{loop};
+        return 1 if defined $element_options->{loop};
         $element_options->{loop} = 1;
-        return $caption;
+        return 1;
     }
     return;
 }
@@ -867,48 +871,48 @@ sub _try_parse_link_component_extra_options_video_controls {
 sub _try_parse_link_component_extra_options {
     my ( $self, $tmp_buffer, $caption, $element_options ) = @_;
     if ( my ($link) = $tmp_buffer =~ /^link=(.*)$/x ) {
-        return $caption if defined $element_options->{link};
+        return 1 if defined $element_options->{link};
         $element_options->{link} = $link;
-        return $caption;
+        return 1;
     }
     if ( my ($alt) = $tmp_buffer =~ /^alt=(.*)$/x ) {
-        return $caption if defined $element_options->{alt};
+        return 1 if defined $element_options->{alt};
         $element_options->{alt} = $alt;
-        return $caption;
+        return 1;
     }
     if ( my ($page) = $tmp_buffer =~ /^page=(\d+)$/x ) {
-        return $caption if defined $element_options->{page};
+        return 1 if defined $element_options->{page};
         $element_options->{page} = $page;
-        return $caption;
+        return 1;
     }
     if ( my ($loosy) = $tmp_buffer =~ /^loosy=(.*)$/x ) {
-        return $caption if ( $loosy ne 'false' );
-        return $caption if defined $element_options->{not_loosy};
+        return 1 if ( $loosy ne 'false' );
+        return 1 if defined $element_options->{not_loosy};
         $element_options->{not_loosy} = 1;
-        return $caption;
+        return 1;
     }
     if ( my ($class_string) = $tmp_buffer =~ /^class=(.*)$/x ) {
-        return $caption if defined $element_options->{classes};
+        return 1 if defined $element_options->{classes};
         $element_options->{classes} = [];
         for my $class ( split /\s+/x, $class_string ) {
             push @{ $element_options->{classes} }, $class;
         }
-        return $caption;
+        return 1;
     }
     my $return_video =
       $self->_try_parse_link_component_extra_options_video_controls(
         $tmp_buffer, $caption, $element_options );
-    return $return_video if defined $return_video;
+    return 1 if defined $return_video;
     return;
 }
 
 sub _try_parse_link_component {
     my ( $self, $tmp_buffer, $caption, $element_options ) = @_;
-    my $return_caption_format =
+    my $found_something =
       $self->_try_parse_link_component_formats( $tmp_buffer, $caption,
         $element_options );
-    if ( defined $return_caption_format ) {
-        return $return_caption_format;
+    if ( defined $found_something ) {
+        return $caption;
     }
     my $return_now;
     ($return_now) =
@@ -922,10 +926,10 @@ sub _try_parse_link_component {
       $self->_try_parse_link_component_valign( $tmp_buffer, $caption,
         $element_options );
     return $return_caption_valign if defined $return_caption_halign;
-    my $return_caption_extra =
+    my $return_component_extra =
       $self->_try_parse_link_component_extra_options( $tmp_buffer, $caption,
         $element_options );
-    return $return_caption_extra if defined $return_caption_extra;
+    return $caption if defined $return_component_extra;
 
     if ( !defined $caption ) {
         return $tmp_buffer;
@@ -1134,7 +1138,7 @@ sub _try_parse_template {
         output        => [],
     };
     my $current_buffer = '';
-    my $needs_arg = 0;
+    my $needs_arg      = 0;
     for ( $i += $size_search + 1 ; $i < length $wiki_text ; $i++ ) {
         my $searched    = '|';
         my $size_search = length $searched;
@@ -1142,10 +1146,10 @@ sub _try_parse_template {
         if ( $searched eq $last_word ) {
             push @{ $template->{output} }, $current_buffer;
             $current_buffer = '';
-            $needs_arg = 1;
+            $needs_arg      = 1;
             next;
         }
-        $needs_arg = 0;
+        $needs_arg   = 0;
         $searched    = '}}';
         $size_search = length $searched;
         $last_word   = substr $wiki_text, $i, $size_search;
@@ -1162,7 +1166,7 @@ sub _try_parse_template {
         next if $needs_next;
         $current_buffer .= substr $wiki_text, $i, 1;
     }
-    if (length $current_buffer || $needs_arg) {
+    if ( length $current_buffer || $needs_arg ) {
         push @{ $template->{output} }, $current_buffer;
         $current_buffer = '';
     }

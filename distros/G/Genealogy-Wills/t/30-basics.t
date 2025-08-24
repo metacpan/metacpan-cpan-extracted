@@ -3,7 +3,7 @@ use warnings;
 
 use File::Temp qw(tempdir);
 use Genealogy::Wills;
-use Test::Most tests => 14;	# Define the number of tests
+use Test::Most tests => 13;	# Define the number of tests
 use Test::Returns;
 
 # Mock database
@@ -38,10 +38,6 @@ ok($obj, 'Object created successfully');
 # Test invalid directory
 my $invalid_dir_obj = Genealogy::Wills->new(directory => '/invalid/directory');
 ok(!defined($invalid_dir_obj), 'Object creation fails with invalid directory');
-
-# Test missing required arguments in `new`
-eval { Genealogy::Wills->new('foo') };
-like($@, qr/^Usage:/, 'Fails gracefully when required arguments are missing in `new`');
 
 # Test object properties
 is($obj->{'directory'}, $temp_dir, 'Directory property set correctly');

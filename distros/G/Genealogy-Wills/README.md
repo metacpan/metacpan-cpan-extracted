@@ -4,7 +4,17 @@ Genealogy::Wills - Lookup in a database of wills
 
 # VERSION
 
-Version 0.09
+Version 0.10
+
+# DESCRIPTION
+
+This module provides a convenient interface to search through a database of historical wills,
+primarily focused on the Kent Wills Transcript.
+It handles database connections, caching, and result formatting.
+
+\- Results are cached for 1 day by default
+\- Database connections are lazy-loaded
+\- Large result sets may consume significant memory
 
 # SYNOPSIS
 
@@ -31,7 +41,7 @@ which can be hash, hash-ref or key-value pairs.
 
 - `directory`
 
-    That is the directory containing obituaries.sql.
+    That is the directory containing wills.sql.
     If not given, the use the module's data directory.
 
 - `logger`
@@ -54,9 +64,45 @@ Each record includes a formatted `url` field.
 
     print $smiths[0]->{'first'}, "\n";
 
+# FORMAL SPECIFICATION
+
+    [NAME, URL, DIRECTORY]
+
+    WillRecord == [
+        first: NAME;
+        last: NAME;
+        url: URL;
+        additional_fields: ℙ(NAME × seq CHAR)
+    ]
+
+    WillsDatabase == [
+        directory: DIRECTORY;
+        cache_duration: ℕ;
+        logger: LOGGER
+    ]
+
+    SearchParams == [
+        last: NAME;
+        first: NAME;
+        optional_params: ℙ(NAME × seq CHAR)
+    ]
+
+    │ last ≠ ∅  -- last name cannot be empty
+    │ |last| > 0  -- last name must have positive length
+
+    search: WillsDatabase × SearchParams → ℙ WillRecord
+
+    ∀ db: WillsDatabase; params: SearchParams •
+        params.last ≠ ∅ ⇒
+        search(db, params) = {r: WillRecord | r.last = params.last ∧ matches(r, params)}
+
+    ∀ db: WillsDatabase; params: SearchParams •
+        params.last = ∅ ⇒
+        search(db, params) = ∅
+
 # AUTHOR
 
-Nigel Horne, `<njh at bandsman.co.uk>`
+Nigel Horne, `<njh at nigelhorne.com>`
 
 # BUGS
 

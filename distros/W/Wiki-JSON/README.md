@@ -91,8 +91,6 @@ Parses the wiki format into a serializable to JSON or YAML Perl data structure.
 
 Retrieves an ArrayRef containing just HashRefs without nesting describing how HTML tags should be open and closed for a wiki text.
 
-(Do not use yet, not enough tested)
-
 ### template\_callbacks
 
 An optional hashref containing any or both of this two keys pointing to subrefs

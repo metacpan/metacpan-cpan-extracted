@@ -117,5 +117,7 @@ schedule-easing.pl - Filter messages based on a schedule.
 		               (currently 0/1, but may support flagged options in the future)
 		--check:       verify the schedule configuration, non-zero exit on any warnings
 		--help
+	
+	The format of the scheduling file is described in Schedule::Easing.
 
 =cut

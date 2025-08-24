@@ -1,5 +1,10 @@
 Revision history for Schedule::Easing
 
+0.1.1 - 2025-08-23
+	- Shaping functions should work
+	- Documentation
+	- Bug fixes for Perl<5.26
+
 0.1.0 - 2025-07-12
 	- Core functionality
 

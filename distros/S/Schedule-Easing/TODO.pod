@@ -12,11 +12,7 @@ Script is currently linewise, but should be updated to leverage C<Easing::Stream
 
 =head2 Script timestamps option
 
-C<schedule-easing.pl --timestamps> should work.
-
-=head2 Function support
-
-Functions are available but the configuration does not currently support specifying functions other than Linear for easing.
+C<schedule-easing.pl --timestamps> should work.  It is currently available but not well tested.
 
 =head2 Expiration warnings
 

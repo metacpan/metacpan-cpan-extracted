@@ -1,7 +1,7 @@
 {
-	"version" : "0.1.0",
+	"version" : "0.1.1",
 	"name"    : "Schedule::Easing",
-	"author"  : "Brian Blackmore",
+	"author"  : ["Brian Blackmore <BBLACKM@cpan.org>"],
 	"abstract": "Stateless, stable selection of events with increased frequency during a schedule",
 	"license" : ["gpl_3"],
 	"prereqs" : {

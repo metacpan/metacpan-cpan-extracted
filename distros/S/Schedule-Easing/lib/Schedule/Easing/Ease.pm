@@ -7,7 +7,7 @@ use Scalar::Util qw/looks_like_number/;
 
 use Schedule::Easing::Function;
 
-our $VERSION='0.1.0';
+our $VERSION='0.1.1';
 
 sub _default_keys { return qw/match begin final tsA tsB shape shapeopt _warnExpired/ }
 sub _default {

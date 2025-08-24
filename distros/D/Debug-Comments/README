@@ -1,0 +1,42 @@
+Debug-Comments
+
+Lightweight Perl source filter to generate debug-trace messages from
+comments.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Debug::Comments
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Debug-Comments
+
+    CPAN Ratings
+        https://cpanratings.perl.org/d/Debug-Comments
+
+    Search CPAN
+        https://metacpan.org/release/Debug-Comments
+
+
+LICENSE AND COPYRIGHT
+
+This software is copyright (c) 2025 by Brett Watson.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+

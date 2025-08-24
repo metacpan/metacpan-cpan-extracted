@@ -20,6 +20,24 @@
 #######################################################################
 
 
+2025-08-21  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000827 released
+
+        * Updated Makefile.PL for Ubuntu
+
+2025-08-21  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000826 released
+
+        * Updated Makefile.PL for Ubuntu
+
+2025-08-21  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000825 released
+
+	* Updated Makefile.PL for Ubuntu
+
 2025-08-14  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000824 released

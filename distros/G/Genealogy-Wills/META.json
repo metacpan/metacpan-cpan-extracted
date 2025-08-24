@@ -55,11 +55,13 @@
             "Module::Info" : "0",
             "Object::Configure" : "0.12",
             "Params::Get" : "0.13",
+            "Params::Validate::Strict" : "0.09",
             "Return::Set" : "0",
             "Scalar::Util" : "0",
             "Test::HTTPStatus" : "0",
             "Try::Tiny" : "0",
             "autodie" : "0",
+            "constant" : "0",
             "perl" : "5.006002"
          }
       },
@@ -81,7 +83,8 @@
    "resources" : {
       "bugtracker" : {
          "mailto" : "bug-Genealogy-Wills@rt.cpan.org",
-         "web" : "https://github.com/nigelhorne/Genealogy-Wills/issues"
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Genealogy-Wills",
+         "x_url" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Genealogy-Wills"
       },
       "homepage" : "https://sites.rootsweb.com/~obituary",
       "repository" : {
@@ -91,6 +94,6 @@
          "x_repository" : "https://github.com/nigelhorne/Genealogy-Wills"
       }
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

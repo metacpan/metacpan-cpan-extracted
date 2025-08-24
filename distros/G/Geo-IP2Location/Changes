@@ -1,5 +1,11 @@
 Revision history for Perl extension Geo::IP2Location.
 
+8.80  Sun August 24 16:00:00 2025
+      Twenty-fourth release under the Geo::IP2Location
+      Added new function "get_as_domain"
+      Added new function "get_as_usagetype"
+      Added new function "get_as_cidr"
+
 8.70  Tue January 3 16:00:00 2023
       Twenty-third release under the Geo::IP2Location
       Added new function "get_district"

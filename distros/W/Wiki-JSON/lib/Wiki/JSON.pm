@@ -11,7 +11,7 @@ use Const::Fast;
 use Wiki::JSON::Parser;
 use Wiki::JSON::HTML;
 
-our $VERSION = "0.0.24";
+our $VERSION = "0.0.29";
 
 const my $MAX_HX_SIZE                                           => 6;
 const my $EXTRA_CHARACTERS_BOLD_AND_ITALIC_WHEN_ITALIC          => 3;
@@ -128,8 +128,6 @@ Parses the wiki format into a serializable to JSON or YAML Perl data structure.
     my $structure = $wiki_parser->pre_html($wiki_string, $template_callbacks);
 
 Retrieves an ArrayRef containing just HashRefs without nesting describing how HTML tags should be open and closed for a wiki text.
-
-(Do not use yet, not enough tested)
 
 =head3 template_callbacks
 

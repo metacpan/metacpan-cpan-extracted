@@ -25,7 +25,7 @@
 #
 ################################################################
 
-our $VERSION='1.0000824';
+our $VERSION='1.0000827';
 
 #print `env`,"\n\n\n";
 
@@ -228,7 +228,7 @@ BEGIN { # FullAuto© MICROSOFT WINDOWS INSTALLER
    BEGIN {
       # Bullet Proof Test for AWS EC2
       # https://serverfault.com/questions/462903/how-to-know-if-a-machine-is-an-ec2-instance
-      $aws=`/bin/bash -c 'if [ -f /sys/hypervisor/uuid ];then if [ \`/bin/head -c 3 /sys/hypervisor/uuid\`=="ec2" ];then echo yes;else echo no;fi;elif [ -r /sys/devices/virtual/dmi/id/product_uuid ];then if [ \`/bin/head -c 3 /sys/devices/virtual/dmi/id/product_uuid\` == "EC2" ]; then echo yes;else echo no;fi;else if \$(curl -s -m 5 http://169.254.169.254/latest/dynamic/instance-identity/document | grep -q availabilityZone);then echo yes;else echo no;fi;fi'`;
+      $aws=`/bin/bash -c 'if [ -f /sys/hypervisor/uuid ];then if [ \`/bin/head -c 3 /sys/hypervisor/uuid\`=="ec2" ];then echo yes;else echo no;fi;elif [ -r /sys/devices/virtual/dmi/id/product_uuid ];then if [ \`/bin/head -c 3 /sys/devices/virtual/dmi/id/product_uuid | /bin/tr "[:lower:]" "[:upper:]"\` == "EC2" ]; then echo yes;else echo no;fi;else if \$(curl -s -m 5 http://169.254.169.254/latest/dynamic/instance-identity/document | grep -q availabilityZone);then echo yes;else echo no;fi;fi'`; 
       $aws=(-1<index $aws,'yes')?1:0;
       if ($aws) {
          my $token=`curl -X PUT  -s "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"`;
@@ -431,16 +431,6 @@ if ($ARGV[0]=~/\.pem/) {
    push @{$amazon{argv}},$ARGV[0];
 }
 our $system_type='';
-# Bullet Proof Test for AWS EC2
-# https://serverfault.com/questions/462903/how-to-know-if-a-machine-is-an-ec2-instance
-#my $aws=`/bin/bash -c 'if [ -f /sys/hypervisor/uuid ];then if [ \`/bin/head -c 3 /sys/hypervisor/uuid\`=="ec2" ];then echo yes;else echo no;fi;elif [ -r /sys/devices/virtual/dmi/id/product_uuid ];then if [ \`/bin/head -c 3 /sys/devices/virtual/dmi/id/product_uuid\` == "EC2" ]; then echo yes;else echo no;fi;else if \$(curl -s -m 5 http://169.254.169.254/latest/dynamic/instance-identity/document | grep -q availabilityZone);then echo yes;else echo no;fi;fi'`;
-#$aws=(-1<index $aws,'yes')?1:0;
-#if ($aws) {
-#   my $token=`curl -X PUT  -s "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"`;
-#   my $instance_type=`curl -s -H "X-aws-ec2-metadata-token: $token" http://169.254.169.254/latest/meta-data/instance-type`;
-#   $amazon{instance_type}=$instance_type;
-#}
-
 if (($^O eq 'linux' || $^O eq 'freebsd') && !(grep { /SKIP|CPAN/i } @ARGV)) {
    if ((-e "/etc/system-release-cpe") &&
          ((-1<index `cat /etc/system-release-cpe`,'amazon:linux') ||
@@ -454,7 +444,6 @@ if (($^O eq 'linux' || $^O eq 'freebsd') && !(grep { /SKIP|CPAN/i } @ARGV)) {
       $system_type='amazon_linux';
    } elsif ((-e "/etc/os-release") &&
          (-1<index `cat /etc/os-release`,'ubuntu')) {
-
       $amazon{'ubuntu'}='' if $aws;
       $system_type='ubuntu';
    } elsif ($^O eq 'freebsd') {
@@ -2273,7 +2262,9 @@ sub size_fmt {
 if (exists $amazon{instance_type}) {
    if ($amazon{instance_type}=~/micro|nano/) {
       unless (grep { /CPAN|SKIP/ } @ARGV) {
-         fa_system('sudo dnf -y install perl-YAML.noarch perl-Net-SSLeay.x86_64');
+	 if ($system_type eq 'amazon_linux') { 
+            fa_system('sudo dnf -y install perl-YAML.noarch perl-Net-SSLeay.x86_64');
+	 }
 #print "BEFORE CPAN LOOPING FREEMEM: ".`sudo cat /proc/meminfo | grep MemFree`;
 #print "BEFORE CPAN LOOPING STARTING AVAILABLE: ".`sudo cat /proc/meminfo | grep MemAvailable`;
          my $cwd=&cwd;
@@ -2358,50 +2349,6 @@ if (($^O ne 'MSWin32') && ($^O ne 'MSWin64') && !grep { /^GETBERK$/ } @ARGV) {
    &fa_install_module('Clone','install','Makefile');
    &fa_install_module('Try::Tiny','install','Makefile');
    &fa_install_module('Test::Fatal','install','Makefile');
-   &fa_install_module('HTTP::Message','install','Makefile');
-   &fa_install_module('HTTP::Cookies','install','Makefile');
-   &fa_install_module('Test::RequiresInternet','install','Makefile');
-   &fa_install_module('LWP','install','Makefile');
-   &fa_install_module('File::HomeDir','install','Makefile');
-   &fa_install_module('ExtUtils::MakeMaker','install','Makefile');
-   &fa_install_module('File::Which','install','Makefile');
-   &fa_install_module('Term::ReadKey','install','Makefile');
-   &fa_install_module('Perl::OSType','install','Makefile');
-   &fa_install_module('Locale::Maketext::Simple','install','Makefile');
-   eval {
-      local $SIG{__DIE__}; # No sigdie handler;
-      require Test::Tester;
-   };
-   if ($@) {
-      &fa_install_module('Test::Simple','install','Makefile');
-   } else {
-      &fa_install_module('Test::Simple','install','Makefile');
-      &fa_install_module('Test::Tester','install','Makefile');
-   }
-   &fa_install_module('Params::Check','install','Makefile');
-   &fa_install_module('version','install','Makefile');
-   &fa_install_module('Module::CoreList','install','Makefile');
-   &fa_install_module('Module::Load','install','Makefile');
-   &fa_install_module('parent','install','Makefile');
-   &fa_install_module('Module::Metadata','install','Makefile');
-   &fa_install_module('Module::Load::Conditional','install','Makefile');
-   &fa_install_module('IPC::Cmd','install','Makefile');
-   &fa_install_module('ExtUtils::CBuilder','install','Makefile');
-   &fa_install_module('Mo','install','Makefile');
-   &fa_install_module('YAML','install','Makefile');
-   &fa_install_module('YAML::Tiny','install','Makefile');
-   &fa_install_module('Algorithm::Diff','install','Makefile');
-   &fa_install_module('Text::Diff','install','Makefile');
-   &fa_install_module('PAR::Dist','install','Makefile');
-   &fa_install_module('IO::Compress::Base::Common','install','Makefile');
-   &fa_install_module('Compress::Raw::Bzip2','install','Makefile');
-   &fa_install_module('Compress::Raw::Zlib','install','Makefile');
-   &fa_install_module('Compress::Zlib','install','Makefile');
-   &fa_install_module('CPAN::Mini','install','Makefile');
-   &fa_install_module('CPAN::Meta::YAML','install','Makefile');
-   &fa_install_module('Parse::CPAN::Meta','install','Makefile');
-   &fa_install_module('CPAN::Meta::Requirements','install','Makefile');
-   &fa_install_module('JSON::PP','install','Makefile');
    my $mod_info='';my $mod_build_version=0.3601;
    unless (-e "dependencies/CPAN/authors" &&
          !(grep {
@@ -2443,6 +2390,95 @@ if (($^O ne 'MSWin32') && ($^O ne 'MSWin64') && !grep { /^GETBERK$/ } @ARGV) {
       &fa_install_module('Pod::Man','install','Makefile');
       &fa_install_module('Module::Build','install','Makefile','force');
    }
+   &fa_install_module('IO::Socket::IP','install','Build');
+   &fa_install_module('Test::Needs','install','Makefile');
+   &fa_install_module('URI','install','Makefile'); 
+   &fa_install_module('HTTP::Message','install','Makefile');
+   &fa_install_module('HTTP::Cookies','install','Makefile');
+   &fa_install_module('Test::RequiresInternet','install','Makefile');
+   &fa_install_module('LWP','install','Makefile');
+   &fa_install_module('CPAN::DistnameInfo','install','Makefile');
+   &fa_install_module('File::Which','install','Makefile');
+   &fa_install_module('File::HomeDir','install','Makefile');
+   &fa_install_module('ExtUtils::MakeMaker','install','Makefile');
+   &fa_install_module('Term::ReadKey','install','Makefile');
+   &fa_install_module('Perl::OSType','install','Makefile');
+   &fa_install_module('Locale::Maketext::Simple','install','Makefile');
+   eval {
+      local $SIG{__DIE__}; # No sigdie handler;
+      require Test::Tester;
+   };
+   if ($@) {
+      &fa_install_module('Test::Simple','install','Makefile');
+   } else {
+      &fa_install_module('Test::Simple','install','Makefile');
+      &fa_install_module('Test::Tester','install','Makefile');
+   }
+   &fa_install_module('Params::Check','install','Makefile');
+   &fa_install_module('version','install','Makefile');
+   &fa_install_module('Module::CoreList','install','Makefile');
+   &fa_install_module('Module::Load','install','Makefile');
+   &fa_install_module('parent','install','Makefile');
+   &fa_install_module('Module::Metadata','install','Makefile');
+   &fa_install_module('Module::Load::Conditional','install','Makefile');
+   &fa_install_module('IPC::Cmd','install','Makefile');
+   &fa_install_module('ExtUtils::CBuilder','install','Makefile');
+   &fa_install_module('Mo','install','Makefile');
+   &fa_install_module('YAML','install','Makefile');
+   &fa_install_module('YAML::Tiny','install','Makefile');
+   &fa_install_module('Algorithm::Diff','install','Makefile');
+   &fa_install_module('Text::Diff','install','Makefile');
+   &fa_install_module('PAR::Dist','install','Makefile');
+   &fa_install_module('IO::Compress::Base::Common','install','Makefile');
+   &fa_install_module('Compress::Raw::Bzip2','install','Makefile');
+   &fa_install_module('Compress::Raw::Zlib','install','Makefile');
+   &fa_install_module('Compress::Zlib','install','Makefile');
+   &fa_install_module('CPAN::Mini','install','Makefile');
+   &fa_install_module('CPAN::Meta::YAML','install','Makefile');
+   &fa_install_module('Parse::CPAN::Meta','install','Makefile');
+   &fa_install_module('CPAN::Meta::Requirements','install','Makefile');
+   &fa_install_module('JSON::PP','install','Makefile');
+   #my $mod_info='';my $mod_build_version=0.3601;
+   #unless (-e "dependencies/CPAN/authors" &&
+   #      !(grep {
+   #      /(?:use[-_]?)?internet|online|connect_to_internet_ok/i } @ARGV)) {
+   #   eval {
+   #      local $SIG{__DIE__}; # No sigdie handler;
+   #      require CPAN;
+   #      {
+   #         local *STDOUT;
+   #         open(STDOUT, ">", \$mod_info);
+   #         CPAN::Shell->m('Module::Build');
+   #      }
+   #   };
+   #   unless ($@) {
+   #      my $instfile='';my $instver='';my $cpanver='';
+   #      if ($mod_info) {
+   #         ($instfile=$mod_info)=~s/^.*INST_FILE\s+([^\s]+).*$/$1/s;
+   #         ($instver=$mod_info)=~s/^.*INST_VERSION\s+([^\s]+).*$/$1/s;
+   #         ($cpanver=$mod_info)=~s/^.*CPAN_VERSION\s+([^\s]+).*$/$1/s;
+   #      }
+   #      if ($instver<$cpanver) {
+   #         $mod_build_version=$cpanver;
+   #      }
+   #   }
+   #}
+   #eval {
+   #   local $SIG{__DIE__}; # No sigdie handler;
+   #   require Module::Build;
+   #};
+   #if ((!($@) && $Module::Build::VERSION<=$mod_build_version) || $@
+   #      || grep { /-*(?:add|all)[-_]?dependencies/i } @ARGV) {
+   #   &fa_install_module('ExtUtils::ParseXS','install','Makefile');
+   #   &fa_install_module('IO::Zlib','install','Makefile');
+   #   &fa_install_module('Archive::Tar','install','Makefile');
+   #   &fa_install_module('inc::latest','install','Makefile');
+   #   &fa_install_module('Regexp::Common','install','Makefile');
+   #   &fa_install_module('Pod::Checker','install','Makefile');
+   #   &fa_install_module('Pod::Parser','install','Makefile');
+   #   &fa_install_module('Pod::Man','install','Makefile');
+   #   &fa_install_module('Module::Build','install','Makefile','force');
+   #}
    if ($^O ne 'MSWin32' && $^O ne 'MSWin64' ||
          grep { /-*(?:add|all)[-_]?dependencies/i } @ARGV) {
       &fa_install_module('IO::Pty','install','Makefile');
@@ -2453,15 +2489,15 @@ if (($^O ne 'MSWin32') && ($^O ne 'MSWin64') && !grep { /^GETBERK$/ } @ARGV) {
    }
    &fa_install_module('IO::Tee','install','Makefile');
    &fa_install_module('HTML::Parser','install','Makefile');
-   &fa_install_module('URI','install','Makefile');
+#&fa_install_module('URI','install','Makefile');
    &fa_install_module('ExtUtils::Config','install','Makefile');
    &fa_install_module('ExtUtils::InstallPaths','install','Makefile');
    &fa_install_module('ExtUtils::Helpers','install','Makefile');
    &fa_install_module('Test::Harness','install','Makefile','','3.33');
    &fa_install_module('CPAN::Requirements::Dynamic','install','Makefile');
    &fa_install_module('Module::Build::Tiny','install','Build');
-   &fa_install_module('IO::Socket::IP','install','Build');
-   &fa_install_module('Test::Needs','install','Makefile');
+   #&fa_install_module('IO::Socket::IP','install','Build');
+   #&fa_install_module('Test::Needs','install','Makefile');
    if ($^O ne 'cygwin'
          || grep { /-*(?:add|all)[-_]?dependencies/i } @ARGV) {
       &fa_install_module('HTTP::Daemon','install','Build');

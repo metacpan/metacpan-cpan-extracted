@@ -1,38 +1,50 @@
 Geo::IP2Location
 ================
 
-This Perl module provides fast lookup of country, region, city, latitude, longitude, ZIP code, time zone, ISP, domain name, connection type, IDD code, area code, weather station code and station, MCC, MNC, mobile carrier brand, elevation, usage type, IP address type, IAB advertising category, district, AS number and AS name from IP address using IP2Location database. This module uses a file based BIN database available at https://www.ip2location.com/database/ip2location upon subscription. You can visit https://www.ip2location.com/development-libraries to download BIN sample files. This database consists of IP address as keys and other information as values. It supports all IP addresses in IPv4 and IPv6.
+This Perl module provides a fast and simple way to look up geolocation and network information for an IP address using an IP2Location BIN database.
+
+It allows you to retrieve a wide range of data using IPv4 and IPv6 addresses, including:
+
+ a) Geolocation: Country, Region, City, Latitude, Longitude, ZIP Code, Time Zone, District, Elevation
+ b) Network: ISP, Domain Name, Connection Type, IP Address Type, Usage Type
+ c) Carrier Information: Mobile Country Code (MCC), Mobile Network Code (MNC), Mobile Carrier Brand
+ d) Autonomous System (AS): AS Number, AS Name, AS Domain Name, AS Usage Type, AS CIDR
+ e) Additional Data: IDD Code, Area Code, Weather Station Code, Weather Station Name, IAB Advertising Category
 
 This module can be used in many types of project such as:
 
- 1) select the geographically closest mirror
- 2) analyze web server logs to determine the countries of visitors
- 3) credit card fraud detection
- 4) software export controls
- 5) display native language and currency
- 6) prevent password sharing and abuse of service
- 7) geotargeting in advertisement
+ 1) Selecting the geographically closest mirror for content delivery.
+ 2) Analyzing web server logs to determine the countries of your visitors.
+ 3) Detecting and preventing credit card fraud.
+ 4) Implementing software export controls.
+ 5) Displaying native languages and currencies to users.
+ 6) Preventing password sharing and service abuse.
+ 7) Geotargeting content and advertisements.
 
-The database will be updated in monthly basis for the greater accuracy. Free sample DB1 database is available at /samples directory or download it online from https://www.ip2location.com/development-libraries.
+To ensure high accuracy, the commercial databases are updated on a daily, weekly or semi-monthly basis.
 
-The complete database is available at https://www.ip2location.com under paid subscription. Meanwhile, free creative-common database is also available at http://lite.ip2location.com upon sign-up.
+Commercial Databases: The complete, high-accuracy databases are available via paid subscription at https://www.ip2location.com.
+Free LITE Database: A free, Creative Commons licensed database is available with sign-up at https://lite.ip2location.com.
+Sample Database: A free sample DB1 database is included in the /samples directory of this distribution or can be downloaded from the IP2Location development libraries page.
 
 
 INSTALLATION
 
-To install this module type the following:
+To install this module, type the following:
 
    perl Makefile.PL
    make
    make test
    make install
 
+
 DEPENDENCIES
 
-The complete database is available at https://www.ip2location.com under subscription package.
+This module requires an IP2Location .BIN database file to function. Please see the section above for details on how to download or subscribe one.
+
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2023 by IP2Location.com, support@ip2location.com
+Copyright (C) 2025 by IP2Location.com, support@ip2location.com
 
 This library is released under the MIT license. See the LICENSE file for full license information.

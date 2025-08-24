@@ -1,10 +1,12 @@
 package Schedule::Easing::Numeric;
 
+use strict;
+use warnings;
 use parent qw/Schedule::Easing::Ease/;
 use Carp qw/carp confess/;
 use Scalar::Util qw/looks_like_number/;
 
-our $VERSION='0.1.0';
+our $VERSION='0.1.1';
 
 sub _default_keys {
 	my ($self)=@_;

@@ -1,0 +1,59 @@
+{
+   "abstract" : "Source filter which turns comments into log messages",
+   "author" : [
+      "Brett Watson <brett.watson@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Debug-Comments",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Filter::Util::Call" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "Test::More" : "0.99"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/TFBW/Debug-Comments/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/TFBW/Debug-Comments.git",
+         "web" : "https://github.com/TFBW/Debug-Comments"
+      }
+   },
+   "version" : "1.000",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

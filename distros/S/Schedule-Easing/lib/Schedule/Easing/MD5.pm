@@ -1,9 +1,11 @@
 package Schedule::Easing::MD5;
 
+use strict;
+use warnings;
 use parent qw/Schedule::Easing::Ease/;
 use Digest::MD5 qw/md5/;
 
-our $VERSION='0.1.0';
+our $VERSION='0.1.1';
 
 sub _default_keys {
 	my ($self)=@_;

@@ -42,6 +42,9 @@ my $dir = 'lib/Genealogy/Wills/data';
 if(defined($ARGV[0]) && ($ARGV[0] eq '-f')) {
 	$force_flag++;
 } elsif($ENV{'AUTOMATED_TESTING'}) {
+	if(!-d $dir) {
+		mkdir $dir, 0755;
+	}
 	exit;
 }
 

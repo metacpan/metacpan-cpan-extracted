@@ -12,8 +12,8 @@ subtest 'Selection'=>sub {
 	my %unshapes=map {$_=>Schedule::Easing::Function::inverse($_)} @names;
 	foreach my $name (@names) { is(ref($shapes{$name}),  'CODE',"Shape:  $name") }
 	foreach my $name (@names) { is(ref($unshapes{$name}),'CODE',"Inverse:  $name") }
-	is(scalar(%{+{map {$_=>1} values(%shapes)}}),  1+$#names,'Shapes have distinct handlers');
-	is(scalar(%{+{map {$_=>1} values(%unshapes)}}),1+$#names,'Inverses have distinct handlers');
+	is(scalar(keys %{+{map {$_=>1} values(%shapes)}}),  1+$#names,'Shapes have distinct handlers');
+	is(scalar(keys %{+{map {$_=>1} values(%unshapes)}}),1+$#names,'Inverses have distinct handlers');
 };
 
 subtest 'Linear'=>sub {
