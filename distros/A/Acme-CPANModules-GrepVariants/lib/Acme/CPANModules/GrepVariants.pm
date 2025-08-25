@@ -4,11 +4,11 @@ use strict;
 use Acme::CPANModulesUtil::Misc;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-11-20'; # DATE
+our $DATE = '2025-08-20'; # DATE
 our $DIST = 'Acme-CPANModules-GrepVariants'; # DIST
-our $VERSION = '0.013'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
-my $description = <<'_';
+my $description = <<'MARKDOWN';
 This list catalogs various grep-like tools.
 
 **1. Reimplementations**
@@ -145,7 +145,8 @@ rows of CSV.
 
 **4e. Variants: other alternate sources**
 
-<prog:grep-from-bash-history> (from <pm:App::BashHistoryUtils>).
+<prog:grep-bash-history-entries> (from <pm:App::BashHistoryUtils>), with
+<prog:grephist> as shorter alias.
 
 <prog:grep-from-iod> (from <pm:App::IODUtils>).
 
@@ -178,7 +179,7 @@ some text, or whether a certain query parameter must match some pattern.
 
 <prog:dategrep> (from L<App::dategrep>) prints lines matching a date range.
 
-_
+MARKDOWN
 
 our $LIST = {
     summary => 'List of grep-like CLI utilities available on CPAN',
@@ -204,7 +205,7 @@ Acme::CPANModules::GrepVariants - List of grep-like CLI utilities available on C
 
 =head1 VERSION
 
-This document describes version 0.013 of Acme::CPANModules::GrepVariants (from Perl distribution Acme-CPANModules-GrepVariants), released on 2024-11-20.
+This document describes version 0.014 of Acme::CPANModules::GrepVariants (from Perl distribution Acme-CPANModules-GrepVariants), released on 2025-08-20.
 
 =head1 DESCRIPTION
 
@@ -337,7 +338,8 @@ L<wordlist> (from L<App::wordlist>) greps words from wordlist modules
 
 B<4e. Variants: other alternate sources>
 
-L<grep-from-bash-history> (from L<App::BashHistoryUtils>).
+L<grep-bash-history-entries> (from L<App::BashHistoryUtils>), with
+L<grephist> as shorter alias.
 
 L<grep-from-iod> (from L<App::IODUtils>).
 
@@ -411,6 +413,8 @@ Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
 =item L<App::grep::sounds::like>
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
 =item L<App::pmgrep>
 
@@ -553,7 +557,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

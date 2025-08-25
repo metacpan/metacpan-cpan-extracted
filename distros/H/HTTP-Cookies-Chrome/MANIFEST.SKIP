@@ -70,3 +70,4 @@ test-corpus/Cookies\.save
 \A\.github\b
 
 \.gitattributes\b
+util/

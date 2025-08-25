@@ -1,3 +1,6 @@
+0.0.30 Sun Aug 24 13:39:45 2025 +0200
+    - A single line break now does not break a paragraph.
+
 0.0.29 Sun Aug 24 08:37:01 2025 +0200
     - Improving warning inside inline
     - Warning on unterminated bold or italic

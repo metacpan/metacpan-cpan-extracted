@@ -32,7 +32,6 @@ share {
     # Build configuration
     plugin 'Build::Make';
 
-    # Define build commands
     build [
         # Standard build process
         ['%{make}'],

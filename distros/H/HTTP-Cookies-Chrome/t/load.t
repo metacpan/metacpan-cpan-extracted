@@ -1,9 +1,6 @@
+use lib qw(t/lib);
 use Test::More;
-
-use HTTP::Cookies::Chrome;
-use File::Spec::Functions;
-
-my $file = catfile( qw( test-corpus cookies.db ) );
+use TestUtils;
 
 my %Domains = qw(
 	.google.com        12
@@ -13,24 +10,26 @@ my %Domains = qw(
 	www.google.com      1
 	);
 
-my $password = '1fFTtVFyMq/J03CMJvPLDg==';
+sanity_subtest();
 
-my $jar = HTTP::Cookies::Chrome->new(
-	chrome_safe_storage_password => $password,
-	file => $file
-	);
-isa_ok( $jar, 'HTTP::Cookies::Chrome' );
-ok( exists $jar->{COOKIES}, "The COOKIES key is in the jar" );
+my $jar;
+subtest 'new jar' => sub {
+	$jar = new_jar();
+	isa_ok( $jar, class() );
+	ok( exists $jar->{COOKIES}, "The COOKIES key is in the jar" );
+	};
 
-my $hash = $jar->{COOKIES};
+subtest 'domain counts' => sub {
+	my $hash = $jar->{COOKIES};
 
-my $domain_count = keys %$hash;
-is( $domain_count, scalar keys %Domains, 'Count of domains is right' );
+	my $domain_count = keys %$hash;
+	is( $domain_count, scalar keys %Domains, 'Count of domains is right' );
 
-foreach my $domain ( keys %Domains ) {
-	my $domain_hash  = $hash->{ $domain }{ '/' };
-	my $count        = keys %$domain_hash;
-	is( $count, $Domains{$domain}, "$domain has $count cookies" );
-	}
+	foreach my $domain ( keys %Domains ) {
+		my $domain_hash  = $hash->{ $domain }{ '/' };
+		my $count        = keys %$domain_hash;
+		is( $count, $Domains{$domain}, "$domain has $count cookies" );
+		}
+	};
 
 done_testing();

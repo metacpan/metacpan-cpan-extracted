@@ -16,7 +16,7 @@ use base 'Novel::Robot::Parser';
 
 use Web::Scraper;
 use Encode;
-use Data::Dumper;
+#use Data::Dumper;
 #use Smart::Comments;
 
 sub base_url { 'https://www.jjwxc.net' }

@@ -8,7 +8,7 @@ use Encode;
 use File::Temp qw/tempfile /;
 use Template;
 
-#our $VERSION = 0.21;
+our $VERSION = 0.21;
 
 sub new {
   my ( $self, %opt ) = @_;

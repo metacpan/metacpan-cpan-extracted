@@ -1,5 +1,15 @@
 Revision history for Database-Abstraction
 
+0.30	Sun Aug 24 15:11:14 EDT 2025
+	slurp mode - remove a data copy
+	selectall_hashref now returns undef if there are no matches
+	rewrote selectall_hashref to not just call selectall_hash, that saves data copying
+	Imply 'entry' argument when possible
+	Added the _fatal method
+	selectall_hashref name is misleading, will be selectall_arrayref
+	selectall_hash name is misleading, will be selectall_array
+	Fix potential memory leak issues
+
 0.29	Mon Aug 18 21:42:25 EDT 2025
 	Moved the test data from data to t/data
 	Fixed wildcard usage determination

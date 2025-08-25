@@ -1,6 +1,6 @@
 package SPVM::Mojolicious;
 
-our $VERSION = "0.014";
+our $VERSION = "0.015";
 
 1;
 
@@ -67,6 +67,16 @@ Most tests are not written.
 =item * L<Mojo::Message::Response|SPVM::Mojo::Message::Response>
 
 =item * L<Mojo::Upload|SPVM::Mojo::Upload>
+
+=item * L<Mojo::Transaction|SPVM::Mojo::Transaction>
+
+=item * L<Mojo::Transaction::HTTP|SPVM::Mojo::Transaction::HTTP>
+
+=item * L<Mojo::Transaction::WebSocket|SPVM::Mojo::Transaction::WebSocket>
+
+=item * L<Mojo::WebSocket::Frame|SPVM::Mojo::WebSocket::Frame>
+
+=item * L<Mojo::WebSocket|SPVM::Mojo::WebSocket>
 
 =back
 

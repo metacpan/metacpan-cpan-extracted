@@ -5,19 +5,18 @@ use strict;
 use warnings;
 use utf8;
 
-#our $VERSION = 0.22;
+our $VERSION = 0.22;
 
-#use Novel::Robot::Browser::CookieJar;
-use HTTP::CookieJar;
-use Data::Dumper;
+#use Data::Dumper;
 
-use File::Slurp qw/slurp/;
 use Encode::Detect::CJK qw/detect/;
 use Encode;
+use File::Slurp qw/slurp/;
+use HTTP::CookieJar;
 use HTTP::Tiny;
-use Parallel::ForkManager;
-use Term::ProgressBar;
 use IO::Uncompress::Gunzip qw(gunzip);
+#use Parallel::ForkManager;
+use Term::ProgressBar;
 use URI::Escape;
 use URI;
 
@@ -28,7 +27,8 @@ our %DEFAULT_HEADER      = (
   'Accept-Encoding' => "gzip",
   'Accept-Language' => 'zh,zh-cn;q=0.8,en-us;q=0.5,en;q=0.3',
   'Connection'      => 'keep-alive',
-  'User-Agent'      => 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:29.0) Gecko/20100101 Firefox/29.0',
+  #'User-Agent'      => 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:29.0) Gecko/20100101 Firefox/29.0',
+  'User-Agent'      => 'User-Agent: MQQBrowser/26 Mozilla/5.0 (Linux; U; Android 2.3.7; zh-cn; MB200 Build/GRJ22; CyanogenMod-7) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1', 
   'DNT'             => 1,
 );
 
@@ -79,6 +79,7 @@ sub request_url_whole {
       next if ( $o{min_page_num} and $i < $o{min_page_num} );
       last if ( $o{max_page_num} and $i > $o{max_page_num} );
 
+
       my ( $u_url, $u_post_data ) = ref( $u ) eq 'HASH' ? @{$u}{qw/url post_data/} : ( $u, undef );
       my $c = $self->request_url( $u_url, $u_post_data );
       my $fs = $o{item_list_sub}->( \$c );
@@ -110,6 +111,9 @@ sub request_url_whole {
       $r->{id} //= ++$item_id;
       $r->{url} = URI->new_abs( $r->{url}, $url )->as_string;
       next unless ( $self->is_item_in_range( $r->{id}, $o{min_item_num}, $o{max_item_num} ) );
+      if(exists $o{back_index}){
+          last if($i + $o{back_index} > $#$data_list);
+      }
 
       if($r->{url}){
           my $c = $self->request_url( $r->{url}, $r->{post_data} );

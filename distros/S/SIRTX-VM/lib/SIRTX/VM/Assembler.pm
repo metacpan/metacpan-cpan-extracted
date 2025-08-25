@@ -22,7 +22,7 @@ use SIRTX::VM::Opcode;
 
 use parent 'Data::Identifier::Interface::Userdata';
 
-our $VERSION = v0.02;
+our $VERSION = v0.03;
 
 my %_escapes = (
     '\\' => '\\',
@@ -93,6 +93,30 @@ my %_synthetic = (
     control         => [[reg => 1, [qw(reg sni:)] => 2, string => 3] => ['user*' => 4] => [
                             ['open', \4, \3],
                             ['control', \1, \2, \4],
+                        ],
+                        [reg => 1, [qw(reg sni:)] => 2, string => 3, reg => 4] => ['user*' => 5, 'arg' => 6] => [
+                            ['open', \5, \3],
+                            ['replace', \6, \4],
+                            ['control', \1, \2, \5],
+                        ],
+                        [reg => 1, [qw(reg sni:)] => 2, string => 3, any => 4] => ['user*' => 5, 'arg' => 6] => [
+                            ['open', \5, \3],
+                            ['open', \6, \4],
+                            ['control', \1, \2, \5],
+                        ],
+                        [any => 1, any => 2, any => 3, reg => 4] => ['arg' => 5] => [
+                            ['replace', \5, \4],
+                            ['control', \1, \2, \3, \5],
+                        ],
+                        [any => 1, any => 2, any => 3, any => 4] => ['arg' => 5] => [
+                            ['open', \5, \4],
+                            ['control', \1, \2, \3, \5],
+                        ]],
+    relations       => [[alias => 1, reg => 2, id => 3, any => 4] => ['user*' => 5, 'user*' => 6] => [
+                            ['.force_mapped', \5],
+                            ['open_function', \5, \1],
+                            ['open', \6, \3],
+                            ['relations', \5, \2, \6, \4],
                         ]],
     '.autosectionstart' => [['"header"' => 1] => [] => [
                             ['.section', \1, '"VM\\r\\n\\xc0\\n"'],
@@ -238,12 +262,18 @@ sub run {
         push(@{$self->{aliases}{'end$boundary$load'} //= []}, $boundary);
     }
 
+    # We are past the first pass.
+    # We disable automapping here. If there is still mapping needed there is a bug somewhere as this all should be resolved by now.
+    # So turning it off to let any requests fail is the safest option.
+    $self->{settings}{regmap_auto} = undef;
+
     {
         my $pushback = $self->{pushback};
 
         $self->{pushback} = []; # reset
 
         foreach my $entry (@{$pushback}) {
+            local $self->{rf} = $entry->{rf};
             $self->{out}->seek($entry->{pos}, SEEK_SET);
             $self->_proc_parts($entry->{parts}, $entry->{opts}, undef, 1);
         }
@@ -430,6 +460,7 @@ sub _autostring_allocate {
 
 sub _pushback {
     my ($self, %opts) = @_;
+    $opts{rf} = $self->{rf}->clone;
     push(@{$self->{pushback}}, \%opts);
 }
 
@@ -833,7 +864,7 @@ sub _get_value_type {
     return 'bool' if $value eq 'true' || $value eq 'false';
     return 'undef' if $value eq 'undef';
     return 'string' if $value =~ /^(?:"|U\+)/;
-    return 'int' if $value =~ /^[\+\-]?(?:0|[1-9][0-9]*|0x[0-9a-fA-F]+|0[0-7]+|0b[01]+)$/;
+    return 'int' if $value =~ /^'?[\+\-]?(?:0|[1-9][0-9]*|0x[0-9a-fA-F]+|0[0-7]+|0b[01]+)$/;
     if ($value =~ /^([a-z]+):(?:0|[1-9][0-9]*)$/) {
         my $type = $1;
         return $type.':' if defined $_type_to_sni{$type};
@@ -860,6 +891,8 @@ sub _parse_int {
     my ($self, $val, $rel) = @_;
     my $neg;
 
+    $val =~ s/^'//;
+
     $rel //= 0;
 
     if ($val =~ s/^-//) {
@@ -872,7 +905,7 @@ sub _parse_int {
 
     if ($val =~ /^[1-9]/) {
         $val = int($val);
-    } elsif ($val =~ /^(?:0[0-7]*|0x[0-9a-f]+|0b[01]+)$/) {
+    } elsif ($val =~ /^(?:0[0-7]*|0x[0-9a-fA-F]+|0b[01]+)$/) {
         $val = oct($val);
     } else {
         die 'Bad integer';
@@ -940,7 +973,7 @@ SIRTX::VM::Assembler - module for assembling SIRTX VM code
 
 =head1 VERSION
 
-version v0.02
+version v0.03
 
 =head1 SYNOPSIS
 

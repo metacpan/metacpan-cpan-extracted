@@ -4,16 +4,18 @@
 # All Rights Reserved.
 # Licensed under the Perl Artistic License.
 #
-# Version: 0.19
+# Version: 0.20
 
 package MathML::Entities;
 
+use 5.006;
 use strict;
+use warnings;
 require Exporter;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw( name2numbered name2utf8 );
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 our %ENTITIES = (
 	'Alpha' => '&#x0391;',
@@ -2242,13 +2244,15 @@ XHTML+MathML named entities (except for the five "safe" XML named entities)
 in the argument of C<name2utf8()> are replaced by the corresponding
 utf-8 characters.
 
+=back
+
 =head1 AUTHOR
 
 Jacques Distler E<lt>distler@golem.ph.utexas.eduE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2005 Jacques Distler. All rights reserved.
+Copyright (c) 2005-2025 Jacques Distler. All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

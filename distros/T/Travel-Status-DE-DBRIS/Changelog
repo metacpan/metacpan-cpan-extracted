@@ -1,3 +1,8 @@
+Travel::Status::DE::DBRIS 0.13 - Mon Aug 25 2025
+
+    * Formation::Group: Update carriage name list (patch by Lili Chelsea Urban)
+    * Formation::Carriage: Handle undefined start/end markers
+
 Travel::Status::DE::DBRIS 0.12 - Sat Jul 05 2025
 
     * dbris-m: Fix --(raw-)json for carriage formation requests

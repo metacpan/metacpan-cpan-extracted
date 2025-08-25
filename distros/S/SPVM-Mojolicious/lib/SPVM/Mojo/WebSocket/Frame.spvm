@@ -36,7 +36,9 @@ class Mojo::WebSocket::Frame {
     
     $self->{payload} = $payload;
     
-    $self->{mask} = (byte)$mask;
+    if ($mask > -1) {
+      $self->{mask} = (byte)$mask;
+    }
     
     return $self;
   }

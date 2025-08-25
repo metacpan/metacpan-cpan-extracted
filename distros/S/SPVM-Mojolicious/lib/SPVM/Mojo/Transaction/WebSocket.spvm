@@ -15,13 +15,22 @@ class Mojo::Transaction::WebSocket extends Mojo::Transaction {
   
   has compressed : rw byte;
   
+  has max_websocket_size : rw int
+    get {
+      unless (exists $self->{max_websocket_size}) {
+        $self->{max_websocket_size} = length(my $_ = Sys->env("SPVM_MOJO_MAX_WEBSOCKET_SIZE")) ? (int)$_ : 262144;
+      }
+      
+      return $self->{max_websocket_size};
+    }
+  ;
+  
+  # Undocumented Fields
   has closing : byte;
   
   has write : string;
   
   has read : string;
-  
-  has max_websocket_size : rw int;
   
   has close_code : int;
   
@@ -95,7 +104,7 @@ class Mojo::Transaction::WebSocket extends Mojo::Transaction {
     $self->emit(finish => $code, $reason);
   }
   
-  method connection : int () { return $self->handshake->connection; }
+  method connection : string () { return $self->handshake->connection; }
   
   method finish : void ($code : int = 0, $reason : string = undef) {
     
@@ -155,7 +164,7 @@ class Mojo::Transaction::WebSocket extends Mojo::Transaction {
     $self->handshake->resume;
   }
   
-  method send : void ($msg : object of string|object[]|Mojo::WebSocket::Frame, $cb : Callback = undef) {
+  method send : void ($msg : object of string|object[]|Mojo::WebSocket::Frame, $cb : Mojo::EventEmitter::Callback = undef) {
     
     if ($cb) {
       $self->once(drain => $cb);
@@ -177,8 +186,8 @@ class Mojo::Transaction::WebSocket extends Mojo::Transaction {
     $self->emit("resume");
   }
   
-  method parse_message : void ($frame : object[]) {
-    
+  method parse_message : void ($frame : Mojo::WebSocket::Frame) {
+    die "Not yet supported.";
   }
   
   method server_write : string () {

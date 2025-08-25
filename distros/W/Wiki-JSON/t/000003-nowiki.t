@@ -35,7 +35,9 @@ use_ok 'Wiki::JSON';
 
 {
     my $text = 'hola
+
 This is how titles are made: <nowiki>=== hola ===</nowiki> Cool isn\'t it?
+
 hola';
 
     my $parsed = Wiki::JSON->new->parse($text);
@@ -72,7 +74,9 @@ hola';
 
 {
     my $text = 'hola
+
 === This is how titles are made: <nowiki>=== hola ===</nowiki> Cool isn\'t it? ===
+
 hola';
 
     my $parsed = Wiki::JSON->new->parse(

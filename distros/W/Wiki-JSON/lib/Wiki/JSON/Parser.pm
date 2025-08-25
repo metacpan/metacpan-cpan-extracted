@@ -43,7 +43,8 @@ sub _search_interrupt {
 sub _insert_into_output {
     die 'Wrong number of arguments' if scalar @_ != 3;
     my ( $self, $output, $buffer ) = @_;
-    if ( $buffer =~ /^$/ ) {
+    $buffer =~ s/(\n|\A)(\n)/$1/gs;
+    if ( $buffer =~ /^$/s ) {
         $buffer = '';
         return ($buffer);
     }
@@ -62,17 +63,26 @@ sub _break_lines_template {
 }
 
 sub _break_lines {
-    my ( $self, $output, $buffer, $i, $current_char, $options ) = @_;
+    my ( $self, $output, $wiki_text, $buffer, $i, $options ) = @_;
     if ( $options->{is_unordered_list} ) {
         return ( 0, $buffer, $i );
     }
-    return $self->_break_lines_on_newline( $output, $buffer, $current_char,
-        $i );
+    return $self->_break_lines_on_newline( $output, $wiki_text, $buffer, $i, );
 }
 
 sub _break_lines_on_newline {
-    my ( $self, $output, $buffer, $current_char, $i ) = @_;
-    if ( $current_char eq "\n" ) {
+    my ( $self, $output, $wiki_text, $buffer, $i ) = @_;
+    my $searched    = "\n\n";
+    my $size_search = length $searched;
+    my $last_word   = substr $wiki_text, $i, $size_search;
+    if ( $last_word eq $searched ) {
+        ($buffer) = $self->_insert_into_output( $output, $buffer );
+        return ( 1, $buffer, $i + $size_search - 1 );
+    }
+    $searched    = "\n* ";
+    $size_search = length $searched;
+    $last_word   = substr $wiki_text, $i, $size_search;
+    if ( $last_word eq $searched ) {
         ($buffer) = $self->_insert_into_output( $output, $buffer );
         return ( 1, $buffer, $i );
     }
@@ -237,9 +247,10 @@ sub _parse_in_array_pre_new_element_parsing {
     if ($needs_return) {
         return ( $needs_next, $needs_return, $i, $buffer, $current_char, );
     }
-    $current_char = substr $wiki_text, $i, 1;
     ( $needs_next, $buffer, $i ) =
-      $self->_break_lines( $output, $buffer, $i, $current_char, $options, );
+      $self->_break_lines( $output, $wiki_text, $buffer, $i, $current_char,
+        $options, );
+    $current_char = substr $wiki_text, $i, 1;
     return ( $needs_next, $needs_return, $i, $buffer, $current_char, );
 }
 
@@ -334,7 +345,7 @@ sub _parse_in_array {
         }
         $buffer = '';
     }
-    if ($options->{is_bold} || $options->{is_italic}) {
+    if ( $options->{is_bold} || $options->{is_italic} ) {
         warn 'Detected bold or italic unterminated syntax';
     }
     return ( $i, $buffer );

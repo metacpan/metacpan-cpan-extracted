@@ -1,3 +1,9 @@
+0.014   2025-08-20  Released-By: PERLANCAR; Urgency: medium
+
+        - Update program name: grep-from-bash-history ->
+          grep-bash-history-entries (with grephist as short alias).
+
+
 0.013   2024-11-20  Released-By: PERLANCAR; Urgency: medium
 
         - Add entry: grep-sounds-like.

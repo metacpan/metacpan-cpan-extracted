@@ -1,32 +1,29 @@
-use Test::More 'no_plan';
+use lib qw(t/lib);
+use Test::More;
+use TestUtils;
 
-use File::Spec::Functions;
+sanity_subtest();
 
-my $class = 'HTTP::Cookies::Chrome';
-use_ok( $class );
-
-my $file = catfile( qw( test-corpus cookies.db ) );
-my $new_file = "$file.save";
+my $new_file = test_database_path() . '.save';
 END { unlink $new_file };
 
-my $password = '1fFTtVFyMq/J03CMJvPLDg==';
+my $jar;
+subtest 'first jar' => sub {
+	$jar = new_jar();
+	isa_ok $jar, class();
+	can_ok $jar, 'save';
+	$jar->save( $new_file );
+	};
 
-my $jar = $class->new(
-	chrome_safe_storage_password => $password,
-	file => $file
-	);
-isa_ok( $jar, $class );
-can_ok( $jar, 'save' );
+my $jar2;
+subtest 'new jar' => sub {
+	$jar2 = class()->new(
+		chrome_safe_storage_password => test_passphrase(),
+		file                         => $new_file
+		);
+	isa_ok $jar2, class();
+	};
 
-$jar->save( $new_file );
-
-my $jar2 = $class->new(
-	chrome_safe_storage_password => $password,
-	file => $new_file
-	);
-isa_ok( $jar2, $class );
-
-#is_deeply( $jar, $jar2 );
-
+done_testing();
 
 

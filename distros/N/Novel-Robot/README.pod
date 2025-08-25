@@ -49,9 +49,12 @@ for example, on debian, 以debian环境为例
     -o : output packer filename, 保存的小说文件名
 
     -i : min_item_num-max_item_num, 只取 x-y 章/楼
+    --back_index: back item num, 不取 倒数 back_index 章/楼
     -j : min_page_num-max_page_num, 只取 x-y 页
 
     -D : only print info, not download, 只输出信息，不下载
+    --single_page: only download single page, not parse content url，只下载当前页面，不作为章节目录解析
+
     -v : verbose
     --progress: 显示进度条(默认不显示)
 

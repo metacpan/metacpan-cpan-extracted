@@ -5,16 +5,17 @@ use strict;
 use warnings;
 use utf8;
 
-use Novel::Robot::Browser;
-use URI;
+#use Data::Dumper;
 use Encode;
-use Web::Scraper;
 use HTML::TreeBuilder;
-use Data::Dumper;
+use URI;
+use Web::Scraper;
+
+use Novel::Robot::Browser;
 #use Smart::Comments;
 
+our $VERSION = 0.32;
 
-#our $VERSION = 0.32;
 
 our %SITE_DOM_NAME = (
   'bbs.jjwxc.net'   => 'hjj',
@@ -86,6 +87,7 @@ sub detect_site {
   if ( $s and $s =~ /^https?:/ ) {
     my ( $dom ) = $s =~ m#^.*?\/\/(.+?)/#;
     return $SITE_DOM_NAME{$dom} if ( exists $SITE_DOM_NAME{$dom} );
+    return 'default';
   }
 
   if($s and -f $s){
@@ -390,7 +392,7 @@ sub guess_novel_item {
   my ( $self, $h, %opt ) = @_;
 
   $$h =~ s#<!--.+?-->##sg;
-  $$h =~ s#<script[^>]*>[^<]*</script>##sg;
+  $$h =~ s#<script[^>]*>[^<]*</script>##isg;
 
   my $tree = HTML::TreeBuilder->new();
   $tree->parse( $$h );
@@ -428,6 +430,23 @@ sub guess_novel_item {
 } ## end sub guess_novel_item
 
 
+sub get_page_ref {
+    my ( $self, $url, %o ) = @_;
+    my $class = 'novel';
+
+    my ( $c ) = $self->{browser}->request_url_simple($url);
+    my $r = $self->{site} ne 'default' ?  $self->extract_item($c) : $self->guess_novel_item( \$c );
+    $r->{content} = $self->tidy_content( $r->{content} );
+
+    my $page= {
+        writer => $o{writer}, 
+        book => $o{book}, 
+        url => $url, 
+        item_list => [ $r ], 
+    };
+
+    return $page;
+}
 
 sub get_tiezi_ref {
   my ( $self, $url, %o ) = @_;

@@ -1,3 +1,10 @@
+v0.03  2025-08-24Z
+    - Added support for 'NNN notation for numbers
+    - Added more synthetic forms of control, and relations
+    - Fixed handling of uppercase hex numbers
+    - Allow cloning registers and register files
+    - Fixed bug with automapping being off in second pass
+
 v0.02  2025-08-17Z
     - Added support for Data::Identifier::Interface::Userdata
     - Added .regattr keyword volatile (currently a dummy)

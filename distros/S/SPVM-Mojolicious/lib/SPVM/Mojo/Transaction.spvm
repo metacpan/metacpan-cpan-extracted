@@ -18,18 +18,84 @@ class Mojo::Transaction extends Mojo::EventEmitter {
   
   has original_remote_address : rw string;
   
+  has remote_address : virtual rw string
+    get {
+      
+      unless ($self->req->reverse_proxy) {
+        return $self->original_remote_address;
+      }
+      
+      my $x_forwarded_for = $self->req->headers->header("X-Forwarded-For");
+      unless ($x_forwarded_for) {
+        $x_forwarded_for = "";
+      }
+      
+      my $addrs   = Re->split("\s*,\s*", $x_forwarded_for);
+      my $trusted = $self->req->trusted_proxies;
+      
+      unless (@$trusted) {
+        if (@$addrs) {
+          return $addrs->[@$addrs - 1];
+        }
+        else {
+          return $self->original_remote_address;
+        }
+      }
+      
+      $addrs = Array->merge_string($addrs, [$self->original_remote_address]);
+      
+      Fn->reverse_inplace($addrs);
+      
+      for my $addr (@$addrs) {
+        my $matches = Fn->grep([$addr : string] method : int ($_ : string) { return Mojo::Util->network_contains($_, $addr); }, $trusted);
+        
+        unless (@$matches) {
+          return $addr ;
+        }
+      }
+      
+      return $addrs->[0];
+    }
+    
+    set {
+      
+      $self->{original_remote_address} = $_;
+    }
+  ;
+  
   has remote_port : rw int;
   
-  has req : rw Mojo::Message::Request;
+  has req : rw Mojo::Message::Request
+    get {
+      unless (exists $self->{req}) {
+        $self->{req} = Mojo::Message::Request->new;
+      }
+      
+      return $self->{req};
+    }
+  ;
   
-  has res : rw Mojo::Message::Response;
+  has res : rw Mojo::Message::Response
+    get {
+      unless (exists $self->{res}) {
+        $self->{res} = Mojo::Message::Response->new;
+      }
+      
+      return $self->{res};
+    }
+  ;
   
+  has connection : rw string
+    set {
+      
+      $self->{connection} = $_;
+      
+      $self->emit(connection => $_);
+    }
+  ;
+  
+  # Undocumented Fields
   has completed : byte;
-  
-  has connection : ro int;
-  
-  # The handle is stored in a transaction object instead that Mojolicious stores it in a user agent object.
-  has handle : rw IO::Socket;
   
   # Class Methods
   static method new : Mojo::Transaction () {
@@ -43,9 +109,6 @@ class Mojo::Transaction extends Mojo::EventEmitter {
   
   protected method init : void ($options : object[] = undef) {
     
-    $self->{req} = Mojo::Message::Request->new;
-    
-    $self->{res} = Mojo::Message::Response->new;
   }
   
   # Instance Methods
@@ -64,64 +127,13 @@ class Mojo::Transaction extends Mojo::EventEmitter {
     $self->{completed} = 1;
   }
   
-  method set_connection : void ($id : int) {
-    
-    $self->{connection} = $id;
-    
-    $self->emit(connection => $id);
-    
-  }
-  
   method is_finished : int () {
     
     return !!$self->{completed};
   }
   
   method is_websocket : int () {
-    die "Not implemented.";
-  }
-  
-  method remote_address : string () {
-    
-    unless ($self->req->reverse_proxy) {
-      return $self->original_remote_address;
-    }
-    
-    my $x_forwarded_for = $self->req->headers->header("X-Forwarded-For");
-    unless ($x_forwarded_for) {
-      $x_forwarded_for = "";
-    }
-    
-    my $addrs   = Re->split("\s*,\s*", $x_forwarded_for);
-    my $trusted = $self->req->trusted_proxies;
-    
-    unless (@$trusted) {
-      if (@$addrs) {
-        return $addrs->[@$addrs - 1];
-      }
-      else {
-        return $self->original_remote_address;
-      }
-    }
-    
-    $addrs = Array->merge_string($addrs, [$self->original_remote_address]);
-    
-    Fn->reverse_inplace($addrs);
-    
-    for my $addr (@$addrs) {
-      my $matches = Fn->grep([$addr : string] method : int ($_ : string) { return Mojo::Util->network_contains($_, $addr); }, $trusted);
-      
-      unless (@$matches) {
-        return $addr ;
-      }
-    }
-    
-    return $addrs->[0];
-  }
-  
-  method set_remote_address : void ($remote_address : string) {
-    
-    $self->{original_remote_address} = $remote_address;
+    return 0;
   }
   
   method result : Mojo::Message::Response () {

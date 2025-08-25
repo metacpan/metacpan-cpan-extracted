@@ -76,17 +76,17 @@ class Mojo::WebSocket {
 
   }
   
-  private static method _challenge : string ($sec_websocket_key : string) {
-    
-=pod
-
-    b64_encode(sha1_bytes(($_[0] || '') . GUID), '')
-
-=cut
-
+  static method client_handshake : Mojo::Transaction::HTTP ($tx : Mojo::Transaction::HTTP) {
+    die "Not yet implemented.";
   }
 
-  static method parse_frame : object[] ($buffer_ref : string[], $max : int) {
+  static method server_handshake : Mojo::Transaction::HTTP ($tx : Mojo::Transaction::HTTP) {
+    die "Not yet implemented.";
+  }
+
+  static method parse_frame : Mojo::WebSocket::Frame ($buffer_ref : string[], $max : int) {
+    
+    die "Not yet implemented.";
 =pod
     my ($buffer, $max) = @_;
 
@@ -143,4 +143,15 @@ class Mojo::WebSocket {
 =cut
 
   }
+  
+  private static method _challenge : string ($sec_websocket_key : string) {
+    
+=pod
+
+    b64_encode(sha1_bytes(($_[0] || '') . GUID), '')
+
+=cut
+
+  }
+
 }

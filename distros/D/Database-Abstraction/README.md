@@ -15,7 +15,7 @@ Database::Abstraction - Read-only Database Abstraction Layer (ORM)
 
 # VERSION
 
-Version 0.29
+Version 0.30
 
 # DESCRIPTION
 
@@ -232,7 +232,7 @@ Uses Carp::carp to log warnings for incorrect usage or potential mistakes.
 
 Sets the class, code reference, or file that will be used for logging.
 
-## selectall\_hashref
+## selectall\_arrayref
 
 Returns a reference to an array of hash references of all the data meeting
 the given criteria.
@@ -242,9 +242,24 @@ optimisations such as "LIMIT 1" will not be used.
 
 Use caching if that is available.
 
+Returns undef if there are no matches.
+
+## selectall\_hashref
+
+Deprecated misleading legacy name for selectall\_arrayref.
+
+## selectall\_array
+
+Similar to selectall\_array but returns an array of hash references.
+
+Con:	Copies more data around than selectall\_arrayref
+Pro:	Better determination of list vs scalar mode than selectall\_arrayref by setting "LIMIT 1"
+
+TODO:	Remove duplicated code
+
 ## selectall\_hash
 
-Similar to selectall\_hashref but returns an array of hash references.
+Deprecated misleading legacy name for selectall\_array.
 
 ## count
 

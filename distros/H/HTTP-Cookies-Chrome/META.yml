@@ -4,7 +4,6 @@ author:
   - 'brian d foy <briandfoy@pobox.com>'
 build_requires:
   Test::More: '1'
-  version: '0.86'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
   File::Spec::Functions: '0'
@@ -19,6 +18,11 @@ no_index:
   directory:
     - t
     - inc
+    - t/lib
+  file:
+    - t/lib/TestUtils.pm
+  namespace:
+    - TestUtils
 requires:
   Crypt::Rijndael: '0'
   DBD::SQLite: '1.32'
@@ -31,5 +35,5 @@ resources:
   bugtracker: https://github.com/briandfoy/http-cookies-chrome/issues
   homepage: https://github.com/briandfoy/http-cookies-chrome
   repository: https://github.com/briandfoy/http-cookies-chrome
-version: '2.005'
+version: '3.002'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

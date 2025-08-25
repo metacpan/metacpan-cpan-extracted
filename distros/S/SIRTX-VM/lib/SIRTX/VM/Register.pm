@@ -15,7 +15,7 @@ use Carp;
 
 use parent 'Data::Identifier::Interface::Userdata';
 
-our $VERSION = v0.02;
+our $VERSION = v0.03;
 
 use constant {
     TYPE_USER               => 'user',
@@ -56,6 +56,12 @@ sub temperature {
     return $self->{temperature};
 }
 
+
+sub clone {
+    my ($self) = @_;
+    return __PACKAGE__->_new(%{$self});
+}
+
 # ---- Private helpers ----
 
 sub _new {
@@ -81,7 +87,7 @@ SIRTX::VM::Register - module for interacting with SIRTX VM code
 
 =head1 VERSION
 
-version v0.02
+version v0.03
 
 =head1 SYNOPSIS
 
@@ -122,6 +128,12 @@ Gets or sets the register owner.
     $register->temperature(SIRTX::VM::Register::TEMPERATURE_HOT());
 
 Gets or sets the register temperature.
+
+=head2 clone
+
+    my SIRTX::VM::Register $clone = $register->clone;
+
+Clones the register.
 
 =head1 AUTHOR
 

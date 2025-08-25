@@ -110,8 +110,11 @@ use_ok 'Wiki::JSON';
 {
     for ( my $i = 1 ; $i < 7 ; $i++ ) {
         my $text = ( '=' x $i ) . ' hola 
+
 hola
+
 hola
+
 hola';
         my $parsed = Wiki::JSON->new->parse($text);
 
@@ -154,8 +157,11 @@ hola';
 }
 {
     my $text = 'hola === hola === hola
+
 hola
+
 hola
+
 hola';
     my $parsed = Wiki::JSON->new->parse($text);
 
@@ -205,8 +211,11 @@ hola';
 
 {
     my $text = '=== hola = hola
+
 hola
+
 hola
+
 hola';
     my $parsed = Wiki::JSON->new->parse($text);
 
@@ -253,7 +262,9 @@ hola';
 {
     my $text = 'hola = hola ===
 hola
+
 hola
+
 hola';
     my $parsed = Wiki::JSON->new->parse($text);
 

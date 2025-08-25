@@ -16,7 +16,7 @@ use Scalar::Util qw(looks_like_number);
 
 use parent 'Data::Identifier::Interface::Userdata';
 
-our $VERSION = v0.02;
+our $VERSION = v0.03;
 
 my %_die_raen = (code => 0, P => 7, codeX => 0, S => 2, T => 4+1, is_return => 1);
 
@@ -111,6 +111,7 @@ my %_synthetic = (
     mod             => [['"out"' => 'undef', reg => 1, reg => 2] => ['control', \1, 'sni:84', \2]],
     jump            => [[reg => 1] => ['seek', 'program_text', \1]],
     return          => [[undef => 'undef'] => ['return']],
+    control         => [[any => 1, any => 2, any => 3, '"arg"' => 'undef'] => ['control', \1, \2, \3]],
 );
 
 
@@ -169,6 +170,8 @@ sub from_template {
 
                 if ($type =~ /^".+"$/) {
                     next outer if $val ne $asm->_parse_string($type);
+                } elsif ($type eq 'any') {
+                    # no-op
                 } else {
                     next outer if $asm->_get_value_type($val) ne $type;
                 }
@@ -485,7 +488,7 @@ SIRTX::VM::Opcode - module for single SIRTX VM opcodes
 
 =head1 VERSION
 
-version v0.02
+version v0.03
 
 =head1 SYNOPSIS
 

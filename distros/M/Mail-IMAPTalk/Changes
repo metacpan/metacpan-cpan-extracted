@@ -2,15 +2,20 @@ Revision history for Perl extension Mail::IMAPTalk.
 
 {{$NEXT}}
 
+4.07      2025-08-25 10:04:00+10:00 Australia/Melbourne
+  - Implement replace and unselect_or_close
+  - Update OAUTH docs
+  - Better errors when SSL fails
+
 4.05      2017-08-31 13:04:00+10:00 Australia/Melbourne
-- MIME structure handling tweaks
+  - MIME structure handling tweaks
 
 4.04      2016-10-22 13:16:42+11:00 Australia/Melbourne
-- Fix authentication to non-SASL-IR servers
-- Use AUTHENTICATE for login when necessary
-- Improve handling of headers with high-bit-set octet
-- Use correct UTF-8 decoder
-- Allow SELECT by SPECIAL-USE flag (Cyrus feature)
+  - Fix authentication to non-SASL-IR servers
+  - Use AUTHENTICATE for login when necessary
+  - Improve handling of headers with high-bit-set octet
+  - Use correct UTF-8 decoder
+  - Allow SELECT by SPECIAL-USE flag (Cyrus feature)
 
 4.03  Wed Mar 23 11:50 2016
   - Bump version and update copyright

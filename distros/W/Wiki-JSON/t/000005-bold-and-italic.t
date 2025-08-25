@@ -6,6 +6,7 @@ use warnings;
 use lib 'lib';
 
 use Test::Most;
+use Test::Warnings;
 
 use_ok 'Wiki::JSON';
 
@@ -14,9 +15,9 @@ use_ok 'Wiki::JSON';
 
     #    print Data::Dumper::Dumper($parsed);
     is_deeply $parsed_html,
-    [
+      [
         Wiki::JSON::HTML->_open_html_element(
-        'article', 0, { class => 'wiki-article' }
+            'article', 0, { class => 'wiki-article' }
         ),
         Wiki::JSON::HTML->_open_html_element('p'),
         Wiki::JSON::HTML->_open_html_element('b'),
@@ -25,7 +26,7 @@ use_ok 'Wiki::JSON';
         ': hola',
         Wiki::JSON::HTML->_close_html_element('p'),
         Wiki::JSON::HTML->_close_html_element('article'),
-    ],
+      ],
       'Simple bold test html starting with bold';
 }
 
@@ -34,9 +35,9 @@ use_ok 'Wiki::JSON';
 
     #    print Data::Dumper::Dumper($parsed);
     is_deeply $parsed_html,
-    [
+      [
         Wiki::JSON::HTML->_open_html_element(
-        'article', 0, { class => 'wiki-article' }
+            'article', 0, { class => 'wiki-article' }
         ),
         Wiki::JSON::HTML->_open_html_element('p'),
         'hola: ',
@@ -46,18 +47,19 @@ use_ok 'Wiki::JSON';
         ': hola',
         Wiki::JSON::HTML->_close_html_element('p'),
         Wiki::JSON::HTML->_close_html_element('article'),
-    ],
+      ],
       'Simple bold test html';
 }
 
 {
-    my $parsed_html = Wiki::JSON->new->pre_html(q/hola: '''''bold and italic''': italic''/);
+    my $parsed_html =
+      Wiki::JSON->new->pre_html(q/hola: '''''bold and italic''': italic''/);
 
     #    print Data::Dumper::Dumper($parsed);
     is_deeply $parsed_html,
-    [
+      [
         Wiki::JSON::HTML->_open_html_element(
-        'article', 0, { class => 'wiki-article' }
+            'article', 0, { class => 'wiki-article' }
         ),
         Wiki::JSON::HTML->_open_html_element('p'),
         'hola: ',
@@ -71,7 +73,7 @@ use_ok 'Wiki::JSON';
         Wiki::JSON::HTML->_close_html_element('i'),
         Wiki::JSON::HTML->_close_html_element('p'),
         Wiki::JSON::HTML->_close_html_element('article'),
-    ],
+      ],
       'Cursed bold and italic test html';
 }
 {
@@ -114,6 +116,7 @@ use_ok 'Wiki::JSON';
 {
     my $parsed = Wiki::JSON->new->parse(
         q/hola: ''' bold ''bold
+
 and italic''' italic'': hola/
     );
 
@@ -143,7 +146,10 @@ and italic''' italic'': hola/
 }
 
 {
-    my $parsed = Wiki::JSON->new->parse(q/hola: '''''bold and italic/);
+    my $parsed;
+    Test::Warnings::warnings {
+        $parsed = Wiki::JSON->new->parse(q/hola: '''''bold and italic/);
+    };
 
     #        print Data::Dumper::Dumper($parsed);
     is_deeply $parsed,
@@ -154,8 +160,11 @@ and italic''' italic'': hola/
 }
 
 {
-    my $parsed =
-      Wiki::JSON->new->parse(q/hola: '''''bold and italic''' italic/);
+    my $parsed;
+    Test::Warnings::warnings {
+        $parsed =
+          Wiki::JSON->new->parse(q/hola: '''''bold and italic''' italic/);
+    };
 
     #        print Data::Dumper::Dumper($parsed);
     is_deeply $parsed, [
@@ -168,10 +177,14 @@ and italic''' italic'': hola/
 
 ## It becomes unable to parse further titles, terminate your bolds and italic.
 {
-    my $parsed =
-      Wiki::JSON->new->parse(q/= hola: '''''bold and italic''' italic = hola/);
+    my $parsed;
+    Test::Warnings::warnings {
+        $parsed =
+          Wiki::JSON->new->parse(
+            q/= hola: '''''bold and italic''' italic = hola/);
+    };
 
-#    print Data::Dumper::Dumper($parsed);
+    #    print Data::Dumper::Dumper($parsed);
     is_deeply $parsed,
       [
         {

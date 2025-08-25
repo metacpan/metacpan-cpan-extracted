@@ -23,13 +23,12 @@ class Mojo::Transaction::HTTP extends Mojo::Transaction {
   
   has handled : byte;
   
+  # Class Methods
   static method new : Mojo::Transaction::HTTP () {
     
     my $self = new Mojo::Transaction::HTTP;
     
     $self->SUPER::init;
-    
-    $self->{writing} = -1;
     
     return $self;
   }
@@ -69,77 +68,6 @@ class Mojo::Transaction::HTTP extends Mojo::Transaction {
   method client_write : string ($server : int) {
     
     $self->_write(0);
-  }
-  
-  method _start_line : string ($msg : Mojo::Message) {
-    
-    my $buffer  = $msg->get_start_line_chunk($self->{offset});
-    my $written = length $buffer;
-    
-    $self->{write}  -= $written;
-    $self->{offset} += $written;
-    
-    if ($self->{write} <= 0) {
-      $self->{http_state} = "headers";
-      $self->{write} = $msg->header_size;
-      $self->{offset} = 0;
-    }
-    
-    return $buffer;
-  }
-  
-  method _headers : string ($msg : Mojo::Message, $head : int) {
-    
-    my $buffer  = $msg->get_header_chunk($self->{offset});
-    
-    my $written = 0;
-    if ($buffer) {
-      $written = length $buffer;
-    }
-    
-    $self->{write}  -= $written;
-    $self->{offset} += $written;
-    
-    if ($self->{write} <= 0) {
-      $self->{http_state} = "body";
-      $self->{offset} = 0;
-      
-      if ($head && $self->is_empty) {
-        $self->completed;
-        $self->{http_state} = "empty";
-      }
-    }
-    
-    return $buffer;
-  }
-  
-  method _body : string ($msg : Mojo::Message, $finish : int) {
-    
-    # Prepare body chunk
-    my $buffer = $msg->get_body_chunk($self->{offset});
-    
-    if ($buffer) {
-      $self->{offset} += length $buffer;
-    }
-    
-    unless ($buffer) {
-      $self->{writing} = 0 ;
-    }
-    
-    if ($finish) {
-      if ($buffer && !length $buffer) {
-        $self->completed;
-      }
-      else {
-        $self->{writing} = 0;
-      }
-    }
-    
-    unless ($buffer) {
-      $buffer = "";
-    }
-    
-    return $buffer;
   }
   
   method is_empty : int () {
@@ -192,10 +120,6 @@ class Mojo::Transaction::HTTP extends Mojo::Transaction {
   
   method resume : void () {
     
-    if ($self->{writing} == -1) {
-      die "[Unexpected Error";
-    }
-    
     $self->{writing} = 1;
     
     $self->emit("resume");
@@ -216,10 +140,81 @@ class Mojo::Transaction::HTTP extends Mojo::Transaction {
   
   method server_write : string ($server : int) { $self->_write(1); }
   
-  method _write : string ($server : int) {
+  private method _start_line : string ($msg : Mojo::Message) {
+    
+    my $buffer  = $msg->get_start_line_chunk($self->{offset});
+    my $written = length $buffer;
+    
+    $self->{write}  -= $written;
+    $self->{offset} += $written;
+    
+    if ($self->{write} <= 0) {
+      $self->{http_state} = "headers";
+      $self->{write} = $msg->header_size;
+      $self->{offset} = 0;
+    }
+    
+    return $buffer;
+  }
+  
+  private method _headers : string ($msg : Mojo::Message, $head : int) {
+    
+    my $buffer  = $msg->get_header_chunk($self->{offset});
+    
+    my $written = 0;
+    if ($buffer) {
+      $written = length $buffer;
+    }
+    
+    $self->{write}  -= $written;
+    $self->{offset} += $written;
+    
+    if ($self->{write} <= 0) {
+      $self->{http_state} = "body";
+      $self->{offset} = 0;
+      
+      if ($head && $self->is_empty) {
+        $self->completed;
+        $self->{http_state} = "empty";
+      }
+    }
+    
+    return $buffer;
+  }
+  
+  private method _body : string ($msg : Mojo::Message, $finish : int) {
+    
+    # Prepare body chunk
+    my $buffer = $msg->get_body_chunk($self->{offset});
+    
+    if ($buffer) {
+      $self->{offset} += length $buffer;
+    }
+    
+    unless ($buffer) {
+      $self->{writing} = 0 ;
+    }
+    
+    if ($finish) {
+      if ($buffer && !length $buffer) {
+        $self->completed;
+      }
+      else {
+        $self->{writing} = 0;
+      }
+    }
+    
+    unless ($buffer) {
+      $buffer = "";
+    }
+    
+    return $buffer;
+  }
+  
+  private method _write : string ($server : int) {
     
     unless ($server) {
-      if ($self->{writing} == -1) {
+      unless (exists $self->{writing}) {
         $self->{writing} = 1;
       }
     }
@@ -258,7 +253,5 @@ class Mojo::Transaction::HTTP extends Mojo::Transaction {
     
     return $chunk;
   }
-  
-  method is_websocket : int () { return 0; }
   
 }

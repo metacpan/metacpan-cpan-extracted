@@ -25,7 +25,9 @@ sub stub_generate {
 }
 {
     my $text = 'hola
+
 hola {{stub}} hola
+
 hola';
     my $parsed_html = Wiki::JSON->new->pre_html(
         $text,
@@ -67,7 +69,9 @@ hola';
 }
 {
     my $text = q@hola
+
 hola '''bold''' {{stub}} hola
+
 hola@;
     my $parsed_html = Wiki::JSON->new->pre_html(
         $text,

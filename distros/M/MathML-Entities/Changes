@@ -1,5 +1,8 @@
 Revision history for Perl module MathML::Entities
 
+0.20 Fri Aug 22 11:46:00 2025
+    - Fix POD
+
 0.19 Thu Aug 21 23:46:00 2025
     - Fix whiffed build
 

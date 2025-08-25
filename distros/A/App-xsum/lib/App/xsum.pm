@@ -1,20 +1,20 @@
 package App::xsum;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-28'; # DATE
-our $DIST = 'App-xsum'; # DIST
-our $VERSION = '0.010'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 
 our %SPEC;
 
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2025-08-25'; # DATE
+our $DIST = 'App-xsum'; # DIST
+our $VERSION = '0.011'; # VERSION
+
 $SPEC{xsum} = {
     v => 1.1,
     summary => 'Compute and check file checksums/digests (using various algorithms)',
-    description => <<'_',
+    description => <<'MARKDOWN',
 
 `xsum` is a handy small utility that can be used as an alternative/replacement
 for the individual per-algorithm Unix utilities like `md5sum`, `sha1sum`,
@@ -26,7 +26,7 @@ to the individual per-algorithm backend like <pm:Digest::MD5>, <pm:Digest::SHA>,
 and so on. Most of the backend modules are written in C/XS so you don't suffer
 significant performance decrease.
 
-_
+MARKDOWN
     args => {
         tag => {
             summary => 'Create a BSD-style checksum',
@@ -41,9 +41,12 @@ _
             'x.name.is_plural' => 1,
             'x.name.singular' => 'file',
             schema => ['array*', of=>'filename*'],
-            req => 1,
             pos => 0,
             slurpy => 1,
+        },
+        files_from => {
+            schema => 'filename*',
+            cmdline_aliases => {T=>{}},
         },
         checksums => {
             'x.name.is_plural' => 1,
@@ -54,7 +57,7 @@ _
         },
         algorithm => {
             schema => ['str*', in=>[qw/crc32 md5 sha1 sha224 sha256 sha384 sha512 sha512224 sha512256 Digest/]],
-            description => <<'_',
+            description => <<'MARKDOWN',
 
 In addition to `md5`, `sha1` or the other algorithms, you can also specify
 `Digest` to use Perl's <pm:Digest> module. This gives you access to tens of
@@ -64,7 +67,7 @@ When `--digest-args` (`-A`) is not specified, algorithm defaults to `md5`. But
 if `--digest-args` (`-A`) is specified, algorithm defaults to `Digest`, for
 convenience.
 
-_
+MARKDOWN
             cmdline_aliases => {a=>{}},
         },
         digest_args => {
@@ -77,12 +80,12 @@ _
                        #of=>'str*',
 
                        'x.perl.coerce_rules'=>['From_str::comma_sep']],
-            description => <<'_',
+            description => <<'MARKDOWN',
 
 If you use `Digest` as the algorithm, you can pass arguments for the <pm:Digest>
 module here.
 
-_
+MARKDOWN
             cmdline_aliases => {A=>{}},
             completion => sub {
                 # due to coerce rule 'str_comma_sep', 'completion' instead of
@@ -221,6 +224,9 @@ _
             summary => 'Unix utility',
         },
     ],
+    args_rels => {
+        req_one => ['files', 'files_from'],
+    },
     examples => [
         {
             summary => 'Compute MD5 digests for some files',
@@ -296,10 +302,24 @@ sub xsum {
 
     my $algorithm = $args{algorithm} // ($args{digest_args} ? 'Digest' : 'md5');
 
+    my @files;
+    if (defined $args{files_from}) {
+        open my $fh, "<", $args{files_from}
+            or return [500, "Can't open '$args{files_from}': $!"];
+        while (my $line = <$fh>) {
+            chomp $line;
+            push @files, $line;
+        }
+    } elsif ($args{files} && @{ $args{files} }) {
+        @files = @{ $args{files} };
+    } else {
+        return [400, "Please supply 'files' from 'files_from'"];
+    }
+
     my $num_success;
     my $envres;
     my $i = -1;
-    for my $file (@{ $args{files} }) {
+    for my $file (@files) {
         $i++;
         if ($args{check}) {
 
@@ -402,7 +422,7 @@ App::xsum - Compute and check file checksums/digests (using various algorithms)
 
 =head1 VERSION
 
-This document describes version 0.010 of App::xsum (from Perl distribution App-xsum), released on 2020-05-28.
+This document describes version 0.011 of App::xsum (from Perl distribution App-xsum), released on 2025-08-25.
 
 =head1 SYNOPSIS
 
@@ -415,7 +435,7 @@ See L<xsum>.
 
 Usage:
 
- xsum(%args) -> [status, msg, payload, meta]
+ xsum(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Compute and check file checksumsE<sol>digests (using various algorithms).
 
@@ -458,7 +478,13 @@ Supply checksum(s).
 If you use C<Digest> as the algorithm, you can pass arguments for the L<Digest>
 module here.
 
-=item * B<files>* => I<array[filename]>
+=item * B<files> => I<array[filename]>
+
+(No description)
+
+=item * B<files_from> => I<filename>
+
+(No description)
 
 =item * B<tag> => I<bool>
 
@@ -469,12 +495,12 @@ Create a BSD-style checksum.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -486,6 +512,41 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-xsum>.
 
 Source repository is at L<https://github.com/perlancar/perl-App-xsum>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-xsum>
@@ -493,35 +554,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 SEE ALSO
-
-
-L<shasum>. Perinci::To::POD=HASH(0x55f16a06f658).
-
-L<md5sum>. Perinci::To::POD=HASH(0x55f16a06f658).
-
-L<sha1sum>. Perinci::To::POD=HASH(0x55f16a06f658).
-
-L<sha224sum>. Perinci::To::POD=HASH(0x55f16a06f658).
-
-L<sha256sum>. Perinci::To::POD=HASH(0x55f16a06f658).
-
-L<sha384sum>. Perinci::To::POD=HASH(0x55f16a06f658).
-
-L<sha512sum>. Perinci::To::POD=HASH(0x55f16a06f658).
-
-L<sum> from L<PerlPowerTools> (which only supports older algorithms like CRC32).
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2020, 2019, 2016 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

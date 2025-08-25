@@ -11,13 +11,15 @@ README.pod
 SECURITY.md
 t/_get_rows.t
 t/compile.t
+t/lib/TestUtils.pm
 t/load.t
 t/pod.t
 t/pod_coverage.t
 t/save.t
 t/test_manifest
-test-corpus/Cookies
-test-corpus/cookies.db
+test-corpus/cookies-v13.db
+test-corpus/cookies-v24.db
+test-corpus/v24-schema.sql
 xt/changes.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

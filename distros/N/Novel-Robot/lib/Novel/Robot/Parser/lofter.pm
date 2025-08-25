@@ -9,6 +9,7 @@ use base 'Novel::Robot::Parser';
 #use HTML::Entities;
 use Encode;
 use Web::Scraper;
+use JSON;
 
 sub charset { 'utf8' }
 
@@ -64,14 +65,21 @@ sub extract_item {
   my ( $self, $c ) = @_;
   #my $c = $self->{browser}->request_url( $r->{url} );
   my $r = {};
-  $r->{content} = $self->scrape_element_try($c, [
-          { path =>  '//div[starts-with(@class,"m-post")]', 'extract' => 'HTML' },
-          { path =>  '//div[@class="txtcont"]',  'extract' => 'HTML' },
-          { path =>  '//div[@class="content"]',  'extract' => 'HTML' },
-          { path =>  '//div[@class="postdesc"]', 'extract' => 'HTML' },
-          { path =>  '//div[@class="article"]',  'extract' => 'HTML' },
-          { path =>  '//div[@class="post-ctc"]',  'extract' => 'HTML' },
-      ]);
+  #$r->{content} = $self->scrape_element_try($c, [
+          #{ path =>  '//div[starts-with(@class,"m-post")]', 'extract' => 'HTML' },
+          #{ path =>  '//div[@class="txtcont"]',  'extract' => 'HTML' },
+          #{ path =>  '//div[@class="content"]',  'extract' => 'HTML' },
+          #{ path =>  '//div[@class="postdesc"]', 'extract' => 'HTML' },
+          #{ path =>  '//div[@class="article"]',  'extract' => 'HTML' },
+          #{ path =>  '//div[@class="post-ctc"]',  'extract' => 'HTML' },
+      #]);
+
+  my ($js) = $c=~m#<script>window\.__initialize_data__ =(.+?)<\/script>#s; 
+  my $js_r = decode_json(encode("utf8", $js));
+  my $post = $js_r->{postData}{data}{postData}{postView};
+  $r->{title} = $post->{title};
+  $r->{content} = $post->{textPostView}{content};
+
   return $r;
 }
 

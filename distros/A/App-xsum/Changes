@@ -1,3 +1,8 @@
+0.011   2025-08-25  Released-By: PERLANCAR; Urgency: medium
+
+        - Add option --files-from (-T).
+
+
 0.010   2020-05-28  Released-By: PERLANCAR; Urgency: medium
 
 	- Add workaround to prevent Perinci::Sub::GetArgs::Argv arrayify

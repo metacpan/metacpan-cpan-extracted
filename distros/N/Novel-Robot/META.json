@@ -4,7 +4,7 @@
       "abbypan <abbypan@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -21,23 +21,17 @@
       },
       "runtime" : {
          "requires" : {
-            "Data::MessagePack" : "0",
             "Encode" : "0",
             "Encode::Detect::CJK" : "0",
             "Encode::Locale" : "0",
-            "File::Copy" : "0",
             "File::Find::Rule" : "0",
             "File::Slurp" : "0",
             "HTML::Entities" : "0",
-            "HTML::FormatText" : "0",
             "HTML::TreeBuilder" : "0",
             "HTTP::CookieJar" : "0",
             "HTTP::Tiny" : "0",
             "IO::Uncompress::Gunzip" : "0",
             "JSON" : "0",
-            "Moo" : "0",
-            "Parallel::ForkManager" : "0",
-            "Parallel::Loops" : "0",
             "Template" : "0",
             "Term::ProgressBar" : "0",
             "URI" : "0",
@@ -54,9 +48,9 @@
          "web" : "https://github.com/abbypan/Novel-Robot"
       }
    },
-   "version" : "0.44",
-   "x_generated_by_perl" : "v5.38.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
+   "version" : "0.45",
+   "x_generated_by_perl" : "v5.42.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.39",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

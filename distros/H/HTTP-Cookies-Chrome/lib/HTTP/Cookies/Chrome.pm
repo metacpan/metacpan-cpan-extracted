@@ -69,6 +69,25 @@ using an earlier Chrome, you should use an older version of this module
 
 =back
 
+=head2 Notes on modernization
+
+HTTP::Cookies::Chrome v3 works with version 24 of the Chrome cookies
+database. If you need something earlier, use an older version of this
+module.
+
+The Chrome cookie database version 24 changed how it stored encrypted
+cookies. It takes the SHA256 of the domain and prepends the binary value
+to the plaintext of the cookie value. It then encrypts the entire thing,
+and puts C<v10> in front of it as before.
+
+So far, this module has been updated to read that format and discard the
+SHA256 rather than verifying its value if correct, or at least passing
+that on so the user can verify it themselves. This module should do
+either or both of those.
+
+Also, this module has not yet been updated to write it out in the same
+way.
+
 =cut
 
 use base qw( HTTP::Cookies );
@@ -77,10 +96,9 @@ use vars qw( $VERSION );
 use constant TRUE  => 1;
 use constant FALSE => 0;
 
-$VERSION = '2.005';
+$VERSION = '3.002';
 
 use DBI;
-
 
 sub _add_value {
 	my( $self, $key, $value ) = @_;
@@ -102,32 +120,87 @@ sub _create_table {
 	my( $self ) = @_;
 
 	$self->_dbh->do(  'DROP TABLE IF EXISTS cookies' );
+	$self->_dbh->do(  'DROP TABLE IF EXISTS meta' );
+
+	$self->_dbh->do( q(CREATE TABLE meta(key LONGVARCHAR NOT NULL UNIQUE PRIMARY KEY, value LONGVARCHAR)) );
+	$self->_dbh->do( q(INSERT INTO meta VALUES('mmap_status','-1')) );
+	$self->_dbh->do( q(INSERT INTO meta VALUES('version','24')) );
+	$self->_dbh->do( q(INSERT INTO meta VALUES('last_compatible_version','24q')) );
 
 	$self->_dbh->do( <<'SQL' );
-CREATE TABLE cookies(
-	creation_utc    INTEGER NOT NULL,
-	host_key        TEXT NOT NULL,
-	name            TEXT NOT NULL,
-	value           TEXT NOT NULL,
-	path            TEXT NOT NULL,
-	expires_utc     INTEGER NOT NULL,
-	is_secure       INTEGER NOT NULL,
-	is_httponly     INTEGER NOT NULL,
-	last_access_utc INTEGER NOT NULL,
-	has_expires     INTEGER NOT NULL DEFAULT 1,
-	is_persistent   INTEGER NOT NULL DEFAULT 1,
-	priority        INTEGER NOT NULL DEFAULT 1,
-	encrypted_value BLOB DEFAULT '',
-	samesite        INTEGER NOT NULL DEFAULT -1,
-	source_scheme   INTEGER NOT NULL DEFAULT 0,
-	source_port     INTEGER NOT NULL DEFAULT -1,
-	is_same_party   INTEGER NOT NULL DEFAULT 0,
-	UNIQUE (host_key, name, path)
-	)
+CREATE TABLE cookies (
+	creation_utc            INTEGER NOT NULL,
+	host_key                TEXT NOT NULL,
+	top_frame_site_key      TEXT NOT NULL,
+	name                    TEXT NOT NULL,
+	value                   TEXT NOT NULL,
+	encrypted_value         BLOB NOT NULL,
+	path                    TEXT NOT NULL,
+	expires_utc             INTEGER NOT NULL,
+	is_secure               INTEGER NOT NULL,
+	is_httponly             INTEGER NOT NULL,
+	last_access_utc         INTEGER NOT NULL,
+	has_expires             INTEGER NOT NULL,
+	is_persistent           INTEGER NOT NULL,
+	priority                INTEGER NOT NULL,
+	samesite                INTEGER NOT NULL,
+	source_scheme           INTEGER NOT NULL,
+	source_port             INTEGER NOT NULL,
+	last_update_utc         INTEGER NOT NULL,
+	source_type             INTEGER NOT NULL,
+	has_cross_site_ancestor INTEGER NOT NULL
+	);
+SQL
+
+	$self->_dbh->do( <<'SQL' );
+CREATE UNIQUE INDEX cookies_unique_index ON cookies(
+	host_key,
+	top_frame_site_key,
+	has_cross_site_ancestor,
+	name,
+	path,
+	source_scheme,
+	source_port
+	);
 SQL
 	}
 
 sub _dbh { $_[0]->{dbh} }
+
+sub _db_24_or_later {
+	my( $self ) = shift;
+
+	state $yes;
+	return $yes if defined $yes;
+
+	my $v = $self->_db_version;
+	$yes = defined $v and $v >= 24;
+	}
+
+sub _db_version {
+	my( $self ) = @_;
+
+	state $has_meta = eval {
+		my $sql = q(SELECT 1 FROM sqlite_master WHERE type='table' AND name='meta');
+		my $array = $self->_dbh->selectall_arrayref( $sql );
+		@$array > 0;
+		};
+	if( $@ ) { warn $@ }
+
+	state $version;
+	return $version if defined $version;
+	return unless $has_meta;
+
+	$version = eval {
+		my $key = 'version';
+		my $sql = qq(SELECT * FROM meta WHERE key = '$key');
+		my $rv = $self->_dbh->selectall_arrayref( $sql );
+		@$rv ? $rv->[0][1] : 0;
+		} // 0;
+	if( $@ ) { warn $@ }
+
+	return $version;
+	};
 
 sub _decrypt {
 	my( $self, $blob ) = @_;
@@ -137,17 +210,33 @@ sub _decrypt {
 		return;
 		}
 
-	my $type = substr $blob, 0, 3;
+	my $type = substr $blob, 0, 3, '';
+
 	unless( $type eq 'v10' ) { # v11 is a thing, too
 		warnings::warn("Encrypted value is unexpected type <$type>") if warnings::enabled();
 		return;
 		}
 
-	my $plaintext = $self->_cipher->decrypt( substr $blob, 3 );
-	my $padding_count = ord( substr $plaintext, -1 );
-	substr( $plaintext, -$padding_count ) = '' if $padding_count < 16;
+	my $plaintext = $self->_cipher->decrypt( $blob );
+	my $sha256;
 
-	$plaintext;
+	if( $self->_db_24_or_later ) {
+		$sha256 = substr $plaintext, 0, 32, '';
+		}
+
+	# padding is always added to get to a multiple of 16. If the value is already
+	# a multiple of 16, it's padded by an additional 16 octets.
+	my $padding_count = ord( substr $plaintext, -1 );
+
+	my $padding = substr( $plaintext, -$padding_count );
+
+	unless( $padding =~ /\A(.){$padding_count}\z/ and ord(substr $padding, 0, 1) == $padding_count ) {
+		warnings::warn("Unexpected padding in encrypted cookie") if warnings::enabled();
+		}
+
+	substr( $plaintext, -$padding_count ) = '' if $padding_count <= 16;
+
+	( $plaintext, $sha256 );
 	}
 
 sub _encrypt {
@@ -165,7 +254,10 @@ sub _encrypt {
 
 	my $blocksize = 16;
 
+	# padding is always added. If the length is already a multiple of 16, the
+	# padding is the same as the blocksize.
 	my $padding_length = ($blocksize - length($value) % $blocksize);
+	$padding_length = $blocksize if $padding_length == 0;
 	my $padding = chr($padding_length) x $padding_length;
 	my $encrypted = 'v10' . $self->_cipher->encrypt( $value . $padding );
 
@@ -173,9 +265,9 @@ sub _encrypt {
 	}
 
 sub _filter_cookies {
-    my( $self ) = @_;
+	my( $self ) = @_;
 
-    $self->scan(
+	$self->scan(
 		sub {
 			my( $version, $key, $val, $path, $domain, $port,
 				$path_spec, $secure, $expires, $discard, $rest ) = @_;
@@ -193,7 +285,6 @@ sub _filter_cookies {
 			$self->_insert( @parts );
 			}
 		);
-
 	}
 
 sub _get_rows {
@@ -201,15 +292,35 @@ sub _get_rows {
 
 	my $dbh = $self->_connect( $file );
 
-	my $sth = $dbh->prepare( 'SELECT * FROM cookies' );
+	my $sth = $dbh->prepare( <<'SQL' );
+		SELECT
+			creation_utc,
+			host_key,
+			name,
+			value,
+			path,
+			expires_utc,
+			is_secure,
+			is_httponly,
+			last_access_utc,
+			has_expires,
+			is_persistent,
+			priority,
+			encrypted_value,
+			samesite,
+			source_scheme,
+			source_port
+		FROM
+			cookies
+SQL
 
 	$sth->execute;
 
 	my @rows =
 		map {
 			if( my $e = $_->encrypted_value ) {
-			my $p = $self->_decrypt( $e );
-				$_->decrypted_value( $self->_decrypt( $e ) );
+				my( $p, $sha256 ) = $self->_decrypt( $e );
+				$_->decrypted_value( $p );
 				}
 			$_;
 			}
@@ -234,8 +345,13 @@ sub _insert {
 
 	my $rest = $parts[REST];
 
-	$rest->{httponly} //= 0;
-	$rest->{samesite} //= 0;
+	$rest->{httponly}           //= 0;
+	$rest->{last_update_utc}    //= time() * 1000;
+	$rest->{samesite}           //= -1;  # magic value for unspecified
+	$rest->{source_scheme}      //= '';
+	$rest->{source_type}        //= '';
+	$rest->{top_frame_site_key} //= '';
+	$rest->{has_cross_site_ancestor} //= 0;
 
 	# possibly thinking about a feature to remove the encryption,
 	# so we'd need to re-encrypt things. Here we assume that already
@@ -254,15 +370,16 @@ sub _insert {
 
 	my @values = (
 		$rest->{creation_utc},
-		@parts[DOMAIN, KEY, VALUE, PATH],
+		$parts[DOMAIN],
+		$rest->{top_frame_site_key},
+		@parts[KEY, VALUE],
+		$encrypted_value,
+		$parts[PATH],
 		$rest->{expires_utc},
 		$parts[SECURE],
-		@{ $rest }{ qw(is_httponly last_access_utc has_expires
-			is_persistent priority) },
-		$encrypted_value,
-		@{ $rest }{ qw(samesite source_scheme ) },
+		@{ $rest }{ qw(is_httponly last_access_utc has_expires is_persistent priority samesite source_scheme) },
 		$parts[PORT],
-		$rest->{is_same_party},
+		@{$rest}{qw(last_update_utc source_type has_cross_site_ancestor)},
 		);
 
 	$self->{insert_sth}->execute( @values );
@@ -280,7 +397,7 @@ sub _make_cipher {
 
 	my $key = do {
 		state $rc2 = require PBKDF2::Tiny;
-		my $s = _platform_settings();
+		my $s = $self->_platform_settings;
 		my $salt = 'saltysalt';
 		my $length = 16;
 		PBKDF2::Tiny::derive( 'SHA-1', $password, $salt, $s->{iterations}, $length );
@@ -313,9 +430,32 @@ sub _platform_settings {
 
 sub _prepare_insert {
 	my( $self ) = @_;
-
-	my $sth = $self->{insert_sth} = $self->_dbh->prepare_cached( <<'SQL' );
-INSERT INTO cookies VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
+	state $columns = [qw(
+		creation_utc
+		host_key
+		top_frame_site_key
+		name
+		value
+		encrypted_value
+		path
+		expires_utc
+		is_secure
+		is_httponly
+		last_access_utc
+		has_expires
+		is_persistent
+		priority
+		samesite
+		source_scheme
+		source_port
+		last_update_utc
+		source_type
+		has_cross_site_ancestor
+		)];
+	state $columns_str = join ', ', @$columns;
+	state $placeholders = join ', ', ('?') x @$columns;
+	my $sth = $self->{insert_sth} = $self->_dbh->prepare_cached( <<"SQL" );
+INSERT INTO cookies ($columns_str) VALUES ( $placeholders )
 SQL
 
 	}
@@ -504,9 +644,9 @@ be a SQLite database.
 =cut
 
 sub save {
-    my( $self, $new_file ) = @_;
+	my( $self, $new_file ) = @_;
 
-    $new_file ||= $self->{'file'} || return;
+	$new_file ||= $self->{'file'} || return;
 
 	my $dbh = $self->_connect( $new_file );
 
@@ -529,41 +669,40 @@ specify a port. This version of C<set_cookie> does no port check.
 # We have to override this part because Chrome has -1 as a valid
 # port value (for "unspecified port"). Otherwise this is lifted from
 # HTTP::Cookies
-sub set_cookie
-{
-    my $self = shift;
-    my($version,
-       $key, $val, $path, $domain, $port,
-       $path_spec, $secure, $maxage, $discard, $rest) = @_;
+sub set_cookie {
+	my $self = shift;
+	my($version,
+		$key, $val, $path, $domain, $port,
+		$path_spec, $secure, $maxage, $discard, $rest) = @_;
 
-    # path and key can not be empty (key can't start with '$')
-    return $self if !defined($path) || $path !~ m,^/, ||
-	            !defined($key)  || $key  =~ m,^\$,;
+	# path and key can not be empty (key can't start with '$')
+	return $self if !defined($path) || $path !~ m,^/, ||
+		!defined($key)  || $key  =~ m,^\$,;
 
-    # ensure legal port
-    if (0 && defined $port) {  # nerf this part
+	# ensure legal port
+	if (0 && defined $port) {  # nerf this part
 	return $self unless $port =~ /^_?\d+(?:,\d+)*$/;
-    }
-
-    my $expires;
-    if (defined $maxage) {
-	if ($maxage <= 0) {
-	    delete $self->{COOKIES}{$domain}{$path}{$key};
-	    return $self;
 	}
-	$expires = time() + $maxage;
-    }
-    $version = 0 unless defined $version;
 
-    my @array = ($version, $val,$port,
+	my $expires;
+	if (defined $maxage) {
+		if ($maxage <= 0) {
+			delete $self->{COOKIES}{$domain}{$path}{$key};
+			return $self;
+		}
+		$expires = time() + $maxage;
+	}
+	$version = 0 unless defined $version;
+
+	my @array = ($version, $val,$port,
 		 $path_spec,
 		 $secure, $expires, $discard);
-    push(@array, {%$rest}) if defined($rest) && %$rest;
-    # trim off undefined values at end
-    pop(@array) while !defined $array[-1];
+	push(@array, {%$rest}) if defined($rest) && %$rest;
+	# trim off undefined values at end
+	pop(@array) while !defined $array[-1];
 
-    $self->{COOKIES}{$domain}{$path}{$key} = \@array;
-    $self;
+	$self->{COOKIES}{$domain}{$path}{$key} = \@array;
+	$self;
 }
 
 BEGIN {
@@ -591,6 +730,7 @@ my %columns = map { state $n = 0; $_, $n++ } qw(
 	decrypted_value
 	);
 
+use Data::Dumper;
 sub new {
 	my( $class, $array ) = @_;
 	bless $array, $class;

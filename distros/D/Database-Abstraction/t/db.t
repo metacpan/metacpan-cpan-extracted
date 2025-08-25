@@ -41,6 +41,9 @@ isa_ok($dao, 'Database::Test', 'Got a Database::Test object');
 my $row = $dao->fetchrow_hashref(entry => 'k1');
 is_deeply($row, { entry => 'v1' }, 'fetchrow_hashref returned correct hashref');
 
+$row = $dao->fetchrow_hashref('k1');
+is_deeply($row, { entry => 'v1' }, 'fetchrow_hashref returned correct hashref with implied entry');
+
 # Test AUTOLOAD column access: calling ->entry('k2') returns the value
 is($dao->entry('k2'), 'v2', 'AUTOLOAD entry() returns correct value for k2');
 

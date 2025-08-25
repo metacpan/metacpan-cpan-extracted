@@ -1,4 +1,6 @@
 package Mail::IMAPTalk;
+use strict;
+use warnings;
 
 =head1 NAME
 
@@ -91,8 +93,8 @@ the given command.
 
 # Export {{{
 require Exporter;
-@ISA = qw(Exporter);
-%EXPORT_TAGS = (
+our @ISA = qw(Exporter);
+our %EXPORT_TAGS = (
   Default => [ qw(get_body_part find_message build_cid_map generate_cid) ]
 );
 Exporter::export_ok_tags('Default');
@@ -123,7 +125,7 @@ sub import {
   goto &Exporter::import;
 }
 
-our $VERSION = '4.06';
+our $VERSION = '4.07';
 # }}}
 
 # Use modules {{{
@@ -146,8 +148,6 @@ BEGIN {
 # Use Time::HiRes if available to handle select restarts
 eval 'use Time::HiRes qw(time);';
 
-use strict;
-use warnings;
 # }}}
 
 =head1 CLASS OVERVIEW
@@ -304,6 +304,8 @@ Examples:
     $IMAP->append("inbox", { Literal => $MsgTxt })
     # Append MSGFILE contents as new message
     $IMAP->append("inbox", \*MSGFILE ])
+    # Append $MsgTxt as UTF-8 string. Assumes UTF8=ACCEPT is enabled.
+    $IMAP->append("inbox", { LiteralUtf8 => $MsgTxt })
 
 =back
 
@@ -563,9 +565,10 @@ sub new {
     my $DefaultPort = 143;
     my $SocketClass = $DefSocketClass;
 
-    if (my $SSLOpt = $Args{UseSSL}) {
-      $SSLOpt = $SSLOpt eq '1' ? '' : " qw($SSLOpt)";
-      eval "use IO::Socket::SSL$SSLOpt; 1;" || return undef;
+    my $SSLOpt = $Args{UseSSL};
+    if ($SSLOpt) {
+      my $SSLUse = $SSLOpt eq '1' ? '' : " qw($SSLOpt)";
+      eval "use IO::Socket::SSL$SSLUse; 1;" || return undef;
       $SocketClass = "IO::Socket::SSL";
       $DefaultPort = 993;
       $SocketOpts{$_} = $Args{$_} for grep { /^SSL_/ } keys %Args;
@@ -574,7 +577,18 @@ sub new {
     $SocketOpts{PeerHost} = $Self->{Server} = $Args{Server} || die "No Server name given";
     $SocketOpts{PeerPort} = $Self->{Port} = $Args{Port} || $DefaultPort;
 
-    $Socket = ($Args{NewSocketCB} || sub { shift->new(@_) })->($SocketClass, %SocketOpts) || return undef;
+    # Clear any errors before creating the socket
+    $! = 0;
+    $@ = "";
+
+    $Socket = ($Args{NewSocketCB} || sub { shift->new(@_) })->($SocketClass, %SocketOpts);
+    if (!$Socket) {
+      # Divine error from system level IO::Socket ($!), IO::Socket::Paranoid ($@) or SSL level IO::Socket::SSL.
+      my $Err = $! || $@ || ($SSLOpt ? IO::Socket::SSL::errstr() : "") || "Unknown";
+      $! = 0; # Clear so only $@ is set
+      $@ = "IMAPTalk: socket connection failed - $Err";
+      return undef;
+    }
 
     # Force flushing after every write to the socket
     my $ofh = select($Socket); $| = 1; select ($ofh);
@@ -612,7 +626,10 @@ sub new {
   if ($Args{Server} || $Args{ExpectGreeting}) {
     $Self->{CmdId} = "*";
     my ($CompletionResp, $DataResp) = $Self->_parse_response('');
-    return undef if $CompletionResp !~ /^ok/i;
+    if ($CompletionResp !~ /^ok/i) {
+      $@ = "IMAPTalk: Unexpected greeting line: $CompletionResp";
+      return undef;
+    }
 
     # At this point, the cached "remainder" should be the banner greeting.  We'll
     # save this into the ServerGreeting cache entry so we can refer to it later,
@@ -1410,7 +1427,7 @@ sub set_select_state {
   if ($State->{state} == Unconnected) {
     return $Self->logout;
   } elsif ($State->{state} == Authenticated) {
-    return $Self->state == Selected ? $Self->unselect : 1;
+    return $Self->state == Selected ? $Self->unselect_or_close : 1;
   } elsif ($State->{state} == Selected) {
     if ($State->{current_folder_mode} eq 'read-write') {
       return $Self->select($State->{current_folder});
@@ -1443,8 +1460,8 @@ IMAP EXAMINE verb is used instead of SELECT.
 Mail::IMAPTalk will cache the currently selected folder, and if you
 issue another ->select("XYZ") for the folder that is already selected,
 it will just return immediately. This can confuse code that expects
-to get side effects of a select call. For that case, call ->unselect()
-first, then ->select().
+to get side effects of a select call. For that case, call ->unselect (or
+->unselect_or_close) first, then ->select.
 
 =cut
 sub select {
@@ -1454,7 +1471,7 @@ sub select {
   my $ReadOnly = delete($Opts{ReadOnly});
 
   if ($unselect) {
-    $Self->unselect();
+    $Self->unselect_or_close;
   }
 
   # Are we already selected and in the same mode?
@@ -1519,6 +1536,23 @@ sub unselect {
   return $Res;
 }
 
+=item I<unselect_or_close()>
+
+Perform the IMAP "unselect" command if the capability is present in the server,
+otherwise perform the "close" command.
+
+=cut
+
+sub unselect_or_close {
+  my $Self = shift;
+
+  if ($Self->capability->{unselect}) {
+    return $Self->unselect;
+  }
+
+  return $Self->close;
+}
+
 =item I<examine($FolderName)>
 
 Perform the standard IMAP 'examine' command to select a folder in read only
@@ -1553,7 +1587,7 @@ sub select_with_state {
   #   of the status items, so we always send them UPPERCASE
 
   # Ensure we are not in a selected state.
-  $Self->unselect();
+  $Self->unselect_or_close;
 
   my $State = $Self->status($Folder, [qw(MESSAGES UIDVALIDITY UIDNEXT)]);
   # Have seen some servers return a NO response followed by STATUS+OK,
@@ -2476,6 +2510,15 @@ sub append {
   my $FolderName = $Self->_fix_folder_name(+shift);
   $Self->cb_folder_changed($FolderName);
   return $Self->_imap_cmd("append", 0, "", $FolderName, @_);
+}
+
+sub replace {
+  my ($Self, $Id, $FolderName, @Rest) = @_;
+
+  $FolderName = $Self->_fix_folder_name($FolderName);
+  $Self->cb_folder_changed($FolderName);
+
+  return $Self->_imap_cmd("replace", 1, "", $Id, $FolderName, @Rest);
 }
 
 =item I<search($MsgIdSet, @SearchCriteria)>
@@ -3645,7 +3688,8 @@ sub _send_data {
 
   my ($AddSpace, $NextAddSpace) = (1, 1);
   foreach my $Arg (@Args) {
-    my ($IsQuote, $IsLiteral, $IsFile, $IsBinary) = ($Opts->{Quote}, 0, 0, 0);
+    my ($IsQuote, $IsLiteral, $IsFile, $IsBinary, $IsUtf8) =
+      ($Opts->{Quote}, 0, 0, 0, 0);
 
     # --- Determine value type and appropriate output
 
@@ -3665,6 +3709,9 @@ sub _send_data {
         } elsif (exists $Arg->{Literal}) {
           $IsLiteral = 1;
           $Arg = ref($Arg->{Literal}) ?  $Arg->{Literal} : \$Arg->{Literal};
+        } elsif (exists $Arg->{LiteralUtf8}) {
+          $IsLiteral = $IsUtf8 = $IsBinary = 1;
+          $Arg = ref($Arg->{LiteralUtf8}) ?  $Arg->{LiteralUtf8} : \$Arg->{LiteralUtf8};
         } elsif (exists $Arg->{Binary}) {
           $IsLiteral = $IsBinary = 1;
           $Arg = ref($Arg->{Binary}) ?  $Arg->{Binary} : \$Arg->{Binary};
@@ -3755,6 +3802,7 @@ sub _send_data {
       }
       $LineBuffer .=
         ($AddSpace ? " " : "") .
+        ($IsUtf8 ? "UTF8 (" : "") .
         ($IsBinary ? "~" : "") .
         "{" . $LiteralSize . $Plus . "}" . LB;
       $Self->_imap_socket_out($LineBuffer);
@@ -3768,6 +3816,10 @@ sub _send_data {
           $Self->_imap_socket_out(ref($Arg) ? $$Arg : $Arg);
         } else {
           $Self->_copy_handle_to_imap_socket($Arg, $LiteralSize);
+        }
+
+        if ($IsUtf8) {
+          $Self->_imap_socket_out(")");
         }
 
       # If no "+ go ahead" response, stick back in read buffer and fall out
@@ -5132,12 +5184,25 @@ sub DESTROY {
 =back
 =cut
 
-=head1 GMAIL, OFFICE 365, YAHOO and XOAUTH2
+=head1 GMAIL, OFFICE 365, YAHOO and OAUTHBEARER/XOAUTH2
 
 GMail, Office 365 and Yahoo are all moving to OAUTH authentication using
-the XOAUTH2 SASL mechanism. At the moment, there doesn't appear to be
-a XOAUTH2 I<Authen::SASL> module on CPAN. If you need to authenticate
-with those systems, you should be able to use this simple module.
+the XOAUTH2 SASL mechanism. Authen::SASL 2.1800 and above support
+OAUTHBEARER and XOAUTH2 so if you have that version or greater you can
+just use:
+
+  my $sasl = Authen::SASL->new(
+    mechanism => 'XOAUTH2' / 'OAUTHBEARER',
+    callback => {
+      user => $username,
+      pass => $token,
+    }
+  );
+
+  $login_res = $connection->authenticate($sasl);
+
+If you have an older version, you can use the following simple
+module instead:
 
   package Authen::SASL::Perl::XOAUTH2;
 
@@ -5146,7 +5211,8 @@ with those systems, you should be able to use this simple module.
   use parent qw(Authen::SASL::Perl);
 
   sub _order { 1 }
-  sub _secflags { () }
+  my @FLAGS;
+  sub _secflags { @FLAGS }
   sub mechanism { 'XOAUTH2' }
 
   sub client_start {
@@ -5155,12 +5221,12 @@ with those systems, you should be able to use this simple module.
     $self->{error} = undef;
     $self->{need_step} = 0;
 
-    my ($user, $auth, $access_token) = map {
+    my ($user, $pass) = map {
       my $v = $self->_call($_);
       defined($v) ? $v : ''
-    } qw(user auth access_token);
+    } qw(user pass);
 
-    return "user=$user\001auth=$auth $access_token\001\001";
+    return "user=$user\001auth=Bearer $pass\001\001";
   }
 
   1;
@@ -5171,8 +5237,7 @@ And then authenticate using:
     mechanism => 'XOAUTH2',
     callback => {
       user => $username,
-      auth => 'Bearer',
-      access_token => $token,
+      pass => $token,
     }
   );
 

@@ -3,9 +3,9 @@ NAME
     available on CPAN
 
 VERSION
-    This document describes version 0.013 of Acme::CPANModules::GrepVariants
+    This document describes version 0.014 of Acme::CPANModules::GrepVariants
     (from Perl distribution Acme-CPANModules-GrepVariants), released on
-    2024-11-20.
+    2025-08-20.
 
 DESCRIPTION
     This list catalogs various grep-like tools.
@@ -141,7 +141,8 @@ DESCRIPTION
 
     4e. Variants: other alternate sources
 
-    grep-from-bash-history (from App::BashHistoryUtils).
+    grep-bash-history-entries (from App::BashHistoryUtils), with grephist as
+    shorter alias.
 
     grep-from-iod (from App::IODUtils).
 
@@ -203,6 +204,8 @@ ACME::CPANMODULES ENTRIES
         Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
     App::grep::sounds::like
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
     App::pmgrep
         Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
@@ -318,7 +321,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

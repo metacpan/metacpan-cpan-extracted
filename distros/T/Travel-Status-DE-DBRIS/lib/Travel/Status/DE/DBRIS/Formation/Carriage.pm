@@ -8,7 +8,7 @@ use utf8;
 use parent 'Class::Accessor';
 use Carp qw(cluck);
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 Travel::Status::DE::DBRIS::Formation::Carriage->mk_ro_accessors(
 	qw(class_type is_closed is_dosto is_locomotive is_powercar
 	  number model section uic_id type
@@ -96,10 +96,12 @@ sub new {
 	$ref->{start_meters} = $pos->{start};
 	$ref->{end_meters}   = $pos->{end};
 	$ref->{start_percent}
-	  = ( $pos->{start} - $platform->{start} ) * 100 / $platform_length,
-	  $ref->{end_percent}
-	  = ( $pos->{end} - $platform->{start} ) * 100 / $platform_length,
-	  $ref->{length_meters} = $pos->{start} - $pos->{end};
+	  = ( $pos->{start} - $platform->{start} ) * 100 / $platform_length;
+	$ref->{end_percent}
+	  = ( $pos->{end} - $platform->{start} ) * 100 / $platform_length;
+	if ( defined $pos->{start} and defined $pos->{end} ) {
+		$ref->{length_meters} = $pos->{start} - $pos->{end};
+	}
 	$ref->{length_percent} = $ref->{end_percent} - $ref->{start_percent};
 
 	if (   $pos->{start} eq ''

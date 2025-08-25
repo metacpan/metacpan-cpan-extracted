@@ -17,7 +17,7 @@ use SIRTX::VM::Register;
 
 use parent 'Data::Identifier::Interface::Userdata';
 
-our $VERSION = v0.02;
+our $VERSION = v0.03;
 
 my @_register_templates = (
     # user:
@@ -201,6 +201,42 @@ sub expand {
 
     return @res;
 }
+
+
+sub clone {
+    my ($self) = @_;
+    my @registers;
+    my %register_names;
+    my $clone = bless {
+        physical_registers => \@registers,
+        logical_registers => [],
+        register_names => \%register_names,
+        logical_temperature => {%{$self->{logical_temperature}}},
+        logical_owner => {%{$self->{logical_owner}}},
+    }, __PACKAGE__;
+
+    # clone registers:
+    foreach my $register (@{$self->{physical_registers}}) {
+        if (defined $register) {
+            my $c = $register->clone;
+            push(@registers, $c);
+
+            if (defined(my $name = $c->name)) {
+                $register_names{$name} = $c;
+            }
+        } else {
+            push(@registers, undef);
+        }
+    }
+
+    # clone map:
+    for (my $i = 0; $i < scalar(@{$self->{logical_registers}}); $i++) {
+        $clone->map($i => $self->get_logical($i)->physical);
+    }
+
+    return $clone;
+}
+
 1;
 
 __END__
@@ -215,7 +251,7 @@ SIRTX::VM::RegisterFile - module for interacting with SIRTX VM code
 
 =head1 VERSION
 
-version v0.02
+version v0.03
 
 =head1 SYNOPSIS
 
@@ -300,6 +336,12 @@ Gets or sets the register temperature.
     my @expanded_names = $rf->expand(@names);
 
 Expands a list of register names. Returns the list of explicit names.
+
+=head2 clone
+
+    my SIRTX::VM::RegisterFile $clone = $rf->clone;
+
+Clones the register file.
 
 =head1 AUTHOR
 
