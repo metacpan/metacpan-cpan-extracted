@@ -9,6 +9,9 @@ class Mojo::UserAgent::CookieJar {
   use Mojo::Path;
   use Mojo::UserAgent::CookieJar::Callback::Ignore;
   
+  # Interfaces
+  interface Stringable;
+  
   # Class Variables
   our $COMMENT : string;
   INIT {
@@ -16,18 +19,25 @@ class Mojo::UserAgent::CookieJar {
   }
   
   # Fields
-  has ignore : ro Mojo::UserAgent::CookieJar::Callback::Ignore;
+  has ignore : rw Mojo::UserAgent::CookieJar::Callback::Ignore;
   
-  has max_cookie_size : ro int;
+  has max_cookie_size : rw int
+    get {
+      unless (exists $self->{max_cookie_size}) {
+        $self->{max_cookie_size} = 4096;
+      }
+      
+      return $self->{max_cookie_size};
+    }
+  ;
   
+  # Undocumented Fields
   has jar : Hash of List of Mojo::Cookie::Response;
   
   # Class Methods
   static method new : Mojo::UserAgent::CookieJar () {
     
     my $self = new Mojo::UserAgent::CookieJar;
-    
-    $self->{max_cookie_size} = 4096;
     
     $self->{jar} = Hash->new;
     
@@ -44,64 +54,17 @@ class Mojo::UserAgent::CookieJar {
   }
   
   # Instance Methods
-  method add : void ($cookie : Mojo::Cookie::Response) {
-    $self->add_([$cookie]);
-  }
-  
-  method add_ : void ($cookies : Mojo::Cookie::Response[]) {
+  method add : void ($cookie : object of Mojo::Cookie::Response|Mojo::Cookie::Response[]) {
     
-    my $size = $self->max_cookie_size;
-    for my $cookie (@$cookies) {
-      
-      # Convert max age to expires
-      my $age = $cookie->max_age;
-      if (Re->m($age, "^\d+$")) {
-        my $age_int = (int)$age;
-        $cookie->set_expires($age <= 0 ? (long)0 : $age + Sys->time) ;
-      }
-      
-      # Check cookie size
-      if (length $cookie->value > $size) {
-        next;
-      }
-      
-      # Replace cookie
-      my $domain = Fn->lc($cookie->domain // "");
-      unless (length $domain) {
-        next;
-      }
-      my $path = $cookie->path;
-      unless (length $path) {
-        next;
-      }
-      my $name = $cookie->name;
-      unless (length $name) {
-        next;
-      }
-      
-      my $jar_list = (List of Mojo::Cookie::Response)$self->{jar}->get($domain);
-      
-      unless ($jar_list) {
-        $jar_list = List->new(new Mojo::Cookie::Response[0]);
-      }
-      
-      my $replaced = 0;
-      for (my $i = 0; $i < $jar_list->length; $i++) {
-        my $cookie_cur = (Mojo::Cookie::Response)$jar_list->get($i);
-        if (&_compare($cookie_cur, $path, $name, $domain)) {
-          $jar_list->set($i, $cookie);
-          $replaced = 1;
-          last;
-        }
-      }
-      
-      unless ($replaced) {
-        $jar_list->push($cookie);
-      }
-      
-      $self->{jar}->set($domain, $jar_list);
+    if ($cookie isa Mojo::Cookie::Response) {
+      $self->_add([(Mojo::Cookie::Response)$cookie]);
     }
-    
+    elsif ($cookie isa Mojo::Cookie::Response[]) {
+      $self->_add((Mojo::Cookie::Response[])$cookie);
+    }
+    else {
+      die "The cookie \$cookie must be a Mojo::Cookie::Response object or a Mojo::Cookie::Response array.";
+    }
   }
   
   method all : Mojo::Cookie::Response[] () {
@@ -240,6 +203,62 @@ class Mojo::UserAgent::CookieJar {
     
     return Fn->join("\n", $lines->to_array);
   }
-
+  
+  private method _add : void ($cookies : Mojo::Cookie::Response[]) {
+    
+    my $size = $self->max_cookie_size;
+    for my $cookie (@$cookies) {
+      
+      # Convert max age to expires
+      my $age = $cookie->max_age;
+      if (Re->m($age, "^\d+$")) {
+        my $age_int = (int)$age;
+        $cookie->set_expires($age <= 0 ? (long)0 : $age + Sys->time) ;
+      }
+      
+      # Check cookie size
+      if (length $cookie->value > $size) {
+        next;
+      }
+      
+      # Replace cookie
+      my $domain = Fn->lc($cookie->domain // "");
+      unless (length $domain) {
+        next;
+      }
+      my $path = $cookie->path;
+      unless (length $path) {
+        next;
+      }
+      my $name = $cookie->name;
+      unless (length $name) {
+        next;
+      }
+      
+      my $jar_list = (List of Mojo::Cookie::Response)$self->{jar}->get($domain);
+      
+      unless ($jar_list) {
+        $jar_list = List->new(new Mojo::Cookie::Response[0]);
+      }
+      
+      my $replaced = 0;
+      for (my $i = 0; $i < $jar_list->length; $i++) {
+        my $cookie_cur = (Mojo::Cookie::Response)$jar_list->get($i);
+        if (&_compare($cookie_cur, $path, $name, $domain)) {
+          $jar_list->set($i, $cookie);
+          $replaced = 1;
+          last;
+        }
+      }
+      
+      unless ($replaced) {
+        $jar_list->push($cookie);
+      }
+      
+      $self->{jar}->set($domain, $jar_list);
+    }
+    
+  }
+  
 }
 

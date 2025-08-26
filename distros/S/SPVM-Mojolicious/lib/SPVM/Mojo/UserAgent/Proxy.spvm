@@ -18,17 +18,9 @@ class Mojo::UserAgent::Proxy {
   has not : rw string[];
   
   # Class Methods
-  static method new : Mojo::UserAgent::Proxy ($options : object[] = undef) {
-    
-    my $options_h = Hash->new($options);
+  static method new : Mojo::UserAgent::Proxy () {
     
     my $self = new Mojo::UserAgent::Proxy;
-    
-    $self->{http} = $options_h->get_string("http");
-    
-    $self->{https} = $options_h->get_string("https");
-    
-    $self->{not} = (string[])$options_h->get("not");
     
     return $self;
   }
@@ -82,7 +74,9 @@ class Mojo::UserAgent::Proxy {
   
   method prepare : void ($tx : Mojo::Transaction::HTTP) {
     
-    if (length Sys->env("SPVM_MOJO_PROXY")) {
+    my $env_mojo_proxy = length(my $_ = Sys->env("SPVM_MOJO_PROXY")) ? (int)$_ : 0;
+    
+    if ($env_mojo_proxy) {
       $self->detect;
     }
     

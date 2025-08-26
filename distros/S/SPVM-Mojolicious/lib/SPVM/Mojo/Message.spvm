@@ -15,6 +15,9 @@ class Mojo::Message extends Mojo::EventEmitter {
   use JSON;
   use Mojo::Content::MultiPart;
   
+  # Interfaces
+  interface Stringable;
+  
   # Fields
   has content : rw Mojo::Content
     get {

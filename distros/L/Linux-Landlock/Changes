@@ -1,3 +1,8 @@
+0.9   2025-08-24
+     - add support for Landlock ABI 6
+     - add the option to restrict the used ABI version
+     - deprecate ll_create_fs_ruleset/ll_create_net_ruleset. Will be removed before 1.0.
+
 0.8   2024-06-15T00:17:56+02:00
      - add support for Landlock ABI 5
      - switch to Math::BigInt to support pure 32-bit Perls

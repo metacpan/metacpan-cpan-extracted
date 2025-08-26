@@ -17,6 +17,8 @@ See L<https://docs.kernel.org/userspace-api/landlock.html> for more information 
 
     use Linux::Landlock::Direct qw(:functions :constants set_no_new_privs);
 
+    # optional: restrict the Landlock functionality that can be used
+    ll_set_max_abi_version(4);
     # create a new ruleset with all supported actions
     my $ruleset_fd = ll_create_ruleset()
       or die "ruleset creation failed: $!\n";
@@ -28,7 +30,7 @@ See L<https://docs.kernel.org/userspace-api/landlock.html> for more information 
         $dir,
     );
     # NO_NEW_PRIVS is required for ll_restrict_self() to work, it can be set by any means, e.g. inherited or
-    # set via some other module; this implementation just exists for convenience
+    # set via some other module; this implementation just exists for convenience. This cannot be undone.
     set_no_new_privs();
     # apply the ruleset to the current process and future children. This cannot be undone.
     ll_restrict_self($ruleset_fd);
@@ -41,6 +43,16 @@ See L<https://docs.kernel.org/userspace-api/landlock.html> for more information 
 
 Int, returns the ABI version of the Landlock implementation. Minimum version is 1.
 Returns -1 on error.
+
+=item ll_set_max_abi_version($max_version)
+
+Sets the maximum ABI version to use. This prevents unexpected behaviour changes when
+your application is running on a newer ABI version.
+
+This should be set to the highest version you tested with.
+
+If this is not used, or called with an undef argument, the maximum supported ABI
+version will be used. This means future kernels could break your application.
 
 =item ll_create_fs_ruleset(@actions)
 
@@ -57,10 +69,15 @@ Int (file descriptor), like L</ll_create_fs_ruleset(@actions)>, but for network 
 
 This requires an ABI version of at least 4. Returns undef on error.
 
-=item ll_create_ruleset($fs_actions, $net_actions)
+=item ll_create_scoped_ruleset(@actions)
 
-Int (file descriptor), creates a new Landlock ruleset that can cover file system
-and network actions at the same time. Returns undef on error.
+Int (file descriptor), creates a new Landlock ruleset that covers "scoped" actions.
+
+=item ll_create_ruleset($fs_actions, $net_actions, $scoped_actions)
+
+Int (file descriptor), creates a new Landlock ruleset that can cover file system,
+network, and scoped actions at once. If no arguments are provided, it defaults to all possible
+actions at the same time. Returns undef on error.
 
 =item ll_add_path_beneath_rule($ruleset_fd, $allowed_access, $parent)
 
@@ -152,6 +169,11 @@ C<%LANDLOCK_ACCESS_NET>
     BIND_TCP
     CONNECT_TCP
 
+C<%%LANDLOCK_SCOPED>
+
+    ABSTRACT_UNIX_SOCKET
+    SIGNAL
+
 C<%LANDLOCK_RULE>
 
     PATH_BENEATH
@@ -175,11 +197,14 @@ ensure that the rules are applied in each thread.
 use strict;
 use warnings;
 use Exporter 'import';
-use List::Util                qw(reduce);
+use List::Util                qw(reduce min);
 use POSIX                     qw();
 use Linux::Landlock::Syscalls qw(NR Q_pack);
 use Math::BigInt;
-our $VERSION = '0.8';
+
+our $VERSION         = '0.9';
+our $MAX_ABI_VERSION = 6;
+
 # adapted from linux/landlock.ph, architecture independent consts
 my $LANDLOCK_CREATE_RULESET_VERSION = (1 << 0);
 our %LANDLOCK_ACCESS_FS = (
@@ -209,6 +234,11 @@ our %LANDLOCK_ACCESS_NET = (
     BIND_TCP    => Math::BigInt->new(1)->blsft(0),
     CONNECT_TCP => Math::BigInt->new(1)->blsft(1),
 );
+our %LANDLOCK_SCOPED = (
+    # ABI version 6
+    ABSTRACT_UNIX_SOCKET => Math::BigInt->new(1)->blsft(0),
+    SIGNAL               => Math::BigInt->new(1)->blsft(1),
+);
 our %LANDLOCK_RULE = (
     PATH_BENEATH => 1,
     NET_PORT     => 2,
@@ -218,14 +248,18 @@ our @EXPORT_OK = qw(
   ll_create_ruleset
   ll_create_fs_ruleset
   ll_create_net_ruleset
+  ll_create_scoped_ruleset
   ll_add_path_beneath_rule
   ll_add_net_port_rule
   ll_all_fs_access_supported
   ll_all_net_access_supported
+  ll_all_scoped_supported
   ll_restrict_self
+  ll_set_max_abi_version
   set_no_new_privs
   %LANDLOCK_ACCESS_FS
   %LANDLOCK_ACCESS_NET
+  %LANDLOCK_SCOPED
   %LANDLOCK_RULE
 );
 our %EXPORT_TAGS = (
@@ -234,29 +268,29 @@ our %EXPORT_TAGS = (
 );
 
 my %MAX_FS_SUPPORTED = (
-    -1 => 0,
-    1  => $LANDLOCK_ACCESS_FS{MAKE_SYM},
-    2  => $LANDLOCK_ACCESS_FS{REFER},
-    3  => $LANDLOCK_ACCESS_FS{TRUNCATE},
-    4  => $LANDLOCK_ACCESS_FS{TRUNCATE},
-    5  => $LANDLOCK_ACCESS_FS{IOCTL_DEV},
+    1 => $LANDLOCK_ACCESS_FS{MAKE_SYM},
+    2 => $LANDLOCK_ACCESS_FS{REFER},
+    3 => $LANDLOCK_ACCESS_FS{TRUNCATE},
+    4 => $LANDLOCK_ACCESS_FS{TRUNCATE},
+    5 => $LANDLOCK_ACCESS_FS{IOCTL_DEV},
+    6 => $LANDLOCK_ACCESS_FS{IOCTL_DEV},
 );
-my %MAX_NET_SUPPORTED = (
-    -1 => 0,
-    1  => 0,
-    2  => 0,
-    3  => 0,
-    4  => $LANDLOCK_ACCESS_NET{CONNECT_TCP},
-);
+my %MAX_NET_SUPPORTED    = (4 => $LANDLOCK_ACCESS_NET{CONNECT_TCP},);
+my %MAX_SCOPED_SUPPORTED = (6 => $LANDLOCK_SCOPED{SIGNAL},);
 
-my ($abi_version, $fs_access_supported, $net_port_supported);
+my ($abi_version, $max_abi_version, $fs_access_supported, $net_port_supported, $scoped_supported);
+
+sub ll_set_max_abi_version {
+    my ($max_version) = @_;
+    undef $abi_version;
+    return $max_abi_version = $max_version;
+}
 
 sub ll_all_fs_access_supported {
     if (!defined $fs_access_supported) {
-        my $version = ll_get_abi_version();
-        $version             = 5 if $version > 5;
+        my $version = min($MAX_ABI_VERSION, ll_get_abi_version());
         $fs_access_supported = reduce { $a | $b } Math::BigInt->new(0),
-          grep { $_ <= $MAX_FS_SUPPORTED{$version} } values %LANDLOCK_ACCESS_FS;
+          grep { $_ <= $MAX_FS_SUPPORTED{$version} // 0 } values %LANDLOCK_ACCESS_FS;
     }
     return $fs_access_supported;
 }
@@ -264,41 +298,57 @@ sub ll_all_fs_access_supported {
 sub ll_all_net_access_supported {
     if (!defined $net_port_supported) {
         my $version = ll_get_abi_version();
-        $version = 4 if $version > 4;
+        $version = min(4, $version);
         $net_port_supported =
           reduce { $a | $b } Math::BigInt->new(0),
-          grep { $_ <= $MAX_NET_SUPPORTED{$version} } values %LANDLOCK_ACCESS_NET;
+          grep { $_ <= $MAX_NET_SUPPORTED{$version} // 0 } values %LANDLOCK_ACCESS_NET;
     }
     return $net_port_supported;
 }
 
+sub ll_all_scoped_supported {
+    if (!defined $scoped_supported) {
+        my $version = ll_get_abi_version();
+        $version = min(6, $version);
+        $scoped_supported =
+          reduce { $a | $b } Math::BigInt->new(0),
+          grep { $_ <= $MAX_SCOPED_SUPPORTED{$version} // 0 } values %LANDLOCK_SCOPED;
+    }
+    return $scoped_supported;
+}
+
 sub ll_get_abi_version {
-    my $nr = NR('landlock_create_ruleset')
-      or return -1;
-    $abi_version = syscall($nr, undef, 0, $LANDLOCK_CREATE_RULESET_VERSION);
+    if (!defined $abi_version) {
+        if (my $nr = NR('landlock_create_ruleset')) {
+            $abi_version = syscall($nr, undef, 0, $LANDLOCK_CREATE_RULESET_VERSION);
+            $abi_version = min($abi_version, $max_abi_version // $abi_version);
+        } else {
+            $abi_version = -1;
+        }
+    }
     return $abi_version;
 }
 
+#@deprecated
 sub ll_create_fs_ruleset {
-    my (@actions) = @_;
-    # handle all known and supported actions if none are specified
-    @actions = ll_all_fs_access_supported() unless @actions;
-    return ll_create_ruleset(\@actions, []);
+    my ($actions) = @_;
+    return ll_create_ruleset($actions, Math::BigInt->bzero);
 }
 
+#@deprecated
 sub ll_create_net_ruleset {
-    my (@actions) = @_;
-    # handle all known and supported actions if none are specified
-    @actions = ll_all_net_access_supported() unless @actions;
-    return ll_create_ruleset([], \@actions);
+    my ($actions) = @_;
+    return ll_create_ruleset(Math::BigInt->bzero, $actions);
 }
 
 sub ll_create_ruleset {
-    my ($fs_actions, $net_actions) = @_;
-
-    my $allowed = Q_pack(reduce { $a | $b } Math::BigInt->new(0), @$fs_actions);
+    my ($fs_actions, $net_actions, $scoped_actions) = @_;
+    my $allowed = Q_pack($fs_actions // ll_all_fs_access_supported());
     if (ll_get_abi_version >= 4) {
-        $allowed .= Q_pack(reduce { $a | $b } Math::BigInt->new(0), @$net_actions);
+        $allowed .= Q_pack($net_actions // ll_all_net_access_supported());
+    }
+    if (ll_get_abi_version >= 6) {
+        $allowed .= Q_pack($scoped_actions // ll_all_scoped_supported());
     }
     my $nr = NR('landlock_create_ruleset') or return;
     my $fd = syscall($nr, $allowed, length $allowed, 0);
@@ -313,7 +363,7 @@ sub ll_add_path_beneath_rule {
     my ($ruleset_fd, $allowed_access, $parent) = @_;
 
     my $fd      = ref $parent ? fileno $parent : $parent;
-    my $applied = $allowed_access & ll_all_fs_access_supported;
+    my $applied = $allowed_access & ll_all_fs_access_supported();
     my $nr      = NR('landlock_add_rule') or return;
     my $result  = syscall($nr, $ruleset_fd, $LANDLOCK_RULE{PATH_BENEATH}, Q_pack($applied) . pack('l', $fd), 0);
     return ($result == 0) ? $applied : undef;
@@ -322,7 +372,7 @@ sub ll_add_path_beneath_rule {
 sub ll_add_net_port_rule {
     my ($ruleset_fd, $allowed_access, $port) = @_;
 
-    my $applied = $allowed_access & ll_all_net_access_supported;
+    my $applied = $allowed_access & ll_all_net_access_supported();
     my $nr      = NR('landlock_add_rule') or return;
     my $result =
       syscall($nr, $ruleset_fd, $LANDLOCK_RULE{NET_PORT}, Q_pack($applied) . Q_pack(Math::BigInt->new($port)), 0);

@@ -29,6 +29,14 @@ Mojo::Path class in L<SPVM> is a container for paths used by L<Mojo::URL|SPVM::M
   $parts_list->push("mojolicious");
   say $path->to_string;
 
+=head1 Interfaces
+
+=over 2
+
+=item * L<Stringable|SPVM::Stringable>
+
+=back
+
 =head1 Fields
 
 =head2 parts

@@ -11,11 +11,12 @@ use Graphics::Framebuffer;
 use List::Util qw(min max shuffle);
 use Time::HiRes qw(sleep time alarm);
 use Getopt::Long;
+use Pod::Usage;
 
 # use Data::Dumper;$Data::Dumper::Sortkeys=1; $Data::Dumper::Purity=1; $Data::Dumper::Deepcopy=1;
 
 BEGIN {
-    our $VERSION = '6.01';
+    our $VERSION = '6.03';
 }
 
 our $F;
@@ -24,14 +25,18 @@ my $new_x;
 my $new_y;
 my $dev      = 0;
 my $psize    = 1;
+my $delay    = 3;
 my $noaccel  = FALSE;
 my $nosplash = FALSE;
-my $delay    = 3;
 my $ignore_x = FALSE;
 my $small    = FALSE;
+my $help     = FALSE;
+my $man      = FALSE;
 my $show_func;
 
 GetOptions(
+	'help|?'           => \$help,
+	'man'              => \$man,
     'x=i'              => \$new_x,
     'y=i'              => \$new_y,
     'dev=i'            => \$dev,
@@ -43,6 +48,9 @@ GetOptions(
     'ignore-x-windows' => \$ignore_x,
     'small'            => \$small,
 );
+
+pod2usage(1) if ($help);
+pod2usage(-exitval => 0, -verbose => 2) if ($man);
 
 $noaccel = ($noaccel) ? 1 : 0;    # Only 1 or 0 please
 if ($small) {
@@ -132,6 +140,7 @@ $F->cls();
 my %func = (
     'Color Mapping'                     => sub { color_mapping(shift); },
     'Plotting'                          => sub { plotting(shift); },
+	'Moire'                             => sub { moire(shift); },
     'Lines'                             => sub { lines(shift, 0); },
     'Angle Lines'                       => sub { angle_lines(shift, 0); },
     'Polygons'                          => sub { polygons(shift, 0); },
@@ -206,6 +215,7 @@ if (defined($show_func)) {
     @order = (
         'Color Mapping',
         'Plotting',
+		'Moire',
         'Lines',
         'Angle Lines',
         'Polygons',
@@ -368,6 +378,37 @@ sub plotting {
         $F->set_color({ 'alpha' => 255, 'red' => int(rand(256)), 'green' => int(rand(256)), 'blue' => int(rand(256)) });
         $F->plot({ 'x' => $x, 'y' => $y, 'pixel_size' => $psize });
     }
+}
+
+sub moire {
+	my $name = shift;
+
+	print_it($F, $name);
+
+	my @g;
+
+	foreach my $j (1.. 3) {
+		foreach my $i (1 .. 3) {
+			$g[$i][$j] = <DATA>;
+		}
+	}
+	my $h = $screen_height;
+	my $w = $screen_width;
+	for(my $y=0;$y<=$h;$y = $y + 4) {
+		for(my $x=0;$x<=$w;$x = $x + 4) {
+			my $i = 2 * ($x / $w);
+			my $j = 2 * ($y / $h);
+			my $r = sqrt($i * $i + $j * $j);
+			my $v = abs(0.5 * (sin(9 *  $i * $r) + cos(6 * $j * $r)));
+			my $c = int(9.9999 * $v);
+			if ($g[1 + $x - 3 * int($x / 3)][1 + $y - 3 * int($y / 3)] <= $c) {
+				$F->setcolor({'red' => 0, 'green' => 0, 'blue' => 255});
+			} else {
+				$F->setcolor({'red' => 255, 'green' => 0, 'blue' => 0});
+			}
+			$F->plot({'x' => $x, 'y' => $y, 'pixel_size' => 4});
+		}
+	}
 }
 
 sub lines {
@@ -1659,6 +1700,28 @@ sub print_it {
 	$fb->acceleration($acc);
 } ## end sub print_it
 
+# The data below is used for the Moire subroutine
+
+__DATA__
+4
+9
+6
+5
+1
+2
+8
+3
+7
+4
+9
+6
+5
+1
+2
+8
+3
+7
+
 __END__
 
 =head1 NAME
@@ -1671,7 +1734,7 @@ This script demonstrates the capabilities of the Graphics::Framebuffer module
 
 =head1 SYNOPSIS
 
- perl primitives.pl [--dev=device number] [--x=X emulated resolution] [--y=Y emulated resolution] [--pixel=pixel size] [--noaccel]
+ perl primitives.pl [options]
 
 =over 2
 
@@ -1694,6 +1757,18 @@ Examples:
 =head1 OPTIONS
 
 =over 2
+
+=item B<--help>
+
+Print brief help instructions
+
+=item B<--man>
+
+Print the full manual page
+
+=item B<--nosplash>
+
+Turn off the splash screen
 
 =item B<--dev>=C<device number>
 
@@ -1731,6 +1806,12 @@ Changes the amount of time given to each function
 
 Instead of running all functions, just run one or more (separated by commas)
 
+=item B<ignore-x-windows>
+
+DANGEROUS TO USE!
+
+This will turn off all checks for Wayland and X-Windows.  It will try to initialize a framebuffer anyway.
+
 =back
 
 =head1 NOTES
@@ -1755,3 +1836,5 @@ GNU Public License Version 3.0
 * See the "LICENSE" file in the distribution for this license.
 
 This program must always be included as part of the Graphics::Framebuffer package.
+
+=cut

@@ -30,6 +30,14 @@ Mojo::Headers class in L<SPVM> is a container for HTTP headers, based on L<RFC 7
   $headers->set_content_type("text/plain");
   say $headers->to_string;
 
+=head1 Interfaces
+
+=over 2
+
+=item * L<Stringable|SPVM::Stringable>
+
+=back
+
 =head1 Fields
 
 =head2 max_line_size

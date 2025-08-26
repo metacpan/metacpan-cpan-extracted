@@ -8,6 +8,9 @@ class Mojo::Date {
   use Sys;
   use Math;
   
+  # Interfaces
+  interface Stringable;
+  
   has epoch : virtual rw double
     get {
       my $epoch = (double)$self->epoch_sec;

@@ -159,7 +159,7 @@ the current controller
 
 has controller => sub ($self) {
     return $self->user->controller if $self->user;
-}, weak => 1;
+};
 
 =head2 app
 

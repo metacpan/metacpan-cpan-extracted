@@ -11,6 +11,7 @@ child processes.
 
 Since the restrictions are set at runtime, from within the process itself,
 you can take into account dynamic information from your configuration.
+
 For example, a server that is supposed to serve files from a specific directory
 can restrict itself to that directory and its subdirectories to mitigate any bugs
 allowing directory traversal attacks. This is much less intrusive than chroot
@@ -28,7 +29,7 @@ about Landlock.
 
       use Linux::Landlock;
 
-      my $ruleset = Linux::Landlock->new(); # this can die
+      my $ruleset = Linux::Landlock->new(supported_abi_version => 4); # this can die
       $ruleset->add_path_rule('/etc/fstab', qw(read_file));
       $ruleset->add_net_rule(22222, qw(bind_tcp));
       $ruleset->apply();
@@ -43,13 +44,26 @@ about Landlock.
       IO::Socket::INET->new(LocalPort => 33333, Proto => 'tcp') or print "failed: $!\n"; # failed
       IO::Socket::INET->new(LocalPort => 22222, Proto => 'tcp') and print "succeeded\n"; # succeeded
 
-- new(\[handled\_fs\_actions => \\@fs\_actions, handled\_net\_actions => \\@net\_actions, die\_on\_unsupported => 1|0\])
+- new(\[handled\_fs\_actions => \\@fs\_actions, handled\_net\_actions => \\@net\_actions, restricted\_ipc => \\@ipc\_actions, die\_on\_unsupported => 1|0\])
 
     Create a new [Linux::Landlock](https://metacpan.org/pod/Linux%3A%3ALandlock) instance.
+
+    `supported_abi_version` indicates the highest ABI version you want to use. It is highly
+    recommended to set this, typically to the version you are testing with.
+    The reason is that restrictions added by newer ABI versions might break you program.
+    If not set, the running kernel's ABI version is used.
 
     `handled_fs_actions` and `handled_net_actions` restrict the set of actions that can be used in rules and that
     will be prevented if not allowed by any rule. By default, all actions supported by the kernel and known to this
     module are covered. This should usually not be changed.
+
+    `restricted_ipc` lists the IPC mechanisms this ruleset should restrict. By default, all IPC mechanisms are
+    restricted. Note that this cannot be changed after calling new().
+
+    Possible IPC mechanisms are:
+
+        abstract_unix_socket
+        signal
 
     If `die_on_unsupported` is set to a true value, the module will die if an unsupported access right is requested.
     Otherwise, access rights will be set on a best-effort basis, as intended by the upstream Landlock API design. This
@@ -90,6 +104,9 @@ about Landlock.
 
     See  [https://docs.kernel.org/userspace-api/landlock.html](https://docs.kernel.org/userspace-api/landlock.html) for all possible access rights.
 
+    Note that **refer** is special. It is only available starting at ABI version 2, but its restrictions
+    are also applied with ABI version 1.
+
     This method dies on error. Errors are: non-existing or non-accessible paths and empty rules.
     If `die_on_unsupported` is used, it will also die if the rules are not supported by the
     current kernel.
@@ -125,8 +142,8 @@ version 3 (kernel version 6.2 or newer, unless backported).
 
 Network functionality is only available since ABI version 4.
 
-Also keep in mind, that some Perl, or even libc, functions might implicitly rely
-on file system access that could have been restricted by Landlock.
+Also keep in mind, that some Perl modules can implicitly rely on operations
+that are restricted by the Landlock rules you apply, so test carefully.
 
 # AUTHOR
 
@@ -134,7 +151,7 @@ Marc Ballarin, <ballarin.marc@gmx.de>
 
 # COPYRIGHT AND LICENSE
 
-Copyright (C) 2024 by Marc Ballarin
+Copyright (C) 2024-2025 by Marc Ballarin
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

@@ -23,7 +23,7 @@ use File::Basename;
 # use Data::Dumper::Simple; $Data::Dumper::Sortkeys = 1; $Data::Dumper::Purity = 1; $Data::Dumper::Deepcopy = 1;
 
 BEGIN {
-    our $VERSION = '2.00';
+    our $VERSION = '2.01';
 }
 
 my $errors           = FALSE;
@@ -180,7 +180,7 @@ sub gather {
                 if (defined($r)) {
                     @pics = (@pics, @{$r});
                 }
-            } elsif (-f "$path/$file" && $file =~ /\.(jpg|jpeg|gif|tiff|bmp|png)$/i) {
+            } elsif (-f "$path/$file" && $file =~ /\.(jpg|jpeg|gif|tiff|bmp|png|mkv|mp4|avi|mpeg4|webp)$/i) {
                 push(@pics, "$path/$file");
             }
         } ## end foreach my $file (@dir)

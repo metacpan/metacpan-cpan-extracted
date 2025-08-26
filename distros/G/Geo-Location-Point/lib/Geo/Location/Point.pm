@@ -6,7 +6,7 @@ use warnings;
 
 use Carp;
 use GIS::Distance;
-use Params::Get;
+use Params::Get 0.13;
 use Scalar::Util;
 
 use overload (
@@ -23,11 +23,11 @@ Geo::Location::Point - Location information
 
 =head1 VERSION
 
-Version 0.14
+Version 0.15
 
 =cut
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 =head1 SYNOPSIS
 
@@ -68,7 +68,7 @@ sub new {
 		Carp::carp(__PACKAGE__, ': latitude not given');
 		return;
 	}
-	if(abs($params->{'lat'}) > 180) {
+	if(abs($params->{'lat'}) > 90) {
 		Carp::carp(__PACKAGE__, ': ', $params->{'lat'}, ': invalid latitude');
 		return;
 	}
@@ -184,8 +184,9 @@ sub equal {
 	my $self = shift;
 	my $other = shift;
 
-	# return ($self->distance($other) <= 1e-9);
-	return((abs($self->lat() - $other->lat()) <= 1e-9) && (abs(($self->long() - $other->long())) <= 1e-9));
+	# return ($self->distance($other) <= 1e-5);
+	# 1e-5 is about 1m, that's tolerant enough
+	return((abs($self->lat() - $other->lat()) <= 1e-5) && (abs(($self->long() - $other->long())) <= 1e-5));
 }
 
 =head2	not_equal
@@ -262,6 +263,7 @@ sub as_string {
 		$rc = ucfirst(lc($rc));
 	}
 
+	# TODO: make this order configurable
 	# foreach my $field('house_number', 'number', 'road', 'street', 'AccentCity', 'city', 'county', 'region', 'state_district', 'state', 'country') {
 	foreach my $field('house_number', 'number', 'road', 'street', 'city', 'county', 'region', 'state_district', 'state', 'country') {
 		if(my $value = ($self->{$field} || $self->{ucfirst($field)})) {
@@ -335,7 +337,7 @@ sub as_uri
 {
 	my $self = shift;
 
-	return 'geo:' . $self->{'latitude'} . ',' . $self->{'longitude'};
+	return 'geo:' . $self->{'lat'} . ',' . $self->{'long'};
 }
 
 =head2	attr
@@ -361,18 +363,20 @@ sub AUTOLOAD {
 
 	if(my $value = shift) {
 		delete $self->{'location'};	# Invalidate the cache
+		delete $self->{'tz'};	# Invalidate the cache
 		$self->{$key} = $value;
 	}
 
 	return $self->{$key} || $self->{ucfirst($key)}
 }
 
+=head1 SUPPORT
+
+This module is provided as-is without any warranty.
+
 =head1 AUTHOR
 
-Nigel Horne <njh@nigelhorne.com>
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+Nigel Horne, C<< <njh at nigelhorne.com> >>
 
 =head1 BUGS
 

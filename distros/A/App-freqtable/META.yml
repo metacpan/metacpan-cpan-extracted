@@ -19,7 +19,7 @@ name: App-freqtable
 provides:
   App::freqtable:
     file: lib/App/freqtable.pm
-    version: '0.009'
+    version: '0.010'
 requires:
   Getopt::Long: '2.50'
   POSIX: '0'
@@ -30,7 +30,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-freqtable
   homepage: https://metacpan.org/release/App-freqtable
   repository: git://github.com/perlancar/perl-App-freqtable.git
-version: '0.009'
+version: '0.010'
 x_Dist_Zilla:
   perl:
     version: '5.040002'

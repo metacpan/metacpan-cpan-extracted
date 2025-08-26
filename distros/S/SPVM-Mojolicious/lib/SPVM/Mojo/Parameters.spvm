@@ -8,6 +8,9 @@ class Mojo::Parameters {
   use Hash;
   use Sort;
   
+  # Interfaces
+  interface Stringable;
+  
   # Fields
   has pairs : rw virtual string[]
     get {

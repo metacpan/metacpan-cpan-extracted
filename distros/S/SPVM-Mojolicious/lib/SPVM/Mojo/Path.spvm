@@ -7,6 +7,9 @@ class Mojo::Path {
   use Mojo::Util;
   use Re;
   
+  # Interfaces
+  interface Stringable;
+  
   # Fields
   has parts : virtual rw string[]
     get {

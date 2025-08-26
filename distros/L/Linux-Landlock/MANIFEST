@@ -13,6 +13,8 @@ lib/Linux/Landlock/Syscalls.pm
 lib/Linux/Landlock.pm
 t/01_direct_fs.t
 t/02_direct_net.t
+t/03_direct_scoped.t
+t/04_direct_pinned_abi.t
 t/10_ruleset.t
 t/data/a
 t/data/b

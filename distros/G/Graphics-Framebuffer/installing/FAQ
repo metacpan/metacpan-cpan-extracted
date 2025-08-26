@@ -5,7 +5,7 @@
 
 Q:  Does GFB play video?
 
-A:  No, it will only pay animated GIFs that fit in memory.
+A:  No, it will only play animated GIFs that fit in memory.
 
     However, if you install "mplayer", then you can play videos with it.  It
     will use the "fbdev" display driver.  Keep in mind this is not a GPU

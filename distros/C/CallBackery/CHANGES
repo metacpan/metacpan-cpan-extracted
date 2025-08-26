@@ -1,3 +1,7 @@
+0.55.3 2025-08-25 16:37:31 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - fix spelling Runnning -> Running
+
 0.55.2 2025-06-12 17:35:56 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - fix fake login page format

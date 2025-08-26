@@ -5,6 +5,6 @@ class Mojo::UserAgent::Transactor::Callback::Generator : interface_t {
   
   use Mojo::Transaction::HTTP;
   
-  required method : Mojo::Transaction::HTTP ($transactor : Mojo::UserAgent::Transactor, $tx : Mojo::Transaction::HTTP, $args : object[]);
+  required method : Mojo::Transaction::HTTP ($transactor : Mojo::UserAgent::Transactor, $tx : Mojo::Transaction::HTTP, $arg1 : object = undef, $arg2 : object = undef, $arg3 : object = undef);
   
 }

@@ -9,10 +9,10 @@ use IO::Socket::INET;
 
 if (ll_get_abi_version() < 4) {
     ok(scalar ll_all_net_access_supported() == 0, "no support");
-    ok(!defined ll_create_net_ruleset(),          "net ruleset creation failed");
+    ok(!defined ll_create_ruleset(),          "net ruleset creation failed");
 } else {
     ok(scalar ll_all_net_access_supported() >= 2, "plausible list");
-    my $ruleset_fd = ll_create_net_ruleset();
+    my $ruleset_fd = ll_create_ruleset();
     ok($ruleset_fd > 0, "ruleset created");
     is(
         ll_add_net_port_rule($ruleset_fd, $LANDLOCK_ACCESS_NET{BIND_TCP}, 33333),

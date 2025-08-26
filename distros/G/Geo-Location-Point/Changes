@@ -1,5 +1,11 @@
 Revision history for Geo::Location::Point
 
+0.15	Mon Aug 25 13:51:01 EDT 2025
+	Check maximum latitude is 90, not 180
+	Use members consistently
+	Ensure tz cache is also invalidated when assigning new location
+	More realistic equals (1e-5 = 1m, 1e-9 is 0.1mm)
+
 0.14	Fri Jul  4 11:03:02 EDT 2025
 	Retrieve "Country" when asking for "country"
 	Use Params::Get

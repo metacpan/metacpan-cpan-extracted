@@ -130,7 +130,7 @@ qx.Class.define("callbackery.data.Server", {
             };
             var newArgs = Array.prototype.slice.call(arguments);
             newArgs[0] = superHandler;
-            busy.manifest('Runnning ' + methodName);
+            busy.manifest('Running ' + methodName);
             this.callAsync.apply(this, newArgs);
         },
         /**

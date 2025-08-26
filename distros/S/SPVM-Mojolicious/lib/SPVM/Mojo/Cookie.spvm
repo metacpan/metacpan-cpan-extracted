@@ -4,6 +4,9 @@
 class Mojo::Cookie {
   version_from Mojolicious;
   
+  # Interfaces
+  interface Stringable;
+  
   # Fields
   has name : rw string;
   

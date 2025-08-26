@@ -35,7 +35,7 @@
             "Carp" : "0",
             "ExtUtils::MakeMaker" : "6.64",
             "GIS::Distance" : "0",
-            "Params::Get" : "0",
+            "Params::Get" : "0.13",
             "Scalar::Util" : "0",
             "perl" : "5.010000"
          }
@@ -66,6 +66,6 @@
          "x_repository" : "https://github.com/nigelhorne/Geo-Location-Point"
       }
    },
-   "version" : "0.14",
+   "version" : "0.15",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -19,80 +19,187 @@ class Mojo::UserAgent extends Mojo::EventEmitter {
     READ_BUFFER_SIZE = 4086,
   }
   
-  # Class Variables
+  # Undocumented Class Variables
   our $DEBUG : ro byte;
   INIT {
-    if (length(my $_ = Sys->env("SPVM_MOJO_CLIENT_DEBUG"))) {
-      $DEBUG = (byte)$_;
-    }
+    $DEBUG = length(my $_ = Sys->env("SPVM_MOJO_CLIENT_DEBUG")) ? (byte)$_ : (byte)0;
   }
   
   # Fields
-  has max_response_size : rw int;
+  has ca : rw string
+    get {
+      unless (exists $self->{ca}) {
+        $self->{ca} = length(my $_ = Sys->env("SPVM_MOJO_CA_FILE")) ? $_ : undef;
+      }
+      
+      return $self->{ca};
+    }
+  ;
+  
+  has cert : rw string
+    get {
+      unless (exists $self->{cert}) {
+        $self->{cert} = length(my $_ = Sys->env("SPVM_CERT_FILE")) ? $_ : undef;
+      }
+      
+      return $self->{cert};
+    }
+  ;
   
   has connect_timeout : rw double;
   
-  has inactivity_timeout : rw double;
+  has cookie_jar : rw Mojo::UserAgent::CookieJar
+    get {
+      unless (exists $self->{cookie_jar}) {
+        $self->{cookie_jar} = Mojo::UserAgent::CookieJar->new;
+      }
+      
+      return $self->{cookie_jar};
+    }
+  ;
   
-  has request_timeout : rw double;
+  has inactivity_timeout : rw double
+    get {
+      unless (exists $self->{inactivity_timeout}) {
+        $self->{inactivity_timeout} = length(my $_ = Sys->env("SPVM_MOJO_INACTIVITY_TIMEOUT")) ? (double)$_ : 40.0;
+      }
+      
+      return $self->{inactivity_timeout};
+    }
+  ;
   
-  has max_connections : rw int;
+  has insecure : rw byte
+    get {
+      unless (exists $self->{insecure}) {
+        $self->{insecure} = length(my $_ = Sys->env("SPVM_MOJO_INSECURE")) ? (byte)$_ : (byte)0;
+      }
+      
+      return $self->{insecure};
+    }
+  ;
   
-  has key : rw string;
+  has max_response_size : rw int;
   
-  has ca : rw string;
+  has key : rw string
+    get {
+      unless (exists $self->{key}) {
+        $self->{key} = length(my $_ = Sys->env("SPVM_MOJO_KEY_FILE")) ? $_ : undef;
+      }
+      
+      return $self->{key};
+    }
+  ;
   
-  has cert : rw string;
+  has max_connections : rw int
+    get {
+      unless (exists $self->{max_connections}) {
+        $self->{max_connections} = 5;
+      }
+      
+      return $self->{max_connections};
+    }
+  ;
   
-  has insecure : rw byte;
+  has max_redirects : rw int
+    get {
+      unless (exists $self->{max_redirects}) {
+        $self->{max_redirects} = length(my $_ = Sys->env("SPVM_MOJO_MAX_REDIRECTS")) ? (int)$_ : 0;
+      }
+      
+      return $self->{max_redirects};
+    }
+  ;
   
-  has max_redirects : rw int;
+  has proxy : rw Mojo::UserAgent::Proxy
+    get {
+      unless (exists $self->{proxy}) {
+        $self->{proxy} = Mojo::UserAgent::Proxy->new;
+      }
+      
+      return $self->{proxy};
+    }
+  ;
   
-  has socket_options : rw object[];
+  has request_timeout : rw double
+    get {
+      unless (exists $self->{request_timeout}) {
+        $self->{request_timeout} = length(my $_ = Sys->env("SPVM_MOJO_REQUEST_TIMEOUT")) ? (double)$_ : 0.0;
+      }
+      
+      return $self->{request_timeout};
+    }
+  ;
   
-  has tls_options : rw object[];
+  # TODO
+  # has server : Mojo::UserAgent::Server;
   
-  has transactor : rw Mojo::UserAgent::Transactor;
+  has socket_options : rw Hash
+    get {
+      unless (exists $self->{socket_options}) {
+        $self->{socket_options} = Hash->new;
+      }
+      
+      return $self->{socket_options};
+    }
+    set ($_ : object of object[]|Hash) {
+      if ($_ isa object[]) {
+        $self->{socket_options} = Hash->new((object[])$_);
+      }
+      elsif ($_ isa Hash) {
+        $self->{socket_options} = (Hash)$_;
+      }
+      elsif (!$_) {
+        $self->{socket_options} = undef;
+      }
+      else {
+        die "The type of socket_options option must be object[] or Hash.";
+      }
+    }
+  ;
   
-  has proxy : rw Mojo::UserAgent::Proxy;
+  has tls_options : rw Hash
+    get {
+      unless (exists $self->{tls_options}) {
+        $self->{tls_options} = Hash->new;
+      }
+      
+      return $self->{tls_options};
+    }
+    set ($_ : object of object[]|Hash) {
+      if (is_options $_) {
+        $self->{tls_options} = Hash->new((object[])$_);
+      }
+      elsif ($_ isa Hash) {
+        $self->{tls_options} = (Hash)$_;
+      }
+      elsif (!$_) {
+        $self->{tls_options} = undef;
+      }
+      else {
+        die "The type of tls_options option must be object[] or Hash.";
+      }
+    }
+  ;
   
-  has cookie_jar : rw Mojo::UserAgent::CookieJar;
+  has transactor : rw Mojo::UserAgent::Transactor
+    get {
+      unless (exists $self->{transactor}) {
+        $self->{transactor} = Mojo::UserAgent::Transactor->new;
+      }
+      
+      return $self->{transactor};
+    }
+  ;
   
+  # Uncodumented Fields
   has keep_alive_sockets_list : List of object[]; # endpoint and socket pairs 
   
-  # Undocumented Fields
   has connections_h : Hash of IO::Socket;
   
   # Class Methods
   static method new : Mojo::UserAgent () {
     
     my $self = new Mojo::UserAgent;
-    
-    $self->{max_response_size} = -1;
-    
-    $self->{connect_timeout} = length(my $_ = Sys->env("SPVM_MOJO_CONNECT_TIMEOUT")) ? (double)$_ : 0.0;
-    
-    $self->{inactivity_timeout} = length(my $_ = Sys->env("SPVM_MOJO_INACTIVITY_TIMEOUT")) ? (double)$_ : 0.0;
-    
-    $self->{request_timeout} = length(my $_ = Sys->env("SPVM_MOJO_REQUEST_TIMEOUT")) ? (double)$_ : 0.0;
-    
-    $self->{max_connections} = 5;
-    
-    $self->{key} = length(my $_ = Sys->env("SPVM_MOJO_KEY_FILE")) ? $_ : undef;
-    
-    $self->{ca} = length(my $_ = Sys->env("SPVM_MOJO_CA_FILE")) ? $_ : undef;
-    
-    $self->{cert} = length(my $_ = Sys->env("SPVM_CERT_FILE")) ? $_ : undef;
-    
-    $self->{proxy} = Mojo::UserAgent::Proxy->new;
-    
-    $self->{cookie_jar} = Mojo::UserAgent::CookieJar->new;
-    
-    $self->{insecure} = (byte)(length(my $_ = Sys->env("SPVM_MOJO_INSECURE")) ? (int)$_ : 0);
-    
-    $self->{max_redirects} = length(my $_ = Sys->env("SPVM_MOJO_MAX_REDIRECTS")) ? (int)$_ : 0;
-    
-    $self->{transactor} = Mojo::UserAgent::Transactor->new;
     
     $self->{keep_alive_sockets_list} = List->new(new object[0]);
     
@@ -101,446 +208,7 @@ class Mojo::UserAgent extends Mojo::EventEmitter {
     return $self;
   }
   
-  # Instance Methods
-  method get : Mojo::Transaction::HTTP ($url : object of string|Mojo::URL, $options : object[] = undef) {
-    
-    my $method = "GET";
-    
-    my $tx = $self->build_tx($method, $url, $options);
-    
-    $tx = $self->start($tx);
-    
-    return $tx;
-  }
-  
-  method head : Mojo::Transaction::HTTP ($url : object of string|Mojo::URL, $options : object[] = undef) {
-    
-    my $method = "HEAD";
-    
-    my $tx = $self->build_tx($method, $url, $options);
-    
-    $tx = $self->start($tx);
-    
-    return $tx;
-  }
-  
-  method delete : Mojo::Transaction::HTTP ($url : object of string|Mojo::URL, $options : object[] = undef) {
-    
-    my $method = "DELETE";
-    
-    my $tx = $self->build_tx($method, $url, $options);
-    
-    $tx = $self->start($tx);
-    
-    return $tx;
-  }
-  
-  method options : Mojo::Transaction::HTTP ($url : object of string|Mojo::URL, $options : object[] = undef) {
-    
-    my $method = "OPTIONS";
-    
-    my $tx = $self->build_tx($method, $url, $options);
-    
-    $tx = $self->start($tx);
-    
-    return $tx;
-  }
-  
-  method patch : Mojo::Transaction::HTTP ($url : object of string|Mojo::URL, $options : object[] = undef) {
-    
-    my $method = "PATCH";
-    
-    my $tx = $self->build_tx($method, $url, $options);
-    
-    $tx = $self->start($tx);
-    
-    return $tx;
-  }
-  
-  method post : Mojo::Transaction::HTTP ($url : object of string|Mojo::URL, $options : object[] = undef) {
-    
-    my $method = "POST";
-    
-    my $tx = $self->build_tx($method, $url, $options);
-    
-    $tx = $self->start($tx);
-    
-    return $tx;
-  }
-  
-  method put : Mojo::Transaction::HTTP ($url : object of string|Mojo::URL, $options : object[] = undef) {
-    
-    my $method = "PUT";
-    
-    my $tx = $self->build_tx($method, $url, $options);
-    
-    $tx = $self->start($tx);
-    
-    return $tx;
-  }
-  
-  method build_tx : Mojo::Transaction::HTTP ($method : string, $url : object of string|Mojo::URL, $options : object[] = undef) {
-    return $self->transactor->tx($method, $url, $options);
-  }
-  
-  method start : Mojo::Transaction::HTTP ($tx : Mojo::Transaction::HTTP) {
-    
-    # Application server
-    $self->emit(prepare => $tx);
-    my $url = $tx->req->url;
-    
-    # TODO
-    # $self->proxy->prepare($tx);
-    
-    # TODO
-    # $self->cookie_jar->prepare($tx);
-    
-    my $max = $self->max_response_size;
-    if ($max >= 0) {
-      $tx->res->set_max_message_size($max);
-    }
-    $self->emit(start => $tx);
-    
-    my $req = $tx->req;
-    
-    $tx = $self->request($tx);
-    
-    return $tx;
-  }
-  
-  private method request : Mojo::Transaction::HTTP ($tx : Mojo::Transaction::HTTP)  {
-    
-    my $method = $tx->req->method;
-    
-    my $url = $tx->req->url;
-    
-    my $options = (object[])undef;
-    
-    my $options_h = Hash->new($options);
-    
-    my $headers = (Mojo::Headers)$options_h->delete_or_default("headers", undef);
-    
-    my $request_timeout = $options_h->delete_or_default_double("request_timeout", $self->{request_timeout});
-    
-    for my $name (@{$options_h->keys}) {
-      die "The \$name option is not available.";
-    }
-    
-    unless ($headers) {
-      $headers = Mojo::Headers->new;
-      $tx->req->content->set_headers($headers);
-    }
-    
-    $tx = $self->connect($tx);
-    
-    $self->write_request($tx);
-    
-    $self->read_response($tx);
-    
-    $tx = $self->finish($tx);
-    
-    return $tx;
-  }
-  
-  method connect : Mojo::Transaction::HTTP ($tx : Mojo::Transaction::HTTP)  {
-    
-    my $handle = (IO::Socket)undef;
-    
-    # Reuse connection
-    {
-      my $_ = $self->transactor->endpoint($tx);
-      my $proto = (string)$_->[0];
-      my $host = (string)$_->[1];
-      my $port = (int)$_->[2];
-      my $endpoint = "$proto:$host:$port";
-      
-      if ($handle = $self->_dequeue($endpoint)) {
-        
-        if (&DEBUG) {
-          warn "-- Reusing connection ($proto://$host:$port)" ;
-        }
-        
-        unless ($tx->connection) {
-          $tx->set_kept_alive(1) ;
-        }
-        
-        $self->{connections_h}->set(Fn->to_address($tx) => $handle);
-        
-        $self->_process($tx);
-        
-        return $tx;
-      }
-    }
-    
-    # CONNECT request to proxy required
-    if (my $connect_tx = $self->_connect_proxy($tx)) {
-      return $connect_tx;
-    }
-    
-    my $t = $self->transactor;
-    
-    my $_ = $t->peer($tx);
-    my $proto = (string)$_->[0];
-    my $host = (string)$_->[1];
-    my $port = (int)$_->[2];
-    
-    unless ($proto eq "http" || $proto eq "https" || $proto eq "http+unix") {
-      die "Unsupported protocol: $proto";
-    }
-    
-    my $options_h = Hash->new;
-    $options_h->set(Timeout => $self->connect_timeout);
-    
-    if ($proto eq "http+unix") { $options_h->set(path => $host); }
-    else {
-      $options_h->set(address => $host);
-      $options_h->set(port => $port);
-    }
-    $options_h->set(socket_options => $self->socket_options);
-    
-    # TLS
-    my $tls = $proto eq "https";
-    
-    my $path = $options_h->get_string("path");
-    
-    # UNIX domain socket
-    if ($path) {
-      $options_h->set(Peer => $path);
-      
-      $handle = (IO::Socket)IO::Socket::UNIX->new($options_h->to_array);
-    }
-    
-    # IP socket
-    else {
-      $options_h->set(PeerAddr => $options_h->get_string("address"));
-      $options_h->delete("address");
-      $options_h->set(PeerPort => &_port($options_h));
-      $options_h->delete("port");
-      
-      my $socket_options = (object[])$options_h->get("socket_options");
-      if ($socket_options) {
-        for (my $i = 0; $i < @$socket_options; $i += 2) {
-          my $key = (string)$socket_options->[$i];
-          my $value = $socket_options->[$i + 1];
-          $options_h->set($key => $value);
-        }
-      }
-      $options_h->delete("socket_options");
-      
-      if ($tls) {
-        $options_h->set(tls => $tls);
-        $options_h->set(tls_ca => $self->ca);
-        $options_h->set(tls_cert => $self->cert);
-        $options_h->set(tls_key => $self->key);
-        
-        $options_h->set(tls_options => $self->tls_options);
-        if ($self->insecure) {
-          my $tls_options = (object[])$options_h->get("tls_options") // new object[0];;
-          $tls_options = Fn->merge_options($tls_options, [(object)0x00]);
-          $options_h->set(tls_options => $tls_options);
-        }
-        
-        $options_h->delete("tls_options");
-        $options_h->delete("tls");
-        $options_h->delete("tls_ca");
-        $options_h->delete("tls_cert");
-        $options_h->delete("tls_key");
-        
-        $handle = (IO::Socket)IO::Socket::SSL->new($options_h->to_array);
-      }
-      else {
-        $handle = (IO::Socket)IO::Socket::IP->new($options_h->to_array);
-      }
-    }
-    
-    $self->{connections_h}->set(Fn->to_address($tx) => $handle);
-    
-    if (&DEBUG) {
-      warn "-- Connect ($proto://$host:$port)";
-    }
-    
-    return $tx;
-  }
-  
-  private method write_request : void ($tx : Mojo::Transaction::HTTP) {
-    
-    my $req = $tx->req;
-    
-    my $handle = (IO::Socket)$self->{connections_h}->get(Fn->to_address($tx));
-    
-    my $start_line = $req->build_start_line;
-    
-    $handle->write($start_line);
-    
-    my $header_lines = $req->build_headers;
-    
-    $handle->write($header_lines);
-    
-    $handle->write("\r\n");
-  }
-  
-  private method read_response : void ($tx : Mojo::Transaction::HTTP) {
-    my $res = Mojo::Message::Response->new;
-    
-    my $handle = (IO::Socket)$self->{connections_h}->get(Fn->to_address($tx));
-    
-    while (1) {
-      my $chunk = (mutable string)new_string_len &READ_BUFFER_SIZE;
-      
-      my $read_length = $handle->read($chunk);
-      
-      if ($read_length == 0) {
-        $res->finish;
-        last;
-      }
-      
-      Fn->shorten($chunk, $read_length);
-      
-      $res->parse($chunk);
-      
-      if ($res->is_finished) {
-        last;
-      }
-    }
-    
-    $tx->set_res($res);
-  }
-  
-  private method _redirect : Mojo::Transaction::HTTP ($old : Mojo::Transaction::HTTP) {
-    
-    my $new = $self->transactor->redirect($old);
-    
-    unless ($new) {
-      return $old;
-    }
-    
-    unless (@{$old->redirects} < $self->max_redirects) {
-      return $old;
-    }
-    
-    $self->start($new);
-    
-    return $new;
-  }
-  
-  method finish : Mojo::Transaction::HTTP ($tx : Mojo::Transaction) {
-    
-    # Premature connection close
-    $tx->closed;
-    my $res = $tx->res;
-    
-    $res->finish;
-    
-    if ($res->code == 0) {
-      die "Premature connection close.";
-    }
-    
-    if ($tx->is_websocket) {
-      my $_ = $self->transactor->endpoint($tx);
-      my $proto = (string)$_->[0];
-      my $host = (string)$_->[1];
-      my $port = (int)$_->[2];
-      my $endpoint = "$proto:$host:$port";
-      
-      $self->_dequeue($endpoint);
-      return undef;
-    }
-    else {
-      
-      my $tx = (Mojo::Transaction::HTTP)$tx;
-      
-      # Disable collecting the cookies temporalily
-      # $self->cookie_jar->collect($tx);
-      
-      # Upgrade connection to WebSocket
-      if (my $ws_tx = $self->transactor->upgrade($tx)) {
-        $ws_tx->client_read($tx->res->content->leftovers);
-        return undef;
-      }
-      
-      # CONNECT requests always have a follow-up request
-      unless (Fn->uc($tx->req->method) eq "CONNECT") {
-        $self->_reuse($tx) ;
-      }
-      
-      $tx = $self->_redirect($tx);
-      
-      return $tx;
-    }
-  }
-  
-  method _reuse : void ($tx : Mojo::Transaction::HTTP) {
-    
-    # Connection close
-    my $max = $self->max_connections;
-    
-    # Keep connection alive
-    my $keep_alive_sockets_list = $self->{keep_alive_sockets_list};
-    
-    while ($keep_alive_sockets_list->length && $keep_alive_sockets_list->length >= $max) {
-      $keep_alive_sockets_list->shift;
-    }
-    
-    my $_ = $self->transactor->endpoint($tx);
-    my $proto = (string)$_->[0];
-    my $host = (string)$_->[1];
-    my $port = (int)$_->[2];
-    my $endpoint = "$proto:$host:$port";
-    
-    $self->_dequeue($endpoint);
-    
-    my $handle = (IO::Socket)$self->{connections_h}->get(Fn->to_address($tx));
-    $keep_alive_sockets_list->push([(object)$endpoint, $handle]);
-  }
-  
-  method _connect_proxy : Mojo::Transaction::HTTP ($old : Mojo::Transaction::HTTP) {
-    
-    # Start CONNECT request
-    my $new = $self->transactor->proxy_connect($old);
-    
-    unless ($new) {
-      return undef;
-    }
-    
-    my $tx = $self->start($new);
-    
-    # Real transaction
-    $old->set_previous($tx);
-    $old->req->set_via_proxy(0);
-    
-    # CONNECT failed
-    if (!$tx->res->is_success || !$tx->keep_alive) {
-      die "Proxy connection failed.";
-    }
-    
-    # Start real transaction without TLS upgrade
-    unless ($tx->req->url->protocol eq "https") {
-      $self->_process($tx);
-      return $tx;
-    }
-    
-    # TLS upgrade before starting the real transaction
-    $tx = $self->connect($old);
-    
-    return $tx;
-  }
-  
-  method _process : void ($tx : Mojo::Transaction::HTTP) {
-    
-    my $handle = (IO::Socket)$self->{connections_h}->get(Fn->to_address($tx));
-    
-    $tx->set_connection(Fn->to_address($tx));
-    
-    unless ($handle isa IO::Socket::UNIX) {
-      my $handle_ip = (IO::Socket::IP)$handle;
-      $tx->set_local_address($handle_ip->sockhost);
-      $tx->set_local_port($handle_ip->sockport);
-      $tx->set_remote_address($handle_ip->peerhost);
-      $tx->set_remote_port($handle_ip->peerport);
-    }
-  }
-  
-  static method _port : int ($options_h : Hash) {
+  private static method _port : int ($options_h : Hash) {
     
     my $port = 0;
     
@@ -553,24 +221,6 @@ class Mojo::UserAgent extends Mojo::EventEmitter {
     }
     
     return $port;
-  }
-  
-  method _dequeue : IO::Socket ($endpoint : string)  {
-    
-    my $keep_alive_sockets_list = $self->{keep_alive_sockets_list};
-    
-    for (my $i = 0; $i < $keep_alive_sockets_list->length; $i++) {
-      my $keep_alive_socket = (object[])$keep_alive_sockets_list->get($i);
-      my $my_endpoint = (string)$keep_alive_socket->[0];
-      my $handle = (IO::Socket)$keep_alive_socket->[1];
-      
-      if ($endpoint eq $my_endpoint) {
-        $keep_alive_sockets_list->remove($i);
-        return $handle;
-      }
-    }
-    
-    return undef;
   }
   
   private static method SSL_cert_default : string () {
@@ -666,4 +316,460 @@ EOS
     
     return $SSL_key_default;
   }
+  
+  # Instance Methods
+  method get : Mojo::Transaction::HTTP ($url : object of string|Mojo::URL, $args1 : object = undef, $args2 : object = undef) {
+    
+    my $method = "GET";
+    
+    my $tx = $self->build_tx($method, $url, $args1, $args2);
+    
+    $tx = $self->start($tx);
+    
+    return $tx;
+  }
+  
+  method head : Mojo::Transaction::HTTP ($url : object of string|Mojo::URL, $args1 : object = undef, $args2 : object = undef) {
+    
+    my $method = "HEAD";
+    
+    my $tx = $self->build_tx($method, $url, $args1, $args2);
+    
+    $tx = $self->start($tx);
+    
+    return $tx;
+  }
+  
+  method delete : Mojo::Transaction::HTTP ($url : object of string|Mojo::URL, $args1 : object = undef, $args2 : object = undef) {
+    
+    my $method = "DELETE";
+    
+    my $tx = $self->build_tx($method, $url, $args1, $args2);
+    
+    $tx = $self->start($tx);
+    
+    return $tx;
+  }
+  
+  method options : Mojo::Transaction::HTTP ($url : object of string|Mojo::URL, $args1 : object = undef, $args2 : object = undef) {
+    
+    my $method = "OPTIONS";
+    
+    my $tx = $self->build_tx($method, $url, $args1, $args2);
+    
+    $tx = $self->start($tx);
+    
+    return $tx;
+  }
+  
+  method patch : Mojo::Transaction::HTTP ($url : object of string|Mojo::URL, $args1 : object = undef, $args2 : object = undef) {
+    
+    my $method = "PATCH";
+    
+    my $tx = $self->build_tx($method, $url, $args1, $args2);
+    
+    $tx = $self->start($tx);
+    
+    return $tx;
+  }
+  
+  method post : Mojo::Transaction::HTTP ($url : object of string|Mojo::URL, $args1 : object = undef, $args2 : object = undef) {
+    
+    my $method = "POST";
+    
+    my $tx = $self->build_tx($method, $url, $args1, $args2);
+    
+    $tx = $self->start($tx);
+    
+    return $tx;
+  }
+  
+  method put : Mojo::Transaction::HTTP ($url : object of string|Mojo::URL, $args1 : object = undef, $args2 : object = undef) {
+    
+    my $method = "PUT";
+    
+    my $tx = $self->build_tx($method, $url, $args1, $args2);
+    
+    $tx = $self->start($tx);
+    
+    return $tx;
+  }
+  
+  method build_tx : Mojo::Transaction::HTTP ($method : string, $url : object of string|Mojo::URL, $args1 : object = undef, $args2 : object = undef) {
+    return $self->transactor->tx($method, $url, $args1, $args2);
+  }
+  
+  method start : Mojo::Transaction::HTTP ($tx : Mojo::Transaction::HTTP) {
+    
+    # Application server
+    $self->emit(prepare => $tx);
+    my $url = $tx->req->url;
+    
+    # TODO
+    # $self->proxy->prepare($tx);
+    
+    # TODO
+    # $self->cookie_jar->prepare($tx);
+    
+    my $max = $self->max_response_size;
+    if ($max >= 0) {
+      $tx->res->set_max_message_size($max);
+    }
+    $self->emit(start => $tx);
+    
+    my $req = $tx->req;
+    
+    $tx = $self->_request($tx);
+    
+    return $tx;
+  }
+  
+  private method _request : Mojo::Transaction::HTTP ($tx : Mojo::Transaction::HTTP)  {
+    
+    my $method = $tx->req->method;
+    
+    my $url = $tx->req->url;
+    
+    my $options = (object[])undef;
+    
+    my $options_h = Hash->new($options);
+    
+    my $headers = (Mojo::Headers)$options_h->delete_or_default("headers", undef);
+    
+    my $request_timeout = $options_h->delete_or_default_double("request_timeout", $self->{request_timeout});
+    
+    for my $name (@{$options_h->keys}) {
+      die "The \$name option is not available.";
+    }
+    
+    unless ($headers) {
+      $headers = Mojo::Headers->new;
+      $tx->req->content->set_headers($headers);
+    }
+    
+    $tx = $self->_connect($tx);
+    
+    $self->write_request($tx);
+    
+    $self->read_response($tx);
+    
+    $tx = $self->_finish($tx);
+    
+    return $tx;
+  }
+  
+  private method _connect : Mojo::Transaction::HTTP ($tx : Mojo::Transaction::HTTP)  {
+    
+    my $handle = (IO::Socket)undef;
+    
+    # Reuse connection
+    {
+      my $_ = $self->transactor->endpoint($tx);
+      my $proto = $_->protocol;
+      my $host = $_->host;
+      my $port = $_->port;
+      my $endpoint = "$proto:$host:$port";
+      
+      if ($handle = $self->_dequeue($endpoint)) {
+        
+        if (&DEBUG) {
+          warn "-- Reusing connection ($proto://$host:$port)" ;
+        }
+        
+        unless ($tx->connection) {
+          $tx->set_kept_alive(1) ;
+        }
+        
+        $self->{connections_h}->set(Fn->to_address($tx) => $handle);
+        
+        $self->_process($tx);
+        
+        return $tx;
+      }
+    }
+    
+    # CONNECT request to proxy required
+    if (my $connect_tx = $self->_connect_proxy($tx)) {
+      return $connect_tx;
+    }
+    
+    my $t = $self->transactor;
+    
+    my $_ = $t->peer($tx);
+    my $proto = $_->protocol;
+    my $host = $_->host;
+    my $port = $_->port;
+    
+    unless ($proto eq "http" || $proto eq "https" || $proto eq "http+unix") {
+      die "Unsupported protocol: $proto";
+    }
+    
+    my $options_h = Hash->new;
+    $options_h->set(Timeout => $self->connect_timeout);
+    
+    if ($proto eq "http+unix") { $options_h->set(path => $host); }
+    else {
+      $options_h->set(address => $host);
+      $options_h->set(port => $port);
+    }
+    
+    # TLS
+    my $tls = $proto eq "https";
+    
+    my $path = $options_h->get_string("path");
+    
+    # UNIX domain socket
+    if ($path) {
+      $options_h->set(Peer => $path);
+      
+      $handle = (IO::Socket)IO::Socket::UNIX->new($options_h->to_array);
+    }
+    
+    # IP socket
+    else {
+      $options_h->set(PeerAddr => $options_h->get_string("address"));
+      $options_h->delete("address");
+      $options_h->set(PeerPort => &_port($options_h));
+      $options_h->delete("port");
+      
+      my $socket_options = $self->socket_options;
+      if ($socket_options) {
+        for my $key (@{$socket_options->keys}) {
+          my $value = $socket_options->get($key);
+          $options_h->set($key => $value);
+        }
+      }
+      $options_h->delete("socket_options");
+      
+      if ($tls) {
+        $options_h->set(tls => $tls);
+        $options_h->set(tls_ca => $self->ca);
+        $options_h->set(tls_cert => $self->cert);
+        $options_h->set(tls_key => $self->key);
+        
+        $options_h->set(tls_options => $self->tls_options);
+        if ($self->insecure) {
+          my $tls_options = (object[])$options_h->get("tls_options") // new object[0];;
+          $tls_options = Fn->merge_options($tls_options, [(object)0x00]);
+          $options_h->set(tls_options => $tls_options);
+        }
+        
+        $options_h->delete("tls_options");
+        $options_h->delete("tls");
+        $options_h->delete("tls_ca");
+        $options_h->delete("tls_cert");
+        $options_h->delete("tls_key");
+        
+        $handle = (IO::Socket)IO::Socket::SSL->new($options_h->to_array);
+      }
+      else {
+        $handle = (IO::Socket)IO::Socket::IP->new($options_h->to_array);
+      }
+    }
+    
+    $self->{connections_h}->set(Fn->to_address($tx) => $handle);
+    
+    if (&DEBUG) {
+      warn "-- Connect ($proto://$host:$port)";
+    }
+    
+    return $tx;
+  }
+  
+  private method write_request : void ($tx : Mojo::Transaction::HTTP) {
+    
+    my $req = $tx->req;
+    
+    my $handle = (IO::Socket)$self->{connections_h}->get(Fn->to_address($tx));
+    
+    my $start_line = $req->build_start_line;
+    
+    $handle->write($start_line);
+    
+    my $header_lines = $req->build_headers;
+    
+    $handle->write($header_lines);
+    
+    $handle->write("\r\n");
+  }
+  
+  private method read_response : void ($tx : Mojo::Transaction::HTTP) {
+    my $res = Mojo::Message::Response->new;
+    
+    my $handle = (IO::Socket)$self->{connections_h}->get(Fn->to_address($tx));
+    
+    while (1) {
+      my $chunk = (mutable string)new_string_len &READ_BUFFER_SIZE;
+      
+      my $read_length = $handle->read($chunk);
+      
+      if ($read_length == 0) {
+        $res->finish;
+        last;
+      }
+      
+      Fn->shorten($chunk, $read_length);
+      
+      $res->parse($chunk);
+      
+      if ($res->is_finished) {
+        last;
+      }
+    }
+    
+    $tx->set_res($res);
+  }
+  
+  private method _finish : Mojo::Transaction::HTTP ($tx : Mojo::Transaction) {
+    
+    # Premature connection close
+    $tx->closed;
+    my $res = $tx->res;
+    
+    $res->finish;
+    
+    if ($res->code == 0) {
+      die "Premature connection close.";
+    }
+    
+    if ($tx->is_websocket) {
+      my $_ = $self->transactor->endpoint($tx);
+      my $proto = $_->protocol;
+      my $host = $_->host;
+      my $port = $_->port;
+      my $endpoint = "$proto:$host:$port";
+      
+      $self->_dequeue($endpoint);
+      return undef;
+    }
+    else {
+      
+      my $tx = (Mojo::Transaction::HTTP)$tx;
+      
+      # Disable collecting the cookies temporalily
+      # $self->cookie_jar->collect($tx);
+      
+      # Upgrade connection to WebSocket
+      if (my $ws_tx = $self->transactor->upgrade($tx)) {
+        $ws_tx->client_read($tx->res->content->leftovers);
+        return undef;
+      }
+      
+      # CONNECT requests always have a follow-up request
+      unless (Fn->uc($tx->req->method) eq "CONNECT") {
+        $self->_reuse($tx) ;
+      }
+      
+      $tx = $self->_redirect($tx);
+      
+      return $tx;
+    }
+  }
+  
+  private method _redirect : Mojo::Transaction::HTTP ($old : Mojo::Transaction::HTTP) {
+    
+    my $new = $self->transactor->redirect($old);
+    
+    unless ($new) {
+      return $old;
+    }
+    
+    unless (@{$old->redirects} < $self->max_redirects) {
+      return $old;
+    }
+    
+    $self->start($new);
+    
+    return $new;
+  }
+  
+  private method _reuse : void ($tx : Mojo::Transaction::HTTP) {
+    
+    # Connection close
+    my $max = $self->max_connections;
+    
+    # Keep connection alive
+    my $keep_alive_sockets_list = $self->{keep_alive_sockets_list};
+    
+    while ($keep_alive_sockets_list->length && $keep_alive_sockets_list->length >= $max) {
+      $keep_alive_sockets_list->shift;
+    }
+    
+    my $_ = $self->transactor->endpoint($tx);
+    my $proto = $_->protocol;
+    my $host = $_->host;
+    my $port = $_->port;
+    my $endpoint = "$proto:$host:$port";
+    
+    $self->_dequeue($endpoint);
+    
+    my $handle = (IO::Socket)$self->{connections_h}->get(Fn->to_address($tx));
+    $keep_alive_sockets_list->push([(object)$endpoint, $handle]);
+  }
+  
+  private method _connect_proxy : Mojo::Transaction::HTTP ($old : Mojo::Transaction::HTTP) {
+    
+    # Start CONNECT request
+    my $new = $self->transactor->proxy_connect($old);
+    
+    unless ($new) {
+      return undef;
+    }
+    
+    my $tx = $self->start($new);
+    
+    # Real transaction
+    $old->set_previous($tx);
+    $old->req->set_via_proxy(0);
+    
+    # CONNECT failed
+    if (!$tx->res->is_success || !$tx->keep_alive) {
+      die "Proxy connection failed.";
+    }
+    
+    # Start real transaction without TLS upgrade
+    unless ($tx->req->url->protocol eq "https") {
+      $self->_process($tx);
+      return $tx;
+    }
+    
+    # TLS upgrade before starting the real transaction
+    $tx = $self->_connect($old);
+    
+    return $tx;
+  }
+  
+  private method _process : void ($tx : Mojo::Transaction::HTTP) {
+    
+    my $handle = (IO::Socket)$self->{connections_h}->get(Fn->to_address($tx));
+    
+    $tx->set_connection(Fn->to_address($tx));
+    
+    unless ($handle isa IO::Socket::UNIX) {
+      my $handle_ip = (IO::Socket::IP)$handle;
+      $tx->set_local_address($handle_ip->sockhost);
+      $tx->set_local_port($handle_ip->sockport);
+      $tx->set_remote_address($handle_ip->peerhost);
+      $tx->set_remote_port($handle_ip->peerport);
+    }
+  }
+  
+  private method _dequeue : IO::Socket ($endpoint : string)  {
+    
+    my $keep_alive_sockets_list = $self->{keep_alive_sockets_list};
+    
+    for (my $i = 0; $i < $keep_alive_sockets_list->length; $i++) {
+      my $keep_alive_socket = (object[])$keep_alive_sockets_list->get($i);
+      my $my_endpoint = (string)$keep_alive_socket->[0];
+      my $handle = (IO::Socket)$keep_alive_socket->[1];
+      
+      if ($endpoint eq $my_endpoint) {
+        $keep_alive_sockets_list->remove($i);
+        return $handle;
+      }
+    }
+    
+    return undef;
+  }
+  
 }

@@ -26,6 +26,14 @@ Mojo::Date class in L<SPVM> implements HTTP date and time functions, based on L<
   my $date = Mojo::Date->new(Sys->time + 60);
   say $date->to_string;
 
+=head1 Interfaces
+
+=over 2
+
+=item * L<Stringable|SPVM::Stringable>
+
+=back
+
 =head1 Fields
 
 =head2 epoch

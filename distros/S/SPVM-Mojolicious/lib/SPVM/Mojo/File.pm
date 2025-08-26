@@ -30,6 +30,14 @@ operating systems.
   $path->make_path;
   $path->child("test.txt")->spew("Hello Mojo!");
 
+=head1 Interfaces
+
+=over 2
+
+=item * L<Stringable|SPVM::Stringable>
+
+=back
+
 =head1 Fields
 
 =head2 file

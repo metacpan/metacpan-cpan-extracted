@@ -1,15 +1,8 @@
-#ifdef __cplusplus
-extern "C" {
-#endif
 #define PERL_NO_GET_CONTEXT
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
 #include <time.h>
-#ifdef __cplusplus
-}
-#endif
-
 
 #define    DAYS_PER_YEAR    365
 #define    DAYS_PER_QYEAR    (4*DAYS_PER_YEAR+1)
@@ -85,7 +78,7 @@ extern "C" {
  *
  * Note that we don't free() the malloc()ed memory unless and until we call
  * malloc() again ourselves because the CRT putenv() function simply puts its
- * pointer argument into the environ[] arrary (it doesn't make a copy of it)
+ * pointer argument into the environ[] array (it doesn't make a copy of it)
  * so this memory must otherwise be leaked.
  */
 
@@ -366,8 +359,10 @@ _strptime(pTHX_ const char *buf, const char *fmt, struct tm *tm, int *got_GMT)
 			if (isspace((unsigned char)c))
 				while (*buf != 0 && isspace((unsigned char)*buf))
 					buf++;
-			else if (c != *buf++)
+			else if (c != *buf++) {
+				warn("Time string mismatches format string");
 				return 0;
+			}
 			continue;
 		}
 
@@ -444,7 +439,12 @@ label:
 			break;
 
 		case 'r':
-			buf = _strptime(aTHX_ buf, "%I:%M:%S %p", tm, got_GMT);
+			if (Locale->AM && strlen(Locale->AM) > 0 &&
+			    Locale->PM && strlen(Locale->PM) > 0) {
+				buf = _strptime(aTHX_ buf, "%I:%M:%S %p", tm, got_GMT);
+			} else {
+				buf = _strptime(aTHX_ buf, "%H:%M:%S", tm, got_GMT);
+			}
 			if (buf == 0)
 				return 0;
 			break;
@@ -546,8 +546,10 @@ label:
 			if (c == 'H' || c == 'k') {
 				if (i > 23)
 					return 0;
-			} else if (i > 12)
+			} else if (i > 12) {
+					warn("Hour cannot be >12 with %%I or %%l");
 				return 0;
+			}
 
 			tm->tm_hour = i;
 
@@ -565,8 +567,11 @@ label:
             len = strlen(Locale->am);
 			if (strncasecmp(buf, Locale->am, len) == 0 ||
 					strncasecmp(buf, Locale->AM, len) == 0) {
-				if (tm->tm_hour > 12)
+				if (tm->tm_hour > 12) {
+					warn("Hour cannot be >12 with %%p");
 					return 0;
+				}
+
 				if (tm->tm_hour == 12)
 					tm->tm_hour = 0;
 				buf += len;
@@ -576,14 +581,17 @@ label:
 			len = strlen(Locale->pm);
 			if (strncasecmp(buf, Locale->pm, len) == 0 ||
 					strncasecmp(buf, Locale->PM, len) == 0) {
-				if (tm->tm_hour > 12)
+				if (tm->tm_hour > 12) {
+					warn("Hour cannot be >12 with %%p");
 					return 0;
+				}
 				if (tm->tm_hour != 12)
 					tm->tm_hour += 12;
 				buf += len;
 				break;
 			}
 
+			warn("Failed parsing %%p");
 			return 0;
 
 		case 'A':
@@ -1023,14 +1031,17 @@ _tzset()
     return; /* skip XSUBPP's PUTBACK */
 
 void
-_strptime ( string, format, got_GMT, SV* localization )
+_strptime ( string, format, got_GMT, localization, defaults_ref )
 	char * string
 	char * format
 	int    got_GMT
+	SV   * localization
+	SV   * defaults_ref
   PREINIT:
        struct tm mytm;
        char * remainder;
        HV   * locales;
+       AV   * defaults_av;
   PPCODE:
        memset(&mytm, 0, sizeof(mytm));
 
@@ -1049,6 +1060,31 @@ _strptime ( string, format, got_GMT, SV* localization )
 
        /* populate our locale data struct (used for %[AaBbPp] flags) */
        _populate_C_time_locale(aTHX_ locales );
+
+       /* Check if defaults array was passed and apply them now */
+       if (SvOK(defaults_ref) && SvROK(defaults_ref) && SvTYPE(SvRV(defaults_ref)) == SVt_PVAV) {
+           defaults_av = (AV*)SvRV(defaults_ref);
+           if (av_len(defaults_av)+1 >= 8) {
+
+               SV** elem;
+               elem = av_fetch(defaults_av, 0, 0);
+               if (elem && SvOK(*elem)) mytm.tm_sec = SvIV(*elem);
+               elem = av_fetch(defaults_av, 1, 0);
+               if (elem && SvOK(*elem)) mytm.tm_min = SvIV(*elem);
+               elem = av_fetch(defaults_av, 2, 0);
+               if (elem && SvOK(*elem)) mytm.tm_hour = SvIV(*elem);
+               elem = av_fetch(defaults_av, 3, 0);
+               if (elem && SvOK(*elem)) mytm.tm_mday = SvIV(*elem);
+               elem = av_fetch(defaults_av, 4, 0);
+               if (elem && SvOK(*elem)) mytm.tm_mon = SvIV(*elem);
+               elem = av_fetch(defaults_av, 5, 0);
+               if (elem && SvOK(*elem)) mytm.tm_year = SvIV(*elem);
+               elem = av_fetch(defaults_av, 6, 0);
+               if (elem && SvOK(*elem)) mytm.tm_wday = SvIV(*elem);
+               elem = av_fetch(defaults_av, 7, 0);
+               if (elem && SvOK(*elem)) mytm.tm_yday = SvIV(*elem);
+           }
+       }
 
        remainder = (char *)_strptime(aTHX_ string, format, &mytm, &got_GMT);
        if (remainder == NULL) {
@@ -1153,9 +1189,13 @@ _get_localization()
 
         len = strftime(buf, TP_BUF_SIZE, "%p", &mytm);
         tmp = hv_store(locales, "AM", 2, newSVpvn(buf,len), 0);
+        len = strftime(buf, TP_BUF_SIZE, "%P", &mytm);
+        tmp = hv_store(locales, "am", 2, newSVpvn(buf,len), 0);
         mytm.tm_hour = 18;
         len = strftime(buf, TP_BUF_SIZE, "%p", &mytm);
         tmp = hv_store(locales, "PM", 2, newSVpvn(buf,len), 0);
+        len = strftime(buf, TP_BUF_SIZE, "%P", &mytm);
+        tmp = hv_store(locales, "pm", 2, newSVpvn(buf,len), 0);
 
         if(tmp == NULL || !SvOK( (SV *) *tmp)){
             croak("Failed to get localization.");

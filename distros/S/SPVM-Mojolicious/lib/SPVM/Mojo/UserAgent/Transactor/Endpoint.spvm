@@ -1,0 +1,37 @@
+# Copyright (c) 2025 Yuki Kimoto
+# MIT License
+
+class Mojo::UserAgent::Transactor::Endpoint {
+  version_from Mojolicious;
+  
+  # Interfaces
+  interface Stringable;
+  
+  # Fields
+  has protocol : rw string;
+  
+  has host : rw string;
+  
+  has port : rw int;
+  
+  # Class Methods
+  static method new : Mojo::UserAgent::Transactor::Endpoint () {
+    
+    my $self = new Mojo::UserAgent::Transactor::Endpoint;
+    
+    return $self;
+  }
+  
+  # Instance Methods
+  method to_string : string () {
+    
+    my $proto = $self->protocol;
+    my $host = $self->host;
+    my $port = $self->port;
+    
+    my $string = "$proto:$host:$port";
+    
+    return $string;
+  }
+  
+}

@@ -1,6 +1,6 @@
 package SPVM::Mojolicious;
 
-our $VERSION = "0.015";
+our $VERSION = "0.016";
 
 1;
 
@@ -18,11 +18,15 @@ This framework is still in early development: there is no documentation yet and 
 
 Most tests are not written.
 
+=head1 Details
+
+=head2 HTTP Client
+
+See L<Mojo::UserAgent|SPVM::Mojo::UserAgent> about the HTTP client in this web framework.
+
 =head1 Classes
 
 =over 2
-
-=item * L<Mojo::UserAgent|SPVM::Mojo::UserAgent>
 
 =item * L<Mojo::Asset|SPVM::Mojo::Asset>
 
@@ -77,6 +81,20 @@ Most tests are not written.
 =item * L<Mojo::WebSocket::Frame|SPVM::Mojo::WebSocket::Frame>
 
 =item * L<Mojo::WebSocket|SPVM::Mojo::WebSocket>
+
+=item * L<Mojo::UserAgent|SPVM::Mojo::UserAgent>
+
+=item * L<Mojo::UserAgent::Transactor|SPVM::Mojo::UserAgent::Transactor>
+
+=item * L<Mojo::UserAgent::Proxy|SPVM::Mojo::UserAgent::Proxy>
+
+=item * L<Mojo::UserAgent::CookieJar|SPVM::Mojo::UserAgent::CookieJar>
+
+=item * L<Mojo::UserAgent::CookieJar::Callback::Ignore|SPVM::Mojo::UserAgent::CookieJar::Callback::Ignore>
+
+=item * L<Mojo::UserAgent::Transactor::Endpoint|SPVM::Mojo::UserAgent::Transactor::Endpoint>
+
+=item * L<Mojo::UserAgent::Transactor::Callback::Generator|SPVM::Mojo::UserAgent::Transactor::Callback::Generator>
 
 =back
 

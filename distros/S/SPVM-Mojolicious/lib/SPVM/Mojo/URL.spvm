@@ -9,6 +9,9 @@ class Mojo::URL {
   use Mojo::Parameters;
   use Mojo::Util;
   
+  # Interfaces
+  interface Stringable;
+  
   # Fields
   has base : rw Mojo::URL;
   

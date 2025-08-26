@@ -7,28 +7,28 @@ use Getopt::Long qw(:config bundling no_ignore_case);
 use POSIX qw(ceil);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-07-24'; # DATE
+our $DATE = '2025-08-03'; # DATE
 our $DIST = 'App-freqtable'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
-my $tmp_freq;
+my $tmp_rank;
 my %Opts = (
     mode => 'line',
     ignore_case => 0,
     print_total => 0,
     print_freq => 1,
     # XXX options to limit memory usage, e.g. max keys, max line length, --md5 (like in nauniq), ...
-    min_freq => undef,
-    max_freq => undef,
+    min_rank => undef,
+    max_rank => undef,
     sort_args => {},
     sort_sub => undef,
     percent => 0,
     clear_before_output => 0,
     output_every => undef,
+    format => undef,
 );
 my $Numeric;
 my %Occurences;
-my $Fmt;
 
 sub parse_cmdline {
     my $res = GetOptions(
@@ -43,13 +43,14 @@ sub parse_cmdline {
         'print-freq'      => sub { $Opts{print_freq} = 1 },
         'no-print-total|T' => sub { $Opts{print_total} = 0 },
         'print-total|t'    => sub { $Opts{print_total} = 1 },
-        'freq=s'    => \$tmp_freq,
+        'rank|r=s' => \$tmp_rank,
         'sort-sub=s' => \$Opts{sort_sub},
         'sort-arg=s%' => $Opts{sort_args},
         'a'   => sub { $Opts{sort_sub} = 'asciibetically' },
-        'percent|p' => sub { $Opts{percent} = 1 },
+        'percent|p' => sub { $Opts{percent}++ },
         'clear-before-output' => sub { $Opts{clear_before_output} = 1 },
         'output-every=i' => \$Opts{output_every},
+        'format=s' =>\$Opts{format},
         'help|h'  => sub {
             print <<USAGE;
 Usage:
@@ -63,12 +64,16 @@ Options:
   --number, -n
   --integer, -i
   --ignore-case, -f
+  --print-freq
   --no-print-freq, -F
-  --freq N|M-N|M-|-N
+  --print-total, -t
+  --no-print-total, -T
+  --percent, -p
+  --format=FMT
+  --rank N|M-N|M-|-N, -r
   --sort-sub=SPEC
   --sort-arg=ARG=VAL
   -a
-  --percent, -p
   --output-every=i
   --clear-before-output
 For more details, see the manpage/documentation.
@@ -77,18 +82,18 @@ USAGE
         },
     );
 
-    if (defined $tmp_freq) {
-        if ($tmp_freq =~ /\A\d+\z/) {
-            $Opts{min_freq} = $Opts{max_freq} = $tmp_freq;
-        } elsif ($tmp_freq =~ /\A-(\d+)\z/) {
-            $Opts{max_freq} = $1;
-        } elsif ($tmp_freq =~ /\A(\d+)-\z/) {
-            $Opts{min_freq} = $1;
-        } elsif ($tmp_freq =~ /\A(\d+)-(\d+)\z/) {
-            $Opts{min_freq} = $1;
-            $Opts{max_freq} = $2;
+    if (defined $tmp_rank) {
+        if ($tmp_rank =~ /\A\d+\z/) {
+            $Opts{min_rank} = $Opts{max_rank} = $tmp_rank;
+        } elsif ($tmp_rank =~ /\A-(\d+)\z/) {
+            $Opts{max_rank} = $1;
+        } elsif ($tmp_rank =~ /\A(\d+)-\z/) {
+            $Opts{min_rank} = $1;
+        } elsif ($tmp_rank =~ /\A(\d+)-(\d+)\z/) {
+            $Opts{min_rank} = $1;
+            $Opts{max_rank} = $2;
         } else {
-            warn "freqtable: Invalid value for --freq: '$tmp_freq', ".
+            warn "freqtable: Invalid value for --rank: '$tmp_rank', ".
                 "please specify N|M-N|M-|-N\n";
             $res = 0;
         }
@@ -100,19 +105,23 @@ USAGE
 sub _print_freqline {
     my ($n, $k, $totoccurrences) = @_;
 
-    if ($Opts{print_freq}) {
-        if ($Opts{percent}) {
-            $n = $totoccurrences == 0 ? 0 : $n/$totoccurrences*100;
-            unless (defined $Fmt) {
-                $Fmt = "%5.2f%%\t%s\n";
+    if (defined $Opts{format}) {
+        my $pct = $totoccurrences == 0 ? 0 : $n/$totoccurrences*100;
+        {
+            no warnings; # XXX only disable warning 'redundant argument in printf'
+            printf $Opts{format}, $n, $k, $pct;
+            print "\n";
+        }
+    } else {
+        if ($Opts{print_freq}) {
+            unless ($Opts{percent} && $Opts{percent} < 2) {
+                printf "%9d ", $n;
             }
-        } else {
-            unless (defined $Fmt) {
-                $Fmt = "%" . ceil(log($n)/log(10)) . "s\t%s\n";
+            if ($Opts{percent}) {
+                my $pct = $totoccurrences == 0 ? 0 : $n/$totoccurrences*100;
+                printf "%6.2f%% ", $pct;
             }
         }
-        printf $Fmt, $n, $k;
-    } else {
         print $k, "\n";
     }
 }
@@ -136,10 +145,12 @@ sub _display_table {
 
     print "\033[2J" if $Opts{clear_before_output};
 
+    my $i = 0;
     for my $k (@keys) {
+        $i++;
         my $n = $Occurences{$k};
-        next if defined $Opts{min_freq} && $n < $Opts{min_freq};
-        next if defined $Opts{max_freq} && $n > $Opts{max_freq};
+        next if defined $Opts{min_rank} && $i < $Opts{min_rank};
+        next if defined $Opts{max_rank} && $i > $Opts{max_rank};
         _print_freqline($n, $k, $totoccurrences);
     }
 
@@ -241,7 +252,7 @@ freqtable - Print frequency table of lines/words/characters/bytes/numbers
 
 =head1 VERSION
 
-This document describes version 0.009 of freqtable (from Perl distribution App-freqtable), released on 2025-07-24.
+This document describes version 0.010 of freqtable (from Perl distribution App-freqtable), released on 2025-08-03.
 
 =head1 SYNOPSIS
 
@@ -332,7 +343,7 @@ Display frequency table (integers):
  % freqtable -i input-nums.txt
  3      9
 
-=head2 -F option
+=head2 Formatting the output line: omitting the frequency (-F option)
 
 Don't display the frequencies:
 
@@ -347,31 +358,41 @@ Don't display the frequencies:
  three
  two
 
-=head2 Filter by frequencies
+=head2 Formatting the output line: showing the percentages (`--percent`, `-p` option)
 
-Only display lines that appear three times:
+The default is to show frequencies as numbers:
 
- % freqtable -F input-lines.txt --freq 3
- 3       five
+ % freqtable input-lines.txt
+         3 five
+ ...
 
-Only display lines that appear more than once:
+You can display frequencies as percent instead:
 
- % freqtable -F input-lines.txt --freq 2-
- 3       five
- 2       eight
- 2       one
+ % freqtable -p input-lines.txt
+  23.08% five
+ ...
 
-Only display lines that appear less than three times:
+Specify another `-p` if you want to display frequencies as integers as well as
+percent:
 
- % freqtable -F input-lines.txt --freq -2
- 2       eight
- 2       one
- 1       four
- 1       nine
- 1       seven
- 1       six
- 1       three
- 1       two
+ % freqtable -pp input-lines.txt
+         3  23.08% five
+ ...
+
+=head2 Formatting the output line: custom formatting (`--format` option)
+
+ % freqtable --format '%04d: %s' input-lines.txt
+ 0003: five
+
+=head2 Filter by rank
+
+Only display the top 3 ranks:
+
+ % freqtable input-lines.txt -r -3
+ % freqtable input-lines.txt -r 1-3
+         3 five
+         2 eight
+         2 one
 
 =head2 Sorting
 
@@ -414,6 +435,25 @@ keys using one of L<Sort::Sub>::* subroutines. Examples:
  1       nine
  1       two
  1       four
+
+=head2 Running table (`--output-every` option)
+
+If you have streaming input, you can instruct `freqtable` to print the result
+periodically after a number of input lines/words/characters/bytes. You can also
+instruct to clear the terminal screen before every output
+(`--clear-before-output`).
+
+ % perl -MArray::Sample::WeightedRandom=sample_weighted_random_with_replacement \
+     -E'say sample_weighted_random_with_replacement(
+          [ ["a", 1], ["b", 2], ["c", 3], ["d",5] ], 1) while 1' | \
+   freqtable --output-every 10000 --clear --percent
+
+Sample output:
+
+ 45.43%  d
+ 27.28%  c
+ 18.20%  b
+  9.10%  a
 
 =head1 DESCRIPTION
 
@@ -483,13 +523,17 @@ Print the total line at the bottom.
 
 Do not print the total line at the bottom (the default).
 
-=item * --freq=s
+=item * --rank=s, -r
 
-Filter by frequencies. C<N> (e.g. --freq 5) means only display items that occur
-N times. C<M-N> (e.g. --freq 5-10) means only display items that occur between M
-and N times. C<M-> (e.g. --freq 5-) means only display items that occur at least
-M times. C<-N> (e.g. --freq -10) means only display items that occur at most N
-times.
+Filter by rank. There are several ways you can do this:
+
+C<-N> to only display the top I<N> ranks.
+
+C<N> to only display the I<N>'th rank.
+
+C<M-N> to only display the I<M>'th to I<N>'th rank.
+
+C<M-> to only display the I<M>'th rank and lower items.
 
 =item * --sort-sub=s
 
@@ -519,7 +563,23 @@ Shortcut for C<--sort=asciibetically>.
 
 =item * --percent, -p
 
-Show frequencies as percentages.
+Show frequencies as percentages instead of integers. If you specify this option
+one more time, will show frequencies as integers I<as well as> percentages.
+
+=item * --format=s
+
+Format frequency line using `sprintf()` template. `freqtable` will supply these
+arguments after the template: frequency integer, item string, and frequency as
+percent. For example:
+
+ %04d: %s              # sample output: 0004: five
+
+If you want to display the item first, you can use something like:
+
+ %2$-12s: %d
+ # sample output:
+ five        : 3
+ eight       : 2
 
 =item * --output-every=i
 

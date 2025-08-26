@@ -1,3 +1,17 @@
+0.010   2025-08-03  Released-By: PERLANCAR; Backward-Incompatible: yes; Urgency: medium
+
+        [NEW FEATURES]
+
+        - Add option --format for custom formatting.
+
+        - The --percent option can noew be specified more than once to display
+          frequency as integers as well as percentages.
+
+        [INCOMPATIBLE CHANGES]
+
+        - Replace --freq with --rank (-r).
+
+
 0.009   2025-07-24  Released-By: PERLANCAR; Urgency: medium
 
         - Add options: --print-total (-t), --no-print-total (-T),

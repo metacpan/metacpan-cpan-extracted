@@ -40,6 +40,14 @@ Resource Locators with support for IDNA and IRIs.
   $url->set_fragment(23);
   say $url->to_string;
 
+=head1 Interfaces
+
+=over 2
+
+=item * L<Stringable|SPVM::Stringable>
+
+=back
+
 =head1 Fields
 
 =head2 base

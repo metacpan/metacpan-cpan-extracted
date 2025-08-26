@@ -391,7 +391,7 @@ BEGIN {
     require Exporter;
 
     # set the version for version checking
-    our $VERSION   = '6.63';
+    our $VERSION   = '6.65';
     our @ISA       = qw(Exporter);
     our @EXPORT_OK = qw(
       FBIOGET_VSCREENINFO
@@ -475,7 +475,7 @@ use Inline C => <<'C_CODE','name' => 'Graphics::Framebuffer', 'VERSION' => $VERS
 /* Copyright 2018-2025 Richard Kelsch, All Rights Reserved
    See the Perl documentation for Graphics::Framebuffer for licensing information.
 
-   Version:  6.63
+   Version:  6.65
 
    You may wonder why the stack is so heavily used when the global structures
    have the needed values.  Well, the module can emulate another graphics mode
@@ -6456,7 +6456,7 @@ Copies a square portion of screen graphic data from x,y,w,h to x_dest,y_dest.  I
     my $self   = shift;
     my $params = shift;
 
-    $self->blit_write({ %{ $self->blit_read({ 'x' => int($params->{'x'}), 'y' => int($params->{'y'}), 'width' => int($params->{'width'}), 'height' => int($params->{'height'}) }) }, 'x' => int($params->{'x_dest'}), 'y' => int($params->{'y_dest'}) });
+    $self->blit_write({	%{ $self->blit_read({'x' => int($params->{'x'}),'y' => int($params->{'y'}),'width' => int($params->{'width'}),'height' => int($params->{'height'})})}, 'x' => int($params->{'x_dest'}), 'y' => int($params->{'y_dest'}) });
 }
 
 sub blit_move {
@@ -7438,6 +7438,19 @@ It applies the following formula to calculate greyscale:
 
 =cut
 
+	##########################################################################
+	# This applies a well known set of blending constants to create a        #
+	# monochrome representation of a color image                             #
+	#                                                                        #
+	# Multiply each color by the constant, then add them together to get the #
+	# final monochrome value.                                                #
+	#                                                                        #
+	# NEWRED     = RED   * 0.2126                                            #
+	# NEWGREEN   = GREEN * 0.7115                                            #
+	# NEWBLUE    = BLUE  * 0.0722                                            #
+	# MONOCHROME = NEWRED + NEWGREEN + NEWBLUE                               #
+	##########################################################################
+
     my $self   = shift;
     my $params = shift;
 
@@ -7567,6 +7580,7 @@ Failures of this method are usually due to it not being able to find the font.  
     # coordinates given.  Since no decent True Type packages or libraries are    #
     # available for Perl, this turned out to be the best and easiest solution.   #
     ##############################################################################
+
     my $self   = shift;
     my $params = shift;
 
@@ -8065,7 +8079,7 @@ If the image has multiple frames, then a reference to an array of hashes is retu
     my $bench_load     = $bench_start;
     my $color_order    = $self->{'COLOR_ORDER'};
     my $hold;
-    if (defined($self->{'FFMPEG'}) && $params->{'file'} =~ /\.(mkv|mp4|avi|mpeg4|webp)$/i) {
+    if (defined($self->{'FFMPEG'}) && $params->{'file'} =~ /\.(mkv|mp4|avi|mpeg4|webp)$/i) { # This uses ffmpeg to convert a movie to a temporary GIF and then plays it
         system($self->{'FFMPEG'},'-i',$params->{'file'},'-vf', 'fps=10,scale=-1:-1:flags=bicubic', '-loop','0','-loglevel','quiet','/tmp/output.gif');
         $hold = $params->{'file'};
         $params->{'file'} = '/tmp/output.gif';
@@ -8272,7 +8286,7 @@ If the image has multiple frames, then a reference to an array of hashes is retu
                 $self->{'DRAW_MODE'} = $saved;
             }
         }
-        if (-e '/tmp/output.gif') {
+        if (-e '/tmp/output.gif') { # Deletes the temporary GIF file if it exists
             unlink('/tmp/output.gif');
             $params->{'file'} = $hold;
         }
@@ -8299,27 +8313,27 @@ Formats can be (they are case-insensitive):
 
 =over 8
 
-* B<JPEG>
+=item * B<JPEG>
 
 The most widely used format.  This is a "lossy" format.  The default quality setting is 75%, but it can be overriden with the "quality" parameter.
 
-* B<GIF>
+=item * B<GIF>
 
 The CompuServe "Graphics Interchange Format".  A very old and outdated format made specifically for VGA graphics modes, but still widely used.  It only allows up to 256 "indexed" colors, so quality is very lacking.  The "dither" paramter determines how colors are translated from 24 bit truecolor to 8 bit indexed.
 
-* B<PNG>
+=item * B<PNG>
 
 The Portable Network Graphics format.  Widely used, very high quality.
 
-* B<PNM>
+=item * B<PNM>
 
 The Portable aNy Map format.  These are typically "PPM" files.  Not widely used.
 
-* B<TGA>
+=item * B<TGA>
 
 The Targa image format.  This is a high-color, lossless format, typically used in photography
 
-* B<TIFF>
+=item * B<TIFF>
 
 The Tagged Image File Format.  Sort of an older version of PNG (but not the same, just similar in capability).  Sometimes used in FAX formats.
 
@@ -8976,7 +8990,7 @@ Returns the active console and the expected console
 =cut
 
     my $self = shift;
-    $self->{'THIS_CONSOLE'} = _slurp('/sys/class/tty/tty0/active');
+    chomp($self->{'THIS_CONSOLE'} = _slurp('/sys/class/tty/tty0/active'));
     $self->{'THIS_CONSOLE'} =~ s/\D+//gs;
     $self->{'THIS_CONSOLE'} += 0; # Force numeric
     return ($self->{'THIS_CONSOLE'}, $self->{'CONSOLE'});
@@ -9373,7 +9387,7 @@ A copy of this license is included in the 'LICENSE' file in this distribution.
 
 =head1 VERSION
 
-Version 6.63 (Jul 16, 2025)
+Version 6.65 (Aug 25, 2025)
 
 =head1 THANKS
 

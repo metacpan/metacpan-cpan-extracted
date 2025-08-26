@@ -48,7 +48,7 @@
    "provides" : {
       "App::freqtable" : {
          "file" : "lib/App/freqtable.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       }
    },
    "release_status" : "stable",
@@ -63,7 +63,7 @@
          "web" : "https://github.com/perlancar/perl-App-freqtable"
       }
    },
-   "version" : "0.009",
+   "version" : "0.010",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.040002"

@@ -14,6 +14,9 @@ class Mojo::File {
   use Cwd;
   use Mojo::Collection;
   
+  # Interfaces
+  interface Stringable;
+  
   # Fields
   has file : rw object of string|File::Temp|File::Temp::Dir;
   

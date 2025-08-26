@@ -23,6 +23,14 @@ This class is an abstract class for child classes.
     
   }
 
+=head1 Interfaces
+
+=over 2
+
+=item * L<Stringable|SPVM::Stringable>
+
+=back
+
 =head1 Events
 
 =head2 finish

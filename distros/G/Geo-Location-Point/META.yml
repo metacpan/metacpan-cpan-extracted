@@ -28,11 +28,11 @@ requires:
   Carp: '0'
   ExtUtils::MakeMaker: '6.64'
   GIS::Distance: '0'
-  Params::Get: '0'
+  Params::Get: '0.13'
   Scalar::Util: '0'
   perl: '5.010000'
 resources:
   bugtracker: https://github.com/nigelhorne/Geo-Location-Point/issues
   repository: git://github.com/nigelhorne/Geo-Location-Point.git
-version: '0.14'
+version: '0.15'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -10,14 +10,14 @@ use Config;
 
 my $base        = dirname(__FILE__) . '/data';
 my $abi_version = ll_get_abi_version();
-print STDERR
-  "Landlock ABI version: $abi_version, archname: $Config{archname}, 64bitint: @{[$Config{use64bitint} ? 1:0 ]}\n";
+
+diag("Landlock ABI version: $abi_version, archname: $Config{archname}, 64bitint: @{[$Config{use64bitint} ? 1:0 ]}");
 if ($abi_version < 0) {
-    ok(!defined ll_create_fs_ruleset(), "no support");
+    ok(!defined ll_create_ruleset(), "no support");
 } else {
-    ok($abi_version > 0,                          "Landlock available, ABI version $abi_version");
-    ok(scalar ll_all_fs_access_supported() >= 13, "plausible list");
-    my $ruleset_fd = ll_create_fs_ruleset()
+    ok($abi_version > 0, "Landlock available, ABI version $abi_version");
+    ok(ll_all_fs_access_supported() >= Math::BigInt->bone()->blsft(13) - 1, "plausible list");
+    my $ruleset_fd = ll_create_ruleset()
       or BAIL_OUT("ruleset creation failed: $!");
     ok($ruleset_fd > 0, "ruleset created");
     opendir(my $dh, $base) or BAIL_OUT("$!");

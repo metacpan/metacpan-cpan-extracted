@@ -11,14 +11,14 @@ my %SYSCALLS;
 my $supports_Q = eval { no warnings 'void'; pack('Q', 1); 1 };
 # endianness test from https://perldoc.perl.org/perlpacktut#Pack-Recipes
 my $is_le = unpack('c', pack('s', 1));
-# emulate pack('Q', ...) on Perl without 64-bit integer support
 
+# emulate pack('Q', ...) on Perl without 64-bit integer support
 #@type $arg Math::BigInt
 sub Q_pack {
     my ($arg) = @_;
 
     if ($supports_Q) {
-        return pack('Q', $arg->numify);
+        return pack('Q', $arg);
     } else {
         my $high = $arg >> 32;
         my $low  = $arg & 0xFFFFFFFF;
@@ -38,6 +38,7 @@ sub NR {
         my $re_aarch64 = qr/aarch64/x;
         my $re_x86     = qr/i686/x;
         my $re_x86_64  = qr/x86_64/x;
+        # hardcoded syscall numbers for common architectures
         if (my ($arch) = $Config{archname} =~ /($re_x86_64|$re_x86|$re_arm|$re_aarch64)/x) {
             my %prctl = (
                 aarch64 => 167,
@@ -59,7 +60,7 @@ sub NR {
                 prctl                   => &SYS_prctl,
             );
         } else {
-            warn "Could not determine syscall numbers, disabling Landlock support,\n";
+            warn "Could not determine syscall numbers, disabling Landlock support. You might need to run 'h2ph'\n";
             return;
         }
     }

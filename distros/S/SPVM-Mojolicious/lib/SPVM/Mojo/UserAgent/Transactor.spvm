@@ -18,62 +18,96 @@ class Mojo::UserAgent::Transactor {
   use Mojo::WebSocket;
   use Sys;
   use Mojo::UserAgent::Transactor::Callback::Generator;
+  use Mojo::UserAgent::Transactor::Endpoint;
   
   # Fields
-  has compressed : rw byte;
+  has compressed : rw byte
+    get {
+      unless (exists $self->{compressed}) {
+        $self->{compressed} = (length (my $_ = Sys->env("SPVM_MOJO_GZIP")) ? (byte)$_ : (byte)1);
+      }
+      
+      return $self->{compressed};
+    }
+  ;
   
-  has generators_h : Hash;
+  has generators : rw Hash of Mojo::UserAgent::Transactor::Callback::Generator
+    get {
+      unless (exists $self->{generators}) {
+        $self->{generators} = Hash->new({
+          form => method : void () { &_form; },
+          json => method : void () { &_json; },
+          multipart => method : void () { &_multipart; },
+        });
+      }
+      
+      return $self->{generators};
+    }
+  ;
   
-  has name : rw string;
+  has name : rw string
+    get {
+      unless (exists $self->{name}) {
+        $self->{name} = "Mojolicious (SPVM)";
+      }
+      
+      return $self->{name};
+    }
+  ;
   
   # Class Methods
   static method new : Mojo::UserAgent::Transactor () {
     
     my $self = new Mojo::UserAgent::Transactor;
     
-    my $compressed = (byte)(length (my $_ = Sys->env("SPVM_MOJO_GZIP")) ? (int)$_ : 1);
-    
-    $self->{compressed} = $compressed;
-    
-    my $generators_h = Hash->new({
-      form => method : void () { &_form; },
-      json => method : void () { &_json; },
-      multipart => method : void () { &_multipart; },
-    });
-    
-    $self->{generators_h} = $generators_h;
-    
-    $self->{name} = "SPVM::Mojolicious";
-    
     return $self;
   }
   
   private static method _form : void () {
-    
+    die "Not implemented.";
   }
   
   private static method _json : void () {
-    
+    die "Not implemented.";
   }
   
   private static method _multipart : void () {
-    
+    die "Not implemented.";
   }
   
-  method add_generator : void ($name : string, $cb : Callback) {
+  private static method _proxy : Mojo::UserAgent::Transactor::Endpoint ($tx : Mojo::Transaction, $proto : string, $host : string, $port : int) {
     
-    $self->{generators_h}->set($name, $cb);
+    my $req = $tx->req;
+    if ($req->via_proxy && (my $proxy = $req->proxy)) {
+      
+      my $proxy_port  = $proxy->port;
+      unless ($proxy_port > 0) {
+        $proxy_port = $proto eq "https" ? 443 : 80;
+      }
+      
+      my $endpoint = Mojo::UserAgent::Transactor::Endpoint->new;
+      $endpoint->set_protocol($proxy->protocol);
+      $endpoint->set_host($proxy->ihost);
+      $endpoint->set_port($proxy_port);
+      
+      return $endpoint;
+    }
+    
+    my $endpoint = Mojo::UserAgent::Transactor::Endpoint->new;
+    $endpoint->set_protocol($proto);
+    $endpoint->set_host($host);
+    $endpoint->set_port($port);
+    
+    return $endpoint;
   }
-
-  method tx : Mojo::Transaction::HTTP ($method : string, $url : object of string|Mojo::URL, $options : object[] = undef) {
+  
+  # Instance Methods
+  method add_generator : void ($name : string, $cb : Mojo::UserAgent::Transactor::Callback::Generator) {
     
-    my $options_h = Hash->new($options);
-    
-    my $generator = (object[])$options_h->get("generator");
-    
-    my $headers_options = (object[])$options_h->get("headers");
-    
-    my $body = $options_h->get_string("body");
+    $self->{generators}->set($name, $cb);
+  }
+  
+  method tx : Mojo::Transaction::HTTP ($method : string, $url : object of string|Mojo::URL, $args1 : object = undef, $args2 : object = undef) {
     
     # Method and URL
     my $tx  = Mojo::Transaction::HTTP->new;
@@ -96,24 +130,45 @@ class Mojo::UserAgent::Transactor {
     # Headers (we identify ourselves and accept gzip compression)
     my $headers = $req->headers;
     
-    $headers->from_hash(Hash->new($headers_options));
+    my $args1_used = 0;
+    if (is_options $args1) {
+      $headers->from_hash(Hash->new((object[])$args1));
+      $args1_used = 1;
+    }
+    
     unless ($headers->user_agent) {
       $headers->set_user_agent($self->name);
     }
     if    (!$self->compressed)         { $tx->res->content->set_auto_decompress(0); }
     elsif (!$headers->accept_encoding) { $headers->set_accept_encoding("gzip"); }
     
-    # Generator
-    if ($generator) {
-      my $name = (string)$generator->[0];
-      my $args = (object[])$generator->[1];
-      
-      my $cb = (Mojo::UserAgent::Transactor::Callback::Generator)$self->{generators_h}->get("$name");
-      $cb->($self, $tx, $args);
+    if ($args1_used) {
+      $args1 = $args2;
     }
     
-    if ($body) {
-      $req->set_body($body);
+    # Generator
+    if ($args1 isa object[] && !(is_options $args1)) {
+      my $generator_args = (object[])$args1;
+      
+      my $name = $args1->(object[])->[0]->(string);
+      
+      my $cb = (Mojo::UserAgent::Transactor::Callback::Generator)$self->{generators}->get($name);
+      
+      if (@$generator_args > 1) {
+        $cb->($self, $tx, $generator_args->[1]);
+      }
+      elsif (@$generator_args > 2) {
+        $cb->($self, $tx, $generator_args->[1], $generator_args->[2]);
+      }
+      elsif (@$generator_args > 3) {
+        $cb->($self, $tx, $generator_args->[1], $generator_args->[2], $generator_args->[3]);
+      }
+      else {
+        die "Too many argument for a generator.";
+      }
+    }
+    else {
+      $req->set_body((string)$args1);
     }
     
     return $tx;
@@ -229,7 +284,7 @@ class Mojo::UserAgent::Transactor {
     return $new;
   }
   
-  method endpoint : object[] ($tx : Mojo::Transaction) {
+  method endpoint : Mojo::UserAgent::Transactor::Endpoint ($tx : Mojo::Transaction) {
     
     # Basic endpoint
     my $req   = $tx->req;
@@ -251,23 +306,12 @@ class Mojo::UserAgent::Transactor {
       return &_proxy($tx, $proto, $host, $port) ;
     }
     
-    return [(object)$proto, $host, $port];
-  }
-  
-  private static method _proxy : object[] ($tx : Mojo::Transaction, $proto : string, $host : string, $port : int) {
+    my $endpoint = Mojo::UserAgent::Transactor::Endpoint->new;
+    $endpoint->set_protocol($proto);
+    $endpoint->set_host($host);
+    $endpoint->set_port($port);
     
-    my $req = $tx->req;
-    if ($req->via_proxy && (my $proxy = $req->proxy)) {
-      
-      my $proxy_port  = $proxy->port;
-      unless ($proxy_port > 0) {
-        $proxy_port = $proto eq "https" ? 443 : 80;
-      }
-      
-      return [(object)$proxy->protocol, $proxy->ihost, $proxy_port];
-    }
-    
-    return [(object)$proto, $host, $port];
+    return $endpoint;
   }
   
   method upgrade : Mojo::Transaction::WebSocket ($tx : Mojo::Transaction::HTTP) {
@@ -293,12 +337,12 @@ class Mojo::UserAgent::Transactor {
     return $ws;
   }
   
-  method peer : object[] ($tx : Mojo::Transaction::HTTP) {
+  method peer : Mojo::UserAgent::Transactor::Endpoint ($tx : Mojo::Transaction::HTTP) {
     
-    my $_ = $self->endpoint($tx);
-    my $proto = (string)$_->[0];
-    my $host = (string)$_->[1];
-    my $port = (int)$_->[2];
+    my $endpoint = $self->endpoint($tx);
+    my $proto = $endpoint->protocol;
+    my $host = $endpoint->host;
+    my $port = $endpoint->port;
     
     return &_proxy($tx, $proto, $host, $port);
   }

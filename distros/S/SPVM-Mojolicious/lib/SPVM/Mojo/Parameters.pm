@@ -29,6 +29,14 @@ Mojo::Parameters class in L<SPVM> is a container for form parameters used by L<M
   $params->pairs_list->push_([i => "♥ mojolicious"]);
   say $params->to_string;
 
+=head1 Interfaces
+
+=over 2
+
+=item * L<Stringable|SPVM::Stringable>
+
+=back
+
 =head1 Fields
 
 =head2 pairs
