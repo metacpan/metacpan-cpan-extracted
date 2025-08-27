@@ -29,7 +29,7 @@
             "Moo" : "0",
             "Path::Tiny" : "0",
             "Test::Most" : "0",
-            "Test::Warnings" : "0",
+            "Test::Output" : "0",
             "perl" : "v5.16.3"
          }
       }
@@ -37,7 +37,7 @@
    "provides" : {
       "Wiki::JSON" : {
          "file" : "lib/Wiki/JSON.pm",
-         "version" : "v0.0.30"
+         "version" : "v0.0.31"
       },
       "Wiki::JSON::Contributing" : {
          "file" : "lib/Wiki/JSON/Contributing.pm"
@@ -58,6 +58,6 @@
          "url" : "https://github.com/sergiotarxz/Perl-Wiki-JSON"
       }
    },
-   "version" : "v0.0.30",
+   "version" : "v0.0.31",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

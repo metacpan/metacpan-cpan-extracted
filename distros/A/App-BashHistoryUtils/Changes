@@ -1,3 +1,8 @@
+0.071   2025-08-20  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] Add grephist as short alias for grep-bash-history-entries.
+
+
 0.070   2021-05-26  Released-By: PERLANCAR; Urgency: high
 
 	- [build] Rebuild to update Sah coercion module names (old Sah coercion

@@ -34,14 +34,14 @@
       },
       "runtime" : {
          "requires" : {
-            "Class::Accessor::Fast" : "0.51",
-            "Config::Tiny" : "2.28",
-            "Date::Format" : "2.24",
-            "HTTP::Request" : "6.45",
-            "IO::Scalar" : "2.113",
-            "JSON" : "4.10",
-            "LWP::UserAgent" : "6.77",
-            "Readonly" : "2.05",
+            "Class::Accessor::Fast" : "0",
+            "Config::Tiny" : "0",
+            "Date::Format" : "0",
+            "HTTP::Request" : "0",
+            "IO::Scalar" : "0",
+            "JSON" : "0",
+            "LWP::UserAgent" : "0",
+            "Readonly" : "0",
             "perl" : "5.016"
          }
       },
@@ -52,10 +52,10 @@
    "provides" : {
       "Markdown::Render" : {
          "file" : "lib/Markdown/Render.pm",
-         "version" : "v1.60.2"
+         "version" : "v1.60.4"
       }
    },
    "release_status" : "stable",
-   "version" : "v1.60.2",
+   "version" : "v1.60.4",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

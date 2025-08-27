@@ -6,7 +6,7 @@ use warnings;
 use lib 'lib';
 
 use Test::Most;
-use Test::Warnings;
+use Test::Output;
 
 use_ok 'Wiki::JSON';
 
@@ -147,9 +147,11 @@ and italic''' italic'': hola/
 
 {
     my $parsed;
-    Test::Warnings::warnings {
+    stderr_is {
         $parsed = Wiki::JSON->new->parse(q/hola: '''''bold and italic/);
-    };
+    } 'Detected bold or italic unterminated syntax WIKI_LINE: 1
+Detected bold or italic unterminated syntax WIKI_LINE: 1
+', 'Errors match';
 
     #        print Data::Dumper::Dumper($parsed);
     is_deeply $parsed,
@@ -161,10 +163,12 @@ and italic''' italic'': hola/
 
 {
     my $parsed;
-    Test::Warnings::warnings {
+    stderr_is {
         $parsed =
           Wiki::JSON->new->parse(q/hola: '''''bold and italic''' italic/);
-    };
+    } 'Detected bold or italic unterminated syntax WIKI_LINE: 1
+Detected bold or italic unterminated syntax WIKI_LINE: 1
+', 'Errors match';
 
     #        print Data::Dumper::Dumper($parsed);
     is_deeply $parsed, [
@@ -178,11 +182,13 @@ and italic''' italic'': hola/
 ## It becomes unable to parse further titles, terminate your bolds and italic.
 {
     my $parsed;
-    Test::Warnings::warnings {
+    stderr_is {
         $parsed =
           Wiki::JSON->new->parse(
             q/= hola: '''''bold and italic''' italic = hola/);
-    };
+    } 'Detected bold or italic unterminated syntax WIKI_LINE: 1
+Detected bold or italic unterminated syntax WIKI_LINE: 1
+', 'Errors match';
 
     #    print Data::Dumper::Dumper($parsed);
     is_deeply $parsed,

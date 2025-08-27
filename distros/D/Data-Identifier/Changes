@@ -1,3 +1,6 @@
+v0.17  2025-08-26Z
+    - Added basic support for sirtx-numerical-identifier
+
 v0.16  2025-06-04Z
     - Added Data::Identifier::Interface::Subobjects (still experimental)
     - Added Data::Identifier::Interface::Simple (still experimental)

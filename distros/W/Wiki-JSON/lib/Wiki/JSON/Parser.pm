@@ -16,18 +16,41 @@ const my $MINIMUM_LINK_SEARCH                                   => 3;
 const my $MINIMUM_TEMPLATE_SEARCH                               => 3;
 const my $LIST_ELEMENT_DELIMITER                                => "\n* ";
 
-has used                => ( is => 'rw', default => sub { 0 } );
-has current_list_output => ( is => 'rw' );
+has used                 => ( is => 'rw', default => sub { 0 } );
+has _current_list_output => ( is => 'rw' );
+has _parse_options       => ( is => 'rw' );
+has _current_element     => ( is => 'rw', default => sub { [] } );
 
 sub parse {
-    my ( $self, $wiki_text ) = @_;
+    my ( $self, $wiki_text, $options ) = @_;
     if ( $self->used ) {
         die 'Parser already used';
     }
+    $self->_parse_options($options);
     my @output;
     $self->_parse_in_array( \@output, $wiki_text );
+    $self->_strip_all_line_numbers( \@output );
     $self->used(1);
     return \@output;
+}
+
+sub _strip_all_line_numbers {
+    my ( $self, $output ) = @_;
+    if ( $self->_parse_options->{track_lines_for_errors} ) {
+        return;
+    }
+    for my $element (@$output) {
+        if ( 'HASH' ne ref $element ) {
+            next;
+        }
+        delete $element->{start_line};
+        if ( defined $element->{output} ) {
+            @{ $element->{output} } =
+              map { $self->_strip_line_numbers_element($_) }
+              @{ $element->{output} };
+        }
+        $self->_strip_all_line_numbers( $element->{output} );
+    }
 }
 
 sub _search_interrupt {
@@ -97,6 +120,9 @@ sub _if_interrupted {
     }
     if ( !$options->{is_nowiki} ) {
         ($buffer) = $self->_insert_into_output( $output, $buffer );
+        if ( !$options->{is_bold} && !$options->{is_italic} ) {
+            @$output = map { $self->_strip_line_numbers_element($_) } @$output;
+        }
     }
     return ($buffer);
 }
@@ -104,7 +130,7 @@ sub _if_interrupted {
 sub _insert_list_element_never_appending {
     my ( $self, $output, $buffer ) = @_;
     push @$output, { type => 'list_element', output => [$buffer] };
-    $self->current_list_output( $output->[-1]{output} );
+    $self->_current_list_output( $output->[-1]{output} );
     $buffer = '';
     return ($buffer);
 }
@@ -128,10 +154,19 @@ sub _if_interrupted_unordered_list {
     return ($buffer);
 }
 
+sub _strip_line_numbers_element {
+    my ( $self, $element ) = @_;
+    if ( 'HASH' ne ref $element ) {
+        return $element;
+    }
+    delete $element->{start_line};
+    return $element;
+}
+
 sub _insert_list_appending_if_possible {
     my ( $self, $output, $buffer, $options ) = @_;
-    if ( defined $self->current_list_output ) {
-        push @{ $self->current_list_output }, $buffer;
+    if ( defined $self->_current_list_output ) {
+        push @{ $self->_current_list_output }, $buffer;
         $buffer = '';
         return ($buffer);
     }
@@ -155,7 +190,7 @@ sub _insert_new_list_element_after_asterisk {
     $buffer = '';
     $i += $size_search;
     push @$output, { type => 'list_element', output => [] };
-    $self->current_list_output( $output->[-1]{output} );
+    $self->_current_list_output( $output->[-1]{output} );
     $buffer = '';
     return ( $i, $buffer, );
 }
@@ -196,12 +231,12 @@ sub _unordered_list_pre_syntax_parsing_newline_logic_br {
     if ( $last_word eq $searched ) {
         $options->{'br_found'} = 1;
         if ( length $buffer ) {
-            if ( defined $self->current_list_output ) {
-                push @{ $self->current_list_output }, $buffer;
+            if ( defined $self->_current_list_output ) {
+                push @{ $self->_current_list_output }, $buffer;
             }
             else {
                 push @$output, { type => 'list_element', output => [$buffer] };
-                $self->current_list_output( $output->[-1]{output} );
+                $self->_current_list_output( $output->[-1]{output} );
             }
         }
         $buffer = '';
@@ -346,7 +381,8 @@ sub _parse_in_array {
         $buffer = '';
     }
     if ( $options->{is_bold} || $options->{is_italic} ) {
-        warn 'Detected bold or italic unterminated syntax';
+        say STDERR 'Detected bold or italic unterminated syntax WIKI_LINE: '
+          . $self->_current_element->[-1]{start_line};
     }
     return ( $i, $buffer );
 }
@@ -389,6 +425,7 @@ sub _try_parse_italic {
     my $last_word   = substr $wiki_text, $i, $size_search;
     my $is_bold_and_italic_single_step =
       $self->_check_bold_and_italic_in_single_step( $wiki_text, $i );
+    my $start_bold_or_italic = $i;
     if ( !$is_bold_and_italic_single_step ) {
         if ( $last_word ne $searched ) {
             return ( 0, $i, $buffer, $options );
@@ -406,7 +443,7 @@ sub _try_parse_italic {
         $i += $EXTRA_CHARACTERS_BOLD_AND_ITALIC_WHEN_ITALIC;
     }
     return $self->_recurse_pending_bold_or_italic( $output, $wiki_text, $i,
-        $buffer, $options );
+        $start_bold_or_italic, $buffer, $options );
 
 }
 
@@ -423,6 +460,8 @@ sub _check_bold_and_italic_in_single_step {
 
 sub _try_parse_unordered_list {
     my ( $self, $output, $wiki_text, $buffer, $i, $options ) = @_;
+    my $start_line =
+      scalar @{ [ split "\n", substr( $wiki_text, 0, $i ) ] };
     if ( 0 < length $buffer ) {
         return ( 0, $i, $buffer, $options );
     }
@@ -435,6 +474,7 @@ sub _try_parse_unordered_list {
     $i += $size_search;
     $options->{is_unordered_list} = 1;
     my $element = { type => 'unordered_list', output => [], };
+    $element->{start_line} = $start_line;
     ( $i, $buffer ) = $self->_parse_in_array(
         $element->{output},
         $wiki_text,
@@ -484,7 +524,7 @@ sub _save_before_new_element {
             push @$output, { type => 'list_element', output => [] };
         }
         $output = $output->[-1]{output};
-        $self->current_list_output($output);
+        $self->_current_list_output($output);
         $options->{element_found} = 1;
     }
     if ( !length $buffer ) {
@@ -496,9 +536,10 @@ sub _save_before_new_element {
 
 sub _try_parse_bold {
     my ( $self, $output, $wiki_text, $buffer, $i, $options ) = @_;
-    my $searched    = q/'''/;
-    my $size_search = length $searched;
-    my $last_word   = substr $wiki_text, $i, $size_search;
+    my $searched             = q/'''/;
+    my $start_bold_or_italic = $i;
+    my $size_search          = length $searched;
+    my $last_word            = substr $wiki_text, $i, $size_search;
     my $is_bold_and_italic_single_step =
       $self->_check_bold_and_italic_in_single_step( $wiki_text, $i );
     if ( !$is_bold_and_italic_single_step ) {
@@ -515,8 +556,8 @@ sub _try_parse_bold {
         $i += 2;
     }
     my @return =
-      $self->_recurse_pending_bold_or_italic( $output, $wiki_text, $i, $buffer,
-        $options );
+      $self->_recurse_pending_bold_or_italic( $output, $wiki_text, $i,
+        $start_bold_or_italic, $buffer, $options );
     $return[0] = 1;
     return @return;
 }
@@ -537,10 +578,18 @@ sub _calculate_bold_or_italic_type {
 }
 
 sub _recurse_pending_bold_or_italic {
-    my ( $self, $output, $wiki_text, $i, $buffer, $options ) = @_;
+    my ( $self, $output, $wiki_text, $i, $start_bold_or_italic, $buffer,
+        $options )
+      = @_;
     my $element = { output => [], };
     my $is_bold_and_italic =
       $self->_calculate_bold_or_italic_type( $element, $options );
+    my $start_line =
+      scalar @{ [ split "\n", substr( $wiki_text, 0, $start_bold_or_italic ) ]
+      };
+    push @{ $self->_current_element }, $element;
+    $element->{start_line} = $start_line;
+    say $element->{start_line} . '';
     if ( !defined $element->{type} ) {
         return ( 0, $i, $buffer, $options );
     }
@@ -593,9 +642,10 @@ sub _recurse_pending_bold_or_italic {
     if ( $i + 1 >= length $wiki_text ) {
         return ( 1, $i, $buffer, $options );
     }
+    pop @{ $self->_current_element };
     my @return =
-      $self->_recurse_pending_bold_or_italic( $output, $wiki_text, $i, $buffer,
-        $options );
+      $self->_recurse_pending_bold_or_italic( $output, $wiki_text, $i,
+        $start_bold_or_italic, $buffer, $options );
     $return[0] = 1;
     return @return;
 }
@@ -617,6 +667,8 @@ sub _try_parse_image {
     my $size_search      = length $searched;
     my $orig_size_search = $size_search;
     my $last_word        = substr $wiki_text, $i, $size_search;
+    my $start_line =
+      scalar @{ [ split "\n", substr( $wiki_text, 0, $i ) ] };
     if ( $last_word ne $searched ) {
         return ( 0, $i, $buffer );
     }
@@ -634,10 +686,11 @@ sub _try_parse_image {
           $self->_save_before_new_element( $output, $buffer, $options );
         push @$output,
           {
-            type    => 'image',
-            link    => $1,
-            caption => '',
-            options => {},
+            type       => 'image',
+            link       => $1,
+            caption    => '',
+            options    => {},
+            start_line => $start_line,
           };
         return ( 1, $i + $size_search + 2, $buffer );
     }
@@ -686,10 +739,11 @@ sub _try_parse_image {
     }
 
     my $template = {
-        type    => 'image',
-        link    => $link,
-        caption => $caption,
-        options => $element_options,
+        type       => 'image',
+        link       => $link,
+        caption    => $caption,
+        options    => $element_options,
+        start_line => $start_line,
     };
     push @$output, $template;
     $i += 1;
@@ -1112,6 +1166,8 @@ sub _try_parse_template {
     my $searched    = '{{';
     my $size_search = length $searched;
     my $last_word   = substr $wiki_text, $i, $size_search;
+    my $start_line =
+      scalar @{ [ split "\n", substr( $wiki_text, 0, $i ) ] };
     if ( $last_word ne $searched ) {
         return ( 0, $i, $buffer );
     }
@@ -1130,6 +1186,7 @@ sub _try_parse_template {
             type          => 'template',
             template_name => $1,
             output        => [],
+            start_line    => $start_line,
           };
         return ( 1, $i + $size_search + 1, $buffer );
     }
@@ -1147,6 +1204,7 @@ sub _try_parse_template {
         type          => 'template',
         template_name => $template_name,
         output        => [],
+        start_line    => $start_line,
     };
     my $current_buffer = '';
     my $needs_arg      = 0;
@@ -1209,6 +1267,8 @@ sub _try_parse_header {
     if ( $last_char ne '=' ) {
         return ( 0, $i, $buffer );
     }
+    my $start_line =
+      scalar @{ [ split "\n", substr( $wiki_text, 0, $i ) ] };
     ( $output, $buffer ) =
       $self->_save_before_new_element( $output, $buffer, $options );
     my $matching = 1;
@@ -1233,6 +1293,7 @@ sub _try_parse_header {
         output   => [],
         type     => 'hx',
     };
+    $header->{start_line} = $start_line;
     ( $i, $buffer ) = $self->_parse_in_array(
         $header->{output},
         $wiki_text,
@@ -1290,163 +1351,163 @@ Wiki::JSON - Parse wiki-like articles to a data-structure transformable to JSON.
 
 =head1 SYNOPSIS
 
-    use Wiki::JSON;
+use Wiki::JSON;
 
-    my $structure = Wiki::JSON->new->parse(<<'EOF');
-    = This is a wiki title =
-    '''This is bold'''
-    ''This is italic''
-    '''''This is bold and italic'''''
-    == This is a smaller title, the user can use no more than 6 equal signs ==
-    <nowiki>''This is printed without expanding the special characters</nowiki>
-    * This
-    * Is
-    * A
-    * Bullet
-    * Point
-    * List
-    {{foo|Templates are generated|with their arguments}}
-    {{stub|This is under heavy development}}
-    The parser has some quirks == This will generate a title ==
-    ''' == '' Unterminated syntaxes will still be parsed until the end of file
-    This is a link to a wiki article: [[Cool Article]]
-    This is a link to a wiki article with an alias: [[Cool Article|cool article]]
-    This is a link to a URL with an alias: [[https://example.com/cool-source.html|cool article]]
-    This is a link to a Image [[File:https:/example.com/img.png|50x50px|frame|This is a caption]]
-    EOF
-
-=head1 DESCRIPTION
-
-A parser for a subset of a mediawiki-like syntax, quirks include some
-supposedly inline elements are parsed multi-line like headers, templates*,
-italic and bolds.
+my $structure = Wiki::JSON->new->parse(<<'EOF');
+= This is a wiki title =
+'''This is bold'''
+''This is italic''
+'''''This is bold and italic'''''
+== This is a smaller title, the user can use no more than 6 equal signs ==
+<nowiki>''This is printed without expanding the special characters</nowiki>
+* This
+* Is
+* A
+* Bullet
+* Point
+* List
+{{foo|Templates are generated|with their arguments}}
+{{stub|This is under heavy development}}
+The parser has some quirks == This will generate a title ==
+''' == '' Unterminated syntaxes will still be parsed until the end of file
+This is a link to a wiki article: [[Cool Article]]
+This is a link to a wiki article with an alias: [[Cool Article|cool article]]
+This is a link to a URL with an alias: [[https://example.com/cool-source.html|cool article]]
+This is a link to a Image [[File:https:/example.com/img.png|50x50px|frame|This is a caption]]
+EOF
 
 =head1 DESCRIPTION
 
 A parser for a subset of a mediawiki-like syntax, quirks include some
 supposedly inline elements are parsed multi-line like headers, templates*,
-italic and bolds.
+           italic and bolds.
 
-Lists are only one level and not everything in mediawiki is supported by the
-moment.
+           =head1 DESCRIPTION
 
-=head2 INSTALLING
+           A parser for a subset of a mediawiki-like syntax, quirks include some
+           supposedly inline elements are parsed multi-line like headers, templates*,
+           italic and bolds.
 
-    cpanm https://github.com/sergiotarxz/Perl-Wiki-JSON.git
+           Lists are only one level and not everything in mediawiki is supported by the
+           moment.
 
-=head2 USING AS A COMMAND
+           =head2 INSTALLING
 
-    wiki2json file.wiki > output.json
+           cpanm https://github.com/sergiotarxz/Perl-Wiki-JSON.git
 
-=head1 INSTANCE METHODS
+           =head2 USING AS A COMMAND
 
-=head2 new
+           wiki2json file.wiki > output.json
 
-    my $wiki_parser = Wiki::JSON->new;
+           =head1 INSTANCE METHODS
 
-=head1 SUBROUTINES/METHODS
+           =head2 new
 
-=head2 parse
+           my $wiki_parser = Wiki::JSON->new;
 
-    my $structure = $wiki_parser->parse($wiki_string);
+           =head1 SUBROUTINES/METHODS
 
-Parses the wiki format into a serializable to JSON or YAML Perl data structure.
+           =head2 parse
 
-=head1 RETURN FROM METHODS
+           my $structure = $wiki_parser->parse($wiki_string);
 
-=head2 parse
+           Parses the wiki format into a serializable to JSON or YAML Perl data structure.
 
-The return is an ArrayRef in which each element is either a string or a HashRef.
+           =head1 RETURN FROM METHODS
 
-HashRefs can be classified by the key type which can be one of these:
+           =head2 parse
 
-=head3 hx
+           The return is an ArrayRef in which each element is either a string or a HashRef.
 
-A header to be printed as h1..h6 in HTML, has the following fields:
+           HashRefs can be classified by the key type which can be one of these:
 
-=over 4
+           =head3 hx
 
-=item hx_level
+           A header to be printed as h1..h6 in HTML, has the following fields:
 
-A number from 1 to 6 defining the header level.
+           =over 4
 
-=item output
+           =item hx_level
 
-An ArrayRef defined by the return from parse.
+           A number from 1 to 6 defining the header level.
 
-=back
+           =item output
 
-=head3 template
+           An ArrayRef defined by the return from parse.
 
-A template thought for developer defined expansions of how some data shoudl be represented.
+           =back
 
-=over 4
+           =head3 template
 
-=item template_name
+           A template thought for developer defined expansions of how some data shoudl be represented.
 
-The name of the template.
+           =over 4
 
-=item output
+           =item template_name
 
-An ArrayRef defined by the return from parse.
+           The name of the template.
 
-=back
+           =item output
 
-=head3 bold
+           An ArrayRef defined by the return from parse.
 
-A set of elements that must be represented as bold text.
+           =back
 
-=over 4
+           =head3 bold
 
-=item output
+           A set of elements that must be represented as bold text.
 
-An ArrayRef defined by the return from parse.
+           =over 4
 
-=back
+           =item output
 
-=head3 italic
+           An ArrayRef defined by the return from parse.
 
-A set of elements that must be represented as italic text.
+           =back
 
-=over 4
+           =head3 italic
 
-=item output
+           A set of elements that must be represented as italic text.
 
-An ArrayRef defined by the return from parse.
+           =over 4
 
-=back
+           =item output
 
-=head3 bold_and_italic
+           An ArrayRef defined by the return from parse.
 
-A set of elements that must be represented as bold and italic text.
+           =back
 
-=over 4
+           =head3 bold_and_italic
 
-=item output
+           A set of elements that must be represented as bold and italic text.
 
-An ArrayRef defined by the return from parse.
+           =over 4
 
-=back
+           =item output
 
-=head3 unordered_list
+           An ArrayRef defined by the return from parse.
 
-A bullet point list.
+           =back
 
-=over 4
+           =head3 unordered_list
 
-=item output
+           A bullet point list.
 
-A ArrayRef of HashRefs from the type list_element.
+           =over 4
 
-=back
+           =item output
 
-=head3 list_element
+           A ArrayRef of HashRefs from the type list_element.
 
-An element in a list, this element must not appear outside of the output element of a list.
+           =back
 
-=over 4
+           =head3 list_element
 
-=item output
+           An element in a list, this element must not appear outside of the output element of a list.
+
+           =over 4
+
+           =item output
 
 An ArrayRef defined by the return from parse.
 

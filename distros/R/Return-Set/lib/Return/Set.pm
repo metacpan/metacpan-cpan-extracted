@@ -2,12 +2,13 @@ package Return::Set;
 
 use strict;
 use warnings;
+use 5.010;
 
 use parent 'Exporter';
 
 use Carp qw(croak);
-use Params::Get 0.11;
-use Params::Validate::Strict 0.04 qw(validate_strict);
+use Params::Get 0.13;
+use Params::Validate::Strict 0.10 qw(validate_strict);
 
 our @EXPORT_OK = qw(set_return);
 
@@ -17,11 +18,11 @@ Return::Set - Return a value optionally validated against a strict schema
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 SYNOPSIS
 
@@ -45,7 +46,7 @@ When used hand-in-hand with L<Params::Get> you should be able to formally specif
 =head2 set_return($value, $schema)
 
 Returns C<$value>.
-If C<$schema> is provided, validates the value against it.
+If C<$schema> is provided, it validates the value against it.
 Croaks if validation fails.
 
 =cut
@@ -54,16 +55,20 @@ sub set_return {
 	my $value;
 	my $schema;
 
+	if((scalar(@_) == 1) && !ref($_[0])) {
+		return $_[0];
+	}
+
 	if(scalar(@_) == 2) {
 		$value = $_[0];
 		$schema = $_[1];
 	} else {
-		my $params = Params::Get::get_params('value', \@_);
-		$value = $params->{'value'};
+		my $params = Params::Get::get_params('output', \@_);
+		$value = $params->{'value'} // $params->{'output'};
 		$schema = $params->{'schema'};
 	}
 
-	if(defined $schema) {
+	if(defined($schema)) {
 		eval {
 			validate_strict(args => { 'value' => $value }, schema => { 'value' => $schema });
 			1;

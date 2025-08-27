@@ -4,7 +4,7 @@
       "BIGFOOT <bigfoot@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -49,17 +49,16 @@
    "provides" : {
       "Text::ASCIITable::EasyTable" : {
          "file" : "lib/Text/ASCIITable/EasyTable.pm",
-         "version" : "1.005"
+         "version" : "1.006"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {},
       "repository" : {
-         "type" : "git",
-         "url" : "git://github.com/rlauer6/Text-ASCIITable-EasyTable.git",
-         "web" : "http://github.com/rlauer6/Text-ASCIITable-EasyTable"
+         "type" : "git"
       }
    },
-   "version" : "1.005",
-   "x_serialization_backend" : "JSON::PP version 4.10"
+   "version" : "1.006",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

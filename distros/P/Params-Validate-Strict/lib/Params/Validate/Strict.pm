@@ -18,11 +18,11 @@ Params::Validate::Strict - Validates a set of parameters against a schema
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =cut
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 =head1 SYNOPSIS
 
@@ -31,17 +31,17 @@ our $VERSION = '0.10';
         age => { type => 'integer', min => 0, max => 150 },
     };
 
-    my $args = {
+    my $input = {
          username => 'john_doe',
          age => '30',	# Will be coerced to integer
     };
 
-    my $validated_args = validate_strict(schema => $schema, args => $args);
+    my $validated_input = validate_strict(schema => $schema, input => $input);
 
-    if (defined $validated_args) {
+    if (defined $validated_input) {
         print "Example 1: Validation successful!\n";
-        print 'Username: ', $validated_args->{username}, "\n";
-        print 'Age: ', $validated_args->{age}, "\n";	# It's an integer now
+        print 'Username: ', $validated_input->{username}, "\n";
+        print 'Age: ', $validated_input->{age}, "\n";	# It's an integer now
     } else {
         print "Example 1: Validation failed: $@\n";
     }
@@ -61,9 +61,10 @@ This function takes two mandatory arguments:
 A reference to a hash that defines the validation rules for each parameter.
 The keys of the hash are the parameter names, and the values are either a string representing the parameter type or a reference to a hash containing more detailed rules.
 
-=item * C<args>
+=item * C<args> || C<input>
 
-A reference to a hash containing the parameters to be validated.  The keys of the hash are the parameter names, and the values are the parameter values.
+A reference to a hash containing the parameters to be validated.
+The keys of the hash are the parameter names, and the values are the parameter values.
 
 =back
 
@@ -110,10 +111,12 @@ The maximum length (for strings), value (for numbers) or number of keys (for has
 =item * C<matches>
 
 A regular expression that the parameter value must match.
+Checks all members of arrayrefs.
 
 =item * C<nomatch>
 
 A regular expression that the parameter value must not match.
+Checks all members of arrayrefs.
 
 =item * C<callback>
 
@@ -173,7 +176,7 @@ sub validate_strict
 	my $params = Params::Get::get_params(undef, \@_);
 
 	my $schema = $params->{'schema'};
-	my $args = $params->{'args'};
+	my $args = $params->{'args'} || $params->{'input'};
 	my $unknown_parameter_handler = $params->{'unknown_parameter_handler'} || 'die';
 
 	# Check if schema and args are references to hashes
@@ -349,7 +352,12 @@ sub validate_strict
 						next;	# Skip if string is undefined
 					}
 					eval {
-						unless($value =~ $rule_value) {
+						if($rules->{'type'} eq 'arrayref') {
+							my @matches = grep { /$rule_value/ } @{$value};
+							if(scalar(@matches) != scalar(@{$value})) {
+								croak "validate_strict: All members of parameter '$key' [", join(', ', @{$value}), "] must match pattern '$rule_value'";
+							}
+						} elsif($value !~ $rule_value) {
 							croak "validate_strict: Parameter '$key' ($value) must match pattern '$rule_value'";
 						}
 					};
@@ -357,7 +365,12 @@ sub validate_strict
 						croak(__PACKAGE__, "::validate_strict: Parameter '$key' invalid regex '$rule_value': $@");
 					}
 				} elsif($rule_name eq 'nomatch') {
-					if($value =~ $rule_value) {
+					if($rules->{'type'} eq 'arrayref') {
+						my @matches = grep { /$rule_value/ } @{$value};
+						if(scalar(@matches)) {
+							croak "validate_strict: No member of parameter '$key' [", join(', ', @{$value}), "] must match pattern '$rule_value'";
+						}
+					} elsif($value =~ $rule_value) {
 						croak "validate_strict: Parameter '$key' ($value) must not match pattern '$rule_value'";
 					}
 				} elsif($rule_name eq 'memberof') {

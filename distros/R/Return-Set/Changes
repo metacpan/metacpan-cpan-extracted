@@ -1,5 +1,10 @@
 Revision history for Return-Set
 
+0.03	Tue Aug 26 15:00:17 EDT 2025
+	Explictly die when no arguments are given
+	Bump the version of Validate::Params::Strict to get latest features to Test::Returns
+	args can now also be output, to be used with Params::Get which takes input
+
 0.02	Mon Jul 28 20:42:49 EDT 2025
 	Fix the pre-req versions
 

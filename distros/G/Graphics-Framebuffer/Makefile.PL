@@ -127,6 +127,7 @@ if (WriteMakefile(
         'Math::Gradient' => '0.03',
         'List::Util'     => '1.20',
         'File::Map'      => '0.64',
+		'Term::ReadKey'  => '0',
         'Imager'         => '0.80',
         'Inline'         => '0.53',
         'Inline::C'      => '0.53',

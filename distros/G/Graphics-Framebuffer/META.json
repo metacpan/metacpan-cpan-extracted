@@ -44,11 +44,12 @@
             "Math::Bezier" : "0.01",
             "Math::Gradient" : "0.03",
             "Math::Trig" : "1.10",
+            "Term::ReadKey" : "0",
             "perl" : "5.020"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "6.65",
+   "version" : "6.67",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

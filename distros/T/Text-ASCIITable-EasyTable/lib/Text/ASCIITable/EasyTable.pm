@@ -5,15 +5,15 @@ use warnings;
 
 use Data::Dumper;
 use JSON;
-use List::Util   qw(pairs);
+use List::Util qw(pairs);
 use Scalar::Util qw(reftype);
 use Text::ASCIITable;
 
 use parent qw(Exporter);
 
-our @EXPORT = qw(easy_table); ## no critic (ProhibitAutomaticExportation)
+our @EXPORT = qw(easy_table);  ## no critic (ProhibitAutomaticExportation)
 
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 
 ########################################################################
 {
@@ -148,8 +148,7 @@ sub _render_data {
 ########################################################################
   my (%options) = @_;
 
-  my ( $data, $rows, $columns, $sort_key )
-    = @options{qw(data rows columns sort_key)};
+  my ( $data, $rows, $columns, $sort_key ) = @options{qw(data rows columns sort_key)};
 
   my @sorted_data;
 
@@ -174,8 +173,6 @@ sub _render_data {
 
   for my $row ( @{$data} ) {
 
-    print {*STDERR} Dumper( [ row => $row ] );
-
     if ( !$row ) {
       push @rendered_data, [];
       next;
@@ -187,9 +184,8 @@ sub _render_data {
     if ($rows) {
       push @rendered_data, [
         map {
-          ref $row_lu{$_}
-            && reftype( $row_lu{$_} ) eq 'CODE' ? $row_lu{$_}->( $row, $_ )
-            : $row_lu{$_}                       ? $row->{ $row_lu{$_} }
+              ref $row_lu{$_} && reftype( $row_lu{$_} ) eq 'CODE' ? $row_lu{$_}->( $row, $_ )
+            : $row_lu{$_}                                         ? $row->{ $row_lu{$_} }
             : $row->{$_}
         } @{$columns},
       ];

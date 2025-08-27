@@ -374,6 +374,7 @@ use Math::Bezier;                                                # Bezier curve 
 use Math::Gradient qw( gradient array_gradient multi_gradient ); # Awesome gradient calculation module
 use List::Util qw(min max);                                      # min and max are very handy!
 use File::Map ':map';                                            # Absolutely necessary to map the screen to a string.
+use Term::ReadKey;
 use Imager;                                                      # This is used for TrueType font printing, image loading.
 use Imager::Matrix2d;
 use Imager::Fill;                                                # For hatch fills
@@ -391,7 +392,7 @@ BEGIN {
     require Exporter;
 
     # set the version for version checking
-    our $VERSION   = '6.65';
+    our $VERSION   = '6.67';
     our @ISA       = qw(Exporter);
     our @EXPORT_OK = qw(
       FBIOGET_VSCREENINFO
@@ -466,6 +467,7 @@ sub DESTROY { # Always clean up after yourself before exiting
     $self->_screen_close();
     unlink('/tmp/output.gif') if (-e '/tmp/output.gif');
     _reset() if ($self->{'RESET'});    # Exit by calling 'reset' first
+	substr($self->{'SCREEN'},0,length($self->{'START_SCREEN'})) = $self->{'START_SCREEN'};
 }
 
 # use Inline 'info', 'noclean', 'noisy'; # Only needed for debugging
@@ -475,7 +477,7 @@ use Inline C => <<'C_CODE','name' => 'Graphics::Framebuffer', 'VERSION' => $VERS
 /* Copyright 2018-2025 Richard Kelsch, All Rights Reserved
    See the Perl documentation for Graphics::Framebuffer for licensing information.
 
-   Version:  6.65
+   Version:  6.67
 
    You may wonder why the stack is so heavily used when the global structures
    have the needed values.  Well, the module can emulate another graphics mode
@@ -3242,6 +3244,7 @@ To get back into X-Windows, you just hit ALT-F7 (or ALT-F8 on some systems).
         }
     }
     $self->_flush_screen();
+    $self->{'START_SCREEN'} = ''. $self->{'SCREEN'};
     chomp($self->{'this_tty'} = `tty`);
     if ($self->{'SPLASH'} > 0) {
         $self->splash($VERSION);
@@ -3858,7 +3861,6 @@ With 'pixel_size', if a positive number greater than 1, is drawn with square pix
             unless (exists($self->{'history'}) && defined($self->{'history'}->{$y}->{$x})) {
                 $index = ($self->{'BYTES_PER_LINE'} * ($y + $self->{'YOFFSET'})) + (($self->{'XOFFSET'} + $x) * $self->{'BYTES'});
                 if ($index >= 0 && $index <= ($self->{'fscreeninfo'}->{'smem_len'} - $self->{'BYTES'})) {
-                    eval {
                         $c = substr($self->{'SCREEN'}, $index, $self->{'BYTES'}) || chr(0) x $self->{'BYTES'};
                         if ($self->{'DRAW_MODE'} == NORMAL_MODE) {
                             $c  = $self->{'RAW_FOREGROUND_COLOR'};
@@ -3906,7 +3908,6 @@ With 'pixel_size', if a positive number greater than 1, is drawn with square pix
                             }
                         }
                         substr($self->{'SCREEN'}, $index, $self->{'BYTES'}) = $c;
-                    };
                     my $error = $@;
                     warn __LINE__ . " $error" if ($error && $self->{'SHOW_ERRORS'});
                     $self->_fix_mapping() if ($error);
@@ -6178,13 +6179,24 @@ NOTE:  The accelerated version of this routine may (and it is a small may) have 
     my $x = int($params->{'x'});
     my $y = int($params->{'y'});
 
-    my $pixel = $self->pixel({ 'x' => $x, 'y' => $y });
-    my $bytes = $self->{'BYTES'};
+    my $pixel = $self->pixel(
+		{
+			'x' => $x,
+			'y' => $y,
+		}
+	);
+    my $bytes    = $self->{'BYTES'};
+	my $tc_bytes = max(3,$bytes);
+	my $x_clip   = $self->{'X_CLIP'};
+	my $xx_clip  = $self->{'XX_CLIP'};
+	my $y_clip   = $self->{'Y_CLIP'};
+	my $yy_clip  = $self->{'YY_CLIP'};
 
     return if ($back eq $self->{'RAW_FOREGROUND_COLOR'});
     unless ($self->{'ACCELERATED'}) {
+		# This doesn't over-use the system stack.  While flood fill algorithms are famous being a stack memory hog, this one goes easy on it.
         my $background = $pixel->{'raw'};
-        my %visited    = ();
+        my @visited    = (); # Used to be an associative array, which was slower
         my @queue      = ();
 
         push(@queue, [$x, $y]);
@@ -6192,12 +6204,28 @@ NOTE:  The accelerated version of this routine may (and it is a small may) have 
         while (scalar(@queue)) {
             my $pointref = shift(@queue);
             ($x, $y)     = @{$pointref};
-            next if (($x < $self->{'X_CLIP'}) || ($x > $self->{'XX_CLIP'}) || ($y < $self->{'Y_CLIP'}) || ($y > $self->{'YY_CLIP'}));
-            unless (exists($visited{"$x,$y"})) {
-                $pixel = $self->pixel({ 'x' => $x, 'y' => $y, 'raw' => TRUE });
+            next if (
+				($x < $x_clip) ||
+				($x > $xx_clip) ||
+				($y < $y_clip) ||
+				($y > $yy_clip)
+			);
+            unless (defined($visited[$x][$y])) {
+                $pixel = $self->pixel(
+					{
+						'x'   => $x,
+						'y'   => $y,
+						'raw' => TRUE,
+					}
+				);
                 if ($pixel eq $background) {
-                    $self->plot({ 'x' => $x, 'y' => $y });
-                    $visited{"$x,$y"}++;
+                    $self->plot(
+						{
+							'x' => $x,
+							'y' => $y,
+						}
+					);
+                    $visited[$x][$y]++;
                     push(@queue, [$x + 1, $y]);
                     push(@queue, [$x - 1, $y]);
                     push(@queue, [$x,     $y + 1]);
@@ -6233,8 +6261,8 @@ NOTE:  The accelerated version of this routine may (and it is a small may) have 
 
         my $saved = $self->blit_read(
             {
-                'x'      => $self->{'X_CLIP'},
-                'y'      => $self->{'Y_CLIP'},
+                'x'      => $x_clip,
+                'y'      => $y_clip,
                 'width'  => $width,
                 'height' => $height,
             }
@@ -6247,18 +6275,18 @@ NOTE:  The accelerated version of this routine may (and it is a small may) have 
             my $img = Imager->new(
                 'xsize'             => $width,
                 'ysize'             => $height,
-                'raw_datachannels'  => max(3, $bytes),
-                'raw_storechannels' => max(3, $bytes),
-                'channels'          => max(3, $bytes),
+                'raw_datachannels'  => $tc_bytes,
+                'raw_storechannels' => $tc_bytes,
+                'channels'          => $tc_bytes,
             );
 
             #            unless ($self->{'DRAW_MODE'}) {
             $img->read(
                 'xsize'             => $width,
                 'ysize'             => $height,
-                'raw_datachannels'  => max(3, $bytes),
-                'raw_storechannels' => max(3, $bytes),
-                'channels'          => max(3, $bytes),
+                'raw_datachannels'  => $tc_bytes,
+                'raw_storechannels' => $tc_bytes,
+                'channels'          => $tc_bytes,
                 'raw_interleave'    => 0,
                 'data'              => $saved->{'image'},
                 'type'              => 'raw',
@@ -6271,31 +6299,31 @@ NOTE:  The accelerated version of this routine may (and it is a small may) have 
                 $pimg->read(
                     'xsize'             => $width,
                     'ysize'             => $height,
-                    'raw_datachannels'  => max(3, $bytes),
-                    'raw_storechannels' => max(3, $bytes),
+                    'raw_datachannels'  => $tc_bytes,
+                    'raw_storechannels' => $tc_bytes,
                     'raw_interleave'    => 0,
-                    'channels'          => max(3, $bytes),
+                    'channels'          => $tc_bytes,
                     'data'              => $pattern,
                     'type'              => 'raw',
                     'allow_incomplete'  => 1
                 );
                 $img->flood_fill(
-                    'x'     => int($x - $self->{'X_CLIP'}),
-                    'y'     => int($y - $self->{'Y_CLIP'}),
+                    'x'     => $x - $x_clip,
+                    'y'     => $y - $y_clip,
                     'color' => $self->{'IMAGER_FOREGROUND_COLOR'},
                     'fill'  => { 'image' => $pimg }
                 );
             } else {
                 $img->flood_fill(
-                    'x'     => int($x - $self->{'X_CLIP'}),
-                    'y'     => int($y - $self->{'Y_CLIP'}),
+                    'x'     => $x - $x_clip,
+                    'y'     => $y - $y_clip,
                     'color' => $self->{'IMAGER_FOREGROUND_COLOR'},
                 );
             }
             $img->write(
                 'type'          => 'raw',
-                'datachannels'  => max(3, $bytes),
-                'storechannels' => max(3, $bytes),
+                'datachannels'  => $tc_bytes,
+                'storechannels' => $tc_bytes,
                 'interleave'    => 0,
                 'data'          => \$saved->{'image'},
             );
@@ -6312,8 +6340,6 @@ sub replace_color {
 
 This replaces one color with another inside the clipping region.  Sort of like a fill without boundary checking.
 
-In 32 bit mode, the replaced alpha channel is ALWAYS set to 255.
-
 =over 4
 
  $fb->replace_color({
@@ -6329,6 +6355,17 @@ In 32 bit mode, the replaced alpha channel is ALWAYS set to 255.
     }
  });
 
+ $fb->replace_color({
+    'old' => {
+        'raw' => "raw encoded string of color",
+    },
+    'new' => {
+        'raw' => "raw encoded string of color",
+    }
+ });
+
+ # Encoded color strings are 4 bytes wide for 32 bit, 3 bytes for 24 bit and 2 bytes for 16 bit color.
+
 =back
 
 * This is not affected by the Acceleration setting, and is just as fast in 16 bit as it is in 24 and 32 bit modes.  Which means, very fast.
@@ -6341,7 +6378,7 @@ In 32 bit mode, the replaced alpha channel is ALWAYS set to 255.
     my $old_r = int($params->{'old'}->{'red'})   || 0;
     my $old_g = int($params->{'old'}->{'green'}) || 0;
     my $old_b = int($params->{'old'}->{'blue'})  || 0;
-    my $old_a = int($params->{'old'}->{'alpha'}) if (exists($params->{'old'}->{'alpha'}));
+    my $old_a = (exists($params->{'old'}->{'alpha'})) ? int($params->{'old'}->{'alpha'}) : undef;
     my $new_r = int($params->{'new'}->{'red'})   || 0;
     my $new_g = int($params->{'new'}->{'green'}) || 0;
     my $new_b = int($params->{'new'}->{'blue'})  || 0;
@@ -6349,87 +6386,106 @@ In 32 bit mode, the replaced alpha channel is ALWAYS set to 255.
 
     my $color_order      = $self->{'COLOR_ORDER'};
     my ($sx, $start)     = (0, 0);
-    $self->set_color({ 'red' => $new_r, 'green' => $new_g, 'blue' => $new_b });
+    $self->set_color(
+		{
+			'red'   => $new_r,
+			'green' => $new_g,
+			'blue'  => $new_b,
+		}
+	);
     my $old_mode         = $self->{'DRAW_MODE'};
     $self->{'DRAW_MODE'} = NORMAL_MODE;
 
     my ($old, $new);
-    if ($self->{'BITS'} == 32) {
-        if ($color_order == BGR) {
-            $old = (defined($old_a)) ? sprintf('\x%02x\x%02x\x%02x\x%02x',    $old_b, $old_g, $old_r, $old_a) : sprintf('\x%02x\x%02x\x%02x.', $old_b, $old_g, $old_r);
-            $new = sprintf('\x%02x\x%02x\x%02x\x%02x', $new_b, $new_g, $new_r, $new_a);
-        } elsif ($color_order == BRG) {
-            $old = (defined($old_a)) ? sprintf('\x%02x\x%02x\x%02x\x%02x',    $old_b, $old_r, $old_g, $old_a) : sprintf('\x%02x\x%02x\x%02x.', $old_b, $old_r, $old_g);
-            $new = sprintf('\x%02x\x%02x\x%02x\x%02x', $new_b, $new_r, $new_g, $new_a);
-        } elsif ($color_order == RGB) {
-            $old = (defined($old_a)) ? sprintf('\x%02x\x%02x\x%02x\x%02x',    $old_r, $old_g, $old_b, $old_a) : sprintf('\x%02x\x%02x\x%02x.', $old_r, $old_g, $old_b);
-            $new = sprintf('\x%02x\x%02x\x%02x\x%02x', $new_r, $new_g, $new_b, $new_a);
-        } elsif ($color_order == RBG) {
-            $old = (defined($old_a)) ? sprintf('\x%02x\x%02x\x%02x\x%02x',    $old_r, $old_b, $old_g, $old_a) : sprintf('\x%02x\x%02x\x%02x.', $old_r, $old_b, $old_g);
-            $new = sprintf('\x%02x\x%02x\x%02x\x%02x', $new_r, $new_b, $new_g, $new_a);
-        } elsif ($color_order == GRB) {
-            $old = (defined($old_a)) ? sprintf('\x%02x\x%02x\x%02x\x%02x',    $old_g, $old_r, $old_b, $old_a) : sprintf('\x%02x\x%02x\x%02x.', $old_g, $old_r, $old_b);
-            $new = sprintf('\x%02x\x%02x\x%02x\x%02x', $new_g, $new_r, $new_b, $new_a);
-        } elsif ($color_order == GBR) {
-            $old = (defined($old_a)) ? sprintf('\x%02x\x%02x\x%02x\x%02x',    $old_g, $old_b, $old_r, $old_a) : sprintf('\x%02x\x%02x\x%02x.', $old_g, $old_b, $old_r);
-            $new = sprintf('\x%02x\x%02x\x%02x\x%02x', $new_g, $new_b, $new_r, $new_a);
-        }
-    } elsif ($self->{'BITS'} == 24) {
-        if ($color_order == BGR) {
-            $old = sprintf('\x%02x\x%02x\x%02x', $old_b, $old_g, $old_r);
-            $new = sprintf('\x%02x\x%02x\x%02x', $new_b, $new_g, $new_r);
-        } elsif ($color_order == BRG) {
-            $old = sprintf('\x%02x\x%02x\x%02x', $old_b, $old_r, $old_g);
-            $new = sprintf('\x%02x\x%02x\x%02x', $new_b, $new_r, $new_g);
-        } elsif ($color_order == RGB) {
-            $old = sprintf('\x%02x\x%02x\x%02x.', $old_r, $old_g, $old_b);
-            $new = sprintf('\x%02x\x%02x\x%02x',  $new_r, $new_g, $new_b);
-        } elsif ($color_order == RBG) {
-            $old = sprintf('\x%02x\x%02x\x%02x.', $old_r, $old_b, $old_g);
-            $new = sprintf('\x%02x\x%02x\x%02x',  $new_r, $new_b, $new_g);
-        } elsif ($color_order == GRB) {
-            $old = sprintf('\x%02x\x%02x\x%02x.', $old_g, $old_r, $old_b);
-            $new = sprintf('\x%02x\x%02x\x%02x',  $new_g, $new_r, $new_b);
-        } elsif ($color_order == GBR) {
-            $old = sprintf('\x%02x\x%02x\x%02x.', $old_g, $old_b, $old_r);
-            $new = sprintf('\x%02x\x%02x\x%02x',  $new_g, $new_b, $new_r);
-        }
-    } elsif ($self->{'BITS'} == 16) {
-        $old_b = $old_b >> (8 - ($self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'length'}));
-        $old_g = $old_g >> (8 - ($self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'length'}));
-        $old_r = $old_r >> (8 - ($self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'length'}));
-        $new_b = $new_b >> (8 - ($self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'length'}));
-        $new_g = $new_g >> (8 - ($self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'length'}));
-        $new_r = $new_r >> (8 - ($self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'length'}));
-        $old = pack('S',
-            (
-                ($old_b << $self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'}) |
-                ($old_g << $self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'}) |
-                ($old_r << $self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'})
-            )
-        );
-        $new = pack('S',
-            (
-                ($new_b << $self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'}) |
-                ($new_g << $self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'}) |
-                ($new_r << $self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'})
-            )
-        );
-        $old = sprintf('\x%02x\x%02x', unpack('C2', $old));
-        $new = sprintf('\x%02x\x%02x', unpack('C2', $new));
-    }
-    my $save = $self->blit_read(
-        {
-            'x'      => $self->{'X_CLIP'},
-            'y'      => $self->{'Y_CLIP'},
-            'width'  => $self->{'W_CLIP'},
-            'height' => $self->{'H_CLIP'}
-        }
-    );
-
-    eval(" \$save->{'image'} =~ s/$old/$new/sg; ");
-        $self->blit_write($save);
-
+	unless (exists($params->{'old'}->{'raw'}) && exists($params->{'new'}->{'raw'})) {
+		if ($self->{'BITS'} == 32) {
+			if ($color_order == BGR) {
+				$old = (defined($old_a)) ? chr($old_b) . chr($old_g) . chr($old_r) . chr($old_a) : chr($old_b) . chr($old_g) . chr($old_r);
+				$new = chr($new_b) . chr($new_g) . chr($new_r) . chr($new_a);
+			} elsif ($color_order == BRG) {
+				$old = (defined($old_a)) ? chr($old_b) . chr($old_r) . chr($old_g) . chr($old_a) : chr($old_b) . chr($old_r) . chr($old_g);
+				$new = chr($new_b) . chr($new_r) . chr($new_g) . chr($new_a);
+			} elsif ($color_order == RGB) {
+				$old = (defined($old_a)) ? chr($old_r) . chr($old_g) . chr($old_b) . chr($old_a) : chr($old_r) . chr($old_g) . chr($old_b);
+				$new = chr($new_r) . chr($new_g) . chr($new_b) . chr($new_a);
+			} elsif ($color_order == RBG) {
+				$old = (defined($old_a)) ? chr($old_r) . chr($old_b) . chr($old_g) . chr($old_a) : chr($old_r) . chr($old_b) . chr($old_g);
+				$new = chr($new_r) . chr($new_b) . chr($new_g) . chr($new_a);
+			} elsif ($color_order == GRB) {
+				$old = (defined($old_a)) ? chr($old_g) . chr($old_r) . chr($old_b) . chr($old_a) : chr($old_g) . chr($old_r) . chr($old_b);
+				$new = chr($new_g) . chr($new_r) . chr($new_b) . chr($new_a);
+			} elsif ($color_order == GBR) {
+				$old = (defined($old_a)) ? chr($old_g) . chr($old_b) . chr($old_r) . chr($old_a) : chr($old_g) . chr($old_b) . chr($old_r);
+				$new = chr($new_g) . chr($new_b) . chr($new_r) . chr($new_a);
+			}
+		} elsif ($self->{'BITS'} == 24) {
+			if ($color_order == BGR) {
+				$old = chr($old_b) . chr($old_g) . chr($old_r);
+				$new = chr($new_b) . chr($new_g) . chr($new_r);
+			} elsif ($color_order == BRG) {
+				$old = chr($old_b) . chr($old_r) . chr($old_g);
+				$new = chr($new_b) . chr($new_r) . chr($new_g);
+			} elsif ($color_order == RGB) {
+				$old = chr($old_r) . chr($old_g) . chr($old_b);
+				$new = chr($new_r) . chr($new_g) . chr($new_b);
+			} elsif ($color_order == RBG) {
+				$old = chr($old_r) . chr($old_b) . chr($old_g);
+				$new = chr($new_r) . chr($new_b) . chr($new_g);
+			} elsif ($color_order == GRB) {
+				$old = chr($old_g) . chr($old_r) . chr($old_b);
+				$new = chr($new_g) . chr($new_r) . chr($new_b);
+			} elsif ($color_order == GBR) {
+				$old = chr($old_g) . chr($old_b) . chr($old_r);
+				$new = chr($new_g) . chr($new_b) . chr($new_r);
+			}
+		} elsif ($self->{'BITS'} == 16) {
+			$old_b = $old_b >> (8 - ($self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'length'}));
+			$old_g = $old_g >> (8 - ($self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'length'}));
+			$old_r = $old_r >> (8 - ($self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'length'}));
+			$new_b = $new_b >> (8 - ($self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'length'}));
+			$new_g = $new_g >> (8 - ($self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'length'}));
+			$new_r = $new_r >> (8 - ($self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'length'}));
+			$old = pack('S',
+				(
+					($old_b << $self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'}) |
+					($old_g << $self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'}) |
+					($old_r << $self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'})
+				)
+			);
+			$new = pack('S',
+				(
+					($new_b << $self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'}) |
+					($new_g << $self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'}) |
+					($new_r << $self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'})
+				)
+			);
+		}
+	} else {
+		$old = $params->{'old'}->{'raw'};
+		$new = $params->{'new'}->{'raw'};
+	}
+	if ($self->{'CLIPPED'}) {
+		my $save = $self->blit_read(
+			{
+				'x'      => $self->{'X_CLIP'},
+				'y'      => $self->{'Y_CLIP'},
+				'width'  => $self->{'W_CLIP'},
+				'height' => $self->{'H_CLIP'},
+			}
+		);
+		if ($self->{'BITS'} == 32 && length($old) == 3) {
+			$save->{'image'} =~ s/\Q$old\E./$new/sg;
+		} else {
+			$save->{'image'} =~ s/\Q$old\E/$new/sg;
+		}
+		$self->blit_write($save);
+	} else {
+		if ($self->{'BITS'} == 32 && length($old) == 3) {
+			$self->{'SCREEN'} =~ s/\Q$old\E./$new/sg;
+		} else {
+			$self->{'SCREEN'} =~ s/\Q$old\E/$new/sg;
+		}
+	}
     $self->{'DRAW_MODE'} = $old_mode;
 }
 
@@ -6530,6 +6586,7 @@ You need to enclose this in a loop if you wish it to play more than once.
     my $image = shift;
     my $rate  = shift || 1;
 
+	ReadMode 4;
     foreach my $frame (0 .. (scalar(@{$image}) - 1)) {
         my $begin = time;
         $self->blit_write($image->[$frame]);
@@ -6538,7 +6595,10 @@ You need to enclose this in a loop if you wish it to play more than once.
         if ($delay > 0) {
             sleep $delay;
         }
+		my $key = uc(ReadKey(-1));
+		last if ($key eq 'Q');
     }
+	ReadMode 0;
 }
 
 sub acceleration {
@@ -8013,6 +8073,15 @@ If 'width' and/or 'height' is given, the image is resized.  Note, resizing is CP
                                    # GIFs look right when this is done.
                                    # the safest setting is to not use this,
                                    # and playback using normal_mode.
+
+              'fpsmax' => 10,
+                                   # If the file is a video file, it will be
+                                   # converted to a GIF file.  This value
+                                   # determines the maximum number of frames
+                                   # per second allowed in the conversion.
+                                   # Note, the higher the number, the slower
+                                   # the conversion process.  This only works
+                                   # if "ffmpeg" is installed.
          }
      )
  );
@@ -8080,7 +8149,11 @@ If the image has multiple frames, then a reference to an array of hashes is retu
     my $color_order    = $self->{'COLOR_ORDER'};
     my $hold;
     if (defined($self->{'FFMPEG'}) && $params->{'file'} =~ /\.(mkv|mp4|avi|mpeg4|webp)$/i) { # This uses ffmpeg to convert a movie to a temporary GIF and then plays it
-        system($self->{'FFMPEG'},'-i',$params->{'file'},'-vf', 'fps=10,scale=-1:-1:flags=bicubic', '-loop','0','-loglevel','quiet','/tmp/output.gif');
+		my $quiet = ($self->{'SHOW_ERRORS'}) ? 'verbose' : 'quiet';
+		my $fpsmax = (defined($params->{'fpsmax'})) ? $params->{'fpsmax'} : 10;
+        warn "ffmpeg -i $params->{'file'} -y -fpsmax $fpsmax -loop 0 -loglevel $quiet '/tmp/output.gif'" if ($self->{'SHOW_ERRORS'});
+        system($self->{'FFMPEG'},'-i',$params->{'file'},'-y', '-fpsmax',$fpsmax, '-loop','0','-loglevel',$quiet,'/tmp/output.gif');
+		warn "Finished converting $params->{'file'}" if ($self->{'SHOW_ERRORS'});
         $hold = $params->{'file'};
         $params->{'file'} = '/tmp/output.gif';
     }
@@ -9387,7 +9460,7 @@ A copy of this license is included in the 'LICENSE' file in this distribution.
 
 =head1 VERSION
 
-Version 6.65 (Aug 25, 2025)
+Version 6.67 (Aug 27, 2025)
 
 =head1 THANKS
 

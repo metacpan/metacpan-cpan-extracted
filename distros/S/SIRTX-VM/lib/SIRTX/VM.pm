@@ -15,7 +15,7 @@ use Carp;
 
 use parent 'Data::Identifier::Interface::Userdata';
 
-our $VERSION = v0.03;
+our $VERSION = v0.04;
 
 1;
 
@@ -31,7 +31,7 @@ SIRTX::VM - module for interacting with SIRTX VM code
 
 =head1 VERSION
 
-version v0.03
+version v0.04
 
 =head1 SYNOPSIS
 

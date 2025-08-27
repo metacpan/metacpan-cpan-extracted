@@ -20,11 +20,12 @@ use Data::Identifier::Generate;
 
 use parent 'Data::Identifier::Interface::Known';
 
-our $VERSION = v0.16;
+our $VERSION = v0.17;
 
 use constant {
     WK_UUID => '8be115d2-dc2f-4a98-91e1-a6e3075cbc31', # uuid
     WK_SID  => 'f87a38cb-fd13-4e15-866c-e49901adbec5', # small-identifier
+    WK_SNI  => '039e0bb7-5dd3-40ee-a98c-596ff6cce405', # sirtx-numerical-identifier
 };
 
 my %imported;
@@ -165,6 +166,11 @@ sub import {
                     $identifier->{id_cache} //= {};
                     $identifier->{id_cache}->{WK_SID()} //= $special{sid};
                 }
+
+                if (defined $special{sni}) {
+                    $identifier->{id_cache} //= {};
+                    $identifier->{id_cache}->{WK_SNI()} //= $special{sni};
+                }
             }
 
             $identifier->register;
@@ -223,7 +229,7 @@ Data::Identifier::Wellknown - format independent identifier object
 
 =head1 VERSION
 
-version v0.16
+version v0.17
 
 =head1 SYNOPSIS
 
@@ -405,22 +411,26 @@ $type uuid
 .   61fba55f-1ba3-460d-85a7-9262557f41c9    hardlink
 
 $extra_classes identifier
-.   8be115d2-dc2f-4a98-91e1-a6e3075cbc31    uuid                        sid=2
+.   8be115d2-dc2f-4a98-91e1-a6e3075cbc31    uuid                        sid=2,sni=119
 .   bfae7574-3dae-425d-89b1-9c087c140c23    tagname                     sid=3
-.   a8d1637d-af19-49e9-9ef8-6bc1fbcf6439    uri                         sid=5
-.   d08dc905-bbf6-4183-b219-67723c3c8374    oid                         sid=6
+.   a8d1637d-af19-49e9-9ef8-6bc1fbcf6439    uri                         sid=5,sni=121
+.   d08dc905-bbf6-4183-b219-67723c3c8374    oid                         sid=6,sni=120
 .   d0a4c6e2-ce2f-4d4c-b079-60065ac681f1    language-tag-identifier     sid=8
-.   ce7aae1e-a210-4214-926a-0ebca56d77e3    wikidata-identifier         sid=9
-.   2bffc55d-7380-454e-bd53-c5acd525d692    roaraudio-error-number      sid=26
+.   ce7aae1e-a210-4214-926a-0ebca56d77e3    wikidata-identifier         sid=9,sni=123
+.   2bffc55d-7380-454e-bd53-c5acd525d692    roaraudio-error-number      sid=26,sni=116
+.   66beb503-9159-41cb-9e7f-2c3eb6b4b5ff    roaraudio-error-symbol      sni=117
 .   f87a38cb-fd13-4e15-866c-e49901adbec5    small-identifier            sid=27
-.   2c7e15ed-aa2f-4e2f-9a1d-64df0c85875a    chat-0-word-identifier      sid=112
+.   2c7e15ed-aa2f-4e2f-9a1d-64df0c85875a    chat-0-word-identifier      sid=112,sni=118
 .   82d529be-0f00-4b4f-a43f-4a22de5f5312    gtin                        sid=160
 .   931f155e-5a24-499b-9fbb-ed4efefe27fe    doi                         sid=162
 
 .   135032f7-cc60-46ee-8f64-1724c2a56fa2    x11-colour-name
-.   f4b073ff-0b53-4034-b4e4-4affe5caf72c    ascii-code-point
+.   f4b073ff-0b53-4034-b4e4-4affe5caf72c    ascii-code-point            sni=122
 .   5f167223-cc9c-4b2f-9928-9fe1b253b560    unicode-code-point
-.   5e80c7b7-215e-4154-b310-a5387045c336    sirtx-logical
+.   5e80c7b7-215e-4154-b310-a5387045c336    sirtx-logical               sni=129
+.   039e0bb7-5dd3-40ee-a98c-596ff6cce405    sirtx-numerical-identifier  sni=10
+.   d73b6550-5309-46ad-acc9-865c9261065b    sirtx-function-number       sni=127
+.   d690772e-de18-4714-aa4e-73fd35e8efc9    sirtx-function-name         sni=128
 .   b1418262-6bc9-459c-b4b0-a054d77db0ea    iban
 .   c8a3a132-f160-473c-b5f3-26a748f37e62    bic
 

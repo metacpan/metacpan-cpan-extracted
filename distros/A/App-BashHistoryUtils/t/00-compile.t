@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 5 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/BashHistoryUtils.pm'
@@ -15,7 +15,8 @@ my @module_files = (
 my @scripts = (
     'script/delete-bash-history-entries',
     'script/each-bash-history-entry',
-    'script/grep-bash-history-entries'
+    'script/grep-bash-history-entries',
+    'script/grephist'
 );
 
 # no fake home requested

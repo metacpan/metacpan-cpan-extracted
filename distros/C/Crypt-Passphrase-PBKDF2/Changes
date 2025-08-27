@@ -1,5 +1,8 @@
 Revision history for Crypt-Passphrase-PBKDF2
 
+0.003     2025-08-27 10:31:49+02:00 Europe/Brussels
+          - Fix crypt_types() subroutine name
+
 0.002     2023-02-27 22:16:22+01:00 Europe/Amsterdam
           - Increase default iterations to 100000
           - Make needs_rehash method stricter

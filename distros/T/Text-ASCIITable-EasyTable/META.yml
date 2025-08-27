@@ -10,7 +10,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.64'
   File::ShareDir::Install: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,13 +23,12 @@ no_index:
 provides:
   Text::ASCIITable::EasyTable:
     file: lib/Text/ASCIITable/EasyTable.pm
-    version: '1.005'
+    version: '1.006'
 requires:
   JSON: '0'
   List::Util: '1.29'
   Text::ASCIITable: '0'
   perl: '5.016'
-resources:
-  repository: git://github.com/rlauer6/Text-ASCIITable-EasyTable.git
-version: '1.005'
+resources: {}
+version: '1.006'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

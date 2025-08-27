@@ -1715,3 +1715,15 @@ Revision history for Graphics-Framebuffer
        Improved the documentation options for examples/primitives
 
        Added a new script to the "examples" directory called "shapes.pl"
+
+6.66   Aug 26, 2025
+
+       Improved the speed of flood fill.  Various documentation changes.
+	   Improved the help options of various examples scripts.  Added 'raw'
+	   option to color replacement routines.
+
+6.67   Aug 27, 2025
+
+       Simplified test script.
+
+	   Added screen restore feature if RESET is off.

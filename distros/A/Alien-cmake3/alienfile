@@ -112,7 +112,7 @@ share {
   # For platforms where there is a binary release, use that:
   if($binary_release_name && !$ENV{ALIEN_CMAKE_FROM_SOURCE})
   {
-    start_url 'https://cmake.org/download/';
+    start_url 'https://cmake.org/files/v3.31/';
     plugin Download => (
       filter  => qr/^cmake-3\.[0-9\.]+-\Q$binary_release_name\E\.\Q$binary_format\E$/,
       version => qr/([0-9\.]+)/,

@@ -11,7 +11,7 @@ use Const::Fast;
 use Wiki::JSON::Parser;
 use Wiki::JSON::HTML;
 
-our $VERSION = "0.0.30";
+our $VERSION = "0.0.31";
 
 const my $MAX_HX_SIZE                                           => 6;
 const my $EXTRA_CHARACTERS_BOLD_AND_ITALIC_WHEN_ITALIC          => 3;
@@ -21,8 +21,12 @@ const my $MINIMUM_TEMPLATE_SEARCH                               => 3;
 const my $LIST_ELEMENT_DELIMITER                                => "\n* ";
 
 sub parse {
-    my ( $self, $wiki_text ) = @_;
-    return Wiki::JSON::Parser->new->parse($wiki_text);
+    if (@_ < 2) {
+        die 'Parse arguments: <$self> <$wiki_text> [$options]';
+    }
+    my ( $self, $wiki_text, $options ) = @_;
+    $options //= {};
+    return Wiki::JSON::Parser->new->parse($wiki_text, $options);
 }
 
 sub pre_html {

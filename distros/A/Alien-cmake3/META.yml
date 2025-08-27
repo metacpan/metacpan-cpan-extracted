@@ -32,7 +32,7 @@ resources:
   bugtracker: https://github.com/PerlAlien/Alien-cmake3/issues
   homepage: https://metacpan.org/pod/Alien::cmake3
   repository: git://github.com/PerlAlien/Alien-cmake3.git
-version: '0.09'
+version: '0.10'
 x_alienfile:
   generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.32'
   requires:

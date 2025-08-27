@@ -6,7 +6,7 @@ use warnings;
 use lib 'lib';
 
 use Test::Most;
-use Test::Warnings qw/warning/;
+use Test::Output;
 
 use_ok 'Wiki::JSON';
 
@@ -88,7 +88,7 @@ end of list/
 }
 
 {
-    like warning {
+    stderr_like {
     my $parsed_html = Wiki::JSON->new->pre_html(
         q/'''
 * hola<br>hola
@@ -140,7 +140,7 @@ end of list '''/
         Wiki::JSON::HTML->_close_html_element('article'),
       ],
       'Test html list gen with warnings';
-      }, qr/unordered list found when content is expected to be inline/, 'Catched warning inline';
+      } qr/unordered list found when content is expected to be inline WIKI_LINE: /, 'Catched warning inline';
 }
 {
     my $parsed = Wiki::JSON->new->parse(

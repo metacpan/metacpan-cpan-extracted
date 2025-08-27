@@ -1,9 +1,38 @@
+2.088001 - 2025-08-26
+
+  [BUG FIXES]
+
+  * revert mistaken field_protection should protect serial on new devices
+
+2.088000 - 2025-08-26
+
+  [NEW FEATURES]
+
+  * #1370 add neighbor_no_type setting to ignore neighbors of given type
+  * #1374 netdisco-do --extra accepts content or stdin or file, for arpnip/macsuck/cf_
+
+  [ENHANCEMENTS]
+
+  * #1363 new setting delete_duplicate_serials to clean duplicates on device discovery
+  * #1365 make clear in logs the LLDP capabilities and platforms matching
+  * #1375 path-to-netdisco-do available as template variable "ndo" in Hooks
+  * #1378 SSH transport public key authentication support
+  * allow dsn name to be empty for testing purposes
+
+  [BUG FIXES]
+
+  * #1360 workaround for swagger missing that False is false
+  * #1376 only update last_macsuck and last_arpnip on successful job
+  * #1381 add stack serials to device search CSV export
+  * field_protection should protect serial on new devices as well as existing
+  * add encoding to netdisco-do POD
+
 2.087001 - 2025-08-20
 
   [BUG FIXES]
 
   * #1366 add sorting by index to neighbor processing
-  * fix bug in custom_fields refresh for device (device_ports fix to come)
+  * fix bug in custom_fields refresh for device
   * fix ambiguous ref() found by new Perls
 
 2.087000 - 2025-07-14

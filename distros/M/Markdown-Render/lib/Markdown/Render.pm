@@ -12,7 +12,7 @@ use JSON;
 use LWP::UserAgent;
 use List::Util qw(none);
 
-our $VERSION = '1.60.2';
+our $VERSION = '1.60.4';
 
 use parent qw(Class::Accessor::Fast);
 
@@ -210,10 +210,14 @@ sub fix_anchors {
 
   my $html;
 
+  # sample:
+  # <div class="markdown-heading"><h1 class="heading-element">Table of Contents</h1><a id="table-of-contents" class="anchor" aria-label="Permalink: Table of Contents" href="#table-of-contents"><span aria-hidden="true" class="octicon octicon-link"></span></a></div>
+
   while ( my $line = <$fh> ) {
     # remove garbage if there...
-    if ( $line =~ /^\s*<h(\d+)><a (.*)>(.*)<\/a>(.*)/xsm ) {
-      $line = "<h$1>$3$4</h$1>\n";
+
+    if ( $line =~ m{<h(\d+)([^>]*?)>([^<]+?)</h\d+><a(.*?)/a>(.*?)}xsm ) {
+      $line = "<a$4$5/a><h$1$2>$3</h$1>\n";
     }
 
     $html .= _fix_header($line);
@@ -241,9 +245,8 @@ sub _fix_header {
   $anchor =~ s/\///xsmg;
 
   $line
-    = sprintf qq{<h%d><a id="%s" class="anchor" href="#%s"></a>%s</h%d>\n},
-    $hn,
-    $anchor, $anchor, $header, $hn;
+    = sprintf qq{<a id="%s" class="anchor" href="#%s"></a><h%s>%s</h%d>\n},
+    $anchor, $anchor, $hn, $header, $hn;
 
   return $line;
 }
@@ -302,7 +305,8 @@ sub _render_with_github {
     return $self->fix_anchors( $rsp->content );
   }
   else {
-    return $self->fix_github_html( $rsp->content );
+    $self->fix_anchors( $rsp->content );
+    return $self->fix_github_html( $self->get_html );
   }
 }
 

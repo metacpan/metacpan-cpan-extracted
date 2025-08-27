@@ -1,9 +1,9 @@
 package Crypt::Passphrase::PBKDF2;
-$Crypt::Passphrase::PBKDF2::VERSION = '0.002';
+$Crypt::Passphrase::PBKDF2::VERSION = '0.003';
 use strict;
 use warnings;
 
-use parent 'Crypt::Passphrase::Encoder';
+use Crypt::Passphrase 0.010 -encoder;
 
 use Carp 'croak';
 use PBKDF2::Tiny qw/derive verify/;
@@ -30,16 +30,12 @@ sub new {
 
 sub ab64_encode {
 	my $input = shift;
-	my $output = encode_base64($input, '');
-	$output =~ tr/+/./;
-	$output =~ s/=+$//;
-	return $output;
+	return encode_base64($input, '') =~ tr/+=/./dr;
 }
 
 sub ab64_decode {
 	my $input = shift;
-	$input =~ tr/./+/;
-	return decode_base64($input);
+	return decode_base64($input =~ tr/./+/r);
 }
 
 sub hash_password {
@@ -59,7 +55,7 @@ sub needs_rehash {
 	return;
 }
 
-sub crypt_types {
+sub crypt_subtypes {
 	return map { "pbkdf2-$_" } keys %param_for_type;
 }
 
@@ -87,7 +83,7 @@ Crypt::Passphrase::PBKDF2 - A PBKDF2 encoder for Crypt::Passphrase
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 DESCRIPTION
 

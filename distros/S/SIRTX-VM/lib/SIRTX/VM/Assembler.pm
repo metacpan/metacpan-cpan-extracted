@@ -22,7 +22,7 @@ use SIRTX::VM::Opcode;
 
 use parent 'Data::Identifier::Interface::Userdata';
 
-our $VERSION = v0.03;
+our $VERSION = v0.04;
 
 my %_escapes = (
     '\\' => '\\',
@@ -549,6 +549,7 @@ sub _proc_parts {
             my $key   = $args[$i + 0];
             my $value = $args[$i + 1];
 
+            $key =~ s/^\$?/\$/; # ensure it starts with a '$'.
             if ($key !~ /^\$[0-9a-zA-Z_]+/) {
                 croak sprintf('Bad key name: line %s: key %s', $opts->{line}, $key);
             }
@@ -556,6 +557,7 @@ sub _proc_parts {
         }
     } elsif ($cmd eq '.popname') {
         foreach my $key (@args) {
+            $key =~ s/^\$?/\$/; # ensure it starts with a '$'.
             unless (defined $self->{aliases}{$key}) {
                 croak sprintf('Bad/unknown key name: line %s: key %s', $opts->{line}, $key);
             }
@@ -563,6 +565,14 @@ sub _proc_parts {
             pop(@{$self->{aliases}{$key}});
             delete $self->{aliases}{$key} unless scalar @{$self->{aliases}{$key}};
         }
+    } elsif ($cmd eq '.tag' && scalar(@args) == 2 && $args[0] =~ /^[0-9a-zA-Z_]+$/ && defined($_type_to_sni{$args[1]})) {
+        push(@{$self->{aliases}{'tag$'.$args[0]} //= []}, 'sni:'.$_type_to_sni{$args[1]});
+    } elsif ($cmd eq '.tag' && scalar(@args) == 2 && $args[0] =~ /^[0-9a-zA-Z_]+$/ && $self->_get_value_type($args[1]) =~ /:$/) {
+        push(@{$self->{aliases}{'tag$'.$args[0]} //= []}, $args[1]);
+    } elsif ($cmd eq '.tag' && scalar(@args) == 2 && $args[0] =~ /^[0-9a-zA-Z_]+$/ && $self->_get_value_type($args[1]) eq 'int') {
+        push(@{$self->{aliases}{'tag$'.$args[0]} //= []}, 'sni:'.$self->_parse_int($args[1]));
+    } elsif ($cmd eq '.tag' && scalar(@args) == 3 && $args[0] =~ /^[0-9a-zA-Z_]+$/ && $args[1] =~ /^[0-9a-zA-Z_]+$/ && $self->_get_value_type($args[2]) eq 'int') {
+        push(@{$self->{aliases}{'tag$'.$args[0]} //= []}, $args[1].':'.$self->_parse_int($args[2]));
     } elsif ($cmd eq '.utf8') {
         foreach my $str (@args) {
             print $out $self->_parse_string($str);
@@ -973,7 +983,7 @@ SIRTX::VM::Assembler - module for assembling SIRTX VM code
 
 =head1 VERSION
 
-version v0.03
+version v0.04
 
 =head1 SYNOPSIS
 

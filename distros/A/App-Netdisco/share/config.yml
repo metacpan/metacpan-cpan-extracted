@@ -645,6 +645,7 @@ snmpretries: 2
 net_snmp_options: {}
 snmp_try_slow_connect: true
 snmp_remoteport: {}
+delete_duplicate_serials: false
 field_protection:
   device:
     serial: ['group:__ANY__']
@@ -700,6 +701,7 @@ expire_userlog: 365
 expire_nodeip_freshness: null
 store_wireless_clients: true
 skip_neighbors: []
+neighbor_no_type: []
 discover_neighbors: true
 discover_routed_neighbors: true
 skip_modules: []

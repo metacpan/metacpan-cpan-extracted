@@ -19,7 +19,7 @@ use Carp;
 use Math::BigInt lib => 'GMP';
 use URI;
 
-our $VERSION = v0.16;
+our $VERSION = v0.17;
 
 use constant {
     RE_UUID => qr/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/,
@@ -45,6 +45,7 @@ use constant {
     WK_DOI  => '931f155e-5a24-499b-9fbb-ed4efefe27fe', # doi
     WK_FC   => 'd576b9d1-47d4-43ae-b7ec-bbea1fe009ba', # factgrid-identifier
     WK_UNICODE_CP => '5f167223-cc9c-4b2f-9928-9fe1b253b560', # unicode-code-point
+    WK_SNI  => '039e0bb7-5dd3-40ee-a98c-596ff6cce405', # sirtx-numerical-identifier
 
     NS_WD   => '9e10aca7-4a99-43ac-9368-6cbfa43636df', # Wikidata-namespace
     NS_FC   => '6491f7a9-0b29-4ef1-992c-3681cea18182', # factgrid-namespace
@@ -75,6 +76,7 @@ my %well_known = (
     oid  => __PACKAGE__->new($well_known_uuid => WK_OID,    validate => RE_OID),
     uri  => __PACKAGE__->new($well_known_uuid => WK_URI,    validate => RE_URI),
     sid  => __PACKAGE__->new($well_known_uuid => WK_SID,    validate => RE_UINT),
+    sni  => __PACKAGE__->new($well_known_uuid => WK_SNI,    validate => RE_UINT),
     wd   => __PACKAGE__->new($well_known_uuid => WK_WD,     validate => RE_QID,  namespace => NS_WD,   generate => 'id-based'),
     fc   => __PACKAGE__->new($well_known_uuid => WK_FC,     validate => RE_QID,  namespace => NS_FC,   generate => 'id-based'),
     gtin => __PACKAGE__->new($well_known_uuid => WK_GTIN,   validate => RE_GTIN, namespace => NS_GTIN, generate => 'id-based'),
@@ -139,6 +141,27 @@ $_->register foreach values %well_known;
     }
 }
 
+# Refill with snis:
+{
+    my %wk_snis = (
+        '039e0bb7-5dd3-40ee-a98c-596ff6cce405'  =>  10, # sirtx-numerical-identifier
+        'f87a38cb-fd13-4e15-866c-e49901adbec5'  => 115, # small-identifier
+        '2bffc55d-7380-454e-bd53-c5acd525d692'  => 116, # roaraudio-error-number
+        '2c7e15ed-aa2f-4e2f-9a1d-64df0c85875a'  => 118, # chat-0-word-identifier
+        WK_UUID()                               => 119,
+        WK_OID()                                => 120,
+        WK_URI()                                => 121,
+        WK_WD()                                 => 123,
+    );
+
+    foreach my $ise (keys %wk_snis) {
+        my $identifier = __PACKAGE__->new(ise => $ise);
+        $identifier->{id_cache} //= {};
+        $identifier->{id_cache}->{WK_SNI()} //= $wk_snis{$ise};
+        $identifier->register; # re-register
+    }
+}
+
 # Some extra tags such as namespaces:
 foreach my $ise (NS_WD, NS_INT, NS_DATE) {
     my $identifier = __PACKAGE__->new(ise => $ise);
@@ -159,6 +182,7 @@ foreach my $ise (NS_WD, NS_INT, NS_DATE) {
         WK_DOI()                                => 'doi',
         WK_FC()                                 => 'factgrid-identifier',
         WK_UNICODE_CP()                         => 'unicode-code-point',
+        WK_SNI()                                => 'sirtx-numerical-identifier',
         NS_WD()                                 => 'Wikidata-namespace',
         NS_FC()                                 => 'factgrid-namespace',
         NS_INT()                                => 'integer-namespace',
@@ -749,6 +773,11 @@ sub register {
         $registered{$well_known{$type_name}->uuid}{$v} = $self;
     }
 
+    foreach my $extra (WK_SNI()) {
+        my $v = $self->{id_cache}{$extra} // next;
+        $registered{$extra}{$v} = $self;
+    }
+
     return $self;
 }
 
@@ -859,7 +888,7 @@ Data::Identifier - format independent identifier object
 
 =head1 VERSION
 
-version v0.16
+version v0.17
 
 =head1 SYNOPSIS
 
@@ -992,6 +1021,10 @@ A BIC (Business Identifier Code).
 =item C<doi>
 
 A doi (digital object identifier).
+
+=item C<sni>
+
+A sirtx-numerical-identifier.
 
 =back
 

@@ -1,3 +1,18 @@
+Tue Aug 26 15:55:36 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.60.4]:
+	* ChangeLog: include updated ChangeLog in tarball
+
+Tue Aug 26 15:23:51 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.60.3]:
+	* .gitignore: *.tmp
+	* Markdown/Render.pm
+	- bump version
+	(fix_anchors): anchor then header
+	(_fix_header): likewise
+	(_render_with_github): fix_anchors
+
 Wed Nov 27 17:15:26 2024  Rob Lauer  <rlauer6@comcast.net>
 
 	[1.60.2]:

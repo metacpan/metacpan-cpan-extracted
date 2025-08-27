@@ -11,7 +11,7 @@ use Time::HiRes qw(sleep time alarm);
 use Getopt::Long;
 
 BEGIN {
-    our $VERSION = '1.03';
+    our $VERSION = '1.04';
 }
 
 # use Data::Dumper::Simple;$Data::Dumper::Sortkeys=1;
@@ -19,6 +19,7 @@ exit(0) unless (scalar(@ARGV));
 my $file = $ARGV[-1];
 
 my $full     = TRUE;
+my $nofull   = FALSE;
 my $noclear  = FALSE;
 my $ignore_x = FALSE;
 my $delay    = 10;
@@ -26,7 +27,7 @@ my $alpha    = 255;
 my $dummy    = FALSE;
 
 GetOptions(
-    'nofull'           => \$full,
+    'nofull'           => \$nofull,
     'full'             => \$dummy,
     'wait=i'           => \$delay,
     'noclear'          => \$noclear,
@@ -39,6 +40,7 @@ our $f = Graphics::Framebuffer->new(
     'SHOW_ERRORS'      => FALSE,
     'RESET'            => 1 - $noclear,
     'IGNORE_X_WINDOWS' => $ignore_x,
+	'DIAGNOSTICS'      => FALSE,
 );
 
 $SIG{'KILL'} = $SIG{'QUIT'} = $SIG{'INT'} = $SIG{'HUP'} = sub { $f->text_mode(); exec('reset'); };
@@ -53,6 +55,7 @@ my %p = (
     'file'   => $file,
     'center' => CENTER_XY
 );
+$full = FALSE if ($nofull);
 if ($full) {
     $p{'width'}  = $f->{'XRES'};
     $p{'height'} = $f->{'YRES'};

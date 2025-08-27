@@ -1,8 +1,9 @@
 use strict;
 use warnings;
 
-use Return::Set qw(set_return);
 use Test::Most;
+
+BEGIN { use_ok('Return::Set', qw(set_return)) }
 
 note('Test without schema - scalar');
 is(set_return('hello'), 'hello', 'Returns scalar without schema');
@@ -13,6 +14,8 @@ is_deeply(set_return($array), $array, 'Returns arrayref without schema');
 
 note('Test with scalar schema - valid');
 is(set_return(123, { type => 'integer'}), 123, 'Passes scalar validation');
+
+is(set_return({ output => 123, schema => { type => 'integer'}}), 123, 'Takes output parameter');
 
 note('Test with arrayref schema - valid');
 my $list = [ 'a', 'b' ];

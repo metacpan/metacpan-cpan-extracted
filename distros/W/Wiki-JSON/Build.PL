@@ -21,7 +21,7 @@ my $build = Module::Build->new(
         'Const::Fast'      => 0,
         'perl'             => 'v5.16.3',
         'Mojolicious'      => 0,
-        'Test::Warnings'   => 0,
+        'Test::Output'     => 0,
     },
     configure_requires => {
         'Module::Build' => 0,

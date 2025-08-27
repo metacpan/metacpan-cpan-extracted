@@ -1,11 +1,13 @@
 package App::BashHistoryUtils;
 
-our $DATE = '2021-05-26'; # DATE
-our $VERSION = '0.070'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2025-08-20'; # DATE
+our $DIST = 'App-BashHistoryUtils'; # DIST
+our $VERSION = '0.071'; # VERSION
 
 our %SPEC;
 
@@ -84,7 +86,7 @@ sub _do {
 
     my $code;
     if ($which eq 'each') {
-        $code = eval "package main; no strict; sub { $args{code} }";
+        $code = eval "package main; no strict; sub { $args{code} }"; ## no critic: BuiltinFunctions::ProhibitStringyEval
         die if $@;
     } else {
         $code = sub {
@@ -222,7 +224,7 @@ App::BashHistoryUtils - CLI utilities related to bash history file
 
 =head1 VERSION
 
-This document describes version 0.070 of App::BashHistoryUtils (from Perl distribution App-BashHistoryUtils), released on 2021-05-26.
+This document describes version 0.071 of App::BashHistoryUtils (from Perl distribution App-BashHistoryUtils), released on 2025-08-20.
 
 =head1 DESCRIPTION
 
@@ -235,6 +237,8 @@ This distribution includes the following CLI utilities:
 =item * L<each-bash-history-entry>
 
 =item * L<grep-bash-history-entries>
+
+=item * L<grephist>
 
 =back
 
@@ -260,13 +264,19 @@ Arguments ('*' denotes required arguments):
 
 =item * B<histfile> => I<str> (default: "/home/u1/.bash_history")
 
+(No description)
+
 =item * B<ignore_case> => I<bool>
+
+(No description)
 
 =item * B<inplace> => I<bool>
 
 Replace original bash history file.
 
 =item * B<invert_match> => I<bool>
+
+(No description)
 
 =item * B<max_age> => I<duration>
 
@@ -333,9 +343,15 @@ You can modify C<$_> to modify the entry. C<$TS> (timestamp) is also available.
 
 =item * B<histfile> => I<str> (default: "/home/u1/.bash_history")
 
+(No description)
+
 =item * B<ignore_case> => I<bool>
 
+(No description)
+
 =item * B<invert_match> => I<bool>
+
+(No description)
 
 =item * B<max_age> => I<duration>
 
@@ -381,9 +397,15 @@ Arguments ('*' denotes required arguments):
 
 =item * B<histfile> => I<str> (default: "/home/u1/.bash_history")
 
+(No description)
+
 =item * B<ignore_case> => I<bool>
 
+(No description)
+
 =item * B<invert_match> => I<bool>
+
+(No description)
 
 =item * B<max_age> => I<duration>
 
@@ -423,14 +445,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-BashHi
 
 Source repository is at L<https://github.com/perlancar/perl-App-BashHistoryUtils>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-BashHistoryUtils/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<Bash::History::Read>
@@ -439,11 +453,37 @@ L<Bash::History::Read>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-BashHistoryUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

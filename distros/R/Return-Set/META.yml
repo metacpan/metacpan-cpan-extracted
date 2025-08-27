@@ -23,12 +23,12 @@ no_index:
 requires:
   Carp: '0'
   Exporter: '0'
-  Params::Get: '0.11'
-  Params::Validate::Strict: '0.04'
-  perl: '5.008'
+  Params::Get: '0.13'
+  Params::Validate::Strict: '0.1'
+  perl: '5.010'
 resources:
-  bugtracker: https://github.com/nigelhorne/Return-Set/issues
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Return-Set
   homepage: https://metacpan.org/pod/Return::Set
   repository: git://github.com/nigelhorne/Return-Set.git
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

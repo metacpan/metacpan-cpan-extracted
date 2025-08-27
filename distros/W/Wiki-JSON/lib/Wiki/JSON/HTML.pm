@@ -17,7 +17,8 @@ sub pre_html_json {
     my @dom;
     push @dom,
       $self->_open_html_element( 'article', 0, { class => 'wiki-article' } );
-    my $json = $self->_wiki_json->parse($wiki_text);
+    my $json =
+      $self->_wiki_json->parse( $wiki_text, { track_lines_for_errors => 1 } );
 
     #    print Data::Dumper::Dumper $json;
 
@@ -86,7 +87,7 @@ sub _parse_output_try_parse_plain_text {
                 $options );
         }
         if ($element) {
-            if (!$last_element_inline_element) {
+            if ( !$last_element_inline_element ) {
                 ($needs_closing_parragraph) =
                   $self->_open_parragraph( $dom, $needs_closing_parragraph, 0,
                     $options );
@@ -234,7 +235,9 @@ sub _parse_output_try_parse_image {
             }
             else {
                 if ( $options->{inside_inline_element} ) {
-                    warn 'Image found when the content is expected to be inline';
+                    say STDERR
+'Image found when the content is expected to be inline WIKI_LINE: '
+                      . $element->{start_line};
                 }
                 ($needs_closing_parragraph) =
                   $self->_close_parragraph( $dom, $needs_closing_parragraph,
@@ -345,7 +348,9 @@ sub _parse_output_try_parse_template {
         my $template  = $element;
         my $is_inline = $template_callbacks->{is_inline}->($template);
         if ( $options->{inside_inline_element} && !$is_inline ) {
-            warn 'No-inline (block) template found inside inline element';
+            say STDERR
+'No-inline (block) template found inside inline element WIKI_LINE: '
+              . $element->{start_line};
         }
         if ($is_inline) {
             $found_inline_element = 1;
@@ -407,7 +412,9 @@ sub _parse_output_try_parse_unordered_list {
     my $needs_next;
     if ( $element->{type} eq 'unordered_list' ) {
         if ( $options->{inside_inline_element} ) {
-            warn 'unordered list found when content is expected to be inline';
+            say STDERR
+'unordered list found when content is expected to be inline WIKI_LINE: ',
+              $element->{start_line};
         }
         ($needs_closing_parragraph) =
           $self->_close_parragraph( $dom, $needs_closing_parragraph, $options );
@@ -446,7 +453,9 @@ sub _parse_output_try_parse_hx {
     my $needs_next;
     if ( $element->{type} eq 'hx' ) {
         if ( $options->{inside_inline_element} ) {
-            warn 'HX found when the content is expected to be inline';
+            say STDERR
+              'HX found when the content is expected to be inline WIKI_LINE: '
+              . $element->{start_line};
         }
         ($needs_closing_parragraph) =
           $self->_close_parragraph( $dom, $needs_closing_parragraph, $options );

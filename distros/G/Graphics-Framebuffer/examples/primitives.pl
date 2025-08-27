@@ -16,7 +16,7 @@ use Pod::Usage;
 # use Data::Dumper;$Data::Dumper::Sortkeys=1; $Data::Dumper::Purity=1; $Data::Dumper::Deepcopy=1;
 
 BEGIN {
-    our $VERSION = '6.03';
+    our $VERSION = '6.04';
 }
 
 our $F;
@@ -108,7 +108,6 @@ print_it($F, ' ', '00FFFFFF');
 $F->{'SPLASH'} = $splash;
 $F->splash($Graphics::Framebuffer::VERSION) unless ($nosplash);
 
-
 my $DORKSMILE;
 
 foreach my $file (@files) {
@@ -188,23 +187,23 @@ my %func = (
     'TrueType Fonts'                    => sub { truetype_fonts(shift); },
     'TrueType Printing'                 => sub { truetype_printing(shift); },
     'Rotate TrueType Fonts'             => sub { rotate_truetype_fonts(shift); },
-    'Color Replace None-Clipped'        => sub { color_replace(shift, 0); },
+    'Color Replace Non-Clipped'         => sub { color_replace(shift, 0); },
     'Color Replace Clipped'             => sub { color_replace(shift, 1); },
     'Blitting'                          => sub { blitting(shift); },
     'Blit Move'                         => sub { blit_move(shift); },
     'Rotate'                            => sub { rotate(shift); },
     'Flipping'                          => sub { flipping(shift); },
     'Monochrome'                        => sub { monochrome(shift); },
-    'XOR Mode Drawing'                  => sub { mode_drawing(1); },
-    'OR Mode Drawing'                   => sub { mode_drawing(2); },
-    'AND Mode Drawing'                  => sub { mode_drawing(3); },
-    'MASK Mode Drawing'                 => sub { mode_drawing(4); },
-    'UNMASK Mode Drawing'               => sub { mode_drawing(5); },
-    'ALPHA Mode Drawing'                => sub { mode_drawing(6); },
-    'ADD Mode Drawing'                  => sub { mode_drawing(7); },
-    'SUBTRACT Mode Drawing'             => sub { mode_drawing(8); },
-    'MULTIPLY Mode Drawing'             => sub { mode_drawing(9); },
-    'DIVIDE Mode Drawing'               => sub { mode_drawing(10); },
+    'XOR Mode Drawing'                  => sub { mode_drawing(shift,1); },
+    'OR Mode Drawing'                   => sub { mode_drawing(shift,2); },
+    'AND Mode Drawing'                  => sub { mode_drawing(shift,3); },
+    'MASK Mode Drawing'                 => sub { mode_drawing(shift,4); },
+    'UNMASK Mode Drawing'               => sub { mode_drawing(shift,5); },
+    'ALPHA Mode Drawing'                => sub { mode_drawing(shift,6); },
+    'ADD Mode Drawing'                  => sub { mode_drawing(shift,7); },
+    'SUBTRACT Mode Drawing'             => sub { mode_drawing(shift,8); },
+    'MULTIPLY Mode Drawing'             => sub { mode_drawing(shift,9); },
+    'DIVIDE Mode Drawing'               => sub { mode_drawing(shift,10); },
     'Animated'                          => sub { animated(shift); },
 );
 
@@ -263,7 +262,7 @@ if (defined($show_func)) {
         'TrueType Fonts',
         'TrueType Printing',
         'Rotate TrueType Fonts',
-        'Color Replace None-Clipped',
+        'Color Replace Non-Clipped',
         'Color Replace Clipped',
         'Blitting',
         'Blit Move',
@@ -1221,7 +1220,12 @@ sub color_replace {
     $F->clip_set({ 'x' => $x, 'y' => $y, 'xx' => $x * 3, 'yy' => $y * 3 }) if ($clipped);
     my $s = time + $delay;
     while (time < $s) {
-        my $pixel = $F->pixel({ 'x' => $XX / 2, 'y' => $YY / 2 });
+        my $pixel = $F->pixel(
+			{
+				'x' => $XX / 2,
+				'y' => $YY / 2,
+			}
+		);
         my $r     = $pixel->{'red'};
         my $g     = $pixel->{'green'};
         my $b     = $pixel->{'blue'};
@@ -1233,20 +1237,20 @@ sub color_replace {
         $F->replace_color(
             {
                 'old' => {
-                    'red'   => $r,
-                    'green' => $g,
-                    'blue'  => $b,
-                    'alpha' => $a
+					'red'   => $r,
+					'green' => $g,
+					'blue'  => $b,
                 },
                 'new' => {
-                    'red'   => $R,
-                    'green' => $G,
-                    'blue'  => $B,
-                    'alpha' => $A
+					'red'   => $R,
+					'green' => $G,
+					'blue'  => $B,
+					'alpha' => $A,
                 }
             }
         );
     }
+	$F->clip_reset();
 }
 
 sub blitting {
@@ -1291,18 +1295,17 @@ sub blit_move {
         }
     );
     my $x = 0;
-    my $y = 0;
-    $image->{'x'} = $x;
-    $image->{'y'} = $y;
+    my $y = 40;
+    $image->{'x'} = $x++;
+    $image->{'y'} = $y++;
     $F->blit_write($image);
     my $s = time + $delay;
 
     while (time < $s) {
         $image = $F->blit_move({ %{$image}, 'x_dest' => abs($x), 'y_dest' => int(abs($y)) });
         $x++;
-        $y = $y + .5;
-		sleep .016666666667;
-#        $F->vsync();
+        $y += .5;
+        $F->vsync();
     }
 }
 
@@ -1519,16 +1522,17 @@ sub animated {
 }
 
 sub mode_drawing {
+	my $name = shift;
     my $mode = shift;
     if ($mode == MASK_MODE) {
-        mask_drawing();
+        mask_drawing($name);
     } elsif ($mode == UNMASK_MODE) {
-        unmask_drawing();
+        unmask_drawing($name);
     } elsif ($mode == ALPHA_MODE) {
-        alpha_drawing();
+        alpha_drawing($name);
     } else {
         my @modes = qw( NORMAL XOR OR AND MASK UNMASK ALPHA ADD SUBTRACT MULTIPLY DIVIDE );
-        print_it($F, "Testing $modes[$mode] Drawing Mode");
+        print_it($F, "Testing $name");
         my $image = $IMAGES[int(rand(scalar(@IMAGES)))];
         my $image2;
         do {

@@ -16,7 +16,7 @@ use Scalar::Util qw(looks_like_number);
 
 use parent 'Data::Identifier::Interface::Userdata';
 
-our $VERSION = v0.03;
+our $VERSION = v0.04;
 
 my %_die_raen = (code => 0, P => 7, codeX => 0, S => 2, T => 4+1, is_return => 1);
 
@@ -321,7 +321,7 @@ sub from_template {
     } elsif ($cmd eq 'open' && scalar(@args) == 2 && $asm->_get_value_type($args[0]) eq 'reg' && $asm->_get_value_type($args[1]) =~ /:$/) {
         my ($type, $num) = $asm->_parse_id($args[1]);
         my $sni = $asm->_type_to_sni($type);
-        return $pkg->new(code => 0, P => $asm->_force_mapped($args[0]), codeX => 1, S => 6, T => 0+2, extra => [$sni, $num]);
+        return $pkg->new(code => 0, P => $asm->_force_mapped($args[0]), codeX => 1, S => 6, T => 0+2, extra => [$sni, $num], size => $size);
     } elsif ($cmd eq 'jump' && scalar(@args) >= 3 && $asm->_get_value_type($args[0]) eq 'int' && ($args[1] eq 'if' || $args[1] eq 'unless')) {
         my $org = $out->tell + 4;
         my $extra = $asm->_parse_int($args[0], $org) - $org;
@@ -488,7 +488,7 @@ SIRTX::VM::Opcode - module for single SIRTX VM opcodes
 
 =head1 VERSION
 
-version v0.03
+version v0.04
 
 =head1 SYNOPSIS
 

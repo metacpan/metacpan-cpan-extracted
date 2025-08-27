@@ -181,7 +181,7 @@ subtest "Invalid Inputs" => sub {
 	};
 	my $args14 = { obj => new_ok('MyClass') };
 	throws_ok {
-		validate_strict(args => $args14, schema => $schema, unknown_parameter_handler => 'die')
+		validate_strict(input => $args14, schema => $schema, unknown_parameter_handler => 'die')
 	} qr/must be an object that understands the bar method/, 'validate min and max in the schema';
 };
 

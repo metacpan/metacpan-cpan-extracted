@@ -7,9 +7,12 @@ use Test::More;
 
 use Crypt::Passphrase::PBKDF2;
 
-my $passphrase = Crypt::Passphrase::PBKDF2->new(
-	type       => 'sha256',
-	iterations => 8000,
+my $passphrase = Crypt::Passphrase->new(
+	encoder => {
+		module     => 'PBKDF2',
+		type       => 'sha256',
+		iterations => 8000,
+	},
 );
 
 my $password = 'password';
