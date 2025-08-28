@@ -26,11 +26,12 @@ no_index:
 provides:
   idi:
     file: lib/idi.pm
-    version: '0.0402'
+    version: '0.0504'
 requires:
   Exporter: '0'
   File::Slurper: '0'
   File::Temp: '0'
+  MIDI::Drummer::Tiny: '0'
   MIDI::RtController: '0'
   MIDI::Simple: '0'
   Moo: '0'
@@ -42,7 +43,7 @@ requires:
 resources:
   homepage: https://github.com/ology/idi
   repository: https://github.com/ology/idi.git
-version: '0.0402'
+version: '0.0504'
 x_generated_by_perl: v5.40.0
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: Artistic-2.0

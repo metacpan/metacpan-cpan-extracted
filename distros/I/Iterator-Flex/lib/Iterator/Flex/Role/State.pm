@@ -5,7 +5,7 @@ package Iterator::Flex::Role::State;
 use strict;
 use warnings;
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 use Role::Tiny;
 
@@ -35,7 +35,7 @@ Iterator::Flex::Role::State - abstract interface role for State
 
 =head1 VERSION
 
-version 0.26
+version 0.27
 
 =head1 INTERNALS
 

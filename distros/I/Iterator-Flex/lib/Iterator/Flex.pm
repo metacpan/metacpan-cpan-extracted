@@ -5,7 +5,7 @@ package Iterator::Flex;
 use strict;
 use warnings;
 use v5.28.0;
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 1;
 
@@ -31,7 +31,7 @@ Iterator::Flex - Iterators with flexible behaviors
 
 =head1 VERSION
 
-version 0.26
+version 0.27
 
 =head1 SYNOPSIS
 

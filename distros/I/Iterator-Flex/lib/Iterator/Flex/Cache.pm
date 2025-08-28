@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use experimental qw( signatures postderef );
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 use parent 'Iterator::Flex::Base';
 use Iterator::Flex::Utils qw( STATE :IterAttrs :IterStates throw_failure );
@@ -183,7 +183,7 @@ Iterator::Flex::Cache - Cache Iterator Class
 
 =head1 VERSION
 
-version 0.26
+version 0.27
 
 =head1 METHODS
 

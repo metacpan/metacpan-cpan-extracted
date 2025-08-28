@@ -392,7 +392,7 @@ BEGIN {
     require Exporter;
 
     # set the version for version checking
-    our $VERSION   = '6.67';
+    our $VERSION   = '6.68';
     our @ISA       = qw(Exporter);
     our @EXPORT_OK = qw(
       FBIOGET_VSCREENINFO
@@ -477,7 +477,7 @@ use Inline C => <<'C_CODE','name' => 'Graphics::Framebuffer', 'VERSION' => $VERS
 /* Copyright 2018-2025 Richard Kelsch, All Rights Reserved
    See the Perl documentation for Graphics::Framebuffer for licensing information.
 
-   Version:  6.67
+   Version:  6.68
 
    You may wonder why the stack is so heavily used when the global structures
    have the needed values.  Well, the module can emulate another graphics mode
@@ -3137,15 +3137,16 @@ This is usually caused by one or more of the following:
 
 \tsudo usermod -a -G video username
 
-  *  You could be attempting to run this inside X-Windows, which doesn't work.
-     You MUST run your script outside of X-Windows from the system Console.
-     If you are inside X-Windows, and you do not know how to get to your
-     console, just hit CTRL-ALT-F2 to access one of the consoles.  This has
-     no windows or mouse functionality.  It is command line only (similar to
-     old DOS).
+  *  You could be attempting to run this inside X-Windows/Wayland, which
+	 doesn't work.  You MUST run your script outside of X-Windows from the
+     system Console.  If you are inside X-Windows/Wayland, and you do not know
+     how to get to your console, just hit CTRL-ALT-F5 to access one of the
+     consoles.  This has no windows or mouse functionality.  It is command
+     line only (similar to old DOS).
 
-     To get back into X-Windows, you just hit ALT-F7 (or ALT-F8 on some
-     systems).
+     To get back into X-Windows/Wayland, you just hit ALT-F1 (or ALT-F8 or
+	 ALT-F7 on some systems).  Linux can have many consoles, which are
+     usually mapped F1 to F9.  One of them is set aside for X-Windows/Wayland.
 
 Actual error reported:\n\n$@\n};
             sleep ($self->{'RESET'}) ? 10 : 1;
@@ -3155,13 +3156,16 @@ Actual error reported:\n\n$@\n};
         print STDERR qq{
 OUCH!  Graphics::Framebuffer cannot memory map the framebuffer!
 
-You are attempting to run this inside X-Windows, which doesn't work.  You MUST
-run your script outside of X-Windows from the system Console.  If you are
-inside X-Windows, and you do not know how to get to your console, just hit
-CTRL-ALT-F2 to access one of the consoles.  This has no windows or mouse
-functionality.  It is command line only (similar to old DOS).
+You are attempting to run this inside X-Windows/Wayland, which doesn't work.
+You MUST run your script outside of X-Windows from the system Console.  If
+you are inside X-Windows/Wayland, and you do not know how to get to your
+console, just hit CTRL-ALT-F5 to access one of the consoles.  This has no
+windows or mouse functionality.  It is command line only (similar to old
+DOS).
 
-To get back into X-Windows, you just hit ALT-F7 (or ALT-F8 on some systems).
+To get back into X-Windows/Wayland, you just hit ALT-F1 (or ALT-F7 or ALT-F8
+on some systems).  Linux can have many consoles, which are usually mapped F1
+to F9.  One of them is set aside for X-Windows/Wayland.
 };
         sleep ($self->{'RESET'}) ? 10 : 1;
         exit(1);
@@ -9460,7 +9464,7 @@ A copy of this license is included in the 'LICENSE' file in this distribution.
 
 =head1 VERSION
 
-Version 6.67 (Aug 27, 2025)
+Version 6.68 (Aug 27, 2025)
 
 =head1 THANKS
 

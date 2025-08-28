@@ -5,7 +5,7 @@ package Iterator::Flex::Role;
 use strict;
 use warnings;
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 use Role::Tiny;
 use experimental 'signatures';
@@ -24,6 +24,19 @@ require Iterator::Flex;
 
 
 sub icache ( $iter, $code, @args ) { Iterator::Flex::Common::icache( \&{$code}, $iter, @args ) }
+
+
+
+
+
+
+
+
+
+
+
+
+sub ichunk ( $iter, @args ) { Iterator::Flex::Common::ichunk( $iter, @args ) }
 
 
 
@@ -84,7 +97,7 @@ __END__
 
 =pod
 
-=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory igather
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory ichunk igather
 
 =head1 NAME
 
@@ -92,7 +105,7 @@ Iterator::Flex::Role - Iterator Methods to add Iterator::Flex Iterator modifiers
 
 =head1 VERSION
 
-version 0.26
+version 0.27
 
 =head1 METHODS
 
@@ -101,6 +114,12 @@ version 0.26
   $new_iter = $iter->icache( sub { ... } );
 
 Return a new iterator caching the original iterator via L<Iterator::Flex/icache>.
+
+=head2 ichunk
+
+  $new_iter = $iter->ichunk( ... );
+
+Return a new iterator chunking the original iterator via L<Iterator::Flex/ichunk>.
 
 =head2 igather
 

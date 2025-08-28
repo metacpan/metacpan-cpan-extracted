@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp qw/confess/;
 
-our $VERSION='0.1.1';
+our $VERSION='0.1.2';
 
 # Presumably there can be a single clock/alarm setting.
 # If clock=2, then on timeout it will update the timer,

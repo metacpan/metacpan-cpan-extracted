@@ -80,3 +80,7 @@
 
         Fixed issue not opening text files in binary mode for special unicode
 		letters.
+
+1.25    Aug 27, 2025
+
+        Improved testing

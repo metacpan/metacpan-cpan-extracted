@@ -2,10 +2,14 @@ package Bluesky::Poster;
 
 use strict;
 use warnings;
-use LWP::UserAgent;
-use JSON qw(encode_json decode_json);
-use URI;
+
 use Carp;
+use LWP::UserAgent;
+use JSON::MaybeXS qw(encode_json decode_json);
+use Object::Configure;
+use Params::Validate::Strict;
+use Params::Get;
+use URI;
 
 =head1 NAME
 
@@ -16,8 +20,8 @@ Bluesky::Poster - Simple interface for posting to Bluesky (AT Protocol)
   use Bluesky::Poster;
 
   my $poster = Bluesky::Poster->new(
-      handle       => 'your-handle.bsky.social',
-      app_password => 'abcd-efgh-ijkl-mnop',
+	  identifier	 => 'your-identifier.bsky.social',
+	  password => 'abcd-efgh-ijkl-mnop',
   );
 
   my $result = $poster->post("Hello from Perl!");
@@ -34,9 +38,79 @@ messages using the AT Protocol API.
 
 =head1 METHODS
 
-=head2 new(handle => ..., app_password => ...)
+=head2 new(identifier => ..., password => ...)
 
 Constructs a new poster object and logs in.
+The indentifier and password can also be read in from a configuration file,
+as per L<Object::Configure>.
+
+=cut
+
+our $VERSION = '0.02';
+
+sub new {
+	my $proto = shift;
+	my $class = ref($proto) || $proto;
+
+	# Allow the identified and password to be read from a file
+        my $params = Params::Validate::Strict::validate_strict({
+		args => Object::Configure::configure($class, Params::Get::get_params(undef, @_ ? \@_ : undef)),
+		schema => {
+			# letters, numbers and full stops
+			'identifier' => { type => 'string', 'min' => 2, matches => qr/^[a-zA-Z0-9.]+$/i },
+			# 16 character hex 4-4-4-4
+			'password' => { type => 'string', 'min' => 19, 'max' => 19, matches => qr/^[a-z0-9]{4}(?:\-[a-z0-9]{4}){3}$/ },
+			'logger' => {},
+			'config_path' => {}
+		}
+	});
+
+	for my $required (qw(identifier password)) {
+		if(!defined($params->{$required})) {
+			if(my $logger = $params->{'logger'}) {
+				$logger->error("Missing required parameter: $required");
+			}
+			croak "Missing required parameter: $required"
+		}
+	}
+
+	my $self = {
+		%{$params},
+		agent	=> LWP::UserAgent->new,
+		json => JSON::MaybeXS->new()->utf8->canonical,
+		session	=> undef,
+	};
+
+	bless $self, $class;
+
+	$self->_login();
+
+	return $self;
+}
+
+sub _login {
+	my $self = shift;
+
+	my $ua = $self->{agent};
+
+	my $res = $ua->post(
+		'https://bsky.social/xrpc/com.atproto.server.createSession',
+		'Content-Type' => 'application/json',
+		Content => $self->{json}->encode({
+			identifier => $self->{identifier},
+			password => $self->{password},
+		}),
+	);
+
+	unless ($res->is_success) {
+		if(my $logger = $self->{'logger'}) {
+			$logger->error('Login failed: ', $res->status_line, "\n", $res->decoded_content());
+		}
+		croak('Login failed: ', $res->status_line, "\n", $res->decoded_content());
+	}
+
+	$self->{session} = $self->{json}->decode($res->decoded_content);
+}
 
 =head2 post($text)
 
@@ -44,95 +118,67 @@ Posts the given text to your Bluesky feed.
 
 =cut
 
-our $VERSION = '0.01';
-
-sub new {
-    my ($class, %args) = @_;
-
-    for my $required (qw(handle app_password)) {
-        croak "Missing required parameter: $required" unless $args{$required};
-    }
-
-    my $self = {
-        handle       => $args{handle},
-        app_password => $args{app_password},
-        agent        => LWP::UserAgent->new,
-        json         => JSON->new->utf8->canonical,
-        session      => undef,
-    };
-
-    bless $self, $class;
-    $self->_login;
-
-    return $self;
-}
-
-sub _login {
-    my ($self) = @_;
-    my $ua = $self->{agent};
-
-    my $res = $ua->post(
-        'https://bsky.social/xrpc/com.atproto.server.createSession',
-        'Content-Type' => 'application/json',
-        Content => $self->{json}->encode({
-            identifier => $self->{handle},
-            password   => $self->{app_password},
-        }),
-    );
-
-    unless ($res->is_success) {
-        croak "Login failed: " . $res->status_line . "\n" . $res->decoded_content;
-    }
-
-    $self->{session} = $self->{json}->decode($res->decoded_content);
-}
-
 sub post {
-    my ($self, $text) = @_;
-    croak "Text is required" unless defined $text;
+	my $self = shift;
+	my $params = Params::Get::get_params('text', @_);
+	my $text = $params->{'text'};
 
-    my $now = time();
-    my $iso_timestamp = _iso8601($now);
+	if(!defined($text)) {
+		if(my $logger = $self->{'logger'}) {
+			$logger->error('Text is required');
+		}
+		croak 'Text is required';
+	}
 
-    my $payload = {
-        repo   => $self->{session}{did},
-        collection => 'app.bsky.feed.post',
-        record => {
-            '$type' => 'app.bsky.feed.post',
-            text  => $text,
-            createdAt => $iso_timestamp,
-        },
-    };
+	my $iso_timestamp = _iso8601(time());
 
-    my $res = $self->{agent}->post(
-        'https://bsky.social/xrpc/com.atproto.repo.createRecord',
-        'Content-Type'  => 'application/json',
-        'Authorization' => 'Bearer ' . $self->{session}{accessJwt},
-        Content => $self->{json}->encode($payload),
-    );
+	my $payload = {
+		repo => $self->{session}{did},
+		collection => 'app.bsky.feed.post',
+		record => {
+			'$type' => 'app.bsky.feed.post',
+			text => $text,
+			createdAt => $iso_timestamp,
+		},
+	};
 
-    unless ($res->is_success) {
-        croak "Post failed: " . $res->status_line . "\n" . $res->decoded_content;
-    }
+	my $res = $self->{agent}->post(
+		'https://bsky.social/xrpc/com.atproto.repo.createRecord',
+		'Content-Type' => 'application/json',
+		'Authorization' => 'Bearer ' . $self->{session}{accessJwt},
+		Content => $self->{json}->encode($payload),
+	);
 
-    return $self->{json}->decode($res->decoded_content);
+	unless ($res->is_success) {
+		if(my $logger = $self->{'logger'}) {
+			$logger->error('Post failed: ' . $res->status_line . "\n" . $res->decoded_content());
+		}
+		croak('Post failed: ', $res->status_line, "\n", $res->decoded_content());
+	}
+
+	return $self->{json}->decode($res->decoded_content);
 }
 
 sub _iso8601 {
-    my $t = shift;
-    my @gmt = gmtime($t);
-    return sprintf(
-        "%04d-%02d-%02dT%02d:%02d:%02dZ",
-        $gmt[5]+1900, $gmt[4]+1, $gmt[3],
-        $gmt[2], $gmt[1], $gmt[0],
-    );
+	my $t = $_[0];
+	my @gmt = gmtime($t);
+
+	return sprintf(
+		"%04d-%02d-%02dT%02d:%02d:%02dZ",
+		$gmt[5]+1900, $gmt[4]+1, $gmt[3],
+		$gmt[2], $gmt[1], $gmt[0],
+	);
 }
 
 1;
 
 =head1 AUTHOR
 
-Nigel Horne, with help from ChatGPT
+Nigel Horne, with some help from ChatGPT
+
+=head1 SUPPORT
+
+This module is provided as-is without any warranty.
 
 =head1 LICENSE
 

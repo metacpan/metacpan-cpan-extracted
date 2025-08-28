@@ -1,5 +1,12 @@
 Revision history for Iterator-Flex
 
+0.27      2025-08-27 17:33:40 EDT
+
+  [ENHANCEMENT]
+
+    * New modifier, ichunk/Chunk, combines upstream iterator elements into
+      chunks of a given size.
+
 0.26      2025-08-22 16:04:52 EDT
 
   [ENHANCEMENT]

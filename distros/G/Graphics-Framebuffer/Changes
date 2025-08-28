@@ -1727,3 +1727,9 @@ Revision history for Graphics-Framebuffer
        Simplified test script.
 
 	   Added screen restore feature if RESET is off.
+
+6.68   Aug 27, 2025
+
+       Added various markdown documentation changes to many files.
+
+       Cleaned up some unneeded extra files.

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp qw/carp confess/;
 
-our $VERSION='0.1.1';
+our $VERSION='0.1.2';
 
 my %shapes=(
 	linear=>\&linearShape,

@@ -16,7 +16,7 @@ demo/MyClass.pm
 lib/Attribute/Handlers.pm
 Makefile.PL
 MANIFEST			This list of files
-README
+t/caller.t
 t/constants.t
 t/data_convert.t
 t/linerep.t

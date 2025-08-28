@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 47;
+plan tests => 48;
 
 my @module_files = (
     'Iterator/Flex.pm',
@@ -15,6 +15,7 @@ my @module_files = (
     'Iterator/Flex/Base.pm',
     'Iterator/Flex/Cache.pm',
     'Iterator/Flex/Cat.pm',
+    'Iterator/Flex/Chunk.pm',
     'Iterator/Flex/Common.pm',
     'Iterator/Flex/Cycle.pm',
     'Iterator/Flex/Factory.pm',

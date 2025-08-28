@@ -4,19 +4,20 @@
       "Damian Conway"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Attribute-Handlers",
    "no_index" : {
       "directory" : [
          "t",
-         "inc"
+         "inc",
+         "demo"
       ]
    },
    "prereqs" : {
@@ -39,13 +40,13 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://rt.perl.org/perlbug/"
+         "web" : "https://github.com/perl/perl5/issues"
       },
       "repository" : {
-         "url" : "git://perl5.git.perl.org/perl.git perl-git"
+         "url" : "https://github.com/perl/perl5.git"
       },
-      "x_MailingList" : "http://lists.cpan.org/showlist.cgi?name=perl5-porters"
+      "x_MailingList" : "https://lists.perl.org/list/perl5-porters.html"
    },
-   "version" : "0.99",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "1.03",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

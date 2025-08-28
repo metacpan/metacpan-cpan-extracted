@@ -15,16 +15,17 @@ Object::Configure - Runtime Configuration for an Object
 
 =head1 VERSION
 
-0.13
+0.14
 
 =cut
 
-our $VERSION = 0.13;
+our $VERSION = 0.14;
 
 =head1 SYNOPSIS
 
 The C<Object::Configure> module is a lightweight utility designed to inject runtime parameters into other classes,
-primarily by layering configuration and logging support.
+primarily by layering configuration and logging support,
+when instatiating objects.
 
 L<Log::Abstraction> and L<Config::Abstraction> are modules developed to solve a specific need:
 runtime configurability without needing to rewrite or hardcode behaviours.
@@ -54,9 +55,7 @@ Add this to your constructor:
 
    sub new {
         my $class = shift;
-        my $params = Params::Get(undef, \@_);
-
-        $params = Object::Configure::configure($class, $params);	# Reads in the runtime configuration settings
+        my $params = Object::Configure::configure($class, @_ ? \@_ : undef);	# Reads in the runtime configuration settings
 
         return bless $params, $class;
     }
@@ -150,11 +149,11 @@ Now you can set up a configuration file and environment variables to configure y
 
 sub configure
 {
-	my $class = shift;	# Name of the calling class
-	my $params = shift;	# Variables passed to the calling class's constructor
+	my $class = $_[0];	# Name of the calling class
+	my $params = $_[1] || {}; 	# Variables passed to the calling class's constructor
 	my $array;
 
-	if(ref($params->{'logger'}) eq 'ARRAY') {
+	if(exists($params->{'logger'}) && (ref($params->{'logger'}) eq 'ARRAY')) {
 		$array = delete $params->{'logger'};	# The merge seems to lose this
 	}
 

@@ -22,3 +22,4 @@ subs.pl
 examples/multiprocessing/many*
 examples/multiprocessing/mce*
 t/*.pl
+fix

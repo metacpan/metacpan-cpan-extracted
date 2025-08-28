@@ -44,6 +44,7 @@
             "Exporter" : "0",
             "File::Slurper" : "0",
             "File::Temp" : "0",
+            "MIDI::Drummer::Tiny" : "0",
             "MIDI::RtController" : "0",
             "MIDI::Simple" : "0",
             "Moo" : "0",
@@ -68,7 +69,7 @@
    "provides" : {
       "idi" : {
          "file" : "lib/idi.pm",
-         "version" : "0.0402"
+         "version" : "0.0504"
       }
    },
    "release_status" : "stable",
@@ -80,7 +81,7 @@
          "web" : "https://github.com/ology/idi"
       }
    },
-   "version" : "0.0402",
+   "version" : "0.0504",
    "x_generated_by_perl" : "v5.40.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "Artistic-2.0"

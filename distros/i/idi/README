@@ -2,12 +2,15 @@ NAME
     idi - Easy, command-line MIDI
 
 SYNOPSIS
-      perl -Midi -E 'x(qw(c1 f o5)); n(qw(qn Cs)); n("F"); n("Ds"); n(qw(hn Gs_d1))' | timidity -Od -
+      perl -Midi -E 'x(qw(c1 f o5)); n([qw(qn Cs)],"F","Ds",[qw(hn Gs_d1)])' | timidity -Od -
       # or with fluidsynth
 
       # Compare with:
       perl -MMIDI::Simple -E 'new_score; noop qw(c1 f o5); n qw(qn Cs); n "F"; n "Ds"; n qw(hn Gs_d1); write_score shift()' idi.mid
       timidity -Od idi.mid
+
+      # Play a drum back-beat:
+      perl -Midi -E 'u(4,["1000000010000000"],["0000100000001000"],["1010101010101010"])' | timidity -Od -
 
       # Control a MIDI device (uniquely named "usb") in real-time
       perl -Midi -E 'i(@ARGV)' keyboard usb
@@ -49,9 +52,16 @@ FUNCTIONS
     Invoke MIDI::RtController to control the second argument with the first.
 
   n
-      n(@note_spec)
+      n(qw(hn C))
+      n(qw(hn 60))
+      n(qw(hn C E G))
+      n(qw(hn 60 64 67))
+      n([qw(hn 60 64 67)], [qw(hn 65 69 71)], ...)
+      n(\@note_spec1, \@note_spec2, ...)
 
-    Add note. See the MIDI::Simple documentation for what a "note_spec" is.
+    Add notes as either a list of a single note-spec or a list of
+    array-references of note-specs. Please see the MIDI::Simple
+    documentation for what a "note_spec" is.
 
   o
       o(3)
@@ -80,6 +90,19 @@ FUNCTIONS
 
     Default: "none"
 
+  u
+      u($bars, $kick, $snare, $hihat)
+      u(4, ["1000000010000000"], ["0000100000001000"], ["1010101010101010"])
+
+      # extended example:
+      use String::Random ();
+      my $gen = String::Random->new;
+      my $pat = sub { $gen->randregex("[01]{16}") };
+      u(4, map { [$pat->()] } 1 .. 3);
+
+    Play a drum pattern Ã  la MIDI::Drummer::Tiny with 16th-note beat
+    resolution.
+
   v
       v(127)
 
@@ -104,15 +127,15 @@ SEE ALSO
 
     File::Temp
 
+    MIDI::Drummer::Tiny
+
+    MIDI::RtController
+
     MIDI::Simple
 
     Music::Tempo
 
     Moo
-
-    strictures
-
-    namespace::clean
 
 AUTHOR
     Gene Boggs <gene@cpan.org>

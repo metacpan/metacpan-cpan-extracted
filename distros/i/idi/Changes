@@ -1,5 +1,26 @@
 Revision history for idi
 
+0.0504    2025-08-28 01:33:24 PDT
+    - Show an extended example of random u() phrases.
+
+0.0503    2025-08-28 01:00:30 PDT
+    - Document the beat resolution change?
+
+0.0502    2025-08-28 00:52:21 PDT
+    - Use 16th-note (drum) beat resolution for u().
+
+0.0501    2025-08-27 20:45:40 PDT
+    - Fix the see also doc section.
+
+0.0500    2025-08-27 20:39:28 PDT
+    - Add the u() functiion to play a drum pattern.
+
+0.0404    2025-08-27 13:06:44 PDT
+    - Actually update the synopsis and n() usage docs.
+
+0.0403    2025-08-27 12:49:43 PDT
+    - Shrink the the n() function calls and arguments.
+
 0.0402    2025-08-08 22:20:39 PDT
     - Rename the get_score() function.
 

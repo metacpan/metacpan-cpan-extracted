@@ -1,0 +1,33 @@
+# Graphics::Framebuffer Module Frequently Asked Questions
+
+## Does GFB play video?
+
+   No, it will only play animated GIFs that fit in memory.
+
+   However, if you install "mplayer", then you can play videos with it.  It will use the "fbdev" display driver.  Keep in mind this is not a GPU accelerated driver.  So your results will vary with your CPU.
+
+-----
+
+## Does this work on Microsoft Windows?
+
+![Windows Incompatible](../Win-No.png)
+
+   No, as Windows does not have a memory mappable framebuffer.
+
+   However, it works fine with VirtualBox and Linux installed on Windows.  If you fullscreen the VirtualBox display, then you can use the framebuffer on the Linux running on it.  You may have to adjust the grub variables and the settings in the "/etc/default/console-settings" and "/etc/default/grub" files, as well as configure VirtualBox to set the framebuffer to a large size.
+
+   If you install the EFI version of Linux, then no need to modify Grub.
+
+   Note:  You can only have this module in emulation mode on MS Windows
+
+-----
+
+## Will GFB ever be hardware accelerated to use the DRM video drivers?
+
+   Not likely, as DRM is not the framebuffer, and has a far different and more complex way of drawing to the screen.  I MAY... MAY ... be able to activate the Framebuffer mode on DRM drivers, if they support it, but if the DRM drivers have this feature, then it should be active as a framebuffer anyway.  Perhaps you might have to use "modprobe" to activate it?
+
+-----
+
+## I cannot get it to work.  Will you help me?
+
+   Yes, to a point.  Please make sure you have tried all of the troubleshooting steps described in "installing/TROUBLESHOOTING".  Send me an email to my address indicated on the documentation or metacpan.org.  Attach, as a plain text file, the output of "examples/dump.pl".

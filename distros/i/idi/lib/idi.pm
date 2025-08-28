@@ -11,6 +11,7 @@ use File::Slurper qw(read_binary);
 use File::Temp qw(tempfile);
 use MIDI::RtController ();
 use MIDI::Simple ();
+use MIDI::Drummer::Tiny ();
 use Music::Tempo qw(bpm_to_ms);
 use namespace::clean;
 use Exporter qw(import);
@@ -26,12 +27,13 @@ our @EXPORT = qw(
     p
     r
     t
+    u
     v
     w
     x
 );
 
-our $VERSION = '0.0402';
+our $VERSION = '0.0504';
 
 my $self;
 
@@ -54,6 +56,14 @@ sub BEGIN {
         default => sub { MIDI::Simple->new_score },
     );
 
+    has drummer => (
+        is => 'lazy',
+    );
+    sub _build_drummer {
+        my ($self) = @_;
+        MIDI::Drummer::Tiny->new(file => $self->filename);
+    }
+
     has play => (
         is      => 'rw',
         default => sub { 1 },
@@ -64,19 +74,32 @@ sub BEGIN {
         default => sub { 0 },
     );
 
+    has is_drums => (
+        is      => 'rw',
+        default => sub { 0 },
+    );
+
     $self = __PACKAGE__->new;
 }
 
 sub END {
     if ($self->play) {
-        $self->score->write_score($self->filename) unless $self->is_written;
-        my $content = read_binary($self->filename);
+        my $content;
+        if ($self->is_drums) {
+            $self->drummer->write unless $self->is_written;
+            $content = read_binary($self->filename);
+        }
+        else {
+            $self->score->write_score($self->filename) unless $self->is_written;
+            $content = read_binary($self->filename);
+        }
         print $content;
     }
 }
 
 sub b {
     my ($bpm) = @_;
+    $self->drummer->set_bpm($bpm);
     $self->score->set_tempo(bpm_to_ms($bpm) * 1000);
 }
 
@@ -103,7 +126,14 @@ sub i {
 }
 
 sub n {
-    $self->score->n(@_);
+    if (ref $_[0] eq 'ARRAY') {
+        for my $notes (@_) {
+            $self->score->n(@$notes);
+        }
+    }
+    else {
+        $self->score->n(@_);
+    }
 }
 
 sub o {
@@ -129,8 +159,22 @@ sub t {
     );
 }
 
+sub u {
+    my ($reps, $kick, $snare, $hhat) = @_;
+    $self->drummer->sync_patterns(
+        $self->drummer->kick      => $kick,
+        $self->drummer->snare     => $snare,
+        $self->drummer->closed_hh => $hhat,
+        duration => $self->drummer->sixteenth,
+    ) for 1 .. $reps;
+    $self->is_drums(1);
+    $self->drummer->score;
+}
+
 sub v {
-    $self->score->Volume(@_);
+    my ($vol) = @_;
+    $self->drummer->set_volume($vol);
+    $self->score->Volume($vol);
 }
 
 sub w {
@@ -151,18 +195,23 @@ sub x {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 idi - Easy, command-line MIDI
 
 =head1 SYNOPSIS
 
-  perl -Midi -E 'x(qw(c1 f o5)); n(qw(qn Cs)); n("F"); n("Ds"); n(qw(hn Gs_d1))' | timidity -Od -
+  perl -Midi -E 'x(qw(c1 f o5)); n([qw(qn Cs)],"F","Ds",[qw(hn Gs_d1)])' | timidity -Od -
   # or with fluidsynth
 
   # Compare with:
   perl -MMIDI::Simple -E 'new_score; noop qw(c1 f o5); n qw(qn Cs); n "F"; n "Ds"; n qw(hn Gs_d1); write_score shift()' idi.mid
   timidity -Od idi.mid
+
+  # Play a drum back-beat:
+  perl -Midi -E 'u(4,["1000000010000000"],["0000100000001000"],["1010101010101010"])' | timidity -Od -
 
   # Control a MIDI device (uniquely named "usb") in real-time
   perl -Midi -E 'i(@ARGV)' keyboard usb
@@ -214,10 +263,16 @@ first.
 
 =head2 n
 
-  n(@note_spec)
+  n(qw(hn C))
+  n(qw(hn 60))
+  n(qw(hn C E G))
+  n(qw(hn 60 64 67))
+  n([qw(hn 60 64 67)], [qw(hn 65 69 71)], ...)
+  n(\@note_spec1, \@note_spec2, ...)
 
-Add note.  See the L<MIDI::Simple> documentation for what a
-"note_spec" is.
+Add notes as either a list of a single note-spec or a list of
+array-references of note-specs. Please see the L<MIDI::Simple>
+documentation for what a "note_spec" is.
 
 =head2 o
 
@@ -249,6 +304,20 @@ Add rest. See the L<MIDI::Simple> documentation for what
 Time signature
 
 Default: C<none>
+
+=head2 u
+
+  u($bars, $kick, $snare, $hihat)
+  u(4, ["1000000010000000"], ["0000100000001000"], ["1010101010101010"])
+
+  # extended example:
+  use String::Random ();
+  my $gen = String::Random->new;
+  my $pat = sub { $gen->randregex("[01]{16}") };
+  u(4, map { [$pat->()] } 1 .. 3);
+
+Play a drum pattern à la L<MIDI::Drummer::Tiny> with 16th-note beat
+resolution.
 
 =head2 v
 
@@ -283,15 +352,15 @@ L<File::Slurper>
 
 L<File::Temp>
 
+L<MIDI::Drummer::Tiny>
+
+L<MIDI::RtController>
+
 L<MIDI::Simple>
 
 L<Music::Tempo>
 
 L<Moo>
-
-L<strictures>
-
-L<namespace::clean>
 
 =head1 AUTHOR
 

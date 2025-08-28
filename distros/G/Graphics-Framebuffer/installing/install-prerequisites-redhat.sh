@@ -4,10 +4,6 @@
 
 sudo yum update # Bring RedHat's module database up to date
 
-# I use "upgrade" instead of "install" to prevent errors if you already
-# have some of these packages installed.  "upgrade" will install them if
-# you do not have them.  Win-win
-
 # Absolutely Needed
 
 sudo yum install gcc \
@@ -28,7 +24,9 @@ sudo yum install gcc \
 
 # Only needed if using the Yum installed Perl
 
-read -p "Do you wish to install the packaged/system Perl prerequisites?" yn
+echo "Necessary OS prerequisites installed.  It is recommended to answer YES to the following question."
+
+read -p "Do you wish to install the packaged/system Perl module prerequisites?" yn
 case $yn in
     [Yy]* )
         sudo yum install perl-math-gradient \

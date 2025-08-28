@@ -8,13 +8,13 @@ use warnings;
 
 use experimental qw( postderef signatures );
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 use Exporter 'import';
 
 our @EXPORT_OK = qw[
   iterator iter iarray icycle icache
-  icat ichain igather igrep imap iproduct iseq istack ifreeze izip
+  icat ichain ichunk igather igrep imap iproduct iseq istack ifreeze izip
   thaw
 ];
 
@@ -187,6 +187,32 @@ sub icat ( @args ) {
 
 sub ichain;
 *ichain = \&icat;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+sub ichunk ( $iterable, $pars = {} ) {
+    require Iterator::Flex::Chunk;
+    Iterator::Flex::Chunk->new( $iterable, $pars );
+}
 
 
 
@@ -541,8 +567,8 @@ __END__
 
 =pod
 
-=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory icat ichain igather
-istack izip
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory icat ichain ichunk
+igather istack izip
 
 =head1 NAME
 
@@ -550,7 +576,7 @@ Iterator::Flex::Common - Iterator Generators and Adapters
 
 =head1 VERSION
 
-version 0.26
+version 0.27
 
 =head1 SYNOPSIS
 
@@ -739,6 +765,25 @@ If all of the iterables support it.
 =item freeze
 
 If all of the iterables support it.
+
+=back
+
+=head2 ichunk
+
+  $iterator = ichunk( $iterable, ?\%pars );
+
+The iterator turns the input into chunks of C<$par{capacity}> elements,
+returning the chunks as arrayrefs.
+
+See L<Iterator::Flex::Chunk> for more details.
+
+The returned iterator supports the following methods:
+
+=over
+
+=item reset
+
+=item next
 
 =back
 

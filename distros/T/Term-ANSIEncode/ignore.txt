@@ -18,3 +18,4 @@ pm_to_blib
 src/ANSIEncode.pm
 fix
 build
+t/*.pl

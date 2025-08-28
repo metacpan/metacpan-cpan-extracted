@@ -7,9 +7,6 @@ use JSON::XS qw/decode_json/;
 use Pod::Usage;
 use Schedule::Easing;
 
-# todo:  expiration (need to verify this works)
-# todo:  check (need a way to set the exit status on warnings, probably _failExpired versus _warnExpired)
-
 #        (these likely all belong in Schedule::Easing::Stream)
 #
 # todo:  stream batching (performance)
@@ -71,9 +68,6 @@ GetOptions(
 );
 if($opt{help}) { pod2usage(-verbose=>2,-exitval=>2) }
 
-if($opt{expiration}) { die 'expiration not yet supported' }
-if($opt{check})      { die 'check not yet supported' }
-
 my @schedule=
 	$opt{schedule} ? loadeval($opt{schedule}) :
 	$opt{json}     ? loadjson($opt{json}) :
@@ -82,10 +76,11 @@ my @schedule=
 # Needs updated to support stream options.
 
 my $easing=Schedule::Easing->new(
-	warnExpired=>$opt{expiration},
 	schedule=>\@schedule,
+	warnExpired=>$opt{expiration}||$opt{check},
 );
-if(!$easing) { exit(1) }
+if(!$easing)    { exit(1) }
+if($opt{check}) { exit(0+!!$$easing{_err}) }
 
 while(<>) {
 	if($opt{timestamps}) { foreach my $sched ($easing->schedule(events=>[$_])) {

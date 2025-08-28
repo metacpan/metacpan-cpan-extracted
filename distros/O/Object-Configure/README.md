@@ -1,5 +1,5 @@
-[![CPAN version](https://badge.fury.io/pl/Class-Debug.svg)](https://metacpan.org/pod/Class::Debug)
-![Perl CI](https://github.com/nigelhorne/Class-Debug/actions/workflows/perl-ci.yml/badge.svg)
+[![CPAN version](https://badge.fury.io/pl/Object-Configure.svg)](https://metacpan.org/pod/Object::Debug)
+![Perl CI](https://github.com/nigelhorne/Object-Configure/actions/workflows/perl-ci.yml/badge.svg)
 
 # NAME
 
@@ -7,12 +7,13 @@ Object::Configure - Runtime Configuration for an Object
 
 # VERSION
 
-0.13
+0.14
 
 # SYNOPSIS
 
 The `Object::Configure` module is a lightweight utility designed to inject runtime parameters into other classes,
-primarily by layering configuration and logging support.
+primarily by layering configuration and logging support,
+when instatiating objects.
 
 [Log::Abstraction](https://metacpan.org/pod/Log%3A%3AAbstraction) and [Config::Abstraction](https://metacpan.org/pod/Config%3A%3AAbstraction) are modules developed to solve a specific need:
 runtime configurability without needing to rewrite or hardcode behaviours.
@@ -42,9 +43,7 @@ Add this to your constructor:
 
     sub new {
          my $class = shift;
-         my $params = Params::Get(undef, \@_);
-
-         $params = Object::Configure::configure($class, $params);        # Reads in the runtime configuration settings
+         my $params = Object::Configure::configure($class, @_ ? \@_ : undef);    # Reads in the runtime configuration settings
 
          return bless $params, $class;
      }
@@ -67,7 +66,6 @@ To control behavior at runtime, `Object::Configure` supports loading settings fr
 A minimal example of a config file (`~/.conf/local.conf`) might look like:
 
     [My__Module]
-
     logger.file = /var/log/mymodule.log
 
 The `configure()` function will read this file,

@@ -4,21 +4,21 @@ examples/fonts.pl
 examples/images/4KTest_Pattern.png
 examples/images/Blonde_Pigtails.jpg
 examples/images/Halloween.jpg
-examples/images/README
+examples/images/README.md
 examples/images/RWBY_Beuowolf.png
 examples/images/RWBY_Crescent_Rose_Ruby.png
 examples/images/RWBY_White.jpg
 examples/images/Ryuko.jpg
 examples/images/Solid.jpg
-examples/images/nothing_to_see.gif
+examples/images/Supercar.gif
 examples/multiprocessing/get-mce-demos
-examples/multiprocessing/README
-examples/multiprocessing/README-MCE
+examples/multiprocessing/README.md
+examples/multiprocessing/README-MCE.md
 examples/multiprocessing/threaded_primitives.pl
 examples/multiprocessing/threaded_slideshow.pl
 examples/multiprocessing/threaded_template.pl
 examples/primitives.pl
-examples/README
+examples/README.md
 examples/screensaver.pl
 examples/slideshow.pl
 examples/template.pl
@@ -29,13 +29,13 @@ examples/viewpic.pl
 examples/banner.vt
 ignore.txt
 installing/detect.sh
-installing/FAQ
-installing/INSTALL
+installing/FAQ.md
+installing/INSTALL.md
 installing/install-prerequisites-debian.sh
 installing/install-prerequisites-redhat.sh
-installing/KNOWN_ISSUES
-installing/TODO
-installing/TROUBLESHOOTING
+installing/KNOWN_ISSUES.md
+installing/TODO.md
+installing/TROUBLESHOOTING.md
 lib/Graphics/Framebuffer.pm
 lib/Graphics/Framebuffer/Mouse.pm
 lib/Graphics/Framebuffer/Splash.pm
@@ -47,6 +47,7 @@ GFB.png
 Win-No.png
 src/Framebuffer.c
 src/Framebuffer.pm.template
+src/README.md
 t/01-primitives.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

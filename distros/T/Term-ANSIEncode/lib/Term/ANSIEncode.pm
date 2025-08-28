@@ -45,52 +45,61 @@ use Text::Wrap::Smart ':all';
 binmode(STDOUT, ":encoding(UTF-8)");
 
 BEGIN {
-    our $VERSION = 1.24;
+    our $VERSION = '1.25';
 }
 
 sub ansi_output {
     my $self  = shift;
     my $text  = shift;
-    my $delay = shift;
+    my $delay = shift || 0;
+	my $test  = shift || FALSE;
 
-    if (length($text) > 1) {
-        while ($text =~ /\[\%\s+BOX (.*?),(\d+),(\d+),(\d+),(\d+),(.*?)\s+\%\](.*?)\[\%\s+ENDBOX\s+\%\]/i) {
-            my $replace = $self->box($1, $2, $3, $4, $5, $6, $7);
-            $text =~ s/\[\%\s+BOX.*?\%\].*?\[\%\s+ENDBOX.*?\%\]/$replace/i;
-        }
-        foreach my $string (keys %{ $self->{'ansi_sequences'} }) {
-            if ($string =~ /CLEAR|CLS/i) {
-                my $ch = locate(1, 1) . cls;
-                $text =~ s/\[\%\s+$string\s+\%\]/$ch/gi;
-            } else {
-                $text =~ s/\[\%\s+$string\s+\%\]/$self->{'ansi_sequences'}->{$string}/gi;
-            }
-        } ## end foreach my $string (keys %{...})
-        foreach my $string (keys %{ $self->{'characters'}->{'NAME'} }) {
-            $text =~ s/\[\%\s+$string\s+\%\]/$self->{'characters'}->{'NAME'}->{$string}/gi;
-        }
-        foreach my $string (keys %{ $self->{'characters'}->{'UNICODE'} }) {
-            $text =~ s/\[\%\s+$string\s+\%\]/$self->{'characters'}->{'UNICODE'}->{$string}/gi;
-        }
-    } ## end if (length($text) > 1)
+	while($text =~ /\[\% .*? \%\]/) {
+		if (length($text) > 1) {
+			while ($text =~ /\[\%\s+BOX (.*?),(\d+),(\d+),(\d+),(\d+),(.*?)\s+\%\](.*?)\[\%\s+ENDBOX\s+\%\]/i) {
+				my $replace = $self->box($1, $2, $3, $4, $5, $6, $7);
+				$text =~ s/\[\%\s+BOX.*?\%\].*?\[\%\s+ENDBOX.*?\%\]/$replace/i;
+			}
+			foreach my $string (keys %{ $self->{'ansi_sequences'} }) {
+#				if ($string =~ /CLEAR|CLS/i) {
+#					my $ch = locate(1, 1) . cls;
+#					$text =~ s/\[\%\s+$string\s+\%\]/$ch/gi;
+#				} else {
+					$text =~ s/\[\%\s+$string\s+\%\]/$self->{'ansi_sequences'}->{$string}/gi;
+#				}
+			} ## end foreach my $string (keys %{...})
+			foreach my $string (keys %{ $self->{'characters'}->{'NAME'} }) {
+				$text =~ s/\[\%\s+$string\s+\%\]/$self->{'characters'}->{'NAME'}->{$string}/gi;
+			}
+			foreach my $string (keys %{ $self->{'characters'}->{'UNICODE'} }) {
+				$text =~ s/\[\%\s+$string\s+\%\]/$self->{'characters'}->{'UNICODE'}->{$string}/gi;
+			}
+		} ## end if (length($text) > 1)
+	}
     my $s_len = length($text);
     my $nl    = $self->{'ansi_sequences'}->{'NEWLINE'};
     my $found = FALSE;
-    foreach my $count (0 .. $s_len) {
-        my $char = substr($text, $count, 1);
-        if ($char eq "\n") {
-            if ($text !~ /$nl/) {    # translate only if the file doesn't have ASCII newlines
-                $char = $nl;
-            }
-        } elsif ($char eq chr(27)) {    # Don't slow down ANSI sequences
-            $found = TRUE;
-        } elsif ($char eq 'm') {
-            $found = FALSE;
-        } elsif (!$found) {
-            sleep $delay if ($delay);
-        }
-        print $char;
-    } ## end foreach my $count (0 .. $s_len)
+	if ($test) {
+		$text =~ s/\n/$nl/gs;
+		return($text);
+	} else {
+		foreach my $count (0 .. $s_len) {
+			my $char = substr($text, $count, 1);
+			if ($char eq "\n") {
+				if ($text !~ /$nl/) {    # translate only if the file doesn't have ASCII newlines
+					$char = $nl;
+				}
+			} elsif ($char eq chr(27)) {    # Don't slow down ANSI sequences
+				$found = TRUE;
+			} elsif ($char eq 'm') {
+				$found = FALSE;
+			} elsif (!$found) {
+				sleep $delay if ($delay);
+			}
+			print $char;
+		} ## end foreach my $count (0 .. $s_len)
+	}
+	return(TRUE);
 } ## end sub ansi_output
 
 sub box {
@@ -163,11 +172,11 @@ sub new {
             'LINEFEED' => chr(10),
             'NEWLINE'  => chr(13) . chr(10),
 
-            'CLEAR'      => locate(1, 1) . cls,
-            'CLS'        => locate(1, 1) . cls,
-            'CLEAR LINE' => clline,
-            'CLEAR DOWN' => cldown,
-            'CLEAR UP'   => clup,
+            'CLEAR'      => $esc . '2J',
+            'CLS'        => $esc . '2J',
+            'CLEAR LINE' => $esc . '0K',
+            'CLEAR DOWN' => $esc . '0J',
+            'CLEAR UP'   => $esc . '1J',
 
             # Cursor
             'UP'      => $esc . 'A',
@@ -247,22 +256,22 @@ sub new {
             'BRIGHT B_CYAN'    => $esc . '106m',
             'BRIGHT B_WHITE'   => $esc . '107m',
 
-            'HORIZONTAL RULE ORANGE'         => "\r" . $esc . '48;5;202m' . clline . $esc . '0m',
-            'HORIZONTAL RULE PINK'           => "\r" . $esc . '48;5;198m' . clline . $esc . '0m',
-            'HORIZONTAL RULE RED'            => "\r" . $esc . '41m' . clline . $esc . '0m',
-            'HORIZONTAL RULE BRIGHT RED'     => "\r" . $esc . '101m' . clline . $esc . '0m',
-            'HORIZONTAL RULE GREEN'          => "\r" . $esc . '42m' . clline . $esc . '0m',
-            'HORIZONTAL RULE BRIGHT GREEN'   => "\r" . $esc . '102m' . clline . $esc . '0m',
-            'HORIZONTAL RULE YELLOW'         => "\r" . $esc . '43m' . clline . $esc . '0m',
-            'HORIZONTAL RULE BRIGHT YELLOW'  => "\r" . $esc . '103m' . clline . $esc . '0m',
-            'HORIZONTAL RULE BLUE'           => "\r" . $esc . '44m' . clline . $esc . '0m',
-            'HORIZONTAL RULE BRIGHT BLUE'    => "\r" . $esc . '104m' . clline . $esc . '0m',
-            'HORIZONTAL RULE MAGENTA'        => "\r" . $esc . '45m' . clline . $esc . '0m',
-            'HORIZONTAL RULE BRIGHT MAGENTA' => "\r" . $esc . '105m' . clline . $esc . '0m',
-            'HORIZONTAL RULE CYAN'           => "\r" . $esc . '46m' . clline . $esc . '0m',
-            'HORIZONTAL RULE BRIGHT CYAN'    => "\r" . $esc . '106m' . clline . $esc . '0m',
-            'HORIZONTAL RULE WHITE'          => "\r" . $esc . '47m' . clline . $esc . '0m',
-            'HORIZONTAL RULE BRIGHT WHITE'   => "\r" . $esc . '107m' . clline . $esc . '0m',
+            'HORIZONTAL RULE ORANGE'         => '[% RETURN %]' . $esc . '48;5;202m' . clline . $esc . '0m',
+            'HORIZONTAL RULE PINK'           => '[% RETURN %]' . $esc . '48;5;198m' . clline . $esc . '0m',
+            'HORIZONTAL RULE RED'            => '[% RETURN %]' . $esc . '41m' . clline . $esc . '0m',
+            'HORIZONTAL RULE BRIGHT RED'     => '[% RETURN %]' . $esc . '101m' . clline . $esc . '0m',
+            'HORIZONTAL RULE GREEN'          => '[% RETURN %]' . $esc . '42m' . clline . $esc . '0m',
+            'HORIZONTAL RULE BRIGHT GREEN'   => '[% RETURN %]' . $esc . '102m' . clline . $esc . '0m',
+            'HORIZONTAL RULE YELLOW'         => '[% RETURN %]' . $esc . '43m' . clline . $esc . '0m',
+            'HORIZONTAL RULE BRIGHT YELLOW'  => '[% RETURN %]' . $esc . '103m' . clline . $esc . '0m',
+            'HORIZONTAL RULE BLUE'           => '[% RETURN %]' . $esc . '44m' . clline . $esc . '0m',
+            'HORIZONTAL RULE BRIGHT BLUE'    => '[% RETURN %]' . $esc . '104m' . clline . $esc . '0m',
+            'HORIZONTAL RULE MAGENTA'        => '[% RETURN %]' . $esc . '45m' . clline . $esc . '0m',
+            'HORIZONTAL RULE BRIGHT MAGENTA' => '[% RETURN %]' . $esc . '105m' . clline . $esc . '0m',
+            'HORIZONTAL RULE CYAN'           => '[% RETURN %]' . $esc . '46m' . clline . $esc . '0m',
+            'HORIZONTAL RULE BRIGHT CYAN'    => '[% RETURN %]' . $esc . '106m' . clline . $esc . '0m',
+            'HORIZONTAL RULE WHITE'          => '[% RETURN %]' . $esc . '47m' . clline . $esc . '0m',
+            'HORIZONTAL RULE BRIGHT WHITE'   => '[% RETURN %]' . $esc . '107m' . clline . $esc . '0m',
         },
         @_,
     };

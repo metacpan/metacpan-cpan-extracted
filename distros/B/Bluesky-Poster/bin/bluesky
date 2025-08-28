@@ -19,9 +19,9 @@ my $config = Config::Abstraction->new('bluesky');
 # die Data::Dumper->new([$config])->Dump();
 
 my $poster = Bluesky::Poster->new(
-    handle       => $config->user(),
-    app_password => $config->password(), # Get this from https://bsky.app/settings/app-passwords
+	identifier => $config->identifier(),
+	password => $config->password(),	# Get this from https://bsky.app/settings/app-passwords
 );
 
-my $result = $poster->post("Hello from Perl and Bluesky!");
+my $result = $poster->post($ARGV[0] || 'Hello from Perl and Bluesky!');
 print "Post URI: $result->{uri}\n";

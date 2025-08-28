@@ -1,12 +1,12 @@
 {
    "abstract" : "Simple interface for posting to Bluesky (AT Protocol)",
    "author" : [
-      "Nigel Horne"
+      "Nigel Horne <njh@nigelhorne.com>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "perl_5"
+      "open_source"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -33,13 +33,22 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "JSON" : "0",
+            "JSON::MaybeXS" : "0",
             "LWP::UserAgent" : "0",
+            "Object::Configure" : "0",
+            "Params::Get" : "0",
+            "Params::Validate::Strict" : "0",
             "URI" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::DescribeMe" : "0",
+            "Test::Most" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,5 +1,8 @@
 Revision history for Schedule::Easing
 
+0.1.2 - 2025-08-24
+	- Support --expiration, --check, and warnExpired
+
 0.1.1 - 2025-08-23
 	- Shaping functions should work
 	- Documentation

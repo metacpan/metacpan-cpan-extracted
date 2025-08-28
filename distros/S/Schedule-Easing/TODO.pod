@@ -4,7 +4,7 @@
 
 =head2 Documentation
 
-Documentation is incomplete.
+Documentation is likely incomplete.
 
 =head2 Script uses C<Easing::Stream>
 
@@ -13,14 +13,6 @@ Script is currently linewise, but should be updated to leverage C<Easing::Stream
 =head2 Script timestamps option
 
 C<schedule-easing.pl --timestamps> should work.  It is currently available but not well tested.
-
-=head2 Expiration warnings
-
-The C<expired> and C<warnExpired> behaviors may not be consistent.
-
-=head2 Check option
-
-The C<check> option is not supported in C<schedule-easing.pl> nor within the modules.
 
 =head1 Tests
 

@@ -9,7 +9,7 @@ use constant {
     FALSE => 0
 };
 
-use List::Util qw(min max);
+use List::Util qw(min max); # Helpful for returning the minimum or maximum value within a list.
 
 BEGIN {
     require Exporter;
@@ -44,15 +44,12 @@ sub splash {
     $self->clip_reset();
     $self->normal_mode();
 
-    # If the screen is tiny, then we use a different splash screen
-    $self->normal_mode();
-
     # Draws the main boxes
-    $self->set_color(
+    $self->set_color( # The green background
 		{
 			'red'   => 0,
-			'green' => 0,
-			'blue'  => 32,
+			'green' => 64,
+			'blue'  => 0,
 			'alpha' => 255,
 		}
 	);
@@ -66,8 +63,9 @@ sub splash {
             'hatch'  => 'dots16'
         }
     );
-    $self->alpha_mode() if ($self->{'GPU'} !~ /nouveaufb/ && $self->{'ACCELERATED'});    # Nouveau SUCKS
-    $self->set_color(
+	# The blue box
+    $self->alpha_mode() if ($self->{'GPU'} !~ /nouveaufb/ && $self->{'ACCELERATED'});    # Set this box to be semi-transparent unless using a Nouveau driver, because Nouveau SUCKS
+    $self->set_color( # Set box to a blue hue
 		{
 			'red'   => 0,
 			'green' => 0,
@@ -75,7 +73,7 @@ sub splash {
 			'alpha' => 255,
 		}
 	);
-    $self->polygon(
+    $self->polygon( # The box is distorted, so draw it as a polygon
         {
             'coordinates' => [
 				(800 * $hf) + $X,
@@ -95,13 +93,13 @@ sub splash {
                 'colors' => {
                     'red'   => [0,   0],
                     'green' => [0,   0],
-                    'blue'  => [128, 255],
-                    'alpha' => [128, 255],
+                    'blue'  => [128, 255], # Make it a blue hue gradient growing in intensity
+                    'alpha' => [128, 255], # Make it less transparent as intensity climbs
                 },
             }
         }
     );
-
+    # The red box
     $self->set_color(
 		{
 			'red'   => 255,
@@ -121,16 +119,16 @@ sub splash {
             'gradient' => {
                 'direction' => 'vertical',
                 'colors'    => {
-                    'red'   => [32, 200],
+                    'red'   => [32, 200], # a gradient of red intensity
                     'green' => [0,  0],
                     'blue'  => [0,  0],
-                    'alpha' => [96, 220],
+                    'alpha' => [96, 220], # a gradient of alpha intensity
                 },
             },
         }
     );
 
-    # Accelerated shadow
+    # 'Accelerated' shadow
     $self->set_color(
 		{
 			'red'   => 32,
@@ -195,7 +193,7 @@ sub splash {
             )
         );
     }
-    if ($self->{'BITS'} >= 24) {
+    if ($self->{'BITS'} >= 24) { # We only draw shadows in 24 bits and 32 bits color levels
         my $shadow = $self->ttf_print(
             {
                 'bounding_box' => TRUE,
@@ -258,6 +256,7 @@ sub splash {
     $rk->{'x'} = (3480 * $hf) - $rk->{'pwidth'};
     $self->ttf_print($rk);
 
+    # Draw the info portion
     $self->alpha_mode() if ($self->{'GPU'} !~ /nouveaufb/ && $self->{'ACCELERATED'});    # Nouveau totally sucks for framebuffer work, so we disable alpha
 
     $self->rbox(
@@ -266,8 +265,6 @@ sub splash {
             'y'      => (1280 * $vf) + $Y,
             'width'  => (3140 * $hf),
             'height' => (560 * $vf),
-
-            #                'radius' => 30 * $vf,
             'filled'   => TRUE,
             'gradient' => {
                 'direction' => 'horizontal',

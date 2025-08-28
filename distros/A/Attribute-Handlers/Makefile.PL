@@ -4,21 +4,21 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
   NAME          => 'Attribute::Handlers',
   VERSION_FROM  => 'lib/Attribute/Handlers.pm',
-  INSTALLDIRS   => 'perl',
-  'LICENSE'     => 'perl',
-  'INSTALLDIRS' => 'perl',
+  ABSTRACT_FROM => 'lib/Attribute/Handlers.pm',
+  INSTALLDIRS   => ( $] < 5.011 ? 'perl' : 'site' ),
+  LICENSE       => 'perl_5',
   PREREQ_PM => {
     'parent' => 0,
   },
-  ($] >= 5.005 ?
-  (ABSTRACT_FROM => 'lib/Attribute/Handlers.pm',
-   'AUTHOR'      => 'Damian Conway') : ()),
+  AUTHOR        => 'Damian Conway',
   META_MERGE => {
     resources => {
-      repository  => 'git://perl5.git.perl.org/perl.git perl-git',
-      bugtracker  => 'http://rt.perl.org/perlbug/',
-      MailingList => 'http://lists.cpan.org/showlist.cgi?name=perl5-porters'
+      repository  => 'https://github.com/perl/perl5.git',
+      bugtracker  => 'https://github.com/perl/perl5/issues',
+      MailingList => 'https://lists.perl.org/list/perl5-porters.html',
     },
-  }
-
+    no_index => {
+      directory => [ 'demo' ],
+    },
+  },
 );

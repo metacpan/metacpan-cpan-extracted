@@ -6,7 +6,7 @@ use parent qw/Schedule::Easing::Ease/;
 use Carp qw/carp confess/;
 use Scalar::Util qw/looks_like_number/;
 
-our $VERSION='0.1.1';
+our $VERSION='0.1.2';
 
 sub _default_keys {
 	my ($self)=@_;
@@ -47,10 +47,12 @@ sub validate {
 	if($$self{ymin}>$$self{ymax}) {
 		(@$self{qw/ymin ymax/})=@$self{qw/ymax ymin/};
 		carp('ymin>ymax');
+		$$self{_err}=1;
 	}
 	elsif($$self{ymin}==$$self{ymax}) {
 		$$self{ymax}=1+$$self{ymin};
 		carp('ymin==ymax');
+		$$self{_err}=1;
 	}
 	if($$self{match}!~/\(\?<value>.*?\)/) { confess("Match pattern does not contain 'value':  $$self{match}") }
 	return $self;

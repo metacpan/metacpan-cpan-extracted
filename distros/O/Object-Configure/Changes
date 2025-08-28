@@ -1,5 +1,8 @@
 Revision history for Object::Configure - Runtime Configuration for an Object
 
+0.14	Wed Aug 27 13:16:36 EDT 2025
+	Allow the params to be undef
+
 0.13	Wed Aug 20 09:39:00 EDT 2025
 	Ensure it works with Log::Abstraction 0.25 and bump to use that
 		Also fixes https://github.com/nigelhorne/Object-Configure/issues/2

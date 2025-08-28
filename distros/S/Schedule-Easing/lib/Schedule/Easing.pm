@@ -3,7 +3,7 @@ package Schedule::Easing;
 use strict;
 use warnings;
 
-our $VERSION='0.1.1';
+our $VERSION='0.1.2';
 
 use Carp qw/carp confess/;
 
@@ -15,8 +15,8 @@ sub new {
 	my ($ref,%opt)=@_;
 	my $class=ref($ref)||$ref;
 	my %self=(
-		schedule=>$opt{schedule}//[],
-		_warnExpired=>$opt{_warnExpired}//0,
+		schedule   =>$opt{schedule}//[],
+		warnExpired=>$opt{warnExpired}//0,
 	);
 	return bless(\%self,$class)->init();
 }
@@ -33,7 +33,8 @@ sub init {
 	foreach my $ease (@{$$self{schedule}}) {
 		if(ref($ease) ne 'HASH') { confess('Schedule entry must be a hash') }
 		if(my $builder=$builder{$$ease{type}}) {
-			$ease=$builder->new(%$ease,_warnExpired=>$$self{_warnExpired});
+			$ease=$builder->new(%$ease,_warnExpired=>$$self{warnExpired});
+			if($$ease{_err}) { $$self{_err}=1 }
 		}
 		else { confess("Unsupported entry type $$ease{type}") }
 	}
@@ -94,11 +95,11 @@ __END__
 
 =head1 NAME
 
-Schedule::Easing - Scheduled ramp-up and linear activation of events
+Schedule::Easing - Stateless, stable filtering of events with ramp-up activation on a schedule
 
 =head1 VERSION
 
-Version 0.1.1
+Version 0.1.2
 
 =head1 SYNOPSIS
 
@@ -129,12 +130,12 @@ Version 0.1.1
       },
     ],
   );
-
+  
   my @matches=$easing->matches(ts=>time(), events=>\@events);
 
 =head1 DESCRIPTION
 
-Easing provides stateless, stable selection of point-in-time events that need to be exposed with increasing frequency over a period of time.  Events may be infrequent or real-time, low or high volume, but must contain some manner of identification for categorization, such as a reported line number or non-random content that can be used to compute a message digest.  As time increases, the percentage of events emitted with be monotonically increasing.
+Easing provides stateless, stable selection of point-in-time events that need to be exposed with increasing frequency over a period of time.  Events may be infrequent or real-time, low or high volume, but must contain some manner of identification for categorization, such as a reported line number or non-random content that can be used to compute a message digest.  As time increases, the percentage of events emitted will be monotonically increasing.
 
 Contrasted with throttling, which suppresses I<any> incoming event in real-time once a threshold is exceeded, easing ensures that new events are uniformly distributed over the configured period of time.  Whereas throttling requires cached statistics, easing can be performed without resident processes or data stores.
 
@@ -292,10 +293,28 @@ All above examples call C<$easing-E<gt>matches(events=>[event, ...])> using line
 
 An array of event objects can be passed instead of simple strings.  An individual C<event> can be a hash of the form C<{message=>"...",...}> or an array of the form C<[message,...]>, and the C<message> will be used for matching purposes.  The returned list will be the entire matching event objects.
 
+=head1 Validation and Debugging
+
+When a non-fatal error is encountered, C<$$easing{_err}=1> will be set.  At this time no additional information is provided, except as emitted by C<carp>.
+
+=head2 Invalid easing configurations
+
+Some parameters to an easing entry are mandatory and die immediately via C<confess>:  Improper C<schedule> structure, entry structure, or invalid types for C<begin>, C<final>, C<tsA>, C<tsB>, C<match>.
+
+=head2 Expired easing configurations
+
+Initializing the object with C<Schedule::Easing-E<gt>new(warnExpired=>1)> will report if any entries in the schedule have C<tsB> in the past, and C<final=1> or C<final=0>.  This permits discovery and removal of unneeded pattern matchers, which otherwise slow down processing.  When C<finalE<lt>1>, no warnings will be reported since filtering is still active.
+
 =head1 SEE ALSO
 
 L<Algorithm::Easing>
 
 Throttling solutions
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify it under the terms of the GNU Library General Public License Version 3 as published by the Free Software Foundation.
+
+This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Library General Public License for more details.
 
 =cut

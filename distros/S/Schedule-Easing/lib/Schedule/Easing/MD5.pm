@@ -5,7 +5,7 @@ use warnings;
 use parent qw/Schedule::Easing::Ease/;
 use Digest::MD5 qw/md5/;
 
-our $VERSION='0.1.1';
+our $VERSION='0.1.2';
 
 sub _default_keys {
 	my ($self)=@_;
