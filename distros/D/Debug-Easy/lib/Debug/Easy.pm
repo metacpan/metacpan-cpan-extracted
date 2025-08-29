@@ -1,10 +1,8 @@
-#############################################################################
 #################         Easy Debugging Module        ######################
 ################# Copyright 2013 - 2025 Richard Kelsch ######################
 #################          All Rights Reserved         ######################
-#############################################################################
 ######## Licensing information available near the end of this file. #########
-#############################################################################
+
 
 package Debug::Easy;
 
@@ -13,8 +11,8 @@ use constant {
     TRUE  => 1,
     FALSE => 0,
 };
-use Config;;
 
+use Config;
 use DateTime;
 use Term::ANSIColor;
 use Time::HiRes qw(time);
@@ -26,6 +24,8 @@ eval {               # Data::Dumper::Simple is preferred.  Try to load it withou
     Data::Dumper::Simple->import();
     1;
 };
+
+use threads;
 
 # Set up dumper variables for friendly output
 
@@ -39,13 +39,12 @@ $Data::Dumper::Sortkeys      = TRUE;
 $Data::Dumper::Purity        = TRUE;
 $Data::Dumper::Deparse       = TRUE;
 
-use threads;
 
 BEGIN {
     require Exporter;
 
     # set the version for version checking
-    our $VERSION = '2.16';
+    our $VERSION = '2.17';
 
     # Inherit from Exporter to export functions and variables
     our @ISA = qw(Exporter);
@@ -571,7 +570,7 @@ sub _send_to_logger {      # This actually simplifies the previous method ... se
     my $threaded = 'PT-';
     my $epoch    = time;
 
-    if (exists($Config{'useithreads'}) && $Config{'useithreads'}) { # Gotta trust the Config vars
+    if (exists($Config{'useithreads'}) && $Config{'useithreads'}) { # Gotta trust the Config vars... right?
 		my $tid   = threads->tid();
 		$threaded = ($tid > 0) ? sprintf('T%02d',$tid) : 'PT-';
     } ## end if (exists($Config{'useithreads'...}))
@@ -810,5 +809,6 @@ And available on CPAN
 
  *  Debug::Easy
  *  Graphics::Framebuffer
+ *  Term::ANSIEncode
 
 =cut

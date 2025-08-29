@@ -1,3 +1,8 @@
+0.5.0  2025-08-28
+
+   - Add -o and -n query flags to print a packages dependents
+   - The -p query flag no longer causes exit if pkg not installed
+
 0.4.2  2025-08-22
 
    - Documentation upgrades

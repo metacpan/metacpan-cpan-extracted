@@ -85,7 +85,7 @@ sub distinct
     my $what = @_ > 1 ? join( ', ', @_ ) : shift( @_ );
     my $query = $self->{query} ||
         return( $self->error( "No query to set as to be ignored." ) );
-    
+
     my $type = uc( ( $query =~ /^\s*(\S+)\s+/ )[ 0 ] );
     # ALTER for table alteration statements (DB::Object::Tables
     my @allowed = qw( SELECT );
@@ -97,7 +97,7 @@ sub distinct
     # Incompatible. Do not bother going further
     return( $self ) if( $query =~ /^[[:blank:]]*(?:$allowed)[[:blank:]]+(?:DISTINCT|ALL)[[:blank:]]+/i );
     my $clause = defined( $what ) ? "DISTINCT ON ($what)" : "DISTINCT";
-    
+
     $query =~ s/^([[:blank:]]*)($allowed)([[blank:]]+)/$1$2 $clause /;
     # my $sth = $self->prepare( $query ) ||
     # $self->{ 'query' } = $query;

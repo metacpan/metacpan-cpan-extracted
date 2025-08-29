@@ -112,6 +112,13 @@ method openfile( $file, $checked=0, $actual=undef ) {
 	return;
     }
     if ( my $f = fs_load($file) ) {
+
+	# Check for filelist.
+	if ( $f->[0] =~ m;^//\s*chordpro\s+songbook;i ) {
+	    $f->[0] = $file;
+	    return $self->GetParent->select_mode("sbexport")->load_filelist($f)
+	}
+
 	# This has the (desired) sideeffect that all newlines
 	# are now \n .
 	$self->{t_editor}->SetText(join("\n",@$f)."\n");
@@ -479,15 +486,14 @@ method OnInsertSymbol($event) {
     unless ( $preferences{enable_insert_symbols} ) {
 	my $md = Wx::MessageDialog->new
 	  ( undef,
-	    "Inserting special symbols introduces the risk that you can ".
-	    "insert symbols that are visible on the screen, but are not ".
-	    "supported by the fonts that are used for the PDF output.\n".
-	    "So these symbols may clobber your output.\n".
+	    "Note: some symbols might not display properly in PDF".
+	    " output, even if visible in the Editor. Make sure that".
+	    " the symbols you use are supported by your output fonts.\n".
 	    "\n".
-	    "Keep this operation disabled?",
+	    "Continue and suppress future warnings?",
 	    "Advanced operation warning",
-	    wxYES_NO|wxICON_WARNING|wxDIALOG_NO_PARENT );
-	return unless $md->ShowModal == wxID_NO;
+	    wxYES_NO|wxNO_DEFAULT|wxICON_WARNING|wxDIALOG_NO_PARENT );
+	return unless $md->ShowModal == wxID_YES;
 	$preferences{enable_insert_symbols} = 1;
 
     }

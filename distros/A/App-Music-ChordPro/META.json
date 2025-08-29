@@ -59,7 +59,9 @@
             "Scalar::Util" : "1.63",
             "Storable" : "3.08",
             "String::Interpolate::Named" : "1.06",
-            "Text::Layout" : "0.045"
+            "Text::Layout" : "0.045",
+            "Unicode::Collate" : "1.31",
+            "Unicode::Normalize" : "1.26"
          }
       },
       "configure" : {
@@ -90,6 +92,8 @@
             "Storable" : "3.08",
             "String::Interpolate::Named" : "1.06",
             "Text::Layout" : "0.045",
+            "Unicode::Collate" : "1.31",
+            "Unicode::Normalize" : "1.26",
             "perl" : "5.026"
          }
       },
@@ -115,18 +119,20 @@
             "Scalar::Util" : "1.63",
             "Storable" : "3.08",
             "String::Interpolate::Named" : "1.06",
-            "Text::Layout" : "0.045"
+            "Text::Layout" : "0.045",
+            "Unicode::Collate" : "1.31",
+            "Unicode::Normalize" : "1.26"
          }
       }
    },
    "provides" : {
       "App::Music::ChordPro" : {
          "file" : "lib/ChordPro.pm",
-         "version" : "v6.80.0"
+         "version" : "v6.80.1"
       },
       "chordpro" : {
          "file" : "script/chordpro",
-         "version" : "v6.80.0"
+         "version" : "v6.80.1"
       }
    },
    "release_status" : "stable",
@@ -145,6 +151,6 @@
          "web" : "https://github.com/ChordPro/chordpro"
       }
    },
-   "version" : "v6.080.0",
+   "version" : "v6.080.1",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

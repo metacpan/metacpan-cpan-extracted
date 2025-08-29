@@ -46,10 +46,12 @@ use List::Util qw(max);
 
 # use Data::Dumper::Simple;$Data::Dumper::Terse=TRUE;$Data::Dumper::Indent=TRUE;$Data::Dumper::Useqq=TRUE;$Data::Dumper::Deparse=TRUE;$Data::Dumper::Quotekeys=TRUE;$Data::Dumper::Trailingcomma=TRUE;$Data::Dumper::Sortkeys=TRUE;$Data::Dumper::Purity=TRUE;$Data::Dumper::Deparse=TRUE;
 
+# Since UTF-8 is the norm, it's enabled for all needed handles
+binmode(STDERR, ":encoding(UTF-8)");
 binmode(STDOUT, ":encoding(UTF-8)");
 binmode(STDIN, ":encoding(UTF-8)");
 
-our $VERSION = $Term::ANSIEncode::VERSION;
+our $VERSION = $Term::ANSIEncode::VERSION; # Pull in the version from Term::ANSIEncode
 
 my $version   = FALSE;
 my $help      = FALSE;

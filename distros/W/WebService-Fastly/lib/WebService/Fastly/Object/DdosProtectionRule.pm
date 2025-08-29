@@ -28,7 +28,6 @@ use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
 
-use WebService::Fastly::Object::DdosProtectionAction;
 use WebService::Fastly::Object::DdosProtectionRuleAllOf;
 use WebService::Fastly::Object::TimestampsNoDelete;
 
@@ -190,9 +189,9 @@ __PACKAGE__->method_documentation({
         read_only => 'false',
             },
     'action' => {
-        datatype => 'DdosProtectionAction',
+        datatype => 'string',
         base_name => 'action',
-        description => '',
+        description => 'Action types for a rule. Supported action values are default, block, log, off. The default action value follows the current protection mode of the associated service.',
         format => '',
         read_only => 'false',
             },
@@ -259,7 +258,7 @@ __PACKAGE__->openapi_types( {
     'updated_at' => 'DateTime',
     'id' => 'string',
     'name' => 'string',
-    'action' => 'DdosProtectionAction',
+    'action' => 'string',
     'customer_id' => 'string',
     'service_id' => 'string',
     'source_ip' => 'string',

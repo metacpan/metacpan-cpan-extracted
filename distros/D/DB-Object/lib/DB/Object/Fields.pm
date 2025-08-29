@@ -228,7 +228,7 @@ DB::Object::Fields - Tables Fields Object Accessor
         unknown_field => 'fatal',
         # debug => 3,
     }) || bailout( "Unable to connect to sql server on host localhost: ", DB::Object->error );
-    
+
     my $tbl = $dbh->some_table || die( "No table \"some_table\" could be found: ", $dbh->error, "\n" );
     my $fo = $tbl->fields_object || die( $tbl->error );
     my $expr = $fo->id == 2;
@@ -294,7 +294,7 @@ The unknown field will be ignored and a warning will be emitted that this field 
 This will trigger a L</die> using a L<Module::Generic::Exception> object. So you could catch it like this:
 
     use Nice::Try;
-    
+
     try
     {
         # $opts contains the property 'unknown_field' set to 'die'

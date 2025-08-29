@@ -33,6 +33,9 @@ docs/ApexRedirect.md
 docs/ApexRedirectAllOf.md
 docs/ApexRedirectApi.md
 docs/AsyncResponse.md
+docs/AttackReport.md
+docs/AttackSignal.md
+docs/AttackSource.md
 docs/AutomationToken.md
 docs/AutomationTokenCreateRequest.md
 docs/AutomationTokenCreateRequestAttributes.md
@@ -137,7 +140,6 @@ docs/DashboardItemPropertyVisualization.md
 docs/DashboardItemPropertyVisualizationPropertyConfig.md
 docs/DashboardPropertyCreatedBy.md
 docs/DashboardPropertyUpdatedBy.md
-docs/DdosProtectionAction.md
 docs/DdosProtectionApi.md
 docs/DdosProtectionAttributeStats.md
 docs/DdosProtectionAttributeValue.md
@@ -145,7 +147,9 @@ docs/DdosProtectionError.md
 docs/DdosProtectionErrorErrors.md
 docs/DdosProtectionEvent.md
 docs/DdosProtectionEventAllOf.md
+docs/DdosProtectionInvalidRequest.md
 docs/DdosProtectionNotAuthenticated.md
+docs/DdosProtectionNotAuthorized.md
 docs/DdosProtectionNotFound.md
 docs/DdosProtectionRequestUpdateConfiguration.md
 docs/DdosProtectionResponseBodyGetAllServices.md
@@ -164,7 +168,7 @@ docs/DdosProtectionResponseProductProduct.md
 docs/DdosProtectionResponseService.md
 docs/DdosProtectionRule.md
 docs/DdosProtectionRuleAllOf.md
-docs/DdosProtectionTrafficAttribute.md
+docs/DdosProtectionRulePatch.md
 docs/DdosProtectionTrafficStats.md
 docs/DdosProtectionTrafficStatsAllOf.md
 docs/DefaultSettings.md
@@ -353,9 +357,12 @@ docs/KvStoreDetails.md
 docs/KvStoreItemApi.md
 docs/KvStoreRequestCreate.md
 docs/KvStoreUpsertBatch.md
+docs/ListAttackReport.md
+docs/ListAttackReportMeta.md
 docs/ListCustomerAddressesResponse.md
 docs/ListDashboardsResponse.md
 docs/ListEomInvoicesResponse.md
+docs/ListSignalReport.md
 docs/Listinvoices.md
 docs/LogAggregationsFilterFieldItem.md
 docs/LogAggregationsGetResponse.md
@@ -383,13 +390,6 @@ docs/LogInsightsMetaFilter.md
 docs/LogInsightsValues.md
 docs/LogPropertyServiceId.md
 docs/LogRecord.md
-docs/LogTimeseriesFilterFieldItem.md
-docs/LogTimeseriesGetResponse.md
-docs/LogTimeseriesGetResponseMeta.md
-docs/LogTimeseriesGetResponseMetaFilters.md
-docs/LogTimeseriesResult.md
-docs/LogTimeseriesResultDimensions.md
-docs/LogTimeseriesValueField.md
 docs/LoggingAddressAndPort.md
 docs/LoggingAzureblobAdditional.md
 docs/LoggingAzureblobApi.md
@@ -509,6 +509,7 @@ docs/MutualAuthenticationResponseData.md
 docs/MutualAuthenticationResponseDataAllOf.md
 docs/MutualAuthenticationsResponse.md
 docs/MutualAuthenticationsResponseAllOf.md
+docs/NgwafReportsApi.md
 docs/NgwafRequestEnable.md
 docs/NgwafRequestUpdateConfiguration.md
 docs/NgwafResponseBodyGetAllServices.md
@@ -534,7 +535,7 @@ docs/ObjectStorageResponseProduct.md
 docs/ObjectStorageResponseProductProduct.md
 docs/ObservabilityAggregationsForLogsApi.md
 docs/ObservabilityCustomDashboardsApi.md
-docs/ObservabilityTimeseriesForLogsApi.md
+docs/ObservabilityTimeseriesApi.md
 docs/OriginInspector.md
 docs/OriginInspectorDimensions.md
 docs/OriginInspectorEntry.md
@@ -760,6 +761,7 @@ docs/Serviceusagetypes.md
 docs/Settings.md
 docs/SettingsApi.md
 docs/SettingsResponse.md
+docs/SignalReport.md
 docs/SigningKey.md
 docs/Snippet.md
 docs/SnippetApi.md
@@ -776,6 +778,9 @@ docs/SudoApi.md
 docs/SudoGenericTokenError.md
 docs/SudoRequest.md
 docs/SudoResponse.md
+docs/TimeseriesGetResponse.md
+docs/TimeseriesMeta.md
+docs/TimeseriesResult.md
 docs/Timestamps.md
 docs/TimestampsNoDelete.md
 docs/TlsActivation.md
@@ -863,6 +868,7 @@ docs/TokenResponse.md
 docs/TokenResponseAllOf.md
 docs/TokensAdditionalProps.md
 docs/TokensApi.md
+docs/TopWorkspace.md
 docs/TypeBillingAddress.md
 docs/TypeContact.md
 docs/TypeCustomer.md
@@ -1013,6 +1019,7 @@ lib/WebService/Fastly/LoggingSplunkApi.pm
 lib/WebService/Fastly/LoggingSumologicApi.pm
 lib/WebService/Fastly/LoggingSyslogApi.pm
 lib/WebService/Fastly/MutualAuthenticationApi.pm
+lib/WebService/Fastly/NgwafReportsApi.pm
 lib/WebService/Fastly/Object/AccessKey.pm
 lib/WebService/Fastly/Object/AccessKeyResponse.pm
 lib/WebService/Fastly/Object/Acl.pm
@@ -1031,6 +1038,9 @@ lib/WebService/Fastly/Object/AiAcceleratorResponseProductProduct.pm
 lib/WebService/Fastly/Object/ApexRedirect.pm
 lib/WebService/Fastly/Object/ApexRedirectAllOf.pm
 lib/WebService/Fastly/Object/AsyncResponse.pm
+lib/WebService/Fastly/Object/AttackReport.pm
+lib/WebService/Fastly/Object/AttackSignal.pm
+lib/WebService/Fastly/Object/AttackSource.pm
 lib/WebService/Fastly/Object/AutomationToken.pm
 lib/WebService/Fastly/Object/AutomationTokenCreateRequest.pm
 lib/WebService/Fastly/Object/AutomationTokenCreateRequestAttributes.pm
@@ -1122,14 +1132,15 @@ lib/WebService/Fastly/Object/DashboardItemPropertyVisualization.pm
 lib/WebService/Fastly/Object/DashboardItemPropertyVisualizationPropertyConfig.pm
 lib/WebService/Fastly/Object/DashboardPropertyCreatedBy.pm
 lib/WebService/Fastly/Object/DashboardPropertyUpdatedBy.pm
-lib/WebService/Fastly/Object/DdosProtectionAction.pm
 lib/WebService/Fastly/Object/DdosProtectionAttributeStats.pm
 lib/WebService/Fastly/Object/DdosProtectionAttributeValue.pm
 lib/WebService/Fastly/Object/DdosProtectionError.pm
 lib/WebService/Fastly/Object/DdosProtectionErrorErrors.pm
 lib/WebService/Fastly/Object/DdosProtectionEvent.pm
 lib/WebService/Fastly/Object/DdosProtectionEventAllOf.pm
+lib/WebService/Fastly/Object/DdosProtectionInvalidRequest.pm
 lib/WebService/Fastly/Object/DdosProtectionNotAuthenticated.pm
+lib/WebService/Fastly/Object/DdosProtectionNotAuthorized.pm
 lib/WebService/Fastly/Object/DdosProtectionNotFound.pm
 lib/WebService/Fastly/Object/DdosProtectionRequestUpdateConfiguration.pm
 lib/WebService/Fastly/Object/DdosProtectionResponseBodyGetAllServices.pm
@@ -1148,7 +1159,7 @@ lib/WebService/Fastly/Object/DdosProtectionResponseProductProduct.pm
 lib/WebService/Fastly/Object/DdosProtectionResponseService.pm
 lib/WebService/Fastly/Object/DdosProtectionRule.pm
 lib/WebService/Fastly/Object/DdosProtectionRuleAllOf.pm
-lib/WebService/Fastly/Object/DdosProtectionTrafficAttribute.pm
+lib/WebService/Fastly/Object/DdosProtectionRulePatch.pm
 lib/WebService/Fastly/Object/DdosProtectionTrafficStats.pm
 lib/WebService/Fastly/Object/DdosProtectionTrafficStatsAllOf.pm
 lib/WebService/Fastly/Object/DefaultSettings.pm
@@ -1312,9 +1323,12 @@ lib/WebService/Fastly/Object/KvStoreBatchResponseErrors.pm
 lib/WebService/Fastly/Object/KvStoreDetails.pm
 lib/WebService/Fastly/Object/KvStoreRequestCreate.pm
 lib/WebService/Fastly/Object/KvStoreUpsertBatch.pm
+lib/WebService/Fastly/Object/ListAttackReport.pm
+lib/WebService/Fastly/Object/ListAttackReportMeta.pm
 lib/WebService/Fastly/Object/ListCustomerAddressesResponse.pm
 lib/WebService/Fastly/Object/ListDashboardsResponse.pm
 lib/WebService/Fastly/Object/ListEomInvoicesResponse.pm
+lib/WebService/Fastly/Object/ListSignalReport.pm
 lib/WebService/Fastly/Object/Listinvoices.pm
 lib/WebService/Fastly/Object/LogAggregationsFilterFieldItem.pm
 lib/WebService/Fastly/Object/LogAggregationsGetResponse.pm
@@ -1341,13 +1355,6 @@ lib/WebService/Fastly/Object/LogInsightsMetaFilter.pm
 lib/WebService/Fastly/Object/LogInsightsValues.pm
 lib/WebService/Fastly/Object/LogPropertyServiceId.pm
 lib/WebService/Fastly/Object/LogRecord.pm
-lib/WebService/Fastly/Object/LogTimeseriesFilterFieldItem.pm
-lib/WebService/Fastly/Object/LogTimeseriesGetResponse.pm
-lib/WebService/Fastly/Object/LogTimeseriesGetResponseMeta.pm
-lib/WebService/Fastly/Object/LogTimeseriesGetResponseMetaFilters.pm
-lib/WebService/Fastly/Object/LogTimeseriesResult.pm
-lib/WebService/Fastly/Object/LogTimeseriesResultDimensions.pm
-lib/WebService/Fastly/Object/LogTimeseriesValueField.pm
 lib/WebService/Fastly/Object/LoggingAddressAndPort.pm
 lib/WebService/Fastly/Object/LoggingAzureblobAdditional.pm
 lib/WebService/Fastly/Object/LoggingAzureblobResponse.pm
@@ -1654,6 +1661,7 @@ lib/WebService/Fastly/Object/Serviceusagetype.pm
 lib/WebService/Fastly/Object/Serviceusagetypes.pm
 lib/WebService/Fastly/Object/Settings.pm
 lib/WebService/Fastly/Object/SettingsResponse.pm
+lib/WebService/Fastly/Object/SignalReport.pm
 lib/WebService/Fastly/Object/SigningKey.pm
 lib/WebService/Fastly/Object/Snippet.pm
 lib/WebService/Fastly/Object/SnippetResponse.pm
@@ -1666,6 +1674,9 @@ lib/WebService/Fastly/Object/Stats.pm
 lib/WebService/Fastly/Object/SudoGenericTokenError.pm
 lib/WebService/Fastly/Object/SudoRequest.pm
 lib/WebService/Fastly/Object/SudoResponse.pm
+lib/WebService/Fastly/Object/TimeseriesGetResponse.pm
+lib/WebService/Fastly/Object/TimeseriesMeta.pm
+lib/WebService/Fastly/Object/TimeseriesResult.pm
 lib/WebService/Fastly/Object/Timestamps.pm
 lib/WebService/Fastly/Object/TimestampsNoDelete.pm
 lib/WebService/Fastly/Object/TlsActivation.pm
@@ -1744,6 +1755,7 @@ lib/WebService/Fastly/Object/TokenCreatedResponseAllOf.pm
 lib/WebService/Fastly/Object/TokenResponse.pm
 lib/WebService/Fastly/Object/TokenResponseAllOf.pm
 lib/WebService/Fastly/Object/TokensAdditionalProps.pm
+lib/WebService/Fastly/Object/TopWorkspace.pm
 lib/WebService/Fastly/Object/TypeBillingAddress.pm
 lib/WebService/Fastly/Object/TypeContact.pm
 lib/WebService/Fastly/Object/TypeCustomer.pm
@@ -1815,7 +1827,7 @@ lib/WebService/Fastly/Object/WsMessageFormat.pm
 lib/WebService/Fastly/ObjectStorageAccessKeysApi.pm
 lib/WebService/Fastly/ObservabilityAggregationsForLogsApi.pm
 lib/WebService/Fastly/ObservabilityCustomDashboardsApi.pm
-lib/WebService/Fastly/ObservabilityTimeseriesForLogsApi.pm
+lib/WebService/Fastly/ObservabilityTimeseriesApi.pm
 lib/WebService/Fastly/OriginInspectorHistoricalApi.pm
 lib/WebService/Fastly/OriginInspectorRealtimeApi.pm
 lib/WebService/Fastly/PackageApi.pm

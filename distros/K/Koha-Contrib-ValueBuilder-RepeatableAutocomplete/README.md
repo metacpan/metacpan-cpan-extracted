@@ -4,7 +4,7 @@ Koha::Contrib::ValueBuilder::RepeatableAutocomplete - Repeatable autcomplete val
 
 # VERSION
 
-version 1.005
+version 1.006
 
 # SYNOPSIS
 
@@ -62,7 +62,9 @@ Parameters:
 
     An ARRAY of HASHes, each hash has to contain a key `label` (which
     will be what the users enter) and a key `value` which has to contain
-    the value to be stored in `target`
+    the value to be stored in `target`. An optional key
+    `value_for_input` can be used if you need to set the input field to a
+    different value than what is returned in `label`.
 
 - `minlength`; optional, defaults to 3
 

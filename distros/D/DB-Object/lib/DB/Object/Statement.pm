@@ -99,7 +99,7 @@ sub distinct
     my $self = shift( @_ );
     my $query = $self->{query} ||
         return( $self->error( "No query to set as to be ignored." ) );
-    
+
     my $type = uc( ( $query =~ /^\s*(\S+)\s+/ )[0] );
     # ALTER for table alteration statements (DB::Object::Tables
     my @allowed = qw( SELECT );
@@ -110,7 +110,7 @@ sub distinct
     }
     # Incompatible. Do not bother going further
     return( $self ) if( $query =~ /^\s*(?:$allowed)\s+(?:DISTINCT|DISTINCTROW|ALL)\s+/i );
-    
+
     $query =~ s/^(\s*)($allowed)(\s+)/$1$2 DISTINCT /;
     # my $sth = $self->prepare( $query ) ||
     # $self->{ 'query' } = $query;
@@ -234,12 +234,12 @@ sub execute
         $self->messagec( 5, "Using {green}", $el->types->length, "{/} binded types from the query object ($q) -> ", sub{ $self->Module::Generic::dump( $types ) } );
         @binded_types = @$types;
     }
-    
+
     if( defined( $el ) )
     {
         $self->messagec( 5, "{green}", $el->elements->length, "{/} elements set and {green}", scalar( @binded_types ), "{/} types set so far with \$q->binded_types_as_param." );
     }
-    
+
     # Get the values to bind
     if( $q && $self->{bind} )
     {
@@ -363,7 +363,7 @@ sub execute
             $self->_is_a( $elem->fo => 'DB::Object::Fields::Field' ) )
         {
         }
-        
+
         if( defined( $el ) && 
             !$bind_mismatch &&
             ( $elem = $el->elements->[$i] ) &&
@@ -437,7 +437,7 @@ sub execute
             $binded[$i] = $binded[$i]->as_json;
         }
     }
-    
+
     local $_;
     my $rv = eval
     {
@@ -452,7 +452,7 @@ sub execute
             {
                 $binded[$i] .= '';
             }
-            
+
             my $data_type = $binded_types[ $i ];
             if( CORE::length( $data_type ) && $self->_is_hash( $data_type ) )
             {
@@ -790,7 +790,7 @@ sub ignore
     my $self = shift( @_ );
     my $query = $self->{query} ||
     return( $self->error( "No query to set as to be ignored." ) );
-    
+
     my $type = uc( ( $query =~ /^\s*(\S+)\s+/ )[0] );
     # ALTER for table alteration statements (DB::Object::Tables
     my @allowed = qw( INSERT UPDATE ALTER );
@@ -802,7 +802,7 @@ sub ignore
     # Incompatible. Do not bother going further
     return( $self ) if( $query =~ /^\s*(?:$allowed)\s+(?:DELAYED|LOW_PRIORITY|HIGH_PRIORITY)\s+/i );
     return( $self ) if( $type eq 'ALTER' && $query !~ /^\s*$type\s+TABLE\s+/i );
-    
+
     $query =~ s/^(\s*)($allowed)(\s+)/$1$2 IGNORE /;
     # my $sth = $self->prepare( $query ) ||
     # $self->{ 'query' } = $query;
@@ -885,7 +885,7 @@ sub join
         $new_fields = $q_target->selected_fields;
         # NOTE: 2021-08-22: If we reset it here, we lose the table aliasing
         # $join_tbl->reset;
-        
+
         # $join_tbl->prefixed( $db ne $join_tbl->database_object->database ? 3 : 1 ) unless( $join_tbl->prefixed );
         $new_table = $join_tbl->prefix;
         $join_tbl->reset;
@@ -927,13 +927,13 @@ sub join
         $self->messagec( 5, "Adding order clause clause of the target table {green}", $q_target->table_object->name, "{/} to the source table {green}", $q_source->table_object->name, "{/} -> ", ( $order_target->value->length ? 'yes' : 'no, nothing to set' ) );
         $q_source->order( $order_target ) if( $order_target->value->length );
     }
-    
+
     if( ( !$q_source->limit || ( $q_source->limit && !$q_source->limit->length ) ) && 
         $q_source->limit && $q_source->limit->length )
     {
         $q_source->limit( $q_target->limit );
     }
-    
+
     my $prev_fields = length( $q->join_fields ) ? $q->join_fields : $q->selected_fields;
     # Regular express to prepend previous fields by their table name if that's not the case already
     $tbl_o->prefixed( $db ne $new_db ? 3 : 1 );
@@ -985,7 +985,7 @@ sub join
                     $fields_tables->{ $f1->field->table }++ if( !$fields_tables->{ $f1->field->table } );
                     next;
                 }
-                
+
                 my( $f1, $f2 ) = ( shift( @$vals ), shift( @$vals ) );
                 my $i_am_negative = 0;
                 if( $self->_is_object( $f2 ) && $f2->isa( 'DB::Object::NOT' ) )
@@ -993,7 +993,7 @@ sub join
                     ( $f2 ) = $f2->value;
                     $i_am_negative++;
                 }
-                
+
                 my( $field1, $field2 );
                 if( $self->_is_object( $f1 ) && $f1->isa( 'DB::Object::Fields::Field' ) )
                 {
@@ -1025,7 +1025,7 @@ sub join
             fields_tables => $fields_tables,
         });
     };
-    
+
     # $on is either a $dbh->AND, or $dbh->OR
     if( defined( $on ) )
     {
@@ -1150,7 +1150,7 @@ sub priority
     };
     ## Bad argument. Do not bother
     return( $self ) if( !exists( $map->{ $prio } ) );
-    
+
     my $query = $self->{query} ||
     return( $self->error( "No query to set priority for was provided." ) );
     my $type = uc( ( $query =~ /^\s*(\S+)\s+/ )[ 0 ] );
@@ -1167,7 +1167,7 @@ sub priority
     # SELECT with something else than HIGH_PRIORITY is incompatible, so do not bother to go further
     return( $self ) if( $prio != 1 && $type =~ /^(?:SELECT)$/i );
     return( $self ) if( $prio != 0 && $type =~ /^(?:DELETE|INSERT|REPLACE|UPDATE)$/i );
-    
+
     $query =~ s/^(\s*)($allowed)(\s+)/$1$2 $map->{ $prio } /i;
     # $self->{ 'query' } = $query;
     # my $sth = $self->prepare( $query ) ||

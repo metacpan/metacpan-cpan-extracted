@@ -5,22 +5,25 @@ package Iterator::Flex::Gather::Constants;
 use strict;
 use warnings;
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 use Exporter 'import';
 
 use constant {
-    GATHER_ELEMENT_MASK    => 0b000011,
-    GATHER_ELEMENT_EXCLUDE => 0b000001,
-    GATHER_ELEMENT_INCLUDE => 0b000010,
-    GATHER_CYCLE_MASK      => 0b111100,
-    GATHER_CYCLE_CONTINUE  => 0b000100,
-    GATHER_CYCLE_RESTART   => 0b001000,
-    GATHER_CYCLE_STOP      => 0b010000,
-    GATHER_CYCLE_ABORT     => 0b100000,
-
-    GATHER_GATHERING     => 1,
-    GATHER_SRC_EXHAUSTED => 2,
+    GATHER_ELEMENT_MASK    => 0b0000111,
+    GATHER_ELEMENT_EXCLUDE => 0b0000001,
+    GATHER_ELEMENT_INCLUDE => 0b0000010,
+    GATHER_ELEMENT_CACHE   => 0b0000100,
+    GATHER_CYCLE_MASK      => 0b1111000,
+    GATHER_CYCLE_CONTINUE  => 0b0001000,
+    GATHER_CYCLE_RESTART   => 0b0010000,
+    GATHER_CYCLE_STOP      => 0b0100000,
+    GATHER_CYCLE_ABORT     => 0b1000000,
+    GATHER_CYCLE_CHOOSE    => 0b1000001,    # not a bit value, just not one
+                                            # of GATHER_CYCLE_STOP or
+                                            # GATHER_CYCLE_ABORT
+    GATHER_GATHERING       => 1,
+    GATHER_SRC_EXHAUSTED   => 2,
 };
 
 our %EXPORT_TAGS = (
@@ -28,6 +31,8 @@ our %EXPORT_TAGS = (
           GATHER_ELEMENT_MASK
           GATHER_ELEMENT_EXCLUDE
           GATHER_ELEMENT_INCLUDE
+          GATHER_ELEMENT_CACHE
+          GATHER_CYCLE_CHOOSE
           GATHER_CYCLE_MASK
           GATHER_CYCLE_CONTINUE
           GATHER_CYCLE_RESTART
@@ -55,7 +60,7 @@ Iterator::Flex::Gather::Constants - Constants for Gather
 
 =head1 VERSION
 
-version 0.27
+version 0.28
 
 =head1 INTERNALS
 

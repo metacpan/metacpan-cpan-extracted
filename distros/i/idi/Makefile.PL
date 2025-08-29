@@ -19,7 +19,7 @@ my %WriteMakefileArgs = (
     "Exporter" => 0,
     "File::Slurper" => 0,
     "File::Temp" => 0,
-    "MIDI::Drummer::Tiny" => 0,
+    "MIDI::Drummer::Tiny" => "0.0612",
     "MIDI::RtController" => 0,
     "MIDI::Simple" => 0,
     "Moo" => 0,
@@ -34,7 +34,7 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.0504",
+  "VERSION" => "0.0505",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -47,7 +47,7 @@ my %FallbackPrereqs = (
   "File::Slurper" => 0,
   "File::Spec" => 0,
   "File::Temp" => 0,
-  "MIDI::Drummer::Tiny" => 0,
+  "MIDI::Drummer::Tiny" => "0.0612",
   "MIDI::RtController" => 0,
   "MIDI::Simple" => 0,
   "Moo" => 0,

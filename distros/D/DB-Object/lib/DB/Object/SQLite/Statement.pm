@@ -38,7 +38,7 @@ sub distinct
     my $what = shift( @_ );
     my $query = $self->{query} ||
     return( $self->error( "No query to set as to be ignored." ) );
-    
+
     my $type = uc( ( $query =~ /^\s*(\S+)\s+/ )[ 0 ] );
     # ALTER for table alteration statements (DB::Object::Tables
     my @allowed = qw( SELECT );
@@ -50,7 +50,7 @@ sub distinct
     # Incompatible. Do not bother going further
     return( $self ) if( $query =~ /^[[:blank:]]*(?:$allowed)[[:blank:]]+(?:DISTINCT|ALL)[[:blank:]]+/i );
     my $clause = defined( $what ) ? "DISTINCT ON ($what)" : "DISTINCT";
-    
+
     $query =~ s/^([[:blank:]]*)($allowed)([[blank:]]+)/$1$2 $clause /;
     # my $sth = $self->prepare( $query ) ||
     # $self->{ 'query' } = $query;
@@ -96,7 +96,7 @@ sub ignore
     my $self = shift( @_ );
     my $query = $self->{query} ||
     return( $self->error( "No query to set as to be ignored." ) );
-    
+
     my $type = uc( ( $query =~ /^[[:blank:]]*(\S+)[[:blank:]]+/ )[ 0 ] );
     # ALTER for table alteration statements (DB::Object::Tables
     my @allowed = qw( INSERT UPDATE );
@@ -107,7 +107,7 @@ sub ignore
     }
     # Already done. Do not bother going further
     return( $self ) if( $query =~ /^[[:blank:]]*(?:$allowed)[[:blank:]]+OR[[:blank:]]+IGNORE[[:blank:]]+/i );
-    
+
     $query =~ s/^([[:blank:]]*)($allowed)([[:blank:]]+)/$1$2 OR IGNORE$3/;
     my $sth = $self->_cache_this( $query ) ||
     return( $self->error( "Error while preparing new ignored query:\n$query" ) );

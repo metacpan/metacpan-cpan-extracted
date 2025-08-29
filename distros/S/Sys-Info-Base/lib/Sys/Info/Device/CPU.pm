@@ -1,12 +1,12 @@
 package Sys::Info::Device::CPU;
-$Sys::Info::Device::CPU::VERSION = '0.7807';
+$Sys::Info::Device::CPU::VERSION = '0.7808';
 use strict;
 use warnings;
 use subs qw(hyper_threading ht);
-use base qw( Sys::Info::Base );
+use parent qw( Sys::Info::Base );
 use Sys::Info::Constants qw( OSID );
 use Carp qw( croak );
-use base __PACKAGE__->load_subclass('Sys::Info::Driver::%s::Device::CPU');
+use parent __PACKAGE__->load_subclass('Sys::Info::Driver::%s::Device::CPU');
 
 BEGIN {
     # define aliases
@@ -103,7 +103,7 @@ Sys::Info::Device::CPU
 
 =head1 VERSION
 
-version 0.7807
+version 0.7808
 
 =head1 SYNOPSIS
 
@@ -225,7 +225,7 @@ L<Sys::Info>, L<Sys::Info::OS>, L<Sys::Info::Device>.
 
 =head1 AUTHOR
 
-Burak Gursoy <burak@cpan.org>
+Burak Gursoy
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -1,14 +1,16 @@
 package Sys::Info::OS;
-$Sys::Info::OS::VERSION = '0.7807';
+$Sys::Info::OS::VERSION = '0.7808';
 use strict;
 use warnings;
 use subs qw( LC_TYPE  );
-use base                 qw( Sys::Info::Base );
-use Carp                 qw( croak );
+use parent qw( Sys::Info::Base );
+
+use Carp qw( croak );
+use Sys::HostIP;
 use Sys::Info::Constants qw( OSID  );
 
 use constant TARGET_CLASS => __PACKAGE__->load_subclass('Sys::Info::Driver::%s::OS');
-use base TARGET_CLASS;
+use parent TARGET_CLASS;
 
 my $POSIX;
 
@@ -93,11 +95,9 @@ sub meta {
 }
 
 sub ip {
-    my $self = shift;
-    require Socket;
-    require Sys::Hostname;
-    my $host = gethostbyname Sys::Hostname::hostname() || return;
-    my $ip   = Socket::inet_ntoa($host);
+    my $self   = shift;
+    my $hostip = Sys::HostIP->new;
+    my $ip     = $hostip->ip;;
     $ip = $self->SUPER::_ip()
         if $ip && $ip =~ m{ \A 127 }xms && $self->SUPER::can('_ip');
     return $ip;
@@ -121,7 +121,7 @@ Sys::Info::OS
 
 =head1 VERSION
 
-version 0.7807
+version 0.7808
 
 =head1 SYNOPSIS
 
@@ -384,7 +384,7 @@ L<http://msdn.microsoft.com/library/en-us/sysinfo/base/osversioninfoex_str.asp>.
 
 =head1 AUTHOR
 
-Burak Gursoy <burak@cpan.org>
+Burak Gursoy
 
 =head1 COPYRIGHT AND LICENSE
 

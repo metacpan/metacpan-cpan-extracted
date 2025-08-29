@@ -33,7 +33,7 @@ our @EXPORT = qw(
     x
 );
 
-our $VERSION = '0.0504';
+our $VERSION = '0.0505';
 
 my $self;
 
@@ -87,7 +87,7 @@ sub END {
         my $content;
         if ($self->is_drums) {
             $self->drummer->write unless $self->is_written;
-            $content = read_binary($self->filename);
+            $content = read_binary($self->drummer->file);
         }
         else {
             $self->score->write_score($self->filename) unless $self->is_written;
@@ -181,11 +181,14 @@ sub w {
     my ($name) = @_;
     if ($name) {
         $self->filename($name);
+        $self->drummer->file($name);
+    }
+    if ($self->is_drums) {
+        $self->drummer->write;
     }
     else {
-        $name = $self->filename;
+        $self->score->write_score($self->filename);
     }
-    $self->score->write_score($name);
     $self->is_written(1);
 }
 

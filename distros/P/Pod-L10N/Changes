@@ -1,5 +1,13 @@
 Revision history for Perl module Pod::L10N
 
+1.10 2025-08-28T18:04:16Z
+
+	- fix exporter error
+
+1.09 2025-08-28T17:55:32Z
+
+	- upgrade upstream to 1.35 (5.40.0-based)
+
 1.08 2025-06-08T16:14:46Z
 
 	- upgrade upstream to 1.33 (5.36.0-based)

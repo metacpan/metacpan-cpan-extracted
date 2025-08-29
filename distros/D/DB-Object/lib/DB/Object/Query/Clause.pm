@@ -109,7 +109,7 @@ sub merge
         {
             @params = @_;
         }
-        
+
         my @clause = ();
         @clause = ( $self->value ) if( $self->value->length > 0 );
         my @generic = ();
@@ -124,7 +124,7 @@ sub merge
                 push( @clause, $this );
                 next;
             }
-            
+
             next if( !$self->_is_a( $this => 'DB::Object::Query::Clause' ) );
             # First check we even have a clause, otherwise skip
             if( !$this->value->length )
@@ -152,7 +152,7 @@ sub merge
             {
                 CORE::push( @clause, $this->value );
             }
-            
+
             if( !$this->generic->is_empty )
             {
                 if( !$this->operator->is_empty && $this->operator ne $op )
@@ -164,7 +164,7 @@ sub merge
                     CORE::push( @generic, $this->generic );
                 }
             }
-            
+
             # we just stack them, and later we will sort them by their object property 'index' value.
             $this->elements->for(sub
             {
@@ -185,7 +185,7 @@ sub merge
 #                 }
                 $elems->push( $v );
             });
-            
+
 #             $self->fields->push( @{$this->fields} ) if( $this->fields->length );
 #             $self->bind->types->push( @{$this->bind->types} ) if( $this->bind->types->length );
 #             $self->bind->values->push( @{$this->bind->values} ) if( $this->bind->values->length );

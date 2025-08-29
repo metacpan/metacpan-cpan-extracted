@@ -83,7 +83,7 @@ sub limit
         # Returns a DB::Object::Query::Clause
         $limit = $self->_process_limit( @_ ) ||
             return( $self->pass_error );
-    
+
         if( CORE::length( $limit->metadata->limit // '' ) )
         {
             $limit->generic( CORE::length( $limit->metadata->offset // '' ) ? 'LIMIT ?, ?' : 'LIMIT ?' );
@@ -333,7 +333,7 @@ sub _query_components
     # no_bind_copy: because join for example does it already and this would duplicate the binded types, so we use this option to tell this method to set an exception. Kind of a hack that needs clean-up in the future from a design point of view.
     $opts->{no_bind_copy} //= 0;
     my( $where, $group, $having, $sort, $order, $limit, $on_conflict );
-    
+
     $where = $self->where();
     if( $type eq 'select' )
     {

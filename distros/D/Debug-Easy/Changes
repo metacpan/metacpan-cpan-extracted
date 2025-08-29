@@ -362,3 +362,7 @@ Revision history for Debug-Easy
 
         Some minor documentation changes.  A little optimization.
 		Build Makefile.PL also modified.
+
+2.17    Aug 29, 2025
+
+        Modifications to the build process.

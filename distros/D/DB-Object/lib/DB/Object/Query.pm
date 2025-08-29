@@ -285,7 +285,7 @@ sub format_statement
     $self->{sorted} = \@sorted;
     my $placeholder_re = $tbl_o->database_object->_placeholder_regexp;
     my $elems = $self->new_elements;
-    
+
     foreach( @sorted )
     {
         my $elem = $self->new_element;
@@ -402,7 +402,7 @@ sub format_statement
                 $elem->format( $tbl_o->database_object->quote( $value ) );
             }
         }
-    
+
         if( $prefix ) 
         {
             s{
@@ -444,7 +444,7 @@ sub format_statement
             });
         }
     }
-    
+
     return( $elems );
 }
 
@@ -464,7 +464,7 @@ sub format_update
             @arg = @$data;
         }
     }
-    
+
     return( $self->error( "Must provide key => value pairs. I received an odd number of arguments" ) ) if( @arg && ( scalar( @arg ) % 2 ) );
     my %arg  = ( @arg );
     my $tbl_o = $self->table_object || return( $self->error( "No table object is set." ) );
@@ -665,13 +665,13 @@ sub getdefault
     $default   = $tbl_o->default || return( $self->pass_error( $tbl_o->error ) );
     $fields    = $tbl_o->fields || return( $self->pass_error( $tbl_o->error ) );
     $structure = $tbl_o->structure || return( $self->pass_error( $tbl_o->error ) );
-    
+
     $self->messagec( 4, "For table {green}${table}{/} {green}", scalar( keys( %$default ) ), "{/} defaults found and {green}", scalar( keys( %$fields ) ), "{/} fields found." );
     if( !scalar( keys( %$fields ) ) )
     {
         return( $self->error( "Missing fields (", scalar( keys( %$fields ) ), " found) for table \"$table\"." ) );
     }
-    
+
     if( $query_type eq 'select' && $enhance )
     {
         my @sorted = sort{ $fields->{ $a }->pos <=> $fields->{ $b }->pos } keys( %$fields );
@@ -697,7 +697,7 @@ sub getdefault
             }
         }
     }
-    
+
     my %to_unixtime = ();
     if( $self->_is_array( $unix_time ) )
     {
@@ -707,7 +707,7 @@ sub getdefault
     {
         %to_unixtime = %$unix_time;
     }
-    
+
     if( %to_unixtime && scalar( keys( %to_unixtime ) ) )
     {
         foreach my $field ( keys( %to_unixtime ) )
@@ -732,7 +732,7 @@ sub getdefault
             }
         }
     }
-    
+
     my %avoid = ();
     if( $self->_is_array( $avoid ) )
     {
@@ -742,7 +742,7 @@ sub getdefault
     {
         %avoid = %$avoid;
     }
-    
+
     if( %avoid && scalar( keys( %avoid ) ) )
     {
         foreach my $field ( keys( %avoid ) )
@@ -754,7 +754,7 @@ sub getdefault
             }
         }
     }
-    
+
     my %as = ();
     if( $self->_is_hash( $alias => 'strict' ) )
     {
@@ -790,13 +790,13 @@ sub getdefault
         exists( $fields->{first_name} ) && 
         !exists( $fields->{name} ) )
     {
-    
+
         my $f = $prefix 
                 ? "CONCAT(${prefix}.first_name, ' ', ${prefix}.last_name)" 
                 : "CONCAT(first_name, ' ', last_name)";
         push( @extra, "$f AS name" );
     }
-    
+
     if( ( exists( $default->{auth} ) && !defined( $arg{auth} ) ) || 
         defined( $arg{auth} ) )
     {
@@ -811,7 +811,7 @@ sub getdefault
             ? $arg{status}
             : 1;
     }
-    
+
     foreach my $data ( keys( %arg ) )
     {
         if( exists( $default->{ $data } ) )
@@ -828,8 +828,8 @@ sub getdefault
     {
         %from_unixtime = %$from_unix;
     }
-    
-    
+
+
     $self->{_args} = $arg;
     $self->{_default} = $default;
     $self->{_fields} = $fields;
@@ -970,7 +970,7 @@ sub insert
         $el->merge( $elems );
         @query = ( "INSERT INTO $table ($fields) VALUES($values)" );
     }
-    
+
     if( $data && $self->_is_hash( $data => 'strict' ) && $el->types->length )
     {
         warn( "You have passed arguments to this insert as hash reference, and you are using placeholders. Using placeholders requires fixed order of arguments which an hash reference cannot guarantee. This will potentially lead to error when executing the query. I recommend you switch to an array of arguments instead, i.e. from { field1 => value1, field2 => value2 } to ( field1 => value1, field2 => value2 ), or to use numbered placeholders like \$1, \$2, etc...\n" );
@@ -1028,7 +1028,7 @@ sub limit
             );
         }
     }
-    
+
     if( !$limit && want( 'OBJECT' ) )
     {
         return( $self->new_null( type => 'object' ) );
@@ -1194,7 +1194,7 @@ sub select
                     $i--;
                     next;
                 }
-                
+
                 foreach my $n ( keys( %$alias ) )
                 {
                     if( lc( $alias->{ $n } ) eq lc( $data->[$i] ) )
@@ -1216,7 +1216,7 @@ sub select
         {
             $fields = $data;
         }
-        
+
         if( length( $fields ) )
         {
             # Now, we eventually add the table and database specification to the fields
@@ -1240,7 +1240,7 @@ sub select
             }gex;
             $fields =~ s/(?<!\.)($tables)(?:\.)/$db\.$1\./g if( $multi_db );
         }
-        
+
         $self->messagef_colour( 3, "<green>%d</> aliases were provided: <red>%s</>", scalar( keys( %$alias ) ), join( ', ', keys( %$alias ) ) );
         if( $alias && %$alias )
         {
@@ -1284,7 +1284,7 @@ sub select
         my $elems = $self->format_statement || return( $self->pass_error );
         $fields = $elems->fields->join( ', ' );
     }
-    
+
     my $tie   = $self->tie();
     my $clauses = $self->_query_components( 'select' ) || return( $self->pass_error );
     my $vars  = $self->local();
@@ -1342,10 +1342,10 @@ sub select
     # Everything meaningfull lies within the object
     # If no bind should be done _save_bind does nothing
     $self->_save_bind();
-    
+
     # Predeclare variables if any.
     $tbl_o->set();
-    
+
     # Query string should lie within the object
     # _cache_this sends back an object no matter what or undef() if an error occurs
     my $sth = $tbl_o->_cache_this( $self );
@@ -1498,12 +1498,12 @@ sub _group_order
                 type    => $type,
                 debug   => $self->debug,
             );
-            
+
             foreach my $field ( @$data )
             {
                 # Some garbage reached us
                 next if( !CORE::length( $field // '' ) );
-                
+
                 # Special treatment if we are being provided multiple clause to merge with ours
                 if( $self->_is_a( $field => 'DB::Object::Query::Clause' ) )
                 {
@@ -1518,7 +1518,7 @@ sub _group_order
                     $clause->merge( $field );
                     next;
                 }
-                
+
                 # Transform a simple 'field' into a field object
                 $field = $tbl_o->fo->$field if( CORE::exists( $fields_ref->{ $field } ) );
                 # my $elem = $self->new_element( field => $field );
@@ -1670,7 +1670,7 @@ sub _group_order
     {
         $clause = $self->{ $prop };
     }
-    
+
     if( !$clause && want( 'OBJECT' ) )
     {
         return( $self->new_null( type => 'object' ) );
@@ -1706,7 +1706,7 @@ sub _having
             {
                 # In case we received some garbage
                 next if( !CORE::length( $field ) );
-                
+
                 # Special treatment if we are being provided multiple clause to merge with ours
                 if( $self->_is_a( $field => 'DB::Object::Query::Clause' ) )
                 {
@@ -1737,7 +1737,7 @@ sub _having
                         value   => $field,
                         type    => 'having',
                     );
-                    
+
                     my $elem = $self->new_element(
                         placeholder => $plh,
                     );
@@ -1808,7 +1808,7 @@ sub _having
     {
         $clause = $self->{having};
     }
-    
+
     if( !$clause && want( 'OBJECT' ) )
     {
         return( $self->new_null( type => 'object' ) );
@@ -1831,7 +1831,7 @@ sub _process_limit
     my $bind  = $tbl_o->use_bind;
     my $placeholder_re = $tbl_o->database_object->_placeholder_regexp;
     my $limit;
-    
+
     # $self->limit can be used to set the offset and limit, but can also be used to 
     # pass limit clause object to be merged, so here we check it, and if found, we do not go further.
     if( @_ )
@@ -1848,7 +1848,7 @@ sub _process_limit
                 $i--;
             }
         }
-        
+
         if( scalar( @clauses ) )
         {
             if( !$self->{limit} )
@@ -1862,7 +1862,7 @@ sub _process_limit
             $limit->merge( @clauses );
             return( $limit );
         }
-        
+
         my( $start, $end );
         if( @_ == 1 )
         {
@@ -1934,7 +1934,7 @@ sub _process_limit
     {
         $limit = $self->{limit};
     }
-    
+
     if( !$limit && want( 'OBJECT' ) )
     {
         return( $self->new_null( type => 'object' ) );
@@ -2104,7 +2104,7 @@ sub _where_having
         my $fields_ref = $tbl_o->fields;
         my $fields     = CORE::join( '|', keys( %$fields_ref ) );
         my $fields_type = $tbl_o->types;
-        
+
         my $process_where_condition;
         $process_where_condition = sub
         {
@@ -2190,7 +2190,7 @@ sub _where_having
 #                             }) || return( $self->pass_error( $cl->error ) );
                             # Even better than instantiating a new DB::Object::Element object, we just use as-is the DB::Object::Fields::Overloaded object, which inherits from DB::Object::Element :)
                             $cl->push( $f );
-                            
+
 #                             if( $const )
 #                             {
 #                                 $cl->bind->types->push( $const );
@@ -2201,7 +2201,7 @@ sub _where_having
 #                             }
                         }
                         push( @list, $cl );
-                        
+
                         # If this field value assignment is followed (as a pair) by just a regular field, this is likely a typo.
                         # Catching some typical typo errors for the benefit of the coder (from experience)
                         if( scalar( @arg ) && 
@@ -2239,7 +2239,7 @@ sub _where_having
                     {
                         warn( "Warning only: found a field object '$arg[0]' (never mind the surrounding quotes) (", overload::StrVal( $arg[0] ), ") followed by no other argument. Did you forget to assign a value such as \$tbl->fo->$arg[0] == 'something' ?\n" );
                     }
-                    
+
                     my( $field, $value ) = splice( @arg, 0, 2 );
                     $self->messagec( 5, "[process_where_condition] Now processing field {green}${field}{/} and value {green}${value}{/}" );
                     # Catching some typical typo errors for the benefit of the coder (from experience)
@@ -2248,7 +2248,7 @@ sub _where_having
                     {
                         warn( "Warning only: found a field object '$field' (never mind the surrounding quotes) (", overload::StrVal( $field ), ") followed by an another (proper) field value assignment ($value). Did you forget to assign a value such as \$tbl->fo->$field == 'something' ?\n" );
                     }
-                    
+
                     unless( $self->_is_a( $field => 'DB::Object::Fields::Field' ) )
                     {
                         $field =~ s/\b(?<![\.\"])($fields)\b/$prefix.$1/gs if( $prefix );
@@ -2283,7 +2283,7 @@ sub _where_having
                         );
                         next;
                     }
-                    
+
                     my $f;
                     if( $self->_is_a( $field => 'DB::Object::Fields::Field' ) )
                     {
@@ -2295,7 +2295,7 @@ sub _where_having
                         $f = $prefix ? "$prefix.$field" : $field;
                         $self->messagec( 5, "[process_where_condition] Setting field \$f to {green}${f}{/}" );
                     }
-                    
+
                     if( ref( $value ) eq 'SCALAR' )
                     {
                         $self->messagec( 5, "[process_where_condition] Value is a scalar reference, using it as is -> {green}", $$value, "{/}" );
@@ -2443,7 +2443,7 @@ sub _where_having
                             });
                             $el = $self->new_element( value => $value );
                         }
-                        
+
                         $el->field( $field ) if( $self->_is_a( $field => 'DB::Object::Fields::Field' ) );
                         if( lc( $fields_type->{ $field } ) eq 'bytea' && 
                             ( $const = $self->database_object->get_sql_type( 'bytea' ) ) )
@@ -2499,7 +2499,7 @@ sub _where_having
     {
         $where = $self->{ $prop };
     }
-    
+
     if( !$where && want( 'OBJECT' ) )
     {
         return( $self->new_null( type => 'object' ) );
@@ -2679,7 +2679,7 @@ L</format_update> will then iterate through each field-value pair, and perform s
 If the field being reviewed was provided to L</from_unixtime>, then L</format_update> will enclose it in the function suitable for the driver to convert it into a database datetime. For example, for Mysql, this would be:
 
     FROM_UNIXTIME(field_name)
-  
+
 If the the given value is a reference to a scalar, it will be used as-is, ie. it will not be enclosed in quotes or anything. This is useful if you want to control which function to use around that field.
 
 If the value is C<?> it will be used as a placeholder and the value will be saved to be bound later in L<DB::Object::Statement/execute>. Its associated type will be added as blank, so it can be guessed later. However, if the column data type is C<bytea>, the the PostgreSQL data type C<DBD::Pg::PG_BYTEA> will be used when binding the value.

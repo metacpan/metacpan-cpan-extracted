@@ -152,7 +152,7 @@ sub format_statement
         my $times = $self->from_unixtime();
         map{ $from_unix->{ $_ }++ } @$times;
     }
-    
+
     if( $self->_is_array( $unixtime ) )
     {
         my %hash = map{ $_ => 1 } @$unixtime;
@@ -191,7 +191,7 @@ sub format_statement
     $self->{sorted} = \@sorted;
     my $placeholder_re = $tbl_o->database_object->_placeholder_regexp;
     my $elems = $self->new_elements( debug => $self->debug );
-    
+
     foreach my $field ( @sorted )
     {
         next if( defined( $struct->{ $field } ) && $struct->{ $field } =~ /\bSERIAL\b/i );
@@ -393,7 +393,7 @@ sub format_statement
                 }
             }
         }
-    
+
         if( $field_prefix ) 
         {
             # $self->message_colour( 3, "Prefix to be used is '<green>$field_prefix</>'." );
@@ -465,7 +465,7 @@ sub limit
             );
         }
     }
-    
+
     if( !$limit && want( 'OBJECT' ) )
     {
         return( $self->new_null( type => 'object' ) );
@@ -524,13 +524,13 @@ sub on_conflict
         {
             return( $self->error( "No target was specified for the on conflict clause." ) );
         }
-        
+
         if( $opts->{where} )
         {
             $hash->{where} = $opts->{where};
             push( @comp, 'WHERE ' . $opts->{where} );
         }
-        
+
         # action => update
         if( $opts->{action} )
         {
@@ -571,7 +571,7 @@ sub on_conflict
                 {
                     return( $self->error( "Fields property to update for on conflict do update clause contains no fields!" ) ) if( !scalar( @{$opts->{fields}} ) );
                 }
-                
+
                 if( $self->_is_array( $opts->{fields} ) )
                 {
                     my $this = $opts->{fields};
@@ -584,9 +584,9 @@ sub on_conflict
                 }
                 # Here the user will use the special table 'excluded'
                 $hash->{fields} = $opts->{fields};
-                
+
                 my $q = [];
-            
+
                 foreach my $k ( sort( keys( %{$opts->{fields}} ) ) )
                 {
                     push( @$q, sprintf( '%s = %s', $k, ref( $opts->{fields}->{ $k } ) eq 'SCALAR' ? ${$opts->{fields}->{ $k }} : $tbl_o->database_object->quote( $opts->{fields}->{ $k } ) ) );
@@ -688,7 +688,7 @@ sub _query_components
     # no_bind_copy: because join for example does it already and this would duplicate the binded types, so we use this option to tell this method to set an exception. Kind of a hack that needs clean-up in the future from a design point of view.
     $opts->{no_bind_copy} //= 0;
     my( $where, $group, $having, $sort, $order, $limit, $returning, $on_conflict );
-    
+
     $where = $self->where();
     if( $type eq 'select' )
     {

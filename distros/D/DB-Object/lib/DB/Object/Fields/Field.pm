@@ -289,7 +289,7 @@ sub _op_overload
     {
         return( $val->_opt_overload( $self, 1, $op ) );
     }
-    
+
     my $field = $self->name;
     my $map =
     {
@@ -326,7 +326,7 @@ sub _op_overload
     {
         $val = $dbo->quote( $val, $const ) if( $dbo );
     }
-    
+
     my $types;
     # If the value is a statement object, stringify it, surround it with parenthesis and use it
     if( $self->_is_a( $val, 'DB::Object::Statement' ) )

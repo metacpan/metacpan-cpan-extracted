@@ -53,7 +53,7 @@ sub distinct
     my $self = shift( @_ );
     my $query = $self->{query} ||
     return( $self->error( "No query to set as to be ignored." ) );
-    
+
     my $type = uc( ( $query =~ /^\s*(\S+)\s+/ )[ 0 ] );
     # ALTER for table alteration statements (DB::Object::Tables
     my @allowed = qw( SELECT );
@@ -64,7 +64,7 @@ sub distinct
     }
     # Incompatible. Do not bother going further
     return( $self ) if( $query =~ /^[[:blank:]]*(?:$allowed)[[:blank:]]+(?:DISTINCT|DISTINCTROW|ALL)[[:blank:]]+/i );
-    
+
     $query =~ s/^([[:blank:]]*)($allowed)([[:blank:]]+)/$1$2 DISTINCT /;
     my $sth = $self->_cache_this( $query ) ||
     return( $self->error( "Error while preparing new ignored query:\n$query" ) );
@@ -178,7 +178,7 @@ sub ignore
     my $self = shift( @_ );
     my $query = $self->{query} ||
     return( $self->error( "No query to set as to be ignored." ) );
-    
+
     my $type = uc( ( $query =~ /^[[:blank:]]*(\S+)[[:blank:]]+/ )[ 0 ] );
     # ALTER for table alteration statements (DB::Object::Tables
     my @allowed = qw( INSERT UPDATE ALTER );
@@ -190,7 +190,7 @@ sub ignore
     # Incompatible. Do not bother going further
     return( $self ) if( $query =~ /^[[:blank:]]*(?:$allowed)[[:blank:]]+(?:DELAYED|LOW_PRIORITY|HIGH_PRIORITY)[[:blank:]]+/i );
     return( $self ) if( $type eq 'ALTER' && $query !~ /^[[:blank:]]*$type[[:blank:]]+TABLE[[:blank:]]+/i );
-    
+
     $query =~ s/^([[:blank:]]*)($allowed)([[:blank:]]+)/$1$2 IGNORE /;
     my $sth = $self->_cache_this( $query ) ||
     return( $self->error( "Error while preparing new ignored query:\n$query" ) );
@@ -224,7 +224,7 @@ sub priority
     };
     # Bad argument. Do not bother
     return( $self ) if( !exists( $map->{ $prio } ) );
-    
+
     my $query = $self->{query} ||
     return( $self->error( "No query to set priority for was provided." ) );
     my $type = uc( ( $query =~ /^[[:blank:]]*(\S+)[[:blank:]]+/ )[ 0 ] );
@@ -241,7 +241,7 @@ sub priority
     # SELECT with something else than HIGH_PRIORITY is incompatible, so do not bother to go further
     return( $self ) if( $prio != 1 && $type =~ /^(?:SELECT)$/i );
     return( $self ) if( $prio != 0 && $type =~ /^(?:DELETE|INSERT|REPLACE|UPDATE)$/i );
-    
+
     $query =~ s/^([[:blank:]]*)($allowed)([[:blank:]]+)/$1$2 $map->{ $prio } /i;
     my $sth = $self->_cache_this( $query ) ||
     return( $self->error( "Error while preparing new low priority query:\n$query" ) );

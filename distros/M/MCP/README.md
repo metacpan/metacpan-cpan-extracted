@@ -11,11 +11,19 @@
 Please be aware that this module is still in development and will be changing rapidly. Additionally the MCP
 specification is getting regular updates which we will implement. Breaking changes are very likely.
 
-  * Tool calling
+  * Tool calling and prompts
   * Streamable HTTP and Stdio transports
   * Scalable with pre-forking web server and async tools using promises
   * HTTP client for testing
   * Can be embedded in Mojolicious web apps
+
+## Installation
+
+  All you need is Perl 5.20 or newer. Just install from [CPAN](https://metacpan.org/pod/MCP).
+
+    $ cpanm -n MCP
+
+  We recommend the use of a [Perlbrew](http://perlbrew.pl) environment.
 
 ## Streamable HTTP Transport
 

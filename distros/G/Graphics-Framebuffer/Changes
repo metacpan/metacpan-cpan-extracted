@@ -1733,3 +1733,18 @@ Revision history for Graphics-Framebuffer
        Added various markdown documentation changes to many files.
 
        Cleaned up some unneeded extra files.
+
+6.69   Aug 28, 2025
+
+       Some CPAN testers complain about fatal on Makefile.PL, so I removed it.
+
+6.70   Aug 29, 2025
+
+       Overhaul of the "examples/primitives" script.
+
+	   Lots of optimizations in the module.  Things run a bit faster.
+
+       Got rid of "Math::Trig".  I declare my own constant of "pi" now.
+
+       Reorganized the flow of "Makefile.PL" to make CPAN testers happy.
+	   Frankly, I agree with them.

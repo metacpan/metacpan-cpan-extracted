@@ -9,7 +9,7 @@ use warnings;
 
 use experimental 'signatures', 'postderef';
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 use Scalar::Util qw( refaddr );
 use Ref::Util    qw( is_hashref );
@@ -159,7 +159,7 @@ Iterator::Flex::Utils - Internal utilities
 
 =head1 VERSION
 
-version 0.27
+version 0.28
 
 =head1 SUBROUTINES
 

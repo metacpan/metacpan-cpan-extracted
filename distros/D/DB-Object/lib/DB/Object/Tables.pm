@@ -721,7 +721,7 @@ sub select
         # return( $q->select( @_ ) ) if( !defined( wantarray() ) );
         return( $q->select( @_ ) );
     }
-    
+
     if( wantarray() )
     {
         my( @val ) = $q->select( @_ ) || return( $self->pass_error( $q->error ) );
@@ -1157,7 +1157,7 @@ L</format_update> will then iterate through each field-value pair, and perform s
 If the field being reviewed was provided to B<from_unixtime>, then L</format_update> will enclose it in the function FROM_UNIXTIME() as in:
 
     FROM_UNIXTIME(field_name)
-  
+
 If the the given value is a reference to a scalar, it will be used as-is, ie. it will not be enclosed in quotes or anything. This is useful if you want to control which function to use around that field.
 
 If the given value is another field or looks like a function having parenthesis, or if the value is a question mark, the value will be used as-is.

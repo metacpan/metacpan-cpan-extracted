@@ -42,64 +42,69 @@ use Term::ANSIColor;
 use Time::HiRes qw( sleep );
 use Text::Wrap::Smart ':all';
 
+# UTF-8 is required for special character handling
+binmode(STDERR, ":encoding(UTF-8)");
 binmode(STDOUT, ":encoding(UTF-8)");
+binmode(STDIN, ":encoding(UTF-8)");
 
 BEGIN {
-    our $VERSION = '1.25';
+    our $VERSION = '1.26';
 }
 
 sub ansi_output {
     my $self  = shift;
     my $text  = shift;
     my $delay = shift || 0;
-	my $test  = shift || FALSE;
+    my $test  = shift || FALSE;
 
-	while($text =~ /\[\% .*? \%\]/) {
-		if (length($text) > 1) {
-			while ($text =~ /\[\%\s+BOX (.*?),(\d+),(\d+),(\d+),(\d+),(.*?)\s+\%\](.*?)\[\%\s+ENDBOX\s+\%\]/i) {
-				my $replace = $self->box($1, $2, $3, $4, $5, $6, $7);
-				$text =~ s/\[\%\s+BOX.*?\%\].*?\[\%\s+ENDBOX.*?\%\]/$replace/i;
-			}
-			foreach my $string (keys %{ $self->{'ansi_sequences'} }) {
-#				if ($string =~ /CLEAR|CLS/i) {
-#					my $ch = locate(1, 1) . cls;
-#					$text =~ s/\[\%\s+$string\s+\%\]/$ch/gi;
-#				} else {
-					$text =~ s/\[\%\s+$string\s+\%\]/$self->{'ansi_sequences'}->{$string}/gi;
-#				}
-			} ## end foreach my $string (keys %{...})
-			foreach my $string (keys %{ $self->{'characters'}->{'NAME'} }) {
-				$text =~ s/\[\%\s+$string\s+\%\]/$self->{'characters'}->{'NAME'}->{$string}/gi;
-			}
-			foreach my $string (keys %{ $self->{'characters'}->{'UNICODE'} }) {
-				$text =~ s/\[\%\s+$string\s+\%\]/$self->{'characters'}->{'UNICODE'}->{$string}/gi;
-			}
-		} ## end if (length($text) > 1)
-	}
+    while ($text =~ /\[\% .*? \%\]/) {
+        if (length($text) > 1) {
+            while ($text =~ /\[\%\s+BOX (.*?),(\d+),(\d+),(\d+),(\d+),(.*?)\s+\%\](.*?)\[\%\s+ENDBOX\s+\%\]/i) {
+                my $replace = $self->box($1, $2, $3, $4, $5, $6, $7);
+                $text =~ s/\[\%\s+BOX.*?\%\].*?\[\%\s+ENDBOX.*?\%\]/$replace/i;
+            }
+            foreach my $string (keys %{ $self->{'ansi_sequences'} }) {
+
+                #				if ($string =~ /CLEAR|CLS/i) {
+                #					my $ch = locate(1, 1) . cls;
+                #					$text =~ s/\[\%\s+$string\s+\%\]/$ch/gi;
+                #				} else {
+                $text =~ s/\[\%\s+$string\s+\%\]/$self->{'ansi_sequences'}->{$string}/gi;
+
+                #				}
+            } ## end foreach my $string (keys %{...})
+            foreach my $string (keys %{ $self->{'characters'}->{'NAME'} }) {
+                $text =~ s/\[\%\s+$string\s+\%\]/$self->{'characters'}->{'NAME'}->{$string}/gi;
+            }
+            foreach my $string (keys %{ $self->{'characters'}->{'UNICODE'} }) {
+                $text =~ s/\[\%\s+$string\s+\%\]/$self->{'characters'}->{'UNICODE'}->{$string}/gi;
+            }
+        } ## end if (length($text) > 1)
+    } ## end while ($text =~ /\[\% .*? \%\]/)
     my $s_len = length($text);
     my $nl    = $self->{'ansi_sequences'}->{'NEWLINE'};
     my $found = FALSE;
-	if ($test) {
-		$text =~ s/\n/$nl/gs;
-		return($text);
-	} else {
-		foreach my $count (0 .. $s_len) {
-			my $char = substr($text, $count, 1);
-			if ($char eq "\n") {
-				if ($text !~ /$nl/) {    # translate only if the file doesn't have ASCII newlines
-					$char = $nl;
-				}
-			} elsif ($char eq chr(27)) {    # Don't slow down ANSI sequences
-				$found = TRUE;
-			} elsif ($char eq 'm') {
-				$found = FALSE;
-			} elsif (!$found) {
-				sleep $delay if ($delay);
-			}
-			print $char;
-		} ## end foreach my $count (0 .. $s_len)
-	}
-	return(TRUE);
+    if ($test) {
+        $text =~ s/\n/$nl/gs;
+        return ($text);
+    } else {
+        foreach my $count (0 .. $s_len) {
+            my $char = substr($text, $count, 1);
+            if ($char eq "\n") {
+                if ($text !~ /$nl/) {    # translate only if the file doesn't have ASCII newlines
+                    $char = $nl;
+                }
+            } elsif ($char eq chr(27)) {    # Don't slow down ANSI sequences
+                $found = TRUE;
+            } elsif ($char eq 'm') {
+                $found = FALSE;
+            } elsif (!$found) {
+                sleep $delay if ($delay);
+            }
+            print $char;
+        } ## end foreach my $count (0 .. $s_len)
+    } ## end else [ if ($test) ]
+    return (TRUE);
 } ## end sub ansi_output
 
 sub box {

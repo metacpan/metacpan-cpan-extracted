@@ -41,7 +41,7 @@ WriteMakefile(
         'List::Util' => '1.20',
     },
     PREREQ_PRINT => TRUE,
-    PREREQ_FATAL => TRUE,
+    PREREQ_FATAL => FALSE,
     PREREQ_PM    => {
         'charnames'         => '0',
         'List::Util'        => '1.20',

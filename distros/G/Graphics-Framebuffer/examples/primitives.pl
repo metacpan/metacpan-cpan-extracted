@@ -16,7 +16,7 @@ use Pod::Usage;
 # use Data::Dumper;$Data::Dumper::Sortkeys=1; $Data::Dumper::Purity=1; $Data::Dumper::Deepcopy=1;
 
 BEGIN {
-    our $VERSION = '6.04';
+    our $VERSION = '6.06';
 }
 
 our $F;
@@ -68,12 +68,13 @@ chomp(my @files = readdir($DIR));
 closedir($DIR);
 
 our @IMAGES;
+our @ANIM;
 our $STAMP = sprintf('%.1', time);
 
 if (defined($new_x)) {
-    $F = Graphics::Framebuffer->new('FB_DEVICE' => "/dev/fb$dev", 'SHOW_ERRORS' => 0, 'SIMULATED_X' => $new_x, 'SIMULATED_Y' => $new_y, 'ACCELERATED' => !$noaccel, 'SPLASH' => 0, 'RESET' => TRUE, 'IGNORE_X_WINDOWS' => $ignore_x);
+    $F = Graphics::Framebuffer->new('FB_DEVICE' => "/dev/fb$dev", 'SHOW_ERRORS' => 0, 'SIMULATED_X' => $new_x, 'SIMULATED_Y' => $new_y, 'ACCELERATED' => !$noaccel, 'SPLASH' => 0, 'RESET' => FALSE, 'IGNORE_X_WINDOWS' => $ignore_x);
 } else {
-    $F = Graphics::Framebuffer->new('FB_DEVICE' => "/dev/fb$dev", 'SHOW_ERRORS' => 0, 'ACCELERATED' => !$noaccel, 'SPLASH' => 0, 'RESET' => TRUE, 'IGNORE_X_WINDOWS' => $ignore_x);
+    $F = Graphics::Framebuffer->new('FB_DEVICE' => "/dev/fb$dev", 'SHOW_ERRORS' => 0, 'ACCELERATED' => !$noaccel, 'SPLASH' => 0, 'RESET' => FALSE, 'IGNORE_X_WINDOWS' => $ignore_x);
 }
 $SIG{'QUIT'} = $SIG{'INT'} = $SIG{'KILL'} = $SIG{'HUP'} = $SIG{'TERM'} = sub { eval { $F->text_mode(); exec('reset'); }; };
 
@@ -83,10 +84,10 @@ $F->cls('OFF');
 my $screen_width  = $sinfo->{'width'};
 my $screen_height = $sinfo->{'height'};
 
-# Everything is based on a 1920x1080 screen, but different resolutions
+# Everything is based on a 3840x2160 screen, but different resolutions
 # are mathematically scaled.
-my $xm = $screen_width / 1920;
-my $ym = $screen_height / 1080;
+my $xm = $screen_width / 3840;
+my $ym = $screen_height / 2160;
 
 my $XX = $screen_width;
 my $YY = $screen_height;
@@ -95,7 +96,7 @@ my $center_x = $F->{'X_CLIP'} + ($F->{'W_CLIP'} / 2);
 my $center_y = $F->{'Y_CLIP'} + ($F->{'H_CLIP'} / 2);
 my $rpi      = ($F->{'fscreeninfo'}->{'id'} =~ /BCM270(8|9)/i) ? TRUE : FALSE;
 
-$delay *= 3 if ($rpi);    # Raspberry PI is sloooooow.  Let's give extra time for each test
+$delay *= 3 if ($rpi);    # Older Raspberry PIs are sloooooow.  Let's give extra time for each test
 my $BW = 0;
 if ($rpi) {
     print "Putting tennis balls on the walker, because this is a Raspberry PI (or equally slow clone)\n";
@@ -111,26 +112,50 @@ $F->splash($Graphics::Framebuffer::VERSION) unless ($nosplash);
 my $DORKSMILE;
 
 foreach my $file (@files) {
-    next if ($file =~ /^\.+/ || $file =~ /Test|gif/i || -d "$images_path/$file");
-    print_it($F, "Loading Image > $file", '00FFFFFF', undef, 1);
-    my $image = $F->load_image(
-        {
-            'x'            => 0,
-            'y'            => 0,
-            'width'        => $XX,
-            'height'       => $F->{'H_CLIP'},
-            'file'         => "$images_path/$file",
-            'convertalpha' => ($file =~ /wolf|Crescent/i) ? 1 : 0,
-            'center'       => CENTER_XY,
-        }
-    );
-    if (defined($image)) {
-        if ($file =~ /Solid/) {
-            $DORKSMILE = $image;
-        } else {
-            push(@IMAGES, $image);
-        }
-    }
+    next if ($file =~ /^\.+/ || $file =~ /Test/i || -d "$images_path/$file");
+	if ($file =~ /\.gif$/i) {
+		print_it($F, "Loading Animation > $file", '00FFFFFF', undef, 1);
+		my $image;
+		if ($XX > 320) { # Only load native for larger screens
+			$image = $F->load_image(
+				{
+					'file'   => "$images_path/$file",
+					'center' => CENTER_XY
+				}
+			);
+			push(@ANIM,$image);
+		}
+		$image = $F->load_image(
+			{
+				'width'  => $XX,
+				'height' => $YY - $F->{'Y_CLIP'},
+				'file'   => "$images_path/$file",
+				'center' => CENTER_XY
+			}
+		);
+		push(@ANIM,$image);
+		push(@ANIM,$image) if ($XX <= 320); # "Native" is really scaled down for tiny screens.
+	} else {
+		print_it($F, "Loading Image > $file", '00FFFFFF', undef, 1);
+		my $image = $F->load_image(
+			{
+				'x'            => 0,
+				'y'            => 0,
+				'width'        => $XX,
+				'height'       => $F->{'H_CLIP'},
+				'file'         => "$images_path/$file",
+				'convertalpha' => ($file =~ /wolf|Crescent/i) ? 1 : 0,
+				'center'       => CENTER_XY,
+			}
+		);
+		if (defined($image)) {
+			if ($file =~ /Solid/) {
+				$DORKSMILE = $image;
+			} else {
+				push(@IMAGES, $image);
+			}
+		}
+	}
 }
 
 $F->cls();
@@ -139,7 +164,6 @@ $F->cls();
 my %func = (
     'Color Mapping'                     => sub { color_mapping(shift); },
     'Plotting'                          => sub { plotting(shift); },
-	'Moire'                             => sub { moire(shift); },
     'Lines'                             => sub { lines(shift, 0); },
     'Angle Lines'                       => sub { angle_lines(shift, 0); },
     'Polygons'                          => sub { polygons(shift, 0); },
@@ -214,7 +238,6 @@ if (defined($show_func)) {
     @order = (
         'Color Mapping',
         'Plotting',
-		'Moire',
         'Lines',
         'Angle Lines',
         'Polygons',
@@ -277,8 +300,8 @@ if (defined($show_func)) {
         'ALPHA Mode Drawing',
         'ADD Mode Drawing',
         'SUBTRACT Mode Drawing',
-        #       'MULTIPLY Mode Drawing',
-        #       'DIVIDE Mode Drawing',
+#        'MULTIPLY Mode Drawing',
+#        'DIVIDE Mode Drawing',
         'Animated',
     );
 }
@@ -294,6 +317,7 @@ foreach my $name (@order) {
 			$F->cls();
 			$F->acceleration(SOFTWARE);
 			$func{$name}->($name . ' -> Accelerated');
+			sleep $delay unless($name =~ /Plot|Lines|Poly|Boxes|Circles|Ellipses|Arcs|Beziers|Pies/);
 		}
     }
 }
@@ -362,8 +386,6 @@ sub color_mapping {
         }
     );
     $F->blit_write($image);
-
-    sleep $delay;
 }
 
 sub plotting {
@@ -377,37 +399,6 @@ sub plotting {
         $F->set_color({ 'alpha' => 255, 'red' => int(rand(256)), 'green' => int(rand(256)), 'blue' => int(rand(256)) });
         $F->plot({ 'x' => $x, 'y' => $y, 'pixel_size' => $psize });
     }
-}
-
-sub moire {
-	my $name = shift;
-
-	print_it($F, $name);
-
-	my @g;
-
-	foreach my $j (1.. 3) {
-		foreach my $i (1 .. 3) {
-			$g[$i][$j] = <DATA>;
-		}
-	}
-	my $h = $screen_height;
-	my $w = $screen_width;
-	for(my $y=0;$y<=$h;$y = $y + 4) {
-		for(my $x=0;$x<=$w;$x = $x + 4) {
-			my $i = 2 * ($x / $w);
-			my $j = 2 * ($y / $h);
-			my $r = sqrt($i * $i + $j * $j);
-			my $v = abs(0.5 * (sin(9 *  $i * $r) + cos(6 * $j * $r)));
-			my $c = int(9.9999 * $v);
-			if ($g[1 + $x - 3 * int($x / 3)][1 + $y - 3 * int($y / 3)] <= $c) {
-				$F->setcolor({'red' => 0, 'green' => 0, 'blue' => 255});
-			} else {
-				$F->setcolor({'red' => 255, 'green' => 0, 'blue' => 0});
-			}
-			$F->plot({'x' => $x, 'y' => $y, 'pixel_size' => 4});
-		}
-	}
 }
 
 sub lines {
@@ -433,7 +424,7 @@ sub angle_lines {
     while (time < $s) {
         $F->set_color({ 'red' => int(rand(256)), 'green' => int(rand(256)), 'blue' => int(rand(256)) });
         $F->angle_line({ 'x' => $center_x, 'y' => $center_y, 'radius' => int($F->{'H_CLIP'} / 2), 'angle' => $angle, 'antialiased' => $aa, 'pixel_size' => $psize });
-        $angle++;
+        $angle = ($F->acceleration()) ? $angle + .1 : $angle + 1;
         $angle -= 360 if ($angle >= 360);
     }
 }
@@ -687,7 +678,7 @@ sub gradient_circles {
 
         #        $F->set_color({ 'red' => int(rand(256)), 'green' => int(rand(256)), 'blue' => int(rand(256)) });
         my $x     = int(rand($XX));
-        my $r     = int(rand($center_y) + 10);
+        my $r     = int(rand($center_y) + 20);
         my $w     = $r * 2;
         my $count = min($w, int(rand(10)) + 2);
         my @red   = map { $_ = int(rand(256)) } (1 .. $count);
@@ -785,7 +776,7 @@ sub gradient_pies {
     my $s = time + $delay;
     while (time < $s) {
         my $x     = int(rand($XX));
-        my $r     = int(rand($center_y) + 10);
+        my $r     = int(rand($center_y) + 20);
         my $w     = $r * 2;
         my $count = min($w, int(rand(10)) + 2);
         my @red   = map { $_ = int(rand(256)) } (1 .. $count);
@@ -820,7 +811,7 @@ sub texture_filled_pies {
     while (time < $s) {
         my $image = $IMAGES[int(rand(scalar(@IMAGES)))];
         my $x     = int(rand($XX));
-        my $r     = int(rand($center_y) + 10);
+        my $r     = int(rand($center_y) + 20);
 
         $F->filled_pie(
             {
@@ -877,7 +868,7 @@ sub gradient_ellipses {
 
     my $s = time + $delay;
     while (time < $s) {
-        my $rh    = int(rand($center_y) + 10);
+        my $rh    = int(rand($center_y) + 20);
         my $h     = $rh * 2;
         my $count = min($h, int(rand(10)) + 2);
         my @red   = map { $_ = int(rand(256)) } (1 .. $count);
@@ -1073,8 +1064,8 @@ sub truetype_fonts {
     my @fonts = (keys %{ $F->{'FONTS'} });
     my $g     = time + $delay;
     while (time < $g) {
-        my $x    = int(rand(600 * $xm));
-        my $y    = int(rand(1080 * $ym));
+        my $x    = int(rand(1200 * $xm));
+        my $y    = int(rand(2160 * $ym));
         my $h    = ($YY <= 240 || $F->{'BITS'} == 16) ? (6 + rand(60)) : (8 + int(rand(300 * $ym)));
         my $ws   = ($XX <= 320 || $F->{'BITS'} == 16) ? rand(2)        : rand(4);
         my $font = $fonts[int(rand(scalar(@fonts)))];
@@ -1107,7 +1098,7 @@ sub truetype_printing {
     $F->ttf_paragraph(
         {
             'x'       => 0,
-            'y'       => 30,
+            'y'       => 60 * $ym,
             'text'    => 'The quick brown fox jumps over the lazy dog.  ' x 400,
             'justify' => 'justified',
             'size'    => int($YY / 75),
@@ -1115,7 +1106,6 @@ sub truetype_printing {
         }
     );
 
-    sleep $delay;
     $F->clip_set(
         {
             'x'  => $XX / 4,
@@ -1135,7 +1125,6 @@ sub truetype_printing {
         }
     );
     $F->clip_reset();
-    sleep $delay;
 }
 
 sub rotate_truetype_fonts {
@@ -1183,20 +1172,20 @@ sub flood_fill {
     if ($XX > 255) {    # && !$rpi) {
         my $image = $IMAGES[int(rand(scalar(@IMAGES)))];
         $F->set_color({ 'red' => int(rand(256)), 'green' => int(rand(256)), 'blue' => int(rand(256)) });
-        $F->polygon({ 'coordinates' => [220 * $xm, 190 * $ym, 1520 * $xm, 80 * $xm, 1160 * $xm, $YY, 960 * $xm, 540 * $ym, 760 * $xm, 780 * $ym] });
+        $F->polygon({ 'coordinates' => [440 * $xm, 190 * $ym, 3040 * $xm, 160 * $xm, 2320 * $xm, $YY, 1920 * $xm, 1080 * $ym, 1520 * $xm, 1560 * $ym] });
 
         $F->set_color({ 'red' => int(rand(256)), 'green' => int(rand(256)), 'blue' => int(rand(256)) });
-        $F->polygon({ 'coordinates' => [1270 * $xm, 570 * $ym, 970 * $xm, 170 * $ym, 600 * $xm, 500 * $ym] });
+        $F->polygon({ 'coordinates' => [2540 * $xm, 1140 * $ym, 1940 * $xm, 340 * $ym, 1200 * $xm, 1000 * $ym] });
 
         $F->set_color({ 'red' => int(rand(256)), 'green' => int(rand(256)), 'blue' => int(rand(256)) });
-        $F->circle({ 'x' => 500 * $xm, 'y' => 320 * $ym, 'radius' => 100 * $xm });
+        $F->circle({ 'x' => 1200 * $xm, 'y' => 640 * $ym, 'radius' => 200 * $xm });
 
         $F->set_color({ 'red' => int(rand(256)), 'green' => int(rand(256)), 'blue' => int(rand(256)) });
 
-        $F->fill({ 'x' => int(350 * $xm), 'y' => int(250 * $ym), 'texture' => $image });
+        $F->fill({ 'x' => int(700 * $xm), 'y' => int(500 * $ym), 'texture' => $image });
 
         $F->set_color({ 'red' => int(rand(256)), 'green' => int(rand(256)), 'blue' => int(rand(256)) });
-        $F->fill({ 'x' => 960 * $xm, 'y' => 440 * $ym });
+        $F->fill({ 'x' => 1920 * $xm, 'y' => 880 * $ym });
     } else {
         $F->set_color({ 'red' => int(rand(256)), 'green' => int(rand(256)), 'blue' => int(rand(256)) });
         $F->polygon({ 'coordinates' => [$center_x, 3, 3, $YY - 3, $center_x, $center_y, $XX - 3, $YY - 4] });
@@ -1204,7 +1193,6 @@ sub flood_fill {
         $F->set_color({ 'red' => int(rand(256)), 'green' => int(rand(256)), 'blue' => int(rand(256)) });
         $F->fill({ 'x' => 3, 'y' => 3 });
     }
-    sleep $delay if ($F->acceleration());
 }
 
 sub color_replace {
@@ -1295,16 +1283,20 @@ sub blit_move {
         }
     );
     my $x = 0;
-    my $y = 40;
-    $image->{'x'} = $x++;
-    $image->{'y'} = $y++;
+    my $y = 40 * $ym;
+	my $y_clip = $F->{'Y_CLIP'};
+    $image->{'x'} = $x;
+    $image->{'y'} = $y;
     $F->blit_write($image);
     my $s = time + $delay;
 
     while (time < $s) {
+		$x = abs(rand($XX - $image->{'width'}));
+		$y = $y_clip + abs(rand(($YY - $y_clip) - $image->{'height'}));
         $image = $F->blit_move({ %{$image}, 'x_dest' => abs($x), 'y_dest' => int(abs($y)) });
         $x++;
         $y += .5;
+		sleep .0166666667;
         $F->vsync();
     }
 }
@@ -1411,7 +1403,7 @@ sub flipping {
                 $F->blit_write($image);
             }
 			sleep .0166666667;
-#            $F->vsync();
+            $F->vsync();
         }
     }
 }
@@ -1441,13 +1433,11 @@ sub monochrome {
         $mono->{'y'} = $F->{'Y_CLIP'} + abs(rand(($YY - $F->{'Y_CLIP'}) - $mono->{'height'}));
         $F->blit_write($mono);
     }
-    sleep $delay;
 }
 
 sub animated {
     my $name = shift;
 	print_it($F, $name . ' -> Loading...');
-	$F->{'DIAGNOSTICS'} = TRUE;
 
     opendir(my $DIR, $images_path);
     chomp(my @list = readdir($DIR));
@@ -1458,64 +1448,41 @@ sub animated {
         next unless ($info =~ /\.gif$/i);
         for my $count (0 .. 1) {
             my $new_name = ($count) ? "$name Fullscreen" : "$name Native";
-            if ($count || $XX <= 320) {
-                print_it($F, "Loading Animated Image '$info' Scaled to Full Screen", 'FFFF00FF', { 'red' => 0, 'green' => 0, 'blue' => 255, 'alpha' => 255 });
-                print STDERR "\n";
-                $image = $F->load_image(
-                    {
-                        'width'  => $XX,
-                        'height' => $YY - $F->{'Y_CLIP'},
-                        'file'   => "$images_path/$info",
-                        'center' => CENTER_XY
-                    }
-                );
-            } else {
-                print_it($F, "Loading Animated Image '$info' Native Size", 'FFFF00FF', { 'red' => 0, 'green' => 0, 'blue' => 255, 'alpha' => 255 });
-                print STDERR "\n";
-                $image = $F->load_image(
-                    {
-                        'file'   => "$images_path/$info",
-                        'center' => CENTER_XY
-                    }
-                );
-            }
-			my $bench = 0;
-#            foreach my $bench (0 .. 1) {
-                if ($count || $XX <= 320) {
-                    print_it($F,
-						$bench ? "Loading Animated Image of '$info' Fullscreen" : $new_name, # "Playing Animated Image of '$info' Fullscreen",
-						$bench ? '0066FFFF' : 'FF00FFFF',
-						$bench ? { 'red' => 0, 'green' => 64, 'blue' => 0, 'alpha' => 255 } : undef);
-                } else {
-                    print_it($F,
-						$bench ? "Loading Animated Image of '$info' Native Size" : $new_name, # "Playing Animated Image of '$info' Native Size",
-						$bench ? '0066FFFF' : 'FF00FFFF',
-						$bench ? { 'red' => 0, 'green' => 64, 'blue' => 0, 'alpha' => 255 } : undef);
-                }
-                if (defined($image)) {
-                    $F->cls();
-                    my $fps   = 0;
-                    my $start = time;
-                    my $s     = time + $delay;
+			$image = $ANIM[$count];
+			if ($count || $XX <= 320) {
+				print_it($F,
+					$new_name,
+					'FF00FFFF',
+				);
+			} else {
+				print_it($F,
+					$new_name,
+					'FF00FFFF',
+				);
+			}
+			if (defined($image)) {
+				$F->cls();
+				my $fps   = 0;
+				my $start = time;
+				my $s     = time + $delay;
 
-                    while (time <= $s) {
-                        foreach my $frame (0 .. (scalar(@{$image}) - 1)) {
-                            if (time > $s * 2) {
-                                print_it($F, 'Your System is Too Slow To Complete The Animation', 'FF9999FF');
-                                sleep 2;
-                                last;
-                            }
-                            my $begin = time;
-                            $F->blit_write($image->[$frame]);
+				while (time <= $s) {
+					foreach my $frame (0 .. (scalar(@{$image}) - 1)) {
+						if (time > $s * 2) {
+							print_it($F, 'Your System is Too Slow To Complete The Animation', 'FF9999FF');
+							sleep 2;
+							last;
+						}
+						my $begin = time;
+						$F->blit_write($image->[$frame]);
 
-                            my $delay = (($image->[$frame]->{'tags'}->{'gif_delay'} * .01)) - (time - $begin);
-                            if ($delay > 0 && !$bench) {
-                                sleep $delay;
-                            }
-                        }
-                    }
-                }
-#            }
+						my $Delay = (($image->[$frame]->{'tags'}->{'gif_delay'} * .01)) - (time - $begin);
+						if ($Delay > 0) {
+							sleep $Delay;
+						}
+					}
+				}
+			}
             last if ($XX <= 320);
         }
     }
@@ -1547,8 +1514,6 @@ sub mode_drawing {
         $F->normal_mode();
         $F->blit_write($image);
 
-        sleep 1;
-
         $F->{'DRAW_MODE'} = $mode;
         $F->blit_write($image2);
 
@@ -1565,7 +1530,7 @@ sub mode_drawing {
         $F->circle({ 'x' => $mid + ($size / 2), 'y' => $F->{'Y_CLIP'} + $size * 2, 'radius' => $size, 'filled' => 1 });
 
         if ($mode == XOR_MODE) {
-            sleep 1;
+			sleep 1;
             $F->circle({ 'x' => $mid + ($size / 2), 'y' => $F->{'Y_CLIP'} + $size * 2, 'radius' => $size, 'filled' => 1 });
 
             $F->set_color({ 'red' => 0, 'green' => 255, 'blue' => 0 });
@@ -1577,7 +1542,6 @@ sub mode_drawing {
             $F->blit_write($image2);
 
         } ## end if ($mode == XOR_MODE)
-        sleep $delay;
     } ## end else [ if ($mode == MASK_MODE)]
 } ## end sub mode_drawing
 
@@ -1597,23 +1561,17 @@ sub alpha_drawing {
     $F->normal_mode();
     $F->blit_write($image);
 
-    sleep 2;
-
     $F->alpha_mode();
     $F->blit_write($image2);
 
-    sleep 2;
-
-    $F->set_color({ 'red' => 0, 'green' => 255, 'blue' => 255, 'alpha' => int(rand(256)) });
+    $F->set_color({ 'red' => 0, 'green' => 255, 'blue' => 255, 'alpha' => int(rand(128) + 128) });
     $F->rbox({ 'x' => 0, 'y' => 0, 'width' => ($XX / 2), 'height' => ($YY / 2), 'filled' => 1 });
 
-    $F->set_color({ 'red' => 255, 'green' => 0, 'blue' => 255, 'alpha' => int(rand(256)) });
+    $F->set_color({ 'red' => 255, 'green' => 0, 'blue' => 255, 'alpha' => int(rand(128) + 128) });
     $F->rbox({ 'x' => $XX / 4, 'y' => $YY / 4, 'width' => ($XX / 2), 'height' => ($YY / 2), 'filled' => 1 });
 
-    $F->set_color({ 'red' => 255, 'green' => 255, 'blue' => 0, 'alpha' => int(rand(256)) });
+    $F->set_color({ 'red' => 255, 'green' => 255, 'blue' => 0, 'alpha' => int(rand(128) + 128) });
     $F->rbox({ 'x' => ($XX / 2), 'y' => ($YY / 2), 'width' => ($XX / 2), 'height' => ($YY / 2), 'filled' => 1 });
-
-    sleep $delay;
 } ## end sub alpha_drawing
 
 sub mask_drawing {
@@ -1632,10 +1590,7 @@ sub mask_drawing {
     $F->blit_write($image1);
     $F->mask_mode();
 
-    sleep .3;
     $F->blit_write($image2);
-
-    sleep $delay;
 } ## end sub mask_drawing
 
 sub unmask_drawing {
@@ -1654,10 +1609,7 @@ sub unmask_drawing {
     $F->blit_write($image1);
     $F->unmask_mode();
 
-    sleep .3;
     $F->blit_write($image2);
-
-    sleep $delay;
 } ## end sub unmask_drawing
 
 sub print_it {
@@ -1819,8 +1771,6 @@ This will turn off all checks for Wayland and X-Windows.  It will try to initial
 =back
 
 =head1 NOTES
-
-Any benchmarking numbers are written to STDERR.  Animations have benchmarking.
 
 Place any other animated GIFs in the C<"examples/images/"> directory and it will include it in the testing
 

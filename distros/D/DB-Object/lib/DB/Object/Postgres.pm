@@ -750,7 +750,7 @@ sub create_db
         return( $self->error( "An error occured while preparing SQL query to create database: ", $@ ) );
     }
     $sth or return( $self->error( "An error occured while preparing SQL query to create database: ", $dbh->errstr ) );
-    
+
     # try-catch
     $rc = eval
     {
@@ -1057,13 +1057,13 @@ SQL
     my $inheritance = "SELECT c.oid::pg_catalog.regclass FROM pg_catalog.pg_class c, pg_catalog.pg_inherits i WHERE c.oid=i.inhparent AND i.inhrelid = ? ORDER BY inhseqno";
     my $get_tbl_comment = "SELECT description FROM pg_description WHERE (SELECT relname FROM pg_class WHERE oid=objoid) = ? and objsubid = 0";
     my $get_field_comment = "SELECT d.description, a.attname FROM pg_description d, pg_attribute a WHERE (SELECT relname FROM pg_class WHERE oid=d.objoid) = ? AND a.attnum=d.objsubid AND a.attrelid=d.objoid AND d.objsubid > 0";
-    
+
     # Get the max size of the fields to properly format the schema
     my $sth = $dbh->{dbh}->prepare_cached( $max_field_size ) || return( $self->error( $dbh->{dbh}->errstr ) );
     $sth->execute() || return( $self->error( $sth->errstr ) );
     my $fsize = $sth->fetchrow;
     $sth->finish;
-    
+
     # Get the list of all inherited fields per table, so we can exclude them in the schema we produce.
     $sth = $dbh->{dbh}->prepare_cached( $inherited_fields ) || return( $self->error( $dbh->{dbh}->errstr ) );
     $sth->execute() || return( $self->error( $sth->errstr ) );
@@ -1075,7 +1075,7 @@ SQL
         push( @{$inherited->{ $h->{ 'table' } }}, $h->{ 'field' } );
     }
     $sth->finish;
-    
+
     foreach my $t ( @$tables )
     {
         my @table_def = ( "CREATE TABLE $t (" );
@@ -1086,7 +1086,7 @@ SQL
         my $tbl_info = $sth->fetchrow_hashref();
         $sth->finish;
         $dbh->bind( 1 );
-        
+
         # Get field info.
         $sth = $dbh->{Dbh}->prepare_cached( $field_info ) || return( $self->error( $dbh->{dbh}->errstr ) );
         $sth->execute( $tbl_info->{ 'oid' } ) || return( $self->error( $sth->errstr ) );
@@ -1144,20 +1144,20 @@ SQL
         }
         $sth->finish;
         push( @table_def, @constraints );
-        
+
         # Get table inheritance
         $sth = $dbh->{dbh}->prepare_cached( $inheritance )  || return( $self->error( $dbh->{dbh}->errstr ) );
         $sth->execute( $tbl_info->{ 'oid' } ) || return( $self->error( $sth->errstr ) );
         $rows = $sth->fetchall_arrayref( {} );
         my @inherit = map{ $_->{ 'oid' } } @$rows;
         $sth->finish;
-        
+
         # Add a comma at the end of each line now we know how many there are.
         for( my $i = 0; $i < $#table_def; $i++ )
         {
             $table_def[ $i ] .= ",";
         }
-        
+
         if( @inherit )
         {
             push( @table_def, sprintf( ') INHERITS (%s);', join( ", ", @inherit ) ) );
@@ -1166,17 +1166,17 @@ SQL
         {
             push( @table_def, ');' );
         }
-        
+
         # Put here the table indexes
         push( @table_def, @index );
-        
+
         # Get comments on the table itself, if any
         $sth = $dbh->{dbh}->prepare_cached( $get_tbl_comment ) || return( $self->error( $sth->{dbh}->errstr ) );
         $sth->execute( $t ) || return( $self->error( $sth->errstr ) );
         my $ref = $sth->fetchrow_hashref();
         $sth->finish;
         push( @table_def, sprintf( "COMMENT ON TABLE %s IS '%s';", $t, $ref->{ 'description' } ) ) if( $ref->{ 'description' } );
-        
+
         # Get comments for each field
         $sth = $dbh->{dbh}->prepare_cached( $get_field_comment ) || return( $self->error( $sth->{dbh}->errstr ) );
         $sth->execute( $t ) || return( $self->error( $sth->errstr ) );
@@ -1707,32 +1707,32 @@ DB::Object::Postgres - SQL API
     schema => 'auth',
     debug => 3,
     }) || bailout( "Unable to connect to sql server on host localhost: ", DB::Object->error );
-    
+
     # Legacy regular query
     my $sth = $dbh->prepare( "SELECT login,name FROM login WHERE login='jack'" ) ||
     die( $dbh->errstr() );
     $sth->execute() || die( $sth->errstr() );
     my $ref = $sth->fetchrow_hashref();
     $sth->finish();
-    
+
     # Get a list of databases;
     my @databases = $dbh->databases;
     # Doesn't exist? Create it:
     my $dbh2 = $dbh->create_db( 'webstore' );
     # Load some sql into it
     my $rv = $dbh2->do( $sql ) || die( $dbh->error );
-    
+
     # Check a table exists
     $dbh->table_exists( 'customers' ) || die( "Cannot find the customers table!\n" );
-    
+
     # Get list of tables, as array reference:
     my $tables = $dbh->tables;
-    
+
     my $cust = $dbh->customers || die( "Cannot get customers object." );
     $cust->where( email => 'john@example.org' );
     my $str = $cust->delete->as_string;
     # Becomes: DELETE FROM customers WHERE email='john\@example.org'
-    
+
     # Do some insert with transaction
     $dbh->begin_work;
     # Making some other inserts and updates here...
@@ -1750,7 +1750,7 @@ DB::Object::Postgres - SQL API
     $result = $cust_sth_ins->as_string;
     # INSERT INTO customers (first_name, last_name, email, active) VALUES('Paul', 'Goldman', 'paul\@example.org', '0')
     $dbh->commit;
-    
+
     # and more elaborate:
     # Ref: https://www.postgresql.org/docs/10/sql-insert.html#SQL-ON-CONFLICT
     $login->on_conflict({
@@ -1763,10 +1763,10 @@ DB::Object::Postgres - SQL API
     });
     # would become:
     insert into login (..) values(...) on conflict on constraint idx_prefs_unique do update set val = EXCLUDED.val;
-    
+
     # Get the last used insert id
     my $id = $dbh->last_insert_id();
-    
+
     $cust->where( email => 'john@example.org' );
     $cust->order( 'last_name' );
     $cust->having( email => qr/\@example/ );
@@ -1774,20 +1774,20 @@ DB::Object::Postgres - SQL API
     my $cust_sth_sel = $cust->select || die( "An error occurred while creating a query to select data frm table customers: " . $cust->error );
     # Becomes:
     # SELECT id, first_name, last_name, email, created, modified, active, created::ABSTIME::INTEGER AS created_unixtime, modified::ABSTIME::INTEGER AS modified_unixtime, CONCAT(first_name, ' ', last_name) AS name FROM customers WHERE email='john\@example.org' HAVING email ~ '\@example' ORDER BY last_name LIMIT 10
-    
+
     $cust->reset;
     $cust->where( email => 'john@example.org' );
     my $cust_sth_upd = $cust->update( active => 0 )
     # Would become:
     # UPDATE ONLY customers SET active='0' WHERE email='john\@example.org'
-    
+
     # Lets' dump the result of our query
     # First to STDERR
     $login->where( "login='jack'" );
     $login->select->dump();
     # Now dump the result to a file
     $login->select->dump( "my_file.txt" );
-    
+
 =head1 VERSION
 
     v1.4.0

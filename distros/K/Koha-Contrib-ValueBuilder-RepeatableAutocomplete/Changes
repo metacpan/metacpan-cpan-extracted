@@ -1,5 +1,10 @@
 Changes for Koha::Contrib::ValueBuilder::RepeatableAutocomplete
 
+1.006     2025-08-29 10:50:51+02:00
+    - instead of showing an alert, just create the target subfield
+      if it is missing (Tadeusz „tadzik” Sośnierz)
+
+
 1.005     2025-08-21 15:16:29+02:00
 
     - show a JS alert if there is no free target subfield

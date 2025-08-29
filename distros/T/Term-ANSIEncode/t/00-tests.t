@@ -9,7 +9,7 @@ use Time::HiRes qw( sleep );
 use List::Util qw(max);
 use utf8;
 
-use Test::More tests => 1124;
+use Test::More qw(no_plan);
 
 BEGIN {
 	use_ok('Term::ANSIEncode') || BAIL_OUT('Cannot load Term::ANSIEncode!');

@@ -5,7 +5,7 @@ use JSON qw(to_json);
 
 # ABSTRACT: Repeatable autcomplete value-builder for Koha
 
-our $VERSION = '1.005'; # VERSION
+our $VERSION = '1.006'; # VERSION
 
 sub build_builder_inline {
     my $class = shift;
@@ -36,15 +36,20 @@ function Focus[% function_name %](event) {
         select: function( event, ui ) {
             event.preventDefault();
 
-            var target = $(inputField.closest('ul').find('input[id^="' + field + '_subfield_4"]').filter((idx, input) => { return $(input).val() == ""; }));
-            if (target.length == 0) {
-                alert("Kein freies Feld '[% target %]' vorhanden");
-                inputField.val('');
-                return;
-            }
+            const source_id_prefix = inputField.attr('id').match(/tag_\d+_subfield_[^_]+/);
+            const sources = inputField.closest('ul').find(`input[id^=${source_id_prefix}]`);
+            const sourceIdx = sources.index(inputField);
 
-            inputField.val( ui.item.clean_label || ui.item.label );
-            target.val( ui.item.value );
+            const targets = inputField.closest('ul').find('input[id^="' + field + '_subfield_4"]');
+            let target = targets[sourceIdx];
+
+            if (target == undefined) {
+                // must be a new source, create a new target
+                targets.last().parent().parent().find('a.buttonPlus').click();
+                target = inputField.closest('ul').find('input[id^="' + field + '_subfield_4"]').last();
+            }
+            inputField.val( ui.item.value_for_input || ui.item.label );
+            $(target).val( ui.item.value_for_target );
             inputField.autocomplete('destroy');
             inputField.blur();
         },
@@ -100,12 +105,7 @@ function Focus[% function_name %](event) {
             inputField.val( ui.item.label );
 
             targetMap.forEach( function(element) {
-                var target = $(inputField.closest('ul').find('input[id^="' + field + '_subfield_' + element.subfield + '"]').filter((idx, input) => { return $(input).val() == ""; }))
-                if (target.length == 0) {
-                    alert("Kein freies Feld '[% target %]' vorhanden");
-                    inputField.val('');
-                    return;
-                }
+                var target = $(inputField.closest('ul').find('input[id^="' + field + '_subfield_' + element.subfield + '"]')[0]);
 
                 switch (element.type) {
                     case 'selected':
@@ -159,7 +159,7 @@ Koha::Contrib::ValueBuilder::RepeatableAutocomplete - Repeatable autcomplete val
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head1 SYNOPSIS
 
@@ -223,7 +223,9 @@ The subfield of the MARC field into which the selected C<value> is stored.
 
 An ARRAY of HASHes, each hash has to contain a key C<label> (which
 will be what the users enter) and a key C<value> which has to contain
-the value to be stored in C<target>
+the value to be stored in C<target>. An optional key
+C<value_for_input> can be used if you need to set the input field to a
+different value than what is returned in C<label>.
 
 =item * C<minlength>; optional, defaults to 3
 

@@ -1,7 +1,9 @@
 Makefile
 Makefile.old
+Makefile.pl
 Build
 Build.bat
+build
 META.*
 MYMETA.*
 .build/
@@ -17,3 +19,5 @@ pm_to_blib
 Debug-Easy-*
 Debug-Easy-*.tar.gz
 test
+.git/
+.gitignore

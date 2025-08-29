@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use experimental 'signatures';
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 use Iterator::Flex::Factory;
 use Iterator::Flex::Utils qw[ THROW STATE EXHAUSTION :IterAttrs :IterStates ];
@@ -135,7 +135,7 @@ Iterator::Flex::Chunk - Chunk Iterator Class
 
 =head1 VERSION
 
-version 0.27
+version 0.28
 
 =head1 METHODS
 

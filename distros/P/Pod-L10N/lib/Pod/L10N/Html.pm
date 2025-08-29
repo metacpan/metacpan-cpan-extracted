@@ -2,10 +2,9 @@ package Pod::L10N::Html;
 use strict;
 use Exporter 'import';
 
-our $VERSION = '1.08';
+our $VERSION = '1.10';
 $VERSION = eval $VERSION;
-our @EXPORT = qw(pod2htmll10n htmlify);
-our @EXPORT_OK = qw(anchorify relativize_url);
+our @EXPORT = qw(pod2htmll10n);
 
 use Config;
 use Cwd;
@@ -68,18 +67,6 @@ Support L<Pod::L10N::Format> extended format.
              "--recurse",
              "--infile=foo.pod",
              "--outfile=/perl/nmanual/foo.html");
-
-See L<Pod::Html> for details.
-
-=head2 htmlify
-
-    htmlify($heading);
-
-See L<Pod::Html> for details.
-
-=head2 anchorify
-
-    anchorify(@heading);
 
 See L<Pod::Html> for details.
 
@@ -457,6 +444,7 @@ sub refine_parser {
         $csslink = qq(\n<link rel="stylesheet" href="$self->{Css}" type="text/css" />);
         $csslink =~ s,\\,/,g;
         $csslink =~ s,(/.):,$1|,;
+#/ # (for VSCode highlighter)
         $tdstyle= '';
     }
 
@@ -531,27 +519,27 @@ sub arrange {
     $base = Pod::L10N::Model::decode_file($fn);
 
     for (@$base){
-	my($o, $t) = @$_;
-	if($o =~ /^=encoding (.+)/){
-	    $encoding = $1;
-	    $ret .= $o . "\n\n";
-	    next;
-	}
-	if($o =~ /^=/){
-	    if(defined $t){
-		$t =~ /\((.+)\)/;
-		$ret .= $o . '@@@@@@@@@@' . $1;
-	    } else {
-		$ret .= $o;
-	    }
-	} else {
-	    if(defined $t){
-		$ret .= $t;
-	    } else {
-		$ret .= $o;
-	    }
-	}
-	$ret .= "\n\n";
+        my($o, $t) = @$_;
+        if($o =~ /^=encoding (.+)/){
+            $encoding = $1;
+            $ret .= $o . "\n\n";
+            next;
+        }
+        if($o =~ /^=/){
+            if(defined $t){
+                $t =~ /\((.+)\)/;
+                $ret .= $o . '@@@@@@@@@@' . $1;
+            } else {
+                $ret .= $o;
+            }
+        } else {
+            if(defined $t){
+                $ret .= $t;
+            } else {
+                $ret .= $o;
+            }
+        }
+        $ret .= "\n\n";
     }
 
     return ($ret, $encoding);
@@ -666,7 +654,7 @@ sub _end_head {
 
     my ($orig, $trans) = split /@@@@@@@@@@/, $_[0]{scratch};
     if(!defined $trans){
-	$trans = $orig;
+        $trans = $orig;
     }
     my $id = $_[0]->idify($orig);
     my $text = $trans;
@@ -681,7 +669,7 @@ sub _end_head {
 sub end_item_text   {
     my ($orig, $trans) = split /@@@@@@@@@@/, $_[0]{scratch};
     if(!defined $trans){
-	$trans = $orig;
+        $trans = $orig;
     }
 
     # idify and anchor =item content if wanted

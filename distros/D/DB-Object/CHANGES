@@ -1,5 +1,8 @@
 Revision history for Perl module DB::Object
 
+v1.8.1 2025-08-29T10:54:16+0900
+    - Updated method _cache_table in DB::Object
+
 v1.8.0 2025-07-30T11:25:58+0900
     - Minor improvements and cleanup of code
 

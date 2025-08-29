@@ -171,13 +171,13 @@ sub on_conflict
         {
             return( $self->error( "No target was specified for the on conflict clause." ) );
         }
-        
+
         if( $opts->{where} )
         {
             $hash->{where} = $opts->{where};
             push( @comp, 'WHERE ' . $opts->{where} );
         }
-        
+
         # action => update
         if( $opts->{action} )
         {
@@ -216,7 +216,7 @@ sub on_conflict
                 {
                     return( $self->error( "Fields property to update for on conflict do update clause contains no fields!" ) ) if( !scalar( @{$opts->{fields}} ) );
                 }
-                
+
                 if( $self->_is_array( $opts->{fields} ) )
                 {
                     my $this = $opts->{fields};
@@ -229,9 +229,9 @@ sub on_conflict
                 }
                 # Here the user will use the special table 'excluded'
                 $hash->{fields} = $opts->{fields};
-                
+
                 my $q = [];
-            
+
                 foreach my $k ( sort( keys( %{$opts->{fields}} ) ) )
                 {
                     push( @$q, sprintf( '%s = %s', $k, ref( $opts->{fields}->{ $k } ) eq 'SCALAR' ? ${$opts->{fields}->{ $k }} : $tbl_o->database_object->quote( $opts->{fields}->{ $k } ) ) );

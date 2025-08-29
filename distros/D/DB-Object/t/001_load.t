@@ -28,10 +28,12 @@ BEGIN
 # find ./lib -type f -name "*.pm" -print | xargs perl -lE 'my @f=sort(@ARGV); for(@f) { s,./lib/,,; s,\.pm$,,; s,/,::,g; substr( $_, 0, 0, q{use_ok( ''} ); $_ .= q{'' );}; say $_; }'
 
     use_ok( 'DB::Object' );
+    use_ok( 'DB::Object::Cache::Tables' );
     use_ok( 'DB::Object::Constraint::Check' );
     use_ok( 'DB::Object::Constraint::Foreign' );
     use_ok( 'DB::Object::Constraint::Index' );
     use_ok( 'DB::Object::Fields' );
+    use_ok( 'DB::Object::Fields::Field' );
     use_ok( 'DB::Object::Fields::Overloaded' );
     use_ok( 'DB::Object::Fields::Unknown' );
     use_ok( 'DB::Object::Placeholder' );
@@ -39,10 +41,8 @@ BEGIN
     use_ok( 'DB::Object::Query::Clause' );
     use_ok( 'DB::Object::Query::Element' );
     use_ok( 'DB::Object::Query::Elements' );
-    use_ok( 'DB::Object::Cache::Tables' );
     use_ok( 'DB::Object::Statement' );
     use_ok( 'DB::Object::Tables' );
-    use_ok( 'DB::Object::Fields::Field' );
     SKIP:
     {
         eval{ require DBD::SQLite; };

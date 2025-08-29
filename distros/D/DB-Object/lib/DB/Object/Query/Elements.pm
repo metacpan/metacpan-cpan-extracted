@@ -131,7 +131,7 @@ sub merge
             warn( "Element provided '", overload::StrVal( $this ), "' is not an DB::Object::Query::Elements or DB::Object::Query::Clause object" );
             next;
         }
-        
+
         $elems->push( $this->elements->list );
     }
     # Make sure our elements are in the right order
@@ -173,7 +173,7 @@ sub push
         {
             return( $self->error( "Unknown value '", ( $elem // 'undef' ), "' to add as element to our clause elements stack." ) );
         }
-        
+
         # Order does not really matter, we just stack them, and after we will sort them by their object property 'index' value, if necessary
         $e->push( $o );
     }

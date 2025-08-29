@@ -937,7 +937,7 @@ sub _curdate
 {
     my $self = shift( @_ );
     my @args = @_;
-    
+
     # try-catch
     local $@;
     my $tz = eval
@@ -1357,32 +1357,32 @@ DB::Object::SQLite - DB Object SQLite Driver
         schema => 'auth',
         debug => 3,
     }) || bailout( "Unable to connect to sql server on host localhost: ", DB::Object->error );
-    
+
     # Legacy regular query
     my $sth = $dbh->prepare( "SELECT login,name FROM login WHERE login='jack'" ) ||
     die( $dbh->errstr() );
     $sth->execute() || die( $sth->errstr() );
     my $ref = $sth->fetchrow_hashref();
     $sth->finish();
-    
+
     # Get a list of databases;
     my @databases = $dbh->databases;
     # Doesn't exist? Create it:
     my $dbh2 = $dbh->create_db( 'webstore' );
     # Load some sql into it
     my $rv = $dbh2->do( $sql ) || die( $dbh->error );
-    
+
     # Check a table exists
     $dbh->table_exists( 'customers' ) || die( "Cannot find the customers table!\n" );
-    
+
     # Get list of tables, as array reference:
     my $tables = $dbh->tables;
-    
+
     my $cust = $dbh->customers || die( "Cannot get customers object." );
     $cust->where( email => 'john@example.org' );
     my $str = $cust->delete->as_string;
     # Becomes: DELETE FROM customers WHERE email='john\@example.org'
-    
+
     # Do some insert with transaction
     $dbh->begin_work;
     # Making some other inserts and updates here...
@@ -1402,7 +1402,7 @@ DB::Object::SQLite - DB Object SQLite Driver
     $dbh->commit;
     # Get the last used insert id
     my $id = $dbh->last_insert_id();
-    
+
     $cust->where( email => 'john@example.org' );
     $cust->order( 'last_name' );
     $cust->having( email => qr/\@example/ );
@@ -1410,20 +1410,20 @@ DB::Object::SQLite - DB Object SQLite Driver
     my $cust_sth_sel = $cust->select || die( "An error occurred while creating a query to select data frm table customers: " . $cust->error );
     # Becomes:
     # SELECT id, first_name, last_name, email, created, modified, active, created::ABSTIME::INTEGER AS created_unixtime, modified::ABSTIME::INTEGER AS modified_unixtime, CONCAT(first_name, ' ', last_name) AS name FROM customers WHERE email='john\@example.org' HAVING email ~ '\@example' ORDER BY last_name LIMIT 10
-    
+
     $cust->reset;
     $cust->where( email => 'john@example.org' );
     my $cust_sth_upd = $cust->update( active => 0 )
     # Would become:
     # UPDATE ONLY customers SET active='0' WHERE email='john\@example.org'
-    
+
     # Lets' dump the result of our query
     # First to STDERR
     $login->where( "login='jack'" );
     $login->select->dump();
     # Now dump the result to a file
     $login->select->dump( "my_file.txt" );
-    
+
 =head1 VERSION
 
     v1.2.0

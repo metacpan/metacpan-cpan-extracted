@@ -1,10 +1,10 @@
 package Sys::Info::Device;
-$Sys::Info::Device::VERSION = '0.7807';
+$Sys::Info::Device::VERSION = '0.7808';
 use strict;
 use warnings;
 use constant SUPPORTED => qw( CPU BIOS );
 use Carp qw( croak );
-use base qw( Sys::Info::Base );
+use parent qw( Sys::Info::Base );
 use Sys::Info::Constants qw( OSID );
 
 BEGIN {
@@ -62,7 +62,7 @@ Sys::Info::Device
 
 =head1 VERSION
 
-version 0.7807
+version 0.7808
 
 =head1 SYNOPSIS
 
@@ -101,7 +101,7 @@ L<Sys::Info::Device::CPU>, L<Sys::Info>.
 
 =head1 AUTHOR
 
-Burak Gursoy <burak@cpan.org>
+Burak Gursoy
 
 =head1 COPYRIGHT AND LICENSE
 

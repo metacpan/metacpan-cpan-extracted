@@ -1,5 +1,28 @@
 Revision history for Iterator-Flex
 
+0.28      2025-08-28 17:54:59 EDT
+
+  [API CHANGE]
+
+    * igather/Gather
+
+        * the default behavior on input iterator exhaustion is
+          GATHER_CYCLE_STOP; new cycle_on_exhaustion parameter may be
+          set to GATHER_CYCLE_CHOOSE for old behavior.
+
+  [ENHANCEMENT]
+
+    * igather/Gather
+
+      * gather cycles can be restarted based upon difference between
+        elements. (GATHER_ELEMENT_CACHE | GATHER_ELEMENT_RESTART )
+
+      * the default behavior on exhaustion is GATHER_CYCLE_STOP; 
+
+      * rewind is supported
+
+      * examples!
+
 0.27      2025-08-27 17:33:40 EDT
 
   [ENHANCEMENT]

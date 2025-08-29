@@ -223,7 +223,7 @@ DB::Object::Cache::Tables - Table Cache
     {
         warn( "Unable to write to tables cache: ", $cache->error, "\n" );
     }
-    
+
     # Returning an array reference of tables hash reference definition
     $all = $cache_tables->get({
         host => $self->host,
@@ -231,7 +231,7 @@ DB::Object::Cache::Tables - Table Cache
         port => $self->port,
         database => $db,
     }) || do
-    
+
 =head1 VERSION
 
     v0.100.5

@@ -1,5 +1,9 @@
 Revision history for Perl extension Sys::Info::Base.
 
+0.7808 2025-08-29 BURAK
+    - Release the Sys::HostIP change.
+    - use perent
+
 0.7807 2018-12-25 BURAK
     - Distro fix.
 

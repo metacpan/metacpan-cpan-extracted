@@ -5,6 +5,7 @@ examples/echo_stdio.pl
 lib/MCP.pm
 lib/MCP/Client.pm
 lib/MCP/Constants.pm
+lib/MCP/Prompt.pm
 lib/MCP/Server.pm
 lib/MCP/Server/Transport.pm
 lib/MCP/Server/Transport/HTTP.pm

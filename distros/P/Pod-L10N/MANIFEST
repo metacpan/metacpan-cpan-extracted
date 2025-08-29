@@ -14,7 +14,6 @@ lib/Pod/L10N/Html/Util.pm
 minil.toml
 script/pod2htmll10n
 t/80_help.t
-t/anchorify-536.t
 t/anchorify.t
 t/cache.pod
 t/cache.t

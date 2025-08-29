@@ -14,7 +14,9 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
+                                      'Sys::HostIP' => '0',
                                       'Text::Template::Simple' => '0',
+                                      'parent' => '0',
                                       'perl' => '5.010'
                                     }
                     },

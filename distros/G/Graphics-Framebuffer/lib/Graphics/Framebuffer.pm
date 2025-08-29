@@ -2,6 +2,7 @@ package Graphics::Framebuffer;
 
 
 
+# Only POD is utf-8.
 =encoding utf8
 
 =head1 NAME
@@ -66,7 +67,7 @@ If you are in X-Windows, and don't know how to get to a console, then just hit C
 
 How many Perl modules actually tell you how they work?  Well, I will tell you how this one works.
 
-The framebuffer is simply a special file that is mapped to the screen.  How the driver does this can be different.  Some may actually directly map the display memory to this file, and some install a second copy of the display to normal memory and copy it to the display on every vertical blank, usually with a fast DMA transfer.
+The framebuffer is simply a special file that is mapped to the screen on Unix style systems like Linux or FreeBSD.  How the driver does this can be different.  Some may actually directly map the display memory to this file, and some install a second copy of the display to normal memory and copy it to the display on every vertical blank, usually with a fast DMA transfer.
 
 This module maps that file to a string, and that ends up making the string exactly the same size as the physical display.  Plotting is simply a matter of calculating where in the string that pixel is and modifying it, via "substr" (never using "=" directly).  It's that simple.
 
@@ -169,7 +170,7 @@ Indicates if C code or hardware acceleration is being used.
 =item B<Possible Values>
 
  0 = Perl code only
- 1 = Some functions accelerated by compiled code (Default)
+ 1 = Some functions accelerated by compiled C code (Default)
  2 = All of #1 plus additional functions accelerated by hardware (currently not supported, and likely never will)
 
 =back
@@ -351,6 +352,7 @@ use constant {
     KD_TEXT             => 0,
 
     # FLAGS
+	# I have never found a driver that actually uses these, else I would have used them
     FBINFO_HWACCEL_NONE      => 0x0000,    # These come from "fb.h" in the kernel source
     FBINFO_HWACCEL_COPYAREA  => 0x0100,
     FBINFO_HWACCEL_FILLRECT  => 0x0200,
@@ -359,6 +361,8 @@ use constant {
     FBINFO_HWACCEL_XPAN      => 0x1000,
     FBINFO_HWACCEL_YPAN      => 0x2000,
     FBINFO_HWACCEL_YWRAP     => 0x4000,
+
+    pi => (4 * atan2(1,1)), # This gets rid of Math::Trig
 };
 
 ## THREADS ##
@@ -369,7 +373,6 @@ use threads::shared;
 use POSIX ();
 use POSIX qw(modf);
 use Time::HiRes qw(sleep time);                                  # The time accuracy has to be milliseconds on many routines
-use Math::Trig ':pi';                                            # Usually only PI is used
 use Math::Bezier;                                                # Bezier curve calculations done here.
 use Math::Gradient qw( gradient array_gradient multi_gradient ); # Awesome gradient calculation module
 use List::Util qw(min max);                                      # min and max are very handy!
@@ -392,7 +395,7 @@ BEGIN {
     require Exporter;
 
     # set the version for version checking
-    our $VERSION   = '6.68';
+    our $VERSION   = '6.70';
     our @ISA       = qw(Exporter);
     our @EXPORT_OK = qw(
       FBIOGET_VSCREENINFO
@@ -467,6 +470,7 @@ sub DESTROY { # Always clean up after yourself before exiting
     $self->_screen_close();
     unlink('/tmp/output.gif') if (-e '/tmp/output.gif');
     _reset() if ($self->{'RESET'});    # Exit by calling 'reset' first
+	# Restore the original screen before run
 	substr($self->{'SCREEN'},0,length($self->{'START_SCREEN'})) = $self->{'START_SCREEN'};
 }
 
@@ -477,7 +481,7 @@ use Inline C => <<'C_CODE','name' => 'Graphics::Framebuffer', 'VERSION' => $VERS
 /* Copyright 2018-2025 Richard Kelsch, All Rights Reserved
    See the Perl documentation for Graphics::Framebuffer for licensing information.
 
-   Version:  6.68
+   Version:  6.70
 
    You may wonder why the stack is so heavily used when the global structures
    have the needed values.  Well, the module can emulate another graphics mode
@@ -3233,6 +3237,7 @@ to F9.  One of them is set aside for X-Windows/Wayland.
 
         bless($self, $class);
     }
+    $self->{'MIN_BYTES'} = max(3,$self->{'BYTES'});
     $self->{'X_FACTOR'} = 3840 / $self->{'XRES'};
     $self->{'Y_FACTOR'} = 2160 / $self->{'YRES'};
     if ($self->{'RESET'}) {
@@ -3248,7 +3253,9 @@ to F9.  One of them is set aside for X-Windows/Wayland.
         }
     }
     $self->_flush_screen();
-    $self->{'START_SCREEN'} = ''. $self->{'SCREEN'};
+    unless($self->{'RESET'}) {
+		$self->{'START_SCREEN'} = ''. $self->{'SCREEN'}; # Force Perl to copy the string, not the reference
+	}
     chomp($self->{'this_tty'} = `tty`);
     if ($self->{'SPLASH'} > 0) {
         $self->splash($VERSION);
@@ -3835,7 +3842,10 @@ With 'pixel_size', if a positive number greater than 1, is drawn with square pix
     my $x    = int($params->{'x'} || 0);            # Ignore decimals
     my $y    = int($params->{'y'} || 0);
     my $size = int($params->{'pixel_size'} || 1);
-    my ($c, $index);
+    my $c;
+	my $index;
+	my $bytes = $self->{'BYTES'};
+	my $color_alpha = $self->{'COLOR_ALPHA'};
     if (abs($size) > 1) {
         if ($size < -1) {
             $size = abs($size);
@@ -3850,68 +3860,71 @@ With 'pixel_size', if a positive number greater than 1, is drawn with square pix
             $self->{'X_CLIP'},  $self->{'Y_CLIP'}, $self->{'XX_CLIP'}, $self->{'YY_CLIP'},
             $self->{'INT_RAW_FOREGROUND_COLOR'},
             $self->{'INT_RAW_BACKGROUND_COLOR'},
-            $self->{'COLOR_ALPHA'},
+            $color_alpha,
             $self->{'DRAW_MODE'},
-            $self->{'BYTES'},
+            $bytes,
             $self->{'BITS'},
             $self->{'BYTES_PER_LINE'},
             $self->{'XOFFSET'}, $self->{'YOFFSET'},
         );
     } else {
+		my $raw_foreground_color = $self->{'RAW_FOREGROUND_COLOR'};
+		my $raw_background_color = $self->{'RAW_BACKGROUND_COLOR'};
+		my $draw_mode            = $self->{'DRAW_MODE'};
         # Only plot if the pixel is within the clipping region
         unless (($x > $self->{'XX_CLIP'}) || ($y > $self->{'YY_CLIP'}) || ($x < $self->{'X_CLIP'}) || ($y < $self->{'Y_CLIP'})) {
             # The 'history' is a 'draw_arc' optimization and beautifier for xor mode.  It only draws pixels not in
             # the history buffer.
             unless (exists($self->{'history'}) && defined($self->{'history'}->{$y}->{$x})) {
-                $index = ($self->{'BYTES_PER_LINE'} * ($y + $self->{'YOFFSET'})) + (($self->{'XOFFSET'} + $x) * $self->{'BYTES'});
-                if ($index >= 0 && $index <= ($self->{'fscreeninfo'}->{'smem_len'} - $self->{'BYTES'})) {
-                        $c = substr($self->{'SCREEN'}, $index, $self->{'BYTES'}) || chr(0) x $self->{'BYTES'};
-                        if ($self->{'DRAW_MODE'} == NORMAL_MODE) {
-                            $c  = $self->{'RAW_FOREGROUND_COLOR'};
-                        } elsif ($self->{'DRAW_MODE'} == XOR_MODE) {
-                            $c ^= $self->{'RAW_FOREGROUND_COLOR'};
-                        } elsif ($self->{'DRAW_MODE'} == OR_MODE) {
-                            $c |= $self->{'RAW_FOREGROUND_COLOR'};
-                        } elsif ($self->{'DRAW_MODE'} == ALPHA_MODE) {
+                $index = ($self->{'BYTES_PER_LINE'} * ($y + $self->{'YOFFSET'})) + (($self->{'XOFFSET'} + $x) * $bytes);
+                if ($index >= 0 && $index <= ($self->{'fscreeninfo'}->{'smem_len'} - $bytes)) {
+                        $c = substr($self->{'SCREEN'}, $index, $self->{'BYTES'}) || chr(0) x $bytes;
+                        if ($draw_mode == NORMAL_MODE) {
+                            $c  = $raw_foreground_color;
+                        } elsif ($draw_mode == XOR_MODE) {
+                            $c ^= $raw_foreground_color;
+                        } elsif ($draw_mode == OR_MODE) {
+                            $c |= $raw_foreground_color;
+                        } elsif ($draw_mode == ALPHA_MODE) {
                             my $back  = $self->get_pixel({ 'x' => $x, 'y' => $y });
-                            my $saved = { 'main' => $self->{'RAW_FOREGROUND_COLOR'} };
+                            my $saved = { 'main' => $raw_foreground_color };
                             foreach my $color (qw( red green blue )) {
                                 $saved->{$color} = $self->{ 'COLOR_' . uc($color) };
-                                $back->{$color}  = ($self->{ 'COLOR_' . uc($color) } * $self->{'COLOR_ALPHA'}) + ($back->{$color} * (1 - $self->{'COLOR_ALPHA'}));
+                                $back->{$color}  = ($self->{ 'COLOR_' . uc($color) } * $color_alpha) + ($back->{$color} * (1 - $color_alpha));
                             }
-                            $back->{'alpha'} = min(255, $self->{'COLOR_ALPHA'} + $back->{'alpha'});
+                            $back->{'alpha'} = min(255, $color_alpha + $back->{'alpha'});
                             $self->set_color($back);
-                            $c = $self->{'RAW_FOREGROUND_COLOR'};
-                            $self->{'RAW_FOREGROUND_COLOR'} = $saved->{'main'};
+                            $c = $raw_foreground_color;
+                            $raw_foreground_color = $saved->{'main'};
                             foreach my $color (qw( red green blue )) {
                                 $self->{ 'COLOR_' . uc($color) } = $saved->{$color};
                             }
-                        } elsif ($self->{'DRAW_MODE'} == AND_MODE) {
-                            $c &= $self->{'RAW_FOREGROUND_COLOR'};
-                        } elsif ($self->{'DRAW_MODE'} == ADD_MODE) {
-                            $c += $self->{'RAW_FOREGROUND_COLOR'};
-                        } elsif ($self->{'DRAW_MODE'} == SUBTRACT_MODE) {
-                            $c -= $self->{'RAW_FOREGROUND_COLOR'};
-                        } elsif ($self->{'DRAW_MODE'} == MULTIPLY_MODE) {
-                            $c *= $self->{'RAW_FOREGROUND_COLOR'};
-                        } elsif ($self->{'DRAW_MODE'} == DIVIDE_MODE) {
-                            $c /= $self->{'RAW_FOREGROUND_COLOR'};
-                        } elsif ($self->{'DRAW_MODE'} == MASK_MODE) {
+                        } elsif ($draw_mode == AND_MODE) {
+                            $c &= $raw_foreground_color;
+                        } elsif ($draw_mode == ADD_MODE) {
+                            $c += $raw_foreground_color;
+                        } elsif ($draw_mode == SUBTRACT_MODE) {
+                            $c -= $raw_foreground_color;
+                        } elsif ($draw_mode == MULTIPLY_MODE) {
+                            $c *= $raw_foreground_color;
+                        } elsif ($draw_mode == DIVIDE_MODE) {
+                            $c /= $raw_foreground_color;
+                        } elsif ($draw_mode == MASK_MODE) {
                             if ($self->{'BITS'} == 32) {
-                                $c = $self->{'RAW_FOREGROUND_COLOR'} if (substr($self->{'RAW_FOREGROUND_COLOR'}, 0, 3) ne substr($self->{'RAW_BACKGROUND_COLOR'}, 0, 3));
+                                $c = $raw_foreground_color if (substr($raw_foreground_color, 0, 3) ne substr($raw_background_color, 0, 3));
                             } else {
-                                $c = $self->{'RAW_FOREGROUND_COLOR'} if ($self->{'RAW_FOREGROUND_COLOR'} ne $self->{'RAW_BACKGROUND_COLOR'});
+                                $c = $raw_foreground_color if ($raw_foreground_color ne $raw_background_color);
                             }
-                        } elsif ($self->{'DRAW_MODE'} == UNMASK_MODE) {
+                        } elsif ($draw_mode == UNMASK_MODE) {
                             my $pixel = $self->pixel({ 'x' => $x, 'y' => $y });
                             my $raw   = $pixel->{'raw'};
                             if ($self->{'BITS'} == 32) {
-                                $c = $self->{'RAW_FOREGROUND_COLOR'} if (substr($raw, 0, 3) eq substr($self->{'RAW_BACKGROUND_COLOR'}, 0, 3));
+                                $c = $raw_foreground_color if (substr($raw, 0, 3) eq substr($raw_background_color, 0, 3));
                             } else {
-                                $c = $self->{'RAW_FOREGROUND_COLOR'} if ($raw eq $self->{'RAW_BACKGROUND_COLOR'});
+                                $c = $raw_foreground_color if ($raw eq $raw_background_color);
                             }
                         }
-                        substr($self->{'SCREEN'}, $index, $self->{'BYTES'}) = $c;
+                        substr($self->{'SCREEN'}, $index, $bytes) = $c;
                     my $error = $@;
                     warn __LINE__ . " $error" if ($error && $self->{'SHOW_ERRORS'});
                     $self->_fix_mapping() if ($error);
@@ -4198,12 +4211,16 @@ Draws a line, in the foreground color, from the last plotted position to the pos
     $size = $params->{'pixel_size'} = 1 if ($antialiased);
     my $XX          = $x_end;
     my $YY          = $y_end;
+	my $x_clip      = $self->{'X_CLIP'};
+	my $y_clip      = $self->{'Y_CLIP'};
+	my $xx_clip     = $self->{'XX_CLIP'};
+	my $yy_clip     = $self->{'YY_CLIP'};
 
     if ($self->{'ACCELERATED'} && $size == 1 && !$antialiased) {
         c_line(
             $self->{'SCREEN'},
             $start_x, $start_y, $x_end, $y_end,
-            $self->{'X_CLIP'},  $self->{'Y_CLIP'}, $self->{'XX_CLIP'}, $self->{'YY_CLIP'},
+            $x_clip,  $y_clip, $xx_clip, $yy_clip,
             $self->{'INT_RAW_FOREGROUND_COLOR'},
             $self->{'INT_RAW_BACKGROUND_COLOR'},
             $self->{'COLOR_ALPHA'},
@@ -4215,7 +4232,10 @@ Draws a line, in the foreground color, from the last plotted position to the pos
             # $antialiased,
         );
     } else {
-        my ($width, $height);
+        my $width;
+		my $height;
+		my $raw_foreground_color = $self->{'RAW_FOREGROUND_COLOR'};
+
         # Determines if the coordinates sent were right-side-up or up-side-down.
         if ($start_x > $x_end) {
             $width = $start_x - $x_end;
@@ -4244,20 +4264,20 @@ Draws a line, in the foreground color, from the last plotted position to the pos
                 }
             }
         } elsif ($y_end == $start_y) {    # Draw a perfectly horizontal line (fast)
-            $x_end   = max($self->{'X_CLIP'}, min($x_end,   $self->{'XX_CLIP'}));
-            $start_x = max($self->{'X_CLIP'}, min($start_x, $self->{'XX_CLIP'}));
+            $x_end   = max($x_clip, min($x_end, $xx_clip));
+            $start_x = max($x_clip, min($start_x, $xx_clip));
             $width   = abs($x_end - $start_x);
             if ($size == 1) {
                 if ($start_x > $x_end) {
-                    $self->blit_write({ 'x' => $x_end, 'y' => $y_end, 'width' => $width, 'height' => 1, 'image' => $self->{'RAW_FOREGROUND_COLOR'} x $width });    # Blitting a horizontal line is much faster!
+                    $self->blit_write({ 'x' => $x_end, 'y' => $y_end, 'width' => $width, 'height' => 1, 'image' => $raw_foreground_color x $width });    # Blitting a horizontal line is much faster!
                 } else {
-                    $self->blit_write({ 'x' => $start_x, 'y' => $start_y, 'width' => $width, 'height' => 1, 'image' => $self->{'RAW_FOREGROUND_COLOR'} x $width });    # Blitting a horizontal line is much faster!
+                    $self->blit_write({ 'x' => $start_x, 'y' => $start_y, 'width' => $width, 'height' => 1, 'image' => $raw_foreground_color x $width });    # Blitting a horizontal line is much faster!
                 }
             } else {
                 if ($start_x > $x_end) {
-                    $self->blit_write({ 'x' => $x_end, 'y' => ($y_end - ($size / 2)), 'width' => $width, 'height' => $size, 'image' => $self->{'RAW_FOREGROUND_COLOR'} x ($width * $size) });    # Blitting a horizontal line is much faster!
+                    $self->blit_write({ 'x' => $x_end, 'y' => ($y_end - ($size / 2)), 'width' => $width, 'height' => $size, 'image' => $raw_foreground_color x ($width * $size) });    # Blitting a horizontal line is much faster!
                 } else {
-                    $self->blit_write({ 'x' => $start_x, 'y' => ($y_end - ($size / 2)), 'width' => $width, 'height' => $size, 'image' => $self->{'RAW_FOREGROUND_COLOR'} x ($width * $size) });    # Blitting a horizontal line is much faster!
+                    $self->blit_write({ 'x' => $start_x, 'y' => ($y_end - ($size / 2)), 'width' => $width, 'height' => $size, 'image' => $raw_foreground_color x ($width * $size) });    # Blitting a horizontal line is much faster!
                 }
             }
         } elsif ($antialiased) {
@@ -4467,9 +4487,9 @@ Draws a Bezier curve, based on a list of control points.
     my $self   = shift;
     my $params = shift;
 
-    my $size   = $params->{'pixel_size'} || 1;
-    my $closed = $params->{'closed'}     || 0;
-    my $filled = $params->{'filled'}     || 0;
+    my $size        = $params->{'pixel_size'} || 1;
+    my $closed      = $params->{'closed'}     || 0;
+    my $filled      = $params->{'filled'}     || 0;
 
     push(@{ $params->{'coordinates'} }, $params->{'coordinates'}->[0], $params->{'coordinates'}->[1]) if ($closed);
 
@@ -4561,6 +4581,7 @@ Draws an arc/pie/poly arc of a circle at point x,y.
     my $mode  = int($params->{'mode'}       || 0);
     my $size  = int($params->{'pixel_size'} || 1);
     my $bytes = $self->{'BYTES'};
+	my $min_bytes = $self->{'MIN_BYTES'};
 
     $start_degrees -= 90;
     $end_degrees   -= 90;
@@ -4665,9 +4686,9 @@ Draws an arc/pie/poly arc of a circle at point x,y.
             my $img = Imager->new(
                 'xsize'             => $w,
                 'ysize'             => $w,
-                'raw_datachannels'  => max(3, $bytes),
-                'raw_storechannels' => max(3, $bytes),
-                'channels'          => max(3, $bytes),
+                'raw_datachannels'  => $min_bytes,
+                'raw_storechannels' => $min_bytes,
+                'channels'          => $min_bytes,
                 'raw_interleave'    => 0,
             );
             unless ($self->{'DRAW_MODE'}) {
@@ -4680,9 +4701,9 @@ Draws an arc/pie/poly arc of a circle at point x,y.
                     $img->read(
                         'xsize'             => $w,
                         'ysize'             => $w,
-                        'raw_datachannels'  => max(3, $bytes),
-                        'raw_storechannels' => max(3, $bytes),
-                        'channels'          => max(3, $bytes),
+                        'raw_datachannels'  => $min_bytes,
+                        'raw_storechannels' => $min_bytes,
+                        'channels'          => $min_bytes,
                         'raw_interleave'    => 0,
                         'data'              => $saved->{'image'},
                         'type'              => 'raw',
@@ -4712,15 +4733,15 @@ Draws an arc/pie/poly arc of a circle at point x,y.
                 $image   = Imager->new(
                     'xsize'             => $w,
                     'ysize'             => $w,
-                    'raw_datachannels'  => max(3, $bytes),
-                    'raw_storechannels' => max(3, $bytes),
+                    'raw_datachannels'  => $min_bytes,
+                    'raw_storechannels' => $min_bytes,
                     'raw_interleave'    => 0,
                 );
                 $image->read(
                     'xsize'             => $w,
                     'ysize'             => $w,
-                    'raw_datachannels'  => max(3, $bytes),
-                    'raw_storechannels' => max(3, $bytes),
+                    'raw_datachannels'  => $min_bytes,
+                    'raw_storechannels' => $min_bytes,
                     'raw_interleave'    => 0,
                     'data'              => $pattern,
                     'type'              => 'raw',
@@ -4746,15 +4767,15 @@ Draws an arc/pie/poly arc of a circle at point x,y.
                 $image = Imager->new(
                     'xsize'             => $w,
                     'ysize'             => $w,
-                    'raw_datachannels'  => max(3, $bytes),
-                    'raw_storechannels' => max(3, $bytes),
+                    'raw_datachannels'  => $min_bytes,
+                    'raw_storechannels' => $min_bytes,
                     'raw_interleave'    => 0,
                 );
                 $image->read(
                     'xsize'             => $w,
                     'ysize'             => $w,
-                    'raw_datachannels'  => max(3, $bytes),
-                    'raw_storechannels' => max(3, $bytes),
+                    'raw_datachannels'  => $min_bytes,
+                    'raw_storechannels' => $min_bytes,
                     'raw_interleave'    => 0,
                     'data'              => $pattern,
                     'type'              => 'raw',
@@ -4765,8 +4786,8 @@ Draws an arc/pie/poly arc of a circle at point x,y.
             $img->arc(%p);
             $img->write(
                 'type'          => 'raw',
-                'datachannels'  => max(3, $bytes),
-                'storechannels' => max(3, $bytes),
+                'datachannels'  => $min_bytes,
+                'storechannels' => $min_bytes,
                 'interleave'    => 0,
                 'data'          => \$saved->{'image'},
             );
@@ -5019,6 +5040,7 @@ Draw an ellipse at center position x,y with XRadius, YRadius.  Either a filled e
     my $xdiameter = $XRadius * 2;
     my $ydiameter = $YRadius * 2;
     my $bytes     = $self->{'BYTES'};
+	my $color_alpha = $self->{'COLOR_ALPHA'};
     if (exists($params->{'gradient'})) {
         if ($params->{'gradient'}->{'direction'} !~ /vertical/i) {
             if (exists($params->{'gradient'}->{'colors'})) {
@@ -5031,7 +5053,7 @@ Draw an ellipse at center position x,y with XRadius, YRadius.  Either a filled e
                         'red'   => [$params->{'gradient'}->{'start'}->{'red'},   $params->{'gradient'}->{'end'}->{'red'}],
                         'green' => [$params->{'gradient'}->{'start'}->{'green'}, $params->{'gradient'}->{'end'}->{'green'}],
                         'blue'  => [$params->{'gradient'}->{'start'}->{'blue'},  $params->{'gradient'}->{'end'}->{'blue'}],
-                        'alpha' => (exists($params->{'gradient'}->{'start'}->{'alpha'})) ? [$params->{'gradient'}->{'start'}->{'alpha'},$params->{'gradient'}->{'end'}->{'alpha'}] : [$self->{'COLOR_ALPHA'},$self->{'COLOR_ALPHA'}],
+                        'alpha' => (exists($params->{'gradient'}->{'start'}->{'alpha'})) ? [$params->{'gradient'}->{'start'}->{'alpha'},$params->{'gradient'}->{'end'}->{'alpha'}] : [$color_alpha,$color_alpha],
                     },
                     'horizontal'
                 );
@@ -5047,7 +5069,7 @@ Draw an ellipse at center position x,y with XRadius, YRadius.  Either a filled e
                 if (exists($params->{'gradient'}->{'colors'}->{'alpha'})) {
                     @ac = multi_gradient($ydiameter, @{ $params->{'gradient'}->{'colors'}->{'alpha'} });
                 } else {
-                    @ac = map {$_ = $self->{'COLOR_ALPHA'}} (1..(scalar(@bc)));
+                    @ac = map {$_ = $color_alpha} (1..(scalar(@bc)));
                 }
             } else {
                 @rc = gradient($params->{'gradient'}->{'start'}->{'red'},   $params->{'gradient'}->{'end'}->{'red'},   $ydiameter);
@@ -5056,7 +5078,7 @@ Draw an ellipse at center position x,y with XRadius, YRadius.  Either a filled e
                 if (exists($params->{'gradient'}->{'start'}->{'alpha'})) {
                     @ac = gradient($params->{'gradient'}->{'start'}->{'alpha'}, $params->{'gradient'}->{'end'}->{'alpha'}, $ydiameter);
                 } else {
-                    @ac = map {$_ = $self->{'COLOR_ALPHA'}} (1..2);
+                    @ac = map {$_ = $color_alpha} (1..2);
                 }
             }
             $gradient = 1;
@@ -5563,6 +5585,7 @@ sub _fill_polygon {
     my $self   = shift;
     my $params = shift;
     my $bytes  = $self->{'BYTES'};
+	my $min_bytes = $self->{'MIN_BYTES'};
 
     my $points = [];
     my $left   = 0;
@@ -5619,17 +5642,17 @@ sub _fill_polygon {
         $img = Imager->new(
             'xsize'             => $width,
             'ysize'             => $height,
-            'raw_datachannels'  => max(3, $bytes),
-            'raw_storechannels' => max(3, $bytes),
-            'channels'          => max(3, $bytes),
+            'raw_datachannels'  => $min_bytes,
+            'raw_storechannels' => $min_bytes,
+            'channels'          => $min_bytes,
         );
         if (exists($saved->{'image'}) && defined($saved->{'image'})) {
             $img->read(
                 'xsize'             => $width,
                 'ysize'             => $height,
-                'raw_datachannels'  => max(3, $bytes),
-                'raw_storechannels' => max(3, $bytes),
-                'channels'          => max(3, $bytes),
+                'raw_datachannels'  => $min_bytes,
+                'raw_storechannels' => $min_bytes,
+                'channels'          => $min_bytes,
                 'raw_interleave'    => 0,
                 'data'              => $saved->{'image'},
                 'type'              => 'raw',
@@ -5642,10 +5665,10 @@ sub _fill_polygon {
             $pimg->read(
                 'xsize'             => $width,
                 'ysize'             => $height,
-                'raw_datachannels'  => max(3, $bytes),
-                'raw_storechannels' => max(3, $bytes),
+                'raw_datachannels'  => $min_bytes,
+                'raw_storechannels' => $min_bytes,
                 'raw_interleave'    => 0,
-                'channels'          => max(3, $bytes),
+                'channels'          => $min_bytes,
                 'data'              => $pattern,
                 'type'              => 'raw',
                 'allow_incomplete'  => 1
@@ -5669,8 +5692,8 @@ sub _fill_polygon {
         );
         $img->write(
             'type'          => 'raw',
-            'datachannels'  => max(3, $bytes),
-            'storechannels' => max(3, $bytes),
+            'datachannels'  => $min_bytes,
+            'storechannels' => $min_bytes,
             'interleave'    => 0,
             'data'          => \$saved->{'image'},
         );
@@ -5690,6 +5713,7 @@ sub _generate_fill {
 
     my $gradient = '';
     my $bytes    = $self->{'BYTES'};
+	my $min_bytes = $self->{'MIN_BYTES'};
     if (ref($type) eq 'HASH') {    # texture
         if ($type->{'width'} != $width || $type->{'height'} != $height) {
             my $new = $self->blit_transform(
@@ -5792,7 +5816,7 @@ sub _generate_fill {
                 $img = Imager->new(
                     'xsize'    => $width,
                     'ysize'    => $height,
-                    'channels' => max(3, $bytes)
+                    'channels' => $min_bytes,
                 );
 
                 # Hatch types:
@@ -5819,8 +5843,8 @@ sub _generate_fill {
                 $img->box('fill' => $fill);
                 $img->write(
                     'type'          => 'raw',
-                    'datachannels'  => max(3, $bytes),
-                    'storechannels' => max(3, $bytes),
+                    'datachannels'  => $min_bytes,
+                    'storechannels' => $min_bytes,
                     'interleave'    => 0,
                     'data'          => \$gradient
                 );
@@ -6190,7 +6214,7 @@ NOTE:  The accelerated version of this routine may (and it is a small may) have 
 		}
 	);
     my $bytes    = $self->{'BYTES'};
-	my $tc_bytes = max(3,$bytes);
+	my $tc_bytes = $self->{'MIN_BYTES'};
 	my $x_clip   = $self->{'X_CLIP'};
 	my $xx_clip  = $self->{'XX_CLIP'};
 	my $y_clip   = $self->{'Y_CLIP'};
@@ -6584,6 +6608,8 @@ The animation is played at the speed described by the file's metadata multiplied
 
 You need to enclose this in a loop if you wish it to play more than once.
 
+The animation will stop if "Q" is pressed
+
 =cut
 
     my $self  = shift;
@@ -6803,6 +6829,7 @@ It takes a hash reference.  It draws in the current drawing mode.
     my $draw_mode = $self->{'DRAW_MODE'};
     my $bytes     = $self->{'BYTES'};
 	my $bits      = $self->{'BITS'};
+	my $raw_background_color = $self->{'RAW_BACKGROUND_COLOR'};
 
     return unless (defined($params->{'image'}) && $params->{'image'} ne '' && $h && $w);
 
@@ -6910,15 +6937,15 @@ It takes a hash reference.  It draws in the current drawing mode.
                             $ipx  = $index + $px4;
                             $data = substr($self->{'SCREEN'}, $ipx, $bytes) || chr(0) x $bytes;
                             if ($self->{'BITS'} == 32) {
-                                if (substr($scrn, ($idx + $px4), 3) ne substr($self->{'RAW_BACKGROUND_COLOR'}, 0, 3)) {
+                                if (substr($scrn, ($idx + $px4), 3) ne substr($raw_background_color, 0, 3)) {
                                     substr($self->{'SCREEN'}, $ipx, $bytes) = substr($scrn, ($idx + $px4), $bytes);
                                 }
                             } elsif ($self->{'BITS'} == 24) {
-                                if (substr($scrn, ($idx + $px4), 3) ne $self->{'RAW_BACKGROUND_COLOR'}) {
+                                if (substr($scrn, ($idx + $px4), 3) ne $raw_background_color) {
                                     substr($self->{'SCREEN'}, $ipx, $bytes) = substr($scrn, ($idx + $px4), $bytes);
                                 }
                             } elsif ($self->{'BITS'} == 16) {
-                                if (substr($scrn, ($idx + $px4), 2) ne $self->{'RAW_BACKGROUND_COLOR'}) {
+                                if (substr($scrn, ($idx + $px4), 2) ne $raw_background_color) {
                                     substr($self->{'SCREEN'}, $ipx, $bytes) = substr($scrn, ($idx + $px4), $bytes);
                                 }
                             }
@@ -6929,15 +6956,15 @@ It takes a hash reference.  It draws in the current drawing mode.
                             $ipx  = $index + $px4;
                             $data = substr($self->{'SCREEN'}, $ipx, $bytes);
                             if ($self->{'BITS'} == 32) {
-                                if (substr($self->{'SCREEN'}, $ipx, 3) eq substr($self->{'RAW_BACKGROUND_COLOR'}, 0, 3)) {
+                                if (substr($self->{'SCREEN'}, $ipx, 3) eq substr($raw_background_color, 0, 3)) {
                                     substr($self->{'SCREEN'}, $ipx, $bytes) = substr($scrn, ($idx + $px4), $bytes);
                                 }
                             } elsif ($self->{'BITS'} == 24) {
-                                if (substr($self->{'SCREEN'}, $ipx, 3) eq $self->{'RAW_BACKGROUND_COLOR'}) {
+                                if (substr($self->{'SCREEN'}, $ipx, 3) eq $raw_background_color) {
                                     substr($self->{'SCREEN'}, $ipx, $bytes) = substr($scrn, ($idx + $px4), $bytes);
                                 }
                             } elsif ($self->{'BITS'} == 16) {
-                                if (substr($self->{'SCREEN'}, $ipx, 2) eq $self->{'RAW_BACKGROUND_COLOR'}) {
+                                if (substr($self->{'SCREEN'}, $ipx, 2) eq $raw_background_color) {
                                     substr($self->{'SCREEN'}, $ipx, $bytes) = substr($scrn, ($idx + $px4), $bytes);
                                 }
                             }
@@ -7129,6 +7156,7 @@ It returns the transformed image in the same format the other BLIT methods use. 
     my $width  = $params->{'blit_data'}->{'width'};
     my $height = $params->{'blit_data'}->{'height'};
     my $bytes  = $self->{'BYTES'};
+	my $min_bytes = max(3,$bytes);
 	my $bits   = $self->{'BITS'};
     my $bline  = $width * $bytes;
     my $image  = $params->{'blit_data'}->{'image'};
@@ -7143,8 +7171,8 @@ It returns the transformed image in the same format the other BLIT methods use. 
             $img->read(
                 'xsize'             => $width,
                 'ysize'             => $height,
-                'raw_datachannels'  => max(3, $bytes),
-                'raw_storechannels' => max(3, $bytes),
+                'raw_datachannels'  => $min_bytes,
+                'raw_storechannels' => $min_bytes,
                 'raw_interleave'    => FALSE,
                 'data'              => $image,
                 'type'              => 'raw',
@@ -7154,8 +7182,8 @@ It returns the transformed image in the same format the other BLIT methods use. 
             $dest->read(
                 'xsize'             => $params->{'merge'}->{'dest_blit_data'}->{'width'},
                 'ysize'             => $params->{'merge'}->{'dest_blit_data'}->{'height'},
-                'raw_datachannels'  => max(3, $bytes),
-                'raw_storechannels' => max(3, $bytes),
+                'raw_datachannels'  => $min_bytes,
+                'raw_storechannels' => $min_bytes,
                 'raw_interleave'    => FALSE,
                 'data'              => $params->{'merge'}->{'dest_blit_data'}->{'image'},
                 'type'              => 'raw',
@@ -7170,8 +7198,8 @@ It returns the transformed image in the same format the other BLIT methods use. 
             $height = $dest->getheight();
             $dest->write(
                 'type'          => 'raw',
-                'datachannels'  => max(3, $bytes),
-                'storechannels' => max(3, $bytes),
+                'datachannels'  => $min_bytes,
+                'storechannels' => $min_bytes,
                 'interleave'    => FALSE,
                 'data'          => \$data
             );
@@ -7272,8 +7300,8 @@ It returns the transformed image in the same format the other BLIT methods use. 
                 $img->read(
                     'xsize'             => $width,
                     'ysize'             => $height,
-                    'raw_storechannels' => max(3, $bytes),
-                    'raw_datachannels'  => max(3, $bytes),
+                    'raw_storechannels' => $min_bytes,
+                    'raw_datachannels'  => $min_bytes,
                     'raw_interleave'    => FALSE,
                     'data'              => $image,
                     'type'              => 'raw',
@@ -7290,7 +7318,7 @@ It returns the transformed image in the same format the other BLIT methods use. 
                 $img    = $rotated;
                 $img->write(
                     'type'          => 'raw',
-                    'storechannels' => max(3, $bytes),
+                    'storechannels' => $min_bytes,
                     'interleave'    => FALSE,
                     'data'          => \$data
                 );
@@ -7315,8 +7343,8 @@ It returns the transformed image in the same format the other BLIT methods use. 
             $img->read(
                 'xsize'             => $width,
                 'ysize'             => $height,
-                'raw_storechannels' => max(3, $bytes),
-                'raw_datachannels'  => max(3, $bytes),
+                'raw_storechannels' => $min_bytes,
+                'raw_datachannels'  => $min_bytes,
                 'raw_interleave'    => FALSE,
                 'data'              => $image,
                 'type'              => 'raw',
@@ -7335,7 +7363,7 @@ It returns the transformed image in the same format the other BLIT methods use. 
             my $scaledimg = $img->scale(%scale);
             $scaledimg->write(
                 'type'          => 'raw',
-                'storechannels' => max(3, $bytes),
+                'storechannels' => $min_bytes,
                 'interleave'    => FALSE,
                 'data'          => \$data
             );
@@ -7670,6 +7698,7 @@ Failures of this method are usually due to it not being able to find the font.  
 
     my $color_order = $self->{'COLOR_ORDER'};
     my $bytes       = $self->{'BYTES'};
+	my $min_bytes   = $self->{'MIN_BYTES'};
     my ($data, $shadow_font, $neg_width, $global_descent, $pos_width, $global_ascent, $descent, $ascent, $advance_width, $right_bearing);    # = ('','',0,0,0,0,0,0,0,0);
 
     if (defined($P_color)) {
@@ -7762,8 +7791,8 @@ Failures of this method are usually due to it not being able to find the font.  
                 $img->read(
                     'data'              => $image->{'image'},
                     'type'              => 'raw',
-                    'raw_datachannels'  => max(3, $bytes),
-                    'raw_storechannels' => max(3, $bytes),
+                    'raw_datachannels'  => $min_bytes,
+                    'raw_storechannels' => $min_bytes,
                     'raw_interleave'    => FALSE,
                     'xsize'             => $TTF_pw,
                     'ysize'             => $TTF_ph
@@ -7782,7 +7811,7 @@ Failures of this method are usually due to it not being able to find the font.  
         );
         $img->write(
             'type'          => 'raw',
-            'storechannels' => max(3, $bytes),    # Must be at least 24 bit
+            'storechannels' => $min_bytes,    # Must be at least 24 bit
             'interleave'    => FALSE,
             'data'          => \$data
         );
@@ -7867,6 +7896,7 @@ Text is started at "x" and wrapped to "x" for each line, no indentation.
 
     my $color_order = $self->{'COLOR_ORDER'};
     my $bytes       = $self->{'BYTES'};
+	my $min_bytes   = $self->{'MIN_BYTES'};
     my $data;
 
     if (defined($P_color)) {
@@ -7915,8 +7945,8 @@ Text is started at "x" and wrapped to "x" for each line, no indentation.
                 $img->read(
                     'data'              => $image->{'image'},
                     'type'              => 'raw',
-                    'raw_datachannels'  => max(3, $bytes),
-                    'raw_storechannels' => max(3, $bytes),
+                    'raw_datachannels'  => $min_bytes,
+                    'raw_storechannels' => $min_bytes,
                     'raw_interleave'    => FALSE,
                     'xsize'             => $self->{'W_CLIP'},
                     'ysize'             => $self->{'H_CLIP'},
@@ -7936,7 +7966,7 @@ Text is started at "x" and wrapped to "x" for each line, no indentation.
         );
         $img->write(
             'type'          => 'raw',
-            'storechannels' => max(3, $bytes),    # Must be at least 24 bit
+            'storechannels' => $min_bytes,    # Must be at least 24 bit
             'interleave'    => FALSE,
             'data'          => \$data
         );
@@ -8151,6 +8181,8 @@ If the image has multiple frames, then a reference to an array of hashes is retu
     my $bench_subtotal = $bench_start;
     my $bench_load     = $bench_start;
     my $color_order    = $self->{'COLOR_ORDER'};
+	my $bytes          = $self->{'BYTES'};
+	my $min_bytes      = $self->{'MIN_BYTES'};
     my $hold;
     if (defined($self->{'FFMPEG'}) && $params->{'file'} =~ /\.(mkv|mp4|avi|mpeg4|webp)$/i) { # This uses ffmpeg to convert a movie to a temporary GIF and then plays it
 		my $quiet = ($self->{'SHOW_ERRORS'}) ? 'verbose' : 'quiet';
@@ -8166,8 +8198,8 @@ If the image has multiple frames, then a reference to an array of hashes is retu
             @Img = Imager->read_multi(
                 'file'             => $params->{'file'},
                 'allow_incomplete' => TRUE,
-                'raw_datachannels' => max(3, $self->{'BYTES'}), # One of these is bound to work
-                'datachannels'     => max(3, $self->{'BYTES'}),
+                'raw_datachannels' => $min_bytes, # One of these is bound to work
+                'datachannels'     => $min_bytes,
             );
         };
         warn __LINE__ . " $@" if ($@ && $self->{'SHOW_ERRORS'});
@@ -8177,8 +8209,8 @@ If the image has multiple frames, then a reference to an array of hashes is retu
                 'file'             => $params->{'file'},
                 'interleave'       => FALSE,
                 'allow_incomplete' => TRUE,
-                'datachannels'     => max(3, $self->{'BYTES'}), # One of these is bound to work.
-                'raw_datachannels' => max(3, $self->{'BYTES'}),
+                'datachannels'     => $min_bytes, # One of these is bound to work.
+                'raw_datachannels' => $min_bytes,
             ));
         };
         warn __LINE__ . " $@" if ($@ && $self->{'SHOW_ERRORS'});
@@ -8438,6 +8470,7 @@ The Tagged Image File Format.  Sort of an older version of PNG (but not the same
 
     my $filename         = $params->{'file'} || 'screendump.jpg';
     my $bytes            = $self->{'BYTES'};
+	my $min_bytes        = $self->{'MIN_BYTES'};
     my ($width, $height) = ($self->{'XRES'}, $self->{'YRES'});
     my $scrn             = $self->blit_read({ 'x' => 0, 'y' => 0, 'width' => $width, 'height' => $height });
 
@@ -8449,8 +8482,8 @@ The Tagged Image File Format.  Sort of an older version of PNG (but not the same
     $img->read(
         'xsize'             => $scrn->{'width'},
         'ysize'             => $scrn->{'height'},
-        'raw_datachannels'  => max(3, $bytes),
-        'raw_storechannels' => max(3, $bytes),
+        'raw_datachannels'  => $min_bytes,
+        'raw_storechannels' => $min_bytes,
         'raw_interleave'    => FALSE,
         'data'              => $scrn->{'image'},
         'type'              => 'raw',
@@ -8458,8 +8491,8 @@ The Tagged Image File Format.  Sort of an older version of PNG (but not the same
     );
     my %p = (
         'type' => $type || 'raw',
-        'datachannels'  => max(3, $bytes),
-        'storechannels' => max(3, $bytes),
+        'datachannels'  => $min_bytes,
+        'storechannels' => $min_bytes,
         'interleave'    => FALSE,
         'file'          => $filename
     );
@@ -9464,7 +9497,7 @@ A copy of this license is included in the 'LICENSE' file in this distribution.
 
 =head1 VERSION
 
-Version 6.68 (Aug 27, 2025)
+Version 6.70 (Aug 29, 2025)
 
 =head1 THANKS
 

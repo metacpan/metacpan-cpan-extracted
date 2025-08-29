@@ -5,7 +5,7 @@ package Iterator::Flex::Role::Current::Closure;
 use strict;
 use warnings;
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 use Iterator::Flex::Utils qw( :default REG_ITERATOR REG_ITER_CURRENT );
 use Role::Tiny;
@@ -52,7 +52,7 @@ Iterator::Flex::Role::Current::Closure - Implement C<current> as a closure store
 
 =head1 VERSION
 
-version 0.27
+version 0.28
 
 =head1 METHODS
 

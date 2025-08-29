@@ -1,5 +1,5 @@
 package Sys::Info::Driver;
-$Sys::Info::Driver::VERSION = '0.7807';
+$Sys::Info::Driver::VERSION = '0.7808';
 use strict;
 use warnings;
 
@@ -17,7 +17,7 @@ Sys::Info::Driver
 
 =head1 VERSION
 
-version 0.7807
+version 0.7808
 
 =head1 NAME
 
@@ -33,7 +33,7 @@ L<Sys::Info::Driver::BSD>.
 
 =head1 AUTHOR
 
-Burak Gursoy <burak@cpan.org>
+Burak Gursoy
 
 =head1 COPYRIGHT AND LICENSE
 

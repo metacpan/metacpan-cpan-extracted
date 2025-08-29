@@ -448,7 +448,7 @@ sub create_db
         return( $self->error( "An error occured while prepareing SQL query to create database: ", $@ ) );
     }
     $sth or return( $self->error( "An error occured while prepareing SQL query to create database: ", $dbh->errstr ) );
-    
+
     $rc = eval
     {
         $dbh->prepare( $sql );
@@ -499,7 +499,7 @@ sub databases
         {
             @$con{ qw( host login passwd ) } = @_;
         }
-        
+
         # try-catch
         local $@;
         $dbh = eval
@@ -872,25 +872,25 @@ DB::Object::Mysql - Mysql Database Object
     $sth->execute() || die( $sth->errstr() );
     my $ref = $sth->fetchrow_hashref();
     $sth->finish();
-    
+
     # Get a list of databases;
     my @databases = $dbh->databases;
     # Doesn't exist? Create it:
     my $dbh2 = $dbh->create_db( 'webstore' );
     # Load some sql into it
     my $rv = $dbh2->do( $sql ) || die( $dbh->error );
-    
+
     # Check a table exists
     $dbh->table_exists( 'customers' ) || die( "Cannot find the customers table!\n" );
-    
+
     # Get list of tables, as array reference:
     my $tables = $dbh->tables;
-    
+
     my $cust = $dbh->customers || die( "Cannot get customers object." );
     $cust->where( email => 'john@example.org' );
     my $str = $cust->delete->as_string;
     # Becomes: DELETE FROM customers WHERE email='john\@example.org'
-    
+
     # Do some insert with transaction
     $dbh->begin_work;
     # Making some other inserts and updates here...
@@ -910,7 +910,7 @@ DB::Object::Mysql - Mysql Database Object
     $dbh->commit;
     # Get the last used insert id
     my $id = $dbh->last_insert_id();
-    
+
     $cust->where( email => 'john@example.org' );
     $cust->order( 'last_name' );
     $cust->having( email => qr/\@example/ );
@@ -918,20 +918,20 @@ DB::Object::Mysql - Mysql Database Object
     my $cust_sth_sel = $cust->select || die( "An error occurred while creating a query to select data frm table customers: " . $cust->error );
     # Becomes:
     # SELECT id, first_name, last_name, email, created, modified, active, created::ABSTIME::INTEGER AS created_unixtime, modified::ABSTIME::INTEGER AS modified_unixtime, CONCAT(first_name, ' ', last_name) AS name FROM customers WHERE email='john\@example.org' HAVING email ~ '\@example' ORDER BY last_name LIMIT 10
-    
+
     $cust->reset;
     $cust->where( email => 'john@example.org' );
     my $cust_sth_upd = $cust->update( active => 0 )
     # Would become:
     # UPDATE ONLY customers SET active='0' WHERE email='john\@example.org'
-    
+
     # Lets' dump the result of our query
     # First to STDERR
     $login->where( "login='jack'" );
     $login->select->dump();
     # Now dump the result to a file
     $login->select->dump( "my_file.txt" );
-    
+
 =head1 VERSION
 
     v1.4.0
@@ -1298,7 +1298,7 @@ L</format_update> will then iterate through each field-value pair, and perform s
 If the field being reviewed was provided to L<DB::Object/from_unixtime>, then L</format_update> will enclose it in the function FROM_UNIXTIME() as in:
 
     FROM_UNIXTIME(field_name)
-  
+
 If the the given value is a reference to a scalar, it will be used as-is, ie. it will not be enclosed in quotes or anything. This is useful if you want to control which function to use around that field.
 
 If the given value is another field or looks like a function having parenthesis, or if the value is a question mark, the value will be used as-is.

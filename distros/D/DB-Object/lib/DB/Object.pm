@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object.pm
-## Version v1.8.0
+## Version v1.8.1
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2025/07/30
+## Modified 2025/08/29
 ## All rights reserved
 ## 
 ## 
@@ -35,7 +35,7 @@ BEGIN
     use POSIX ();
     use Wanted;
     our $PLACEHOLDER_REGEXP = qr/\b\?\b/;
-    our $VERSION = 'v1.8.0';
+    our $VERSION = 'v1.8.1';
 };
 
 use strict;
@@ -366,7 +366,7 @@ sub connect
                 : $CACHE_DIR
     );
     $self->{unknown_field} = CORE::delete( $param->{unknown_field} ) if( CORE::exists( $param->{unknown_field} ) );
-    
+
     $param = $self->_check_connect_param( $param ) || return( $self->pass_error );
     my $opt = {};
     if( exists( $param->{opt} ) )
@@ -400,11 +400,11 @@ sub connect
     # Will be used in _dbi_connect()
     $self->{cache_connections} = CORE::delete( $param->{cache_connections} ) if( CORE::exists( $param->{cache_connections} ) );
     $self->{cache_table} = CORE::delete( $param->{cache_table} ) if( CORE::exists( $param->{cache_table} ) );
-    
+
     # If parameters starting with an upper case are provided, they are DBI database parameters
     #my @dbi_opts = grep( /^[A-Z][a-zA-Z]+/, keys( %$param ) );
     #@$opt{ @dbi_opts } = @$param{ @dbi_opts };
-    
+
     if( my $driver = $self->driver )
     {
         my $drh = $self->SUPER::install_driver( $driver ) ||
@@ -1152,6 +1152,7 @@ sub table
     if( $self->cache_table )
     {
         $tbl = $self->_cache_table(
+            host => $self->host,
             database => $self->database,
             table => $table,
         );
@@ -1162,7 +1163,7 @@ sub table
     {
         # cache_table is not enabled.
     }
-    
+
     if( !$tbl )
     {
         $tbl = $table_class->new( $table, 
@@ -1176,6 +1177,7 @@ sub table
         {
             $self->messagec( 6, "Caching table {green}${table}{/}" );
             $self->_cache_table(
+                host => $self->host,
                 database => $self->database,
                 table => $tbl,
             ) || return( $self->pass_error );
@@ -1403,48 +1405,73 @@ sub _cache_table
     my $self = shift( @_ );
     my $opts = $self->_get_args_as_hash( @_ );
     my $class = ( ref( $self ) || $self );
-    my $sym = $self->_get_symbol( '$TABLE_CACHE' );
-    if( !defined( $sym ) )
+    my $repo = Module::Generic::Global->new( table_cache => 'system' ) ||
+        return( $self->pass_error( Module::Generic::Global->error ) );
+    $repo->lock;
+    my $cache = $repo->get // {};
+    unless( CORE::exists( $opts->{host} ) && CORE::exists( $opts->{database} ) )
     {
-        return( $self->pass_error ) if( $self->error );
-        return( $self->error( "No variable ${class}::TABLE_CACHE could be found!" ) );
+        return( $cache );
     }
-    ref( $$sym ) eq 'HASH' or return( $self->error( "Variable ${class}::TABLE_CACHE is not an hash reference." ) );
-    my $cache = $$sym;
-    if( CORE::exists( $opts->{database} ) )
+    my( $host, $database, $table ) = @$opts{qw( host database table )};
+    return( $self->error( "A host name was provided, but is undefined or empty." ) ) if( !defined( $host ) || !CORE::length( $host // '' ) );
+    return( $self->error( "A database name was provided, but is undefined or empty." ) ) if( !defined( $database ) || !CORE::length( $database // '' ) );
+    my $updated = 0;
+    if( !defined( $cache->{ $host } ) )
     {
-        my( $database, $table ) = @$opts{qw( database table )};
-        return( $self->error( "A database name was provided, but is undefined or empty." ) ) if( !defined( $database ) || !CORE::length( $database // '' ) );
-        if( !defined( $cache->{ $database } ) )
+        if( !CORE::exists( $cache->{ $host } ) ||
+            ref( $cache->{ $host } ) ne 'HASH' )
         {
-            $cache->{ $database } = {} if( !CORE::exists( $cache->{ $database } ) || ref( $cache->{ $database } ) ne 'HASH' );
-        }
-        $self->messagec( 6, "There are {green}", scalar( keys( %{$cache->{ $database }} ) ), "{/} eements in hash reference \$cache->\{ $database \}" );
-        return( $cache->{ $database } ) if( !defined( $table ) );
-        if( $self->_is_a( $table => 'DB::Object::Tables' ) )
-        {
-            my $name = $table->name || 
-                return( $self->error( "No table name associated with this table object." ) );
-            my $dbo = $table->database_object;
-            $table->database_object( undef );
-            my $clone = $table->clone;
-            $table->database_object( $dbo );
-            $cache->{ $database }->{ "$name" } = $clone;
-        }
-        elsif( !ref( $table ) || ( ref( $table ) && $self->_can_overload( $table => '""' ) ) )
-        {
-            return( '' ) if( !CORE::exists( $cache->{ $database }->{ "$table" } ) || !defined( $cache->{ $database }->{ "$table" } ) );
-            my $tbl = $cache->{ $database }->{ "$table" };
-            my $clone = $tbl->clone;
-            $clone->database_object( $self );
-            return( $clone );
-        }
-        else
-        {
-            return( $self->error( "I do not understand the value provided for the 'table' option -> ", overload::StrVal( $table ) ) );
+            $cache->{ $host } = {};
+            $updated++;
         }
     }
-    return( $cache // {} );
+    if( !defined( $cache->{ $host }->{ $database } ) )
+    {
+        if( !CORE::exists( $cache->{ $host }->{ $database } ) ||
+            ref( $cache->{ $host }->{ $database } ) ne 'HASH' )
+        {
+            $cache->{ $host }->{ $database } = {};
+            $updated++;
+        }
+    }
+    $self->messagec( 6, "There are {green}", scalar( keys( %{$cache->{ $host }->{ $database }} ) ), "{/} elements in hash reference \$cache->\{ $host \}->\{ $database \}" );
+    # The caller has not provided any table value, hinting it wants the entire hash repository for this database.
+    if( !defined( $table ) )
+    {
+        $repo->set( $cache ) if( $updated );
+        return( $cache->{ $host }->{ $database } );
+    }
+    # We are given a table object, we store it in the repository. This is mutator mode
+    if( $self->_is_a( $table => 'DB::Object::Tables' ) )
+    {
+        my $name = $table->name || 
+            return( $self->error( "No table name associated with this table object." ) );
+        my $dbo = $table->database_object;
+        $table->database_object( undef );
+        my $clone = $table->clone;
+        $table->database_object( $dbo );
+        $cache->{ $host }->{ $database }->{ "$name" } = $clone;
+        $repo->set( $cache );
+    }
+    # The user has provided a table name, and thus expects the related cloned table object from the cache table repository.
+    # This is accessor mode.
+    elsif( !ref( $table ) || ( ref( $table ) && $self->_can_overload( $table => '""' ) ) )
+    {
+        if( !CORE::exists( $cache->{ $host }->{ $database }->{ "$table" } ) || 
+            !defined( $cache->{ $host }->{ $database }->{ "$table" } ) )
+        {
+            return( '' );
+        }
+        my $tbl = $cache->{ $host }->{ $database }->{ "$table" };
+        my $clone = $tbl->clone;
+        $clone->database_object( $self );
+        return( $clone );
+    }
+    else
+    {
+        return( $self->error( "I do not understand the value provided for the 'table' option -> ", $self->_str_va( $table ) ) );
+    }
 }
 
 sub _cache_this
@@ -1508,7 +1535,7 @@ sub _cache_this
         # Maybe we ought to write:
         # $prepare = $cache ? \&prepare_cached : \prepare;
         # $sth = $prepare->( $self, $self->{ 'query' } ) ||
-    
+
         # $sth = $self->prepare_cached( $query ) ||
         my $prepare_options = {};
         if( $q && $self->_is_a( $q, 'DB::Object::Query' ) )
@@ -1663,22 +1690,22 @@ sub _connection_params2hash
             $param->{ $keys[ $i ] } = $_[ $i ];
         }
     }
-    
+
     my $equi =
     {
-    database => 'DB_NAME',
-    login    => 'DB_LOGIN',
-    passwd   => 'DB_PASSWD',
-    host     => 'DB_HOST',
-    port     => 'DB_PORT',
-    driver   => 'DB_DRIVER',
-    schema   => 'DB_SCHEMA',
+        database => 'DB_NAME',
+        login    => 'DB_LOGIN',
+        passwd   => 'DB_PASSWD',
+        host     => 'DB_HOST',
+        port     => 'DB_PORT',
+        driver   => 'DB_DRIVER',
+        schema   => 'DB_SCHEMA',
     };
     foreach my $prop ( keys( %$equi ) )
     {
         $param->{ $prop } = $ENV{ $equi->{ $prop } } if( $ENV{ $equi->{ $prop } } && !length( $param->{ $prop } ) );
     }
-    
+
     # A simple json file
     # An URI could be http://localhost:5432?database=somedb etc...
     # or it could also be file:/foo/bar?opt={"RaiseError":true}
@@ -1734,7 +1761,7 @@ sub _connection_params2hash
             }
         }
     }
-    
+
     if( $param->{conf_file} || $param->{config_file} || $ENV{DB_CON_FILE} )
     {
         my $db_con_file = $self->new_file( CORE::delete( $param->{conf_file} ) || CORE::delete( $param->{config_file} ) || $ENV{DB_CON_FILE} );
@@ -1755,7 +1782,7 @@ sub _connection_params2hash
         {
             $db_con_file_ok++;
         }
-        
+
         my $json = {};
         # try-catch
         local $@;
@@ -1823,7 +1850,7 @@ sub _connection_params2hash
     {
         @$param{ qw( host port ) } = split( /:/, $param->{host}, 2 );
     }
-    
+
     if( !$param->{opt} && $ENV{DB_OPT} )
     {
         my $jdata = {};
@@ -2158,7 +2185,7 @@ AUTOLOAD
     push( @supported_class, 'DB::Object' );
     my $ok_classes = join( '|', @supported_class );
     my $base_class = ( $class =~ /^($ok_classes)/ )[0];
-    
+
     # Is it a table object that is being requested?
     # if( $self && scalar( grep{ /^$meth$/ } @$tables ) )
     # Getting table object take NO argument.
@@ -2246,7 +2273,7 @@ AUTOLOAD
         }
         $@ = $save;
     }
-    
+
     if( $self && exists( $self->{sth} ) )
     {
         # e.g. $sth->pg_server_prepare => $self->{sth}->{pg_server_prepare}
@@ -2886,7 +2913,7 @@ In future release, other operators than C<=> will be implemented for C<JSON> and
 
 =head1 VERSION
 
-    v1.8.0
+    v1.8.1
 
 =head1 DESCRIPTION
 
@@ -3042,7 +3069,7 @@ Alternatively, it can contain connections parameters for multiple databases and 
 This is used to specify an uri to contain all the connection parameters for one database connection. It can also provided via the environment variable I<DB_CON_URI>. For example:
 
     http://db.example.com:5432?database=some_database&login=sql_joe&passwd=some%020password&driver=Pg&schema=warehouse&&opt=%7B%22RaiseError%22%3A+false%2C+%22PrintError%22%3Atrue%2C+%22AutoCommit%22%3Atrue%7D
-    
+
 Here the I<opt> parameter is passed as a json string, for example:
 
     {"RaiseError": false, "PrintError":true, "AutoCommit":true}

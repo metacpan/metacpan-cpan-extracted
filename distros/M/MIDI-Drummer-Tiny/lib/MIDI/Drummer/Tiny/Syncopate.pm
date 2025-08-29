@@ -1,5 +1,5 @@
 package MIDI::Drummer::Tiny::Syncopate;
-$MIDI::Drummer::Tiny::Syncopate::VERSION = '0.6011';
+$MIDI::Drummer::Tiny::Syncopate::VERSION = '0.6012';
 our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Syncopation logic
@@ -191,7 +191,7 @@ MIDI::Drummer::Tiny::Syncopate - Syncopation logic
 
 =head1 VERSION
 
-version 0.6011
+version 0.6012
 
 =head1 SYNOPSIS
 

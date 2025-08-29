@@ -1,6 +1,7 @@
 blib*
 Makefile
 Makefile.old
+build
 Build
 Build.bat
 _build*
@@ -23,3 +24,4 @@ examples/multiprocessing/many*
 examples/multiprocessing/mce*
 t/*.pl
 fix
+.git/

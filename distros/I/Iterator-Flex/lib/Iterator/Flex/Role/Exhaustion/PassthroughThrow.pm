@@ -5,7 +5,7 @@ package Iterator::Flex::Role::Exhaustion::PassthroughThrow;
 use strict;
 use warnings;
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 use Role::Tiny;
 use experimental 'signatures';
@@ -65,7 +65,7 @@ Iterator::Flex::Role::Exhaustion::PassthroughThrow - signal exhaustion by transi
 
 =head1 VERSION
 
-version 0.27
+version 0.28
 
 =head1 METHODS
 

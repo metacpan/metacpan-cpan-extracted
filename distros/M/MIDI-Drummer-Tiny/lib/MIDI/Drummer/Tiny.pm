@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Glorified metronome
 
-our $VERSION = '0.6011';
+our $VERSION = '0.6012';
 
 use 5.024;
 use strictures 2;
@@ -136,7 +136,7 @@ sub BUILD ( $self, $args_ref ) {
 #pod =cut
 
 has file => (
-    is      => 'ro',
+    is      => 'rw',
     isa     => MIDI_File,
     coerce  => 1,
     default => 'MIDI-Drummer.mid',
@@ -1470,7 +1470,7 @@ MIDI::Drummer::Tiny - Glorified metronome
 
 =head1 VERSION
 
-version 0.6011
+version 0.6012
 
 =head1 SYNOPSIS
 

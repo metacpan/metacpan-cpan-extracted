@@ -6,7 +6,7 @@ use v5.34.0; # The Perl version on Slackware 15.0 (sbozyp's min supported versio
 
 package Sbozyp;
 
-our $VERSION = '0.4.2';
+our $VERSION = '0.5.0';
 
 use File::Basename qw(basename dirname);
 use File::Temp;
@@ -171,6 +171,8 @@ sub query_command_main {
         '-a'     => \my $opt_listinstalled,
         '-d'     => \my $opt_slackdesc,
         '-i'     => \my $opt_info,
+        '-n'     => \my $opt_recdependents,
+        '-o'     => \my $opt_directdependents,
         '-p'     => \my $opt_pkginstalled,
         '-q'     => \my $opt_printqueue,
         '-r'     => \my $opt_readme,
@@ -178,13 +180,13 @@ sub query_command_main {
         '-u'     => \my $opt_listneedupgrade
     );
     if ($opt_help) { print $help_msg ; return }
-    my $opts_set = 0; for ($opt_listinstalled,$opt_slackdesc,$opt_info,$opt_pkginstalled,$opt_printqueue,$opt_readme,$opt_slackbuild,$opt_listneedupgrade) { $opts_set++ if defined }
+    my $opts_set = 0; for ($opt_listinstalled,$opt_slackdesc,$opt_info,$opt_recdependents,$opt_directdependents,$opt_pkginstalled,$opt_printqueue,$opt_readme,$opt_slackbuild,$opt_listneedupgrade) { $opts_set++ if defined }
     if    ($opts_set > 1)  { sbozyp_die("can only set 1 option but $opts_set were set") }
     elsif ($opts_set == 0) { @_ == 1 or die "$usage\n"; my $pkg = pkg($_[0]); query_pkg_ui($pkg) }
     else {
-        my $opt = $opt_listinstalled ? '-a' : $opt_slackdesc ? '-d' : $opt_info ? '-i' : $opt_pkginstalled ? '-p' : $opt_printqueue ? '-q' : $opt_readme ? '-r' : $opt_slackbuild ? '-s' : $opt_listneedupgrade ? '-u' : die;
+        my $opt = $opt_listinstalled ? '-a' : $opt_slackdesc ? '-d' : $opt_info ? '-i' : $opt_recdependents ? '-n' : $opt_directdependents ? '-o' : $opt_pkginstalled ? '-p' : $opt_printqueue ? '-q' : $opt_readme ? '-r' : $opt_slackbuild ? '-s' : $opt_listneedupgrade ? '-u' : die;
         my $pkg;
-        if ($opt_slackdesc || $opt_info || $opt_pkginstalled || $opt_printqueue || $opt_readme || $opt_slackbuild) {
+        if ($opt_slackdesc || $opt_info || $opt_recdependents || $opt_directdependents || $opt_pkginstalled || $opt_printqueue || $opt_readme || $opt_slackbuild) {
             @_ == 1 or sbozyp_die("query: option '$opt' requires single PKGNAME argument");
             $pkg = pkg($_[0]);
         } else { @_ == 0 or sbozyp_die("query: option '$opt' does not take PKGNAME argument") }
@@ -195,13 +197,15 @@ sub query_command_main {
                 print $pkgname, "\n";
             }
         }
-        elsif ($opt_slackdesc)    { sbozyp_print_file("$pkg->{PKGDIR}/slack-desc")                                           }
-        elsif ($opt_info)         { sbozyp_print_file("$pkg->{PKGDIR}/$pkg->{PRGNAM}.info")                                  }
-        elsif ($opt_pkginstalled) { if (defined(my $version = pkg_installed($pkg))) { print "$version\n" } else { die "\n" } }
-        elsif ($opt_printqueue)   { print "$_->{PKGNAME}\n" for pkg_queue($pkg)                                              }
-        elsif ($opt_readme)       { sbozyp_print_file("$pkg->{PKGDIR}/README")                                               }
-        elsif ($opt_slackbuild)   { sbozyp_print_file("$pkg->{PKGDIR}/$pkg->{PRGNAM}.SlackBuild")                            }
-        elsif ($opt_listneedupgrade) {
+        elsif ($opt_slackdesc)        { sbozyp_print_file("$pkg->{PKGDIR}/slack-desc")                         }
+        elsif ($opt_info)             { sbozyp_print_file("$pkg->{PKGDIR}/$pkg->{PRGNAM}.info")                }
+        elsif ($opt_recdependents)    { print "$_->{PKGNAME}\n" for pkg_dependents_recursive($pkg)             }
+        elsif ($opt_directdependents) { print "$_->{PKGNAME}\n" for pkg_dependents_direct($pkg)                }
+        elsif ($opt_pkginstalled)     { if (defined(my $version = pkg_installed($pkg))) { print "$version\n" } }
+        elsif ($opt_printqueue)       { print "$_->{PKGNAME}\n" for pkg_queue($pkg)                            }
+        elsif ($opt_readme)           { sbozyp_print_file("$pkg->{PKGDIR}/README")                             }
+        elsif ($opt_slackbuild)       { sbozyp_print_file("$pkg->{PKGDIR}/$pkg->{PRGNAM}.SlackBuild")          }
+        elsif ($opt_listneedupgrade)  {
             my %installed_sbo_pkgs = installed_sbo_pkgs();
             for my $pkgname (sort keys %installed_sbo_pkgs) {
                 my $installed_version = $installed_sbo_pkgs{$pkgname};
@@ -311,7 +315,7 @@ sub pkg {
             else                                       { 0             }
         }
     };
-    return wantarray ? %$pkg : $pkg;
+    return $pkg
 }
 
 sub query_pkg_ui {
@@ -350,8 +354,8 @@ sub query_pkg_ui {
 
 sub pkg_installed {
     my ($pkg) = @_;
-    my $installed_sbo_pkgs = installed_sbo_pkgs(); # hash from PKGNAME to version
-    my $version = $installed_sbo_pkgs->{$pkg->{PKGNAME}};
+    my %installed_sbo_pkgs = installed_sbo_pkgs(); # hash from PKGNAME to version
+    my $version = $installed_sbo_pkgs{$pkg->{PKGNAME}};
     return $version;
 }
 
@@ -680,7 +684,6 @@ sub pkg_queue {
     my @queue = ($pkg);
     my $resolve_deps = sub {
         my ($pkg) = @_;
-        # $pkg->{REQUIRES} will never contain %README% as its removed when we parse a pkgs info file (see pkg()).
         for my $req (@{$pkg->{REQUIRES}}) {
             my $req_pkg = pkg($req);
             @queue = grep { $req_pkg->{PKGNAME} ne $_->{PKGNAME} } @queue;
@@ -704,6 +707,36 @@ sub merge_pkg_queues {
     return @queue;
 }
 
+sub pkg_dependents_direct {
+    my ($pkg) = @_;
+    my @dependents;
+    my @installed_sbo_pkgs = keys %{{ installed_sbo_pkgs() }};
+    for my $pkgname (@installed_sbo_pkgs) {
+        my $pkg_ = pkg($pkgname);
+        my @deps = @{$pkg_->{REQUIRES}};
+        push @dependents, $pkg_ if grep { $pkg->{PRGNAM} eq $_ } @deps;
+    }
+    @dependents = sort { $a->{PKGNAME} cmp $b->{PKGNAME} } @dependents;
+    return @dependents;
+}
+
+sub pkg_dependents_recursive {
+    my ($pkg) = @_;
+    my @dependents;
+    my %seen;
+    my $resolve_dependents = sub {
+        my @pkgs = @_;
+        for my $pkg (@pkgs) {
+            next if $seen{$pkg->{PKGNAME}};
+            $seen{$pkg->{PKGNAME}} = 1;
+            push @dependents, $pkg;
+            __SUB__->(pkg_dependents_direct($pkg));
+        }
+    };
+    $resolve_dependents->(pkg_dependents_direct($pkg));
+    @dependents = sort { $a->{PKGNAME} cmp $b->{PKGNAME} } @dependents;
+    return @dependents;
+}
 sub parse_slackware_pkgname {
     my ($slackware_pkgname) = @_;
     my ($prgnam, $version) = $slackware_pkgname =~ /^([\w-]+)-([^-]*)-[^-]*-\d+_SBo$/;
@@ -751,7 +784,7 @@ sub installed_sbo_pkgs {
             defined $pkgname ? ($pkgname, $version) : ();
         } grep /_SBo$/, sbozyp_readdir("$root/var/lib/pkgtools/packages");
     }
-    return wantarray ? %installed_sbo_pkgs : \%installed_sbo_pkgs;
+    return %installed_sbo_pkgs;
 }
 
 sub prepare_pkg {
@@ -831,7 +864,7 @@ sub manage_install_queue_ui {
             $error_msg = "invalid input: '$input'";
         }
     }
-    return wantarray ? @pkg_queue : \@pkg_queue;
+    return @pkg_queue;
 }
 
 sub install_slackware_pkg {
@@ -1081,7 +1114,7 @@ Examples:
 
 =head2 QUERY
 
- Usage: sbozyp <query|qr> [-h] [-a] [-d] [-i] [-p] [-q] [-r] [-s] [-u] PKGNAME?
+ Usage: sbozyp <query|qr> [-h] [-a] [-d] [-i] [-n] [-o] [-p] [-q] [-r] [-s] [-u] PKGNAME?
 
 Query for package related information.
 
@@ -1097,7 +1130,9 @@ Options are:
  -a                  Print a list of all SBo packages installed on the system
  -d                  Print PKGNAME's slack-desc file
  -i                  Print PKGNAME's info file
- -p                  If PKGNAME is installed print the installed version, else exit with status 1
+ -n                  Print PKGNAME's recursive dependents
+ -o                  Print PKGNAME'S direct dependents
+ -p                  If PKGNAME is installed print the installed version
  -q                  Print PKGNAME's dependencies (recursively and in order)
  -r                  Print PKGNAME's README file
  -s                  Print PKGNAME's .SlackBuild file
@@ -1108,7 +1143,7 @@ Examples:
  sbozyp query --help
  sbozyp qr system/password-store
  sbozyp qr -q password-store
- sbozyp qr -u
+ sbozyp -S qr -u
  sbozyp -S -R $REPO qr password-store
 
 =head2 SEARCH

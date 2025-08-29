@@ -1,5 +1,8 @@
 Revision history for idi
 
+0.0505    2025-08-28 17:28:10 PDT
+    - Correct the drummer file() and write() logic.
+
 0.0504    2025-08-28 01:33:24 PDT
     - Show an extended example of random u() phrases.
 

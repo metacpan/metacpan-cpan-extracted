@@ -19,7 +19,7 @@ my %module_build_args = (
     "Mark Hofstetter <cpan\@trust-box.at>"
   ],
   "dist_name" => "Koha-Contrib-ValueBuilder-RepeatableAutocomplete",
-  "dist_version" => "1.005",
+  "dist_version" => "1.006",
   "license" => "perl",
   "module_name" => "Koha::Contrib::ValueBuilder::RepeatableAutocomplete",
   "recursive_test_files" => 1,
