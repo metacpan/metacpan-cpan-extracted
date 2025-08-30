@@ -6,17 +6,9 @@ use Getopt::Long;
 use JSON::XS qw/decode_json/;
 use Pod::Usage;
 use Schedule::Easing;
+use Schedule::Easing::Stream;
 
-#        (these likely all belong in Schedule::Easing::Stream)
-#
-# todo:  stream batching (performance)
-# todo:  reduce the number of calls to time(), maybe via alarm()?
-#        timecheck=lines,##,sleep,##,clock,##,regexp,string
-#        where lines=## would update the time every ## lines
-#        where sleep=## if there is no input, wait ##sec before checking (might block fifo) (but will be interrupted by clock/alarm())
-#        where clock=## uses alarm(##) to uptime the time every ## seconds
-#        where regexp=string would use the pattern to get the time from the lines (but this requires epoch time)
-# todo:  support historical checking, pulling the timestamp from the line itself
+# todo:  replay mode, historical checking, pulling the timestamp from the line itself?
 
 sub load {
 	my ($fn)=@_;
@@ -53,6 +45,7 @@ my %opt=(
 	timestamps=>0,
 	expiration=>0,
 	check     =>0,
+	stream    =>'lines=>1',
 	help      =>0,
 	time      =>undef,
 );
@@ -60,9 +53,10 @@ my %opt=(
 GetOptions(
 	'schedule=s'=>\$opt{schedule},
 	'json=s'    =>\$opt{json},
-	'timestamps'=>\$opt{expiration},
+	'timestamps'=>\$opt{timestamps},
 	'expiration'=>\$opt{expiration},
 	'check'     =>\$opt{check},
+	'stream=s'  =>\$opt{stream},
 	'help'      =>\$opt{help},
 	'time=i'    =>\$opt{time},    # undocumented
 );
@@ -73,8 +67,6 @@ my @schedule=
 	$opt{json}     ? loadjson($opt{json}) :
 	die 'Configuration is required';
 
-# Needs updated to support stream options.
-
 my $easing=Schedule::Easing->new(
 	schedule=>\@schedule,
 	warnExpired=>$opt{expiration}||$opt{check},
@@ -82,16 +74,26 @@ my $easing=Schedule::Easing->new(
 if(!$easing)    { exit(1) }
 if($opt{check}) { exit(0+!!$$easing{_err}) }
 
-while(<>) {
-	if($opt{timestamps}) { foreach my $sched ($easing->schedule(events=>[$_])) {
-		# UNTESTED
-		$$sched[0]//=9999999999;
-		print "$$sched[0] $_\n";
-	} }
-	else {
-		print $easing->matches(ts=>$opt{time},events=>[$_]);
-	}
+my ($inputcb,$updatecb,%streamopt);
+eval "\%streamopt=($opt{stream});";
+if($@) { die "Stream options error:  $@" }
+
+if($opt{timestamps}) {
+	$inputcb=sub {
+		foreach my $sched ($easing->schedule(events=>[@_])) {
+			$$sched[0]//=9999999999; print join(' ',@$sched); } };
+	$updatecb=undef;
 }
+else {
+	my $currentts;
+	$inputcb=sub { print $easing->matches(ts=>$currentts,events=>[@_]) };
+	if($opt{time}) { $currentts=$opt{time}; $updatecb=undef }
+	else { $updatecb=sub { $currentts=time() } }
+}
+
+my $stream=Schedule::Easing::Stream->new(fh=>\*STDIN,input=>$inputcb,update=>$updatecb,%streamopt);
+$stream->read();
+
 
 __END__
 
@@ -106,11 +108,13 @@ schedule-easing.pl - Filter messages based on a schedule.
 	schedule-easing.pl [options] [--schedule=file | --json=file] [file ...]
 	
 	options:
-		--timestamps:  (not yet available) for every event, compute the timestamp it would become active
+		--timestamps:  for every event, compute the timestamp it would become active
 		               (epoch seconds, or 0="always", or 9999999999="never")
 		--expiration:  warn on startup if schedule entries have expired (default=false)
 		               (currently 0/1, but may support flagged options in the future)
 		--check:       verify the schedule configuration, non-zero exit on any warnings
+		--stream:      stream options as a Perl hash declaration:
+		               "sleep=>N,clock=>N,batch=>N,lines=>N,regexp=>qr/.../"
 		--help
 	
 	The format of the scheduling file is described in Schedule::Easing.

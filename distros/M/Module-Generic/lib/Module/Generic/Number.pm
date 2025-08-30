@@ -893,7 +893,8 @@ sub decode_lconv
     return( $ref );
 };
 
-sub default { return( shift->_set_get_hash_as_mix_object( 'default', @_ ) ); }
+# sub default { return( shift->_set_get_hash_as_mix_object( 'default', @_ ) ); }
+sub default { return( shift->_set_get_hash( 'default', @_ ) ); }
 
 sub encoding { return( shift->_set_get_scalar( 'encoding', @_ ) ); }
 

@@ -875,8 +875,8 @@ if($p > $mbi &&
    $p >= $mbi &&
    $mbi < $p &&
    $mbi <= $p &&
-   ($p <=> $mbi) > 0 &&
-   ($mbi <=> $p) < 0 &&
+   ($p <=> $mbi) == 1 &&
+   ($mbi <=> $p) == -1 &&
    $p != $mbi &&
    !($p == $mbi) &&
    Math::MPFR::get_refcnt($p) == $expected_refcnt) {print "ok 51\n"}

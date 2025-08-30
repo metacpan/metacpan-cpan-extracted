@@ -1,0 +1,29 @@
+# Copyright (c) 2025 Yuki Kimoto
+# MIT License
+
+class Compress::Raw::Zlib::Base {
+  version_from Compress::Raw::Zlib;
+  
+  use Compress::Raw::Zlib::Z_stream;
+  
+  # Fields
+  has WindowBits : int;
+  
+  has Dictionary : string;
+  
+  has Bufsize : long;
+  
+  has z_stream : Compress::Raw::Zlib::Z_stream;
+  
+  # Instance Methods
+  native method total_out : long ();
+  
+  native method total_in : long ();
+  
+  method get_Bufsize : long () {
+    return $self->{Bufsize};
+  }
+  
+  native method adler : long ();
+  
+}

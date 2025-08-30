@@ -2557,22 +2557,25 @@ SV * Rmpfr_get_IV(pTHX_ mpfr_t * x, SV * round) {
 #endif
 }
 
-int Rmpfr_set_IV(pTHX_ mpfr_t * x, SV * sv,  SV * round) {
-  CHECK_ROUNDING_VALUE
+int Rmpfr_set_IV(pTHX_ mpfr_t * x, SV * sv,  unsigned int rnd) {
+#if MPFR_VERSION_MAJOR < 4
+  if((mp_rnd_t)rnd > 4)
+    croak("Illegal rounding value supplied for this version (%s) of the mpfr library", MPFR_VERSION_STRING);
+#endif
 
   if(!SV_IS_IOK(sv))
     croak("Arg provided to Rmpfr_set_IV is not an IV");
 
 #if defined MATH_MPFR_NEED_LONG_LONG_INT
   if(SvUOK(sv))
-    return mpfr_set_uj(*x, SvUV(sv), (mpfr_rnd_t)SvNV(round));
+    return mpfr_set_uj(*x, SvUV(sv), (mpfr_rnd_t)rnd);
 
-  return mpfr_set_sj(*x, SvIV(sv), (mpfr_rnd_t)SvNV(round));
+  return mpfr_set_sj(*x, SvIV(sv), (mpfr_rnd_t)rnd);
 #else
   if(SvUOK(sv))
-    return mpfr_set_ui(*x, SvUV(sv), (mpfr_rnd_t)SvNV(round));
+    return mpfr_set_ui(*x, SvUV(sv), (mpfr_rnd_t)rnd);
 
-  return mpfr_set_si(*x, SvIV(sv), (mpfr_rnd_t)SvNV(round));
+  return mpfr_set_si(*x, SvIV(sv), (mpfr_rnd_t)rnd);
 #endif
 }
 
@@ -2589,7 +2592,7 @@ void Rmpfr_init_set_IV(pTHX_ SV * q, SV * round) {
 
   mpfr_init(*mpfr_t_obj);
   sv_setiv(obj, INT2PTR(IV,mpfr_t_obj));
-  ret = Rmpfr_set_IV(aTHX_ mpfr_t_obj, q, round);
+  ret = Rmpfr_set_IV(aTHX_ mpfr_t_obj, q, SvUV(round));
   SvREADONLY_on(obj);
   RETURN_STACK_2  /*defined in math_mpfr_include.h */
 }
@@ -2607,7 +2610,7 @@ void Rmpfr_init_set_IV_nobless(pTHX_ SV * q, SV * round) {
 
   mpfr_init(*mpfr_t_obj);
   sv_setiv(obj, INT2PTR(IV,mpfr_t_obj));
-  ret = Rmpfr_set_IV(aTHX_ mpfr_t_obj, q, round);
+  ret = Rmpfr_set_IV(aTHX_ mpfr_t_obj, q, SvUV(round));
   SvREADONLY_on(obj);
   RETURN_STACK_2  /*defined in math_mpfr_include.h */
 }
@@ -4239,15 +4242,24 @@ SV * overload_spaceship(pTHX_ mpfr_t * a, SV * b, SV * third) {
         mpfr_set_erangeflag();
         return &PL_sv_undef;
       }
-      return newSViv(mpfr_cmp(*a, *(INT2PTR(mpfr_t *, SvIVX(SvRV(b))))));
+      ret = mpfr_cmp(*a, *(INT2PTR(mpfr_t *, SvIVX(SvRV(b)))));
+      if(ret < 0) return newSViv(-1);
+      if(ret > 0) return newSViv(1);
+      return newSViv(0);
     }
 
     if(strEQ(h, "Math::GMPq")) {
-      return newSViv(mpfr_cmp_q(*a, *(INT2PTR(mpq_t *, SvIVX(SvRV(b))))));
+      ret = mpfr_cmp_q(*a, *(INT2PTR(mpq_t *, SvIVX(SvRV(b)))));
+      if(ret < 0) return newSViv(-1);
+      if(ret > 0) return newSViv(1);
+      return newSViv(0);
     }
 
     if(strEQ(h, "Math::GMPz") || strEQ(h, "Math::GMP")) {
-      return newSViv(mpfr_cmp_z(*a, *(INT2PTR(mpz_t *, SvIVX(SvRV(b))))));
+      ret = mpfr_cmp_z(*a, *(INT2PTR(mpz_t *, SvIVX(SvRV(b)))));
+      if(ret < 0) return newSViv(-1);
+      if(ret > 0) return newSViv(1);
+      return newSViv(0);
     }
   }
   croak("Invalid argument supplied to Math::MPFR::overload_spaceship");
@@ -6036,6 +6048,7 @@ SV * Rmpfr_ai(pTHX_ mpfr_t * rop, mpfr_t * op, SV * round) {
   return newSViv(mpfr_ai(*rop, *op, (mpfr_rnd_t)SvUV(round)));
 }
 
+
 SV * Rmpfr_get_flt(pTHX_ mpfr_t * a, SV * round) {
   return newSVnv(mpfr_get_flt(*a, (mpfr_rnd_t)SvUV(round)));
 }
@@ -6301,6 +6314,40 @@ SV * Rmpfr_set_LD(pTHX_ mpfr_t * rop, SV * op, SV *rnd) {
   else croak("2nd arg (which needs to be a Math::LongDouble object) supplied to Rmpfr_set_LD is not an object");
 }
 
+SV * Rmpfr_set_BFLOAT16(pTHX_ mpfr_t * rop, SV * op, SV *rnd) {
+#ifdef MPFR_WANT_BFLOAT16
+  if(sv_isobject(op)) {
+    const char* h = HvNAME(SvSTASH(SvRV(op)));
+
+    if(strEQ(h, "Math::Bfloat16")) {
+      return newSViv(mpfr_set_bfloat16(*rop, *(INT2PTR(__bf16 *, SvIVX(SvRV(op)))), (mpfr_rnd_t)SvUV(rnd)));
+    }
+    croak("2nd arg (a %s object) supplied to Rmpfr_set_BFLOAT16 needs to be a Math::Bfloat16 object",
+           HvNAME(SvSTASH(SvRV(op))));
+  }
+  else croak("2nd arg (which must be a Math::Bfloat16 object) supplied to Rmpfr_set_BFLOAT16 is not an object");
+#else
+  croak("This build of Math::MPFR has been built without __bf16 (Bfloat16) support");
+#endif
+}
+
+SV * Rmpfr_set_FLOAT16(pTHX_ mpfr_t * rop, SV * op, SV *rnd) {
+#ifdef MPFR_WANT_FLOAT16
+  if(sv_isobject(op)) {
+    const char* h = HvNAME(SvSTASH(SvRV(op)));
+
+    if(strEQ(h, "Math::Float16")) {
+      return newSViv(mpfr_set_float16(*rop, *(INT2PTR(_Float16 *, SvIVX(SvRV(op)))), (mpfr_rnd_t)SvUV(rnd)));
+    }
+    croak("2nd arg (a %s object) supplied to Rmpfr_set_FLOAT16 needs to be a Math::Float16 object",
+           HvNAME(SvSTASH(SvRV(op))));
+  }
+  else croak("2nd arg (which needs to be a Math::Float16 object) supplied to Rmpfr_set_FLOAT16 is not an object");
+#else
+  croak("This build of Math::MPFR has been built without _Float16 (Float16) support");
+#endif
+}
+
 /*
 int mpfr_set_decimal64 (mpfr_t rop, _Decimal64 op, mpfr_rnd_t rnd)
 */
@@ -6392,6 +6439,61 @@ void Rmpfr_get_LD(pTHX_ SV * rop, mpfr_t * op, SV * rnd) {
   else {
     PERL_UNUSED_ARG2(op, rnd);
     croak("1st arg (which needs to be a Math::LongDouble object) supplied to Rmpfr_get_LD is not an object");
+  }
+}
+
+void Rmpfr_get_BFLOAT16(pTHX_ SV * rop, mpfr_t * op, SV * rnd) {
+#if defined MPFR_WANT_BFLOAT16
+  if(sv_isobject(rop)) {
+    const char* h = HvNAME(SvSTASH(SvRV(rop)));
+
+    if(strEQ(h, "Math::Bfloat16")) {
+      *(INT2PTR(__bf16 *, SvIVX(SvRV(rop)))) = mpfr_get_bfloat16(*op, (mpfr_rnd_t)SvUV(rnd));
+    }
+    else croak("1st arg (a %s object) supplied to Rmpfr_get_BFLOAT16 needs to be a Math::Bfloat16 object",
+                HvNAME(SvSTASH(SvRV(rop))));
+  }
+  else {
+    PERL_UNUSED_ARG2(op, rnd);
+    croak("1st arg (which must be a Math::Bfloat16 object) supplied to Rmpfr_get_BFLOAT16 is not an object");
+  }
+#else
+  croak("This build of Math::MPFR has been built without __bf16 (Bfloat16) support");
+#endif
+}
+
+void Rmpfr_get_FLOAT16(pTHX_ SV * rop, mpfr_t * op, SV * rnd) {
+#if defined MPFR_WANT_FLOAT16
+  if(sv_isobject(rop)) {
+    const char* h = HvNAME(SvSTASH(SvRV(rop)));
+
+    if(strEQ(h, "Math::Float16")) {
+      *(INT2PTR(_Float16 *, SvIVX(SvRV(rop)))) = mpfr_get_float16(*op, (mpfr_rnd_t)SvUV(rnd));
+    }
+    else croak("1st arg (a %s object) supplied to Rmpfr_get_FLOAT16 needs to be a Math::Float16 object",
+                HvNAME(SvSTASH(SvRV(rop))));
+  }
+  else {
+    PERL_UNUSED_ARG2(op, rnd);
+    croak("1st arg (which needs to be a Math::Float16 object) supplied to Rmpfr_get_FLOAT16 is not an object");
+  }
+#else
+  croak("This build of Math::MPFR has been built without _Float16 support");
+#endif
+}
+
+void Rmpfr_get_FLT(pTHX_ SV * rop, mpfr_t * op, SV * rnd) {
+  if(sv_isobject(rop)) {
+    const char* h = HvNAME(SvSTASH(SvRV(rop)));
+
+    if(strEQ(h, "Math::Float32")) {
+      *(INT2PTR(float *, SvIVX(SvRV(rop)))) = mpfr_get_flt(*op, (mpfr_rnd_t)SvUV(rnd));
+    }
+    else croak("1st arg (a %s object) supplied to Rmpfr_get_FLT needs to be a Math::Float32 object",
+                HvNAME(SvSTASH(SvRV(rop))));
+  }
+  else {
+    croak("1st arg (which needs to be a Math::Float32 object) supplied to Rmpfr_get_FLT is not an object");
   }
 }
 
@@ -6637,6 +6739,18 @@ void Rmpfr_get_FLOAT128(pTHX_ SV * rop, mpfr_t * op, SV * rnd) {
 #  endif
     croak("MPFR_WANT_FLOAT128 needs to have been defined when building Math::MPFR - - see \"PASSING __float128 VALUES\" in the Math::MPFR documentation");
 #endif
+}
+
+SV * Rmpfr_set_FLT(pTHX_ mpfr_t * rop, SV * op, SV * rnd) {
+  if(sv_isobject(op)) {
+    const char* h = HvNAME(SvSTASH(SvRV(op)));
+
+    if(strEQ(h, "Math::Float32"))
+      return newSViv(mpfr_set_flt(*rop, *(INT2PTR( float *, SvIVX(SvRV(op)))), (mpfr_rnd_t)SvUV(rnd)));
+      croak("2nd arg (a %s object) supplied to Rmpfr_set_FLT needs to be a Math::Float32 object",
+             HvNAME(SvSTASH(SvRV(op))));
+  }
+  else croak("2nd arg (which needs to be a Math::Float32 object) supplied to Rmpfr_set_FLT is not an object");
 }
 
 SV * Rmpfr_set_FLOAT128(pTHX_ mpfr_t * rop, SV * op, SV * rnd) {
@@ -9328,7 +9442,30 @@ void _unpack_bfloat16(pTHX_ mpfr_t * f) {
 #endif
 }
 
+SV * _subnormalize_pv(pTHX_ SV * val, int emin, int emax, int prec) {
+  /* First argument (val) is assumed to be a PV */
+  mpfr_t * mpfr_t_obj;
+  SV * obj_ref, * obj;
+  int inex;
+  mpfr_exp_t emin_reset, emax_reset;
 
+  NEW_MATH_MPFR_OBJECT("Math::MPFR",_subnormalize_pv) /* defined in math_mpfr_include.h */
+  mpfr_init2 (*mpfr_t_obj, (mpfr_prec_t)prec);
+
+  emin_reset = mpfr_get_emin();
+  emax_reset = mpfr_get_emax();
+  mpfr_set_emin((mpfr_exp_t)emin);
+  mpfr_set_emax((mpfr_exp_t)emax);
+
+  inex = mpfr_strtofr(*mpfr_t_obj, SvPV_nolen(val), NULL, 0, GMP_RNDN);
+  mpfr_subnormalize(*mpfr_t_obj, inex, GMP_RNDN);
+
+  mpfr_set_emin(emin_reset);
+  mpfr_set_emax(emax_reset);
+
+  OBJ_READONLY_ON /*defined in math_mpfr_include.h */
+  return obj_ref;
+}
 
 
 MODULE = Math::MPFR  PACKAGE = Math::MPFR
@@ -11772,12 +11909,12 @@ CODE:
 OUTPUT:  RETVAL
 
 int
-Rmpfr_set_IV (x, sv, round)
+Rmpfr_set_IV (x, sv, rnd)
 	mpfr_t *	x
 	SV *	sv
-	SV *	round
+	unsigned int	rnd
 CODE:
-  RETVAL = Rmpfr_set_IV (aTHX_ x, sv, round);
+  RETVAL = Rmpfr_set_IV (aTHX_ x, sv, rnd);
 OUTPUT:  RETVAL
 
 void
@@ -12974,6 +13111,24 @@ CODE:
 OUTPUT:  RETVAL
 
 SV *
+Rmpfr_set_BFLOAT16 (rop, op, rnd)
+	mpfr_t *	rop
+	SV *	op
+	SV *	rnd
+CODE:
+  RETVAL = Rmpfr_set_BFLOAT16 (aTHX_ rop, op, rnd);
+OUTPUT:  RETVAL
+
+SV *
+Rmpfr_set_FLOAT16 (rop, op, rnd)
+	mpfr_t *	rop
+	SV *	op
+	SV *	rnd
+CODE:
+  RETVAL = Rmpfr_set_FLOAT16 (aTHX_ rop, op, rnd);
+OUTPUT:  RETVAL
+
+SV *
 Rmpfr_set_DECIMAL64 (rop, op, rnd)
 	mpfr_t *	rop
 	SV *	op
@@ -12998,6 +13153,33 @@ Rmpfr_get_LD (rop, op, rnd)
 	SV *	rnd
         PPCODE:
         Rmpfr_get_LD(aTHX_ rop, op, rnd);
+        XSRETURN_EMPTY; /* return empty stack */
+
+void
+Rmpfr_get_BFLOAT16 (rop, op, rnd)
+	SV *	rop
+	mpfr_t *	op
+	SV *	rnd
+        PPCODE:
+        Rmpfr_get_BFLOAT16(aTHX_ rop, op, rnd);
+        XSRETURN_EMPTY; /* return empty stack */
+
+void
+Rmpfr_get_FLOAT16 (rop, op, rnd)
+	SV *	rop
+	mpfr_t *	op
+	SV *	rnd
+        PPCODE:
+        Rmpfr_get_FLOAT16(aTHX_ rop, op, rnd);
+        XSRETURN_EMPTY; /* return empty stack */
+
+void
+Rmpfr_get_FLT (rop, op, rnd)
+	SV *	rop
+	mpfr_t *	op
+	SV *	rnd
+        PPCODE:
+        Rmpfr_get_FLT(aTHX_ rop, op, rnd);
         XSRETURN_EMPTY; /* return empty stack */
 
 void
@@ -13128,6 +13310,15 @@ Rmpfr_get_FLOAT128 (rop, op, rnd)
         PPCODE:
         Rmpfr_get_FLOAT128(aTHX_ rop, op, rnd);
         XSRETURN_EMPTY; /* return empty stack */
+
+SV *
+Rmpfr_set_FLT (rop, op, rnd)
+	mpfr_t *	rop
+	SV *	op
+	SV *	rnd
+CODE:
+  RETVAL = Rmpfr_set_FLT (aTHX_ rop, op, rnd);
+OUTPUT:  RETVAL
 
 SV *
 Rmpfr_set_FLOAT128 (rop, op, rnd)
@@ -13733,4 +13924,14 @@ _unpack_bfloat16 (f)
         }
         /* must have used dXSARGS; list context implied */
         return;
+
+SV *
+_subnormalize_pv (val, emin, emax, prec)
+	SV *	val
+	int	emin
+	int	emax
+	int	prec
+CODE:
+  RETVAL = _subnormalize_pv (aTHX_ val, emin, emax, prec);
+OUTPUT:  RETVAL
 

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Asynchronous HTTP Request and Promise - ~/lib/HTTP/Promise/Body/Form/Data.pm
-## Version v0.1.0
+## Version v0.1.1
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/06/13
-## Modified 2022/06/13
+## Modified 2025/08/30
 ## All rights reserved.
 ## 
 ## 
@@ -16,12 +16,13 @@ BEGIN
 {
     use strict;
     use warnings;
-    use warnings::register;
+    warnings::register_categories( 'HTTP::Promise' );
     use parent qw( HTTP::Promise::Body::Form );
-    use vars qw( $VERSION $CRLF );
+    use vars qw( $VERSION $CRLF $DEBUG );
     use Data::UUID;
     our $CRLF = "\015\012";
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.1.1';
+    our $DEBUG = 4; # REMOVE ME
 };
 
 use strict;
@@ -31,6 +32,7 @@ sub init
 {
     my $self = shift( @_ );
     $self->{order} = [];
+    $self->{debug} = $DEBUG;
     $self->{_init_strict_use_sub} = 1;
     $self->SUPER::init( @_ ) || return( $self->pass_error );
     return( $self );
@@ -40,7 +42,7 @@ sub as_string
 {
     my $self = shift( @_ );
     my $opts = $self->_get_args_as_hash( @_ );
-    my $boundary = $opts->{boundary} ||= Data::UUID->new->create_str;
+    my $boundary = $opts->{boundary} || $self->boundary || Data::UUID->new->create_str;
     my $eol  = $opts->{eol} || $CRLF;
     my $parts = $self->make_parts( $opts );
     return( $self->pass_error ) if( !defined( $parts ) );
@@ -102,11 +104,52 @@ sub as_urlencoded
     return( $form );
 }
 
-sub length { return( shift->Module::Generic::Hash::length ); }
+sub boundary { return( shift->_internal( 'boundary', '_set_get_scalar', @_ ) ); }
+
+# in HTTP::Promise::Body::Form::Data
+
+sub length
+{
+    my $self = shift( @_ );
+    my $opts = $self->_get_args_as_hash( @_ );
+    my $eol  = $opts->{eol} || $CRLF;
+    my $boundary = $opts->{boundary} || $self->boundary || Data::UUID->new->create_str;
+
+    my $total = 0;
+    my $sep   = '--' . $boundary . $eol;
+    my $end   = '--' . $boundary . '--' . $eol;
+
+    require bytes;
+    my $parts = $self->make_parts( $opts );
+    return( $self->pass_error ) if( !defined( $parts ) );
+
+    foreach my $ent ( @$parts )
+    {
+        # leading boundary
+        $total += CORE::length( $sep );
+
+        # body bytes + trailing CRLF
+        my $part = $ent->as_string( $eol );
+        return( $self->pass_error( $_->error ) ) if( !defined( $part ) );
+        # my $blen = bytes::length( $part );
+        # Ensure text parts are ASCII, use bytes::length for binary
+        my $blen = ( ref( $ent ) && $ent->is_binary ) ? bytes::length( $part ) : CORE::length( $part );
+        $total += $blen;
+        $total += CORE::length( $eol );
+    }
+
+    # closing boundary
+    $total += CORE::length( $end );
+
+    return( $total );
+}
 
 sub make_parts
 {
     my $self = shift( @_ );
+    my $tie_obj  = $self->_tie_object;
+    my $tie_flag = $tie_obj->enable;
+    $tie_obj->enable(1) if( !$tie_flag );
     my $opts = $self->_get_args_as_hash( @_ );
     my $order = $self->order;
     my $keys = $self->_is_array( $opts->{fields} )
@@ -117,7 +160,7 @@ sub make_parts
     $self->_load_class( 'HTTP::Promise::Entity' ) || return( $self->pass_error );
     $self->_load_class( 'HTTP::Promise::Headers' ) || return( $self->pass_error );
     my $parts = $self->new_array;
-    
+
     my $process = sub
     {
         my( $n, $v ) = @_;
@@ -132,7 +175,14 @@ sub make_parts
             $headers = HTTP::Promise::Headers->new;
 #             $body = HTTP::Promise::Entity->new_body( string => $v ) ||
 #                 return( $self->pass_error( HTTP::Promise::Entity->error ) );
-            $body = HTTP::Promise::Entity->new_body( string => $v );
+            if( $self->_is_a( $v => 'Module::Generic::File' ) )
+            {
+                $body = HTTP::Promise::Entity->new_body( file => $v );
+            }
+            else
+            {
+                $body = HTTP::Promise::Entity->new_body( string => $v );
+            }
             if( !defined( $body ) )
             {
                 return( $self->pass_error( HTTP::Promise::Entity->error ) );
@@ -145,11 +195,18 @@ sub make_parts
         return( $self->pass_error( $headers->error ) ) if( !defined( $cd ) );
         $cd->disposition( 'form-data' );
         $cd->name( $n );
-        if( $self->_is_a( $body => 'HTTP::Promise::Body::File' ) && 
-            !$cd->filename )
+        if( $self->_is_a( $body => 'HTTP::Promise::Body::File' ) )
         {
-            my $basename = $body->basename;
-            $cd->filename( $basename );
+            if( !$cd->filename )
+            {
+                my $basename = $body->basename;
+                $cd->filename( $basename );
+            }
+            # Set Content-Type per part when we can
+            my $ctype = $body->finfo->mime_type || 'application/octet-stream';
+            my $ctfld = $headers->new_field( 'Content-Type' ) || return( $self->pass_error( $headers->error ) );
+            $ctfld->type( "$ctype" );
+            $headers->content_type( "$ctfld" );
         }
         $headers->content_disposition( "$cd" );
         
@@ -158,7 +215,7 @@ sub make_parts
         $ent->name( $n );
         return( $ent );
     };
-    
+
     foreach my $n ( @$keys )
     {
         my $v = $self->{ $n };
@@ -166,20 +223,29 @@ sub make_parts
         {
             foreach my $v2 ( @$v )
             {
-                my $ent = $process->( $n, $v2 ) ||
+                my $ent = $process->( $n, $v2 );
+                if( !defined( $ent ) )
+                {
+                    $tie_obj->enable(0) if( !$tie_flag );
                     return( $self->pass_error );
+                }
                 $ent->name( $n );
                 $parts->push( $ent );
             }
         }
         else
         {
-            my $ent = $process->( $n, $v ) ||
+            my $ent = $process->( $n, $v );
+            if( !defined( $ent ) )
+            {
+                $tie_obj->enable(0) if( !$tie_flag );
                 return( $self->pass_error );
+            }
             $ent->name( $n );
             $parts->push( $ent );
         }
     }
+    $tie_obj->enable(0) if( !$tie_flag );
     return( $parts );
 }    
 
@@ -202,7 +268,16 @@ sub open
     return( $io );
 }
 
-sub order { return( shift->_set_get_array_as_object( 'order', @_ ) ); }
+# sub order { return( shift->_set_get_array_as_object( 'order', @_ ) ); }
+sub order { return( shift->_internal( 'order', '_set_get_array_as_object', @_ ) ); }
+# sub order
+# {
+#     my $self = shift( @_ );
+#     $self->_tie_object->enable(0);
+#     my $rv = $self->SUPER::_set_get_array_as_object( 'order', @_ );
+#     $self->_tie_object->enable(1);
+#     return( $rv );
+# }
 
 sub print
 {
@@ -213,11 +288,13 @@ sub print
     return( $self->error( "Filehandle provided ($fh) is not a valid filehandle." ) ) if( !$self->_is_glob( $fh ) );
     my $encoded = $self->as_string;
     return( $self->pass_error ) if( !defined( $encoded ) );
-    print( $fh $$encoded ) || return( $self->error( "Unable to print on given filehandle '$fh': $!" ) );
+    CORE::print( $fh $$encoded ) || return( $self->error( "Unable to print on given filehandle '$fh': $!" ) );
     return(1);
 }
 
-sub _is_warnings_enabled { return( warnings::enabled( $_[0] ) ); }
+sub size { return( shift->Module::Generic::Hash::length ); }
+
+sub _is_warnings_enabled { return( warnings::enabled( 'HTTP::Promise' ) ); }
 
 # NOTE: FREEZE is inherited
 
@@ -258,7 +335,7 @@ HTTP::Promise::Body::Form::Data - A multipart/form-data Representation Class
 
 =head1 VERSION
 
-    v0.1.0
+    v0.1.1
 
 =head1 DESCRIPTION
 
@@ -314,7 +391,7 @@ Supported options are:
 
 A string used as a part delimiter. Note, however, that even if you provide this value, it will not replace the C<boundary> value of a C<HTTP::Promise::Body::Form::Field> C<Content-Disposition> field if it is set.
 
-If this is not provided, a new one will be automatically generated using L<Data::UUID/create_str>
+If this is not provided, it will use the value set with L</boundary>, or in the last resort, a new one will be automatically generated using L<Data::UUID/create_str>
 
 =item * C<eol>
 
@@ -332,21 +409,15 @@ If not provided, it will default to alphabetic order.
 
 This returns a new L<HTTP::Promise::Body::Form> object based on the current data, or upon error, sets an L<error|Module::Generic/error> and returns C<undef>.
 
-=head2 make_parts
+=head2 boundary
 
-This takes an hash or hash reference of options and creates L<entity part objects|HTTP::Promise::Entity> and returns them as an L<array object|Module::Generic::Array>
+Sets or gets a boundary delimiter, used to separate parts in a C<multiparts/form-data>
 
-Supported options are:
+=head2 length
 
-=over 4
+Returns the size in bytes of this multipart form data. This is used to compute the total body size of the HTTP request.
 
-=item * C<boundary>
-
-A string used as a part delimiter. Note, however, that even if you provide this value, it will not replace the C<boundary> value of a C<HTTP::Promise::Body::Form::Field> C<Content-Disposition> field if it is set.
-
-If this is not provided, a new one will be automatically generated using L<Data::UUID/create_str>
-
-=back
+This is not to be confused with L</size>, which is used to get the number of parts in this object.
 
 =head2 make_parts
 
@@ -357,6 +428,12 @@ Note that at this point, the body is not encoded and the C<Content-Length> is no
 Supported options are:
 
 =over 4
+
+=item * C<boundary>
+
+A string used as a part delimiter. Note, however, that even if you provide this value, it will not replace the C<boundary> value of a C<HTTP::Promise::Body::Form::Field> C<Content-Disposition> field if it is set.
+
+If this is not provided, a new one will be automatically generated using L<Data::UUID/create_str>
 
 =item * C<fields>
 
@@ -401,6 +478,16 @@ Sets or gets an L<array object|Module::Generic::Array> of form fields in the des
 =head2 print
 
 Provided with a valid filehandle, and this print the C<form-data> representation of the form fields and their values, to the given filehandle, or upon error, sets an L<error|Module::Generic/error> and returns C<undef>
+
+=head2 size
+
+Returns the number of parts in this object.
+
+This is not to be confused with L</length>, which is used to get the size in bytes of the multipart form-data.
+
+=head1 THREAD-SAFETY
+
+L<HTTP::Promise::Body::Form::Data> is thread-safe for all operations, as it operates on per-object state and uses thread-safe external libraries.
 
 =head1 AUTHOR
 

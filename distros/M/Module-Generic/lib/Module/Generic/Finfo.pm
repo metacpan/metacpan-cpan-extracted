@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Finfo.pm
-## Version v0.5.2
+## Version v0.5.3
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/20
-## Modified 2025/04/23
+## Modified 2025/08/22
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -66,7 +66,7 @@ BEGIN
     };
     our %EXPORT_TAGS = ( all => [qw( FILETYPE_NOFILE FILETYPE_REG FILETYPE_DIR FILETYPE_CHR FILETYPE_BLK FILETYPE_PIPE FILETYPE_LNK FILETYPE_SOCK FILETYPE_UNKFILE )] );
     our @EXPORT_OK = qw( FILETYPE_NOFILE FILETYPE_REG FILETYPE_DIR FILETYPE_CHR FILETYPE_BLK FILETYPE_PIPE FILETYPE_LNK FILETYPE_SOCK FILETYPE_UNKFILE );
-    our $VERSION = 'v0.5.2';
+    our $VERSION = 'v0.5.3';
 };
 
 use v5.26.1;
@@ -259,7 +259,17 @@ sub mime_type
         {
             $self->_load_class( 'File::MMagic' ) || die( $self->pass_error );
             my $m = File::MMagic->new;
-            return( $self->new_scalar( $m->checktype_filename( $file ) ) );
+            # try-catch
+            local $@;
+            my $type = eval
+            {
+                $m->checktype_filename( $file );
+            };
+            if( $@ )
+            {
+                return( $self->error( "Error getting the file $file mime-type using the method 'checktype_filename' from File::MMagic: $@" ) );
+            }
+            return( $self->new_scalar( $type ) );
         }
     };
     if( $@ )
@@ -645,7 +655,7 @@ Module::Generic::Finfo - File Info Object Class
 
 =head1 VERSION
 
-    v0.5.2
+    v0.5.3
 
 =head1 DESCRIPTION
 

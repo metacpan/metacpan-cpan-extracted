@@ -2,7 +2,7 @@
 
 use v5.12;
 use warnings;
-use Test::More tests => 74;
+use Test::More tests => 70;
 BEGIN { unshift @INC, 'lib', '../lib'}
 
 my $module = 'Graphics::Toolkit::Color::Values';
@@ -90,17 +90,10 @@ is( $blue_hwb->{'rgb'}[0],                  0,  'blue has a no red vlaue');
 is( $blue_hwb->{'rgb'}[1],                  0,  'blue has a no green value');
 is( $blue_hwb->{'rgb'}[2],                  1,  'blue has a maximal blue value');
 
-#### name and closest name #############################################
+#### name ################ #############################################
 my $black = Graphics::Toolkit::Color::Values->new_from_any_input('ciexyz( 0, 0, 0)');
 is( $black->name,                   'black',  'created black from CSS string in XYZ');
 my $white = Graphics::Toolkit::Color::Values->new_from_any_input(['hsv', 0, 0, 100 ]);
 is( $white->name,                   'white',  'created white from named ARRAY in HSV');
-
-my ($hname, $hd) = $blue_hwb->closest_name_and_distance();
-is( $hname,                 'blue',  'closest name to "blue" is the same as name');
-is( $hd,                         0,  'no distance to closest name');
-my ($cname, $cd) = $fuchsia_cmy->closest_name_and_distance();
-is( $cname,                 'magenta',  'closest name to "magenta" is same as name');
-is( $cd,                            0,  'no distance to closest name');
 
 exit 0;

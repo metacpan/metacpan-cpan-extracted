@@ -8,11 +8,11 @@ Documentation is likely incomplete.
 
 =head2 Script uses C<Easing::Stream>
 
-Script is currently linewise, but should be updated to leverage C<Easing::Stream>.
+(Available with 0.1.3)  Script is currently linewise, but should be updated to leverage C<Easing::Stream>.
 
 =head2 Script timestamps option
 
-C<schedule-easing.pl --timestamps> should work.  It is currently available but not well tested.
+(Available with 0.1.3)  C<schedule-easing.pl --timestamps> should work.  It is currently available but not well tested.
 
 =head1 Tests
 

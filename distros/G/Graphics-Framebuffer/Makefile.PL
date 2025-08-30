@@ -68,8 +68,13 @@ unless($pmt =~ /^Y/i) {
 print colored(['bright_yellow'],'             Loading C code'), ' ... ';
 my $ccode    = slurp_file('src/Framebuffer.c');
 print colored(['bright_green'],"Loaded\n");
+
+print colored(['bright_yellow'],'           Loading MetaDate'), ' ... ';
+my $meta     = slurp_file('src/metadata.txt');
+print colored(['bright_green'],"Loaded\n");
+
 print colored(['bright_yellow'],'    Loading Module Template'), ' ... ';
-my $template = slurp_file('src/Framebuffer.pm.template');
+my $template = slurp_file('src/Framebuffer.pm');
 print colored(['bright_green'],"Loaded\n");
 my $Eml;
 
@@ -77,18 +82,18 @@ print colored(['bright_yellow'],' Adding C to Framebuffer.pm') . ' ... ';
 $template =~ s/\#\# C CODE \#\#/$ccode/s;
 print colored(['bright_green'],"Added\n");
 
-if ($template =~ /^\# (.*?)\n/s) {
+if ($meta =~ /^\# (.*?)\n/s) {
 	print colored(['bright_yellow'],'   Is this a threaded Perl?'), ' ... ';
 	if ($Config{'useithreads'}) {
-		print colored(['bright_green'],'YES'),"\n";
+		print colored(['bright_green'],'YES')," Leaving thread support\n";
 	} else {
 		$template =~ s/\#\# THREADS \#.*?\#\#THREADS\#\#//sg;
-		print colored(['red'],'NO'),"\n";
+		print colored(['red'],'NO')," Removing thread support\n";
 	}
     print colored(['bright_yellow'],'         Inserting versions'), ' ... ';
     my ($version, $date, $email) = split(/\:/, $1 );
     my ($month, $day, $year) = split(/ |, /,$date);
-    $template =~ s/^.*?\n//s;
+#    $template =~ s/^.*?\n//s;
     $template =~ s/\#\# VERSION \#\#/$version/sg;
     $template =~ s/\#\# VERSION DATE \#\#/$date/sg;
     $template =~ s/\#\# YEAR \#\#/$year/sg;

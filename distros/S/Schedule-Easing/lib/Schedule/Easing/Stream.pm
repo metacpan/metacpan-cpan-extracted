@@ -4,21 +4,7 @@ use strict;
 use warnings;
 use Carp qw/confess/;
 
-our $VERSION='0.1.2';
-
-# Presumably there can be a single clock/alarm setting.
-# If clock=2, then on timeout it will update the timer,
-# but clock=2 also means that the batch should be processed at that time, if non-empty.
-# Ergo if clock=undef/0, it means there will be no update of the logged time,
-# but also the batch will always wait for more.
-# Now it would be possible with clock=2 to have resetTime=3, and every two seconds it would count
-# down, but that means the logged time would actually only update every 3sec.
-# Instead of introducing such complexity, it's just easier to say that things happen every 2sec.
-# Now if there is a batch with a timeout of clock=2, it means that the logged time Must Update
-# every 2sec, and that may not be desirable.  If the update() function is a no-op, then the
-# logged time would never actually change.  Presumably they could provide their own countdown
-# function in such cases to control if/when the logged time is actually updated, if every.
-# So I think it makes sense, clock=N means alarm(N) will perform update() and input(@batch).
+our $VERSION='0.1.3';
 
 sub new {
 	my ($ref,%opt)=@_;
@@ -66,7 +52,7 @@ sub read {
 	if($$self{clock}&&($$self{clock}>=1)) {
 		$SIG{ALRM}=sub {
 			$self->processBatch(\@batch,1);
-			&{$$self{update}}(time());
+			&{$$self{update}}(time()) if($$self{update});
 			alarm($$self{clock});
 		};
 		alarm($$self{clock});
@@ -74,7 +60,7 @@ sub read {
 	while(<$fh>) {
 		if($$self{regexp}&&(my ($ts)=($_=~$$self{regexp}))) {
 			$self->processBatch(\@batch,0);
-			&{$$self{update}}($ts); 
+			&{$$self{update}}($ts) if($$self{update});
 			$self->processBatch([$_],1);
 			$countdown=$$self{lines};
 			next;
@@ -83,7 +69,7 @@ sub read {
 		if(1+$#batch<$$self{batch}) { next }
 		$self->processBatch(\@batch,1);
 		if(defined($countdown)&&(($countdown-=$$self{batch})<=0)) {
-			&{$$self{update}}(time());
+			&{$$self{update}}(time()) if($$self{update});
 			$countdown=$$self{lines};
 		}
 	};
@@ -155,11 +141,11 @@ Setting C<batch=E<gt>M> will collect C<M> lines before calling C<input(@batch)>.
 
 If C<lines> is set, the line counter is checked only once after C<M> batched lines are processed, after which the line counter will be I<reset>.  Therefore, C<linesE<gt>M> may only perform an C<update> in some of the batches, whereas C<linesE<lt>=M> will call C<update> after every batch.
 
-If C<clock> is set, when the C<alarm()> fires any existing, partial batch will be passed to C<input> first, and then C<update> will be called.  This permits "batching with timeout" to ensure that no batch is held for more than C<clock> seconds, but it can output partial batches.
+If C<clock> is set, when the C<alarm()> fires, any existing, partial batch will be passed to C<input> first, and then C<update> will be called.  This permits "batching with timeout" to ensure that no batch is held for more than C<clock> seconds, but it can output partial batches.
 
 If C<regexp> is set, it first processes any existing, partial batch, before passing the single matched line to C<input>.
 
-To enforce a fixed batch size despite other settings, the C<input> handler can perform its own batching.
+To enforce a fixed batch size despite other settings and C<alarm()> interruptions, the C<input> handler can perform its own batching.
 
 =head2 Sleeping
 

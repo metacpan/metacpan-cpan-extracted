@@ -16,7 +16,7 @@ BEGIN
 {
     use strict;
     use warnings;
-    use warnings::register;
+    warnings::register_categories( 'HTTP::Promise' );
     use parent qw( HTTP::Promise::Headers::Generic );
     our $VERSION = 'v0.1.0';
 };
@@ -90,7 +90,7 @@ HTTP::Promise::Headers::ContentType - Content-Type Header Field
 
     use HTTP::Promise::Headers::ContentType;
     my $ct = HTTP::Promise::Headers::ContentType->new || 
-        die( HTTP::Promise::Headers::ContentType->error, "\n" );
+        die( HTTP::Promise::Headers::ContentType->error );
     $ct->value( 'text/plain' );
 
 =head1 VERSION
@@ -145,6 +145,10 @@ Sets or gets the mime-type for this field.
 =head2 value
 
 Sets or gets the mime-type for this C<Content-Type>. This is effectively the same as L</type>
+
+=head1 THREAD-SAFETY
+
+This module is thread-safe for all operations, as it operates on per-object state and uses thread-safe external libraries.
 
 =head1 AUTHOR
 

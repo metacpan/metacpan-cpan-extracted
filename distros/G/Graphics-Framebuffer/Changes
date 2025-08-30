@@ -1742,9 +1742,18 @@ Revision history for Graphics-Framebuffer
 
        Overhaul of the "examples/primitives" script.
 
-	   Lots of optimizations in the module.  Things run a bit faster.
+       Lots of optimizations in the module.  Things run a bit faster.
 
        Got rid of "Math::Trig".  I declare my own constant of "pi" now.
 
        Reorganized the flow of "Makefile.PL" to make CPAN testers happy.
-	   Frankly, I agree with them.
+       Frankly, I agree with them.
+
+6.71   Aug 29, 2025
+
+       Changed how the build process works and how the files in "src/" are
+       used.
+
+       Made some additions to the C code to eventually make way for 8 bit
+       (monochrome VGA) mode.  Oddly enough, the C code will be ready before
+       the Perl code.

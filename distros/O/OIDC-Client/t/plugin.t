@@ -96,21 +96,21 @@ sub test_redirect_to_authorize_with_maximum_parameters {
     );
 
     # Then
-    cmp_deeply($obj->get_flash->('oidc_state'), re('^state_param1,state_param2,[\w-]{36,36}$'),
-       'expected oidc_state flash');
-
-    is($obj->get_flash->('oidc_provider'), 'my_provider',
-       'expected oidc_provider flash');
-
-    is($obj->get_flash->('oidc_target_url'), 'my_target_url',
-       'expected oidc_target_url flash');
+    my ($state, $auth_data) = get_auth_data($obj);
+    cmp_deeply($state, re('^state_param1,state_param2,[\w-]{36,36}$'),
+               'expected state');
+    cmp_deeply($auth_data,
+               { nonce      => re('^[\w-]{36,36}$'),
+                 provider   => 'my_provider',
+                 target_url => 'my_target_url' },
+               'expected oidc_auth session data');
 
     is($obj->redirect->(), 'my_auth_url',
        'expected redirect');
 
     cmp_deeply([ $obj->client->next_call() ],
-               [ 'auth_url', bag($obj->client, nonce        => re('^[\w-]{36,36}$'),
-                                               state        => re('^state_param1,state_param2,[\w-]+$'),
+               [ 'auth_url', bag($obj->client, nonce        => $auth_data->{nonce},
+                                               state        => $state,
                                                redirect_uri => 'my_login_redirect_uri',
                                                extra_params => { param => 'param' }) ],
                'expected call to client');
@@ -127,27 +127,21 @@ sub test_redirect_to_authorize_with_minimum_parameters {
     $obj->redirect_to_authorize();
 
     # Then
-    cmp_deeply($obj->get_flash->('oidc_nonce'), re('^[\w-]{36,36}$'),
-       'expected oidc_state flash');
-
-    cmp_deeply($obj->get_flash->('oidc_state'), re('^[\w-]{36,36}$'),
-       'expected oidc_state flash');
-
-    isnt($obj->get_flash->('oidc_nonce'), $obj->get_flash->('oidc_state'),
-       'oidc_nonce and oidc_state have different values');
-
-    is($obj->get_flash->('oidc_provider'), 'my_provider',
-       'expected oidc_provider flash');
-
-    is($obj->get_flash->('oidc_target_url'), '/current-url',
-       'expected oidc_target_url flash');
+    my ($state, $auth_data) = get_auth_data($obj);
+    cmp_deeply($state, re('^[\w-]{36,36}$'),
+               'expected state');
+    cmp_deeply($auth_data,
+               { nonce      => re('^[\w-]{36,36}$'),
+                 provider   => 'my_provider',
+                 target_url => '/current-url' },
+               'expected oidc_auth session data');
 
     is($obj->redirect->(), 'my_auth_url',
        'expected redirect');
 
     cmp_deeply([ $obj->client->next_call() ],
-               [ 'auth_url', bag($obj->client, nonce => re('^[\w-]{36,36}$'),
-                                               state => re('^[\w-]{36,36}$')) ],
+               [ 'auth_url', bag($obj->client, nonce => $auth_data->{nonce},
+                                               state => $state) ],
                'expected call to client');
   };
 }
@@ -168,44 +162,28 @@ sub test_get_token_with_provider_error {
 }
 
 sub test_get_token_with_invalid_state_parameter {
-  subtest "get_token() without state parameter/flash" => sub {
-
-    # Given
-    my $obj = build_object(request_params => {},
-                           flash          => {});
-
-    # When - Then
-    throws_ok {
-      $obj->get_token();
-    } qr/invalid state parameter/,
-      'expected exception';
-    isa_ok($@, 'OIDC::Client::Error::Authentication');
-  };
-
   subtest "get_token() without state parameter" => sub {
 
     # Given
-    my $obj = build_object(request_params => {},
-                           flash          => {oidc_state => 'abc'});
+    my $obj = build_object(request_params => {});
 
     # When - Then
     throws_ok {
       $obj->get_token();
-    } qr/got '' but expected 'abc'/,
+    } qr/no state parameter/,
       'expected exception';
     isa_ok($@, 'OIDC::Client::Error::Authentication');
   };
 
-  subtest "get_token() with state parameter different from state in flash" => sub {
+  subtest "get_token() without authorisation data in session" => sub {
 
     # Given
-    my $obj = build_object(request_params => {state      => 'aaa'},
-                           flash          => {oidc_state => 'abc'});
+    my $obj = build_object(request_params => {state => 'aaa'});
 
     # When - Then
     throws_ok {
       $obj->get_token();
-    } qr/got 'aaa' but expected 'abc'/,
+    } qr/no authorisation data for state : 'aaa'/,
       'expected exception';
     isa_ok($@, 'OIDC::Client::Error::Authentication');
   };
@@ -215,10 +193,9 @@ sub test_get_token_ok {
   subtest "get_token() with all tokens" => sub {
 
     # Given
-    my $obj = build_object(request_params => {code       => 'my_code',
-                                              state      => 'abc'},
-                           flash          => {oidc_nonce => 'my-nonce',
-                                              oidc_state => 'abc'});
+    my $obj = build_object(request_params => {code  => 'my_code',
+                                              state => 'abc'});
+    set_auth_data($obj, 'abc' => {nonce => 'my-nonce'});
 
     # When
     my $identity = $obj->get_token(
@@ -269,16 +246,19 @@ sub test_get_token_ok {
                                                  expected_audience => 'my_id',
                                                  expected_nonce    => 'my-nonce'] ],
                'expected call to client->verify_token');
+
+    my ($state, $auth_data) = get_auth_data($obj);
+    ok(!defined $state && !defined $auth_data,
+       'auth_data has been deleted');
   };
 
   subtest "get_token() with only ID token" => sub {
 
     # Given
-    my $obj = build_object(request_params => {code       => 'my_code',
-                                              state      => 'abc'},
-                           flash          => {oidc_nonce => 'my-nonce',
-                                              oidc_state => 'abc'},
-                           token_response => {id_token   => 'my_id_token'});
+    my $obj = build_object(request_params => {code     => 'my_code',
+                                              state    => 'abc'},
+                           token_response => {id_token => 'my_id_token'});
+    set_auth_data($obj, 'abc' => {nonce => 'my-nonce'});
 
     # When
     my $identity = $obj->get_token(
@@ -323,10 +303,10 @@ sub test_get_token_ok {
     my $expires_in = 3600;
     my $obj = build_object(request_params => {code                => 'my_code',
                                               state               => 'abc'},
-                           flash          => {oidc_nonce          => 'my-nonce',
-                                              oidc_state          => 'abc'},
                            token_response => {id_token            => 'my_id_token'},
                            config         => {identity_expires_in => $expires_in});
+    set_auth_data($obj, 'abc' => {nonce => 'my-nonce'});
+
     # When
     my $begin_time = time;
     my $identity = $obj->get_token(
@@ -346,10 +326,10 @@ sub test_get_token_ok {
     # Given
     my $obj = build_object(request_params => {code                => 'my_code',
                                               state               => 'abc'},
-                           flash          => {oidc_nonce          => 'my-nonce',
-                                              oidc_state          => 'abc'},
                            token_response => {id_token            => 'my_id_token'},
                            config         => {identity_expires_in => 0});
+    set_auth_data($obj, 'abc' => {nonce => 'my-nonce'});
+
     # When
     my $identity = $obj->get_token(
       redirect_uri => 'my_redirect_uri',
@@ -363,11 +343,10 @@ sub test_get_token_ok {
   subtest "get_token() with only access token" => sub {
 
     # Given
-    my $obj = build_object(request_params => {code       => 'my_code',
-                                              state      => 'abc'},
-                           flash          => {oidc_nonce => 'my-nonce',
-                                              oidc_state => 'abc'},
+    my $obj = build_object(request_params => {code         => 'my_code',
+                                              state        => 'abc'},
                            token_response => {access_token => 'my_access_token'});
+    set_auth_data($obj, 'abc' => {nonce => 'my-nonce'});
 
     # When
     my $identity = $obj->get_token(
@@ -400,12 +379,11 @@ sub test_get_token_ok {
   subtest "get_token() with access token and refresh token" => sub {
 
     # Given
-    my $obj = build_object(request_params => {code       => 'my_code',
-                                              state      => 'abc'},
-                           flash          => {oidc_nonce => 'my-nonce',
-                                              oidc_state => 'abc'},
+    my $obj = build_object(request_params => {code          => 'my_code',
+                                              state         => 'abc'},
                            token_response => {access_token  => 'my_access_token',
                                               refresh_token => 'my_refresh_token'});
+    set_auth_data($obj, 'abc' => {nonce => 'my-nonce'});
 
     # When
     my $identity = $obj->get_token(
@@ -1300,14 +1278,19 @@ sub test_redirect_to_logout_with_id_token {
 
     # When
     $obj->redirect_to_logout(
-      state         => 'my_state',
-      extra_params  => { param => 'param' },
-      target_url    => 'my_target_url',
+      extra_params       => { param => 'param' },
+      target_url         => 'my_target_url',
+      other_state_params => ['my_state'],
     );
 
     # Then
-    is($obj->get_flash->('oidc_target_url'), 'my_target_url',
-       'expected oidc_target_url flash');
+    my ($state, $logout_data) = get_logout_data($obj);
+    cmp_deeply($state, re('^my_state,[\w-]{36,36}$'),
+               'expected state');
+    cmp_deeply($logout_data,
+               { provider   => 'my_provider',
+                 target_url => 'my_target_url' },
+               'expected oidc_logout session data');
 
     is($obj->redirect->(), 'my_logout_url',
        'expected redirect');
@@ -1315,7 +1298,7 @@ sub test_redirect_to_logout_with_id_token {
     cmp_deeply([ $obj->client->next_call(3) ],
                [ 'logout_url', bag($obj->client, id_token                 => 'my_id_token',
                                                  post_logout_redirect_uri => 'my_logout_redirect_uri',
-                                                 state                    => 'my_state',
+                                                 state                    => $state,
                                                  extra_params             => { param => 'param' }) ],
                'expected call to client');
   };
@@ -1334,14 +1317,20 @@ sub test_redirect_to_logout_without_id_token {
     );
 
     # Then
-    is($obj->get_flash->('oidc_target_url'), undef,
-       'no oidc_target_url flash');
+    my ($state, $logout_data) = get_logout_data($obj);
+    cmp_deeply($state, re('^[\w-]{36,36}$'),
+               'expected state');
+    cmp_deeply($logout_data,
+               { provider   => 'my_provider',
+                 target_url => undef },
+               'expected oidc_logout session data');
 
     is($obj->redirect->(), 'my_logout_url',
        'expected redirect');
 
     cmp_deeply([ $obj->client->next_call() ],
-               [ 'logout_url', bag($obj->client, post_logout_redirect_uri => 'my_personal_logout_redirect_uri') ],
+               [ 'logout_url', bag($obj->client, post_logout_redirect_uri => 'my_personal_logout_redirect_uri',
+                                                 state                    => $state) ],
                'expected call to client');
   };
 }
@@ -1972,7 +1961,6 @@ sub build_object {
     return $params{config}->{audience_alias}{$alias}{audience};
   });
 
-  my $flash = $params{flash} || {};
   my $redirect;
 
   return $class->new(
@@ -1981,8 +1969,6 @@ sub build_object {
     request_headers => $params{request_headers} || {},
     session         => {},
     stash           => {},
-    get_flash       => sub { return $flash->{$_[0]}; },
-    set_flash       => sub { $flash->{$_[0]} = $_[1]; return; },
     redirect        => sub { if ($_[0]) { $redirect = $_[0]; return; }
                              else { return $redirect } },
     client          => $mock_client,
@@ -2026,4 +2012,44 @@ sub get_store {
 
   my $store = $store_mode eq 'session' ? $obj->session
                                        : $obj->stash;
+}
+
+sub get_auth_data {
+  my ($obj) = @_;
+
+  my @states = keys %{$obj->session->{oidc_auth}};
+  if (@states == 1) {
+    my $state = $states[0];
+    my $auth_data = $obj->session->{oidc_auth}{$state};
+    return ($state, $auth_data);
+  }
+  elsif (@states == 0) {
+    return ();
+  }
+  else {
+    die q{should have maximum one state in 'oidc_auth' hashref};
+  }
+}
+
+sub set_auth_data {
+  my ($obj, $state, $data) = @_;
+
+  $obj->session->{oidc_auth}{$state} = $data;
+}
+
+sub get_logout_data {
+  my ($obj) = @_;
+
+  my @states = keys %{$obj->session->{oidc_logout}};
+  if (@states == 1) {
+    my $state = $states[0];
+    my $auth_data = $obj->session->{oidc_logout}{$state};
+    return ($state, $auth_data);
+  }
+  elsif (@states == 0) {
+    return ();
+  }
+  else {
+    die q{should have maximum one state in 'oidc_logout' hashref};
+  }
 }

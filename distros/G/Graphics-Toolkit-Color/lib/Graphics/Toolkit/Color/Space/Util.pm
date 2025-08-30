@@ -5,32 +5,10 @@ package Graphics::Toolkit::Color::Space::Util;
 use v5.12;
 use warnings;
 use Exporter 'import';
-our @EXPORT_OK = qw/round_int round_decimals real_mod min max uniq apply_d65 remove_d65 mult_matrix3 is_nr/;
+our @EXPORT_OK = qw/round_int round_decimals mod_real min max uniq apply_d65 remove_d65 mult_matrix3 is_nr/;
 our %EXPORT_TAGS = (all => [@EXPORT_OK]);
 
-my $half      = 0.50000000000008;
-my $tolerance = 0.00000000000008;
-
-sub round_int {
-    $_[0] >= 0 ? int ($_[0] + $half)
-               : int ($_[0] - $half)
-}
-
-sub round_decimals {
-    my ($nr, $precision) = @_;
-    return round_int( $nr ) unless defined $precision and $precision;
-    $precision = 10 ** $precision;
-    return  round_int( $nr * $precision ) / $precision;
-}
-
-
-sub real_mod { # real value modulo
-    return 0 unless defined $_[1] and $_[1];
-    return  $_[0] - (int($_[0] / $_[1]) * $_[1]);
-}
-
-sub is_nr { $_[0] =~ /^\-?\d+(\.\d+)?$/ }
-
+#### lists #############################################################
 sub max {
     my $v = shift;
     for (@_) { next unless defined $_; $v = $_ if $v < $_ }
@@ -49,6 +27,30 @@ sub uniq {
     grep {not $seen{$_}++} @_;
 }
 
+#### basic math ########################################################
+my $half      = 0.50000000000008;
+my $tolerance = 0.00000000000008;
+sub round_int {
+    $_[0] >= 0 ? int ($_[0] + $half)
+               : int ($_[0] - $half)
+}
+
+sub round_decimals {
+    my ($nr, $precision) = @_;
+    return round_int( $nr ) unless defined $precision and $precision;
+    $precision = 10 ** $precision;
+    return  round_int( $nr * $precision ) / $precision;
+}
+
+
+sub mod_real { # real value modulo
+    return 0 unless defined $_[1] and $_[1];
+    return  $_[0] - (int($_[0] / $_[1]) * $_[1]);
+}
+
+sub is_nr { $_[0] =~ /^\-?\d+(\.\d+)?$/ }
+
+#### color computation #################################################
 # change normalized RGB values to and from standard observer 2°
 sub apply_d65  { $_[0] > 0.04045  ? ((($_[0] + 0.055) / 1.055 ) ** 2.4) : ($_[0] / 12.92) }
 sub remove_d65 { $_[0] > 0.003131 ? ((($_[0]**(1/2.4)) * 1.055) - 0.055) : ($_[0] * 12.92) }

@@ -138,14 +138,27 @@ sub chomp
 sub clone
 {
     my $self = shift( @_ );
-    $self->_tie_object->enable(0);
+    my $obj = $self->_tie_object;
+    my $flag = $obj->enable;
+    $obj->enable(0) if( $flag );
     my $data = $self->{data};
     my $clone = Clone::clone( $data );
-    $self->_tie_object->enable(1);
+    $obj->enable(1) if( $flag );
     return( $self->new( $clone ) );
 }
 
-sub debug { return( shift->_internal( 'debug', '_set_get_number', @_ ) ); }
+# sub debug { return( shift->_internal( 'debug', '_set_get_number', @_ ) ); }
+# sub debug { return( shift->_super_method( 'debug', @_ ) ); }
+sub debug
+{
+    my $self = shift( @_ );
+    my $obj = $self->_tie_object;
+    my $flag = $obj->enable;
+    $obj->enable(0) if( $flag );
+    my $rv = $self->SUPER::debug( @_ );
+    $obj->enable(1) if( $flag );
+    return( $rv );
+}
 
 sub defined { CORE::defined( $_[0]->{ $_[1] } ); }
 
@@ -167,6 +180,27 @@ sub each
         CORE::defined( $code->( $k, $v ) ) || CORE::last;
     }
     return( $self );
+}
+
+sub error
+{
+    my $self = shift( @_ );
+    my $obj = $self->_tie_object;
+    my $flag = $obj->enable;
+    $obj->enable(0) if( $flag );
+    my( @rv, $rv2 );
+    if( wantarray )
+    {
+        @rv = $self->SUPER::error( @_ );
+        $obj->enable(1) if( $flag );
+        return( @rv );
+    }
+    else
+    {
+        $rv2 = $self->SUPER::error( @_ );
+        $obj->enable(1) if( $flag );
+        return( $rv2 );
+    }
 }
 
 sub exists { return( CORE::exists( shift->{ shift( @_ ) } ) ); }
@@ -204,7 +238,9 @@ sub json
     {
         $opts = { @_ };
     }
-    $self->_tie_object->enable(0);
+    my $obj = $self->_tie_object;
+    my $flag = $obj->enable;
+    $obj->enable(0) if( $flag );
     my $data = $self->{data};
     # $opts->{utf8} = 1 if( !CORE::exists( $opts->{utf8} ) );
     if( CORE::exists( $opts->{order} ) )
@@ -252,7 +288,7 @@ sub json
         }
     }
     my $json = $j->encode( $data );
-    $self->_tie_object->enable(1);
+    $obj->enable(1) if( $flag );
     return( Module::Generic::Scalar->new( $json ) );
 }
 
@@ -271,8 +307,12 @@ sub key_object
 sub keys
 {
     my $self = shift( @_ );
-    $self->_tie_object->enable(1);
-    return( Module::Generic::Array->new( [ CORE::keys( %$self ) ] ) );
+    my $obj = $self->_tie_object;
+    my $flag = $obj->enable;
+    $obj->enable(1) if( !$flag );
+    my $rv = Module::Generic::Array->new( [ CORE::keys( %$self ) ] );
+    $obj->enable(0) if( !$flag );
+    return( $rv );
 }
 
 sub length { return( Module::Generic::Number->new( CORE::scalar( CORE::keys( %{$_[0]} ) ) ) ); }
@@ -306,7 +346,9 @@ sub md5
     my $self = shift( @_ );
     $self->_load_class( 'Digest::MD5' ) ||
         return( $self->pass_error );
-    $self->_tie_object->enable(0);
+    my $obj = $self->_tie_object;
+    my $flag = $obj->enable;
+    $obj->enable(0) if( $flag );
     my $data = $self->{data};
     my $j = JSON->new->allow_nonref->canonical;
     # try-catch
@@ -314,10 +356,11 @@ sub md5
     my $json = eval{ $j->encode( $data ) };
     if( $@ )
     {
+        $obj->enable(1) if( $flag );
         return( $self->error( "Unable to serialise the hash reference data to JSON: $@" ) );
     }
-    my $checksum = Digest::MD5::md5_hex($json );
-    $self->_tie_object->enable(1);
+    my $checksum = Digest::MD5::md5_hex( $json );
+    $obj->enable(1) if( $flag );
     return( $checksum );
 }
 
@@ -336,7 +379,9 @@ sub merge
     my $opts = {};
     $opts = pop( @_ ) if( @_ && ref( $_[-1] ) eq 'HASH' );
     $opts->{overwrite} = 1 unless( CORE::exists( $opts->{overwrite} ) );
-    $self->_tie_object->enable(0);
+    my $obj = $self->_tie_object;
+    my $flag = $obj->enable;
+    $obj->enable(0) if( $flag );
     my $data = $self->{data};
     my $seen = {};
     my $copy;
@@ -372,8 +417,50 @@ sub merge
         }
     };
     $copy->( $hash, $data, $opts );
-    $self->_tie_object->enable(1);
+    $obj->enable(1) if( $flag );
     return( $self );
+}
+
+{
+    no warnings 'once';
+    *message = \&_message;
+    *message_check = \&_message_check;
+    *message_frame = \&_message_frame;
+    *message_log = \&_message_log;
+    *message_log_io = \&_message_log_io;
+    *messagef = \&_messagef;
+}
+
+sub noexec
+{
+    my $self = shift( @_ );
+    my $obj = $self->_tie_object;
+    my $flag = $obj->enable;
+    $obj->enable(0) if( $flag );
+    my $rv = $self->SUPER::noexec( @_ );
+    $obj->enable(1) if( $flag );
+    return( $rv );
+}
+
+sub pass_error
+{
+    my $self = shift( @_ );
+    my $obj = $self->_tie_object;
+    my $flag = $obj->enable;
+    $obj->enable(0) if( $flag );
+    my( @rv, $rv2 );
+    if( wantarray )
+    {
+        @rv = $self->SUPER::pass_error( @_ );
+        $obj->enable(1) if( $flag );
+        return( @rv );
+    }
+    else
+    {
+        $rv2 = $self->SUPER::pass_error( @_ );
+        $obj->enable(1) if( $flag );
+        return( $rv2 );
+    }
 }
 
 sub remove { return( shift->delete( @_ ) ); }
@@ -420,7 +507,9 @@ sub values
 sub _dumper
 {
     my $self = shift( @_ );
-    $self->_tie_object->enable(0);
+    my $obj = $self->_tie_object;
+    my $flag = $obj->enable;
+    $obj->enable(0) if( $flag );
     my $data = $self->{data};
     my $d = Data::Dumper->new( [ $data ] );
     $d->Indent(1);
@@ -431,7 +520,7 @@ sub _dumper
     $d->Bless( '' );
     # return( $d->Dump );
     my $str = $d->Dump;
-    $self->_tie_object->enable(1);
+    $obj->enable(1) if( $flag );
     return( $str );
 }
 
@@ -440,18 +529,89 @@ sub _internal
     my $self = shift( @_ );
     my $field = shift( @_ );
     my $meth  = shift( @_ );
-    $self->_tie_object->enable(0);
-    my( @resA, $resB );
+    my $code = $self->can( $meth ) || die( "Method $meth is unknown in class ", ref( $self ) );
+    my $obj = $self->_tie_object;
+    my $flag = $obj->enable;
+    $obj->enable(0) if( $flag );
+    my( @rv, $rv2 );
     if( wantarray )
     {
-        @resA = $self->$meth( $field, @_ );
+        @rv = $code->( $self, $field, @_ );
+        $obj->enable(1) if( $flag );
+        return( @rv );
     }
     else
     {
-        $resB = $self->$meth( $field, @_ );
+        $rv2 = $code->( $self, $field, @_ );
+        $obj->enable(1) if( $flag );
+        return( $rv2 );
     }
-    $self->_tie_object->enable(1);
-    return( wantarray ? @resA : $resB );
+}
+
+sub _message
+{
+    my $self = shift( @_ );
+    my $obj = $self->_tie_object;
+    my $flag = $obj->enable;
+    $obj->enable(0) if( $flag );
+    my $rv = $self->SUPER::_message( @_, { skip_frames => 1 } );
+    $obj->enable(1) if( $flag );
+    return( $rv );
+}
+
+sub _message_check
+{
+    my $self = shift( @_ );
+    my $obj = $self->_tie_object;
+    my $flag = $obj->enable;
+    $obj->enable(0) if( $flag );
+    my $rv = $self->SUPER::_message_check( @_ );
+    $obj->enable(1) if( $flag );
+    return( $rv );
+}
+
+sub _message_frame
+{
+    my $self = shift( @_ );
+    my $obj = $self->_tie_object;
+    my $flag = $obj->enable;
+    $obj->enable(0) if( $flag );
+    my $rv = $self->SUPER::_message_frame( @_ );
+    $obj->enable(1) if( $flag );
+    return( $rv );
+}
+
+sub _message_log
+{
+    my $self = shift( @_ );
+    my $obj = $self->_tie_object;
+    my $flag = $obj->enable;
+    $obj->enable(0) if( $flag );
+    my $rv = $self->SUPER::_message_log( @_ );
+    $obj->enable(1) if( $flag );
+    return( $rv );
+}
+
+sub _message_log_io
+{
+    my $self = shift( @_ );
+    my $obj = $self->_tie_object;
+    my $flag = $obj->enable;
+    $obj->enable(0) if( $flag );
+    my $rv = $self->SUPER::_message_log_io( @_ );
+    $obj->enable(1) if( $flag );
+    return( $rv );
+}
+
+sub _messagef
+{
+    my $self = shift( @_ );
+    my $obj = $self->_tie_object;
+    my $flag = $obj->enable;
+    $obj->enable(0) if( $flag );
+    my $rv = $self->SUPER::_messagef( @_ );
+    $obj->enable(1) if( $flag );
+    return( $rv );
 }
 
 sub _obj_comp
@@ -499,6 +659,52 @@ sub _obj_eq
     return( $strA eq $strB );
 }
 
+sub _super_method
+{
+    my $self = shift( @_ );
+    my $meth = shift( @_ ) || die( "No method to call in our parent." );
+    my $code = $self->SUPER::can( $meth ) || die( "Method $meth is not supported in our parent class." );
+    my $obj = $self->_tie_object;
+    my $flag = $obj->enable;
+    $obj->enable(0) if( $flag );
+    my( @rv, $rv2 );
+    if( wantarray )
+    {
+        @rv = $code->( $self, @_ );
+        $obj->enable(1) if( $flag );
+        return( @rv );
+    }
+    else
+    {
+        $rv2 = $code->( $self, @_ );
+        $obj->enable(1) if( $flag );
+        return( $rv2 );
+    }
+}
+
+sub _temporary_disable
+{
+    my $self = shift( @_ );
+    my $cb = shift( @_ ) || die( "No callback provided." );
+    die( "Callback provided is not a code reference." ) if( ref( $cb // '' ) ne 'CODE' );
+    my $obj = $self->_tie_object;
+    my $flag = $obj->enable;
+    $obj->enable(0) if( $flag );
+    my( @rv, $rv2 );
+    if( wantarray )
+    {
+        @rv = $cb->( $self, @_ );
+        $obj->enable(1) if( $flag );
+        return( @rv );
+    }
+    else
+    {
+        $rv2 = $cb->( $self, @_ );
+        $obj->enable(1) if( $flag );
+        return( $rv2 );
+    }
+}
+
 sub _tie_object
 {
     my $self = shift( @_ );
@@ -521,9 +727,11 @@ sub FREEZE
     my $serialiser = CORE::shift( @_ ) // '';
     my $class = CORE::ref( $self );
     my $clone = $self->clone;
-    $clone->_tie_object->enable(0);
+    my $obj = $self->_tie_object;
+    my $flag = $obj->enable;
+    $obj->enable(0) if( $flag );
     my %data = %{$clone->{data}};
-    $clone->_tie_object->enable(1);
+    $obj->enable(1) if( $flag );
     # Return an array reference rather than a list so this works with Sereal and CBOR
     # On or before Sereal version 4.023, Sereal did not support multiple values returned
     CORE::return( [$class, \%data] ) if( $serialiser eq 'Sereal' && Sereal::Encoder->VERSION <= version->parse( '4.023' ) );

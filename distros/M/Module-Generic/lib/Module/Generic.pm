@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v1.0.2
+## Version v1.0.3
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2025/06/03
+## Modified 2025/07/31
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -99,7 +99,7 @@ BEGIN
         (?<ver>(?^:\.[0-9]+) (?^:_[0-9]+)?)
         )
     )/;
-    our $VERSION     = 'v1.0.2';
+    our $VERSION     = 'v1.0.3';
 };
 
 use v5.26.1;
@@ -1384,6 +1384,7 @@ sub error
     $o = $repo->get;
     if( CORE::defined( $o ) && CORE::length( $o ) )
     {
+        # Found an exception object using Module::Generic::Global
     }
     elsif( !CAN_THREADS && CORE::defined( ${ $class . '::ERROR' } ) )
     {
@@ -3258,10 +3259,11 @@ sub _message_frame
 {
     my $self = shift( @_ );
     my $this = $self->_obj2h;
-    $this->{_message_frame } = {} if( !exists( $this->{_message_frame} ) );
-    my $mf = $this->{_message_frame};
+    my $mf;
     if( @_ )
     {
+        $this->{_message_frame } = {} if( !exists( $this->{_message_frame} ) );
+        $mf = $this->{_message_frame};
         my $args = {};
         if( ref( $_[0] ) eq 'HASH' )
         {
@@ -3286,7 +3288,7 @@ sub _message_frame
             return( $self->error( "I was expecting a key => value pair such as routine => stack frame (integer)" ) );
         }
     }
-    return( $mf );
+    return( $mf // {} );
 }
 
 sub _message_log
@@ -3609,6 +3611,7 @@ sub _set_get_array_as_object : lvalue
     my $field = shift( @_ );
     my $this  = $self->_obj2h;
     my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
+#     {
 
     my $callbacks = {};
     my $check;
@@ -3645,6 +3648,23 @@ sub _set_get_array_as_object : lvalue
                 $self->_load_class( 'Module::Generic::Array' ) || return( $self->pass_error );
                 my $o = Module::Generic::Array->new( ( defined( $data->{ $field } ) && CORE::length( $data->{ $field } ) ) ? $data->{ $field } : [] );
                 $data->{ $field } = $o;
+                if( scalar( keys( %$callbacks ) ) && !$o->has_callback )
+                {
+                    foreach my $t ( qw( add remove ) )
+                    {
+                        if( CORE::exists( $callbacks->{ "array_${t}" } ) &&
+                            defined( $callbacks->{ "array_${t}" } ) )
+                        {
+                            my $coderef = ref( $callbacks->{ "array_${t}" } ) eq 'CODE'
+                                ? $callbacks->{ "array_${t}" }
+                                : $self->can( $callbacks->{ "array_${t}" } );
+                            if( defined( $coderef ) )
+                            {
+                                $o->callback( $t => $coderef );
+                            }
+                        }
+                    }
+                }
             }
 
             if( $def->{wantlist} && $ctx->{list} )
@@ -3732,6 +3752,26 @@ sub _set_get_array_as_object : lvalue
                 $data->{ $field } = $o;
             }
             $self->clear_error;
+
+            # Now, set the array callbacks if any
+            if( scalar( keys( %$callbacks ) ) &&
+                $data->{ $field } )
+            {
+                foreach my $t ( qw( add remove ) )
+                {
+                    if( CORE::exists( $callbacks->{ "array_${t}" } ) &&
+                        defined( $callbacks->{ "array_${t}" } ) )
+                    {
+                        my $coderef = ref( $callbacks->{ "array_${t}" } ) eq 'CODE'
+                            ? $callbacks->{ "array_${t}" }
+                            : $self->can( $callbacks->{ "array_${t}" } );
+                        if( defined( $coderef ) )
+                        {
+                            $data->{ $field }->callback( $t => $coderef );
+                        }
+                    }
+                }
+            }
 
             if( $def->{wantlist} && $ctx->{list} )
             {
@@ -5338,6 +5378,8 @@ sub _set_get_number : lvalue
                 |
             )/x,
         short           => qr/(?:[-+]?)(?:0|[1-9][0-9]{0,4})/,
+        signed_byte     => qr/(?:[-+]?)(?:0|[1-9][0-9]{0,2})/,
+        unsigned_byte   => qr/(?:0|[1-9][0-9]{0,2})/,
         unsigned_int    => qr/(?:0|[1-9][0-9]*)/,
         unsigned_long   => qr/(?:0|[1-9][0-9]{0,9})/,
         unsigned_real   => qr/
@@ -5359,6 +5401,7 @@ sub _set_get_number : lvalue
             )/x,
         unsigned_short  => qr/(?:0|[1-9][0-9]{0,4})/,
     };
+    $standard_constraints->{byte} = $standard_constraints->{signed_byte};
     # Aliasing double, decimal, and float to real, since for Perl regexp pattern it would not make much difference.
     $standard_constraints->{dec} = $standard_constraints->{decimal} = $standard_constraints->{double} = $standard_constraints->{float} = $standard_constraints->{real};
     $standard_constraints->{integer} = $standard_constraints->{int};
@@ -5368,6 +5411,8 @@ sub _set_get_number : lvalue
     $standard_constraints->{octal} = $standard_constraints->{oct};
     $standard_constraints->{unsigned_dec} = $standard_constraints->{unsigned_decimal} = $standard_constraints->{unsigned_double} = $standard_constraints->{unsigned_float} = $standard_constraints->{unsigned_real};
     $standard_constraints->{positive_dec} = $standard_constraints->{positive_decimal} = $standard_constraints->{positive_double} = $standard_constraints->{positive_float} = $standard_constraints->{positive_real} = $standard_constraints->{unsigned_real};
+    $standard_constraints->{signed_byte_int} = $standard_constraints->{signed_byte};
+    $standard_constraints->{unsigned_byte_int} = $standard_constraints->{unsigned_byte};
     # The constraint name for error reporting purposes.
     # If there is no entry, the key will be used as-is. For example 'real' -> 'real' and 'int' -> 'integer'
     my $constraint_names =
@@ -5387,7 +5432,9 @@ sub _set_get_number : lvalue
         'positive_double' => 'positive double-precision number',
         'positive_float' => 'positive floating-point number',
         'real'          => 'real number',
+        'signed_byte'   => 'signed byte',
         'short'         => 'short integer',
+        'unsigned_byte' => 'unsigned byte',
         'unsigned_int'  => 'unsigned integer',
         'unsigned_long' => 'unsigned long integer',
         # Yes, those below are made-up types
@@ -5398,9 +5445,14 @@ sub _set_get_number : lvalue
         # This one is a real type though
         'unsigned_short' => 'unsigned short integer',
     };
+    $constraint_names->{byte} = $constraint_names->{signed_byte};
+    $constraint_names->{positive_decimal} = $constraint_names->{positive_dec};
+    $constraint_names->{signed_byte_int} = $constraint_names->{signed_byte};
+    $constraint_names->{signed_byte_integer} = $constraint_names->{signed_byte};
+    $constraint_names->{unsigned_byte_int} = $constraint_names->{unsigned_byte};
+    $constraint_names->{unsigned_byte_integer} = $constraint_names->{unsigned_byte};
     $constraint_names->{unsigned_integer} = $constraint_names->{unsigned_int};
     $constraint_names->{unsigned_decimal} = $constraint_names->{unsigned_dec};
-    $constraint_names->{positive_decimal} = $constraint_names->{positive_dec};
     if( ref( $field ) eq 'HASH' )
     {
         $opts = $field;
@@ -5456,6 +5508,15 @@ sub _set_get_number : lvalue
                         $opts->{constraint} eq 'unsigned_long_integer' )
                     {
                         ( $start_range, $end_range ) = ( 0, 4_294_967_295 );
+                    }
+                    # Existing code for short/long...
+                    elsif( $opts->{constraint} =~ /^(signed_byte|byte|signed_byte_int|signed_byte_integer)$/ )
+                    {
+                        ( $start_range, $end_range ) = ( -128, 127 );
+                    }
+                    elsif( $opts->{constraint} =~ /^(unsigned_byte|unsigned_byte_int|unsigned_byte_integer)$/ )
+                    {
+                        ( $start_range, $end_range ) = ( 0, 255 );
                     }
 
                     if( defined( $start_range ) && defined( $end_range ) )
@@ -6022,6 +6083,8 @@ sub _set_get_object_array_object
 
     my $def = {};
     my $callback;
+    # 'add' or 'remove' callbacks when data gets added or removed from the array object. See Module::Generic::Array documentation.
+    my $callbacks;
     my $check;
     if( ref( $field ) eq 'HASH' )
     {
@@ -6042,6 +6105,12 @@ sub _set_get_object_array_object
             ref( $def->{callback} ) eq 'CODE' )
         {
             $callback = $def->{callback};
+        }
+        if( CORE::exists( $def->{callbacks} ) &&
+            defined( $def->{callbacks} ) &&
+            ref( $def->{callbacks} ) eq 'HASH' )
+        {
+            $callbacks = $def->{callbacks};
         }
         $check = $def->{check} if( CORE::exists( $def->{check} ) && ref( $def->{check} ) eq 'CODE' );
     }
@@ -6065,7 +6134,26 @@ sub _set_get_object_array_object
             return( $self->error( "Invalid value provided." ) ) if( !$rv );
         }
         my $ref = $self->_set_get_object_array( $def, $class, $that ) || return( $self->pass_error );
-        return( Module::Generic::Array->new( $ref ) );
+        my $obj = Module::Generic::Array->new( $ref );
+        # Now, set the array callbacks if any
+        if( defined( $callbacks ) )
+        {
+            foreach my $t ( qw( add remove ) )
+            {
+                if( CORE::exists( $callbacks->{ "array_${t}" } ) &&
+                    defined( $callbacks->{ "array_${t}" } ) )
+                {
+                    my $coderef = ref( $callbacks->{ "array_${t}" } ) eq 'CODE'
+                        ? $callbacks->{ "array_${t}" }
+                        : $self->can( $callbacks->{ "array_${t}" } );
+                    if( defined( $coderef ) )
+                    {
+                        $obj->callback( $t => $coderef );
+                    }
+                }
+            }
+        }
+        return( $obj );
     };
 
     if( @_ )
@@ -11681,7 +11769,7 @@ Quick way to create a class with feature-rich methods
 
 =head1 VERSION
 
-    v1.0.2
+    v1.0.3
 
 =head1 DESCRIPTION
 
@@ -14574,6 +14662,14 @@ An unsigned short integer, i.e. an integer between C<0>, and C<65,535> (2^16-1)
 
 A real number, on which is aliased decimal number, double-precision number, and floating-point number
 
+=item * C<signed_byte>, C<byte>
+
+A signed byte, i.e., an integer between C<-128> and C<127>.
+
+=item * C<unsigned_byte>
+
+An unsigned byte, i.e., an integer between C<0> and C<255>.
+
 =back
 
 =item * C<field>
@@ -14824,6 +14920,24 @@ This is a useful callback when the module instantiation either does not use the 
             my( $self, $value ) = @_; # do some check
             return(1); # Do not forget to return true
         },
+        callbacks =>
+        {
+            array_add => sub
+            {
+                my $def = shift( @_ );
+                my( $pos, $ref ) = @$def{qw( start added )};
+                return unless( blessed( $ref->[0] ) && $ref->[0]->isa( 'MyPackage') );
+                return(1);
+            },
+            array_remove => sub
+            {
+                my $def = shift( @_ );
+                my( $start, $end ) = @$def{qw( start end )};
+                printf( STDERR "Called from package %s at line %d\n", @{$def->{caller}}[0,2] );
+                # Do some check to accept or reject
+                return(1); # always return true to accept
+            },
+        },
     }, 'Some::Module', @_ ) ); }
 
 Provided with an object property name and a class/package name and similar to L</_set_get_object_array2> this will create an array reference of objects.
@@ -14839,6 +14953,14 @@ Mandatory. The object property name.
 =item * C<callback>
 
 Optional. A code reference like an anonymous subroutine that will be called with the class and an array reference of values provided, but possibly empty.
+
+=item * C<callbacks>
+
+Optional. An hash of keys-callbacks pairs. The supported callback types are: C<array_add>, and C<array_remove>
+
+When set, those callbacks will be called when data is added or removed to the array. Be careful that this may slow down your application depending on the frequency of the array call, and what the callback routine does.
+
+See the L<Module::Generic::Array/callback> for more information, and also the methods L<Module::Generic::Array/get_callback>, and L<Module::Generic::Array/has_callback>
 
 =item * C<check>
 

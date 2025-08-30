@@ -1,5 +1,9 @@
 Revision history for Pod::Weaver::Section::SourceGitHub
 
+0.58  2025-08-29
+    - Add "header" option to allow changing the header name.
+      (thanks Robert Rothenberg) [PR #2]
+
 0.57  2024-01-22
     - Fix extra https:// in front of repo urls
 

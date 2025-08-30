@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Asynchronous HTTP Request and Promise - ~/lib/HTTP/Promise/Parser.pm
-## Version v0.2.0
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v0.2.1
+## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/03/25
-## Modified 2023/09/08
+## Modified 2025/08/30
 ## All rights reserved.
 ## 
 ## 
@@ -16,7 +16,7 @@ BEGIN
 {
     use strict;
     use warnings;
-    use warnings::register;
+    warnings::register_categories( 'HTTP::Promise' );
     use parent qw( Module::Generic );
     use vars qw( @EXPORT @EXPORT_OK %EXPORT_TAGS $VERSION $ERROR $DEBUG $EXCEPTION_CLASS
                  $CRLF $LWS $TEXT $TOKEN $HEADER $HTTP_VERSION $REQUEST $RESPONSE 
@@ -74,7 +74,7 @@ BEGIN
     our $ERROR    = '';
     our $DEBUG    = 0;
     our $EXCEPTION_CLASS = 'HTTP::Promise::Exception';
-    our $VERSION = 'v0.2.0';
+    our $VERSION = 'v0.2.1';
 };
 
 use strict;
@@ -922,7 +922,7 @@ sub parse_singleton
             # Assignment used for the warning below
             $total_bytes = $bytes;
         }
-        warn( ref( $self ), "->parse_singleton: Warning only: HTTP body size advertised ($len) does not match the size actually read from filehandle ($total_bytes)\n" ) if( $total_bytes != $len && warnings::enabled( ref( $self ) ) );
+        warn( ref( $self ), "->parse_singleton: Warning only: HTTP body size advertised ($len) does not match the size actually read from filehandle ($total_bytes)\n" ) if( $total_bytes != $len && warnings::enabled( 'HTTP::Promise' ) );
     }
     # No Content-Length defined or there is a boundary expected
     else
@@ -1113,7 +1113,7 @@ HTTP::Promise::Parser - Fast HTTP Request & Response Parser
 
 =head1 VERSION
 
-    v0.2.0
+    v0.2.1
 
 =head1 DESCRIPTION
 
@@ -1617,6 +1617,10 @@ When set, this returns a L<file object|Module::Generic::File>
 =head2 tmp_to_core
 
 Boolean. When set to true, this will store data in memory rather than in a file on the filesystem.
+
+=head1 THREAD-SAFETY
+
+This module is thread-safe for all operations, as it operates on per-object state and uses thread-safe external libraries.
 
 =head1 AUTHOR
 

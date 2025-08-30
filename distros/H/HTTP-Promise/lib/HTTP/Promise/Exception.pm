@@ -47,6 +47,12 @@ This class inherits all its methods from L<Module::Generic::Exception>
 
 Plese see L<Module::Generic::Exception> for details.
 
+=head1 THREAD SAFETY
+
+This module is thread-safe.
+
+It inherits from L<Module::Generic::Exception>, and each instance of L<Module::Generic::Exception> is self-contained and immutable once created and does not share any mutable state across threads.
+
 =head1 AUTHOR
 
 Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>

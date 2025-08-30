@@ -138,6 +138,7 @@ t/trig.t
 t/trigamma.t
 t/TRmpfr_out_str.t
 t/underflow.t
+t/unpack_floats.t
 t/use64bitint.t
 t/uselongdouble.t
 t/view_config.t

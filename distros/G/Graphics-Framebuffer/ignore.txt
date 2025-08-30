@@ -17,7 +17,7 @@ fb_list*
 test*
 *.inl
 *.yml
-src/Framebuffer.pm
+src/Splash.pm
 src/Makefile.pl
 subs.pl
 examples/multiprocessing/many*

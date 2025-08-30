@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Array.pm
-## Version v2.2.3
+## Version v2.3.0
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2025/05/28
+## Modified 2025/08/03
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -37,7 +37,7 @@ BEGIN
     use Module::Generic::Global ':const';
 
     $DEBUG = 0;
-    our $VERSION = 'v2.2.3';
+    our $VERSION = 'v2.3.0';
 };
 
 use v5.26.1;
@@ -174,6 +174,7 @@ sub callback
                 data => $self,
                 debug => $DEBUG,
                 $what => $code,
+                object => $self,
             }) || CORE::return;
             CORE::return(1);
         }
@@ -512,6 +513,20 @@ sub get
     }
 }
 
+sub get_callback
+{
+    my $self = CORE::shift( @_ );
+    my $type = CORE::shift( @_ ) ||
+        CORE::return( $self->error( "No type was provided to get the array callback." ) );
+    unless( $type eq 'add' || $type eq 'remove' )
+    {
+        CORE::return( $self->error( "Unsupported callback type '$type'. You can only use 'add' or 'remove'." ) );
+    }
+    my $tie = tied( @$self );
+    CORE::return if( !$tie );
+    CORE::return( $tie->get_callback( $type ) );
+}
+
 sub get_null
 {
     my $self = CORE::shift( @_ );
@@ -571,6 +586,27 @@ sub grep
 }
 
 sub has { CORE::return( CORE::shift->exists( @_ ) ); }
+
+sub has_callback
+{
+    my $self = CORE::shift( @_ );
+    my $type = CORE::shift( @_ );
+    my $tie = tied( @$self );
+    CORE::return(0) if( !$tie );
+    if( defined( $type ) && CORE::length( $type // '' ) )
+    {
+        unless( $type eq 'add' || $type eq 'remove' )
+        {
+            CORE::return( $self->error( "Unsupported callback type '$type'. You can only use 'add' or 'remove'." ) );
+        }
+        CORE::return( $tie->has_callback( $type ) );
+    }
+    # No type was provided
+    else
+    {
+        CORE::return( $tie->has_callback( 'add' ) || $tie->has_callback( 'remove' ) );
+    }
+}
 
 # Same as get. Maybe I should alias it
 sub index
@@ -1255,10 +1291,11 @@ sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
 
         my $ref =
         {
-        callback_add => $opts->{add},
-        callback_remove => $opts->{remove},
-        data => ( ( Scalar::Util::reftype( $opts->{data} ) // '' ) eq 'ARRAY' ? [@{$opts->{data}}] : [] ),
-        debug => $opts->{debug},
+            callback_add => $opts->{add},
+            callback_remove => $opts->{remove},
+            data => ( ( Scalar::Util::reftype( $opts->{data} ) // '' ) eq 'ARRAY' ? [@{$opts->{data}}] : [] ),
+            debug => $opts->{debug},
+            object => $opts->{object},
         };
         print( STDERR ( ref( $class ) || $class ), "::TIEARRAY: Using ", CORE::scalar( @{$ref->{data}} ), " elements in array vs ", CORE::scalar( @{$opts->{data}} ), " received via opts->data.\n" ) if( $ref->{debug} );
         CORE::return( bless( $ref => ( ref( $class ) || $class ) ) );
@@ -1279,7 +1316,7 @@ sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
         {
             my $removed = [ @$data ];
             my $caller = $self->get_caller;
-            my $def = { type => 'remove', start => 0, end => $#$data, removed => $removed, data => $removed, 'caller' => $caller };
+            my $def = { type => 'remove', start => 0, end => $#$data, removed => $removed, data => $removed, 'caller' => $caller, object => $self->{object} };
             local $_ = $def;
             $rv = $cb->( $def );
         }
@@ -1304,7 +1341,7 @@ sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
         {
             my $removed = [ @$data[ $key ] ];
             my $caller = $self->get_caller;
-            my $def = { type => 'remove', start => $key, end => $key, removed => $removed, data => $removed, 'caller' => $caller };
+            my $def = { type => 'remove', start => $key, end => $key, removed => $removed, data => $removed, 'caller' => $caller, object => $self->{object} };
             local $_ = $def;
             $rv = $cb->( $def );
         }
@@ -1355,7 +1392,7 @@ sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
         {
             my $removed = [ @$data[ $#$data ] ];
             my $caller = $self->get_caller;
-            my $def = { type => 'remove', start => $#$data, end => $#$data, removed => $removed, data => $removed, 'caller' => $caller };
+            my $def = { type => 'remove', start => $#$data, end => $#$data, removed => $removed, data => $removed, 'caller' => $caller, object => $self->{object} };
             local $_ = $def;
             $rv = $cb->( $def );
         }
@@ -1379,7 +1416,7 @@ sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
         {
             my $added = \@values;
             my $caller = $self->get_caller;
-            my $def = { type => 'add', start => ( $#$data + 1 ), added => $added, data => $added, 'caller' => $caller };
+            my $def = { type => 'add', start => ( $#$data + 1 ), added => $added, data => $added, 'caller' => $caller, object => $self->{object} };
             local $_ = $def;
             $rv = $cb->( $def );
         }
@@ -1403,7 +1440,7 @@ sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
         {
             my $removed = [ @$data[0] ];
             my $caller = $self->get_caller;
-            my $def = { type => 'remove', start => 0, end => 0, removed => $removed, data => $removed, 'caller' => $caller };
+            my $def = { type => 'remove', start => 0, end => 0, removed => $removed, data => $removed, 'caller' => $caller, object => $self->{object} };
             local $_ = $def;
             $rv = $cb->( $def );
         }
@@ -1433,7 +1470,7 @@ sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
             {
                 my $added = \@values;
                 my $caller = $self->get_caller;
-                my $def = { type => 'add', start => $offset, added => $added, data => $added, 'caller' => $caller };
+                my $def = { type => 'add', start => $offset, added => $added, data => $added, 'caller' => $caller, object => $self->{object} };
                 local $_ = $def;
                 $rv = $cb->( $def );
             }
@@ -1451,7 +1488,7 @@ sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
             {
                 my $removed = [ @$data[ $offset..( $offset + ( $len - 1 ) ) ] ];
                 my $caller = $self->get_caller;
-                my $def = { type => 'remove', start => $offset, end => ( $offset + ( $len - 1 ) ), removed => $removed, data => $removed, 'caller' => $caller };
+                my $def = { type => 'remove', start => $offset, end => ( $offset + ( $len - 1 ) ), removed => $removed, data => $removed, 'caller' => $caller, object => $self->{object} };
                 local $_ = $def;
                 $rv = $cb->( $def );
             }
@@ -1475,7 +1512,7 @@ sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
         {
             my $added = [ $value ];
             my $caller = $self->get_caller;
-            my $def = { type => 'add', start => $index, added => $added, data => $added, 'caller' => $caller };
+            my $def = { type => 'add', start => $index, added => $added, data => $added, 'caller' => $caller, object => $self->{object} };
             local $_ = $def;
             $rv = $cb->( $def );
         }
@@ -1515,7 +1552,7 @@ sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
             print( STDERR ref( $self ), "::UNSHIFT: got here for values to add '", join( "', '", @values ), "' with callback '$cb'\n" ) if( $self->{debug} );
             my $added = \@values;
             my $caller = $self->get_caller;
-            my $def = { type => 'add', start => 0, added => $added, data => $added, 'caller' => $caller };
+            my $def = { type => 'add', start => 0, added => $added, data => $added, 'caller' => $caller, object => $self->{object} };
             local $_ = $def;
             $rv = $cb->( $def );
         }

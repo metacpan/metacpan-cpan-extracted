@@ -231,12 +231,12 @@ is( $values->[0],                      42,    'red value is right');
 is( $values->[1],                      50,    'green value is right');
 is( $values->[2],                     239,    'blue value is right');
 
-@colors = $cluster->($white, [1,1,1], 1, $HSL);
+@colors = $cluster->($white, [1.01,1.01,1.01], 1, $HSL);
 is( int @colors,                       12,    'cluster edging on roof of HSL space');
 
 @colors = $cluster->($midblue, 0, 1, $HSL);
 is( int @colors,                        1,    'computed minmal ball shaped cluster with one color');
-@colors = $cluster->($midblue, 2, 2, $RGB);
+@colors = $cluster->($midblue, 2.01, 2, $RGB);
 is( int @colors,                       13,    'computed smallest ball shaped cluster in RGB');
 $values = $colors[1]->shaped('RGB');
 is( ref $values,                  'ARRAY',    'center color is on pos one');

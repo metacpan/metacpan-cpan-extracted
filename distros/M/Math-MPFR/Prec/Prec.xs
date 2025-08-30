@@ -45,6 +45,11 @@ SV * prec_cast(pTHX_ SV * iv) {
   return obj_ref;
 }
 
+int _PREC_MIN(void) {
+  /* Used by MPFR.pm to set the constant PREC_MIN */
+  return (int)MPFR_PREC_MIN;
+}
+
 void DESTROY(pTHX_ SV *  rop) {
   Safefree(INT2PTR(mp_prec_t *, SvIVX(SvRV(rop))));
 }
@@ -61,6 +66,10 @@ prec_cast (iv)
 CODE:
   RETVAL = prec_cast (aTHX_ iv);
 OUTPUT:  RETVAL
+
+int
+_PREC_MIN ()
+
 
 void
 DESTROY (rop)

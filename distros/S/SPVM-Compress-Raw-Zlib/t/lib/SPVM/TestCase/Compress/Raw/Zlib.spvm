@@ -1,0 +1,11 @@
+class TestCase::Compress::Raw::Zlib {
+  use Compress::Raw::Zlib;
+  use Compress::Raw::Zlib::Constant;
+  use Compress::Raw::Zlib::Deflate;
+  use Compress::Raw::Zlib::Inflate;
+  
+  static method test : int () {
+    
+    return 1;
+  }
+}

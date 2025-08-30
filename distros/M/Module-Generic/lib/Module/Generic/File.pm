@@ -725,16 +725,19 @@ sub close
 {
     my $self = shift( @_ );
     my $io = $self->opened || return( $self );
-    my $fd = $io->fileno;
-    $io->close;
-    # We use the file as the universal key, just like flock locks the file on its inode
-    my $repo_key = $self->filepath;
-    my $repo = Module::Generic::Global->new( 'fd_locks' => CORE::ref( $self ), key => "$repo_key" ) ||
-        return( $self->pass_error( Module::Generic::Global->error ) );
-    # Clear any lock state
-    $repo->remove;
-    # Clear instance lock state
-    $self->locked(0);
+    if( $self->is_file )
+    {
+        my $fd = $io->fileno;
+        $io->close;
+        # We use the file as the universal key, just like flock locks the file on its inode
+        my $repo_key = $self->filepath;
+        my $repo = Module::Generic::Global->new( 'fd_locks' => CORE::ref( $self ), key => "$repo_key" ) ||
+            return( $self->pass_error( Module::Generic::Global->error ) );
+        # Clear any lock state
+        $repo->remove;
+        # Clear instance lock state
+        $self->locked(0);
+    }
     $self->opened( undef );
     return( $self );
 }

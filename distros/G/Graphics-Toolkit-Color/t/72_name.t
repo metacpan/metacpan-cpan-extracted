@@ -2,7 +2,7 @@
 
 use v5.12;
 use warnings;
-use Test::More tests => 63;
+use Test::More tests => 66;
 BEGIN { unshift @INC, 'lib', '../lib'}
 use Graphics::Toolkit::Color::Space::Util ':all';
 
@@ -41,10 +41,15 @@ is( $values->[2],              0,       'blue value is correct' );
 @names = Graphics::Toolkit::Color::Name::from_values([255,0,0]);
 is( int @names,                1,       'no second arg, get only one name "from_values"');
 is( $names[0],             'red',       'and its name is "red"');
-@names = Graphics::Toolkit::Color::Name::from_values([255,0,0], undef, 'all');
+@names = Graphics::Toolkit::Color::Name::from_values([255,0,0], undef, 'all' );
 is( int @names,                2,       'all names were requested "from_values"' );
 is( $names[0],             'red',       'it is also "red" on first position' );
 is( $names[1],            'red1',       'it is "red1" on second position' );
+@names = Graphics::Toolkit::Color::Name::from_values([255,0,0], undef, 'all', 'full' );
+is( int @names,                2,       'names do not expand when in default scheme' );
+is( $names[0],             'red',       'it is also "red" on first position' );
+is( $names[1],            'red1',       'it is "red1" on second position' );
+
 @names = Graphics::Toolkit::Color::Name::closest_from_values([255,0,0] );
 is( int @names,                2,       'got names and distance from "closest_from_values"');
 is( $names[0],             'red',       'and its name is "red"' );

@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 05-NULL.t 1910 2023-03-30 19:16:30Z willem $	-*-perl-*-
+# $Id: 05-NULL.t 2035 2025-08-14 11:49:15Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -40,6 +40,7 @@ for my $rr ( Net::DNS::RR->new( name => $name, type => $type, %$hash ) ) {
 		is( $rr2->$_, $rr->$_, "additional attribute rr->$_()" );
 	}
 
+	$rr->class(1);
 	$rr->ttl(1234);
 	my $encoded = $rr->encode;
 	my $decoded = Net::DNS::RR->decode( \$encoded );

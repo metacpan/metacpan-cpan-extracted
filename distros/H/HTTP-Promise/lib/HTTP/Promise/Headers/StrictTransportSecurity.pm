@@ -16,7 +16,7 @@ BEGIN
 {
     use strict;
     use warnings;
-    use warnings::register;
+    warnings::register_categories( 'HTTP::Promise' );
     use parent qw( HTTP::Promise::Headers::Generic );
     our $VERSION = 'v0.1.0';
 };
@@ -151,6 +151,10 @@ Sets or gets an arbitrary boolean property.
 =head2 properties
 
 Returns the L<hash object|Module::Generic::hash> used as a repository of properties.
+
+=head1 THREAD-SAFETY
+
+This module is thread-safe for all operations, as it operates on per-object state and uses thread-safe external libraries.
 
 =head1 AUTHOR
 

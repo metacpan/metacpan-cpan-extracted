@@ -1,0 +1,67 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use FindBin qw($Bin);
+use Getopt::Long qw(GetOptions);
+use File::Slurp qw(read_file);
+use JSON::MaybeXS;
+
+use SEO::Inspector;
+
+# -------------------------------
+# Command line options
+# -------------------------------
+my ($url, $file, $json);
+GetOptions(
+	'url|u=s'  => \$url,
+	'file|f=s' => \$file,
+	'json|j'   => \$json,
+) or die "Usage: $0 --url <URL> | --file <HTML file> [--json]\n";
+
+die 'Specify either --url or --file' unless $url || $file;
+
+# -------------------------------
+# Create inspector object
+# -------------------------------
+my $inspector = SEO::Inspector->new(
+	url => $url,
+	plugin_dirs => [ "$Bin/lib/SEO/Inspector/Plugin" ]
+);
+
+# -------------------------------
+# Fetch HTML and run checks
+# -------------------------------
+my ($html, $plugin_results, $builtin_results);
+
+if ($file) {
+	$html = read_file($file);
+	die 'File is empty' unless $html;
+
+	$plugin_results  = $inspector->check_html($html);
+	$builtin_results = $inspector->run_all($html);
+} else {
+	my $all_results = $inspector->check_url($url);
+	$html		= delete $all_results->{_html}; # remove internal HTML
+	$plugin_results  = { map { $_ => $all_results->{$_} } grep { exists $inspector->{plugins}{$_} } keys %$all_results };
+	$builtin_results = { map { $_ => $all_results->{$_} } grep { !exists $inspector->{plugins}{$_} } keys %$all_results };
+}
+
+# -------------------------------
+# Merge results
+# -------------------------------
+my %results = (%$plugin_results, %$builtin_results);
+
+# -------------------------------
+# Output results
+# -------------------------------
+if ($json) {
+	print JSON::MaybeXS::encode_json(\%results), "\n";
+} else {
+	for my $key (sort keys %results) {
+		my $r = $results{$key};
+		next unless ref $r eq 'HASH';
+		printf "[%s] %s: %s\n", $r->{status} // 'unknown', $r->{name} // $key, $r->{notes} // '';
+	}
+}

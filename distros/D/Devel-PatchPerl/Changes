@@ -1,6 +1,108 @@
 ==================================================
-Changes from 2016-01-13 00:00:00 +0000 to present.
+Changes from 2020-08-31 00:00:00 +0000 to present.
 ==================================================
+
+-----------------------------------------
+version 2.14 at 2025-08-30 08:12:44 +0000
+-----------------------------------------
+
+  Change: 2653e0e59fec69c6d8b02405b3d7e3c3b9730bd5
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2025-08-30 09:12:44 +0000
+
+    Release 2.14 
+
+  Change: eae518c1f34a0e7fd6498d199b032043a5e2930a
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2025-08-30 09:09:13 +0000
+
+    Defanged the GCC brace groups patching
+
+    It sometimes works and it mostly doesn't needs more investigation. 
+
+  Change: 975bf1029c046347ec1aa55ad1305e559a883984
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2025-08-07 11:16:22 +0000
+
+    Fix processing logic
+
+    Plugins were not being processed if perl version being patched was
+    higher than the certified perl version.
+
+    Refactored so that plugins are always processed if they are specified
+    regardless of certification. 
+
+-----------------------------------------
+version 2.12 at 2025-04-28 17:04:00 +0000
+-----------------------------------------
+
+  Change: 950b6d09440f4d0213e5e97303af289f38be746c
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2025-04-28 18:04:00 +0000
+
+    Fixing mistakes of the past
+
+    2.10-TRIAL included a checkout of the perl source tree 
+
+-----------------------------------------
+version 2.10 at 2025-04-24 17:44:36 +0000
+-----------------------------------------
+
+  Change: fa55c4e9c77c87c990b5f0e297355b8c726453b2
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2025-04-24 18:44:36 +0000
+
+    Trial release 2.10
+
+    Bumped hints to v5.41.12 level 
+
+  Change: 6b5ce8dadf32f9f74a4ea3ecaaf15573a2062cd7
+  Author: ICHINOSE Shogo <shogo82148@gmail.com>
+  Date : 2025-04-23 10:05:05 +0000
+
+    bump GitHub Actions to latest 
+
+  Change: 553b9a6faf3c7b707aa75819526862b5c1b70f5e
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2024-12-21 20:57:36 +0000
+
+    Fix an issue building DB_File on Darwin
+
+    Opened the previous FreeBSD only fix to Darwin too 
+
+  Change: e2b82093b69907e132201f93eeb7130cc34b90e6
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2024-12-21 20:44:21 +0000
+
+    Add patches for Devel::PPPort
+
+    Together with previous commit this should shut up clang's warnings
+    about GCC braces 
+
+  Change: 9c464a923a8acca600ba661067083cf7196da864
+  Author: Shoichi Kaji <skaji@cpan.org>
+  Date : 2024-06-29 11:01:43 +0000
+
+    add skip_using_gcc_brace_groups 
+
+-----------------------------------------
+version 2.09 at 2023-11-28 00:04:49 +0000
+-----------------------------------------
+
+  Change: 6b09b7f0dd2c526539145e78bb6f9b9eb03502a3
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2023-11-28 00:04:49 +0000
+
+    Fix an issue building DB_File on FreeBSD
+
+    v5.8.9 and v5.10.0 fail to build on FreeBSD 14.0-RELEASE which comes
+    with clang 16.0.6. Backported revisions to DB_File from v5.10.1 which
+    did build.
+
+    Only tested against v5.8.9 and v5.10.0 and only applicable to OS ==
+    'freebsd' for the moment
+
+    Updated included hints. 
 
 -----------------------------------------
 version 2.08 at 2021-01-11 20:08:00 +0000
@@ -162,570 +264,6 @@ version 2.02 at 2020-11-08 19:28:50 +0000
 
     introduce GitHub Actions 
 
------------------------------------------
-version 2.00 at 2020-06-04 10:20:07 +0000
------------------------------------------
-
-  Change: 0ab4bf0d8b02af79e1afed7fac9e91b75f1c1fda
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2020-06-04 11:20:07 +0000
-
-    Resolve patching issues with v5.22.x and v5.24.x
-
-    https://github.com/bingos/devel-patchperl/issues/44
-
-    Configure changes had been backported to the v5.22 and v5.24 maint
-    releases, so what worked for .0 releases didn't work for later maint
-    releases.
-
-    I have adjusted and tested the patch application criteria for all
-    v5.22.x and v5.24.x releases. 
-
------------------------------------------
-version 1.98 at 2020-05-25 18:17:30 +0000
------------------------------------------
-
-  Change: 25ccc65e1b2bd688983ced340c23561888456921
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2020-05-25 19:17:30 +0000
-
-    Added command line switches to patchperl
-
-    --version prints version of Devel::PatchPerl and exits
-
-    --patchlevel will update patchlevel.h even in a git repository
-
-    One may also set the PERL5_PATCHPERL_PATCHLEVEL env var to have the
-    same effect as --patchlevel 
-
------------------------------------------
-version 1.96 at 2020-05-25 11:21:50 +0000
------------------------------------------
-
-  Change: 15cdb6b32538d3cefc779735413f0fe8522aa27b
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2020-05-25 12:21:50 +0000
-
-    Resolve reported issue with 1.94 release
-
-    https://github.com/bingos/devel-patchperl/issues/42
-
-    Will successfully patch all the way back to v5.6.0 
-
------------------------------------------
-version 1.94 at 2020-05-24 12:52:39 +0000
------------------------------------------
-
-  Change: 14c825fc079cb8f0d626b6b9769d048db9771bc0
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2020-05-24 13:52:39 +0000
-
-    Added Configure patch for GCC10
-
-    https://github.com/perl/perl5/commit/9f4e6307232229875331a55e44e1245b
-    0b91e219
-
-    Fedora 32 now ships with GCC 10 as the system compiler 
-
------------------------------------------
-version 1.92 at 2020-04-27 10:25:28 +0000
------------------------------------------
-
-  Change: fc4fd9ed11ccce6c653010df796d7ccc5c0a8bb9
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2020-04-27 11:25:28 +0000
-
-    Release engineering for 1.92
-
-    - Added
-    https://github.com/perl/perl5/commit/e9c9cf57594854df9f5802f7f149be47
-    38212e96
-
-    to resolve issues building threaded/quadmath perls below v5.28.0 on
-    recent Ubunutu 20.04 
-
------------------------------------------
-version 1.90 at 2020-03-11 15:12:17 +0000
------------------------------------------
-
-  Change: 4e7524712ba22826ee94dc270270d544a8402b40
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2020-03-11 15:12:17 +0000
-
-    Release engineering for 1.90
-
-    - Finessed patching for Time::Local 2020 problem
-
-    Local.t patching back to v5.8.7 
-
------------------------------------------
-version 1.88 at 2020-03-10 20:11:48 +0000
------------------------------------------
-
-  Change: a54f02952cf7e62be4ed4f4772a1db6544949fcf
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2020-03-10 20:11:48 +0000
-
-    Release engineering for 1.88
-
-    - Fixes for Locale.t year 2020 problems
-
-    Applies back to v5.13.9 
-
------------------------------------------
-version 1.86 at 2020-02-04 15:37:02 +0000
------------------------------------------
-
-  Change: 8cf8b79c67f7d3aed2b54f21adedd3019dbc687f
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2020-02-04 15:37:02 +0000
-
-    Release engineering for 1.86
-
-    - Added fix for ExtUtils::MM_AIX preventing builds on AIX for
-
-    perls v5.28.x and v5.30.x 
-
------------------------------------------
-version 1.84 at 2020-01-28 19:00:25 +0000
------------------------------------------
-
-  Change: 64abf332fa8344c14becb070727cec3b6e8c06d8
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2020-01-28 19:00:25 +0000
-
-    Release engineering for 1.84
-
-    - fixed problem with 1.82 release that stops perls < 5.10
-
-    from being patched
-
-    (I suck at Perl Versions). 
-
------------------------------------------
-version 1.82 at 2020-01-28 18:45:38 +0000
------------------------------------------
-
-  Change: f367dbcb8e4fd2b998450e2f52a2844cb7be2d71
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2020-01-28 18:45:38 +0000
-
-    Release engineering for 1.82
-
-    Certified perl version < 5.031004 
-
-  Change: ead35cf30015274f8b98c0f93c93882b1502345a
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2020-01-28 18:38:42 +0000
-
-    Fix issue with SDBM_File on perls > 5.10.0 and < 5.14.4
-
-    I've only seen an issue without the patch on Alpine Linux
-    (https://github.com/Perl/perl5/commit/acdbe25bd91) 
-
------------------------------------------
-version 1.80 at 2019-11-19 16:27:40 +0000
------------------------------------------
-
-  Change: acdcf1d67ae426367f42ca763b9ba6b92dd90925
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2019-11-19 16:27:40 +0000
-
-    Release engineering for 1.80
-
-    - Fixes https://github.com/bingos/devel-patchperl/issues/38
-
-    "Failed to apply devel-patchperl to perl 5.8.8 in macOS" 
-
-  Change: 94520b369885689366535b80a05b16e8129789d7
-  Author: Shoichi Kaji <skaji@cpan.org>
-  Date : 2019-11-19 16:26:17 +0000
-
-    fix #38; _patch -> _patch_b64 
-
------------------------------------------
-version 1.78 at 2019-11-14 14:18:25 +0000
------------------------------------------
-
-  Change: fd36f9e4d74f0360b79ad8d9db3795d15dd45da7
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2019-11-14 14:18:25 +0000
-
-    Release engineering for 1.78
-
-    No functional changes, removed stray file from the dist. GH #37 
-
------------------------------------------
-version 1.76 at 2019-11-10 21:56:25 +0000
------------------------------------------
-
-  Change: c6c3401c1ff06069158e500666a15d5b917c5333
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2019-11-10 21:56:25 +0000
-
-    Release engineering for 1.76 
-
-  Change: fe21ec31068762a266065d97d58049024d324712
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2019-11-10 21:52:33 +0000
-
-    Fix issues with patching utils/h2ph.PL on v5.8.x
-
-    Whilst I was at it got it working for the v5.9.x series and converted
-    patch storage to base64 
-
------------------------------------------
-version 1.74 at 2019-11-10 19:12:13 +0000
------------------------------------------
-
-  Change: bc34799b4bbfd6617f994462cf286c885076a685
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2019-11-10 19:12:13 +0000
-
-    Release engineering for 1.74 
-
-  Change: ce53c2729056069ab0a1703ab4a607ff591c67a3
-  Author: Shoichi Kaji <skaji@cpan.org>
-  Date : 2019-11-10 19:09:52 +0000
-
-    fix #35; restore file permission 
-
-  Change: feb438a355d8f56eb7c302ca0c861fd06f82323c
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2019-11-10 19:07:52 +0000
-
-    Revert "Fix issue where Configure was left not executable"
-
-    This reverts commit 8c5111233d3120fc9e5c11045755a4d96d247848.
-
-    Will apply skaji's solution as it is much more elegant. 
-
------------------------------------------
-version 1.72 at 2019-11-10 17:14:02 +0000
------------------------------------------
-
-  Change: 525226049faf7c37435bd8850a72b441d5611769
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2019-11-10 17:14:02 +0000
-
-    Release engineering for 1.72 
-
-  Change: 8c5111233d3120fc9e5c11045755a4d96d247848
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2019-11-10 17:12:54 +0000
-
-    Fix issue where Configure was left not executable 
-
-  Change: eb986180d4cb0d6bef5c6cb937c915cf5f3c1ab4
-  Author: Mohammad S Anwar <mohammad.anwar@yahoo.com>
-  Date : 2019-11-08 09:25:18 +0000
-
-    Added test prereq Test::More as suggested by CPANTS.
-
-    Signed-off-by: Chris 'BinGOs' Williams <chris@bingosnet.co.uk> 
-
------------------------------------------
-version 1.70 at 2019-11-08 02:01:40 +0000
------------------------------------------
-
-  Change: a28752586c80e3973427a195eee9fef139769126
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2019-11-08 02:01:40 +0000
-
-    Release engineering for 1.70 
-
-  Change: cdbf062e9cae9bdccb4d510a506a93c01f879f9b
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2019-11-08 01:59:33 +0000
-
-    Added Base64 encoding of patches
-
-    This should resolve issues such as RT#130939 Initially encoded the
-    offending patch 
-
------------------------------------------
-version 1.68 at 2019-11-07 10:11:25 +0000
------------------------------------------
-
-  Change: ad469d13d24b4ba61745025946d94873c6741bbb
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2019-11-07 10:11:25 +0000
-
-    Release engineering for 1.68
-
-    Don't index package Errno 
-
------------------------------------------
-version 1.66 at 2019-11-07 00:59:46 +0000
------------------------------------------
-
-  Change: 0b8b9e1a230fc5db2da7a0c134059acb36bd0f18
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2019-11-07 00:59:46 +0000
-
-    Release engineering for 1.66 
-
-  Change: 3be89570ad0dc2cbd7de4fe8b2abce06e178e55c
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2019-11-07 00:51:03 +0000
-
-    Fix issues with v5.7.x (h2ph.PL and Errno.pm.PL) 
-
-  Change: 9795ec9c40d3a2fb627e975b7fc1503375cd9a9b
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2019-11-06 23:49:45 +0000
-
-    Fix utils/h2ph.PL patching on v5.8.0 
-
-  Change: b4e5461e9e762b26944305ddcb195c29a98c1b39
-  Author: wwlwpd <6434714+wwlwpd@users.noreply.github.com>
-  Date : 2019-06-21 10:10:58 +0000
-
-    Set files to be patched to 0644 if they are 0444, set back after.
-
-    Issue 31: In an environment that uses the Lustre file system, it's
-    been seen that any files that are set to 0444 (read only) will cause
-    fatal filesystem errors when the patch is attempted. This makes using
-    perlbrew to install perl on these systems impossible This change
-    detects read-only files about to be patched, sets them to 0644 for
-    the duration of the patching, then sets them back to 0444 so that
-    they exist as expected during the actual build process. 
-
------------------------------------------
-version 1.64 at 2019-06-15 09:35:16 +0000
------------------------------------------
-
-  Change: 62eed456ce2092db5521f21adbd8c34b30987c84
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2019-06-15 10:35:16 +0000
-
-    Release engineering for 1.64 
-
-  Change: a7e913e3ffb1228ab7628da44ecfb1b9da59e8b7
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2019-06-15 10:33:43 +0000
-
-    Fix GH issue #33 Fails to patch 5.20.3 
-
------------------------------------------
-version 1.62 at 2019-06-02 13:06:13 +0000
------------------------------------------
-
-  Change: c49873891956e56b72e3a986f3d2b13f8b785a9c
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2019-06-02 14:06:13 +0000
-
-    Release engineering for 1.62 
-
-  Change: 2c864effec4b1ade1fb45f10c6d917942eecd479
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2019-06-02 14:04:38 +0000
-
-    Fixed GH issue #30 patch_source fails with 5.8.1..8 
-
------------------------------------------
-version 1.60 at 2019-05-14 11:37:28 +0000
------------------------------------------
-
-  Change: 1595e5c61cbef9e8d580cbdd97b32eefdb83209a
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2019-05-14 12:37:28 +0000
-
-    Release engineering for 1.60 
-
-  Change: 66635512bb0e8ddb8dd8e5f2142600697eafd946
-  Author: Benjamin Smith <bsmith@cpan.org>
-  Date : 2019-05-14 12:34:42 +0000
-
-    Fix Configure patch for fwrapv issue
-
-    Signed-off-by: Chris 'BinGOs' Williams <chris@bingosnet.co.uk> 
-
------------------------------------------
-version 1.58 at 2019-04-26 15:51:27 +0000
------------------------------------------
-
-  Change: 1be25996c64d8e3b9ed9997facc4e07f66722f59
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2019-04-26 16:51:27 +0000
-
-    Release engineering for 1.58 
-
-  Change: 9acd33780d61b675239cb812777a172eb0ae4492
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2019-04-26 16:50:42 +0000
-
-    Merge hints from blead v5.29.10 
-
-  Change: 7753eb224020419fc199bf5bc207cce0bef93d18
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2019-04-26 16:46:44 +0000
-
-    Add patch to fix lib/h2ph.t 
-
-  Change: 3f58aa0bda494f4a7ff8e8d178bce25e0928efd2
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2019-04-26 15:34:00 +0000
-
-    Added patch to fix utils/h2ph.PL 
-
-  Change: 86165ca94b2bc35ac49e99c91371e0bb269d2d72
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2019-04-26 14:18:44 +0000
-
-    Patch Configure for -fwrapv 
-
-  Change: 9eabda784544256a9fe1879bef9b0a0c043546f3
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2019-04-26 10:58:03 +0000
-
-    Test hints() function as well 
-
-  Change: e1d4c88a89f3809432479113de2370a31cb68fb4
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2019-04-26 10:01:03 +0000
-
-    Added test for non-existant plugin 
-
------------------------------------------
-version 1.56 at 2019-02-26 14:01:17 +0000
------------------------------------------
-
-  Change: 1e8e1b66831493bbf6993eb5190527b8f1312e8a
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2019-02-26 14:01:17 +0000
-
-    Let's not exit from a sub, eh
-
-    Apparently I am an idiot. 
-
------------------------------------------
-version 1.54 at 2019-02-18 11:06:49 +0000
------------------------------------------
-
-  Change: 498fcff11abd4e5f06a4e916c2296323c1125ced
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2019-02-18 11:06:49 +0000
-
-    Updated hints and added certified perl version
-
-    If perl to be patched is greater than or equal to certified perl
-    version than patchperl will exit doing nothing 
-
------------------------------------------
-version 1.52 at 2018-06-23 09:12:01 +0000
------------------------------------------
-
-  Change: 9987ca085ff78e37d4fb0a118a16dc6b6b11ba79
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2018-06-23 10:12:01 +0000
-
-    Release engineering for 1.52 
-
-  Change: d4d87e4d9324316e1ab392619491a96885aa3fa1
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2018-06-23 10:03:51 +0000
-
-    Updated hints 
-
-  Change: 95826fad7e96f573dad727374cfb9f4a8b1017ee
-  Author: Bram <bram-tvguho@mail.wizbit.be>
-  Date : 2017-12-08 12:56:34 +0000
-
-    Add patch for 'Perl_fp_class_denorm'
-
-    Patch error:
-
-    sv.o: In function `S_hextract':
-
-    sv.c:(.text+0xcfd): undefined reference to `Perl_fp_class_denorm'
-
-    perl5 commit message:
-
-    Fallbacks for Perl_fp_class_denorm().
-
-    These may be needed if the compiler doesn't expose the C99 math
-
-    without some special switches.
-
-    See also: - https://rt.perl.org/Public/Bug/Display.html?id=132255 -
-    perl5 commit 488307ffa67ce70fc9755e560a74dac04bdcb0e4 
-
------------------------------------------
-version 1.48 at 2017-02-12 18:32:39 +0000
------------------------------------------
-
-  Change: 5a47f8c8ee6a2658264412f66d010fd50820e304
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2017-02-12 18:32:39 +0000
-
-    Updated hints 
-
-  Change: cbdc230953a7bb62852d6f9bd65ea2ebecec935a
-  Author: David Golden <xdg@xdg.me>
-  Date : 2017-02-12 14:29:34 +0000
-
-    Patch Time::HiRes in 5.24.[01] (#26)
-
-    Time::HiRes is broken on threaded darwin in 5.24.0 and 5.24.1. This
-    patch brings in changes from blead that fix it. The patch is
-    unfortunately large, as untangling just the compilation fix from
-    other changes and still getting tests to pass wasn't straightforward. 
-
------------------------------------------
-version 1.46 at 2016-11-21 11:02:53 +0000
------------------------------------------
-
-  Change: d89ef82256c963746f576c2ce1dfb8ef8bd0aca6
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2016-11-21 11:02:53 +0000
-
-    Updated hints 
-
------------------------------------------
-version 1.44 at 2016-08-18 11:38:32 +0000
------------------------------------------
-
-  Change: 7438a96d49d498b6bd3752293c4d147d9f3fef49
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2016-08-18 12:38:32 +0000
-
-    Updated hints for darwin, freebsd and gnu (hurd) 
-
------------------------------------------
-version 1.42 at 2016-04-21 16:08:59 +0000
------------------------------------------
-
-  Change: af3745be4c87fbf89b59c0a6356a3944b59d6179
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2016-04-21 17:08:59 +0000
-
-    Update hints file for Darwin 
-
-  Change: 0c03b74346458076f014851f7501e7cb96c4c06d
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2016-04-21 17:08:52 +0000
-
-    Don't patch the patchlevel if in Git repository
-
-    This should address https://rt.cpan.org/Ticket/Display.html?id=108689 
-
-  Change: d8048d8ce5280d4ac67a5f99b97d2fc43aef8bef
-  Author: Chris Williams <chris@bingosnet.co.uk>
-  Date : 2016-01-01 01:41:04 +0000
-
-    Merge pull request #25 from book/master
-
-    Add the proper patch for ext/Errno/Errno_pm.PL in Perl 5.7.2 
-
-  Change: c3e98d2f49d52819b85982e118fda73baaa90070
-  Author: Philippe Bruhat (BooK) <book@cpan.org>
-  Date : 2015-12-30 08:47:59 +0000
-
-    Add the proper patch for ext/Errno/Errno_pm.PL in Perl 5.7.2
-
-    Fixes GH #24 
-
 =================================================
-Plus 70 releases after 2016-01-13 00:00:00 +0000.
+Plus 99 releases after 2020-08-31 00:00:00 +0000.
 =================================================

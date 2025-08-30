@@ -16,7 +16,7 @@ BEGIN
 {
     use strict;
     use warnings;
-    use warnings::register;
+    warnings::register_categories( 'HTTP::Promise' );
     use parent qw( HTTP::Promise::Headers::Generic );
     our $VERSION = 'v0.1.0';
 };
@@ -156,6 +156,10 @@ Set or get an arbitrary name-value pair attribute.
 Set or get multiple name-value parameters.
 
 Calling this without any parameters, retrieves the associated L<hash object|Module::Generic::Hash>
+
+=head1 THREAD-SAFETY
+
+This module is thread-safe for all operations, as it operates on per-object state and uses thread-safe external libraries.
 
 =head1 AUTHOR
 

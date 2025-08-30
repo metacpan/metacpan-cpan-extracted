@@ -1,5 +1,5 @@
 package Sys::Info::Driver::Linux::Device;
-$Sys::Info::Driver::Linux::Device::VERSION = '0.7909';
+$Sys::Info::Driver::Linux::Device::VERSION = '0.7911';
 use strict;
 use warnings;
 
@@ -17,7 +17,7 @@ Sys::Info::Driver::Linux::Device
 
 =head1 VERSION
 
-version 0.7909
+version 0.7911
 
 =head1 SYNOPSIS
 

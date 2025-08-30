@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
 license: lgpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,11 +17,11 @@ name: PDF-API2
 requires:
   Compress::Zlib: '1.0'
   Font::TTF: '0'
-  perl: v5.10.0
+  perl: v5.20.0
 resources:
   bugtracker: https://github.com/ssimms/pdfapi2/issues
   repository: git://github.com/ssimms/pdfapi2.git
-version: '2.047'
-x_generated_by_perl: v5.32.1
+version: '2.048'
+x_generated_by_perl: v5.36.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: LGPL-2.1

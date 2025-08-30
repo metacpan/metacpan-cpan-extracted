@@ -6,13 +6,6 @@ use v5.12;
 use warnings;
 use Graphics::Toolkit::Color::Space qw/min max/;
 
-my $hsb_def = Graphics::Toolkit::Color::Space->new( axis => [qw/hue saturation brightness/],
-                                                   range => [360, 100, 100],  precision => 0,
-                                                    type => [qw/angular linear linear/],
-                                                  suffix => ['', '%', '%'], );
-
-   $hsb_def->add_converter('RGB', \&to_rgb, \&from_rgb );
-
 sub from_rgb {
     my ($r, $g, $b) = @{$_[0]};
     my $vmin = min($r, $g, $b);
@@ -26,7 +19,6 @@ sub from_rgb {
                           : (($r - $g) / $d + 4);
     return ([$h/6, $s, $br]);
 }
-
 sub to_rgb {
     my ($h, $s, $b) = @{$_[0]};
     return ([$b, $b, $b]) if $s == 0;
@@ -44,4 +36,11 @@ sub to_rgb {
     return \@rgb;
 }
 
-$hsb_def;
+Graphics::Toolkit::Color::Space->new (
+            axis => [qw/hue saturation brightness/],
+           range => [360, 100, 100],
+       precision => 0,
+            type => [qw/angular linear linear/],
+          suffix => ['', '%', '%'],
+         convert => {RGB => [\&to_rgb, \&from_rgb]},
+);

@@ -13,7 +13,7 @@ is( not($@), 1, 'could load the module');
 is( ref $space, 'Graphics::Toolkit::Color::Space', 'got tight return value by loading module');
 is( $space->name,                           'LAB', 'color space name is LAB');
 is( $space->alias,                       'CIELAB', 'color space alias name is CIELAB');
-is( $space->is_name('lab'),                     1, 'color space name NCol is correct');
+is( $space->is_name('lab'),                     1, 'color space name "lab" is correct');
 is( $space->is_name('CIElab'),                  1, 'axis initials do not equal space name this time');
 is( $space->is_name('xyz'),                     0, 'axis initials do not equal space name this time');
 is( $space->axis_count,        3,                  'color space has 3 axis');
@@ -34,8 +34,8 @@ is( $space->is_partial_hash({'L*' => 1, 'a*' => 0, 'b*' => 0}), 1,  'found hash 
 is( $space->is_partial_hash({l => 1, a => 0}), 1,  'found hash with some keys');
 is( $space->is_partial_hash({a => 1, b => 0}), 1,  'found hash with some other keys');
 is( $space->is_partial_hash({a => 1, x => 0}), 0,  'partial hash with bad keys');
-is( $space->can_convert('XYZ'),    1,                 'do convert from and to xyz');
-is( $space->can_convert('xyz'),    1,              'namespace can be written upper case');
+is( $space->can_convert('XYZ'),    1,              'do convert from and to xyz');
+is( $space->can_convert('xyz'),    1,              'namespace can be written lower case');
 is( $space->can_convert('CIELAB'), 0,              'can not convert to itself');
 is( $space->format([0,0,0], 'css_string'), 'lab(0, 0, 0)', 'can format css string');
 

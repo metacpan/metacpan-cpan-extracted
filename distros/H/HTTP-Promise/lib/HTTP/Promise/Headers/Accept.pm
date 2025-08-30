@@ -16,7 +16,7 @@ BEGIN
 {
     use strict;
     use warnings;
-    use warnings::register;
+    warnings::register_categories( 'HTTP::Promise' );
     use parent qw( HTTP::Promise::Headers::Generic );
     our $VERSION = 'v0.1.0';
 };
@@ -154,6 +154,10 @@ For example, the following:
 will be sorted as:
 
     text/html, application/xhtml+xml, image/webp, application/xml;q=0.9, */*;q=0.8
+
+=head1 THREAD-SAFETY
+
+This module is thread-safe for all operations, as it operates on per-object state and uses thread-safe external libraries.
 
 =head1 AUTHOR
 

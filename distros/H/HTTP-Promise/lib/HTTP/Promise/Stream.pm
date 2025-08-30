@@ -16,7 +16,7 @@ BEGIN
 {
     use strict;
     use warnings;
-    use warnings::register;
+    warnings::register_categories( 'HTTP::Promise' );
     use parent qw( Module::Generic );
     use vars qw( $FILTER_MAP $CLASSES $ENCODING_SUFFIX $SUFFIX_ENCODING );
     # use Nice::Try;
@@ -33,22 +33,22 @@ no warnings 'uninitialized';
     no warnings 'once';
     $CLASSES = 
     {
-    base64  => [qw( HTTP::Promise::Stream::Base64 HTTP::Promise::Stream::Base64 )],
-    brotli  => [qw( HTTP::Promise::Stream::Brotli HTTP::Promise::Stream::Brotli ), HAS_BROWSER_SUPPORT],
-    bzip2   => [qw( IO::Compress::Bzip2 IO::Uncompress::Bunzip2 ), HAS_BROWSER_SUPPORT],
-    deflate => [qw( IO::Compress::Deflate IO::Uncompress::Inflate ), HAS_BROWSER_SUPPORT],
-    gzip    => [qw( IO::Compress::Gzip IO::Uncompress::Gunzip ), HAS_BROWSER_SUPPORT],
-    lzf     => [qw( IO::Compress::Lzf IO::Uncompress::UnLzf )],
-    lzip    => [qw( IO::Compress::Lzip IO::Uncompress::UnLzip )],
-    lzma    => [qw( IO::Compress::Lzma IO::Uncompress::UnLzma )],
-    lzop    => [qw( IO::Compress::Lzop IO::Uncompress::UnLzop )],
-    lzw     => [qw( HTTP::Promise::Stream::LZW HTTP::Promise::Stream::LZW )],
-    qp      => [qw( HTTP::Promise::Stream::QuotedPrint HTTP::Promise::Stream::QuotedPrint )],
-    rawdeflate => [qw( IO::Compress::RawDeflate IO::Uncompress::RawInflate ), HAS_BROWSER_SUPPORT],
-    uu      => [qw( HTTP::Promise::Stream::UU HTTP::Promise::Stream::UU )],
-    xz      => [qw( IO::Compress::Xz IO::Uncompress::UnXz  )],
-    zip     => [qw( IO::Compress::Zip IO::Uncompress::Unzip )],
-    zstd    => [qw( IO::Compress::Zstd IO::Uncompress::UnZstd )],
+        base64  => [qw( HTTP::Promise::Stream::Base64 HTTP::Promise::Stream::Base64 )],
+        brotli  => [qw( HTTP::Promise::Stream::Brotli HTTP::Promise::Stream::Brotli ), HAS_BROWSER_SUPPORT],
+        bzip2   => [qw( IO::Compress::Bzip2 IO::Uncompress::Bunzip2 ), HAS_BROWSER_SUPPORT],
+        deflate => [qw( IO::Compress::Deflate IO::Uncompress::Inflate ), HAS_BROWSER_SUPPORT],
+        gzip    => [qw( IO::Compress::Gzip IO::Uncompress::Gunzip ), HAS_BROWSER_SUPPORT],
+        lzf     => [qw( IO::Compress::Lzf IO::Uncompress::UnLzf )],
+        lzip    => [qw( IO::Compress::Lzip IO::Uncompress::UnLzip )],
+        lzma    => [qw( IO::Compress::Lzma IO::Uncompress::UnLzma )],
+        lzop    => [qw( IO::Compress::Lzop IO::Uncompress::UnLzop )],
+        lzw     => [qw( HTTP::Promise::Stream::LZW HTTP::Promise::Stream::LZW )],
+        qp      => [qw( HTTP::Promise::Stream::QuotedPrint HTTP::Promise::Stream::QuotedPrint )],
+        rawdeflate => [qw( IO::Compress::RawDeflate IO::Uncompress::RawInflate ), HAS_BROWSER_SUPPORT],
+        uu      => [qw( HTTP::Promise::Stream::UU HTTP::Promise::Stream::UU )],
+        xz      => [qw( IO::Compress::Xz IO::Uncompress::UnXz  )],
+        zip     => [qw( IO::Compress::Zip IO::Uncompress::Unzip )],
+        zstd    => [qw( IO::Compress::Zstd IO::Uncompress::UnZstd )],
     };
     $CLASSES->{inflate} = $CLASSES->{deflate};
     $CLASSES->{rawinflate} = $CLASSES->{inflate};
@@ -2338,6 +2338,10 @@ The file is opened in read mode and its content is read by chunks o 10Kb (10240 
 =back
 
 =for Pod::Coverage _get_size
+
+=head1 THREAD-SAFETY
+
+This module is thread-safe for all operations, as it operates on per-object state and uses thread-safe external libraries.
 
 =head1 AUTHOR
 

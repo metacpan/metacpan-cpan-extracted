@@ -1,5 +1,11 @@
 Changes for OIDC-Client distribution
 
+1.02 2025-08-29
+  - Management of multiple authorizations to avoid errors if the same user executes multiple 'authorize' requests at the same time.
+  - Same changes for logout data
+  - No more need for flash data
+  - No more 'state' parameter for redirect_to_logout() method, use 'other_state_params' parameter instead
+
 1.01 2025-08-15
   - Fix merge from feature branch to main branch
 

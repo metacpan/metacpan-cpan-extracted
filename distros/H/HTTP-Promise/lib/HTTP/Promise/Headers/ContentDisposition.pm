@@ -16,7 +16,7 @@ BEGIN
 {
     use strict;
     use warnings;
-    use warnings::register;
+    warnings::register_categories( 'HTTP::Promise' );
     use parent qw( HTTP::Promise::Headers::Generic );
     our $VERSION = 'v0.1.0';
 };
@@ -277,6 +277,10 @@ Note that if you use this, you bypass other specialised method who do some addit
 Sets or gets multiple arbitrary C<Content-Disposition> properties at once.
 
 If called without any arguments, this returns the L<hash object|Module::Generic::Hash> used to store the C<Content-Disposition> properties.
+
+=head1 THREAD-SAFETY
+
+This module is thread-safe for all operations, as it operates on per-object state and uses thread-safe external libraries.
 
 =head1 AUTHOR
 

@@ -16,7 +16,7 @@ BEGIN
 {
     use strict;
     use warnings;
-    use warnings::register;
+    warnings::register_categories( 'HTTP::Promise' );
     use parent qw( HTTP::Promise::Headers::ContentSecurityPolicy );
     our $VERSION = 'v0.1.0';
 };
@@ -68,6 +68,10 @@ The CSP L</report_uri> method should be used with this header, otherwise this cl
 =head2 report_uri
 
 This takes an uri where the report will be sent. See L<this Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/report-uri> for an example php script to use to get those reports.
+
+=head1 THREAD-SAFETY
+
+This module is thread-safe for all operations, as it operates on per-object state and uses thread-safe external libraries.
 
 =head1 AUTHOR
 

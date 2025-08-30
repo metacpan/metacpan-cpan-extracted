@@ -6,14 +6,6 @@ use v5.12;
 use warnings;
 use Graphics::Toolkit::Color::Space qw/round_decimals/;
 
-my  $hcl_def = Graphics::Toolkit::Color::Space->new( name => 'CIELCHuv',
-                                                    alias => 'LCHuv',
-                                                     axis => [qw/luminance chroma hue/],
-                                                    range => [100, 261, 360],
-                                                precision => 3 );
-
-    $hcl_def->add_converter('LUV', \&to_luv, \&from_luv );
-
 my $TAU = 6.283185307;
 
 sub from_luv {
@@ -27,8 +19,6 @@ sub from_luv {
     $h += $TAU if $h < 0;
     return ([$luv->[0], $c / 261, $h / $TAU ]);
 }
-
-
 sub to_luv {
     my ($lch) = shift;
     my $u = $lch->[1] * cos($lch->[2] * $TAU) * 261;
@@ -36,4 +26,12 @@ sub to_luv {
     return ([$lch->[0], ($u+134) / 354, ($v+140) / 262 ]);
 }
 
-$hcl_def;
+Graphics::Toolkit::Color::Space->new(
+       name => 'CIELCHuv',
+      alias => 'LCHuv',
+       axis => [qw/luminance chroma hue/],
+       type => [qw/linear linear angular/],
+      range => [100, 261, 360],
+  precision => 3,
+    convert => {LUV => [\&to_luv, \&from_luv]},
+);

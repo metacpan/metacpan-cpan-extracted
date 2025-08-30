@@ -16,7 +16,7 @@ BEGIN
 {
     use strict;
     use warnings;
-    use warnings::register;
+    warnings::register_categories( 'HTTP::Promise' );
     use parent qw( HTTP::Promise::Headers::Accept );
     our $VERSION = 'v0.1.0';
 };
@@ -76,6 +76,10 @@ Example:
 =head1 METHODS
 
 See L<HTTP::Promise::Headers::Accept>
+
+=head1 THREAD-SAFETY
+
+This module is thread-safe for all operations, as it operates on per-object state and uses thread-safe external libraries.
 
 =head1 AUTHOR
 

@@ -1,0 +1,9 @@
+# Copyright (c) 2025 Yuki Kimoto
+# MIT License
+
+class Compress::Raw::Zlib {
+  version "0.001";
+  
+  use Resource::Zlib;
+  
+}

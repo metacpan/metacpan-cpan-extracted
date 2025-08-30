@@ -4,7 +4,7 @@
       "Michael Schout <mschout@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -17,7 +17,7 @@
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
-            "perl" : "5.004"
+            "perl" : "5.006"
          }
       },
       "develop" : {
@@ -52,7 +52,7 @@
    "provides" : {
       "Pod::Weaver::Section::SourceGitHub" : {
          "file" : "lib/Pod/Weaver/Section/SourceGitHub.pm",
-         "version" : "0.57"
+         "version" : "0.58"
       }
    },
    "release_status" : "stable",
@@ -67,9 +67,9 @@
          "web" : "https://github.com/mschout/pod-weaver-section-sourcegithub"
       }
    },
-   "version" : "0.57",
-   "x_generated_by_perl" : "v5.36.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.36",
+   "version" : "0.58",
+   "x_generated_by_perl" : "v5.42.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.39",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

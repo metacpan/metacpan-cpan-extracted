@@ -16,7 +16,7 @@ BEGIN
 {
     use strict;
     use warnings;
-    use warnings::register;
+    warnings::register_categories( 'HTTP::Promise' );
     use parent qw( HTTP::Promise::Message );
     use vars qw( $VERSION $EXCEPTION_CLASS $KNOWN_METHODS $KNOWN_METHODS_I $TIMEOUT
                  $DEFAULT_MIME_TYPE $DEFAULT_METHOD $DEFAULT_PROTOCOL $SCHEME_RE $INTL_URI_RE );
@@ -321,7 +321,7 @@ sub parse
 {
     my $self = shift( @_ );
     my $str  = shift( @_ );
-    warnings::warnif( 'Undefined argument to ' . ( ref( $self ) || $self ) . '->parse()' ) if( !defined( $str ) );
+    warn( 'Undefined argument to ' . ( ref( $self ) || $self ) . '->parse()' ) if( !defined( $str ) && warnings::enabled( 'HTTP::Promise' ) );
     $self->clear_error;
     if( !defined( $str ) || !length( $str ) )
     {
@@ -871,6 +871,10 @@ This is to be used on Perl internal UTF-8 strings.
 =head2 version
 
 This is inherited from L<HTTP::Promise::Message>. See L<HTTP::Promise::Message/version>
+
+=head1 THREAD-SAFETY
+
+This module is thread-safe for all operations, as it operates on per-object state and uses thread-safe external libraries.
 
 =head1 AUTHOR
 

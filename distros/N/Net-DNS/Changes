@@ -1,4 +1,10 @@
-$Id: Changes 2034 2025-07-29 18:04:34Z willem $                       -*-text-*-
+$Id: Changes 2041 2025-08-29 12:11:41Z willem $                       -*-text-*-
+
+
+**** 1.53 Aug 29, 2025
+
+	Suppress autovivified undefined $rr->{class} and $rr->{ttl}.
+	Rework test scripts for SVCB and DELEG.
 
 
 **** 1.52 Jul 29, 2025

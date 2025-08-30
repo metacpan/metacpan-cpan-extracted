@@ -16,7 +16,7 @@ BEGIN
 {
     use strict;
     use warnings;
-    use warnings::register;
+    warnings::register_categories( 'HTTP::Promise' );
     use parent qw( Module::Generic );
     use vars qw( $CRLF $IS_WIN32 $INIT_PARAMS $VERSION );
     use Errno qw( EAGAIN ECONNRESET EINPROGRESS EINTR EWOULDBLOCK ECONNABORTED EISCONN );
@@ -1389,6 +1389,10 @@ It returns the number of bytes written or, upon error, sets an L<error|Module::G
 Provided with some data an an optional timeout, and this will write the data to the filehandle set.
 
 It returns the number of bytes written or, upon error, sets an L<error|Module::Generic/error> and returns C<undef>
+
+=head1 THREAD-SAFETY
+
+This module is thread-safe for all operations, as it operates on per-object state and uses thread-safe external libraries.
 
 =head1 AUTHOR
 

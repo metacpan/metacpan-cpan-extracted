@@ -75,15 +75,7 @@ sub formatted { # in shape values in any format # _ -- ~space, @~|~format, @~|~r
     return $values unless ref $values;
     return $color_space->format( $values, $format_name, $suffix_def );
 }
-sub name {
-    my ($self, $scheme, $all) = @_;
-    return $self->{'name'} unless defined $scheme;
-    Graphics::Toolkit::Color::Name::from_values( $self->shaped, $scheme, $all);
-}
-sub closest_name_and_distance {
-    my ($self, $scheme, $all) = @_;
-    Graphics::Toolkit::Color::Name::closest_from_values( $self->shaped, $scheme, $all);
-}
+sub name { $_[0]->{'name'} }
 
 #### single color calculator ###########################################
 sub set { # .values, %newval -- ~space_name --> _

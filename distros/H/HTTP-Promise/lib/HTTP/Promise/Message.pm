@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Asynchronous HTTP Request and Promise - ~/lib/HTTP/Promise/Message.pm
-## Version v0.3.0
-## Copyright(c) 2023 DEGUEST Pte. Ltd.
+## Version v0.3.1
+## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/03/21
-## Modified 2024/02/01
+## Modified 2025/08/30
 ## All rights reserved.
 ## 
 ## 
@@ -16,7 +16,7 @@ BEGIN
 {
     use strict;
     use warnings;
-    use warnings::register;
+    warnings::register_categories( 'HTTP::Promise' );
     use parent qw( Module::Generic );
     use vars qw( $DEBUG $ERROR $AUTOLOAD $CRLF $HTTP_VERSION );
     use Data::UUID;
@@ -26,7 +26,7 @@ BEGIN
     our $CRLF = "\015\012";
     # HTTP/1.0, HTTP/1.1, HTTP/2
     our $HTTP_VERSION  = qr/(?<http_protocol>HTTP\/(?<http_version>(?<http_vers_major>[0-9])(?:\.(?<http_vers_minor>[0-9]))?))/;
-    our $VERSION = 'v0.3.0';
+    our $VERSION = 'v0.3.1';
 };
 
 use strict;
@@ -999,7 +999,7 @@ sub _make_parts
         $self->_load_class( 'HTTP::Promise::Parser' ) || return( $self->pass_error );
         my $parser = HTTP::Promise::Parser->new( debug => $self->debug );
         my $def = $parser->looks_like_what( $buff );
-        warn( "Part found of type message/http, but its content does not match a HTTP request or response.\n" ) if( !$def && warnings::enabled() );
+        warn( "Part found of type message/http, but its content does not match a HTTP request or response.\n" ) if( !$def && warnings::enabled( 'HTTP::Promise' ) );
         return( $self->pass_error( $parser->error ) ) if( !defined( $def ) );
         # Give back what we just read to the reader for later use
         $reader->unread( $buff );
@@ -1154,7 +1154,7 @@ HTTP::Promise::Message - HTTP Message Class
 
 =head1 VERSION
 
-    v0.3.0
+    v0.3.1
 
 =head1 DESCRIPTION
 
@@ -1634,6 +1634,10 @@ Sets or gets the HTTP protocol version, something like C<1.0>, or C<1.1>, or may
 This returns a L<number object|Module::Generic::Number>
 
 =for Pod::Coverage STORABLE_thaw_post_processing
+
+=head1 THREAD-SAFETY
+
+This module is thread-safe for all operations, as it operates on per-object state and uses thread-safe external libraries.
 
 =head1 AUTHOR
 

@@ -16,6 +16,7 @@ BEGIN
 {
     use strict;
     use warnings;
+    warnings::register_categories( 'HTTP::Promise' );
     use HTTP::Promise::Stream;
     use parent -norequire, qw( HTTP::Promise::Stream::Generic );
     use vars qw( @EXPORT_OK $VERSION $EXCEPTION_CLASS $LZWError );
@@ -261,6 +262,10 @@ Returns true if the module L<Compress::LZW::Decompressor> is installed, false ot
 =head2 is_encoder_installed
 
 Returns true if the module L<Compress::LZW::Compressor> is installed, false otherwise.
+
+=head1 THREAD-SAFETY
+
+This module is thread-safe for all operations, as it operates on per-object state and uses thread-safe external libraries.
 
 =head1 AUTHOR
 

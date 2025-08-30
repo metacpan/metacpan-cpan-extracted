@@ -1,5 +1,5 @@
 package Sys::Info::Driver::Linux::Device::CPU;
-$Sys::Info::Driver::Linux::Device::CPU::VERSION = '0.7909';
+$Sys::Info::Driver::Linux::Device::CPU::VERSION = '0.7911';
 use strict;
 use warnings;
 use parent qw(Sys::Info::Base);
@@ -123,7 +123,7 @@ Sys::Info::Driver::Linux::Device::CPU
 
 =head1 VERSION
 
-version 0.7909
+version 0.7911
 
 =head1 SYNOPSIS
 

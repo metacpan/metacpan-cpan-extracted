@@ -6,13 +6,6 @@ use v5.12;
 use warnings;
 use Graphics::Toolkit::Color::Space;
 
-my  $luv_def = Graphics::Toolkit::Color::Space->new(  alias => 'CIELUV',        # space name is LUV
-                                                       axis => [qw/L* u* v*/],  # short l u v
-                                                      range => [100, [-134, 220], [-140, 122]],
-                                                  precision => 3 );
-
-$luv_def->add_converter('XYZ', \&to_xyz, \&from_xyz );
-
 my @D65 = (0.95047, 1, 1.08883); # illuminant
 my $eta = 0.008856 ;
 my $kappa = 903.3;
@@ -35,8 +28,6 @@ sub from_xyz {
 
     return ([ $l / 100 , ($u+134) / 354, ($v+140) / 262 ]);
 }
-
-
 sub to_xyz {
     my ($luv) = shift;
     my $l = $luv->[0] * 100;
@@ -59,4 +50,10 @@ sub to_xyz {
     return [ map { $XYZ->[$_] / $D65[$_] } 0 .. 2 ];
 }
 
-$luv_def;
+Graphics::Toolkit::Color::Space->new(
+        alias => 'CIELUV',        # space name is LUV
+         axis => [qw/L* u* v*/],  # short l u v
+        range => [100, [-134, 220], [-140, 122]],
+    precision => 3,
+      convert => {XYZ => [\&to_xyz, \&from_xyz]},
+);

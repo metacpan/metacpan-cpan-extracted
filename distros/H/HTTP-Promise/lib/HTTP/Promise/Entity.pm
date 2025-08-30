@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Asynchronous HTTP Request and Promise - ~/lib/HTTP/Promise/Entity.pm
-## Version v0.2.1
+## Version v0.2.2
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/04/19
-## Modified 2023/09/22
+## Modified 2025/08/30
 ## All rights reserved.
 ## 
 ## 
@@ -16,7 +16,7 @@ BEGIN
 {
     use strict;
     use warnings;
-    use warnings::register;
+    warnings::register_categories( 'HTTP::Promise' );
     use parent qw( Module::Generic );
     use vars qw( $VERSION $EXCEPTION_CLASS $BOUNDARY_DELIMITER $BOM2ENC $ENC2BOM $BOM_RE 
                  $BOM_MAX_LENGTH $DEFAULT_MIME_TYPE );
@@ -32,7 +32,7 @@ BEGIN
     our $EXCEPTION_CLASS = 'HTTP::Promise::Exception';
     our $BOUNDARY_DELIMITER = "\015\012";
     our $DEFAULT_MIME_TYPE = 'application/octet-stream';
-    our $VERSION = 'v0.2.1';
+    our $VERSION = 'v0.2.2';
 };
 
 use strict;
@@ -139,6 +139,7 @@ sub as_string
         $opts->{binmode} = 'raw';
     }
     my $fh = $output->open( '>' ) || return( $self->pass_error( $output->error ) );
+    $fh->binmode( ':raw' );
     # $self->print( $fh, ( scalar( keys( %$opts ) ) ? $opts : () ) ) || return( $self->pass_error );
     $self->print( $fh, ( scalar( keys( %$opts ) ) ? $opts : () ) ) || return( $self->pass_error );
     $fh->close;
@@ -589,7 +590,7 @@ sub decode_body
     $opts->{raise_error} //= 0;
     $self->_load_class( 'HTTP::Promise::Stream' ) || return( $self->error );
     my $body = $self->body;
-    warn( "No encoding were provided to decode the HTTP body.\n" ) if( !scalar( @$encodings ) && warnings::enabled( ref( $self ) ) );
+    warn( "No encoding were provided to decode the HTTP body.\n" ) if( !scalar( @$encodings ) && warnings::enabled( 'HTTP::Promise' ) );
     # Nothing to do
     return( $self ) if( !$body || !scalar( @$encodings ) );
     # Parameters to be passed. Transparent set to 0 allow for failure
@@ -614,7 +615,7 @@ sub decode_body
         my $f = $body;
         if( $f->is_empty )
         {
-            warn( "HTTP Body file '$f' is empty, so there is nothing to decode\n" ) if( warnings::enabled( ref( $self ) ) );
+            warn( "HTTP Body file '$f' is empty, so there is nothing to decode\n" ) if( warnings::enabled( 'HTTP::Promise' ) );
             return( $self );
         }
         my $ext = $f->extension;
@@ -690,7 +691,7 @@ sub decode_body
         my $temp = $body;
         if( $body->is_empty )
         {
-            warn( "HTTP Body in memory is empty, so there is nothing to decode\n" ) if( warnings::enabled( ref( $self ) ) );
+            warn( "HTTP Body in memory is empty, so there is nothing to decode\n" ) if( warnings::enabled( 'HTTP::Promise' ) );
             return( $self );
         }
         
@@ -1002,7 +1003,7 @@ sub encode_body
     my $encodings = $self->new_array( $self->_is_array( $this ) ? $this : [split( /[[:blank:]\h]*,[[:blank:]\h]*/, "${this}" )] );
     $self->_load_class( 'HTTP::Promise::Stream' ) || return( $self->error );
     my $body = $self->body;
-    warn( "No encodings were provided to encode the HTTP body.\n" ) if( !scalar( @$encodings ) && warnings::enabled( ref( $self ) ) );
+    warn( "No encodings were provided to encode the HTTP body.\n" ) if( !scalar( @$encodings ) && warnings::enabled( 'HTTP::Promise' ) );
     # Nothing to do
     return( $self ) if( !$body );
     my $seen = {};
@@ -1011,7 +1012,7 @@ sub encode_body
         my $f = $body;
         if( $f->is_empty )
         {
-            warn( "HTTP Body file '$f' is empty, so there is nothing to encode\n" ) if( warnings::enabled( ref( $self ) ) );
+            warn( "HTTP Body file '$f' is empty, so there is nothing to encode\n" ) if( warnings::enabled( 'HTTP::Promise' ) );
             return( $self );
         }
         my $ext = $f->extension;
@@ -1045,7 +1046,7 @@ sub encode_body
         my $temp = $body;
         if( $body->is_empty )
         {
-            warn( "HTTP Body in memory is empty, so there is nothing to encode\n" ) if( warnings::enabled( ref( $self ) ) );
+            warn( "HTTP Body in memory is empty, so there is nothing to encode\n" ) if( warnings::enabled( 'HTTP::Promise' ) );
             return( $self );
         }
         
@@ -1279,7 +1280,7 @@ sub is_binary
         my $bytes = $io->read( $buff, 4096 );
         $io->close;
         return( $self->pass_error( $io->error ) ) if( !defined( $bytes ) );
-        warn( "Body is ", $body->length, " bytes big, but somehow I could not read ny bytes out of it.\n" ) if( !$bytes && warnings::enabled() );
+        warn( "Body is ", $body->length, " bytes big, but somehow I could not read ny bytes out of it.\n" ) if( !$bytes && warnings::enabled( 'HTTP::Promise' ) );
         return(0) if( !$bytes );
         $data = \$buff;
     }
@@ -1502,10 +1503,10 @@ sub new_body
     my $type = shift( @_ ) || 'scalar';
     my $map =
     {
-    file   => 'HTTP::Promise::Body::File',
-    form   => 'HTTP::Promise::Body::Form',
-    scalar => 'HTTP::Promise::Body::Scalar',
-    string => 'HTTP::Promise::Body::Scalar',
+        file   => 'HTTP::Promise::Body::File',
+        form   => 'HTTP::Promise::Body::Form',
+        scalar => 'HTTP::Promise::Body::Scalar',
+        string => 'HTTP::Promise::Body::Scalar',
     };
     my $class = $map->{ $type } || return( $self->error( "Unsupported body type '$type'" ) );
     if( $type eq 'form' )
@@ -1529,6 +1530,7 @@ sub open
 
 sub output_dir { return( shift->_set_get_file( 'output_dir', @_ ) ); }
 
+# An array of HTTP::Promise::Entity objects
 sub parts { return( shift->_set_get_array_as_object( '_parts', @_ ) ); }
 
 sub preamble { return( shift->_set_get_array_as_object( 'preamble', @_ ) ); }
@@ -1890,7 +1892,7 @@ sub _prepare_multipart_headers
             $name = $part->name;
             if( !$name )
             {
-                warn( "Warning: no part name set for this part No. ${n}\n" ) if( warnings::enabled() );
+                warn( "Warning: no part name set for this part No. ${n}\n" ) if( warnings::enabled( 'HTTP::Promise' ) );
                 $name = ++$auto_name;
                 $part->name( $name );
             }
@@ -1967,7 +1969,7 @@ HTTP::Promise::Entity - HTTP Entity Class
 
 =head1 VERSION
 
-    v0.2.1
+    v0.2.2
 
 =head1 DESCRIPTION
 
@@ -2618,6 +2620,10 @@ This returns the encoding as a string upon success, an empty string if no suitab
 =head2 textual_type
 
 Returns true if this entity mime-type starts with C<text>, such as C<text/plain> or C<text/html> or starts with C<message>, such as C<message/http>
+
+=head1 THREAD-SAFETY
+
+L<HTTP::Promise::Entity> is thread-safe for all operations, as it operates on per-object state and uses thread-safe external libraries.
 
 =head1 AUTHOR
 

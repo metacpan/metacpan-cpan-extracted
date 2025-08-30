@@ -1,0 +1,38 @@
+.gitattributes
+.gitignore
+Changes
+helper/constants.pl
+helper/constants.txt
+lib/SPVM/Compress/Raw/Zlib.c
+lib/SPVM/Compress/Raw/Zlib.config
+lib/SPVM/Compress/Raw/Zlib.pm
+lib/SPVM/Compress/Raw/Zlib.spvm
+lib/SPVM/Compress/Raw/Zlib/Base.c
+lib/SPVM/Compress/Raw/Zlib/Base.config
+lib/SPVM/Compress/Raw/Zlib/Base.pm
+lib/SPVM/Compress/Raw/Zlib/Base.spvm
+lib/SPVM/Compress/Raw/Zlib/Constant.c
+lib/SPVM/Compress/Raw/Zlib/Constant.config
+lib/SPVM/Compress/Raw/Zlib/Constant.pm
+lib/SPVM/Compress/Raw/Zlib/Constant.spvm
+lib/SPVM/Compress/Raw/Zlib/Deflate.c
+lib/SPVM/Compress/Raw/Zlib/Deflate.config
+lib/SPVM/Compress/Raw/Zlib/Deflate.pm
+lib/SPVM/Compress/Raw/Zlib/Deflate.spvm
+lib/SPVM/Compress/Raw/Zlib/Inflate.c
+lib/SPVM/Compress/Raw/Zlib/Inflate.config
+lib/SPVM/Compress/Raw/Zlib/Inflate.pm
+lib/SPVM/Compress/Raw/Zlib/Inflate.spvm
+lib/SPVM/Compress/Raw/Zlib/Z_stream.c
+lib/SPVM/Compress/Raw/Zlib/Z_stream.config
+lib/SPVM/Compress/Raw/Zlib/Z_stream.pm
+lib/SPVM/Compress/Raw/Zlib/Z_stream.spvm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/basic.t
+t/lib/SPVM/TestCase/Compress/Raw/Zlib.spvm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

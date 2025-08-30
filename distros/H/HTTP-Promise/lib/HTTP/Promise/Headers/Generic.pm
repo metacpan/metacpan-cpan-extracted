@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Asynchronous HTTP Request and Promise - ~/lib/HTTP/Promise/Headers/Generic.pm
-## Version v0.1.1
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v0.1.2
+## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/05/06
-## Modified 2023/09/08
+## Modified 2025/08/30
 ## All rights reserved.
 ## 
 ## 
@@ -16,6 +16,7 @@ BEGIN
 {
     use strict;
     use warnings;
+    warnings::register_categories( 'HTTP::Promise' );
     use parent qw( Module::Generic );
     use vars qw( $VERSION $QV_ELEMENT $QV_VALUE );
     use Encode ();
@@ -29,7 +30,7 @@ BEGIN
     # Accept: audio/*; q=0.2, audio/basic
     our $QV_ELEMENT = qr/(?:[^\;\,]+)/;
     our $QV_VALUE   = qr/(?:0(?:\.[0-9]{0,3})?|1(?:\.0{0,3})?)/;
-    our $VERSION = 'v0.1.1';
+    our $VERSION = 'v0.1.2';
 };
 
 use strict;
@@ -424,7 +425,7 @@ sub _set_get_properties_as_string
     {
         if( !exists( $props->{ $_ } ) )
         {
-            # warnings::warn( "Property is in our stack, but not in our repository of properties, skipping.\n" ) if( warnings::enabled( ref( $self ) ) );
+            # warnings::warn( "Property is in our stack, but not in our repository of properties, skipping.\n" ) if( warnings::enabled( 'HTTP::Promise' ) );
             # warn( "Property is in our stack, but not in our repository of properties, skipping.\n" ) if( $self->_warnings_is_enabled );
             warn( "Property \"$_\" is in our stack, but not in our repository of properties, skipping.\n" );
             next;
@@ -699,7 +700,7 @@ HTTP::Promise::Headers::Generic - Generic HTTP Header Class
 
 =head1 VERSION
 
-    v0.1.1
+    v0.1.2
 
 =head1 DESCRIPTION
 
@@ -930,6 +931,10 @@ Upon error, this sets an L<error|Module::Generic/error> and returns C<undef>
 This sets or gets a header main value.
 
 For example C<text/html> in C<text/html; charset=utf-8>
+
+=head1 THREAD-SAFETY
+
+This module is thread-safe for all operations, as it operates on per-object state and uses thread-safe external libraries.
 
 =head1 AUTHOR
 

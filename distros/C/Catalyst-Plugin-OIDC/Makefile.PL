@@ -24,7 +24,7 @@ my %WriteMakefileArgs = (
     "Clone" => 0,
     "List::Util" => 0,
     "Moose" => 0,
-    "OIDC::Client" => "1.01",
+    "OIDC::Client" => "1.02",
     "Scalar::Util" => 0,
     "Try::Tiny" => 0,
     "namespace::autoclean" => 0
@@ -47,7 +47,7 @@ my %WriteMakefileArgs = (
     "Test::MockModule" => "0.177.0",
     "Test::More" => 0
   },
-  "VERSION" => "1.00",
+  "VERSION" => "1.01",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -76,7 +76,7 @@ my %FallbackPrereqs = (
   "List::Util" => 0,
   "Mojolicious" => "8.24",
   "Moose" => 0,
-  "OIDC::Client" => "1.01",
+  "OIDC::Client" => "1.02",
   "Scalar::Util" => 0,
   "Test::MockModule" => "0.177.0",
   "Test::More" => 0,

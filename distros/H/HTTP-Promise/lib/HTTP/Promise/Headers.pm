@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Asynchronous HTTP Request and Promise - ~/lib/HTTP/Promise/Headers.pm
-## Version v0.2.0
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v0.2.2
+## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/03/21
-## Modified 2023/09/08
+## Modified 2025/08/30
 ## All rights reserved.
 ## 
 ## 
@@ -16,19 +16,19 @@ BEGIN
 {
     use strict;
     use warnings;
-    use warnings::register;
+    warnings::register_categories( 'HTTP::Promise' );
     use parent qw( HTTP::XSHeaders );
     use vars qw( $VERSION $EXCEPTION_CLASS $MOD_PERL $SUPPORTED $MOD_PATH );
-    use Config;
     use Cwd ();
     use Encode;
     use HTTP::Promise::Exception;
     use HTTP::XSHeaders 0.400004;
     use IO::File;
+    use Module::Generic::Global qw( :const );
     # use Nice::Try;
     use Scalar::Util;
     use URI::Escape::XS ();
-    use Want;
+    use Wanted;
     if( exists( $ENV{MOD_PERL} )
         &&
         ( $MOD_PERL = $ENV{MOD_PERL} =~ /^mod_perl\/(\d+\.[\d\.]+)/ ) )
@@ -45,10 +45,9 @@ BEGIN
         Apache2::Const->import( compile => qw( :log OK ) );
     }
     use constant CRLF => "\015\012";
-    use constant HAS_THREADS  => ( $Config{useithreads} && $INC{'threads.pm'} );
     our $EXCEPTION_CLASS = 'HTTP::Promise::Exception';
     our $SUPPORTED = {};
-    our $VERSION = 'v0.2.0';
+    our $VERSION = 'v0.2.2';
 };
 
 use strict;
@@ -505,7 +504,7 @@ sub decode_filename
             if( $@ )
             {
                 # return( $self->error( "Error decoding content disposition file name: $e" ) );
-                warnings::warnif( "Error decoding content disposition file name: $@" );
+                warn( "Error decoding content disposition file name: $@" ) if( warnings::enabled( 'HTTP::Promise' ) );
             }
             
             eval
@@ -519,7 +518,7 @@ sub decode_filename
             if( $@ )
             {
                 # return( $self->error( "Error encoding content disposition file name: $e" ) );
-                warnings::warnif( "Error encoding content disposition file name from '$charset' to 'locale_fs': $@" );
+                warn( "Error encoding content disposition file name from '$charset' to 'locale_fs': $@" ) if( warnings::enabled( 'HTTP::Promise' ) );
             }
         }
     }
@@ -580,10 +579,56 @@ sub error
 {
     my $self = shift( @_ );
     my $class = ref( $self ) || $self;
+    my $i_am_blessed = Scalar::Util::blessed( $self ) ? 1 : 0;
     no warnings;
     our $MOD_PERL;
     my $o;
     no strict 'refs';
+    no warnings 'once';
+    my $want_return = 
+    {
+        array => sub
+        {
+            return( [] );
+        },
+        code => sub
+        {
+            return( sub{} );
+        },
+        'glob' => sub
+        {
+            my $dummy = '';
+            open( my $tmp, '>', \$dummy );
+            return( $tmp );
+        },
+        hash => sub
+        {
+            return( {} );
+        },
+        object => sub
+        {
+            $self->_load_class( 'Module::Generic::Null' ) ||
+                die( "Unable to load Module::Generic::Null" );
+            my $null = Module::Generic::Null->new( $o, { debug => $self->{debug}, has_error => 1, wants => 'object' });
+            return( $null );
+        },
+        'scalar' => sub
+        {
+            my $dummy = undef;
+            return( \$dummy );
+        },
+    };
+
+    my $want_what = Wanted::wantref();
+
+    # Ensure this is lowercase and at the same time that this is defined
+    $want_what = lc( $want_what // '' );
+    # What type of expected value we support to prevent perl error upon undef.
+    # By default: object
+    my $want_ok = [qw( object )];
+
+    my $err_key = HAS_THREADS ? join( ';', $class, $$, threads->tid ) : join( ';', $class, $$ );
+    my $repo = Module::Generic::Global->new( 'errors' => $class, key => $err_key );
     if( @_ )
     {
         my $args = {};
@@ -612,11 +657,7 @@ sub error
         # Note Taken from Carp to find the right point in the stack to start from
         my $caller_func;
         $caller_func = \&{"CORE::GLOBAL::caller"} if( defined( &{"CORE::GLOBAL::caller"} ) );
-        if( defined( $o ) )
-        {
-            $self->{error} = ${ $class . '::ERROR' } = $o;
-        }
-        else
+        if( !defined( $o ) )
         {
             my $ex_class = CORE::length( $args->{class} )
                 ? $args->{class}
@@ -631,9 +672,14 @@ sub error
                 # We have to die, because we have an error within another error
                 die( __PACKAGE__ . "::error() is unable to load exception class \"$ex_class\": $@" ) if( $@ );
             }
-            $o = $self->{error} = ${ $class . '::ERROR' } = $ex_class->new( $args );
+            # $o = $self->{error} = ${ $class . '::ERROR' } = $ex_class->new( $args );
+            $o = $ex_class->new( $args );
         }
-        
+        $self->{error} = $o;
+        $repo->set( $o );
+        # For backward compatibility, so the user can access $My::Module::ERROR
+        ${ $class . '::ERROR' } = $o;
+
         my $r;
         if( $MOD_PERL )
         {
@@ -649,7 +695,7 @@ sub error
                 print( STDERR "Error trying to get the global Apache2::ApacheRec: $@\n" );
             }
         }
-        
+
         if( $r )
         {
             if( my $log_handler = $r->get_handlers( 'PerlPrivateErrorHandler' ) )
@@ -658,7 +704,7 @@ sub error
             }
             else
             {
-                $r->warn( $o->as_string ) if( warnings::enabled() );
+                $r->warn( $o->as_string ) if( warnings::enabled( 'HTTP::Promise' ) );
             }
         }
         elsif( $self->{fatal} || ( defined( ${"${class}\::FATAL_ERROR"} ) && ${"${class}\::FATAL_ERROR"} ) )
@@ -667,7 +713,7 @@ sub error
             # die( $@ ? $o : $enc_str );
             die( $o );
         }
-        elsif( warnings::enabled() )
+        elsif( warnings::enabled( 'HTTP::Promise' ) )
         {
             if( $r )
             {
@@ -680,7 +726,7 @@ sub error
                 warn( $@ ? $o : $enc_str );
             }
         }
-        
+
         # https://metacpan.org/pod/Perl::Critic::Policy::Subroutines::ProhibitExplicitReturnUndef
         # https://perlmonks.org/index.pl?node_id=741847
         # Because in list context this would create a lit with one element undef()
@@ -691,23 +737,53 @@ sub error
         # 2020-05-12: Added the no_return_null_object to instruct not to return a null object
         # This is especially needed when an error is called from TIEHASH that returns a special object.
         # A Null object would trigger a fatal perl segmentation fault
-        if( !$args->{no_return_null_object} && want( 'OBJECT' ) )
+        if( !$args->{no_return_null_object} && 
+            (
+                ( $want_what && CORE::exists( $want_return->{ $want_what } ) && scalar( grep( /^$want_what$/i, @$want_ok ) ) ) || 
+                $args->{object}
+            ) )
         {
-            require Module::Generic::Null;
-            my $null = Module::Generic::Null->new( $o, { debug => $self->{debug}, has_error => 1 });
-            rreturn( $null );
+            if( $args->{object} )
+            {
+                rreturn( $want_return->{object}->() );
+            }
+            else
+            {
+                rreturn( $want_return->{ $want_what }->() );
+            }
         }
         return;
     }
-    # To avoid the perl error of 'called on undefined value' and so the user can do
-    # $o->error->message for example without concerning himself/herself whether an exception object is actually set
-    if( !$self->{error} && want( 'OBJECT' ) )
+    if( $i_am_blessed )
     {
-        require Module::Generic::Null;
-        my $null = Module::Generic::Null->new( $o, { debug => $self->{debug}, wants => 'object' });
-        rreturn( $null );
+        # To avoid the perl error of 'called on undefined value' and so the user can do
+        # $o->error->_message for example without concerning himself/herself whether an exception object is actually set
+        if( !$self->{error} )
+        {
+            if( $want_what && 
+                CORE::exists( $want_return->{ $want_what } ) &&
+                scalar( grep( /^$want_what$/i, @$want_ok ) ) )
+            {
+                rreturn( $want_return->{ $want_what }->() );
+            }
+        }
+        else
+        {
+            return( $self->{error} );
+        }
     }
-    return( ref( $self ) ? $self->{error} : ${ $class . '::ERROR' } );
+
+    $o = $repo->get;
+    if( CORE::defined( $o ) && CORE::length( $o ) )
+    {
+        # Found an exception object using Module::Generic::Global
+    }
+    elsif( !CAN_THREADS && CORE::defined( ${ $class . '::ERROR' } ) )
+    {
+        $o = ${ $class . '::ERROR' };
+        warn( "Accessing ${class}::ERROR is deprecated; use ${class}->error instead" ) if( warnings::enabled( 'HTTP::Promise' ) );
+    }
+    return( $o );
 }
 
 sub etag { return( shift->_set_get_one( 'Etag', @_ ) ); }
@@ -1183,15 +1259,27 @@ sub new_scalar
 # <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Origin>
 sub origin { return( shift->_set_get_one_uri( 'Origin', @_ ) ); }
 
-# Copied from Module::Generic to avoid loading it
+# Purpose is to get an error object thrown from, possibly another package, 
+# and make it ours and pass it along
+# e.g.:
+# $self->pass_error
+# $self->pass_error( 'Some error that will be passed to error()' );
+# $self->pass_error( $error_object );
+# $self->pass_error( $error_object, { class => 'Some::ExceptionClass', code => 400 } );
+# $self->pass_error({ class => 'Some::ExceptionClass' });
 sub pass_error
 {
     my $self = shift( @_ );
-    my $pack = ref( $self ) || $self;
+    my $class = ref( $self ) || $self;
     my $opts = {};
     my $err;
-    my $class;
+    my $ex_class;
+    my $code;
+    my $callback;
     no strict 'refs';
+    my $err_key = HAS_THREADS() ? join( ';', $class, $$, threads->tid ) : join( ';', $class, $$ );
+    my $repo = Module::Generic::Global->new( 'errors' => $class, key => $err_key );
+
     if( scalar( @_ ) )
     {
         # Either an hash defining a new error and this will be passed along to error(); or
@@ -1210,47 +1298,70 @@ sub pass_error
             $err = $_[0];
         }
     }
-    # We set $class only if the hash provided is a one-element hash and not an error-defining hash
-    $class = CORE::delete( $opts->{class} ) if( scalar( keys( %$opts ) ) == 1 && [keys( %$opts )]->[0] eq 'class' );
-    
+    $err = $opts->{error} if( !defined( $err ) && CORE::exists( $opts->{error} ) && defined( $opts->{error} ) && CORE::length( $opts->{error} ) );
+    # We set $ex_class only if the hash provided is a one-element hash and not an error-defining hash
+    # $class = CORE::delete( $opts->{class} ) if( scalar( keys( %$opts ) ) == 1 && [keys( %$opts )]->[0] eq 'class' );
+    $ex_class = $opts->{class} if( CORE::exists( $opts->{class} ) && defined( $opts->{class} ) && CORE::length( $opts->{class} ) );
+    $code = $opts->{code} if( CORE::exists( $opts->{code} ) && defined( $opts->{code} ) && CORE::length( $opts->{code} ) );
+    $callback = $opts->{callback} if( CORE::exists( $opts->{callback} ) && defined( $opts->{callback} ) && ref( $opts->{callback} ) );
+
     # called with no argument, most likely from the same class to pass on an error 
     # set up earlier by another method; or
     # with an hash containing just one argument class => 'Some::ExceptionClass'
-    if( !defined( $err ) && ( !scalar( @_ ) || defined( $class ) ) )
+    if( !defined( $err ) && ( !scalar( @_ ) || defined( $ex_class ) ) )
     {
-        if( !defined( $self->{error} ) )
+        my $error;
+        if( Scalar::Util::blessed( $self ) )
         {
-            warn( "No error object provided and no previous error set either! It seems the previous method call returned a simple undef\n" );
+            $error = $self->{error};
+        }
+        elsif( $repo->exists )
+        {
+            $error = $repo->get;
+        }
+
+        if( !defined( $error ) )
+        {
+            warn( "No error object provided and no previous error set either! It seems the previous method call returned a simple undef\n", $self->_get_stack_trace );
         }
         else
         {
-            $err = ( defined( $class ) ? bless( $self->{error} => $class ) : $self->{error} );
+            $err = ( defined( $ex_class ) ? bless( $error => $ex_class ) : $error );
+            $err->code( $code ) if( defined( $code ) );
         }
     }
+    # An error object was provided
     elsif( defined( $err ) && 
            Scalar::Util::blessed( $err ) && 
            ( scalar( @_ ) == 1 || 
-             ( scalar( @_ ) == 2 && defined( $class ) ) 
+             ( scalar( @_ ) == 2 && defined( $ex_class ) ) 
            ) )
     {
-        $self->{error} = ${ $pack . '::ERROR' } = ( defined( $class ) ? bless( $err => $class ) : $err );
+        # If necessary, we re-bless the error object to the designated class
+        my $o = ( defined( $ex_class ) ? bless( $err => $ex_class ) : $err );
+        $self->{error} = $o;
+        # We ned to be backward compatible, and allow the user to access $My::Module::ERROR
+        $repo->set( $o );
+        ${ $class . '::ERROR' } = $o;
+        $self->{error}->code( $code ) if( defined( $code ) );
+
+        if( $self->{fatal} || ( defined( ${"${class}\::FATAL_ERROR"} ) && ${"${class}\::FATAL_ERROR"} ) )
+        {
+            die( $self->{error} );
+        }
     }
     # If the error provided is not an object, we call error to create one
     else
     {
         return( $self->error( @_ ) );
     }
-    
+
     if( want( 'OBJECT' ) )
     {
-        require Module::Generic::Null;
+        $self->_load_class( 'Module::Generic::Null' ) ||
+            die( "Unable to load Module::Generic::Null" );
         my $null = Module::Generic::Null->new( $err, { debug => $self->{debug}, has_error => 1 });
         rreturn( $null );
-    }
-    my $wantarray = wantarray();
-    if( $self->debug )
-    {
-        my $caller = [caller(1)];
     }
     return;
 }
@@ -1559,7 +1670,7 @@ sub _date_header
         return( $v ) if( !defined( $v ) || !length( "${v}" ) );
         if( !length( "$v" ) || ( ref( $v ) && !overload::Method( $v, '""' ) ) )
         {
-            warnings::warn( "I do not know what to do with this supposedly datetime header value '$v'\n" ) if( length( "$v" ) );
+            warn( "I do not know what to do with this supposedly datetime header value '$v'\n" ) if( length( "$v" ) );
 #             if( want( 'OBJECT' ) )
 #             {
 #                 require Module::Generic::Null;
@@ -1624,7 +1735,7 @@ sub _get_args_as_hash
     no warnings 'uninitialized';
     my $ref = {};
     my $order = $self->new_array;
-    my $need_list = Want::want( 'LIST' ) ? 1 : 0;
+    my $need_list = want( 'LIST' ) ? 1 : 0;
     if( scalar( @_ ) == 1 && Scalar::Util::reftype( $_[0] ) eq 'HASH' )
     {
         $ref = shift( @_ );
@@ -1710,9 +1821,43 @@ sub _is_class_loaded
 {
     my $self = shift( @_ );
     my $class = shift( @_ );
-    ( my $pm = $class ) =~ s{::}{/}gs;
-    $pm .= '.pm';
-    return( CORE::exists( $INC{ $pm } ) );
+    my $key = HAS_THREADS ? join( ';', $class, threads->tid() ) : $class;
+    my $repo = Module::Generic::Global->new( 'loaded_classes' => ( ref( $self ) || $self ), key => $key );
+    if( $MOD_PERL )
+    {
+        # https://perl.apache.org/docs/2.0/api/Apache2/Module.html#C_loaded_
+        my $rv = Apache2::Module::loaded( $class );
+        return(1) if( $rv );
+    }
+    # elsif( HAS_THREADS && $repo->exists )
+    elsif( $repo->exists )
+    {
+        return(1);
+    }
+    else
+    {
+        ( my $pm = $class ) =~ s{::}{/}gs;
+        $pm .= '.pm';
+        if( CORE::exists( $INC{ $pm } ) )
+        {
+            $repo->set(1);
+            return(1);
+        }
+    }
+    no strict 'refs';
+    my $ns = \%{ $class . '::' };
+    if( exists( $ns->{ISA} ) || 
+        exists( $ns->{BEGIN} ) || 
+        (
+            exists( $ns->{VERSION} ) &&
+            Scalar::Util::reftype( \$ns->{VERSION} ) eq 'GLOB' &&
+            defined( ${*{\$ns->{VERSION}}{SCALAR}} )
+        ) )
+    {
+        $repo->set(1);
+        return(1);
+    }
+    return(0);
 }
 
 sub _is_glob
@@ -1727,10 +1872,68 @@ sub _is_glob
 sub _load_class
 {
     my $self = shift( @_ );
-    my $class = shift( @_ ) || return( $self->error( "No class to load was provided." ) );
-    eval( "require $class;" );
-    return( $self->error( "Unable to load class \"$class\": $@" ) ) if( $@ );
-    return( $class );
+    my $class = shift( @_ ) || return( $self->error( "No package name was provided to load." ) );
+
+    # Rigorous validation
+    return( $self->error( "Class name is empty." ) ) unless( length( $class ) );
+
+    my $opts = {};
+    $opts = pop( @_ ) if ( ref( $_[-1] ) eq 'HASH' );
+
+    # Validate options
+    my %valid_opts = map { $_ => 1 } qw( caller version no_import );
+    foreach my $key ( keys( %$opts ) )
+    {
+        return( $self->error( "Invalid option: $key" ) ) unless ( exists( $valid_opts{ $key } ) );
+    }
+    if( exists( $opts->{version} ) )
+    {
+        return( $self->error( "Version must be defined and non-empty." ) ) unless( defined( $opts->{version} ) && length( $opts->{version} ) );
+    }
+
+    my $args = $self->_get_args_as_array( @_ );
+
+    # Get the caller's package so we load the module in context
+    my $caller_class = $opts->{caller} || CORE::caller;
+
+    # Return if already loaded (threads aware)
+    my $is_loaded = $self->_is_class_loaded( $class );
+    if( $is_loaded )
+    {
+        if( scalar( @$args ) )
+        {
+            my $pl = "package ${caller_class}; $class->import(" . ( scalar( @$args ) ? "'" . join( "', '", @$args ) . "'" : '' ) . ");";
+            eval( $pl );
+            return( $self->error( "Error importing class $class into caller's namespace ${caller_class}: $@" ) ) if( $@ );
+        }
+        return( $class );
+    }
+    # Use a shared variable for locking in threaded environments
+    # What we retrieved from _is_class_loaded is not a threaded shared value, so we have to do this instead:
+    my $key = HAS_THREADS ? join( ';', $class, threads->tid() ) : $class;
+    my $repo = Module::Generic::Global->new( 'loaded_classes' => ( ref( $self ) || $self ), key => $key );
+
+    # Load the module with thread safety
+    {
+        my $has_version = ( CORE::exists( $opts->{version} ) && CORE::length( $opts->{version} // '' ) ) ? 1 : 0;
+        local $SIG{__DIE__} = sub{};
+        local $@;
+        my $pl = "package ${caller_class}; require $class;";
+        eval( $pl );
+        return( $self->error( "Unable to load package ${class}: $@\nCode executed was:\n${pl}" ) ) if( $@ );
+        if( $has_version )
+        {
+            eval{ $class->VERSION( $opts->{version} ) };
+            return( $self->error( "Insufficient version ", $class->VERSION(), ", for class $class. $opts->{version} minimum is required." ) ) if( $@ );
+        }
+
+        $pl = "package ${caller_class}; $class->import(" . ( scalar( @$args ) ? "'" . join( "', '", @$args ) . "'" : '' ) . ");";
+        eval( $pl );
+        return( $self->error( "Error importing class $class into caller's namespace ${caller_class}: $@" ) ) if( $@ );
+        $repo->set(1);
+    }
+
+    return( $self->_is_class_loaded( $class ) ? $class : '' );
 }
 
 sub _set_get
@@ -1904,6 +2107,15 @@ sub _set_get_one_uri
     }
 }
 
+# $obj->_str_val( $some_object );
+# $obj->_str_val( undef );
+sub _str_val
+{
+    no overloading;
+    return( '' ) unless( scalar( @_ ) > 1 && defined( $_[1] ) );
+    return( "$_[1]" );
+}
+
 # NOTE: For CBOR and Sereal
 sub FREEZE
 {
@@ -2026,7 +2238,7 @@ HTTP::Promise::Headers - HTTP Headers Class
 
 =head1 VERSION
 
-    v0.2.0
+    v0.2.2
 
 =head1 DESCRIPTION
 
@@ -3589,6 +3801,10 @@ Example:
 See also L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-XSS-Protection>
 
 =for Pod::Coverage STORABLE_thaw_post_processing
+
+=head1 THREAD-SAFETY
+
+This module is thread-safe for all operations, as it operates on per-object state and uses thread-safe external libraries.
 
 =head1 AUTHOR
 

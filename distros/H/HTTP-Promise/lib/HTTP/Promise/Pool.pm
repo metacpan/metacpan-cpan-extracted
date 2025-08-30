@@ -16,6 +16,7 @@ BEGIN
 {
     use strict;
     use warnings;
+    warnings::register_categories( 'HTTP::Promise' );
     use parent qw( Module::Generic );
     our $VERSION = 'v0.2.0';
 };
@@ -158,6 +159,10 @@ Sets or gets the socket.
 =head2 steal
 
 Provided with an C<host> and C<port>, this checks if those matches the current values, and returns the current socket after resetting the object.
+
+=head1 THREAD-SAFETY
+
+This module is thread-safe for all operations, as it operates on per-object state and uses thread-safe external libraries.
 
 =head1 AUTHOR
 

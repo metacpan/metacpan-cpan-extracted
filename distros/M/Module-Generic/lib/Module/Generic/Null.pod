@@ -21,7 +21,7 @@ Module::Generic::Null - Null Value Chaining Object Class
 
 =head1 VERSION
 
-    v1.1.3
+    v1.1.4
 
 =head1 DESCRIPTION
 

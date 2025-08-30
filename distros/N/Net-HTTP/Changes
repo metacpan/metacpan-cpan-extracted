@@ -1,5 +1,9 @@
 Release history for Net-HTTP
 
+6.24      2025-08-29 11:21:58Z
+    - Fix #84: Replace neverssl.com with example.com in live tests (GH#86)
+      (Copilot)
+
 6.23      2023-06-16 11:46:01Z
     - Don't treat HTTP header names as case sensitive in test (GH#81) (Olaf
       Alders)

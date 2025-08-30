@@ -6,13 +6,6 @@ use v5.12;
 use warnings;
 use Graphics::Toolkit::Color::Space;
 
-my  $lab_def = Graphics::Toolkit::Color::Space->new( alias => 'CIELAB',        # space name LAB
-                                                      axis => [qw/L* a* b*/],  # short l a b
-                                                     range => [100, [-500, 500], [-200, 200]],
-                                                 precision => 3 );             # lightness, cyan-orange balance, magenta-green balance
-
-$lab_def->add_converter('XYZ', \&to_xyz, \&from_xyz );
-
 my @D65 = (0.95047, 1, 1.08883); # illuminant
 my $eta = 0.008856 ;
 my $kappa = 903.3;
@@ -25,7 +18,6 @@ sub from_xyz {
     my $b = ($xyz[1] - $xyz[2] + 1) / 2;
     return ([$l, $a, $b]);
 }
-
 sub to_xyz {
     my ($lab) = shift;
     my $fy = ($lab->[0] + 0.16) / 1.16;
@@ -35,4 +27,10 @@ sub to_xyz {
     return \@xyz;
 }
 
-$lab_def;
+Graphics::Toolkit::Color::Space->new (
+        alias => 'CIELAB',          # space name LAB
+         axis => [qw/L* a* b*/],    # short l a b  -  lightness, cyan-orange balance, magenta-green balance
+        range => [100, [-500, 500], [-200, 200]],
+    precision => 3,
+      convert => {XYZ => [\&to_xyz, \&from_xyz]},
+);

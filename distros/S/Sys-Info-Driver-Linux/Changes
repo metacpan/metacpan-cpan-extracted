@@ -1,5 +1,11 @@
 Revision history for Perl extension Sys::Info::Driver::Linux.
 
+0.7911 2025-08-30 BURAK
+     - sudo will always fetch the real loginname, which doesn't need to be root. There is no point to check that. uid/guid is enough.
+
+0.7910 2025-08-30 BURAK
+     - Fallback to loginname if real name is unset.
+
 0.7909 2025-08-18 BURAK
      - Fix mem stats.
      - Fix CPU speed collection.

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Asynchronous HTTP Request and Promise - ~/lib/HTTP/Promise.pm
-## Version v0.6.0
+## Version v0.6.2
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/06
-## Modified 2025/07/30
+## Modified 2025/08/30
 ## All rights reserved.
 ## 
 ## 
@@ -60,7 +60,7 @@ BEGIN
     our $EXTENSION_VARY = 1;
     our $DEFAULT_MIME_TYPE = 'application/octet-stream';
     our $SERIALISER = $Promise::Me::SERIALISER;
-    our $VERSION = 'v0.6.0';
+    our $VERSION = 'v0.6.2';
 };
 
 use strict;
@@ -927,6 +927,18 @@ sub send
     my $opts = $self->_get_args_as_hash( @_ );
     $opts->{expect_threshold} //= $self->expect_threshold // 0;
     $opts->{total_attempts} //= 0;
+#     if( $self->debug >= 4 )
+#     {
+#         my $hcopy = $req->headers->clone;
+#         if( my $auth = $hcopy->authorization )
+#         {
+#             $auth =~ s/\b([A-Za-z]+)\s+(\S{6})\S+/$1 $2…/;
+#             $hcopy->authorization( $auth );
+#         }
+#         my $h = $hcopy->as_string;
+#         my $cl = $req->content_length // 0;
+#         my $preview = $req->start_line . "\n" . $h . "\n<" . $cl . " bytes body omitted>";
+#     }
 
     my $p = {};
     # my $timeout = time() + $self->timeout;
@@ -964,7 +976,7 @@ sub send
     {
         $p->{local_port} = $local_port;
     }
-    
+
     my $proxy = $self->proxy;
     my $no_proxy = $self->no_proxy;
     if( $proxy && $no_proxy )
@@ -974,7 +986,7 @@ sub send
             undef( $proxy );
         }
     }
-    
+
     local $SIG{PIPE} = 'IGNORE';
     my $io;
     my $sock = $self->_pool->steal( @$p{qw( host port )} );
@@ -1084,7 +1096,7 @@ sub send
         my $ct_len = $req->headers->content_length;
         if( $body_len != $ct_len )
         {
-            warn( "Content-Length set (${ct_len}) does not match the actual body size (${body_len})\n" ) if( warnings::enabled( ref( $self ) ) );
+            warn( "Content-Length set (${ct_len}) does not match the actual body size (${body_len})\n" ) if( warnings::enabled() );
         }
         
         my $sock = $io->filehandle;
@@ -1199,6 +1211,7 @@ sub send
         if( $req->version && 
             $req->version > 1.0 && 
             defined( $expect_threshold ) && 
+            $expect_threshold > 0 &&
             defined( $body ) &&
             $body->length > $expect_threshold )
         {
@@ -1685,9 +1698,11 @@ sub _make_request_data
     {
         $ct = 'application/x-www-form-urlencoded';
     }
+    # If the user used the short version of multipart/form-data, we update the Content-Type accordingly.
     elsif( $ct && $ct eq 'form-data' )
     {
         $ct = 'multipart/form-data';
+        $req->headers->header( 'Content-Type' => $ct );
     }
 
     if( defined( $ct ) && length( "$ct" ) )
@@ -1710,17 +1725,23 @@ sub _make_request_data
             # HTTP::Promise::Body::Form::Data inherits from HTTP::Promise::Body::Form, so we do it first
             if( $self->_is_a( $content => 'HTTP::Promise::Body::Form::Data' ) )
             {
+                $content->debug( $self->debug ); # REMOVE ME
+                $content->boundary( $obj->boundary );
                 my $parts = $content->make_parts ||
                     return( $self->pass_error( $content->error ) );
                 $ent->parts( $parts );
+                $ent->body( $content );
             }
             if( $self->_is_a( $content => 'HTTP::Promise::Body::Form' ) )
             {
                 my $form = $content->as_form_data ||
                     return( $self->pass_error( $content->error ) );
+                $form->debug( $self->debug ); # REMOVE ME
+                $form->boundary( $obj->boundary );
                 my $parts = $form->make_parts ||
                     return( $self->pass_error( $form->error ) );
                 $ent->parts( $parts );
+                $ent->body( $form );
             }
             elsif( $self->_is_array( $content ) )
             {
@@ -1734,9 +1755,12 @@ sub _make_request_data
                     return( $self->pass_error );
                 my $form = HTTP::Promise::Body::Form::Data->new( @$content ) ||
                     return( $self->pass_error( HTTP::Promise::Body::Form::Data->error ) );
+                $form->debug( $self->debug ); # REMOVE ME
+                $form->boundary( $obj->boundary );
                 my $parts = $form->make_parts( fields => $fields ) ||
                     return( $self->pass_error( $form->error ) );
                 $ent->parts( $parts );
+                $ent->body( $form );
             }
             elsif( ref( $content ) eq 'HASH' )
             {
@@ -1744,9 +1768,12 @@ sub _make_request_data
                     return( $self->pass_error );
                 my $form = HTTP::Promise::Body::Form::Data->new( $content ) ||
                     return( $self->pass_error( HTTP::Promise::Body::Form::Data->error ) );
+                $form->debug( $self->debug ); # REMOVE ME
+                $form->boundary( $obj->boundary );
                 my $parts = $form->make_parts ||
                     return( $self->pass_error( $form->error ) );
                 $ent->parts( $parts );
+                $ent->body( $form );
             }
             else
             {
@@ -1814,7 +1841,11 @@ sub _make_request_data
         {
             $ent->encode_body( $encodings ) if( !$ent->is_encoded );
         }
-        $req->content_length( $ent->body->length );
+        # Here we could pass a boundary => $boundary argument to $ent->body->length which would then be passed to the as_string method, but the as_string method in HTTP::Promise::Body::Form::Data will call the method 'boundary' if no boundary value is provided as an option.
+        # $req->content_length( $ent->body->length );
+        my $bytes = $ent->body->length ||
+            return( $self->pass_error( $ent->body->error ) );
+        $req->content_length( $bytes );
     }
     # Set the Content-Length to 0 only if there is a Content-Type set
     elsif( $ct )
@@ -2310,7 +2341,7 @@ HTTP::Promise - Asynchronous HTTP Request and Promise
 
 =head1 VERSION
 
-    v0.6.0
+    v0.6.2
 
 =head1 DESCRIPTION
 
@@ -3286,6 +3317,10 @@ However, if L</use_promise> is set to false, this will return an L<HTTP::Promise
 You can, however, specify, another method by providing the C<method> option with value being an HTTP method, i.e. C<DELETE>, C<GET>, C<HEAD>, C<OPTIONS>, C<PATCH>, C<POST>, C<PUT>.
 
 See also L<Mozilla documentation on fetch|https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch>
+
+=head1 THREAD-SAFETY
+
+This module is thread-safe for all operations, as it operates on per-object state and uses thread-safe external libraries.
 
 =head1 AUTHOR
 

@@ -5,7 +5,7 @@ use base 'PDF::API2::Basic::PDF::Pages';
 use strict;
 use warnings;
 
-our $VERSION = '2.047'; # VERSION
+our $VERSION = '2.048'; # VERSION
 
 use Carp;
 use POSIX qw(floor);

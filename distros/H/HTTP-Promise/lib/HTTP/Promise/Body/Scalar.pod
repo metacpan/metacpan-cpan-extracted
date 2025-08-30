@@ -71,6 +71,10 @@ This returns nothing since there is no filepath for an all-memory body data
 
 This calls L<Module::Generic::Scalar/reset> to empty the underlying body data.
 
+=head1 THREAD-SAFETY
+
+This module is designed to be fully thread-safe and process-safe, ensuring data integrity across Perl ithreads and mod_perl’s threaded Multi-Processing Modules (MPMs) such as Worker or Event. It inherits from L<Module::Generic::Scalar>, which relies on L<Module::Generic::Global> for thread-safe storage of shared state and employs synchronisation mechanisms to prevent data corruption and race conditions.
+
 =head1 AUTHOR
 
 Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>

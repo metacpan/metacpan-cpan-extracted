@@ -6,13 +6,6 @@ use v5.12;
 use warnings;
 use Graphics::Toolkit::Color::Space qw/mult_matrix3/;
 
-                                                      # luma, cyan-orange balance, magenta-green balance
-my  $yuv_def = Graphics::Toolkit::Color::Space->new( axis  => [qw/luma Pb Pr/], alias => 'YPbPr',
-                                                     short => [qw/Y U V/],
-                                                     range => [1, [-.5, .5], [-.5, .5],] );
-
-    $yuv_def->add_converter('RGB', \&to_rgb, \&from_rgb );
-
 sub from_rgb {
     my ($rgb) = shift;
     my (@yuv) =  mult_matrix3([[ 0.299   ,  0.587,     0.114    ],
@@ -22,8 +15,6 @@ sub from_rgb {
     $yuv[2] += 0.5;
     return \@yuv;
 }
-
-
 sub to_rgb {
     my ($yuv) = shift;
     $yuv->[1] -= 0.5;
@@ -34,5 +25,11 @@ sub to_rgb {
     return \@rgb;
 }
 
-$yuv_def;
+Graphics::Toolkit::Color::Space->new(
+        alias => 'YPbPr',
+        axis  => [qw/luma Pb Pr/], # luma, cyan-orange balance, magenta-green balance
+        short => [qw/Y U V/],
+        range => [1, [-.5, .5], [-.5, .5],],
+      convert => {RGB => [\&to_rgb, \&from_rgb]},
+);
 

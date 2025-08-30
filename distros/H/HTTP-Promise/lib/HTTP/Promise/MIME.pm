@@ -16,6 +16,7 @@ BEGIN
 {
     use strict;
     use warnings;
+    warnings::register_categories( 'HTTP::Promise' );
     use parent qw( Module::Generic );
     use vars qw( $VERSION $TYPES $HAS_FILE_MMAGIC_XS );
     # use File::MMagic::XS;
@@ -257,6 +258,10 @@ Returns an hash L<object|Module::Generic::Hash> containing mime types with their
 There is no mime type without suffix.
 
 The internal data is from L<Apache2 trunk|http://svn.apache.org/viewvc/httpd/httpd/trunk/docs/conf/mime.types?view=markup>
+
+=head1 THREAD-SAFETY
+
+This module is thread-safe for all operations, as it operates on per-object state and uses thread-safe external libraries.
 
 =head1 AUTHOR
 

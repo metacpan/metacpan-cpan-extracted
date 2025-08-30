@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Asynchronous HTTP Request and Promise - ~/lib/HTTP/Promise/Body/Form.pm
-## Version v0.2.2
-## Copyright(c) 2024 DEGUEST Pte. Ltd.
+## Version v0.2.4
+## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/05/18
-## Modified 2025/03/09
+## Modified 2025/08/30
 ## All rights reserved.
 ## 
 ## 
@@ -16,12 +16,12 @@ BEGIN
 {
     use strict;
     use warnings;
-    use warnings::register;
+    warnings::register_categories( 'HTTP::Promise' );
     use parent qw( Module::Generic::Hash );
     use vars qw( $VERSION );
     # use Nice::Try;
     use URL::Encode::XS ();
-    our $VERSION = 'v0.2.2';
+    our $VERSION = 'v0.2.4';
 };
 
 use strict;
@@ -78,7 +78,7 @@ sub as_form_data
     my $self = shift( @_ );
     my $hash = {};
     my $keys = $self->keys->sort;
-    $self->_load_class( 'HHTP::Promise::Body::Form' ) || return( $self->pass_error );
+    $self->_load_class( 'HTTP::Promise::Body::Form' ) || return( $self->pass_error );
     my $form = HHTP::Promise::Body::Form->new;
     foreach my $n ( @$keys )
     {
@@ -141,9 +141,12 @@ sub as_string
     my @pairs = ();
     # try-catch
     local $@;
+    my $obj = $self->_tie_object;
+    # We need to temporarily enable public storage access, so we force enable to true, but put it back to what it was after.
+    my $flag = $obj->enable;
+    $obj->enable(1) if( !$flag );
     eval
     {
-        $self->_tie_object->enable(1);
         foreach my $n ( @$keys )
         {
             my $v = $self->{ $n };
@@ -170,6 +173,7 @@ sub as_string
             }
         }
     };
+    $obj->enable(0) if( !$flag );
     if( $@ )
     {
         return( $self->error( "Error while Trying to url-encode ", scalar( @$keys ), " form elements: $@" ) );
@@ -252,6 +256,10 @@ sub encode
     return( '' ) if( !scalar( @$this ) );
     my $rv;
     my @pairs = ();
+    my $obj = $self->_tie_object;
+    # We need to temporarily enable public storage access, so we force enable to true, but put it back to what it was after.
+    my $flag = $obj->enable;
+    $obj->enable(1) if( !$flag );
     # try-catch
     local $@;
     eval
@@ -282,6 +290,7 @@ sub encode
         }
         $rv = join( '&', @pairs );
     };
+    $obj->enable(0) if( !$flag );
     if( $@ )
     {
         return( $self->error( "Error while Trying to url-encode ", scalar( @$this ), " elements provided: $@" ) );
@@ -306,14 +315,11 @@ sub encode_string
     return( $encoded );
 }
 
-sub error
+sub length
 {
-    my $self = shift( @_ );
-    $self->_tie_object->enable(0);
-    return( $self->SUPER::error( @_ ) );
+    require bytes;
+    return( bytes::length( shift->as_string( @_ ) ) );
 }
-
-sub length { return( CORE::length( shift->as_string ) ); }
 
 sub open
 {
@@ -325,13 +331,6 @@ sub open
     my $io = $s->open( @_ ) ||
         return( $self->pass_error( $s->error ) );
     return( $io );
-}
-
-sub pass_error
-{
-    my $self = shift( @_ );
-    $self->_tie_object->enable(0);
-    return( $self->SUPER::pass_error( @_ ) );
 }
 
 sub print
@@ -347,7 +346,7 @@ sub print
     return(1);
 }
 
-sub _is_warnings_enabled { return( warnings::enabled( $_[0] ) ); }
+sub _is_warnings_enabled { return( warnings::enabled( 'HTTP::Promise' ) ); }
 
 # NOTE: FREEZE is inherited
 
@@ -377,7 +376,7 @@ HTTP::Promise::Body::Form - x-www-form-urlencoded Data Class
 
 =head1 VERSION
 
-    v0.2.2
+    v0.2.4
 
 =head1 DESCRIPTION
 
@@ -481,6 +480,69 @@ This encodes the key-pairs as C<x-www-form-urlencoded> by calling L</as_string>,
 =head2 print
 
 Provided with a valid filehandle, and this print the C<x-www-form-urlencoded> representation of the key-value pairs contained in this object, to the given filehandle, or upon error, sets an L<error|Module::Generic/error> and returns C<undef>
+
+=head1 THREAD-SAFETY
+
+L<HTTP::Promise::Body::Form::Data> is thread-safe for per-object operations, with proper handling of per-object state and external libraries. It supports multi-threaded environments, but since it inherits from L<Module::Generic::Hash>, who is also thread-safe, but still care must be taken when sharing objects across threads or modifying global variables.
+
+Key considerations for thread-safety:
+
+=over 4
+
+=item * B<Shared Variables>
+
+The global variable C<$KEY_OBJECT> controls whether references can be used as hash keys. It is not shared by default, so concurrent modifications in threads may cause race conditions. Use C<local> or the L</key_object> method to set it per-object:
+
+    use threads;
+    my $h = HTTP::Promise::Body::Form::Data->new;
+    $h->key_object(1); # Thread-safe per object
+    my $ref = [];
+    $h->{ $ref } = "array"; # Safe
+
+=item * B<Hash Data>
+
+Hash data is stored in a tied hash (L<Module::Generic::TieHash>), which is per-object and thread-safe for independent operations. Operations like L</merge>, L</json>, and L</clone> operate on local data. However, concurrent modifications to a shared object are not thread-safe without synchronisation:
+
+    use threads;
+    my $h = HTTP::Promise::Body::Form::Data->new( first_name => "John" );
+    lock( $h ); # Synchronize access
+    my @threads = map
+    {
+        threads->create(sub
+        {
+            lock( $h );
+            $h->merge({ last_name => "Doe" }); # Thread-safe with lock
+        });
+    } 1..5;
+    $_->join for( @threads );
+
+For best practices, create per-thread objects to avoid shared state:
+
+     use threads;
+     my @threads = map
+     {
+         threads->create(sub
+         {
+             my $h = HTTP::Promise::Body::Form::Data->new( first_name => "John" );
+             $h->merge({ last_name => "Doe" }); # Thread-safe
+         });
+     } 1..5;
+     $_->join for @threads;
+
+=item * B<Serialisation>
+
+Serialisation methods (L</FREEZE>, L</THAW>) operate on per-object state, making them thread-safe:
+
+    use threads;
+    use Storable;
+    my $h = HTTP::Promise::Body::Form::Data->new( age => 30 );
+    my $frozen = Storable::freeze( $h ); # Thread-safe
+
+=back
+
+For debugging in threaded environments:
+
+    ls -l /proc/$$/fd  # List open file descriptors
 
 =head1 AUTHOR
 

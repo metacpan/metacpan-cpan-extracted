@@ -1,5 +1,5 @@
 package Sys::Info::Driver::Linux::Constants;
-$Sys::Info::Driver::Linux::Constants::VERSION = '0.7909';
+$Sys::Info::Driver::Linux::Constants::VERSION = '0.7911';
 use strict;
 use warnings;
 use parent qw( Exporter );
@@ -78,7 +78,7 @@ Sys::Info::Driver::Linux::Constants
 
 =head1 VERSION
 
-version 0.7909
+version 0.7911
 
 =head1 SYNOPSIS
 

@@ -6,18 +6,6 @@ use v5.12;
 use warnings;
 use Graphics::Toolkit::Color::Space qw/min max/;
 
-my $hsl_def = Graphics::Toolkit::Color::Space->new( name => 'NCol',
-                                                    axis => [qw/hue whiteness blackness/],
-                                                    type => [qw/angular linear linear/],
-                                                   range => [600, 100, 100],  precision => 0,
-                                              value_form => ['[RYGCBMrygcbm]\d{1,3}','\d{1,3}','\d{1,3}'],
-                                                  suffix => ['', '%', '%'],
-                                                  );
-
-   $hsl_def->set_value_numifier( \&read_values, \&write_values );
-   $hsl_def->add_converter('RGB', \&to_rgb, \&from_rgb );
-
-
 my @color_char = qw/R Y G C B M/;
 my %char_value = (map { $color_char[$_] => $_ } 0 .. $#color_char);
 
@@ -33,7 +21,6 @@ sub write_values {
     my $hue_str = $color_char[ $digit ] . sprintf( "%u", ($hue - ($digit * 100)));
     return [$hue_str, $val->[1], $val->[2]];
 }
-
 
 sub from_rgb {
     my ($r, $g, $b) = @{$_[0]};
@@ -74,4 +61,14 @@ sub to_rgb {
     return \@rgb;
 }
 
-$hsl_def;
+Graphics::Toolkit::Color::Space->new(
+         name => 'NCol',
+         axis => [qw/hue whiteness blackness/],
+         type => [qw/angular linear linear/],
+        range => [600, 100, 100],
+    precision => 0,
+   value_form => ['[RYGCBMrygcbm]\d{1,3}','\d{1,3}','\d{1,3}'],
+       suffix => ['', '%', '%'],
+      convert => {RGB => [\&to_rgb, \&from_rgb]},
+       values => {read => \&read_values, write => \&write_values, }
+);

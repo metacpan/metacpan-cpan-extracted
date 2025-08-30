@@ -1,0 +1,66 @@
+# Copyright (c) 2025 Yuki Kimoto
+# MIT License
+
+class Compress::Raw::Zlib::Inflate extends Compress::Raw::Zlib::Base {
+  version_from Compress::Raw::Zlib;
+  
+  use Compress::Raw::Zlib::Constant as ZLIB;
+  use Fn;
+  use Compress::Raw::Zlib::Z_stream;
+  
+  # Undocumented Fields
+  has LimitOutput : byte;
+  
+  # Class Methods
+  static method new : Compress::Raw::Zlib::Inflate ($options : object[] = undef) {
+    
+    my $self = new Compress::Raw::Zlib::Inflate;
+    
+    $self->init($options);
+    
+    return $self;
+  }
+  
+  # Instance Methods
+  method init : void ($options : object[] = undef) {
+    
+    my $option_names = [
+      "-WindowBits",
+      "-Dictionary",
+      "-Bufsize",
+      "-LimitOutput",
+    ];
+    
+    Fn->check_option_names($options, $option_names);
+    
+    my $options_h = Hash->new($options);
+    
+    $self->{WindowBits} = $options_h->get_or_default_int("-WindowBits", ZLIB->MAX_WBITS);
+    
+    $self->{Dictionary} = $options_h->get_or_default_string("-Dictionary", "");
+    
+    $self->{Bufsize} = $options_h->get_or_default_int("-Bufsize", 4096);
+    
+    $self->{LimitOutput} = (byte)$options_h->get_or_default_int("-LimitOutput", 0);
+    
+    unless ($self->{Bufsize} >= 1) {
+      die "The value of '-Bufsize' option must be >= 1.";
+    }
+    
+    # If the lower 4 bits of WindowBits is 0b0000, it is set to 0b1111(MAX_WBITS).
+    if (($self->{WindowBits} & ZLIB->MAX_WBITS) == 0) {
+      $self->{WindowBits} += ZLIB->MAX_WBITS;
+    }
+    
+    $self->_inflateInit;
+    
+  }
+  
+  native method inflateReset : void ();
+  
+  native method inflate : void ($input : mutable string, $output_ref : string[]);
+  
+  native method DESTROY : void ();
+  
+  private native method _inflateInit : void ();
+}

@@ -1,0 +1,21 @@
+bin/seo-inspect
+Changes
+lib/SEO/Inspector.pm
+lib/SEO/Inspector/Plugin/MetaDescriptionCheck.pm
+lib/SEO/Inspector/Plugin/TitleCheck.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+scripts/generate_index.pl
+t/10-load.t
+t/30-basics.t
+t/eof.t
+t/eol.t
+t/plugins.t
+t/pod-synopsis.t
+t/seo-inspect.t
+t/url.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

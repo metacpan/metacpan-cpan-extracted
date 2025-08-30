@@ -742,7 +742,7 @@ else {
 #########################
 #########################
 
-if((Math::MPFR->new(10) <=> "$strinf") < 0) {print "ok 101\n"}
+if((Math::MPFR->new(10) <=> "$strinf") == -1) {print "ok 101\n"}
 else {
   warn "\n 10 >= inf\n";
   print "not ok 101\n";
@@ -763,19 +763,19 @@ else {
 }
 
 $x = (Math::MPFR->new(10) <=> "61.2");
-if($x < 0) {print "ok 104\n"}
+if($x == -1) {print "ok 104\n"}
 else {
   warn "\n \$x: $x\n";
   print "not ok 104\n";
 }
 
-if((Math::MPFR->new(10) <=> $inf) < 0){print "ok 105\n"}
+if((Math::MPFR->new(10) <=> $inf) == -1){print "ok 105\n"}
 else {
   warn "\n 10 !< inf\n";
   print "not ok 105\n";
 }
 
-if((Math::MPFR->new(10) <=> $inf * -1) > 0){print "ok 106\n"}
+if((Math::MPFR->new(10) <=> $inf * -1) == 1){print "ok 106\n"}
 else {
   warn "\n 10 !> inf\n";
   print "not ok 106\n";
@@ -823,7 +823,7 @@ if($z <= "$strninf") {
 }
 else {print "ok 112\n"}
 
-if(($z <=> "$strninf") > 0) {print "ok 113\n"}
+if(($z <=> "$strninf") == 1) {print "ok 113\n"}
 else {
   warn "\n $z !> infinity\n";
   print "not ok 113\n";

@@ -59,20 +59,20 @@ sub TIEHASH
     @$list{ @$disable } = (1) x scalar( @$disable );
     my $hash =
     {
-    # The caller sets this to its class, so we can differentiate calls from inside and outside our caller's package
-    disable => $list,
-    debug => $opts->{debug},
-    # When disabled, the Tie::Hash system will return hash key values directly under $self instead of $self->{data}
-    # Disabled by default so the new() method can access its setup data directly under $self
-    # Then new() can call enable to active it
-    enable => 1,
-    # Do we enable the use of object as hash key?
-    key_object => $opts->{key_object} // 0,
-    # Where to store the actual hash data
-    data  => {},
-    # object reference address -> value
-    # This is used to store object as key
-    object_repo => {},
+        # The caller sets this to its class, so we can differentiate calls from inside and outside our caller's package
+        disable => $list,
+        debug => $opts->{debug},
+        # When disabled, the Tie::Hash system will return hash key values directly under $self instead of $self->{data}
+        # Disabled by default so the new() method can access its setup data directly under $self
+        # Then new() can call enable to active it
+        enable => 1,
+        # Do we enable the use of object as hash key?
+        key_object => $opts->{key_object} // 0,
+        # Where to store the actual hash data
+        data  => {},
+        # object reference address -> value
+        # This is used to store object as key
+        object_repo => {},
     };
     my $self = bless( $hash => ( ref( $this ) || $this ) );
     return( $self );
@@ -220,11 +220,12 @@ sub STORE
     my $caller = caller;
     if( $self->_exclude( $caller ) || !$self->{enable} )
     {
-        #print( STDERR "STORE($caller)[owner calling] <- '$key' -> '$val'\n" );
+        # print( STDERR "STORE($caller)[owner calling] <- '$key' -> '$val'\n" );
         $self->{ $key } = $val;
     }
     else
     {
+        # print( STDERR "STORE($caller)[non-owner calling] <- '$key' -> '$val' called from class ", [caller]->[0], " at line ", [caller]->[2], "\n" );
         # Ensure recursive tied hash
         if( ref( $val ) eq 'HASH' &&
             !tied( %$val ) )

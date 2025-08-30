@@ -1,12 +1,14 @@
-"Schedule::Easing" Version 0.1.2
+"Schedule::Easing" Version 0.1.3
 
 Abstract:
 ---------
 This packages provides a method for filtering existing, ongoing events with a throttling-like mechanism that slowly increases the percentage of messages transmitted over time.  For log messages of warnings or errors that are typically ignored, for example, organizations may wish to begin acting on those messages, but transmitting all such messages to recipients immediately would be considered an "unmanagable flood" and users will likely ignore every message as spam.  Instead, messages can be transmitted at low rates initially, providing an opportunity for users to respond and fix underlying issues.  Over the chosen schedule, eventually all messages will be transmitted and cleanup will have concluded.
 
-What's new in version 0.1.2:
+What's new in version 0.1.3:
 --------------------------
-* schedule-easing.pl fully supports warnings and check modes
+* schedule-easing.pl uses a stream handler in all modes to improve performance
+* schedule-easing.pl timestamps mode is supported
+* schedule-easing.pl fully supports warnings and check modes (since 0.1.2)
 
 Copyright & License:
 --------------------

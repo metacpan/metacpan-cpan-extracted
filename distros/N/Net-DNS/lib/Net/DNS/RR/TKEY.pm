@@ -2,7 +2,7 @@ package Net::DNS::RR::TKEY;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: TKEY.pm 2003 2025-01-21 12:06:06Z willem $)[2];
+our $VERSION = (qw$Id: TKEY.pm 2035 2025-08-14 11:49:15Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -63,10 +63,6 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 	return $rdata;
 }
 
-
-sub class {				## override RR method
-	return 'ANY';
-}
 
 sub encode {				## override RR method
 	my $self = shift;

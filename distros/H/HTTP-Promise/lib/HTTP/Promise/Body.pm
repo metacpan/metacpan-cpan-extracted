@@ -15,6 +15,7 @@ BEGIN
 {
     use strict;
     use warnings;
+    warnings::register_categories( 'HTTP::Promise' );
     use parent qw( Module::Generic );
     use vars qw( $VERSION $EXCEPTION_CLASS );
     use HTTP::Promise::Exception;
@@ -336,6 +337,10 @@ Provided with a filehandle, or an L<HTTP::Promise::IO> object and an hash or has
 =head2 purge
 
 This is a no-op and is superseded by inheriting classes.
+
+=head1 THREAD-SAFETY
+
+L<HTTP::Promise::Body> is thread-safe for all operations, as it operates on per-object state and uses thread-safe external libraries.
 
 =head1 AUTHOR
 

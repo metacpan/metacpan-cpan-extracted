@@ -1,5 +1,5 @@
 package Sys::Info::Driver::Linux::OS;
-$Sys::Info::Driver::Linux::OS::VERSION = '0.7909';
+$Sys::Info::Driver::Linux::OS::VERSION = '0.7911';
 use strict;
 use warnings;
 use parent qw( Sys::Info::Base );
@@ -118,22 +118,39 @@ sub build     { return shift->_populate_osversion->{OSVERSION}{RAW}{BUILD_DATE} 
 sub uptime    { return time - shift->tick_count }
 
 # user methods
+
 sub is_root {
+    my $self = shift;
     return 0 if defined &Sys::Info::EMULATE;
-    my $name = login_name();
     my $id   = POSIX::geteuid();
     my $gid  = POSIX::getegid();
     return 0 if $@;
     return 0 if ! defined $id || ! defined $gid;
-    return $id == 0 && $gid == 0 && $name eq 'root';
+    return $id == 0 && $gid == 0;
 }
 
 sub login_name {
     my($self, @args) = @_;
     my %opt   = @args % 2 ? () : @args;
     my $login = POSIX::getlogin() || return;
-    my $rv    = eval { $opt{real} ? (getpwnam $login)[REAL_NAME_FIELD] : $login };
-    $rv =~ s{ [,]{3,} \z }{}xms if $opt{real};
+    my $rv;
+    eval {
+        if ( $opt{real} ) {
+            $rv = (getpwnam $login)[REAL_NAME_FIELD];
+            $rv =~ s{ [,]{3,} \z }{}xms;
+            if ( ! $rv ) {
+                # unset, fall back to the loginname
+                $rv = $login;
+                delete $opt{real};
+            }
+        }
+        $rv ||= $login;
+        1;
+    } or do {
+        my $eval_error = $@ || 'Zombie error';
+        warn sprintf 'Error getting login name: %s', $@;
+        $rv = $login;
+    };
     return $rv;
 }
 
@@ -293,7 +310,7 @@ Sys::Info::Driver::Linux::OS
 
 =head1 VERSION
 
-version 0.7909
+version 0.7911
 
 =head1 SYNOPSIS
 

@@ -16,7 +16,7 @@ BEGIN
 {
     use strict;
     use warnings;
-    use warnings::register;
+    warnings::register_categories( 'HTTP::Promise' );
     use parent qw( HTTP::Promise::Headers::Generic );
     use URI::Escape::XS ();
     our $VERSION = 'v0.1.0';
@@ -277,6 +277,10 @@ Here, C<h2> is the protocol and means HTTP/2. C<h3-25> would be for draft 25 of 
 You can even pass unsafe characters. They will be encoded upon stringification:
 
     $alt->protocol( 'w=x:y#z' ); # example from rfc7838
+
+=head1 THREAD-SAFETY
+
+This module is thread-safe for all operations, as it operates on per-object state and uses thread-safe external libraries.
 
 =head1 AUTHOR
 

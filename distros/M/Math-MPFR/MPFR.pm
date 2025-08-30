@@ -41,6 +41,7 @@
     use constant MPFR_3_1_6_OR_LATER    => Math::MPFR::Random::_MPFR_VERSION() >  196869 ? 1 : 0;
     use constant MPFR_4_0_2_OR_LATER    => Math::MPFR::Random::_MPFR_VERSION() >= 262146 ? 1 : 0;
     use constant MPFR_PV_NV_BUG         => Math::MPFR::Random::_has_pv_nv_bug();
+    use constant MPFR_PREC_MIN          => Math::MPFR::Prec::_PREC_MIN();
 
     # https://github.com/StrawberryPerl/Perl-Dist-Strawberry/issues/226
     # Math::MPFR::Random::_buggy() was modified in version 4.34 to
@@ -148,7 +149,8 @@ Rmpfr_fma Rmpfr_fmma Rmpfr_fmms Rmpfr_fmod Rmpfr_fmod_ui Rmpfr_fmodquo Rmpfr_fms
 Rmpfr_fpif_export Rmpfr_fpif_import Rmpfr_fprintf Rmpfr_frac
 Rmpfr_free_cache Rmpfr_free_cache2 Rmpfr_free_pool Rmpfr_frexp Rmpfr_gamma Rmpfr_gamma_inc
 Rmpfr_get_bfloat16
-Rmpfr_get_DECIMAL128 Rmpfr_get_DECIMAL64 Rmpfr_get_FLOAT128 Rmpfr_get_IV Rmpfr_get_LD Rmpfr_get_NV
+Rmpfr_get_BFLOAT16 Rmpfr_get_DECIMAL128 Rmpfr_get_DECIMAL64 Rmpfr_get_FLOAT16 Rmpfr_get_FLOAT128
+Rmpfr_get_FLT Rmpfr_get_IV Rmpfr_get_LD Rmpfr_get_NV
 Rmpfr_get_d Rmpfr_get_d1 Rmpfr_get_d_2exp Rmpfr_get_default_prec Rmpfr_get_default_rounding_mode
 Rmpfr_get_emax Rmpfr_get_emax_max Rmpfr_get_emax_min Rmpfr_get_emin Rmpfr_get_emin_max
 Rmpfr_get_emin_min Rmpfr_get_exp Rmpfr_get_f Rmpfr_get_float128 Rmpfr_get_flt Rmpfr_get_float16
@@ -178,7 +180,8 @@ Rmpfr_randinit_mt Rmpfr_random2 Rmpfr_randseed Rmpfr_randseed_ui Rmpfr_rec_root 
 Rmpfr_regular_p Rmpfr_reldiff Rmpfr_remainder Rmpfr_remquo
 Rmpfr_rint Rmpfr_rint_ceil Rmpfr_rint_floor Rmpfr_rint_round Rmpfr_rint_roundeven Rmpfr_rint_trunc
 Rmpfr_root Rmpfr_rootn_ui Rmpfr_round Rmpfr_round_nearest_away Rmpfr_roundeven
-Rmpfr_sec Rmpfr_sech Rmpfr_set Rmpfr_set_DECIMAL128 Rmpfr_set_DECIMAL64 Rmpfr_set_FLOAT128
+Rmpfr_sec Rmpfr_sech Rmpfr_set Rmpfr_set_BFLOAT16 Rmpfr_set_DECIMAL128 Rmpfr_set_DECIMAL64
+Rmpfr_set_FLOAT16 Rmpfr_set_FLOAT128 Rmpfr_set_FLT
 Rmpfr_set_IV Rmpfr_set_LD Rmpfr_set_NV Rmpfr_set_d Rmpfr_set_default_prec
 Rmpfr_set_default_rounding_mode Rmpfr_set_divby0 Rmpfr_set_emax Rmpfr_set_emin Rmpfr_set_erangeflag
 Rmpfr_set_bfloat16
@@ -201,12 +204,13 @@ anytoa atodouble atonum atonv
 check_exact_decimal decimalize doubletoa dragon_test
 fr_cmp_q_rounded mpfr_max_orig_len mpfr_min_inter_prec mpfrtoa numtoa nvtoa nv2mpfr nvtoa_test
 prec_cast q_add_fr q_cmp_fr q_div_fr q_fmod_fr q_mul_fr q_sub_fr rndna
+subnormalize_generic subnormalize_bfloat16 subnormalize_float16 subnormalize_float32
 unpack_bfloat16 unpack_float16 unpack_float32
 );
 
     @Math::MPFR::EXPORT_OK = (@tags, 'bytes');
 
-    our $VERSION = '4.43';
+    our $VERSION = '4.44';
     #$VERSION = eval $VERSION;
 
     Math::MPFR->DynaLoader::bootstrap($VERSION);
@@ -832,6 +836,10 @@ sub Rmpfr_round_nearest_away {
 }
 
 sub _get_NV_properties {
+  # For the record
+  # __bf16  : $bits =  8; $emin = -132; $emax = 128;
+  # _Float16: $bits = 11; $emin = -23 ?; $emax = 16 ?;
+  # _Float32: $bits = 24; $emin = ????; $emax = ???;
 
   my($bits, $PREC, $max_dig, $min_pow, $normal_min, $NV_MAX, $nvtype, $emax, $emin);
 
@@ -1874,6 +1882,93 @@ sub unpack_bfloat16 {
   return join('', @ret);
 }
 
+sub subnormalize_bfloat16 {
+    # Arg can be IV/UV,PV, NV, Math::GMPf object,
+    # Math::GMPq object or Math::MPFR object.
+    return subnormalize_generic($_[0], -132, 128, 8);
+}
+
+sub subnormalize_float16 {
+    # Arg can be IV/UV,PV, NV, Math::GMPf object,
+    # Math::GMPq object or Math::MPFR object.
+    return subnormalize_generic($_[0], -23, 16, 11);
+}
+
+sub subnormalize_float32 {
+    # Arg can be IV/UV,PV, NV, Math::GMPf object,
+    # Math::GMPq object or Math::MPFR object.
+    return subnormalize_generic($_[0], -148, 128, 24);
+}
+
+
+sub subnormalize_generic {
+  my ($sv, $emin, $emax, $prec) = (shift, shift, shift, shift);
+  my $itsa = _itsa($sv);
+  my $limit =       2 ** ($emin - 1);
+  my $lower_limit = 2 ** ($emin - 2);
+  my $to8 = Rmpfr_init2($prec);
+  my $inex;
+
+  if( $itsa == 1 || $itsa == 2 ) {       # IV or UV
+    my $ret = Rmpfr_init2($prec);
+    Rmpfr_set_IV($ret, $sv, MPFR_RNDN);
+    return $ret;
+  }
+
+  if($itsa == 4 ) {                     # PV
+    return _subnormalize_pv($sv, $emin, $emax, $prec);
+  }
+
+  my $signbit = 1;
+  $signbit = -1 if $sv < 0;
+
+  if($itsa == 3) { # NV
+    $inex = Rmpfr_set_NV($to8, $sv, MPFR_RNDN); # NV
+    $signbit = -1 if ($sv == 0 && Rmpfr_signbit(Math::MPFR->new($sv)));
+  }
+  elsif($itsa == 5) {
+    $inex = Rmpfr_set($to8, $sv, MPFR_RNDN);   # MPFR
+    $signbit = -1 if (Rmpfr_zero_p($to8) && Rmpfr_signbit($to8));
+  }
+  elsif($itsa == 6) {
+    $inex = Rmpfr_set_f($to8, $sv, MPFR_RNDN);  # GMPf
+    $signbit = -1 if (Rmpfr_zero_p($to8) && Rmpfr_signbit($to8));
+  }
+  elsif($itsa == 7) {
+    $inex = Rmpfr_set_q($to8, $sv, MPFR_RNDN);  # GMPq
+    $signbit = -1 if (Rmpfr_zero_p($to8) && Rmpfr_signbit($to8));
+  }
+  else {
+    die "Unrecognized argument passed to subnormalize_generic()";
+  }
+
+  return $to8 if( Rmpfr_inf_p($to8) || Rmpfr_nan_p($to8) );
+  if(Rmpfr_get_exp($to8) >= $emax + 1) {
+    Rmpfr_set_inf($to8, $signbit);
+    return $to8;
+  }
+  if(Rmpfr_get_exp($to8) < $emin) {
+    if(abs($sv) <= $lower_limit) { # Compare to $sv, not to $to8. Avoids double rounding
+      Rmpfr_set_zero($to8, $signbit);
+      return $to8;
+    }
+    Rmpfr_set_NV($to8, $limit * $signbit, MPFR_RNDN);
+    return $to8;
+  }
+  return _subn($to8, $inex, $emin, $emax);
+}
+
+sub _subn {
+    my ($to8, $inex, $emin, $emax) = (shift, shift, shift, shift);
+    my $emin_orig = Rmpfr_get_emin();
+    my $emax_orig = Rmpfr_get_emax();
+    Rmpfr_set_emin($emin);
+    Rmpfr_set_emax($emax);
+    Rmpfr_subnormalize($to8, $inex, MPFR_RNDN);
+    Rmpfr_set_emin($emin_orig);
+    Rmpfr_set_emax($emax_orig);
+    return $to8;
+}
 
 1;
 

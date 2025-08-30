@@ -15,7 +15,7 @@ BEGIN
 {
     use strict;
     use warnings;
-    use warnings::register;
+    warnings::register_categories( 'HTTP::Promise' );
     use parent qw( HTTP::Promise::Message );
     use vars qw( $DEFAULT_PROTOCOL $VERSION );
     use HTTP::Promise::Status;
@@ -301,7 +301,7 @@ sub parse
 {
     my $self = shift( @_ );
     my $str  = shift( @_ );
-    warnings::warnif( 'Undefined argument to ' . ( ref( $self ) || $self ) . '->parse()' ) if( !defined( $str ) );
+    warn( 'Undefined argument to ' . ( ref( $self ) || $self ) . '->parse()' ) if( !defined( $str ) && warnings::enabled( 'HTTP::Promise' ) );
     $self->clear_error;
     if( !defined( $str ) || !length( $str ) )
     {
@@ -823,6 +823,10 @@ Returns a regular string made of the L</code> and the L</status>. If no status i
 =head2 version
 
 This is inherited from L<HTTP::Promise::Message>. See L<HTTP::Promise::Message/version>
+
+=head1 THREAD-SAFETY
+
+This module is thread-safe for all operations, as it operates on per-object state and uses thread-safe external libraries.
 
 =head1 AUTHOR
 

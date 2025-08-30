@@ -18,26 +18,26 @@ is( $space->is_name('LCH'),                     1, 'color space name LCH is corr
 is( $space->is_name('hab'),                     0, 'color space name LCH is correct');
 is( $space->axis_count,                         3, 'color space has 3 dimensions');
 
-is( ref $space->check_value_shape([0,0]),              '',   "CIELCHab got too few values");
-is( ref $space->check_value_shape([0, 0, 0, 0]),       '',   "CIELCHab got too many values");
-is( ref $space->check_value_shape([0, 0, 0]),          'ARRAY',   'check minimal CIELCHab values are in bounds');
-is( ref $space->check_value_shape([100, 539, 360]),    'ARRAY',   'check maximal CIELCHab values are in bounds');
-is( ref $space->check_value_shape([-0.1, 0, 0]),       '',   "L value is too small");
-is( ref $space->check_value_shape([100.01, 0, 0]),     '',   'L value is too big');
-is( ref $space->check_value_shape([0, -0.1, 0]),       '',   "c value is too small");
-is( ref $space->check_value_shape([0, 539.1, 0]),      '',   'c value is too big');
-is( ref $space->check_value_shape([0, 0, -0.1]),       '',   'h value is too small');
-is( ref $space->check_value_shape([0, 0, 360.2] ),     '',   "h value is too big");
+is( ref $space->check_value_shape([0,0]),             '',   "CIELCHab got too few values");
+is( ref $space->check_value_shape([0, 0, 0, 0]),      '',   "CIELCHab got too many values");
+is( ref $space->check_value_shape([0, 0, 0]),         'ARRAY',   'check minimal CIELCHab values are in bounds');
+is( ref $space->check_value_shape([100, 539, 360]),   'ARRAY',   'check maximal CIELCHab values are in bounds');
+is( ref $space->check_value_shape([-0.1, 0, 0]),      '',   "L value is too small");
+is( ref $space->check_value_shape([100.01, 0, 0]),    '',   'L value is too big');
+is( ref $space->check_value_shape([0, -0.1, 0]),      '',   "c value is too small");
+is( ref $space->check_value_shape([0, 539.1, 0]),     '',   'c value is too big');
+is( ref $space->check_value_shape([0, 0, -0.1]),      '',   'h value is too small');
+is( ref $space->check_value_shape([0, 0, 360.2] ),    '',   "h value is too big");
 
-is( $space->is_value_tuple([0,0,0]), 1,            'tuple has 3 elements');
-is( $space->is_partial_hash({c => 1, h => 0}), 1,  'found hash with some axis names');
+is( $space->is_value_tuple([0,0,0]),                   1,  'tuple has 3 elements');
+is( $space->is_partial_hash({c => 1, h => 0}),         1,  'found hash with some axis names');
 is( $space->is_partial_hash({l => 1, c => 0, h => 0}), 1, 'found hash with all short axis names');
 is( $space->is_partial_hash({luminance => 1, chroma => 0, hue => 0}), 1, 'found hash with all long axis names');
 is( $space->is_partial_hash({c => 1, v => 0, l => 0}), 0, 'found hash with one wrong axis name');
-is( $space->can_convert( 'LAB'), 1,                 'do only convert from and to rgb');
-is( $space->can_convert( 'Lab'), 1,                 'namespace can be written lower case');
-is( $space->can_convert( 'CIELCHab'), 0,               'can not convert to itself');
-is( $space->format([0,0,0], 'css_string'), 'lch(0, 0, 0)', 'can format css string');
+is( $space->can_convert( 'LAB'),                       1, 'do only convert from and to CIELAB');
+is( $space->can_convert( 'Lab'),                       1, 'namespace can be written lower case');
+is( $space->can_convert( 'CIELCHab'),                  0, 'can not convert to itself');
+is( $space->format([0,0,0], 'css_string'), 'lch(0, 0, 0)','can format css string');
 
 my $val = $space->deformat(['CIELCHab', 0, -1, -0.1]);
 is( ref $val,  'ARRAY', 'deformated named ARRAY into tuple');
@@ -75,9 +75,9 @@ is( round_decimals( $lch->[2], 5),    0,  'H value is good');
 my $lab = $space->convert_to( 'LAB',  [ 0, 0, 0 ]);
 is( ref $lab,                    'ARRAY',  'converted black to LAB');
 is( int @$lab,                         3,  'right amount of values');
-is( round_decimals( $lab->[0], 5),    0,  'L* value is good');
-is( round_decimals( $lab->[1], 5),   .5,  'a* value is good');
-is( round_decimals( $lab->[2], 5),   .5,  'b* value is good');
+is( round_decimals( $lab->[0], 5),     0,  'L* value is good');
+is( round_decimals( $lab->[1], 5),    .5,  'a* value is good');
+is( round_decimals( $lab->[2], 5),    .5,  'b* value is good');
 
 # white
 $val = $space->denormalize( [1, 0, 0] );

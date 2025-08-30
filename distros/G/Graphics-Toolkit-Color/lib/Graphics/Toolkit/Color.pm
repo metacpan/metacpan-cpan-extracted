@@ -2,7 +2,7 @@
 # public user level API: docs, help and arg cleaning
 
 package Graphics::Toolkit::Color;
-our $VERSION = '1.92';
+our $VERSION = '1.961';
 
 use v5.12;
 use warnings;
@@ -124,16 +124,41 @@ EOH
     $self->{'values'}->formatted( @$arg{qw/in as suffix range precision/} );
 }
 
-sub name         { $_[0]{'values'}->name }
+sub name         {
+    my ($self, @args) = @_;
+    return $self->{'values'}->name unless @args;
+    my $arg = _split_named_args( \@args, 'from', [], {from => 'default', all => 0, full => 0});
+    my $help = <<EOH;
+    GTC method 'name' accepts three optional, named arguments:
+    name ( ...
+        'CSS'                 # color naming scheme works as only positional argument
+        from => 'CSS'         # same scheme (defaults to internal: X + CSS + PantoneReport)
+        from => ['SVG', 'X']  # more color naming schemes at once, without duplicates
+        all => 1              # returns list of all names associated with the object's values
+        full => 1             # adds color scheme name to the color name. 'SVG:red'
+EOH
+    return Graphics::Toolkit::Color::Name::from_values( $self->{'values'}->shaped, @$arg{qw/from all full/});
+}
+
 sub closest_name {
-    my ($self) = shift;
-    my ($name, $distance) = $self->{'values'}->closest_name_and_distance;
+    my ($self, @args) = @_;
+    my $arg = _split_named_args( \@args, 'from', [], {from => 'default', all => 0, full => 0});
+    my $help = <<EOH;
+    GTC method 'name' accepts three optional, named arguments:
+    closest_name ( ...
+        'CSS'                 # color naming scheme works as only positional argument
+        from => 'CSS'         # same scheme (defaults to internal: X + CSS + PantoneReport)
+        from => ['SVG', 'X']  # more color naming schemes at once, without duplicates
+        all => 1              # returns list of all names associated with the object's values
+        full => 1             # adds color scheme name to the color name. 'SVG:red'
+EOH
+    my ($name, $distance) = Graphics::Toolkit::Color::Name::closest_from_values(
+                                $self->{'values'}->shaped, @$arg{qw/from all full/});
     return wantarray ? ($name, $distance) : $name;
 }
 
 sub distance {
     my ($self, @args) = @_;
-    @args = %{$args[0]} if @args == 1 and ref $args[0] eq 'HASH';
     my $arg = _split_named_args( \@args, 'to', ['to'], {in => $default_space_name, select => undef, range => undef});
     my $help = <<EOH;
     GTC method 'distance' accepts as arguments either a scalar color definition or
@@ -356,11 +381,12 @@ Graphics::Toolkit::Color - calculate color (sets), IO many spaces and formats
     use Graphics::Toolkit::Color qw/color/;
 
     my $red = Graphics::Toolkit::Color->new('red');  # create color object
-    say $red->add_value( 'blue' => 255 )->name;      # red + blue = 'fuchsia'
+    say $red->add_value( 'blue' => 255 )->name;      # red + blue = 'magenta'
     my @blue = color( 0, 0, 255)->values('HSL');     # 240, 100, 50 = blue
     $red->mix( to => [HSL => 0,0,80], amount => 10); # mix red with a little grey
     $red->gradient( to => '#0000FF', steps => 10);   # 10 colors from red to blue
-    my @base_triple = $red->complement( 3 );         # get fitting red green and blue
+    my @base_triadic = $red->complement( 3 );        # get fitting red green and blue
+    my @reds = $red->cluster( radius => 4, distance => 1 );
 
 
 =head1 DEPRECATION WARNING
@@ -390,7 +416,7 @@ Error messages will appear as return values instead of the expected result.
 
 While this module can understand and output color values to many
 L<color spaces|Graphics::Toolkit::Color::Space::Hub/COLOR-SPACES>,
-L<color spaces|Graphics::Toolkit::Color::Space::Hub/RGB>
+L<RGB|Graphics::Toolkit::Color::Space::Hub/RGB>
 is the (internal) primal one, because GTC is about colors that can be
 shown on the screen, and these are usually encoded in I<RGB>.
 Humans access colors on hardware level (eye) in I<RGB>, on cognition level
@@ -575,35 +601,51 @@ they appear by default you can surpress them by adding C<suffix =E<gt> ''>
 
 =head2 name
 
-Returns the normalized name (lower case, without I<'_'>) of the color
-held by the object - even when the object was created with numerical values.
-It returns an empty string when no color constant with the exact same values
-was found in the I<X11> or I<HTML> (I<SVG>) scheme or the I<Pantone report>.
-If several constants have matching values, the most well known name, which
-is in most cases also the shortest will be returned.
-All names from the internal , default color scheme are listed
-L<here|Graphics::Toolkit::Color::Name::Constant/NAMES>.
+Returns the normalized name string (lower case, without I<'_'>) that
+represents the I<RGB> values of this color in the default color scheme,
+which is I<X11> + I<HTML> (I<SVG>) + I<Pantone report>
+(see L<all names|Graphics::Toolkit::Color::Name::Constant/NAMES>).
 These are the same who can be used with L</new('name')>.
 
-Alternatively you may provide the name of a color scheme as the only,
-positional, optional argument. Then only that color scheme (as used in
-L</new('scheme:color')>) will be searched, if there is a color with the
-exact same values. That name will be the returned, otherwise you get an
-empty string. If the values doesnt have to match exactly, try the next method.
+Alternatively you may provide named arguments or one positional argument,
+which requires the same input as the named argument C<from>. It names one
+or a list of color schemes, from which the name will be selected then.
+Your otions are C<CSS>, C<Crayola>, C<EmergyC>, C<GrayScale>, C<HTML>,
+C<IE>, C<Mozilla>, C<Netscape>, C<Pantone>, C<PantoneReport>, C<SVG>,
+C<VACCC>, C<Werner>, C<Windows>, C<WWW> and C<X> plus self created naming
+schemes (see L<Graphics::Toolkit::Color::Name::Scheme>). Please note
+that all listed schemes are parts of modules that have to be installed
+separately. For your convenience I created the module
+L<Bundle::Graphics::ColorNames> to install them all at once. If you
+try to use a scheme from a not installed module your will get an error
+message instead of a color name.
+
+The second named argument is C<all>, which needs to be a perly boolean.
+It defaults to false. But when set to 1 you will get a list of all names
+that are associated with the current values. There will be no duplicates,
+when several schemes are searched.
+
+A third named argument is C<full>, also needing a perly boolean, that
+defaults to false. When set C<true> (1), the schema is part of the returned
+color name. These full names are also accepted by the constructor.
 
     $blue->name();                                   # 'blue'
     $blue->name('SVG');                              # 'blue'
-    $blue->name([qw/CSS X/]);                        # 'blue'
+    $blue->name( from => [qw/CSS X/], all => 1);     # 'blue', 'blue1'
+    $blue->name( from => 'CSS', full => 1);          # 'CSS:blue'
 
 
 =head2 closest_name
 
-Returns in scalar context a color L</name>, which has the shortest
-L</distance> in RGB to the current color.
-In list context, you get additionally the just mentioned distance
-as a second return value.
+Works almost identical as method L</name>, but guarantees a none empty
+result, unless invoking a weird empty color scheme - the method returns
+scalar context a color name, which has the shortest L</distance> in I<RGB>
+to the current color. In list context, you get additionally the just
+mentioned distance as a second return value.
 
-As with the previous method, one positional, optional argument is the color schme.
+All arguments work as mentioned above. The only difference (due to the
+second return value), multiple names (when requested) have to come in the
+form of an ARRAY (as the first return value).
 
     my $name = $red_like->closest_name;              # closest name in default scheme
     my $name = $red_like->closest_name('HTML');      # closest HTML constant
@@ -705,12 +747,12 @@ employ the C<amount> argument, which is the weight the mixed in color(s)
 get, counted in percentages. The remaining percentage to 100 is the weight
 of the color, held by the caller object. This would be naturally nothing,
 if the C<amount> is greater than hundret, which is especially something
-to consider, if mixing more than two colors. Then you provide the argument
-C<to> and C<amount> with an array of colors and respectively their amounts.
+to consider, if mixing more than two colors. Then both C<to> and C<amount>
+have to get an array of colors and respectively their amounts (same order).
 Obviously both arrays MUST have the same length. If the sum of amounts is
 greater than 100 the original color is ignored but the weight ratios will
 be kept. You may actually give C<amount> a scalar value while mixing a list
-of colors. Then the amount is applied to every color mentioned unter the
+of colors. Then the amount is applied to every color mentioned under the
 C<to> argument. In this case you go over the sum of 100% very quickly.
 
     $blue->mix( 'silver');                                         # 50% silver, 50% blue
@@ -798,6 +840,7 @@ The bigger the absolute numeric value the bigger the effect. Please have
 in mind that values over 2 result is a very strong tilt.
 
 Optional is the named argument L</in> (color space - details behind link).
+Tip: use C<oklab> and C<cieluv> spaces for visually smooth gradients.
 
     # we turn to grey
     my @colors = $c->gradient( to => $grey, steps => 5);
@@ -907,6 +950,36 @@ L<Convert::Color>
 L<Color::Similarity>
 
 =back
+
+=head1 ACKNOWLEDGEMENT
+
+These people contributed by providing patches, bug reports and useful
+comments:
+
+=over 4
+
+=item *
+
+Petr Pisar  (ppisar)
+
+=item *
+
+Slaven Rezic (srezic)
+
+=item *
+
+Gabor Szabo (szabgab)
+
+=item *
+
+Gene Boggs (GENE)
+
+=item *
+
+Stefan Reddig (sreagle)
+
+=back
+
 
 =head1 AUTHOR
 

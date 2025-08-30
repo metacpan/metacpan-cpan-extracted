@@ -176,7 +176,7 @@ Module::Generic::Array - An Array Manipulation Object Class
 
 =head1 VERSION
 
-    v2.2.3
+    v2.3.0
 
 =head1 DESCRIPTION
 
@@ -279,7 +279,8 @@ It does this by tieing the array to its internal class C<Module::Generic::Array:
     my $a = Module::Generic::Array->new();
     $a->callback( add => sub
     {
-        my( $pos, $ref ) = @_;
+        my $def = shift( @_ );
+        my( $pos, $ref ) = @$def{qw( start added )};
         return unless( blessed( $ref->[0] ) && $ref->[0]->isa( 'MyPackage') );
         return(1);
     });
@@ -692,6 +693,15 @@ In non-object context, will return the value as is, and in object context and if
 
 See also L</index>
 
+=head2 get_callback
+
+    my $code = $a->get_callback( 'add' );
+    my $code = $a->get_callback( 'remove' );
+
+Retrieve the current callback set for the specified callback type, and return the associated code reference. Only C<add> and C<remove> are allowed.
+
+If there is no callback currently set, this will return C<undef>. If you just want to check if the array has a callback, consider using L</has_callback> instead.
+
 =head2 get_null
 
 This operates the same way as L</get>, except that if the value at the offset given is L<perlfunc/undef>, then, instead of returning a L<Module::Generic::Scalar> object representing that value, it will return instead a L<Module::Generic::Null> object.
@@ -755,6 +765,19 @@ It returns a list of matches found in list context and a new L<Module::Generic::
 =head2 has
 
 This is an alias for L</exists>
+
+=head2 has_callback
+
+    $a->has_callback( 'add' );
+    $a->has_callback( 'remove' );
+
+Or, if you just want to check if there is any callback set:
+
+    $a->has_callback;
+
+Checks if the array object has a callback for the specified type, and returns true or false. Ony C<add> or C<remove> is supported.
+
+If no callback type is specified, this will check if any callback has been set for this array object.
 
 =head2 index
 

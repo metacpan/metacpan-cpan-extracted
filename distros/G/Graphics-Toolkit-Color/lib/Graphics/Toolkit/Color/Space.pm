@@ -10,12 +10,13 @@ use Graphics::Toolkit::Color::Space::Basis;
 use Graphics::Toolkit::Color::Space::Shape;
 use Graphics::Toolkit::Color::Space::Format;
 use Graphics::Toolkit::Color::Space::Util qw/:all/;
-our @EXPORT_OK = qw/round_int round_decimals real_mod min max apply_d65 remove_d65 mult_matrix3 close_enough is_nr/;
+our @EXPORT_OK = qw/round_int round_decimals mod_real min max uniq apply_d65 remove_d65 mult_matrix3 is_nr/;
 our %EXPORT_TAGS = (all => [@EXPORT_OK]);
 
 ########################################################################
 sub new {
     my $pkg = shift;
+    return if @_ % 2;
     my %args = @_;
     my $basis = Graphics::Toolkit::Color::Space::Basis->new( $args{'axis'}, $args{'short'}, $args{'name'}, $args{'alias'});
     return $basis unless ref $basis;
@@ -23,7 +24,32 @@ sub new {
     return $shape unless ref $shape;
     my $format = Graphics::Toolkit::Color::Space::Format->new( $basis, $args{'value_form'}, $args{'prefix'}, $args{'suffix'} );
     return $format unless ref $format;
-    bless { basis => $basis, shape => $shape, format => $format, convert => {} };
+    my $self = bless { basis => $basis, shape => $shape, format => $format, convert => {} };
+    if (ref $args{'format'} eq 'HASH'){
+        for my $format_name (keys %{$args{'format'}}){
+            my $formatter = $args{'format'}{$format_name};
+            next unless ref $formatter eq 'ARRAY' and  @$formatter > 0;
+            $format->add_formatter($format_name, $formatter->[0])
+                if exists $formatter->[0] and ref $formatter->[0] eq 'CODE';
+            $format->add_deformatter($format_name, $formatter->[1])
+                if exists $formatter->[1] and ref $formatter->[1] eq 'CODE';
+        }
+    }
+    if (ref $args{'convert'} eq 'HASH'){
+        for my $converter_target (keys %{$args{'convert'}}){
+            my $converter = $args{'convert'}{ $converter_target };
+            next unless ref $converter eq 'ARRAY' and @$converter > 1
+                    and ref $converter->[0] eq 'CODE' and ref $converter->[1] eq 'CODE';
+            $self->add_converter( $converter_target, @$converter );
+        }
+    }
+    if (ref $args{'values'} eq 'HASH') {
+        my $numifier = $args{'values'};
+        $format->set_value_numifier( $numifier->{'read'}, $numifier->{'write'} )
+            if ref $numifier->{'read'} eq 'CODE' and ref $numifier->{'write'} eq 'CODE';
+    }
+
+    return $self;
 }
 
 ########################################################################
@@ -57,9 +83,6 @@ sub add_constraint     { shift->shape->add_constraint(@_)}    # ~name, ~error, &
 sub form               { $_[0]{'format'} }
 sub format             { shift->form->format(@_) }            # @+values, ~format_name -- @~suffix --> $*color
 sub deformat           { shift->form->deformat(@_) }          # $*color                -- @~suffix --> @+values, ~format_name
-sub add_formatter      { shift->form->add_formatter(@_) }     # ~format_name, &formatter           --> &?
-sub add_deformatter    { shift->form->add_deformatter(@_) }   # ~format_name, &deformatter         --> &?
-sub set_value_numifier { shift->form->set_value_numifier(@_)} # &reader, &writer                   --> &?
 
 #### conversion ########################################################
 sub converter_names      { keys %{  $_[0]{'convert'} } }

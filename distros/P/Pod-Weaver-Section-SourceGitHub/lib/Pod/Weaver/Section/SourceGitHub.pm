@@ -1,5 +1,5 @@
 package Pod::Weaver::Section::SourceGitHub;
-$Pod::Weaver::Section::SourceGitHub::VERSION = '0.57';
+$Pod::Weaver::Section::SourceGitHub::VERSION = '0.58';
 # ABSTRACT: Add SOURCE pod section for a github repository
 
 use Moose;
@@ -100,7 +100,7 @@ Pod::Weaver::Section::SourceGitHub - Add SOURCE pod section for a github reposit
 
 =head1 VERSION
 
-version 0.57
+version 0.58
 
 =head1 SYNOPSIS
 
@@ -139,7 +139,7 @@ Michael Schout <mschout@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Michael Schout.
+This software is copyright (c) 2025 by Michael Schout.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

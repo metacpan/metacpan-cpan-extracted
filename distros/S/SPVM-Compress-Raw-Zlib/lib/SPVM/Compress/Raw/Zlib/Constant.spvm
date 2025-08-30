@@ -1,0 +1,79 @@
+# Copyright (c) 2025 Yuki Kimoto
+# MIT License
+
+class Compress::Raw::Zlib::Constant {
+  version_from Compress::Raw::Zlib;
+  
+  native static method DEF_WBITS : int ();
+
+  native static method MAX_MEM_LEVEL : int ();
+
+  native static method MAX_WBITS : int ();
+
+  native static method OS_CODE : int ();
+
+  native static method Z_ASCII : int ();
+
+  native static method Z_BEST_COMPRESSION : int ();
+
+  native static method Z_BEST_SPEED : int ();
+
+  native static method Z_BINARY : int ();
+
+  native static method Z_BLOCK : int ();
+
+  native static method Z_BUF_ERROR : int ();
+
+  native static method Z_DATA_ERROR : int ();
+
+  native static method Z_DEFAULT_COMPRESSION : int ();
+
+  native static method Z_DEFAULT_STRATEGY : int ();
+
+  native static method Z_DEFLATED : int ();
+
+  native static method Z_ERRNO : int ();
+
+  native static method Z_FILTERED : int ();
+
+  native static method Z_FINISH : int ();
+
+  native static method Z_FIXED : int ();
+
+  native static method Z_FULL_FLUSH : int ();
+
+  native static method Z_HUFFMAN_ONLY : int ();
+
+  native static method Z_MEM_ERROR : int ();
+
+  native static method Z_NEED_DICT : int ();
+
+  native static method Z_NO_COMPRESSION : int ();
+
+  native static method Z_NO_FLUSH : int ();
+
+  native static method Z_OK : int ();
+
+  native static method Z_PARTIAL_FLUSH : int ();
+
+  native static method Z_RLE : int ();
+
+  native static method Z_STREAM_END : int ();
+
+  native static method Z_STREAM_ERROR : int ();
+
+  native static method Z_SYNC_FLUSH : int ();
+
+  native static method Z_UNKNOWN : int ();
+
+  native static method Z_VERSION_ERROR : int ();
+
+  static method WANT_GZIP : int () {
+    return 16;
+  }
+
+  static method WANT_GZIP_OR_ZLIB : int () {
+    return 32;
+  }
+
+}

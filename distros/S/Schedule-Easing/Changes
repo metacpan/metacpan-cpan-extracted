@@ -1,5 +1,10 @@
 Revision history for Schedule::Easing
 
+0.1.3 - 2025-08-29
+	- Utilize Schedule::Easing::Stream
+	- Support --stream options
+	- Support --timestamps
+
 0.1.2 - 2025-08-24
 	- Support --expiration, --check, and warnExpired
 

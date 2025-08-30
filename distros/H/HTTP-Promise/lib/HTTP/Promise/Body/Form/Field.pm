@@ -16,6 +16,7 @@ BEGIN
 {
     use strict;
     use warnings;
+    warnings::register_categories( 'HTTP::Promise' );
     use parent qw( Module::Generic );
     use vars qw( $VERSION $EXCEPTION_CLASS );
     our $EXCEPTION_CLASS = 'HTTP::Promise::Exception';
@@ -222,6 +223,10 @@ Sets or gets the field name as a L<scalar object|Module::Generic::Scalar>
 This retrieves the field data as a new L<scalar object|Module::Generic::Scalar>, regardless if it the field C<body> is in memory or on file.
 
 Whatever argument is provided, is passed through to L<HTTP::Promise::Body/as_string>
+
+=head1 THREAD-SAFETY
+
+L<HTTP::Promise::Body::Form::Field> is thread-safe for all operations, as it operates on per-object state and uses thread-safe external libraries.
 
 =head1 AUTHOR
 

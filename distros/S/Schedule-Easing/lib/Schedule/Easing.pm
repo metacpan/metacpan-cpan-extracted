@@ -3,7 +3,7 @@ package Schedule::Easing;
 use strict;
 use warnings;
 
-our $VERSION='0.1.2';
+our $VERSION='0.1.3';
 
 use Carp qw/carp confess/;
 
@@ -66,7 +66,6 @@ sub matches {
 
 sub schedule {
 	my ($self,%opt)=@_;
-	confess('Not yet supported');
 	my @res;
 	foreach my $event (@{$opt{events}}) {
 		my $message;
@@ -79,6 +78,8 @@ sub schedule {
 		foreach my $ease (@{$$self{schedule}}) {
 			if(my %data=$ease->matches($message)) {
 				$scheduled=$ease->schedule(message=>$message,%data);
+				my $intsched=int($scheduled);
+				if($scheduled>$intsched) { $scheduled=1+$intsched }
 				last;
 			}
 		}
@@ -99,7 +100,7 @@ Schedule::Easing - Stateless, stable filtering of events with ramp-up activation
 
 =head1 VERSION
 
-Version 0.1.2
+Version 0.1.3
 
 =head1 SYNOPSIS
 
@@ -137,9 +138,9 @@ Version 0.1.2
 
 Easing provides stateless, stable selection of point-in-time events that need to be exposed with increasing frequency over a period of time.  Events may be infrequent or real-time, low or high volume, but must contain some manner of identification for categorization, such as a reported line number or non-random content that can be used to compute a message digest.  As time increases, the percentage of events emitted will be monotonically increasing.
 
-Contrasted with throttling, which suppresses I<any> incoming event in real-time once a threshold is exceeded, easing ensures that new events are uniformly distributed over the configured period of time.  Whereas throttling requires cached statistics, easing can be performed without resident processes or data stores.
+Contrasted with throttling, which suppresses I<any> incoming events in real-time once a threshold is exceeded, easing ensures that new events are uniformly distributed over the configured period of time.  Whereas throttling requires cached statistics, easing can be performed without resident processes or data stores.
 
-As an example, easing permits an alerting system to be configured based on a large number of reported failures I<that already exist>, without immediately shifting from "no alerts" to a large number of unmanageable alerts.  Easing can also be leveraged in A-to-B activation scenarios, supporting staged deployments or similar.
+As an example, easing permits an alerting system to be configured based on a large number of reported failures I<that already exist>, without a sudden shift from "no alerts" to a large number of unmanageable alerts.  Easing can also be leveraged in A-to-B activation scenarios, supporting staged deployments or similar.
 
 =head2 EXAMPLE
 
@@ -165,7 +166,7 @@ Suppose the following failures and warnings are logged
   [1755488245] INFO stock increased, 144 grapes
   [1755488259] ERROR invalid type in request, handler.pm line 299
 
-The first category of errors, Invalid type, could be transmitted based on the line number of the error.  The two timestamps have been chosen for this example (roughly 22 minutes).  At the beginning of the window, no matching lines will emit.  But the middle of the window (11min), lines with numbers 0 through 250 will emit.  At the end and after, all matching lines will emit.
+The first category of errors, "invalid type", could be transmitted based on the line number of the error.  The start and end timestamps have been chosen for this example (roughly 22 minutes apart).  At the beginning of the window, no matching lines will emit.  At the middle of the window (11min), lines with numbers 0 through 250 will be emitted.  At the end and after, all matching lines will be emitted.
 
   {
     name=>'Invalid type errors', type=>'numeric',
@@ -202,13 +203,13 @@ As a simple example, this shows the basic values.  In practical use, the configu
 
 =head1 Configuration
 
-The configuration is an array of line matchers and associated easing configuration.  For each input line, configured patterns will be checked in order.  The first matching pattern will compute if the message is to be included based on the easing configuration, and will either be emitted or omitted.  When a line is matched, no additional line matchers will be checked.  If a line matches no configured pattern, I<it is always emitted>.
+The configuration is an array of line matchers and associated easing configuration.  For each input line, configured patterns will be checked in order.  The first matching pattern will determine if the message is to be emitted or omitted by the easing configuration.  When the line is matched, no additional line matchers will be checked.  If a line matches no configured pattern, I<it is always emitted>.
 
 In general, each easing configuration requires a C<type>, C<match> pattern, two timestamps to configure the window, and a C<begin> and C<final> message rate threshold.
 
 =head2 Window Specification
 
-Most easing types require a start and end, C<tsA> and C<tsB>, to specify the activation window.  Values are Unix epoch seconds.  By default, C<tsA> represents the easing initialization, before which all matching messages will be blocked.  By default, C<tsB> represents the easing conclusion, after which all matching messages will be included.  The common use case is that, between the two times, the rate of included messages will increase linearly from 0% to 100%.
+Most easing types require a start and end, C<tsA> and C<tsB>, to specify the activation window.  Values are Unix epoch seconds.  By default, C<tsA> represents the start of the easing behavior, before which all matching messages will be blocked.  By default, C<tsB> represents the conclusion of the easing behavior, after which all matching messages will be included.  The common use case is that, between the two times, the rate of included messages will increase linearly from 0% to 100%.
 
 =head2 Message Thresholds
 
@@ -289,7 +290,7 @@ For example, if C<ts> is in the exact middle of the window, supposing C<begin=0>
 
 =head2 Event Objects
 
-All above examples call C<$easing-E<gt>matches(events=>[event, ...])> using linewise matches.  That is C<event="..."> is a message string.
+All above examples call C<$easing-E<gt>matches(events=>[event, ...])> using linewise matches.  That is, C<event="..."> is a message string.
 
 An array of event objects can be passed instead of simple strings.  An individual C<event> can be a hash of the form C<{message=>"...",...}> or an array of the form C<[message,...]>, and the C<message> will be used for matching purposes.  The returned list will be the entire matching event objects.
 
@@ -299,7 +300,7 @@ When a non-fatal error is encountered, C<$$easing{_err}=1> will be set.  At this
 
 =head2 Invalid easing configurations
 
-Some parameters to an easing entry are mandatory and die immediately via C<confess>:  Improper C<schedule> structure, entry structure, or invalid types for C<begin>, C<final>, C<tsA>, C<tsB>, C<match>.
+Some parameters to an easing entry are mandatory and will fail initialization via C<confess>:  Improper C<schedule> structure, entry structure, or invalid types for C<begin>, C<final>, C<tsA>, C<tsB>, C<match>.
 
 =head2 Expired easing configurations
 
@@ -309,7 +310,7 @@ Initializing the object with C<Schedule::Easing-E<gt>new(warnExpired=>1)> will r
 
 L<Algorithm::Easing>
 
-Throttling solutions
+Throttling solutions...
 
 =head1 LICENSE
 

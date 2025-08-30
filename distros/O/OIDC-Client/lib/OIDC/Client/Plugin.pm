@@ -61,18 +61,6 @@ has 'stash' => (
   required => 1,
 );
 
-has 'get_flash' => (
-  is       => 'ro',
-  isa      => 'CodeRef',
-  required => 1,
-);
-
-has 'set_flash' => (
-  is       => 'ro',
-  isa      => 'CodeRef',
-  required => 1,
-);
-
 has 'redirect' => (
   is       => 'ro',
   isa      => 'CodeRef',
@@ -174,7 +162,8 @@ Hashref which can be used to send extra query parameters.
 
 =item other_state_params
 
-List (arrayref) of strings to add to the C<state> parameter.
+List (arrayref) of strings to add before the auto-generated UUID string to build
+the C<state> parameter. All these strings are separated by a comma.
 
 =back
 
@@ -208,11 +197,12 @@ sub redirect_to_authorize {
 
   my $authorize_url = $self->client->auth_url(%args);
 
-  $self->set_flash->(oidc_nonce      => $nonce);
-  $self->set_flash->(oidc_state      => $state);
-  $self->set_flash->(oidc_provider   => $self->client->provider);
-  $self->set_flash->(oidc_target_url => $params{target_url} ? $params{target_url}
-                                                            : $self->current_url);
+  $self->session->{oidc_auth}{$state} = {
+    nonce      => $nonce,
+    provider   => $self->client->provider,
+    target_url => $params{target_url} ? $params{target_url}
+                                      : $self->current_url,
+  };
 
   $self->log_msg(debug => "OIDC: redirecting to provider : $authorize_url");
   $self->redirect->($authorize_url);
@@ -260,7 +250,7 @@ sub get_token {
     OIDC::Client::Error::Provider->throw({response_parameters => $self->request_params});
   }
 
-  $self->_check_state_parameter();
+  my $auth_data = $self->_extract_auth_data();
 
   my $redirect_uri = $params{redirect_uri} || $self->login_redirect_uri;
 
@@ -273,7 +263,7 @@ sub get_token {
     my $claims_id_token = $self->client->verify_token(
       token             => $id_token,
       expected_audience => $self->client->id,
-      expected_nonce    => $self->get_flash->('oidc_nonce'),
+      expected_nonce    => $auth_data->{nonce},
     );
     $self->_store_identity(
       id_token => $id_token,
@@ -698,9 +688,10 @@ Default to the URL built from the C<logout_redirect_path> configuration entry.
 
 Hashref which can be used to send extra query parameters.
 
-=item state
+=item other_state_params
 
-String which can be send in the C<state> parameter.
+List (arrayref) of strings to add before the auto-generated UUID string to build
+the C<state> parameter. All these strings are separated by a comma.
 
 =back
 
@@ -714,10 +705,14 @@ sub redirect_to_logout {
     target_url               => { isa => 'Str', optional => 1 },
     post_logout_redirect_uri => { isa => 'Str', optional => 1 },
     extra_params             => { isa => 'HashRef', optional => 1 },
-    state                    => { isa => 'Str', optional => 1 },
+    other_state_params       => { isa => 'ArrayRef[Str]', optional => 1 },
   );
 
-  my %args;
+  my $state = join ',', (@{$params{other_state_params} || []}, $self->_generate_uuid_string());
+
+  my %args = (
+    state => $state,
+  );
 
   if ($params{with_id_token} // $self->client->config->{logout_with_id_token}) {
     my $identity = $self->get_stored_identity()
@@ -729,17 +724,16 @@ sub redirect_to_logout {
     $args{post_logout_redirect_uri} = $redirect_uri;
   }
 
-  $args{state} = $params{state} if defined $params{state};
-
   if (my $extra_params = $params{extra_params}) {
     $args{extra_params} = $extra_params;
   }
 
   my $logout_url = $self->client->logout_url(%args);
 
-  if (my $target_url = $params{target_url}) {
-    $self->set_flash->(oidc_target_url => $target_url);
-  }
+  $self->session->{oidc_logout}{$state} = {
+    provider   => $self->client->provider,
+    target_url => $params{target_url},
+  };
 
   $self->log_msg(debug => "OIDC: redirecting to idp for log out : $logout_url");
   $self->redirect->($logout_url);
@@ -1046,17 +1040,16 @@ sub _generate_uuid_string {
 }
 
 
-sub _check_state_parameter {
+sub _extract_auth_data {
   my $self = shift;
 
-  my $state          = $self->request_params->{state} || '';
-  my $expected_state = $self->get_flash->('oidc_state') || '';
+  my $state = $self->request_params->{state}
+    or OIDC::Client::Error::Authentication->throw("OIDC: no state parameter in request");
 
-  if (! $state || ! $expected_state || $state ne $expected_state) {
-    OIDC::Client::Error::Authentication->throw(
-      "OIDC: invalid state parameter (got '$state' but expected '$expected_state')"
-    );
-  }
+  my $auth_data = delete $self->session->{oidc_auth}{$state}
+    or OIDC::Client::Error::Authentication->throw("OIDC: no authorisation data for state : '$state'");
+
+  return $auth_data;
 }
 
 

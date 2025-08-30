@@ -6,14 +6,6 @@ use v5.12;
 use warnings;
 use Graphics::Toolkit::Color::Space qw/min max/;
 
-my $hwb_def = Graphics::Toolkit::Color::Space->new( axis => [qw/hue whiteness blackness/],
-                                                   range => [360, 100, 100], precision => 0,
-                                                    type => [qw/angular linear linear/],
-                                                  suffix => ['', '%', '%'],
-                                                  );
-
-   $hwb_def->add_converter('RGB', \&to_rgb, \&from_rgb );
-
  # add constraint W + B <= 100
 
 sub from_rgb {
@@ -32,8 +24,6 @@ sub from_rgb {
                           : (($r - $g) / $d + 4);
     return ([$h/6, $white, $black]);
 }
-
-
 sub to_rgb {
     my ($h, $w, $b) = @{$_[0]};
     return ([0, 0, 0]) if $b == 1;
@@ -57,4 +47,11 @@ sub to_rgb {
     return \@rgb;
 }
 
-$hwb_def;
+Graphics::Toolkit::Color::Space->new(
+            axis => [qw/hue whiteness blackness/],
+           range => [360, 100, 100],
+       precision => 0,
+            type => [qw/angular linear linear/],
+          suffix => ['', '%', '%'],
+         convert => {RGB => [\&to_rgb, \&from_rgb]},
+);

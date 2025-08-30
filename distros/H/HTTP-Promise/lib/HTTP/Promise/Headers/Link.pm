@@ -16,7 +16,7 @@ BEGIN
 {
     use strict;
     use warnings;
-    use warnings::register;
+    warnings::register_categories( 'HTTP::Promise' );
     use parent qw( HTTP::Promise::Headers::Generic );
     our $VERSION = 'v0.1.0';
 };
@@ -287,6 +287,10 @@ Sets or gets the encoded title language. This takes an iso 639 language code (se
 This is set automatically when calling L</title>. You actually need to call L</title> first to have a value set.
 
 Returns a L<scalar object|Module::Generic::Scalar> containing the title language.
+
+=head1 THREAD-SAFETY
+
+This module is thread-safe for all operations, as it operates on per-object state and uses thread-safe external libraries.
 
 =head1 AUTHOR
 

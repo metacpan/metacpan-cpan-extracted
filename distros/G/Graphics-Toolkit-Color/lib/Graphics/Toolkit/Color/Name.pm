@@ -30,31 +30,32 @@ sub get_values {
 
 sub from_values {
     my ($values, $scheme_name, $all_names, $full_name) = @_;
-    my @names = ();
+    my @return_names = ();
     my @scheme_names = (ref $scheme_name eq 'ARRAY') ? (@$scheme_name)
-                     : (defined $scheme_name)        ? $scheme_name : 'default';
+                     : (defined $scheme_name)        ? $scheme_name : 'DEFAULT';
     for my $scheme_name (@scheme_names) {
         my $scheme = try_get_scheme( $scheme_name );
         next unless ref $scheme;
         my $names = $scheme->names_from_values( $values );
         next unless ref $names;
-        push @names, @$names;
+        $names = [ map { uc($scheme_name).':'.$_} @$names] if $full_name and uc($scheme_name) ne 'DEFAULT';
+        push @return_names, @$names;
     }
-    push @names, '' unless @names;
-    @names = uniq( @names );
-    return (defined $all_names and $all_names) ? @names : $names[0];
+    push @return_names, '' unless @return_names;
+    @return_names = uniq( @return_names );
+    return (defined $all_names and $all_names) ? @return_names : $return_names[0];
 }
 
 sub closest_from_values {
     my ($values, $scheme_name, $all_names, $full_name) = @_;
     # exact search first
-    my @names = from_values( $values, $scheme_name, $all_names, $full_name );
-    return ((@names == 1) ? $names[0] : \@names, 0)
-        unless @names == 1 and $names[0] eq '';
+    my @return_names = from_values( $values, $scheme_name, $all_names, $full_name );
+    return ((@return_names == 1) ? $return_names[0] : \@return_names, 0)
+        unless @return_names == 1 and $return_names[0] eq '';
 
     my @scheme_names = (ref $scheme_name eq 'ARRAY') ? (@$scheme_name)
-                     : (defined $scheme_name)        ? $scheme_name : 'default';
-    @names = ();
+                     : (defined $scheme_name)        ? $scheme_name : 'DEFAULT';
+    @return_names = ();
     my $distance = 'Inf';
     for my $scheme_name (@scheme_names) {
         my $scheme = try_get_scheme( $scheme_name );
@@ -64,23 +65,25 @@ sub closest_from_values {
         next unless ref $names;
         next unless $d <= $distance;
         $distance = $d;
-        @names = ($distance == $d) ? (@names, @$names) : (@$names);
+        $names = [ map { uc($scheme_name).':'.$_} @$names] if $full_name and uc($scheme_name) ne 'DEFAULT';
+        @return_names = ($distance == $d) ? (@return_names, @$names) : (@$names);
     }
-    @names = uniq( @names );
-    my $name = (defined $all_names and $all_names) ? \@names : $names[0];
+    @return_names = uniq( @return_names );
+    my $name = (defined $all_names and $all_names) ? \@return_names : $return_names[0];
     return ($name, $distance);
 }
 
 #### color scheme API ##################################################
 # load default scheme on RUNTIME
-my %color_scheme = (default => Graphics::Toolkit::Color::Name::Scheme->new());
+my %color_scheme = (DEFAULT => Graphics::Toolkit::Color::Name::Scheme->new());
 my $default_names = require Graphics::Toolkit::Color::Name::Constant;
 for my $color_block (@$default_names){
-    $color_scheme{'default'}->add_color( $_, [ @{$color_block->{$_}}[0,1,2] ] ) for keys %$color_block;
+    $color_scheme{'DEFAULT'}->add_color( $_, [ @{$color_block->{$_}}[0,1,2] ] ) for keys %$color_block;
 }
 
 sub try_get_scheme { # auto loader
-    my $scheme_name = shift // 'default';
+    my $scheme_name = shift // 'DEFAULT';
+    $scheme_name = uc $scheme_name;
     unless (exists $color_scheme{ $scheme_name }){
         my $module_base = 'Graphics::ColorNames';
         # eval "use $module_base";
@@ -100,7 +103,7 @@ sub add_scheme {
     my ($scheme, $scheme_name) = @_;
     return if ref $scheme ne 'Graphics::Toolkit::Color::Name::Scheme'
         or not defined $scheme_name or exists $color_scheme{ $scheme_name };
-    $color_scheme{ $scheme_name } = $scheme;
+    $color_scheme{ uc $scheme_name } = $scheme;
 }
 my $rgb_max = 256;
 sub from_hex_to_rgb_tuple {

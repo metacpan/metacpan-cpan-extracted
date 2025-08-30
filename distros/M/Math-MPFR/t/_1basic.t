@@ -23,6 +23,7 @@ warn "# has MPFR_PV_NV_BUG:          ", Math::MPFR::_has_pv_nv_bug(), "\n";
 warn "# has WIN32_FMT_BUG:           ", Math::MPFR::Random::_buggy(), "\n";
 warn "# has _Float16                 ", Math::MPFR::_have_float16(), "\n";
 warn "# has __bf16                   ", Math::MPFR::_have_bfloat16(), "\n";
+warn "# MPFR_PREC_MIN                ", Math::MPFR::MPFR_PREC_MIN, "\n";
 
 if   (pack("L", 305419897) eq pack("N", 305419897)) {warn "# Machine appears to be big-endian\n"}
 elsif(pack("L", 305419897) eq pack("V", 305419897)) {warn "# Machine appears to be little-endian\n"}
@@ -88,10 +89,10 @@ if(!$@) {
             : warn "# mpfr library thresholds file: $evaluate\n";
 }
 
-cmp_ok($Math::MPFR::VERSION, 'eq', '4.43', "Math::MPFR::VERSION ($Math::MPFR::VERSION) is as expected");
+cmp_ok($Math::MPFR::VERSION, 'eq', '4.44', "Math::MPFR::VERSION ($Math::MPFR::VERSION) is as expected");
 
 my $xs_version = Math::MPFR::_get_xs_version();
-cmp_ok($xs_version, 'eq', '4.43', "Math::MPFR::_get_xs_version returns $xs_version as expected");
+cmp_ok($xs_version, 'eq', '4.44', "Math::MPFR::_get_xs_version returns $xs_version as expected");
 
 my $l_ver = Rmpfr_get_version();
 my $h_ver = MPFR_VERSION_STRING;
@@ -153,6 +154,8 @@ if($^O =~ /^MSWin/) {
     cmp_ok(WIN32_FMT_BUG, '==', 0, "WIN32_FMT_BUG set to zero");
   }
 }
+
+cmp_ok(RMPFR_PREC_MIN, '==', Math::MPFR::MPFR_PREC_MIN, 'MPFR_PREC_MIN setting is consistent');
 
 done_testing();
 

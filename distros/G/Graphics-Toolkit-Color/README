@@ -6,11 +6,12 @@ SYNOPSIS
         use Graphics::Toolkit::Color qw/color/;
 
         my $red = Graphics::Toolkit::Color->new('red');  # create color object
-        say $red->add_value( 'blue' => 255 )->name;      # red + blue = 'fuchsia'
+        say $red->add_value( 'blue' => 255 )->name;      # red + blue = 'magenta'
         my @blue = color( 0, 0, 255)->values('HSL');     # 240, 100, 50 = blue
         $red->mix( to => [HSL => 0,0,80], amount => 10); # mix red with a little grey
         $red->gradient( to => '#0000FF', steps => 10);   # 10 colors from red to blue
-        my @base_triple = $red->complement( 3 );         # get fitting red green and blue
+        my @base_triadic = $red->complement( 3 );        # get fitting red green and blue
+        my @reds = $red->cluster( radius => 4, distance => 1 );
 
 DEPRECATION WARNING
     Methods of the old API ( *string*, *rgb*, *red*, *green*, *blue*,
@@ -36,12 +37,12 @@ DESCRIPTION
     return values instead of the expected result.
 
     While this module can understand and output color values to many color
-    spaces, color spaces is the (internal) primal one, because GTC is about
-    colors that can be shown on the screen, and these are usually encoded in
-    *RGB*. Humans access colors on hardware level (eye) in *RGB*, on
-    cognition level in *HSL* (brain) and on cultural level (language) with
-    names. Having easy access to all of those plus some color math and many
-    formats should enable you to get the color palette you desire quickly.
+    spaces, RGB is the (internal) primal one, because GTC is about colors
+    that can be shown on the screen, and these are usually encoded in *RGB*.
+    Humans access colors on hardware level (eye) in *RGB*, on cognition
+    level in *HSL* (brain) and on cultural level (language) with names.
+    Having easy access to all of those plus some color math and many formats
+    should enable you to get the color palette you desire quickly.
 
 CONSTRUCTOR
     There are many options to create a color object. In short you can either
@@ -194,33 +195,49 @@ GETTER
         $blue->values( in => 'XYZ', range => 1, precision => 2);# normalized, 2 decimals max.
 
   name
-    Returns the normalized name (lower case, without *'_'*) of the color
-    held by the object - even when the object was created with numerical
-    values. It returns an empty string when no color constant with the exact
-    same values was found in the *X11* or *HTML* (*SVG*) scheme or the
-    *Pantone report*. If several constants have matching values, the most
-    well known name, which is in most cases also the shortest will be
-    returned. All names from the internal , default color scheme are listed
-    here. These are the same who can be used with "new('name')".
+    Returns the normalized name string (lower case, without *'_'*) that
+    represents the *RGB* values of this color in the default color scheme,
+    which is *X11* + *HTML* (*SVG*) + *Pantone report* (see all names).
+    These are the same who can be used with "new('name')".
 
-    Alternatively you may provide the name of a color scheme as the only,
-    positional, optional argument. Then only that color scheme (as used in
-    "new('scheme:color')") will be searched, if there is a color with the
-    exact same values. That name will be the returned, otherwise you get an
-    empty string. If the values doesnt have to match exactly, try the next
-    method.
+    Alternatively you may provide named arguments or one positional
+    argument, which requires the same input as the named argument "from". It
+    names one or a list of color schemes, from which the name will be
+    selected then. Your otions are "CSS", "Crayola", "EmergyC", "GrayScale",
+    "HTML", "IE", "Mozilla", "Netscape", "Pantone", "PantoneReport", "SVG",
+    "VACCC", "Werner", "Windows", "WWW" and "X" plus self created naming
+    schemes (see Graphics::Toolkit::Color::Name::Scheme). Please note that
+    all listed schemes are parts of modules that have to be installed
+    separately. For your convenience I created the module
+    Bundle::Graphics::ColorNames to install them all at once. If you try to
+    use a scheme from a not installed module your will get an error message
+    instead of a color name.
+
+    The second named argument is "all", which needs to be a perly boolean.
+    It defaults to false. But when set to 1 you will get a list of all names
+    that are associated with the current values. There will be no
+    duplicates, when several schemes are searched.
+
+    A third named argument is "full", also needing a perly boolean, that
+    defaults to false. When set "true" (1), the schema is part of the
+    returned color name. These full names are also accepted by the
+    constructor.
 
         $blue->name();                                   # 'blue'
         $blue->name('SVG');                              # 'blue'
-        $blue->name([qw/CSS X/]);                        # 'blue'
+        $blue->name( from => [qw/CSS X/], all => 1);     # 'blue', 'blue1'
+        $blue->name( from => 'CSS', full => 1);          # 'CSS:blue'
 
   closest_name
-    Returns in scalar context a color "name", which has the shortest
-    "distance" in RGB to the current color. In list context, you get
-    additionally the just mentioned distance as a second return value.
+    Works almost identical as method "name", but guarantees a none empty
+    result, unless invoking a weird empty color scheme - the method returns
+    scalar context a color name, which has the shortest "distance" in *RGB*
+    to the current color. In list context, you get additionally the just
+    mentioned distance as a second return value.
 
-    As with the previous method, one positional, optional argument is the
-    color schme.
+    All arguments work as mentioned above. The only difference (due to the
+    second return value), multiple names (when requested) have to come in
+    the form of an ARRAY (as the first return value).
 
         my $name = $red_like->closest_name;              # closest name in default scheme
         my $name = $red_like->closest_name('HTML');      # closest HTML constant
@@ -310,14 +327,14 @@ SINGLE COLOR
     get, counted in percentages. The remaining percentage to 100 is the
     weight of the color, held by the caller object. This would be naturally
     nothing, if the "amount" is greater than hundret, which is especially
-    something to consider, if mixing more than two colors. Then you provide
-    the argument "to" and "amount" with an array of colors and respectively
-    their amounts. Obviously both arrays MUST have the same length. If the
-    sum of amounts is greater than 100 the original color is ignored but the
-    weight ratios will be kept. You may actually give "amount" a scalar
-    value while mixing a list of colors. Then the amount is applied to every
-    color mentioned unter the "to" argument. In this case you go over the
-    sum of 100% very quickly.
+    something to consider, if mixing more than two colors. Then both "to"
+    and "amount" have to get an array of colors and respectively their
+    amounts (same order). Obviously both arrays MUST have the same length.
+    If the sum of amounts is greater than 100 the original color is ignored
+    but the weight ratios will be kept. You may actually give "amount" a
+    scalar value while mixing a list of colors. Then the amount is applied
+    to every color mentioned under the "to" argument. In this case you go
+    over the sum of 100% very quickly.
 
         $blue->mix( 'silver');                                         # 50% silver, 50% blue
         $blue->mix( to => 'silver', amount => 60 );                    # 60% silver, 40% blue
@@ -396,6 +413,7 @@ COLOR SETS
     a very strong tilt.
 
     Optional is the named argument "in" (color space - details behind link).
+    Tip: use "oklab" and "cieluv" spaces for visually smooth gradients.
 
         # we turn to grey
         my @colors = $c->gradient( to => $grey, steps => 5);
@@ -472,6 +490,20 @@ SEE ALSO
     *   Convert::Color
 
     *   Color::Similarity
+
+ACKNOWLEDGEMENT
+    These people contributed by providing patches, bug reports and useful
+    comments:
+
+    *   Petr Pisar (ppisar)
+
+    *   Slaven Rezic (srezic)
+
+    *   Gabor Szabo (szabgab)
+
+    *   Gene Boggs (GENE)
+
+    *   Stefan Reddig (sreagle)
 
 AUTHOR
     Herbert Breunung, <lichtkind@cpan.org>

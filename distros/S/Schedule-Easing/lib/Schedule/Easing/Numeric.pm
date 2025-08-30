@@ -6,7 +6,7 @@ use parent qw/Schedule::Easing::Ease/;
 use Carp qw/carp confess/;
 use Scalar::Util qw/looks_like_number/;
 
-our $VERSION='0.1.2';
+our $VERSION='0.1.3';
 
 sub _default_keys {
 	my ($self)=@_;

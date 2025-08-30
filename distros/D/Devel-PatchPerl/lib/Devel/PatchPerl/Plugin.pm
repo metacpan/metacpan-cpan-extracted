@@ -1,5 +1,5 @@
 package Devel::PatchPerl::Plugin;
-$Devel::PatchPerl::Plugin::VERSION = '2.08';
+$Devel::PatchPerl::Plugin::VERSION = '2.14';
 #ABSTRACT: Devel::PatchPerl plugins explained
 
 use strict;
@@ -19,7 +19,7 @@ Devel::PatchPerl::Plugin - Devel::PatchPerl plugins explained
 
 =head1 VERSION
 
-version 2.08
+version 2.14
 
 =head1 DESCRIPTION
 
@@ -65,6 +65,9 @@ Summarised:
     $plugin->patchperl( version => $vers, source => $srcdir, patchexe => $patch );
   };
 
+Plugins are responsible for checking that their patches apply to the version of perl that
+is being patched.
+
 =head1 WHAT CAN PLUGINS DO?
 
 Anything you desire to a Perl source tree.
@@ -82,7 +85,7 @@ Chris Williams <chris@bingosnet.co.uk>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Chris Williams and Marcus Holland-Moritz.
+This software is copyright (c) 2025 by Chris Williams and Marcus Holland-Moritz.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

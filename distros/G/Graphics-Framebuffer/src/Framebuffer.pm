@@ -1,4 +1,3 @@
-# 6.70:Aug 29, 2025:Richard Kelsch <rich@rk-internet.com>
 package Graphics::Framebuffer;
 
 ## TEMP COPYRIGHT ##

@@ -500,6 +500,12 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
                                                # --enable-decimal-float.
                                                # $D128 is a
                                                # Math::Decimal128 object
+   $inex = Rmpfr_set_FLT($rop, $FLT, $rnd); # Set $rop to the value of
+                                            # the Math::Float32 object $FLT.
+   $inex = Rmpfr_set_FLOAT16($rop, $F16, $rnd); # Set $rop to the value of the
+                                                # Math::Float16 object $F16
+   $inex = Rmpfr_set_BFLOAT16($rop, $BF16, $rnd);# Set $rop to the value of the
+                                                 # Math::Bfloat16 object $BF16
    $inex = Rmpfr_set_FLOAT128($rop, $F128, $rnd);# mpfr-4.0.0 and later
                                                # && mpfr lib built with
                                                # --enable-float128.
@@ -799,6 +805,12 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
                                          # only on 64-bit systems.
    $NV = Rmpfr_get_bfloat16($op, $rnd);  # mpfr-4.3.0 and later, and
                                          # only on 64-bit systems.
+   Rmpfr_get_FLT($FLT, $op, $rnd);       # Set the Math::Float32 object $FLT
+                                         # to the float value of $op.
+   Rmpfr_get_FLOAT16($F16, $op, $rnd);   # Set the Math::Float16 object $F16
+                                         # to the _Float16 value of $op.
+   Rmpfr_get_BFLOAT16($F16, $op, $rnd);  # Set the Math::Bfloat16 object $F16
+                                         # to the __bf16 value of $op.
    Rmpfr_get_LD($LD, $op, $rnd);         # $LD is a Math::LongDouble object.
    Rmpfr_get_DECIMAL64($d64, $op, $rnd); # mpfr-3.1.0 or later &&
                                          # mpfr lib built with
@@ -812,9 +824,10 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
                                         # $F128 is a Math::Float128
                                         # object.
     Convert $op to a 'double', a 'long double', a '__float128', an 'NV',
-    a 'float', a '_Float16', a '__bf16', a Math::LongDouble object,
-    a Math::Decimal64 object, or a Math::Float128 object using the
-    rounding mode $rnd.
+    a 'float', a '_Float16', a '__bf16', a Math::Float32 object, a
+    Math::Float16 object, a Math::Bfloat16 object, a Math::LongDouble
+    object, a Math::Decimal64 object, or a Math::Float128 object using
+    the rounding mode $rnd.
     Rmpfr_get_float16 and Rmpfr_get_bfloat16 are currently unavailable to
     32-bit systems. Where enabled they actually return an NV that has been
     set to the exact value of $op rounded (according to $rnd) to a _Float16
@@ -963,7 +976,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     Set $q1 to the exact rational value of $q2 * $op.
 
    q_div_fr($q1, $q2, $op); # $q1, $q2 are mpq objects
-    Set $q1 to the exact rational value of $q2 % p.
+    Set $q1 to the exact rational value of $q2 % $op.
 
    q_fmod_fr($q1, $q2, $op); # $q1, $q2 are mpq objects
     Set $q1 to the exact rational value of fmod($q2,$op).
@@ -1670,24 +1683,6 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     MPFR_PREC_MAX.
     Return 0 if the export/import was successful.
 
-   $str = unpack_bfloat16($arg, $rnd, [$base]);# 16-bit "bfloat"
-   $str = unpack_float16($arg, $rnd, [$base]); # 16-bit half prec.
-   $str = unpack_float32($arg, $rnd, [$base]); # 32-bit single prec.
-    The "bfloat16" and "Float16" forms require mpfr-4.3.0 or later.
-    $arg is one of IV, UV, NV, PV, or Math::MPFR object.
-    Unpack $arg's value to an upper case hex string, where the
-    value of $arg has been cast (in accordance with $rnd) to a
-    __bf16 (bfloat) or  _Float16 or _Float32 type.
-    $base is an optional argument specifying the base when $arg
-    is a PV (string). If no $base argument is provided, then the
-    base of the given PV is determined by using the approach
-    specified in the Rmpfr_strtofr() documentation, provided
-    above in the "ASSIGNMENT" section.
-    For example:
-      print unpack_bfloat16(-2.625, MPFR_RNDN); # Outputs C028
-      print unpack_float16 (-2.625, MPFR_RNDN); # Outputs C140
-      print unpack_float32 (-2.625, MPFR_RNDN); # Outputs C0280000
-
    ########################
 
    DISPLAYING INFS AND NANS
@@ -1706,9 +1701,37 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    EXCEPTIONS
 
    $inex = Rmpfr_subnormalize ($op, $si, $rnd);
-    This function rounds $op emulating subnormal number arithmetic.
+    This function subnormalizes $op when subnormalization is appropriate.
+    Otherwise $op remains unchanged.
     See the MPFR documentation for mpfr_subnormalize at:
-    www.mpfr.org/mpfr-current/mpfr.html#Function-and-Type-Index
+    https://www.mpfr.org/mpfr-current/mpfr.html#index-mpfr_005fsubnormalize
+
+   $rop = subnormalize_float32 ($val);
+   $rop = subnormalize_float16 ($val);
+   $rop = subnormalize_bfloat16($val);
+   $rop = subnormalize_generic ($val, $emin, $emax, $prec);
+    $val can be an IV/UV,PV, NV, Math::GMPf object, Math::GMPq
+    object or Math::MPFR object.
+    For "float32" (ie the single precision "float"):
+     Returns a 24-bit precision Math::MPFR object containing the
+     value held by $val, adjusted for either "float" subnormalization
+     or infinitude when appropriate. This sub simply calls:
+        subnormalize_generic($_[0], -148, 128, 24);
+    For "float16":
+     Returns an 11-bit precision Math::MPFR object containing the
+     value held by $val, adjusted for either "_Float16" subnormalization
+     or infinitude when appropriate. This sub simply calls:
+        subnormalize_generic($_[0], -23, 16, 11);
+    For "bfloat16:
+     Returns an 8-bit precision Math::MPFR object containing the
+     value held by $val, adjusted for either "__bf16" subnormalization
+     or infinitude when appropriate. This sub simply calls:
+        subnormalize_generic($_[0], -132, 128, 8);
+    For "generic":
+     Returns a $prec-bit precision Math::MPFR object containing the
+     value held by $val, adjusted for either subnormalization or
+     infinitude (when appropriate), and based upon the value of $prec
+     and upon the exponent range specified by $emin and $emax.
 
    $si =  Rmpfr_get_emin();
    $si =  Rmpfr_get_emax();
@@ -2279,6 +2302,28 @@ $str = anytoa($op); # $op precision must be 53 or 64 or 113 or 2098
     throw a fatal error (with diagnostic message stating that the
     requested byte structure is not currently available).
 
+   $str = unpack_bfloat16($arg, $rnd, [$base]);# 16-bit "bfloat"
+   $str = unpack_float16($arg, $rnd, [$base]); # 16-bit half prec.
+   $str = unpack_float32($arg, $rnd, [$base]); # 32-bit single prec.
+    The "bfloat16" and "float16" forms require mpfr-4.3.0 or later.
+    They also require that Math::MPFR has been built with
+    "__bf16" and (respectively) "_Float16" support.
+    (The "float32" is simply the single precision "float", which
+    should be universally supported.)
+    $arg is one of IV, UV, NV, PV, or Math::MPFR object.
+    Unpack $arg's value to an upper case hex string, where the
+    value of $arg has been cast (in accordance with $rnd) to a
+    __bf16 (bfloat) or  _Float16 or _Float32 type.
+    $base is an optional argument specifying the base when $arg
+    is a PV (string). If no $base argument is provided, then the
+    base of the given PV is determined by using the approach
+    specified in the Rmpfr_strtofr() documentation, provided
+    above in the "ASSIGNMENT" section.
+    For example:
+      print unpack_bfloat16(-2.625, MPFR_RNDN); # Outputs C028
+      print unpack_float16 (-2.625, MPFR_RNDN); # Outputs C140
+      print unpack_float32 (-2.625, MPFR_RNDN); # Outputs C0280000
+
    $si = IOK_flag($sv); # $sv is a perl scalar variable.
    $si = NOK_flag($sv);
    $si = POK_flag($sv);
@@ -2846,7 +2891,7 @@ $str = anytoa($op); # $op precision must be 53 or 64 or 113 or 2098
 
     This program is free software; you may redistribute it and/or
     modify it under the same terms as Perl itself.
-    Copyright 2006-2024 Sisyphus
+    Copyright 2006-2025 Sisyphus
 
 =head1 AUTHOR
 

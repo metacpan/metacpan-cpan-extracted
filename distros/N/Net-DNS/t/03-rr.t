@@ -1,10 +1,10 @@
 #!/usr/bin/perl
-# $Id: 03-rr.t 1910 2023-03-30 19:16:30Z willem $	-*-perl-*-
+# $Id: 03-rr.t 2035 2025-08-14 11:49:15Z willem $	-*-perl-*-
 #
 
 use strict;
 use warnings;
-use Test::More tests => 106;
+use Test::More tests => 98;
 use TestToolkit;
 
 
@@ -40,7 +40,7 @@ for my $rr ( Net::DNS::RR->new("$name $ttl $class $type $rdata") ) {
 
 
 for my $example ( Net::DNS::RR->new('example.com. 0 IN A 192.0.2.1') ) {
-	my $expect = $example->string;	## check basic parsing of all acceptable forms of A record
+	my $expect = unpack 'H*', $example->encode;	## check basic parsing of all acceptable forms of A record
 	foreach my $testcase (
 		join( "\t", qw( example.com 0 IN A ), q(\# 4 c0 00 02 01) ),
 		join( "\t", qw( example.com 0 IN A ), q(\# 4 c0000201 ) ),
@@ -61,15 +61,14 @@ for my $example ( Net::DNS::RR->new('example.com. 0 IN A 192.0.2.1') ) {
 		'example.com	CLASS1	0	A	192.0.2.1',
 		'example.com	CLASS1	0	TYPE1	192.0.2.1',
 		) {
-		my $rr = Net::DNS::RR->new("$testcase");
-		$rr->ttl( $example->ttl );			# TTL only shown if defined
-		is( $rr->string, $expect, "Net::DNS::RR->new( $testcase )" );
+		my $result = unpack 'H*', Net::DNS::RR->new("$testcase")->encode;
+		is( $result, $expect, "Net::DNS::RR->new( $testcase )" );
 	}
 }
 
 
 for my $example ( Net::DNS::RR->new('example.com. 0 IN TXT "txt-data"') ) {
-	my $expect = $example->string;	## check parsing of comments, quotes and brackets
+	my $expect = unpack 'H*', $example->encode;	## check parsing of comments, quotes and brackets
 	foreach my $testcase (
 		q(example.com 0 IN TXT txt-data ; space delimited),
 		q(example.com 0	   TXT txt-data),
@@ -88,9 +87,8 @@ for my $example ( Net::DNS::RR->new('example.com. 0 IN TXT "txt-data"') ) {
 		q(example.com	IN	0	TXT	"txt-data"),
 		'example.com (	0	IN	TXT	txt-data )	; bracketed',
 		) {
-		my $rr = Net::DNS::RR->new("$testcase");
-		$rr->ttl( $example->ttl );			# TTL only shown if defined
-		is( $rr->string, $expect, "Net::DNS::RR->new( $testcase )" );
+		my $result = unpack 'H*', Net::DNS::RR->new("$testcase")->encode;
+		is( $result, $expect, "Net::DNS::RR->new( $testcase )" );
 	}
 }
 
@@ -114,22 +112,23 @@ foreach my $testcase (
 }
 
 
-foreach my $testcase (			## check encode/decode functions
-	'example.com	A',
-	'example.com	IN',
-	'example.com	IN A',
-	'example.com	IN 123 A',
-	'example.com	123 A',
-	'example.com	123 IN A',
-	'example.com	A 192.0.2.1',
-	'1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.8.B.D.0.1.0.0.2.ip6.arpa	PTR example.com.'
-	) {
-	my $rr	    = Net::DNS::RR->new("$testcase");
-	my $encoded = $rr->encode;
-	my $decoded = Net::DNS::RR->decode( \$encoded );
-	$rr->ttl( $decoded->ttl ) unless $rr->ttl;
-	is( $decoded->string, $rr->string, "encode/decode $testcase" );
-}
+#foreach my $testcase (			## check encode/decode functions
+#	'example.com	A',
+#	'example.com	IN',
+#	'example.com	IN A',
+#	'example.com	IN 123 A',
+#	'example.com	123 A',
+#	'example.com	123 IN A',
+#	'example.com	A 192.0.2.1',
+#	'1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.8.B.D.0.1.0.0.2.ip6.arpa	PTR example.com.'
+#	) {
+#	my $rr	    = Net::DNS::RR->new("$testcase");
+#	my $encoded = $rr->encode;
+#	my $decoded = Net::DNS::RR->decode( \$encoded );
+#	$rr->ttl( $decoded->{ttl} ) unless defined $rr->{ttl};
+#	$rr->class( $decoded->{class} ) unless defined $rr->{class};
+#	is( $decoded->string, $rr->string, "encode/decode $testcase" );
+#}
 
 
 for my $rr ( Net::DNS::RR->new( type => 'OPT' ) ) {
@@ -153,8 +152,8 @@ foreach my $testcase (			## check canonical encode function
 foreach my $testcase (			## check plain and generic formats
 	[owner => 'example.com.', type => 'A'],
 	[owner => 'example.com.', type => 'A', rdata => ''],
-	['example.com.	IN	NS	a.iana-servers.net.'],
-	[	'example.com.	IN	SOA	(
+	['example.com.	86400	NS	a.iana-servers.net.'],
+	['example.com.	IN	SOA	(
 			sns.dns.icann.org. noc.dns.icann.org.
 			2015082417	;serial
 			7200		;refresh

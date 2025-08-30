@@ -1,0 +1,50 @@
+---
+abstract: 'Run SEO checks on HTML or URLs'
+author:
+  - 'Nigel Horne <njh@nigelhorne.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Path: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  File::stat: '0'
+  FindBin: '0'
+  IPC::Run3: '0'
+  JSON::MaybeXS: '0'
+  POSIX: '0'
+  Test::DescribeMe: '0'
+  Test::Most: '0'
+  Test::Needs: '0'
+  Test::NoWarnings: '0'
+  autodie: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: SEO-Inspector
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  File::Slurp: '0'
+  Getopt::Long: '0'
+  HTML::TreeBuilder: '0'
+  IPC::System::Simple: '0'
+  Module::Pluggable: '0'
+  Mojo::URL: '0'
+  Mojo::UserAgent: '0'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/nigelhorne/SEO-Inspector/issues
+  homepage: https://metacpan.org/pod/SEO::Inspector
+  repository: git://github.com/nigelhorne/SEO-Inspector.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

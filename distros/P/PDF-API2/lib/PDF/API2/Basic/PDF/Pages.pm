@@ -13,7 +13,7 @@ use warnings;
 
 use base 'PDF::API2::Basic::PDF::Dict';
 
-our $VERSION = '2.047'; # VERSION
+our $VERSION = '2.048'; # VERSION
 
 use PDF::API2::Basic::PDF::Array;
 use PDF::API2::Basic::PDF::Dict;

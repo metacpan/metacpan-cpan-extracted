@@ -80,7 +80,7 @@
          "web" : "https://github.com/sebmourlhou/oidc-client"
       }
    },
-   "version" : "1.01",
+   "version" : "1.02",
    "x_generated_by_perl" : "v5.28.3",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.12",
    "x_spdx_expression" : "Artistic-2.0"

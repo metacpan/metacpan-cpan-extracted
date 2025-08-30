@@ -9,9 +9,9 @@ build_requires:
   warnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  perl: '5.004'
+  perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,7 +20,7 @@ name: Pod-Weaver-Section-SourceGitHub
 provides:
   Pod::Weaver::Section::SourceGitHub:
     file: lib/Pod/Weaver/Section/SourceGitHub.pm
-    version: '0.57'
+    version: '0.58'
 requires:
   Moose: '0'
   Moose::Autobox: '0'
@@ -30,7 +30,7 @@ resources:
   bugtracker: https://github.com/mschout/pod-weaver-section-sourcegithub/issues
   homepage: https://github.com/mschout/pod-weaver-section-sourcegithub
   repository: https://github.com/mschout/pod-weaver-section-sourcegithub.git
-version: '0.57'
-x_generated_by_perl: v5.36.0
-x_serialization_backend: 'YAML::Tiny version 1.74'
+version: '0.58'
+x_generated_by_perl: v5.42.0
+x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

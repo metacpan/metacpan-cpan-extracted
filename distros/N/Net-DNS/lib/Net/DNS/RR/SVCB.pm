@@ -2,7 +2,7 @@ package Net::DNS::RR::SVCB;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: SVCB.pm 2033 2025-07-29 18:03:07Z willem $)[2];
+our $VERSION = (qw$Id: SVCB.pm 2037 2025-08-18 14:39:32Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -47,10 +47,8 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 	my $params = $self->{SvcParams} = [];
 	while ( ( my $start = $offset + 4 ) <= $limit ) {
 		my ( $key, $size ) = unpack( "\@$offset n2", $rdata );
-		my $next = $start + $size;
-		last if $next > $limit;
+		last if ( $offset = $start + $size ) > $limit;
 		push @$params, ( $key, substr $rdata, $start, $size );
-		$offset = $next;
 	}
 	die $self->type . ': corrupt RDATA' unless $offset == $limit;
 	return;
@@ -135,8 +133,7 @@ Amen
 				push @value, split /,/;
 			}
 
-			s/[-]/_/g;				# extract identifier
-			m/^([^=]+)/;
+			m/^([^=]+)/;				# extract identifier
 			$self->$1(@value);
 		}
 	}
@@ -176,7 +173,7 @@ sub _defaults {				## specify RR attribute default values
 sub svcpriority {
 	my ( $self, @value ) = @_;				# uncoverable pod
 	for (@value) { $self->{SvcPriority} = 0 + $_ }
-	return $self->{SvcPriority} || 0;
+	return $self->{SvcPriority};
 }
 
 
@@ -214,7 +211,7 @@ sub port {				## port=1234
 
 sub ipv4hint {				## ipv4hint=192.0.2.1,...
 	my ( $self, @value ) = @_;
-	return $self->_SvcParam( 4, _ipv4(@value) );
+	return $self->_SvcParam( 4, _address4(@value) );
 }
 
 sub ech {				## ech=base64
@@ -224,7 +221,7 @@ sub ech {				## ech=base64
 
 sub ipv6hint {				## ipv6hint=2001:DB8::1,...
 	my ( $self, @value ) = @_;
-	return $self->_SvcParam( 6, _ipv6(@value) );
+	return $self->_SvcParam( 6, _address6(@value) );
 }
 
 sub dohpath {				## dohpath=/dns-query{?dns}
@@ -249,18 +246,19 @@ sub tls_supported_groups {		## tls_supported_groups=29,23
 
 sub _concatenate {			## concatenate octet string(s)
 	my @arg = @_;
-	return scalar(@arg) ? join( '', @arg ) : return ();
+	return scalar(@arg) ? join( '', @arg ) : @arg;
 }
 
 sub _boolean {
 	my @arg = @_;
 	return '' unless scalar @arg;
-	return shift(@arg) ? '' : undef;
+	return map { $_ ? '' : undef } @arg;
 }
 
 sub _string {
 	my @arg = @_;
-	return _concatenate( map { Net::DNS::Text->new($_)->encode() } @arg );
+	my @val = map { split /,/ } @arg;
+	return _concatenate( map { Net::DNS::Text->new($_)->encode() } @val );
 }
 
 sub _base64 {
@@ -270,17 +268,20 @@ sub _base64 {
 
 sub _integer16 {
 	my @arg = @_;
-	return _concatenate( map { pack( 'n', $_ ) } @arg );
+	my @val = map { split /,/ } @arg;
+	return _concatenate( map { pack( 'n', $_ ) } @val );
 }
 
-sub _ipv4 {
+sub _address4 {
 	my @arg = @_;
-	return _concatenate( map { Net::DNS::RR::A::address( {}, $_ ) } @arg );
+	my @val = map { split /,/ } @arg;
+	return _concatenate( map { Net::DNS::RR::A::address( {}, $_ ) } @val );
 }
 
-sub _ipv6 {
+sub _address6 {
 	my @arg = @_;
-	return _concatenate( map { Net::DNS::RR::AAAA::address( {}, $_ ) } @arg );
+	my @val = map { split /,/ } @arg;
+	return _concatenate( map { Net::DNS::RR::AAAA::address( {}, $_ ) } @val );
 }
 
 
@@ -361,12 +362,12 @@ other unpredictable behaviour.
 
 =head2 SvcPriority
 
-	$svcpriority = $rr->svcpriority;
-	$rr->svcpriority( $svcpriority );
+	$rr->SvcPriority( $svcpriority );
+	$svcpriority = $rr->SvcPriority;
 
-The priority of this record
-(relative to others, with lower values preferred). 
-A value of 0 indicates AliasMode.
+The priority of this record relative to others in the RRset,
+(lower values being preferred). 
+A value of 0 indicates AliasMode.')
 
 =head2 TargetName
 

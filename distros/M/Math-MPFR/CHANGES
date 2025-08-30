@@ -1,5 +1,16 @@
 Revision history for Perl module Math::MPFR
 
+4.44
+  - Add subnormalize_float32, subnormalize_float16 and subnormalize_bfloat16.
+  - Add Rmpfr_get_BFLOAT16/Rmpfr_set_BFLOAT16, Rmpfr_get_FLOAT16/Rmpfr_set_FLOAT16
+    and Rmpfr_get_FLT/Rmpfr_set_FLT functions.
+  - Ensure that overloaded <=> operations return one of 1, -1, 0, and undef.
+    Required some amendments to MPFR.xs, and some rewriting of parts of some
+    test scripts.
+    Issue raised by https://rt.cpan.org/Ticket/Display.html?id=168076 .
+  - Add _PREC_MIN() to Prec/Prec.xs. This allows MPFR.pm to set the constant
+    MPFR_PREC_MIN to the appropriate value.
+
 4.43
   - More changes to t/_Float16.t and t/bfloat16.t needed to address what 4.42
     was intended to fix.

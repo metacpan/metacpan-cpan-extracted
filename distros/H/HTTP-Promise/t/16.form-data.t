@@ -28,7 +28,7 @@ SKIP:
     isa_ok( $form => ['HTTP::Promise::Body::Form::Data'], 'as_form_data' );
     SKIP:
     {
-        is( $form->length, 4, '4 fields found for form-data' );
+        is( $form->size, 4, '4 fields found for form-data' );
         diag( "Fields set in \$form are: ", $form->keys->join( ', ' )->scalar ) if( $DEBUG );
         isa_ok( $form->{category}->body, ['HTTP::Promise::Body::Scalar'], 'field category body' );
         isa_ok( $form->{location}->body, ['HTTP::Promise::Body::Scalar'], 'field location body' );

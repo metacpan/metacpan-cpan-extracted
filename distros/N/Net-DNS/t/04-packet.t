@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 04-packet.t 1980 2024-06-02 10:16:33Z willem $	-*-perl-*-
+# $Id: 04-packet.t 2035 2025-08-14 11:49:15Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -81,6 +81,8 @@ foreach my $section (qw(answer authority additional)) {
 	my $i	= ++$index;
 	my $rr1 = Net::DNS::RR->new(
 		Name	=> "$section$i.example.test",
+		Class	=> "IN",
+		TTL	=> 3600,
 		Type	=> "A",
 		Address => "10.0.0.$i"
 		);
@@ -92,6 +94,8 @@ foreach my $section (qw(answer authority additional)) {
 	my $j	= ++$index;
 	my $rr2 = Net::DNS::RR->new(
 		Name	=> "$section$j.example.test",
+		Class	=> "IN",
+		TTL	=> 3600,
 		Type	=> "A",
 		Address => "10.0.0.$j"
 		);
@@ -102,11 +106,12 @@ foreach my $section (qw(answer authority additional)) {
 }
 
 # Add enough distinct labels to render compression unusable at some point
+my $longtext = 'x' x 255;
 for ( 0 .. 255 ) {
-	$update->push( 'answer', Net::DNS::RR->new( "X$_ TXT \"" . pack( "A255", "x" ) . '"' ) );
+	$update->push( 'answer', Net::DNS::RR->new("X$_ 0 IN TXT $longtext") );
 }
-$update->push( 'answer', Net::DNS::RR->new('XY TXT ""') );
-$update->push( 'answer', Net::DNS::RR->new('VW.XY TXT ""') );
+$update->push( 'answer', Net::DNS::RR->new('XY 0 IN TXT ""') );
+$update->push( 'answer', Net::DNS::RR->new('VW.XY 0 IN TXT ""') );
 
 #	Decode data buffer and compare with original
 my $buffer  = $update->encode;
@@ -124,14 +129,8 @@ ok( $decoded->answersize, 'answersize() alias works' );
 ok( $decoded->answerfrom, 'answerfrom() alias works' );
 
 
-foreach my $section (qw(question)) {
+foreach my $section (qw(question answer authority additional)) {
 	my @original = map { $_->string } $update->$section;
-	my @content  = map { $_->string } $decoded->$section;
-	is_deeply( \@content, \@original, "check content of $section section" );
-}
-
-foreach my $section (qw(answer authority additional)) {
-	my @original = map { $_->ttl(0); $_->string } $update->$section;    # almost! need TTL defined
 	my @content  = map { $_->string } $decoded->$section;
 	is_deeply( \@content, \@original, "check content of $section section" );
 }

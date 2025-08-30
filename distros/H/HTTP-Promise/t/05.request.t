@@ -163,7 +163,7 @@ my @test_methods = (
 for( @test_methods )
 {
     my( $meth, $expect ) = @$_;
-    no warnings 'HTTP::Promise::Request';
+    no warnings 'HTTP::Promise';
     my $r = HTTP::Promise::Request->new( $meth, '/', { debug => $DEBUG } );
     if( !defined( $expect ) )
     {

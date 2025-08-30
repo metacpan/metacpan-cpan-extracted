@@ -46,8 +46,9 @@ README.md
 GFB.png
 Win-No.png
 src/Framebuffer.c
-src/Framebuffer.pm.template
+src/Framebuffer.pm
 src/README.md
+src/metadata.txt
 t/01-primitives.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

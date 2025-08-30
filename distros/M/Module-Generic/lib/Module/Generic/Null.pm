@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Null.pm
-## Version v1.1.3
-## Copyright(c) 2024 DEGUEST Pte. Ltd.
+## Version v1.1.4
+## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2025/05/28
+## Modified 2025/07/31
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -28,7 +28,7 @@ BEGIN
     );
     use Scalar::Util ();
     use Wanted;
-    our( $VERSION ) = 'v1.1.3';
+    our( $VERSION ) = 'v1.1.4';
 };
 
 use strict;
@@ -38,7 +38,10 @@ sub new
 {
     my $this = shift( @_ );
     my $class = ref( $this ) || $this;
+    my $error_object;
+    $error_object = shift( @_ ) if( Scalar::Util::blessed( $_[0] ) );
     my $hash = ( @_ == 1 && ref( $_[0] ) ? shift( @_ ) : { @_ } );
+    $hash->{has_error} = $error_object;
     return( bless( $hash => $class ) );
 }
 

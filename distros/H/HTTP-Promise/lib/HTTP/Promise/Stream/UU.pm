@@ -16,6 +16,7 @@ BEGIN
 {
     use strict;
     use warnings;
+    warnings::register_categories( 'HTTP::Promise' );
     use HTTP::Promise::Stream;
     use parent -norequire, qw( HTTP::Promise::Stream::Generic );
     use vars qw( @EXPORT_OK $VERSION $EXCEPTION_CLASS $UUError );
@@ -292,6 +293,10 @@ Always returns true, because decoding is done internally.
 =head2 is_encoder_installed
 
 Always returns true, because encoding is done internally.
+
+=head1 THREAD-SAFETY
+
+This module is thread-safe for all operations, as it operates on per-object state and uses thread-safe external libraries.
 
 =head1 AUTHOR
 

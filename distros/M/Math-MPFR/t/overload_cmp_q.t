@@ -36,12 +36,12 @@ else {print "not ok 5\n"}
 
 my $def = $fop <=> $qop;
 
-if($def > 0) {print "ok 6\n"}
+if($def == 1) {print "ok 6\n"}
 else {print "not ok 6\n"}
 
 $def = -$fop <=> $qop;
 
-if($def < 0) {print "ok 7\n"}
+if($def == -1) {print "ok 7\n"}
 else {print "not ok 7\n"}
 
 $def = Math::MPFR->new(0.5) <=> Math::GMPq->new('1/2');

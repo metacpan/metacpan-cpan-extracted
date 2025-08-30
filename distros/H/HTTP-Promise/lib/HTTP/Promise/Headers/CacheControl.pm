@@ -16,7 +16,7 @@ BEGIN
 {
     use strict;
     use warnings;
-    use warnings::register;
+    warnings::register_categories( 'HTTP::Promise' );
     use parent qw( HTTP::Promise::Headers::Generic );
     our $VERSION = 'v0.1.0';
 };
@@ -302,6 +302,10 @@ The C<stale-if-error> response directive indicates that the cache can reuse a st
 The C<stale-while-revalidate> response directive indicates that the cache could reuse a stale response while it revalidates it to a cache.
 
     Cache-Control: max-age=604800, stale-while-revalidate=86400
+
+=head1 THREAD-SAFETY
+
+This module is thread-safe for all operations, as it operates on per-object state and uses thread-safe external libraries.
 
 =head1 AUTHOR
 

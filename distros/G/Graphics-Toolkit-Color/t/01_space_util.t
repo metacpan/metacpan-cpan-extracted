@@ -31,7 +31,7 @@ is( $rd->( 1.4999999, 2),  1.5,  'positive rounding with one decimal');
 is( $rd->(-1.4999999, 2), -1.5,  'negative rounding with one decimal');
 
 
-my $rmod = \&Graphics::Toolkit::Color::Space::Util::real_mod;
+my $rmod = \&Graphics::Toolkit::Color::Space::Util::mod_real;
 is( $rmod->(),                       0,     'default to 0 when both values missing');
 is( $rmod->(1),                      0,     'default to 0 when a value is missing');
 is( $rmod->(1,0),                    0,     'default to 0 when a divisor is zero');

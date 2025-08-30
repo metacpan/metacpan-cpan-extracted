@@ -1,5 +1,13 @@
 Revision history for Perl module Module::Generic
 
+v1.0.3 2025-08-30T14:29:05+0900
+    - Corrected a minor oversight in Module::Generic::Null new
+    - Corrected a minor error in documentation of Module::Generic::Array for 'callback'
+    - Improved methods '_set_get_array_as_object', '_set_get_object_array', and '_set_get_object_array_object' in Module::Generic
+    - Added methods 'has_callback', and 'get_callback' in Module::Generic::Array
+    - Corrected method 'close' in Module::Generic::File to only apply to file for fileno.
+    - Improved the method 'mime_type' in Module::Generic::Finfo
+
 v1.0.2 2025-07-30T08:35:32+0900
     - Improved method _set_get_object_without_init in Module::Generic
     - Added the option of specifying a format to _set_get_datetime, and improved the method

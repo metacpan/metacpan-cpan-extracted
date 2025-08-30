@@ -5,7 +5,7 @@ use base 'PDF::API2::Resource::BaseFont';
 use strict;
 use warnings;
 
-our $VERSION = '2.047'; # VERSION
+our $VERSION = '2.048'; # VERSION
 
 use Encode qw(:all);
 

@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 05-SVCB.t 2028 2025-07-22 16:52:42Z willem $	-*-perl-*-
+# $Id: 05-SVCB.t 2035 2025-08-14 11:49:15Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -14,68 +14,92 @@ exit( plan skip_all => 'unresolved AUTOLOAD regression	[perl #120694]' )
 		unless ( $] > 5.018001 )
 		or ( $] < 5.018 );
 
-plan tests => 50;
+plan tests => 78;
 
-
-my $name = 'SVCB.example';
 my $type = 'SVCB';
-my $code = 64;
-my @attr = qw( svcpriority targetname port );
-my @data = qw( 1 pool.svc.example 1234 );
-my @also = qw(key0 mandatory alpn no-default-alpn port ipv4hint ech ipv6hint dohpath ohttp);
 
-my $wire = '000104706f6f6c03737663076578616d706c65000003000204d2';
+my @keys = qw(mandatory alpn no-default-alpn port ipv4hint ech ipv6hint);
+my @also = qw(dohpath ohttp tls-supported-groups);
 
 my $typecode = unpack 'xn', Net::DNS::RR->new( type => $type )->encode;
-is( $typecode, $code, "$type RR type code = $code" );
-
-my $hash = {};
-@{$hash}{@attr} = @data;
+ok( $typecode, "$type RR type code = $typecode" );
 
 
-for my $rr ( Net::DNS::RR->new( name => $name, type => $type, %$hash ) ) {
-	my $string = $rr->string;
-	my $rr2	   = Net::DNS::RR->new($string);
-	is( $rr2->string, $string, 'new/string transparent' );
-
-	is( $rr2->encode, $rr->encode, 'new($string) and new(%hash) equivalent' );
-
-	foreach (qw(svcpriority targetname)) {
-		is( $rr->$_, $hash->{$_}, "expected result from rr->$_()" );
+for my $rr ( Net::DNS::RR->new( my $record = 'example. SVCB' ) ) {
+	ok( $rr, "new DELEG RR:	$record" );
+	foreach my $parameter ( qw(SvcPriority TargetName), @keys, @also ) {
+		is( $rr->$parameter, undef, "$parameter undefined" );
 	}
+	is( $rr->rdata, '', 'empty rdata' );
+	ok( $rr->string, 'presentation format string' );
+}
 
-	my $encoded = $rr->encode;
-	my $decoded = Net::DNS::RR->decode( \$encoded );
-	my $hex1    = unpack 'H*', $encoded;
-	my $hex2    = unpack 'H*', $decoded->encode;
-	my $hex3    = unpack 'H*', $rr->rdata;
-	is( $hex2, $hex1, 'encode/decode transparent' );
-	is( $hex3, $wire, 'encoded RDATA matches example' );
+for my $rr ( Net::DNS::RR->new( my $record = 'example. SVCB 0 target.example.' ) ) {
+	ok( $rr,	     "new DELEG RR:	$record" );
+	ok( $rr->TargetName, 'TargetName defined' );
+	is( $rr->SvcPriority, 0, 'SvcPriority zero' );
+	ok( $rr->string, 'presentation format string' );
 }
 
 
-for my $rr ( Net::DNS::RR->new(". $type") ) {
-	foreach ( qw(TargetName), @also ) {
-		is( $rr->$_(), undef, "empty RR has undefined $_" );
-	}
+for my $rr ( Net::DNS::RR->new( my $record = 'example. SVCB 1 target.example.' ) ) {
+	ok( $rr,	     "new DELEG RR:	$record" );
+	ok( $rr->TargetName, 'TargetName defined' );
+	is( $rr->SvcPriority, 1, 'SvcPriority non-zero' );
+	ok( $rr->string, 'presentation format string' );
+}
 
-	$rr->SvcPriority(1);
-	$rr->TargetName('.');
-	my $l0 = length $rr->encode;
-	$rr->no_default_alpn(0);
-	$rr->no_default_alpn(1);
-	isnt( length( $rr->encode ), $l0, 'insert SvcParams key' );
-	$rr->no_default_alpn(undef);
-	is( length( $rr->encode ), $l0, 'delete SvcParams key' );
-
-	exception( 'non-existent method', sub { $rr->bogus } );
+for my $rr ( Net::DNS::RR->new( my $record = 'example. SVCB 1 .' ) ) {
+	ok( $rr, "new DELEG RR:	$record" );
+	is( $rr->TargetName, $rr->owner, 'TargetName defined' );
+	ok( $rr->string, 'presentation format string' );
 }
 
 
-for my $corruption ( pack 'H*', '00004000010000000000070001000bad0001' ) {
-	local $SIG{__WARN__} = sub { };
-	my $rr = Net::DNS::RR->decode( \$corruption );
-	like( $rr->string, '/corrupt/i', 'string() includes corrupt RDATA' );
+for my $rr ( Net::DNS::RR->new( my $record = 'example. SVCB 1 . mandatory=alpn alpn=h2,h3' ) ) {
+	ok( $rr,		 "new DELEG RR:	$record" );
+	ok( defined $rr->key0(), 'correct SvcParameter key defined' );
+}
+
+for my $rr ( Net::DNS::RR->new( my $record = 'example. SVCB 1 . alpn=h2,h3 no-default-alpn' ) ) {
+	ok( $rr,			  "new DELEG RR:	$record" );
+	ok( defined $rr->key1(),	  'correct SvcParameter key defined' );
+	ok( defined $rr->no_default_alpn, '$rr->no_default_alpn true' );
+}
+
+for my $rr ( Net::DNS::RR->new( my $record = 'example. SVCB 1 . port=53' ) ) {
+	ok( $rr,		 "new DELEG RR:	$record" );
+	ok( defined $rr->key3(), 'correct SvcParameter key defined' );
+}
+
+for my $rr ( Net::DNS::RR->new( my $record = 'example. SVCB 1 . ipv4hint=192.0.2.1' ) ) {
+	ok( $rr,		 "new DELEG RR:	$record" );
+	ok( defined $rr->key4(), 'correct SvcParameter key defined' );
+}
+
+for my $rr ( Net::DNS::RR->new( my $record = 'example. SVCB 1 . ech=Base64format' ) ) {
+	ok( $rr,		 "new DELEG RR:	$record" );
+	ok( defined $rr->key5(), 'correct SvcParameter key defined' );
+}
+
+for my $rr ( Net::DNS::RR->new( my $record = 'example. SVCB 1 . ipv6hint=192.0.2.1' ) ) {
+	ok( $rr,		 "new DELEG RR:	$record" );
+	ok( defined $rr->key6(), 'correct SvcParameter key defined' );
+}
+
+for my $rr ( Net::DNS::RR->new( my $record = 'example. SVCB 1 . dohpath=/dns-query{?dns}' ) ) {
+	ok( $rr,		 "new DELEG RR:	$record" );
+	ok( defined $rr->key7(), 'correct SvcParameter key defined' );
+}
+
+for my $rr ( Net::DNS::RR->new( my $record = 'example. SVCB 1 . ohttp=0 ohttp=1' ) ) {
+	ok( $rr,		 "new DELEG RR:	$record" );
+	ok( defined $rr->key8(), 'correct SvcParameter key defined' );
+}
+
+for my $rr ( Net::DNS::RR->new( my $record = 'example. SVCB 1 . tls-supported-groups=29,23' ) ) {
+	ok( $rr,		 "new DELEG RR:	$record" );
+	ok( defined $rr->key9(), 'correct SvcParameter key defined' );
 }
 
 
@@ -89,6 +113,22 @@ example.com.	SVCB	16 foo.example.org.	( mandatory=alpn alpn=h2,h3-19
 			tls-supported-groups=29,23
 			)
 END
+
+
+for my $rr ( Net::DNS::RR->new('example. SVCB 1 . ') ) {
+	my $l0 = length $rr->encode;
+	$rr->port(53);
+	is( length( $rr->encode ), $l0 + 6, 'insert SvcParams key' );
+}
+
+
+for my $corruption ( pack 'H*', '00004000010000000000070001000bad0001' ) {
+	local $SIG{__WARN__} = sub { };
+	my $rr = Net::DNS::RR->decode( \$corruption );
+	like( $rr->string, '/corrupt/i', 'string() includes corrupt RDATA' );
+	is( length( $rr->encode ), length($corruption), 'preserve corrupt rdata' );
+	exception( 'non-existent method', sub { $rr->bogus } );
+}
 
 
 ####	Test Vectors

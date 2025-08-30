@@ -21,6 +21,8 @@ use warnings;
 
 eval "use Cache::FastMmap 1.57;";
 plan( skip_all => "Cache::FastMmap 1.57 required for testing mmap with Cache::FastMmap" ) if( $@ );
+my $key = "test_key$$";
+my @cleanup;
 
 SKIP:
 {
@@ -29,7 +31,7 @@ SKIP:
 
     my $cache = Module::Generic::File::Mmap->new(
         debug => $DEBUG,
-        key => 'test_key',
+        key => "${key}_1",
         serialiser => $SERIALISER,
         size => 2048,
         # destroy => 1,
@@ -48,11 +50,10 @@ SKIP:
         $s->unlock;
         $s->remove;
     };
-    skip( "Failed to create shared cache object: " . $cache->error, 21 ) if( !defined( $s ) );
     ok( defined( $s ), 'open return value' );
-
-    skip( "Failed to create shared cache object: " . Module::Generic::File::Mmap->error, 21 ) if( !defined( $s ) );
-    isa_ok( $s => ['Module::Generic::File::Mmap'] );
+    diag( "Error opening mmap cache file: ", $cache->error ) if( $DEBUG && !defined( $s ) );
+    skip( "Failed to create shared cache object.", 1 ) if( !defined( $s ) );
+    push( @cleanup, $s );
 
     isa_ok( $s, ['Module::Generic::File::Mmap'], 'Shared cache object' );
     my $test_data = { name => 'John Doe', location => 'Tokyo' };
@@ -158,7 +159,7 @@ SKIP:
     {
         my $cache2 = Module::Generic::File::Mmap->new(
             debug => $DEBUG,
-            key => 'test_key',
+            key => "${key}_1",
             serialiser => $SERIALISER,
             mode => 0666,
         );
@@ -198,17 +199,35 @@ subtest 'serialisation with cbor' => sub
         my $cbor = CBOR::XS->new->allow_sharing;
         my $cache = Module::Generic::File::Mmap->new(
             debug => $DEBUG,
-            key => 'test_key',
+            key => "${key}_2",
             serialiser => $SERIALISER,
             size => 2048,
             # destroy => 1,
             destroy => 0,
             mode => 0666,
-        ) || die( Module::Generic::File::Mmap->error );
+        );
+        ok( $cache, 'Module::Generic::File::Mmap instantiated' );
+        if( !$cache )
+        {
+            skip( "Failed to instantiate a Module::Generic::File::Mmap object: " . Module::Generic::File::Mmap->error, 1 );
+        }
         my $s = $cache->open({ mode => 'w' });
+        defined( $s ) || do
+        {
+            diag( "Failed to open shared cache: ", $cache->error ) if( $DEBUG );
+        };
+        local $SIG{__DIE__} = sub
+        {
+            diag( "Got error: ", join( '', @_ ), ". Cleaning up shared cache." ) if( $DEBUG );
+            $s->unlock;
+            $s->remove;
+        };
+        ok( defined( $s ), 'open return value' );
         diag( "Error opening mmap cache file: ", $cache->error ) if( $DEBUG && !defined( $s ) );
-        ok( $s, 'mmap cache opened' );
-        skip( "Failed to instantiate a mmap object.", 6 ) if( !defined( $s ) );
+        skip( "Failed to create shared cache object.", 1 ) if( !defined( $s ) );
+        isa_ok( $s, ['Module::Generic::File::Mmap'], 'Shared cache object' );
+        push( @cleanup, $s );
+
         ok( $s->write({ name => 'John Doe', location => 'Tokyo' }), 'write to cache mmap' );
         eval
         {
@@ -238,14 +257,35 @@ subtest 'serialisation with sereal' => sub
         my $dec = Sereal::Decoder->new;
         my $cache = Module::Generic::File::Mmap->new(
             debug => $DEBUG,
-            key => 'test_key',
+            key => "${key}_3",
             serialiser => $SERIALISER,
             size => 2048,
             # destroy => 1,
             destroy => 0,
             mode => 0666,
-        ) || die( Module::Generic::File::Mmap->error );
+        );
+        ok( $cache, 'Module::Generic::File::Mmap instantiated' );
+        if( !$cache )
+        {
+            skip( "Failed to instantiate a Module::Generic::File::Mmap object: " . Module::Generic::File::Mmap->error, 1 );
+        }
         my $s = $cache->open({ mode => 'w' });
+        defined( $s ) || do
+        {
+            diag( "Failed to open shared cache: ", $cache->error ) if( $DEBUG );
+        };
+        local $SIG{__DIE__} = sub
+        {
+            diag( "Got error: ", join( '', @_ ), ". Cleaning up shared cache." ) if( $DEBUG );
+            $s->unlock;
+            $s->remove;
+        };
+        ok( defined( $s ), 'open return value' );
+        diag( "Error opening mmap cache file: ", $cache->error ) if( $DEBUG && !defined( $s ) );
+        skip( "Failed to create shared cache object.", 1 ) if( !defined( $s ) );
+        isa_ok( $s, ['Module::Generic::File::Mmap'], 'Shared cache object' );
+        push( @cleanup, $s );
+
         ok( $s->write({ name => 'John Doe', location => 'Tokyo' }), 'write to cache mmap' );
         eval
         {
@@ -273,14 +313,35 @@ subtest 'serialisation with storable' => sub
         skip( "Storable::Improved v0.1.3 required for testing serialisation with Storable", 1 ) if( $@ );
         my $cache = Module::Generic::File::Mmap->new(
             debug => $DEBUG,
-            key => 'test_key',
+            key => "${key}_4",
             serialiser => $SERIALISER,
             size => 2048,
             # destroy => 1,
             destroy => 0,
             mode => 0666,
-        ) || die( Module::Generic::File::Mmap->error );
+        );
+        ok( $cache, 'Module::Generic::File::Mmap instantiated' );
+        if( !$cache )
+        {
+            skip( "Failed to instantiate a Module::Generic::File::Mmap object: " . Module::Generic::File::Mmap->error, 1 );
+        }
         my $s = $cache->open({ mode => 'w' });
+        defined( $s ) || do
+        {
+            diag( "Failed to open shared cache: ", $cache->error ) if( $DEBUG );
+        };
+        local $SIG{__DIE__} = sub
+        {
+            diag( "Got error: ", join( '', @_ ), ". Cleaning up shared cache." ) if( $DEBUG );
+            $s->unlock;
+            $s->remove;
+        };
+        ok( defined( $s ), 'open return value' );
+        diag( "Error opening mmap cache file: ", $cache->error ) if( $DEBUG && !defined( $s ) );
+        skip( "Failed to create shared cache object.", 1 ) if( !defined( $s ) );
+        isa_ok( $s, ['Module::Generic::File::Mmap'], 'Shared cache object' );
+        push( @cleanup, $s );
+
         ok( $s->write({ name => 'John Doe', location => 'Tokyo' }), 'write to cache mmap' );
         eval
         {
@@ -298,6 +359,15 @@ subtest 'serialisation with storable' => sub
             fail( "Error serialising or deserialising: $@" );
         }
     };
+};
+
+END
+{
+    foreach my $s ( @cleanup )
+    {
+        next unless( defined( $s ) );
+        $s->remove;
+    }
 };
 
 done_testing();
