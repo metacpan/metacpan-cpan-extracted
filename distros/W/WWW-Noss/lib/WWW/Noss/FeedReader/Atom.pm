@@ -2,7 +2,7 @@ package WWW::Noss::FeedReader::Atom;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 use WWW::Noss::TextToHtml qw(text2html);
 use WWW::Noss::Timestamp;
@@ -214,7 +214,7 @@ sub read_feed {
 
     }
 
-    if (not defined $channel->{ title } or not defined $channel->{ updated }) {
+    if (not defined $channel->{ title }) {
         die sprintf "%s is not a valid Atom feed\n", $feed->name;
     }
 
@@ -246,6 +246,17 @@ sub read_feed {
         }
         map { [ $_, $entries->[$_]] }
         0 .. $#$entries;
+
+    $channel->{ updated } //=
+        $entries->[$#$entries]{ updated } //
+        $entries->[$#$entries]{ published };
+
+    # So the feed doesn't have an updated field (which is technically required),
+    # and none of its posts have an updated or published field either. The
+    # feed is probably beyond saving.
+    if (not defined $channel->{ updated }) {
+        die sprintf "%s is not a valid Atom feed\n", $feed->name;
+    }
 
     return ($channel, $entries);
 

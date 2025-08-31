@@ -113,6 +113,8 @@ my $marker2a = "\x01\x00\x4f\x00\x6c\x00\x65\x00\x31\x00\x30\x00\x4e\x00\x61\x00
 my $marker3 = "\x5c\x6f\x62\x6a\x65\x6d\x62";
 my $marker4 = "\x5c\x6f\x62\x6a\x64\x61\x74";
 my $marker5 = "\x5c\x20\x6f\x62\x6a\x64\x61\x74";
+# CVE-2025-21298
+my $marker6 = '{\rtf1{\object\objhtml\objw1\objh1\objupdate\rsltpict{\*\objclass ';
 # Excel .xlsx encrypted package, thanks to Dan Bagwell for the sample
 my $encrypted_marker = "\x45\x00\x6e\x00\x63\x00\x72\x00\x79\x00\x70\x00\x74\x00\x65\x00\x64\x00\x50\x00\x61\x00\x63\x00\x6b\x00\x61\x00\x67\x00\x65";
 # Excel .xls marker present only on unencrypted files
@@ -123,7 +125,7 @@ my $exe_marker2 = "URLDownloadToFileA";
 
 # CVE-2021-40444 marker
 my $mhtml_marker1 = "^MHTML:&#x48;&#x54;&#x50;&#x3a;&#x5c;&#x5c;&#x31;&";
-my $mhtml_marker2 = "^mhtml:https?://";
+my $mhtml_marker2 = "^(?:mhtml:https?://|file:///)";
 
 # this code burps an ugly message if it fails, but that's redirected elsewhere
 # AZ_OK is a constant exported by Archive::Zip
@@ -248,7 +250,7 @@ prepare for more CPU overhead.
 
 =item olemacro_prefer_contentdisposition ( 0 | 1 ) (default: 1)
 
-Choose if the content-disposition header filename be preferred if ambiguity is encountered whilst trying to get filename.
+DEPRECATED: This option is deprecated and will be removed in a future release.
 
 =back
 
@@ -550,9 +552,8 @@ sub _check_attachments {
   foreach my $part ($pms->{msg}->find_parts(qr/./, 1)) {
     next if $part->{type} =~ /$conf->{olemacro_skip_ctypes}/i;
 
-    my ($ctt, $ctd, $cte, $name) = get_part_details($pms, $part, $conf->{olemacro_prefer_contentdisposition});
-    next unless defined $ctt;
-    next if $name eq '';
+    my $name = $part->{name};
+    next unless defined $name;
 
     if ($name =~ /$conf->{olemacro_skip_exts}/i) {
       dbg("Skipping file \"$name\" (olemacro_skip_exts)");
@@ -795,6 +796,20 @@ sub _check_macrotype_doc {
 
   return if !defined $data || $data eq '';
 
+  # check uris in rtf file
+  if(_is_rtf_file($name, $data)) {
+    # do not read the whole file, it might be huge
+    my $tdata = substr($data, 0, 200000);
+    foreach (split(/\n/, $tdata)) {
+      if(/HYPERLINK "(.*)"/) {
+        my $uri = $1;
+        dbg("Found uri $uri in file $name");
+        $pms->add_uri_detail_list($uri);
+      } 
+    } 
+  }
+
+  # return if the file is not a zip file
   return unless _is_zip_file($name, $data);
   my $zip = _open_zip_handle($data);
   return unless $zip;
@@ -854,15 +869,14 @@ sub _check_macrotype_doc {
     foreach my $rl (@relations) {
       if ($rl =~ /Target=\"([^"]*)\".*?TargetMode=\"External\"/is) {
         my $uri = $1;
+        dbg("Found target uri: $uri");
         if ($uri =~ /(?:$mhtml_marker1|$mhtml_marker2)/i) {
-          dbg("Found target mhtml uri: $uri");
           if (keys %{$pms->{olemacro_mhtml_uri}} < 5) {
             $pms->{olemacro_mhtml_uri}{$uri} = 1;
           }
         }
         $uri =~ s/^mhtml://i;
         if ($uri =~ /^https?:\/\//i) {
-          dbg("Found target uri: $uri");
           if (!exists $pms->{olemacro_redirect_uri}{$uri}) {
             if (keys %{$pms->{olemacro_redirect_uri}} < 10) {
               $pms->add_uri_detail_list($uri);
@@ -954,6 +968,16 @@ sub _is_zip_file {
   return 0;
 }
 
+sub _is_rtf_file {
+  my ($name, $data) = @_;
+
+  if (index($data, '{\rtf1') == 0 || $name =~ /\.rtf$/i) {
+    return 1;
+  }
+
+  return 0;
+}
+
 sub _check_markers {
   my ($data) = @_;
 
@@ -971,18 +995,28 @@ sub _check_markers {
   }
 
   # Check for rtf markers
+  my $rtf_marker = 0;
   if (index($data, $marker3) > -1) {
     dbg('Marker 3 found');
-    return 1;
+    $rtf_marker++;
   }
 
   if (index($data, $marker4) > -1) {
     dbg('Marker 4 found');
-    return 1;
+    $rtf_marker++;
   }
 
   if (index($data, $marker5) > -1) {
     dbg('Marker 5 found');
+    $rtf_marker++;
+  }
+
+  if (index($data, $marker6) > -1) {
+    dbg('CVE 2025-21298 marker found');
+    $rtf_marker++;
+  }
+  
+  if($rtf_marker > 1) {
     return 1;
   }
 

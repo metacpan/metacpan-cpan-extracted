@@ -2,6 +2,8 @@ bin/noss
 bin/nossui
 Changes
 doc/nossui.pod
+img/noss-logo.png
+img/noss-the-mouse.png
 lib/WWW/Noss.pm
 lib/WWW/Noss/BaseConfig.pm
 lib/WWW/Noss/Curl.pm

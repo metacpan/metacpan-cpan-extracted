@@ -2,7 +2,7 @@ package WWW::Noss;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 use Cwd;
 use Getopt::Long qw(GetOptionsFromArray);
@@ -204,6 +204,10 @@ my $DEFAULT_FEED_FMT = <<'HERE';
   Unread:  %U/%p
 
 HERE
+
+my %DOESNT_NEED_FEED = map { $_ => 1 } qw(
+    import help
+);
 
 sub _HELP  {
 
@@ -893,7 +897,7 @@ sub _get_feed {
             proxy => $self->{ Proxy },
             proxy_user => $self->{ ProxyUser },
             (
-                $self->{ Unconditional }
+                !$self->{ Unconditional }
                 ? (
                     time_cond => (-f $feed->path ? $feed->path : undef),
                     etag_compare => (-s $feed->etag ? $feed->etag : undef),
@@ -1862,7 +1866,7 @@ sub init {
             or die "Failed to mkdir $self->{ EtagDir }: $!\n";
     }
 
-    unless ($self->{ Cmd } eq 'import') {
+    unless (exists $DOESNT_NEED_FEED{ $self->{ Cmd } }) {
         $self->{ FeedFile } //= _default_feeds;
         unless (defined $self->{ FeedFile }) {
             die "$PRGNAM could not find a feeds file to read a feed list from\n";
@@ -1912,9 +1916,11 @@ sub init {
         die "Invalid argument to --limit-rate\n";
     }
 
-    $self->{ DB } = WWW::Noss::DB->new(
-        File::Spec->catfile($self->{ DataDir }, 'database.sqlite3')
-    );
+    unless ($DOESNT_NEED_FEED{ $self->{ Cmd } }) {
+        $self->{ DB } = WWW::Noss::DB->new(
+            File::Spec->catfile($self->{ DataDir }, 'database.sqlite3')
+        );
+    }
 
     if (defined $self->{ TimeFmt }) {
         _set_z_fmt($self->{ TimeFmt });
@@ -1930,7 +1936,7 @@ sub run {
 
     $COMMANDS{ $self->{ Cmd } }->($self);
 
-    if ($self->{ AutoClean } and $self->{ Cmd } ne 'clean') {
+    if ($self->{ AutoClean } and not $DOESNT_NEED_FEED{ $self->{ Cmd } }) {
         $self->clean;
     }
 

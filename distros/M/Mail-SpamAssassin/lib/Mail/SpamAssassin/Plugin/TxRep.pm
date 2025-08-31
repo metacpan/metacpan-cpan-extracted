@@ -1108,8 +1108,6 @@ Used by the SQLBasedAddrList storage implementation.
 
 The table name where reputation is to be stored in, for the above DSN.
 
-=back
-
 =cut
 
   push (@cmds, {
@@ -1119,9 +1117,40 @@ The table name where reputation is to be stored in, for the above DSN.
     type         => $Mail::SpamAssassin::Conf::CONF_TYPE_STRING
   });
 
+=item B<txrep_min_score value>
+
+ (default: undef)
+
+Minimum TxRep score, used to limit TxRep score adjustements.
+
+=cut
+
+  push (@cmds, {
+    setting      => 'txrep_min_score',
+    is_admin     => 1,
+    default      => undef,
+    type         => $Mail::SpamAssassin::Conf::CONF_TYPE_NUMERIC
+  });
+
+=item B<txrep_max_score value>
+
+ (default: undef)
+
+Maximum TxRep score, used to limit TxRep score adjustements.
+
+=back
+
+=cut
+
+  push (@cmds, {
+    setting      => 'txrep_max_score',
+    is_admin     => 1,
+    default      => undef,
+    type         => $Mail::SpamAssassin::Conf::CONF_TYPE_NUMERIC
+  });
+
   $conf->{parser}->register_commands(\@cmds);
 }
-
 
 ###########################################################################
 sub _message {
@@ -1355,6 +1384,13 @@ sub check_senders_reputation {
                 # calculating the delta from the stored message reputation
                 $delta = ($msgscore + $self->{conf}->{txrep_factor}*$msg_rep) / (1+$self->{conf}->{txrep_factor}) - $msgscore;
                 if ($delta != 0) {
+		    if(defined $self->{conf}->{txrep_min_score} and ($delta < $self->{conf}->{txrep_min_score})) {
+		      dbg("TxRep: $delta score is lower then minimum allowed TxRep score, score adjusted to $self->{conf}->{txrep_min_score}"); 
+		      $delta = $self->{conf}->{txrep_min_score};
+		    } elsif(defined $self->{conf}->{txrep_max_score} and ($delta > $self->{conf}->{txrep_max_score})) {
+		      dbg("TxRep: $delta score is higher then maximum allowed TxRep score, score adjusted to $self->{conf}->{txrep_max_score}"); 
+		      $delta = $self->{conf}->{txrep_max_score};
+		    }
                     $pms->got_hit("TXREP", "TXREP: ", ruletype => 'eval', score => sprintf("%0.3f", $delta));
                 }
                 dbg("TxRep: message %s already scanned, using old data; post-TxRep score: %0.3f", $msg_id, $pms->{score} || 'undef');
@@ -1432,6 +1468,13 @@ sub check_senders_reputation {
   if (!defined $self->{learning}) {
     $delta = ($self->{totalweight})? $self->{conf}->{txrep_factor} * $delta / $self->{totalweight}  :  0;
     if ($delta) {
+      if(defined $self->{conf}->{txrep_min_score} and ($delta < $self->{conf}->{txrep_min_score})) {
+        dbg("TxRep: $delta score is lower then minimum allowed TxRep score, score adjusted to $self->{conf}->{txrep_min_score}"); 
+        $delta = $self->{conf}->{txrep_min_score};
+      } elsif(defined $self->{conf}->{txrep_max_score} and ($delta > $self->{conf}->{txrep_max_score})) {
+        dbg("TxRep: $delta score is higher then maximum allowed TxRep score, score adjusted to $self->{conf}->{txrep_max_score}"); 
+        $delta = $self->{conf}->{txrep_max_score};
+      }
       $pms->got_hit("TXREP", "TXREP: ", ruletype => 'eval', score => sprintf("%0.3f", $delta));
     }
     $msgscore += $delta;
@@ -1482,7 +1525,7 @@ sub check_reputation {
   my ($self, $storage, $pms, $key, $id, $ip, $signedby, $msgscore) = @_;
 
   my $delta  = 0;
-  my $weight = ($key eq 'MSG_ID') ? 1 : $pms->{main}->{conf}->{'txrep_weight_'.lc($key)};
+  my $weight = ($key eq 'MSG_ID') ? 1 : $self->{conf}->{'txrep_weight_'.lc($key)};
 
 #  {
 #    #Bug 7164, trying to find out reason for these: _WARN: Use of uninitialized value $msgscore in addition (+) at /usr/share/perl5/vendor_perl/Mail/SpamAssassin/Plugin/TxRep.pm line 1415.
@@ -2004,6 +2047,8 @@ sub learner_close {
   dbg("TxRep: learner_close");
 }
 
+sub has_txrep_min_score { 1 }
+sub has_txrep_max_score { 1 }
 
 =head1 OPTIMIZING TXREP
 

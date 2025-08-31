@@ -3,8 +3,11 @@
 use lib '.'; use lib 't';
 use SATest; sa_t_init("sa_txrep");
 
+use Test::More;
 
-use Test::More tests => 8;
+my @dbmods = grep eval "require $_", ('DB_File', 'GDBM_File', 'SDBM_File');
+plan skip_all => "No db module is available" unless @dbmods;
+plan tests => 9 * @dbmods;
 
 # ---------------------------------------------------------------------------
 
@@ -22,20 +25,6 @@ my $rules = q(
     header   FROM_2_EMAILS      From =~ /(?:^|<|"| )([\w+.-]+\@[\w.-]+\.\w\w++)(?:[^\n\w<]{0,80})?<(?!\1)[^\n\s]*\@/i
 );
 
-tstpre ("
-  loadplugin Mail::SpamAssassin::Plugin::TxRep
-");
-
-# only use rules defined here in tstprefs()
-clear_localrules();
-
-tstprefs ("
-  use_txrep 1
-  auto_welcomelist_path ./$userstate/txreptest
-  auto_welcomelist_file_mode 0755
-  $rules
-");
-
 %txrep_pattern0 = (
   q{ 0.0 TXREP } => 'Score normalizing',
 );
@@ -52,84 +41,127 @@ tstprefs ("
   q{ -90 TXREP } => 'Score normalizing',
 );
 
-%patterns = ();
-%anti_patterns = %txrep_pattern0;
-sarun ("-L -t < data/txrep/0", \&patterns_run_cb);
-ok_all_patterns();
-clear_pattern_counters();
-
-# feed TxRep
-sarun ("-L -t < data/txrep/1", \&patterns_run_cb);
-sarun ("-L -t < data/txrep/2", \&patterns_run_cb);
-
-%patterns = %txrep_pattern1;
-%anti_patterns = ();
-sarun ("-L -t < data/txrep/3", \&patterns_run_cb);
-ok_all_patterns();
-clear_pattern_counters();
-
-%patterns = %txrep_pattern2;
-%anti_patterns = ();
-sarun ("--add-addr-to-welcomelist=test1\@gmail.com");
-sarun ("-L -t < data/txrep/4", \&patterns_run_cb);
-ok_all_patterns();
-clear_pattern_counters();
-
-%patterns = %txrep_pattern3;
-%anti_patterns = ();
-sarun ("-L -t < data/txrep/5", \&patterns_run_cb);
-ok_all_patterns();
-clear_pattern_counters();
-
-tstprefs("
-  use_txrep 1
-  auto_welcomelist_path ./$userstate/txreptest
-  auto_welcomelist_file_mode 0755
-  txrep_weight_email 10
-  $rules
-");
-unlink("./$userstate/txreptest");
-
-%txrep_pattern0 = (
+%txrep_pattern0a = (
   q{ 0.0 TXREP } => 'Score normalizing',
 );
 
-%txrep_pattern1 = (
+%txrep_pattern1a = (
   q{ 1.1 TXREP } => 'Score normalizing',
 );
 
-%txrep_pattern2 = (
+%txrep_pattern2a = (
   q{ -25 TXREP } => 'Score normalizing',
 );
 
-%txrep_pattern3 = (
+%txrep_pattern3a = (
   q{ -36 TXREP } => 'Score normalizing',
 );
 
-%patterns = ();
-%anti_patterns = %txrep_pattern0;
-sarun ("-L -t < data/txrep/0", \&patterns_run_cb);
-ok_all_patterns();
-clear_pattern_counters();
+%txrep_pattern3b = (
+  q{ -1.0 TXREP } => 'Score normalizing',
+);
 
-# feed TxRep
-sarun ("-L -t < data/txrep/1", \&patterns_run_cb);
-sarun ("-L -t < data/txrep/2", \&patterns_run_cb);
+tstpre ("
+  loadplugin Mail::SpamAssassin::Plugin::TxRep
+");
 
-%patterns = %txrep_pattern1;
-%anti_patterns = ();
-sarun ("-L -t < data/txrep/3", \&patterns_run_cb);
-ok_all_patterns();
-clear_pattern_counters();
+# only use rules defined here in tstprefs()
+clear_localrules();
 
-%patterns = %txrep_pattern2;
-%anti_patterns = ();
-sarun ("--add-addr-to-welcomelist=test1\@gmail.com");
-sarun ("-L -t < data/txrep/4", \&patterns_run_cb);
-ok_all_patterns();
-clear_pattern_counters();
+# Run entire set of tests with each available xxx_File module
+foreach my $dbmodule (@dbmods) {
+  diag "Testing with $dbmodule";
 
-%patterns = %txrep_pattern3;
-%anti_patterns = ();
-sarun ("-L -t < data/txrep/5", \&patterns_run_cb);
-ok_all_patterns();
+  tstprefs ("
+  use_txrep 1
+  auto_welcomelist_path ./$userstate/txreptest
+  auto_welcomelist_file_mode 0755
+  auto_welcomelist_db_modules $dbmodule
+  $rules
+  ");
+  unlink("./$userstate/txreptest", "./$userstate/txreptest.pag", "./$userstate/txreptest.dir", "./$userstate/txreptest.mutex");
+
+  %patterns = ();
+  %anti_patterns = %txrep_pattern0;
+  sarun ("-L -t < data/txrep/0", \&patterns_run_cb);
+  ok_all_patterns();
+  clear_pattern_counters();
+
+  # feed TxRep
+  sarun ("-L -t < data/txrep/1", \&patterns_run_cb);
+  sarun ("-L -t < data/txrep/2", \&patterns_run_cb);
+
+  %patterns = %txrep_pattern1;
+  %anti_patterns = ();
+  sarun ("-L -t < data/txrep/3", \&patterns_run_cb);
+  ok_all_patterns();
+  clear_pattern_counters();
+
+  %patterns = %txrep_pattern2;
+  %anti_patterns = ();
+  sarun ("--add-addr-to-welcomelist=test1\@gmail.com");
+  sarun ("-L -t < data/txrep/4", \&patterns_run_cb);
+  ok_all_patterns();
+  clear_pattern_counters();
+
+  %patterns = %txrep_pattern3;
+  %anti_patterns = ();
+  sarun ("-L -t < data/txrep/5", \&patterns_run_cb);
+  ok_all_patterns();
+  clear_pattern_counters();
+
+  tstprefs("
+  use_txrep 1
+  txrep_min_score undef
+  auto_welcomelist_path ./$userstate/txreptest
+  auto_welcomelist_file_mode 0755
+  auto_welcomelist_db_modules $dbmodule
+  txrep_weight_email 10
+  $rules
+  ");
+  unlink("./$userstate/txreptest", "./$userstate/txreptest.pag", "./$userstate/txreptest.dir", "./$userstate/txreptest.mutex");
+
+  %patterns = ();
+  %anti_patterns = %txrep_pattern0a;
+  sarun ("-L -t < data/txrep/0", \&patterns_run_cb);
+  ok_all_patterns();
+  clear_pattern_counters();
+
+  # feed TxRep
+  sarun ("-L -t < data/txrep/1", \&patterns_run_cb);
+  sarun ("-L -t < data/txrep/2", \&patterns_run_cb);
+
+  %patterns = %txrep_pattern1a;
+  %anti_patterns = ();
+  sarun ("-L -t < data/txrep/3", \&patterns_run_cb);
+  ok_all_patterns();
+  clear_pattern_counters();
+
+  %patterns = %txrep_pattern2a;
+  %anti_patterns = ();
+  sarun ("--add-addr-to-welcomelist=test1\@gmail.com");
+  sarun ("-L -t < data/txrep/4", \&patterns_run_cb);
+  ok_all_patterns();
+  clear_pattern_counters();
+
+  %patterns = %txrep_pattern3a;
+  %anti_patterns = ();
+  sarun ("-L -t < data/txrep/5", \&patterns_run_cb);
+  ok_all_patterns();
+
+  tstprefs("
+  use_txrep 1
+  txrep_min_score -1.0
+  auto_welcomelist_path ./$userstate/txreptest
+  auto_welcomelist_file_mode 0755
+  auto_welcomelist_db_modules $dbmodule
+  txrep_weight_email 10
+  $rules
+  ");
+
+  %patterns = %txrep_pattern3b;
+  %anti_patterns = ();
+  sarun ("-L -t < data/txrep/5", \&patterns_run_cb);
+  ok_all_patterns();
+
+}

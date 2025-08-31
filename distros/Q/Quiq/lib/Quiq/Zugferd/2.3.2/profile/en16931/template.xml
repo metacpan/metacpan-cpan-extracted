@@ -36,7 +36,7 @@
         <ram:SellerAssignedID schemeID="">BT-155</ram:SellerAssignedID>
         <ram:BuyerAssignedID schemeID=""></ram:BuyerAssignedID>
         <ram:Name>BT-153</ram:Name>
-        <ram:Description></ram:Description>
+        <ram:Description>BT-154</ram:Description>
         <ram:ApplicableProductCharacteristic>
           <ram:Description>BT-160</ram:Description>
           <ram:Value>BT-161</ram:Value>
@@ -185,7 +185,7 @@
       </ram:SpecifiedLineTradeSettlement>
     </ram:IncludedSupplyChainTradeLineItem>
     <ram:ApplicableHeaderTradeAgreement>
-      <ram:BuyerReference></ram:BuyerReference>
+      <ram:BuyerReference>BT-10</ram:BuyerReference>
       <ram:SellerTradeParty>
         <ram:ID schemeID="">BT-29</ram:ID>
         <ram:GlobalID schemeID=""></ram:GlobalID>
@@ -337,10 +337,10 @@
         </ram:FormattedIssueDateTime>
       </ram:ContractReferencedDocument>
       <ram:AdditionalReferencedDocument>
-        <ram:IssuerAssignedID schemeID=""></ram:IssuerAssignedID>
+        <ram:IssuerAssignedID schemeID="">BT-122</ram:IssuerAssignedID>
         <ram:URIID schemeID=""></ram:URIID>
         <ram:LineID schemeID=""></ram:LineID>
-        <ram:TypeCode></ram:TypeCode>
+        <ram:TypeCode>BT-122-0</ram:TypeCode>
         <ram:Name></ram:Name>
         <ram:AttachmentBinaryObject mimeCode="" filename=""></ram:AttachmentBinaryObject>
         <ram:ReferenceTypeCode></ram:ReferenceTypeCode>
@@ -371,7 +371,7 @@
             <ram:CompleteNumber></ram:CompleteNumber>
           </ram:TelephoneUniversalCommunication>
           <ram:EmailURIUniversalCommunication>
-            <ram:URIID schemeID=""></ram:URIID>
+            <ram:URIID schemeID="">BT-58</ram:URIID>
             <ram:CompleteNumber></ram:CompleteNumber>
           </ram:EmailURIUniversalCommunication>
         </ram:DefinedTradeContact>

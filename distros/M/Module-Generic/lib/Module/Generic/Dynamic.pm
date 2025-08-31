@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Dynamic.pm
-## Version v1.2.4
+## Version v1.2.5
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2023/11/18
+## Modified 2025/08/31
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -22,7 +22,7 @@ BEGIN
     use Module::Generic::Global ':const';
     use Scalar::Util ();
     our $DEBUG = 0;
-    our $VERSION = 'v1.2.4';
+    our $VERSION = 'v1.2.5';
 };
 
 use strict;
@@ -144,8 +144,8 @@ EOT
             {
                 $func_name = '_set_get_uri';
             }
-            # my $pl = "sub ${class}::${clean_field} { return( shift->${func_name}( '$clean_field', \@_ ) ); }";
-            my $pl = q[sub ${class}::${clean_field} { print( STDERR "Got here\n" ); }];
+            my $pl = "sub ${class}::${clean_field} { return( shift->${func_name}( '$clean_field', \@_ ) ); }";
+            # my $pl = q[sub ${class}::${clean_field} { print( STDERR "Got here\n" ); }];
             eval( $pl );
             my $rv = $self->$clean_field( $hash->{ $k } );
             return( $self->pass_error ) if( !defined( $rv ) && $self->error );

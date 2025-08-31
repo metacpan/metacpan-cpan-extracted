@@ -73,7 +73,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.229';
+our $VERSION = '1.230';
 
 # -----------------------------------------------------------------------------
 
@@ -257,7 +257,7 @@ sub currentLevel {
 
 =head1 VERSION
 
-1.229
+1.230
 
 =head1 AUTHOR
 

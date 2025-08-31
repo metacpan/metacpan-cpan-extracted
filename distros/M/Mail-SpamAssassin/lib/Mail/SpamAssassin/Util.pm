@@ -34,6 +34,8 @@ NOTE: Utility functions should not be changing global variables such
 as $_, $1, $2, ... $/, etc. unless explicitly documented.  If these
 variables are in use by these functions, they should be localized.
 
+=head1 METHODS
+
 =over 4
 
 =cut
@@ -46,6 +48,7 @@ use warnings;
 use re 'taint';
 
 use Mail::SpamAssassin::Logger;
+use Mail::SpamAssassin::Header::ParameterHeader;
 
 use version 0.77;
 use Exporter ();
@@ -138,6 +141,10 @@ $have_libidn||$have_libidn2
           "internationalized domain names with U-labels will not be recognized!");
 
 ###########################################################################
+our($enc_utf8);
+BEGIN {
+  $enc_utf8  = Encode::find_encoding('UTF-8');
+};
 
 # find an executable in the current $PATH (or whatever for that platform)
 {
@@ -329,6 +336,16 @@ sub untaint_hostname {
   }
 }
 
+=item C<untaint_var($var)>
+
+This sub takes a scalar or a reference to an array, hash, scalar or another
+reference and recursively untaints all its values (and keys if it's a
+reference to a hash).
+It will return the untainted value if requested but to avoid unnecessary copying,
+the return value should be ignored when working on lists.
+
+=cut
+
 # This sub takes a scalar or a reference to an array, hash, scalar or another
 # reference and recursively untaints all its values (and keys if it's a
 # reference to a hash). It should be used with caution as blindly untainting
@@ -405,11 +422,16 @@ sub taint_var {
 
 ###########################################################################
 
-# Check for full hostname / FQDN / DNS name validity.  IP addresses must be
-# validated with other functions like Constants::IP_ADDRESS.  Does not check
-# for valid TLD, use $self->{main}->{registryboundaries}->is_domain_valid()
-# additionally for that.  If $is_ascii given and true, skip idn_to_ascii()
-# conversion.
+=item C<is_fqdn_valid($host)>
+
+Check for full hostname / FQDN / DNS name validity.  IP addresses must be
+validated with other functions like Constants::IP_ADDRESS.  Does not check
+for valid TLD, use $self->{main}->{registryboundaries}->is_domain_valid()
+additionally for that.  If $is_ascii given and true, skip idn_to_ascii()
+conversion.
+
+=cut
+
 sub is_fqdn_valid {
   my ($host, $is_ascii) = @_;
   return if !defined $host;
@@ -424,6 +446,10 @@ sub is_fqdn_valid {
 
   # remove trailing dots
   $host =~ s/\.+\z//;
+  # skip if $host as two or more consecutive dots
+  if(index($host, '..') != -1) {
+    return;
+  }
 
   # max total length 253
   return if length($host) > 253;
@@ -453,9 +479,13 @@ sub is_fqdn_valid {
 
 ###########################################################################
 
-# returns true if the provided string of octets represents a syntactically
-# valid UTF-8 string, otherwise a false is returned
-#
+=item C<is_valid_utf8($str)>
+
+The sub returns true if the provided string of octets represents a syntactically
+valid UTF-8 string, otherwise a false is returned.
+
+=cut
+
 sub is_valid_utf_8 {
 # my $octets = $_[0];
   return undef if !defined $_[0]; ## no critic (ProhibitExplicitReturnUndef)
@@ -490,12 +520,16 @@ sub is_valid_utf_8 {
                   \xF4 [\x80-\x8F] [\x80-\xBF]{2} )* \z/xs ? 1 : 0;
 }
 
-# Given an international domain name with U-labels (UTF-8 or Unicode chars)
-# converts it to ASCII-compatible encoding (ACE).  If the argument is in
-# ASCII (or is an invalid IDN), returns it lowercased but otherwise unchanged.
-# The result is always in octets (utf8 flag off) even if the argument was in
-# Unicode characters.
-#
+=item C<idn_to_ascii($domain)>
+
+Given an international domain name with U-labels (UTF-8 or Unicode chars)
+converts it to ASCII-compatible encoding (ACE).  If the argument is in
+ASCII (or is an invalid IDN), returns it lowercased but otherwise unchanged.
+The result is always in octets (utf8 flag off) even if the argument was in
+Unicode characters.
+
+=cut
+
 #my $idn_cache = {};
 sub idn_to_ascii {
   no bytes;  # make sure there is no 'use bytes' in effect
@@ -587,10 +621,14 @@ sub idn_to_ascii {
 
 ###########################################################################
 
-# map process termination status number to an informative string, and
-# append optional message (dual-valued errno or a string or a number),
-# returning the resulting string
-#
+=item C<exit_status_str($stat, $errno)>
+
+map process termination status number to an informative string, and
+append optional message (dual-valued errno or a string or a number),
+returning the resulting string
+
+=cut
+
 sub exit_status_str {
   my($stat,$errno) = @_;
   my $str;
@@ -615,10 +653,14 @@ sub exit_status_str {
 }
 
 ###########################################################################
+ 
+=item C<proc_status_ok($exit_status, $errno, @success)>
 
-# check errno to be 0 and a process exit status to be in the list of success
-# status codes, returning true if both are ok, and false otherwise
-#
+check errno to be 0 and a process exit status to be in the list of success
+status codes, returning true if both are ok, and false otherwise.
+
+=cut
+
 sub proc_status_ok {
   my($exit_status,$errno,@success) = @_;
   my $ok = 0;
@@ -711,6 +753,14 @@ sub local_tz {
   $LOCALTZ = sprintf("%+.2d%.2d", $z/60, $z%60);
   return $LOCALTZ;
 }
+
+=item C<parse_rfc822_date($date)>
+
+Parses an RFC 2822 formatted date string and returns a Unix timestamp.
+Takes a date to parse as input and returns a Unix timestamp (seconds since epoch)
+if the date can be parsed, or undef on failure.
+
+=cut
 
 sub parse_rfc822_date {
   my ($date) = @_;
@@ -834,6 +884,12 @@ sub parse_rfc822_date {
 
   return $time;
 }
+
+=item C<time_to_rfc822_date($timestamp)>
+
+Converts a Unix timestamp and returns an RFC 2822 formatted date string.
+
+=cut
 
 sub time_to_rfc822_date {
   my($time) = @_;
@@ -978,6 +1034,13 @@ sub base64_decode {
   return $out;
 }
 
+=item C<qp_decode($str)>
+
+Decodes a string that has been encoded using the Quoted-Printable
+content transfer encoding.
+
+=cut
+
 sub qp_decode {
   my $str = $_[0];
 
@@ -1076,6 +1139,12 @@ sub common_application_data_directory {
 }
 
 ###########################################################################
+
+=item C<extract_ipv4_addr_from_string($str)>
+
+Given a string, extract an IPv4 address from it.
+
+=cut
 
 # Given a string, extract an IPv4 address from it.  Required, since
 # we currently have no way to portably unmarshal an IPv4 address from
@@ -1176,11 +1245,15 @@ sub ips_match_in_24_mask {
 
 ###########################################################################
 
-# Given a quad-dotted IPv4 address or an IPv6 address, reverses the order
-# of its bytes (IPv4) or nibbles (IPv6), joins them with dots, producing
-# a string suitable for reverse DNS lookups. Returns undef in case of a
-# syntactically invalid IP address.
-#
+=item C<reverse_ip_address($ip)>
+
+Given a quad-dotted IPv4 address or an IPv6 address, reverses the order
+of its bytes (IPv4) or nibbles (IPv6), joins them with dots, producing
+a string suitable for reverse DNS lookups. Returns undef in case of a
+syntactically invalid IP address.
+
+=cut
+
 sub reverse_ip_address {
   my ($ip) = @_;
 
@@ -1241,59 +1314,11 @@ sub parse_content_type {
   my $missing; # flag missing content-type, even though we force it text/plain
   my $ct = $_[-1] || do { $missing = 1; 'text/plain; charset=us-ascii' };
 
-  # This could be made a bit more rigid ...
-  # the actual ABNF, BTW (RFC 1521, section 7.2.1):
-  # boundary := 0*69<bchars> bcharsnospace
-  # bchars := bcharsnospace / " "
-  # bcharsnospace :=    DIGIT / ALPHA / "'" / "(" / ")" / "+" /"_"
-  #               / "," / "-" / "." / "/" / ":" / "=" / "?"
-  #
-  # The boundary may be surrounded by double quotes.
-  # "the boundary parameter, which consists of 1 to 70 characters from
-  # a set of characters known to be very robust through email gateways,
-  # and NOT ending with white space.  (If a boundary appears to end with
-  # white space, the white space must be presumed to have been added by
-  # a gateway, and must be deleted.)"
-  #
-  # In practice:
-  # - MUAs accept whitespace before and after the "=" character
-  # - only an opening double quote seems to be needed
-  # - non-quoted boundaries should be followed by space, ";", or end of line
-  # - blank boundaries seem to not work
-  #
-  my($boundary) = $ct =~ m!\bboundary\s*=\s*("[^"]+|[^\s";]+(?=[\s;]|$))!i;
-
-  # remove double-quotes in boundary (should only be at start and end)
-  #
-  $boundary =~ tr/"//d if defined $boundary;
-
-  # Parse out the charset and name, if they exist.
-  #
-  my($charset) = $ct =~ /\bcharset\s*=\s*["']?(.*?)["']?(?:;|$)/i;
-  my($name) = $ct =~ /\b(?:file)?name\s*=\s*["']?(.*?)["']?(?:;|$)/i;
-
-  # RFC 2231 section 3: Parameter Value Continuations
-  # support continuations for name values
-  #
-  if (!$name && $ct =~ /\b(?:file)?name\*0\s*=/i) {
-
-    my @name;
-    $name[$1] = $2
-      while ($ct =~ /\b(?:file)?name\*(\d+)\s*=\s*["']?(.*?)["']?(?:;|$)/ig);
-
-    $name = join "", grep defined, @name;
-  }
-
-  # Get the actual MIME type out ...
-  # Note: the header content may not be whitespace unfolded, so make sure the
-  # REs do /s when appropriate.
-  # correct:
-  # Content-type: text/plain; charset=us-ascii
-  # missing a semi-colon, CT shouldn't have whitespace anyway:
-  # Content-type: text/plain charset=us-ascii
-  #
-  $ct =~ s/^\s+//;				# strip leading whitespace
-  $ct =~ s/;.*$//s;				# strip everything after first ';'
+  my $header = Mail::SpamAssassin::Header::ParameterHeader->new($ct);
+  my $boundary = $header->parameter('boundary');
+  my $charset = $header->parameter('charset');
+  my $name = $header->parameter('name');
+  $ct = $header->value();
   $ct =~ s@^([^/]+(?:/[^/\s]*)?).*$@$1@s;	# only something/something ...
   $ct = lc $ct;
 
@@ -1302,7 +1327,7 @@ sub parse_content_type {
   # list of known bad/non-plain formats, do likewise.
   $missing = 1 if !$ct; # flag missing content-type
   if (!$ct ||
-        ($ct =~ /^text\b/ && $ct !~ /^text\/(?:x-vcard|calendar|html)$/))
+      $ct =~ /^text\b(?!\/(?:x-vcard|calendar|html|x-amp-html)$)/)
   {
     $ct = "text/plain";
   }
@@ -1321,43 +1346,20 @@ sub parse_content_type {
 
 ###########################################################################
 
-sub url_encode {
+sub url_decode {
   my ($url) = @_;
-  my (@characters) = split(/(\%[0-9a-fA-F]{2})/, $url);
-  my (@unencoded);
-  my (@encoded);
-
-  foreach (@characters) {
-    # escaped character set ...
-    if (/\%[0-9a-fA-F]{2}/) {
-      # IF it is in the range of 0x00-0x20 or 0x7f-0xff
-      #    or it is one of  "<", ">", """, "#", "%",
-      #                     ";", "/", "?", ":", "@", "=" or "&"
-      # THEN preserve its encoding
-      unless (/(20|7f|[0189a-fA-F][0-9a-fA-F])/i) {
-	s/\%([2-7][0-9a-fA-F])/sprintf "%c", hex($1)/e;
-	push(@unencoded, $_);
-      }
-    }
-    # other stuff
-    else {
-      # no re "strict";  # since perl 5.21.8
-      # 0x00-0x20, 0x7f-0xff, ", %, <, >
-      s/([\000-\040\177-\377\042\045\074\076])
-	  /push(@encoded, $1) && sprintf "%%%02x", unpack("C",$1)/egx;
-    }
-  }
-  if (wantarray) {
-    return(join("", @characters), join("", @unencoded), join("", @encoded));
-  }
-  else {
-    return join("", @characters);
-  }
+  return $url unless ($url =~ /\%[0-9a-fA-F]{2}/);
+  utf8::encode($url) if utf8::is_utf8($url);
+  # decode %25 into % before doing the actual decoding
+  $url =~ s/%25/%/g;
+  $url =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/eg;
+  $url = $enc_utf8->decode($url);
+  return $url;
 }
 
 ###########################################################################
 
-=item $module = first_available_module (@module_list)
+=item C<first_available_module(@module_list)>
 
 Return the name of the first module that can be successfully loaded with
 C<require> from the list.  Returns C<undef> if none are available.
@@ -1386,7 +1388,7 @@ sub first_available_module {
 
 ###########################################################################
 
-=item touch_file(file, { args });
+=item C<touch_file($file, $args)>
 
 Touch or create a file.
 
@@ -1434,10 +1436,11 @@ sub pseudo_random_string {
 
 ###########################################################################
 
-=item my ($filepath, $filehandle) = secure_tmpfile();
+=item C<secure_tmpfile()>
 
 Generates a filename for a temporary file, opens it exclusively and
-securely, and returns a filehandle to the open file (opened O_RDWR).
+securely, and returns a filehandle to the open file (opened O_RDWR)
+and it filename.
 
 If it cannot open a file after 20 tries, it returns C<undef>.
 
@@ -1494,7 +1497,7 @@ sub secure_tmpfile {
   return ($reportfile, $tmpfh);
 }
 
-=item my ($dirpath) = secure_tmpdir();
+=item C<secure_tmpdir()>
 
 Generates a directory for temporary files.  Creates it securely and
 returns the path to the directory.
@@ -1627,22 +1630,30 @@ sub uri_list_canonicalize {
     $nuri =~ tr{\\}{/};
 
     # http:www.foo.biz -> http://www.foo.biz
-    $nuri =~ s{^(https?:)/{0,2}}{$1//}i;
+    # http://///www.foo.biz -> http://www.foo.biz (Bug 8288)
+    $nuri =~ s{^(https?:)/*}{$1//}i;
 
     # *always* make a dup with all %-encoding decoded, since
     # important parts of the URL may be encoded (such as the
     # scheme). (bug 4213)
     if ($nuri =~ /%[0-9a-fA-F]{2}/) {
-      $nuri = Mail::SpamAssassin::Util::url_encode($nuri);
+      $nuri = Mail::SpamAssassin::Util::url_decode($nuri);
     }
 
     # www.foo.biz -> http://www.foo.biz
     # unschemed URIs: assume default of "http://" as most MUAs do
+    my $schemed = 1;
     if ($nuri !~ /^[-_a-z0-9]+:/i) {
+      my $dom;
+      if(defined $rb) {
+        $dom = $rb->uri_to_domain($nuri);
+      }
       if ($nuri =~ /^ftp\./) {
 	$nuri =~ s{^}{ftp://}g;
       }
-      else {
+      elsif(not defined $dom or (defined $dom and $dom !~ /\./)) {
+	$schemed = 0;
+      } else {
 	$nuri =~ s{^}{http://}g;
       }
     }
@@ -1659,7 +1670,7 @@ sub uri_list_canonicalize {
     $nuri =~ s/\&\#(?:x2e|12290|x3002|65294|xff0e|65377|xff61);/./gi;
 
     # put the new URI on the new list if it's different
-    if ($nuri ne $uri) {
+    if ($nuri ne $uri and $schemed eq 1) {
       push(@nuris, $nuri);
     }
 
@@ -1789,7 +1800,7 @@ sub uri_list_canonicalize {
              $nhost ne 'localhost' && $port eq '80' &&
              $nhost =~ /^(?:www\.)?([^.]+)$/) {
         # Do not add .com to already valid schemelessly parsed domains (Bug 7891)
-        unless (defined $rb && $rb->is_domain_valid($nhost)) {
+        unless ((defined $schemed && $schemed eq 0) || (defined $rb && $rb->is_domain_valid($nhost))) {
           push(@nuris, join('', $proto, 'www.', $1, '.com', $rest));
         }
       }
@@ -2143,6 +2154,12 @@ if ($] >= 5.016) {
 } else {
   eval '$qr_sa = sub { return qr/$_[0]/; }';
 }
+
+=item C<compile_regexp($re, $strip_delimiters, $ignore_always_matching)>
+
+Compiles a regular expression pattern for efficient and safe use within SpamAssassin.
+
+=cut
 
 # returns ($compiled_re, $error)
 # if any errors, $compiled_re = undef, $error has string
@@ -2579,82 +2596,6 @@ sub parse_header_addresses {
   return @results;
 }
 
-sub get_part_details {
-    my ($pms, $part, $prefer_contentdisposition) = @_;
-    #https://en.wikipedia.org/wiki/MIME#Content-Disposition
-    #https://github.com/mikel/mail/pull/464
-
-    my $ctt = $part->get_header('content-type');
-    return undef unless defined $ctt; ## no critic (ProhibitExplicitReturnUndef)
-
-    my $cte = lc($part->get_header('content-transfer-encoding') || '');
-    return undef unless ($cte =~ /^(?:base64|quoted\-printable)$/); ## no critic (ProhibitExplicitReturnUndef)
-
-    $ctt = _decode_part_header($part, $ctt || '');
-
-    my $name = '';
-    my $cttname = '';
-    my $ctdname = '';
-
-    if ($ctt =~ m/name\s*=\s*["']?([^"';]*)/is) {
-      $cttname = $1;
-      $cttname =~ s/\s+$//;
-    }
-
-    my $ctd = $part->get_header('content-disposition');
-    $ctd = _decode_part_header($part, $ctd || '');
-
-    if ($ctd =~ m/filename\s*=\s*["']?([^"';]*)/is) {
-      $ctdname = $1;
-      $ctdname =~ s/\s+$//;
-    }
-
-    if (lc $ctdname eq lc $cttname) {
-      $name = $ctdname;
-    } elsif ($ctdname eq '') {
-      $name = $cttname;
-    } elsif ($cttname eq '') {
-      $name = $ctdname;
-    } else {
-      if ((defined $ctdname) and $prefer_contentdisposition) {
-        $name = $ctdname;
-      } else {
-        $name = $cttname;
-      }
-    }
-
-    return $ctt, $ctd, $cte, $name;
-}
-
-sub _decode_part_header {
-  my($part, $header_field_body) = @_;
-
-  return '' unless defined $header_field_body && $header_field_body ne '';
-
-  # deal with folding and cream the newlines and such
-  $header_field_body =~ s/\n[ \t]+/\n /g;
-  $header_field_body =~ s/\015?\012//gs;
-
-  local($1,$2,$3);
-
-  # Multiple encoded sections must ignore the interim whitespace.
-  # To avoid possible FPs with (\s+(?==\?))?, look for the whole RE
-  # separated by whitespace.
-  1 while $header_field_body =~
-            s{ ( = \? [A-Za-z0-9_-]+ \? [bqBQ] \? [^?]* \? = ) \s+
-               ( = \? [A-Za-z0-9_-]+ \? [bqBQ] \? [^?]* \? = ) }
-             {$1$2}xsg;
-
-  # transcode properly encoded RFC 2047 substrings into UTF-8 octets,
-  # leave everything else unchanged as it is supposed to be UTF-8 (RFC 6532)
-  # or plain US-ASCII
-  $header_field_body =~
-    s{ (?: = \? ([A-Za-z0-9_-]+) \? ([bqBQ]) \? ([^?]*) \? = ) }
-     { $part->__decode_header($1, uc($2), $3) }xsge;
-
-  return $header_field_body;
-}
-
 # Check some basic parsing mistakes
 sub _valid_parsed_address {
   return 0 if !defined $_[0];
@@ -2694,6 +2635,7 @@ sub _parse_header_addresses {
     my $comment = defined $5 ? $5 : undef;
 
     my ($user, $host, $invalid);
+    $invalid = 0;
 
     # Check relaxed <> capture
     if (defined $2) {
@@ -2701,7 +2643,7 @@ sub _parse_header_addresses {
       $address =~ s/\((?:|(?:[^()\\]++|\\.)*+)\)//gs;
       # Validate as somewhat email looking
       if ($address !~ /^$header_address_mailre$/) {
-        $address = undef;
+        $invalid = 1;
       }
     }
 
@@ -2729,6 +2671,7 @@ sub _parse_header_addresses {
         }
       }
       $phrase = $newphrase;
+      $phrase =~ s/^\s+|\s+\z//gs; # Trim whitespace
 
       # If we only have phrase which looks email, swap when valid
       # Check all in one if, either swap or don't
@@ -2769,7 +2712,7 @@ sub _parse_header_addresses {
       ($user, $host) = ($2, $3);
     }
 
-    $invalid = !defined $host || !is_fqdn_valid(idn_to_ascii($host), 1);
+    $invalid = 1 if !defined $host || !is_fqdn_valid(idn_to_ascii($host), 1);
     push @results, {
       'phrase' => $phrase,
       'user' => $user,

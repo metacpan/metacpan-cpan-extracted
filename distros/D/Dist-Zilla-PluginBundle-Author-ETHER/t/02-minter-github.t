@@ -109,15 +109,15 @@ like(
 
 like(
     path($mint_dir, 't', '01-basic.t')->slurp_utf8,
-    qr/^use My::New::Dist;\n\nfail\('this test is TODO!'\);$/m,
+    qr/^use My::New::Dist;\n\nmy \$todo = todo\('not yet implemented'\);\nfail\('this test is TODO!'\);\n\ndone_testing;$/m,
     'test gets generic content',
 );
 
 my $dist_ini = path($mint_dir, 'dist.ini')->slurp_utf8;
 like(
     $dist_ini,
-    qr/\[\@Author::ETHER\]\n:version = [\d.]+\n\n/,
-    'plugin bundle and version is referenced in dist.ini',
+    qr/\[\@Author::ETHER\]\n:version = [\d.]+\nbugtracker = github\nTest::MinimumVersion.max_target_perl = 5\.020\b/,
+    'plugin bundle and version, and minimum perl version are referenced in dist.ini',
 );
 
 like(

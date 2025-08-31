@@ -1,12 +1,7 @@
 package Dist::Zilla::Plugin::CoderwallEndorse;
-BEGIN {
-  $Dist::Zilla::Plugin::CoderwallEndorse::AUTHORITY = 'cpan:YANICK';
-}
-{
-  $Dist::Zilla::Plugin::CoderwallEndorse::VERSION = '0.2.0';
-}
-# ABSTRACT: Adds a Coderwall 'endorse' button to README Markdown file
-
+our $AUTHORITY = 'cpan:YANICK';
+# ABSTRACT: Adds a Coderwall 'endorse' button to README Markdown file (DEPRECATED)
+$Dist::Zilla::Plugin::CoderwallEndorse::VERSION = '0.2.1';
 
 use strict;
 use warnings;
@@ -135,11 +130,11 @@ __END__
 
 =head1 NAME
 
-Dist::Zilla::Plugin::CoderwallEndorse - Adds a Coderwall 'endorse' button to README Markdown file
+Dist::Zilla::Plugin::CoderwallEndorse - Adds a Coderwall 'endorse' button to README Markdown file (DEPRECATED)
 
 =head1 VERSION
 
-version 0.2.0
+version 0.2.1
 
 =head1 SYNOPSIS
 
@@ -153,6 +148,8 @@ version 0.2.0
     users = coderwall_name : author name, other_cw_name : other author
 
 =head1 DESCRIPTION
+
+B<Deprecated>: Coderwall endorse buttons are, alas, not a thing anymore. :-(
 
 If a C<README.mkdn> file is presents, a Coderwall 'endorse' button will be
 added beside author names if a author-name-to-coderwall-user mapping has been
@@ -175,7 +172,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Yanick Champoux.
+This software is copyright (c) 2025 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

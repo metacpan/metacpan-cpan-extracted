@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::Plugin::Breaks; # git description: v0.003-23-gd774732
+package Dist::Zilla::Plugin::Breaks; # git description: v0.004-7-gf1353f4
+# vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Add metadata about potential breakages caused by your distribution
 # KEYWORDS: distribution metadata prerequisites upstream dependencies modules conflicts breaks breakages
-# vim: set ts=8 sts=4 sw=4 tw=115 et :
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 use Moose;
 with 'Dist::Zilla::Role::MetaProvider';
@@ -81,7 +81,7 @@ Dist::Zilla::Plugin::Breaks - Add metadata about potential breakages caused by y
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -188,7 +188,7 @@ L<http://dzil.org/#mailing-list>.
 There is also an irc channel available for users of this distribution, at
 L<C<#distzilla> on C<irc.perl.org>|irc://irc.perl.org/#distzilla>.
 
-I am also usually active on irc, as 'ether' at C<irc.perl.org>.
+I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.libera.chat>.
 
 =head1 AUTHOR
 

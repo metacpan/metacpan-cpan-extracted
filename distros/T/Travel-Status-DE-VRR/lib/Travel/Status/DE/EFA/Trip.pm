@@ -9,7 +9,7 @@ use Travel::Status::DE::EFA::Stop;
 
 use parent 'Class::Accessor';
 
-our $VERSION = '3.14';
+our $VERSION = '3.15';
 
 Travel::Status::DE::EFA::Trip->mk_ro_accessors(
 	qw(operator product product_class name line number type id dest_name dest_id)
@@ -78,8 +78,19 @@ sub polyline {
 		$distance = GIS::Distance->new;
 	};
 
+	# Ggf. sollte die Abbildung andersrum laufen: Im zweiten Schritt durch die
+	# Polyline iterieren und Stops zuordnen (d.h. polyline_i als Key); bei
+	# Bedarf Polyline-Indexe duplizieren. Lässt sich wunderbar an der Linie
+	# 101/106 in Essen testen (3x Helenenstr, davon 2x am Anfang und 1x
+	# mittendrin).
+
 	if ($distance) {
 		my %min_dist;
+
+		# A single trip may pass the same stop multiple times, meaning that
+		# stop IDs alone are not guaranteed to be unique. So we need to use a
+		# stop's index in the trip's route as key in addition to the stop's ID.
+		my $route_i = 0;
 		for my $stop ( $self->route ) {
 			for my $polyline_index ( 0 .. $#{ $self->{polyline} } ) {
 				my $pl   = $self->{polyline}[$polyline_index];
@@ -88,21 +99,41 @@ sub polyline {
 					$stop->{latlon}[1],
 					$pl->{lat}, $pl->{lon}
 				);
-				if ( not $min_dist{ $stop->{id_code} }
-					or $min_dist{ $stop->{id_code} }{dist} > $dist )
+				my $key = $route_i . ';' . $stop->{id_code};
+				if ( not $min_dist{$key}
+					or $min_dist{$key}{dist} > $dist )
 				{
-					$min_dist{ $stop->{id_code} } = {
+					$min_dist{$key} = {
 						dist  => $dist,
 						index => $polyline_index,
 					};
 				}
 			}
+			$route_i += 1;
 		}
+		$route_i = 0;
 		for my $stop ( $self->route ) {
-			if ( $min_dist{ $stop->{id_code} } ) {
-				$self->{polyline}[ $min_dist{ $stop->{id_code} }{index} ]{stop}
+			my $key = $route_i . ';' . $stop->{id_code};
+			if ( $min_dist{$key} ) {
+				if ( defined $self->{polyline}[ $min_dist{$key}{index} ]{stop} )
+				{
+					warn(
+"$key: overwriting stop ref at $min_dist{$key}{index} with $key"
+					);
+
+					# XXX experimental and untested
+					# one polyline entry maps to multiple stops → duplicate it; insert $stop after the already-present entry
+					#$min_dist{$key}{index} += 1;
+					#splice(
+					#	@{ $self->{polyline} },
+					#	$min_dist{$key}{index},
+					#	0, { %{ $self->{polyline}[ $min_dist{$key}{index} ] } }
+					#);
+				}
+				$self->{polyline}[ $min_dist{$key}{index} ]{stop}
 				  = $stop;
 			}
+			$route_i += 1;
 		}
 	}
 
@@ -207,7 +238,7 @@ trip
 
 =head1 VERSION
 
-version 3.14
+version 3.15
 
 =head1 DESCRIPTION
 

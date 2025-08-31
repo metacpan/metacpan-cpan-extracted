@@ -1,3 +1,67 @@
+1.130 2025-08-30
+================
+
+[Quiq::AnsiColor]
+* Doku bearbeitet
+
+[Quiq::Config]
+* new(): Doku bearbeitet, Fehlermeldung verbessert
+
+[Quiq::Hash]
+* setDeep(): verbessert
+
+[Quiq::Mustang]
+* getResult(): Format html hinzugefügt
+
+[Quiq::Path]
+* getFirst(): Exception verbessert
+
+[Quiq::Tree]
+* blessNodes(): Behandlung von Skalarreferenzen ergänzt
+
+[Quiq::Url]
+* queryEncode(): Option -append hinzugefügt
+
+[Quiq::Mustang]
+* business-rule.txt: Schreibung Business Test korrigiert
+
+[Quiq::Sdoc::Producer]
+* link(), linkDefs(): Attribut target hinzugefügt
+* segment(): Metode hinzugefügt
+
+[Quiq::StreamServe::Block]
+* add(), content(): Methoden hinzugefügt
+* get(): Option sloppy hinzugefügt
+
+[Quiq::StreamServe::Stream]
+* new(): Optionen -debug und -ignore hinzugefügt
+* split(): Doku hinzugefügt
+
+[Quiq::Test::Class]
+* Doku ergänzt
+
+[Quiq::Zugferd]
+* Doku bearbeitet
+* toXml(): Methode hinzugefügt
+* en16941/template.xml: Platzhalter hinzugefügt
+* Business-group.csv: ergänzt
+* Business-term.csv: ergänzt
+
+[Quiq::Zugferd::Entity::Rechnung]
+* Klasse hinzugefügt
+
+[Quiq::Zugferd::Entity::Verkaufer]
+* Klasse hinzugefügt
+
+[Quiq::Zugferd::Entity::Kaeufer]
+* Klasse hinzugefügt
+
+[Quiq::Zugferd::Entity::Empfaenger]
+* Klasse hinzugefügt
+
+[Quiq::Zugferd::Entity::Tree]
+* processSubTree(): Methode hinzugefügt
+
 1.229 2025-07-12
 ================
 

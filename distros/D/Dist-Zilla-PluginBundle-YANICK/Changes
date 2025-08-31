@@ -1,5 +1,13 @@
 Revision history for Dist-Zilla-PluginBundle-YANICK
 
+0.32.1 2025-08-30
+ [DOCUMENTATION]
+ - add a SECURITY.md policy.
+ - add a CONTRIBUTING.md policy to the repo.
+
+ [STATISTICS]
+ - code churn: 6 files changed, 224 insertions(+), 10 deletions(-)
+
 0.32.0 2025-06-25
  [ENHANCEMENTS]
  - Default development branch is now 'main'.

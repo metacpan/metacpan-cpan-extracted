@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v1.0.3
+## Version v1.0.5
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2025/07/31
+## Modified 2025/08/31
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -99,7 +99,7 @@ BEGIN
         (?<ver>(?^:\.[0-9]+) (?^:_[0-9]+)?)
         )
     )/;
-    our $VERSION     = 'v1.0.3';
+    our $VERSION     = 'v1.0.5';
 };
 
 use v5.26.1;
@@ -4841,7 +4841,9 @@ sub _set_get_hash_as_mix_object : lvalue
                     $self->_load_class( 'Module::Generic::Hash' ) ||
                         return( $self->pass_error );
                     local $Module::Generic::Hash::DEBUG = $self->debug;
-                    my $o = Module::Generic::Hash->new( $data->{ $field } );
+                    # my $o = Module::Generic::Hash->new( $data->{ $field } );
+                    my $o = Module::Generic::Hash->new ||
+                        return( $self->pass_error( Module::Generic::Hash->error ) );
                     return( $o );
                 }
                 return;
@@ -4872,6 +4874,11 @@ sub _set_get_hash_as_mix_object : lvalue
                 elsif( ref( $_[0] ) eq 'Module::Generic::Hash' )
                 {
                     $arg = $_[0]->clone;
+                }
+                # or, maybe this is a subclass of Module::Generic::Hash ?
+                elsif( $self->_is_a( $_[0] => 'Module::Generic::Hash' ) )
+                {
+                    $arg = $_[0];
                 }
                 elsif( !( @_ % 2 ) )
                 {
@@ -4910,12 +4917,19 @@ sub _set_get_hash_as_mix_object : lvalue
                 $self->clear_error;
                 return( $data->{ $field } = $val );
             }
+            # or, maybe this is a subclass of Module::Generic::Hash ?
+            elsif( $self->_is_a( $val => 'Module::Generic::Hash' ) )
+            {
+                $self->clear_error;
+                return( $data->{ $field } = $val );
+            }
             else
             {
                 $self->_load_class( 'Module::Generic::Hash' ) ||
                     return( $self->pass_error );
                 local $Module::Generic::Hash::DEBUG = $self->debug;
-                $data->{ $field } = Module::Generic::Hash->new( $val );
+                $data->{ $field } = Module::Generic::Hash->new( $val ) ||
+                    return( $self->pass_error( Module::Generic::Hash->error ) );
             }
 
             if( !defined( $data->{ $field } ) )
@@ -4927,7 +4941,9 @@ sub _set_get_hash_as_mix_object : lvalue
                     $self->_load_class( 'Module::Generic::Hash' ) ||
                         return( $self->pass_error );
                     local $Module::Generic::Hash::DEBUG = $self->debug;
-                    my $o = Module::Generic::Hash->new( $data->{ $field } );
+                    # my $o = Module::Generic::Hash->new( $data->{ $field } );
+                    my $o = Module::Generic::Hash->new ||
+                        return( $self->pass_error( Module::Generic::Hash->error ) );
                     $self->clear_error;
                     return( $o );
                 }
@@ -4939,7 +4955,8 @@ sub _set_get_hash_as_mix_object : lvalue
                 $self->_load_class( 'Module::Generic::Hash' ) ||
                     return( $self->pass_error );
                 local $Module::Generic::Hash::DEBUG = $self->debug;
-                my $o = Module::Generic::Hash->new( $data->{ $field } );
+                my $o = Module::Generic::Hash->new( $data->{ $field } ) ||
+                    return( $self->pass_error( Module::Generic::Hash->error ) );
                 $data->{ $field } = $o;
             }
             $self->clear_error;
@@ -11769,7 +11786,7 @@ Quick way to create a class with feature-rich methods
 
 =head1 VERSION
 
-    v1.0.3
+    v1.0.5
 
 =head1 DESCRIPTION
 

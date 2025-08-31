@@ -1,30 +1,37 @@
 Revision history for Language::l33t
 
-1.0.1 2016-11-26
-  - Stop using SemiAffordance accessors. 
-  - Switch Method::Signatures for bona fide signatures.
-  - Switch to Type::Tiny.
-  - Switch from Moose to Moo.
-  - Use MooseX::MungeHas.
-  - Switch from Readonly to Const::Fast.
+1.0.2 2025-08-30
+ [BUG FIXES]
+ - Minor refactorings.
 
-  [ STATISTICS ]
-    - code churn: 6 files changed, 209 insertions(+), 108 deletions(-)
+ [STATISTICS]
+ - code churn: 7 files changed, 292 insertions(+), 26 deletions(-)
+
+1.0.1 2016-11-26
+ - Stop using SemiAffordance accessors. 
+ - Switch Method::Signatures for bona fide signatures.
+ - Switch to Type::Tiny.
+ - Switch from Moose to Moo.
+ - Use MooseX::MungeHas.
+ - Switch from Readonly to Const::Fast.
+
+ [STATISTICS]
+ - code churn: 6 files changed, 209 insertions(+), 108 deletions(-)
 
 1.0.0 2013-03-04
-  - conversion to Moose.
-  - added the language specs, as the original webpage is gone.
+ - conversion to Moose.
+ - added the language specs, as the original webpage is gone.
 
 0.03 Jul 3, 2006
-  - Remove depedency to IO::String
+ - Remove depedency to IO::String
 
 0.02 Jul 2, 2006
-  - Promoted to Language::l33t, yay!
-  - opcode CON now working
-  - Fixed nested IF/EIFs
-  - Added support for Makefile.PL
-  - Added module depedencies
-  - Beefed up the pod documentation.
+ - Promoted to Language::l33t, yay!
+ - opcode CON now working
+ - Fixed nested IF/EIFs
+ - Added support for Makefile.PL
+ - Added module depedencies
+ - Beefed up the pod documentation.
 
 0.01 Jun 25, 2006
-  - First version, released on an unsuspecting world.
+ - First version, released on an unsuspecting world.

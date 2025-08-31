@@ -11,7 +11,7 @@ use Test::Builder;
 use Exporter 'import';
 
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 our @EXPORT_OK = qw(file_is);
 
@@ -58,7 +58,7 @@ Test::File::Cmp - Test routine for file comparison independent of CRLF or LF lin
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 
 =head1 SYNOPSIS
@@ -66,7 +66,7 @@ Version 0.05
     use Test::File::Cmp qw(file_is);
 
     # ...
-    file_is(got_file, $expected_file);
+    file_is($got_file, $expected_file);
     # ...
 
 =head1 DESCRIPTION
@@ -153,6 +153,7 @@ the same terms as the Perl 5 programming language system itself.
 =head1 SEE ALSO
 
 L<Test::Builder>,
+L<Test::File::Content>,
 L<Test::File::Contents>,
 L<Test::More>
 

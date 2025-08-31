@@ -287,5 +287,11 @@
       <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2018-10-08</dc:issued>
     </Version>
   </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2.03</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2024-08-24</dc:issued>
+    </Version>
+  </release>
   <programming-language>Perl</programming-language>
 </Project>

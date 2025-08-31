@@ -1,6 +1,19 @@
 # noss
+
+![noss](img/noss-logo.png)
+
 **noss** is a command-line RSS/Atom feed reader and aggregator written in
 Perl.
+
+## Installing
+**noss** has been packaged for the following repositories:
+* CPAN: <https://metacpan.org/dist/WWW-Noss>
+* Alpine Linux: <https://pkgs.alpinelinux.org/package/edge/testing/x86_64/perl-www-noss>
+* Slackware Linux (SBo): <https://slackbuilds.org/repository/15.0/network/noss/>
+
+If you cannot install **noss** through any of the above repositories, you can
+try building **noss** from source by following the instructions provided in
+the [Building](#Building) section below.
 
 ## Building
 **noss** should be able to run on most Unix-like and Windows systems.

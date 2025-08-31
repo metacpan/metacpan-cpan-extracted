@@ -27,7 +27,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.229';
+our $VERSION = '1.230';
 
 use Quiq::Hash;
 
@@ -76,19 +76,75 @@ sub new {
 
     return $class->SUPER::new(
         prefix => $prefix,
-        hash => Quiq::Hash->new($h)->unlockKeys,
+        hash => Quiq::Hash->new($h),
+        read => {}, # Gelesene Elemente
     );
 }
 
 # -----------------------------------------------------------------------------
 
-=head2 Objektnmethoden
+=head2 Objektmethoden
+
+=head3 add() - Setze Schlüssel/Wert-Paar ohne Exception
+
+=head4 Synopsis
+
+  $ssb->add($key,$val);
+
+=head4 Description
+
+Ist der Schlüssel vorhanden, wird sein Wert gesetzt. Ist er nicht
+vorhanden wird er mit dem angegebenen Wert hinzugefügt.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub add {
+    my ($self,$key,$val) = @_;
+
+    $self->hash->add($key,$val);
+
+    return;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 content() - Inhalt des Blocks
+
+=head4 Synopsis
+
+  $text =  $ssb->content;
+
+=head4 Description
+
+Liefere den Inhalt des Blocks als Text. Die Schlüssel sind alphanumerisch
+sortiert.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub content {
+    my $self = shift;
+
+    my $h = $self->hash;
+
+    my $text = '';
+    for my $key (sort $h->keys) {
+        $text .= sprintf "%9s %s\n",$key,$h->{$key};
+    }
+
+    return $text;
+}
+
+# -----------------------------------------------------------------------------
 
 =head3 set() - Setze Schlüssel/Wert-Paar
 
 =head4 Synopsis
 
-  $ssb = $class->set($key,$val);
+  $ssb->set($key,$val);
 
 =cut
 
@@ -98,6 +154,7 @@ sub set {
     my ($self,$key,$val) = @_;
 
     $self->hash->set($key,$val);
+
     return;
 }
 
@@ -108,13 +165,44 @@ sub set {
 =head4 Synopsis
 
   $val = $ssb->get($key);
+  $val = $ssb->get($key,$sloppy);
+
+=head4 Arguments
+
+=over 4
+
+=item $key
+
+Schlüssel
+
+=back
+
+=head4 Options
+
+=over 4
+
+=item $sloppy (Default: 0)
+
+Wirf bei Nichtexistenz von $key keine Exception, sondern liefere C<undef>.
+
+=back
 
 =cut
 
 # -----------------------------------------------------------------------------
 
 sub get {
-    my ($self,$key) = @_;
+    my ($self,$key,$sloppy) = @_;
+
+    $self->read->{$key} = 1; # Element wurde gelesen
+
+    if ($sloppy) {
+        local $@;
+        eval {$self->hash->get($key)};
+        if ($@) {
+            return undef;
+        }
+    }
 
     return $self->hash->get($key);
 }
@@ -137,7 +225,7 @@ sub get {
 
 =head1 VERSION
 
-1.229
+1.230
 
 =head1 AUTHOR
 

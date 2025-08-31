@@ -13,69 +13,6 @@ use constant MIN_MAKEMAKER_VERSION => 6.64;
 use constant RUNNING_ON_WINDOWS => ($^O =~ /^(mswin|dos|os2)/oi);
 use constant HAS_DBI => eval { require DBI; };
 
-my @ATT_KEYS = (
-  # PLEASE READ THE FILE 'PACKAGING' FOR INFORMATION ON THESE VARIABLES.
-  #
-  # (Current) EU::MMs make a difference between these three possible general
-  # install destinations. One can set INSTALLDIRS to 'perl', 'site' or
-  # 'vendor' to choose one explicitly (the default is 'site'). They have the
-  # following meaning:
-  #  * PERL:    Only essential modules shipped with Perl should be installed
-  #             there. Don't put Apache SpamAssassin there.
-  #  * SITE:    The default. Normal installations via CPAN or from the sources
-  #             should use these dirs.
-  #  * VENDOR:  A special set of paths for packaged (RPM, deb, portage, ...)
-  #             Perl modules. Not always (correctly) used but the intention
-  #             is to keep the system from overwriting the modules installed
-  #             by the user.
-  #
-  # See also
-  # <http://search.cpan.org/author/MSCHWERN/ExtUtils-MakeMaker-6.16/lib/ExtUtils/MakeMaker.pm#Default_Makefile_Behaviour>
-  # <http://www.debian.org/doc/packaging-manuals/perl-policy/ch-module_packages.html#s-vendor_dirs>
-  # <http://archive.develooper.com/perl5-porters@perl.org/msg94113.html>
-  # <https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=78053>
-  # <http://www.mail-archive.com/makemaker@perl.org/msg00779.html>
-  #
-  # The options SYSCONFDIR, DATADIR and CONFDIR all support those three
-  # possibilities. The '*' in the following comments refers to those.
-
-  'SYSCONFDIR',       # Overwrite all $*SYSCONFDIRs; normally determined
-  'PERLSYSCONFDIR',   # based on $*PREFIX.
-  'SITESYSCONFDIR',   #
-  'VENDORSYSCONFDIR', #
-
-  'DATADIR',          # Overwrite all INSTALL*DATAs; normally determined
-  'INSTALLDATA',      # based on $*PREFIX.
-  'INSTALLSITEDATA',  #
-  'INSTALLVENDORDATA',#
-
-  'CONFDIR',          # Overwrite all INSTALL*CONFs; normally determined
-  'INSTALLCONF',      # based on $*SYSCONFDIR.
-  'INSTALLSITECONF',  #
-  'INSTALLVENDORCONF',#
-
-  'DEFRULESDIR',      # A synonym for 'DATADIR'.
-  'LOCALRULESDIR',    # " "       "   'CONFDIR'.
-
-  'LOCALSTATEDIR',    # normally determined based on $*PREFIX.
-  'PERLLOCALSTATEDIR', 
-  'SITELOCALSTATEDIR', 
-  'VENDORLOCALSTATEDIR',
-
-  'RE2C_BIN',         # hard code the path for re2c if possible
-
-  'PERL_BIN',         # Sets the Perl interpreter used by the scripts.
-  'PERL_WARN',        # Can be used to disable warnings in the scripts
-  'PERL_TAINT',       # "   "  "    "  "    taint mode for the scripts (DON'T)
-
-
-  'BUILD_SPAMC'  ,    # Set to 'no' to skip build of spamc on Windows.
-  'BUILD_SPAMD',      # Set to 'no' to skip build of spamd on Windows.
-  'ENABLE_SSL',       # Set to 'yes' to build spamc with SSL support.
-  'CONTACT_ADDRESS',  # To not ask for the contact address, use this.
-);
-
-
 sub parse_arg {
   my($val, $name) = (@_);
   if ($val =~ /^($name)=["']?(.*?)["']?$/) {
@@ -175,7 +112,6 @@ my %makefile = (
     'PREREQ_PM' => {
         'File::Spec'           => 0.8,           # older versions lack some routines we need
         'File::Copy'           => 2.02,          # this version is shipped with 5.005_03, the oldest version known to work
-        'File::Temp'           => 0,             # core module, dependency not needed, here for testing purposes, see bug 8089
         'Pod::Usage'           => 1.10,          # all versions prior to this do seem to be buggy
         'HTML::Parser'         => 3.43,          # the HTML code is based on this parser, older versions have utf-8 bugs
         'Archive::Tar'         => 1.23,          # for sa-update
@@ -202,8 +138,6 @@ my %makefile = (
     # The modules that are not core or that require a minimum version that are used in default tests
     'TEST_REQUIRES' => {
         'Test::Simple' => 1.302067,
-        'Perl::Critic::Policy::TestingAndDebugging::ProhibitNoStrict' => 0,
-        'Perl::Critic::Policy::Perlsecret' => 0,
     },
 
     'LICENSE' => 'apache_2_0',
@@ -356,7 +290,7 @@ $makefile{META_MERGE} = {
   resources => {
     license     => 'http://www.apache.org/licenses/LICENSE-2.0.html',
     homepage    => 'https://spamassassin.apache.org/',
-    bugtracker  => 'https://issues.apache.org/SpamAssassin/',
+    bugtracker  => 'https://bz.apache.org/SpamAssassin/',
     repository  => { 
 			url=>'http://svn.apache.org/repos/asf/spamassassin/',
 			type=>'svn'
@@ -375,6 +309,7 @@ $makefile{META_MERGE} = {
         'Mail::SPF' =>                 0,
         'MaxMind::DB::Reader' =>       0,
         'MaxMind::DB::Reader::XS' =>   0,
+        'IP::Geolocation:MMDB' =>      0,
         'Geo::IP' =>                   0,
         'IP::Country::DB_File' =>      0,
         'IP::Country::Fast' =>         0,
@@ -516,7 +451,7 @@ sub macro_ref {
 # If it is omitted, the value set in the current EU::MM instance is used.
 sub macro_def {
   my($name, $val) = (@_, undef);
-  my $MUST_NOT_HAPPEN = "THIS MUST NOT HAPPEN. PLEASE REPORT A BUG VIA <https://issues.apache.org/SpamAssassin/>";
+  my $MUST_NOT_HAPPEN = "THIS MUST NOT HAPPEN. PLEASE REPORT A BUG VIA <https://bz.apache.org/SpamAssassin/>";
   die $MUST_NOT_HAPPEN  unless defined $name;
   die $MUST_NOT_HAPPEN  unless defined $EQ;
   $val = $SELF->{$name} unless defined $val;
@@ -1163,6 +1098,7 @@ conf__install:
 	$(PERL) -MFile::Copy -e "copy(q[rules/v343.pre], q[$(B_CONFDIR)/v343.pre]) unless -f q[$(B_CONFDIR)/v343.pre]"
 	$(PERL) -MFile::Copy -e "copy(q[rules/v400.pre], q[$(B_CONFDIR)/v400.pre]) unless -f q[$(B_CONFDIR)/v400.pre]"
 	$(PERL) -MFile::Copy -e "copy(q[rules/v401.pre], q[$(B_CONFDIR)/v401.pre]) unless -f q[$(B_CONFDIR)/v401.pre]"
+	$(PERL) -MFile::Copy -e "copy(q[rules/v402.pre], q[$(B_CONFDIR)/v402.pre]) unless -f q[$(B_CONFDIR)/v402.pre]"
 
 data__install:
 	-$(MKPATH) $(B_DATADIR)

@@ -437,7 +437,8 @@ sub parse_received_line {
   }
   # Communigate Pro - Bug 6495 adds HTTP as possible transmission method
   # 	Bug 7277: XIMSS used by Pronto and other custom apps, IMAP supports XMIT extension
-  elsif (/CommuniGate Pro (HTTP|SMTP|XIMSS|IMAP)/ && / \(account /) {
+  # 	Bug 8329: CommuniGate Pro has been rebranded into CommuniGate SPEC
+  elsif (/CommuniGate (?:Pro|SPEC) (HTTP|SMTP|XIMSS|IMAP)/ && / \(account /) {
     $auth = 'Communigate';
   }
   # Microsoft Exchange (complete with syntax error)
@@ -911,7 +912,7 @@ sub parse_received_line {
     }
 
     # Let's try to support a few qmailish formats in one;
-    # http://issues.apache.org/SpamAssassin/show_bug.cgi?id=2744#c14 :
+    # http://bz.apache.org/SpamAssassin/show_bug.cgi?id=2744#c14 :
     # Received: from unknown (HELO feux01a-isp) (213.199.4.210) by totor.bouissou.net with SMTP; 1 Nov 2003 07:05:19 -0000 
     # Received: from adsl-207-213-27-129.dsl.lsan03.pacbell.net (HELO merlin.net.au) (Owner50@207.213.27.129) by totor.bouissou.net with SMTP; 10 Nov 2003 06:30:34 -0000 
     if (/^(\S+) \((?:HELO|EHLO) ([^\)]*)\) \((\S*@)?\[?(${IP_ADDRESS})\]?\).* by (\S+) /)
@@ -1012,7 +1013,11 @@ sub parse_received_line {
     # Received: from host.example.com ([192.0.2.1] verified)
     # by mail.example.net (CommuniGate Pro SMTP 5.1.13)
     # with ESMTP id 9786656 for user@example.net; Thu, 27 Mar 2008 15:08:17 +0600
-    if (/ \(CommuniGate Pro/ && /^(\S+) \(\[(${IP_ADDRESS})\] verified\) by (\S+) \(/) {
+    #
+    # Received: from host.example.com ([192.0.2.1] verified)
+    # by mail.example.net (CommuniGate SPEC SMTP 8.0.7)
+    # with ESMTP id 9786656 for user@example.net; Thu, 27 Mar 2008 15:08:17 +0600
+    if (/ \(CommuniGate (?:Pro|SPEC)/ && /^(\S+) \(\[(${IP_ADDRESS})\] verified\) by (\S+) \(/) {
       $mta_looked_up_dns = 1;
       $rdns = $1; $helo = $1; $ip = $2; $by = $3; goto enough;
     }

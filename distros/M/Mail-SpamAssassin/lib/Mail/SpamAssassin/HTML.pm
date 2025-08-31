@@ -28,6 +28,7 @@ use HTML::Parser 3.43 ();
 use Mail::SpamAssassin::Logger;
 use Mail::SpamAssassin::Constants qw(:sa);
 use Mail::SpamAssassin::Util qw(untaint_var);
+use Mail::SpamAssassin::HTML::Color;
 
 our @ISA = qw(HTML::Parser);
 
@@ -52,7 +53,7 @@ my %tricks = map {; $_ => 1 }
 
 # elements that change text style
 my %elements_text_style = map {; $_ => 1 }
-  qw( body font table tr th td big small basefont marquee span p div a ),
+  qw( body font table tr th td big small marquee span p div a strong em b i sup sub ),
 ;
 
 # elements that insert whitespace
@@ -73,7 +74,6 @@ my %elements_uri = map {; $_ => 1 }
 
 # permitted element attributes
 my %ok_attributes;
-$ok_attributes{basefont}{$_} = 1 for qw( color face size );
 $ok_attributes{body}{$_} = 1 for qw( text bgcolor link alink vlink background );
 $ok_attributes{font}{$_} = 1 for qw( color face size );
 $ok_attributes{marquee}{$_} = 1 for qw( bgcolor background );
@@ -85,6 +85,28 @@ $ok_attributes{span}{$_} = 1 for qw( style );
 $ok_attributes{p}{$_} = 1 for qw( style );
 $ok_attributes{div}{$_} = 1 for qw( style );
 $ok_attributes{a}{$_} = 1 for qw( style );
+$ok_attributes{strong}{$_} = 1 for qw( style );
+$ok_attributes{em}{$_} = 1 for qw( style );
+$ok_attributes{b}{$_} = 1 for qw( style );
+$ok_attributes{i}{$_} = 1 for qw( style );
+$ok_attributes{big}{$_} = 1 for qw( style );
+$ok_attributes{small}{$_} = 1 for qw( style );
+$ok_attributes{sup}{$_} = 1 for qw( style );
+$ok_attributes{sub}{$_} = 1 for qw( style );
+
+# Map font "size" attribute to font size in pixels
+my @font_size_map = (undef, 10, 13, 16, 18, 24, 32, 48);
+
+# Map font-size keyword to font size in pixels
+my %font_keyword_map = (
+  'xx-small' => 9,
+  'x-small' => 10,
+  'small' => 13,
+  'medium' => 16,
+  'large' => 18,
+  'x-large' => 24,
+  'xx-large' => 32,
+);
 
 sub new {
   my ($class, $character_semantics_input, $character_semantics_output) = @_;
@@ -113,11 +135,10 @@ sub html_start {
   $self->put_results(html => 1);
 
   # initial display attributes
-  $self->{basefont} = 3;
   my %default = (tag => "default",
-		 fgcolor => "#000000",
-		 bgcolor => "#ffffff",
-		 size => $self->{basefont});
+		 fgcolor => Mail::SpamAssassin::HTML::Color->new("black"),
+		 bgcolor => Mail::SpamAssassin::HTML::Color->new("white"),
+		 font_size => 16);
   push @{ $self->{text_style} }, \%default;
 }
 
@@ -220,8 +241,8 @@ sub parse {
 
   $self->{image_area} = 0;
   $self->{title_index} = -1;
-  $self->{max_size} = 3;	# start at default size
-  $self->{min_size} = 3;	# start at default size
+  $self->{max_size} = 16;	# start at default size
+  $self->{min_size} = 16;	# start at default size
   $self->{closed_html} = 0;
   $self->{closed_body} = 0;
   $self->{closed_extra} = 0;
@@ -507,14 +528,6 @@ sub text_style {
       # TODO: skip if we've already seen body
     }
 
-    # change basefont (only change size)
-    if ($tag eq "basefont" &&
-	exists $attr->{size} && $attr->{size} =~ /^\s*(\d+)/)
-    {
-      $self->{basefont} = $1;
-      return;
-    }
-
     # close elements with optional end tags
     $self->close_table_tag($tag) if ($tag eq "td" || $tag eq "tr");
 
@@ -526,14 +539,10 @@ sub text_style {
 
     # big and small tags
     if ($tag eq "big") {
-      $new{size} += 1;
-      push @{ $self->{text_style} }, \%new;
-      return;
+      $new{font_size} *= 1.2;
     }
     if ($tag eq "small") {
-      $new{size} -= 1;
-      push @{ $self->{text_style} }, \%new;
-      return;
+      $new{font_size} /= 1.2;
     }
 
     # tag attributes
@@ -541,90 +550,112 @@ sub text_style {
       next unless exists $ok_attributes{$tag}{$name};
       if ($name eq "text" || $name eq "color") {
 	# two different names for text color
-	$new{fgcolor} = name_to_rgb($attr->{$name});
+        eval {
+          $new{fgcolor} = Mail::SpamAssassin::HTML::Color->new($attr->{$name});
+          1;
+        } or do {
+          $self->put_results(font_invalid_color => 1);
+        }
+      }
+      elsif ($name eq "bgcolor") {
+        eval {
+          $new{bgcolor} = Mail::SpamAssassin::HTML::Color->new($attr->{bgcolor});
+          1;
+        } or do {
+          $self->put_results(font_invalid_color => 1);
+        }
       }
       elsif ($name eq "size") {
+        my $size;
 	if ($attr->{size} =~ /^\s*([+-]\d+)/) {
 	  # relative font size
-	  $new{size} = $self->{basefont} + $1;
+          $size = 3 + $1;
 	}
 	elsif ($attr->{size} =~ /^\s*(\d+)/) {
 	  # absolute font size
-	  $new{size} = $1;
+	  $size = $1;
+        }
+        if (defined($size)) {
+          if ($size < 1) {
+            $size = 1;
+            $self->put_results(font_invalid_size => 1);
+          } elsif ($size > 7) {
+            $size = 7;
+            $self->put_results(font_invalid_size => 1);
+          }
+          $new{font_size} = $font_size_map[$size];
+        } else {
+          $self->put_results(font_invalid_size => 1);
         }
       }
       elsif ($name eq 'style') {
         $new{style} = $attr->{style};
 	my @parts = split(/;/, $new{style});
 	foreach (@parts) {
-	  if (/^\s*(background-)?color:\s*(.+?)\s*$/i) {
-	    my $whcolor = $1 ? 'bgcolor' : 'fgcolor';
-	    my $value = lc $2;
-	    # prevent parsing of the valid CSS3 property value as
-	    # 'invalid color' (Bug 7892)
-	    $value =~ s/\s*!\s*important$//;
+          s/\s*!\s*important$//i; # Remove !important flag
+          if (/^\s*(background-)?color:\s*(.+?)\s*$/i) {
+            my $whcolor = $1 ? 'bgcolor' : 'fgcolor';
+            my $value = lc($2);
 
-	    if (index($value, 'rgb') >= 0) {
-	      $value =~ tr/0-9,//cd;
-	      my @rgb = split(/,/, $value);
-              $new{$whcolor} = sprintf("#%02x%02x%02x",
-                                       map { !$_ ? 0 : $_ > 255 ? 255 : $_ }
-                                           @rgb[0..2]);
+            if ($value eq 'currentcolor') {
+              # inherit color from parent foreground
+              $new{$whcolor} = $self->{text_style}[-1]->{fgcolor};
+            } elsif ($value ne 'inherit') {
+              eval {
+                $new{$whcolor} = Mail::SpamAssassin::HTML::Color->new($value);
+                1;
+              } or do {
+                $self->put_results(font_invalid_color => 1);
+              }
             }
-            elsif ($value eq 'inherit') {
-              # do nothing, just prevent parsing of the valid
-              # CSS3 property value as 'invalid color' (Bug 7778)
-            }
-            elsif ($value eq 'transparent') {
-              # keep for now, handle outside the loop (Bug 8205)
-              $new{$whcolor} = $value;
-            }
-	    else {
-	      $new{$whcolor} = name_to_rgb($value);
-	    }
-	  }
-          elsif (/^\s*background:\s*(.+?)\s*$/) {
+          }
+          elsif (/^\s*background:\s*(.+?)\s*$/i) {
             # parse CSS background property (Bug 8210)
-            my $layers = parse_css_background(lc($1));
+            my $layers = parse_css_background($1);
             # loop through values in the bottom layer and look for valid colors
             for my $value (@{$layers->[-1]}) {
-              my $color = name_to_rgb($value);
-              if ($color ne 'invalid') {
+              if (lc($value) eq 'currentcolor') {
+                # inherit color from parent foreground
+                $new{bgcolor} = $self->{text_style}[-1]->{fgcolor};
+                last;
+              }
+              my $color = eval { Mail::SpamAssassin::HTML::Color->new($value) };
+              if (defined $color) {
                 $new{bgcolor} = $color;
                 last;
               }
             }
-
 	  }
+          elsif (/^\s*font-size:\s*(.+?)\s*$/i) {
+            eval {
+              $new{font_size} = $self->parse_font_size($1);
+              1;
+            } or do {
+              $self->put_results(font_invalid_size => 1);
+            }
+          }
 	  elsif (/^\s*([a-z_-]+)\s*:\s*(\S.*?)\s*$/i) {
 	    # "display: none", "visibility: hidden", etc.
-	    $new{'style_'.$1} = $2;
+	    $new{'style_'.lc($1)} = lc($2);
 	  }
 	}
-        # Handle transparent colors (Bug 8205)
-        if ($new{bgcolor} eq 'transparent') {
-          # replace with parent's bgcolor
-          $new{bgcolor} = $self->{text_style}[-1]->{bgcolor};
-        }
-        if ($new{fgcolor} eq 'transparent') {
-          # replace with current bgcolor
-          $new{fgcolor} = $new{bgcolor};
-        }
-      }
-      elsif ($name eq "bgcolor") {
-	# overwrite with hex value, $new{bgcolor} is set below
-        $attr->{bgcolor} = name_to_rgb($attr->{bgcolor});
       }
       else {
         # attribute is probably okay
 	$new{$name} = $attr->{$name};
       }
 
-      if ($new{size} > $self->{max_size}) {
-	$self->{max_size} = $new{size};
+      # blend new background color with parent background color
+      # Note: blending has no effect if the color is opaque (alpha = 1)
+      $new{bgcolor}->blend($self->{text_style}[-1]->{bgcolor});
+      # blend new text color with new background color
+      $new{fgcolor}->blend($new{bgcolor});
+
+      if ($new{font_size} > $self->{max_size}) {
+	$self->{max_size} = $new{font_size};
       }
-      elsif ($new{size} < $self->{min_size}) {
-	$self->{min_size} = $new{size};
+      elsif ($new{font_size} < $self->{min_size}) {
+	$self->{min_size} = $new{font_size};
       }
     }
     push @{ $self->{text_style} }, \%new;
@@ -724,54 +755,66 @@ sub parse_css_background {
 
 }
 
+# Parses a font-size value.
+# Returns the size in pixels.
+sub parse_font_size {
+  my $self = shift;
+  my $size = lc(shift);
+
+  $size =~ s/^\s+|\s+$//g; # trim whitespace
+
+  if ($size =~ /^([\d.]+)\s*(px|pt|r?em|ex|%)?$/) {
+    my $value = $1;
+    my $unit = $2 // 'px';
+    if ($unit eq 'px') {
+      return $value;
+    }
+    elsif ($unit eq 'pt') {
+      return $value * 1.33;
+    }
+    elsif ($unit eq 'em') {
+      return $value * $self->{text_style}[-1]->{font_size};
+    }
+    elsif ($unit eq 'rem') {
+      return $value * 16;
+    }
+    elsif ($unit eq 'ex') {
+      return $value * 7;
+    }
+    elsif ($unit eq '%') {
+      return $value / 100 * $self->{text_style}[-1]->{font_size};
+    }
+  }
+  elsif (exists($font_keyword_map{$size})) {
+    return $font_keyword_map{lc $size};
+  }
+  elsif ($size eq 'larger') {
+    return $self->{text_style}[-1]->{font_size} * 1.2;
+  }
+  elsif ($size eq 'smaller') {
+    return $self->{text_style}[-1]->{font_size} / 1.2;
+  }
+  elsif ($size eq 'inherit') {
+    return $self->{text_style}[-1]->{font_size};
+  }
+  elsif ($size eq 'initial') {
+    return 16;
+  }
+
+  die "Invalid font size: $size";
+}
+
 sub html_font_invisible {
   my ($self, $text) = @_;
 
   my $fg = $self->{text_style}[-1]->{fgcolor};
   my $bg = $self->{text_style}[-1]->{bgcolor};
-  my $size = $self->{text_style}[-1]->{size};
+  my $font_size = $self->{text_style}[-1]->{'font_size'};
   my $display = $self->{text_style}[-1]->{style_display};
   my $visibility = $self->{text_style}[-1]->{style_visibility};
 
-  # invisibility
-  if (substr($fg,-6) eq substr($bg,-6)) {
-    $self->put_results(font_low_contrast => 1);
-    return 1;
-  # near-invisibility
-  } elsif ($fg =~ /^\#?([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/) {
-    my ($r1, $g1, $b1) = (hex($1), hex($2), hex($3));
-
-    if ($bg =~ /^\#?([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/) {
-      my ($r2, $g2, $b2) = (hex($1), hex($2), hex($3));
-
-      my $r = ($r1 - $r2);
-      my $g = ($g1 - $g2);
-      my $b = ($b1 - $b2);
-
-      # geometric distance weighted by brightness
-      # maximum distance is 191.151823601032
-      my $distance = ((0.2126*$r)**2 + (0.7152*$g)**2 + (0.0722*$b)**2)**0.5;
-
-      # the text is very difficult to read if the distance is under 12,
-      # a limit of 14 to 16 might be okay if the usage significantly
-      # increases (near-invisible text is at about 0.95% of spam and
-      # 1.25% of HTML spam right now), but please test any changes first
-      if ($distance < 12) {
-	$self->put_results(font_low_contrast => 1);
-	return 1;
-      }
-    }
-  }
-
-  
-  # invalid color
-  if ($fg eq 'invalid' or $bg eq 'invalid') {
-    $self->put_results(font_invalid_color => 1);
-    return 1;
-  }
-
   # size too small
-  if ($size <= 1) {
+  if ($font_size < 8) {
     return 1;
   }
 
@@ -780,7 +823,18 @@ sub html_font_invisible {
     return 1;
   }
 
+  # <span style="visibility: hidden">
   if ($visibility && lc $visibility eq 'hidden') {
+    return 1;
+  }
+
+  # low-contrast text
+  # the text is very difficult to read if the distance is under 12,
+  # a limit of 14 to 16 might be okay if the usage significantly
+  # increases (near-invisible text is at about 0.95% of spam and
+  # 1.25% of HTML spam right now), but please test any changes first
+  if ($fg->distance($bg) < 12 ) {
+    $self->put_results(font_low_contrast => 1);
     return 1;
   }
 
@@ -992,275 +1046,6 @@ sub html_declaration {
 }
 
 ###########################################################################
-
-my %html_color = (
-  # HTML 4 defined 16 colors
-  aqua => 0x00ffff,
-  black => 0x000000,
-  blue => 0x0000ff,
-  fuchsia => 0xff00ff,
-  gray => 0x808080,
-  green => 0x008000,
-  lime => 0x00ff00,
-  maroon => 0x800000,
-  navy => 0x000080,
-  olive => 0x808000,
-  purple => 0x800080,
-  red => 0xff0000,
-  silver => 0xc0c0c0,
-  teal => 0x008080,
-  white => 0xffffff,
-  yellow => 0xffff00,
-  # colors specified in CSS3 color module
-  aliceblue => 0xf0f8ff,
-  antiquewhite => 0xfaebd7,
-  aqua => 0x00ffff,
-  aquamarine => 0x7fffd4,
-  azure => 0xf0ffff,
-  beige => 0xf5f5dc,
-  bisque => 0xffe4c4,
-  black => 0x000000,
-  blanchedalmond => 0xffebcd,
-  blue => 0x0000ff,
-  blueviolet => 0x8a2be2,
-  brown => 0xa52a2a,
-  burlywood => 0xdeb887,
-  cadetblue => 0x5f9ea0,
-  chartreuse => 0x7fff00,
-  chocolate => 0xd2691e,
-  coral => 0xff7f50,
-  cornflowerblue => 0x6495ed,
-  cornsilk => 0xfff8dc,
-  crimson => 0xdc143c,
-  cyan => 0x00ffff,
-  darkblue => 0x00008b,
-  darkcyan => 0x008b8b,
-  darkgoldenrod => 0xb8860b,
-  darkgray => 0xa9a9a9,
-  darkgreen => 0x006400,
-  darkgrey => 0xa9a9a9,
-  darkkhaki => 0xbdb76b,
-  darkmagenta => 0x8b008b,
-  darkolivegreen => 0x556b2f,
-  darkorange => 0xff8c00,
-  darkorchid => 0x9932cc,
-  darkred => 0x8b0000,
-  darksalmon => 0xe9967a,
-  darkseagreen => 0x8fbc8f,
-  darkslateblue => 0x483d8b,
-  darkslategray => 0x2f4f4f,
-  darkslategrey => 0x2f4f4f,
-  darkturquoise => 0x00ced1,
-  darkviolet => 0x9400d3,
-  deeppink => 0xff1493,
-  deepskyblue => 0x00bfff,
-  dimgray => 0x696969,
-  dimgrey => 0x696969,
-  dodgerblue => 0x1e90ff,
-  firebrick => 0xb22222,
-  floralwhite => 0xfffaf0,
-  forestgreen => 0x228b22,
-  fuchsia => 0xff00ff,
-  gainsboro => 0xdcdcdc,
-  ghostwhite => 0xf8f8ff,
-  gold => 0xffd700,
-  goldenrod => 0xdaa520,
-  gray => 0x808080,
-  green => 0x008000,
-  greenyellow => 0xadff2f,
-  grey => 0x808080,
-  honeydew => 0xf0fff0,
-  hotpink => 0xff69b4,
-  indianred => 0xcd5c5c,
-  indigo => 0x4b0082,
-  ivory => 0xfffff0,
-  khaki => 0xf0e68c,
-  lavender => 0xe6e6fa,
-  lavenderblush => 0xfff0f5,
-  lawngreen => 0x7cfc00,
-  lemonchiffon => 0xfffacd,
-  lightblue => 0xadd8e6,
-  lightcoral => 0xf08080,
-  lightcyan => 0xe0ffff,
-  lightgoldenrodyellow => 0xfafad2,
-  lightgray => 0xd3d3d3,
-  lightgreen => 0x90ee90,
-  lightgrey => 0xd3d3d3,
-  lightpink => 0xffb6c1,
-  lightsalmon => 0xffa07a,
-  lightseagreen => 0x20b2aa,
-  lightskyblue => 0x87cefa,
-  lightslategray => 0x778899,
-  lightslategrey => 0x778899,
-  lightsteelblue => 0xb0c4de,
-  lightyellow => 0xffffe0,
-  lime => 0x00ff00,
-  limegreen => 0x32cd32,
-  linen => 0xfaf0e6,
-  magenta => 0xff00ff,
-  maroon => 0x800000,
-  mediumaquamarine => 0x66cdaa,
-  mediumblue => 0x0000cd,
-  mediumorchid => 0xba55d3,
-  mediumpurple => 0x9370db,
-  mediumseagreen => 0x3cb371,
-  mediumslateblue => 0x7b68ee,
-  mediumspringgreen => 0x00fa9a,
-  mediumturquoise => 0x48d1cc,
-  mediumvioletred => 0xc71585,
-  midnightblue => 0x191970,
-  mintcream => 0xf5fffa,
-  mistyrose => 0xffe4e1,
-  moccasin => 0xffe4b5,
-  navajowhite => 0xffdead,
-  navy => 0x000080,
-  oldlace => 0xfdf5e6,
-  olive => 0x808000,
-  olivedrab => 0x6b8e23,
-  orange => 0xffa500,
-  orangered => 0xff4500,
-  orchid => 0xda70d6,
-  palegoldenrod => 0xeee8aa,
-  palegreen => 0x98fb98,
-  paleturquoise => 0xafeeee,
-  palevioletred => 0xdb7093,
-  papayawhip => 0xffefd5,
-  peachpuff => 0xffdab9,
-  peru => 0xcd853f,
-  pink => 0xffc0cb,
-  plum => 0xdda0dd,
-  powderblue => 0xb0e0e6,
-  purple => 0x800080,
-  red => 0xff0000,
-  rosybrown => 0xbc8f8f,
-  royalblue => 0x4169e1,
-  saddlebrown => 0x8b4513,
-  salmon => 0xfa8072,
-  sandybrown => 0xf4a460,
-  seagreen => 0x2e8b57,
-  seashell => 0xfff5ee,
-  sienna => 0xa0522d,
-  silver => 0xc0c0c0,
-  skyblue => 0x87ceeb,
-  slateblue => 0x6a5acd,
-  slategray => 0x708090,
-  slategrey => 0x708090,
-  snow => 0xfffafa,
-  springgreen => 0x00ff7f,
-  steelblue => 0x4682b4,
-  tan => 0xd2b48c,
-  teal => 0x008080,
-  thistle => 0xd8bfd8,
-  tomato => 0xff6347,
-  turquoise => 0x40e0d0,
-  violet => 0xee82ee,
-  wheat => 0xf5deb3,
-  white => 0xffffff,
-  whitesmoke => 0xf5f5f5,
-  yellow => 0xffff00,
-  yellowgreen => 0x9acd32,
-);
-
-sub name_to_rgb_old {
-  my $color = lc $_[0];
-
-  # note: Mozilla strips leading and trailing whitespace at this point,
-  # but IE does not
-
-  # named colors
-  my $hex = $html_color{$color};
-  if (defined $hex) {
-    return sprintf("#%06x", $hex);
-  }
-
-  # Flex Hex: John Graham-Cumming, http://www.jgc.org/pdf/lisa2004.pdf
-  # strip optional # character
-  $color =~ s/^#//;
-  # pad right-hand-side to a multiple of three
-  $color .= "0" x (3 - (length($color) % 3)) if (length($color) % 3);
-  # split into triplets
-  my $length = length($color) / 3;
-  my @colors = ($color =~ /(.{$length})(.{$length})(.{$length})/);
-  # truncate each color to a DWORD, take MSB, left pad nibbles
-  foreach (@colors) { s/.*(.{8})$/$1/; s/(..).*/$1/; s/^(.)$/0$1/ };
-  # the color
-  $color = join("", @colors);
-  # replace non-hex characters with 0
-  $color =~ tr/0-9a-f/0/c;
-
-  return "#" . $color;
-}
-
-sub name_to_rgb {
-  my $color = lc $_[0];
-  my $before = $color;
-
-  # strip leading and ending whitespace
-  $color =~ s/^\s*//;
-  $color =~ s/\s*$//;
-
-  # named colors
-  my $hex = $html_color{$color};
-  if (defined $hex) {
-    return sprintf("#%06x", $hex);
-  }
-
-  # IF NOT A NAME, IT SHOULD BE A HEX COLOR, HEX SHORTHAND or rgb values
-  if ($color =~ m/^[#a-f0-9]*$|rgb\([\d%, ]*\)/i) {
-
-    #Convert the RGB values to hex values so we can fall through on the programming
-
-    #RGB PERCENTS TO HEX
-    if ($color =~ m/rgb\((\d+)%,\s*(\d+)%,\s*(\d+)%\s*\)/i) {
-      $color = "#".dec2hex(int($1/100*255)).dec2hex(int($2/100*255)).dec2hex(int($3/100*255));
-    }
-
-    #RGB DEC TO HEX
-    if ($color =~ m/rgb\((\d+),\s*(\d+),\s*(\d+)\s*\)/i) {
-      $color = "#".dec2hex($1).dec2hex($2).dec2hex($3);
-    }
-
-    #PARSE THE HEX
-    if ($color =~ m/^#/) {
-      # strip to hex only
-      $color =~ s/[^a-f0-9]//ig;
-
-      # strip to 6 if greater than 6
-      if (length($color) > 6) {
-        $color=substr($color,0,6);
-      }
-
-      # strip to 3 if length < 6)
-      if (length($color) > 3 && length($color) < 6) {
-        $color=substr($color,0,3);
-      }
-
-      # pad right-hand-side to a multiple of three
-      $color .= "0" x (3 - (length($color) % 3)) if (length($color) % 3);
-
-      #DUPLICATE SHORTHAND HEX
-      if (length($color) == 3) {
-        $color =~ m/(.)(.)(.)/;
-        $color = "$1$1$2$2$3$3";
-      }
-
-    } else {
-      return "invalid";
-    } 
-
-  } else {
-    #INVALID 
-
-    #??RETURN BLACK SINCE WE DO NOT KNOW HOW THE MUA / BROWSER WILL PARSE
-    #$color = "000000";
-
-    return "invalid";
-  }
-
-  #print "DEBUG: before/after name_to_rgb new version: $before/$color\n";
-
-  return "#" . $color;
-}
 
 sub dec2hex {
   my ($dec) = @_;

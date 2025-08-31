@@ -38,11 +38,12 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.229';
+our $VERSION = '1.230';
 
 use Quiq::StreamServe::Block;
 use Quiq::FileHandle;
 use Quiq::Hash;
+use Quiq::AnsiColor;
 
 # -----------------------------------------------------------------------------
 
@@ -54,7 +55,34 @@ use Quiq::Hash;
 
 =head4 Synopsis
 
-  $ssf = $class->new($file);
+  $ssf = $class->new($file,%options);
+
+=head4 Arguments
+
+=over 4
+
+=item $file
+
+Pfad der Streamdatei.
+
+=back
+
+=head4 Options
+
+=over 4
+
+=item -debug => $bool (Default: 0)
+
+Gib den Inhalt des Streams auf STDOUT aus (Blöcke in Lesereihenfolge,
+Felder alphanumerisch sortiert).
+
+=item -ignore => \@vals (Default: [])
+
+Feldwerte, die auf einen Leerstring reduziert werden. Beispiel:
+
+  -ignore => ['.','*','-']
+
+=back
 
 =head4 Returns
 
@@ -69,10 +97,23 @@ Instantiiere ein Objekt der Klasse und liefere dieses zurück.
 # -----------------------------------------------------------------------------
 
 sub new {
-    my ($class,$file) = @_;
+    my $class = shift;
+    # @_: $file,%options
+
+    # Optionen und Argumente
+
+    my $debug = 0;
+    my $ignoreA = [];
+
+    my $argA = $class->parameters(1,1,\@_,
+        -debug => \$debug,
+        -ignore => \$ignoreA,
+    );
+    my $file = shift @$argA;
 
     # Datenstrukturen mit erstem (zunächst leeren) Block
 
+    my $type;
     my $prefix = '*';
     my $blk = Quiq::StreamServe::Block->new($prefix);
     my @blocks = ($blk);
@@ -93,11 +134,16 @@ sub new {
         if (!defined $val) {
             # Wir übergehen Zeilen ohne Wert. Es sollte nur eine geben:
             #     BEGIN<NAME>
+            ($type) = $key =~ /BEGIN(.*)/;
             next;
         }
         $val =~ s/^\s+|\s+$//; # Wert von umgebendem Whitespace befreien
+        for my $ign (@$ignoreA) { # unerwünschte Werte wegfiltern
+            if ($val eq $ign) {
+                $val = '';
+            }
+        }
         if (/^(..)INDCTR/) {
-            # $blk->lockKeys;
             # Nächsten (zunächst leeren) Block hinzufügen
             $prefix = $1;
             $blk = Quiq::StreamServe::Block->new($prefix);
@@ -106,13 +152,14 @@ sub new {
             push @$secBlkA,$blk;
         }
         else {
-            $blk->set($key=>$val); 
+            $blk->add($key=>$val); 
         }
     }
     $fh->close;
-    # $blk->lockKeys;
 
     return $class->SUPER::new(
+        file => $file,
+        type => $type,
         blockA => \@blocks,
         sectionH => Quiq::Hash->new(\%section),
     );
@@ -150,6 +197,9 @@ Stream-Daten
 Zerlege einen (Multi-)Stream (aus Datei oder In-Memory-Daten)
 in Einzelstreams und liefere die Liste der Einzelstreams zurück.
 
+Die gelieferte Liste ist leer, wenn der Stream lediglich einen A0- oder
+A1-Block enthält.
+
 =cut
 
 # -----------------------------------------------------------------------------
@@ -163,7 +213,7 @@ sub split {
     my $fh = Quiq::FileHandle->new('<',$file);
     while (<$fh>) {
         if (/^BEGIN/) {
-            if (/A0$/) {
+            if (/A\d$/) {
                 $skip = 1;
             }
             else {
@@ -191,114 +241,29 @@ sub split {
 
 =head2 Objektmethoden
 
-=head3 get() - Liefere Wert
+=head3 allBlocks() - Liste aller Blöcke
 
 =head4 Synopsis
 
-  $val = $ssf->get($name,$i);
-  $val = $ssf->get($name);
-
-=head4 Arguments
-
-=over 4
-
-=item $name
-
-Name des abzufragenden Feldes
-
-=item $i (Default: 0)
-
-Index im Falle mehrfachen Vorkommens des Feldes
-
-=back
+  @arr | $arrH = $ssf->allBlocks;
 
 =head4 Returns
 
-(String) Wert
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub get {
-    my ($self,$name) = splice @_,0,2;
-    my $i = shift // 0;
-
-    my $prefix = substr($name,0,1) eq '*'? '*': substr($name,0,2);
-    return $self->sectionH->get($prefix)->[$i]->get($name);
-}
-
-# -----------------------------------------------------------------------------
-
-=head3 try() - Liefere Wert
-
-=head4 Synopsis
-
-  $val = $ssf->try($name,$i);
-  $val = $ssf->try($name);
-
-=head4 Arguments
-
-=over 4
-
-=item $name
-
-Name des abzufragenden Feldes
-
-=item $i (Default: 0)
-
-Index im Falle mehrfachen Vorkommens des Feldes
-
-=back
-
-=head4 Returns
-
-(String) Wert
+(Array of Hashes) Liste von Blöcken
 
 =head4 Description
 
-Wie get(), nur dass der Zugriff auf ein nicht-existentes Feld nicht
-zu einer Exception führt, sondern C<undef> geliefert wird.
+Liefere die Liste aller Blöcke des Streams.
 
 =cut
 
 # -----------------------------------------------------------------------------
 
-sub try {
-    my ($self,$name) = splice @_,0,2;
-    my $i = shift // 0;
-
-    my $prefix = substr($name,0,1) eq '*'? '*': substr($name,0,2);
-    my $val = eval {$self->{'sectionH'}->{$prefix}->[$i]->get($name)};
-    return $val;
-}
-
-# -----------------------------------------------------------------------------
-
-=head3 prefixes() - Liste der Blockarten (Präfixe)
-
-=head4 Synopsis
-
-  @arr | $arrH = $ssf->prefixes;
-
-=head4 Returns
-
-(Array of Strings) Liste der Block-Präfixe
-
-=head4 Description
-
-Liefere die Liste der Blockarten. Eine Blockart ist durch die Liste
-der gemeinsamen Feldpräfixe charakterisiert.
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub prefixes {
+sub allBlocks {
     my $self = shift;
 
-    my @arr = sort keys %{$self->sectionH};
-    return wantarray? @arr: \@arr;
+    my $arr = $self->blockA;
+    return wantarray? @$arr: $arr;
 }
 
 # -----------------------------------------------------------------------------
@@ -364,36 +329,243 @@ sub blocks {
 
 # -----------------------------------------------------------------------------
 
-=head3 allBlocks() - Liste aller Blöcke
+=head3 file() - Pfad der Streamdatei (Accessor-Methode)
 
 =head4 Synopsis
 
-  @arr | $arrH = $ssf->allBlocks;
+  $path = $ssf->file;
 
 =head4 Returns
 
-(Array of Hashes) Liste von Blöcken
+(String) Pfad der Streamdatei
 
 =head4 Description
 
-Liefere die Liste aller Blöcke des Streams.
+Liefere den Pfad der Streamdatei.
 
 =cut
 
 # -----------------------------------------------------------------------------
 
-sub allBlocks {
+# Accessor-Methode
+
+# -----------------------------------------------------------------------------
+
+=head3 get() - Liefere Wert
+
+=head4 Synopsis
+
+  $val = $ssf->get($name,$i);
+  $val = $ssf->get($name);
+
+=head4 Arguments
+
+=over 4
+
+=item $name
+
+Name des abzufragenden Feldes
+
+=item $i (Default: 0)
+
+Index im Falle mehrfachen Vorkommens des Feldes
+
+=back
+
+=head4 Returns
+
+(String) Wert
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub get {
+    my ($self,$name) = splice @_,0,2;
+    my $i = shift // 0;
+
+    my $prefix = substr($name,0,1) eq '*'? '*': substr($name,0,2);
+    return $self->sectionH->get($prefix)->[$i]->get($name);
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 prefixes() - Liste der Blockarten (Präfixe)
+
+=head4 Synopsis
+
+  @arr | $arrH = $ssf->prefixes;
+
+=head4 Returns
+
+(Array of Strings) Liste der Block-Präfixe
+
+=head4 Description
+
+Liefere die Liste der Blockarten. Eine Blockart ist durch die Liste
+der gemeinsamen Feldpräfixe charakterisiert.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub prefixes {
     my $self = shift;
 
-    my $arr = $self->blockA;
-    return wantarray? @$arr: $arr;
+    my @arr = sort keys %{$self->sectionH};
+    return wantarray? @arr: \@arr;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 report() - Liefere Bericht über den Stream
+
+=head4 Synopsis
+
+  $text = $ssf->report;
+
+=head4 Returns
+
+(String) Text des Berichts
+
+=head4 Description
+
+Erzeuge einen Bericht über den Stream und liefere dessen Text zurück.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub report {
+    my $self = shift;
+
+    my $a = Quiq::AnsiColor->new(1);
+
+    my $text = sprintf "---%s---\n",$a->str('bold red','Stream Report');
+
+    for my $blk ($self->allBlocks) {
+        $text .= $blk->prefix."\n";
+        my $h = $blk->hash;
+        my $r = $blk->read;
+        for my $key (sort $blk->hash->keys) {
+            # $text .= "  $key\n";
+            my $val = $h->{$key};
+            $text .= sprintf "  %s = %s\n",$key,
+                $r->{$key}? $a->str('green',$val): $val;
+        }
+    }
+
+    return $text;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 try() - Liefere Wert
+
+=head4 Synopsis
+
+  $val = $ssf->try($name,$i);
+  $val = $ssf->try($name);
+
+=head4 Arguments
+
+=over 4
+
+=item $name
+
+Name des abzufragenden Feldes
+
+=item $i (Default: 0)
+
+Index im Falle mehrfachen Vorkommens des Feldes
+
+=back
+
+=head4 Returns
+
+(String) Wert
+
+=head4 Description
+
+Wie get(), nur dass der Zugriff auf ein nicht-existentes Feld nicht
+zu einer Exception führt, sondern C<undef> geliefert wird.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub try {
+    my ($self,$name) = splice @_,0,2;
+    my $i = shift // 0;
+
+    my $prefix = substr($name,0,1) eq '*'? '*': substr($name,0,2);
+    my $val = eval {$self->{'sectionH'}->{$prefix}->[$i]->get($name)};
+    return $val;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 type() - Typ des Stream
+
+=head4 Synopsis
+
+  $type = $ssf->type;
+  $type = $class->type($file);
+
+=head4 Arguments
+
+=over 4
+
+=item $file
+
+Stream-Datei
+
+=back
+
+=head4 Returns
+
+(String) Typ des Stream, z.B. C<SOS1890H>
+
+=head4 Description
+
+Liefere den Typ der Streamdatei $ssf bzw. $file. Als Klassenmethode
+gerufen, wird der Typ effizient ermittelt, ohne den ganzen Stream
+einzulesen.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub type {
+    my $this = shift;
+
+    # Typ aus dem Objekt liefern
+
+    if (ref $this) {
+        return $this->{'type'};
+    }
+
+    # StreamServe-Datei lesen
+
+    my $file = shift;
+
+    my $type;
+    my $fh = Quiq::FileHandle->new('<',$file);
+    while (<$fh>) {
+        if (/^BEGIN(.*)/) {
+            $type = $1;
+        }
+    }
+    $fh->close;
+
+    return $type;
 }
 
 # -----------------------------------------------------------------------------
 
 =head1 VERSION
 
-1.229
+1.230
 
 =head1 AUTHOR
 

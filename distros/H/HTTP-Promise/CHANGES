@@ -1,5 +1,8 @@
 Revision history for Perl module HTTP::Promise
 
+v0.6.3 2025-08-30T20:09:40+0900
+    - Corrected dependency
+
 v0.6.2 2025-08-30T18:04:49+0900
     - Corrected unit test for form-data
     - Centralised use of warnings with HTTP::Promise category

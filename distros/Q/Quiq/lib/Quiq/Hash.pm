@@ -63,7 +63,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.229';
+our $VERSION = '1.230';
 
 use Scalar::Util ();
 use Quiq::Stacktrace;
@@ -377,25 +377,22 @@ sub getDeep {
 
 =head4 Synopsis
 
-  $h->setDeep($key,$val);
+  $h->setDeep(@keyVal);
 
 =head4 Arguments
 
 =over 4
 
-=item $key
+=item @keyVal
 
-Zugriffspfad der Form "key1.key2..."
-
-=item $val
-
-Wert, der gesetzt wird
+Schlüssel ist ein Zugriffspfad der Form "key1.key2...", Wert ist ein
+beliebiger skalarer Wert.
 
 =back
 
 =head4 Description
 
-Setze den Wert zum angegebenen Schlüssel. Der Schlüssel ist eine
+Setze die Werte auf die angegebenen Schlüssel. Der Schlüssel ist eine
 mit Punkt (.) getrennte Kette von Einzelschlüsseln, so dass
 sich ein "tiefer Zugriff" kompakt formulieren lässt.
 
@@ -403,7 +400,7 @@ sich ein "tiefer Zugriff" kompakt formulieren lässt.
 
 B<Folge von Hash-Zugriffen>
 
-  $h->setDeep('invoice.header.invoiceNumber',$val);
+  $h->setDeep('invoice.header.invoiceNumber' => $val);
 
 ist dasselbe wie
 
@@ -411,7 +408,7 @@ ist dasselbe wie
 
 B<Zugriff über Array-Element>
 
-  $h->setDeep('settlement.tradeTax.[0].type',$val);
+  $h->setDeep('settlement.tradeTax.[0].type' => $val);
 
 ist dasselbe wie
 
@@ -422,33 +419,39 @@ ist dasselbe wie
 # -----------------------------------------------------------------------------
 
 sub setDeep {
-    my ($self,$key,$val) = @_;
+    my $self = shift;
+    # @_: @keyVal
 
     my $ref = $self;
-    my @keys = split /\./,$key;
-    for (my $i = 0; $i < $#keys; $i++) {
-        if ($keys[$i] =~ /\[(\d+)\]/) { # Array-Zugriff
-            if (!exists $ref->[$1]) {
-                $self->throw(
-                    'HASH-00099: Non-existent access path',
-                    Path => $key,
-                    Key => $keys[$i],
-                );
+    while (@_) {
+        my $key = shift;
+        my $val = shift;
+
+        my @keys = split /\./,$key;
+        for (my $i = 0; $i < $#keys; $i++) {
+            if ($keys[$i] =~ /\[(\d+)\]/) { # Array-Zugriff
+                if (!exists $ref->[$1]) {
+                    $self->throw(
+                        'HASH-00099: Non-existent access path',
+                        Path => $key,
+                        Key => $keys[$i],
+                    );
+                }
+                $ref = $ref->[$1];
             }
-            $ref = $ref->[$1];
-        }
-        else { # Hash-Zugriff
-            if (!exists $ref->{$keys[$i]}) {
-                $self->throw(
-                    'HASH-00099: Non-existent access path',
-                    Path => $key,
-                    Key => $keys[$i],
-                );
+            else { # Hash-Zugriff
+                if (!exists $ref->{$keys[$i]}) {
+                    $self->throw(
+                        'HASH-00099: Non-existent access path',
+                        Path => $key,
+                        Key => $keys[$i],
+                    );
+                }
+                $ref = $ref->{$keys[$i]};
             }
-            $ref = $ref->{$keys[$i]};
         }
+        $ref->{$keys[-1]} = $val;
     }
-    $ref->{$keys[-1]} = $val;
 
     return;
 }
@@ -1763,7 +1766,7 @@ Das Benchmark-Programm (bench-hash):
 
 =head1 VERSION
 
-1.229
+1.230
 
 =head1 AUTHOR
 

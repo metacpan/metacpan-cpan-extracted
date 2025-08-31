@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-Plugin-Breaks
 
+0.005     2025-08-30 16:36:37Z
+          - tooling refresh
+
 0.004     2016-08-19 00:46:59Z
           - clarify wording in abstract
 

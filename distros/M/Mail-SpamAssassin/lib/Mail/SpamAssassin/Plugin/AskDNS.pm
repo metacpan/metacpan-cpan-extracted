@@ -33,6 +33,9 @@ responses trickle in, filters them according to the requested DNS resource
 record type and optional subrule filtering expression, yielding a rule hit
 if a response meets filtering conditions.
 
+Any host or its domain part matching uridnsbl_skip_domains is ignored
+by default.
+
 =head1 RULE DEFINITIONS AND PRIVILEGED SETTINGS
 
 =over 4
@@ -61,11 +64,13 @@ that tags cannot have parameters in parenthesis when used in askdns
 templates (exceptions found below).  Tag names may appear anywhere in the
 template - each queried DNS zone prescribes how a query should be formed.
 
-Special supported tag HEADER() can be used to query any header content,
-using same header names/modifiers that as header rules support.  For example
-_HEADER(Reply-To:addr:domain)_ can be used to query the trimmed domain part
-of Reply-To address.  See Mail::SpamAssassin::Conf documentation about
-header rules.
+Special supported tag HEADER() can be used to extract any mail header
+field content by specifying a header field name with optional modifiers
+as an argument, like what is supported by header rules.  For example
+_HEADER(Reply-To:addr:domain)_ can be used to extract a trimmed domain
+part of an address found in a Reply-To header field.
+See Mail::SpamAssassin::Conf documentation about header rules
+and their modifiers.
 
 A query template may contain any number of tag names including none,
 although in the most common anticipated scenario exactly one tag name would
@@ -134,7 +139,7 @@ the response.
 When a plain string is used as a filter, it must be enclosed in single or
 double quotes. For the rule to hit, the response must match the filtering
 string exactly, and a RR type of a response must match the query type.
-Typical use is an exact text string for TXT queries, or an exact quad-dotted
+Typical use is an exact text string for TXT queries, or an exact dotted-quad
 IPv4 address. In case of a TXT or SPF resource record which can return
 multiple character-strings (as defined in Section 3.3 of [RFC1035]), these
 strings are concatenated with no delimiters before comparing the result
@@ -154,7 +159,7 @@ with a specified filtering value and tested to fall within a 127.0.0.0/8
 network range - the rule hits if the result is nonzero:
 ((r & n) != 0) && ((r & 0xff000000) == 0x7f000000).  An example: 0x10 .
 
-A pair of numerical values (each a decimal, hexadecimal or quad-dotted)
+A pair of numerical values (each a decimal, hexadecimal or dotted-quad)
 delimited by a '-' specifies an IPv4 address range, and a pair of values
 delimited by a '/' specifies an IPv4 address followed by a bitmask. Again,
 this type of filtering expression is primarily intended with RR type-A
@@ -162,7 +167,7 @@ DNS queries. The rule hits if the RR type matches, and the returned IP
 address falls within the specified range: (r E<gt>= n1 && r E<lt>= n2), or
 masked with a bitmask matches the specified value: (r & m) == (n & m) .
 
-As a shorthand notation, a single quad-dotted value is equivalent to
+As a shorthand notation, a single dotted-quad value is equivalent to
 a n-n form, i.e. it must match the returned value exactly with all its bits.
 
 Some typical examples of a numeric filtering parameter are: 127.0.1.2,
@@ -227,7 +232,7 @@ sub new {
 # numerical values, or as a bracketed and comma-separated list of DNS rcode
 # names or their numerical codes. Recognized numerical forms are: m, n1-n2,
 # or n/m, where n,n1,n2,m can be any of: decimal digits, 0x followed by
-# up to 8 hexadecimal digits, or an IPv4 address in quad-dotted notation.
+# up to 8 hexadecimal digits, or an IPv4 address in dotted-quad notation.
 # The argument is checked for syntax, undef is returned on syntax errors.
 # A string that looks like a regular expression is converted to a compiled
 # Regexp object and returned as a result. Otherwise, numeric components of
@@ -415,6 +420,15 @@ sub launch_queries {
         foreach my $q (keys %q_iter) {
           # handle space separated multi-valued tags
           foreach my $val (@{$pms->{askdns_tag_cache}{$tag}}) {
+            if (exists $pms->{conf}->{uridnsbl_skip_domains}->{lc $val}) {
+              dbg("askdns: query skipped, uridnsbl_skip_domains: $val");
+              next;
+            }
+            my $dom = $pms->{main}->{registryboundaries}->trim_domain($val);
+            if (exists $pms->{conf}->{uridnsbl_skip_domains}->{lc $dom}) {
+              dbg("askdns: query skipped, uridnsbl_skip_domains: $val");
+              next;
+            }
             my $qtmp = $q;
             $qtmp =~ s/\Q_${tag}_\E/${val}/g;
             $q_iter_new{$qtmp} = 1;

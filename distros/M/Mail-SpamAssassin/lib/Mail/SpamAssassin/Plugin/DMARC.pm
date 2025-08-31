@@ -69,6 +69,7 @@ my $VERSION = 0.2;
 
 use Mail::SpamAssassin;
 use Mail::SpamAssassin::Plugin;
+use Mail::SpamAssassin::Util qw(is_fqdn_valid);
 
 our @ISA = qw(Mail::SpamAssassin::Plugin);
 
@@ -274,6 +275,10 @@ sub _check_dmarc {
     return if !defined $mfrom_domain;
     dbg("EnvelopeFrom header not found, using From");
   }
+  if(!is_fqdn_valid($mfrom_domain)) {
+    dbg("Invalid domain name $mfrom_domain");
+    return;
+  }
 
   my $spf_status = 'none';
   if ($pms->{spf_pass})         { $spf_status = 'pass'; }
@@ -328,12 +333,12 @@ sub _check_dmarc {
   }
 
   my $dmarc_arc_verified = 0;
-  if (($result->result ne 'pass') and (ref($pms->{arc_verifier}) and ($pms->{arc_verifier}->result))) {
+  if (($result->result ne 'pass') and (ref($pms->{arc_verifier}) and ($pms->{arc_verifier}->result eq 'pass'))) {
     undef $result;
     $dmarc_arc_verified = 1;
     # if DMARC fails retry by reading data from AAR headers
     # use Mail::SpamAssassin::Plugin::AuthRes if available to read ARC signature details
-    my @spf_parsed = sort { ( $a->{authres_parsed}{spf}{arc_index} // 0 ) <=> ( $b->{authres_parsed}{spf}{arc_index} // 0 ) } @{$pms->{authres_parsed}{spf}};
+    my @spf_parsed = sort { ( $a->{authres_parsed}{spf}{arc_index} // 0 ) <=> ( $b->{authres_parsed}{spf}{arc_index} // 0 ) } @{$pms->{authres_parsed}{spf} // []};
     my $old_arc_index = 0;
     foreach my $spf_parse ( @spf_parsed ) {
       last if not defined $spf_parse->{arc_index};
@@ -343,7 +348,9 @@ sub _check_dmarc {
         my $mfrom_dom = $spf_parse->{properties}{smtp}{mailfrom};
         if($mfrom_dom =~ /\@(.*)/) {
           $mfrom_dom = $1;
-        }
+        } else {
+	  $mfrom_dom = $mfrom_domain
+	}
         $dmarc->spf([
           {
             scope  => 'mfrom',
@@ -383,6 +390,14 @@ sub _check_dmarc {
     }
 
     eval { $result = $dmarc->validate(); };
+    if ($@) {
+      dbg("error while validating domain $mfrom_domain: $@");
+      return;
+    }
+  }
+
+  if(defined $result and ($result->result ne 'none') and (defined $result->{published}) and ($result->published->can('stringify'))) {
+    dbg("Evaluated DMARC record \"" . $result->published->stringify . "\" for domain $mfrom_domain");
   }
 
   # Report that DMARC failed but it has been overridden because of AAR headers

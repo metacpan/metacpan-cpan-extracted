@@ -4,14 +4,18 @@ package Dist::Zilla::MintingProfile::Author::ETHER;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Mint distributions like ETHER does
 
-our $VERSION = '0.167';
+our $VERSION = '0.168';
 
+use Moose;
+with 'Dist::Zilla::Role::MintingProfile' => { -version => '5.047' };
+
+no autovivification warn => qw(fetch store exists delete);
 use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
-use Moose;
-with 'Dist::Zilla::Role::MintingProfile' => { -version => '5.047' };
+no if "$]" >= 5.041009, feature => 'smartmatch';
+no feature 'switch';
 use File::ShareDir;
 use Path::Tiny;
 use Carp;
@@ -43,7 +47,7 @@ Dist::Zilla::MintingProfile::Author::ETHER - Mint distributions like ETHER does
 
 =head1 VERSION
 
-version 0.167
+version 0.168
 
 =head1 SYNOPSIS
 

@@ -1,7 +1,7 @@
 package Language::l33t::Operators;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Implementation of the l33t language operators
-$Language::l33t::Operators::VERSION = '1.0.1';
+$Language::l33t::Operators::VERSION = '1.0.2';
 use Moo::Role;
 
 use Const::Fast;
@@ -42,7 +42,7 @@ sub opcode($self,$index) {
         warn "j00 4r3 teh 5ux0r\n";
         $index = $NOP;
     }
-    return $op_codes[ $index ]->( $_[0] );
+    return $op_codes[ $index ]->($self);
 }
 
 
@@ -202,7 +202,7 @@ Language::l33t::Operators - Implementation of the l33t language operators
 
 =head1 VERSION
 
-version 1.0.1
+version 1.0.2
 
 =head1 AUTHOR
 
@@ -210,7 +210,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2006 by Yanick Champoux.
+This software is copyright (c) 2025, 2008 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

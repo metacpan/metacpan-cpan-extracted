@@ -25,6 +25,7 @@ DecodeShortURLs - Check for shortened URLs
 
   url_shortener tinyurl.com
   url_shortener_get bit.ly
+  url_shortener_custom_user_agent t.co curl/8.6.0
 
   body HAS_SHORT_URL          eval:short_url()
   describe HAS_SHORT_URL      Message has one or more shortened URLs
@@ -75,14 +76,16 @@ documented in L<SYNOPSIS> section.
 
 =head1 NOTES
 
-This plugin runs at the check_dnsbl hook (priority -100) so that it may
-modify the parsed URI list prior to normal uri rules or the URIDNSBL plugin.
+This plugin runs at priority -10 so that it may
+modify the parsed URI list prior to normal uri rules or the URIDNSBL plugin
+but after the Redirector plugin.
 
 =cut
 
 package Mail::SpamAssassin::Plugin::DecodeShortURLs;
 
 use Mail::SpamAssassin::Plugin;
+use Mail::SpamAssassin::Util qw(idn_to_ascii is_fqdn_valid);
 use strict;
 use warnings;
 
@@ -189,6 +192,36 @@ sub set_config {
       foreach my $domain (split(/\s+/, $value)) {
         $self->{url_shortener}->{lc $domain} = 2; # 2 == get
       }
+    }
+  });
+
+=over 4
+
+=item url_shortener_custom_user_agent domain user-agent  (default: none)
+
+Custom HTTP user-agent to be used for specific domains,
+instead of the default specified in C<url_shortener_user_agent>.
+Required for some services like t.co to return blocked URL correctly.
+
+Example:
+
+ url_shortener_custom_user_agent t.co curl/8.6.0
+
+=back
+
+=cut
+
+  push (@cmds, {
+    setting => 'url_shortener_custom_user_agent',
+    code => sub {
+      my ($self, $key, $value, $line) = @_;
+      if ($value eq '') {
+        return $Mail::SpamAssassin::Conf::MISSING_REQUIRED_VALUE;
+      }
+      my @values = split(/\s+/, $value);
+      my $domain = shift(@values);
+      my $ua = join('', @values);
+      $self->{url_shortener}->{user_agent}->{lc $domain} = $ua;
     }
   });
 
@@ -431,8 +464,9 @@ Maximum depth of chained redirections that a short URL can generate.
 
 =item url_shortener_user_agent       (default: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.67 Safari/537.36)
 
-Set User-Agent header for HTTP requests.  Some services require it to look
-like a common browser.
+Set default User-Agent header for HTTP requests.  Some services require it to look
+like a common browser. User-Agent can be overriden on a per url_shortener basis using
+the C<url_shortener_ua> setting.
 
 =back
 
@@ -707,6 +741,9 @@ sub _check_shortener_uri {
     (.*?\w)?		# Some path wanted
     }ix;
   my $host = lc $1;
+  if(is_fqdn_valid($host)) {
+    $host = idn_to_ascii($host);
+  }
   my $has_path = defined $2;
   my $levels = $host =~ tr/.//;
   # No point looking at single level "xxx.yy" without a path
@@ -716,6 +753,7 @@ sub _check_shortener_uri {
     return {
       'uri' => $uri,
       'method' => $conf->{url_shortener}->{$host} == 1 ? 'head' : 'get',
+      'user_agent' => (defined $conf->{url_shortener}->{user_agent}->{$host}) ? $conf->{url_shortener}->{user_agent}->{$host} : $conf->{url_shortener_user_agent},
     };
   }
   # if domain is a 3rd level domain check if there is a url shortener
@@ -727,6 +765,7 @@ sub _check_shortener_uri {
       return {
         'uri' => $uri,
         'method' => $conf->{url_shortener}->{$domain} == 1 ? 'head' : 'get',
+        'user_agent' => (defined $conf->{url_shortener}->{user_agent}->{$host}) ? $conf->{url_shortener}->{user_agent}->{$host} : $conf->{url_shortener_user_agent},
       };
     }
   }
@@ -737,6 +776,7 @@ sub _check_shortener_uri {
     return {
       'uri' => $uri,
       'method' => $conf->{url_shortener}->{$1} == 1 ? 'head' : 'get',
+      'user_agent' => (defined $conf->{url_shortener}->{user_agent}->{$host}) ? $conf->{url_shortener}->{user_agent}->{$host} : $conf->{url_shortener_user_agent},
     };
   }
   return;
@@ -757,10 +797,11 @@ sub _check_short {
   # Sort short URLs into hash to de-dup them
   my %short_urls;
   my $uris = $pms->get_uri_detail_list();
-  while (my($uri, $info) = each %{$uris}) {
+  foreach my $uri (keys %$uris) {
+    my $info = $uris->{$uri};
     next unless $info->{domains} && $info->{cleaned};
     # Remove anchors and parameters from shortened uris
-    $uri =~ s/(?:\#|\?).*//g;
+    $uri =~ s/\/?(?:\#|\?).*//g;
     if (my $short_url_info = _check_shortener_uri($uri, $conf)) {
       $short_urls{$uri} = $short_url_info;
       last if scalar keys %short_urls >= $conf->{max_short_urls};
@@ -834,6 +875,12 @@ sub recursive_lookup {
   } else {
     # Not cached; do lookup
     my $method = $short_url_info->{method};
+    my $useragent = $short_url_info->{user_agent};
+    if(defined $useragent) {
+      $ua->agent($useragent);
+    } else {
+      $ua->agent($conf->{url_shortener_user_agent});
+    }
     my $response = $ua->$method($short_url);
     if (!$response->is_redirect) {
       dbg("URL is not redirect: $short_url = ".$response->status_line);
@@ -949,6 +996,7 @@ sub has_short_url { 1 }
 sub has_autoclean { 1 }
 sub has_short_url_code { 1 }
 sub has_user_agent { 1 } # url_shortener_user_agent
+sub has_custom_user_agent { 1 } # url_shortener_custom_user_agent
 sub has_get { 1 } # url_shortener_get
 sub has_clear { 1 } # clear_url_shortener
 sub has_timeout { 1 } # url_shortener_timeout

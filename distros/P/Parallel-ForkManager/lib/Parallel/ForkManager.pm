@@ -1,7 +1,7 @@
 package Parallel::ForkManager;
 our $AUTHORITY = 'cpan:DLUX';
 # ABSTRACT:  A simple parallel processing fork manager
-$Parallel::ForkManager::VERSION = '2.03';
+$Parallel::ForkManager::VERSION = '2.04';
 use POSIX ":sys_wait_h";
 use Storable ();
 use File::Spec;
@@ -223,6 +223,11 @@ sub running_procs {
     return @pids;
 }
 
+sub running_procs_with_identifiers {
+    my $self = shift;
+    return %{ $self->{processes} };
+}
+
 sub wait_for_available_procs {
     my( $self, $nbr ) = @_;
     $nbr ||= 1;
@@ -341,7 +346,7 @@ Parallel::ForkManager - A simple parallel processing fork manager
 
 =head1 VERSION
 
-version 2.03
+version 2.04
 
 =head1 SYNOPSIS
 
@@ -510,6 +515,13 @@ C<start> or C<wait_all_children>.
     my @pids = $pm->running_procs;
 
     my $nbr_children = $pm->running_procs;
+
+=item running_procs_with_identifiers
+
+Returns a list of pairs.  The keys are the pids of forked processes (as
+returned by C<running_procs> and the values are the identifiers given to those
+pids by C<start>.  If no identifier was given for a process, the value for that
+pid will be undefined.
 
 =item wait_for_available_procs( $n )
 
@@ -1019,7 +1031,7 @@ Gabor Szabo <gabor@szabgab.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024, 2015 by Balázs Szabó.
+This software is copyright (c) 2025, 2015 by Balázs Szabó.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

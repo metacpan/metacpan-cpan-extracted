@@ -22,11 +22,11 @@ use warnings;
 use re 'taint';
 
 my $VERSION = 'svnunknown';
-if ('$Id: sa-update.raw 1914735 2023-12-17 09:11:35Z sidney $' =~ ':') {
-  # Subversion keyword "$Id: sa-update.raw 1914735 2023-12-17 09:11:35Z sidney $" has been successfully expanded.
+if ('$Id: sa-update.raw 1924963 2025-04-09 15:37:29Z gbechis $' =~ ':') {
+  # Subversion keyword "$Id: sa-update.raw 1924963 2025-04-09 15:37:29Z gbechis $" has been successfully expanded.
   # Doesn't happen with automated launchpad builds:
   # https://bugs.launchpad.net/launchpad/+bug/780916
-  $VERSION = &Mail::SpamAssassin::Version . ' / svn' . (split(/\s+/, '$Id: sa-update.raw 1914735 2023-12-17 09:11:35Z sidney $'))[2];
+  $VERSION = &Mail::SpamAssassin::Version . ' / svn' . (split(/\s+/, '$Id: sa-update.raw 1924963 2025-04-09 15:37:29Z gbechis $'))[2];
 }
 
 my $PREFIX          = '@@PREFIX@@';             # substituted at 'make' time
@@ -291,7 +291,7 @@ else {
 
 
 # check only disabled gpg
-# https://issues.apache.org/SpamAssassin/show_bug.cgi?id=5854
+# https://bz.apache.org/SpamAssassin/show_bug.cgi?id=5854
 if ( defined $opt{'checkonly'}) {
   $GPG_ENABLED=0;
   dbg("gpg: Disabling gpg requirement due to checkonly flag.");
@@ -1450,7 +1450,7 @@ sub do_dns_query {
   #
   # From Net::DNS maintainers (Willem Toorop, NLnet Labs):
   #   I encourage you to use txtdata for getting the values of
-  # <version>.updates.spamassassin.org and mirros.updates.spamassassin.org.
+  # <version>.updates.spamassassin.org and mirrors.updates.spamassassin.org.
   # As those records have only a single rdata field, txtdata would return
   # the same value since Net::DNS 0.34.
   #
@@ -2287,7 +2287,7 @@ C<Mail::SpamAssassin>
 
 =head1 BUGS
 
-See E<lt>https://issues.apache.org/SpamAssassin/E<gt>
+See E<lt>https://bz.apache.org/SpamAssassin/E<gt>
 
 =head1 AUTHORS
 

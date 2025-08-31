@@ -3,7 +3,7 @@ package Quiq;
 use strict;
 use warnings;
 
-our $VERSION = '1.229';
+our $VERSION = '1.230';
 
 =encoding utf8
 
@@ -13,7 +13,7 @@ Quiq - Class library for rapid development
 
 =head1 DESCRIPTION
 
-Diese Klassenbibliothek enthält 249 anwendungsunabhängige Klassen,
+Diese Klassenbibliothek enthält 258 anwendungsunabhängige Klassen,
 die ich in Projekten nutze. Die Klassen sind nach
 einheitlichen Prinzipien konzipiert. Die Bibliothek befindet
 sich unter kontinuierlicher Weiterentwicklung.
@@ -1016,6 +1016,42 @@ L<Quiq::Zugferd> - Generiere das XML von ZUGFeRD-Rechnungen
 
 =item *
 
+L<Quiq::Zugferd::Entity> - Basisklasse der Entitätsklassen
+
+=item *
+
+L<Quiq::Zugferd::Entity::Attribut> - Position
+
+=item *
+
+L<Quiq::Zugferd::Entity::Empfaenger> - Empfänger
+
+=item *
+
+L<Quiq::Zugferd::Entity::Freitext> - Position
+
+=item *
+
+L<Quiq::Zugferd::Entity::Kaeufer> - Käufer (Zahler)
+
+=item *
+
+L<Quiq::Zugferd::Entity::Position> - Position
+
+=item *
+
+L<Quiq::Zugferd::Entity::Rechnung> - Rechnung
+
+=item *
+
+L<Quiq::Zugferd::Entity::Umsatzsteuer> - Umsatzsteuer
+
+=item *
+
+L<Quiq::Zugferd::Entity::Verkaeufer> - Verkäufer
+
+=item *
+
 L<Quiq::Zugferd::Tree> - Operatonen auf ZUGFeRD-Baum
 
 =back
@@ -1026,7 +1062,7 @@ L<Quiq::Zugferd::Tree> - Operatonen auf ZUGFeRD-Baum
 
 =head1 VERSION
 
-1.229
+1.230
 
 =head1 AUTHOR
 

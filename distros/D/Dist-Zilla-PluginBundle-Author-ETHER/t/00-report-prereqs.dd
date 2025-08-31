@@ -3,13 +3,13 @@ do { my $x = {
                         'requires' => {
                                         'Devel::CheckBin' => '0',
                                         'ExtUtils::MakeMaker' => '0',
-                                        'File::ShareDir::Install' => '0.06',
+                                        'File::ShareDir::Install' => '0.10',
                                         'perl' => '5.013002'
                                       }
                       },
        'develop' => {
                       'recommends' => {
-                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.166',
+                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.167',
                                         'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007'
                                       },
                       'requires' => {
@@ -176,6 +176,8 @@ do { my $x = {
                                       'Text::Tabs' => '2013.0426',
                                       'Try::Tiny' => '0',
                                       'URI::Escape' => '0',
+                                      'autovivification' => '0',
+                                      'feature' => '0',
                                       'if' => '0',
                                       'namespace::autoclean' => '0',
                                       'perl' => '5.013002',

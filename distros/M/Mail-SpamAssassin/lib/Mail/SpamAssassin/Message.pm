@@ -857,9 +857,10 @@ sub parse_body {
       # If it's not multipart, go ahead and just deal with it.
       $self->_parse_normal($toparse);
 
+      my $type = $msg->effective_type();
       # bug 5041: process message/*, but exclude message/partial content types
-      if (index($msg->{'type'}, 'message/') == 0 &&
-          $msg->{'type'} ne 'message/partial' && $subparse > 0)
+      if (index($type, 'message/') == 0 &&
+          $type ne 'message/partial' && $subparse > 0)
       {
         # Just decode the part, but we don't need the resulting string here.
         $msg->decode(0);
@@ -875,7 +876,7 @@ sub parse_body {
         # bug 5051, bug 3748: check $msg->{decoded}: sometimes message/* parts
         # have no content, and we get stuck waiting for STDIN, which is bad. :(
 
-        if (($msg->{'type'} eq 'message/rfc822' || $msg->{'type'} eq 'message/global') &&
+        if (($type eq 'message/rfc822' || $type eq 'message/global') &&
             defined $msg->{'decoded'} && $msg->{'decoded'} ne '')
         {
 	  # Ok, so this part is still semi-recursive, since M::SA::Message
@@ -1182,14 +1183,15 @@ sub _parse_normal {
   }
   $msg->{'charset'} = $ct[2];
 
-  # attempt to figure out a name for this attachment if there is one ...
-  my $disp = $msg->header('content-disposition') || '';
-  if ($disp =~ /name=\s*"?([^";]+)"?/i) {
-    $msg->{'name'} = $1;
+  # parse content-disposition header
+  if ( my $disp = $msg->header('content-disposition') ) {
+    $disp = Mail::SpamAssassin::Header::ParameterHeader->new($disp);
+    $msg->{'disposition'} = $disp->value();
+    $msg->{'name'} = $disp->parameter('filename');
   }
-  elsif ($ct[3]) {
-    $msg->{'name'} = $ct[3];
-  }
+  # if the content-disposition header doesn't have a filename, try to get
+  # the filename from the content-type header
+  $msg->{'name'} = $ct[3] unless defined $msg->{'name'};
 
   $msg->{'boundary'} = $boundary;
 
@@ -1197,8 +1199,9 @@ sub _parse_normal {
   # ahead and write the part data out to a temp file -- why keep sucking
   # up RAM with something we're not going to use?
   #
-  unless ($msg->{'type'} eq 'text/plain' || $msg->{'type'} eq 'text/html' ||
-          index($msg->{'type'}, 'message/') == 0) {
+  my $type = $msg->effective_type();
+  unless ($type eq 'text/plain' || $type eq 'text/html' ||
+          index($type, 'message/') == 0) {
     my($filepath, $fh);
     eval {
       ($filepath, $fh) = Mail::SpamAssassin::Util::secure_tmpfile();  1;
@@ -1276,6 +1279,12 @@ sub get_body_text_array_common {
     my($type, $rnd) = $p->$method_name();  # decode this part
     # Only text/* types are rendered ...
     if (defined $rnd) {
+      # Skip text attachments that are not considered part of the email body
+      my $cdisp = $p->{'headers'}->{'content-disposition'}[0];
+      if(($method_name ne 'invisible_rendered') and (defined $cdisp and ($cdisp =~ /^attachment;/) and ($type =~ /text\//))) {
+        dbg("$method_name: Skipping text attachment with content-disposition \"$cdisp\"");
+        next;
+      }
       # Truncate to body_part_scan_size
       if ($scansize && length($rnd) > $scansize) {
         # Try truncating at boundary, nearest 1k block is fine

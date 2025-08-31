@@ -2,7 +2,7 @@ package WWW::Noss::GroupConfig;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 use parent 'WWW::Noss::BaseConfig';
 

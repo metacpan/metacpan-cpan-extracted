@@ -1,7 +1,7 @@
 package Dist::Zilla::MintingProfile::Author::YANICK;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: create distributions like YANICK
-$Dist::Zilla::MintingProfile::Author::YANICK::VERSION = '0.32.0';
+$Dist::Zilla::MintingProfile::Author::YANICK::VERSION = '0.32.1';
 use strict;
 use warnings;
 
@@ -25,7 +25,7 @@ Dist::Zilla::MintingProfile::Author::YANICK - create distributions like YANICK
 
 =head1 VERSION
 
-version 0.32.0
+version 0.32.1
 
 =head1 AUTHOR
 

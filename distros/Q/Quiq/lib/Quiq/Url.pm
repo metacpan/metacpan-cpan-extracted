@@ -26,7 +26,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.229';
+our $VERSION = '1.230';
 
 use Encode ();
 use Quiq::Array;
@@ -48,7 +48,7 @@ use Quiq::Option;
 
 Instantiiere ein Objekt der Klasse und liefere eine Referenz auf
 dieses Objekt zurück. Da die Klasse ausschließlich Klassenmethoden
-enthält, hat das Objekt ausschließlich die Funktion, eine abkürzende
+enthält, hat das Objekt lediglich die Funktion, eine abkürzende
 Aufrufschreibweise zu ermöglichen.
 
 =cut
@@ -81,6 +81,16 @@ sub new {
 =item @keyVal
 
 Liste der Query-String Parameter
+
+=back
+
+=head4 Options
+
+=over 4
+
+=item -append => $queryString
+
+Hänge den Querystring $querystring (unverändert) an den URL an.
 
 =back
 
@@ -254,6 +264,10 @@ soll. Dies ist, wenn bentigt, typischweise ein Fragezeichen (?).
 
 =over 4
 
+=item -append => $queryString
+
+Hänge den Querystring $querystring (unverändert) an den URL an.
+
 =item -encoding => $encoding (Default: 'utf-8')
 
 Das Encoding, in dem die Zeichenkette encodiert werden soll.
@@ -342,6 +356,7 @@ sub queryEncode {
 
     # Direktiven
 
+    my $append => undef;
     my $encoding = 'utf-8',
     my $null = 0;
     my $separator = '&';
@@ -354,7 +369,11 @@ sub queryEncode {
         if (substr($key,0,1) eq '-') {
             # Optionen
 
-            if ($key eq '-encoding') {
+            if ($key eq '-append') {
+                $append = shift;
+                next;
+            }
+            elsif ($key eq '-encoding') {
                 $encoding = shift;
                 next;
             }
@@ -381,6 +400,12 @@ sub queryEncode {
             $str .= '=';
             $str .= $this->encode($val,$encoding);
         }
+    }
+    if ($append) {
+        if ($str) {
+            $str .= $separator;
+        }
+        $str .= $append;
     }
 
     return $i? "$initialChar$str": $str;
@@ -581,7 +606,7 @@ sub split {
 
 =head1 VERSION
 
-1.229
+1.230
 
 =head1 AUTHOR
 

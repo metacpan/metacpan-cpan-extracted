@@ -1,5 +1,6 @@
 AUTHOR_PLEDGE
 CODE_OF_CONDUCT.md
+CONTRIBUTING.md
 CONTRIBUTORS
 Changes
 INSTALL
@@ -9,11 +10,13 @@ META.json
 META.yml
 Makefile.PL
 README.mkdn
+SECURITY.md
 SIGNATURE
 cpanfile
 doap.xml
 lib/Dist/Zilla/MintingProfile/Author/YANICK.pm
 lib/Dist/Zilla/PluginBundle/YANICK.pm
+lib/Dist/Zilla/PluginBundle/YANICK/Contributing.pm
 share/profiles/default/Module.pm
 share/profiles/default/profile.ini
 share/profiles/default/skel/.gitignore

@@ -1,5 +1,15 @@
 Revision history for Dist-Zilla-PluginBundle-Author-ETHER
 
+0.168     2025-08-31 00:35:06Z
+          - minting profile updates:
+            - pragma boilerplate updated to disable "smartmatch" and "switch"
+              features
+            - GitHub issues tracker is now the default; added templates for
+              pull requests and issues
+            - use Test2::V0 in generated tests
+            - require latest (at the time) version of this pluginbundle, and
+              minimum perl version of 5.020
+
 0.167     2025-05-20 00:01:11Z
           - fix woven pod for irc details when irc channel contains a hyphen
 

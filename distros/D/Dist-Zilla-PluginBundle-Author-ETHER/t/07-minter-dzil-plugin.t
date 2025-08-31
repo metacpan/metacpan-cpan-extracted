@@ -46,6 +46,7 @@ like(
 
 \[\@Author::ETHER\]
 :version = [\d.]+
+bugtracker = github
 Test::MinimumVersion.max_target_perl = 5.008003
 
 \[MetaResources\]

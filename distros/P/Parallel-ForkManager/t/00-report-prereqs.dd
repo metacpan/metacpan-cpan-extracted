@@ -6,6 +6,7 @@ do { my $x = {
                       },
        'develop' => {
                       'requires' => {
+                                      'Software::Security::Policy::Individual' => '0',
                                       'Test::More' => '0.96',
                                       'Test::Vars' => '0'
                                     }

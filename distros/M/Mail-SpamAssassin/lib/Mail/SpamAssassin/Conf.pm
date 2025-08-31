@@ -623,7 +623,7 @@ See above.
 
 =item blocklist_to user@example.com
 
-Previously blacklist_auth which will work interchangeably until 4.1.
+Previously blacklist_to which will work interchangeably until 4.1.
 
 If the given address appears as a recipient in the message headers
 (Resent-To, To, Cc, obvious envelope recipient, etc.) the mail will
@@ -3081,12 +3081,12 @@ zone.  There's a few things to note:
 Duplicated IPs are only queried once and reserved IPs are not queried.
 Private IPs are those listed in
 C<https://www.iana.org/assignments/ipv4-address-space>, or
-C<https://tools.ietf.org/html/rfc5735> as private.
+C<https://www.rfc-editor.org/rfc/rfc5735> as private.
 
 =item the 'set' argument
 
 This is used as a 'zone ID'.  If you want to look up a multiple-meaning zone
-like SORBS, you can then query the results from that zone using it;
+like Spamhaus Zen, you can then query the results from that zone using it;
 but all check_rbl_sub() calls must use that zone ID.
 
 Also, if more than one IP address gets a DNSBL hit for a particular rule, it
@@ -4097,6 +4097,84 @@ bayes_sql_override_username config option.
     type => $CONF_TYPE_BOOL,
   });
 
+=item bayes_redis_read_servers host=hostname1;port=port1,host=hostname2;port=port2,...
+
+Used for BayesStore::Redis storage implementation.
+Specifies a comma-separated list of Redis servers to use for read operations. Each server
+can have its own connection parameters specified with semicolon-separated key=value pairs.
+Multiple read servers provide high availability through automatic failover.
+Example: host=redis1.example.com;port=6379,host=redis2.example.com;port=6379
+
+=cut
+
+  push (@cmds, {
+    setting => 'bayes_redis_read_servers',
+    is_admin => 1,
+    default => '',
+    type => $CONF_TYPE_STRING,
+  });
+
+=item bayes_redis_write_server host=hostname;port=port;...
+
+Used for BayesStore::Redis storage implementation.
+Specifies the Redis server to use for write operations with semicolon-separated
+key=value connection parameters. Only a single write server is supported to
+ensure data consistency.
+Example: host=master.example.com;port=6379
+
+=cut
+
+  push (@cmds, {
+    setting => 'bayes_redis_write_server',
+    is_admin => 1,
+    default => '',
+    type => $CONF_TYPE_STRING,
+  });
+
+=item bayes_redis_database n
+
+Used for BayesStore::Redis storage implementation.
+Specifies the Redis database number to use (default: 0).
+
+=cut
+
+  push (@cmds, {
+    setting => 'bayes_redis_database',
+    is_admin => 1,
+    default => 0,
+    type => $CONF_TYPE_NUMERIC,
+  });
+
+=item bayes_redis_password password
+
+Used for BayesStore::Redis storage implementation.
+Specifies the password to use for Redis authentication.
+
+=cut
+
+  push (@cmds, {
+    setting => 'bayes_redis_password',
+    is_admin => 1,
+    default => '',
+    type => $CONF_TYPE_STRING,
+  });
+
+=item bayes_redis_prefix prefix
+
+Used for BayesStore::Redis storage implementation.
+Specifies a prefix to use for all Redis keys. This allows multiple SpamAssassin
+instances to share the same Redis database without key collisions.
+Example: bayes:user1:
+
+=cut
+
+  push (@cmds, {
+    setting => 'bayes_redis_prefix',
+    is_admin => 1,
+    default => '',
+    type => $CONF_TYPE_STRING,
+  });
+
 =item user_scores_dsn DBI:databasetype:databasename:hostname:port
 
 If you load user scores from an SQL database, this will set the DSN
@@ -4351,6 +4429,7 @@ If not specified, all supported ones are tried in this order:
 Plugins can override this internally if required.
 
  MaxMind::DB::Reader  (same as GeoIP2::Database::Reader)
+ IP::Geolocation::MMDB
  Geo::IP
  IP::Country::DB_File  (not used unless geodb_options path set)
  IP::Country::Fast
@@ -4368,6 +4447,8 @@ Plugins can override this internally if required.
       if ($value eq 'maxmind::db::reader' ||
             $value eq 'geoip2::database::reader' || $value eq 'geoip2') {
         $self->{geodb}->{module} = 'geoip2';
+      } elsif ($value eq 'ip::geolocation::mmdb') {
+        $self->{geodb}->{module} = 'geoip2-mmdb';
       } elsif ($value eq 'geo::ip' || $value eq 'geoip') {
         $self->{geodb}->{module} = 'geoip';
       } elsif ($value eq 'ip::country::db_file' || $value eq 'db_file') {

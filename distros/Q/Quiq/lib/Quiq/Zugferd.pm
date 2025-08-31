@@ -40,8 +40,9 @@ use base qw/Quiq::Hash/;
 use v5.10;
 use strict;
 use warnings;
+use utf8;
 
-our $VERSION = '1.229';
+our $VERSION = '1.230';
 
 use Quiq::PerlModule;
 use Quiq::Path;
@@ -50,6 +51,7 @@ use Quiq::Dumper;
 use XML::Compile::Schema ();
 use XML::LibXML ();
 use XML::Compile::Util ();
+use Quiq::Shell;
 use Quiq::Storable;
 use Quiq::AnsiColor;
 use Quiq::Xml;
@@ -193,6 +195,126 @@ sub new {
 # -----------------------------------------------------------------------------
 
 =head2 Objektmethoden
+
+=head3 checkAttributes() - Prüfe die Attribute des Rechnungsobjekts
+
+=head4 Synopsis
+
+  $msg = $zug->checkAttributes($rch);
+
+=head4 Arguments
+
+=over 4
+
+=item $rch
+
+(Object) Das Rechnungsobjekt
+
+=back
+
+=head4 Returns
+
+(String) Prüfungsbericht
+
+=head4 Description
+
+Prüfe die Felder des Rechnungsobjekts auf mögliche Fehler und liefere
+einen Bericht über das Ergebnis. Falls keine Fehler festgestellt wurden,
+lieferet die Methode einen Leerstring ('').
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub checkAttributes {
+    my ($self,$rch) = @_;
+
+    my $text = '';
+
+    # Skalare Attribute
+
+    my $btH = $self->bt;
+    for my $bt (values %$btH) {
+        if (!$bt->mandatory) {
+            next;
+        }
+        my $key = $bt->attribute;
+        if ($key) {
+            my $val = $rch->getDeep($key);
+            if (!$val) {
+                $text .= sprintf q|ERROR: Rechnungsattribut "%s" (%s)|.
+                    " hat keinen Wert\n",$key,$bt->name;
+            }
+        }
+    }
+
+    # Listen
+
+    my $arr = $rch->positionen;
+    if (!@$arr) {
+        $text .= sprintf "ERROR: Rechnung hat keine Positionen\n";
+    }
+
+    $arr = $rch->umsatzsteuern;
+    if (!@$arr) {
+        $text .= sprintf "ERROR: Umsatzsteueraufschlüsselung fehlt\n";
+    }
+
+    return $text;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 combine() - Erzeuge ZUGFeRD PDF
+
+=head4 Synopsis
+
+  $zug->combine($pdfFile,$xmlFile,$zugferdFile);
+
+=head4 Arguments
+
+=over 4
+
+=item $pdfFile
+
+(String) Der Pfad zum PDF der Rechnung
+
+=item $xmlFile
+
+(String) Der Pfad zum ZUGFeRD XML der Rechnung
+
+=item $zugferdFile
+
+(String) Der Pfad zur resultierenden ZUGFeRD Rechnung
+
+=back
+
+=head4 Description
+
+Füge das Rechnungs-PDF $pdfFile und das ZUGFeRD XML $xmlFile
+zusammen und schreibe das Ergebnis nach $zugferdFile.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub combine {
+    my ($self,$pdfFile,$xmlFile,$zugferdFile) = @_;
+
+    my $p = Quiq::Path->new;
+
+    my $symlink = sprintf '%s/factur-x.xml',$p->dir($xmlFile);
+    $p->duplicate('symlink',$xmlFile,$symlink);
+
+    my $sh = Quiq::Shell->new;
+    $sh->exec("pdftk $pdfFile attach_files $symlink output $zugferdFile");
+
+    $p->delete($symlink);
+
+    return;
+}
+
+# -----------------------------------------------------------------------------
 
 =head3 createInvoice() - Erzeuge das XML einer ZUGFeRD-Rechnung (abstrakt)
 
@@ -464,6 +586,214 @@ sub resolvePlaceholders {
 
 # -----------------------------------------------------------------------------
 
+=head3 toXml() - Liefere das Zugferd-XML einer Rechnung
+
+=head4 Synopsis
+
+  $xml = $zug->toXml($rch,%options);
+
+=head4 Arguments
+
+=over 4
+
+=item $rch
+
+(object) Rechnung
+
+=back
+
+=head4 Options
+
+=over 4
+
+=item -debug => $bool (Default: 0)
+
+Gib Detailinformation auf STDOUT aus.
+
+=back
+
+=head4 Returns
+
+(String) XML
+
+=head4 Description
+
+Erzeuge eine ZUGFeRD XML Repräsentation des Rechnungs-Objekts $rch
+und liefere diese zurück.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub toXml {
+    my $self = shift;
+    # @_: $rch,%options
+
+    # Argumente und Optionen
+
+    my $debug = 0;
+
+    my $argA = $self->parameters(1,1,\@_,
+        -debug => \$debug,
+    );
+    my $rch = shift @$argA;
+
+    # Operation ausführen
+
+    if ($debug) {
+        my $a = Quiq::AnsiColor->new(1);
+        printf "---%s---\n",$a->str('bold red','Objects');
+        say Quiq::Dumper->dump($rch),"---";
+    }
+
+    # Freitexte
+
+    my $bg1 =  $self->processSubTree('BG-1',$rch->freitexte,sub {
+        my ($zug,$t,$frt,$i) = @_;
+
+        $zug->resolvePlaceholders(
+            -subTree => $t,
+            -showPlaceholders => $debug,
+            -label => 'Freitext',
+            '--',
+            'BT-21' => $frt->code,
+            'BT-22' => $frt->text,
+        );
+
+        return $t;
+    });
+
+    # Positionen
+
+    my $bg25 = $self->processSubTree('BG-25',$rch->positionen,sub {
+        my ($zug,$t,$pos,$i) = @_;
+
+        # Artikelattribute
+
+        my $path = 'SpecifiedTradeProduct.ApplicableProductCharacteristic';
+        my $bg32 = $t->processSubTree($path,'BG-32',$pos->attribute,sub {
+            my ($ztr,$t,$atr,$i) = @_;
+
+            $t->resolvePlaceholders(
+                -showPlaceholders => 0,
+                '--',
+                'BT-160' => $atr->name,
+                'BT-161' => $atr->wert,
+            );
+
+            return $t;
+        });
+
+        my $proz = $pos->umsatzsteuersatz // '';
+
+        $zug->resolvePlaceholders(
+            -subTree => $t,
+            -showPlaceholders => $debug,
+            -label => 'Position',
+            '--',
+            'BT-126' => $pos->positionsnummer,
+            'BT-153' => $pos->artikelname,
+            'BT-154' => $pos->artikelbeschreibung,
+            $pos->transferDate('abrechnungszeitraumVon','BT-134'),
+            $pos->transferDate('abrechnungszeitraumBis','BT-135'),
+            'BT-129' => $pos->menge,
+            'BT-130' => $pos->einheit,
+            'BT-146' => $pos->preisProEinheitNetto,
+            'BT-131' => $pos->gesamtpreisNetto,
+            'BT-152' => $proz,
+            'BT-151' => $proz eq '0.00'? 'E': 'S',
+            'BT-151-0' => 'VAT',
+            # Artikelattribute
+            'BG-32' => $bg32,
+        );
+
+        return $t;
+    });
+
+    # Umsatzsteuern
+
+    my $bg23 = $self->processSubTree('BG-23',$rch->umsatzsteuern,sub {
+        my ($zug,$t,$ums,$i) = @_;
+ 
+        $zug->resolvePlaceholders(
+           -subTree => $t,
+           -showPlaceholders => $debug,
+           -label => 'Umstzsteueraufschlüsselung',
+           '--',
+           'BT-117' => $ums->umsatzsteuerbetrag,
+           'BT-118-0' => 'VAT',
+           'BT-118' => $ums->umsatzsteuerkategorie,
+           'BT-116' => $ums->summeBetraege,
+           'BT-119' => $ums->prozentsatz,
+           'BT-120' => $ums->befreiungsgrund,
+       );
+
+       return $t;
+    });
+
+    return $self->resolvePlaceholders(
+        -label => 'Rechnung',
+        -validate => !$debug,
+        -showPlaceholders => $debug,
+        -showTree => $debug,
+        '--',
+        # Rechnung (allgemeine Angaben)
+        'BT-24' => $rch->profilKennung,
+        'BT-3' => $rch->rechnungsart,
+        'BT-1' => $rch->rechnungsnummer,
+        $rch->transferDate('rechnungsdatum','BT-2'),
+        'BT-5' => $rch->waehrung,
+        'BT-10' => $rch->leitwegId,
+        'BT-12' => $rch->vertragsnummer,
+        'BT-20' => $rch->zahlungsbedingungen,
+        $rch->transferDate('faelligkeitsdatum','BT-9'),
+        'BT-82' => $rch->zahlungsmittel,
+        'BT-83' => $rch->verwendungszweck,
+        'BT-81' => $rch->zahlungsart,
+        'BT-84' => $rch->iban,
+        'BT-86' => $rch->bic,
+        # Verkäufer
+        'BT-27' => $rch->verkaeufer->name,
+        'BT-38' => $rch->verkaeufer->plz,
+        'BT-35' => $rch->verkaeufer->strasse,
+        'BT-37' => $rch->verkaeufer->ort,
+        'BT-40' => $rch->verkaeufer->land,
+        'BT-31' => $rch->verkaeufer->umsatzsteuerId,
+        'BT-31-0' => 'VA',
+        # Käufer (Zahler)
+        'BT-44' => $rch->kaeufer->name,
+        'BT-56' => $rch->kaeufer->kontakt,
+        'BT-46' => $rch->kaeufer->kundennummer,
+        'BT-50' => $rch->kaeufer->strasse,
+        'BT-53' => $rch->kaeufer->plz,
+        'BT-52' => $rch->kaeufer->ort,
+        'BT-55' => $rch->kaeufer->land,
+        # Empfänger
+        'BT-70' => $rch->empfaenger->name,
+        'BT-76' => $rch->empfaenger->kontakt,
+        'BT-75' => $rch->empfaenger->strasse,
+        'BT-78' => $rch->empfaenger->plz,
+        'BT-77' => $rch->empfaenger->ort,
+        'BT-80' => $rch->empfaenger->land,
+        $rch->empfaenger->transferDate('lieferdatum','BT-72'),
+        # Beträge
+        'BT-106' => $rch->summePositionenNetto,
+        'BT-109' => $rch->gesamtsummeNetto,
+        'BT-110' => $rch->summeUmsatzsteuer,
+        'BT-110-0' => $rch->waehrung,
+        'BT-112' => $rch->gesamtsummeBrutto,
+        'BT-115' => $rch->faelligerBetrag,
+        # Freitexte
+        'BG-1' => $bg1,
+        # Positionen
+        'BG-25' => $bg25,
+        # Umsatzsteuern
+        'BG-23' => $bg23,
+    );
+}
+
+# -----------------------------------------------------------------------------
+
 =head3 tree() - Liefere den ZUGFeRD-Baum
 
 =head4 Synopsis
@@ -578,10 +908,11 @@ sub bg {
 
 # -----------------------------------------------------------------------------
 
-=head3 bt() - Business Term
+=head3 bt() - Business Term(s)
 
 =head4 Synopsis
 
+  %bt | $btH = $zug->bt;
   $bt = $zug->bt($name);
 
 =head4 Arguments
@@ -611,9 +942,17 @@ Das Objekt hat die Attribute:
 
 Name des Business Terms.
 
+=item mandatory
+
+Pflichtfeldstatus. 0=optional, 1=XSD-Pflicht, 2=Mustang-Pflicht
+
 =item text
 
 Kurzbeschreibung des Business Terms.
+
+=item attribute
+
+Name des Objektattributs
 
 =item path
 
@@ -645,9 +984,10 @@ sub bt {
                 next;
             }
             chomp;
-            my ($name,$mandatory,$text) = split /;/;
+            my ($name,$mandatory,$attribute,$text) = split /;/;
             $h{$name} = Quiq::Hash->new(
                 name => $name,
+                attribute => $attribute,
                 mandatory => $mandatory,
                 text => $text,
                 path => undef,
@@ -670,6 +1010,11 @@ sub bt {
 
         return \%h;
     });
+
+    if (!$name) {
+        my $h = $self->btH;
+        return wantarray? %$h: $h;
+    }
 
     my $bt = $btH->{$name} // $self->throw(
         'ZUGFERD-00099: Business term does not exist',
@@ -724,9 +1069,172 @@ sub zugferdDir {
 
 # -----------------------------------------------------------------------------
 
+=head1 DETAILS
+
+=head2 Vorgehen bei der Generierung einer ZUGFeRD E-Rechnung
+
+Der Inhalt einer Rechnung setzt sich aus verschiedenen Bestandteilen
+zusammen:
+
+=over 2
+
+=item *
+
+Rechnungsdaten
+
+=over 2
+
+=item *
+
+Allgemeine Rechnungsdaten
+
+=item *
+
+Rechnungsreferenzen
+
+=back
+
+=item *
+
+Verkäufer
+
+=over 2
+
+=item *
+
+Informationen zum Verkäufer
+
+=item *
+
+Steuervertreter des Verkäufers
+
+=item *
+
+Postanschrift des Verkäufers
+
+=item *
+
+Kontaktdaten des Verkäufers
+
+=item *
+
+Vom Verkäufer abweichender Zahlungsempfänger
+
+=back
+
+=item *
+
+Käufer
+
+=over 2
+
+=item *
+
+Informationen zum Käufer
+
+=item *
+
+Postanschrift des Käufers
+
+=item *
+
+Kontaktdaten des Käufers
+
+=item *
+
+Lieferinformation
+
+=back
+
+=item *
+
+Rechnungspositionen
+
+=over 2
+
+=item *
+
+Rechnungsposition
+
+=item *
+
+Weitere Daten zur Position
+
+=item *
+
+Nachlässe auf Ebene der Rechnungsposition
+
+=item *
+
+Zuschläge auf Ebene der Rechnungsposition
+
+=back
+
+=item *
+
+Rechnungsbeträge
+
+=over 2
+
+=item *
+
+Nachlässe auf Ebene der Rechnung
+
+=item *
+
+Zuschläge auf Ebene der Rechnung
+
+=item *
+
+Aufschlüsselung der Umsatzsteuer auf Ebene der Rechnung
+
+=item *
+
+Rechnungsbeträge
+
+=back
+
+=item *
+
+Zahlungsdaten
+
+=over 2
+
+=item *
+
+Zahlungsdaten
+
+=item *
+
+Zahlungsmittel: Überweisung
+
+=item *
+
+Zahlungsmittel: Lastschrift
+
+=back
+
+=item *
+
+Anhänge
+
+=item *
+
+Verweise
+
+=item *
+
+Empfänger
+
+=item *
+
+Texte auf Rechnungs- und Positionsebene
+
+=back
+
 =head1 VERSION
 
-1.229
+1.230
 
 =head1 AUTHOR
 

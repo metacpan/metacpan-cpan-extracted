@@ -338,7 +338,8 @@ sub new {
               EXTRACTTEXTFLAGS EXTRACTTEXTURIS DCCREP
               PYZOR DKIMIDENTITY DKIMDOMAIN DKIMSELECTOR
               BAYESTC BAYESTCLEARNED BAYESTCSPAMMY BAYESTCHAMMY
-              HAMMYTOKENS SPAMMYTOKENS TOKENSUMMARY)) {
+              HAMMYTOKENS SPAMMYTOKENS TOKENSUMMARY URIHOSTS
+              URIDOMAINS URICNAMES)) {
     $tag_data_ref->{$_} = undef;  # exist, but undefined
   }
 
@@ -479,10 +480,12 @@ sub check_cleanup {
     my $area = $test_logs->{$rule}->{area} || '';
     my $desc = $test_logs->{$rule}->{desc} || '';
 
-    if ($score >= 10 || $score <= -10) {
-      $score = sprintf("%4.0f", $score);
-    } else {
-      $score = sprintf("%4.1f", $score);
+    if(defined $score) {
+      if ($score >= 10 || $score <= -10) {
+        $score = sprintf("%4.0f", $score);
+      } else {
+        $score = sprintf("%4.1f", $score);
+      }
     }
 
     my $terse = '';
@@ -2374,6 +2377,7 @@ sub _get {
       # Note: parse_header_addresses always called with raw undecoded value
       # Skip invalid addresses here
       my @addrs = parse_header_addresses($line);
+      push @{$self->{address_details}->{$request_lc}}, @addrs; # Bug 8342: save for later
       if (@addrs) {
         if ($getaddr) {
           foreach my $addr (@addrs) {
@@ -2779,7 +2783,7 @@ sub _process_text_uri_list {
 
       if ($uri =~ /^mailto:/i) {
         # MUAs linkify and urldecode mailto:foo%40bar%2Fcom
-        $uri = Mail::SpamAssassin::Util::url_encode($uri) if $uri =~ /\%[0-9a-f]{2}/i;
+        $uri = Mail::SpamAssassin::Util::url_decode($uri) if $uri =~ /\%[0-9a-f]{2}/i;
         # Skip unless @ found after decoding, then check tld is valid
         next unless $uri =~ /\@([^?&>]*)/;
         my $host = $1; $host =~ s/(?:\%20)+$//; # strip trailing %20 from host
@@ -2807,6 +2811,12 @@ sub _process_html_uri_list {
       if ($self->add_uri_detail_list($uri, $info->{types}, 'html', 0)) {
         # Need also to copy and uniq anchor text
         if (exists $info->{anchor_text}) {
+          # Bug 8268: Collapse whitespace
+          for (@{$info->{anchor_text}}) {
+            s/^\s+|\s+$//g;
+            s/\s+/ /g;
+            utf8::encode($_) if utf8::is_utf8($_);  # Bug 8310: UTF-8 encode anchor_text
+          }
           my %seen;
           foreach (grep { !$seen{$_}++ } @{$info->{anchor_text}}) {
             push @{$self->{uri_detail_list}->{$uri}->{anchor_text}}, $_;
@@ -2897,6 +2907,42 @@ sub add_uri_detail_list {
       dbg("uri: added host: $host domain: $domain");
       $domains{$domain} = 1;
       $hosts{$host} = $domain;
+    }
+
+    if($self->is_dns_available()) {
+      # XXX we cannot call bgsend_and_start_lookup,
+      # otherwise get_uri_detail_list() might not
+      # return domains extracted from CNAME dns queries
+      # in time
+      my $orig_resolver =  $self->{main}->{resolver}->get_resolver();
+      my $pkt;
+      eval {
+        return if not defined $host;
+        my $handle = $orig_resolver->bgsend($host, 'CNAME');
+        $pkt = $orig_resolver->bgread($handle);
+        return if !$pkt; # aborted / timed out
+        my @answ = $pkt->answer;
+        foreach my $ans ( @answ ) {
+          return if not defined $ans->cname;
+          if(not exists $self->{dns_cname_cache}{$host}) {
+            $self->{dns_cname_cache}{$host} = $ans->cname;
+            dbg("dns: found CNAME " . $ans->cname . " for host $host");
+            my $cname_types = { %{$types} };
+            $cname_types->{unlinked} = 1;
+            $cname_types->{noclean} = 1;
+            $self->{uri_cnames}{$ans->cname} = $host;
+            $self->add_uri_detail_list($ans->cname, $cname_types, $source, 1);
+	  }
+        }
+      } or do {
+        undef $pkt;
+        if($@) {
+          my $eval_stat = $@ ne '' ? $@ : "errno=$!";  chomp $eval_stat;
+          # resignal if alarm went off
+          die $eval_stat  if $eval_stat =~ /__alarm__ignore__\(.*\)/s;
+          info("dns: bad dns reply: %s", $eval_stat);
+        }
+      };
     }
   }
 
@@ -3245,6 +3291,15 @@ sub get_envelope_from {
 
   # Cached?
   return $self->{envelopefrom} if exists $self->{envelopefrom};
+
+  my $suppl_attrib = $self->{msg}->{suppl_attrib};
+  if (exists($suppl_attrib->{return_path})) {
+    # Envelope information was provided by the caller
+    my $envf = $suppl_attrib->{return_path};
+    $envf = $1 if $envf =~ /^<(.*)>$/;  # strip '<' and '>' if present
+    dbg("message: using EnvelopeFrom provided by suppl_attrib: '%s'", $envf);
+    return $self->{envelopefrom} = $envf;
+  }
 
   # bug 2142:
   # Get the SMTP MAIL FROM:, aka. the "envelope sender", if our

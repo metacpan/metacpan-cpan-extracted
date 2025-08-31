@@ -4,7 +4,7 @@ Dist::Zilla::PluginBundle::YANICK - Be like Yanick when you build your dists
 
 # VERSION
 
-version 0.32.0
+version 0.32.1
 
 # DESCRIPTION
 
@@ -23,6 +23,7 @@ his distributions. It's roughly equivalent to
 
 [InstallGuide]
 [Covenant]
+[PluginBundle::YANICK::Contributing]
 [ContributorCovenant]
 
 [GithubMeta]
@@ -112,6 +113,11 @@ process_changes = 1
 [CopyrightYearFromGit]
 
 [GitHubREADME::Badge]
+
+[SecurityPolicy]
+-policy = Individual
+timeframe = 1 month
+perl_support_years = 5
 ```
 
 ## ARGUMENTS
@@ -146,10 +152,6 @@ Passed to `ModuleBuild` plugin.
 
 For `Git::GatherDir`. Defaults to false.
 
-### tweet
-
-If a tweet should be sent. Defaults to `true`.
-
 ### doap\_changelog
 
 If the DOAP plugin should generate the project history
@@ -176,13 +178,13 @@ Defaults to `github`.
 ### import\_from\_build
 
 ```
-import_from_build = cpanfile,AUTHOR_PLEDGE,CODE_OF_CONDUCT.md
+import_from_build = cpanfile,AUTHOR_PLEDGE,CODE_OF_CONDUCT.md,CONTRIBUTING.md
 ```
 
 Comma-separated list of files to import in the checked out
 repo from the build.
 
-Defaults to `cpanfile,AUTHOR_PLEDGE,CODE_OF_CONDUCT.md`
+Defaults to `cpanfile,AUTHOR_PLEDGE,CODE_OF_CONDUCT.md,CONTRIBUTING.md`
 
 # AUTHOR
 

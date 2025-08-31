@@ -22,6 +22,7 @@
       },
       "develop" : {
          "requires" : {
+            "Software::Security::Policy::Individual" : "0",
             "Test::More" : "0.96",
             "Test::Vars" : "0"
          }
@@ -29,6 +30,7 @@
       "runtime" : {
          "requires" : {
             "Dist::Zilla" : "0",
+            "Dist::Zilla::File::InMemory" : "0",
             "Dist::Zilla::Plugin::Authority" : "0",
             "Dist::Zilla::Plugin::CPANFile" : "0",
             "Dist::Zilla::Plugin::ChangeStats::Git" : "v0.2.1",
@@ -67,13 +69,17 @@
             "Dist::Zilla::Plugin::Test::ReportPrereqs" : "0",
             "Dist::Zilla::Plugin::Test::UnusedVars" : "0",
             "Dist::Zilla::Plugin::VerifyPhases" : "0",
+            "Dist::Zilla::Role::FileGatherer" : "0",
             "Dist::Zilla::Role::MintingProfile::ShareDir" : "0",
+            "Dist::Zilla::Role::Plugin" : "0",
             "Dist::Zilla::Role::PluginBundle::Config::Slicer" : "0",
             "Dist::Zilla::Role::PluginBundle::Easy" : "0",
+            "Dist::Zilla::Role::TextTemplate" : "0",
             "Moose" : "0",
             "Type::Tiny" : "0",
             "Types::Standard" : "0",
             "experimental" : "0",
+            "perl" : "v5.20.0",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -87,19 +93,22 @@
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
-            "Test::More" : "0",
-            "perl" : "5.006"
+            "Test::More" : "0"
          }
       }
    },
    "provides" : {
       "Dist::Zilla::MintingProfile::Author::YANICK" : {
          "file" : "lib/Dist/Zilla/MintingProfile/Author/YANICK.pm",
-         "version" : "v0.32.0"
+         "version" : "v0.32.1"
       },
       "Dist::Zilla::PluginBundle::YANICK" : {
          "file" : "lib/Dist/Zilla/PluginBundle/YANICK.pm",
-         "version" : "v0.32.0"
+         "version" : "v0.32.1"
+      },
+      "Dist::Zilla::PluginBundle::YANICK::Contributing" : {
+         "file" : "lib/Dist/Zilla/PluginBundle/YANICK/Contributing.pm",
+         "version" : "v0.32.1"
       }
    },
    "release_status" : "stable",
@@ -114,7 +123,7 @@
          "web" : "https://github.com/yanick/Dist-Zilla-PluginBundle-YANICK"
       }
    },
-   "version" : "0.32.0",
+   "version" : "0.32.1",
    "x_author_pledge" : {
       "version" : 1
    },

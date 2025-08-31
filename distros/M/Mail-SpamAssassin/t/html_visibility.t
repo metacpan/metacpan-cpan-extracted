@@ -1,7 +1,8 @@
 #!/usr/bin/perl -T
 use strict;
 use warnings;
-use lib 'lib';
+use lib '.'; use lib 't';
+use SATest; sa_t_init("html_visibility");
 use Mail::SpamAssassin::HTML;
 use Test::More;
 
@@ -10,6 +11,16 @@ my @tests = (
         html               => '<div style="background-color: transparent">X</div>',
         visibility         => 'visible',
         font_invalid_color => 0,
+    },
+    {
+        html               => '<div style="color: inherit">X</div>',
+        visibility         => 'visible',
+        font_invalid_color => 0,
+    },
+    {
+        html               => '<div style="color: foo">X</div>',
+        visibility         => 'visible',
+        font_invalid_color => 1,
     },
     {
         html               => '<div style="color: transparent">X</div>',
@@ -22,7 +33,7 @@ my @tests = (
         font_invalid_color => 0,
     },
     {
-        html               => '<div style="background-color: red;color: transparent">X</div>',
+        html               => '<div style=" BACKGROUND-COLOR: RED ; COLOR: TRANSPARENT ">X</div>',
         visibility         => 'invisible',
         font_invalid_color => 0,
     },
@@ -47,8 +58,138 @@ my @tests = (
         font_invalid_color => 0,
     },
     {
+        html               => '<div style="background-color: #ffffff;color: rgba(0,0,0,0)">X</div>',
+        visibility         => 'invisible',
+        font_invalid_color => 0,
+    },
+    {
+        html               => '<div style="background-color: papayawhip;color: lightgoldenrodyellow">X</div>',
+        visibility         => 'invisible',
+        font_invalid_color => 0,
+    },
+    {
         html               => '<div style="color: red !important">X</div>',
         visibility         => 'visible',
+        font_invalid_color => 0,
+    },
+    {
+        html               => '<div style="display: none !important">X</div>',
+        visibility         => 'invisible',
+        font_invalid_color => 0,
+    },
+    {
+        html               => '<div style="DISPLAY: NONE !IMPORTANT">X</div>',
+        visibility         => 'invisible',
+        font_invalid_color => 0,
+    },
+    {
+        html               => '<div style="visibility: hidden">X</div>',
+        visibility         => 'invisible',
+        font_invalid_color => 0,
+    },
+    {
+        html               => '<font size="1">X</font>',
+        visibility         => 'visible',
+        font_invalid_color => 0,
+    },
+    {
+        html               => '<font color="white">X</font>',
+        visibility         => 'invisible',
+        font_invalid_color => 0,
+    },
+    {
+        html               => '<body bgcolor="black">X</body>',
+        visibility         => 'invisible',
+        font_invalid_color => 0,
+    },
+    {
+        html               => '<strong style="display: none;">X</strong>',
+        visibility         => 'invisible',
+        font_invalid_color => 0,
+    },
+    {
+        html               => '<em style="display: none;">X</em>',
+        visibility         => 'invisible',
+        font_invalid_color => 0,
+    },
+    {
+        html               => '<b style="display: none;">X</b>',
+        visibility         => 'invisible',
+        font_invalid_color => 0,
+    },
+    {
+        html               => '<i style="display: none;">X</i>',
+        visibility         => 'invisible',
+        font_invalid_color => 0,
+    },
+    {
+        html               => '<big style="display: none;">X</big>',
+        visibility         => 'invisible',
+        font_invalid_color => 0,
+    },
+    {
+        html               => '<small style="display: none;">X</small>',
+        visibility         => 'invisible',
+        font_invalid_color => 0,
+    },
+    {
+        html               => '<sup style="display: none;">X</sup>',
+        visibility         => 'invisible',
+        font_invalid_color => 0,
+    },
+    {
+        html               => '<sub style="display: none;">X</sub>',
+        visibility         => 'invisible',
+        font_invalid_color => 0,
+    },
+    {
+        html               => '<span style="font-size: 0px;">X</span>',
+        visibility         => 'invisible',
+        font_invalid_color => 0,
+    },
+    {
+        html               => '<span style="font-size: 0">X</span>',
+        visibility         => 'invisible',
+        font_invalid_color => 0,
+    },
+    {
+        html               => '<span style="font-size: 1 em;">X</span>',
+        visibility         => 'visible',
+        font_invalid_color => 0,
+    },
+    {
+        html               => '<span style="font-size: 10pt;">X</span>',
+        visibility         => 'visible',
+        font_invalid_color => 0,
+    },
+    {
+        html               => '<span style="font-size: 1pt;">X</span>',
+        visibility         => 'invisible',
+        font_invalid_color => 0,
+    },
+    {
+        html               => '<span style="font-size: 10%;">X</span>',
+        visibility         => 'invisible',
+        font_invalid_color => 0,
+    },
+    {
+        html               => '<div style="font-size: 0"><span style="font-size: initial">X</span></div>',
+        visibility         => 'visible',
+        font_invalid_color => 0,
+    },
+    {
+        html               => '<span style="color: currentColor;">X</span>',
+        visibility         => 'visible',
+        font_invalid_color => 0,
+    },
+    {
+        html               => '<span style="background-color: currentColor;">X</span>',
+        visibility         => 'invisible',
+        font_invalid_color => 0,
+    },
+    {
+        html               => '<span style="background: currentColor;">X</span>',
+        visibility         => 'invisible',
         font_invalid_color => 0,
     },
 );

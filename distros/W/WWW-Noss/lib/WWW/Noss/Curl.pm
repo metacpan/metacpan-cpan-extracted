@@ -2,7 +2,7 @@ package WWW::Noss::Curl;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 use Exporter qw(import);
 our @EXPORT_OK = qw(curl curl_error);
@@ -92,6 +92,10 @@ our %CODES = (
     94 => 'Authentication function returned error',
     95 => 'Error detected in HTTP/3 layer',
     96 => 'QUIC connection error',
+    97 => 'Proxy handshake error',
+    98 => 'Client-side certificate required to complete TLS handshake',
+    99 => 'Poll or select returned fatal error',
+    100 => 'Value or data field grew larger than allowed',
     # and maybe some more in the future...
 );
 

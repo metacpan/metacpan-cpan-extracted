@@ -89,6 +89,12 @@ This plugin helps detected spam using attached PDF files
         min: required, message contains at least x images in pdf attachments.
         max: optional, if specified, must not contain more than x pdf images
 
+  pdf_uri_count()
+
+     body RULENAME  eval:pdf_uri_count(<min>,[max])
+        min: required, message contains at least x uris in pdf attachments.
+        max: optional, if specified, must not contain more than x pdf uris
+
   pdf_pixel_coverage()
 
      body RULENAME  eval:pdf_pixel_coverage(<min>,[max])
@@ -112,7 +118,7 @@ This plugin helps detected spam using attached PDF files
 
   pdf_match_fuzzy_md5()
 
-     body RULENAME  eval:pdf_match_md5(<string>)
+     body RULENAME  eval:pdf_match_fuzzy_md5(<string>)
         string: 32-byte md5 hex - see ruleset for obtaining the fuzzy md5
 
   pdf_match_details()
@@ -124,6 +130,18 @@ This plugin helps detected spam using attached PDF files
   pdf_is_encrypted()
 
      body RULENAME eval:pdf_is_encrypted()
+
+  pdf_has_form()
+
+     body RULENAME eval:pdf_has_form()
+
+  pdf_has_script()
+
+     body RULENAME eval:pdf_has_script()
+
+  pdf_has_auto_script()
+
+     body RULENAME eval:pdf_has_auto_script()
 
   pdf_is_empty_body()
 
@@ -183,6 +201,7 @@ sub new {
 
   $self->register_eval_rule ("pdf_count", $Mail::SpamAssassin::Conf::TYPE_BODY_EVALS);
   $self->register_eval_rule ("pdf_image_count", $Mail::SpamAssassin::Conf::TYPE_BODY_EVALS);
+  $self->register_eval_rule ("pdf_uri_count", $Mail::SpamAssassin::Conf::TYPE_BODY_EVALS);
   $self->register_eval_rule ("pdf_pixel_coverage", $Mail::SpamAssassin::Conf::TYPE_BODY_EVALS);
   $self->register_eval_rule ("pdf_image_size_exact", $Mail::SpamAssassin::Conf::TYPE_BODY_EVALS);
   $self->register_eval_rule ("pdf_image_size_range", $Mail::SpamAssassin::Conf::TYPE_BODY_EVALS);
@@ -193,6 +212,9 @@ sub new {
   $self->register_eval_rule ("pdf_match_fuzzy_md5", $Mail::SpamAssassin::Conf::TYPE_BODY_EVALS);
   $self->register_eval_rule ("pdf_match_details", $Mail::SpamAssassin::Conf::TYPE_BODY_EVALS);
   $self->register_eval_rule ("pdf_is_encrypted", $Mail::SpamAssassin::Conf::TYPE_BODY_EVALS);
+  $self->register_eval_rule ("pdf_has_form", $Mail::SpamAssassin::Conf::TYPE_BODY_EVALS);
+  $self->register_eval_rule ("pdf_has_script", $Mail::SpamAssassin::Conf::TYPE_BODY_EVALS);
+  $self->register_eval_rule ("pdf_has_auto_script", $Mail::SpamAssassin::Conf::TYPE_BODY_EVALS);
   $self->register_eval_rule ("pdf_is_empty_body", $Mail::SpamAssassin::Conf::TYPE_BODY_EVALS);
 
   # lower priority for add_uri_detail_list to work
@@ -209,6 +231,7 @@ sub parsed_metadata {
   # initialize
   $pms->{pdfinfo}->{count_pdf} = 0;
   $pms->{pdfinfo}->{count_pdf_images} = 0;
+  $pms->{pdfinfo}->{count_pdf_uris} = 0;
 
   my @parts = $pms->{msg}->find_parts(qr@^(image|application)/(pdf|octet\-stream)$@, 1);
   my $part_count = scalar @parts;
@@ -232,6 +255,7 @@ sub parsed_metadata {
 
   _set_tag($pms, 'PDFCOUNT',  $pms->{pdfinfo}->{count_pdf});
   _set_tag($pms, 'PDFIMGCOUNT', $pms->{pdfinfo}->{count_pdf_images});
+  _set_tag($pms, 'PDFURICOUNT', $pms->{pdfinfo}->{count_pdf_uris});
 }
 
 sub _get_pdf_details {
@@ -263,6 +287,9 @@ sub _get_pdf_details {
   my $no_more_fuzzy = 0;
   my $got_image = 0;
   my $encrypted = 0;
+  my $has_form = 0;
+  my $has_script = 0;
+  my $has_auto_script = 0;
   my %uris;
 
   while ($data =~ /([^\n]+)/g) {
@@ -282,6 +309,26 @@ sub _get_pdf_details {
     if (!$encrypted && index($line, '/Encrypt') == 0) {
       # store encrypted flag.
       $encrypted = $pms->{pdfinfo}->{encrypted} = 1;
+    }
+
+    # Detect if the PDF file has an embedded form
+    if (!$has_form && index($line, '/AcroForm') == 0) {
+      # PDF has a Form.
+      $has_form = $pms->{pdfinfo}->{has_form} = 1;
+    }
+
+    # Detect if the PDF file has Javascript code that can optionally be started automatically
+    if (!$has_script && index($line, '/JS') == 0) {
+      # PDF has Javascript code.
+      $has_script = $pms->{pdfinfo}->{has_script} = 1;
+    }
+    if (!$has_auto_script && index($line, '/AA') == 0) {
+      $has_auto_script++;
+    } elsif (!$has_auto_script && index($line, '/OpenAction') == 0) {
+      $has_auto_script++;
+    }
+    if($has_auto_script and $has_script) {
+      $pms->{pdfinfo}->{has_auto_script} = 1;
     }
 
     # From a v1.3 pdf
@@ -334,13 +381,23 @@ sub _get_pdf_details {
         $location = _parse_string($1);
       }
       if (not defined($location) or index($location, '.') <= 0) {
-        $location = _parse_string($2);
+	if(defined $2) {
+          $location = _parse_string($2);
+        } elsif(defined $1) {
+          $location = $1;
+          local $1;
+          $location =~ s/\\([0-3]?[0-7]{1,2})/chr(oct($1))/ge;
+          $location = _parse_string($location);
+        } else {
+	  next;
+	}
       }
       next unless index($location, '.') > 0; # ignore some binary mess
       next if $location =~ /\0/; # ignore urls with NUL characters
       if (!exists $uris{$location}) {
         $uris{$location} = 1;
         dbg("pdfinfo: found URI: $location");
+        $pms->{pdfinfo}->{count_pdf_uris}++;
         $pms->add_uri_detail_list($location);
       }
     }
@@ -502,6 +559,24 @@ sub pdf_is_encrypted {
   return $pms->{pdfinfo}->{encrypted} ? 1 : 0;
 }
 
+sub pdf_has_form {
+  my ($self, $pms, $body) = @_;
+
+  return $pms->{pdfinfo}->{has_form} ? 1 : 0;
+}
+
+sub pdf_has_script {
+  my ($self, $pms, $body) = @_;
+
+  return $pms->{pdfinfo}->{has_script} ? 1 : 0;
+}
+
+sub pdf_has_auto_script {
+  my ($self, $pms, $body) = @_;
+
+  return $pms->{pdfinfo}->{has_auto_script} ? 1 : 0;
+}
+
 sub pdf_count {
   my ($self, $pms, $body, $min, $max) = @_;
 
@@ -512,6 +587,12 @@ sub pdf_image_count {
   my ($self, $pms, $body, $min, $max) = @_;
 
   return _result_check($min, $max, $pms->{pdfinfo}->{count_pdf_images});
+}
+
+sub pdf_uri_count {
+  my ($self, $pms, $body, $min, $max) = @_;
+
+  return _result_check($min, $max, $pms->{pdfinfo}->{count_pdf_uris});
 }
 
 sub pdf_pixel_coverage {
@@ -634,5 +715,24 @@ sub _result_check {
   return 0 if defined $nomaxequal && $nomaxequal && $value == $max;
   return 1;
 }
+
+# Version features
+sub has_pdf_named { 1 }
+sub has_pdf_name_regex { 1 }
+sub has_pdf_is_encrypted { 1 }
+sub has_pdf_count { 1 }
+sub has_pdf_image_count { 1 }
+sub has_pdf_uri_count { 1 }
+sub has_pdf_pixel_coverage { 1 }
+sub has_pdf_image_to_text_ratio { 1 }
+sub has_pdf_is_empty_body { 1 }
+sub has_pdf_image_size_exact { 1 }
+sub has_pdf_image_size_range { 1 }
+sub has_pdf_match_md5 { 1 }
+sub has_pdf_match_fuzzy_md5 { 1 }
+sub has_pdf_match_details { 1 }
+sub has_pdf_has_form { 1 }
+sub has_pdf_has_script { 1 }
+sub has_pdf_has_auto_script { 1 }
 
 1;

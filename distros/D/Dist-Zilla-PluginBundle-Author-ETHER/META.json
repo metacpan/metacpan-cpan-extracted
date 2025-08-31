@@ -32,13 +32,13 @@
          "requires" : {
             "Devel::CheckBin" : "0",
             "ExtUtils::MakeMaker" : "0",
-            "File::ShareDir::Install" : "0.06",
+            "File::ShareDir::Install" : "0.10",
             "perl" : "5.013002"
          }
       },
       "develop" : {
          "recommends" : {
-            "Dist::Zilla::PluginBundle::Author::ETHER" : "0.166",
+            "Dist::Zilla::PluginBundle::Author::ETHER" : "0.167",
             "Dist::Zilla::PluginBundle::Git::VersionManager" : "0.007"
          },
          "requires" : {
@@ -205,6 +205,8 @@
             "Text::Tabs" : "2013.0426",
             "Try::Tiny" : "0",
             "URI::Escape" : "0",
+            "autovivification" : "0",
+            "feature" : "0",
             "if" : "0",
             "namespace::autoclean" : "0",
             "perl" : "5.013002",
@@ -329,15 +331,15 @@
    "provides" : {
       "Dist::Zilla::MintingProfile::Author::ETHER" : {
          "file" : "lib/Dist/Zilla/MintingProfile/Author/ETHER.pm",
-         "version" : "0.167"
+         "version" : "0.168"
       },
       "Dist::Zilla::PluginBundle::Author::ETHER" : {
          "file" : "lib/Dist/Zilla/PluginBundle/Author/ETHER.pm",
-         "version" : "0.167"
+         "version" : "0.168"
       },
       "Pod::Weaver::PluginBundle::Author::ETHER" : {
          "file" : "lib/Pod/Weaver/PluginBundle/Author/ETHER.pm",
-         "version" : "0.167"
+         "version" : "0.168"
       }
    },
    "release_status" : "stable",
@@ -355,12 +357,23 @@
       "x_IRC" : "irc://irc.perl.org/#distzilla",
       "x_MailingList" : "http://dzil.org/#mailing-list"
    },
-   "version" : "0.167",
+   "version" : "0.168",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.041012"
+         "version" : "5.043002"
       },
       "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "configure",
+                  "type" : "requires"
+               }
+            },
+            "name" : "ConfigureRequires",
+            "version" : "6.033"
+         },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
             "config" : {
@@ -1059,7 +1072,7 @@
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
             "config" : {
                "Dist::Zilla::Plugin::Git::Contributors" : {
-                  "git_version" : "2.47.1",
+                  "git_version" : "2.50.1",
                   "include_authors" : 0,
                   "include_releaser" : 1,
                   "order_by" : "commits",
@@ -1150,7 +1163,7 @@
             "class" : "Dist::Zilla::Plugin::EnsureLatestPerl",
             "config" : {
                "Dist::Zilla::Plugin::EnsureLatestPerl" : {
-                  "Module::CoreList" : "5.20250421"
+                  "Module::CoreList" : "5.20250820"
                }
             },
             "name" : "@Author::ETHER/EnsureLatestPerl",
@@ -1183,7 +1196,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.47.1",
+                  "git_version" : "2.50.1",
                   "repo_root" : "."
                }
             },
@@ -1194,7 +1207,7 @@
             "class" : "Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.47.1",
+                  "git_version" : "2.50.1",
                   "repo_root" : "."
                }
             },
@@ -1205,7 +1218,7 @@
             "class" : "Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.47.1",
+                  "git_version" : "2.50.1",
                   "repo_root" : "."
                }
             },
@@ -1239,7 +1252,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.47.1",
+                  "git_version" : "2.50.1",
                   "repo_root" : "."
                }
             },
@@ -1351,7 +1364,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.47.1",
+                  "git_version" : "2.50.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1368,12 +1381,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.167",
+                  "tag" : "v0.168",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.47.1",
+                  "git_version" : "2.50.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1423,7 +1436,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.47.1",
+                  "git_version" : "2.50.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1454,7 +1467,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.47.1",
+                  "git_version" : "2.50.1",
                   "repo_root" : "."
                }
             },
@@ -1625,7 +1638,7 @@
       "Roy Ivy III <rivy@cpan.org>",
       "\u0421\u0435\u0440\u0433\u0435\u0439 \u0420\u043e\u043c\u0430\u043d\u043e\u0432 <sromanov@cpan.org>"
    ],
-   "x_generated_by_perl" : "v5.41.12",
+   "x_generated_by_perl" : "v5.43.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.39",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_static_install" : 0,

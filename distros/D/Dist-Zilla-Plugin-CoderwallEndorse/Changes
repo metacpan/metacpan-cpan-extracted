@@ -1,5 +1,12 @@
 Revision history for Dist-Zilla-Plugin-CoderwallEndorse
 
+0.2.1 2025-08-30
+ [BUG FIXES]
+ - Tagging the module as deprecated.
+
+ [STATISTICS]
+ - code churn: 8 files changed, 264 insertions(+), 6 deletions(-)
+
 0.2.0 2013-12-15
  [ENHANCEMENTS]
  - Move the plugin to the dzil file munging phase.  (RT#91409, reported by
@@ -25,4 +32,3 @@ Revision history for Dist-Zilla-Plugin-CoderwallEndorse
 
 0.1.0 2012-11-11
  - First version, unleashed on an unsuspecting world.
-

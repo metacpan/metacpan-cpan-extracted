@@ -4,7 +4,7 @@ Parallel::ForkManager - A simple parallel processing fork manager
 
 # VERSION
 
-version 2.03
+version 2.04
 
 # SYNOPSIS
 
@@ -179,6 +179,13 @@ C for child.
 
     my $nbr_children = $pm->running_procs;
     ```
+
+- running\_procs\_with\_identifiers
+
+    Returns a list of pairs.  The keys are the pids of forked processes (as
+    returned by `running_procs` and the values are the identifiers given to those
+    pids by `start`.  If no identifier was given for a process, the value for that
+    pid will be undefined.
 
 - wait\_for\_available\_procs( $n )
 
@@ -688,7 +695,7 @@ Ken Clarke <www.perlprogrammer.net>  (datastructure retrieval)
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024, 2015 by Balázs Szabó.
+This software is copyright (c) 2025, 2015 by Balázs Szabó.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

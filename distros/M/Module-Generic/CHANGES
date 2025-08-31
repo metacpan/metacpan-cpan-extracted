@@ -1,5 +1,11 @@
 Revision history for Perl module Module::Generic
 
+v1.0.5 2025-08-31T18:43:48+0900
+    - Improved _set_get_hash_as_mix_object, and corrected minor issue in Module::Generic::Dynamic
+
+v1.0.4 2025-08-30T17:46:06+0900
+    - Corrected the freeze method of Module::Generic::Hash
+
 v1.0.3 2025-08-30T14:29:05+0900
     - Corrected a minor oversight in Module::Generic::Null new
     - Corrected a minor error in documentation of Module::Generic::Array for 'callback'

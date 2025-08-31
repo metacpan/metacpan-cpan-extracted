@@ -1,5 +1,15 @@
 Revision history for Perl extension Parallel::ForkManager.
 
+2.04 2025-08-30
+ [DOCUMENTATION]
+ - Add a SECURITY document. (GH#44)
+
+ [ENHANCEMENTS]
+ - Add 'running_procs_with_identifiers' method
+
+ [STATISTICS]
+ - code churn: 7 files changed, 157 insertions(+), 116 deletions(-)
+
 2.03 2024-08-24
  [BUG FIXES]
  - Fix invalid default error when using old Moo (GH#41)

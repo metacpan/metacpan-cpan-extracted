@@ -1,4 +1,6 @@
 AUTHOR_PLEDGE
+CODE_OF_CONDUCT.md
+CONTRIBUTING.md
 CONTRIBUTORS
 Changes
 INSTALL
@@ -9,6 +11,7 @@ META.yml
 Makefile.PL
 README
 README.mkdn
+SECURITY.md
 SIGNATURE
 cpanfile
 doap.xml
@@ -23,5 +26,4 @@ t/00-report-prereqs.dd
 t/00-report-prereqs.t
 t/basic.t
 t/sample1.t
-xt/release/pause-permissions.t
 xt/release/unused-vars.t

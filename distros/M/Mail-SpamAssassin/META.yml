@@ -4,13 +4,11 @@ author:
   - 'The Apache SpamAssassin Project <dev@spamassassin.apache.org>'
 build_requires:
   ExtUtils::MakeMaker: '6.64'
-  Perl::Critic::Policy::Perlsecret: '0'
-  Perl::Critic::Policy::TestingAndDebugging::ProhibitNoStrict: '0'
   Test::Simple: '1.302067'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
 license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -54,7 +52,6 @@ requires:
   Errno: '0'
   File::Copy: '2.02'
   File::Spec: '0.8'
-  File::Temp: '0'
   HTML::Parser: '3.43'
   IO::Zlib: '1.04'
   Mail::DKIM: '0.31'
@@ -70,5 +67,5 @@ resources:
   homepage: https://spamassassin.apache.org/
   license: http://www.apache.org/licenses/LICENSE-2.0.html
   repository: http://svn.apache.org/repos/asf/spamassassin/
-version: '4.000001'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: '4.000002'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

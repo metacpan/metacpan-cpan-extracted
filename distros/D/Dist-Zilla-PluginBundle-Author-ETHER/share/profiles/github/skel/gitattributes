@@ -1,3 +1,0 @@
-*.pl linguist-language=Perl whitespace=trailing-space,space-before-tab,tab-in-indent
-*.pm linguist-language=Perl whitespace=trailing-space,space-before-tab,tab-in-indent
-*.t linguist-language=Perl whitespace=trailing-space,space-before-tab,tab-in-indent

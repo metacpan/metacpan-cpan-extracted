@@ -15,7 +15,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,10 +24,10 @@ name: Parallel-ForkManager
 provides:
   Parallel::ForkManager:
     file: lib/Parallel/ForkManager.pm
-    version: '2.03'
+    version: '2.04'
   Parallel::ForkManager::Child:
     file: lib/Parallel/ForkManager/Child.pm
-    version: '2.03'
+    version: '2.04'
 requires:
   Carp: '0'
   File::Path: '0'
@@ -43,7 +43,7 @@ resources:
   bugtracker: https://github.com/dluxhu/perl-parallel-forkmanager/issues
   homepage: https://github.com/dluxhu/perl-parallel-forkmanager
   repository: https://github.com/dluxhu/perl-parallel-forkmanager.git
-version: '2.03'
+version: '2.04'
 x_authority: cpan:DLUX
 x_contributor_covenant:
   version: 0.02

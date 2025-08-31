@@ -223,9 +223,6 @@ WriteMakefile
    # Linker flags for building a dynamically loadable module
    'LDDLFLAGS' => $LDDLFLAGS_magick,
 
-   # Install PerlMagick binary into ImageMagick bin directory
-   'INSTALLBIN'	=> '/usr/local/bin',
-
    # Library specification
    'LIBS' => [ $LIBS_magick ],
 

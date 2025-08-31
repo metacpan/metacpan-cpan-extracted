@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Hash.pm
-## Version v1.5.0
+## Version v1.5.1
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2025/07/04
+## Modified 2025/08/30
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -43,7 +43,7 @@ BEGIN
     );
     # Do we allow the use of object as hash keys?
     our $KEY_OBJECT = 0;
-    our( $VERSION ) = 'v1.5.0';
+    our( $VERSION ) = 'v1.5.1';
 };
 
 use strict;
@@ -72,11 +72,14 @@ sub new
     if( scalar( @_ ) == 1 )
     {
         my $data = shift( @_ );
-        return( $that->error( "I was expecting an hash, but instead got '", ( $data // 'undef' ), "'." ) ) if( Scalar::Util::reftype( $data // '' ) ne 'HASH' );
-        my $tied = tied( %$data );
-        return( $that->error( "Hash provided is already tied to ", ref( $tied ), " and our package $class cannot use it, or it would disrupt the tie." ) ) if( $tied );
-        my @keys = CORE::keys( %$data );
-        @hash{ @keys } = @$data{ @keys };
+        if( defined( $data ) )
+        {
+            return( $that->error( "I was expecting an hash, but instead got '", ( $data // 'undef' ), "'." ) ) if( Scalar::Util::reftype( $data // '' ) ne 'HASH' );
+            my $tied = tied( %$data );
+            return( $that->error( "Hash provided is already tied to ", ref( $tied ), " and our package $class cannot use it, or it would disrupt the tie." ) ) if( $tied );
+            my @keys = CORE::keys( %$data );
+            @hash{ @keys } = @$data{ @keys };
+        }
     }
     elsif( scalar( @_ ) > 1 &&
         !( @_ % 2 ) )
@@ -729,9 +732,10 @@ sub FREEZE
     my $clone = $self->clone;
     my $obj = $self->_tie_object;
     my $flag = $obj->enable;
-    $obj->enable(0) if( $flag );
-    my %data = %{$clone->{data}};
-    $obj->enable(1) if( $flag );
+    $obj->enable(1) if( !$flag );
+    # my %data = %{$clone->{data} // {}};
+    my %data = %$self;
+    $obj->enable(0) if( !$flag );
     # Return an array reference rather than a list so this works with Sereal and CBOR
     # On or before Sereal version 4.023, Sereal did not support multiple values returned
     CORE::return( [$class, \%data] ) if( $serialiser eq 'Sereal' && Sereal::Encoder->VERSION <= version->parse( '4.023' ) );

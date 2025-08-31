@@ -1,22 +1,24 @@
 use strict;
 use warnings;
-package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.166-2-gab864ba
+package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.167-6-g4d7c77c
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: A plugin bundle for distributions built by ETHER
 # KEYWORDS: author bundle distribution tool
 
-our $VERSION = '0.167';
+our $VERSION = '0.168';
 
-use if "$]" >= 5.022, experimental => 're_strict';
-no if "$]" >= 5.031009, feature => 'indirect';
-no if "$]" >= 5.033001, feature => 'multidimensional';
-no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use Moose;
 with
     'Dist::Zilla::Role::PluginBundle::Easy',
     'Dist::Zilla::Role::PluginBundle::PluginRemover' => { -version => '0.103' },
     'Dist::Zilla::Role::PluginBundle::Config::Slicer';
 
+use if "$]" >= 5.022, experimental => 're_strict';
+no if "$]" >= 5.031009, feature => 'indirect';
+no if "$]" >= 5.033001, feature => 'multidimensional';
+no if "$]" >= 5.033006, feature => 'bareword_filehandles';
+no if "$]" >= 5.041009, feature => 'smartmatch';
+no feature 'switch';
 use Dist::Zilla::Util;
 use Moose::Util::TypeConstraints qw(enum subtype where class_type);
 use List::Util 1.45 qw(first any uniq none);
@@ -668,7 +670,7 @@ Dist::Zilla::PluginBundle::Author::ETHER - A plugin bundle for distributions bui
 
 =head1 VERSION
 
-version 0.167
+version 0.168
 
 =head1 SYNOPSIS
 

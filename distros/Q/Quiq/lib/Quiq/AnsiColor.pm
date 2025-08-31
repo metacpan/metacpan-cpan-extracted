@@ -81,7 +81,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.229';
+our $VERSION = '1.230';
 
 use Term::ANSIColor ();
 
@@ -230,7 +230,8 @@ Siehe L<str|"str() - Formatiere String mit Colorcodes">()
 
 =head4 Description
 
-Wie L<str|"str() - Formatiere String mit Colorcodes">(), nur dass der Rückgabewert mit einem Newline beendet wird.
+Wie L<str|"str() - Formatiere String mit Colorcodes">(), nur dass der
+Rückgabewert mit einem Newline beendet wird.
 
 =cut
 
@@ -244,7 +245,7 @@ sub strLn {
 
 =head1 VERSION
 
-1.229
+1.230
 
 =head1 AUTHOR
 

@@ -73,7 +73,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.229';
+our $VERSION = '1.230';
 
 use Quiq::Option;
 use Quiq::Reference;
@@ -108,7 +108,7 @@ dem Inhalt $text.
 =item -secure => $bool (Default: 0)
 
 Prüfe die Sicherheit der Datei. Wenn gesetzt, wird geprüft,
-ob die Datei nur für den Benutzer lesbar/schreibbar ist.
+ob die Datei nur für den aufrufenden Benutzer lesbar/schreibbar ist.
 
 =back
 
@@ -184,7 +184,7 @@ sub new {
             else {
                 $class->throw(
                     'CFG-00002: Config file not found',
-                    ConfigFile => $cfgFile,
+                    ConfigFile => "@_",
                 );
             }
         }
@@ -297,7 +297,7 @@ sub try {
 
 =head1 VERSION
 
-1.229
+1.230
 
 =head1 AUTHOR
 

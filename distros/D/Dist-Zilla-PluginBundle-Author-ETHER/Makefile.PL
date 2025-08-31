@@ -22,7 +22,7 @@ my %WriteMakefileArgs = (
   "CONFIGURE_REQUIRES" => {
     "Devel::CheckBin" => 0,
     "ExtUtils::MakeMaker" => 0,
-    "File::ShareDir::Install" => "0.06"
+    "File::ShareDir::Install" => "0.10"
   },
   "DISTNAME" => "Dist-Zilla-PluginBundle-Author-ETHER",
   "LICENSE" => "perl",
@@ -145,6 +145,8 @@ my %WriteMakefileArgs = (
     "Text::Tabs" => "2013.0426",
     "Try::Tiny" => 0,
     "URI::Escape" => 0,
+    "autovivification" => 0,
+    "feature" => 0,
     "if" => 0,
     "namespace::autoclean" => 0,
     "strict" => 0,
@@ -175,7 +177,7 @@ my %WriteMakefileArgs = (
     "namespace::clean" => 0,
     "parent" => 0
   },
-  "VERSION" => "0.167",
+  "VERSION" => "0.168",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -315,6 +317,8 @@ my %FallbackPrereqs = (
   "Text::Tabs" => "2013.0426",
   "Try::Tiny" => 0,
   "URI::Escape" => 0,
+  "autovivification" => 0,
+  "feature" => 0,
   "if" => 0,
   "lib" => 0,
   "namespace::autoclean" => 0,

@@ -10,9 +10,11 @@ use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
+no if "$]" >= 5.041009, feature => 'smartmatch';
+no feature 'switch';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
-use Test::More 0.88;
+use Test2::V0;
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
 {{
     ($zilla_plugin) = ($dist->name =~ /^Dist-Zilla-Plugin-(.+)$/g);
@@ -72,6 +74,7 @@ diag 'got log messages: ', explain \$tzil->log_messages
   if not Test::Builder->new->is_passing;
 PLUGIN
         : 'use ' . $dist->name =~ s/-/::/gr . ';'
-            . "\n\nfail('this test is TODO!');"
+            . "\n\nmy \$todo = todo('not yet implemented');"
+            . "\nfail('this test is TODO!');\n"
 }}
 done_testing;

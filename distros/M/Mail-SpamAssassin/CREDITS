@@ -1,4 +1,4 @@
-Copyright (C) 2024 The Apache Software Foundation
+Copyright (C) 2025 The Apache Software Foundation
 
 Project Management Committee (PMC):
 
@@ -15,11 +15,10 @@ Project Management Committee (PMC):
    - John Hardin
    - Dave Jones
    - Adam Katz
-   - Henrik Krohns
    - Sidney Markowitz
    - Mark Martinec
    - Kevin A. McGrail
-   - Michael Parker       http://www.amazon.com/o/registry/10BBAR2M03T6F
+   - Kent Oyer
    - Joe Quinn
    - Paul Stead
 
@@ -37,15 +36,18 @@ PMC Emeritus & inactive committers:
   We wish them well and hope to see them return someday.
 
    - Matthew Cline
-   - Duncan Findlay - PMC Emeritus
    - Tony Finch
+   - Duncan Findlay - PMC Emeritus
    - Steve Freegard
    - Craig Hughes
    - Matt Kettler - PMC Emeritus
+   - Henrik Krohns - PMC Emeritus
    - Justin Mason - Creator & PMC Emeritus
    - Robert Menschel
-   - Daryl C. W. O'Shea - PMC Emeritus
    - John Gardiner Myers
+   - Daniel Lemke
+   - Daryl C. W. O'Shea - PMC Emeritus
+   - Michael Parker - PMC Emeritus
    - Daniel Quinlan - PMC Emeritus
    - Dale 'Doc' Schneider - PMC Emeritus
    - Matt Sergeant
@@ -54,7 +56,6 @@ PMC Emeritus & inactive committers:
    - Warren Togami
    - Theo Van Dinter - PMC Emeritus
    - Matt Yackley
-   - Daniel Lemke
 
 Spamc credits:
 

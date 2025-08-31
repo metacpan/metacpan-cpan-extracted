@@ -1,3 +1,8 @@
+Travel::Status::DE::VRR 3.15 - Sat Aug 30 2025
+
+    * Trip->polyline: improve handling of trips that pass the same stop
+      multiple times
+
 Travel::Status::DE::VRR 3.14 - Mon Jul 14 2025
 
     * Fix handling of stops with just a single departure

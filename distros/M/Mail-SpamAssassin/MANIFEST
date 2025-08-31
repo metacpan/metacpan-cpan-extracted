@@ -50,7 +50,10 @@ lib/Mail/SpamAssassin/DBBasedAddrList.pm
 lib/Mail/SpamAssassin/Dns.pm
 lib/Mail/SpamAssassin/DnsResolver.pm
 lib/Mail/SpamAssassin/GeoDB.pm
+lib/Mail/SpamAssassin/Header.pm
+lib/Mail/SpamAssassin/Header/ParameterHeader.pm
 lib/Mail/SpamAssassin/HTML.pm
+lib/Mail/SpamAssassin/HTML/Color.pm
 lib/Mail/SpamAssassin/Locales.pm
 lib/Mail/SpamAssassin/Locker.pm
 lib/Mail/SpamAssassin/Locker/Flock.pm
@@ -103,6 +106,7 @@ lib/Mail/SpamAssassin/Plugin/PhishTag.pm
 lib/Mail/SpamAssassin/Plugin/PDFInfo.pm
 lib/Mail/SpamAssassin/Plugin/Pyzor.pm
 lib/Mail/SpamAssassin/Plugin/Razor2.pm
+lib/Mail/SpamAssassin/Plugin/Redirectors.pm
 lib/Mail/SpamAssassin/Plugin/RelayCountry.pm
 lib/Mail/SpamAssassin/Plugin/RelayEval.pm
 lib/Mail/SpamAssassin/Plugin/ResourceLimits.pm
@@ -158,6 +162,7 @@ rules/v342.pre
 rules/v343.pre
 rules/v400.pre
 rules/v401.pre
+rules/v402.pre
 rules/20_aux_tlds.cf
 rules-extras/README.txt
 rules-extras/10_uridnsbl_skip_financial.cf
@@ -237,6 +242,9 @@ sql/bayes_pg.sql
 sql/decodeshorturl_mysql.sql
 sql/decodeshorturl_pg.sql
 sql/decodeshorturl_sqlite.sql
+sql/redirectors_mysql.sql
+sql/redirectors_pg.sql
+sql/redirectors_sqlite.sql
 sql/userpref_mysql.sql
 sql/userpref_pg.sql
 sql/txrep_mysql.sql
@@ -451,6 +459,9 @@ t/data/spam/gtube.eml
 t/data/spam/gtubedcc.eml
 t/data/spam/gtubedcc_crlf.eml
 t/data/spam/hashbl
+t/data/spam/invalid_from
+t/data/spam/invalid_replyto
+t/data/spam/invalid_sender
 t/data/spam/olevbmacro/encrypted.eml
 t/data/spam/olevbmacro/goodcsv.eml
 t/data/spam/olevbmacro/macro.eml
@@ -463,6 +474,8 @@ t/data/spam/phishing_openphish.eml
 t/data/spam/phishing_phishtank.eml
 t/data/spam/pyzor
 t/data/spam/razor2
+t/data/spam/redirectors/base.eml
+t/data/spam/redirectors/base2.eml
 t/data/spam/relayUS.eml
 t/data/spam/spf1
 t/data/spam/spf2
@@ -470,6 +483,8 @@ t/data/spam/spf3
 t/data/spam/unicode1
 t/data/spam/unicode2
 t/data/spam/urilocalbl_net.eml
+t/data/spam/utf8_anchor_text.eml
+t/data/spam/utf16.eml
 t/data/spamc_blank.cf
 t/data/taintcheckplugin.pm
 t/data/testplugin.pm
@@ -563,6 +578,7 @@ t/mkrules_else.t
 t/nonspam.t
 t/olevbmacro.t
 t/originating_ip_hdr.t
+t/parameter_header.t
 t/pdfinfo.t
 t/phishing.t
 t/plugin.t
@@ -581,6 +597,7 @@ t/re_base_extraction.t
 t/recips.t
 t/recreate.t
 t/recursion.t
+t/redirectors.t
 t/regexp_named_capture.t
 t/regexp_valid.t
 t/relative_scores.t
@@ -687,7 +704,9 @@ t/uribl_domains_only.t
 t/uribl_ips_only.t
 t/uridetail.t
 t/urilocalbl.t
+t/utf16.t
 t/utf8.t
+t/util_parse_header_addresses.t
 t/util_wrap.t
 t/welcomelist_addrs.t
 t/welcomelist_from.t

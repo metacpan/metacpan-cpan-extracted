@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.006;
+use 5.020000;
 
 use ExtUtils::MakeMaker;
 
@@ -21,10 +21,11 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Dist-Zilla-PluginBundle-YANICK",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.006",
+  "MIN_PERL_VERSION" => "5.020000",
   "NAME" => "Dist::Zilla::PluginBundle::YANICK",
   "PREREQ_PM" => {
     "Dist::Zilla" => 0,
+    "Dist::Zilla::File::InMemory" => 0,
     "Dist::Zilla::Plugin::Authority" => 0,
     "Dist::Zilla::Plugin::CPANFile" => 0,
     "Dist::Zilla::Plugin::ChangeStats::Git" => "0.2.1",
@@ -63,9 +64,12 @@ my %WriteMakefileArgs = (
     "Dist::Zilla::Plugin::Test::ReportPrereqs" => 0,
     "Dist::Zilla::Plugin::Test::UnusedVars" => 0,
     "Dist::Zilla::Plugin::VerifyPhases" => 0,
+    "Dist::Zilla::Role::FileGatherer" => 0,
     "Dist::Zilla::Role::MintingProfile::ShareDir" => 0,
+    "Dist::Zilla::Role::Plugin" => 0,
     "Dist::Zilla::Role::PluginBundle::Config::Slicer" => 0,
     "Dist::Zilla::Role::PluginBundle::Easy" => 0,
+    "Dist::Zilla::Role::TextTemplate" => 0,
     "Moose" => 0,
     "Type::Tiny" => 0,
     "Types::Standard" => 0,
@@ -80,7 +84,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.32.0",
+  "VERSION" => "0.32.1",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -89,6 +93,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Dist::Zilla" => 0,
+  "Dist::Zilla::File::InMemory" => 0,
   "Dist::Zilla::Plugin::Authority" => 0,
   "Dist::Zilla::Plugin::CPANFile" => 0,
   "Dist::Zilla::Plugin::ChangeStats::Git" => "0.2.1",
@@ -127,9 +132,12 @@ my %FallbackPrereqs = (
   "Dist::Zilla::Plugin::Test::ReportPrereqs" => 0,
   "Dist::Zilla::Plugin::Test::UnusedVars" => 0,
   "Dist::Zilla::Plugin::VerifyPhases" => 0,
+  "Dist::Zilla::Role::FileGatherer" => 0,
   "Dist::Zilla::Role::MintingProfile::ShareDir" => 0,
+  "Dist::Zilla::Role::Plugin" => 0,
   "Dist::Zilla::Role::PluginBundle::Config::Slicer" => 0,
   "Dist::Zilla::Role::PluginBundle::Easy" => 0,
+  "Dist::Zilla::Role::TextTemplate" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,

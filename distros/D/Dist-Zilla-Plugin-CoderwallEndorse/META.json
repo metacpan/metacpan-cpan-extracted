@@ -1,32 +1,29 @@
 {
-   "abstract" : "Adds a Coderwall 'endorse' button to README Markdown file",
+   "abstract" : "Adds a Coderwall 'endorse' button to README Markdown file (DEPRECATED)",
    "author" : [
       "Yanick Champoux <yanick@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Dist-Zilla-Plugin-CoderwallEndorse",
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "Module::Build" : "0.3601"
-         }
-      },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.3601"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "develop" : {
          "requires" : {
-            "version" : "0.9901"
+            "Software::Security::Policy::Individual" : "0",
+            "Test::More" : "0.96",
+            "Test::Vars" : "0"
          }
       },
       "runtime" : {
@@ -41,39 +38,50 @@
          }
       },
       "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
          "requires" : {
+            "ExtUtils::MakeMaker" : "0",
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "JSON::Any" : "0",
             "Test::DZil" : "0",
-            "Test::More" : "0.96"
+            "Test::More" : "0.96",
+            "perl" : "5.006"
          }
       }
    },
    "provides" : {
       "Dist::Zilla::Plugin::CoderwallEndorse" : {
          "file" : "lib/Dist/Zilla/Plugin/CoderwallEndorse.pm",
-         "version" : "v0.2.0"
+         "version" : "v0.2.1"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "bug-dist-zilla-plugin-coderwallendorse at rt.cpan.org",
-         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-CoderwallEndorse"
+         "web" : "https://github.com/yanick/Dist-Zilla-Plugin-CoderwallEndorse/issues"
       },
-      "homepage" : "http://search.cpan.org/dist/Dist-Zilla-Plugin-CoderwallEndorse/",
+      "homepage" : "https://github.com/yanick/Dist-Zilla-Plugin-CoderwallEndorse",
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/yanick/Dist-Zilla-Plugin-CoderwallEndorse.git",
          "web" : "https://github.com/yanick/Dist-Zilla-Plugin-CoderwallEndorse"
       }
    },
-   "version" : "0.2.0",
+   "version" : "0.2.1",
    "x_author_pledge" : {
       "version" : 1
    },
-   "x_authority" : "cpan:YANICK"
+   "x_authority" : "cpan:YANICK",
+   "x_contributor_covenant" : {
+      "version" : 0.02
+   },
+   "x_deprecated" : 1,
+   "x_generated_by_perl" : "v5.38.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

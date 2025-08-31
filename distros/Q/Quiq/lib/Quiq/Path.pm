@@ -31,7 +31,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.229';
+our $VERSION = '1.230';
 
 use Quiq::Option;
 use Quiq::FileHandle;
@@ -487,7 +487,7 @@ sub copyToDir {
 
 =head4 Synopsis
 
-  $class->duplicate($method,$srcPath,$destPath,@opt);
+  $this->duplicate($method,$srcPath,$destPath,@opt);
 
 =head4 Arguments
 
@@ -538,10 +538,10 @@ Werte für $method:
 # -----------------------------------------------------------------------------
 
 sub duplicate {
-    my $class = shift;
+    my $this = shift;
     my $method = shift;
-    my $srcPath = shift;
-    my $destPath = shift;
+    my $srcPath = $this->expandTilde(shift);
+    my $destPath = $this->expandTilde(shift);
     # @_: @opt
 
     # Optionen
@@ -557,19 +557,19 @@ sub duplicate {
     # Operation ausführen
 
     if ($method eq 'copy') {
-        $class->copy($srcPath,$destPath,-preserve=>1);
+        $this->copy($srcPath,$destPath,-preserve=>1);
     }
     elsif ($method eq 'move' || $method eq 'rename') {
-        $class->rename($srcPath,$destPath);
+        $this->rename($srcPath,$destPath);
     }
     elsif ($method eq 'link') {
-        $class->link($srcPath,$destPath);
+        $this->link($srcPath,$destPath);
     }
     elsif ($method eq 'symlink') {
-        $class->symlinkRelative($srcPath,$destPath);
+        $this->symlinkRelative($srcPath,$destPath);
     }
     else {
-        $class->throw;
+        $this->throw;
     }
 
     return;
@@ -4497,7 +4497,7 @@ sub uid {
 
 =head1 VERSION
 
-1.229
+1.230
 
 =head1 AUTHOR
 

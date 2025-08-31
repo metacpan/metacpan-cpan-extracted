@@ -4,21 +4,23 @@ Language::l33t - a l33t interpreter
 
 # VERSION
 
-version 1.0.1
+version 1.0.2
 
 # SYNOPSIS
 
-    use Language::l33t;
+```perl
+use Language::l33t;
 
-    my $interpreter = Language::l33t->new;
-    $interpreter->set_source( 'Ph34r my l33t sk1llz' );
-    $interpreter->run;
+my $interpreter = Language::l33t->new;
+$interpreter->set_source( 'Ph34r my l33t sk1llz' );
+$interpreter->run;
+```
 
 # DESCRIPTION
 
 Language::l33t is a Perl interpreter of the l33t language created by
 Stephen McGreal and Alex Mole. For the specifications of l33t, refer
-to [Language::l33t::Specifications](https://metacpan.org/pod/Language::l33t::Specifications).
+to [Language::l33t::Specifications](https://metacpan.org/pod/Language%3A%3Al33t%3A%3ASpecifications).
 
 # METHODS
 
@@ -41,15 +43,17 @@ Creates a new interpreter. The options that can be passed to the function are:
 
     E.g.:
 
-        my $output;
-        open my $fh_output, '>', \$output;
+    ```perl
+    my $output;
+    open my $fh_output, '>', \$output;
 
-        my $l33t = Language::l33t->new( stdout => $fh_output );
+    my $l33t = Language::l33t->new( stdout => $fh_output );
 
-        $l33t->set_source( $code );
-        $l33t->run;
+    $l33t->set_source( $code );
+    $l33t->run;
 
-        print "l33t output: $output";
+    print "l33t output: $output";
+    ```
 
 - memory\_max\_size => $bytes
 
@@ -80,13 +84,15 @@ recompiled, and pointers reset to their initial values.
 
 E.g.
 
-    my $l33t = Language::l33t->new();
-    $l33t->load( $code );
-    $l33t->run;
+```perl
+my $l33t = Language::l33t->new();
+$l33t->load( $code );
+$l33t->run;
 
-    # to run the same code a second time
-    $l33t->reset;
-    $l33t->run;
+# to run the same code a second time
+$l33t->reset;
+$l33t->run;
+```
 
 ## memory
 
@@ -113,7 +119,7 @@ Returns the memory of the interpreter in its current state as an array.
 
 # SEE ALSO
 
-[Language::l33t::Specifications](https://metacpan.org/pod/Language::l33t::Specifications)
+[Language::l33t::Specifications](https://metacpan.org/pod/Language%3A%3Al33t%3A%3ASpecifications)
 
 # THANKS 
 
@@ -127,7 +133,7 @@ Yanick Champoux <yanick@cpan.org> [![endorse](http://api.coderwall.com/yanick/en
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2006 by Yanick Champoux.
+This software is copyright (c) 2025, 2008 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

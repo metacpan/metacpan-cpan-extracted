@@ -1,6 +1,6 @@
 package Dist::Zilla::PluginBundle::YANICK;
 our $AUTHORITY = 'cpan:YANICK';
-$Dist::Zilla::PluginBundle::YANICK::VERSION = '0.32.0';
+$Dist::Zilla::PluginBundle::YANICK::VERSION = '0.32.1';
 # ABSTRACT: Be like Yanick when you build your dists
 
 # [TODO] add CONTRIBUTING file
@@ -59,7 +59,7 @@ sub configure {
     my $upstream       = $arg->{upstream}       || 'github';
 
     my @import_from_build = $arg->{import_from_build} ? split( ',', $arg->{import_from_build} ) :
-        qw/ cpanfile AUTHOR_PLEDGE CODE_OF_CONDUCT.md /;
+        qw/ cpanfile AUTHOR_PLEDGE CODE_OF_CONDUCT.md CONTRIBUTING.md /;
 
     my %mb_args;
     $mb_args{mb_class} = $arg->{mb_class} if $arg->{mb_class};
@@ -70,6 +70,7 @@ sub configure {
 
     $self->add_plugins(
         qw/
+            =Dist::Zilla::PluginBundle::YANICK::Contributing
             Git::Contributors
             ContributorsFile
             Test::Compile
@@ -176,8 +177,12 @@ sub configure {
 #            ttl_filename => 'project.ttl',
         } ],
         'CPANFile',
+        [ SecurityPolicy => {
+            -policy => 'Individual',
+            timeframe => '1 month',
+            perl_support_years => 5,
+        } ],
     );
-
 
     $self->config_slice( 'mb_class' );
 
@@ -198,7 +203,7 @@ Dist::Zilla::PluginBundle::YANICK - Be like Yanick when you build your dists
 
 =head1 VERSION
 
-version 0.32.0
+version 0.32.1
 
 =head1 DESCRIPTION
 
@@ -216,6 +221,7 @@ his distributions. It's roughly equivalent to
 
     [InstallGuide]
     [Covenant]
+    [PluginBundle::YANICK::Contributing]
     [ContributorCovenant]
 
     [GithubMeta]
@@ -306,6 +312,11 @@ his distributions. It's roughly equivalent to
 
     [GitHubREADME::Badge]
 
+    [SecurityPolicy]
+    -policy = Individual
+    timeframe = 1 month
+    perl_support_years = 5
+
 =head2 ARGUMENTS
 
 =head3 autoprereqs_skip
@@ -338,10 +349,6 @@ Passed to C<ModuleBuild> plugin.
 
 For C<Git::GatherDir>. Defaults to false.
 
-=head3 tweet
-
-If a tweet should be sent. Defaults to C<true>.
-
 =head3 doap_changelog
 
 If the DOAP plugin should generate the project history
@@ -367,12 +374,12 @@ Defaults to C<github>.
 
 =head3 import_from_build
 
-    import_from_build = cpanfile,AUTHOR_PLEDGE,CODE_OF_CONDUCT.md
+    import_from_build = cpanfile,AUTHOR_PLEDGE,CODE_OF_CONDUCT.md,CONTRIBUTING.md
 
 Comma-separated list of files to import in the checked out
 repo from the build.
 
-Defaults to C<cpanfile,AUTHOR_PLEDGE,CODE_OF_CONDUCT.md>
+Defaults to C<cpanfile,AUTHOR_PLEDGE,CODE_OF_CONDUCT.md,CONTRIBUTING.md>
 
 =head1 AUTHOR
 

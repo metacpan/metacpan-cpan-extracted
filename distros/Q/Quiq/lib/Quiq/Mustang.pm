@@ -45,7 +45,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.229';
+our $VERSION = '1.230';
 
 use Quiq::Path;
 use Quiq::PerlModule;
@@ -230,7 +230,7 @@ sub validate {
   
   ($status,$text) = $mus->getResult($pattern,'text');
   ($status,$ruleH) = $mus->getResult($pattern,'hash');
-  ($status,$html) = $mus->getResult($pattern,'hash');
+  ($status,$html) = $mus->getResult($pattern,'html');
 
 =head4 Arguments
 
@@ -686,7 +686,7 @@ sub mustangDir {
 
 =head1 VERSION
 
-1.229
+1.230
 
 =head1 AUTHOR
 

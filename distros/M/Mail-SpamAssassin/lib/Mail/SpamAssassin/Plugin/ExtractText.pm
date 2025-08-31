@@ -277,6 +277,7 @@ my $VERSION = 0.001;
 use File::Basename;
 
 use Mail::SpamAssassin::Logger;
+use Mail::SpamAssassin::Plugin;
 use Mail::SpamAssassin::Util qw (compile_regexp untaint_var untaint_file_path
   proc_status_ok exit_status_str);
 
@@ -601,7 +602,7 @@ sub _extract {
       push @{$coll->{flags}}, 'ActionURI';
       dbg("extracttext: ActionURI: $1");
       push @{$coll->{text}}, $text;
-      push @{$coll->{uris}}, $2;
+      push @{$coll->{uris}}, $1;
     } elsif($text =~ /QR-Code\:([^\s]*)/) {
       # zbarimg(1) prefixes the url with "QR-Code:" string
       my $qrurl = $1;
@@ -622,7 +623,7 @@ sub _extract {
     # $coll->{words} += scalar @{[split(/\W+/s,$text)]} - 1;  # old perl hack
 
     dbg("extracttext: rendering text for type $type with $tool->{name}");
-    $part->set_rendered($text);
+    $part->set_rendered($text, $type);
   }
 
   if (@types) {
@@ -735,6 +736,9 @@ sub parsed_metadata {
     if (defined $v) {
       $pms->set_tag("ExtractText$tag", $v);
       dbg("extracttext: tag: $tag $v");
+      if($tag eq 'Uris') {
+        map { $pms->add_uri_detail_list($_) } split(/ /, $v);
+      }
     }
   }
   return 1;
