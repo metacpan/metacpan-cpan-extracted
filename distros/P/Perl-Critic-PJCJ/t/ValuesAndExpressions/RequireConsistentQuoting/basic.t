@@ -74,47 +74,6 @@ subtest "Invalid token types" => sub {
   );
 };
 
-subtest "Use statement argument rules" => sub {
-  # Module with no arguments - OK
-  good $Policy, "use Foo",    "use with no arguments is fine";
-  good $Policy, "use Foo ()", "use with empty parens is fine";
-
-  # Module with one argument - can use "" or qw()
-  good $Policy, 'use Foo "arg1"',
-    "use with one double-quoted argument is fine";
-  bad $Policy, "use Foo 'arg1'", "use qw()",
-    "use with one single-quoted argument should use qw()";
-  good $Policy, "use Foo qw(arg1)", "use with one qw() argument is fine";
-
-  # Module with multiple arguments - must use qw()
-  bad $Policy, 'use Foo "arg1", "arg2"', "use qw()",
-    "use with multiple quoted arguments should use qw()";
-  bad $Policy, "use Foo 'arg1', 'arg2'", "use qw()",
-    "use with multiple single-quoted arguments should use qw()";
-  bad $Policy, "use Foo ('arg1', 'arg2')", "use qw()",
-    "use with multiple arguments in parens should use qw()";
-  bad $Policy, 'use Foo "arg1", "arg2", "arg3"', "use qw()",
-    "use with three quoted arguments should use qw()";
-
-  # Mixed arguments - should use qw()
-  bad $Policy, "use Foo qw(arg1), 'arg2'", "use qw()",
-    "mixed qw() and quotes should use qw() for all";
-  bad $Policy, "use Foo 'arg1', qw(arg2)", "use qw()",
-    "mixed quotes and qw() should use qw() for all";
-
-  # Good cases with multiple arguments
-  good $Policy, "use Foo qw(arg1 arg2)",
-    "multiple arguments with qw() is correct";
-  good $Policy, "use Foo qw(arg1 arg2 arg3)",
-    "three arguments with qw() is correct";
-  bad $Policy, "use Foo qw[arg1 arg2]", "use qw()",
-    "qw[] should use qw() with parentheses only";
-
-  # Other statement types should not be checked
-  good $Policy, "require Foo", "require statements are not checked";
-  good $Policy, "no warnings", "no statements are not checked";
-};
-
 subtest "Find optimal delimiter coverage" => sub {
   # Test find_optimal_delimiter with non-bracket current delimiter
   # This covers the condition where current delimiter is not in bracket list

@@ -2,7 +2,7 @@
 
 use v5.12;
 use warnings;
-use Test::More tests => 70;
+use Test::More tests => 72;
 BEGIN { unshift @INC, 'lib', '../lib'}
 use Graphics::Toolkit::Color::Space::Util ':all';
 
@@ -49,6 +49,8 @@ is( ref Graphics::Toolkit::Color->new( ['CIELCHab', 0, 0, 0]),          $module,
 is( ref Graphics::Toolkit::Color->new( ['hsb', 100.23, 0.173, .214]),   $module, 'different number shapes');
 is( ref Graphics::Toolkit::Color->new( ['NCol','B10','100%','0%']),     $module, 'named ARRAY with values that need preprocessing');
 is( ref Graphics::Toolkit::Color->new( ['ncol','B0','100','0']),        $module, 'try single digit string value');
+is( ref Graphics::Toolkit::Color->new( OKLAB => [0,0,0] ),              $module, 'named ARRAY ref in uc oklab space');
+is( ref Graphics::Toolkit::Color->new( 'hunterlab', [1,2,3] ),          $module, 'named ARRAY ref in lc hunterlab space');
 is( ref Graphics::Toolkit::Color->new( { }),                                 '', 'HASH needs keys');
 is( ref Graphics::Toolkit::Color->new( {r=> 1 }),                            '', 'HASH one key is not enough');
 is( ref Graphics::Toolkit::Color->new( r=> 1 ),                              '', 'even without a HASH ref');

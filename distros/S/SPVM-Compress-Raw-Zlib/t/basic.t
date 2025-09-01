@@ -16,7 +16,25 @@ my $api = SPVM::api();
 
 my $start_memory_blocks_count = $api->get_memory_blocks_count;
 
-ok(SPVM::TestCase::Compress::Raw::Zlib->test);
+ok(SPVM::TestCase::Compress::Raw::Zlib->deflate_and_inflate_basic);
+
+ok(SPVM::TestCase::Compress::Raw::Zlib->deflate_and_inflate_small_buffer);
+
+ok(SPVM::TestCase::Compress::Raw::Zlib->deflate_and_inflate_WANT_GZIP);
+
+ok(SPVM::TestCase::Compress::Raw::Zlib->deflate_and_inflate_dictionary);
+
+ok(SPVM::TestCase::Compress::Raw::Zlib->deflate_and_inflate_options);
+
+ok(SPVM::TestCase::Compress::Raw::Zlib->deflate_and_inflate_rfc1951);
+
+ok(SPVM::TestCase::Compress::Raw::Zlib->deflate_and_inflate_fields);
+
+ok(SPVM::TestCase::Compress::Raw::Zlib->deflateReset_and_inflateReset);
+
+ok(SPVM::TestCase::Compress::Raw::Zlib->deflateTune);
+
+ok(SPVM::TestCase::Compress::Raw::Zlib->deflate_and_inflate_LimitOutput);
 
 # Version check
 {

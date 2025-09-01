@@ -75,7 +75,24 @@ sub closest_names_from_values {
 }
 
 sub names_in_range {
-    my ($self, $values, $range, $space_name) = @_;
+    my ($self, $values, $range) = @_;
+    my @names;
+    my $sqr_max  = $range ** 2;
+    my $all_values = $self->{'shaped'}{'values'};
+    for my $index_name (keys %$all_values){
+        my $index_values = $all_values->{ $index_name };
+        my $temp_sqr_sum = ($index_values->[0] - $values->[0]) ** 2;
+        next if $temp_sqr_sum > $sqr_max;
+        $temp_sqr_sum += ($index_values->[1] - $values->[1]) ** 2;
+        next if $temp_sqr_sum > $sqr_max;
+        $temp_sqr_sum += ($index_values->[2] - $values->[2]) ** 2;
+        next if $temp_sqr_sum > $sqr_max;
+        push @names, $index_name;
+    }
+    return '' unless @names;
+    # restore as much order as possible
+    @names = map { @{$self->names_from_values( $self->values_from_name($_))} } @names;
+    return [ uniq( @names ) ];
 }
 
 #### util ##############################################################
@@ -86,7 +103,7 @@ sub _clean_name {
 }
 
 1;
-#    my $names = $scheme->names_in_range( $values, $distance ); #       -> ARRAY of names
+
 __END__
 
 =pod

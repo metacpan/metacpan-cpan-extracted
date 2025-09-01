@@ -1,0 +1,18 @@
+MANIFEST
+CHANGES
+Makefile.PL
+FakeFloat16.pm
+FakeFloat16.pod
+FakeFloat16.xs
+t/basic.t
+t/inf.t
+t/new.t
+t/next.t
+t/overload_arith.t
+t/overload_cmp.t
+t/subnormal.t
+t/unpack.t
+README
+
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

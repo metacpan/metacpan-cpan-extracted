@@ -1,3 +1,8 @@
+0.9.1 2025-08-31
+     - fix tests for old ABI versions
+     - fix tests for environments where NO_NEW_PRIVS is already set
+     - add new helper get_no_new_privs
+
 0.9   2025-08-24
      - add support for Landlock ABI 6
      - add the option to restrict the used ABI version
@@ -31,7 +36,7 @@
 0.3   2024-05-10T00:39:49+02:00
     - rename Linux::Landlock::Ruleset to Linux::Landlock
 
-0.2    2024-05-09T23:43:52+02:00
+0.2   2024-05-09T23:43:52+02:00
 
     - some packaging and metadata fixes
     - add tests for network actions on kernels without support

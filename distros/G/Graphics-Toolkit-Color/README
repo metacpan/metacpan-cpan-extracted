@@ -55,7 +55,7 @@ CONSTRUCTOR
     Most clear, flexible and longest input format: a hash with long or short
     axis names as keys with fitting values. This can be "red", "green" and
     "blue" or "r", "g" and "b" or names from any other color space. Upper or
-    lower case doesnt matter.
+    lower case doesn't matter.
 
         my $red = Graphics::Toolkit::Color->new( r => 255, g => 0, b => 0 );
         my $red = Graphics::Toolkit::Color->new({r => 255, g => 0, b => 0}); # works too
@@ -75,15 +75,17 @@ CONSTRUCTOR
         my $red = Graphics::Toolkit::Color->new( 'RGB',  255, 0, 0 ); # named ARRAY syntax
         my $red = Graphics::Toolkit::Color->new(  RGB => 255, 0, 0 ); # with fat comma
         my $red = Graphics::Toolkit::Color->new([ RGB => 255, 0, 0]); # and brackets
+        my $red = Graphics::Toolkit::Color->new(  RGB =>[255, 0, 0]); # separate name and values
+        my $red = Graphics::Toolkit::Color->new(  YUV =>.299,-0.168736, .5); # same color in YUV
 
   new('rgb($r,$g,$b)')
     String format that is supported by CSS (*css_string* format): it starts
     with the case insensitive color space name (lower case is default),
-    followed by the comma separated values in round braces. The value
-    suffixes that are defined by the color space (*'%'* in case of *HSV*)
-    are optional.
+    followed by the (optionally with) comma separated values in round
+    braces. The value suffixes that are defined by the color space (*'%'* in
+    case of *HSV*) are optional.
 
-        my $red = Graphics::Toolkit::Color->new( 'rgb(255, 0, 0)' );
+        my $red = Graphics::Toolkit::Color->new( 'rgb(255 0 0)' );
         my $blue = Graphics::Toolkit::Color->new( 'hsv(240, 100%, 100%)' );
 
   new('rgb: $r, $g, $b')
@@ -112,12 +114,8 @@ CONSTRUCTOR
   new('scheme:color')
     Get a color by name from a specific scheme or standard as provided by an
     external module Graphics::ColorNames::* , which has to be installed
-    separately. * is a placeholder for the scheme name, which might be:
-    Crayola, CSS, EmergyC, GrayScale, HTML, IE, Mozilla, Netscape, Pantone,
-    PantoneReport, SVG, VACCC, Werner, Windows, WWW or X. In latter case
-    *Graphics::ColorNames::X* has to be installed. You can get them all at
-    once via Bundle::Graphics::ColorNames. The color name will be normalized
-    as above.
+    separately or with Bundle::Graphics::ColorNames. See all scheme names
+    here . The color name will be normalized as above.
 
         my $color = Graphics::Toolkit::Color->new('SVG:green');
         my @schemes = Graphics::ColorNames::all_schemes();      # look up the installed
@@ -145,36 +143,36 @@ GETTER
     first one is needed.
 
     When given no arguments, the method returns a list with the integer
-    values: "red", "green" and "blue" in 0..255 range, since *RGB* is the
+    values: "red", "green" and "blue" in 0 .. 255 range, since *RGB* is the
     default color space of this module.
 
-    If one argument is provided, the values get converted into the given
-    color space. The same is done when using the named argument "in" (see
-    more behind the link). The also reoccurring argument "range" is
-    explained in its own section too. Please note you have to use the
-    "range" argument only, if you like to deviate from the value ranges
-    defined by the chosen color space.
+    If one positional argument is provided, the values get converted into
+    the color space of the given name. The same is done when using the named
+    argument "in" (full explanation behind the link). The named argument
+    "range" is also explained in its own section. Please note you have to
+    use the "range" argument only, if you like to deviate from the value
+    ranges defined by the chosen color space.
 
     The maybe most characteristic argument for this method is "as", which
-    enables the same formats the constructor method "new" accepts, since
-    *GTC* is built with the design principle of total serialisation -
-    meaning every output can be evaluated back into a color object and any
-    intput can be serialized into an output. To every format: "list"
-    (default), "named_array", "hash", "char_hash", "named_string",
-    "css_string", "array" (RGB only) and "hex_string" (RGB only) is an
-    example below. Format names are case insensitive. For more explanations,
-    please see: formats.
+    enables all the same formats the constructor method "new" accepts. *GTC*
+    is built with the design principle of total serialisation. This means:
+    every contructor input format can be reproduced by a getter method and
+    vice versa. These formats are: "list" (default), "named_array", "hash",
+    "char_hash", "named_string", "css_string", "array" (RGB only) and
+    "hex_string" (RGB only). The remaining two. "name" and "full:name" are
+    produce by the method "name". Format names are case insensitive. For
+    more explanations, please see: formats section in GTC::Space::Hub.
 
-    "precision" is more exotic but sometimes you need to escape the numeric
-    precision, set by a color spaces definition. For instance "LAB" values
-    will have maximally three decimals, no matter how precise the input was.
-    In case you prefer 4 decimals, just use "precision => 4". A zero means
-    no decimals and -1 stands for maximal precision - which can spit out
-    more decimals than you prefer. Different precisions per axis ([1,2,3])
-    are possible.
+    "precision" is more exotic argument, but sometimes you need to escape
+    the numeric precision, set by a color spaces definition. For instance
+    "LAB" values will have maximally three decimals, no matter how precise
+    the input was. In case you prefer 4 decimals, just use "precision => 4".
+    A zero means no decimals and -1 stands for maximal precision - which can
+    spit out more decimals than you prefer. Different precisions per axis
+    are possible via an ARRAY ref: "precision => [1,2,3]".
 
-    In same way you can atach a little string per value by ussing the
-    "suffix" aregument. Normally these are percentage signs but in some
+    In same way you can atach a little strings per value by ussing the
+    "suffix" argument. Normally these are percentage signs but in some
     spaces, where they appear by default you can surpress them by adding
     "suffix => ''"
 
@@ -198,50 +196,54 @@ GETTER
     Returns the normalized name string (lower case, without *'_'*) that
     represents the *RGB* values of this color in the default color scheme,
     which is *X11* + *HTML* (*SVG*) + *Pantone report* (see all names).
-    These are the same who can be used with "new('name')".
+    These are the same which can be used with "new('name')".
 
     Alternatively you may provide named arguments or one positional
-    argument, which requires the same input as the named argument "from". It
-    names one or a list of color schemes, from which the name will be
-    selected then. Your otions are "CSS", "Crayola", "EmergyC", "GrayScale",
-    "HTML", "IE", "Mozilla", "Netscape", "Pantone", "PantoneReport", "SVG",
-    "VACCC", "Werner", "Windows", "WWW" and "X" plus self created naming
-    schemes (see Graphics::Toolkit::Color::Name::Scheme). Please note that
-    all listed schemes are parts of modules that have to be installed
-    separately. For your convenience I created the module
-    Bundle::Graphics::ColorNames to install them all at once. If you try to
-    use a scheme from a not installed module your will get an error message
-    instead of a color name.
+    argument, which is the same as the named argument "from". That required
+    a name of a color schemes, as listed here. You also can submit a list
+    thereof inside a ARRRAY ref which also dictates the order of resulting
+    color names. Please note that all color schemes, except the default one,
+    depend on external modules, which have to be installed separately or via
+    Bundle::Graphics::ColorNames. If you try to use a scheme from a not
+    installed module your will get an error message instead of a color name.
+    You can also create your custom color naming scheme via
+    Graphics::Toolkit::Color::Name::Scheme.
 
     The second named argument is "all", which needs to be a perly boolean.
-    It defaults to false. But when set to 1 you will get a list of all names
+    It defaults to false. But if set to 1, you will get a list of all names
     that are associated with the current values. There will be no
     duplicates, when several schemes are searched.
 
-    A third named argument is "full", also needing a perly boolean, that
-    defaults to false. When set "true" (1), the schema is part of the
-    returned color name. These full names are also accepted by the
-    constructor.
+    A third named argument is "full" - also needing a perly boolean that
+    defaults to false. When set "true" (1), the schema name becomes part of
+    the returned color name as in 'SVG:red'. These full names are also
+    accepted by the constructor.
+
+    The fourth named argument is "distance", which means the same thing as
+    in "distance" and it defaults to zero. It is most useful in combinataion
+    with "all" to get all color names that are within a certain distance.
 
         $blue->name();                                   # 'blue'
         $blue->name('SVG');                              # 'blue'
         $blue->name( from => [qw/CSS X/], all => 1);     # 'blue', 'blue1'
         $blue->name( from => 'CSS', full => 1);          # 'CSS:blue'
+        $blue->name( distance => 3, all => 1) ;          # all names within the distance
 
   closest_name
-    Works almost identical as method "name", but guarantees a none empty
-    result, unless invoking a weird empty color scheme - the method returns
-    scalar context a color name, which has the shortest "distance" in *RGB*
-    to the current color. In list context, you get additionally the just
-    mentioned distance as a second return value.
+    Returns in scalar context a color name, which has the shortest
+    "distance" in *RGB*nto the current color. In list context, you get
+    additionally the just mentioned distance as a second return value. This
+    method works almost identically as method "name", but guarantees a none
+    empty result, unless invoking a unusually empty color scheme.
 
-    All arguments work as mentioned above. The only difference (due to the
-    second return value), multiple names (when requested) have to come in
-    the form of an ARRAY (as the first return value).
+    All arguments work as mentioned above, only here is no "distance"
+    argument. The only difference is (due to the second return value),
+    multiple names (when requested) have to come in the form of an ARRAY as
+    the first return value.
 
         my $name = $red_like->closest_name;              # closest name in default scheme
         my $name = $red_like->closest_name('HTML');      # closest HTML constant
-        ($red_name, $distance) = $red_like->closest_name;
+        ($red_name, $distance) = $red_like->closest_name( from => 'Pantone', all => 1 );
 
   distance
     Is a floating point number that measures the Euclidean distance between
@@ -251,17 +253,20 @@ GETTER
     required one.
 
     The "distance" is measured in *RGB* color space unless told otherwise by
-    the argument "in". Please use the *CIELAB* or *CIELUV* space, if you are
+    the argument "in". Please use the *OKLAB* or *CIELUV* space, if you are
     interested in getting a result that matches the human perception.
 
     The third argument is named "select". It's useful if you want to regard
-    only certain dimensions (axis). For instance if you want to know only
-    the difference in brightness between two colors, you type "select =>
-    'lightness'" or "select => 'l'". This works of course only if you choose
-    *HSL* or something similar like *LAB* as color space. Long or short axis
-    names are accepted, but they all have to come from one color space. You
-    also can mention one axis several times for heightened emphasis on this
-    dimension.
+    only certain dimensions (axis - long and short axis names are accepted).
+    For instance if you want to know only the difference in brightness
+    between two colors, you type "select => 'lightness'" or "select => 'l'".
+    This naturally works only if you did also choose *HSL* as a color space
+    or something similar that has a "lightness" axis like *LAB* or *OKLAB*.
+    The "select" argument accepts a string or an ARRAY with several axis
+    names, which can also repeat. For instance there is a formula to compute
+    distances in RGB that weights the squared value delta's: "$distance =
+    sqrt( 3 * delta_red**2 + 4 * delta_green**2 + 2 * delta_blue**2)". You
+    can recreate that formula by typing "select => [qw/ r r r g g g g b b/]"
 
     The last argument is named "range", which can change the result
     drasticly.
@@ -432,13 +437,14 @@ COLOR SETS
     ARRAY of values you get the a cuboid with the given dimensions.
 
     The minimal distance between any two colors of a cluster is set by the
-    "distance" argument, which is computed the same way as the method
-    "distance". In a cuboid shaped cluster- the colors will form a cubic
-    grid - inside the ball shaped cluster they form a cuboctahedral grid,
-    which is packed tighter, but still obeys the minimal distance.
+    "minimal_distance" argument, which is computed the same way as the
+    method "distance", in has a short alias "min_d". In a cuboid shaped
+    cluster- the colors will form a cubic grid - inside the ball shaped
+    cluster they form a cuboctahedral grid, which is packed tighter, but
+    still obeys the minimal distance.
 
-        my @blues = $blue->cluster( radius => 4, distance => 0.3 );
-        my @c = $color->cluster( radius => [2,2,3], distance => 0.4, in => YUV );
+        my @blues = $blue->cluster( radius => 4, minimal_distance => 0.3 );
+        my @c = $color->cluster( r => [2,2,3], min_d => 0.4, in => YUV );
 
 ARGUMENTS
     Some named arguments of the above listed methods reappear in several

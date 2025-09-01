@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+LICENSE
+README
+t/00-load.t
+t/05-ignorant-load.t
+t/10-fail-correctly.t
+lib/Module/Case.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

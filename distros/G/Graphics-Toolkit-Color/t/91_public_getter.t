@@ -2,7 +2,7 @@
 
 use v5.12;
 use warnings;
-use Test::More tests => 85;
+use Test::More tests => 92;
 BEGIN { unshift @INC, 'lib', '../lib'}
 use Graphics::Toolkit::Color::Space::Util 'round_decimals';
 use Graphics::Toolkit::Color qw/color/;
@@ -12,6 +12,7 @@ my $blue  = color({r => 0, g => 0, b=>255});
 my $purple = color({hue => 300, s => 100, l => 25});
 my $black = color([0,0,0]);
 my $white = color('cmy',0,0,0);
+my @names;
 
 is( $red->name,          'red', 'color name "red" is correct');
 is( $blue->name,        'blue', 'color name "blue" is correct');
@@ -24,6 +25,17 @@ is( $blue->closest_name,        'blue', 'color "blue" is also closest name');
 is( $purple->closest_name,    'purple', 'color "purple" is also closest name');
 is( $black->closest_name,      'black', 'color "black" is also closest name');
 is( $white->closest_name,      'white', 'color "white" is also closest name');
+
+@names = $blue->name(all => 1, full => 1);
+is( int @names,                 2, '"blue" has two names');
+is( $names[0],             'blue', '"blue" is first, no default name space name in color name');
+is( $names[1],            'blue1', '"blue1" is second"');
+@names = sort $blue->name(all => 1, distance => 25);
+is( int @names,                 3, 'around "blue" with distance 25 you get 3 colors');
+is( $names[0],             'blue', '"blue" is first, no default name space name in color name');
+is( $names[1],            'blue1', '"blue1" is second"');
+is( $names[2],            'blue2', '"blue2" is third"');
+
 my ($name, $d) = $red->closest_name;
 is( $name,               'red', 'color name is "red" also in array context');
 is( $d,                      0, 'and has no distance');

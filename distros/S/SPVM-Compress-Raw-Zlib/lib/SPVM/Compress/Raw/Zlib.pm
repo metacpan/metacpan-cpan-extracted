@@ -1,6 +1,6 @@
 package SPVM::Compress::Raw::Zlib;
 
-our $VERSION = "0.001";
+our $VERSION = "0.002";
 
 1;
 
@@ -15,9 +15,17 @@ SPVM::Compress::Raw::Zlib - Low-Level Interface to zlib compression library
 Compress::Raw::Zlib class in L<SPVM> provides a Perl interface to the I<zlib>
 compression libraries.
 
-B<WARNINGS:>
+=head1 Classes
 
-B<This distribution has a significantly incomplete implementation and hasn't been tested at all, and is completely undocumented.>
+=over 2
+
+=item * L<Compress::Raw::Zlib::Deflate|SPVM::Compress::Raw::Zlib::Deflate>
+
+=item * L<Compress::Raw::Zlib::Inflate|SPVM::Compress::Raw::Zlib::Inflate>
+
+=item * L<Compress::Raw::Zlib::Constant|SPVM::Compress::Raw::Zlib::Constant>
+
+=back
 
 =head1 Repository
 

@@ -59,7 +59,7 @@ This class is responsible for providing trading times or holidays related inform
 
 use Moose;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use List::Util qw(min max first);
 use Date::Utility;
@@ -435,7 +435,7 @@ Examples:
 
     # Sunday opening adjustment for RSI exchanges
     my $changes = $calendar->regularly_adjusts_trading_hours_on(
-        Finance::Exchange->create_exchange('RSI_FOREX_EURUSD'),
+        Finance::Exchange->create_exchange('TACTICAL_FOREX_EURUSD'),
         Date::Utility->new('2023-02-12')  # Sunday
     );
     # Returns a hashref with adjusted opening time on Sundays:
@@ -455,9 +455,9 @@ sub regularly_adjusts_trading_hours_on {
     my $changes;
     my $use_dst_time = $self->is_in_dst_at($exchange, $when);
 
-    # Handle Sunday opening adjustments for RSI exchanges
+    # Handle Sunday opening adjustments for tactical exchanges, except tactical crypto which opens 24/7
     if ($day_of_week == 0) {    # Sunday
-        if ($exchange->symbol =~ /^(RSI_FOREX_EURUSD|RSI_FOREX_GBPUSD|RSI_FOREX_USDJPY|RSI_METAL)$/) {
+        if ($exchange->symbol =~ /^(TACTICAL_FOREX.*|TACTICAL_METALS)$/) {
             my $partial_trading = $exchange->market_times->{partial_trading};
 
             if ($partial_trading) {
@@ -486,7 +486,7 @@ sub regularly_adjusts_trading_hours_on {
                     rule => $rule,
                 },
             };
-        } elsif ($exchange->symbol =~ /^(RSI_FOREX_EURUSD|RSI_FOREX_GBPUSD|RSI_FOREX_USDJPY|RSI_METAL)$/) {
+        } elsif ($exchange->symbol =~ /^(TACTICAL_FOREX.*|TACTICAL_METALS)$/) {
             my $close_time = $use_dst_time ? $exchange->market_times->{dst}->{friday_close} : $exchange->market_times->{standard}->{friday_close};
             $changes = {
                 'daily_close' => {

@@ -1,6 +1,9 @@
 Revision history for BibTeX::Parser
 
-1.92.   2025-07-09 New numbering scheme.  Bug fixes.  Debug statements
+1.93    2025-08-31 BibTeX::Parser: match @string identifiers
+        case-insensitively, as BibTeX does.
+
+1.92    2025-07-09 New numbering scheme.  Bug fixes.  Debug statements
 
 1.04    2023-08-20  New release
 

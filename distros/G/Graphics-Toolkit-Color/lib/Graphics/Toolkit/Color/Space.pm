@@ -10,7 +10,7 @@ use Graphics::Toolkit::Color::Space::Basis;
 use Graphics::Toolkit::Color::Space::Shape;
 use Graphics::Toolkit::Color::Space::Format;
 use Graphics::Toolkit::Color::Space::Util qw/:all/;
-our @EXPORT_OK = qw/round_int round_decimals mod_real min max uniq apply_d65 remove_d65 mult_matrix3 is_nr/;
+our @EXPORT_OK = qw/round_int round_decimals mod_real min max uniq mult_matrix_vector_3 is_nr/;
 our %EXPORT_TAGS = (all => [@EXPORT_OK]);
 
 ########################################################################

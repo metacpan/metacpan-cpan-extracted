@@ -18,16 +18,7 @@ int32_t SPVM__Compress__Raw__Zlib__Inflate___inflateInit(SPVM_ENV* env, SPVM_VAL
   int32_t windowBits = env->get_field_int_by_name(env, stack, obj_self, "WindowBits", &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { goto END_OF_FUNC; }
   
-  void* obj_dictionary = env->get_field_string_by_name(env, stack, obj_self, "Dictionary", &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) { goto END_OF_FUNC; }
-  const char* dictionary = NULL;
-  int32_t dictonary_length = 0;
-  if (obj_dictionary) {
-    dictionary = env->get_chars(env, stack, obj_dictionary);
-    dictonary_length = env->length(env, stack, obj_dictionary);
-  }
-  
-  z_stream* st_z_stream = NULL;
+  z_stream* st_z_stream = env->new_memory_block(env, stack, sizeof(z_stream));
   int32_t status = inflateInit2(st_z_stream, windowBits);
   
   if (!(status == Z_OK)) {
@@ -35,14 +26,7 @@ int32_t SPVM__Compress__Raw__Zlib__Inflate___inflateInit(SPVM_ENV* env, SPVM_VAL
     goto END_OF_FUNC;
   }
   
-  if (dictionary && dictonary_length) {
-    status = inflateSetDictionary(st_z_stream, (const Bytef*) dictionary, dictonary_length);
-  }
-  
-  if (!(status == Z_OK)) {
-    error_id = env->die(env, stack, "[zlib Error]inflateSetDictionary() failed(status:%d).", status, __func__, FILE_NAME, __LINE__);
-    goto END_OF_FUNC;
-  }
+  int32_t z_stream_initialized = 1;
   
   void* obj_z_stream = env->new_pointer_object_by_name(env, stack, "Compress::Raw::Zlib::Z_stream", st_z_stream, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { goto END_OF_FUNC; }
@@ -54,7 +38,11 @@ int32_t SPVM__Compress__Raw__Zlib__Inflate___inflateInit(SPVM_ENV* env, SPVM_VAL
   
   if (error_id) {
     if (st_z_stream) {
-      free(st_z_stream);
+      if (z_stream_initialized) {
+        deflateEnd(st_z_stream);
+      }
+      
+      env->free_memory_block(env, stack, st_z_stream);
       st_z_stream = NULL;
     }
   }
@@ -94,9 +82,13 @@ int32_t SPVM__Compress__Raw__Zlib__Inflate__DESTROY(SPVM_ENV* env, SPVM_VALUE* s
   void* obj_z_stream = env->get_field_object_by_name(env, stack, obj_self, "z_stream", &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { goto END_OF_FUNC; }
   
-  z_stream* st_z_stream = env->get_pointer(env, stack, obj_z_stream);
-  
-  inflateEnd(st_z_stream);
+  if (obj_z_stream) {
+    z_stream* st_z_stream = env->get_pointer(env, stack, obj_z_stream);
+    
+    inflateEnd(st_z_stream);
+    
+    env->free_memory_block(env, stack, st_z_stream);
+  }
   
   END_OF_FUNC:
   
@@ -146,16 +138,21 @@ int32_t SPVM__Compress__Raw__Zlib__Inflate__inflate(SPVM_ENV* env, SPVM_VALUE* s
   st_z_stream->next_out = output;
   st_z_stream->avail_out = Bufsize;
   
-  st_z_stream->avail_out = 0;
+  int32_t avail_in_diff = st_z_stream->avail_in;
+  int32_t avail_out_diff = st_z_stream->avail_out;
+  
   int32_t status = Z_OK;
   while (1) {
     
-    if (status == Z_BUF_ERROR && st_z_stream->avail_in == 0) {
+    if (st_z_stream->avail_in == 0 && avail_out_diff == 0) {
       break;
     }
-    
-    if (LimitOutput && st_z_stream->avail_out == 0) {
-      break;
+    else {
+      if (LimitOutput) {
+        if (st_z_stream->avail_out == 0) {
+          break;
+        }
+      }
     }
     
     if (st_z_stream->avail_out == 0) {
@@ -168,13 +165,38 @@ int32_t SPVM__Compress__Raw__Zlib__Inflate__inflate(SPVM_ENV* env, SPVM_VALUE* s
       
       st_z_stream->next_out = new_output + output_length;
       st_z_stream->avail_out = Bufsize;
+      output_length = new_output_length;
     }
+    
+    int32_t avali_in = st_z_stream->avail_in;
+    
+    int32_t avail_out = st_z_stream->avail_out;
     
     status = inflate(st_z_stream, Z_SYNC_FLUSH);
     
     int32_t fatal_error = 0;
     if (status == Z_NEED_DICT) {
-      fatal_error = 1;
+      void* obj_dictionary = env->get_field_string_by_name(env, stack, obj_self, "Dictionary", &error_id, __func__, FILE_NAME, __LINE__);
+      if (error_id) { goto END_OF_FUNC; }
+      
+      if (obj_dictionary) {
+        const char* dictionary = NULL;
+        int32_t dictonary_length = 0;
+        if (obj_dictionary) {
+          dictionary = env->get_chars(env, stack, obj_dictionary);
+          dictonary_length = env->length(env, stack, obj_dictionary);
+        }
+        
+        status = inflateSetDictionary(st_z_stream, (const Bytef*)dictionary, dictonary_length);
+        
+        if (!(status == Z_OK)) {
+          error_id = env->die(env, stack, "[zlib Error]inflateSetDictionary() failed(status:%d).", status, __func__, FILE_NAME, __LINE__);
+          goto END_OF_FUNC;
+        }
+      }
+      else {
+        fatal_error = 1;
+      }
     }
     else if (status < 0 && status != Z_BUF_ERROR) {
       fatal_error = 1;
@@ -185,6 +207,9 @@ int32_t SPVM__Compress__Raw__Zlib__Inflate__inflate(SPVM_ENV* env, SPVM_VALUE* s
       goto END_OF_FUNC;
     }
     
+    avail_in_diff = avali_in - st_z_stream->avail_in;
+    
+    avail_out_diff = avail_out - st_z_stream->avail_out;
   }
   
   output_length -= st_z_stream->avail_out;
@@ -205,6 +230,8 @@ int32_t SPVM__Compress__Raw__Zlib__Inflate__inflate(SPVM_ENV* env, SPVM_VALUE* s
   if (output) {
     env->free_memory_block(env, stack, output);
   }
+  
+  stack[0].ival = status;
   
   return error_id;
 }

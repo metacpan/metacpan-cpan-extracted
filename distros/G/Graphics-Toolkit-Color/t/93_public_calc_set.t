@@ -98,23 +98,23 @@ is( $values[1],                         0,    'green value is right');
 is( $values[2],                       191,    'blue value is right');
 
 #### cluster ###########################################################
-like( $white->cluster(),                                        qr/GTC method/,  'cluster method needs arguments');
-like( $white->cluster(1),                                       qr/GTC method/,  'one is not enough');
-like( $white->cluster(radius => 2),                             qr/GTC method/,  'only radius is not enough');
-like( $white->cluster(distance => 2),                           qr/GTC method/,  'only distance is not enough');
-unlike( $white->cluster(radius => 2, distance => 2),            qr/GTC method/,  'need both');
-like( $white->cluster(radius => 2, distance => 2, in => 'CMA'), qr/GTC method/,  'need real space name');
-like( $white->cluster(radius => 1, distance => '-'),            qr/GTC method/,  "distance has to be a number");
-like( $white->cluster(radius => 'd', distance => 2),            qr/GTC method/,  "radius has to be a number");
-like( $white->cluster(radius => [1,2,3], distance => 2, in => 'CMYK'),     qr/GTC method/,  "radius tuple too short");
-like( $white->cluster(radius => ['e',1,2,3], distance => 2, in => 'CMYK'), qr/GTC method/,  "radius tuple has to be number only");
-unlike( $white->cluster(radius => [0,1,2,3], distance => 2, in => 'CMYK'), qr/GTC method/,  "radius tuple in solng enough");
-like( $white->cluster(radius => 5, distance => 2, in => 'CMYK'),           qr/GTC method/,  "CMYK doesn't work with cuboctahedral packing");
-like( $white->cluster(radius => 0, distance => 0),                         qr/GTC method/,  "distance has to be positive");
-like( $white->cluster(radius => 1, distance => 1, ar => 2),                qr/GTC method/,  "reject invented arguments");
-like( $white->cluster(radius => 1, distance => 1, 'ar'),                   qr/GTC method/,  "odd number of arguments");
+like( $white->cluster(),                                            qr/GTC method/, 'cluster method needs arguments');
+like( $white->cluster(1),                                           qr/GTC method/, 'one is not enough');
+like( $white->cluster(radius => 2),                                 qr/GTC method/, 'only radius is not enough');
+like( $white->cluster(distance => 2),                               qr/GTC method/, 'only distance is not enough');
+unlike( $white->cluster(radius => 2, minimal_distance => 2),        qr/GTC method/, 'need both r and min d argument');
+like( $white->cluster(radius => 2, min_d => 2, in => 'CMA'),        qr/GTC method/, 'need real space name');
+like( $white->cluster(radius => 1, minimal_distance => '-'),        qr/GTC method/, "distance has to be a number");
+like( $white->cluster(radius => 'd', minimal_distance => 2),        qr/GTC method/, "radius has to be a number");
+like( $white->cluster(radius => [1,2,3], min_d => 2, in => 'CMYK'), qr/GTC method/, "radius tuple too short");
+like( $white->cluster(r => ['e',1,2,3], min_d => 2, in => 'CMYK'),  qr/GTC method/, "radius tuple has to be number only");
+unlike( $white->cluster(r => [0,1,2,3], min_d => 2, in => 'CMYK'),  qr/GTC method/, "radius tuple is long enough");
+like( $white->cluster(r => 5, minimal_distance => 2, in => 'CMYK'), qr/GTC method/, "CMYK doesn't work with cuboctahedral packing");
+like( $white->cluster(radius => 0, minimal_distance => 0),          qr/GTC method/, "distance has to be positive");
+like( $white->cluster(radius => 1, minimal_distance => 1, ar => 2), qr/GTC method/, "reject invented arguments");
+like( $white->cluster(radius => 1, minimal_distance => 1, 'ar'),    qr/GTC method/, "odd number of arguments");
 
-@colors = $midblue->cluster( radius => 2, distance => 2 );
+@colors = $midblue->cluster( radius => 2.01, minimal_distance => 2 );
 is( int @colors,                       13,    'computed smallest ball shaped cluster in RGB');
 @values = $colors[1]->values();
 is( @values,                            3,    'center color is on pos one');
@@ -131,7 +131,7 @@ is( $values[0],                        42,    'red value is right (was rounded u
 is( $values[1],                        51,    'green value is right');
 is( $values[2],                       241,    'blue value is right (1.4 less but rounded up)');
 
-@colors = $midblue->cluster( radius => [1,1,1], distance => 1, in => 'RGB');
+@colors = $midblue->cluster( r => [1.01,1.01,1.01], minimal_distance => 1, in => 'RGB');
 is( int @colors,                       27,    'computed tiny cuboid cluster with 27 colors');
 @values = $colors[0]->values();
 is( int @values,                        3,    'got first color in min corner');
@@ -144,7 +144,7 @@ is( $values[0],                        44,    'red value is right');
 is( $values[1],                        53,    'green value is right');
 is( $values[2],                       243,    'blue value is right');
 
-@colors = $white->cluster( radius => [1,1,1], distance => 1, in => 'HSL' );
+@colors = $white->cluster( r => [1.01,1.01,1.01], min_d => 1, in => 'HSL' );
 is( int @colors,                       12,    'cluster edging on roof of HSL space');
 
 exit 0;

@@ -34,6 +34,12 @@ subtest "q() operator" => sub {
     "q() should use single quotes when content would interpolate";
   bad $Policy, 'my $x = q(user@domain.com)', "use ''",
     'q() with @ variable should use single quotes';
+  bad $Policy, 'my $x = q(price: \$5.00)', "use ''",
+    "q() with escaped dollar should use single quotes";
+  bad $Policy, 'my $x = q(email: \@domain.com)', "use ''",
+    "q() with escaped at-sign should use single quotes";
+  bad $Policy, 'my $x = q(path\to\$file)', "use ''",
+    "q() with backslash before dollar should use single quotes";
 
   # When q() is justified
   good $Policy, q[my $x = q(has 'single' and "double" quotes)],
@@ -162,20 +168,20 @@ subtest "Additional q() operator coverage tests" => sub {
   # Edge case: content that might confuse the would_interpolate method
   # q() with \@ is preserved because \@ would have different meaning
   # in double quotes, but delimiter should be optimised
-  bad $Policy, 'my $x = q((\@));', "use q[]",
-    'q() with escaped @ and parens should optimise delimiter to q[]';
+  bad $Policy, 'my $x = q((\@));', "use ''",
+    q[q() with escaped @ and parens should optimise delimiter to ''];
 
-  good $Policy, q[my $x = q(\@escaped at sign with "quotes")],
-    'q() with escaped @ should stay q()';
+  bad $Policy, 'my $x = q(\@escaped at sign with "quotes")', "use ''",
+    'q() with escaped @ should suggest single quotes';
 
   # Test q() with escaped sigils and quotes
   # q() with \$ or \@ is preserved because they would have different
   # meaning in double quotes
-  good $Policy, q[my $x = q(\$var and "quotes" together)],
-    "q() with escaped dollar should stay q()";
+  bad $Policy, 'my $x = q(\$var and "quotes" together)', "use ''",
+    "q() with escaped dollar should suggest single quotes";
 
-  good $Policy, q[my $x = q(\@var and "quotes" together)],
-    "q() with escaped at should stay q()";
+  bad $Policy, 'my $x = q(\@var and "quotes" together)', "use ''",
+    "q() with escaped at should suggest single quotes";
 
   # Test q() with content that might not be handled by early returns
   bad $Policy, 'my $x = q(text with "quotes" and \\ escapes)', "use ''",

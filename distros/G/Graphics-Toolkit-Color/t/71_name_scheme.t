@@ -7,7 +7,8 @@ BEGIN { unshift @INC, 'lib', '../lib'}
 use Graphics::Toolkit::Color::Space::Util ':all';
 
 my $module = 'Graphics::Toolkit::Color::Name::Scheme';
-use_ok( $module, 'could load the module');
+eval "use $module";
+is( not($@), 1, 'could load the module');
 
 my ($scheme, $names, @names, $values, $distance);
 $scheme = Graphics::Toolkit::Color::Name::Scheme->new('');

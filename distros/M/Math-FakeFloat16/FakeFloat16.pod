@@ -1,0 +1,158 @@
+
+=pod
+
+=head1 NAME
+
+ Math::FakeFloat16 - Emulate  _Float16 floating point arithmetic.
+
+=head1 DEPENDENCIES
+
+ This module requires Math-MPFR-4.44 or later.
+
+=head1 DESCRIPTION
+
+ We emulate the  _Float16 arithmetic using Math::MPFR objects.
+ (Access to the  _Float16 C type is neither sought nor required.)
+
+=head1 SYNOPSIS
+
+ Values can be assigned either as an IV (42), a PV ("1.414164"), an
+ NV (1.414164), a Math::MPFR object (Math::MPFR->new("1.414164")),
+ a Math::GMPq object (Math::GMPq->new("1.414164')) or a Math::GMPf
+ object (Math::GMPf->new("1.414164")).
+ And the values held within a Math::FakeFloat16 object can be
+ interpolated by double-quoting the object :
+
+ my $val = '1.41416';
+ my $obj = Math::FakeFloat16->new($val);
+ print "$obj\n"; # prints 1.4141.
+
+ All input values are effectively cast to a  _Float16 value, rounded
+ to nearest, with ties to even.
+
+ NOTE !!!!!!! :
+  If you want to assign a specific value (eg 1.96500000000000014e2)
+  it is better to assign it as a PV. It will then be rounded only
+  once. If you first assign that value to something else (eg an NV),
+  and then assign it to a Math::FakeFloat16 object, the  value can
+  be rounded twice.
+
+ The  _Float16 has only 11 bits of precision.
+ Maximum finite value is 65504.
+ Minimum positive non-zero value is 5.9605e-8.
+
+=head1 ASSIGNMENT FUNCTIONS
+
+    $obj = Math::FakeFloat16->new($[val]);
+    $obj = Math::FakeFloat16::new([$val]);
+     Set $obj to a Math::FakeFloat16 object with value $val.
+     If $val is not provided, the $obj has the value NaN.
+     $val cab be an IV (integer), an NV (perl float), a PV (string),
+     a Math::FakeFloat16 object, a Math::MPFR object, a Math::GMPf
+     object or a Math::GMPq object.
+     See the SYNOPSIS section (above) for some elaboration,
+     If necessay, $val will be rounded (to nearest, ties to even)
+     to fit into the  _Float16 type.
+
+    f16_set($obj, $val);
+     Set the value of $obj to the value specified by $val (rounded
+     to nearest, ties to even if necessary.)
+     $val can be any one of the types that new() accepts.
+
+    f16_set_nan($obj);
+     Se the value of $obj to NaN.
+
+    f16_set_inf($obj, $iv);
+     If $iv is greater than or equal to 0, then set $obj to +Inf.
+     Else set $obj to -Inf.
+
+    f16_set_zero($obj, $iv);
+     If $iv is greater than or equal to 0, then set $obj to 0.
+     Else set $obj to -0.
+
+=head1 ARITHMETIC
+
+ All arithmetic is done via the overloading of the
+ '+', '-', '*', '/', '%', '**'/, '+=', '-=', '*=', '/=', '%=',
+ and '**=' operators.
+ The '%' and '%=' overloading calls the fmod function.
+
+ The 'log', 'exp', 'sqrt', 'abs' and 'int' functions are also
+ overloaded.
+
+=head1 COMPARISON
+
+ The following comparison operators are also overloaded :
+ '==', '!=', '>', '>=', '<', '<=' and '<=>'
+
+ Also, the following boolean operations:
+  '!' and 'bool'
+
+=head1 OUTPUT FUNCTIONS
+
+    $string = "$obj";
+     Set $str to the value of $obj in decimal scientific
+     notation (eg 1.234e-2). If this string is passed as
+     the argument to Math::FakeFloat16->new(), then the
+     returned object will hold the identical value to the
+     object from which the string was retrieved.  That is,
+     the condition:
+       (Math::FakeFloat16->new("$obj") == $obj)
+     will always be true (unless $obj is NaN, of course).
+
+    print $obj;
+    print "$obj";
+     Either form will display the string returned by the
+     interpolating of $obj.
+
+   $string = unpack_f16_hex($obj);
+    Unpack the  _Float16 encoding of the value held by $obj as a string
+    of hex characters.
+    For example, unpack 0, denorm min and +Inf:
+      print unpack_f16_hex(Math::FakeFloat16->new(0));         # 0000
+      print unpack_f16_hex(Math::FakeFloat16->new('-0'));      # 8000
+      print unpack_f16_hex(Math::FakeFloat16->new(2) ** -133); # 0001
+      print unpack_f16_hex(Math::FakeFloat16->new(2) ** 128);  # 7F80 (+inf)
+
+=head1 MISCELLANEOUS FUNCTIONS
+
+    $iv = is_f16_nan($obj);
+     Return 1 if the object holds a NaN. Else return 0.
+
+    $iv = is_f16_inf($obj);
+     Return 1 if the object holds a +Inf.
+     Return -1 if the object holds a -Inf.
+     Otherwise return 0.
+
+    $iv = is_f16_zero($obj);
+     Return 1 if the object holds a zero that is not -0.
+     Return -1 if the object holds a -0.
+     Otherwise return 0.
+
+   $nv = f16_to_NV($obj);
+    Return the value of $obj as an NV.
+    $nv then holds exactly the same value as $obj.
+
+   $MPFR_OBJECT = f16_to_MPFR($obj);
+    Return a new Math::MPFR object that is identical to the Math::MPFR
+    object that is encapsulated in $obj.
+
+   f16_nextabove($obj);
+    Increments the value in $obj by the smallest possible positive,
+    non-zero amount.
+
+   f16_nextbelow($obj);
+    Decrements the value in $obj by the smallest possible positive,
+    non-zero amount.
+
+=head1 LICENSE
+
+    This program is free software; you may redistribute it and/or
+    modify it under the same terms as Perl itself.
+    Copyright 2025 Sisyphus.
+
+=head1 AUTHOR
+
+    Sisyphus <sisyphus at(@) cpan dot (.) org>
+
+=cut

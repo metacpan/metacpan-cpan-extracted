@@ -7,7 +7,7 @@ use Clone qw(clone);
 use File::ShareDir;
 use YAML::XS qw(LoadFile);
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head1 NAME
 

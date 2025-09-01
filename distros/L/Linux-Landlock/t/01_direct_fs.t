@@ -5,13 +5,14 @@ use warnings;
 use Test::More;
 use IO::File;
 use File::Basename;
-use Linux::Landlock::Direct qw(:functions :constants set_no_new_privs);
+use Linux::Landlock::Direct qw(:functions :constants set_no_new_privs get_no_new_privs);
 use Config;
 
 my $base        = dirname(__FILE__) . '/data';
 my $abi_version = ll_get_abi_version();
 
-diag("Landlock ABI version: $abi_version, archname: $Config{archname}, 64bitint: @{[$Config{use64bitint} ? 1:0 ]}");
+my $no_new_privs_set = get_no_new_privs();
+diag("Landlock ABI version: $abi_version, archname: $Config{archname}, 64bitint: @{[$Config{use64bitint} ? 1:0 ]}, no_new_privs_set: $no_new_privs_set");
 if ($abi_version < 0) {
     ok(!defined ll_create_ruleset(), "no support");
 } else {
@@ -43,8 +44,11 @@ if ($abi_version < 0) {
     $writable_fh->close();
     ok(!defined ll_add_path_beneath_rule(fileno(*STDIN), $LANDLOCK_ACCESS_FS{READ_FILE}, $dh),
         "attempt to add rule to wrong fd: $!");
-    ok(!defined ll_restrict_self($ruleset_fd), "no_new_privs not set: $!");
-    ok(set_no_new_privs(),                     "no_new_privs set");
+    SKIP: {
+        skip "no_new_privs was already set", if $no_new_privs_set;
+        ok(!defined ll_restrict_self($ruleset_fd), "no_new_privs not set: $!");
+        ok(set_no_new_privs(),                     "no_new_privs set");
+    }
     ok(ll_restrict_self($ruleset_fd),          "successfully restricted");
     ok(IO::File->new("$base/a", '<'),          "can read from file in $base");
     ok(!IO::File->new("$base/a", '>>'),        "cannot write to file in $base");

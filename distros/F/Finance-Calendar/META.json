@@ -87,7 +87,7 @@
    "provides" : {
       "Finance::Calendar" : {
          "file" : "lib/Finance/Calendar.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       }
    },
    "release_status" : "stable",
@@ -102,7 +102,7 @@
          "web" : "https://github.com/deriv-com/perl-Finance-Calendar"
       }
    },
-   "version" : "0.06",
+   "version" : "0.07",
    "x_authority" : "cpan:DERIV",
    "x_contributors" : [
       "Jun Bon <junbon@binary.com>",
@@ -111,10 +111,10 @@
       "Tom Molesworth <tom@binary.com>",
       "Jean-Yves Sireau <jy@binary.com>",
       "Torsten F\u00f6rtsch <torsten@binary.com>",
+      "mukesh-deriv <85932084+mukesh-deriv@users.noreply.github.com>",
       "Arash <61218785+arash-binary@users.noreply.github.com>",
       "Arun Venkataraman <arun@regentmarkets.com>",
       "chylli-deriv <52912308+chylli-deriv@users.noreply.github.com>",
-      "mukesh-deriv <85932084+mukesh-deriv@users.noreply.github.com>",
       "qiangliu <52957232+qiangliu-binary@users.noreply.github.com>",
       "Tanvir Faisal <126654333+tanvir-deriv@users.noreply.github.com>",
       "yngshan-binary <yngshan@binary.com>"

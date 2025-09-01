@@ -1,0 +1,14 @@
+Revision history for Perl extension Module::Case.
+
+0.03  Sat Aug 30 18:00:00 2025
+ - Allow case-ignorant systems act case-sensitive
+   when loading modules.
+ - Add tests to exploit case-ignorant behavior
+   with and without Module::Case
+
+0.02  Sat Aug 30 01:00:00 2025
+ - Get "make test" to pass
+
+0.01  Fri Aug 29 21:30:26 2025
+ - original version; created by h2xs 1.23 with options
+   -b 5.8.0 -Afn Module::Case

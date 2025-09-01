@@ -1,7 +1,7 @@
-.PHONY: show-authordeps install-authordeps reinstall-authordeps \
-	show-deps install-deps reinstall-deps \
-	t xt format lint clean build install \
-	cover cover-html cover-compilation cover-nvim
+.PHONY: show-authordeps install-authordeps reinstall-authordeps
+.PHONY: show-deps install-deps reinstall-deps
+.PHONY: t tv zt test format lint clean build install
+.PHONY: cover cover-html cover-compilation cover-nvim cover-all
 
 show-authordeps:
 	@dzil authordeps
@@ -22,7 +22,10 @@ reinstall-deps:
 	dzil listdeps --develop | cpm install -g --reinstall --no-prebuilt -
 
 t:
-	yath test -j20 --qvf --no-color -T --term-width=$(tput cols)
+	yath test -j20 --qvf -T --term-width=$(tput cols)
+
+tv:
+	yath test -j20 --qvf -T --term-width=$(tput cols) -v
 
 zt: clean
 	dzil test -j20

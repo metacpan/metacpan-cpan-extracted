@@ -1,12 +1,17 @@
 package LaTeX::ToUnicode::Tables;
 BEGIN {
-  $LaTeX::ToUnicode::Tables::VERSION = '1.92';
+  $LaTeX::ToUnicode::Tables::VERSION = '1.93';
 }
 use strict;
 use warnings;
 #ABSTRACT: Character tables for LaTeX::ToUnicode
 
 use utf8; # just for the german support
+
+# The replacement texts throughout this file must not use HTML markup,
+# since any <>& may be converted to entities in the main convert()
+# function in ToUnicode.pm.
+
 
 # TeXnically not all of these are ligatures, but close enough.
 # Order is important, so has to be a list, not a hash.
@@ -25,9 +30,9 @@ our @LIGATURES = (
 #
 # Some additional ligatures supported in T1 encoding, but we won't (from
 # tex-text.map):
-# U+002C U+002C <> U+201E  ; ,, -> DOUBLE LOW-9 QUOTATION MARK
-# U+003C U+003C <> U+00AB  ; << -> LEFT POINTING GUILLEMET
-# U+003E U+003E <> U+00BB  ; >> -> RIGHT POINTING GUILLEMET
+# ,, -> DOUBLE LOW-9 QUOTATION MARK (U+201E)
+# << -> LEFT POINTING GUILLEMET     (U+00AB)
+# >> -> RIGHT POINTING GUILLEMET    (U+00BB)
 
 #  for {\MARKUP ...} and {\MARKUPshape ...} and \textMARKUP{...}. Not
 # every combination is defined (e.g., there is no \subscriptshape
@@ -93,7 +98,7 @@ our %CONTROL_SYMBOLS = (
     '@'  => '', # end of sentence
    # A..Z control words, not symbols
     '['  => '',  # start display math
-    '\\' => ' ', # line break
+    '\\' => ' ', # line break, usually not in HTML
     ']'  => '',  # end display math
    # ^ circumflex accent
     '_'  => '_', # underscore
@@ -160,7 +165,7 @@ our %CONTROL_WORDS = (
     'TeX'            => 'TeX',
     'XeLaTeX'        => 'XeLaTeX',
     'XeTeX'          => 'XeTeX',
-    'allowbreak'    => '<wbr>',
+    'allowbreak'     => '\x{200B}', # zero width space to allow breaks
     'ast'            => '*',
     'bullet'         => '\x{2022}',
     'dag'            => '\x{2020}',
@@ -169,6 +174,8 @@ our %CONTROL_WORDS = (
     'ddagger'        => '\x{2021}',
     'dots'           => '\x{2026}',
     'epsilon'        => '\x{03F5}',
+    'guillemetleft'  => '\x{00AB}',
+    'guillemetright' => '\x{00BB}',
     'hookleftarrow'  => '\x{21A9}',
     'hookrightarrow' => '\x{21AA}',
     'ldots'          => '\x{2026}',

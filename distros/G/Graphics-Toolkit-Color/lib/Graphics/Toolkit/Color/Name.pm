@@ -29,14 +29,15 @@ sub get_values {
 }
 
 sub from_values {
-    my ($values, $scheme_name, $all_names, $full_name) = @_;
+    my ($values, $scheme_name, $all_names, $full_name, $distance) = @_;
     my @return_names = ();
     my @scheme_names = (ref $scheme_name eq 'ARRAY') ? (@$scheme_name)
                      : (defined $scheme_name)        ? $scheme_name : 'DEFAULT';
     for my $scheme_name (@scheme_names) {
         my $scheme = try_get_scheme( $scheme_name );
         next unless ref $scheme;
-        my $names = $scheme->names_from_values( $values );
+        my $names = $distance ? $scheme->names_in_range( $values, $distance )
+                              : $scheme->names_from_values( $values );
         next unless ref $names;
         $names = [ map { uc($scheme_name).':'.$_} @$names] if $full_name and uc($scheme_name) ne 'DEFAULT';
         push @return_names, @$names;
@@ -138,13 +139,26 @@ Graphics::Toolkit::Color::Name - translate color names to values and vice versa
 
 =head1 DESCRIPTION
 
-This modules stores a set of
-L<color schemes|Graphics::Toolkit::Color::Name::Scheme>, where named
-color constants are stored. There is a
-L<default scheme|Graphics::Toolkit::Color::Name::Constant> and additional
-ones, fed by L<Bundle::Graphics::ColorNames> modules, which have to be
-installed separately. Wherever a method accepts a color scheme name,
-you may also pass an ARRAY with several scheme names.
+This module autoloads and holds a set of
+L<color schemes|Graphics::Toolkit::Color::Name::Scheme>, where color
+names with associated RGB values are stored (color name spaces).
+There is a L<default scheme|Graphics::Toolkit::Color::Name::Constant>
+and additional ones, fed Graphics::ColorNames::* Modules. which have to
+be installed separately. For your convenance I created
+L<Bundle::Graphics::ColorNames> to install them all at once, which all
+also frees you from the search which module provides which space
+(some provide several).
+
+This module also provides methods that search in those schemes. Wherever
+a method accepts a color scheme name, it will default to the default name
+space, but also accepts an ARRAY with several scheme names.
+
+
+=head1 SCHEMES
+
+Acceptable scheme names are currently: I<Crayola>, I<CSS>, I<EmergyC>,
+I<GrayScale>, I<HTML>, I<IE>, I<Mozilla>, I<Netscape>, I<Pantone>,
+I<PantoneReport>, I<SVG>, I<VACCC>, I<Werner>, I<Windows>, I<WWW> or I<X> (X11).
 
 
 =head1 ROUTINES

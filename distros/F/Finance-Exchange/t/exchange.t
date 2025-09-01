@@ -22,9 +22,9 @@ subtest 'exchange object construction' => sub {
 
 subtest 'trading_days' => sub {
     my $expected = {
-        everyday     => ['RANDOM',           'RANDOM_NOCTURNE', 'CRYPTOCURRENCY', 'RSI_CRYPTO'],
-        sun_thru_thu => ['EGX',              'SAS', 'DFM', 'ADS', 'KSE'],
-        sun_thru_fri => ['RSI_FOREX_EURUSD', 'RSI_FOREX_GBPUSD', 'RSI_FOREX_USDJPY', 'RSI_METAL'],
+        everyday     => ['RANDOM',                'RANDOM_NOCTURNE', 'CRYPTOCURRENCY', 'TACTICAL_CRYPTO'],
+        sun_thru_thu => ['EGX',                   'SAS', 'DFM', 'ADS', 'KSE'],
+        sun_thru_fri => ['TACTICAL_FOREX_EURUSD', 'TACTICAL_FOREX_GBPUSD', 'TACTICAL_FOREX_USDJPY', 'TACTICAL_METALS'],
         weekdays     => [
             'ICE_LIFFE',   'EEI_PA',   'BIS',         'NYSE_SPC',   'KRX',          'SYNFSE',       'BSE',          'HKF',
             'BOVESPA',     'SWX',      'TRSE',        'EURONEXT',   'SYNTSE',       'TSE_S',        'TSE',          'OSLO',
@@ -82,10 +82,12 @@ subtest 'exchange currency' => sub {
         'SGD' => ['SES', 'SGX', 'SGX_OTC'],
         'TRY' => ['BIS'],
         'USD' => [
-            'NYSE_SPC',     'SYNNYSE_SPC',      'NYSE',             'MOF',    'NASDAQ_INDEX', 'CME',
-            'RTS',          'ODLS',             'SP_GLOBAL',        'NASDAQ', 'SYNNYSE_DJI',  'SP_GSCI',
-            'OIL_OTC',      'BRENT_OTC',        'CME_OTC',          'ICE',    'NASDAQ_OTC',   'NYSE_OTC',
-            'NYSE_SPC_OTC', 'RSI_FOREX_EURUSD', 'RSI_FOREX_GBPUSD', 'RSI_FOREX_USDJPY'
+            'NYSE_SPC',              'SYNNYSE_SPC', 'NYSE',         'MOF',
+            'NASDAQ_INDEX',          'CME',         'RTS',          'ODLS',
+            'SP_GLOBAL',             'NASDAQ',      'SYNNYSE_DJI',  'SP_GSCI',
+            'OIL_OTC',               'BRENT_OTC',   'CME_OTC',      'ICE',
+            'NASDAQ_OTC',            'NYSE_OTC',    'NYSE_SPC_OTC', 'TACTICAL_FOREX_EURUSD',
+            'TACTICAL_FOREX_GBPUSD', 'TACTICAL_FOREX_USDJPY'
         ],
         'ZAR' => ['JSE', 'JSE_OTC'],
     };
@@ -95,8 +97,8 @@ subtest 'exchange currency' => sub {
         METAL           => 1,
         RANDOM_NOCTURNE => 1,
         CRYPTOCURRENCY  => 1,
-        RSI_CRYPTO      => 1,
-        RSI_METAL       => 1
+        TACTICAL_CRYPTO => 1,
+        TACTICAL_METALS => 1
     );
 
     foreach my $ex (map { Finance::Exchange->create_exchange($_) } @exchanges) {

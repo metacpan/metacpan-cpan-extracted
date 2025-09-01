@@ -6,7 +6,7 @@ use warnings;
 
 use Exporter     qw( import );
 use PPI          ();
-use Test2::V0    qw( is like );
+use Test2::V0    qw( fail is like );
 use feature      qw( signatures );
 use experimental qw( signatures );
 
@@ -43,12 +43,18 @@ sub count_violations ($policy, $code, $expected_violations, $description) {
 }
 
 sub good ($policy, $code, $description) {
-  count_violations($policy, $code, 0, $description);
+  my @violations = count_violations($policy, $code, 0, $description);
+  my $field
+    = ref($policy) =~ /RequireConsistentQuoting/
+    ? "explanation"
+    : "description";
+  fail join " --- ", (map $_ // "*undef*", $_->$field, $code) for @violations;
 }
 
 sub bad ($policy, $code, $expected_message, $description) {
   my @violations = find_violations($policy, $code);
   is @violations, 1, "$description - should have one violation";
+  return unless @violations;
 
   # For quoting policies, check explanation instead of description
   my $field

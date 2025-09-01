@@ -198,7 +198,7 @@ Examples:
 
     # Sunday opening adjustment for RSI exchanges
     my $changes = $calendar->regularly_adjusts_trading_hours_on(
-        Finance::Exchange->create_exchange('RSI_FOREX_EURUSD'),
+        Finance::Exchange->create_exchange('TACTICAL_FOREX_EURUSD'),
         Date::Utility->new('2023-02-12')  # Sunday
     );
     # Returns a hashref with adjusted opening time on Sundays:

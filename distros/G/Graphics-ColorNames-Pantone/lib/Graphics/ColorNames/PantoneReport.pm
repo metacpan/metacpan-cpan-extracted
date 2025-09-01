@@ -1,12 +1,11 @@
 
-
 package Graphics::ColorNames::PantoneReport;
 
 require 5.008;
 use strict;
 use warnings;
 
-our $VERSION = '0.54';
+our $VERSION = '0.56';
 
 sub NamesRgbTable {
     return {
@@ -28,7 +27,7 @@ sub NamesRgbTable {
     'ceruleanblue'        =>   0x98B4D4,
     'rosequartz'          =>   0xF7CAC9,
     'peachecho'           =>   0xF7786B,
-    'serenity'            =>   0x91A8D0,
+    'serenity'            =>   0x92A8D1,
     'snorkelblue'         =>   0x034F84,
     'limpetshell'         =>   0x98DDDE,
     'lilacgrey'           =>   0x9896A4,
@@ -85,7 +84,7 @@ sub NamesRgbTable {
     'valiantpoppy'        =>   0xBD3D3A,
     'nebulasblue'         =>   0x3F69AA,
     'ceylonyellow'        =>   0xD5AE41,
-    'martiniolive'        =>   0x766F57,
+    'martiniolive'        =>   0x766F57, # selected twice
     'russetorange'        =>   0xE47A2E,
     'crocuspetal'         =>   0xBE9EC9,
     'limelight'           =>   0xF1EA7F,
@@ -119,7 +118,7 @@ sub NamesRgbTable {
     'darkcheddar'         =>   0xE08119,
     'galaxyblue'          =>   0x2A4B7C,
     'bluestone'           =>   0x577284,
-    'orangetiger'         =>   0xF96714,
+    'orangetiger'         =>   0xF96714, # selected twice
     'eden'                =>   0x264E36,
     'vanillacustard'      =>   0xF3E0BE,
     'eveningblue'         =>   0x2A293E,
@@ -166,7 +165,7 @@ sub NamesRgbTable {
     'desertmist'          =>   0xE0B589,
     'willow'              =>   0x9A8B4F,
     'veryperi'            =>   0x696aad,
-    'spunsugar'           =>   0xb8deec, 
+    'spunsugar'           =>   0xb8deec,
     'gossamerpink'        =>   0xf9c5c2,
     'innuendo'            =>   0xc43f66,
     'skydiver'            =>   0x1e609e,
@@ -183,19 +182,75 @@ sub NamesRgbTable {
     'poppyseed'           =>   0x66686c,
     'lavafalls'           =>   0x9f383a,
     'samoansun'           =>   0xf5cc72,
-#    'orangetiger'         =>   0xfe7133, # selected twice
     'roseviolet'          =>   0xc15391,
     'amazon'              =>   0x1C734B,
     'nosegay'             =>   0xf0c0d8,
     'waterspout'          =>   0x93dbe0,
     'caramelcafe'         =>   0x8b5a3e,
     'midnight'            =>   0x315d78,
-#    'martiniolive'        =>   0x776f57, # selected twice
     'arcticwolf'          =>   0xe6decf,
     'autumnblonde'        =>   0xf2d6b3,
     'polarnight'          =>   0x434550,
     'lodenfrost'          =>   0x758e77,
     'chiseledstone'       =>   0x8f8f93,
+    'myknosblue'          =>   0x005B88,
+    'leprechaun'          =>   0x378661,
+    'fuchsiafedora'       =>   0xCA4286,
+    'palerosette'         =>   0xFFBBB9,
+    'adobe'               =>   0xA66948,
+    'firewhirl'           =>   0xA73730,
+    'rhodonite'           =>   0x302C4D,
+    'springlake'          =>   0x698295,
+    'rootbeer'            =>   0x714A41,
+    'coconutcream'        =>   0xEFE3DF,
+    'olivebranch'         =>   0x6A6A45,
+    'peachfuzz'           =>   0xFFBE98,
+    'rooibostea'          =>   0xAE4B38,
+    'orangeade'           =>   0xE75936,
+    'watercress'          =>   0x708C66,
+    'desertflower'        =>   0xFF9A90,
+    'chambrayblue'        =>   0xA4B9DA,
+    'pastellilac'         =>   0xBEB2D5,
+    'marlin'              =>   0x505C84,
+    'lemondrop'           =>   0xF8D974,
+    'capri'               =>   0x42BDCB,
+    'tomatocream'         =>   0xC57644,
+    'goldenpalm'          =>   0xAF8D1F,
+    'scarletsmile'        =>   0x9F2436,
+    'aventurine'          =>   0x005348,
+    'redorange'           =>   0xEF5327,
+    'fern'                =>   0x999E62,
+    'italianplum'         =>   0x51354A,
+    'moonstruck'          =>   0xC2BEB6,
+    'wintersky'           =>   0xA6C0CD,
+    'lucentwhite'         =>   0xF4F7FF,
+    'mochamousse'         =>   0xa47864,
+    'bran'                =>   0xa66e4a,
+    'crocus'              =>   0xc67fae,
+    'limecream'           =>   0xd7e8bc,
+    'whitegrape'          =>   0xa6be47,
+    'dejavublue'          =>   0x2e5283,
+    'kashmir'             =>   0x6f8d6a,
+    'mistedmarigold'      =>   0xe3bd33,
+    'cocoon'              =>   0xc9b27c,
+    'antiquewhite'        =>   0xede3d2,
+    'rumrasin'            =>   0x583432,
+    'moonbeam'            =>   0xcdc6bd,
+    'bluegranite'         =>   0x717388,
+    'lemongrass'          =>   0xdcd494,
+    'brandiedmelon'       =>   0xd1805f,
+    'lyonsblue'           =>   0x005871,
+    'damson'              =>   0x854c65,
+    'primrosepink'        =>   0xefdadd,
+    'winterberry'         =>   0xbe394f,
+    'hotchocolate'        =>   0x704a49,
+    'poppyred'            =>   0xdc343b,
+    'bronzebrown'         =>   0x82643e,
+    'brightwhite'         =>   0xf4f5f0,
+    'frenchroast'         =>   0x58423f,
+    'vaporblue'           =>   0xbdbebf,
+    'crownblue'           =>   0x464b65,
+    'mauvewine'           =>   0x5b3644,
   };
 }
 
@@ -219,21 +274,22 @@ Graphics::ColorNames::PantoneReport - RGB values of Pantone Report colors
 See the documentation of L<Graphics::ColorNames> for information how to use
 this module.
 
-This module defines 184 names and associated RGB values of colors that were
-part of the annual report of the I<Pantone Institute> from 2016 to 2022.
+This module defines 242 names and associated RGB values of colors that were
+part of the annual report of the I<Pantone Institute> from 2016 to 2025.
 They reflect trends at the I<New York Fashion Week> and should not be
 mistaken for the colors of the palette created by Pantone for Designers,
-which can be accessed via L<Graphics::ColorNames::Pantone>. I choose 
-TPX (TPG) over TCX values since ladder are specific to the textile industry 
+which can be accessed via L<Graphics::ColorNames::Pantone>. I choose
+TPX (TPG) over TCX values since ladder are specific to the textile industry
 and I assume usage of this module is monitor related. However, when no
 TPX (TPG) available we took TCX, since I dont have the exact conversion
 formula.
 
-All names are lower case and do not contain space or apostrophes or other 
+All names are lower case and do not contain space or apostrophes or other
 none ASCII characters - the originally named C<"Potter's Clay"> is
 here C<"pottersclay"> and C<'Crème de Peche'> => C<'cremedepeche'>.
-But you can actually access them as "Potters_Clay" and 'Creme_de_Peche'
-because L<Graphics::ColorNames> does normalize names C<lc> and removing I<'_'>.
+But you can actually access them as "Potters_Clay" and 'Creme de Peche'
+because L<Graphics::ColorNames> does normalize names by C<lc> and
+removing I<'_'> and I<' '>.
 
 
 =head1 SEE ALSO
@@ -250,7 +306,7 @@ Based on L<Graphics::ColorNames::X> by Robert Rothenberg.
 
 =head1 LICENSE
 
-Copyright 2022 Herbert Breunung
+Copyright 2022-25 Herbert Breunung
 
 This program is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.

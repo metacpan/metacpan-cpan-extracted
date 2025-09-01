@@ -1,5 +1,8 @@
 Revision history for Finance-Exchange
 
+0.07      2025-09-01 05:51:29+00:00 UTC
+    - Rename RSI* exchanges to TACTICAL* exchanges
+
 0.06      2025-08-22 03:56:07+00:00 UTC
     - Adjusts Sunday opening and Friday closing times for RSI exchanges
 

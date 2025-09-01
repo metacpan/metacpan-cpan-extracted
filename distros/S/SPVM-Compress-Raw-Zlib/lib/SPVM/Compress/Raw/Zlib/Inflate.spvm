@@ -25,23 +25,23 @@ class Compress::Raw::Zlib::Inflate extends Compress::Raw::Zlib::Base {
   method init : void ($options : object[] = undef) {
     
     my $option_names = [
-      "-WindowBits",
-      "-Dictionary",
-      "-Bufsize",
-      "-LimitOutput",
+      "WindowBits",
+      "Dictionary",
+      "Bufsize",
+      "LimitOutput",
     ];
     
     Fn->check_option_names($options, $option_names);
     
     my $options_h = Hash->new($options);
     
-    $self->{WindowBits} = $options_h->get_or_default_int("-WindowBits", ZLIB->MAX_WBITS);
+    $self->{WindowBits} = $options_h->get_or_default_int("WindowBits", ZLIB->MAX_WBITS);
     
-    $self->{Dictionary} = $options_h->get_or_default_string("-Dictionary", "");
+    $self->{Dictionary} = $options_h->get_or_default_string("Dictionary", undef);
     
-    $self->{Bufsize} = $options_h->get_or_default_int("-Bufsize", 4096);
+    $self->{Bufsize} = $options_h->get_or_default_int("Bufsize", 4096);
     
-    $self->{LimitOutput} = (byte)$options_h->get_or_default_int("-LimitOutput", 0);
+    $self->{LimitOutput} = (byte)$options_h->get_or_default_int("LimitOutput", 0);
     
     unless ($self->{Bufsize} >= 1) {
       die "The value of '-Bufsize' option must be >= 1.";
@@ -58,7 +58,7 @@ class Compress::Raw::Zlib::Inflate extends Compress::Raw::Zlib::Base {
   
   native method inflateReset : void ();
   
-  native method inflate : void ($input : mutable string, $output_ref : string[]);
+  native method inflate : int ($input : mutable string, $output_ref : string[]);
   
   native method DESTROY : void ();
   

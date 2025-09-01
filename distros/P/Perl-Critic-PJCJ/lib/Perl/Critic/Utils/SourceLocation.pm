@@ -1,4 +1,4 @@
-package Perl::Critic::Utils::SourceLocation v0.1.2;
+package Perl::Critic::Utils::SourceLocation v0.1.4;
 
 use v5.26.0;
 use strict;
@@ -56,7 +56,7 @@ Perl::Critic::Utils::SourceLocation - Synthetic PPI element
 
 =head1 VERSION
 
-version v0.1.2
+version v0.1.4
 
 =head1 SYNOPSIS
 

@@ -18,7 +18,7 @@ my $Policy
 
 subtest "Double quoted strings" => sub {
   good $Policy, 'my $x = "hello"', "Double quoted simple string";
-  good $Policy, 'my $x = "It\'s a nice day"',
+  good $Policy, q(my $x = "It's a nice day"),
     "String with single quote needs double quotes";
   good $Policy, 'my $x = "Hello $name"',
     "String with interpolation needs double quotes";

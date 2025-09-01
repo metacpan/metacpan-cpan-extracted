@@ -1,11 +1,11 @@
 package BibTeX::Parser::Author;
 {
-  $BibTeX::Parser::Author::VERSION = '1.92';
+  $BibTeX::Parser::Author::VERSION = '1.93';
 }
 
 use warnings;
 use strict;
-use BibTeX::Parser qw (_split_braced_string);
+require BibTeX::Parser; # mutual dependency
 
 use overload
 	'""' => \&to_string;
@@ -427,7 +427,7 @@ the following token is not: C<{von}>
 
 =head1 VERSION
 
-version 1.92
+version 1.93
 
 =head1 AUTHOR
 

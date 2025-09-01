@@ -1,11 +1,916 @@
 class TestCase::Compress::Raw::Zlib {
   use Compress::Raw::Zlib;
-  use Compress::Raw::Zlib::Constant;
+  use Compress::Raw::Zlib::Constant as ZLIB;
   use Compress::Raw::Zlib::Deflate;
   use Compress::Raw::Zlib::Inflate;
   
-  static method test : int () {
+  use Fn;
+  
+  static method deflate_and_inflate_basic : int () {
+    
+    {
+      my $data = "I am a HAL 9000 computer";
+      
+      my $read_length = 4;
+      
+      my $deflate = Compress::Raw::Zlib::Deflate->new;
+      
+      unless ($deflate->total_in == 0) {
+        return 0;
+      }
+      
+      unless ($deflate->total_out == 0) {
+        return 0;
+      }
+      
+      my $compressed_data = "";
+      my $status = ZLIB->Z_OK;
+      for (my $i = 0; $i < length $data; $i += $read_length) {
+        
+        my $ch = Fn->substr($data, $i, $read_length);
+        
+        $status = $deflate->deflate($ch, my $_ = [(string)undef]);
+        
+        if (length $_->[0]) {
+          $compressed_data .= $_->[0];
+        }
+      }
+      
+      unless ($status == ZLIB->Z_OK) {
+        return 0;
+      }
+      
+      $deflate->flush(my $_ = [(string)undef]);
+      
+      unless ($status == ZLIB->Z_OK) {
+        return 0;
+      }
+      
+      if (length $_->[0]) {
+        $compressed_data .= $_->[0];
+      }
+      
+      unless ($deflate->total_in == length $data) {
+        return 0;
+      }
+      
+      unless ($deflate->total_out == length $compressed_data) {
+        return 0;
+      }
+      
+      # zlib format
+      unless ($compressed_data->[0] == (byte)0x78) {
+        return 0;
+      }
+      unless ($compressed_data->[1] == (byte)0x9C) {
+        return 0;
+      }
+      
+      {
+        my $inflate = Compress::Raw::Zlib::Inflate->new;
+        
+        unless ($inflate->total_in == 0) {
+          return 0;
+        }
+        
+        unless ($inflate->total_out == 0) {
+          return 0;
+        }
+        
+        my $compressed_data = (mutable string)copy $compressed_data;
+        
+        my $uncompressed_data = "";
+        my $status = ZLIB->Z_OK;
+        for (my $i = 0; $i < length $compressed_data; $i += $read_length) {
+          
+          my $ch = (mutable string)Fn->substr($compressed_data, $i, $read_length);
+          
+          my $total_in_start = $inflate->total_in;
+          
+          my $ch_length_start = length $ch;
+          
+          $status = $inflate->inflate($ch, my $_ = [(string)undef]);
+          
+          my $total_in_diff = $inflate->total_in - $total_in_start;
+          
+          my $ch_length_diff = $ch_length_start - length $ch;
+          
+          unless ($total_in_diff == $ch_length_diff) {
+            return 0;
+          }
+          
+          if (length $_->[0]) {
+            $uncompressed_data .= $_->[0];
+          }
+        }
+        
+        unless ($inflate->total_in == length $compressed_data) {
+          return 0;
+        }
+        
+        unless ($inflate->total_out == length $uncompressed_data) {
+          return 0;
+        }
+        
+        unless ($status == ZLIB->Z_STREAM_END) {
+          return 0;
+        }
+        
+        unless ($uncompressed_data eq $data) {
+          return 0;
+        }
+      }
+    }
     
     return 1;
   }
+  
+  static method deflate_and_inflate_small_buffer : int () {
+    
+    for (my $bufsize = 1; $bufsize <= 2; $bufsize++) {
+      my $data = "I am a HAL 9000 computer";
+      
+      my $deflate = Compress::Raw::Zlib::Deflate->new({Bufsize => $bufsize});
+      
+      unless ($deflate->total_in == 0) {
+        return 0;
+      }
+      
+      unless ($deflate->total_out == 0) {
+        return 0;
+      }
+      
+      my $compressed_data = "";
+      for (my $i = 0; $i < length $data; $i++) {
+        
+        my $ch = Fn->substr($data, $i, 1);
+        
+        $deflate->deflate($ch, my $_ = [(string)undef]);
+        
+        if (length $_->[0]) {
+          $compressed_data .= $_->[0];
+        }
+      }
+      
+      $deflate->flush(my $_ = [(string)undef]);
+      
+      if (length $_->[0]) {
+        $compressed_data .= $_->[0];
+      }
+      
+      unless ($deflate->total_in == length $data) {
+        return 0;
+      }
+      
+      unless ($deflate->total_out == length $compressed_data) {
+        return 0;
+      }
+      
+      {
+        my $inflate = Compress::Raw::Zlib::Inflate->new({Bufsize => 1});
+        
+        unless ($inflate->total_in == 0) {
+          return 0;
+        }
+        
+        unless ($inflate->total_out == 0) {
+          return 0;
+        }
+        
+        my $compressed_data = (mutable string)copy $compressed_data;
+        
+        my $uncompressed_data = "";
+        for (my $i = 0; $i < length $compressed_data; $i++) {
+          
+          my $ch = (mutable string)Fn->substr($compressed_data, $i, 1);
+          
+          $inflate->inflate($ch, my $_ = [(string)undef]);
+          
+          if (length $_->[0]) {
+            $uncompressed_data .= $_->[0];
+          }
+        }
+        
+        unless ($inflate->total_in == length $compressed_data) {
+          return 0;
+        }
+        
+        unless ($inflate->total_out == length $uncompressed_data) {
+          return 0;
+        }
+        
+        unless ($uncompressed_data eq $data) {
+          return 0;
+        }
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method deflate_and_inflate_WANT_GZIP : int () {
+    
+    {
+      my $data = "I am a HAL 9000 computer";
+      
+      my $read_length = 4;
+      
+      my $deflate = Compress::Raw::Zlib::Deflate->new({WindowBits => ZLIB->WANT_GZIP});
+      
+      unless ($deflate->total_in == 0) {
+        return 0;
+      }
+      
+      unless ($deflate->total_out == 0) {
+        return 0;
+      }
+      
+      my $compressed_data = "";
+      for (my $i = 0; $i < length $data; $i += $read_length) {
+        
+        my $ch = Fn->substr($data, $i, $read_length);
+        
+        $deflate->deflate($ch, my $_ = [(string)undef]);
+        
+        if (length $_->[0]) {
+          $compressed_data .= $_->[0];
+        }
+      }
+      
+      $deflate->flush(my $_ = [(string)undef]);
+      
+      if (length $_->[0]) {
+        $compressed_data .= $_->[0];
+      }
+      
+      unless ($deflate->total_in == length $data) {
+        return 0;
+      }
+      
+      unless ($deflate->total_out == length $compressed_data) {
+        return 0;
+      }
+      
+      {
+        my $inflate = Compress::Raw::Zlib::Inflate->new({WindowBits => ZLIB->WANT_GZIP});
+        
+        unless ($inflate->total_in == 0) {
+          return 0;
+        }
+        
+        unless ($inflate->total_out == 0) {
+          return 0;
+        }
+        
+        my $compressed_data = (mutable string)copy $compressed_data;
+        
+        # GZIP format
+        unless ($compressed_data->[0] == (byte)0x1f) {
+          return 0;
+        }
+        unless ($compressed_data->[1] == (byte)0x8b) {
+          return 0;
+        }
+        
+        my $uncompressed_data = "";
+        for (my $i = 0; $i < length $compressed_data; $i += $read_length) {
+          
+          my $ch = (mutable string)Fn->substr($compressed_data, $i, $read_length);
+          
+          $inflate->inflate($ch, my $_ = [(string)undef]);
+          
+          if (length $_->[0]) {
+            $uncompressed_data .= $_->[0];
+          }
+        }
+        
+        unless ($inflate->total_in == length $compressed_data) {
+          return 0;
+        }
+        
+        unless ($inflate->total_out == length $uncompressed_data) {
+          return 0;
+        }
+        
+        unless ($uncompressed_data eq $data) {
+          return 0;
+        }
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method deflate_and_inflate_dictionary : int () {
+    
+    # RFC 1950 (zlib format):
+    {
+      my $data = "I am a HAL 9000 computer";
+      
+      my $read_length = 4;
+      
+      my $dictionary = "hello";
+      
+      my $deflate_options = {
+        Dictionary => $dictionary,
+      };
+      
+      my $deflate = Compress::Raw::Zlib::Deflate->new($deflate_options);
+      
+      my $compressed_data = "";
+      for (my $i = 0; $i < length $data; $i += $read_length) {
+        
+        my $ch = Fn->substr($data, $i, $read_length);
+        
+        $deflate->deflate($ch, my $_ = [(string)undef]);
+        
+        if (length $_->[0]) {
+          $compressed_data .= $_->[0];
+        }
+      }
+      
+      $deflate->flush(my $_ = [(string)undef]);
+      
+      if (length $_->[0]) {
+        $compressed_data .= $_->[0];
+      }
+      
+      {
+        my $inflate_options = {
+          Dictionary => $dictionary,
+        };
+        
+        my $inflate = Compress::Raw::Zlib::Inflate->new($inflate_options);
+        
+        my $compressed_data = (mutable string)copy $compressed_data;
+        
+        my $uncompressed_data = "";
+        for (my $i = 0; $i < length $compressed_data; $i += $read_length) {
+          
+          my $ch = (mutable string)Fn->substr($compressed_data, $i, $read_length);
+          
+          $inflate->inflate($ch, my $_ = [(string)undef]);
+          
+          if (length $_->[0]) {
+            $uncompressed_data .= $_->[0];
+          }
+        }
+        
+        unless ($uncompressed_data eq $data) {
+          return 0;
+        }
+      }
+    }
+    
+    # RFC 1951 (raw DEFLATE format):
+    {
+      my $data = "I am a HAL 9000 computer";
+      
+      my $read_length = 4;
+      
+      my $dictionary = "hello";
+      
+      my $deflate_options = {
+        Dictionary => $dictionary,
+        WindowBits => -ZLIB->MAX_WBITS,
+      };
+      
+      my $deflate = Compress::Raw::Zlib::Deflate->new($deflate_options);
+      
+      my $compressed_data = "";
+      for (my $i = 0; $i < length $data; $i += $read_length) {
+        
+        my $ch = Fn->substr($data, $i, $read_length);
+        
+        $deflate->deflate($ch, my $_ = [(string)undef]);
+        
+        if (length $_->[0]) {
+          $compressed_data .= $_->[0];
+        }
+      }
+      
+      $deflate->flush(my $_ = [(string)undef]);
+      
+      if (length $_->[0]) {
+        $compressed_data .= $_->[0];
+      }
+      
+      {
+        my $inflate_options = {
+          Dictionary => $dictionary,
+          WindowBits => -ZLIB->MAX_WBITS,
+        };
+        
+        my $inflate = Compress::Raw::Zlib::Inflate->new($inflate_options);
+        
+        my $compressed_data = (mutable string)copy $compressed_data;
+        
+        my $uncompressed_data = "";
+        for (my $i = 0; $i < length $compressed_data; $i += $read_length) {
+          
+          my $ch = (mutable string)Fn->substr($compressed_data, $i, $read_length);
+          
+          $inflate->inflate($ch, my $_ = [(string)undef]);
+          
+          if (length $_->[0]) {
+            $uncompressed_data .= $_->[0];
+          }
+        }
+        
+        unless ($uncompressed_data eq $data) {
+          return 0;
+        }
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method deflate_and_inflate_options : int () {
+    
+    {
+      my $data = "I am a HAL 9000 computer";
+      
+      my $read_length = 4;
+      
+      my $dictionary = "hello";
+      
+      my $deflate_options = {
+        Level => ZLIB->Z_BEST_COMPRESSION,
+        MemLevel => 1,
+        Strategy => ZLIB->Z_HUFFMAN_ONLY,
+      };
+      
+      my $deflate = Compress::Raw::Zlib::Deflate->new($deflate_options);
+      
+      my $compressed_data = "";
+      for (my $i = 0; $i < length $data; $i += $read_length) {
+        
+        my $ch = Fn->substr($data, $i, $read_length);
+        
+        $deflate->deflate($ch, my $_ = [(string)undef]);
+        
+        if (length $_->[0]) {
+          $compressed_data .= $_->[0];
+        }
+      }
+      
+      $deflate->flush(my $_ = [(string)undef]);
+      
+      if (length $_->[0]) {
+        $compressed_data .= $_->[0];
+      }
+      
+      {
+        my $inflate_options = {};
+        
+        my $inflate = Compress::Raw::Zlib::Inflate->new($inflate_options);
+        
+        my $compressed_data = (mutable string)copy $compressed_data;
+        
+        my $uncompressed_data = "";
+        for (my $i = 0; $i < length $compressed_data; $i += $read_length) {
+          
+          my $ch = (mutable string)Fn->substr($compressed_data, $i, $read_length);
+          
+          $inflate->inflate($ch, my $_ = [(string)undef]);
+          
+          if (length $_->[0]) {
+            $uncompressed_data .= $_->[0];
+          }
+        }
+        
+        unless ($uncompressed_data eq $data) {
+          return 0;
+        }
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method deflate_and_inflate_rfc1951 : int () {
+    
+    {
+      my $data = "I am a HAL 9000 computer";
+      
+      my $read_length = 4;
+      
+      my $deflate = Compress::Raw::Zlib::Deflate->new({WindowBits => -ZLIB->MAX_WBITS});
+      
+      unless ($deflate->total_in == 0) {
+        return 0;
+      }
+      
+      unless ($deflate->total_out == 0) {
+        return 0;
+      }
+      
+      my $compressed_data = "";
+      for (my $i = 0; $i < length $data; $i += $read_length) {
+        
+        my $ch = Fn->substr($data, $i, $read_length);
+        
+        $deflate->deflate($ch, my $_ = [(string)undef]);
+        
+        if (length $_->[0]) {
+          $compressed_data .= $_->[0];
+        }
+      }
+      
+      $deflate->flush(my $_ = [(string)undef]);
+      
+      if (length $_->[0]) {
+        $compressed_data .= $_->[0];
+      }
+      
+      unless ($deflate->total_in == length $data) {
+        return 0;
+      }
+      
+      unless ($deflate->total_out == length $compressed_data) {
+        return 0;
+      }
+      
+      {
+        my $inflate = Compress::Raw::Zlib::Inflate->new({WindowBits => -ZLIB->MAX_WBITS});
+        
+        unless ($inflate->total_in == 0) {
+          return 0;
+        }
+        
+        unless ($inflate->total_out == 0) {
+          return 0;
+        }
+        
+        my $compressed_data = (mutable string)copy $compressed_data;
+        
+        my $uncompressed_data = "";
+        for (my $i = 0; $i < length $compressed_data; $i += $read_length) {
+          
+          my $ch = (mutable string)Fn->substr($compressed_data, $i, $read_length);
+          
+          my $total_in_start = $inflate->total_in;
+          
+          my $ch_length_start = length $ch;
+          
+          $inflate->inflate($ch, my $_ = [(string)undef]);
+          
+          my $total_in_diff = $inflate->total_in - $total_in_start;
+          
+          my $ch_length_diff = $ch_length_start - length $ch;
+          
+          unless ($total_in_diff == $ch_length_diff) {
+            return 0;
+          }
+          
+          if (length $_->[0]) {
+            $uncompressed_data .= $_->[0];
+          }
+        }
+        
+        unless ($inflate->total_in == length $compressed_data) {
+          return 0;
+        }
+        
+        unless ($inflate->total_out == length $uncompressed_data) {
+          return 0;
+        }
+        
+        unless ($uncompressed_data eq $data) {
+          return 0;
+        }
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method deflate_and_inflate_fields : int () {
+    
+    # Deflate
+    {
+      my $deflate = Compress::Raw::Zlib::Deflate->new({Bufsize => 10});
+      
+      unless ($deflate->get_Bufsize == 10) {
+        return 0;
+      }
+      
+      unless ($deflate->adler == 1) {
+        return 0;
+      }
+      
+      unless ($deflate->get_Strategy == ZLIB->Z_DEFAULT_STRATEGY) {
+        return 0;
+      }
+      
+      unless ($deflate->get_Level == ZLIB->Z_DEFAULT_COMPRESSION) {
+        return 0;
+      }
+    }
+    
+    # Inflate
+    {
+      my $inflate = Compress::Raw::Zlib::Inflate->new({Bufsize => 10});
+      
+      unless ($inflate->get_Bufsize == 10) {
+        return 0;
+      }
+      
+      unless ($inflate->adler == 1) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method deflateReset_and_inflateReset : int () {
+    
+    {
+      my $data = "I am a HAL 9000 computer";
+      
+      my $read_length = 4;
+      
+      my $deflate = Compress::Raw::Zlib::Deflate->new;
+      
+      $deflate->deflate("abcde", my $_ = [(string)undef]);
+      
+      $deflate->deflateReset;
+      
+      unless ($deflate->total_in == 0) {
+        return 0;
+      }
+      
+      unless ($deflate->total_out == 0) {
+        return 0;
+      }
+      
+      my $compressed_data = "";
+      for (my $i = 0; $i < length $data; $i += $read_length) {
+        
+        my $ch = Fn->substr($data, $i, $read_length);
+        
+        $deflate->deflate($ch, my $_ = [(string)undef]);
+        
+        if (length $_->[0]) {
+          $compressed_data .= $_->[0];
+        }
+      }
+      
+      $deflate->flush(my $_ = [(string)undef]);
+      
+      if (length $_->[0]) {
+        $compressed_data .= $_->[0];
+      }
+      
+      unless ($deflate->total_in == length $data) {
+        return 0;
+      }
+      
+      unless ($deflate->total_out == length $compressed_data) {
+        return 0;
+      }
+      
+      # zlib format
+      unless ($compressed_data->[0] == (byte)0x78) {
+        return 0;
+      }
+      unless ($compressed_data->[1] == (byte)0x9C) {
+        return 0;
+      }
+      
+      {
+        my $inflate = Compress::Raw::Zlib::Inflate->new;
+        
+        my $compressed_data_tmp = (mutable string)copy $compressed_data;
+        
+        $inflate->inflate($compressed_data_tmp, my $_ = [(string)undef]);
+        
+        $inflate->inflateReset;
+        
+        unless ($inflate->total_in == 0) {
+          return 0;
+        }
+        
+        unless ($inflate->total_out == 0) {
+          return 0;
+        }
+        
+        my $compressed_data = (mutable string)copy $compressed_data;
+        
+        my $uncompressed_data = "";
+        for (my $i = 0; $i < length $compressed_data; $i += $read_length) {
+          
+          my $ch = (mutable string)Fn->substr($compressed_data, $i, $read_length);
+          
+          my $total_in_start = $inflate->total_in;
+          
+          my $ch_length_start = length $ch;
+          
+          $inflate->inflate($ch, my $_ = [(string)undef]);
+          
+          my $total_in_diff = $inflate->total_in - $total_in_start;
+          
+          my $ch_length_diff = $ch_length_start - length $ch;
+          
+          unless ($total_in_diff == $ch_length_diff) {
+            return 0;
+          }
+          
+          if (length $_->[0]) {
+            $uncompressed_data .= $_->[0];
+          }
+        }
+        
+        unless ($inflate->total_in == length $compressed_data) {
+          return 0;
+        }
+        
+        unless ($inflate->total_out == length $uncompressed_data) {
+          return 0;
+        }
+        
+        unless ($uncompressed_data eq $data) {
+          return 0;
+        }
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method deflateTune : int () {
+    
+    {
+      my $data = "I am a HAL 9000 computer";
+      
+      my $read_length = 4;
+      
+      my $deflate = Compress::Raw::Zlib::Deflate->new;
+      
+      $deflate->deflateTune(65536, 128, 4, 128);
+      
+      unless ($deflate->total_in == 0) {
+        return 0;
+      }
+      
+      unless ($deflate->total_out == 0) {
+        return 0;
+      }
+      
+      my $compressed_data = "";
+      for (my $i = 0; $i < length $data; $i += $read_length) {
+        
+        my $ch = Fn->substr($data, $i, $read_length);
+        
+        $deflate->deflate($ch, my $_ = [(string)undef]);
+        
+        if (length $_->[0]) {
+          $compressed_data .= $_->[0];
+        }
+      }
+      
+      $deflate->flush(my $_ = [(string)undef]);
+      
+      if (length $_->[0]) {
+        $compressed_data .= $_->[0];
+      }
+      
+      unless ($deflate->total_in == length $data) {
+        return 0;
+      }
+      
+      unless ($deflate->total_out == length $compressed_data) {
+        return 0;
+      }
+      
+      # zlib format
+      unless ($compressed_data->[0] == (byte)0x78) {
+        return 0;
+      }
+      unless ($compressed_data->[1] == (byte)0x9C) {
+        return 0;
+      }
+      
+      {
+        my $inflate = Compress::Raw::Zlib::Inflate->new;
+        
+        unless ($inflate->total_in == 0) {
+          return 0;
+        }
+        
+        unless ($inflate->total_out == 0) {
+          return 0;
+        }
+        
+        my $compressed_data = (mutable string)copy $compressed_data;
+        
+        my $uncompressed_data = "";
+        for (my $i = 0; $i < length $compressed_data; $i += $read_length) {
+          
+          my $ch = (mutable string)Fn->substr($compressed_data, $i, $read_length);
+          
+          my $total_in_start = $inflate->total_in;
+          
+          my $ch_length_start = length $ch;
+          
+          $inflate->inflate($ch, my $_ = [(string)undef]);
+          
+          my $total_in_diff = $inflate->total_in - $total_in_start;
+          
+          my $ch_length_diff = $ch_length_start - length $ch;
+          
+          unless ($total_in_diff == $ch_length_diff) {
+            return 0;
+          }
+          
+          if (length $_->[0]) {
+            $uncompressed_data .= $_->[0];
+          }
+        }
+        
+        unless ($inflate->total_in == length $compressed_data) {
+          return 0;
+        }
+        
+        unless ($inflate->total_out == length $uncompressed_data) {
+          return 0;
+        }
+        
+        unless ($uncompressed_data eq $data) {
+          return 0;
+        }
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method deflate_and_inflate_LimitOutput : int () {
+    
+    my $data = Fn->repeat("I am a HAL 9000 computer", 2001);
+    
+    my $bufsizes = [1, 2, 3, 13, 4096, 1024*10];
+    for (my $i = 0; $i < @$bufsizes; $i++) {
+      
+      my $bufsize = $bufsizes->[$i];
+      
+      my $deflate = Compress::Raw::Zlib::Deflate->new({Bufsize => $bufsize});
+      
+      my $read_length = $bufsize;
+      
+      my $compressed_data = "";
+      for (my $i = 0; $i < length $data; $i += $read_length) {
+        
+        my $ch = Fn->substr($data, $i, $read_length);
+        
+        $deflate->deflate($ch, my $_ = [(string)undef]);
+        
+        if (length $_->[0]) {
+          $compressed_data .= $_->[0];
+        }
+      }
+      
+      $deflate->flush(my $_ = [(string)undef]);
+      
+      if (length $_->[0]) {
+        $compressed_data .= $_->[0];
+      }
+      
+      {
+        my $inflate = Compress::Raw::Zlib::Inflate->new({Bufsize => $bufsize, LimitOutput => 1});
+        
+        my $compressed_data = (mutable string)copy $compressed_data;
+        
+        my $uncompressed_data = "";
+        my $status = ZLIB->Z_OK;
+        for (my $i = 0; $i < length $compressed_data; $i += $read_length) {
+          
+          my $ch = (mutable string)Fn->substr($compressed_data, $i, $read_length);
+          
+          while (length $ch) {
+            $status = $inflate->inflate($ch, my $_ = [(string)undef]);
+            
+            if (length $_->[0]) {
+              $uncompressed_data .= $_->[0];
+            }
+          }
+          
+        }
+        
+        unless ($status == ZLIB->Z_STREAM_END) {
+          return 0;
+        }
+        
+        unless ($uncompressed_data eq $data) {
+          return 0;
+        }
+      }
+    }
+    
+    return 1;
+  }
+  
+  
 }

@@ -412,7 +412,7 @@ the space has no alias name.
 
 =head2 OKLAB
 
-is a modern improvement of L</CIELAB> by Björn Ottosson with no alias name
+is a modern improvement of L</CIELAB> by Bjoern Ottosson with no alias name
 and for nicer color transitions and better numeric behaviour.
 The axis long names are same as the same ones: B<L> with values (0 .. 1),
 B<a> and B<b> with both (-0.5 .. 0.5). If you want to use it like in B<CSS>,

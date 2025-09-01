@@ -6,7 +6,7 @@ class Compress::Raw::Zlib::Base {
   
   use Compress::Raw::Zlib::Z_stream;
   
-  # Fields
+  # Undocumented Fields
   has WindowBits : int;
   
   has Dictionary : string;

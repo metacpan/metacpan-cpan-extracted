@@ -6,7 +6,8 @@ use Test::More tests => 157;
 
 BEGIN { unshift @INC, 'lib', '../lib'}
 my $module = 'Graphics::Toolkit::Color::Space::Basis';
-use_ok( $module, 'could load the module');
+eval "use $module";
+is( not($@), 1, 'could load the module');
 
 #### basic construction ################################################
 is( ref Graphics::Toolkit::Color::Space::Basis->new(),         '', 'constructor needs arguments');

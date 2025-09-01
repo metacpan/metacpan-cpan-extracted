@@ -1,13 +1,13 @@
 package BibTeX::Parser::Entry;
 {
-  $BibTeX::Parser::Entry::VERSION = '1.92';
+  $BibTeX::Parser::Entry::VERSION = '1.93';
 }
 
 use warnings;
 use strict;
 
-use BibTeX::Parser::Author;
-use BibTeX::Parser qw (_split_braced_string);
+require BibTeX::Parser::Author; # mutual dependencies
+require BibTeX::Parser;
 
 sub new {
 	my ($class, $type, $key, $parse_ok, $fieldsref) = @_;
@@ -421,7 +421,7 @@ Can take values 'Uppercase' (the default), 'Lowercase' or 'Titlecase'
 
 =head1 VERSION
 
-version 1.92
+version 1.93
 
 =head1 AUTHOR
 

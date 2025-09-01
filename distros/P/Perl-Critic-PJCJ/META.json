@@ -73,7 +73,7 @@
          "web" : "https://github.com/pjcj/Perl-Critic-PJCJ"
       }
    },
-   "version" : "v0.1.2",
+   "version" : "v0.1.4",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.042000"
@@ -259,7 +259,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.50.1",
+                  "git_version" : "2.51.0",
                   "repo_root" : "."
                }
             },
@@ -281,14 +281,14 @@
                },
                "Dist::Zilla::Role::Git::DirtyFiles" : {
                   "allow_dirty" : [
-                     "Changes",
+                     "Changes.md",
                      "dist.ini"
                   ],
                   "allow_dirty_match" : [],
-                  "changelog" : "Changes"
+                  "changelog" : "Changes.md"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.50.1",
+                  "git_version" : "2.51.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -305,12 +305,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.1.2",
+                  "tag" : "v0.1.4",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.50.1",
+                  "git_version" : "2.51.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -330,7 +330,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.50.1",
+                  "git_version" : "2.51.0",
                   "repo_root" : "."
                }
             },

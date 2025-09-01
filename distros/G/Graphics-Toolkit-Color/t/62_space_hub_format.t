@@ -2,7 +2,7 @@
 
 use v5.12;
 use warnings;
-use Test::More tests => 95;
+use Test::More tests => 100;
 BEGIN { unshift @INC, 'lib', '../lib'}
 use Graphics::Toolkit::Color::Space::Util 'round_decimals';
 use Graphics::Toolkit::Color::Space::Hub;
@@ -59,20 +59,27 @@ is( $values->[1],                   22, 'w value is right');
 is( $values->[2],                    5, 'b value is right');
 
 ($values, $space) = $deformat->('lab(0, -500, 200)');
-is( $space,                     'LAB', 'got LAB css_string right');
-is( ref $values,              'ARRAY', 'got ARRAY tuple');
-is( int @$values,                   3, 'CIELAB has 3 axis');
-is( $values->[0], 0,     'L* value is right');
-is( $values->[1], -500,     'a* value is right');
-is( $values->[2], 200,     'b* value has right value');
+is( $space,       'LAB', 'got LAB css_string right');
+is( ref $values,'ARRAY', 'got ARRAY tuple');
+is( int @$values,     3, 'CIELAB has 3 axis');
+is( $values->[0],     0, 'L* value is right');
+is( $values->[1],  -500, 'a* value is right');
+is( $values->[2],   200, 'b* value has right value');
 
 ($values, $space) = $deformat->(['yuv', 0.4, -0.5, 0.5]);
-is( $space,                     'YUV', 'found YUV named array');
-is( ref $values,              'ARRAY', 'got ARRAY tuple');
-is( int @$values,                   3, 'RGB has 3 axis');
-is( $values->[0], 0.4, 'Y value is right');
-is( $values->[1],-0.5,  'U value is right');
-is( $values->[2], 0.5,  'V value got clamped to max');
+is( $space,        'YUV', 'found YUV named array');
+is( ref $values, 'ARRAY', 'got ARRAY tuple');
+is( int @$values,      3, 'RGB has 3 axis');
+is( $values->[0],    0.4, 'Y value is right');
+is( $values->[1],   -0.5,  'U value is right');
+is( $values->[2],    0.5,  'V value got clamped to max');
+
+($values, $space) = $deformat->(['hunterLAB', 12, 2.5, 0.04]);
+is( $space,                    'HUNTERLAB', 'found HUNTERLAB named array');
+is( int @$values,                          3, 'RGB has 3 axis');
+is( $values->[0],    12,  'L value is right');
+is( $values->[1],   2.5,  'a value is right');
+is( $values->[2],  0.04,  'b value got clamped to max');
 
 ($values, $space) = $deformat->({h => 360, s => 10, v => 100});
 is( $space,          'HSV', 'found HSV short named hash');

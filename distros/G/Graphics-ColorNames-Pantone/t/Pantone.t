@@ -21,3 +21,5 @@ for my $name (keys %colors) {
 is( uc $colors{'100'},     'FFFF7D');
 is( uc $colors{'251'},     'DE9CFF');
 is( uc $colors{'8142x'},   '3047FF');
+
+exit (0);

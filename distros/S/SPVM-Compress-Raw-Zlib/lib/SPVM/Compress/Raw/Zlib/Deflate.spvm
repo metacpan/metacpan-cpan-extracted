@@ -30,32 +30,32 @@ class Compress::Raw::Zlib::Deflate extends Compress::Raw::Zlib::Base {
   method init : void ($options : object[] = undef) {
     
     my $option_names = [
-      "-Level",
-      "-Method",
-      "-WindowBits",
-      "-MemLevel",
-      "-Strategy",
-      "-Dictionary",
-      "-Bufsize",
+      "Level",
+      "Method",
+      "WindowBits",
+      "MemLevel",
+      "Strategy",
+      "Dictionary",
+      "Bufsize",
     ];
     
     Fn->check_option_names($options, $option_names);
     
     my $options_h = Hash->new($options);
     
-    $self->{Level} = $options_h->get_or_default_int("-Level", ZLIB->Z_DEFAULT_COMPRESSION);
+    $self->{Level} = $options_h->get_or_default_int("Level", ZLIB->Z_DEFAULT_COMPRESSION);
     
-    $self->{Method} = $options_h->get_or_default_int("-Method", ZLIB->Z_DEFLATED);
+    $self->{Method} = $options_h->get_or_default_int("Method", ZLIB->Z_DEFLATED);
     
-    $self->{WindowBits} = $options_h->get_or_default_int("-WindowBits", ZLIB->MAX_WBITS);
+    $self->{WindowBits} = $options_h->get_or_default_int("WindowBits", ZLIB->MAX_WBITS);
     
-    $self->{MemLevel} = $options_h->get_or_default_int("-MemLevel", ZLIB->MAX_MEM_LEVEL);
+    $self->{MemLevel} = $options_h->get_or_default_int("MemLevel", ZLIB->MAX_MEM_LEVEL);
     
-    $self->{Strategy} = $options_h->get_or_default_int("-Strategy", ZLIB->Z_DEFAULT_STRATEGY);
+    $self->{Strategy} = $options_h->get_or_default_int("Strategy", ZLIB->Z_DEFAULT_STRATEGY);
     
-    $self->{Dictionary} = $options_h->get_or_default_string("-Dictionary", "");
+    $self->{Dictionary} = $options_h->get_or_default_string("Dictionary", undef);
     
-    $self->{Bufsize} = $options_h->get_or_default_long("-Bufsize", 4096);
+    $self->{Bufsize} = $options_h->get_or_default_long("Bufsize", 4096);
     
     unless ($self->{Bufsize} >= 1) {
       die "The value of '-Bufsize' option must be >= 1.";
@@ -73,19 +73,19 @@ class Compress::Raw::Zlib::Deflate extends Compress::Raw::Zlib::Base {
   method deflateParams : void ($options : object[] = undef) {
     
     my $option_names = [
-      "-Level",
-      "-Strategy",
+      "Level",
+      "Strategy",
     ];
     
     Fn->check_option_names($options, $option_names);
     
     my $options_h = Hash->new($options);
     
-    if ($options_h->exists("-Level")) {
-      $self->{Level} = $options_h->get_int("-Level");
+    if ($options_h->exists("Level")) {
+      $self->{Level} = $options_h->get_int("Level");
     }
-    if ($options_h->exists("-Strategy")) {
-      $self->{Strategy} = $options_h->get_int("-Strategy");
+    if ($options_h->exists("Strategy")) {
+      $self->{Strategy} = $options_h->get_int("Strategy");
     }
     
     $self->_deflateParams;
@@ -95,14 +95,18 @@ class Compress::Raw::Zlib::Deflate extends Compress::Raw::Zlib::Base {
   
   native method deflateTune : void ($good_length : int, $max_lazy : int, $nice_length : int, $max_chain : int);
   
-  native method deflate : void ($input : string, $output_ref : string[]);
+  native method deflate : int ($input : string, $output_ref : string[]);
   
-  native method flush : void ($output_ref : string[], $flush_type : int = -1);
+  native method flush : int ($output_ref : string[], $flush_type : int = -1);
   
   native method DESTROY : void ();
   
   method get_Strategy : int () {
     return $self->{Strategy};
+  }
+  
+  method get_Level : int () {
+    return $self->{Level};
   }
   
   private native method _deflateInit : void ();

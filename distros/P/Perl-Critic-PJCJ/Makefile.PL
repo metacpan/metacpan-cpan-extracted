@@ -28,7 +28,7 @@ my %WriteMakefileArgs = (
     "Test2::V0" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "v0.1.2",
+  "VERSION" => "v0.1.4",
   "test" => {
     "TESTS" => "t/*.t t/CodeLayout/ProhibitLongLines/*.t t/Utils/SourceLocation/*.t t/ValuesAndExpressions/RequireConsistentQuoting/*.t"
   }
@@ -58,10 +58,10 @@ delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
 sub MY::postamble {
     return <<'END_MAKEFILE';
 
-.PHONY: show-authordeps install-authordeps reinstall-authordeps \
-	show-deps install-deps reinstall-deps \
-	t xt format lint build \
-	cover cover-html cover-compilation cover-nvim
+.PHONY: show-authordeps install-authordeps reinstall-authordeps
+.PHONY: show-deps install-deps reinstall-deps
+.PHONY: t tv zt format lint build 
+.PHONY: cover cover-html cover-compilation cover-nvim cover-all
 
 show-authordeps:
 	@dzil authordeps
@@ -82,7 +82,10 @@ reinstall-deps:
 	dzil listdeps --develop | cpm install -g --reinstall --no-prebuilt -
 
 t:
-	yath test -j20 --qvf --no-color -T --term-width=$(tput cols)
+	yath test -j20 --qvf -T --term-width=$(tput cols)
+
+tv:
+	yath test -j20 --qvf -T --term-width=$(tput cols) -v
 
 zt: clean
 	dzil test -j20

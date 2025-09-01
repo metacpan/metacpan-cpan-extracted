@@ -7,7 +7,6 @@ use Linux::Landlock::Direct qw(:functions :constants set_no_new_privs);
 
 if (ll_get_abi_version() < 6) {
     ok(scalar ll_all_scoped_supported() == 0, "no support");
-    ok(!defined ll_create_scoped_ruleset(),   "scoped ruleset creation failed");
 } else {
     ok(ll_all_scoped_supported() >= Math::BigInt->bone()->blsft(2) - 1, "plausible list");
     my $ruleset_fd = ll_create_ruleset(undef, undef, $LANDLOCK_SCOPED{ABSTRACT_UNIX_SOCKET} | $LANDLOCK_SCOPED{SIGNAL});

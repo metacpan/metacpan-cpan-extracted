@@ -6,7 +6,9 @@ use Test::More tests => 70;
 BEGIN { unshift @INC, 'lib', '../lib'}
 
 my $module = 'Graphics::Toolkit::Color::Values';
-use_ok( $module, 'could load the module');
+eval "use $module";
+is( not($@), 1, 'could load the module');
+
 my (@values, $values);
 #### new_from_tuple ####################################################
 is( ref Graphics::Toolkit::Color::Values->new_from_tuple(),  '',  'new need at least one argument');

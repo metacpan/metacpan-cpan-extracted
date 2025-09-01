@@ -75,7 +75,7 @@ is( int @list,                    1,     'dleted all none uniq elements');
 is( $list[0],                     0,     'no issues with zero');
 
 
-my $MM = \&Graphics::Toolkit::Color::Space::Util::mult_matrix3;
+my $MM = \&Graphics::Toolkit::Color::Space::Util::mult_matrix_vector_3;
 my @rv = $MM->([[1,2,3],[1,2,3],[1,2,3],], 0,0,0);
 is( int @rv,   3,        'result of matrix multiplication has length of 3');
 is( $rv[0],    0,        'first value of matrix multiplication result is 0');

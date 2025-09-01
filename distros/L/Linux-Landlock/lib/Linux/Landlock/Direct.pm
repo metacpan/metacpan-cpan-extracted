@@ -124,6 +124,10 @@ to work. See L<https://docs.kernel.org/userspace-api/no_new_privs.html> for more
 
 This is technically not part of Landlock and only added for convenience.
 
+=item get_no_new_privs()
+
+Get the current state of the NO_NEW_PRIVS flag.
+
 =back
 
 =head1 EXPORTS
@@ -209,46 +213,46 @@ our $MAX_ABI_VERSION = 6;
 my $LANDLOCK_CREATE_RULESET_VERSION = (1 << 0);
 our %LANDLOCK_ACCESS_FS = (
     # ABI version 1
-    EXECUTE     => Math::BigInt->new(1)->blsft(0),
-    WRITE_FILE  => Math::BigInt->new(1)->blsft(1),
-    READ_FILE   => Math::BigInt->new(1)->blsft(2),
-    READ_DIR    => Math::BigInt->new(1)->blsft(3),
-    REMOVE_DIR  => Math::BigInt->new(1)->blsft(4),
-    REMOVE_FILE => Math::BigInt->new(1)->blsft(5),
-    MAKE_CHAR   => Math::BigInt->new(1)->blsft(6),
-    MAKE_DIR    => Math::BigInt->new(1)->blsft(7),
-    MAKE_REG    => Math::BigInt->new(1)->blsft(8),
-    MAKE_SOCK   => Math::BigInt->new(1)->blsft(9),
-    MAKE_FIFO   => Math::BigInt->new(1)->blsft(10),
-    MAKE_BLOCK  => Math::BigInt->new(1)->blsft(11),
-    MAKE_SYM    => Math::BigInt->new(1)->blsft(12),
+    EXECUTE     => Math::BigInt->bone->blsft(0),
+    WRITE_FILE  => Math::BigInt->bone->blsft(1),
+    READ_FILE   => Math::BigInt->bone->blsft(2),
+    READ_DIR    => Math::BigInt->bone->blsft(3),
+    REMOVE_DIR  => Math::BigInt->bone->blsft(4),
+    REMOVE_FILE => Math::BigInt->bone->blsft(5),
+    MAKE_CHAR   => Math::BigInt->bone->blsft(6),
+    MAKE_DIR    => Math::BigInt->bone->blsft(7),
+    MAKE_REG    => Math::BigInt->bone->blsft(8),
+    MAKE_SOCK   => Math::BigInt->bone->blsft(9),
+    MAKE_FIFO   => Math::BigInt->bone->blsft(10),
+    MAKE_BLOCK  => Math::BigInt->bone->blsft(11),
+    MAKE_SYM    => Math::BigInt->bone->blsft(12),
     # ABI version 2
-    REFER => Math::BigInt->new(1)->blsft(13),
+    REFER => Math::BigInt->bone->blsft(13),
     # ABI version 3
-    TRUNCATE => Math::BigInt->new(1)->blsft(14),
+    TRUNCATE => Math::BigInt->bone->blsft(14),
     # ABI version 5
-    IOCTL_DEV => Math::BigInt->new(1)->blsft(15),
+    IOCTL_DEV => Math::BigInt->bone->blsft(15),
 );
 our %LANDLOCK_ACCESS_NET = (
     # ABI version 4
-    BIND_TCP    => Math::BigInt->new(1)->blsft(0),
-    CONNECT_TCP => Math::BigInt->new(1)->blsft(1),
+    BIND_TCP    => Math::BigInt->bone->blsft(0),
+    CONNECT_TCP => Math::BigInt->bone->blsft(1),
 );
 our %LANDLOCK_SCOPED = (
     # ABI version 6
-    ABSTRACT_UNIX_SOCKET => Math::BigInt->new(1)->blsft(0),
-    SIGNAL               => Math::BigInt->new(1)->blsft(1),
+    ABSTRACT_UNIX_SOCKET => Math::BigInt->bone->blsft(0),
+    SIGNAL               => Math::BigInt->bone->blsft(1),
 );
 our %LANDLOCK_RULE = (
     PATH_BENEATH => 1,
     NET_PORT     => 2,
 );
 our @EXPORT_OK = qw(
+  get_no_new_privs
   ll_get_abi_version
   ll_create_ruleset
   ll_create_fs_ruleset
   ll_create_net_ruleset
-  ll_create_scoped_ruleset
   ll_add_path_beneath_rule
   ll_add_net_port_rule
   ll_all_fs_access_supported
@@ -383,6 +387,12 @@ sub set_no_new_privs {
     my $PR_SET_NO_NEW_PRIVS = 38;
     my $nr                  = NR('prctl') or return;
     return (syscall($nr, $PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0) == 0) ? 1 : undef;
+}
+
+sub get_no_new_privs {
+    my $PR_GET_NO_NEW_PRIVS = 39;
+    my $nr                  = NR('prctl') or return;
+    return syscall($nr, $PR_GET_NO_NEW_PRIVS, 0, 0, 0, 0);
 }
 
 sub ll_restrict_self {

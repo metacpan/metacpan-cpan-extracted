@@ -3,7 +3,7 @@
 use v5.26.0;
 use strict;
 use warnings;
-use feature "signatures";
+use feature qw( signatures );
 
 sub read_targets_file ($targets_file) {
   unless (-f $targets_file) {

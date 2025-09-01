@@ -26,7 +26,7 @@ resources:
   bugtracker: https://github.com/pjcj/Perl-Critic-PJCJ/issues
   homepage: https://pjcj.net/perl.html
   repository: git://github.com/pjcj/Perl-Critic-PJCJ.git
-version: v0.1.2
+version: v0.1.4
 x_Dist_Zilla:
   perl:
     version: '5.042000'
@@ -169,7 +169,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.50.1
+          git_version: 2.51.0
           repo_root: .
       name: Git::Check
       version: '2.051'
@@ -186,12 +186,12 @@ x_Dist_Zilla:
           signoff: 0
         Dist::Zilla::Role::Git::DirtyFiles:
           allow_dirty:
-            - Changes
+            - Changes.md
             - dist.ini
           allow_dirty_match: []
-          changelog: Changes
+          changelog: Changes.md
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.50.1
+          git_version: 2.51.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -204,11 +204,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.1.2
+          tag: v0.1.4
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.50.1
+          git_version: 2.51.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -222,7 +222,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.50.1
+          git_version: 2.51.0
           repo_root: .
       name: Git::Push
       version: '2.051'

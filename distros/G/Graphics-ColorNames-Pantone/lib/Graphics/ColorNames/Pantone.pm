@@ -6,7 +6,7 @@ require 5.008;
 use strict;
 use warnings;
 
-our $VERSION = '0.54';
+our $VERSION = '0.56';
 
 sub NamesRgbTable { {
   '100'   =>  0xFFFF7D,
@@ -1103,6 +1103,9 @@ sub NamesRgbTable { {
 }; }
 
 1;
+__END__
+
+=pod
 
 =head1 NAME
 
@@ -1125,7 +1128,7 @@ are part of a palette created by the I<Pantone Institute> for Designers.
 Please not mistake them for the colors of the annual I<Pantone Report>.
 To access them use L<Graphics::ColorNames::PantoneReport>.
 
-Pantone names are numbers with three or four digits. Colors from the 
+Pantone names are numbers with three or four digits. Colors from the
 extended palette are marked by an appended I<'2x'> (without space)
 (e.g. C<8082x> ).
 
@@ -1143,7 +1146,7 @@ Based on L<Graphics::ColorNames::X> by Robert Rothenberg.
 
 =head1 LICENSE
 
-Copyright 2022 Herbert Breunung
+Copyright 2022-25 Herbert Breunung
 
 This program is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.

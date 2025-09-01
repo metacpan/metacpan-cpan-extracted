@@ -8,60 +8,63 @@ package SPVM::Compress::Raw::Zlib::Base;
 
 =head1 Name
 
-SPVM::Compress::Raw::Zlib::Base - Short Description
+SPVM::Compress::Raw::Zlib::Base - Raw::Zlib Base Class
 
 =head1 Description
 
-Compress::Raw::Zlib::Base class in L<SPVM> has methods to do someting.
+Compress::Raw::Zlib::Base class in L<SPVM> is the base class of L<Compress::Raw::Zlib::Deflate|SPVM::Compress::Raw::Zlib::Deflate> and L<Compress::Raw::Zlib::Inflate|SPVM::Compress::Raw::Zlib::Inflate>.
 
 =head1 Usage
 
   use Compress::Raw::Zlib::Base;
-
-=head1 Details
-
-
-
-=head1 Super Class
-
-
-
-=head1 Interfaces
-
-
-
-=head1 Enumerations
-
-
-
-=head1 Fields
-
-
-
-=head1 Class Methods
-
-
+  
+  class Compress::Raw::Zlib::MyClass extends Compress::Raw::Zlib::Base {
+    
+  }
 
 =head1 Instance Methods
 
+=head2 total_out
 
+C<method total_out : long ();>
+
+Returns the value of C<total_out> member variable of C<z_stream> object.
+
+=head2 total_in
+
+C<method total_in : long ();>
+
+Returns the value of C<total_in> member variable of C<z_stream> object.
+
+=head2 get_Bufsize
+
+C<method get_Bufsize : long ();>
+
+Returns the buffer size used to carry out the compression or decompression.
+
+=head2 adler
+
+C<method adler : long ();>
+
+Returns the value of C<adler> member variable of C<z_stream> object.
 
 =head1 Well Known Child Classes
 
+=over 2
 
+=item * L<Compress::Raw::Zlib::Deflate|SPVM::Compress::Raw::Zlib::Deflate>
+
+=item * L<Compress::Raw::Zlib::Inflate|SPVM::Compress::Raw::Zlib::Inflate>
+
+=back
 
 =head1 See Also
 
+=over 2
 
+=item * L<Compress::Raw::Zlib|SPVM::Compress::Raw::Zlib>
 
-
-=head1 Repository
-
-
-
-=head1 Author
-
-Yuki Kimoto C<kimoto.yuki@gmail.com>
+=back
 
 =head1 Copyright & License
 

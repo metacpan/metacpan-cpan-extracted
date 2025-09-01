@@ -1,5 +1,8 @@
 Changes for LaTeX::ToUnicode
 
+1.93    2025-08-31 recognize \guillemetleft and \guillemetright;
+        convert \allowbreak to &#x200B; (zero-width space) instead of <wbr>.
+
 1.92    2024-07-09 New numbering scheme.  Debug statements
 
 0.54    2023-11-17 Better handling of \{ \}.  New release

@@ -8,7 +8,8 @@ use Graphics::Toolkit::Color::Space::Util 'round_decimals';
 
 my $module = 'Graphics::Toolkit::Color::Space::Hub';
 my $space_ref = 'Graphics::Toolkit::Color::Space';
-use_ok( $module, 'could load the module');
+eval "use $module";
+is( not($@), 1, 'could load the module');
 
 is( ref Graphics::Toolkit::Color::Space::Hub::get_space('RGB'),  $space_ref, 'RGB is a color space');
 is( Graphics::Toolkit::Color::Space::Hub::is_space_name($_),   1, "found $_ color space")

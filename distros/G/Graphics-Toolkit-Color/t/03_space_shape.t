@@ -7,7 +7,8 @@ use Test::More tests => 183;
 BEGIN { unshift @INC, 'lib', '../lib'}
 my $module = 'Graphics::Toolkit::Color::Space::Shape';
 
-use_ok( $module, 'could load the module');
+eval "use $module";
+is( not($@), 1, 'could load the module');
 my $obj = Graphics::Toolkit::Color::Space::Shape->new();
 is( $obj,  undef,       'constructor needs arguments');
 

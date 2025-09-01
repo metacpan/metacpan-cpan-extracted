@@ -1,12 +1,12 @@
 package BibTeX::Parser;
 {
-  $BibTeX::Parser::VERSION = '1.92';
+    $BibTeX::Parser::VERSION = '1.93';
 }
 # ABSTRACT: A pure perl BibTeX parser
 use warnings;
 use strict;
 
-use BibTeX::Parser::Entry;
+require BibTeX::Parser::Entry; # mutual dependency, so use instead of require
 
 
 my $re_namechar = qr/[a-zA-Z0-9\!\$\&\*\+\-\.\/\:\;\<\>\?\[\]\^\_\`\|\']/o;
@@ -95,7 +95,7 @@ sub _parse_next {
 
             if ( $type eq "STRING" ) {
                 if (/\G\{\s*($re_name)\s*=\s*/cgo) {
-                    my $key   = $1;
+                    my $key   = lc($1);
                     my $value = _parse_string( $self->{strings},
                                        exists $self->{opts}->{"no-warn-ack"} );
                     if ( defined $self->{strings}->{$key} ) {
@@ -196,8 +196,8 @@ sub _parse_string {
         if (/\G(\d+)/cg) {
             $value .= $1;
         } elsif (/\G($re_name)/cgo) {
-            if (! defined $strings_ref->{$1}) {
-                warn("Using undefined string $1")
+            if (! defined $strings_ref->{lc($1)}) {
+                warn("Using undefined string $1 (", lc($1), ")")
                   unless $no_warn_ack && $1 =~ /^ack-/;
             }
             $value .= $strings_ref->{$1} || "";
@@ -366,7 +366,7 @@ L<BibTeX::Parser::Author>
 
 =head1 VERSION
 
-version 1.92
+version 1.93
 
 =head1 AUTHOR
 

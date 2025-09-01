@@ -1152,22 +1152,22 @@ RANDOM_NOCTURNE:
   symbol: RANDOM_NOCTURNE
   trading_days: everyday
   trading_timezone: UTC
-RSI_CRYPTO:
+TACTICAL_CRYPTO:
   delay_amount: '0'
-  display_name: Crypto RSI
+  display_name: Tactical Crypto
   market_times:
     partial_trading: {}
     standard:
       daily_open: 0s
       daily_close: 23h59m59s
       daily_settlement: 23h59m59s
-  symbol: RSI_CRYPTO
+  symbol: TACTICAL_CRYPTO
   trading_days: everyday
   trading_timezone: UTC
-RSI_FOREX_EURUSD:
+TACTICAL_FOREX_EURUSD:
   currency: USD
   delay_amount: '0'
-  display_name: EUR/USD RSI
+  display_name: Tactical EUR/USD
   market_times:
     dst:
       daily_open: 0s
@@ -1184,13 +1184,13 @@ RSI_FOREX_EURUSD:
       daily_close: 23h59m59s
       daily_settlement: 23h59m59s
       friday_close: 21h55m
-  symbol: RSI_FOREX_EURUSD
+  symbol: TACTICAL_FOREX_EURUSD
   trading_days: sun_thru_fri
   trading_timezone: America/New_York
-RSI_FOREX_GBPUSD:
+TACTICAL_FOREX_GBPUSD:
   currency: USD
   delay_amount: '0'
-  display_name: GBP/USD RSI
+  display_name: Tactical GBP/USD
   market_times:
     dst:
       daily_open: 0s
@@ -1207,13 +1207,13 @@ RSI_FOREX_GBPUSD:
       daily_close: 23h59m59s
       daily_settlement: 23h59m59s
       friday_close: 21h55m
-  symbol: RSI_FOREX_GBPUSD
+  symbol: TACTICAL_FOREX_GBPUSD
   trading_days: sun_thru_fri
   trading_timezone: America/New_York
-RSI_FOREX_USDJPY:
+TACTICAL_FOREX_USDJPY:
   currency: USD
   delay_amount: '0'
-  display_name: USD/JPY RSI
+  display_name: Tactical USD/JPY
   market_times:
     dst:
       daily_open: 0s
@@ -1230,12 +1230,12 @@ RSI_FOREX_USDJPY:
       daily_close: 23h59m59s
       daily_settlement: 23h59m59s
       friday_close: 21h55m
-  symbol: RSI_FOREX_USDJPY
+  symbol: TACTICAL_FOREX_USDJPY
   trading_days: sun_thru_fri
   trading_timezone: America/New_York
-RSI_METAL:
+TACTICAL_METALS:
   delay_amount: '0'
-  display_name: Metals RSI
+  display_name: Tactical Metals
   market_times:
     dst:
       daily_open: 0s
@@ -1252,7 +1252,7 @@ RSI_METAL:
       daily_close: 23h59m59s
       daily_settlement: 23h59m59s
       friday_close: 20h45m
-  symbol: RSI_METAL
+  symbol: TACTICAL_METALS
   trading_days: sun_thru_fri
   trading_timezone: America/New_York
 RTS:

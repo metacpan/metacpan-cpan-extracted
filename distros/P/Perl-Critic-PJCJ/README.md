@@ -50,10 +50,9 @@ simple rules:
 **Bad examples:**
 
 ```perl
-# Excessive punctuation
 my $greeting = 'hello';                     # use double quotes (Rule 2)
-my @words    = qw{word(with)parens};        # use qw[] (Rules 1, 3)
-my $file     = q!path/to/file!;             # use "" (Rules 1, 3)
+my @words    = qw{word(with)parens};        # use qw[] (Rule 3)
+my $file     = q!path/to/file!;             # use "" (Rule 3)
 my $text     = qq(simple);                  # use "" instead of qq() (Rule 1)
 my $literal  = q(contains$literal);         # use '' instead of q() (Rule 1)
 ```
@@ -62,18 +61,18 @@ my $literal  = q(contains$literal);         # use '' instead of q() (Rule 1)
 
 ```perl
 # Rule 1: Reduce punctuation
-my $greeting = "hello";                     # double quotes for simple strings
 my $text     = "simple";                    # "" preferred over qq()
 my $literal  = 'contains$literal';          # '' preferred over q()
 my $file     = "path/to/file";              # "" reduces punctuation
 
 # Rule 2: Prefer interpolated strings
-my $email = 'user@domain.com';              # literal @ uses single quotes
-my $var   = 'Price: $10';                   # literal $ uses single quotes
+my $greeting = "hello";                     # double quotes for simple strings
+my $email    = 'user@domain.com';           # literal @ uses single quotes
+my $var      = 'Price: $10';                # literal $ uses single quotes
 
 # Rule 3: Optimal delimiter selection
 my @words = qw[ word(with)parens ];         # [] handles unbalanced parentheses
-my $cmd   = qx( command[with]brackets );    # () handles unbalanced brackets
+my $cmd   = qx( command[with}brackets );    # () handles unbalanced brackets
 my @list  = qw( one two );                  # bracket delimiters only
 
 # Special Case: Use statements

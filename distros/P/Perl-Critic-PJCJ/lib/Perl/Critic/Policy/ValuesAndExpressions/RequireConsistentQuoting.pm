@@ -1,4 +1,4 @@
-package Perl::Critic::Policy::ValuesAndExpressions::RequireConsistentQuoting v0.1.2;
+package Perl::Critic::Policy::ValuesAndExpressions::RequireConsistentQuoting v0.1.4;
 
 use v5.26.0;
 use strict;
@@ -47,6 +47,32 @@ sub would_interpolate ($self, $string) {
   $would_interpolate
 }
 
+sub would_interpolate_from_single_quotes ($self, $string) {
+  # Test whether a string from single quotes would interpolate if converted
+  # to double quotes. This is used when checking single-quoted strings to
+  # see if they should stay single-quoted to avoid unintended interpolation.
+  #
+  # The challenge is that PPI gives us the decoded content of single-quoted
+  # strings. For example, for the source 'price: \\$5.00', PPI's string()
+  # method returns 'price: \$5.00' (with one backslash). But to test
+  # interpolation properly, we need to reconstruct what the original
+  # escaping would have been.
+  #
+  # In single quotes, only backslash (\) and apostrophe (') are escaped:
+  # - '\' in the source becomes '\\' in the content
+  # - '\'' in the source becomes ''' in the content
+  #
+  # So to reconstruct the original string for interpolation testing:
+  # - Each '\' in content represents '\\' in the original source
+  # - Each ''' in content represents '\'' in the original source
+
+  my $reconstructed = $string;
+  $reconstructed =~ s/\\/\\\\/g;  # \ → \\
+  $reconstructed =~ s/'/\\'/g;    # ' → \'
+
+  $self->would_interpolate($reconstructed)
+}
+
 sub delimiter_preference_order ($self, $delimiter_start) {
   return 0 if $delimiter_start eq "(";
   return 1 if $delimiter_start eq "[";
@@ -60,21 +86,9 @@ sub parse_quote_token ($self, $elem) {
 
   # Handle all possible delimiters, not just bracket pairs
   # Order matters: longer matches first
-  if ($content =~ /\A(qw|qq|qx|q)\s*(.)(.*)\z/s) {
-    my ($op, $start_delim, $rest) = ($1, $2, $3);
-    my $end_delim = $start_delim;
-
-    $end_delim
-      = $start_delim eq "(" ? ")"
-      : $start_delim eq "[" ? "]"
-      : $start_delim eq "{" ? "}"
-      : $start_delim eq "<" ? ">"
-      :                       $start_delim;
-    # Non-bracket delimiters use same char for start/end
-
-    $rest =~ s/\Q$end_delim\E\z//;
-
-    ($start_delim, $end_delim, $rest, $op)
+  if ($content =~ /\A(?:(qw|qq|qx|q)\s*)?(.)(.*)(.)\z/s) {
+    my ($op, $start_delim, $str, $end_delim) = ($1, $2, $3, $4);
+    ($start_delim, $end_delim, $str, $op)
   }
 }
 
@@ -104,12 +118,7 @@ sub _get_supported_delimiters ($self, $operator) {
   );
 }
 
-sub find_optimal_delimiter (
-  $self, $content,
-  $operator      = "qw",
-  $current_start = "",
-  $current_end   = "",
-) {
+sub find_optimal_delimiter ($self, $content, $operator, $start, $end) {
   my @delimiters = $self->_get_supported_delimiters($operator);
 
   for my $delim (@delimiters) {
@@ -120,7 +129,7 @@ sub find_optimal_delimiter (
     $delim->{count} = $count;
   }
 
-  my $min_count = (sort { $a <=> $b } map { $_->{count} } @delimiters)[0];
+  my $min_count = (sort { $a <=> $b } map $_->{count}, @delimiters)[0];
 
   # Find optimal delimiter: handle unbalanced content, then preference order
   my ($optimal) = sort {
@@ -132,7 +141,7 @@ sub find_optimal_delimiter (
   my $current_is_bracket = 0;
   my $current_delim;
   for my $delim (@delimiters) {
-    if ($delim->{start} eq $current_start && $delim->{end} eq $current_end) {
+    if ($delim->{start} eq $start && $delim->{end} eq $end) {
       $current_delim      = $delim;
       $current_is_bracket = 1;
       last;
@@ -147,18 +156,15 @@ sub find_optimal_delimiter (
 }
 
 sub check_delimiter_optimisation ($self, $elem) {
-  my ($current_start, $current_end, $content, $operator)
-    = $self->parse_quote_token($elem);
+  my ($start, $end, $content, $operator) = $self->parse_quote_token($elem);
+  return unless defined $start;
 
-  return unless defined $current_start;
-
+  $operator //= "q" if $start eq "'";
   my ($optimal_delim, $current_is_optimal)
-    = $self->find_optimal_delimiter($content, $operator, $current_start,
-      $current_end);
-
+    = $self->find_optimal_delimiter($content, $operator, $start, $end);
   return $self->violation($Desc,
     sprintf($Expl_optimal, $optimal_delim->{display}), $elem)
-    if !$current_is_optimal;
+    unless $current_is_optimal;
 
   undef
 }
@@ -176,16 +182,72 @@ sub violates ($self, $elem, $) {
 
   my $class      = ref $elem;
   my $method     = $dispatch->{$class} or return;
-  my @violations = grep { defined } $self->$method($elem);
+  my @violations = grep defined, $self->$method($elem);
   @violations
 }
 
-sub _choose_optimal_quote_style ($self, $elem, $string, $has_single_quotes,
-  $has_double_quotes, $would_interpolate,)
-{
+sub check_single_quoted ($self, $elem) {
+  return if $self->_is_in_use_statement($elem);
+  my $string = $elem->string;
+
+  # Special case: strings with newlines don't follow the rules
+  return if $self->_has_newlines($string);
+
+  my $has_single_quotes = index($string, "'") != -1;
+  my $has_double_quotes = index($string, '"') != -1;
+
+  return $self->check_delimiter_optimisation($elem)
+    if $has_single_quotes && $has_double_quotes;
+
+  return if
+    # Keep single quotes if the string contains double quotes
+    $has_double_quotes ||
+    # Check if string contains escape sequences that would have different
+    # meanings between single vs double quotes. If so, preserve single quotes.
+    $self->_has_quote_sensitive_escapes($string) ||
+    # Keep single quotes if double would introduce interpolation
+    $self->would_interpolate_from_single_quotes($string);
+
+  my $would_interpolate = $self->would_interpolate_from_single_quotes($string);
+
+  $self->violation($Desc, $Expl_double, $elem)
+}
+
+sub check_double_quoted ($self, $elem) {
+  return if $self->_is_in_use_statement($elem);
+
+  my $string  = $elem->string;
+  my $content = $elem->content;
+
+  # Special case: strings with newlines don't follow the rules
+  return if $self->_has_newlines($string);
+
+  # Check for escaped dollar/at signs or double quotes, but only suggest single
+  # quotes if no other interpolation exists AND no dangerous escape sequences
+  return $self->violation($Desc, $Expl_single, $elem)
+    if $content =~ /\\[\$\@\"]/
+    && !$self->_has_quote_sensitive_escapes($string)
+    && !$self->would_interpolate($string);
+
+  return
+}
+
+sub check_q_literal ($self, $elem) {
+  return if $self->_is_in_use_statement($elem);
+
+  my $string = $elem->string;
+
+  # Special case: strings with newlines don't follow the rules
+  return if $self->_has_newlines($string);
+
+  my $has_single_quotes = index($string, "'") != -1;
+  my $has_double_quotes = index($string, '"') != -1;
+
   # Has both quote types - q() handles this cleanly
   return $self->check_delimiter_optimisation($elem)
     if $has_single_quotes && $has_double_quotes;
+
+  my $would_interpolate = $self->would_interpolate_from_single_quotes($string);
 
   if ($has_single_quotes) {
     return $would_interpolate
@@ -204,76 +266,6 @@ sub _choose_optimal_quote_style ($self, $elem, $string, $has_single_quotes,
   $self->violation($Desc, $Expl_double, $elem)
 }
 
-sub check_single_quoted ($self, $elem) {
-  return if $self->_is_in_use_statement($elem);
-  my $string  = $elem->string;
-  my $content = $elem->content;
-
-  # Special case: strings with newlines don't follow the rules
-  return if $self->_has_newlines($string);
-
-  # Rules 1,2: Use double quotes unless string has literal $/@ or double quotes
-  return if index($string, '"') != -1;
-
-  # Escaped single quotes suggest double quotes
-  return $self->violation($Desc, $Expl_double, $elem) if $content =~ /\\'/;
-
-  my $would_interpolate = $self->would_interpolate($string);
-
-  # Check if string contains escape sequences that would have different meanings
-  # between single vs double quotes. If so, preserve single quotes.
-  return if $self->_has_dangerous_escape_sequences($string);
-
-  # Literal \$ and \@ would change meaning in double quotes
-  return if $self->_has_literal_escape_sigils($string);
-
-  return $self->violation($Desc, $Expl_double, $elem)
-    if !$would_interpolate && index($string, '"') == -1;
-
-  return
-}
-
-sub check_double_quoted ($self, $elem) {
-  return if $self->_is_in_use_statement($elem);
-
-  my $string  = $elem->string;
-  my $content = $elem->content;
-
-  # Special case: strings with newlines don't follow the rules
-  return if $self->_has_newlines($string);
-
-  # Check for escaped dollar/at signs or double quotes, but only suggest single
-  # quotes if no other interpolation exists
-  return $self->violation($Desc, $Expl_single, $elem)
-    if $content =~ /\\[\$\@\"]/ && !$self->would_interpolate($string);
-
-  return
-}
-
-sub check_q_literal ($self, $elem) {
-  return if $self->_is_in_use_statement($elem);
-
-  my $string = $elem->string;
-
-  # Special case: strings with newlines don't follow the rules
-  return if $self->_has_newlines($string);
-
-  # Preserve q() for escape sequences, optimize delimiter
-  return $self->check_delimiter_optimisation($elem)
-    if $self->_has_dangerous_escape_sequences($string);
-
-  # Preserve q() for literal \$ or \@, optimize delimiter
-  return $self->check_delimiter_optimisation($elem)
-    if $self->_has_literal_escape_sigils($string);
-
-  my $has_single_quotes = index($string, "'") != -1;
-  my $has_double_quotes = index($string, '"') != -1;
-  my $would_interpolate = $self->would_interpolate($string);
-
-  $self->_choose_optimal_quote_style($elem, $string, $has_single_quotes,
-    $has_double_quotes, $would_interpolate)
-}
-
 sub check_qq_interpolate ($self, $elem) {
   return if $self->_is_in_use_statement($elem);
 
@@ -284,7 +276,7 @@ sub check_qq_interpolate ($self, $elem) {
 
   # Only preserve qq() if escape sequences are actually needed
   return $self->check_delimiter_optimisation($elem)
-    if $self->_has_dangerous_escape_sequences($string);
+    if $self->_has_quote_sensitive_escapes($string);
 
   my $double_quote_suggestion
     = $self->_what_would_double_quotes_suggest($string);
@@ -301,12 +293,10 @@ sub check_qq_interpolate ($self, $elem) {
     if $double_quote_suggestion && $double_quote_suggestion eq "qq()";
 
   # Rule 1: Otherwise prefer simple double quotes unless delimiter chars present
-  my $has_special_chars
-    = index($string, '"') != -1
-    || index($string, "'") != -1
-    || $self->would_interpolate($string);
+  my $has_delimiter_chars
+    = index($string, '"') != -1 || index($string, "'") != -1;
 
-  $has_special_chars
+  $has_delimiter_chars
     ? $self->check_delimiter_optimisation($elem)
     : $self->violation($Desc, $Expl_double, $elem)
 }
@@ -330,16 +320,101 @@ sub check_quote_operators ($self, $elem) {
   return
 }
 
-sub check_use_statement ($self, $elem) {
-  # Only check 'use' statements, not 'require' or 'no'
-  return unless $elem->type eq "use";
+sub _analyse_argument_types ($self, $elem, @args) {
+
+  my $fat_comma
+    = any { $_->isa("PPI::Token::Operator") && $_->content eq "=>" } @args;
+  my $complex_expr = any {
+         $_->isa("PPI::Token::Symbol")
+      || $_->isa("PPI::Structure")
+      || $_->isa("PPI::Statement")
+  } @args;
+  my $version = any {
+         $_->isa("PPI::Token::Number::Version")
+      || $_->isa("PPI::Token::Number::Float")
+  } @args;
+  my $simple_strings = any {
+         $_->isa("PPI::Token::Quote::Single")
+      || $_->isa("PPI::Token::Quote::Double")
+  } @args;
+  my $q_operators = any {
+         $_->isa("PPI::Token::Quote::Literal")
+      || $_->isa("PPI::Token::Quote::Interpolate")
+  } @args;
+
+  # Check if the original use statement has parentheses
+  my @children = $elem->children;
+  my $parens   = any { $_->isa("PPI::Structure::List") } @children;
+
+  ($fat_comma, $complex_expr, $version, $simple_strings, $q_operators, $parens)
+}
+
+sub check_use_statement ($self, $elem) {  ## no critic (complexity)
+    # Check "use" and "no" statements, but not "require"
+  return unless $elem->type =~ /^(use|no)$/;
 
   my @args = $self->_extract_use_arguments($elem) or return;
 
   my ($string_count, $has_qw, $qw_uses_parens)
-    = $self->_analyze_use_arguments(@args);
-  $self->_check_use_violations($elem, $string_count, $has_qw, $qw_uses_parens,
-    @args)
+    = $self->_summarise_use_arguments(@args);
+
+  # Check for different types of arguments
+  my (
+    $has_fat_comma,      $has_complex_expr, $has_version,
+    $has_simple_strings, $has_q_operators,  $has_parens
+  ) = $self->_analyse_argument_types($elem, @args);
+
+  # Rule 4: Special cases - no violation
+  return () if $has_version && @args == 1;  # Single version number
+
+  # Rule 1: qw() without parens should use qw()
+  return $self->violation($Desc, $Expl_use_qw, $elem)
+    if $has_qw && !$qw_uses_parens;
+
+  # Rule 2: Any => operator anywhere → should have no parentheses
+  if ($has_fat_comma) {
+    if ($has_parens) {
+      state $expl_remove_parens = "remove parentheses";
+      return $self->violation($Desc, $expl_remove_parens, $elem);
+    }
+    return ();
+  }
+
+  # Rule 3: Complex expressions → should have no parentheses
+  if ($has_complex_expr) {
+    if ($has_parens) {
+      state $expl_remove_parens_complex = "remove parentheses";
+      return $self->violation($Desc, $expl_remove_parens_complex, $elem);
+    }
+    return ();
+  }
+
+  # Check if any string would interpolate (works for all quote types)
+  for my $arg (@args) {
+    # Skip qw() tokens as they never interpolate
+    next if $arg->isa("PPI::Token::QuoteLike::Words");
+
+    # Only check tokens that have a string method (string-like tokens)
+    next unless $arg->can("string");
+
+    my $content = $arg->string;
+    if ($self->would_interpolate($content)) {
+      # If interpolation is needed, don't suggest qw() - let normal rules apply
+      return ();
+    }
+  }
+
+  # Rule 1: All simple strings or q() operators → use qw()
+  if (($has_simple_strings || $has_q_operators) && !$has_qw) {
+    return $self->violation($Desc, $Expl_use_qw, $elem);
+  }
+
+  # Mixed qw() and other things
+  if ($has_qw && ($string_count > 0 || $has_q_operators)) {
+    return $self->violation($Desc, $Expl_use_qw, $elem);
+  }
+
+  ()
 }
 
 sub _extract_use_arguments ($self, $elem) {
@@ -349,7 +424,7 @@ sub _extract_use_arguments ($self, $elem) {
 
   for my $child (@children) {
     if ($child->isa("PPI::Token::Word") && !$found_module) {
-      next if $child->content eq "use";
+      next if $child->content =~ /^(use|no)$/;
       # This is the module name
       $found_module = 1;
       next;
@@ -358,14 +433,47 @@ sub _extract_use_arguments ($self, $elem) {
     if ($found_module) {
       next if $child->isa("PPI::Token::Whitespace");
       next if $child->isa("PPI::Token::Structure") && $child->content eq ";";
-      push @args, $child;
+      # Skip commas but keep fat comma (=>) and other significant operators
+      next if $child->isa("PPI::Token::Operator") && $child->content eq ",";
+
+      # If it's a list structure (parentheses), extract its contents
+      if ($child->isa("PPI::Structure::List")) {
+        push @args, $self->_extract_list_arguments($child);
+      } else {
+        push @args, $child;
+      }
     }
   }
 
   @args
 }
 
-sub _analyze_use_arguments ($self, @args) {
+sub _extract_list_arguments ($self, $list) {
+  my @args;
+  for my $child ($list->children) {
+    if ($child->isa("PPI::Statement::Expression")) {
+      for my $expr_child ($child->children) {
+        next if $expr_child->isa("PPI::Token::Whitespace");
+        # Skip commas but keep fat comma (=>) and other significant operators
+        next
+          if $expr_child->isa("PPI::Token::Operator")
+          && $expr_child->content eq ",";
+        push @args, $expr_child;
+      }
+    } elsif ($child->isa("PPI::Statement") || $child->isa("PPI::Structure")) {
+      # Handle other statements and structures (like hash constructors)
+      push @args, $child;
+    } else {
+      # Handle direct tokens
+      next if $child->isa("PPI::Token::Whitespace");
+      next if $child->isa("PPI::Token::Structure");  # Skip ( ) { } etc.
+      push @args, $child;
+    }
+  }
+  @args
+}
+
+sub _summarise_use_arguments ($self, @args) {
   my $string_count   = 0;
   my $has_qw         = 0;
   my $qw_uses_parens = 1;
@@ -378,42 +486,26 @@ sub _analyze_use_arguments ($self, @args) {
   ($string_count, $has_qw, $qw_uses_parens)
 }
 
-sub _check_use_violations ($self, $elem, $string_count, $has_qw,
-  $qw_uses_parens, @args,)
-{
-  return $self->violation($Desc, $Expl_use_qw, $elem)
-    if ($has_qw && !$qw_uses_parens)             # qw() without parens
-    || ($has_qw && $string_count > 0)            # Mixed qw() and quotes
-    || ($string_count > 1 && !$has_qw)           # Multiple strings
-    || (
-      $string_count == 1 && !$has_qw &&          # Single quotes
-      any { $_->isa("PPI::Token::Quote::Single") } @args
-    );
-
-  ()
-}
-
-sub _count_use_arguments ($self, $elem, $string_count_ref, $has_qw_ref,
-  $qw_uses_parens_ref,)
+sub _count_use_arguments ($self, $elem, $str_count_ref, $qw_ref, $qw_parens_ref)
 {
 
-  $$string_count_ref++
+  $$str_count_ref++
     if $elem->isa("PPI::Token::Quote::Single")
     || $elem->isa("PPI::Token::Quote::Double")
     || $elem->isa("PPI::Token::Quote::Literal")
     || $elem->isa("PPI::Token::Quote::Interpolate");
 
   if ($elem->isa("PPI::Token::QuoteLike::Words")) {
-    $$has_qw_ref = 1;
+    $$qw_ref = 1;
     my $content = $elem->content;
-    $$qw_uses_parens_ref = 0 if $content !~ /\Aqw\s*\(/;
+    $$qw_parens_ref = 0 if $content !~ /\Aqw\s*\(/;
   }
 
   # Recursively check children (for structures like lists)
   if ($elem->can("children")) {
     for my $child ($elem->children) {
-      $self->_count_use_arguments($child, $string_count_ref, $has_qw_ref,
-        $qw_uses_parens_ref);
+      $self->_count_use_arguments($child, $str_count_ref, $qw_ref,
+        $qw_parens_ref);
     }
   }
 }
@@ -421,8 +513,27 @@ sub _count_use_arguments ($self, $elem, $string_count_ref, $has_qw_ref,
 sub _is_in_use_statement ($self, $elem) {
   my $current = $elem;
   while ($current) {
-    return 1
-      if $current->isa("PPI::Statement::Include") && $current->type eq "use";
+    if ($current->isa("PPI::Statement::Include")
+      && ($current->type =~ /^(use|no)$/))
+    {
+      # Check if this use statement has any strings that would interpolate
+      my @args = $self->_extract_use_arguments($current);
+      for my $arg (@args) {
+        # Skip qw() tokens as they never interpolate
+        next if $arg->isa("PPI::Token::QuoteLike::Words");
+
+        # Only check tokens that have a string method (string-like tokens)
+        next unless $arg->can("string");
+
+        my $content = $arg->string;
+        if ($self->would_interpolate($content)) {
+          # If interpolation is needed, don't treat this as a use statement
+          # so individual strings get checked normally
+          return 0;
+        }
+      }
+      return 1;
+    }
     $current = $current->parent;
   }
   0
@@ -448,7 +559,7 @@ sub _what_would_double_quotes_suggest ($self, $string) {
   undef
 }
 
-sub _has_dangerous_escape_sequences ($self, $string) {
+sub _has_quote_sensitive_escapes ($self, $string) {
   # Check if string contains escape sequences that would have different meanings
   # in single vs double quotes. These should be preserved in their current
   # quote style to maintain their intended meaning.
@@ -463,16 +574,10 @@ sub _has_dangerous_escape_sequences ($self, $string) {
       [0-7]{1,3}          |  # Octal: \033 \377
       o\{[^}]*\}          |  # Octal braces: \o{033}
       c.                  |  # Control chars: \c[ \cA
-      N\{[^}]*\}             # Named chars: \N{name} \N{U+263A}
+      N\{[^}]*\}          |  # Named chars: \N{name} \N{U+263A}
+      [luLUEQ]               # String modification: \l \u \L \U \E \Q
     )
   /x
-}
-
-sub _has_literal_escape_sigils ($self, $string) {
-  # Check if string contains literal \$ or \@ that would have different
-  # meanings between single and double quotes when converting FROM
-  # single quotes TO double quotes (not the other direction).
-  $string =~ /\\[\$\@]/
 }
 
 sub _has_newlines ($self, $string) {
@@ -498,7 +603,7 @@ consistent and optimal quoting
 
 =head1 VERSION
 
-version v0.1.2
+version v0.1.4
 
 =head1 SYNOPSIS
 
@@ -507,12 +612,17 @@ version v0.1.2
   my @words    = qw{word(with)parens};    # use qw[] for unbalanced content
   my $text     = qq(simple);              # use "" instead of qq()
   my $file     = q!path/to/file!;         # use "" instead of q()
+  use Config 'arg1', 'arg2';              # simple strings should use qw()
+  use lib ( "$HOME/perl" );               # complex expressions need no
+                                          # parentheses
 
   # Good examples:
   my $greeting = "hello";                 # double quotes for simple strings
   my @words    = qw[ word(with)parens ];  # optimal delimiter choice
   my $text     = "simple";                # "" preferred over qq()
   my $file     = "path/to/file";          # "" reduces punctuation
+  use Config qw( arg1 arg2 );             # simple use arguments use qw()
+  use lib "$HOME/perl";                   # interpolation uses normal rules
 
 =head1 DESCRIPTION
 
@@ -563,35 +673,67 @@ or C<{}> in that order.
   my $path  = q|some|path|;               # should use ""
   my $text  = qq#some#text#;              # should use ""
 
-=head2 Special Case: Use statements
+=head2 Special Case: Use and No statements
 
-Use statements have special quoting requirements for their import lists:
+Use and no statements have special quoting requirements for their import lists.
+Both C<use> and C<no> statements follow identical rules:
 
 =over 4
 
 =item * Modules with no arguments or empty parentheses are acceptable
 
-=item * Modules with one argument may use double quotes C<""> or C<qw( )>
+=item * Single version numbers (e.g., C<1.23>, C<v5.10.0>) are exempt from all
+rules
 
-=item * Modules with multiple arguments must use C<qw( )> with parentheses only
+=item * Fat comma (C<=E<gt>>) arguments should have no parentheses for
+readability
+
+=item * Complex expressions (variables, conditionals, structures) should have
+no parentheses
+
+=item * Arguments requiring interpolation follow normal string quoting rules
+individually
+
+=item * Simple string arguments without interpolation should use C<qw( )>
+with parentheses only
 
 =back
 
-This allows for compatibility with
+This design promotes readability whilst maintaining compatibility with
 L<perlimports|https://metacpan.org/pod/perlimports>.
 
-  # Good
+  # Good - basic cases
   use Foo;                                # no arguments
   use Bar ();                             # empty parentheses
-  use Baz "single_arg";                   # one argument with double quotes
-  use Qux qw( single_arg );               # one argument with qw()
-  use Quux qw( arg1 arg2 arg3 );          # multiple arguments with qw()
+  use Baz 1.23;                           # version numbers exempt
+  no warnings;                            # no statements follow same rules
 
-  # Bad
-  use Foo 'single_arg';                   # single quotes not allowed
-  use Bar "arg1", "arg2";                 # multiple arguments need qw()
+  # Good - fat comma arguments (no parentheses)
+  use Data::Printer
+    deparse       => 0,
+    show_unicode  => 1,
+    class         => { expand => "all" };
+
+  # Good - complex expressions (no parentheses)
+  use Module $VERSION;
+  use Config $DEBUG ? "verbose" : "quiet";
+  use Handler { config => "file.conf" };
+
+  # Good - interpolation cases (normal string rules)
+  use lib "$HOME/perl", "/usr/lib";       # interpolation prevents qw()
+  no warnings "$category", "another";     # applies to no statements too
+
+  # Good - simple strings use qw()
+  use Foo qw( arg1 arg2 arg3 );           # multiple simple arguments
+  no warnings qw( experimental uninitialized );
+
+  # Bad - incorrect quoting
+  use Foo 'single_arg';                   # single quotes should use qw()
+  use Bar "arg1", "arg2";                 # simple strings need qw()
   use Baz qw[ arg1 arg2 ];                # qw() must use parentheses only
-  use Qux qw{ arg1 arg2 };                # qw() must use parentheses only
+  use Qux ( key => "value" );             # fat comma needs no parentheses
+  use Quux ( $VERSION );                  # complex expressions need no
+                                          # parentheses
 
 =head2 Special Case: Newlines
 
@@ -682,20 +824,46 @@ This Policy is not configurable except for the standard options.
   my $both = qq(has 'single' and "double" quotes); # qq() handles both
                                                     # quote types cleanly
 
-=head2 Use Statement Examples
+=head2 Use and No Statement Examples
 
   # Bad
-  use Foo 'single_arg';                   # single quotes not allowed
-  use Bar "arg1", "arg2";                 # multiple args need qw()
-  use Baz qw[ arg1 arg2 ];                # qw() must use parentheses
-  use Qux qw{ arg1 arg2 arg3 };           # qw() must use parentheses
+  use Foo 'single_arg';                   # single quotes should use qw()
+  use Bar "arg1", "arg2";                 # simple strings need qw()
+  use Baz qw[ arg1 arg2 ];                # qw() must use parentheses only
+  use Qux ( key => "value" );             # fat comma should have no parentheses
+  use Quux ( $VERSION );                  # complex expressions need no
+                                          # parentheses
+  no warnings ( "experimental" );         # simple strings should use qw()
 
   # Good
-  use Foo;                                # no arguments allowed
-  use Bar ();                             # empty parentheses allowed
-  use Baz "single_arg";                   # one argument with double quotes
-  use Qux qw( single_arg );               # one argument with qw()
-  use Quux qw( arg1 arg2 arg3 );          # multiple arguments with qw() only
+  use Foo;                                # no arguments
+  use Bar ();                             # empty parentheses
+  use Baz 1.23;                           # version numbers exempt
+  use Qux qw( single_arg );               # simple string uses qw()
+  use Quux qw( arg1 arg2 arg3 );          # multiple simple arguments
+  no warnings qw( experimental uninitialized ); # no statements follow same
+                                                  # rules
+
+  # Fat comma examples (no parentheses)
+  use Data::Printer
+    deparse       => 0,
+    show_unicode  => 1;
+  use Config
+    key           => "value",
+    another_key   => { nested => "structure" };
+
+  # Complex expression examples (no parentheses)
+  use Module $VERSION;                    # variable argument
+  use Config $DEBUG ? "verbose" : "quiet"; # conditional expression
+  use Handler { config => "file.conf" };   # hash reference
+
+  # Interpolation examples (normal string rules apply)
+  use lib "$HOME/perl", "/usr/lib";       # interpolation prevents qw()
+  use lib "$x/d1", "$x/d2";               # both strings need interpolation
+  use lib "$HOME/perl", "static";         # mixed interpolation uses double
+                                          # quotes
+  no warnings "$category", "another";     # no statements handle
+                                          # interpolation too
 
 =head1 METHODS
 
@@ -720,6 +888,21 @@ consistency.
 
 Uses PPI's authoritative parsing to detect interpolation rather than regex
 patterns, ensuring accurate detection of complex cases like literal variables.
+
+=head2 would_interpolate_from_single_quotes
+
+Tests whether a string from single quotes would interpolate if converted to
+double quotes. This specialised version handles the challenge that PPI provides
+decoded string content rather than the original source text.
+
+When checking single-quoted strings, PPI's C<string()> method returns the
+decoded content. For example, the source C<'price: \\$5.00'> becomes
+C<'price: \$5.00'> in the content (with one backslash). To test interpolation
+properly, this method reconstructs what the original escaping would have been
+by re-escaping backslashes and apostrophes according to single-quote rules.
+
+This ensures accurate detection of whether converting a single-quoted string to
+double quotes would introduce unintended variable interpolation.
 
 =head2 delimiter_preference_order
 
@@ -806,10 +989,59 @@ delimiters to handle unbalanced content gracefully.
 
 =head2 check_use_statement
 
-Checks quoting consistency in C<use> statements. Enforces that single-argument
-use statements should use double quotes rather than C<qw()>, and that
-multi-argument use statements should always use C<qw()>. This promotes
-consistency and clarity in module import statements.
+Checks quoting consistency in C<use> and C<no> statements. Implements
+comprehensive argument analysis to enforce appropriate quoting based on
+argument types:
+
+=over 4
+
+=item * Version numbers are exempt from all quoting rules
+
+=item * Fat comma arguments should have no parentheses for readability
+
+=item * Complex expressions should have no parentheses to reduce visual noise
+
+=item * Arguments requiring interpolation follow normal string quoting rules
+
+=item * Simple string arguments should use C<qw()> with parentheses only
+
+=back
+
+This promotes consistency and clarity whilst supporting modern Perl idioms
+and maintaining compatibility with tools like perlimports.
+
+=head2 _analyse_argument_types
+
+Analyses use/no statement arguments to classify them into different types:
+fat comma operators, complex expressions, version numbers, simple strings,
+and quote operators. This classification drives the quoting rule enforcement
+in C<check_use_statement>.
+
+Also detects whether the original statement uses parentheses, which affects
+the violation messages for fat comma and complex expression cases.
+
+=head2 _extract_use_arguments
+
+Extracts and processes arguments from use/no statements, handling both bare
+arguments and those enclosed in parentheses. Skips whitespace, commas, and
+semicolons whilst preserving significant operators like fat comma (C<=E<gt>>).
+
+Handles nested list structures by recursively extracting their contents,
+ensuring all argument types are properly identified for rule enforcement.
+
+=head2 _extract_list_arguments
+
+Recursively processes parenthesised argument lists within use/no statements.
+Handles complex nested structures including expressions, statements, and
+hash constructors whilst filtering out structural tokens that don't affect
+quoting decisions.
+
+=head2 _summarise_use_arguments
+
+Provides summary statistics about use/no statement arguments: counts string
+tokens, detects C<qw()> usage, and verifies that C<qw()> operators use
+parentheses rather than other delimiters. This information drives the
+violation logic in C<check_use_statement>.
 
 =head1 AUTHOR
 

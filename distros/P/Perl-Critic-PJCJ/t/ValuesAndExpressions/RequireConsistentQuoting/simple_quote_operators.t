@@ -39,8 +39,10 @@ subtest "q() with simple strings - follow single quote rules" => sub {
 
   # Case 3: Strings that would cause single quotes to need q()
   # (because they have both single and double quotes)
-  bad $Policy, q(my $x = q/mix 'single' and "double"/;), "use q()",
-    "q/ with mixed quotes should suggest q()";
+  bad $Policy, q(my $x = 'mix \'single\' and "double"';), "use q()",
+    "'' with mixed quotes should suggest q()";
+  bad $Policy, q[my $x = 'mix \'single\' and "double" and ()';], "use q[]",
+    "'' with mixed quotes and parentheses should suggest q[]";
   bad $Policy, q(my $x = q|mix 'single' and "double"|;), "use q()",
     "q| with mixed quotes should suggest q()";
 

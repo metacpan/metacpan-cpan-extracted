@@ -17,7 +17,7 @@ my $abi_version = Linux::Landlock->get_abi_version();
 if ($abi_version < 0) {
     throws_ok(sub { Linux::Landlock->new() }, qr/not available/, "Landlock not available");
 } else {
-    my $ruleset = Linux::Landlock->new(restricted_ipc => []);
+    my $ruleset = Linux::Landlock->new(restricted_ipc => [], die_on_unsupported => 1);
     ok($ruleset->allow_perl_inc_access(), "allow_perl_inc_access");
     is(
         $ruleset->add_path_beneath_rule($base, qw(read_file)),
@@ -33,7 +33,7 @@ if ($abi_version < 0) {
     if ($abi_version >= 4) {
         is($ruleset->add_net_port_rule(33333, 'bind_tcp'), $LANDLOCK_ACCESS_NET{BIND_TCP}, "allow port 33333");
     } else {
-        throws_ok(sub { $ruleset->add_net_port_rule(33333, 'bind_tcp') }, qr/desired/, "no network support");
+        throws_ok(sub { $ruleset->add_net_port_rule(33333, 'bind_tcp') }, qr/invalid/i, "no network support");
     }
     ok(defined IO::Dir->new("/"),  "can opendir /");
     ok($ruleset->apply(),          "apply ruleset");
@@ -74,7 +74,10 @@ if ($abi_version < 0) {
         "allow read_file on $base/a"
     );
     ok($ruleset2->apply(), "apply ruleset");
-    ok(!kill(0, $ppid),               "cannot signal parent ($ppid)");
+    SKIP: {
+        skip "No signal restrictions possible", if $abi_version < 6;
+        ok(!kill(0, $ppid),               "cannot signal parent ($ppid)");
+    }
     ok(-r "$base/b",       "technically readable: $base/b");
     $! = 0;
     ok(!defined IO::File->new("$base/b", 'r'), "no longer readable: $base/b");
@@ -91,7 +94,7 @@ if ($abi_version < 0) {
     }
     my $ruleset_strict = Linux::Landlock->new(die_on_unsupported => 1);
     ok(defined $ruleset_strict, "ruleset created");
-    $LANDLOCK_ACCESS_FS{BOGUS} = Math::BigInt->new(1)->blsft(60);
+    $LANDLOCK_ACCESS_FS{BOGUS} = Math::BigInt->bone->blsft(60);
     throws_ok(sub { $ruleset_strict->add_path_beneath_rule("$base/a", qw(read_file bogus)) },
         qr/Unsupported/, "unsupported rule caught");
     my $ruleset_relaxed = Linux::Landlock->new();

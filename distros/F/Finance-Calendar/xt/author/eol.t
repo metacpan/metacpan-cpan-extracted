@@ -16,7 +16,7 @@ my @files = (
     't/calendar.t',
     't/rc/perlcriticrc',
     't/rc/perltidyrc',
-    't/rsi_exchanges.t',
+    't/tactical_exchanges.t',
     'xt/author/critic.t',
     'xt/author/distmeta.t',
     'xt/author/eol.t',

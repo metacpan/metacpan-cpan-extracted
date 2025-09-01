@@ -1,9 +1,12 @@
 Revision history for Finance-Exchange
 
+0.05      2025-09-01 05:44:27+00:00 UTC
+        - Rename RSI* exchanges to TACTICAL* exchanges
+
 0.04      2025-08-22 04:29:18+00:00 UTC
         - Define trading sessions for RSI exchanges
         - Fix KSE exchange having the wrong symbol
-        - Update display names for several exchanges (some had typo)
+        - Update display names for several exchanges
 
 0.02      2024-06-21 08:36:16+00:00 UTC
         - Add new OTC exchanges (CME_OTC and SGX_OTC) for new symbols

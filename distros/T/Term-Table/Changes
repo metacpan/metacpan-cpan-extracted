@@ -1,3 +1,8 @@
+0.025     2025-08-31 10:51:26-07:00 America/Los_Angeles
+
+    - Typo Fix
+    - Hide some diagnostics when tests run in perl core
+
 0.024     2024-12-27 18:52:06-08:00 America/Los_Angeles
 
     - Additional changes to t/honor_env_in_non_tty.t, and adding debugging
