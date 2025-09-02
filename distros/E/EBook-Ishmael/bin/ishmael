@@ -26,7 +26,8 @@ text contents of an ebook, but has since grown to be able to dump metadata,
 images, and more. B<ishmael> dumps formatted text by default, but it can dump
 other kinds of content through the use of command-line options.
 
-I<file> is the ebook file for B<ishmael> to dump. I<output> is the path to
+I<file> is the ebook file for B<ishmael> to dump. C<-> can be given as the input
+path to read from F<stdin>. I<output> is the path to
 write any output to. If not specified, it defaults to F<stdout> (except for the
 B<-c>|B<--cover> and B<-g>|B<--image> options). F<stdout> can also be manually
 specified via C<->.
@@ -183,7 +184,7 @@ Specify the formatted text line width. Defaults to C<80>.
 =item B<-N>|B<--no-network>
 
 Disable fetching remote network resources when reading an ebook, such as
-external XML DTDs or entities. This may cause errors when reading some ebooks..
+external XML DTDs or entities. This may cause errors when reading some ebooks.
 
 =item B<-t>|B<--text>
 
@@ -226,11 +227,7 @@ to use for the dumped metadata. The following are valid I<form>s.
 
 =item json
 
-=item pjson (pretty JSON)
-
 =item xml
-
-=item pxml (pretty XML)
 
 =back
 

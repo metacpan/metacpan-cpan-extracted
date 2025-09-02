@@ -45,6 +45,7 @@ either CPAN or your system's package manager:
 **ishmael** also depends on the following programs to be installed on your
 system:
 * `poppler-utils` (optional; for PDF support)
+* Xpdf's `pdftopng` or ImageMagick's `convert`: (optional; for PDF cover dumping)
 * `unrar` (optional; for CBR support)
 * `7z` (optional; for CB7 support)
 * `chmlib` (optional; for CHM support)

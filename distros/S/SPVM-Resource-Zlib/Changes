@@ -1,3 +1,8 @@
+1.004  2025-09-02
+  [Requirement Changes]
+    * Require SPVM 0.990084.
+  [Resource Upgrade]
+    * Upgrade zlib from v1.2.13 to v1.3.1.
 1.003  2025-01-29
   [Requirement Changes]
     * Require SPVM 0.990042.

@@ -1,3 +1,6 @@
+0.2312    2025-09-01 18:56:18Z
+          - fix filename check for VMS (Craig Berry, GH#44)
+
 0.2311    2020-10-03 04:04:15Z
           - Fix new PERMS test so as to also pass on root (RT#133443)
 

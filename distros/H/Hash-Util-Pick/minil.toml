@@ -1,11 +1,11 @@
 name = "Hash-Util-Pick"
-badges = ["travis", "appveyor"]
+badges = ["github-actions/test.yml", "metacpan"]
 authority = "cpan:PINE"
-authors = ['Pine Mizune']
+authors = ["Pine Mizune"]
 license = "mit"
 
-module_maker = 'ModuleBuild'
-markdown_maker = 'Pod::Markdown::Github'
+module_maker = "ModuleBuild"
+markdown_maker = "Pod::Markdown::Github"
 
 [build]
-build_class = 'builder::MyBuilder'
+build_class = "builder::MyBuilder"

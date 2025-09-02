@@ -1,55 +1,55 @@
 package EBook::Ishmael::PDB::Record;
 use 5.016;
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 use strict;
 use warnings;
 
 sub new {
 
-	my $class  = shift;
-	my $data   = shift;
-	my $params = shift;
+    my $class  = shift;
+    my $data   = shift;
+    my $params = shift;
 
-	my $self = {
-		Data => $data,
-		Off  => $params->{Offset},
-		Attr => $params->{Attributes},
-		UID  => $params->{UID},
-	};
+    my $self = {
+        Data => $data,
+        Off  => $params->{Offset},
+        Attr => $params->{Attributes},
+        UID  => $params->{UID},
+    };
 
-	return bless $self, $class;
+    return bless $self, $class;
 
 }
 
 sub data {
 
-	my $self = shift;
+    my $self = shift;
 
-	return $self->{Data};
+    return $self->{Data};
 
 }
 
 sub offset {
 
-	my $self = shift;
+    my $self = shift;
 
-	return $self->{Off};
+    return $self->{Off};
 
 }
 
 sub attributes {
 
-	my $self = shift;
+    my $self = shift;
 
-	return $self->{Attr};
+    return $self->{Attr};
 
 }
 
 sub uid {
 
-	my $self = shift;
+    my $self = shift;
 
-	return $self->{UID};
+    return $self->{UID};
 
 }
 

@@ -1,5 +1,18 @@
 Revision history for Perl module EBook::Ishmael.
 
+1.08  Sep 01 2025
+  - Add support for reading ebooks from standard input when '-' is given as the
+    input path.
+  - -m json and -m xml now act the same as -m pjson and -m pxml.
+  - The 'pjson' and 'pxml' metadata options are deprecated and will be removed
+    sometime in a future release. Please just use 'json' and 'xml' instead.
+  - ishmael can now dump PDF covers with ImageMagick's convert.
+  - For ebook formats that ishmael uses system commands to process, file names
+    with single quotes (') are properly quoted.
+  - Using '.*' for cover image dumping has now been removed.
+  - Slightly improve startup time.
+  - Fix documentation typos.
+
 1.07  May 23 2025
   - Add Fishmael: the new mascot/logo for ishmael.
   - Add -N|--no-network option: disable fetching of remote resources when
@@ -92,7 +105,7 @@ Revision history for Perl module EBook::Ishmael.
       metadata; ishmael (the original), json, pjson (the original --meta-json),
       xml, and pxml. These formats are specified by an optional argument to
       --metadata (--metadata=<form>). This has removed the need for --meta-json
-      to be a seperate option.
+      to be a separate option.
     - Changed default -c/--cover behavior. Output is now written to a file
       rather than stdout by default ("pick the right default"). You can also add
       a '.*' (dot asterisk) to the end of the output path name which ishmael
@@ -188,7 +201,7 @@ Revision history for Perl module EBook::Ishmael.
       detailed, it should at least be consistent across different formats.
   Fixes:
     - Modify PDF tests to account for differing output between different
-      verions of pdfinfo.
+      versions of pdfinfo.
     - Use '-T text/html' option for w3m, so that it recognizes given data as
       HTML and actually tries to format it.
 

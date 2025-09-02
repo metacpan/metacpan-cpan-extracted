@@ -1,0 +1,69 @@
+Env-AsYaml
+
+Env-AsYaml is intended to be a tool for examination of the environment in which
+the user is running programs, starting processes or seeking a solution to odd
+problems.
+
+The current process always has "environmental variables" set. This program
+facilitates printing them out as YAML. Lists of paths, like the common
+across-platforms env variable PATH, will become YAML sequences, much easier to
+read. This will be useful for troubleshooting, writing scripts for the shell
+environment, and probably for other things which I haven't thought of yet.
+
+To explain further: not infrequently, unexpected or undesirable program
+behavior can be traced to settings in the environment. These settings are
+present as "environment variables" and can consist of simple strings (scalars)
+or lists (typically, lists of paths). The Env.pm module understands lists like
+these and, using this ability, Env-AsYaml presents them to the user as very
+readable lists. The author works on a Microsoft Windows OS with the Cygwin
+environment (not exclusively though, because he also uses Gnu/Linux) and
+through no intentional doing of his own, has seen his PATH env variable balloon
+to as many as 26 items (including some duplicates)! This module was written to
+help address such problems.
+
+This readme was written to document version 0.30 (first release) of Env::AsYaml.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Env::AsYaml
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Env-AsYaml
+
+    CPAN Ratings
+        https://cpanratings.perl.org/d/Env-AsYaml
+
+    Search CPAN
+        https://metacpan.org/release/Env-AsYaml
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2025 by Sören Andersen.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+

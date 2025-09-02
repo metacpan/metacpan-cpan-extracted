@@ -1,7 +1,7 @@
   use strict;
   use warnings;
   package Alien::Bit;
-$Alien::Bit::VERSION = '0.05';
+$Alien::Bit::VERSION = '0.07';
 use parent qw( Alien::Base );
 
 =head1 NAME
@@ -10,7 +10,7 @@ Alien::Bit - Find or install the Bit library
 
 =head1 VERSION
 
-version 0.05
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -18,8 +18,8 @@ Installs the Bit library, used to manipulate bitsets and their packed containers
 
 =head1 DESCRIPTION
 
-This distribution provides the librry Bit so that it can be used by 
-other Perl distributions that are on CPAN.  It will download Bit from Github
+This distribution provides the library C<Bit> so that it can be used by 
+other Perl distributions that are on CPAN.  It will download C<Bit> from Github
 and will build the (static and dynamic) versions of the library for use by other
 Perl modules.
 
@@ -27,6 +27,21 @@ Perl modules.
 =head1 SEE ALSO
 
 =over 4
+
+=item L<Bit::Set|https://metacpan.org/pod/Bit::Set>
+
+This module provides a procedural Perl interface to the C library L<Bit|https://github.com/chrisarg/Bit>,
+for creating and manipulating bitsets. It uses C<FFI::Platypus> to wrap the
+C functions and C<Alien::Bit> to locate and link to the C library.
+
+=item L<Bit::Set::DB|https://metacpan.org/pod/Bit::Set::DB>
+
+This module provides a procedural Perl interface to the C library C<Bit>,
+for creating and manipulating containers of bitsets (BitDB). It uses
+C<FFI::Platypus> to wrap the C functions and C<Alien::Bit> to locate and link
+to the C library. The main purpose of this library is to provide multithreaded
+and hardware accelerated (e.g. GPU) versions of container operations e.g. forming
+the population count of the intersection of two containers of bitsets.
 
 =item L<Bit|https://github.com/chrisarg/Bit>
 

@@ -34,7 +34,11 @@ ok(SPVM::TestCase::Compress::Raw::Zlib->deflateReset_and_inflateReset);
 
 ok(SPVM::TestCase::Compress::Raw::Zlib->deflateTune);
 
+ok(SPVM::TestCase::Compress::Raw::Zlib->deflate_and_inflate_AppendOutput);
+
 ok(SPVM::TestCase::Compress::Raw::Zlib->deflate_and_inflate_LimitOutput);
+
+ok(SPVM::TestCase::Compress::Raw::Zlib->gzip_and_gunzip);
 
 # Version check
 {

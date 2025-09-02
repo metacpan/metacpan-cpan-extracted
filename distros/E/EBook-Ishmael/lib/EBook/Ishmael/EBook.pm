@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook;
 use 5.016;
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 use strict;
 use warnings;
 
@@ -24,56 +24,56 @@ use EBook::Ishmael::EBook::Zip;
 use EBook::Ishmael::EBook::zTXT;
 
 our %EBOOK_FORMATS = map { lc $_ => "EBook::Ishmael::EBook::$_" } qw(
-	CB7 CBR CBZ CHM Epub FictionBook2 HTML KF8 Mobi PalmDoc PDF Text XHTML Zip
-	zTXT
+    CB7 CBR CBZ CHM Epub FictionBook2 HTML KF8 Mobi PalmDoc PDF Text XHTML Zip
+    zTXT
 );
 
 sub ebook_id {
 
-	my $file = shift;
+    my $file = shift;
 
-	open my $fh, '<', $file
-		or die "Failed to open $file for reading: $!\n";
-	binmode $fh;
+    open my $fh, '<', $file
+        or die "Failed to open $file for reading: $!\n";
+    binmode $fh;
 
-	for my $f (
-		# Make sure text is last
-		sort {
-			return  1 if $a eq 'text';
-			return -1 if $b eq 'text';
-			return $a cmp $b;
-		} keys %EBOOK_FORMATS
-	) {
+    for my $f (
+        # Make sure text is last
+        sort {
+            return  1 if $a eq 'text';
+            return -1 if $b eq 'text';
+            return $a cmp $b;
+        } keys %EBOOK_FORMATS
+    ) {
 
-		seek $fh, 0, 0;
+        seek $fh, 0, 0;
 
-		if ($EBOOK_FORMATS{ $f }->heuristic($file, $fh)) {
-			close $fh;
-			return $f;
-		}
+        if ($EBOOK_FORMATS{ $f }->heuristic($file, $fh)) {
+            close $fh;
+            return $f;
+        }
 
-	}
+    }
 
-	close $fh;
-	return undef;
+    close $fh;
+    return undef;
 
 }
 
 sub new {
 
-	my $class = shift;
-	my $file  = shift;
-	my $type  = shift // ebook_id($file);
-	my $enc   = shift;
-	my $net   = shift;
+    my $class = shift;
+    my $file  = shift;
+    my $type  = shift // ebook_id($file);
+    my $enc   = shift;
+    my $net   = shift;
 
-	if (not defined $type) {
-		die "Could not identify $file format\n";
-	}
+    if (not defined $type) {
+        die "Could not identify $file format\n";
+    }
 
-	my $obj = $EBOOK_FORMATS{ $type }->new($file, $enc, $net);
+    my $obj = $EBOOK_FORMATS{ $type }->new($file, $enc, $net);
 
-	return $obj;
+    return $obj;
 
 }
 

@@ -15,6 +15,8 @@ class Compress::Raw::Zlib::Base {
   
   has z_stream : Compress::Raw::Zlib::Z_stream;
   
+  has AppendOutput : byte;
+  
   # Instance Methods
   native method total_out : long ();
   

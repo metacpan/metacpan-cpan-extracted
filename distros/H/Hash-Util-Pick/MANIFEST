@@ -3,7 +3,6 @@ Changes
 LICENSE
 META.json
 README.md
-appveyor.yml
 builder/MyBuilder.pm
 cpanfile
 lib/Hash/Util/Pick.pm

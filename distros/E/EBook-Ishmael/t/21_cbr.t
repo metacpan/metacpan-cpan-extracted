@@ -13,7 +13,7 @@ use EBook::Ishmael::ImageID;
 my $TEST_CBR = $ENV{TEST_CBR} // $EBook::Ishmael::EBook::CBR::CAN_TEST;
 
 unless ($TEST_CBR) {
-	plan skip_all => "TEST_CBR set to 0 or unrar not installed";
+    plan skip_all => "TEST_CBR set to 0 or unrar not installed";
 }
 
 my $CBR = File::Spec->catfile(qw/t data gpl3.cbr/);
@@ -36,19 +36,19 @@ ok($ebook->has_cover, "has cover");
 
 ok($ebook->cover, "cover ok");
 is(
-	image_id(\($ebook->cover)),
-	"png",
-	"cover looks like a png"
+    image_id(\($ebook->cover)),
+    "png",
+    "cover looks like a png"
 );
 
 is($ebook->image_num, 28, "image count ok");
 
 for my $i (0 .. 27) {
-	is(
-		image_id($ebook->image($i)),
-		"png",
-		"image #$i ok"
-	);
+    is(
+        image_id($ebook->image($i)),
+        "png",
+        "image #$i ok"
+    );
 }
 
 done_testing();

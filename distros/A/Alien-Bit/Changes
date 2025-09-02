@@ -1,5 +1,9 @@
 Revision history for Alien-Bit
 
+0.07      2025-09-01 09:44:06-06:00 America/Denver
+- Expanded documentation and fixed typos
+0.06      2025-09-01 09:34:53-06:00 America/Denver
+- Fixed documentation
 0.05      2025-08-24 18:59:51-06:00 America/Denver
 - Fixed formatting of POD documentation
 0.04      2025-08-24 18:54:47-06:00 America/Denver

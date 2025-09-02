@@ -27,7 +27,8 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "0",
+            "File::ShareDir::Install" : "0"
          }
       },
       "runtime" : {
@@ -43,12 +44,16 @@
             "Net::IDN::Encode" : "0",
             "Net::IP" : "0",
             "Net::RDAP" : "0.40",
-            "PPI" : "0",
             "Pod::Usage" : "0",
             "Term::ANSIColor" : "0",
             "Term::Size" : "0",
             "Text::Wrap" : "0",
             "URI" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
          }
       }
    },
@@ -63,6 +68,6 @@
          "web" : "https://github.com/gbxyz/rdapper"
       }
    },
-   "version" : "1.18",
+   "version" : "1.19",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

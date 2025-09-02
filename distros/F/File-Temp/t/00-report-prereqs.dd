@@ -6,7 +6,7 @@ do { my $x = {
                       },
        'develop' => {
                       'recommends' => {
-                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.158',
+                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.168',
                                         'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007'
                                       },
                       'requires' => {
@@ -14,7 +14,6 @@ do { my $x = {
                                       'File::Spec' => '0',
                                       'IO::Handle' => '0',
                                       'IPC::Open3' => '0',
-                                      'Pod::Coverage::TrustPod' => '0',
                                       'Pod::Wordlist' => '0',
                                       'Test::CPAN::Changes' => '0.19',
                                       'Test::CPAN::Meta' => '0',
@@ -22,10 +21,10 @@ do { my $x = {
                                       'Test::Mojibake' => '0',
                                       'Test::More' => '0.96',
                                       'Test::Pod' => '1.41',
-                                      'Test::Pod::Coverage' => '1.08',
+                                      'Test::Pod::Coverage::TrustMe' => '0.002001',
                                       'Test::Pod::No404s' => '0',
                                       'Test::Portability::Files' => '0',
-                                      'Test::Spelling' => '0.12',
+                                      'Test::Spelling' => '0.17',
                                       'warnings' => '0'
                                     }
                     },
@@ -109,7 +108,6 @@ do { my $x = {
                                            'Dist::Zilla::Plugin::NextRelease' => '5.033',
                                            'Dist::Zilla::Plugin::OSPrereqs' => '0',
                                            'Dist::Zilla::Plugin::OnlyCorePrereqs' => '0.014',
-                                           'Dist::Zilla::Plugin::PodCoverageTests' => '5.040',
                                            'Dist::Zilla::Plugin::PodSyntaxTests' => '5.040',
                                            'Dist::Zilla::Plugin::PodWeaver' => '4.008',
                                            'Dist::Zilla::Plugin::Prereqs' => '0',
@@ -126,6 +124,7 @@ do { my $x = {
                                            'Dist::Zilla::Plugin::Test::ChangesHasContent' => '0',
                                            'Dist::Zilla::Plugin::Test::Compile' => '2.039',
                                            'Dist::Zilla::Plugin::Test::Kwalitee' => '2.10',
+                                           'Dist::Zilla::Plugin::Test::Pod::Coverage::TrustMe' => '0',
                                            'Dist::Zilla::Plugin::Test::Pod::No404s' => '1.003',
                                            'Dist::Zilla::Plugin::Test::PodSpelling' => '2.006003',
                                            'Dist::Zilla::Plugin::Test::Portability' => '2.000007',

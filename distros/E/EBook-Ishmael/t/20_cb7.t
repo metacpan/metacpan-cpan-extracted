@@ -13,7 +13,7 @@ use EBook::Ishmael::ImageID;
 my $TEST_CB7 = $ENV{TEST_CB7} // $EBook::Ishmael::EBook::CB7::CAN_TEST;
 
 unless ($TEST_CB7) {
-	plan skip_all => "TEST_CB7 set to 0 or 7z not installed";
+    plan skip_all => "TEST_CB7 set to 0 or 7z not installed";
 }
 
 my $CB7 = File::Spec->catfile(qw/t data gpl3.cb7/);
@@ -36,19 +36,19 @@ ok($ebook->has_cover, "has cover");
 
 ok($ebook->cover, "cover ok");
 is(
-	image_id(\($ebook->cover)),
-	"png",
-	"cover looks like a png"
+    image_id(\($ebook->cover)),
+    "png",
+    "cover looks like a png"
 );
 
 is($ebook->image_num, 28, "image count ok");
 
 for my $i (0 .. 27) {
-	is(
-		image_id($ebook->image($i)),
-		"png",
-		"image #$i ok"
-	);
+    is(
+        image_id($ebook->image($i)),
+        "png",
+        "image #$i ok"
+    );
 }
 
 done_testing();

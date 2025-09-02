@@ -13,7 +13,7 @@ use EBook::Ishmael::ImageID;
 my $TEST_CHM = $ENV{TEST_CHM} // $EBook::Ishmael::EBook::CHM::CAN_TEST;
 
 unless ($TEST_CHM) {
-	plan skip_all => "TEST_CHM set to 0 or chmlib not installed";
+    plan skip_all => "TEST_CHM set to 0 or chmlib not installed";
 }
 
 # I couldn't be bothered to figure out how to use Microsoft's CHM creator, so
@@ -41,15 +41,15 @@ ok(! defined $ebook->cover, "has no cover");
 is($ebook->image_num, 2, "image count ok");
 
 is(
-	image_id($ebook->image(0)),
-	"gif",
-	"image #0 ok"
+    image_id($ebook->image(0)),
+    "gif",
+    "image #0 ok"
 );
 
 is(
-	image_id($ebook->image(1)),
-	"gif",
-	"image #1 ok"
+    image_id($ebook->image(1)),
+    "gif",
+    "image #1 ok"
 );
 
 done_testing();

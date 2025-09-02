@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook::XHTML;
 use 5.016;
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 use strict;
 use warnings;
 
@@ -10,18 +10,18 @@ my $XHTML_NS = 'http://www.w3.org/1999/xhtml';
 
 sub heuristic {
 
-	my $class = shift;
-	my $file  = shift;
-	my $fh    = shift;
+    my $class = shift;
+    my $file  = shift;
+    my $fh    = shift;
 
-	return 1 if $file =~ /\.xhtml?$/;
-	return 0 unless -T $fh;
+    return 1 if $file =~ /\.xhtml?$/;
+    return 0 unless -T $fh;
 
-	read $fh, my ($head), 1024;
+    read $fh, my ($head), 1024;
 
-	return 0 unless $head =~ /<[^<>]+xmlns\s*=\s*"\Q$XHTML_NS\E"[^<>]*>/;
+    return 0 unless $head =~ /<[^<>]+xmlns\s*=\s*"\Q$XHTML_NS\E"[^<>]*>/;
 
-	return $head =~ /<\s*html[^<>]+>/;
+    return $head =~ /<\s*html[^<>]+>/;
 
 }
 

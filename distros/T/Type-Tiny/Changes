@@ -7,6 +7,19 @@ Home page:    <https://metacpan.org/release/Type-Tiny>
 Bug tracker:  <https://github.com/tobyink/p5-type-tiny/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+2.008003	2025-09-02
+
+ [ Bug Fixes ]
+ - Make sure methods fake-inherited from Moose (if it's loaded) are a last
+   resort.
+   Robert Moore++
+
+ [ Other ]
+ - Slightly streamlined `Type::Tiny::can` and `Type::Tiny::AUTOLOAD`.
+ - When dumping structures via Data::Dumper (mostly in error messages)
+   suppress any warnings Data::Dumper would emit.
+   Diab Jerius++
+
 2.008002	2025-04-30
 
  [ Bug Fixes ]

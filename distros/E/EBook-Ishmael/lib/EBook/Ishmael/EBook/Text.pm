@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook::Text;
 use 5.016;
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 use strict;
 use warnings;
 
@@ -16,96 +16,96 @@ use EBook::Ishmael::TextToHtml;
 # plain text ebook formats as just text.
 sub heuristic {
 
-	my $class = shift;
-	my $file  = shift;
+    my $class = shift;
+    my $file  = shift;
 
-	return -T $file;
+    return -T $file;
 
 }
 
 sub new {
 
-	my $class = shift;
-	my $file  = shift;
-	my $enc   = shift // 'UTF-8';
+    my $class = shift;
+    my $file  = shift;
+    my $enc   = shift // 'UTF-8';
 
-	my $self = {
-		Source   => undef,
-		Metadata => EBook::Ishmael::EBook::Metadata->new,
-		Encode   => $enc,
-	};
+    my $self = {
+        Source   => undef,
+        Metadata => EBook::Ishmael::EBook::Metadata->new,
+        Encode   => $enc,
+    };
 
-	bless $self, $class;
+    bless $self, $class;
 
-	$self->{Source} = File::Spec->rel2abs($file);
+    $self->{Source} = File::Spec->rel2abs($file);
 
-	$self->{Metadata}->title([ basename($self->{Source}) ]);
-	$self->{Metadata}->modified([ scalar gmtime((stat $self->{Source})[9]) ]);
-	$self->{Metadata}->format([ 'Text' ]);
+    $self->{Metadata}->title([ basename($self->{Source}) ]);
+    $self->{Metadata}->modified([ scalar gmtime((stat $self->{Source})[9]) ]);
+    $self->{Metadata}->format([ 'Text' ]);
 
-	return $self;
+    return $self;
 
 }
 
 sub html {
 
-	my $self = shift;
-	my $out  = shift;
+    my $self = shift;
+    my $out  = shift;
 
-	open my $rh, '<', $self->{Source}
-		or die "Failed to open $self->{Source} for reading: $!\n";
-	my $html = text2html(
-		decode(
-			$self->{Encode},
-			do { local $/ = undef; <$rh> }
-		)
-	);
-	close $rh;
+    open my $rh, '<', $self->{Source}
+        or die "Failed to open $self->{Source} for reading: $!\n";
+    my $html = text2html(
+        decode(
+            $self->{Encode},
+            do { local $/ = undef; <$rh> }
+        )
+    );
+    close $rh;
 
-	if (defined $out) {
-		open my $wh, '>', $out
-			or die "Failed to open $out for writing: $!\n";
-		binmode $wh, ':utf8';
-		print { $wh } $html;
-		close $wh;
-		return $out;
-	} else {
-		return $html;
-	}
+    if (defined $out) {
+        open my $wh, '>', $out
+            or die "Failed to open $out for writing: $!\n";
+        binmode $wh, ':utf8';
+        print { $wh } $html;
+        close $wh;
+        return $out;
+    } else {
+        return $html;
+    }
 
 }
 
 sub raw {
 
-	my $self = shift;
-	my $out  = shift;
+    my $self = shift;
+    my $out  = shift;
 
-	open my $rh, '<', $self->{Source}
-		or die "Failed to open $self->{Source} for reading: $!\n";
-	my $raw = decode(
-		$self->{Encode},
-		do { local $/ = undef; <$rh> }
-	);
-	close $rh;
+    open my $rh, '<', $self->{Source}
+        or die "Failed to open $self->{Source} for reading: $!\n";
+    my $raw = decode(
+        $self->{Encode},
+        do { local $/ = undef; <$rh> }
+    );
+    close $rh;
 
-	if (defined $out) {
-		open my $wh, '>', $out
-			or die "Failed to open $out for writing: $!\n";
-		binmode $wh, ':utf8';
-		print { $wh } $raw;
-		close $wh;
-		return $out;
-	} else {
-		return $raw;
-	}
+    if (defined $out) {
+        open my $wh, '>', $out
+            or die "Failed to open $out for writing: $!\n";
+        binmode $wh, ':utf8';
+        print { $wh } $raw;
+        close $wh;
+        return $out;
+    } else {
+        return $raw;
+    }
 
 }
 
 sub metadata {
 
-	my $self = shift;
+    my $self = shift;
 
-	return $self->{Metadata}->hash;
+    return $self->{Metadata}->hash;
 
 }
 

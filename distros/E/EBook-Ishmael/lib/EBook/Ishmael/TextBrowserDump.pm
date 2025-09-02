@@ -1,6 +1,6 @@
 package EBook::Ishmael::TextBrowserDump;
 use 5.016;
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 use strict;
 use warnings;
 
@@ -12,6 +12,8 @@ use List::Util qw(first);
 
 use File::Which;
 
+use EBook::Ishmael::ShellQuote qw(shell_quote);
+
 our $CAN_DUMP = 0;
 
 # From links
@@ -19,123 +21,131 @@ my $WIDTH_MAX = 512;
 my $WIDTH_MIN = 10;
 
 my @ORDER = qw(
-	lynx
-	links
-	elinks
-	w3m
-	chawan
-	queequeg
+    lynx
+    links
+    elinks
+    w3m
+    chawan
+    queequeg
 );
 
 my %Browsers = (
-	'lynx' => {
-		Bins  => [ qw(lynx) ],
-		Bin   => undef,
-		Opts  => [ qw(-dump -force_html -nolist -display_charset=utf8) ],
-		Width => '-width %d',
-		Xhtml => [ qw(-xhtml_parsing) ],
-	},
-	'links' => {
-		Bins  => [ qw(links links2) ],
-		Bin   => undef,
-		Opts  => [ qw(-dump -force-htm -codepage utf8) ],
-		Width => '-width %d',
-		Xhtml => [],
-	},
-	'elinks' => {
-		Bins  => [ qw(elinks) ],
-		Bin   => undef,
-		Opts  => [ qw(-dump -force-html -no-home -no-references -no-numbering
-		              -dump-charset utf8) ],
-		Width => '-dump-width %d',
-		Xhtml => [],
-	},
-	'w3m' => {
-		Bins  => [ qw(w3m) ],
-		Bin   => undef,
-		Opts  => [ qw(-dump -T text/html -O utf8) ],
-		Width => '-cols %d',
-		Xhtml => [],
-	},
-	'chawan' => {
-		Bins  => [ qw(cha) ],
-		Bin   => undef,
-		Opts  => [ qw(-d -I utf8 -O utf8 -T text/html) ],
-		Width => "-o 'display.columns=%d'",
-		Xhtml => [],
-	},
-	'queequeg' => {
-		Bins  => [ qw(queequeg) ],
-		Bin   => undef,
-		Opts  => [ qw(-e utf8) ],
-		Width => '-w %d',
-		Xhtml => [],
-	},
+    'lynx' => {
+        Bins  => [ qw(lynx) ],
+        Bin   => undef,
+        Opts  => [ qw(-dump -force_html -nolist -display_charset=utf8) ],
+        Width => '-width %d',
+        Xhtml => [ qw(-xhtml_parsing) ],
+    },
+    'links' => {
+        Bins  => [ qw(links links2) ],
+        Bin   => undef,
+        Opts  => [ qw(-dump -force-htm -codepage utf8) ],
+        Width => '-width %d',
+        Xhtml => [],
+    },
+    'elinks' => {
+        Bins  => [ qw(elinks) ],
+        Bin   => undef,
+        Opts  => [ qw(-dump -force-html -no-home -no-references -no-numbering
+                      -dump-charset utf8) ],
+        Width => '-dump-width %d',
+        Xhtml => [],
+    },
+    'w3m' => {
+        Bins  => [ qw(w3m) ],
+        Bin   => undef,
+        Opts  => [ qw(-dump -T text/html -O utf8) ],
+        Width => '-cols %d',
+        Xhtml => [],
+    },
+    'chawan' => {
+        Bins  => [ qw(cha) ],
+        Bin   => undef,
+        Opts  => [ qw(-d -I utf8 -O utf8 -T text/html) ],
+        Width => "-o 'display.columns=%d'",
+        Xhtml => [],
+    },
+    'queequeg' => {
+        Bins  => [ qw(queequeg) ],
+        Bin   => undef,
+        Opts  => [ qw(-e utf8) ],
+        Width => '-w %d',
+        Xhtml => [],
+    },
 );
 
 my $Default = undef;
 
 for my $k (@ORDER) {
 
-	my $bin = first { which $_ } @{ $Browsers{ $k }->{Bins} };
+    my $bin = first { which $_ } @{ $Browsers{ $k }->{Bins} };
 
-	next unless defined $bin;
+    next unless defined $bin;
 
-	$Browsers{ $k }->{Bin} = $bin;
+    $Browsers{ $k }->{Bin} = $bin;
 
-	$Default //= $k;
+    $Default //= $k;
 
 }
 
 $CAN_DUMP = defined $Default;
 
 unless ($CAN_DUMP) {
-	warn "No valid text browser was found installed on your system, you " .
-	     "will be unable to use any feature requiring a text browser\n";
+    warn "No valid text browser was found installed on your system, you " .
+         "will be unable to use any feature requiring a text browser\n";
 }
 
 sub browser_dump {
 
-	unless (defined $Default) {
-		die "Cannot use browser to dump HTML; no valid browser was found on your system\n";
-	}
+    unless (defined $Default) {
+        die "Cannot use browser to dump HTML; no valid browser was found on your system\n";
+    }
 
-	my $file  = shift;
-	my $param = shift // {};
+    my $file  = shift;
+    my $param = shift // {};
 
-	my $browser = $param->{browser} // $Default;
-	my $xhtml   = $param->{xhtml}   // 0;
-	my $width   = $param->{width}   // 80;
+    my $browser = $param->{browser} // $Default;
+    my $xhtml   = $param->{xhtml}   // 0;
+    my $width   = $param->{width}   // 80;
 
-	unless (exists $Browsers{ $browser }) {
-		die "'$browser' is not a valid browser\n";
-	}
+    unless (exists $Browsers{ $browser }) {
+        die <<"HERE";
+'$browser' is not a valid browser; the following is a list of valid browsers:
+    lynx
+    links
+    elinks
+    w3m
+    chawan
+    queequeg
+HERE
+    }
 
-	unless (defined $Browsers{ $browser }->{Bin}) {
-		die "'$browser' is not installed on your system\n";
-	}
+    unless (defined $Browsers{ $browser }->{Bin}) {
+        die "'$browser' is not installed on your system\n";
+    }
 
-	unless ($width >= $WIDTH_MIN and $width <= $WIDTH_MAX) {
-		die "Width cannot be greater than $WIDTH_MAX or less than $WIDTH_MIN\n";
-	}
+    unless ($width >= $WIDTH_MIN and $width <= $WIDTH_MAX) {
+        die "Width cannot be greater than $WIDTH_MAX or less than $WIDTH_MIN\n";
+    }
 
-	my $cmd = sprintf
-		"%s %s %s %s '%s'",
-		$Browsers{ $browser }->{Bin},
-		sprintf($Browsers{ $browser }->{Width}, $width),
-		join(" ", @{ $Browsers{ $browser }->{Opts} }),
-		($xhtml ? join(" ", @{ $Browsers{ $browser }->{Xhtml} }) : ''),
-		$file;
+    my $cmd = sprintf
+        "%s %s %s %s %s",
+        $Browsers{ $browser }->{Bin},
+        sprintf($Browsers{ $browser }->{Width}, $width),
+        join(" ", @{ $Browsers{ $browser }->{Opts} }),
+        ($xhtml ? join(" ", @{ $Browsers{ $browser }->{Xhtml} }) : ''),
+        shell_quote($file);
 
-	my $dump = qx/$cmd/;
+    my $dump = qx/$cmd/;
 
-	unless ($? >> 8 == 0) {
-		die "Failed to dump $file with $Browsers{ $browser }->{Bin}\n";
-	}
+    unless ($? >> 8 == 0) {
+        die "Failed to dump $file with $Browsers{ $browser }->{Bin}\n";
+    }
 
-	# We can't use 'open IN => ":encoding(UTF-8)"' because it was broken prior
-	# to 5.34, so we must manually decode :-/.
-	return decode('UTF-8', $dump);
+    # We can't use 'open IN => ":encoding(UTF-8)"' because it was broken prior
+    # to 5.34, so we must manually decode :-/.
+    return decode('UTF-8', $dump);
 
 }
 

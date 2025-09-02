@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook::Epub;
 use 5.016;
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 use strict;
 use warnings;
 
@@ -25,384 +25,384 @@ my $DCNS = "http://purl.org/dc/elements/1.1/";
 # If file uses zip magic bytes, assume it to be an EPUB.
 sub heuristic {
 
-	my $class = shift;
-	my $file  = shift;
-	my $fh    = shift;
+    my $class = shift;
+    my $file  = shift;
+    my $fh    = shift;
 
-	return 0 if $file =~ /\.zip$/;
+    return 0 if $file =~ /\.zip$/;
 
-	read $fh, my $mag, 4;
+    read $fh, my $mag, 4;
 
-	return $mag eq $MAGIC;
+    return $mag eq $MAGIC;
 }
 
 # Set _rootfile based on container.xml's rootfile@full-path attribute.
 sub _get_rootfile {
 
-	my $self = shift;
+    my $self = shift;
 
-	my $dom = XML::LibXML->load_xml(
-		location => $self->{_container},
-		no_network => !$self->{Network},
-	);
-	my $ns = $dom->documentElement->namespaceURI;
+    my $dom = XML::LibXML->load_xml(
+        location => $self->{_container},
+        no_network => !$self->{Network},
+    );
+    my $ns = $dom->documentElement->namespaceURI;
 
-	my $xpc = XML::LibXML::XPathContext->new($dom);
-	$xpc->registerNs('container', $ns);
+    my $xpc = XML::LibXML::XPathContext->new($dom);
+    $xpc->registerNs('container', $ns);
 
-	my ($rf) = $xpc->findnodes(
-		'/container:container'   .
-		'/container:rootfiles'   .
-		'/container:rootfile[1]' .
-		'/@full-path'
-	);
+    my ($rf) = $xpc->findnodes(
+        '/container:container'   .
+        '/container:rootfiles'   .
+        '/container:rootfile[1]' .
+        '/@full-path'
+    );
 
-	unless (defined $rf) {
-		die "Could not find root file in EPUB $self->{Source}\n";
-	}
+    unless (defined $rf) {
+        die "Could not find root file in EPUB $self->{Source}\n";
+    }
 
-	$self->{_rootfile} = File::Spec->catfile($self->{_unzip}, $rf->value());
+    $self->{_rootfile} = File::Spec->catfile($self->{_unzip}, $rf->value());
 
-	return $self->{_rootfile};
+    return $self->{_rootfile};
 
 }
 
 # Reads metadata and _spine from rootfile.
 sub _read_rootfile {
 
-	my $self = shift;
+    my $self = shift;
 
-	# Hash of epub metadata items and their corresponding Metadata method
-	# accessors.
-	my %dcmeta = (
-		'contributor' => 'contributor',
-		'creator'     => 'author',
-		'date',       => 'created',
-		'description' => 'description',
-		'identifier'  => 'id',
-		'language'    => 'language',
-		'publisher'   => 'contributor',
-		'subject'     => 'genre',
-		'title',      => 'title',
-	);
+    # Hash of epub metadata items and their corresponding Metadata method
+    # accessors.
+    my %dcmeta = (
+        'contributor' => 'contributor',
+        'creator'     => 'author',
+        'date',       => 'created',
+        'description' => 'description',
+        'identifier'  => 'id',
+        'language'    => 'language',
+        'publisher'   => 'contributor',
+        'subject'     => 'genre',
+        'title',      => 'title',
+    );
 
-	$self->{_contdir} = dirname($self->{_rootfile});
+    $self->{_contdir} = dirname($self->{_rootfile});
 
-	my $dom = XML::LibXML-> load_xml(
-		location => $self->{_rootfile},
-		no_network => !$self->{Network},
-	);
-	my $ns = $dom->documentElement->namespaceURI;
+    my $dom = XML::LibXML-> load_xml(
+        location => $self->{_rootfile},
+        no_network => !$self->{Network},
+    );
+    my $ns = $dom->documentElement->namespaceURI;
 
-	my $xpc = XML::LibXML::XPathContext->new($dom);
-	$xpc->registerNs('package', $ns);
-	$xpc->registerNs('dc', $DCNS);
+    my $xpc = XML::LibXML::XPathContext->new($dom);
+    $xpc->registerNs('package', $ns);
+    $xpc->registerNs('dc', $DCNS);
 
-	my ($meta) = $xpc->findnodes(
-		'/package:package/package:metadata'
-	);
+    my ($meta) = $xpc->findnodes(
+        '/package:package/package:metadata'
+    );
 
-	my ($manif) = $xpc->findnodes(
-		'/package:package/package:manifest'
-	);
+    my ($manif) = $xpc->findnodes(
+        '/package:package/package:manifest'
+    );
 
-	my ($spine) = $xpc->findnodes(
-		'/package:package/package:spine'
-	);
+    my ($spine) = $xpc->findnodes(
+        '/package:package/package:spine'
+    );
 
-	unless (defined $meta) {
-		die "EPUB $self->{Source} is missing metadata in rootfile\n";
-	}
+    unless (defined $meta) {
+        die "EPUB $self->{Source} is missing metadata in rootfile\n";
+    }
 
-	unless (defined $manif) {
-		die "EPUB $self->{Source} is missing manifest in rootfile\n";
-	}
+    unless (defined $manif) {
+        die "EPUB $self->{Source} is missing manifest in rootfile\n";
+    }
 
-	unless (defined $spine) {
-		die "EPUB $self->{Source} is missing spine in rootfile\n";
-	}
+    unless (defined $spine) {
+        die "EPUB $self->{Source} is missing spine in rootfile\n";
+    }
 
-	for my $dc ($xpc->findnodes('./dc:*', $meta)) {
+    for my $dc ($xpc->findnodes('./dc:*', $meta)) {
 
-		my $name = $dc->nodeName =~ s/^dc://r;
-		my $text = $dc->textContent();
+        my $name = $dc->nodeName =~ s/^dc://r;
+        my $text = $dc->textContent();
 
-		next unless exists $dcmeta{ $name };
+        next unless exists $dcmeta{ $name };
 
-		$text =~ s/\s+/ /g;
+        $text =~ s/\s+/ /g;
 
-		my $method = $dcmeta{ $name };
+        my $method = $dcmeta{ $name };
 
-		push @{ $self->{Metadata}->$method }, $text;
+        push @{ $self->{Metadata}->$method }, $text;
 
-	}
+    }
 
-	for my $itemref ($xpc->findnodes('./package:itemref', $spine)) {
+    for my $itemref ($xpc->findnodes('./package:itemref', $spine)) {
 
-		my $id = $itemref->getAttribute('idref') or next;
+        my $id = $itemref->getAttribute('idref') or next;
 
-		my ($item) = $xpc->findnodes(
-			"./package:item[\@id=\"$id\"]", $manif
-		) or next;
+        my ($item) = $xpc->findnodes(
+            "./package:item[\@id=\"$id\"]", $manif
+        ) or next;
 
-		unless (($item->getAttribute('media-type') // '') eq 'application/xhtml+xml') {
-			next;
-		}
+        unless (($item->getAttribute('media-type') // '') eq 'application/xhtml+xml') {
+            next;
+        }
 
-		my $href = $item->getAttribute('href') or next;
+        my $href = $item->getAttribute('href') or next;
 
-		$href = File::Spec->catfile($self->{_contdir}, $href);
+        $href = File::Spec->catfile($self->{_contdir}, $href);
 
-		next unless -f $href;
+        next unless -f $href;
 
-		push @{ $self->{_spine} }, $href;
+        push @{ $self->{_spine} }, $href;
 
-	}
+    }
 
-	# Get list of images
-	for my $item ($xpc->findnodes('./package:item', $manif)) {
+    # Get list of images
+    for my $item ($xpc->findnodes('./package:item', $manif)) {
 
-		next unless ($item->getAttribute('media-type') // '') =~ /^image\//;
+        next unless ($item->getAttribute('media-type') // '') =~ /^image\//;
 
-		my $href = $item->getAttribute('href') or next;
-		$href = File::Spec->catfile($self->{_contdir}, $href);
+        my $href = $item->getAttribute('href') or next;
+        $href = File::Spec->catfile($self->{_contdir}, $href);
 
-		push @{ $self->{_images} }, $href if -f $href;
+        push @{ $self->{_images} }, $href if -f $href;
 
-	}
+    }
 
-	my ($covmeta) = $xpc->findnodes('./package:meta[@name="cover"]', $meta);
+    my ($covmeta) = $xpc->findnodes('./package:meta[@name="cover"]', $meta);
 
-	# Put if code in own block so that we can last out of it.
-	if (defined $covmeta) {{
+    # Put if code in own block so that we can last out of it.
+    if (defined $covmeta) {{
 
-		my $covcont = $covmeta->getAttribute('content') or last;
+        my $covcont = $covmeta->getAttribute('content') or last;
 
-		my ($covitem) = $xpc->findnodes("./package:item[\@id=\"$covcont\"]", $manif)
-			or last;
+        my ($covitem) = $xpc->findnodes("./package:item[\@id=\"$covcont\"]", $manif)
+            or last;
 
-		my $covhref = $covitem->getAttribute('href') or last;
+        my $covhref = $covitem->getAttribute('href') or last;
 
-		my $covpath = File::Spec->catfile($self->{_contdir}, $covhref);
+        my $covpath = File::Spec->catfile($self->{_contdir}, $covhref);
 
-		last unless -f $covpath;
+        last unless -f $covpath;
 
-		$self->{_cover} = $covpath;
+        $self->{_cover} = $covpath;
 
-	}}
+    }}
 
-	return 1;
+    return 1;
 
 }
 
 sub new {
 
-	my $class = shift;
-	my $file  = shift;
-	my $enc   = shift;
-	my $net   = shift // 1;
+    my $class = shift;
+    my $file  = shift;
+    my $enc   = shift;
+    my $net   = shift // 1;
 
-	my $self = {
-		Source     => undef,
-		Metadata   => EBook::Ishmael::EBook::Metadata->new,
-		Network    => $net,
-		_unzip     => undef,
-		_container => undef,
-		_rootfile  => undef,
-		# Directory where _rootfile is, as that is where all of the "content"
-		# files are.
-		_contdir   => undef,
-		# List of content files in order specified by spine.
-		_spine     => [],
-		_cover     => undef,
-		_images    => [],
-	};
+    my $self = {
+        Source     => undef,
+        Metadata   => EBook::Ishmael::EBook::Metadata->new,
+        Network    => $net,
+        _unzip     => undef,
+        _container => undef,
+        _rootfile  => undef,
+        # Directory where _rootfile is, as that is where all of the "content"
+        # files are.
+        _contdir   => undef,
+        # List of content files in order specified by spine.
+        _spine     => [],
+        _cover     => undef,
+        _images    => [],
+    };
 
-	bless $self, $class;
+    bless $self, $class;
 
-	$self->read($file);
+    $self->read($file);
 
-	unless (@{ $self->{Metadata}->title }) {
-		$self->{Metadata}->title([ (fileparse($file, qr/\.[^.]*/))[0] ]);
-	}
+    unless (@{ $self->{Metadata}->title }) {
+        $self->{Metadata}->title([ (fileparse($file, qr/\.[^.]*/))[0] ]);
+    }
 
-	$self->{Metadata}->format([ 'EPUB' ]);
+    $self->{Metadata}->format([ 'EPUB' ]);
 
-	return $self;
+    return $self;
 
 }
 
 sub read {
 
-	my $self = shift;
-	my $src  = shift;
+    my $self = shift;
+    my $src  = shift;
 
-	my $tmpdir = safe_tmp_unzip;
+    my $tmpdir = safe_tmp_unzip;
 
-	unzip($src, $tmpdir);
+    unzip($src, $tmpdir);
 
-	$self->{Source} = File::Spec->rel2abs($src);
-	$self->{_unzip} = $tmpdir;
+    $self->{Source} = File::Spec->rel2abs($src);
+    $self->{_unzip} = $tmpdir;
 
-	$self->{_container} = File::Spec->catfile($self->{_unzip}, $CONTAINER);
+    $self->{_container} = File::Spec->catfile($self->{_unzip}, $CONTAINER);
 
-	unless (-f $self->{_container}) {
-		die "$src is an invalid EPUB file: does not have a META-INF/container.xml\n";
-	}
+    unless (-f $self->{_container}) {
+        die "$src is an invalid EPUB file: does not have a META-INF/container.xml\n";
+    }
 
-	$self->_get_rootfile();
-	$self->_read_rootfile();
+    $self->_get_rootfile();
+    $self->_read_rootfile();
 
-	return 1;
+    return 1;
 
 }
 
 sub html {
 
-	my $self = shift;
-	my $out  = shift;
+    my $self = shift;
+    my $out  = shift;
 
-	my $html = join '', map {
+    my $html = join '', map {
 
-		my $dom = XML::LibXML->load_xml(
-			location => $_,
-			no_network => !$self->{Network},
-		);
-		my $ns = $dom->documentElement->namespaceURI;
+        my $dom = XML::LibXML->load_xml(
+            location => $_,
+            no_network => !$self->{Network},
+        );
+        my $ns = $dom->documentElement->namespaceURI;
 
-		my $xpc = XML::LibXML::XPathContext->new($dom);
-		$xpc->registerNs('html', $ns);
+        my $xpc = XML::LibXML::XPathContext->new($dom);
+        $xpc->registerNs('html', $ns);
 
-		my ($body) = $xpc->findnodes('/html:html/html:body')
-			or next;
+        my ($body) = $xpc->findnodes('/html:html/html:body')
+            or next;
 
-		map { $_->toString } $body->childNodes;
+        map { $_->toString } $body->childNodes;
 
-	} @{ $self->{_spine} };
+    } @{ $self->{_spine} };
 
-	if (defined $out) {
-		open my $fh, '>', $out
-			or die "Failed to open $out for writing: $!\n";
-		binmode $fh, ':utf8';
-		print { $fh } $html;
-		close $fh;
-		return $out;
-	} else {
-		return $html;
-	}
+    if (defined $out) {
+        open my $fh, '>', $out
+            or die "Failed to open $out for writing: $!\n";
+        binmode $fh, ':utf8';
+        print { $fh } $html;
+        close $fh;
+        return $out;
+    } else {
+        return $html;
+    }
 
 }
 
 sub raw {
 
-	my $self = shift;
-	my $out  = shift;
+    my $self = shift;
+    my $out  = shift;
 
-	my $raw = join "\n\n", map {
+    my $raw = join "\n\n", map {
 
-		my $dom = XML::LibXML->load_xml(
-			location => $_,
-			no_network => !$self->{Network},
-		);
-		my $ns = $dom->documentElement->namespaceURI;
+        my $dom = XML::LibXML->load_xml(
+            location => $_,
+            no_network => !$self->{Network},
+        );
+        my $ns = $dom->documentElement->namespaceURI;
 
-		my $xpc = XML::LibXML::XPathContext->new($dom);
-		$xpc->registerNs('html', $ns);
+        my $xpc = XML::LibXML::XPathContext->new($dom);
+        $xpc->registerNs('html', $ns);
 
-		my ($body) = $xpc->findnodes('/html:html/html:body')
-			or next;
+        my ($body) = $xpc->findnodes('/html:html/html:body')
+            or next;
 
-		$body->textContent;
+        $body->textContent;
 
-	} @{ $self->{_spine} };
+    } @{ $self->{_spine} };
 
-	if (defined $out) {
-		open my $fh, '>', $out
-			or die "Failed to open $out for writing: $!\n";
-		binmode $fh, ':utf8';
-		print { $fh } $raw;
-		close $fh;
-		return $out;
-	} else {
-		return $raw;
-	}
+    if (defined $out) {
+        open my $fh, '>', $out
+            or die "Failed to open $out for writing: $!\n";
+        binmode $fh, ':utf8';
+        print { $fh } $raw;
+        close $fh;
+        return $out;
+    } else {
+        return $raw;
+    }
 
 }
 
 sub metadata {
 
-	my $self = shift;
+    my $self = shift;
 
-	return $self->{Metadata}->hash;
+    return $self->{Metadata}->hash;
 
 }
 
 sub has_cover {
 
-	my $self = shift;
+    my $self = shift;
 
-	return defined $self->{_cover};
+    return defined $self->{_cover};
 
 }
 
 sub cover {
 
-	my $self = shift;
-	my $out  = shift;
+    my $self = shift;
+    my $out  = shift;
 
-	return undef unless defined $self->{_cover};
+    return undef unless defined $self->{_cover};
 
-	open my $rh, '<', $self->{_cover}
-		or die "Failed to open $self->{_cover} for reading: $!\n";
-	binmode $rh;
-	my $bin = do { local $/ = undef; readline $rh };
-	close $rh;
+    open my $rh, '<', $self->{_cover}
+        or die "Failed to open $self->{_cover} for reading: $!\n";
+    binmode $rh;
+    my $bin = do { local $/ = undef; readline $rh };
+    close $rh;
 
-	if (defined $out) {
-		open my $wh, '>', $out
-			or die "Failed to open $out for writing: $!\n";
-		binmode $wh;
-		print { $wh } $bin;
-		close $wh;
-		return $out;
-	} else {
-		return $bin;
-	}
+    if (defined $out) {
+        open my $wh, '>', $out
+            or die "Failed to open $out for writing: $!\n";
+        binmode $wh;
+        print { $wh } $bin;
+        close $wh;
+        return $out;
+    } else {
+        return $bin;
+    }
 
 }
 
 sub image_num {
 
-	my $self = shift;
+    my $self = shift;
 
-	return scalar @{ $self->{_images} };
+    return scalar @{ $self->{_images} };
 
 }
 
 sub image {
 
-	my $self = shift;
-	my $n    = shift;
+    my $self = shift;
+    my $n    = shift;
 
-	if ($n >= $self->image_num) {
-		return undef;
-	}
+    if ($n >= $self->image_num) {
+        return undef;
+    }
 
-	open my $fh, '<', $self->{_images}[$n]
-		or die "Failed to open $self->{_images}[$n] for reading: $!\n";
-	binmode $fh;
-	my $img = do { local $/ = undef; readline $fh };
-	close $fh;
+    open my $fh, '<', $self->{_images}[$n]
+        or die "Failed to open $self->{_images}[$n] for reading: $!\n";
+    binmode $fh;
+    my $img = do { local $/ = undef; readline $fh };
+    close $fh;
 
-	return \$img;
+    return \$img;
 
 }
 
 DESTROY {
 
-	my $self = shift;
+    my $self = shift;
 
-	remove_tree($self->{_unzip}, { safe => 1 }) if -d $self->{_unzip};
+    remove_tree($self->{_unzip}, { safe => 1 }) if -d $self->{_unzip};
 
 }
 

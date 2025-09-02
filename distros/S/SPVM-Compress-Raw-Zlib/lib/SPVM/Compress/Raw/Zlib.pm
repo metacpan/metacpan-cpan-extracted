@@ -1,6 +1,6 @@
 package SPVM::Compress::Raw::Zlib;
 
-our $VERSION = "0.002";
+our $VERSION = "0.003";
 
 1;
 
@@ -26,6 +26,24 @@ compression libraries.
 =item * L<Compress::Raw::Zlib::Constant|SPVM::Compress::Raw::Zlib::Constant>
 
 =back
+
+=head1 Class Methods
+
+=head2 gzip
+
+C<static method gzip : void ($input : string, $output_ref : string[], $options : object[] = undef);>
+
+Compresses $input and outputs to $output_ref->[0] with the option $options.
+
+C<AppendOutput> and C<WindowBits> options are set appropriately.
+
+=head2 gunzip
+
+C<static method gunzip : void ($input : string, $output_ref : string[], $options : object[] = undef);>
+
+Uncompresses $input and outputs to $output_ref->[0] with the option $options.
+
+C<AppendOutput> and C<WindowBits> options are set appropriately.
 
 =head1 Repository
 

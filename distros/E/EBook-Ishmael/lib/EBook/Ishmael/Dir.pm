@@ -1,6 +1,6 @@
 package EBook::Ishmael::Dir;
 use 5.016;
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 use strict;
 use warnings;
 
@@ -11,20 +11,20 @@ use File::Spec;
 
 sub dir {
 
-	my $dir = shift;
+    my $dir = shift;
 
-	opendir my ($dh), $dir
-		or die "Failed to opendir $dir: $!\n";
+    opendir my ($dh), $dir
+        or die "Failed to opendir $dir: $!\n";
 
-	my @files =
-		sort
-		map { File::Spec->catfile($dir, $_) }
-		grep { $_ !~ /^\.\.?$/ }
-		readdir $dh;
+    my @files =
+        sort
+        map { File::Spec->catfile($dir, $_) }
+        grep { $_ !~ /^\.\.?$/ }
+        readdir $dh;
 
-	closedir $dh;
+    closedir $dh;
 
-	return @files;
+    return @files;
 
 }
 

@@ -1,6 +1,6 @@
 package EBook::Ishmael::Unzip;
 use 5.016;
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 use strict;
 use warnings;
 
@@ -15,48 +15,48 @@ use Archive::Zip qw(:ERROR_CODES :CONSTANTS);
 
 sub safe_tmp_unzip {
 
-	# Archive::Zip does not support unzipping to symlinked directory. This is a
-	# problem on platforms like Darwin, as /tmp is symlinked.
-	if (not -l File::Spec->tmpdir) {
-		return tempdir(CLEANUP => 1);
-	# Try working directory...
-	} elsif (! -l cwd and -w cwd) {
-		return tempdir(DIR => cwd, CLEANUP => 1);
-	# Try HOME...
-	} elsif (
-		exists $ENV{HOME} and
-		-d $ENV{HOME}     and
-		! -l $ENV{HOME}   and
-		-w $ENV{HOME}
-	) {
-		return tempdir(DIR => $ENV{HOME}, CLEANUP => 1);
-	# Give up and die :-(
-	} else {
-		die "Could not find a suitable unzip directory\n";
-	}
+    # Archive::Zip does not support unzipping to symlinked directory. This is a
+    # problem on platforms like Darwin, as /tmp is symlinked.
+    if (not -l File::Spec->tmpdir) {
+        return tempdir(CLEANUP => 1);
+    # Try working directory...
+    } elsif (! -l cwd and -w cwd) {
+        return tempdir(DIR => cwd, CLEANUP => 1);
+    # Try HOME...
+    } elsif (
+        exists $ENV{HOME} and
+        -d $ENV{HOME}     and
+        ! -l $ENV{HOME}   and
+        -w $ENV{HOME}
+    ) {
+        return tempdir(DIR => $ENV{HOME}, CLEANUP => 1);
+    # Give up and die :-(
+    } else {
+        die "Could not find a suitable unzip directory\n";
+    }
 
 }
 
 sub unzip {
 
-	my $zip = shift;
-	my $out = shift;
+    my $zip = shift;
+    my $out = shift;
 
-	my $obj = Archive::Zip->new;
+    my $obj = Archive::Zip->new;
 
-	unless ($obj->read($zip) == AZ_OK) {
-		die "Could not read $zip as a zip archive\n";
-	}
+    unless ($obj->read($zip) == AZ_OK) {
+        die "Could not read $zip as a zip archive\n";
+    }
 
-	for my $m ($obj->members) {
-		$m->unixFileAttributes($m->isDirectory ? 0755 : 0644);
-	}
+    for my $m ($obj->members) {
+        $m->unixFileAttributes($m->isDirectory ? 0755 : 0644);
+    }
 
-	unless ($obj->extractTree('', $out) == AZ_OK) {
-		die "Could not unzip $zip to $out\n";
-	}
+    unless ($obj->extractTree('', $out) == AZ_OK) {
+        die "Could not unzip $zip to $out\n";
+    }
 
-	return 1;
+    return 1;
 
 }
 

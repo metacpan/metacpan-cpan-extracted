@@ -2,7 +2,7 @@ requires 'perl', '5.010001';
 
 on test => sub {
     requires 'Test::More', '0.98';
-    requires 'Test::Deep', '1.120';
+    requires 'Test::Deep', '>= 1.120, < 1.200';
     requires 'Test::Exception', '0.43';
 };
 

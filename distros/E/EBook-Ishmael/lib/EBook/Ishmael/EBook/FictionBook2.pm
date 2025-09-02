@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook::FictionBook2;
 use 5.016;
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 use strict;
 use warnings;
 
@@ -19,375 +19,375 @@ my $NS = "http://www.gribuser.ru/xml/fictionbook/2.0";
 # retrieving a value from that node.
 
 my %TITLE = (
-	'genre' => sub {
+    'genre' => sub {
 
-		my $node = shift;
+        my $node = shift;
 
-		return genre => $node->textContent;
+        return genre => $node->textContent;
 
-	},
-	'author' => sub {
+    },
+    'author' => sub {
 
-		my $node = shift;
+        my $node = shift;
 
-		my $name = join(' ',
-			grep { /\S/ } map { $_->textContent } $node->childNodes
-		);
+        my $name = join(' ',
+            grep { /\S/ } map { $_->textContent } $node->childNodes
+        );
 
-		return author => $name;
+        return author => $name;
 
-	},
-	'book-title' => sub {
+    },
+    'book-title' => sub {
 
-		my $node = shift;
+        my $node = shift;
 
-		return title => $node->textContent;
+        return title => $node->textContent;
 
-	},
-	'lang' => sub {
+    },
+    'lang' => sub {
 
-		my $node = shift;
+        my $node = shift;
 
-		return language => $node->textContent;
+        return language => $node->textContent;
 
-	},
-	'src-lang' => sub {
+    },
+    'src-lang' => sub {
 
-		my $node = shift;
+        my $node = shift;
 
-		return language => $node->textContent;
+        return language => $node->textContent;
 
-	},
-	'translator' => sub {
+    },
+    'translator' => sub {
 
-		my $node = shift;
+        my $node = shift;
 
-		my $name = join(' ',
-			grep { /\S/ } map { $_->textContent } $node->childNodes
-		);
+        my $name = join(' ',
+            grep { /\S/ } map { $_->textContent } $node->childNodes
+        );
 
-		return contributor => $name;
+        return contributor => $name;
 
-	},
+    },
 );
 
 my %DOCUMENT = (
-	'author' => sub {
+    'author' => sub {
 
-		my $node = shift;
+        my $node = shift;
 
-		my $name = join(' ',
-			grep { /\S/ } map { $_->textContent } $node->childNodes
-		);
+        my $name = join(' ',
+            grep { /\S/ } map { $_->textContent } $node->childNodes
+        );
 
-		return contributor => $name;
+        return contributor => $name;
 
-	},
-	'program-used' => sub {
+    },
+    'program-used' => sub {
 
-		my $node = shift;
+        my $node = shift;
 
-		return software => $node->textContent;
+        return software => $node->textContent;
 
-	},
-	'date' => sub {
+    },
+    'date' => sub {
 
-		my $node = shift;
+        my $node = shift;
 
-		return created => $node->textContent;
+        return created => $node->textContent;
 
-	},
-	'id' => sub {
+    },
+    'id' => sub {
 
-		my $node = shift;
+        my $node = shift;
 
-		return id => $node->textContent;
+        return id => $node->textContent;
 
-	},
-	'version' => sub {
+    },
+    'version' => sub {
 
-		my $node = shift;
+        my $node = shift;
 
-		return format => "FictionBook2 " . $node->textContent;
+        return format => "FictionBook2 " . $node->textContent;
 
-	},
-	'src-ocr' => sub {
+    },
+    'src-ocr' => sub {
 
-		my $node = shift;
+        my $node = shift;
 
-		return author => $node->textContent
+        return author => $node->textContent
 
-	},
+    },
 
 );
 
 my %PUBLISH = (
-	'year' => sub {
+    'year' => sub {
 
-		my $node = shift;
+        my $node = shift;
 
-		return created => $node->textContent;
+        return created => $node->textContent;
 
-	},
-	'publisher' => sub {
+    },
+    'publisher' => sub {
 
-		my $node = shift;
+        my $node = shift;
 
-		my $name = join(' ',
-			grep { /\S/ } map { $_->textContent } $node->childNodes
-		);
+        my $name = join(' ',
+            grep { /\S/ } map { $_->textContent } $node->childNodes
+        );
 
-		return contributor => $name;
+        return contributor => $name;
 
-	},
-	'book-name' => sub {
+    },
+    'book-name' => sub {
 
-		my $node = shift;
+        my $node = shift;
 
-		return title => $node->textContent;
+        return title => $node->textContent;
 
-	},
+    },
 );
 
 sub heuristic {
 
-	my $class = shift;
-	my $file  = shift;
-	my $fh    = shift;
+    my $class = shift;
+    my $file  = shift;
+    my $fh    = shift;
 
-	return 1 if $file =~ /\.fb2$/;
-	return 0 unless -T $fh;
+    return 1 if $file =~ /\.fb2$/;
+    return 0 unless -T $fh;
 
-	read $fh, my ($head), 1024;
+    read $fh, my ($head), 1024;
 
-	return $head =~ /<\s*FictionBook[^<>]+xmlns\s*=\s*"\Q$NS\E"[^<>]*>/;
+    return $head =~ /<\s*FictionBook[^<>]+xmlns\s*=\s*"\Q$NS\E"[^<>]*>/;
 
 }
 
 sub _read_metadata {
 
-	my $self = shift;
+    my $self = shift;
 
-	my $ns = $self->{_dom}->documentElement->namespaceURI;
+    my $ns = $self->{_dom}->documentElement->namespaceURI;
 
-	my $xpc = XML::LibXML::XPathContext->new($self->{_dom});
-	$xpc->registerNs('FictionBook', $ns);
+    my $xpc = XML::LibXML::XPathContext->new($self->{_dom});
+    $xpc->registerNs('FictionBook', $ns);
 
-	my ($desc) = $xpc->findnodes(
-		'/FictionBook:FictionBook' .
-		'/FictionBook:description'
-	) or return 1;
+    my ($desc) = $xpc->findnodes(
+        '/FictionBook:FictionBook' .
+        '/FictionBook:description'
+    ) or return 1;
 
-	my ($title)   = $xpc->findnodes('./FictionBook:title-info',    $desc);
-	my ($doc)     = $xpc->findnodes('./FictionBook:document-info', $desc);
-	my ($publish) = $xpc->findnodes('./FictionBook:publish-info',  $desc);
+    my ($title)   = $xpc->findnodes('./FictionBook:title-info',    $desc);
+    my ($doc)     = $xpc->findnodes('./FictionBook:document-info', $desc);
+    my ($publish) = $xpc->findnodes('./FictionBook:publish-info',  $desc);
 
-	if (defined $title) {
-		for my $n ($title->childNodes) {
-			next unless exists $TITLE{ $n->nodeName };
-			my ($k, $v) = $TITLE{ $n->nodeName }->($n);
-			push @{ $self->{Metadata}->$k }, $v;
-		}
-	}
+    if (defined $title) {
+        for my $n ($title->childNodes) {
+            next unless exists $TITLE{ $n->nodeName };
+            my ($k, $v) = $TITLE{ $n->nodeName }->($n);
+            push @{ $self->{Metadata}->$k }, $v;
+        }
+    }
 
-	if (defined $doc) {
-		for my $n ($doc->childNodes) {
-			next unless exists $DOCUMENT{ $n->nodeName };
-			my ($k, $v) = $DOCUMENT{ $n->nodeName }->($n);
-			push @{ $self->{Metadata}->$k }, $v;
-		}
-	}
+    if (defined $doc) {
+        for my $n ($doc->childNodes) {
+            next unless exists $DOCUMENT{ $n->nodeName };
+            my ($k, $v) = $DOCUMENT{ $n->nodeName }->($n);
+            push @{ $self->{Metadata}->$k }, $v;
+        }
+    }
 
-	if (defined $publish) {
-		for my $n ($publish->childNodes) {
-			next unless exists $PUBLISH{ $n->nodeName };
-			my ($k, $v) = $PUBLISH{ $n->nodeName }->($n);
-			push @{ $self->{Metadata}->$k }, $v;
-		}
-	}
+    if (defined $publish) {
+        for my $n ($publish->childNodes) {
+            next unless exists $PUBLISH{ $n->nodeName };
+            my ($k, $v) = $PUBLISH{ $n->nodeName }->($n);
+            push @{ $self->{Metadata}->$k }, $v;
+        }
+    }
 
-	@{ $self->{_images} } = grep {
-		($_->getAttribute('content-type') // '') =~ /^image\//
-	} $xpc->findnodes('/FictionBook:FictionBook/FictionBook:binary');
+    @{ $self->{_images} } = grep {
+        ($_->getAttribute('content-type') // '') =~ /^image\//
+    } $xpc->findnodes('/FictionBook:FictionBook/FictionBook:binary');
 
-	my ($covmeta) = $xpc->findnodes('./FictionBook:coverpage', $title);
+    my ($covmeta) = $xpc->findnodes('./FictionBook:coverpage', $title);
 
-	# Put if code inside own block so we can easily last out of it.
-	if (defined $covmeta) {{
+    # Put if code inside own block so we can easily last out of it.
+    if (defined $covmeta) {{
 
-		my ($img) = $xpc->findnodes('./FictionBook:image', $covmeta)
-			or last;
-		my $href = $img->getAttribute('l:href') or last;
-		$href =~ s/^#//;
+        my ($img) = $xpc->findnodes('./FictionBook:image', $covmeta)
+            or last;
+        my $href = $img->getAttribute('l:href') or last;
+        $href =~ s/^#//;
 
-		my ($binary) = $xpc->findnodes(
-			"/FictionBook:FictionBook/FictionBook:binary[\@id=\"$href\"]"
-		) or last;
+        my ($binary) = $xpc->findnodes(
+            "/FictionBook:FictionBook/FictionBook:binary[\@id=\"$href\"]"
+        ) or last;
 
-		$self->{_cover} = $binary;
+        $self->{_cover} = $binary;
 
-	}}
+    }}
 
-	return 1;
+    return 1;
 
 }
 
 sub new {
 
-	my $class = shift;
-	my $file  = shift;
-	my $enc   = shift;
-	my $net   = shift // 1;
+    my $class = shift;
+    my $file  = shift;
+    my $enc   = shift;
+    my $net   = shift // 1;
 
-	my $self = {
-		Source   => undef,
-		Metadata => EBook::Ishmael::EBook::Metadata->new,
-		Network  => $net,
-		_dom     => undef,
-		_cover   => undef,
-		_images  => [],
-	};
+    my $self = {
+        Source   => undef,
+        Metadata => EBook::Ishmael::EBook::Metadata->new,
+        Network  => $net,
+        _dom     => undef,
+        _cover   => undef,
+        _images  => [],
+    };
 
-	bless $self, $class;
+    bless $self, $class;
 
-	$self->{Source} = File::Spec->rel2abs($file);
+    $self->{Source} = File::Spec->rel2abs($file);
 
-	$self->{_dom} = XML::LibXML->load_xml(
-		location => $file,
-		no_network => !$self->{Network},
-	);
+    $self->{_dom} = XML::LibXML->load_xml(
+        location => $file,
+        no_network => !$self->{Network},
+    );
 
-	$self->_read_metadata;
+    $self->_read_metadata;
 
-	unless (@{ $self->{Metadata}->format }) {
-		$self->{Metadata}->format([ 'FictionBook2' ]);
-	}
+    unless (@{ $self->{Metadata}->format }) {
+        $self->{Metadata}->format([ 'FictionBook2' ]);
+    }
 
-	return $self;
+    return $self;
 
 }
 
 sub html {
 
-	my $self = shift;
-	my $out  = shift;
+    my $self = shift;
+    my $out  = shift;
 
-	my $ns = $self->{_dom}->documentElement->namespaceURI;
+    my $ns = $self->{_dom}->documentElement->namespaceURI;
 
-	my $xpc = XML::LibXML::XPathContext->new($self->{_dom});
-	$xpc->registerNs('FictionBook', $ns);
+    my $xpc = XML::LibXML::XPathContext->new($self->{_dom});
+    $xpc->registerNs('FictionBook', $ns);
 
-	my @bodies = $xpc->findnodes(
-		'/FictionBook:FictionBook' .
-		'/FictionBook:body'
-	) or die "Invalid FictionBook2 file $self->{Source}\n";
+    my @bodies = $xpc->findnodes(
+        '/FictionBook:FictionBook' .
+        '/FictionBook:body'
+    ) or die "Invalid FictionBook2 file $self->{Source}\n";
 
-	my $html = join '',
-		map { $_->toString }
-		map { $_->childNodes }
-		@bodies;
+    my $html = join '',
+        map { $_->toString }
+        map { $_->childNodes }
+        @bodies;
 
-	if (defined $out) {
-		open my $fh, '>', $out
-			or die "Failed to open $out for writing: $!\n";
-		binmode $fh, ':utf8';
-		print { $fh } $html;
-		close $fh;
-		return $out;
-	} else {
-		return $html;
-	}
+    if (defined $out) {
+        open my $fh, '>', $out
+            or die "Failed to open $out for writing: $!\n";
+        binmode $fh, ':utf8';
+        print { $fh } $html;
+        close $fh;
+        return $out;
+    } else {
+        return $html;
+    }
 
 }
 
 sub raw {
 
-	my $self = shift;
-	my $out  = shift;
+    my $self = shift;
+    my $out  = shift;
 
-	my $ns = $self->{_dom}->documentElement->namespaceURI;
+    my $ns = $self->{_dom}->documentElement->namespaceURI;
 
-	my $xpc = XML::LibXML::XPathContext->new($self->{_dom});
-	$xpc->registerNs('FictionBook', $ns);
+    my $xpc = XML::LibXML::XPathContext->new($self->{_dom});
+    $xpc->registerNs('FictionBook', $ns);
 
-	my @bodies = $xpc->findnodes(
-		'/FictionBook:FictionBook' .
-		'/FictionBook:body'
-	) or die "Invalid FictionBook2 file $self->{Source}\n";
+    my @bodies = $xpc->findnodes(
+        '/FictionBook:FictionBook' .
+        '/FictionBook:body'
+    ) or die "Invalid FictionBook2 file $self->{Source}\n";
 
-	my $raw = join '', map { $_->textContent } @bodies;
+    my $raw = join '', map { $_->textContent } @bodies;
 
-	if (defined $out) {
-		open my $fh, '>', $out
-			or die "Failed to open $out for writing: $!\n";
-		binmode $fh, ':utf8';
-		print { $fh } $raw;
-		close $fh;
-		return $out;
-	} else {
-		return $raw;
-	}
+    if (defined $out) {
+        open my $fh, '>', $out
+            or die "Failed to open $out for writing: $!\n";
+        binmode $fh, ':utf8';
+        print { $fh } $raw;
+        close $fh;
+        return $out;
+    } else {
+        return $raw;
+    }
 
 }
 
 sub metadata {
 
-	my $self = shift;
+    my $self = shift;
 
-	return $self->{Metadata}->hash;
+    return $self->{Metadata}->hash;
 
 }
 
 sub has_cover {
 
-	my $self = shift;
+    my $self = shift;
 
-	return defined $self->{_cover};
+    return defined $self->{_cover};
 
 }
 
 sub cover {
 
-	my $self = shift;
-	my $out  = shift;
+    my $self = shift;
+    my $out  = shift;
 
-	return undef unless $self->has_cover;
+    return undef unless $self->has_cover;
 
-	my $bin = decode_base64($self->{_cover}->textContent);
+    my $bin = decode_base64($self->{_cover}->textContent);
 
-	if (defined $out) {
-		open my $fh, '>', $out
-			or die "Failed to open $out for writing: $!\n";
-		binmode $fh;
-		print { $fh } $bin;
-		close $fh;
-		return $out;
-	} else {
-		return $bin;
-	}
+    if (defined $out) {
+        open my $fh, '>', $out
+            or die "Failed to open $out for writing: $!\n";
+        binmode $fh;
+        print { $fh } $bin;
+        close $fh;
+        return $out;
+    } else {
+        return $bin;
+    }
 
 }
 
 sub image_num {
 
-	my $self = shift;
+    my $self = shift;
 
-	return scalar @{ $self->{_images} };
+    return scalar @{ $self->{_images} };
 
 }
 
 sub image {
 
-	my $self = shift;
-	my $n    = shift;
+    my $self = shift;
+    my $n    = shift;
 
-	if ($n >= $self->image_num) {
-		return undef;
-	}
+    if ($n >= $self->image_num) {
+        return undef;
+    }
 
-	my $img = decode_base64($self->{_images}[$n]->textContent);
+    my $img = decode_base64($self->{_images}[$n]->textContent);
 
-	return \$img;
+    return \$img;
 
 }
 

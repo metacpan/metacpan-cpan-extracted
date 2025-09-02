@@ -1,238 +1,238 @@
 package EBook::Ishmael::EBook::Metadata;
 use 5.016;
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 use strict;
 use warnings;
 
 sub new {
 
-	my $class = shift;
-	my $data  = shift // {};
+    my $class = shift;
+    my $data  = shift // {};
 
-	for my $k (keys %{ $data }) {
-		unless (ref $data->{ $k } eq 'ARRAY') {
-			die "'$k' is not an array ref";
-		}
-	}
+    for my $k (keys %{ $data }) {
+        unless (ref $data->{ $k } eq 'ARRAY') {
+            die "'$k' is not an array ref";
+        }
+    }
 
-	my $self = {
-		Author      => $data->{Author}      // [],
-		Software    => $data->{Software}    // [],
-		Created     => $data->{Created}     // [],
-		Modified    => $data->{Modified}    // [],
-		Format      => $data->{Format}      // [],
-		Title       => $data->{Title}       // [],
-		Language    => $data->{Language}    // [],
-		Genre       => $data->{Genre}       // [],
-		ID          => $data->{ID}          // [],
-		Description => $data->{Description} // [],
-		Contributor => $data->{Contributor} // [],
-	};
+    my $self = {
+        Author      => $data->{Author}      // [],
+        Software    => $data->{Software}    // [],
+        Created     => $data->{Created}     // [],
+        Modified    => $data->{Modified}    // [],
+        Format      => $data->{Format}      // [],
+        Title       => $data->{Title}       // [],
+        Language    => $data->{Language}    // [],
+        Genre       => $data->{Genre}       // [],
+        ID          => $data->{ID}          // [],
+        Description => $data->{Description} // [],
+        Contributor => $data->{Contributor} // [],
+    };
 
-	return bless $self, $class;
+    return bless $self, $class;
 
 }
 
 sub hash {
 
-	my $self = shift;
+    my $self = shift;
 
-	my $hash = { %{ $self } };
+    my $hash = { %{ $self } };
 
-	for my $k (keys %{ $hash }) {
-		unless (@{ $hash->{ $k } }) {
-			delete $hash->{ $k };
-		}
-	}
+    for my $k (keys %{ $hash }) {
+        unless (@{ $hash->{ $k } }) {
+            delete $hash->{ $k };
+        }
+    }
 
-	return $hash;
+    return $hash;
 
 }
 
 sub author {
 
-	my $self = shift;
-	my $set  = shift;
+    my $self = shift;
+    my $set  = shift;
 
-	unless (defined $set) {
-		return $self->{Author};
-	}
+    unless (defined $set) {
+        return $self->{Author};
+    }
 
-	unless (ref $set eq 'ARRAY') {
-		die "Setter requires array ref as argument";
-	}
+    unless (ref $set eq 'ARRAY') {
+        die "Setter requires array ref as argument";
+    }
 
-	$self->{Author} = $set;
+    $self->{Author} = $set;
 
 }
 
 sub software {
 
-	my $self = shift;
-	my $set  = shift;
+    my $self = shift;
+    my $set  = shift;
 
-	unless (defined $set) {
-		return $self->{Software};
-	}
+    unless (defined $set) {
+        return $self->{Software};
+    }
 
-	unless (ref $set eq 'ARRAY') {
-		die "Setter requires array ref as argument";
-	}
+    unless (ref $set eq 'ARRAY') {
+        die "Setter requires array ref as argument";
+    }
 
-	$self->{Software} = $set;
+    $self->{Software} = $set;
 
 }
 
 sub created {
 
-	my $self = shift;
-	my $set  = shift;
+    my $self = shift;
+    my $set  = shift;
 
-	unless (defined $set) {
-		return $self->{Created};
-	}
+    unless (defined $set) {
+        return $self->{Created};
+    }
 
-	unless (ref $set eq 'ARRAY') {
-		die "Setter requires array ref as argument";
-	}
+    unless (ref $set eq 'ARRAY') {
+        die "Setter requires array ref as argument";
+    }
 
-	$self->{Created} = $set;
+    $self->{Created} = $set;
 
 }
 
 sub modified {
 
-	my $self = shift;
-	my $set  = shift;
+    my $self = shift;
+    my $set  = shift;
 
-	unless (defined $set) {
-		return $self->{Modified};
-	}
+    unless (defined $set) {
+        return $self->{Modified};
+    }
 
-	unless (ref $set eq 'ARRAY') {
-		die "Setter requires array ref as argument";
-	}
+    unless (ref $set eq 'ARRAY') {
+        die "Setter requires array ref as argument";
+    }
 
-	$self->{Modified} = $set;
+    $self->{Modified} = $set;
 
 }
 
 sub format {
 
-	my $self = shift;
-	my $set  = shift;
+    my $self = shift;
+    my $set  = shift;
 
-	unless (defined $set) {
-		return $self->{Format};
-	}
+    unless (defined $set) {
+        return $self->{Format};
+    }
 
-	unless (ref $set eq 'ARRAY') {
-		die "Setter requires array ref as argument";
-	}
+    unless (ref $set eq 'ARRAY') {
+        die "Setter requires array ref as argument";
+    }
 
-	$self->{Format} = $set;
+    $self->{Format} = $set;
 
 }
 
 sub title {
 
-	my $self = shift;
-	my $set  = shift;
+    my $self = shift;
+    my $set  = shift;
 
-	unless (defined $set) {
-		return $self->{Title};
-	}
+    unless (defined $set) {
+        return $self->{Title};
+    }
 
-	unless (ref $set eq 'ARRAY') {
-		die "Setter requires array ref as argument";
-	}
+    unless (ref $set eq 'ARRAY') {
+        die "Setter requires array ref as argument";
+    }
 
-	$self->{Title} = $set;
+    $self->{Title} = $set;
 
 }
 
 sub language {
 
-	my $self = shift;
-	my $set  = shift;
+    my $self = shift;
+    my $set  = shift;
 
-	unless (defined $set) {
-		return $self->{Language};
-	}
+    unless (defined $set) {
+        return $self->{Language};
+    }
 
-	unless (ref $set eq 'ARRAY') {
-		die "Setter requires array ref as argument";
-	}
+    unless (ref $set eq 'ARRAY') {
+        die "Setter requires array ref as argument";
+    }
 
-	$self->{Language} = $set;
+    $self->{Language} = $set;
 
 }
 
 sub genre {
 
-	my $self = shift;
-	my $set  = shift;
+    my $self = shift;
+    my $set  = shift;
 
-	unless (defined $set) {
-		return $self->{Genre};
-	}
+    unless (defined $set) {
+        return $self->{Genre};
+    }
 
-	unless (ref $set eq 'ARRAY') {
-		die "Setter requires array ref as argument";
-	}
+    unless (ref $set eq 'ARRAY') {
+        die "Setter requires array ref as argument";
+    }
 
-	$self->{Genre} = $set;
+    $self->{Genre} = $set;
 
 }
 
 sub id {
 
-	my $self = shift;
-	my $set  = shift;
+    my $self = shift;
+    my $set  = shift;
 
-	unless (defined $set) {
-		return $self->{ID};
-	}
+    unless (defined $set) {
+        return $self->{ID};
+    }
 
-	unless (ref $set eq 'ARRAY') {
-		die "Setter requires array ref as argument";
-	}
+    unless (ref $set eq 'ARRAY') {
+        die "Setter requires array ref as argument";
+    }
 
-	$self->{ID} = $set;
+    $self->{ID} = $set;
 
 }
 
 sub description {
 
-	my $self = shift;
-	my $set  = shift;
+    my $self = shift;
+    my $set  = shift;
 
-	unless (defined $set) {
-		return $self->{Description};
-	}
+    unless (defined $set) {
+        return $self->{Description};
+    }
 
-	unless (ref $set eq 'ARRAY') {
-		die "Setter requires array ref as argument";
-	}
+    unless (ref $set eq 'ARRAY') {
+        die "Setter requires array ref as argument";
+    }
 
-	$self->{Description} = $set;
+    $self->{Description} = $set;
 
 }
 
 sub contributor {
 
-	my $self = shift;
-	my $set  = shift;
+    my $self = shift;
+    my $set  = shift;
 
-	unless (defined $set) {
-		return $self->{Contributor};
-	}
+    unless (defined $set) {
+        return $self->{Contributor};
+    }
 
-	unless (ref $set eq 'ARRAY') {
-		die "Setter requires array ref as argument";
-	}
+    unless (ref $set eq 'ARRAY') {
+        die "Setter requires array ref as argument";
+    }
 
-	$self->{Contributor} = $set;
+    $self->{Contributor} = $set;
 
 }
 

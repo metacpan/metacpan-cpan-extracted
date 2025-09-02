@@ -13,7 +13,7 @@ use EBook::Ishmael::ImageID;
 my $TEST_PDF = $ENV{TEST_PDF} // $EBook::Ishmael::EBook::PDF::CAN_TEST;
 
 unless ($TEST_PDF) {
-	plan skip_all => "TEST_PDF set to 0 or poppler utils are not installed";
+    plan skip_all => "TEST_PDF set to 0 or PDF utils are not installed";
 }
 
 my $PDF = File::Spec->catfile(qw/t data gpl3.pdf/);
@@ -27,9 +27,9 @@ is($ebook->metadata->{Author}[0], 'Unknown', 'metadata author ok');
 is($ebook->metadata->{Format}[0], 'PDF 1.4', 'metadata format ok');
 
 is_deeply(
-	$ebook->metadata->{Contributor},
-	[ 'calibre 7.16.0', 'calibre 7.16.0' ],
-	'metadata software ok'
+    $ebook->metadata->{Contributor},
+    [ 'calibre 7.16.0', 'calibre 7.16.0' ],
+    'metadata software ok'
 );
 
 is($ebook->metadata->{Title}[0], 'gpl3', 'metadata title ok');
@@ -44,9 +44,9 @@ ok($ebook->html, "html ok");
 ok($ebook->has_cover, "has cover");
 
 is(
-	image_id(\($ebook->cover)),
-	"png",
-	"cover looks like a png"
+    image_id(\($ebook->cover)),
+    "png",
+    "cover looks like a png"
 );
 
 is($ebook->image_num, 0, "image count ok");

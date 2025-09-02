@@ -1,6 +1,4 @@
 .gitattributes
-.github/workflows/linux-ubuntu-latest-32bit.yml
-.github/workflows/linux-ubuntu-latest-perl-5.8.9.yml
 .github/workflows/linux-ubuntu-latest.yml
 .github/workflows/macos-latest.yml
 .github/workflows/windows-latest.yml
@@ -94,6 +92,8 @@ lib/SPVM/Resource/Zlib.native/src/contrib/minizip/MiniZip64_info.txt
 lib/SPVM/Resource/Zlib.native/src/contrib/minizip/mztools.c
 lib/SPVM/Resource/Zlib.native/src/contrib/minizip/unzip.c
 lib/SPVM/Resource/Zlib.native/src/contrib/minizip/zip.c
+lib/SPVM/Resource/Zlib.native/src/contrib/nuget/nuget.csproj
+lib/SPVM/Resource/Zlib.native/src/contrib/nuget/nuget.sln
 lib/SPVM/Resource/Zlib.native/src/contrib/pascal/example.pas
 lib/SPVM/Resource/Zlib.native/src/contrib/pascal/readme.txt
 lib/SPVM/Resource/Zlib.native/src/contrib/pascal/zlibd32.mak
@@ -152,6 +152,15 @@ lib/SPVM/Resource/Zlib.native/src/contrib/vstudio/vc14/zlibstat.vcxproj
 lib/SPVM/Resource/Zlib.native/src/contrib/vstudio/vc14/zlibvc.def
 lib/SPVM/Resource/Zlib.native/src/contrib/vstudio/vc14/zlibvc.sln
 lib/SPVM/Resource/Zlib.native/src/contrib/vstudio/vc14/zlibvc.vcxproj
+lib/SPVM/Resource/Zlib.native/src/contrib/vstudio/vc17/miniunz.vcxproj
+lib/SPVM/Resource/Zlib.native/src/contrib/vstudio/vc17/minizip.vcxproj
+lib/SPVM/Resource/Zlib.native/src/contrib/vstudio/vc17/testzlib.vcxproj
+lib/SPVM/Resource/Zlib.native/src/contrib/vstudio/vc17/testzlibdll.vcxproj
+lib/SPVM/Resource/Zlib.native/src/contrib/vstudio/vc17/zlib.rc
+lib/SPVM/Resource/Zlib.native/src/contrib/vstudio/vc17/zlibstat.vcxproj
+lib/SPVM/Resource/Zlib.native/src/contrib/vstudio/vc17/zlibvc.def
+lib/SPVM/Resource/Zlib.native/src/contrib/vstudio/vc17/zlibvc.sln
+lib/SPVM/Resource/Zlib.native/src/contrib/vstudio/vc17/zlibvc.vcxproj
 lib/SPVM/Resource/Zlib.native/src/contrib/vstudio/vc9/miniunz.vcproj
 lib/SPVM/Resource/Zlib.native/src/contrib/vstudio/vc9/minizip.vcproj
 lib/SPVM/Resource/Zlib.native/src/contrib/vstudio/vc9/testzlib.vcproj
@@ -237,7 +246,6 @@ lib/SPVM/Resource/Zlib.native/src/zlib.3.pdf
 lib/SPVM/Resource/Zlib.native/src/zlib.map
 lib/SPVM/Resource/Zlib.native/src/zlib.pc.cmakein
 lib/SPVM/Resource/Zlib.native/src/zlib.pc.in
-lib/SPVM/Resource/Zlib.native/src/zlib2ansi
 lib/SPVM/Resource/Zlib.native/src/zutil.c
 lib/SPVM/Resource/Zlib.pm
 lib/SPVM/Resource/Zlib.spvm

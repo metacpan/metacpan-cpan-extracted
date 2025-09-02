@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/pine/p5-Hash-Util-Pick.svg?branch=master)](https://travis-ci.org/pine/p5-Hash-Util-Pick) [![Build Status](https://img.shields.io/appveyor/ci/pine/p5-Hash-Util-Pick/master.svg?logo=appveyor)](https://ci.appveyor.com/project/pine/p5-Hash-Util-Pick/branch/master)
+[![Actions Status](https://github.com/pine/p5-Hash-Util-Pick/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/pine/p5-Hash-Util-Pick/actions?workflow=test) [![MetaCPAN Release](https://badge.fury.io/pl/Hash-Util-Pick.svg)](https://metacpan.org/release/Hash-Util-Pick)
 # NAME
 
 Hash::Util::Pick - The non-destructive utilities for picking hash
@@ -14,7 +14,7 @@ my $src = {
     baz => 2,
 };
 
-my $dest = pick $hash => qw/foo bar/;
+my $dest = pick $src => qw/foo bar/;
 # => { foo => 0, bar => 1 }
 ```
 
@@ -68,7 +68,7 @@ omit_by { foo => 0, bar => 1 } => sub { $_ > 0 }; # { foo => 0 }
 
 The MIT License (MIT)
 
-Copyright (c) 2016-2019 Pine Mizune
+Copyright (c) 2016-2019, 2025 Pine Mizune
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

@@ -29,19 +29,19 @@ ok($ebook->has_cover, "has cover");
 
 ok($ebook->cover, "cover ok");
 is(
-	image_id(\($ebook->cover)),
-	"png",
-	"cover looks like a png"
+    image_id(\($ebook->cover)),
+    "png",
+    "cover looks like a png"
 );
 
 is($ebook->image_num, 28, "image count ok");
 
 for my $i (0 .. 27) {
-	is(
-		image_id($ebook->image($i)),
-		"png",
-		"image #$i ok"
-	);
+    is(
+        image_id($ebook->image($i)),
+        "png",
+        "image #$i ok"
+    );
 }
 
 done_testing();

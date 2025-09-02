@@ -1,5 +1,5 @@
 name = "Text-Diff-Unified-XS"
-badges = ["travis"]
+badges = ["github-actions/test.yml", "metacpan"]
 authority = "cpan:PINE"
 license = "mit"
 

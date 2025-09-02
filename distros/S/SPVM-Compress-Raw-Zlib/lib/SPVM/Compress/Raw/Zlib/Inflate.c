@@ -73,28 +73,6 @@ int32_t SPVM__Compress__Raw__Zlib__Inflate__inflateReset(SPVM_ENV* env, SPVM_VAL
   return error_id;
 }
 
-int32_t SPVM__Compress__Raw__Zlib__Inflate__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
-  
-  int32_t error_id = 0;
-  
-  void* obj_self = stack[0].oval;
-  
-  void* obj_z_stream = env->get_field_object_by_name(env, stack, obj_self, "z_stream", &error_id, __func__, FILE_NAME, __LINE__);
-  if (error_id) { goto END_OF_FUNC; }
-  
-  if (obj_z_stream) {
-    z_stream* st_z_stream = env->get_pointer(env, stack, obj_z_stream);
-    
-    inflateEnd(st_z_stream);
-    
-    env->free_memory_block(env, stack, st_z_stream);
-  }
-  
-  END_OF_FUNC:
-  
-  return error_id;
-}
-
 int32_t SPVM__Compress__Raw__Zlib__Inflate__inflate(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t error_id = 0;
@@ -124,6 +102,9 @@ int32_t SPVM__Compress__Raw__Zlib__Inflate__inflate(SPVM_ENV* env, SPVM_VALUE* s
   if (error_id) { goto END_OF_FUNC; }
   
   int32_t LimitOutput = env->get_field_byte_by_name(env, stack, obj_self, "LimitOutput", &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) { goto END_OF_FUNC; }
+  
+  int32_t AppendOutput = env->get_field_byte_by_name(env, stack, obj_self, "AppendOutput", &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { goto END_OF_FUNC; }
   
   char* input = (char*)env->get_chars(env, stack, obj_input);
@@ -216,6 +197,14 @@ int32_t SPVM__Compress__Raw__Zlib__Inflate__inflate(SPVM_ENV* env, SPVM_VALUE* s
   
   void* obj_output = env->new_string(env, stack, output, output_length);
   
+  if (AppendOutput) {
+    void* obj_output_arg = env->get_elem_object(env, stack, obj_output_ref, 0);
+    
+    if (obj_output_arg) {
+      obj_output = env->concat(env, stack, obj_output_arg, obj_output);
+    }
+  }
+  
   env->set_elem_object(env, stack, obj_output_ref, 0, obj_output);
   
   int32_t used_input_length = input_length - st_z_stream->avail_in;
@@ -232,6 +221,28 @@ int32_t SPVM__Compress__Raw__Zlib__Inflate__inflate(SPVM_ENV* env, SPVM_VALUE* s
   }
   
   stack[0].ival = status;
+  
+  return error_id;
+}
+
+int32_t SPVM__Compress__Raw__Zlib__Inflate__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t error_id = 0;
+  
+  void* obj_self = stack[0].oval;
+  
+  void* obj_z_stream = env->get_field_object_by_name(env, stack, obj_self, "z_stream", &error_id, __func__, FILE_NAME, __LINE__);
+  if (error_id) { goto END_OF_FUNC; }
+  
+  if (obj_z_stream) {
+    z_stream* st_z_stream = env->get_pointer(env, stack, obj_z_stream);
+    
+    inflateEnd(st_z_stream);
+    
+    env->free_memory_block(env, stack, st_z_stream);
+  }
+  
+  END_OF_FUNC:
   
   return error_id;
 }

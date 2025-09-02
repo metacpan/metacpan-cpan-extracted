@@ -64,6 +64,12 @@ The initial size for the output buffer.
 
 See L</"inflate"> about this option.
 
+=item * C<AppendOutput> : Int = 0
+
+If this option is set to false, the output buffers in L</"inflate"> method will be truncated before uncompressed data is written to them.
+
+If the option is set to true, uncompressed data will be appended to the output buffer in L</"inflate"> methods.
+
 =back
 
 See L<Compress::Raw::Zlib::Constant|SPVM::Compress::Raw::Zlib::Constant> about C<zlib> constants.

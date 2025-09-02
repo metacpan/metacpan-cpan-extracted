@@ -1,0 +1,12 @@
+#############################
+# Module Math::FakeBfloat16 #
+#############################
+
+Emulates __bf16 arithmetic using Math::MPFR objects.
+The __bf16 type is not needed, and not sought by this module.
+
+Math-MPFR-4.44 or later is required .
+
+Please report any bugs to https://github.com/sisyphus/math-fakebfloat16/issues.
+
+

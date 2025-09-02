@@ -1,4 +1,8 @@
 Revision history for Bit-Set
 
+0.03      2025-09-01 22:18:09-06:00 America/Denver
+- Extended documentation for performance considerations
+0.02      2025-09-01 08:54:19-06:00 America/Denver
+0.02 Fixed documentation formatting
 0.01      2025-08-31 14:34:48-06:00 America/Denver
 -	Initial release

@@ -12,7 +12,7 @@ sub new {
         needs_compiler_cpp   => 1,
         generate_xshelper_h  => 'src/xshelper.h',
         generate_ppport_h    => 'src/ppport.h',
-        extra_compiler_flags => ['-DPERL_EXT', '-Ivendor/dtl'],
+        extra_compiler_flags => ['-DPERL_EXT', '-Idtl'],
     );
 }
 

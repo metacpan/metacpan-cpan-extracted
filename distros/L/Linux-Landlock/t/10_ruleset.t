@@ -11,11 +11,12 @@ use File::Basename;
 use Linux::Landlock::Direct qw(:constants);
 use Math::BigInt;
 
-my $ppid = getppid;
+my $ppid        = getppid;
 my $base        = dirname(__FILE__) . '/data';
 my $abi_version = Linux::Landlock->get_abi_version();
 if ($abi_version < 0) {
-    throws_ok(sub { Linux::Landlock->new() }, qr/not available/, "Landlock not available");
+    my $ruleset = Linux::Landlock->new();
+    ok(!$ruleset->allow_perl_inc_access(), "nothing done");
 } else {
     my $ruleset = Linux::Landlock->new(restricted_ipc => [], die_on_unsupported => 1);
     ok($ruleset->allow_perl_inc_access(), "allow_perl_inc_access");
@@ -37,13 +38,13 @@ if ($abi_version < 0) {
     }
     ok(defined IO::Dir->new("/"),  "can opendir /");
     ok($ruleset->apply(),          "apply ruleset");
-    ok(kill(0, $ppid),                "can signal parent ($ppid)");
+    ok(kill(0, $ppid),             "can signal parent ($ppid)");
     ok(!defined IO::Dir->new("/"), "can no longer opendir /");
     ok($!{EACCES},                 "correct error: $!");
     $! = 0;
     ok(eval { require Data::Dumper; }, "require Data::Dumper");
 
-    SKIP: {
+  SKIP: {
         skip "no network support", if $abi_version < 4;
         ok(defined IO::Socket::INET->new(LocalPort  => 33333, Proto => 'tcp',), "socket created");
         ok(!defined IO::Socket::INET->new(LocalPort => 33334, Proto => 'tcp',), "socket not created: $!");
@@ -60,9 +61,9 @@ if ($abi_version < 0) {
     ok(defined IO::File->new("$base/a", 'r'), "readable: $base/a");
     ok(defined IO::File->new("$base/b", 'r'), "readable: $base/b");
     # may not exist in some environments
-    SKIP: {
+  SKIP: {
         skip "no /usr/bin/cat", unless -x '/usr/bin/cat';
-        is(system("/usr/bin/cat $base/a"), 0, "cat $base/a is allowed...");
+        is(system("/usr/bin/cat $base/a"),             0, "cat $base/a is allowed...");
         is(system("/usr/bin/cat $base/a > /dev/null"), 0, "... as is writing to /dev/null");
     }
 
@@ -74,16 +75,16 @@ if ($abi_version < 0) {
         "allow read_file on $base/a"
     );
     ok($ruleset2->apply(), "apply ruleset");
-    SKIP: {
+  SKIP: {
         skip "No signal restrictions possible", if $abi_version < 6;
-        ok(!kill(0, $ppid),               "cannot signal parent ($ppid)");
+        ok(!kill(0, $ppid), "cannot signal parent ($ppid)");
     }
-    ok(-r "$base/b",       "technically readable: $base/b");
+    ok(-r "$base/b", "technically readable: $base/b");
     $! = 0;
     ok(!defined IO::File->new("$base/b", 'r'), "no longer readable: $base/b");
     ok($!{EACCES},                             "correct error: $!");
-    ok(defined IO::File->new("$base/a", 'r'), "still readable: $base/a...");
-    SKIP: {
+    ok(defined IO::File->new("$base/a", 'r'),  "still readable: $base/a...");
+  SKIP: {
         skip "no /usr/bin/cat", unless -x '/usr/bin/cat';
         is(system("/usr/bin/cat $base/a"), -1, "no permission to run cat");
     }

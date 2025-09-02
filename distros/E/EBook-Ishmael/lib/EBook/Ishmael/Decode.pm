@@ -1,6 +1,6 @@
 package EBook::Ishmael::Decode;
 use 5.016;
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 use strict;
 use warnings;
 
@@ -9,43 +9,43 @@ our @EXPORT_OK = qw(lz77_decode);
 
 sub lz77_decode {
 
-	my $encode = shift;
+    my $encode = shift;
 
-	my $len = length $encode;
-	my $p = 0;
+    my $len = length $encode;
+    my $p = 0;
 
-	my $decode = '';
+    my $decode = '';
 
-	while ($p < $len) {
+    while ($p < $len) {
 
-		my $b = ord substr $encode, $p++, 1;
+        my $b = ord substr $encode, $p++, 1;
 
-		# space + xor byte with 0x80
-		if ($b >= 0xc0) {
-			$decode .= ' ';
-			$decode .= chr($b ^ 0x80);
-		# length-distance pair: get next byte, strip 2 leading bits, split byte
-		# into 11 bits of distance and 3 bits of length + 3
-		} elsif ($b >= 0x80) {
-			$b = ($b << 8) + ord substr $encode, $p++, 1;
-			my $d = ($b & 0x3fff) >> 3;
-			my $l = ($b & 0x0007) + 3;
-			$decode .= substr $decode, -$d, 1 while $l--;
-		# literal copy
-		} elsif ($b >= 0x09) {
-			$decode .= chr $b;
-		# copy next 1-8 bytes
-		} elsif ($b >= 0x01) {
-			$decode .= substr $encode, $p, $b;
-			$p += $b;
-		# copy null byte
-		} else {
-			$decode .= "\0";
-		}
+        # space + xor byte with 0x80
+        if ($b >= 0xc0) {
+            $decode .= ' ';
+            $decode .= chr($b ^ 0x80);
+        # length-distance pair: get next byte, strip 2 leading bits, split byte
+        # into 11 bits of distance and 3 bits of length + 3
+        } elsif ($b >= 0x80) {
+            $b = ($b << 8) + ord substr $encode, $p++, 1;
+            my $d = ($b & 0x3fff) >> 3;
+            my $l = ($b & 0x0007) + 3;
+            $decode .= substr $decode, -$d, 1 while $l--;
+        # literal copy
+        } elsif ($b >= 0x09) {
+            $decode .= chr $b;
+        # copy next 1-8 bytes
+        } elsif ($b >= 0x01) {
+            $decode .= substr $encode, $p, $b;
+            $p += $b;
+        # copy null byte
+        } else {
+            $decode .= "\0";
+        }
 
-	}
+    }
 
-	return $decode;
+    return $decode;
 
 }
 

@@ -184,7 +184,7 @@ use Linux::Landlock::Direct qw(
   ll_set_max_abi_version
   set_no_new_privs
 );
-our $VERSION = '0.9';
+our $VERSION = '0.9.2';
 
 sub new {
     my ($class, %args) = @_;
@@ -193,10 +193,13 @@ sub new {
         ll_set_max_abi_version($args{supported_abi_version});
     }
     my $kernel_abi_version = ll_get_abi_version();
-    warn "Landlock is not available\n" if $kernel_abi_version < 1;
     my $self = bless {}, $class;
     $self->{die_on_unsupported} = $args{die_on_unsupported};
-    $self->{_rule_fd}           = ll_create_ruleset(
+    if ($kernel_abi_version < 1) {
+        warn "Landlock is not available\n";
+        return $self;
+    }
+    $self->{_rule_fd} = ll_create_ruleset(
         __reduce_path_beneath_rules($args{handled_fs_actions}),
         __reduce_net_port_rules($args{handled_net_actions}),
         __reduce_ipc_scopes($args{restricted_ipc}),
@@ -204,11 +207,27 @@ sub new {
     return $self;
 }
 
+sub _is_available {
+    my ($self) = @_;
+    if (!defined $self->{_rule_fd}) {
+        if ($self->{die_on_unsupported}) {
+            die "Landlock is not available\n";
+        }
+    } else {
+        return 1;
+    }
+}
+
 sub apply {
     my ($self) = @_;
-    set_no_new_privs()                  or die "Failed to set no_new_privs: $!\n";
-    ll_restrict_self($self->{_rule_fd}) or die "Failed to restrict self: $!\n";
-    return 1;
+
+    if ($self->_is_available()) {
+        set_no_new_privs()                  or die "Failed to set no_new_privs: $!\n";
+        ll_restrict_self($self->{_rule_fd}) or die "Failed to restrict self: $!\n";
+        return 1;
+    } else {
+        return;
+    }
 }
 
 sub get_abi_version {
@@ -218,22 +237,24 @@ sub get_abi_version {
 sub add_path_beneath_rule {
     my ($self, $path, @allowed) = @_;
 
-    my $is_dir = -d $path;
-    if (my $fd = $is_dir ? POSIX::opendir($path) : POSIX::open($path)) {
-        my $allowed = __reduce_path_beneath_rules(\@allowed);
-        my $result  = ll_add_path_beneath_rule($self->{_rule_fd}, $allowed, $fd);
-        if ($is_dir) {
-            POSIX::closedir($fd);
+    if ($self->_is_available()) {
+        my $is_dir = -d $path;
+        if (my $fd = $is_dir ? POSIX::opendir($path) : POSIX::open($path)) {
+            my $allowed = __reduce_path_beneath_rules(\@allowed);
+            my $result  = ll_add_path_beneath_rule($self->{_rule_fd}, $allowed, $fd);
+            if ($is_dir) {
+                POSIX::closedir($fd);
+            } else {
+                POSIX::close($fd);
+            }
+            die "Failed to add rule: $!\n" unless $result;
+            if ($result != $allowed && $self->{die_on_unsupported}) {
+                die "Unsupported access rights: $allowed vs. $result\n";
+            }
+            return $result;
         } else {
-            POSIX::close($fd);
+            die "Failed to open $path: $!\n";
         }
-        die "Failed to add rule: $!\n" unless $result;
-        if ($result != $allowed && $self->{die_on_unsupported}) {
-            die "Unsupported access rights: $allowed vs. $result\n";
-        }
-        return $result;
-    } else {
-        die "Failed to open $path: $!\n";
     }
 }
 
@@ -273,32 +294,36 @@ sub __reduce_ipc_scopes {
 sub add_net_port_rule {
     my ($self, $port, @allowed) = @_;
 
-    my $allowed = __reduce_net_port_rules(\@allowed);
-    my $result  = ll_add_net_port_rule($self->{_rule_fd}, $allowed, $port) or die "Failed to add rule: $!\n";
-    if ($result != $allowed && $self->{die_on_unsupported}) {
-        die "Unsupported access rights: $allowed vs. $result\n";
+    if ($self->_is_available()) {
+        my $allowed = __reduce_net_port_rules(\@allowed);
+        my $result = ll_add_net_port_rule($self->{_rule_fd}, $allowed, $port) or die "Failed to add rule: $!\n";
+        if ($result != $allowed && $self->{die_on_unsupported}) {
+            die "Unsupported access rights: $allowed vs. $result\n";
+        }
+        return $result;
     }
-    return $result;
 }
 
 sub allow_perl_inc_access {
     my ($self) = @_;
 
+    my $result = 1;
     for (@INC) {
         next unless -d $_;
         next if $_ eq '.';
-        $self->add_path_beneath_rule($_, qw(read_file read_dir));
+        $result &&= $self->add_path_beneath_rule($_, qw(read_file read_dir));
     }
-    return 1;
+    return $result;
 }
 
 sub allow_std_dev_access {
     my ($self) = @_;
 
+    my $result = 1;
     for (qw(null zero random urandom)) {
-        $self->add_path_beneath_rule("/dev/$_", qw(read_file write_file));
+        $result &&= $self->add_path_beneath_rule("/dev/$_", qw(read_file write_file));
     }
-    return 1;
+    return $result;
 }
 
 sub DESTROY {

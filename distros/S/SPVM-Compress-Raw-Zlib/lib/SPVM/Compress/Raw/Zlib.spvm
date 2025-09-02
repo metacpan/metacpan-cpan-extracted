@@ -2,8 +2,37 @@
 # MIT License
 
 class Compress::Raw::Zlib {
-  version "0.002";
+  version "0.003";
   
   use Resource::Zlib;
+  
+  use Compress::Raw::Zlib::Deflate;
+  
+  use Compress::Raw::Zlib::Inflate;
+  
+  use Compress::Raw::Zlib::Constant as ZLIB;
+  
+  # Class Methods;
+  static method gzip : void ($input : string, $output_ref : string[], $options : object[] = undef) {
+    
+    $options = Fn->merge_options($options, {AppendOutput => 1, WindowBits => ZLIB->WANT_GZIP});
+    
+    my $deflate = Compress::Raw::Zlib::Deflate->new($options);
+    
+    $deflate->deflate($input, $output_ref);
+    
+    $deflate->flush($output_ref);
+  }
+  
+  static method gunzip : void ($input : string, $output_ref : string[], $options : object[] = undef) {
+    
+    $options = Fn->merge_options($options, {AppendOutput => 1, WindowBits => ZLIB->WANT_GZIP});
+    
+    my $inflate = Compress::Raw::Zlib::Inflate->new($options);
+    
+    my $input_copy = (mutable string)copy $input;
+    
+    $inflate->inflate($input_copy, $output_ref);
+  }
   
 }

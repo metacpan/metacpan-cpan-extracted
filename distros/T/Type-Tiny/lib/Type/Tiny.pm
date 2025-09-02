@@ -10,7 +10,7 @@ BEGIN {
 
 BEGIN {
 	$Type::Tiny::AUTHORITY  = 'cpan:TOBYINK';
-	$Type::Tiny::VERSION    = '2.008002';
+	$Type::Tiny::VERSION    = '2.008003';
 	$Type::Tiny::XS_VERSION = '0.016';
 }
 
@@ -66,8 +66,9 @@ our @InternalPackages = qw(
 	Type::Tiny
 	Type::Tiny::_DeclaredType
 	Type::Tiny::_HalfOp
+	Type::Tiny::Bitfield
 	Type::Tiny::Class
-	Type::Tiny::ConsrtainedObject
+	Type::Tiny::ConstrainedObject
 	Type::Tiny::Duck
 	Type::Tiny::Enum
 	Type::Tiny::Intersection
@@ -494,6 +495,7 @@ sub _dd {
 		local $Data::Dumper::Maxdepth = 2;
 		my $str;
 		eval {
+			local $SIG{__WARN__} = sub {};
 			$str = Data::Dumper::Dumper( $value );
 			$str = substr( $str, 0, $N - 12 ) . '...' . substr( $str, -1, 1 )
 				if length( $str ) >= $N;
@@ -1495,6 +1497,8 @@ my %object_methods = (
 	numifies_to           => 1
 );
 
+my $re_list_methods = qr/\A(?:(?:a(?:ll|ny|ssert_a(?:ll|ny))|first|grep|map|rsort|sort))\z/;
+
 sub can {
 	my $self = shift;
 	
@@ -1507,11 +1511,6 @@ sub can {
 	return $can if $can;
 	
 	if ( ref( $self ) ) {
-		if ( $INC{"Moose/Meta/TypeConstraint.pm"} ) {
-			my $method = $self->moose_type->can( @_ );
-			return sub { shift->moose_type->$method( @_ ) }
-				if $method;
-		}
 		if ( $_[0] =~ /\Amy_(.+)\z/ ) {
 			my $method = $self->_lookup_my_method( $1 );
 			return $method if $method;
@@ -1520,12 +1519,16 @@ sub can {
 			require Type::Tiny::ConstrainedObject;
 			return Type::Tiny::ConstrainedObject->can( $_[0] );
 		}
-		for my $util ( qw/ grep map sort rsort first any all assert_any assert_all / ) {
-			if ( $_[0] eq $util ) {
-				$self->{'_util'}{$util} ||= eval { $self->_build_util( $util ) };
-				return unless $self->{'_util'}{$util};
-				return sub { my $s = shift; $s->{'_util'}{$util}( @_ ) };
-			}
+		if ( $_[0] =~ $re_list_methods ) {
+			my $util = $_[0];
+			$self->{'_util'}{$util} ||= eval { $self->_build_util( $util ) };
+			return unless $self->{'_util'}{$util};
+			return sub { my $s = shift; $s->{'_util'}{$util}( @_ ) };
+		}
+		if ( $INC{"Moose/Meta/TypeConstraint.pm"} ) {
+			my $method = $self->moose_type->can( @_ );
+			return sub { shift->moose_type->$method( @_ ) }
+				if $method;
 		}
 	} #/ if ( ref( $self ) )
 	
@@ -1538,10 +1541,6 @@ sub AUTOLOAD {
 	return if $m eq 'DESTROY';
 	
 	if ( ref( $self ) ) {
-		if ( $INC{"Moose/Meta/TypeConstraint.pm"} ) {
-			my $method = $self->moose_type->can( $m );
-			return $self->moose_type->$method( @_ ) if $method;
-		}
 		if ( $m =~ /\Amy_(.+)\z/ ) {
 			my $method = $self->_lookup_my_method( $1 );
 			return &$method( $self, @_ ) if $method;
@@ -1552,10 +1551,12 @@ sub AUTOLOAD {
 			no strict 'refs';
 			goto \&{"Type::Tiny::ConstrainedObject::$m"};
 		}
-		for my $util ( qw/ grep map sort rsort first any all assert_any assert_all / ) {
-			if ( $m eq $util ) {
-				return ( $self->{'_util'}{$util} ||= $self->_build_util( $util ) )->( @_ );
-			}
+		if ( $m =~ $re_list_methods ) {
+			return ( $self->{'_util'}{$m} ||= $self->_build_util( $m ) )->( @_ );
+		}
+		if ( $INC{"Moose/Meta/TypeConstraint.pm"} ) {
+			my $method = $self->moose_type->can( $m );
+			return $self->moose_type->$method( @_ ) if $method;
 		}
 	} #/ if ( ref( $self ) )
 	

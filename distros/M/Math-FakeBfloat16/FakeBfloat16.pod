@@ -1,0 +1,168 @@
+
+=pod
+
+=head1 NAME
+
+ Math::FakeBfloat16 - Emulate __bf16 floating point arithmetic.
+
+=head1 DEPENDENCIES
+
+ This module requires Math-MPFR-4.44 or later.
+
+=head1 DESCRIPTION
+
+ We emulate the __bf16 arithmetic using Math::MPFR objects.
+ (Access to the __bf16 C type is neither sought nor required.)
+
+=head1 SYNOPSIS
+
+ Values can be assigned either as an IV (42), a PV ("1.414164"), an
+ NV (1.414164), a Math::MPFR object (Math::MPFR->new("1.414164")),
+ a Math::GMPq object (Math::GMPq->new("1.414164')) or a Math::GMPf
+ object (Math::GMPf->new("1.414164")).
+ And the values held within a Math::FakeBfloat16 object can be
+ interpolated by double-quoting the object :
+
+ my $val = '1.41416';
+ my $obj = Math::FakeBfloat16->new($val);
+ print "$obj\n"; # prints 1.414.
+
+ All input values are effectively cast to a __bf16 value, rounded
+ to nearest, with ties to even.
+
+ NOTE !!!!!!! :
+  If you want to assign a specific value (eg 1.96500000000000014e2)
+  it is better to assign it as a PV. It will then be rounded only
+  once. If you first assign that value to something else (eg an NV),
+  and then assign it to a Math::FakeBfloat16 object, the  value can
+  be rounded twice. In the following example the value is firstly
+  rounded to an NV, and secondly from the NV to the 8-bit
+  precision Math::FakeBfloat16 object. EXAMPLE (when $Config{nvtype}
+  is 'double'):
+
+   my $pv = '1.96500000000000014e2';
+   my $nv =  1.96500000000000014e2 ;
+   print Math::FakeBfloat16->new($pv); # 1.97e2 (rounded only once)
+   print Math::FakeBfloat16->new($nv); # 1.96e2 (rounded twice)
+
+  Mostly it won't matter, but we see here that it sometimes can.
+
+ The __bf16 has only 8 bits of precision.
+ Maximum finite value is 3.39e38.
+ Minimum positive non-zero value is 9.184e-41.
+
+=head1 ASSIGNMENT FUNCTIONS
+
+    $obj = Math::FakeBfloat16->new($[val]);
+    $obj = Math::FakeBfloat16::new([$val]);
+     Set $obj to a Math::FakeBfloat16 object with value $val.
+     If $val is not provided, the $obj has the value NaN.
+     $val cab be an IV (integer), an NV (perl float), a PV (string),
+     a Math::FakeBfloat16 object, a Math::MPFR object, a Math::GMPf
+     object or a Math::GMPq object.
+     See the SYNOPSIS section (above) for some elaboration,
+     If necessay, $val will be rounded (to nearest, ties to even)
+     to fit into the __bf16 type.
+
+    bf16_set($obj, $val);
+     Set the value of $obj to the value specified by $val (rounded
+     to nearest, ties to even if necessary.)
+     $val can be any one of the types that new() accepts.
+
+    bf16_set_nan($obj);
+     Se the value of $obj to NaN.
+
+    bf16_set_inf($obj, $iv);
+     If $iv is greater than or equal to 0, then set $obj to +Inf.
+     Else set $obj to -Inf.
+
+    bf16_set_zero($obj, $iv);
+     If $iv is greater than or equal to 0, then set $obj to 0.
+     Else set $obj to -0.
+
+=head1 ARITHMETIC
+
+ All arithmetic is done via the overloading of the
+ '+', '-', '*', '/', '%', '**'/, '+=', '-=', '*=', '/=', '%=',
+ and '**=' operators.
+ The '%' and '%=' overloading calls the fmod function.
+
+ The 'log', 'exp', 'sqrt', 'abs' and 'int' functions are also
+ overloaded.
+
+=head1 COMPARISON
+
+ The following comparison operators are also overloaded :
+ '==', '!=', '>', '>=', '<', '<=' and '<=>'
+
+ Also, the following boolean operations:
+  '!' and 'bool'
+
+=head1 OUTPUT FUNCTIONS
+
+    $string = "$obj";
+     Set $str to the value of $obj in decimal scientific
+     notation (eg 1.234e-2). If this string is passed as
+     the argument to Math::FakeBfloat16->new(), then the
+     returned object will hold the identical value to the
+     object from which the string was retrieved.  That is,
+     the condition:
+       (Math::FakeBfloat16->new("$obj") == $obj)
+     will always be true (unless $obj is NaN, of course).
+
+    print $obj;
+    print "$obj";
+     Either form will display the string returned by the
+     interpolating of $obj.
+
+   $string = unpack_bf16_hex($obj);
+    Unpack the __bf16 encoding of the value held by $obj as a string
+    of hex characters.
+    For example, unpack 0, denorm min and +Inf:
+      print unpack_bf16_hex(Math::FakeBfloat16->new(0));         # 0000
+      print unpack_bf16_hex(Math::FakeBfloat16->new('-0'));      # 8000
+      print unpack_bf16_hex(Math::FakeBfloat16->new(2) ** -133); # 0001
+      print unpack_bf16_hex(Math::FakeBfloat16->new(2) ** 128);  # 7F80 (+inf)
+
+=head1 MISCELLANEOUS FUNCTIONS
+
+    $iv = is_bf16_nan($obj);
+     Return 1 if the object holds a NaN. Else return 0.
+
+    $iv = is_bf16_inf($obj);
+     Return 1 if the object holds a +Inf.
+     Return -1 if the object holds a -Inf.
+     Otherwise return 0.
+
+    $iv = is_bf16_zero($obj);
+     Return 1 if the object holds a zero that is not -0.
+     Return -1 if the object holds a -0.
+     Otherwise return 0.
+
+   $nv = bf16_to_NV($obj);
+    Return the value of $obj as an NV.
+    $nv then holds exactly the same value as $obj.
+
+   $MPFR_OBJECT = bf16_to_MPFR($obj);
+    Return a new Math::MPFR object that is identical to the Math::MPFR
+    object that is encapsulated in $obj.
+
+   bf16_nextabove($obj);
+    Increments the value in $obj by the smallest possible positive,
+    non-zero amount.
+
+   bf16_nextbelow($obj);
+    Decrements the value in $obj by the smallest possible positive,
+    non-zero amount.
+
+=head1 LICENSE
+
+    This program is free software; you may redistribute it and/or
+    modify it under the same terms as Perl itself.
+    Copyright 2025 Sisyphus.
+
+=head1 AUTHOR
+
+    Sisyphus <sisyphus at(@) cpan dot (.) org>
+
+=cut

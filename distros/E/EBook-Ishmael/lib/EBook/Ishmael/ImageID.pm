@@ -1,6 +1,6 @@
 package EBook::Ishmael::ImageID;
 use 5.016;
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 use strict;
 use warnings;
 
@@ -12,24 +12,24 @@ use List::Util qw(max);
 use XML::LibXML;
 
 my %MAGIC = (
-	pack("C*", 0xff, 0xd8, 0xff)                               => 'jpg',
-	pack("C*", 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a) => 'png',
-	pack("C*", 0x47, 0x49, 0x46, 0x38)                         => 'gif',
-	pack("C*", 0x52, 0x49, 0x46, 0x46)                         => 'webp',
-	pack("C*", 0x42, 0x4d)                                     => 'bmp',
-	pack("C*", 0x49, 0x49)                                     => 'tif',
-	pack("C*", 0x4d, 0x4d)                                     => 'tif',
+    pack("C*", 0xff, 0xd8, 0xff)                               => 'jpg',
+    pack("C*", 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a) => 'png',
+    pack("C*", 0x47, 0x49, 0x46, 0x38)                         => 'gif',
+    pack("C*", 0x52, 0x49, 0x46, 0x46)                         => 'webp',
+    pack("C*", 0x42, 0x4d)                                     => 'bmp',
+    pack("C*", 0x49, 0x49)                                     => 'tif',
+    pack("C*", 0x4d, 0x4d)                                     => 'tif',
 );
 
 # File formats that do not have magic bytes, use a subroutine instead.
 my %NONMAGIC = (
-	'svg' => sub {
-		substr(${ $_[0] }, 0, 1024) =~ /<\s*svg[^<>]*>/
-	},
+    'svg' => sub {
+        substr(${ $_[0] }, 0, 1024) =~ /<\s*svg[^<>]*>/
+    },
 );
 
 my $IMGRX = sprintf "(%s)", join '|', qw(
-	png jpg jpeg tif tiff gif bmp webp svg
+    png jpg jpeg tif tiff gif bmp webp svg
 );
 
 # This function may not support many image formats as it was designed for
@@ -38,149 +38,149 @@ my $IMGRX = sprintf "(%s)", join '|', qw(
 # TODO: Add tif support
 # TODO: Add webp support (probably never)
 my %SIZE = (
-	# size stored as two BE ushorts in the SOF0 marker, at offset 5.
-	'jpg' => sub {
+    # size stored as two BE ushorts in the SOF0 marker, at offset 5.
+    'jpg' => sub {
 
-		my $ref = shift;
+        my $ref = shift;
 
-		my $len = length $$ref;
+        my $len = length $$ref;
 
-		my $p = 2;
+        my $p = 2;
 
-		my $sof = join ' ', 0xff, 0xc0;
+        my $sof = join ' ', 0xff, 0xc0;
 
-		while ($p < $len) {
+        while ($p < $len) {
 
-			my $id = join ' ', unpack "CC", substr $$ref, $p, 2;
-			$p += 2;
-			my $mlen = unpack "n", substr $$ref, $p, 2;
+            my $id = join ' ', unpack "CC", substr $$ref, $p, 2;
+            $p += 2;
+            my $mlen = unpack "n", substr $$ref, $p, 2;
 
-			unless ($id eq $sof) {
-				$p += $mlen;
-				next;
-			}
+            unless ($id eq $sof) {
+                $p += $mlen;
+                next;
+            }
 
-			my ($y, $x) = unpack "nn", substr $$ref, $p + 3, 4;
+            my ($y, $x) = unpack "nn", substr $$ref, $p + 3, 4;
 
-			return [ $x, $y ];
+            return [ $x, $y ];
 
-		}
+        }
 
-		return undef;
+        return undef;
 
-	},
-	# size stored as two BE ulongs at offset 16
-	'png' => sub {
+    },
+    # size stored as two BE ulongs at offset 16
+    'png' => sub {
 
-		my $ref = shift;
+        my $ref = shift;
 
-		return undef unless length $$ref > 24;
+        return undef unless length $$ref > 24;
 
-		my ($x, $y) = unpack "N N", substr $$ref, 16, 8;
+        my ($x, $y) = unpack "N N", substr $$ref, 16, 8;
 
-		return [ $x, $y ];
+        return [ $x, $y ];
 
-	},
-	# size stored as two LE ushorts at offset 6
-	'gif' => sub {
+    },
+    # size stored as two LE ushorts at offset 6
+    'gif' => sub {
 
-		my $ref = shift;
+        my $ref = shift;
 
-		return undef unless length $$ref > 10;
+        return undef unless length $$ref > 10;
 
-		my ($x, $y) = unpack "v v", substr $$ref, 6, 4;
+        my ($x, $y) = unpack "v v", substr $$ref, 6, 4;
 
-		return [ $x, $y ];
+        return [ $x, $y ];
 
-	},
-	# size storage depends on header. For an OS header, two LE ushorts at
-	# offset 18. For Windows, two LE signed longs at offset 18.
-	'bmp' => sub {
+    },
+    # size storage depends on header. For an OS header, two LE ushorts at
+    # offset 18. For Windows, two LE signed longs at offset 18.
+    'bmp' => sub {
 
-		my $ref = shift;
+        my $ref = shift;
 
-		return undef unless length $$ref > 24;
+        return undef unless length $$ref > 24;
 
-		my $dbisize = unpack "V", substr $$ref, 14, 4;
+        my $dbisize = unpack "V", substr $$ref, 14, 4;
 
-		my ($x, $y);
+        my ($x, $y);
 
-		# OS
-		if ($dbisize == 16) {
-			($x, $y) = unpack "v v", substr $$ref, 18, 4;
-		# Win
-		} else {
-			($x, $y) = unpack "(ll)<", substr $$ref, 18, 8;
-			return undef if $x < 0 or $y < 0;
-		}
+        # OS
+        if ($dbisize == 16) {
+            ($x, $y) = unpack "v v", substr $$ref, 18, 4;
+        # Win
+        } else {
+            ($x, $y) = unpack "(ll)<", substr $$ref, 18, 8;
+            return undef if $x < 0 or $y < 0;
+        }
 
-		return [ $x, $y ];
+        return [ $x, $y ];
 
-	},
-	# Get width and height attributes of root node.
-	'svg' => sub {
+    },
+    # Get width and height attributes of root node.
+    'svg' => sub {
 
-		my $ref = shift;
+        my $ref = shift;
 
-		my $dom;
+        my $dom;
 
-		eval {
-			$dom = XML::LibXML->load_xml(string => $ref);
-			1;
-		} or return undef;
+        eval {
+            $dom = XML::LibXML->load_xml(string => $ref);
+            1;
+        } or return undef;
 
-		my $svg = $dom->documentElement;
+        my $svg = $dom->documentElement;
 
-		my $x = $svg->getAttribute('width') or return undef;
-		my $y = $svg->getAttribute('height') or return undef;
+        my $x = $svg->getAttribute('width') or return undef;
+        my $y = $svg->getAttribute('height') or return undef;
 
-		return [ $x, $y ];
+        return [ $x, $y ];
 
-	},
+    },
 );
 
 sub image_id {
 
-	my $ref = shift;
+    my $ref = shift;
 
-	my $sublen = max map { length } keys %MAGIC;
+    my $sublen = max map { length } keys %MAGIC;
 
-	my $mag = substr $$ref, 0, $sublen;
+    my $mag = substr $$ref, 0, $sublen;
 
-	for my $m (keys %MAGIC) {
-		return $MAGIC{ $m } if $mag =~ /^\Q$m\E/;
-	}
+    for my $m (keys %MAGIC) {
+        return $MAGIC{ $m } if $mag =~ /^\Q$m\E/;
+    }
 
-	for my $nm (keys %NONMAGIC) {
-		return $nm if $NONMAGIC{ $nm }->($ref);
-	}
+    for my $nm (keys %NONMAGIC) {
+        return $nm if $NONMAGIC{ $nm }->($ref);
+    }
 
-	return undef;
+    return undef;
 
 }
 
 sub image_size {
 
-	my $ref = shift;
-	my $fmt = shift // image_id($ref);
+    my $ref = shift;
+    my $fmt = shift // image_id($ref);
 
-	unless (defined $fmt) {
-		die "Could not determine image data format\n";
-	}
+    unless (defined $fmt) {
+        die "Could not determine image data format\n";
+    }
 
-	unless (exists $SIZE{ $fmt }) {
-		return undef;
-	}
+    unless (exists $SIZE{ $fmt }) {
+        return undef;
+    }
 
-	return $SIZE{ $fmt }->($ref);
+    return $SIZE{ $fmt }->($ref);
 
 }
 
 sub is_image_path {
 
-	my $path = shift;
+    my $path = shift;
 
-	return $path =~ /\.$IMGRX$/;
+    return $path =~ /\.$IMGRX$/;
 
 }
 

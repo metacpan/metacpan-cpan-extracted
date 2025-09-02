@@ -2,9 +2,12 @@ Changes
 Dockerfile
 lib/App/rdapper.pm
 lib/App/rdapper/l10n.pm
+locale/de/LC_MESSAGES/rdapper.mo
 locale/de/LC_MESSAGES/rdapper.po
 locale/en/LC_MESSAGES/rdapper.mo
 locale/en/LC_MESSAGES/rdapper.po
+locale/es/LC_MESSAGES/rdapper.mo
+locale/es/LC_MESSAGES/rdapper.po
 locale/fr/LC_MESSAGES/rdapper.mo
 locale/fr/LC_MESSAGES/rdapper.po
 locale/pt/LC_MESSAGES/rdapper.mo
@@ -16,5 +19,6 @@ mkmo.sh
 rdapper
 README.md
 t/00.use.t
+t/01-l10n.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

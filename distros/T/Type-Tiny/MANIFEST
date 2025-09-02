@@ -435,6 +435,7 @@ t/40-bugs/gh14.t
 t/40-bugs/gh140.t
 t/40-bugs/gh143.t
 t/40-bugs/gh158.t
+t/40-bugs/gh180.t
 t/40-bugs/gh80.t
 t/40-bugs/gh96.t
 t/40-bugs/hg166.t

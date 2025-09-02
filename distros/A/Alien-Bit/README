@@ -2,19 +2,34 @@ NAME
     Alien::Bit - Find or install the Bit library
 
 VERSION
-    version 0.05
+    version 0.07
 
 SYNOPSIS
     Installs the Bit library, used to manipulate bitsets and their packed
     containers
 
 DESCRIPTION
-    This distribution provides the librry Bit so that it can be used by
-    other Perl distributions that are on CPAN. It will download Bit from
+    This distribution provides the library "Bit" so that it can be used by
+    other Perl distributions that are on CPAN. It will download "Bit" from
     Github and will build the (static and dynamic) versions of the library
     for use by other Perl modules.
 
 SEE ALSO
+    Bit::Set <https://metacpan.org/pod/Bit::Set>
+        This module provides a procedural Perl interface to the C library
+        Bit <https://github.com/chrisarg/Bit>, for creating and manipulating
+        bitsets. It uses "FFI::Platypus" to wrap the C functions and
+        "Alien::Bit" to locate and link to the C library.
+
+    Bit::Set::DB <https://metacpan.org/pod/Bit::Set::DB>
+        This module provides a procedural Perl interface to the C library
+        "Bit", for creating and manipulating containers of bitsets (BitDB).
+        It uses "FFI::Platypus" to wrap the C functions and "Alien::Bit" to
+        locate and link to the C library. The main purpose of this library
+        is to provide multithreaded and hardware accelerated (e.g. GPU)
+        versions of container operations e.g. forming the population count
+        of the intersection of two containers of bitsets.
+
     Bit <https://github.com/chrisarg/Bit>
         Bit is a high-performance, uncompressed bitset implementation in C,
         optimized for modern architectures. The library provides an

@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/pine/p5-Text-Diff-Unified-XS.svg?branch=master)](https://travis-ci.org/pine/p5-Text-Diff-Unified-XS)
+[![Actions Status](https://github.com/pine/p5-Text-Diff-Unified-XS/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/pine/p5-Text-Diff-Unified-XS/actions?workflow=test) [![MetaCPAN Release](https://badge.fury.io/pl/Text-Diff-Unified-XS.svg)](https://metacpan.org/release/Text-Diff-Unified-XS)
 # NAME
 
 Text::Diff::Unified::XS - The fast Text::Diff module
@@ -14,7 +14,7 @@ my $diff = diff \$string1, \$string2;
 
 # DESCRIPTION
 
-Text::Diff::Unified::XS is the fast [Text::Diff](https://metacpan.org/pod/Text::Diff) module implemented by XS.
+Text::Diff::Unified::XS is the fast [Text::Diff](https://metacpan.org/pod/Text%3A%3ADiff) module implemented by XS.
 
 # METHODS
 
@@ -64,7 +64,7 @@ XS  409/s 542%   --
 
 (The MIT license)
 
-Copyright (c) 2016-2019 Pine Mizune
+Copyright (c) 2016-2019, 2025 Pine Mizune
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the

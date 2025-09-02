@@ -82,6 +82,12 @@ The dictionary.
 
 The initial size for the output buffer.
 
+=item * C<AppendOutput> : Int = 0
+
+If this option is set to false, the output buffers in L</"deflate"> and L</"flush"> methods will be truncated before uncompressed data is written to them.
+
+If the option is set to true, uncompressed data will be appended to the output buffer in L</"deflate"> and L</"flush"> methods.
+
 =back
 
 See L<Compress::Raw::Zlib::Constant|SPVM::Compress::Raw::Zlib::Constant> about C<zlib> constants.

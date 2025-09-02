@@ -40,9 +40,9 @@ class TestCase::Compress::Raw::Zlib {
         return 0;
       }
       
-      $deflate->flush(my $_ = [(string)undef]);
+      $status = $deflate->flush(my $_ = [(string)undef]);
       
-      unless ($status == ZLIB->Z_OK) {
+      unless ($status == ZLIB->Z_STREAM_END) {
         return 0;
       }
       
@@ -912,5 +912,174 @@ class TestCase::Compress::Raw::Zlib {
     return 1;
   }
   
+  static method deflate_and_inflate_AppendOutput : int () {
+    
+    {
+      my $data = "I am a HAL 9000 computer";
+      
+      my $read_length = 4;
+      
+      my $deflate = Compress::Raw::Zlib::Deflate->new({AppendOutput => 1});
+      
+      unless ($deflate->total_in == 0) {
+        return 0;
+      }
+      
+      unless ($deflate->total_out == 0) {
+        return 0;
+      }
+      
+      my $compressed_data = "";
+      my $status = ZLIB->Z_OK;
+      my $output_ref = [(string)undef];
+      for (my $i = 0; $i < length $data; $i += $read_length) {
+        
+        my $ch = Fn->substr($data, $i, $read_length);
+        
+        $status = $deflate->deflate($ch, $output_ref);
+      }
+      
+      unless ($status == ZLIB->Z_OK) {
+        return 0;
+      }
+      
+      $deflate->flush($output_ref);
+      
+      $compressed_data = $output_ref->[0];
+      
+      unless ($status == ZLIB->Z_OK) {
+        return 0;
+      }
+      
+      unless ($deflate->total_in == length $data) {
+        return 0;
+      }
+      
+      unless ($deflate->total_out == length $compressed_data) {
+        return 0;
+      }
+      
+      # zlib format
+      unless ($compressed_data->[0] == (byte)0x78) {
+        return 0;
+      }
+      unless ($compressed_data->[1] == (byte)0x9C) {
+        return 0;
+      }
+      
+      {
+        my $inflate = Compress::Raw::Zlib::Inflate->new({AppendOutput => 1});
+        
+        unless ($inflate->total_in == 0) {
+          return 0;
+        }
+        
+        unless ($inflate->total_out == 0) {
+          return 0;
+        }
+        
+        my $compressed_data = (mutable string)copy $compressed_data;
+        
+        my $uncompressed_data = "";
+        my $status = ZLIB->Z_OK;
+        my $output_ref = [(string)undef];
+        for (my $i = 0; $i < length $compressed_data; $i += $read_length) {
+          
+          my $ch = (mutable string)Fn->substr($compressed_data, $i, $read_length);
+          
+          my $total_in_start = $inflate->total_in;
+          
+          my $ch_length_start = length $ch;
+          
+          $status = $inflate->inflate($ch, $output_ref);
+          
+          my $total_in_diff = $inflate->total_in - $total_in_start;
+          
+          my $ch_length_diff = $ch_length_start - length $ch;
+          
+          unless ($total_in_diff == $ch_length_diff) {
+            return 0;
+          }
+        }
+        
+        $uncompressed_data = $output_ref->[0];
+        
+        unless ($inflate->total_in == length $compressed_data) {
+          return 0;
+        }
+        
+        unless ($inflate->total_out == length $uncompressed_data) {
+          return 0;
+        }
+        
+        unless ($status == ZLIB->Z_STREAM_END) {
+          return 0;
+        }
+        
+        unless ($uncompressed_data eq $data) {
+          return 0;
+        }
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method gzip_and_gunzip : int () {
+    
+    {
+      my $data = "I am a HAL 9000 computer";
+      
+      my $output_ref = [(string)undef];
+      Compress::Raw::Zlib->gzip($data, $output_ref);
+      my $compressed_data = $output_ref->[0];
+      
+      {
+        # GZIP format
+        unless ($compressed_data->[0] == (byte)0x1f) {
+          return 0;
+        }
+        unless ($compressed_data->[1] == (byte)0x8b) {
+          return 0;
+        }
+        
+        my $output_ref = [(string)undef];
+        Compress::Raw::Zlib->gunzip($compressed_data, $output_ref);
+        my $uncompressed_data = $output_ref->[0];
+        
+        unless ($uncompressed_data eq $data) {
+          return 0;
+        }
+      }
+    }
+    
+    {
+      my $data = "I am a HAL 9000 computer";
+      
+      my $output_ref = [(string)undef];
+      Compress::Raw::Zlib->gzip($data, $output_ref, {Bufsize => 1});
+      my $compressed_data = $output_ref->[0];
+      
+      {
+        # GZIP format
+        unless ($compressed_data->[0] == (byte)0x1f) {
+          return 0;
+        }
+        unless ($compressed_data->[1] == (byte)0x8b) {
+          return 0;
+        }
+        
+        my $output_ref = [(string)undef];
+        Compress::Raw::Zlib->gunzip($compressed_data, $output_ref, {Bufsize => 1});
+        my $uncompressed_data = $output_ref->[0];
+        
+        unless ($uncompressed_data eq $data) {
+          return 0;
+        }
+      }
+    }
+    
+    return 1;
+  }
   
 }

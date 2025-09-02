@@ -37,6 +37,7 @@ class Compress::Raw::Zlib::Deflate extends Compress::Raw::Zlib::Base {
       "Strategy",
       "Dictionary",
       "Bufsize",
+      "AppendOutput",
     ];
     
     Fn->check_option_names($options, $option_names);
@@ -56,6 +57,8 @@ class Compress::Raw::Zlib::Deflate extends Compress::Raw::Zlib::Base {
     $self->{Dictionary} = $options_h->get_or_default_string("Dictionary", undef);
     
     $self->{Bufsize} = $options_h->get_or_default_long("Bufsize", 4096);
+    
+    $self->{AppendOutput} = (byte)$options_h->get_or_default_int("AppendOutput", 0);
     
     unless ($self->{Bufsize} >= 1) {
       die "The value of '-Bufsize' option must be >= 1.";

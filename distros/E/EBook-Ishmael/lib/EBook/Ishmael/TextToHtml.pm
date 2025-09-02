@@ -1,6 +1,6 @@
 package EBook::Ishmael::TextToHtml;
 use 5.016;
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 use strict;
 use warnings;
 
@@ -9,20 +9,20 @@ our @EXPORT = qw(text2html);
 
 sub text2html {
 
-	my $text = shift;
+    my $text = shift;
 
-	$text =~ s/&/&amp;/g;
-	$text =~ s/</&lt;/g;
-	$text =~ s/>/&gt;/g;
+    $text =~ s/&/&amp;/g;
+    $text =~ s/</&lt;/g;
+    $text =~ s/>/&gt;/g;
 
-	my @paras = split /(\s*\n){2,}/, $text;
+    my @paras = split /(\s*\n){2,}/, $text;
 
-	my $html = join '',
-		map { "<p>\n" . $_ . "</p>\n" }
-		grep { /\S/ }
-		@paras;
+    my $html = join '',
+        map { "<p>\n" . $_ . "</p>\n" }
+        grep { /\S/ }
+        @paras;
 
-	return $html;
+    return $html;
 
 }
 

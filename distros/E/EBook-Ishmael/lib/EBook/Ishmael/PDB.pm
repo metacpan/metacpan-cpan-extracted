@@ -1,6 +1,6 @@
 package EBook::Ishmael::PDB;
 use 5.016;
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 use strict;
 use warnings;
 
@@ -14,256 +14,256 @@ my $EPOCH_OFFSET = -2082844800;
 
 sub new {
 
-	my $class = shift;
-	my $pdb   = shift;
+    my $class = shift;
+    my $pdb   = shift;
 
-	my $self = {
-		Name        => undef,
-		Attr        => undef,
-		Version     => undef,
-		CDate       => undef,
-		MDate       => undef,
-		BDate       => undef,
-		ModNum      => undef,
-		AppInfo     => undef,
-		SortInfo    => undef,
-		Type        => undef,
-		Creator     => undef,
-		UIDSeed     => undef,
-		NextRecList => undef,
-		RecNum      => undef,
-		Recs        => [],
-		Size        => undef,
-	};
+    my $self = {
+        Name        => undef,
+        Attr        => undef,
+        Version     => undef,
+        CDate       => undef,
+        MDate       => undef,
+        BDate       => undef,
+        ModNum      => undef,
+        AppInfo     => undef,
+        SortInfo    => undef,
+        Type        => undef,
+        Creator     => undef,
+        UIDSeed     => undef,
+        NextRecList => undef,
+        RecNum      => undef,
+        Recs        => [],
+        Size        => undef,
+    };
 
-	open my $fh, '<', $pdb
-		or die "Failed to open $pdb for reading: $!\n";
-	binmode $fh;
+    open my $fh, '<', $pdb
+        or die "Failed to open $pdb for reading: $!\n";
+    binmode $fh;
 
-	seek $fh, 0, 2;
-	$self->{Size} = tell $fh;
-	seek $fh, 0, 0;
+    seek $fh, 0, 2;
+    $self->{Size} = tell $fh;
+    seek $fh, 0, 0;
 
-	read $fh, my ($hdr), $HEADER_COMMON;
+    read $fh, my ($hdr), $HEADER_COMMON;
 
-	(
-		$self->{Name},
-		$self->{Attr},
-		$self->{Version},
-		$self->{CDate},
-		$self->{MDate},
-		$self->{BDate},
-		$self->{ModNum},
-		$self->{AppInfo},
-		$self->{SortInfo},
-		$self->{Type},
-		$self->{Creator},
-		$self->{UIDSeed},
-		$self->{NextRecList},
-		$self->{RecNum},
-	) = unpack "a32 n n N N N N N N N N N N n", $hdr;
+    (
+        $self->{Name},
+        $self->{Attr},
+        $self->{Version},
+        $self->{CDate},
+        $self->{MDate},
+        $self->{BDate},
+        $self->{ModNum},
+        $self->{AppInfo},
+        $self->{SortInfo},
+        $self->{Type},
+        $self->{Creator},
+        $self->{UIDSeed},
+        $self->{NextRecList},
+        $self->{RecNum},
+    ) = unpack "a32 n n N N N N N N N N N N n", $hdr;
 
-	unless ($self->{Name} =~ /\0$/) {
-		die "$self->{Source} is not a PDB file, name is not null-terminated\n";
-	}
+    unless ($self->{Name} =~ /\0$/) {
+        die "$self->{Source} is not a PDB file, name is not null-terminated\n";
+    }
 
-	unless ($self->{NextRecList} == 0) {
-		die "$pdb is not a PDB file\n";
-	}
+    unless ($self->{NextRecList} == 0) {
+        die "$pdb is not a PDB file\n";
+    }
 
-	if ($self->{RecNum} == 0) {
-		die "PDB $pdb has no records\n";
-	}
+    if ($self->{RecNum} == 0) {
+        die "PDB $pdb has no records\n";
+    }
 
-	# If the epoch offset knocks the time below zero, then that probably means
-	# that the time was stored as a Unix time.
-	$self->{CDate} &&= $self->{CDate} + $EPOCH_OFFSET > 0
-		? $self->{CDate} + $EPOCH_OFFSET
-		: $self->{CDate};
-	$self->{MDate} &&= $self->{MDate} + $EPOCH_OFFSET > 0
-		? $self->{MDate} + $EPOCH_OFFSET
-		: $self->{MDate};
-	$self->{BDate} &&= $self->{BDate} + $EPOCH_OFFSET > 0
-		? $self->{BDate} + $EPOCH_OFFSET
-		: $self->{BDate};
+    # If the epoch offset knocks the time below zero, then that probably means
+    # that the time was stored as a Unix time.
+    $self->{CDate} &&= $self->{CDate} + $EPOCH_OFFSET > 0
+        ? $self->{CDate} + $EPOCH_OFFSET
+        : $self->{CDate};
+    $self->{MDate} &&= $self->{MDate} + $EPOCH_OFFSET > 0
+        ? $self->{MDate} + $EPOCH_OFFSET
+        : $self->{MDate};
+    $self->{BDate} &&= $self->{BDate} + $EPOCH_OFFSET > 0
+        ? $self->{BDate} + $EPOCH_OFFSET
+        : $self->{BDate};
 
-	my @recs;
+    my @recs;
 
-	for my $i (0 .. $self->{RecNum} - 1) {
+    for my $i (0 .. $self->{RecNum} - 1) {
 
-		read $fh, my ($buf), $RECORD_INFO;
+        read $fh, my ($buf), $RECORD_INFO;
 
-		my $rec = {};
+        my $rec = {};
 
-		(
-			$rec->{Offset},
-			$rec->{Attributes},
-			$rec->{UID},
-		) = unpack "N C C3", $buf;
+        (
+            $rec->{Offset},
+            $rec->{Attributes},
+            $rec->{UID},
+        ) = unpack "N C C3", $buf;
 
-		if ($rec->{Offset} > $self->{Size}) {
-			die "Malformed PDB file: $pdb\n";
-		}
+        if ($rec->{Offset} > $self->{Size}) {
+            die "Malformed PDB file: $pdb\n";
+        }
 
-		push @recs, $rec;
+        push @recs, $rec;
 
-	}
+    }
 
-	for my $i (0 .. $self->{RecNum} - 1) {
+    for my $i (0 .. $self->{RecNum} - 1) {
 
-		my $size = $i == $self->{RecNum} - 1
-			? $self->{Size}           - $recs[$i]->{Offset}
-			: $recs[$i + 1]->{Offset} - $recs[$i]->{Offset};
+        my $size = $i == $self->{RecNum} - 1
+            ? $self->{Size}           - $recs[$i]->{Offset}
+            : $recs[$i + 1]->{Offset} - $recs[$i]->{Offset};
 
-		seek $fh, $recs[$i]->{Offset}, 0;
+        seek $fh, $recs[$i]->{Offset}, 0;
 
-		read $fh, my ($buf), $size;
+        read $fh, my ($buf), $size;
 
-		push @{ $self->{Recs} }, EBook::Ishmael::PDB::Record->new(
-			$buf,
-			$recs[$i]
-		);
+        push @{ $self->{Recs} }, EBook::Ishmael::PDB::Record->new(
+            $buf,
+            $recs[$i]
+        );
 
-	}
+    }
 
-	return bless $self, $class;
+    return bless $self, $class;
 
 }
 
 sub name {
 
-	my $self = shift;
+    my $self = shift;
 
-	return $self->{Name} =~ s/\0+$//r;
+    return $self->{Name} =~ s/\0+$//r;
 
 }
 
 sub attributes {
 
-	my $self = shift;
+    my $self = shift;
 
-	return $self->{Attr};
+    return $self->{Attr};
 
 }
 
 sub version {
 
-	my $self = shift;
+    my $self = shift;
 
-	return $self->{Version};
+    return $self->{Version};
 
 }
 
 sub cdate {
 
-	my $self = shift;
+    my $self = shift;
 
-	return $self->{CDate};
+    return $self->{CDate};
 
 }
 
 sub mdate {
 
-	my $self = shift;
+    my $self = shift;
 
-	return $self->{MDate};
+    return $self->{MDate};
 
 }
 
 sub bdate {
 
-	my $self = shift;
+    my $self = shift;
 
-	return $self->{BDate};
+    return $self->{BDate};
 
 }
 
 sub modnum {
 
-	my $self = shift;
+    my $self = shift;
 
-	return $self->{ModNum};
+    return $self->{ModNum};
 
 }
 
 sub app_info {
 
-	my $self = shift;
+    my $self = shift;
 
-	return $self->{AppInfo};
+    return $self->{AppInfo};
 
 }
 
 sub sort_info {
 
-	my $self = shift;
+    my $self = shift;
 
-	return $self->{SortInfo};
+    return $self->{SortInfo};
 
 }
 
 sub type {
 
-	my $self = shift;
+    my $self = shift;
 
-	return $self->{Type};
+    return $self->{Type};
 
 }
 
 sub creator {
 
-	my $self = shift;
+    my $self = shift;
 
-	return $self->{Creator};
+    return $self->{Creator};
 
 }
 
 sub uid_seed {
 
-	my $self = shift;
+    my $self = shift;
 
-	return $self->{UIDSeed};
+    return $self->{UIDSeed};
 
 }
 
 sub next_rec_list {
 
-	my $self = shift;
+    my $self = shift;
 
-	return $self->{NextRecList};
+    return $self->{NextRecList};
 
 }
 
 sub recnum {
 
-	my $self = shift;
+    my $self = shift;
 
-	return $self->{RecNum};
+    return $self->{RecNum};
 
 }
 
 sub record {
 
-	my $self = shift;
-	my $rec  = shift;
+    my $self = shift;
+    my $rec  = shift;
 
-	return $self->{Recs}->[$rec];
+    return $self->{Recs}->[$rec];
 
 }
 
 sub records {
 
-	my $self = shift;
+    my $self = shift;
 
-	return @{ $self->{Recs} };
+    return @{ $self->{Recs} };
 
 }
 
 sub size {
 
-	my $self = shift;
+    my $self = shift;
 
-	return $self->{Size};
+    return $self->{Size};
 
 }
 
