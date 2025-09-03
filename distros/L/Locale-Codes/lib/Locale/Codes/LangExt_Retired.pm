@@ -3,7 +3,7 @@ Locale::Codes::LangExt_Retired;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'deprecate_codes' is run.
-#    Generated on: Sun Jun  1 17:55:48 EDT 2025
+#    Generated on: Tue Sep  2 11:08:53 EDT 2025
 
 use strict;
 require 5.006;
@@ -11,7 +11,7 @@ use warnings;
 use utf8;
 
 our($VERSION);
-$VERSION='3.84';
+$VERSION='3.85';
 
 $Locale::Codes::Retired{'langext'}{'alpha'}{'code'} = {
    q(ajp) => q(South Levantine Arabic),

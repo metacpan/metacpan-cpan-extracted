@@ -3,7 +3,7 @@ Locale::Codes::Language_Codes;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'harvest_data' is run.
-#    Generated on: Sun Jun  1 17:50:28 EDT 2025
+#    Generated on: Tue Sep  2 11:06:54 EDT 2025
 
 use strict;
 require 5.006;
@@ -11,7 +11,7 @@ use warnings;
 use utf8;
 
 our($VERSION);
-$VERSION='3.84';
+$VERSION='3.85';
 
 $Locale::Codes::Data{'language'}{'id'} = '8035';
 
@@ -2806,6 +2806,7 @@ $Locale::Codes::Data{'language'}{'id2names'} = {
       ],
    q(0885) => [
       q(Assiniboine),
+      q(Nakoda Assiniboine),
       ],
    q(0886) => [
       q(Casuarina Coast Asmat),
@@ -2894,6 +2895,7 @@ $Locale::Codes::Data{'language'}{'id2names'} = {
       ],
    q(0914) => [
       q(Atikamekw),
+      q(Nehirowimowin),
       ],
    q(0915) => [
       q(Ati),
@@ -5459,6 +5461,7 @@ $Locale::Codes::Data{'language'}{'id2names'} = {
       ],
    q(1760) => [
       q(Chilcotin),
+      q(Tsilhqotin),
       ],
    q(1761) => [
       q(Chaldean Neo-Aramaic),
@@ -5482,6 +5485,7 @@ $Locale::Codes::Data{'language'}{'id2names'} = {
       q(Chala),
       ],
    q(1768) => [
+      q(Klallam),
       q(Clallam),
       ],
    q(1769) => [
@@ -11449,6 +11453,7 @@ $Locale::Codes::Data{'language'}{'id2names'} = {
       q(Kwanga),
       ],
    q(3722) => [
+      q(Kwak'wala),
       q(Kwakiutl),
       ],
    q(3723) => [
@@ -18356,6 +18361,7 @@ $Locale::Codes::Data{'language'}{'id2names'} = {
       ],
    q(5995) => [
       q(Sechelt),
+      q(She shashishalhem),
       ],
    q(5996) => [
       q(Sedang),
@@ -18540,6 +18546,7 @@ $Locale::Codes::Data{'language'}{'id2names'} = {
       ],
    q(6056) => [
       q(Shuswap),
+      q(Secwepemctsin),
       ],
    q(6057) => [
       q(Shasta),
@@ -19080,6 +19087,7 @@ $Locale::Codes::Data{'language'}{'id2names'} = {
       ],
    q(6234) => [
       q(Squamish),
+      q(Skwxwu7mesh snichim),
       ],
    q(6235) => [
       q(Kufr Qassem Sign Language (KQSL)),
@@ -19990,6 +19998,8 @@ $Locale::Codes::Data{'language'}{'id2names'} = {
       ],
    q(6534) => [
       q(Thompson),
+      q(Nlekepmxcin),
+      q(Thompson River Salish),
       ],
    q(6535) => [
       q(Kochila Tharu),
@@ -20002,6 +20012,7 @@ $Locale::Codes::Data{'language'}{'id2names'} = {
       ],
    q(6538) => [
       q(Tahltan),
+      q(Taltan),
       ],
    q(6539) => [
       q(Thuri),
@@ -24298,7 +24309,7 @@ $Locale::Codes::Data{'language'}{'id2names'} = {
       q(Molo),
       ],
    q(7951) => [
-      q(Mpuono),
+      q(Mbuun),
       ],
    q(7952) => [
       q(Mituku),
@@ -30398,7 +30409,7 @@ $Locale::Codes::Data{'language'}{'alias2id'} = {
       ],
    q(clallam) => [
       q(1768),
-      q(0),
+      q(1),
       ],
    q(classical armenian) => [
       q(7354),
@@ -38312,6 +38323,10 @@ $Locale::Codes::Data{'language'}{'alias2id'} = {
       q(3859),
       q(0),
       ],
+   q(klallam) => [
+      q(1768),
+      q(0),
+      ],
    q(klamath-modoc) => [
       q(3452),
       q(0),
@@ -39576,9 +39591,13 @@ $Locale::Codes::Data{'language'}{'alias2id'} = {
       q(3283),
       q(0),
       ],
-   q(kwakiutl) => [
+   q(kwak'wala) => [
       q(3722),
       q(0),
+      ],
+   q(kwakiutl) => [
+      q(3722),
+      q(1),
       ],
    q(kwakum) => [
       q(3731),
@@ -43060,6 +43079,10 @@ $Locale::Codes::Data{'language'}{'alias2id'} = {
       q(1054),
       q(0),
       ],
+   q(mbuun) => [
+      q(7951),
+      q(0),
+      ],
    q(mbwela) => [
       q(4268),
       q(0),
@@ -44244,10 +44267,6 @@ $Locale::Codes::Data{'language'}{'alias2id'} = {
       q(4279),
       q(0),
       ],
-   q(mpuono) => [
-      q(7951),
-      q(0),
-      ],
    q(mpur) => [
       q(0722),
       q(0),
@@ -44764,6 +44783,10 @@ $Locale::Codes::Data{'language'}{'alias2id'} = {
       q(4253),
       q(0),
       ],
+   q(nakoda assiniboine) => [
+      q(0885),
+      q(1),
+      ],
    q(nakwi) => [
       q(4755),
       q(0),
@@ -45215,6 +45238,10 @@ $Locale::Codes::Data{'language'}{'alias2id'} = {
    q(nehan) => [
       q(5097),
       q(0),
+      ],
+   q(nehirowimowin) => [
+      q(0914),
+      q(1),
       ],
    q(nek) => [
       q(4903),
@@ -45931,6 +45958,10 @@ $Locale::Codes::Data{'language'}{'alias2id'} = {
    q(nkutu) => [
       q(4960),
       q(0),
+      ],
+   q(nlekepmxcin) => [
+      q(6534),
+      q(1),
       ],
    q(nnam) => [
       q(4771),
@@ -50676,6 +50707,10 @@ $Locale::Codes::Data{'language'}{'alias2id'} = {
       q(6014),
       q(0),
       ],
+   q(secwepemctsin) => [
+      q(6056),
+      q(1),
+      ],
    q(sedang) => [
       q(5996),
       q(0),
@@ -51095,6 +51130,10 @@ $Locale::Codes::Data{'language'}{'alias2id'} = {
    q(she) => [
       q(6061),
       q(0),
+      ],
+   q(she shashishalhem) => [
+      q(5995),
+      q(1),
       ],
    q(shehri) => [
       q(6059),
@@ -51615,6 +51654,10 @@ $Locale::Codes::Data{'language'}{'alias2id'} = {
    q(skou) => [
       q(6121),
       q(0),
+      ],
+   q(skwxwu7mesh snichim) => [
+      q(6234),
+      q(1),
       ],
    q(slave (athapascan)) => [
       q(0108),
@@ -53088,6 +53131,10 @@ $Locale::Codes::Data{'language'}{'alias2id'} = {
       q(6873),
       q(0),
       ],
+   q(taltan) => [
+      q(6538),
+      q(1),
+      ],
    q(talu) => [
       q(7813),
       q(0),
@@ -53900,6 +53947,10 @@ $Locale::Codes::Data{'language'}{'alias2id'} = {
       q(6534),
       q(0),
       ],
+   q(thompson river salish) => [
+      q(6534),
+      q(2),
+      ],
    q(thopho) => [
       q(7815),
       q(0),
@@ -54655,6 +54706,10 @@ $Locale::Codes::Data{'language'}{'alias2id'} = {
    q(tsikimba) => [
       q(3272),
       q(0),
+      ],
+   q(tsilhqotin) => [
+      q(1760),
+      q(1),
       ],
    q(tsimane) => [
       q(1646),

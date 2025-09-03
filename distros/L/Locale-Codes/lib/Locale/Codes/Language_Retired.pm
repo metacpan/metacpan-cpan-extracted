@@ -3,7 +3,7 @@ Locale::Codes::Language_Retired;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'deprecate_codes' is run.
-#    Generated on: Sun Jun  1 17:55:48 EDT 2025
+#    Generated on: Tue Sep  2 11:08:53 EDT 2025
 
 use strict;
 require 5.006;
@@ -11,7 +11,7 @@ use warnings;
 use utf8;
 
 our($VERSION);
-$VERSION='3.84';
+$VERSION='3.85';
 
 $Locale::Codes::Retired{'language'}{'alpha-2'}{'code'} = {
    q(in) => q(Indonesian),
@@ -362,6 +362,7 @@ $Locale::Codes::Retired{'language'}{'alpha-3'}{'name'} = {
    q(chilean quechua) => [ q(cqu), q(Chilean Quechua) ],
    q(chipiajes) => [ q(cbe), q(Chipiajes) ],
    q(chungmboko) => [ q(cug), q(Chungmboko) ],
+   q(clallam) => [ q(clm), q(Clallam) ],
    q(coastal kadazan) => [ q(kzj), q(Coastal Kadazan) ],
    q(coxima) => [ q(kox), q(Coxima) ],
    q(coyaima) => [ q(coy), q(Coyaima) ],
@@ -484,6 +485,7 @@ $Locale::Codes::Retired{'language'}{'alpha-3'}{'name'} = {
    q(kunggara) => [ q(kvs), q(Kunggara) ],
    q(kutang ghale) => [ q(ght), q(Kutang Ghale) ],
    q(kwak) => [ q(kwq), q(Kwak) ],
+   q(kwakiutl) => [ q(kwk), q(Kwakiutl) ],
    q(kwato) => [ q(kop), q(Kwato) ],
    q(kyenga) => [ q(tye), q(Kyenga) ],
    q(laka (nigeria)) => [ q(lak), q(Laka (Nigeria)) ],
@@ -540,6 +542,7 @@ $Locale::Codes::Retired{'language'}{'alpha-3'}{'name'} = {
    q(montagnais) => [ q(moe), q(Montagnais) ],
    q(mosiro) => [ q(mwy), q(Mosiro) ],
    q(mpongmpong) => [ q(mgg), q(Mpongmpong) ],
+   q(mpuono) => [ q(zmp), q(Mpuono) ],
    q(mro chin) => [ q(cmr), q(Mro Chin) ],
    q(mudbura) => [ q(mwd), q(Mudbura) ],
    q(muduapa) => [ q(wiv), q(Muduapa) ],

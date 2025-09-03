@@ -513,6 +513,13 @@ $Data{'language'}{'iana'}{'orig'}{'name'} = {
    "Meänkieli"                                      => "Meankieli",
    "Lengua de señas Albarradas"                     => "Lengua de senas Albarradas",
    "Língua Gestual Guineense"                      => "Lingua Gestual Guineense",
+   "Tsilhqot’in"                               => "Tsilhqotin",
+   "Hän"                                          => "Han",
+   "Mòcheno"                                      => "Mocheno",
+   "Secwepemctsín"                                => "Secwepemctsin",
+   "Sḵwx̱wú7mesh sníchim"                     => "Skwxwu7mesh snichim",
+   "Nłeʔkepmxcín"                             => "Nlekepmxcin",
+   "Tāłtān"                                  => "Taltan",
 };
 
 $Data{'language'}{'iana'}{'ignore'} = {

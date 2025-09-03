@@ -20,7 +20,7 @@ use lib ($FindBin::Bin, 'blib/lib');
 
 use WWW::Mechanize::Chrome::Webshot;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 my $VERBOSITY = 10; # we need verbosity of 10 (max), so this is not used
 my $CLEANUP = (exists($ENV{'PERL_TEST_TEMPDIR_TINY_NOCLEANUP'}) && ($ENV{'PERL_TEST_TEMPDIR_TINY_NOCLEANUP'}>0)) ? 1 : 0;
@@ -152,7 +152,8 @@ ok(! -z $tmpfile, "$tmpfile contains some bytes") or BAIL_OUT("no data in screen
 # verify output image has exif metadata
 my $rr = WWW::Mechanize::Chrome::Webshot::_check_if_exif_tags_exist_in_image(
 	$tmpfile,
-	$metadata
+	$metadata,
+	$shooter->log,
 );
 ok(defined $rr, 'WWW::Mechanize::Chrome::Webshot::_check_if_exif_tags_exist_in_image()'." : called and got some result back") or BAIL_OUT;
 # returns a hash with tags as keys and each key having a value:

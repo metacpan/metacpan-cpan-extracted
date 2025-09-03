@@ -1,5 +1,5 @@
 package Env::AsYaml;
-# Last modified: Thu Aug 28 2025 12:40:56 PM -04:00 [EDT]
+# Last modified: Tue Sep 02 2025 01:10:52 PM -04:00 [EDT]
 # First created: Sat Aug 09 2025 05:38:14 PM -04:00 [EDT]
 
 use v5.18;
@@ -15,18 +15,18 @@ troubleshooting the system.
 
 =head1 VERSION
 
-Version 0.30
+Version 0.35
 
 =cut
 
-our $VERSION = '0.30';
+our $VERSION = '0.35';
 
 =head1 SYNOPSIS
 
 This module checks the environment it's running in and prints it to STDOUT as
 YAML. Env vars that are lists (such as C<$PATH>) are formatted in YAML as lists.
 
-    use Env::AsYaml;   # imports 'showPathLists' and 'showScalars'
+    use Env::AsYaml;   # auto-imports 'showPathLists' and 'showScalars'
 
 =cut
 

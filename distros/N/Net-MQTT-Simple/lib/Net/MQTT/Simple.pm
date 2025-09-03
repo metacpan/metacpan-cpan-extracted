@@ -6,7 +6,7 @@ use warnings;
 use IO::Socket::IP;
 use Socket ();
 
-our $VERSION = '1.32';
+our $VERSION = '1.33';
 
 # Please note that these are not documented and are subject to change:
 our $KEEPALIVE_INTERVAL = 60;
@@ -150,7 +150,7 @@ sub _connect {
     # Reset state
     $self->{last_connect} = time;
     $self->{buffer} = "";
-    $self->{subscribed} = {};
+    $self->{actually_subscribed} = {};
     delete $self->{ping};
 
     # Connect

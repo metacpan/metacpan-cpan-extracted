@@ -8,7 +8,7 @@
 
 package Mail::Transport::Exim;
 use vars '$VERSION';
-$VERSION = '3.006';
+$VERSION = '3.007';
 
 use base 'Mail::Transport::Send';
 

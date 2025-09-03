@@ -406,6 +406,7 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                             } else {
                                 busy.manifest(this.tr('Preparing Download ...'));
                             }
+                            setTimeout(() => { busy.vanish(); }, 3 * 1000); // hide the activity indicator after 3 seconds anyway
                             callbackery.data.Server.getInstance().callAsyncSmart(function (cookie) {
                                 let url = 'download'
                                     + '?name=' + cfg.name

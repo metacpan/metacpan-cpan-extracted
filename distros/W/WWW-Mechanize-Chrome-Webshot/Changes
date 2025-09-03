@@ -7,3 +7,5 @@ Revision history for WWW-Mechanize-Chrome-Webshot
 0.03    2025/08/21
         Modified t/300-exif-local-site.t to verify correct exif metadata insertion to both PNG and PDF output images.
         Pod fixes.
+0.04    2025/09/02
+        It now logs to a Mojo::Log which by default dumps to STDERR/STDOUT.

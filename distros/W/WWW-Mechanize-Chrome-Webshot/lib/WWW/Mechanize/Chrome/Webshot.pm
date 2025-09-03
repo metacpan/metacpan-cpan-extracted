@@ -11,7 +11,7 @@ use warnings;
 #	_check_if_exif_tags_exist_in_image
 #);
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use Log::Log4perl qw(:easy);
 # >= v5.31 which supports EXIF for png files
@@ -29,7 +29,7 @@ use WWW::Mechanize::Chrome::DOMops qw/
 
 # a basic default configuration file in enhanced JSON (see L<Config::JSON::Enhanced>)
 my $DEFAULT_CONFIGSTRING = <<'EOCS';
-</* $VERSION = '0.03'; */>
+</* $VERSION = '0.04'; */>
 </* comments are allowed */>
 </* and <% vars %> and <% verbatim sections %> */>
 {
@@ -114,7 +114,7 @@ sub	new {
 	# this will read configuration and create confighash,
 	# make logger, verbosity,
 	# instantiate any objects we need here etc.
-	if( $self->init($params) ){ print STDERR __PACKAGE__."${whoami} (via $parent), line ".__LINE__." : error, call to init() has failed.\n"; return undef }
+	if( $self->init($params) ){ print STDERR "${whoami} (via $parent), line ".__LINE__." : error, call to init() has failed.\n"; return undef }
 
 	# Now we have a logger
 	my $log = $self->log();
@@ -123,7 +123,6 @@ sub	new {
 	if( $self->init_module_specific($params) ){ $log->error("${whoami} (via $parent), line ".__LINE__." : error, call to init_module_specific() has failed."); return undef }
 
 	my $verbosity = $self->verbosity;
-
 	if( $verbosity > 0 ){ $log->info("${whoami} (via $parent), line ".__LINE__." : done, success (verbosity is set to ".$self->verbosity." and cleanup to ".$self->cleanup.").") }
 
 	return $self;
@@ -136,6 +135,7 @@ sub	blank_browser { $_[0]->mech_obj->get('about:blank'); $_[0]->mech_obj->sleep(
 # if asked, that obstruct the shot, e.g. banners and dumps the browser's window
 # to a PNG or PDF file (whose filename must be supplied as input param).
 # NOTE: PDF output does not seem to contain the whole browser content!
+# it has a preset size.
 # optional 'remove-dom-elements' overwrites the self if any
 # optional 'exif' parameter (as hash) specifies tag/value pairs to be inserted as
 # metadata into the final output image
@@ -148,20 +148,21 @@ sub	shoot {
 	my $params = $_[1]; # a hashref of 'output-filename', 'url' etc.
 	my $parent = ( caller(1) )[3] || "N/A";
 	my $whoami = ( caller(0) )[3];
-	my $verbos = $self->verbosity();
+	my $verbos = $self->verbosity;
+	my $log = $self->log;
 
 	# this is required
 	my $outfile = exists($params->{'output-filename'}) ? $params->{'output-filename'} : undef;
-	if( ! defined $outfile ){ print STDERR "$whoami (via $parent), line ".__LINE__." : error, 'output-filename' parameter was not specified.\n"; return 0 }
+	if( ! defined $outfile ){ $log->error("$whoami (via $parent), line ".__LINE__." : error, 'output-filename' parameter was not specified."); return 0 }
 
 	my $outformat;
 	if( exists($params->{'output-format'}) && defined($params->{'output-format'}) ){
 		if( $params->{'output-format'} =~ /^(png|pdf)$/ ){ $outformat = $1 }
-		else { print STDERR "$whoami (via $parent), line ".__LINE__." : error, parameter 'output-format' was specified as '".$params->{'output-format'}."' but one of 'png' or 'pdf' was expected.\n"; return 0 }
+		else { $log->error("$whoami (via $parent), line ".__LINE__." : error, parameter 'output-format' was specified as '".$params->{'output-format'}."' but one of 'png' or 'pdf' was expected."); return 0 }
 	} else {
 		# try and deduce the format from the file extension
 		if( $outfile =~ /\.(pdf|png)$/i ){ $outformat = $1 }
-		else { print STDERR "$whoami (via $parent), line ".__LINE__." : error, parameter 'output-format' was not specified and failed to deduce the output format from the specified output filename ($outfile). Either specify 'output-format' as one of 'png' or 'pdf' or make the 'output-filename' clearer.\n"; return 0 }
+		else { $log->error("$whoami (via $parent), line ".__LINE__." : error, parameter 'output-format' was not specified and failed to deduce the output format from the specified output filename ($outfile). Either specify 'output-format' as one of 'png' or 'pdf' or make the 'output-filename' clearer."); return 0 }
 	}
 
 	# this is optional, because mech already may be in current page
@@ -192,7 +193,7 @@ sub	shoot {
 	}
 	if( defined $exif ){
 		# check that the exif data format is valid : { k => v, ... }
-		if( ref($exif)ne'HASH' ){ print STDERR "$whoami (via $parent), line ".__LINE__." : error, 'exif' parameter expects a HASH of tagname => tagvalue pairs, not ".ref($exif).".\n"; return 0; }
+		if( ref($exif)ne'HASH' ){ $log->error("$whoami (via $parent), line ".__LINE__." : error, 'exif' parameter expects a HASH of tagname => tagvalue pairs, not ".ref($exif)."."); return 0; }
 	}
 
 	# here we can check if we have a mech instantiated or not
@@ -201,7 +202,7 @@ sub	shoot {
 	# we are instantiating the mech, if no url was specified then what to print? perhaps homepage?
 	if( ! defined($self->{'_private'}->{'WWW::Mechanize::Chrome-object'})
 	 && ! defined($URL)
-	){ print STDOUT "$whoami (via $parent), line ".__LINE__." : warning, mech is being instantiated now but there was no 'url' parameter specified, are you sure?\n" }
+	){ $log->info("$whoami (via $parent), line ".__LINE__." : warning, mech is being instantiated now but there was no 'url' parameter specified, are you sure?") }
 
 	my $mech = $self->mech_obj;
 
@@ -213,15 +214,15 @@ sub	shoot {
 	#$self->blank_browser();
 
 	# and then get the page
-	if( defined($URL) && ! $mech->get($URL) ){ print STDERR "$whoami (via $parent), line ".__LINE__." : call to ".'get()'." has failed for url: $URL\n"; return 0 }
+	if( defined($URL) && ! $mech->get($URL) ){ $log->error("$whoami (via $parent), line ".__LINE__." : call to ".'get()'." has failed for url: $URL"); return 0 }
 
 	# move by nothing in order to load images
 	$self->scroll(0,0);
 
 	# sleep a second or two till it gets settled
-	if( $verbos > 0 ){ print "$whoami (via $parent), line ".__LINE__." : allowing settle time of ".$self->{'settle-time'}." seconds.\n"; }
+	if( $verbos > 0 ){ $log->info("$whoami (via $parent), line ".__LINE__." : allowing settle time of ".$self->{'settle-time'}." seconds."); }
 	sleep($self->settle_time());
-	if( $verbos > 0 ){ print "$whoami (via $parent), line ".__LINE__." : woke up after settle time of ".$self->{'settle-time'}." seconds.\n"; }
+	if( $verbos > 0 ){ $log->info("$whoami (via $parent), line ".__LINE__." : woke up after settle time of ".$self->{'settle-time'}." seconds."); }
 
 	# move by nothing in order to load images
 	$self->scroll(0,0);
@@ -230,47 +231,52 @@ sub	shoot {
 	if( defined $remove_dom_elements ){
 		foreach my $anentry (@$remove_dom_elements){
 			if( ! defined $anentry ){
-				if( $verbos > 0 ){ print "$whoami (via $parent), line ".__LINE__." : found undef in array of 'remove-dom-elements' which signifies that I should skip the rest (if any).\n"; }
+				if( $verbos > 0 ){ $log->info("$whoami (via $parent), line ".__LINE__." : found undef in array of 'remove-dom-elements' which signifies that I should skip the rest (if any)."); }
 				# any undef in the array is a signal to skip the rest
 				last
 			}
-			if( $verbos > 0 ){ print "$whoami (via $parent), line ".__LINE__." : removing DOM element(s): "; print perl2dump($anentry); }
+			if( $verbos > 0 ){ $log->info("$whoami (via $parent), line ".__LINE__." : removing DOM element(s):\n".perl2dump($anentry)); }
 			my %delparms = (
 				%$anentry,
 				'mech-obj' => $mech,
 			);
 			my $zapret = WWW::Mechanize::Chrome::DOMops::domops_zap(\%delparms);
 			if( $zapret->{'status'} < 0 ){ 
-				print STDERR perl2dump($zapret)."$whoami (via $parent), line ".__LINE__." : call to ".'WWW::Mechanize::Chrome::DOMOps::domops_zap()'." has failed, with above error, for these parameters:\n".perl2dump($anentry)."\n---end of parameters.\n";
+				$log->error(perl2dump($zapret)."$whoami (via $parent), line ".__LINE__." : call to ".'WWW::Mechanize::Chrome::DOMOps::domops_zap()'." has failed, with above error, for these parameters:\n".perl2dump($anentry)."\n---end of parameters.");
 				if( $stoperr > 0 ){
-					print STDERR "$whoami (via $parent), line ".__LINE__." : stopping now because 'stop-on-error' was set.";
+					$log->error("$whoami (via $parent), line ".__LINE__." : stopping now because 'stop-on-error' was set.");
 					return 0 # do not continue if error!
 				} else { next }
 			}
-			if( $verbos > 1 ){ print "Done zapped DOM element : ".perl2dump($anentry) }
+			if( $verbos > 1 ){ $log->info("$whoami (via $parent), line ".__LINE__." : done zapped DOM element :\n".perl2dump($anentry)) }
 		}
 	}
 
 	# settle for a bit before taking the screenshot
 	sleep($self->settle_time());
 
-	if( $verbos > 0 ){ print "$whoami (via $parent), line ".__LINE__." : taking a screenshot and dumping it to file '$outfile' ...\n" }
+	if( $verbos > 0 ){ $log->info("$whoami (via $parent), line ".__LINE__." : taking a screenshot and dumping it to file '$outfile' ...") }
 
 	# smile!!! (or say cheese)
 	my $fh;
-	if( ! open $fh, '>:raw', $outfile ){ print STDERR "$whoami (via $parent), line ".__LINE__." : error, failed to open file '$outfile' for writing, $!\n"; return 0 }
+	if( ! open $fh, '>:raw', $outfile ){ $log->error("$whoami (via $parent), line ".__LINE__." : error, failed to open file '$outfile' for writing, $!"); return 0 }
 	print $fh ($outformat eq 'pdf' ? $mech->content_as_pdf(format=>'A4') : $mech->content_as_png());
 	close $fh;
 
 	if( $exif ){
-		# WARNING keys do not like unicode, not special chars (space, '::' etc.)
-		# values can have anything including unicode
+		# WARNING: exif keys do not like unicode,
+		# neither special chars (space, '::' etc.)
+		# exif values can have anything, including unicode
 
 		# if caller supplied exif as an ARRAY, then here we go
 		# { k => v, ... }
 
-		my $exifTool = new Image::ExifTool;
-
+		my $exifTool = Image::ExifTool->new();
+		if( ! defined $exifTool ){
+			$log->error("$whoami (via $parent), line ".__LINE__." : error, failed to instantiate an ".'Image::ExifTool'." object. Continuing with the rest - output is saved but exif data will be missing ...");
+			goto FINISH; # mummy look! they are using gotos!!!
+		}
+		# Add custom user-defined tags:
 		# Gosh! https://exiftool.org/forum/index.php?topic=7377.0
 		my %tagnames = map { $_ => { Name => $_, Writable => 'string' } } keys %$exif;
 		%Image::ExifTool::UserDefined = ( 'Image::ExifTool::XMP::xmp' => { %tagnames } );
@@ -278,26 +284,27 @@ sub	shoot {
 		for my $tn (keys %$exif){
 			my $tv = $exif->{$tn};
 			my @rs = $exifTool->SetNewValue($tn, $tv);
-			if( $rs[0] == 0 ){ print STDERR "$whoami (via $parent), line ".__LINE__." : error, failed to add tag '${tn}' => '${tv}', ignoring it. Error: ".$rs[1]."\n" }
+			if( $rs[0] == 0 ){ $log->error("$whoami (via $parent), line ".__LINE__." : error, failed to add tag '${tn}' => '${tv}', ignoring this error and continuing with the rest - output is saved but exif data may be missing. Error: ".$rs[1]."") }
 		}
 		my $ws = $exifTool->WriteInfo($outfile);
-		if( $ws == 0 ){ print STDERR perl2dump($exif)."$whoami (via $parent), line ".__LINE__." : error, failed to write above EXIF data to output file '$outfile'. Ignoring this ...\n" }
-		elsif( $ws == 2 ){ print STDERR perl2dump($exif)."$whoami (via $parent), line ".__LINE__." : warning, there were no EXIF data changes to be written to the output file '$outfile' (see the data above). None of the user-specified exif data seems to have been written because there was probably none.\n" }
+		if( $ws == 0 ){ $log->error(perl2dump($exif)."$whoami (via $parent), line ".__LINE__." : error, failed to write above EXIF data to output file '$outfile'. Ignoring this and continuing with the rest - output is saved but exif data will be missing ...") }
+		elsif( $ws == 2 ){ $log->error(perl2dump($exif)."$whoami (via $parent), line ".__LINE__." : warning, there were no EXIF data changes to be written to the output file '$outfile' (see the data above). None of the user-specified exif data seems to have been written because there was probably none.") }
 
-		# do a check
+		# do a check? if not paranoid, comment this out:
 		my $have_errors = 0;
-		my $retc = WWW::Mechanize::Chrome::Webshot::_check_if_exif_tags_exist_in_image($outfile, $exif);
-		if( ! defined($retc) ){ print STDERR "$whoami (via $parent), line ".__LINE__." : warning, call to ".'_check_if_exif_tags_exist_in_image()'." has failed.\n" }
+		my $retc = WWW::Mechanize::Chrome::Webshot::_check_if_exif_tags_exist_in_image($outfile, $exif, $log);
+		if( ! defined($retc) ){ $log->error("$whoami (via $parent), line ".__LINE__." : warning, call to ".'_check_if_exif_tags_exist_in_image()'." has failed. Ignoring this error and continuing with the rest - output is saved but exif data may be missing ...") }
 		else {
 			for my $tn (keys %$exif){
-				if( ! exists($retc->{$tn}) ){ print STDERR "$whoami (via $parent), line ".__LINE__." : warning, tagname '${tn}' is not contained in the output image as it should."; $have_errors = 1 }
-				if( $retc->{$tn} == 0 ){ print STDERR "$whoami (via $parent), line ".__LINE__." : warning, tagname '${tn}' is not contained in the output image."; $have_errors = 1 }
-				if( $retc->{$tn} == 2 ){ print STDERR "$whoami (via $parent), line ".__LINE__." : warning, tagname '${tn}' is contained in the output image but its value is not correct (expected: ".$exif->{$tn}."')."; $have_errors = 1 }
+				if( ! exists($retc->{$tn}) ){ $log->error("$whoami (via $parent), line ".__LINE__." : warning, tagname '${tn}' is not contained in the output image as it should."); $have_errors = 1 }
+				if( $retc->{$tn} == 0 ){ $log->error("$whoami (via $parent), line ".__LINE__." : warning, tagname '${tn}' is not contained in the output image. Ignoring this and continuing with the rest - output is saved but exif data may be missing ..."); $have_errors = 1 }
+				if( $retc->{$tn} == 2 ){ $log->error("$whoami (via $parent), line ".__LINE__." : warning, tagname '${tn}' is contained in the output image but its value is not correct (expected: ".$exif->{$tn}."'). Ignoring this and continuing with the rest - output is saved but exif data may be missing ..."); $have_errors = 1 }
 			}
 		}
-		# we need to encode utf8 the exif data...
-		if( ($have_errors==0) && ($verbos > 0) ){ print STDOUT Encode::encode_utf8(perl2dump($exif))."$whoami (via $parent), line ".__LINE__." : above exif data was inserted into the screenshot image '$outfile' ...\n" }
+		if( ($have_errors==0) && ($verbos > 0) ){ $log->info(perl2dump($exif)."$whoami (via $parent), line ".__LINE__." : above exif data was inserted into the screenshot image '$outfile' ...") }
 	}
+
+	FINISH:
 	return 1 # success
 }
 
@@ -308,7 +315,8 @@ sub	shoot {
 sub	launch_mech_obj {
 	my $self = $_[0];
 	my $params = $_[1] // {};
-	my $verbos = $self->verbosity();
+	my $verbos = $self->verbosity;
+	my $log = $self->log;
 	# the above params have the same structure as the default below
 	# we overwrite defaults with params (if any)
 
@@ -372,9 +380,9 @@ sub	launch_mech_obj {
         	Log::Log4perl->easy_init(Log::Log4perl::Level::to_priority('ERROR'));
 	}
 
-	if( $verbos > 2 ){ print STDOUT perl2dump(\%my_mech_params)."$whoami (via $parent), line ".__LINE__." : instantiating a WWW::Mechanize::Chrome object with above parameters ...\n" }
+	if( $verbos > 2 ){ $log->info(perl2dump(\%my_mech_params)."$whoami (via $parent), line ".__LINE__." : instantiating a WWW::Mechanize::Chrome object with above parameters ...") }
 	$self->{'_private'}->{'WWW::Mechanize::Chrome-object'} = WWW::Mechanize::Chrome->new(%my_mech_params);
-	if( ! defined $self->{'_private'}->{'WWW::Mechanize::Chrome-object'} ){ print STDERR "_create_mech_obj() : call to ".'WWW::Mechanize::Chrome->new()'." with params:\n".perl2dump(%my_mech_params)."\n---end mech launch params\n    has failed, parameters to this sub (launch_mech_obj) are:\n".perl2dump($params)."\n---- end of sub parameters.\n"; return undef }
+	if( ! defined $self->{'_private'}->{'WWW::Mechanize::Chrome-object'} ){ $log->error("_create_mech_obj() : call to ".'WWW::Mechanize::Chrome->new()'." with params:\n".perl2dump(%my_mech_params)."\n---end mech launch params\n    has failed, parameters to this sub (launch_mech_obj) are:\n".perl2dump($params)."\n---- end of sub parameters."); return undef }
 	# at this stage the my_mech_params are different, appended by W::M::C !!!
 	# --no-sandbox exists there too!
 
@@ -382,7 +390,7 @@ sub	launch_mech_obj {
 	# to fix the mech obj too, after we created it above:
 	$verbos = $self->verbosity($self->verbosity);
 
-	if( $verbos > 0 ){ print "$whoami (via $parent), line ".__LINE__." : launched ".'WWW::Mechanize::Chrome'." with the following parameters:\n".perl2dump(\%my_mech_params)."\n--- end mech launch parameters\n"; }
+	if( $verbos > 0 ){ $log->info("$whoami (via $parent), line ".__LINE__." : launched ".'WWW::Mechanize::Chrome'." with the following parameters:\n".perl2dump(\%my_mech_params)."\n--- end mech launch parameters."); }
 
 	return  $self->{'_private'}->{'WWW::Mechanize::Chrome-object'};
 }
@@ -597,28 +605,27 @@ sub init {
 	# then we will overwrite with user-specified params if any
 	my ($configfile, $confighash);
 	if( exists($params->{'configfile'}) && defined($configfile=$params->{'configfile'}) ){
-		if( ! -f $configfile ){ print STDERR __PACKAGE__."${whoami} (via $parent), line ".__LINE__." : error, specified configfile '$configfile' does not exist or it is not a file.\n"; return 1 }
+		if( ! -f $configfile ){ print STDERR "${whoami} (via $parent), line ".__LINE__." : error, specified configfile '$configfile' does not exist or it is not a file.\n"; return 1 }
 		# this reads, creates confighash and calls confighash() which will do all the tests
-		if( ! defined $self->configfile($configfile) ){ print STDERR __PACKAGE__."${whoami} (via $parent), line ".__LINE__." : error, call to ".'configfile()'." has failed for configfile '$configfile'.\n"; return 1 }
+		if( ! defined $self->configfile($configfile) ){ print STDERR "${whoami} (via $parent), line ".__LINE__." : error, call to ".'configfile()'." has failed for configfile '$configfile'.\n"; return 1 }
 		$confighash = $self->confighash();
 	} elsif( exists($params->{'configstring'}) && defined($params->{'configstring'}) ){
 		$confighash = parse_configstring($params->{'configstring'}, undef);
-		if( ! defined $confighash ){ print STDERR $params->{'configstring'}."\n".__PACKAGE__."${whoami} (via $parent), line ".__LINE__." : error, call to ".'parse_configstring()'." has failed for the above configuration string provided.\n"; return 1 }
+		if( ! defined $confighash ){ print STDERR $params->{'configstring'}."\n"."${whoami} (via $parent), line ".__LINE__." : error, call to ".'parse_configstring()'." has failed for the above configuration string provided.\n"; return 1 }
 		# this sets the confighash and checks it too
-		if( ! defined $self->confighash($confighash) ){ print STDERR $params->{'configstring'}."\n".__PACKAGE__."${whoami} (via $parent), line ".__LINE__." : error, call to ".'confighash()'." has failed for above configuration string provided.\n"; return 1 }
+		if( ! defined $self->confighash($confighash) ){ print STDERR $params->{'configstring'}."\n"."${whoami} (via $parent), line ".__LINE__." : error, call to ".'confighash()'." has failed for above configuration string provided.\n"; return 1 }
 	} elsif( exists($params->{'confighash'}) && defined($params->{'confighash'}) ){
 		$confighash = $params->{'confighash'};
 		# this sets the confighash and checks it too
-		if( ! defined $self->confighash($confighash) ){ print STDERR __PACKAGE__."${whoami} (via $parent), line ".__LINE__." : error, call to ".'confighash()'." has failed.\n"; return 1 }
+		if( ! defined $self->confighash($confighash) ){ print STDERR "${whoami} (via $parent), line ".__LINE__." : error, call to ".'confighash()'." has failed.\n"; return 1 }
 	} else {
 		# no config specified, load default
 		$confighash = parse_configstring($DEFAULT_CONFIGSTRING, undef);
-		if( ! defined $confighash ){ print STDERR $params->{'configstring'}."\n".__PACKAGE__."${whoami} (via $parent), line ".__LINE__." : error, call to ".'parse_configstring()'." has failed for the above configuration string provided.\n"; return 1 }
+		if( ! defined $confighash ){ print STDERR $params->{'configstring'}."\n"."${whoami} (via $parent), line ".__LINE__." : error, call to ".'parse_configstring()'." has failed for the above configuration string provided.\n"; return 1 }
 		# this sets the confighash and checks it too
-		if( ! defined $self->confighash($confighash) ){ print STDERR $params->{'configstring'}."\n".__PACKAGE__."${whoami} (via $parent), line ".__LINE__." : error, call to ".'confighash()'." has failed for above configuration string provided.\n"; return 1 }
-		print STDERR __PACKAGE__."${whoami} (via $parent), line ".__LINE__." : warning, loading default configuration because none was specified ...\n";
+		if( ! defined $self->confighash($confighash) ){ print STDERR $params->{'configstring'}."\n"."${whoami} (via $parent), line ".__LINE__." : error, call to ".'confighash()'." has failed for above configuration string provided.\n"; return 1 }
+		print STDOUT "${whoami} (via $parent), line ".__LINE__." : warning, loading default configuration because none was specified ...\n";
 	}
-
 	# by now we have a confighash in self or died
 
 	# for creating the logger: check
@@ -627,13 +634,13 @@ sub init {
 	#  3. if all else fails, create a vanilla logger
 	if( exists($params->{'logger'}) && defined($params->{'logger'}) ){
 		$self->{'_private'}->{'log'}->{'logger-object'} = $params->{'logger'};
-		#print STDOUT "${whoami} (via $parent), line ".__LINE__." : using user-supplied logger object.\n";
+		#$log->info("${whoami} (via $parent), line ".__LINE__." : using user-supplied logger object.");
 	} elsif( exists($params->{'logfile'}) && defined($params->{'logfile'}) ){
 		$self->{'_private'}->{'log'}->{'logger-object'} = Mojo::Log->new(path => $params->{'logfile'});
-		#print STDOUT "${whoami} (via $parent), line ".__LINE__." : logging to file '".$params->{'logfile'}."'.\n";
+		#$log->info("${whoami} (via $parent), line ".__LINE__." : logging to file '".$params->{'logfile'}."'.");
 	} elsif( ! defined($self->{'_private'}->{'log'}->{'logger-object'}) ){
 		$self->{'_private'}->{'log'}->{'logger-object'} = Mojo::Log->new();
-		#print STDOUT "${whoami} (via $parent), line ".__LINE__." : a vanilla logger has been created to log to the console.\n";
+		#$log->info("${whoami} (via $parent), line ".__LINE__." : a vanilla logger has been created to log to the console.");
 	}
 
         # Now we have a logger
@@ -733,7 +740,7 @@ sub init {
 	# 'exif' specified in the shoot()
 	if( exists($params->{'exif'}) && defined($params->{'exif'}) ){
 		# check that the exif data format is valid : { k => v, ... }
-		if( ref($params->{'exif'})ne'HASH' ){ print STDERR "$whoami (via $parent), line ".__LINE__." : error, 'exif' parameter expects a HASH of tagname => tagvalue pairs, not ".ref($params->{'exif'}).".\n"; return 1; }
+		if( ref($params->{'exif'})ne'HASH' ){ $log->error("$whoami (via $parent), line ".__LINE__." : error, 'exif' parameter expects a HASH of tagname => tagvalue pairs, not ".ref($params->{'exif'})."."); return 1; }
 		$self->{'_private'}->{'exif'} = $params->{'exif'};
 	}
 
@@ -806,7 +813,7 @@ sub init_module_specific {
 	}
 
 	# done
-	if( $verbosity > 0 ){ $log->info("${whoami} (via $parent), line ".__LINE__." : ".__PACKAGE__." has been initialised ...") }
+	if( $verbosity > 0 ){ $log->info("${whoami} (via $parent), line ".__LINE__." : "." has been initialised ...") }
 	return 0 # success
 }
 
@@ -818,7 +825,7 @@ sub init_module_specific {
 # 2 : exists but has incorrect value
 # exists or not respectively
 sub	_check_if_exif_tags_exist_in_image {
-	my ($imagefile, $exif) = @_;
+	my ($imagefile, $exif, $log) = @_;
 	my $parent = ( caller(1) )[3] || "N/A";
 	my $whoami = ( caller(0) )[3];
 	# the problem is that tagnames (not values) can take their own mysterious case
@@ -831,15 +838,15 @@ sub	_check_if_exif_tags_exist_in_image {
 		my $tnuc = uc $tn;
 		if( ! exists($info->{$tnuc}) ){
 			# missing, output is 0
-			print STDERR "$whoami (via $parent), line ".__LINE__." : error, tag name '${tn}' does not exist in output image '$imagefile'.\n";
+			$log->error("$whoami (via $parent), line ".__LINE__." : error, tag name '${tn}' does not exist in output image '$imagefile'.");
 			$ret{$tn} = 0;
 			next;
 		}
 		my $gv = Encode::decode_utf8($info->{$tnuc});
 		if( $gv ne $tv ){
 			# incorrect value, output is 2
-			print STDERR "$whoami (via $parent), line ".__LINE__." : error, tag name '${tn}' in output image '$imagefile' does not have the correct value (expected: '".${tv}."', got: '".${gv}."').\n";
-			#print STDERR "$whoami (via $parent), line ".__LINE__." : error, tag name '${tn}' in output image '$imagefile' does not have the correct value (expected: '".${tv}."', got: '".Encode::decode_utf8(${gv})."').\n";
+			$log->error("$whoami (via $parent), line ".__LINE__." : error, tag name '${tn}' in output image '$imagefile' does not have the correct value (expected: '".${tv}."', got: '".${gv}."').");
+			#$log->error("$whoami (via $parent), line ".__LINE__." : error, tag name '${tn}' in output image '$imagefile' does not have the correct value (expected: '".${tv}."', got: '".Encode::decode_utf8(${gv})."').");
 			$ret{$tn} = 2;
 			next;
 		}
@@ -860,7 +867,7 @@ WWW::Mechanize::Chrome::Webshot - cheap and cheerful html2pdf converter, take a 
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =head1 SYNOPSIS
 
@@ -891,7 +898,7 @@ Here are some examples:
     $shooter->shoot({
       'output-filename' => 'abc.png',
       # optional unless it can not be deduced from filename
-      'output-format' => 'png', # pdf
+      'output-format' => 'png', # or pdf
 
       # URL or local file, e.g. 'file:///A/B/C.html'
       # !!! BUT USE ABSOLUTE FILEPATH in uri
@@ -1134,6 +1141,14 @@ the first time you take a screenshot. It will only be re-spawned if
 you have shutdown the browser in the meantime. Exiting your script
 will shutdown the browser. And so, running a script again will
 re-spawn the browser (AFAIK).
+
+
+=head2 CAVEATS
+
+In exporting to PDF, the size of the output image does not
+seem to be the same as the browser size. This does not happen
+with exporting to PNG.
+
 
 =head1 AUTHOR
 

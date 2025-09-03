@@ -11,7 +11,7 @@ use Exporter qw(import);
 
 our( @EXPORT, @EXPORT_OK, %EXPORT_TAGS );
 
-our $VERSION = '0.906';
+our $VERSION = '0.907';
 
 =encoding utf8
 
@@ -75,6 +75,8 @@ I don't really know what this does.
 =item * bg_green
 
 =item * bg_magenta
+
+=item * bg_orange
 
 =item * bg_red
 
@@ -226,6 +228,8 @@ This dies if N is not a positive number between 0 and 255 (inclusive).
 =item * text_green
 
 =item * text_magenta
+
+=item * text_orange
 
 =item * text_red
 
@@ -446,6 +450,23 @@ BEGIN {
 			*{$name} = sub () { $value };
 			_export( $name, $group->[1] );
 			}
+		}
+
+	my @secondary_colors = (
+		[ 'orange', [ 0xFF, 0x8C, 0x00 ] ],
+		);
+
+	foreach my $tuple ( @secondary_colors ) {
+		no strict 'refs';
+		my( $color, $rgb ) = $tuple->@*;
+		my $name = "text_$color";
+		my $value = text_rgb( $rgb->@* );
+		*{$name} = sub () { $value };
+		_export( $name, 'text' );
+
+		$name = "bg_$color";
+		$value = bg_rgb( $rgb->@* );
+		_export( $name, 'bg' );
 		}
 	}
 

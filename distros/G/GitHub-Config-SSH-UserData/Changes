@@ -1,5 +1,9 @@
 Revision history for GitHub-Config-SSH-UserData
 
+0.04    2025/09/02
+
+        - allow localizing HOME before calling the function.
+
 0.03    2025/08/09
 
         - Removed duplicate statement.

@@ -8,7 +8,7 @@
 
 package Mail::Transport;
 use vars '$VERSION';
-$VERSION = '3.006';
+$VERSION = '3.007';
 
 use base 'Mail::Reporter';
 
@@ -20,25 +20,25 @@ use File::Spec;
 
 
 my %mailers =
- ( exim     => '::Exim'
- , imap     => '::IMAP4'
- , imap4    => '::IMAP4'
- , mail     => '::Mailx'
- , mailx    => '::Mailx'
- , pop      => '::POP3'
- , pop3     => '::POP3'
- , postfix  => '::Sendmail'
- , qmail    => '::Qmail'
- , sendmail => '::Sendmail'
- , smtp     => '::SMTP'
- );
+  ( exim     => '::Exim'
+  , imap     => '::IMAP4'
+  , imap4    => '::IMAP4'
+  , mail     => '::Mailx'
+  , mailx    => '::Mailx'
+  , pop      => '::POP3'
+  , pop3     => '::POP3'
+  , postfix  => '::Sendmail'
+  , qmail    => '::Qmail'
+  , sendmail => '::Sendmail'
+  , smtp     => '::SMTP'
+  );
 
 
 sub new(@)
 {   my $class = shift;
 
     $class eq __PACKAGE__ || $class eq "Mail::Transport::Send"
-		or return $class->SUPER::new(@_);
+        or return $class->SUPER::new(@_);
 
     # auto restart by creating the right transporter.
 
@@ -106,7 +106,5 @@ sub findBinary($@)
 
     undef;
 }
-
-#------------------------------------------
 
 1;

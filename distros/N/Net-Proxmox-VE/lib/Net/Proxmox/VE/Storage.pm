@@ -7,7 +7,7 @@ use strict;
 use warnings;
 
 package Net::Proxmox::VE::Storage;
-$Net::Proxmox::VE::Storage::VERSION = '0.42';
+$Net::Proxmox::VE::Storage::VERSION = '0.43';
 use parent 'Exporter';
 
 use Net::Proxmox::VE::Exception;
@@ -128,7 +128,7 @@ Net::Proxmox::VE::Storage - Store object
 
 =head1 VERSION
 
-version 0.42
+version 0.43
 
 =head1 SYNOPSIS
 

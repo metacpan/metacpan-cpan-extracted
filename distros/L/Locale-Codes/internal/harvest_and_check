@@ -122,7 +122,7 @@ our %new      = get_data();
 
 print "#"x70,"\n";
 print "Suspected HTML in codes:\n\n";
-system("egrep '<' $file");
+system("grep -E '<' $file");
 
 compare("NAMES");
 

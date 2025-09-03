@@ -1,5 +1,12 @@
 Revision history for Perl extension Module::Case.
 
+0.04  Tue Sep 02 21:00:00 2025
+ - Add more test cases
+ - Avoid @INC munging unless exists sensitive modules
+ - Always restore @INC once all flagged modules are tried
+ - Prevent "Subroutine redefined" spewage when double loading
+ - Fix bug where another CODEREF in @INC may get skipped
+
 0.03  Sat Aug 30 18:00:00 2025
  - Allow case-ignorant systems act case-sensitive
    when loading modules.

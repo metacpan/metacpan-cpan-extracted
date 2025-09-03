@@ -7,11 +7,18 @@ This document is automatically generated from the document:
 and that document should be considered the canonical source of change
 related information.
 
+3.85  2025-09-02  sbeck
+  -  Fixed missing test
+         Missed testing for one error case in code2names that caused it to
+         return the incorrect value. GitHub #19
+
+  -  NEW CODE(s)
+
 3.84  2025-06-10  sbeck
   -  Fixed a packaging error
          For some reason, there was a problem with my 3.83 package which
          caused the module to completely disappear from CPAN. This is a
-         release to try to correct that.
+         release to try to correct that. Reported by Michal Josef Spacek.
 
 3.83  2025-06-01  sbeck
   -  NEW CODE(s)

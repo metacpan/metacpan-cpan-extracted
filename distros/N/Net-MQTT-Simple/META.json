@@ -45,6 +45,6 @@
          "web" : "https://github.com/Juerd/Net-MQTT-Simple"
       }
    },
-   "version" : "1.32",
+   "version" : "1.33",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,0 +1,12 @@
+TODO list for Perl module Perl5::TestEachCommit
+
+Improve Perl5::TestEachCommit::Util::usage().  As of now it's just a skeleton.
+Write POD for it.
+
+Write a program which will appear under scripts in the tarball and be
+installable under /usr/local/bin which will call
+Perl5::TestEachCommit::Util::process_command_line() to process switches, then
+call a sensible collection of Perl5::TestEachCommit methods.
+
+Write a subclass which during Configure, make test_prep and make test_harness
+will divert all STDOUT to /dev/null.  Perl5::TestEachCommit::Quietly.

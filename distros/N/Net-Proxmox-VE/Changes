@@ -1,5 +1,8 @@
 Revision history for perl Net::Proxmox::VE
 
+0.43 2025-09-02
+- Add totp support for user+pass logins
+
 0.42 2025-08-03
 - Add Test::Exception to build requirements (GH#33)
 

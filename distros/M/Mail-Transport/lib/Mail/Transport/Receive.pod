@@ -80,8 +80,6 @@ specified ID.
 
 =head2 Server connection
 
-Extends L<"Server connection" in Mail::Transport|Mail::Transport/"Server connection">.
- 
 =over 4
 
 =item $obj-E<gt>B<findBinary>( $name, [@directories] )
@@ -168,6 +166,10 @@ Inherited, see L<Mail::Reporter/"Cleanup">
 
 =back
 
+=head2 Server connection
+
+Extends L<"Server connection" in Mail::Transport|Mail::Transport/"Server connection">.
+ 
 =head1 DIAGNOSTICS
 
 =over 4
@@ -195,8 +197,8 @@ of the package.
 
 =head1 SEE ALSO
 
-This module is part of Mail-Transport distribution version 3.006,
-built on August 21, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Transport distribution version 3.007,
+built on September 03, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

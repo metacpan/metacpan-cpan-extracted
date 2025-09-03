@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# Last modified: Thu Aug 28 2025 04:41:39 PM -04:00 [EDT]
+# Last modified: Tue Sep 02 2025 01:15:23 PM -04:00 [EDT]
 # First created: Thu Jul 24 2025 12:47:02 PM -04:00 [EDT]
 
 {
@@ -8,7 +8,7 @@
     use v5.18;
     use utf8;
     use warnings;
-    our $VERSION = '0.30';
+    our $VERSION = '0.35';
     require Exporter;
     our @ISA = qw(Exporter);
     our @EXPORT = ();

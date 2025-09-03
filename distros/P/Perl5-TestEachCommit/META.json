@@ -1,0 +1,66 @@
+{
+   "abstract" : "Test each commit in a pull request to Perl core",
+   "author" : [
+      "James E Keenan (jkeenan@cpan.org)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Perl5-TestEachCommit",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Devel::CheckBin" : "0",
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Dump" : "0",
+            "File::Spec" : "0",
+            "File::Spec::Unix" : "0",
+            "Getopt::Long" : "0",
+            "perl" : "5.014000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "String::PerlIdentifier" : "0.06",
+            "Test::Simple" : "0.44"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jkeenan/perl5-test-each-commit/issues"
+      },
+      "homepage" : "http://thenceforward.net/perl/modules/Perl5-TestEachCommit/",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/jkeenan/perl5-test-each-commit.git",
+         "web" : "https://github.com/jkeenan/perl5-test-each-commit"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

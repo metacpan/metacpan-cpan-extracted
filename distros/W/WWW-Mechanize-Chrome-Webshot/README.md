@@ -4,7 +4,7 @@ WWW::Mechanize::Chrome::Webshot - cheap and cheerful html2pdf converter, take a 
 
 # VERSION
 
-Version 0.03
+Version 0.04
 
 # SYNOPSIS
 
@@ -35,7 +35,7 @@ Here are some examples:
     $shooter->shoot({
       'output-filename' => 'abc.png',
       # optional unless it can not be deduced from filename
-      'output-format' => 'png', # pdf
+      'output-format' => 'png', # or pdf
 
       # URL or local file, e.g. 'file:///A/B/C.html'
       # !!! BUT USE ABSOLUTE FILEPATH in uri
@@ -261,6 +261,12 @@ the first time you take a screenshot. It will only be re-spawned if
 you have shutdown the browser in the meantime. Exiting your script
 will shutdown the browser. And so, running a script again will
 re-spawn the browser (AFAIK).
+
+## CAVEATS
+
+In exporting to PDF, the size of the output image does not
+seem to be the same as the browser size. This does not happen
+with exporting to PNG.
 
 # AUTHOR
 

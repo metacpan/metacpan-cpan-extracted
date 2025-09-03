@@ -4,6 +4,11 @@
 All changes are made by Mark Overmeer <markov@cpan.org> unless
 explicitly stated differently.
 
+version 3.007: Wed  3 Sep 10:47:04 CEST 2025
+
+	Fixes:
+	- smtp when the message body does not naturally end on a blank.
+
 version 3.006: Thu 21 Aug 10:23:14 CEST 2025
 
 	Changes:

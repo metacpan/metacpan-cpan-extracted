@@ -4,17 +4,9 @@ use 5.008000;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 our $sensitive_modules;
-
-sub import {
-    my $class = shift;
-    foreach (@_) {
-        $sensitive_modules->{$_} = $_;
-    }
-    return;
-}
 
 our $inc_sniffer = sub {
     # Special @INC hook to only load modules with exact case match.
@@ -27,22 +19,19 @@ our $inc_sniffer = sub {
     $pkg =~ s/\.pm$//;
     $pkg =~ s{/+}{::}g;
     # For efficiency purposes, skip module unless it's one of the special case sensitive packages flagged to load case-sensitively.
-    delete $sensitive_modules->{$pkg} or return undef;
+    $sensitive_modules->{$pkg} or return undef;
 
-    # Skip the directories before me since they've already been tried and obviously didn't find the file
+    # Skip the directories before me since they've already been tried (and obviously didn't find the file already or else we wouldn't be here)
     my $keep = 0;
     # Only look through regular directories after myself but ignore CODEREFs (such as myself) in @INC
     my @scan = grep { $keep = 1 if $_ eq $self; !ref $_ and $keep; } @INC;
-    if (!keys %$sensitive_modules) {
-        # If this was the last sensitive module, restore @INC without me
-        $sensitive_modules = undef;
-        @INC = grep { $_ ne $self } @INC;
-    }
+    # Now that @scan has been built, it's safe to disable $pkg from the list.
+    __PACKAGE__->unimport($pkg);
     my $found_wrong_case = 0;
-    foreach my $dir (grep { !ref $_ } @scan) {
+    foreach my $dir (@scan) {
         if (open my $fh, "<", "$dir/$filename") {
             # Found a matching file but might not have same case.
-            # Take a quick peek to packe sure the case matches too.
+            # Take a quick peek to make sure the case matches too.
             my $contents = join "", <$fh>;
             if ($contents =~ /^\s*package\s+\Q$pkg\E\s*;/m) {
                  # Smells like a pretty good package.
@@ -75,11 +64,70 @@ our $inc_sniffer = sub {
     return undef;
 };
 
-our $already_injected;
-if (!$already_injected++) {
-    # Never injected into @INC yet
-    unshift @INC, $inc_sniffer;
-    $sensitive_modules ||= {};
+our $sub_import = sub {
+    my $class = shift;
+    foreach (@_) {
+        # Autovivify $sensitive_modules only as needed
+        $sensitive_modules->{$_} = $_;
+    }
+    if (keys %$sensitive_modules and !grep { $_ eq $inc_sniffer } @INC) {
+        # Only inject the sniffer if there is something to smell
+        # and only if it's not already in the list.
+        # Search for the first regular directory (non-ref string) @INC setting
+        # Then jam the $inc_sniffer right before it.
+        for (my $i = 0; $i < @INC; $i++) {
+            if (!ref $INC[$i]) {
+                splice @INC, $i, 0, $inc_sniffer;
+                last;
+            }
+        }
+    }
+    return;
+};
+
+my $sub_unimport = sub {
+    my $class = shift;
+    my $wiped = undef;
+    if ($sensitive_modules) {
+        if (@_) {
+            # Pick out module(s) to quit case sniffing for
+            foreach (@_) {
+                $wiped ||= delete $sensitive_modules->{$_};
+            }
+        }
+        else {
+            # No specific module provided, so just wipe everything
+            ($wiped) = keys %$sensitive_modules;
+            $sensitive_modules = undef;
+        }
+    }
+    if (!$sensitive_modules or !keys %$sensitive_modules) {
+        # No module case-sensitive modules left, so restore @INC without the sniffer
+        $sensitive_modules = undef;
+        @INC = grep { $_ ne $inc_sniffer } @INC;
+    }
+    # Return one of the modules that got wiped, if any.
+    return $wiped;
+};
+
+{
+    no strict 'refs';
+    my $should_pkg = __PACKAGE__;
+    defined &{"$should_pkg\::import"}   or *{"$should_pkg\::import"}   = $sub_import;
+    defined &{"$should_pkg\::unimport"} or *{"$should_pkg\::unimport"} = $sub_unimport;
+    (my $should_file = "$should_pkg.pm") =~ s%::%/%g;
+    if (__FILE__ !~ m{\b\Q$should_file\E$} and
+        __FILE__ =~ m{\b(\Q$should_file\E)$}i) {
+        my $fake_file = $1;
+        my $fake_pkg = $fake_file;
+        $fake_pkg =~ s%/+%::%g;
+        $fake_pkg =~ s/\.pm//;
+        #if (eval { require Carp }) { Carp::carp("Case-ignorant filesystem exploited by loading module wrongly: $fake_pkg"); }
+        defined &{"$fake_pkg\::import"}   or *{"$fake_pkg\::import"}   = *{"$should_pkg\::import"};
+        defined &{"$fake_pkg\::unimport"} or *{"$fake_pkg\::unimport"} = *{"$should_pkg\::unimport"};
+        # Fake Preload Real Module
+        $INC{$should_file} = __FILE__;
+    }
 }
 
 1;

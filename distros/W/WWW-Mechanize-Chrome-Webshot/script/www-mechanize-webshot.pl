@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use Getopt::Long;
 use Encode;
@@ -16,7 +16,7 @@ use WWW::Mechanize::Chrome::Webshot;
 use Data::Roundtrip qw/perl2dump no-unicode-escape-permanently/;
 
 my $DEFAULT_CONFIGSTRING = <<'EOCH';
-</* $VERSION = '0.03'; */>
+</* $VERSION = '0.04'; */>
 </* comments are allowed */>
 </* and <% vars %> and <% verbatim sections %> */>
 {

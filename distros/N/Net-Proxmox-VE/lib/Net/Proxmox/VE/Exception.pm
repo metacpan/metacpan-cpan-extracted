@@ -7,7 +7,7 @@ use strict;
 use warnings;
 
 package Net::Proxmox::VE::Exception;
-$Net::Proxmox::VE::Exception::VERSION = '0.42';
+$Net::Proxmox::VE::Exception::VERSION = '0.43';
 
 sub _new {
 
@@ -70,7 +70,7 @@ Net::Proxmox::VE::Exception - Functions for the 'cluster' portion of the API
 
 =head1 VERSION
 
-version 0.42
+version 0.43
 
 =head1 SYNOPSIS
 

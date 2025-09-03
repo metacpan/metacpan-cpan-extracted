@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# Last modified: Fri Aug 15 2025 06:31:35 PM -04:00 [EDT]
+# Last modified: Tue Sep 02 2025 01:16:34 PM -04:00 [EDT]
 # First created: Wed Aug 06 2025 01:25:55 PM -04:00 [EDT]
 
 package Env::Scalars::scalars2yaml;
@@ -7,7 +7,7 @@ use strict;
 use v5.18;
 use utf8;
 use warnings;
-our $VERSION = '0.30';
+our $VERSION = '0.35';
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = ();

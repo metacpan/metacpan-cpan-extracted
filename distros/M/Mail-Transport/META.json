@@ -54,6 +54,6 @@
          "web" : "https://github.com/markov2/perl5-Mail-Transport"
       }
    },
-   "version" : "3.006",
+   "version" : "3.007",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

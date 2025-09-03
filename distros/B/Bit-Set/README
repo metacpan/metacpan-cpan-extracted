@@ -2,7 +2,7 @@ NAME
     Bit::Set - Perl interface for bitset functions from the 'bit' C library
 
 VERSION
-    version 0.03
+    version 0.04
 
 SYNOPSIS
       use Bit::Set;
@@ -453,8 +453,8 @@ VIBECODING A FFI API
 
     Vibe coding a Perl interface to a foreign library- Part 1
     <https://chrisarg.github.io/Killing-It-with-PERL/2025/06/30/Vibe-coding-
-    a-Perl-interface-to-a-foreign-library-Part-1.html> =item Vibe coding a
-    Perl interface to a foreign library - Part 2
+    a-Perl-interface-to-a-foreign-library-Part-1.html>
+    Vibe coding a Perl interface to a foreign library - Part 2
     <https://chrisarg.github.io/Killing-It-with-PERL/2025/07/04/Vibe-coding-
     a-Perl-interface-to-a-foreign-library-Part-2.html>
 
@@ -523,11 +523,8 @@ VIBECODING A FFI API
          implementation for the C structure that passes options for the
          CPU/GPU enhanced container functions.
 
-    *    the POD documentation was generated as a skeleton using the
-         grouping of function in the README file. The documentation was no
-         frills, a very simple repetition of what is available from Bit
-         <https://github.com/chrisarg/Bit>, but it is enough to get one
-         started.
+    *    the POD documentation was skeleton but at least it followed the
+         grouping in the Bit <https://github.com/chrisarg/Bit> README file.
 
     However, the code itself would not work, requiring a few minor tweaks
     that are summarized below:

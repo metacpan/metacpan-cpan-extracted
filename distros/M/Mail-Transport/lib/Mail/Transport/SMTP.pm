@@ -8,7 +8,7 @@
 
 package Mail::Transport::SMTP;
 use vars '$VERSION';
-$VERSION = '3.006';
+$VERSION = '3.007';
 
 use base 'Mail::Transport::Send';
 
@@ -47,11 +47,7 @@ sub init($)
 
 sub trySend($@)
 {   my ($self, $message, %args) = @_;
-
-    my %send_options =
-      ( %{$self->{MTS_esmtp_options} || {}}
-      , %{$args{esmtp_options}       || {}}
-      );
+    my %send_options = ( %{$self->{MTS_esmtp_options} || {}}, %{$args{esmtp_options} || {}} );
 
     # From whom is this message.
     my $from = $args{from} || $self->{MTS_from} || $message->sender || '<>';
@@ -73,6 +69,7 @@ sub trySend($@)
     my $out = '';
     open my $fh, '>:raw', \$out;
     $self->putContent($message, $fh, undisclosed => 0);
+	$out =~ m![\r\n]\z! or $out .= "\r\n";
     close $fh;
 
     #### Send
@@ -133,8 +130,8 @@ sub Net::SMTP::datafast($)
 
     $$data =~ tr/\r\n/\015\012/ if "\r" ne "\015";  # mac
     $$data =~ s/(?<!\015)\012/\015\012/g;  # \n -> crlf as sep.  Needed?
-    $$data =~ s/^\./../;         # data starts with a dot, escape it
-    $$data =~ s/\012\./\012../g; # other lines which start with a dot
+    $$data =~ s/^\./../;                   # data starts with a dot, escape it
+    $$data =~ s/\012\./\012../g;           # other lines which start with a dot
 
     $self->_syswrite_with_timeout($$data . ".\015\012");
     $self->response == CMD_OK;
@@ -148,25 +145,20 @@ sub contactAnyServer()
     my ($enterval, $count, $timeout) = $self->retry;
     my ($host, $port, $username, $password) = $self->remoteHost;
     my @hosts = ref $host ? @$host : $host;
+    my $opts  = $self->{MTS_net_smtp_opts};
 
     foreach my $host (@hosts)
-    {   my $server = $self->tryConnectTo
-         ( $host, Port => $port,
-         , %{$self->{MTS_net_smtp_opts}}, Timeout => $timeout
-         );
-
-        defined $server or next;
+    {   my $server = $self->tryConnectTo($host, Port => $port, %$opts, Timeout => $timeout)
+            or next;
 
         $self->log(PROGRESS => "Opened SMTP connection to $host.");
 
         if(defined $username)
-        {   if($server->auth($username, $password))
-            {    $self->log(PROGRESS => "$host: Authentication succeeded.");
-            }
-            else
+        {   unless($server->auth($username, $password))
             {    $self->log(ERROR => "Authentication failed.");
                  return undef;
             }
+            $self->log(PROGRESS => "$host: Authentication succeeded.");
         }
 
         return $server;

@@ -1,0 +1,36 @@
+---
+abstract: 'Test each commit in a pull request to Perl core'
+author:
+  - 'James E Keenan (jkeenan@cpan.org)'
+build_requires:
+  Capture::Tiny: '0'
+  ExtUtils::MakeMaker: '0'
+  String::PerlIdentifier: '0.06'
+  Test::Simple: '0.44'
+configure_requires:
+  Devel::CheckBin: '0'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Perl5-TestEachCommit
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Data::Dump: '0'
+  File::Spec: '0'
+  File::Spec::Unix: '0'
+  Getopt::Long: '0'
+  perl: '5.014000'
+resources:
+  bugtracker: https://github.com/jkeenan/perl5-test-each-commit/issues
+  homepage: http://thenceforward.net/perl/modules/Perl5-TestEachCommit/
+  repository: https://github.com/jkeenan/perl5-test-each-commit.git
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

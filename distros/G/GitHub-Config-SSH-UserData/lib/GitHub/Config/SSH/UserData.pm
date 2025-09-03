@@ -10,10 +10,7 @@ use File::Spec::Functions;
 
 use Exporter 'import';
 
-use constant DEFAULT_CFG_FILE => catfile($ENV{HOME}, qw(.ssh config));
-
-our $VERSION = '0.03';
-
+our $VERSION = '0.04';
 
 our @EXPORT_OK = qw(get_user_data_from_ssh_cfg);
 
@@ -21,7 +18,7 @@ our @EXPORT_OK = qw(get_user_data_from_ssh_cfg);
 sub get_user_data_from_ssh_cfg {
   croak("Wrong number of arguments") if !@_ || @_ > 2;
   my $user_name = shift;
-  my $config_file = shift // DEFAULT_CFG_FILE;
+  my $config_file = shift // catfile($ENV{HOME}, qw(.ssh config));
   croak("First argument must be a scalar (a string)") if ref($user_name);
   croak("Second argument must be a scalar (a string)") if ref($config_file);
 
@@ -65,7 +62,7 @@ GitHub::Config::SSH::UserData - Read user data from comments in ssh config file
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =head1 SYNOPSIS
 

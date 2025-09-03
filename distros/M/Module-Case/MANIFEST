@@ -5,7 +5,14 @@ LICENSE
 README
 t/00-load.t
 t/05-ignorant-load.t
+t/06-dogfood-self.t
+t/07-dogfood-bad-good.t
+t/08-dogfood-good-bad.t
 t/10-fail-correctly.t
+t/11-fail-last.t
+t/15-unimport.t
+t/20-inc-ref-behavior-without.t
+t/21-inc-ref-behavior-with.t
 lib/Module/Case.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

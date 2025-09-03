@@ -7,7 +7,7 @@ use strict;
 use warnings;
 
 package Net::Proxmox::VE;
-$Net::Proxmox::VE::VERSION = '0.42';
+$Net::Proxmox::VE::VERSION = '0.43';
 use HTTP::Headers;
 use HTTP::Request::Common qw(GET POST DELETE);
 use JSON::MaybeXS         qw(decode_json);
@@ -283,6 +283,33 @@ sub get {
 }
 
 
+sub _handle_tfa {
+
+    my ($self, $challenge) = @_;
+
+    my $totp = $self->{params}->{totp} // '';
+    # if $totp is a code ref then call it
+    if (ref $totp eq 'CODE') {
+        $totp = $totp->(
+            username => $self->{params}->{username},
+            host     => $self->{params}->{host},
+            realm    => $self->{params}->{realm},
+        );
+    }
+
+    # Prepare login request w/ totp
+    my $url = $self->url_prefix . 'access/ticket';
+    my $data = {
+        'username' => $self->{params}->{username} . '@'
+          . $self->{params}->{realm},
+        'password' => "totp:$totp",
+        'tfa-challenge' => $challenge,
+    };
+
+    # Perform login request w/ totp
+    return $self->{ua}->post( $url, $data );
+}
+
 sub login {
 
     my $self = shift or return;
@@ -294,34 +321,54 @@ sub login {
     }
 
     # Prepare login request
-    my $url = $self->url_prefix . 'access/ticket';
-
-    # Perform login request
     my $request_time = time();
-    my $data         = {
+    my $url = $self->url_prefix . 'access/ticket';
+    my $request = {
         'username' => $self->{params}->{username} . '@'
           . $self->{params}->{realm},
         'password' => $self->{params}->{password},
     };
-    my $response = $self->{ua}->post( $url, $data );
+
+    # Perform login request
+    my $response = $self->{ua}->post( $url, $request );
 
     if ( $response->is_success ) {
         my $login_ticket_data = decode_json( $response->decoded_content );
-        $self->{ticket} = $login_ticket_data->{data};
-
-# We use the request time because the time to get the json ticket is undetermined.
-# It seems wiser to discard a ticket a few seconds before it expires rather than to incorrectly
-# continue using it after it has expired
-        $self->{ticket_timestamp} = $request_time;
-        print "DEBUG: login successful\n"
-          if $self->{params}->{debug};
-        return 1;
-    }
-    else {
-        if ( $self->{params}->{debug} ) {
-            print "DEBUG: login not successful\n";
-            print "DEBUG: " . $response->status_line . "\n";
+        my $data = $login_ticket_data->{data};
+        # Take care of TFA if needed
+        if ( $data->{NeedTFA} ) {
+            unless ( defined $self->{totp} ) {
+                print "DEBUG: totp required but not provided\n"
+                  if $self->{params}->{debug};
+                return;
+            }
+            $response = $self->_handle_tfa($data->{ticket});
+            if ($response->is_success) {
+                print "DEBUG: tfa successful\n"
+                  if $self->{params}->{debug};
+                my $tfa_ticket_data = decode_json( $response->decoded_content );
+                $self->{ticket} = $tfa_ticket_data->{data};
+            }
         }
+        else {
+            $self->{ticket} = $data;
+        }
+
+        if ($data->{ticket}) {
+            # We use the request time because the time to get the json ticket is undetermined.
+            # It seems wiser to discard a ticket a few seconds before it expires rather than to incorrectly
+            # continue using it after it has expired
+            $self->{ticket_timestamp} = $request_time;
+            print "DEBUG: login successful\n"
+              if $self->{params}->{debug};
+            return 1;
+        }
+    }
+
+    # If we get here then Login has failed
+    if ( $self->{params}->{debug} ) {
+        print "DEBUG: login not successful\n";
+        print "DEBUG: " . $response->status_line . "\n";
     }
 
     return;
@@ -332,11 +379,12 @@ sub _load_auth {
 
     my ( $self, $params ) = @_;
 
-    if ( $params->{password}
+    if ( ( $params->{password} or $params->{totp} )
         and ( $params->{tokenid} or $params->{secret} ) )
     {
         Net::Proxmox::VE::Exception->throw(
-'Both password and API Token provided. Pleae pick one authentication method'
+            'Both password and API Token credentials provided.'
+            . ' Please pick one authentication method'
         );
     }
 
@@ -349,6 +397,8 @@ sub _load_auth {
         $self->{'params'}->{'password'} = $password;
         $self->{'params'}->{'realm'}    = $realm;
         $self->{'params'}->{'username'} = $username;
+        $self->{'params'}->{'totp'}     = delete $params->{totp}
+            if defined $params->{totp};
         $self->{'ticket'}               = undef;
         $self->{'ticket_timestamp'}     = undef;
         $self->{'ticket_life'}          = 7200;        # 2 Hours
@@ -511,7 +561,7 @@ Net::Proxmox::VE - Pure Perl API for Proxmox Virtual Environment
 
 =head1 VERSION
 
-version 0.42
+version 0.43
 
 =head1 SYNOPSIS
 
@@ -523,6 +573,7 @@ version 0.42
       password => 'barpassword',
       username => 'root', # optional
       port     => 8006,   # optional
+      totp     => 123456, # optional
       realm    => 'pam',  # optional
   );
 
@@ -642,9 +693,9 @@ value of action with the GET method
 
 =head2 login
 
-Initiates the log in to the PVE Server using JSON API, and potentially obtains an Access Ticket.
+Initiates the login to the PVE Server using JSON API, and potentially obtains an Access Ticket.
 
-Returns true if success
+Returns true if successful
 
 =head2 new
 
@@ -655,13 +706,9 @@ Examples...
   my $obj = Net::Proxmox::VE->new(%args);
   my $obj = Net::Proxmox::VE->new(\%args);
 
-Valid arguments are...
+Authentication arguments are...
 
 =over 4
-
-=item I<host>
-
-Proxmox host instance to interact with. Required so no default.
 
 =item I<username>
 
@@ -669,7 +716,39 @@ User name used for authentication. Defaults to 'root', optional.
 
 =item I<password>
 
-Pass word user for authentication. Required so no default.
+Pass word user for authentication. Either use this password field or I<tokenid> and I<secret>.
+
+=item I<totp>
+
+Either the totp code or a sub ref to code that will return the totop code.
+
+  totp => '12345',
+  totp => sub { my %args = @_; return '12345' },
+
+If a subref is provided, the %args will include the keys I<username>, I<realm>, and I<host> with corresponding
+values. These may optionally be used to help determine the topt.
+
+Only valid with I<username> and I<password> parameters.
+
+=item I<tokenid>
+
+The tokenid of the API keys being used. Optional.
+
+=item I<secret>
+
+The secret of the API keys being used. Optional, although required when a I<tokenid> is provided.
+
+This is distinct from the I<password> field.
+
+=back
+
+Other arguments are...
+
+=over 4
+
+=item I<host>
+
+Proxmox host instance to interact with. Required so no default.
 
 =item I<port>
 

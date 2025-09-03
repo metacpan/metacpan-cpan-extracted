@@ -1,0 +1,44 @@
+#!perl
+
+use strict;
+use warnings;
+
+BEGIN {
+    if (eval { require tEsT::mOrE }) {
+        # Yey! This is very likely to be a case-insensitive file system
+        import Test::More tests => 14;
+        my $f = $INC{"Test/More.pm"} = delete $INC{"tEsT/mOrE.pm"};
+        ok($f, "Case-ignorant file system detected");
+        ok($INC{"Test/More.pm"}, "Test::More loaded with munged case: $f");
+    }
+    else {
+         print "1..0 # SKIP Smells like case-sensitive file system so not a valid test: $^O\n";
+         exit;
+    }
+}
+
+our $why = "";
+
+# First load the real module
+use Module::Case qw(cwD);
+BEGIN { ok(1, "Module::Case compiled and imported") }
+
+# Then try loading with broken case
+use mOdUlE::cAsE qw(cwd Cwd);
+BEGIN { ok(1, "mOdUlE::cAsE compiled and imported") }
+
+ok(!eval { require cwD }, "cwD: correctly fails even on case-ignorant file system");
+chomp($why = $@);
+ok($why, "Reason: $why");
+ok(!$INC{"cwD.pm"}, "cwD never loaded");
+
+ok(!eval { require cwd }, "cwd: correctly fails even on case-ignorant file system");
+chomp($why = $@);
+ok($why, "Reason: $why");
+ok(!$INC{"cwd.pm"}, "cwd never loaded");
+
+ok(!$INC{"Cwd.pm"}, "Cwd not loaded yet");
+ok(eval { require Cwd }, "Cwd require'd");
+chomp($why = $@);
+ok(!$why, "Cwd no error");
+ok($INC{"Cwd.pm"}, "Cwd loaded correctly");

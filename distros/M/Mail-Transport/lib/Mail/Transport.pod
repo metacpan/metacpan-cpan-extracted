@@ -146,30 +146,6 @@ Inherited, see L<Mail::Reporter/"Attributes">
 
 =back
 
-=head2 Server connection
-
-=over 4
-
-=item $obj-E<gt>B<findBinary>( $name, [@directories] )
-
-Look for a binary with the specified $name in the directories which
-are defined to be safe.  The list of standard directories is followed
-by the optional @directories.  The full pathname is returned.
-
-You may specify L<new(proxy)|Mail::Transport/"METHODS">, which specifies the absolute name
-of the binary to be used.
-
-=item $obj-E<gt>B<remoteHost>()
-
-Returns the hostname, port number, username and password to be used to
-establish the connection to the server for sending or receiving mail.
-
-=item $obj-E<gt>B<retry>()
-
-Returns the retry interval, retry count, and timeout for the connection.
-
-=back
-
 =head2 Error handling
 
 Extends L<"Error handling" in Mail::Reporter|Mail::Reporter/"Error handling">.
@@ -240,6 +216,30 @@ Inherited, see L<Mail::Reporter/"Cleanup">
 
 =back
 
+=head2 Server connection
+
+=over 4
+
+=item $obj-E<gt>B<findBinary>( $name, [@directories] )
+
+Look for a binary with the specified $name in the directories which
+are defined to be safe.  The list of standard directories is followed
+by the optional @directories.  The full pathname is returned.
+
+You may specify L<new(proxy)|Mail::Transport/"METHODS">, which specifies the absolute name
+of the binary to be used.
+
+=item $obj-E<gt>B<remoteHost>()
+
+Returns the hostname, port number, username and password to be used to
+establish the connection to the server for sending or receiving mail.
+
+=item $obj-E<gt>B<retry>()
+
+Returns the retry interval, retry count, and timeout for the connection.
+
+=back
+
 =head1 DIAGNOSTICS
 
 =over 4
@@ -267,8 +267,8 @@ of the package.
 
 =head1 SEE ALSO
 
-This module is part of Mail-Transport distribution version 3.006,
-built on August 21, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Transport distribution version 3.007,
+built on September 03, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

@@ -23,7 +23,7 @@ use lib ($FindBin::Bin, 'blib/lib');
 
 use WWW::Mechanize::Chrome::Webshot;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 my $VERBOSITY = 0; # we need verbosity of 10 (max), so this is not used
 my $CLEANUP = (exists($ENV{'PERL_TEST_TEMPDIR_TINY_NOCLEANUP'}) && ($ENV{'PERL_TEST_TEMPDIR_TINY_NOCLEANUP'}>0)) ? 1 : 0;
@@ -92,7 +92,11 @@ is($r, 1, 'shoot()'." : called and got good result.") or BAIL_OUT;
 ok(-s $tmpfile, "output file '$tmpfile' contains the screenshot") or BAIL_OUT("no screenshot was created, output file ($tmpfile) is missing or empty, something seriously wrong.");
 
 # check we have the exif tags
-$retc = WWW::Mechanize::Chrome::Webshot::_check_if_exif_tags_exist_in_image($tmpfile, $shoot_params->{'exif'});
+$retc = WWW::Mechanize::Chrome::Webshot::_check_if_exif_tags_exist_in_image(
+	$tmpfile,
+	$shoot_params->{'exif'},
+	$shooter->log,
+);
 ok(defined($retc), 'WWW::Mechanize::Chrome::Webshot::_check_if_exif_tags_exist_in_image()'." : called and got defined result for output file '$tmpfile'.") or BAIL_OUT("failed for output file '$tmpfile'");
 for my $tn (keys %{ $shoot_params->{'exif'} }){
 	ok(exists($retc->{$tn}), 'WWW::Mechanize::Chrome::Webshot::_check_if_exif_tags_exist_in_image()'." : called and output file '$tmpfile' contains tagname '${tn}'.") or BAIL_OUT("failed for output file '$tmpfile'");
@@ -120,7 +124,11 @@ is($r, 1, 'shoot()'." : called and got good result.") or BAIL_OUT;
 ok(-s $tmpfile, "output file '$tmpfile' contains the screenshot") or BAIL_OUT("no screenshot was created, output file ($tmpfile) is missing or empty, something seriously wrong.");
 
 # check we have the exif tags
-$retc = WWW::Mechanize::Chrome::Webshot::_check_if_exif_tags_exist_in_image($tmpfile, $shoot_params->{'exif'});
+$retc = WWW::Mechanize::Chrome::Webshot::_check_if_exif_tags_exist_in_image(
+	$tmpfile,
+	$shoot_params->{'exif'},
+	$shooter->log,
+);
 ok(defined($retc), 'WWW::Mechanize::Chrome::Webshot::_check_if_exif_tags_exist_in_image()'." : called and got defined result for output file '$tmpfile'.") or BAIL_OUT("failed for output file '$tmpfile'");
 for my $tn (keys %{ $shoot_params->{'exif'} }){
 	ok(exists($retc->{$tn}), 'WWW::Mechanize::Chrome::Webshot::_check_if_exif_tags_exist_in_image()'." : called and output file '$tmpfile' contains tagname '${tn}'.") or BAIL_OUT("failed for output file '$tmpfile'");

@@ -7,7 +7,7 @@ use strict;
 use warnings;
 
 package Net::Proxmox::VE::Cluster;
-$Net::Proxmox::VE::Cluster::VERSION = '0.42';
+$Net::Proxmox::VE::Cluster::VERSION = '0.43';
 use parent 'Exporter';
 
 use Net::Proxmox::VE::Exception;
@@ -461,7 +461,7 @@ Net::Proxmox::VE::Cluster - Functions for the 'cluster' portion of the API
 
 =head1 VERSION
 
-version 0.42
+version 0.43
 
 =head1 SYNOPSIS
 

@@ -16,7 +16,7 @@ use if $] >= 5.027007, 'deprecate';
 use Locale::Codes::Constants;
 
 our($VERSION);
-$VERSION='3.84';
+$VERSION='3.85';
 
 use Exporter qw(import);
 our(@EXPORT_OK,%EXPORT_TAGS);
@@ -316,7 +316,9 @@ sub code2names {
    my $type = $$self{'type'};
 
    my ($err,$code,$codeset) = $self->_code(@args);
-   return undef  if ($err  ||  ! $code);
+   return undef  if ($err  ||
+                     ! $code  ||
+                     ! exists $Data{$type}{'code2id'}{$codeset}{$code});
 
    my $id   = $Data{$type}{'code2id'}{$codeset}{$code}[0];
    my @name = @{ $Data{$type}{'id2names'}{$id} };
