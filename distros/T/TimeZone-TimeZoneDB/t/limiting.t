@@ -1,9 +1,10 @@
 #!/usr/bin/env perl
 
-# Test rate limiting
+# Test rate limiting and cache
 
 use strict;
 use warnings;
+
 use CHI;
 use Geo::Location::Point;
 use Time::HiRes qw(time);
@@ -68,10 +69,10 @@ RATE_LIMIT: {
 	ok($num_requests >= 2, 'At least two API requests have been made');
 	cmp_ok($num_requests, '==', $MyTestUA::REQUEST_COUNT);
 
-	ok($cache->get('tz:51.34:1.42'));
-
 	if($num_requests >= 2) {
 		my $elapsed = $MyTestUA::REQUEST_TIMES[1] - $MyTestUA::REQUEST_TIMES[0];
 		cmp_ok($elapsed, '>=', $min_interval, "Rate limiting enforced: elapsed time >= $min_interval sec");
 	}
+
+	cmp_ok(ref($cache->get('tz:51.340000:1.420000')), 'eq', 'HASH');
 }

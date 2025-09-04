@@ -6,8 +6,9 @@
 
   <name xml:lang="en">Glib::Object::Introspection</name>
   <shortdesc xml:lang="en">Dynamically create Perl language bindings</shortdesc>
-  <homepage rdf:resource="http://gtk2-perl.sourceforge.net/" />
-  <mailing-list rdf:resource="http://mail.gnome.org/mailman/listinfo/gtk-perl-list" />
+  <homepage rdf:resource="https://gtk2-perl.sourceforge.net/" />
+  <developer-forum rdf:resource="https://discourse.gnome.org/tag/perl" />
+  <bug-database rdf:resource="https://gitlab.gnome.org/GNOME/perl-glib-object-introspection/-/issues/" />
 
   <maintainer>
     <foaf:Person>

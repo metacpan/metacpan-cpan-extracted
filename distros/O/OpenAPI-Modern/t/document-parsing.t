@@ -140,6 +140,67 @@ ERRORS
   memory_cycle_ok($doc, 'no leaks in the document object');
 };
 
+subtest '/paths correctness' => sub {
+  my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
+    canonical_uri => 'http://localhost:1234/api',
+    schema => {
+      openapi => OAS_VERSION,
+      info => {
+        title => 'my title',
+        version => '1.2.3',
+      },
+      paths => {
+        '/a/{a}' => {},
+        '/a/{b}' => {},
+        '/b/{a}/hi' => {},
+        '/b/{b}/hi' => {},
+        '/c/{c}/d/{c}/e/{e}/f/{e}' => {},
+        'x-{alpha}' => {},
+        'x-{beta}' => {},
+        'x-{foo}-{foo}' => {},
+      },
+    },
+  );
+
+  cmp_result(
+    [ map $_->TO_JSON, $doc->errors ],
+    [
+      +{
+        instanceLocation => '',
+        keywordLocation => '/paths/~1a~1{b}',
+        absoluteKeywordLocation => str(Mojo::URL->new('http://localhost:1234/api#/paths/~1a~1{b}')),
+        error => 'duplicate of templated path "/a/{a}"',
+      },
+      +{
+        instanceLocation => '',
+        keywordLocation => '/paths/~1b~1{b}~1hi',
+        absoluteKeywordLocation => str(Mojo::URL->new('http://localhost:1234/api#/paths/~1b~1{b}~1hi')),
+        error => 'duplicate of templated path "/b/{a}/hi"',
+      },
+      +{
+        instanceLocation => '',
+        keywordLocation => '/paths/~1c~1{c}~1d~1{c}~1e~1{e}~1f~1{e}',
+        absoluteKeywordLocation => str(Mojo::URL->new('http://localhost:1234/api#/paths/~1c~1{c}~1d~1{c}~1e~1{e}~1f~1{e}')),
+        error => 'duplicate path template variable "c"',
+      },
+      +{
+        instanceLocation => '',
+        keywordLocation => '/paths/~1c~1{c}~1d~1{c}~1e~1{e}~1f~1{e}',
+        absoluteKeywordLocation => str(Mojo::URL->new('http://localhost:1234/api#/paths/~1c~1{c}~1d~1{c}~1e~1{e}~1f~1{e}')),
+        error => 'duplicate path template variable "e"',
+      },
+    ],
+    'duplicate paths or template variables are not permitted',
+  );
+
+  is(document_result($doc), substr(<<'ERRORS', 0, -1), 'stringified errors');
+'/paths/~1a~1{b}': duplicate of templated path "/a/{a}"
+'/paths/~1b~1{b}~1hi': duplicate of templated path "/b/{a}/hi"
+'/paths/~1c~1{c}~1d~1{c}~1e~1{e}~1f~1{e}': duplicate path template variable "c"
+'/paths/~1c~1{c}~1d~1{c}~1e~1{e}~1f~1{e}': duplicate path template variable "e"
+ERRORS
+};
+
 subtest 'extract operationIds and identify duplicates' => sub {
   my $yaml = OPENAPI_PREAMBLE.<<'YAML';
 components:
@@ -182,8 +243,8 @@ YAML
     schema => $yamlpp->load_string($yaml),
   );
 
-  ok(!$doc->errors, 'no errors when parsing this document');
-  cmp_deeply(
+  cmp_result([ $doc->errors ], [], 'no errors when parsing this document');
+  cmp_result(
     $doc->_operationIds,
     {
       operation_id_a => '/components/callbacks/callback_a/$url_a/patch',
@@ -447,16 +508,15 @@ webhooks:
   bar: {}
 YAML
 
-  cmp_result([$doc->errors], [], 'no errors during traversal');
-  cmp_deeply(
+  cmp_result([ $doc->errors ], [], 'no errors when parsing this document');
+  cmp_result(
     my $index = { $doc->resource_index },
     {
       'http://localhost:1234/api' => {
         path => '',
         canonical_uri => str('http://localhost:1234/api'),
         specification_version => 'draft2020-12',
-        vocabularies => bag(map 'JSON::Schema::Modern::Vocabulary::'.$_,
-          qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated OpenAPI)),
+        vocabularies => bag(OAS_VOCABULARIES->@*),
         anchors => {
           anchor1 => {
             path => '/components/schemas/anchor1',
@@ -472,8 +532,7 @@ YAML
         path => '/components/schemas/beta_schema',
         canonical_uri => str('http://localhost:1234/beta'),
         specification_version => 'draft2020-12',
-        vocabularies => bag(map 'JSON::Schema::Modern::Vocabulary::'.$_,
-          qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated OpenAPI)),
+        vocabularies => bag(OAS_VOCABULARIES->@*),
       },
       'http://localhost:1234/gamma' => {
         path => '/components/schemas/beta_schema/not',
@@ -486,8 +545,7 @@ YAML
         path => '/components/parameters/my_param1/schema',
         canonical_uri => str('http://localhost:1234/parameter1_id'),
         specification_version => 'draft2020-12',
-        vocabularies => bag(map 'JSON::Schema::Modern::Vocabulary::'.$_,
-          qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated OpenAPI)),
+        vocabularies => bag(OAS_VOCABULARIES->@*),
         anchors => {
           anchor3 => {
             path => '/components/parameters/my_param1/schema/properties/foo',
@@ -499,36 +557,31 @@ YAML
         path => '/components/parameters/my_param2/content/media_type_0/schema',
         canonical_uri => str('http://localhost:1234/parameter2_id'),
         specification_version => 'draft2020-12',
-        vocabularies => bag(map 'JSON::Schema::Modern::Vocabulary::'.$_,
-          qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated OpenAPI)),
+        vocabularies => bag(OAS_VOCABULARIES->@*),
       },
       'http://localhost:1234/pathItem0_param_id' => {
         path => '/components/pathItems/path0/parameters/0/schema',
         canonical_uri => str('http://localhost:1234/pathItem0_param_id'),
         specification_version => 'draft2020-12',
-        vocabularies => bag(map 'JSON::Schema::Modern::Vocabulary::'.$_,
-          qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated OpenAPI)),
+        vocabularies => bag(OAS_VOCABULARIES->@*),
       },
       'http://localhost:1234/pathItem0_get_param_id' => {
         path => '/components/pathItems/path0/get/parameters/0/schema',
         canonical_uri => str('http://localhost:1234/pathItem0_get_param_id'),
         specification_version => 'draft2020-12',
-        vocabularies => bag(map 'JSON::Schema::Modern::Vocabulary::'.$_,
-          qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated OpenAPI)),
+        vocabularies => bag(OAS_VOCABULARIES->@*),
       },
       'http://localhost:1234/pathItem0_get_requestBody_id' => {
         path => '/components/pathItems/path0/get/requestBody/content/media_type_1/schema',
         canonical_uri => str('http://localhost:1234/pathItem0_get_requestBody_id'),
         specification_version => 'draft2020-12',
-        vocabularies => bag(map 'JSON::Schema::Modern::Vocabulary::'.$_,
-          qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated OpenAPI)),
+        vocabularies => bag(OAS_VOCABULARIES->@*),
       },
       map +('http://localhost:1234/pathItem0_get_responses'.$_.'_id' => {
         path => '/components/pathItems/path0/get/responses/200/content/media_type_'.$_.'/schema',
         canonical_uri => str('http://localhost:1234/pathItem0_get_responses'.$_.'_id'),
         specification_version => 'draft2020-12',
-        vocabularies => bag(map 'JSON::Schema::Modern::Vocabulary::'.$_,
-          qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated OpenAPI)),
+        vocabularies => bag(OAS_VOCABULARIES->@*),
       }), 2..3,
     },
     'subschema resources are correctly identified in the document',
@@ -710,7 +763,7 @@ paths:
   /foo/beta: {}
 YAML
 
-  cmp_result([$doc->errors], [], 'no errors during traversal');
+  cmp_result([ $doc->errors ], [], 'no errors when parsing this document');
   memory_cycle_ok($doc, 'no leaks in the document object');
 
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(

@@ -6,7 +6,7 @@ use v5.12;
 use warnings;
 use Wx;
 use base qw/Wx::Panel/;
-use App::GUI::Harmonograph::Widget::SliderCombo;
+use App::GUI::Wx::Widget::Custom::SliderCombo;
 
 my $default_settings = {
         draw => 'line', pen_style => 'solid', line_thickness => 1, dot_probability => 100,
@@ -35,22 +35,22 @@ sub new {
 
     $self->{'widget'}{'draw'} = Wx::RadioBox->new( $self, -1, 'Draw', [-1, -1], [120, -1], ['Dots', 'Line']);
     $self->{'widget'}{'draw'}->SetToolTip('draw just dots (off) or connect them with lines (on)');
-    $self->{'widget'}{'pen_style'} = Wx::ComboBox->new( $self, -1, 'solid', [-1,-1], [125, -1],
+    $self->{'widget'}{'pen_style'}  = Wx::ComboBox->new( $self, -1, 'solid', [-1,-1], [125, -1],
         [qw/dotted short_dash solid vertical horizontal cross diagonal bidiagonal/], &Wx::wxTE_READONLY );
     $self->{'widget'}{'pen_style'}->SetToolTip('which pattern is engraved in drawn line / dots');
-    $self->{'widget'}{'line_thickness'} = App::GUI::Harmonograph::Widget::SliderCombo->new( $self, 355, 'Thickness','dot size or thickness of drawn line in pixel',  1,  55,  1);
-    $self->{'widget'}{'duration_min'} = App::GUI::Harmonograph::Widget::SliderCombo->new( $self, 85, 'Minutes','', 0,  100,  10);
-    $self->{'widget'}{'duration_s'}   = App::GUI::Harmonograph::Widget::SliderCombo->new( $self, 85, 'Seconds','', 0,  59,  10);
-    $self->{'widget'}{'dot_probability'} = App::GUI::Harmonograph::Widget::SliderCombo->new( $self, 340, 'Probability','', 1,  100,  100, .1);
+    $self->{'widget'}{'line_thickness'}  = App::GUI::Wx::Widget::Custom::SliderCombo->new( $self, 355, 'Thickness','dot size or thickness of drawn line in pixel',  1,  55,  1);
+    $self->{'widget'}{'duration_min'}    = App::GUI::Wx::Widget::Custom::SliderCombo->new( $self, 85, 'Minutes','', 0,  100,  10);
+    $self->{'widget'}{'duration_s'}      = App::GUI::Wx::Widget::Custom::SliderCombo->new( $self, 85, 'Seconds','', 0,  59,  10);
+    $self->{'widget'}{'dot_probability'} = App::GUI::Wx::Widget::Custom::SliderCombo->new( $self, 340, 'Probability','', 1,  100,  100, .1);
     $self->{'widget'}{'dot_probability'}->SetToolTip("How high is the chance that a dot is actually set in percent ?");
-    $self->{'widget'}{'100dots_per_second'} = App::GUI::Harmonograph::Widget::SliderCombo->new( $self, 110, 'Coarse','how many dots is drawn in a second in batches of 50 ?',  0,  90,  10);
-    $self->{'widget'}{'dots_per_second'} = App::GUI::Harmonograph::Widget::SliderCombo->new( $self, 100, 'Fine','how many dots is drawn in a second ?',  0,  99,  10);
+    $self->{'widget'}{'100dots_per_second'} = App::GUI::Wx::Widget::Custom::SliderCombo->new( $self, 110, 'Coarse','how many dots is drawn in a second in batches of 50 ?',  0,  90,  10);
+    $self->{'widget'}{'dots_per_second'} = App::GUI::Wx::Widget::Custom::SliderCombo->new( $self, 100, 'Fine','how many dots is drawn in a second ?',  0,  99,  10);
     $self->{'widget'}{'color_flow_type'} = Wx::ComboBox->new( $self, -1, 'no', [-1,-1], [115, -1], [qw/no one_time alternate circular/], &Wx::wxTE_READONLY );
     $self->{'widget'}{'color_flow_type'}->SetToolTip("type of color flow: - linear - from start to end color \n  - alter(nate) - linearly between start and end color \n   - cicular - around the rainbow from start color visiting end color");
     $self->{'label'}{'flow_type'}->SetToolTip("type of color flow: - linear - from start to end color \n  - alter(nate) - linearly between start and end color \n   - cicular - around the rainbow from start color visiting end color");
-    $self->{'widget'}{'color_flow_dynamic'} = App::GUI::Harmonograph::Widget::SliderCombo->new( $self, 115, 'Dynamic', '0 = equally paced color change, larger = starting with slow color change becoming faster - or vice versa when dir activated', -12,  12,  0, .01);
-    $self->{'widget'}{'color_flow_speed'} = App::GUI::Harmonograph::Widget::SliderCombo->new( $self, 116, 'Speed','color changes per minute', 1, 90, 1, .1);
-    $self->{'widget'}{'invert_flow_speed'} = Wx::CheckBox->new( $self, -1, ' Invert');
+    $self->{'widget'}{'color_flow_dynamic'} = App::GUI::Wx::Widget::Custom::SliderCombo->new( $self, 115, 'Dynamic', '0 = equally paced color change, larger = starting with slow color change becoming faster - or vice versa when dir activated', -12,  12,  0, .01);
+    $self->{'widget'}{'color_flow_speed'}   = App::GUI::Wx::Widget::Custom::SliderCombo->new( $self, 116, 'Speed','color changes per minute', 1, 90, 1, .1);
+    $self->{'widget'}{'invert_flow_speed'}  = Wx::CheckBox->new( $self, -1, ' Invert');
     $self->{'widget'}{'invert_flow_speed'}->SetToolTip("invert value of color change speed by 1/x");
 
     $self->{'widget'}{'colors_used'} = Wx::ComboBox->new( $self, -1, 2, [-1,-1], [75, -1], [2 .. 10], &Wx::wxTE_READONLY );

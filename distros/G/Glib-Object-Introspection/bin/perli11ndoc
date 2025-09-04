@@ -14,7 +14,7 @@ use XML::LibXML qw//;
   BEGIN {
     if (!@ARGV) {
       local $@;
-      $have_display = eval {use Gtk3; Gtk3::init_check ()};
+      $have_display = eval 'use Gtk3; Gtk3::init_check ()';
     }
   }
 
@@ -1653,7 +1653,7 @@ sub quit {
 package PathBar;
 
 # The BEGIN { eval } dance is to support not loading Gtk3 in text mode.
-BEGIN { eval {use Glib::Object::Subclass qw/Gtk3::Box/;} }
+BEGIN { eval 'use Glib::Object::Subclass qw/Gtk3::Box/;' }
 
 sub TRUE () {1}
 sub FALSE () {0}
@@ -1724,7 +1724,7 @@ sub update_buttons {
 package PathLabel;
 
 # The BEGIN { eval } dance is to support not loading Gtk3 in text mode.
-BEGIN { eval {use Glib::Object::Subclass qw/Gtk3::Label/;} }
+BEGIN { eval 'use Glib::Object::Subclass qw/Gtk3::Label/;' }
 
 sub TRUE () {1}
 sub FALSE () {0}

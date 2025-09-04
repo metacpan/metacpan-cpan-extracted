@@ -29,23 +29,25 @@ my $minimal_schema = {
 subtest 'missing arguments' => sub {
   die_result(
     sub { OpenAPI::Modern->new },
-    qr/missing required constructor arguments: either openapi_document, or openapi_uri/,
-    'need openapi_document or openapi_uri',
+    qr/missing required constructor arguments: either openapi_document or openapi_schema/,
+    'need something in constructor arguments',
   );
 
   die_result(
     sub { OpenAPI::Modern->new(openapi_uri => 'foo') },
-    qr/missing required constructor arguments: either openapi_document, or openapi_uri and openapi_schema/,
-    'need openapi_document or openapi_schema',
-  );
-
-  die_result(
-    sub { OpenAPI::Modern->new(openapi_schema => $minimal_schema) },
-    qr/missing required constructor arguments: either openapi_document, or openapi_uri and openapi_schema/,
+    qr/missing required constructor arguments: either openapi_document or openapi_schema/,
     'need openapi_document or openapi_schema',
   );
 
   my $openapi;
+  lives_result(
+    sub {
+      $openapi = OpenAPI::Modern->new(openapi_schema => $minimal_schema);
+      memory_cycle_ok($openapi, 'no cycles');
+    },
+    'openapi_schema is sufficient',
+  );
+
   lives_result(
     sub {
       $openapi = OpenAPI::Modern->new(
@@ -54,7 +56,7 @@ subtest 'missing arguments' => sub {
       );
       memory_cycle_ok($openapi, 'no cycles');
     },
-    'simple usecase: providing just canonical_uri and schema',
+    'canonical_uri and schema is sufficient',
   );
 
   cmp_result(
@@ -154,7 +156,7 @@ subtest 'missing arguments' => sub {
         evaluator => $js,
       );
       is($openapi->openapi_uri, 'openapi.yaml', 'got uri out of object');
-      cmp_deeply($openapi->openapi_schema, $minimal_schema, 'got schema out of object');
+      cmp_result($openapi->openapi_schema, $minimal_schema, 'got schema out of object');
       ok($openapi->evaluator->collect_annotations, 'original evaluator is still defined');
       memory_cycle_ok($openapi, 'no cycles');
     },
@@ -169,7 +171,7 @@ subtest 'missing arguments' => sub {
         evaluator => JSON::Schema::Modern->new(validate_formats => 0),
       );
       is($openapi->openapi_uri, 'openapi.yaml', 'got uri out of object');
-      cmp_deeply($openapi->openapi_schema, $minimal_schema, 'got schema out of object');
+      cmp_result($openapi->openapi_schema, $minimal_schema, 'got schema out of object');
       ok(!$openapi->evaluator->validate_formats, 'evaluator overrides the default');
       memory_cycle_ok($openapi, 'no cycles');
     },
@@ -183,7 +185,7 @@ subtest 'missing arguments' => sub {
         openapi_schema => $minimal_schema,
       );
       is($openapi->openapi_uri, 'openapi.yaml', 'got uri out of object');
-      cmp_deeply($openapi->openapi_schema, $minimal_schema, 'got schema out of object');
+      cmp_result($openapi->openapi_schema, $minimal_schema, 'got schema out of object');
       ok($openapi->evaluator->validate_formats, 'default evaluator is used');
       memory_cycle_ok($openapi, 'no cycles');
     },
@@ -224,19 +226,19 @@ subtest 'construct with document' => sub {
     'canonical uri is taken from the document',
   );
 
-  cmp_deeply(
+  cmp_result(
     scalar $openapi->evaluator->get('http://localhost:1234/api#/components/schemas/foo'),
     true,
     'can construct an openapi object with a pre-existing document',
   );
 
-  cmp_deeply(
+  cmp_result(
     scalar $openapi->evaluator->get('https://spec.openapis.org/oas/3.1/schema/latest#/type'),
     'object',
     'the main OAD schema is available from the evaluator used in OpenAPI::Modern construction',
   );
 
-  cmp_deeply(
+  cmp_result(
     $openapi->evaluator->_get_vocabulary_class('https://spec.openapis.org/oas/3.1/vocab/base'),
     [
       'draft2020-12',
@@ -245,7 +247,7 @@ subtest 'construct with document' => sub {
     'the OpenAPI vocabulary is also available on the evaluator',
   );
 
-  cmp_deeply(
+  cmp_result(
     $openapi->evaluator->_get_format_validation('int32'),
     {
       type => 'number',

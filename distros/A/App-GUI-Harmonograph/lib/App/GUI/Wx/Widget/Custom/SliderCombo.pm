@@ -1,7 +1,7 @@
 
 # slider widget with display of value and nudge buttons
 
-package App::GUI::Harmonograph::Widget::SliderCombo;
+package App::GUI::Wx::Widget::Custom::SliderCombo;
 use v5.12;
 use warnings;
 use Wx;
@@ -26,7 +26,7 @@ sub new {
     my @l = map {length $_} $min, $min+$self->{'value_delta'}, $max-$self->{'value_delta'}, $max;
     my $max_txt_size = 0;
     map {$max_txt_size = $_ if $max_txt_size < $_} @l;
-    $self->{'widget'}{'txt'} = Wx::TextCtrl->new( $self, -1, $init_value, [-1,-1], [(4 * $max_txt_size) + 30,-1], &Wx::wxTE_RIGHT);
+    $self->{'widget'}{'txt'} = Wx::TextCtrl->new( $self, -1, $init_value, [-1,-1], [(6 * $max_txt_size) + 26,-1], &Wx::wxTE_RIGHT);
     $self->{'widget'}{'button'}{'-'} = Wx::Button->new( $self, -1, '-', [-1,-1],[27, 27] );
     $self->{'widget'}{'button'}{'+'} = Wx::Button->new( $self, -1, '+', [-1,-1],[27, 27] );
 
@@ -42,11 +42,11 @@ sub new {
 
     my $sizer = Wx::BoxSizer->new(&Wx::wxHORIZONTAL);
     my $attr = &Wx::wxLEFT | &Wx::wxALIGN_CENTER_VERTICAL | &Wx::wxALIGN_LEFT;
-    $sizer->Add( $lbl,  0, $attr, 5);
-    $sizer->Add( $self->{'widget'}{'txt'}, 0, $attr, 10);
-    $sizer->Add( $self->{'widget'}{'button'}{'-'}, 0, $attr, 0);
-    $sizer->Add( $self->{'widget'}{'button'}{'+'}, 0, $attr, 0);
-    $sizer->Add( $self->{'widget'}{'slider'}, 0, $attr, 10);
+    $sizer->Add( $lbl,                             0, $attr,  5);
+    $sizer->Add( $self->{'widget'}{'txt'},         0, $attr, 10);
+    $sizer->Add( $self->{'widget'}{'button'}{'-'}, 0, $attr,  0);
+    $sizer->Add( $self->{'widget'}{'button'}{'+'}, 0, $attr,  0);
+    $sizer->Add( $self->{'widget'}{'slider'},      0, $attr, 10);
     $sizer->Add( 0,     1, &Wx::wxEXPAND|&Wx::wxGROW);
     $self->SetSizer($sizer);
 

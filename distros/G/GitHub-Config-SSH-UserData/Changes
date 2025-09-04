@@ -1,5 +1,9 @@
 Revision history for GitHub-Config-SSH-UserData
 
+0.05    2025/09/03
+
+        - Bugfix (wrong results with some versions of perl)
+
 0.04    2025/09/02
 
         - allow localizing HOME before calling the function.

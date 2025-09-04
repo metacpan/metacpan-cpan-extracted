@@ -7,7 +7,7 @@ use 5.012000;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "drawing Mandelbrot and Julia fractals with complex equations",
+  "ABSTRACT" => "drawing Mandelbrot-, Julia fractals and more",
   "AUTHOR" => "Herbert Breunung <lichtkind\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -24,14 +24,14 @@ my %WriteMakefileArgs = (
     "File::HomeDir" => 1,
     "File::Spec" => 3,
     "FindBin" => 1,
-    "Graphics::Toolkit::Color" => "1.71",
+    "Graphics::Toolkit::Color" => "1.9",
     "Wx" => "0.9"
   },
   "TEST_REQUIRES" => {
     "Test::More" => "1.3",
     "Test::Warn" => "0.30"
   },
-  "VERSION" => "0.7",
+  "VERSION" => "0.72",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,7 +43,7 @@ my %FallbackPrereqs = (
   "File::HomeDir" => 1,
   "File::Spec" => 3,
   "FindBin" => 1,
-  "Graphics::Toolkit::Color" => "1.71",
+  "Graphics::Toolkit::Color" => "1.9",
   "Test::More" => "1.3",
   "Test::Warn" => "0.30",
   "Wx" => "0.9"

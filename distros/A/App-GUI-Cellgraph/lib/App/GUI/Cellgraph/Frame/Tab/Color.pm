@@ -1,12 +1,11 @@
 
-# color panel tab
-
-use v5.12;
-use warnings;
-use Wx;
+# color selection page
 
 package App::GUI::Cellgraph::Frame::Tab::Color;
 use base qw/Wx::Panel/;
+use v5.12;
+use warnings;
+use Wx;
 
 use App::GUI::Cellgraph::Frame::Panel::ColorBrowser;
 use App::GUI::Cellgraph::Frame::Panel::ColorPicker;
@@ -43,17 +42,17 @@ sub new {
     $self->{'curr_color_lbl'}     = Wx::StaticText->new($self, -1, 'Selected State Color' );
     $self->{'color_store_lbl'}    = Wx::StaticText->new($self, -1, 'Color Store' );
 
-    $self->{'widget'}{'dynamic'} = Wx::ComboBox->new( $self, -1, 1, [-1,-1],[75, -1], [ 0.2, 0.25, 0.33, 0.4, 0.5, 0.66, 0.7, 0.83, 0.9, 1, 1.2, 1.5, 2, 2.5, 3, 4 ]);
+    $self->{'widget'}{'tilt'} = Wx::ComboBox->new( $self, -1, 1, [-1,-1],[75, -1], [ 0.2, 0.25, 0.33, 0.4, 0.5, 0.66, 0.7, 0.83, 0.9, 1, 1.2, 1.5, 2, 2.5, 3, 4 ]);
     $self->{'widget'}{'delta_S'} = Wx::TextCtrl->new( $self, -1, 0, [-1,-1], [50,-1], &Wx::wxTE_RIGHT);
     $self->{'widget'}{'delta_L'} = Wx::TextCtrl->new( $self, -1, 0, [-1,-1], [50,-1], &Wx::wxTE_RIGHT);
 
     $self->{'btn'}{'gray'}       = Wx::Button->new( $self, -1, 'Gray',       [-1,-1], [45, 17] );
     $self->{'btn'}{'gradient'}   = Wx::Button->new( $self, -1, 'Gradient',   [-1,-1], [70, 17] );
     $self->{'btn'}{'complement'} = Wx::Button->new( $self, -1, 'Complement', [-1,-1], [90, 17] );
-    $self->{'btn'}{'gray'}->SetToolTip("reset to default grey scale color pallet. Adheres to count of needed colors and current dynamic settings.");
-    $self->{'btn'}{'gradient'}->SetToolTip("create gradient between first and current color. Adheres to dynamic settings.");
+    $self->{'btn'}{'gray'}->SetToolTip("reset to default grey scale color pallet. Adheres to count of needed colors and current tilt settings.");
+    $self->{'btn'}{'gradient'}->SetToolTip("create gradient between first and current color. Adheres to tilt settings.");
     $self->{'btn'}{'complement'}->SetToolTip("Create color set from first up to current color as complementary colors. Adheres to both delta values.");
-    $self->{'widget'}{'dynamic'}->SetToolTip("dynamic of gradient (1 = linear) and also of gray scale");
+    $self->{'widget'}{'tilt'}->SetToolTip("tilt of gradient (0 = linear) and also of gray scale");
     $self->{'widget'}{'delta_S'}->SetToolTip("max. satuaration deviation when computing complement colors ( -100 .. 100)");
     $self->{'widget'}{'delta_L'}->SetToolTip("max. lightness deviation when computing complement colors ( -100 .. 100)");
 
@@ -68,19 +67,19 @@ sub new {
 
 
     Wx::Event::EVT_BUTTON( $self, $self->{'btn'}{'gray'}, sub {
-        $self->set_all_colors( color('white')->gradient( to => 'black', steps => $self->{'state_count'}, dynamic => $self->{'widget'}{'dynamic'}->GetValue) );
+        $self->set_all_colors( color('white')->gradient( to => 'black', steps => $self->{'state_count'}, tilt => $self->{'widget'}{'tilt'}->GetValue) );
     });
     Wx::Event::EVT_BUTTON( $self, $self->{'btn'}{'gradient'}, sub {
         my @c = $self->get_all_colors;
-        my @new_colors = $c[0]->gradient( to => $c[ $self->{'current_state'} ], in => 'RGB', steps => $self->{'current_state'}+1, dynamic => $self->{'widget'}{'dynamic'}->GetValue);
+        my @new_colors = $c[0]->gradient( to => $c[ $self->{'current_state'} ], in => 'RGB', steps => $self->{'current_state'}+1, tilt => $self->{'widget'}{'tilt'}->GetValue);
         $self->set_all_colors( @new_colors );
     });
     Wx::Event::EVT_BUTTON( $self, $self->{'btn'}{'complement'}, sub {
         my @c = $self->get_all_colors;
         my @new_colors = $c[ $self->{'current_state'} ]->complement( steps => $self->{'current_state'}+1,
-                                                                     saturation_tilt => $self->{'widget'}{'delta_S'}->GetValue,
-                                                                     lightness_tilt => $self->{'widget'}{'delta_L'}->GetValue );
-        push @new_colors, shift @new_colors;
+                                                                     targe => {
+                                                                           s => $self->{'widget'}{'delta_S'}->GetValue,
+                                                                           l => $self->{'widget'}{'delta_L'}->GetValue }, );
         $self->set_all_colors( @new_colors );
     });
 
@@ -91,7 +90,7 @@ sub new {
     $f_sizer->AddSpacer( 10 );
     $f_sizer->Add( $self->{'btn'}{'gray'}, 0, $std_attr|&Wx::wxALL, 5 );
     $f_sizer->Add( $self->{'btn'}{'gradient'}, 0, $std_attr|&Wx::wxALL, 5 );
-    $f_sizer->Add( $self->{'widget'}{'dynamic'}, 0, $std_attr|&Wx::wxALL, 5 );
+    $f_sizer->Add( $self->{'widget'}{'tilt'}, 0, $std_attr|&Wx::wxALL, 5 );
     $f_sizer->AddSpacer( 20 );
     $f_sizer->Add( $self->{'btn'}{'complement'}, 0, $std_attr|&Wx::wxALL, 5 );
     $f_sizer->Add( $self->{'widget'}{'delta_S'}, 0, $std_attr|&Wx::wxALL, 5 );
@@ -163,16 +162,16 @@ sub select_state {
     $self->{'browser'}->set_data( $self->{'state_colors'}[$self->{'current_state'}]->values(as => 'hash'), 'silent' );
 }
 
-sub init { $_[0]->set_settings( { 0 => '#FFFFFF', 1 => '#000000', dynamic => 1, delta_S => 0, delta_L => 0 } ) }
+sub init { $_[0]->set_settings( { 0 => '#FFFFFF', 1 => '#000000', tilt => 1, delta_S => 0, delta_L => 0 } ) }
 
 sub get_settings {
     my ($self) = @_;
     my $data = {
-        dynamic => $self->{'widget'}{'dynamic'}->GetValue,
+        tilt => $self->{'widget'}{'tilt'}->GetValue,
         delta_S => $self->{'widget'}{'delta_S'}->GetValue,
         delta_L => $self->{'widget'}{'delta_L'}->GetValue,
     };
-    $data->{$_} = $self->{'state_colors'}[$_]->values(as => 'string') for 0 .. $self->{'last_state'};
+    $data->{$_} = $self->{'state_colors'}[$_]->values(as => 'hex_string') for 0 .. $self->{'last_state'};
     $data;
 }
 sub get_state {
@@ -184,8 +183,8 @@ sub get_state {
 
 sub set_settings {
     my ($self, $data) = @_;
-    return unless ref $data eq 'HASH' and exists $data->{'dynamic'};
-    $self->{'widget'}{$_}->SetValue( $data->{$_} )     for qw/dynamic delta_S delta_L/;
+    return unless ref $data eq 'HASH' and exists $data->{'tilt'};
+    $self->{'widget'}{$_}->SetValue( $data->{$_} )     for qw/tilt delta_S delta_L/;
     $data->{$_} = $data->{$_} // $default_color_def    for 0 .. $self->{'last_state'};
     $self->{'state_colors'}[$_] = color( $data->{$_} ) for 0 .. $self->{'last_state'};
     $self->set_all_colors( @{$self->{'state_colors'}} );

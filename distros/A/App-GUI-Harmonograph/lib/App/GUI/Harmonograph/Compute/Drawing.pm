@@ -6,7 +6,7 @@ use v5.12;
 use warnings;
 use utf8;
 use Graphics::Toolkit::Color qw/color/;
-use Benchmark;
+# use Benchmark;
 
 my $TAU = 6.283185307;
 
@@ -31,7 +31,7 @@ sub calculate_colors {
             push @colors, $color_objects[$i]->gradient(
                     to => $color_objects[$i+1],
                     steps => gradient_steps( $dots_per_gradient ),
-                    dynamic => $set->{'color_flow_dynamic'},
+                    tilt => $set->{'color_flow_dynamic'},
             );
         }
         $color_swap_time = int( $dot_count / @colors );
@@ -49,7 +49,7 @@ sub calculate_colors {
             push @c, $color_objects[$i]->gradient(
                     to => $color_objects[$i+1],
                     steps => $gradient_steps,
-                    dynamic => $set->{'color_flow_dynamic'},
+                    tilt => $set->{'color_flow_dynamic'},
             );
         }
         $color_swap_time = int( $dots_per_gradient / $gradient_steps );
@@ -73,14 +73,14 @@ sub calculate_colors {
             push @c, $color_objects[$i]->gradient(
                     to => $color_objects[$i+1],
                     steps => $gradient_steps,
-                    dynamic => $set->{'color_flow_dynamic'},
+                    tilt => $set->{'color_flow_dynamic'},
             );
         }
         pop @c;
         push @c, $color_objects[-1]->gradient(
                 to => $color_objects[0],
                 steps => $gradient_steps,
-                dynamic => $set->{'color_flow_dynamic'},
+                tilt => $set->{'color_flow_dynamic'},
         );
         pop @c;
         $color_swap_time = int ($dots_per_gradient / $gradient_steps);
@@ -93,14 +93,17 @@ sub calculate_colors {
 }
 
 sub compile {
-    my ($state, $progress_bar, $main_radius, $board_size, $sketch) = @_;
-    my $set = $state;
-    my $Cr = $main_radius;
-    my $t = Benchmark->new();
-    $board_size *= 3;
-    my $dot_per_sec = ($set->{'visual'}{'dot_density'} || 1);
-    my $dot_count = ((defined $sketch) ? 5 : $set->{'visual'}{'duration'}) * $dot_per_sec;
+    my ($args, $main_radius) = @_;
+    return unless ref $args eq 'HASH';
+    my $set          = $args->{'settings'};
+    my $progress_bar = $args->{'progress_bar'};
 
+    my $Cr = $main_radius;
+    my $board_size = 3 * $main_radius;
+    # my $t = Benchmark->new();
+
+    my $dot_per_sec = ($set->{'visual'}{'dot_density'} || 1);
+    my $dot_count = ((exists $args->{'sketch'}) ? 5 : $set->{'visual'}{'duration'}) * $dot_per_sec;
     $set->{'visual'}{'connect_dots'} = int ($set->{'visual'}{'draw'} eq 'Line');
 
     my ($colors, $color_swap_time) = calculate_colors( $set, $dot_count, $dot_per_sec );
@@ -277,7 +280,7 @@ sub compile {
     if ($color_swap_time){
         push @code, '  if ($color_timer++ == $color_swap_time){', '    $color_timer = 1',
                     '    $dc->SetPen( Wx::Pen->new( shift @wx_colors, $pen_size, $pen_style) )';
-        push @code, '    $progress_bar->add_percentage( ($i/ $dot_count*100), [(shift @colors)->values] )' unless defined $sketch;
+        push @code, '    $progress_bar->add_percentage( ($i/ $dot_count*100), [(shift @colors)->values] )' unless exists $args->{'sketch'};
         push @code, '  }';
     }
     push @code, @compute_coor_code, @update_var_code;
@@ -289,13 +292,13 @@ sub compile {
                 '  ($x_old, $y_old) = ($x, $y)' )
               : '  $dc->DrawPoint( $x, $y )');
     push @code, '}';
-    push @code, '$progress_bar->add_percentage( 100, [$first_color->values] )' unless defined $sketch or $color_swap_time ;
+    push @code, '$progress_bar->add_percentage( 100, [$first_color->values] )' unless exists $args->{'sketch'} or $color_swap_time ;
 
     my $code = join '', map {$_.";\n"} @code, '}'; # say $code;
     my $code_ref = eval $code;
-    die "bug '$@' in drawing code: $code" if $@; #
-    # say "comp: ",timestr( timediff( Benchmark->new(), $t) );
-    return $code_ref
+    die "bug '$@' in drawing code: $code" if $@;   # say "comp: ",timestr( timediff( Benchmark->new(), $t) );
+    return $code_ref;
 }
+
 
 1;

@@ -4,7 +4,7 @@
 package App::GUI::Juliagraph::Compute::Image;
 use v5.12;
 use warnings;
-use Benchmark;
+# use Benchmark;
 use Graphics::Toolkit::Color qw/color/;
 use Wx;
 use App::GUI::Juliagraph::Widget::ProgressBar;
@@ -53,11 +53,11 @@ sub compute_colors {
             push @color_object, $start_color->gradient( to => $set->{'color'}{ $color_nr },
                                                      steps => $gradient_part_length,
                                                         in => $set->{'mapping'}{'gradient_space'},
-                                                   dynamic => $set->{'mapping'}{'gradient_dynamic'} );
+                                                      tilt => $set->{'mapping'}{'gradient_dynamic'} );
             pop @color_object if $color_nr != $end_nr;
         }
         $background_color = (substr($set->{'mapping'}{'background_color'}, 0, 5) eq 'color')
-                          ? $set->{'color'}{'1'}
+                          ? $set->{'color'}{'11'}
                           : $set->{'mapping'}{'background_color'};
         $background_color = '#001845' if $background_color eq 'blue';
         $background_color = color( $background_color );
@@ -80,7 +80,7 @@ sub compute_colors {
                                               to => $color_object[$subgradient_nr],
                                            steps => $set->{'mapping'}{'subgradient_steps'},
                                               in => $set->{'mapping'}{'subgradient_space'},
-                                         dynamic => $set->{'mapping'}{'subgradient_dynamic'} );
+                                            tilt => $set->{'mapping'}{'subgradient_dynamic'} );
             my @subcolor = map { [$_->values( 'RGB' )] } @subgradient;
             $color_value[$subgradient_nr - 1][$_] = $subcolor[ $subgradient_mapping{$_} ]
                     for 0 .. $set->{'mapping'}{'subgradient_size'} - 1;
@@ -100,7 +100,7 @@ sub from_settings {
     my( $set, $size, $sketch ) = @_;
     my $img = Wx::Image->new( $size->{'x'}, $size->{'y'} );
     my $sketch_factor = (defined $sketch) ? SKETCH_FACTOR : 0;
-    my $t0 = Benchmark->new();
+    #my $t0 = Benchmark->new();
 
     my $max_iter  =  int $set->{'constraint'}{'stop_nr'} ** 2;
     my $max_value =  int $set->{'constraint'}{'stop_value'} ** 2;
@@ -279,7 +279,7 @@ sub from_settings {
     my $code = join '', map { $_ . ";\n"} @code;
     eval $code;
     die "bad iter code - $@ :\n$code" if $@; # say $code;
-    say "compile:",timestr(timediff(Benchmark->new, $t0));
+    #say "compile:",timestr(timediff(Benchmark->new, $t0));
 
     return $img;
 }

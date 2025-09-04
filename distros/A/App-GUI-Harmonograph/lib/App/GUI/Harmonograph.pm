@@ -1,12 +1,14 @@
+
+# app starter and main event lop
+
+package App::GUI::Harmonograph;
 use v5.12;
 use warnings;
 use Wx;
 use utf8;
 use FindBin;
-
-package App::GUI::Harmonograph;
 our $NAME = __PACKAGE__;
-our $VERSION = '1.0';
+our $VERSION = '1.01';
 
 use base qw/Wx::App/;
 use App::GUI::Harmonograph::Frame;
@@ -96,7 +98,11 @@ several enhancements:
 
 =item *
 
-third pendulum can rotate
+fourth pendulum is a rotation of drawing board
+
+=item *
+
+pendulum five and six create an epicycle
 
 =item *
 
@@ -104,15 +110,16 @@ pendula can oscillate at none integer frequencies
 
 =item *
 
-separate complex amplitude and frequency damping
+separate complex amplitude and frequency damping in 8 flavours
 
 =item *
 
-draw lines or dots with changeable density and size
+draw lines or dots with changeable size, density and probability
 
 =item *
 
-3 types of color changes with changeable speed and polynomial dynamics
+complex color rainbows with up to 10 color, 3 types of color change patterns
+and with changeable speed and polynomial dynamics
 
 =back
 
@@ -290,8 +297,8 @@ The second selector has five options: "= + - * /". If you choose the
 first (equal sign) your time variable will be just swapped out with another
 variable. The other four option describe the operation that will be applied
 upon you time value. So e.g. if you select plus the resulting formula
-will be C<x = radius * cos (time + (...))>. The allude to whatever you
-will choose with the next three selectors.
+will be C<x = radius * cos (time + (...))>. The dots allude to whatever
+you will choose with the next three selectors.
 
 Selector three and four are just factors. They contain natural numbers
 and natural constants you can multiply the variable with. And last not
@@ -473,15 +480,11 @@ where you can see which perl, Wx and other versions you are currently using.
 
 L<App::GUI::Cellgraph>
 
-L<App::GUI::Chaosgraph>
-
-L<App::GUI::Dynagraph>
-
 L<App::GUI::Juliagraph>
 
 L<App::GUI::Sierpingraph>
 
-L<App::GUI::Tangraph>
+L<App::GUI::Spirograph>
 
 =head1 AUTHOR
 
@@ -489,7 +492,7 @@ Herbert Breunung (lichtkind@cpan.org)
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright(c) 2022-23 by Herbert Breunung
+Copyright(c) 2022-25 by Herbert Breunung
 
 All rights reserved.
 This program is free software and can be used, changed and distributed

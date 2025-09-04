@@ -7,8 +7,8 @@ is_deeply
     query_decode('a&a&%c3%be=%26%3d%c3%be&a=3'),
     { a => [ builtin::true, builtin::true, 3 ], "\xfe" => "&=\xfe" };
 
-ok !eval { query_decode('%10'); 1 };
-like $@, qr/Invalid control character/;
+ok !eval { query_decode('a=%fe%83%bf%bf%bf%bf%bf%0a'); 1 };
+like $@, qr/does not map to Unicode/;
 
 is_deeply query_decode('&&&a=b'), { a => 'b' };
 

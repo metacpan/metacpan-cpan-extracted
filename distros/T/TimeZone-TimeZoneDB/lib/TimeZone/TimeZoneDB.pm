@@ -7,6 +7,11 @@ use Carp;
 use CHI;
 use JSON::MaybeXS;
 use LWP::UserAgent;
+use Object::Configure;
+use Params::Get 0.13;
+use Params::Validate::Strict 0.10;
+use Return::Set;
+use Scalar::Util;
 use Time::HiRes;
 use URI;
 
@@ -16,11 +21,11 @@ TimeZone::TimeZoneDB - Interface to L<https://timezonedb.com> for looking up Tim
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 SYNOPSIS
 
@@ -77,54 +82,87 @@ sleeps for the remaining time.
     $ua->env_proxy(1);
     $tzdb = TimeZone::TimeZoneDB->new(ua => $ua, key => 'XXXXX');
 
-    my $tz = $tzdb->tz({ latitude => 51.34, longitude => 1.42 })->{'zoneName'};
+    my $tz = $tzdb->get_time_zone({ latitude => 51.34, longitude => 1.42 })->{'zoneName'};
     print "Ramsgate's time zone is $tz.\n";
+
+Creates a new instance. Acceptable options include:
+
+=over 4
+
+=item * C<ua>
+
+An object to use for HTTP requests.
+If not provided, a default user agent is created.
+
+=item * C<host>
+
+The API host endpoint.
+Defaults to L<https://api.timezonedb.com>
+
+=item * C<cache>
+
+A caching object.
+If not provided,
+an in-memory cache is created with a default expiration of one day.
+
+=item * C<min_interval>
+
+Minimum number of seconds to wait between API requests.
+Defaults to C<0> (no delay).
+Use this option to enforce rate-limiting.
+
+=back
 
 =cut
 
 sub new
 {
-	my($class, %args) = @_;
+	my $class = shift;
+	my $params = Params::Get::get_params(undef, \@_) || {};
 
 	if(!defined($class)) {
 		# TimeZone::TimeZoneDB::new() used rather than TimeZone::TimeZoneDB->new()
 		$class = __PACKAGE__;
-	} elsif(ref($class)) {
-		# clone the given object
-		return bless { %{$class}, %args }, ref($class);
+	} elsif(Scalar::Util::blessed($class)) {
+		# If $class is an object, clone it with new arguments
+		return bless { %{$class}, %{$params} }, ref($class);
 	}
 
-	my $key = $args{'key'} or Carp::croak("'key' argument is required");
+	$params = Object::Configure::configure($class, $params);	# Reads in the runtime configuration settings
 
-	my $ua = $args{ua};
+	my $key = $params->{'key'} or Carp::croak("'key' argument is required");
+
+	my $ua = $params->{ua};
 	if(!defined($ua)) {
 		$ua = LWP::UserAgent->new(agent => __PACKAGE__ . "/$VERSION");
 		$ua->default_header(accept_encoding => 'gzip,deflate');
 	}
-	my $host = $args{host} || 'api.timezonedb.com';
+	my $host = $params->{host} || 'api.timezonedb.com';
 
 	# Set up caching (default to an in-memory cache if none provided)
-	my $cache = $args{cache} || CHI->new(
+	my $cache = $params->{cache} || CHI->new(
 		driver => 'Memory',
-		global => 1,
+		global => 0,
 		expires_in => '1 day',
 	);
 
 	# Set up rate-limiting: minimum interval between requests (in seconds)
-	my $min_interval = $args{min_interval} || 0;	# default: no delay
+	my $min_interval = $params->{min_interval} || 0;	# default: no delay
 
 	return bless {
 		key => $key,
-		ua => $ua,
-		host => $host,
-		cache => $cache,
 		min_interval => $min_interval,
 		last_request => 0,	# Initialize last_request timestamp
-		%args,
+		%{$params},
+		cache => $cache,
+		host => $host,
+		ua => $ua,
 	}, $class;
 }
 
 =head2 get_time_zone
+
+Returns a hashref with at least one key (the zoneName)
 
     use Geo::Location::Point;
 
@@ -132,28 +170,50 @@ sub new
     # Find Ramsgate's time zone
     $tz = $tzdb->get_time_zone($ramsgate)->{'zoneName'}, "\n";
 
+=head3	API SPECIFICATION
+
+=head4	INPUT
+
+  {
+    'latitude' => { type => 'number', min => -90, max => 90 },
+    'longitude' => { type => 'number', min => -180, max => 180 },
+  }
+
+=head4	OUTPUT
+
+Argument error: croak
+No matches found: undef
+
+  {
+    'type' => 'hashref',
+    'min' => 1
+  }
+
 =cut
 
 sub get_time_zone
 {
 	my $self = shift;
-	my %param;
+	my $params;
 
-	if(ref($_[0]) eq 'HASH') {
-		%param = %{$_[0]};
-	} elsif((@_ == 1) && ref($_[0]) && $_[0]->can('latitude')) {
+	if((@_ == 1) && Scalar::Util::blessed($_[0]) && $_[0]->can('latitude')) {
 		my $location = $_[0];
-		$param{latitude} = $location->latitude();
-		$param{longitude} = $location->longitude();
-	} elsif((@_ % 2) == 0) {
-		%param = @_;
+		$params->{latitude} = $location->latitude();
+		$params->{longitude} = $location->longitude();
 	} else {
-		Carp::carp('Usage: get_time_zone(latitude => $latitude, longitude => $longitude)');
-		return;
+		$params = Params::Get::get_params(undef, \@_);
 	}
 
-	my $latitude = $param{latitude};
-	my $longitude = $param{longitude};
+	$params = Params::Validate::Strict::validate_strict(
+		args => $params,
+		schema => {
+			'latitude' => { type => 'number', min => -90, max => 90 },
+			'longitude' => { type => 'number', min => -180, max => 180 },
+		}
+	);
+
+	my $latitude = $params->{latitude};
+	my $longitude = $params->{longitude};
 
 	if((!defined($latitude)) || (!defined($longitude))) {
 		Carp::carp('Usage: get_time_zone(latitude => $latitude, longitude => $longitude)');
@@ -179,12 +239,13 @@ sub get_time_zone
 	# $url =~ s/%2C/,/g;
 
 	# Create a cache key based on the location (might want to use a stronger hash function if needed)
-	my $cache_key = "tz:$latitude:$longitude";
+	# Normalize the key so that 0.1 vs 0.1000000 use the same key
+	my $cache_key = sprintf('tz:%.6f:%.6f', $latitude, $longitude);
 	if(my $cached = $self->{cache}->get($cache_key)) {
 		return $cached;
 	}
 
-	# Enforce rate-limiting: ensure at least min_interval seconds between requests.
+	# Enforce rate-limiting: ensure at least min_interval seconds between requests
 	my $now = time();
 	my $elapsed = $now - $self->{last_request};
 	if($elapsed < $self->{min_interval}) {
@@ -211,13 +272,17 @@ sub get_time_zone
 	}
 
 	# Cache the result before returning it
-	$self->{cache}->set($cache_key, $rc);
+	$self->{'cache'}->set($cache_key, $rc);
 
 	if($rc && defined($rc->{'status'}) && ($rc->{'status'} ne 'OK')) {
-		# TODO: print error code
+		if(my $logger = $self->{'logger'}) {
+			$logger->warn(__PACKAGE__, ": $url returns $rc->{status}");
+		}
 		return;
 	}
-	return $rc;	# No support for list context, yet
+
+	# Assert output: a hashref with at least one key (the zoneName)
+	return Return::Set::set_return($rc, { 'type' => 'hashref', 'min' => 1 });	# No support for list context, yet
 
 	# my @results = @{ $data || [] };
 	# wantarray ? @results : $results[0];
@@ -261,6 +326,8 @@ Lots of thanks to the folks at L<https://timezonedb.com>.
 
 =head1 BUGS
 
+This module is provided as-is without any warranty.
+
 Please report any bugs or feature requests to C<bug-timezone-timezonedb at rt.cpan.org>,
 or through the web interface at
 L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=TimeZone-TimeZoneDB>.
@@ -269,7 +336,13 @@ automatically be notified of progress on your bug as I make changes.
 
 =head1 SEE ALSO
 
-TimezoneDB API: L<https://timezonedb.com/api>
+=over 4
+
+=item * TimezoneDB API: L<https://timezonedb.com/api>
+
+=item * Testing Dashboard: L<https://nigelhorne.github.io/TimeZone-TimeZoneDB/coverage/>
+
+=back
 
 =head1 LICENSE AND COPYRIGHT
 

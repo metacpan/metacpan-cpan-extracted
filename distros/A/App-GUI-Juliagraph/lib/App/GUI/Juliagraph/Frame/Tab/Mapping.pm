@@ -20,10 +20,9 @@ my $default_settings =  {
     };
 
 sub new {
-    my ( $class, $parent, $config ) = @_;
+    my ( $class, $parent ) = @_;
 
     my $self = $class->SUPER::new( $parent, -1);
-    $self->{'config'}   = $config;
     $self->{'callback'} = sub {};
     $self->{'tab'}{'color'} = '';
 
@@ -68,7 +67,7 @@ sub new {
     $self->{'scale_distro'} = Wx::ComboBox->new( $self, -1, 'linear',  [-1,-1],[100, -1], [qw/log cubert sqrt linear square cube exp/]);
     $self->{'begin_color'}  = Wx::ComboBox->new( $self, -1, 'color 3', [-1,-1],[100, -1], [@color_names]);
     $self->{'end_color'}    = Wx::ComboBox->new( $self, -1, 'color 4', [-1,-1],[100, -1], [@color_names]);
-    $self->{'background_color'}   = Wx::ComboBox->new( $self, -1,'black', [-1,-1],[100,-1], [qw/black blue gray white/, 'color 1']);
+    $self->{'background_color'}   = Wx::ComboBox->new( $self, -1,'black', [-1,-1],[100,-1], [qw/black blue gray white/, 'color 11']);
     $self->{'gradient_dynamic'}   = Wx::ComboBox->new( $self, -1,      0, [-1,-1],[80, -1], [-5, -4, -3, -2.5, -2, -1.6, -1.3, -1, -0.8, -0.7, -0.6, -0.5, -0.4, -0.3, -0.2, -0.1, 0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 1, 1.3, 1.6, 2, 2.5, 3, 4, 5]);
     $self->{'gradient_space'}     = Wx::ComboBox->new( $self, -1,  'RGB', [-1,-1],[80, -1], [qw/RGB HSL/]);
     $self->{'subgradient_steps'}  = App::GUI::Juliagraph::Widget::SliderCombo->new( $self, 249, 'Steps :', "How man shades toes the subgradient have ?", 2, 100, 5, 1);

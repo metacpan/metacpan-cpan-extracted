@@ -34,15 +34,9 @@ my $js = JSON::Schema::Modern->new(
 # construct a minimal document in order to get the vocabulary and formats loaded
 my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
   evaluator => $js,
-  schema => {
-    openapi => OAS_VERSION,
-    info => {
-      title => 'my title',
-      version => '1.2.3',
-    },
-    paths => {},
-  },
-);
+  schema => YAML::PP->new(boolean => 'JSON::PP')->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+paths: {}
+YAML
 
 $accepter->acceptance(
   validate_data => sub ($schema, $instance_data) {

@@ -4,7 +4,7 @@ TimeZone::TimeZoneDB - Interface to [https://timezonedb.com](https://timezonedb.
 
 # VERSION
 
-Version 0.03
+Version 0.04
 
 # SYNOPSIS
 
@@ -57,16 +57,61 @@ it allows users to override default configurations while maintaining a lightweig
     $ua->env_proxy(1);
     $tzdb = TimeZone::TimeZoneDB->new(ua => $ua, key => 'XXXXX');
 
-    my $tz = $tzdb->tz({ latitude => 51.34, longitude => 1.42 })->{'zoneName'};
+    my $tz = $tzdb->get_time_zone({ latitude => 51.34, longitude => 1.42 })->{'zoneName'};
     print "Ramsgate's time zone is $tz.\n";
 
+Creates a new instance. Acceptable options include:
+
+- `ua`
+
+    An object to use for HTTP requests.
+    If not provided, a default user agent is created.
+
+- `host`
+
+    The API host endpoint.
+    Defaults to [https://api.timezonedb.com](https://api.timezonedb.com)
+
+- `cache`
+
+    A caching object.
+    If not provided,
+    an in-memory cache is created with a default expiration of one day.
+
+- `min_interval`
+
+    Minimum number of seconds to wait between API requests.
+    Defaults to `0` (no delay).
+    Use this option to enforce rate-limiting.
+
 ## get\_time\_zone
+
+Returns a hashref with at least one key (the zoneName)
 
     use Geo::Location::Point;
 
     my $ramsgate = Geo::Location::Point->new({ latitude => 51.34, longitude => 1.42 });
     # Find Ramsgate's time zone
     $tz = $tzdb->get_time_zone($ramsgate)->{'zoneName'}, "\n";
+
+### API SPECIFICATION
+
+#### INPUT
+
+    {
+      'latitude' => { type => 'number', min => -90, max => 90 },
+      'longitude' => { type => 'number', min => -180, max => 180 },
+    }
+
+#### OUTPUT
+
+Argument error: croak
+No matches found: undef
+
+    {
+      'type' => 'hashref',
+      'min' => 1
+    }
 
 ## ua
 
@@ -96,6 +141,8 @@ Lots of thanks to the folks at [https://timezonedb.com](https://timezonedb.com).
 
 # BUGS
 
+This module is provided as-is without any warranty.
+
 Please report any bugs or feature requests to `bug-timezone-timezonedb at rt.cpan.org`,
 or through the web interface at
 [http://rt.cpan.org/NoAuth/ReportBug.html?Queue=TimeZone-TimeZoneDB](http://rt.cpan.org/NoAuth/ReportBug.html?Queue=TimeZone-TimeZoneDB).
@@ -104,7 +151,8 @@ automatically be notified of progress on your bug as I make changes.
 
 # SEE ALSO
 
-TimezoneDB API: [https://timezonedb.com/api](https://timezonedb.com/api)
+- TimezoneDB API: [https://timezonedb.com/api](https://timezonedb.com/api)
+- Testing Dashboard: [https://nigelhorne.github.io/TimeZone-TimeZoneDB/coverage/](https://nigelhorne.github.io/TimeZone-TimeZoneDB/coverage/)
 
 # LICENSE AND COPYRIGHT
 

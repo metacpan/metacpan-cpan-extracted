@@ -27,7 +27,7 @@ sub new {
     my $pos_lbl      = Wx::StaticText->new($self, -1, 'P o s i t i o n : ' );
     my $x_lbl        = Wx::StaticText->new($self, -1, 'X : ' );
     my $y_lbl        = Wx::StaticText->new($self, -1, 'Y : ' );
-    $self->{'lbl_const'} = Wx::StaticText->new($self, -1, 'C o n s t a n t :' );
+    $self->{'lbl_const'} = Wx::StaticText->new($self, -1, 'C o n s t a n t : ' );
     $self->{'lbl_consta'} = Wx::StaticText->new($self, -1, 'A : ' );
     $self->{'lbl_constb'} = Wx::StaticText->new($self, -1, 'B : ' );
     $self->{'lbl_starta'} = Wx::StaticText->new($self, -1, 'A : ' );

@@ -7,33 +7,32 @@ use Wx;
 
 package App::GUI::Harmonograph::Frame::Tab::Color;
 use base qw/Wx::Panel/;
-
+use App::GUI::Wx::Widget::Custom::ColorDisplay;
+use App::GUI::Wx::Widget::Custom::PositionMarker;
 use App::GUI::Harmonograph::Frame::Panel::ColorBrowser;
 use App::GUI::Harmonograph::Frame::Panel::ColorPicker;
 use App::GUI::Harmonograph::Frame::Panel::ColorSetPicker;
-use App::GUI::Harmonograph::Widget::ColorDisplay;
-use App::GUI::Harmonograph::Widget::PositionMarker;
 use Graphics::Toolkit::Color qw/color/;
 
 our $default_color_def = $App::GUI::Harmonograph::Frame::Panel::ColorSetPicker::default_color;
-my $default_settings = { 1=> 'blue', 2=> 'red', dynamic => 0, delta_S => 0, delta_L => 0 };
+my $default_settings = { 1 => 'blue', 2 => 'red', tilt => 0, delta_S => 0, delta_L => 0 };
 
 sub new {
-    my ( $class, $parent, $config ) = @_;
+    my ( $class, $parent, $config, $count ) = @_;
     my $self = $class->SUPER::new( $parent, -1);
 
     $self->{'call_back'}  = sub {};
     $self->{'config'}     = $config;
-    $self->{'color_count'} = 10;        # number of displayed colors
+    $self->{'color_count'} = $count;        # number of displayed colors
     $self->{'active_color_count'} = 2;  # nr of currently used colors, overwritten on init
     $self->{'current_color_nr'} = 0;    # index starts from 0
     $self->{'display_size'} = 33;
 
     $self->{'used_colors'}       = [ color('blue')->gradient( to => 'red', steps => $self->{'active_color_count'}) ];
     $self->{'used_colors'}[$_]   = color( $default_color_def ) for $self->{'active_color_count'} .. $self->{'color_count'}-1;
-    $self->{'color_marker'}      = [ map { App::GUI::Harmonograph::Widget::PositionMarker->new
+    $self->{'color_marker'}      = [ map { App::GUI::Wx::Widget::Custom::PositionMarker->new
                                            ($self, $self->{'display_size'}, 20, $_, '', $default_color_def) } 0 .. $self->{'color_count'}-1 ];
-    $self->{'color_display'}[$_] = App::GUI::Harmonograph::Widget::ColorDisplay->new
+    $self->{'color_display'}[$_] = App::GUI::Wx::Widget::Custom::ColorDisplay->new
         ($self, $self->{'display_size'}-2, $self->{'display_size'},
          $_, $self->{'used_colors'}[$_]->values(as => 'hash')      ) for 0 .. $self->{'color_count'}-1;
     $self->{'color_marker'}[$_-1]->SetToolTip("used color number $_ to change (marked by arrow - crosses mark currently passive colors)") for 2 .. $self->{'color_count'};
@@ -47,7 +46,7 @@ sub new {
     $self->{'label'}{'selected_color'}  = Wx::StaticText->new($self, -1, 'Selected Color' );
     $self->{'label'}{'color_store'}     = Wx::StaticText->new($self, -1, 'Color Store' );
 
-    $self->{'widget'}{'dynamic'} = Wx::ComboBox->new( $self, -1, 1, [-1,-1], [80, -1], [ -6, -5, -4, -3, -2.5, -2, -1.5, -1, -0.5, 0, 0.5, 1, 1.5, 2, 2.5, 3, 4, 5, 6]);
+    $self->{'widget'}{'tilt'} = Wx::ComboBox->new( $self, -1, 1, [-1,-1], [80, -1], [ -5, -4, -3, -2.5, -2, -1.5, -1, -0.8, -0.6, -0.4, -0.2, 0, 0.2, 0.4, 0.6, 0.8, 1, 1.5, 2, 2.5, 3, 4, 5]);
     $self->{'widget'}{'delta_S'} = Wx::TextCtrl->new( $self, -1, 0, [-1,-1], [50,-1], &Wx::wxTE_RIGHT);
     $self->{'widget'}{'delta_L'} = Wx::TextCtrl->new( $self, -1, 0, [-1,-1], [50,-1], &Wx::wxTE_RIGHT);
 
@@ -57,9 +56,9 @@ sub new {
     $self->{'button'}{'right'} = Wx::Button->new( $self, -1, '>', [-1,-1], [30, 17] );
     $self->{'button'}{'left'}->SetToolTip("Move currently selected color to the left.");
     $self->{'button'}{'right'}->SetToolTip("Move currently selected color to the left.");
-    $self->{'button'}{'gradient'}->SetToolTip("Create gradient between first and current color. Adheres to dynamic settings.");
+    $self->{'button'}{'gradient'}->SetToolTip("Create gradient between first and current color. Adheres to tilt settings.");
     $self->{'button'}{'complement'}->SetToolTip("Create color set from first up to current color as complementary colors. Adheres to both delta values.");
-    $self->{'widget'}{'dynamic'}->SetToolTip("dynamic of gradient (1 = linear) and also of gray scale");
+    $self->{'widget'}{'tilt'}->SetToolTip("tilt of gradient (0 = linear) and also of gray scale");
     $self->{'widget'}{'delta_S'}->SetToolTip("max. satuaration deviation when computing complement colors ( -100 .. 100)");
     $self->{'widget'}{'delta_L'}->SetToolTip("max. lightness deviation when computing complement colors ( -100 .. 100)");
 
@@ -76,15 +75,14 @@ sub new {
 
     Wx::Event::EVT_BUTTON( $self, $self->{'button'}{'gradient'}, sub {
         my @c = $self->get_all_colors;
-        my @new_colors = $c[0]->gradient( to => $c[ $self->{'current_color_nr'} ], in => 'RGB', steps => $self->{'current_color_nr'}+1, dynamic => $self->{'widget'}{'dynamic'}->GetValue);
+        my @new_colors = $c[0]->gradient( to => $c[ $self->{'current_color_nr'} ], in => 'RGB', steps => $self->{'current_color_nr'}+1, tilt => $self->{'widget'}{'tilt'}->GetValue);
         $self->set_all_colors( @new_colors );
     });
     Wx::Event::EVT_BUTTON( $self, $self->{'button'}{'complement'}, sub {
         my @c = $self->get_all_colors;
         my @new_colors = $c[ $self->{'current_color_nr'} ]->complement( steps => $self->{'current_color_nr'}+1,
-                                                                     saturation_tilt => $self->{'widget'}{'delta_S'}->GetValue,
-                                                                     lightness_tilt => $self->{'widget'}{'delta_L'}->GetValue );
-        push @new_colors, shift @new_colors;
+                                                                        target => { s => $self->{'widget'}{'delta_S'}->GetValue,
+                                                                                    l => $self->{'widget'}{'delta_L'}->GetValue } );
         $self->set_all_colors( @new_colors );
     });
     Wx::Event::EVT_BUTTON( $self, $self->{'button'}{'left'}, sub {
@@ -115,7 +113,7 @@ sub new {
     my $f_sizer = Wx::BoxSizer->new(&Wx::wxHORIZONTAL);
     $f_sizer->AddSpacer( 10 );
     $f_sizer->Add( $self->{'button'}{'gradient'},  0, $all_attr, 5 );
-    $f_sizer->Add( $self->{'widget'}{'dynamic'},   0, $all_attr, 5 );
+    $f_sizer->Add( $self->{'widget'}{'tilt'},   0, $all_attr, 5 );
     $f_sizer->AddSpacer( 25 );
     $f_sizer->Add( $self->{'button'}{'complement'},0, $all_attr, 5 );
     $f_sizer->Add( $self->{'widget'}{'delta_S'},   0, $all_attr, 5 );
@@ -199,8 +197,8 @@ sub init { $_[0]->set_settings( $default_settings ) }
 
 sub set_settings {
     my ($self, $settings) = @_;
-    return unless ref $settings eq 'HASH' and exists $settings->{'dynamic'};
-    $self->{'widget'}{$_}->SetValue( $settings->{$_} // $default_settings->{$_} ) for qw/dynamic delta_S delta_L/;
+    return unless ref $settings eq 'HASH' and exists $settings->{'tilt'};
+    $self->{'widget'}{$_}->SetValue( $settings->{$_} // $default_settings->{$_} ) for qw/tilt delta_S delta_L/;
     $self->set_all_colors( grep {defined $_} map {$settings->{$_}} 1 .. $self->{'color_count'} );
 }
 
@@ -208,11 +206,11 @@ sub get_state    { $_[0]->get_settings }
 sub get_settings {
     my ($self) = @_;
     my $data = {
-        dynamic => $self->{'widget'}{'dynamic'}->GetValue,
+        tilt    => $self->{'widget'}{'tilt'}->GetValue,
         delta_S => $self->{'widget'}{'delta_S'}->GetValue,
         delta_L => $self->{'widget'}{'delta_L'}->GetValue,
     };
-    $data->{$_} = $self->{'used_colors'}[$_-1]->values(as => 'hex') for 1 .. $self->{'color_count'};
+    $data->{$_} = $self->{'used_colors'}[$_-1]->values(as => 'hex_string') for 1 .. $self->{'color_count'};
     $data;
 }
 

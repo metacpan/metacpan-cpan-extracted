@@ -10,7 +10,7 @@ use File::Spec::Functions;
 
 use Exporter 'import';
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 our @EXPORT_OK = qw(get_user_data_from_ssh_cfg);
 
@@ -24,7 +24,7 @@ sub get_user_data_from_ssh_cfg {
 
   open(my $hndl, '<', $config_file);
   my %seen;
-  my $cfg_data;
+  my $cfg_data = {};
   while (defined(my $line = <$hndl>)) {
     if ($line =~ /^Host\s+github-(\S+)\s*$/) {
       my $current_user_name = $1;
@@ -40,14 +40,14 @@ sub get_user_data_from_ssh_cfg {
                 (?:(\S+(\s+\S+)))?$                 # other data (optional)
                /x or
         croak("$current_user_name: missing or invalid user info");
-      @{$cfg_data}{qw(full_name email email2 other_data)} = @{^CAPTURE};
+      @{$cfg_data}{qw(full_name email email2 other_data)} = ($1, $2, $3, $4);
       $cfg_data->{full_name} //= $current_user_name;
       delete @{$cfg_data}{ grep { not defined $cfg_data->{$_} } keys %{$cfg_data} };
       last;
     }
   }
   close($hndl);
-  croak("$user_name: user name not in $config_file") unless $cfg_data;
+  croak("$user_name: user name not in $config_file") unless keys(%$cfg_data);
   return $cfg_data;
 }
 
@@ -62,7 +62,7 @@ GitHub::Config::SSH::UserData - Read user data from comments in ssh config file
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =head1 SYNOPSIS
 

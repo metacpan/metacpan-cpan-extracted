@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2023-2024 -- leonerd@leonerd.org.uk
 
-package meta 0.013;
+package meta 0.014;
 
 use v5.14;
 use warnings;

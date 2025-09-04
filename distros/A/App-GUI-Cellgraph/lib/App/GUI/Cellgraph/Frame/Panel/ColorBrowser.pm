@@ -1,15 +1,14 @@
-use v5.12;
-use warnings;
-use Wx;
+
+# panel with sliders to select a color
 
 package App::GUI::Cellgraph::Frame::Panel::ColorBrowser;
 use base qw/Wx::Panel/;
+use v5.12;
+use warnings;
+use Wx;
 use App::GUI::Cellgraph::Widget::SliderCombo;
 use App::GUI::Cellgraph::Widget::ColorDisplay;
 use Graphics::Toolkit::Color qw/color/;
-
-my $RGB = Graphics::Toolkit::Color::Space::Hub::get_space('RGB');
-my $HSL = Graphics::Toolkit::Color::Space::Hub::get_space('HSL');
 
 sub new {
     my ( $class, $parent, $type, $init_color ) = @_;
@@ -48,8 +47,7 @@ sub new {
         my @rgb = ($self->{'widget'}{'red'}->GetValue,
                    $self->{'widget'}{'green'}->GetValue,
                    $self->{'widget'}{'blue'}->GetValue );
-        my @hsl = $HSL->deconvert( [$RGB->normalize( \@rgb )], 'RGB');
-        @hsl = $HSL->denormalize( \@hsl );
+        my @hsl = color( @rgb )->values('HSL');
         $self->{'widget'}{'hue'}->SetValue( $hsl[0], 1 );
         $self->{'widget'}{'sat'}->SetValue( $hsl[1], 1 );
         $self->{'widget'}{'light'}->SetValue( $hsl[2], 1 );
@@ -59,8 +57,7 @@ sub new {
         my @hsl = ($self->{'widget'}{'hue'}->GetValue,
                    $self->{'widget'}{'sat'}->GetValue,
                    $self->{'widget'}{'light'}->GetValue );
-        my @rgb = $HSL->convert( [$HSL->normalize( \@hsl )], 'RGB');
-        @rgb = $RGB->denormalize( \@rgb );
+        my @rgb = color( 'HSL', @hsl )->values('RGB');
         $self->{'widget'}{'red'}->SetValue( $rgb[0], 1 );
         $self->{'widget'}{'green'}->SetValue( $rgb[1], 1 );
         $self->{'widget'}{'blue'}->SetValue( $rgb[2], 1 );
@@ -102,9 +99,7 @@ sub set_data {
     $self->{'widget'}{'red'}->SetValue( $data->{'red'}, 1);
     $self->{'widget'}{'green'}->SetValue( $data->{'green'}, 1);
     $self->{'widget'}{'blue'}->SetValue( $data->{'blue'}, 1 );
-    my @rgb = @$data{qw/red green blue/};
-    my @hsl = $HSL->deconvert( [$RGB->normalize( \@rgb )], 'RGB');
-    @hsl = $HSL->denormalize( \@hsl );
+    my @hsl = color( $data )->values('HSL');
     $self->{'widget'}{'hue'}->SetValue( $hsl[0], 1 );
     $self->{'widget'}{'sat'}->SetValue( $hsl[1], 1 );
     $self->{'widget'}{'light'}->SetValue( $hsl[2], 1 );
@@ -117,4 +112,3 @@ sub SetCallBack {
 }
 
 1;
-

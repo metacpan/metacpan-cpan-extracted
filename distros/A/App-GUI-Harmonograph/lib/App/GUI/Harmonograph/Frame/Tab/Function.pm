@@ -7,7 +7,6 @@ use utf8;
 use warnings;
 use Wx;
 use base qw/Wx::Panel/;
-use App::GUI::Harmonograph::Widget::SliderCombo;
 
 my @function_names = (qw/sin cos tan cot sec csc sinh cosh tanh coth sech csch/);
 my @variable_names = ('X time',  'Y time', 'E time', 'F time', 'W time', 'R time',
@@ -15,10 +14,11 @@ my @variable_names = ('X time',  'Y time', 'E time', 'F time', 'W time', 'R time
                       'X radius','Y radius', 'E radius', 'F radius', 'W radius', 'R radius'); # variable names
 my @operator_names = (qw/= + - * \//);
 my @pendulum_names = (qw/x y e f wx wy r11 r12 r21 r22/);
-my @const_names = (1, '√2', '√3', '√5', 'π', 'τ', 'φ', 'Φ', 'e', 'γ', 'Γ', 'G', 'A');
-my %const = (1 => 1, 2 => 2, 3 => 3, '√2' => 1.4142135623731, '√3' => 1.73205080756888, '√5' => 2.236067977499789,
+my @const_names = (1, '√2', '√3', '√5', 'π', 'τ', 'φ', 'Φ', 'ψ', 'e', 'γ', 'Γ', 'G', 'A');
+my %const = (1 => 1, 2 => 2, 3 => 3, '√2' => 1.4142135623731, '3√3' => 1.44224957030740838232,
+            '√3' => 1.73205080756888, '√5' => 2.236067977499789,
             'π' => 3.1415926535,  'τ' => 6.2831853071795,
-            'φ' => 0.61803398874989, 'Φ' => 1.61803398874989,
+            'φ' => 0.61803398874989, 'Φ' => 1.61803398874989, 'ψ' => 1.46557123187676802665,
               e => 2.718281828,  'γ' => 0.57721566490153286, 'Γ' => 1.7724538509055160,
               G => 0.9159655941772190150, A => 1.28242712910062,
 );

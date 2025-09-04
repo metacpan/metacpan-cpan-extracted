@@ -1,11 +1,12 @@
-use v5.12;
-use warnings;
-use Wx;
+
+# painting area on left side
 
 package App::GUI::Cellgraph::Frame::Panel::Board;
 use base qw/Wx::Panel/;
-use Benchmark;
-
+use v5.12;
+use warnings;
+use Wx;
+#use Benchmark;
 use App::GUI::Cellgraph::Compute::Grid;
 use Graphics::Toolkit::Color qw/color/;
 
@@ -97,7 +98,7 @@ sub paint {
             $dc->DrawLine(            0, $grid_d * $_,  $grid_max_x, $grid_d * $_) for 1 .. $self->{'cells'}{'y'};
         }
 
-    my @color = map { Wx::Colour->new( $_->rgb ) } @{$self->{'state'}{'color'}{'objects'}};
+    my @color = map { Wx::Colour->new( $_->values ) } @{$self->{'state'}{'color'}{'objects'}};
     my @pen   = map {Wx::Pen->new( $_, 1, &Wx::wxPENSTYLE_SOLID )} @color;
     my @brush = map { Wx::Brush->new( $_, &Wx::wxBRUSHSTYLE_SOLID ) } @color;
     my $grid  = App::GUI::Cellgraph::Compute::Grid::create( $self->{'state'}, $self->{'cells'}{'x'}, $sketch_length );

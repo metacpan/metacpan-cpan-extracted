@@ -1,10 +1,10 @@
-package FU::Validate 1.2;
+package FU::Validate 1.3;
 
 use v5.36;
 use experimental 'builtin', 'for_list';
 use builtin qw/true false blessed trim/;
 use Carp 'confess';
-use FU::Util 'to_bool';
+use FU::Util 'to_bool', 'has_control';
 
 
 # Unavailable as custom validation names
@@ -12,7 +12,7 @@ my %builtin = map +($_,1), qw/
     type
     default
     onerror
-    trim
+    trim allow_control
     elems sort unique
     accept_scalar accept_array
     keys values unknown missing
@@ -296,8 +296,13 @@ sub _validate_input {
     $_[1] = $_[1]->@* == 0 ? undef : $c->{accept_array} eq 'first' ? $_[1][0] : $_[1][ $#{$_[1]} ]
         if $c->{accept_array} && ref $_[1] eq 'ARRAY';
 
-    # trim (needs to be done before the 'default' test)
-    $_[1] = trim $_[1] =~ s/\r//rg if defined $_[1] && !ref $_[1] && $type eq 'scalar' && (!exists $c->{trim} || $c->{trim});
+    # early scalar checks
+    if (defined $_[1] && !ref $_[1] && $type eq 'scalar') {
+        # trim needs to be done before the 'default' test
+        $_[1] = trim $_[1] =~ s/\r//rg if !exists $c->{trim} || $c->{trim};
+
+        return { validation => 'allow_control' } if !$c->{allow_control} && has_control $_[1];
+    }
 
     # default
     if (!defined $_[1] || (!ref $_[1] && $_[1] eq '')) {
@@ -403,6 +408,7 @@ sub _inval($t,$v) { sprintf 'invalid %s: %s', $t, _fmtval $v }
 # TODO: document.
 our %error_format = (
     required  => sub { 'required value missing' },
+    allow_control => sub { 'invalid control character' },
     type      => sub($e) { "invalid type, expected '$e->{expected}' but got '$e->{got}'" },
     unknown   => sub($e) { sprintf 'unknown key%s: %s', $e->{keys}->@* == 1 ? '' : 's', join ', ', map _fmtkey($_), $e->{keys}->@* },
     minlength => sub($e) { sprintf "input too short, expected minimum of %d but got %d", $e->{expected}, $e->{got} },
@@ -590,6 +596,9 @@ Upon failure, the error object will look something like:
     got        => 'scalar'
   }
 
+Beware: setting the type to I<any> causes the I<trim> and I<allow_control>
+validations to be skipped.
+
 =item default => $val
 
 If not set, or set to C<\'required'> (note: scalarref), then a value is required
@@ -622,6 +631,12 @@ return value of the subroutine is then returned for this validation.
 By default, any whitespace around scalar-type input is removed before testing
 any other validations. Setting I<trim> to a false value will disable this
 behavior.
+
+=item allow_control => 0/1
+
+By default, ASCII control characters in the input are not permitted for scalar
+values and trigger a validation error. Set this to a positive value to disable
+the check.
 
 =item keys => $hashref
 

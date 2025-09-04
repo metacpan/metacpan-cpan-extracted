@@ -6,8 +6,8 @@ use v5.12;
 use warnings;
 use Wx;
 use base qw/Wx::Panel/;
-use App::GUI::Harmonograph::Widget::SliderCombo;
-use App::GUI::Harmonograph::Widget::ColorDisplay;
+use App::GUI::Wx::Widget::Custom::SliderCombo;
+use App::GUI::Wx::Widget::Custom::ColorDisplay;
 use Graphics::Toolkit::Color qw/color/;
 
 my $RGB = Graphics::Toolkit::Color::Space::Hub::get_space('RGB');
@@ -25,12 +25,12 @@ sub new {
     my @rgb = $init_color->values('RGB');
     my @hsl = $init_color->values('HSL');
 
-    $self->{'widget'}{'red'}   =  App::GUI::Harmonograph::Widget::SliderCombo->new( $self, 365, ' R  ', "red part of $type color",    0, 255,  $rgb[0]);
-    $self->{'widget'}{'green'} =  App::GUI::Harmonograph::Widget::SliderCombo->new( $self, 365, ' G  ', "green part of $type color",  0, 255,  $rgb[1]);
-    $self->{'widget'}{'blue'}  =  App::GUI::Harmonograph::Widget::SliderCombo->new( $self, 365, ' B  ', "blue part of $type color",   0, 255,  $rgb[2]);
-    $self->{'widget'}{'hue'}   =  App::GUI::Harmonograph::Widget::SliderCombo->new( $self, 365, ' H  ', "hue of $type color",         0, 359,  $hsl[0]);
-    $self->{'widget'}{'sat'}   =  App::GUI::Harmonograph::Widget::SliderCombo->new( $self, 365, ' S   ', "saturation of $type color", 0, 100,  $hsl[1]);
-    $self->{'widget'}{'light'} =  App::GUI::Harmonograph::Widget::SliderCombo->new( $self, 365, ' L   ', "lightness of $type color",  0, 100,  $hsl[2]);
+    $self->{'widget'}{'red'}   =  App::GUI::Wx::Widget::Custom::SliderCombo->new( $self, 365, ' R  ', "red part of $type color",    0, 255,  $rgb[0]);
+    $self->{'widget'}{'green'} =  App::GUI::Wx::Widget::Custom::SliderCombo->new( $self, 365, ' G  ', "green part of $type color",  0, 255,  $rgb[1]);
+    $self->{'widget'}{'blue'}  =  App::GUI::Wx::Widget::Custom::SliderCombo->new( $self, 365, ' B  ', "blue part of $type color",   0, 255,  $rgb[2]);
+    $self->{'widget'}{'hue'}   =  App::GUI::Wx::Widget::Custom::SliderCombo->new( $self, 365, ' H  ', "hue of $type color",         0, 359,  $hsl[0]);
+    $self->{'widget'}{'sat'}   =  App::GUI::Wx::Widget::Custom::SliderCombo->new( $self, 365, ' S   ', "saturation of $type color", 0, 100,  $hsl[1]);
+    $self->{'widget'}{'light'} =  App::GUI::Wx::Widget::Custom::SliderCombo->new( $self, 365, ' L   ', "lightness of $type color",  0, 100,  $hsl[2]);
     $self->{'button'}{'rnd_'.$_} = Wx::Button->new( $self, -1, '?',  [-1,-1], [30,25] ) for qw/red green blue hue sat light/;
     $self->{'button'}{'rnd_red'}->SetToolTip("randomize red value");
     $self->{'button'}{'rnd_green'}->SetToolTip("randomize green value");
@@ -50,8 +50,7 @@ sub new {
         my @rgb = ($self->{'widget'}{'red'}->GetValue,
                    $self->{'widget'}{'green'}->GetValue,
                    $self->{'widget'}{'blue'}->GetValue );
-        my @hsl = $HSL->deconvert( [$RGB->normalize( \@rgb )], 'RGB');
-        @hsl = $HSL->denormalize( \@hsl );
+        my @hsl = color( @rgb )->values('HSL');
         $self->{'widget'}{'hue'}->SetValue( $hsl[0], 1 );
         $self->{'widget'}{'sat'}->SetValue( $hsl[1], 1 );
         $self->{'widget'}{'light'}->SetValue( $hsl[2], 1 );
@@ -61,8 +60,7 @@ sub new {
         my @hsl = ($self->{'widget'}{'hue'}->GetValue,
                    $self->{'widget'}{'sat'}->GetValue,
                    $self->{'widget'}{'light'}->GetValue );
-        my @rgb = $HSL->convert( [$HSL->normalize( \@hsl )], 'RGB');
-        @rgb = $RGB->denormalize( \@rgb );
+        my @rgb = color( 'HSL', @hsl )->values('RGB');
         $self->{'widget'}{'red'}->SetValue( $rgb[0], 1 );
         $self->{'widget'}{'green'}->SetValue( $rgb[1], 1 );
         $self->{'widget'}{'blue'}->SetValue( $rgb[2], 1 );
@@ -98,16 +96,14 @@ sub get_data { {  red => $_[0]->{'widget'}{'red'}->GetValue,
                  blue => $_[0]->{'widget'}{'blue'}->GetValue, } }
 
 sub set_data {
-    my ( $self, $data, $silent ) = @_;
-    return unless ref $data eq 'HASH'
-        and exists $data->{'red'} and exists $data->{'green'} and exists $data->{'blue'};
+    my ( $self, $color, $silent ) = @_;
+    return unless ref $color eq 'HASH'
+        and exists $color->{'red'} and exists $color->{'green'} and exists $color->{'blue'};
 
-    $self->{'widget'}{'red'}->SetValue( $data->{'red'}, 1);
-    $self->{'widget'}{'green'}->SetValue( $data->{'green'}, 1);
-    $self->{'widget'}{'blue'}->SetValue( $data->{'blue'}, 1 );
-    my @rgb = @$data{qw/red green blue/};
-    my @hsl = $HSL->deconvert( [$RGB->normalize( \@rgb )], 'RGB');
-    @hsl = $HSL->denormalize( \@hsl );
+    $self->{'widget'}{'red'}->SetValue( $color->{'red'}, 1);
+    $self->{'widget'}{'green'}->SetValue( $color->{'green'}, 1);
+    $self->{'widget'}{'blue'}->SetValue( $color->{'blue'}, 1 );
+    my @hsl = color($color)->values('HSL');
     $self->{'widget'}{'hue'}->SetValue( $hsl[0], 1 );
     $self->{'widget'}{'sat'}->SetValue( $hsl[1], 1 );
     $self->{'widget'}{'light'}->SetValue( $hsl[2], 1 );

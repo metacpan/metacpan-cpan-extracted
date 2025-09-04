@@ -1,4 +1,4 @@
-package FU 1.2;
+package FU 1.3;
 use v5.36;
 use Carp 'confess', 'croak';
 use IO::Socket;
@@ -312,7 +312,7 @@ sub _read_req($c) {
 
     ($REQ->{path}, my $qs) = split /\?/, $REQ->{path}//'', 2;
     $REQ->{qs} //= $qs;
-    eval { $REQ->{path} = FU::Util::uri_unescape($REQ->{path}); 1; } || fu->error(400, $@);
+    eval { $REQ->{path} = FU::Util::uri_unescape($REQ->{path}); FU::Util::check_control($REQ->{path}); 1; } || fu->error(400, $@);
     fu->error(400, 'Invalid character in path') if $REQ->{path} =~ /[\r\n\t]/; # There are plenty other questionable characters, but newlines and tabs are definitely out
 }
 
@@ -1267,7 +1267,7 @@ handler being run. Any other exception is passed to the C<500> error handler.
 
 While the C<FU::> namespace is used for global configuration and utility
 functions, the C<fu> object is intended for methods that deal with request
-processing (although some are useful used outside of request handlers as well).
+processing (although some are useful outside of request handlers as well).
 
 The C<fu> object itself can be used to store request-local data. For example,
 the following is a valid approach to handle user authentication:

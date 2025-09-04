@@ -5,7 +5,7 @@ requires "Carp" => "1.35";
 requires "File::HomeDir" => "1";
 requires "File::Spec" => "3";
 requires "FindBin" => "1";
-requires "Graphics::Toolkit::Color" => "1.71";
+requires "Graphics::Toolkit::Color" => "1.9";
 requires "Wx" => "0.9";
 requires "perl" => "v5.12.0";
 

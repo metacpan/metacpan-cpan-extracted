@@ -9,6 +9,7 @@ SECURITY.md
 t/00-load.t
 t/01-test-data/cfg-01
 t/01-test-data/cfg-02
+t/01-test-data/.ssh/config
 t/01-user_data.t
 t/manifest.t
 t/pod-coverage.t

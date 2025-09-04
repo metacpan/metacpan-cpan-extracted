@@ -34,6 +34,9 @@ use constant DEFAULT_BASE_METASCHEMA => JSON::Schema::Modern::Document::OpenAPI:
 use constant DEFAULT_METASCHEMA => JSON::Schema::Modern::Document::OpenAPI::DEFAULT_METASCHEMA;
 use constant OAS_VOCABULARY => JSON::Schema::Modern::Document::OpenAPI::OAS_VOCABULARY;
 
+use constant OAS_VOCABULARIES => [ map 'JSON::Schema::Modern::Vocabulary::'.$_,
+  qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated OpenAPI) ];
+
 # technically all 3.1.x versions should be supported, but this is all we have tested for, and the
 # version of the schemas we're bundling.
 use constant OAS_VERSION => JSON::Schema::Modern::Document::OpenAPI::OAS_VERSION;

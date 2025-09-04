@@ -57,6 +57,10 @@
 #  define HAVE_SUB_SIGNATURES
 #endif
 
+#if HAVE_PERL_VERSION(5, 43, 3)
+#  define HAVE_OP_MULTIPARAM
+#endif
+
 #ifndef av_count
 #  define av_count(av)  (AvFILL(av)+1)
 #endif
@@ -1099,10 +1103,15 @@ signature(SV *metasub)
         break;
     }
 
-    if(!o || o->op_type != OP_ARGCHECK)
+    if(!o)
       goto nosig;
 
-    RETVAL = wrap_cv_signature(cv, o, flags);
+    if(o->op_type == OP_ARGCHECK
+#ifdef HAVE_OP_MULTIPARAM
+       || o->op_type == OP_MULTIPARAM
+#endif
+    )
+      RETVAL = wrap_cv_signature(cv, o, flags);
 
     nosig:
       ;
@@ -1133,18 +1142,31 @@ mandatory_params(SV *metasig)
     max_args         = 3
   CODE:
   {
+    int params, opt_params;
+    char slurpy;
 #ifdef HAVE_SUB_SIGNATURES
     struct CVwithOP *cvop = (struct CVwithOP *)SvPVX(SvRV(metasig));
 #  if HAVE_PERL_VERSION(5, 31, 5)
-    struct op_argcheck_aux *aux = (struct op_argcheck_aux *)cUNOP_AUXx(cvop->op)->op_aux;
-    int params     = aux->params + ((cvop->flags & CVSIGNATURE_IS_METHOD) ? 1 : 0);
-    int opt_params = aux->opt_params;
-    char slurpy    = aux->slurpy;
+#    ifdef HAVE_OP_MULTIPARAM
+    if(cvop->op->op_type == OP_MULTIPARAM) {
+      struct op_multiparam_aux *aux = (struct op_multiparam_aux *)cUNOP_AUXx(cvop->op)->op_aux;
+      params     = aux->n_positional;
+      opt_params = params - aux->min_args;
+      slurpy     = aux->slurpy;
+    }
+    else
+#    endif
+    {
+      struct op_argcheck_aux *aux = (struct op_argcheck_aux *)cUNOP_AUXx(cvop->op)->op_aux;
+      params     = aux->params + ((cvop->flags & CVSIGNATURE_IS_METHOD) ? 1 : 0);
+      opt_params = aux->opt_params;
+      slurpy     = aux->slurpy;
+    }
 #  else
     UNOP_AUX_item *aux = cUNOP_AUXx(cvop->op)->op_aux;
-    int params     = aux[0].iv;
-    int opt_params = aux[1].iv;
-    char slurpy    = aux[2].iv;
+    params     = aux[0].iv;
+    opt_params = aux[1].iv;
+    slurpy     = aux[2].iv;
 #  endif
 
     switch(ix) {

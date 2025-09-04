@@ -120,7 +120,7 @@ sub new {
     $main_sizer->Add( $self->{'rule_plate'}, 1, $std_attr, 0);
     $self->SetSizer( $main_sizer );
 
-    $self->regenerate_rules( color('white')->gradient_to('black', 2) );
+    $self->regenerate_rules( color('white')->gradient( to => 'black', steps => 2) );
     $self->init;
     $self;
 }
@@ -136,7 +136,7 @@ sub regenerate_rules {
     for my $i (0 .. $#colors) {
         return unless ref $colors[$i] eq 'Graphics::Toolkit::Color';
         if (exists $self->{'state_colors'}[$i]) {
-            my @rgb = $colors[$i]->values('rgb');
+            my @rgb = $colors[$i]->values();
             $do_recolor += !( $rgb[$_] == $self->{'state_colors'}[$i][$_]) for 0 .. 2;
         } else { $do_recolor++ }
     }
@@ -144,7 +144,7 @@ sub regenerate_rules {
     $self->{'input_size'} = $self->{'subrules'}->input_size;
     $self->{'state_count'} = $self->{'subrules'}->state_count;
     $self->{'rule_mode'}   = $self->{'subrules'}->mode;
-    $self->{'state_colors'} = [map {[$_->rgb]} @colors];
+    $self->{'state_colors'} = [map {[$_->values]} @colors];
     my @sub_rule_pattern = $self->{'subrules'}->independent_input_patterns;
 
     if ($do_regenerate){
@@ -199,7 +199,7 @@ sub regenerate_rules {
         }
         $self->Layout if $refresh;
     } elsif ($do_recolor) {
-        my @rgb = map {[$_->rgb]} @colors;
+        my @rgb = map {[$_->values]} @colors;
         $self->{'rule_input'}[$_]->SetColors( @rgb ) for $self->{'subrules'}->index_iterator;
     }
 }

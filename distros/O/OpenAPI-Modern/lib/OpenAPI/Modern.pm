@@ -1,10 +1,10 @@
 use strictures 2;
-package OpenAPI::Modern; # git description: v0.090-12-g36d07d0
+package OpenAPI::Modern; # git description: v0.091-13-g0b4443c
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI v3.1 document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI v3.1 Swagger HTTP request response
 
-our $VERSION = '0.091';
+our $VERSION = '0.092';
 
 use 5.020;
 use utf8;
@@ -68,16 +68,15 @@ has debug => (
 around BUILDARGS => sub ($orig, $class, @args) {
   my $args = $class->$orig(@args);
 
-  croak 'missing required constructor arguments: either openapi_document, or openapi_uri and openapi_schema'
-    if not exists $args->{openapi_document}
-      and (not exists $args->{openapi_uri} or not exists $args->{openapi_schema});
+  croak 'missing required constructor arguments: either openapi_document or openapi_schema'
+    if not exists $args->{openapi_document} and not exists $args->{openapi_schema};
 
   my $had_document = exists $args->{openapi_document};
 
   $args->{evaluator} //= JSON::Schema::Modern->new(validate_formats => 1, max_traversal_depth => 80);
 
   $args->{openapi_document} //= JSON::Schema::Modern::Document::OpenAPI->new(
-    canonical_uri => $args->{openapi_uri},
+    exists $args->{openapi_uri} ? (canonical_uri => $args->{openapi_uri}) : (),
     schema => $args->{openapi_schema},
     evaluator => $args->{evaluator},
   );
@@ -1125,7 +1124,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI v3.1 d
 
 =head1 VERSION
 
-version 0.091
+version 0.092
 
 =head1 SYNOPSIS
 
@@ -1150,6 +1149,11 @@ version 0.091
         required: true
         schema:
           pattern: ^[a-z]+$
+      - name: bar_id
+        in: path
+        required: true
+        schema:
+          pattern: ^\d+$
       post:
         operationId: my_foo_request
         parameters:
@@ -1216,16 +1220,16 @@ prints:
   {
     "errors" : [
       {
-        "absoluteKeywordLocation" : "https://production.example.com/api#/paths/~1foo~1%7Bfoo_id%7D/post/requestBody/content/application~1json/schema/properties/hello/type",
+        "absoluteKeywordLocation" : "https://production.example.com/api#/paths/~1foo~1%7Bfoo_id%7D~1bar~1%7Bbar_id%7D/post/requestBody/content/application~1json/schema/properties/hello/type",
         "error" : "got integer, not string",
         "instanceLocation" : "/request/body/hello",
-        "keywordLocation" : "/paths/~1foo~1{foo_id}/post/requestBody/content/application~1json/schema/properties/hello/type"
+        "keywordLocation" : "/paths/~1foo~1{foo_id}~1bar~1%7Bbar_id%7D/post/requestBody/content/application~1json/schema/properties/hello/type"
       },
       {
-        "absoluteKeywordLocation" : "https://production.example.com/api#/paths/~1foo~1%7Bfoo_id%7D/post/requestBody/content/application~1json/schema/properties",
+        "absoluteKeywordLocation" : "https://production.example.com/api#/paths/~1foo~1%7Bfoo_id%7D~1bar~1%7Bbar_id%7D/post/requestBody/content/application~1json/schema/properties",
         "error" : "not all properties are valid",
         "instanceLocation" : "/request/body",
-        "keywordLocation" : "/paths/~1foo~1{foo_id}/post/requestBody/content/application~1json/schema/properties"
+        "keywordLocation" : "/paths/~1foo~1{foo_id}~1bar~1%7Bbar_id%7D/post/requestBody/content/application~1json/schema/properties"
       }
     ],
     "valid" : false
@@ -1260,28 +1264,30 @@ Unless otherwise noted, these are also available as read-only accessors.
 
 =head2 openapi_uri
 
+Optional.
+
 The URI that identifies the OpenAPI document; an alias to C<< ->openapi_document->canonical_uri >>.
 See L<JSON::Schema::Modern::Document::OpenAPI/canonical_uri>.
 Ignored if L</openapi_document> is provided.
 
 This URI will be used at runtime to resolve relative URIs used in
-the OpenAPI document, such as for C<jsonSchemaDialect> or C<servers url> values, as well as used
-for locations in L<JSON::Schema::Modern::Result> objects (see below).
+the OpenAPI document, such as for C<jsonSchemaDialect> or C<servers url> values and C<$ref>
+locations, as well as used for locations in L<JSON::Schema::Modern::Result> objects (see below).
 
 The value of C<$self> in the document (if present) is resolved against this value.
-It is strongly recommended that this URI is absolute.
+It is strongly recommended that this resulting URI is absolute.
 
 =head2 openapi_schema
 
 The data structure describing the OpenAPI v3.1 document (as specified at
 L<https://spec.openapis.org/oas/v3.1>); an alias to C<< ->openapi_document->schema >>.
 See L<JSON::Schema::Modern::Document::OpenAPI/schema>.
-Ignored if L</openapi_document> is provided.
+Ignored if L</openapi_document> is provided, otherwise required.
 
 =head2 openapi_document
 
 The L<JSON::Schema::Modern::Document::OpenAPI> document that holds the OpenAPI information to be
-used for validation. If it is not provided to the constructor, then both L</openapi_uri> and
+used for validation. If it is not provided to the constructor, then
 L</openapi_schema> B<MUST> be provided, and L</evaluator> will also be used if provided.
 
 =head2 evaluator
@@ -1290,7 +1296,8 @@ The L<JSON::Schema::Modern> object to use for all URI resolution and JSON Schema
 Optional (a default is constructed when omitted).
 
 This must be prepared in advance if custom metaschemas are to be used, as the evaluator is what
-holds the information about all available schemas.
+holds the information about all available schemas (which are used by keywords such as
+C<jsonSchemaDialect> and C<$ref>.
 
 =head2 debug
 
@@ -1303,7 +1310,7 @@ described below.
 
 =head2 document_get
 
-  my $parameter_data = $openapi->document_get('/paths/~1foo~1{foo_id}/get/parameters/0');
+  my $parameter_data = $openapi->document_get('/paths/~1foo~1{foo_id}~1bar~1%7Bbar_id%7D/post/parameters/0');
 
 Fetches the subschema at the provided JSON pointer.
 Proxies to L<JSON::Schema::Modern::Document::OpenAPI/get>.
@@ -1315,12 +1322,12 @@ L</recursive_get>.
 
   $result = $openapi->validate_request(
     $request,
-    # optional second argument can contain any combination of:
+    # optional second argument can contain any combination of these keys+values:
     my $options = {
-      path_template => '/foo/{arg1}/bar/{arg2}',
-      operation_id => 'my_operation_id',
-      path_captures => { arg1 => 1, arg2 => 2 },
-      method => 'get',
+      path_template => '/foo/{foo_id}/bar/{bar_id}',
+      operation_id => 'my_foo_request',
+      path_captures => { foo_id => 'abc', bar_id => 2 },
+      method => 'POST',
     },
   );
 
@@ -1343,7 +1350,6 @@ to improve performance.
   $result = $openapi->validate_response(
     $response,
     {
-      path_template => '/foo/{arg1}/bar/{arg2}',
       request => $request,
     },
   );
@@ -1357,7 +1363,7 @@ the L</openapi_uri> (which is derived from the document's C<$self> keyword as we
 provided to the document constructor).
 
 The second argument is an optional hashref that contains extra information about the request
-corresponding to the response, as in L</find_path>.
+corresponding to the response, as in L</validate_request> and L</find_path>.
 
 C<request> is also accepted as a key in the hashref, representing the original request object that
 corresponds to this response (as not all HTTP libraries link to the request in the response object).
@@ -1402,7 +1408,7 @@ C<debug>: when C<$OpenAPI::Modern::DEBUG> or L</debug> is set on the OpenAPI::Mo
 
 =item *
 
-C<uri_patterns>: an arrayref of patterns that are attempted to be matched against the URI
+C<uri_patterns>: an arrayref of patterns that were attempted to be matched against the URI
 
 =back
 
@@ -1523,6 +1529,15 @@ This distribution comes bundled with all the metaschema documents you need to bu
 or build custom schemas on top of. It aims to always use the latest versions of the documents; if
 you need earlier versions, you can find them at
 L<https://spec.openapis.org/#openapi-specification-schemas>.
+
+The default metaschema used by this tool does not permit the use of C<$schema> keywords
+in subschemas (where the value differs from the default OAS dialect), but a more permissive
+dialect is also available (or you can define your own), which you declare by providing the
+C<L<jsonSchemaDialect/https://spec.openapis.org/oas/v3.1#fixed-fields>> property in your OpenAPI
+Document.
+
+The schemas are also available under the URIs C<< s/<date>/latest/ >> so you don't have to change your
+code or configurations to keep pace with internal changes.
 
 =head1 ON THE USE OF JSON SCHEMAS
 

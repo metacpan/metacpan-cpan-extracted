@@ -14,53 +14,36 @@ use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 use lib 't/lib';
 use Helper;
 
-my $preamble = {
-  openapi => OAS_VERSION,
-  info => {
-    title => 'my title',
-    version => '1.2.3',
-  },
-};
+my $yamlpp = YAML::PP->new(boolean => 'JSON::PP');
 
 subtest recursive_get => sub {
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
     evaluator => my $js = JSON::Schema::Modern->new,
-    schema => {
-      %$preamble,
-      components => {
-        parameters => {
-          foo => { '$ref' => '#/components/parameters/bar' },
-          bar => { '$ref' => '#/components/parameters/foo' },
-          baz => { name => 'baz', in => 'query', schema => {} },
-          blip => { '$ref' => '#/components/schemas/bar/properties/foo' },
-        },
-        schemas => {
-          foo => { '$ref' => 'http://localhost:5678/api#/properties/foo' },
-          bar => {
-            '$id' => 'http://localhost:5678/api',
-            type => 'object',
-            properties => { foo => { type => 'string' } },
-          },
-          baz => {
-            '$ref' => 'http://far_far_away/api2#/components/schemas/alpha',
-          },
-        },
-      },
-      paths => {
-        '/foo' => {
-          post => {
-            parameters => [
-              { '$ref' => '#/i_do_not_exist' },
-              { '$ref' => '#/components/parameters/foo' },
-              { '$ref' => '#/components/parameters/baz' },
-              { '$ref' => '#/components/parameters/blip' }, # -> parameter -> schema
-            ],
-          },
-        },
-      },
-    },
-  );
+    schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+components:
+  parameters:
+    foo: { $ref: '#/components/parameters/bar' }
+    bar: { $ref: '#/components/parameters/foo' }
+    baz: { name: baz, in: query, schema: {} }
+    blip: { $ref: '#/components/schemas/bar/properties/foo' }
+  schemas:
+    foo: { $ref: 'http://localhost:5678/api#/properties/foo' }
+    bar:
+      $id: http://localhost:5678/api
+      type: object
+      properties: { foo: { type: string } }
+    baz:
+      $ref: 'http://far_far_away/api2#/components/schemas/alpha'
+paths:
+  /foo:
+    post:
+      parameters:
+        - $ref: '#/i_do_not_exist'
+        - $ref: '#/components/parameters/foo'
+        - $ref: '#/components/parameters/baz'
+        - $ref: '#/components/parameters/blip' # -> parameter -> schema
+YAML
 
   cmp_result([$doc->errors], [], 'no errors during traversal');
 
@@ -71,19 +54,14 @@ subtest recursive_get => sub {
   my $doc2 = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://far_far_away/api2',
     evaluator => $js,
-    schema => {
-      %$preamble,
-      components => {
-        parameters => {
-          foo => { '$ref' => 'http://localhost:1234/api#/components/parameters/baz' },
-        },
-        schemas => {
-          alpha => { type => 'integer' },
-          beta => { properties => { alpha => { type => 'string' } } },
-        },
-      },
-    },
-  );
+    schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+components:
+  parameters:
+    foo: { $ref: 'http://localhost:1234/api#/components/parameters/baz' }
+  schemas:
+    alpha: { type: integer }
+    beta: { properties: { alpha: { type: string } } }
+YAML
 
   cmp_result([$doc2->errors], [], 'no errors during traversal');
   $openapi->evaluator->add_document($doc2);

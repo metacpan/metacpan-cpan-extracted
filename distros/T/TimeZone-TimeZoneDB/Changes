@@ -1,5 +1,14 @@
 Revision history for TimeZone::TimeZoneDB
 
+0.04	Wed Sep  3 07:42:27 EDT 2025
+	Use Object::Configure
+	More use of Params::Get
+	Use Return::Set and Params::Validate::Strict
+	Normalize cache key to avoid missed cache opportunities
+	Fix docs which had a couple of small mistakes
+	Don't use global in CHI memory - safer for threading
+	Added test dashboard to GitHub Pages
+
 0.03	Wed Feb 12 07:36:10 EST 2025
 	Added rate-limiting and caching support
 	Use Test::DescribeMe to simplify tests

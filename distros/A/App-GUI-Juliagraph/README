@@ -1,11 +1,10 @@
 NAME
-    App::GUI::Juliagraph - drawing Mandelbrot and Julia fractals with
-    complex equations
+    App::GUI::Juliagraph - drawing Mandelbrot-, Julia fractals and more
 
 SYNOPSIS
     1.  read this POD
 
-    2.  start the program ins shell: > "juliagraph"
+    2.  start the program in the shell: > "juliagraph"
 
     3.  move knobs and observe how preview sketch reacts til you got an
         interesting image
@@ -189,7 +188,7 @@ GUI
     "Gradient" button). Right beside is a text box to skew the gradient in
     one or anotehr direction. To get complementary colors push the
     "Complement" button. This also can be skewed on the saturation and
-    lightness axis (text boxes beside). The arrow butons there help oýou to
+    lightness axis (text boxes beside). The arrow butons there help you to
     move colors to another position.
 
     To change a color you have to fist select it by clicking on it or the
@@ -226,8 +225,9 @@ GUI
     format of serial images and the first wild card in dialog. Above that is
     another submenu for setting the image size.
 
-    The third menu has only a dialog with some additional information of
-    version numbers and our homepage.
+    The third menu has only one item that opens a help dialog. That displays
+    some core information about author, version number and a link to this
+    page, the main documentation.
 
 SEE ALSO
     App::GUI::Cellgraph
@@ -246,11 +246,4 @@ COPYRIGHT
 
     All rights reserved. This program is free software and can be used and
     distributed under the GPL 3 licence.
-
-POD ERRORS
-    Hey! The above document had some coding errors, which are explained
-    below:
-
-    Around line 289:
-        Non-ASCII character seen before =encoding in 'oýou'. Assuming CP1252
 

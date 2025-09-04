@@ -1,26 +1,36 @@
-package FU::Util 1.2;
+package FU::Util 1.3;
 
 use v5.36;
 use FU::XS;
 use Carp 'confess';
 use Exporter 'import';
+use Encode ();
 use POSIX ();
 use experimental 'builtin';
 
 our @EXPORT_OK = qw/
     to_bool
     json_format json_parse
-    utf8_decode uri_escape uri_unescape
+    has_control check_control utf8_decode
+    uri_escape uri_unescape
     query_decode query_encode
     httpdate_format httpdate_parse
     gzip_lib gzip_compress brotli_compress
     fdpass_send fdpass_recv
 /;
 
+
+# Internal utility function
+sub has_control :prototype($) ($s) { defined $s && $s =~ /[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/ }
+sub check_control :prototype($) ($s) { confess 'Invalid control character' if has_control $s; }
+
+# Deprecated, call Encode::decode() directly.
 sub utf8_decode :prototype($) {
     return if !defined $_[0];
-    confess 'Invalid UTF-8' if !utf8::decode($_[0]);
-    confess 'Invalid control character' if $_[0] =~ /[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/;
+    eval {
+        $_[0] = Encode::decode('UTF-8', $_[0], Encode::FB_CROAK);
+        1
+    } || confess($@ =~ s/ at .+\n$//r);
     $_[0]
 }
 
@@ -171,13 +181,6 @@ Supported C<%options>:
 
 =over
 
-=item allow_control
-
-Boolean, set to true to allow (encoded) ASCII control characters in JSON
-strings, such as C<\u0000>, C<\b>, C<\u007f>, etc.  These characters are
-permitted per RFC-8259, but disallowed by this parser by default. See
-C<utf8_decode()> below.
-
 =item utf8
 
 Boolean, interpret the input C<$string> as a UTF-8 encoded byte string instead
@@ -292,18 +295,6 @@ inputs, at the cost of flexibility.
 
 =over
 
-=item utf8_decode($bytes)
-
-Convert a (perl-UTF-8 encoded) byte string into a sanitized perl Unicode
-string. The conversion is performed in-place, so the C<$bytes> argument is
-turned into a Unicode string. Returns the same string for convenience.
-
-This function throws an error if the input is not valid UTF-8 or if it contains
-ASCII control characters - that is, any character between C<0x00> and C<0x1f>
-except for tab, newline and carriage return.
-
-(This is a tiny wrapper around C<utf8::decode()> with some extra checks)
-
 =item uri_escape($string)
 
 Takes an Unicode string and returns a percent-encoded ASCII string, suitable
@@ -312,8 +303,7 @@ for use in a query parameter.
 =item uri_unescape($string)
 
 Takes an Unicode string potentially containing percent-encoding and returns a
-decoded Unicode string. Also checks for ASCII control characters as per
-C<utf8_decode()>.
+decoded Unicode string.
 
 =item query_decode($string)
 
@@ -330,8 +320,7 @@ have a value are decoded as C<builtin::true>. Example:
     # }
 
 The input C<$string> is assumed to be a perl Unicode string. An error is thrown
-if the resulting data decodes into invalid UTF-8 or contains control
-characters, as per C<utf8_decode>.
+if the resulting data decodes into invalid UTF-8.
 
 =item query_encode($hashref)
 

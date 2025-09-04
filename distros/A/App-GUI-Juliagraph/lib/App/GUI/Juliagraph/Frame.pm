@@ -31,8 +31,8 @@ sub new {
     $self->{'tabs'}            = Wx::AuiNotebook->new($self, -1, [-1,-1], [-1,-1], &Wx::wxAUI_NB_TOP );
     $self->{'tab'}{'constraint'}  = App::GUI::Juliagraph::Frame::Tab::Constraints->new( $self->{'tabs'} );
     $self->{'tab'}{'monomial'}    = App::GUI::Juliagraph::Frame::Tab::Polynomial->new( $self->{'tabs'} );
-    $self->{'tab'}{'mapping'}     = App::GUI::Juliagraph::Frame::Tab::Mapping->new( $self->{'tabs'}, $self->{'config'} );
-    $self->{'tab'}{'color'}       = App::GUI::Juliagraph::Frame::Tab::Color->new( $self->{'tabs'}, $self->{'config'} );
+    $self->{'tab'}{'mapping'}     = App::GUI::Juliagraph::Frame::Tab::Mapping->new( $self->{'tabs'} );
+    $self->{'tab'}{'color'}       = App::GUI::Juliagraph::Frame::Tab::Color->new( $self->{'tabs'}, $self->{'config'}, 11 );
     $self->{'tabs'}->AddPage( $self->{'tab'}{'constraint'}, 'Constraints');
     $self->{'tabs'}->AddPage( $self->{'tab'}{'monomial'},   'Monomials');
     $self->{'tabs'}->AddPage( $self->{'tab'}{'mapping'},    'Color Mapping');

@@ -1,6 +1,11 @@
+0.5.1  2025-09-03
+
+   - Added -m query flag to print all packages with no parents
+   - Various performance improvements
+
 0.5.0  2025-08-28
 
-   - Add -o and -n query flags to print a packages dependents
+   - Added -o and -n query flags to print a packages dependents
    - The -p query flag no longer causes exit if pkg not installed
 
 0.4.2  2025-08-22
@@ -50,16 +55,16 @@
 
 0.0.7  2024-10-28
 
-   - Bug fix in the SlackBuild.
+   - Bug fix in the SlackBuild
 
 0.0.6  2024-10-21
 
-   - Bug fix in the SlackBuild.
+   - Bug fix in the SlackBuild
 
 0.0.5  2024-10-21
 
-   - Bug fix.
+   - Bug fix
 
 0.0.4  2024-10-20
 
-   - First release.
+   - First release

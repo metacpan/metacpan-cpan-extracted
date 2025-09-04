@@ -1,0 +1,5 @@
+name = "Zabbix7-API"
+badges = ["github-actions/test.yml"]
+module_maker="ModuleBuild"
+static_install = "auto"
+

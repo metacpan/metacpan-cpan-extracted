@@ -1,8 +1,8 @@
+
+package App::GUI::Wx::Widget::Custom::PositionMarker;
 use v5.12;
 use warnings;
 use Wx;
-
-package App::GUI::Harmonograph::Widget::PositionMarker;
 use base qw/Wx::Panel/;
 
 sub new {

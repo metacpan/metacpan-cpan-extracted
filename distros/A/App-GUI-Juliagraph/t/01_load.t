@@ -25,3 +25,5 @@ use_ok( 'App::GUI::Juliagraph::Frame::Tab::Mapping' );
 use_ok( 'App::GUI::Juliagraph::Frame::Tab::Color' );
 use_ok( 'App::GUI::Juliagraph::Frame' );
 use_ok( 'App::GUI::Juliagraph' );
+
+exit 0;

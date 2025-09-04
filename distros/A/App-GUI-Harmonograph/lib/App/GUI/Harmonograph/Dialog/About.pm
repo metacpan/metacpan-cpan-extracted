@@ -10,15 +10,15 @@ sub new {
     my ( $class, $parent) = @_;
     my $self = $class->SUPER::new( $parent, -1, 'About Wx::GUI::Harmonograph' );
 
-    my @center = ( [-1,-1], [-1,-1], &Wx::wxALIGN_CENTRE_HORIZONTAL );
-    my $version = Wx::StaticText->new( $self, -1, $App::GUI::Harmonograph::NAME . '    version '.$App::GUI::Harmonograph::VERSION , @center);
-    my $author  = Wx::StaticText->new( $self, -1, ' by Herbert Breunung ', @center);
-    my $license = Wx::StaticText->new( $self, -1, ' licensed under the GPL 3 ', @center);
-    my $perl    = Wx::StaticText->new( $self, -1, 'using Perl '.$^V, @center);
-    my $wx      = Wx::StaticText->new( $self, -1, 'WxPerl '. $Wx::VERSION . '  ( '. &Wx::wxVERSION_STRING. ' )', @center);
-    my $gtc     = Wx::StaticText->new( $self, -1, 'Graphics::Toolkit::Color  '.$Graphics::Toolkit::Color::VERSION, @center);
-    my $hd      = Wx::StaticText->new( $self, -1, 'File::HomeDir  '.$File::HomeDir::VERSION, @center);
-    my $url_lbl = Wx::StaticText->new( $self, -1, 'latest version on CPAN:   ', @center);
+    my @label_property = ( [-1,-1], [-1,-1], &Wx::wxALIGN_CENTRE_HORIZONTAL );
+    my $version = Wx::StaticText->new( $self, -1, $App::GUI::Harmonograph::NAME . '    version '.$App::GUI::Harmonograph::VERSION , @label_property);
+    my $author  = Wx::StaticText->new( $self, -1, ' by Herbert Breunung ', @label_property);
+    my $license = Wx::StaticText->new( $self, -1, ' licensed under the GPL 3 ', @label_property);
+    my $perl    = Wx::StaticText->new( $self, -1, 'using Perl '.$^V, @label_property);
+    my $wx      = Wx::StaticText->new( $self, -1, 'WxPerl '. $Wx::VERSION . '  ( '. &Wx::wxVERSION_STRING. ' )', @label_property);
+    my $gtc     = Wx::StaticText->new( $self, -1, 'Graphics::Toolkit::Color  '.$Graphics::Toolkit::Color::VERSION, @label_property);
+    my $hd      = Wx::StaticText->new( $self, -1, 'File::HomeDir  '.$File::HomeDir::VERSION, @label_property);
+    my $url_lbl = Wx::StaticText->new( $self, -1, 'latest version on CPAN:   ', @label_property);
     my $url     = Wx::HyperlinkCtrl->new( $self, -1, 'metacpan.org/pod/App::GUI::Harmonograph', 'https://metacpan.org/pod/App::GUI::Harmonograph' );
 
     $self->{'close'} = Wx::Button->new( $self, -1, '&Close', [10,10], [-1, -1] );

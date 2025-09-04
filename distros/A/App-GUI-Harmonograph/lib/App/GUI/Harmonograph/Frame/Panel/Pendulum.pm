@@ -7,12 +7,12 @@ use v5.12;
 use utf8;
 use warnings;
 use Wx;
-use App::GUI::Harmonograph::Widget::SliderCombo;
+use App::GUI::Wx::Widget::Custom::SliderCombo;
 
-my @const_names = (1, 2, 3, '√2', '√3', '√5', 'π', 'τ', 'φ', 'Φ', 'e', 'γ', 'Γ', 'G', 'A');
+my @const_names = (1, 2, 3, '√2', '√3', '√5', 'π', 'τ', 'φ', 'Φ', 'ψ', 'e', 'γ', 'Γ', 'G', 'A');
 my %const = (1 => 1, 2 => 2, 3 => 3, '√2' => 1.4142135623731, '√3' => 1.73205080756888, '√5' => 2.236067977499789,
             'π' => 3.1415926535,  'τ' => 6.2831853071795,
-            'φ' => 0.61803398874989, 'Φ' => 1.61803398874989,
+            'φ' => 0.61803398874989, 'Φ' => 1.61803398874989, 'ψ' => 1.46557123187676802665,
               e => 2.718281828,  'γ' => 0.57721566490153286, 'Γ' => 1.7724538509055160,
               G => 0.9159655941772190150, A => 1.28242712910062,
 );
@@ -33,15 +33,15 @@ sub new {
     my $main_label  = Wx::StaticText->new($self, -1, uc($label) );
     $main_label->SetToolTip($help);
 
-    $self->{'frequency'}  = App::GUI::Harmonograph::Widget::SliderCombo->new
+    $self->{'frequency'}  = App::GUI::Wx::Widget::Custom::SliderCombo->new
                         ( $self, 100, 'Frequency', 'frequency of '.$help, 1, $max, 1 );
-    $self->{'freq_dez'} = App::GUI::Harmonograph::Widget::SliderCombo->new
+    $self->{'freq_dez'} = App::GUI::Wx::Widget::Custom::SliderCombo->new
                         ( $self, 100, 'Precise   ', 'decimals of frequency at '.$help, 0, 1000, 0);
     $self->{'freq_factor'} = Wx::ComboBox->new( $self, -1, 1, [-1,-1],[70, 20], [@const_names]);
     $self->{'freq_factor'}->SetToolTip('base factor the frequency will be multiplied with: one (no), or a math constants as shown');
-    $self->{'freq_damp'} = App::GUI::Harmonograph::Widget::SliderCombo->new( $self, 100, 'Damp  ', 'damping factor (diminishes frequency over time)', 0, 200, 0);
+    $self->{'freq_damp'} = App::GUI::Wx::Widget::Custom::SliderCombo->new( $self, 100, 'Damp  ', 'damping factor (diminishes frequency over time)', 0, 200, 0);
     $self->{'freq_damp_type'} = Wx::ComboBox->new( $self, -1, '*', [-1,-1],[70, 20], [ '*', '-']);
-    $self->{'freq_damp_acc'} = App::GUI::Harmonograph::Widget::SliderCombo->new( $self, 100, 'Acceleration ', 'accelaration of damping factor', 0, 100, 0);
+    $self->{'freq_damp_acc'} = App::GUI::Wx::Widget::Custom::SliderCombo->new( $self, 100, 'Acceleration ', 'accelaration of damping factor', 0, 100, 0);
     $self->{'freq_damp_acc_type'} = Wx::ComboBox->new( $self, -1, '*', [-1,-1],[70, 20], [ '*', '/', '+', '-']);
     $self->{'invert_freq'} = Wx::CheckBox->new( $self, -1, ' Inv.');
     $self->{'invert_freq'}->SetToolTip('invert (1/x) pendulum frequency');
@@ -53,16 +53,16 @@ sub new {
     $self->{'half_off'}->SetToolTip("$help starts with offset of half rotation");
     $self->{'quarter_off'} = Wx::CheckBox->new( $self, -1, ' 90');
     $self->{'quarter_off'}->SetToolTip("$help starts with offset of quater rotation");
-    $self->{'offset'} = App::GUI::Harmonograph::Widget::SliderCombo->new
+    $self->{'offset'} = App::GUI::Wx::Widget::Custom::SliderCombo->new
                             ($self, 110, 'Offset', "additional offset $help starts with (0 - quater rotation)", 0, 100, 0);
-    $self->{'radius'} = App::GUI::Harmonograph::Widget::SliderCombo->new( $self, 100, 'Radius %', "radius / amplitude of $help swing", 0, 200, 100);
+    $self->{'radius'} = App::GUI::Wx::Widget::Custom::SliderCombo->new( $self, 100, 'Radius %', "radius / amplitude of $help swing", 0, 200, 100);
     $self->{'radius_factor'} = Wx::ComboBox->new( $self, -1, 1, [-1,-1],[70, 20], [@const_names]);
     $self->{'radius_factor'}->SetToolTip('base factor the radius will be multiplied with: one (no), or a math constants as shown');
     $self->{'neg_radius'} = Wx::CheckBox->new( $self, -1, ' Neg.');
     $self->{'neg_radius'}->SetToolTip('allow radius to become negative');
-    $self->{'radius_damp'} = App::GUI::Harmonograph::Widget::SliderCombo->new( $self, 100, 'Damp  ', 'damping factor (diminishes amplitude over time)', 0, 200, 0);
+    $self->{'radius_damp'} = App::GUI::Wx::Widget::Custom::SliderCombo->new( $self, 100, 'Damp  ', 'damping factor (diminishes amplitude over time)', 0, 200, 0);
     $self->{'radius_damp_type'} = Wx::ComboBox->new( $self, -1, '*', [-1,-1],[70, 20], [ '*', '-']);
-    $self->{'radius_damp_acc'} = App::GUI::Harmonograph::Widget::SliderCombo->new( $self, 100, 'Acceleration ', 'accelaration of damping factor', 0, 100, 0);
+    $self->{'radius_damp_acc'} = App::GUI::Wx::Widget::Custom::SliderCombo->new( $self, 100, 'Acceleration ', 'accelaration of damping factor', 0, 100, 0);
     $self->{'radius_damp_acc_type'} = Wx::ComboBox->new( $self, -1, '*', [-1,-1],[70, 20], [ '*', '/', '+', '-']);
     $self->{'reset_radius'} = Wx::Button->new( $self, -1, '1', [-1,-1], [35, 17] );
     $self->{'reset_radius'}->SetToolTip('reset radius to 100 %');

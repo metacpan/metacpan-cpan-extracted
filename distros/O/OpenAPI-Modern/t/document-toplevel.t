@@ -10,32 +10,43 @@ no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 no if "$]" >= 5.041009, feature => 'smartmatch';
 no feature 'switch';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
+use Test::Warnings qw(:no_end_test warnings had_no_warnings);
 
 use lib 't/lib';
 use Helper;
 
+use constant STRICT_DIALECT_URI => 'https://raw.githubusercontent.com/karenetheridge/OpenAPI-Modern/master/share/strict-dialect.json';
+use constant STRICT_METASCHEMA_URI => 'https://raw.githubusercontent.com/karenetheridge/OpenAPI-Modern/master/share/strict-schema.json';
+
+my $yamlpp = YAML::PP->new(boolean => 'JSON::PP');
+
 subtest 'basic construction' => sub {
-  my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
-    canonical_uri => 'http://localhost:1234/api',
-    schema => {
-      openapi => OAS_VERSION,
-      info => {
-        title => 'my title',
-        version => '1.2.3',
-      },
-      paths => {},
-    },
+  cmp_result(
+    [ warnings {
+      JSON::Schema::Modern::Document::OpenAPI->new(
+        canonical_uri => 'http://localhost:1234/api',
+        schema => {},
+        json_schema_dialect => 'https://example.com/metaschema',
+      )
+    } ],
+    [ re(qr/^json_schema_dialect has been removed as a constructor attribute: use jsonSchemaDialect in your document instead/) ],
+    'json_schema_dialect may no longer be overridden via the constructor',
   );
 
-  cmp_deeply(
+  my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
+    canonical_uri => 'http://localhost:1234/api',
+    schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+paths: {}
+YAML
+
+  cmp_result(
     { $doc->resource_index },
     {
       'http://localhost:1234/api' => {
         path => '',
         canonical_uri => str('http://localhost:1234/api'),
         specification_version => 'draft2020-12',
-        vocabularies => bag(map 'JSON::Schema::Modern::Vocabulary::'.$_,
-          qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated OpenAPI)),
+        vocabularies => bag(OAS_VOCABULARIES->@*),
       },
     },
     'the document itself is recorded as a resource',
@@ -55,7 +66,43 @@ subtest 'top level document checks' => sub {
   );
 
 
-  my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
+  my $doc;
+  cmp_result(
+    [ warnings {
+      $doc = JSON::Schema::Modern::Document::OpenAPI->new(
+        specification_version => 'draft7',
+        schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+components:
+  schemas:
+    test_schema:
+      $id: /foo/bar
+YAML
+    } ],
+    [ re(qr/^specification_version argument is ignored by this subclass: use jsonSchemaDialect in your document instead/) ],
+    'unsupported construction arguments (but supported in the base class) generate warnings',
+  );
+
+  cmp_result(
+    $doc->{resource_index},
+    {
+      '' => {
+        canonical_uri => str(''),
+        path => '',
+        specification_version => 'draft2020-12',
+        vocabularies => bag(OAS_VOCABULARIES->@*),
+      },
+      '/foo/bar' => {
+        canonical_uri => str('/foo/bar'),
+        path => '/components/schemas/test_schema',
+        specification_version => 'draft2020-12',
+        vocabularies => bag(OAS_VOCABULARIES->@*),
+      },
+    },
+    '...and also gracefully removed from consideration',
+  );
+
+
+  $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
     schema => {},
   );
@@ -174,15 +221,9 @@ ERRORS
 
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
-    schema => {
-      openapi => OAS_VERSION,
-      info => {
-        title => 'my title',
-        version => '1.2.3',
-      },
-      '$self' => '#frag\\ment',
-    },
-  );
+    schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+$self: '#frag\\ment'
+YAML
 
   cmp_result(
     [ map $_->TO_JSON, $doc->errors ],
@@ -212,15 +253,9 @@ ERRORS
 
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
-    schema => {
-      openapi => OAS_VERSION,
-      info => {
-        title => 'my title',
-        version => '1.2.3',
-      },
-      jsonSchemaDialect => '/foo',
-    },
-  );
+    schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+jsonSchemaDialect: /foo
+YAML
 
   cmp_result(
     [ map $_->TO_JSON, $doc->errors ],
@@ -254,15 +289,9 @@ ERRORS
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
     evaluator => $js,
-    schema => {
-      openapi => OAS_VERSION,
-      info => {
-        title => 'my title',
-        version => '1.2.3',
-      },
-      jsonSchemaDialect => 'https://metaschema/with/wrong/spec',
-    },
-  );
+    schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+jsonSchemaDialect: https://metaschema/with/wrong/spec
+YAML
 
   cmp_result(
     [ map $_->TO_JSON, $doc->errors ],
@@ -287,27 +316,22 @@ ERRORS
 '/jsonSchemaDialect/$vocabulary/https:~1~1unknown': "https://unknown" is not a known vocabulary
 '/jsonSchemaDialect': "https://metaschema/with/wrong/spec" is not a valid metaschema
 ERRORS
+};
 
-
-  $doc = JSON::Schema::Modern::Document::OpenAPI->new(
+subtest 'custom dialects via jsonSchemaDialect' => sub {
+  my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
-    evaluator => $js = JSON::Schema::Modern->new,
-    schema => {
-      openapi => OAS_VERSION,
-      info => {
-        title => 'my title',
-        version => '1.2.3',
-      },
-      # no jsonSchemaDialect
-      paths => {},
-    },
-  );
+    evaluator => my $js = JSON::Schema::Modern->new,
+    schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+# no jsonSchemaDialect
+paths: {}
+YAML
 
   cmp_result([ $doc->errors ], [], 'no errors with default jsonSchemaDialect');
-  is($doc->json_schema_dialect, DEFAULT_DIALECT, 'default jsonSchemaDialect is saved in the document');
+  is($doc->metaschema_uri, DEFAULT_BASE_METASCHEMA, 'default metaschema is saved for the document');
 
   $js->add_document($doc);
-  cmp_deeply(
+  cmp_result(
     $js->{_resource_index},
     superhashof({
       # our document itself is a resource, even if it isn't a json schema itself
@@ -316,8 +340,7 @@ ERRORS
         path => '',
         specification_version => 'draft2020-12',
         document => shallow($doc),
-        vocabularies => bag(map 'JSON::Schema::Modern::Vocabulary::'.$_,
-          qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated OpenAPI)),
+        vocabularies => bag(OAS_VOCABULARIES->@*),
       },
       # the oas vocabulary, and the dialect that uses it
       DEFAULT_DIALECT() => {
@@ -368,29 +391,20 @@ ERRORS
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
     evaluator => $js,
-    schema => {
-      openapi => OAS_VERSION,
-      info => {
-        title => 'my title',
-        version => '1.2.3',
-      },
-      jsonSchemaDialect => 'https://mymetaschema',
-      components => {
-        schemas => {
-          Foo => {
-            maxLength => false,  # this is a bad schema, but our custom dialect does not detect that
-          },
-        },
-      },
-    },
     metaschema_uri => DEFAULT_METASCHEMA, # '#meta' is now just {"type": ["object","boolean"]}
-  );
+    schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+jsonSchemaDialect: https://mymetaschema
+components:
+  schemas:
+    Foo:
+      maxLength: false  # this is a bad schema, but our custom dialect does not detect that
+YAML
+
   cmp_result([ $doc->errors ], [], 'no errors with a custom jsonSchemaDialect');
-  is($doc->json_schema_dialect, 'https://mymetaschema', 'custom jsonSchemaDialect is saved in the document');
-  is($doc->metaschema_uri, DEFAULT_METASCHEMA, 'custom metaschema is saved');
+  is($doc->metaschema_uri, DEFAULT_METASCHEMA, 'default (permissive) metaschema is saved');
 
   $js->add_document($doc);
-  cmp_deeply(
+  cmp_result(
     $js->{_resource_index},
     superhashof({
       # our document itself is a resource, even if it isn't a json schema itself
@@ -419,29 +433,20 @@ ERRORS
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
     evaluator => $js,
-    schema => {
-      openapi => OAS_VERSION,
-      info => {
-        title => 'my title',
-        version => '1.2.3',
-      },
-      jsonSchemaDialect => 'https://mymetaschema',
-      components => {
-        schemas => {
-          Foo => {
-            maxLength => false,  # this is a bad schema, but our custom dialect does not detect that
-          },
-        },
-      },
-    },
     # metaschema_uri is not set, but autogenerated
-  );
+    schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+jsonSchemaDialect: https://mymetaschema
+components:
+  schemas:
+    Foo:
+      maxLength: false,  # this is a bad schema, but our custom dialect does not detect that
+YAML
+
   cmp_result([ $doc->errors ], [], 'no errors with a custom jsonSchemaDialect');
-  is($doc->json_schema_dialect, 'https://mymetaschema', 'custom jsonSchemaDialect is saved in the document');
   like($doc->metaschema_uri, qr{^https://custom-dialect\.example\.com/[[:xdigit:]]{32}$}, 'dynamic metaschema is used');
 
   $js->add_document($doc);
-  cmp_deeply(
+  cmp_result(
     $js->{_resource_index},
     superhashof({
       # our document itself is a resource, even if it isn't a json schema itself
@@ -478,34 +483,77 @@ ERRORS
     }),
     'dialect resources are properly stored on the evaluator',
   );
+};
 
+subtest 'custom dialects, via metaschema_uri' => sub {
+  my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
+    metaschema_uri => STRICT_METASCHEMA_URI,
+    schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+components:
+  schemas:
+    Foo:
+      blah: unrecognized keyword!
+    Bar:
+      x-todo: this one is okay
+YAML
 
-  # relative $self, absolute original_uri - $self is resolved with original_uri
-  $doc = JSON::Schema::Modern::Document::OpenAPI->new(
-    canonical_uri => 'http://localhost:1234/foo/api.json',
-    evaluator => $js,
-    schema => {
-      openapi => OAS_VERSION,
-      info => {
-        title => 'my title',
-        version => '1.2.3',
-      },
-      '$self' => 'user/api.json',  # the 'user' family of APIs
-      paths => {},
+  cmp_result(
+    ($doc->errors)[0]->TO_JSON,
+    {
+      instanceLocation => '/components/schemas/Foo/blah',
+      keywordLocation => '/$ref/properties/components/$ref/properties/schemas/additionalProperties/$dynamicRef/$ref/unevaluatedProperties',
+      absoluteKeywordLocation => STRICT_DIALECT_URI.'#/unevaluatedProperties',
+      error => 'additional property not permitted',
     },
+    'subschemas identified, and error found',
   );
+};
+
+subtest 'custom dialects, via metaschema_uri and jsonSchemaDialect' => sub {
+  my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
+    metaschema_uri => STRICT_METASCHEMA_URI,
+    schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<YAML));
+jsonSchemaDialect: ${\ STRICT_DIALECT_URI() }
+components:
+  schemas:
+    Foo:
+      blah: unrecognized keyword!
+    Bar:
+      x-todo: this one is okay
+YAML
+
+  cmp_result(
+    ($doc->errors)[0]->TO_JSON,
+    {
+      instanceLocation => '/components/schemas/Foo/blah',
+      keywordLocation => '/$ref/properties/components/$ref/properties/schemas/additionalProperties/$dynamicRef/$ref/unevaluatedProperties',
+      absoluteKeywordLocation => STRICT_DIALECT_URI.'#/unevaluatedProperties',
+      error => 'additional property not permitted',
+    },
+    'subschemas identified, and error found',
+  );
+};
+
+subtest 'custom $self value' => sub {
+  # relative $self, absolute original_uri - $self is resolved with original_uri
+  my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
+    canonical_uri => 'http://localhost:1234/foo/api.json',
+    evaluator => my $js = JSON::Schema::Modern->new,
+    schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+$self: user/api.json  # the 'user' family of APIs
+paths: {}
+YAML
 
   is($doc->original_uri, 'http://localhost:1234/foo/api.json', 'retrieval uri');
   is($doc->canonical_uri, 'http://localhost:1234/foo/user/api.json', 'canonical uri is $self resolved against retrieval uri');
-  cmp_deeply(
+  cmp_result(
     $doc->{resource_index},
     {
       'http://localhost:1234/foo/user/api.json' => {
         canonical_uri => str('http://localhost:1234/foo/user/api.json'),
         path => '',
         specification_version => 'draft2020-12',
-        vocabularies => bag(map 'JSON::Schema::Modern::Vocabulary::'.$_,
-          qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated OpenAPI)),
+        vocabularies => bag(OAS_VOCABULARIES->@*),
       },
     },
     'resource is properly indexed',
@@ -516,28 +564,21 @@ ERRORS
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/foo/api.json',
     evaluator => $js,
-    schema => {
-      openapi => OAS_VERSION,
-      info => {
-        title => 'my title',
-        version => '1.2.3',
-      },
-      '$self' => 'http://localhost:5555/user/api.json',  # the 'user' family of APIs
-      paths => {},
-    },
-  );
+    schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+$self: http://localhost:5555/user/api.json  # the 'user' family of APIs
+paths: {}
+YAML
 
   is($doc->original_uri, 'http://localhost:1234/foo/api.json', 'retrieval uri');
   is($doc->canonical_uri, 'http://localhost:5555/user/api.json', 'canonical uri is $self, already absolute');
-  cmp_deeply(
+  cmp_result(
     $doc->{resource_index},
     {
       'http://localhost:5555/user/api.json' => {
         canonical_uri => str('http://localhost:5555/user/api.json'),
         path => '',
         specification_version => 'draft2020-12',
-        vocabularies => bag(map 'JSON::Schema::Modern::Vocabulary::'.$_,
-          qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated OpenAPI)),
+        vocabularies => bag(OAS_VOCABULARIES->@*),
       },
     },
     'resource is properly indexed',
@@ -547,28 +588,21 @@ ERRORS
   # relative $self, relative original_uri - $self is resolved with original_uri
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'foo/api.json',
-    schema => {
-      openapi => OAS_VERSION,
-      info => {
-        title => 'my title',
-        version => '1.2.3',
-      },
-      '$self' => 'user/api.json',  # the 'user' family of APIs
-      paths => {},
-    },
-  );
+    schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+$self: user/api.json  # the 'user' family of APIs
+paths: {}
+YAML
 
   is($doc->original_uri, 'foo/api.json', 'retrieval uri');
   is($doc->canonical_uri, 'foo/user/api.json', 'canonical uri is $self resolved against retrieval uri');
-  cmp_deeply(
+  cmp_result(
     $doc->{resource_index},
     {
       'foo/user/api.json' => {
         canonical_uri => str('foo/user/api.json'),
         path => '',
         specification_version => 'draft2020-12',
-        vocabularies => bag(map 'JSON::Schema::Modern::Vocabulary::'.$_,
-          qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated OpenAPI)),
+        vocabularies => bag(OAS_VOCABULARIES->@*),
       },
     },
     'resource is properly indexed',
@@ -578,32 +612,26 @@ ERRORS
   # absolute $self, relative original_uri - $self is used as is
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'foo/api.json',
-    schema => {
-      openapi => OAS_VERSION,
-      info => {
-        title => 'my title',
-        version => '1.2.3',
-      },
-      '$self' => 'http://localhost:5555/user/api.json',  # the 'user' family of APIs
-      paths => {},
-    },
-  );
+    schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+$self: http://localhost:5555/user/api.json  # the 'user' family of APIs
+paths: {}
+YAML
 
   is($doc->original_uri, 'foo/api.json', 'retrieval uri');
   is($doc->canonical_uri, 'http://localhost:5555/user/api.json', 'canonical uri is $self, already absolute');
-  cmp_deeply(
+  cmp_result(
     $doc->{resource_index},
     {
       'http://localhost:5555/user/api.json' => {
         canonical_uri => str('http://localhost:5555/user/api.json'),
         path => '',
         specification_version => 'draft2020-12',
-        vocabularies => bag(map 'JSON::Schema::Modern::Vocabulary::'.$_,
-          qw(Core Applicator Validation FormatAnnotation Content MetaData Unevaluated OpenAPI)),
+        vocabularies => bag(OAS_VOCABULARIES->@*),
       },
     },
     'resource is properly indexed',
   );
 };
 
+had_no_warnings() if $ENV{AUTHOR_TESTING};
 done_testing;

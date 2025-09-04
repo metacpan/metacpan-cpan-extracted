@@ -79,6 +79,10 @@ t { trim => 0 }, " Va\rl id \n ", " Va\rl id \n ";
 f {}, '  ', { validation => 'required' }, 'required value missing';
 t { trim => 0 }, '  ', '  ';
 
+# allow_control
+f {}, "\b", { validation => 'allow_control' }, 'invalid control character';
+t { allow_control => 1 }, "\b", "\b";
+
 # accept_array
 t { default => undef, accept_array => 'first' }, [], undef;
 t { default => undef, accept_array => 'first' }, [' x '], 'x';

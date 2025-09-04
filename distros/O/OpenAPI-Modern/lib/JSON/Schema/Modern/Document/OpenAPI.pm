@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Document::OpenAPI;
 # ABSTRACT: One OpenAPI v3.1 document
 # KEYWORDS: JSON Schema data validation request response OpenAPI
 
-our $VERSION = '0.091';
+our $VERSION = '0.092';
 
 use 5.020;
 use utf8;
@@ -20,7 +20,7 @@ no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 no if "$]" >= 5.041009, feature => 'smartmatch';
 no feature 'switch';
 use JSON::Schema::Modern::Utilities qw(E canonical_uri jsonp is_equal);
-use Carp 'croak';
+use Carp qw(croak carp);
 use Safe::Isa;
 use Digest::MD5 'md5_hex';
 use Storable 'dclone';
@@ -33,6 +33,8 @@ use Types::Standard qw(InstanceOf HashRef Str Enum);
 use namespace::clean;
 
 extends 'JSON::Schema::Modern::Document';
+
+our @CARP_NOT = qw(Sereal Sereal::Decoder);
 
 # schema files to add by default
 # these are also available as URIs with 'latest' instead of the timestamp.
@@ -56,17 +58,6 @@ has '+schema' => (
   isa => HashRef,
 );
 
-has '+metaschema_uri' => (
-  lazy => 1,
-  default => DEFAULT_BASE_METASCHEMA,
-);
-
-has json_schema_dialect => (
-  is => 'rwp',
-  isa => InstanceOf['Mojo::URL'],
-  coerce => sub { $_[0]->$_isa('Mojo::URL') ? $_[0] : Mojo::URL->new($_[0]) },
-);
-
 # json pointer => entity name (indexed by integer); overrides parent
 # these aren't all the different types of objects; for now we only track those that are the valid
 # target of a $ref keyword in an openapi document.
@@ -82,6 +73,20 @@ has _operationIds => (
 
 sub get_operationId_path { $_[0]->_operationIds->{$_[1]} }
 sub _add_operationId { $_[0]->_operationIds->{$_[1]} = Str->($_[2]) }
+
+# we define the sub directly, rather than using an 'around', since our root base class is not
+# Moo::Object, so we never got a BUILDARGS to modify
+sub BUILDARGS ($class, @args) {
+  my $args = $class->Moo::Object::BUILDARGS(@args); # we do not inherit from Moo::Object
+
+  carp 'json_schema_dialect has been removed as a constructor attribute: use jsonSchemaDialect in your document instead'
+    if exists $args->{json_schema_dialect};
+
+  carp 'specification_version argument is ignored by this subclass: use jsonSchemaDialect in your document instead'
+    if defined(delete($args->{specification_version}));
+
+  return $args;
+}
 
 # (probably) temporary, until the parent class evaluator is completely removed
 sub evaluator { die 'improper attempt to use of document evaluator' }
@@ -164,11 +169,10 @@ sub traverse ($self, $evaluator, $config_override = {}) {
 
   # /jsonSchemaDialect: https://spec.openapis.org/oas/v3.1#specifying-schema-dialects
   {
-    my $json_schema_dialect = $self->json_schema_dialect // $schema->{jsonSchemaDialect};
 
     # §4.8.24.5: "If [jsonSchemaDialect] is not set, then the OAS dialect schema id MUST be used for
     # these Schema Objects."
-    $json_schema_dialect //= DEFAULT_DIALECT;
+    my $json_schema_dialect = $schema->{jsonSchemaDialect} // DEFAULT_DIALECT;
 
     # traverse an empty schema with this metaschema uri to confirm it is valid, and add an entry in
     # the evaluator's _metaschema_vocabulary_classes
@@ -185,10 +189,12 @@ sub traverse ($self, $evaluator, $config_override = {}) {
     }
 
     $state->@{qw(specification_version vocabularies)} = $check_metaschema_state->@{qw(specification_version vocabularies)};
-    $self->_set_json_schema_dialect($json_schema_dialect);
+    $state->{json_schema_dialect} = $json_schema_dialect; # subsequent '$schema' keywords can still override this
 
-    $self->_set_metaschema_uri($self->_dynamic_metaschema_uri($json_schema_dialect, $evaluator))
-      if not $self->_has_metaschema_uri and $json_schema_dialect ne DEFAULT_DIALECT;
+    $self->_set_metaschema_uri(
+          $json_schema_dialect eq DEFAULT_DIALECT ? DEFAULT_BASE_METASCHEMA
+        : $self->_dynamic_metaschema_uri($json_schema_dialect, $evaluator))
+      if not $self->_has_metaschema_uri;
   }
 
   $state->{identifiers}{$state->{initial_schema_uri}} = {
@@ -431,7 +437,7 @@ sub _traverse_schema ($self, $state) {
   my $subschema_state = $state->{evaluator}->traverse($schema, {
     initial_schema_uri => canonical_uri($state),
     traversed_schema_path => $state->{traversed_schema_path}.$state->{schema_path},
-    metaschema_uri => $self->json_schema_dialect,
+    metaschema_uri => $state->{json_schema_dialect},  # can be overridden with the '$schema' keyword
   });
 
   push $state->{errors}->@*, $subschema_state->{errors}->@*;
@@ -501,6 +507,11 @@ sub _dynamic_metaschema_uri ($self, $json_schema_dialect, $evaluator) {
 # callback hook for Sereal::Decoder
 sub THAW ($class, $serializer, $data) {
   delete $data->{evaluator};
+
+  if (defined(my $dialect = delete $data->{json_schema_dialect})) {
+    carp "use of no-longer-supported constructor argument: json_schema_dialect = \"$dialect\"; use \"jsonSchemaDialect\": \"...\"  in your OpenAPI document itself";
+  }
+
   my $self = bless($data, $class);
 
   foreach my $attr (qw(schema _entities)) {
@@ -525,7 +536,7 @@ JSON::Schema::Modern::Document::OpenAPI - One OpenAPI v3.1 document
 
 =head1 VERSION
 
-version 0.091
+version 0.092
 
 =head1 SYNOPSIS
 
@@ -552,7 +563,7 @@ version 0.091
   }
 }
 JSON
-    metaschema_uri => 'https://example.com/my_custom_dialect',
+    metaschema_uri => 'https://example.com/my_custom_metaschema',
   );
 
 =head1 DESCRIPTION
@@ -561,7 +572,8 @@ Provides structured parsing of an OpenAPI document, suitable as the base for mor
 request and response validation, code generation or form generation.
 
 The provided document must be a valid OpenAPI document, as specified by the schema identified by
-L<https://spec.openapis.org/oas/3.1/schema-base/2025-02-13>
+L<https://spec.openapis.org/oas/3.1/schema-base/2025-02-13> (which is a wrapper around
+L<https://spec.openapis.org/oas/3.1/schema/2025-02-13>),
 and the L<OpenAPI v3.1.x specification|https://spec.openapis.org/oas/v3.1>.
 
 =for Pod::Coverage THAW DEFAULT_BASE_METASCHEMA DEFAULT_DIALECT DEFAULT_METASCHEMA DEFAULT_SCHEMAS
@@ -579,15 +591,19 @@ The actual raw data representing the OpenAPI document. Required.
 
 =for stopwords metaschema schemas
 
-A L<JSON::Schema::Modern> object, which will be used for subsequent evaluation of data against
-schemas in the document, either manually or perhaps via a web framework plugin
-(see L<Mojo::Plugin::OpenAPI::Modern>).
+A L<JSON::Schema::Modern> object which is used for parsing the schema of this document. This is the
+object that holds all other schemas that may be used for parsing: that is, metaschemas that define
+the structure of the document.
 
 Optional, unless you are using custom metaschemas for your OpenAPI document or embedded JSON Schemas
 (in which case you should define the evaluator first and call L<JSON::Schema::Modern/add_schema> for
 each customization, before calling this constructor).
 
-This argument is not preserved by the constructor, so it is not available as an accessor.
+This argument is not saved after object construction, so it is not available as an accessor.
+However, if this document object was constructed via a call to L<OpenAPI::Modern/new>, it will be
+saved on that object for use during request and response validation, so it is expected that the
+evaluator object should also hold the other documents that are needed for runtime evaluation (which
+may be other L<JSON::Schema::Modern::Document::OpenAPI> objects).
 
 =head2 canonical_uri
 
@@ -598,29 +614,18 @@ It is strongly recommended that this URI is absolute.
 
 See also L</retrieval_uri>.
 
-=head2 json_schema_dialect
-
-The URI of the metaschema to use for all embedded L<JSON Schemas|https://json-schema.org/> in the
-document.
-
-Overrides the value of C<jsonSchemaDialect> in the document, or the specification default
-(C<https://spec.openapis.org/oas/3.1/dialect/2024-11-10>).
-
-If you specify your own dialect here or in C<jsonSchemaDialect>, then you need to add the
-vocabularies and schemas to the implementation yourself (see C<JSON::Schema::Modern/add_vocabulary>
-and C<JSON::Schema::Modern/add_schema>).
-
-Note this is B<NOT> the same as L<JSON::Schema::Modern::Document/metaschema_uri>
-(and C<metaschema_uri> below), which contains the
-URI of the schema describing the entire document (and is not a metaschema in this case, as the
-entire document is not a JSON Schema).
-
 =head2 metaschema_uri
 
 The URI of the schema that describes the OpenAPI document itself. Defaults to
-L<https://spec.openapis.org/oas/3.1/schema-base/2025-02-13> when the json schema dialect is not
-changed; otherwise defaults to a dynamically generated metaschema that uses the correct
-value of C<jsonSchemaDialect>, so you don't need to write one yourself.
+L<https://spec.openapis.org/oas/3.1/schema-base/2025-02-13> when the
+C<L<jsonSchemaDialect/https://spec.openapis.org/oas/v3.1#fixed-fields>>
+is not changed from its default; otherwise defaults to a dynamically generated metaschema that uses
+the correct value of C<jsonSchemaDialect>, so you don't need to write one yourself.
+
+Note that both the schemas described by C<metaschema_uri> and by the C<jsonSchemaDialect> keyword
+(if you are using custom schemas) should be loaded into the evaluator in advance with
+L<JSON::Schema::Modern/add_schema>, and then this evaluator should be provided to the
+L<OpenAPI::Modern> constructor.
 
 =head1 METHODS
 

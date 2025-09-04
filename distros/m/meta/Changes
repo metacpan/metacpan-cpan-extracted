@@ -1,5 +1,10 @@
 Revision history for meta
 
+0.014   2025-09-03
+        [BUGFIXES]
+         * Account for `OP_MULTIPARAM` of signatured subs in latest bleadperl
+           https://github.com/Perl/perl5/issues/23675
+
 0.013   2025-04-23
         [BUGFIXES]
          * Skip t/80subname+Sub-Util.t on perls that don't have Sub::Util

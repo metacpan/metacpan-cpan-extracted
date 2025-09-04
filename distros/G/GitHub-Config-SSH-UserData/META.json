@@ -57,7 +57,7 @@
    "provides" : {
       "GitHub::Config::SSH::UserData" : {
          "file" : "lib/GitHub/Config/SSH/UserData.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -68,7 +68,7 @@
          "web" : "https://github.com/klaus-rindfrey/perl-github-config-ssh-userdata.git"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_bugtracker" : {
       "web" : "https://github.com/klaus-rindfrey/perl-github-config-ssh-userdata/issues"
    },

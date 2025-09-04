@@ -1,9 +1,12 @@
+
+# square that displays a color
+
+package App::GUI::Wx::Widget::Custom::ColorDisplay;
+use base qw/Wx::Panel/;
 use v5.12;
 use warnings;
 use Wx;
 
-package App::GUI::Harmonograph::Widget::ColorDisplay;
-use base qw/Wx::Panel/;
 
 sub new {
     my ( $class, $parent, $x, $y, $nr, $init  ) = @_;

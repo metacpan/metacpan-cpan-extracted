@@ -39,7 +39,7 @@ sub new {
                                                    $self->{'x_pos'} , $self->{'y_pos'} + $self->{'menu_size'} );
         }
         1;
-    }); # Blit
+    });
     #  Wx::Event::EVT_ENTER_WINDOW( $self, sub {  });
     #  Wx::Event::EVT_LEFT_DOWN( $self, sub { });
     #  Wx::Event::EVT_MOTION( $self, sub { });

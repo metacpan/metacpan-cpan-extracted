@@ -21,7 +21,7 @@ my $Test_Data_Dir = catdir(dirname(__FILE__), '01-test-data');
              'full_name'  => 'John Doe',
              'other_data' => 'additional data'
             },
-           "$test_cfg_file: ALL_ITEMS");
+            "$test_cfg_file: ALL_ITEMS");
 
   is_deeply(get_user_data_from_ssh_cfg('minimal', $test_cfg_file),
             {
@@ -73,10 +73,21 @@ my $Test_Data_Dir = catdir(dirname(__FILE__), '01-test-data');
     local $@;
     eval { get_user_data_from_ssh_cfg('non-existing-name', $test_cfg_file) };
     ok(defined($@) && $@ =~ /\bnon-existing-name: user name not in \Q$test_cfg_file\E\b/,
-       "$test_cfg_file: non-existing-name: correct error message");
+       "$test_cfg_file: non-existing-name: correct error message")or diag ">>>$@<<<";
   }
 }
 
+{
+  local $ENV{HOME} = $Test_Data_Dir;
+  is_deeply(get_user_data_from_ssh_cfg('perry.mason'),
+            {
+             'email'      => 'perry.mason@addr.xyz',
+             'email2'     => 'pm@bar',
+             'full_name'  => 'Perry Mason',
+             'other_data' => 'blah blah'
+            },
+            'localized HOME');
+}
 
 #==================================================================================================
 done_testing();

@@ -1,3 +1,12 @@
+Overview of changes in Glib::Object::Introspection 0.052
+========================================================
+- Revert change to evals. They should be string evals to allow failures of
+  Gtk3 load.
+- DOAP: Add issue tracker URL; replace defunct mailing list with GNOME
+  Discourse URL
+- Handle pointer types
+- Update `DYLD_LIBRARY_PATH` when building on macOS/Darwin
+
 Overview of changes in Glib::Object::Introspection 0.051
 ========================================================
 - Check for empty closures (RT#147409)

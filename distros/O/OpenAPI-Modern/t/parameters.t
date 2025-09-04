@@ -16,21 +16,16 @@ use Helper;
 
 my $openapi = OpenAPI::Modern->new(
   openapi_uri => 'http://localhost:1234/api',
-  openapi_schema => {
-    openapi => OAS_VERSION,
-    info => { title => 'Test API', version => '1.2.3' },
-    components => {
-      schemas => {
-        nothing => {},
-        string => { type => 'string' },
-        array => { type => 'array' },
-        object => { type => 'object' },
-        deep_string => { '$defs' => { foo => { type => 'string' } } },
-        ref_to_deep_string => { '$ref' => '#/components/schemas/string' },
-      },
-    },
-  },
-);
+  openapi_schema => YAML::PP->new(boolean => 'JSON::PP')->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+components:
+  schemas:
+    nothing: {}
+    string: { type: string }
+    array: { type: array }
+    object: { type: object }
+    deep_string: { $defs: { foo: { type: string } } }
+    ref_to_deep_string: { $ref: '#/components/schemas/string' }
+YAML
 
 $openapi->evaluator->add_schema({
   '$id' => 'http://localhost:1234/extras',

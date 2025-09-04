@@ -7,7 +7,7 @@ use warnings;
 use Wx;
 use utf8;
 our $NAME = __PACKAGE__;
-our $VERSION = '0.7';
+our $VERSION = '0.72';
 
 use base qw/Wx::App/;
 use App::GUI::Juliagraph::Frame;
@@ -32,7 +32,7 @@ __END__
 
 =head1 NAME
 
-App::GUI::Juliagraph - drawing Mandelbrot and Julia fractals with complex equations
+App::GUI::Juliagraph - drawing Mandelbrot-, Julia fractals and more
 
 =head1 SYNOPSIS
 
@@ -44,7 +44,7 @@ read this POD
 
 =item 2.
 
-start the program ins shell: > C<juliagraph>
+start the program in the shell: > C<juliagraph>
 
 =item 3.
 
@@ -286,7 +286,7 @@ and the currently selected. This can be either a gradient (with C<Gradient>
 button). Right beside is a text box to skew the gradient in one or anotehr
 direction. To get complementary colors push the C<Complement> button.
 This also can be skewed on the saturation and lightness axis (text boxes
-beside). The arrow butons there help oýou to move colors to another position.
+beside). The arrow butons there help you to move colors to another position.
 
 To change a color you have to fist select it by clicking on it or the
 marker below. After that the marker turns into an arrow pointing down.
@@ -324,7 +324,9 @@ The submenu above onle set the preferred format, which is the format
 of serial images and the first wild card in dialog. Above that is another
 submenu for setting the image size.
 
-The third menu has only a dialog with some additional information of version numbers and our homepage.
+The third menu has only one item that opens a help dialog. That displays
+some core information about author, version number and a link to this page,
+the main documentation.
 
 =head1 SEE ALSO
 

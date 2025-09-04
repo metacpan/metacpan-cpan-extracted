@@ -5,13 +5,13 @@ use warnings;
 use utf8;
 use base qw/Wx::Frame/;
 use Wx::AUI;
+use App::GUI::Wx::Widget::Custom::ProgressBar;
 use App::GUI::Harmonograph::Dialog::About;
 use App::GUI::Harmonograph::Frame::Panel::Board;
 use App::GUI::Harmonograph::Frame::Panel::Pendulum;
 use App::GUI::Harmonograph::Frame::Tab::Function;
 use App::GUI::Harmonograph::Frame::Tab::Visual;
 use App::GUI::Harmonograph::Frame::Tab::Color;
-use App::GUI::Harmonograph::Widget::ProgressBar;
 use App::GUI::Harmonograph::Settings; # file IO for parameters of image
 use App::GUI::Harmonograph::Config;   # file IO for program config: dirs, color set store
 
@@ -30,10 +30,10 @@ sub new {
     # create GUI parts
     $self->{'tabs'}             = Wx::AuiNotebook->new($self, -1, [-1,-1], [-1,-1], &Wx::wxAUI_NB_TOP );
     $self->{'tab'}{'linear'}    = Wx::Panel->new($self->{'tabs'});
-    $self->{'tab'}{'circular'}  = Wx::Panel->new($self->{'tabs'});
     $self->{'tab'}{'epicycle'}  = Wx::Panel->new($self->{'tabs'});
+    $self->{'tab'}{'circular'}  = Wx::Panel->new($self->{'tabs'});
     $self->{'tab'}{'function'}  = App::GUI::Harmonograph::Frame::Tab::Function->new( $self->{'tabs'} );
-    $self->{'tab'}{'color'}     = App::GUI::Harmonograph::Frame::Tab::Color->new( $self->{'tabs'}, $self->{'config'} );
+    $self->{'tab'}{'color'}     = App::GUI::Harmonograph::Frame::Tab::Color->new( $self->{'tabs'}, $self->{'config'}, 10 );
     $self->{'tab'}{'visual'}    = App::GUI::Harmonograph::Frame::Tab::Visual->new( $self->{'tabs'}, $self->{'tab'}{'color'} );
     $self->{'tabs'}->AddPage( $self->{'tab'}{'linear'},   'Linearl Pendulum');
     $self->{'tabs'}->AddPage( $self->{'tab'}{'epicycle'}, 'Epi Pendulum');
@@ -54,7 +54,7 @@ sub new {
     $self->{'pendulum'}{$_}->SetCallBack( sub { $self->sketch( ) } ) for @{$self->{'pendulum_names'}};
     $self->{'tab'}{$_}->SetCallBack( sub { $self->sketch( ) } ) for @{$self->{'tab_names'}};
 
-    $self->{'progress_bar'}     = App::GUI::Harmonograph::Widget::ProgressBar->new( $self, 455,  10, [20, 20, 110] );
+    $self->{'progress_bar'}     = App::GUI::Wx::Widget::Custom::ProgressBar->new( $self, 455,  10, [20, 20, 110] );
     $self->{'board'}            = App::GUI::Harmonograph::Frame::Panel::Board->new( $self, 600, 600 );
     $self->{'dialog'}{'about'}  = App::GUI::Harmonograph::Dialog::About->new();
 
@@ -191,9 +191,9 @@ sub new {
     my $cmdi_sizer = Wx::BoxSizer->new( &Wx::wxHORIZONTAL );
     my $image_lbl = Wx::StaticText->new( $self, -1, 'Pen Color:' );
     $cmdi_sizer->Add( $image_lbl,     0, $all_attr, 15 );
-    $cmdi_sizer->Add( $self->{'progress_bar'},         0, $vset_attr, 20 );
+    $cmdi_sizer->Add( $self->{'progress_bar'},       0, $vset_attr, 20 );
     $cmdi_sizer->AddSpacer(10);
-    $cmdi_sizer->Add( $self->{'btn'}{'draw'},      0, $all_attr, 5 );
+    $cmdi_sizer->Add( $self->{'btn'}{'draw'},        0, $all_attr, 5 );
 
     my $cmds_sizer = Wx::BoxSizer->new( &Wx::wxHORIZONTAL );
     my $series_lbl = Wx::StaticText->new( $self, -1, 'Series:' );
@@ -253,14 +253,12 @@ sub update_recent_settings_menu {
         Wx::Event::EVT_MENU( $self, $Recent_ID++, sub { $self->open_setting_file( $path ) });
     }
     $self->{'setting_menu'}->Insert( 2, $set_menu_ID, '&Recent', $self->{'recent_menu'}, 'recently saved settings' );
-
 }
 
 sub init {
     my ($self) = @_;
     $self->{'pendulum'}{$_}->init() for @{$self->{'pendulum_names'}};
     $self->{'tab'}{$_}->init() for @{$self->{'tab_names'}};
-    $self->{'progress_bar'}->set_color( { red => 20, green => 20, blue => 110 } );
     $self->sketch( );
     $self->SetStatusText( "all settings are set to default", 1);
     $self->set_settings_save(1);
@@ -285,15 +283,16 @@ sub draw {
     my ($self) = @_;
     $self->SetStatusText( "drawing .....", 0 );
     my @colors = $self->{'tab'}{'color'}->get_all_colors;
-    $self->{'progress_bar'}->set_color( $colors[0]->values( ) );
-    $self->{'board'}->draw( $self->get_settings );
+    $self->{'progress_bar'}->set_start_color( $colors[0]->values( ) );
+    $self->{'board'}->draw( $self->get_settings, $self->{'progress_bar'} );
+    #$self->{'progress_bar'}->paint;
     $self->SetStatusText( "done complete drawing", 0 );
 }
 sub sketch {
     my ($self) = @_;
     $self->SetStatusText( "sketching a preview .....", 0 );
     $self->{'progress_bar'}->reset();
-    $self->{'board'}->sketch( $self->get_settings );
+    $self->{'board'}->sketch( $self->get_settings, $self->{'progress_bar'} );
     $self->SetStatusText( "done sketching a preview", 0 );
     if ($self->{'saved'}){
         $self->inc_base_counter();
@@ -303,7 +302,7 @@ sub sketch {
 
 sub write_image {
     my ($self, $file)  = @_;
-    $self->{'board'}->save_file( $file );
+    $self->{'board'}->save_file( $file, $self->get_settings, $self->{'progress_bar'} );
     $file = App::GUI::Harmonograph::Settings::shrink_path( $file );
     $self->SetStatusText( "saved image under: $file", 0 );
     $self->set_settings_save(1);

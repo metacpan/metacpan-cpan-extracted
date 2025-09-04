@@ -1,11 +1,12 @@
-use v5.12;
-use warnings;
-use Wx;
+
+#
 
 package App::GUI::Harmonograph::Frame::Panel::ColorSetPicker;
 use base qw/Wx::Panel/;
-
-use App::GUI::Harmonograph::Widget::ColorDisplay;
+use v5.12;
+use warnings;
+use Wx;
+use App::GUI::Wx::Widget::Custom::ColorDisplay;
 use Graphics::Toolkit::Color qw/color/;
 
 our $default_color = {red => 225, green => 225, blue => 225};
@@ -30,7 +31,7 @@ sub new {
     $self->{'save'} = Wx::Button->new( $self, -1, 'Save',    [-1,-1], [$btnw, $btnh] );
     $self->{'new'}  = Wx::Button->new( $self, -1, 'New',     [-1,-1], [$btnw, $btnh] );
 
-    $self->{'display'}[$_] = App::GUI::Harmonograph::Widget::ColorDisplay->new( $self, 16, 9, $_, $default_color ) for 0 .. $self->{'max_display_count'}-1;
+    $self->{'display'}[$_] = App::GUI::Wx::Widget::Custom::ColorDisplay->new( $self, 16, 9, $_, $default_color ) for 0 .. $self->{'max_display_count'}-1;
 
     $self->{'select'}->SetToolTip("select color set in list directly");
     $self->{'<'}->SetToolTip("go to previous color set name in list");
@@ -51,7 +52,7 @@ sub new {
         $self->update_select();
     });
     Wx::Event::EVT_BUTTON( $self, $self->{'save'}, sub {
-        $self->{'sets'}{ $self->current_set_name } = [map { $_->name ? $_->name : $_->rgb_hex } $parent->get_all_colors];
+        $self->{'sets'}{ $self->current_set_name } = [map { $_->name ? $_->name : $_->values( as => 'hex_string') } $parent->get_all_colors];
         $self->update_display();
     });
     Wx::Event::EVT_BUTTON( $self, $self->{'new'}, sub {

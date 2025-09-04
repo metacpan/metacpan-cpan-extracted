@@ -1,4 +1,4 @@
-package FU::MultipartFormData 1.2;
+package FU::MultipartFormData 1.3;
 use v5.36;
 use Carp 'confess';
 use FU::Util 'utf8_decode';
@@ -175,9 +175,7 @@ this on large fields.
 
 =item value
 
-Returns a copy of the field value as a Unicode string. Uses C<utf8_decode()>
-from L<FU::Util>, so also throws an error if the value contains control
-characters.
+Returns a copy of the field value as a Unicode string.
 
 =item substr($off, $len)
 

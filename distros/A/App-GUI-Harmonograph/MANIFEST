@@ -26,9 +26,10 @@ lib/App/GUI/Harmonograph/Frame/Tab/Color.pm
 lib/App/GUI/Harmonograph/Frame/Tab/Function.pm
 lib/App/GUI/Harmonograph/Frame/Tab/Visual.pm
 lib/App/GUI/Harmonograph/Settings.pm
-lib/App/GUI/Harmonograph/Widget/ColorDisplay.pm
-lib/App/GUI/Harmonograph/Widget/PositionMarker.pm
-lib/App/GUI/Harmonograph/Widget/ProgressBar.pm
-lib/App/GUI/Harmonograph/Widget/SliderCombo.pm
+lib/App/GUI/Wx/Widget/Custom/Canvas.pm
+lib/App/GUI/Wx/Widget/Custom/ColorDisplay.pm
+lib/App/GUI/Wx/Widget/Custom/PositionMarker.pm
+lib/App/GUI/Wx/Widget/Custom/ProgressBar.pm
+lib/App/GUI/Wx/Widget/Custom/SliderCombo.pm
 t/01_load.t
 xt/author/pod-syntax.t

@@ -41,6 +41,12 @@ instance_sv_to_pointer (GICallableInfo *info, SV *sv, GPerlI11nInvocationInfo *i
 				                        info_type,
 				                        sv);
 			}
+                } else if (g_type_is_a (type, G_TYPE_POINTER)) {
+                        dwarn ("  -> pointer\n");
+                        pointer = sv_to_struct (GI_TRANSFER_NOTHING,
+                                                container,
+                                                info_type,
+                                                sv);
 		} else {
 			dwarn ("  -> boxed: type=%s (%"G_GSIZE_FORMAT")\n",
 			       g_type_name (type), type);
@@ -396,6 +402,12 @@ interface_to_sv (GITypeInfo* info,
 				sv = gperl_new_boxed (arg->v_pointer, type, own);
 			}
 		}
+
+                else if (g_type_is_a (type, G_TYPE_POINTER)) {
+                        dwarn ("  -> pointer: pointer=%p, type=%"G_GSIZE_FORMAT" (%s), own=%d\n",
+                               arg->v_pointer, type, g_type_name (type), own);
+			sv = struct_to_sv (interface, info_type, arg->v_pointer, own);
+                }
 
 #if GLIB_CHECK_VERSION (2, 24, 0)
 		else if (g_type_is_a (type, G_TYPE_VARIANT)) {

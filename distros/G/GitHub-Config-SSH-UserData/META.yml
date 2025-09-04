@@ -27,7 +27,7 @@ no_index:
 provides:
   GitHub::Config::SSH::UserData:
     file: lib/GitHub/Config/SSH/UserData.pm
-    version: '0.04'
+    version: '0.05'
 requires:
   Carp: '0'
   Exporter: '1.6'
@@ -39,7 +39,7 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/klaus-rindfrey/perl-github-config-ssh-userdata.git
-version: '0.04'
+version: '0.05'
 x_bugtracker:
   web: https://github.com/klaus-rindfrey/perl-github-config-ssh-userdata/issues
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

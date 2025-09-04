@@ -1,5 +1,12 @@
 Revision history for OpenAPI-Modern
 
+0.092     2025-09-03 22:49:24Z
+          - removed the 'json_schema_dialect' constructor argument for
+            JSON::Schema::Modern::Document::OpenAPI (use jsonSchemaDialect in
+            the document instead)
+          - the 'openapi_uri' constructor argument for OpenAPI::Modern is no
+            longer required, as it can be calculated from the JSMDO default
+
 0.091     2025-08-16 20:52:35Z
           - various internal changes to adjust for changes in
             JSON::Schema::Modern 0.617

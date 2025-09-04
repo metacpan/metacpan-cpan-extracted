@@ -1,0 +1,76 @@
+---
+abstract: 'Access the JSON-RPC API of a Zabbix server'
+author:
+  - "SCOTTH\r"
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build: '0.4005'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.23, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Zabbix7-API
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Zabbix7::API:
+    file: lib/Zabbix7/API.pm
+    version: '1.1'
+  Zabbix7::API::Action:
+    file: lib/Zabbix7/API/Action.pm
+  Zabbix7::API::Application:
+    file: lib/Zabbix7/API/Application.pm
+  Zabbix7::API::CRUDE:
+    file: lib/Zabbix7/API/CRUDE.pm
+  Zabbix7::API::Graph:
+    file: lib/Zabbix7/API/Graph.pm
+  Zabbix7::API::GraphItem:
+    file: lib/Zabbix7/API/GraphItem.pm
+  Zabbix7::API::Host:
+    file: lib/Zabbix7/API/Host.pm
+  Zabbix7::API::HostGroup:
+    file: lib/Zabbix7/API/HostGroup.pm
+  Zabbix7::API::HostInterface:
+    file: lib/Zabbix7/API/HostInterface.pm
+  Zabbix7::API::Item:
+    file: lib/Zabbix7/API/Item.pm
+  Zabbix7::API::Macro:
+    file: lib/Zabbix7/API/Macro.pm
+  Zabbix7::API::Map:
+    file: lib/Zabbix7/API/Map.pm
+  Zabbix7::API::MediaType:
+    file: lib/Zabbix7/API/MediaType.pm
+  Zabbix7::API::Proxy:
+    file: lib/Zabbix7/API/Proxy.pm
+  Zabbix7::API::Script:
+    file: lib/Zabbix7/API/Script.pm
+  Zabbix7::API::Template:
+    file: lib/Zabbix7/API/Template.pm
+  Zabbix7::API::Trigger:
+    file: lib/Zabbix7/API/Trigger.pm
+  Zabbix7::API::User:
+    file: lib/Zabbix7/API/User.pm
+  Zabbix7::API::UserGroup:
+    file: lib/Zabbix7/API/UserGroup.pm
+requires:
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/scotticles/perl-zabbix7-api/issues
+  homepage: https://github.com/scotticles/perl-zabbix7-api
+  repository: https://github.com/scotticles/perl-zabbix7-api.git
+version: '1.1'
+x_contributors:
+  - 'Scotth <scotth@cpan.org>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

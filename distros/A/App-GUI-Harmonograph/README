@@ -32,16 +32,18 @@ DESCRIPTION
     This is a cybernetic recreation of an Prof. Blackburns invention with
     several enhancements:
 
-    *   third pendulum can rotate
+    *   fourth pendulum is a rotation of drawing board
+
+    *   pendulum five and six create an epicycle
 
     *   pendula can oscillate at none integer frequencies
 
-    *   separate complex amplitude and frequency damping
+    *   separate complex amplitude and frequency damping in 8 flavours
 
-    *   draw lines or dots with changeable density and size
+    *   draw lines or dots with changeable size, density and probability
 
-    *   3 types of color changes with changeable speed and polynomial
-        dynamics
+    *   complex color rainbows with up to 10 color, 3 types of color change
+        patterns and with changeable speed and polynomial dynamics
 
 Mechanics
     The classic Harmonograph is sturdy metal rack which does not move while
@@ -196,7 +198,7 @@ GUI
     first (equal sign) your time variable will be just swapped out with
     another variable. The other four option describe the operation that will
     be applied upon you time value. So e.g. if you select plus the resulting
-    formula will be "x = radius * cos (time + (...))". The allude to
+    formula will be "x = radius * cos (time + (...))". The dots allude to
     whatever you will choose with the next three selectors.
 
     Selector three and four are just factors. They contain natural numbers
@@ -369,21 +371,17 @@ GUI
 SEE ALSO
     App::GUI::Cellgraph
 
-    App::GUI::Chaosgraph
-
-    App::GUI::Dynagraph
-
     App::GUI::Juliagraph
 
     App::GUI::Sierpingraph
 
-    App::GUI::Tangraph
+    App::GUI::Spirograph
 
 AUTHOR
     Herbert Breunung (lichtkind@cpan.org)
 
 COPYRIGHT & LICENSE
-    Copyright(c) 2022-23 by Herbert Breunung
+    Copyright(c) 2022-25 by Herbert Breunung
 
     All rights reserved. This program is free software and can be used,
     changed and distributed under the GPL 3 licence.

@@ -46,7 +46,7 @@ subtest 'Get Time Zone' => sub {
 # Test get_time_zone with missing parameters
 subtest 'Get Time Zone - Missing Parameters' => sub {
 	my $tzdb = TimeZone::TimeZoneDB->new(key => 'dummy_key', ua => LWP::UserAgent->new());
-	my $result = $tzdb->get_time_zone();
-
-	is($result, undef, 'Returns undef when missing parameters');
+	throws_ok {
+		$tzdb->get_time_zone();
+	} qr/Required parameter/, 'Dies when missing parameters';
 };

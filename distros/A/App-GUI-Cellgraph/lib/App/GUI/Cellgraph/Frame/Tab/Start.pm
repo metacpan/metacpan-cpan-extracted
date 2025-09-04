@@ -19,12 +19,12 @@ sub new {
     $self->{'call_back'} = sub {};
     my $rule_cell_size = 20;
 
-    $self->{'state_colors'}   = [map { [$_->values('rgb')]} color('white')->gradient_to('black', $self->{'state_count'})];
+    $self->{'state_colors'}   = [map { [$_->values('rgb')]} color('white')->gradient( to => 'black', steps => $self->{'state_count'})];
     $self->{'state_switches'} = [map { App::GUI::Cellgraph::Widget::ColorToggle->new
                                        ( $self, $rule_cell_size, $rule_cell_size, $self->{'state_colors'}, 0) } @{$self->{'cells_iterator'}}];
     $self->{'state_switches'}[$_]->SetToolTip('click with left or right to change state of this cell in starting row') for @{$self->{'cells_iterator'}};
     # $self->{'state_switches'}[0]->Enable(0);
-    $self->{'action_colors'}   = [map {[$_->values('rgb')]} color('white')->gradient_to('orange', 6)];
+    $self->{'action_colors'}   = [map {[$_->values('rgb')]} color('white')->gradient(to => 'orange', steps => 6)];
     $self->{'action_switches'} = [map { App::GUI::Cellgraph::Widget::ColorToggle->new( $self, $rule_cell_size, $rule_cell_size, $self->{'action_colors'}, 0) } @{$self->{'cells_iterator'}}];
     $self->{'action_switches'}[$_]->SetToolTip('click with left or right to change action value of this cell in starting row') for @{$self->{'cells_iterator'}};
 

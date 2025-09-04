@@ -1,3 +1,18 @@
+0.72   2025-09-03  lichtkind
+-------
+    * = minor fix release = 2 fixes
+    * & update dist.ini
+    * & exclude examples in dist.ini to not bloat distro
+    * ? POD fixes
+
+0.71   2025-09-03  lichtkind
+-------
+    * = minor fix release = 4 fixes
+    * & minor architecture fix (to reuse this version of color tab)
+    * & adapt to new GTC 1.9 API
+    * ? POD fixes
+    * ! sketch drawing works now every time on app start
+
 0.7    2025-04-20  lichtkind
 -------
     * = major feature release
@@ -26,7 +41,7 @@
 -------
     * = fixes yet
     * / more color constants
-    * ' improved example picture in POD
+    * ? improved example picture in POD
     * ! fixed smoke tests
 
 0.42   2023-11-17  lichtkind
