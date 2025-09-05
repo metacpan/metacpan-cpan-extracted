@@ -39,7 +39,7 @@ use SNMP::Info::Layer2;
 
 our ($VERSION, %FUNCS, %GLOBALS, %MIBS, %MUNGE);
 
-$VERSION = '3.972002';
+$VERSION = '3.973000';
 
 %MIBS = (
     %SNMP::Info::Layer2::MIBS,
@@ -111,7 +111,7 @@ sub os_ver {
     my $ah_ver   = $aerohive->os_bin();
     my $descr    = $aerohive->description();
 
-    if ( defined ($ah_ver) && $ah_ver =~ m/\bHiveOS\s(\d+\.\w+)\b/ix ) {
+    if ( defined ($ah_ver) && $ah_ver =~ m/\b(?:HiveOS|IQ\sEngine)\s(\d+\.\w+)\b/ix ) {
         return $1;
     }
     if ( defined ($descr) && $descr =~ m/\bHiveOS\s(\d+\.\w+)\b/ix ) {
@@ -404,7 +404,7 @@ Returns 'aerohive'.
 
 =item $aerohive->os()
 
-Returns 'hiveos'.
+Returns 'hiveos', also for devices running IQ Engine code.
 
 =item $aerohive->serial()
 

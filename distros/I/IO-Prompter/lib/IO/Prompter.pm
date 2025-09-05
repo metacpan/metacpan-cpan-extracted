@@ -11,7 +11,7 @@ use Scalar::Util qw< openhandle looks_like_number >;
 use Symbol       qw< qualify_to_ref >;
 use match::smart qw< match >;
 
-our $VERSION = '0.005002';
+our $VERSION = '0.005004';
 
 my $fake_input;     # Flag that we're faking input from the source
 
@@ -170,7 +170,7 @@ sub prompt {
 
     # Clear the screen if requested to...
     if ($opt_ref->{-wipe}) {
-        $outputter_ref->(-nostyle => "\n" x 1000);
+        $outputter_ref->(-noindent, -nostyle => "\n" x 1000);
     }
 
     # Handle menu structures...
@@ -190,7 +190,7 @@ sub prompt {
                 $opt_ref->{-menu_curr_level} = $menu[-1]{value_for};
 
                 # Show menu and retreive choice...
-                $outputter_ref->(-style => $menu[-1]{prompt});
+                $outputter_ref->(-indent, -style => $menu[-1]{prompt});
                 my $tag = $inputter_ref->($menu[-1]{constraint});
 
                 # Handle a failure by exiting the loop...
@@ -216,9 +216,10 @@ sub prompt {
                 last MENU if !ref $input;
 
                 # Otherwise, go down the menu one level...
+                (my $submenu_name = $menu[-1]{key_for}{$tag}) =~ s{\A(?:[\cA-\cZ]|\\c[a-zA-Z])\h*}{};
                 push @menu,
                     _build_menu($input,
-                                "Select from $menu[-1]{key_for}{$tag}: ",
+                                "Select from $submenu_name: ",
                                 $opt_ref->{-number} || $opt_ref->{-integer}
                     );
                 $menu[-1]{prompt} .= '> ';
@@ -227,14 +228,14 @@ sub prompt {
 
         # Otherwise, simply ask and ye shall receive...
         else {
-                $outputter_ref->(-style => $opt_ref->{-prompt});
+                $outputter_ref->(-indent, -style => $opt_ref->{-prompt});
                 $input = $inputter_ref->();
         }
         1;
     }
     // do {
         # Supply the missing newline if requested...
-        $outputter_ref->(-echostyle => $opt_ref->{-return}(q{}))
+        $outputter_ref->(-noindent, -echostyle => $opt_ref->{-return}(q{}))
             if exists $opt_ref->{-return};
 
         # Rethrow any other exception...
@@ -459,6 +460,7 @@ sub _decode_args {
         -echostyle => sub{ q{} },
         -echo      => sub { my $char = shift; $char eq "\t" ? q{ } : $char },
         -return    => sub { "\n" },
+        -indent    => q{},
     );
 
     DECODING:
@@ -591,6 +593,13 @@ sub _decode_args {
                 $option{-echostyle} = _gen_wrapper_for($style);
             }
 
+            # Specify an indent at the start of each line...
+            elsif ($arg =~ /^-indent/) {
+                my $indent = shift(@_) // q{};
+                $indent = q{ } x $indent if looks_like_number($indent);
+                $indent =~ s/\v+//g;
+                $option{-indent} = $indent;
+            }
 
             # Specify input and output filehandles...
             elsif ($arg =~ /^-stdio$/) { $option{-in}  = *STDIN;
@@ -965,7 +974,7 @@ sub _verify_input_constraints {
     }
 
     # Sort and clean up -must list...
-    my $must_ref = $opt_ref->{-must} // {};
+    my $must_ref      = $opt_ref->{-must} // {};
     my @must_keys     = sort keys %{$must_ref};
     my %clean_key_for = map { $_ => (/^\d+[.:]?\s*(.*)/s ? $1 : $_) } @must_keys;
     my @must_kv_list  = map { $clean_key_for{$_} => $must_ref->{$_} } @must_keys;
@@ -1005,7 +1014,7 @@ sub _verify_input_constraints {
 
         # Redraw post-menu prompt with failure message appended...
         $failed =~ s{.*$MENU_MK}{}xms;
-        $outputter_ref->(-style => _wipe_line(), $failed);
+        $outputter_ref->(-indent, -style => _wipe_line(), $failed);
 
         # Reset input collector...
         ${$input_ref}  = q{};
@@ -1063,7 +1072,7 @@ sub _generate_buffered_reader_from {
                     sleep 1;
                     for ($local_fake_input =~ m/\X/g) {
                         _simulate_typing();
-                        $outputter_ref->(-echostyle => $opt_ref->{-echo}($_));
+                        $outputter_ref->(-noindent, -echostyle => $opt_ref->{-echo}($_));
                     }
                     readline $in_fh;
 
@@ -1287,8 +1296,8 @@ sub _generate_unbuffered_reader_from {
                 my $input_copy = $input;
                 eval { $opt_ref->{-monitor}->($input_copy, \%opts) };
             }
-            $outputter_ref->( -style => $opt_ref->{-style}, _wipe_line(), $opt_ref->{-prompt});
-            $outputter_ref->( -echostyle => join(q{}, map { $opt_ref->{-echo}($_) } $input =~ m/\X/g) );
+            $outputter_ref->( -indent, -style => $opt_ref->{-style}, _wipe_line(), $opt_ref->{-prompt});
+            $outputter_ref->( -noindent, -echostyle => join(q{}, map { $opt_ref->{-echo}($_) } $input =~ m/\X/g) );
         }
 
         my $insert_offset = 0;
@@ -1396,8 +1405,8 @@ sub _generate_unbuffered_reader_from {
                             : q{};
 
                         # Update prompt with selected completion...
-                        $outputter_ref->( -style =>
-                            $list_display,
+                        $outputter_ref->( -indent, 
+                            -style => $list_display,
                             _wipe_line(),
                             $opt_ref->{-prompt}, $input
                         );
@@ -1429,7 +1438,7 @@ sub _generate_unbuffered_reader_from {
                             = join q{}, map { $opt_ref->{-echo}($_) } $input_pre =~ m/\X/g;
                         my $display_post
                             = join q{}, map { $opt_ref->{-echo}($_) } $input_post =~ m/\X/g;
-                        $outputter_ref->( -echostyle =>
+                        $outputter_ref->( -noindent, -echostyle =>
                               "\b" x length($display_pre)
                             . join(q{}, map { $opt_ref->{-echo}($_) } $input =~ m/\X/g)
                             . q{ } x length($opt_ref->{-echo}(q{ }))
@@ -1441,7 +1450,7 @@ sub _generate_unbuffered_reader_from {
                         if ($faking) {
                             substr($local_fake_input,0,0,$erased);
                         }
-                        $outputter_ref->( -nostyle =>
+                        $outputter_ref->( -noindent, -nostyle =>
                             map { $_ x (length($opt_ref->{-echo}($_)//'X')) }
                                 "\b", ' ', "\b"
                         );
@@ -1480,7 +1489,7 @@ sub _generate_unbuffered_reader_from {
                     if ($faking && length($local_fake_input)) {
                         for ($local_fake_input =~ m/\X/g) {
                             _simulate_typing();
-                            $outputter_ref->(-echostyle => $opt_ref->{-echo}($_));
+                            $outputter_ref->(-noindent, -echostyle => $opt_ref->{-echo}($_));
                         }
                         $input .= $local_fake_input;
                     }
@@ -1509,11 +1518,11 @@ sub _generate_unbuffered_reader_from {
                         }
 
                         # Echo it as if it had been typed...
-                        $outputter_ref->(-echostyle => $opt_ref->{-echo}($def_val));
+                        $outputter_ref->(-noindent, -echostyle => $opt_ref->{-echo}($def_val));
                     }
 
                     # Echo the return (or otherwise, as specified)...
-                    $outputter_ref->(-echostyle => $opt_ref->{-return}($next));
+                    $outputter_ref->(-noindent, -echostyle => $opt_ref->{-return}($next));
 
                     # Clean up, and return the input...
                     Term::ReadKey::ReadMode('restore', $in_fh);
@@ -1575,14 +1584,14 @@ sub _generate_unbuffered_reader_from {
                             = join q{}, map { $opt_ref->{-echo}($_) } $input_pre =~ m/\X/g;
                         my $display_post
                             = join q{}, map { $opt_ref->{-echo}($_) } $input_post =~ m/\X/g;
-                        $outputter_ref->( -echostyle =>
+                        $outputter_ref->(-noindent,  -echostyle =>
                               "\b" x length($display_pre)
                             . join(q{}, map { $opt_ref->{-echo}($_) } $input =~ m/\X/g)
                             . "\b" x length($display_post)
                         );
                     }
                     elsif ($next !~ $EDIT_KEY) {
-                        $outputter_ref->(-echostyle => $opt_ref->{-echo}($next));
+                        $outputter_ref->(-noindent, -echostyle => $opt_ref->{-echo}($next));
                     }
 
                     # Not verbatim after this...
@@ -1622,7 +1631,7 @@ sub _generate_unbuffered_reader_from {
                 if ( $opt_ref->{-single}
                 &&   exists $opt_ref->{-return}
                 &&   $input !~ /\A\R\z/ ) {
-                    $outputter_ref->(-echostyle => $opt_ref->{-return}(q{}));
+                    $outputter_ref->(-noindent, -echostyle => $opt_ref->{-return}(q{}));
                 }
 
                 return $input;
@@ -1646,8 +1655,8 @@ sub _generate_unbuffered_reader_from {
                         = join q{}, map { $opt_ref->{-echo}($_) } $input_pre =~ m/\X/g;
                     my $display_post
                         = join q{}, map { $opt_ref->{-echo}($_) } $input_post =~ m/\X/g;
-                    $outputter_ref->( -style => $opt_ref->{-style}, _wipe_line(), $opt_ref->{-prompt});
-                    $outputter_ref->( -echostyle =>
+                    $outputter_ref->(-indent,  -style => $opt_ref->{-style}, _wipe_line(), $opt_ref->{-prompt});
+                    $outputter_ref->(-noindent,  -echostyle =>
                                     join(q{}, map { $opt_ref->{-echo}($_) } $input =~ m/\X/g)
                                     . "\b" x (length($display_post)-1)
                     );
@@ -1668,11 +1677,11 @@ sub _build_menu {
 
     my $source_type = ref $source_ref;
     if ($source_type eq 'HASH') {
-        my @sorted_keys = sort(keys(%{$source_ref}));
-        @selectors = $is_numeric ? (1..@sorted_keys) : ('a'..'z','A'..'Z');
+        my @sorted_keys        = sort(keys(%{$source_ref}));
+        @selectors             = $is_numeric ? (1..@sorted_keys) : ('a'..'z','A'..'Z');
         @key_for{@selectors}   = @sorted_keys;
         @value_for{@selectors} = @{$source_ref}{@sorted_keys};
-        $source_ref = \@sorted_keys;
+        $source_ref            = \@sorted_keys;
     }
     elsif ($source_type eq 'SCALAR') {
         $source_ref = [ split "\n", ${$source_ref} ];
@@ -1686,8 +1695,7 @@ sub _build_menu {
 
     ITEM:
     for my $tag (@selectors) {
-        my $item = shift(@source) // last ITEM;
-        chomp $item;
+        (my $item = shift(@source) // last ITEM) =~s{\A(?:[\cA-\cZ]|\\c[a-zA-Z])\h*|\s*\z}{}g;
         $prompt .= sprintf("%4s. $item\n", $tag);
         $final = $tag;
     }
@@ -1791,22 +1799,23 @@ sub _stylize {
 sub _std_printer_to {
     my ($out_filehandle, $opt_ref) = @_;
     no strict 'refs';
+    my $indent = $opt_ref->{-indent};
     _autoflush($out_filehandle);
     if (eval { require Term::ANSIColor}) {
         return sub {
-            my $style = shift;
+            my ($indent_mode, $style, @loc) = @_;
             return tell($out_filehandle) if $style eq -tell;
-            my @loc = (@_);
             s{\e}{^}gxms for @loc;
+            if ($indent_mode eq -indent) { s{^}{$indent}gxms for @loc; }
             print {$out_filehandle} _stylize($opt_ref->{$style}(@loc), @loc);
         };
     }
     else {
         return sub {
-            my $style = shift;
+            my ($indent_mode, $style, @loc) = @_;
             return tell($out_filehandle) if $style eq -tell;
-            my @loc = (@_);
             s{\e}{^}gxms for @loc;
+            if ($indent_mode eq -indent) { s{^}{$indent}gxms for @loc; }
             print {$out_filehandle} @loc;
         };
     }
@@ -1819,6 +1828,7 @@ sub _null_printer {
 
 1; # Magic true value required at end of module
 __END__
+=encoding utf8
 
 =head1 NAME
 
@@ -1827,7 +1837,7 @@ IO::Prompter - Prompt for input, read it, clean it, return it.
 
 =head1 VERSION
 
-This document describes IO::Prompter version 0.005002
+This document describes IO::Prompter version 0.005004
 
 
 =head1 SYNOPSIS
@@ -1980,6 +1990,8 @@ or add a L<"no-op"|"Escaping otherwise magic options"> to them.
     -h[STR] -hist[ory][=>SPEC] Specify the history set this call belongs to
 
             -in=>HANDLE        Read from specified handle
+
+            -indent=>NUM/STR   Indent each line of prompt by NUM cols or with STR
 
     -i      -integer[=>SPEC]   Accept only valid integers (that smartmatch SPEC)
 
@@ -2158,6 +2170,55 @@ with:
 If for some reason you I<do> want a newline at the end of the prompt (i.e.
 with the input starting on the next line) just put two newlines at the end
 of the prompt. Only the very last one will be removed.
+
+
+=head4 Prompt position
+
+Sometimes when you are issuing a series of nested prompts, it can be useful
+to indent different prompts to different depths to help users understand the
+relationship between requested inputs. For example:
+
+    Enter a new ID:
+        Enter person's full name:
+            Enter person's preferred name:
+        Enter person's age:
+        Enter person's status:
+
+    Enter a new ID:
+
+To make this style of interaction easier to achieve, you can call C<prompt()>
+with the C<-indent> option. This option expects either an integer (which specifies
+the number of space characters to prepend to each output line), or else a string
+(which is simply prepended to the prompt). For example, to achieve the prompt sequence
+shown earlier:
+
+    my $ID     = prompt( -indent=>0, 'Enter a new ID:');
+    my $name   = prompt( -indent=>4, 'Enter person's full name:');
+    my $pfname = prompt( -indent=>8, 'Enter person's preferred name:');
+    my $age    = prompt( -indent=>4, 'Enter person's age:');
+    my $status = prompt( -indent=>4, 'Enter person's status:');
+
+Alternatively, you can specify the exact string to be prepended to each prompt,
+by passing C<-indent> anything other than an integer. For example:
+
+    use utf8;
+    my $ID     = prompt( -indent=>'', "Enter a new ID:");
+    my $name   = prompt( -indent=>'  ┣━━━ ', "Enter person's full name:");
+    my $pfname = prompt( -indent=>'  ┃      ┗━━━ ', "Enter person's preferred name:");
+    my $age    = prompt( -indent=>'  ┣━━━ ', "Enter person's age:");
+    my $status = prompt( -indent=>'  ┗━━━ ', "Enter person's status:");
+
+...which would then prompt with something like:
+
+    Enter a new ID:
+      ┣━━━ Enter person's full name:
+      ┃      ┗━━━ Enter person's preferred name:
+      ┣━━━ Enter person's age:
+      ┗━━━ Enter person's status:
+
+Note that the advantage of using C<-indent> rather than just prepending the desired indent
+directly to the prompt is that C<-indent> is applied to I<every> line of a multiline prompt
+or menu, and also to any constraint-induced reprompts.
 
 
 =head3 Specifying how the prompt looks
@@ -2341,6 +2402,29 @@ It will then only permit the user to enter a valid selector key (in the
 previous example: 'a', 'b', or 'c'). Once one of the alternatives is
 selected, C<prompt()> will return the corresponding value from the hash
 (0, 1, or -1, respectively, in this case).
+
+You can control the order in which keys are sorted, by prefixing one or more keys
+with an alphabetic control character (i.e. C<"\cA"> to C<"\cZ">. The entire keys
+will still be sorted alphabetically, but the leading control characters will always
+sort before any other characters, and will then be automatically removed from the
+keys before they are displayed in the menu.
+
+For example, given:
+
+    prompt 'Choose...',
+           -menu=>{ "\cX live free"=>1,
+                    "\cY die"=>0,
+                    "\cZ transcend"=>-1 },
+           '>';
+
+C<prompt()> will display:
+
+    Choose...
+        a. live free
+        b. die
+        c. transcend
+    > _
+
 
 Note that the use of alphabetics as selector keys inherently limits the
 number of usable menu items to 52. See L<"Numeric menus"> for a way to

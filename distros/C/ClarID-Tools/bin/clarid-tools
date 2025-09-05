@@ -1,0 +1,142 @@
+#!/usr/bin/env perl
+#
+#   ClarID-Tools CLI
+#
+#   Last Modified: Aug/08/2025
+#
+#   $VERSION taken from ClarID::Tools
+#
+#   Copyright (C) 2025 Manuel Rueda - CNAG
+#
+#   License: Artistic License 2.0
+#
+#   If this program helps you in your research, please cite.
+
+use strict;
+use warnings;
+use FindBin qw($Bin);
+use lib "$Bin/../lib";
+use ClarID::Tools;
+use JSON::XS qw(encode_json);
+use POSIX    qw(strftime);
+use Cwd      qw(getcwd);
+
+use Path::Tiny;
+
+my ( $LOG_PATH, $ARGV_ORIG ) = _extract_log_path();
+_log_invocation( $LOG_PATH, $ARGV_ORIG );
+
+# Shared usage text
+my $USAGE = <<'END_USAGE';
+Error: no command given.
+
+Usage:
+  clarid-tools <command> [options]
+  clarid-tools help [all|code|validate|qrcode]
+  clarid-tools --version
+
+Commands:
+  code       Encode or decode IDs using your codebook
+  validate   Validate a codebook against its JSON schema
+  qrcode     Encode or decode ClarIDs to/from QR codes
+
+Run `clarid-tools help all` to see every option at once.
+END_USAGE
+
+# Dispatch
+# NOTE: we read @ARGV *after* stripping -log so users can put -log anywhere
+my $cmd = shift @ARGV // '';
+
+# version flag
+if ( $cmd eq '-v' || $cmd eq '--v' || $cmd eq '--version' ) {
+    printf "clarid-tools version %s\n", ClarID::Tools->VERSION;
+    exit;
+}
+
+if ( $cmd =~ /^-?-?help$/ ) {
+    my $sub = shift @ARGV // 'all';
+    if ( $sub eq 'all' ) {
+        for my $c (qw(code validate qrcode)) {
+            print "\n=== clarid-tools $c options ===\n\n";
+            system( $^X, $0, $c, '--help' );
+        }
+    }
+    else {
+        exec $^X, $0, $sub, '--help';
+    }
+    exit;
+}
+
+# No command or unknown
+if ( !$cmd || $cmd !~ /^(?:code|validate|qrcode)$/ ) {
+    die $USAGE;
+}
+
+# Delegate to subcommands
+if ( $cmd eq 'code' ) {
+    require ClarID::Tools::Command::code;
+    ClarID::Tools::Command::code->new_with_options->execute;
+}
+elsif ( $cmd eq 'validate' ) {
+    require ClarID::Tools::Command::validate;
+    ClarID::Tools::Command::validate->new_with_options->execute;
+}
+elsif ( $cmd eq 'qrcode' ) {
+    require ClarID::Tools::Command::qrcode;
+    ClarID::Tools::Command::qrcode->new_with_options->execute;
+}
+
+# --- logging glue ----------------------------------------------------
+sub _extract_log_path {
+
+    # Returns (log_path_or_undef, \@argv_original)
+    my @orig = @ARGV;
+
+    # We must handle -log, --log, and --log=FILE, anywhere in ARGV
+    for ( my $i = 0 ; $i < @ARGV ; $i++ ) {
+        my $arg = $ARGV[$i];
+
+        # --log=/path/file
+        if ( $arg =~ /^--log=(.*)$/ ) {
+            my $path = $1 ne '' ? $1 : './clarid-cli.log';
+            splice @ARGV, $i, 1;
+            return ( $path, \@orig );
+        }
+
+        # -log or --log [optional path]
+        if ( $arg eq '-log' || $arg eq '--log' ) {
+            my $path = './clarid-cli.log';
+            if ( defined $ARGV[ $i + 1 ] && $ARGV[ $i + 1 ] !~ /^-/ ) {
+                $path = $ARGV[ $i + 1 ];
+                splice @ARGV, $i, 2;    # remove flag and path
+            }
+            else {
+                splice @ARGV, $i, 1;    # remove flag only
+            }
+            return ( $path, \@orig );
+        }
+    }
+    return ( undef, \@orig );
+}
+
+sub _log_invocation {
+    my ( $log_file, $argv_snapshot ) = @_;
+    return unless $log_file;
+
+    # Never crash CLI on logging errors
+    eval {
+        my $rec = {
+            ts      => strftime( '%Y-%m-%dT%H:%M:%SZ', gmtime ),
+            cmd     => $0,
+            argv    => $argv_snapshot,                             # original ARGV (including -log)
+            cwd     => getcwd(),
+            pid     => $$,
+            version => ClarID::Tools->VERSION,
+        };
+        my $json = JSON::XS->new->utf8->canonical->encode($rec);    # utf-8
+        path($log_file)->spew($json);
+    };
+    return;
+}
+
+1;

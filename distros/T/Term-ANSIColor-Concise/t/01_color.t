@@ -36,19 +36,20 @@ is(ansi_color_24("ABCDEF", "text"), "\e[38;2;171;205;239m"."text".RESET, "ansi_c
 
 {
     my $text = ansi_color("R", "AB") . "CD" . ansi_color("R", "EF");
-    my $rslt = ansi_color("R", "AB") . ansi_color("B", "CD") . ansi_color("R", "EF");
-    is(ansi_color("B", $text), $rslt, "nested");
+    my $rslt = ansi_code("U") . ansi_color("R", "AB") . ansi_code("U") . "CD" . ansi_color("R", "EF");
+    is(ansi_color("U", $text), $rslt, "nested");
 }
 
 {
     my $text = "AB" . ansi_color("B", "CD") . "EF";
-    my $rslt = ansi_color("R", "AB") . ansi_color("B", "CD") . ansi_color("R", "EF");
-    is(ansi_color("R", $text), $rslt, "nested 2");
+    my $rslt = ansi_code("U") . "AB" . ansi_color("B", "CD") . ansi_code("U") . "EF" . RESET;
+    is(ansi_color("U", $text), $rslt, "nested 2");
 }
 
 {
     my $text = ansi_color("R", "ABCDEF");
-    is(ansi_color("B", $text), $text, "nested/unchange");
+    my $rslt = ansi_code("U") . $text;
+    is(ansi_color("U", $text), $rslt, "nested 3");
 }
 
 TODO: {

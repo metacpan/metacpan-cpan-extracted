@@ -1,0 +1,9 @@
+*.bck
+*.old
+*.swp
+*.pyc
+bck/
+old/
+__pycache__/
+/do_readme.sh
+/README_text.md

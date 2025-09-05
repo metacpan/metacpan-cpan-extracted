@@ -1,0 +1,48 @@
+---
+abstract: 'ClarID: A Human-Readable and Compact Identifier Specification for Biomedical Metadata Integration'
+author:
+  - 'Manuel Rueda <mrueda@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Path: '2.18'
+  File::Spec::Functions: '3.75'
+  Test::More: '1.30'
+configure_requires:
+  ExtUtils::MakeMaker: '7.70'
+  File::ShareDir::Install: '0.14'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: ClarID-Tools
+no_index:
+  directory:
+    - t
+    - inc
+    - docs
+    - t
+    - nb
+requires:
+  App::Cmd: '0.337'
+  File::ShareDir::ProjectDistDir: '1.000009'
+  JSON::Validator: '5.14'
+  JSON::XS: '4.03'
+  Moo: '2.005005'
+  MooX::Options: '4.103'
+  Path::Tiny: '0.144'
+  Term::ANSIColor: '5.01'
+  Text::CSV_XS: '1.50'
+  Types::Standard: '2.004000'
+  YAML::XS: '0.88'
+  namespace::autoclean: '0.31'
+  perl: '5.036000'
+resources:
+  bugtracker: https://github.com/CNAG-Biomedical-Informatics/clarid-tools/issues
+  homepage: https://github.com/CNAG-Biomedical-Informatics/clarid-tools
+  license: http://www.opensource.org/licenses/artistic-license-2.0
+  repository: https://github.com/CNAG-Biomedical-Informatics/clarid-tools.git
+version: '0.01'
+x_contributors: []
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

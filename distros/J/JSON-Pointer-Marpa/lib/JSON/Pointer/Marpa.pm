@@ -3,10 +3,7 @@ use warnings;
 
 package JSON::Pointer::Marpa;
 
-# Keeping the following $VERSION declaration on a single line is important.
-#<<<
-use version 0.9915; our $VERSION = version->declare( '1.0.2' );
-#>>>
+$JSON::Pointer::Marpa::VERSION = 'v1.0.3';
 
 use Marpa::R2   ();
 use URI::Escape qw( uri_unescape );
@@ -69,7 +66,8 @@ sub get {
   # to be called only(!) for the URI fragment identifier representation type
   # (section 6). Backslash unescaping has to be done for the JSON string
   # representation (section 5) type.
-  $json_pointer = uri_unescape( $json_pointer ) if $json_pointer =~ s/\A#//; ## no critic (RequireExtendedFormatting)
+  $json_pointer = uri_unescape( $json_pointer )
+    if $json_pointer =~ s/\A#//; ## no critic (RequireExtendedFormatting)
 
   my $recognizer = Marpa::R2::Scanless::R->new(
     {
@@ -80,7 +78,8 @@ sub get {
   );
   $recognizer->read( \$json_pointer );
 
-  ${ $recognizer->value( JSON::Pointer::Marpa::Semantics->new( $json_document ) ) }
+  ${ $recognizer->value( JSON::Pointer::Marpa::Semantics->new( $json_document ) )
+  }
 }
 
 1

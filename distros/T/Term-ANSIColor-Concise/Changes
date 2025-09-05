@@ -1,5 +1,43 @@
 Revision history for Perl extension Term-ANSIColor-Concise
 
+3.01 2025-09-05T09:44:27Z
+
+    - Add support for color adjustment modifiers: luminance (y), lightness (l), saturation (s), hue (h)
+    - Add support for color transformation operations: complement (c), LCH hue rotation (r), inversion (i)
+    - Add support for grayscale conversion: luminance-based (g) and lightness-based (G)
+    - Add support for HSL, LCH, and Lab color space specifications
+    - Add comprehensive documentation and test coverage for new color features
+    - Fix grammar and language issues throughout documentation
+
+2.08 2024-11-16T05:38:13Z
+
+    - add "Left Right Margin Mode" sequence
+    - treat nul, vt, np, U+2028, U+2029 as EOL
+
+2.07 2024-09-12T01:19:56Z
+
+    - support CPR and STBM sequence
+    - implement csi_report() function
+
+2.06 2024-05-09T08:40:54Z
+
+    - now ansi_color() returns result list in array context
+
+2.05 2023-06-17T08:18:50Z
+
+    - introduce cumulative color policy
+
+2.04 2023-06-16T10:07:55Z
+
+    - support other sequences:
+        VPA, VPR, CSI, OSC, DECEC, DECDC
+
+2.03 2023-06-06T02:54:05Z
+
+    - support some additional CSI names:
+        Insert/Delete/Erase Character (ICH, DCH, ECH)
+        Insert/Delete Line (IL, DL)
+
 2.0201 2023-03-15T10:56:15Z
 
     - fix typo bug introduced in 2.02

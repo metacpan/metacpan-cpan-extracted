@@ -11,7 +11,7 @@ use warnings;
 #	_check_if_exif_tags_exist_in_image
 #);
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use Log::Log4perl qw(:easy);
 # >= v5.31 which supports EXIF for png files
@@ -24,12 +24,13 @@ use Config::JSON::Enhanced;
 use Data::Roundtrip qw/perl2dump no-unicode-escape-permanently/;
 use WWW::Mechanize::Chrome::DOMops qw/
 	domops_zap
-	domops_VERBOSITY
+	$domops_VERBOSITY
+	$domops_LOGGER
 /;
 
 # a basic default configuration file in enhanced JSON (see L<Config::JSON::Enhanced>)
 my $DEFAULT_CONFIGSTRING = <<'EOCS';
-</* $VERSION = '0.04'; */>
+</* $VERSION = '0.05'; */>
 </* comments are allowed */>
 </* and <% vars %> and <% verbatim sections %> */>
 {
@@ -632,8 +633,8 @@ sub init {
 	#  1. params if they have logger or logfile
 	#  2. our own confighash if it contains logfile
 	#  3. if all else fails, create a vanilla logger
-	if( exists($params->{'logger'}) && defined($params->{'logger'}) ){
-		$self->{'_private'}->{'log'}->{'logger-object'} = $params->{'logger'};
+	if( exists($params->{'logger-object'}) && defined($params->{'logger-object'}) ){
+		$self->{'_private'}->{'log'}->{'logger-object'} = $params->{'logger-object'};
 		#$log->info("${whoami} (via $parent), line ".__LINE__." : using user-supplied logger object.");
 	} elsif( exists($params->{'logfile'}) && defined($params->{'logfile'}) ){
 		$self->{'_private'}->{'log'}->{'logger-object'} = Mojo::Log->new(path => $params->{'logfile'});
@@ -646,6 +647,12 @@ sub init {
         # Now we have a logger
         my $log = $self->log();
         $log->short(1);
+
+	# deprecated 'logger' has now become 'logger-object', we die if this is used
+	if( exists($params->{'logger'}) && defined($params->{'logger'}) ){ $log->error("${whoami} (via $parent), line ".__LINE__." : error, constructor parameter 'logger' has been replaced by 'logger-object'. This parameter specifies a logger object to be passed on this object."); return 1 }
+
+	# our logger becomes DOMops logger:
+	$WWW::Mechanize::Chrome::DOMops::domops_LOGGER = $log;
 
 	# Set verbosity and cleanup as follows:
 	#  1. check if exists in params
@@ -665,6 +672,7 @@ sub init {
 	# AND ALSO YOU MUST CALL verbosity(x) AGAIN at the end when
 	# all are instantiated, or whenever you (re-)instantiating one of these objects.
 	# like $self->verbosity( $self->verbosity );
+	# THIS also sets DOMops verbosity:
 	if( $self->verbosity($v) < 0 ){ $log->error("${whoami} (via $parent), line ".__LINE__." : error, call to 'verbosity()' has failed for value '$v'."); return 1 }
 
 	my $verbosity = $self->verbosity; # we have verbosity
@@ -867,7 +875,7 @@ WWW::Mechanize::Chrome::Webshot - cheap and cheerful html2pdf converter, take a 
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =head1 SYNOPSIS
 
@@ -894,6 +902,11 @@ Here are some examples:
 
     my $shooter = WWW::Mechanize::Chrome::Webshot->new({
       'settle-time' => 10,
+      # optionally specify a Mojo::Log logger,
+      # useful if you have a global logger you want to use:
+      'logger-object' => Mojo::Log->new(path=>'webshot.log'),
+      # or just specify a file to log output to:
+      #'logfile' => 'webshot.log',
     });
     $shooter->shoot({
       'output-filename' => 'abc.png',
@@ -1116,9 +1129,9 @@ This will save the screenshot and also adds the specified exif data:
 
 C<< script/www-mechanize-webshot.pl --url 'https://www.902.gr' --resolution 2000x2000 --exif 'created' 'bliako' --output-filename '902.png' --settle-time 10 >>
 
-Debug why the output is not what you expect, show the browser and let it live for huge settle time:
+Debug why the output is not what you expect, show the browser and let it live for huge settle time, also log output to a file:
 
-C<< script/www-mechanize-webshot.pl --no-headless --url 'https://www.902.gr' --resolution 2000x2000 --output-filename '902.png' --settle-time 100000 >>
+C<< script/www-mechanize-webshot.pl --no-headless --url 'https://www.902.gr' --resolution 2000x2000 --output-filename '902.png' --settle-time 100000 --verbosity 10 --logfile debug.log >>
 
 This will also remove specified DOM elements by tag name and XPath selector. Note that
 the output format will be deduced as PDF because of the filename:
@@ -1131,16 +1144,180 @@ C<< script/www-mechanize-webshot.pl --url 'https://www.902.gr' --resolution 2000
 
 =back
 
+=head1 CREATING THE MECH OBJECT
+
+The mech (L<WWW::Mechanize::Chrome>) object must be supplied
+to the functions in this module. It must be created by the caller.
+This is how I do it:
+
+    use WWW::Mechanize::Chrome;
+    use Log::Log4perl qw(:easy);
+    Log::Log4perl->easy_init($ERROR);
+
+    my %default_mech_params = (
+    	headless => 1,
+    #	log => $mylogger,
+    	launch_arg => [
+    		'--window-size=600x800',
+    		'--password-store=basic', # do not ask me for stupid chrome account password
+    #		'--remote-debugging-port=9223',
+    #		'--enable-logging', # see also log above
+    		'--disable-gpu',
+    		'--no-sandbox',
+    		'--ignore-certificate-errors',
+    		'--disable-background-networking',
+    		'--disable-client-side-phishing-detection',
+    		'--disable-component-update',
+    		'--disable-hang-monitor',
+    		'--disable-save-password-bubble',
+    		'--disable-default-apps',
+    		'--disable-infobars',
+    		'--disable-popup-blocking',
+    	],
+    );
+
+    my $mech_obj = eval {
+    	WWW::Mechanize::Chrome->new(%default_mech_params)
+    };
+    die $@ if $@;
+
+    # This transfers all javascript code's console.log(...)
+    # messages to perl's warn()
+    # we need to keep $console var in scope!
+    my $console = $mech_obj->add_listener('Runtime.consoleAPICalled', sub {
+    	  warn
+    	      "js console: "
+    	    . join ", ",
+    	      map { $_->{value} // $_->{description} }
+    	      @{ $_[0]->{params}->{args} };
+    	})
+    ;
+
+    # and now fetch a page
+    my $URL = '...';
+    my $retmech = $mech_obj->get($URL);
+    die "failed to fetch $URL" unless defined $retmech;
+    $mech_obj->sleep(1); # let it settle
+    # now the mech object has loaded the URL and has a DOM hopefully.
+    # You can pass it on to domops_find() or domops_zap() to operate on the DOM.
+
+
+=head1 SECURITY WARNING
+
+L<WWW::Mechanize::Chrome> invokes the C<google-chrome>
+executable
+on behalf of the current user. Headless or not, C<google-chrome>
+is invoked. Depending on the launch parameters, either
+a fresh, new browser session will be created or the
+session of the current user with their profile, data, cookies,
+passwords, history, etc. will be used. The latter case is very
+dangerous.
+
+This behaviour is controlled by L<WWW::Mechanize::Chrome>'s
+L<constructor|WWW::Mechanize::Chrome#WWW::Mechanize::Chrome-%3Enew(-%options-)>
+parameters which, in turn, are used for launching
+the C<google-chrome> executable. Specifically,
+see L<WWW::Mechanize::Chrome#separate_session>,
+L<<WWW::Mechanize::Chrome#data_directory>
+and L<WWW::Mechanize::Chrome#incognito>.
+
+B<Unless you really need to mechsurf with your current session, aim
+to launching the browser with a fresh new session.
+This is the safest option.>
+
+B<Do not rely on default behaviour as this may change over
+time. Be explicit.>
+
+Also, be warned that L<WWW::Mechanize::Chrome::DOMops> executes
+javascript code on that C<google-chrome> instance.
+This is done nternally with javascript code hardcoded
+into the L<WWW::Mechanize::Chrome::DOMops>'s package files.
+
+On top of that L<WWW::Mechanize::Chrome::DOMops> allows
+for B<user-specified javascript code> to be executed on
+that C<google-chrome> instance. For example the callbacks
+on each element found, etc.
+
+This is an example of what can go wrong if
+you are not using a fresh C<google-chrome>
+session:
+
+You have just used C<google-chrome> to access your
+yahoo webmail and you did not logout.
+So, there will be an
+access cookie in the C<google-chrome> when you later
+invoke it via L<WWW::Mechanize::Chrome> (remember
+you have not told it to use a fresh session).
+
+If you allow
+unchecked user-specified (or copy-pasted from ChatGPT)
+javascript code in
+L<WWW::Mechanize::Chrome::DOMops>'s
+C<domops_find()>, C<domops_zap()>, etc. then it is, theoretically,
+possible that this javascript code
+initiates an XHR to yahoo and fetch your emails and
+pass them on to your perl code.
+
+But there is another problem,
+L<WWW::Mechanize::Chrome::DOMops>'s
+integrity of the embedded javascript code may have
+been compromised to exploit your current session.
+
+This is very likely with a Windows installation which,
+being the security swiss cheese it is, it
+is possible for anyone to compromise your module's code.
+It is less likely in Linux, if your modules are
+installed by root and are read-only for normal users.
+But, still, it is possible to be compromised (by root).
+
+Another issue is with the saved passwords and
+the browser's auto-fill when landing on a login form.
+
+Therefore, for all these reasons, B<it is advised not to invoke (via L<WWW::Mechanize::Chrome>)
+C<google-chrome> with your
+current/usual/everyday/email-access/bank-access
+identity so that it does not have access to
+your cookies, passwords, history etc.>
+
+It is better to create a fresh
+C<google-chrome>
+identity/profile and use that for your
+C<WWW::Mechanize::Chrome::DOMops> needs.
+
+No matter what identity you use, you may want
+to erase the cookies and history of C<google-chrome>
+upon its exit. That's a good practice.
+
+It is also advised to review the
+javascript code you provide
+via L<WWW::Mechanize::Chrome::DOMops> callbacks if
+it is taken from 3rd-party, human or not, e.g. ChatGPT.
+
+Additionally, make sure that the current
+installation of L<WWW::Mechanize::Chrome::DOMops>
+in your system is not compromised with malicious javascript
+code injected into it. For this you can check its MD5 hash
+
 =head2 REQUIREMENTS
 
-This module requires that the Chrome browser is installed in your
-computer and can be found by L<WWW::Mechanize::Chrome>.
+=head1 DEPENDENCIES
 
-The browser will be run, usually headless -- so a headless desktop is fine,
+This module depends on L<WWW::Mechanize::Chrome> which, in turn,
+depends on the C<google-chrome> executable be installed on the
+host computer. See L<WWW::Mechanize::Chrome::Install> on
+how to install the executable.
+
+Test scripts (which create there own mech object) will detect the absence
+of C<google-chrome> binary and exit gracefully, meaning the test passes.
+But with a STDERR message to the user. Who will hopefully notice it and
+proceed to C<google-chrome> installation. In any event, this module
+will be installed with or without C<google-chrome>.
+
+The browser will be run, usually headless -- so a headless host system is fine,
 the first time you take a screenshot. It will only be re-spawned if
 you have shutdown the browser in the meantime. Exiting your script
 will shutdown the browser. And so, running a script again will
-re-spawn the browser (AFAIK).
+re-spawn the browser (AFAICU/sic/).
 
 
 =head2 CAVEATS

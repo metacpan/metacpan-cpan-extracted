@@ -1,0 +1,5 @@
+unique_id,subject_id,project,species,tissue,sample_type,assay,condition,timepoint,duration,batch,replicate
+samp001,1,CNAG-Test,Human,Liver,Normal,RNA_seq,C22.0,Baseline,P0D,1,5
+samp002,2,CNAG-Test,Mouse,Brain,Tumor,ChIP_seq,C71.0,Treatment,P7W,2,2
+samp003,3,CNAG-Test,Zebrafish,Blood,Normal,WES,I46,Surgery,P1M,3,1
+samp004,4,CNAG-Test,Rat,Kidney,Normal,LC_MS,C66,Challenge,P3Y,1,10

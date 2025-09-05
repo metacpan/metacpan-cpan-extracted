@@ -1,0 +1,38 @@
+.gitattributes
+.gitignore
+bin/clarid-tools
+Changes
+cpanfile
+docker/Dockerfile
+docker/README.md
+ex/biosample.csv
+ex/biosample_to_decode.csv
+ex/README
+ex/subject.csv
+ex/subject_to_decode_human.csv
+ex/subject_to_decode_stub.csv
+lib/ClarID/Tools.pm
+lib/ClarID/Tools/Command/code.pm
+lib/ClarID/Tools/Command/qrcode.pm
+lib/ClarID/Tools/Command/validate.pm
+lib/ClarID/Tools/Util.pm
+lib/ClarID/Tools/Validator.pm
+Makefile.PL
+MANIFEST			This list of files
+mkdocs.yml
+non-containerized/README.md
+share/clarid-codebook-schema.json
+share/clarid-codebook.yaml
+share/icd10.json
+share/icd10_order.json
+t/bulk.t
+t/code.t
+t/data/bad_codebook.yaml
+t/data/biosample_conds.csv
+t/data/biosample_conds_to_decode.csv
+t/data/duplicate_codebook.yaml
+t/qrcode.t
+t/validate.t
+VERSION
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

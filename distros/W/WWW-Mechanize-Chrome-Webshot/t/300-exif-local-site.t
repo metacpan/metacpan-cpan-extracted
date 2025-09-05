@@ -23,7 +23,7 @@ use lib ($FindBin::Bin, 'blib/lib');
 
 use WWW::Mechanize::Chrome::Webshot;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 my $VERBOSITY = 0; # we need verbosity of 10 (max), so this is not used
 my $CLEANUP = (exists($ENV{'PERL_TEST_TEMPDIR_TINY_NOCLEANUP'}) && ($ENV{'PERL_TEST_TEMPDIR_TINY_NOCLEANUP'}>0)) ? 1 : 0;

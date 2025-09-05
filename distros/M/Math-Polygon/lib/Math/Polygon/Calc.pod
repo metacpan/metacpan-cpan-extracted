@@ -11,15 +11,15 @@ Math::Polygon::Calc - Simple polygon calculations
 
 =head1 SYNOPSIS
 
- my @poly = ( [1,2], [2,4], [5,7], [1, 2] );
+  my @poly = ( [1,2], [2,4], [5,7], [1, 2] );
 
- my ($xmin, $ymin, $xmax, $ymax) = polygon_bbox @poly;
+  my ($xmin, $ymin, $xmax, $ymax) = polygon_bbox @poly;
 
- my $area = polygon_area @poly;
- MY $L    = polygon_perimeter @poly;
- if(polygon_is_clockwise @poly) { ... };
- 
- my @rot  = polygon_start_minxy @poly;
+  my $area = polygon_area @poly;
+  MY $L    = polygon_perimeter @poly;
+  if(polygon_is_clockwise @poly) { ... };
+
+  my @rot  = polygon_start_minxy @poly;
 
 =head1 DESCRIPTION
 
@@ -36,10 +36,10 @@ packages.
 Returns the area enclosed by the polygon.  The last point of the list
 must be the same as the first to produce a correct result.
 
-The algorithm was found at L<http://mathworld.wolfram.com/PolygonArea.html>,
+The algorithm was found at L<https://mathworld.wolfram.com/PolygonArea.html>,
 and sounds:
 
- A = abs( 1/2 * (x1y2-x2y1 + x2y3-x3y2 ...)
+  A = abs( 1/2 * (x1y2-x2y1 + x2y3-x3y2 ...)
 
 =item B<polygon_bbox>(@points)
 
@@ -51,10 +51,10 @@ area.
 
 Polygons, certainly after some computations, can have a lot of
 horrible artifacts: points which are double, spikes, etc.
-The optional HASH contains the %options.
+The optional HASH contains the C<%options>.
 
  -Option       --Default
-  remove_spikes  <false>
+  remove_spikes  <C<false>>
 
 =over 2
 
@@ -69,17 +69,37 @@ removed.
 
 =back
 
-=item B<polygon_centroid>(@points)
+=item B<polygon_centroid>( [%options|\%options], @points )
 
 Returns the centroid location of the polygon.
 
 The last point of the list must be the same as the first (must be
-'closed') to produce a correct result.  When the polygon is very flat,
-it will not produce a stable result: minor changes in single coordinates
-will move the centroid too far.
+'closed') to produce a correct result.
+
+B<warning:> When the polygon is very flat, it will not produce a
+stable result: minor changes in single coordinates will move the
+centroid too far.
 
 The algorithm was found at
-F<http://en.wikipedia.org/wiki/Centroid#Of_a_polygon>
+L<https://en.wikipedia.org/wiki/Centroid#Of_a_polygon>
+
+ -Option  --Default
+  is_large  false
+
+=over 2
+
+=item is_large => BOOLEAN
+
+When the polygon is small and far from the origin C<(0,0)> (as often
+happens when processing geo coordinates), then rounding errors will have a
+large impact on result of the algorithm.  To avoid this, we will move the
+poly first close to the origin, and move the calculated center point back.
+
+This transform, which cost modest performance, can be disabled with
+this option.  The transformation will also not happen when the first
+C<x> coordinate is an object, like Math::BigFloat.
+
+=back
 
 =item B<polygon_clockwise>(@points)
 
@@ -87,7 +107,7 @@ Be sure the polygon points are in clockwise order.
 
 =item B<polygon_contains_point>($point, @points)
 
-Returns true if the point is inside the closed polygon.  On an edge will
+Returns C<true> if the point is inside the closed polygon.  On an edge will
 be flagged as 'inside'.  But be warned of rounding issues, caused by
 the floating-point calculations used by this algorithm.
 
@@ -103,20 +123,24 @@ a closed polygon.
 =item B<polygon_equal>( \@points1, \@points2, [$tolerance] )
 
 Compare two polygons, on the level of points. When the polygons are
-the same but rotated, this will return false. See L<polygon_same()|Math::Polygon::Calc/"FUNCTIONS">.
+the same but rotated, this will return C<false>. See L<polygon_same()|Math::Polygon::Calc/"FUNCTIONS">.
 
 =item B<polygon_format>($format, @points)
 
-[1.07] Map the $format over all @points, both the X and Y coordinate.  This
+[1.07] Map the C<$format> over all C<@points>, both the X and Y coordinate.  This
 is especially useful to reduce the number of digits in the stringification.
 For instance, when you want reproducible results in regression scripts.
 
-The format is anything supported by printf(), for instance "%5.2f".  Or,
+The format is anything supported by C<printf()>, for instance C<"%5.2f">.  Or,
 you can pass a code reference which accepts a single value.
 
 =item B<polygon_is_clockwise>(@points)
 
+Z<>
+
 =item B<polygon_is_closed>(@points)
+
+Z<>
 
 =item B<polygon_perimeter>(@points)
 
@@ -126,13 +150,13 @@ a line is presumed; for a polygon they must match.
 
 This is simply Pythagoras.
 
- $l = sqrt((x1-x0)^2 + (y1-y0)^2) + sqrt((x2-x1)^2+(y2-y1)^2) + ...
+  $l = sqrt((x1-x0)^2 + (y1-y0)^2) + sqrt((x2-x1)^2+(y2-y1)^2) + ...
 
 =item B<polygon_same>( \@points1, \@points2, [$tolerance] )
 
-Compare two polygons, where the polygons may be rotated wrt each
-other. This is (much) slower than L<polygon_equal()|Math::Polygon::Calc/"FUNCTIONS">, but some algorithms
-will cause un unpredictable rotation in the result.
+[1.12] Compare two polygons, where the polygons may be rotated or mirrored
+wrt each other. This is (much) slower than L<polygon_equal()|Math::Polygon::Calc/"FUNCTIONS">, but some
+algorithms will cause un unpredictable rotation in the result.
 
 =item B<polygon_start_minxy>(@points)
 
@@ -141,18 +165,35 @@ corner of the bounding box is made first.
 
 =item B<polygon_string>(@points)
 
+Z<>
+
+=back
+
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Error: empty polygon is neither closed nor open
+
+Cast by polygon_is_closed()
+
+=item Error: polygon points on a line, so no centroid
+
+Cast by polygon_centroid()
+
 =back
 
 =head1 SEE ALSO
 
-This module is part of Math-Polygon distribution version 1.11,
-built on May 02, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Math-Polygon version 2.00,
+built on September 04, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2004-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2004-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

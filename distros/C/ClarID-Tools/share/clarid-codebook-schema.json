@@ -1,0 +1,147 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "http://example.org/schemas/clarid-codebook.schema.json",
+  "schemaVersion": "0.01",
+  "title": "ClarID Codebook Schema",
+  "type": "object",
+  "required": ["metadata", "entities"],
+  "properties": {
+    "metadata": { "$ref": "#/definitions/metadata" },
+    "entities": { "$ref": "#/definitions/entitiesWrapper" }
+  },
+  "additionalProperties": false,
+  "definitions": {
+    "entitiesWrapper": {
+      "type": "object",
+      "required": ["_defaults", "biosample", "subject"],
+      "properties": {
+        "_defaults": { "$ref": "#/definitions/defaultsMap" },
+        "biosample": { "$ref": "#/definitions/biosampleCategory" },
+        "subject":   { "$ref": "#/definitions/subjectCategory" }
+      },
+      "additionalProperties": false
+    },
+    "defaultsMap": {
+      "description": "Global fall-through entries for any category",
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": { "$ref": "#/definitions/termEntryNoId" }
+    },
+    "metadata": {
+      "type": "object",
+      "required": ["version", "author", "date", "center"],
+      "properties": {
+        "version":     { "type": "string" },
+        "author":      { "type": "string" },
+        "date":        { "type": "string", "format": "date" },
+        "center":      { "type": "string" },
+        "description": { "type": "string" },
+        "repository":  { "type": "string", "format": "uri" }
+      },
+      "additionalProperties": false
+    },
+    "biosampleCategory": {
+      "type": "object",
+      "required": [
+        "project",
+        "species",
+        "tissue",
+        "sample_type",
+        "assay",
+        "timepoint",
+        "condition_pattern",
+        "duration_pattern"
+      ],
+      "properties": {
+        "project":           { "$ref": "#/definitions/studyProjectCategory" },
+        "species":           { "$ref": "#/definitions/speciesTermMap" },
+        "tissue":            { "$ref": "#/definitions/termMapWithStub" },
+        "sample_type":       { "$ref": "#/definitions/termMapWithStub" },
+        "assay":             { "$ref": "#/definitions/termMapWithStub" },
+        "timepoint":         { "$ref": "#/definitions/termMapWithStub" },
+        "condition":         { "$ref": "#/definitions/termMapWithStub" },
+        "batch_pattern":     { "$ref": "#/definitions/patternConfig" },
+        "condition_pattern": { "$ref": "#/definitions/patternConfig" },
+        "duration_pattern":  { "$ref": "#/definitions/patternConfig" },
+        "replicate_pattern": { "$ref": "#/definitions/patternConfig" }
+      },
+      "additionalProperties": false
+    },
+    "subjectCategory": {
+      "type": "object",
+      "required": ["study", "type", "condition_pattern", "sex", "age_group"],
+      "properties": {
+        "study":             { "$ref": "#/definitions/studyProjectCategory" },
+        "type":              { "$ref": "#/definitions/termMapWithStub" },
+        "condition_pattern": { "$ref": "#/definitions/patternConfig" },
+        "sex":               { "$ref": "#/definitions/termMapWithStub" },
+        "age_group":         { "$ref": "#/definitions/termMapWithStub" }
+      },
+      "additionalProperties": false
+    },
+    "studyProjectCategory": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": { "$ref": "#/definitions/termEntryNoId" }
+    },
+    "speciesTermMap": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": { "$ref": "#/definitions/speciesTermEntry" }
+    },
+    "speciesTermEntry": {
+      "allOf": [
+        { "$ref": "#/definitions/termEntryWithStub" },
+        {
+          "properties": {
+            "code":     { "type": "string", "pattern": "^[A-Z][a-z]{2}[A-Z][a-z]{2}$" },
+            "tax_code": { "type": "string", "pattern": "^[A-Z]{3}$" }
+          }
+        }
+      ]
+    },
+    "termMapWithStub": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": { "$ref": "#/definitions/termEntryWithStub" }
+    },
+    "termEntryWithStub": {
+      "type": "object",
+      "required": ["code", "stub_code", "label", "id"],
+      "properties": {
+        "code":      { "type": "string", "minLength": 1 },
+        "stub_code": { "type": "string", "minLength": 1 },
+        "label":     { "type": "string", "minLength": 1 },
+        "id":        { "$ref": "#/definitions/CURIE" },
+        "tax_code":  { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "termEntryNoId": {
+      "type": "object",
+      "required": ["code", "stub_code", "label"],
+      "properties": {
+        "code":      { "type": "string", "minLength": 1 },
+        "stub_code": { "type": "string", "minLength": 1 },
+        "label":     { "type": "string", "minLength": 1 },
+        "id":        { "type": ["string", "null"] },
+        "tax_code":  { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "patternConfig": {
+      "type": "object",
+      "required": ["regex", "code_format", "stub_format"],
+      "properties": {
+        "regex":       { "type": "string" },
+        "code_format": { "type": "string" },
+        "stub_format": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "CURIE": {
+      "type": "string",
+      "pattern": "^\\w[^:]+:.+$"
+    }
+  }
+}

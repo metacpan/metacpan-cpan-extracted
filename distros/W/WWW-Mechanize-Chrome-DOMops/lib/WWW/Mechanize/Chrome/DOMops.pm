@@ -6,24 +6,31 @@ use warnings;
 
 use Exporter qw(import);
 our @EXPORT = (
+	# NOTE from doc: our @EXPORT    = qw(afunc $scalar @array);   # afunc is a function
 	# I wanted to distinguish find() from similar subs from foreign modules
 	# and domops_find() came. But for consistency now all are prefixed ...
 	'domops_zap',
 	'domops_find',
-	'domops_VERBOSITY',
+	'$domops_VERBOSITY',
+	'$domops_LOGGER',
 	'domops_read_dom_element_selectors_from_JSON_string',
 	'domops_read_dom_element_selectors_from_JSON_file',
 	'domops_wait_for_page_to_load'
 );
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
+use Mojo::Log;
 use String::Escape qw/escape/;
 
 use Data::Roundtrip qw/perl2dump json2perl perl2json no-unicode-escape-permanently/;
 
 # caller can set this to 0,1,2,3
 our $domops_VERBOSITY = 0;
+# default logger logs to STDOUT/ERR
+# caller can set this to their own logger
+# which must implement error(), warn() and info() :
+our $domops_LOGGER = Mojo::Log->new;
 
 # Here are JS helpers. We use these in our own internal JS code.
 # They are visible to the user's JS callbacks.
@@ -75,12 +82,12 @@ sub domops_find {
 	my $parent = ( caller(1) )[3] || "N/A";
 	my $whoami = ( caller(0) )[3];
 
-	if( $WWW::Mechanize::Chrome::DOMops::domops_VERBOSITY > 0 ){ print STDOUT "$whoami (via $parent), line ".__LINE__." : called ...\n" }
+	if( $WWW::Mechanize::Chrome::DOMops::domops_VERBOSITY > 0 ){ $domops_LOGGER->info("$whoami (via $parent), line ".__LINE__." : called ...") }
 
 	my $amech_obj = exists($params->{'mech-obj'}) ? $params->{'mech-obj'} : undef;
 	if( ! $amech_obj ){
 		my $anerrmsg = "$whoami (via $parent), line ".__LINE__." : a mech-object is required via 'mech-obj'.";
-		print STDERR $anerrmsg."\n";
+		$domops_LOGGER->error($anerrmsg);
 		return {
 			'status' => -3,
 			'message' => $anerrmsg
@@ -102,18 +109,18 @@ sub domops_find {
 			$selectors{$asel} = $params->{$asel};
 		} else {
 			my $anerrmsg = "$whoami (via $parent), line ".__LINE__." : error, parameter '$asel' expects a scalar or an ARRAYref and not '".ref($params->{$asel})."'.";
-			print STDERR $anerrmsg."\n";
+			$domops_LOGGER->error($anerrmsg);
 			return {
 				'status' => -3,
 				'message' => $anerrmsg
 			}
 		}
 		$have_a_selector = 1;
-		if( $WWW::Mechanize::Chrome::DOMops::domops_VERBOSITY > 1 ){ print STDOUT perl2dump($selectors{$asel})."$whoami (via $parent), line ".__LINE__." : found selector '$asel' with above content.\n" }
+		if( $WWW::Mechanize::Chrome::DOMops::domops_VERBOSITY > 1 ){ $domops_LOGGER->info(perl2dump($selectors{$asel})."$whoami (via $parent), line ".__LINE__." : found selector '$asel' with above content.") }
 	}
 	if( not $have_a_selector ){
 		my $anerrmsg = "$whoami (via $parent), line ".__LINE__." : at least one selector must be specified by supplying one or more parameters from these: '".join("','", @known_selectors)."'.";
-		print STDERR $anerrmsg."\n";
+		$domops_LOGGER->error($anerrmsg);
 		return {
 			'status' => -3,
 			'message' => $anerrmsg
@@ -146,7 +153,7 @@ sub domops_find {
 			# one or more callbacks must be contained in an ARRAY
 			if( ref($m) ne 'ARRAY' ){
 				my $anerrmsg = "$whoami (via $parent), line ".__LINE__." : error callback parameter '$acbname' must be an array of hashes each containing a 'code' and a 'name' field. You supplied a '".ref($m)."'.";
-				print STDERR $anerrmsg."\n";
+				$domops_LOGGER->error($anerrmsg);
 				return { 'status' => -3, 'message' => $anerrmsg }
 			}
 			for my $acbitem (@$m){
@@ -155,12 +162,12 @@ sub domops_find {
 				 || ! exists($acbitem->{'name'})
 				){
 					my $anerrmsg = "$whoami (via $parent), line ".__LINE__." : error callback parameter '$acbname' must be an array of hashes each containing a 'code' and a 'name' field.";
-					print STDERR $anerrmsg."\n";
+					$domops_LOGGER->error($anerrmsg);
 					return { 'status' => -3, 'message' => $anerrmsg }
 				}
 			}
 			$callbacks{$acbname} = $m;
-			if( $WWW::Mechanize::Chrome::DOMops::domops_VERBOSITY > 0 ){ print STDOUT "$whoami (via $parent), line ".__LINE__." : adding ".scalar(@$m)." callback(s) of type '$acbname' ...\n" }
+			if( $WWW::Mechanize::Chrome::DOMops::domops_VERBOSITY > 0 ){ $domops_LOGGER->info("$whoami (via $parent), line ".__LINE__." : adding ".scalar(@$m)." callback(s) of type '$acbname' ...") }
 		}
 	}
 
@@ -178,7 +185,7 @@ sub domops_find {
 		 || 0 # <<< default is intersection (superfluous but verbose)
 	;
 
-	if( $WWW::Mechanize::Chrome::DOMops::domops_VERBOSITY > 1 ){ print "$whoami (via $parent), line ".__LINE__." : using ".($Union?'UNION':'INTERSECTION')." to combine the matched elements.\n"; }
+	if( $WWW::Mechanize::Chrome::DOMops::domops_VERBOSITY > 1 ){ $domops_LOGGER->info("$whoami (via $parent), line ".__LINE__." : using ".($Union?'UNION':'INTERSECTION')." to combine the matched elements."); }
 	# there is no way to break a JS eval'ed via perl and return something back unless
 	# one uses gotos or an anonymous function, see
 	#    https://www.perlmonks.org/index.pl?node_id=1232479
@@ -263,7 +270,7 @@ EOJ
 		# like comma at end of array.
 		if( ! defined $aselvalue ){
 			my $anerrmsg = "$whoami (via $parent), line ".__LINE__." : error, check the syntax of selector spec '$aselname' because it failed to be converted to JSON: ${_aselvalue}";
-			print STDERR $anerrmsg."\n";
+			$domops_LOGGER->error($anerrmsg);
 			return {
 				'status' => -3,
 				'message' => $anerrmsg
@@ -508,31 +515,31 @@ EOJ
 })(); // end of anonymous function and now execute it
 }; // end our eval scope
 EOJ
-	if( $WWW::Mechanize::Chrome::DOMops::domops_VERBOSITY > 2 ){ print "--begin javascript code to eval:\n\n${jsexec}\n\n--end javascript code.\n$whoami (via $parent), line ".__LINE__." : evaluating above javascript code.\n" }
+	if( $WWW::Mechanize::Chrome::DOMops::domops_VERBOSITY > 2 ){ $domops_LOGGER->info("--begin javascript code to eval:\n\n${jsexec}\n\n--end javascript code.\n$whoami (via $parent), line ".__LINE__." : evaluating above javascript code.") }
 
 	if( defined $js_outfile ){
 		if( open(my $FH, '>', $js_outfile) ){ print $FH $jsexec; close $FH }
-		else { print STDERR "$whoami (via $parent), line ".__LINE__." : warning, failed to open file '$js_outfile' for writing the output javascript code, skipping it ...\n" }
-		if( $WWW::Mechanize::Chrome::DOMops::domops_VERBOSITY > 0 ){ print STDOUT "$whoami (via $parent), line ".__LINE__." : javascript code to be executed has been written to local file '${js_outfile}' for debugging.\n" }
+		else { $domops_LOGGER->warn("$whoami (via $parent), line ".__LINE__." : warning, failed to open file '$js_outfile' for writing the output javascript code, skipping it ...") }
+		if( $WWW::Mechanize::Chrome::DOMops::domops_VERBOSITY > 0 ){ $domops_LOGGER->info("$whoami (via $parent), line ".__LINE__." : javascript code to be executed has been written to local file '${js_outfile}' for debugging.") }
 	}
 
 	my ($retval, $typ);
-	eval { ($retval, $typ) = $amech_obj->eval($jsexec) };
-	if( $@ ){
-		print STDERR "--begin javascript to eval:\n\n${jsexec}\n\n--end javascript code.\n$whoami (via $parent), line ".__LINE__." : eval of above javascript has failed: $@\n";
+	my $rr = eval { ($retval, $typ) = $amech_obj->eval($jsexec); 1 };
+	if( $@ || ! $rr ){
+		$domops_LOGGER->error("--begin javascript to eval:\n\n${jsexec}\n\n--end javascript code.\n$whoami (via $parent), line ".__LINE__." : eval of above javascript has failed".($@?": $@":"."));
 		return {
 			'status' => -2,
 			'message' => "eval has failed: $@"
 		};
 	};
 	if( ! defined $retval ){
-		print STDERR "--begin javascript to eval:\n\n${jsexec}\n\n--end javascript code.\n$whoami (via $parent), line ".__LINE__." : eval of above javascript has returned an undefined result.\n";
+		$domops_LOGGER->error("--begin javascript to eval:\n\n${jsexec}\n\n--end javascript code.\n$whoami (via $parent), line ".__LINE__." : eval of above javascript has returned an undefined result.");
 		return {
 			'status' => -2,
 			'message' => "eval returned un undefined result."
 		};
 	}
-	if( $WWW::Mechanize::Chrome::DOMops::domops_VERBOSITY > 2 ){ print "$whoami (via $parent), line ".__LINE__." : done evaluating javascript code with success.\n" }
+	if( $WWW::Mechanize::Chrome::DOMops::domops_VERBOSITY > 2 ){ $domops_LOGGER->info("$whoami (via $parent), line ".__LINE__." : done evaluating javascript code with success.") }
 
 	# this contains 'status' and 'found' which contains all
 	# ids matched
@@ -558,12 +565,12 @@ sub domops_zap {
 	my $parent = ( caller(1) )[3] || "N/A";
 	my $whoami = ( caller(0) )[3];
 
-	if( $WWW::Mechanize::Chrome::DOMops::domops_VERBOSITY > 0 ){ print STDOUT "$whoami (via $parent), line ".__LINE__." : called ...\n" }
+	if( $WWW::Mechanize::Chrome::DOMops::domops_VERBOSITY > 0 ){ $domops_LOGGER->info("$whoami (via $parent), line ".__LINE__." : called ...") }
 
 	my $amech_obj = exists($params->{'mech-obj'}) ? $params->{'mech-obj'} : undef;
 	if( ! $amech_obj ){
 		my $anerrmsg = ($WWW::Mechanize::Chrome::DOMops::domops_VERBOSITY>2 ? perl2dump($params) : "")."$whoami (via $parent), line ".__LINE__." : error, input parameter 'mech-obj' is missing, see above parameters.";
-		print STDERR $anerrmsg."\n";
+		$domops_LOGGER->error($anerrmsg);
 		return {
 			'status' => -3,
 			'message' => $anerrmsg
@@ -598,7 +605,7 @@ sub domops_zap {
 
 	if( ! defined $ret ){
 		my $anerrmsg = ($WWW::Mechanize::Chrome::DOMops::domops_VERBOSITY>2 ? perl2dump({%$params,'mech-obj'=>'<reducted>'}) : "")."$whoami (via $parent), line ".__LINE__." : error, call to domops_find()/1 has failed for above parameters.";
-		print STDERR $anerrmsg."\n";
+		$domops_LOGGER->error($anerrmsg);
 		return {
 			'status' => -2,
 			'message' => $anerrmsg
@@ -606,7 +613,7 @@ sub domops_zap {
 	}
 	if( $ret->{'status'} < 0 ){
 		my $anerrmsg = ($WWW::Mechanize::Chrome::DOMops::domops_VERBOSITY>2 ? perl2dump({%$params,'mech-obj'=>'<reducted>'}) : "")."$whoami (via $parent), line ".__LINE__." : error, call to domops_find()/2 has failed for above parameters with this error message: ".$ret->{'message'};
-		print STDERR $anerrmsg."\n";
+		$domops_LOGGER->error($anerrmsg);
 		return {
 			'status' => -2,
 			'message' => $anerrmsg
@@ -627,11 +634,12 @@ sub domops_read_dom_element_selectors_from_JSON_file {
 	my $parent = ( caller(1) )[3] || "N/A";
 	my $whoami = ( caller(0) )[3];
 	my $FH;
-	if( ! open($FH, '<:encoding(UTF-8)', $jsonfile) ){ print STDERR "$whoami (via $parent) : error, failed to open file '$jsonfile' for reading the DOM elements to be removed (as JSON): $!"; return undef }
+	if( $domops_VERBOSITY > 1 ){ $domops_LOGGER->info("$whoami (via $parent) : called for JSON file '$jsonfile' ...") }
+	if( ! open($FH, '<:encoding(UTF-8)', $jsonfile) ){ $domops_LOGGER->error("$whoami (via $parent) : error, failed to open file '$jsonfile' for reading the DOM elements to be removed (as JSON): $!"); return undef }
 	my $jsonstr;
 	{ local $/ = undef; $jsonstr = <$FH> } close $FH;
 	my $ret = WWW::Mechanize::Chrome::DOMops::domops_read_dom_element_selectors_from_JSON_string($jsonstr);
-	if( ! defined $ret ){ print STDERR "$whoami (via $parent) : error, call to ".'domops_read_dom_element_selectors_from_JSON_string()'." has failed for input file '$jsonfile'.\n"; return undef }
+	if( ! defined $ret ){ $domops_LOGGER->error("$whoami (via $parent) : error, call to ".'domops_read_dom_element_selectors_from_JSON_string()'." has failed for input file '$jsonfile'."); return undef }
 	return $ret;
 }
 # It parses a JSON string (the input parameter) which
@@ -644,16 +652,16 @@ sub domops_read_dom_element_selectors_from_JSON_string {
 	my $parent = ( caller(1) )[3] || "N/A";
 	my $whoami = ( caller(0) )[3];
 	my $perld = json2perl($jsonstr);
-	if( ! defined $perld ){ print STDERR "${jsonstr}\n$whoami (via $parent) : error, specified dom elements to be removed (see above) failed to be parsed as JSON.\n"; return undef }
+	if( ! defined $perld ){ $domops_LOGGER->error("${jsonstr}\n$whoami (via $parent) : error, specified dom elements to be removed (see above) failed to be parsed as JSON."); return undef }
 	if( ref($perld) eq 'ARRAY' ){
 		for (@$perld){
-			if( ref($_) ne 'HASH' ){ print STDERR "$whoami (via $parent) : error, specified dom elements to be removed (as JSON) must either specify an ARRAY of hashes, each hash being the specification for selecting a dom element, OR a HASH containing the dom element selection specification. An array was specified but it contains at least one item of type '".ref($_)."' but only HASHes are allowed as the ARRAY elements. The spec was:\n".$jsonstr."\n"; return undef }
+			if( ref($_) ne 'HASH' ){ $domops_LOGGER->error("$whoami (via $parent) : error, specified dom elements to be removed (as JSON) must either specify an ARRAY of hashes, each hash being the specification for selecting a dom element, OR a HASH containing the dom element selection specification. An array was specified but it contains at least one item of type '".ref($_)."' but only HASHes are allowed as the ARRAY elements. The spec was:\n".$jsonstr); return undef }
 		}
 		return $perld;
 	} elsif( ref($perld) eq 'HASH' ){
 		return [ $perld ];
 	}
-	print "$whoami (via $parent) : error, specified dom element selectors (as JSON) must either specify an ARRAY of hashes, each hash being the specification of a dom element selector, OR a HASH containing the dom element selection specification. The data type of what was specified was '".ref($perld)."' and the spec was:\n".$jsonstr."\n";
+	$domops_LOGGER->info("$whoami (via $parent) : error, specified dom element selectors (as JSON) must either specify an ARRAY of hashes, each hash being the specification of a dom element selector, OR a HASH containing the dom element selection specification. The data type of what was specified was '".ref($perld)."' and the spec was:\n".$jsonstr);
 	return undef
 }
 
@@ -691,14 +699,14 @@ sub domops_wait_for_page_to_load {
 	my $whoami = ( caller(0) )[3];
 
 	my $mech_obj = (exists($params->{'mech-obj'}) && defined($params->{'mech-obj'})) ? $params->{'mech-obj'} : undef;
-	if( ! $mech_obj ){ print STDERR "$whoami (via $parent), line ".__LINE__." : a mech-object is required via 'mech-obj'.\n"; return 1 }
+	if( ! $mech_obj ){ $domops_LOGGER->error("$whoami (via $parent), line ".__LINE__." : a mech-object is required via 'mech-obj'."); return 1 }
 
 	# wait for the page to load
-	if( $domops_VERBOSITY > 0 ){ print STDOUT "${whoami} (via $parent), line ".__LINE__." : called and now waiting for event 'Page.loadEventFired' ...\n" }
+	if( $domops_VERBOSITY > 0 ){ $domops_LOGGER->info("${whoami} (via $parent), line ".__LINE__." : called and now waiting for event 'Page.loadEventFired' ...") }
 	my $events = $mech_obj->_collectEvents(
 		sub { $_[0]->{method} eq 'Page.loadEventFired' }
 	);
-	if( $domops_VERBOSITY > 1 ){ print STDOUT "${whoami} (via $parent), line ".__LINE__." : detected event 'Page.loadEventFired'. Page is loaded.\n" }
+	if( $domops_VERBOSITY > 1 ){ $domops_LOGGER->info("${whoami} (via $parent), line ".__LINE__." : detected event 'Page.loadEventFired'. Page is loaded.") }
 	# at this stage the event 'Page.loadEventFired' is fired
 
 	# optionally check for elements to be visible, perhaps dynamically injected?
@@ -709,7 +717,7 @@ sub domops_wait_for_page_to_load {
 	my $iters = int($timeout/$sleeptime) + 1;
 
 	if( exists($params->{'elements-must-be-present'}) && defined($params->{'elements-must-be-present'}) ){
-		if( $domops_VERBOSITY > 1 ){ print STDOUT "${whoami} (via $parent), line ".__LINE__." : elements to check if present have been specified, checking them with timeout=${timeout}, sleep=${sleeptime}, iterations=${iters} ...\n" }
+		if( $domops_VERBOSITY > 1 ){ $domops_LOGGER->info("${whoami} (via $parent), line ".__LINE__." : elements to check if present have been specified, checking them with timeout=${timeout}, sleep=${sleeptime}, iterations=${iters} ...") }
 		my @elems = (ref($params->{'elements-must-be-present'}) eq 'ARRAY') ? @{$params->{'elements-must-be-present'}} : ($params->{'elements-must-be-present'});
 		my %elems = map { $_ => 1 } @elems;
 		my $document_src;
@@ -725,7 +733,7 @@ sub domops_wait_for_page_to_load {
 				$have_document_src = 1;
 			} elsif( (ref($document_src) eq 'ARRAY') && (scalar(@elems)==scalar(@$document_src)) ){
 				$have_document_src = 2;
-			} else { print STDERR "${whoami} (via $parent), line ".__LINE__." : error, input parameter 'document' must either be a scalar (denoting a document source for all elements in 'elements-must-be-present') or an ARRAYref with exactly the same number of elements as the elements specified in 'elements-must-be-present' (the latter has ".scalar(@elems)." items).\n"; return 1 }
+			} else { $domops_LOGGER->error("${whoami} (via $parent), line ".__LINE__." : error, input parameter 'document' must either be a scalar (denoting a document source for all elements in 'elements-must-be-present') or an ARRAYref with exactly the same number of elements as the elements specified in 'elements-must-be-present' (the latter has ".scalar(@elems)." items)."); return 1 }
 		} else { $adocsrc = 'var mydoc = document;' }
 		my $op = ( exists($params->{'elements-must-be-present-op'}) && defined($params->{'elements-must-be-present-op'}) && $params->{'elements-must-be-present-op'}=~/^&+|\|+$/ ) ? $params->{'elements-must-be-present-op'} : '&&';
 		my $success = 0;
@@ -762,13 +770,13 @@ sub domops_wait_for_page_to_load {
 					.' if( mydoc !== null ){ r=document.evaluate('.String::Escape::escape('qprintable', $xpa).', mydoc, null, XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);'
 					.'if( r == null ){ 0 } else { r.snapshotLength; }} else { 0 }'
 				;
-				if( $domops_VERBOSITY > 2 ){ print STDOUT "--begin javascript to eval:\n\n${jsexec}\n\n--end javascript code.\n${whoami} (via $parent), line ".__LINE__." : iteration $iter : executing above JS code ...\n" }
-				eval { ($retval, $typ) = $mech_obj->eval($jsexec) };
-				if( $@ ){ print STDERR "--begin javascript to eval:\n\n${jsexec}\n\n--end javascript code.\n$whoami (via $parent), line ".__LINE__." : iteration $iter : eval of above javascript has failed: $@\n"; return 1 }
-				if( $domops_VERBOSITY > 2 ){ print STDOUT "--begin javascript to eval:\n\n${jsexec}\n\n--end javascript code.\n$whoami (via $parent), line ".__LINE__." : iteration $iter : the value returned from executing above javascript (of type '$typ'): '${retval}'\n" }
+				if( $domops_VERBOSITY > 2 ){ $domops_LOGGER->info("--begin javascript to eval:\n\n${jsexec}\n\n--end javascript code.\n${whoami} (via $parent), line ".__LINE__." : iteration $iter : executing above JS code ...") }
+				my $rr = eval { ($retval, $typ) = $mech_obj->eval($jsexec); 1 };
+				if( $@ || ! $rr ){ $domops_LOGGER->error("--begin javascript to eval:\n\n${jsexec}\n\n--end javascript code.\n$whoami (via $parent), line ".__LINE__." : iteration $iter : eval of above javascript has failed".($@?": $@":".")); return 1 }
+				if( $domops_VERBOSITY > 2 ){ $domops_LOGGER->info("--begin javascript to eval:\n\n${jsexec}\n\n--end javascript code.\n$whoami (via $parent), line ".__LINE__." : iteration $iter : the value returned from executing above javascript (of type '$typ'): '${retval}'") }
 				if( $retval > 0 ){
 					# element found
-					if( $domops_VERBOSITY > 2 ){ print STDOUT "--begin javascript to eval:\n\n${jsexec}\n\n--end javascript code.\n$whoami (via $parent), line ".__LINE__." : iteration $iter : element found (operator '$op') : ${xpa}\n" }
+					if( $domops_VERBOSITY > 2 ){ $domops_LOGGER->info("--begin javascript to eval:\n\n${jsexec}\n\n--end javascript code.\n$whoami (via $parent), line ".__LINE__." : iteration $iter : element found (operator '$op') : ${xpa}") }
 					if( $op eq '||' ){
 						$success = 1;
 						last ITERS;
@@ -779,11 +787,11 @@ sub domops_wait_for_page_to_load {
 			} # for ELEMS:
 			if( ($success=(scalar(grep { defined $_ } @elems) == 0)) ){ last ITERS }
 		} # for ITERS:
-		if( $success > 0 ){ if( $domops_VERBOSITY > 0 ){ print STDOUT "${whoami} (via $parent), line ".__LINE__." : all elements specified were found, page is ready.\n" } }
+		if( $success > 0 ){ if( $domops_VERBOSITY > 0 ){ $domops_LOGGER->info("${whoami} (via $parent), line ".__LINE__." : all elements specified were found, page is ready.") } }
 		else {
 			# some elements not found (but dom-ready event was fired)
 			# the result depends on the timeout!
-			if( $domops_VERBOSITY > 0 ){ print STDOUT "${whoami} (via $parent), line ".__LINE__." : (some) elements specified were NOT found, page is NOT ready on the specified timeout.\n" }
+			if( $domops_VERBOSITY > 0 ){ $domops_LOGGER->info("${whoami} (via $parent), line ".__LINE__." : (some) elements specified were NOT found, page is NOT ready on the specified timeout.") }
 			return 2;
 		}
  	}
@@ -793,7 +801,7 @@ sub domops_wait_for_page_to_load {
 		? Future->wait_all( $events, $params->{'callback'} )
 		: Future->wait_all( $events )
 	;
-	if( $domops_VERBOSITY > 0 ){ print STDOUT "${whoami} (via $parent), line ".__LINE__." : page is now loaded!\n" }
+	if( $domops_VERBOSITY > 0 ){ $domops_LOGGER->info("${whoami} (via $parent), line ".__LINE__." : page is now loaded!") }
 	return 0 # success
 }
 
@@ -807,7 +815,7 @@ WWW::Mechanize::Chrome::DOMops - Operations on the DOM loaded in Chrome
 
 =head1 VERSION
 
-Version 0.12
+Version 0.13
 
 =head1 SYNOPSIS
 
@@ -861,10 +869,16 @@ There is more information about this in section L<ELEMENT SELECTORS>.
 
 Here are some usage scenaria:
 
-    use WWW::Mechanize::Chrome::DOMops qw/domops_zap domops_find domops_VERBOSITY/;
+    use WWW::Mechanize::Chrome::DOMops qw/
+        domops_zap domops_find
+        $domops_VERBOSITY
+        $domops_LOGGER
+    /;
 
     # adjust verbosity: 0, 1, 2, 3
     $WWW::Mechanize::Chrome::domops_VERBOSITY = 3;
+    # optionally set our own logger instead of using default (to STDOUT/ERR)
+    $WWW::Mechanize::Chrome::domops_VERBOSITY = Mojo::Log->new(path=>'xx.log');
 
     # First, create a mech object and load a URL on it
     # Note: you need google-chrome binary installed in your system!
@@ -970,7 +984,7 @@ EOJS
     # -1 indicates that javascript code executed correctly but
     # failed somewhere in its logic.
 
-    print "Found " . $ret->{'status'} . " matches which are: "
+    "Found " . $ret->{'status'} . " matches which are: ";
     # ... results are in $ret->{'found'}->{'first-level'}
     # ... and also in $ret->{'found'}->{'all-levels'}
     # the latter contains a recursive list of those
@@ -1023,9 +1037,13 @@ CSS and XPath selectors, to appear
 
     domops_wait_for_page_to_load()
 
-and the flag to denote verbosity (default is 0, no verbosity)
+=item verbosity value (default is 0, no verbosity)
 
-    $WWW::Mechanize::Chrome::DOMops::domops_VERBOSITY
+    $WWW::Mechanize::Chrome::DOMops::domops_VERBOSITY = 0;
+
+=item logger object (default logs to STDOUT/ERR)
+
+    $WWW::Mechanize::Chrome::DOMops::domops_LOGGER = Mojo::Log->new;
 
 =back
 
@@ -1399,7 +1417,25 @@ directly be passed on to L</domops_find($params)> and L</domops_zap($params)>.
 =head2 $WWW::Mechanize::Chrome::DOMops::domops_VERBOSITY
 
 Set this upon loading the module to C<0, 1, 2, 3>
-to adjust verbosity. C<0> implies no verbosity.
+to adjust verbosity. C<0> implies no verbosity and it is the default.
+
+=head2 $WWW::Mechanize::Chrome::DOMops::domops_LOGGER
+
+Set this upon loading the module to your own logger object
+which must implement 3 methods: C<error()>, C<warn()>, C<info()>.
+L<Mojo::Log> does implement the above 3 methods. But if you
+have a different object whose class implements these methods then
+pass it on! Even if your preferred logger object does not support
+these 3 methods, you can create a wrapper class around your
+preferred logger object to implement the 3 methods.
+
+Default is a L<Mojo::Log> object which logs to STDOUT/ERR,
+so you do not need to be concerned with this option at all.
+
+You may want to use your own logger if this module is called from
+another module which has its own logger and you want all
+logging to go to the same place. Or, you want to log to
+a file, e.g. C<$WWW::Mechanize::Chrome::DOMops::domops_LOGGER = Mojo::Log->new(path=>'xx.log');>
 
 
 =head1 ELEMENT SELECTORS

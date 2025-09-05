@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-JSON::Pointer::Marpa - Marpa::R2 based JSON Pointer RFC6901 implementation.
+JSON::Pointer::Marpa - Marpa::R2 based JSON Pointer RFC6901 implementation
 
 =head1 SYNOPSIS
 
@@ -35,7 +35,7 @@ error conditions is raised:
 
 =item * Currently referenced type '%s' isn't a JSON object!"
 
-=item * JSON array has been accessed with an index %i that is greater than or equal to the size of the array!
+=item * JSON array has been accessed with an index %d that is greater than or equal to the size of the array!
 
 =item * JSON object has been accessed with a member '%s' that does not exist!
 

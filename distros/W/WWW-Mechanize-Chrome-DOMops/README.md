@@ -4,7 +4,7 @@ WWW::Mechanize::Chrome::DOMops - Operations on the DOM loaded in Chrome
 
 # VERSION
 
-Version 0.12
+Version 0.13
 
 # SYNOPSIS
 
@@ -44,10 +44,16 @@ There is more information about this in section ["ELEMENT SELECTORS"](#element-s
 
 Here are some usage scenaria:
 
-      use WWW::Mechanize::Chrome::DOMops qw/domops_zap domops_find domops_VERBOSITY/;
+      use WWW::Mechanize::Chrome::DOMops qw/
+          domops_zap domops_find
+          $domops_VERBOSITY
+          $domops_LOGGER
+      /;
 
       # adjust verbosity: 0, 1, 2, 3
       $WWW::Mechanize::Chrome::domops_VERBOSITY = 3;
+      # optionally set our own logger instead of using default (to STDOUT/ERR)
+      $WWW::Mechanize::Chrome::domops_VERBOSITY = Mojo::Log->new(path=>'xx.log');
 
       # First, create a mech object and load a URL on it
       # Note: you need google-chrome binary installed in your system!
@@ -153,7 +159,7 @@ Here are some usage scenaria:
       # -1 indicates that javascript code executed correctly but
       # failed somewhere in its logic.
 
-      print "Found " . $ret->{'status'} . " matches which are: "
+      "Found " . $ret->{'status'} . " matches which are: ";
       # ... results are in $ret->{'found'}->{'first-level'}
       # ... and also in $ret->{'found'}->{'all-levels'}
       # the latter contains a recursive list of those
@@ -203,9 +209,13 @@ CSS and XPath selectors, to appear
 
         domops_wait_for_page_to_load()
 
-    and the flag to denote verbosity (default is 0, no verbosity)
+- verbosity value (default is 0, no verbosity)
 
-        $WWW::Mechanize::Chrome::DOMops::domops_VERBOSITY
+        $WWW::Mechanize::Chrome::DOMops::domops_VERBOSITY = 0;
+
+- logger object (default logs to STDOUT/ERR)
+
+        $WWW::Mechanize::Chrome::DOMops::domops_LOGGER = Mojo::Log->new;
 
 # SUBROUTINES/METHODS
 
@@ -534,7 +544,25 @@ directly be passed on to ["domops\_find($params)"](#domops_find-params) and ["do
 ## $WWW::Mechanize::Chrome::DOMops::domops\_VERBOSITY
 
 Set this upon loading the module to `0, 1, 2, 3`
-to adjust verbosity. `0` implies no verbosity.
+to adjust verbosity. `0` implies no verbosity and it is the default.
+
+## $WWW::Mechanize::Chrome::DOMops::domops\_LOGGER
+
+Set this upon loading the module to your own logger object
+which must implement 3 methods: `error()`, `warn()`, `info()`.
+[Mojo::Log](https://metacpan.org/pod/Mojo%3A%3ALog) does implement the above 3 methods. But if you
+have a different object whose class implements these methods then
+pass it on! Even if your preferred logger object does not support
+these 3 methods, you can create a wrapper class around your
+preferred logger object to implement the 3 methods.
+
+Default is a [Mojo::Log](https://metacpan.org/pod/Mojo%3A%3ALog) object which logs to STDOUT/ERR,
+so you do not need to be concerned with this option at all.
+
+You may want to use your own logger if this module is called from
+another module which has its own logger and you want all
+logging to go to the same place. Or, you want to log to
+a file, e.g. `$WWW::Mechanize::Chrome::DOMops::domops_LOGGER = Mojo::Log-`new(path=>'xx.log');>
 
 # ELEMENT SELECTORS
 

@@ -1,3 +1,5 @@
+# -*- indent-tabs-mode: nil -*-
+
 package #
 ToggleValue {
 
@@ -5,29 +7,29 @@ ToggleValue {
     use warnings;
 
     sub new {
-	my $class = shift;
-	my $obj = bless {}, $class;
-	my %opt = @_;
-	$obj->{VALUE} = $opt{value} // 1;
-	$obj->{CURRENT} = $obj->{INIT} = $opt{init} // 0;
-	$obj;
+        my $class = shift;
+        my $obj = bless {}, $class;
+        my %opt = @_;
+        $obj->{VALUE} = $opt{value} // 1;
+        $obj->{CURRENT} = $obj->{INIT} = $opt{init} // 0;
+        $obj;
     }
 
     sub toggle {
-	my $obj = shift;
-	my $prev = $obj->{CURRENT};
-	$obj->{CURRENT} ^= $obj->{VALUE};
-	$prev;
+        my $obj = shift;
+        my $prev = $obj->{CURRENT};
+        $obj->{CURRENT} ^= $obj->{VALUE};
+        $prev;
     }
 
     sub value {
-	my $obj = shift;
-	$obj->{CURRENT};
+        my $obj = shift;
+        $obj->{CURRENT};
     }
 
     sub reset {
-	my $obj = shift;
-	$obj->{CURRENT} = $obj->{INIT};
+        my $obj = shift;
+        $obj->{CURRENT} = $obj->{INIT};
     }
 
 }

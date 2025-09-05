@@ -1,24 +1,20 @@
 ---
-abstract: 'Marpa::R2 based JSON Pointer RFC6901 implementation.'
+abstract: 'Marpa::R2 based JSON Pointer RFC6901 implementation'
 author:
   - 'Sven Willenbuecher <sven.willenbuecher@gmx.de>'
 build_requires:
   ExtUtils::MakeMaker: '0'
   JSON::PP: '0'
   Test::Fatal: '0'
-  Test::Harness: '3.50'
   Test::More: '1.001005'
-  Test::Needs: '0'
 configure_requires:
-  Config: '0'
   ExtUtils::MakeMaker: '6.76'
   ExtUtils::MakeMaker::CPANfile: '0.09'
-  File::Spec::Functions: '0'
+  File::Spec: '0'
   strict: '0'
-  version: '0.9915'
   warnings: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.143240'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -31,7 +27,7 @@ no_index:
 provides:
   JSON::Pointer::Marpa:
     file: lib/JSON/Pointer/Marpa.pm
-    version: v1.0.2
+    version: v1.0.3
   JSON::Pointer::Marpa::Semantics:
     file: lib/JSON/Pointer/Marpa/Semantics.pm
 requires:
@@ -41,10 +37,8 @@ requires:
   perl: '5.010001'
   strict: '0'
   subs: '0'
-  version: '0.9915'
   warnings: '0'
 resources:
   bugtracker: https://github.com/XSven/JSON-Pointer-Marpa/issues
   repository: git://github.com/XSven/JSON-Pointer-Marpa.git
-version: 1.0.2
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: v1.0.3

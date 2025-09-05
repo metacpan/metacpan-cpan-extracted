@@ -1,5 +1,5 @@
 package Sys::Info::Device::CPU;
-$Sys::Info::Device::CPU::VERSION = '0.7808';
+$Sys::Info::Device::CPU::VERSION = '0.7810';
 use strict;
 use warnings;
 use subs qw(hyper_threading ht);
@@ -103,7 +103,7 @@ Sys::Info::Device::CPU
 
 =head1 VERSION
 
-version 0.7808
+version 0.7810
 
 =head1 SYNOPSIS
 

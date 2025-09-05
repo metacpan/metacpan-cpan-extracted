@@ -1,5 +1,5 @@
 package Sys::Info::Helper;
-$Sys::Info::Helper::VERSION = '0.7808';
+$Sys::Info::Helper::VERSION = '0.7810';
 use strict;
 use warnings;
 use parent qw(Exporter);
@@ -365,7 +365,7 @@ Sys::Info::Helper
 
 =head1 VERSION
 
-version 0.7808
+version 0.7810
 
 =head1 SYNOPSIS
 

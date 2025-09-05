@@ -1,0 +1,78 @@
+<5>[56266] [i] WWW::Mechanize::Chrome::Webshot::init_module_specific (via WWW::Mechanize::Chrome::Webshot::new), line 803 : called ...
+<5>[56266] [i] $VAR1 = {
+  "no_sandbox" => 0,
+  "launch_arg" => [
+    "--disable-hang-monitor",
+    "--disable-gpu",
+    "--disable-save-password-bubble",
+    "--disable-client-side-phishing-detection",
+    "--disable-component-update",
+    "--disable-popup-blocking",
+    "--disable-default-apps",
+    "--disable-background-networking",
+    "--disable-infobars",
+    "--window-size=2000,2000",
+    "--password-store=basic",
+    "--ignore-certificate-errors"
+  ],
+  "headless" => 1
+};
+WWW::Mechanize::Chrome::Webshot::launch_mech_obj (via WWW::Mechanize::Chrome::Webshot::init_module_specific), line 384 : instantiating a WWW::Mechanize::Chrome object with above parameters ...
+<5>[56266] [i] WWW::Mechanize::Chrome::Webshot::launch_mech_obj (via WWW::Mechanize::Chrome::Webshot::init_module_specific), line 394 : launched WWW::Mechanize::Chrome with the following parameters:
+$VAR1 = {
+  "no_sandbox" => 0,
+  "launch_arg" => [
+    "--disable-hang-monitor",
+    "--disable-gpu",
+    "--disable-save-password-bubble",
+    "--disable-client-side-phishing-detection",
+    "--disable-component-update",
+    "--disable-popup-blocking",
+    "--disable-default-apps",
+    "--disable-background-networking",
+    "--disable-infobars",
+    "--window-size=2000,2000",
+    "--password-store=basic",
+    "--ignore-certificate-errors",
+    "--remote-debugging-port=0",
+    "--remote-allow-origins=*",
+    "--remote-debugging-address=127.0.0.1",
+    "--no-first-run",
+    "--mute-audio",
+    "--no-default-browser-check",
+    "--no-sandbox",
+    "--safebrowsing-disable-auto-update",
+    "--disable-background-networking",
+    "--disable-background-timer-throttling",
+    "--disable-backgrounding-occluded-windows",
+    "--disable-breakpad",
+    "--disable-default-apps",
+    "--disable-dev-shm-usage",
+    "--disable-domain-reliability",
+    "--disable-gpu",
+    "--disable-ipc-flooding-protection",
+    "--disable-client-side-phishing-detection",
+    "--disable-component-update",
+    "--disable-hang-monitor",
+    "--disable-popup-blocking",
+    "--disable-prompt-on-repost",
+    "--disable-renderer-backgrounding",
+    "--disable-sync",
+    "--disable-translate",
+    "--disable-web-resources",
+    "--headless",
+    "about:blank"
+  ],
+  "headless" => 1
+};
+
+--- end mech launch parameters.
+<5>[56266] [i] WWW::Mechanize::Chrome::Webshot::init_module_specific (via WWW::Mechanize::Chrome::Webshot::new), line 824 :  has been initialised ...
+<5>[56266] [i] WWW::Mechanize::Chrome::Webshot::new (via N/A), line 127 : done, success (verbosity is set to 10 and cleanup to 1).
+<5>[56266] [i] WWW::Mechanize::Chrome::Webshot::shoot (via N/A), line 224 : allowing settle time of 10 seconds.
+<5>[56266] [i] WWW::Mechanize::Chrome::Webshot::shoot (via N/A), line 226 : woke up after settle time of 10 seconds.
+<5>[56266] [i] WWW::Mechanize::Chrome::Webshot::shoot (via N/A), line 259 : taking a screenshot and dumping it to file '902.png' ...
+<5>[56266] [i] $VAR1 = {
+  "created" => "bliako"
+};
+WWW::Mechanize::Chrome::Webshot::shoot (via N/A), line 305 : above exif data was inserted into the screenshot image '902.png' ...

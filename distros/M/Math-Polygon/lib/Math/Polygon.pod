@@ -6,21 +6,25 @@ Math::Polygon - Class for maintaining polygon data
 
 =head1 SYNOPSIS
 
- my $poly = Math::Polygon->new( [1,2], [2,4], [5,7], [1,2] );
- print $poly->nrPoints;
- my @p    = $poly->points;
+  my $poly = Math::Polygon->new( [1,2], [2,4], [5,7], [1,2] );
+  print $poly->nrPoints;
+  my @p    = $poly->points;
 
- my ($xmin, $ymin, $xmax, $ymax) = $poly->bbox;
+  my ($xmin, $ymin, $xmax, $ymax) = $poly->bbox;
 
- my $area   = $poly->area;
- my $l      = $poly->perimeter;
- if($poly->isClockwise) { ... };
- 
- my $rot    = $poly->startMinXY;
- my $center = $poly->centroid;
- if($poly->contains($point)) { ... };
+  my $area   = $poly->area;
+  my $l      = $poly->perimeter;
+  if($poly->isClockwise) { ... };
 
- my $boxed  = $poly->lineClip($xmin, $xmax, $ymin, $ymax);
+  my $rot    = $poly->startMinXY;
+  my $center = $poly->centroid;
+  if($poly->contains($point)) { ... };
+
+  my $boxed  = $poly->lineClip($xmin, $xmax, $ymin, $ymax);
+
+  # [2.00] Stack-trace for errors, add this to your script
+  # to see where your math goes wrong:
+  use Log::Report mode => "DEBUG";
 
 =head1 DESCRIPTION
 
@@ -28,9 +32,13 @@ This class provides an Object Oriented interface around
 L<Math::Polygon::Calc|Math::Polygon::Calc>, L<Math::Polygon::Clip|Math::Polygon::Clip>, and other.  Together,
 these modules provide basic transformations on 2D polygons in pure perl.
 
-B<WARNING:> these computations may show platform dependent rounding
+B<WARNING:> These computations may show platform dependent rounding
 differences.  These may also originate from compilation options of
 the Perl version you installed.
+
+B<TIP:> When you need better accuracy, you may use Math::BigFloat to
+represent coordinate values.  Of course, this has a considerable price
+in performance.
 
 =head1 METHODS
 
@@ -38,12 +46,10 @@ the Perl version you installed.
 
 =over 4
 
-=item $obj-E<gt>B<new>(%options, [@points], %options)
+=item $any-E<gt>B<new>(%options, [@points], %options)
 
-=item Math::Polygon-E<gt>B<new>(%options, [@points], %options)
-
-You may add %options before and/or after the @points.  You may also use
-the "points" option to set the points.  Each point in @points is
+You may add C<%options> before and/or after the C<@points>.  You may also use
+the "points" option to set the points.  Each point in C<@points> is
 (a references) to an ARRAY with two elements: an X and a Y coordinate.
 
 When C<new()> is called as instance method, it is believed that the
@@ -61,7 +67,7 @@ overruled.
 =item bbox => [$xmin,$ymin, $xmax,$ymax]
 
 Usually computed from the shape automatically, but can also be
-overruled. See L<bbox()|Math::Polygon/"Geometry">.
+overruled (for instance because it is already known). See L<bbox()|Math::Polygon/"Geometry">.
 
 =item clockwise => BOOLEAN
 
@@ -76,10 +82,10 @@ See L<points()|Math::Polygon/"Attributes"> and L<nrPoints()|Math::Polygon/"Attri
 
 example: creation of new polygon
 
- my $p = Math::Polygon->new([1,0],[1,1],[0,1],[0,0],[1,0]);
+  my $p = Math::Polygon->new([1,0],[1,1],[0,1],[0,0],[1,0]);
 
- my @p = ([1,0],[1,1],[0,1],[0,0],[1,0]);
- my $p = Math::Polygon->new(points => \@p);
+  my @p = ([1,0],[1,1],[0,1],[0,0],[1,0]);
+  my $p = Math::Polygon->new(points => \@p);
 
 =back
 
@@ -93,12 +99,13 @@ Returns the number of points,
 
 =item $obj-E<gt>B<order>()
 
-Returns the number of (unique?) points: one less than L<nrPoints()|Math::Polygon/"Attributes">.
+Returns the number of (unique?) points: one less than L<nrPoints()|Math::Polygon/"Attributes">
+because we (usually) have a closed polygon.
 
 =item $obj-E<gt>B<point>( $index, [$index,...] )
 
-Returns the point with the specified $index or INDEXES.  In SCALAR context,
-only the first $index is used.
+Returns the point with the specified C<$index> or INDEXES.  In SCALAR context,
+only the first C<$index> is used.
 
 example: 
 
@@ -110,8 +117,8 @@ example:
 In LIST context, the points are returned as list, otherwise as
 reference to an ARRAY of points.
 
-[1.09] When a FORMAT is given, each coordinate will get processed.
-This may be useful to hide platform specific rounding errors.  FORMAT
+[1.09] When a C<FORMAT> is given, each coordinate will get processed.
+This may be useful to hide platform specific rounding errors.  C<FORMAT>
 may be a CODE reference or a C<printf()> alike string.
 See L<Math::Polygon::Calc::polygon_format()|Math::Polygon::Calc/"FUNCTIONS">.
 
@@ -160,11 +167,10 @@ Returns a new, beautified version of this polygon.
 Function L<Math::Polygon::Calc::polygon_beautify()|Math::Polygon::Calc/"FUNCTIONS">.
 
 Polygons, certainly after some computations, can have a lot of horrible
-artifacts: points which are double, spikes, etc.  This functions provided
-by this module beautify them.  A new polygon is returned.
+artifacts: points which are double, spikes, etc.
 
  -Option       --Default
-  remove_spikes  <false>
+  remove_spikes  false
 
 =over 2
 
@@ -172,11 +178,26 @@ by this module beautify them.  A new polygon is returned.
 
 =back
 
-=item $obj-E<gt>B<centroid>()
+=item $obj-E<gt>B<centroid>(%options)
 
 Returns the centroid location of the polygon.  The last point of the list
 must be the same as the first to produce a correct result.  The computed
 result is cached.  Function L<Math::Polygon::Calc::polygon_centroid()|Math::Polygon::Calc/"FUNCTIONS">.
+
+B<Be aware> that this algorithm does not like very flat polygons.
+
+ -Option  --Default
+  is_large  false
+
+=over 2
+
+=item is_large => BOOLEAN
+
+[2.00] When the polygon is large with respect to its distance to the
+origin, we do not need to be afraid for rounding errors.  When set,
+the calculation will be a bit faster.
+
+=back
 
 example: 
 
@@ -209,10 +230,11 @@ example:
 [1.05] Returns the distance of the point to the closest point on the border of
 the polygon, zero if the point is on an edge.
 
-=item $obj-E<gt>B<equal>( <$other | \@points,[$tolerance]> | $points )
+=item $obj-E<gt>B<equal>(($other|\@points, [$tolerance]) | @points)
 
-Compare two polygons, on the level of points. When the polygons are
-the same but rotated, this will return false. See L<same()|Math::Polygon/"Geometry">.
+Compare two polygons on the level of C<@points>. When the polygons are
+the same but rotated or mirrored, this returns C<false>. See L<same()|Math::Polygon/"Geometry"> for
+the more thorrow (and expensive) comparison.
 Function L<Math::Polygon::Calc::polygon_equal()|Math::Polygon::Calc/"FUNCTIONS">.
 
 example: 
@@ -233,7 +255,7 @@ example:
 
 =item $obj-E<gt>B<isClosed>()
 
-Returns true if the first point of the poly definition is the same
+Returns C<true> if the first point of the poly definition is the same
 as the last point.
 
 =item $obj-E<gt>B<perimeter>()
@@ -245,14 +267,14 @@ Function L<Math::Polygon::Calc::polygon_perimeter()|Math::Polygon::Calc/"FUNCTIO
 
 example: 
 
- my $fence = $poly->perimeter;
- print "fence length: $fence $poly_units\n"
+  my $fence = $poly->perimeter;
+  print "fence length: $fence $poly_units\n"
 
-=item $obj-E<gt>B<same>( <$other_polygon | \@points, [$tolerance]> | @points )
+=item $obj-E<gt>B<same>(($other|\@points, [$tolerance]) | @points)
 
-Compare two polygons, where the polygons may be rotated wrt each
-other. This is (much) slower than L<equal()|Math::Polygon/"Geometry">, but some algorithms
-will cause un unpredictable rotation in the result.
+[1.12] Compare two polygons, where the polygons may be rotated or
+mirrored wrt each other. This is (much) slower than L<equal()|Math::Polygon/"Geometry">, but
+some algorithms will cause un unpredictable rotation in the result.
 Function L<Math::Polygon::Calc::polygon_same()|Math::Polygon::Calc/"FUNCTIONS">.
 
 example: 
@@ -264,7 +286,7 @@ example:
 =item $obj-E<gt>B<startMinXY>()
 
 Returns a new polygon object, where the points are rotated in such a way
-that the point which is losest to the left-bottom point of the bounding
+that the point which is closest to the left-bottom point of the bounding
 box has become the first.
 
 Function L<Math::Polygon::Calc::polygon_start_minxy()|Math::Polygon::Calc/"FUNCTIONS">.
@@ -275,7 +297,7 @@ Function L<Math::Polygon::Calc::polygon_start_minxy()|Math::Polygon::Calc/"FUNCT
 
 Implemented in L<Math::Polygon::Transform|Math::Polygon::Transform>: changes on the structure of
 the polygon except clipping.  All functions return a new polygon object
-or undef.
+or C<undef>.
 
 =over 4
 
@@ -304,7 +326,7 @@ Some programs call this "flip" or "flop".
 
  -Option--Default
   b       0
-  line    <undef>
+  line    <C<undef>>
   rc      undef
   x       undef
   y       undef
@@ -458,17 +480,17 @@ Removing points will change the area of the polygon.
 
 Clipping a polygon into rectangles can be done in various ways.
 With this algorithm, the parts of the polygon which are outside
-the $box are mapped on the borders.  The polygon stays in one piece,
+the C<$box> are mapped on the borders.  The polygon stays in one piece,
 but may have vertices which are followed in two directions.
 
 Returned is one polygon, which is cleaned from double points,
 spikes and superfluous intermediate points, or C<undef> when
-no polygon is outside the $box.
+no polygon is outside the C<$box>.
 Function L<Math::Polygon::Clip::polygon_fill_clip1()|Math::Polygon::Clip/"FUNCTIONS">.
 
 =item $obj-E<gt>B<lineClip>($box)
 
-Returned is a list of ARRAYS-OF-POINTS containing line pieces
+Returned is a LIST of ARRAYS-of-points containing line pieces
 from the input polygon.
 Function L<Math::Polygon::Clip::polygon_line_clip()|Math::Polygon::Clip/"FUNCTIONS">.
 
@@ -482,21 +504,22 @@ Function L<Math::Polygon::Clip::polygon_line_clip()|Math::Polygon::Clip/"FUNCTIO
 
 Print the polygon.
 
-[1.09] When a FORMAT is specified, all coordinates will get formatted
+[1.09] When a C<FORMAT> is specified, all coordinates will get formatted
 first.  This may hide platform dependent rounding differences.
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Math-Polygon distribution version 1.11,
-built on May 02, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Math-Polygon version 2.00,
+built on September 04, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2004-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2004-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

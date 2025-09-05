@@ -27,6 +27,7 @@ my %WriteMakefileArgs = (
     BUILD_REQUIRES => {
     },
     TEST_REQUIRES => {
+	'Mojo::Log' => '0',
 	'Data::Roundtrip' => '0.30',
 	'File::Spec' => '0',
 	'FindBin' => '0',
@@ -37,6 +38,7 @@ my %WriteMakefileArgs = (
 	'WWW::Mechanize::Chrome' => '0',
     },
     PREREQ_PM => {
+	'Mojo::Log' => '0',
 	'Data::Roundtrip' => '0.30',
 	'String::Escape' => '0',
 	'Exporter' => '0',

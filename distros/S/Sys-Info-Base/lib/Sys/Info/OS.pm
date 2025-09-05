@@ -1,5 +1,5 @@
 package Sys::Info::OS;
-$Sys::Info::OS::VERSION = '0.7808';
+$Sys::Info::OS::VERSION = '0.7810';
 use strict;
 use warnings;
 use subs qw( LC_TYPE  );
@@ -11,6 +11,11 @@ use Sys::Info::Constants qw( OSID  );
 
 use constant TARGET_CLASS => __PACKAGE__->load_subclass('Sys::Info::Driver::%s::OS');
 use parent TARGET_CLASS;
+
+use constant {
+    LOCALHOST_IP      => '127.0.0.1',
+    RE_IS_JUNK_DEVICE => qr{ docker[0-9]+ }xms,
+};
 
 my $POSIX;
 
@@ -97,9 +102,39 @@ sub meta {
 sub ip {
     my $self   = shift;
     my $hostip = Sys::HostIP->new;
-    my $ip     = $hostip->ip;;
-    $ip = $self->SUPER::_ip()
-        if $ip && $ip =~ m{ \A 127 }xms && $self->SUPER::can('_ip');
+    my $int    = $hostip->interfaces;
+
+    my $ip;
+    if ( my $eth = $int->{eth0} ) {
+        $ip = $eth;
+    }
+    else {
+        my @devs = keys %{ $int };
+
+        my @junk_keys = grep {
+            $_ =~ RE_IS_JUNK_DEVICE
+        } @devs;
+
+        delete @{ $ip }->{ @junk_keys}
+            if @junk_keys;
+
+        for my $type ( keys %{ $int } ) {
+            if ( $int->{ $type } eq LOCALHOST_IP ) {
+                delete $int->{ $type };
+            }
+        }
+
+        if ( my $i_feel_lucky = $devs[ rand @devs ] ) {
+            $ip = $int->{ $i_feel_lucky };
+        }
+    }
+
+    if (
+            $ip && $ip =~ m{ \A 127 }xms
+        &&  $self->SUPER::can('_ip')
+    ) {
+        $ip = $self->SUPER::_ip()
+    }
     return $ip;
 }
 
@@ -121,7 +156,7 @@ Sys::Info::OS
 
 =head1 VERSION
 
-version 0.7808
+version 0.7810
 
 =head1 SYNOPSIS
 

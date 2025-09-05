@@ -9,7 +9,7 @@ use warnings;
 
 #use utf8;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use Test::More;
 use Test::More::UTF8;
@@ -38,23 +38,31 @@ ok(-f $configfile, "config file exists ($configfile).") or BAIL_OUT;
 # sicily
 my $URL = 'https://www.google.com/maps/@38.093577,13.444609,16z';
 
-my $LOGFILE = File::Spec->catfile($tmpdir, 'otpclient.log');
+my $LOGFILE = File::Spec->catfile($tmpdir, 'webshot.log');
 my $log = Mojo::Log->new(path => $LOGFILE);
 
 my $cparams = {
 	'configfile' => $configfile,
 #	'verbosity' => $VERBOSITY, # use config's
 	'cleanup' => $CLEANUP,
-	'logger' => $log,
+	'logger-object' => $log,
 	'launch-mech-on-demand' => 1,
 };
 
 my $client = WWW::Mechanize::Chrome::Webshot->new($cparams);
 ok(defined($client), 'WWW::Mechanize::Chrome::Webshot->new()'." : called and got defined result.") or BAIL_OUT;
-$client->log->info("testing!");
+$client->log->info("testing hahaha 123-info!");
+$client->log->error("testing hahaha 123-error!");
+$client->log->warn("testing hahaha 123-warn!");
 ok(-f $LOGFILE, 'WWW::Mechanize::Chrome::Webshot->new()'." : output log file exists ($LOGFILE).") or BAIL_OUT;
 ok(! -z $LOGFILE, 'WWW::Mechanize::Chrome::Webshot->new()'." : output log file exists ($LOGFILE) and it is not empty.") or BAIL_OUT;
-
+# and make sure we have logged the above
+my ($FH, $contents);
+ok(open($FH, '<', $LOGFILE), "Logfile '$LOGFILE' opened for reading.") or BAIL_OUT("no, it failed to open for reading: $!");
+{ local $/ = undef; $contents = <$FH> } close $FH;
+for ('info', 'error', 'warn'){
+	ok($contents=~/testing hahaha 123-${_}\!/, "Logfile '$LOGFILE' contains logged text for mode '$_'.") or BAIL_OUT("${contents}\nno, see above what it contains (file '$LOGFILE').");
+}
 # you need to make $mech out of scope so that next use
 # is not confused (with already running mech)
 $client->shutdown;
@@ -164,7 +172,7 @@ $client->shutdown;
 
 # try with a config string
 my $configstring = <<'EOCS';
-</* $VERSION = '0.04'; */>
+</* $VERSION = '0.05'; */>
 </* comments are allowed */>
 </* and <% vars %> and <% verbatim sections %> */>
 {
@@ -212,7 +220,7 @@ $cparams = {
 	'configstring' => $configstring,
 #	'verbosity' => $VERBOSITY, # use config's
 	'cleanup' => $CLEANUP,
-	'logger' => $log,
+	'logger-object' => $log,
 	'launch-mech-on-demand' => 1,
 };
 

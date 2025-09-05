@@ -1,34 +1,47 @@
 use strict;
 use warnings;
 
-use Config                        qw( %Config );
-use File::Spec::Functions         qw( catfile );
-use ExtUtils::MakeMaker::CPANfile qw( WriteMakefile );
+use ExtUtils::MakeMaker::CPANfile
+  ;    # do not supply an empty list because import() has to be called
+use File::Spec::Functions qw( catfile );
 
 my @main_module_namespace = qw( JSON Pointer Marpa );
-my $version               = '1.0.2';
-my $release_status        = 'stable';                   # transition: unstable => testing => stable
+my $release_status = 'stable';    # transition: unstable => testing => stable
 
 my $distname            = join '-',  @main_module_namespace;
 my $main_module         = join '::', @main_module_namespace;
 my $main_module_file    = catfile( @main_module_namespace ) . '.pm';
 my $main_module_podfile = catfile( @main_module_namespace ) . '.pod';
-my %WriteMakefileArgs   = (
-  NAME             => $main_module,
-  AUTHOR           => 'Sven Willenbuecher <sven.willenbuecher@gmx.de>',
-  VERSION_FROM     => catfile( 'lib', $main_module_file ),
-  ABSTRACT_FROM    => catfile( 'lib', $main_module_podfile ),
-  LICENSE          => 'Perl_5',
+# we are not using
+# VERSION_FROM  => catfile( 'lib', $main_module_file )
+# because we have to set the main module version in META_MERGE/provides too
+my $main_module_version =
+  MM->parse_version( catfile( 'lib', $main_module_file ) );
+
+my %att = (
+  NAME          => $main_module,
+  AUTHOR        => 'Sven Willenbuecher <sven.willenbuecher@gmx.de>',
+  VERSION       => $main_module_version,
+  ABSTRACT_FROM => catfile( 'lib', $main_module_podfile ),
+  # another valid license string is "restricted"
+  # https://metacpan.org/pod/CPAN::Meta::Spec#license
+  LICENSE          => 'perl_5',
   MIN_PERL_VERSION => '5.10.1',
-  META_MERGE       => {
-    'meta-spec' => { version => 2 },
-    provides    => {
+  # safe naming of custom arguments passed to Makefile.PL
+  # https://github.com/Perl-Toolchain-Gang/ExtUtils-MakeMaker/issues/470
+  DISTVNAME => "$distname-$main_module_version"
+    . ( $release_status ne 'stable' ? '-TRIAL1' : '' )
+  ,    # related to the below release_status metadata field
+  META_MERGE => {
+    'meta-spec'    => { version => 2 },
+    release_status => $release_status,
+    provides       => {
       $main_module => {
         file    => catfile( 'lib', $main_module_file ),
-        version => $version
+        version => $main_module_version
       },
       join( '::', $main_module, 'Semantics' ) => {
-        file => 'lib/JSON/Pointer/Marpa/Semantics.pm',
+        file => catfile( 'lib', @main_module_namespace, 'Semantics' ) . '.pm'
       }
     },
     resources => {
@@ -42,11 +55,23 @@ my %WriteMakefileArgs   = (
       }
     }
   },
-  clean     => { FILES                => "$distname* cover_db" },
-  dist      => { TARFLAGS             => 'cf', COMPRESS => 'gzip -9f', SUFFIX => 'gz' },
-  realclean => { FILES                => 'local' },
+  # check ExtUtils::MakeMaker Changes
+  NORECURS  => 1,
+  clean     => { FILES    => "$distname*" },
+  dist      => { TARFLAGS => 'cf', COMPRESS => 'gzip -9f', SUFFIX => 'gz' },
+  realclean => { FILES    => 'local' },
   test      => { RECURSIVE_TEST_FILES => 1 }
 );
 
-no warnings qw( void );
-caller() ? \%WriteMakefileArgs : WriteMakefile( %WriteMakefileArgs )
+# Makefile.PL as a modulino
+# https://www.masteringperl.org/2015/01/makefile-pl-as-a-modulino/
+if ( caller() ) {
+  no warnings qw( redefine );
+  # redefine ExtUtils::MakeMaker::WriteMakefile() to echo its atributes
+  *ExtUtils::MakeMaker::WriteMakefile = sub {
+    +{ @_ }    # \%att
+  };
+  # re-trigger the ExtUtils::MakeMaker::WriteMakefile() modification
+  ExtUtils::MakeMaker::CPANfile->import
+}
+WriteMakefile( %att )

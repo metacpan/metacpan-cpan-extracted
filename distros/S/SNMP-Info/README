@@ -2,7 +2,7 @@ NAME
     SNMP::Info - OO Interface to Network devices and MIBs through SNMP
 
 VERSION
-    SNMP::Info - Version 3.972002
+    SNMP::Info - Version 3.973000
 
 AUTHOR
     SNMP::Info is maintained by team of Open Source authors headed by Eric
@@ -41,6 +41,11 @@ SYNOPSIS
                                 # AuthPass  => 'authp4ss',
                                 # PrivProto => 'DES',      # DES|AES
                                 # PrivPass  => 'pr1vp4ss',
+
+                                # Rarer options - see https://metacpan.org/pod/SNMP for full list
+                                # Timeout => 15 * 1000000, # microseconds
+                                # RemotePort => 161,
+                                # NonIncreasing => 1
                                });
 
      my $err = $info->error();
@@ -738,6 +743,11 @@ SUBCLASSES
 
             See documentation in SNMP::Info::Layer3::DLink for details.
 
+        SNMP::Info::Layer3::EdgeSwitch
+            Subclass for Broadcom EdgeSwitch devices.
+
+            See documentation in SNMP::Info::Layer3::EdgeSwitch for details.
+
         SNMP::Info::Layer3::Enterasys
             Subclass for Enterasys devices.
 
@@ -1008,6 +1018,12 @@ SUBCLASSES
             Subclass for Citrix Netscaler appliances.
 
             See documentation in SNMP::Info::Layer7::Netscaler for details.
+
+        SNMP::Info::Layer7::Stormshield
+            Subclass for Stormshield Network Security appliances.
+
+            See documentation in SNMP::Info::Layer7::Stormshield for
+            details.
 
 Thanks
     Thanks for testing and coding help (in no particular order) to :

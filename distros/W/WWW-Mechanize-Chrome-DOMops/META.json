@@ -4,7 +4,7 @@
       "Andreas Hadjiprocopis <bliako@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -32,6 +32,7 @@
          "requires" : {
             "Data::Roundtrip" : "0.30",
             "Exporter" : "0",
+            "Mojo::Log" : "0",
             "String::Escape" : "0",
             "perl" : "5.006"
          }
@@ -42,6 +43,7 @@
             "File::Spec" : "0",
             "FindBin" : "0",
             "Log::Log4perl" : "0",
+            "Mojo::Log" : "0",
             "Test2::Plugin::UTF8" : "0",
             "Test::More" : "0",
             "Test::TempDir::Tiny" : "0",
@@ -50,6 +52,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.12",
+   "version" : "0.13",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

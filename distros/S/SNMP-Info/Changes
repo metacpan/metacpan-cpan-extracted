@@ -1,3 +1,13 @@
+Version 3.973000 (2025-09-04)
+
+  [NEW FEATURES]
+
+  * #550 Stormshield support
+
+  [ENHANCEMENTS]
+
+  * #546 Layer7::Neoteris improvments (@earendilfr)
+
 Version 3.972002 (2024-10-29)
 
   [BUG FIXES]

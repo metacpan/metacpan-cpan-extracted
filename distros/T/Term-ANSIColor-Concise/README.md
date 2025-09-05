@@ -15,13 +15,17 @@ Term::ANSIColor::Concise - Produce ANSI terminal sequence by concise notation
     say ansi_color('FUDI<Gold>/L10E',
                    'Flashing Underlined Bold Italic Gold on Gray10 Bar');
 
+    say ansi_color('<red>+l20-s10', 'Lightened desaturated red');
+    say ansi_color('hsl(240,100,50)=y70c', 'Blue set to 70% luminance then complemented');
+    say ansi_color('lab(50,20,-30)+h60', 'Lab color with hue shifted 60 degrees');
+
 <div>
     <p><img width="750" src="https://raw.githubusercontent.com/tecolicom/Term-ANSIColor-Concise/main/images/synopsis.png">
 </div>
 
 # VERSION
 
-Version 2.0201
+Version 3.01
 
 # DESCRIPTION
 
@@ -30,7 +34,50 @@ colors and effects for ANSI terminals.  These notations are supposed to
 be used in command line option parameters.
 
 This module used to be a part of [Getopt::EX::Colormap](https://metacpan.org/pod/Getopt%3A%3AEX%3A%3AColormap) module, which
-provide easy handling interface for command line options.
+provides an easy handling interface for command line options.
+
+## COLOR SPECIFICATIONS
+
+Colors can be specified using various formats and color spaces:
+
+### RGB Colors
+
+- Hexadecimal format
+
+        FF0000        # Red (6 digits)
+        #F00          # Red (3 digits)
+        #FF0000       # Red (with # prefix)
+
+- Decimal format  
+
+        rgb(255,0,0)  # Red using RGB values (0-255)
+        (255,0,0)     # Red (rgb prefix optional)
+
+### Other Color Spaces
+
+- HSL (Hue, Saturation, Lightness)
+
+        hsl(0,100,50)     # Red: hue=0°, saturation=100%, lightness=50%
+        hsl(120,100,50)   # Green: hue=120°, saturation=100%, lightness=50%
+        hsl(240,100,50)   # Blue: hue=240°, saturation=100%, lightness=50%
+
+- LCH (Lightness, Chroma, Hue) - CIE LCHab
+
+        lch(50,130,0)     # Red: lightness=50, chroma=130, hue=0°
+        lch(87,119,136)   # Green: lightness=87, chroma=119, hue=136°
+        lch(32,133,306)   # Blue: lightness=32, chroma=133, hue=306°
+
+- Lab (Lightness, a\*, b\*) - CIE Lab
+
+        lab(50,68,48)     # Red: L*=50, a*=68, b*=48
+        lab(87,-79,80)    # Green: L*=87, a*=-79, b*=80  
+        lab(32,79,-108)   # Blue: L*=32, a*=79, b*=-108
+
+### Named Colors
+
+    <red>             # Named color (see COLOR NAMES section)
+    <lightblue>       # Color name with modifier
+    <gray50>          # Grayscale levels
 
 ## 256 or 24bit COLORS
 
@@ -38,67 +85,84 @@ By default, this library produces ANSI 256 color sequence.  That is
 eight standard colors, eight high intensity colors, 6x6x6 216 colors,
 and gray scales in 24 steps.
 
-Color described by 12bit/24bit RGB values are converted to 6x6x6 216
-colors, or 24 gray scales if all RGB values are same.
+Colors described by 12bit/24bit RGB values are converted to 6x6x6 216
+colors, or 24 gray scales if all RGB values are the same.
 
 For a terminal which can display 24bit colors, full-color sequence can
 be produced.  See ["ENVIRONMENT"](#environment) section.
 
 # FUNCTION
 
-- **ansi\_color**(_spec_, _text_)
+- **ansi\_color**(_spec_, _text_, ...)
 
-    Return colorized version of given text.  Produces 256 or 24bit colors
+    Returns the colorized version of the given text.  Produces 256 or 24bit colors
     depending on the setting.
 
-    In the result, given _text_ is enclosed by appropriate open/close
-    sequences.  Close sequence can vary according to the open sequence.
+    In the result, the given _text_ is enclosed by appropriate open/close
+    sequences.  The close sequence can vary according to the open sequence.
     See ["RESET SEQUENCE"](#reset-sequence) section.
 
-    If the _text_ already includes colored regions, they remain untouched
-    and only non-colored parts are colored.
+    If _text_ already contains colored areas, the color specifications
+    are applied accumulatively. For example, if an underline instruction
+    is given for a string of red text, both specifications will be in
+    effect.
 
-    Actually, _spec_ and _text_ pair can be repeated as many as
-    possible.  It is same as calling the function multiple times with
-    single pair and join results.
+    The _spec_ and _text_ pairs can be repeated any number of times. In
+    scalar context, the results from each pair are returned as a
+    concatenated string. When used in array context, results are
+    returned as a list.
 
 - **ansi\_color**(\[ _spec1_, _spec2_, ... \], _text_)
 
-    If _spec_ parameter is ARRAYREF, multiple _spec_s can be specified
-    at once.  This is not useful for color spec because they can be simply
-    joined, but may be useful when mixed with ["FUNCTION SPEC"](#function-spec).
+    If the _spec_ parameter is an ARRAYREF, multiple _spec_s can be specified
+    at once.  This is not useful for text color specs because they can be
+    simply joined, but may be useful when mixed with ["FUNCTION SPEC"](#function-spec).
 
 - **ansi\_color\_24**(_spec_, _text_)
 - **ansi\_color\_24**(\[ _spec1_, _spec2_, ... \], _text_)
 
-    Function **ansi\_color\_24** always produces 24bit color sequence for
-    12bit/24bit color spec.
+    Function **ansi\_color\_24** always produces 24bit color sequences for
+    12bit/24bit color specs.
 
 - **cached\_ansi\_color**(_cache_, _spec_, _text_)
 
-    Backend interface for **ansi\_color**.  First parameter is a hash object
-    used to cache data.  If you concern about cache mismatch situation,
-    use this interface with original cache.
+    Backend interface for **ansi\_color**.  The first parameter is a hash object
+    used to cache data.  If you are concerned about cache mismatch situations,
+    use this interface with an original cache.
 
 - **ansi\_pair**(_color\_spec_)
 
-    Produces introducer and recover sequences for given spec.
+    Produces introducer and recovery sequences for the given spec.
 
-    Additional third value indicates if the introducer includes Erase Line
-    sequence.  It gives a hint the sequence is necessary for empty string.
+    An additional third value indicates if the introducer includes an Erase Line
+    sequence.  This gives a hint that the sequence is necessary for empty strings.
     See ["RESET SEQUENCE"](#reset-sequence).
 
 - **ansi\_code**(_color\_spec_)
 
-    Produces introducer sequence for given spec.  Reset code can be taken
+    Produces introducer sequence for the given spec.  Reset code can be obtained
     by **ansi\_code("Z")**.
 
 - **csi\_code**(_name_, _params_)
 
     Produce CSI (Control Sequence Introducer) sequence by name with
-    numeric parameters.  Parameter _name_ is one of standard (CUU, CUD,
-    CUF, CUB, CNL, CPL, CHA, CUP, ED, EL, SU, SD, HVP, SGR, SCP, RCP) or
-    non-standard (RIS, DECSC, DECRC).
+    numeric parameters.  Parameter _name_ is one of standard (ICH, CUU,
+    CUD, CUF, CUB, CNL, CPL, CHA, CUP, ED, EL, IL, DL, DCH, SU, SD, ECH,
+    VPA, VPR, HVP, SGR, DSR, SCP, RCP) or non-standard (CPR, STBM, CSI,
+    OSC, RIS, DECSC, DECRC, DECEC, DECDC).
+
+- **csi\_report**(_name_, _n_, _string_)
+
+    Extracts parameters from the response string returned from the
+    terminal.  _n_ specifies the number of parameters included in the
+    response.
+
+    Currently, only `CPR` (Cursor Position Report) is effective as
+    _name_.  The current cursor position can be obtained from the
+    response string resulting from the `DSR` (Device Status Report)
+    sequence as follows.
+
+        my($line, $column) = csi_report('CPR', 2, $answer);
 
 # COLOR SPEC
 
@@ -212,6 +276,7 @@ section for detail.
 Native CSI (Control Sequence Introducer) sequences in the form of
 `{NAME}`.
 
+    ICH n   Insert Character
     CUU n   Cursor up
     CUD n   Cursor Down
     CUF n   Cursor Forward
@@ -222,12 +287,25 @@ Native CSI (Control Sequence Introducer) sequences in the form of
     CUP n,m Cursor Position
     ED  n   Erase in Display (0 after, 1 before, 2 entire, 3 w/buffer)
     EL  n   Erase in Line (0 after, 1 before, 2 entire)
+    IL  n   Insert Line
+    DL  n   Delete Line
+    DCH n   Delete Character (scroll rest to left)
     SU  n   Scroll Up
     SD  n   Scroll Down
+    ECH n   Erase Character
+    VPA n   Vertical Position Absolute
+    VPR n   Vertical Position Relative
     HVP n,m Horizontal Vertical Position
     SGR n*  Select Graphic Rendition
+    DSR n   Device Status Report (6 cursor position)
     SCP     Save Cursor Position
     RCP     Restore Cursor Position
+
+And there are some non-standard CSI sequences.
+
+    CPR  n,m Cursor Position Report – VT100 to Host
+    STBM n,m Set Top and Bottom Margins
+    SLRM n,m Set Left Right Margins
 
 These names can be followed by optional numerical parameters, using
 comma (`,`) or semicolon (`;`) to separate multiple ones, with
@@ -237,12 +315,18 @@ described as `{SGR1;30;48;5;224}` or more readable
 
 Some other escape sequences are supported in the form of `{NAME}`.
 These sequences do not start with CSI, and do not take parameters.
-VT100 compatible terminal usually support these, and does not support
-`SCP` and `RCP` CSI code.
+VT100 compatible terminals usually support these, and do not support
+`SCP` and `RCP` CSI codes.
 
-    RIS     Reset to Initial State
-    DECSC   DEC Save Cursor
-    DECRC   DEC Restore Cursor
+    CSI      Control Sequence Introducer
+    OSC      Operating System Command
+    RIS      Reset to Initial State
+    DECSC    DEC Save Cursor
+    DECRC    DEC Restore Cursor
+    DECEC    DEC Enable Cursor
+    DECDC    DEC Disable Cursor
+    DECELRM  DEC Enable Left Right Margin Mode
+    DECDLRM  DEC Disable Left Right Margin Mode
 
 ## EXAMPLES
 
@@ -254,74 +338,165 @@ VT100 compatible terminal usually support these, and does not support
     R/G  500/050  #F00/#0F0  #FF0000/#00FF00  <red>/<green>
     W/w  L03/L20  #333/#ccc  #333333/#cccccc  <gray20>/<gray80>
 
+# COLOR ADJUSTMENT
+
+Colors can be dynamically adjusted using modifier characters appended after 
+color specifications. These modifiers allow you to adjust various color 
+properties such as luminance, lightness, saturation, and hue.
+
+## MODIFIER SYNTAX
+
+Color modifiers use the format: `[OPERATION][PARAMETER][VALUE]`
+
+- **Operations**
+    - `+` - Add value (relative adjustment)
+    - `-` - Subtract value (relative adjustment)  
+    - `=` - Set absolute value
+    - `*` - Multiply by percentage (value/100)
+    - `%` - Modulo operation
+
+## ADJUSTABLE PARAMETERS
+
+- **l** - Lightness (HSL lightness: 0-100)
+
+        <red>+l10     # Increase red lightness by 10
+        <green>-l15   # Decrease green lightness by 15
+        <blue>=l75    # Set blue lightness to 75
+        <orange>*l120 # Multiply orange lightness by 1.2
+
+- **y** - Luminance (brightness perception: 0-100)
+
+        <red>+y10     # Increase red luminance by 10
+        <blue>-y20    # Decrease blue luminance by 20
+        <green>=y50   # Set green luminance to 50
+
+- **s** - Saturation (HSL saturation: 0-100)
+
+        <red>+s20     # Increase red saturation by 20
+        <yellow>-s30  # Decrease yellow saturation by 30
+        <magenta>=s0  # Set magenta saturation to 0 (grayscale)
+
+- **h** - Hue (HSL hue shift in degrees: 0-360)
+
+        <red>+h60     # Shift red hue by 60 degrees
+        <cyan>-h120   # Shift cyan hue by -120 degrees
+        <purple>=h180 # Set purple hue to 180 degrees
+
+- **c** - Complement (180 degree hue shift)
+
+        <red>c        # Get complement of red (cyan)
+
+- **r** - Rotate Hue (LCH hue rotation, preserving luminance)
+
+        <red>+r60     # Rotate red hue by 60 degrees in LCH space
+        <blue>=r180   # Rotate to 180 degrees (complement with luminance preserved)
+
+- **i** - Inverse (RGB inversion)
+
+        <red>i        # Invert red to cyan
+        <blue>i       # Invert blue to yellow
+
+- **g** - Luminance Grayscale (convert to grayscale using luminance)
+
+        <red>g        # Convert red to luminance-based grayscale
+
+- **G** - Lightness Grayscale (convert to grayscale using lightness)
+
+        <red>G        # Convert red to lightness-based grayscale
+
+The color adjustment functionality is implemented through the 
+[Term::ANSIColor::Concise::Transform](https://metacpan.org/pod/Term%3A%3AANSIColor%3A%3AConcise%3A%3ATransform) module and uses 
+[Term::ANSIColor::Concise::ColorObject](https://metacpan.org/pod/Term%3A%3AANSIColor%3A%3AConcise%3A%3AColorObject) for color space conversions.
+
 # COLOR NAMES
 
-Color names listed in [Graphics::ColorNames::X](https://metacpan.org/pod/Graphics%3A%3AColorNames%3A%3AX) module can be used.
-See [https://en.wikipedia.org/wiki/X11\_color\_names](https://en.wikipedia.org/wiki/X11_color_names).
+Color names listed in [Graphics::ColorNames::X](https://metacpan.org/pod/Graphics%3A%3AColorNames%3A%3AX) module can be used in
+the form of `<NAME>`.
 
-    aliceblue antiquewhite aqua aquamarine azure beige bisque black
-    blanchedalmond blue blueviolet brown burlywood cadetblue
-    chartreuse chocolate coral cornflowerblue cornsilk crimson cyan
-    darkolivegreen dimgray dimgrey dodgerblue firebrick floralwhite
-    forestgreen fuchsia gainsboro ghostwhite gold goldenrod gray green
-    greenyellow grey honeydew hotpink indianred indigo ivory khaki
-    lavender lavenderblush lawngreen lemonchiffon lightgoldenrodyellow
-    lime limegreen linen magenta maroon midnightblue mintcream
-    mistyrose moccasin navajowhite navy navyblue oldlace olive
-    olivedrab orange orangered orchid papayawhip peachpuff peru pink
-    plum powderblue purple rebeccapurple red rosybrown royalblue
-    saddlebrown salmon sandybrown seagreen seashell sienna silver
-    skyblue slateblue slategray slategrey snow springgreen steelblue
-    tan teal thistle tomato turquoise violet violetred webgray
-    webgreen webgrey webmaroon webpurple wheat white whitesmoke
-    x11gray x11green x11grey x11maroon x11purple yellow yellowgreen
+    aliceblue      antiquewhite   aqua         aquamarine
+    azure          beige          bisque       black
+    blanchedalmond blue           blueviolet   brown
+    burlywood      cadetblue      chartreuse   chocolate
+    coral          cornflowerblue cornsilk     crimson
+    cyan           darkolivegreen dimgray      dimgrey
+    dodgerblue     firebrick      floralwhite  forestgreen
+    fuchsia        gainsboro      ghostwhite   gold
+    goldenrod      gray           green        greenyellow
+    grey           honeydew       hotpink      indianred
+    indigo         ivory          khaki        lavender
+    lavenderblush  lawngreen      lemonchiffon lightgoldenrodyellow
+    lime           limegreen      linen        magenta
+    maroon         midnightblue   mintcream    mistyrose
+    moccasin       navajowhite    navy         navyblue
+    oldlace        olive          olivedrab    orange
+    orangered      orchid         papayawhip   peachpuff
+    peru           pink           plum         powderblue
+    purple         rebeccapurple  red          rosybrown
+    royalblue      saddlebrown    salmon       sandybrown
+    seagreen       seashell       sienna       silver
+    skyblue        slateblue      slategray    slategrey
+    snow           springgreen    steelblue    tan
+    teal           thistle        tomato       turquoise
+    violet         violetred      webgray      webgreen
+    webgrey        webmaroon      webpurple    wheat
+    white          whitesmoke     x11gray      x11green
+    x11grey        x11maroon      x11purple    yellow
+    yellowgreen
 
 In the above list, next colors have variants with prefix of `dark`,
 `light`, `medium`, `pale`, `deep`.
 
     aquamarine   medium_aquamarine
-    blue         dark_blue light_blue medium_blue
-    coral        light_coral
-    cyan         dark_cyan light_cyan
-    goldenrod    dark_goldenrod light_goldenrod pale_goldenrod
-    gray         dark_gray light_gray
-    green        dark_green light_green pale_green
-    grey         dark_grey light_grey
+    blue         dark_blue      light_blue       medium_blue
+    coral                       light_coral
+    cyan         dark_cyan      light_cyan
+    goldenrod    dark_goldenrod light_goldenrod  pale_goldenrod
+    gray         dark_gray      light_gray
+    green        dark_green     light_green      pale_green
+    grey         dark_grey      light_grey
     khaki        dark_khaki
     magenta      dark_magenta
     orange       dark_orange
-    orchid       dark_orchid medium_orchid
-    pink         deep_pink light_pink
-    purple       medium_purple
+    orchid       dark_orchid                     medium_orchid
+    pink         deep_pink      light_pink
+    purple                                       medium_purple
     red          dark_red
-    salmon       dark_salmon light_salmon
-    seagreen     dark_seagreen light_seagreen medium_seagreen
-    skyblue      deep_skyblue light_skyblue
-    slateblue    dark_slateblue light_slateblue medium_slateblue
+    salmon       dark_salmon    light_salmon
+    seagreen     dark_seagreen  light_seagreen   medium_seagreen
+    skyblue      deep_skyblue   light_skyblue
+    slateblue    dark_slateblue light_slateblue  medium_slateblue
     slategray    dark_slategray light_slategray
     slategrey    dark_slategrey light_slategrey
-    springgreen  medium_springgreen
-    steelblue    light_steelblue
+    springgreen                                  medium_springgreen
+    steelblue                   light_steelblue
     turquoise    dark_turquoise medium_turquoise pale_turquoise
     violet       dark_violet
-    violetred    medium_violetred pale_violetred
-    yellow       light_yellow
+    violetred                   medium_violetred pale_violetred
+    yellow                      light_yellow
 
-Next colors have four variants.  For example, color `brown` has
+The following colors have four variants.  For example, color `brown` has
 `brown1`, `brown2`, `brown3`, `brown4`.
 
-    antiquewhite aquamarine azure bisque blue brown burlywood
-    cadetblue chartreuse chocolate coral cornsilk cyan darkgoldenrod
-    darkolivegreen darkorange darkorchid darkseagreen darkslategray
-    deeppink deepskyblue dodgerblue firebrick gold goldenrod green
-    honeydew hotpink indianred ivory khaki lavenderblush lemonchiffon
-    lightblue lightcyan lightgoldenrod lightpink lightsalmon
-    lightskyblue lightsteelblue lightyellow magenta maroon
-    mediumorchid mediumpurple mistyrose navajowhite olivedrab orange
-    orangered orchid palegreen paleturquoise palevioletred peachpuff
-    pink plum purple red rosybrown royalblue salmon seagreen seashell
-    sienna skyblue slateblue slategray snow springgreen steelblue tan
-    thistle tomato turquoise violetred wheat yellow
+    antiquewhite   aquamarine     azure          bisque
+    blue           brown          burlywood      cadetblue
+    chartreuse     chocolate      coral          cornsilk
+    cyan           darkgoldenrod  darkolivegreen darkorange
+    darkorchid     darkseagreen   darkslategray  deeppink
+    deepskyblue    dodgerblue     firebrick      gold
+    goldenrod      green          honeydew       hotpink
+    indianred      ivory          khaki          lavenderblush
+    lemonchiffon   lightblue      lightcyan      lightgoldenrod
+    lightpink      lightsalmon    lightskyblue   lightsteelblue
+    lightyellow    magenta        maroon         mediumorchid
+    mediumpurple   mistyrose      navajowhite    olivedrab
+    orange         orangered      orchid         palegreen
+    paleturquoise  palevioletred  peachpuff      pink
+    plum           purple         red            rosybrown
+    royalblue      salmon         seagreen       seashell
+    sienna         skyblue        slateblue      slategray
+    snow           springgreen    steelblue      tan
+    thistle        tomato         turquoise      violetred
+    wheat          yellow
 
 `gray` and `grey` have 100 steps of variants.
 
@@ -333,11 +508,11 @@ for detail.
 
 # FUNCTION SPEC
 
-Color spec can be CODEREF or object.  If it is a CODEREF, that code is
-called with text as an argument, and return the result.
+Color spec can be a CODEREF or object.  If it is a CODEREF, that code is
+called with text as an argument, and returns the result.
 
-If it is an object which has method `call`, it is called with the
-variable `$_` set as target text.
+If it is an object which has a method `call`, it is called with the
+variable `$_` set as the target text.
 
 # RESET SEQUENCE
 
@@ -346,26 +521,26 @@ from colored text.  This is preferable to clear background color set
 by scrolling in the middle of colored text at the bottom of the
 terminal.
 
-However, on some terminal, including Apple\_Terminal, _Erase Line_
-sequence clear the text on the cursor position when it is at the
-rightmost column of the screen.  In other words, rightmost character
-sometimes mysteriously disappear when it is the last character in the
-colored region.  If you do not like this behavior, set module variable
-`$NO_RESET_EL` or `ANSICOLOR_NO_RESET_EL` environment.
+However, on some terminals, including Apple\_Terminal, the _Erase Line_
+sequence clears the text at the cursor position when it is at the
+rightmost column of the screen.  In other words, the rightmost character
+sometimes mysteriously disappears when it is the last character in the
+colored region.  If you do not like this behavior, set the module variable
+`$NO_RESET_EL` or the `ANSICOLOR_NO_RESET_EL` environment variable.
 
-_Erase Line_ sequence `{EL}` clears the line from cursor position to
-the end of the line, which means filling the area by background color.
+The _Erase Line_ sequence `{EL}` clears the line from the cursor position to
+the end of the line, which means filling the area with the background color.
 When _Erase Line_ is explicitly found in the start sequence, it is
-copied to just before (not after) ending reset sequence, with
-preceding sequence if necessary, to keep the effect of filling line
+copied to just before (not after) the ending reset sequence, with the
+preceding sequence if necessary, to keep the effect of filling the line
 even if the text is wrapped to multiple lines.
 
 See ["ENVIRONMENT"](#environment) section.
 
 ## LESS
 
-Because _Erase Line_ sequence end with `K`, it is a good idea to
-tell **less** command so, if you want to see the output using it.
+Because the _Erase Line_ sequence ends with `K`, it is a good idea to
+tell the **less** command so, if you want to see the output using it.
 
     LESS=-cR
     LESSANSIENDCHARS=mK
@@ -373,23 +548,22 @@ tell **less** command so, if you want to see the output using it.
 # ENVIRONMENT
 
 If the environment variable `NO_COLOR` is set, regardless of its
-value, colorization interface in this module never produce color
-sequence.  Primitive function such as `ansi_code` is not the case.
+value, the colorization interface in this module will never produce color
+sequences.  Primitive functions such as `ansi_code` are not affected.
 See [https://no-color.org/](https://no-color.org/).
 
 Function **ansi\_color** produces 256 or 24bit colors depending on the
-value of `$RGB24` module variable.  Also 24bit mode is enabled when
-environment `ANSICOLOR_RGB24` is set or `COLORTERM` is `truecolor`.
+value of the `$RGB24` module variable.  24bit mode is also enabled when
+the environment variable `ANSICOLOR_RGB24` is set or `COLORTERM` is `truecolor`.
 
-If the module variable `$NO_RESET_EL` set, or
-`ANSICOLOR_NO_RESET_EL` environment, _Erase Line_ sequence is not
-produced with RESET code.  See ["RESET SEQUENCE"](#reset-sequence).
+If the module variable `$NO_RESET_EL` is set, or the
+`ANSICOLOR_NO_RESET_EL` environment variable is set, the _Erase Line_ sequence is not
+produced with the RESET code.  See ["RESET SEQUENCE"](#reset-sequence).
 
 # COLOR TABLE
 
-Color table can be shown by other module
-[Term::ANSIColor::Concise::Table](https://metacpan.org/pod/Term%3A%3AANSIColor%3A%3AConcise%3A%3ATable).  Next command will show table of
-256 colors.
+The color table can be shown by the [Term::ANSIColor::Concise::Table](https://metacpan.org/pod/Term%3A%3AANSIColor%3A%3AConcise%3A%3ATable) module.  
+The following command will show the table of 256 colors.
 
     $ perl -MTerm::ANSIColor::Concise::Table=:all -e colortable
 
@@ -405,11 +579,11 @@ Color table can be shown by other module
 
 ## [Getopt::EX::Colormap](https://metacpan.org/pod/Getopt%3A%3AEX%3A%3AColormap)
 
-This module is originally implemented in [Getopt::EX::Colormap](https://metacpan.org/pod/Getopt%3A%3AEX%3A%3AColormap)
-module.  It provides an easy way to maintain labeled and indexed list
-for color handling in command line option.
+This module was originally implemented in the [Getopt::EX::Colormap](https://metacpan.org/pod/Getopt%3A%3AEX%3A%3AColormap)
+module.  It provides an easy way to maintain labeled and indexed lists
+for color handling in command line options.
 
-You can take care of user option like this:
+You can handle user options like this:
 
     use Getopt::Long;
     my @opt_colormap;
@@ -433,15 +607,21 @@ options for various tools.
 
 ## [App::ansiecho](https://metacpan.org/pod/App%3A%3Aansiecho)
 
-To use this module's function directly from a command line,
-[App::ansiecho](https://metacpan.org/pod/App%3A%3Aansiecho) is a good one.  You can apply colors and effects for
-echoing argument.
+To use this module's functions directly from the command line,
+[App::ansiecho](https://metacpan.org/pod/App%3A%3Aansiecho) is a good choice.  You can apply colors and effects to
+echoed arguments.
 
 ## [App::Greple](https://metacpan.org/pod/App%3A%3AGreple)
 
-This code and [Getopt::EX](https://metacpan.org/pod/Getopt%3A%3AEX) was implemented as a part of
-[App::Greple](https://metacpan.org/pod/App%3A%3AGreple) command originally.  It is still a intensive user of
-this module capability and would be a good use-case.
+This code and [Getopt::EX](https://metacpan.org/pod/Getopt%3A%3AEX) were originally implemented as part of
+the [App::Greple](https://metacpan.org/pod/App%3A%3AGreple) command.  It is still an intensive user of
+this module's capabilities and would be a good use case.
+
+## [Graphics::ColorObject](https://metacpan.org/pod/Graphics%3A%3AColorObject)
+
+For detailed information about color spaces other than RGB (such as HSL, 
+LCH, Lab, YIQ, etc.), refer to [Graphics::ColorObject](https://metacpan.org/pod/Graphics%3A%3AColorObject) which provides 
+comprehensive color space conversion capabilities used by this module.
 
 ## OTHERS
 
@@ -453,7 +633,9 @@ this module capability and would be a good use-case.
 
 [https://no-color.org/](https://no-color.org/)
 
-https://www.ecma-international.org/wp-content/uploads/ECMA-48\_5th\_edition\_june\_1991.pdf
+[https://www.ecma-international.org/wp-content/uploads/ECMA-48\_5th\_edition\_june\_1991.pdf](https://www.ecma-international.org/wp-content/uploads/ECMA-48_5th_edition_june_1991.pdf)
+
+[https://vt100.net/docs/vt100-ug/](https://vt100.net/docs/vt100-ug/)
 
 # AUTHOR
 
@@ -465,7 +647,7 @@ The following copyright notice applies to all the files provided in
 this distribution, including binary files, unless explicitly noted
 otherwise.
 
-Copyright 2015-2023 Kazumasa Utashiro
+Copyright ©︎ 2015-2025 Kazumasa Utashiro
 
 # LICENSE
 

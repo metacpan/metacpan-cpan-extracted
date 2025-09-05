@@ -7,6 +7,24 @@ explicitly stated differently.
    paper with nice algorithm: http://citeseer.ist.psu.edu/cache/papers/cs/25021/http:zSzzSzfractal.dam.fmph.uniba.skzSz~sccgzSzproceedingszSz1998zSzZalik.pdf/zalik98quick.pdf
 20121024 Request by Rick Rutgers: widening polygon contour
 
+version 2.00: Thu  4 Sep 10:18:08 CEST 2025
+
+	Changes:
+	- Log::Report replaces die and Carp (causes bump of major version number)
+	- requires Perl 5.16 (2012)
+	- convert to OODoc 3.03 release process.
+
+	Fixes:
+	- polygon_same must also consider a mirrored result.
+	  rt.cpan.org#169305 [Graham Knop]
+
+	Improvements:
+	- reduce rounding errors in centroid by default
+	  rt.cpan.org#169306 [Graham Knop]
+	- tip use of Math::BigFloat
+	- restyle code and docs to match OODoc 2.03
+	- all ::Transform functions can have the options as HASH as well
+
 version 1.11: Fri  2 May 16:57:09 CEST 2025
 
 	Fixes:

@@ -4,6 +4,8 @@ author:
   - 'Mark Overmeer <markov@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Test::More: '1'
+  Test::Pod: '1'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -18,12 +20,31 @@ no_index:
     - t
     - inc
 requires:
+  Log::Report: '0'
   Math::Trig: '0'
   Scalar::Util: '1.13'
   Test::More: '0.47'
 resources:
   homepage: http://perl.overmeer.net/CPAN/
-  license: http://dev.perl.org/licenses/
   repository: https://github.com/markov2/perl5-Math-Polygon.git
-version: '1.11'
+version: '2.00'
+x_oodist:
+  email: markov@cpan.org
+  first_year: 2004
+  generate:
+    -
+      format: pod3
+      podtail: ~
+  include: []
+  oodoc_version: 3.03
+  parser:
+    pmhead: ~
+    skip_links: []
+    syntax: markov
+  raw:
+    publish: ../public_html/math-polygon/raw
+  release:
+    publish: ../public_html/math-polygon/source
+  tests: {}
+  use: []
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

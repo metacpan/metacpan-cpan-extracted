@@ -21,7 +21,7 @@ use lib 'blib/lib';
 
 #use utf8;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use Test::More;
 use Test2::Plugin::UTF8; # rids of the Wide Character in TAP message!
@@ -46,7 +46,10 @@ Log::Log4perl->easy_init($ERROR);
 # mech object in an eval and if that fails, then we EXIT this
 # test file gracefully without any failure (just a warning
 # for the user)
-my $cv = eval { WWW::Mechanize::Chrome->chrome_version() };
+my $cv = eval {
+	Log::Log4perl->easy_init($ERROR);
+	WWW::Mechanize::Chrome->chrome_version()
+};
 if( $@ne'' ){
 	plan skip_all => "$@\nError: you need to install the google-chrome executable before continuing.\n";
 	exit 0; # gracefull exit, all tests have passed! hopefully the user trying to install it has seen this message.
@@ -100,6 +103,7 @@ my %default_mech_params = (
 );
 
 my $mech_obj = eval {
+	Log::Log4perl->easy_init($ERROR);
 	WWW::Mechanize::Chrome->new(%default_mech_params)
 };
 ok($@eq'', "WWW::Mechanize::Chrome->new() : called via an eval() and did not fail.") or BAIL_OUT("failed to create WWW::Mechanize::Chrome object vial an eval() : $@");

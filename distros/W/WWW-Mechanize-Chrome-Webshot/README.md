@@ -4,7 +4,7 @@ WWW::Mechanize::Chrome::Webshot - cheap and cheerful html2pdf converter, take a 
 
 # VERSION
 
-Version 0.04
+Version 0.05
 
 # SYNOPSIS
 
@@ -31,6 +31,11 @@ Here are some examples:
 
     my $shooter = WWW::Mechanize::Chrome::Webshot->new({
       'settle-time' => 10,
+      # optionally specify a Mojo::Log logger,
+      # useful if you have a global logger you want to use:
+      'logger-object' => Mojo::Log->new(path=>'webshot.log'),
+      # or just specify a file to log output to:
+      #'logfile' => 'webshot.log',
     });
     $shooter->shoot({
       'output-filename' => 'abc.png',
@@ -238,9 +243,9 @@ For convenience, the following scripts are provided:
 
     `script/www-mechanize-webshot.pl --url 'https://www.902.gr' --resolution 2000x2000 --exif 'created' 'bliako' --output-filename '902.png' --settle-time 10`
 
-    Debug why the output is not what you expect, show the browser and let it live for huge settle time:
+    Debug why the output is not what you expect, show the browser and let it live for huge settle time, also log output to a file:
 
-    `script/www-mechanize-webshot.pl --no-headless --url 'https://www.902.gr' --resolution 2000x2000 --output-filename '902.png' --settle-time 100000`
+    `script/www-mechanize-webshot.pl --no-headless --url 'https://www.902.gr' --resolution 2000x2000 --output-filename '902.png' --settle-time 100000 --verbosity 10 --logfile debug.log`
 
     This will also remove specified DOM elements by tag name and XPath selector. Note that
     the output format will be deduced as PDF because of the filename:
@@ -251,16 +256,179 @@ For convenience, the following scripts are provided:
 
     `script/www-mechanize-webshot.pl --url 'https://www.902.gr' --resolution 2000x2000 --exif 'created' 'bliako' --output-filename 'tmpimg' --output-format 'PDF' --settle-time 10`
 
+# CREATING THE MECH OBJECT
+
+The mech ([WWW::Mechanize::Chrome](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3AChrome)) object must be supplied
+to the functions in this module. It must be created by the caller.
+This is how I do it:
+
+    use WWW::Mechanize::Chrome;
+    use Log::Log4perl qw(:easy);
+    Log::Log4perl->easy_init($ERROR);
+
+    my %default_mech_params = (
+        headless => 1,
+    #   log => $mylogger,
+        launch_arg => [
+                '--window-size=600x800',
+                '--password-store=basic', # do not ask me for stupid chrome account password
+    #           '--remote-debugging-port=9223',
+    #           '--enable-logging', # see also log above
+                '--disable-gpu',
+                '--no-sandbox',
+                '--ignore-certificate-errors',
+                '--disable-background-networking',
+                '--disable-client-side-phishing-detection',
+                '--disable-component-update',
+                '--disable-hang-monitor',
+                '--disable-save-password-bubble',
+                '--disable-default-apps',
+                '--disable-infobars',
+                '--disable-popup-blocking',
+        ],
+    );
+
+    my $mech_obj = eval {
+        WWW::Mechanize::Chrome->new(%default_mech_params)
+    };
+    die $@ if $@;
+
+    # This transfers all javascript code's console.log(...)
+    # messages to perl's warn()
+    # we need to keep $console var in scope!
+    my $console = $mech_obj->add_listener('Runtime.consoleAPICalled', sub {
+          warn
+              "js console: "
+            . join ", ",
+              map { $_->{value} // $_->{description} }
+              @{ $_[0]->{params}->{args} };
+        })
+    ;
+
+    # and now fetch a page
+    my $URL = '...';
+    my $retmech = $mech_obj->get($URL);
+    die "failed to fetch $URL" unless defined $retmech;
+    $mech_obj->sleep(1); # let it settle
+    # now the mech object has loaded the URL and has a DOM hopefully.
+    # You can pass it on to domops_find() or domops_zap() to operate on the DOM.
+
+# SECURITY WARNING
+
+[WWW::Mechanize::Chrome](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3AChrome) invokes the `google-chrome`
+executable
+on behalf of the current user. Headless or not, `google-chrome`
+is invoked. Depending on the launch parameters, either
+a fresh, new browser session will be created or the
+session of the current user with their profile, data, cookies,
+passwords, history, etc. will be used. The latter case is very
+dangerous.
+
+This behaviour is controlled by [WWW::Mechanize::Chrome](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3AChrome)'s
+[constructor](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3AChrome%23WWW%3A%3AMechanize%3A%3AChrome-%253Enew%28-%25options-%29)
+parameters which, in turn, are used for launching
+the `google-chrome` executable. Specifically,
+see [WWW::Mechanize::Chrome#separate\_session](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3AChrome%23separate_session),
+[<WWW::Mechanize::Chrome#data\_directory](https://metacpan.org/pod/%3CWWW%3A%3AMechanize%3A%3AChrome%23data_directory)
+and [WWW::Mechanize::Chrome#incognito](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3AChrome%23incognito).
+
+**Unless you really need to mechsurf with your current session, aim
+to launching the browser with a fresh new session.
+This is the safest option.**
+
+**Do not rely on default behaviour as this may change over
+time. Be explicit.**
+
+Also, be warned that [WWW::Mechanize::Chrome::DOMops](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3AChrome%3A%3ADOMops) executes
+javascript code on that `google-chrome` instance.
+This is done nternally with javascript code hardcoded
+into the [WWW::Mechanize::Chrome::DOMops](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3AChrome%3A%3ADOMops)'s package files.
+
+On top of that [WWW::Mechanize::Chrome::DOMops](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3AChrome%3A%3ADOMops) allows
+for **user-specified javascript code** to be executed on
+that `google-chrome` instance. For example the callbacks
+on each element found, etc.
+
+This is an example of what can go wrong if
+you are not using a fresh `google-chrome`
+session:
+
+You have just used `google-chrome` to access your
+yahoo webmail and you did not logout.
+So, there will be an
+access cookie in the `google-chrome` when you later
+invoke it via [WWW::Mechanize::Chrome](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3AChrome) (remember
+you have not told it to use a fresh session).
+
+If you allow
+unchecked user-specified (or copy-pasted from ChatGPT)
+javascript code in
+[WWW::Mechanize::Chrome::DOMops](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3AChrome%3A%3ADOMops)'s
+`domops_find()`, `domops_zap()`, etc. then it is, theoretically,
+possible that this javascript code
+initiates an XHR to yahoo and fetch your emails and
+pass them on to your perl code.
+
+But there is another problem,
+[WWW::Mechanize::Chrome::DOMops](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3AChrome%3A%3ADOMops)'s
+integrity of the embedded javascript code may have
+been compromised to exploit your current session.
+
+This is very likely with a Windows installation which,
+being the security swiss cheese it is, it
+is possible for anyone to compromise your module's code.
+It is less likely in Linux, if your modules are
+installed by root and are read-only for normal users.
+But, still, it is possible to be compromised (by root).
+
+Another issue is with the saved passwords and
+the browser's auto-fill when landing on a login form.
+
+Therefore, for all these reasons, **it is advised not to invoke (via [WWW::Mechanize::Chrome](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3AChrome))
+`google-chrome` with your
+current/usual/everyday/email-access/bank-access
+identity so that it does not have access to
+your cookies, passwords, history etc.**
+
+It is better to create a fresh
+`google-chrome`
+identity/profile and use that for your
+`WWW::Mechanize::Chrome::DOMops` needs.
+
+No matter what identity you use, you may want
+to erase the cookies and history of `google-chrome`
+upon its exit. That's a good practice.
+
+It is also advised to review the
+javascript code you provide
+via [WWW::Mechanize::Chrome::DOMops](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3AChrome%3A%3ADOMops) callbacks if
+it is taken from 3rd-party, human or not, e.g. ChatGPT.
+
+Additionally, make sure that the current
+installation of [WWW::Mechanize::Chrome::DOMops](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3AChrome%3A%3ADOMops)
+in your system is not compromised with malicious javascript
+code injected into it. For this you can check its MD5 hash
+
 ## REQUIREMENTS
 
-This module requires that the Chrome browser is installed in your
-computer and can be found by [WWW::Mechanize::Chrome](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3AChrome).
+# DEPENDENCIES
 
-The browser will be run, usually headless -- so a headless desktop is fine,
+This module depends on [WWW::Mechanize::Chrome](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3AChrome) which, in turn,
+depends on the `google-chrome` executable be installed on the
+host computer. See [WWW::Mechanize::Chrome::Install](https://metacpan.org/pod/WWW%3A%3AMechanize%3A%3AChrome%3A%3AInstall) on
+how to install the executable.
+
+Test scripts (which create there own mech object) will detect the absence
+of `google-chrome` binary and exit gracefully, meaning the test passes.
+But with a STDERR message to the user. Who will hopefully notice it and
+proceed to `google-chrome` installation. In any event, this module
+will be installed with or without `google-chrome`.
+
+The browser will be run, usually headless -- so a headless host system is fine,
 the first time you take a screenshot. It will only be re-spawned if
 you have shutdown the browser in the meantime. Exiting your script
 will shutdown the browser. And so, running a script again will
-re-spawn the browser (AFAIK).
+re-spawn the browser (AFAICU/sic/).
 
 ## CAVEATS
 

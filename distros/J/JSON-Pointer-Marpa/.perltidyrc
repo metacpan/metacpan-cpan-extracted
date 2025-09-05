@@ -1,0 +1,17 @@
+--backup-and-modify-in-place
+--backup-file-extension='/'
+# "tightness" means the closeness with which pairs of enclosing tokens,
+# such as parentheses, contain the quantities within.
+--paren-tightness 0
+--square-bracket-tightness 0
+--brace-tightness 0
+--variable-maximum-line-length
+--maximum-line-length 80
+--indent-columns 2
+--continuation-indentation 2
+--cuddled-else
+--static-side-comments
+# https://blogs.perl.org/users/mauke/2010/05/no-semicolon-after-return-values.html
+# No semicolon after return values
+--noadd-semicolons
+--noblanks-before-comments

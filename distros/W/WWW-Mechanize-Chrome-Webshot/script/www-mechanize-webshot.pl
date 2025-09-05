@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use Getopt::Long;
 use Encode;
@@ -16,7 +16,7 @@ use WWW::Mechanize::Chrome::Webshot;
 use Data::Roundtrip qw/perl2dump no-unicode-escape-permanently/;
 
 my $DEFAULT_CONFIGSTRING = <<'EOCH';
-</* $VERSION = '0.04'; */>
+</* $VERSION = '0.05'; */>
 </* comments are allowed */>
 </* and <% vars %> and <% verbatim sections %> */>
 {
@@ -67,6 +67,7 @@ my $constructor_params = {
 	'WWW::Mechanize::Chrome-params' => {},
 	'stop-on-error' => 0,
 	'remove-dom-elements' => undef,
+	'logfile' => undef,
 };
 my $webshot_params = {
 	'url' => undef,
@@ -111,6 +112,7 @@ if( ! Getopt::Long::GetOptions(
 		die "$0 : error, failed to parse input JSON read from file '$jsonfile' via --".$_[0] unless defined $constructor_params->{'remove-dom-elements'}
 	},
 	'configfile=s' => sub { $constructor_params->{$_[0]} = $_[1] },
+	'logfile=s' => sub { $constructor_params->{$_[0]} = $_[1] },
 	'verbosity=i' => sub { $constructor_params->{$_[0]} = $_[1] },
 	'help|h|?' => sub { print STDOUT usage($0)."\n"; exit(0) },
 ) ){ print STDERR usage($0) . "\n\n$0 : error, something wrong with command line parameters.\n"; exit(1) }
@@ -148,6 +150,7 @@ sub usage {
 	"[--remove-dom-elements-file F [--remove-dom-elements-file F ...] : same as --remove-dom-elements but the selector spec is in a file as a JSON string. This is vastly more convenient than specifying JSON strings on the command line - especially for poor windowers out there!]\n".
 	"[--stop-on-error : all errors are fatal, this is particularly specific to deleting DOM elements and what happens if not found. Default is to ignore these errors.]\n".
 	"[--configfile F : a file with configuration in Enhanced JSON format. There is default configuration if this is not provided.]\n".
+	"[--logfile L : specify a file for logging our output to.]\n".
 	"[--verbosity N : specify verbosity. Zero being the mute. Default is ".$constructor_params->{'verbosity'}.".]\n".
 	"\nThis script will load the specified url or a local HTML file in a headless browser sized at the specified resolution (thanks to Corion/WWW::Mechanize::Chrome), allow some settle time, optionally remove any specified DOM elements and take a screenshot of the rendered result as displayed in the browser. The screenshot image will then be added with exif tags if any are specified and then saved to the output file.\n".
 	"\nExamples:\n".

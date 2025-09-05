@@ -1,8 +1,15 @@
 Revision history for Perl extension Sys::Info::Base.
 
+0.7810 2025-09-04 BURAK
+    - Returned the device id instead of ip in the previous version.
+    - Filter out the localhost.
+
+0.7809 2025-09-04 BURAK
+    - Filter out junk ips.
+
 0.7808 2025-08-29 BURAK
     - Release the Sys::HostIP change.
-    - use perent
+    - use parent
 
 0.7807 2018-12-25 BURAK
     - Distro fix.

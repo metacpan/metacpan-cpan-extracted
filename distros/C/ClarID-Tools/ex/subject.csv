@@ -1,0 +1,5 @@
+unique_id,study,subject_id,type,condition,sex,age_group
+patient_001,COPDStudy,1001,Case,J44.9,Male,Age40to49
+patient_002,AsthmaCohort,1002,Control,J98.51,Female,Age50to59
+patient_003,COPDStudy,1003,Control,J44.9,Female,Age50to59
+patient_004,AsthmaCohort,1004,Case,J98.51,Male,Age40to49

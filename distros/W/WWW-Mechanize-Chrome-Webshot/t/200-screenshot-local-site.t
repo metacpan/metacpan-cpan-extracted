@@ -20,7 +20,7 @@ use lib ($FindBin::Bin, 'blib/lib');
 
 use WWW::Mechanize::Chrome::Webshot;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 my $curdir = Cwd::abs_path($FindBin::Bin);
 

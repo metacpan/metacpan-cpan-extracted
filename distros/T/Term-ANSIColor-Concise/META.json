@@ -4,7 +4,7 @@
       "Kazumasa Utashiro"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.20",
+   "generated_by" : "Minilla/v3.1.26",
    "license" : [
       "perl_5"
    ],
@@ -42,9 +42,15 @@
       },
       "runtime" : {
          "requires" : {
+            "Colouring::In" : "0.27",
             "Graphics::ColorNames" : "v3.0.0",
-            "List::Util" : "0",
+            "Graphics::ColorNames::HTML" : "0",
+            "Graphics::ColorNames::Netscape" : "0",
+            "Graphics::ColorNames::Windows" : "0",
+            "Graphics::ColorObject" : "0",
+            "List::Util" : "1.45",
             "Scalar::Util" : "0",
+            "aliased" : "0",
             "perl" : "v5.14.0"
          }
       },
@@ -55,13 +61,32 @@
       }
    },
    "provides" : {
+      "Graphics::ColorObject" : {
+         "file" : "lib/Term/ANSIColor/Concise/ColorObject.pm"
+      },
       "Term::ANSIColor::Concise" : {
          "file" : "lib/Term/ANSIColor/Concise.pm",
-         "version" : "2.0201"
+         "version" : "3.01"
+      },
+      "Term::ANSIColor::Concise::Color" : {
+         "file" : "lib/Term/ANSIColor/Concise/Color.pm",
+         "version" : "3.01"
+      },
+      "Term::ANSIColor::Concise::ColorObject" : {
+         "file" : "lib/Term/ANSIColor/Concise/ColorObject.pm",
+         "version" : "3.01"
+      },
+      "Term::ANSIColor::Concise::ColorUtils" : {
+         "file" : "lib/Term/ANSIColor/Concise/ColorUtils.pm",
+         "version" : "3.01"
       },
       "Term::ANSIColor::Concise::Table" : {
          "file" : "lib/Term/ANSIColor/Concise/Table.pm",
-         "version" : "2.0201"
+         "version" : "3.01"
+      },
+      "Term::ANSIColor::Concise::Transform" : {
+         "file" : "lib/Term/ANSIColor/Concise/Transform.pm",
+         "version" : "3.01"
       }
    },
    "release_status" : "stable",
@@ -76,12 +101,12 @@
          "web" : "https://github.com/tecolicom/Term-ANSIColor-Concise"
       }
    },
-   "version" : "2.0201",
+   "version" : "3.01",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>",
       "Kazumasa Utashiro <utashiro@cpan.org>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.12",
+   "x_serialization_backend" : "JSON::PP version 4.06",
    "x_static_install" : 1
 }

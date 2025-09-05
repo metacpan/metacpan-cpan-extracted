@@ -56,5 +56,9 @@ Revision history for WWW-Mechanize-Chrome-DOMops
 0.11    23-04-2025/14:00
         Added the headless option to launching mechanize in tests.
 
-0.12    08-04-2025/11:00
+0.12    04-08-2025/11:00
         Changed the minimum required version of dependency Data::Roundtrip to 0.30 (instead of 0/any), in Makefile.PL, because older versions die on parsing malformed JSON which is part of the testing process. The new version of Data::Roundtrip does not die on malformed JSON but it fails.
+
+0.13    04-09-2025/11:00
+        Added exportable global variable 'our $domops_LOGGER' which, if imported, can be set to caller's own logger object. Default logs to STDOUT/ERR using Mojo::Log, which will not break things from previous version unless for unicode strings.
+

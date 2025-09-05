@@ -34,7 +34,9 @@ sub array_index_dereferencing {
   } elsif ( $crt eq 'HASH' ) {
     $self->set_crv( _member_exists( $crv, $index ) )
   } else {
-    Marpa::R2::Context::bail( "Currently referenced type '$crt' isn't a JSON structured type (array or object)!" )
+    Marpa::R2::Context::bail(
+"Currently referenced type '$crt' isn't a JSON structured type (array or object)!"
+    )
   }
 
   undef
@@ -45,7 +47,8 @@ sub next_array_index_dereferencing {
 
   my $crv = $self->get_crv;
   ref $crv eq 'ARRAY'
-    ? Marpa::R2::Context::bail( "Handling of '$next_index' array index isn't implemented!" )
+    ? Marpa::R2::Context::bail(
+    "Handling of '$next_index' array index isn't implemented!" )
     : $self->set_crv( $crv->{ $next_index } );
 
   undef
@@ -57,7 +60,8 @@ sub object_name_dereferencing {
 
   my $crv = $self->get_crv;
   my $crt = ref $crv;         # crt == currently referenced type
-  Marpa::R2::Context::bail( "Currently referenced type '$crt' isn't a JSON object!" )
+  Marpa::R2::Context::bail(
+    "Currently referenced type '$crt' isn't a JSON object!" )
     unless $crt eq 'HASH';
   $self->set_crv( _member_exists( $crv, $member ) );
 
@@ -84,7 +88,8 @@ sub _index_exists ( $$ ) {
   $index < @$crv
     ? $crv->[ $index ]
     : Marpa::R2::Context::bail(
-    "JSON array has been accessed with an index $index that is greater than or equal to the size of the array!" )
+"JSON array has been accessed with an index $index that is greater than or equal to the size of the array!"
+    )
 }
 
 sub _member_exists ( $$ ) {
@@ -92,7 +97,8 @@ sub _member_exists ( $$ ) {
 
   exists $crv->{ $member }
     ? $crv->{ $member }
-    : Marpa::R2::Context::bail( "JSON object has been accessed with a member '$member' that does not exist!" )
+    : Marpa::R2::Context::bail(
+    "JSON object has been accessed with a member '$member' that does not exist!" )
 }
 
 1

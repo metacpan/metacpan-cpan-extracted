@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.20, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.26, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,22 +24,42 @@ no_index:
     - author
     - builder
 provides:
+  Graphics::ColorObject:
+    file: lib/Term/ANSIColor/Concise/ColorObject.pm
   Term::ANSIColor::Concise:
     file: lib/Term/ANSIColor/Concise.pm
-    version: '2.0201'
+    version: '3.01'
+  Term::ANSIColor::Concise::Color:
+    file: lib/Term/ANSIColor/Concise/Color.pm
+    version: '3.01'
+  Term::ANSIColor::Concise::ColorObject:
+    file: lib/Term/ANSIColor/Concise/ColorObject.pm
+    version: '3.01'
+  Term::ANSIColor::Concise::ColorUtils:
+    file: lib/Term/ANSIColor/Concise/ColorUtils.pm
+    version: '3.01'
   Term::ANSIColor::Concise::Table:
     file: lib/Term/ANSIColor/Concise/Table.pm
-    version: '2.0201'
+    version: '3.01'
+  Term::ANSIColor::Concise::Transform:
+    file: lib/Term/ANSIColor/Concise/Transform.pm
+    version: '3.01'
 requires:
+  Colouring::In: '0.27'
   Graphics::ColorNames: v3.0.0
-  List::Util: '0'
+  Graphics::ColorNames::HTML: '0'
+  Graphics::ColorNames::Netscape: '0'
+  Graphics::ColorNames::Windows: '0'
+  Graphics::ColorObject: '0'
+  List::Util: '1.45'
   Scalar::Util: '0'
+  aliased: '0'
   perl: v5.14.0
 resources:
   bugtracker: https://github.com/tecolicom/Term-ANSIColor-Concise/issues
   homepage: https://github.com/tecolicom/Term-ANSIColor-Concise
   repository: https://github.com/tecolicom/Term-ANSIColor-Concise.git
-version: '2.0201'
+version: '3.01'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

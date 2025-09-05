@@ -39,7 +39,7 @@ use SNMP::Info::Layer3;
 
 our ($VERSION, %GLOBALS, %MIBS, %FUNCS, %MUNGE);
 
-$VERSION = '3.972002';
+$VERSION = '3.973000';
 
 %MIBS = (
     %SNMP::Info::Layer3::MIBS,
@@ -103,8 +103,8 @@ sub uptime {
     my $uptime;
 
     $uptime = $netsnmp->hrSystemUptime();
-    return $uptime if defined $uptime;
-
+    # sometimes hrSystemUptime is 0 so check truthy, not defined
+    return $uptime if $uptime;
     return $netsnmp->SUPER::uptime();
 }
 

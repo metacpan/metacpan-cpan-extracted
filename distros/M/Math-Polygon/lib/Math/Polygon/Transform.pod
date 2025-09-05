@@ -11,9 +11,12 @@ Math::Polygon::Transform - Polygon transformation
 
 =head1 SYNOPSIS
 
- my @poly = ( [1,2], [2,4], [5,7], [1, 2] );
+  my @poly = ( [1,2], [2,4], [5,7], [1, 2] );
 
- my $area = polygon_transform resize => 3.14, @poly;
+  my $area = polygon_transform resize => 3.14, @poly;
+
+  # requires [2.00]
+  my $area = polygon_transform +{resize => 3.14}, @poly;
 
 =head1 DESCRIPTION
 
@@ -23,7 +26,7 @@ This package contains polygon transformation algorithms.
 
 =over 4
 
-=item B<polygon_grid>(%options, @points)
+=item B<polygon_grid>(%options|\%options, @points)
 
 Snap the polygon points to grid points, where artifacts are removed.
 
@@ -40,14 +43,14 @@ no transformation will take place.
 
 =back
 
-=item B<polygon_mirror>(%options, @points)
+=item B<polygon_mirror>(%options|\%options, @points)
 
 Mirror the polygon in a line.  Only one of the options can be provided.
 Some programs call this "flip" or "flop".
 
  -Option--Default
   b       0
-  line    <undef>
+  line    <C<undef>>
   rc      undef
   x       undef
   y       undef
@@ -80,9 +83,9 @@ Mirror in the line C<y=value>, which means that C<x> stays unchanged.
 
 =back
 
-=item B<polygon_move>(%options, @points)
+=item B<polygon_move>(%options|\%options, @points)
 
-Returns a list of points which are moved over the indicated distance
+Returns a list of points which are moved over the indicated distance.
 
  -Option--Default
   dx      0
@@ -100,7 +103,14 @@ Displacement in the vertical direction.
 
 =back
 
-=item B<polygon_resize>(%options, @points)
+example: 
+
+  my @moved = polygon_move dx => -5.12, @points;
+  my @moved = polygon_move +{dx => -5.12}, @points; # since [2.00]
+
+=item B<polygon_resize>(%options|\%options, @points)
+
+Make the polygon smaller or larger, with respect to a center.
 
  -Option--Default
   center  [0,0]
@@ -128,7 +138,9 @@ Specific scaling factor in the vertical direction.
 
 =back
 
-=item B<polygon_rotate>(%options, @points)
+=item B<polygon_rotate>(%options|\%options, @points)
+
+Rotate a polygon around a center.
 
  -Option --Default
   center   [0,0]
@@ -149,7 +161,9 @@ specify rotation angle in rads (between -pi and 2*pi)
 
 =back
 
-=item B<polygon_simplify>(%options, @points)
+=item B<polygon_simplify>(%options|\%options, @points)
+
+Z<>
 
  -Option    --Default
   max_points  undef
@@ -189,18 +203,21 @@ Removing points will change the area of the polygon.
 
 =item Error: you need to specify 'x', 'y', 'rc', or 'line'
 
+Cast by polygon_mirror()
+
 =back
 
 =head1 SEE ALSO
 
-This module is part of Math-Polygon distribution version 1.11,
-built on May 02, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Math-Polygon version 2.00,
+built on September 04, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2004-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2004-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

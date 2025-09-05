@@ -1,8 +1,9 @@
-severity = harsh
-#severity = cruel
-#severity = brutal
-
-verbose = %f: %m at line %l, column %c.  (Policy: %p, Severity: %s)\n
+# harsh  (3)
+# cruel  (2)
+# brutal (1)
+severity           = harsh
+program-extensions = .PL .pl .t
+verbose            = %f: %m at line %l, column %c.  (Policy: %p, Severity: %s)\n
 
 [-BuiltinFunctions::ProhibitSleepViaSelect]
 # https://github.com/Perl-Critic/Perl-Critic/issues/1053
@@ -15,4 +16,9 @@ verbose = %f: %m at line %l, column %c.  (Policy: %p, Severity: %s)\n
 allow_name_regex = _(?:build|trigger)_\w+
 [-Subroutines::RequireArgUnpacking]
 [-Subroutines::RequireFinalReturn]
+# https://github.com/Perl-Critic/Perl-Critic/issues/1094
+[TestingAndDebugging::RequireTestLabels]
+[ValuesAndExpressions::ProhibitInterpolationOfLiterals]
+severity = 3
+allow_if_string_contains_single_quote = 1
 [-ValuesAndExpressions::RequireInterpolationOfMetachars]

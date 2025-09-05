@@ -1,5 +1,5 @@
 package Sys::Info::Driver;
-$Sys::Info::Driver::VERSION = '0.7808';
+$Sys::Info::Driver::VERSION = '0.7810';
 use strict;
 use warnings;
 
@@ -17,7 +17,7 @@ Sys::Info::Driver
 
 =head1 VERSION
 
-version 0.7808
+version 0.7810
 
 =head1 NAME
 

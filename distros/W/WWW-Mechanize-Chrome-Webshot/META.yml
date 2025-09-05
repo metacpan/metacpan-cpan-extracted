@@ -42,5 +42,5 @@ resources:
   bugtracker: https://github.com/hadjiprocopis/WWW-Mechanize-Chrome-Webshot/issues
   homepage: https://metacpan.org/module/WWW::Mechanize::Chrome::Webshot
   repository: https://github.com/hadjiprocopis/WWW-Mechanize-Chrome-Webshot
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -217,3 +217,15 @@ Revision history for IO-Prompter
 
     * Worked around odd 'uninitialized' warning under timeouts
       (thanks Diab!)
+
+
+0.005003  Fri Aug 29 10:09:38 2025
+
+    * Added sorting control for hash-based menus
+      (thanks Alexander!)
+
+
+0.005004  Fri Sep  5 17:56:01 2025
+
+    * Added -indent option
+      (thanks Alexander!)

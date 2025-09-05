@@ -1,0 +1,131 @@
+site_name: 'ClarID-Tools Documentation'
+site_description: 'ClarID-Tools: ID Management for Biospecimens and Subjects'
+site_author: 'Manuel Rueda, PhD'
+copyright: '&copy; Copyright 2025, Manuel Rueda, CNAG'
+repo_name: 'ClarID-Tools'
+repo_url: https://github.com/CNAG-Biomedical-Informatics/clarid-tools
+edit_uri: edit/main/docs/
+extra_css:
+  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.css
+  - https:////cdn.datatables.net/2.3.2/css/dataTables.dataTables.min.css
+  - css/theme_overrides.css
+
+extra_javascript:
+  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.js
+  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/contrib/auto-render.min.js
+  - js/vendor/katex.js               # your KaTeX init AFTER the libs
+  - https://code.jquery.com/jquery-3.7.1.js
+  - https://cdn.datatables.net/2.3.2/js/dataTables.min.js
+  - js/datatables-init.js            # DT init AFTER the DT lib
+  - js/theme_overrides.js            # Custom tweaks last
+
+plugins:
+  - search
+  - include-markdown
+  - macros
+  - table-reader
+  - mermaid2:
+      arguments:
+        startOnLoad: true
+
+markdown_extensions:
+    - toc:
+        toc_depth: 2-3
+        permalink: true
+    - admonition
+    - attr_list
+    - footnotes
+    - md_in_html
+    - pymdownx.critic
+    - pymdownx.caret
+    - pymdownx.details
+    - pymdownx.keys
+    - pymdownx.mark
+    - pymdownx.tilde
+    - pymdownx.saneheaders
+    - pymdownx.magiclink:
+        hide_protocol: true
+    - pymdownx.tabbed:
+        alternate_style: true
+    - pymdownx.tasklist:
+        custom_checkbox: true
+    - tables
+    - mdx_gh_links:
+        user: CNAG-Biomedical-Informatics
+        repo: clarid-tools
+    - pymdownx.emoji:
+        emoji_index: !!python/name:material.extensions.emoji.twemoji
+        emoji_generator: !!python/name:material.extensions.emoji.to_svg
+    - pymdownx.highlight:
+        anchor_linenums: true
+        line_spans: __span
+        pygments_lang_class: true
+    - pymdownx.inlinehilite
+    - pymdownx.snippets:
+        base_path: ["docs", "non-containerized", "docker", "ex", "share", "nb"]
+        url_download: true
+    - pymdownx.superfences:
+        custom_fences:
+            - name: mermaid
+              class: mermaid
+              format: !!python/name:mermaid2.fence_mermaid
+    - pymdownx.arithmatex:
+        generic: true
+
+nav:
+  - "🏠 Introduction": index.md
+  - "⬇️ Download & Installation":
+      - "🛠 Non-containerized": download-and-installation/non-containerized.md
+      - "🐳 Docker-based": download-and-installation/docker-based.md
+  - "🚀 Getting Started":
+      - "Quickstart": usage/quickstart.md
+      - "CLI Reference": usage/cli-reference.md
+  - "🧪 Use Cases":
+      - "Subject": use-cases/subject.md
+      - "Biosample": use-cases/biosample.md
+  - "🔧 Technical Details":
+      - "Implementation": technical-details/implementation.md
+      - "Specification": technical-details/specification.md
+      - "Codebook & Schema": technical-details/codebook-and-schema.md
+      - "Pre-processing script": technical-details/pre-processing-script.md
+  - "❓ Help":
+     - "🤔 FAQs": help/faq.md
+     - "📖 Google Colab": https://colab.research.google.com/drive/1smS42yzL7qYV1kCz34baTWLRr_AAap-r
+  - "ℹ️ About":
+      - "About": about/about.md
+      - "Citation": about/citation.md
+
+theme:
+  name: material
+  palette:
+    - media: '(prefers-color-scheme: dark)'
+      scheme: default
+      primary: blue grey
+      accent: amber
+      toggle:
+        icon: material/lightbulb
+        name: Switch to light mode
+    - media: '(prefers-color-scheme: light)'
+      scheme: slate
+      primary: blue grey
+      accent: amber
+      toggle:
+        icon: material/lightbulb-outline
+        name: Switch to dark mode
+  logo: img/clarid-logo.png
+  icon:
+    repo: fontawesome/brands/github-alt
+  features:
+    - content.code.select
+    - content.code.copy
+    - content.tabs.link
+    - search.highlight
+    - search.share
+    - navigation.tracking
+    - navigation.sections
+    - toc.integrate
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/CNAG-Biomedical-Informatics

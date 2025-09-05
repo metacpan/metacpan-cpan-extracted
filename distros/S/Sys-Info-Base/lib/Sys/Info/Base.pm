@@ -1,5 +1,5 @@
 package Sys::Info::Base;
-$Sys::Info::Base::VERSION = '0.7808';
+$Sys::Info::Base::VERSION = '0.7810';
 use strict;
 use warnings;
 
@@ -142,7 +142,7 @@ Sys::Info::Base
 
 =head1 VERSION
 
-version 0.7808
+version 0.7810
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,10 @@
+declare -a opt
+for d in $(seq 0 15 359)
+do
+    d=$(printf %03d $d)
+    c='#a00'
+    a="$c+h$d=s80/$c+h$d=l90"
+    opt+=(-c $a $a)
+done
+
+perl -Ilib -S ansiecho --separate $'\n' "${opt[@]}"

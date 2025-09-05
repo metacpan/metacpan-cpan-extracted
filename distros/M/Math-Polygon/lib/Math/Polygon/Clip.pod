@@ -11,10 +11,10 @@ Math::Polygon::Clip - frame a polygon in a square
 
 =head1 SYNOPSIS
 
- my @poly  = ( [1,2], [2,4], [5,7], [1, 2] );
- my @box   = ( $xmin, $ymin, $xmax, $ymax );
+  my @poly  = ( [1,2], [2,4], [5,7], [1, 2] );
+  my @box   = ( $xmin, $ymin, $xmax, $ymax );
 
- my $boxed = polygon_clip \@box, @poly;
+  my $boxed = polygon_clip \@box, @poly;
 
 =head1 DESCRIPTION
 
@@ -28,7 +28,7 @@ Cut-off all parts of the polygon which are outside the box
 
 Clipping a polygon into rectangles can be done in various ways.
 With this algorithm (which I designed myself, but may not be new), the
-parts of the polygon which are outside the @box are mapped on the borders.
+parts of the polygon which are outside the C<@box> are mapped on the borders.
 The polygon stays in one piece.
 
 Returned is one list of points, which is cleaned from double points,
@@ -53,24 +53,25 @@ from the input polygon (or line).
 
 example: 
 
- my @points = ( [1,2], [2,3], [2,0], [1,-1], [1,2] );
- my @bbox   = ( 0, -2, 2, 2 );
- my @l      = polygon_line_clip \@bbox, @points;
- print scalar @l;      # 1, only one piece found
- my @first = @{$l[0]}; # first is [2,0], [1,-1], [1,2]
+  my @points = ( [1,2], [2,3], [2,0], [1,-1], [1,2] );
+  my @bbox   = ( 0, -2, 2, 2 );
+  my @l      = polygon_line_clip \@bbox, @points;
+  print scalar @l;      # 1, only one piece found
+  my @first = @{$l[0]}; # first is [2,0], [1,-1], [1,2]
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Math-Polygon distribution version 1.11,
-built on May 02, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Math-Polygon version 2.00,
+built on September 04, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2004-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2004-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

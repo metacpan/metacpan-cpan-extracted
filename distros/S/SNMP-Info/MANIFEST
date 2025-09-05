@@ -98,6 +98,7 @@ lib/SNMP/Info/Layer3/Contivity.pm
 lib/SNMP/Info/Layer3/Cumulus.pm
 lib/SNMP/Info/Layer3/Dell.pm
 lib/SNMP/Info/Layer3/DLink.pm
+lib/SNMP/Info/Layer3/EdgeSwitch.pm
 lib/SNMP/Info/Layer3/Enterasys.pm
 lib/SNMP/Info/Layer3/ERX.pm
 lib/SNMP/Info/Layer3/Extreme.pm
@@ -151,6 +152,7 @@ lib/SNMP/Info/Layer7/HWGroup.pm
 lib/SNMP/Info/Layer7/Liebert.pm
 lib/SNMP/Info/Layer7/Neoteris.pm
 lib/SNMP/Info/Layer7/Netscaler.pm
+lib/SNMP/Info/Layer7/Stormshield.pm
 lib/SNMP/Info/LLDP.pm
 lib/SNMP/Info/MAU.pm
 lib/SNMP/Info/MRO.pm
@@ -257,6 +259,7 @@ xt/lib/Test/SNMP/Info/Layer3/Contivity.pm
 xt/lib/Test/SNMP/Info/Layer3/Cumulus.pm
 xt/lib/Test/SNMP/Info/Layer3/Dell.pm
 xt/lib/Test/SNMP/Info/Layer3/DLink.pm
+xt/lib/Test/SNMP/Info/Layer3/EdgeSwitch.pm
 xt/lib/Test/SNMP/Info/Layer3/Enterasys.pm
 xt/lib/Test/SNMP/Info/Layer3/ERX.pm
 xt/lib/Test/SNMP/Info/Layer3/Extreme.pm
@@ -304,6 +307,7 @@ xt/lib/Test/SNMP/Info/Layer7/Gigamon.pm
 xt/lib/Test/SNMP/Info/Layer7/Liebert.pm
 xt/lib/Test/SNMP/Info/Layer7/Neoteris.pm
 xt/lib/Test/SNMP/Info/Layer7/Netscaler.pm
+xt/lib/Test/SNMP/Info/Layer7/Stormshield.pm
 xt/lib/Test/SNMP/Info/LLDP.pm
 xt/lib/Test/SNMP/Info/MAU.pm
 xt/lib/Test/SNMP/Info/NortelStack.pm

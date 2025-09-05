@@ -1,0 +1,2 @@
+unique_id,subject_id,project,species,tissue,sample_type,assay,condition,timepoint,duration,batch,replicate,clar_id
+samp001,1,CNAG-Test,Human,Liver,Normal,RNA_seq,C22.0;C22.2;C22.3;C24.4,Baseline,P0D,1,5,CNAG_Test-HomSap-00001-LIV-NOR-RNA-C22.0+C22.2+C22.3+C24.4-BSL-P0D-B01-R05

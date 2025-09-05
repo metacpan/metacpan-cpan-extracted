@@ -9,3 +9,6 @@ Revision history for WWW-Mechanize-Chrome-Webshot
         Pod fixes.
 0.04    2025/09/02
         It now logs to a Mojo::Log which by default dumps to STDERR/STDOUT.
+0.05    2025/09/04
+        Breaking change: constructor parameter 'logger' is replaced by 'logger-object'. It is used to pass a logger object (which implements methods error(), warn() and info()) on to the constructed instance.
+
