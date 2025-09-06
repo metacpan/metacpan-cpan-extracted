@@ -1,0 +1,19 @@
+bin/golp
+Changes
+example/c5diagonalpuffer1.rle
+example/owssagarstretcher.rle
+example/POD/c5diagonalpuffer1.png
+example/POD/owssagarstretcher.png
+ignore.txt
+lib/App/GUI/GoLP.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+README.md
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

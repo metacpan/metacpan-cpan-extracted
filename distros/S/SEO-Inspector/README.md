@@ -2,6 +2,10 @@
 
 SEO::Inspector - Run SEO checks on HTML or URLs
 
+# VERSION
+
+Version 0.02
+
 # SYNOPSIS
 
     use SEO::Inspector;
@@ -22,7 +26,7 @@ SEO::Inspector - Run SEO checks on HTML or URLs
 
 SEO::Inspector provides:
 
-- Built-in SEO checks: title, meta description, canonical link, robots meta, viewport, H1 presence, word count, image alt text
+- 14 built-in SEO checks
 - Plugin system: dynamically load modules under SEO::Inspector::Plugin namespace
 - Methods to check HTML strings or fetch and analyze a URL
 
@@ -71,6 +75,7 @@ A plugin must provide at least two methods:
           name   => 'My Check',
           status => 'ok' | 'warn' | 'error',
           notes  => 'human-readable message',
+          resolution => 'how to resolve'
         }
 
 ## Running Plugins
@@ -101,10 +106,10 @@ the string "Hello":
 
         sub run {
                 my ($self, $html) = @_;
-                if ($html =~ /Hello/) {
+                if($html =~ /Hello/) {
                         return { name => 'Hello Check', status => 'ok', notes => 'found Hello' };
                 } else {
-                        return { name => 'Hello Check', status => 'warn', notes => 'no Hello' };
+                        return { name => 'Hello Check', status => 'warn', notes => 'no Hello', resolution => 'add a hello field' };
                 }
         }
 
@@ -156,8 +161,7 @@ Nigel Horne, `<njh at nigelhorne.com>`
 
 # SEE ALSO
 
-Test coverage report: [https://nigelhorne.github.io/SEO-Inspector/coverage/](https://nigelhorne.github.io/SEO-Inspector/coverage/)
-
+- Test coverage report: [https://nigelhorne.github.io/SEO-Inspector/coverage/](https://nigelhorne.github.io/SEO-Inspector/coverage/)
 - [https://github.com/nigelhorne/SEO-Checker](https://github.com/nigelhorne/SEO-Checker)
 - [https://github.com/sethblack/python-seo-analyzer](https://github.com/sethblack/python-seo-analyzer)
 
@@ -199,7 +203,7 @@ You can also look for information at:
 
 # LICENCE AND COPYRIGHT
 
-Copyright 2010-2025 Nigel Horne.
+Copyright 2025 Nigel Horne.
 
 Usage is subject to licence terms.
 

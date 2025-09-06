@@ -1,5 +1,9 @@
 Revision history for Perl extension Module::Case.
 
+0.05  Wed Sep 05 21:00:00 2025
+ - Add '-all' feature to enforce case sensitive
+   module loading, even on case-ignorant systems.
+
 0.04  Tue Sep 02 21:00:00 2025
  - Add more test cases
  - Avoid @INC munging unless exists sensitive modules

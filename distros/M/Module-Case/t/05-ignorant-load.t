@@ -17,7 +17,7 @@ BEGIN {
     }
 }
 
-# This is what happened WITHOUT using Module::Case.
+# This is what happens WITHOUT using Module::Case at all.
 # Exploit the problem on case insensitive file system:
 ok(eval {require cWd}, "cWd: Case-ignorant file system gleefully loads the module");
 ok(!$@, "cWd: No errors even though mismatching package $@");

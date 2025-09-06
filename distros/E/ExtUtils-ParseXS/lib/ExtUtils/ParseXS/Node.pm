@@ -2,7 +2,7 @@ package ExtUtils::ParseXS::Node;
 use strict;
 use warnings;
 
-our $VERSION = '3.58';
+our $VERSION = '3.59';
 
 =head1 NAME
 
@@ -1407,7 +1407,9 @@ sub lookup_input_typemap {
         # as a pseudo-parameter, then override the normal typedef - which
         # would emit SvPV_nolen(...) - and instead, emit SvPV(...,
         # STRLEN_length_of_foo)
-        if ($xstype eq 'T_PV' and $self->{has_length}) {
+        if ($self->{has_length}) {
+            $pxs->blurt("length(NAME) not supported with typemaps other than T_PV")
+                if $xstype ne 'T_PV';
             die "default value not supported with length(NAME) supplied"
                 if defined $default;
             return "($type)SvPV($arg, STRLEN_length_of_$var);",
@@ -2425,7 +2427,7 @@ sub parse {
             # $C_arg regex doesn't work. This code path should ideally
             # never be reached, and indicates a design weakness in $C_arg.
             @param_texts = split(/\s*,\s*/, $params_text);
-            Warn($pxs,   "Warning: cannot parse parameter list "
+            $pxs->Warn($pxs,   "Warning: cannot parse parameter list "
                        . "'$params_text', fallback to split");
         }
     }

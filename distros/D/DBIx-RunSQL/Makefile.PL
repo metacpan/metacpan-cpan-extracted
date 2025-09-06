@@ -40,7 +40,7 @@ my %module = (
         x_static_install => 1, # we are pure Perl and don't do anything fancy
     },
 
-    MIN_PERL_VERSION => '5.010',
+    MIN_PERL_VERSION => '5.020', # we use signatures
 
     'EXE_FILES' => [
         'bin/run-sql.pl',
@@ -55,12 +55,14 @@ my %module = (
     'PREREQ_PM'     => {
                         'strict'       => 0,
                         'warnings'     => 0,
+                        'experimental' => '0.036',
                         'Getopt::Long' => '2.36', # GetOptionsFromArray
                         'DBI'          => 0,
+                        'Carp'         => 0,
                         'Module::Load' => 0,
                       }, # e.g., Module::Name => 1.1
     TEST_REQUIRES => {
-        'Test::More'   => 0,
+        'Test2::V0'    => 0,
         'Data::Dumper' => 0,
     },
 

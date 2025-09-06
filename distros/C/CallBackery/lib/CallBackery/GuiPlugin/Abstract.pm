@@ -59,7 +59,19 @@ The current user object
 
 =cut
 
-has 'user'=> undef;
+# if no user is assigned, all access checks are positive, this allows to explore the
+# modules full capabilities during startup
+has 'user'=> sub ($self) {
+    my $mockUser = bless {}, 'MockUser';
+    unless (defined &MockUser::may) {
+        *MockUser::may = sub ($mockSelf, $right) {
+            $self->log->debug("MockUser::may($right) -> true");
+            return 1;
+        };
+    }
+    return $mockUser;
+};
+
 
 has 'dbHandle' => sub ($self) {
     $self->user->db;

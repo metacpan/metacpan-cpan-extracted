@@ -4,6 +4,7 @@ author:
   - 'Nigel Horne <njh@nigelhorne.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  File::Glob: '0'
   File::Path: '0'
   File::Spec: '0'
   File::Temp: '0'
@@ -12,10 +13,12 @@ build_requires:
   IPC::Run3: '0'
   JSON::MaybeXS: '0'
   POSIX: '0'
+  Path::Tiny: '0'
   Test::DescribeMe: '0'
   Test::Most: '0'
   Test::Needs: '0'
   Test::NoWarnings: '0'
+  Try::Tiny: '0'
   autodie: '0'
   strict: '0'
   warnings: '0'
@@ -41,10 +44,12 @@ requires:
   Module::Pluggable: '0'
   Mojo::URL: '0'
   Mojo::UserAgent: '0'
+  Object::Configure: '0.14'
+  Params::Get: '0.13'
   perl: '5.008'
 resources:
   bugtracker: https://github.com/nigelhorne/SEO-Inspector/issues
   homepage: https://metacpan.org/pod/SEO::Inspector
   repository: git://github.com/nigelhorne/SEO-Inspector.git
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

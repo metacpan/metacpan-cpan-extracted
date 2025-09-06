@@ -1,4 +1,8 @@
-Revision history for Config::Abstraction - Configuration Abstraction Layer
+Revision history for Config::Abstraction - Merge and manage configuration data from different sources
+
+0.34	Fri Sep  5 08:37:21 EDT 2025
+	Added bin/config-dump
+	If schema is passed in, validate the config file against it
 
 0.33	Thu Jul 17 08:19:41 EDT 2025
 	The config_path value wasn't being stashed properly

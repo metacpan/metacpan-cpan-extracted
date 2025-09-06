@@ -8,7 +8,7 @@ use FindBin;
 WriteMakefile(
   NAME         => 'CallBackery',
   VERSION_FROM => 'lib/CallBackery.pm',
-  ABSTRACT     => 'CallBackery is a Mojolicious+Qoodoo Framework for building Web Applications',
+  ABSTRACT     => 'CallBackery is a Mojolicious+Qooxdoo Framework for building Web Applications',
   AUTHOR       => 'Tobias Oetiker <tobi@oetiker.ch>',
   LICENSE      => 'gpl_3',
   PREREQ_PM    => {

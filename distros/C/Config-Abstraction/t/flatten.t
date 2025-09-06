@@ -34,4 +34,21 @@ diag(Data::Dumper->new([$config])->Dump()) if($ENV{'TEST_VERBOSE'});
 cmp_ok($config->get('disc_cache.driver'), 'eq', 'File', 'XML/Colon files correctly handle commas');
 cmp_ok($config->all()->{'disc_cache'}{'driver'}, 'eq', 'File', 'XML/Colon files correctly handle commas');
 
+throws_ok( sub  {
+	$config = Config::Abstraction->new(
+		path => [$test_dir],
+		config_file => 'auto_test',
+		schema => {
+			'SiteTitle' => { 'type' => 'string' },
+			'Contents' => { 'type' => 'string' },
+			'root_dir' => { 'type' => 'string' },
+			'disc_cache' => { 'type' => 'string' },
+			'memory_cache' => { 'type' => 'string' },
+			'OPENADDR_HOME' => { 'type' => 'string' },
+			'config_path' => { 'type' => 'string' },	# Meta variable that is added
+			'vwflog' => { 'type' => 'string' },
+		},
+	)
+}, qr/Unknown parameter 'Host'/, 'Disallowed items caught');
+
 done_testing();

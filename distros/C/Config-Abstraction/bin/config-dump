@@ -1,0 +1,89 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Config::Abstraction;
+use Getopt::Long qw(GetOptions);
+use Pod::Usage;
+
+my $config_dirs;
+my $file;
+my $env_prefix = 'APP_';
+my $help;
+my $format = 'dumper';	# dumper | json | yaml
+
+GetOptions(
+	'file=s' => \$file,
+	'dirs=s' => \$config_dirs,
+	'env_prefix=s' => \$env_prefix,
+	'format=s' => \$format,
+	'help|?' => \$help,
+) or pod2usage(2);
+
+pod2usage(1) if $help;
+
+my $args;
+$args->{'env_prefix'} = $env_prefix if($env_prefix);
+$args->{'file'} = $file if($file);
+$args->{'config_dirs'} = split(/,/, $config_dirs) if($config_dirs);
+
+if(my $cfg = Config::Abstraction->new($args)) {
+	my $data = $cfg->all();
+
+	if($format eq 'json') {
+		require JSON;
+		print JSON::encode_json($data), "\n";
+	} elsif($format eq 'yaml') {
+		require YAML;
+		print YAML::Dump($data);
+	} else {
+		require Data::Dumper;
+		Data::Dumper->import();
+		no warnings 'once';	# Silence Sortkeys message
+
+		local $Data::Dumper::Terse = 1;
+		local $Data::Dumper::Sortkeys = 1;
+		print Dumper($data);
+	}
+}
+
+__END__
+
+=head1 NAME
+
+config-dump - Display merged configuration from Config::Abstraction
+
+=head1 SYNOPSIS
+
+  config-dump --file myapp.conf --env_prefix MYAPP_
+  config-dump --file settings.json --format json
+  config-dump --format yaml
+
+=head1 DESCRIPTION
+
+Loads configuration from supported sources and prints the fully merged
+configuration to STDOUT. Useful for debugging or inspecting the final values
+that your application will use.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--file FILE>
+
+Load configuration from the specified file (supports formats your sources handle).
+
+=item B<--env_prefix PREFIX>
+
+Environment variable prefix to search for (default: C<APP_>).
+
+=item B<--format FORMAT>
+
+Output format: C<dumper>, C<json>, or C<yaml>. Default: C<dumper>.
+
+=item B<--help>
+
+Show this help message.
+
+=back

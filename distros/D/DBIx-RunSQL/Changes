@@ -1,3 +1,9 @@
+0.26 2025-09-05
+    * Switch ->split_sql() to an iterator API
+      This allows us to run large SQL files without reading them into
+      RAM in one piece.
+    * Require Perl 5.020 as minimum Perl version
+
 0.25 2024-08-15
     * Don't use Test::More::isn't() anymore, in favour of Test::More::isnt()
 

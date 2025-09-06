@@ -32,5 +32,5 @@ resources:
   bugtracker: https://github.com/Perl/perl5/issues
   homepage: https://github.com/Perl/perl5
   repository: https://github.com/Perl/perl5.git
-version: '3.58'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: '3.59'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

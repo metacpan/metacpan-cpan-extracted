@@ -1,5 +1,5 @@
 ---
-abstract: 'Configuration Abstraction Layer'
+abstract: 'Merge and manage configuration data from different sources'
 author:
   - 'Nigel Horne <njh@nigelhorne.com>'
 build_requires:
@@ -35,6 +35,8 @@ requires:
   JSON::MaybeXS: '0'
   JSON::Parse: '0'
   Params::Get: '0.04'
+  Params::Validate::Strict: '0'
+  Scalar::Util: '0'
   XML::PP: '0.06'
   YAML::XS: '0'
   perl: '5.010000'
@@ -42,5 +44,5 @@ resources:
   bugtracker: https://github.com/nigelhorne/Config-Abstraction/issues
   homepage: https://metacpan.org/pod/Config::Abstraction
   repository: git://github.com/nigelhorne/Config-Abstraction.git
-version: '0.33'
+version: '0.34'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

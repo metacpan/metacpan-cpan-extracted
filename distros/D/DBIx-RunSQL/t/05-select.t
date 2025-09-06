@@ -52,20 +52,20 @@ isnt $result, undef, "We got some kind of result";
 like $result, qr/\bname\b.*?\bage\b/m, "An empty resultset still outputs the column titles";
 unlike $result, qr/\bbar\b.*?\b100\b/m, "(but obviously, no values)";
 
-my $sth= $test_dbh->prepare(<<'SQL');
+$sth= $test_dbh->prepare(<<'SQL');
     select * from foo order by name, age;
 SQL
 $sth->execute;
-my $result= DBIx::RunSQL->format_results( sth => $sth, rotate => 1 );
+$result= DBIx::RunSQL->format_results( sth => $sth, rotate => 1 );
 
 isnt $result, undef, "We got some kind of result";
 like $result, qr/\bname\b.*?\bbar\s+baz\b/m, "The name row exists";
 like $result, qr/\bage\b.*?\b100\b\s+1\b/m, "The age row exists";
 
-my $sth= $test_dbh->prepare(<<'SQL');
+$sth= $test_dbh->prepare(<<'SQL');
     select * from foo
     where age is null
 SQL
 $sth->execute;
-my $result= DBIx::RunSQL->format_results( sth => $sth, null => '<null>' );
+$result= DBIx::RunSQL->format_results( sth => $sth, null => '<null>' );
 like $result, qr/<null>/m, "We can set custom strings for NULL";

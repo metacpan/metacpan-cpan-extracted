@@ -40,11 +40,14 @@
             "Module::Pluggable" : "0",
             "Mojo::URL" : "0",
             "Mojo::UserAgent" : "0",
+            "Object::Configure" : "0.14",
+            "Params::Get" : "0.13",
             "perl" : "5.008"
          }
       },
       "test" : {
          "requires" : {
+            "File::Glob" : "0",
             "File::Path" : "0",
             "File::Spec" : "0",
             "File::Temp" : "0",
@@ -53,10 +56,12 @@
             "IPC::Run3" : "0",
             "JSON::MaybeXS" : "0",
             "POSIX" : "0",
+            "Path::Tiny" : "0",
             "Test::DescribeMe" : "0",
             "Test::Most" : "0",
             "Test::Needs" : "0",
             "Test::NoWarnings" : "0",
+            "Try::Tiny" : "0",
             "autodie" : "0",
             "strict" : "0",
             "warnings" : "0"
@@ -78,6 +83,6 @@
          "x_repository" : "https://github.com/nigelhorne/SEO-Inspector"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

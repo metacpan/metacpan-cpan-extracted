@@ -94,7 +94,6 @@ t/testset/bot/bot_general.yaml
 t/testset/bot/bot_misc.yaml
 t/testset/bot/bytespider.yaml
 t/testset/bot/centro_ads_crawler.yaml
-t/testset/bot/chatgpt-user.yaml
 t/testset/bot/claudebot.yaml
 t/testset/bot/duckduckbot.yaml
 t/testset/bot/facebookcrawler.yaml
@@ -109,7 +108,6 @@ t/testset/bot/googlebot.yaml
 t/testset/bot/googlebot_ad.yaml
 t/testset/bot/googlebot_misc.yaml
 t/testset/bot/googlebot_mobile.yaml
-t/testset/bot/gptbot.yaml
 t/testset/bot/hatena_bot.yaml
 t/testset/bot/huawei.yaml
 t/testset/bot/inoreader.yaml
@@ -119,6 +117,7 @@ t/testset/bot/mail_ru_bot.yaml
 t/testset/bot/msnbot.yaml
 t/testset/bot/netcraft.yaml
 t/testset/bot/oldreader.yaml
+t/testset/bot/openai-chatgpt.yaml
 t/testset/bot/oracle_grapeshotcrawler.yaml
 t/testset/bot/owler.yaml
 t/testset/bot/perplexity.yaml

@@ -32,10 +32,12 @@
       },
       "runtime" : {
          "requires" : {
+            "Carp" : "0",
             "DBI" : "0",
             "Getopt::Long" : "2.36",
             "Module::Load" : "0",
-            "perl" : "5.010",
+            "experimental" : "0.036",
+            "perl" : "5.020",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -43,7 +45,7 @@
       "test" : {
          "requires" : {
             "Data::Dumper" : "0",
-            "Test::More" : "0"
+            "Test2::V0" : "0"
          }
       }
    },
@@ -62,7 +64,7 @@
          "web" : "https://github.com/Corion/DBIx-RunSQL"
       }
    },
-   "version" : "0.25",
+   "version" : "0.26",
    "x_serialization_backend" : "JSON::PP version 4.07",
    "x_static_install" : 1
 }

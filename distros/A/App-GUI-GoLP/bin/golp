@@ -1,0 +1,1096 @@
+#!/usr/bin/perl
+use 5.014;
+use strict;
+
+package GoLP_load;
+# routines to load files
+# .cells and .rle are common file formats 
+
+sub load {
+    my ($filename) = @_;
+
+    if ( $filename =~ /\.cells \z/imsx ) {
+        return load_cells_file($filename);
+    }
+    elsif ( $filename =~ /\.rle \z/imsx ) {
+        return load_RLE_file($filename);
+    }
+    
+    warn("Unknown file type: '$filename'");
+    return undef;
+}
+
+sub load_RLE_file {
+    my ($filename) = @_;
+
+    my $fh;
+    unless ( defined open($fh, "<", $filename) ) {
+        warn("Could not open file '$filename': $!");      
+        return undef;  
+    }
+
+    my ($birth, $survival) = ( [3], [2,3] );
+    my ($width, $height) = (0, 0);
+    my $rle_data = "";
+    
+    READ_RLE_FILE: while (my $line = <$fh>) {
+        chomp($line);
+        if ( $line =~ /\A \s* \#/imsx ) { # skip comments           
+            next READ_RLE_FILE; 
+        }
+        if ($line =~ /\A x \s* = \s* (\d+), \s* y \s* = \s* (\d+)/imsx) { # parse header
+            ($width, $height) = ($1, $2);
+            # check for rule
+            if ( $line =~ m|rule \s* = \s* B \s* (\d+) \s* / \s* S \s* (\d+)|imsx ) {
+                ($birth, $survival) = map { [split //] } ($1, $2);         
+            }
+            elsif ( $line =~ m|rule \s* = \s* (\d+) \s* / \s* (\d+)|imsx ) {
+                ($birth, $survival) = map { [split //] } ($2, $1);
+            }
+            next READ_RLE_FILE;
+        }
+        $rle_data .= $line; 
+    }
+    close $fh;
+
+    if ( ($width <= 0) || ($height <= 0) ) {
+        warn("File '$filename' seems to be missing header, cannot load.");
+        return undef;
+    }
+
+    # process RLE data
+    $rle_data =~ s/!//g;
+    
+    my @rows;
+    my $x = 0;
+    my $y = 0;
+    my $count = "";
+
+    foreach my $char (split //, $rle_data) {
+        if ($char =~ /\d/) {
+            $count .= $char;  # Accumulate digit characters
+        } elsif ($char eq 'b' || $char eq 'o') {
+            $count = $count eq "" ? 1 : $count; # Default count is 1
+            my $state = ($char eq 'o') ? 1 : 0; # 'o' is live (1), 'b' is dead (0)
+            
+            # Fill the grid with the decoded run
+            for (1 .. $count) {
+                $rows[$y][$x++] = $state;
+            }
+            $count = "";  # Reset count
+        } elsif ($char eq '$') {
+            $count = $count eq "" ? 1 : $count;
+            for (1 .. $count) {
+                $y++;
+                $x = 0; # Move to the next row
+            }
+            $count = "";
+        }
+    }
+
+    # Ensure all rows have the same width
+    for my $row (@rows) {
+        push @{$row}, (0) x ($width - scalar @{$row});
+    }    
+
+    return { rows => $height, cols => $width, data => \@rows, birth => $birth, survival => $survival };
+}
+
+sub load_cells_file {
+    my ($filename) = @_;
+
+    my $fh;
+    unless ( defined open($fh, "<", $filename) ) {
+        warn("Could not open file '$filename': $!");      
+        return undef;  
+    }
+
+    my $max_row_len = 0;
+    my %cell_state_map = ( '.' => 0, 'o' => 1, 'O' => 1, 'x' => 1, 'X' => 1, );
+    my @file_grid;
+
+    READ_CELLS_FILE: while ( my $line = <$fh> ) {
+        chomp($line);
+
+        next READ_CELLS_FILE if $line =~ /!/;                # skip comments
+
+        # sometimes in .cells files the trailing dead cells in a row are omitted
+        my $row_len = length($line);
+        if ( $row_len > $max_row_len ) {
+            $max_row_len = $row_len;
+        }
+
+        my @row_cells = map { $cell_state_map{$_} } split(//, $line);
+        push @file_grid, \@row_cells;   
+    }
+
+    close($fh);
+
+    my @grid;
+    # we can't guarantee that the grid read from the file has uniform length rows.
+    foreach my $row (@file_grid) {
+        my @file_row = @{$row};
+        my $trailing = $max_row_len - scalar(@file_row);
+        if ( $trailing < 0 ) {
+            warn("Somehow calculating the row length went wrong");
+            return undef;
+        }
+        push @file_row, (0) x $trailing;            
+        push @grid, \@file_row;
+    }
+
+    my $rows = scalar(@grid);
+    my $cols = $max_row_len;
+
+    unless ( defined($rows) && ($rows > 0) && defined($cols) && ($cols > 0) ) {
+        warn("Load does not look successful!");
+        return undef;
+    }
+
+    return { rows => $rows, cols => $cols, data => \@grid };
+}
+
+
+
+package CustomRuleForm;
+# Dialog to set birth/survival rules
+
+use Prima;
+use Prima::Classes;
+use vars qw(@ISA);
+@ISA = qw(Prima::Dialog);
+
+use Prima::Buttons;
+use Prima::Label;
+
+sub profile_default
+{
+	my $def = $_[0]-> SUPER::profile_default;
+	my %prf = (
+		name => 'Custom Rules',
+		origin => [766, 356],
+		originDontCare => 0,
+		size => [253, 396],
+		sizeDontCare => 0,
+		width => 253,
+		height => 396,
+		left => 766,
+		bottom => 356,
+		designScale => [8, 16],
+	);
+	@$def{keys %prf} = values %prf;
+	return $def;
+}
+
+sub init
+{
+	my $self = shift;
+	my %instances = map {$_ => {}} qw();
+	my %profile = $self->SUPER::init(@_);
+	my %names   = (q(Form1) => $self);
+	$self->lock;
+
+    # title row
+	$names{Title_Label_1} = $names{Form1}->insert( qq(Prima::Label) => 
+		name => 'Title_Label_1',
+		origin => [8, 364],
+		size => [79, 20],
+		text => 'Neighbours',
+	);
+	$names{Title_Label_2} = $names{Form1}->insert( qq(Prima::Label) => 
+		name => 'Title_Label_2',
+		origin => [108, 364],
+		size => [44, 20],
+		text => 'Birth',
+	);
+	$names{Title_Label_3} = $names{Form1}->insert( qq(Prima::Label) => 
+		name => 'Title_Label_3',
+		origin => [172, 364],
+		size => [60, 20],
+		text => 'Survival',
+	);
+
+    # rows
+    my $y_offset = 332;
+    foreach my $row (0..8) {
+	    $names{'Label_Row' . $row} = $names{Form1}->insert( qq(Prima::Label) => 
+		    name => 'Label_Row' . $row,
+		    origin => [40, $y_offset-1],
+		    size => [23, 20],
+		    text => $row,
+	    );    
+	    $names{'Birth_CheckBox_Row' . $row} = $names{Form1}->insert( qq(Prima::CheckBox) => 
+		    name => 'Birth_CheckBox_Row' . $row,
+		    origin => [116, $y_offset],
+		    showHint => 1,
+		    size => [30, 20],
+		    text => '',
+	    );
+	    $names{'Survival_CheckBox_Row' . $row} = $names{Form1}->insert( qq(Prima::CheckBox) => 
+		    name => 'Survival_CheckBox_Row' . $row,
+		    origin => [192, $y_offset],
+		    size => [32, 20],
+		    text => '',
+	    );
+        $y_offset -= 32;
+    }
+
+    # OK/Cancel buttons
+	$names{Button1} = $names{Form1}->insert( qq(Prima::Button) => 
+		name => 'Button1',
+		origin => [ 16, 14],
+		size => [ 96, 36],
+		text => '~OK',
+        modalResult => mb::OK,
+	);
+	$names{Button2} = $names{Form1}->insert( qq(Prima::Button) => 
+		name => 'Button2',
+		origin => [140, 14],
+		size => [96, 36],
+		text => 'Cancel',
+        modalResult => mb::Cancel,
+	);
+
+	$self->unlock;
+	return %profile;
+}
+
+sub set_rules {
+    my ($self, $birth, $survival) = @_;
+
+    my %b_rules;
+    if ( ref($birth) eq 'ARRAY' ) {
+        foreach my $num (@{$birth}) {
+            $b_rules{$num} = 1;
+        }
+    }
+
+    my %s_rules;
+    if ( ref($survival) eq 'ARRAY' ) {
+        foreach my $num (@{$survival}) {
+            $s_rules{$num} = 1;
+        }
+    }
+
+    foreach my $i (0..8) {
+        my $b_cbox = 'Birth_CheckBox_Row' . $i;
+        my $s_cbox = 'Survival_CheckBox_Row' . $i;
+
+        exists $b_rules{$i} ? $self->$b_cbox->checked(1) : $self->$b_cbox->checked(0);
+        exists $s_rules{$i} ? $self->$s_cbox->checked(1) : $self->$s_cbox->checked(0);
+    }
+
+    return;
+}
+
+sub get_rule_string {
+    my $self = shift;
+
+    my @birth;
+    my @survival;
+
+    foreach my $i (0..8) {
+        my $b_cbox = 'Birth_CheckBox_Row' . $i;
+        my $s_cbox = 'Survival_CheckBox_Row' . $i;
+        if ( $self->$b_cbox->checked() ) {
+            push @birth, $i;
+        }
+        if ( $self->$s_cbox->checked() ) {
+            push @survival, $i;
+        }
+    }
+
+    return (\@birth, \@survival);    
+}
+
+
+package ZoomChangeForm;
+# Dialog box for adjusting the zoom/scale (which can also be changed using the mousewheel)
+# created using the VB program
+
+use Prima;
+use Prima::Classes;
+use vars qw(@ISA);
+@ISA = qw(Prima::Dialog);
+
+use Prima::Buttons;
+use Prima::Label;
+use Prima::Sliders;
+
+sub profile_default
+{
+	my $def = $_[0]->SUPER::profile_default;
+	my %prf = (
+		name => 'Zoom',
+		origin => [778, 651],
+		originDontCare => 0,
+		size => [232, 129],
+		sizeDontCare => 0,
+		width => 232,
+		height => 129,
+		left => 778,
+		bottom => 651,
+		designScale => [8, 16],
+	);
+	@$def{keys %prf} = values %prf;
+	return $def;
+}
+
+sub init
+{
+    my $self = shift;
+    my %profile = $self->SUPER::init(@_);
+
+    my %names = ( q(Form1) => $self);
+	$self->lock;
+	$names{Button1} = $names{Form1}->insert( qq(Prima::Button) => 
+		name => 'Button1',
+		origin => [12, 14],
+		size => [96, 36],
+		text => '~OK',
+        modalResult => mb::OK,
+	);
+	$names{Button2} = $names{Form1}->insert( qq(Prima::Button) => 
+		name => 'Button2',
+		origin => [120, 14],
+		size => [96, 36],
+		text => 'Cancel',
+        modalResult => mb::Cancel,
+	);
+	$names{Label1} = $names{Form1}->insert( qq(Prima::Label) => 
+		name => 'Label1',
+		origin => [12, 92],
+		size => [202, 20],
+		text => 'Zoom (pixels per cell)',
+	);
+	$names{SpinEdit1} = $names{Form1}->insert( qq(Prima::SpinEdit) => 
+		max => 50,
+		min => 1,
+		name => 'SpinEdit1',
+		origin => [12, 60],
+		size => [204, 24],
+	);
+	$self->unlock;    
+
+	return %profile;
+}
+
+sub value {
+    my $self = shift;
+    my $val = shift;
+
+    if ( defined $val ) {
+        $self->SpinEdit1->value($val);
+        return;
+    }
+    else {
+        return $self->SpinEdit1->value();
+    }    
+}
+
+package main;
+
+use Prima qw(Application MsgBox Dialog::FileDialog Dialog::ColorDialog Cairo);
+use Cairo;
+use Game::Life::Faster;
+use List::Util qw/max min/;
+use File::Basename;
+use Feature::Compat::Try;
+
+my $filename = shift;               # can specify an input file on the command line
+my ($filebase, $dirs, $suffix);
+my $initial_title = 'GoLP';
+my $initial_win_size = [800, 600];
+my ($board_width, $board_height);
+my ($birth, $survival);
+my $game;
+my $game_ready = 0;
+my $tick_delay_ms = 250;
+my $grid = 1;
+my $autogrow = 1;
+my $ticks = 0;
+my $status = 1;
+my $colordialog;
+
+# From https://conwaylife.com/wiki/List_of_Life-like_rules
+my %rule_name_to_BS = (
+    "Conway's Life"         =>  'B3/S23',
+    "Seeds"                 =>  'B2/S',
+    "Live Free or Die"      =>  'B2/S0',
+    "Flock"                 =>  'B3/S12',
+    "LowLife"               =>  'B3/S13',
+    "Long Life"             =>  'B345/S5',
+    "Amoeba"                =>  'B357/S1358',
+    "Geology"               =>  'B3578/S24678',
+    "HighLife"              =>  'B36/S23',
+    "Day and Night"         =>  'B3678/S34678',
+    "Pedestrian Life"       =>  'B38/S23',
+    "HoneyLife"             =>  'B38/S238',
+    "Maze"                  =>  'B3/S12345',
+    "Mazectric"             =>  'B3/S1234',
+    "Star Trek"             =>  'B3/S0248',
+    "Life without death"    =>  'B3/S012345678',
+    "Persian rug"           =>  'B234/S',    
+    "Coral"                 =>  'B3/S45678',
+    "Stains"                =>  'B3678/S235678',
+    "Morley"                =>  'B368/S245',
+    "Bacteria"              =>  'B34/S456',
+    "Assimilation"          =>  'B345/S4567',
+    "Gnarl"                 =>  'B1/S1',
+    "Snakeskin"             =>  'B1/S134567',
+    "Replicator"            =>  'B1357/S1357',
+);
+
+my %rule_BS_to_name;
+while ( my ($k, $v) = each %rule_name_to_BS ) {
+    $rule_BS_to_name{$v} = $k;
+}
+
+my $livecolor = hex('ffffff');
+my ($live_r, $live_g, $live_b) = (1, 1, 1);
+my $deadcolor = 0;
+my ($dead_r, $dead_g, $dead_b) = (0, 0, 0);
+my $gridcolor = hex('4d4d4d');
+my ($grid_r, $grid_g, $grid_b) = (0.3, 0.3, 0.3);
+
+my $scale = 4; # pixels per cell dimension
+
+my $vp_x_offset = 0;
+my $vp_y_offset = 0;
+
+if ( defined $filename ) {
+    if ( load_game($filename) ) {
+        ($filebase, $dirs, $suffix) = fileparse($filename, '.rle', '.cells');
+        $initial_title = "GoLP | " . $filebase . $suffix;
+    }
+    else {
+        warn("Could not load up: $filename");
+    }
+}
+
+# create the main window with all the different menu options and interactions.
+my $w = Prima::MainWindow->new(
+
+    layered => 1,
+    buffered => 1,
+    text => $initial_title,
+	size => $initial_win_size,
+
+    menuItems => [
+            [ '~File' => [
+                    ['~Open', 'Ctrl+O', '^O', sub { 
+                            my ( $window, $menu ) = @_;
+
+                            my $open = Prima::Dialog::OpenDialog->new(
+                                    filter => [
+                                            ['Run-length encoded (.rle)' => '*.rle'],
+                                            ['Plaintext (.cells)' => '*.cells'],
+                                    ]
+                            );
+
+                            if ( $open->execute ) {
+                                if ( load_game($open->fileName) ) {
+                                    # start paused
+                                    $window->menu->uncheck('pause');
+                                    $window->Timer->stop();
+                                    $ticks = 0;
+                        
+                                    ($filebase, $dirs, $suffix) = fileparse($open->fileName, '.rle', '.cells');                                    
+                                    $window->text("GoLP | " . $filebase . $suffix);
+                                    my $rule = to_bs_string($birth, $survival);
+                                    $window->menu->check($rule);
+
+                                    $window->repaint();
+                                }
+                                else {
+                                    message('ERROR: Could not load ' . $open->fileName);
+                                }                                
+                            }
+                        }],
+                    [],
+                    ['~Exit', 'Ctrl+X', '^X', sub { shift-> close } ],
+            ]],
+            [ '~Options' => [
+
+		            [ 'pause' => '~Play/Pause' => 'Space' => kb::Space => sub {
+			            my ( $window, $menu ) = @_;
+                        $window->menu->toggle($menu) ? $window->Timer->start() : $window->Timer->stop();
+		            } ],
+                    ['*Grid' => '~Grid' => sub { 
+			            my ( $window, $menu ) = @_;
+                        $grid = $window->menu->toggle($menu);
+                        $window->repaint();
+                    } ],
+                    ['*Grow' => '~Autogrow' => sub { 
+			            my ( $window, $menu ) = @_;
+                        $autogrow = $window->menu->toggle($menu);
+                    } ],
+                    ['*Status' => 'S~tatus line' => sub { 
+			            my ( $window, $menu ) = @_;
+                        $status = $window->menu->toggle($menu);
+                        $window->repaint();
+                    } ],
+		            [ '~Snapshot board' => 'F5' => kb::F5 => sub {
+                        my $snapname = to_png($game->get_grid());
+                        if ( -e $snapname ) {
+                            message("Snapshot written to $snapname");
+                        }
+                        else {
+                            message("ERROR - snapshot not created");
+                        }
+		            } ],
+                    [ 'L~oop delay' => [
+                        [ '(s_zero' => '0 ms'  => sub { $_[0]->Timer->timeout(0);  } ],
+                        [ 'ms_25' => '25 ms'  => sub { $_[0]->Timer->timeout(25); } ],
+                        [ 'ms_50' => '50 ms'  => sub { $_[0]->Timer->timeout(50); } ],
+                        [ 'ms_100' => '100 ms' => sub { $_[0]->Timer->timeout(100); } ],
+                        [ '*ms_250' => '250 ms' => sub { $_[0]->Timer->timeout(250); } ],
+                        [ 'ms_500' => '500 ms' => sub { $_[0]->Timer->timeout(500); } ],
+                        [ 'one_s' => '1 s' => sub { $_[0]->Timer->timeout(1000); } ],
+                        [ 'ms_2500' => '2.5 s' => sub { $_[0]->Timer->timeout(2500); } ],
+                        [ 'five_s' => '5 s' => sub { $_[0]->Timer->timeout(5000); } ],
+                        [ 'ten_s)' => '10 s' => sub { $_[0]->Timer->timeout(10000); } ],
+                    ]],
+                    [ '~Rules' => [
+                         [ '*(B3/S23' => "Conway's Life (B3/S23)" => sub { handle_rule($_[0], 'B3/S23'); } ], 
+                         [ 'B357/S1358' => "Amoeba (B357/S1358)" => sub { handle_rule($_[0], 'B357/S1358'); } ], 
+                         [ 'B345/S4567' => "Assimilation (B345/S4567)" => sub { handle_rule($_[0], 'B345/S4567'); } ], 
+                         [ 'B34/S456' => "Bacteria (B34/S456)" => sub { handle_rule($_[0], 'B34/S456'); } ], 
+                         [ 'B3/S45678' => "Coral (B3/S45678)" => sub { handle_rule($_[0], 'B3/S45678'); } ], 
+                         [ 'B3678/S34678' => "Day and Night (B3678/S34678)" => sub { handle_rule($_[0], 'B3678/S34678'); } ], 
+                         [ 'B3/S12' => "Flock (B3/S12)" => sub { handle_rule($_[0], 'B3/S12'); } ], 
+                         [ 'B3578/S24678' => "Geology (B3578/S24678)" => sub { handle_rule($_[0], 'B3578/S24678'); } ], 
+                         [ 'B1/S1' => "Gnarl (B1/S1)" => sub { handle_rule($_[0], 'B1/S1'); } ], 
+                         [ 'B36/S23' => "HighLife (B36/S23)" => sub { handle_rule($_[0], 'B36/S23'); } ], 
+                         [ 'B38/S238' => "HoneyLife (B38/S238)" => sub { handle_rule($_[0], 'B38/S238'); } ], 
+                         [ 'B3/S012345678' => "Life without death (B3/S012345678)" => sub { handle_rule($_[0], 'B3/S012345678'); } ], 
+                         [ 'B2/S0' => "Live Free or Die (B2/S0)" => sub { handle_rule($_[0], 'B2/S0'); } ], 
+                         [ 'B345/S5' => "Long Life (B345/S5)" => sub { handle_rule($_[0], 'B345/S5'); } ], 
+                         [ 'B3/S13' => "LowLife (B3/S13)" => sub { handle_rule($_[0], 'B3/S13'); } ], 
+                         [ 'B3/S12345' => "Maze (B3/S12345)" => sub { handle_rule($_[0], 'B3/S12345'); } ], 
+                         [ 'B3/S1234' => "Mazectric (B3/S1234)" => sub { handle_rule($_[0], 'B3/S1234'); } ], 
+                         [ 'B368/S245' => "Morley (B368/S245)" => sub { handle_rule($_[0], 'B368/S245'); } ], 
+                         [ 'B38/S23' => "Pedestrian Life (B38/S23)" => sub { handle_rule($_[0], 'B38/S23'); } ], 
+                         [ 'B234/S' => "Persian rug (B234/S)" => sub { handle_rule($_[0], 'B234/S'); } ], 
+                         [ 'B1357/S1357' => "Replicator (B1357/S1357)" => sub { handle_rule($_[0], 'B1357/S1357'); } ], 
+                         [ 'B2/S' => "Seeds (B2/S)" => sub { handle_rule($_[0], 'B2/S'); } ], 
+                         [ 'B1/S134567' => "Snakeskin (B1/S134567)" => sub { handle_rule($_[0], 'B1/S134567'); } ], 
+                         [ 'B3678/S235678' => "Stains (B3678/S235678)" => sub { handle_rule($_[0], 'B3678/S235678'); } ], 
+                         [ 'B3/S0248' => "Star Trek (B3/S0248)" => sub { handle_rule($_[0], 'B3/S0248'); } ],                                
+                         [ 'custom)' => "Custom rule..." => sub {
+                            my ( $window ) = @_;
+                            my $rule_changer = CustomRuleForm->new();
+                            $rule_changer->set_rules($birth, $survival);
+                            if ( $rule_changer->execute() != mb::Cancel ) {
+                                my ($new_b, $new_s) = $rule_changer->get_rule_string();
+                                my $str = to_bs_string($new_b, $new_s);
+                                if ( exists $rule_BS_to_name{$str} ) {
+                                    $window->menu->check($str);
+                                }
+                                handle_rule($window, $str); 
+                            }
+                         }],
+                    ]],
+                    [],
+                    ['change_zoom' => '~Zoom...' => sub {
+                        my ( $window ) = @_;
+                        my $zoom_changer = ZoomChangeForm->new();
+                        $zoom_changer->value($scale);
+                        if ( $zoom_changer->execute() != mb::Cancel ) {
+                            $scale = $zoom_changer->value();
+                            $window->repaint();
+                        }
+                    } ],
+                    [],
+                    ['live_color' => '~Live cell color...' => sub {
+                        handle_color($_[0], \$livecolor, \$live_r, \$live_g, \$live_b);
+                    } ],
+                    ['dead_color' => '~Dead cell color...' => sub {
+                        handle_color($_[0], \$deadcolor, \$dead_r, \$dead_g, \$dead_b);
+                    } ],
+                    ['grid_color' => 'Gr~id color...' => sub {
+                        handle_color($_[0], \$gridcolor, \$grid_r, \$grid_g, \$grid_b);
+                    } ],
+            ]],                
+            [],
+            ['About' => sub {
+                    message_box("GoLP", "App::GUI::GoLP v1.0\nby Matt Johnson (mjohnson\@cpan.org)", mb::Information);
+            }],
+    ],
+
+    onPaint => sub {
+        my ( $self, $canvas ) = @_;
+        $self->clear;
+        my @size = $self->size; 
+        my $cr = $canvas->cairo_context(transform => 0);
+        my $data;
+        $data = $game->get_grid() if defined $game;
+        my $live_cells = to_window($cr, $size[0], $size[1], $data );     
+
+        if ( $status ) {
+            my $bs_string = to_bs_string($birth, $survival);
+            if ( exists $rule_BS_to_name{$bs_string} ) {
+                $bs_string .= " (" . $rule_BS_to_name{$bs_string} . ")";
+            }
+            my $status_line = "Rules: $bs_string | " . sprintf("Zoom: %d ppc | Ticks: %d | Live cells: %d", $scale, $ticks, $live_cells);    
+
+            my @box = @{$canvas->get_text_box($status_line)}[0..7]; # can the return order be guaranteed?
+            my @x = @box[0,2,4,6];
+            my @y = @box[1,3,5,7];            
+            my $min_x = min(@x);
+            my $max_x = max(@x);
+            my $min_y = min(@y);
+            my $max_y = max(@y);
+
+            $canvas->color(cl::Black);
+            $canvas->bar($min_x, $min_y, $max_x, $max_y);
+            $canvas->bar_alpha(255, $min_x, $min_y, $max_x, $max_y);
+            $canvas->color(cl::White);
+            $canvas->text_out($status_line,0,0);
+        }
+    },
+
+	onMouseDown  => sub { 
+                            my ($self, $btn, $mod, $x, $y) = @_; 
+                            $self->{dragging} = 1;
+                            $self->{cur_pos} = [$x, $y];
+                            $self->{cur_vel} = [0, 0];
+                        },
+
+	onMouseUp    => sub { 
+                            my ($self, $btn, $mod, $x, $y) = @_; 
+                            $self->{dragging} = 0;
+                        },
+
+    onMouseMove =>  sub {
+                            my ($self, $mod, $x, $y) = @_;
+                            if ( $game_ready && $self->{dragging} ) {
+                                $self->{prev_pos} = $self->{cur_pos};
+                                $self->{cur_pos} = [$x, $y];
+                                $self->{cur_vel} = [$x - $self->{prev_pos}[0], $y - $self->{prev_pos}[1]];
+                                my @size = $self->size; 
+                                drag_viewport($self->{cur_vel}, \@size);
+                                $self->repaint();
+                            }
+                        },
+
+    onMouseWheel => sub {
+                            my ($self, $mod, $x, $y, $z) = @_;
+                            if ( $game_ready ) {
+                                my @size = $self->size; 
+                                if ( change_scale($z, \@size) ) {
+                                    $self->repaint();
+                                }
+                            }
+                        },
+);
+
+# Timer runs the simulation
+$w->insert( Timer => 
+	timeout => $tick_delay_ms,
+    name    => 'Timer',
+	onTick  => sub {
+        if ( $game_ready ) {
+            $game->process();
+            $ticks++;		    
+
+            if ( $autogrow ) {
+                my $boundary;
+                try { 
+                    $boundary = $game->get_used_grid_coord();
+                }
+                catch ($e) {
+                    $boundary = undef;
+                }
+                if ( defined $boundary ) {
+                    my ($min_row, $max_row, $min_col, $max_col) = @{$boundary};
+                    if (    ($min_row < 5) || 
+                            ($min_col < 5) || 
+                            (($board_width-$max_col) < 5) ||
+                            (($board_height-$max_row) < 5) 
+                            ) {
+
+                        grow_board( $boundary );
+                    }
+                }
+            }
+
+            $w->repaint();
+        }
+	}
+)->stop();
+
+run Prima;
+
+###############
+
+
+sub grow_board {
+    my ($bounds) = @_;
+
+    my ($min_row, $max_row, $min_col, $max_col) = @{$bounds};
+
+    my $expansion_factor = 100; # add this number of cells
+
+    my $row_start = 0;
+    my $col_start = 0;
+
+    my $add_left = 0;
+    my $add_right = 0;
+    my $add_top = 0;
+    my $add_bottom = 0;
+
+    if ( $min_row < 5 ) {
+        $add_top = $expansion_factor;
+        $row_start += $expansion_factor;
+    }
+
+    if ( ($board_height-$max_row) < 5 ) {
+        $add_bottom = $expansion_factor;
+    }
+
+    if ( $min_col < 5 ) {
+        $add_left = $expansion_factor;
+        $col_start += $expansion_factor;
+    }
+
+    if ( ($board_width-$max_col) < 5 ) {
+        $add_right = $expansion_factor;
+    }
+
+    my $new_board_width = $board_width + $add_left + $add_right;
+    my $new_board_height = $board_height + $add_top + $add_bottom;
+
+    my @board = $game->get_text_grid();   
+
+    $game = Game::Life::Faster->new( [$new_board_width, $new_board_height], $birth, $survival );
+    $game->place_text_points( $row_start, $col_start, 'X', @board );
+
+    $board_width = $new_board_width;
+    $board_height = $new_board_height;
+   
+    return;
+}
+
+sub load_game {
+    my ($filename) = @_;
+
+    my $grid = GoLP_load::load($filename);
+
+    if ( ref($grid) ne 'HASH' ) {
+        warn("File: '$filename' not loaded");
+        return 0;
+    }
+
+    $board_width = $grid->{cols} + 25;
+    $board_height = $grid->{rows} + 25;
+
+    if ( exists $grid->{birth} ) {
+        $birth = $grid->{birth};
+        $survival = $grid->{survival};
+    }
+    else {  # default GoL
+        $birth = [3];
+        $survival = [2,3];
+    }
+
+    $game = Game::Life::Faster->new( [$board_width, $board_height], $birth, $survival );
+
+    # Figure out the starting column and row
+    my $insert_col = int($board_width/2) - int($grid->{cols}/2);
+    my $insert_row = int($board_height/2) - int($grid->{rows}/2);
+
+    $game->place_points( $insert_row, $insert_col, $grid->{data} ); 
+    $game_ready = 1;    
+
+    return 1;
+}
+
+sub change_scale {
+    my ($z, $vp) = @_;
+
+    if ( $z > 0 ) {
+        return 0 unless $scale < 38;
+        $scale++;
+    }
+    elsif ( $z < 0 ) {
+        return 0 unless $scale > 1;
+        $scale--;
+    }       
+
+    my $vp_w = $vp->[0];
+    my $vp_h = $vp->[1];
+
+    my $p_w = $board_width * $scale;
+    my $p_h = $board_height * $scale;
+
+    if ( ($vp_x_offset + $vp_w) >= $p_w ) {
+        $vp_x_offset = $p_w - $vp_w;
+    }
+
+    if ( ($vp_y_offset + $vp_h) >= $p_h ) {
+        $vp_y_offset = $p_h - $vp_h;
+    }
+
+    $vp_x_offset = 0 if $vp_x_offset < 0;
+    $vp_y_offset = 0 if $vp_y_offset < 0;
+
+    return 1;
+}
+
+sub drag_viewport {
+    my ($v, $vp) = @_;
+
+    my $v_x = $v->[0];
+    my $v_y = $v->[1];
+    my $vp_w = $vp->[0];
+    my $vp_h = $vp->[1];
+
+    my $p_w = $board_width * $scale;
+    my $p_h = $board_height * $scale;
+
+    if ( $p_w > $vp_w ) {
+
+        my $new_x_offset = $vp_x_offset - $v_x;
+
+        if ( ($new_x_offset >= 0) && ($new_x_offset < ($p_w - $vp_w)) ) {
+            $vp_x_offset = $new_x_offset;
+        }
+    }
+
+    if ( $p_h > $vp_h ) {
+    
+        my $new_y_offset = $vp_y_offset + $v_y;
+
+        if ( ($new_y_offset >= 0) && ($new_y_offset < ($p_h - $vp_h)) ) {
+            $vp_y_offset = $new_y_offset;
+        }
+    }
+
+    return;
+}
+
+sub to_window {
+    my ($cr, $vp_w, $vp_h, $data) = @_;
+
+    my $b_w = $board_width; 
+    my $b_h = $board_height; 
+
+    my $p_w = $b_w * $scale;
+    my $p_h = $b_h * $scale;
+
+    return render($cr, $data, $b_w, $b_h, $p_w, $p_h, $vp_w, $vp_h, $vp_x_offset, $vp_y_offset);
+}
+
+sub to_png {
+    my ($data) = @_;
+
+    my $b_w = $board_width; 
+    my $b_h = $board_height; 
+
+    my $p_w = $b_w * $scale;
+    my $p_h = $b_h * $scale;
+
+    my $surface = Cairo::ImageSurface->create('argb32', $p_w, $p_h);
+    my $cr = Cairo::Context->create($surface);
+
+    my $live_cells = render($cr, $data, $b_w, $b_h, $p_w, $p_h, $p_w, $p_h, 0, 0);
+
+    my $filename = "snapshot:" . $filebase . ";ticks:" . $ticks . ";livecells:" . $live_cells . ".png";
+
+    $cr->show_page;
+    $surface->write_to_png($filename);
+
+    return $filename;
+}
+
+# draw the board
+sub render {
+    my ($cr, $data, $b_w, $b_h, $p_w, $p_h, $vp_w, $vp_h, $vp_x_o, $vp_y_o) = @_;
+
+    $cr->rectangle (0, 0, $vp_w, $vp_h);
+    $cr->set_source_rgb (0.1, 0.1, 0.1);
+    $cr->fill;
+
+    return 0 unless defined $data;
+
+    my $p_start_x;
+    my $p_start_y;
+
+    if ( $p_w > $vp_w ) {
+        $p_start_x = -$vp_x_o;
+    }
+    elsif ( $p_w < $vp_w ) {
+        $p_start_x = int($vp_w/2) - int($p_w/2);
+    }
+    else {
+        $p_start_x = 0;
+    }
+
+    if ( $p_h > $vp_h ) {
+        $p_start_y = -$vp_y_o;
+    }
+    elsif( $p_h < $vp_h ) {
+        $p_start_y = int($vp_h/2) - int($p_h/2);
+    }
+    else {
+        $p_start_y = 0;
+    }
+
+    my $p_end_x = $p_start_x + $p_w;
+    my $p_end_y = $p_start_y + $p_h;
+
+    # fill board to black
+    $cr->rectangle(max($p_start_x, 0), max($p_start_y, 0), min($vp_w, $p_w), min($vp_h, $p_h));
+    $cr->set_source_rgb($dead_r, $dead_g, $dead_b);
+    $cr->fill;
+    
+    if ( $grid && ($scale > 3) ) {
+
+        $cr->set_source_rgb ($grid_r, $grid_g, $grid_b);
+
+        # draw grid
+        # horizontal
+        foreach my $i (0..$b_h-1) {
+    
+            my $y = $p_start_y+($scale * $i);
+
+            if ( ($y > 0) && ($y < $vp_h) ) {
+                $cr->rectangle(max($p_start_x, 0), $y, min($p_w, $vp_w), 1);
+                $cr->fill;
+            }           
+        }
+        # vertical
+        foreach my $i (0..$b_w-1) {
+    
+            my $x = $p_start_x+($scale * $i);
+
+            if ( ($x > 0) && ($x < $vp_w) ) {
+                $cr->rectangle($x, max($p_start_y, 0), 1, min($p_h, $vp_h));
+                $cr->fill;
+            }           
+        }       
+    }
+
+    $cr->set_source_rgb($live_r, $live_g, $live_b);
+
+    my $live_cells = 0;
+
+    my $p_row_offset = 0;
+    foreach my $row (@{$data}) {
+
+        my $p_col_offset = 0;
+        foreach my $col (@{$row}) {
+
+            if ( $col ) {
+
+                $live_cells++;
+    
+                my $x_start = $p_start_x+$p_col_offset;
+                my $y_start = $p_start_y+$p_row_offset;
+                my $x_end = $x_start + $scale;
+                my $y_end = $y_start + $scale;
+
+                my $drawing = 1;
+                $drawing = 0 if ($x_end < 0) || ($y_end < 0);
+                $drawing = 0 if ($x_start >= $vp_w) || ($y_start >= $vp_h);
+
+                if ( $drawing ) {
+
+                    my $x_dim = $scale;
+                    my $y_dim = $scale;
+
+                    # perform clipping at edges of viewport
+                    if ( $x_start < 0 ) {
+                        $x_dim += $x_start;
+                        $x_start = 0;
+                    }
+
+                    if ( $y_start < 0 ) {
+                        $y_dim += $y_start;
+                        $y_start = 0;
+                    }
+                   
+                    if ( $x_end >= $vp_w ) {
+                        $x_dim = $vp_w - $x_start;
+                    }
+
+                    if ( $y_end >= $vp_h ) {
+                        $y_dim = $vp_h - $y_start;
+                    }
+                   
+                    $cr->rectangle ($x_start, $y_start, $x_dim, $y_dim );
+                    $cr->fill;
+                }
+            }            
+            
+            $p_col_offset += $scale;
+        }
+
+        $p_row_offset += $scale;
+    }       
+
+    return $live_cells;    
+}
+
+
+sub handle_color {
+    my ($window, $color, $r, $g, $b) = @_;
+
+    $colordialog = Prima::Dialog::ColorDialog->new() unless $colordialog;
+    $colordialog->value($$color);
+
+    if ( $colordialog->execute() != mb::Cancel ) {
+        $$color = $colordialog->value();
+        ($$r, $$g, $$b) = map { $_ / 256 } cl::to_rgb($$color);
+        $window->repaint();
+    }
+
+    return;
+}
+
+sub handle_rule {
+    my ($window, $rule) = @_;
+
+    ($birth, $survival) = from_bs_string($rule);
+    
+    my @board = $game->get_text_grid();   
+
+    $game = Game::Life::Faster->new( [$board_width, $board_height], $birth, $survival );
+    $game->place_text_points( 0, 0, 'X', @board );
+
+    $window->repaint();
+
+    return;
+}
+
+sub from_bs_string {
+    my ($rulestring) = @_;
+
+    my $birth = [];
+    my $survival = [];
+
+    if ( $rulestring =~ m|B \s* (\d*) \s* / \s* S \s* (\d*)|imsx ) {
+        ($birth, $survival) = map { [split //] } ($1, $2);            
+    }
+
+    return ($birth, $survival);
+}
+
+sub to_bs_string {
+    my ($birth, $survival) = @_;
+
+    my $b_t = "";                     
+    if ( defined($birth) && (ref($birth) eq 'ARRAY') ) {
+        $b_t = join("", sort { $a <=> $b } @{$birth});
+    }
+
+    my $s_t = "";                     
+    if ( defined($survival) && (ref($survival) eq 'ARRAY') ) {
+        $s_t = join("", sort { $a <=> $b } @{$survival});
+    }    
+
+    return "B" . $b_t . "/S" . $s_t;
+}
+
+

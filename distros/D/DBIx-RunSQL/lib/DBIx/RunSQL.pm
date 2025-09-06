@@ -1,10 +1,12 @@
 package DBIx::RunSQL;
-use strict;
-use warnings;
+use 5.020;
+use experimental 'signatures';
+use stable 'postderef';
 use DBI;
 use Module::Load 'load';
+use Carp 'croak';
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 
 =encoding utf8
 
@@ -23,6 +25,7 @@ DBIx::RunSQL - run SQL from a file
     my $test_dbh = DBIx::RunSQL->create(
         dsn       => 'dbi:SQLite:dbname=:memory:',
         sql       => 'sql/create.sql',
+        options   => { PrintError => 0, RaiseError => 1 },
         force     => 1,
         verbose   => 1,
         formatter => 'Text::Table',
@@ -193,19 +196,13 @@ C<null> - string to replace SQL C<NULL> columns by
 
 sub run_sql_file {
     my ($self,%args) = @_;
-    my @sql;
     if( ! $args{ fh }) {
-        open $args{ fh }, "<", $args{sql}
+        open $args{ fh }, "<:crlf", $args{sql}
             or die "Couldn't read '$args{sql}' : $!";
-    };
-    {
-        # potentially this should become C<< $/ = ";\n"; >>
-        # and a while loop to handle large SQL files
-        local $/;
-        $args{ sql }= readline $args{ fh }; # sluuurp
+        delete $args{ sql };
     };
     $self->run_sql(
-        %args
+        %args,
     );
 }
 
@@ -281,20 +278,20 @@ C<null> - string to replace SQL C<NULL> columns by
 sub run_sql {
     my ($self,%args) = @_;
     my $errors = 0;
-    my @sql= 'ARRAY' eq ref $args{ sql }
-             ? @{ $args{ sql }}
-             : $args{ sql };
 
-    $args{ verbose_handler } ||= sub {
-        $args{ verbose_fh } ||= \*main::STDOUT;
-        print { $args{ verbose_fh } } "$_[0]\n";
+    if( ! $args{ verbose_handler }) {
+        $args{ verbose_fh } //= \*main::STDOUT;
+        $args{ verbose_handler } = sub {
+            print { $args{ verbose_fh } } "$_[0]\n";
+        }
     };
     my $status = delete $args{ verbose_handler };
 
-    # Because we blindly split above on /;\n/
-    # we need to reconstruct multi-line CREATE TRIGGER statements here again
-    my $trigger;
-    for my $statement ($self->split_sql( $args{ sql })) {
+    if( $args{ fh }) {
+        $args{ sql } = delete $args{ fh };
+    };
+
+    while( defined(my $statement = $self->split_sql($args{ sql }))) {
         # skip "statements" that consist only of comments
         next unless $statement =~ /^\s*[A-Z][A-Z]/mi;
         $status->($statement) if $args{verbose};
@@ -470,14 +467,17 @@ sub format_results {
 
 =head2 C<< DBIx::RunSQL->split_sql ARGS >>
 
-  my @statements= DBIx::RunSQL->split_sql( <<'SQL');
+  my $sql = <<'SQL';
       create table foo (name varchar(64));
       create trigger foo_insert on foo before insert;
           new.name= 'foo-'||old.name;
       end;
       insert into foo name values ('bar');
   SQL
-  # Returns three elements
+  while( defined( my $s = DBIx::RunSQL->split_sql( $sql ))) {
+      push @statements, $s;
+  }
+  # @statements has three elements
 
 This is a helper subroutine to split a sequence of (semicolon-newline-delimited)
 SQL statements into separate statements. It is documented because
@@ -486,39 +486,63 @@ override or replace it. It might also be useful outside the context
 of L<DBIx::RunSQL> if you need to split up a large blob
 of SQL statements into smaller pieces.
 
-The subroutine needs the whole sequence of SQL statements in memory.
-If you are attempting to restore a large SQL dump backup into your
-database, this approach might not be suitable.
+This routine takes a string, filehandle or an iterator as its parameter.
+This iterator should return the next statement.
+A filehandle or a string will be split at C< ;\n >.
+
+C<split_sql> will try to reassemble C<CREATE TRIGGER>
+statements from the list of statements.
 
 =cut
 
-sub split_sql {
-    my( $self, $sql )= @_;
-    my @sql = split /;[ \t]*\r?\n/, $sql;
+sub next_sql {
+    $_[1] =~ /\G\s*(\S.*?)(?:;[ \t]*\r?\n|\s*;?\s*\z)/sg
+        or return undef;
+    return "$1";
+}
 
-    # Because we blindly split above on /;\n/
-    # we need to reconstruct multi-line CREATE TRIGGER statements here again
-    my @res;
+sub split_sql {
+    my $self = shift;
+    my $iterator;
+
+    if( ! ref $_[0] ) {
+        # We got an SQL string, make up an iterator
+        my $s = \$_[0];
+        $iterator = sub { $self->next_sql($$s) };
+    } elsif( ref $_[0] eq 'CODE' ) {
+        $iterator = $_[0]
+    } elsif( ref $_[0] eq 'GLOB' ) {
+        my $fh = $_[0];
+        $iterator = sub { local $/ = ";\n"; <$fh> }
+    } else {
+        croak "Don't know how to handle reference type " . ref $_[0];
+    }
+
+    my $statement = $iterator->();
+    return undef
+        if not defined $statement;
     my $trigger;
-    for my $statement (@sql) {
-        next unless $statement =~ /\S/;
-        if( $statement =~ /^\s*CREATE\s+TRIGGER\b/i ) {
+
+    if( $statement =~ /^\s*CREATE\s+TRIGGER\b/i ) {
+        if( $statement !~ /END$/i ) {
+            # Multiline CREATE TRIGGER statement
             $trigger = $statement;
-            next
-                if( $statement !~ /END$/i );
-            $statement = $trigger;
-            undef $trigger;
-        } elsif( $trigger ) {
-            $trigger .= ";\n$statement";
-            next
-                if( $statement !~ /END$/i );
-            $statement = $trigger;
-            undef $trigger;
-        };
-        push @res, $statement;
+
+            my $next;
+            do {
+                $next = $iterator->();
+                $trigger .= ";" if $trigger !~ /;$/;
+                $trigger .= "\n$next"
+                    if defined $next;
+            } until (! defined $next or $next =~ /END$/i);
+        } else {
+            # Single-line CREATE TRIGGER statement
+            $trigger = $statement;
+        }
+        $statement = $trigger;
     };
 
-    @res
+    return $statement
 }
 
 1;

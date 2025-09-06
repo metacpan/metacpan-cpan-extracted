@@ -65,8 +65,6 @@ my $wiped = unimport Module::Case qw(CwD No::Such::Module);
 is($wiped, "CwD", "[unimport Module::Case qw(CwD No::Such::Module);] unimport returned disabled package $wiped");
 ok(!$Module::Case::sensitive_modules->{CwD}, "CwD: Package unflagged at run-time");
 
-#use Module::Case qw(cwd cwD cWd cWD Cwd CwD CWd);
-
 ok(!$INC{"CWd.pm"}, "CWd not loaded yet");
 ok(!eval { require CWd }, "CWd: correctly fails even on case-ignorant file system");
 chomp($why = $@);

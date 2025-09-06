@@ -37,7 +37,12 @@ my $config = Config::Abstraction->new(
 ok(defined($config));
 diag(Data::Dumper->new([$config->all()])->Dump()) if($ENV{'TEST_VERBOSE'});
 $config = $config->all();
+
+cmp_ok(scalar(@{$config->{'config_path'}}), '==', 1, 'The configuration was read from one file');
+like($config->{'config_path'}->[0], qr/test\.pl$/, 'config_path is correct');
+
 delete($config->{'config_path'});
+
 cmp_deeply($config, {
 	'book' => {
 		'chapter1' => {

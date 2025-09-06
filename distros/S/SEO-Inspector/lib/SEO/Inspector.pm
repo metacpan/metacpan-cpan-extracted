@@ -7,10 +7,20 @@ use Carp;
 use Mojo::UserAgent;
 use Mojo::URL;
 use Module::Pluggable require => 1, search_path => 'SEO::Inspector::Plugin';
+use Object::Configure 0.14;
+use Params::Get 0.13;
 
 =head1 NAME
 
 SEO::Inspector - Run SEO checks on HTML or URLs
+
+=head1 VERSION
+
+Version 0.02
+
+=cut
+
+our $VERSION = '0.02';
 
 =head1 SYNOPSIS
 
@@ -34,7 +44,7 @@ SEO::Inspector provides:
 
 =over 4
 
-=item * Built-in SEO checks: title, meta description, canonical link, robots meta, viewport, H1 presence, word count, image alt text
+=item * 14 built-in SEO checks
 
 =item * Plugin system: dynamically load modules under SEO::Inspector::Plugin namespace
 
@@ -89,6 +99,7 @@ The hashref should have at least these keys:
     name   => 'My Check',
     status => 'ok' | 'warn' | 'error',
     notes  => 'human-readable message',
+    resolution => 'how to resolve'
   }
 
 =back
@@ -121,10 +132,10 @@ the string "Hello":
 
 	sub run {
 		my ($self, $html) = @_;
-		if ($html =~ /Hello/) {
+		if($html =~ /Hello/) {
 			return { name => 'Hello Check', status => 'ok', notes => 'found Hello' };
 		} else {
-			return { name => 'Hello Check', status => 'warn', notes => 'no Hello' };
+			return { name => 'Hello Check', status => 'warn', notes => 'no Hello', resolution => 'add a hello field' };
 		}
 	}
 
@@ -152,17 +163,17 @@ If C<plugin_dirs> isn't given, it tries hard to find the right place.
 
 =cut
 
-our $VERSION = '0.01';
-
 # -------------------------------
 # Constructor
 # -------------------------------
 sub new {
-	my ($class, %args) = @_;
-	my $self = bless { %args }, $class;
+	my $class = shift;
+	my $params = Object::Configure::configure($class, Params::Get::get_params(undef, \@_));
 
-	$self->{ua} ||= Mojo::UserAgent->new();
-	$self->{plugins} ||= {};
+	$params->{'ua'} ||= Mojo::UserAgent->new();
+	$params->{'plugins'} ||= {};
+
+	my $self = bless { %{$params} }, $class;
 
 	$self->load_plugins();
 
@@ -191,7 +202,7 @@ sub load_plugins {
 
 			my $finder = Module::Pluggable::Object->new(
 				search_path => ['SEO::Inspector::Plugin'],
-				require	 => 1,
+				require => 1,
 				instantiate => 'new',
 			);
 
@@ -232,17 +243,21 @@ sub check {
 	$html //= $self->_fetch_html();
 
 	my %dispatch = (
-		title			=> \&_check_title,
+		title => \&_check_title,
 		meta_description => \&_check_meta_description,
-		canonical		=> \&_check_canonical,
-		robots_meta	=> \&_check_robots_meta,
-		viewport		 => \&_check_viewport,
-		h1_presence	=> \&_check_h1_presence,
-		word_count	 => \&_check_word_count,
+		canonical => \&_check_canonical,
+		robots_meta => \&_check_robots_meta,
+		viewport => \&_check_viewport,
+		h1_presence => \&_check_h1_presence,
+		word_count => \&_check_word_count,
 		links_alt_text => \&_check_links_alt_text,
 		check_structured_data => \&_check_structured_data,
-		check_headings	=> \&_check_headings,
-		check_links	=> \&_check_links,
+		check_headings => \&_check_headings,
+		check_links => \&_check_links,
+		open_graph => \&_check_open_graph,
+		twitter_cards => \&_check_twitter_cards,
+		page_size => \&_check_page_size,
+		readability => \&_check_readability,
 	);
 
 	# built-in checks
@@ -279,6 +294,7 @@ sub run_all
 	for my $check (qw(
 		title meta_description canonical robots_meta viewport h1_presence word_count links_alt_text
 		check_structured_data check_headings check_links
+		open_graph twitter_cards page_size readability
 	)) {
 		$results{$check} = $self->check($check, $html);
 	}
@@ -322,7 +338,7 @@ sub check_url {
 
 	$url //= $self->{url};
 
-	croak "URL missing" unless $url;
+	croak('URL missing') unless $url;
 
 	my $html = $self->_fetch_html($url);
 
@@ -343,7 +359,7 @@ sub _check_title {
 	if ($html =~ /<title>(.*?)<\/title>/is) {
 		my $title = $1;
 		$title =~ s/^\s+|\s+$//g;		 # trim
-		$title =~ s/\s{2,}/ /g;		   # collapse spaces
+		$title =~ s/\s{2,}/ /g;		# collapse spaces
 
 		my $len = length($title);
 		my $status = 'ok';
@@ -382,12 +398,18 @@ sub _check_meta_description {
 	return { name => 'Meta Description', status => 'warn', notes => 'missing meta description' };
 }
 
-sub _check_canonical {
+sub _check_canonical
+{
 	my ($self, $html) = @_;
 	if ($html =~ /<link\s+rel=["']canonical["']\s+href=["'](.*?)["']/is) {
 		return { name => 'Canonical', status => 'ok', notes => 'canonical link present' };
 	}
-	return { name => 'Canonical', status => 'warn', notes => 'missing canonical link' };
+	return {
+		name => 'Canonical',
+		status => 'warn',
+		notes => 'missing canonical link',
+		resolution => 'Add canonical link to <head>: <link rel="canonical" href="https://your-domain.com/this-page-url"> - use the preferred URL for this page to prevent duplicate content issues'
+	};
 }
 
 sub _check_robots_meta {
@@ -395,7 +417,12 @@ sub _check_robots_meta {
 	if ($html =~ /<meta\s+name=["']robots["']\s+content=["'](.*?)["']/is) {
 		return { name => 'Robots Meta', status => 'ok', notes => 'robots meta present' };
 	}
-	return { name => 'Robots Meta', status => 'warn', notes => 'missing robots meta' };
+	return {
+		name => 'Robots Meta',
+		status => 'warn',
+		notes => 'missing robots meta',
+		resolution => 'Add robots meta tag to <head>: <meta name="robots" content="index, follow"> for normal indexing, or <meta name="robots" content="noindex, nofollow"> to prevent indexing - controls how search engines crawl and index this page'
+	};
 }
 
 sub _check_viewport {
@@ -403,7 +430,12 @@ sub _check_viewport {
 	if ($html =~ /<meta\s+name=["']viewport["']\s+content=["'](.*?)["']/is) {
 		return { name => 'Viewport', status => 'ok', notes => 'viewport meta present' };
 	}
-	return { name => 'Viewport', status => 'warn', notes => 'missing viewport meta' };
+	return {
+		name => 'Viewport',
+		status => 'warn',
+		notes => 'missing viewport meta',
+		resolution => 'Add viewport meta tag to <head>: <meta name="viewport" content="width=device-width, initial-scale=1.0"> - essential for mobile responsiveness and Google mobile-first indexing'
+	};
 }
 
 sub _check_h1_presence {
@@ -429,7 +461,20 @@ sub _check_links_alt_text {
 		my $attr = $1;
 		push @missing, $1 unless $attr =~ /alt=/i;
 	}
-	return { name => 'Links Alt Text', status => @missing ? 'warn' : 'ok', notes => @missing ? scalar(@missing) . " images missing alt" : 'all images have alt' };
+	if(scalar(@missing)) {
+		return {
+			name => 'Links Alt Text',
+			status => 'warn',
+			notes => scalar(@missing) . ' images missing alt',
+			resolution => 'Add alt attributes to all images: <img src="image.jpg" alt="Descriptive text"> - describe the image content for screen readers and SEO. Use alt="" for decorative images that don\'t add meaning'
+		};
+	}
+
+	return {
+		name => 'Links Alt Text',
+		status => 'ok',
+		notes => 'all images have alt'
+	};
 }
 
 sub _check_structured_data {
@@ -437,11 +482,20 @@ sub _check_structured_data {
 
 	my @jsonld = ($html =~ /<script\b[^>]*type=["']application\/ld\+json["'][^>]*>(.*?)<\/script>/gis);
 
+	if(scalar(@jsonld)) {
+		return {
+			name => 'Structured Data',
+			status => 'ok',
+			notes => scalar(@jsonld) . ' JSON-LD block(s) found'
+		};
+	}
+
 	return {
 		name => 'Structured Data',
-		status => @jsonld ? 'ok' : 'warn',
-		notes => @jsonld ? scalar(@jsonld) . " JSON-LD block(s) found" : 'no structured data found',
-	};
+		status => 'warn',
+		notes => 'no structured data found',
+		resolution => 'Add JSON-LD structured data to <head>: <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "Page Title", "description": "Page description"}</script> - helps search engines understand your content better and enables rich snippets'
+	}
 }
 
 # _check_headings
@@ -474,7 +528,7 @@ sub _check_headings {
 
 	# Capture all headings and their order
 	while ($html =~ /<(h[1-6])\b[^>]*>(.*?)<\/\1>/gi) {
-		my $tag  = lc $1;
+		my $tag = lc $1;
 		my $text = $2 // '';
 		$text =~ s/\s+/ /g;	# normalize whitespace
 		$text =~ s/^\s+|\s+$//g;
@@ -489,9 +543,9 @@ sub _check_headings {
 	# Check for no headings
 	if (!%counts) {
 		return {
-			name   => 'Headings',
+			name => 'Headings',
 			status => 'warn',
-			notes  => 'no headings found',
+			notes => 'no headings found',
 		};
 	}
 
@@ -531,12 +585,12 @@ sub _check_headings {
 
 	# Summarize counts and issues
 	my $summary = join ', ', map { "$_: $counts{$_}" } sort keys %counts;
-	$summary   .= @issues ? " | Issues: " . join('; ', @issues) : '';
+	$summary .= @issues ? " | Issues: " . join('; ', @issues) : '';
 
 	return {
-		name   => 'Headings',
+		name => 'Headings',
 		status => $status,
-		notes  => $summary,
+		notes => $summary,
 	};
 }
 
@@ -555,7 +609,7 @@ sub _check_links {
 
 	while ($html =~ m{<a\b([^>]*)>(.*?)</a>}gis) {
 		my $attrs = $1;
-		my $text  = $2 // '';
+		my $text = $2 // '';
 
 		$total++;
 
@@ -605,9 +659,203 @@ sub _check_links {
 	}
 
 	return {
-		name   => 'Links',
+		name => 'Links',
 		status => $status,
-		notes  => $notes,
+		notes => $notes,
+	};
+}
+
+# Checks for essential Open Graph tags that improve social media sharing
+sub _check_open_graph {
+	my ($self, $html) = @_;
+
+	my %og_tags;
+	my @required = qw(title description image url);
+
+	# Extract all Open Graph meta tags
+	while ($html =~ /<meta\s+(?:property|name)=["']og:([^"']+)["']\s+content=["']([^"']*)["']/gis) {
+		$og_tags{$1} = $2;
+	}
+
+	my @missing = grep { !exists $og_tags{$_} || !$og_tags{$_} } @required;
+	my $found = keys %og_tags;
+
+	my $status = @missing ? 'warn' : 'ok';
+	my $notes;
+
+	if ($found == 0) {
+		$notes = 'no Open Graph tags found';
+		$status = 'warn';
+	} elsif (@missing) {
+		$notes = sprintf('%d OG tags found, missing: %s', $found, join(', ', @missing));
+	} else {
+		$notes = sprintf('all essential OG tags present (%d total)', $found);
+	}
+
+	return {
+		name => 'Open Graph',
+		status => $status,
+		notes => $notes,
+		resolution => 'Add missing tags to <head>: <meta property="og:title" content="Your Page Title">, <meta property="og:description" content="Brief page description">'
+	};
+}
+
+# Checks for Twitter Card meta tags for better Twitter sharing
+sub _check_twitter_cards {
+	my ($self, $html) = @_;
+
+	my %twitter_tags;
+	my @recommended = qw(card title description);
+
+	# Extract Twitter Card meta tags
+	while ($html =~ /<meta\s+(?:property|name)=["']twitter:([^"']+)["']\s+content=["']([^"']*)["']/gis) {
+		$twitter_tags{$1} = $2;
+	}
+
+	my @missing = grep { !exists $twitter_tags{$_} || !$twitter_tags{$_} } @recommended;
+	my $found = keys %twitter_tags;
+
+	my $status = @missing ? 'warn' : 'ok';
+	my $notes;
+
+	if ($found == 0) {
+		$notes = 'no Twitter Card tags found';
+		$status = 'warn';
+	} elsif (@missing) {
+		$notes = sprintf('%d Twitter tags found, missing: %s', $found, join(', ', @missing));
+	} else {
+		$notes = sprintf('essential Twitter Card tags present (%d total)', $found);
+	}
+
+	return {
+		name => 'Twitter Cards',
+		status => $status,
+		notes => $notes,
+		resolution => 'Add missing tags to <head>: <meta name="twitter:card" content="summary">, <meta name="twitter:title" content="Your Page Title">'
+	};
+}
+
+# Checks HTML size and warns if too large (impacts loading speed)
+sub _check_page_size {
+	my ($self, $html) = @_;
+
+	my $size_bytes = length($html);
+	my $size_kb = int($size_bytes / 1024);
+
+	my $status = 'ok';
+	my $notes = "${size_kb}KB HTML size";
+	my $resolution = '';
+
+	if ($size_bytes > 1_048_576) {	# > 1MB
+		$status = 'error';
+		$notes .= ' (too large, over 1MB)';
+		$resolution = 'Consider optimizing: minify CSS/JS, compress images, remove unused elements, enable server compression';
+	} elsif ($size_bytes > 102_400) {	# > 100KB
+		$status = 'warn';
+		$notes .= ' (large, consider optimization)';
+	} elsif ($size_bytes < 1024) {	# < 1KB
+		$status = 'warn';
+		$notes .= ' (suspiciously small)';
+	} else {
+		$notes .= ' (good size)';
+	}
+
+	return {
+		name => 'Page Size',
+		status => $status,
+		notes => $notes,
+		resolution => $resolution
+	};
+}
+
+# Calculates approximate Flesch Reading Ease score for content readability
+sub _check_readability {
+	my ($self, $html) = @_;
+
+	# Extract text content (remove scripts, styles, and HTML tags)
+	my $text = $html;
+	$text =~ s/<script\b[^>]*>.*?<\/script>//gis;
+	$text =~ s/<style\b[^>]*>.*?<\/style>//gis;
+	$text =~ s/<[^>]+>//g;
+	$text =~ s/\s+/ /g;
+	$text =~ s/^\s+|\s+$//g;
+
+	return {
+		name => 'Readability',
+		status => 'warn',
+		notes => 'insufficient text for analysis',
+		resolution => 'Add more content to the page - aim for at least 300 words of meaningful text',
+	} if length($text) < 100;
+
+	# Count sentences (approximate)
+	my $sentences = () = $text =~ /[.!?]+/g;
+	$sentences = 1 if $sentences == 0;	# avoid division by zero
+
+	# Count words
+	my @words = split /\s+/, $text;
+	my $word_count = @words;
+
+	return {
+		name => 'Readability',
+		status => 'warn',
+		notes => 'insufficient content for analysis',
+		resolution => 'Add more substantial content - aim for at least 300 words for proper SEO value',
+	} if $word_count < 50;
+
+	# Count syllables (very basic approximation)
+	my $syllables = 0;
+	for my $word (@words) {
+		$word = lc($word);
+		$word =~ s/[^a-z]//g;	# remove punctuation
+		next if length($word) == 0;
+
+		# Simple syllable counting heuristic
+		my $vowels = () = $word =~ /[aeiouy]/g;
+		$syllables += $vowels > 0 ? $vowels : 1;
+		$syllables-- if $word =~ /e$/;	# silent e
+	}
+	$syllables = $word_count if $syllables < $word_count;	# minimum 1 syllable per word
+
+	# Flesch Reading Ease formula
+	my $avg_sentence_length = $word_count / $sentences;
+	my $avg_syllables_per_word = $syllables / $word_count;
+	my $flesch_score = 206.835 - (1.015 * $avg_sentence_length) - (84.6 * $avg_syllables_per_word);
+
+	my $status = 'ok';
+	my $level;
+	my $notes;
+	my $resolution = '';
+
+	if ($flesch_score >= 90) {
+		$level = 'very easy';
+	} elsif ($flesch_score >= 80) {
+		$level = 'easy';
+	} elsif ($flesch_score >= 70) {
+		$level = 'fairly easy';
+	} elsif ($flesch_score >= 60) {
+		$level = 'standard';
+	} elsif ($flesch_score >= 50) {
+		$level = 'fairly difficult';
+		$status = 'warn';
+		$resolution = 'Consider simplifying: use shorter sentences (aim for 15-20 words), choose simpler words, break up long paragraphs, add bullet points or lists';
+	} elsif ($flesch_score >= 30) {
+		$level = 'difficult';
+		$status = 'warn';
+		$resolution = 'Improve readability: use much shorter sentences (10-15 words), replace complex words with simpler alternatives, add more paragraph breaks, use active voice';
+	} else {
+		$level = 'very difficult';
+		$status = 'warn';
+		$resolution = 'Significantly simplify content: break long sentences into multiple short ones, replace jargon with plain language, add explanations for technical terms, use more white space and formatting';
+	}
+
+	$notes = sprintf('Flesch score: %.1f (%s) - %d words, %d sentences',
+		$flesch_score, $level, $word_count, $sentences);
+
+	return {
+		name => 'Readability',
+		status => $status,
+		notes => $notes,
+		resolution => $resolution,
 	};
 }
 
@@ -617,9 +865,9 @@ Nigel Horne, C<< <njh at nigelhorne.com> >>
 
 =head1 SEE ALSO
 
-Test coverage report: L<https://nigelhorne.github.io/SEO-Inspector/coverage/>
-
 =over 4
+
+=item * Test coverage report: L<https://nigelhorne.github.io/SEO-Inspector/coverage/>
 
 =item * L<https://github.com/nigelhorne/SEO-Checker>
 
@@ -669,7 +917,7 @@ L<http://deps.cpantesters.org/?module=SEO::Inspector>
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright 2010-2025 Nigel Horne.
+Copyright 2025 Nigel Horne.
 
 Usage is subject to licence terms.
 

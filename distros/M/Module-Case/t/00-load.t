@@ -8,9 +8,10 @@
 use strict;
 use warnings;
 
-use Test::More tests => 2;
+use Test::More tests => 3;
 BEGIN { use_ok('Module::Case') };
 BEGIN { use_ok('Cwd') };
+BEGIN { use_ok('IO::Socket') };
 
 #########################
 

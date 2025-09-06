@@ -15,6 +15,7 @@ DBIx::RunSQL - run SQL from a file
     my $test_dbh = DBIx::RunSQL->create(
         dsn       => 'dbi:SQLite:dbname=:memory:',
         sql       => 'sql/create.sql',
+        options   => { PrintError => 0, RaiseError => 1 },
         force     => 1,
         verbose   => 1,
         formatter => 'Text::Table',
@@ -159,14 +160,17 @@ sets.
 
 ## `DBIx::RunSQL->split_sql ARGS`
 
-    my @statements= DBIx::RunSQL->split_sql( <<'SQL');
+    my $sql = <<'SQL';
         create table foo (name varchar(64));
         create trigger foo_insert on foo before insert;
             new.name= 'foo-'||old.name;
         end;
         insert into foo name values ('bar');
     SQL
-    # Returns three elements
+    while( defined( my $s = DBIx::RunSQL->split_sql( $sql ))) {
+        push @statements, $s;
+    }
+    # @statements has three elements
 
 This is a helper subroutine to split a sequence of (semicolon-newline-delimited)
 SQL statements into separate statements. It is documented because
@@ -175,9 +179,12 @@ override or replace it. It might also be useful outside the context
 of [DBIx::RunSQL](https://metacpan.org/pod/DBIx%3A%3ARunSQL) if you need to split up a large blob
 of SQL statements into smaller pieces.
 
-The subroutine needs the whole sequence of SQL statements in memory.
-If you are attempting to restore a large SQL dump backup into your
-database, this approach might not be suitable.
+This routine takes a string, filehandle or an iterator as its parameter.
+This iterator should return the next statement.
+A filehandle or a string will be split at ` ;\n `.
+
+`split_sql` will try to reassemble `CREATE TRIGGER`
+statements from the list of statements.
 
 ## `DBIx::RunSQL->parse_command_line`
 

@@ -137,4 +137,13 @@ diag(Data::Dumper->new([$config])->Dump()) if($ENV{'TEST_VERBOSE'});
 
 cmp_ok($config->get('first.second'), 'eq', 'value', 'Action similar to Config::Auto works');
 
+$config = Config::Abstraction->new(
+	data => { 'xyzzy' => 'plugh' },
+	config_dirs => [$test_dir],
+	config_file => 'foo'
+);
+
+cmp_ok($config->get('first.second'), 'eq', 'value', 'Giving data allow new data');
+cmp_ok($config->get('xyzzy'), 'eq', 'plugh', 'Giving data allow new data');
+
 done_testing();

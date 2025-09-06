@@ -1,0 +1,64 @@
+{
+   "abstract" : "A GUI for viewing Life-like cellular automata, in Perl/Prima",
+   "author" : [
+      "Matt Johnson <mjohnson@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-GUI-GoLP",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Cairo" : "1.109",
+            "Feature::Compat::Try" : "0.05",
+            "File::Basename" : "2.85",
+            "Game::Life::Faster" : "0.007",
+            "List::Util" : "0",
+            "Prima" : "1.74",
+            "perl" : "5.014"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mjohnson108/p5-App-GUI-GoLP/issues"
+      },
+      "homepage" : "https://github.com/mjohnson108/",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/mjohnson108/p5-App-GUI-GoLP.git",
+         "web" : "https://github.com/mjohnson108/p5-App-GUI-GoLP"
+      }
+   },
+   "version" : "1.0",
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

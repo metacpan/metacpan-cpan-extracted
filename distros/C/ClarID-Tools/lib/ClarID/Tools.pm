@@ -8,7 +8,7 @@ use File::ShareDir::ProjectDistDir qw(dist_dir);
 use App::Cmd::Setup -app;
 
 # Central version for your entire CLI suite
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 # Share dir
 our $share_dir = dist_dir('ClarID-Tools');

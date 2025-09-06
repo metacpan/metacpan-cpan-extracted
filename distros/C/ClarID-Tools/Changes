@@ -1,5 +1,7 @@
 Revision history for Perl distribution Pheno-Ranker
 
-0.01 2025-09-04T00:00:00Z (Manuel Rueda <mrueda@cpan.org>)
+0.02 2025-09-05T00:00:00Z (Manuel Rueda <mrueda@cpan.org>)
 
  - First release 
+
+Note: Versions < 0.02 were for deployment testing

@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use DBIx::RunSQL;
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 
 my $exitcode = DBIx::RunSQL->handle_command_line('myapp', \@ARGV);
 exit $exitcode;

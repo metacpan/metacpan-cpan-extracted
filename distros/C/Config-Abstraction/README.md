@@ -1,12 +1,16 @@
 # NAME
 
-Config::Abstraction - Configuration Abstraction Layer
+Config::Abstraction - Merge and manage configuration data from different sources
 
 # VERSION
 
-Version 0.33
+Version 0.34
 
 # SYNOPSIS
+
+`Config::Abstraction` lets you load configuration from multiple sources—such as files, environment variables, and in-code defaults—and merge them with predictable precedence.
+It provides a consistent API for accessing the configuration settings, regardless of where they came from,
+this helps keep your application’s or class's configuration flexible, centralized, and easy to override.
 
     use Config::Abstraction;
 
@@ -21,6 +25,17 @@ Version 0.33
 # DESCRIPTION
 
 `Config::Abstraction` is a flexible configuration management layer that sits above `Config::*` modules.
+It provides a simple way to layer multiple configuration sources with predictable merge order.
+It lets you define sources such as:
+
+- Perl hashes (in-memory defaults or dynamic values)
+- Environment variables (with optional prefixes)
+- Configuration files (YAML, JSON, INI, or plain key=value)
+- Command-line arguments
+
+Sources are applied in the order they are provided. Later sources override
+earlier ones unless a key is explicitly set to `undef` in the later source.
+
 In addition to using drivers to load configuration data from multiple file
 formats (YAML, JSON, XML, and INI),
 it also allows levels of configuration, each of which overrides the lower levels.
@@ -29,6 +44,18 @@ overrides and command line arguments for runtime configuration adjustments.
 This module is designed to help developers manage layered configurations that can be loaded from files and overridden at run-time for debugging,
 offering a modern, robust and dynamic approach
 to configuration management.
+
+## Merge Precedence Diagram
+
+    +----------------+
+    |   CLI args     |  (Highest priority)
+    +----------------+
+    | Environment    |
+    +----------------+
+    | Config file(s) |
+    +----------------+
+    | Defaults       |  (Lowest priority)
+    +----------------+
 
 ## KEY FEATURES
 
@@ -179,8 +206,17 @@ Options:
 
 - `data`
 
-    A hash ref of data to prime the configuration with.
-    Any other data will overwrite by this.
+    A hash ref of default data to prime the configuration with.
+    These are applied before loading
+    other sources and can be overridden by later sources or by explicitly passing
+    options directly to `new`.
+
+        $config = Config::Abstraction->new(
+            data => {
+                log_level => 'info',
+                retries => 3,
+            }
+        );
 
 - `env_prefix`
 
@@ -218,6 +254,10 @@ Options:
     The default is a `'.'`,
     as in dotted notation,
     such as `'database.user'`.
+
+- `schema`
+
+    A [Params::Validate::Strict](https://metacpan.org/pod/Params%3A%3AValidate%3A%3AStrict) compatible schema to validate the configuration file against.
 
 If just one argument is given, it is assumed to be the name of a file.
 
@@ -286,8 +326,8 @@ when `sep_char` is set to '\_'.
             },
             log_level => 'debug'
         },
-        flatten   => 1,
-        sep_char  => '_'
+        flatten => 1,
+        sep_char => '_'
     );
 
     my $user = $config->database_user();        # returns 'alice'
@@ -297,6 +337,16 @@ when `sep_char` is set to '\_'.
 
     # Attempting to call a nonexistent key
     my $foo = $config->nonexistent_key();       # dies with error
+
+# COMMON PITFALLS
+
+- Nested hashes
+
+    Merging replaces entire nested hashes unless you enable deep merging.
+
+- Undef values
+
+    Keys explicitly set to `undef` in a later source override earlier values.
 
 # BUGS
 
@@ -321,9 +371,20 @@ You can find documentation for this module with the perldoc command.
 
 # SEE ALSO
 
+- [Config::Any](https://metacpan.org/pod/Config%3A%3AAny)
 - [Config::Auto](https://metacpan.org/pod/Config%3A%3AAuto)
+- [Hash::Merge](https://metacpan.org/pod/Hash%3A%3AMerge)
 - [Log::Abstraction](https://metacpan.org/pod/Log%3A%3AAbstraction)
+- Test Dashboard [https://nigelhorne.github.io/Config-Abstraction/coverage/](https://nigelhorne.github.io/Config-Abstraction/coverage/)
 
 # AUTHOR
 
 Nigel Horne, `<njh at nigelhorne.com>`
+
+# POD ERRORS
+
+Hey! **The above document had some coding errors, which are explained below:**
+
+- Around line 34:
+
+    Non-ASCII character seen before =encoding in 'sources—such'. Assuming UTF-8

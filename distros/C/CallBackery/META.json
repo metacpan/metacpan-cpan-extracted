@@ -1,5 +1,5 @@
 {
-   "abstract" : "CallBackery is a Mojolicious+Qoodoo Framework for building Web Applications",
+   "abstract" : "CallBackery is a Mojolicious+Qooxdoo Framework for building Web Applications",
    "author" : [
       "Tobias Oetiker <tobi@oetiker.ch>"
    ],
@@ -63,6 +63,6 @@
          "url" : "https://github.com/oetiker/callbackery"
       }
    },
-   "version" : "v0.55.4",
+   "version" : "v0.56.0",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,5 +1,9 @@
 package Config::Abstraction;
 
+# TODO: add TOML file support
+# TODO: environment-specific encodings - automatic loading of dev/staging/prod
+# TODO: devise a scheme to encrypt passwords in config files
+
 use strict;
 use warnings;
 
@@ -10,20 +14,26 @@ use File::Slurp qw(read_file);
 use File::Spec;
 use Hash::Merge qw(merge);
 use Params::Get 0.04;
+use Params::Validate::Strict;
+use Scalar::Util;
 
 =head1 NAME
 
-Config::Abstraction - Configuration Abstraction Layer
+Config::Abstraction - Merge and manage configuration data from different sources
 
 =head1 VERSION
 
-Version 0.33
+Version 0.34
 
 =cut
 
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 
 =head1 SYNOPSIS
+
+C<Config::Abstraction> lets you load configuration from multiple sources—such as files, environment variables, and in-code defaults—and merge them with predictable precedence.
+It provides a consistent API for accessing the configuration settings, regardless of where they came from,
+this helps keep your application’s or class's configuration flexible, centralized, and easy to override.
 
   use Config::Abstraction;
 
@@ -38,6 +48,24 @@ our $VERSION = '0.33';
 =head1 DESCRIPTION
 
 C<Config::Abstraction> is a flexible configuration management layer that sits above C<Config::*> modules.
+It provides a simple way to layer multiple configuration sources with predictable merge order.
+It lets you define sources such as:
+
+=over 4
+
+=item * Perl hashes (in-memory defaults or dynamic values)
+
+=item * Environment variables (with optional prefixes)
+
+=item * Configuration files (YAML, JSON, INI, or plain key=value)
+
+=item * Command-line arguments
+
+=back
+
+Sources are applied in the order they are provided. Later sources override
+earlier ones unless a key is explicitly set to C<undef> in the later source.
+
 In addition to using drivers to load configuration data from multiple file
 formats (YAML, JSON, XML, and INI),
 it also allows levels of configuration, each of which overrides the lower levels.
@@ -46,6 +74,18 @@ overrides and command line arguments for runtime configuration adjustments.
 This module is designed to help developers manage layered configurations that can be loaded from files and overridden at run-time for debugging,
 offering a modern, robust and dynamic approach
 to configuration management.
+
+=head2 Merge Precedence Diagram
+
+  +----------------+
+  |   CLI args     |  (Highest priority)
+  +----------------+
+  | Environment    |
+  +----------------+
+  | Config file(s) |
+  +----------------+
+  | Defaults       |  (Lowest priority)
+  +----------------+
 
 =head2 KEY FEATURES
 
@@ -210,8 +250,17 @@ Considers the files C<default> and C<$script_name> before looking at C<config_fi
 
 =item * C<data>
 
-A hash ref of data to prime the configuration with.
-Any other data will overwrite by this.
+A hash ref of default data to prime the configuration with.
+These are applied before loading
+other sources and can be overridden by later sources or by explicitly passing
+options directly to C<new>.
+
+  $config = Config::Abstraction->new(
+      data => {
+          log_level => 'info',
+          retries => 3,
+      }
+  );
 
 =item * C<env_prefix>
 
@@ -250,6 +299,10 @@ The default is a C<'.'>,
 as in dotted notation,
 such as C<'database.user'>.
 
+=item * C<schema>
+
+A L<Params::Validate::Strict> compatible schema to validate the configuration file against.
+
 =back
 
 If just one argument is given, it is assumed to be the name of a file.
@@ -263,9 +316,9 @@ sub new
 
 	if(scalar(@_) == 1) {
 		# Just one parameter - the name of a file
-		$params = Params::Get::get_params('file', @_);
+		$params = Params::Get::get_params('file', \@_);
 	} else {
-		$params = Params::Get::get_params(undef, @_) || {};
+		$params = Params::Get::get_params(undef, \@_) || {};
 	}
 
 	$params->{'config_dirs'} //= $params->{'path'};	# Compatibility with Config::Auto
@@ -280,7 +333,9 @@ sub new
 		} else {
 			# Set up the default value for config_dirs
 			if($^O ne 'MSWin32') {
-				push @{$params->{'config_dirs'}}, '/etc', '/usr/local/etc';
+				$params->{'config_dirs'} = [ '/etc', '/usr/local/etc' ];
+			} else {
+				$params->{'config_dirs'} = [''];
 			}
 			if($ENV{'HOME'}) {
 				push @{$params->{'config_dirs'}},
@@ -303,7 +358,7 @@ sub new
 
 	my $self = bless {
 		sep_char => '.',
-		%{$params},
+		%{$params->{defaults} ? $params->{defaults} : $params},
 		env_prefix => $params->{env_prefix} || 'APP_',
 		config => {},
 	}, $class;
@@ -318,6 +373,10 @@ sub new
 		}
 	}
 	$self->_load_config();
+
+	if(my $schema = $params->{'schema'}) {
+		$self->{'config'} = Params::Validate::Strict::validate_strict(schema => $schema, input => $self->{'config'});
+	}
 
 	if($self->{'config'} && scalar(keys %{$self->{'config'}})) {
 		return $self;
@@ -355,6 +414,8 @@ sub _load_config
 		}
 	}
 	for my $dir (@dirs) {
+		next if(!defined($dir));
+
 		for my $file (qw/base.yaml base.yml base.json base.xml base.ini local.yaml local.yml local.json local.xml local.ini/) {
 			my $path = File::Spec->catfile($dir, $file);
 			if($logger) {
@@ -488,7 +549,7 @@ sub _load_config
 					if(!$data) {
 						$self->_load_driver('YAML::XS', ['LoadFile']);
 						if((eval { $data = LoadFile($path) }) && (ref($data) eq 'HASH')) {
-							# Could be colon file, could be YAML, whichever it is, break the configuration fields
+							# Could be colon file, could be YAML, whichever it is break the configuration fields
 							# foreach my($k, $v) (%{$data}) {
 							foreach my $k (keys %{$data}) {
 								my $v = $data->{$k};
@@ -637,15 +698,12 @@ sub get
 		return undef unless ref $ref eq 'HASH';
 		$ref = $ref->{$part};
 	}
-	if(defined($ref)) {
-		if(!$self->{'no_fixate'}) {
-			if(ref($ref) eq 'HASH') {
-				Data::Reuse::fixate(%{$ref});
-			} elsif(ref($ref) eq 'ARRAY') {
-				Data::Reuse::fixate(@{$ref});
-			}
+	if((defined($ref) && !$self->{'no_fixate'})) {
+		if(ref($ref) eq 'HASH') {
+			Data::Reuse::fixate(%{$ref});
+		} elsif(ref($ref) eq 'ARRAY') {
+			Data::Reuse::fixate(@{$ref});
 		}
-	} else {
 	}
 	return $ref;
 }
@@ -757,7 +815,7 @@ sub _load_driver
 		$self->{'failed'}{$driver} = 1;
 		return;
 	}
-	$driver->import(@{$imports});
+	$driver->import(@{ $imports // [] });
 	$self->{'loaded'}{$driver} = 1;
 	return 1;
 }
@@ -777,8 +835,8 @@ when C<sep_char> is set to '_'.
             },
             log_level => 'debug'
         },
-        flatten   => 1,
-        sep_char  => '_'
+        flatten => 1,
+        sep_char => '_'
     );
 
     my $user = $config->database_user();	# returns 'alice'
@@ -827,6 +885,20 @@ sub AUTOLOAD
 
 1;
 
+=head1 COMMON PITFALLS
+
+=over 4
+
+=item * Nested hashes
+
+Merging replaces entire nested hashes unless you enable deep merging.
+
+=item * Undef values
+
+Keys explicitly set to C<undef> in a later source override earlier values.
+
+=back
+
 =head1 BUGS
 
 It should be possible to escape the separator character either with backslashes or quotes.
@@ -852,9 +924,15 @@ You can find documentation for this module with the perldoc command.
 
 =over 4
 
+=item * L<Config::Any>
+
 =item * L<Config::Auto>
 
+=item * L<Hash::Merge>
+
 =item * L<Log::Abstraction>
+
+=item * Test Dashboard L<https://nigelhorne.github.io/Config-Abstraction/coverage/>
 
 =back
 

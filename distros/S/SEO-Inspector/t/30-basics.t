@@ -11,9 +11,9 @@ use SEO::Inspector;
 # Fake plugin
 # -------------------------------
 {
-    package SEO::Inspector::Plugin::FakeCheck;
-    sub new { bless {}, shift }
-    sub run { return { name => 'FakeCheck', status => 'ok', notes => 'plugin ran' }; }
+	package SEO::Inspector::Plugin::FakeCheck;
+	sub new { bless {}, shift }
+	sub run { return { name => 'FakeCheck', status => 'ok', notes => 'plugin ran' }; }
 }
 
 # -------------------------------
