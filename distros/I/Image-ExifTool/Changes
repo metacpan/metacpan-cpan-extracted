@@ -4,8 +4,103 @@ ExifTool Version History
 
 RSS feed: https://exiftool.org/rss.xml
 
-Note: The most recent production release is Version 13.30. (Other versions are
+Note: The most recent production release is Version 13.35. (Other versions are
 considered development releases, and are not uploaded to MetaCPAN.)
+
+Sept. 6, 2025 - Version 13.35 (production release)
+
+  - Added a new CanonModelID
+  - Added new Olympus PictureMode and LensType values (thanks Michael Meissner)
+  - Decode GPS from another DJI protobuf format (DJI Neo)
+  - Decode a few new FujiFilm tags
+  - Enhanced -ee option to extract M-RAW information from all images in FujiFilm
+    RAF files
+  - Improved handling of standard-format unknown XMP date/time tags when the API
+    XMPAutoConv option is set (which is the default) to put them in the "Time"
+    group and apply the -d date/time formatting
+  - Improved -fileNUM option so it may be used to access tags from alternate
+    files when the specified target FILE doesn't exist
+  - Improved print conversions for some Canon tags to handle "n/a" values
+  - Enhanced JSON long output (-j -l) so the API SaveBin option also returns the
+    Rational ("rat") value if available
+  - Changed -if option so the expression is evaluated even when the source file
+    doesn't exist (to allow more flexibily when using -fileNUM option or when
+    creating the output file when writing)
+  - Fixed decoding of a few new Pentax tags (thanks Karsten Gieselmann)
+  - Fixed -diff feature to report differences in binary-data values and to be
+    consistent with handling of backslashes in Windows path names
+
+Aug. 18, 2025 - Version 13.34
+
+  - Decode a number of new Pentax tags (thanks Karsten Gieselmann)
+  - Decode a new Canon tag (thanks Peter Wem, github #344)
+  - Updated Sony decoding for the ILME-FX2 and DSC-RX1RM3 (thanks Jos Roost)
+  - Minor fixes to decoding of new Olympus tags (thanks Karsten Gieselmann)
+  - Reverted change of 13.20 which changed the behaviour when writing
+    incorrectly-formatted date/time values
+  - Patched to avoid "uninitialized value $module" when using some custom config
+    files
+  - Fixed issue reading maker notes from some Sony ILCE models
+  - API Changes:
+      - Added UndefTags option to allow -m
+        and/or -f to be used without modifying the value of undef tags in -if
+        expressions (which was the behaviour prior to version 12.60)
+
+July 25, 2025 - Version 13.33
+
+  - Added read support for TNEF files (eg. "winmail.dat")
+  - Added a new Canon HighlightTonePriority value (github #339)
+  - Decode Canon FocusBracketing tag (github #340)
+  - Decode more tags for newer Nikon Z models (thanks Warren Hatch)
+  - Decode a few more Olympus tags (thanks Karsten Gieselmann)
+  - Decode face detection tags for the Pentax K-3III (thanks Karsten Gieselmann)
+  - Decode a few more FujiFilm tags (github #343)
+  - Handle Olympus RawDev2IFD tag 0x8000 (named it RawDevSubIFD)
+  - Improved recognition of some Sony lenses (github #342)
+  - Enhanced the -p option to cycle through sub-documents
+  - Improved extraction of GoPro timed GPS to use sub-document numbers to
+    separate the individual fixes, allowing -p to extract all fixes at
+    sub-second resolution (although for earlier models these may not contain
+    timestamps)
+  - Extract EXIF information from Sigma fp MOV videos
+  - Patched to avoid "multi-segment EXIF with external pointers" error when
+    writing Olympus OM-1 JPG files converted by some utilities
+  - Fixed decoding of Panasonic LongExposureNRUsed (thanks AndrewJ)
+  - Fixed long-standing bug when using special characters in the -d option
+    argument
+
+July 2, 2025 - Version 13.32
+
+  - Added a new Olympus CameraType (thanks Herb and Albert Shan)
+  - Added a new Sony LensType (github #335)
+  - Added a new Nikon CropHiSpeed value (thanks Albert Shan)
+  - Added a warning if a tag value couldn't be packed for writing to a binary
+    data structure
+  - Decode more Ricoh/Pentax AF tags for some models (thanks Karsten Gieselmann)
+  - Decode Canon HDR-PQ tag (github #336)
+  - Extract a couple more EXIF tags
+  - Patched to allow a dot (.) in the name of a structure element when writing
+  - Fixed "uninitialized value" bug when using -w with the -stay_open feature
+  - Fixed bug in -file option when using tag names to specify the name of the
+    alternate file (the tags were taken only from the first input file unless a
+    file name formatting code was also specified)
+
+June 19, 2025 - Version 13.31
+
+  - Added a new CanonModelID and RFLensType (thanks Norbert Wasser)
+  - Added some new FujiFilm AdvancedFilter values (thanks Greybeard)
+  - Added a new Nikon Z LensID (thanks Warren Hatch)
+  - Decode a few new Sigma tags
+  - Decode two more types of timed GPS from MP4 videos
+  - Decode more Pentax AF tags for some models (thanks Karsten Gieselmann)
+  - Extract Pages MediaBox from PDF files (github #333)
+  - Enhanced Validate feature to check some embedded images
+  - Remove sub-seconds if they exist when writing a PDF date
+  - Removed a debugging warning left in the -plot update of 13.28
+  - Changed DNG ProfileIFD RGBTables to Binary-type tag (github #334)
+  - Internal code improvements in the handling of some trailers
+  - Patched LNK string parsing for Windows nonconformity (github #332)
+  - Fixed a few possible "uninitialized value" warnings
 
 May 22, 2025 - Version 13.30 (production release)
 
@@ -50,6 +145,8 @@ Apr. 25, 2025 - Version 13.28
   - Decode ShutterCount for Canon EOS R8 and R50 (github #325)
   - Decode ThumbnailTIFF from some Insta360 videos
   - Decode AROT:HDRGainCurveSize from APP10
+  - Enhanced the -plot feature to allow Multi option to specify a different
+    number of datasets for each plot
   - Updated to the 2025 MPF specification
   - Renamed K-3III AFPoints to AFPointsSelected and changed decoding
   - Fixed bug introduced in 13.23 that could cause an incorrect parsing of XMP
@@ -388,7 +485,7 @@ Nov. 12, 2024 - Version 13.03
 Nov. 5, 2024 - Version 13.02
 
   - Enhanced -j -l output to add optional "fmt" and "hex" fields
-  - Enhanced -geotag option to support Android "Export Timeline data" JSON
+  - Enhanced -geotag option to support Google Maps "Export Timeline data" JSON
     format
   - Changed ProductVersion of Windows launcher to match ExifTool version
   - Patched to use empty group name instead of "Copy0" for family 4 group name

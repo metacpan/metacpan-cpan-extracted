@@ -3,10 +3,9 @@ abstract: 'Semantic version v2.0 object for Perl'
 author:
   - 'Pine Mizune <pinemz@gmail.com>'
 build_requires:
-  Devel::Cover: '1.20'
-  Devel::Cover::Report::Codecov: '0'
+  Data::OptList: '< 0.114'
   Perl::Critic: '1.125'
-  Test::Deep: '0.117'
+  Test::Deep: '>= 0.117, < 1.200'
   Test::Deep::Matcher: '0.01'
   Test::Exception: '0.40'
   Test::Mock::Guard: '0.10'
@@ -16,7 +15,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.27, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -35,14 +34,14 @@ no_index:
 provides:
   SemVer::V2::Strict:
     file: lib/SemVer/V2/Strict.pm
-    version: '0.17'
+    version: '0.18'
 requires:
   perl: '5.010000'
 resources:
   bugtracker: https://github.com/pine/p5-SemVer-V2-Strict/issues
   homepage: https://github.com/pine/p5-SemVer-V2-Strict
-  repository: git://github.com/pine/p5-SemVer-V2-Strict.git
-version: '0.17'
+  repository: https://github.com/pine/p5-SemVer-V2-Strict.git
+version: '0.18'
 x_authority: cpan:PINE
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

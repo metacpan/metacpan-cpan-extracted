@@ -88,7 +88,7 @@ sub ProcessCTMD($$$);
 sub ProcessExifInfo($$$);
 sub SwapWords($);
 
-$VERSION = '4.91';
+$VERSION = '4.96';
 
 # Note: Removed 'USM' from 'L' lenses since it is redundant - PH
 # (or is it?  Ref 32 shows 5 non-USM L-type lenses)
@@ -636,9 +636,10 @@ $VERSION = '4.91';
    '61182.58' => 'Canon RF 70-200mm F2.8 L IS USM Z + RF1.4x', #42
    '61182.59' => 'Canon RF 70-200mm F2.8 L IS USM Z + RF2x', #42
    '61182.60' => 'Canon RF 16-28mm F2.8 IS STM', #42
-   '61182.61' => 'Canon RF 50mm F1.4 L VCM', #42
-   '61182.62' => 'Canon RF 24mm F1.4 L VCM', #42
-   '61182.63' => 'Canon RF 20mm F1.4 L VCM', #42
+   '61182.61' => 'Canon RF-S 14-30mm F4-6.3 IS STM PZ', #42
+   '61182.62' => 'Canon RF 50mm F1.4 L VCM', #42
+   '61182.63' => 'Canon RF 24mm F1.4 L VCM', #42
+   '61182.64' => 'Canon RF 20mm F1.4 L VCM', #42
     65535 => 'n/a',
 );
 
@@ -1005,7 +1006,9 @@ $VERSION = '4.91';
     0x80000491 => 'PowerShot V10', #25
     0x80000495 => 'EOS R1', #PH
     0x80000496 => 'R5 Mark II', #forum16406
+    0x80000497 => 'PowerShot V1', #PH
     0x80000498 => 'EOS R100', #25
+    0x80000516 => 'EOS R50 V', #42
     0x80000520 => 'EOS D2000C', #IB
     0x80000560 => 'EOS D6000C', #PH (guess)
 );
@@ -2149,6 +2152,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
             TagTable => 'Image::ExifTool::Canon::RawBurstInfo',
         }
     },
+  # 0x4049 - related to croping (forum13491) - "8 0 0 0" = no crop, "8 1 0 1" = crop enabled
     0x4059 => { #forum16111
         Name => 'LevelInfo',
         SubDirectory => {
@@ -2619,12 +2623,20 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     # 47 - related to aspect ratio: 100=4:3,70=1:1/16:9,90=3:2,60=4:5 (PH G12)
     #      (roughly image area in percent - 4:3=100%,1:1/16:9=75%,3:2=89%,4:5=60%)
     # 48 - 3 for CR2/CR3, 4 or 7 for JPG, -1 for edited JPG (see forum16127)
+    50 => { #github340
+        Name => 'FocusBracketing',
+        PrintConv => { 0 => 'Disable', 1 => 'Enable' },
+    },
     51 => { #forum16036 (EOS R models)
         Name => 'Clarity',
         PrintConv => {
             OTHER => sub { shift },
             0x7fff => 'n/a',
         },
+    },
+    52 => { #github336
+        Name  => 'HDR-PQ',
+        PrintConv => { %offOn, -1 => 'n/a' },
     },
 );
 
@@ -7032,6 +7044,7 @@ my %ciMaxFocal = (
             320 => 'Canon RF 70-200mm F2.8 L IS USM Z + RF1.4x', #42
             321 => 'Canon RF 70-200mm F2.8 L IS USM Z + RF2x', #42
             323 => 'Canon RF 16-28mm F2.8 IS STM', #42
+            324 => 'Canon RF-S 14-30mm F4-6.3 IS STM PZ', #42
             325 => 'Canon RF 50mm F1.4 L VCM', #42
             326 => 'Canon RF 24mm F1.4 L VCM', #42
             327 => 'Canon RF 20mm F1.4 L VCM', #42
@@ -8928,7 +8941,7 @@ my %ciMaxFocal = (
     },
     3 => {
         Name => 'HighlightTonePriority',
-        PrintConv => \%offOn,
+        PrintConv => { %offOn, 2 => 'Enhanced' }, #github339 (Enhanced)
     },
     4 => {
         Name => 'LongExposureNoiseReduction',
@@ -9160,15 +9173,37 @@ my %filterConv = (
         Name => 'AFConfigTool',
         ValueConv => '$val + 1',
         ValueConvInv => '$val - 1',
-        PrintConv => '"Case $val"',
-        PrintConvInv => '$val=~/(\d+)/ ? $1 : undef',
+        PrintHex => 1,
+        PrintConv => {
+            0x80000000 => 'n/a',
+            OTHER => sub { 'Case ' . shift },
+        },
+        PrintConvInv => '$val=~/(\d+)/ ? $1 : 0x80000000',
     },
-    2 => 'AFTrackingSensitivity',
+    2 => {
+        Name => 'AFTrackingSensitivity',
+        PrintHex => 1,
+        PrintConv => {
+            0x7fffffff => 'n/a',
+            OTHER => sub { shift },
+        },
+    },
     3 => {
         Name => 'AFAccelDecelTracking',
         Description => 'AF Accel/Decel Tracking',
+        PrintHex => 1,
+        PrintConv => {
+            0x7fffffff => 'n/a',
+            OTHER => sub { shift },
+        },
     },
-    4 => 'AFPointSwitching',
+    4 => {
+        Name => 'AFPointSwitching',
+        PrintConv => {
+            0x7fffffff => 'n/a',
+            OTHER => sub { shift },
+        },
+    },
     5 => { #52
         Name => 'AIServoFirstImage',
         PrintConv => {
@@ -9318,6 +9353,14 @@ my %filterConv = (
             1 => 'People',
             2 => 'Animals',
             3 => 'Vehicles',
+        },
+    },
+    21 => { #github344 (R6)
+        Name => 'SubjectSwitching',
+        PrintConv => {
+            0 => 'Initial Priority',
+            1 => 'On Subject',
+            2 => 'Switch Subject',
         },
     },
     24 => { #forum16068

@@ -89,6 +89,51 @@ use constant OSD_OtherConfiguration => "Other Configuration";
 # IPCamera::Reolink:SetOsd() pos values as list.
 our @OSD_pos_list = (OSD_UpperLeft, OSD_TopCenter, OSD_UpperRight, OSD_LowerLeft, OSD_BottomCenter, OSD_LowerRight, OSD_OtherConfiguration, );
 
+# IPCamera::Reolink::SetWhiteLed() and IPCamera::Reolink::GetWhiteLed() state values
+use constant WhiteLed_StateOff => 0; 
+use constant WhiteLed_StateOn => 1; 
+
+# IPCamera::Reolink::SetWhiteLed() and IPCamera::Reolink::GetWhiteLed() mode values
+use constant WhiteLed_ModeOff => 0; 
+use constant WhiteLed_ModeNightSmart => 1; 
+use constant WhiteLed_ModeTimer => 3; 
+
+# IPCamera::Reolink::SetWhiteLed() and IPCamera::Reolink::GetWhiteLed() mode values as list
+our @WhiteLed_Mode_list = (WhiteLed_ModeOff, WhiteLed_ModeNightSmart, WhiteLed_ModeTimer, );
+
+# IPCamera::Reolink::SetWhiteLed() and IPCamera::Reolink::GetWhiteLed() bright values
+use constant WhiteLed_BrightMin => 1; 
+use constant WhiteLed_BrightMax => 100; 
+
+# IPCamera::Reolink::SetWhiteLed() and IPCamera::Reolink::GetWhiteLed() LightingSchedule values
+package IPCamera::Reolink::LightingSchedule
+{
+    my %hash;
+    sub new($$$$){
+        my($StartHour, $StartMin, $EndHour, $EndMin) = @_;
+        $hash{StartHour} = $StartHour;
+        $hash{StartMin} = $StartMin;
+        $hash{EndHour} = $EndHour;
+        $hash{EndMin} = $EndMin;
+
+        return \%hash;
+    } # new
+} # package IPCamera::Reolink::LightingSchedule
+
+# IPCamera::Reolink::SetWhiteLed() and IPCamera::Reolink::GetWhiteLed() wlAiDetectType values
+package IPCamera::Reolink::wlAiDetectType
+{
+    my %hash;
+    sub new($$$){
+        my($dog_cat, $people, $vehicle) = @_;
+        $hash{dog_cat} = $dog_cat;
+        $hash{people} = $people;
+        $hash{vehicle} = $vehicle;
+
+        return \%hash;
+    } # new
+} # package IPCamera::Reolink::wlAiDetectType
+
 # IPCamera::Reolink:AudioAlarmPlay() alarm_mode values.
 use constant AAP_AlarmModeTimes => "times"; # play # times specified by times
 use constant AAP_AlarmModeManual => "manu"; # play continuously until next AudioAlarmPlay command
@@ -96,7 +141,7 @@ use constant AAP_AlarmModeManual => "manu"; # play continuously until next Audio
 # IPCamera::Reolink:AudioAlarmPlay() alarm_mode values as list.
 our @AAP_AlarmMode_list = (AAP_AlarmModeTimes, AAP_AlarmModeManual, );
 
-our $VERSION = '1.06';
+our $VERSION = '1.09';
 
 our $DEBUG = 0; # > 0 for debug output to STDERR
 
@@ -510,6 +555,55 @@ sub AudioAlarmPlay($$$$$){
         return 0;
     } # if
 } # AudioAlarmPlay()
+
+# SetWhiteLed() - set configuration of white led (spot light)
+sub SetWhiteLed($$$$$$$){
+    my($self, $channel, $state, $mode, $bright, $lighting_schedule_r, $ai_detect_type_r) = @_;
+    if(!_checkLoginLeaseTime($self)){
+        return 0;
+    } # if
+    my($_camera_rest_client, $_camera_login_token) = ($self->{_camera_rest_client}, $self->{_camera_login_token});
+    #my $setwhiteled_r = [ {cmd => "SetWhiteLed", param => { WhiteLed => { channel => int($channel), state => int($state), mode => int($mode), bright => int($bright), }}} ];
+    my $setwhiteled_r = [ {cmd => "SetWhiteLed", param => { WhiteLed => { channel => int($channel), }}} ];
+    if(defined($state)){
+        ${$setwhiteled_r->[0]->{param}->{WhiteLed}}{state} = int($state);
+    } # if
+    if(defined($mode)){
+        ${$setwhiteled_r->[0]->{param}->{WhiteLed}}{mode} = int($mode);
+    } # if
+    if(defined($bright)){
+        ${$setwhiteled_r->[0]->{param}->{WhiteLed}}{bright} = int($bright);
+    } # if
+    if(defined($lighting_schedule_r)){
+        ${$setwhiteled_r->[0]->{param}->{WhiteLed}}{LightingSchedule} = $lighting_schedule_r;
+    } # if
+    if(defined($ai_detect_type_r)){
+        ${$setwhiteled_r->[0]->{param}->{WhiteLed}}{wlAiDetectType} = $ai_detect_type_r;
+    } # if
+    my $response_r = _sendCameraCommand($_camera_rest_client, 'SetWhiteLed', $setwhiteled_r, $_camera_login_token);
+    if(defined($response_r)){
+        return 1;
+    }else{
+        return 0;
+    } # if
+} # SetWhiteLed()
+
+# GetWhiteLed() - get configuration of white led (spot light)
+sub GetWhiteLed($$){
+    my($self, $channel) = @_;
+    if(!_checkLoginLeaseTime($self)){
+        return 0;
+    } # if
+    my($_camera_rest_client, $_camera_login_token) = ($self->{_camera_rest_client}, $self->{_camera_login_token});
+    my $getwhiteled_r = [ {cmd => "GetWhiteLed", action => 0, param => { channel => int($channel), }} ];
+    my $response_r = _sendCameraCommand($_camera_rest_client, 'GetWhiteLed', $getwhiteled_r, $_camera_login_token);
+    if(defined($response_r)){
+        return (@$response_r[0]->{value}, @$response_r[0]->{range}, @$response_r[0]->{initial}, );
+    }else{
+        return (undef, undef, undef);
+    } # if
+} # GetWhiteLed()
+
 =pod
 
 =encoding UTF-8
@@ -520,7 +614,7 @@ IPCamera::Reolink - Reolink API provides access to the System, Security, Network
 
 =head1 VERSION
 
-1.06
+1.09
 
 =head1 SYNOPSIS
 
@@ -587,6 +681,28 @@ IPCamera::Reolink - Reolink API provides access to the System, Security, Network
  # Play Audio Alarm 1 time 
  
  my $r = $camera->AudioAlarmPlay(IPCamera::Reolink::ChannelDefault, 0, 1, IPCamera::Reolink::AAP_AlarmModeTimes);
+
+ # Turn the spotlight on.
+ 
+ $camera->SetWhiteLed(IPCamera::Reolink::ChannelDefault, IPCamera::Reolink::WhiteLed_StateOn, undef, undef, undef, undef);
+
+ # Turn the spotlight off.
+ 
+ $camera->SetWhiteLed(IPCamera::Reolink::ChannelDefault, IPCamera::Reolink::WhiteLed_StateOff, undef, undef, undef);
+
+ # Set the spotlight brightness to maximum.
+ 
+ my $whiteled_bright = IPCamera::Reolink::WhiteLed_BrightMax;
+ $camera->SetWhiteLed(IPCamera::Reolink::ChannelDefault, undef, undef, $whiteled_bright, undef, undef);
+
+ # Get the spotlight values.
+ 
+ my ($whiteled_value_r, $whiteled_range_r, $whiteled_initial_r) = $camera->GetWhiteLed(IPCamera::Reolink::ChannelDefault);
+ die "IPCamera::Reolink::GetWhiteLed() failed\n" if(!defined($whiteled_value_r));
+ print STDERR  "White Led Value: bright=" . $whiteled_value_r->{WhiteLed}->{bright};
+ print STDERR  "White Led Value: mode=" . $whiteled_value_r->{WhiteLed}->{mode};
+ print STDERR  "White Led Value: state=" . $whiteled_value_r->{WhiteLed}->{state};
+ print STDERR  "White Led Value: LightingSchedule: StartHour=" . $whiteled_value_r->{WhiteLed}->{LightingSchedule}->{StartHour}, 0);
 
  # Logout of camera
 
@@ -794,7 +910,23 @@ play # times specified by times
 
 play continuously until next AudioAlarmPlay command
 
-=head2 IPCamera::Reolink::SetPtzPrest() maximum legth of preset name.
+=back
+
+=head2 IPCamera::Reolink::SetWhiteLed() state values.
+
+=over 4
+
+=item WhiteLed_StateOff => 0; 
+
+White Led off.
+
+=item WhiteLed_StateOn => 1; 
+
+White Led off.
+
+=back
+
+=head2 IPCamera::Reolink::SetPtzPreset() maximum legth of preset name.
 
 =over 4
 
@@ -835,6 +967,10 @@ I<IPCamera::Reolink::AAP_AlarmMode_list> is the IPCamera::Reolink::AudioAlarmPla
 =head1 METHODS
 
 =head2 new({camera_url => "http://192.168.1.99/", camera_user_name => "admin", camera_password => "password", camera_x509_certificate_file => undef, camera_x509_key_file => undef, camera_certificate_authority_file => undef, })
+
+Hash reference version.
+
+See below for details.
 
 =head2 new($camera_url, $camera_user_name, $camera_password)
 
@@ -1045,7 +1181,7 @@ Device name.
 
 =item $devinfo_r->{type} ("IPC")
 
-Device type.
+Device type, "IPC" for IP camera or "NVR" for network video recorder.
 
 =item $devinfo_r->{wifi} (0)
 
@@ -1688,8 +1824,6 @@ If you are connected to an NVR then there is usually one channel per attached ca
 
 =back
 
-=back
-
 =over 4
 
 =item $id 
@@ -1698,17 +1832,11 @@ Preset id, integer value in the range [PTZ_PresetMin + 1, PTZ_PresetMax +1].
 
 =back
 
-=back
-
 =over 4
 
 =item $name 
 
 Preset name, maximum length  PTZ_PresetMaxNameLength characters.
-
-=back
-
-=back
 
 =item return
 
@@ -1807,6 +1935,147 @@ Play continuously until next AudioAlarmPlay command.
 =item return
 
 Returns 1 if audio alarm played else 0.
+
+=back
+
+=head2 SetWhiteLed($camera_channel, $state, $mode, $bright, $lighting_schedule_r, $ai_detect_type_r)
+
+Set the configuration of the white led (spotlight). 
+Any of the parameters with the value undef will not be modified.
+
+=over 
+
+=item $camera_channel 
+
+Perform camera operation on specified camera channel.
+
+=over 4
+
+=item IPCamera::Reolink::ChannelDefault 
+
+If you are connected to a camera then there is (usually) only 1 channel.
+
+=item integer >= 0
+
+If you are connected to an NVR then there is usually one channel per attached camera starting at integer value 0.
+
+=back
+
+=item $state 
+
+White led/spotlight state.
+
+=over 4
+
+=item IPCamera::Reolink::WhiteLed_StateOff
+
+White led off.
+
+=item IPCamera::Reolink::WhiteLed_StateOn
+
+White led on.
+
+=back
+
+=item $mode 
+
+White led/spotlight state.
+
+=over 4
+
+=item IPCamera::Reolink::WhiteLed_ModeOff
+
+Spotlight will never be turned on.
+
+=item IPCamera::Reolink::WhiteLed_ModeNightSmart
+
+Spotlight will be turned on at night when motion is detected.
+
+=item IPCamera::Reolink::WhiteLed_ModeTimer
+
+Spotlight will be turned on per $lighting_schedule_r schedule.
+
+=back
+
+=item $bright
+
+Set spotlight brightness as an integer value between IPCamera::Reolink::WhiteLed_BrightMin and IPCamera::Reolink::WhiteLed_BrightMax.
+
+=item $lighting_schedule_r
+
+new IPCamera::Reolink::LightingSchedule($StartHour, $StartMin, $EndHour, $EndMin)
+
+=over 4
+
+=item $StartHour
+
+0 <= $StartHour < 24
+
+=item $StartMin
+
+0 <= $StartMin < 60
+
+=item $EndHour
+
+0 <= $EndHour < 24
+
+=item $EndMin
+
+0 <= $EndMin < 60
+
+=back
+
+=item $ai_detect_type_r
+
+new IPCamera::Reolink::wlAiDetectType($dog_cat, $people, $vehicle)
+
+=over 4
+
+=item $dog_cat
+
+1 to enable dog/cat (animal) detection, 0 to disable
+
+=item $people
+
+1 to enable people detection, 0 to disable
+
+=item $vehicle
+
+1 to enable vehicle detection, 0 to disable
+
+=back
+
+=item return
+
+Returns 1 if SetWhiteLed() successful else 0 on failure.
+
+=back
+
+=head2 GetWhiteLed($camera_channel)
+
+Get the configuration of the white led (spotlight)
+
+=over 
+
+=item $camera_channel 
+
+Perform camera operation on specified camera channel.
+
+=over 4
+
+=item IPCamera::Reolink::ChannelDefault 
+
+If you are connected to a camera then there is (usually) only 1 channel.
+
+=item integer >= 0
+
+If you are connected to an NVR then there is usually one channel per attached camera starting at integer value 0.
+
+=item return
+
+Returns undef if the GetWhiteLed function failed.
+
+Returns ($whiteled_value_r, $whiteled_range_r, $whiteled_initial_r).
 
 =back
 

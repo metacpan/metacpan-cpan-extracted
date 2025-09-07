@@ -1,5 +1,10 @@
 -----
 
+0.1.5    2025-09-06
+   [Changed]
+       * Updated to libvirt tag v11.7.0 (from v11.6.0)
+       * No actual changes
+
 0.1.4    2025-08-05
    [Added]
        * New constants:

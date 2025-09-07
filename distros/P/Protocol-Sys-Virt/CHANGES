@@ -22,7 +22,7 @@
            * deserialize_domain_migrate_perform3_args
            * serialize_domain_migrate_perform3_args
     [Changed]
-       * Updated to libvirt tag v11.5.0 (from 11.4.0)
+       * Updated to libvirt tag v11.6.0 (from 11.5.0)
 
 11.5.0    2025-07-11
     [Changed]

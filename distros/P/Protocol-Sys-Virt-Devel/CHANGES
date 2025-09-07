@@ -1,5 +1,8 @@
 -----
 
+1.0.1   2025-08-06
+    * Fix warning 'possible accidental interpolation of @$'
+
 1.0.0   2024-12-11
     No changes from 0.0.5
 

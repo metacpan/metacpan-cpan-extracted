@@ -64,7 +64,7 @@ web hosting which disables an "unlimited traffic" web site if a single bot hamme
 the site with a moderate load.  An alternate ExifTool homepage is available at
 <a href="http://exiftool.sourceforge.net/">http://exiftool.sourceforge.net/</a></i></p> -->
 
-<p><i class=orng><b>Note:</b> IP's that agressively download multiple copies of
+<p><i class=orng><b>Note:</b> IP's that aggressively download multiple copies of
 the distribution files or access web pages too quickly will be blocked.</i></p>
 
 <div class=wide><table class=links><tr>
@@ -101,10 +101,13 @@ the distribution files or access web pages too quickly will be blocked.</i></p>
 <br><a href="#contact">Contact Me</a>
 </div>
 
+<p><i class=red><b>(To reduce load on the exiftool.org server,
+the download links now point to SourceForge)</b></i></p>
+
 <blockquote><table class='dl lg'><tr><td><b>
-<a href="Image-ExifTool-13.30.tar.gz">
-Download        Version 13.30</a> (7.4 MB) -
-<a href="history.html">May 22, 2025</a></b></td></tr></table></blockquote>
+<a href="https://sourceforge.net/projects/exiftool/files/Image-ExifTool-13.35.tar.gz/download">
+Download        Version 13.35</a> (7.6 MB) -
+<a href="history.html">Sept. 6, 2025</a></b></td></tr></table></blockquote>
 
 <p><b>ExifTool is a platform-independent <a href="ExifTool.html">Perl
 library</a> plus a <a href="exiftool_pod.html">command-line application</a> for
@@ -156,11 +159,11 @@ only, and do not include the HTML documentation or other files of the full
 distribution above.)</i></p>
 
 <blockquote><table class='dl lg'><tr><td rowspan=2><b><a name="alone">Windows</a></b></td><td><b>
-32-bit: <a href="exiftool-13.30_32.zip">
-         exiftool-13.30_32.zip</a> (11.0 MB)</b></td></tr>
+32-bit: <a href="https://sourceforge.net/projects/exiftool/files/exiftool-13.35_32.zip/download">
+         exiftool-13.35_32.zip</a> (11.1 MB)</b></td></tr>
 <tr><td><b>64-bit:
-<a href="exiftool-13.30_64.zip">
-         exiftool-13.30_64.zip</a> (10.8 MB)</b></td></tr>
+<a href="https://sourceforge.net/projects/exiftool/files/exiftool-13.35_64.zip/download">
+         exiftool-13.35_64.zip</a> (10.9 MB)</b></td></tr>
          </table></blockquote>
 
 <p><b>The Windows executable</b> archives include Perl. Just download and un-zip
@@ -178,8 +181,8 @@ if you have any problems/comments with these versions.)</i></p>
 
 <blockquote><table class='dl lg'><tr><td><b>
 MacOS Package:
-<a href="ExifTool-13.30.pkg">
-         ExifTool-13.30.pkg</a> (5.3 MB)</b></td></tr></table></blockquote>
+<a href="https://sourceforge.net/projects/exiftool/files/ExifTool-13.35.pkg/download">
+         ExifTool-13.35.pkg</a> (5.5 MB)</b></td></tr></table></blockquote>
 
 <p><b>The MacOS package</b> installs the ExifTool command-line application and
 libraries in /usr/local/bin. After installing, type "<code>exiftool</code>" in a
@@ -512,8 +515,9 @@ metadata types for each file format.  C2PA metadata is not currently <b>W</b>rit
 <tr><td>THM</td><td>R/W</td><td>Thumbnail image (<a href="TagNames/JPEG.html">JPEG</a>)</td><td>R/W/C</td><td>R/W/C</td><td>R/W/C</td><td>R/W/C</td><td>R/D</td><td><a href="#JPEG">Supported JPEG Meta Information</a></td></tr>
 <tr><td><a href="TagNames/OOXML.html">THMX</a></td><td>R</td><td>Office Open XML Theme</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/OOXML.html">XML</a> <a href="TagNames/ZIP.html">ZIP</a></td></tr>
 <tr><td><a href="TagNames/EXIF.html">TIFF, TIF</a></td><td>R/W</td><td>Tagged Image File Format</td><td>R/W/C</td><td>R/W/C</td><td>R/W/C</td><td>R/W/C</td><td>R/D</td><td>R/W/C <a href="TagNames/GeoTiff.html">GeoTIFF</a><span class=sup>1</span>, R/W <a href="#Trailers">Trailers</a></td></tr>
-<tr><td><a href="TagNames/Font.html">TTF, TTC</a></td><td>R</td><td>True Type Font/Collection</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R</td><td>R <a href="TagNames/Font.html">Font</a></td></tr>
+<tr><td><a href="TagNames/TNEF.html">TNEF</a></td><td>R</td><td>Transport Neutral Encapsulation Format</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R</td><td>R <a href="TagNames/TNEF.html">TNEF</a></td></tr>
 <tr><td><a href="TagNames/Torrent.html">TORRENT</a></td><td>R</td><td>BitTorrent description file</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/Torrent.html">Torrent</a></td></tr>
+<tr><td><a href="TagNames/Font.html">TTF, TTC</a></td><td>R</td><td>True Type Font/Collection</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R</td><td>R <a href="TagNames/Font.html">Font</a></td></tr>
 <tr><td><a href="TagNames/Text.html">TXT</a></td><td>R</td><td>Text files</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/Text.html">Text</a></td></tr>
 <tr><td><a href="TagNames/VCard.html">VCF, VCARD</a></td><td>R</td><td>Virtual Card</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/VCard.html">VCard</a></td></tr>
 <tr><td>VNT</td><td>R</td><td>Scene7 Vignette (<a href="TagNames/FlashPix.html">FPX</a>-like)</td><td>-</td><td>-</td><td>-</td><td>R</td><td>-</td><td>R <a href="TagNames/FlashPix.html">FlashPix</a></td></tr>
@@ -1435,7 +1439,7 @@ binary data.  The simple script above does not handle this case.</p>
 
 <p><b><a name="user_docs">User-contributed Documentation</a></b></p>
 <ul>
-<li><a href="https://www.weareavp.com/exiftool-tutorial-series/">ExifTool Tutorial</a> (video in 4 parts by <a href="https://www.weareavp.com">AVP</a>)</li>
+<li>ExifTool Tutorial (video in 4 parts -- see <a href="https://exiftool.org/forum/index.php?msg=93461">this post</a> for links to the videos)</li>
 <li><a href="http://www.youtube.com/watch?v=K9PAD7GqUag">Using the ExifTool on Linux to read/write Exif Tags to your photo collection</a> (video by <a href="http://www.linuxbyexample.org">Linux By Example</a>)</li>
 <li><a href="http://www.youtube.com/watch?v=WchknYwbFJY">Working with jpg Metadata Comments - Exiftool - BASH - Linux Command Line</a> (video by <a href="http://www.linuxbyexample.org">Linux By Example</a>)</li>
 <li><a href="http://sourceforge.net/projects/exiftool1line/files/">Useful one-line ExifTool commands</a> (.txt file)</li>
@@ -1618,7 +1622,7 @@ models.  (To see this information, run exiftool with the <code>-U</code>
 option.)  In this area, ExifTool is very much a collaborative effort, and
 development relies heavily on the input from camera owners to help decode new
 meta information.  If you manage to figure out what any of it means, send me an
-e-mail (philharvey66 at gmail.com) and I'll <b>add your new discoveries to
+e-mail (exiftool@gmail.com) and I'll <b>add your new discoveries to
 ExifTool</b>.  Many thanks to all who have helped so far...</p>
 
 <h2><a name="ack">Acknowledgements</a></h2>

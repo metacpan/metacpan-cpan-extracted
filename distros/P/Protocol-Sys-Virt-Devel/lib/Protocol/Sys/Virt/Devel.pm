@@ -3,7 +3,7 @@ use v5.20;
 use warnings;
 use experimental 'signatures';
 
-package Protocol::Sys::Virt::Devel v1.0.0;
+package Protocol::Sys::Virt::Devel v1.0.1;
 
 use parent 'Exporter';
 our @EXPORT_OK = qw( extract_all );
@@ -212,7 +212,7 @@ sub _header_constant_extractor($libvirt, $header) {
             my ($orig, $val) = ($1, $2);
             $val = _strip_number_suffix(_trim($val));
             next if $orig =~ m/^(VIR_DEPRECATED|VIR_EXPORT_VAR)$/; # for C programs, but not for us...
-            next if $val =~ m/^@.*@$/; # defined by autoconf macro... can't include
+            next if $val =~ m/^\@.*\@$/; # defined by autoconf macro... can't include
             my (undef, $module) = pairfirst {;
                 $orig =~ m/$a/
             } @{ $headers{$header}->{module} };

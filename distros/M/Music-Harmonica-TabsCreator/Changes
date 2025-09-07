@@ -1,5 +1,15 @@
 Revision history for Perl distribution Music-Harmonica-Tabs
 
+1.05 - 2025-09-06
+ - Set a tag "other" on tunings that are not harmonicas.
+
+1.04 - 2025-09-06
+ - Fix a typo in the solo tuning definition.
+
+1.03 - 2025-09-06
+ - Add a couple more diatonic tunings.
+ - Add  support for the Triola.
+
 1.02 - 2025-03-26
  - Catch a minor error when the input music does not contain any note to avoid
    some warnings.

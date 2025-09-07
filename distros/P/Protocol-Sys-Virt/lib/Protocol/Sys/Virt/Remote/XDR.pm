@@ -1,7 +1,7 @@
 ####################################################################
 #
 #     This file was generated using XDR::Parse version v0.3.1,
-#        XDR::Gen version 0.0.5 and LibVirt version v11.6.0
+#        XDR::Gen version 0.0.5 and LibVirt version v11.7.0
 #
 #      Don't edit this file, use the source template instead
 #
@@ -9,7 +9,7 @@
 #
 ####################################################################
 
-package Protocol::Sys::Virt::Remote::XDR v11.6.0;
+package Protocol::Sys::Virt::Remote::XDR v11.7.0;
 
 use constant {
     VIR_TYPED_PARAM_INT     => 1,
@@ -34683,9 +34683,9 @@ Protocol::Sys::Virt::Remote::XDR - Constants and (de)serializers for remote serv
 
 =head1 VERSION
 
-v11.6.0
+v11.7.0
 
-Based on LibVirt tag v11.6.0
+Based on LibVirt tag v11.7.0
 
 =head1 SYNOPSYS
 

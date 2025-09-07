@@ -49,7 +49,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::GPS;
 
-$VERSION = '3.17';
+$VERSION = '3.19';
 
 sub ProcessMOV($$;$);
 sub ProcessKeys($$$);
@@ -2379,7 +2379,14 @@ my %userDefined = (
     # saut - 4 bytes all zero (Samsung SM-N900T)
     # smrd - string "TRUEBLUE" (Samsung SM-C101, etc)
     # ---- Sigma ----
-    SIGM => {
+    SIGM => [{
+        Name => 'SigmaEXIF',
+        Condition => '$$valPt =~ /^(II\x2a\0|MM\0\x2a)/',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Exif::Main',
+            ProcessProc => \&Image::ExifTool::ProcessTIFF, # (because ProcessMOV is default)
+        },
+    },{
         Name => 'PreviewImage',
         # 32-byte header followed by preview image.  Length at offset 6 in header
         Condition => 'length($$valPt) > 0x20 and length($$valPt) == unpack("x6V",$$valPt) + 0x20',
@@ -2396,7 +2403,7 @@ my %userDefined = (
             }
             return $pt;
         },
-    },
+    }],
     # ---- TomTom Bandit Action Cam ----
     TTMD => {
         Name => 'TomTomMetaData',
@@ -2937,7 +2944,7 @@ my %userDefined = (
         Writable => 'int8u',
         Protected => 1,
         PrintConv => {
-            0 => 'Horizontal (Normal)',
+            0 => 'Horizontal (normal)',
             1 => 'Rotate 270 CW',
             2 => 'Rotate 180',
             3 => 'Rotate 90 CW',
@@ -10522,12 +10529,13 @@ QTLang: foreach $tag (@{$$et{QTLang}}) {
     for (; $trailer; $trailer=$$trailer[3]) {
         next if $lastPos > $$trailer[1];    # skip if we have already processed this as an atom
         last unless $raf->Seek($$trailer[1], 0);
-        if ($$trailer[0] eq 'LigoGPS' and $raf->Read($buff, 8) == 8 and $buff =~ /skip$/) {
+        if ($$trailer[0] eq 'LigoGPS' and $raf->Read($buff, 8) == 8 and $buff =~ /skip$/i) {
             $ee or $et->Warn('Use the ExtractEmbedded option to decode timed GPS',3), next;
             my $len = Get32u(\$buff, 0) - 16;
             if ($len > 0 and $raf->Read($buff, $len) == $len and $buff =~ /^LIGOGPSINFO\0/) {
                 my $tbl = GetTagTable('Image::ExifTool::QuickTime::Stream');
                 my %dirInfo = ( DataPt => \$buff, DataPos => $$trailer[1] + 8, DirName => 'LigoGPSTrailer' );
+                $et->VerboseDump(\$buff, DataPos => $dirInfo{DataPos});
                 Image::ExifTool::LigoGPS::ProcessLigoGPS($et, \%dirInfo, $tbl);
             } else {
                 $et->Warn('Unrecognized data in LigoGPS trailer');

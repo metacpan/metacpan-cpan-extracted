@@ -58,6 +58,7 @@
             "Encode::Locale" : "0"
          },
          "requires" : {
+            "List::MoreUtils" : "0",
             "Readonly" : "0",
             "perl" : "5.036"
          }
@@ -90,6 +91,6 @@
          "web" : "https://github.com/mkende/harmonica_tabs_creator"
       }
    },
-   "version" : "1.02",
+   "version" : "1.05",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

@@ -3,8 +3,6 @@ Changes
 LICENSE
 META.json
 README.md
-appveyor.yml
-codecov.yml
 cpanfile
 lib/SemVer/V2/Strict.pm
 minil.toml

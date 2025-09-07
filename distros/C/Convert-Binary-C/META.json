@@ -47,6 +47,6 @@
          "web" : "https://github.com/mhx/Convert-Binary-C"
       }
    },
-   "version" : "0.85",
+   "version" : "0.86",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

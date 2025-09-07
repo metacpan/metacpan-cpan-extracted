@@ -1,7 +1,7 @@
 ####################################################################
 #
 #     This file was generated using XDR::Parse version v0.3.1
-#                   and LibVirt version v11.6.0
+#                   and LibVirt version v11.7.0
 #
 #      Don't edit this file, use the source template instead
 #
@@ -19,7 +19,7 @@ use Future::AsyncAwait;
 use Object::Pad 0.821;
 use Sublike::Extended 0.29 'method', 'sub'; # From XS-Parse-Sublike, used by Future::AsyncAwait
 
-class Sys::Async::Virt v0.1.4;
+class Sys::Async::Virt v0.1.5;
 
 # inheriting from IO::Async::Notifier (a non-Object::Pad base class) implies ':repr(HASH)'
 inherit IO::Async::Notifier;
@@ -31,30 +31,30 @@ use Future::Queue;
 use Log::Any qw($log);
 use Scalar::Util qw(reftype weaken);
 
-use Protocol::Sys::Virt::Remote::XDR v11.6.0;
+use Protocol::Sys::Virt::Remote::XDR v11.7.0;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
-use Protocol::Sys::Virt::KeepAlive v11.6.0;
-use Protocol::Sys::Virt::Remote v11.6.0;
-use Protocol::Sys::Virt::Transport v11.6.0;
-use Protocol::Sys::Virt::URI v11.6.0; # imports parse_url
+use Protocol::Sys::Virt::KeepAlive v11.7.0;
+use Protocol::Sys::Virt::Remote v11.7.0;
+use Protocol::Sys::Virt::Transport v11.7.0;
+use Protocol::Sys::Virt::URI v11.7.0; # imports parse_url
 
-use Sys::Async::Virt::Connection::Factory v0.1.4;
-use Sys::Async::Virt::Domain v0.1.4;
-use Sys::Async::Virt::DomainCheckpoint v0.1.4;
-use Sys::Async::Virt::DomainSnapshot v0.1.4;
-use Sys::Async::Virt::Network v0.1.4;
-use Sys::Async::Virt::NetworkPort v0.1.4;
-use Sys::Async::Virt::NwFilter v0.1.4;
-use Sys::Async::Virt::NwFilterBinding v0.1.4;
-use Sys::Async::Virt::Interface v0.1.4;
-use Sys::Async::Virt::StoragePool v0.1.4;
-use Sys::Async::Virt::StorageVol v0.1.4;
-use Sys::Async::Virt::NodeDevice v0.1.4;
-use Sys::Async::Virt::Secret v0.1.4;
+use Sys::Async::Virt::Connection::Factory v0.1.5;
+use Sys::Async::Virt::Domain v0.1.5;
+use Sys::Async::Virt::DomainCheckpoint v0.1.5;
+use Sys::Async::Virt::DomainSnapshot v0.1.5;
+use Sys::Async::Virt::Network v0.1.5;
+use Sys::Async::Virt::NetworkPort v0.1.5;
+use Sys::Async::Virt::NwFilter v0.1.5;
+use Sys::Async::Virt::NwFilterBinding v0.1.5;
+use Sys::Async::Virt::Interface v0.1.5;
+use Sys::Async::Virt::StoragePool v0.1.5;
+use Sys::Async::Virt::StorageVol v0.1.5;
+use Sys::Async::Virt::NodeDevice v0.1.5;
+use Sys::Async::Virt::Secret v0.1.5;
 
-use Sys::Async::Virt::Callback v0.1.4;
-use Sys::Async::Virt::Stream v0.1.4;
+use Sys::Async::Virt::Callback v0.1.5;
+use Sys::Async::Virt::Stream v0.1.5;
 
 use constant {
     CLOSE_REASON_ERROR                                  => 0,
@@ -2350,9 +2350,9 @@ Sys::Async::Virt - LibVirt protocol implementation for clients
 
 =head1 VERSION
 
-v0.1.4
+v0.1.5
 
-Based on LibVirt tag v11.6.0
+Based on LibVirt tag v11.7.0
 
 =head1 SYNOPSIS
 
@@ -2409,7 +2409,7 @@ value.
 
 =head2 RUNNING AGAINST OLDER SERVERS
 
-The reference LibVirt version of this module is v11.6.0. This means
+The reference LibVirt version of this module is v11.7.0. This means
 all API entry points have been implemented as they are declared in the
 protocol of that version (except for the ones listed in the section
 L</UNIMPLEMENTED ENTRYPOINTS>).  The consequence of a server being of a lower
@@ -2418,7 +2418,7 @@ supported by the server.
 
 =head2 RUNNING AGAINST NEWER SERVERS
 
-The module can run against any version of LibVirt newer than v11.6.0;
+The module can run against any version of LibVirt newer than v11.7.0;
 any new entry points in the API will not be available, but all existing APIs
 can be used as per the stability guarantees.
 

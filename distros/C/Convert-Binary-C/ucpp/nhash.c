@@ -443,7 +443,12 @@ int HTT2_del(HTT2 *htt, const char *name)
 #define SCAN_FLAG_WIPE   0x1
 #define SCAN_FLAG_ARG    0x2
 
-static void scan_node(hash_item_header *node, void (*action)(), void *arg, unsigned flags)
+typedef struct {
+	void (*a1)(void *);
+	void (*a2)(void *, void *);
+} scan_action_t;
+
+static void scan_node(hash_item_header *node, scan_action_t action, void *arg, unsigned flags)
 {
 	unsigned v;
 
@@ -461,9 +466,9 @@ static void scan_node(hash_item_header *node, void (*action)(), void *arg, unsig
 			nnode = pnode->left;
 
 			if (flags & SCAN_FLAG_ARG)
-				action(arg, pnode);
+				action.a2(arg, pnode);
 			else
-				action(pnode);
+				action.a1(pnode);
 
 			if (flags & SCAN_FLAG_WIPE) freemem(tmp);
 		}
@@ -475,9 +480,9 @@ static void scan_node(hash_item_header *node, void (*action)(), void *arg, unsig
 		char *tmp = node->ident;
 
 		if (flags & SCAN_FLAG_ARG)
-			action(arg, node);
+			action.a2(arg, node);
 		else
-			action(node);
+			action.a1(node);
 
 		if (flags & SCAN_FLAG_WIPE) freemem(tmp);
 	}
@@ -487,18 +492,22 @@ static void scan_node(hash_item_header *node, void (*action)(), void *arg, unsig
 void HTT_scan(HTT *htt, void (*action)(void *))
 {
 	unsigned u;
+	scan_action_t act;
+	act.a1 = action;
 
 	for (u = 0; u < HTT_NUM_TREES; u ++) {
-		scan_node(htt->tree[u], action, NULL, 0);
+		scan_node(htt->tree[u], act, NULL, 0);
 	}
 }
 
 void HTT_scan_arg(HTT *htt, void (*action)(void *, void *), void *arg)
 {
 	unsigned u;
+	scan_action_t act;
+	act.a2 = action;
 
 	for (u = 0; u < HTT_NUM_TREES; u ++) {
-		scan_node(htt->tree[u], action, arg, SCAN_FLAG_ARG);
+		scan_node(htt->tree[u], act, arg, SCAN_FLAG_ARG);
 	}
 }
 
@@ -556,29 +565,40 @@ void HTT2_clone(HTT2 *ctt, const HTT2 *htt)
 /* see nhash.h */
 void HTT2_scan(HTT2 *htt, void (*action)(void *))
 {
-	scan_node(htt->tree[0], action, NULL, 0);
-	scan_node(htt->tree[1], action, NULL, 0);
+	scan_action_t act;
+	act.a1 = action;
+
+	scan_node(htt->tree[0], act, NULL, 0);
+	scan_node(htt->tree[1], act, NULL, 0);
 }
 
 void HTT2_scan_arg(HTT2 *htt, void (*action)(void *, void *), void *arg)
 {
-	scan_node(htt->tree[0], action, arg, SCAN_FLAG_ARG);
-	scan_node(htt->tree[1], action, arg, SCAN_FLAG_ARG);
+	scan_action_t act;
+	act.a2 = action;
+
+	scan_node(htt->tree[0], act, arg, SCAN_FLAG_ARG);
+	scan_node(htt->tree[1], act, arg, SCAN_FLAG_ARG);
 }
 
 /* see nhash.h */
 void HTT_kill(HTT *htt)
 {
 	unsigned u;
+	scan_action_t act;
+	act.a1 = htt->deldata;
 
 	for (u = 0; u < HTT_NUM_TREES; u ++) {
-		scan_node(htt->tree[u], htt->deldata, NULL, SCAN_FLAG_WIPE);
+		scan_node(htt->tree[u], act, NULL, SCAN_FLAG_WIPE);
 	}
 }
 
 /* see nhash.h */
 void HTT2_kill(HTT2 *htt)
 {
-	scan_node(htt->tree[0], htt->deldata, NULL, SCAN_FLAG_WIPE);
-	scan_node(htt->tree[1], htt->deldata, NULL, SCAN_FLAG_WIPE);
+	scan_action_t act;
+	act.a1 = htt->deldata;
+
+	scan_node(htt->tree[0], act, NULL, SCAN_FLAG_WIPE);
+	scan_node(htt->tree[1], act, NULL, SCAN_FLAG_WIPE);
 }

@@ -1,5 +1,5 @@
 name = "SemVer-V2-Strict"
-badges = ["travis", "appveyor", "codecov"]
+badges = ["github-actions/test.yml", "metacpan"]
 module_maker="ModuleBuildTiny"
 license = "mit"
 authors = ["Pine Mizune <pinemz@gmail.com>"]

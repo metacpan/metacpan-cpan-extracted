@@ -19,7 +19,7 @@ WriteMakefile(
         },
     },
     NAME              => 'Sys::Async::Virt',
-    VERSION           => 'v0.1.4',
+    VERSION           => 'v0.1.5',
     # VERSION_FROM      => 'lib/Sys/Async/Virt.pm', EU::MM doesn't support 'class' statements with version numbers
 );
 

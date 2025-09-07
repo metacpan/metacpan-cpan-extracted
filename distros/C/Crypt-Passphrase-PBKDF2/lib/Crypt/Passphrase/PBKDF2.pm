@@ -1,5 +1,5 @@
 package Crypt::Passphrase::PBKDF2;
-$Crypt::Passphrase::PBKDF2::VERSION = '0.003';
+$Crypt::Passphrase::PBKDF2::VERSION = '0.004';
 use strict;
 use warnings;
 
@@ -83,17 +83,25 @@ Crypt::Passphrase::PBKDF2 - A PBKDF2 encoder for Crypt::Passphrase
 
 =head1 VERSION
 
-version 0.003
+version 0.004
+
+=head1 SYNOPSIS
+
+ my $passphrase = Crypt::Passphrase->new(
+   encoder => {
+     module     => 'PBKDF2',
+     type       => 'sha256',
+     iterations => 128_000,
+   },
+ );
 
 =head1 DESCRIPTION
 
 This class implements a PBKDF2 encoder for Crypt::Passphrase. It allows for any SHA-1 or SHA-2 hash, and any number of iterations.
 
-=head1 METHODS
+=head2 Configuration
 
-=head2 new(%args)
-
-This creates a new PBKDF2 encoder, it takes named parameters that are all optional. Note that some defaults are likely to change at some point in the future, as computers get progressively more powerful and cryptoanalysis gets more advanced.
+It accepts the following arguments:
 
 =over 4
 
@@ -111,21 +119,9 @@ The size of the salt. This defaults to 16 bytes, which should be more than enoug
 
 =back
 
-=head2 hash_password($password)
+=head2 COMPATIBILITY
 
-This hashes the passwords with pbkdf2 according to the specified settings and a random salt (and will thus return a different result each time).
-
-=head2 needs_rehash($hash)
-
-This returns true if the hash uses a different cipher, or if any of the parameters is lower that desired by the encoder.
-
-=head2 crypt_types()
-
-This class supports the following crypt types: C<pbkdf2-sha1>, C<pbkdf2-sha224>, C<pbkdf2-sha225>, C<pbkdf2-sha384> and C<pbkdf2-512>.
-
-=head2 verify_password($password, $hash)
-
-This will check if a password matches a pbkdf2 hash.
+This module aims to be compatible with L<passlib|https://passlib.readthedocs.io/en/stable/lib/passlib.hash.pbkdf2_digest.html> when used with C<sha1>, C<sha256>, or C<sha512>.
 
 =head1 AUTHOR
 

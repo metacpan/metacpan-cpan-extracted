@@ -29,7 +29,7 @@ use vars qw($VERSION $RELEASE @ISA @EXPORT_OK %EXPORT_TAGS $AUTOLOAD @fileTypes
             %jpegMarker %specialTags %fileTypeLookup $testLen $exeDir
             %static_vars $advFmtSelf $configFile @configFiles $noConfig);
 
-$VERSION = '13.30';
+$VERSION = '13.35';
 $RELEASE = '';
 @ISA = qw(Exporter);
 %EXPORT_TAGS = (
@@ -42,7 +42,7 @@ $RELEASE = '';
     # exports not part of the public API, but used by ExifTool modules:
     DataAccess => [qw(
         ReadValue GetByteOrder SetByteOrder ToggleByteOrder Get8u Get8s Get16u
-        Get16s Get32u Get32s Get64u GetFloat GetDouble GetFixed32s Write
+        Get16s Get32u Get32s Get64u Get64s GetFloat GetDouble GetFixed32s Write
         WriteValue Tell Set8u Set8s Set16u Set32u Set64u Set64s
     )],
     Utils => [qw(GetTagTable TagTableKeys GetTagInfoList AddTagToTable HexDump)],
@@ -152,8 +152,8 @@ sub ReadValue($$$;$$$);
     APE::OldHeader Audible MPC MPEG::Audio MPEG::Video MPEG::Xing M2TS QuickTime
     QuickTime::ImageFile QuickTime::Stream QuickTime::Tags360Fly Matroska
     Matroska::StdTag MOI MXF DV Flash Flash::FLV Real::Media Real::Audio
-    Real::Metafile Red RIFF AIFF ASF WTV DICOM FITS XISF MIE JSON HTML XMP::SVG
-    Palm Palm::MOBI Palm::EXTH Torrent EXE EXE::PEVersion EXE::PEString
+    Real::Metafile Red RIFF AIFF ASF TNEF WTV DICOM FITS XISF MIE JSON HTML
+    XMP::SVG Palm Palm::MOBI Palm::EXTH Torrent EXE EXE::PEVersion EXE::PEString
     EXE::DebugRSDS EXE::DebugNB10 EXE::Misc EXE::MachO EXE::PEF EXE::ELF EXE::AR
     EXE::CHM LNK PCAP Font VCard Text VCard::VCalendar VCard::VNote RSRC Rawzor
     ZIP ZIP::GZIP ZIP::RAR ZIP::RAR5 RTF OOXML iWork ISO FLIR::AFF FLIR::FPF
@@ -200,7 +200,7 @@ $defaultLang = 'en';    # default language
                 RAR 7Z BZ2 CZI TAR EXE EXR HDR CHM LNK WMF AVC DEX DPX RAW Font
                 JUMBF RSRC M2TS MacOS PHP PCX DCX DWF DWG DXF WTV Torrent VCard
                 LRI R3D AA PDB PFM2 MRC LIF JXL MOI ISO ALIAS PCAP JSON MP3
-                DICOM PCD NKA ICO TXT AAC);
+                TNEF DICOM PCD NKA ICO TXT AAC);
 
 # file types that we can write (edit)
 my @writeTypes = qw(JPEG TIFF GIF CRW MRW ORF RAF RAW PNG MIE PSD XMP PPM EPS
@@ -536,6 +536,7 @@ my %createTypes = map { $_ => 1 } qw(XMP ICC MIE VRD DR4 EXIF EXV);
     THMX => [['ZIP','FPX'], 'Office Open XML Theme'],
     TIF  =>  'TIFF',
     TIFF => ['TIFF', 'Tagged Image File Format'],
+    TNEF => ['TNEF', 'Transport Neural Encapsulation Format'], # (actual extension is .DAT)
     TORRENT => ['Torrent', 'BitTorrent description file'],
     TS   =>  'M2TS',
     TTC  => ['Font', 'True Type Font Collection'],
@@ -802,6 +803,7 @@ my %fileDescription = (
     TAR  => 'application/x-tar',
     THMX => 'application/vnd.ms-officetheme',
     TIFF => 'image/tiff',
+    TNEF => 'application/vnd.ms-tnef',
     Torrent => 'application/x-bittorrent',
     TTC  => 'application/font-ttf',
     TTF  => 'application/font-ttf',
@@ -1012,6 +1014,7 @@ $testLen = 1024;    # number of bytes to read when testing for magic number
     RWZ  => 'rawzor',
     SWF  => '[FC]WS[^\0]',
     TAR  => '.{257}ustar(  )?\0', # (this doesn't catch old-style tar files)
+    TNEF => '\x78\x9f\x3e\x22..\x01\x06\x90\x08\0',
     TXT  => '(\xff\xfe|(\0\0)?\xfe\xff|(\xef\xbb\xbf)?[\x07-\x0d\x20-\x7e\x80-\xfe]*$)',
     TIFF => '(II|MM)', # don't test magic number (some raw formats are different)
     VCard=> '(?i)BEGIN:(VCARD|VCALENDAR|VNOTE)\r\n',
@@ -1178,6 +1181,7 @@ my @availableOptions = (
     [ 'SystemTags',       undef,  'extract additional File System tags' ],
     [ 'TextOut',        \*STDOUT, 'file for Verbose/HtmlDump output' ],
     [ 'TimeZone',         undef,  'local time zone' ],
+    [ 'UndefTags',        undef,  'leave undef tags in -if conditions when -m or -f are used' ],
     [ 'Unknown',          0,      'flag to get values of unknown tags (0-2)' ],
     [ 'UserParam',        { },    'user parameters for additional user-defined tag values' ],
     [ 'Validate',         undef,  'perform additional validation' ],
@@ -2821,6 +2825,8 @@ sub ExtractInfo($;@)
                 $isDir = 1;
             } else {
                 $self->Error('Error opening file');
+                # continue to process alt files if necessary
+                $self->DoneExtract() if $$self{ALT_EXIFTOOL};
             }
         } else {
             $self->Error('No file specified');
@@ -4292,6 +4298,7 @@ sub Init($)
     $$self{LOW_PRIORITY_DIR} = { PreviewIFD => 1 }; # names of priority 0 directories
     $$self{TIFF_TYPE}  = '';        # type of TIFF data (APP1, TIFF, NEF, etc...)
     $$self{FMT_EXPR}   = undef;     # current advanced formatting expression
+    $$self{HAS_DOC}    = { };       # lookup for all document numbers in this file
     $$self{Make}       = '';        # camera make
     $$self{Model}      = '';        # camera model
     $$self{CameraType} = '';        # Olympus camera type
@@ -6582,6 +6589,8 @@ sub ConvertDateTime($$)
             }
             $a[5] -= 1900;  # strftime year starts from 1900
             $date = POSIX::strftime($fmt, @a);  # generate the formatted date/time
+            # apparently strftime can set the UTF-8 flag (argh!), so reset this if necessary
+            $self->Sanitize(\$date) if $fmt =~ /[\x80-\xff]/;
         } elsif ($$self{OPTIONS}{StrictDate}) {
             undef $date;
         }
@@ -9480,6 +9489,7 @@ sub FoundTag($$$;@)
     $$self{TAG_EXTRA}{$tag}{G1} = $grps[1] if $grps[1];
     if ($$self{DOC_NUM}) {
         $$self{TAG_EXTRA}{$tag}{G3} = $$self{DOC_NUM};
+        $$self{HAS_DOC}{$$self{DOC_NUM}} = 1;
         if ($$self{DOC_NUM} =~ /^(\d+)/) {
             # keep track of maximum 1st-level sub-document number
             $$self{DOC_COUNT} = $1 unless $$self{DOC_COUNT} >= $1;
@@ -9719,8 +9729,10 @@ sub ExtractBinary($$$;$)
             $isPreview = 1;
         }
         my $lcTag = lc $tag;
-        if ((not $$self{OPTIONS}{Binary} or $$self{EXCL_TAG_LOOKUP}{$lcTag}) and
-             not $$self{OPTIONS}{Verbose} and not $$self{REQ_TAG_LOOKUP}{$lcTag})
+        my $options = $$self{OPTIONS};
+        if ((not $$options{Binary} or $$self{EXCL_TAG_LOOKUP}{$lcTag}) and
+             not $$options{Verbose} and not $$options{Validate} and
+             not $$self{REQ_TAG_LOOKUP}{$lcTag})
         {
             return "Binary data $length bytes";
         }

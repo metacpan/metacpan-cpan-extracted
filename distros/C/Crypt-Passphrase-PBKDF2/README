@@ -1,5 +1,5 @@
 This archive contains the distribution Crypt-Passphrase-PBKDF2,
-version 0.003:
+version 0.004:
 
   A PBKDF2 encoder for Crypt::Passphrase
 

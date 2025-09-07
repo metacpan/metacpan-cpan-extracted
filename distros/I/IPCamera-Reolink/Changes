@@ -25,3 +25,6 @@ Revision history for IPCamera-Reolink
 
 1.06    Sat 21 Jun 2025 05:37:24 PM EDT 
         -added SetPtzPreset() - implement camera API SetPtzPreset iterface, used to set configuration of Ptz Preset.
+
+1.09    Sat 06 Sep 2025 04:41:48 PM EDT
+        - added SetWhiteLed() and GetWhiteLed() to control camera spotlight.

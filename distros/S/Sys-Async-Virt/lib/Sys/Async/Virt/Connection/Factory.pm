@@ -1,7 +1,7 @@
 ####################################################################
 #
 #     This file was generated using XDR::Parse version v0.3.1
-#                   and LibVirt version v11.6.0
+#                   and LibVirt version v11.7.0
 #
 #      Don't edit this file, use the source template instead
 #
@@ -16,7 +16,7 @@ use experimental 'signatures';
 use Future::AsyncAwait;
 use Object::Pad;
 
-class Sys::Async::Virt::Connection::Factory v0.1.4;
+class Sys::Async::Virt::Connection::Factory v0.1.5;
 
 use Carp qw(croak);
 use Log::Any qw($log);
@@ -82,7 +82,7 @@ Sys::Async::Virt::Connection::Factory - Class for
 
 =head1 VERSION
 
-v0.1.4
+v0.1.5
 
 =head1 SYNOPSIS
 
