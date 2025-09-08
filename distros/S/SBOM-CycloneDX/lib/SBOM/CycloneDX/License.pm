@@ -40,7 +40,7 @@ has bom_ref => (
     coerce => sub { ref($_[0]) ? $_[0] : SBOM::CycloneDX::BomRef->new($_[0]) }
 );
 
-has id              => (is => 'rw', isa => Str);
+has id              => (is => 'rw', isa => Str, trigger => 1);
 has name            => (is => 'rw', isa => Str);
 has acknowledgement => (is => 'rw', isa => Enum [qw(declared concluded)]);
 has text            => (is => 'rw', isa => InstanceOf ['SBOM::CycloneDX::Attachment']);
@@ -58,6 +58,24 @@ has properties => (
     isa     => ArrayLike [InstanceOf ['SBOM::CycloneDX::Property']],
     default => sub { SBOM::CycloneDX::List->new }
 );
+
+
+sub _trigger_id {
+
+    my ($self) = @_;
+
+    if ($self->id && $self->id =~ /(WITH|AND|OR)/) {
+        DEBUG and say STDERR '-- Detected SPDX expression';
+        $self->expression($self->id);
+        $self->{id} = undef;
+    }
+
+    if ($self->id && $self->id =~ /^(NOASSERTION|NONE)$/) {
+        DEBUG and say STDERR "-- Detected $1 license identifier (unset license identifier)";
+        $self->{id} = undef;
+    }
+
+}
 
 
 sub _trigger_url {

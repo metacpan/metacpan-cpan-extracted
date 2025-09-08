@@ -1,0 +1,257 @@
+#!/usr/bin/env perl
+use 5.014;
+use strict;
+use warnings;
+
+use Pod::Usage;
+
+use Getopt::Long;
+
+use Dist::PolicyFiles;
+
+my @OptDef = qw(login|l=s
+                module|m=s
+
+                contrib_md_tmpl|c=s
+                dir|d=s
+                email|e=s
+                full_name|n=s
+                prefix|p=s
+                sec_md_params|s=s
+                uncapitalize|u
+
+                help|h
+                version|V
+              );
+my %Opts;
+GetOptions(\%Opts, @OptDef) or pod2usage;
+
+pod2usage(-verbose => 2, -exitval => 0) if $Opts{help};
+if ($Opts{version}) {
+  print("dist-policyfiles (Dist::PolicyFiles) $Dist::PolicyFiles::VERSION\n");
+  exit 0;
+}
+
+my %SecArgs = map {split(/\s*=\s*/, $_, 2)} split(/\s*;\s*/, delete($Opts{sec_md_params}) // "");
+my $contrib_md_tmpl = delete($Opts{contrib_md_tmpl});
+
+pod2usage(-message => 'Missing module: --module') if !exists($Opts{module});
+pod2usage(-message => 'Missing login name: --login') if !exists($Opts{login}); # pod2usage
+
+
+my $Pf_Obj = Dist::PolicyFiles->new(%Opts);
+$Pf_Obj->create_security_md(%SecArgs);
+$Pf_Obj->create_contrib_md($contrib_md_tmpl);
+
+
+1;
+
+
+__END__
+
+
+=pod
+
+
+=head1 NAME
+
+dist-policyfiles - Generate CONTRIBUTING.md and SECURITY.md
+
+
+=head1 SYNOPSIS
+
+  dist-policyfiles --module|-m MODULE  --login|-l LOGINNAME
+                  [--dir|-d DIR
+                  --email|-e EMAILADDR  --full_name FULL_NAME
+                  --prefix|-p PREFIX  --uncapitalize|-u
+                   sec_md_params|s PARAMSTR  --contrib_md_tmpl|-c FILENAME]
+
+=head1 DESCRIPTION
+
+This command line tool creates the policy files F<CONTRIBUTING.md> and
+F<SECURITY.md>. It is shipped with module L<Dist::PolicyFiles>.
+
+Options B<C<--module>> and B<C<--login>> are mandatory. If at least one of
+B<C<--email>> and B<C<--full_name>> is not specified, the script attempts to
+read the missing information from comments in F<HOME/.ssh/config>. Refer to
+L<GitHub::Config::SSH::UserData> for a description how this is done.
+
+You can use the B<C<--prefix>> and B<C<--uncapitalize>> options to change how the
+repo name is generated. For more information, see the description of
+B<C<--sec_md_params>>.
+
+For each option there is a one-letter abbreviation.
+
+=head2 OPTIONS
+
+=head3 Mandatory options
+
+=over
+
+=item B<C<--login>> I<C<LOGINNAME>>
+
+=item B<C<-l>> I<C<LOGINNAME>>
+
+Mandatory. User's github login name.
+
+
+=item B<C<--module>> I<C<MODULENAME>>
+
+=item B<C<-m>> I<C<MODULENAME>>
+
+Mandatory. Module name.
+
+=back
+
+
+=head3 Optional options
+
+=over
+
+=item B<C<--contrib_md_tmpl>> I<C<FILENAME>>
+
+=item B<C<-c>> I<C<FILENAME>>
+
+Optional. The name of a template file (see L<Text::Template>) for the
+F<CONTRIBUTING.md>. If this argument is not specified, then the internal
+default template is used.
+
+
+=item B<C<--dir>> I<C<DIRNAME>>
+
+=item B<C<-d>> I<C<DIRNAME>>
+
+Optional.  Directory where the policy files should be written. By default,
+this is the current working directory.
+
+
+=item B<C<--email>> I<C<EMAILADDRESS>>
+
+=item B<C<-e>> I<C<EMAILADDRESS>>
+
+Optional. If not specified, the script tries to read it from comments in
+F<HOME/.ssh/config> (see L<GitHub::Config::SSH::UserData>).
+
+
+=item B<C<--full_name>> I<C<FULLNAME>>
+
+=item B<C<-n>> I<C<FULLNAME>>
+
+Optional. User's full name. If not specified, the script tries to read it from
+comments in F<HOME/.ssh/config> (refer to L<GitHub::Config::SSH::UserData>).
+
+=item B<C<--help>>
+
+=item B<C<-h>>
+
+Print this documentation, ignoring all other given options.
+
+
+=item B<C<--prefix>> I<C<PREFIX>>
+
+=item B<C<-p>> I<C<PREFIX>>
+
+Optional. Prefix for repo name. Default is an empty string.
+
+
+=item B<C<--sec_md_params>> I<C<PARAMETERLIST>>
+
+=item B<C<-s>> I<C<PARAMETERLIST>>
+
+Optional. A semicolon separated list of named parameters. These are exactly
+the same as those accepted by the C<new()> method of
+L<Software::Security::Policy::Individual>.
+
+Example:
+
+   -s 'minimum_perl_version=5.14;timeframe=10 days'
+
+Defaults:
+
+
+=item C<maintainer:>
+
+User's full name and email address, e.g.:
+
+   John Doe <jd@cpan.org>
+
+=item C<program>
+
+Module name, see option C<module>.
+
+=item C<url>
+
+   https://github.com/LOGIN/REPO/blob/main/SECURITY.md
+
+where:
+
+=over
+
+=item I<C<LOGIN>>
+
+User's login name, see option C<login>.
+
+=item I<C<REPO>>
+
+The repo name is structured as follows:
+
+=over
+
+=item *
+
+The repo name begins with the value C<prefix> (if specified).
+
+=item *
+
+The rest of the repo name is the module name where the double colons are replaced with hyphens.
+
+=item *
+
+If option C<uncapitalise> is specified, the latter part of the repo name is
+changed to lower case.
+
+=back
+
+=back
+
+To completely disable one of these arguments, set it to an empty string.
+
+
+=item B<C<--uncapitalize>>
+
+=item B<C<-u>>
+
+Optional. Specify this option if your repo name is lower case.
+
+
+=item B<C<--version>>
+
+=item B<C<-V>>
+
+Print this version information, ignoring all other given options (except for
+B<C<--help>> which has higher priority).
+
+B<Note>: the one-letter abbreviation for this is upper case B<C<-V>>.
+
+
+=back
+
+
+=head1 SEE ALSO
+
+L<Dist::PolicyFiles>,
+
+
+=head1 AUTHOR
+
+Klaus Rindfrey, C<< <klausrin at cpan.org.eu> >>
+
+
+=head1 LICENSE AND COPYRIGHT
+
+This software is copyright (c) 2025 by Klaus Rindfrey.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -370,7 +370,9 @@ _detect_magic(SV* sv) {
 
 void
 _dispel_magic(ISET* s, SV* sv) {
+#ifdef SET_DEBUG
     SV* self_svrv = s->is_weak;
+#endif
     MAGIC* mg = _detect_magic(sv);
     IF_SPELL_DEBUG(_warn("dispelling magic from %p (self = %p, mg = %p)",
 			 sv, self_svrv, mg));
@@ -486,7 +488,7 @@ _cast_magic(ISET* s, SV* sv) {
     MAGIC* mg;
     SV ** svp;
     int how = SET_OBJECT_MAGIC_backref;
-    I32 i,l,free;
+    I32 i, free;
 
     mg = _detect_magic(sv);
     if (mg) {
@@ -543,7 +545,7 @@ iset_remove_one(ISET* s, SV* el, int spell_in_progress)
 {
   SV *referant;
   I32 hash, index;
-  SV **el_iter, **el_last, **el_out_iter;
+  SV **el_iter, **el_last;
   BUCKET* bucket;
 
   IF_DEBUG(_warn("removing scalar %p from set %p", el, s));
@@ -574,7 +576,6 @@ iset_remove_one(ISET* s, SV* el, int spell_in_progress)
     return 0;
 
   el_iter = bucket->sv;
-  el_out_iter = el_iter;
   el_last = el_iter + bucket->n;
   IF_DEBUG(_warn("remove: el_last = %p, el_iter = %p", el_last, el_iter));
 
@@ -684,9 +685,7 @@ remove(self, ...)
    PPCODE:
 
       ISET* s = INT2PTR(ISET*, SvIV(SvRV(self)));
-      I32 hash, index, item;
-      SV **el_iter, **el_last, **el_out_iter;
-      BUCKET* bucket;
+      I32 item;
       int removed = 0;
 
       for (item = 1; item < items; ++item)
@@ -981,9 +980,9 @@ CODE:
   IF_SPELL_DEBUG(_warn("found magic on %p - %p", sv, mg));
   IF_SPELL_DEBUG(_warn("mg_obj = %p", mg->mg_obj));
 
-     /*magic = newSV(0);
-  SvRV(magic) = mg->mg_obj;
-  SvROK_on(magic); */
+  /* magic = newSV(0);
+     SvRV(magic) = mg->mg_obj;
+     SvROK_on(magic); */
   POPs;
   magic = newRV_inc(mg->mg_obj);
   PUSHs(magic);
@@ -1098,6 +1097,8 @@ CODE:
 	MH = newSViv(SvIV(sv));
       } else if (SvNOKp(sv)) {
 	MH = newSVnv(SvNV(sv));
+      } else {
+        Perl_croak(aTHX_ "Not a NV nor IV");
       }
       sv_2pv(MH, &lp);
       SvPOK_only(MH);

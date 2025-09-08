@@ -2751,6 +2751,10 @@ sub metadata {
 sub exportRequestParameters {
     my ( $self, $req ) = @_;
 
+    unless ( $self->ssoMatch($req) ) {
+        return PE_OK;
+    }
+
     if ( my $p = $req->param('prompt') ) {
         if ( $p eq 'none' ) {
             return $self->_unauthPromptNone($req);

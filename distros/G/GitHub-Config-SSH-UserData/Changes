@@ -1,8 +1,12 @@
 Revision history for GitHub-Config-SSH-UserData
 
+0.06    2025/09/08
+
+       - Updated policy files.
+
 0.05    2025/09/03
 
-        - Bugfix (wrong results with some versions of perl)
+        - Bugfix (wrong results with some versions of perl).
 
 0.04    2025/09/02
 

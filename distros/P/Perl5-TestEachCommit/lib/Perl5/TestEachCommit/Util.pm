@@ -7,13 +7,9 @@ use File::Spec::Unix;
 use Getopt::Long;
 use locale; # make \w work right in non-ASCII lands
 
-our $VERSION = 0.02; # Please keep in synch with lib/Perl5/TestEachCommit.pm
+our $VERSION = 0.03; # Please keep in synch with lib/Perl5/TestEachCommit.pm
 $VERSION = eval $VERSION;
-our @EXPORT_OK = qw(
-    process_command_line
-    usage
-);
-#prepare_repository
+our @EXPORT_OK = qw( process_command_line );
 
 =head1 NAME
 
@@ -30,20 +26,33 @@ invalid.
 =cut
 
 sub process_command_line {
-    my %opts = @ARGV;
-    my $result = GetOptions(\%opts)
-        or croak "Error in command line arguments";
-    #    usage("-", "invalid parameters") if not $result;
-    usage("-") if defined $opts{help};  # see if the user asked for help
-    $opts{help} = "";                   # just to make -w shut-up.
+    local @ARGV = @ARGV;
+
+    my %opts = map { $_ => '' } ( qw|
+        workdir
+        branch
+        start
+        end
+        configure_command
+        make_test_prep_command
+        make_test_harness_command
+        skip_test_harness
+        verbose
+    | );
+
+    my $result = GetOptions(
+        "workdir=s" =>     \$opts{workdir},
+        "branch=s" =>     \$opts{branch},
+        "start=s" =>     \$opts{start},
+        "end=s" =>     \$opts{end},
+        "configure_command=s" =>     \$opts{configure_command},
+        "make_test_prep_command=s" =>     \$opts{make_test_prep_command},
+        "make_test_harness_command=s" =>     \$opts{make_test_harness_command},
+        "skip_test_harness" =>     \$opts{skip_test_harness},
+        "verbose" =>     \$opts{verbose},
+    ) or croak "Error in command line arguments";
+
     return \%opts;
-}
-
-sub usage {
-    say STDERR <<END_OF_USAGE;
-Usage:  $0: DETAIL TO COME
-
-END_OF_USAGE
 }
 
 1;

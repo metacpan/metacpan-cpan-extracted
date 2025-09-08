@@ -154,6 +154,18 @@ sub runTests {
         "0", "inDomain works for notexample.com" );
     is( $r->( { env => { HTTP_HOST => "exampleacom" } }, {} ),
         "0", "inDomain works for exampleacom" );
+
+    # Complex expressions
+    $r = compileRule('join(":",grep {$_ eq "a"} split(":", $list))');
+    is( ref($r), "CODE", "Returned code ref" );
+    is(
+        $r->(
+            { env  => { HTTP_HOST => "AUTH.EXAMPLE.COM" } },
+            { list => "a:b:c:a:d:a" }
+        ),
+        "a:a:a"
+    );
+
 }
 
 sub runUnsafeTests {
@@ -173,7 +185,7 @@ eval { $h->localConfig($conf); $h->logLevelInit() };
 ok( !$@, 'init' );
 
 subtest "Safe jail off" => sub {
-    plan tests => 35;
+    plan tests => 37;
     ok( $h->configReload($conf), 'Load conf' );
     is(
         ref( $h->tsv->{jail}->jail ),
@@ -186,7 +198,7 @@ subtest "Safe jail off" => sub {
 };
 
 subtest "Safe jail on" => sub {
-    plan tests => 33;
+    plan tests => 35;
     ok( $h->configReload( { %$conf, useSafeJail => 1 } ), 'Load conf' );
     is( ref( $h->tsv->{jail}->jail ), "Safe", "Safe jail is enabled" );
 

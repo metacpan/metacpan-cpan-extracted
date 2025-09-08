@@ -1,4 +1,10 @@
 ---
+version: 0.83
+date:    Mon Sep  8 09:13:25 AM CEST 2025
+changes:
+- Improve make release
+- pinact run -u for github PR security
+---
 version: 0.82
 date:    Fr 3. Feb 14:16:03 CET 2023
 changes:

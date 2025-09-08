@@ -1,5 +1,8 @@
 Revision history for OpenAPI-Modern
 
+0.093     2025-09-07 20:32:18Z
+          - fix error in tests exposed by JSON::Schema::Modern 0.618
+
 0.092     2025-09-03 22:49:24Z
           - removed the 'json_schema_dialect' constructor argument for
             JSON::Schema::Modern::Document::OpenAPI (use jsonSchemaDialect in

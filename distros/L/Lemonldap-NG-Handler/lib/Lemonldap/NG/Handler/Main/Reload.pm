@@ -673,7 +673,7 @@ sub substitute {
 sub buildSub {
     my ( $class, $val ) = @_;
     my $res =
-      $class->tsv->{jail}->jail_reval("sub{my (\$r,\$s)=\@_;return($val)}");
+      $class->tsv->{jail}->jail_reval("sub{my (\$r,\$s)=\@_; local *_;return($val)}");
     unless ($res) {
         $class->logger->error( $class->tsv->{jail}->error );
     }

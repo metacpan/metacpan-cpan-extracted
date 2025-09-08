@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       - run: perl -V
       - name: install cpan deps
         uses: perl-actions/install-with-cpm@stable
@@ -65,6 +65,9 @@ jobs:
       matrix:
         perl-version:
           [
+            "5.42",
+            "5.40",
+            "5.38",
             "5.36",
             "5.34",
             "5.32",
@@ -83,8 +86,8 @@ jobs:
           ]
 
     steps:
-      - uses: actions/checkout@v1
-      - uses: shogo82148/actions-setup-perl@v1
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - uses: shogo82148/actions-setup-perl@5796a908661aa68fc0a5b8f55c6791af2376d72e # v1.35.0
         with:
           perl-version: ${{ matrix.perl-version }}
       - run: perl -V
@@ -117,7 +120,7 @@ jobs:
         perl-version: [latest]
 
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       - run: perl -V
       - name: install cpan deps
         uses: perl-actions/install-with-cpm@stable
@@ -163,7 +166,7 @@ jobs:
       - run: perl Makefile.PL
       - run: make test TEST_VERBOSE=1 2>&1 | tee make.log
       - name: Upload make.log
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: failure()
         with:
           name: artifacts

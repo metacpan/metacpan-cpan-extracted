@@ -24,45 +24,50 @@ require SBOM::CycloneDX::License;
 require SBOM::CycloneDX::Tool;
 
 
-# CPAN::Meta::Spec | SPDX                      | Description
-# -----------------|---------------------------|--------------------------------
 my %CPAN_META_SPEC_LICENSE_MAPPING = (
-    agpl_3      => 'AGPL-3.0',                # GNU Affero General Public License, Version 3
-    apache_1_1  => 'Apache-1.1',              # Apache Software License, Version 1.1
-    apache_2_0  => 'Apache-2.0',              # Apache License, Version 2.0
-    artistic_1  => 'Artistic-1.0',            # Artistic License, (Version 1)
-    artistic_2  => 'Artistic-2.0',            # Artistic License, Version 2.0
-    bsd         => 'BSD-3-Clause',            # BSD License (three-clause)
-    freebsd     => 'BSD-2-Clause-FreeBSD',    # FreeBSD License (two-clause)
-    gfdl_1_2    => 'GFDL-1.2',                # GNU Free Documentation License, Version 1.2
-    gfdl_1_3    => 'GFDL-1.3',                # GNU Free Documentation License, Version 1.3
-    gpl_1       => 'GPL-1.0',                 # GNU General Public License, Version 1
-    gpl_2       => 'GPL-2.0',                 # GNU General Public License, Version 2
-    gpl_3       => 'GPL-3.0',                 # GNU General Public License, Version 3
-    lgpl_2_1    => 'LGPL-2.1',                # GNU Lesser General Public License, Version 2.1
-    lgpl_3_0    => 'LGPL-3.0',                # GNU Lesser General Public License, Version 3.0
-    mit         => 'MIT',                     # MIT (aka X11) License
-    mozilla_1_0 => 'MPL-1.0',                 # Mozilla Public License, Version 1.0
-    mozilla_1_1 => 'MPL-1.1',                 # Mozilla Public License, Version 1.1
-    openssl     => 'OpenSSL',                 # OpenSSL License
-    perl_5      => 'Artistic-1.0-Perl',       # The Perl 5 License (Artistic 1 & GPL 1 or later)
-    qpl_1_0     => 'QPL-1.0',                 # Q Public License, Version 1.0
-    ssleay      => 'SSLeay-standalone',       # Original SSLeay License
-    sun         => 'SISSL',                   # Sun Internet Standards Source License (SISSL)
-    zlib        => 'Zlib',                    # zlib License
+
+# CPAN::Meta::Spec licenses
+
+# license          | SPDX                                      | Description
+# -----------------|-------------------------------------------|--------------------------------
+
+    agpl_3      => 'AGPL-3.0',                                 # GNU Affero General Public License, Version 3
+    apache_1_1  => 'Apache-1.1',                               # Apache Software License, Version 1.1
+    apache_2_0  => 'Apache-2.0',                               # Apache License, Version 2.0
+    artistic_1  => 'Artistic-1.0',                             # Artistic License, (Version 1)
+    artistic_2  => 'Artistic-2.0',                             # Artistic License, Version 2.0
+    bsd         => 'BSD-3-Clause',                             # BSD License (three-clause)
+    freebsd     => 'BSD-2-Clause-FreeBSD',                     # FreeBSD License (two-clause)
+    gfdl_1_2    => 'GFDL-1.2-or-later',                        # GNU Free Documentation License, Version 1.2
+    gfdl_1_3    => 'GFDL-1.3-or-later',                        # GNU Free Documentation License, Version 1.3
+    gpl_1       => 'GPL-1.0-only',                             # GNU General Public License, Version 1
+    gpl_2       => 'GPL-2.0-only',                             # GNU General Public License, Version 2
+    gpl_3       => 'GPL-3.0-only',                             # GNU General Public License, Version 3
+    lgpl_2_1    => 'LGPL-2.1',                                 # GNU Lesser General Public License, Version 2.1
+    lgpl_3_0    => 'LGPL-3.0',                                 # GNU Lesser General Public License, Version 3.0
+    mit         => 'MIT',                                      # MIT (aka X11) License
+    mozilla_1_0 => 'MPL-1.0',                                  # Mozilla Public License, Version 1.0
+    mozilla_1_1 => 'MPL-1.1',                                  # Mozilla Public License, Version 1.1
+    openssl     => 'OpenSSL',                                  # OpenSSL License
+    perl_5      => 'Artistic-1.0-Perl OR GPL-1.0-or-later',    # The Perl 5 License (Artistic 1 & GPL 1 or later)
+    qpl_1_0     => 'QPL-1.0',                                  # Q Public License, Version 1.0
+    ssleay      => 'SSLeay-standalone',                        # Original SSLeay License
+    sun         => 'SISSL',                                    # Sun Internet Standards Source License (SISSL)
+    zlib        => 'Zlib',                                     # zlib License
+
+
+# Additional license (from CPAN::Meta::Spec)
+#
+# The following license strings are also valid and indicate other licensing not described above:
+#
+# license          | SPDX                                      | Description
+# -----------------|-------------------------------------------|--------------------------------
+
+    open_source  => 'NOASSERTION',                             # Other Open Source Initiative (OSI) approved license
+    restricted   => 'NOASSERTION',                             # Requires special permission from copyright holder
+    unrestricted => 'CC0-1.0',                                 # Not an OSI approved license, but not restricted
+    unknown      => 'NONE',                                    # License not provided in metadata
 );
-
-# From CPAN::Meta::Spec
-#
-#   The following license strings are also valid and indicate other licensing not described above:
-#
-#   string          description
-#   -------------   -----------------------------------------------
-#   open_source     Other Open Source Initiative (OSI) approved license
-#   restricted      Requires special permission from copyright holder
-#   unrestricted    Not an OSI approved license, but not restricted
-#   unknown         License not provided in metadata
-
 
 sub urn_uuid { sprintf 'urn:uuid:%s', create_uuid_as_string(UUID_V4) }
 sub urn_cdx  { sprintf 'urn:cdx:%s',  create_uuid_as_string(UUID_V4) }
@@ -177,7 +182,7 @@ SBOM::CycloneDX::Util - Utility for CycloneDX
 
 =head1 DESCRIPTION
 
-L<SBOM::CycloneDX::Utility> provides a set of utility for L<SBOM::CycloneDX>.
+L<SBOM::CycloneDX::Util> provides a set of utility for L<SBOM::CycloneDX>.
 
 =head2 FUNCTIONS
 

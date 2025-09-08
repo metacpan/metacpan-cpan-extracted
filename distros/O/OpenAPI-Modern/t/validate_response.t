@@ -262,7 +262,7 @@ YAML
         {
           instanceLocation => '/response/code',
           keywordLocation => '/components/pathItems/my_path_item/post/responses',
-          absoluteKeywordLocation => $doc_uri->clone->fragment('/components/pathItems/my_path_item/post/responses')->to_string,
+          absoluteKeywordLocation => $doc_uri.'#/components/pathItems/my_path_item/post/responses',
           error => 'no response object found for code 400',
         },
       ],
@@ -274,7 +274,7 @@ YAML
     {
       method => 'post',
       operation_id => 'my_components_pathItem_operation',
-      operation_uri => str($doc_uri->clone->fragment('/components/pathItems/my_path_item/post')),
+      operation_uri => str($doc_uri.'#/components/pathItems/my_path_item/post'),
     },
     'operation is not under a path-item with a path template, but still exists',
   );
@@ -314,7 +314,7 @@ YAML
         {
           instanceLocation => '/response/code',
           keywordLocation => '/webhooks/my_hook/post/responses',
-          absoluteKeywordLocation => $doc_uri->clone->fragment('/webhooks/my_hook/post/responses')->to_string,
+          absoluteKeywordLocation => $doc_uri.'#/webhooks/my_hook/post/responses',
           error => 'no response object found for code 400',
         },
       ],
@@ -326,7 +326,7 @@ YAML
     {
       method => 'post',
       operation_id => 'my_webhook_operation',
-      operation_uri => str($doc_uri->clone->fragment('/webhooks/my_hook/post')),
+      operation_uri => str($doc_uri.'#/webhooks/my_hook/post'),
     },
     'operation is not under a path-item with a path template, but still exists',
   );
@@ -389,7 +389,7 @@ YAML
         {
           instanceLocation => '/response/header',
           keywordLocation => jsonp(qw(/paths /foo $ref post responses default headers Alpha required)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment('/components/pathItems/my_path_item2/post/responses/default/headers/Alpha/required')->to_string,
+          absoluteKeywordLocation => $doc_uri.'#/components/pathItems/my_path_item2/post/responses/default/headers/Alpha/required',
           error => 'missing header: Alpha',
         },
       ],
@@ -589,7 +589,7 @@ YAML
         {
           instanceLocation => '/response',
           keywordLocation => jsonp(qw(/paths /foo post responses 303 $ref $ref)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment('/components/responses/foo/$ref')->to_string,
+          absoluteKeywordLocation => $doc_uri.'#/components/responses/foo/$ref',
           error => 'EXCEPTION: unable to find resource "'.$doc_uri.'#/i_do_not_exist"',
         },
       ],
@@ -605,7 +605,7 @@ YAML
         {
           instanceLocation => '/response/header',
           keywordLocation => jsonp(qw(/paths /foo post responses default $ref headers Foo-Bar $ref required)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment('/components/headers/foo-header/required')->to_string,
+          absoluteKeywordLocation => $doc_uri.'#/components/headers/foo-header/required',
           error => 'missing header: Foo-Bar',
         },
       ],
@@ -621,7 +621,7 @@ YAML
         {
           instanceLocation => '/response/header/Foo-Bar',
           keywordLocation => jsonp(qw(/paths /foo post responses default $ref headers Foo-Bar $ref schema pattern)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment('/components/headers/foo-header/schema/pattern')->to_string,
+          absoluteKeywordLocation => $doc_uri.'#/components/headers/foo-header/schema/pattern',
           error => 'pattern does not match',
         },
       ],
@@ -770,7 +770,7 @@ YAML
         {
           instanceLocation => '/response/body',
           keywordLocation => jsonp(qw(/paths /foo post responses default $ref content application/json schema type)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment('/components/responses/default/content/application~1json/schema/type')->to_string,
+          absoluteKeywordLocation => $doc_uri.'#/components/responses/default/content/application~1json/schema/type',
           error => 'got null, not object',
         },
       ],
@@ -787,7 +787,7 @@ YAML
         {
           instanceLocation => '/response/body',
           keywordLocation => jsonp(qw(/paths /foo post responses default $ref content)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment('/components/responses/default/content')->to_string,
+          absoluteKeywordLocation => $doc_uri.'#/components/responses/default/content',
           error => 'incorrect Content-Type "text/bloop"',
         },
       ],
@@ -804,7 +804,7 @@ YAML
         {
           instanceLocation => '/response/body',
           keywordLocation => jsonp(qw(/paths /foo post responses default $ref content bloop/html)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/components/responses/default/content bloop/html)))->to_string,
+          absoluteKeywordLocation => $doc_uri.'#/components/responses/default/content/bloop~1html',
           error => 'EXCEPTION: unsupported media type "bloop/html": add support with $openapi->add_media_type(...)',
         },
       ],
@@ -1030,8 +1030,8 @@ YAML
   # note: when 204, mojo's $message->body always returns '' and Content-Length is stripped.
   # this test is only possible (for HTTP::Response) if we manually add a Content-Length; it will not
   # be added via parse().
-  TODO: {
-  local $TODO = 'Mojolicious will strip Content-Length for 204 responses' if $::TYPE eq 'mojo';
+  if ($::TYPE eq 'mojo') {
+  todo 'Mojolicious will strip Content-Length for 204 responses' => sub {
   cmp_result(
     $openapi->validate_response(response(204, [ 'Content-Type' => 'text/plain', 'Content-Length' => 20 ], 'I should not have content'),
       { path_template => '/foo', method => 'post' })->TO_JSON,
@@ -1054,7 +1054,7 @@ YAML
     },
     'an undesired response body is detectable for 204 responses',
   );
-  }
+  }}
 
 
   $openapi = OpenAPI::Modern->new(
@@ -1219,6 +1219,9 @@ YAML
   );
 };
 
-goto START if ++$type_index < @::TYPES;
+if (++$type_index < @::TYPES) {
+  bail_if_not_passing if $ENV{AUTHOR_TESTING};
+  goto START;
+}
 
 done_testing;

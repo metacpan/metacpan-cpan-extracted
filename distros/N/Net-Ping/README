@@ -4,13 +4,13 @@ NAME
 SYNOPSIS
         use Net::Ping;
 
-        $p = Net::Ping->new();
+        my $p = Net::Ping->new();
         print "$host is alive.\n" if $p->ping($host);
         $p->close();
 
-        $p = Net::Ping->new("icmp");
+        my $p = Net::Ping->new("icmp");
         $p->bind($my_addr); # Specify source interface of pings
-        foreach $host (@host_array)
+        foreach my $host (@host_array)
         {
             print "$host is ";
             print "NOT " unless $p->ping($host, 2);
@@ -19,11 +19,11 @@ SYNOPSIS
         }
         $p->close();
 
-        $p = Net::Ping->new("icmpv6");
-        $ip = "[fd00:dead:beef::4e]";
+        my $p = Net::Ping->new("icmpv6");
+        my $ip = "[fd00:dead:beef::4e]";
         print "$ip is alive.\n" if $p->ping($ip);
 
-        $p = Net::Ping->new("tcp", 2);
+        my $p = Net::Ping->new("tcp", 2);
         # Try connecting to the www port instead of the echo port
         $p->port_number(scalar(getservbyname("http", "tcp")));
         while ($stop_time > time())
@@ -35,19 +35,19 @@ SYNOPSIS
         undef($p);
 
         # Like tcp protocol, but with many hosts
-        $p = Net::Ping->new("syn");
+        my $p = Net::Ping->new("syn");
         $p->port_number(getservbyname("http", "tcp"));
-        foreach $host (@host_array) {
+        foreach my $host (@host_array) {
           $p->ping($host);
         }
-        while (($host,$rtt,$ip) = $p->ack) {
+        while (my ($host, $rtt, $ip) = $p->ack) {
           print "HOST: $host [$ip] ACKed in $rtt seconds.\n";
         }
 
         # High precision syntax (requires Time::HiRes)
-        $p = Net::Ping->new();
+        my $p = Net::Ping->new();
         $p->hires();
-        ($ret, $duration, $ip) = $p->ping($host, 5.5);
+        my ($ret, $duration, $ip) = $p->ping($host, 5.5);
         printf("$host [ip: $ip] is alive (packet return time: %.2f ms)\n",
                 1000 * $duration)
           if $ret;
@@ -280,9 +280,9 @@ DESCRIPTION
         tcp socket. It's only necessary to do this if you want to provide a
         different timeout when creating the connection, or remove the
         overhead of establishing the connection from the first ping. If you
-        don't call "open()", the connection is automatically opened the
-        first time "ping()" is called. This call simply does nothing if you
-        are using any protocol other than stream.
+        don't call open(), the connection is automatically opened the first
+        time ping() is called. This call simply does nothing if you are
+        using any protocol other than stream.
 
         The $host argument can be omitted when specifying the "host" option
         to new().
@@ -308,7 +308,7 @@ DESCRIPTION
 
     $p->nack( $failed_ack_host );
         The reason that "host $failed_ack_host" did not receive a valid ACK.
-        Useful to find out why when "ack($fail_ack_host)" returns a false
+        Useful to find out why when ack($fail_ack_host) returns a false
         value.
 
     $p->ack_unfork($host)
@@ -316,10 +316,12 @@ DESCRIPTION
         enabled.
 
     $p->ping_icmp([$host, $timeout, $family])
-        The "ping" method used with the icmp protocol.
+        The "ping" method used with the icmp protocol. Under Linux under a
+        non-root account this uses now SOCK_DGRAM.
 
     $p->ping_icmpv6([$host, $timeout, $family])
-        The "ping" method used with the icmpv6 protocol.
+        The "ping" method used with the icmpv6 protocol. Under Linux under a
+        non-root account this uses now SOCK_DGRAM.
 
     $p->ping_stream([$host, $timeout, $family])
         The "ping" method used with the stream protocol.
@@ -373,10 +375,10 @@ DESCRIPTION
         function returns the value of the port that "ping" will connect to.
 
     $p->mselect
-        A "select()" wrapper that compensates for platform peculiarities.
+        A select() wrapper that compensates for platform peculiarities.
 
     $p->ntop
-        Platform abstraction over "inet_ntop()"
+        Platform abstraction over inet_ntop()
 
     $p->checksum($msg)
         Do a checksum on the message. Basically sum all of the short words
@@ -387,8 +389,8 @@ DESCRIPTION
 
     pingecho($host [, $timeout]);
         To provide backward compatibility with the previous version of
-        Net::Ping, a "pingecho()" subroutine is available with the same
-        functionality as before. "pingecho()" uses the tcp protocol. The
+        Net::Ping, a pingecho() subroutine is available with the same
+        functionality as before. pingecho() uses the tcp protocol. The
         return values and parameters are the same as described for the
         "ping" method. This subroutine is obsolete and may be removed in a
         future version of Net::Ping.

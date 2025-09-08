@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Result;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Contains the result of a JSON Schema evaluation
 
-our $VERSION = '0.617';
+our $VERSION = '0.618';
 
 use 5.020;
 use Moo;
@@ -46,7 +46,8 @@ has valid => (
   is => 'ro',
   isa => Bool|InstanceOf('JSON::PP::true')|InstanceOf('JSON::PP::false'),
   coerce => sub { $_[0] ? true : false }, # might be JSON::PP::* or builtin::* booleans
-  required => 1,
+  lazy => 1,
+  default => sub ($self) { $self->error_count == 0 },
 );
 sub result { goto \&valid } # backcompat only
 
@@ -57,6 +58,8 @@ has exception => (
   default => sub ($self) { any { $_->exception or $_->error =~ /^EXCEPTION: / } $self->errors },
 );
 
+# has errors
+# has annotations
 # turn hashrefs in _errors or _annotations into blessed objects
 has $_.'s' => (
   is => 'bare',
@@ -121,12 +124,20 @@ around BUILDARGS => sub ($orig, $class, @args) {
   $args->{_annotations} = delete $args->{annotations} if
     exists $args->{annotations} and any { !blessed($_) } $args->{annotations}->@*;
 
+  croak 'inconsistent inputs: errors is not empty but valid is true'
+    if $args->{valid}
+      and (exists $args->{_errors} and $args->{_errors}->@*
+        or exists $args->{errors} and $args->{errors}->@*);
+
+  croak 'inconsistent inputs: errors is empty but valid is false'
+    if exists $args->{valid} and not $args->{valid}
+      and (not exists $args->{_errors} or not $args->{_errors}->@*)
+      and (not exists $args->{errors} or not $args->{errors}->@*);
+
   return $args;
 };
 
 sub BUILD ($self, $args) {
-  warn 'result is false but there are no errors' if not $self->valid and not $self->error_count;
-
   $self->{_errors} = $args->{_errors} if exists $args->{_errors};
   $self->{_annotations} = $args->{_annotations} if exists $args->{_annotations};
 }
@@ -268,7 +279,7 @@ JSON::Schema::Modern::Result - Contains the result of a JSON Schema evaluation
 
 =head1 VERSION
 
-version 0.617
+version 0.618
 
 =head1 SYNOPSIS
 
@@ -305,23 +316,29 @@ The object also contains a I<bitwise AND> overload (C<&>), for combining two res
 result is valid iff both inputs are valid; annotations and errors from the second argument are
 appended to those of the first in a new Result object).
 
-=head1 ATTRIBUTES
+=head1 CONSTRUCTOR ARGUMENTS
+
+Unless otherwise noted, these are also available as read-only accessors.
 
 =head2 valid
 
 A boolean. Indicates whether validation was successful or failed.
 
+Optional, as it can be calculated from the presence of C<errors> or C<annotations>.
+
 =head2 errors
 
-Returns an array of L<JSON::Schema::Modern::Error> objects.
+An array of L<JSON::Schema::Modern::Error> objects.
 
 =head2 annotations
 
-Returns an array of L<JSON::Schema::Modern::Annotation> objects.
+An array of L<JSON::Schema::Modern::Annotation> objects.
 
 =head2 output_format
 
 =for stopwords subschemas
+
+Also available as a read/write accessor.
 
 One of: C<flag>, C<basic>, C<strict_basic>, C<terse>, C<data_only>. Defaults to C<basic>.
 
@@ -372,6 +389,8 @@ C<< [ 400, <first error string> ] >> otherwise. The exact error string is hidden
 errors because you should not leak internal issues with your application, but you may also wish to
 obfuscate normal validation errors, in which case you should check for C<400> and change the string
 to C<'Bad Request'>.
+
+Also available as a read/write accessor.
 
 =head1 METHODS
 

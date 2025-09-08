@@ -13,12 +13,17 @@ no feature 'switch';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 use Path::Tiny;
 use Mojo::UserAgent;
-use YAML::PP;
 use Digest::MD5 'md5_hex';
+use Test::File::ShareDir -share => { -dist => { 'OpenAPI-Modern' => 'share' } };
+use lib 'lib';
 use JSON::Schema::Modern;
 use JSON::Schema::Modern::Document::OpenAPI;
 
 # see https://spec.openapis.org/#openapi-specification-schemas for the latest links
+
+# TODO: do not store the exact URIs of these files; instead store a mapping of URI regexes to the
+# filenames in which we will store them.
+# Also carefully arrange the order of them so dependencies are loaded first.
 
 my %files = (
   # metaschema for json schemas contained within openapi documents:
@@ -40,7 +45,7 @@ my %files = (
 
 my $web_url = 'https://spec.openapis.org/';
 
-my $ua = Mojo::UserAgent->new;
+my $ua = Mojo::UserAgent->new(max_redirects => 3);
 say "# fetching $web_url" if $ENV{DEBUG};
 my $res = $ua->get($web_url)->result;
 die "Failed to fetch $web_url", $res->code, " ", $res->message if $res->is_error;
@@ -74,37 +79,57 @@ if (my @outdated_schemas = grep $new_schemas{$_}->@*, sort keys %new_schemas) {
 }
 
 
-my $yaml = YAML::PP->new(boolean => 'JSON::PP');
-my $js = JSON::Schema::Modern->new(validate_formats => 1);
+my $json_decoder = JSON::Schema::Modern::_JSON_BACKEND()->new->utf8(1);
+my $js = JSON::Schema::Modern->new(strict => 1, validate_formats => 1);
 my %checksums;
 
 # download fresh copies of our files, validate against their schemas and against our code
-foreach my $target (keys %files) {
+foreach my $target (sort keys %files) {
   my $uri = $files{$target};
 
-  say "# fetching $uri to share/$target" if $ENV{DEBUG};
+  say "# fetching   $uri -> share/$target" if $ENV{DEBUG};
   my $res = $ua->get($uri)->result;
   die "Failed to fetch $uri", $res->code, " ", $res->message if $res->is_error;
 
   $target = path('share', $target);
   $target->parent->mkpath;
-  $target->spew_utf8(my $content = $res->text);
+  $target->spew_raw(my $content = $res->body);
   $checksums{$target} = md5_hex($content);
 
-  next if $target =~ /LICENSE$/;
+  next if $target->basename eq 'LICENSE';
 
-  my $document = $js->add_schema($yaml->load_string($content));
+  # perform a simple validation, which should use a metaschema that is already preloaded into the
+  # JSON::Schema::Modern instance
+  my $schema = $json_decoder->decode($content);
+  say '# validating ', $schema->{'$id'}, ' -> ', $target if $ENV{DEBUG};
+  my $result = $js->validate_schema($schema, { strict => 1 });
+  die $result->dump if not $result->valid;
+}
 
-  say "# validating ", $document->canonical_uri if $ENV{DEBUG};
-  my $result = $document->validate;
-  die $js->_json_decoder->pretty->encode($result) if not $result->valid;
+# all files must be updated before any of them can be loaded as documents, since they depend on each
+# other via the '$schema' and '$vocabulary' keywords
 
-  die 'for uri ', $document->schema->{'$id'}, ', mismatch between jsonSchemaDialect "',
-      $document->schema->{properties}{jsonSchemaDialect}{default},
+foreach my $target (sort keys %files) {
+  $target = path('share', $target);
+  next if $target->basename eq 'LICENSE';
+
+  my $schema = $json_decoder->decode($target->slurp_raw);
+  say '# loading    ', $schema->{'$id'}, ' -> ', $target if $ENV{DEBUG};
+
+  # Note that if these are new files, then this type of validate won't work...
+  # because the files won't be in the resource index. But we can fix this by carefully rearranging
+  # the order in which we load the files, and can sequentially add them to the evaluator's resource
+  # index.
+
+  my $result = JSON::Schema::Modern::Document->validate(schema => $schema);
+  die $result->dump if not $result->valid;
+
+  die 'for uri ', $schema->{'$id'}, ', mismatch between jsonSchemaDialect "',
+      $schema->{properties}{jsonSchemaDialect}{default},
       '" and assumed default "',
       JSON::Schema::Modern::Document::OpenAPI->DEFAULT_DIALECT, '"'
-    if exists((($document->schema->{properties}//{})->{jsonSchemaDialect}//{})->{default})
-      and $document->schema->{properties}{jsonSchemaDialect}{default}
+    if exists((($schema->{properties}//{})->{jsonSchemaDialect}//{})->{default})
+      and $schema->{properties}{jsonSchemaDialect}{default}
         ne JSON::Schema::Modern::Document::OpenAPI->DEFAULT_DIALECT;
 }
 

@@ -10,7 +10,7 @@ use File::Spec::Functions;
 
 use Exporter 'import';
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 our @EXPORT_OK = qw(get_user_data_from_ssh_cfg);
 
@@ -62,7 +62,7 @@ GitHub::Config::SSH::UserData - Read user data from comments in ssh config file
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =head1 SYNOPSIS
 
@@ -175,7 +175,7 @@ your bug as I make changes.
 
 L<https://gist.github.com/oanhnn/80a89405ab9023894df7>
 
-L<App::ghmulti>, L<Git::RemoteURL::Parse>
+L<App::ghmulti>, L<Dist::PolicyFiles>, L<Git::RemoteURL::Parse>
 
 
 =head1 SUPPORT

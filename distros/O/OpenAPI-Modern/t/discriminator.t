@@ -62,7 +62,7 @@ YAML
         {
           instanceLocation => '',
           keywordLocation => '/discriminator',
-          absoluteKeywordLocation => $doc_uri->clone->fragment('/components/schemas/pet/discriminator')->to_string,
+          absoluteKeywordLocation => $doc_uri.'#/components/schemas/pet/discriminator',
           error => 'missing required discriminator property "petType"',
         },
       ],
@@ -84,13 +84,13 @@ YAML
         {
           instanceLocation => '/meow',
           keywordLocation => '/anyOf/0/$ref/properties/meow/const',
-          absoluteKeywordLocation => $doc_uri->clone->fragment('/components/schemas/cat/properties/meow/const')->to_string,
+          absoluteKeywordLocation => $doc_uri.'#/components/schemas/cat/properties/meow/const',
           error => 'value does not match',
         },
         {
           instanceLocation => '/meow',
           keywordLocation => '/discriminator/propertyName/properties/meow/const',
-          absoluteKeywordLocation => $doc_uri->clone->fragment('/components/schemas/cat/properties/meow/const')->to_string,
+          absoluteKeywordLocation => $doc_uri.'#/components/schemas/cat/properties/meow/const',
           error => 'value does not match',
         },
       ),
@@ -124,13 +124,13 @@ YAML
         {
           instanceLocation => '/swims',
           keywordLocation => '/anyOf/1/$ref/properties/swims/const',
-          absoluteKeywordLocation => $doc_uri->clone->fragment('/components/schemas/definitions/$defs/aquatic/properties/swims/const')->to_string,
+          absoluteKeywordLocation => $doc_uri.'#/components/schemas/definitions/$defs/aquatic/properties/swims/const',
           error => 'value does not match',
         },
         {
           instanceLocation => '/swims',
           keywordLocation => '/discriminator/mapping/fish/properties/swims/const',
-          absoluteKeywordLocation => $doc_uri->clone->fragment('/components/schemas/definitions/$defs/aquatic/properties/swims/const')->to_string,
+          absoluteKeywordLocation => $doc_uri.'#/components/schemas/definitions/$defs/aquatic/properties/swims/const',
           error => 'value does not match',
         },
       ),
@@ -164,7 +164,7 @@ YAML
         {
           instanceLocation => '/petType',
           keywordLocation => '/discriminator',
-          absoluteKeywordLocation => $doc_uri->clone->fragment('/components/schemas/pet/discriminator')->to_string,
+          absoluteKeywordLocation => $doc_uri.'#/components/schemas/pet/discriminator',
           error => 'invalid petType: "dog"',
         },
       ),
@@ -251,19 +251,19 @@ YAML
         {
           instanceLocation => '/sound',
           keywordLocation => '/discriminator/mapping/dog/allOf/1/properties/sound/const',
-          absoluteKeywordLocation => $doc_uri->clone->fragment('/components/schemas/Dog/allOf/1/properties/sound/const')->to_string,
+          absoluteKeywordLocation => $doc_uri.'#/components/schemas/Dog/allOf/1/properties/sound/const',
           error => 'value does not match',
         },
         {
           instanceLocation => '',
           keywordLocation => '/discriminator/mapping/dog/allOf/1/properties',
-          absoluteKeywordLocation => $doc_uri->clone->fragment('/components/schemas/Dog/allOf/1/properties')->to_string,
+          absoluteKeywordLocation => $doc_uri.'#/components/schemas/Dog/allOf/1/properties',
           error => 'not all properties are valid',
         },
         {
           instanceLocation => '',
           keywordLocation => '/discriminator/mapping/dog/allOf',
-          absoluteKeywordLocation => $doc_uri->clone->fragment('/components/schemas/Dog/allOf')->to_string,
+          absoluteKeywordLocation => $doc_uri.'#/components/schemas/Dog/allOf',
           error => 'subschema 1 is not valid',
         },
       ],

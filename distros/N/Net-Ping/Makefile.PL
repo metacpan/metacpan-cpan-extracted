@@ -67,7 +67,13 @@ sub depend {
 README : lib/Net/Ping.pm
 	pod2text lib/Net/Ping.pm > README
 release : dist
-	git tag \$(VERSION)
+	if test \"\$(shell git rev-parse --abbrev-ref HEAD)\" != \"master\" || \\
+           test \"\$(shell git diff --raw)\" != \"\" || \\
+           test \"\$(shell git diff --cached --raw)\" != \"\" ; then \\
+          echo 'You are not on a clean master branch, aborting.'; \\
+          exit 1; \\
+	fi
+	-git tag -f \$(VERSION)
 	cpan-upload \$(DISTVNAME).tar\$(SUFFIX)
 	git push
 	git push --tags

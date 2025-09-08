@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Document::OpenAPI;
 # ABSTRACT: One OpenAPI v3.1 document
 # KEYWORDS: JSON Schema data validation request response OpenAPI
 
-our $VERSION = '0.092';
+our $VERSION = '0.093';
 
 use 5.020;
 use utf8;
@@ -28,8 +28,9 @@ use File::ShareDir 'dist_dir';
 use Path::Tiny;
 use List::Util 'pairs';
 use Ref::Util 'is_plain_hashref';
+use builtin::compat 'blessed';
 use MooX::TypeTiny 0.002002;
-use Types::Standard qw(InstanceOf HashRef Str Enum);
+use Types::Standard qw(HashRef Str);
 use namespace::clean;
 
 extends 'JSON::Schema::Modern::Document';
@@ -263,6 +264,7 @@ sub traverse ($self, $evaluator, $config_override = {}) {
   foreach my $path (sort keys(($schema->{paths}//{})->%*)) {
     next if $path =~ '^x-';
     my %seen_names;
+    # { for the editor
     foreach my $name ($path =~ m!\{([^}]+)\}!g) {
       if (++$seen_names{$name} == 2) {
         ()= E({ %$state, schema_path => jsonp('/paths', $path) },
@@ -270,6 +272,7 @@ sub traverse ($self, $evaluator, $config_override = {}) {
       }
     }
 
+    # { for the editor
     my $normalized = $path =~ s/\{[^}]+\}/\x00/r;
     if (my $first_path = $seen_path{$normalized}) {
       ()= E({ %$state, schema_path => jsonp('/paths', $path) },
@@ -298,6 +301,7 @@ sub traverse ($self, $evaluator, $config_override = {}) {
         next;
       }
 
+      # { for the editor
       my $normalized = $servers->[$server_idx]{url} =~ s/\{[^}]+\}/\x00/r;
       # { for the editor
       my @url_variables = $servers->[$server_idx]{url} =~ /\{([^}]+)\}/g;
@@ -367,6 +371,13 @@ sub traverse ($self, $evaluator, $config_override = {}) {
   }
 
   return $state;
+}
+
+# just like the base class's version, except we skip the evaluate step because we already did
+# that as part of traverse.
+sub validate ($class, @args) {
+  my $document = blessed($class) ? $class : $class->new(@args);
+  return JSON::Schema::Modern::Result->new(valid => !$document->has_errors, errors => [ $document->errors ]);
 }
 
 ######## NO PUBLIC INTERFACES FOLLOW THIS POINT ########
@@ -536,7 +547,7 @@ JSON::Schema::Modern::Document::OpenAPI - One OpenAPI v3.1 document
 
 =head1 VERSION
 
-version 0.092
+version 0.093
 
 =head1 SYNOPSIS
 

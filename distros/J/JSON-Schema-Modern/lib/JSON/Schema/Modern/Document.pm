@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Document;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: One JSON Schema document
 
-our $VERSION = '0.617';
+our $VERSION = '0.618';
 
 use 5.020;
 use Moo;
@@ -22,11 +22,12 @@ use Mojo::URL;
 use Carp 'croak';
 use List::Util 1.29 'pairs';
 use Ref::Util 0.100 'is_plain_hashref';
-use builtin::compat 'refaddr';
+use builtin::compat qw(refaddr blessed);
 use Safe::Isa 1.000008;
 use MooX::TypeTiny;
 use Types::Standard 1.016003 qw(InstanceOf HashRef Str Map Dict ArrayRef Enum ClassName Undef Slurpy Optional Bool);
 use Types::Common::Numeric 'PositiveOrZeroInt';
+use JSON::Schema::Modern::Utilities qw(json_pointer_type canonical_uri_type);
 use namespace::clean;
 
 extends 'Mojo::JSON::Pointer';
@@ -62,19 +63,17 @@ has metaschema_uri => (
 
 # "A JSON Schema resource is a schema which is canonically identified by an absolute URI."
 # https://json-schema.org/draft/2020-12/json-schema-core.html#rfc.section.4.3.5
-my $path_type = Str->where('m{^(?:/|$)}');  # JSON pointer relative to the document root
 has resource_index => (
   is => 'bare',
   isa => Map[my $resource_key_type = Str->where('!/#/'), my $resource_type = Dict[
-      # always stringwise-equal to the top level key
       canonical_uri => (InstanceOf['Mojo::URL'])->where(q{not defined $_->fragment}),
-      path => $path_type,
+      path => json_pointer_type,  # JSON pointer relative to the document root
       specification_version => Enum[qw(draft4 draft6 draft7 draft2019-09 draft2020-12)],
       # the vocabularies used when evaluating instance data against schema
       vocabularies => ArrayRef[ClassName->where(q{$_->DOES('JSON::Schema::Modern::Vocabulary')})],
       anchors => Optional[HashRef[Dict[
-        canonical_uri => (InstanceOf['Mojo::URL'])->where(q{not defined $_->fragment or substr($_->fragment, 0, 1) eq '/'}),
-        path => $path_type,
+        canonical_uri => canonical_uri_type,  # equivalent uri with json pointer fragment
+        path => json_pointer_type,  # JSON pointer relative to the document root
         dynamic => Optional[Bool],
       ]]],
       Slurpy[HashRef[Undef]],  # no other fields allowed
@@ -216,9 +215,20 @@ sub traverse ($self, $evaluator, $config_override = {}) {
   return $state;
 }
 
-sub validate ($self, $evaluator = undef) {
-  $evaluator //= JSON::Schema::Modern->new(validate_formats => 1);
-  return $evaluator->evaluate($self->schema, $self->metaschema_uri);
+sub validate ($class, @args) {
+  croak 'bad argument list' if blessed($args[0]);
+
+  my $args = $class->Moo::Object::BUILDARGS(@args);
+  my $document = blessed($class) ? $class : $class->new($args);
+
+  my $doc_result = JSON::Schema::Modern::Result->new(errors => [ $document->errors ]);
+
+  # ideally, the traverse phase run during document construction should have found all errors that a
+  # simple metaschema evaluation would reveal, but we'll do both just to make sure.
+  my $evaluator = $args->{evaluator} // JSON::Schema::Modern->new(validate_formats => 1);
+  my $eval_result = $evaluator->evaluate($document->schema, $document->metaschema_uri);
+
+  return $doc_result & $eval_result;
 }
 
 # callback hook for Sereal::Encoder
@@ -253,7 +263,7 @@ JSON::Schema::Modern::Document - One JSON Schema document
 
 =head1 VERSION
 
-version 0.617
+version 0.618
 
 =head1 SYNOPSIS
 
@@ -261,13 +271,11 @@ version 0.617
 
     my $document = JSON::Schema::Modern::Document->new(
       canonical_uri => 'https://example.com/v1/schema',
-      metaschema_uri => 'https://example.com/my/custom/metaschema',
       schema => $schema,
     );
     my $foo_definition = $document->get('/$defs/foo');
     my %resource_index = $document->resource_index;
-
-    my sanity_check = $document->validate;
+    my $metaschema_uri = $document->metaschema_uri;
 
 =head1 DESCRIPTION
 
@@ -297,8 +305,9 @@ The original passed-in value is saved in L</original_uri>.
 
 Sets the metaschema that is used to describe the document (or more specifically, any JSON Schemas
 contained within the document), which determines the
-specification version and vocabularies used during evaluation. Does not override any
-C<$schema> keyword actually present in the schema document.
+specification version and vocabularies used during evaluation.
+Does not override any C<$schema> keyword actually present in the schema document, and normally you
+should use this keyword instead.
 
 =head2 specification_version
 
@@ -392,18 +401,22 @@ See L<Mojo::JSON::Pointer/get>.
 
 =head2 validate
 
-  $result = $document->validate;
-  $result = $document->validate($evaluator);
+  $result = JSON::Schema::Modern::Document->validate(<normal constructor arguments>);
 
-Evaluates the document against its metaschema. See L<JSON::Schema::Modern/evaluate>.
-For regular JSON Schemas this is redundant with creating the document in the first place (as it
-includes a validation check), but for some subclasses of this class, additional things might be
-checked that are not caught by document creation.
+Constructs the document object, and then performs a further sanity check by evaluating the document
+against its metaschema. (See L<JSON::Schema::Modern/evaluate>.) This is preferred to simply
+attempting to add the document to the evaluator with L<JSON::Schema::Modern/add_schema> in cases
+where the document's sanity is not known, as that method will die if errors are encountered.
 
-If the document's metaschema is one of the core bundled metaschemas (see
+As with calling C<new>, if the document's metaschema is one of the core bundled metaschemas (see
 L<JSON::Schema::Modern/BUNDLED META-SCHEMAS>), the C<$evaluator> argument is optional, as these
 metaschemas are available to all evaluator instances; otherwise (you are using a custom metaschema),
-you must provide the same evaluator instance as was used to construct the document object.
+you must provide the same evaluator instance as would be used to construct the document object.
+
+Returns a L<JSON::Schema::Modern::Result> object containing the final result.
+
+See also L<JSON::Schema::Modern/validate_schema>, which is nearly equivalent but only works for
+JSON Schemas, not any potential subclass of JSON::Schema::Modern::Document.
 
 =head2 TO_JSON
 

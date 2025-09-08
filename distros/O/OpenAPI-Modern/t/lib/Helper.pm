@@ -17,12 +17,13 @@ use List::Util 'pairs';
 use Ref::Util 'is_hashref';
 use Mojo::Message::Request;
 use Mojo::Message::Response;
+use Test2::V0 qw(!bag !bool !warnings);  # prefer Test::Deep and Test::Warnings versions of these exports
 use Test2::API 'context_do';
 use Test2::Tools::Exception 'lives';
 use Test::Needs;
-use Test::More 0.96;
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
-use Test::Deep; # import symbols: ignore, re etc
+use if $ENV{AUTHOR_TESTING}, 'Test2::Plugin::BailOnFail';
+use Test::Deep qw(!array !hash); # import symbols: ignore, re etc
 use JSON::Schema::Modern::Document::OpenAPI;
 use JSON::Schema::Modern::Utilities qw(true false);
 use OpenAPI::Modern;
@@ -250,7 +251,7 @@ sub to_str ($message) {
 # as the OpenAPI::Modern constructor might do.
 sub document_result ($document) {
   JSON::Schema::Modern::Result->new(
-    valid => $document->has_errors,
+    valid => !$document->has_errors,
     errors => [ $document->errors ],
   );
 }
@@ -351,6 +352,22 @@ sub die_result ($sub, $pattern, $test_name) {
 sub exception :prototype(&) {
   eval { $_[0]->() };
   return $@ eq '' ? undef : $@;
+}
+
+sub bail_if_not_passing {
+  context_do {
+    my $ctx = shift;
+    $ctx->bail if not $ctx->hub->is_passing;
+  }
+}
+
+sub todo_maybe ($reason_or_undef, $sub) {
+  if ($reason_or_undef) {
+    todo $reason_or_undef => $sub;
+  }
+  else {
+    $sub->();
+  }
 }
 
 1;

@@ -182,8 +182,6 @@ Properties:
 
 =over
 
-=item C<_purl_parse>, 
-
 =item C<author>, [Deprecated] This will be removed in a future version. Use
 "authors" or "manufacturer" methods instead.
 The person(s) or organization(s) that authored the component
@@ -323,8 +321,6 @@ available or cannot be determined for the component.
 with semantic versioning but is not enforced.
 
 =back
-
-=item $component->_purl_parse
 
 =item $component->author
 

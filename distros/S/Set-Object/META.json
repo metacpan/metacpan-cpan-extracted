@@ -4,7 +4,7 @@
       "Jean-Louis Leroy, Sam Vilain and Reini Urban"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.38, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -54,6 +54,6 @@
          "web" : "https://github.com/rurban/Set-Object"
       }
    },
-   "version" : "1.42",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "1.43",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

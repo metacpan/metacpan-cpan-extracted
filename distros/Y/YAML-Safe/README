@@ -170,7 +170,7 @@ Configuration
 
     "dumpcode" =item "get_dumpcode"
         If enabled supports Dump of CV code blocks via
-        "YAML::Safe::coderef2text()".
+        YAML::Safe::coderef2text().
 
     "quotenum" =item "get_quotenum"
         Default: enabled.

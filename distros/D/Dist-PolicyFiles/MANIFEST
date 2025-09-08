@@ -1,0 +1,30 @@
+Changes
+CONTRIBUTING.md
+foo.pl
+lib/Dist/PolicyFiles.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+README.md
+script/dist-policyfiles
+SECURITY.md
+t/00-load.t
+t/01-data/.ssh/config
+t/01-new.t
+t/02-data/.ssh/config
+t/02-data/CONTRIBUTING-johndoe.md
+t/02-data/CONTRIBUTING-klaus-rindfrey.md
+t/02-data/CONTRIBUTING.md
+t/02-data/CONTRIBUTING.md.tmpl
+t/02-data/SECURITY-johndoe.md
+t/02-data/SECURITY-klaus-rindfrey.md
+t/02-data/SECURITY.md
+t/02-policies.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t
+xt/pod-spell.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

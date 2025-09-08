@@ -448,6 +448,9 @@ ok(
             openidconnectcallback => 1,
             error                 => "canceled",
             state                 => $state,
+
+            # 3445, make sure unwanted parameters don't confuse LLNG
+            prompt => "none",
         },
         accept => 'text/html',
     ),
@@ -551,6 +554,10 @@ sub rp {
     return LLNG::Manager::Test->new( {
             ini => {
                 logLevel                   => $debug,
+
+                # needed to to test #3445
+                issuerDBOpenIDConnectActivation => "1",
+
                 domain                     => 'rp.com',
                 portal                     => 'http://auth.rp.com/',
                 authentication             => 'OpenIDConnect',

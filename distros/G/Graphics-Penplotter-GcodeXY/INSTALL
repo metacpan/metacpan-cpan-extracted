@@ -1,0 +1,11 @@
+INSTALLATION
+
+To install this module:
+1. Run the following commands in your terminal:
+perl Build.PL
+./Build
+./Build test
+./Build install
+
+If you do not already have Module::Build installed, you may first need to install it via CPAN:
+cpan Module::Build

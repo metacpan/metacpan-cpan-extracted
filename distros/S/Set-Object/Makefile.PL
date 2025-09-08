@@ -52,10 +52,23 @@ package MY;
 
 sub depend {
   "
+release-test : dist
+	if test \"\$(shell git rev-parse --abbrev-ref HEAD)\" != \"master\" || \\
+           test \"\$(shell git status --porcelain)\" != \"\" ; then \\
+          echo 'You are not on a clean master branch, aborting.'; \\
+          exit 1 ; \\
+	fi
+	echo git tag \$(VERSION)
+	echo cpan-upload \$(DISTVNAME).tar\$(SUFFIX)
+	echo git push
+	echo git push --tags
+
 release : dist
-	-git commit -am\"release \$(VERSION)\"
-	echo -n continue?
-	read y
+	if test \"\$(shell git rev-parse --abbrev-ref HEAD)\" != \"master\" || \\
+           test \"\$(shell git status --porcelain)\" != \"\" ; then \\
+          echo 'You are not on a clean master branch, aborting.'; \\
+          exit 1; \\
+	fi
 	git tag \$(VERSION)
 	cpan-upload \$(DISTVNAME).tar\$(SUFFIX)
 	git push

@@ -10,11 +10,10 @@ no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use Path::Tiny;
-use HTTP::Tiny;
+use Mojo::UserAgent;
 use Digest::MD5 'md5_hex';
 use Test::File::ShareDir -share => { -dist => { 'JSON-Schema-Modern' => 'share' } };
 use lib 'lib';
-use JSON::Schema::Modern 0.578;
 
 # ATTENTION DISTRO REPACKAGERS: do NOT use fresh copies of these files
 # from their source; it is important to include the original versions
@@ -49,25 +48,37 @@ my %files = (
   'LICENSE' => 'https://raw.githubusercontent.com/json-schema-org/json-schema-spec/main/LICENSE',
 );
 
-my $js = JSON::Schema::Modern->new(validate_formats => 1);
+my $ua = Mojo::UserAgent->new(max_redirects => 3);
 my %checksums;
 
-foreach my $target (keys %files) {
-  my $source_uri = $files{$target};
+foreach my $target (sort keys %files) {
+  my $uri = $files{$target};
+
+  say "# fetching $uri -> share/$target" if $ENV{DEBUG};
+  my $res = $ua->get($uri)->result;
+  die "Failed to fetch $uri", $res->code, " ", $res->message if $res->is_error;
+
   $target = path('share', $target);
   $target->parent->mkpath;
+  $target->spew_raw(my $content = $res->body);
+  $checksums{$target} = md5_hex($content);
+}
 
-  my $response = HTTP::Tiny->new->get($source_uri);
-  die "Failed to fetch $source_uri: $response->{status} $response->{reason}" if not $response->{success};
+# lazy-load this to make sure we load the files we just downloaded
+require JSON::Schema::Modern;
 
-  $target->spew_raw($response->{content});
-  $checksums{$target} = md5_hex($response->{content});
+my $json_decoder = JSON::Schema::Modern::_JSON_BACKEND()->new->utf8(1);
 
+# all files must be updated before any of them can be validated, since they depend on each other via
+# the '$schema' and '$vocabulary' keywords
+foreach my $target (sort keys %files) {
+  $target = path('share', $target);
   next if $target->basename eq 'LICENSE';
 
-  my $document = $js->get_document($source_uri);
-  print '# validating ', $document->canonical_uri, "\n" if $ENV{DEBUG};
-  my $result = $document->validate;
+  my $schema = $json_decoder->decode($target->slurp_raw);
+  say '# validating ', $schema->{'$id'}//$schema->{id}, ' -> ', $target if $ENV{DEBUG};
+
+  my $result = JSON::Schema::Modern::Document->validate(schema => $schema);
   die $result->dump if not $result->valid;
 }
 

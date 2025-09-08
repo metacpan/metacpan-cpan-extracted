@@ -195,7 +195,6 @@ sub postLogin {
 
 sub authenticatedRequest {
     my ( $self, $req ) = @_;
-    $req->data->{alreadyAuthenticated} = 1;
     return $self->do(
         $req,
         [
@@ -400,7 +399,7 @@ sub do {
         }
         else {
             my $res = { result => 1, error => $err };
-            unless ( $req->data->{alreadyAuthenticated} ) {
+            if ( $req->data->{newAuth} ) {
                 $res->{id}      = $req->id;
                 $res->{id_http} = $req->sessionInfo->{_httpSession}
                   if $req->sessionInfo->{_httpSession};

@@ -220,7 +220,6 @@ subtest 'path parameters' => sub {
     },
   );
 
-  TODO:
   foreach my $test (@tests) {
     undef $parameter_content;
     my $state = {
@@ -235,19 +234,19 @@ subtest 'path parameters' => sub {
     ()= $openapi->_validate_path_parameter({ %$state, data_path => '/request/path/'.$name },
       $test->{param_obj}, $test->{path_captures});
 
-    local $TODO = $test->{todo} if $test->{todo};
+    todo_maybe($test->{todo}, sub {
+      is_equal(
+        [ map $_->TO_JSON, $state->{errors}->@* ],
+        $test->{errors}//[],
+        'path '.$name.': '.(($test->{errors}//[])->@* ? 'the correct error was returned' : 'no errors occurred'),
+      );
 
-    is_equal(
-      [ map $_->TO_JSON, $state->{errors}->@* ],
-      $test->{errors}//[],
-      'path '.$name.': '.(($test->{errors}//[])->@* ? 'the correct error was returned' : 'no errors occurred'),
-    );
-
-    is_equal(
-      $parameter_content,
-      $test->{content},
-      'path '.$name.': '.(defined $test->{content} ? 'the correct content was extracted' : 'no content was extracted'),
-    );
+      is_equal(
+        $parameter_content,
+        $test->{content},
+        'path '.$name.': '.(defined $test->{content} ? 'the correct content was extracted' : 'no content was extracted'),
+      );
+    });
   }
 };
 
@@ -367,7 +366,6 @@ subtest 'query parameters' => sub {
     # deepObject, object, true
   );
 
-  TODO:
   foreach my $test (@tests) {
     undef $parameter_content;
     my $state = {
@@ -382,19 +380,19 @@ subtest 'query parameters' => sub {
     ()= $openapi->_validate_query_parameter({ %$state, data_path => '/request/query/'.$name },
       $test->{param_obj}, Mojo::URL->new('https://example.com/blah?'.$test->{queries}));
 
-    local $TODO = $test->{todo} if $test->{todo};
+    todo_maybe($test->{todo}, sub {
+      is_equal(
+        [ map $_->TO_JSON, $state->{errors}->@* ],
+        $test->{errors}//[],
+        'query '.$name.' from '.$test->{queries}.': '.(($test->{errors}//[])->@* ? 'the correct error was returned' : 'no errors occurred'),
+      );
 
-    is_equal(
-      [ map $_->TO_JSON, $state->{errors}->@* ],
-      $test->{errors}//[],
-      'query '.$name.' from '.$test->{queries}.': '.(($test->{errors}//[])->@* ? 'the correct error was returned' : 'no errors occurred'),
-    );
-
-    is_equal(
-      $parameter_content,
-      $test->{content},
-      'query '.$name.' from '.$test->{queries}.': '.(defined $test->{content} ? 'the correct content was extracted' : 'no content was extracted'),
-    );
+      is_equal(
+        $parameter_content,
+        $test->{content},
+        'query '.$name.' from '.$test->{queries}.': '.(defined $test->{content} ? 'the correct content was extracted' : 'no content was extracted'),
+      );
+    });
   }
 };
 
@@ -540,7 +538,6 @@ subtest 'header parameters' => sub {
     },
   );
 
-  TODO:
   foreach my $test (@tests) {
     undef $parameter_content;
     my $state = {
@@ -560,21 +557,21 @@ subtest 'header parameters' => sub {
         $name, $test->{header_obj}, $headers);
     };
 
-    local $TODO = $test->{todo} if $test->{todo};
+    todo_maybe($test->{todo}, sub {
+      is($exception, undef, 'no exceptions');
 
-    is($exception, undef, 'no exceptions');
+      is_equal(
+        [ map $_->TO_JSON, $state->{errors}->@* ],
+        $test->{errors}//[],
+        'header '.$name.': '.(($test->{errors}//[])->@* ? 'the correct error was returned' : 'no errors occurred'),
+      );
 
-    is_equal(
-      [ map $_->TO_JSON, $state->{errors}->@* ],
-      $test->{errors}//[],
-      'header '.$name.': '.(($test->{errors}//[])->@* ? 'the correct error was returned' : 'no errors occurred'),
-    );
-
-    is_equal(
-      $parameter_content,
-      $test->{content},
-      'header '.$name.': '.(defined $test->{content} ? 'the correct content was extracted' : 'no content was extracted'),
-    );
+      is_equal(
+        $parameter_content,
+        $test->{content},
+        'header '.$name.': '.(defined $test->{content} ? 'the correct content was extracted' : 'no content was extracted'),
+      );
+    });
   }
 };
 

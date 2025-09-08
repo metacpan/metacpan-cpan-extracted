@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern; # git description: v0.616-16-g27f0ba00
+package JSON::Schema::Modern; # git description: v0.617-15-gea47162e
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema using a JSON Schema
 # KEYWORDS: JSON Schema validator data validation structure specification
 
-our $VERSION = '0.617';
+our $VERSION = '0.618';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -38,7 +38,7 @@ use Feature::Compat::Try;
 use JSON::Schema::Modern::Error;
 use JSON::Schema::Modern::Result;
 use JSON::Schema::Modern::Document;
-use JSON::Schema::Modern::Utilities qw(get_type canonical_uri E abort annotate_self jsonp is_type assert_uri local_annotations is_schema);
+use JSON::Schema::Modern::Utilities qw(get_type canonical_uri E abort annotate_self jsonp is_type assert_uri local_annotations is_schema json_pointer_type canonical_uri_type);
 use namespace::clean;
 
 our @CARP_NOT = qw(
@@ -209,6 +209,7 @@ sub add_document {
   my $document = shift;
   croak 'wrong document type' if not $document->$_isa('JSON::Schema::Modern::Document');
 
+  # we will never add a document to the resource index if it has errors
   die JSON::Schema::Modern::Result->new(
     output_format => $self->output_format,
     valid => 0,
@@ -488,7 +489,7 @@ sub validate_schema ($self, $schema, $config_override = {}) {
   return $result if not $result->valid;
 
   # the traversal pass will validate all constraints that weren't handled by the metaschema
-  my $state = $self->traverse($schema, $config_override);
+  my $state = $self->traverse($schema);
   return JSON::Schema::Modern::Result->new(
     output_format => $self->output_format,
     valid => 0,
@@ -829,20 +830,18 @@ sub _eval_subschema ($self, $data, $schema, $state) {
   return $valid;
 }
 
-my $path_type = Str->where('m{^(?:/|$)}');  # JSON pointer relative to the document root
 has _resource_index => (
   is => 'bare',
   isa => Map[my $resource_key_type = Str->where('!/#/'), my $resource_type = Dict[
-      # may not be stringwise-equal to the top level key
       canonical_uri => (InstanceOf['Mojo::URL'])->where(q{not defined $_->fragment}),
-      path => $path_type,
+      path => json_pointer_type,  # JSON pointer relative to the document root
       specification_version => my $spec_version_type = Enum(SPECIFICATION_VERSIONS_SUPPORTED),
       document => InstanceOf['JSON::Schema::Modern::Document'],
       # the vocabularies used when evaluating instance data against schema
       vocabularies => ArrayRef[my $vocabulary_class_type = ClassName->where(q{$_->DOES('JSON::Schema::Modern::Vocabulary')})],
       anchors => Optional[HashRef[Dict[
-        canonical_uri => (InstanceOf['Mojo::URL'])->where(q{not defined $_->fragment or substr($_->fragment, 0, 1) eq '/'}),
-        path => $path_type,
+        canonical_uri => canonical_uri_type,  # equivalent uri with json pointer fragment
+        path => json_pointer_type,  # JSON pointer relative to the document root
         dynamic => Optional[Bool],
       ]]],
       Slurpy[HashRef[Undef]],  # no other fields allowed
@@ -1293,7 +1292,7 @@ JSON::Schema::Modern - Validate data against a schema using a JSON Schema
 
 =head1 VERSION
 
-version 0.617
+version 0.618
 
 =head1 SYNOPSIS
 
@@ -1887,6 +1886,9 @@ types).
 Fetches the L<JSON::Schema::Modern::Document> object (or subclass) that contains the provided
 identifier (uri or uri-reference). C<undef> if the schema with that URI has not been loaded (or
 cached).
+
+Note: this _does not download a document from the network_. It only fetches the document from the
+internal cache in the C<JSON::Schema::Modern> document.
 
 =head1 CACHING
 

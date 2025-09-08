@@ -1,0 +1,51 @@
+---
+abstract: 'Generate CONTRIBUTING.md and SECURITY.md'
+author:
+  - 'Klaus Rindfrey <klausrin@cpan.org.eu>'
+build_requires:
+  Cwd: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Basename: '0'
+  File::Spec::Functions: '0'
+  File::Temp: '0'
+  Test::Fatal: '0'
+  Test::File::Cmp: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec::Functions: '0'
+  autodie: '0'
+  strict: '0'
+  warnings: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-PolicyFiles
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Dist::PolicyFiles:
+    file: lib/Dist/PolicyFiles.pm
+    version: '0.02'
+requires:
+  Carp: '0'
+  File::Basename: '0'
+  File::Spec::Functions: '0'
+  GitHub::Config::SSH::UserData: '0.05'
+  Software::Security::Policy::Individual: '0.11'
+  Text::Template: '1.61'
+  autodie: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: https://github.com/klaus-rindfrey/perl-dist-policyfiles.git
+version: '0.02'
+x_bugtracker:
+  web: https://github.com/klaus-rindfrey/perl-dist-policyfiles/issues
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

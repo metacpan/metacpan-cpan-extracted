@@ -5,7 +5,7 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
-    NAME               => 'SBOM-CycloneDX',
+    NAME               => 'SBOM::CycloneDX',
     AUTHOR             => q{Giuseppe Di Terlizzi <gdt@cpan.org>},
     VERSION_FROM       => 'lib/SBOM/CycloneDX.pm',
     LICENSE            => 'artistic_2',

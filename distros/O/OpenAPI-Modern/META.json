@@ -137,12 +137,13 @@
             "Term::ANSIColor" : "0",
             "Test2::API" : "0",
             "Test2::Tools::Exception" : "0",
+            "Test2::V0" : "0",
             "Test::Deep" : "0",
             "Test::File::ShareDir" : "0",
             "Test::JSON::Schema::Acceptance" : "1.014",
             "Test::Memory::Cycle" : "0",
             "Test::Mojo" : "0",
-            "Test::More" : "0.96",
+            "Test::More" : "0",
             "Test::Needs" : "0",
             "Test::Warnings" : "0.033",
             "YAML::PP" : "0.005",
@@ -236,15 +237,15 @@
    "provides" : {
       "JSON::Schema::Modern::Document::OpenAPI" : {
          "file" : "lib/JSON/Schema/Modern/Document/OpenAPI.pm",
-         "version" : "0.092"
+         "version" : "0.093"
       },
       "JSON::Schema::Modern::Vocabulary::OpenAPI" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/OpenAPI.pm",
-         "version" : "0.092"
+         "version" : "0.093"
       },
       "OpenAPI::Modern" : {
          "file" : "lib/OpenAPI/Modern.pm",
-         "version" : "0.092"
+         "version" : "0.093"
       }
    },
    "release_status" : "stable",
@@ -259,7 +260,7 @@
          "web" : "https://github.com/karenetheridge/OpenAPI-Modern"
       }
    },
-   "version" : "0.092",
+   "version" : "0.093",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.043002"
@@ -270,7 +271,7 @@
             "config" : {
                "Dist::Zilla::Plugin::Run::Role::Runner" : {
                   "eval" : [
-                     "unshift @INC, '%d/lib'; do './update-schemas'; die $@ || $! if $@ || $!"
+                     "do './update-schemas'; die $@ || $! if $@ || $!"
                   ],
                   "fatal_errors" : 1,
                   "quiet" : 0,
@@ -1148,7 +1149,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.092",
+                  "tag" : "v0.093",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },

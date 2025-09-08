@@ -1,0 +1,86 @@
+{
+   "abstract" : "Produce gcode files for pen plotters from Perl",
+   "author" : [
+      "Albert Koelmans (albert.koelmans@googlemail.com)."
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.26",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Graphics-Penplotter-GcodeXY",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "Font::FreeType" : "0",
+            "Image::SVG::Path" : "0",
+            "Image::SVG::Transform" : "0",
+            "List::Util" : "0",
+            "Math::Bezier" : "0",
+            "Math::Trig" : "0",
+            "POSIX" : "0",
+            "Readonly" : "0",
+            "Term::ANSIColor" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7",
+            "XML::Parser" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "v5.38.2"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Graphics::Penplotter::GcodeXY" : {
+         "file" : "lib/Graphics/Penplotter/GcodeXY.pm",
+         "version" : "v0.5.12"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/gamk67/Graphics-Penplotter-GcodeXY",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/gamk67/Graphics-Penplotter-GcodeXY.git",
+         "web" : "https://github.com/gamk67/Graphics-Penplotter-GcodeXY"
+      }
+   },
+   "version" : "v0.5.12",
+   "x_contributors" : [
+      "gamk67 <31990368+gamk67@users.noreply.github.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.16",
+   "x_static_install" : 1
+}

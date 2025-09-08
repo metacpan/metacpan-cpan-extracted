@@ -1,10 +1,10 @@
 use strictures 2;
-package OpenAPI::Modern; # git description: v0.091-13-g0b4443c
+package OpenAPI::Modern; # git description: v0.092-11-gd83c9c0
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI v3.1 document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI v3.1 Swagger HTTP request response
 
-our $VERSION = '0.092';
+our $VERSION = '0.093';
 
 use 5.020;
 use utf8;
@@ -375,7 +375,9 @@ sub find_path ($self, $options, $state = {}) {
     # The path_template cannot be found if the operation path is not directly under /paths (such as
     # for path-items reached by a $ref): we will do a URI -> path_template lookup later on,
     # which will work as long as the operation does not correspond to a webhook or callback.
-    # TODO: need a mechanism for specifying these
+    # TODO: need a mechanism for specifying these for validate_request
+    # FIXME: if the request's real 'path' has a $ref to this path-item, we will find the wrong
+    # path_template, and the subsequent _match_uri check will fail.
     if ($operation_path ne jsonp('/paths', $path_template, $method)) {
       undef $path_template;
     }
@@ -1124,7 +1126,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI v3.1 d
 
 =head1 VERSION
 
-version 0.092
+version 0.093
 
 =head1 SYNOPSIS
 
