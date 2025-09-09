@@ -1,5 +1,5 @@
-# This code is part of Perl distribution OODoc version 3.02.
-# The POD got stripped from this file by OODoc version 3.02.
+# This code is part of Perl distribution OODoc version 3.03.
+# The POD got stripped from this file by OODoc version 3.03.
 # For contributors see file ChangeLog.
 
 # This software is copyright (c) 2003-2025 by Mark Overmeer.
@@ -14,7 +14,7 @@
 #oodist: testing, however the code of this development version may be broken!
 
 package OODoc::Parser;{
-our $VERSION = '3.02';
+our $VERSION = '3.03';
 }
 
 use parent 'OODoc::Object';
@@ -52,8 +52,8 @@ sub init($)
 	$self->SUPER::init($args) or return;
 
 	my $skip = delete $args->{skip_links} || [];
-	my @skip = map { reftype $_ eq 'REGEXP' ? $_ : qr/^\Q$_\E(?:\:\:|$)/ }
-		reftype $skip eq 'ARRAY' ? @$skip : $skip;
+	my @skip = map { ref $_ eq 'REGEXP' ? $_ : qr/^\Q$_\E(?:\:\:|$)/ }
+		ref $skip eq 'ARRAY' ? @$skip : $skip;
 
 	$self->{skip_links} = \@skip;
 	$self;

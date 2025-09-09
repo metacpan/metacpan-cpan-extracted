@@ -30,11 +30,15 @@ Extends L<"OVERLOADED" in OODoc::Export|OODoc::Export/"OVERLOADED">.
 
 =over 4
 
-=item overload: B<'==' and '!=' (numeric comparison)>
+=item overload: B<'!='> (numeric different)
 
 Inherited, see L<OODoc::Object/"OVERLOADED">
 
-=item overload: B<'bool'>
+=item overload: B<'=='> (numeric equivalent)
+
+Inherited, see L<OODoc::Object/"OVERLOADED">
+
+=item overload: B<'bool'> 
 
 Inherited, see L<OODoc::Object/"OVERLOADED">
 
@@ -74,73 +78,29 @@ Extends L<"Attributes" in OODoc::Export|OODoc::Export/"Attributes">.
 
 =over 4
 
-=item $obj-E<gt>B<unique>()
-
-Inherited, see L<OODoc::Object/"Attributes">
-
-=back
-
-=head2 Manual Repository
-
-Extends L<"Manual Repository" in OODoc::Export|OODoc::Export/"Manual Repository">.
-
-=over 4
-
-=item $obj-E<gt>B<addManual>($manual)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<findManual>($name)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<mainManual>($name)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<manuals>()
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<manualsForPackage>($name)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<packageNames>()
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<publicationIndex>()
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<publish>(\%options)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=back
-
-=head2 Atributes
-
-Extends L<"Atributes" in OODoc::Export|OODoc::Export/"Atributes">.
-
-=over 4
-
 =item $obj-E<gt>B<format>()
 
-Inherited, see L<OODoc::Export/"Atributes">
+Inherited, see L<OODoc::Export/"Attributes">
 
 =item $obj-E<gt>B<markupStyle>()
 
-Inherited, see L<OODoc::Export/"Atributes">
+Inherited, see L<OODoc::Export/"Attributes">
 
 =item $obj-E<gt>B<parser>()
 
-Inherited, see L<OODoc::Export/"Atributes">
+Inherited, see L<OODoc::Export/"Attributes">
+
+=item $obj-E<gt>B<publish>(\%options)
+
+Inherited, see L<OODoc::Object/"Attributes">
 
 =item $obj-E<gt>B<serializer>()
 
-Inherited, see L<OODoc::Export/"Atributes">
+Inherited, see L<OODoc::Export/"Attributes">
+
+=item $obj-E<gt>B<unique>()
+
+Inherited, see L<OODoc::Object/"Attributes">
 
 =back
 
@@ -205,24 +165,18 @@ Extends L<"DETAILS" in OODoc::Export|OODoc::Export/"DETAILS">.
 
 =item Fault: cannot write output to $file: $!
 
-Z<>
-
-=item Error: manual definition requires manual object
-
-A call to L<addManual()|OODoc::Object/"Manual Repository"> expects a new manual object (a L<OODoc::Manual|OODoc::Manual>),
-however an incompatible thing was passed.  Usually, intended was a call
-to L<manualsForPackage()|OODoc::Object/"Manual Repository"> or L<mainManual()|OODoc::Object/"Manual Repository">.
+Cast by write()
 
 =item Fault: write errors to $file: $!
 
-Z<>
+Cast by write()
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of OODoc version 3.02,
-built on August 15, 2025. Website: F<https://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.03,
+built on September 08, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 

@@ -4,7 +4,7 @@ use utf8;
 use strict;
 use warnings;
 
-$Acme::Glue::VERSION = "2025.06";
+$Acme::Glue::VERSION = "2025.09";
 
 =encoding utf8
 
@@ -14,9 +14,16 @@ Acme::Glue - A placeholder module for code accompanying a Perl photo project
 
 =head1 VERSION
 
-2025.06
+2025.09
 
 =head1 DESCRIPTION
+
+=begin HTML
+
+<p><img src="https://images.squarespace-cdn.com/content/v1/60f40aa1942bba66cf802d7d/1626967232855-GP54O7LH9BAGBGAXJXUJ/05_yapc_eu_2016_f04.jpg?format=625w"
+width="525" alt="Acme::Glue Photo" /></p>
+
+=end HTML
 
 Acme::Glue is the companion Perl module for a Perl photo project, the idea
 for the photo project is to have each photo include a small snippet of code.

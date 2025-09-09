@@ -20,5 +20,5 @@ no_index:
 resources:
   license: http://dev.perl.org/licenses/
   repository: http://github.com/rurban/Opcodes
-version: '0.15'
+version: '0.16'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -2,7 +2,7 @@ NAME
     Mock::Config - temporarily set Config or XSConfig values
 
 VERSION
-    Version 0.04
+    Version 0.05
 
 SYNOPSIS
     XSConfig is readonly, so workaround that.

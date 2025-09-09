@@ -1,4 +1,5 @@
 /* -*- c-basic-offset:4 -*- */
+#define PERL_EXT_RE_BUILD
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
@@ -275,7 +276,17 @@ PCRE2_comp(pTHX_ SV * const pattern, U32 flags)
 
     /* Check how many parens we need */
     (void)pcre2_pattern_info(ridata->ri, PCRE2_INFO_CAPTURECOUNT, &nparens);
-    re->nparens = re->lastparen = re->lastcloseparen = nparens;
+    re->nparens = nparens;
+#if (PERL_VERSION >= 37 && PERL_SUBVERSION >= 8)
+    /* this is used to support Branch Reset (?|(a)|(b)) style patterns.
+     * The physical buffer layout may be larger than the logical layout
+     */
+    re->logical_nparens = nparens;
+#endif
+    /* these are run time properties, they should be 0 after compile. They
+     * should only be set after execution */
+    re->lastparen = 0;
+    re->lastcloseparen = 0;
     Newxz(re->offs, nparens + 1, regexp_paren_pair);
 
     /* return the regexp */
@@ -453,17 +464,20 @@ PCRE2_exec(pTHX_ REGEXP * const rx, char *stringarg, char *strend,
         return 0;
     }
 
-    re->subbeg = strbeg;
     re->sublen = strend - strbeg;
+    re->subbeg = savepvn(strbeg, re->sublen);
 
     rc = pcre2_get_ovector_count(ridata->match_data);
     ovector = pcre2_get_ovector_pointer(ridata->match_data);
     DEBUG_r(PerlIO_printf(Perl_debug_log,
         "PCRE2 match \"%.*s\" =~ /%s/: found %d matches\n",
         (int)re->sublen, strbeg, RX_WRAPPED(rx), rc-1));
+    re->lastparen = rc - 1;
+    re->lastcloseparen = rc -1;
     for (i = 0; i < rc; i++) {
         re->offs[i].start = ovector[i * 2];
         re->offs[i].end   = ovector[i * 2 + 1];
+
         DEBUG_r(PerlIO_printf(Perl_debug_log,
             "match[%d]: \"%.*s\" [%d,%d]\n",
             i, (int)(re->offs[i].end - re->offs[i].start), &stringarg[re->offs[i].start],

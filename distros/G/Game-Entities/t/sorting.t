@@ -1,32 +1,31 @@
 #!/usr/bin/env perl
 
-use Test::More;
-use Game::Entities;
+use Test2::V0 -target => 'Game::Entities';
 use List::Util 'shuffle';
 
 # A pseudo-component
 my $new = sub { bless \( my $x = $_[1] ), $_[0] };
 
 subtest Comparator => sub {
-    my $R = Game::Entities->new;
+    my $R = Game::Entities->new( prefix => 'X' );
 
     srand 1234;
     my @shuffled = shuffle 1 .. 30;;
 
     for ( 0 .. $#shuffled ) {
         my $guid = $R->create;
-        $R->add( $guid => A->$new( $shuffled[$_] ) );
-        $R->add( $guid => B->$new( $shuffled[$_] ) ) unless $_ % 2;
-        $R->add( $guid => C->$new( $shuffled[$_] ) ) unless $_ % 3;
+        $R->add( $guid =>    'A'->$new( $shuffled[$_] ) );
+        $R->add( $guid => 'X::B'->$new( $shuffled[$_] ) ) unless $_ % 2;
+        $R->add( $guid =>    'C'->$new( $shuffled[$_] ) ) unless $_ % 3;
     };
 
     # Sort B numerically
-    $R->sort( B => sub { $$a <=> $$b } );
+    $R->sort( ':B' => sub { $$a <=> $$b } );
 
-    $R->sort( A => 'B' ); # Sort A according to B
-    $R->sort( C => 'B' ); # Sort C according to B
+    $R->sort( A => ':B' ); # Sort A according to B
+    $R->sort( C => ':B' ); # Sort C according to B
 
-    is_deeply [ map ${ $_->[0] }, $R->view('A')->components ] => [
+    is [ map ${ $_->[0] }, $R->view('A')->components ] => [
         2,
         3,
         5,
@@ -59,7 +58,7 @@ subtest Comparator => sub {
         23
     ] => 'Sorted component pool with subset';
 
-    is_deeply [ map ${ $_->[0] }, $R->view('B')->components ] => [
+    is [ map ${ $_->[0] }, $R->view(':B')->components ] => [
         2,
         3,
         5,
@@ -77,7 +76,7 @@ subtest Comparator => sub {
         29
     ] => 'Sorted component pool numerically';
 
-    is_deeply [ map ${ $_->[0] }, $R->view('C')->components ] => [
+    is [ map ${ $_->[0] }, $R->view('C')->components ] => [
         5,
         8,
         16,
@@ -110,7 +109,7 @@ subtest Prototype => sub {
     $R->sort( A => 'B' ); # Sort A according to B
     $R->sort( C => 'B' ); # Sort C according to B
 
-    is_deeply [ map ${ $_->[0] }, $R->view('A')->components ] => [
+    is [ map ${ $_->[0] }, $R->view('A')->components ] => [
         2,
         3,
         5,
@@ -143,7 +142,7 @@ subtest Prototype => sub {
         23
     ] => 'Sorted component pool with subset';
 
-    is_deeply [ map ${ $_->[0] }, $R->view('B')->components ] => [
+    is [ map ${ $_->[0] }, $R->view('B')->components ] => [
         2,
         3,
         5,
@@ -161,7 +160,7 @@ subtest Prototype => sub {
         29
     ] => 'Sorted component pool numerically';
 
-    is_deeply [ map ${ $_->[0] }, $R->view('C')->components ] => [
+    is [ map ${ $_->[0] }, $R->view('C')->components ] => [
         5,
         8,
         16,

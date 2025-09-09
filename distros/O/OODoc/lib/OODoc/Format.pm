@@ -1,5 +1,5 @@
-# This code is part of Perl distribution OODoc version 3.02.
-# The POD got stripped from this file by OODoc version 3.02.
+# This code is part of Perl distribution OODoc version 3.03.
+# The POD got stripped from this file by OODoc version 3.03.
 # For contributors see file ChangeLog.
 
 # This software is copyright (c) 2003-2025 by Mark Overmeer.
@@ -14,7 +14,7 @@
 #oodist: testing, however the code of this development version may be broken!
 
 package OODoc::Format;{
-our $VERSION = '3.02';
+our $VERSION = '3.03';
 }
 
 use parent 'OODoc::Object';
@@ -25,13 +25,14 @@ use warnings;
 use Log::Report    'oodoc';
 
 use OODoc::Manifest ();
+use Scalar::Util    qw/weaken/;
 
-our %formatters =
-( pod   => 'OODoc::Format::Pod',
+our %formatters = (
+	pod   => 'OODoc::Format::Pod',
 	pod2  => 'OODoc::Format::Pod2',
 	pod3  => 'OODoc::Format::Pod3',
 	html  => 'OODoc::Format::Html',
-	html2 => 'OODoc::Format::Html2'   # not (yet) included in the OODoc release
+	html2 => 'OODoc::Format::Html2',   # not (yet) included in the OODoc release
 );
 
 #--------------------
@@ -42,9 +43,7 @@ sub new($%)
 	$class eq __PACKAGE__
 		or return $class->SUPER::new(%args);
 
-	my $format = $args{format}
-		or error __x"no formatter specified.";
-
+	my $format = $args{format} or error __x"no formatter specified";
 	my $pkg = $formatters{$format} || $format;
 
 	eval "require $pkg";
@@ -69,6 +68,10 @@ sub init($)
 		or error __x"no working directory specified for {name}", name => $name;
 
 	$self->{OF_manifest} = delete $args->{manifest} || OODoc::Manifest->new;
+
+	$self->{OF_index}    = delete $args->{index}  or error __x"no index specified";
+	weaken($self->{OF_index});
+
 	$self;
 }
 
@@ -83,6 +86,7 @@ sub version()  { $_[0]->{OF_version} }
 sub workdir()  { $_[0]->{OF_workdir} }
 sub manifest() { $_[0]->{OF_manifest} }
 sub format()   { $_[0]->{OF_format} }
+sub index()    { $_[0]->{OF_index} }
 
 #--------------------
 
@@ -95,9 +99,11 @@ sub createPages(%)
 	# Manual knowledge is global
 
 	my $options = $args{manual_format} || [];
-	foreach my $package (sort $self->packageNames)
+	my $index   = $self->index;
+
+	foreach my $package (sort $index->packageNames)
 	{
-		foreach my $manual ($self->manualsForPackage($package))
+		foreach my $manual ($index->manualsForPackage($package))
 		{	$select->($manual) or next;
 
 			unless($manual->chapters)

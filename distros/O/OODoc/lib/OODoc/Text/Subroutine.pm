@@ -1,5 +1,5 @@
-# This code is part of Perl distribution OODoc version 3.02.
-# The POD got stripped from this file by OODoc version 3.02.
+# This code is part of Perl distribution OODoc version 3.03.
+# The POD got stripped from this file by OODoc version 3.03.
 # For contributors see file ChangeLog.
 
 # This software is copyright (c) 2003-2025 by Mark Overmeer.
@@ -14,7 +14,7 @@
 #oodist: testing, however the code of this development version may be broken!
 
 package OODoc::Text::Subroutine;{
-our $VERSION = '3.02';
+our $VERSION = '3.03';
 }
 
 use parent 'OODoc::Text';
@@ -49,8 +49,13 @@ sub _call($)
 	my $name       = $exporter->markupString($self->name);
 	my $paramlist  = $exporter->markupString($self->parameters);
 
+	### Also implemented in the formatters...
+
 	if($style eq 'html')
 	{	my $call       = qq[<b><a name="$unique">$name</a></b>];
+		$type eq 'tie'
+			and return qq[tie $call, $paramlist];
+
 		$call         .= "(&nbsp;$paramlist&nbsp;)" if length $paramlist;
 
 		return
@@ -59,15 +64,15 @@ sub _call($)
 		  : $type eq 'ci_method'? qq[\$any-&gt;$call]
 		  : $type eq 'overload' ? qq[overload: $call]
 		  : $type eq 'function' ? qq[$call]
-		  : $type eq 'tie'      ? $call
-		  : panic "Type $type? for $call";
+		  :    panic "Type $type? for $call";
 	}
 
 	if($style eq 'pod')
-	{	my $params
-		  = !length $paramlist ? '()'
-		  : $paramlist =~ m/^[\[<]|[\]>]$/ ? "( $paramlist )"
-		  :                      "($paramlist)";
+	{	$type eq 'tie'
+			and return qq[tie B<$name>, $paramlist];
+
+		my $params = !length $paramlist ? '()' :
+			$paramlist =~ m/^[\[<]|[\]>]$/ ? "( $paramlist )" : "($paramlist)";
 
 		return
 			$type eq 'i_method' ? qq[\$obj-E<gt>B<$name>$params]
@@ -75,7 +80,6 @@ sub _call($)
 		  : $type eq 'ci_method'? qq[\$any-E<gt>B<$name>$params]
 		  : $type eq 'function' ? qq[B<$name>$params]
 		  : $type eq 'overload' ? qq[overload: B<$name>]
-		  : $type eq 'tie'      ? qq[B<$name>$params]
 		  :    panic $type;
 	}
 

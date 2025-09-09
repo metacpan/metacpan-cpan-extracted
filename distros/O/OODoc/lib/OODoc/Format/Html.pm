@@ -1,5 +1,5 @@
-# This code is part of Perl distribution OODoc version 3.02.
-# The POD got stripped from this file by OODoc version 3.02.
+# This code is part of Perl distribution OODoc version 3.03.
+# The POD got stripped from this file by OODoc version 3.03.
 # For contributors see file ChangeLog.
 
 # This software is copyright (c) 2003-2025 by Mark Overmeer.
@@ -15,7 +15,7 @@
 #oorestyle: not found P for method expandTemplate($name)
 
 package OODoc::Format::Html;{
-our $VERSION = '3.02';
+our $VERSION = '3.03';
 }
 
 use parent 'OODoc::Format';
@@ -399,6 +399,7 @@ sub showSubroutineUse(@)
 	my $subroutine = $args{subroutine} or panic;
 	my $manual     = $args{manual}     or panic;
 	my $output     = $args{output}     or panic;
+	my $type       = $subroutine->type;
 
 	my $unique     = $subroutine->unique;
 	$self->mark($manual, $unique);
@@ -406,16 +407,15 @@ sub showSubroutineUse(@)
 	my $name       = $self->cleanupString($manual, $subroutine->name);
 	my $paramlist  = $self->cleanupString($manual, $subroutine->parameters);
 	my $call       = qq[<b><a name="$unique">$name</a></b>];
-	$call         .= "(&nbsp;$paramlist&nbsp;)" if length $paramlist;
+	my $param      = length $paramlist ? "(&nbsp;$paramlist&nbsp;)" : '';
 
-	my $type       = $subroutine->type;
 	my $use
-	  = $type eq 'i_method' ? qq[\$obj-&gt;$call]
-	  : $type eq 'c_method' ? qq[\$class-&gt;$call]
-	  : $type eq 'ci_method'? qq[\$any-&gt;$call]
-	  : $type eq 'overload' ? qq[overload: $call]
-	  : $type eq 'function' ? qq[$call]
-	  : $type eq 'tie'      ? $call
+	  = $type eq 'i_method' ? qq[\$obj-&gt;$call$param]
+	  : $type eq 'c_method' ? qq[\$class-&gt;$call$param]
+	  : $type eq 'ci_method'? qq[\$any-&gt;$call$param]
+	  : $type eq 'overload' ? qq[overload: $call $paramlist]
+	  : $type eq 'function' ? qq[$call$param]
+	  : $type eq 'tie'      ? qq[tie $call, $paramlist]
 	  :     panic "Type $type? for $call";
 
 	$output->print( <<SUBROUTINE );
@@ -471,7 +471,10 @@ sub showOptionUse(@)
 	$params    = qq[ =&gt; <span class="params">$params</span>]
 		if length $params;
 
-	my $use    = qq[<span class="option">$option</span>];
+	my $id     = $option->unique;
+	$self->mark($manual, $id);
+
+	my $use    = qq[<span class="option"><a name="$id">$option</a></span>];
 	$output->print( qq[<dt class="option_use">$use$params</dt>\n] );
 	$self;
 }
@@ -750,11 +753,12 @@ sub templateIndex($$)
 
 	my $columns = $attrs->{table_columns} || 2;
 	my @rows;
+	my @manuals = $self->index->manuals;
 
 	if($group eq 'SUBROUTINES')
 	{	my @subs;
 
-		foreach my $manual ($self->manuals)
+		foreach my $manual (@manuals)
 		{	foreach my $sub ($select->($manual->ownSubroutines))
 			{	my $linksub = $self->link($manual, $sub, $sub->name);
 				my $linkman = $self->link(undef, $manual, $manual->name);
@@ -766,7 +770,7 @@ sub templateIndex($$)
 		@rows = map $_->[1], sort { $a->[0] cmp $b->[0] } @subs;
 	}
 	elsif($group eq 'DIAGNOSTICS')
-	{	foreach my $manual ($self->manuals)
+	{	foreach my $manual (@manuals)
 		{	foreach my $sub ($manual->ownSubroutines)
 			{	my @diags    = $select->($sub->diagnostics) or next;
 
@@ -787,7 +791,7 @@ DIAG
 		@rows = sort @rows;
 	}
 	elsif($group eq 'DETAILS')
-	{	foreach my $manual (sort $select->($self->manuals))
+	{	foreach my $manual (sort $select->(@manuals))
 		{	my $details  = $manual->chapter("DETAILS") or next;
 			my @sections;
 			foreach my $section ($details->sections)
@@ -801,12 +805,11 @@ DIAG
 
 			my $sections = join "\n", map "<li>".$self->link($manual, $_)."</li>", @sections;
 
-			push @rows, $self->link($manual, $details, "Details in $manual")
-			. qq[\n<ul>\n$sections</ul>\n]
+			push @rows, $self->link($manual, $details, "Details in $manual") . qq[\n<ul>\n$sections</ul>\n]
 		}
 	}
 	elsif($group eq 'MANUALS')
-	{	@rows = map $self->link(undef, $_, $_->name), sort $select->($self->manuals);
+	{	@rows = map $self->link(undef, $_, $_->name), sort $select->(@manuals);
 	}
 	else
 	{	error __x"unknown group {name} as list attribute", name => $group;
@@ -818,9 +821,7 @@ DIAG
 
 	my $output = qq[<tr>];
 	while(@rows >= $columns)
-	{	$output .= qq[<td valign="top" width="$width">]
-				. join( "<br>\n", splice(@rows, 0, $rows))
-				.  qq[</td>\n];
+	{	$output .= qq[<td valign="top" width="$width">] . join( "<br>\n", splice(@rows, 0, $rows)) . qq[</td>\n];
 	}
 	$output   .= qq[</tr>\n];
 	$output;

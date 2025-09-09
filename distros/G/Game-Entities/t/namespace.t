@@ -1,9 +1,9 @@
 #!/usr/bin/env perl
 
-use Test::More;
+use Test2::V0;
 use Game::Entities;
 
-is_deeply [ sort keys %Game::Entities:: ], [qw(
+is [ sort keys %Game::Entities:: ], [qw(
     BEGIN
     GUID::
     Set::
@@ -28,7 +28,7 @@ is_deeply [ sort keys %Game::Entities:: ], [qw(
     view
 )] => 'No unexpected methods in Game::Entities namespace';
 
-is_deeply [ sort keys %Game::Entities::View:: ], [qw|
+is [ sort keys %Game::Entities::View:: ], [qw|
     ((
     (@{}
     (bool

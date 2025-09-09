@@ -146,8 +146,17 @@ README : \$(VERSION_FROM)
 README.md : \$(VERSION_FROM)
 	pod2markdown \$(VERSION_FROM) > \$@
 
-release : dist
-	git tag \$(VERSION)
+xtest :: test
+	RELEASE_TESTING=1 \$(MAKE) test TEST_FILES=t/z_*.t
+
+release : xtest dist
+	if test \"\$(shell git rev-parse --abbrev-ref HEAD)\" != \"master\" || \\
+           test \"\$(shell git diff --raw)\" != \"\" || \\
+           test \"\$(shell git diff --cached --raw)\" != \"\" ; then \\
+          echo 'You are not on a clean master branch, aborting.'; \\
+          exit 1; \\
+	fi
+	-git tag -f \$(VERSION)
 	cpan-upload \$(DISTVNAME).tar\$(SUFFIX)
 	git push
 	git push --tags

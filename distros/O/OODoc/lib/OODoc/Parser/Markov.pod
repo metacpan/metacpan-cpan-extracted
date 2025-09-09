@@ -31,11 +31,15 @@ Extends L<"OVERLOADED" in OODoc::Parser|OODoc::Parser/"OVERLOADED">.
 
 =over 4
 
-=item overload: B<'==' and '!=' (numeric comparison)>
+=item overload: B<'!='> (numeric different)
 
 Inherited, see L<OODoc::Object/"OVERLOADED">
 
-=item overload: B<'bool'>
+=item overload: B<'=='> (numeric equivalent)
+
+Inherited, see L<OODoc::Object/"OVERLOADED">
+
+=item overload: B<'bool'> 
 
 Inherited, see L<OODoc::Object/"OVERLOADED">
 
@@ -57,6 +61,7 @@ Inherited, see L<OODoc::Object/"Constructors">
 
  -Option          --Defined in     --Default
   additional_rules                   []
+  index                              <required>
   skip_links        OODoc::Parser    undef
   syntax            OODoc::Parser    'markov'
 
@@ -67,6 +72,10 @@ Inherited, see L<OODoc::Object/"Constructors">
 Reference to an array which contains references to match-action pairs,
 as accepted by L<rule()|OODoc::Parser::Markov/"Parsing a file">.  These rules get preference over the existing
 rules.
+
+=item index => OODoc::Index object
+
+[2.01] where the package and manual administration is.
 
 =item skip_links => ARRAY|REGEXP|STRING
 
@@ -92,6 +101,14 @@ With a new C<$manual>, a new one is set.
 When a C<BOOLEAN> is specified, the status changes.  It returns the current
 status of the document reader.
 
+=item $obj-E<gt>B<index>()
+
+[2.01] Returns the documentation tree administration.
+
+=item $obj-E<gt>B<publish>(\%options)
+
+Inherited, see L<OODoc::Object/"Attributes">
+
 =item $obj-E<gt>B<rules>()
 
 Returns the ARRAY of active rules.  You may modify it.
@@ -104,46 +121,6 @@ in.
 =item $obj-E<gt>B<unique>()
 
 Inherited, see L<OODoc::Object/"Attributes">
-
-=back
-
-=head2 Manual Repository
-
-Extends L<"Manual Repository" in OODoc::Parser|OODoc::Parser/"Manual Repository">.
-
-=over 4
-
-=item $obj-E<gt>B<addManual>($manual)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<findManual>($name)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<mainManual>($name)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<manuals>()
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<manualsForPackage>($name)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<packageNames>()
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<publicationIndex>()
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<publish>(\%options)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
 
 =back
 
@@ -168,7 +145,8 @@ example:
 
 =item $obj-E<gt>B<parse>(%options)
 
-Inherited, see L<OODoc::Parser/"Parsing a file">
+Process an input file into manual fragments.
+Improves base, see L<OODoc::Parser/"Parsing a file">
 
  -Option      --Default
   distribution  <required>
@@ -666,34 +644,37 @@ B<. Example: how subroutines are documented>
 
 =item Warning: Pod tag $tag does not terminate any doc in $file line $line
 
-Z<>
+Cast by parse()
 
 =item Warning: Pod tag $tag does not terminate any doc in $file line $number
 
 There is no document to end here.
+Cast by parse()
 
 =item Error: Unknown format key '$key' in manual $manual
 
-Z<>
+Cast by cleanupPodL()
 
 =item Warning: You may have accidentally captured code in doc $file line $linenr
 
 Some keywords on the first position of a line are very common for code.
 However, code within doc should start with a blank to indicate pre-formatted
 lines.  Rarely, this warning may be produced incorrectly.
+Cast by parse()
 
 =item Fault: cannot read document from $file: $!
 
 The document file can not be processed because it can not be read.  Reading
 is required to be able to build a documentation tree.
+Cast by parse()
 
 =item Fault: cannot write stripped code to $file: $!
 
-Z<>
+Cast by parse()
 
 =item Error: chapter $name before package statement in $file line $line
 
-Z<>
+Cast by parse()
 
 =item Error: chapter `$name' before package statement in $file line $number
 
@@ -701,6 +682,7 @@ A package file can contain more than one package: more than one
 name space.  The docs are sorted after the name space.  Therefore,
 each chapter must be preceeded by a package statement in the file
 to be sure that the correct name space is used.
+Cast by parse()
 
 =item Warning: debugging remains in $file line $linenr
 
@@ -708,54 +690,54 @@ The author's way of debugging is by putting warn/die/carp etc on the
 first position of a line.  Other lines in a method are always indented,
 which means that these debugging lines are clearly visible.  You may
 simply ingnore this warning.
+Cast by parse()
 
 =item Error: default for option $name outside subroutine in $file line $linenr
 
 A default is set, however there is not subroutine in scope (yet).  It
 is plausible that the option does not exist either, but that will
 be checked later.
+Cast by parse()
 
 =item Warning: default line incorrect in $file line $linenr:\n $line
 
 The shown C<$line> is not in the right format: it should contain at least
 two words being the option name and the default value.
+Cast by parse()
 
 =item Error: diagnostic $type outside subroutine in $file line $linenr
 
 It is unclear to which subroutine this diagnostic message belongs.
+Cast by parse()
 
 =item Warning: doc did not end in $file
 
 When the whole C<$file> was parsed, the documentation part was still open.
 Probably you forgot to terminate it with a C<=cut>.
+Cast by parse()
 
 =item Warning: empty L link in $manual
 
-Z<>
+Cast by decomposeL()
 
 =item Error: example outside chapter in $file line $linenr
 
 An example can belong to a subroutine, chapter, section, and subsection.
 Apparently, this example was found before the first chapter started in
 the file.
+Cast by parse()
 
 =item Warning: in $where, options but no call parameter %options
 
-Z<>
+Cast by autoMarkup()
 
 =item Warning: in $where, text uses unknown '$label'
 
-Z<>
+Cast by autoMarkup()
 
 =item Warning: manual $manual links to unknown entry '$item' in $other_manual
 
-Z<>
-
-=item Error: manual definition requires manual object
-
-A call to L<addManual()|OODoc::Object/"Manual Repository"> expects a new manual object (a L<OODoc::Manual|OODoc::Manual>),
-however an incompatible thing was passed.  Usually, intended was a call
-to L<manualsForPackage()|OODoc::Object/"Manual Repository"> or L<mainManual()|OODoc::Object/"Manual Repository">.
+Cast by decomposeL()
 
 =item Warning: module $name is not on your system, but linked to in $manual
 
@@ -763,20 +745,23 @@ The module can not be found.  This may be an error at your part (usually
 a typo) or you didn't install the module on purpose.  This message will
 also be produced if some defined package is stored in one file together
 with an other module or when compilation errors are encountered.
+Cast by decomposeM()
 
 =item Warning: no block for line $linenr in file $file\n $line
 
-Z<>
+Cast by parse()
 
 =item Warning: no diagnostic message supplied in $file line $linenr
 
 The start of a diagnostics message was indicated, however not provided
 on the same line.
+Cast by parse()
 
 =item Error: no input file to parse specified
 
 The parser needs the name of a file to be read, otherwise it can not
 work.
+Cast by parse()
 
 =item Warning: no manual for $package (correct casing?)
 
@@ -784,69 +769,81 @@ The manual for C<$package> cannot be found.  If you have a module named this
 way, this may indicate that the NAME chapter of the manual page in that
 module differs from the package name.  Often, this is a typo in the
 NAME... probably a difference in used cases.
+Cast by decomposeM()
 
 =item Error: option $name outside subroutine in $file line $linenr
 
 An option is set, however there is not subroutine in scope (yet).
+Cast by parse()
 
 =item Warning: option '$name' unknown for $call() in $where, found in $manual
 
-Z<>
+Cast by decomposeM()
 
 =item Warning: option line incorrect in $file line $linenr:\n $line
 
 The shown C<$line> is not in the right format: it should contain at least
 two words being the option name and an abstract description of possible
 values.
+Cast by parse()
 
 =item Warning: requires line incorrect in $file line $linenr:\n $line
 
-Z<>
+Cast by parse()
 
 =item Error: section '$name' outside chapter in $file line $line
 
-Z<>
+Cast by parse()
 
 =item Error: section '$name' outside chapter in $file line $number
 
 Sections must be contained in chapters.
+Cast by parse()
 
 =item Warning: subroutine $call() is not defined by $pkg, but linked to in $manual
 
-Z<>
+Cast by decomposeM()
 
 =item Error: subroutine $name outside chapter in $file line $line
 
-Z<>
+Cast by parse()
 
 =item Error: subroutine $name outside chapter in $file line $number
 
 Subroutine descriptions (method, function, tie, ...) can only be used
 within a restricted set of chapters.  You have not started any
 chapter yet.
+Cast by parse()
+
+=item Error: subroutine without name in $file line $line
+
+Cast by parse()
 
 =item Error: subsection '$name' outside section in $file line $line
 
-Z<>
+Cast by parse()
 
 =item Error: subsection '$name' outside section in $file line $number
 
 Subsections are only allowed in a chapter when it is nested within
 a section.
+Cast by parse()
 
 =item Error: subsubsection '$name' outside section in $file line $line
 
-Z<>
+Cast by parse()
 
 =item Error: subsubsection '$name' outside subsection in $file line $number
 
 Subsubsections are only allowed in a chapter when it is nested within
 a subsection.
+Cast by parse()
 
 =item Warning: unknown markup in $file line $linenr:\n $line
 
 The standard pod and the extensions made by this parser define a long
 list of markup keys, but yours is not one of these predefined names.
+Cast by parse()
 
 =item Warning: use problem for module $name in $manual;\n$err
 
@@ -854,13 +851,14 @@ In an attempt to check the correctness of your naming of a module,
 OODoc will try to compile ("require") the named module.  Apparently,
 the module was found, but something else went wrong.  The exact cause
 is not always easy to find.
+Cast by decomposeM()
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of OODoc version 3.02,
-built on August 15, 2025. Website: F<https://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.03,
+built on September 08, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 

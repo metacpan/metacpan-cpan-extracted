@@ -167,7 +167,7 @@ info "*  producing $project release $version";
 ### Start OODoc
 ###
 
-my $doc  = OODoc->new(
+my $doc = OODoc->new(
 	distribution => $project,
 	version      => $version,  # version of whole
 );
@@ -287,7 +287,7 @@ sub extract_distro($%)
 	my $p_config = $dist_config->{parser} || { };
 	my $pmheadfn = rel2abs delete $p_config->{pmhead} || 'PMHEAD.txt', $dir;
 	my $select   = delete $p_config->{select} || qr[^ lib/ .*? \.(?:pod|pm) $ ]x;
-	my $parser   = OODoc::Parser->new(%$p_config);
+	my $parser   = OODoc::Parser->new(%$p_config, index => $doc->index);
 
 	if($is_root)
 	{	my $pmhead   = -f $pmheadfn ? read_text $pmheadfn : $default_pmhead;
@@ -744,13 +744,9 @@ sub create_export($$)
 	require OODoc::Export;
 	my $exporter = OODoc::Export->new(serializer => $serial, markup => $markup);
 
-#	my $tail = oodist_meta $makefile;
-#	$tail->{license_year_range} = delete $tail->{year};  # naming improvement
-
 	my $tree = $exporter->tree($doc,
 		manuals       => $manuals,
 		distributions => \%distros,
-#		meta     => $tail,      # only flat key-value, where value is a string
 	);
 
 	-d $dest || mkdir $dest

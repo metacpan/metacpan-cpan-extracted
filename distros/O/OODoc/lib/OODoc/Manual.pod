@@ -14,11 +14,13 @@ OODoc::Manual - one manual about a package
   my $doc    = OODoc->new(...);
   my $manual = OODoc::Manual->new(name => ..., source => ...);
 
-  $doc->findManual($manual);
-  my @manual = $doc->manualsForPackage('Mail::Box');
+  my $index  = $doc->index;
+  my $manual = $index->findManual($name);
+  my @manual = $index->manualsForPackage('Mail::Box');
 
   print $manual->name;
   print $manual->package;
+  print $manual->overview;
 
 =head1 DESCRIPTION
 
@@ -33,15 +35,19 @@ Extends L<"OVERLOADED" in OODoc::Object|OODoc::Object/"OVERLOADED">.
 
 =over 4
 
-=item overload: B<'==' and '!=' (numeric comparison)>
+=item overload: B<'!='> (numeric different)
 
 Inherited, see L<OODoc::Object/"OVERLOADED">
 
-=item overload: B<'bool'>
+=item overload: B<'=='> (numeric equivalent)
 
 Inherited, see L<OODoc::Object/"OVERLOADED">
 
-=item overload: B<cmp>
+=item overload: B<'bool'> 
+
+Inherited, see L<OODoc::Object/"OVERLOADED">
+
+=item overload: B<cmp> 
 
 String comparison takes place between a manual name and another
 manual name which may be a manual object or any other string or
@@ -53,7 +59,7 @@ example:
   if($man1 eq $man2) ...
   my @sorted = sort @manuals;    # implicit calls to cmp
 
-=item overload: B<stringification>
+=item overload: B<stringification> 
 
 Used in string context, a manual produces its name.
 
@@ -75,6 +81,7 @@ Inherited, see L<OODoc::Object/"Constructors">
 
  -Option      --Default
   distribution  <required>
+  index         <required>
   package       <required>
   parser        <required>
   pure_pod      false
@@ -85,6 +92,10 @@ Inherited, see L<OODoc::Object/"Constructors">
 =over 2
 
 =item distribution => STRING
+
+=item index => OODoc::Index
+
+[2.01] Needed for see which packages belong to this manual.
 
 =item package => STRING
 
@@ -125,6 +136,10 @@ Extends L<"Attributes" in OODoc::Object|OODoc::Object/"Attributes">.
 
 Returns the distribution which includes this manual.
 
+=item $obj-E<gt>B<index>()
+
+Z<>
+
 =item $obj-E<gt>B<isPurePod>()
 
 Returns whether this package has real code related to it.
@@ -136,6 +151,10 @@ Returns the package of the manual.
 =item $obj-E<gt>B<parser>()
 
 Returns the parser which has produced this manual object.
+
+=item $obj-E<gt>B<publish>(\%options)
+
+Inherited, see L<OODoc::Object/"Attributes">
 
 =item $obj-E<gt>B<source>()
 
@@ -152,46 +171,6 @@ Inherited, see L<OODoc::Object/"Attributes">
 =item $obj-E<gt>B<version>()
 
 Returns the version of this manual information.
-
-=back
-
-=head2 Manual Repository
-
-Extends L<"Manual Repository" in OODoc::Object|OODoc::Object/"Manual Repository">.
-
-=over 4
-
-=item $obj-E<gt>B<addManual>($manual)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<findManual>($name)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<mainManual>($name)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<manuals>()
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<manualsForPackage>($name)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<packageNames>()
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<publicationIndex>()
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<publish>(\%options)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
 
 =back
 
@@ -395,14 +374,14 @@ more detail.  The most detailed location for the description is returned.
 
 =over 4
 
-=item $obj-E<gt>B<index>()
+=item $obj-E<gt>B<overview>()
 
-Returns a string which can be used as index of headings used in this
+[2.01] Returns a string which can be used as index of headings used in this
 manual page.
 
 example: 
 
-  print $manual->index;
+  print $manual->overview;
 
 =item $obj-E<gt>B<stats>()
 
@@ -420,6 +399,7 @@ Each documentation part requires a chapter "NAME" which starts with
 the manual name followed by a dash.  Apparently, this was not found
 in the indicated file.  This chapter description must be anywhere
 after the package statement leading the name-space.
+Cast by name()
 
 =item Error: The NAME chapter does not have the right format in $file
 
@@ -429,40 +409,38 @@ manual's name, one dash ('-'), and then a brief explanation. For instance:
 
   =chapter NAME
   OODoc::Manual - one manual about a package
-
-=item Error: manual definition requires manual object
-
-A call to L<addManual()|OODoc::Object/"Manual Repository"> expects a new manual object (a L<OODoc::Manual|OODoc::Manual>),
-however an incompatible thing was passed.  Usually, intended was a call
-to L<manualsForPackage()|OODoc::Object/"Manual Repository"> or L<mainManual()|OODoc::Object/"Manual Repository">.
+Cast by name()
 
 =item Error: no distribution is specified for manual $name
 
-Z<>
+Cast by new()
 
 =item Error: no source filename is specified for manual $name
 
 You have to specify where you found the information for the manual.  This
 does not need to be the name of an existing file, but usually it will be.
+Cast by new()
 
 =item Error: no version is specified for manual $name
 
-Z<>
+Cast by new()
 
 =item Warning: order conflict '$take' before '$insert' in $file line $linenr
 
 The order of the objects in a sub-class shall be the same as that of
 the super class, otherwise the result of merging of the information
 received from both classes is undertermined.
+Cast by mergeStructure()
 
 =item Error: package name is not specified
 
 You try to instantiate a manual, but have not specified the name
 of the package which is described in this manual, which is required.
+Cast by new()
 
 =item Warning: section without location in $manual: $section
 
-Z<>
+Cast by expand()
 
 =item Warning: subroutine $name location conflict: $here and $there
 
@@ -480,22 +458,24 @@ This warning means that the location of the method in this manual page
 is not related to that of the same method in an other page.  For instance,
 in the first page it is listed in chapter "METHODS", and in the second
 in chapter "FUNCTIONS".
+Cast by mostDetailedLocation()
 
 =item Warning: subroutine '$name' location conflict:\n  $p1 in $man1\n  $p2 in $man2
 
-Z<>
+Cast by mostDetailedLocation()
 
 =item Error: two chapters named $name in $file line $line1 and $line2
 
 The indicated file contains two chapters with the same name, which
 is not permitted.  Join the contents of both parts.
+Cast by chapter()
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of OODoc version 3.02,
-built on August 15, 2025. Website: F<https://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.03,
+built on September 08, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 

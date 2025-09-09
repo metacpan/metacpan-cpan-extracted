@@ -7,6 +7,24 @@ TODO:
 	- subs could not only list 'Inherited from', but also 'Extended by'
 	- in POD, group "Inherited" referenced subs?
 
+version 3.03: Mon  8 Sep 12:57:12 CEST 2025
+
+	Changes:
+	- documentation tree now in OODoc::Index, not global.
+	- manual->index became manual->overview.
+
+	Fixes:
+	- html template: functions not shown alphabetically.
+	- html link to specific options
+
+	Improvements:
+	- warning in addSubroutine()
+	- display of ties and overload in both POD and HTML
+	- add OODoc::Examples for Markov parser
+	- pod diagnostics show which function produces them.
+	- subsubsection is h5 in html
+	- publicationIndex() hidden
+
 version 3.02: Fri 15 Aug 14:52:20 CEST 2025
 
 	Fixes:

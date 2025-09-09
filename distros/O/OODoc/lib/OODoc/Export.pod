@@ -14,8 +14,13 @@ OODoc::Export - base-class for exporters
 
 =head1 SYNOPSIS
 
-  my $doc = OODoc->new(...);
-  $doc->export('json');
+  my $doc  = OODoc->new(...);
+  my $tree = $doc->export('json');
+
+  my $export = OODoc::Export::JSON->new(markup => 'html');
+  my $export = OODoc::Export->new(serializer => 'json', markup => 'html');
+  my $tree   = $export->tree;
+  $export->write("a.json", $tree, pretty_print => 1);
 
 =head1 DESCRIPTION
 
@@ -38,11 +43,15 @@ Extends L<"OVERLOADED" in OODoc::Object|OODoc::Object/"OVERLOADED">.
 
 =over 4
 
-=item overload: B<'==' and '!=' (numeric comparison)>
+=item overload: B<'!='> (numeric different)
 
 Inherited, see L<OODoc::Object/"OVERLOADED">
 
-=item overload: B<'bool'>
+=item overload: B<'=='> (numeric equivalent)
+
+Inherited, see L<OODoc::Object/"OVERLOADED">
+
+=item overload: B<'bool'> 
 
 Inherited, see L<OODoc::Object/"OVERLOADED">
 
@@ -71,7 +80,7 @@ Inherited, see L<OODoc::Object/"Constructors">
 =item markup => $markup
 
 Specifies the markup style for the output.  At the moment, only markup
-in 'html' is supported.  See accessor L<markupStyle()|OODoc::Export/"Atributes">.
+in 'html' is supported.  See accessor L<markupStyle()|OODoc::Export/"Attributes">.
 
 =item serializer => $name
 
@@ -87,56 +96,6 @@ Extends L<"Attributes" in OODoc::Object|OODoc::Object/"Attributes">.
 
 =over 4
 
-=item $obj-E<gt>B<unique>()
-
-Inherited, see L<OODoc::Object/"Attributes">
-
-=back
-
-=head2 Manual Repository
-
-Extends L<"Manual Repository" in OODoc::Object|OODoc::Object/"Manual Repository">.
-
-=over 4
-
-=item $obj-E<gt>B<addManual>($manual)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<findManual>($name)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<mainManual>($name)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<manuals>()
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<manualsForPackage>($name)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<packageNames>()
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<publicationIndex>()
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<publish>(\%options)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=back
-
-=head2 Atributes
-
-=over 4
-
 =item $obj-E<gt>B<format>()
 
 Z<>
@@ -149,9 +108,17 @@ Z<>
 
 Z<>
 
+=item $obj-E<gt>B<publish>(\%options)
+
+Inherited, see L<OODoc::Object/"Attributes">
+
 =item $obj-E<gt>B<serializer>()
 
 The label for this serializer.
+
+=item $obj-E<gt>B<unique>()
+
+Inherited, see L<OODoc::Object/"Attributes">
 
 =back
 
@@ -174,8 +141,8 @@ Convert a block of text, which still contains markup.
 
 =item $obj-E<gt>B<markupString>($string, %args)
 
-Convert a line of text, which still contains markup.  This sometimes as some
-differences with a L<markupBlock()|OODoc::Export/"Output">.
+Convert a line of text, which still contains markup.  This sometimes shows some
+different markup compared to the output of L<markupBlock()|OODoc::Export/"Output">.
 
 =item $obj-E<gt>B<podChapters>($pod)
 
@@ -441,28 +408,22 @@ Log::Report.
 
 =item Error: exporter $name has compilation errors: $err
 
-Z<>
+Cast by new()
 
 =item Error: exporter serializer '$name' is unknown.
 
-Z<>
-
-=item Error: manual definition requires manual object
-
-A call to L<addManual()|OODoc::Object/"Manual Repository"> expects a new manual object (a L<OODoc::Manual|OODoc::Manual>),
-however an incompatible thing was passed.  Usually, intended was a call
-to L<manualsForPackage()|OODoc::Object/"Manual Repository"> or L<mainManual()|OODoc::Object/"Manual Repository">.
+Cast by new()
 
 =item Error: only HTML markup is currently supported.
 
-Z<>
+Cast by new()
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of OODoc version 3.02,
-built on August 15, 2025. Website: F<https://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.03,
+built on September 08, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 

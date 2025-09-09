@@ -1,5 +1,5 @@
-# This code is part of Perl distribution OODoc version 3.02.
-# The POD got stripped from this file by OODoc version 3.02.
+# This code is part of Perl distribution OODoc version 3.03.
+# The POD got stripped from this file by OODoc version 3.03.
 # For contributors see file ChangeLog.
 
 # This software is copyright (c) 2003-2025 by Mark Overmeer.
@@ -14,7 +14,7 @@
 #oodist: testing, however the code of this development version may be broken!
 
 package OODoc::Text::Structure;{
-our $VERSION = '3.02';
+our $VERSION = '3.03';
 }
 
 use parent 'OODoc::Text';
@@ -108,15 +108,15 @@ sub publish($$)
 #--------------------
 
 sub addSubroutine(@)
-{	my $self = shift;
+{	my ($self, $fn, @objs) = @_;
 	my $subs = $self->{OTS_subs} ||= [];
 
-	foreach my $sub (@_)
+	foreach my $sub (@objs)
 	{	$sub->container($self);
 
 		my $name = $sub->name;
 		if(my $has = first { $_->name eq $name } @$subs)
-		{	warn "WARNING: name '$name' seen before, lines ".$has->linenr. " and " . $sub->linenr . "\n";
+		{	warning __x"name '{name}' seen before, file {file} lines {nr1} and {nr2}", name => $name, file => $fn, nr1 => $has->linenr, nr2 => $sub->linenr;
 		}
 		push @{$self->{OTS_subs}}, $sub;
 	}

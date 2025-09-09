@@ -12,7 +12,7 @@ use Sub::Util    ();
 
 use experimental 'signatures';
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 
 # The main entity registry, inspired by https://github.com/skypjack/entt
 
@@ -91,8 +91,16 @@ my $recycle_guid = sub ($self) {
     return $self->{entities}[$next] = $next | ( $ver << ENTITY_SHIFT );
 };
 
+my $maybe_prefix = sub ( $self, $name ) {
+    $$name =~ s/^:([^:])/$self->{prefix}::$1/ if $self->{prefix};
+};
+
 my $get = sub ( $self, $unsafe, $guid, @types ) {
     my $index = $guid->$entity;
+
+    if ( $self->{prefix} ) {
+        s/^:([^:])/$self->{prefix}::$1/ for @types;
+    }
 
     my @got = map {
         my $set    = $self->{components}{"$_"};
@@ -108,10 +116,9 @@ my $get = sub ( $self, $unsafe, $guid, @types ) {
 
 ## Public methods
 
-sub new ( $class ) {
-    my $self = bless {}, $class;
+sub new ( $class, %args ) {
+    my $self = bless { %args{prefix} }, $class;
     $self->clear;
-    $self;
 }
 
 sub created ($self) { scalar @{ $self->{entities} } - 1 }
@@ -144,7 +151,7 @@ sub clear ($self) {
     $self->{entities} = [ undef ];
     $self->{available} = NULL_ENTITY;
 
-    return;
+    return $self;
 }
 
 # Create a new entity
@@ -165,10 +172,9 @@ sub check ( $self, $guid, $type ) {
     Carp::croak 'Component name must be defined and not a reference'
         if ! defined $type || ref $type;
 
-    my $index  = $guid->$entity;
-    my $set    = $self->{components}{"$type"};
+    $self->$maybe_prefix(\$type);
 
-    $set->$contains( $index );
+    $self->{components}{$type}->$contains( $guid->$entity );
 }
 
 # Add or replace a component for an entity
@@ -198,11 +204,10 @@ sub add ( $self, $guid, @components ) {
 
         # Adding a component invalidates any cached view that uses it
         delete $self->{view_cache}{$_} for
-            grep { index( $_, "|$name|" ) != -1 }
-            keys %{ $self->{view_cache} },
+            grep index( $_, "|$name|" ) != -1, keys %{ $self->{view_cache} },
     }
 
-    return;
+    return $self;
 }
 
 # Get a component for an entity
@@ -236,11 +241,15 @@ sub delete ( $self, $guid, @types ) {
         $self->{entities}[$ent] = $self->{available} | ( $ver << ENTITY_SHIFT );
         $self->{available} = $ent;
 
-        return;
+        return $self;
     }
 
     Carp::croak 'Component name must not be a reference'
         if List::Util::any { ref } @types;
+
+    if ( $self->{prefix} ) {
+        s/^:([^:])/$self->{prefix}::$1/ for @types;
+    }
 
     for my $name (@types) {
         next unless $self->check( $guid, $name );
@@ -261,12 +270,11 @@ sub delete ( $self, $guid, @types ) {
         }
 
         # Deleting a component invalidates any cached view that uses it
-        delete $self->{view_cache}{$_} for
-            grep { index( $_, "|$name|" ) != -1 }
-            keys %{ $self->{view_cache} },
+        delete $self->{view_cache}{$_}
+            for grep index( $_, "|$name|" ) != -1, keys %{ $self->{view_cache} };
     }
 
-    return;
+    return $self;
 }
 
 # Checks if an entity identifier refers to a valid entity; that is, one that
@@ -280,6 +288,8 @@ sub valid ( $self, $guid ) {
 }
 
 sub sort ( $self, $name, $comparator ) {
+    $self->$maybe_prefix(\$name);
+
     my $set = $self->{components}{$name}
         // Carp::croak "Cannot sort $name: no such component in registry";
 
@@ -288,11 +298,12 @@ sub sort ( $self, $name, $comparator ) {
     my $comps  = $set->[COMPONENTS];
 
     # Sorting a component invalidates any cached view that uses it
-    delete $self->{view_cache}{$_} for
-        grep { index( $_, "|$name|" ) != -1 }
-        keys %{ $self->{view_cache} };
+    delete $self->{view_cache}{$_}
+        for grep index( $_, "|$name|" ) != -1, keys %{ $self->{view_cache} };
 
     if ( ! ref $comparator ) {
+        $self->$maybe_prefix(\$comparator);
+
         my $other = $self->{components}{$comparator}
             // Carp::croak "Cannot sort according to $comparator: no such component in registry";
 
@@ -307,7 +318,7 @@ sub sort ( $self, $name, $comparator ) {
             $j++;
         }
 
-        return;
+        return $self;
     }
 
     # See https://skypjack.github.io/2019-09-25-ecs-baf-part-5/
@@ -341,7 +352,7 @@ sub sort ( $self, $name, $comparator ) {
         }
     }
 
-    return;
+    return $self;
 }
 
 package
@@ -360,7 +371,7 @@ package
         $code->( $_->[0], @{ $_->[1] } ) for List::Util::pairs @$self
     }
 
-    sub first ( $self, $code ) {
+    sub first ( $self, $code = sub { 1 } ) {
         my $res = List::Util::first { $code->( $_->[0], @{ $_->[1] } ) } List::Util::pairs @$self;
         return $res ? ( $res->[0], @{ $res->[1] } ) : ();
     }
@@ -378,6 +389,10 @@ sub view ( $self, @types ) {
                 grep $self->valid( $_ ),
                 @{ $self->{entities} }[ 1 .. $#{ $self->{entities} } ]
         )
+    }
+
+    if ( $self->{prefix} ) {
+        s/^:([^:])/$self->{prefix}::$1/ for @types;
     }
 
     # Return a view for a single component

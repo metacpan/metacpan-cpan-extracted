@@ -19,7 +19,7 @@ elsif (! $ENV{PERL_AUTHOR_TESTING}) {
     plan skip_all => 'Lengthy test; set PERL_AUTHOR_TESTING to run';
 }
 else {
-    plan tests => 13;
+    plan tests => 14;
     #plan 'no_plan';
 }
 
@@ -101,6 +101,9 @@ my $opts = {
         like($datum, qr/^[a-f0-9]{40}\s\|\s{3}[0-3]/,
             "Got expected data from display_results");
     }
+
+    ok($self->cleanup_repository(),
+        "cleanup_repository() returned true value");
 }
 
 

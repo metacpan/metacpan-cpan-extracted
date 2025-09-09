@@ -1,5 +1,8 @@
 Revision history for OpenAPI-Modern
 
+0.094     2025-09-08 19:05:29Z
+          - fix redefinition warning in tests
+
 0.093     2025-09-07 20:32:18Z
           - fix error in tests exposed by JSON::Schema::Modern 0.618
 

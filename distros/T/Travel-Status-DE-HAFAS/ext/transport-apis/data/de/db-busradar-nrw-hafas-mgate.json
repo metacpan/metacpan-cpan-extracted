@@ -9,7 +9,7 @@
   "timezone": "Europe/Berlin",
   "attribution": {
     "name": "DB Regio Bus NRW",
-    "homepage": "https://www.dbregiobus-nrw.de/regiobusnrw/view/service/busradar.shtml",
+    "homepage": "https://www.dbregiobus-nrw.de/service/busradar",
     "isProprietary": true
   },
   "coverage": {
@@ -25,7 +25,7 @@
       "name": "DB Busradar NRW",
       "os": "Android 9",
       "type": "AND",
-      "v": 3000000
+      "v": "3000000"
     },
     "ext": "DB.REGIO.1",
     "ver": "1.45",

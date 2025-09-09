@@ -28,19 +28,23 @@ Extends L<"OVERLOADED" in OODoc::Text|OODoc::Text/"OVERLOADED">.
 
 =over 4
 
-=item overload: B<'""' (stringification)>
+=item overload: B<'!='> (numeric different)
+
+Inherited, see L<OODoc::Object/"OVERLOADED">
+
+=item overload: B<'""'> (stringification)
 
 Inherited, see L<OODoc::Text/"OVERLOADED">
 
-=item overload: B<'==' and '!=' (numeric comparison)>
+=item overload: B<'=='> (numeric equivalent)
 
 Inherited, see L<OODoc::Object/"OVERLOADED">
 
-=item overload: B<'bool'>
+=item overload: B<'bool'> 
 
 Inherited, see L<OODoc::Object/"OVERLOADED">
 
-=item overload: B<'cmp' (string comparison)>
+=item overload: B<'cmp'> (string comparison)
 
 Inherited, see L<OODoc::Text/"OVERLOADED">
 
@@ -139,6 +143,10 @@ result may be C<undef> or empty.
 
 Returns the path of the text structure which contains this subroutine.
 
+=item $obj-E<gt>B<publish>(\%options)
+
+Inherited, see L<OODoc::Object/"Attributes">
+
 =item $obj-E<gt>B<type>()
 
 Inherited, see L<OODoc::Text/"Attributes">
@@ -150,46 +158,6 @@ Inherited, see L<OODoc::Object/"Attributes">
 =item $obj-E<gt>B<where>()
 
 Inherited, see L<OODoc::Text/"Attributes">
-
-=back
-
-=head2 Manual Repository
-
-Extends L<"Manual Repository" in OODoc::Text|OODoc::Text/"Manual Repository">.
-
-=over 4
-
-=item $obj-E<gt>B<addManual>($manual)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<findManual>($name)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<mainManual>($name)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<manuals>()
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<manualsForPackage>($name)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<packageNames>()
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<publicationIndex>()
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<publish>(\%options)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
 
 =back
 
@@ -264,19 +232,13 @@ one manual.
 
 =over 4
 
-=item Error: manual definition requires manual object
-
-A call to L<addManual()|OODoc::Object/"Manual Repository"> expects a new manual object (a L<OODoc::Manual|OODoc::Manual>),
-however an incompatible thing was passed.  Usually, intended was a call
-to L<manualsForPackage()|OODoc::Object/"Manual Repository"> or L<mainManual()|OODoc::Object/"Manual Repository">.
-
 =item Warning: no default for option $name defined in $file line $linenr
 
-Z<>
+Cast by collectedOptions()
 
 =item Warning: no option $name for default in $file line $linenr
 
-Z<>
+Cast by collectedOptions()
 
 =item Warning: subroutine $name extended by different type:
 
@@ -287,14 +249,15 @@ between these places.
 
 In very rare cases, this warning can be ignored, but usually these
 situation is errorneous of confusing for the users of the library.
+Cast by extends()
 
 =item Warning: subroutine $name() extended by different type:\n  $type1 in $file1 line $line1\n  $type2 in $file2 line $line2
 
-Z<>
+Cast by extends()
 
 =item Warning: subroutine $name() location conflict:\n  $path1 in $file1 line $line1\n  $path2 in $file2 line $line2
 
-Z<>
+Cast by location()
 
 =item Warning: subroutine $self location conflict: $here $super
 
@@ -303,13 +266,14 @@ manual pages.  You may change the level of clearness about the
 exact location (place in the chapter in one page, and in a subsection
 in the next), as long as it is not conflicting (the subsection must
 be a part of the chapter).
+Cast by location()
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of OODoc version 3.02,
-built on August 15, 2025. Website: F<https://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.03,
+built on September 08, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 

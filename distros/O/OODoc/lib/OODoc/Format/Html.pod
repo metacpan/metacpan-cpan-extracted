@@ -31,11 +31,15 @@ Extends L<"OVERLOADED" in OODoc::Format|OODoc::Format/"OVERLOADED">.
 
 =over 4
 
-=item overload: B<'==' and '!=' (numeric comparison)>
+=item overload: B<'!='> (numeric different)
 
 Inherited, see L<OODoc::Object/"OVERLOADED">
 
-=item overload: B<'bool'>
+=item overload: B<'=='> (numeric equivalent)
+
+Inherited, see L<OODoc::Object/"OVERLOADED">
+
+=item overload: B<'bool'> 
 
 Inherited, see L<OODoc::Object/"OVERLOADED">
 
@@ -60,6 +64,7 @@ Inherited, see L<OODoc::Object/"Constructors">
   html_meta_data                    ''
   html_root                         '/'
   html_stylesheet                   undef
+  index            OODoc::Format    <required>
   jump_script                       <html_root>/jump.cgi
   manifest         OODoc::Format    undef
   project          OODoc::Format    <required>
@@ -80,6 +85,8 @@ Cascading Style Sheets, and such.
 =item html_stylesheet => STRING
 
 Adds a link to the stylesheet to the meta-data.
+
+=item index => OODoc::Index
 
 =item jump_script => URI
 
@@ -114,6 +121,10 @@ Inherited, see L<OODoc::Format/"Attributes">
 
 Without trailing slash.
 
+=item $obj-E<gt>B<index>()
+
+Inherited, see L<OODoc::Format/"Attributes">
+
 =item $obj-E<gt>B<jumpScript>()
 
 Z<>
@@ -139,6 +150,10 @@ Returns a string with html for the page header block.
 
 Inherited, see L<OODoc::Format/"Attributes">
 
+=item $obj-E<gt>B<publish>(\%options)
+
+Inherited, see L<OODoc::Object/"Attributes">
+
 =item $obj-E<gt>B<unique>()
 
 Inherited, see L<OODoc::Object/"Attributes">
@@ -150,46 +165,6 @@ Inherited, see L<OODoc::Format/"Attributes">
 =item $obj-E<gt>B<workdir>()
 
 Inherited, see L<OODoc::Format/"Attributes">
-
-=back
-
-=head2 Manual Repository
-
-Extends L<"Manual Repository" in OODoc::Format|OODoc::Format/"Manual Repository">.
-
-=over 4
-
-=item $obj-E<gt>B<addManual>($manual)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<findManual>($name)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<mainManual>($name)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<manuals>()
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<manualsForPackage>($name)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<packageNames>()
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<publicationIndex>()
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<publish>(\%options)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
 
 =back
 
@@ -228,10 +203,10 @@ Inherited, see L<OODoc::Format/"Page generation">
 
 =item project => STRING
 
-=item template => DIRECTORY|HASH
+=item template => $directory|HASH
 
-A DIRECTORY containing all template files which have to be filled-in
-and copied per manual page created.  You may also specify an HASH
+A C<$directory> containing all template files which have to be filled-in
+and copied per manual page created.  You may also specify an C<HASH>
 of file- and directory names and format options for each of those files.
 These options can be overruled by values specified in the template file.
 
@@ -245,9 +220,10 @@ Default:
 
 Complex:
 
-  template => { "man_index/"    => [ show_examples => 'NO' ],
-                "man_main.html" => [ show_examples => 'EXPAND' ]
-              }
+  template => {
+     "man_index/"    => [ show_examples => 'NO' ],
+     "man_main.html" => [ show_examples => 'EXPAND' ]
+  }
 
 =item $obj-E<gt>B<createOtherPages>(%options)
 
@@ -536,7 +512,7 @@ and otherwise the project total version.
 
 =item Error: cannot find chapter NAME in manual $file
 
-Z<>
+Cast by templateName()
 
 =item Error: cannot find template source '$name'
 
@@ -544,126 +520,123 @@ Somewhere was specified to use C<$name> (a file or directory) as source
 for a template.  However, it does not seem to exist.  Unfortunately,
 the location where the source is specified is not known when the
 error is produced.
+Cast by expandTemplate()
 
 =item Fault: cannot write html manual to $file: $!
 
-Z<>
+Cast by createManual()
 
 =item Fault: cannot write html to $fn: $!
 
-Z<>
+Cast by createOtherPages()
 
 =item Fault: cannot write markers to $file: $!
 
-Z<>
+Cast by createManual()
 
 =item Error: chapter NAME in manual $manual has illegal shape
 
-Z<>
+Cast by templateName()
 
 =item Error: chapter without name in template $file
 
-Z<>
+Cast by templateChapter()
 
 =item Error: chapter without name in template $fn
 
 In your template file, a {chapter} statement is used, which is
 erroneous, because it requires a chapter name.
+Cast by templateChapter()
 
 =item Fault: chmod of $fn to $mode failed: $!
 
-Z<>
+Cast by createOtherPages()
 
 =item Fault: copy from $from to $to failed: $!
 
-Z<>
+Cast by createOtherPages()
 
 =item Error: expect one name with 'a'
 
-Z<>
+Cast by templateHref()
 
 =item Fault: html source directory $dir: $!
 
-Z<>
+Cast by createOtherPages()
 
 =item Error: illegal show option choice: $value
 
-Z<>
+Cast by showOptions()
 
 =item Error: illegal value for show_option_table: $value
 
-Z<>
+Cast by showSubroutine()
 
 =item Error: illegal value for show_sub_description: $value
 
-Z<>
+Cast by showSubroutine()
 
 =item Error: illegal value for show_subroutine: $value
 
-Z<>
+Cast by showSubroutine()
 
 =item Error: illegal value to show_sections: $value
 
-Z<>
-
-=item Error: manual definition requires manual object
-
-A call to L<addManual()|OODoc::Object/"Manual Repository"> expects a new manual object (a L<OODoc::Manual|OODoc::Manual>),
-however an incompatible thing was passed.  Usually, intended was a call
-to L<manualsForPackage()|OODoc::Object/"Manual Repository"> or L<mainManual()|OODoc::Object/"Manual Repository">.
+Cast by templateList()
 
 =item Error: missing path for $dest
 
-Z<>
+Cast by templateHref()
 
 =item Error: missing required chapter $name in $manual
 
-Z<>
+Cast by showRequiredChapter()
 
 =item Error: no group named as attribute for index
 
 In your template file, an {index} statement is used without a chapter name
 or 'ALL'.  Therefore, it is unclear which kind of index has to
 be built.
+Cast by templateList()
 
 =item Error: no group named as attribute for list
 
-Z<>
+Cast by templateIndex()
 
 =item Warning: no meaning for container $tags in chapter block
 
-Z<>
+Cast by templateChapter()
 
 =item Warning: no meaning for container $tags in index block
 
-Z<>
+Cast by templateList()
 
 =item Warning: no meaning for container $tags in list block
 
-Z<>
+Cast by templateIndex()
 
 =item Error: not a manual, so no automatic template title in $file
 
-Z<>
+Cast by templateTitle()
 
 =item Error: not a manual, so no manual name for template $file
 
-Z<>
+Cast by templateManual()
 
 =item Error: not a manual, so no name for template $file
 
-Z<>
+Cast by templateName()
 
 =item Error: unknown group $name as list attribute
 
-Z<>
+Cast by templateIndex()
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of OODoc version 3.02,
-built on August 15, 2025. Website: F<https://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.03,
+built on September 08, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 

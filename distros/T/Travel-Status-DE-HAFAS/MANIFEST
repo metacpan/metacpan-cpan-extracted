@@ -8,6 +8,7 @@ cpanfile
 Dockerfile
 ext/transport-apis/.editorconfig
 ext/transport-apis/.github/workflows/validate.yml
+ext/transport-apis/.github/workflows/website.yml
 ext/transport-apis/code-of-conduct.md
 ext/transport-apis/data/at/ivb-hafas-mgate.json
 ext/transport-apis/data/at/linz-efa.json
@@ -29,7 +30,6 @@ ext/transport-apis/data/ch/tpg-hafas-mgate.json
 ext/transport-apis/data/ch/zvv-hafas-mgate.json
 ext/transport-apis/data/de/avv-hafas-mgate.json
 ext/transport-apis/data/de/bayernfahrplan-efa.json
-ext/transport-apis/data/de/bbnavi-angermuende-otp.json
 ext/transport-apis/data/de/bvg-hafas-mgate.json
 ext/transport-apis/data/de/bwegt-efa.json
 ext/transport-apis/data/de/bwegt-trias.json
@@ -52,6 +52,7 @@ ext/transport-apis/data/de/nahsh-hafas-mgate.json
 ext/transport-apis/data/de/nasa-hafas-mgate.json
 ext/transport-apis/data/de/nvv-hafas-mgate.json
 ext/transport-apis/data/de/rmv-hafas-mgate.json
+ext/transport-apis/data/de/rnv-motis.json
 ext/transport-apis/data/de/rolph-efa.json
 ext/transport-apis/data/de/rsag-hafas-mgate.json
 ext/transport-apis/data/de/saarvv-hafas-mgate.json
@@ -74,9 +75,11 @@ ext/transport-apis/data/dk/rejseplanen-hafas-mgate.json
 ext/transport-apis/data/ee/peatus-otp.json
 ext/transport-apis/data/fi/digitransit-otp.json
 ext/transport-apis/data/fi/helsinki-otp.json
+ext/transport-apis/data/fi/varely-otp.json
 ext/transport-apis/data/fi/waltti-otp.json
 ext/transport-apis/data/ie/iarnrod-eireann-hafas-mgate.json
 ext/transport-apis/data/it/piemonte-otp.json
+ext/transport-apis/data/it/sta-eta.json
 ext/transport-apis/data/it/torino-otp.json
 ext/transport-apis/data/lu/cfl-hafas-mgate.json
 ext/transport-apis/data/lu/mobiliteit-lu-hafas-mgate.json
@@ -103,6 +106,7 @@ ext/transport-apis/tools/fill-coverage-area.py
 ext/transport-apis/tools/pretty-json.py
 ext/transport-apis/tools/README.md
 ext/transport-apis/tools/requirements.txt
+ext/transport-apis/website/index.html
 lib/Travel/Status/DE/HAFAS.pm
 lib/Travel/Status/DE/HAFAS/Journey.pm
 lib/Travel/Status/DE/HAFAS/Location.pm

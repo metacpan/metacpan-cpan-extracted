@@ -347,9 +347,13 @@ if (!$INC{'re/engine/PCRE2.pm'}) {
         1977)  if $] < 5.026;
 }
 
-push @pcre_fail, (1638)     if "$]" =~ /^5\.01[34]/;
 push @pcre_fail, (554, 672) if "$]" =~ /^5\.01[3-6]/;
 push @pcre_fail, (629)      if "$]" =~ /^5\.01[3-8]/;
+
+push @pcre_fail, (1638, 1696) if $] >= 5.013;
+push @pcre_fail, (1561..1563, 1567..1569) if $] >= 5.020;
+push @pcre_fail, (653, 659, 662, 1801..1802) if $] >= 5.024;
+
 # codeblocks
 push @pcre_fail, (1770..1776, 1778, 1809) if "$]" =~ /^5\.01[56]/;
 push @pcre_fail, (1960..1962, 1966, 1987, 1989..1991)
@@ -365,6 +369,7 @@ push @pcre_skip, (1383,1399,1410,1548..1572,1639,1792,1830)
   if $] < 5.020; # Malformed UTF-8 character (fatal), group index overflow
 push @pcre_skip, (1981) if $] < 5.026; # crashes
 push @pcre_fail, (1976) if $] < 5.026; # fixed with 5.26 [perl 128420]
+
 my %skip_ver;
 $skip_ver{'5.015'} = 1684; # skip < 5.14, >= 1684
 $skip_ver{'5.021'} = 1896; # skip < 5.20, >= 1896

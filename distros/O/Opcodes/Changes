@@ -1,6 +1,9 @@
 -*- change-log -*-
 Based on CORE Opcode-1.16
 
+0.16	2025-09-08 rurban
+	* improved make release target and CI
+
 0.15	2025-06-27 rurban
 	* fix GIMME deprecation warning
 	* fix some pod and markdown linting issues

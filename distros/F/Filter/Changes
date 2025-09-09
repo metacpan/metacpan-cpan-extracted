@@ -1,3 +1,7 @@
+1.65 2025-09-08 rurban
+----
+  * Docs and CI only
+
 1.64 2022-08-16 rurban
 ----
   * Exec: Silence all Windows -Wint-conversion and -Wint-to-pointer-cast
@@ -285,7 +289,7 @@
 
   * Call & Exec now use the CXT* macros
 
-  * moved all backward compatability code into ppport.h
+  * moved all backward compatibility code into ppport.h
 
 1.25
 ----

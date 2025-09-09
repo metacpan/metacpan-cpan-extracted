@@ -1,5 +1,5 @@
-# This code is part of Perl distribution OODoc version 3.02.
-# The POD got stripped from this file by OODoc version 3.02.
+# This code is part of Perl distribution OODoc version 3.03.
+# The POD got stripped from this file by OODoc version 3.03.
 # For contributors see file ChangeLog.
 
 # This software is copyright (c) 2003-2025 by Mark Overmeer.
@@ -14,7 +14,7 @@
 #oodist: testing, however the code of this development version may be broken!
 
 package OODoc::Object;{
-our $VERSION = '3.02';
+our $VERSION = '3.03';
 }
 
 
@@ -39,7 +39,7 @@ sub new(@)
 	my $self = (bless {}, $class)->init(\%args);
 
 	if(my @missing = keys %args)
-	{	error __xn"Unknown object attribute '{names}' for {pkg}", "Unknown object attributes for {pkg}: {names}",
+	{	error __xn"unknown object attribute '{names}' for {pkg}", "unknown object attributes for {pkg}: {names}",
 			scalar @missing, names => \@missing, pkg => $class;
 	}
 
@@ -60,51 +60,13 @@ sub init($)
 
 sub unique() { $_[0]->{OO_unique} }
 
-#--------------------
 
-my %packages;
-my %manuals;
+my $index;  # still a global :-(  Set by ::Export
+sub _publicationIndex($) { $index = $_[1] }
 
-sub addManual($)
-{	my ($self, $manual) = @_;
-
-	ref $manual && $manual->isa('OODoc::Manual')
-		or panic "manual definition requires manual object";
-
-	push @{$packages{$manual->package}}, $manual;
-	$manuals{$manual->name} = $manual;
-	$self;
-}
-
-
-sub mainManual($)
-{	my ($self, $name) = @_;
-	first { $_ eq $_->package } $self->manualsForPackage($name);
-}
-
-
-sub manualsForPackage($)
-{	my ($self, $name) = @_;
-	@{$packages{$name || 'doc'} || []};
-}
-
-
-sub manuals() { values %manuals }
-
-
-sub findManual($) { $manuals{ $_[1] } }
-
-
-sub packageNames() { keys %packages }
-
-
-my %index;
 sub publish($)
 {	my ($self, $args) = @_;
-	$index{$self->unique} = +{ id => $self->unique };
+	$index->{$self->unique} = +{ id => $self->unique };
 }
-
-
-sub publicationIndex() { \%index }
 
 1;

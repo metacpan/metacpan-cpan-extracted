@@ -2,6 +2,22 @@ use Test2::V0;
 use Net::Cisco::FMC::v1;
 use JSON qw();
 
+{
+    my $fmc = Net::Cisco::FMC::v1->new(
+        server      =>  'https://' . $ENV{NET_CISCO_FMC_V1_HOSTNAME} . ':12345',
+        user        => 'foo',
+        passwd      => 'bar',
+        clientattrs => { timeout => 1 },
+    );
+
+    like(
+        dies { $fmc->login },
+        qr/Connection timed out/,
+        "got correct exception"
+    )
+        || note($@);
+}
+
 skip_all "environment variables not set"
     unless exists $ENV{NET_CISCO_FMC_V1_HOSTNAME}
         && exists $ENV{NET_CISCO_FMC_V1_USERNAME}

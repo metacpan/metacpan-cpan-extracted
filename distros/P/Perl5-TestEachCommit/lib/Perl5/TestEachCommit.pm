@@ -1,7 +1,7 @@
 package Perl5::TestEachCommit;
 use 5.014;
 use warnings;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 $VERSION = eval $VERSION;
 use Carp;
 use Data::Dump ( qw| dd pp| );
@@ -152,6 +152,7 @@ Perl5::TestEachCommit object (blessed hash reference).
 sub new {
     my ($class, $params) = @_;
     my $args = {};
+
     for my $k (keys %{$params}) { $args->{$k} = $params->{$k}; }
     my %data;
     croak "Must supply SHA of first commit to be studied to 'start'"
@@ -490,6 +491,9 @@ Called internally within C<examine_all_commits()>.
 sub examine_one_commit {
     my ($self, $c) = @_;
     chdir $self->{workdir} or croak "Unable to change to $self->{workdir}";
+    # So that ./Configure, make test_prep and make_test_harness all behave
+    # as they typically do in a git checkout.
+    local $ENV{PERL_CORE} = 1;
 
     my $rv = system(qq|git clean -dfxq|) and croak "Unable to git-clean";
     $rv = system(qq|git checkout $c|) and croak "Unable to git-checkout $c";
@@ -501,7 +505,6 @@ sub examine_one_commit {
     if ($rv) {
         carp "Unable to configure at $c";
         push @{$self->{results}}, { commit => $c, score => $commit_score };
-#        next COMMIT;
         return;
     }
     else {
@@ -512,7 +515,6 @@ sub examine_one_commit {
         if ($rv) {
             carp "Unable to make_test_prep at $c";
             push @{$self->{results}}, { commit => $c, score => $commit_score };
-#            next COMMIT;
             return;
         }
         else {
@@ -534,6 +536,45 @@ sub examine_one_commit {
             push @{$self->{results}}, { commit => $c, score => $commit_score };
         }
     }
+}
+
+=head2 C<cleanup_repository()>
+
+=over 4
+
+=item * Purpose
+
+Clean up the repository in the directory designated by C<workdir>.
+
+=item * Arguments
+
+    $self->cleanup_respository();
+
+=item * Return Value
+
+Implicitly returns a true value upon success.
+
+=item * Comment
+
+Performs a F<git clean> and F<git checkout blead> but does not do any fetching
+from origin or updating of C<blead>.
+
+=back
+
+=cut
+
+sub cleanup_repository {
+    my $self = shift;
+
+    chdir $self->{workdir} or croak "Unable to change to $self->{workdir}";
+
+    my $grv = system(qq|
+        git bisect reset && \
+        git clean -dfxq && \
+        git checkout blead
+    |) and croak "Unable to clean $self->{workdir} after git activity";
+
+    return 1;
 }
 
 =head1 BUGS

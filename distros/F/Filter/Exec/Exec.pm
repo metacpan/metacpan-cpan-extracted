@@ -3,7 +3,7 @@ package Filter::Util::Exec ;
 use strict;
 require 5.006 ;
 require XSLoader;
-our $VERSION = "1.64" ;
+our $VERSION = "1.65" ;
 
 XSLoader::load('Filter::Util::Exec');
 1 ;

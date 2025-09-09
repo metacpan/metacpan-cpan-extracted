@@ -1,5 +1,9 @@
 Revision history for Perl extension JSON::SIMD
 
+1.07 Sun Sep  7 07:13:49 PM CEST 2025
+	- Fix CVE-2025-40930 - buffer overread in the FP number parser of the legacy decoder
+	- Import simdjson 3.13.0, with it, better big integer support
+
 1.06 Thu Apr 27 17:55:29 CEST 2023
 	- fix core_bools with false argument (now restores default)
 	- make is_bool aware of core booleans on perl >= 5.36

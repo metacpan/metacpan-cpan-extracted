@@ -1,5 +1,14 @@
 Revision history for re::engine::PCRE2
 
+0.17 Mon Sep  8 02:50:56 PM CEST 2025 rurban
+    - use savepvn to copy the matched string (demerphq PR #40)
+    - set up logical_parens on 5.37.8, and related fixes (demerphq PR #40)
+    - Ensure PERL_EXT_RE_BUILD is defined (demerphq PR #40)
+    - Added github CI
+    - Added more failing regression tests since 5.24
+    - skip macOS: Alien::PCRE2 or homebrew pcre requires include "pcre2.h"
+      This might require a rename to _PCRE2.h and _PCRE2.xs
+
 0.16 Wed May 15 18:18:20 CEST 2019 rurban
     - fix race in t/gh29-segv.t (Petr Písař PR#35)
 

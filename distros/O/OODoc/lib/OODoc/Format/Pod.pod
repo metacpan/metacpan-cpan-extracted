@@ -38,11 +38,15 @@ Extends L<"OVERLOADED" in OODoc::Format|OODoc::Format/"OVERLOADED">.
 
 =over 4
 
-=item overload: B<'==' and '!=' (numeric comparison)>
+=item overload: B<'!='> (numeric different)
 
 Inherited, see L<OODoc::Object/"OVERLOADED">
 
-=item overload: B<'bool'>
+=item overload: B<'=='> (numeric equivalent)
+
+Inherited, see L<OODoc::Object/"OVERLOADED">
+
+=item overload: B<'bool'> 
 
 Inherited, see L<OODoc::Object/"OVERLOADED">
 
@@ -64,6 +68,7 @@ Inherited, see L<OODoc::Object/"Constructors">
 
  -Option  --Defined in     --Default
   format    OODoc::Format    'pod'
+  index     OODoc::Format    <required>
   manifest  OODoc::Format    undef
   project   OODoc::Format    <required>
   version   OODoc::Format    <required>
@@ -72,6 +77,8 @@ Inherited, see L<OODoc::Object/"Constructors">
 =over 2
 
 =item format => 'pod*'|'html*'|PACKAGE
+
+=item index => OODoc::Index
 
 =item manifest => OBJECT
 
@@ -95,6 +102,10 @@ Extends L<"Attributes" in OODoc::Format|OODoc::Format/"Attributes">.
 
 Inherited, see L<OODoc::Format/"Attributes">
 
+=item $obj-E<gt>B<index>()
+
+Inherited, see L<OODoc::Format/"Attributes">
+
 =item $obj-E<gt>B<manifest>()
 
 Inherited, see L<OODoc::Format/"Attributes">
@@ -102,6 +113,10 @@ Inherited, see L<OODoc::Format/"Attributes">
 =item $obj-E<gt>B<project>()
 
 Inherited, see L<OODoc::Format/"Attributes">
+
+=item $obj-E<gt>B<publish>(\%options)
+
+Inherited, see L<OODoc::Object/"Attributes">
 
 =item $obj-E<gt>B<unique>()
 
@@ -114,46 +129,6 @@ Inherited, see L<OODoc::Format/"Attributes">
 =item $obj-E<gt>B<workdir>()
 
 Inherited, see L<OODoc::Format/"Attributes">
-
-=back
-
-=head2 Manual Repository
-
-Extends L<"Manual Repository" in OODoc::Format|OODoc::Format/"Manual Repository">.
-
-=over 4
-
-=item $obj-E<gt>B<addManual>($manual)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<findManual>($name)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<mainManual>($name)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<manuals>()
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<manualsForPackage>($name)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<packageNames>()
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<publicationIndex>()
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<publish>(\%options)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
 
 =back
 
@@ -173,7 +148,7 @@ The C<%options> are a collection of all options available to C<show*()> methods.
 Improves base, see L<OODoc::Format/"Page generation">
 
  -Option  --Defined in     --Default
-  append                     ''
+  append                     ""
   manual    OODoc::Format    <required>
   project   OODoc::Format    <required>
   template  OODoc::Format    undef
@@ -465,56 +440,50 @@ not quotes, comma's and exactly one blank between the strings.
 
 =item Error: cannot link to a $package
 
-Z<>
+Cast by link()
 
 =item Fault: cannot read prelimary pod from $file: $!
 
-Z<>
+Cast by simplifyPod()
 
 =item Fault: cannot write final pod to $file: $!
 
-Z<>
+Cast by simplifyPod()
 
 =item Fault: cannot write prelimary pod manual to $file: $!
 
-Z<>
+Cast by createManual()
 
 =item Error: illegal show option choice: $value
 
-Z<>
+Cast by showOptions()
 
 =item Error: illegal value for show_option_table: $value
 
-Z<>
+Cast by showSubroutine()
 
 =item Error: illegal value for show_sub_description: $value
 
-Z<>
+Cast by showSubroutine()
 
 =item Error: illegal value for show_subroutine: $value
 
-Z<>
-
-=item Error: manual definition requires manual object
-
-A call to L<addManual()|OODoc::Object/"Manual Repository"> expects a new manual object (a L<OODoc::Manual|OODoc::Manual>),
-however an incompatible thing was passed.  Usually, intended was a call
-to L<manualsForPackage()|OODoc::Object/"Manual Repository"> or L<mainManual()|OODoc::Object/"Manual Repository">.
+Cast by showSubroutine()
 
 =item Error: missing required chapter $name in $manual
 
-Z<>
+Cast by showRequiredChapter()
 
 =item Fault: write to $file failed: $!
 
-Z<>
+Cast by simplifyPod()
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of OODoc version 3.02,
-built on August 15, 2025. Website: F<https://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.03,
+built on September 08, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 

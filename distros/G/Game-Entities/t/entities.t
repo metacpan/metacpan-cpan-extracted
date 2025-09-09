@@ -1,9 +1,7 @@
 #!/usr/bin/env perl
 
-use strict;
-use warnings;
-use Test::More;
-use Game::Entities;
+use Test2::V0 -target => 'Game::Entities';;
+use Test2::Tools::Spec;
 
 use experimental 'signatures';
 
@@ -27,28 +25,57 @@ sub exception :prototype(&;@) {
     like $@, $check, 'error message';
 }
 
-subtest 'Basic operations' => sub {
-    my $R = Game::Entities->new;
+@Prefix::Named::ISA = 'Named';
+@Prefix::Aging::ISA = 'Aging';
+@Prefix::Other::ISA = 'Other';
 
-    my ( $a, $b ) = map $R->create, 1 .. 2;
+describe 'Basic operations' => sub {
+    my $prefix;
 
-    ok !$R->check( $a, 'Named' ), 'A does not have Named';
+    case 'With prefix' => sub { $prefix = 'Prefix' };
+    case 'No prefix'   => sub { $prefix = undef    };
 
-    $R->add( $a, Named->new( name => 'old' ) );
-    $R->add( $a, Named->new( name => 'new' ) );
+    it Works => { flat => 1 } => sub {
+        my $base   = $prefix ? "${prefix}::" : '';
+        my $marker = $prefix ? ':'           : '';
 
-    ok  $R->check( $a, 'Named' ), 'A has Named';
-    ok !$R->check( $b, 'Named' ), 'B does not have Named';
+        my $R = Game::Entities->new( prefix => $prefix );
 
-    is  $R->get( $a, 'Named' )->name, 'new', 'Adding component replaces';
+        my ( $a, $b ) = map $R->create, 1 .. 2;
 
-    ok !$R->delete( $a, 'Named' ), 'delete returns falsy';
-    ok !$R->check(  $a, 'Named' ), 'A does not have Named';
+        is $R->check( $a, "${marker}Named" ), F,
+            "A does not have ${base}Named";
 
-    $R->delete( $a, 'Named' );
+        $R->add( $a, "${base}Named"->new( name => 'old' ) );
+        $R->add( $a, "${base}Named"->new( name => 'new' ) );
 
-    ok !$R->check( $a, 'Named' ), 'Deleting is idempotent';
-    ok !$R->get(   $a, 'Named' ), 'Getting returns undef when no component';
+        is $R->check( $a, "${marker}Named" ), T,
+            "A has ${base}Named";
+
+        if ( $prefix ) {
+            is $R->check( $a,   'Named' ), F, 'No colon does not use prefix';
+            is $R->check( $a, '::Named' ), F, 'Double colon does not use prefix';
+        }
+
+        is $R->check( $b, "${marker}Named" ), F,
+            "B does not have ${base}Named";
+
+        is $R->get( $a, "${marker}Named" )->name, 'new',
+            'Adding component replaces';
+
+        ref_is $R->delete( $a, "${marker}Named" ), $R;
+
+        is $R->check( $a, "${marker}Named" ), F,
+            "A does not have ${base}Named";
+
+        $R->delete( $a, "${marker}Named" );
+
+        is $R->check( $a, "${marker}Named" ), F,
+            'Deleting is idempotent';
+
+        is $R->get( $a, "${marker}Named" ), U,
+            'Getting returns undef when no component';
+    };
 };
 
 subtest 'Delete entities' => sub {
@@ -90,7 +117,7 @@ subtest 'Recycling GUIDs' => sub {
     # Create 20 entities
     # They should re-use the first 10 IDs and use the next 10 ( 0 .. 19 )
     @e = map $R->create( Other->new ), 0 .. 19;
-    is_deeply [ sort { $a <=> $b } map $_ & 0xFFFFF, @e ],
+    is [ sort { $a <=> $b } map $_ & 0xFFFFF, @e ],
         [ 1 .. 20 ],
         'Recycled and generated the right IDs';
 
@@ -131,21 +158,21 @@ subtest 'View' => sub {
     $R->add( $extra   => Other->new                   );
 
     subtest 'Simple view' => sub {
-        is_deeply [ sort map {
+        is [ sort map {
                     my $name = $R->get( $_, 'Named' );
                     $name ? $name->name : ();
                 } $R->view('Named')->entities
             ],
             [qw( Mit Most Pat Tim )], 'entities';
 
-        is_deeply [ sort map {
+        is [ sort map {
                     my ($name) = @$_;
                     $name ? $name->name : ();
                 } $R->view('Named')->components
             ],
             [qw( Mit Most Pat Tim )], 'components';
 
-        is_deeply [ sort map {
+        is [ sort map {
                     my ( $guid, $age ) = ( $_->[0], @{ $_->[1] } );
                     $age->age;
                 } @{ $R->view('Aging') }
@@ -154,10 +181,17 @@ subtest 'View' => sub {
 
         {
             my @first = $R->view('Aging')->first( sub { $_[1]->age > 100 } );
-            is_deeply [ $first[0], $first[1]->age ], [ 6, 200 ], 'first with match';
+            is [ $first[0], $first[1]->age ], [ 6, 200 ],
+                'first with match returns flat list';
         }
 
-        is_deeply [ $R->view('Aging')->first( sub { $_[1]->age > 1000 } ) ],
+        {
+            my @first = $R->view('Aging')->first;
+            is [ $first[0], $first[1]->age ], [ 2, 10 ],
+                'first with no matcher returns first element';
+        }
+
+        is [ $R->view('Aging')->first( sub { $_[1]->age > 1000 } ) ],
             [], 'first with no match returns empty list';
 
         my @set;
@@ -165,25 +199,25 @@ subtest 'View' => sub {
             push @set, $age->age;
         });
 
-        is_deeply [ sort @set ], [ 10, 2, 20, 200 ], 'each';
+        is [ sort @set ], [ 10, 2, 20, 200 ], 'each';
     };
 
     subtest 'Complex view' => sub {
-        is_deeply [ sort map {
+        is [ sort map {
                     my ( $name, $age ) = $R->get( $_, 'Named', 'Aging' );
                     join ':', $age->age, $name->name;
                 } $R->view('Aging', 'Named')->entities
             ],
             [qw( 200:Most 20:Tim 2:Mit )], 'entities';
 
-        is_deeply [ sort map {
+        is [ sort map {
                     my ($age, $name) = @$_;
                     join ':', $age->age, $name->name;
                 } $R->view('Aging', 'Named')->components
             ],
             [qw( 200:Most 20:Tim 2:Mit )], 'components';
 
-        is_deeply [ sort map {
+        is [ sort map {
                     my ($age, $name) = @{ $_->[1] };
                     join ':', $age->age, $name->name;
                 } @{ $R->view('Aging', 'Named') }
@@ -200,8 +234,8 @@ subtest 'View' => sub {
             push @name_age, join ':', $age->age, $name->name;
         });
 
-        is_deeply [ sort @age_name ], [qw( 200:Most 20:Tim 2:Mit )], 'each';
-        is_deeply [ sort @age_name ], [ sort @name_age ], 'order';
+        is [ sort @age_name ], [qw( 200:Most 20:Tim 2:Mit )], 'each';
+        is [ sort @age_name ], [ sort @name_age ], 'order';
     };
 
     subtest 'Global view' => sub {
@@ -210,8 +244,23 @@ subtest 'View' => sub {
             push @set, $guid . ':' . ( defined $R->get( $guid, 'Aging' ) ? 1 : 0 );
         });
 
-        is_deeply [ sort @set ], [qw( 1:0 2:1 3:1 5:1 6:1 )],
+        is [ sort @set ], [qw( 1:0 2:1 3:1 5:1 6:1 )],
             'Iterate over all entities';
+    };
+
+    subtest 'View with prefix' => sub {
+        my $R = Game::Entities->new( prefix => 'Prefix' );
+
+        my $aging = $R->create( Prefix::Aging->new( age  =>  1  ) );
+        my $named = $R->create(         Named->new( name => 'x' ) );
+
+        my $both = $R->create(
+            Prefix::Aging->new( age  =>  2  ),
+                    Named->new( name => 'y' ),
+        );
+
+        is [ $R->view(qw( :Aging Named ))->entities ], [ $both ],
+            'Views can use prefixes';
     };
 };
 
@@ -246,7 +295,7 @@ subtest 'Modifying view' => sub {
         push @x, $x->value;
     });
 
-    is_deeply [ sort @x ], [ 11, 6, 9 ], 'View can modify components';
+    is [ sort @x ], [ 11, 6, 9 ], 'View can modify components';
 
     my @y;
     $R->view->each( sub ($e) {
@@ -254,7 +303,7 @@ subtest 'Modifying view' => sub {
         push @y, $y->value;
     });
 
-    is_deeply [ sort @y ], [ 10, 11, 7 ], 'Other component is left alone';
+    is [ sort @y ], [ 10, 11, 7 ], 'Other component is left alone';
 
     $R->_dump_entities;
     like $R->_dump_entities, qr/SPARSE/, 'Generated dump';

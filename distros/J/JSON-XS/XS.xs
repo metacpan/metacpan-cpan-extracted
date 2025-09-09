@@ -253,16 +253,16 @@ json_atof_scan1 (const char *s, NV *accum, int *expo, int postdp, int maxdepth)
   // if we recurse too deep, skip all remaining digits
   // to avoid a stack overflow attack
   if (expect_false (--maxdepth <= 0))
-    while (((U8)*s - '0') < 10)
+    while (*s >= '0' && *s <= '9')
       ++s;
 
   for (;;)
     {
-      U8 dig = (U8)*s - '0';
+      U8 dig = *s - '0';
 
       if (expect_false (dig >= 10))
         {
-          if (dig == (U8)((U8)'.' - (U8)'0'))
+          if (dig == (U8)('.' - '0'))
             {
               ++s;
               json_atof_scan1 (s, accum, expo, 1, maxdepth);
@@ -282,8 +282,8 @@ json_atof_scan1 (const char *s, NV *accum, int *expo, int postdp, int maxdepth)
               else if (*s == '+')
                 ++s;
 
-              while ((dig = (U8)*s - '0') < 10)
-                exp2 = exp2 * 10 + *s++ - '0';
+              while (*s >= '0' && *s <= '9')
+                exp2 = exp2 * 10 + (*s++ - '0');
 
               *expo += neg ? -exp2 : exp2;
             }
@@ -920,7 +920,7 @@ encode_sv (enc_t *enc, SV *sv)
         {
           // optimise the "small number case"
           // code will likely be branchless and use only a single multiplication
-          // works for numbers up to 59074
+          // 4.28 works for numbers up to 59074
           I32 i = SvIVX (sv);
           U32 u;
           char digit, nz = 0;
@@ -928,7 +928,7 @@ encode_sv (enc_t *enc, SV *sv)
           need (enc, 6);
 
           *enc->cur = '-'; enc->cur += i < 0 ? 1 : 0;
-          u = i < 0 ? -i : i;
+          u = i < 0 ? -i : i; // not undefined due to range check above
 
           // convert to 4.28 fixed-point representation
           u = u * ((0xfffffff + 10000) / 10000); // 10**5, 5 fractional digits

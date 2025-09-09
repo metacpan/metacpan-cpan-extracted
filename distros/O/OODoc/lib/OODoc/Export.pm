@@ -1,5 +1,5 @@
-# This code is part of Perl distribution OODoc version 3.02.
-# The POD got stripped from this file by OODoc version 3.02.
+# This code is part of Perl distribution OODoc version 3.03.
+# The POD got stripped from this file by OODoc version 3.03.
 # For contributors see file ChangeLog.
 
 # This software is copyright (c) 2003-2025 by Mark Overmeer.
@@ -14,7 +14,7 @@
 #oodist: testing, however the code of this development version may be broken!
 
 package OODoc::Export;{
-our $VERSION = '3.02';
+our $VERSION = '3.03';
 }
 
 use parent 'OODoc::Object';
@@ -75,14 +75,19 @@ sub tree($%)
 {	my ($self, $doc, %args)   = @_;
 	$args{exporter}      = $self;
 
+	my $pubindex         = +{};
+	$self->_publicationIndex($pubindex);
+
 	my $selected_manuals = $args{manuals};
 	my %need_manual      = map +($_ => 1), @{$selected_manuals || []};
 	my @podtail_chapters = $self->podChapters($args{podtail});
 
 	my %man;
-	foreach my $package (sort $doc->packageNames)
+	my $manindex = $doc->index;
+
+	foreach my $package (sort $manindex->packageNames)
 	{
-		foreach my $manual ($doc->manualsForPackage($package))
+		foreach my $manual ($manindex->manualsForPackage($package))
 		{	!$selected_manuals || $need_manual{$manual} or next;
 			my $man = $manual->publish(\%args) or next;
 
@@ -101,9 +106,9 @@ sub tree($%)
 		manuals        => \%man,
 		meta           => \%meta,
 		distributions  => $args{distributions} || {},
-		index          => $self->publicationIndex,
+		index          => $pubindex,
 
-		generated_by   => {
+		generated_by   => +{
 			program         => $0,
 			program_version => $main::VERSION // undef,
 			oodoc_version   => $OODoc::VERSION // 'devel',

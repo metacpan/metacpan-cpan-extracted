@@ -40,11 +40,15 @@ Extends L<"OVERLOADED" in OODoc::Object|OODoc::Object/"OVERLOADED">.
 
 =over 4
 
-=item overload: B<'==' and '!=' (numeric comparison)>
+=item overload: B<'!='> (numeric different)
 
 Inherited, see L<OODoc::Object/"OVERLOADED">
 
-=item overload: B<'bool'>
+=item overload: B<'=='> (numeric equivalent)
+
+Inherited, see L<OODoc::Object/"OVERLOADED">
+
+=item overload: B<'bool'> 
 
 Inherited, see L<OODoc::Object/"OVERLOADED">
 
@@ -105,9 +109,17 @@ Extends L<"Attributes" in OODoc::Object|OODoc::Object/"Attributes">.
 
 Returns the nice name for the distribution.
 
+=item $obj-E<gt>B<index>()
+
+Returns the L<OODoc::Index|OODoc::Index> which maintains the collected information.
+
 =item $obj-E<gt>B<project>()
 
 Returns the general project description, by default the distribution name.
+
+=item $obj-E<gt>B<publish>(\%options)
+
+Inherited, see L<OODoc::Object/"Attributes">
 
 =item $obj-E<gt>B<unique>()
 
@@ -116,46 +128,6 @@ Inherited, see L<OODoc::Object/"Attributes">
 =item $obj-E<gt>B<version>()
 
 Returns the version string for the distribution.
-
-=back
-
-=head2 Manual Repository
-
-Extends L<"Manual Repository" in OODoc::Object|OODoc::Object/"Manual Repository">.
-
-=over 4
-
-=item $obj-E<gt>B<addManual>($manual)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<findManual>($name)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<mainManual>($name)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<manuals>()
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<manualsForPackage>($name)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<packageNames>()
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<publicationIndex>()
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<publish>(\%options)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
 
 =back
 
@@ -476,49 +448,52 @@ To test the document production for C<My::Module>, try (on UNIX/Linux)
 
 =item Info: * collect package relations
 
-Z<>
+Cast by finalize()
 
 =item Info: * create inheritance chapters
 
-Z<>
+Cast by finalize()
 
 =item Info: * expand manual contents
 
-Z<>
+Cast by finalize()
 
 =item Info: * finalize each manual
 
-Z<>
+Cast by finalize()
 
 =item Error: cannot compile $pkg class: $err
 
 The C<$pkg> parser class does not exist or produces compiler errors.
+Cast by processFiles()
 
 =item Fault: cannot copy distribution file $from to $to: $!
 
 For some reason, a plain file can not be copied C<$from> your source
 tree C<$to> the location where the distribution is made.
+Cast by processFiles()
 
 =item Fault: cannot create $dir: $!
 
-Z<>
+Cast by mkdirhier()
 
 =item Fault: cannot read distribution version from file $file: $!
 
-Z<>
+Cast by new()
 
 =item Fault: cannot read version from $file: $!
 
 A C<$file> named F<version> or F<VERSION> was found to contain the
 distribution version, but not accessible.
+Cast by processFiles()
 
 =item Info: compiling all packages
 
-Z<>
+Cast by getPackageRelations()
 
 =item Info: detect inheritance relationships
 
-Z<>
+Cast by getPackageRelations()
 
 =item Warning: errors from $manual: $err
 
@@ -526,23 +501,20 @@ Syntax error in your code, or a problem caused by stripping the file.
 You can run your test-scripts before the files get stripped as long
 as you do not use C<make test>, because that will try to produce
 manual-pages as well...
+Cast by getPackageRelations()
 
 =item Error: formatter() requires a directory to write the manuals to
 
 You have to provide a value to C<workdir>, which will be used as top directory
 for the produced output.  It does not matter whether there is already some
 stuff in that directory.
-
-=item Error: manual definition requires manual object
-
-A call to L<addManual()|OODoc::Object/"Manual Repository"> expects a new manual object (a L<OODoc::Manual|OODoc::Manual>),
-however an incompatible thing was passed.  Usually, intended was a call
-to L<manualsForPackage()|OODoc::Object/"Manual Repository"> or L<mainManual()|OODoc::Object/"Manual Repository">.
+Cast by formatter()
 
 =item Warning: no file $file to include in the distribution
 
 Probably your MANIFEST file lists this C<$file> which does not exist.
 The C<$file> will be skipped for now, but may cause problems later on.
+Cast by processFiles()
 
 =item Error: no version specified for distribution $dist
 
@@ -550,11 +522,13 @@ Version information will be added to all packages and all manual
 pages.  You need to specify a version and be sure that it changes
 with each release, or create a file named F<version> or F<VERSION>
 which contains that data.
+Cast by new()
 
 =item Error: parser $name could not be instantiated
 
 Something went wrong while starting the parser object.  Probably there is
 an other error message which will tell you the exact cause.
+Cast by processFiles()
 
 =item Error: requires a directory to write the distribution to
 
@@ -565,10 +539,11 @@ When processing the manifest file, some files must be copied directly
 to a temporary directory.  The packages are first stripped from
 their pseudo doc, and then written to the same directory.  That
 directory will be the place where C<< make dist >> is run later.
+Cast by processFiles()
 
 =item Error: the produced distribution needs a project description
 
-Z<>
+Cast by new()
 
 =item Error: there is no version defined for the source files
 
@@ -576,18 +551,20 @@ Each manual will need a version number.  There are various ways to
 specify one.  For instance, create a file named F<version> or F<VERSION>
 in the top source directory of your distribution, or specify a version
 as argument to L<OODoc::new()|OODoc/"METHODS"> or L<OODoc::processFiles()|OODoc/"Parser">.
+Cast by processFiles()
 
 =item Error: use regex, code reference or array for file selection, not $type
 
 The L<processFiles(select)|OODoc/"Parser"> option is not understood.  You may specify
 an ARRAY, regular expression, or a CODE reference.
+Cast by selectFiles()
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of OODoc version 3.02,
-built on August 15, 2025. Website: F<https://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.03,
+built on September 08, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 

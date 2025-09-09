@@ -10,6 +10,7 @@ OODoc::Object - base class for all OODoc classes.
    OODoc
    OODoc::Export
    OODoc::Format
+   OODoc::Index
    OODoc::Manifest
    OODoc::Manual
    OODoc::Parser
@@ -29,13 +30,17 @@ for all of the other classes.
 
 =over 4
 
-=item overload: B<'==' and '!=' (numeric comparison)>
+=item overload: B<'!='> (numeric different)
+
+Results in C<true> when the objects are different
+
+=item overload: B<'=='> (numeric equivalent)
 
 Numeric comparison is used to compare to objects whether they are
-identical.  String comparison is overloaded to compare the names
-of the objects.
+identical.  On many extensions, string comparison is overloaded to
+compare the names of the objects.
 
-=item overload: B<'bool'>
+=item overload: B<'bool'> 
 
 Always returns C<true>: "exists".
 
@@ -63,6 +68,11 @@ options when used with many other method defined by OODoc.
 
 =over 4
 
+=item $obj-E<gt>B<publish>(\%options)
+
+Extract the data of an object for export, and register it in the index.
+A HASH is returned which should get filled with useful data.
+
 =item $obj-E<gt>B<unique>()
 
 Returns a unique id for this text item.  This is the easiest way to
@@ -76,79 +86,28 @@ example:
 
 =back
 
-=head2 Manual Repository
-
-All manuals can be reached everywhere in the program: it is a global
-collection.
-
-=over 4
-
-=item $obj-E<gt>B<addManual>($manual)
-
-The C<$manual> will be added to the list of known manuals.  The same package
-name can appear in more than one manual.  This OBJECT shall be of type
-L<OODoc::Manual|OODoc::Manual>.
-
-=item $obj-E<gt>B<findManual>($name)
-
-[3.00] Returns the manual with the specified name, or else C<undef>.
-
-=item $obj-E<gt>B<mainManual>($name)
-
-Returns the manual of the named package which contains the primar
-documentation for the code of the package C<$name>.
-
-=item $obj-E<gt>B<manuals>()
-
-All manuals are returned.
-
-=item $obj-E<gt>B<manualsForPackage>($name)
-
-Returns a list package objects which are related to the specified C<$name>.
-One C<$name> can appear in more than one file, and therefore a list is
-returned.
-
-=item $obj-E<gt>B<packageNames>()
-
-Returns the names of all defined packages.
-
-=item $obj-E<gt>B<publicationIndex>()
-
-Returns the collected objects for publication.
-
-=item $obj-E<gt>B<publish>(\%options)
-
-Extract the data of an object for export, and register it in the index.
-A HASH is returned which should get filled with useful data.
-
-=back
-
 =head1 DIAGNOSTICS
 
 =over 4
 
-=item Error: Unknown object attribute '$name' for $pkg
+=item Error: unknown object attribute '$name' for $pkg
 
 You have used the option with C<$name>, which is not defined with the
 instantiation (the C<new> method) of this object.
+Cast by new()
 
-=item Error: Unknown object attributes for $pkg: '$names'
+=item Error: unknown object attributes for $pkg: '$names'
 
 You have used more than one option which is not defined to instantiate
 the object.
-
-=item Error: manual definition requires manual object
-
-A call to L<addManual()|OODoc::Object/"Manual Repository"> expects a new manual object (a L<OODoc::Manual|OODoc::Manual>),
-however an incompatible thing was passed.  Usually, intended was a call
-to L<manualsForPackage()|OODoc::Object/"Manual Repository"> or L<mainManual()|OODoc::Object/"Manual Repository">.
+Cast by new()
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of OODoc version 3.02,
-built on August 15, 2025. Website: F<https://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.03,
+built on September 08, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 

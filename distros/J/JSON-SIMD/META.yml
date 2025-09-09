@@ -8,7 +8,7 @@ configure_requires:
   ExtUtils::CppGuess: '0.15'
   ExtUtils::MakeMaker: '6.52'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.66, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,5 +24,5 @@ resources:
   bugtracker: https://github.com/pjuhasz/JSON-SIMD/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/pjuhasz/JSON-SIMD
-version: '1.06'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: '1.07'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

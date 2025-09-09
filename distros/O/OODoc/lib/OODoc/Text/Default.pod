@@ -26,19 +26,23 @@ Extends L<"OVERLOADED" in OODoc::Text|OODoc::Text/"OVERLOADED">.
 
 =over 4
 
-=item overload: B<'""' (stringification)>
+=item overload: B<'!='> (numeric different)
+
+Inherited, see L<OODoc::Object/"OVERLOADED">
+
+=item overload: B<'""'> (stringification)
 
 Inherited, see L<OODoc::Text/"OVERLOADED">
 
-=item overload: B<'==' and '!=' (numeric comparison)>
+=item overload: B<'=='> (numeric equivalent)
 
 Inherited, see L<OODoc::Object/"OVERLOADED">
 
-=item overload: B<'bool'>
+=item overload: B<'bool'> 
 
 Inherited, see L<OODoc::Object/"OVERLOADED">
 
-=item overload: B<'cmp' (string comparison)>
+=item overload: B<'cmp'> (string comparison)
 
 Inherited, see L<OODoc::Text/"OVERLOADED">
 
@@ -121,6 +125,10 @@ Inherited, see L<OODoc::Text/"Attributes">
 
 Inherited, see L<OODoc::Text/"Attributes">
 
+=item $obj-E<gt>B<publish>(\%options)
+
+Inherited, see L<OODoc::Object/"Attributes">
+
 =item $obj-E<gt>B<subroutine>()
 
 Returns the subroutine object for this option.
@@ -140,46 +148,6 @@ The value of this default.
 =item $obj-E<gt>B<where>()
 
 Inherited, see L<OODoc::Text/"Attributes">
-
-=back
-
-=head2 Manual Repository
-
-Extends L<"Manual Repository" in OODoc::Text|OODoc::Text/"Manual Repository">.
-
-=over 4
-
-=item $obj-E<gt>B<addManual>($manual)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<findManual>($name)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<mainManual>($name)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<manuals>()
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<manualsForPackage>($name)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<packageNames>()
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<publicationIndex>()
-
-Inherited, see L<OODoc::Object/"Manual Repository">
-
-=item $obj-E<gt>B<publish>(\%options)
-
-Inherited, see L<OODoc::Object/"Manual Repository">
 
 =back
 
@@ -207,22 +175,10 @@ Inherited, see L<OODoc::Text/"Collected">
 
 =back
 
-=head1 DIAGNOSTICS
-
-=over 4
-
-=item Error: manual definition requires manual object
-
-A call to L<addManual()|OODoc::Object/"Manual Repository"> expects a new manual object (a L<OODoc::Manual|OODoc::Manual>),
-however an incompatible thing was passed.  Usually, intended was a call
-to L<manualsForPackage()|OODoc::Object/"Manual Repository"> or L<mainManual()|OODoc::Object/"Manual Repository">.
-
-=back
-
 =head1 SEE ALSO
 
-This module is part of OODoc version 3.02,
-built on August 15, 2025. Website: F<https://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.03,
+built on September 08, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 

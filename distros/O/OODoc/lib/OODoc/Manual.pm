@@ -1,5 +1,5 @@
-# This code is part of Perl distribution OODoc version 3.02.
-# The POD got stripped from this file by OODoc version 3.02.
+# This code is part of Perl distribution OODoc version 3.03.
+# The POD got stripped from this file by OODoc version 3.03.
 # For contributors see file ChangeLog.
 
 # This software is copyright (c) 2003-2025 by Mark Overmeer.
@@ -14,7 +14,7 @@
 #oodist: testing, however the code of this development version may be broken!
 
 package OODoc::Manual;{
-our $VERSION = '3.02';
+our $VERSION = '3.03';
 }
 
 use parent 'OODoc::Object';
@@ -28,6 +28,7 @@ use OODoc::Text::Chapter ();
 
 use Scalar::Util  qw/blessed/;
 use List::Util    qw/first/;
+use Scalar::Util  qw/weaken/;
 
 # Prefered order of all supported chapters
 my @chapter_names = qw/
@@ -71,6 +72,8 @@ sub init($)
 
 	$self->{OM_parser}   = delete $args->{parser}    or panic;
 	$self->{OM_stripped} = delete $args->{stripped};
+	$self->{OM_index}    = delete $args->{index}     or panic;
+	weaken($self->{OM_index});
 
 	$self->{OM_pure_pod} = delete $args->{pure_pod} || 0;
 	$self->{OM_chapter_hash} = {};
@@ -84,25 +87,14 @@ sub init($)
 
 #--------------------
 
-sub package() {$_[0]->{OM_package}}
-
-
-sub parser() {$_[0]->{OM_parser}}
-
-
-sub source() {$_[0]->{OM_source}}
-
-
-sub version() {$_[0]->{OM_version}}
-
-
-sub distribution() {$_[0]->{OM_distr}}
-
-
-sub stripped() {$_[0]->{OM_stripped}}
-
-
-sub isPurePod() {$_[0]->{OM_pure_pod}}
+sub package()   { $_[0]->{OM_package}  }
+sub parser()    { $_[0]->{OM_parser}   }
+sub source()    { $_[0]->{OM_source}   }
+sub version()   { $_[0]->{OM_version}  }
+sub stripped()  { $_[0]->{OM_stripped} }
+sub isPurePod() { $_[0]->{OM_pure_pod} }
+sub index()     { $_[0]->{OM_index}    }
+sub distribution() { $_[0]->{OM_distr} }
 
 #--------------------
 
@@ -166,7 +158,7 @@ sub subroutine($)
 	my $sub;
 
 	my $package = $self->package;
-	my @parts   = defined $package ? $self->manualsForPackage($package) : $self;
+	my @parts   = defined $package ? $self->index->manualsForPackage($package) : $self;
 
 	foreach my $part (@parts)
 	{	foreach my $chapter ($part->chapters)
@@ -236,7 +228,7 @@ sub extraCode()
 	my $name = $self->name;
 
 	$self->package eq $name
-	? grep $_->name ne $name, $self->manualsForPackage($name)
+	? grep $_->name ne $name, $self->index->manualsForPackage($name)
 	: ();
 }
 
@@ -627,7 +619,7 @@ STATS
 }
 
 
-sub index()
+sub overview()
 {	my $self  = shift;
 	my @lines;
 	foreach my $chapter ($self->chapters)

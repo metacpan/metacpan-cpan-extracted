@@ -9,6 +9,8 @@ bin/oodist
 examples/markov.pm
 lib/OODoc.pm
 lib/OODoc.pod
+lib/OODoc/Examples.pm
+lib/OODoc/Examples.pod
 lib/OODoc/Export.pm
 lib/OODoc/Export.pod
 lib/OODoc/Export/JSON.pm
@@ -25,6 +27,8 @@ lib/OODoc/Format/Pod3.pm
 lib/OODoc/Format/Pod3.pod
 lib/OODoc/Format/TemplateMagic.pm
 lib/OODoc/Format/TemplateMagic.pod
+lib/OODoc/Index.pm
+lib/OODoc/Index.pod
 lib/OODoc/Manifest.pm
 lib/OODoc/Manifest.pod
 lib/OODoc/Manual.pm

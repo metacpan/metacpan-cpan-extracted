@@ -261,7 +261,9 @@ static SV* recursive_parse_json(pTHX_ dec_t *dec, T element) {
         // for scalar documents it can detect trailing content
         ERROR_RETURN_IF(TRAILING_CONTENT);
 
-        // handle case of large numbers:
+        // simdjson 3.13+ natively handles big integers
+
+        // old way of handling case of large numbers:
         // we save it as a string, but try to validate if it looks like a number at least
         // (and if it is a small but invalid number, get a more precise error code)
         auto str = get_raw_json_token_from(element);
@@ -312,6 +314,14 @@ static SV* recursive_parse_json(pTHX_ dec_t *dec, T element) {
           ERROR_RETURN;
 
           res = newSVuv((UV)u);
+          break;
+        }
+      case ondemand::number_type::big_integer:
+        {
+          // handle case of large numbers:
+          // we save it as a string, and at this point simdjson has hopefully validated it for us
+          auto str = get_raw_json_token_from(element);
+          res = newSVpvn_utf8(str.data(), str.size(), 1);
           break;
         }
       }

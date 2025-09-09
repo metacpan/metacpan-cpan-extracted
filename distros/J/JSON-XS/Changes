@@ -6,6 +6,19 @@ TODO: how to cope with tagged values and standard json decoders
 TODO: investigate magic (Eric Brine)
 TODO: [PATCH] Types::Serialiser: Inline true(), false() and error() functions
 TODO: replace bool_stash by BOOL_STASH seems to work with mod_perl, make a compile time option?
+TODO: https://github.com/ulfjack/ryu https://lemire.me/blog/2020/03/10/fast-float-parsing-in-practice/ / https://github.com/lemire/fast_double_parser
+
+TODO: validate_utf8, apparewntly some people confuse themselves.
+TODO: security considerations
+TODO: perl 5.36 has builtin::true/false/is_bool. Not sure how to integrate those.
+
+4.04 Fri 05 Sep 2025 23:59:48 CEST
+        - fix heap overflow causing crashes, possibly information
+          disclosure or worse (CVE-2025-40928), and causes JSON::XS to
+          accept invalid JSON texts as valid in some cases. Thanks to
+          Michael Hudak for finding this, the CPAN Security Group for
+          coordinating this, and Reini Urban for double-checking the patch
+          (and Peter Juhasz for potentially reporting this much earlier).
 
 4.03 Tue Oct 27 19:05:01 CET 2020
 	- when parsing comments in relaxed mode, JSON::XS would detect garbage

@@ -1,0 +1,204 @@
+=encoding utf8
+
+=head1 NAME
+
+OODoc::Examples - check the generated output
+
+=head1 SYNOPSIS
+
+ # Not code
+
+=head1 DESCRIPTION
+
+This manual page does not produce any code, and does not document OODoc:
+it lists various existing constructs supported by the Markov parser
+(L<OODoc::Parser::Markov|OODoc::Parser::Markov>), to check whether the produced output
+(POD, HTML or generated via Export) from OODoc is correct.
+
+It is really useful to look at the source of this page on github, metacpan,
+or in the distribution.
+L<https://github.com/markov2/perl5-OODoc/blob/master/lib/OODoc/Examples.pm>
+
+=head1 METHODS
+
+The chapter names which you can use in the manual-pages are restricted.  Only
+with "podtail", you may add some of your own at the end of the generated
+manual-page.
+
+=head2 Subroutine calls
+
+These are the various code entry points, where C<tie> and C<overload> are
+weird outliers.
+
+=over 4
+
+=item overload: B<""> (stringify)
+
+Z<>
+
+=item tie B<%hash>, $class, %options
+
+Z<>
+
+=item $any-E<gt>B<classInstanceMethod>(%options)
+
+Z<>
+
+=item $class-E<gt>B<classMethod>(%options)
+
+Z<>
+
+=item B<function_name>(%options)
+
+Z<>
+
+=item $obj-E<gt>B<instanceMethod>(%options)
+
+Z<>
+
+=item $obj-E<gt>B<instanceMethod2>(%options)
+
+Z<>
+
+=back
+
+=head2 Subroutine description
+
+=over 4
+
+=item $obj-E<gt>B<subr>(%options)
+
+Some descriptive text.
+
+ -Option     --Default
+  is_optional  "my default"
+  is_required  <required>
+
+=over 2
+
+=item is_optional => STRING
+
+This is an optional argument.
+
+=item is_required => STRING
+
+This is a required argument.
+
+=back
+
+example: first example
+
+This is an example for subroutine 'subr'.
+
+example: another example
+
+This is another example for subroutine 'subr'.
+
+=back
+
+=head2 Subroutine references
+
+The C<M> tag can be used to make references to Methods (functions, ...)
+and even parameters and options of them.  Much more fine-grained than
+standard PerlPod.  This does understand inheritance.
+
+=over 4
+
+=item * L<subr()|OODoc::Examples/"Subroutine description">; refers to method subr
+
+=item * L<subr(is_optional)|OODoc::Examples/"Subroutine description">; refers to option C<is_optional> of method subr
+
+=back
+
+These may also be in other manual-pages:
+
+=over 4
+
+=item * L<OODoc::finalize()|OODoc/"Actions">; refers to a method in a different manual
+
+=item * L<OODoc::processFiles(version)|OODoc/"Parser">; refers to an option of a method in another manual
+
+=back
+
+=head2 Blocks
+
+This is a section, within chapter METHODS.
+
+=head3 SubSection
+
+This is a subsection.
+
+=head4 SubSubSection
+
+This is a subsubsection.
+
+=head2 Block references
+
+In-page links:
+
+=over 4
+
+=item * L</"METHODS">, links to chapter METHODS
+
+=item * L</"Blocks">, links to section Blocks
+
+=item * L</"SubSection">, links to SubSection
+
+=item * L</"SubSubSection">, links to SubSubSection
+
+=item * L<https://ibm.com>, links to external webpage
+
+=back
+
+In-page links, but now with alternative text:
+
+=over 4
+
+=item * L<TEXT|/"METHODS">, links to chapter METHODS
+
+=item * L<TEXT|/"Blocks">, links to section Blocks
+
+=item * L<TEXT|/"SubSection">, links to SubSection
+
+=item * L<TEXT|/"SubSubSection">, links to SubSubSection
+
+=item * L<TEXT|https://ibm.com>, links to external webpage
+
+=back
+
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Error: oops, something went wrong
+
+Errors reflect problems in the running code.
+Cast by subr()
+
+=item Fault: ouch, that hurts; system fault: $!
+
+Faults are system errors which make it into errors.
+Cast by subr()
+
+=item Info: transfer completed
+
+Info statements usually show at verbose runs, to elaborate on
+steps made.
+Cast by subr()
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of OODoc version 3.03,
+built on September 08, 2025. Website: F<https://perl.overmeer.net/oodoc/>
+
+=head1 LICENSE
+
+For contributors see file ChangeLog.
+
+This software is copyright (c) 2003-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+

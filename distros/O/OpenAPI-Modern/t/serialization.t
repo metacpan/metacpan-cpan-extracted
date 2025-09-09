@@ -12,7 +12,6 @@ no feature 'switch';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
 use Test::Needs qw(Sereal::Encoder Sereal::Decoder);
-use if $ENV{AUTOMATED_TESTING}, 'Test::Warnings';
 use lib 't/lib';
 use Helper;
 

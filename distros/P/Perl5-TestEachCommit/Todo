@@ -1,12 +1,45 @@
 TODO list for Perl module Perl5::TestEachCommit
 
-Improve Perl5::TestEachCommit::Util::usage().  As of now it's just a skeleton.
-Write POD for it.
+Decide whether we should offer a method which, upon completion of work, will
+automatically or optionally reset the workdir to a clean checkout of blead.
+DONE Sep 08: cleanup_repository() added in 0a2687467f.
+
+Decide whether to set PERL_CORE=1 so that all tests are run on the assumption
+that we're working within the Perl core distribution.  This would, I believe,
+eliminate some output from testing Term::Tables which is cluttering up the
+terminal.
+DONE Sep 08: added in c9e2eb9d21.
+
+File a P5P issue or p.r. to eliminate this extraneous STDERR output I'm noticing in runs:
+
+    $ ack 'TODO: examine kid' .
+    ext/XS-APItest/APItest.xs
+    1227:  fprintf(stderr, "TODO: examine kid %p (optype=%s)\n", kid, PL_op_name[kid->op_type]);
+
+UPDATE (Sep 08): @leonerd has agreed to this and has it in a pending p.r.
+
+Write a 'dryrun' option for process_command_line which will construct the
+object, prepare the repository (but then it wouldn't be completely dry, would
+it?), display the plan, display the commits and exit.  BUT:  should this be an
+option for process_command_line() or for a program (e.g.,
+'test-each-commit-p5p' that creates a P5::TEC object and methods?
 
 Write a program which will appear under scripts in the tarball and be
 installable under /usr/local/bin which will call
 Perl5::TestEachCommit::Util::process_command_line() to process switches, then
-call a sensible collection of Perl5::TestEachCommit methods.
+call a sensible collection of Perl5::TestEachCommit methods.  Have begun
+writing such a program locally.  When polished, we'll include it in the
+distro.
 
 Write a subclass which during Configure, make test_prep and make test_harness
 will divert all STDOUT to /dev/null.  Perl5::TestEachCommit::Quietly.
+
+Testing p.r.s with many commits is time-consuming.  You don't want to have to
+keep a terminal open on your laptop to run an instance.  That suggests you
+probably want to do this (i) on a server (unless your laptop has more cores
+than your server); (ii) in a 'screen' session.  But when you re-attach to the
+screen session you only see the last 30 lines or so -- which may not be enough
+to display the scores of all commits.  That suggests we will want to offer the
+option of logging the output somewhere -- which in turn suggests we may want
+to resurrect the 'resultsdir' command-line option.
+

@@ -1,5 +1,5 @@
-# This code is part of Perl distribution OODoc version 3.02.
-# The POD got stripped from this file by OODoc version 3.02.
+# This code is part of Perl distribution OODoc version 3.03.
+# The POD got stripped from this file by OODoc version 3.03.
 # For contributors see file ChangeLog.
 
 # This software is copyright (c) 2003-2025 by Mark Overmeer.
@@ -15,7 +15,7 @@
 #oodist: testing, however the code of this development version may be broken!
 
 package OODoc::Format::Pod;{
-our $VERSION = '3.02';
+our $VERSION = '3.03';
 }
 
 use parent 'OODoc::Format';
@@ -240,7 +240,8 @@ sub showDiagnostics(@)
 	{	my $name    = $self->cleanup($manual, $diag->name);
 		my $type    = $diag->type;
 		$output->print("\n=item $type: $name\n\n");
-		$output->print($self->cleanup($manual, $diag->description || 'Z<>'));
+		$output->print($self->cleanup($manual, $diag->description));
+		$output->print("Cast by ", $diag->subroutine->name, "()\n");
 		$output->print("\n");
 	}
 	$self;
@@ -289,10 +290,12 @@ sub subroutineUse($$)
 	my $type       = $subroutine->type;
 	my $name       = $self->cleanup($manual, $subroutine->name);
 	my $paramlist  = $self->cleanup($manual, $subroutine->parameters);
-	my $params
-	= !length $paramlist ? '()'
-	: $paramlist =~ m/^[\[<]|[\]>]$/ ? "( $paramlist )"
-	:                      "($paramlist)";
+
+	$type eq 'tie'
+		and return qq[tie B<$name>, $paramlist];
+
+	my $params     = !length $paramlist ? '()' :
+		$paramlist =~ m/^[\[<]|[\]>]$/ ? "( $paramlist )" : "($paramlist)";
 
 	my $class      = $manual->package;
 	my $use
@@ -300,8 +303,7 @@ sub subroutineUse($$)
 	  : $type eq 'c_method' ? qq[\$class-E<gt>B<$name>$params]
 	  : $type eq 'ci_method'? qq[\$any-E<gt>B<$name>$params]
 	  : $type eq 'function' ? qq[B<$name>$params]
-	  : $type eq 'overload' ? qq[overload: B<$name>]
-	  : $type eq 'tie'      ? qq[B<$name>$params]
+	  : $type eq 'overload' ? qq[overload: B<$name> $paramlist]
 	  :    panic $type;
 
 	$use;

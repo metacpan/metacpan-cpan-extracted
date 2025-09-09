@@ -1,5 +1,5 @@
 package Net::Cisco::FMC::v1;
-$Net::Cisco::FMC::v1::VERSION = '0.010000';
+$Net::Cisco::FMC::v1::VERSION = '0.011000';
 # ABSTRACT: Cisco Firepower Management Center (FMC) API version 1 client library
 
 use 5.024;
@@ -37,14 +37,39 @@ has '_refresh_token' => (
 
 with 'Net::Cisco::FMC::v1::Role::REST::Client';
 
+# $res = Role::REST::Client::Response
+
+sub _error_handler ($self, $res) {
+    my $error_message;
+
+    my $data = $res->data;
+
+    if (ref $data eq 'HASH' ) {
+        if (exists $data->{error}
+            && ref $data->{error} eq 'HASH'
+            && exists $data->{error}->{messages}
+            && ref $data->{error}->{messages} eq 'ARRAY'
+            && exists $data->{error}->{message}[0]->{description}) {
+            $error_message = $data->{error}->{messages}[0]->{description};
+        }
+        else {
+            $error_message = $data->{message};
+        }
+    }
+    # underlying exception like Could not connect to 'cpmanager.example.org'
+    else {
+        $error_message = $data;
+    }
+
+    croak($error_message);
+}
+
 sub _create ($self, $url, $object_data, $query_params = {}, $expected_code = 201) {
     my $params = $self->user_agent->www_form_urlencode( $query_params );
     my $res = $self->post("$url?$params", $object_data);
-    my $code = $res->code;
-    my $data = $res->data;
-    croak($data->{error}->{messages}[0]->{description})
-        unless $code == $expected_code;
-    return $data;
+    $self->_error_handler($res)
+        unless $res->code == $expected_code;
+    return $res->data;
 }
 
 sub _list ($self, $url, $query_params = {}) {
@@ -60,11 +85,10 @@ sub _list ($self, $url, $query_params = {}) {
             limit => $limit,
             %$query_params,
         });
-        my $code = $res->code;
         my $data = $res->data;
 
-        croak($data->{error}->{messages}[0]->{description})
-            unless $code == 200;
+        $self->_error_handler($res)
+            unless $res->code == 200;
 
         push @items, $data->{items}->@*
             if exists $data->{items} && ref $data->{items} eq 'ARRAY';
@@ -85,13 +109,11 @@ sub _list ($self, $url, $query_params = {}) {
 
 sub _get ($self, $url, $query_params = {}) {
     my $res = $self->get($url, $query_params);
-    my $code = $res->code;
-    my $data = $res->data;
 
-    croak($data->{error}->{messages}[0]->{description})
-        unless $code == 200;
+    $self->_error_handler($res)
+        unless $res->code == 200;
 
-    return $data;
+    return $res->data;
 }
 
 sub _update ($self, $url, $object, $object_data, $query_params = {}) {
@@ -103,21 +125,19 @@ sub _update ($self, $url, $object, $object_data, $query_params = {}) {
 
     my $params = $self->user_agent->www_form_urlencode( $query_params );
     my $res = $self->put("$url?$params", $updated_data);
-    my $code = $res->code;
-    my $data = $res->data;
-    my $errmsg = ref $data eq 'HASH'
-        ? $data->{error}->{messages}[0]->{description}
-        : $data;
-    croak($errmsg)
-        unless $code == 200;
 
-    return $data;
+    $self->_error_handler($res)
+        unless $res->code == 200;
+
+    return $res->data;
 }
 
 sub _delete ($self, $url) {
     my $res = $self->delete($url);
-    croak($res->data->{error}->{messages}[0]->{description})
+
+    $self->_error_handler($res)
         unless $res->code == 200;
+
     return 1;
 }
 
@@ -268,10 +288,7 @@ sub login($self) {
             $res->response->header('x-auth-access-token'));
     }
     else {
-        my $errmsg = ref $res->data eq 'HASH'
-            ? $res->data->{error}->{messages}[0]->{description}
-            : $res->data;
-        croak($errmsg);
+        $self->_error_handler($res);
     }
 }
 
@@ -293,7 +310,7 @@ sub logout($self) {
         $self->clear_persistent_headers;
     }
     else {
-        croak($res->data->{error}->{messages}[0]->{description});
+        $self->_error_handler($res);
     }
 }
 
@@ -789,7 +806,7 @@ Net::Cisco::FMC::v1 - Cisco Firepower Management Center (FMC) API version 1 clie
 
 =head1 VERSION
 
-version 0.010000
+version 0.011000
 
 =head1 SYNOPSIS
 
@@ -1025,7 +1042,7 @@ Alexander Hartmaier <abraxxa@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 - 2024 by Alexander Hartmaier.
+This software is copyright (c) 2018 - 2025 by Alexander Hartmaier.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

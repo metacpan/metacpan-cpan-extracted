@@ -1,0 +1,135 @@
+=encoding utf8
+
+=head1 NAME
+
+OODoc::Index - administer the collected information
+
+=head1 INHERITANCE
+
+ OODoc::Index
+   is an OODoc::Object
+
+=head1 SYNOPSIS
+
+  my $index = $oodoc->index;
+
+=head1 DESCRIPTION
+
+Extends L<"DESCRIPTION" in OODoc::Object|OODoc::Object/"DESCRIPTION">.
+
+=head1 OVERLOADED
+
+#--------------------
+
+Extends L<"OVERLOADED" in OODoc::Object|OODoc::Object/"OVERLOADED">.
+
+=over 4
+
+=item overload: B<'!='> (numeric different)
+
+Inherited, see L<OODoc::Object/"OVERLOADED">
+
+=item overload: B<'=='> (numeric equivalent)
+
+Inherited, see L<OODoc::Object/"OVERLOADED">
+
+=item overload: B<'bool'> 
+
+Inherited, see L<OODoc::Object/"OVERLOADED">
+
+=back
+
+=head1 METHODS
+
+Extends L<"METHODS" in OODoc::Object|OODoc::Object/"METHODS">.
+
+=head2 Constructors
+
+Extends L<"Constructors" in OODoc::Object|OODoc::Object/"Constructors">.
+
+=over 4
+
+=item $class-E<gt>B<new>(%options)
+
+Inherited, see L<OODoc::Object/"Constructors">
+
+=back
+
+=head2 Attributes
+
+Extends L<"Attributes" in OODoc::Object|OODoc::Object/"Attributes">.
+
+=over 4
+
+=item $obj-E<gt>B<publish>(\%options)
+
+Inherited, see L<OODoc::Object/"Attributes">
+
+=item $obj-E<gt>B<unique>()
+
+Inherited, see L<OODoc::Object/"Attributes">
+
+=back
+
+=head2 The Manual Repository
+
+=over 4
+
+=item $obj-E<gt>B<addManual>($manual)
+
+The C<$manual> will be added to the list of known manuals.  The same package
+name can appear in more than one manual.  This OBJECT shall be of type
+L<OODoc::Manual|OODoc::Manual>.
+
+=item $obj-E<gt>B<findManual>($name)
+
+[3.00] Returns the manual with the specified name, or else C<undef>.
+
+=item $obj-E<gt>B<mainManual>($name)
+
+Returns the manual of the named package which contains the primar
+documentation for the code of the package C<$name>.
+
+=item $obj-E<gt>B<manuals>()
+
+All manuals are returned.
+
+=item $obj-E<gt>B<manualsForPackage>($name)
+
+Returns a list package objects which are related to the specified C<$name>.
+One C<$name> can appear in more than one file, and therefore a list is
+returned.
+
+=item $obj-E<gt>B<packageNames>()
+
+Returns the names of all defined packages.
+
+=back
+
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Error: manual definition requires manual object
+
+A call to L<addManual()|OODoc::Index/"The Manual Repository"> expects a new manual object (a L<OODoc::Manual|OODoc::Manual>),
+however an incompatible thing was passed.  Usually, intended was a call
+to L<manualsForPackage()|OODoc::Index/"The Manual Repository"> or L<mainManual()|OODoc::Index/"The Manual Repository">.
+Cast by addManual()
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of OODoc version 3.03,
+built on September 08, 2025. Website: F<https://perl.overmeer.net/oodoc/>
+
+=head1 LICENSE
+
+For contributors see file ChangeLog.
+
+This software is copyright (c) 2003-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+

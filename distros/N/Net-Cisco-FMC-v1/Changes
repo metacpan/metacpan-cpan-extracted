@@ -1,4 +1,7 @@
-Revision history for Net-Cisco-FMC-v1: 0.010000
+Revision history for Net-Cisco-FMC-v1: 0.011000
+
+0.011000  2025-09-09 09:53:31+02:00 Europe/Vienna
+    - throw consistent exception messages for all API calls
 
 0.010000  2024-03-07 18:39:58+01:00 Europe/Vienna
     - add methods for accesspolicy categories

@@ -1,5 +1,5 @@
-# This code is part of Perl distribution OODoc version 3.02.
-# The POD got stripped from this file by OODoc version 3.02.
+# This code is part of Perl distribution OODoc version 3.03.
+# The POD got stripped from this file by OODoc version 3.03.
 # For contributors see file ChangeLog.
 
 # This software is copyright (c) 2003-2025 by Mark Overmeer.
@@ -14,7 +14,7 @@
 #oodist: testing, however the code of this development version may be broken!
 
 package OODoc::Text::SubSection;{
-our $VERSION = '3.02';
+our $VERSION = '3.03';
 }
 
 use parent 'OODoc::Text::Structure';
@@ -23,6 +23,8 @@ use strict;
 use warnings;
 
 use Log::Report    'oodoc';
+
+use List::Util     qw/first/;
 
 #--------------------
 
@@ -47,7 +49,9 @@ sub emptyExtension($)
 
 sub findEntry($)
 {	my ($self, $name) = @_;
-	$self->name eq $name ? $self : ();
+	return $self if $self->name eq $name;
+	my $subsubsect = $self->subsubsection($name);
+	defined $subsubsect ? $subsubsect : ();
 }
 
 #--------------------

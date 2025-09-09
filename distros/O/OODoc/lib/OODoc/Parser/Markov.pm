@@ -1,5 +1,5 @@
-# This code is part of Perl distribution OODoc version 3.02.
-# The POD got stripped from this file by OODoc version 3.02.
+# This code is part of Perl distribution OODoc version 3.03.
+# The POD got stripped from this file by OODoc version 3.03.
 # For contributors see file ChangeLog.
 
 # This software is copyright (c) 2003-2025 by Mark Overmeer.
@@ -14,7 +14,7 @@
 #oodist: testing, however the code of this development version may be broken!
 
 package OODoc::Parser::Markov;{
-our $VERSION = '3.02';
+our $VERSION = '3.03';
 }
 
 use parent 'OODoc::Parser';
@@ -36,7 +36,7 @@ use OODoc::Text::Example       ();
 use OODoc::Manual              ();
 
 use File::Spec     ();
-use Scalar::Util   qw/blessed/;
+use Scalar::Util   qw/blessed weaken/;
 
 my $url_modsearch = 'https://metacpan.org/dist/';
 my $url_coderoot  = 'CODE';
@@ -54,6 +54,10 @@ sub init($)
 
 	$self->{OPM_rules} = [];
 	$self->rule(@$_) for @rules;
+
+	$self->{OPM_index} = delete $args->{index} or panic; 
+	weaken($self->{OPM_index});
+
 	$self;
 }
 
@@ -74,6 +78,9 @@ sub currentManual(;$) { my $s = shift; @_ ? ($s->{OPM_manual} = shift) : $s->{OP
 
 
 sub rules() { $_[0]->{OPM_rules} }
+
+
+sub index() { $_[0]->{OPM_index} }
 
 #--------------------
 
@@ -176,6 +183,7 @@ sub parse(@)
 			parser       => $self,
 			distribution => $distr,
 			version      => $version,
+			index        => $self->index,
 		);
 
 		push @manuals, $manual;
@@ -209,6 +217,7 @@ sub parse(@)
 				source   => $input,
 				stripped => $output,
 				parser   => $self,
+				index    => $self->index,
 
 				distribution => $distr,
 				version      => $version,
@@ -225,6 +234,7 @@ sub parse(@)
 				parser   => $self,
 				distribution => $distr,
 				version  => $version,
+				index    => $self->index,
 			);
 			push @manuals, $manual;
 			$self->currentManual($manual);
@@ -403,7 +413,13 @@ sub docSubroutine($$$$)
 	$line    =~ s/^\=(\w+)\s+//;
 	my $type = $1;
 
-	my ($name, $params) = $type eq 'overload' ? ($line, '') : $line =~ m/^(\w*)\s*(.*?)\s*$/;
+	my ($name, $params)
+	  = $type eq 'tie'      ? $line =~ m/^([$@%*]\w+)\,?\s*(.*?)\s*$/
+	  : $type eq 'overload' ? $line =~ m/^(\S+)\s*(.*?)\s*$/
+	  :    $line =~ m/^(\w+)\s*(.*?)\s*$/;
+
+	defined $name
+		or error __x"subroutine without name in {file} line {line}", file => $fn, line => $ln;
 
 	my $container = $self->{OPM_subsection} || $self->{OPM_section} || $self->{OPM_chapter}
 		or error __x"subroutine {name} outside chapter in {file} line {line}", name => $name, file => $fn, line => $ln;
@@ -413,7 +429,7 @@ sub docSubroutine($$$$)
 		parameters => $params, linenr => $ln, container => $container);
 
 	$self->setBlock($sub->openDescription);
-	$container->addSubroutine($sub);
+	$container->addSubroutine($fn, $sub);
 	$sub;
 }
 
@@ -566,7 +582,7 @@ sub decomposeM($$)
 
 	my $man;
 		if(not length($link)) { $man = $manual }
-	elsif(defined($man = $self->findManual($link))) { ; }
+	elsif(defined($man = $self->index->findManual($link))) { ; }
 	else
 	{	eval "no warnings; require $link";
 		if(  ! $@
@@ -591,7 +607,7 @@ sub decomposeM($$)
 	defined $subroutine && length $subroutine
 		or return (undef, $man);
 
-	my $package = $self->findManual($man->package);
+	my $package = $self->index->findManual($man->package);
 	unless(defined $package)
 	{	my $want = $man->package;
 		warning __x"no manual for {package} (correct casing?)", package => $want;
@@ -635,7 +651,7 @@ sub decomposeL($$)
 	($name, $item)    = (undef, $name) if $name =~ m/^".*"$/;
 	$item     =~ s/^"(.*)"$/$1/        if defined $item;
 
-	my $man   = length $name ? ($self->findManual($name) || $name) : $manual;
+	my $man   = length $name ? ($self->index->findManual($name) || $name) : $manual;
 
 	my $dest;
 	if(!ref $man)
@@ -658,8 +674,7 @@ sub decomposeL($$)
 		$text //= $item;
 	}
 	else
-	{	warning __x"manual {manual} links to unknown entry '{item}' in {other_manual}",
-			manual => $manual, entry => $item, other_manual => $man;
+	{	warning __x"manual {manual} links to unknown entry '{item}' in {other_manual}", manual => $manual, item => $item, other_manual => $man;
 		$dest   = $man;
 		$text //= "$man";
 	}

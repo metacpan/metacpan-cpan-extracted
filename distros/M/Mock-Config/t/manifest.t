@@ -5,7 +5,7 @@ if (!-d ".git" or $^O != /^(linux|.*bsd|darwin|solaris|sunos)$/) {
 }
 plan tests => 1;
 
-system("git ls-tree -r --name-only HEAD | grep -E -v '(.gitmodules|t/CORE)' >MANIFEST.git");
+system("git ls-tree -r --name-only HEAD | grep -E -v '(.github/workflows/testsuite.yml)' >MANIFEST.git");
 if (-e "MANIFEST.git") {
   diag "MANIFEST.git created with git ls-tree";
   is(`diff -bu MANIFEST.git MANIFEST`, "", "MANIFEST.git compared to MANIFEST")

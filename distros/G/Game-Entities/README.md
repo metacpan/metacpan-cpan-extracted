@@ -53,7 +53,8 @@ Game::Entities - A simple entity registry for ECS designs
     # Delete the entity and all its components
     $ECS->delete($guid);
 
-    $ECS->clear; # Delete all entities and components
+    # Delete all entities and components
+    $ECS->clear;
 
 # DESCRIPTION
 
@@ -120,7 +121,29 @@ possible over any group of entities that have a set of common components.
 
     $ECS = Game::Entities->new;
 
-Creates a new entity registry. The constructor takes no arguments.
+Creates a new entity registry. The constructor takes the following arguments:
+
+- prefix
+
+    _Since version 0.101_
+
+    If set to a true value, this will be prepended to any component name that
+    starts with a single colon (`:`). This will only affect methods that accept
+    component names, that is ["check"](#check), ["delete"](#delete), ["view"](#view), and ["get"](#get).
+
+    This can be used to reduce the repetition when using multiple components that
+    share a base namespace:
+
+        $ECS = Game::Entities->new( prefix => 'Local' );
+
+        my $guid = $ECS->create( Local::Renderable->new );
+
+        $ECS->check( $guid => 'Renderable' );        # False: no leading colon
+        $ECS->check( $guid => 'Local::Renderable' ); # True: uses full name
+        $ECS->check( $guid => ':Renderable' );       # True: uses the prefix
+
+    Note that the prefix should not have any trailing colons: these will be added
+    automatically.
 
 ## create
 
@@ -131,7 +154,7 @@ these will be added to the entity before returning.
 
 ## add
 
-    $ECS->add( $guid, @components );
+    $ECS = $ECS->add( $guid, @components );
 
 Takes an entity's GUID and a component, and adds that component to the
 specified entity. If the entity already had a component of that type, calling
@@ -139,6 +162,9 @@ this method will silently overwrite it.
 
 Multiple components can be specified, and they will all be added in the order
 they were provided.
+
+Starting from version 0.101 this method returns the invokant, so it supports
+chaining.
 
 ## get
 
@@ -157,8 +183,8 @@ When called with a list of components names, it will return a list.
 
 ## delete
 
-    $ECS->delete( $guid );
-    $ECS->delete( $guid, @component_names );
+    $ECS = $ECS->delete( $guid );
+    $ECS = $ECS->delete( $guid, @component_names );
 
 When called with only an entity's GUID, it deletes all components from the
 entity, and marks that entity's GUID as invalid.
@@ -166,6 +192,9 @@ entity, and marks that entity's GUID as invalid.
 When called with one or more additional component names,the components by
 those names will be removed from the specified entity in the order provided.
 Deleting a component from an entity is an idempotent process.
+
+Starting from version 0.101 this method returns the invokant, so it supports
+chaining.
 
 ## check
 
@@ -198,16 +227,19 @@ entities that have been created and not yet deleted.
 
 ## clear
 
-    $ECS->clear;
+    $ECS = $ECS->clear;
 
 Resets the internal storage of the registry. Calling this method leaves no
 trace from the previous state.
 
+Starting from version 0.101 this method returns the invokant, so it supports
+chaining.
+
 ## sort
 
-    $ECS->sort( $component_name => $parent_name );
-    $ECS->sort( $component_name => sub { $a ... $b } );
-    $ECS->sort( $component_name => sub ($$) { $_[0] ... $_[1] } );
+    $ECS = $ECS->sort( $component_name => $parent_name );
+    $ECS = $ECS->sort( $component_name => sub { $a ... $b } );
+    $ECS = $ECS->sort( $component_name => sub ($$) { $_[0] ... $_[1] } );
 
 _Since version 0.006, with support for prototypes since 0.011_
 
@@ -240,6 +272,9 @@ Sorting a component pool invalidates any cached views that use that component.
 
 The imposed order for this component is guaranteed to be stable as long as no
 components of this type are added or removed.
+
+Starting from version 0.101 this method returns the invokant, so it supports
+chaining.
 
 ## view
 
@@ -295,12 +330,14 @@ or remove components from those entities.
 ### first
 
     my ( $guid, @comps ) = $view->first( sub ( $guid, @comps ) { ... } );
+    my ( $guid, @comps ) = $view->first;
 
-_Since version 0.009._
+_Since version 0.009, with no coderef since 0.102_
 
 This function is similar to [each](#each), with the difference that iteration
 through the view will stop early the first time the provided coderef returns a
-true value.
+true value. If no coderef is provided, the match will be the first element in
+the view (it's equivalent to `sub { 1 }`).
 
 If the coderef ever returns true, a flat list with the GUID and the components
 in the view will be returned. If it never returns true, this method will

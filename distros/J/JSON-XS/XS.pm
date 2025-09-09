@@ -89,7 +89,7 @@ package JSON::XS;
 
 use common::sense;
 
-our $VERSION = '4.03';
+our $VERSION = '4.04';
 our @ISA = qw(Exporter);
 
 our @EXPORT = qw(encode_json decode_json);
@@ -431,7 +431,7 @@ This setting has currently no effect on tied hashes.
 
 =item $enabled = $json->get_allow_nonref
 
-Unlike other boolean options, this opotion is enabled by default beginning
+Unlike other boolean options, this option is enabled by default beginning
 with version C<4.0>. See L<SECURITY CONSIDERATIONS> for the gory details.
 
 If C<$enable> is true (or missing), then the C<encode> method can convert a
@@ -823,7 +823,7 @@ I<cannot> be the beginning of a valid JSON text:
 
    [,
 
-In reality, hopwever, the parser might continue to read data until a
+In reality, however, the parser might continue to read data until a
 length limit is exceeded or it finds a closing bracket.
 
 =head2 EXAMPLES
@@ -1195,7 +1195,7 @@ context. It must return a single scalar that can be directly encoded into
 JSON. This scalar replaces the object in the JSON text.
 
 For example, the following C<TO_JSON> method will convert all L<URI>
-objects to JSON strings when serialised. The fatc that these values
+objects to JSON strings when serialised. The fact that these values
 originally were L<URI> objects is lost.
 
    sub URI::TO_JSON {
@@ -1618,7 +1618,7 @@ explicitly disallow scalar values in your encoder and decoder:
    $json_coder = JSON::XS->new->allow_nonref (0)
 
 This is a somewhat unhappy situation, and the blame can fully be put on
-JSON's inmventor, Douglas Crockford, who unilaterally changed the format
+JSON's inventor, Douglas Crockford, who unilaterally changed the format
 in 2006 without consulting the IETF, forcing the IETF to either fork the
 format or go with it (as I was told, the IETF wasn't amused).
 
@@ -1680,7 +1680,7 @@ interested.
 
 C<JSON::XS> uses the L<Types::Serialiser> module to provide boolean
 constants. That means that the JSON true and false values will be
-comaptible to true and false values of other modules that do the same,
+compatible to true and false values of other modules that do the same,
 such as L<JSON::PP> and L<CBOR::XS>.
 
 
@@ -1705,8 +1705,8 @@ cost of not outputting valid JSON anymore.
 
 When you use C<allow_tags> to use the extended (and also nonstandard and
 invalid) JSON syntax for serialised objects, and you still want to decode
-the generated When you want to serialise objects, you can run a regex
-to replace the tagged syntax by standard JSON arrays (it only works for
+the generated text with a standard JSON decoder, you can run a regex to
+replace the tagged syntax by standard JSON arrays (it only works for
 "normal" package names without comma, newlines or single colons). First,
 the readable Perl version:
 
