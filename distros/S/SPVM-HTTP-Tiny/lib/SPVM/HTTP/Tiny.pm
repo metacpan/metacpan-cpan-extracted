@@ -1,6 +1,6 @@
 package SPVM::HTTP::Tiny;
 
-our $VERSION = "0.012";
+our $VERSION = "0.013";
 
 1;
 
@@ -38,17 +38,23 @@ B<This class is highly experimental. Many dramatic incompatibilities are expecte
     print $response->content;
   }
 
+=head1 Details
+
+=head2 Note
+
+This class is a wrapper of L<Mojo::User::Agent|SPVM::Mojo::User::Agent>. So this class has a lot of dependencies instead of Perl's one.
+
 =head1 Fields
 
 =head2 agent
 
-  has agent : ro string;
+C<has agent : ro string;>
 
 The user agent.
 
 =head2 timeout
 
-  has timeout : ro double;
+C<has timeout : ro double;>
 
 The request timeout seconds.
 
@@ -56,7 +62,7 @@ The request timeout seconds.
 
 =head2 new
 
-  static method new : HTTP::Tiny ($options : object[] = undef);
+C<static method new : HTTP::Tiny ($options : object[] = undef);>
 
 Creates a new L<HTTP::Tiny|SPVM::HTTP::Tiny> object.
 
@@ -78,7 +84,7 @@ Sets the L</"timeout"> field.
 
 =head2 get
 
-  method get : HTTP::Tiny::Response ($url : string, $options : object[] = undef);
+C<method get : HTTP::Tiny::Response ($url : string, $options : object[] = undef);>
 
 Gets the HTTP response by sending an HTTP GET request to the URL $url.
 
@@ -100,23 +106,23 @@ Timeout seconds.
 
 =head2 head
 
-  method head : HTTP::Tiny::Response ($url : string, $options : object[] = undef);
+C<method head : HTTP::Tiny::Response ($url : string, $options : object[] = undef);>
 
 =head2 put
 
-  method put : HTTP::Tiny::Response ($url : string, $options : object[] = undef);
+C<method put : HTTP::Tiny::Response ($url : string, $options : object[] = undef);>
 
 =head2 post
 
-  method post : HTTP::Tiny::Response ($url : string, $options : object[] = undef);
+C<method post : HTTP::Tiny::Response ($url : string, $options : object[] = undef);>
 
 =head2 patch
 
-  method patch : HTTP::Tiny::Response ($url : string, $options : object[] = undef);
+C<method patch : HTTP::Tiny::Response ($url : string, $options : object[] = undef);>
 
 =head2 delete
 
-  method delete : HTTP::Tiny::Response ($url : string, $options : object[] = undef);
+C<method delete : HTTP::Tiny::Response ($url : string, $options : object[] = undef);>
 
 =head1 Repository
 

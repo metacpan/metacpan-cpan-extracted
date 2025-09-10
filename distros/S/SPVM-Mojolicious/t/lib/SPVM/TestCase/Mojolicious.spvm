@@ -3,6 +3,12 @@ class TestCase::Mojolicious {
   use Mojo::Home;
   use Mojo::Log;
   
+  use Mojolicious::Static;
+  use Mojolicious::Types;
+  use Mojolicious::Lite;
+  use Mojolicious::Plugin;
+  use Mojolicious::Plugins;
+  
   static method test : int () {
     
     return 1;

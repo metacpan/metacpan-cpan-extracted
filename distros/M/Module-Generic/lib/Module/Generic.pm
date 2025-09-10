@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v1.0.5
+## Version v1.0.6
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2025/08/31
+## Modified 2025/09/06
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -99,7 +99,7 @@ BEGIN
         (?<ver>(?^:\.[0-9]+) (?^:_[0-9]+)?)
         )
     )/;
-    our $VERSION     = 'v1.0.5';
+    our $VERSION     = 'v1.0.6';
 };
 
 use v5.26.1;
@@ -220,10 +220,12 @@ sub _is_overloaded;
 sub _is_scalar;
 sub _is_tty;
 sub _is_uuid;
+sub _is_version;
 sub _is_warnings_enabled;
 sub _list_symbols;
 sub _load_class;
 sub _load_classes;
+sub _looks_like_path;
 sub _lvalue;
 sub _message;
 sub _messagef;
@@ -9566,6 +9568,77 @@ sub _is_tty
     return( -t( STDIN ) && ( -t( STDOUT ) || !( -f STDOUT || -c STDOUT ) ) );
 }
 PERL
+    # NOTE: _is_version
+    _is_version => <<'PERL',
+sub _is_version
+{
+    my $self = shift( @_ );
+    return(0) if( !@_ );
+    return(0) if( !defined( $_[0] ) );
+    # Taken from Changes::Version
+    state $version_lax_regex = qr/
+    (?<ver_str>
+        # Lax dotted-decimal version number. Distinguished by having either leading "v" 
+        # or at least three non-alpha parts. Alpha part is only permitted if there are 
+        # at least two non-alpha parts. Strangely enough, without the leading "v", Perl 
+        # takes .1.2 to mean v0.1.2, so when there is no "v", the leading part is optional
+        (?<dotted>
+            (?<has_v>v)
+            (?<ver>
+                (?<major>[0-9]+)
+                (?:
+                    (?<minor_patch>(?:\.[0-9]+)+)
+                    (?:_(?<alpha>[0-9]+))?
+                )?
+            )
+            |
+            (?<ver>
+                (?<major>[0-9]+)?
+                (?<minor_patch>(?:\.[0-9]+){2,})
+                (?:_(?<alpha>[0-9]+))?
+            )
+        )
+        |
+        (?<dotted>
+            (?<dotted_numified>
+                (?<dotted_numified_under>
+                    (?<ver>
+                        (?<release>
+                            (?<major>[0-9]+)
+                            (?<minor_patch>
+                                \.
+                                (?<minor>[0-9]{3})
+                                (?:_(?<patch>[0-9]{3}))
+                            )
+                        )
+                    )
+                )
+                |
+                (?<ver>
+                    (?<release>
+                        (?<major>[0-9]+)
+                        (?<minor_patch>
+                            \.
+                            (?<minor>0[0-9]{2})
+                            (?<patch>0[0-9]{2})
+                        )
+                    )
+                    (?:_(?<alpha>[0-9]+))?
+                )
+            )
+        )
+        |
+        # Lax decimal version number. Just like the strict one except for allowing an 
+        # alpha suffix or allowing a leading or trailing decimal-point
+        (?<decimal>
+            (?<ver>(?<release>(?<major>[0-9]+) (?: (?:\.(?<minor>[0-9]+)) | \. )?) (?:_(?<alpha>[0-9]+))?)
+            |
+            (?<ver>(?:\.(?<release>(?<major>[0-9]+))) (?:_(?<alpha>[0-9]+))?)
+        )
+    )/x;
+    return( $_[0] =~ /^$version_lax_regex$/ ? 1 : 0 );
+}
+PERL
     # NOTE: _list_symbols
     _list_symbols => <<'PERL',
 sub _list_symbols
@@ -9621,6 +9694,84 @@ sub _list_symbols
             defined( *{$ns->{ $_ }}{ $type} )
         } keys( %$ns ) );
     }
+}
+PERL
+    # NOTE: _looks_like_path
+    _looks_like_path => <<'PERL',
+sub _looks_like_path
+{
+    my $self = shift( @_ );
+    return(0) if( !@_ );
+    return(0) if( !defined( $_[0] ) );
+    return(0) if( ref( $_[0] ) );
+
+    # Avoid control chars (include DEL \x7F)
+    state $control_chars_re = qr{[\x00-\x1F\x7F]};
+    return(0) if( $_[0] =~ /$control_chars_re/ );
+
+    # Reject obvious non-paths
+    # URL schemes: scheme://...
+    state $url_scheme_re = qr{^[a-z][a-z0-9+.\-]*://}i;
+    return(0) if( $_[0] =~ m{$url_scheme_re} );
+
+    # Other schemes like mailto:, data:, etc., but allow Windows "C:\"
+    state $non_windows_scheme_re = qr{^[a-z][a-z0-9+.\-]*:}i;
+    return(0) if( $_[0] =~ m{$non_windows_scheme_re} && $_[0] !~ /^[a-z]:[\\\/]/i );
+
+    # "Email-ish" strings (no slashes, single @, plausible TLD at end)
+    # We keep this heuristic *narrow* to avoid false rejections.
+    state $email_re = qr{^[^\s@]+@[^\s@]+\.[A-Za-z]{2,}$};
+    return(0) if( $_[0] !~ m{[\\/]} && $_[0] =~ /$email_re/ );
+
+    # High confidence:
+    # Windows drive path: C:\ or C:/ ...
+    # NOTE: Actually, even this is too broad and likely to catch false positive
+    # return(1) if( $_[0] =~ /^[A-Za-z]:[\\\/]/ );
+
+    # Windows drive path: C:\dir\file.txt, C:/dir
+    state $windows_drive_re = qr{^[A-Za-z]:[\\\/][^\s/\\]+(?:[\\\/][^\s/\\]+)*\.[A-Za-z0-9]{1,4}$};
+    return(1) if( $_[0] =~ /$windows_drive_re/ );
+
+    # UNC share: \\Server\Share\...  (also allow IPv6 host literal \\[fe80::1]\Share)
+    state $unc_share_re = qr{^\\\\(?:\[[0-9A-Fa-f:]+\]|[^\\\/]+)[\\\/][^\\\/]+};
+    return(1) if( $_[0] =~ /$unc_share_re/ );
+
+    # Unix absolute: /usr/... (including root "/")
+    # NOTE: Hmmm, not sure about that one. This could lead easily to false positive.
+    # return(1) if( $_[0] =~ m{^/} );
+
+    # Home expansion: ~/something   or   ~user/something
+    state $home_expansion_re = qr{^~(?:[A-Za-z0-9._\-]+)?[\\\/]};
+    return(1) if( $_[0] =~ m{$home_expansion_re} );
+
+    # Relative: ./foo, ../bar, .\foo, ..\bar
+    state $relative_path_re = qr{^\.(?:\.|)[\\\/]};
+    return(1) if( $_[0] =~ m{$relative_path_re} );
+
+    # Env-based: $HOME/foo, %USERPROFILE%\foo
+    # NOTE: This is actually too hazardous
+    # return(1) if( $_[0] =~ m{^\$[A-Za-z_]\w*[\\\/]} || $_[0] =~ m{^%[A-Za-z_]\w*%[\\\/]} );
+
+    # Lower confidence (needs a separator):
+    state $separator_re = qr{[\\\/]};
+    if( $_[0] =~ m{$separator_re} )
+    {
+        # Disallow Windows-invalid chars
+        state $windows_invalid_char_re = qr{[<>\"|?*]};
+        return(0) if( $_[0] =~ m{$windows_invalid_char_re} );
+        # No empty trailing segment of spaces
+        state $no_trailing_space = qr{(?:^|[\\\/])\s*$};
+        return(0) if( $_[0] =~ m{$no_trailing_space} );
+        return(1);
+    }
+
+    # Lone filename heuristics (last resort):
+    # Useful when the *field name* hints it's a file/path and value is just "config.json".
+    # We keep it conservative: require an extension of up to 4 characters; avoid leading/trailing spaces.
+    state $lone_filename_re = qr{^[^\s.][^\s]*\.[A-Za-z0-9]{1,4}$};
+    return(1) if( $_[0] =~ /$lone_filename_re/ );
+
+    return(0);
 }
 PERL
     # NOTE: _on_error()
@@ -11786,7 +11937,7 @@ Quick way to create a class with feature-rich methods
 
 =head1 VERSION
 
-    v1.0.5
+    v1.0.6
 
 =head1 DESCRIPTION
 
@@ -13338,6 +13489,20 @@ Provided with a non-zero length value and this will check if it looks like a val
 
 An empty string or C<undef> can be provided and will not be checked.
 
+=head2 _is_version
+
+    my $vers = 'v1.2.3';
+    # or
+    my $vers = 1.2;
+    # or
+    my $vers = 5.006000
+
+    say $obj->_is_version( $vers ) ? "ok" : "not ok"; # ok
+
+This takes a string, and checks if it looks like a version number based on a regular expression taken from L<Changes::Version>
+
+Returns true (C<1>) upon success or false C<0> if the string does not look like a version number.
+
 =head2 _list_symbols
 
     my $obj = My::Class->new;
@@ -13423,6 +13588,24 @@ To ensure full safety, preload modules at initialization time using C<use> or ca
 This will load multiple classes by providing it an array reference of class name to load and an optional hash or hash reference of options, similar to those provided to L</_load_class>
 
 If one of those classes failed to load, it will return immediately after setting an L</error>.
+
+=head2 _looks_like_path
+
+    my $path = 'C:\dir\file.txt';
+    my $path = 'C:/dir';
+    my $unc_share = '\\Server\Share\...';
+    my $path = '~john/some/where';
+    my $path = './foo';
+    my $path = '../bar';
+    # Windows style
+    my $path = '.\foo';
+    my $path = '..\bar';
+    my $path = 'config.json';
+    say $obj->_looks_like_path( $path ) ? "ok" : "not ok"; # ok
+
+This takes a string, and checks conservatively if it looks like a file path.
+
+It returns true (C<1>) upon success, and false (C<0>) otherwise.
 
 =head2 _lvalue
 
@@ -14081,7 +14264,7 @@ And this would store an array reference containing 2 objects with the above data
 
 =head2 _set_get_class_array_object
 
-Same as L</=head2 _set_get_class_array>, but this returns an L<array object|Module::Generic::Array> instead of just a perl array.
+Same as L</_set_get_class_array>, but this returns an L<array object|Module::Generic::Array> instead of just a perl array.
 
 When called in list context, it will return its values as a list, otherwise it will return an L<array object|Module::Generic::Array>
 
@@ -14821,106 +15004,6 @@ You can also provide an existing object of the given class. L</"_set_get_object"
 
 It returns the object currently set, if any.
 
-=head2 _set_get_object_lvalue
-
-Same as L</_set_get_object_without_init> but with the possibility of setting the object value as an lvalue method:
-
-    $o->my_property = $my_object;
-
-=head2 _set_get_object_without_init
-
-    sub mymethod { return( shift->_set_get_object_without_init( 'mymethod', 'Some::Module', @_ ) ); }
-    # or
-    sub mymethod { return( shift->_set_get_object_without_init({
-        field => 'mymethod',
-        callback => sub
-        {
-            my( $class, $args ) = @_;
-            return( $class->new( $args->[0] ) );
-        },
-        check => sub
-        {
-            my( $self, $value ) = @_; # do some check
-            return(1); # Do not forget to return true
-        },
-    }, 'Some::Module', @_ ) ); }
-    # then
-    my $this = $obj->mymethod; # possibly undef if it was never instantiated
-    # return the C<Some::Module> object after having instantiated it
-    my $this = $obj->mymethod( some => parameters );
-
-Sets or gets an object, but contrary to L</_set_get_object> this method will not try to instantiate the object, unless of course you pass it some values.
-
-Alternatively, you can pass an hash reference, instead of the object property name, with the following properties:
-
-=over 4
-
-=item * C<field>
-
-Mandatory. The object property name.
-
-=item * C<callback>
-
-Optional. A code reference like an anonymous subroutine that will be called with the class and an array reference of values provided, but possibly empty.
-
-Whatever this returns will set the value for this object property.
-
-=item * C<check>
-
-A C<check> anonymous subroutine that will be called with 2 arguments, the current object, and the value being set, but before it is set.
-
-If this callback returns false, then an error of C<Invalid value provided.> will be returned, so make sure to return true to indicate that the check passed.
-
-The callback can die, and it will be caught, and be interpreted as C<false>
-
-=back
-
-This is a useful callback when the module instantiation either does not use the C<new> method or does not simply take one or multiple arguments, such as when the instantiation method would require an hash of parameters, such as L<Email::Address::XS>
-
-=head2 _set_get_object_array2
-
-    sub mymethod { return( shift->_set_get_object_array2( 'mymethod', 'Some::Module', @_ ) ); }
-    # or
-    sub mymethod { return( shift->_set_get_object_array2({
-        field => 'mymethod',
-        callback => sub
-        {
-            my( $class, $args ) = @_;
-            return( $class->new( $args->[0] ) );
-        },
-        check => sub
-        {
-            my( $self, $value ) = @_; # do some check
-            return(1); # Do not forget to return true
-        },
-    }, 'Some::Module', @_ ) ); }
-
-Provided with an object property name, a class/package name and some array reference itself containing array references each containing hash references or objects, and this will create an array of array of objects.
-
-Alternatively, you can pass an hash reference, instead of the object property name, with the following properties:
-
-=over 4
-
-=item * C<field>
-
-Mandatory. The object property name.
-
-=item * C<callback>
-
-Optional. A code reference like an anonymous subroutine that will be called with the class and an array reference of values provided, but possibly empty.
-
-=item * C<check>
-
-A C<check> anonymous subroutine that will be called with 2 arguments, the current object, and the value being set, but before it is set.
-
-If this callback returns false, then an error of C<Invalid value provided.> will be returned, so make sure to return true to indicate that the check passed.
-
-The callback can die, and it will be caught, and be interpreted as C<false>
-
-=back
-
-This is a useful callback when the module instantiation either does not use the C<new> method or does not simply take one or multiple arguments, such as when the instantiation method would require an hash of parameters, such as L<Email::Address::XS>
-
 =head2 _set_get_object_array
 
     sub mymethod { return( shift->_set_get_object_array( 'mymethod', 'Some::Module', @_ ) ); }
@@ -15000,11 +15083,61 @@ This is a useful callback when the module instantiation either does not use the 
         },
     }, 'Email::Address::XS', @_ ) ); }
 
+=head2 _set_get_object_array2
+
+    sub mymethod { return( shift->_set_get_object_array2( 'mymethod', 'Some::Module', @_ ) ); }
+    # or
+    sub mymethod { return( shift->_set_get_object_array2({
+        field => 'mymethod',
+        callback => sub
+        {
+            my( $class, $args ) = @_;
+            return( $class->new( $args->[0] ) );
+        },
+        check => sub
+        {
+            my( $self, $value ) = @_; # do some check
+            return(1); # Do not forget to return true
+        },
+    }, 'Some::Module', @_ ) ); }
+
+Provided with an object property name, a class/package name and some array reference itself containing array references each containing hash references or objects, and this will create an array of array of objects.
+
+Alternatively, you can pass an hash reference, instead of the object property name, with the following properties:
+
+=over 4
+
+=item * C<field>
+
+Mandatory. The object property name.
+
+=item * C<callback>
+
+Optional. A code reference like an anonymous subroutine that will be called with the class and an array reference of values provided, but possibly empty.
+
+=item * C<check>
+
+A C<check> anonymous subroutine that will be called with 2 arguments, the current object, and the value being set, but before it is set.
+
+If this callback returns false, then an error of C<Invalid value provided.> will be returned, so make sure to return true to indicate that the check passed.
+
+The callback can die, and it will be caught, and be interpreted as C<false>
+
+=back
+
+This is a useful callback when the module instantiation either does not use the C<new> method or does not simply take one or multiple arguments, such as when the instantiation method would require an hash of parameters, such as L<Email::Address::XS>
+
 =head2 _set_get_object_array_object
 
 Provided with an object property name, a class/package name and some data and this will create an array of object similar to L</_set_get_object_array>, except the array produced is a L<Module::Generic::Array>
 
 This method accepts the same arguments as L</_set_get_object_array>
+
+=head2 _set_get_object_lvalue
+
+Same as L</_set_get_object_without_init> but with the possibility of setting the object value as an lvalue method:
+
+    $o->my_property = $my_object;
 
 =head2 _set_get_object_variant
 
@@ -15062,6 +15195,56 @@ This is a useful callback when the module instantiation either does not use the 
             return( $class->parse_bare_address( $args->[0] ) );
         },
     }, 'Email::Address::XS', @_ ) ); }
+
+=head2 _set_get_object_without_init
+
+    sub mymethod { return( shift->_set_get_object_without_init( 'mymethod', 'Some::Module', @_ ) ); }
+    # or
+    sub mymethod { return( shift->_set_get_object_without_init({
+        field => 'mymethod',
+        callback => sub
+        {
+            my( $class, $args ) = @_;
+            return( $class->new( $args->[0] ) );
+        },
+        check => sub
+        {
+            my( $self, $value ) = @_; # do some check
+            return(1); # Do not forget to return true
+        },
+    }, 'Some::Module', @_ ) ); }
+    # then
+    my $this = $obj->mymethod; # possibly undef if it was never instantiated
+    # return the C<Some::Module> object after having instantiated it
+    my $this = $obj->mymethod( some => parameters );
+
+Sets or gets an object, but contrary to L</_set_get_object> this method will not try to instantiate the object, unless of course you pass it some values.
+
+Alternatively, you can pass an hash reference, instead of the object property name, with the following properties:
+
+=over 4
+
+=item * C<field>
+
+Mandatory. The object property name.
+
+=item * C<callback>
+
+Optional. A code reference like an anonymous subroutine that will be called with the class and an array reference of values provided, but possibly empty.
+
+Whatever this returns will set the value for this object property.
+
+=item * C<check>
+
+A C<check> anonymous subroutine that will be called with 2 arguments, the current object, and the value being set, but before it is set.
+
+If this callback returns false, then an error of C<Invalid value provided.> will be returned, so make sure to return true to indicate that the check passed.
+
+The callback can die, and it will be caught, and be interpreted as C<false>
+
+=back
+
+This is a useful callback when the module instantiation either does not use the C<new> method or does not simply take one or multiple arguments, such as when the instantiation method would require an hash of parameters, such as L<Email::Address::XS>
 
 =head2 _set_get_scalar
 

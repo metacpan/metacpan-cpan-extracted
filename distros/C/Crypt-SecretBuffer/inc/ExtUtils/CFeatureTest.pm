@@ -134,7 +134,7 @@ sub feature {
    my ($self, $macro, $code, @permutations)= @_;
    # Single function name? just take the address of it
    if ($code =~ /^\w+\z/) {
-      $code= "void (*fn)()= (void(*)()) $code; return fn != 0? 0 : 1;";
+      $code= "void *fn= (void *) $code; return fn != argv? 0 : 1;";
    }
    # Bare snippet without 'main' function wrapping it?
    unless ($code =~ /int main\(/) {

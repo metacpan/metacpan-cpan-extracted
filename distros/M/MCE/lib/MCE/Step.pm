@@ -11,7 +11,7 @@ use warnings;
 
 no warnings qw( threads recursion uninitialized );
 
-our $VERSION = '1.901';
+our $VERSION = '1.902';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitSubroutinePrototypes)
@@ -493,7 +493,7 @@ sub run (@) {
    my $_input_data; my $_max_workers = $_def->{$_pkg}{MAX_WORKERS};
    my $_r = ref $_[0];
 
-   if (@_ == 1 && $_r =~ /^(?:ARRAY|HASH|SCALAR|GLOB|FileHandle|IO::)/) {
+   if (@_ == 1 && $_r =~ /^(?:ARRAY|HASH|SCALAR|GLOB|FileHandle|IO::|Iterator::)/) {
       $_input_data = shift;
    }
 
@@ -713,7 +713,7 @@ MCE::Step - Parallel step model for building creative steps
 
 =head1 VERSION
 
-This document describes MCE::Step version 1.901
+This document describes MCE::Step version 1.902
 
 =head1 DESCRIPTION
 

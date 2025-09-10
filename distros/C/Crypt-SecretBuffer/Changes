@@ -1,3 +1,8 @@
+Version 0.006 - 2025-09-09
+  - Fix bug checking errno for EAGAIN after failed _append_random
+  - Fix Makefile.PL feature tests for required lib linker flags
+  - Fix Win32 compat when wincrypt.h isn't required/available
+
 Version 0.005 - 2025-06-05
   - Fix bug in index() that fails to search on final char of buffer
   - Improved OS feature detection, which should fix many build failures

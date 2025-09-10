@@ -1,7 +1,7 @@
 package Perl5::TestEachCommit;
 use 5.014;
 use warnings;
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 $VERSION = eval $VERSION;
 use Carp;
 use Data::Dump ( qw| dd pp| );
@@ -164,8 +164,9 @@ sub new {
 
     # workdir: First see if it has been assigned and exists
     # later: see whether it is a git checkout (and of perl)
-    $args->{workdir} //= ($ENV{SECONDARY_CHECKOUT_DIR} || '');
-    -d $args->{workdir} or croak "Unable to locate workdir in $args->{workdir}";
+    $args->{workdir} ||= ($ENV{SECONDARY_CHECKOUT_DIR} || '');
+    -d $args->{workdir} or croak "Unable to locate workdir";
+
     $data{workdir} = delete $args->{workdir};
 
     $data{branch} = $args->{branch} ? delete $args->{branch} : 'blead';

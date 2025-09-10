@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File.pm
-## Version v0.13.0
+## Version v0.14.0
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/20
-## Modified 2025/07/25
+## Modified 2025/09/06
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -143,7 +143,7 @@ BEGIN
     # Catching non-ascii characters: [^\x00-\x7F]
     # Credits to: File::Util
     $ILLEGAL_CHARACTERS = qr/[\x5C\/\|\015\012\t\013\*\"\?\<\:\>]/;
-    our $VERSION = 'v0.13.0';
+    our $VERSION = 'v0.14.0';
 };
 
 use v5.12.0;
@@ -3384,6 +3384,14 @@ sub parent
     return( $self->{parent} );
 }
 
+sub parents
+{
+    my $self = shift( @_ );
+    my( $vol, $parent, $file ) = $self->_spec_splitpath( $self->filename );
+    my @dirs = CORE::grep{ CORE::length( $_ // '' ) } $self->_spec_splitdir( $parent );
+    return( $self->new_array( \@dirs ) );
+}
+
 sub print { return( shift->_filehandle_method( 'print', 'file', @_ ) ); }
 
 sub printflush { return( shift->_filehandle_method( 'printflush', 'file', @_ ) ); }
@@ -3909,6 +3917,23 @@ sub split
     shift( @$frags ) if( scalar( @$frags ) > 1 && !CORE::length( $frags->[0] ) && $opts->{remove_leading_sep} );
     push( @$frags, $base );
     return( $self->new_array( $frags ) );
+}
+
+sub splitdir
+{
+    my $self = shift( @_ );
+    my $path = shift( @_ );
+    return( $self->error( "No path was provided to split." ) ) if( !CORE::defined( $path ) || !CORE::length( $path // '' ) );
+    return( $self->_spec_splitdir( $path ) );
+}
+
+sub splitpath
+{
+    my $self = shift( @_ );
+    return( $self->_spec_splitpath( $self->filename ) );
+    my( $vol, $parent, $file ) = $self->_spec_splitpath( $self->filename );
+    my @dirs = map{ CORE::length( $_ // '' ) } $self->_spec_splitdir( $parent );
+    return( $self->new_array( \@dirs ) );
 }
 
 sub spurt { return( shift->unload( @_ ) ); }
@@ -5659,7 +5684,7 @@ Module::Generic::File - File Object Abstraction Class
 
 =head1 VERSION
 
-    v0.13.0
+    v0.14.0
 
 =head1 DESCRIPTION
 
@@ -7174,6 +7199,13 @@ If you provide a digit, it will return the parent in the hierarchy at the desire
 
 If the digit provided, exceeds the number of possible parents, the root file object will be returned.
 
+=head2 parents
+
+    my $f = Module::Generic::File->new( '/some/where/myfile.txt' );
+    my $all = $f->parents; # ['some', 'where']
+
+This returns an L<array object|Module::Generic::Array> containing all the parent directories for the current element.
+
 =head2 print
 
 Calls L<perlfunc/print> on the file handle and pass it whatever arguments is provided.
@@ -7356,6 +7388,34 @@ It can take an optional hash or hash reference of parameters. The only one curre
 
     my $frags = $f->split( remove_leading_sep => 1 );
     # Returns ['some', 'where', 'in', 'time.txt']
+
+=head2 splitdir
+
+    my $some_directory_path = '/some/where/in/here';
+    my @parts = $f->splitdir( $some_directory_path );
+    # Returns an array of ('some', 'where', 'in', 'here')
+
+This takes a directory path, and return the call to C<File::Spec->splitdir>, which is an array of directories.
+
+=head2 splitpath
+
+    my $f = Module::Generic::File->new( '/some/where/myfile.txt' );
+    my( $vol, $dir, $filename ) = $f->splitpath;
+    # $vol would be undef
+    # $dir would be /some/where
+    # $filename would be myfile.txt
+
+This takes no arguments, and returns:
+
+=over 4
+
+=item 1. the volume, if any, such as on Windows platform, otherwise C<undef>
+
+=item 2. the directory path, such as C</some/where>
+
+=item 3. the filename
+
+=back
 
 =head2 spurt
 

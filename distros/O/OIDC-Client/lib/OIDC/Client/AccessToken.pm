@@ -12,12 +12,6 @@ has 'token' => (
   required => 1,
 );
 
-has 'refresh_token' => (
-  is       => 'ro',
-  isa      => 'Maybe[Str]',
-  required => 0,
-);
-
 has 'token_type' => (
   is       => 'ro',
   isa      => 'Maybe[Str]',
@@ -31,9 +25,10 @@ has 'expires_at' => (
 );
 
 has 'scopes' => (
-  is       => 'ro',
-  isa      => 'Maybe[ArrayRef[Str]]',
-  required => 0,
+  is        => 'ro',
+  isa       => 'Maybe[ArrayRef[Str]]',
+  required  => 0,
+  predicate => 'has_scopes',
 );
 
 has 'claims' => (
@@ -57,11 +52,6 @@ Class representing an access token
 =head2 token
 
 The string of the access token. Required
-
-=head2 refresh_token
-
-The refresh token which can be used to obtain new access tokens
-using the same authorization grant
 
 =head2 token_type
 

@@ -38,9 +38,69 @@ class Mojo::Cookie::Response extends Mojo::Cookie {
   has secure : rw byte;
   
   # Class Methods
-  static method new : Mojo::Cookie::Response () {
+  static method new : Mojo::Cookie::Response ($options : object[] = undef) {
     
     my $self = new Mojo::Cookie::Response;
+    
+    if ($options) {
+      my $option_names = [
+        "name",
+        "value",
+        "domain",
+        "expires",
+        "host_only",
+        "httponly",
+        "max_age",
+        "path",
+        "samesite",
+        "secure",
+      ];
+      
+      Fn->check_option_names($options, $option_names);
+      
+      my $options_h = Hash->new($options);
+      
+      if ($options_h->exists("name")) {
+        $self->{name} = $options_h->get_string("name");
+      }
+      
+      if ($options_h->exists("value")) {
+        $self->{value} = $options_h->get_string("value");
+      }
+      
+      if ($options_h->exists("domain")) {
+        $self->{domain} = $options_h->get_string("domain");
+      }
+      
+      if ($options_h->exists("expires")) {
+        $self->{expires} = $options_h->get_long("expires");
+      }
+      
+      if ($options_h->exists("host_only")) {
+        $self->{host_only} = (byte)$options_h->get_int("host_only");
+      }
+      
+      if ($options_h->exists("httponly")) {
+        $self->{httponly} = (byte)$options_h->get_int("httponly");
+      }
+      
+      if ($options_h->exists("max_age")) {
+        $self->{max_age} = $options_h->get_int("max_age");
+      }
+      
+      if ($options_h->exists("path")) {
+        $self->{path} = $options_h->get_string("path");
+      }
+      
+      if ($options_h->exists("samesite")) {
+        $self->{samesite} = $options_h->get_string("samesite");
+      }
+      
+      if ($options_h->exists("secure")) {
+        $self->{secure} = (byte)$options_h->get_int("secure");
+      }
+      
+    }
     
     return $self;
   }

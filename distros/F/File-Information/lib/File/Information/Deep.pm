@@ -16,19 +16,48 @@ use parent 'File::Information::Base';
 use Carp;
 use Scalar::Util qw(weaken);
 
-our $VERSION = v0.11;
+our $VERSION = v0.12;
+
+my %_PNG_colour_types = ( # namespace: 4c11d438-f6f3-417f-85e3-e56e46851dae
+    0   => {ise => 'a3934b85-5bec-5cd7-a571-727e4cecfcb1', displayname => 'Greyscale'},
+    2   => {ise => '56262598-1d35-566d-b9a3-0e752d58b8ce', displayname => 'Truecolor'},
+    3   => {ise => '67f61b65-4978-510b-b318-247da7934837', displayname => 'Indexed-color'},
+    4   => {ise => 'cbdafa4e-1cb8-59a9-b6ec-b7a1bef3fcd4', displayname => 'Greyscale with alpha'},
+    6   => {ise => 'c6ef9ba0-3b7f-5248-a4f4-18e39c14d7b3', displayname => 'Truecolor with alpha'},
+);
+
+my %_PNG_filter_method = ( # namespace: 06f15860-8191-41f5-881c-a465be563089
+    0   => {ise => 'b7a197cb-2eee-517f-ae57-8e299d1a92e9', displayname => 'None'},
+    1   => {ise => 'c194fcce-c957-5436-861f-09af8526fed8', displayname => 'Sub'},
+    2   => {ise => 'fe14ef2d-4098-5a7e-81a0-88beae0e1e65', displayname => 'Up'},
+    3   => {ise => 'b0df25b4-b1fb-52cc-a6be-162440bd9628', displayname => 'Average'},
+    4   => {ise => '974cf00a-c2e2-5d08-b1da-08169e09b173', displayname => 'Paeth'},
+);
+
+my %_PNG_compression_method = ( # namespace: b2b8b4bf-3b0f-4037-9bbc-96e6b53ae73d
+    0   => {ise => 'f47c8ff3-5218-555d-bf89-ba30706c29e1', displayname => 'deflate'},
+);
 
 my %_properties = (
-    pdf_version             => {loader => \&_load_pdf},
-    pdf_pages               => {loader => \&_load_pdf},
-    odf_keywords            => {loader => \&_load_odf},
-    data_uriid_barcodes     => {loader => \&_load_barcodes, rawtype => 'Data::URIID::Barcode'},
-    vmv0_filesize           => {loader => \&_load_vmv0},
-    vmv0_section_pointer    => {loader => \&_load_vmv0},
-    vmv0_minimum_handles    => {loader => \&_load_vmv0},
-    vmv0_minimum_ram        => {loader => \&_load_vmv0},
-    vmv0_boundary_text      => {loader => \&_load_vmv0},
-    vmv0_boundary_load      => {loader => \&_load_vmv0},
+    pdf_version                 => {loader => \&_load_pdf},
+    pdf_pages                   => {loader => \&_load_pdf},
+    odf_keywords                => {loader => \&_load_odf},
+    data_uriid_barcodes         => {loader => \&_load_barcodes, rawtype => 'Data::URIID::Barcode'},
+    vmv0_filesize               => {loader => \&_load_vmv0},
+    vmv0_section_pointer        => {loader => \&_load_vmv0},
+    vmv0_minimum_handles        => {loader => \&_load_vmv0},
+    vmv0_minimum_ram            => {loader => \&_load_vmv0},
+    vmv0_boundary_text          => {loader => \&_load_vmv0},
+    vmv0_boundary_load          => {loader => \&_load_vmv0},
+    png_ihdr_width              => {loader => \&_load_png},
+    png_ihdr_height             => {loader => \&_load_png},
+    png_ihdr_bit_depth          => {loader => \&_load_png},
+    png_ihdr_color_type         => {loader => \&_load_png},
+    png_ihdr_compression_method => {loader => \&_load_png},
+    png_ihdr_filter_method      => {loader => \&_load_png},
+    png_ihdr_interlace_method   => {loader => \&_load_png},
+    gif_screen_width            => {loader => \&_load_gif},
+    gif_screen_height           => {loader => \&_load_gif},
 );
 
 my %_vmv0_code_P1_info = (
@@ -78,6 +107,12 @@ foreach my $key (@_image_extra_keys) {
 }
 $_properties{image_info_extra_thumb_mtime}{rawtype} = 'unixts';
 $_properties{image_info_extra_thumb_uri}{rawtype} = 'uri';
+
+
+# Register well known:
+foreach my $value (values(%_PNG_colour_types), values(%_PNG_filter_method), values(%_PNG_compression_method)) {
+    Data::Identifier->new(ise => $value->{ise}, displayname => $value->{displayname})->register;
+}
 
 
 #@returns File::Information::Base
@@ -318,6 +353,65 @@ sub _load_vmv0 {
     }
 }
 
+sub _load_png {
+    my ($self, $key, %opts) = @_;
+    my $pv = ($self->{properties_values} //= {})->{current} //= {};
+
+    return if defined $self->{_loaded_png};
+    $self->{_loaded_png} = 1;
+
+    return unless $self->_check_mediatype(qw(image/png));
+
+    {
+        my $inode = $self->parent->inode;
+        my $data = $inode->peek(wanted => 1024);
+
+        if (substr($data, 0, 8) eq "\x89\x50\x4e\x47\x0d\x0a\x1a\x0a") {
+            if (substr($data, 8, 8) eq "\0\0\0\x0dIHDR") {
+                my $crc = eval {require Digest::CRC; Digest::CRC->new(type => 'crc32');} // eval { require Digest; Digest->new('CRC-32'); } // croak 'No CRC-32 support';
+                $crc->add(substr($data, 8 + 4, 4 + 13));
+                if (substr($data, 16 + 13, 4) eq pack('H8', $crc->hexdigest)) {
+                    my ($width, $height, $bit_depth, $color_type, $compression_method, $filter_method, $interlace_method) = unpack('NNCCCCC', substr($data, 16, 13));
+                    $pv->{png_ihdr_width}               = {raw => $width};
+                    $pv->{png_ihdr_height}              = {raw => $height};
+                    $pv->{png_ihdr_bit_depth}           = {raw => $bit_depth};
+                    $pv->{png_ihdr_interlace_method}    = {raw => $interlace_method};
+                    if (defined(my $ct = $_PNG_colour_types{$color_type})) {
+                        $pv->{png_ihdr_color_type}          = {raw => $color_type, ise => $ct->{ise}};
+                    }
+                    if (defined(my $fm = $_PNG_filter_method{$filter_method})) {
+                        $pv->{png_ihdr_filter_method}       = {raw => $filter_method, ise => $fm->{ise}};
+                    }
+                    if (defined(my $cm = $_PNG_compression_method{$compression_method})) {
+                        $pv->{png_ihdr_compression_method}  = {raw => $compression_method, ise => $cm->{ise}};
+                    }
+                }
+            }
+        }
+    }
+}
+
+sub _load_gif {
+    my ($self, $key, %opts) = @_;
+    my $pv = ($self->{properties_values} //= {})->{current} //= {};
+
+    return if defined $self->{_loaded_gif};
+    $self->{_loaded_gif} = 1;
+
+    return unless $self->_check_mediatype(qw(image/gif));
+
+    {
+        my $inode = $self->parent->inode;
+        my $data = $inode->peek(wanted => 1024);
+
+        if (substr($data, 0, 6) eq 'GIF89a') { # TODO: check if the following code also holds true for GIF87a
+            my ($width, $height) = unpack('vv', substr($data, 6, 4));
+            $pv->{gif_screen_width}  = {raw => $width}  if $width  > 0;
+            $pv->{gif_screen_height} = {raw => $height} if $height > 0;
+        }
+    }
+}
+
 sub _load_image_info {
     my ($self, $key, %opts) = @_;
     my $pv = ($self->{properties_values} //= {})->{current} //= {};
@@ -452,7 +546,7 @@ File::Information::Deep - generic module for extracting information from filesys
 
 =head1 VERSION
 
-version v0.11
+version v0.12
 
 =head1 SYNOPSIS
 

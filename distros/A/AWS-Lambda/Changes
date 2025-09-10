@@ -1,5 +1,13 @@
 Revision history for Perl extension aws-lambda
 
+0.6.0 2025-09-10T02:50:47Z
+    - Perl 5.42.0 is released #194
+
+0.5.5 2025-09-10T01:19:36Z
+    - ap-southeast-6 is available #199
+    - bump JSON::XS 4.04 and Cpanel::JSON::XS 4.04 #197
+    - bump IO::Socket::SSL 2.095 #184, #187, #193
+
 0.5.4 2025-06-16T02:52:21Z
     - ap-east-2 is available #182
     - bump IO::Socket::SSL 2.091 #177, #181

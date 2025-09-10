@@ -22,7 +22,7 @@ use File::Information::Tagpool;
 
 use parent 'Data::Identifier::Interface::Known';
 
-our $VERSION = v0.11;
+our $VERSION = v0.12;
 
 my $HAVE_FILE_VALUEFILE = eval {require File::ValueFile::Simple::Reader; 1;};
 my $HAVE_UNIX_MKNOD     = eval {require Unix::Mknod; 1;};
@@ -561,7 +561,7 @@ File::Information - generic module for extracting information from filesystems
 
 =head1 VERSION
 
-version v0.11
+version v0.12
 
 =head1 SYNOPSIS
 

@@ -16,7 +16,10 @@ use Term::ANSIColor;
 
 # use Data::Dumper::Simple;$Data::Dumper::Terse=TRUE;$Data::Dumper::Indent=TRUE;$Data::Dumper::Useqq=TRUE;$Data::Dumper::Deparse=TRUE;$Data::Dumper::Quotekeys=TRUE;$Data::Dumper::Trailingcomma=TRUE;$Data::Dumper::Sortkeys=TRUE;$Data::Dumper::Purity=TRUE;$Data::Dumper::Deparse=TRUE;
 
+# This block can have issues on FreeBSD
 my ($COLS,$ROWS,$w,$h) = GetTerminalSize(*STDOUT);
+$COLS = 80 if ($COLS < 80);
+$ROWS = 25 if ($ROWS < 25);
 my $pmt = 'Y';
 my $pad = int(($COLS - 23)/2);
 my $line = '-' x $pad . ' Graphics::Framebuffer ' . '-' x $pad;

@@ -79,10 +79,6 @@ Change "username" with the username of your account
 
     detect.sh
 
-  If you still are not sure, you can go to the following URL and your
-  distribution should be there, with the type of core base it is:
-
-
   Pick the appropriate prerequisie script to run.
 
   It will install the absolute minimum packages on your system needed to use

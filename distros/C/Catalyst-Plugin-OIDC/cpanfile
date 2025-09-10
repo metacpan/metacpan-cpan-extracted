@@ -6,7 +6,7 @@ requires 'Catalyst::Runtime', '5.90084';
 requires 'Clone';
 requires 'List::Util';
 requires 'Moose';
-requires 'OIDC::Client', '1.02';
+requires 'OIDC::Client', '1.03';
 requires 'Scalar::Util';
 requires 'Try::Tiny';
 requires 'namespace::autoclean';

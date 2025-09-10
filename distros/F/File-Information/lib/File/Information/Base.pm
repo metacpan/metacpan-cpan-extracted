@@ -53,7 +53,7 @@ use constant { # Taken from Data::Identifier
     WK_TAGPOOL_POOL                 => '1f30649d-eb55-48cb-93d7-6d6fcba23909',
 };
 
-our $VERSION = v0.11;
+our $VERSION = v0.12;
 
 our %_digest_name_converter = ( # stolen from Data::URIID::Result
     fc('md5')   => 'md-5-128',
@@ -999,6 +999,7 @@ sub _known_provider {
     }
 }
 
+
 1;
 
 __END__
@@ -1013,7 +1014,7 @@ File::Information::Base - generic module for extracting information from filesys
 
 =head1 VERSION
 
-version v0.11
+version v0.12
 
 =head1 SYNOPSIS
 
@@ -1146,6 +1147,8 @@ The ISE of the document. That is it's UUID, OID, or URI.
 =item C<mediatype>
 
 The media type of the document.
+
+See also L</MEDIA SUBTYPE DETECTION>.
 
 =item C<oid>
 
@@ -1412,6 +1415,38 @@ The following classes are supported. In addition the classes from L<File::Inform
 =item C<properties_name>
 
 Returns the names known by L</property_info>.
+
+=back
+
+=head1 MEDIA SUBTYPE DETECTION
+
+Via the key C<mediatype> modules implementing this interface such as L<File::Information::Inode> will provide media subtype detection.
+This feature is only available for formats that allow for unambiguous detection.
+
+The following minimal requirements are required for formats to be added. Note that this is not a complete list.
+Adhering to it is not sufficient for a format to be included.
+
+=over
+
+=item *
+
+The format must provide a unambiguous magic within the first 64 bytes of the file.
+To be unambiguous a magic must be at least 32 bit long (better 64 bit long) and must be distinct
+and not confusable with other formats.
+
+=item *
+
+The media subtype must be registered with IANA.
+Both the current list and registration format can be found at
+L<https://www.iana.org/assignments/media-types/>.
+
+=item *
+
+The format must not be subject to disputes, or limiting legal factors such as patents.
+
+=item *
+
+The specification for the format must be publically available.
 
 =back
 

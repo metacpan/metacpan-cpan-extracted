@@ -6,8 +6,8 @@ class HTTP::Tiny::Handle {
   
   allow HTTP::Tiny;
   
-  use HTTP::Tiny::Message::Request;
-  use HTTP::Tiny::Message::Response;
+  use Mojo::Message::Request;
+  use Mojo::Message::Response;
   
   use Fn;
   use Re;
@@ -36,7 +36,7 @@ class HTTP::Tiny::Handle {
     return $self;
   }
   
-  private method connect : HTTP::Tiny::Handle ($req : HTTP::Tiny::Message::Request) {
+  private method connect : HTTP::Tiny::Handle ($req : Mojo::Message::Request) {
     
     my $url = $req->url;
     my $scheme = $url->scheme;
@@ -75,7 +75,7 @@ class HTTP::Tiny::Handle {
     return $self;
   }
   
-  private method write_request : void ($req : HTTP::Tiny::Message::Request) {
+  private method write_request : void ($req : Mojo::Message::Request) {
     
     my $socket = $self->{socket};
     
@@ -90,9 +90,9 @@ class HTTP::Tiny::Handle {
     $socket->write("\r\n");
   }
   
-  private method read_response : HTTP::Tiny::Message::Response () {
+  private method read_response : Mojo::Message::Response () {
     
-    my $res = HTTP::Tiny::Message::Response->new;
+    my $res = Mojo::Message::Response->new;
     
     my $handle = $self->{socket};
     

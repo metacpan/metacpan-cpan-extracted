@@ -9,6 +9,8 @@ use Test::NoTabs;
 my @files = (
     'lib/OIDC/Client.pm',
     'lib/OIDC/Client/AccessToken.pm',
+    'lib/OIDC/Client/AccessTokenBuilder.pm',
+    'lib/OIDC/Client/ApiUserAgentBuilder.pm',
     'lib/OIDC/Client/Config.pod',
     'lib/OIDC/Client/Error.pm',
     'lib/OIDC/Client/Error/Authentication.pm',
@@ -23,7 +25,9 @@ my @files = (
     'lib/OIDC/Client/TokenResponseParser.pm',
     'lib/OIDC/Client/User.pm',
     't/00-compile.t',
+    't/access-token-builder.t',
     't/access-token.t',
+    't/api-useragent-builder.t',
     't/client.t',
     't/error-provider.t',
     't/identity.t',

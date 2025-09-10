@@ -1757,3 +1757,7 @@ Revision history for Graphics-Framebuffer
        Made some additions to the C code to eventually make way for 8 bit
        (monochrome VGA) mode.  Oddly enough, the C code will be ready before
        the Perl code.
+
+6.72   Sep 9, 2025
+
+       Made changes to help with building on FreeBSD.

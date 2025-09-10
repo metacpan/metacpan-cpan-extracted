@@ -37,12 +37,13 @@ my $test= ExtUtils::CFeatureTest->new;
 
 if ($^O eq 'MSWin32') {
    $test->require_header('windows.h');
-   $test->require_header('wincrypt.h');
+   $test->header('wincrypt.h');
 } else {
    $test->require_header('unistd.h');
    $test->require_header('fcntl.h');
    $test->require_header('termios.h');
    $test->require_feature(HAVE_PTHREAD => 'pthread_detach', { h => 'pthread.h', -l => 'pthread' });
+   $test->require_feature(HAVE_CLOCK_GETTIME => 'clock_gettime', { h => 'time.h', -l => 'rt' });
 
    $test->feature(HAVE_MINCORE   => 'mincore',   { h => 'sys/mman.h' });
    $test->feature(HAVE_GETRANDOM => 'getrandom', { h => 'sys/random.h' });
@@ -52,7 +53,7 @@ $test->header('stdbool.h');
 $test->feature(HAVE_BOOL      => 'bool x= true; return x == false;');
 
 $test->feature(HAVE_LIBSSL    => 'unsigned char buf[1]; return RAND_bytes(buf, 1) == 1? 0 : 1;',
-               { h => 'openssl/rand.h', lib => 'ssl' });
+               { h => 'openssl/rand.h', -l => 'ssl' });
 
 $test->header('string.h');
 $test->feature(HAVE_EXPLICIT_BZERO => 'char buf[1]= { 1 }; explicit_bzero(buf, 1); return buf[0];');
@@ -113,7 +114,7 @@ my %WriteMakefileArgs = (
     "Time::HiRes" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.005",
+  "VERSION" => "0.006",
   "test" => {
     "TESTS" => "t/*.t"
   }

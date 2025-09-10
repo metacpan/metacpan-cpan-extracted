@@ -6,13 +6,14 @@ use warnings;
 
 use Error::Pure qw(err);
 use Mo::utils::Number qw(check_int check_natural check_number check_percent
-	check_positive_natural);
+	check_positive_decimal check_positive_natural);
 use Readonly;
 
 Readonly::Array our @EXPORT_OK => qw(check_int_range check_natural_range
-	check_number_range check_percent_range check_positive_natural_range);
+	check_number_range check_percent_range check_positive_decimal_range
+	check_positive_natural_range);
 
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 # ... -2, -1, 0, 1, 2, ...
 sub check_int_range {
@@ -83,6 +84,22 @@ sub check_percent_range {
 	return;
 }
 
+sub check_positive_decimal_range {
+	my ($self, $key, $min, $max) = @_;
+
+	_check_key($self, $key) && return;
+
+	check_positive_decimal($self, $key);
+
+	if ($self->{$key} < $min || $self->{$key} > $max) {
+		err "Parameter '".$key."' must be a positive decimal number between $min and $max.",
+			'Value', $self->{$key},
+		;
+	}
+
+	return;
+}
+
 # 1, 2 ...
 sub check_positive_natural_range {
 	my ($self, $key, $min, $max) = @_;
@@ -130,6 +147,7 @@ Mo::utils::Number::Range - Mo number utilities for ranges.
  check_natural_range($self, $key, $min, $max);
  check_number_range($self, $key, $min, $max);
  check_percent_range($self, $key, $min, $max);
+ check_positive_decimal_range($self, $key, $min, $max);
  check_positive_natural_range($self, $key, $min, $max);
 
 =head1 DESCRIPTION
@@ -185,6 +203,17 @@ Value could be undefined or doesn't exist.
 
 Returns undef.
 
+=head2 C<check_positive_decimal_range>
+
+ check_positive_decimal_range($self, $key, $min, $max);
+
+I<Since version 0.07.>
+
+Check parameter defined by C<$key> if it's in range of positive decimal numbers.
+Value could be undefined or doesn't exist.
+
+Returns undef.
+
 =head2 C<check_positive_natural_range>
 
  check_positive_natural_range($self, $key, $min, $max);
@@ -219,6 +248,11 @@ Returns undef.
          Parameter '%s' has bad percent value (missing %).
                  Value: %s
          Parameter '%s' must be a percent between %s% and %s%.
+                 Value: %s
+ check_positive_decimal_range():
+         Parameter '%s' must be a positive decimal number.
+                 Value: %s
+         Parameter '%s' must be a positive decimal number between %s and %s.
                  Value: %s
  check_positive_natural_range():
          Parameter '%s' must be a positive natural number.
@@ -481,6 +515,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.06
+0.07
 
 =cut

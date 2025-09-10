@@ -4,7 +4,7 @@ Iterator::Flex - Iterators with flexible behaviors
 
 # VERSION
 
-version 0.28
+version 0.29
 
 # SYNOPSIS
 

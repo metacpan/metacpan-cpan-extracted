@@ -7,6 +7,7 @@ use feature 'state';
 use Test::More;
 use Test::Deep;
 use Test::Exception;
+use Test::Warn;
 use Log::Any::Test;
 use Log::Any qw($log);
 use Carp qw(croak);
@@ -56,16 +57,6 @@ sub test_build_with_exceptions {
 
     throws_ok {
       $class->new(
-        provider => 'my_provider',
-        id     => 'my_client_id',
-        secret => 'my_client_secret',
-        log    => $log,
-      );
-    } qr/jwks_url not found in provider metadata/,
-      'jwks_url is missing';
-
-    throws_ok {
-      $class->new(
         log => $log,
         config => {
           provider => 'my_provider',
@@ -94,9 +85,8 @@ sub test_build_with_exceptions {
 
   throws_ok {
     $class->new(
-      log      => $log,
-      kid_keys => {},
-      config   => {
+      log    => $log,
+      config => {
         provider            => 'my_provider',
         id                  => 'my_client_id',
         secret              => 'my_client_secret',
@@ -120,9 +110,8 @@ sub test_secret_from_config {
 
     # When
     my $client = $class->new(
-      log      => $log,
-      kid_keys => {},
-      config   => \%config,
+      log    => $log,
+      config => \%config,
     );
 
     # Then
@@ -143,9 +132,8 @@ sub test_secret_from_env {
     # When - Then
     throws_ok {
       $class->new(
-        log      => $log,
-        kid_keys => {},
-        config   => \%config,
+        log    => $log,
+        config => \%config,
       );
     } qr/OIDC: no secret configured or set up in environment/,
       'missing secret';
@@ -155,9 +143,8 @@ sub test_secret_from_env {
 
     # When
     my $client = $class->new(
-      log      => $log,
-      kid_keys => {},
-      config   => \%config,
+      log    => $log,
+      config => \%config,
     );
 
     # Then
@@ -180,9 +167,8 @@ sub test_user_agent {
 
     # When
     my $client = $class->new(
-      log      => $log,
-      kid_keys => {},
-      config   => \%config,
+      log    => $log,
+      config => \%config,
     );
 
     # Then
@@ -201,8 +187,7 @@ sub test_claim_mapping_from_config {
       firstname => 'firstName',
     );
     my $client = $class->new(
-      log      => $log,
-      kid_keys => {},
+      log    => $log,
       config => {
         provider      => 'my_provider',
         id            => 'my_client_id',
@@ -225,8 +210,7 @@ sub test_claim_mapping_from_default_value {
 
     # Given
     my $client = $class->new(
-      log      => $log,
-      kid_keys => {},
+      log    => $log,
       config => {
         provider => 'my_provider',
         id       => 'my_client_id',
@@ -253,8 +237,7 @@ sub test_decode_jwt_options_from_config {
       leeway     => 20,
     );
     my $client = $class->new(
-      log      => $log,
-      kid_keys => {},
+      log    => $log,
       config => {
         provider           => 'my_provider',
         id                 => 'my_client_id',
@@ -277,8 +260,7 @@ sub test_decode_jwt_options_from_default_value {
 
     # Given
     my $client = $class->new(
-      log      => $log,
-      kid_keys => {},
+      log    => $log,
       config => {
         provider => 'my_provider',
         id       => 'my_client_id',
@@ -434,7 +416,7 @@ sub test_kid_keys {
   );
   $test->mock_response_parser();
 
-  subtest "kid_keys" => sub {
+  subtest "kid_keys ok" => sub {
     $log->clear();
 
     # Given
@@ -472,6 +454,27 @@ sub test_kid_keys {
                ],
                'expected log');
   };
+
+  subtest "kid_keys croaks without jwks_url" => sub {
+    $log->clear();
+
+    # Given
+    my $client = $class->new(
+      log             => $log,
+      user_agent      => $test->mocked_user_agent,
+      response_parser => $test->mocked_response_parser,
+      config     => {
+        provider => 'my_provider',
+        id       => 'my_client_id',
+        secret   => 'my_client_secret',
+      },
+    );
+
+    # When - Then
+    throws_ok { $client->kid_keys }
+      qr/jwks_url not found in provider metadata/,
+      'jwks_url is missing';
+  };
 }
 
 sub test_auth_url_croaks_without_authorize_url {
@@ -479,9 +482,8 @@ sub test_auth_url_croaks_without_authorize_url {
 
     # Given
     my $client = $class->new(
-      log      => $log,
-      kid_keys => {},
-      config   => {
+      log    => $log,
+      config => {
         provider => 'my_provider',
         id       => 'my_client_id',
         secret   => 'my_client_secret',
@@ -500,8 +502,7 @@ sub test_auth_url_returning_string {
 
     # Given
     my $client = $class->new(
-      log      => $log,
-      kid_keys => {},
+      log    => $log,
       config => {
         provider => 'my_provider',
         id       => 'my_client_id',
@@ -933,7 +934,7 @@ sub test_get_token_refresh_token {
   );
   $test->mock_token_response_parser();
 
-  subtest "get_token() password grant type" => sub {
+  subtest "get_token() refresh_token grant type without scope" => sub {
 
     # Given
     my $client = $class->new(
@@ -945,6 +946,7 @@ sub test_get_token_refresh_token {
         provider => 'my_provider',
         id       => 'my_client_id',
         secret   => 'my_client_secret',
+        scope    => 'my_scope',
       },
       provider_metadata => { token_url => 'https://my-provider/token' },
     );
@@ -970,7 +972,47 @@ sub test_get_token_refresh_token {
                'expected call to user agent');
   };
 
-  subtest "get_token() password grant type with basic auth" => sub {
+  subtest "get_token() refresh_token grant type with scope" => sub {
+
+    # Given
+    my $client = $class->new(
+      log                   => $log,
+      user_agent            => $test->mocked_user_agent,
+      token_response_parser => $test->mocked_token_response_parser,
+      kid_keys => {},
+      config => {
+        provider => 'my_provider',
+        id       => 'my_client_id',
+        secret        => 'my_client_secret',
+        scope         => 'my_scope',
+        refresh_scope => 'my_refresh_scope',
+      },
+      provider_metadata => { token_url => 'https://my-provider/token' },
+    );
+
+    # When
+    my $token_response = $client->get_token(
+      grant_type    => 'refresh_token',
+      refresh_token => 'my_refresh_token',
+    );
+
+    # Then
+    is($token_response->access_token, 'my_access_token',
+       'expected access token');
+
+    my %expected_args = (
+      grant_type    => 'refresh_token',
+      client_id     => 'my_client_id',
+      client_secret => 'my_client_secret',
+      refresh_token => 'my_refresh_token',
+      scope         => 'my_refresh_scope',
+    );
+    cmp_deeply([ $test->mocked_user_agent->next_call() ],
+               [ 'post', [ $test->mocked_user_agent, 'https://my-provider/token', {}, 'form', \%expected_args ] ],
+               'expected call to user agent');
+  };
+
+  subtest "get_token() refresh_token grant type with basic auth" => sub {
 
     # Given
     my $client = $class->new(
@@ -1310,7 +1352,6 @@ sub test_get_userinfo {
     log             => $log,
     user_agent      => $test->mocked_user_agent,
     response_parser => $test->mocked_response_parser,
-    kid_keys => {},
     config => {
       provider => 'my_provider',
       id       => 'my_client_id',
@@ -1365,8 +1406,7 @@ sub test_get_audience_for_alias {
 
     # Given
     my $client = $class->new(
-      log      => $log,
-      kid_keys => {},
+      log    => $log,
       config => {
         provider       => 'my_provider',
         id             => 'my_client_id',
@@ -1406,8 +1446,7 @@ sub test_get_scope_for_audience {
 
     # Given
     my $client = $class->new(
-      log      => $log,
-      kid_keys => {},
+      log    => $log,
       config => {
         provider       => 'my_provider',
         id             => 'my_client_id',
@@ -1460,7 +1499,6 @@ sub test_exchange_token {
       log                   => $log,
       user_agent            => $test->mocked_user_agent,
       token_response_parser => $test->mocked_token_response_parser,
-      kid_keys => {},
       config => {
         provider => 'my_provider',
         id       => 'my_client_id',
@@ -1499,7 +1537,6 @@ sub test_exchange_token {
       log                   => $log,
       user_agent            => $test->mocked_user_agent,
       token_response_parser => $test->mocked_token_response_parser,
-      kid_keys => {},
       config => {
         provider => 'my_provider',
         id       => 'my_client_id',
@@ -1540,7 +1577,6 @@ sub test_exchange_token {
       log                   => $log,
       user_agent            => $test->mocked_user_agent,
       token_response_parser => $test->mocked_token_response_parser,
-      kid_keys => {},
       config => {
         provider => 'my_provider',
         id       => 'my_client_id',
@@ -1585,8 +1621,7 @@ sub test_build_api_useragent {
 
     # Given
     my $client = $class->new(
-      log      => $log,
-      kid_keys => {},
+      log    => $log,
       config => {
         provider => 'my_provider',
         id       => 'my_client_id',
@@ -1597,16 +1632,16 @@ sub test_build_api_useragent {
     my $token      = 'my_token';
 
     # When
-    my $ua = $client->build_api_useragent(
-      token_type => $token_type,
-      token      => $token,
-    );
+    my $ua;
+    warning_like {
+      $ua = $client->build_api_useragent(
+        token_type => $token_type,
+        token      => $token,
+      );
+    } 'deprecated';
 
     # Then
     isa_ok($ua, 'Mojo::UserAgent');
-    my $tx = $ua->build_tx(GET => 'localhost');
-    $tx = $ua->start($tx);
-    is($tx->req->headers->authorization, 'my_token_type my_token');
   };
 
   subtest "build_api_useragent() without token parameter" => sub {
@@ -1624,7 +1659,6 @@ sub test_build_api_useragent {
       log      => $log,
       user_agent            => $test->mocked_user_agent,
       token_response_parser => $test->mocked_token_response_parser,
-      kid_keys => {},
       config => {
         provider                  => 'my_provider',
         id                        => 'my_client_id',
@@ -1643,9 +1677,6 @@ sub test_build_api_useragent {
 
     # Then
     isa_ok($ua, 'Mojo::UserAgent');
-    my $tx = $ua->build_tx(GET => 'localhost');
-    $tx = $ua->start($tx);
-    is($tx->req->headers->authorization, 'Bearer my_access_token');
   };
 }
 
@@ -1654,9 +1685,8 @@ sub test_logout_url_croaks_without_end_session_url {
 
     # Given
     my $client = $class->new(
-      log      => $log,
-      kid_keys => {},
-      config   => {
+      log    => $log,
+      config => {
         provider => 'my_provider',
         id       => 'my_client_id',
         secret   => 'my_client_secret',
@@ -1675,8 +1705,7 @@ sub test_logout_url_returning_string {
 
     # Given
     my $client = $class->new(
-      log      => $log,
-      kid_keys => {},
+      log    => $log,
       config => {
         provider => 'my_provider',
         id       => 'my_client_id',
@@ -1740,8 +1769,7 @@ sub test_logout_url_returning_mojo_url {
 
     # Given
     my $client = $class->new(
-      log      => $log,
-      kid_keys => {},
+      log    => $log,
       config => {
         provider                 => 'my_provider',
         id                       => 'my_client_id',
@@ -1793,8 +1821,7 @@ sub test_get_claim_value {
       last_name => 'lastName',
     );
     my $client = $class->new(
-      log      => $log,
-      kid_keys => {},
+      log    => $log,
       config => {
         provider      => 'my_provider',
         id            => 'my_client_id',

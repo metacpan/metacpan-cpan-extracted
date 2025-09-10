@@ -1,5 +1,14 @@
 Changes for OIDC-Client distribution
 
+1.03 2025-09-09
+  - The refresh token is not stored in the AccessToken object anymore but in its own store
+  - The ID token can now be renewed on its own
+  - Added 'refresh_scope' configuration entry to specify the desired scope of the requested renewed token
+  - The 'jwks_url' configuration entry is no longer mandatory
+  - New OIDC::Client::AccessTokenBuilder module
+  - New OIDC::Client::ApiUserAgentBuilder module
+  - Added 'uo' and 'title' user attributes
+
 1.02 2025-08-29
   - Management of multiple authorizations to avoid errors if the same user executes multiple 'authorize' requests at the same time.
   - Same changes for logout data

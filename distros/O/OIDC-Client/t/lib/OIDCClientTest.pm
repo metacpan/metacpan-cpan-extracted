@@ -17,6 +17,7 @@ for (qw(mocked_user_agent
      )) { has $_ => ( is  => 'rw', isa => 'Test::MockObject' ) }
 
 for (qw(mocked_decode_jwt
+        mocked_access_token_builder
      )) { has $_ => ( is  => 'rw', isa => 'Test::MockModule' ) }
 
 sub launch_tests {
@@ -97,6 +98,21 @@ sub mock_decode_jwt {
   }
 
   $self->mocked_decode_jwt($mock_crypt_jwt);
+}
+
+sub mock_access_token_builder {
+  my ($self, %params) = validated_hash(
+    \@_,
+    time => { isa => 'Int', optional => 1 },
+  );
+
+  my $mock_access_token_builder = Test::MockModule->new('OIDC::Client::AccessTokenBuilder');
+
+  if (defined $params{time}) {
+    $mock_access_token_builder->redefine('_get_time' => $params{time});
+  }
+
+  $self->mocked_access_token_builder($mock_access_token_builder);
 }
 
 1;

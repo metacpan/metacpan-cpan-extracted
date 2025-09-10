@@ -382,9 +382,9 @@ IV secret_buffer_append_random(secret_buffer *buf, size_t n, unsigned flags) {
       got= read(fd, buf->data + buf->len, n);
       #endif
       if (got <= 0) {
-         if (got < 0 && errno == EAGAIN)
+         if (got < 0 && errno == EINTR)
             continue; /* keep trying */
-         if ((flags & SECRET_BUFFER_NONBLOCK) && (got == 0 || errno == EWOULDBLOCK || errno == EINTR))
+         if ((flags & SECRET_BUFFER_NONBLOCK) && (got == 0 || errno == EWOULDBLOCK || errno == EAGAIN))
             break; /* user requested a single try */
          #ifdef HAVE_GETRANDOM
          croak_with_syserror("getrandom", errno);

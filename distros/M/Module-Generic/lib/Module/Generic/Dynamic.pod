@@ -11,23 +11,35 @@ Module::Generic::Dynamic - Dynamic Object Class
 
     # Then, instantiating an object
     my $object = My::Module->new({
-        name => $some_name,
+        name => 'Test Product',
         quantity => 20,
-        metadata => $some_hash_reference,
+        metadata => { sku => 'ABC123', price => 99.99 },
         tags => [qw( product entrepreneurship capital )],
+        created => '2023-11-18T10:30:00',
+        is_active => 1,
+        url => 'https://example.com',
+        file_path => './config.ini',
     });
 
-    # Then the methods corresponding to the data keys can be accessed
-    my $product_name = $object->name
-    # etc
+    # Accessing methods
+    print $object->name; # Test Product
+    print $object->metadata->sku; # ABC123
+    print $object->tags->join(','); # product,test
+    print $object->created->year; # 2023
+
+    # Dynamic method creation via AUTOLOAD
+    $object->version('1.2.3');
+    print $object->version->stringify; # 1.2.3
 
 =head1 VERSION
 
-    v1.2.5
+    v1.3.0
 
 =head1 DESCRIPTION
 
-The purpose of this class/package is to provide a framework to create dynamically created class/package.
+C<Module::Generic::Dynamic> provides a framework for dynamically creating classes and methods based on an input hash reference. It automatically generates accessor methods for each key-value pair, inferring the appropriate data type and handling method creation at runtime using C<AUTOLOAD>.
+
+This module is particularly useful for creating flexible, data-driven objects where the structure is not known in advance. It supports a wide range of data types, including scalars, hashes, arrays, booleans, URIs, UUIDs, IP addresses, versions, files, code references, globs, and custom objects.
 
 For more granular control over the method to be used for each data key-value, use L<Module::Generic/"_set_get_class">
 
@@ -35,31 +47,103 @@ For more granular control over the method to be used for each data key-value, us
 
 =head2 new
 
-Provided with an hash reference of data, this will create dynamically a class based on the class/pacakge name used to call B<new>
-
-It will then associate helper method sbased on the data type for each key of the hash reference. Precisely:
+Provided with a hash reference of data, this creates a new object and dynamically generates a class based on the calling package name. For each key-value pair in the hash, it creates an accessor method and assigns an appropriate handler based on the data type:
 
 =over 4
 
-=item * C<hash>
-
-This would create method after the key name and a new class also based on the key name, and use the helper method L<Module::Generic/"_set_get_object">
-
 =item * C<array>
 
-If the array contains hash references, this will create a new class/package dynamically and create an object for each hash reference in the array using L<Module::Generic/"_set_get_object_array">
-
-Otherwise, it will create the method using L<Module::Generic/"_set_get_array">
-
-=item * C<string>
-
-This would create a method using the helper method L<Module::Generic/"_set_get_scalar">
+If the array contains hash references, creates a method using L<Module::Generic/"_set_get_object_array_object"> with a new dynamic class for each hash element. Otherwise, uses L<Module::Generic/"_set_get_array_as_object"> to return a L<Module::Generic::Array> object.
 
 =item * C<boolean>
 
-This would create a method using the helper method L<Module::Generic/"_set_get_boolean">
+For keys matching C<is_>, C<has_>, C<enable>, C<active>, C<valid>, C<disabled>, or C<inactive> (case-insensitive) with values C<0>, C<1>, C<undef>, or empty string, uses L<Module::Generic/"_set_get_boolean"> to return a L<Module::Generic::Boolean> object.
+
+=item * C<code>
+
+For code references, uses L<Module::Generic/"_set_get_code"> to store and execute the code.
+
+=item * C<file>
+
+For keys matching C<file> or C<path> with a valid file path (e.g., C<./config.ini>, C<~/docs>), uses L<Module::Generic/"_set_get_file"> to return a L<Module::Generic::File> object.
+
+=item * C<glob>
+
+For glob references (e.g., filehandles), uses L<Module::Generic/"_set_get_glob">.
+
+=item * C<hash>
+
+Creates a method using L<Module::Generic/"_set_get_object"> and a new dynamic class (e.g., C<My::Module::KeyName>) for nested hash data.
+
+=item * C<integer>
+
+For keys matching C<count>, C<size>, or C<quantity> with an integer value, uses L<Module::Generic/"_set_get_number"> to return a L<Module::Generic::Number> object.
+
+=item * C<IP address>
+
+For keys matching C<ip>, C<ip_addr>, or C<ip_address> with a valid IPv4 or IPv6 address, uses L<Module::Generic/"_set_get_ip"> to return a L<Module::Generic::Scalar> object.
+
+=item * C<number>
+
+For numeric values (integer or floating-point), uses L<Module::Generic/"_set_get_number"> to return a L<Module::Generic::Number> object.
+
+=item * C<object>
+
+For blessed objects (e.g., L<JSON::PP::Boolean>, L<Module::Generic::File>, custom classes), uses the appropriate handler (e.g., L<Module::Generic/"_set_get_boolean"> for booleans) or L<Module::Generic/"_set_get_object"> for others, preserving the object’s class.
+
+=item * C<string>
+
+Creates a method using L<Module::Generic/"_set_get_scalar_as_object">, returning a L<Module::Generic::Scalar> object.
+
+=item * C<URI>
+
+For keys matching C<uri> or C<url> or values starting with C<http://> or C<https://>, uses L<Module::Generic/"_set_get_uri"> to return a L<URI> object. If L<Regexp::Common::URI> is available, it validates URIs more precisely.
+
+=item * C<UUID>
+
+For keys matching C<id>, C<_id>, or ending with C<id> with a valid UUID format, uses L<Module::Generic/"_set_get_uuid"> to return a L<Module::Generic::Scalar> object.
+
+=item * C<version>
+
+For keys matching C<version> with a valid version string (e.g., C<1.2.3>), uses L<Module::Generic/"_set_get_version"> to return a L<version> object.
 
 =back
+
+If a key results in an invalid method name (e.g., starting with digits), it is sanitized by removing non-alphanumeric characters and leading digits.
+
+Example:
+
+    my $obj = Module::Generic::Dynamic->new({
+        name => 'Test',
+        is_active => 1,
+        url => 'https://example.com',
+        file => './config.ini',
+    });
+    print $obj->name; # Test
+    print $obj->is_active; # 1 (Module::Generic::Boolean)
+    print $obj->url->host; # example.com
+    print $obj->file->basename; # config.ini
+
+=head2 AUTOLOAD
+
+Dynamically creates accessor methods for undefined method calls based on the method name and the first argument’s type (if provided). It uses the same type-guessing logic as C<new>, inferring handlers from:
+
+=over 4
+
+=item * Method name patterns (e.g., C<is_active> for boolean, C<url> for URI).
+=item * Argument types (e.g., L<JSON::PP::Boolean>, hash, array, scalar).
+=item * Value formats (e.g., UUID, IP address, file path).
+
+=back
+
+If no arguments are provided (getter call), the method is created based on the method name. For example:
+
+    my $obj = Module::Generic::Dynamic->new;
+    $obj->url('https://example.com');
+    print $obj->url->host; # example.com
+    print $obj->is_active; # Creates boolean accessor, returns undef
+
+Invalid inputs (e.g., non-UUID values for C<id> fields) fall back to L<Module::Generic/"_set_get_scalar_as_object">.
 
 =head1 SERIALISATION
 
@@ -73,7 +157,15 @@ This would create a method using the helper method L<Module::Generic/"_set_get_b
 
 =for Pod::Coverage TO_JSON
 
-Serialisation by L<CBOR|CBOR::XS>, L<Sereal> and L<Storable::Improved> (or the legacy L<Storable>) is supported by this package. To that effect, the following subroutines are implemented: C<FREEZE>, C<THAW>, C<STORABLE_freeze> and C<STORABLE_thaw>
+Serialisation is supported for L<CBOR|CBOR::XS>, L<Sereal>, L<Storable::Improved>, and L<Storable>. The module implements C<FREEZE>, C<THAW>, C<STORABLE_freeze>, C<STORABLE_thaw>, and C<TO_JSON> to handle object serialization and deserialization, preserving data types and structure.
+
+Example:
+
+    my $obj = Module::Generic::Dynamic->new({ name => 'Test', tags => [qw( product test )] });
+    my $data = $obj->serialise( $obj, serialiser => 'Storable::Improved' );
+    my $new_obj = Module::Generic->new->deserialise( data => $data, serialiser => 'Storable::Improved' );
+    print $new_obj->name; # Test
+    print $new_obj->tags->join(','); # product,test
 
 =head1 THREAD SAFETY WARNING
 
@@ -83,13 +175,9 @@ C<Module::Generic::Dynamic> dynamically creates packages and injects methods int
 
 =over 4
 
-=item *
+=item * Race conditions between threads attempting to create the same symbol.
 
-Race conditions between threads attempting to create the same symbol
-
-=item *
-
-Corrupted symbol tables if a method is installed while another thread is reading or writing from the same class
+=item * Corrupted symbol tables if a method is installed while another thread is reading or writing from the same class.
 
 =back
 
@@ -97,26 +185,36 @@ Corrupted symbol tables if a method is installed while another thread is reading
 
 =over 4
 
-=item *
+=item * Use this module only during application initialization, before any threads are spawned.
 
-Use this module only during application initialisation, before any threads are spawned.
+=item * Avoid invoking C<new> or triggering C<AUTOLOAD> from within a thread.
 
-=item *
-
-Avoid invoking C<new()> or triggering C<AUTOLOAD()> from within a thread.
-
-=item *
-
-If used in a persistent environment (like mod_perl), precompile structures at startup.
+=item * In persistent environments (e.g., mod_perl), precompile structures at startup.
 
 =back
 
 =head1 ERROR HANDLING
 
-Errors in C<new> and C<AUTOLOAD>, such as invalid parameters, return C<undef> with an error object accessible via C<< $obj->error >>. Check for errors to handle failures gracefully:
+Errors in C<new> and C<AUTOLOAD>, such as invalid parameters or failed method creation, return C<undef> with an error object accessible via C<< $obj->error >>. Check for errors to handle failures gracefully:
 
-    my $obj = Module::Generic::Dynamic->new( %data );
-    die( $obj->error ) if( !defined( $obj ) );
+    my $obj = Module::Generic::Dynamic->new({ name => 'Test' });
+    die $obj->error if !defined $obj;
+
+Invalid method names (e.g., starting with digits) are sanitised by removing non-alphanumeric characters and leading digits, or ignored if no valid name remains.
+
+=head1 LIMITATIONS
+
+=over 4
+
+=item * Invalid method names (e.g., C<123invalid>) are sanitised or ignored, which may lead to unexpected behavior if not checked.
+
+=item * Type guessing is conservative to avoid false positives. For example, a string like C</api/v1> is treated as a scalar unless the key name suggests a file (e.g., C<file_path>).
+
+=item * Ambiguous inputs (e.g., a number that could be a version or integer) may default to a less specific handler (e.g., L<Module::Generic/"_set_get_number">).
+
+=back
+
+Users can override type guessing by explicitly using L<Module::Generic/"_set_get_class"> for more control.
 
 =head1 AUTHOR
 

@@ -7,7 +7,7 @@ use File::Spec::Unix;
 use Getopt::Long;
 use locale; # make \w work right in non-ASCII lands
 
-our $VERSION = 0.04; # Please keep in synch with lib/Perl5/TestEachCommit.pm
+our $VERSION = 0.05; # Please keep in synch with lib/Perl5/TestEachCommit.pm
 $VERSION = eval $VERSION;
 our @EXPORT_OK = qw( process_command_line );
 

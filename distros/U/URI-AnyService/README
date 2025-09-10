@@ -1,0 +1,88 @@
+NAME
+
+    URI::AnyService - Simple /etc/services-driven URI objects
+
+VERSION
+
+    version v0.90.0
+
+SYNOPSIS
+
+        use URI;
+        use URI::AnyService;
+    
+        my $uri = URI->new('smtp://example.com');
+        say $uri->has_recognized_scheme;  # !!0
+        say $uri->port;                   # ''
+    
+        my $uas = URI::AnyService->new('smtp://example.com');
+        say $uas->has_recognized_scheme;  # !!1
+        say $uas->port;                   # 25
+
+DESCRIPTION
+
+    This module creates simple URI-based objects for protocols that it
+    doesn't yet have defined. It works just like URI, except it just
+    supports the generic servers methods, and not anything scheme-specific.
+    In other words, most of the methods that http/https objects support.
+
+    Port numbers are looked up from a /etc/services file. If you don't have
+    a /etc/services file, one will be provided for you, but there's no
+    guarantee that it will be up-to-date or apply to your specific
+    protocol.
+
+    This allows you to use a URL like smtp://example.com without having to
+    set a default port in the URL.
+
+GLOBAL VARIABLES
+
+ %SERVICE_PORTS
+
+    This is a hash of schemes/protocols to port numbers. It is loaded from
+    the /etc/services file, as soon as you use this module.
+
+    Most of the time, you shouldn't mess with this. But, if there is some
+    new protocol that you need to add that happens to not exist in your
+    /etc/services files, you can do so with:
+
+        $URI::AnyService::SERVICE_PORTS{'my-protocol'} = 1234;
+
+    This variable is not exportable, so you need to use the full package
+    syntax.
+
+USE OPTIONS
+
+ :InternalServicesData
+
+        use URI::AnyService ':InternalServicesData';
+
+    This will force the internal services data to be loaded, even if the
+    /etc/services file is available. This is useful for testing, or if you
+    know that the /etc/services files on your servers are not consistent.
+
+    Please note that there are no guarantees that the internal data is
+    up-to-date or accurate. It's mostly used as a "last resort" fallback.
+
+CONSTRUCTOR
+
+        URI::AnyService->new($str);
+        URI::AnyService->new($str, $scheme);
+
+    This constructor is very similiar to URI's version, including the
+    somewhat-legacy two parameter form. In most cases, you should just use
+    the whole URL string.
+
+    A scheme that was defined in the services file is required.
+
+AUTHOR
+
+    Grant Street Group <developers@grantstreet.com>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2025 by Grant Street Group.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+

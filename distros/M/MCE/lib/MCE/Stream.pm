@@ -11,7 +11,7 @@ use warnings;
 
 no warnings qw( threads recursion uninitialized );
 
-our $VERSION = '1.901';
+our $VERSION = '1.902';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitSubroutinePrototypes)
@@ -417,7 +417,7 @@ sub run (@) {
    my $_input_data; my $_max_workers = $_def->{$_pkg}{MAX_WORKERS};
    my $_r = ref $_[0];
 
-   if (@_ == 1 && $_r =~ /^(?:ARRAY|HASH|SCALAR|GLOB|FileHandle|IO::)/) {
+   if (@_ == 1 && $_r =~ /^(?:ARRAY|HASH|SCALAR|GLOB|FileHandle|IO::|Iterator::)/) {
       _croak("$_tag: (HASH) not allowed as input by this MCE model")
          if $_r eq 'HASH';
       $_input_data = shift;
@@ -691,7 +691,7 @@ MCE::Stream - Parallel stream model for chaining multiple maps and greps
 
 =head1 VERSION
 
-This document describes MCE::Stream version 1.901
+This document describes MCE::Stream version 1.902
 
 =head1 SYNOPSIS
 

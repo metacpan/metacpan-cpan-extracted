@@ -14,7 +14,7 @@ package MCE::Core::Validation;
 use strict;
 use warnings;
 
-our $VERSION = '1.901';
+our $VERSION = '1.902';
 
 ## Items below are folded into MCE.
 
@@ -247,8 +247,10 @@ sub _parse_chunk_size {
 
    if ($_chunk_size eq 'auto') {
 
-      if ( (defined $_params && ref $_params->{input_data} eq 'CODE') ||
-           (defined $_input_data && ref $_input_data eq 'CODE')
+      if ( (defined $_params &&
+                ref $_params->{input_data} =~ /^(?:CODE|Iterator::)/) ||
+           (defined $_input_data &&
+                ref $_input_data =~ /^(?:CODE|Iterator::)/)
       ) {
          # Iterators may optionally use chunk_size to determine how much
          # to return per iteration. The default is 1 for MCE Models, same
@@ -402,7 +404,7 @@ MCE::Core::Validation - Core validation methods for Many-Core Engine
 
 =head1 VERSION
 
-This document describes MCE::Core::Validation version 1.901
+This document describes MCE::Core::Validation version 1.902
 
 =head1 DESCRIPTION
 

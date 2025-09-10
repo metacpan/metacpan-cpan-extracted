@@ -1,0 +1,193 @@
+# Copyright (c) 2025 Yuki Kimoto
+# MIT License
+
+class Mojolicious::Sessions {
+  version_from Mojolicious;
+  
+  use JSON;
+  use Mojo::Util;
+  use Mojolicious::Sessions::Callback::Serialize;
+  use Mojolicious::Sessions::Callback::Deserialize;
+  use Mojolicious::Controller;
+  
+  # Fields
+  has cookie_domain : rw string;
+  
+  has encrypted : rw byte;
+  
+  has secure : rw byte;
+  
+  has cookie_name : rw string
+    get {
+      unless (exists $self->{cookie_name}) {
+        $self->{cookie_name} = "mojolicious";
+      }
+      
+      return $self->{cookie_name};
+    }
+  ;
+  
+  has cookie_path : rw string
+    get {
+      unless (exists $self->{cookie_path}) {
+        $self->{cookie_path} = "/";
+      }
+      
+      return $self->{cookie_path};
+    }
+  ;
+  
+  has default_expiration : rw int
+    get {
+      unless (exists $self->{default_expiration}) {
+        $self->{default_expiration} = 3600;
+      }
+      
+      return $self->{default_expiration};
+    }
+  ;
+  
+  has deserialize : rw Mojolicious::Sessions::Callback::Deserialize
+    get {
+      unless (exists $self->{deserialize}) {
+        $self->{deserialize} = method : object ($json : string) {
+          return JSON->new->decode($json);
+        };
+      }
+      
+      return $self->{deserialize};
+    }
+  ;
+  
+  has samesite : rw string
+    get {
+      unless (exists $self->{samesite}) {
+        $self->{samesite} = "Lax";
+      }
+      
+      return $self->{samesite};
+    }
+  ;
+  
+  has serialize : rw Mojolicious::Sessions::Callback::Serialize
+    get {
+      unless (exists $self->{serialize}) {
+        $self->{serialize} = method : string ($data : object) {
+          return JSON->new->encode($data);
+        };
+      }
+      
+      return $self->{serialize};
+    }
+  ;
+  
+  # Class Methods
+  static method new : Mojolicious::Sessions () {
+    
+    my $self = new Mojolicious::Sessions;
+    
+    return $self;
+  }
+  
+  # Instance Methods
+  method load : void ($c : Mojolicious::Controller) {
+    
+    # FUTURE
+    if ($self->encrypted) {
+      die "Encrypted cookie is not supported.";
+    }
+    
+    my $value = $c->signed_cookie($self->cookie_name);
+    
+    unless ($value) {
+      return;
+    }
+    
+    Re->s(my $_ = [$value], ["-", "g"], "=");
+    $value = $_->[0];
+    
+    my $session = (Hash)$self->deserialize->(Mojo::Util->b64_decode($value));
+    unless ($session) {
+      return;
+    }
+    
+    my $exists_expiration = $session->exists("expiration");
+    
+    my $exists_expires = $session->exists("expires");
+    
+    # "expiration" value is inherited
+    my $expiration = $exists_expiration ? $session->get_int("expiration") : $self->default_expiration;
+    
+    my $expires =  $session->get_long("expires");
+    $session->delete("expires");
+    
+    if (!$expires && $expiration) {
+      return;
+    }
+    
+    
+    if ($exists_expires && $expires <= Sys->time) {
+      return;
+    }
+    
+    my $session_keys = $session->keys;
+    
+    my $session_keys_length = @$session_keys;
+    
+    $c->set_active_session($session_keys_length);
+    
+    unless ($session_keys_length) {
+      return;
+    }
+    
+    $c->set_session($session);
+    
+    if ($session->get("new_flash")) {
+      $session->set(flash => $session->delete("new_flash"));
+    }
+  }
+  
+
+  method store : void ($c : Mojolicious::Controller) {
+
+    # Make sure session was active
+    my $session = $c->session;
+    unless ($session) {
+      return;
+    }
+    
+    unless (@$session->keys || $c->active_session) {
+      return;
+    }
+    
+    die "TODO";
+    
+=pod
+
+    # Don't reset flash for static files
+    my $old = delete $session->{flash};
+    $session->{new_flash} = $old if $stash->{'mojo.static'};
+    delete $session->{new_flash} unless keys %{$session->{new_flash}};
+
+    # Generate "expires" value from "expiration" if necessary
+    my $expiration = $session->{expiration} // $self->default_expiration;
+    my $default    = delete $session->{expires};
+    $session->{expires} = $default || time + $expiration if $expiration || $default;
+
+    my $value = b64_encode $self->serialize->($session), '';
+    $value =~ y/=/-/;
+    my $options = {
+      domain   => $self->cookie_domain,
+      expires  => $session->{expires},
+      httponly => 1,
+      path     => $self->cookie_path,
+      samesite => $self->samesite,
+      secure   => $self->secure
+    };
+    my $method = $self->encrypted ? 'encrypted_cookie' : 'signed_cookie';
+    $c->$method($self->cookie_name, $value, $options);
+
+=cut
+
+  }
+}

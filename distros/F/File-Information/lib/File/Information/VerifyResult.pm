@@ -17,7 +17,7 @@ use Carp;
 
 use File::Information::VerifyTestResult;
 
-our $VERSION = v0.11;
+our $VERSION = v0.12;
 
 # ----------------
 
@@ -66,7 +66,7 @@ File::Information::VerifyResult - generic module for extracting information from
 
 =head1 VERSION
 
-version v0.11
+version v0.12
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,15 @@
+# Copyright (c) 2025 Yuki Kimoto
+# MIT License
+
+class Mojo::Cache {
+  version_from Mojolicious;
+  
+  # Class Method
+  static method new : Mojo::Cache () {
+    
+    my $self = new Mojo::Cache;
+    
+    return $self;
+  }
+  
+}

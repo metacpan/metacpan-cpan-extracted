@@ -3,11 +3,8 @@ class TestCase::HTTP::Tiny {
   use Fn;
   use Go;
   use Array;
-  use HTTP::Tiny::Daemon;
   
-  use HTTP::Tiny::Transaction;
-  use HTTP::Tiny::Transaction::HTTP;
-  use HTTP::Tiny::Content::Single;
+  use HTTP::Tiny;
   
   our $RESULT : IntList;
   

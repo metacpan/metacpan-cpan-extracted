@@ -7,7 +7,7 @@ package Iterator::Flex::Role::Wrap::Self;
 use strict;
 use warnings;
 
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 
 use Scalar::Util;
 use Iterator::Flex::Utils 'NEXT';
@@ -58,7 +58,7 @@ Iterator::Flex::Role::Wrap::Self - Construct a next() method for a coderef which
 
 =head1 VERSION
 
-version 0.28
+version 0.29
 
 =head1 INTERNALS
 

@@ -21,19 +21,19 @@ no_index:
 provides:
   SIRTX::VM:
     file: lib/SIRTX/VM.pm
-    version: v0.4.0
+    version: v0.5.0
   SIRTX::VM::Assembler:
     file: lib/SIRTX/VM/Assembler.pm
-    version: v0.4.0
+    version: v0.5.0
   SIRTX::VM::Opcode:
     file: lib/SIRTX/VM/Opcode.pm
-    version: v0.4.0
+    version: v0.5.0
   SIRTX::VM::Register:
     file: lib/SIRTX/VM/Register.pm
-    version: v0.4.0
+    version: v0.5.0
   SIRTX::VM::RegisterFile:
     file: lib/SIRTX/VM/RegisterFile.pm
-    version: v0.4.0
+    version: v0.5.0
 requires:
   Carp: '1.35'
   Data::Identifier: v0.16.0
@@ -44,7 +44,7 @@ requires:
   perl: v5.16.0
 resources:
   repository: git://gitea.dev.loewenfelsen.net/11201-Loewenfelsen/SIRTX-VM.git
-version: v0.04
+version: v0.05
 x_generated_by_perl: v5.36.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: Artistic-2.0

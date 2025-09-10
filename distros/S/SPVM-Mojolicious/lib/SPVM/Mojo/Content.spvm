@@ -9,6 +9,7 @@ class Mojo::Content extends Mojo::EventEmitter {
   use Native::MethodCall;
   use Mojo::SSE;
   use Mojo::SSE::Event;
+  use Format;
   
   # Class Variables
   our $BOUNDARY_RE : Regex;
@@ -459,7 +460,7 @@ class Mojo::Content extends Mojo::EventEmitter {
     # First chunk has no leading CRLF
     my $crlf = $self->{chunks}++ ? "\x0d\x0a" : "";
     
-    return $crlf . Fn->sprintf("%x", [(object)length $chunk]) . "\x0d\x0a$chunk";
+    return $crlf . Format->sprintf("%x", [(object)length $chunk]) . "\x0d\x0a$chunk";
   }
   
   private method _decompress : void ($chunk : string) {

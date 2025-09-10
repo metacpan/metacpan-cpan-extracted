@@ -64,7 +64,8 @@
             "Test::Exception" : "0",
             "Test::MockModule" : "v0.177.0",
             "Test::MockObject" : "0",
-            "Test::More" : "0"
+            "Test::More" : "0",
+            "Test::Warn" : "0"
          }
       }
    },
@@ -80,7 +81,7 @@
          "web" : "https://github.com/sebmourlhou/oidc-client"
       }
    },
-   "version" : "1.02",
+   "version" : "1.03",
    "x_generated_by_perl" : "v5.28.3",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.12",
    "x_spdx_expression" : "Artistic-2.0"

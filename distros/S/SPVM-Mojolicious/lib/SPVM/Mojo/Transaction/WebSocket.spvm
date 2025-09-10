@@ -5,6 +5,7 @@ class Mojo::Transaction::WebSocket extends Mojo::Transaction {
   version_from Mojolicious;
   
   use Mojo::WebSocket::Frame;
+  use Packer;
   
   # Fields
   has handshake : rw Mojo::Transaction::HTTP;
@@ -108,7 +109,7 @@ class Mojo::Transaction::WebSocket extends Mojo::Transaction {
   
   method finish : void ($code : int = 0, $reason : string = undef) {
     
-    my $payload = $code ? Fn->pack("n", [(object)$code]) : "";
+    my $payload = $code ? Packer->new->pack("n", [(object)$code]) : "";
     
     if ($reason) {
       $payload .= $reason;

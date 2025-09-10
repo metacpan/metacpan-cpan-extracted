@@ -1,5 +1,14 @@
 Revision history for Perl module Module::Generic
 
+v1.0.6 2025-09-10T11:23:50+0900
+    - Added methods parents, splitdir, and splitpath in Module::Generic::File
+    - Corrected a faulty unit test in 27.dynamic.t
+    - Added dynamic support methods _is_version and _looks_like_path
+    - Improved a bit the documentation for Module::Generic
+    - Corrected the test suite for Module::Generic::Dynamic (Gitlab issue #14 brought by Slaven Rezić)
+    - Substantially enhanced the module Module::Generic::Dynamic
+    - Improved documentation for Module::Generic::Dynamic
+
 v1.0.5 2025-08-31T18:43:48+0900
     - Improved _set_get_hash_as_mix_object, and corrected minor issue in Module::Generic::Dynamic
 

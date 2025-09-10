@@ -23,7 +23,7 @@ Module::Generic - Generic Module to inherit from
         $self->{_private_param} = 'some value';
         return( $self );
     }
-    
+
     sub active { return( shift->_set_get_boolean( 'active', @_ ) ); }
     sub address { return( shift->_set_get_object( 'address', 'My::Address', @_ ) ); }
     sub age { return( shift->_set_get_number( 'age', @_ ) ); }
@@ -59,14 +59,53 @@ Module::Generic - Generic Module to inherit from
         }, @_ ) );
     }
 
+Quick way to create a class with feature-rich methods
+
+    create_class My::Package extends => 'Other::Package';
+    # or, maybe
+    create_class My::Package extends => 'Other::Package', method =>
+    {
+        since => 'datetime',
+        uri => 'uri',
+        tags => 'array_object',
+        meta => 'hash',
+        active => 'boolean',
+        callback => 'code',
+        config => 'file',
+        allowed_from => 'ip',
+        total => 'number',
+        id => 'uuid',
+        version => 'version',
+        filehandle => 'glob',
+        object => { type => 'object', class => 'Some::Class' },
+        customer => 
+        {
+            type => 'class',
+            def =>
+            {
+                id => 'uuid',
+                since => 'datetime',
+                name => 'scalar_as_object',
+                age => 'decimal',
+            }
+        }
+    };
+    my $obj = My::Package->new;
+    my $cust = $obj->customer(
+        name => 'John Doe',
+        age => 32,
+        since => 'now',
+    );
+    $obj->customer->id( '44d9a3ab-32e2-4c46-b6c9-8b307f273d47' );
+
 # VERSION
 
-    v0.32.4
+    v1.0.6
 
 # DESCRIPTION
 
 [Module::Generic](https://metacpan.org/pod/Module%3A%3AGeneric) as its name says it all, is a generic module to inherit from.
-It is designed to provide a useful framework and speed up coding and debugging.
+It is designed to be fast and provide a useful framework and speed up coding and debugging.
 It contains standard and support methods that may be superseded by your module.
 
 It also contains an AUTOLOAD transforming any hash object key into dynamic methods and also recognize the dynamic routine a la AutoLoader. The reason is that while `AutoLoader` provides the user with a convenient AUTOLOAD, I wanted a way to also keep the functionnality of [Module::Generic](https://metacpan.org/pod/Module%3A%3AGeneric) AUTOLOAD that were not included in `AutoLoader`. So the only solution was a merger.
@@ -126,6 +165,8 @@ This is a handy method to use at the beginning of other methods of calling packa
 
 This way the end user may be sure that if `$obj-`error()> returns true something wrong has occured.
 
+Note that all helper method such as `_set_get_*` use this method when used as mutator. This means that if those methods are used to set some value, and they do so successfully, they will reset any previous error. When used as accessor, any previous error set will remain.
+
 ## clone
 
 Clone the current object if it is of type hash or array reference. It returns an error if the type is neither.
@@ -150,15 +191,15 @@ Provided with a hash reference of parameters, this will return a string properly
 
 Parameters are:
 
-- _text_ or _message_
+- `text` or _message_
 
     This is the text to be formatted in colour.
 
-- _bgcolour_ or _bgcolor_ or _bg\_colour_ or _bg\_color_
+- `bgcolour` or _bgcolor_ or _bg\_colour_ or _bg\_color_
 
     The value for the background colour.
 
-- _colour_ or _color_ or _fg\_colour_ or _fg\_color_ or _fgcolour_ or _fgcolor_
+- `colour` or _color_ or _fg\_colour_ or _fg\_color_ or _fgcolour_ or _fgcolor_
 
     The value for the foreground colour.
 
@@ -170,7 +211,7 @@ Parameters are:
 
     It returns the text properly formatted to be outputted in a terminal.
 
-- _style_
+- `style`
 
     The possible values are: _bold_, _italic_, _underline_, _blink_, _reverse_, _conceal_, _strike_
 
@@ -336,6 +377,30 @@ Sets or gets an error number.
 
 ## error
 
+    my $o = Foo::Bar->new;
+    $o->do_something || return( $self->error( "Some error", "message." ) );
+    # or
+    $o->do_something || return( $self->error({
+        message => "Some error message.",
+        # will be loaded if necessary
+        class => 'My::Exception::Class',
+        # by default 'object' only
+        # it could also be simply 'all' to imply all the ones below
+        want => [qw( array code glob hash object scalar )],
+        debug => 4,
+        # code to execute upon error
+        callback => sub
+        {
+            # do some cleanup
+            $dbh->rollback if( $dbh->transaction );
+        },
+        # make it fatal
+        fatal => 1,
+        # When used inside an lvalue method
+        # lvalue => 1,
+        # assign => 1,
+    }) );
+
 Provided with a list of strings or an hash reference of parameters and this will set the current error issuing a [Module::Generic::Exception](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3AException) object, call ["warn" in perlfunc](https://metacpan.org/pod/perlfunc#warn), or `$r-`warn> under Apache2 modperl, and returns undef() or an empty list in list context:
 
     if( $some_condition )
@@ -356,7 +421,15 @@ The script calling your module could write calls to your module methods like thi
 
 If you want to use an hash reference instead, you can pass the following parameters. Any other parameters will be passed to the exception class.
 
-- _class_
+- `assign`
+
+    Boolean. Set this to a true value if this is called within an assign method, such as one using lvalue.
+
+- `callback`
+
+    Specify a code reference such as a reference to a subroutine. This is designed to be called upon error to do some cleanup for example.
+
+- `class`
 
     The package name or class to use to instantiate the error object. By default, it will use [Module::Generic::Exception](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3AException) class or the one specified with the object property `_exception_class`
 
@@ -370,11 +443,25 @@ If you want to use an hash reference instead, you can pass the following paramet
 
     Note, however, that if the class specified cannot be loaded for some reason, ["error" in Module::Generic](https://metacpan.org/pod/Module%3A%3AGeneric#error) will die since this would be an error within another error.
 
-- _message_
+- `debug`
+
+    Integer. Specify a value to set the debugging value for this exception.
+
+- `fatal`
+
+    Boolean. Specify a true value to make this error fatal. This means that instead of issuing a `warn`, it will die.
+
+- `lvalue`
+
+    Boolean. Set this to a true value if this is called within an assign method, such as one using lvalue.
+
+- `message`
+
+    Specify a string for the error message.
 
     The error message.
 
-- _want_
+- `want`
 
     An array reference of data types that you allow this method to return when such data type is expected by the original caller.
 
@@ -486,8 +573,8 @@ Uset to get an object data key value:
 This is no more needed, as it has been more conveniently bypassed by the AUTOLOAD
 generic routine with which you may say:
 
-    $obj->verbose( 1 );
-    $obj->debug( 0 );
+    $obj->verbose(1);
+    $obj->debug(0);
     ## ...
     my $verbose = $obj->verbose();
 
@@ -624,17 +711,17 @@ If the object has a property _\_msg\_no\_exec\_sub_ set to true, then a code ref
 
 ["message"](#message) also takes an optional hash reference as the last parameter with the following recognised options:
 
-- _caller\_info_
+- `caller_info`
 
     This is a boolean value, which is true by default.
 
     When true, this will prepend the debug message with information about the caller of ["message"](#message)
 
-- _level_
+- `level`
 
     An integer. Debugging level.
 
-- _message_
+- `message`
 
     The text of the debugging message. This is optional since this can be provided as first or consecutive arguments like in a list as demonstrated in the example above. This allows you to do something like this:
 
@@ -644,15 +731,15 @@ If the object has a property _\_msg\_no\_exec\_sub_ set to true, then a code ref
 
         $self->message( { message => "Some debug message here", prefix => ">>", level => 2 });
 
-- _no\_encoding_
+- `no_encoding`
 
     Boolean value. If true and when the debugging is set to be printed to a file, this will not set the binmode to `utf-8`
 
-- _prefix_
+- `prefix`
 
     By default this is set to `##`. This value is used as the prefix used in debugging output.
 
-- _type_
+- `type`
 
     Type of debugging
 
@@ -680,6 +767,10 @@ See also ["colour\_format"](#colour_format) and ["colour\_parse"](#colour_parse)
 ## message\_frame
 
 Return the optional hash reference of parameters, if any, that can be provided as the last argument to ["message"](#message)
+
+## messagec
+
+This is an alias for ["message\_colour"](#message_colour)
 
 ## messagef
 
@@ -754,6 +845,68 @@ By default it enables the following [JSON](https://metacpan.org/pod/JSON) object
 - ["convert\_blessed" in JSON](https://metacpan.org/pod/JSON#convert_blessed)
 - ["relaxed" in JSON](https://metacpan.org/pod/JSON#relaxed)
 
+Additional supported options are as follows, including any of the [JSON](https://metacpan.org/pod/JSON) supported options:
+
+- `allow_blessed`
+
+    Boolean. When enabled, this will not return an error when it encounters a blessed reference that [JSON](https://metacpan.org/pod/JSON) cannot convert otherwise. Instead, a JSON `null` value is encoded instead of the object.
+
+- `allow_nonref`
+
+    Boolean. When enabled, this will convert a non-reference into its corresponding string, number or null [JSON](https://metacpan.org/pod/JSON) value. Default is enabled.
+
+- `allow_tags`
+
+    Boolean. When enabled, upon encountering a blessed object, this will check for the availability of the `FREEZE` method on the object's class. If found, it will be used to serialise the object into a nonstandard tagged [JSON](https://metacpan.org/pod/JSON) value (that [JSON](https://metacpan.org/pod/JSON) decoders cannot decode). 
+
+- `allow_unknown`
+
+    Boolean. When enabled, this will not return an error when [JSON](https://metacpan.org/pod/JSON) encounters values it cannot represent in JSON (for example, filehandles) but instead will encode a [JSON](https://metacpan.org/pod/JSON) "null" value.
+
+- `ascii`
+
+    Boolean. When enabled, will not generate characters outside the code range 0..127 (which is ASCII).
+
+- `canonical` or `ordered`
+
+    Boolean value. If true, the JSON data will be ordered. Note that it will be slower, especially on a large set of data.
+
+- `convert_blessed`
+
+    Boolean. When enabled, upon encountering a blessed object, [JSON](https://metacpan.org/pod/JSON) will check for the availability of the `TO_JSON` method on the object's class. If found, it will be called in scalar context and the resulting scalar will be encoded instead of the object.
+
+- `indent`
+
+    Boolean. When enabled, this will use a multiline format as output, putting every array member or object/hash key-value pair into its own line, indenting them properly.
+
+- `latin1`
+
+    Boolean. When enabled, this will encode the resulting [JSON](https://metacpan.org/pod/JSON) text as latin1 (or iso-8859-1),
+
+- `max_depth`
+
+    Integer. This sets the maximum nesting level (default 512) accepted while encoding or decoding. When the limit is reached, this will return an error.
+
+- `pretty`
+
+    Boolean value. If true, the JSON data will be generated in a human readable format. Note that this will take considerably more space.
+
+- `space_after`
+
+    Boolean. When enabled, this will add an extra optional space after the ":" separating keys from values.
+
+- `space_before`
+
+    Boolean. When enabled, this will add an extra optional space before the ":" separating keys from values.
+
+- `utf8`
+
+    Boolean. This option is ignored, because the JSON data are saved to file using UTF-8 and double encoding would produce mojibake.
+
+## new\_json\_safe
+
+This is the same as [new\_json](#new_json), except that it uses [Module::Generic::JSON](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3AJSON), which is a thin, and reliable wrapper around [JSON](https://metacpan.org/pod/JSON). [Module::Generic::JSON](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3AJSON) never dies, but instead sets an [error object](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3AException), and returns `undef`, or an empty list depending on the caller context.
+
 ## new\_null
 
 Returns a null value based on the expectations of the caller and thus without breaking the caller's call flow.
@@ -773,7 +926,7 @@ In any other context, `undef` is returned or an empty list.
 Without using ["new\_null"](#new_null), if you return simply undef, like:
 
     my $val = $object->return_false->[0];
-    
+
     sub return_false { return }
 
 The above would trigger an error that the value returned by `return_false` is not an array reference.
@@ -784,15 +937,15 @@ For example:
     my $this = My::Object->new;
     my $val  = $this->call1;
     # return undef)
-    
+
     # object context
     $val = $this->call1->call_again;
     # $val is undefined
-    
+
     # hash reference context
     $val = $this->call1->fake->{name};
     # $val is undefined
-    
+
     # array reference context
     $val = $this->call1->fake->[0];
     # $val is undefined
@@ -896,7 +1049,19 @@ You can optionally provide an hash of parameters as the last argument, such as:
 
     return( $self->pass_error( $obj->error, { class => 'My::Exception', code => 400 } ) );
 
+Or, you could also pass all parameters as an hash reference, such as:
+
+    return( $self->pass_error({
+        error => $obj->error,
+        class => 'My::Exception',
+        code => 400,
+    }) );
+
 Supported options are:
+
+- `callback`
+
+    A code reference, such as a subroutine reference or an anonymous code that will be executed. This is designed to be used to do some cleanup.
 
 - `class`
 
@@ -905,6 +1070,12 @@ Supported options are:
 - `code`
 
     The error code to set in the error object being passed.
+
+- `error`
+
+    The error object to be passed on.
+
+    If this is not provided, it will get it with the object `error` method, or the class global variable `$ERROR`
 
 ## quiet
 
@@ -932,11 +1103,11 @@ This method takes some data and an optional hash or hash reference of parameters
 
 The supported parameters are:
 
-- _append_
+- `append`
 
     Boolean. If true, the serialised data will be appended to the given file. This works only in conjonction with _file_
 
-- _base64_
+- `base64`
 
     Thise can be set to a true value like `1`, or to your preferred base64 encoder/decoder, or to an array reference containing 2 code references, the first one for encoding and the second one for decoding.
 
@@ -944,19 +1115,19 @@ The supported parameters are:
 
     If this option is set and no appropriate module could be found, `serialise` will return an error.
 
-- _file_
+- `file`
 
     String. A file path where to store the serialised data.
 
-- _io_
+- `io`
 
     A file handle. This is used when the serialiser is [Storable::Improved](https://metacpan.org/pod/Storable%3A%3AImproved) / [Storable](https://metacpan.org/pod/Storable) to call its function ["store\_fd" in Storable::Improved](https://metacpan.org/pod/Storable%3A%3AImproved#store_fd) and ["fd\_retrieve" in Storable::Improved](https://metacpan.org/pod/Storable%3A%3AImproved#fd_retrieve)
 
-- _lock_
+- `lock`
 
     Boolean. If true, this will lock the file before writing to it. This works only in conjonction with _file_ and the serialiser [Storable::Improved](https://metacpan.org/pod/Storable%3A%3AImproved)
 
-- _serialiser_ or _serializer_
+- `serialiser` or `serializer`
 
     A string being the class of the serialiser to use. This can be only either [Sereal](https://metacpan.org/pod/Sereal) or [Storable::Improved](https://metacpan.org/pod/Storable%3A%3AImproved)
 
@@ -1106,6 +1277,8 @@ Alternatively, you can pass an hash reference, instead of the object property na
 - `callback`
 
     Optional. A code reference like an anonymous subroutine that will be called with the class and an array reference of values provided, but possibly empty.
+
+    The current object is accessible in the callback as the special variable `$_`
 
 This is a useful callback when the module instantiation either does not use the `new` method or does not simply take one or multiple arguments, such as when the instantiation method would require an hash of parameters, such as [Email::Address::XS](https://metacpan.org/pod/Email%3A%3AAddress%3A%3AXS)
 
@@ -1369,6 +1542,17 @@ Provided with some value, possibly, undefined, and this returns true if it is a 
 
 Same as ["\_is\_array"](#_is_array), but for hash reference.
 
+You can pass also the additional argument `strict`, in which case, this will apply only to non-objects.
+
+For example:
+
+    my $hash = {};
+    say $this->_is_hash( $hash ); # true
+    my $obj = Foo::Bar->new;
+    say $this->_is_hash( $obj ); # true
+    # but...
+    say $this->_is_hash( $obj => 'strict' ); # false
+
 ## \_is\_integer
 
 Returns true if the value provided is an integer, or false otherwise. A valid value includes an integer starting with `+` or `-`
@@ -1439,11 +1623,11 @@ It traps any error with an eval and return ["undef" in perlfunc](https://metacpa
 
 Possible options are:
 
-- _caller_
+- `caller`
 
     The package name of the caller. If this is not provided, it will default to the value provided with ["caller" in perlfunc](https://metacpan.org/pod/perlfunc#caller)
 
-- _no\_import_
+- `no_import`
 
     Set to a true value and this will prevent the loaded module from importing anything into your namespace.
 
@@ -1451,9 +1635,21 @@ Possible options are:
 
         use My::Module ();
 
-- _version_
+- `version`
 
     The minimum version for this class to load. This value is passed directly to ["use" in perlfunc](https://metacpan.org/pod/perlfunc#use)
+
+### THREAD SAFETY WARNING
+
+**\_load\_class** is mostly thread-safe, but dynamic class loading using `eval` and `use` at runtime can pose risks in threaded environments.
+
+Perl caches loaded modules, but if two threads try to load the same module simultaneously, and the module performs initialization in `BEGIN` blocks or via side effects in its import mechanism, this can lead to race conditions or partial loading.
+
+#### Safe Usage Recommendations
+
+- Call `_load_class` during application startup or before any threads are spawned.
+- Avoid dynamically loading classes at runtime inside threads unless you are certain the modules being loaded are themselves thread-safe and have no side effects on import.
+- To ensure full safety, preload modules at initialization time using `use` or call `_load_class` during the main thread's setup phase.
 
 ## \_load\_classes
 
@@ -1560,11 +1756,65 @@ Supported formats are:
 
     sub name { return( shift->_set_get( 'name', @_ ) ); }
 
+or
+
+    sub name { return( shift->_set_get({
+        field => 'name',
+        check => sub {
+            my( $self, $value ) = @_; # do some check
+            return(1); # Do not forget to return true
+        },
+        callbacks => {
+            set => sub {
+                my( $self, $value ) = @_;
+                # Do something here with the value set.
+            },
+        },
+    }, @_ ) ); }
+
 Provided with an object property name and some value and this will set or get that value for that property.
 
 However, if the value stored is an array and is called in list context, it will return the array as a list and not the array reference. Same thing for an hash reference. It will return an hash in list context. In scalar context, it returns whatever the value is, such as array reference, hash reference or string, etc.
 
+Alternatively, you can provide an hash reference instead of a field name, and pass additional parameters, such as:
+
+- `check`
+
+    A `check` anonymous subroutine that will be called with 2 arguments, the current object, and the value being set, but before it is set.
+
+    If this callback returns false, then an error of `Invalid value provided.` will be returned, so make sure to return true to indicate that the check passed.
+
+    The callback can die, and it will be caught, and be interpreted as `false`
+
+- `callbacks`
+
+    An hash reference of callbacks. You can use either `set` or `add` whichever you prefer.
+
+    The callback will be called with the current object, and the value that has already been set.
+
+    Any fatal exception during the callback will not be caught.
+
 ## \_set\_get\_array
+
+    sub my_array { return( shift->_set_get_array( 'my_array', @_ ) ); }
+    my $ref = $self->my_array( @some_values );
+    my $ref = $self->my_array( $array_ref );
+
+or
+
+    sub name { return( shift->_set_get_array({
+        field => 'name',
+        check => sub {
+            my( $self, $value ) = @_; # do some check
+            return(1); # Do not forget to return true
+        },
+        callbacks => {
+            set => sub {
+                my( $self, $value ) = @_;
+                # Do something here with the value set.
+            },
+        },
+    }, @_ ) ); }
 
 Provided with an object property name and some data and this will store the data as an array reference.
 
@@ -1574,7 +1824,43 @@ Example :
 
     sub products { return( shift->_set_get_array( 'products', @_ ) ); }
 
+Alternatively, you can provide an hash reference instead of a field name, and pass additional parameters, such as:
+
+- `check`
+
+    A `check` anonymous subroutine that will be called with 2 arguments, the current object, and the value being set, but before it is set.
+
+    If this callback returns false, then an error of `Invalid value provided.` will be returned, so make sure to return true to indicate that the check passed.
+
+    The callback can die, and it will be caught, and be interpreted as `false`
+
+- `callbacks`
+
+    An hash reference of callbacks. You can use either `set` or `add` whichever you prefer.
+
+    The callback will be called with the current object, and the value that has already been set.
+
+    Any fatal exception during the callback will not be caught.
+
 ## \_set\_get\_array\_as\_object
+
+    sub name { return( shift->_set_get_array_as_object( 'name', @_ ) ); }
+
+or
+
+    sub name { return( shift->_set_get_array_as_object({
+        field => 'name',
+        check => sub {
+            my( $self, $value ) = @_; # do some check
+            return(1); # Do not forget to return true
+        },
+        callbacks => {
+            set => sub {
+                my( $self, $value ) = @_;
+                # Do something here with the value set.
+            },
+        },
+    }, @_ ) ); }
 
 Provided with an object property name and some data and this will store the data as an object of [Module::Generic::Array](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3AArray)
 
@@ -1590,13 +1876,23 @@ And using your method:
     printf( "There are %d products\n", $object->products->length );
     $object->products->push( $new_product );
 
-Alternatively, you can pass an hash reference instead of an object property to provide callbacks that will be called upon addition or removal of value.
-
-This hash reference can contain the following properties:
+Alternatively, you can pass an hash reference instead of an object property to provide additional parameters, such as:
 
 - callbacks
 
     An hash reference of operation type `add` (or `set`)) to callback subroutine name or code reference pairs.
+
+    The callback will be called with the current object, and the value that has already been set.
+
+    Any fatal exception during the callback will not be caught.
+
+- `check`
+
+    A `check` anonymous subroutine that will be called with 2 arguments, the current object, and the value being set, but before it is set.
+
+    If this callback returns false, then an error of `Invalid value provided.` will be returned, so make sure to return true to indicate that the check passed.
+
+    The callback can die, and it will be caught, and be interpreted as `false`
 
 - field
 
@@ -1622,6 +1918,22 @@ The value of the callback can be either a subroutine name or a code reference.
 
     sub is_true { return( shift->_set_get_boolean( 'is_true', @_ ) ); }
 
+or
+
+    sub name { return( shift->_set_get_boolean({
+        field => 'name',
+        check => sub {
+            my( $self, $value ) = @_; # do some check
+            return(1); # Do not forget to return true
+        },
+        callbacks => {
+            set => sub {
+                my( $self, $value ) = @_;
+                # Do something here with the value set.
+            },
+        },
+    }, @_ ) ); }
+
 Provided with an object property name and some data and this will store the data as a boolean value.
 
 If the data provided is a [JSON::PP::Boolean](https://metacpan.org/pod/JSON%3A%3APP%3A%3ABoolean) or [Module::Generic::Boolean](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3ABoolean) object, the data is stored as is.
@@ -1638,13 +1950,25 @@ Alternatively, you can pass an hash reference instead of an object property to p
 
 This hash reference can contain the following properties:
 
-- field
+- `field`
 
     The object property name
 
-- callbacks
+- `check`
 
-    An hash reference of operation type `add` (or `set`) to callback subroutine name or code reference pairs.
+    A `check` anonymous subroutine that will be called with 2 arguments, the current object, and the value being set, but before it is set.
+
+    If this callback returns false, then an error of `Invalid value provided.` will be returned, so make sure to return true to indicate that the check passed.
+
+    The callback can die, and it will be caught, and be interpreted as `false`
+
+- `callbacks`
+
+    An hash reference of callbacks. You can use either `set` or `add` whichever you prefer.
+
+    The callback will be called with the current object, and the value that has already been set.
+
+    Any fatal exception during the callback will not be caught.
 
 For example:
 
@@ -1839,7 +2163,7 @@ The `context` provided with the special variable `$_` inside the callback may ha
 
         $obj->pointless();
 
-See also [Want](https://metacpan.org/pod/Want) for more on this context-rich information.
+See also [Wanted](https://metacpan.org/pod/Wanted) for more on this context-rich information.
 
 ## \_set\_get\_class
 
@@ -1938,19 +2262,79 @@ And this would store an array reference containing 2 objects with the above data
 
 ## \_set\_get\_class\_array\_object
 
-Same as ["=head2 \_set\_get\_class\_array"](#head2-_set_get_class_array), but this returns an [array object](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3AArray) instead of just a perl array.
+Same as ["\_set\_get\_class\_array"](#_set_get_class_array), but this returns an [array object](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3AArray) instead of just a perl array.
 
 When called in list context, it will return its values as a list, otherwise it will return an [array object](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3AArray)
 
 ## \_set\_get\_code
 
+    sub name { return( shift->_set_get_code( 'name', @_ ) ); }
+
+or
+
+    sub name { return( shift->_set_get_code({
+        field => 'name',
+        check => sub {
+            my( $self, $value ) = @_; # do some check
+            return(1); # Do not forget to return true
+        },
+        callbacks => {
+            set => sub {
+                my( $self, $value ) = @_;
+                # Do something here with the value set.
+            },
+        },
+    }, @_ ) ); }
+
 Provided with an object property name and some code reference and this stores and retrieve the current value.
 
-It returns under and set an error if the provided value is not a code reference.
+It returns `undef` and set an error if the provided value is not a code reference.
+
+Alternatively, you can provide an hash reference instead of a field name, and pass additional parameters, such as:
+
+- `check`
+
+    A `check` anonymous subroutine that will be called with 2 arguments, the current object, and the value being set, but before it is set.
+
+    If this callback returns false, then an error of `Invalid value provided.` will be returned, so make sure to return true to indicate that the check passed.
+
+    The callback can die, and it will be caught, and be interpreted as `false`
+
+- `callbacks`
+
+    An hash reference of callbacks. You can use either `set` or `add` whichever you prefer.
+
+    The callback will be called with the current object, and the value that has already been set.
+
+    Any fatal exception during the callback will not be caught.
+
+- `field`
+
+    The object property name
 
 ## \_set\_get\_datetime
 
     sub created_on { return( shift->_set_get_datetime( 'created_on', @_ ) ); }
+
+or
+
+    sub created_on { return( shift->_set_get_datetime({
+        field => 'created_on',
+        check => sub {
+            my( $self, $value ) = @_; # do some check
+            return(1); # Do not forget to return true
+        },
+        callbacks => {
+            set => sub {
+                my( $self, $value ) = @_;
+                # Do something here with the value set.
+            },
+        },
+        # optionally specify a format to use for all objects
+        format => '%FT%TZ',
+        # Can also use 'time_zone'
+        tz => 'UTC',
+    }, @_ ) ); }
 
 Provided with an object property name and asome date or datetime string and this will attempt to parse it and save it as a [DateTime](https://metacpan.org/pod/DateTime) object.
 
@@ -1966,9 +2350,112 @@ Even if there is no value set, and this method is called in chain, it returns a 
 
 Of course, the value of `iso8601` will be empty since this is a fake method produced by [Module::Generic::Null](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3ANull). The return value of a method should always be checked.
 
+Alternatively, you can provide an hash reference instead of a field name, and pass additional parameters, such as:
+
+- `check`
+
+    A `check` anonymous subroutine that will be called with 2 arguments, the current object, and the value being set, but before it is set.
+
+    If this callback returns false, then an error of `Invalid value provided.` will be returned, so make sure to return true to indicate that the check passed.
+
+    The callback can die, and it will be caught, and be interpreted as `false`
+
+- `callbacks`
+
+    An hash reference of callbacks. You can use either `set` or `add` whichever you prefer.
+
+    The callback will be called with the current object, and the value that has already been set.
+
+    Any fatal exception during the callback will not be caught.
+
+- `field`
+
+    The object property name
+
+- `format`
+
+    An optional format that will be used to create a [DateTime::Format::Strptime](https://metacpan.org/pod/DateTime%3A%3AFormat%3A%3AStrptime) that will be attached to the [DateTime](https://metacpan.org/pod/DateTime) object.
+
+- `tz`
+
+    A string representing the time zone for the the datetime.
+
+## \_set\_get\_enum
+
+    sub choice { return( shift->_set_get_enum( 'choice', [qw( yes no )], @_ ) ); }
+    # or
+    sub choice : lvalue { return( shift->_set_get_enum({
+        field   => 'choice',
+        allowed => [qw( yes no )],
+        # case insensitive
+        case    => 0,
+        check => sub {
+            my( $self, $value ) = @_; # do some check
+            return(1); # Do not forget to return true
+        },
+        callbacks => {
+            set => sub {
+                my( $self, $value ) = @_;
+                # Do something here with the value set.
+            },
+        },
+    }, @_ ) ); }
+
+This support method handles `enum` values, i.e. a list of allowed values that can be set.
+
+It takes either a `field` name, and an array of `allowed` values; or an hash reference with the following supported options:
+
+- `allowed`
+
+    An array reference of allowed values.
+
+- `case`
+
+    A boolean value as to whether the value received should be compared in a case sensitive (true) or case insensitive (false) way against the allowed value.
+
+    Thus, if true, an hypothetical value `yes` would match against the `allowed` values `['yes', 'no']`, but would fail if that value were `YES`
+
+    Default is true.
+
+- `check`
+
+    A `check` anonymous subroutine that will be called with 2 arguments, the current object, and the value being set, but before it is set.
+
+    If this callback returns false, then an error of `Invalid value provided.` will be returned, so make sure to return true to indicate that the check passed.
+
+    The callback can die, and it will be caught, and be interpreted as `false`
+
+- `callbacks`
+
+    An hash reference of callbacks. You can use either `set` or `add` whichever you prefer.
+
+    The callback will be called with the current object, and the value that has already been set.
+
+    Any fatal exception during the callback will not be caught.
+
+- `field`
+
+    The field name.
+
 ## \_set\_get\_file
 
     sub file { return( shift->_set_get_file( 'file', @_ ) ); }
+
+or
+
+    sub file { return( shift->_set_get_file({
+        field => 'file',
+        check => sub {
+            my( $self, $value ) = @_; # do some check
+            return(1); # Do not forget to return true
+        },
+        callbacks => {
+            set => sub {
+                my( $self, $value ) = @_;
+                # Do something here with the value set.
+            },
+        },
+    }, @_ ) ); }
 
 Provided with an object property name and a file and this will store the given file as a [Module::Generic::File](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3AFile) object.
 
@@ -1976,17 +2463,93 @@ It returns `undef` and set an [error](#error) if the provided value is not a pro
 
 Note that the files does not need to exist and it can also be a directory or a symbolic link or any other file on the system.
 
+Alternatively, you can provide an hash reference instead of a field name, and pass additional parameters, such as:
+
+- `check`
+
+    A `check` anonymous subroutine that will be called with 2 arguments, the current object, and the value being set, but before it is set.
+
+    If this callback returns false, then an error of `Invalid value provided.` will be returned, so make sure to return true to indicate that the check passed.
+
+    The callback can die, and it will be caught, and be interpreted as `false`
+
+- `callbacks`
+
+    An hash reference of callbacks. You can use either `set` or `add` whichever you prefer.
+
+    The callback will be called with the current object, and the value that has already been set.
+
+    Any fatal exception during the callback will not be caught.
+
+- `field`
+
+    The object property name
+
 ## \_set\_get\_glob
 
     sub handle { return( shift->_set_get_glob( 'handle', @_ ) ); }
+
+or
+
+    sub handle { return( shift->_se_set_get_globt_get({
+        field => 'handle',
+        check => sub {
+            my( $self, $value ) = @_; # do some check
+            return(1); # Do not forget to return true
+        },
+        callbacks => {
+            set => sub {
+                my( $self, $value ) = @_;
+                # Do something here with the value set.
+            },
+        },
+    }, @_ ) ); }
 
 Provided with an object property name and a glob (file handle) and this will store the given glob.
 
 It returns `undef` and set an [error](#error) if the provided value is not a glob.
 
+Alternatively, you can provide an hash reference instead of a field name, and pass additional parameters, such as:
+
+- `check`
+
+    A `check` anonymous subroutine that will be called with 2 arguments, the current object, and the value being set, but before it is set.
+
+    If this callback returns false, then an error of `Invalid value provided.` will be returned, so make sure to return true to indicate that the check passed.
+
+    The callback can die, and it will be caught, and be interpreted as `false`
+
+- `callbacks`
+
+    An hash reference of callbacks. You can use either `set` or `add` whichever you prefer.
+
+    The callback will be called with the current object, and the value that has already been set.
+
+    Any fatal exception during the callback will not be caught.
+
+- `field`
+
+    The object property name
+
 ## \_set\_get\_hash
 
     sub metadata { return( shift->_set_get_hash( 'metadata', @_ ) ); }
+
+or
+
+    sub metadata { return( shift->_set_get_hash({
+        field => 'metadata',
+        check => sub {
+            my( $self, $value ) = @_; # do some check
+            return(1); # Do not forget to return true
+        },
+        callbacks => {
+            set => sub {
+                my( $self, $value ) = @_;
+                # Do something here with the value set.
+            },
+        },
+    }, @_ ) ); }
 
 Provided with an object property name and an hash reference and this set the property name with this hash reference.
 
@@ -1999,13 +2562,73 @@ You can even pass it an associative array, and it will be saved as a hash refere
 
     my $hash = $object->metadata;
 
+Alternatively, you can provide an hash reference instead of a field name, and pass additional parameters, such as:
+
+- `check`
+
+    A `check` anonymous subroutine that will be called with 2 arguments, the current object, and the value being set, but before it is set.
+
+    If this callback returns false, then an error of `Invalid value provided.` will be returned, so make sure to return true to indicate that the check passed.
+
+    The callback can die, and it will be caught, and be interpreted as `false`
+
+- `callbacks`
+
+    An hash reference of callbacks. You can use either `set` or `add` whichever you prefer.
+
+    The callback will be called with the current object, and the value that has already been set.
+
+    Any fatal exception during the callback will not be caught.
+
+- `field`
+
+    The object property name
+
 ## \_set\_get\_hash\_as\_mix\_object
 
     sub metadata { return( shift->_set_get_hash_as_mix_object( 'metadata', @_ ) ); }
 
+or
+
+    sub metadata { return( shift->_set_get_hash_as_mix_object({
+        field => 'metadata',
+        check => sub {
+            my( $self, $value ) = @_; # do some check
+            return(1); # Do not forget to return true
+        },
+        callbacks => {
+            set => sub {
+                my( $self, $value ) = @_;
+                # Do something here with the value set.
+            },
+        },
+    }, @_ ) ); }
+
 Provided with an object property name, and an optional hash reference and this returns a [Module::Generic::Hash](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3AHash) object, which allows to manipulate the hash just like any regular hash, but it provides on top object oriented method described in details in [Module::Generic::Hash](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3AHash).
 
 This is different from ["\_set\_get\_hash\_as\_object"](#_set_get_hash_as_object) below whose keys and values are accessed as dynamic methods and method arguments.
+
+Alternatively, you can provide an hash reference instead of a field name, and pass additional parameters, such as:
+
+- `check`
+
+    A `check` anonymous subroutine that will be called with 2 arguments, the current object, and the value being set, but before it is set.
+
+    If this callback returns false, then an error of `Invalid value provided.` will be returned, so make sure to return true to indicate that the check passed.
+
+    The callback can die, and it will be caught, and be interpreted as `false`
+
+- `callbacks`
+
+    An hash reference of callbacks. You can use either `set` or `add` whichever you prefer.
+
+    The callback will be called with the current object, and the value that has already been set.
+
+    Any fatal exception during the callback will not be caught.
+
+- `field`
+
+    The object property name
 
 ## \_set\_get\_hash\_as\_object
 
@@ -2027,15 +2650,59 @@ Then populating the data :
 
     printf( "Customer name is %s\n", $object->metadata->last_name );
 
+### THREAD SAFETY
+
+This method uses [Module::Generic::Dynamic](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3ADynamic), and thus is not thread-safe. It should be invoked only during initialization, before any threads are spawned.
+
+For safe usage in multi-threaded environments, avoid using dynamic class creation features at runtime.
+
 ## \_set\_get\_ip
 
     sub ip { return( shift->_set_get_ip( 'ip', @_ ) ); }
+
+or
+
+    sub ip { return( shift->_set_get_ip({
+        field => 'ip',
+        check => sub {
+            my( $self, $value ) = @_; # do some check
+            return(1); # Do not forget to return true
+        },
+        callbacks => {
+            set => sub {
+                my( $self, $value ) = @_;
+                # Do something here with the value set.
+            },
+        },
+    }, @_ ) ); }
 
 This helper method takes a value and check if it is a valid IP address using ["\_is\_ip"](#_is_ip). If `undef` or zero-byte value is provided, it will merely accept it, as it can be used to reset the value by the caller.
 
 If a value is successfully set, it returns a [Module::Generic::Scalar](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3AScalar) object representing the string passed.
 
 From there you can pass the result to [Net::IP](https://metacpan.org/pod/Net%3A%3AIP) in your own code, assuming you have that module installed.
+
+Alternatively, you can provide an hash reference instead of a field name, and pass additional parameters, such as:
+
+- `check`
+
+    A `check` anonymous subroutine that will be called with 2 arguments, the current object, and the value being set, but before it is set.
+
+    If this callback returns false, then an error of `Invalid value provided.` will be returned, so make sure to return true to indicate that the check passed.
+
+    The callback can die, and it will be caught, and be interpreted as `false`
+
+- `callbacks`
+
+    An hash reference of callbacks. You can use either `set` or `add` whichever you prefer.
+
+    The callback will be called with the current object, and the value that has already been set.
+
+    Any fatal exception during the callback will not be caught.
+
+- `field`
+
+    The object property name
 
 ## \_set\_get\_lvalue
 
@@ -2045,21 +2712,43 @@ This is now an alias for ["\_set\_get\_callback"](#_set_get_callback)
 
 Provided with an object property name and a number, and this will create a [Module::Generic::Number](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3ANumber) object and return it.
 
-As of version v0.13.0 it also works as a lvalue method. See [perlsub](https://metacpan.org/pod/perlsub)
+If an invalid value is provided (e.g., empty string, non-stringifiable reference, or value failing the constraint), an error is returned, accessible via the object's ["error"](#error) method.
+
+As of version `v0.13.0` it also works as a lvalue method. See [perlsub](https://metacpan.org/pod/perlsub)
 
 In your module:
 
     package MyObject;
     use parent qw( Module::Generic );
-    
+
     sub level : lvalue { return( shift->_set_get_number( 'level', @_ ) ); }
+
+\# or
+
+    sub level : lvalue { return( shift->_set_get_number({
+        field => 'level',
+        check => sub {
+            my( $self, $value ) = @_;
+            # do some check here
+            return(1); # Do not forget to return true
+        },
+        constraint => 'unsigned_int',
+        # or
+        # constraint => qr/\d+/,
+        callbacks => {
+            set => sub {
+                my( $self, $value ) = @_;
+                # Do something here with the value set.
+            },
+        },
+    }, @_ ) ); }
 
 In the script using module `MyObject`:
 
     my $obj = MyObject->new;
     $obj->level = 3; # level is now 3
     # or
-    $obj->level( 4 ) # level is now 4
+    $obj->level(4) # level is now 4
     print( "Level is: ", $obj->level, "\n" ); # Level is 4
     print( "Is it an odd number: ", $obj->level->is_odd ? 'yes' : 'no', "\n" );
     # Is it an od number: no
@@ -2071,7 +2760,76 @@ This hash reference can contain the following properties:
 
 - `callbacks`
 
-    An hash reference of operation type `add` (or `set`) to callback subroutine name or code reference pairs.
+    An hash reference of callbacks. You can use either `set` or `add` whichever you prefer.
+
+    The callback will be called with the current object, and the value that has already been set.
+
+    Any fatal exception during the callback will not be caught.
+
+- `check`
+
+    A `check` anonymous subroutine that will be called with 2 arguments, the current object, and the value being set, but before it is set.
+
+    If this callback returns false, then an error of `Invalid value provided.` will be returned, so make sure to return true to indicate that the check passed.
+
+    The callback can die, and it will be caught, and be interpreted as `false`
+
+- `constraint`
+
+    Either a regular expression provided using the operator `qr//`, or a known token:
+
+    - `bin`, `binary`
+
+        A binary, supporting fractional values (e.g., `101.11`) and scientific notation (e.g., `101.11E-2`).
+
+    - `hex`, `hexadecimal`
+
+        A hexadecimal, supporting fractional values (e.g., `FF.1A`) and scientific notation (e.g., `FF.1AE-2`).
+
+    - `int`, `integer`
+    - `long`
+
+        A long integer, i.e. an integer between `-2,147,483,648`, and `2,147,483,647`
+
+    - `negative_int`
+
+        A negative integer
+
+    - `oct`, `octal`
+
+        An octal number, supporting fractional values (e.g., `77.33`) and scientific notation (e.g., `77.33E-2`).
+
+    - `short`
+
+        A short integer, i.e. an integer between `-32,768`, and `32,767`
+
+    - `unsigned_int`, `unsigned_integer`, `positive_int`
+
+        An unsigned integer, on which is aliased a positive integer
+
+    - `unsigned_long`
+
+        An unsigned long integer, i.e. an integer between `0`, and `4,294,967,295` (2^32-1)
+
+    - `unsigned_real`, `unsigned_dec`, `unsigned_decimal`, `unsigned_float`, `unsigned_double`, `positive_real`, `positive_dec`, `positive_decimal`, `positive_float`, `positive_double`
+
+        A positive decimal number.
+
+    - `unsigned_short`
+
+        An unsigned short integer, i.e. an integer between `0`, and `65,535` (2^16-1)
+
+    - `real`, `dec`, `decimal`, `double`, `float`
+
+        A real number, on which is aliased decimal number, double-precision number, and floating-point number
+
+    - `signed_byte`, `byte`
+
+        A signed byte, i.e., an integer between `-128` and `127`.
+
+    - `unsigned_byte`
+
+        An unsigned byte, i.e., an integer between `0` and `255`.
 
 - `field`
 
@@ -2083,7 +2841,7 @@ This hash reference can contain the following properties:
 
 For example:
 
-    sub length { return( shift->set_get_number({
+    sub length { return( shift->_set_get_number({
         field => 'length',
         callbacks => 
         {
@@ -2092,6 +2850,50 @@ For example:
     }), @_ ); }
 
 The value of the callback can be either a subroutine name or a code reference.
+
+## \_set\_get\_number\_as\_scalar
+
+    sub name { return( shift->_set_get_number_as_scalar( 'name', @_ ) ); }
+
+or
+
+    sub name { return( shift->_set_get({
+        field => 'name',
+        check => sub {
+            my( $self, $value ) = @_; # do some check
+            return(1); # Do not forget to return true
+        },
+        callbacks => {
+            set => sub {
+                my( $self, $value ) = @_;
+                # Do something here with the value set.
+            },
+        },
+    }, @_ ) ); }
+
+This sets or gets a number as a regular string, but checking the value is indeed a number by using [Regexp::Common](https://metacpan.org/pod/Regexp%3A%3ACommon)
+
+Alternatively, you can provide an hash reference instead of a field name, and pass additional parameters, such as:
+
+- `check`
+
+    A `check` anonymous subroutine that will be called with 2 arguments, the current object, and the value being set, but before it is set.
+
+    If this callback returns false, then an error of `Invalid value provided.` will be returned, so make sure to return true to indicate that the check passed.
+
+    The callback can die, and it will be caught, and be interpreted as `false`
+
+- `callbacks`
+
+    An hash reference of callbacks. You can use either `set` or `add` whichever you prefer.
+
+    The callback will be called with the current object, and the value that has already been set.
+
+    Any fatal exception during the callback will not be caught.
+
+- `field`
+
+    The object property name
 
 ## \_set\_get\_number\_or\_object
 
@@ -2109,6 +2911,10 @@ Provided with an object property name and a number or an object and this call th
             my( $class, $args ) = @_;
             return( $class->new( $args->[0] ) );
         },
+        check => sub {
+            my( $self, $value ) = @_; # do some check
+            return(1); # Do not forget to return true
+        },
     }, My::Class, @_ ) ); }
 
     sub myobject { return( shift->_set_get_object( 'myobject', My::Class, @_ ) ); }
@@ -2125,6 +2931,14 @@ The property name can also be an hash reference that will be used to provide mor
 
     Any fatal error during object instantiation is caught and an [error](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3AException) would be set and `undef` would be returned in scalar context, or an empty list in list context.
 
+- `check`
+
+    A `check` anonymous subroutine that will be called with 2 arguments, the current object, and the value being set, but before it is set.
+
+    If this callback returns false, then an error of `Invalid value provided.` will be returned, so make sure to return true to indicate that the check passed.
+
+    The callback can die, and it will be caught, and be interpreted as `false`
+
 - `field`
 
     The actual property name
@@ -2139,11 +2953,185 @@ You can also provide an existing object of the given class. ["\_set\_get\_object
 
 It returns the object currently set, if any.
 
+## \_set\_get\_object\_array
+
+    sub mymethod { return( shift->_set_get_object_array( 'mymethod', 'Some::Module', @_ ) ); }
+    # or
+    sub mymethod { return( shift->_set_get_object_array({
+        field => 'mymethod',
+        callback => sub
+        {
+            my( $class, $args ) = @_;
+            return( $class->new( $args->[0] ) );
+        },
+        check => sub
+        {
+            my( $self, $value ) = @_; # do some check
+            return(1); # Do not forget to return true
+        },
+        callbacks =>
+        {
+            array_add => sub
+            {
+                my $def = shift( @_ );
+                my( $pos, $ref ) = @$def{qw( start added )};
+                return unless( blessed( $ref->[0] ) && $ref->[0]->isa( 'MyPackage') );
+                return(1);
+            },
+            array_remove => sub
+            {
+                my $def = shift( @_ );
+                my( $start, $end ) = @$def{qw( start end )};
+                printf( STDERR "Called from package %s at line %d\n", @{$def->{caller}}[0,2] );
+                # Do some check to accept or reject
+                return(1); # always return true to accept
+            },
+        },
+    }, 'Some::Module', @_ ) ); }
+
+Provided with an object property name and a class/package name and similar to ["\_set\_get\_object\_array2"](#_set_get_object_array2) this will create an array reference of objects.
+
+Alternatively, you can pass an hash reference, instead of the object property name, with the following properties:
+
+- `field`
+
+    Mandatory. The object property name.
+
+- `callback`
+
+    Optional. A code reference like an anonymous subroutine that will be called with the class and an array reference of values provided, but possibly empty.
+
+- `callbacks`
+
+    Optional. An hash of keys-callbacks pairs. The supported callback types are: `array_add`, and `array_remove`
+
+    When set, those callbacks will be called when data is added or removed to the array. Be careful that this may slow down your application depending on the frequency of the array call, and what the callback routine does.
+
+    See the ["callback" in Module::Generic::Array](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3AArray#callback) for more information, and also the methods ["get\_callback" in Module::Generic::Array](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3AArray#get_callback), and ["has\_callback" in Module::Generic::Array](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3AArray#has_callback)
+
+- `check`
+
+    A `check` anonymous subroutine that will be called with 2 arguments, the current object, and the value being set, but before it is set.
+
+    If this callback returns false, then an error of `Invalid value provided.` will be returned, so make sure to return true to indicate that the check passed.
+
+    The callback can die, and it will be caught, and be interpreted as `false`
+
+This is a useful callback when the module instantiation either does not use the `new` method or does not simply take one or multiple arguments, such as when the instantiation method would require an hash of parameters, such as [Email::Address::XS](https://metacpan.org/pod/Email%3A%3AAddress%3A%3AXS)
+
+    sub emails { return( shift->_set_get_object_array({
+        field => 'emails',
+        callback => sub
+        {
+            my( $class, $args ) = @_;
+            return( $class->parse_bare_address( $args->[0] ) );
+        },
+    }, 'Email::Address::XS', @_ ) ); }
+
+## \_set\_get\_object\_array2
+
+    sub mymethod { return( shift->_set_get_object_array2( 'mymethod', 'Some::Module', @_ ) ); }
+    # or
+    sub mymethod { return( shift->_set_get_object_array2({
+        field => 'mymethod',
+        callback => sub
+        {
+            my( $class, $args ) = @_;
+            return( $class->new( $args->[0] ) );
+        },
+        check => sub
+        {
+            my( $self, $value ) = @_; # do some check
+            return(1); # Do not forget to return true
+        },
+    }, 'Some::Module', @_ ) ); }
+
+Provided with an object property name, a class/package name and some array reference itself containing array references each containing hash references or objects, and this will create an array of array of objects.
+
+Alternatively, you can pass an hash reference, instead of the object property name, with the following properties:
+
+- `field`
+
+    Mandatory. The object property name.
+
+- `callback`
+
+    Optional. A code reference like an anonymous subroutine that will be called with the class and an array reference of values provided, but possibly empty.
+
+- `check`
+
+    A `check` anonymous subroutine that will be called with 2 arguments, the current object, and the value being set, but before it is set.
+
+    If this callback returns false, then an error of `Invalid value provided.` will be returned, so make sure to return true to indicate that the check passed.
+
+    The callback can die, and it will be caught, and be interpreted as `false`
+
+This is a useful callback when the module instantiation either does not use the `new` method or does not simply take one or multiple arguments, such as when the instantiation method would require an hash of parameters, such as [Email::Address::XS](https://metacpan.org/pod/Email%3A%3AAddress%3A%3AXS)
+
+## \_set\_get\_object\_array\_object
+
+Provided with an object property name, a class/package name and some data and this will create an array of object similar to ["\_set\_get\_object\_array"](#_set_get_object_array), except the array produced is a [Module::Generic::Array](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3AArray)
+
+This method accepts the same arguments as ["\_set\_get\_object\_array"](#_set_get_object_array)
+
 ## \_set\_get\_object\_lvalue
 
 Same as ["\_set\_get\_object\_without\_init"](#_set_get_object_without_init) but with the possibility of setting the object value as an lvalue method:
 
     $o->my_property = $my_object;
+
+## \_set\_get\_object\_variant
+
+    sub name { return( shift->_set_get_object_variant( 'name', @_ ) ); }
+
+or
+
+    sub name { return( shift->_set_get_object_variant({
+        field => 'name',
+        check => sub {
+            my( $self, $value ) = @_; # do some check
+            return(1); # Do not forget to return true
+        },
+        callbacks => {
+            set => sub {
+                my( $self, $value ) = @_;
+                # Do something here with the value set.
+            },
+        },
+    }, @_ ) ); }
+
+Provided with an object property name, a class/package name and some data, and depending whether the data provided is an hash reference or an array reference, this will either instantiate an object for the given hash reference or an array of objects with the hash references in the given array.
+
+This means the value stored for the object property will vary between an hash or array reference.
+
+Alternatively, you can pass an hash reference, instead of the object property name, with the following properties:
+
+- `field`
+
+    Mandatory. The object property name.
+
+- `callback`
+
+    Optional. A code reference like an anonymous subroutine that will be called with the class and an array reference of values provided, but possibly empty.
+
+- `check`
+
+    A `check` anonymous subroutine that will be called with 2 arguments, the current object, and the value being set, but before it is set.
+
+    If this callback returns false, then an error of `Invalid value provided.` will be returned, so make sure to return true to indicate that the check passed.
+
+    The callback can die, and it will be caught, and be interpreted as `false`
+
+This is a useful callback when the module instantiation either does not use the `new` method or does not simply take one or multiple arguments, such as when the instantiation method would require an hash of parameters, such as [Email::Address::XS](https://metacpan.org/pod/Email%3A%3AAddress%3A%3AXS)
+
+    sub emails { return( shift->_set_get_object_variant({
+        field => 'emails',
+        callback => sub
+        {
+            my( $class, $args ) = @_;
+            return( $class->parse_bare_address( $args->[0] ) );
+        },
+    }, 'Email::Address::XS', @_ ) ); }
 
 ## \_set\_get\_object\_without\_init
 
@@ -2155,6 +3143,11 @@ Same as ["\_set\_get\_object\_without\_init"](#_set_get_object_without_init) but
         {
             my( $class, $args ) = @_;
             return( $class->new( $args->[0] ) );
+        },
+        check => sub
+        {
+            my( $self, $value ) = @_; # do some check
+            return(1); # Do not forget to return true
         },
     }, 'Some::Module', @_ ) ); }
     # then
@@ -2176,113 +3169,102 @@ Alternatively, you can pass an hash reference, instead of the object property na
 
     Whatever this returns will set the value for this object property.
 
-This is a useful callback when the module instantiation either does not use the `new` method or does not simply take one or multiple arguments, such as when the instantiation method would require an hash of parameters, such as [Email::Address::XS](https://metacpan.org/pod/Email%3A%3AAddress%3A%3AXS)
+- `check`
 
-## \_set\_get\_object\_array2
+    A `check` anonymous subroutine that will be called with 2 arguments, the current object, and the value being set, but before it is set.
 
-    sub mymethod { return( shift->_set_get_object_array2( 'mymethod', 'Some::Module', @_ ) ); }
-    # or
-    sub mymethod { return( shift->_set_get_object_array2({
-        field => 'mymethod',
-        callback => sub
-        {
-            my( $class, $args ) = @_;
-            return( $class->new( $args->[0] ) );
-        },
-    }, 'Some::Module', @_ ) ); }
+    If this callback returns false, then an error of `Invalid value provided.` will be returned, so make sure to return true to indicate that the check passed.
 
-Provided with an object property name, a class/package name and some array reference itself containing array references each containing hash references or objects, and this will create an array of array of objects.
-
-Alternatively, you can pass an hash reference, instead of the object property name, with the following properties:
-
-- `field`
-
-    Mandatory. The object property name.
-
-- `callback`
-
-    Optional. A code reference like an anonymous subroutine that will be called with the class and an array reference of values provided, but possibly empty.
+    The callback can die, and it will be caught, and be interpreted as `false`
 
 This is a useful callback when the module instantiation either does not use the `new` method or does not simply take one or multiple arguments, such as when the instantiation method would require an hash of parameters, such as [Email::Address::XS](https://metacpan.org/pod/Email%3A%3AAddress%3A%3AXS)
-
-## \_set\_get\_object\_array
-
-    sub mymethod { return( shift->_set_get_object_array( 'mymethod', 'Some::Module', @_ ) ); }
-    # or
-    sub mymethod { return( shift->_set_get_object_array({
-        field => 'mymethod',
-        callback => sub
-        {
-            my( $class, $args ) = @_;
-            return( $class->new( $args->[0] ) );
-        },
-    }, 'Some::Module', @_ ) ); }
-
-Provided with an object property name and a class/package name and similar to ["\_set\_get\_object\_array2"](#_set_get_object_array2) this will create an array reference of objects.
-
-Alternatively, you can pass an hash reference, instead of the object property name, with the following properties:
-
-- `field`
-
-    Mandatory. The object property name.
-
-- `callback`
-
-    Optional. A code reference like an anonymous subroutine that will be called with the class and an array reference of values provided, but possibly empty.
-
-This is a useful callback when the module instantiation either does not use the `new` method or does not simply take one or multiple arguments, such as when the instantiation method would require an hash of parameters, such as [Email::Address::XS](https://metacpan.org/pod/Email%3A%3AAddress%3A%3AXS)
-
-    sub emails { return( shift->_set_get_object_array({
-        field => 'emails',
-        callback => sub
-        {
-            my( $class, $args ) = @_;
-            return( $class->parse_bare_address( $args->[0] ) );
-        },
-    }, 'Email::Address::XS', @_ ) ); }
-
-## \_set\_get\_object\_array\_object
-
-Provided with an object property name, a class/package name and some data and this will create an array of object similar to ["\_set\_get\_object\_array"](#_set_get_object_array), except the array produced is a [Module::Generic::Array](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3AArray)
-
-This method accepts the same arguments as ["\_set\_get\_object\_array"](#_set_get_object_array)
-
-## \_set\_get\_object\_variant
-
-Provided with an object property name, a class/package name and some data, and depending whether the data provided is an hash reference or an array reference, this will either instantiate an object for the given hash reference or an array of objects with the hash references in the given array.
-
-This means the value stored for the object property will vary between an hash or array reference.
-
-Alternatively, you can pass an hash reference, instead of the object property name, with the following properties:
-
-- `field`
-
-    Mandatory. The object property name.
-
-- `callback`
-
-    Optional. A code reference like an anonymous subroutine that will be called with the class and an array reference of values provided, but possibly empty.
-
-This is a useful callback when the module instantiation either does not use the `new` method or does not simply take one or multiple arguments, such as when the instantiation method would require an hash of parameters, such as [Email::Address::XS](https://metacpan.org/pod/Email%3A%3AAddress%3A%3AXS)
-
-    sub emails { return( shift->_set_get_object_variant({
-        field => 'emails',
-        callback => sub
-        {
-            my( $class, $args ) = @_;
-            return( $class->parse_bare_address( $args->[0] ) );
-        },
-    }, 'Email::Address::XS', @_ ) ); }
 
 ## \_set\_get\_scalar
 
     sub name { return( shift->_set_get_scalar( 'name', @_ ) ); }
 
+or
+
+    sub name { return( shift->_set_get_scalar({
+        field => 'name',
+        check => sub
+        {
+            my( $self, $value ) = @_; # do some check
+            return(1); # Do not forget to return true
+        },
+        callbacks =>
+        {
+            set => sub
+            {
+                my( $self, $value ) = @_;
+                # Do something here with the value set.
+            },
+        },
+    }, @_ ) ); }
+
 Provided with an object property name, and a string, possibly a number or anything really and this will set the property value accordingly. Very straightforward.
+
+Alternatively, you can pass an hash reference instead of an object property to provide callbacks that will be called upon addition or removal of value.
+
+This hash reference can contain the following properties:
+
+- `field`
+
+    The object property name
+
+- `callbacks`
+
+    An hash reference of operation type `add` (or `set`), or `get` to callback subroutine name or code reference pairs.
+
+- `check`
+
+    A `check` anonymous subroutine that will be called with 2 arguments, the current object, and the value being set, but before it is set.
+
+    If this callback returns false, then an error of `Invalid value provided.` will be returned, so make sure to return true to indicate that the check passed.
+
+    The callback can die, and it will be caught, and be interpreted as `false`
+
+For example:
+
+    sub name { return( shift->set_get_scalar({
+        field => 'name',
+        callbacks => 
+        {
+            set => '_some_add_callback',
+            get => sub
+            {
+                my $self = shift( @_ );
+                # do something that returns a value.
+            },
+        },
+    }), @_ ); }
+
+The value of the callback can be either a subroutine name or a code reference.
 
 It returns the currently value stored.
 
 ## \_set\_get\_scalar\_as\_object
+
+    sub name { return( shift->_set_get_scalar_as_object( 'name', @_ ) ); }
+
+or
+
+    sub name { return( shift->_set_get_scalar_as_object({
+        field => 'name',
+        check => sub
+        {
+            my( $self, $value ) = @_; # do some check
+            return(1); # Do not forget to return true
+        },
+        callbacks => 
+        {
+            set => sub
+            {
+                my( $self, $value ) = @_;
+                # Do something here with the value set.
+            },
+        },
+    }, @_ ) ); }
 
 Provided with an object property name, and a string or a scalar reference and this stores it as an object of [Module::Generic::Scalar](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3AScalar)
 
@@ -2307,13 +3289,21 @@ Alternatively, you can pass an hash reference instead of an object property to p
 
 This hash reference can contain the following properties:
 
-- field
+- `field`
 
     The object property name
 
-- callbacks
+- `callbacks`
 
-    An hash reference of operation type `add` (or `set`) to callback subroutine name or code reference pairs.
+    An hash reference of operation type `add` (or `set`), or `get` to callback subroutine name or code reference pairs.
+
+- `check`
+
+    A `check` anonymous subroutine that will be called with 2 arguments, the current object, and the value being set, but before it is set.
+
+    If this callback returns false, then an error of `Invalid value provided.` will be returned, so make sure to return true to indicate that the check passed.
+
+    The callback can die, and it will be caught, and be interpreted as `false`
 
 For example:
 
@@ -2338,15 +3328,50 @@ If no value has been set yet, this returns a [Module::Generic::Null](https://met
     sub uri { return( shift->_set_get_uri( 'uri', @_ ) ); }
     sub uri { return( shift->_set_get_uri( { field => 'uri', class => 'URI::Fast' }, @_ ) ); }
 
+or
+
+    sub uri { return( shift->_set_get_uri({
+        field => 'uri',
+        check => sub
+        {
+            my( $self, $value ) = @_; # do some check
+            return(1); # Do not forget to return true
+        },
+        callbacks => 
+        {
+            set => sub
+            {
+                my( $self, $value ) = @_;
+                # Do something here with the value set.
+            },
+        },
+    }, @_ ) ); }
+
 Provided with an object property name, and an uri and this creates an [URI](https://metacpan.org/pod/URI) object and sets the property value accordingly.
 
 Alternatively, the property name can be an hash with the following properties:
 
-- _field_
+- `field`
 
     The object property name
 
-- _class_
+- `check`
+
+    A `check` anonymous subroutine that will be called with 2 arguments, the current object, and the value being set, but before it is set.
+
+    If this callback returns false, then an error of `Invalid value provided.` will be returned, so make sure to return true to indicate that the check passed.
+
+    The callback can die, and it will be caught, and be interpreted as `false`
+
+- `callbacks`
+
+    An hash reference of callbacks. You can use either `set` or `add` whichever you prefer.
+
+    The callback will be called with the current object, and the value that has already been set.
+
+    Any fatal exception during the callback will not be caught.
+
+- `class`
 
     The URI class to use. By default, [URI](https://metacpan.org/pod/URI), but you could also use [URI::Fast](https://metacpan.org/pod/URI%3A%3AFast), or other class of your choice. That class will be loaded, if it is not loaded already.
 
@@ -2356,11 +3381,54 @@ It returns the current value, if any, so the return value could be undef, thus i
 
 ## \_set\_get\_uuid
 
+    sub id { return( shift->_set_get_uuid( 'id', @_ ) ); }
+
+or
+
+    sub id { return( shift->_set_get_uuid({
+        field => 'id',
+        check => sub
+        {
+            my( $self, $value ) = @_; # do some check
+            return(1); # Do not forget to return true
+        },
+        callbacks =>
+        {
+            set => sub
+            {
+                my( $self, $value ) = @_;
+                # Do something here with the value set.
+            },
+        },
+    }, @_ ) ); }
+
 Provided with an object, a property name, and an UUID (Universal Unique Identifier) and this stores it as an object of [Module::Generic::Scalar](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3AScalar).
 
 If an empty or undefined value is provided, it will be stored as is.
 
 However, if there is no value and this method is called in object context, such as in chaining, this will return a special [Module::Generic::Null](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3ANull) object that prevents perl error that whatever method follows was called on an undefined value.
+
+Alternatively, you can provide an hash reference instead of a field name, and pass additional parameters, such as:
+
+- `check`
+
+    A `check` anonymous subroutine that will be called with 2 arguments, the current object, and the value being set, but before it is set.
+
+    If this callback returns false, then an error of `Invalid value provided.` will be returned, so make sure to return true to indicate that the check passed.
+
+    The callback can die, and it will be caught, and be interpreted as `false`
+
+- `callbacks`
+
+    An hash reference of callbacks. You can use either `set` or `add` whichever you prefer.
+
+    The callback will be called with the current object, and the value that has already been set.
+
+    Any fatal exception during the callback will not be caught.
+
+- `field`
+
+    The object property name
 
 ## \_set\_get\_version
 
@@ -2370,15 +3438,49 @@ However, if there is no value and this method is called in object context, such 
     # or
     sub version : lvalue { return( shift->_set_get_version( { field => 'version', class => 'Perl::Version' }, @_ ) ); }
 
+or
+
+    sub version { return( shift->_set_get_version({
+        field => 'version',
+        check => sub
+        {
+            my( $self, $value ) = @_; # do some check
+            return(1); # Do not forget to return true
+        },
+        callbacks =>
+        {
+            set => sub {
+                my( $self, $value ) = @_;
+                # Do something here with the value set.
+            },
+        },
+    }, @_ ) ); }
+
 Provided with an object, a property name, and a version string and this stores it as an object of [version](https://metacpan.org/pod/version) by default.
 
 Alternatively, the property name can be an hash with the following properties:
 
-- _field_
+- `field`
 
     The object property name
 
-- _class_
+- `check`
+
+    A `check` anonymous subroutine that will be called with 2 arguments, the current object, and the value being set, but before it is set.
+
+    If this callback returns false, then an error of `Invalid value provided.` will be returned, so make sure to return true to indicate that the check passed.
+
+    The callback can die, and it will be caught, and be interpreted as `false`
+
+- `callbacks`
+
+    An hash reference of callbacks. You can use either `set` or `add` whichever you prefer.
+
+    The callback will be called with the current object, and the value that has already been set.
+
+    Any fatal exception during the callback will not be caught.
+
+- `class`
 
     The version class to use. By default, [version](https://metacpan.org/pod/version), but you could also use [Perl::Version](https://metacpan.org/pod/Perl%3A%3AVersion), or other class of your choice. That class will be loaded, if it is not loaded already.
 
@@ -2393,6 +3495,191 @@ would work, but of course also:
 The value can be a legitimate version string, or a version object matching the `class` to be used, which is by default [version](https://metacpan.org/pod/version). If it is a string, it will be made an object of the class specified using `parse` if that class supports it, or by simply calling `new`.
 
 When called in get mode, it will convert any value pre-set, if any, into a version object of the specified class if the value is not an object of that class already, and return it, or else it will return an empty string or undef whatever you will have set in your object for this property.
+
+## \_set\_symbol
+
+    $o->_set_symbol(
+        # class defaults to the current object class
+        variable => '$some_scalar_ref',
+        # variable value defaults to scalar reference to undef
+        # or [], {}, sub{} depending on the variable type
+    );
+    # or
+    $o->_set_symbol(
+        class => 'Foo::Bar',
+        variable => '$some_scalar_name',
+        value => \"some string reference",
+    );
+    # or
+    $o->_set_symbol(
+        class => 'Foo::Bar',
+        variable => '@some_array_name',
+        value => $an_array_reference,
+    );
+    # or
+    $o->_set_symbol(
+        class => 'Foo::Bar',
+        variable => '%some_array_name',
+        value => $an_hash_reference,
+    );
+    # or
+    $o->_set_symbol(
+        class => 'Foo::Bar',
+        variable => '&some_sub_name',
+        value => $a_code_reference,
+    );
+    # or
+    $o->_set_symbol(
+        class => 'Foo::Bar',
+        # explicitly specify the variable type
+        type => 'hash',
+        variable => '$some_hash_name',
+        value => $an_hash_reference,
+    );
+    # or
+    $o->_set_symbol(
+        class => 'Foo::Bar',
+        type => 'array',
+        variable => '$some_array_name',
+        value => $an_array_reference,
+    );
+    # or
+    $o->_set_symbol(
+        class => 'Foo::Bar',
+        type => 'scalar',
+        variable => '$some_array_name',
+        value => $a_scalar_reference,
+    );
+    # or
+    $o->_set_symbol(
+        class => 'Foo::Bar',
+        type => 'code',
+        variable => '$some_sub_name',
+        # Like \&some_thing, or maybe sub{ # do something here }
+        value => $a_code_reference,
+    );
+
+This method is used to dynamically add a new symbol to a given class, a.k.a. package. A proper symbol type can only be an array reference, an hash reference, a scalar, a code reference, or a glob. This is useful for metaprogramming or creating dynamically extensible APIs.
+
+This takes the following options:
+
+- `class`
+
+    The class, or package name to add the new symbol to.
+
+- `end_line`
+
+    An integer to specify the end line of the the code reference, represented by the variable, in the class provided. If none is provided, the value for `start_line` will be used.
+
+- `filename`
+
+    An optional filename to associate the new symbol with. For example `/some/where/file.pl`
+
+    This is only used when perl debugging is enabled and for variables that are code reference.
+
+    If no filename is provided, it will default to the value returned by ["caller" in perlfunc](https://metacpan.org/pod/perlfunc#caller)
+
+- `start_line`
+
+    An integer to specify the start line of the code reference, represented by the variable, in the class provided.
+
+    If no start line is provided, it will default to 0.
+
+- `type`
+
+    Optional. Explicitly define the type of the symbol: `scalar`, `array`, `hash`, `code`, or `glob`. This can override the sigil detection logic.
+
+    If this is not explicitly specified, the type will be derived from the sigil, i.e. the first character of the variable name.
+
+    The sigil will determine how the variable will be accessed from the package name. For example:
+
+        $o->_set_symbol(
+            class => 'Foo::Bar',
+            variable => '@some_array',
+            value => [qw( John Peter Paul )],
+        );
+
+    The `@Foo::Bar::some_array` is accessible, but not `$Foo::Bar::some_array`, but if you do:
+
+        $o->_set_symbol(
+            class => 'Foo::Bar',
+            variable => '$some_array',
+            value => [qw( John Peter Paul )],
+        );
+
+    then, `$Foo::Bar::some_array` is accessible, but not `@Foo::Bar::some_array`
+
+    If you prefer providing a variable with a dollar for the name, because you use a reference, it is ok too. The type will be derived from the value you provide if the value is an array, a code reference or an hash.
+
+    There will be a slight difference in the symbol table. Variable starting with `%`, or `@` can only then be retrieved with the same sigil. If an array, hash or code reference variable is stored with `$`, it will be stored as `REF`, and must be dereferenced when the symbol is later retrieved. For example:
+
+        $o->_set_symbol(
+            variable => '$some_array_name',
+            value => [qw( John Peter Paul )],
+        );
+        my $sym = $o->_get_symbol( '$some_array_name' );
+        my $ref = $$sym;
+        say "@$ref"; # John Peter Paul
+
+    Whereas:
+
+        $o->_set_symbol(
+            variable => '@some_array_name',
+            value => [qw( John Peter Paul )],
+        );
+        my $sym = $o->_get_symbol( '@some_array_name' );
+        say "@$sym"; # John Peter Paul
+
+    Acceptable value types are: `array`, `code`, `glob`, `hash`, or `scalar`, but also `lvalue`, `regexp`, and `vstring`
+
+- `value`
+
+    A reference to the value you want to assign to that new symbol. For example, a scalar reference, an arrayref, a coderef, etc.
+
+    If the value is not suitable for the new symbol, an error is returned.
+
+- `variable`
+
+    A variable including its `sigil`, i.e. the first character of a variable name, such as `$`, `%`, `@`, or `&`
+
+See also ["\_get\_symbol"](#_get_symbol) to retrieve the symbol set.
+
+### THREAD SAFETY WARNING
+
+**\_set\_symbol is not thread-safe.** It modifies the package's symbol table (via `*{...}` operations), which is global and shared across all threads.
+
+Injecting or redefining symbols dynamically after threads have been created can cause race conditions, unexpected behavior, or crashes.
+
+#### Safe Usage Recommendations
+
+- Call `_set_symbol` _only before_ any threads are created (i.e., during startup/init phase).
+- Avoid calling this method at runtime inside threads or shared libraries if thread safety is a concern.
+- If using with threads, consider guarding symbol modification with external synchronization (e.g., a global mutex). However, this cannot prevent race conditions if the symbol is already in use.
+
+#### Possible Safer Alternatives
+
+Per-object or closure-based dispatch may be preferable if your use case allows:
+
+    $object->{some_accessor} = sub { ... };
+
+Or use a dynamic delegation pattern via AUTOLOAD:
+
+    sub AUTOLOAD {
+        my $method = our $AUTOLOAD;
+        return $self->{dynamic_methods}{$method}->(@_);
+    }
+
+However, if you truly need to define package-level symbols, this method remains appropriate — just observe the threading caveats above.
+
+## \_str\_val
+
+    my $str = $self->_str_val( $some_object );
+
+This takes a value, possibly an object, especially one that stringifies, and it returns its string representation.
+
+This does the same thing as `overload::StrVal`, expect it handles undefined value, and is called on your class object.
+
+If the value provided is `undef`, or if no value was provided at all, this will simply return an empty string `''`. This is designed so perl will not warn of undefined value being used.
 
 ## \_to\_array\_object
 
@@ -2482,6 +3769,8 @@ To catch fatal error you can use a `try-catch` block such as implemented by [Nic
 
 Since [perl version 5.33.7](https://perldoc.perl.org/blead/perlsyn#Try-Catch-Exception-Handling) you can use the try-catch block using an experimental feature `use feature 'try';`, but this does not support `catch` by exception class.
 
+Note that all helper methods such as `_set_get_*`. when used as mutator, meaning when some values are set successfully, will clear any previous error set. When used as accessor, any previous error set will remain.
+
 # SERIALISATION
 
 The modules in the [Module::Generic](https://metacpan.org/pod/Module%3A%3AGeneric) distribution all supports [Storable::Improved](https://metacpan.org/pod/Storable%3A%3AImproved) (or the legacy [Storable](https://metacpan.org/pod/Storable)), [Sereal](https://metacpan.org/pod/Sereal) and [CBOR](https://metacpan.org/pod/CBOR%3A%3AXS) serialisation, by implementing the methods `FREEZE`, `THAW`, `STORABLE_freeze`, `STORABLE_thaw`
@@ -2498,6 +3787,363 @@ For [CBOR](https://metacpan.org/pod/CBOR%3A%3AXS), it is recommended to use the 
 
 Also, if you use the option `allow_tags` with [JSON](https://metacpan.org/pod/JSON), then all of those modules will work too, since this option enables support for the `FREEZE` and `THAW` methods.
 
+# CLASS FUNCTIONS
+
+## create\_class
+
+Dynamically creates a Perl package with inheritance, optionally injecting getter/setter methods for a variety of data types, including objects, arrays, and more.
+
+This method is provided by [Module::Generic](https://metacpan.org/pod/Module%3A%3AGeneric) and can be called directly or via the `UNIVERSAL` namespace.
+
+    create_class My::Package extends => 'Other::Package';
+    create_class My::Package extends => 'Other::Package', method =>
+    {
+        since => 'datetime',
+        uri => 'uri',
+        tags => 'array_object',
+        meta => 'hash',
+        active => 'boolean',
+        callback => 'code',
+        config => 'file',
+        allowed_from => 'ip',
+        total => 'number',
+        id => 'uuid',
+        version => 'version',
+        filehandle => 'glob',
+        object => { type => 'object', class => 'Some::Class' },
+        customer => 
+        {
+            type => 'class',
+            def =>
+            {
+                id => 'uuid',
+                since => 'datetime',
+                name => 'scalar_as_object',
+                age => 'decimal',
+            }
+        }
+    };
+
+Provided with a class name and an optional hash or hash reference of options, and this will create that class possibly with the requested methods.
+
+Supported options are:
+
+- `extends`
+
+    This represents a parent class to inherit from. If none is provided, it will inherit from [Module::Generic](https://metacpan.org/pod/Module%3A%3AGeneric) by default.
+
+    You may also use the synonym `parent` instead of `extends` if you prefer.
+
+- `method` or `methods`
+
+    A hash reference of method name to their definition, which may be either a string representing a method `type`, or a hash reference, including a `type` property.
+
+    Possible method types supported are:
+
+    - `array`
+
+        Will use the method ["\_set\_get\_array"](#_set_get_array)
+
+    - `array_as_object`
+
+        Will use the method ["\_set\_get\_array\_as\_object"](#_set_get_array_as_object)
+
+    - `boolean`
+
+        Will use the method ["\_set\_get\_boolean"](#_set_get_boolean)
+
+    - `class`
+
+            create_class My::Class method =>
+            {
+                # Will automatically create, when needed, a class My::Class::Customer
+                # with the following methods:
+                customer => 
+                {
+                    type => 'class',
+                    def =>
+                    {
+                        id => 'uuid',
+                        since => 'datetime',
+                        name => 'scalar_as_object',
+                        age => 'decimal',
+                    }
+                }
+            };
+            # Then, you could use it like this:
+            my $obj = My::Class->new;
+            my $cust = $obj->customer(
+                # A Module::Generic::Scalar object
+                name => 'John Doe',
+                id => 'c47e1113-8336-4437-ba20-54f8cd0afb18',
+                # A DateTime object
+                since => 'now',
+                # A Module::Generic::Number object
+                age => 32,
+            );
+            say $obj->name, " is ", $obj->age, " years old.";
+
+        Will use the method ["\_set\_get\_class"](#_set_get_class) that dynamically creates object classes based on the method name it is called upon.
+
+        If the class name provided is not already loaded, it will be created dynamically using `create_class`.
+
+        For this `type`, you will also need to provide 1 other property:
+
+        - 1. `def` or `definition`
+
+            A hash reference used for the definition of this dynamic class.
+
+        See also `class_array` and `class_array_object`.
+
+    - `class_array`
+
+        Will use the method ["\_set\_get\_class\_array"](#_set_get_class_array) to return a conventional perl array of specified object class.
+
+        If the class name provided is not already loaded, it will be created dynamically using `create_class`.
+
+        For this `type`, you will also need to provide 1 other property:
+
+        - 1. `def` or `definition`
+
+            A hash reference used for the definition of this dynamic class.
+
+    - `class_array_object`
+
+        Will use the method ["\_set\_get\_class\_array\_object"](#_set_get_class_array_object) to return an [object array](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3AArray) of specified object class.
+
+        If the class name provided is not already loaded, it will be created dynamically using `create_class`.
+
+        For this `type`, you will also need to provide 1 other property:
+
+        - 1. `def` or `definition`
+
+            A hash reference used for the definition of this dynamic class.
+
+    - `code`
+
+        Will use the method ["\_set\_get\_code"](#_set_get_code)
+
+    - `datetime`
+
+        Will use the method ["\_set\_get\_datetime"](#_set_get_datetime)
+
+    - `decimal`
+
+        Will use the method ["\_set\_get\_number"](#_set_get_number)
+
+    - `file`
+
+        Will use the method ["\_set\_get\_file"](#_set_get_file)
+
+    - `float`
+
+        Will use the method ["\_set\_get\_number"](#_set_get_number)
+
+    - `glob`
+
+        Will use the method ["\_set\_get\_glob"](#_set_get_glob)
+
+    - `hash`
+
+        Will use the method ["\_set\_get\_hash"](#_set_get_hash)
+
+    - `hash_as_object`
+
+        Will use the method ["\_set\_get\_hash\_as\_mix\_object"](#_set_get_hash_as_mix_object)
+
+    - `integer`
+
+        Will use the method ["\_set\_get\_number"](#_set_get_number)
+
+    - `ip`
+
+        Will use the method ["\_set\_get\_ip"](#_set_get_ip)
+
+    - `long`
+
+        Will use the method ["\_set\_get\_number"](#_set_get_number)
+
+    - `number`
+
+        Will use the method ["\_set\_get\_number"](#_set_get_number)
+
+    - `object`
+
+        Will use the method ["\_set\_get\_object"](#_set_get_object)
+
+        This means that if the method is chained, it will instantiate automatically a new object, if none is set yet. If you want to **not** automatically instantiate an object, use the type `object_no_init` instead.
+
+        For this `type`, you will also need to provide 1 other property:
+
+        - 1. `class` or `packages`
+
+            A hash reference used for the definition of this dynamic class.
+
+    - `object_array`
+
+        Will use the method ["\_set\_get\_object\_array"](#_set_get_object_array)
+
+        For this `type`, you will also need to provide 1 other property:
+
+        - 1. `class` or `packages`
+
+            A hash reference used for the definition of this dynamic class.
+
+    - `object_array_object`
+
+        Will use the method ["\_set\_get\_object\_array\_object"](#_set_get_object_array_object)
+
+        For this `type`, you will also need to provide 1 other property:
+
+        - 1. `class` or `packages`
+
+            A hash reference used for the definition of this dynamic class.
+
+    - `object_no_init`
+
+        Will use the method ["\_set\_get\_object\_without\_init"](#_set_get_object_without_init)
+
+        This means that if the method is chained, instead of instantiating automatically a new object, it will return instead [Module::Generic::Null](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3ANull). If you want to automatically instantiate an object, use the type `object`
+
+        For this `type`, you will also need to provide 1 other property:
+
+        - 1. `class` or `packages`
+
+            A hash reference used for the definition of this dynamic class.
+
+    - `scalar`
+
+        Will use the method ["\_set\_get\_scalar"](#_set_get_scalar)
+
+    - `scalar_as_object`
+
+        Will use the method ["\_set\_get\_scalar\_as\_object"](#_set_get_scalar_as_object)
+
+    - `scalar_or_object`
+
+        Will use the method ["\_set\_get\_scalar\_or\_object"](#_set_get_scalar_or_object)
+
+        For this `type`, you will also need to provide 1 other property:
+
+        - 1. `class` or `packages`
+
+            A hash reference used for the definition of this dynamic class.
+
+    - `uri`
+
+        Will use the method ["\_set\_get\_uri"](#_set_get_uri)
+
+    - `uuid`
+
+        Will use the method ["\_set\_get\_uuid"](#_set_get_uuid)
+
+    - `version`
+
+        Will use the method ["\_set\_get\_version"](#_set_get_version)
+
+        For this `type`, you will also need to provide 1 other property:
+
+        - 1. `def` or `definition`
+
+            A hash reference used for the definition of this dynamic class.
+
+### Shortcut Usage
+
+Instead of a full method definition, you may use a simple string:
+
+    methods => 
+    {
+        name => 'scalar',
+        age  => 'integer'
+    }
+
+This is equivalent to:
+
+    methods => 
+    {
+        name => { type => 'scalar' },
+        age  => { type => 'integer' }
+    }
+
+### Return Value
+
+Upon success, it returns the fully qualified class name created, or the already-loaded class if it existed.
+
+Upon error, it sets an [error object](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3AException), and returns an empty list in list context, or `undef` in scalar context, so you can do:
+
+    create_class( My::Package, @sone_arguments ) || die( Module::Generic->error );
+
+# THREAD & PROCESS SAFETY
+
+This module is thread-safe. All shared internal variables are properly protected using [Module::Generic::Global](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3AGlobal), which employs [threads::shared](https://metacpan.org/pod/threads%3A%3Ashared) and `lock` when Perl ithreads support is available, or [APR::ThreadRWLock](https://metacpan.org/pod/APR%3A%3AThreadRWLock) when running under mod\_perl with threaded MPMs (Worker or Event). In non-threaded environments, locking operations are skipped automatically.
+
+Errors are stored using [Module::Generic::Global](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3AGlobal), which provides thread/process-safe global storage with automatic locking and serialisation.
+
+There are various scenarios under which we need to be careful about global variables and they are:
+
+- 1. Perl is non-threaded
+
+    This is safe. No global variables are shared
+
+- 2. Perl is built as threaded
+
+    If the code runs inside a thread, then we ensure thread-safety of global variables, otherwise they are safe. We check for this even during runtime using `HAS_THREADS` below.
+
+- 3. Perl is running under Apache2/modperl with Prefork
+
+    Apache/modperl creates separate instances of the global variables, and there is no risk of collision.
+
+- 4. Perl is running under Apache/modperl with [Worker or Event MPM](https://httpd.apache.org/docs/2.4/en/mod/worker.html) (Multi-Processing Module)
+
+    This setup requires that your version of Perl be compiled with `ithreads` (Interpreter Threads) enabled as [documented in the modperl documentation](https://perl.apache.org/docs/2.0/user/install/install.html#item_Threaded_MPMs)
+
+    Since there is a risk of collision of global variables, [Module::Generic::Global](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3AGlobal) detects it, and uses [threads::shared](https://metacpan.org/pod/threads%3A%3Ashared) or [APR::ThreadRWLock](https://metacpan.org/pod/APR%3A%3AThreadRWLock) as necessary.
+
+## Thread Checking
+
+This module provides subroutines to check thread support and usage, used internally for thread-safe error handling and other operations. These are imported from [Module::Generic::Global](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3AGlobal) via `use Module::Generic::Global ':const'`.
+
+- CAN\_THREADS
+
+    A constant indicating whether Perl is compiled with thread support (`$Config{useithreads}`). Returns `1` if threads are supported, `0` otherwise.
+
+        if( Module::Generic::CAN_THREADS )
+        {
+            print( "Perl supports threads\n" );
+        }
+
+- HAS\_THREADS
+
+    A subroutine (not a constant) that returns `1` if Perl supports threads and the `threads` module is loaded (`$INC{'threads.pm'}`), `0` otherwise. Evaluated at runtime to detect dynamic loading of `threads`.
+
+        if( Module::Generic::HAS_THREADS )
+        {
+            print( "Threads are in use\n" );
+        }
+
+    Note that some modules, such as [forks](https://metacpan.org/pod/forks), may manipulate `%INC` to emulate `threads`. In such cases, `HAS_THREADS` may return `1` even if `threads.pm` is not loaded. This is typically safe, as `forks` provides a compatible `tid` method, but in untrusted environments, consider additional checks (e.g., verifying `$INC{'threads.pm'}` points to the actual `threads.pm`).
+
+- IN\_THREAD
+
+    A subroutine (not a constant) that returns `1` if Perl supports threads, the `threads` module is loaded, and the current execution is in a child thread (`threads-`tid != 0>), `0` otherwise. Evaluated at runtime.
+
+        if( Module::Generic::IN_THREAD() )
+        {
+            print( "Running in a child thread\n" );
+        }
+
+## Thread-Safety Considerations
+
+The `HAS_THREADS` and `IN_THREAD` subroutines rely on `$INC{'threads.pm'}` to detect thread usage. While this is reliable for standard Perl modules like `threads`, some modules (e.g., [forks](https://metacpan.org/pod/forks)) may set `$INC{'threads.pm'}` to emulate thread behaviour. In such cases, `HAS_THREADS` and `IN_THREAD` may return `1` when [forks](https://metacpan.org/pod/forks) is loaded instead of [threads](https://metacpan.org/pod/threads). Since [forks](https://metacpan.org/pod/forks) provides a compatible `tid` method, this is generally safe.
+
+Errors are stored in both instance-level (`$self->{error}`) and class-level (`Module::Generic::Global` repository under the `errors` namespace) storage to support patterns like `My::Module->new || die( My::Module->error )`. Each class-process-thread combination (keyed by `class;pid;tid` or `class;pid`) has at most one error in the repository, as subsequent errors overwrite the previous entry, preventing memory growth.
+
+In mod\_perl environments with Prefork MPM, errors are per-process, behaving like a non-threaded environment, requiring no additional handling. In threaded MPMs (Worker or Event), threads within a process share the error repository, necessitating thread-safety. Since mod\_perl’s threaded MPMs require Perl to be compiled with thread support (`$Config{useithreads}` is true), the repository is made thread-safe using `threads::shared` and `CORE::lock`. If nevertheless, somehow [threads](https://metacpan.org/pod/threads) is not loaded, a warning is issued, indicating potential data corruption in concurrent access scenarios.
+
+In untrusted or complex environments where `%INC` manipulation is a concern, you may wish to add custom checks (e.g., verifying `$INC{'threads.pm'}` points to `threads.pm` rather than `forks.pm`). For most applications, the default behaviour is sufficient, as [forks](https://metacpan.org/pod/forks) and similar modules are designed to be compatible with [threads](https://metacpan.org/pod/threads).
+
+**Warning**: When using mod\_perl with threaded MPMs, certain Perl functions and operations may be unsafe or affect all threads in a process. Users should consult [perlthrtut](http://perldoc.perl.org/perlthrtut.html) and the [mod\_perl documentation](https://perl.apache.org/docs/2.0/user/coding/coding.html#Thread_environment_Issues) for details on thread-unsafe functions and thread-locality issues.
+
 # SEE ALSO
 
 [Module::Generic::Exception](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3AException), [Module::Generic::Array](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3AArray), [Module::Generic::Scalar](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3AScalar), [Module::Generic::Boolean](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3ABoolean), [Module::Generic::Number](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3ANumber), [Module::Generic::Null](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3ANull), [Module::Generic::Dynamic](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3ADynamic) and [Module::Generic::Tie](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3ATie), [Module::Generic::File](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3AFile), [Module::Generic::Finfo](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3AFinfo), [Module::Generic::SharedMem](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3ASharedMem), [Module::Generic::Scalar::IO](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3AScalar%3A%3AIO)
@@ -2510,7 +4156,7 @@ Jacques Deguest <`jack@deguest.jp`>
 
 # COPYRIGHT & LICENSE
 
-Copyright (c) 2000-2020 DEGUEST Pte. Ltd.
+Copyright (c) 2000-2024 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

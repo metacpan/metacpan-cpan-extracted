@@ -1,0 +1,25 @@
+# Copyright (c) 2025 Yuki Kimoto
+# MIT License
+
+class Mojo::DynamicMethods : interface_t {
+  version_from Mojolicious;
+  
+  # Interface Methods
+  method dynamic_methods : Hash of Mojo::DynamicMethods::Callback ();
+  
+  method call : object ($name : string, $arg1 : object = undef, $arg2 : object = undef, $arg3 : object = undef) {
+    
+    my $dynamic_methods = $self->dynamic_methods;
+    
+    my $dynamic_method = $dynamic_methods->get($name);
+    
+    unless ($dynamic_method) {
+      die "Can't call the dynamic method '$name'.";
+    }
+    
+    my $ret = $dynamic_method->(Mojo::DynamicMethods::Callback)->($arg1, $arg2, $arg3);
+    
+    return $ret;
+  }
+  
+}

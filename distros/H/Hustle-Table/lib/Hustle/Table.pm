@@ -1,5 +1,5 @@
 package Hustle::Table;
-our $VERSION="v0.7.1";
+our $VERSION="v0.7.3";
 
 use strict;
 use warnings;
@@ -169,7 +169,6 @@ sub _prepare_online_cached {
 	my \$entry;
   no warnings "numeric";
 	sub {
-    my \@output;
     for my \$input (\@_){
       \$entry=\$cache->{\$input};
       \$entry and return \$entry->\@*;
@@ -192,6 +191,7 @@ sub _prepare_online_cached {
       }]}
 
 
+      my \@output;
       for(\$cache->{\$input}//=[]){
         # If we get here and nothing matched, we force default match
         push \$_->\@*, \$table->[\@\$table-1], undef unless \$_->\@*;
@@ -199,13 +199,17 @@ sub _prepare_online_cached {
         # Copy to output
         push \@output, \$_->@*;
       } 
-    }
     return \@output;
+    }
 	} ';
 
   my $top_level=Template::Plex->load([$template],{table=>$table, cache=>$cache, sub=>$sub_template});
+
+  local $"="";    # Make sure the string join operator in templates is as expeected
+
   my $s=$top_level->render;
   $top_level->cleanup;
+  local $@;
   my $ss=eval $s;
   $ss;
 }

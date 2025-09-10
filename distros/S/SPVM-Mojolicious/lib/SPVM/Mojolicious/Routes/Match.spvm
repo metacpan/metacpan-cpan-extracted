@@ -1,0 +1,154 @@
+# Copyright (c) 2025 Yuki Kimoto
+# MIT License
+
+class Mojolicious::Routes::Match {
+  version_from Mojolicious;
+  
+  use Mojolicious::Controller;
+  
+  # Fields
+  has root : rw Mojolicious::Routes;
+  
+  has endpoint : rw Mojolicious::Routes;
+  
+  has position : int;
+  
+  has stack : virtual rw object[]
+    
+    get {
+      return $self->stack_list->to_array;
+    }
+    set {
+      $self->set_stack_list(List->new($_));
+    }
+  ;
+  
+  has stack_list : rw List
+    get {
+      unless (exists $self->{stack_list}) {
+        $self->{stack_list} = List->new;
+      }
+      
+      return $self->{stack_list};
+    }
+  ;
+  
+  # Class Methods
+  static method new : Mojolicious::Routes::Match () {
+    
+    my $self = new Mojolicious::Routes::Match;
+    
+    return $self;
+  }
+  
+  # Instance Methods
+  method find : void ($c : Mojolicious::Controller, $options : Hash) {
+    $self->_match($self->root, $c, $options);
+  }
+  
+  method path_for : Hash ($arg1 : object, $arg2 : object = undef) {
+
+=pod
+
+    my $name = (string)undef;
+    if ($arg1 isa string) {
+      $name = (string)$arg1;
+      $arg1 = $arg2;
+    }
+    
+    my $values = (object[])undef;
+    if ($arg1 isa object[]) {
+      $values = (object[])$arg1;
+    }
+    
+    # Current route
+    my $route = undef;
+    my $current) = !$name || $name eq "current";
+    
+    if ($current) {
+      unless ($route = $self->endpoint) {
+        return Hash->new;
+      }
+    }
+    
+    # Find endpoint
+    else {
+      unless ($route = $self->root->lookup($name)) {
+        return Hash->new({path => $name});
+      }
+    }
+    
+    # Merge values (clear format)
+    my $captures    = $self->stack->[-1] // {};
+    my %merged      = (%$captures, format => undef, %values);
+    my $pattern     = $route->pattern;
+    my $constraints = $pattern->constraints;
+    $merged{format} = ($current ? $captures->{format} : undef) // $pattern->defaults->{format}
+      if !exists $values{format} && $constraints->{format} && $constraints->{format} ne '1';
+    
+    return {path => $route->render(\%merged), websocket => $route->has_websocket};
+
+=cut
+
+  }
+  
+  private method _match : void ($r : Mojolicious::Routes, $c : Mojolicious::Controller, $options : Hash) {
+    
+=pod
+
+    # Pattern
+    my $path    = $options->{path};
+    my $partial = $r->partial;
+    my $detect  = (my $endpoint = $r->is_endpoint) && !$partial;
+    return undef unless my $captures = $r->pattern->match_partial(\$path, $detect);
+    local $options->{path} = $path;
+    local @{$self->{captures} //= {}}{keys %$captures} = values %$captures;
+    $captures = $self->{captures};
+
+    # Method
+    my $methods = $r->methods;
+    return undef if $methods && !grep { $_ eq $options->{method} } @$methods;
+
+    # Conditions
+    if (my $over = $r->requires) {
+      my $conditions = $self->{conditions} ||= $self->root->conditions;
+      for (my $i = 0; $i < @$over; $i += 2) {
+        return undef unless my $condition = $conditions->{$over->[$i]};
+        return undef if !$condition->($r, $c, $captures, $over->[$i + 1]);
+      }
+    }
+
+    # WebSocket
+    return undef if $r->is_websocket && !$options->{websocket};
+
+    # Partial
+    my $empty = !length $path || $path eq '/';
+    if ($partial) {
+      $captures->{path} = $path;
+      $self->endpoint($r);
+      $empty = 1;
+    }
+
+    # Endpoint (or intermediate destination)
+    if (($endpoint && $empty) || $r->inline) {
+      push @{$self->stack}, {%$captures};
+      if ($endpoint && $empty) {
+        my $format = $captures->{format};
+        if ($format) { $_->{format} = $format for @{$self->stack} }
+        return !!$self->endpoint($r);
+      }
+      delete @$captures{qw(app cb)};
+    }
+
+    # Match children
+    my $snapshot = $r->parent ? [@{$self->stack}] : [];
+    for my $child (@{$r->children}) {
+      return 1 if $self->_match($child, $c, $options);
+      $self->stack([@$snapshot]);
+    }
+
+=cut
+
+  }
+
+}

@@ -1,0 +1,14 @@
+Changelog for URI-AnyService
+
+v0.90.0 2025-09-09T16:07:58
+ - Update LICENSE / README / Makefile (Brendan Byrd)
+ - Pull request #1: SRE-9462 (Brendan Byrd)
+ - Scheme RE fixes (Brendan Byrd)
+ - Extra unit tests (Brendan Byrd)
+ - Stack -X checks for $services_file (Andrew Hewus Fresh)
+ - Expose and document %SERVICE_PORTS and :InternalServicesData (Brendan
+   Byrd)
+ - Fix bug with scheme detection during /etc/services loading (Brendan
+   Byrd)
+ - Create URI::AnyService (Brendan Byrd)
+ - Initial Commit (Brendan Byrd)

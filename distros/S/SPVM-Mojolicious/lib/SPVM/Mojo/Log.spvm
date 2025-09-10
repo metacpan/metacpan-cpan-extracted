@@ -12,6 +12,7 @@ class Mojo::Log extends Mojo::EventEmitter {
   use Sys::IO::Constant as IOC;
   use Mojo::Log::Callback::Message;
   use Time::HiRes;
+  use Format;
   
   # Class Variables
   
@@ -231,7 +232,7 @@ class Mojo::Log extends Mojo::EventEmitter {
     }
     my $sec_with_fp = (double)($tm->tm_sec . ".$fp");
     
-    my $time_formatted = Fn->sprintf("%04d-%02d-%02d %02d:%02d:%08.5f", [(object)($tm->tm_year + 1900), $tm->tm_mon + 1, $tm->tm_mday, $tm->tm_hour, $tm->tm_min,
+    my $time_formatted = Format->sprintf("%04d-%02d-%02d %02d:%02d:%08.5f", [(object)($tm->tm_year + 1900), $tm->tm_mon + 1, $tm->tm_mday, $tm->tm_hour, $tm->tm_min,
       $sec_with_fp]);
     
     my $default_message = "[$time_formatted] [" . Sys->process_id . "] [$level] $message\n";

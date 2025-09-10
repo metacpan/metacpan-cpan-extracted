@@ -1,0 +1,14 @@
+# Minimum-supported Perl for the Perl toolchain, according to the Lyon Amendment
+requires 'perl', 'v5.16.0';
+
+# First version of v5, which seems like a good starting point
+requires 'URI', 'v5.05';
+
+on test => sub {
+    requires 'Test2::V0';
+    requires 'List::Util', '1.29';
+};
+
+on develop => sub {
+    requires 'Dist::Zilla::PluginBundle::Author::GSG';
+};

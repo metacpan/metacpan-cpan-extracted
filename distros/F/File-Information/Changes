@@ -1,3 +1,8 @@
+v0.12  2025-09-09Z
+    - Added PNG IHDR parser
+    - Added GIF89a header parser stub
+    - Improved documentation
+
 v0.11  2025-08-15Z
     - Added support for vmv0 image files
     - Implemented Data::Identifier::Interface::Known

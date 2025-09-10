@@ -155,6 +155,15 @@ to the application once authentication has been completed.
 
 String with space separators defining the desired scope of rights of the requested token.
 
+=head2 provider."provider".refresh_scope
+
+String with space separators, used only for the C<refresh_token> grant-type, defining
+the desired scope of rights of the requested renewed token.
+
+May be useful, depending on your needs, to restrict scopes relative to the initial
+request. For example, removing the C<openid> scope means that no new ID token will
+be received, only a new access token with its new refresh token.
+
 =head2 provider."provider".identity_expires_in
 
 Number of seconds to add to the current time (when the ID token is retrieved) to force

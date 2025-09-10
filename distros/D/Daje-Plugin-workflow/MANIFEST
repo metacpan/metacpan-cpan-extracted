@@ -3,6 +3,7 @@ Changes
 LICENSE
 README.md
 cpanfile
+lib/Daje/Controller/Workflow.pm
 lib/Daje/Plugin/Workflow.pm
 minil.toml
 t/00_compile.t

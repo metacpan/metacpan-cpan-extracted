@@ -1,0 +1,12 @@
+# Copyright (c) 2025 Yuki Kimoto
+# MIT License
+
+class Mojo::Loader {
+  version_from Mojolicious;
+  
+  # Class Methods
+  static method load_class : void ($class_name : string) {
+    die "Not implemented";
+  }
+
+}

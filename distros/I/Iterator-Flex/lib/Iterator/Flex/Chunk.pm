@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use experimental 'signatures';
 
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 
 use Iterator::Flex::Factory;
 use Iterator::Flex::Utils qw[ THROW STATE EXHAUSTION :IterAttrs :IterStates ];
@@ -76,6 +76,11 @@ sub construct ( $class, $state ) {
     my $self;
     my $iterator_state;
 
+    # This iterator may have to delay signalling exhaustion for one
+    # cycle if the input iterator is exhausted and the current chunk
+    # is not empty
+    my $next_is_exhausted = !!0;
+
     return {
         ( +_NAME ) => 'ichunk',
 
@@ -85,7 +90,7 @@ sub construct ( $class, $state ) {
 
         ( +NEXT ) => sub {
             return $self->signal_exhaustion
-              if $iterator_state == IterState_EXHAUSTED;
+              if $iterator_state == IterState_EXHAUSTED || $next_is_exhausted;
 
             my @chunked;
             my $ret = eval {
@@ -96,11 +101,15 @@ sub construct ( $class, $state ) {
                 die $@
                   unless Ref::Util::is_blessed_ref( $@ )
                   && $@->isa( 'Iterator::Flex::Failure::Exhausted' );
-                $self->set_exhausted;
+
+                return $self->signal_exhaustion if !@chunked;
+                $next_is_exhausted = !!1;
             }
             return \@chunked;
         },
-        ( +RESET )    => sub { },
+        ( +RESET ) => sub {
+            $next_is_exhausted = !!0;
+        },
         ( +_DEPENDS ) => $src,
     };
 }
@@ -135,7 +144,7 @@ Iterator::Flex::Chunk - Chunk Iterator Class
 
 =head1 VERSION
 
-version 0.28
+version 0.29
 
 =head1 METHODS
 

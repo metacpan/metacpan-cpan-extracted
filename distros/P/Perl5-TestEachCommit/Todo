@@ -17,6 +17,7 @@ File a P5P issue or p.r. to eliminate this extraneous STDERR output I'm noticing
     1227:  fprintf(stderr, "TODO: examine kid %p (optype=%s)\n", kid, PL_op_name[kid->op_type]);
 
 UPDATE (Sep 08): @leonerd has agreed to this and has it in a pending p.r.
+UPDATE (Sep 09): He did so in 4521b3ce4a6347e5b77358c28b615e08987c60e1.
 
 Write a 'dryrun' option for process_command_line which will construct the
 object, prepare the repository (but then it wouldn't be completely dry, would

@@ -42,9 +42,10 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::MockModule" => "0.177.0",
     "Test::MockObject" => 0,
-    "Test::More" => 0
+    "Test::More" => 0,
+    "Test::Warn" => 0
   },
-  "VERSION" => "1.02",
+  "VERSION" => "1.03",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -73,6 +74,7 @@ my %FallbackPrereqs = (
   "Test::MockModule" => "0.177.0",
   "Test::MockObject" => 0,
   "Test::More" => 0,
+  "Test::Warn" => 0,
   "Throwable::Error" => 0,
   "Try::Tiny" => 0,
   "namespace::autoclean" => 0

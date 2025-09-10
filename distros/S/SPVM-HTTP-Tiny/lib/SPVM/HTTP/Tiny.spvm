@@ -2,7 +2,7 @@
 # MIT License
 
 class HTTP::Tiny {
-  version "0.012";
+  version "0.013";
   
   use Fn;
   use Re;
@@ -15,25 +15,23 @@ class HTTP::Tiny {
   use Time::Piece;
   
   use HTTP::Tiny::Handle;
-  use HTTP::Tiny::Message::Request;
-  use HTTP::Tiny::Message::Response;
   use HTTP::Tiny::Response;
-  use HTTP::Tiny::Headers;
-  use HTTP::Tiny::URL;
-  use HTTP::Tiny::CookieJar::Interface;
-  use HTTP::Tiny::Headers;
-  use HTTP::Tiny::Path;
-  use HTTP::Tiny::Parameters;
-  use HTTP::Tiny::Asset;
-  use HTTP::Tiny::Asset::File;
-  use HTTP::Tiny::Asset::Memory;
+  
+  use Mojo::Message::Request;
+  use Mojo::Message::Response;
+  use Mojo::Headers;
+  use Mojo::URL;
+  use Mojo::Headers;
+  use Mojo::Path;
+  use Mojo::Parameters;
+  use Mojo::Asset;
+  use Mojo::Asset::File;
+  use Mojo::Asset::Memory;
   
   # Fields
   has agent : rw string;
   
-  has cookie_jar : rw HTTP::Tiny::CookieJar::Interface;
-  
-  has default_headers : rw HTTP::Tiny::Headers;
+  has default_headers : rw Mojo::Headers;
   
   has local_address : rw string;
   
@@ -197,14 +195,14 @@ class HTTP::Tiny {
     
     my $options_h = Hash->new($options);
     
-    my $headers = (HTTP::Tiny::Headers)$options_h->get_or_default("headers", undef);
+    my $headers = (Mojo::Headers)$options_h->get_or_default("headers", undef);
     
-    my $new_headers = (HTTP::Tiny::Headers)undef;
+    my $new_headers = (Mojo::Headers)undef;
     if ($headers) {
       $new_headers = $headers->clone;
     }
     else {
-      $new_headers = HTTP::Tiny::Headers->new;
+      $new_headers = Mojo::Headers->new;
     }
     
     $new_headers->remove("content-type");
@@ -312,7 +310,7 @@ class HTTP::Tiny {
     
     my $data_callback = $options_h->delete_or_default("data_callback", undef);
     
-    my $headers = (HTTP::Tiny::Headers)$options_h->delete_or_default("headers", undef);
+    my $headers = (Mojo::Headers)$options_h->delete_or_default("headers", undef);
     
     my $timeout = $options_h->delete_or_default_double("timeout", $self->{timeout});
     
@@ -321,7 +319,7 @@ class HTTP::Tiny {
     }
     
     unless ($headers) {
-      $headers = HTTP::Tiny::Headers->new;
+      $headers = Mojo::Headers->new;
     }
     
     unless ($headers->header("user-agent")) {
@@ -329,15 +327,15 @@ class HTTP::Tiny {
       $headers->add("user-agent" => $agent);
     }
     
-    my $url = HTTP::Tiny::URL->new($url_string);
+    my $url = Mojo::URL->new($url_string);
     
     $url->set_port(80);
     
-    my $request = HTTP::Tiny::Message::Request->new({
-      method    => $method,
-      url => $url,
-      headers   => $headers,
-    });
+    my $request = Mojo::Message::Request->new;
+    
+    $request->set_method($method);
+    $request->set_url($url);
+    $request->content->set_headers($headers);
     
     my $socket  = HTTP::Tiny::Handle->new({
       timeout => $timeout,
@@ -424,13 +422,13 @@ class HTTP::Tiny {
     
     my $option_headers_object = $options_h->get("headers");
     
-    my $option_headers = (HTTP::Tiny::Headers)undef;
+    my $option_headers = (Mojo::Headers)undef;
     
-    if ($option_headers_object is_type HTTP::Tiny::Headers) {
-      $option_headers = $option_headers_object->(HTTP::Tiny::Headers)->clone;
+    if ($option_headers_object is_type Mojo::Headers) {
+      $option_headers = $option_headers_object->(Mojo::Headers)->clone;
     }
     else {
-      die "The type of the \"headers\" option must be the object[] type or a HTTP::Tiny::Headers type.";
+      die "The type of the \"headers\" option must be the object[] type or a Mojo::Headers type.";
     }
     
     if (Sys->e($file)) {
@@ -460,11 +458,11 @@ class HTTP::Tiny {
       my $lm = $result->headers->header("last-modified");
       
       if ($lm) {
-        my $http_date = (HTTP::Tiny::Date)undef;
-        eval { $http_date = HTTP::Tiny::Date->new($lm); }
+        my $http_date = (Mojo::Date)undef;
+        eval { $http_date = Mojo::Date->new($lm); }
         
         if ($http_date) {
-          my $mtime = $http_date->epoch;
+          my $mtime = (long)$http_date->epoch;
           Sys->utime($mtime, $mtime, $file);
         }
       }

@@ -1,0 +1,168 @@
+# Copyright (c) 2025 Yuki Kimoto
+# MIT License
+
+class Mojolicious::Types {
+  version_from Mojolicious;
+  
+  use Hash;
+  use Mojolicious::Controller;
+  use Re;
+  use Sort;
+  use StringList;
+  
+  # Fields
+  has mapping : rw Hash of string[]
+    get {
+      
+      unless (exists $self->{mapping}) {
+        $self->{mapping} = Hash->new({
+          appcache => ["text/cache-manifest"],
+          atom     => ["application/atom+xml"],
+          bin      => ["application/octet-stream"],
+          css      => ["text/css"],
+          gif      => ["image/gif"],
+          gz       => ["application/x-gzip"],
+          htm      => ["text/html"],
+          html     => ["text/html;charset=UTF-8"],
+          ico      => ["image/x-icon"],
+          jpeg     => ["image/jpeg"],
+          jpg      => ["image/jpeg"],
+          js       => ["application/javascript"],
+          json     => ["application/json;charset=UTF-8"],
+          mp3      => ["audio/mpeg"],
+          mp4      => ["video/mp4"],
+          ogg      => ["audio/ogg"],
+          ogv      => ["video/ogg"],
+          pdf      => ["application/pdf"],
+          png      => ["image/png"],
+          rss      => ["application/rss+xml"],
+          sse      => ["text/event-stream"],
+          svg      => ["image/svg+xml"],
+          ttf      => ["font/ttf"],
+          txt      => ["text/plain;charset=UTF-8"],
+          webm     => ["video/webm"],
+          woff     => ["font/woff"],
+          woff2    => ["font/woff2"],
+          xml      => ["application/xml", "text/xml"],
+          zip      => ["application/zip"]
+        });
+      }
+      
+      return $self->{mapping};
+    }
+  ;
+  
+  # Class Methods
+  static method new : Mojolicious::Types () {
+    
+    my $self = new Mojolicious::Types;
+    
+    return $self;
+  }
+  
+  # Instance Methods
+  method content_type : void ($c : Mojolicious::Controller, $options : object[] = undef) {
+    
+    my $options_h = Hash->new($options);
+    
+    my $headers = $c->res->headers;
+    
+    if ($headers->content_type) {
+      return;
+    }
+    
+    my $file = $options_h->get_string("file");
+    
+    my $ext = $options_h->get_string("ext");
+    
+    my $type = $file ? $self->file_type($file) : $self->type($ext);
+    
+    $headers->set_content_type($type // "application/octet-stream");
+  }
+  
+  method detect : string[] ($accept : string) {
+    
+    # Extract and prioritize MIME types
+    my $types = Hash->new;
+    
+    for my $accept_value (@{Fn->split(",", $accept // "")}) {
+      
+      if (my $m = Re->m($accept_value, ["^\s*([^,; ]+)(?:\s*\;\s*q\s*=\s*(\d+(?:\.\d+)?))?\s*$", "i"])) {
+        
+        my $type_lc = Fn->lc($m->cap1);
+        
+        my $q = $m->cap2 ? (int)$m->cap2 : 1;
+        
+        $types->set($type_lc => $q);
+      }
+    }
+    
+    my $detected = $types->keys;
+    
+    Sort->sort_object($detected, [$types : Hash] method : int ($a : object, $b : object) {
+      return $types->get_int((string)$b) <=> $types->get_int((string)$a);
+    });
+    
+    # Detect extensions from MIME types
+    my $reverse = Hash->new;
+    my $mapping = $self->mapping;
+    
+    my $mapping_keys = $mapping->keys;
+    Sort->sort_string_asc($mapping_keys);
+    
+    for my $ext (@$mapping_keys) {
+      my $types = (string[])$mapping->get($ext);
+      
+      for my $type (@$types) {
+        
+        Re->s(my $_ = [$type], "\;.*$", "");
+        $type = $_->[0];
+        
+        $type = Fn->lc($type);
+        
+        $reverse->set($type => Array->merge_string((string[])$reverse->get($type), [$type]));
+      }
+    }
+    
+    my $exts_list = StringList->new;
+    for my $detected_type (@$detected) {
+      my $ext = $reverse->get_string($detected_type);
+      
+      $exts_list->push($ext);
+    }
+    
+    return $exts_list->to_array;
+  }
+  
+  method file_type : string ($file : string) {
+    return $self->type(Mojo::File->path($file)->extname);
+  }
+  
+  method type : string ($ext : string) {
+    
+    my $lc_ext = Fn->lc($ext);
+    
+    my $type = $self->mapping->get($lc_ext)->(string[])->[0];
+    
+    return $type;
+  }
+  
+  method set_type : string ($ext : string, $type : object of string|string[] = undef) {
+    
+    my $types = (string[])undef;
+    if ($type isa string) {
+      $types = [(string)$type];
+    }
+    elsif ($type isa string[]) {
+      $types = (string[])$type;
+    }
+    else {
+      die "\$type must be a string or a string[] object.";
+    }
+    
+    my $lc_ext = Fn->lc($ext);
+    
+    $self->mapping->set($lc_ext => $types);
+  }
+
+}

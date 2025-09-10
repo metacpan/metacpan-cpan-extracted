@@ -2,5 +2,22 @@
 # MIT License
 
 class Mojolicious {
-  version "0.016";
+  version "0.017";
+  
+  use Mojolicious::Routes;
+  use Mojo::Log;
+  use Mojolicious::Sessions;
+  
+  # Fields
+  has routes : rw Mojolicious::Routes
+    get {
+      unless (exists $self->{routes}) {
+        $self->{routes} = Mojolicious::Routes->new;
+      }
+    }
+  ;
+  
+  has log : rw Mojo::Log;
+  
+  has moniker : rw string;
 }

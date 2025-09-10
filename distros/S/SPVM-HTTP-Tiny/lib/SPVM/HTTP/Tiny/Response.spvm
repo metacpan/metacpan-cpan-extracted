@@ -7,12 +7,13 @@ class HTTP::Tiny::Response {
   allow HTTP::Tiny::Handle;
   allow HTTP::Tiny;
   
-  use HTTP::Tiny::Headers;
+  use Mojo::Headers;
+  use Mojo::Content::Single;
   
-  has response : HTTP::Tiny::Message::Response;
+  has response : Mojo::Message::Response;
   
   # Class Methods
-  private static method new : HTTP::Tiny::Response ($response : HTTP::Tiny::Message::Response) {
+  private static method new : HTTP::Tiny::Response ($response : Mojo::Message::Response) {
     
     my $self = new HTTP::Tiny::Response;
     
@@ -58,7 +59,7 @@ class HTTP::Tiny::Response {
     return $reason;
   }
   
-  method headers : HTTP::Tiny::Headers () {
+  method headers : Mojo::Headers () {
     
     my $res = $self->{response};
     
@@ -71,7 +72,7 @@ class HTTP::Tiny::Response {
     
     # my $content = $res->content_v0;
     
-    my $content = $res->content->(HTTP::Tiny::Content::Single)->asset->slurp;
+    my $content = $res->content->(Mojo::Content::Single)->asset->slurp;
     
     return $content;
   }

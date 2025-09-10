@@ -22,7 +22,7 @@ use SIRTX::VM::Opcode;
 
 use parent 'Data::Identifier::Interface::Userdata';
 
-our $VERSION = v0.04;
+our $VERSION = v0.05;
 
 my %_escapes = (
     '\\' => '\\',
@@ -111,6 +111,79 @@ my %_synthetic = (
                         [any => 1, any => 2, any => 3, any => 4] => ['arg' => 5] => [
                             ['open', \5, \4],
                             ['control', \1, \2, \3, \5],
+                        ]],
+    push            => [[any => 1, string => 2] => ['user*' => 3] => [
+                            ['open', \3, \2],
+                            ['push', \1, \3],
+                        ],
+                        [any => 1, any => 2] => ['user*' => 3] => [
+                            ['open', \3, \2],
+                            ['control', \1, 'sni:180', \3],
+                        ],
+                        [any => 1, [qw(int id string)] => 2, '"arg"' => 3] => ['user*' => 4] => [
+                            ['open', \4, \2],
+                            ['control', \1, 'sni:180', \4, \3],
+                        ],
+                        [any => 1, reg => 2, '"arg"' => 3] => [] => [
+                            ['control', \1, 'sni:180', \2, \3],
+                        ],
+                        [any => 1, [qw(int id string)] => 2, reg => 3] => ['user*' => 4, 'arg' => 5] => [
+                            ['open', \4, \2],
+                            ['replace', \5, \3],
+                            ['control', \1, 'sni:180', \4, \3],
+                        ],
+                        [any => 1, reg => 2, reg => 3] => ['arg' => 4] => [
+                            ['replace', \4, \3],
+                            ['control', \1, 'sni:180', \2, \4],
+                        ],
+                        [any => 1, [qw(int id string)] => 2, any => 3] => ['user*' => 4, 'arg' => 5] => [
+                            ['open', \4, \2],
+                            ['open', \5, \3],
+                            ['control', \1, 'sni:180', \4, \3],
+                        ],
+                        [any => 1, reg => 2, any => 3] => ['arg' => 4] => [
+                            ['open', \4, \3],
+                            ['control', \1, 'sni:180', \2, \4],
+                        ]],
+    pop             => [[reg => 1, reg => 2] => [] => [
+                            ['control', \2, 'sni:181'],
+                            ['replace', \1, 'out'],
+                        ]],
+    setvalue        => [
+                        [reg => 1, reg => 2, '"arg"' => 3] => [] => [
+                            ['control', \1, 'sni:102', \2, \3],
+                        ],
+                        [reg => 1, any => 2, '"arg"' => 3] => ['user*' => 4] => [
+                            ['open', \4, \2],
+                            ['control', \1, 'sni:102', \4, \3],
+                        ],
+                        [reg => 1, reg => 2, reg => 3] => ['arg' => 4] => [
+                            ['replace', \4, \3],
+                            ['control', \1, 'sni:102', \2, \4],
+                        ],
+                        [reg => 1, any => 2, reg => 3] => ['arg' => 4, 'user*' => 5] => [
+                            ['replace', \4, \3],
+                            ['open', \5, \2],
+                            ['control', \1, 'sni:102', \5, \4],
+                        ],
+                        [reg => 1, any => 2, any => 3] => ['arg' => 4, 'user*' => 5] => [
+                            ['open', \4, \3],
+                            ['open', \5, \2],
+                            ['control', \1, 'sni:102', \5, \4],
+                        ]],
+    getvalue        => [
+                        ['"out"' => 1, reg => 2, any => 3] => ['user*' => 4] => [
+                            ['open', \4, \3],
+                            ['getvalue', \1, \2, \4],
+                        ],
+                        [reg => 1, reg => 2, reg => 3] => [] => [
+                            ['getvalue', 'out', \2, \3],
+                            ['replace', \1, 'out'],
+                        ],
+                        [reg => 1, reg => 2, any => 3] => ['user*' => 4] => [
+                            ['open', \4, \3],
+                            ['getvalue', 'out', \2, \4],
+                            ['replace', \1, 'out'],
                         ]],
     relations       => [[alias => 1, reg => 2, id => 3, any => 4] => ['user*' => 5, 'user*' => 6] => [
                             ['.force_mapped', \5],
@@ -664,6 +737,7 @@ sub _proc_parts {
         $self->{rf}->map_reset;
     } elsif ($cmd eq '.endfunction' && scalar(@args) == 0 && defined($self->{current}{function})) {
         unless ($self->{was_return}) {
+            $self->_save_position('return$function$'.$self->{current}{function});
             $self->_write_opcode(SIRTX::VM::Opcode->from_template(parts => ['return'], assembler => $self));
         }
         $self->_save_endposition('function$'.$self->{current}{function});
@@ -875,10 +949,13 @@ sub _get_value_type {
     return 'undef' if $value eq 'undef';
     return 'string' if $value =~ /^(?:"|U\+)/;
     return 'int' if $value =~ /^'?[\+\-]?(?:0|[1-9][0-9]*|0x[0-9a-fA-F]+|0[0-7]+|0b[01]+)$/;
+
     if ($value =~ /^([a-z]+):(?:0|[1-9][0-9]*)$/) {
         my $type = $1;
         return $type.':' if defined $_type_to_sni{$type};
     }
+
+    $value =~ s/^\/(0|[1-9][0-9]*)$/127:$1/;
     if ($value =~ /^([1-9][0-9]*):(?:0|[1-9][0-9]*)$/) {
         my $type = $1;
         if (defined $_sni_to_type{$type}) {
@@ -953,6 +1030,9 @@ sub _parse_string {
 
 sub _parse_id {
     my ($self, $str) = @_;
+
+    $str =~ s/^\/(0|[1-9][0-9]*)$/127:$1/;
+
     if ($str =~ /^([a-z]+):(0|[1-9][0-9]*)$/) {
         my ($type, $num) = ($1, $2);
         return ($type, $self->_parse_int($num));
@@ -983,7 +1063,7 @@ SIRTX::VM::Assembler - module for assembling SIRTX VM code
 
 =head1 VERSION
 
-version v0.04
+version v0.05
 
 =head1 SYNOPSIS
 

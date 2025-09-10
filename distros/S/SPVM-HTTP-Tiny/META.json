@@ -39,6 +39,7 @@
             "SPVM::IO" : "0.211",
             "SPVM::JSON" : "1.002",
             "SPVM::MIME::Base64" : "1.003",
+            "SPVM::Mojolicious" : "0.016",
             "SPVM::Mozilla::CA" : "0.001",
             "SPVM::Regex" : "0.246",
             "SPVM::Time::Local" : "0.112",
@@ -54,6 +55,6 @@
          "web" : "https://github.com/yuki-kimoto/SPVM-HTTP-Tiny"
       }
    },
-   "version" : "0.012",
+   "version" : "0.013",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

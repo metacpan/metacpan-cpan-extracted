@@ -15,7 +15,7 @@ use Carp;
 
 use parent 'Data::Identifier::Interface::Userdata';
 
-our $VERSION = v0.04;
+our $VERSION = v0.05;
 
 use constant {
     TYPE_USER               => 'user',
@@ -87,7 +87,7 @@ SIRTX::VM::Register - module for interacting with SIRTX VM code
 
 =head1 VERSION
 
-version v0.04
+version v0.05
 
 =head1 SYNOPSIS
 

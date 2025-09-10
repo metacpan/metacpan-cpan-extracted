@@ -1,0 +1,12 @@
+# Copyright (c) 2025 Yuki Kimoto
+# MIT License
+
+class Mojolicious::Plugin {
+  version_from Mojolicious;
+  
+  use Mojolicious;
+  
+  # Instance Methods
+  method register : void ($app : Mojolicious, $options : object[] = undef)  { die "Not implemented."; }
+  
+}

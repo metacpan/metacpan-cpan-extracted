@@ -1,0 +1,205 @@
+# Copyright (c) 2025 Yuki Kimoto
+# MIT License
+
+class Mojolicious::Routes extends Mojolicious::Routes::Route {
+  version_from Mojolicious;
+  
+  use Hash;
+  use Mojo::Cache;
+  use Mojolicious::Routes::Callback::Condition;
+  use Mojo::DynamicMethods;
+  use Mojo::DynamicMethods::Callback;
+  use Regex;
+  use Mojolicious::Controller;
+  
+  # Interfaces
+  interface Mojo::DynamicMethods;
+  
+  # Fields
+  has cache : rw Mojo::Cache
+    get {
+      unless (exists $self->{cache}) {
+        $self->{cache} = Mojo::Cache->new;
+      }
+      
+      return $self->{cache};
+    }
+  ;
+  
+  has conditions : rw Hash of Mojolicious::Routes::Callback::Condition
+    get {
+      unless (exists $self->{conditions}) {
+        $self->{conditions} = Hash->new;
+      }
+      
+      return $self->{conditions};
+    }
+  ;
+  
+  has shortcuts : rw Hash of Mojo::DynamicMethods::Callback
+    get {
+      unless (exists $self->{shortcuts}) {
+        $self->{shortcuts} = Hash->new;
+      }
+      
+      return $self->{shortcuts};
+    }
+  ;
+  
+  has types : rw Hash of object of string|Regex|string[]|Regex[]|object[]
+    get {
+      unless (exists $self->{types}) {
+        $self->{types} = Hash->new;
+        $self->{types}->set(num => [Regex->new("[0-9]+")]);
+      }
+      
+      return $self->{types};
+    }
+  ;
+  
+  has namespaces : rw string[]
+    get {
+      unless (exists $self->{namespaces}) {
+        $self->{namespaces} = new string[0];
+      }
+      
+      return $self->{namespaces};
+    }
+  ;
+  
+  # Class Methods
+  static method new : Mojolicious::Routes () {
+    
+    my $self = new Mojolicious::Routes;
+    
+    return $self;
+  }
+  
+  static method _render : string ($c : Mojolicious::Controller) {
+    
+    die "TODO";
+=pod
+
+    my $stash = $c->stash;
+    
+    if ($stash->get_int("mojo.rendered")) {
+      return undef;
+    }
+    
+    my $rendered = $c->render_maybe;
+    
+    unless ($rendered) {
+      unless ($stash->get_int("mojo.routed")) {
+       die "Route without action and nothing to render";
+      }
+    }
+
+=cut
+
+  }
+  
+  # Instance Methods
+  method dynamic_methods : Hash of Hash of Mojo::DynamicMethods::Callback () {
+    return $self->shortcuts;
+  }
+  
+  method add_condition : void ($name : string, $cb : Mojolicious::Routes::Callback::Condition) {
+    
+    $self->conditions->set($name, $cb);
+  }
+  
+  method add_shortcut : void ($name : string, $cb : Mojo::DynamicMethods::Callback) {
+    $self->conditions->set($name, $cb);
+  }
+  
+  method call : object ($name : string, $arg1 : object = undef, $arg2 : object = undef, $arg3 : object = undef) {
+    
+    my $ret = $self->Mojo::DynamicMethods::call($name, $arg1, $arg2, $arg3);
+    
+    return $ret;
+  }
+  
+  method add_type : void ($name : string, $type : object of string|Regex|string[]|Regex[]|object[]) {
+    
+    $self->types->set($name, $type);
+  }
+  
+  method continue : void ($c : Mojolicious::Controller) {
+
+=pod
+
+    my $match    = $c->match;
+    my $stack    = $match->stack;
+    my $position = $match->position;
+    
+    my $field = $stack->[$position];
+    unless ($field) {
+      return &_render($c);
+    }
+    
+    # Merge captures into stash
+    my $stash = $c->stash;
+    @{$stash->{'mojo.captures'} //= {}}{keys %$field} = values %$field;
+    @$stash{keys %$field} = values %$field;
+    
+    my $continue;
+    my $last = !$stack->[++$position];
+    if (my $cb = $field->{cb}) { $continue = $self->_callback($c, $cb, $last) }
+    else                       { $continue = $self->_controller($c, $field, $last) }
+    $match->position($position);
+    $self->continue($c) if $last || $continue;
+
+=cut
+
+  }
+  
+  method lookup : Mojolicious::Routes ($name : string) {
+    
+  }
+  
+  method any : Mojolicious::Routes ($arg1 : object = undef, $arg2 : object = undef, $arg3 : object = undef, $arg4 : object = undef) {
+    
+    return (Mojolicious::Routes)$self->SUPER::any($arg1, $arg2, $arg3, $arg4);
+  }
+  
+  method delete : Mojolicious::Routes ($arg1 : object = undef, $arg2 : object = undef, $arg3 : object = undef) {
+    
+    return (Mojolicious::Routes)$self->SUPER::delete($arg1, $arg2, $arg3);
+  }
+  
+  method get : Mojolicious::Routes ($arg1 : object = undef, $arg2 : object = undef, $arg3 : object = undef) {
+    
+    return (Mojolicious::Routes)$self->SUPER::get($arg1, $arg2, $arg3);
+  }
+  
+  method options : Mojolicious::Routes ($arg1 : object = undef, $arg2 : object = undef, $arg3 : object = undef) {
+    
+    return (Mojolicious::Routes)$self->SUPER::options($arg1, $arg2, $arg3);
+  }
+  
+  method patch : Mojolicious::Routes ($arg1 : object = undef, $arg2 : object = undef, $arg3 : object = undef) {
+    
+    return (Mojolicious::Routes)$self->SUPER::patch($arg1, $arg2, $arg3);
+  }
+  
+  method post : Mojolicious::Routes ($arg1 : object = undef, $arg2 : object = undef, $arg3 : object = undef) {
+    
+    return (Mojolicious::Routes)$self->SUPER::post($arg1, $arg2, $arg3);
+  }
+  
+  method put : Mojolicious::Routes ($arg1 : object = undef, $arg2 : object = undef, $arg3 : object = undef) {
+    
+    return (Mojolicious::Routes)$self->SUPER::put($arg1, $arg2, $arg3);
+  }
+  
+  method under : Mojolicious::Routes ($arg1 : object = undef, $arg2 : object = undef, $arg3 : object = undef) {
+    
+    return (Mojolicious::Routes)$self->SUPER::under($arg1, $arg2, $arg3);
+  }
+  
+  method websocket : Mojolicious::Routes ($arg1 : object = undef, $arg2 : object = undef, $arg3 : object = undef) {
+    
+    return (Mojolicious::Routes)$self->SUPER::websocket($arg1, $arg2, $arg3);
+  }
+  
+}

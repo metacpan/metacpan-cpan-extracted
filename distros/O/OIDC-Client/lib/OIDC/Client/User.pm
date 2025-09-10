@@ -54,6 +54,18 @@ has 'role_prefix' => (
   required => 0,
 );
 
+has 'uo' => (
+  is       => 'ro',
+  isa      => 'Maybe[Str]',
+  required => 0,
+);
+
+has 'title' => (
+  is       => 'ro',
+  isa      => 'Maybe[Str]',
+  required => 0,
+);
+
 =head1 METHODS
 
 =head2 has_role( $role_to_check )

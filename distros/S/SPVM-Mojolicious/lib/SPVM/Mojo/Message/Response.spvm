@@ -114,6 +114,28 @@ class Mojo::Message::Response extends Mojo::Message {
     return Mojo::Cookie::Response->new->parse($headers->get_set_cookie);
   }
   
+  method set_cookies : void ($name : string, $cookies : object[] of Mojo::Cookie::Response|object[]) {
+    
+    # Add cookies
+    my $headers = $self->headers;
+    for my $cookie (@$cookies) {
+      
+      my $cookie_ = (Mojo::Cookie::Response)undef;
+      if ($cookie isa Mojo::Cookie::Response) {
+        $cookie_ = (Mojo::Cookie::Response)$cookie;
+      }
+      elsif ($cookie isa object[]) {
+        $cookie_ = Mojo::Cookie::Response->new((object[])$cookie);
+      }
+      else {
+        die "The element of the cookies \$cookies must be a Mojo::Cookie::Response or object[] object.";
+      }
+      
+      $headers->add("Set-Cookie" => $cookie_->to_string);
+    }
+    
+  }
+  
   method default_message : string ($code : int = -1) {
     if ($code < 0) {
       $code = $self->code;

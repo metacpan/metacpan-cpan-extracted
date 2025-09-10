@@ -13,7 +13,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = v0.11;
+our $VERSION = v0.12;
 
 use constant {
     STATUS_ERROR                => 'error',
@@ -132,7 +132,7 @@ File::Information::VerifyBase - generic module for extracting information from f
 
 =head1 VERSION
 
-version v0.11
+version v0.12
 
 =head1 SYNOPSIS
 

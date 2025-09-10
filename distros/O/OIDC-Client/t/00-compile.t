@@ -6,11 +6,13 @@ use warnings;
 
 use Test::More;
 
-plan tests => 14 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 16 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'OIDC/Client.pm',
     'OIDC/Client/AccessToken.pm',
+    'OIDC/Client/AccessTokenBuilder.pm',
+    'OIDC/Client/ApiUserAgentBuilder.pm',
     'OIDC/Client/Error.pm',
     'OIDC/Client/Error/Authentication.pm',
     'OIDC/Client/Error/InvalidResponse.pm',

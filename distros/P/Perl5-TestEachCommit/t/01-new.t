@@ -4,7 +4,7 @@ use warnings;
 use Perl5::TestEachCommit;
 use File::Temp qw(tempfile tempdir);
 use File::Spec::Functions;
-use Test::More tests => 17;
+use Test::More tests => 19;
 use Data::Dump qw(dd pp);
 use Capture::Tiny qw(capture_stdout);
 
@@ -71,6 +71,18 @@ note("Testing error conditions and defaults in new()");
     my $self;
     eval { $self = Perl5::TestEachCommit->new( \%theseopts ); };
     ok(! $@, "No exceptions, indicating $tdir assigned to 'workdir'");
+}
+
+{
+    local $@;
+    my %theseopts = map { $_ => $opts->{$_} } keys %{$opts};
+    undef $theseopts{workdir};
+    my $tdir = '/tmp';
+    ok(-d $tdir, "okay to use $tdir during testing");
+    local $ENV{SECONDARY_CHECKOUT_DIR} = $tdir;
+    my $self;
+    eval { $self = Perl5::TestEachCommit->new( \%theseopts ); };
+    ok(! $@, "No exceptions, indicating that in absence of 'workdir' argument, 'SECONDARY_CHECKOUT_DIR' was assigned thereto");
 }
 
 {

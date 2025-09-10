@@ -1,0 +1,96 @@
+# Copyright (c) 2025 Yuki Kimoto
+# MIT License
+
+class Mojolicious::Static {
+  version_from Mojolicious;
+  
+  use Mojo::Asset::File;
+  use Mojo::Asset::Memory;
+  use Mojo::Date;
+  use Mojo::File;
+  use Mojo::Util;
+  use Mojolicious::Controller;
+  
+  # Fields
+  has asset_dir : rw string
+    get {
+      unless (exists $self->{asset_dir}) {
+        $self->{asset_dir} = "assets";
+      }
+      
+      return $self->{asset_dir};
+    }
+  ;
+  
+  has classes : rw string[]
+    get {
+      unless (exists $self->{classes}) {
+        $self->{classes} = ["main"];
+      }
+      
+      return $self->{classes};
+    }
+  ;
+  
+  has extra : rw Hash of string
+    get {
+      unless (exists $self->{extra}) {
+        $self->{extra} = Hash->new;
+      }
+      
+      return $self->{extra};
+    }
+  ;
+  
+  has paths : rw string[]
+    get {
+      unless (exists $self->{paths}) {
+        $self->{paths} = new string[0];
+      }
+      
+      return $self->{paths};
+    }
+  ;
+  
+  has prefix : rw string;
+  
+  # Undocumented Fields
+  has assets : Hash;
+  
+  # Class Methods
+  static method new : Mojolicious::Static () {
+    
+    my $self = new Mojolicious::Static;
+    
+    return $self;
+  }
+  
+  # Instance Methods
+  method asset_path : string ($asset : string) {
+    
+    unless (Re->m($asset, "^\/")) {
+      $asset = "/$asset";
+    }
+    
+    $self->{assets} //= Hash->new;
+    
+    my $assets = $self->{assets};
+    
+    return $self->file_path("/" . $self->asset_dir . ($assets->get_string($asset) // $asset));
+  }
+  
+  method file_path : string ($file : string) {
+    
+    unless (Re->m($file, "^\/")) {
+      $file = "/$file";
+    }
+    
+    my $prefix = $self->prefix;
+    unless ($prefix) {
+      return $file ;
+    }
+    
+    return "$prefix$file";
+  }
+
+}

@@ -16,3 +16,7 @@ Revision history for Perl module Perl5::TestEachCommit
     - Add method cleanup_repository(); test it.
     - Have configuration, build and harness behave as if invoked from Perl 5
       core (via setting PERL_CORE to true value within scope).
+
+0.05 Tue Sep  9 04:46:57 PM EDT 2025
+    - Fix bug in new(): failure to check for Perl-truth of argument rather
+      than mere definedness.

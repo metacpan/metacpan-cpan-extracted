@@ -48,7 +48,8 @@ t/Mo-utils-Number-Range/03-check_int_range.t
 t/Mo-utils-Number-Range/04-check_natural_range.t
 t/Mo-utils-Number-Range/05-check_number_range.t
 t/Mo-utils-Number-Range/06-check_percent_range.t
-t/Mo-utils-Number-Range/07-check_positive_natural_range.t
+t/Mo-utils-Number-Range/07-check_positive_decimal_range.t
+t/Mo-utils-Number-Range/08-check_positive_natural_range.t
 t/Mo-utils-Number-Utils/01-use.t
 t/Mo-utils-Number-Utils/02-version.t
 t/Mo-utils-Number-Utils/03-sub_check_percent.t

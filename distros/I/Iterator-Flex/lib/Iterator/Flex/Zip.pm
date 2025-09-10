@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use experimental 'signatures', 'declared_refs';
 
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 
 use Iterator::Flex::Factory;
 use Iterator::Flex::Utils qw[ THROW STATE EXHAUSTION :IterAttrs :IterStates ];
@@ -381,7 +381,7 @@ Iterator::Flex::Zip - Zip Iterator Class
 
 =head1 VERSION
 
-version 0.28
+version 0.29
 
 =head1 METHODS
 

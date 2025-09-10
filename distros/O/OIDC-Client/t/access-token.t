@@ -129,12 +129,11 @@ sub test_to_hashref {
   subtest "to_hashref() - all attributes" => sub {
 
     my %data = (
-      token         => 'my_token',
-      refresh_token => 'my_refresh_token',
-      token_type    => 'my_token_type',
-      expires_at    => 1234,
-      scopes        => [qw/scope1 scope2/],
-      claims        => { 'c1' => 'claim1', 'c2' => 'claim2' }
+      token      => 'my_token',
+      token_type => 'my_token_type',
+      expires_at => 1234,
+      scopes     => [qw/scope1 scope2/],
+      claims     => { 'c1' => 'claim1', 'c2' => 'claim2' }
     );
 
     # Given
@@ -151,8 +150,8 @@ sub test_to_hashref {
   subtest "to_hashref() - only attributes having defined values" => sub {
 
     my %data = (
-      token         => 'my_token',
-      refresh_token => undef,
+      token      => 'my_token',
+      token_type => undef,
     );
 
     # Given

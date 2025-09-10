@@ -1,7 +1,7 @@
 package Crypt::SecretBuffer;
 # VERSION
 # ABSTRACT: Prevent accidentally leaking a string of sensitive data
-$Crypt::SecretBuffer::VERSION = '0.005';
+$Crypt::SecretBuffer::VERSION = '0.006';
 
 use strict;
 use warnings;
@@ -16,8 +16,8 @@ bootstrap Crypt::SecretBuffer;
 
 {
    package Crypt::SecretBuffer::Exports;
-$Crypt::SecretBuffer::Exports::VERSION = '0.005';
-   use Exporter 'import';
+$Crypt::SecretBuffer::Exports::VERSION = '0.006';
+use Exporter 'import';
    @Crypt::SecretBuffer::Exports::EXPORT_OK= qw( secret_buffer secret NONBLOCK AT_LEAST );
    sub secret_buffer {
       Crypt::SecretBuffer->new(@_)
@@ -389,7 +389,7 @@ instructions how to report security vulnerabilities.
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 AUTHOR
 

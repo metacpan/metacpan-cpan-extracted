@@ -5,7 +5,7 @@ package Iterator::Flex::Role::Exhaustion::ImportedReturn;
 use strict;
 use warnings;
 
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 
 use Iterator::Flex::Utils qw( :default REG_GENERAL REG_GP_INPUT_EXHAUSTION );
 
@@ -50,7 +50,7 @@ Iterator::Flex::Role::Exhaustion::ImportedReturn - Imported iterator returns a s
 
 =head1 VERSION
 
-version 0.28
+version 0.29
 
 =head1 METHODS
 

@@ -1,0 +1,9 @@
+# Copyright (c) 2025 Yuki Kimoto
+# MIT License
+
+class Mojolicious::Sessions::Callback::Deserialize : interface_t {
+  version_from Mojolicious;
+  
+  required method : object ($json : string);
+  
+}

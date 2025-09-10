@@ -1,4 +1,4 @@
-package SPVM::HTTP::Tiny::Message::Response;
+package SPVM::HTTP::Tiny::Response;
 
 
 
@@ -6,25 +6,21 @@ package SPVM::HTTP::Tiny::Message::Response;
 
 =head1 Name
 
-SPVM::HTTP::Tiny::Message::Response - HTTP Response
+SPVM::HTTP::Tiny::Response - HTTP Response
 
 =head1 Description
 
-The HTTP::Tiny::Message::Response class of L<SPVM> has methods to manipulate HTTP responses.
+The HTTP::Tiny::Response class of L<SPVM> has methods to manipulate HTTP responses.
 
 =head1 Usage
   
-  my $response = HTTP::Tiny->new->get('http://example.com/');
+  my $response = HTTP::Tiny->new->get("http://example.com/");
   
   my $success = $response->success;
   
   my $status = $response->status;
   
   my $content = $response->content;
-
-=head1 Inheritance
-
-L<HTTP::Tiny::Message|SPVM::HTTP::Tiny::Message>
 
 =head1 Fields
 

@@ -7,6 +7,7 @@ class Mojo::Date {
   use Time::Local;
   use Sys;
   use Math;
+  use Format;
   
   # Interfaces
   interface Stringable;
@@ -187,7 +188,7 @@ class Mojo::Date {
     
     # RFC 3339 (1994-11-06T08:49:37Z)
     my $tm = Sys->gmtime($epoch_sec);
-    my $string = Fn->sprintf("%04d-%02d-%02dT%02d:%02d:%02d.%09lld", [(object)($tm->tm_year + 1900), $tm->tm_mon + 1, $tm->tm_mday, $tm->tm_hour, $tm->tm_min, $tm->tm_sec]);
+    my $string = Format->sprintf("%04d-%02d-%02dT%02d:%02d:%02d.%09lld", [(object)($tm->tm_year + 1900), $tm->tm_mon + 1, $tm->tm_mday, $tm->tm_hour, $tm->tm_min, $tm->tm_sec]);
     
     if ($self->{epoch_nsec} > 0) {
       $string .= ".$self->{epoch_nsec}";
@@ -206,7 +207,7 @@ class Mojo::Date {
     
     # RFC 7231 (Sun, 06 Nov 1994 08:49:37 GMT)
     my $tm = Sys->gmtime($epoch_sec);
-    my $string = Fn->sprintf("%s, %02d %s %04d %02d:%02d:%02d GMT", [(object)$DAYS->[$tm->tm_wday], $tm->tm_mday, $MONTHS->[$tm->tm_mon], $tm->tm_year + 1900,  $tm->tm_hour, $tm->tm_min, $tm->tm_sec]);
+    my $string = Format->sprintf("%s, %02d %s %04d %02d:%02d:%02d GMT", [(object)$DAYS->[$tm->tm_wday], $tm->tm_mday, $MONTHS->[$tm->tm_mon], $tm->tm_year + 1900,  $tm->tm_hour, $tm->tm_min, $tm->tm_sec]);
     
     return $string;
   }

@@ -1,0 +1,10 @@
+# Copyright (c) 2025 Yuki Kimoto
+# MIT License
+
+class Mojo::DynamicMethods::Callback : interface_t {
+  version_from Mojolicious;
+  
+  # Interface Methods
+  required method : object ($that : object, $arg1 : object = undef, $arg2 : object = undef, $arg3 : object = undef);
+  
+}

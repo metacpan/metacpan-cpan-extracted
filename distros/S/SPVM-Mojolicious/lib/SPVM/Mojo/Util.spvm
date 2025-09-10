@@ -9,6 +9,7 @@ class Mojo::Util {
   use MIME::Base64;
   use StringList;
   use Digest::SHA;
+  use Format;
   
   our $QUOTED_VALUE_RE : string;
   INIT {
@@ -54,7 +55,7 @@ class Mojo::Util {
     my $string_ref = [$string];
     Re->s($string_ref, ["($char_class)", "g"], method : string ($regex : Regex, $match : Regex::Match) {
       
-      my $ret = Fn->sprintf("%%%02X", [(object)Fn->ord($match->cap1)]);
+      my $ret = Format->sprintf("%%%02X", [(object)Fn->ord($match->cap1)]);
       
       return $ret;
     });

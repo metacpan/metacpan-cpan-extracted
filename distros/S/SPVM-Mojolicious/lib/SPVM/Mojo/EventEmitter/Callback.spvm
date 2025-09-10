@@ -5,6 +5,6 @@ class Mojo::EventEmitter::Callback : interface_t {
   version_from Mojolicious;
   
   # Interface Methods
-  required method : void ($that : object, $arg1 : object = undef, $arg2 : object = undef, $arg3 : object = undef);
+  required method : object ($that : object, $arg1 : object = undef, $arg2 : object = undef, $arg3 : object = undef);
   
 }
