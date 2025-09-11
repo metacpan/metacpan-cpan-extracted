@@ -12,7 +12,7 @@ Use a Virtual Machine like VirtualBox to use on Windows, with a Linux distributi
 
 ## PREREQUISITES
 
-This module was developed for Linux, but can work on any Unix-like OS *as long as it has a framebuffer*.
+This module was developed for Linux, but can work on any Unix-like OS *as long as it has a framebuffer*.  HOWEVER, for anything other than Linux, it's not likely to work out of the box.  It expects a framebuffer inside of "/dev".  It also requires a Linux-specific IOCTL call to be able to query the structure of the framebuffer.  This query requires a portion of the kernel source code to be used to understand the kernel structure returned from the IOCTL call.  The actual module code can work on something like FreeBSD, but considerable overhead modification needs to be done for the build process to make it actually work.  I suggest using Linux if you want to exploit the framebuffer, especially a UEFI install to make it the easiest.
 
 This module REQUIRES access to the video framebuffer, usually "/dev/fb0".  You must be using a video device and driver that exposes this device to software.  Video cards with their proprietary drivers are not likely to work.  However, most open-sourced drivers, seem to work fine.  VirtualBox drivers work too.  You must also have the appropriate permissions to write to this device (usually membership with group "video").
 
@@ -96,7 +96,7 @@ This module, suprisingly, runs on a variety of hardware with accessible framebuf
 
 Some lower clocked ARM devices may be too slow for practical use of all of the methods in this module, but the best way to find out is to run ```examples/primitives.pl``` to see which are fast enough to use.
 
-Here's what I have tested this module on (all 1920x1080x32):
+Here's what I have tested this module on (all at least 1920x1080x32):
 
 * **Raspberry PI2/3** - Tollerable, I did 16 bit mode testing and coding on this machine.  Using a Perlbrew custom compiled Perl helps a bit.  The Raspberry PI are configured, by default, to be in 16 bit graphics mode.  This is not the best mode if you are going to be loading images or rendering TrueType text, as color space conversions can take a long time (with acceleration off).  Overall, 32 bit mode works best on this machine, especially for image loading and text rendering.  This performance limitation can, however, be minimized using the C acceleration features, if you still wish to use the 16 bit display mode.
 

@@ -9,6 +9,8 @@ use Encode::Guess;
 use PDK::Utils::Date;
 use Carp;
 
+our $VERSION = '0.005';
+
 # 配置内容数组
 has config => (
     is       => 'ro',
@@ -214,15 +216,37 @@ __PACKAGE__->meta->make_immutable;
 1;
 
 =encoding utf8
-=head1 名称
+=head1 NAME
 
 PDK::Utils::Context - 配置解析上下文工具类
 
-=head1 简介
+=head1 SYNOPSIS
+
+    use PDK::Utils::Context;
+
+    my $ctx = PDK::Utils::Context->new(config => [
+        "line1",
+        "line2",
+        "line3",
+    ]);
+
+    say $ctx->confSign;   # 打印配置签名（MD5）
+    say $ctx->timestamp;  # 打印时间戳
+
+    # 逐行解析
+    while (my $line = $ctx->nextUnParsedLine) {
+        say "解析: $line";
+    }
+
+    # 回溯与忽略
+    $ctx->backtrack;
+    $ctx->ignore;
+
+=head1 DESCRIPTION
 
 该模块用于管理和解析配置内容，提供游标控制、行解析标志、签名生成、时间戳管理等功能，方便逐行读取和回溯。
 
-=head1 属性
+=head1 ATTRIBUTES
 
 =head2 config
 
@@ -262,7 +286,7 @@ PDK::Utils::Context - 配置解析上下文工具类
 
 时间戳，使用 L<PDK::Utils::Date> 生成的格式化日期时间字符串。
 
-=head1 方法说明
+=head1 METHODS
 
 =head2 goToHead
 
@@ -319,7 +343,7 @@ PDK::Utils::Context - 配置解析上下文工具类
 
 设置当前行的解析标志，默认为 1。
 
-=head1 错误处理
+=head1 ERROR HANDLING
 
 =over 4
 
@@ -333,7 +357,7 @@ PDK::Utils::Context - 配置解析上下文工具类
 
 =back
 
-=head1 使用示例
+=head1 EXAMPLES
 
     use PDK::Utils::Context;
 
@@ -355,13 +379,12 @@ PDK::Utils::Context - 配置解析上下文工具类
     $ctx->backtrack;
     $ctx->ignore;
 
-=head1 作者
+=head1 AUTHOR
 
 WENWU YAN E<lt>968828@gmail.comE<gt>
 
-=head1 版权与许可
+=head1 LICENSE AND COPYRIGHT
 
-本模块遵循与 Perl 相同的许可协议。
+This software is licensed under the same terms as Perl itself.
 
 =cut
-

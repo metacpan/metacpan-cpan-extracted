@@ -7,6 +7,73 @@ class Mojolicious::Routes::Route {
   use Mojo::Util;
   use Mojolicious::Routes::Pattern;
   
+  # Class Variables
+  # Reserved stash values
+  our $RESERVED : Hash of string;
+  INIT {
+    
+    my $reserved = [
+      "action",
+      "app",
+      "cb",
+      "controller",
+      "data",
+      "extends",
+      "format",
+      "handler",
+      "inline",
+      "json",
+      "layout",
+      "namespace",
+      "path",
+      "status",
+      "template",
+      "text",
+      "variant",
+    ];
+    
+    $RESERVED = Hash->new_from_keys($reserved => 1);
+  }
+  
+  # Fields
+  has inline : rw byte;
+  
+  has partial : rw byte;
+  
+  has children : rw Mojolicious::Routes::Route[]
+    get {
+      unless (exists $self->{children}) {
+        $self->{children} = new Mojolicious::Routes::Route[0];
+      }
+      
+      return $self->{children};
+    }
+  ;
+  
+  has parent : rw Mojolicious::Routes::Route
+    get {
+      unless (exists $self->{parent}) {
+        $self->{parent} = undef;
+      }
+      
+      return $self->{parent};
+    }
+    set {
+      $self->{parent} = $_;
+      weaken $self->{parent};
+    }
+  ;
+  
+  has pattern : rw Mojolicious::Routes::Pattern
+    get {
+      unless (exists $self->{pattern}) {
+        $self->{pattern} = Mojolicious::Routes::Pattern->new;
+      }
+      
+      return $self->{pattern};
+    }
+  ;
+  
   # Undocumented Fields
   has websocket : byte;
   
@@ -15,60 +82,61 @@ class Mojolicious::Routes::Route {
     die "Not implemeneted.";
   }
   
-  method any : Mojolicious::Routes::Route ($arg1 : object = undef, $arg2 : object = undef, $arg3 : object = undef, $arg4 : object = undef) {
+  method any : Mojolicious::Routes::Route ($args : object...) {
     
     my $methods = (string[])undef;
-    if ($arg1 isa string[]) {
-      $methods = (string[])$arg1;
-      $arg1 = $arg2;
-      $arg2 = $arg3;
-      $arg3 = $arg4;
+    my $shift = 0;
+    if ($args->[0] isa string[]) {
+      $methods = (string[])$args->[0];
+      $shift = 1;
     }
     else {
       $methods = new string[0];
     }
     
-    return $self->_generate_route($methods, $arg1, $arg2, $arg3);
-  }
-  
-  method delete : Mojolicious::Routes::Route ($arg1 : object = undef, $arg2 : object = undef, $arg3 : object = undef) {
-    return $self->_generate_route(DELETE => $arg1, $arg2, $arg3);
-  }
-  
-  method get : Mojolicious::Routes::Route ($arg1 : object = undef, $arg2 : object = undef, $arg3 : object = undef) {
-    return $self->_generate_route(GET => $arg1, $arg2, $arg3);
-  }
-  
-  method options : Mojolicious::Routes::Route ($arg1 : object = undef, $arg2 : object = undef, $arg3 : object = undef) {
-    return $self->_generate_route(OPTIONS => $arg1, $arg2, $arg3);
-  }
-  
-  method patch : Mojolicious::Routes::Route ($arg1 : object = undef, $arg2 : object = undef, $arg3 : object = undef) {
-    return $self->_generate_route(PATCH => $arg1, $arg2, $arg3);
-  }
-  
-  method post : Mojolicious::Routes::Route ($arg1 : object = undef, $arg2 : object = undef, $arg3 : object = undef) {
-    return $self->_generate_route(POST => $arg1, $arg2, $arg3);
-  }
-  
-  method put : Mojolicious::Routes::Route ($arg1 : object = undef, $arg2 : object = undef, $arg3 : object = undef) {
-    return $self->_generate_route(PUT => $arg1, $arg2, $arg3);
-  }
-  
-  method under : Mojolicious::Routes::Route ($arg1 : object = undef, $arg2 : object = undef, $arg3 : object = undef) {
-    return $self->_generate_route(under => $arg1, $arg2, $arg3);
-  }
-  
-  method websocket : Mojolicious::Routes::Route ($arg1 : object = undef, $arg2 : object = undef, $arg3 : object = undef) {
+    $args = $shift ? (object...)Array->copy_object_address($args, 1, @$args - 1) : $args;
     
-    my $route = $self->get($arg1, $arg2, $arg3);
+    return $self->_generate_route($methods, $args);
+  }
+  
+  method delete : Mojolicious::Routes::Route ($args : object...) {
+    return $self->_generate_route(DELETE => $args);
+  }
+  
+  method get : Mojolicious::Routes::Route ($args : object...) {
+    return $self->_generate_route(GET => $args);
+  }
+  
+  method options : Mojolicious::Routes::Route ($args : object...) {
+    return $self->_generate_route(OPTIONS => $args);
+  }
+  
+  method patch : Mojolicious::Routes::Route ($args : object...) {
+    return $self->_generate_route(PATCH => $args);
+  }
+  
+  method post : Mojolicious::Routes::Route ($args : object...) {
+    return $self->_generate_route(POST => $args);
+  }
+  
+  method put : Mojolicious::Routes::Route ($args : object...) {
+    return $self->_generate_route(PUT => $args);
+  }
+  
+  method under : Mojolicious::Routes::Route ($args : object...) {
+    return $self->_generate_route(under => $args);
+  }
+  
+  method websocket : Mojolicious::Routes::Route ($args : object...) {
+    
+    my $route = $self->get($args);
     
     $route->{websocket} = 1;
     
     return $route;
   }
   
-  private method _generate_route : Mojolicious::Routes::Route ($method : object of string|string[], $arg1 : object = undef, $arg2 : object = undef, $arg3 : object = undef) {
+  private method _generate_route : Mojolicious::Routes::Route ($method : object of string|string[], $args : object[]) {
     die "TODO";
   }
 
@@ -77,17 +145,6 @@ class Mojolicious::Routes::Route {
 __END__
 
 TODO
-
-has [qw(inline partial)];
-has 'children' => sub { [] };
-has parent     => undef, weak => 1;
-has pattern    => sub { Mojolicious::Routes::Pattern->new };
-
-# Reserved stash values
-my %RESERVED = map { $_ => 1 } (
-  qw(action app cb controller data extends format handler inline json layout namespace path status template text),
-  qw(variant)
-);
 
 sub BUILD_DYNAMIC {
   my ($class, $method, $dyn_methods) = @_;

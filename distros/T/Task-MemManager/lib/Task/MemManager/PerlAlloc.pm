@@ -1,11 +1,11 @@
 package Task::MemManager::PerlAlloc;
-$Task::MemManager::PerlAlloc::VERSION = '0.02';
+$Task::MemManager::PerlAlloc::VERSION = '0.03';
 use strict;
 use warnings;
 use Carp            qw(croak);
-use Convert::Scalar qw(grow len);
+use Convert::Scalar qw(len readonly grow readonly_on);
 use Inline ( C => 'DATA', );
-use constant { ZERO_STRING_BYTE => "\0", };
+use constant { ZERO_STRING_BYTE => 0, };
 
 Inline->init()
   ; ## prevents warning "One or more DATA sections were not processed by Inline"
@@ -54,29 +54,54 @@ sub get_buffer_address {
 sub malloc {
     my ( $num_of_items, $size_of_each_item, $init_value ) = @_;
     my $buffer_size = $num_of_items * $size_of_each_item;
-    my $buffer;
 
-    my $terminator_byte;
-    # Do not want initialized memory, just grow the buffer
-    unless (  $init_value ) {
-        $init_value = ZERO_STRING_BYTE;
-        grow $buffer, $buffer_size;
-    }
-    else {
-        if ( lc $init_value eq 'zero' ) {
-            $init_value = ZERO_STRING_BYTE;
-        }
-        $buffer = $init_value x ( $buffer_size - 1 )
-          ;    # -1 to account for the string terminator
-    }
-    # Die without nuance if the buffer allocation fails
-    unless ( len $buffer ) {
-        croak "Failed to allocate buffer using Perl's string functions";
-    }
-    $terminator_byte = ord $init_value;
-    vec( $buffer, $buffer_size - 1, 8 ) = $terminator_byte ;
+    my $byte_value =
+      ( lc $init_value eq 'zero' || !defined $init_value )
+      ? ZERO_STRING_BYTE
+      : ord $init_value;
+
+    my $buffer = ( pack "C", $byte_value ) x $buffer_size;
 
     return \$buffer;
+}
+
+###############################################################################
+# Usage       : my $buffer =
+# Task::MemManager::PerlAlloc::consume($external_buffer_ref, $length);
+# Purpose     : Consumes an external buffer, stored in a scalar variable
+#               (provided as a reference to simulate pass-by-reference)
+# Returns     : A reference to the external buffer
+# Parameters  : $external_buffer - A reference to the external buffer
+#               $length          - The length of the buffer to consume. If the
+#                                  length is greater than the actual length of
+#                                  the buffer, the buffer will grow to the size.
+#                                  If the length is less than the actual length
+#                                  of the buffer, only the specified length
+#                                  will be consumed.
+# Throws      : Croaks if the external buffer is not defined, or if it is not a
+#               scalar reference or if the length of the external buffer is
+#               non-positive.
+# Comments    : The Perl buffer is *copied* into a new scalar variable, so the
+#               original buffer can be freed or go out of scope without
+#               affecting the buffer managed by Task::MemManager.
+# See Also    : n/a
+
+sub consume {
+    my ( $external_buffer_ref, $length ) = @_;
+    croak "External buffer is not defined" unless defined $external_buffer_ref;
+    croak "External buffer is not a scalar reference"
+      unless ref($external_buffer_ref) eq 'SCALAR';
+    my $current_length = length($$external_buffer_ref);
+    croak "External buffer is read-only" if readonly($external_buffer_ref);
+    croak "Length of external buffer is not positive"
+      unless $current_length > 0;
+
+    my $returned_buffer = $$external_buffer_ref;
+    grow( $returned_buffer, $length )
+      if $length != $current_length;
+    substr( $returned_buffer, 0, 1 ) =
+      substr( $returned_buffer, 0, 1 );    #force Perl to make a copy
+    return \$returned_buffer;
 }
 
 1;
@@ -87,7 +112,7 @@ Task::MemManager::PerlAlloc - Allocates buffers using Perl's string functions
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

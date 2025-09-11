@@ -7,6 +7,8 @@ use namespace::autoclean;
 use PDK::Utils::Set;
 use Carp;
 
+our $VERSION = '0.005';
+
 # 从IP范围获取整数范围
 sub getRangeFromIpRange {
     my ($self, $ipMin, $ipMax) = @_;
@@ -233,15 +235,37 @@ __PACKAGE__->meta->make_immutable;
 1;
 
 =encoding utf8
-=head1 名称
+=head1 NAME
 
 PDK::Utils::Ip - IP 地址与掩码转换及范围操作工具类
 
-=head1 简介
+=head1 SYNOPSIS
+
+    use PDK::Utils::Ip;
+
+    my $ipUtil = PDK::Utils::Ip->new;
+
+    # IP 转整数
+    my $num = $ipUtil->changeIpToInt("192.168.1.1");
+    say $num;  # 3232235777
+
+    # 整数转 IP
+    say $ipUtil->changeIntToIp($num);  # 192.168.1.1
+
+    # 获取 IP 范围
+    my ($min, $max) = $ipUtil->getRangeFromIpMask("192.168.1.0", "24");
+
+    # 获取网络地址
+    say $ipUtil->getNetIpFromIpMask("192.168.1.10", "255.255.255.0"); # 192.168.1.0
+
+    # 服务端口范围
+    my ($smin, $smax) = $ipUtil->getRangeFromService("tcp/80");
+
+=head1 DESCRIPTION
 
 该模块提供了一系列与 IP 地址、掩码、端口及服务相关的工具方法，支持 IP 与整数的互转、CIDR/掩码处理、范围计算、以及服务端口解析。
 
-=head1 方法说明
+=head1 METHODS
 
 =head2 IP 范围处理
 
@@ -364,7 +388,7 @@ PDK::Utils::Ip - IP 地址与掩码转换及范围操作工具类
 
 =back
 
-=head1 错误处理
+=head1 ERROR HANDLING
 
 =over 4
 
@@ -382,7 +406,7 @@ IP 格式不正确时抛出异常。
 
 =back
 
-=head1 使用示例
+=head1 EXAMPLES
 
     use PDK::Utils::Ip;
 
@@ -404,13 +428,12 @@ IP 格式不正确时抛出异常。
     # 服务端口范围
     my ($smin, $smax) = $ipUtil->getRangeFromService("tcp/80");
 
-=head1 作者
+=head1 AUTHOR
 
 WENWU YAN E<lt>968828@gmail.comE<gt>
 
-=head1 版权与许可
+=head1 LICENSE AND COPYRIGHT
 
-本模块遵循与 Perl 相同的许可协议。
+This software is licensed under the same terms as Perl itself.
 
 =cut
-

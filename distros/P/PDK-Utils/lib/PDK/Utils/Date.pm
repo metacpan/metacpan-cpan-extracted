@@ -7,13 +7,17 @@ use namespace::autoclean;
 use POSIX qw/strftime/;
 use Carp;
 
+our $VERSION = '0.005';
+
 # 获取当前年月（格式：YYYY-MM）
 sub getCurrentYearMonth {
+    my $self = shift;
     return strftime("%Y-%m", localtime);
 }
 
 # 获取当前年月日（格式：YYYY-MM-DD）
 sub getCurrentYearMonthDay {
+    my $self = shift;
     return strftime("%Y-%m-%d", localtime);
 }
 
@@ -80,19 +84,29 @@ __PACKAGE__->meta->make_immutable;
 1;
 
 =encoding utf8
-=head1 名称
+=head1 NAME
 
 PDK::Utils::Date - 日期时间工具类
 
-=head1 简介
+=head1 SYNOPSIS
+
+    use PDK::Utils::Date;
+
+    my $dateUtil = PDK::Utils::Date->new;
+
+    say $dateUtil->getCurrentYearMonth();     # 2025-09
+    say $dateUtil->getCurrentYearMonthDay();  # 2025-09-09
+    say $dateUtil->getFormatedDate("yyyy-mm-dd hh:mi:ss");
+
+=head1 DESCRIPTION
 
 该模块提供常用的日期与时间处理方法，包括获取当前日期、年月、以及自定义格式化输出。
 
-=head1 方法说明
+=head1 METHODS
 
 =head2 getCurrentYearMonth
 
-    my $ym = PDK::Utils::Date::getCurrentYearMonth();
+    my $ym = $dateUtil->getCurrentYearMonth();
 
 获取当前年月，返回字符串格式：
 
@@ -104,7 +118,7 @@ PDK::Utils::Date - 日期时间工具类
 
 =head2 getCurrentYearMonthDay
 
-    my $ymd = PDK::Utils::Date::getCurrentYearMonthDay();
+    my $ymd = $dateUtil->getCurrentYearMonthDay();
 
 获取当前年月日，返回字符串格式：
 
@@ -170,7 +184,7 @@ PDK::Utils::Date - 日期时间工具类
     $dateUtil->getFormatedDate(1609459200, "yyyy/mm/dd");
     # 输出: 2021/01/01
 
-=head1 错误处理
+=head1 ERROR HANDLING
 
 =over 4
 
@@ -180,7 +194,7 @@ PDK::Utils::Date - 日期时间工具类
 
 =back
 
-=head1 使用示例
+=head1 EXAMPLES
 
     use PDK::Utils::Date;
 
@@ -190,13 +204,12 @@ PDK::Utils::Date - 日期时间工具类
     say $dateUtil->getCurrentYearMonthDay();  # 2025-09-09
     say $dateUtil->getFormatedDate("yyyy-mm-dd hh:mi:ss");
 
-=head1 作者
+=head1 AUTHOR
 
 WENWU YAN E<lt>968828@gmail.comE<gt>
 
-=head1 版权与许可
+=head1 LICENSE AND COPYRIGHT
 
-本模块遵循与 Perl 相同的许可协议。
+This software is licensed under the same terms as Perl itself.
 
 =cut
-

@@ -34,10 +34,10 @@
          "requires" : {
             "Authen::OATH" : "0",
             "Convert::Base32" : "0",
+            "Crypt::URandom::Token" : "0",
             "Dancer" : "1.3097",
             "Dancer::Plugin::FlashMessage" : "0",
             "Dancer::Test" : "1.3097",
-            "Math::Random::MT" : "0",
             "Template" : "2",
             "URI::Escape" : "0",
             "YAML" : "0",
@@ -64,7 +64,7 @@
          "web" : "https://github.com/Corion/Auth-GoogleAuthenticator"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.07",
    "x_static_install" : 1
 }

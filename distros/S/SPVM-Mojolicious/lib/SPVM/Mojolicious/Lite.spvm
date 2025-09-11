@@ -42,67 +42,67 @@ class Mojolicious::Lite extends Mojolicious {
   }
   
   # Instance Methods
-  method any : Mojolicious::Routes ($arg1 : object = undef, $arg2 : object = undef, $arg3 : object = undef, $arg4 : object = undef) {
+  method any : Mojolicious::Routes ($args : object...) {
     
     my $routes = $self->routes;
     
-    return $routes->any($arg1, $arg2, $arg3, $arg4);
+    return $routes->any($args);
   }
   
-  method del : Mojolicious::Routes ($arg1 : object = undef, $arg2 : object = undef, $arg3 : object = undef) {
+  method del : Mojolicious::Routes ($args : object...) {
     
     my $routes = $self->routes;
     
-    return $routes->delete($arg1, $arg2, $arg3);
+    return $routes->delete($args);
   }
   
-  method get : Mojolicious::Routes ($arg1 : object = undef, $arg2 : object = undef, $arg3 : object = undef) {
+  method get : Mojolicious::Routes ($args : object...) {
     
     my $routes = $self->routes;
     
-    return $routes->get($arg1, $arg2, $arg3);
+    return $routes->get($args);
   }
   
-  method options : Mojolicious::Routes ($arg1 : object = undef, $arg2 : object = undef, $arg3 : object = undef) {
+  method options : Mojolicious::Routes ($args : object...) {
     
     my $routes = $self->routes;
     
-    return $routes->options($arg1, $arg2, $arg3);
+    return $routes->options($args);
   }
   
-  method patch : Mojolicious::Routes ($arg1 : object = undef, $arg2 : object = undef, $arg3 : object = undef) {
+  method patch : Mojolicious::Routes ($args : object...) {
     
     my $routes = $self->routes;
     
-    return $routes->patch($arg1, $arg2, $arg3);
+    return $routes->patch($args);
   }
   
-  method post : Mojolicious::Routes ($arg1 : object = undef, $arg2 : object = undef, $arg3 : object = undef) {
+  method post : Mojolicious::Routes ($args : object...) {
     
     my $routes = $self->routes;
     
-    return $routes->post($arg1, $arg2, $arg3);
+    return $routes->post($args);
   }
   
-  method put : Mojolicious::Routes ($arg1 : object = undef, $arg2 : object = undef, $arg3 : object = undef) {
+  method put : Mojolicious::Routes ($args : object...) {
     
     my $routes = $self->routes;
     
-    return $routes->put($arg1, $arg2, $arg3);
+    return $routes->put($args);
   }
   
-  method under : Mojolicious::Routes ($arg1 : object = undef, $arg2 : object = undef, $arg3 : object = undef) {
+  method under : Mojolicious::Routes ($args : object...) {
     
     my $root = $self->root;
     
-    return $self->{routes} = $root->under($arg1, $arg2, $arg3);
+    return $self->{routes} = $root->under($args);
   }
   
-  method websocket : Mojolicious::Routes ($arg1 : object = undef, $arg2 : object = undef, $arg3 : object = undef) {
+  method websocket : Mojolicious::Routes ($args : object...) {
     
     my $routes = $self->routes;
     
-    return $routes->websocket($arg1, $arg2, $arg3);
+    return $routes->websocket($args);
   }
   
 }

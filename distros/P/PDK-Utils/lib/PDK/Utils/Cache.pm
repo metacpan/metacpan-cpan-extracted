@@ -6,6 +6,8 @@ use Moose;
 use namespace::autoclean;
 use Carp;
 
+our $VERSION = '0.005';
+
 # 缓存数据结构属性
 has cache => (
     is      => 'ro',           # 只读属性
@@ -99,15 +101,34 @@ __PACKAGE__->meta->make_immutable;
 1;
 
 =encoding utf8
-=head1 名称
+=head1 NAME
 
 PDK::Utils::Cache - 简单的层级缓存工具类
 
-=head1 简介
+=head1 SYNOPSIS
+
+    use PDK::Utils::Cache;
+
+    my $cache = PDK::Utils::Cache->new;
+
+    # 设置缓存
+    $cache->set('user', 'profile', 'name', 'Wenwu');
+    $cache->set('user', 'profile', 'age', 18);
+
+    # 获取缓存
+    my $name = $cache->get('user', 'profile', 'name'); # Wenwu
+
+    # 删除指定缓存
+    $cache->clear('user', 'profile', 'age');
+
+    # 清空缓存
+    $cache->clear();
+
+=head1 DESCRIPTION
 
 该模块提供一个基于 Perl 哈希结构的简易缓存工具，支持多级键路径的存取和清除操作，适合在程序运行期间存储临时数据。
 
-=head1 属性
+=head1 ATTRIBUTES
 
 =head2 cache
 
@@ -116,7 +137,7 @@ PDK::Utils::Cache - 简单的层级缓存工具类
 
 内部缓存数据结构，默认是一个空的哈希引用。
 
-=head1 方法说明
+=head1 METHODS
 
 =head2 get(@keys)
 
@@ -167,7 +188,7 @@ PDK::Utils::Cache - 简单的层级缓存工具类
 
 如果路径不存在，返回 undef。
 
-=head1 使用示例
+=head1 EXAMPLES
 
     use PDK::Utils::Cache;
 
@@ -186,7 +207,7 @@ PDK::Utils::Cache - 简单的层级缓存工具类
     # 清空缓存
     $cache->clear();
 
-=head1 错误处理
+=head1 ERROR HANDLING
 
 =over 4
 
@@ -200,13 +221,12 @@ PDK::Utils::Cache - 简单的层级缓存工具类
 
 =back
 
-=head1 作者
+=head1 AUTHOR
 
 WENWU YAN E<lt>968828@gmail.comE<gt>
 
-=head1 版权与许可
+=head1 LICENSE AND COPYRIGHT
 
-本模块遵循与 Perl 相同的许可协议。
+This software is licensed under the same terms as Perl itself.
 
 =cut
-

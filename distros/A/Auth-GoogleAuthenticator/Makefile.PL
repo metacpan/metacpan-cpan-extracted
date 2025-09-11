@@ -61,7 +61,7 @@ my %module = (
         # Auth::GoogleAuthenticator prereqs
         'Authen::OATH' => 0,
         'Convert::Base32' => 0,
-        'Math::Random::MT' => 0, # for generation of good passcodes
+        'Crypt::URandom::Token' => 0, # for generation of good passcodes
         'URI::Escape' => 0, # for url-escaping the user name
     },
     TEST_REQUIRES => {

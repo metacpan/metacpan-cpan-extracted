@@ -1,14 +1,26 @@
 package Task::MemManager::CMalloc;
-$Task::MemManager::CMalloc::VERSION = '0.01';
+$Task::MemManager::CMalloc::VERSION = '0.02';
 use strict;
 use warnings;
 
+use Config;
 use Carp qw(carp croak);
 use Inline ( C => 'DATA', );
 
 Inline->init()
   ; ## prevents warning "One or more DATA sections were not processed by Inline"
 
+my $MAX_ADDR;
+BEGIN {
+
+    if ($Config{ptrsize} == 8) {
+        $MAX_ADDR = 2**48 - 1;
+    } elsif ($Config{ptrsize} == 4) {
+        $MAX_ADDR = 2**32 - 1;
+    } else {
+        croak "Unsupported pointer size: $Config{ptrsize}";
+    }
+}
 ##############################################################################
 # Usage       : Task::MemManager::CMalloc::free($buffer);
 # Purpose     : Frees the buffer allocated by malloc
@@ -75,6 +87,38 @@ sub malloc {
     return \$buffer;
 }
 
+###############################################################################
+# Usage       : my $buffer =
+# Task::MemManager::CMalloc::consume($external_buffer_ref, $length);
+# Purpose     : Consumes an external buffer, whose address is stored in a scalar
+#               (provided as a reference to simulate pass-by-reference)
+# Returns     : A reference to the buffer that is now owned by
+#               Task::MemManager. 
+# Parameters  : $external_buffer - A reference to the external buffer
+#               $length          - The length of the buffer to consume. 
+#                                This info should be provided by the caller and
+#                                should be accurate to ensure no buffer
+#                                overflows occur.
+# Throws      : Croaks if the external buffer is not defined, or if it is not a
+#               scalar reference or if the length of the external buffer is
+#               non-positive, or not a 64 bit address
+# Comments    : The external buffer value will be zeroed out by
+#               Task::MemManager to avoid double frees.
+# See Also    : n/a
+
+sub consume {
+    my ( $external_buffer_ref, $length ) = @_;
+    croak "External buffer is not defined" unless defined $external_buffer_ref;
+    croak "External buffer is not a scalar reference"
+      unless ref($external_buffer_ref) eq 'SCALAR';
+        
+        croak "Length of external buffer is not a valid memory address"
+            unless ($length > 0 && $length < $MAX_ADDR);
+    my $return_value = $$external_buffer_ref;
+    $$external_buffer_ref = 0;
+
+    return \$return_value;
+}
 1;
 
 =head1 NAME
@@ -83,7 +127,7 @@ Task::MemManager::CMalloc - Allocates buffers using C's malloc
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 

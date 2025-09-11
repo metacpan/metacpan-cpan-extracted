@@ -22,6 +22,12 @@
 
 -----
 
+## Does this work on Darwin/FreeBSD etc?
+
+   Likely not, as the module depends on Linux kernel sources and IOCTL calls to the kernel.  I am making an attempt to see if I can make it work on FreeBSD, but it's an uphill battle.  FreeBSD is like an OS make by Ikea.  Once it's set up to do what you want, it works quite well.  However, gettung to that point is a royal pain in the neck.
+
+-----
+
 ## Will GFB ever be hardware accelerated to use the DRM video drivers?
 
    Not likely, as DRM is not the framebuffer, and has a far different and more complex way of drawing to the screen.  I MAY... MAY ... be able to activate the Framebuffer mode on DRM drivers, if they support it, but if the DRM drivers have this feature, then it should be active as a framebuffer anyway.  Perhaps you might have to use "modprobe" to activate it?

@@ -1,5 +1,11 @@
 Revision history for Statistics-Krippendorff
 
+0.04    2025-09-11
+        - Optimize coincidence building (runtime shortened from hours
+          to seconds for large datasets).
+        - Remove CPAN Ratings from the documentation.
+        - Update installation instructions.
+
 0.03    2025-02-08
         - Require minimal version of Test2::V0 to have float(precision => ...)
 

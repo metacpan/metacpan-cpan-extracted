@@ -13,3 +13,4 @@ t/hashref.t
 t/mix.t
 t/safenav.t
 t/synopsis.t
+t/unblessed.t

@@ -6,7 +6,6 @@ use warnings;
 
 use Test2::Bundle::More;
 use Test2::Tools::Compare;
-use Test2::Tools::Exception;
 use Test2::Tools::Explain;
 
 use DBIx::Class::Storage::DBI::mysql::Retryable;
@@ -35,10 +34,7 @@ CDTest::Schema->storage_type('::DBI::mysql::Retryable');
 # database doesn't have any useful data in it.  The database must exist prior to running
 # the test.
 
-our $EXEC_COUNTER    = 0;
-our $EXEC_SUCCESS_AT = 4;
-our $EXEC_SLEEP_TIME = 0.5;
-our @EXEC_ERRORS     = (
+our @TEST_ERRORS = (
     'Deadlock found when trying to get lock; try restarting transaction',
     'Lock wait timeout exceeded; try restarting transaction',
     'MySQL server has gone away',
@@ -46,10 +42,20 @@ our @EXEC_ERRORS     = (
     'WSREP has not yet prepared node for application use',
     'Server shutdown in progress',
 );
+
+our $EXEC_COUNTER    = 0;
+our $EXEC_SUCCESS_AT = 4;
+our $EXEC_SLEEP_TIME = 0.5;
 our $EXEC_UPDATE_SQL = 'SELECT 1';
 our $EXEC_ACTUALLY_EXECUTE = 0;
 
+our $COMMIT_COUNTER    = 0;
+our $COMMIT_SUCCESS_AT = 4;
+our $COMMIT_SLEEP_TIME = 0.5;
+our $COMMIT_ACTUALLY_EXECUTE = 0;
+
 our $UPDATE_FAILED = 0;
+our $COMMIT_FAILED = 0;
 
 our $IS_MYSQL = $CDTEST_DSN && $CDTEST_DSN =~ /^dbi:mysql:/;
 
@@ -67,7 +73,7 @@ no warnings 'redefine';
     );
 
     # Zero-based error, then one-based counter MOD check
-    my $error = $EXEC_ERRORS[ $EXEC_COUNTER % @EXEC_ERRORS ];
+    my $error = $TEST_ERRORS[ $EXEC_COUNTER % @TEST_ERRORS ];
 
     my $rv = '0E0';
     if ($EXEC_ACTUALLY_EXECUTE) {
@@ -87,6 +93,35 @@ no warnings 'redefine';
 
     $UPDATE_FAILED = 0;
     return (wantarray ? ($rv, $sth, @$bind) : $rv);
+};
+
+# The original is just a simple: shift->_dbh->commit;
+*DBIx::Class::Storage::DBI::_exec_txn_commit = sub {
+    my ($self) = @_;
+
+    my $dbh = $self->_dbh;
+
+    # Zero-based error, then one-based counter MOD check
+    my $error = $TEST_ERRORS[ $COMMIT_COUNTER % @TEST_ERRORS ];
+
+    my $rc = !!1;
+    if ($COMMIT_ACTUALLY_EXECUTE) {
+        $rc = eval { $dbh->commit };
+        $error = $@ if $@;
+    }
+
+    sleep $COMMIT_SLEEP_TIME if $COMMIT_SLEEP_TIME;
+
+    $COMMIT_COUNTER++;
+    if ($COMMIT_COUNTER % $COMMIT_SUCCESS_AT) {  # only success at exact divisors
+        $COMMIT_FAILED = 1;
+        $self->throw_exception(
+            "DBI Exception: DBD::mysql::db commit failed: $error"
+        );
+    }
+
+    $COMMIT_FAILED = 0;
+    return $rc;
 };
 
 my $orig_do = \&DBI::db::do;
@@ -117,7 +152,7 @@ sub __connect_test {
     $UPDATE_FAILED = 0;
 
     # Zero-based error, then one-based counter MOD check
-    my $error = $EXEC_ERRORS[ $EXEC_COUNTER % @EXEC_ERRORS ];
+    my $error = $TEST_ERRORS[ $EXEC_COUNTER % @TEST_ERRORS ];
 
     sleep $EXEC_SLEEP_TIME if $EXEC_SLEEP_TIME;
 
@@ -159,22 +194,27 @@ sub run_update_test {
         $storage->connect_info( $storage->_connect_info );
         $storage->disconnect;
 
+        my $update_track = sub { $schema->resultset('Track')->update({ track_id => 1 }) };
         my $start_time = time;
 
+        # Test2::Tools::Exception checks eval _too_ properly for us to be able to use it here, especially
+        # when we're trying to test for $@ pollution.  Instead, we want to blindly check $@, as assume
+        # failures from that.  But, we'll check both sides for test failure clarity.
+        local $@;
+        my $ok = eval {
+            $update_track->()          unless $args{use_transaction};
+            $schema->txn_do($update_track) if $args{use_transaction};
+            1;
+        };
+        my $err = $@;
+
         if ($args{exception}) {
-            like(
-                dies {
-                    $schema->resultset('Track')->update({ track_id => 1 });
-                },
-                $args{exception},
-                'SQL dies with proper exception',
-            );
+            ok  (!$ok,                   'SQL dies');
+            like($err, $args{exception}, 'expected exception');
         }
         else {
-            try_ok {
-                $schema->resultset('Track')->update({ track_id => 1 });
-            }
-            'SQL successful';
+            ok($ok,      'SQL successful');
+            is($err, '', 'no exception');
         }
 
         # Always add two seconds for lag and code runtimes
@@ -240,6 +280,17 @@ subtest 'clean_test_with_disable_retryable' => sub {
     $storage->disable_retryable(0);
 };
 
+subtest 'clean_test_with_db_transactions' => sub {
+    local $EXEC_COUNTER      = 0;
+    local $EXEC_SUCCESS_AT   = 1;
+    local $COMMIT_COUNTER    = 0;
+    local $COMMIT_SUCCESS_AT = 1;
+
+    run_update_test(
+        use_transaction => 1,
+    );
+};
+
 subtest 'recoverable_failures' => sub {
     local $EXEC_COUNTER    = 0;
 
@@ -251,6 +302,47 @@ subtest 'recoverable_failures' => sub {
             (2.83 - $EXEC_SLEEP_TIME)
         ),
         attempts => $EXEC_SUCCESS_AT,
+    );
+};
+
+subtest 'recoverable_transaction_failures' => sub {
+    local $EXEC_COUNTER      = 0;
+    local $EXEC_SUCCESS_AT   = 1;
+    local $COMMIT_COUNTER    = 0;
+
+    run_update_test(
+        use_transaction => 1,
+        duration => (
+            $EXEC_SUCCESS_AT   * $EXEC_SLEEP_TIME   +
+            $COMMIT_SUCCESS_AT * $COMMIT_SLEEP_TIME + (
+                # hitting minimum exponential timer sleeps each time
+                (1.41 - $COMMIT_SLEEP_TIME) +
+                (2.00 - $COMMIT_SLEEP_TIME) +
+                (2.83 - $COMMIT_SLEEP_TIME)
+            )
+        ),
+        attempts => $EXEC_SUCCESS_AT * $COMMIT_SUCCESS_AT,
+    );
+};
+
+subtest 'recoverable_mixed_execute_transaction_failures' => sub {
+    local $EXEC_COUNTER      = 0;
+    local $EXEC_SUCCESS_AT   = 2;
+    local $EXEC_SLEEP_TIME   = 0;
+    # NOTE: COMMIT_COUNTER won't get hit until after execute is successful
+    local $COMMIT_COUNTER    = $EXEC_COUNTER;
+    local $COMMIT_SUCCESS_AT = $EXEC_SUCCESS_AT;
+    local $COMMIT_SLEEP_TIME = $EXEC_SLEEP_TIME;
+
+    run_update_test(
+        use_transaction => 1,
+        duration => $COMMIT_SUCCESS_AT * $COMMIT_SLEEP_TIME + (
+            # hitting minimum exponential timer sleeps each time
+            (1.41 - $COMMIT_SLEEP_TIME) +
+            (2.00 - $COMMIT_SLEEP_TIME) +
+            (2.83 - $COMMIT_SLEEP_TIME)
+        ),
+        attempts => $EXEC_SUCCESS_AT * $COMMIT_SUCCESS_AT,
     );
 };
 
@@ -299,7 +391,7 @@ subtest 'connection_failure_before_update_failure' => sub {
 subtest 'non_retryable_failure' => sub {
     local $EXEC_COUNTER    = 0;
     local $EXEC_SLEEP_TIME = 3;
-    local @EXEC_ERRORS     = (
+    local @TEST_ERRORS     = (
         "Duplicate entry '1-1' for key 'PRIMARY'",
     );
 
@@ -310,6 +402,27 @@ subtest 'non_retryable_failure' => sub {
         duration  => $EXEC_SLEEP_TIME,
         attempts  => 1,
         exception => qr<Failed dbh_do coderef: Exception not transient, attempts: 1 / 8, timer: [\d\.]+ / 0.0 sec, last exception:.+DBI Exception: DBD::mysql::st execute failed: Duplicate entry .+ for key>,
+    );
+
+    $storage->retries_before_error_prefix(1);
+};
+
+subtest 'non_retryable_transaction_failure' => sub {
+    local $EXEC_COUNTER      = 0;
+    local $EXEC_SUCCESS_AT   = 1;
+    local $COMMIT_COUNTER    = 0;
+    local $COMMIT_SLEEP_TIME = 3;
+    local @TEST_ERRORS       = (
+        "Duplicate entry '1-1' for key 'PRIMARY'",
+    );
+
+    $storage->retries_before_error_prefix(0);
+
+    run_update_test(
+        use_transaction => 1,
+        duration  => $COMMIT_SLEEP_TIME,
+        attempts  => 1,
+        exception => qr<Failed txn_do coderef: Exception not transient, attempts: 1 / 8, timer: [\d\.]+ / 0.0 sec, last exception:.+DBI Exception: DBD::mysql::db commit failed: Duplicate entry .+ for key>,
     );
 
     $storage->retries_before_error_prefix(1);

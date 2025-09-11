@@ -17,7 +17,7 @@ use namespace::clean;
 
 # ABSTRACT: MySQL-specific DBIC storage engine with retry support
 use version;
-our $VERSION = 'v1.0.2'; # VERSION
+our $VERSION = 'v1.0.3'; # VERSION
 
 #pod =head1 SYNOPSIS
 #pod
@@ -186,6 +186,8 @@ __PACKAGE__->enable_retryable(1);
 #pod Messing with this setting in the middle of a database action would not be wise.
 #pod
 #pod Default is on.
+#pod
+#pod =for Pod::Coverage max_attempts retryable_timeout disable_retryable
 #pod
 #pod =cut
 
@@ -444,11 +446,15 @@ sub _blockrunner_do {
     ### we're removing the die handler a bit too high up in the process, and we have exception
     ### throwing that should use the outside handler.
     ###
+    ### Also, BlockRunner doesn't always protect its $@ result from DBI evals, so we also need to
+    ### protect that here.
+    ###
     ### So, we save it here, and throw it out when we're done.
 
     $self->_retryable_original_die_handler( $SIG{__DIE__} );
 
     return preserve_context {
+        local $@;
         local $SIG{__DIE__};
         $br->run($target_runner);
     }
@@ -534,6 +540,10 @@ sub txn_do {
 
     $self->_blockrunner_do( txn_do => @_ );
 }
+
+#pod =for Pod::Coverage is_dbi_error_retryable
+#pod
+#pod =cut
 
 ### XXX: This is a now deprecated method that only existed in the non-public version, but
 ### it's a public method that should still exist for anybody previously using it.
@@ -697,7 +707,7 @@ DBIx::Class::Storage::DBI::mysql::Retryable - MySQL-specific DBIC storage engine
 
 =head1 VERSION
 
-version v1.0.2
+version v1.0.3
 
 =head1 SYNOPSIS
 
@@ -843,6 +853,8 @@ Messing with this setting in the middle of a database action would not be wise.
 
 Default is on.
 
+=for Pod::Coverage max_attempts retryable_timeout disable_retryable
+
 =head1 METHODS
 
 =head2 dbh_do
@@ -879,6 +891,8 @@ Works just like L<DBIx::Class::Storage/txn_do>, except it's now protected agains
 retryable failures.
 
 Calling this method through the C<$schema> object is typically more convenient.
+
+=for Pod::Coverage is_dbi_error_retryable
 
 =head2 throw_exception
 
@@ -946,7 +960,7 @@ Grant Street Group <developers@grantstreet.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2021 - 2022 by Grant Street Group.
+This software is Copyright (c) 2021 - 2025 by Grant Street Group.
 
 This is free software, licensed under:
 

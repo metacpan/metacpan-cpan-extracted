@@ -17,8 +17,8 @@
 ]>
 <ISBNRangeMessage>
   <MessageSource>International ISBN Agency</MessageSource>
-  <MessageSerialNumber>8645caa4-ef17-4ffe-b5ce-14ed9ca5dd76</MessageSerialNumber>
-  <MessageDate>Thu, 4 Sep 2025 04:44:38 BST</MessageDate>
+  <MessageSerialNumber>0a5e61cd-02cd-48da-a46a-def493012cd5</MessageSerialNumber>
+  <MessageDate>Thu, 11 Sep 2025 04:46:27 BST</MessageDate>
   <EAN.UCCPrefixes>
     <EAN.UCC>
       <Prefix>978</Prefix>
@@ -4629,23 +4629,23 @@
       <Agency>Uganda</Agency>
       <Rules>
         <Rule>
-          <Range>0000000-0799999</Range>
+          <Range>0000000-0999999</Range>
           <Length>2</Length>
         </Rule>
         <Rule>
-          <Range>0800000-5999999</Range>
+          <Range>1000000-5999999</Range>
           <Length>0</Length>
         </Rule>
         <Rule>
-          <Range>6000000-6999999</Range>
+          <Range>6000000-7099999</Range>
           <Length>3</Length>
         </Rule>
         <Rule>
-          <Range>7000000-9549999</Range>
+          <Range>7100000-9499999</Range>
           <Length>0</Length>
         </Rule>
         <Rule>
-          <Range>9550000-9999999</Range>
+          <Range>9500000-9999999</Range>
           <Length>4</Length>
         </Rule>
       </Rules>

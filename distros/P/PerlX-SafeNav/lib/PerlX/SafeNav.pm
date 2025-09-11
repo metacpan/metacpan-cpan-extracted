@@ -1,7 +1,7 @@
 package PerlX::SafeNav;
-use strict;
+use v5.14;
 use warnings;
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 use Exporter 'import';
 

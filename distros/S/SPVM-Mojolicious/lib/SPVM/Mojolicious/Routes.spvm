@@ -157,49 +157,49 @@ class Mojolicious::Routes extends Mojolicious::Routes::Route {
     
   }
   
-  method any : Mojolicious::Routes ($arg1 : object = undef, $arg2 : object = undef, $arg3 : object = undef, $arg4 : object = undef) {
+  method any : Mojolicious::Routes ($args : object...) {
     
-    return (Mojolicious::Routes)$self->SUPER::any($arg1, $arg2, $arg3, $arg4);
+    return (Mojolicious::Routes)$self->SUPER::any($args);
   }
   
-  method delete : Mojolicious::Routes ($arg1 : object = undef, $arg2 : object = undef, $arg3 : object = undef) {
+  method delete : Mojolicious::Routes ($args : object...) {
     
-    return (Mojolicious::Routes)$self->SUPER::delete($arg1, $arg2, $arg3);
+    return (Mojolicious::Routes)$self->SUPER::delete($args);
   }
   
-  method get : Mojolicious::Routes ($arg1 : object = undef, $arg2 : object = undef, $arg3 : object = undef) {
+  method get : Mojolicious::Routes ($args : object...) {
     
-    return (Mojolicious::Routes)$self->SUPER::get($arg1, $arg2, $arg3);
+    return (Mojolicious::Routes)$self->SUPER::get($args);
   }
   
-  method options : Mojolicious::Routes ($arg1 : object = undef, $arg2 : object = undef, $arg3 : object = undef) {
+  method options : Mojolicious::Routes ($args : object...) {
     
-    return (Mojolicious::Routes)$self->SUPER::options($arg1, $arg2, $arg3);
+    return (Mojolicious::Routes)$self->SUPER::options($args);
   }
   
-  method patch : Mojolicious::Routes ($arg1 : object = undef, $arg2 : object = undef, $arg3 : object = undef) {
+  method patch : Mojolicious::Routes ($args : object...) {
     
-    return (Mojolicious::Routes)$self->SUPER::patch($arg1, $arg2, $arg3);
+    return (Mojolicious::Routes)$self->SUPER::patch($args);
   }
   
-  method post : Mojolicious::Routes ($arg1 : object = undef, $arg2 : object = undef, $arg3 : object = undef) {
+  method post : Mojolicious::Routes ($args : object...) {
     
-    return (Mojolicious::Routes)$self->SUPER::post($arg1, $arg2, $arg3);
+    return (Mojolicious::Routes)$self->SUPER::post($args);
   }
   
-  method put : Mojolicious::Routes ($arg1 : object = undef, $arg2 : object = undef, $arg3 : object = undef) {
+  method put : Mojolicious::Routes ($args : object...) {
     
-    return (Mojolicious::Routes)$self->SUPER::put($arg1, $arg2, $arg3);
+    return (Mojolicious::Routes)$self->SUPER::put($args);
   }
   
-  method under : Mojolicious::Routes ($arg1 : object = undef, $arg2 : object = undef, $arg3 : object = undef) {
+  method under : Mojolicious::Routes ($args : object...) {
     
-    return (Mojolicious::Routes)$self->SUPER::under($arg1, $arg2, $arg3);
+    return (Mojolicious::Routes)$self->SUPER::under($args);
   }
   
-  method websocket : Mojolicious::Routes ($arg1 : object = undef, $arg2 : object = undef, $arg3 : object = undef) {
+  method websocket : Mojolicious::Routes ($args : object...) {
     
-    return (Mojolicious::Routes)$self->SUPER::websocket($arg1, $arg2, $arg3);
+    return (Mojolicious::Routes)$self->SUPER::websocket($args);
   }
   
 }

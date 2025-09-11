@@ -20,7 +20,7 @@ my %WriteMakefileArgs = (
     "Mail::Sender" => "0.903",
     "Moose" => "2.4000"
   },
-  "VERSION" => "0.004",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }

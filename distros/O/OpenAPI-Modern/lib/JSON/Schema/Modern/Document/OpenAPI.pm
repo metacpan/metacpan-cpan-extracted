@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Document::OpenAPI;
 # ABSTRACT: One OpenAPI v3.1 document
 # KEYWORDS: JSON Schema data validation request response OpenAPI
 
-our $VERSION = '0.094';
+our $VERSION = '0.095';
 
 use 5.020;
 use utf8;
@@ -50,9 +50,13 @@ use constant DEFAULT_SCHEMAS => [
 
 # these are all pre-loaded, and also made available as s/<date>/latest/
 use constant DEFAULT_DIALECT => 'https://spec.openapis.org/oas/3.1/dialect/2024-11-10';
-use constant DEFAULT_BASE_METASCHEMA => 'https://spec.openapis.org/oas/3.1/schema-base/2025-02-13';
-use constant DEFAULT_METASCHEMA => 'https://spec.openapis.org/oas/3.1/schema/2025-02-13';
+use constant DEFAULT_BASE_METASCHEMA => 'https://spec.openapis.org/oas/3.1/schema-base/2025-08-31';
+use constant DEFAULT_METASCHEMA => 'https://spec.openapis.org/oas/3.1/schema/2025-08-31';
 use constant OAS_VOCABULARY => 'https://spec.openapis.org/oas/3.1/meta/2024-11-10';
+
+# it is likely the case that we can support a version beyond what's stated here -- but we may not,
+# so we'll warn to that effect. Every effort will be made to upgrade this implementation to fully
+# support the latest version as soon as possible.
 use constant OAS_VERSION => '3.1.1';
 
 has '+schema' => (
@@ -137,7 +141,7 @@ sub traverse ($self, $evaluator, $config_override = {}) {
       },
       jsonSchemaDialect => {
         type => 'string',
-        format => 'uri',
+        format => 'uri-reference',
       },
     },
   };
@@ -150,10 +154,26 @@ sub traverse ($self, $evaluator, $config_override = {}) {
       validate_formats => 1,
       callbacks => {
         pattern => sub ($data, $schema, $state) {
-          return E($state, 'unrecognized openapi version %s', $data)
-            if $state->{data_path} eq '/openapi' and $data !~ /^3\.1\.[0-9]+(-.+)?$/;
           return E($state, '$self cannot contain a fragment')
             if $state->{data_path} eq '/$self' and $data =~ /#/;
+
+          if ($state->{data_path} eq '/openapi') {
+            return E($state, 'unrecognized/unsupported openapi version %s', $data)
+              if $data !~ /^3\.1\.[0-9]+(-.+)?$/;
+
+            my @oad_version = split /\./, $data;
+            my @supported_version = split /\./, OAS_VERSION;
+
+            if ($oad_version[0] > $supported_version[0]
+                || $oad_version[0] == $supported_version[0]
+                  && ($oad_version[1] > $supported_version[1]
+                || $oad_version[1] == $supported_version[1] && $oad_version[2] > $supported_version[2])) {
+              carp 'WARNING: your document was written for version ', $data,
+                ' but this implementation has only been tested up to ', OAS_VERSION,
+                ': this may be okay but you should upgrade your OpenAPI::Modern installation soon';
+            }
+          }
+
           return 1;
         },
       },
@@ -170,10 +190,13 @@ sub traverse ($self, $evaluator, $config_override = {}) {
 
   # /jsonSchemaDialect: https://spec.openapis.org/oas/v3.1#specifying-schema-dialects
   {
-
     # §4.8.24.5: "If [jsonSchemaDialect] is not set, then the OAS dialect schema id MUST be used for
     # these Schema Objects."
-    my $json_schema_dialect = $schema->{jsonSchemaDialect} // DEFAULT_DIALECT;
+    # §4.6: "Unless specified otherwise, all fields that are URIs MAY be relative references as
+    # defined by [RFC3986] Section 4.2."
+    my $json_schema_dialect = exists $schema->{jsonSchemaDialect}
+      ? Mojo::URL->new($schema->{jsonSchemaDialect})->to_abs($self->canonical_uri)
+      : DEFAULT_DIALECT;
 
     # traverse an empty schema with this metaschema uri to confirm it is valid, and add an entry in
     # the evaluator's _metaschema_vocabulary_classes
@@ -547,7 +570,7 @@ JSON::Schema::Modern::Document::OpenAPI - One OpenAPI v3.1 document
 
 =head1 VERSION
 
-version 0.094
+version 0.095
 
 =head1 SYNOPSIS
 
@@ -583,8 +606,8 @@ Provides structured parsing of an OpenAPI document, suitable as the base for mor
 request and response validation, code generation or form generation.
 
 The provided document must be a valid OpenAPI document, as specified by the schema identified by
-L<https://spec.openapis.org/oas/3.1/schema-base/2025-02-13> (which is a wrapper around
-L<https://spec.openapis.org/oas/3.1/schema/2025-02-13>),
+L<https://spec.openapis.org/oas/3.1/schema-base/2025-08-31> (which is a wrapper around
+L<https://spec.openapis.org/oas/3.1/schema/2025-08-31>),
 and the L<OpenAPI v3.1.x specification|https://spec.openapis.org/oas/v3.1>.
 
 =for Pod::Coverage THAW DEFAULT_BASE_METASCHEMA DEFAULT_DIALECT DEFAULT_METASCHEMA DEFAULT_SCHEMAS
@@ -628,7 +651,7 @@ See also L</retrieval_uri>.
 =head2 metaschema_uri
 
 The URI of the schema that describes the OpenAPI document itself. Defaults to
-L<https://spec.openapis.org/oas/3.1/schema-base/2025-02-13> when the
+L<https://spec.openapis.org/oas/3.1/schema-base/2025-08-31> when the
 C<L<jsonSchemaDialect/https://spec.openapis.org/oas/v3.1#fixed-fields>>
 is not changed from its default; otherwise defaults to a dynamically generated metaschema that uses
 the correct value of C<jsonSchemaDialect>, so you don't need to write one yourself.

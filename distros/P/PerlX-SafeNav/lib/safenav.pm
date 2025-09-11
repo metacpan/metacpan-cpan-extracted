@@ -1,5 +1,5 @@
 package safenav;
-use strict;
+use v5.14;
 use warnings;
 use PerlX::SafeNav ('$safenav', '$unsafenav', '&safenav');
 

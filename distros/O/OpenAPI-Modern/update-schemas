@@ -15,30 +15,26 @@ use Path::Tiny;
 use Mojo::UserAgent;
 use Digest::MD5 'md5_hex';
 use Test::File::ShareDir -share => { -dist => { 'OpenAPI-Modern' => 'share' } };
-use lib 'lib';
 use JSON::Schema::Modern;
-use JSON::Schema::Modern::Document::OpenAPI;
+use lib 'lib';  # make sure we load the newly-patched version of our modules
 
 # see https://spec.openapis.org/#openapi-specification-schemas for the latest links
 
-# TODO: do not store the exact URIs of these files; instead store a mapping of URI regexes to the
-# filenames in which we will store them.
-# Also carefully arrange the order of them so dependencies are loaded first.
-
+# note that these entries are duplicated in JSON::Schema::Modern::Document::OpenAPI
 my %files = (
   # metaschema for json schemas contained within openapi documents:
   # standard json schema (presently draft2020-12) + OAD vocabulary
-  'oas/dialect/base.schema.json' => JSON::Schema::Modern::Document::OpenAPI::DEFAULT_DIALECT,
+  'oas/dialect/base.schema.json' => 'https://spec.openapis.org/oas/3.1/dialect/2024-11-10',
 
   # OAD vocabulary definition
-  'oas/meta/base.schema.json' => JSON::Schema::Modern::Document::OpenAPI::OAS_VOCABULARY,
+  'oas/meta/base.schema.json' => 'https://spec.openapis.org/oas/3.1/meta/2024-11-10',
 
   # openapi document schema that forces the use of the json schema dialect (no $schema overrides
   # permitted)
-  'oas/schema-base.json' => JSON::Schema::Modern::Document::OpenAPI::DEFAULT_BASE_METASCHEMA,
+  'oas/schema-base.json' => 'https://spec.openapis.org/oas/3.1/schema-base/2025-08-31',
 
   # the main openapi document schema, with permissive (unvalidated) json schemas
-  'oas/schema.json' => JSON::Schema::Modern::Document::OpenAPI::DEFAULT_METASCHEMA,
+  'oas/schema.json' => 'https://spec.openapis.org/oas/3.1/schema/2025-08-31',
 
   'oas/LICENSE' => 'https://raw.githubusercontent.com/OAI/OpenAPI-Specification/main/LICENSE',
 );
@@ -65,19 +61,33 @@ foreach my $e ($res->dom->find('a[href]')->each) {
   }
 }
 
-# identify outdated schema files, and find all references to them in the repository
+# identify outdated schema files, and replace all references to them in the repository
 if (my @outdated_schemas = grep $new_schemas{$_}->@*, sort keys %new_schemas) {
-  warn join("\n", 'these outdated files should be updated (fix the hash in update-schemas and re-run):',
+  warn join("\n", 'these outdated entries will be replaced everywhere they are found (including in this script itself):',
     map +("$_ -> ".join(', ', sort $new_schemas{$_}->@*)), @outdated_schemas), "\n\n";
 
-  my $re = join('|', map "\Q$_\E", @outdated_schemas);
-  my @outdated_files = grep !exists $files{s!share/!!r} && path($_)->slurp_utf8 =~ $re, split /\n/, `git ls-files`;
-  warn join("\n", 'all other files containing references to outdated files:', @outdated_files), "\n\n";
+  # now we just keep track of the newest version of each..
+  %new_schemas = map +($new_schemas{$_}->@* ? ($_ => $new_schemas{$_}->[-1]) : ()), @outdated_schemas;
 
-  warn join("\n", 'run this repeatedly in order to find bad references:',
-    'ack -l \''.$re.'\' `git ls-files`'), "\n\n";
+  foreach my $file (split("\n", `git ls-files`) ) {
+    next if $file =~ m{^share/oas/};  # skip references in the files we are replacing
+    path($file)->edit_raw(sub {
+        foreach my $outdated (@outdated_schemas) {
+          s/$outdated/$new_schemas{$outdated}/g;
+        }
+      });
+  }
+
+  # update the values of %files for all schemas that are outdated
+  my %inverted_files = reverse %files;
+  foreach my $outdated (@outdated_schemas) {
+    $inverted_files{$new_schemas{$outdated}} = delete $inverted_files{$outdated};
+  }
+  %files = reverse %inverted_files;
 }
-
+else {
+  %new_schemas = ();
+}
 
 my $json_decoder = JSON::Schema::Modern::_JSON_BACKEND()->new->utf8(1);
 my $js = JSON::Schema::Modern->new(strict => 1, validate_formats => 1);
@@ -107,7 +117,9 @@ foreach my $target (sort keys %files) {
 }
 
 # all files must be updated before any of them can be loaded as documents, since they depend on each
-# other via the '$schema' and '$vocabulary' keywords
+# other via the '$schema' and '$vocabulary' keywords... and we delay loading the document class,
+# so we get the new versions of our constants
+require JSON::Schema::Modern::Document::OpenAPI;
 
 foreach my $target (sort keys %files) {
   $target = path('share', $target);
@@ -138,3 +150,16 @@ path('t/checksums.t')->edit_raw(sub {
   m/^__DATA__$/mg;
   $_ = substr($_, 0, pos()+1).join("\n", map $_.' '.$checksums{$_}, sort keys %checksums)."\n";
 });
+
+if (keys %new_schemas) {
+  my ($seen_next, $seen_blank);
+  say '# edited Changes file' if $ENV{DEBUG};
+  path('Changes')->edit_lines_utf8(sub {
+    if ($seen_next ||= /^\{\{\$NEXT\}\}/ and not $seen_blank and /^$/) {
+      s/^$/        - updated bundled schemas to their latest published versions\n/;
+      $seen_blank = 1;
+    }
+  });
+
+  exec 'git commit -m"update bundled schemas to latest versions" Changes lib share t update-schemas';
+}

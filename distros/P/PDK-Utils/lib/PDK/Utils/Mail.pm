@@ -7,6 +7,8 @@ use namespace::autoclean;
 use Mail::Sender;
 use Carp;
 
+our $VERSION = '0.005';
+
 # SMTP服务器地址
 has smtp => (
     is       => 'ro',
@@ -111,15 +113,36 @@ __PACKAGE__->meta->make_immutable;
 1;
 
 =encoding utf8
-=head1 名称
+=head1 NAME
 
 PDK::Utils::Mail - 邮件发送工具类
 
-=head1 简介
+=head1 SYNOPSIS
 
-该模块基于 L<Mail::Sender>，提供简单的邮件发送接口，支持 SMTP、收件人去重、字符编码自动识别等功能。
+    use PDK::Utils::Mail;
 
-=head1 属性
+    my $mailer = PDK::Utils::Mail->new(
+        smtp => 'smtp.example.com',
+        from => 'noreply@example.com',
+    );
+
+    eval {
+        $mailer->sendmail(
+            to      => 'user1@example.com;user2@example.com',
+            cc      => 'manager@example.com',
+            subject => '测试邮件',
+            msg     => '<h1>Hello, World!</h1>',
+        );
+    };
+    if ($@) {
+        warn "邮件发送失败: $@";
+    }
+
+=head1 DESCRIPTION
+
+该模块基于 L<Mail::Sender>，提供简洁的邮件发送接口，支持 SMTP、收件人去重、字符编码自动识别等功能。
+
+=head1 ATTRIBUTES
 
 =over 4
 
@@ -143,7 +166,7 @@ PDK::Utils::Mail - 邮件发送工具类
 
 =back
 
-=head1 方法说明
+=head1 METHODS
 
 =head2 sendmail(\%param | %param)
 
@@ -171,21 +194,21 @@ PDK::Utils::Mail - 邮件发送工具类
 
 =back
 
-=head1 错误处理
+=head1 ERROR HANDLING
 
 =over 4
 
 =item *
 
-缺少收件人地址会抛出异常。
+缺少收件人地址时会抛出异常。
 
 =item *
 
-邮件发送失败时，抛出 L<Carp::confess> 异常，并包含错误信息。
+邮件发送失败时，会抛出 L<Carp::confess> 异常，并包含错误信息。
 
 =back
 
-=head1 使用示例
+=head1 EXAMPLES
 
     use PDK::Utils::Mail;
 
@@ -206,13 +229,13 @@ PDK::Utils::Mail - 邮件发送工具类
         warn "邮件发送失败: $@";
     }
 
-=head1 作者
+=head1 AUTHOR
 
 WENWU YAN E<lt>968828@gmail.comE<gt>
 
-=head1 版权与许可
+=head1 LICENSE AND COPYRIGHT
 
-本模块遵循与 Perl 相同的许可协议。
+This software is licensed under the same terms as Perl itself.
 
 =cut
 

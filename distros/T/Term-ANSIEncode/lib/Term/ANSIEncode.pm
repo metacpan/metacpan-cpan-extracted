@@ -45,65 +45,35 @@ use Text::Wrap::Smart ':all';
 # UTF-8 is required for special character handling
 binmode(STDERR, ":encoding(UTF-8)");
 binmode(STDOUT, ":encoding(UTF-8)");
-binmode(STDIN, ":encoding(UTF-8)");
+binmode(STDIN,  ":encoding(UTF-8)");
 
 BEGIN {
-    our $VERSION = '1.26';
+    our $VERSION = '1.28';
 }
 
 sub ansi_output {
     my $self  = shift;
     my $text  = shift;
-    my $delay = shift || 0;
-    my $test  = shift || FALSE;
 
-    while ($text =~ /\[\% .*? \%\]/) {
-        if (length($text) > 1) {
+	if (length($text) > 1) {
+		while ($text =~ /\[\% (.*?) \%\]/) {
             while ($text =~ /\[\%\s+BOX (.*?),(\d+),(\d+),(\d+),(\d+),(.*?)\s+\%\](.*?)\[\%\s+ENDBOX\s+\%\]/i) {
                 my $replace = $self->box($1, $2, $3, $4, $5, $6, $7);
                 $text =~ s/\[\%\s+BOX.*?\%\].*?\[\%\s+ENDBOX.*?\%\]/$replace/i;
             }
             foreach my $string (keys %{ $self->{'ansi_sequences'} }) {
-
-                #				if ($string =~ /CLEAR|CLS/i) {
-                #					my $ch = locate(1, 1) . cls;
-                #					$text =~ s/\[\%\s+$string\s+\%\]/$ch/gi;
-                #				} else {
                 $text =~ s/\[\%\s+$string\s+\%\]/$self->{'ansi_sequences'}->{$string}/gi;
-
-                #				}
-            } ## end foreach my $string (keys %{...})
+            }
             foreach my $string (keys %{ $self->{'characters'}->{'NAME'} }) {
                 $text =~ s/\[\%\s+$string\s+\%\]/$self->{'characters'}->{'NAME'}->{$string}/gi;
             }
             foreach my $string (keys %{ $self->{'characters'}->{'UNICODE'} }) {
                 $text =~ s/\[\%\s+$string\s+\%\]/$self->{'characters'}->{'UNICODE'}->{$string}/gi;
             }
-        } ## end if (length($text) > 1)
-    } ## end while ($text =~ /\[\% .*? \%\]/)
-    my $s_len = length($text);
-    my $nl    = $self->{'ansi_sequences'}->{'NEWLINE'};
-    my $found = FALSE;
-    if ($test) {
-        $text =~ s/\n/$nl/gs;
-        return ($text);
-    } else {
-        foreach my $count (0 .. $s_len) {
-            my $char = substr($text, $count, 1);
-            if ($char eq "\n") {
-                if ($text !~ /$nl/) {    # translate only if the file doesn't have ASCII newlines
-                    $char = $nl;
-                }
-            } elsif ($char eq chr(27)) {    # Don't slow down ANSI sequences
-                $found = TRUE;
-            } elsif ($char eq 'm') {
-                $found = FALSE;
-            } elsif (!$found) {
-                sleep $delay if ($delay);
-            }
-            print $char;
-        } ## end foreach my $count (0 .. $s_len)
-    } ## end else [ if ($test) ]
+        }
+		$text =~ s/\[ \% TOKEN \% \]/\[\% TOKEN \%\]/;
+		print $text;
+    }
     return (TRUE);
 } ## end sub ansi_output
 
@@ -177,11 +147,12 @@ sub new {
             'LINEFEED' => chr(10),
             'NEWLINE'  => chr(13) . chr(10),
 
-            'CLEAR'      => $esc . '2J',
-            'CLS'        => $esc . '2J',
+            'CLEAR'      => $esc . '2J' . $esc . 'H',
+            'CLS'        => $esc . '2J' . $esc . 'H',
             'CLEAR LINE' => $esc . '0K',
             'CLEAR DOWN' => $esc . '0J',
             'CLEAR UP'   => $esc . '1J',
+            'HOME'       => $esc . 'H',
 
             # Cursor
             'UP'      => $esc . 'A',
@@ -261,22 +232,23 @@ sub new {
             'BRIGHT B_CYAN'    => $esc . '106m',
             'BRIGHT B_WHITE'   => $esc . '107m',
 
-            'HORIZONTAL RULE ORANGE'         => '[% RETURN %]' . $esc . '48;5;202m' . clline . $esc . '0m',
-            'HORIZONTAL RULE PINK'           => '[% RETURN %]' . $esc . '48;5;198m' . clline . $esc . '0m',
-            'HORIZONTAL RULE RED'            => '[% RETURN %]' . $esc . '41m' . clline . $esc . '0m',
-            'HORIZONTAL RULE BRIGHT RED'     => '[% RETURN %]' . $esc . '101m' . clline . $esc . '0m',
-            'HORIZONTAL RULE GREEN'          => '[% RETURN %]' . $esc . '42m' . clline . $esc . '0m',
-            'HORIZONTAL RULE BRIGHT GREEN'   => '[% RETURN %]' . $esc . '102m' . clline . $esc . '0m',
-            'HORIZONTAL RULE YELLOW'         => '[% RETURN %]' . $esc . '43m' . clline . $esc . '0m',
-            'HORIZONTAL RULE BRIGHT YELLOW'  => '[% RETURN %]' . $esc . '103m' . clline . $esc . '0m',
-            'HORIZONTAL RULE BLUE'           => '[% RETURN %]' . $esc . '44m' . clline . $esc . '0m',
-            'HORIZONTAL RULE BRIGHT BLUE'    => '[% RETURN %]' . $esc . '104m' . clline . $esc . '0m',
-            'HORIZONTAL RULE MAGENTA'        => '[% RETURN %]' . $esc . '45m' . clline . $esc . '0m',
-            'HORIZONTAL RULE BRIGHT MAGENTA' => '[% RETURN %]' . $esc . '105m' . clline . $esc . '0m',
-            'HORIZONTAL RULE CYAN'           => '[% RETURN %]' . $esc . '46m' . clline . $esc . '0m',
-            'HORIZONTAL RULE BRIGHT CYAN'    => '[% RETURN %]' . $esc . '106m' . clline . $esc . '0m',
-            'HORIZONTAL RULE WHITE'          => '[% RETURN %]' . $esc . '47m' . clline . $esc . '0m',
-            'HORIZONTAL RULE BRIGHT WHITE'   => '[% RETURN %]' . $esc . '107m' . clline . $esc . '0m',
+			# MACROS
+            'HORIZONTAL RULE ORANGE'         => '[% RETURN %][% B_ORANGE %][% CLEAR LINE %][% RESET %]',
+            'HORIZONTAL RULE PINK'           => '[% RETURN %][% B_PINK %][% CLEAR LINE %][% RESET %]',
+            'HORIZONTAL RULE RED'            => '[% RETURN %][% B_RED %][% CLEAR LINE %][% RESET %]',
+            'HORIZONTAL RULE BRIGHT RED'     => '[% RETURN %][% BRIGHT B_RED %][% CLEAR LINE %][% RESET %]',
+            'HORIZONTAL RULE GREEN'          => '[% RETURN %][% B_GREEN %][% CLEAR LINE %][% RESET %]',
+            'HORIZONTAL RULE BRIGHT GREEN'   => '[% RETURN %][% BRIGHT B_GREEN %][% CLEAR LINE %][% RESET %]',
+            'HORIZONTAL RULE YELLOW'         => '[% RETURN %][% B_YELLOW %][% CLEAR LINE %][% RESET %]',
+            'HORIZONTAL RULE BRIGHT YELLOW'  => '[% RETURN %][% BRIGHT B_YELLOW %][% CLEAR LINE %][% RESET %]',
+            'HORIZONTAL RULE BLUE'           => '[% RETURN %][% B_BLUE %][% CLEAR LINE %][% RESET %]',
+            'HORIZONTAL RULE BRIGHT BLUE'    => '[% RETURN %][% BRIGHT B_BLUE %][% CLEAR LINE %][% RESET %]',
+            'HORIZONTAL RULE MAGENTA'        => '[% RETURN %][% B_MAGENTA %][% CLEAR LINE %][% RESET %]',
+            'HORIZONTAL RULE BRIGHT MAGENTA' => '[% RETURN %][% BRIGHT B_MAGENTA %][% CLEAR LINE %][% RESET %]',
+            'HORIZONTAL RULE CYAN'           => '[% RETURN %][% B_CYAN %][% CLEAR LINE %][% RESET %]',
+            'HORIZONTAL RULE BRIGHT CYAN'    => '[% RETURN %][% BRIGHT B_CYAN %][% CLEAR LINE %][% RESET %]',
+            'HORIZONTAL RULE WHITE'          => '[% RETURN %][% B_WHITE %][% CLEAR LINE %][% RESET %]',
+            'HORIZONTAL RULE BRIGHT WHITE'   => '[% RETURN %][% BRIGHT B_WHITE %][% CLEAR LINE %][% RESET %]',
         },
         @_,
     };
@@ -352,17 +324,12 @@ ANSI Encode
 A markup language to generate basic ANSI text
 This module is for use with the executable file
 
-=head1 AUTHOR & COPYRIGHT
-
-Richard Kelsch
-
- Copyright (C) 2025 Richard Kelsch
- All Rights Reserved
- GNU Public License 3.0
-
 =head1 USAGE
 
  my $obj = Term::ANSIEncode->new();
+ $obj->output($string); # $string contains the markup to be converted and sent to STDOUT.
+
+See the manual for "ansi-encode" to use a script to load a file directly.
 
 Use this version for a full list of symbols:
  my $obj = Term::ANSIEncode->new('mode' => 'long');
@@ -383,6 +350,7 @@ Use this version for a full list of symbols:
 
 =head2 CURSOR
 
+ HOME        = Moves the cursor home to location 1,1.
  UP          = Moves cursor up one step
  DOWN        = Moves cursor down one step
  RIGHT       = Moves cursor right one step
@@ -477,5 +445,17 @@ Makes a solid blank line, the full width of the screen with the selected backgro
  HORIZONTAL RULE BRIGHT MAGENTA  = A solid line of bright magenta background
  HORIZONTAL RULE BRIGHT CYAN     = A solid line of bright cyan background
  HORIZONTAL RULE BRIGHT WHITE    = A solid line of bright white background
+
+=head1 AUTHOR & COPYRIGHT
+
+Richard Kelsch
+
+ Copyright (C) 2025 Richard Kelsch
+ All Rights Reserved
+ Perl Artistic License
+
+This program is free software; you can redistribute it and/or modify it under the terms of the the Artistic License (2.0). You may obtain a copy of the full license at:
+
+L<http://www.perlfoundation.org/artistic_license_2_0>
 
 =cut

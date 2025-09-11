@@ -4,7 +4,7 @@ Statistics::Krippendorff - Calculate Krippendorff's alpha
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
@@ -16,7 +16,7 @@ use Moo;
 
 use experimental qw( signatures );
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use List::Util qw{ min sum };
 
@@ -157,21 +157,30 @@ sub _build_vals($self) {
 }
 
 sub _build_coincidence($self) {
+    my @vals = $self->vals;
     my %coinc;
-    my @s = $self->vals;
-    for my $v (@s) {
-        for my $v_ (@s) {
-            $coinc{$v}{$v_} = sum(map {
-                my $unit = $_;
-                my @k = keys %$unit;
-                sum(0,
-                    map {
-                        my $i = $_;
-                        scalar grep $unit->{$_} eq $v_,
-                        grep $i ne $_, @k
-                    } grep $unit->{$_} eq $v, @k
-                ) / (@k - 1)
-            } @{ $self->units });
+    @{ $coinc{$_} }{@vals} = (0) x @vals for @vals;
+
+    for my $unit (@{ $self->units }) {
+        my %is_value;
+        @is_value{ values %$unit } = ();
+        my @values = keys %is_value;
+        my @keys   = keys %$unit;
+
+        for my $v (@values) {
+            for my $v_ (@values) {
+                my $coinc_count = 0;
+                for my $key1 (@keys) {
+                    for my $key2 (@keys) {
+                        next if $key1 eq $key2;
+
+                        ++$coinc_count
+                            if $unit->{$key1} eq $v
+                            && $unit->{$key2} eq $v_;
+                    }
+                }
+                $coinc{$v}{$v_} += $coinc_count / (@keys - 1);
+            }
         }
     }
     return \%coinc
@@ -360,10 +369,6 @@ You can also look for information at:
 =item * GitHub (report bugs here)
 
 L<https://github.com/choroba/statistics-krippendorff>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Statistics-Krippendorff>
 
 =item * Search CPAN
 

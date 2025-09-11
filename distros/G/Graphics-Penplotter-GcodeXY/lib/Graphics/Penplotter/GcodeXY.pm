@@ -1,4 +1,4 @@
-package Graphics::Penplotter::GcodeXY v0.5.12;
+package Graphics::Penplotter::GcodeXY v0.5.13;
 
 use v5.38.2;  # required by List::Util and Term::ANSIcolor (perl testers matrix)
 use strict;
@@ -150,36 +150,36 @@ sub new {
     my ( $class, %data ) = @_;
     my $self = {
         # public:
-        papersize  => undef,   # paper size e.g. "A3"
-        xsize      => undef,   # bounding box x
-        ysize      => undef,   # bounding box y
-        units      => 'in',    # inches is used internally
-        header     => "G20\nG90\nG17\nF 50\nG92 X 0 Y 0 Z 0\nG00 Z 0\n",  # must end with penup
-        trailer    => "G00 Z 0\nG00 X 0 Y 0\n",
-        penupcmd   => "G00 Z 0\n",
-        pendowncmd => "G00 Z 0.2\n",
-        margin     => 1.0,     # margin as a PERCENTAGE
-        outfile    => $EMPTY_STR,
-        curvepts   => 50,
-        check      => 0,
-        warn       => 0,       # out of page bounds warning
-        hatchsep   => 0.012,   # inches, equivalent to 0.3 mm (the tip of a BIC ballpoint pen)
-        id       => $EMPTY_STR,
-        optimize => 1,
+        papersize     => undef,   # paper size e.g. "A3"
+        xsize         => undef,   # bounding box x
+        ysize         => undef,   # bounding box y
+        units         => 'in',    # inches is used internally
+        header        => "G20\nG90\nG17\nF 50\nG92 X 0 Y 0 Z 0\nG00 Z 0\n",  # must end with penup
+        trailer       => "G00 Z 0\nG00 X 0 Y 0\n",
+        penupcmd      => "G00 Z 0\n",
+        pendowncmd    => "G00 Z 0.2\n",
+        margin        => 1.0,     # margin as a PERCENTAGE
+        outfile       => $EMPTY_STR,
+        curvepts      => 50,
+        check         => 0,
+        warn          => 0,       # out of page bounds warning
+        hatchsep      => 0.012,   # inches, equivalent to 0.3 mm (the tip of a BIC ballpoint pen)
+        id            => $EMPTY_STR,
+        optimize      => 1,
 
         # private:
-        dscale    => 1.0,      # device scaling, used when units not "in"
-        opt_debug => 0,        # what is the optimizer doing?
-        maxx      => 0.0,      # gcode design bounding box
-        maxy      => 0.0,
-        minx      => $BBMAX,
-        miny      => $BBMAX,
-        penlocked => 0,
-        fontsize  => 0,        # default font size
-        fontname  => "",       # current font name
-        posx      => 0,        # current point, x
-        posy      => 0,        # current point, y
-        pencount  => 0,        # number of times pen raised/lowered (raise+lower counts as 1)
+        dscale        => 1.0,      # device scaling, used when units not "in"
+        opt_debug     => 0,        # what is the optimizer doing?
+        maxx          => 0.0,      # gcode design bounding box
+        maxy          => 0.0,
+        minx          => $BBMAX,
+        miny          => $BBMAX,
+        penlocked     => 0,
+        fontsize      => 0,        # default font size
+        fontname      => "",       # current font name
+        posx          => 0,        # current point, x
+        posy          => 0,        # current point, y
+        pencount      => 0,        # number of times pen raised/lowered (raise+lower counts as 1)
         slowdistcount => 0,    # distance traveled on paper (in fact, its square)
         fastdistcount => 0,    # distance traveled above paper (in fact, its square)
 
@@ -1045,7 +1045,7 @@ sub arcto {
         return 1;
     }
     else {
-        #$self->_error('arcto: cannot fillet');  # TODO not always an error
+        # $self->_error('arcto: cannot fillet');  # not always an error
         return 0;
     }
 }
@@ -1359,45 +1359,6 @@ sub _transform {
             $self->{CTM}->[1][2];
         $ptsref->[ 2 * $k ] = $tmp;
     }
-    return 1;
-}
-
-# Debugging
-sub _printarr {
-    my ( $self, $mref, $s ) = @_;
-    my @m = @{$mref};
-    print STDOUT $s . ':' . $EOL;
-    foreach my $i ( 0 .. 2 ) {
-        foreach my $j ( 0 .. 2 ) {
-            printf STDOUT '%5.2f ', $m[$i][$j];
-        }
-        print STDOUT $EOL;
-    }
-    return 1;
-}
-
-# Debugging
-sub _printarr1 {
-    my ( $self, $mref, $s ) = @_;
-    my @m   = @{$mref};
-    my $len = scalar @m;
-    print STDOUT $s . ':' . $EOL;
-    foreach my $i ( 0 .. $len - 1 ) {
-        printf STDOUT '%5.2f ', $m[$i];
-    }
-    print STDOUT $EOL;
-    return 1;
-}
-
-sub _printpts {
-    my ( $self, $aref, $s ) = @_;
-    my @a = @{$aref};
-    my $l = scalar @a;
-    print STDOUT $s . ':' . $EOL . '(';
-    foreach my $i ( 0 .. $l - 1 ) {
-        printf STDOUT '%5.2f ', $a[$i];
-    }
-    print STDOUT ')' . $EOL;
     return 1;
 }
 
@@ -2010,7 +1971,7 @@ sub _flushHsegments {
         }
         return;
     }
-    #$self->_prHsegs();
+    # $self->_prHsegs(); # for debugging
     $self->_hoptimize();
     foreach my $i ( 0 .. $len - 1 ) {
         $d = sqrt(
@@ -2043,22 +2004,6 @@ sub _flushHsegments {
         }
         # ignore comments
     }
-    return 1;
-}
-
-# debugging - print the list of hatch segments
-sub _prHsegs {
-    my $self = shift;
-    my $len  = scalar @{ $self->{hsegments} };
-    print STDOUT "=====prHsegs: $len entries" . $EOL;
-    foreach my $i ( 0 .. $len - 1 ) {
-        printf STDOUT "%s (%5.2f,%5.2f) -> (%5.2f,%5.2f)\n",
-            $self->{hsegments}[$i]{key},
-            $self->{hsegments}[$i]{sx},
-            $self->{hsegments}[$i]{sy},
-            $self->{hsegments}[$i]{dx},
-            $self->{hsegments}[$i]{dy};
-    }    # foreach
     return 1;
 }
 
@@ -2247,30 +2192,6 @@ sub _sameside {
     if ( $y1 > $y && $y2 > $y ) { return 1 }
     if ( $y1 < $y && $y2 < $y ) { return 1 }
     return 0;
-}
-
-#
-# print the "crossings" array, for debugging
-#
-sub _prcrossings {
-    my ( $self, $cref, $hl ) = @_;
-    my @cr   = @{$cref};
-    my $lenc = scalar @cr;
-    # debugging:
-    if ( $lenc < 3 ) { return 0 }
-    print STDOUT "crossings for hatchline $hl: $lenc\n";
-    if ( !$lenc ) { return 0 }
-    for my $i ( 0 .. $lenc - 1 ) {
-        my $j = $cr[$i]{seg};
-        print STDOUT '    perc ' . $cr[$i]{perc} . " segment $j: ";
-        printf STDOUT "%s (%5.2f,%5.2f) -> (%5.2f,%5.2f)\n",
-            $self->{psegments}[$j]{key},
-            $self->{psegments}[$j]{sx},
-            $self->{psegments}[$j]{sy},
-            $self->{psegments}[$j]{dx},
-            $self->{psegments}[$j]{dy};
-    }
-    return 1;
 }
 
 # set the separation between hatch lines, in current units
@@ -4053,24 +3974,6 @@ sub _keep {
     }
     ${$line}    += 1;
     ${$refrest} -= 1;
-    return 1;
-}
-
-# debugging
-sub _prPsegs {
-    my $self = shift;
-    my $len  = scalar @{ $self->{psegments} };
-    if (! $len) {
-        if ($self->{check}) {
-            print STDOUT "_prPsegs: empty segment list$EOL"
-        }
-    }
-    foreach my $i ( 0 .. $len - 1 ) {
-        $self->_prPseg($i);
-        if ($self->{check}) {
-            print STDOUT $EOL
-        }
-    }
     return 1;
 }
 

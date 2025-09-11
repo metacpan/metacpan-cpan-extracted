@@ -12,20 +12,6 @@
 #                  © Copyright 2025 Richard Kelsch                    #
 #                        All Rights Reserved                          #
 #######################################################################
-# This program is free software: you can redistribute it and/or       #
-# modify it under the terms of the GNU General Public License as      #
-# published by the Free Software Foundation, either version 3 of the  #
-# License, or (at your option) any later version.                     #
-#                                                                     #
-# This program is distributed in the hope that it will be useful, but #
-# WITHOUT ANY WARRANTY; without even the implied warranty of          #
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU   #
-# General Public License for more details.                            #
-#                                                                     #
-# You should have received a copy of the GNU General Public License   #
-# along with this program.  If not, see:                              #
-#                                     <http://www.gnu.org/licenses/>. #
-#######################################################################
 
 use strict;
 use utf8;
@@ -49,9 +35,9 @@ use List::Util qw(max);
 # Since UTF-8 is the norm, it's enabled for all needed handles
 binmode(STDERR, ":encoding(UTF-8)");
 binmode(STDOUT, ":encoding(UTF-8)");
-binmode(STDIN, ":encoding(UTF-8)");
+binmode(STDIN,  ":encoding(UTF-8)");
 
-our $VERSION = $Term::ANSIEncode::VERSION; # Pull in the version from Term::ANSIEncode
+our $VERSION = $Term::ANSIEncode::VERSION;    # Pull in the version from Term::ANSIEncode
 
 my $version   = FALSE;
 my $help      = FALSE;
@@ -88,8 +74,9 @@ my $text = <<'VERSION';
 [% ORANGE %]║[% RESET %][% B_ANSI17 %]                         Written By [% BRIGHT YELLOW %]Richard Kelsch[% RESET %][% B_ANSI17 %]                           [% RESET %][% ORANGE %]║[% RESET %]
 [% ORANGE %]║[% RESET %][% B_ANSI17 %]                       Copyright ©[% GREEN %]2025 [% BRIGHT YELLOW %]Richard Kelsch[% RESET %][% B_ANSI17 %]                        [% RESET %][% ORANGE %]║[% RESET %]
 [% ORANGE %]║[% RESET %][% B_ANSI17 %]                            All Rights Reserved                              [% RESET %][% ORANGE %]║[% RESET %]
-[% ORANGE %]║[% RESET %][% B_ANSI17 %]                   GNU General Public License version 3                      [% RESET %][% ORANGE %]║[% RESET %]
+[% ORANGE %]║[% RESET %][% B_ANSI17 %]                           Perl Artistic License                             [% RESET %][% ORANGE %]║[% RESET %]
 [% ORANGE %]║[% RESET %][% B_ANSI17 %]                               Version [% GREEN %]XXXX[% RESET %][% B_ANSI17 %]                                  [% RESET %][% ORANGE %]║[% RESET %]
+[% ORANGE %]║[% RESET %][% B_ANSI17 %]              GitHub:  https://github.com/richcsst/ansi-encode               [% RESET %][% ORANGE %]║[% RESET %]
 [% ORANGE %]╚═════════════════════════════════════════════════════════════════════════════╝[% RESET %]
 
 VERSION
@@ -148,8 +135,8 @@ foreach my $c (0 .. 23) {
 $greydient .= '[% RESET %]';
 ###
 my $to = <<'TOKENS';
-[% CLEAR %]Tokens have to be encapsulated inside [% TOKEN %] (the TOKEN must be
-surrounded by at least one space on each side.  Colors beyond the standard 8
+[% CLEAR %]Tokens have to be encapsulated inside [ % TOKEN % ] (the TOKEN must be
+surrounded by at least one space on each side).  Colors beyond the standard 8
 will require a terminal that supports 256 colors.  It is also recommended that
 your terminal supports UTF-8 for advanced character/symbol support.  Some
 terminals may not support some features.
@@ -266,18 +253,17 @@ TOKENS
 ###
 
 $to =~ s/\[\% GREYDIENT \%\]/$greydient/g;
-
 if ($version) {
     $| = 1;
-    $ansi->ansi_output($text, 0);
+    $ansi->ansi_output($text);
 } elsif ($help) {
     $| = 1;
-    $ansi->ansi_output($small, 0);
+    $ansi->ansi_output($small);
 } elsif ($tokens) {
-    $ansi->ansi_output($to, 0);
+    $ansi->ansi_output($to);
 } elsif ($rawtokens) {
     print "\n╔", '═' x 131, "╗\n";
-    $ansi->ansi_output('║[% B_BLACK %][% BRIGHT YELLOW %]' . ' ' x 46 . 'THE FOLLOWING ARE THE AVAILABLE TOKENS' . ' ' x 47 . "[% RESET %]║\n", 0);
+    $ansi->ansi_output('║[% B_BLACK %][% BRIGHT YELLOW %]' . ' ' x 46 . 'THE FOLLOWING ARE THE AVAILABLE TOKENS' . ' ' x 47 . "[% RESET %]║\n");
     print '╠', '═' x 32, '╦', '═' x 32, '╦', '═' x 32, '╦', '═' x 32, '╣', "\n";
     printf('║ %-31s║ %-31s║ %-31s║ %-31s║', 'ANSI0 - ANSI231', 'B_ANSI0 - B_ANSI231', 'GREY0 - GREY28', 'B_GREY0 - B_GREY28');
     print "\n║";
@@ -309,7 +295,7 @@ if ($version) {
         $temp .= $ansi->{'characters'}->{'NAME'}->{$name} . ' ';
     }
     $temp .= "\n\n";
-    $ansi->ansi_output($temp, 0);
+    $ansi->ansi_output($temp);
 } elsif ($unicode) {
     my @names;
     my $search = pop(@ARGV);
@@ -355,7 +341,7 @@ if ($version) {
     } ## end while (scalar(@names))
     $temp .= "\n" unless ($full);
     $temp .= '[% ANSI52 %]╰───────┴───────────────────────────────────[% RESET %]' . "\n\n";
-    $ansi->ansi_output($temp, 0);
+    $ansi->ansi_output($temp);
 } elsif ($symbols) {
     my @names;
     my $search = pop(@ARGV);
@@ -382,7 +368,7 @@ if ($version) {
         } ## end if ($name ne '')
     } ## end while (scalar(@names))
     $temp .= '[% ANSI52 %]╰───────┴─' . '─' x $size . '─╯[% RESET %]' . "\n\n";
-    $ansi->ansi_output($temp, 0);
+    $ansi->ansi_output($temp);
 } elsif ($colors) {
     my $grey   = '[% GREY8 %]';
     my $off    = '[% RESET %]';
@@ -415,23 +401,23 @@ if ($version) {
         }
     } ## end foreach my $i (0 .. 6)
     $string .= "\n" . $grey . '╰────┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──╯' . $off . "\n";
-    $ansi->ansi_output($string, 0);
+    $ansi->ansi_output($string);
 } else {    # Output file to STDOUT
     my $file = $ARGV[0];
     if (defined($file) && -e $file) {
-		my $size = -s $file;
-		open(my $FILE,'<',$file);
-		binmode($FILE, ":encoding(UTF-8)");
-		read($FILE, my $text, $size);
-		close($FILE);
-        $ansi->ansi_output($text, 0);
+        my $size = -s $file;
+        open(my $FILE, '<', $file);
+        binmode($FILE, ":encoding(UTF-8)");
+        read($FILE, my $text, $size);
+        close($FILE);
+        $ansi->ansi_output($text);
     } else {
+        $ansi->ansi_output($small);
         $| = 1;
-        $ansi->ansi_output($small, 0);
     }
 } ## end else [ if ($version) ]
 
-exit;
+exit(0);
 
 __END__
 
@@ -442,14 +428,6 @@ ANSI Encode
 =head1 SYNOPSIS
 
 A markup language to generate basic ANSI text
-
-=head1 AUTHOR & COPYRIGHT
-
-Richard Kelsch
-
- Copyright (C) 2025 Richard Kelsch
- All Rights Reserved
- GNU Public License 3.0
 
 =head1 USAGE
 
@@ -525,6 +503,7 @@ B<RESET> changes output text to normal.
 
 =head2 CURSOR
 
+ HOME        = Moves the cursor to the location 1,1.
  UP          = Moves cursor up one step
  DOWN        = Moves cursor down one step
  RIGHT       = Moves cursor right one step
@@ -619,5 +598,17 @@ Makes a solid blank line, the full width of the screen with the selected backgro
  HORIZONTAL RULE BRIGHT MAGENTA  = A solid line of bright magenta background
  HORIZONTAL RULE BRIGHT CYAN     = A solid line of bright cyan background
  HORIZONTAL RULE BRIGHT WHITE    = A solid line of bright white background
+
+=head1 AUTHOR & COPYRIGHT
+
+Richard Kelsch
+
+ Copyright (C) 2025 Richard Kelsch
+ All Rights Reserved
+ Perl Artistic License
+
+This program is free software; you can redistribute it and/or modify it under the terms of the the Artistic License (2.0). You may obtain a copy of the full license at:
+
+L<http://www.perlfoundation.org/artistic_license_2_0>
 
 =cut

@@ -14,7 +14,7 @@ Markup text to ANSI encoder
 
 ### -**v** or --**version**
 ```
-    Show version and licensing info
+    Show version and licensing info.
 ```
 
 ### -**h** or --**help**
@@ -24,24 +24,22 @@ Markup text to ANSI encoder
 
 ### -**t** or --**tokens**
 ```
-    Show most used tokens
+    Show most used tokens.
 ```
 
 ### -**c** or --**colors**
 ```
-    Show color grid for use with "ANSI" and "GREY" tokens
+    Show color grid for use with "ANSI" and "GREY" tokens.
 ```
 
 ### -**s** or --**symbols** [search]
 ```
-    Show all of the symbol character tokens by name
-	Use search to shorten the huge list
+    Show all of the symbol character tokens by name.  Use search to shorten the huge list.
 ````
 
 ### -**u** or --**unicode** [search]
 ```
-    Show all of the symbol character tokens by unicode
-	Use search to shorten the huge list
+    Show all of the symbol character tokens by unicode.  Use search to shorten the huge list.
 ```
 
 ### -**d** or --**dump** [search]
@@ -54,11 +52,15 @@ Markup text to ANSI encoder
     Use the full token table.  This will increase the initialization time.
 ```
 
+## Author
+
+Richard Kelsch
+
+* **GitHub** - https://github.com/richcsst
+
 ## Tokens
 
-Tokens have to be encapsulated inside [% token %] (the token must be
-surrounded by at least one space on each side.  Colors beyond the standard 8
-will require a terminal that supports 256 colors.
+Tokens have to be encapsulated inside [% token %] (the token must be surrounded by at least one space on each side.  Colors beyond the standard 8 will require a terminal that supports 256 colors.
 
 NOTE:  Use "less -r" to view ANSI in "less"
 

@@ -1,5 +1,8 @@
 Revision history for perl distribution PerlX-SafeNav
 
+0.005     2025-09-10 22:40:20+0900
+   - require perl 5.14, for the package block syntax.
+
 0.004     2023-07-13 08:02:54-0400
    - support older versions of perls: https://github.com/gugod/PerlX-SafeNav/pull/4
 

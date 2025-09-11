@@ -9,6 +9,8 @@ use POSIX;
 use Data::Dumper;
 use experimental 'smartmatch';
 
+our $VERSION = '0.005';
+
 # 最小值数组属性，存储每个区间的最小值
 has mins => (
     is      => 'rw',            # 读写属性
@@ -418,15 +420,37 @@ __PACKAGE__->meta->make_immutable;
 1;
 
 =encoding utf8
-=head1 名称
+=head1 NAME
 
 PDK::Utils::Set - 区间集合操作工具类
 
-=head1 简介
+=head1 SYNOPSIS
+
+    use PDK::Utils::Set;
+
+    # 创建区间集合
+    my $set = PDK::Utils::Set->new(1, 5);
+    $set->addToSet(10, 20);
+
+    # 合并区间
+    $set->mergeToSet(6, 9);
+
+    # 打印集合
+    $set->dump;
+
+    # 交集
+    my $set2 = PDK::Utils::Set->new(4, 15);
+    my $inter = $set->interSet($set2);
+    $inter->dump;
+
+    # 比较关系
+    say $set->compare($set2);   # equal / containButNotEqual / belongButNotEqual / other
+
+=head1 DESCRIPTION
 
 该模块提供了一个基于区间的集合类，实现了区间的添加、合并、比较、交集等常用操作。
 
-=head1 属性
+=head1 ATTRIBUTES
 
 =over 4
 
@@ -440,7 +464,7 @@ PDK::Utils::Set - 区间集合操作工具类
 
 =back
 
-=head1 构造方法
+=head1 CONSTRUCTOR
 
 =over 4
 
@@ -462,7 +486,7 @@ PDK::Utils::Set - 区间集合操作工具类
 
 =back
 
-=head1 方法说明
+=head1 METHODS
 
 =head2 基础操作
 
@@ -560,7 +584,7 @@ PDK::Utils::Set - 区间集合操作工具类
 
 =back
 
-=head1 错误处理
+=head1 ERROR HANDLING
 
 =over 4
 
@@ -574,15 +598,15 @@ PDK::Utils::Set - 区间集合操作工具类
 
 =item *
 
-C<addToSet> 与 C<_mergeToSet> 方法只允许传入两个整数参数，否则抛出异常。
+C<addToSet> 与 C<mergeToSet> 方法只允许传入两个整数参数，否则抛出异常。
 
 =item *
 
-比较方法的参数必须是 C<Firewall::Utils::Set> 对象，否则抛出异常。
+比较方法的参数必须是 C<PDK::Utils::Set> 对象，否则抛出异常。
 
 =back
 
-=head1 使用示例
+=head1 EXAMPLES
 
     use PDK::Utils::Set;
 
@@ -604,13 +628,13 @@ C<addToSet> 与 C<_mergeToSet> 方法只允许传入两个整数参数，否则�
     # 比较关系
     say $set->compare($set2);   # equal / containButNotEqual / belongButNotEqual / other
 
-=head1 作者
+=head1 AUTHOR
 
 WENWU YAN E<lt>968828@gmail.comE<gt>
 
-=head1 版权与许可
+=head1 LICENSE AND COPYRIGHT
 
-本模块遵循与 Perl 相同的许可协议。
+This software is licensed under the same terms as Perl itself.
 
 =cut
 

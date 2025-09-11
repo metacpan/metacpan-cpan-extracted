@@ -1,3 +1,5 @@
 Revision history for Task-MemManager-CMalloc
 
+0.02      2025-09-10 22:45:58-06:00 America/Denver
+- Provided the consume functionality to the module.
 0.01      2024-12-01 20:32:46-07:00 America/Denver

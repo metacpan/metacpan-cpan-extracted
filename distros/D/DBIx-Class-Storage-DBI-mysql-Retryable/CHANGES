@@ -1,6 +1,13 @@
 Changelog for DBIx-Class-Storage-DBI-mysql-Retryable
 
-v1.0.2 2022-08-15T21:15:59
+v1.0.3 2025-09-10T15:20:43
+ - Update LICENSE / README / Makefile (Brendan Byrd)
+ - Pod::Coverage fixes (Brendan Byrd)
+ - Pull request #5: Patch - SM-5852 (Brendan Byrd)
+ - Localize $@ inside of BlockRunner run block (Brendan Byrd)
+ - Pull request #4: SM-3756 (Brendan Byrd)
+
+v1.0.2 2022-08-11T16:26:24
  - Fix POD bug (Brendan Byrd)
  - Update README (Brendan Byrd)
  - Only check outside exception handler test if $IS_MYSQL (Brendan Byrd)

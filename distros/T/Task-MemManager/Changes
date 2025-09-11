@@ -1,7 +1,20 @@
 Revision history for Task-MemManager
 
+0.03      2025-09-10 22:45:12-06:00 America/Denver
+- Updated documentation
+- Fixed error of only assigning the last byte of the buffer to the init value
+when using PerlAlloc
+- Removed un-necessary code in PerlAlloc that grew the buffer and then assigned
+to it
+- Created consume method to obtain external buffers
+- Added check for overlapping memory regions when allocating/consuming new
+buffers
+- Fixed bug in DESTROY that attempted to free buffers (and their properties)
+that had not been successfully allocated or consumed
+- Added examples to illustrate the consumption of external buffers, both
+Perl scalars and raw memory buffers. 
 0.02      2024-12-01 20:32:10-07:00 America/Denver
-Separated Memory allocator that used C's malloc into its own package and
+- Separated Memory allocator that used C's malloc into its own package and
 corrected typos
 0.01      2024-08-25 17:41:34-06:00 America/Denver
-First version incorporating allocators based on Perl and C (malloc/calloc)
+- First version incorporating allocators based on Perl and C (malloc/calloc)

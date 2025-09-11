@@ -6,9 +6,9 @@ author:
 build_requires:
   Test2::V0: '0'
 configure_requires:
-  Module::Build::Tiny: '0.039'
+  Module::Build::Tiny: '0.044'
 dynamic_config: 0
-generated_by: 'App::ModuleBuildTiny version 0.041, CPAN::Meta::Converter version 2.150010'
+generated_by: 'App::ModuleBuildTiny version 0.051, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,7 +17,7 @@ name: PerlX-SafeNav
 provides:
   PerlX::SafeNav:
     file: lib/PerlX/SafeNav.pm
-    version: '0.004'
+    version: '0.005'
   PerlX::SafeNav::ArrayRef:
     file: lib/PerlX/SafeNav.pm
   PerlX::SafeNav::HashRef:
@@ -31,12 +31,13 @@ requires:
   Tie::Array: '0'
   Tie::Hash: '0'
   overload: '0'
-  strict: '0'
+  perl: v5.14.0
   warnings: '0'
 resources:
   bugtracker: https://github.com/gugod/PerlX-SafeNav/issues
   repository: https://github.com/gugod/PerlX-SafeNav.git
-version: '0.004'
+version: '0.005'
+x_generated_by_perl: v5.40.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_spdx_expression: MIT
 x_static_install: '1'

@@ -3,4 +3,12 @@
 
 class Mojolicious::Routes::Pattern {
   
+  # Class Methods
+  static method new : Mojolicious::Routes::Pattern () {
+    
+    my $self = new Mojolicious::Routes::Pattern;
+    
+    return $self;
+  }
+  
 }

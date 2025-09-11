@@ -1,5 +1,5 @@
 package Task::MemManager;
-$Task::MemManager::VERSION = '0.02';
+$Task::MemManager::VERSION = '0.03';
 use strict;
 use warnings;
 
@@ -11,39 +11,64 @@ use Scalar::Util;
 
 Inline->init()
   ; ## prevents warning "One or more DATA sections were not processed by Inline"
-  
+
 *ident = \&Scalar::Util::refaddr
   ;  # alias of refaddr in Ch. 15 & 16 of "Perl Best Practices" (O'Reilly, 2005)
 
 # ABSTRACT: A memory allocator for low level code in Perl.
 
+
+
 # Properties of the Memory Manager class (inside out object attributes)
-my %buffer;             # Memory buffer
-my %size_of_buffer;     # Size of the buffer
-my %size_of_element;    # Size of each element in the buffer
-my %num_of_elements;    # Number of elements in the buffer
-my %delayed_gc_for;     # Objects with delayed garbage collection
-my %death_stub;         # Function to call upon object destruction
-my %allocator_of;       # Allocator used to allocate the buffer
+my %buffer;               # Memory buffer
+my %size_of_buffer;       # Size of the buffer
+my %size_of_element;      # Size of each element in the buffer
+my %num_of_elements;      # Number of elements in the buffer
+my %delayed_gc_for;       # Objects with delayed garbage collection
+my %death_stub;           # Function to call upon object destruction
+my %allocator_of;         # Allocator used to allocate the buffer
+my %memory_region;        # Memory region assigned to the buffer
+my %is_nonoverlapping;    # Is the memory region non-overlapping ?
+
+# Private functions
+my $consume_or_allocate_private_func;    # Avoids DRY when allocating/consuming
 
 # Find implemented memory allocators under this namespace
 my @alloc_modules = findsubmod 'Task::MemManager';
 
+my @utility_modules;
+
 # Load allocators and store their functions
 my %allocator_function;
 my @allocator_functions = qw(malloc free get_buffer_address);
+my @optional_functions  = qw(consume);
 TEST_MODULE: foreach my $module_name (@alloc_modules) {
     ( my $key = $module_name ) =~ s/Task::MemManager:://;
     my $alloc_module = use_module($module_name);    # Load the module
+    my $number_of_functions =
+      grep { $alloc_module->can($_) } @allocator_functions;
+    if (    $number_of_functions > 0
+        and $number_of_functions < @allocator_functions )
+    {
+        push @utility_modules, $module_name;
+        carp "Module $alloc_module does not implement all required methods "
+          . "(@allocator_functions)\n This module will not be used for "
+          . "memory allocation";
+        next TEST_MODULE;
+    }    ## zero implemented functions is OK, it may be a utility module
+
+    # Store the mandatory and optional functions of the allocator
     foreach my $function (@allocator_functions) {
-        if ( my $code_ref = $alloc_module->can($function) ) {
-            $allocator_function{$key}{$function} = $code_ref;
-        }
-        else {
-            carp "Module $alloc_module does not have a $function method\n"
-              . "This module will not be used for memory allocation";
-            next TEST_MODULE;
-        }
+        $allocator_function{$key}{$function} = $alloc_module->can($function);
+    }
+    foreach my $function (@optional_functions) {
+        $allocator_function{$key}{$function} = (
+              $alloc_module->can($function)
+            ? $alloc_module->can($function)
+            : sub {
+                croak "$module_name does not implement $function";
+            }
+        );
     }
 }
 
@@ -57,11 +82,13 @@ TEST_MODULE: foreach my $module_name (@alloc_modules) {
 #               $opts_ref         - Reference to a hash of options. These are:
 #                allocator      - Name of the allocator to use
 #                delayed_gc     - Should garbage collection be delayed ?
+#                                 If it evaluates to non-false, it'll delay GC
 #                init_value     - Value to initialize the buffer with
 #                death_stub     - Function to call upon object destruction
 #                  it will receive the object's properties and identifier
 #                  as a hash reference if it is defined
-# Throws      : Croaks if the buffer allocation fails
+# Throws      : Croaks if the buffer allocation fails, or if the allocator
+#                does not exist
 # Comments    : Default allocator is PerlAlloc, which uses Perl's string
 #                functions,
 #               Default init_value is undef ('zero' zeroes out memory, any
@@ -70,47 +97,113 @@ TEST_MODULE: foreach my $module_name (@alloc_modules) {
 # See Also    : n/a
 sub new {
     my ( $self, $num_of_items, $size_of_each_item, $opts_ref ) = @_;
+    my $init_value = $opts_ref->{init_value};
+    $opts_ref->{delayed_gc} //= 0;
+
+    return $self->$consume_or_allocate_private_func( $num_of_items,
+        $size_of_each_item, $opts_ref, 'malloc',
+        [ $num_of_items, $size_of_each_item, $init_value ] );
+}
+
+###############################################################################
+# Usage       : my $buffer = Task::MemManager->consume($buffer,10,1,
+#                {allocator => 'PerlAlloc'});
+# Purpose     : Consumers a buffer created with the specified allocator
+# Returns     : A reference to the buffer
+# Parameters  : $external_buffer_ref - Reference to the external buffer
+#               $num_of_items     - Number of items in the buffer
+#               $size_of_each_item - Size of each item in the buffer
+#               $opts_ref         - Reference to a hash of options. These are:
+#                allocator      - Name of the allocator to use
+#                delayed_gc     - Should garbage collection be delayed ?
+#                                 If it evaluates to non-false, it'll delay GC
+#                init_value     - Value to initialize the buffer with (ignored)
+#                death_stub     - Function to call upon object destruction
+#                  it will receive the object's properties and identifier
+#                  as a hash reference if it is defined
+# Throws      : Croaks if the buffer allocation fails, or if the allocator
+#                does not provide a consume function
+# Comments    : Default allocator is PerlAlloc, which uses Perl's string
+#                functions,
+#               Default init_value is undef ('zero' zeroes out memory, any
+#                 byte value will initialize memory with that value)
+#               Default delayed_gc is 1 (garbage collection is delayed)
+# See Also    : n/a
+sub consume {
+    my ( $self, $external_buffer_ref, $num_of_items, $size_of_each_item,
+        $opts_ref )
+      = @_;
+    $opts_ref->{delayed_gc} //= 1;
+    return $self->$consume_or_allocate_private_func( $num_of_items,
+        $size_of_each_item, $opts_ref, 'consume',
+        [ $external_buffer_ref, $num_of_items * $size_of_each_item ] );
+
+}
+
+# Private function to avoid DRY when allocating or consuming a buffer
+$consume_or_allocate_private_func = sub {
+    my ( $self, $num_of_items, $size_of_each_item, $opts_ref, $func,
+        $func_args_ref )
+      = @_;
 
     # exit if the number of items or the number of bytes per item is not defined
     croak "Number of items and size of each item must be defined"
       unless defined $num_of_items and defined $size_of_each_item;
 
     # Various defaults here
-    my $init_value     = $opts_ref->{init_value};
-    my $delayed_gc     = $opts_ref->{delayed_gc} // 0;
+
     my $death_stub     = $opts_ref->{death_stub};
     my $allocator_name = $opts_ref->{allocator} // 'PerlAlloc';
     unless ( exists $allocator_function{$allocator_name} ) {
         croak "Allocator $allocator_name is not implemented";
     }
-    my $allocator  = $allocator_function{$allocator_name}{malloc};
+    my $allocator  = $allocator_function{$allocator_name}{$func};
     my $new_buffer = bless do {
-        my $anon_scalar =
-          $allocator->( $num_of_items, $size_of_each_item, $init_value );
+        my $anon_scalar = $allocator->(@$func_args_ref);
     }, $self;
     unless ($new_buffer) {
         croak "Failed to allocate buffer using $allocator_name";
     }
     my $buffer_identifier = ident $new_buffer;
 
-    # store the attributes of the buffer
-    $buffer{$buffer_identifier} =
+    # Detect overlapping memory regions and kill the program if detected
+    my $start_address =
       $allocator_function{$allocator_name}{get_buffer_address}
       ->( ${$new_buffer} )
       or croak "Failed to get buffer address";
-    $size_of_buffer{$buffer_identifier}  = $num_of_items * $size_of_each_item;
-    $size_of_element{$buffer_identifier} = $size_of_each_item;
-    $num_of_elements{$buffer_identifier} = $num_of_items;
-    $allocator_of{$buffer_identifier}    = $allocator_name;
+    my $end_address = $start_address + $num_of_items * $size_of_each_item - 1;
+    while ( my ( $existing_buffer_identifier, $regions_of_buffers ) =
+        each %memory_region )
+    {
+        my ( $other_start, $other_end ) = $regions_of_buffers->@*;
+        if ( ( $start_address >= $other_start and $start_address <= $other_end )
+            or ( $end_address >= $other_start and $end_address <= $other_end ) )
+        {
+            # avoids double free in DESTROY - have the OS do the cleanup
+            $is_nonoverlapping{$existing_buffer_identifier} = 0;
+            $is_nonoverlapping{$buffer_identifier}          = 0;
+            carp "Memory region overlap detected";
+        }
+    }
 
-    if ($delayed_gc) {
+    # store the attributes of the buffer
+    $buffer{$buffer_identifier}            = $start_address;
+    $memory_region{$buffer_identifier}     = [ $start_address, $end_address ];
+    $size_of_buffer{$buffer_identifier}    = $num_of_items * $size_of_each_item;
+    $size_of_element{$buffer_identifier}   = $size_of_each_item;
+    $num_of_elements{$buffer_identifier}   = $num_of_items;
+    $allocator_of{$buffer_identifier}      = $allocator_name;
+    $is_nonoverlapping{$buffer_identifier} = 1;
+
+    if ( $opts_ref->{delayed_gc} ) {
         $delayed_gc_for{$buffer_identifier} = $new_buffer;
     }
-    if ($death_stub) {
+    if ( $opts_ref->{death_stub} ) {
         $death_stub{$buffer_identifier} = $death_stub;
     }
+
     return $new_buffer;
-}
+};
 
 sub DESTROY {
     my ($self) = @_;
@@ -132,7 +225,8 @@ sub DESTROY {
 
     # Free the buffer and delete the properties
     $allocator_function{ $allocator_of{$identifier} }{free}
-      ->( $buffer{$identifier} );
+      ->( $buffer{$identifier} )
+      if $is_nonoverlapping{$identifier};
     delete $allocator_of{$identifier};
     delete $buffer{$identifier};
     delete $size_of_buffer{$identifier};
@@ -167,8 +261,8 @@ sub extract_buffer_region {
 }
 
 ###############################################################################
-# Usage       : Task::MemManager->delayed_gc();
-# Purpose     : Perform garbage collection on all objects that have delayed GC
+# Usage       : Task::MemManager->get_buffer();
+# Purpose     : Obtains the memory address of the buffer (useful for C code)
 # Returns     : The memory address of the buffer as an unsigned integer
 # Parameters  : n/a
 # Throws      : n/a
@@ -239,7 +333,7 @@ Task::MemManager - A memory allocated and manager for low level code in Perl.
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -262,6 +356,14 @@ version 0.02
 
 Task::MemManager is a memory allocator and manager designed for low level code in Perl. 
 It provides functionalities to allocate, manage, and manipulate memory buffers.
+The allocators are stored in separate packages under the Task::MemManager namespace.
+Each allocator B<should implement the following functions>: malloc, free, and get_buffer_address,
+that allocate, free, and return the address of a buffer respectively.
+B<Optional functions> that may be implemented include: 
+  consume, which takes an external buffer and wraps it in a Task::MemManager object.
+Packages that do not implement these functions will not be used for memory allocation purposes.
+e.g. they may implement other functionalities for working with memory buffers.
+The default allocator is PerlAlloc, which uses Perl's string functions to allocate memory.
 
 =head1 METHODS
 
@@ -545,6 +647,80 @@ Time the precise moment of death:
   say "End of the program - see how Perl's destroying all "
     . "delayed GC objects along with the rest of the objects";
 
+=head2 Example 6: Consuming buffers and preventing double free
+
+In this example we will create a simple buffer using FFI::Platypus::Memory's
+malloc,and then we will consume it using Task::MemManager::CMalloc.
+We will then create 2 bonafide Perl scalars, and then we will consume them
+using Task::MemManager::PerlAlloc. We will then try to consume one of the
+two Perl scalars using the memory address of the respective buffer 
+using Task::MemManager::CMalloc to show the detection of overlapping memory 
+regions, which causes the program to croak. Ordinarly, one would anticipate 
+problems during the program shutdown as the DESTROY function is called to deal 
+with the Task::MemManager objects. This is prevented because we track the 
+regions that are overlapping and do not free them in the destructor.
+We rather let the operating system to deal with them, when the program is wiped
+out of memory. Note that consuming of a raw memory address will lead to the
+zeroing out of the Perl scalar holding the address to prevent double free. 
+This example is entirely self-contained.
+
+  # consume - PerlAlloc & CMalloc, checking for overlapping allocations
+  use FFI::Platypus::Buffer; 
+  use FFI::Platypus::Memory;
+  my $consumable  = "\0" x 100;
+  my $consumable2 = "\0" x 100;
+  my $pointer = malloc 1024;
+  # use FFI::Platypus::Buffer to obtain the memory address of the Perl scalar 
+  my ($reconsumable, $consumable_length) =   scalar_to_buffer $consumable; 
+
+  say "Memory address is $pointer";
+  my $mem_pointer =Task::MemManager->consume(\$pointer, 100,1,
+    {
+        death_stub => sub {
+              my ($obj_ref) = @_;
+              printf "Killing the reconsumable 0x%8x \n", $obj_ref->{identifier};
+        },
+        allocator => 'CMalloc'
+    }
+  );
+  say "Memory address is $pointer";
+
+  my $mem_consumable = Task::MemManager->consume(\$consumable, 1000,1,
+    {
+        death_stub => sub {
+              my ($obj_ref) = @_;
+              printf "Killing the consumable 0x%8x \n", $obj_ref->{identifier};
+        },
+        allocator => 'PerlAlloc'
+    }
+  );
+
+  my $mem_consumable2 = Task::MemManager->consume(\$consumable2, 100,1,
+    {
+        death_stub => sub {
+              my ($obj_ref) = @_;
+              printf "Killing the consumable 0x%8x \n", $obj_ref->{identifier};
+        },
+        allocator => 'PerlAlloc'
+    }
+  );
+
+  undef $consumable2;
+  # try to ingest the same area twice
+
+  
+  # CMalloc is incorrect, but free will never be called on the buffer
+  my $mem_consumable3 = Task::MemManager->consume(\$reconsumable, 100,1,
+    {
+        death_stub => sub {
+              my ($obj_ref) = @_;
+              printf "Killing the consumable 0x%8x \n", $obj_ref->{identifier};
+        },
+        allocator => 'CMalloc'
+    }
+  );
+
+
 
 =head1 DIAGNOSTICS
 
@@ -597,7 +773,6 @@ See L<https://en.wikipedia.org/wiki/MIT_License> for more information.
 
 
 =cut
-
 
 __DATA__
 

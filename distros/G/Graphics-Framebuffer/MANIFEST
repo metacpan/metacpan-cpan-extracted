@@ -42,6 +42,7 @@ lib/Graphics/Framebuffer/Splash.pm
 Makefile.PL
 MANIFEST			This list of files
 README.md
+AUTHOR.md
 GFB.png
 Win-No.png
 src/Framebuffer.c

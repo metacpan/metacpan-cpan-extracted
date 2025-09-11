@@ -1,10 +1,10 @@
 ANSI-Encode.png
-AUTHOR
+AUTHOR.md
 bin/ansi-encode
 Changes
 examples/sample.ans
 examples/banner.vt
-HISTORY
+HISTORY.md
 ignore.txt
 lib/Term/ANSIEncode.pm
 Makefile.PL

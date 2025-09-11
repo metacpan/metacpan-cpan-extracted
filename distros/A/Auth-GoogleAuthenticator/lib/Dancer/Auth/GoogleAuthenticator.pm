@@ -2,15 +2,14 @@ package Dancer::Auth::GoogleAuthenticator;
 use Dancer ':syntax';
 use Dancer::Plugin::FlashMessage;
 use Auth::GoogleAuthenticator;
-use vars qw($VERSION);
+use Crypt::URandom::Token;
+our $VERSION = '0.05';
 
 =head1 NAME
 
 Dancer::Auth::GoogleAuthenticator - Two-Factor demo app
 
 =cut
-
-$VERSION= '0.04';
 
 my %users = (
     test => { name => 'test',
@@ -77,7 +76,11 @@ post '/auth/setup' => sub {
         # Make up random OTP secret
         # XX Should be configurable/callback
         my @letters = ('a'..'z','0'..'9');
-        $user->{otp_secret} = join '', map { $letters[rand @letters]} 1..10;
+        my $obj = Crypt::URandom::Token->new(
+            length   => 10,
+            alphabet => \@letters,
+        );
+        $user->{otp_secret} = $obj->get;
     };
 
     redirect '/auth/setup';

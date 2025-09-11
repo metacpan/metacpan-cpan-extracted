@@ -1,3 +1,8 @@
+0.018 2025-09-11
+  [Changes]
+    * Improve server related classes.
+  [Requirement Changes]
+    * Require SPVM 0.990087.
 0.017 2025-09-10
   [Requirement Changes]
     * Require SPVM 0.990085.

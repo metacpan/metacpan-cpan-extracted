@@ -89,3 +89,16 @@
 
         Apparently my new testing methodology ticked off some CPAN testers.
 		So I'll relax them a bit.
+
+        Changed the license.
+
+1.27    Aug 10, 2025
+
+        Fixed a runaway loop in "-t" output.
+		
+		Removed the "one character at a time" output left over from the
+		old BBS Universal code.  Output is much faster now.
+
+1.28    Aug 10, 2025
+
+        Updated the documentation to be better informative on CPAN.

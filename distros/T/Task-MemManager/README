@@ -3,7 +3,7 @@ NAME
     Perl.
 
 VERSION
-    version 0.02
+    version 0.03
 
 SYNOPSIS
       use Task::MemManager;
@@ -22,7 +22,16 @@ SYNOPSIS
 DESCRIPTION
     Task::MemManager is a memory allocator and manager designed for low
     level code in Perl. It provides functionalities to allocate, manage, and
-    manipulate memory buffers.
+    manipulate memory buffers. The allocators are stored in separate
+    packages under the Task::MemManager namespace. Each allocator should
+    implement the following functions: malloc, free, and get_buffer_address,
+    that allocate, free, and return the address of a buffer respectively.
+    Optional functions that may be implemented include: consume, which takes
+    an external buffer and wraps it in a Task::MemManager object. Packages
+    that do not implement these functions will not be used for memory
+    allocation purposes. e.g. they may implement other functionalities for
+    working with memory buffers. The default allocator is PerlAlloc, which
+    uses Perl's string functions to allocate memory.
 
 METHODS
   new
@@ -292,6 +301,79 @@ EXAMPLES
       undef $mem_cp2;
       say "End of the program - see how Perl's destroying all "
         . "delayed GC objects along with the rest of the objects";
+
+  Example 6: Consuming buffers and preventing double free
+    In this example we will create a simple buffer using
+    FFI::Platypus::Memory's malloc,and then we will consume it using
+    Task::MemManager::CMalloc. We will then create 2 bonafide Perl scalars,
+    and then we will consume them using Task::MemManager::PerlAlloc. We will
+    then try to consume one of the two Perl scalars using the memory address
+    of the respective buffer using Task::MemManager::CMalloc to show the
+    detection of overlapping memory regions, which causes the program to
+    croak. Ordinarly, one would anticipate problems during the program
+    shutdown as the DESTROY function is called to deal with the
+    Task::MemManager objects. This is prevented because we track the regions
+    that are overlapping and do not free them in the destructor. We rather
+    let the operating system to deal with them, when the program is wiped
+    out of memory. Note that consuming of a raw memory address will lead to
+    the zeroing out of the Perl scalar holding the address to prevent double
+    free. This example is entirely self-contained.
+
+      # consume - PerlAlloc & CMalloc, checking for overlapping allocations
+      use FFI::Platypus::Buffer; 
+      use FFI::Platypus::Memory;
+      my $consumable  = "\0" x 100;
+      my $consumable2 = "\0" x 100;
+      my $pointer = malloc 1024;
+      # use FFI::Platypus::Buffer to obtain the memory address of the Perl scalar 
+      my ($reconsumable, $consumable_length) =   scalar_to_buffer $consumable; 
+
+      say "Memory address is $pointer";
+      my $mem_pointer =Task::MemManager->consume(\$pointer, 100,1,
+        {
+            death_stub => sub {
+                  my ($obj_ref) = @_;
+                  printf "Killing the reconsumable 0x%8x \n", $obj_ref->{identifier};
+            },
+            allocator => 'CMalloc'
+        }
+      );
+      say "Memory address is $pointer";
+
+      my $mem_consumable = Task::MemManager->consume(\$consumable, 1000,1,
+        {
+            death_stub => sub {
+                  my ($obj_ref) = @_;
+                  printf "Killing the consumable 0x%8x \n", $obj_ref->{identifier};
+            },
+            allocator => 'PerlAlloc'
+        }
+      );
+
+      my $mem_consumable2 = Task::MemManager->consume(\$consumable2, 100,1,
+        {
+            death_stub => sub {
+                  my ($obj_ref) = @_;
+                  printf "Killing the consumable 0x%8x \n", $obj_ref->{identifier};
+            },
+            allocator => 'PerlAlloc'
+        }
+      );
+
+      undef $consumable2;
+      # try to ingest the same area twice
+
+  
+      # CMalloc is incorrect, but free will never be called on the buffer
+      my $mem_consumable3 = Task::MemManager->consume(\$reconsumable, 100,1,
+        {
+            death_stub => sub {
+                  my ($obj_ref) = @_;
+                  printf "Killing the consumable 0x%8x \n", $obj_ref->{identifier};
+            },
+            allocator => 'CMalloc'
+        }
+      );
 
 DIAGNOSTICS
     There are no diagnostics that one can use. The module will croak if the

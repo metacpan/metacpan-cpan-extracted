@@ -26,13 +26,24 @@ no_index:
 provides:
   Graphics::Penplotter::GcodeXY:
     file: lib/Graphics/Penplotter/GcodeXY.pm
-    version: v0.5.12
+    version: v0.5.13
 requires:
+  File::Temp: '0'
+  Font::FreeType: '0'
+  Image::SVG::Path: '0'
+  Image::SVG::Transform: '0'
+  List::Util: '0'
+  Math::Bezier: '0'
+  Math::Trig: '0'
+  POSIX: '0'
+  Readonly: '0'
+  Term::ANSIColor: '0'
+  XML::Parser: '0'
   perl: v5.38.2
 resources:
   homepage: https://github.com/gamk67/Graphics-Penplotter-GcodeXY
   repository: https://github.com/gamk67/Graphics-Penplotter-GcodeXY.git
-version: v0.5.12
+version: v0.5.13
 x_contributors:
   - 'gamk67 <31990368+gamk67@users.noreply.github.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
