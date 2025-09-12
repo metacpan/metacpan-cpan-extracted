@@ -11,16 +11,16 @@ String::Print - printf alternative
   use String::Print;           # simpelest way
   use String::Print qw/printi printp/, %config;
   printi 'age {years}', years => 12;
- 
+
   # interpolation of arrays and hashes (serializers)
   printi 'price-list: {prices}', prices => \@p, _join => "+";
   printi 'dump: {c}', c => \%config;
- 
+
   # same with positional parameters
   printp 'age %d", 12;
   printp 'price-list: %.2f', \@prices;
   printp 'dump: %s', \%settings;
- 
+
   # modifiers
   printi 'price: {price%.2f}', price => 3.14*VAT*EURO;
 
@@ -31,11 +31,11 @@ String::Print - printf alternative
 
   ### Object Oriented interface
 
-  use String::Print 'oo';      # import nothing 
+  use String::Print 'oo';      # import nothing
   my $f = String::Print->new(%config);
   $f->printi('age {years}', years => 12);
   $f->printp('age %d', 12);
- 
+
   ### via Log::Report's __* functions (optional translation)
 
   use Log::Report;             # or Log::Report::Optional
@@ -44,12 +44,12 @@ String::Print - printf alternative
   ### via Log::Report::Template (Template Toolkit extension)
 
   [% SET name = 'John Doe' %]
-  [% loc("Dear {name},") %]     # includes translation
+  [% loc("Dear {name},") %]    # includes translation
 
 =head1 DESCRIPTION
 
-This module inserts values into (format) strings.  It provides C<printf>
-and C<sprintf> alternatives via both an object oriented and a functional
+This module inserts values into (format) strings.  It provides C<printf()>
+and C<sprintf()> alternatives via both an object oriented and a functional
 interface.
 
 Read in the L</DETAILS> chapter below, why this module provides a better
@@ -67,7 +67,7 @@ can also call them as method.
   use String::Print 'oo';
   my $f = String::Print->new(%config);
   $f->printi($format, @params);
- 
+
   # exactly the same functionality:
   use String::Print 'printi', %config;
   printi $format, @params;
@@ -81,7 +81,9 @@ object has some benefits.
 
 =over 4
 
-=item String::Print-E<gt>B<new>(%options)
+=item $class-E<gt>B<new>(%options)
+
+The C<%options> of the constructure configure processing options.
 
  -Option     --Default
   encode_for   undef
@@ -94,8 +96,8 @@ object has some benefits.
 =item encode_for => HASH|'HTML'
 
 [0.91] The format string and the inserted values will get encoded according to
-some syntax rules.  For instance, C<encode_entities()> of HTML::Entities
-when you specify the predefined string C<HTML>.  See L<encodeFor()|String::Print/"Attributes">.
+some syntax rules.  Function C<encode_entities()> provided by HTML::Entities
+is used when you specify the predefined string C<HTML>.  See L<encodeFor()|String::Print/"Attributes">.
 
 =item missing_key => CODE
 
@@ -117,13 +119,13 @@ How to serialize data elements.
 
 example: 
 
-  my $f = String::Print->new
-    ( modifiers   => [ EUR   => sub {sprintf "%5.2f e", $_[0]} ]
-    , serializers => [ UNDEF => sub {'-'} ]
-    , encode_for  => 'HTML'
-    );
+  my $f = String::Print->new(
+    modifiers   => [ EUR   => sub {sprintf "%5.2f e", $_[0]} ],
+    serializers => [ UNDEF => sub {'-'} ],
+    encode_for  => 'HTML',
+  );
 
-  $f->printi("price: {p EUR}", p => 3.1415); # price: ␣␣3.14 e
+  $f->printi("price: {p EUR}", p => 3.1415); # price: XX3.14 e (X=blank)
   $f->printi("count: {c}", c => undef);      # count: -
 
 =back
@@ -134,10 +136,11 @@ example:
 
 =item $obj-E<gt>B<addModifiers>(PAIRS)
 
-The PAIRS are a combination of an selector and a CODE which processes the
+The C<PAIRS> are a combination of an selector and a CODE which processes the
 value when the modifier matches.  The selector is a string or (preferred)
 a regular expression. Later modifiers with the same name overrule earlier
-definitions.  You may also specify an ARRAY of modifiers per C<print>.
+definitions.  You may also specify an ARRAY of modifiers per L<printi()|String::Print/"FUNCTIONS">
+or L<printp()|String::Print/"FUNCTIONS">.
 
 See section L</"Interpolation: Modifiers"> about the details.
 
@@ -153,13 +156,10 @@ Read section L</"Output encoding"> about the details.
 The following are provided as method and as function.  You find their
 explanation further down on this page.
 
-$obj->B<printi>([$fh], $format, PAIRS|HASH);
-
-$obj->B<printp>([$fh], $format, PAIRS|HASH);
-
-$obj->B<sprinti>($format, PAIRS|HASH);
-
-$obj->B<sprintp>($format, LIST, PAIRS);
+  $obj->printi([$fh], $format, %data|\%data);
+  $obj->printp([$fh], $format, @params, %options);
+  my $s = $obj->sprinti($format, %data|\%data);
+  my $s = $obj->sprintp($format, @params, %options);
 
 =head1 FUNCTIONS
 
@@ -171,37 +171,37 @@ B<. Example>
   use String::Print;           # all
   use String::Print 'sprinti'; # only sprinti
 
-  use String::Print 'printi'   # only printi
-    , modifiers   => [ EUR   => sub {sprintf "%5.2f e", $_[0]} ]
-    , serializers => [ UNDEF => sub {'-'} ];
+  use String::Print 'printi',   # only printi
+    modifiers   => [ EUR   => sub {sprintf "%5.2f e", $_[0]} ],
+    serializers => [ UNDEF => sub {'-'} ];
 
   printi "price: {p EUR}", p => 3.1415; # price: ␣␣3.14 e
   printi "count: {c}", c => undef;      # count: -
 
 =over 4
 
-=item B<printi>( [$fh], $format, PAIRS|HASH )
+=item B<printi>( [$fh], $format, %data|\%data )
 
-Calls L<sprinti()|String::Print/"FUNCTIONS"> to fill the data in PAIRS or HASH in $format, and
-then sends it to the $fh (by default the selected file)
+Calls L<sprinti()|String::Print/"FUNCTIONS"> to fill the C<%data> into C<$format>, and
+then sends it to the C<$fh> (by default the selected file)
 
   open my $fh, '>', $file;
   printi $fh, ...
 
   printi \*STDERR, ...
 
-=item B<printp>( [$fh], $format, PAIRS|HASH )
+=item B<printp>( [$fh], $format, @params, %options )
 
-Calls L<sprintp()|String::Print/"FUNCTIONS"> to fill the data in PAIRS or HASH in $format, and
-then sends it to the $fh (by default the selected file)
+Calls L<sprintp()|String::Print/"FUNCTIONS"> to fill the C<@params> in C<$format>, and
+then sends it to the C<$fh> (by default the selected file)
 
-=item B<sprinti>($format, PAIRS|HASH|OBJECT)
+=item B<sprinti>($format, %data|\%data|OBJECT, %options)
 
-The $format refers to some string, maybe the result of a translation.
+The C<$format> refers to some string, maybe the result of a translation.
 
-The PAIRS (which may be passed as LIST, HASH, or blessed HASH) contains
+The C<%data> (which may be passed as LIST, HASH, or blessed HASH) contains
 a mixture of special and normal variables to be filled in.  The names
-of the special variables (the options) start with an underscore (C<_>).
+of the special variables (the C<%options>) start with an underscore (C<_>).
 
  -Option  --Default
   _append   undef
@@ -213,7 +213,7 @@ of the special variables (the options) start with an underscore (C<_>).
 
 =item _append => STRING|OBJECT
 
-Text as STRING appended after $format, without interpolation.
+Text as STRING appended after C<$format>, without interpolation.
 
 =item _count => INTEGER
 
@@ -227,32 +227,30 @@ Which STRING to use when an ARRAY is being filled-in as parameter.
 
 =item _prepend => STRING|OBJECT
 
-Text as STRING prepended before $format, without interpolation.  This
-may also be an OBJECT which gets stringified, but variables not filled-in.
+Text as STRING prepended before C<$format>, without interpolation.  This
+may also be an C<OBJECT> which gets stringified, but variables not filled-in.
 
 =back
 
-=item B<sprintp>($format, LIST, PAIRS)
+=item B<sprintp>($format, @positionals, %options)
 
 Where L<sprinti()|String::Print/"FUNCTIONS"> uses named parameters --especially useful when the
 strings need translation-- this function stays close to the standard
 C<sprintf()>.  All features of POSIX formats are supported.  This
-should say enough: you can use C<%3$0#5.*d>, if you like.
+should say enough: you can use C<< %3$0#5.*d >>, if you like.
 
-It may be useful to know that the positional $format is rewritten and
-then fed into L<sprinti()|String::Print/"FUNCTIONS">.  B<Be careful> with the length of the LIST:
-superfluous parameter PAIRS are passed along to C<sprinti()>, and
+It may be useful to know that the positional C<$format> is rewritten and
+then fed into L<sprinti()|String::Print/"FUNCTIONS">.  B<Be careful> with the length of the C<@positionals>:
+superfluous parameter C<%options> are passed along to C<sprinti()>, and
 should only contain "specials": parameter names which start with '_'.
 
 example: of the rewrite
 
   # positional parameters
-  my $x = sprintp "dumpfiles: %s\n", \@dumpfiles
-     , _join => ':';
+  my $x = sprintp "dumpfiles: %s\n", \@dumpfiles, _join => ':';
 
   # is rewritten into, and then processed as
-  my $x = sprinti "dumpfiles: {_1}\n"
-     , _1 => \@dumpfiles, _join => ':';
+  my $x = sprinti "dumpfiles: {_1}\n", _1 => \@dumpfiles, _join => ':';
 
 =back
 
@@ -398,7 +396,7 @@ More examples which do work:
 
   # when name is a column in the database query result
   printi "Username: {user.name}", user => $sth->fetchrow_hashref;
- 
+
   # call a sub which does the database query, returning a HASH
   printi "Username: {user.name}", user => sub { $db->getUser('John') };
 
@@ -465,7 +463,7 @@ via the C<_join> OPTION.
 
 By default, HASHes are interpolated with sorted keys,
 
-   $key => $value, $key2 => $value2, ...
+  $key => $value, $key2 => $value2, ...
 
 There is no quoting on the keys or values (yet).  Usually, this will
 produce an ugly result anyway.
@@ -548,7 +546,7 @@ for instance, help you with rounding or columns:
 
 The POSIX C<printf()> does not handle unicode strings.  Perl does
 understand that the 's' modifier may need to insert utf8 so does not
-count bytes but characters.  C<printi()> does not use characters but
+count bytes but characters.  L<printi()|String::Print/"FUNCTIONS"> does not use characters but
 "grapheme clusters" via Unicode::GCString.  Now, also composed
 characters do work correctly.
 
@@ -570,6 +568,10 @@ format.  The C<BYTES> modifier simplifies this a lot:
 
 The output will always be 6 characters.  Examples are "999  B", "1.2 kB",
 and " 27 MB".
+
+=head3 Default modifier: HTML
+
+[0.95] interpolate the parameter with HTML entity encoding.
 
 =head3 Default modifiers: YEAR, DATE, TIME, DT, and DT()
 
@@ -631,20 +633,20 @@ You may suggest additional formats, or add your own modifier.
 
 =head3 Default modifiers: //word, //"string", //'string'
 
-[0.91] By default, an undefined value is shown as text 'undef'.  Empty
+[0.91] By default, an undefined value is shown as text 'C<undef>'.  Empty
 strings are shown as nothing.  This may not be nice.  You may want to
 be more specific when a value is missing.
 
-   "visitors: {count //0}"
-   "published: {date DT//'not yet'}"
-   "copyright: {year//2017 YEAR}
+  "visitors: {count //0}"
+  "published: {date DT//'not yet'}"
+  "copyright: {year//2017 YEAR}
 
 Modifiers will usually return C<undef> when they are called with an
 undefined or empty value.  By the right order of '//', you may product
 different kinds of output:
 
-   "price: {price//5 EUR}"
-   "price: {price EUR//unknown}"
+  "price: {price//5 EUR}"
+  "price: {price EUR//unknown}"
 
 =head3 Private modifiers
 
@@ -653,13 +655,13 @@ a CODE, which is called when the selector matches.  The selector is either
 a string or a regular expression.
 
   # in Object Oriented syntax:
-  my $f = String::Print->new
-    ( modifiers => [ qr/[€₤]/ => \&money ]
-    );
+  my $f = String::Print->new(
+    modifiers => [ qr/[€₤]/ => \&money ],
+  );
 
   # in function syntax:
-  use String::Print 'printi', 'sprinti'
-    , modifiers => [ qr/[€₤]/ => \&money ];
+  use String::Print 'printi', 'sprinti',
+    modifiers => [ qr/[€₤]/ => \&money ];
 
   # the implementation:
   sub money$$$$)
@@ -721,7 +723,7 @@ In pure Template Toolkit, you would write
   # in your code
   username => $user->name,
 
-With plain String::Print with output encoding enabled, you can do:
+With plain L<String::Print|String::Print> with output encoding enabled, you can do:
 
   # in your TT-template
   <div>[% show_username %]</div>
@@ -768,7 +770,7 @@ More examples in Log::Report::Template.
 In some cases, the data which is inserted is already encoded in the
 output syntax.  For instance, you already have HTML to be included.
 
-The default exclusion rule for HTML output is C<qr/html$/i>, which
+The default exclusion rule for HTML output is C<< qr/html$/i >>, which
 means that all inserted named parameters, where the name ends on C<html>
 will not get html-entity encoded.
 
@@ -776,11 +778,11 @@ This will work by default:
 
   # with encodeFor('HTML')
   printp "Me & Co: {name}, {description_html}",
-     name => 'René', description_html => $descr;
+     name => 'RenE<eacute>', description_html => $descr;
 
 This may result in:
 
-  Me &amp; Co: Ren&eacute;, <font color="red">new member</font>
+  Me E<amp>amp; Co: RenE<amp>eacute;, <font color="red">new member</font>
 
 Better not to have HTML in your program: leave it to the template.  But
 in some cases, you have no choice.
@@ -789,14 +791,14 @@ in some cases, you have no choice.
 
 There are a quite a number of modules on CPAN which extend the functionality
 of C<printf()>.  To name a few:
-L<String::Format|http://search.cpan.org/~darren/String-Format>,
-L<String::Errf|http://http://search.cpan.org/~rjbs/String-Errf>,
-L<String::Formatter|http://http://search.cpan.org/~rjbs/String-Formatter>,
-L<Text::Sprintf::Named|http://search.cpan.org/~shlomif/Text-Sprintf-Named>,
-L<Acme::StringFormat|http://search.cpan.org/~gfuji/Acme-StringFormat>,
-L<Text::sprintf|http://search.cpan.org/~sharyanto/Text-sprintfn>,
-L<Log::Sprintf|http://search.cpan.org/~frew/Log-Sprintf>, and
-L<String::Sprintf|http://search.cpan.org/~bartl/String-Sprintf>.
+L<String::Format|https://metacpan.org/dist/String-Format>,
+L<String::Errf|https://metacpan.org/dist/String-Errf>,
+L<String::Formatter|https://metacpan.org/dist/String-Formatter>,
+L<Text::Sprintf::Named|https://metacpan.org/dist/Text-Sprintf-Named>,
+L<Acme::StringFormat|https://metacpan.org/dist/Acme-StringFormat>,
+L<Text::sprintf|https://metacpan.org/dist/Text-sprintfn>,
+L<Log::Sprintf|https://metacpan.org/dist/Log-Sprintf>, and
+L<String::Sprintf|https://metacpan.org/dist/String-Sprintf>.
 They are all slightly different.
 
 When the C<String::Print> module was created, none of the modules
@@ -809,14 +811,15 @@ C<String::Print> is nicely integrated with Log::Report.
 
 =head1 SEE ALSO
 
-This module is part of String-Print distribution version 0.94,
-built on March 01, 2020. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of String-Print version 0.95,
+built on September 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2016-2020 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2016-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

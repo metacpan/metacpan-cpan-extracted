@@ -11,16 +11,16 @@ Log::Report::Dispatcher::Callback - call a code-ref for each log-line
 
 =head1 SYNOPSIS
 
- sub cb($$$)
- {   my ($disp, $options, $reason, $message) = @_;
-     ...
- }
+  sub cb($$$)
+  {   my ($disp, $options, $reason, $message) = @_;
+      ...
+  }
 
- dispatcher Log::Report::Dispatcher::Callback => 'cb'
-    , callback => \&cb;
+  dispatcher Log::Report::Dispatcher::Callback => 'cb',
+        callback => \&cb;
 
- dispatcher CALLBACK => 'cb'   # same
-    , callback => \&cb;
+  dispatcher CALLBACK => 'cb',   # same
+        callback => \&cb;
 
 =head1 DESCRIPTION
 
@@ -30,13 +30,12 @@ may best make your own extension to L<Log::Report::Dispatcher|Log::Report::Dispa
 for simple things this will do.
 
 Extends L<"DESCRIPTION" in Log::Report::Dispatcher|Log::Report::Dispatcher/"DESCRIPTION">.
- 
+
 B<. Example>
 
   sub send_mail($$$)
   {   my ($disp, $options, $reason, $message) = @_;
-      my $msg = Mail::Send->new(Subject => $reason
-        , To => 'admin@localhost');
+      my $msg = Mail::Send->new(Subject => $reason, To => 'admin@localhost');
       my $fh  = $msg->open('sendmail');
       print $fh $disp->translate($reason, $message);
       close $fh;
@@ -47,23 +46,25 @@ B<. Example>
 =head1 METHODS
 
 Extends L<"METHODS" in Log::Report::Dispatcher|Log::Report::Dispatcher/"METHODS">.
- 
+
 =head2 Constructors
 
 Extends L<"Constructors" in Log::Report::Dispatcher|Log::Report::Dispatcher/"Constructors">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<close>()
 
 Inherited, see L<Log::Report::Dispatcher/"Constructors">
 
-=item Log::Report::Dispatcher::Callback-E<gt>B<new>($type, $name, %options)
+=item $class-E<gt>B<new>($type, $name, %options)
+
+Inherited, see L<Log::Report::Dispatcher/"Constructors">
 
  -Option       --Defined in             --Default
   accept         Log::Report::Dispatcher  depend on mode
   callback                                <required>
-  charset        Log::Report::Dispatcher  <undef>
+  charset        Log::Report::Dispatcher  <C<undef>>
   format_reason  Log::Report::Dispatcher  'LOWERCASE'
   locale         Log::Report::Dispatcher  <system locale>
   mode           Log::Report::Dispatcher  'NORMAL'
@@ -95,7 +96,7 @@ L<Log::Report::Message|Log::Report::Message>).  Finally the text-domain of the m
 =head2 Accessors
 
 Extends L<"Accessors" in Log::Report::Dispatcher|Log::Report::Dispatcher/"Accessors">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<callback>()
@@ -127,24 +128,18 @@ Inherited, see L<Log::Report::Dispatcher/"Accessors">
 =head2 Logging
 
 Extends L<"Logging" in Log::Report::Dispatcher|Log::Report::Dispatcher/"Logging">.
- 
+
 =over 4
 
-=item $obj-E<gt>B<addSkipStack>(@CODE)
-
-=item Log::Report::Dispatcher::Callback-E<gt>B<addSkipStack>(@CODE)
+=item $any-E<gt>B<addSkipStack>(@CODE)
 
 Inherited, see L<Log::Report::Dispatcher/"Logging">
 
-=item $obj-E<gt>B<collectLocation>()
-
-=item Log::Report::Dispatcher::Callback-E<gt>B<collectLocation>()
+=item $any-E<gt>B<collectLocation>()
 
 Inherited, see L<Log::Report::Dispatcher/"Logging">
 
-=item $obj-E<gt>B<collectStack>( [$maxdepth] )
-
-=item Log::Report::Dispatcher::Callback-E<gt>B<collectStack>( [$maxdepth] )
+=item $any-E<gt>B<collectStack>( [$maxdepth] )
 
 Inherited, see L<Log::Report::Dispatcher/"Logging">
 
@@ -156,9 +151,7 @@ Inherited, see L<Log::Report::Dispatcher/"Logging">
 
 Inherited, see L<Log::Report::Dispatcher/"Logging">
 
-=item $obj-E<gt>B<stackTraceLine>(%options)
-
-=item Log::Report::Dispatcher::Callback-E<gt>B<stackTraceLine>(%options)
+=item $any-E<gt>B<stackTraceLine>(%options)
 
 Inherited, see L<Log::Report::Dispatcher/"Logging">
 
@@ -171,17 +164,28 @@ Inherited, see L<Log::Report::Dispatcher/"Logging">
 =head1 DETAILS
 
 Extends L<"DETAILS" in Log::Report::Dispatcher|Log::Report::Dispatcher/"DETAILS">.
- 
+
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Error: dispatcher $name needs a 'callback'
+
+Cast by new()
+
+=back
+
 =head1 SEE ALSO
 
-This module is part of Log-Report distribution version 1.40,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report version 1.41,
+built on September 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2007-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2007-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

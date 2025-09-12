@@ -11,20 +11,20 @@ Log::Report::Translator::POT - translation based on POT files
 
 =head1 SYNOPSIS
 
- # internal use
- my $msg = Log::Report::Message->new
-   ( _msgid  => "Hello World\n"
-   , _domain => 'my-domain'
-   );
+  # internal use
+  my $msg = Log::Report::Message->new(
+	_msgid  => "Hello World\n",
+    _domain => 'my-domain',
+  );
 
- print Log::Report::Translator::POT
-    ->new(lexicons => $dir)
-    ->translate($msg, 'nl-BE');
+  print Log::Report::Translator::POT
+     ->new(lexicons => $dir)
+     ->translate($msg, 'nl-BE');
 
- # normal use (end-users view in the program's ::main)
- textdomain 'my-domain'
-   , translator =>  Log::Report::Translator::POT->new(lexicon => $dir);
- print __"Hello World\n";
+  # normal use (end-users view in the program's ::main)
+  textdomain 'my-domain',
+    translator =>  Log::Report::Translator::POT->new(lexicon => $dir);
+  print __"Hello World\n";
 
 =head1 DESCRIPTION
 
@@ -33,22 +33,18 @@ lazily (unless forced).  This module accesses the PO's in a compact way,
 using L<Log::Report::Lexicon::POTcompact|Log::Report::Lexicon::POTcompact>, which is much more efficient
 than L<Log::Report::Lexicon::PO|Log::Report::Lexicon::PO>.
 
-Extends L<"DESCRIPTION" in Log::Report::Translator|Log::Report::Translator/"DESCRIPTION">.
- 
 =head1 METHODS
 
-Extends L<"METHODS" in Log::Report::Translator|Log::Report::Translator/"METHODS">.
- 
 =head2 Constructors
 
-Extends L<"Constructors" in Log::Report::Translator|Log::Report::Translator/"Constructors">.
- 
 =over 4
 
-=item Log::Report::Translator::POT-E<gt>B<new>(%options)
+=item $class-E<gt>B<new>(%options)
+
+Z<>
 
  -Option  --Default
-  charset   <undef>
+  charset   <C<undef>>
   lexicons  <see text>
 
 =over 2
@@ -74,18 +70,16 @@ of a L<Log::Report::Lexicon::Index|Log::Report::Lexicon::Index>.
 
 example: default lexicon directory
 
- # file xxx/perl5.8.8/My/Module.pm
- use Log::Report 'my-domain'
-   , translator => Log::Report::Translator::POT->new;
+  # file xxx/perl5.8.8/My/Module.pm
+  use Log::Report 'my-domain',
+    translator => Log::Report::Translator::POT->new;
 
- # lexicon now in xxx/perl5.8.8/My/Module/messages/
+  # lexicon now in xxx/perl5.8.8/My/Module/messages/
 
 =back
 
 =head2 Accessors
 
-Extends L<"Accessors" in Log::Report::Translator|Log::Report::Translator/"Accessors">.
- 
 =over 4
 
 =item $obj-E<gt>B<charset>()
@@ -101,30 +95,43 @@ translation files may be located.
 
 =head2 Translating
 
-Extends L<"Translating" in Log::Report::Translator|Log::Report::Translator/"Translating">.
- 
 =over 4
 
-=item $obj-E<gt>B<load>($domain, $locale)
+=item $obj-E<gt>B<translate>($msg, $lang, $context)
 
-Inherited, see L<Log::Report::Translator/"Translating">
+Z<>
 
-=item $obj-E<gt>B<translate>( $message, [$language, $ctxt] )
+=back
 
-Inherited, see L<Log::Report::Translator/"Translating">
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Error: You have to upgrade Log::Report::Lexicon to at least 1.00
+
+Cast by new()
+
+=item Info: read table $filename as $class for $dname in $locale
+
+Cast by translate()
+
+=item Error: unknown translation table extension '$ext' in $filename
+
+Cast by translate()
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Log-Report-Lexicon distribution version 1.13,
-built on May 06, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report-Lexicon version 1.14,
+built on September 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2007-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2007-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

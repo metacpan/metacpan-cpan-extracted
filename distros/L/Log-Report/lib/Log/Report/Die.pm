@@ -1,13 +1,20 @@
-# Copyrights 2007-2025 by [Mark Overmeer <markov@cpan.org>].
-#  For other contributors see ChangeLog.
-# See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.03.
-# This code is part of distribution Log-Report. Meta-POD processed with
-# OODoc into POD and HTML manual-pages.  See README.md
-# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
+# This code is part of Perl distribution Log-Report version 1.41.
+# The POD got stripped from this file by OODoc version 3.04.
+# For contributors see file ChangeLog.
+
+# This software is copyright (c) 2007-2025 by Mark Overmeer.
+
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+# SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
+
+#oodist: *** DO NOT USE THIS VERSION FOR PRODUCTION ***
+#oodist: This file contains OODoc-style documentation which will get stripped
+#oodist: during its release in the distribution.  You can use this file for
+#oodist: testing, however the code of this development version may be broken!
 
 package Log::Report::Die;{
-our $VERSION = '1.40';
+our $VERSION = '1.41';
 }
 
 use base 'Exporter';
@@ -19,87 +26,87 @@ our @EXPORT = qw/die_decode exception_decode/;
 
 use POSIX  qw/locale_h/;
 
+#--------------------
 
 sub die_decode($%)
-{   my ($text, %args) = @_;
+{	my ($text, %args) = @_;
 
-    my @text   = split /\n/, $text;
-    @text or return ();
-    chomp $text[-1];
+	my @text   = split /\n/, $text;
+	@text or return ();
+	chomp $text[-1];
 
-    # Try to catch the error directly, to remove it from the error text
-    my %opt    = (errno => $! + 0);
-    my $err    = "$!";
+	# Try to catch the error directly, to remove it from the error text
+	my %opt    = (errno => $! + 0);
+	my $err    = "$!";
 
-    if($text[0] =~ s/ at (.+) line (\d+)\.?$// )
-    {   $opt{location} = [undef, $1, $2, undef];
-    }
-    elsif(@text > 1 && $text[1] =~ m/^\s*at (.+) line (\d+)\.?$/ )
-    {   # sometimes people carp/confess with \n, folding the line
-        $opt{location} = [undef, $1, $2, undef];
-        splice @text, 1, 1;
-    }
+	if($text[0] =~ s/ at (.+) line (\d+)\.?$// )
+	{	$opt{location} = [undef, $1, $2, undef];
+	}
+	elsif(@text > 1 && $text[1] =~ m/^\s*at (.+) line (\d+)\.?$/ )
+	{	# sometimes people carp/confess with \n, folding the line
+		$opt{location} = [undef, $1, $2, undef];
+		splice @text, 1, 1;
+	}
 
-    $text[0] =~ s/\s*[.:;]?\s*$err\s*$//  # the $err is translation sensitive
-        or delete $opt{errno};
+	$text[0] =~ s/\s*[.:;]?\s*$err\s*$//  # the $err is translation sensitive
+		or delete $opt{errno};
 
-    my @msg = shift @text;
-    length $msg[0] or $msg[0] = 'stopped';
+	my @msg = shift @text;
+	length $msg[0] or $msg[0] = 'stopped';
 
-    my @stack;
-    foreach (@text)
-    {   if(m/^\s*(.*?)\s+called at (.*?) line (\d+)\s*$/)
-             { push @stack, [ $1, $2, $3 ] }
-        else { push @msg, $_ }
-    }
-    $opt{stack}   = \@stack;
-    $opt{classes} = [ 'perl', (@stack ? 'confess' : 'die') ];
+	my @stack;
+	foreach (@text)
+	{	if(m/^\s*(.*?)\s+called at (.*?) line (\d+)\s*$/)
+		     { push @stack, [ $1, $2, $3 ] }
+		else { push @msg, $_ }
+	}
+	$opt{stack}   = \@stack;
+	$opt{classes} = [ 'perl', (@stack ? 'confess' : 'die') ];
 
-    my $reason
-      = $opt{errno} ? 'FAULT'
-      : @stack      ? 'PANIC'
-      :               $args{on_die} || 'ERROR';
+	my $reason
+	  = $opt{errno} ? 'FAULT'
+	  : @stack      ? 'PANIC'
+	  :               $args{on_die} || 'ERROR';
 
-    (\%opt, $reason, join("\n", @msg));
+	(\%opt, $reason, join("\n", @msg));
 }
 
 
 sub _exception_dbix($$)
-{   my ($exception, $args) = @_;
+{	my ($exception, $args) = @_;
 	my $on_die = delete $args->{on_die};
 	my %opts   = %$args;
 
-    my @lines  = split /\n/, "$exception";  # accessor missing to get msg
-    my $first  = shift @lines;
-    my ($sub, $message, $fn, $linenr) = $first =~
-       m/^ (?: ([\w:]+?) \(\)\: [ ] | \{UNKNOWN\}\: [ ] )?
-           (.*?) 
-           \s+ at [ ] (.+) [ ] line [ ] ([0-9]+)\.?
-         $/x;
-    my $pkg    = defined $sub && $sub =~ s/^([\w:]+)\:\:// ? $1 : $0;
+	my @lines  = split /\n/, "$exception";  # accessor missing to get msg
+	my $first  = shift @lines;
+	my ($sub, $message, $fn, $linenr) = $first =~
+		m/^ (?: ([\w:]+?) \(\)\: [ ] | \{UNKNOWN\}\: [ ] )?
+			(.*?)
+			\s+ at [ ] (.+) [ ] line [ ] ([0-9]+)\.?
+		$/x;
+	my $pkg    = defined $sub && $sub =~ s/^([\w:]+)\:\:// ? $1 : $0;
 
-    $opts{location} ||= [ $pkg, $fn, $linenr, $sub ];
+	$opts{location} ||= [ $pkg, $fn, $linenr, $sub ];
 
-    my @stack;
-    foreach (@lines)
-    {   my ($func, $fn, $linenr)
-           = /^\s+(.*?)\(\)\s+called at (.*?) line ([0-9]+)$/ or next;
-        push @stack, [ $func, $fn, $linenr ];
-    }
+	my @stack;
+	foreach (@lines)
+	{	my ($func, $fn, $linenr) = /^\s+(.*?)\(\)\s+called at (.*?) line ([0-9]+)$/ or next;
+		push @stack, [ $func, $fn, $linenr ];
+	}
 	$opts{stack} ||= \@stack if @stack;
 
-    my $reason
-      = $opts{errno} ? 'FAULT'
-      : @stack       ? 'PANIC'
-      :                $on_die || 'ERROR';
+	my $reason
+	  = $opts{errno} ? 'FAULT'
+	  : @stack       ? 'PANIC'
+	  :                $on_die || 'ERROR';
 
-    (\%opts, $reason, $message);
+	(\%opts, $reason, $message);
 }
 
 my %_libxml_errno2reason = (1 => 'WARNING', 2 => 'MISTAKE', 3 => 'ERROR');
 
 sub _exception_libxml($$)
-{   my ($exc, $args) = @_;
+{	my ($exc, $args) = @_;
 	my $on_die = delete $args->{on_die};
 	my %opts   = %$args;
 
@@ -107,33 +114,33 @@ sub _exception_libxml($$)
 	$opts{location} ||= [ 'libxml', $exc->file, $exc->line, $exc->domain ];
 
 	my $msg = $exc->message . $exc->context . "\n"
-            . (' ' x $exc->column) . '^'
-            . ' (' . $exc->domain . ' error ' . $exc->code . ')';
+			. (' ' x $exc->column) . '^'
+			. ' (' . $exc->domain . ' error ' . $exc->code . ')';
 
 	my $reason = $_libxml_errno2reason{$exc->level} || 'PANIC';
-    (\%opts, $reason, $msg);
+	(\%opts, $reason, $msg);
 }
 
 sub exception_decode($%)
-{   my ($exception, %args) = @_;
+{	my ($exception, %args) = @_;
 	my $errno = $! + 0;
 
-    return _exception_dbix($exception, \%args)
-	    if $exception->isa('DBIx::Class::Exception');
+	return _exception_dbix($exception, \%args)
+		if $exception->isa('DBIx::Class::Exception');
 
 	return _exception_libxml($exception, \%args)
-	    if $exception->isa('XML::LibXML::Error');
+		if $exception->isa('XML::LibXML::Error');
 
-    # Unsupported exception system, sane guesses
-    my %opt =
-      ( classes => [ 'unknown exception', 'die', ref $exception ]
-      , errno   => $errno
-      );
+	# Unsupported exception system, sane guesses
+	my %opt = (
+		classes => [ 'unknown exception', 'die', ref $exception ],
+		errno   => $errno,
+	);
 
-    my $reason = $errno ? 'FAULT' : ($args{on_die} || 'ERROR');
+	my $reason = $errno ? 'FAULT' : ($args{on_die} || 'ERROR');
 
-    # hopefully stringification is overloaded
-    (\%opt, $reason, "$exception");
+	# hopefully stringification is overloaded
+	(\%opt, $reason, "$exception");
 }
 
 "to die or not to die, that's the question";

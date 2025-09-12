@@ -7,6 +7,21 @@ Mark Overmeer.
 TODO:
 	. connect to Message::Passing framework
 
+version 1.41: Thu 11 Sep 13:01:50 CEST 2025
+
+	Changes:
+	- require Perl 5.16 (2012)
+
+	Fixes:
+	- remember message 'to' within try
+	  [Andy Beverley] github issue #9
+
+	Improvements:
+	- reorder docs in ::Domain
+	- remove unused fromTemplateToolkit()
+	- convert to OODoc 3.03
+	- protect original exception from before throw()
+
 version 1.40: Fri 18 Apr 17:05:09 CEST 2025
 
 	Fixes:
@@ -26,7 +41,7 @@ version 1.39: Mon  9 Sep 19:57:06 CEST 2024
 version 1.38: Mon  9 Sep 11:00:15 CEST 2024
 
 	Fixes:
-	- Require Dancer2 >= 0.207 for test [cpantesters], [GitHub issue #13]
+	- Require Dancer2 >= 0.207 for test [cpantesters], GitHub issue #13
 	- error code must be set when the script exists with error or panic
 	  [Any Beverley]
 

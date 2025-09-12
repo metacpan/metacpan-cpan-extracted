@@ -7,7 +7,7 @@ use Test2::API qw( context );
 use parent qw( Log::Log4perl::Appender );
 
 # ABSTRACT: Append to TAP output
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.07'; # VERSION
 
 
 sub new
@@ -45,23 +45,34 @@ Log::Log4perl::Appender::TAP - Append to TAP output
 
 =head1 VERSION
 
-version 0.05
+version 0.07
 
 =head1 SYNOPSIS
 
  use Test2::V0;
- use Log::Log4perl;
+ use Log::Log4perl qw( :easy );
  
- LOG::Log4perl::init(\<<CONF);
+ Log::Log4perl::init(\<<CONF);
  log4perl.rootLogger=ERROR, TAP
  log4perl.appender.TAP=Log::Log4perl::Appender::TAP
  log4perl.appender.TAP.method=diag
- log4perl.appender.TAP=layout=PatternLayout
- log4perl.appender.TAP=layout.ConversionPattern="[%rms] %m%n"
+ log4perl.appender.TAP.layout=PatternLayout
+ log4perl.appender.TAP.layout.ConversionPattern="[%rms] %m"
  CONF
  
  DEBUG "this message doesn't see the light of day";
  ERROR "This gets logged to TAP using diag";
+ 
+ ok 1;
+ 
+ done_testing;
+
+outputs:
+
+ # Seeded srand with seed '20250911' from local date.
+ # "[0ms] This gets logged to TAP using diag"
+ ok 1
+ 1..1
 
 =head1 DESCRIPTION
 
@@ -91,7 +102,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017-2022 by Graham Ollis.
+This software is copyright (c) 2017-2025 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

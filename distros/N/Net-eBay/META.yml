@@ -33,5 +33,5 @@ requires:
   Text::Format: '0'
   XML::Dumper: '0'
   XML::Simple: '0'
-version: '0.63'
+version: '0.66'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -11,27 +11,26 @@ Log::Report::Lexicon::POT - manage PO files
 
 =head1 SYNOPSIS
 
- # this is usually not for end-users, See ::Extract::PerlPPI
- # using a PO table
+  # this is usually not for end-users, See ::Extract::PerlPPI
+  # using a PO table
 
- my $pot = Log::Report::Lexicon::POT
-    ->read('po/nl.po', charset => 'utf-8')
-        or die;
-
- my $po = $pot->msgid('msgid');
- my $po = $pot->msgid($msgid, $msgctxt);
- print $pot->nrPlurals;
- print $pot->msgstr('msgid', 3);
- print $pot->msgstr($msgid, 3, $msgctxt);
- $pot->write;  # update the file
-
- # fill the table, by calling the next a lot
- my $po  = Log::Report::Lexicon::PO->new(...);
- $pot->add($po);
-
- # creating a PO table
- $pot->write('po/nl.po')
+  my $pot = Log::Report::Lexicon::POT->read('po/nl.po', charset => 'utf-8')
      or die;
+
+  my $po = $pot->msgid('msgid');
+  my $po = $pot->msgid($msgid, $msgctxt);
+  print $pot->nrPlurals;
+  print $pot->msgstr('msgid', 3);
+  print $pot->msgstr($msgid, 3, $msgctxt);
+  $pot->write;  # update the file
+
+  # fill the table, by calling the next a lot
+  my $po  = Log::Report::Lexicon::PO->new(...);
+  $pot->add($po);
+
+  # creating a PO table
+  $pot->write('po/nl.po')
+      or die;
 
 =head1 DESCRIPTION
 
@@ -47,18 +46,18 @@ sincere simplification.  Each PO record will be represented by a
 L<Log::Report::Lexicon::PO|Log::Report::Lexicon::PO>.
 
 Extends L<"DESCRIPTION" in Log::Report::Lexicon::Table|Log::Report::Lexicon::Table/"DESCRIPTION">.
- 
+
 =head1 METHODS
 
 Extends L<"METHODS" in Log::Report::Lexicon::Table|Log::Report::Lexicon::Table/"METHODS">.
- 
+
 =head2 Constructors
 
 Extends L<"Constructors" in Log::Report::Lexicon::Table|Log::Report::Lexicon::Table/"Constructors">.
- 
+
 =over 4
 
-=item Log::Report::Lexicon::POT-E<gt>B<new>(%options)
+=item $class-E<gt>B<new>(%options)
 
 Create a new POT file.  The initial header is generated for you, but
 it can be changed using the L<header()|Log::Report::Lexicon::POT/"Managing PO's"> method.
@@ -118,9 +117,9 @@ PO files.
 
 =back
 
-=item Log::Report::Lexicon::POT-E<gt>B<read>($filename, %options)
+=item $class-E<gt>B<read>($filename, %options)
 
-Read the POT information from $filename.
+Read the POT information from C<$filename>.
 
  -Option --Default
   charset  <required>
@@ -136,7 +135,7 @@ this explicitly.
 
 =item $obj-E<gt>B<write>( [$filename|$fh], %options )
 
-When you pass an open $fh, you are yourself responsible that
+When you pass an open C<$fh>, you are yourself responsible that
 the correct character-encoding (binmode) is set.  When the write
 followed a L<read()|Log::Report::Lexicon::POT/"Constructors"> or the filename was explicitly set with L<filename()|Log::Report::Lexicon::POT/"Attributes">,
 then you may omit the first parameter.
@@ -159,7 +158,7 @@ commented out (marked with '#~') but left in the file.
 =head2 Attributes
 
 Extends L<"Attributes" in Log::Report::Lexicon::Table|Log::Report::Lexicon::Table/"Attributes">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<charset>()
@@ -169,7 +168,7 @@ to be aware of Perl's internal encoding for the characters.
 
 =item $obj-E<gt>B<filename>()
 
-Returns the $filename, as derived from L<read()|Log::Report::Lexicon::POT/"Constructors"> or specified during
+Returns the filename, as derived from L<read()|Log::Report::Lexicon::POT/"Constructors"> or specified during
 initiation with L<new(filename)|Log::Report::Lexicon::POT/"Constructors">.
 
 =item $obj-E<gt>B<index>()
@@ -187,17 +186,17 @@ Returns the language code, which is derived from the filename.
 =head2 Managing PO's
 
 Extends L<"Managing PO's" in Log::Report::Lexicon::Table|Log::Report::Lexicon::Table/"Managing PO's">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<keepReferencesTo>($table)
 
-Remove all references which are not found as key in the hash $table.
+Remove all references which are not found as key in the hash C<$table>.
 Returns the number of references left.
 
 =item $obj-E<gt>B<removeReferencesTo>($filename)
 
-Remove all the references to the indicate $filename from all defined
+Remove all the references to the indicate C<$filename> from all defined
 translations.  Returns the number of refs left.
 
 =item $obj-E<gt>B<stats>()
@@ -206,7 +205,7 @@ Returns a HASH with some statistics about this POT table.
 
 =item $obj-E<gt>B<updated>( [$date] )
 
-Replace the "PO-Revision-Date" with the specified $date, or the current
+Replace the "PO-Revision-Date" with the specified C<$date>, or the current
 moment.
 
 =back
@@ -214,41 +213,45 @@ moment.
 =head3 Translation
 
 Extends L<"Translation" in Log::Report::Lexicon::Table|Log::Report::Lexicon::Table/"Translation">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<msgid>( STRING, [$msgctxt] )
 
-Lookup the L<Log::Report::Lexicon::PO|Log::Report::Lexicon::PO> with the STRING.  If you
+Lookup the L<Log::Report::Lexicon::PO|Log::Report::Lexicon::PO> with the C<STRING>.  If you
 want to add a new translation, use L<add()|Log::Report::Lexicon::POT/"Managing PO's">.  Returns C<undef>
 when not defined.
+Improves base, see L<Log::Report::Lexicon::Table/"Translation">
 
 =item $obj-E<gt>B<msgstr>( $msgid, [$count, [$msgctxt]] )
 
-Returns the translated string for $msgid.  When $count is not specified or
+Returns the translated string for C<$msgid>.  When C<$count> is not specified or
 C<undef>, the translation string related to "1" is returned.
+Improves base, see L<Log::Report::Lexicon::Table/"Translation">
 
 =back
 
 =head3 Administration
 
 Extends L<"Administration" in Log::Report::Lexicon::Table|Log::Report::Lexicon::Table/"Administration">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<add>($po)
 
-Add the information from a $po into this POT.  If the msgid of the $po
+Add the information from a C<$po> into this POT.  If the msgid of the C<$po>
 is already known, that is an error.
+Improves base, see L<Log::Report::Lexicon::Table/"Administration">
 
 =item $obj-E<gt>B<header>( [$field, [$content]] )
 
 The translation of a blank MSGID is used to store a MIME header, which
-contains some meta-data.  When only a $field is specified, that content is
-looked-up (case-insensitive) and returned.  When a $content is specified,
+contains some meta-data.  When only a C<$field> is specified, that content is
+looked-up (case-insensitive) and returned.  When a C<$content> is specified,
 the knowledge will be stored.  In latter case, the header structure
-may get created.  When the $content is set to C<undef>, the field will
+may get created.  When the C<$content> is set to C<undef>, the field will
 be removed.
+Improves base, see L<Log::Report::Lexicon::Table/"Administration">
 
 =item $obj-E<gt>B<nrPlurals>()
 
@@ -267,6 +270,7 @@ Inherited, see L<Log::Report::Lexicon::Table/"Administration">
 Returns a list with all defined L<Log::Report::Lexicon::PO|Log::Report::Lexicon::PO> objects. When
 the string C<$active> is given as parameter, only objects which have
 references are returned.
+Improves base, see L<Log::Report::Lexicon::Table/"Administration">
 
 =back
 
@@ -274,28 +278,78 @@ references are returned.
 
 =over 4
 
+=item Error: cannot detect charset in $fn
+
+Cast by read()
+
+=item Fault: cannot read from file $fn (unknown charset): $!
+
+Cast by read()
+
+=item Fault: cannot read in $cs from file $fn: $!
+
+Cast by read()
+
+=item Fault: cannot write to file $fn with $layers: $!
+
+Cast by write()
+
+=item Fault: failed reading from file $fn: $!
+
+Cast by read()
+
+=item Error: invalid plural-form algorithm '$alg'
+
+Cast by setupPluralAlgorithm()
+
 =item Error: no filename or file-handle specified for PO
 
 When a PO file is written, then a filename or file-handle must be
 specified explicitly, or set beforehand using the L<filename()|Log::Report::Lexicon::POT/"Attributes">
 method, or known because the write follows a L<read()|Log::Report::Lexicon::POT/"Constructors"> of the file.
+Cast by write()
 
-=item Error: only acceptable parameter is 'ACTIVE'
+=item Error: no filename or file-handle specified for PO
+
+Cast by write()
+
+=item Error: no header defined in POT for file $fn
+
+Cast by header()
 
 =item Error: textdomain parameter is required
+
+Cast by new()
+
+=item Error: the only acceptable parameter is 'ACTIVE', not '$p'
+
+Cast by translations()
+
+=item Error: there is no Plural-Forms field in the header, but needed
+
+Cast by pluralIndex()
+
+=item Error: translation already exists for '$msgid' with '$ctxt
+
+Cast by add()
+
+=item Error: unsupported charset $charset in $fn
+
+Cast by read()
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Log-Report-Lexicon distribution version 1.13,
-built on May 06, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report-Lexicon version 1.14,
+built on September 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2007-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2007-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

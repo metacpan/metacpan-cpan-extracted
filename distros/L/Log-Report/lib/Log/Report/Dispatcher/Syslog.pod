@@ -11,13 +11,13 @@ Log::Report::Dispatcher::Syslog - send messages to syslog
 
 =head1 SYNOPSIS
 
- # add syslog dispatcher
- dispatcher SYSLOG => 'syslog', accept => 'NOTICE-'
-   , format_reason => 'IGNORE'
-   , to_prio => [ 'ALERT-' => 'err' ];
+  # add syslog dispatcher
+  dispatcher SYSLOG => 'syslog', accept => 'NOTICE-',
+    format_reason => 'IGNORE',
+    to_prio => [ 'ALERT-' => 'err' ];
 
- # disable default dispatcher, when daemon
- dispatcher close => 'default';
+  # disable default dispatcher, when daemon
+  dispatcher close => 'default';
 
 =head1 DESCRIPTION
 
@@ -45,26 +45,27 @@ using L<new(to_prio)|Log::Report::Dispatcher::Syslog/"Constructors">.  See examp
   MISTAKE => LOG_WARNING
 
 Extends L<"DESCRIPTION" in Log::Report::Dispatcher|Log::Report::Dispatcher/"DESCRIPTION">.
- 
+
 =head1 METHODS
 
 Extends L<"METHODS" in Log::Report::Dispatcher|Log::Report::Dispatcher/"METHODS">.
- 
+
 =head2 Constructors
 
 Extends L<"Constructors" in Log::Report::Dispatcher|Log::Report::Dispatcher/"Constructors">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<close>()
 
 Inherited, see L<Log::Report::Dispatcher/"Constructors">
 
-=item Log::Report::Dispatcher::Syslog-E<gt>B<new>($type, $name, %options)
+=item $class-E<gt>B<new>($type, $name, %options)
 
 With syslog, people tend not to include the REASON of the message
 in the logs, because that is already used to determine the destination
 of the message.
+Improves base, see L<Log::Report::Dispatcher/"Constructors">
 
  -Option        --Defined in             --Default
   accept          Log::Report::Dispatcher  depend on mode
@@ -73,8 +74,8 @@ of the message.
   flags                                    'pid,nowait'
   format                                   <unchanged>
   format_reason   Log::Report::Dispatcher  'IGNORE'
-  identity                                 <basename $0>
-  include_domain                           <false>
+  identity                                 <basename C<$0>>
+  include_domain                           <C<false>>
   locale          Log::Report::Dispatcher  <system locale>
   logsocket                                undef
   mode            Log::Report::Dispatcher  'NORMAL'
@@ -84,20 +85,20 @@ of the message.
 
 =item accept => REASONS
 
-=item charset => CHARSET
+=item charset => $charset
 
-Translate the text-strings into the specified charset, otherwise the
+Translate the text-strings into the specified C<$charset>, otherwise the
 sysadmin may get unreadable text.
 
-=item facility => STRING
+=item facility => $facility
 
 The possible values for this depend (a little) on the system.  POSIX
 only defines C<user>, and C<local0> up to C<local7>.
 
-=item flags => STRING
+=item flags => $flags
 
-Any combination of flags as defined by Sys::Syslog, for instance
-C<pid>, C<ndelay>, and C<nowait>.
+Any combination of C<$flags> as defined by Sys::Syslog, as comma-separated
+string.  Examples for flags are: C<pid>, C<ndelay>, and C<nowait>.
 
 =item format => CODE
 
@@ -113,7 +114,7 @@ origin of the exception.
 
 =item format_reason => 'UPPERCASE'|'LOWERCASE'|'UCFIRST'|'IGNORE'|CODE
 
-=item identity => STRING
+=item identity => $program
 
 =item include_domain => BOOLEAN
 
@@ -139,12 +140,12 @@ See L<reasonToPrio()|Log::Report::Dispatcher::Syslog/"Logging">.
 =head2 Accessors
 
 Extends L<"Accessors" in Log::Report::Dispatcher|Log::Report::Dispatcher/"Accessors">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<format>( [CODE] )
 
-Returns the CODE ref which formats the syslog line.
+Returns the C<CODE> ref which formats the syslog line.
 
 =item $obj-E<gt>B<isDisabled>()
 
@@ -171,24 +172,18 @@ Inherited, see L<Log::Report::Dispatcher/"Accessors">
 =head2 Logging
 
 Extends L<"Logging" in Log::Report::Dispatcher|Log::Report::Dispatcher/"Logging">.
- 
+
 =over 4
 
-=item $obj-E<gt>B<addSkipStack>(@CODE)
-
-=item Log::Report::Dispatcher::Syslog-E<gt>B<addSkipStack>(@CODE)
+=item $any-E<gt>B<addSkipStack>(@CODE)
 
 Inherited, see L<Log::Report::Dispatcher/"Logging">
 
-=item $obj-E<gt>B<collectLocation>()
-
-=item Log::Report::Dispatcher::Syslog-E<gt>B<collectLocation>()
+=item $any-E<gt>B<collectLocation>()
 
 Inherited, see L<Log::Report::Dispatcher/"Logging">
 
-=item $obj-E<gt>B<collectStack>( [$maxdepth] )
-
-=item Log::Report::Dispatcher::Syslog-E<gt>B<collectStack>( [$maxdepth] )
+=item $any-E<gt>B<collectStack>( [$maxdepth] )
 
 Inherited, see L<Log::Report::Dispatcher/"Logging">
 
@@ -205,9 +200,7 @@ table.  This can be changed with L<new(to_prio)|Log::Report::Dispatcher::Syslog/
 
 Inherited, see L<Log::Report::Dispatcher/"Logging">
 
-=item $obj-E<gt>B<stackTraceLine>(%options)
-
-=item Log::Report::Dispatcher::Syslog-E<gt>B<stackTraceLine>(%options)
+=item $any-E<gt>B<stackTraceLine>(%options)
 
 Inherited, see L<Log::Report::Dispatcher/"Logging">
 
@@ -220,17 +213,32 @@ Inherited, see L<Log::Report::Dispatcher/"Logging">
 =head1 DETAILS
 
 Extends L<"DETAILS" in Log::Report::Dispatcher|Log::Report::Dispatcher/"DETAILS">.
- 
+
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Error: max one active syslog dispatcher, attempt for $new have $old
+
+Cast by new()
+
+=item Error: syslog level '$level' not understood
+
+Cast by new()
+
+=back
+
 =head1 SEE ALSO
 
-This module is part of Log-Report distribution version 1.40,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report version 1.41,
+built on September 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2007-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2007-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

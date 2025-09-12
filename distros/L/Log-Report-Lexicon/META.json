@@ -30,6 +30,11 @@
             "ExtUtils::MakeMaker" : "0"
          }
       },
+      "develop" : {
+         "requires" : {
+            "OODoc" : "3.00"
+         }
+      },
       "runtime" : {
          "requires" : {
             "Data::Dumper" : "0",
@@ -47,20 +52,54 @@
             "Scalar::Util" : "0",
             "Test::More" : "0.86"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "1",
+            "Test::Pod" : "1"
+         }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "homepage" : "http://perl.overmeer.net/CPAN/",
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ],
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/markov2/perl5-Log-Report-Lexicon.git",
          "web" : "https://github.com/markov2/perl5-Log-Report-Lexicon"
       }
    },
-   "version" : "1.13",
+   "version" : "1.14",
+   "x_oodist" : {
+      "email" : "markov@cpan.org",
+      "first_year" : 2007,
+      "generate" : [
+         {
+            "format" : "pod3",
+            "podtail" : null
+         }
+      ],
+      "include" : [
+         "../String-Print",
+         "../Log-Report-Optional"
+      ],
+      "oodoc_version" : 3.03,
+      "parser" : {
+         "pmhead" : null,
+         "skip_links" : [],
+         "syntax" : "markov"
+      },
+      "raw" : {
+         "publish" : "../public_html/log-report-lexicon/raw"
+      },
+      "release" : {
+         "publish" : "../public_html/log-report-lexicon/source"
+      },
+      "tests" : {},
+      "use" : [
+         "../Log-Report",
+         "../Log-Report-Template"
+      ]
+   },
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

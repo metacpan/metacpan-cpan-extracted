@@ -17,18 +17,18 @@ Log::Report::Dispatcher - manage message dispatching, display or logging
 
 =head1 SYNOPSIS
 
- use Log::Report;
+  use Log::Report;
 
- # The following will be created for you automatically
- dispatcher 'PERL', 'default', accept => 'NOTICE-';
- dispatcher close => 'default';  # after deamonize
+  # The following will be created for you automatically
+  dispatcher 'PERL', 'default', accept => 'NOTICE-';
+  dispatcher close => 'default';  # after deamonize
 
- dispatcher 'FILE', 'log'
-   , mode => 'DEBUG', to => '/var/log/mydir/myfile';
+  dispatcher 'FILE', 'log',
+    mode => 'DEBUG', to => '/var/log/mydir/myfile';
 
- # Full package name is used, same as 'FILE'
- dispatcher Log::Report::Dispatch::File => 'stderr'
-   , to => \*STDERR, accept => 'NOTICE-';
+  # Full package name is used, same as 'FILE'
+  dispatcher Log::Report::Dispatch::File => 'stderr',
+    to => \*STDERR, accept => 'NOTICE-';
 
 =head1 DESCRIPTION
 
@@ -48,26 +48,26 @@ filtering rules.  See the L</DETAILS> section, below.
 =item $obj-E<gt>B<close>()
 
 Terminate the dispatcher activities.  The dispatcher gets disabled,
-to avoid the case that it is accidentally used.  Returns C<undef> (false)
+to avoid the case that it is accidentally used.  Returns C<undef> (C<false>)
 if the dispatcher was already closed.
 
-=item Log::Report::Dispatcher-E<gt>B<new>($type, $name, %options)
+=item $class-E<gt>B<new>($type, $name, %options)
 
-Create a dispatcher.  The $type of back-end to start is required, and listed
+Create a dispatcher.  The C<$type> of back-end to start is required, and listed
 in the L</DESCRIPTION> part of this manual-page. For various external
 back-ends, special wrappers are created.
 
-The $name must be uniquely identifying this dispatcher.  When a second
+The C<$name> must be uniquely identifying this dispatcher.  When a second
 dispatcher is created (via L<Log::Report::dispatcher()|Log::Report/"Report Production and Configuration">) with the name
 of an existing dispatcher, the existing one will get replaced.
 
-All %options which are not consumed by this base constructor are passed
-to the wrapped back-end.  Some of them will check whether all %options
-are understood, other ignore unknown %options.
+All C<%options> which are not consumed by this base constructor are passed
+to the wrapped back-end.  Some of them will check whether all C<%options>
+are understood, other ignore unknown C<%options>.
 
  -Option       --Default
   accept         depend on mode
-  charset        <undef>
+  charset        <C<undef>>
   format_reason  'LOWERCASE'
   locale         <system locale>
   mode           'NORMAL'
@@ -122,6 +122,8 @@ for smooth Getopt::Long integration.
 
 =item $obj-E<gt>B<isDisabled>()
 
+Z<>
+
 =item $obj-E<gt>B<mode>()
 
 Returns the mode in use for the dispatcher as number.  See L<new(mode)|Log::Report::Dispatcher/"Constructors">
@@ -136,12 +138,12 @@ Returns the unique name of this dispatcher.
 Returns the list with all REASONS which are needed to fulfill this
 dispatcher's needs.  When disabled, the list is empty, but not forgotten.
 
-[0.999] when only one $reason is specified, it is returned if in the
+[0.999] when only one C<$reason> is specified, it is returned if in the
 list.
 
 =item $obj-E<gt>B<type>()
 
-The dispatcher $type, which is usually the same as the class of this
+The dispatcher type, which is usually the same as the class of this
 object, but not in case of wrappers like for Log::Dispatch.
 
 =back
@@ -150,21 +152,19 @@ object, but not in case of wrappers like for Log::Dispatch.
 
 =over 4
 
-=item $obj-E<gt>B<addSkipStack>(@CODE)
+=item $any-E<gt>B<addSkipStack>(@CODE)
 
-=item Log::Report::Dispatcher-E<gt>B<addSkipStack>(@CODE)
-
-[1.13] Add one or more CODE blocks of caller lines which should not be
-collected for stack-traces or location display.  A CODE gets
-called with an ARRAY of caller information, and returns true
+[1.13] Add one or more C<CODE> blocks of caller lines which should not be
+collected for stack-traces or location display.  A C<CODE> gets
+called with an ARRAY of caller information, and returns C<true>
 when that line should get skipped.
 
 B<Warning:> this logic is applied globally: on all dispatchers.
 
 example: 
 
-By default, all lines in the Log::Report packages are skipped from
-display, with a simple CODE as this:
+By default, all lines in the L<Log::Report|Log::Report> packages are skipped from
+display, with a simple C<CODE> as this:
 
   sub in_lr { $_[0][0] =~ m/^Log\:\:Report(?:\:\:|$)/ }
   Log::Report::Dispatcher->addSkipStack(\&in_lr);
@@ -172,33 +172,29 @@ display, with a simple CODE as this:
 The only parameter to in_lr is the return of caller().  The first
 element of that ARRAY is the package name of a stack line.
 
-=item $obj-E<gt>B<collectLocation>()
-
-=item Log::Report::Dispatcher-E<gt>B<collectLocation>()
+=item $any-E<gt>B<collectLocation>()
 
 Collect the information to be displayed as line where the error occurred.
 
-=item $obj-E<gt>B<collectStack>( [$maxdepth] )
-
-=item Log::Report::Dispatcher-E<gt>B<collectStack>( [$maxdepth] )
+=item $any-E<gt>B<collectStack>( [$maxdepth] )
 
 Returns an ARRAY of ARRAYs with text, filename, line-number.
 
 =item $obj-E<gt>B<log>(HASH-$of-%options, $reason, $message, $domain)
 
 This method is called by L<Log::Report::report()|Log::Report/"Report Production and Configuration"> and should not be called
-directly.  Internally, it will call L<translate()|Log::Report::Dispatcher/"Logging">, which does most $of
+directly.  Internally, it will call L<translate()|Log::Report::Dispatcher/"Logging">, which does most C<$of>
 the work.
 
 =item $obj-E<gt>B<skipStack>()
 
 [1.13] Returns the number of nestings in the stack which should be skipped
-to get outside the Log::Report (and related) modules.  The end-user
+to get outside the L<Log::Report|Log::Report> (and related) modules.  The end-user
 does not want to see those internals in stack-traces.
 
-=item $obj-E<gt>B<stackTraceLine>(%options)
+=item $any-E<gt>B<stackTraceLine>(%options)
 
-=item Log::Report::Dispatcher-E<gt>B<stackTraceLine>(%options)
+Z<>
 
  -Option    --Default
   abstract    1
@@ -250,7 +246,9 @@ may be multi-line (in case a stack trace is produced).
 When a dispatcher is created (via L<new()|Log::Report::Dispatcher/"Constructors"> or L<Log::Report::dispatcher()|Log::Report/"Report Production and Configuration">),
 you must specify the TYPE of the dispatcher.  This can either be a class
 name, which extends a L<Log::Report::Dispatcher|Log::Report::Dispatcher>, or a pre-defined
-abbreviation of a class name.  Implemented are:
+abbreviation of a class name.
+
+Implemented are:
 
 =over 4
 
@@ -323,26 +321,26 @@ will get translated as well.  Otherwise, all will be in English.
 Exactly what will be added depends on the actual mode of the dispatcher
 (change it with L<mode()|Log::Report::Dispatcher/"Accessors">, initiate it with L<new(mode)|Log::Report::Dispatcher/"Constructors">).
 
-                        mode mode mode mode
- REASON   SOURCE   TE!  NORM VERB ASSE DEBUG
- trace    program  ...                 S
- assert   program  ...            SL   SL
- info     program  T..       S    S    S
- notice   program  T..  S    S    S    S
- mistake  user     T..  S    S    S    SL
- warning  program  T..  S    S    SL   SL
- error    user     TE.  S    S    SL   SC
- fault    system   TE!  S    S    SL   SC
- alert    system   T.!  SL   SL   SC   SC
- failure  system   TE!  SL   SL   SC   SC
- panic    program  .E.  SC   SC   SC   SC
+                         mode mode mode mode
+  REASON   SOURCE   TE!  NORM VERB ASSE DEBUG
+  trace    program  ...                 S
+  assert   program  ...            SL   SL
+  info     program  T..       S    S    S
+  notice   program  T..  S    S    S    S
+  mistake  user     T..  S    S    S    SL
+  warning  program  T..  S    S    SL   SL
+  error    user     TE.  S    S    SL   SC
+  fault    system   TE!  S    S    SL   SC
+  alert    system   T.!  SL   SL   SC   SC
+  failure  system   TE!  SL   SL   SC   SC
+  panic    program  .E.  SC   SC   SC   SC
 
- T - usually translated
- E - exception (execution interrupted)
- ! - will include $! text at display
- L - include filename and linenumber
- S - show/print when accepted
- C - stack trace (like Carp::confess())
+  T - usually translated
+  E - exception (execution interrupted)
+  ! - will include $! text at display
+  L - include filename and linenumber
+  S - show/print when accepted
+  C - stack trace (like Carp::confess())
 
 =head3 Filters
 
@@ -373,36 +371,55 @@ using concatenation (see L<Log::Report::Message::concat()|Log::Report::Message/"
 
 B<. Example: a filter on syslog>
 
- dispatcher filter => \&myfilter, 'syslog';
+  dispatcher filter => \&myfilter, 'syslog';
 
- # ignore all translatable and non-translatable messages containing
- # the word "skip"
- sub myfilter($$$$)
- {   my ($disp, $opts, $reason, $message) = @_;
-     return () if $message->untranslated =~ m/\bskip\b/;
-     ($reason, $message);
- }
+  # ignore all translatable and non-translatable messages containing
+  # the word "skip"
+  sub myfilter($$$$)
+  {   my ($disp, $opts, $reason, $message) = @_;
+      return () if $message->untranslated =~ m/\bskip\b/;
+      ($reason, $message);
+  }
 
 B<. Example: take all mistakes and warnings serious>
 
- dispatch filter => \&take_warns_seriously;
- sub take_warns_seriously($$$$)
- {   my ($disp, $opts, $reason, $message) = @_;
-       $reason eq 'MISTAKE' ? (ERROR   => $message)
-     : $reason eq 'WARNING' ? (FAULT   => $message)
-     :                        ($reason => $message);
- }
+  dispatch filter => \&take_warns_seriously;
+  sub take_warns_seriously($$$$)
+  {   my ($disp, $opts, $reason, $message) = @_;
+        $reason eq 'MISTAKE' ? (ERROR   => $message)
+      : $reason eq 'WARNING' ? (FAULT   => $message)
+      :                        ($reason => $message);
+  }
+
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Error: Perl does not support charset $cs
+
+Cast by new()
+
+=item Alert: cannot use class $backend:\n$@: $!
+
+Cast by new()
+
+=item Error: illegal format_reason '$format' for dispatcher
+
+Cast by new()
+
+=back
 
 =head1 SEE ALSO
 
-This module is part of Log-Report distribution version 1.40,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report version 1.41,
+built on September 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2007-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2007-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

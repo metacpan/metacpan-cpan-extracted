@@ -20,7 +20,7 @@ Log::Report::Template - Template Toolkit with translations
 
 This module extends Template, which is the core of Template Toolkit.
 The main addition is support for translations via the translation
-framework offered by L<Log::Report|Log::Report>.
+framework offered by Log::Report.
 
 You add translations to a template system, by adding calls to some
 translation function (by default called C<loc()>) to your template text.
@@ -40,7 +40,7 @@ Please read the L</DETAILS> section before you start using this module.
 
 =over 4
 
-=item Log::Report::Template-E<gt>B<new>(%options)
+=item $class-E<gt>B<new>(%options)
 
 Create a new translator object.  You may pass the C<%options> as HASH or
 PAIRS.  By convension, all basic Template Toolkit options are in capitals.
@@ -100,6 +100,8 @@ Get the C<String::Print> object which formats the messages.
 
 =item $obj-E<gt>B<translateTo>( [$language] )
 
+Z<>
+
 =back
 
 =head2 Handling text domains
@@ -145,7 +147,7 @@ DEBUG.
   charset         'UTF-8'
   filename_match  qr/\.tt2?$/
   filenames       undef
-  write_tables    <true>
+  write_tables    <C<true>>
 
 =over 2
 
@@ -164,7 +166,7 @@ subset by hand.
 
 =item write_tables => BOOLEAN
 
-When false, the po-files will not get updated.
+When C<false>, the po-files will not get updated.
 
 =back
 
@@ -194,7 +196,7 @@ may in the program code.  This module (actually L<String::Print|String::Print>)
 can be trained to convert money during translation, because '£'
 is a modifier.  The translation for Dutch (via a PO table) could be
 
-   "Prijs: {p.price €}"
+  "Prijs: {p.price €}"
 
 SO: we want to get both table fields in one translation.  Try this:
 
@@ -252,11 +254,11 @@ actually being called to do the formatting)
 
 Examples:
 
- # pi in two decimals
- [% loc("π = {pi %.2f}", pi => 3.14157) %]
+  # pi in two decimals
+  [% loc("π = {pi %.2f}", pi => 3.14157) %]
 
- # show int, no fraction. filesize is a template variable
- [% loc("file size {size %d}", size => filesize + 0.5) %]
+  # show int, no fraction. filesize is a template variable
+  [% loc("file size {size %d}", size => filesize + 0.5) %]
 
 =item BYTES
 
@@ -271,20 +273,20 @@ Examples:
 =item Time-formatting YEAR, DATE, TIME, DT
 
 Accept various time syntaxes as value, and translate them into
-standard formats: year only, date in YYYY-MM-DD, time as 'HH::MM::SS',
+standard formats: year only, date in C<YYYY-MM-DD>, time as C<HH::MM::SS>,
 and various DateTime formats:
 
 Examples:
 
   # shows 'Copyright 2017'
   [% loc("Copyright {today YEAR}", today => '2017-06-26') %]
- 
+
   # shows 'Created: 2017-06-26'
   [% loc("Created: {now DATE}", now => '2017-06-26 00:24:15') %]
-  
+
   # shows 'Night: 00:24:15'
   [% loc("Night: {now TIME}", now => '2017-06-26 00:24:15') %]
-  
+
   # shows 'Mon Jun 26 00:28:50 CEST 2017'
   [% loc("Stamp: {now DT(ASC)}", now => 1498429696) %]
 
@@ -317,7 +319,7 @@ collect the error like this:
      or die $tt->error;
 
 When the 'procesing_errors' option is set to 'EXCEPTION', the error is
-translated into a L<Log::Report::Exception|Log::Report::Exception>:
+translated into a Log::Report::Exception:
 
   use Log::Report;
   try { $tt->process($template_fn, $vars, ...) };
@@ -411,7 +413,7 @@ required.
   [% loc('msgid', PAIRS) %]
   [% loc("msgid|plural", COUNTER, PAIRS) %]
   [% loc("msgid|plural", _count => COUNTER, PAIRS) %]
- 
+
   [% INCLUDE
        title = loc('something')
    %]
@@ -422,7 +424,7 @@ internally in Template Toolkit, it is convenient to permit both syntaxes.
   [% | loc(PAIRS) %]msgid[% END %]
   [% 'msgid' | loc(PAIRS) %]
   [% "msgid" | loc(PAIRS) %]
-  
+
   [% "msgid|plural" | loc(COUNTER, PAIRS) %]
   [% "msgid|plural" | loc(_count => COUNTER, PAIRS) %]
   [% FILTER loc %]msgid[% END %]
@@ -535,7 +537,7 @@ The alternative is via extension:
   use My::Template;
   my $templater = My::Template->new;
   $templater->process('template_file.tt', \%vars);
-  
+
   # File lib/My/Template.pm
   package My::Template;
   use parent 'Log::Report::Template';
@@ -560,20 +562,20 @@ in C<$lexicon/$textdomain-$charset.po>.  That file will be left empty:
 copy it to start a new translation.
 
 There are many ways to structure PO-files.  Which structure used, is
-detected automatically by L<Log::Report::Lexicon|Log::Report::Lexicon>.  My personal preference 
+detected automatically by L<Log::Report::Lexicon|Log::Report::Lexicon>.  My personal preference
 is C<$lexicon/$textdomain/$language-$charset.po>.  On Unix-like systems,
 you would do:
 
   # Start a new language
   mkdir mylexicon/mydomain
-  cp mylexicon/mydomain-utf8.po mylexicon/mydomain/nl_NL-utf8.po 
-  
+  cp mylexicon/mydomain-utf8.po mylexicon/mydomain/nl_NL-utf8.po
+
   # fill the nl_NL-utf8.po file with the translation
   poedit mylexicon/mydomain/nl_NL-utf8.po
-  
+
   # add the file to your version control system
   git add mylexicon/mydomain/nl_NL-utf8.po
-  
+
 Now, when your program sets the locale to 'nl-NL', it should start
 translating to Dutch.  If it doesn't, it is not always easy to
 figure-out what is wrong...
@@ -596,16 +598,35 @@ will prefer mo files, if it encounters them, but generation is not (yet)
 organized via Log::Report components.  Search for "msgfmt" as separate
 tool or CPAN module.
 
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Error: directory $dir not in INCLUDE_PATH, used by $option
+
+Cast by addTextdomain()
+
+=item Error: illegal value '$value' for 'processing_errors' option
+
+Cast by new()
+
+=item Error: translation function '$func' already in use by textdomain '$name'
+
+Cast by addTextdomain()
+
+=back
+
 =head1 SEE ALSO
 
-This module is part of Log-Report-Template distribution version 1.02,
-built on July 29, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report-Template version 1.03,
+built on September 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2017-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2017-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

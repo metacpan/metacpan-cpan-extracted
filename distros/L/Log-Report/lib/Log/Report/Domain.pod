@@ -14,32 +14,32 @@ Log::Report::Domain - administer one text-domain
 
 =head1 SYNOPSIS
 
- # internal usage
- use Log::Report::Domain;
- my $domain = Log::Report::Domain->new(name => $name);
+  # internal usage
+  use Log::Report::Domain;
+  my $domain = Log::Report::Domain->new(name => $name);
 
- # find a ::Domain object
- use Log::Report 'my-domain';
- my $domain = textdomain 'my-domain'; # find domain config
- my $domain = textdomain;             # config of this package
+  # find a ::Domain object
+  use Log::Report 'my-domain';
+  my $domain = textdomain 'my-domain'; # find domain config
+  my $domain = textdomain;             # config of this package
 
- # explicit domain configuration
- package My::Package;
- use Log::Report 'my-domain';         # set textdomain for package
+  # explicit domain configuration
+  package My::Package;
+  use Log::Report 'my-domain';         # set textdomain for package
 
- textdomain $name, %configure;        # set config, once per program
- (textdomain $name)->configure(%configure); # same
- textdomain->configure(%configure);   # same if current package in $name
+  textdomain $name, %configure;        # set config, once per program
+  (textdomain $name)->configure(%configure); # same
+  textdomain->configure(%configure);   # same if current package in $name
 
- # implicit domain configuration
- package My::Package;
- use Log::Report 'my-domain', %configure;
- 
- # external file for configuration (perl or json format)
- use Log::Report 'my-domain', config => $filename;
+  # implicit domain configuration
+  package My::Package;
+  use Log::Report 'my-domain', %configure;
 
- use Log::Report 'my-domain';
- textdomain->configure(config => $filename);
+  # external file for configuration (perl or json format)
+  use Log::Report 'my-domain', config => $filename;
+
+  use Log::Report 'my-domain';
+  textdomain->configure(config => $filename);
 
 =head1 DESCRIPTION
 
@@ -60,18 +60,18 @@ configuration.  The administration for the configuration is managed in
 this package.
 
 Extends L<"DESCRIPTION" in Log::Report::Minimal::Domain|Log::Report::Minimal::Domain/"DESCRIPTION">.
- 
+
 =head1 METHODS
 
 Extends L<"METHODS" in Log::Report::Minimal::Domain|Log::Report::Minimal::Domain/"METHODS">.
- 
+
 =head2 Constructors
 
 Extends L<"Constructors" in Log::Report::Minimal::Domain|Log::Report::Minimal::Domain/"Constructors">.
- 
+
 =over 4
 
-=item Log::Report::Domain-E<gt>B<new>(%options)
+=item $class-E<gt>B<new>(%options)
 
 Create a new Domain object.
 
@@ -89,7 +89,7 @@ Create a new Domain object.
 =head2 Attributes
 
 Extends L<"Attributes" in Log::Report::Minimal::Domain|Log::Report::Minimal::Domain/"Attributes">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<configure>(%options)
@@ -97,7 +97,7 @@ Extends L<"Attributes" in Log::Report::Minimal::Domain|Log::Report::Minimal::Dom
 The import is automatically called when the package is compiled.  For all
 but one packages in your distribution, it will only contain the name of
 the DOMAIN.  For one package, it will contain configuration information.
-These %options are used for all packages which use the same DOMAIN.
+These C<%options> are used for all packages which use the same DOMAIN.
 See chapter L</Configuring> below.
 
  -Option         --Defined in                  --Default
@@ -110,9 +110,9 @@ See chapter L</Configuring> below.
 
 =over 2
 
-=item config => FILENAME
+=item config => $file
 
-Read the settings from the file.  The parameters found in the file are
+Read the settings from the C<$file>.  The parameters found in the file are
 used as default for the parameters above.  This parameter is especially
 useful for the C<context_rules>, which need to be shared between the
 running application and F<xgettext-perl>.  See L<readConfig()|Log::Report::Domain/"Attributes">
@@ -136,7 +136,7 @@ the non-translatable messages in.  In case no translation is needed,
 you still wish the system error messages to be in the same language
 as the report.  Of course, each textdomain can define its own.
 
-=item translator => L<Log::Report::Translator|Log::Report::Translator>|HASH
+=item translator => Log::Report::Translator|HASH
 
 Set the object which will do the translations for this domain.
 
@@ -146,11 +146,7 @@ Set the object which will do the translations for this domain.
 
 =item $obj-E<gt>B<contextRules>()
 
-=item $obj-E<gt>B<defaultContext>()
-
-Returns the current default translation context settings as HASH.  You should
-not modify the content of that HASH: change it by called L<setContext()|Log::Report::Domain/"Attributes"> or
-L<updateContext()|Log::Report::Domain/"Attributes">.
+Z<>
 
 =item $obj-E<gt>B<isConfigured>()
 
@@ -162,11 +158,11 @@ Inherited, see L<Log::Report::Minimal::Domain/"Attributes">
 
 =item $obj-E<gt>B<nativeLanguage>()
 
-=item $obj-E<gt>B<readConfig>($filename)
+Z<>
 
-=item Log::Report::Domain-E<gt>B<readConfig>($filename)
+=item $any-E<gt>B<readConfig>($filename)
 
-Helper method, which simply parses the content $filename into a HASH to be
+Helper method, which simply parses the content C<$filename> into a HASH to be
 used as parameters to L<configure()|Log::Report::Domain/"Attributes">. The filename must end on '.pl',
 to indicate that it uses perl syntax (can be processed with Perl's C<do>
 command) or end on '.json'.  See also chapter L</Configuring> below.
@@ -176,40 +172,48 @@ or JSON (when it ends with C<.json>).  Various modules may explain parts
 of what can be found in these files, for instance
 L<Log::Report::Translator::Context|Log::Report::Translator::Context>.
 
+=item $obj-E<gt>B<translator>()
+
+Z<>
+
+=back
+
+=head2 Translating
+
+Extends L<"Translating" in Log::Report::Minimal::Domain|Log::Report::Minimal::Domain/"Translating">.
+
+=over 4
+
+=item $obj-E<gt>B<defaultContext>()
+
+Returns the current default translation context settings as HASH.  You should
+not modify the content of that HASH: change it by called L<setContext()|Log::Report::Domain/"Translating"> or
+L<updateContext()|Log::Report::Domain/"Translating">.
+
+=item $obj-E<gt>B<interpolate>( $msgid, [$args] )
+
+Inherited, see L<Log::Report::Minimal::Domain/"Translating">
+
 =item $obj-E<gt>B<setContext>(STRING|HASH|ARRAY|PAIRS)
 
 Temporary set the default translation context for messages.  This is used
 when the message is created without a C<_context> parameter. The context
-can be retrieved with L<defaultContext()|Log::Report::Domain/"Attributes">.
+can be retrieved with L<defaultContext()|Log::Report::Domain/"Translating">.
 
 Contexts are totally ignored then there are no C<context_rules>.  When
-you do not wish to change settings, you may simply provide a HASH.
+you do not wish to change settings, you may simply provide a C<HASH>.
 
 example: 
 
-   use Log::Report 'my-domain', context_rules => {};
-
-=item $obj-E<gt>B<translator>()
-
-=item $obj-E<gt>B<updateContext>(STRING|HASH|ARRAY|PAIRS)
-
-[1.10] Make changes and additions to the active context (see L<setContext()|Log::Report::Domain/"Attributes">).
-
-=back
-
-=head2 Action
-
-Extends L<"Action" in Log::Report::Minimal::Domain|Log::Report::Minimal::Domain/"Action">.
- 
-=over 4
-
-=item $obj-E<gt>B<interpolate>( $msgid, [$args] )
-
-Inherited, see L<Log::Report::Minimal::Domain/"Action">
+  use Log::Report 'my-domain', context_rules => {};
 
 =item $obj-E<gt>B<translate>($message, $language)
 
-Translate the $message into the $language.
+Translate the C<$message> into the C<$language>.
+
+=item $obj-E<gt>B<updateContext>(STRING|HASH|ARRAY|PAIRS)
+
+[1.10] Make changes and additions to the active context (see L<setContext()|Log::Report::Domain/"Translating">).
 
 =back
 
@@ -220,20 +224,20 @@ Translate the $message into the $language.
 Configuration of a domain can happen in many ways: either explicitly or
 implicitly.  The explicit form:
 
-   package My::Package;
-   use Log::Report 'my-domain';
+  package My::Package;
+  use Log::Report 'my-domain';
 
-   textdomain 'my-domain', %configuration;
-   textdomain->configure(%configuration);
-   textdomain->configure(\%configuration);
+  textdomain 'my-domain', %configuration;
+  textdomain->configure(%configuration);
+  textdomain->configure(\%configuration);
 
-   textdomain->configure(conf => $filename);
+  textdomain->configure(conf => $filename);
 
 The implicit form is (no variables possible, only constants!)
 
-   package My::Package;
-   use Log::Report 'my-domain', %configuration;
-   use Log::Report 'my-domain', conf => '/filename';
+  package My::Package;
+  use Log::Report 'my-domain', %configuration;
+  use Log::Report 'my-domain', conf => '/filename';
 
 You can only configure your domain in one place in your program.  The
 textdomain setup is then used for all packages in the same domain.
@@ -248,9 +252,9 @@ will use L<String::Print|String::Print> function C<printi()>, with the standard 
 
   textdomain 'some-domain'
     formatter =>
-      { class     => 'String::Print'    # default
-      , method    => 'sprinti'          # default
-      , %options    # constructor options for the class
+      { class     => 'String::Print',    # default
+        method    => 'sprinti',          # default
+        %options    # constructor options for the class
       );
 
 When you want your own formatter, or configuration of C<String::Print>,
@@ -273,7 +277,7 @@ name in some of the log lines.  For this, (ab)use the translation context:
   # or
   textdomain 'my-domain',
     content_rules => { ... };
-  
+
   ### every time you start working for a different virtual host
   (textdomain 'my-domain')->setContext(host => $host);
 
@@ -282,16 +286,43 @@ name in some of the log lines.  For this, (ab)use the translation context:
   use Log::Report 'my-domain';
   error __x"in {_context.host} not logged-in {user}", user => $username;
 
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Warning: Missing key '$key' in format '$format', file $use
+
+Cast by configure()
+
+=item Fault: cannot open JSON file for context at $fn: $!
+
+Cast by readConfig()
+
+=item Error: the native_language '$locale' is not a valid locale
+
+Cast by configure()
+
+=item Error: unsupported context file type for $fn
+
+Cast by readConfig()
+
+=item Error: you need to configure context_rules before setContext
+
+Cast by setContext()
+
+=back
+
 =head1 SEE ALSO
 
-This module is part of Log-Report distribution version 1.40,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report version 1.41,
+built on September 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2007-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2007-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

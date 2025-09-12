@@ -10,6 +10,7 @@ set_spell_cmd('aspell --master=en_US list');
 add_stopwords(<DATA>);
 all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
+198982749
 49699333
 Aas
 Accomazzi
@@ -347,6 +348,7 @@ canonicalized
 capoeirab
 cjm
 colin
+copilot
 corion
 cpan
 data

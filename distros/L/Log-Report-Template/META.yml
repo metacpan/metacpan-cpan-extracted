@@ -4,6 +4,8 @@ author:
   - 'Mark Overmeer <markov@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Test::More: '1'
+  Test::Pod: '1'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -27,7 +29,30 @@ requires:
   Test::More: '0.86'
 resources:
   homepage: http://perl.overmeer.net/CPAN/
-  license: http://dev.perl.org/licenses/
   repository: https://github.com/markov2/perl5-Log-Report-Template.git
-version: '1.02'
+version: '1.03'
+x_oodist:
+  email: markov@cpan.org
+  first_year: 2017
+  generate:
+    -
+      format: pod3
+      podtail: ~
+  include:
+    - ../Log-Report
+    - ../Log-Report-Lexicon
+    - ../Log-Report-Optional
+    - ../String-Print
+  oodoc_version: 3.04
+  parser:
+    pmhead: ~
+    skip_links:
+      - Dancer2::Config
+    syntax: markov
+  raw:
+    publish: ../public_html/log-report-template/raw
+  release:
+    publish: ../public_html/log-report-template/source
+  tests: {}
+  use: []
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

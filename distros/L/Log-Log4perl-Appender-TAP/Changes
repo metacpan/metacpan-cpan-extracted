@@ -1,5 +1,11 @@
 Revision history for Log-Log4perl-Appender-TAP
 
+0.07      2025-09-11 07:01:27 -0600
+  - Fix other syntax errors and typos in synopsis :(
+
+0.06      2025-09-11 06:27:21 -0600
+  - Fixed incorrect capitalization in synopsis
+
 0.05      2023-05-07 06:09:46 -0600
   - Documentation improvements
 

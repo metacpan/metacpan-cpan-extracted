@@ -6,8 +6,8 @@ Log::Report::Lexicon::Index - search through available translation files
 
 =head1 SYNOPSIS
 
- my $index = Log::Report::Lexicon::Index->new($directory);
- my $fn    = $index->find('my-domain', 'nl_NL.utf-8');
+  my $index = Log::Report::Lexicon::Index->new($directory);
+  my $fn    = $index->find('my-domain', 'nl_NL.utf-8');
 
 =head1 DESCRIPTION
 
@@ -22,12 +22,12 @@ created.
 
 =over 4
 
-=item Log::Report::Lexicon::Index-E<gt>B<new>($directory, %options)
+=item $class-E<gt>B<new>($directory, %options)
 
 Create an index for a certain directory.  If the directory does not
 exist or is empty, then the object will still be created.
 
-All files the $directory tree which are recognized as an translation table
+All files the C<$directory> tree which are recognized as an translation table
 format which is understood will be listed.  Momentarily, those are:
 
 =over
@@ -59,9 +59,9 @@ Returns the directory name.
 
 =item $obj-E<gt>B<addFile>( $basename, [$absolute] )
 
-Add a certain file to the index.  This method returns the $absolute
+Add a certain file to the index.  This method returns the C<$absolute>
 path to that file, which must be used to access it.  When not explicitly
-specified, the $absolute path will be calculated.
+specified, the C<$absolute> path will be calculated.
 
 =item $obj-E<gt>B<find>($textdomain, $locale)
 
@@ -69,7 +69,7 @@ Lookup the best translation table, according to the rules described
 in chapter L</DETAILS>, below.
 
 Returned is a filename, or C<undef> if nothing is defined for the
-$locale (there is no default on this level).
+C<$locale> (there is no default on this level).
 
 =item $obj-E<gt>B<index>()
 
@@ -82,9 +82,9 @@ filename, and the value the case-sensitive version of the filename.
 
 Returned is a list of filenames which is used to update the list of
 MSGIDs when source files have changed.  All translation files which
-belong to a certain $domain are listed.
+belong to a certain C<$domain> are listed.
 
-The $extension filter can be used to reduce the filenames further, for
+The C<$extension> filter can be used to reduce the filenames further, for
 instance to select only C<po>, C<mo> or C<gmo> files, and ignore readme's.
 Use an string, without dot and interpreted case-insensitive, or a
 regular expression.
@@ -124,15 +124,15 @@ textdomain C<my-domain>.  The translation is made into C<nl-NL.utf-8>
 (locale for Dutch spoken in The Netherlands, utf-8 encoded text file).
 
 The default location for the translation table is under
- ~perl5.8.8/Some/Module/messages/
+  ~perl5.8.8/Some/Module/messages/
 
 for instance
- ~perl5.8.8/Some/Module/messages/nl-NL.utf-8/LC_MESSAGES/my-domain.po
+  ~perl5.8.8/Some/Module/messages/nl-NL.utf-8/LC_MESSAGES/my-domain.po
 
 There are alternatives, as described in L<Log::Report::Lexicon::Index|Log::Report::Lexicon::Index>,
 for instance
- ~perl5.8.8/Some/Module/messages/my-domain/nl-NL.utf-8.po
- ~perl5.8.8/Some/Module/messages/my-domain/nl.po
+  ~perl5.8.8/Some/Module/messages/my-domain/nl-NL.utf-8.po
+  ~perl5.8.8/Some/Module/messages/my-domain/nl.po
 
 =head2 Locale search
 
@@ -205,14 +205,15 @@ from you [please help improve this]), and are treated case-INsensitive!
 
 =head1 SEE ALSO
 
-This module is part of Log-Report-Lexicon distribution version 1.13,
-built on May 06, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report-Lexicon version 1.14,
+built on September 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2007-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2007-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

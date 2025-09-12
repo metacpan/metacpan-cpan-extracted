@@ -8,38 +8,32 @@ Log::Report::Template::Textdomain - template translation with one domain
 
  Log::Report::Template::Textdomain
    is a Log::Report::Domain
-   is a Log::Report::Minimal::Domain
 
 =head1 SYNOPSIS
 
- my $templater = Log::Report::Template->new(...);
- my $domain    = $templater->addTextdomain(%options);
+  my $templater = Log::Report::Template->new(...);
+  my $domain    = $templater->addTextdomain(%options);
 
 =head1 DESCRIPTION
 
 Manage one translation domain for L<Log::Report::Template|Log::Report::Template>.
 
-Extends L<"DESCRIPTION" in Log::Report::Domain|Log::Report::Domain/"DESCRIPTION">.
- 
 =head1 METHODS
 
-Extends L<"METHODS" in Log::Report::Domain|Log::Report::Domain/"METHODS">.
- 
 =head2 Constructors
 
-Extends L<"Constructors" in Log::Report::Domain|Log::Report::Domain/"Constructors">.
- 
 =over 4
 
-=item Log::Report::Template::Textdomain-E<gt>B<new>(%options)
+=item $class-E<gt>B<new>(%options)
 
- -Option              --Defined in                  --Default
-  lang                                                undef
-  lexicon                                             undef
-  name                  Log::Report::Minimal::Domain  <required>
-  only_in_directory                                   undef
-  templater                                           <required>
-  translation_function                                'loc'
+Z<>
+
+ -Option              --Default
+  lang                  undef
+  lexicon               undef
+  only_in_directory     undef
+  templater             <required>
+  translation_function  'loc'
 
 =over 2
 
@@ -50,15 +44,13 @@ for each user connection via L<translateTo()|Log::Report::Template::Textdomain/"
 
 =item lexicon => DIRECTORY
 
-=item name => STRING
-
 =item only_in_directory => DIRECTORY|ARRAY
 
 The textdomain can only be used in the indicated directories: if found
 anywhere else, it's an error.  When not specified, the function is
 allowed everywhere.
 
-=item templater => L<Log::Report::Template|Log::Report::Template>-object
+=item templater => Log::Report::Template-object
 
 =item translation_function => STRING
 
@@ -67,9 +59,9 @@ See L<function()|Log::Report::Template::Textdomain/"Attributes">.  It must be un
 
 =back
 
-=item Log::Report::Template::Textdomain-E<gt>B<upgrade>($domain, %options)
+=item $class-E<gt>B<upgrade>($domain, %options)
 
-Upgrade a base class L<Log::Report::Domain|Log::Report::Domain>-object into an Template
+Upgrade a base class Log::Report::Domain-object into an Template
 domain.
 
 This is a bit akward process, needed when one of the code packages
@@ -80,31 +72,17 @@ configuration stays intact.
 
 =head2 Attributes
 
-Extends L<"Attributes" in Log::Report::Domain|Log::Report::Domain/"Attributes">.
- 
 =over 4
-
-=item $obj-E<gt>B<configure>(%options)
-
-Inherited, see L<Log::Report::Domain/"Attributes">
-
-=item $obj-E<gt>B<contextRules>()
-
-Inherited, see L<Log::Report::Domain/"Attributes">
 
 =item $obj-E<gt>B<expectedIn>($filename)
 
-Return true when the function name which relates to this domain is
+Return C<true> when the function name which relates to this domain is
 allowed to be used for the indicated file.  The msgid extractor will warn
 when there is no match.
 
 =item $obj-E<gt>B<function>()
 
 Returns the name of the function which is used for translations.
-
-=item $obj-E<gt>B<isConfigured>()
-
-Inherited, see L<Log::Report::Minimal::Domain/"Attributes">
 
 =item $obj-E<gt>B<lang>()
 
@@ -115,51 +93,15 @@ for this domain, or better L<Log::Report::Template::translateTo()|Log::Report::T
 
 Directory where the translation tables are kept.
 
-=item $obj-E<gt>B<name>()
-
-Inherited, see L<Log::Report::Minimal::Domain/"Attributes">
-
-=item $obj-E<gt>B<nativeLanguage>()
-
-Inherited, see L<Log::Report::Domain/"Attributes">
-
-=item $obj-E<gt>B<readConfig>($filename)
-
-=item Log::Report::Template::Textdomain-E<gt>B<readConfig>($filename)
-
-Inherited, see L<Log::Report::Domain/"Attributes">
-
 =item $obj-E<gt>B<templater>()
 
 The L<Log::Report::Template|Log::Report::Template> object which is using this textdomain.
-
-=item $obj-E<gt>B<translator>()
-
-Inherited, see L<Log::Report::Domain/"Attributes">
 
 =back
 
 =head2 Translating
 
-Extends L<"Translating" in Log::Report::Domain|Log::Report::Domain/"Translating">.
- 
 =over 4
-
-=item $obj-E<gt>B<defaultContext>()
-
-Inherited, see L<Log::Report::Domain/"Translating">
-
-=item $obj-E<gt>B<interpolate>( $msgid, [$args] )
-
-Inherited, see L<Log::Report::Minimal::Domain/"Translating">
-
-=item $obj-E<gt>B<setContext>(STRING|HASH|ARRAY|PAIRS)
-
-Inherited, see L<Log::Report::Domain/"Translating">
-
-=item $obj-E<gt>B<translate>($message, $language)
-
-Inherited, see L<Log::Report::Domain/"Translating">
 
 =item $obj-E<gt>B<translateTo>($lang)
 
@@ -172,28 +114,54 @@ But in general, you can best use L<Log::Report::Template::translateTo()|Log::Rep
 This method returns a CODE which is able to handle a call for
 translation by Template Toolkit.
 
+=back
+
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Warning: Missing key '$key' in format '$format', in $use //template
+
 =encoding utf-8
+Cast by translationFunction()
 
-=item $obj-E<gt>B<updateContext>(STRING|HASH|ARRAY|PAIRS)
+=item Error: extension to domain '$name' already exists
 
-Inherited, see L<Log::Report::Domain/"Translating">
+Cast by upgrade()
+
+=item Error: message does not contain counting alternatives in '$msgid'
+
+Cast by translationFunction()
+
+=item Error: no counting positional for '$msgid'
+
+Cast by translationFunction()
+
+=item Error: no counting positional for '$msgid'
+
+Cast by translationFunction()
+
+=item Error: superfluous positional parameters for '$msgid'
+
+Cast by translationFunction()
+
+=item Error: superfluous positional parameters for '$msgid'
+
+Cast by translationFunction()
 
 =back
 
-=head1 DETAILS
-
-Extends L<"DETAILS" in Log::Report::Domain|Log::Report::Domain/"DETAILS">.
- 
 =head1 SEE ALSO
 
-This module is part of Log-Report-Template distribution version 1.02,
-built on July 29, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report-Template version 1.03,
+built on September 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2017-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2017-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

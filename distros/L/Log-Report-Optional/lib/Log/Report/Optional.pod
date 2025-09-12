@@ -7,13 +7,13 @@ Log::Report::Optional - pick Log::Report or ::Minimal
 =head1 INHERITANCE
 
  Log::Report::Optional
-   is a Exporter
+   is an Exporter
 
 =head1 SYNOPSIS
 
- # Use Log::Report when already loaded, otherwise Log::Report::Minimal
- package My::Package;
- use Log::Report::Optional 'my-domain';
+  # Use Log::Report when already loaded, otherwise Log::Report::Minimal
+  package My::Package;
+  use Log::Report::Optional 'my-domain';
 
 =head1 DESCRIPTION
 
@@ -41,7 +41,7 @@ simpelest possible way.
 
 =over 4
 
-=item Log::Report::Optional-E<gt>B<usedBy>()
+=item $class-E<gt>B<usedBy>()
 
 Returns the classes which loaded the optional module.
 
@@ -49,14 +49,15 @@ Returns the classes which loaded the optional module.
 
 =head1 SEE ALSO
 
-This module is part of Log-Report-Optional distribution version 1.07,
-built on January 15, 2021. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report-Optional version 1.08,
+built on September 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2013-2021 by [Mark Overmeer <mark@overmeer.net>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2013-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

@@ -18,7 +18,7 @@ use Carp;
 use Data::Tools;
 use Data::Tools::Socket;
 
-our $VERSION = '1.47';
+our $VERSION = '1.49';
 
 our @ISA    = qw( Exporter );
 our @EXPORT = qw(
@@ -58,6 +58,11 @@ my %PROTOCOL_TYPES = (
                          'require' => undef,
                          'pack'    => \&protocol_type_hash_pack, 
                          'unpack'  => \&protocol_type_hash_unpack,
+                         },
+                  'H' => {
+                         'require' => undef,
+                         'pack'    => \&protocol_type_hash_url_pack, 
+                         'unpack'  => \&protocol_type_hash_url_unpack,
                          },
                   );
 
@@ -219,6 +224,18 @@ sub protocol_type_hash_unpack
 {
   load_protocol( 'h' );
   return str2hash( shift );
+}
+
+sub protocol_type_hash_url_pack
+{
+  load_protocol( 'H' );
+  return hash2str_url( shift );
+}
+
+sub protocol_type_hash_url_unpack
+{
+  load_protocol( 'H' );
+  return str2hash_url( shift );
 }
 
 ##############################################################################

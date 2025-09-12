@@ -7,8 +7,8 @@ Log::Report::Translator::Context - handle translation contexts
 =head1 SYNOPSIS
 
   # usually, the context information is in a separate file
-  textdomain 'my-domain'
-    , config => $filename;
+  textdomain 'my-domain',
+    config => $filename;
 
 =head1 DESCRIPTION
 
@@ -22,23 +22,23 @@ For instance, two libraries used in the same application, or two
 componentent within a single library both want to used the same
 default text (which usually is very short)
 
-   char * t1 = pgettext('interface', 'None');
-   char * t2 = pgettext('selections', 'None');
+  char * t1 = pgettext('interface', 'None');
+  char * t2 = pgettext('selections', 'None');
 
 Some translation setups use the library name consequently as msgctxt.
 But, the name "context" is pretending much more power than the gettext
 libraries are capable of: it usually only behaves like a namespace.
 
-For L<Log::Report|Log::Report>, the power of "context" is extended with selecting
+For Log::Report, the power of "context" is extended with selecting
 between alternatives for the use of a msgid B<on the same spot>.
 
 For instance, the gender of the user of the website determines whether
 `he' or `she' needs to be used in the translation.  In this example,
 the gender is set as context keyword in the message:
 
-   my ($name, $sex) = ('Jack', 'male');
-   print __x"{name<gender} found his key", name => $name
-     , _context => "gender=$sex";
+  my ($name, $sex) = ('Jack', 'male');
+  print __x"{name<gender} found his key", name => $name,
+    _context => "gender=$sex";
 
 =head1 METHODS
 
@@ -46,7 +46,9 @@ the gender is set as context keyword in the message:
 
 =over 4
 
-=item Log::Report::Translator::Context-E<gt>B<new>(%options)
+=item $class-E<gt>B<new>(%options)
+
+Z<>
 
  -Option--Default
   rules   {}
@@ -76,8 +78,8 @@ Returns a HASH to the simplified context maps.
 =item $obj-E<gt>B<ctxtFor>( $message, $lang, [$context] )
 
 Returns a pair of the MSGID stripped from context markup, and the
-context evaluated into the msgctxt string.  The $message is a
-L<Log::Report::Message|Log::Report::Message> object.  The $context is the default context
+context evaluated into the msgctxt string.  The C<$message> is a
+Log::Report::Message object.  The C<$context> is the default context
 for a certain textdomain.
 
   my ($msgid, $msgctxt) = $context->ctxtFor($msg, $lang, $context);
@@ -85,14 +87,12 @@ for a certain textdomain.
 =item $obj-E<gt>B<expand>($msgid, $language, %options)
 
 Expand the context settings into all possible combinations which need
-translations in the PO file.  This may depend on the $language.
-The $msgid is used in error messages.
+translations in the PO file.  This may depend on the C<$language>.
+The C<$msgid> is used in error messages.
 
-=item $obj-E<gt>B<needDecode>($source, STRING|ARRAY|HASH|PAIRS)
+=item $any-E<gt>B<needDecode>($source, STRING|ARRAY|HASH|PAIRS)
 
-=item Log::Report::Translator::Context-E<gt>B<needDecode>($source, STRING|ARRAY|HASH|PAIRS)
-
-Converts the context settings passed with the MSGID, into a HASH which will
+Converts the context settings passed with the MSGID, into a C<HASH> which will
 be matched to the context providers.
 
 =back
@@ -108,8 +108,8 @@ For instance, two libraries used in the same application, or two
 componentent within a single library both want to used the same
 default text (which usually is very short)
 
-   char * t1 = pgettext('interface', 'None');
-   char * t2 = pgettext('selections', 'None');
+  char * t1 = pgettext('interface', 'None');
+  char * t2 = pgettext('selections', 'None');
 
 Some translation setups use the library name consequently as msgctxt.
 But, the name "context" is pretending much more power than the gettext
@@ -117,28 +117,28 @@ libraries are capable of: it usually only behaves like a namespace.
 
 =head2 Contexts in Log::Report
 
-For L<Log::Report|Log::Report>, the power of "context" is extended with selecting
+For Log::Report, the power of "context" is extended with selecting
 between alternatives for the use of a msgid B<on the same spot>.
 
 For instance, the gender of the user of the website determines whether
 `he' or `she' needs to be used in the translation.  In this example,
 the gender is set as context keyword in the message:
 
-   my ($name, $sex) = ('Jack', 'male');
-   print __x"{name<gender} found his key", name => $name
-     , _context => "gender=$sex";
+  my ($name, $sex) = ('Jack', 'male');
+  print __x"{name<gender} found his key", name => $name,
+    _context => "gender=$sex";
 
 This would also be possible in traditional gettext, although probably
 rarely used.  A complication is that the scripts to maintain the po
 tables are not too smart; do not understand complex code constructs.
 Probably this would beed needed:
 
-   if(sex==MALE)
-   {   printf pgettext('male', "%s found his key\n", name);
-   }
-   else
-   {   printf pgettext('female', "%s found her key\n", name);
-   }
+  if(sex==MALE)
+  {   printf pgettext('male', "%s found his key\n", name);
+  }
+  else
+  {   printf pgettext('female', "%s found her key\n", name);
+  }
 
 =head2 Using context_rules
 
@@ -171,14 +171,14 @@ For instance, the gender of the user of the website determines whether
 `he' or `she' needs to be used.  In this example, the gender is set as
 context keyword in the message:
 
-   $name = 'Jack';
-   print __x"{name} found her key", name => $name;
+  $name = 'Jack';
+  print __x"{name} found her key", name => $name;
 
 You may try to solve this via:
 
-   my ($name, $gender) = ('Jack', 'male');
-   print __x"{name} found {personal} key", name => $name
-     , personal => ($gender eq 'male' ? 'his' : 'her');    # No!
+  my ($name, $gender) = ('Jack', 'male');
+  print __x"{name} found {personal} key", name => $name,
+    personal => ($gender eq 'male' ? 'his' : 'her');    # No!
 
 This does not translate!  For one, you would need to translate C<his> and
 C<her> to the language as well.  But in some languages, the differences
@@ -186,24 +186,24 @@ between addressed genders have more impact on the whole sentence.
 
 So, Log::Report translations add extra syntax:
 
-   my ($name, $gender) = ('Jack', 'male');
-   print __x"{name<gender} found her key", name => $name
-     , _context => "gender=$gender";
+  my ($name, $gender) = ('Jack', 'male');
+  print __x"{name<gender} found her key", name => $name,
+    _context => "gender=$gender";
 
 The C<gender> marking tells the translation table builder (xgettext-perl)
 and the translation handler that there is a context active.
 
 Now, the English PO-file has
 
-   # gender alternatives 'male' and 'female'
+  # gender alternatives 'male' and 'female'
 
-   msgctxt "gender=male"
-   msgid  "{name} found his key"
-   msgstr "{name} found his key"
+  msgctxt "gender=male"
+  msgid  "{name} found his key"
+  msgstr "{name} found his key"
 
-   msgctxt "gender=female"
-   msgid   "{name} found his key"
-   msgstr  "{name} found her key"
+  msgctxt "gender=female"
+  msgid   "{name} found his key"
+  msgstr  "{name} found her key"
 
 To make this work, both the application and the C<xgettext-perl> script
 must share information to understand which genders are available.  See
@@ -211,16 +211,16 @@ the section on "Configuration" below.
 
 Another example:
 
-   print __x"greetings{<style}";
-   # style alternatives 'formal' and 'informal'
+  print __x"greetings{<style}";
+  # style alternatives 'formal' and 'informal'
 
-   msgctxt "style=formal"
-   msgid   "greetings"
-   msgstr  "Dear Sir/Madam,"
+  msgctxt "style=formal"
+  msgid   "greetings"
+  msgstr  "Dear Sir/Madam,"
 
-   msgctxt "style=informal"
-   msgid   "greetings"
-   msgstr  "Hey buddy,"
+  msgctxt "style=informal"
+  msgid   "greetings"
+  msgstr  "Hey buddy,"
 
 As can be seen, the '<style' marking may be added inside the '{}' of
 a filled-in parameter, or may appear on its own.  These markings are
@@ -241,12 +241,12 @@ a HASH:
   my @context = (qw/gender=male agegroup=adult married=yes/);
   _context => \@context;
 
-Probably the 
+Probably the
   my %context = (gender => 'male', agegroup => 'adult', married => 'yes');
   my %context = qw/gender male  agegroup adult  married yes/;
   _context => \%context;
 
-Standard gettext only allows a single keyword (=string) 
+Standard gettext only allows a single keyword (=string)
 C<Log::Report> permits you to set-up a context for a whole
 text-domain, which means that multiple context rules may be active at
 any moment.
@@ -259,17 +259,17 @@ the log messages may need to show that domain name.  Of course, you can
 collect (or pass on) the hostname when throwing the error... something
 like this:
 
-   # can I access $vhost easily?
-   error __x"For {host}, login failed for {user}"
-      , host => $vhost->name, user => $user;
+  # can I access $vhost easily?
+  error __x"For {host}, login failed for {user}",
+        host => $vhost->name, user => $user;
 
 Via contexts:
 
-   # when you know the vhost: (max once per request)
-   textdomain->setContext(host => $vhost->name);  # or updateContext
+  # when you know the vhost: (max once per request)
+  textdomain->setContext(host => $vhost->name);  # or updateContext
 
-   # until you reconfigure the context
-   error __x"For {_context.host}, login failed for {user}", user => $user;
+  # until you reconfigure the context
+  error __x"For {_context.host}, login failed for {user}", user => $user;
 
 The context values are always available for interpolation.
 
@@ -297,14 +297,14 @@ chosen.
 In the simplest form, the msgctxt field contains a single keyword
 (not containing a comma).
 
-   msgctxt "gender=male"
+  msgctxt "gender=male"
 
 But you can do more.  B<Be warned> that most (all?) existing tools
 which smartly edit PO-files do not understand these constructs: they
 see the msgctxt as dump string without meaning.
 
-   msgctxt "agegroup=baby,agegroup=grandparent" # baby OR grandparent
-   msgctxt "gender=male agegroup=adult"         # both male AND adult
+  msgctxt "agegroup=baby,agegroup=grandparent" # baby OR grandparent
+  msgctxt "gender=male agegroup=adult"         # both male AND adult
 
 So, a comma separated list of alternatives.  If any matches, then the
 rule is selected.
@@ -322,12 +322,12 @@ Therefore, we need a map-file.
 
 The context maps are included in a configuration file which is passed to
 xgettext-perl and to the program which uses contexts.
-See L<Log::Report::Domain::readConfig()|Log::Report::Domain/"Attributes">.
+See Log::Report::Domain subroutine readConfig.
 
 Example of such configuration file: (JSON syntax and Perl syntax)
 
-  === JSON ===                    ==== Perl ===
-  {                               {
+  === JSON ===                    ==== Perl ==   =
+ {{
      "context_rules" : {             context_rules => {
         "gender" : [                    gender => [
            "male",                         'male',
@@ -389,19 +389,46 @@ the third gender.
 If you are not interested for a certain tag, then put it on 'IGNORE'
 as default or for your language.
 
-         "default" : "IGNORE",           default => 'IGNORE'
-         "nl": "IGNORE"                  nl => 'IGNORE'
+  "default" : "IGNORE",           default => 'IGNORE'
+  "nl": "IGNORE"                  nl => 'IGNORE'
+
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Error: no context definition for `$tag' in `$msgid'
+
+Cast by ctxtFor()
+
+=item Warning: no value for tag `$tag' in the context
+
+Cast by ctxtFor()
+
+=item Error: tags value must have form `a=b', found `$this' in `$source'
+
+Cast by needDecode()
+
+=item Warning: unknown alternative `$alt' for tag `$tag' in context of `$msgid'
+
+Cast by ctxtFor()
+
+=item Error: unknown context tag '$tag' used in '$msgid'
+
+Cast by expand()
+
+=back
 
 =head1 SEE ALSO
 
-This module is part of Log-Report-Lexicon distribution version 1.13,
-built on May 06, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report-Lexicon version 1.14,
+built on September 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2007-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2007-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

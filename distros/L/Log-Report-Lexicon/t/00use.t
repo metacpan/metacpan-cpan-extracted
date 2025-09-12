@@ -11,6 +11,9 @@ my @show_versions =
  qw/PPI
     POSIX
     Test::Pod
+    Log::Report::Optional
+    Log::Report
+    String::Print
    /;
 
 warn "Perl $]\n";

@@ -29,11 +29,11 @@ Net::eBay - Perl Interface to XML based eBay API.
 
 =head1 VERSION
 
-Version 0.63
+Version 0.66
 
 =cut
 
-our $VERSION = '0.63';
+our $VERSION = '0.66';
 
 =head1 SYNOPSIS
 
@@ -260,8 +260,8 @@ sub new {
 
   $hash->{defaults} = {
                        API           => 2,
-                       # compatibility => 655,
-                       compatibility => 967,
+                       #compatibility => 967,
+                       compatibility => 1423,
                        timeout       => 50,
                        retries       => 2,
                       };
@@ -893,6 +893,7 @@ sub build_RESTful_URL {
     my ($base_url, $params_ref) = @_;
     
     # Create URI object from base
+
     my $uri = URI->new($base_url);
     
     # Append query parameters
@@ -922,7 +923,7 @@ sub RESTful_Query {
 
         return $data;
     } else {
-        print STDERR "API call failed: " . $res->status_line . "\n" . $res->decoded_content . "\n";
+        print STDERR "API call to '$base_url' failed: " . $res->status_line . "\n" . $res->decoded_content . "\n";
         return undef;
     }
 }

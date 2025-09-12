@@ -1,13 +1,20 @@
-# Copyrights 2007-2025 by [Mark Overmeer <markov@cpan.org>].
-#  For other contributors see ChangeLog.
-# See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.03.
-# This code is part of distribution Log-Report. Meta-POD processed with
-# OODoc into POD and HTML manual-pages.  See README.md
-# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
+# This code is part of Perl distribution Log-Report version 1.41.
+# The POD got stripped from this file by OODoc version 3.04.
+# For contributors see file ChangeLog.
+
+# This software is copyright (c) 2007-2025 by Mark Overmeer.
+
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+# SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
+
+#oodist: *** DO NOT USE THIS VERSION FOR PRODUCTION ***
+#oodist: This file contains OODoc-style documentation which will get stripped
+#oodist: during its release in the distribution.  You can use this file for
+#oodist: testing, however the code of this development version may be broken!
 
 package Log::Report::Domain;{
-our $VERSION = '1.40';
+our $VERSION = '1.41';
 }
 
 use base 'Log::Report::Minimal::Domain';
@@ -21,6 +28,7 @@ use Scalar::Util       qw/blessed/;
 
 use Log::Report::Translator;
 
+#--------------------
 
 sub init($)
 {	my ($self, $args) = @_;
@@ -29,13 +37,13 @@ sub init($)
 	$self;
 }
 
-#----------------
+#--------------------
 
-sub nativeLanguage() {shift->{LRD_native}}
-sub translator()     {shift->{LRD_transl}}
-sub contextRules()   {shift->{LRD_ctxt_rules}}
+sub nativeLanguage() { $_[0]->{LRD_native} }
+sub translator()     { $_[0]->{LRD_transl} }
+sub contextRules()   { $_[0]->{LRD_ctxt_rules} }
 
-#----------------
+
 
 sub configure(%)
 {	my ($self, %args) = @_;
@@ -82,7 +90,7 @@ sub configure(%)
 }
 
 sub _reportMissingKey($$)
-{   my ($self, $sp, $key, $args) = @_;
+{	my ($self, $sp, $key, $args) = @_;
 
 	warning __x"Missing key '{key}' in format '{format}', file {use}",
 		key => $key, format => $args->{_format}, use => $args->{_use};
@@ -90,6 +98,30 @@ sub _reportMissingKey($$)
 	undef;
 }
 
+
+
+sub readConfig($)
+{	my ($thing, $fn) = @_;
+	my $config;
+
+	if($fn =~ m/\.pl$/i)
+	{	$config = do $fn;
+	}
+	elsif($fn =~ m/\.json$/i)
+	{	eval "require JSON"; panic $@ if $@;
+		open my($fh), '<:encoding(utf8)', $fn
+			or fault __x"cannot open JSON file for context at {fn}", fn => $fn;
+		local $/;
+		$config = JSON->utf8->decode(<$fh>);
+	}
+	else
+	{	error __x"unsupported context file type for {fn}", fn => $fn;
+	}
+
+	$config;
+}
+
+#--------------------
 
 sub setContext(@)
 {	my $self = shift;
@@ -112,32 +144,8 @@ sub updateContext(@)
 }
 
 
-sub defaultContext() { shift->{LRD_ctxt_def} }
+sub defaultContext() { $_[0]->{LRD_ctxt_def} }
 
-
-sub readConfig($)
-{	my ($self, $fn) = @_;
-	my $config;
-
-	if($fn =~ m/\.pl$/i)
-	{	$config = do $fn;
-	}
-	elsif($fn =~ m/\.json$/i)
-	{	eval "require JSON"; panic $@ if $@;
-		open my($fh), '<:encoding(utf8)', $fn
-			or fault __x"cannot open JSON file for context at {fn}"
-			   , fn => $fn;
-		local $/;
-		$config = JSON->utf8->decode(<$fh>);
-	}
-	else
-	{	error __x"unsupported context file type for {fn}", fn => $fn;
-	}
-
-	$config;
-}
-
-#-------------------
 
 sub translate($$)
 {	my ($self, $msg, $lang) = @_;
@@ -169,3 +177,4 @@ sub translate($$)
 1;
 
 __END__
+#--------------------

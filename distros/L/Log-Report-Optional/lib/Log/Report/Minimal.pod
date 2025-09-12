@@ -7,12 +7,12 @@ Log::Report::Minimal - simulate Log::Report functions simple
 =head1 INHERITANCE
 
  Log::Report::Minimal
-   is a Exporter
+   is an Exporter
 
 =head1 SYNOPSIS
 
- # See Log::Report, most functions get "hollow" behavior
- use Log::Report::Optional mode => 'DEBUG';
+  # See Log::Report, most functions get "hollow" behavior
+  use Log::Report::Optional mode => 'DEBUG';
 
 =head1 DESCRIPTION
 
@@ -28,6 +28,8 @@ full-blown feature set.
 
 =item B<textdomain>( <[$name],$config>|<$name, 'DELETE'|'EXISTS'>|$domain )
 
+Z<>
+
 =back
 
 =head2 Report Production and Configuration
@@ -38,9 +40,9 @@ full-blown feature set.
 
 Not supported.
 
-=item B<report>( [$options], $reason, $message|<STRING,$params> )
+=item B<report>( [\%options], $reason, $message|<STRING,$params> )
 
-Be warned that %options is a HASH here.
+Be warned that C<%options> is a HASH here.
 
  -Option  --Default
   errno     $! or 1
@@ -56,6 +58,8 @@ Be warned that %options is a HASH here.
 
 =item B<try>(CODE, %options)
 
+Z<>
+
 =back
 
 =head2 Abbreviations for report()
@@ -64,25 +68,47 @@ Be warned that %options is a HASH here.
 
 =item B<alert>($message)
 
+Z<>
+
 =item B<assert>($message)
+
+Z<>
 
 =item B<error>($message)
 
+Z<>
+
 =item B<failure>($message)
+
+Z<>
 
 =item B<fault>($message)
 
+Z<>
+
 =item B<info>($message)
+
+Z<>
 
 =item B<mistake>($message)
 
+Z<>
+
 =item B<notice>($message)
+
+Z<>
 
 =item B<panic>($message)
 
+Z<>
+
 =item B<trace>($message)
 
+Z<>
+
 =item B<warning>($message)
+
+Z<>
 
 =back
 
@@ -94,19 +120,35 @@ No translations, no L<Log::Report::Message> objects returned.
 
 =item B<N__>($msgid)
 
+Z<>
+
 =item B<N__n>($single_msgid, $plural_msgid)
+
+Z<>
 
 =item B<N__w>(STRING)
 
+Z<>
+
 =item B<__>($msgid)
+
+Z<>
 
 =item B<__n>($msgid, $plural_msgid, $count, PAIRS)
 
+Z<>
+
 =item B<__nx>($msgid, $plural_msgid, $count, PAIRS)
+
+Z<>
 
 =item B<__x>($msgid, PAIRS)
 
+Z<>
+
 =item B<__xn>($single_msgid, $plural_msgid, $count, PAIRS)
+
+Z<>
 
 =back
 
@@ -120,16 +162,39 @@ See Log::Report subroutine import.
 
 =back
 
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Error: even length parameter list for __x at $where
+
+Cast by __x()
+
+=item Error: odd length parameter list with '$msg'
+
+Cast by report()
+
+=item Error: syntax flag must be either SHORT or REPORT, not `$flag'
+
+Cast by import()
+
+=item Error: token '$token' not recognized as reason
+
+Cast by report()
+
+=back
+
 =head1 SEE ALSO
 
-This module is part of Log-Report-Optional distribution version 1.07,
-built on January 15, 2021. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report-Optional version 1.08,
+built on September 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2013-2021 by [Mark Overmeer <mark@overmeer.net>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2013-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

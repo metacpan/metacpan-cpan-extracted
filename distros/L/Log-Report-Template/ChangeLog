@@ -6,6 +6,13 @@ Mark Overmeer.
 Simplify when this becomes available in the leading Dancer2 version:
 	https://github.com/PerlDancer/Dancer2/pull/1723
 
+version 1.03: Mon  8 Sep 15:54:42 CEST 2025
+
+	Improvements:
+	- normalize blanks for filtered text blocks.
+	  requested by [Andy Beverley]
+	- convert to OODoc 3.03
+
 version 1.02: Tue 29 Jul 09:55:57 CEST 2025
 
 	Changes:

@@ -14,8 +14,7 @@ Log::Report::Lexicon::Table - generic interface to translation tables
 =head1 SYNOPSIS
 
   # use one of the extensions, for instance:
-  my $pot = Log::Report::Lexicon::POT
-     ->read('po/nl.po', charset => 'utf-8')
+  my $pot = Log::Report::Lexicon::POT->read('po/nl.po', charset => 'utf-8')
          or panic;
 
 =head1 DESCRIPTION
@@ -49,7 +48,9 @@ super efficient.
 
 =over 4
 
-=item Log::Report::Lexicon::Table-E<gt>B<new>(%options)
+=item $class-E<gt>B<new>(%options)
+
+Z<>
 
 =back
 
@@ -63,12 +64,12 @@ super efficient.
 
 =item $obj-E<gt>B<msgid>( STRING, [$msgctxt] )
 
-Lookup the L<Log::Report::Lexicon::PO|Log::Report::Lexicon::PO> with the STRING.
+Lookup the L<Log::Report::Lexicon::PO|Log::Report::Lexicon::PO> with the C<STRING>.
 Returns C<undef> when not defined.
 
 =item $obj-E<gt>B<msgstr>( $msgid, [$count, $msgctxt] )
 
-Returns the translated string for $msgid.  When not specified, $count is 1.
+Returns the translated string for C<$msgid>.  When not specified, C<$count> is 1.
 
 =back
 
@@ -78,13 +79,13 @@ Returns the translated string for $msgid.  When not specified, $count is 1.
 
 =item $obj-E<gt>B<add>($po)
 
-Add the information from a $po into this POT.  If the msgid of the $po
+Add the information from a C<$po> into this POT.  If the msgid of the C<$po>
 is already known, that is an error.
 
 =item $obj-E<gt>B<header>($field)
 
 The translation of a blank MSGID is used to store a MIME header, which
-contains some meta-data.  The $field value is looked-up (case-insensitive)
+contains some meta-data.  The C<$field> value is looked-up (case-insensitive)
 and returned.
 
 =item $obj-E<gt>B<nrPlurals>()
@@ -93,7 +94,7 @@ Returns the number of plurals, when not known then '2'.
 
 =item $obj-E<gt>B<pluralIndex>($count)
 
-Returns the msgstr index used to translate a value of $count.
+Returns the msgstr index used to translate a value of C<$count>.
 
 =item $obj-E<gt>B<setupPluralAlgorithm>()
 
@@ -103,7 +104,7 @@ C<Plural-Forms> header field.  [1.09] The header field is not required
 when not used.
 
 A full list of plural forms per language can be found at
-F<http://docs.translatehouse.org/projects/localization-guide/en/latest/l10n/pluralforms.html>
+L<https://docs.translatehouse.org/projects/localization-guide/en/latest/l10n/pluralforms.html>
 
 =item $obj-E<gt>B<translations>( [$active] )
 
@@ -117,20 +118,31 @@ references are returned.
 
 =over 4
 
+=item Error: invalid plural-form algorithm '$alg'
+
+Cast by setupPluralAlgorithm()
+
 =item Error: only acceptable parameter is 'ACTIVE'
+
+Cast by translations()
+
+=item Error: there is no Plural-Forms field in the header, but needed
+
+Cast by pluralIndex()
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Log-Report-Lexicon distribution version 1.13,
-built on May 06, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report-Lexicon version 1.14,
+built on September 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2007-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2007-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

@@ -17,7 +17,9 @@ records are kept in a POT file, implemented in L<Log::Report::Lexicon::POT|Log::
 
 =over 4
 
-=item Log::Report::Lexicon::PO-E<gt>B<new>(%options)
+=item $class-E<gt>B<new>(%options)
+
+Z<>
 
  -Option      --Default
   automatic     ""
@@ -96,43 +98,43 @@ Parse a "flags" line.
 
 =item $obj-E<gt>B<addReferences>(STRING|LIST|ARRAY)
 
-The STRING is a blank separated list of LOCATIONS.  The LIST and
-ARRAY contain separate LOCATIONs.  A LOCATION is of the form
+The C<STRING> is a blank separated list of LOCATIONS.  The C<LIST> and
+C<ARRAY> contain separate LOCATIONs.  A LOCATION is of the form
 C<filename:linenumber>.  Returns the internal HASH with references.
 
 =item $obj-E<gt>B<automatic>( [LIST|ARRAY|STRING] )
 
-Returns a STRING which contains the cleaned paragraph of automatically
+Returns a C<STRING> which contains the cleaned paragraph of automatically
 added comments.  If an argument is specified, it will replace the current
 comment.
 
 =item $obj-E<gt>B<comment>( [LIST|ARRAY|STRING] )
 
-Returns a STRING which contains the cleaned paragraph of translator's
+Returns a C<STRING> which contains the cleaned paragraph of translator's
 comment.  If an argument is specified, it will replace the current
 comment.
 
 =item $obj-E<gt>B<format>( $language | <PAIRS|ARRAY|HASH> )
 
-When one $language is specified, it looks whether a C<$language-format> or
-C<no-$language-format> is present in the line of FLAGS.  This will return
-C<1> (true) in the first case, C<0> (false) in the second case.  It will
-return C<undef> (also false) in case that both are not present.
+When one C<$language> is specified, it looks whether a "language-format" or
+"no-language-format" is present in the line of FLAGS.  This will return
+C<1> (C<true>) in the first case, C<0> (C<false>) in the second case.  It will
+return C<undef> (also C<false>) in case that both are not present.
 
-You can also specify PAIRS: the key is a language name, and the
+You can also specify C<PAIRS>: the key is a language name, and the
 value is either C<0>, C<1>, or C<undef>.
 
 example: use of format()
 
- # getters
- if($po->format('c')) ...
- unless($po->format('perl-brace')) ...
- if(defined $po->format('java')) ...
+  # getters
+  if($po->format('c')) ...
+  unless($po->format('perl-brace')) ...
+  if(defined $po->format('java')) ...
 
- # setters
- $po->format(java => 1);       # results in 'java-format'
- $po->format(java => 0);       # results in 'no-java-format'
- $po->format(java => undef);   # results in ''
+  # setters
+  $po->format(java => 1);       # results in 'java-format'
+  $po->format(java => 0);       # results in 'no-java-format'
+  $po->format(java => undef);   # results in ''
 
 =item $obj-E<gt>B<fuzzy>( [BOOLEAN] )
 
@@ -144,7 +146,7 @@ Returns whether the translation has any references, or is the header.
 
 =item $obj-E<gt>B<keepReferencesTo>($table)
 
-Remove all references which are not found as key in the hash $table.
+Remove all references which are not found as key in the hash C<$table>.
 Returns the number of references left.
 
 =item $obj-E<gt>B<msgctxt>()
@@ -157,8 +159,8 @@ Returns the actual msgid, which cannot be C<undef>.
 
 =item $obj-E<gt>B<msgstr>( [$index, [STRING]] )
 
-With a STRING, a new translation will be set.  Without STRING, a
-lookup will take place.  When no plural is defined, the $index is
+With a C<STRING>, a new translation will be set.  Without C<STRING>, a
+lookup will take place.  When no plural is defined, the C<$index> is
 ignored.
 
 =item $obj-E<gt>B<plural>( [STRING] )
@@ -169,11 +171,11 @@ Returns the actual msgid_plural, which can be C<undef>.
 
 Returns an unsorted list of LOCATIONS.  When options are specified,
 then those will be used to replace all currently defined references.
-Returns the unsorted LIST of references.
+Returns the unsorted C<LIST> of references.
 
 =item $obj-E<gt>B<removeReferencesTo>($filename)
 
-Remove all the references to the indicate $filename from the list.  Returns
+Remove all the references to the indicate C<$filename> from the list.  Returns
 the number of refs left.
 
 =back
@@ -182,10 +184,10 @@ the number of refs left.
 
 =over 4
 
-=item Log::Report::Lexicon::PO-E<gt>B<fromText>( STRING, [$where] )
+=item $class-E<gt>B<fromText>( STRING, [$where] )
 
-Parse the STRING into a new PO object.  The $where string should explain
-the location of the STRING, to be used in error messages.
+Parse the C<STRING> into a new PO object.  The C<$where> string should explain
+the location of the C<STRING>, to be used in error messages.
 
 =item $obj-E<gt>B<toString>(%options)
 
@@ -210,16 +212,59 @@ behavior is attempted.
 
 =back
 
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Warning: do not understand command '$cmd' at $where
+
+Cast by fromText()
+
+=item Warning: do not understand line at $where:\n  $line
+
+Cast by fromText()
+
+=item Error: no msgid defined for PO
+
+Cast by new()
+
+=item Warning: no msgid in block $where
+
+Cast by fromText()
+
+=item Warning: no plurals for '$msgid'
+
+Cast by toString()
+
+=item Warning: quoted line is not a continuation at $where
+
+Cast by fromText()
+
+=item Warning: too many plurals for '$msgid'
+
+Cast by toString()
+
+=item Warning: unknown comment type '$cmd' at $where
+
+Cast by fromText()
+
+=item Warning: unknown flag $flag ignored
+
+Cast by addFlags()
+
+=back
+
 =head1 SEE ALSO
 
-This module is part of Log-Report-Lexicon distribution version 1.13,
-built on May 06, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report-Lexicon version 1.14,
+built on September 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2007-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2007-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

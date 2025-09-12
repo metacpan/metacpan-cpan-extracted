@@ -3,6 +3,13 @@
 Unless noted otherwise, these changes where initiated and applied by
 Mark Overmeer.
 
+version 1.08: Mon  8 Sep 14:39:55 CEST 2025
+
+	Improvements:
+	- better warning on translation domain conflict.
+	- add .gitignore
+	- convert to OODoc 3.03
+
 version 1.07: Fri 15 Jan 09:57:35 CET 2021
 
 	Improvements:

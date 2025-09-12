@@ -1,13 +1,15 @@
 ---
-abstract: 'Log::Report in the lightest form'
+abstract: 'Log::Report in its lightest form'
 author:
   - 'Mark Overmeer <mark@overmeer.net>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Test::More: '1'
+  Test::Pod: '1'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,7 +24,26 @@ requires:
   Test::More: '0.86'
 resources:
   homepage: http://perl.overmeer.net/CPAN/
-  license: http://dev.perl.org/licenses/
   repository: https://github.com/markov2/perl5-Log-Report-Optional.git
-version: '1.07'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.011'
+version: '1.08'
+x_oodist:
+  email: markov@cpan.org
+  first_year: 2013
+  generate:
+    -
+      format: pod3
+      podtail: ~
+  include: []
+  oodoc_version: 3.04
+  parser:
+    pmhead: ~
+    skip_links: []
+    syntax: markov
+  raw:
+    publish: ../public_html/log-report-optional/raw
+  release:
+    publish: ../public_html/log-report-optional/source
+  tests: {}
+  use:
+    - ../String-Print
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

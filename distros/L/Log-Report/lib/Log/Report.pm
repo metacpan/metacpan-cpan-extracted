@@ -1,13 +1,20 @@
-# Copyrights 2007-2025 by [Mark Overmeer <markov@cpan.org>].
-#  For other contributors see ChangeLog.
-# See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.03.
-# This code is part of distribution Log-Report. Meta-POD processed with
-# OODoc into POD and HTML manual-pages.  See README.md
-# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
+# This code is part of Perl distribution Log-Report version 1.41.
+# The POD got stripped from this file by OODoc version 3.04.
+# For contributors see file ChangeLog.
+
+# This software is copyright (c) 2007-2025 by Mark Overmeer.
+
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+# SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
+
+#oodist: *** DO NOT USE THIS VERSION FOR PRODUCTION ***
+#oodist: This file contains OODoc-style documentation which will get stripped
+#oodist: during its release in the distribution.  You can use this file for
+#oodist: testing, however the code of this development version may be broken!
 
 package Log::Report;{
-our $VERSION = '1.40';
+our $VERSION = '1.41';
 }
 
 use base 'Exporter';
@@ -58,6 +65,7 @@ textdomain 'log-report';
 
 my $default_dispatcher = dispatcher PERL => 'default', accept => 'NOTICE-';
 
+#--------------------
 
 sub report($@)
 {	my $opts = ref $_[0] eq 'HASH' ? +{ %{ (shift) } } : {};
@@ -90,10 +98,10 @@ sub report($@)
 	{	# explicit destination, still disp may not need it.
 		if(ref $to eq 'ARRAY')
 		{	my %disp = map +($_->name => $_), @disp;
-			@disp	= grep defined, @disp{@$to};
+			@disp	 = grep defined, @disp{@$to};
 		}
 		else
-		{	@disp	= grep $_->name eq $to, @disp;
+		{	@disp	 = grep $_->name eq $to, @disp;
 		}
 		push @disp, $try if defined $try;
 
@@ -111,7 +119,7 @@ sub report($@)
 	if(!blessed $message)
 	{	# untranslated message into object
 		@_%2 and error __x"odd length parameter list with '{msg}'", msg => $message;
-		$message  = $lrm->new(_prepend => $message, @_);
+		$message   = $lrm->new(_prepend => $message, @_);
 	}
 	elsif($message->isa('Log::Report::Exception'))
 	{	$exception = $message;
@@ -128,7 +136,7 @@ sub report($@)
 		$message = $lrm->new(_prepend => $text, @_);
 	}
 
-	$message->to(undef) if $to;  # overrule destination of message
+	$message->to($to) if $to;  # overrule destination of message
 	if(my $disp_name = $message->to)
 	{	@disp = grep $_->name eq $disp_name, @disp;
 		push @disp, $try if defined $try && $disp_name ne 'try';
@@ -161,8 +169,7 @@ sub report($@)
 		(defined($^S) ? $^S : 1) or exit($opts->{errno} || 0);
 
 		$! = $opts->{errno} || 0;
-		$@ = $exception || Log::Report::Exception->new(report_opts => $opts
-		  , reason => $reason, message => $message);
+		$@ = $exception || Log::Report::Exception->new(report_opts => $opts, reason => $reason, message => $message);
 		die;   # $@->PROPAGATE() will be called, some eval will catch this
 	}
 
@@ -170,11 +177,8 @@ sub report($@)
 }
 
 
-my %disp_actions = map +($_ => 1), qw/
-  close find list disable enable mode needs filter active-try do-not-reopen
-  /;
-
-my $reopen_disp = 1;
+my %disp_actions = map +($_ => 1), qw/close find list disable enable mode needs filter active-try do-not-reopen/;
+my $reopen_disp  = 1;
 
 sub dispatcher($@)
 {	if(! $disp_actions{$_[0]})
@@ -182,12 +186,11 @@ sub dispatcher($@)
 
 		# old dispatcher with same name will be closed in DESTROY
 		my $disps = $reporter->{dispatchers};
- 
+
 		if(!$reopen_disp)
 		{	my $has = first {$_->name eq $name} @$disps;
 			if(defined $has && $has ne $default_dispatcher)
-			{	my $default = $name eq 'default'
-				   ? ' (refreshing configuration instead)' : '';
+			{	my $default = $name eq 'default' ? ' (refreshing configuration instead)' : '';
 				trace "not reopening $name$default";
 				return $has;
 			}
@@ -196,8 +199,7 @@ sub dispatcher($@)
 		my @disps = grep $_->name ne $name, @$disps;
 		trace "reopening dispatcher $name" if @disps != @$disps;
 
-		my $disp = Log::Report::Dispatcher
-		   ->new($type, $name, mode => $default_mode, @_);
+		my $disp = Log::Report::Dispatcher ->new($type, $name, mode => $default_mode, @_);
 
 		push @disps, $disp if $disp;
 		$reporter->{dispatchers} = \@disps;
@@ -208,23 +210,22 @@ sub dispatcher($@)
 
 	my $command = shift;
 	if($command eq 'list')
-	{	mistake __"the 'list' sub-command doesn't expect additional parameters"
-		   if @_;
+	{	@_ and mistake __"the 'list' sub-command doesn't expect additional parameters";
 		my @disp = @{$reporter->{dispatchers}};
 		push @disp, $nested_tries[-1] if @nested_tries;
 		return @disp;
 	}
 	if($command eq 'needs')
 	{	my $reason = shift || 'undef';
-		error __"the 'needs' sub-command parameter '{reason}' is not a reason"
-			unless is_reason $reason;
+		is_reason $reason
+			or error __x"the 'needs' sub-command parameter '{need}' is not a reason", need => $reason;
 		my $disp = $reporter->{needs}{$reason};
 		return $disp ? @$disp : ();
 	}
 	if($command eq 'filter')
 	{	my $code = shift;
-		error __"the 'filter' sub-command needs a CODE reference"
-			unless ref $code eq 'CODE';
+		ref $code eq 'CODE'
+			or error __"the 'filter' sub-command needs a CODE reference";
 		my %names = map +($_ => 1), @_;
 		push @{$reporter->{filters}}, [ $code, \%names ];
 		return ();
@@ -240,7 +241,7 @@ sub dispatcher($@)
 	my $mode	 = $command eq 'mode' ? shift : undef;
 
 	my $all_disp = @_==1 && $_[0] eq 'ALL';
-	my $disps	= $reporter->{dispatchers};
+	my $disps    = $reporter->{dispatchers};
 	my @disps;
 	if($all_disp) { @disps = @$disps }
 	else
@@ -261,7 +262,7 @@ sub dispatcher($@)
 	elsif($command eq 'disable') { $_->_disabled(1) for @disps }
 	elsif($command eq 'mode')
 	{	Log::Report::Dispatcher->defaultMode($mode) if $all_disp;
-		 $_->_set_mode($mode) for @disps;
+		$_->_set_mode($mode) for @disps;
 	}
 
 	# find does require reinventarization
@@ -289,9 +290,8 @@ sub _whats_needed()
 sub try(&@)
 {	my $code = shift;
 
-	@_ % 2
-	  and report {location => [caller 0]}, PANIC =>
-		  __x"odd length parameter list for try(): forgot the terminating ';'?";
+	@_ % 2 and report +{ location => [caller 0] },
+		PANIC => __x"odd length parameter list for try(): forgot the terminating ';'?";
 
 	unshift @_, mode => 'DEBUG'
 		if $reporter->{needs}{TRACE};
@@ -331,7 +331,7 @@ sub try(&@)
 	wantarray ? @ret : $ret;
 }
 
-#------------
+#--------------------
 
 sub trace(@)   {report TRACE   => @_}
 sub assert(@)  {report ASSERT  => @_}
@@ -345,13 +345,14 @@ sub alert(@)   {report ALERT   => @_}
 sub failure(@) {report FAILURE => @_}
 sub panic(@)   {report PANIC   => @_}
 
-#-------------
+#--------------------
 
 
 sub __($)
 {	my ($cpkg, $fn, $linenr) = caller;
 	$lrm->new(_msgid  => shift, _domain => pkg2domain($cpkg), _use => "$fn line $linenr");
-} 
+}
+
 
 
 # label "msgid" added before first argument
@@ -361,7 +362,7 @@ sub __x($@)
 
 	my $msgid = shift;
 	$lrm->new(_msgid => $msgid, _expand => 1, _domain => pkg2domain($cpkg), _use => "$fn line $linenr", @_);
-} 
+}
 
 
 sub __n($$$@)
@@ -397,7 +398,7 @@ sub N__n($$) {@_}
 sub N__w(@) {split " ", $_[0]}
 
 
-#-------------
+#--------------------
 
 sub __p($$) { __($_[0])->_msgctxt($_[1]) }
 sub __px($$@)
@@ -415,7 +416,7 @@ sub __npx($$$$@)
 	__nx($msgid, $msgid, $plural, $count, @_)->_msgctxt($ctxt);
 }
 
-#-------------
+#--------------------
 
 sub import(@)
 {	my $class = shift;
@@ -455,15 +456,13 @@ sub import(@)
 		{	push @export, @reason_functions
 		}
 		elsif($syntax ne 'REPORT' && $syntax ne 'LONG')
-		{	error __x"syntax flag must be either SHORT or REPORT, not `{flag}' in {fn} line {line}",
-				flag => $syntax, fn => $fn, line => $linenr;
+		{	error __x"syntax flag must be either SHORT or REPORT, not `{flag}' in {fn} line {line}", flag => $syntax, fn => $fn, line => $linenr;
 		}
 	}
 
 	if(my $msg_class = delete $opts{message_class})
 	{	$msg_class->isa($lrm)
-			or error __x"message_class {class} does not extend {base}"
-				 , base => $lrm, class => $msg_class;
+			or error __x"message_class {class} does not extend {base}", base => $lrm, class => $msg_class;
 		$lrm = $msg_class;
 	}
 
@@ -471,14 +470,14 @@ sub import(@)
 
 	### Log::Report::Domain configuration
 
-    if(defined $textdomain)
-    {   pkg2domain $pkg, $textdomain, $fn, $linenr;
-        my $domain = textdomain $textdomain;
+	if(defined $textdomain)
+	{	pkg2domain $pkg, $textdomain, $fn, $linenr;
+		my $domain = textdomain $textdomain;
 		$domain->configure(%opts, where => [$pkg, $fn, $linenr ]) if keys %opts;
-    }
-    elsif(keys %opts)
-    {   error __x"no domain for configuration options in {fn} line {line}", fn => $fn, line => $linenr;
-    }
+	}
+	elsif(keys %opts)
+	{	error __x"no domain for configuration options in {fn} line {line}", fn => $fn, line => $linenr;
+	}
 }
 
 # deprecated, since we have a ::Domain object in 1.00
@@ -522,7 +521,7 @@ sub textdomain(@)
 	$domain;
 }
 
-#--------------
+#--------------------
 
 sub needs(@)
 {	my $thing = shift;
@@ -530,6 +529,6 @@ sub needs(@)
 	first {$self->{needs}{$_}} @_;
 }
 
-#--------------
+#--------------------
 
 1;

@@ -22,7 +22,7 @@ use File::Glob;
 use Hash::Util qw( lock_hashref unlock_hashref lock_ref_keys );
 use Fcntl qw( :flock );
 
-our $VERSION = '1.47';
+our $VERSION = '1.49';
 
 our @ISA    = qw( Exporter );
 our @EXPORT = qw(
@@ -521,13 +521,24 @@ sub dir_path_ensure
 
 ##############################################################################
 
+my %SLASH_ESCAPES     = ( "\\" => '\\\\', "\n" => '\\n', "\r" => '\\r', "\t" => '\\t', "=" => '\\=', ":" => '\\:',  );
+my %SLASH_ESCAPES_REV = reverse %SLASH_ESCAPES;
+
+sub str_escape_ipl
+{
+  $_[0] =~ s/[\\\n\r\t=:]/$SLASH_ESCAPES{$&}/ge;
+}
+
+sub str_unescape_ipl
+{
+  $_[0] =~ s/\\[\\nrt=:]/$SLASH_ESCAPES_REV{$&}/ge;
+}
+
 sub str_escape
 {
   my $text = shift;
-  
-  $text =~ s/\\/\\\\/g;
-  $text =~ s/\r/\\r/g;
-  $text =~ s/\n/\\n/g;
+
+  str_escape_ipl( $text );
   return $text;
 }
 
@@ -535,10 +546,7 @@ sub str_unescape
 {
   my $text = shift;
 
-  $text =~ s/\\r/\r/g;
-  $text =~ s/\\n/\n/g;
-  $text =~ s/\\\\/\\/g;
-  
+  str_unescape_ipl( $text );
   return $text;
 }
 
@@ -767,9 +775,8 @@ sub hash2str
    my $str;
    while( my ( $k, $v ) = each %$hr )
     {
-    $k =~ s/=/\\=/g;
-    $v =~ s/\\/\\\\/g;
-    $v =~ s/\n/\\n/g;
+    str_escape_ipl( $k );
+    str_escape_ipl( $v );
     $str .= "$k=$v\n";
     }
 
@@ -784,9 +791,8 @@ sub str2hash
   for( split /\n/, $str )
     {
     my ( $k, $v ) = split /(?<!\\)=/, $_, 2;
-    $k =~ s/\\=/=/g;
-    $v =~ s/\\\\/\\/g;
-    $v =~ s/\\n/\n/g;
+    str_unescape_ipl( $k );
+    str_unescape_ipl( $v );
     $hr{ $k } = $v;
     }
 
@@ -801,9 +807,8 @@ sub hash2str_keys
   for my $k ( @_ )
     {
     my $v = $hr->{ $k };
-    $k =~ s/=/\\=/g;
-    $v =~ s/\\/\\\\/g;
-    $v =~ s/\n/\\n/g;
+    str_escape_ipl( $k );
+    str_escape_ipl( $v );
     $str .= "$k=$v\n";
     }
 

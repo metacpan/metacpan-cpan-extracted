@@ -2,29 +2,43 @@
 
 =head1 NAME
 
-Log::Report::Exception - a collected report
+Log::Report::Exception - a single generated event
 
 =head1 SYNOPSIS
 
- # created within a try block
- try { error "help!" };
- my $exception = $@->wasFatal;
- $exception->throw if $exception;
+  # created within a try block
+  try { error "help!" };
+  my $exception = $@->wasFatal;
+  $exception->throw if $exception;
 
- $@->reportFatal;  # combination of above two lines
+  $@->reportFatal;  # combination of above two lines
 
- my $message = $exception->message;   # the Log::Report::Message
+  my $message = $exception->message;   # the Log::Report::Message
 
- if($message->inClass('die')) ...
- if($exception->inClass('die')) ...   # same
- if($@->wasFatal(class => 'die')) ... # same
+  if($message->inClass('die')) ...
+  if($exception->inClass('die')) ...   # same
+  if($@->wasFatal(class => 'die')) ... # same
 
 =head1 DESCRIPTION
 
-In Log::Report, exceptions are not as extended as available in
+In L<Log::Report|Log::Report>, exceptions are not as extended as available in
 languages as Java: you do not create classes for them.  The only
 thing an exception object does, is capture some information about
 an (untranslated) report.
+
+=head1 OVERLOADED
+
+=over 4
+
+=item overload: B<""> stringification
+
+Produces "reason: message" via L<toString()|Log::Report::Exception/"Processing">.
+
+=item overload: B<bool> boolean condition
+
+Always returns C<true>: the exception object exists.
+
+=back
 
 =head1 METHODS
 
@@ -32,20 +46,23 @@ an (untranslated) report.
 
 =over 4
 
-=item Log::Report::Exception-E<gt>B<new>(%options)
+=item $class-E<gt>B<new>(%options)
+
+Create a new exception object, which is basically a C<message> which
+was produced for a C<reason>.
 
  -Option     --Default
   message      <required>
   reason       <required>
-  report_opts  {}
+  report_opts  +{ }
 
 =over 2
 
 =item message => Log::Report::Message
 
-=item reason => REASON
+=item reason => $reason
 
-=item report_opts => HASH
+=item report_opts => \%opts
 
 =back
 
@@ -68,7 +85,7 @@ example:
 
 =item $obj-E<gt>B<message>( [$message] )
 
-Change the $message of the exception, must be a L<Log::Report::Message|Log::Report::Message>
+Change the C<$message> of the exception, must be a L<Log::Report::Message|Log::Report::Message>
 object.
 
 When you use a C<Log::Report::Message> object, you will get a new one
@@ -77,13 +94,18 @@ you have to re-assign the result of the modification.
 
 example: 
 
- $e->message->concat('!!')); # will not work!
- $e->message($e->message->concat('!!'));
- $e->message(__x"some message {msg}", msg => $xyz);
+  $e->message->concat('!!')); # will not work!
+  $e->message($e->message->concat('!!'));
+
+  $e->message(__x"some message {xyz}", xyz => $xyz);
 
 =item $obj-E<gt>B<reason>( [$reason] )
 
+Z<>
+
 =item $obj-E<gt>B<report_opts>()
+
+Z<>
 
 =back
 
@@ -93,7 +115,7 @@ example:
 
 =item $obj-E<gt>B<inClass>($class|Regexp)
 
-Check whether any of the classes listed in the message match $class
+Check whether any of the classes listed in the message match C<$class>
 (string) or the Regexp.  This uses L<Log::Report::Message::inClass()|Log::Report::Message/"Processing">.
 
 =item $obj-E<gt>B<print>( [$fh] )
@@ -102,31 +124,33 @@ The default filehandle is STDOUT.
 
 example: 
 
- print $exception;  # via overloading
- $exception->print; # OO style
+  print $exception;  # via overloading
+  $exception->print; # OO style
 
 =item $obj-E<gt>B<throw>(%options)
 
-Insert the message contained in the exception into the currently
-defined dispatchers.  The C<throw> name is commonly known
-exception related terminology for C<report>.
+Insert the message contained in the exception into the currently defined
+dispatchers.  The C<throw> as method name is commonly known exception
+related terminology for C<report>.
 
-The %options overrule the captured options to L<Log::Report::report()|Log::Report/"Report Production and Configuration">.
+The C<%options> overrule the captured options to L<Log::Report::report()|Log::Report/"Report Production and Configuration">.
 This can be used to overrule a destination.  Also, the reason can
 be changed.
 
+Returned is the LIST of dispatchers which have accepted the forwarded
+exception.
+
 example: overrule defaults to report
 
- try { report {to => 'stderr'}, ERROR => 'oops!' };
- $@->reportFatal(to => 'syslog');
+  try { report {to => 'default'}, ERROR => 'oops!' };
+  $@->reportFatal(to => 'syslog');
 
- $exception->throw(to => 'syslog');
-
- $@->wasFatal->throw(reason => 'WARNING');
+  my ($syslog) = $exception->throw(to => 'syslog');
+  my @disps = $@->wasFatal->throw(reason => 'WARNING');
 
 =item $obj-E<gt>B<toHTML>( [$locale] )
 
-[1.11] as L<toString()|Log::Report::Exception/"Processing">, and escape HTML volatile characters.
+[1.11] Calls L<toString()|Log::Report::Exception/"Processing"> and then escapes HTML volatile characters.
 
 =item $obj-E<gt>B<toString>( [$locale] )
 
@@ -136,31 +160,22 @@ higher levels.
 
 example: printing exceptions
 
- print $_->toString for $@->exceptions;
- print $_ for $@->exceptions;   # via overloading
-
-=back
-
-=head1 OVERLOADING
-
-=over 4
-
-=item overload: B<stringification>
-
-Produces "reason: message".
+  print $_->toString for $@->exceptions;
+  print $_ for $@->exceptions;   # via overloading
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Log-Report distribution version 1.40,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report version 1.41,
+built on September 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2007-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2007-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

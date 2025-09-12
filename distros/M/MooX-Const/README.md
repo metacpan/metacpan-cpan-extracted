@@ -75,27 +75,12 @@ If omitted, `strict` is assumed to be true.
 
 # RECENT CHANGES
 
-Changes for version v0.7.0 (2025-08-09)
+Changes for version v0.7.1 (2025-09-11)
 
-- Incompatible Changes
-    - Minimum Perl version is v5.20.
-- Enhancements
-    - The isa option of attributes can be a code reference.
-    - Internal code improvements.
-- Documentation
-    - Clarified the documentation on the isa option of attributes.
-    - Fixed cut-and-paste error in CONTRIBUTING.md.
-    - Fixed errors in the README.
-    - Removed the INSTALL file.
-    - Removed redundant section.
+- Bugs
+    - Fixed warnings about using @\_ in signatured subroutines.
 - Tests
-    - Moved author tests into the xt directory.
     - Added more author tests.
-    - Added tests with MooseX::MungeHas.
-- Toolchain
-    - Improved Dist::Zilla configuration.
-    - Stop regenerating MANIFEST.SKIP.
-    - Add GitHub workflow to run tests.
 
 See the `Changes` file for more details.
 
@@ -171,8 +156,8 @@ then see `SECURITY.md` for instructions how to report security vulnerabilities.
 
 # SOURCE
 
-The development version is on github at [https://github.com/robrwo/MooX-Const](https://github.com/robrwo/MooX-Const)
-and may be cloned from [git://github.com/robrwo/MooX-Const.git](git://github.com/robrwo/MooX-Const.git)
+The development version is on github at ["robrwo/MooX-Const" in github.com](https://metacpan.org/pod/github.com#robrwo-MooX-Const)
+and may be cloned from ["robrwo/MooX-Const.git" in github.com](https://metacpan.org/pod/github.com#robrwo-MooX-Const.git)
 
 See `CONTRIBUTING.md` for more information.
 

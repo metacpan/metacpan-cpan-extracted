@@ -6,13 +6,13 @@ Log::Report::Minimal::Domain - administer one text-domain
 
 =head1 SYNOPSIS
 
- use Log::Report::Minimal::Domain;
- my $domain = Log::Report::Minimal::Domain->new(name => $name);
+  use Log::Report::Minimal::Domain;
+  my $domain = Log::Report::Minimal::Domain->new(name => $name);
 
- # normal usage
- use Log::Report::Optional;       # or Log::Report itself
- my $domain = textdomain $name;   # find config
- textdomain $name, %configure;    # set config, only once.
+  # normal usage
+  use Log::Report::Optional;       # or Log::Report itself
+  my $domain = textdomain $name;   # find config
+  textdomain $name, %configure;    # set config, only once.
 
 =head1 DESCRIPTION
 
@@ -24,7 +24,9 @@ Read L<Log::Report::Domain>.
 
 =over 4
 
-=item Log::Report::Minimal::Domain-E<gt>B<new>(%options)
+=item $class-E<gt>B<new>(%options)
+
+Z<>
 
  -Option--Default
   name    <required>
@@ -33,7 +35,18 @@ Read L<Log::Report::Domain>.
 
 =item name => STRING
 
+The name of the textdomain is used in its invocation, but also as (part of) the
+translation file names, hence please keep it simple and short.
+
 =back
+
+example: textdomain name choice
+
+A good choice is to use Perl's distribution name for the domain name.  For instance,
+the domain name for this module would be set this way:
+
+  use Log::Report 'log-report-optional';
+  use Log::Report 'log-report-opt';
 
 =back
 
@@ -42,6 +55,8 @@ Read L<Log::Report::Domain>.
 =over 4
 
 =item $obj-E<gt>B<configure>(%options)
+
+Z<>
 
  -Option--Default
   where   <required>
@@ -57,11 +72,15 @@ configure a domain on more than one location.
 
 =item $obj-E<gt>B<isConfigured>()
 
+Z<>
+
 =item $obj-E<gt>B<name>()
+
+Z<>
 
 =back
 
-=head2 Action
+=head2 Translating
 
 =over 4
 
@@ -73,16 +92,27 @@ instance.
 
 =back
 
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Error: illegal formatter `$name' at $fn line $line
+
+Cast by configure()
+
+=back
+
 =head1 SEE ALSO
 
-This module is part of Log-Report-Optional distribution version 1.07,
-built on January 15, 2021. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report-Optional version 1.08,
+built on September 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2013-2021 by [Mark Overmeer <mark@overmeer.net>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2013-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

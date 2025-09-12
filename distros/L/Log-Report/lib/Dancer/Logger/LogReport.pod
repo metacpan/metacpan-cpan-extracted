@@ -40,7 +40,7 @@ Dancer::Logger::LogReport - reroute Dancer logs into Log::Report
 =head1 DESCRIPTION
 
 The L<Log::Report|Log::Report> exception/translation framework defines a large
-number of logging back-ends.  The same log messages can be sent to 
+number of logging back-ends.  The same log messages can be sent to
 multiple destinations at the same time via flexible dispatchers.
 When you use this logger in your Dancer application, it will nicely
 integrate with non-Dancer modules which need logging.
@@ -53,7 +53,7 @@ program... its just a better name than 'debug'.
 
 You probably want to set a very simple C<logger_format>, because the
 dispatchers do already add some of the fields that the default
-C<simple> format adds.  For instance, to get the filename/line-number 
+C<simple> format adds.  For instance, to get the filename/line-number
 in messages depends on the dispatcher 'mode' (f.i. 'DEBUG').
 
 You also want to set the log level to C<debug>, because level filtering
@@ -61,14 +61,15 @@ is controlled per dispatcher (as well)
 
 =head1 SEE ALSO
 
-This module is part of Log-Report distribution version 1.40,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report version 1.41,
+built on September 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2007-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2007-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

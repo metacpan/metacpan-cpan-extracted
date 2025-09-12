@@ -1,7 +1,6 @@
 ChangeLog
 MANIFEST
 Makefile.PL
-README
 README.md
 lib/String/Print.pm
 lib/String/Print.pod
@@ -19,6 +18,7 @@ t/50m_format.t
 t/51m_bytes.t
 t/52m_dates.t
 t/53m_default.t
+t/54m_html.t
 xt/99pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

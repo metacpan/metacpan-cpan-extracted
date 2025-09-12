@@ -1,14 +1,21 @@
-# Copyrights 2013-2021 by [Mark Overmeer <mark@overmeer.net>].
-#  For other contributors see ChangeLog.
-# See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.02.
-# This code is part of distribution Log-Report-Optional. Meta-POD processed
-# with OODoc into POD and HTML manual-pages.  See README.md
-# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
+# This code is part of Perl distribution Log-Report-Optional version 1.08.
+# The POD got stripped from this file by OODoc version 3.04.
+# For contributors see file ChangeLog.
 
-package Log::Report::Minimal;
-use vars '$VERSION';
-$VERSION = '1.07';
+# This software is copyright (c) 2013-2025 by Mark Overmeer.
+
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+# SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
+
+#oodist: *** DO NOT USE THIS VERSION FOR PRODUCTION ***
+#oodist: This file contains OODoc-style documentation which will get stripped
+#oodist: during its release in the distribution.  You can use this file for
+#oodist: testing, however the code of this development version may be broken!
+
+package Log::Report::Minimal;{
+our $VERSION = '1.08';
+}
 
 use base 'Exporter';
 
@@ -24,8 +31,7 @@ use Log::Report::Minimal::Domain ();
 ### if you change anything here, you also have to change Log::Report::Minimal
 my @make_msg         = qw/__ __x __n __nx __xn N__ N__n N__w/;
 my @functions        = qw/report dispatcher try textdomain/;
-my @reason_functions = qw/trace assert info notice warning
-   mistake error fault alert failure panic/;
+my @reason_functions = qw/trace assert info notice warning mistake error fault alert failure panic/;
 
 our @EXPORT_OK = (@make_msg, @functions, @reason_functions);
 
@@ -37,8 +43,8 @@ sub N__($); sub N__n($$); sub N__w(@);
 
 my ($mode, %need);
 sub need($)
-{   $mode = shift;
-    %need = map +($_ => 1), expand_reasons mode_accepts $mode;
+{	$mode = shift;
+	%need = map +($_ => 1), expand_reasons mode_accepts $mode;
 }
 need 'NORMAL';
 
@@ -46,72 +52,69 @@ my %textdomains;
 textdomain 'default';
 
 sub _interpolate(@)
-{   my ($msgid, %args) = @_;
+{	my ($msgid, %args) = @_;
 
-    my $textdomain = $args{_domain};
-    unless($textdomain)
-    {   my ($pkg) = caller 1;
-        $textdomain = pkg2domain $pkg;
-    }
+	my $textdomain = $args{_domain};
+	unless($textdomain)
+	{	my ($pkg) = caller 1;
+		$textdomain = pkg2domain $pkg;
+	}
 
-    (textdomain $textdomain)->interpolate($msgid, \%args);
+	(textdomain $textdomain)->interpolate($msgid, \%args);
 }
 
-#
-# Some initiations
-#
-
+#--------------------
 
 sub textdomain($@)
-{   if(@_==1 && blessed $_[0])
-    {   my $domain = shift;
-        return $textdomains{$domain->name} = $domain;
-    }
+{	if(@_==1 && blessed $_[0])
+	{	my $domain = shift;
+		return $textdomains{$domain->name} = $domain;
+	}
 
-    if(@_==2)
-    {    # used for 'maintenance' and testing
-        return delete $textdomains{$_[0]} if $_[1] eq 'DELETE';
-        return $textdomains{$_[0]} if $_[1] eq 'EXISTS';
-    }
+	if(@_==2)
+	{	# used for 'maintenance' and testing
+		return delete $textdomains{$_[0]} if $_[1] eq 'DELETE';
+		return $textdomains{$_[0]} if $_[1] eq 'EXISTS';
+	}
 
-    my $name   = shift;
-    my $domain = $textdomains{$name}
-      ||= Log::Report::Minimal::Domain->new(name => $name);
+	my $name   = shift;
+	my $domain = $textdomains{$name} ||= Log::Report::Minimal::Domain->new(name => $name);
 
-    @_ ? $domain->configure(@_, where => [caller]) : $domain;
+	@_ ? $domain->configure(@_, where => [caller]) : $domain;
 }
 
+#--------------------
 
 # $^S = $EXCEPTIONS_BEING_CAUGHT; parse: undef, eval: 1, else 0
 
 sub _report($$@)
-{   my ($opts, $reason) = (shift, shift);
+{	my ($opts, $reason) = (shift, shift);
 
-    # return when no-one needs it: skip unused trace() fast!
-    my $stop = exists $opts->{is_fatal} ? $opts->{is_fatal} : is_fatal $reason;
-    $need{$reason} || $stop or return;
+	# return when no-one needs it: skip unused trace() fast!
+	my $stop = exists $opts->{is_fatal} ? $opts->{is_fatal} : is_fatal $reason;
+	$need{$reason} || $stop or return;
 
-    is_reason $reason
-        or error __x"token '{token}' not recognized as reason", token=>$reason;
+	is_reason $reason
+		or error __x"token '{token}' not recognized as reason", token=>$reason;
 
-    $opts->{errno} ||= $!+0 || $? || 1
-        if use_errno($reason) && !defined $opts->{errno};
+	$opts->{errno} ||= $!+0 || $? || 1
+		if use_errno($reason) && !defined $opts->{errno};
 
-    my $message = shift;
-    @_%2 and error __x"odd length parameter list with '{msg}'", msg => $message;
+	my $message = shift;
+	@_%2 and error __x"odd length parameter list with '{msg}'", msg => $message;
 
-    my $show    = lc($reason).': '.$message;
+	my $show    = lc($reason).': '.$message;
 
-    if($stop)
-    {   # ^S = EXCEPTIONS_BEING_CAUGHT, within eval or try
-        $! = $opts->{errno} || 0;
-        die "$show\n";    # call the die handler
-    }
-    else
-    {   warn "$show\n";   # call the warn handler
-    }
+	if($stop)
+	{	# ^S = EXCEPTIONS_BEING_CAUGHT, within eval or try
+		$! = $opts->{errno} || 0;
+		die "$show\n";    # call the die handler
+	}
+	else
+	{	warn "$show\n";   # call the warn handler
+	}
 
-    1;
+	1;
 }
 
 
@@ -119,20 +122,19 @@ sub dispatcher($@) { panic "no dispatchers available in ".__PACKAGE__ }
 
 
 sub try(&@)
-{   my $code = shift;
+{	my $code = shift;
 
-    @_ % 2 and report {}, PANIC =>
-        __x"odd length parameter list for try(): forgot the terminating ';'?";
+	@_ % 2 and report {}, PANIC => __x"odd length parameter list for try(): forgot the terminating ';'?";
 
-#XXX MO: only needs the fatal subset, exclude the warns/prints
-
-    eval { $code->() };
+	#XXX MO: only needs the fatal subset, exclude the warns/prints
+	eval { $code->() };
 }
 
+#--------------------
 
 sub report(@)
-{   my %opt = @_ && ref $_[0] eq 'HASH' ? %{ (shift) } : ();
-    _report \%opt, @_;
+{	my %opt = @_ && ref $_[0] eq 'HASH' ? %{ (shift) } : ();
+	_report \%opt, @_;
 }
 
 sub trace(@)   {_report {}, TRACE   => @_}
@@ -147,36 +149,33 @@ sub alert(@)   {_report {}, ALERT   => @_}
 sub failure(@) {_report {}, FAILURE => @_}
 sub panic(@)   {_report {}, PANIC   => @_}
 
+#--------------------
 
-sub __($) { shift }
+sub __($) { $_[0] }
+
 
 
 sub __x($@)
-{   @_%2 or error __x"even length parameter list for __x at {where}"
-      , where => join(' line ', (caller)[1,2]);
-
-    _interpolate @_, _expand => 1;
-} 
+{	@_%2 or error __x"even length parameter list for __x at {where}", where => join(' line ', (caller)[1,2]);
+	_interpolate @_, _expand => 1;
+}
 
 
 sub __n($$$@)
-{   my ($single, $plural, $count) = (shift, shift, shift);
-    _interpolate +($count==1 ? $single : $plural)
-      , _count => $count, @_;
+{	my ($single, $plural, $count) = (shift, shift, shift);
+	_interpolate +($count==1 ? $single : $plural), _count => $count, @_;
 }
 
 
 sub __nx($$$@)
-{   my ($single, $plural, $count) = (shift, shift, shift);
-    _interpolate +($count==1 ? $single : $plural)
-      , _count => $count, _expand => 1, @_;
+{	my ($single, $plural, $count) = (shift, shift, shift);
+	_interpolate +($count==1 ? $single : $plural), _count => $count, _expand => 1, @_;
 }
 
 
 sub __xn($$$@)   # repeated for prototype
-{   my ($single, $plural, $count) = (shift, shift, shift);
-    _interpolate +($count==1 ? $single : $plural)
-      , _count => $count , _expand => 1, @_;
+{	my ($single, $plural, $count) = (shift, shift, shift);
+	_interpolate +($count==1 ? $single : $plural), _count => $count , _expand => 1, @_;
 }
 
 
@@ -184,44 +183,43 @@ sub N__($)   { $_[0] }
 sub N__n($$) {@_}
 sub N__w(@)  {split " ", $_[0]}
 
-#------------------
+#--------------------
 
 sub import(@)
-{   my $class = shift;
+{	my $class = shift;
 
-    my $to_level   = @_ && $_[0] =~ m/^\+\d+$/ ? shift : 0;
-    my $textdomain = @_%2 ? shift : 'default';
-    my %opts       = @_;
-    my $syntax     = delete $opts{syntax} || 'SHORT';
+	my $to_level   = @_ && $_[0] =~ m/^\+\d+$/ ? shift : 0;
+	my $textdomain = @_%2 ? shift : 'default';
+	my %opts       = @_;
+	my $syntax     = delete $opts{syntax} || 'SHORT';
 
-    my ($pkg, $fn, $linenr) = caller $to_level;
-    pkg2domain $pkg, $textdomain, $fn, $linenr;
-    my $domain     = textdomain $textdomain;
+	my ($pkg, $fn, $linenr) = caller $to_level;
+	pkg2domain $pkg, $textdomain, $fn, $linenr;
+	my $domain     = textdomain $textdomain;
 
-    need delete $opts{mode}
-        if defined $opts{mode};
+	need delete $opts{mode}
+		if defined $opts{mode};
 
-    my @export;
-    if(my $in = $opts{import})
-    {   push @export, ref $in eq 'ARRAY' ? @$in : $in;
-    }
-    else
-    {   push @export, @functions, @make_msg;
+	my @export;
+	if(my $in = $opts{import})
+	{	push @export, ref $in eq 'ARRAY' ? @$in : $in;
+	}
+	else
+	{	push @export, @functions, @make_msg;
 
-        my $syntax = delete $opts{syntax} || 'SHORT';
-        if($syntax eq 'SHORT')
-        {   push @export, @reason_functions
-        }
-        elsif($syntax ne 'REPORT' && $syntax ne 'LONG')
-        {   error __x"syntax flag must be either SHORT or REPORT, not `{flag}'"
-              , flag => $syntax;
-        }
-    }
+		my $syntax = delete $opts{syntax} || 'SHORT';
+		if($syntax eq 'SHORT')
+		{	push @export, @reason_functions
+		}
+		elsif($syntax ne 'REPORT' && $syntax ne 'LONG')
+		{	error __x"syntax flag must be either SHORT or REPORT, not `{flag}'", flag => $syntax;
+		}
+	}
 
-    $class->export_to_level(1+$to_level, undef, @export);
+	$class->export_to_level(1+$to_level, undef, @export);
 
-    $domain->configure(%opts, where => [$pkg, $fn, $linenr ])
-        if %opts;
+	$domain->configure(%opts, where => [$pkg, $fn, $linenr ])
+		if %opts;
 }
 
 1;

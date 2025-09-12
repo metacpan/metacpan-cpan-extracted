@@ -14,5 +14,13 @@
    is here[% END %]<br>
 [% S("second table") %]
 
+[% FILTER loc %]
+
+   multi-line   cleanup
+	this mess, as HTML
+
+accepts
+[% END %]
+
 </body>
 </html>

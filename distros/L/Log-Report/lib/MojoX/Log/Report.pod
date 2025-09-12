@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-MojoX::Log::Report - divert log messages into Log::Report 
+MojoX::Log::Report - divert log messages into Log::Report
 
 =head1 INHERITANCE
 
@@ -17,8 +17,8 @@ MojoX::Log::Report - divert log messages into Log::Report
 
 =head1 DESCRIPTION
 
-[Included since Log::Report v1.00]
-Mojo likes to log messages directly into a file, by default.  Log::Report
+[Included since L<Log::Report|Log::Report> v1.00]
+Mojo likes to log messages directly into a file, by default.  L<Log::Report|Log::Report>
 constructs a L<Log::Report::Exception|Log::Report::Exception> object first.
 
 Be aware that this extension does catch the messages to be logged,
@@ -26,7 +26,7 @@ but that the dispatching of the error follows a different route now.
 For instance, you cannot use C<$ENV{MOJO_LOG_LEVEL}> to control the output
 level, but you need to use L<Log::Report::dispatcher()|Log::Report/"Report Production and Configuration"> action C<mode>.
 
-Mojo defines five "levels" of messages, which map onto Log::Report's
+Mojo defines five "levels" of messages, which map onto L<Log::Report|Log::Report>'s
 reasons this way:
 
   debug  TRACE
@@ -41,22 +41,23 @@ reasons this way:
 
 =over 4
 
-=item MojoX::Log::Report-E<gt>B<new>(%options)
+=item $class-E<gt>B<new>(%options)
 
-Inherited %options C<path> and C<level> are ignored.
+Inherited C<%options> C<path> and C<level> are ignored.
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Log-Report distribution version 1.40,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report version 1.41,
+built on September 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2007-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2007-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

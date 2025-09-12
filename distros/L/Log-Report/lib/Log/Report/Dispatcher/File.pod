@@ -11,33 +11,33 @@ Log::Report::Dispatcher::File - send messages to a file or file-handle
 
 =head1 SYNOPSIS
 
- dispatcher Log::Report::Dispatcher::File => 'stderr'
-   , to => \*STDERR, accept => 'NOTICE-';
+  dispatcher Log::Report::Dispatcher::File => 'stderr',
+    to => \*STDERR, accept => 'NOTICE-';
 
- # close a dispatcher
- dispatcher close => 'stderr';
+  # close a dispatcher
+  dispatcher close => 'stderr';
 
- # let dispatcher open and close the file
- dispatcher FILE => 'mylog', to => '/var/log/mylog'
-   , charset => 'utf-8';
- ...
- dispatcher close => 'mylog';  # will close file
+  # let dispatcher open and close the file
+  dispatcher FILE => 'mylog', to => '/var/log/mylog',
+    charset => 'utf-8';
+  ...
+  dispatcher close => 'mylog';  # will close file
 
- # open yourself, then also close yourself
- open OUT, ">:encoding('iso-8859-1')", '/var/log/mylog'
-     or fault "...";
- dispatcher FILE => 'mylog', to => \*OUT;
- ...
- dispatcher close => 'mylog';  
- close OUT;
+  # open yourself, then also close yourself
+  open OUT, ">:encoding('iso-8859-1')", '/var/log/mylog'
+      or fault "...";
+  dispatcher FILE => 'mylog', to => \*OUT;
+  ...
+  dispatcher close => 'mylog';
+  close OUT;
 
- # dispatch into a scalar
- my $output = '';
- open $outfile, '>', \$output;
- dispatcher FILE => 'into-scalar', to => \$outfile;
- ...
- dispatcher close => 'into-scalar';
- print $output;
+  # dispatch into a scalar
+  my $output = '';
+  open $outfile, '>', \$output;
+  dispatcher FILE => 'into-scalar', to => \$outfile;
+  ...
+  dispatcher close => 'into-scalar';
+  print $output;
 
 =head1 DESCRIPTION
 
@@ -47,27 +47,30 @@ This basic file logger accepts an file-handle or filename as destination.
 can write to the same file.
 
 Extends L<"DESCRIPTION" in Log::Report::Dispatcher|Log::Report::Dispatcher/"DESCRIPTION">.
- 
+
 =head1 METHODS
 
 Extends L<"METHODS" in Log::Report::Dispatcher|Log::Report::Dispatcher/"METHODS">.
- 
+
 =head2 Constructors
 
 Extends L<"Constructors" in Log::Report::Dispatcher|Log::Report::Dispatcher/"Constructors">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<close>()
 
 Only when initiated with a FILENAME, the file will be closed.  In any
 other case, nothing will be done.
+Improves base, see L<Log::Report::Dispatcher/"Constructors">
 
-=item Log::Report::Dispatcher::File-E<gt>B<new>($type, $name, %options)
+=item $class-E<gt>B<new>($type, $name, %options)
+
+Inherited, see L<Log::Report::Dispatcher/"Constructors">
 
  -Option       --Defined in             --Default
   accept         Log::Report::Dispatcher  depend on mode
-  charset        Log::Report::Dispatcher  LOCALE
+  charset        Log::Report::Dispatcher  LC_CTYPE
   format                                  <adds timestamp>
   format_reason  Log::Report::Dispatcher  'LOWERCASE'
   locale         Log::Report::Dispatcher  <system locale>
@@ -86,16 +89,17 @@ other case, nothing will be done.
 [1.00] process each printed line.  By default, this adds a timestamp,
 but you may want to add hostname, process number, or more.
 
-   format => sub { '['.localtime().'] '.$_[0] }
-   format => sub { shift }   # no timestamp
-   format => 'LONG'
+  format => sub { '['.localtime().'] '.$_[0] }
+  format => sub { shift }   # no timestamp
+  format => 'LONG'
 
 The first parameter to format is the string to print; it is already
 translated and trailed by a newline.  The second parameter is the
 text-domain (if known).
 
-[1.10] As third parameter, you get the $msg raw object as well (maybe
+[1.10] As third parameter, you get the message raw object as well (maybe
 you want to use the message context?)
+
 [1.19] After the three positional parameters, there may be a list
 of pairs providing additional facts about the exception.  It may
 contain C<location> information.
@@ -107,10 +111,10 @@ The "LONG" format is equivalent to:
 
 Use of context:
 
-   format => sub { my ($msgstr, $domain, $msg, %more) = @_;
-      my $host = $msg->context->{host};
-      "$host $msgstr";
-   }
+  format => sub { my ($msgstr, $domain, $msg, %more) = @_;
+     my $host = $msg->context->{host};
+     "$host $msgstr";
+  }
 
 =item format_reason => 'UPPERCASE'|'LOWERCASE'|'UCFIRST'|'IGNORE'|CODE
 
@@ -120,22 +124,22 @@ Use of context:
 
 =item replace => BOOLEAN
 
-Only used in combination with a FILENAME: throw away the old file
+Only used in combination with a C<to> filename: throw away the old file
 if it exists.  Probably you wish to append to existing information.
 
-Use the LOCALE setting by default, which is LC_CTYPE or LC_ALL or LANG
+Use the locale setting by default, which is LC_CTYPE or LC_ALL or LANG
 (in that order).  If these contain a character-set which Perl understands,
 then that is used, otherwise silently ignored.
 
-=item to => FILENAME|FILEHANDLE|OBJECT|CODE
+=item to => $file|$fh|OBJECT|CODE
 
-You can either specify a FILENAME, which is opened in append mode with
-autoflush on. Or pass any kind of FILE-HANDLE or some OBJECT which
+You can either specify a C<$file> by name, which is opened in append mode with
+autoflush on. Or pass any kind of file handle C<$fh>, or some OBJECT which
 implements a C<print()> method. You probably want to have autoflush
-enabled on your FILE-HANDLES.
+enabled on your file-handles.
 
 When cleaning-up the dispatcher, the file will only be closed in case
-of a FILENAME.
+of a named C<$file>.
 
 [1.10] When you pass a CODE, then for each log message the function is
 called with two arguments: this dispatcher object and the message object.
@@ -143,17 +147,17 @@ In some way (maybe via the message context) you have to determine the
 log filename.  This means that probably many log-files are open at the
 same time.
 
-   # configuration time
-   dispatcher FILE => 'logfile', to =>
-       sub { my ($disp, $msg) = @_; $msg->context->{logfile} };
+  # configuration time
+  dispatcher FILE => 'logfile', to =>
+     sub { my ($disp, $msg) = @_; $msg->context->{logfile} };
 
-   # whenever you want to change the logfile
-   textdomain->updateContext(logfile => '/var/log/app');
-   (textdomain 'mydomain')->setContext(logfile => '/var/log/app');
+  # whenever you want to change the logfile
+  textdomain->updateContext(logfile => '/var/log/app');
+  (textdomain 'mydomain')->setContext(logfile => '/var/log/app');
 
-   # or
-   error __x"help", _context => {logfile => '/dev/tty'};
-   error __x"help", _context => "logfile=/dev/tty";
+  # or
+  error __x"help", _context => {logfile => '/dev/tty'};
+  error __x"help", _context => "logfile=/dev/tty";
 
 =back
 
@@ -162,7 +166,7 @@ same time.
 =head2 Accessors
 
 Extends L<"Accessors" in Log::Report::Dispatcher|Log::Report::Dispatcher/"Accessors">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<filename>()
@@ -171,6 +175,8 @@ Returns the name of the opened file, or C<undef> in case this dispatcher
 was started from a file-handle or file-object.
 
 =item $obj-E<gt>B<format>()
+
+Z<>
 
 =item $obj-E<gt>B<isDisabled>()
 
@@ -191,7 +197,7 @@ Inherited, see L<Log::Report::Dispatcher/"Accessors">
 =item $obj-E<gt>B<output>($msg)
 
 Returns the file-handle to write the log lines to. [1.10] This may
-depend on the $msg (especially message context)
+depend on the C<$msg> (especially message context)
 
 =item $obj-E<gt>B<type>()
 
@@ -205,31 +211,25 @@ Inherited, see L<Log::Report::Dispatcher/"Accessors">
 
 =item $obj-E<gt>B<rotate>($filename|CODE)
 
-[1.00] Move the current file to $filename, and start a new file.
+[1.00] Move the current file to C<$filename>, and start a new file.
 
 =back
 
 =head2 Logging
 
 Extends L<"Logging" in Log::Report::Dispatcher|Log::Report::Dispatcher/"Logging">.
- 
+
 =over 4
 
-=item $obj-E<gt>B<addSkipStack>(@CODE)
-
-=item Log::Report::Dispatcher::File-E<gt>B<addSkipStack>(@CODE)
+=item $any-E<gt>B<addSkipStack>(@CODE)
 
 Inherited, see L<Log::Report::Dispatcher/"Logging">
 
-=item $obj-E<gt>B<collectLocation>()
-
-=item Log::Report::Dispatcher::File-E<gt>B<collectLocation>()
+=item $any-E<gt>B<collectLocation>()
 
 Inherited, see L<Log::Report::Dispatcher/"Logging">
 
-=item $obj-E<gt>B<collectStack>( [$maxdepth] )
-
-=item Log::Report::Dispatcher::File-E<gt>B<collectStack>( [$maxdepth] )
+=item $any-E<gt>B<collectStack>( [$maxdepth] )
 
 Inherited, see L<Log::Report::Dispatcher/"Logging">
 
@@ -241,9 +241,7 @@ Inherited, see L<Log::Report::Dispatcher/"Logging">
 
 Inherited, see L<Log::Report::Dispatcher/"Logging">
 
-=item $obj-E<gt>B<stackTraceLine>(%options)
-
-=item Log::Report::Dispatcher::File-E<gt>B<stackTraceLine>(%options)
+=item $any-E<gt>B<stackTraceLine>(%options)
 
 Inherited, see L<Log::Report::Dispatcher/"Logging">
 
@@ -256,17 +254,44 @@ Inherited, see L<Log::Report::Dispatcher/"Logging">
 =head1 DETAILS
 
 Extends L<"DETAILS" in Log::Report::Dispatcher|Log::Report::Dispatcher/"DETAILS">.
- 
+
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Error: cannot rotate log file which was opened as file-handle
+
+Cast by rotate()
+
+=item Fault: cannot write log into $file: $!
+
+Cast by rotate()
+
+=item Error: dispatcher $name needs parameter 'to'
+
+Cast by new()
+
+=item Fault: unable to rotate logfile $fn to $oldfn: $!
+
+Cast by rotate()
+
+=item Error: unknown format parameter `$what'
+
+Cast by new()
+
+=back
+
 =head1 SEE ALSO
 
-This module is part of Log-Report distribution version 1.40,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report version 1.41,
+built on September 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2007-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2007-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

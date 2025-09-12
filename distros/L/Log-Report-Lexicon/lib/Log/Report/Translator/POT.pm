@@ -1,13 +1,25 @@
-# Copyrights 2007-2025 by [Mark Overmeer <markov@cpan.org>].
-#  For other contributors see ChangeLog.
-# See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.03.
+# This code is part of Perl distribution Log-Report-Lexicon version 1.14.
+# The POD got stripped from this file by OODoc version 3.04.
+# For contributors see file ChangeLog.
+
+# This software is copyright (c) 2007-2025 by Mark Overmeer.
+
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+# SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
+
+#oodist: *** DO NOT USE THIS VERSION FOR PRODUCTION ***
+#oodist: This file contains OODoc-style documentation which will get stripped
+#oodist: during its release in the distribution.  You can use this file for
+#oodist: testing, however the code of this development version may be broken!
+#oorestyle: old style disclaimer to be removed.
+
 # This code is part of distribution Log-Report-Lexicon. Meta-POD processed
 # with OODoc into POD and HTML manual-pages.  See README.md
 # Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package Log::Report::Translator::POT;{
-our $VERSION = '1.13';
+our $VERSION = '1.14';
 }
 
 use base 'Log::Report::Translator';
@@ -33,6 +45,8 @@ sub _fn_to_lexdir($);
 	*LC_MESSAGES = sub(){5} if $@;
 }
 
+#--------------------
+
 
 sub new(@)
 {	my $class = shift;
@@ -47,8 +61,8 @@ sub init($)
 	my $lex = delete $args->{lexicons} || delete $args->{lexicon} ||
 		(ref $self eq __PACKAGE__ ? [] : _fn_to_lexdir $args->{callerfn});
 
-	error __x"You have to upgrade Log::Report::Lexicon to at least 1.00"
-		if +($Log::Report::Lexicon::Index::VERSION || 999) < 1.00;
+	+($Log::Report::Lexicon::Index::VERSION || 999) >= 1.00
+		or error __x"You have to upgrade Log::Report::Lexicon to at least 1.00";
 
 	my @lex;
 	foreach my $dir (ref $lex eq 'ARRAY' ? @$lex : $lex)
@@ -68,14 +82,14 @@ sub _fn_to_lexdir($)
 	File::Spec->catdir($fn, 'messages');
 }
 
-#------------
+#--------------------
 
-sub lexicons() { @{shift->{LRTP_lexicons}} }
+sub lexicons() { @{ $_[0]->{LRTP_lexicons}} }
 
 
-sub charset() { shift->{LRTP_charset} }
+sub charset() { $_[0]->{LRTP_charset} }
 
-#------------
+#--------------------
 
 sub translate($;$$)
 {	my ($self, $msg, $lang, $ctxt) = @_;
@@ -111,16 +125,14 @@ sub load($$)
 		my $class
 		  = $ext eq 'mo' ? 'Log::Report::Lexicon::MOTcompact'
 		  : $ext eq 'po' ? 'Log::Report::Lexicon::POTcompact'
-		  : error __x"unknown translation table extension '{ext}' in {filename}", ext => $ext, filename => $fn;
+		  :     error __x"unknown translation table extension '{ext}' in {filename}", ext => $ext, filename => $fn;
 
-		info __x"read table {filename} as {class} for {dname} in {locale}",
-			filename => $fn, class => $class, dname => $dname, locale => $locale
+		info __x"read table {filename} as {class} for {dname} in {locale}", filename => $fn, class => $class, dname => $dname, locale => $locale
 			if $dname ne 'log-report';  # avoid recursion
 
 		eval "require $class" or panic $@;
- 
-		return $self->{LRTP_pots}{$dname}{$locale} =
-			$class->read($fn, charset => $self->charset);
+
+		return $self->{LRTP_pots}{$dname}{$locale} = $class->read($fn, charset => $self->charset);
 	}
 
 	$self->{LRTP_pots}{$dname}{$locale} = undef;

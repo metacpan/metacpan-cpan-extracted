@@ -10,15 +10,15 @@ Log::Report::Lexicon - translation component of Log::Report
 
 This module is the main extry point for the distribution, but has
 currently no further use.  This distribution contains all components
-of L<Log::Report|Log::Report> which handle translations.
+of Log::Report which handle translations.
 
 If you do not need translations, you do not need to install this module.
-When you use L<Log::Report|Log::Report> and need to add translations, it may be
+When you use Log::Report and need to add translations, it may be
 very little work: when you nicely wrote texts in the advised message
 format like
 
-   print __x"Greetings to you, {name}", name => $name;
-   fault __x"cannot open file {filename}", filename => $fn;
+  print __x"Greetings to you, {name}", name => $name;
+  fault __x"cannot open file {filename}", filename => $fn;
 
 then all is in perfect condition to introduce translations: it requires
 very little to no additions to the existing code!
@@ -41,7 +41,7 @@ Translation table administration, in PO or MO format.
 Translation table file file administration, understanding locales,
 domains, and attributes in the filenames.
 
-=item * L<Log::Report::Translator|Log::Report::Translator>
+=item * Log::Report::Translator
 
 The run-time component of translations.
 
@@ -53,7 +53,9 @@ The run-time component of translations.
 
 =over 4
 
-=item Log::Report::Lexicon-E<gt>B<new>(%options)
+=item $class-E<gt>B<new>(%options)
+
+Z<>
 
 =back
 
@@ -61,14 +63,15 @@ The run-time component of translations.
 
 =head1 SEE ALSO
 
-This module is part of Log-Report-Lexicon distribution version 1.13,
-built on May 06, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report-Lexicon version 1.14,
+built on September 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2007-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2007-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

@@ -22,7 +22,7 @@ use experimental qw( signatures );
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.7.0';
+our $VERSION = 'v0.7.1';
 
 
 sub import(@) {
@@ -35,8 +35,8 @@ sub import(@) {
       : \&Moo::Role::_install_tracked;
 
     if ( my $has = $target->can('has') ) {
-        my $new_has = sub(@) {
-            $has->( _process_has(@_) );
+        my $new_has = sub(@args) {
+            $has->( _process_has(@args) );
         };
         $installer->( $target, "has", $new_has );
     }
@@ -146,7 +146,7 @@ MooX::Const - Syntactic sugar for constant and write-once Moo(se) attributes
 
 =head1 VERSION
 
-version v0.7.0
+version v0.7.1
 
 =for stopwords backported const isa ro wo
 
@@ -254,8 +254,8 @@ L<Type::Tiny>
 
 =head1 SOURCE
 
-The development version is on github at L<https://github.com/robrwo/MooX-Const>
-and may be cloned from L<git://github.com/robrwo/MooX-Const.git>
+The development version is on github at L<github.com/robrwo/MooX-Const>
+and may be cloned from L<github.com/robrwo/MooX-Const.git>
 
 See F<CONTRIBUTING.md> for more information.
 

@@ -16,6 +16,20 @@ bugs:
 wishlist:
 	- let xgettext-perl produce mo files as well.
 
+version 1.14: Mon  8 Sep 15:31:33 CEST 2025
+
+	Changes:
+	- require Perl 5.16 (2012)
+
+	Fixes:
+	- fix pod2usage
+	  github merge#3 [Sam Kington]
+	- understand 'use Log::Report' with minimal required version number
+	  github merge#4 and #5 [Sam Kington]
+
+	Improvements:
+	- convert to OODoc 3.03
+
 version 1.13: Tue  6 May 09:49:55 CEST 2025
 
 	Changes:

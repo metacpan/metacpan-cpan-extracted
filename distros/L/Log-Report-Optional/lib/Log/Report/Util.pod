@@ -7,14 +7,14 @@ Log::Report::Util - helpful routines to Log::Report
 =head1 INHERITANCE
 
  Log::Report::Util
-   is a Exporter
+   is an Exporter
 
 =head1 SYNOPSIS
 
- my ($language, $territory, $charset, $modifier)
-    = parse_locale 'nl_BE.utf-8@home';
+  my ($language, $territory, $charset, $modifier)
+     = parse_locale 'nl_BE.utf-8@home';
 
- my @take = expand_reasons 'INFO-ERROR,PANIC';
+  my @take = expand_reasons 'INFO-ERROR,PANIC';
 
 =head1 DESCRIPTION
 
@@ -32,12 +32,12 @@ man-page may contain some useful background information.
 =item B<expand_reasons>($reasons)
 
 Returns a sub-set of all existing message reason labels, based on the
-content $reasons string. The following rules apply:
+content C<$reasons> string. The following rules apply:
 
- REASONS     = BLOCK [ ',' BLOCKS ] | ARRAY-of-REASON
- BLOCK       = '-' TO | FROM '-' TO | ONE | SOURCE
- FROM,TO,ONE = 'TRACE' | 'ASSERT' | ,,, | 'PANIC'
- SOURCE      = 'USER' | 'PROGRAM' | 'SYSTEM' | 'FATAL' | 'ALL' | 'NONE'
+  REASONS     = BLOCK [ ',' BLOCKS ] | ARRAY-of-REASON
+  BLOCK       = '-' TO | FROM '-' TO | ONE | SOURCE
+  FROM,TO,ONE = 'TRACE' | 'ASSERT' | ,,, | 'PANIC'
+  SOURCE      = 'USER' | 'PROGRAM' | 'SYSTEM' | 'FATAL' | 'ALL' | 'NONE'
 
 The SOURCE specification group all reasons which are usually related to
 the problem: report about problems caused by the user, reported by
@@ -45,25 +45,27 @@ the program, or with system interaction.
 
 example: of expended REASONS
 
- WARNING-FAULT # == WARNING,MISTAKE,ERROR,FAULT
- WARNING,INFO  # == WARNING,INFO
- -INFO         # == TRACE-INFO
- ALERT-        # == ALERT,FAILURE,PANIC
- USER          # == MISTAKE,ERROR
- ALL           # == TRACE-PANIC
- FATAL         # == ERROR,FAULT,FAILURE,PANIC [1.07]
- NONE          # ==
+  WARNING-FAULT # == WARNING,MISTAKE,ERROR,FAULT
+  WARNING,INFO  # == WARNING,INFO
+  -INFO         # == TRACE-INFO
+  ALERT-        # == ALERT,FAILURE,PANIC
+  USER          # == MISTAKE,ERROR
+  ALL           # == TRACE-PANIC
+  FATAL         # == ERROR,FAULT,FAILURE,PANIC [1.07]
+  NONE          # ==
 
 =item B<is_fatal>($reason)
 
-Returns true if the $reason is severe enough to cause an exception
+Returns C<true> if the C<$reason> is severe enough to cause an exception
 (or program termination).
 
 =item B<is_reason>($name)
 
-Returns true if the STRING is one of the predefined REASONS.
+Returns C<true> if the STRING is one of the predefined REASONS.
 
 =item B<use_errno>($reason)
+
+Z<>
 
 =back
 
@@ -79,11 +81,15 @@ Returns something acceptable by L<expand_reasons()|Log::Report::Util/"Reasons">
 
 =item B<mode_number>($name|$mode)
 
-Returns the $mode as number.
+Returns the C<$mode> as number.
 
 =item B<must_show_location>($mode, $reason)
 
+Z<>
+
 =item B<must_show_stack>($mode, $reason)
+
+Z<>
 
 =back
 
@@ -117,10 +123,10 @@ variant (RFC3066 is probably never used)
 
 =item B<pkg2domain>( $package, [$domain, $filename, $line] )
 
-With $domain, $filename and $line, this registers a location where the
-textdomain is specified.  Each $package can only belong to one $domain.
+With C<$domain>, C<$filename> and C<$line>, this registers a location where the
+textdomain is specified.  Each C<$package> can only belong to one C<$domain>.
 
-Without these parameters, the registered domain for the $package is
+Without these parameters, the registered domain for the C<$package> is
 returned.
 
 =item B<to_html>($string)
@@ -134,16 +140,39 @@ For instance, backslash-t is replaced by a tab character.
 
 =back
 
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Error: reason '$begin' more serious than '$end' in '$reasons
+
+Cast by expand_reasons()
+
+=item Error: unknown locale language in locale `$locale'
+
+Cast by parse_locale()
+
+=item Error: unknown reason $which in '$reasons'
+
+Cast by expand_reasons()
+
+=item Error: unknown reason $which in '$reasons'
+
+Cast by expand_reasons()
+
+=back
+
 =head1 SEE ALSO
 
-This module is part of Log-Report-Optional distribution version 1.07,
-built on January 15, 2021. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report-Optional version 1.08,
+built on September 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2013-2021 by [Mark Overmeer <mark@overmeer.net>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2013-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

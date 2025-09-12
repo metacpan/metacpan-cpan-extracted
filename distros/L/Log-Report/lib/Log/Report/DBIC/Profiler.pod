@@ -17,14 +17,14 @@ Log::Report::DBIC::Profiler - query profiler for DBIx::Class
 
   # And maybe (if no exceptions expected from DBIC)
   $schema->exception_action(sub { panic @_ });
-  
+
   # Log to syslog
   use Log::Report;
-  dispatcher SYSLOG => 'myapp'
-    , identity => 'myapp'
-    , facility => 'local0'
-    , flags    => "pid ndelay nowait"
-    , mode     => 'DEBUG';
+  dispatcher SYSLOG => 'myapp',
+    identity => 'myapp',
+    facility => 'local0',
+    flags    => "pid ndelay nowait",
+    mode     => 'DEBUG';
 
 =head1 DESCRIPTION
 
@@ -33,14 +33,15 @@ selected back-end (via a dispatcher, see L<Log::Report::Dispatcher|Log::Report::
 
 =head1 SEE ALSO
 
-This module is part of Log-Report distribution version 1.40,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report version 1.41,
+built on September 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2007-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2007-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

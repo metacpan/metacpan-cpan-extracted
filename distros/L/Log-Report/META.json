@@ -30,30 +30,91 @@
             "ExtUtils::MakeMaker" : "0"
          }
       },
+      "develop" : {
+         "requires" : {
+            "OODoc" : "3.04"
+         }
+      },
       "runtime" : {
          "requires" : {
             "Devel::GlobalDestruction" : "0.09",
             "Encode" : "2.00",
             "Log::Report::Optional" : "1.07",
+            "Log::Report::Template" : "1.02",
             "Scalar::Util" : "0",
             "String::Print" : "0.91",
             "Sys::Syslog" : "0.27",
             "Test::More" : "0.86"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "1",
+            "Test::Pod" : "1"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "homepage" : "http://perl.overmeer.net/CPAN/",
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ],
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/markov2/perl5-Log-Report.git",
          "web" : "https://github.com/markov2/perl5-Log-Report"
       }
    },
-   "version" : "1.40",
+   "version" : "1.41",
+   "x_oodist" : {
+      "email" : "markov@cpan.org",
+      "first_year" : 2007,
+      "generate" : [
+         {
+            "format" : "pod3",
+            "podtail" : null
+         },
+         {
+            "docroot" : "/logreport/html",
+            "format" : "html",
+            "publish" : "../public_html/log-report/htmlpkg",
+            "stylesheet" : "/logreport/html/oodoc.css",
+            "templates" : "html",
+            "webpages" : "../public_html/logreport/html"
+         },
+         {
+            "export" : "website",
+            "include_manuals" : null,
+            "markup" : "html",
+            "publish" : "../public_html/log-report/doctree",
+            "serializer" : "json"
+         }
+      ],
+      "include" : [
+         "../Log-Report-Lexicon",
+         "../Log-Report-Optional",
+         "../Log-Report-Template",
+         "../String-Print"
+      ],
+      "oodoc_version" : 3.04,
+      "parser" : {
+         "pmhead" : null,
+         "skip_links" : [
+            "Dancer2::Config",
+            "Dancer2::Logger::Syslog",
+            "Locale::TextDomain",
+            "Log::Dispatch",
+            "Log::Dispatch::Output",
+            "Log::Log4perl"
+         ],
+         "syntax" : "markov"
+      },
+      "raw" : {
+         "publish" : "../public_html/log-report/raw"
+      },
+      "release" : {
+         "publish" : "../public_html/log-report/source"
+      },
+      "tests" : {},
+      "use" : []
+   },
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

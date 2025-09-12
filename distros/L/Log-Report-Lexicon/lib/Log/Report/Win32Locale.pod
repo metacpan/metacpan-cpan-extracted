@@ -40,21 +40,21 @@ The algorithms in this module are based on Win32::Locale and Win32::Codepage.
 
 Returns the encoding name (usable with module Encode) based on the current
 codepage.  For example, C<cp1252> for iso-8859-1 (latin-1) or C<cp932> for
-Shift-JIS Japanese.  Returns undef if the encoding cannot be identified.
+Shift-JIS Japanese.  Returns C<undef> if the encoding cannot be identified.
 
 =item B<codepage_to_iso>($codepage)
 
-Translate windows $codepage into ISO code.  The $codepage is numeric
+Translate windows C<$codepage> into ISO code.  The C<$codepage> is numeric
 or a hex string like '0x0304'.
 
 =item B<iso_locale>( [$codepage] )
 
 Returns the ISO string for the Microsoft codepage locale.  Might return
-C<undef>/false.  By default, the actual codepage is used.
+C<undef>/C<false>.  By default, the actual codepage is used.
 
 =item B<iso_to_codepage>($iso)
 
-Returns the numeric value of the codepage.  The $iso may look like
+Returns the numeric value of the codepage.  The C<$iso> may look like
 this: C<xx_YY>.  Then, first the C<xx_YY> is looked-up.  If that does
 not exist, C<xx> is tried.
 
@@ -62,7 +62,7 @@ not exist, C<xx> is tried.
 
 Returns the numeric language ID for the current codepage language.
 For example, the numeric value for C<0x0409> for C<en-US>, and C<0x0411>
-for C<ja>.  Returns false if the codepage cannot be identified.
+for C<ja>.  Returns C<false> if the codepage cannot be identified.
 
 =item B<ms_install_codepage_id>()
 
@@ -78,14 +78,15 @@ Returns the locale setting from the control panel.
 
 =head1 SEE ALSO
 
-This module is part of Log-Report-Lexicon distribution version 1.13,
-built on May 06, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report-Lexicon version 1.14,
+built on September 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2007-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2007-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

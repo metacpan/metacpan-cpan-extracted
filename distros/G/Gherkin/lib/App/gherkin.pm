@@ -1,6 +1,6 @@
 
 package App::gherkin;
-$App::gherkin::VERSION = '34.0.0';
+$App::gherkin::VERSION = '35.0.0';
 use strict;
 use warnings;
 use open ':std', ':encoding(UTF-8)';

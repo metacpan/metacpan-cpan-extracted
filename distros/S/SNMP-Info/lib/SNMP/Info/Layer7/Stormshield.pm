@@ -40,11 +40,12 @@ use Data::Dumper;
 
 our ($VERSION, %GLOBALS, %MIBS, %FUNCS, %MUNGE);
 
-$VERSION = '3.973000';
+$VERSION = '3.974000';
 
 %MIBS = (
     %SNMP::Info::Layer7::MIBS,
     'STORMSHIELD-HA-MIB'     => 'snsFwSerial',
+    'STORMSHIELD-IF-MIB'     => 'snsifUserName',
     'STORMSHIELD-PROPERTY-MIB' => 'snsSerialNumber',
 );
 
@@ -57,6 +58,7 @@ $VERSION = '3.973000';
     'propmib_serial'   => 'STORMSHIELD_PROPERTY_MIB__snsSerialNumber',
     'propmib_model'    => 'STORMSHIELD_PROPERTY_MIB__snsModel',
     'propmib_version'  => 'STORMSHIELD_PROPERTY_MIB__snsVersion',
+    'propmib_systemname'  => 'STORMSHIELD_PROPERTY_MIB__snsSystemName',
 );
 
 %FUNCS = (
@@ -68,11 +70,88 @@ $VERSION = '3.973000';
     'hamib_halicense' => 'STORMSHIELD_HA_MIB__snsHALicence',
     # can't use, MAX-ACCESS	not-accessible
     #'hamib_nodeindex' => 'STORMSHIELD_HA_MIB__snsNodeIndex',
+
+    # use STORMSHIELD_IF_MIB
+    # it uses different indexes than ifXEntry so we need to take care
+    # of not mixing things up. 
+    'ifmib_interfaces' => 'STORMSHIELD_IF_MIB__snsifDrvName',
+    'i_name' => 'STORMSHIELD_IF_MIB__snsifName',
+    'i_alias' => 'STORMSHIELD_IF_MIB__snsifName',
+    'i_description' => 'STORMSHIELD_IF_MIB__snsifUserName',
+    'i_type' => 'STORMSHIELD_IF_MIB__snsifType',
+    'i_index' => 'STORMSHIELD_IF_MIB__snsifIndex',
+
+    # regular interface tables
+    '_mib2_i_description' => 'IF-MIB__ifDescr',
+
     );
 
 %MUNGE = (
-    %SNMP::Info::Layer7::MUNGE,
+    %SNMP::Info::Layer7::MUNGE
     );
+
+sub _ifindex_conversion {
+  my $Stormshield = shift;
+
+  # return a table that maps ifTable indexes to snsifTable indexes, so we can look up STORMSHIELD_IF_MIB data using standard IF-MIB indexes
+
+  # .iso.org.dod.internet.private.enterprises.stormshield.stormshieldMIB.snsif.snsifTable.snsifEntry.snsifDrvName.1 = STRING: "tun0"
+  # .iso.org.dod.internet.private.enterprises.stormshield.stormshieldMIB.snsif.snsifTable.snsifEntry.snsifDrvName.4 = STRING: "igc7"
+  # .iso.org.dod.internet.private.enterprises.stormshield.stormshieldMIB.snsif.snsifTable.snsifEntry.snsifDrvName.5 = STRING: "igc6"
+
+  # .iso.org.dod.internet.mgmt.mib-2.interfaces.ifTable.ifEntry.ifDescr.7 = STRING: "igc6"
+  # .iso.org.dod.internet.mgmt.mib-2.interfaces.ifTable.ifEntry.ifDescr.8 = STRING: "igc7"
+  # .iso.org.dod.internet.mgmt.mib-2.interfaces.ifTable.ifEntry.ifDescr.12 = STRING: "tun0"
+
+  my $snsif = $Stormshield->ifmib_interfaces() || {};
+  my $mib2if_desc = $Stormshield->_mib2_i_description() || {};
+  my $mib2if = {reverse %$mib2if_desc};
+  my $map_m2s = {};
+
+  foreach my $si ( keys %$snsif ) {
+    my $sv = $snsif->{$si};
+    my $mib_index = $mib2if->{$sv};
+    if (defined $mib_index) {
+      $map_m2s->{$mib_index} = $si;
+    }
+  }
+
+  # now for e.g. ifDescr.8 (igc7):
+  # this will return $map_m2s->{8} = 4, the STORMSHIELD_IF_MIB index for igc7
+  return $map_m2s;
+}
+
+sub _map_table {
+  # get STORMSHIELD_IF_MIB data and map it to standard IF-MIB indexes
+  my ($Stormshield, $snsif_method) = @_;
+  my $map_m2s = $Stormshield->_ifindex_conversion();
+  
+  # Map method names to their SNMP attribute names
+  my %method_to_attr = (
+    'i_name' => 'snsifName',
+    'i_alias' => 'snsifName', 
+    'i_description' => 'snsifUserName',
+    'i_type' => 'snsifType',
+    'i_index' => 'snsifIndex',
+  );
+  
+  my $attr_name = $method_to_attr{$snsif_method};
+  
+  # Get the raw SNMP data by calling the attribute method directly
+  my $snsif_data = {};
+  if ($attr_name && $Stormshield->can($attr_name)) {
+    $snsif_data = $Stormshield->$attr_name() || {};
+  }
+  
+  my $out = {};
+
+  foreach my $mib_index ( keys %$map_m2s ) {
+    my $snsif_index = $map_m2s->{$mib_index};
+    $out->{$mib_index} = $snsif_data->{$snsif_index};
+  }
+  return $out;
+}
+
 
 sub vendor {
     return 'stormshield';
@@ -80,6 +159,11 @@ sub vendor {
 
 sub os {
     return 'SNS';
+}
+
+sub name {
+    my $Stormshield = shift;
+    return $Stormshield->propmib_systemname() || $Stormshield->SUPER::name();
 }
 
 sub serial {
@@ -199,6 +283,40 @@ sub e_serial {
   }
 
   return \%e_index;
+}
+
+# Interface methods - all grouped together
+sub interfaces {
+  # return standard IF-MIB interface names keyed by standard IF-MIB indexes
+  my $Stormshield = shift;
+  return $Stormshield->_mib2_i_description();
+}
+
+
+# STORMSHIELD_IF_MIB specific methods that map to standard IF-MIB indexes
+sub i_name {
+  my $Stormshield = shift;
+  return $Stormshield->_map_table('i_name');
+}
+
+sub i_alias {
+  my $Stormshield = shift;
+  return $Stormshield->_map_table('i_alias');
+}
+
+sub i_description {
+  my $Stormshield = shift;
+  return $Stormshield->_map_table('i_description');
+}
+
+sub i_type {
+  my $Stormshield = shift;
+  return $Stormshield->_map_table('i_type');
+}
+
+sub i_index {
+  my $Stormshield = shift;
+  return $Stormshield->_map_table('i_index');
 }
 
 1;
@@ -321,6 +439,10 @@ These are methods that return scalar value from SNMP
 
 Returns 'stormshield'.
 
+=item $Stormshield->name()
+
+Returns snsProductProperty.snsSystemName if available, regular sysName otherwise
+
 =item $Stormshield->os()
 
 Returns 'SNS'.
@@ -385,6 +507,36 @@ C<snsVersion>).
 =item $Stormshield->e_serial()
 
 Returns reference to hash: key = iid, value = serial (from C<snsFwSerial>).
+
+=item $Stormshield->interfaces()
+
+Override interface details with STORMSHIELD_IF_MIB
+
+=back
+
+=head2 Overrides
+
+=over
+
+=item $Stormshield->i_name()
+
+Returns reference to hash: key = ifIndex, value = interface name from STORMSHIELD_IF_MIB.
+
+=item $Stormshield->i_alias()
+
+Returns reference to hash: key = ifIndex, value = interface alias from STORMSHIELD_IF_MIB.
+
+=item $Stormshield->i_description()
+
+Returns reference to hash: key = ifIndex, value = interface description from STORMSHIELD_IF_MIB.
+
+=item $Stormshield->i_type()
+
+Returns reference to hash: key = ifIndex, value = interface type from STORMSHIELD_IF_MIB.
+
+=item $Stormshield->i_index()
+
+Returns reference to hash: key = ifIndex, value = interface index from STORMSHIELD_IF_MIB.
 
 =back
 

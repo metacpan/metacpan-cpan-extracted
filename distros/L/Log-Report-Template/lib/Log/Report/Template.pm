@@ -1,14 +1,21 @@
-# Copyrights 2017-2025 by [Mark Overmeer <markov@cpan.org>].
-#  For other contributors see ChangeLog.
-# See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.02.
-# This code is part of distribution Log-Report-Template. Meta-POD processed
-# with OODoc into POD and HTML manual-pages.  See README.md
-# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
+# This code is part of Perl distribution Log-Report-Template version 1.03.
+# The POD got stripped from this file by OODoc version 3.04.
+# For contributors see file ChangeLog.
 
-package Log::Report::Template;
-use vars '$VERSION';
-$VERSION = '1.02';
+# This software is copyright (c) 2017-2025 by Mark Overmeer.
+
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+# SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
+
+#oodist: *** DO NOT USE THIS VERSION FOR PRODUCTION ***
+#oodist: This file contains OODoc-style documentation which will get stripped
+#oodist: during its release in the distribution.  You can use this file for
+#oodist: testing, however the code of this development version may be broken!
+
+package Log::Report::Template;{
+our $VERSION = '1.03';
+}
 
 use base 'Template';
 
@@ -19,10 +26,11 @@ use Log::Report 'log-report-template';
 use Log::Report::Template::Textdomain ();
 # use Log::Report::Template::Extract on demand.
 
-use File::Find        qw(find);
-use Scalar::Util      qw(blessed);
+use File::Find        qw/find/;
+use Scalar::Util      qw/blessed/;
 use Template::Filters ();
 use String::Print     ();
+
 
 
 sub new
@@ -52,8 +60,7 @@ sub _init($)
 	my $handle_errors = $args->{processing_errors} || 'NATIVE';
 	if($handle_errors eq 'EXCEPTION') { $self->{LRT_exceptions} = 1 }
 	elsif($handle_errors ne 'NATIVE')
-	{	error __x"illegal value '{value}' for 'processing_errors' option",
-			value => $handle_errors;
+	{	error __x"illegal value '{value}' for 'processing_errors' option", value => $handle_errors;
 	}
 
 	$self->{LRT_formatter} = $self->_createFormatter($args);
@@ -79,7 +86,7 @@ sub _createFormatter($)
 	sub { $sp->sprinti(@_) };
 }
 
-#---------------
+#--------------------
 
 sub formatter() { $_[0]->{LRT_formatter} }
 
@@ -92,14 +99,14 @@ sub translateTo(;$)
 	my $lang = shift;
 
 	return $lang   # language unchanged?
-		if ! defined $lang ? ! defined $old
-		 : ! defined $old  ? 0 : $lang eq $old;
+		if ! defined $lang ? ! defined $old : ! defined $old  ? 0 : $lang eq $old;
 
 	$_->translateTo($lang) for $self->domains;
 	$self->{LRT_trTo} = $lang;
 }
 
-#---------------
+#--------------------
+
 
 sub addTextdomain($%) {
 	my ($self, %args) = @_;
@@ -112,8 +119,7 @@ sub addTextdomain($%) {
 		my @incl  = $self->_incl_path;
 		foreach my $dir (@$only)
 		{	next if grep $_ eq $dir, @incl;
-			error __x"directory {dir} not in INCLUDE_PATH, used by {option}",
-				dir => $dir, option => 'addTextdomain(only_in_directory)';
+			error __x"directory {dir} not in INCLUDE_PATH, used by {option}", dir => $dir, option => 'addTextdomain(only_in_directory)';
 		}
 	}
 
@@ -142,8 +148,8 @@ sub addTextdomain($%) {
 	$domain;
 }
 
-sub _incl_path() { @{shift->{LRT_path}} }
-sub _stash()     { shift->service->context->stash }
+sub _incl_path() { @{ $_[0]->{LRT_path}} }
+sub _stash()     { $_[0]->service->context->stash }
 
 
 sub domains()   { values %{$_[0]->{LRT_domains} } }
@@ -199,7 +205,7 @@ sub extract(%)
 	}
 }
 
-#------------
+#--------------------
 
 sub _cols_factory(@)
 {	my $self = shift;
@@ -251,8 +257,6 @@ sub _defaultFilters()
 	$self;
 }
 
-#------------
-
 
 sub _collectModifiers($)
 {	my ($self, $args) = @_;
@@ -260,13 +264,9 @@ sub _collectModifiers($)
 	# First match will be used
 	my @modifiers = @{$args->{modifiers} || []};
 
-	# More default extensions expected here.  String::Print already
-	# adds a bunch.
-
+	# More default extensions expected here.  String::Print already adds a bunch.
 	\@modifiers;
 }
-
-#------------
 
 
 {	# Log::Report exports 'error', and we use that.  Our base-class
@@ -278,11 +278,11 @@ sub _collectModifiers($)
 
 	sub error()
 	{
-		return Log::Report::error(@_)
-			unless blessed $_[0] && $_[0]->isa('Template');
+		blessed $_[0] && $_[0]->isa('Template')
+			or return Log::Report::error(@_);
 
-		return shift->SUPER::error(@_)
-			unless $_[0]->{LRT_exceptions};
+		$_[0]->{LRT_exceptions}
+			or return shift->SUPER::error(@_);
 
 		@_ or panic "inexpected call to collect errors()";
 
@@ -292,6 +292,6 @@ sub _collectModifiers($)
 }
 
 
-#------------
+#--------------------
 
 1;

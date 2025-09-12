@@ -1,13 +1,20 @@
-# Copyrights 2007-2025 by [Mark Overmeer <markov@cpan.org>].
-#  For other contributors see ChangeLog.
-# See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.03.
-# This code is part of distribution Log-Report-Lexicon. Meta-POD processed
-# with OODoc into POD and HTML manual-pages.  See README.md
-# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
+# This code is part of Perl distribution Log-Report-Lexicon version 1.14.
+# The POD got stripped from this file by OODoc version 3.04.
+# For contributors see file ChangeLog.
+
+# This software is copyright (c) 2007-2025 by Mark Overmeer.
+
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+# SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
+
+#oodist: *** DO NOT USE THIS VERSION FOR PRODUCTION ***
+#oodist: This file contains OODoc-style documentation which will get stripped
+#oodist: during its release in the distribution.  You can use this file for
+#oodist: testing, however the code of this development version may be broken!
 
 package Log::Report::Win32Locale;{
-our $VERSION = '1.13';
+our $VERSION = '1.14';
 }
 
 use base 'Exporter';
@@ -17,51 +24,55 @@ use strict;
 
 use Log::Report 'log-report-lexicon';
 
-our @EXPORT = qw/codepage_to_iso iso_to_codepage
-  iso_locale charset_encoding
-  ms_codepage_id ms_install_codepage_id ms_locale/;
- 
+our @EXPORT = qw/
+	codepage_to_iso
+	iso_to_codepage
+	iso_locale
+	charset_encoding
+	ms_codepage_id
+	ms_install_codepage_id
+	ms_locale
+/;
+
 use Win32::TieRegistry;
 
-my %codepage2iso;
-my %localewin2iso;
-my %charsetwin;
+my (%codepage2iso, %localewin2iso, %charsetwin);
 while(<DATA>)
-{  my ($codepage, $iso, $localewin, $charsetwin, $name) = split /\,\s*/, $_, 5;
-   defined $name or die "Missing field in '$_'";
-   $codepage2iso{hex $codepage} = $iso;
-   $localewin2iso{$localewin}   = $iso;
-   $charsetwin{$localewin}      = $charsetwin;
+{	my ($codepage, $iso, $localewin, $charsetwin, $name) = split /\,\s*/, $_, 5;
+	defined $name or die "Missing field in '$_'";
+	$codepage2iso{hex $codepage} = $iso;
+	$localewin2iso{$localewin}   = $iso;
+	$charsetwin{$localewin}      = $charsetwin;
 }
 my %iso2codepage = reverse %codepage2iso;
 close DATA;
 
+#--------------------
 
 sub codepage_to_iso($)
-{   my $cp = shift;
-    defined $cp ? $codepage2iso{$cp =~ m/^0x/i ? hex($cp) : $cp} : ();
+{	my $cp = shift;
+	defined $cp ? $codepage2iso{$cp =~ m/^0x/i ? hex($cp) : $cp} : ();
 }
- 
+
 
 sub iso_to_codepage($)
-{   my $iso = shift;
-    return $iso2codepage{$iso}
-        if $iso2codepage{$iso};
+{	my $iso = shift;
+	return $iso2codepage{$iso}
+		if $iso2codepage{$iso};
 
-    my ($lang) = split $iso, /\_/;
-    $iso2codepage{$lang};
+	my ($lang) = split $iso, /\_/;
+	$iso2codepage{$lang};
 }
 
 
 sub iso_locale(;$)
-{   my $locale = shift;
-    if(defined $locale)
-    {   my $iso = $localewin2iso{$locale} || $codepage2iso{$locale};
-        return $iso if $iso;
-    }
+{	my $locale = shift;
+	if(defined $locale)
+	{	my $iso = $localewin2iso{$locale} || $codepage2iso{$locale};
+		return $iso if $iso;
+	}
 
-       codepage_to_iso(ms_codepage_id())
-    || codepage_to_iso(ms_locale());
+	codepage_to_iso(ms_codepage_id()) || codepage_to_iso(ms_locale());
 }
 
 # the following functions are rewrites of Win32::Codepage version 1.00
@@ -69,40 +80,39 @@ sub iso_locale(;$)
 # Win32 does not nicely export the functions.
 
 my $nls = 'HKEY_LOCAL_MACHINE/SYSTEM/CurrentControlSet/Control/Nls';
-my $del = {Access => Win32::TieRegistry::KEY_READ(), Delimiter => '/'};
+my $del = +{ Access => Win32::TieRegistry::KEY_READ(), Delimiter => '/' };
 my $codepages = Win32::TieRegistry->new("$nls/CodePage", $del);
 my $languages = Win32::TieRegistry->new("$nls/Language", $del);
 
 
 sub charset_encoding
-{   my $charset = $codepages->GetValue("ACP") || $codepages->GetValue("OEMCP");
-    $charset && $charset =~ m/^[0-9a-fA-F]+$/ ? "cp".lc($charset) : undef;
+{	my $charset = $codepages->GetValue("ACP") || $codepages->GetValue("OEMCP");
+	$charset && $charset =~ m/^[0-9a-fA-F]+$/ ? "cp".lc($charset) : undef;
 }
 
 
 sub ms_codepage_id
-{   my $id = $languages->GetValue("Default");
-    $id && $id =~ m/^[0-9a-fA-F]+$/ ? hex($id) : undef;
+{	my $id = $languages->GetValue("Default");
+	$id && $id =~ m/^[0-9a-fA-F]+$/ ? hex($id) : undef;
 }
 
 
 sub ms_install_codepage_id
-{   my $id = $languages->GetValue("InstallLanguage");
-    $id && $id =~ m/^[0-9a-fA-F]+$/ ? hex($id) : undef;
+{	my $id = $languages->GetValue("InstallLanguage");
+	$id && $id =~ m/^[0-9a-fA-F]+$/ ? hex($id) : undef;
 }
- 
+
 # the following functions are rewrites of Win32::Locale version 0.04
 # Copyright (c) 2001,2003 Sean M. Burke,  Under perl license.
 # The module seems unmaintained, and treating the 'region' in the ISO
 # code as lower-case is a mistake.
 
-my $i18n = Win32::TieRegistry->new
-  ("HKEY_CURRENT_USER/Control Panel/International", $del);
+my $i18n = Win32::TieRegistry->new("HKEY_CURRENT_USER/Control Panel/International", $del);
 
 
 sub ms_locale
-{   my $locale = $i18n->GetValue("Locale");
-    $locale =~ m/^[0-9a-fA-F]+$/ ? hex($locale) : undef;
+{	my $locale = $i18n->GetValue("Locale");
+	$locale =~ m/^[0-9a-fA-F]+$/ ? hex($locale) : undef;
 }
 
 1;

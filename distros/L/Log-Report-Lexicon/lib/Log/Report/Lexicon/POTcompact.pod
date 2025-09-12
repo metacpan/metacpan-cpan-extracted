@@ -11,12 +11,12 @@ Log::Report::Lexicon::POTcompact - use translations from a POT file
 
 =head1 SYNOPSIS
 
- # using a PO table efficiently
- my $pot = Log::Report::Lexicon::POTcompact->read('po/nl.po')
-    or die;
+  # using a PO table efficiently
+  my $pot = Log::Report::Lexicon::POTcompact->read('po/nl.po')
+     or die;
 
- my $header = $pot->msgid('');
- print $pot->msgstr('msgid', 3);
+  my $header = $pot->msgid('');
+  print $pot->msgstr('msgid', 3);
 
 =head1 DESCRIPTION
 
@@ -32,24 +32,24 @@ If you like to change the content of PO files, then use
 L<Log::Report::Lexicon::POT|Log::Report::Lexicon::POT>.
 
 Extends L<"DESCRIPTION" in Log::Report::Lexicon::Table|Log::Report::Lexicon::Table/"DESCRIPTION">.
- 
+
 =head1 METHODS
 
 Extends L<"METHODS" in Log::Report::Lexicon::Table|Log::Report::Lexicon::Table/"METHODS">.
- 
+
 =head2 Constructors
 
 Extends L<"Constructors" in Log::Report::Lexicon::Table|Log::Report::Lexicon::Table/"Constructors">.
- 
+
 =over 4
 
-=item Log::Report::Lexicon::POTcompact-E<gt>B<new>(%options)
+=item $class-E<gt>B<new>(%options)
 
 Inherited, see L<Log::Report::Lexicon::Table/"Constructors">
 
-=item Log::Report::Lexicon::POTcompact-E<gt>B<read>($filename, %options)
+=item $class-E<gt>B<read>($filename, %options)
 
-Read the POT table information from $filename, as compact as possible.
+Read the POT table information from C<$filename>, as compact as possible.
 Comments, plural-form, and such are lost on purpose: they are not
 needed for translations.
 
@@ -70,7 +70,7 @@ field in the po-file header.
 =head2 Attributes
 
 Extends L<"Attributes" in Log::Report::Lexicon::Table|Log::Report::Lexicon::Table/"Attributes">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<filename>()
@@ -87,30 +87,32 @@ get translated into utf8 before being used in Perl.
 =head2 Managing PO's
 
 Extends L<"Managing PO's" in Log::Report::Lexicon::Table|Log::Report::Lexicon::Table/"Managing PO's">.
- 
+
 =head3 Translation
 
 Extends L<"Translation" in Log::Report::Lexicon::Table|Log::Report::Lexicon::Table/"Translation">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<msgid>( STRING, [$msgctxt] )
 
-Lookup the translations with the STRING.  Returns a SCALAR, when only
+Lookup the translations with the C<STRING>.  Returns a SCALAR, when only
 one translation is known, and an ARRAY wherein there are multiple.
 Returns C<undef> when the translation is not defined.
+Improves base, see L<Log::Report::Lexicon::Table/"Translation">
 
 =item $obj-E<gt>B<msgstr>( $msgid, [$count, [$msgctxt] )
 
-Returns the translated string for $msgid.  When not specified, $count is 1
+Returns the translated string for C<$msgid>.  When not specified, C<$count> is 1
 (the single form).
+Improves base, see L<Log::Report::Lexicon::Table/"Translation">
 
 =back
 
 =head3 Administration
 
 Extends L<"Administration" in Log::Report::Lexicon::Table|Log::Report::Lexicon::Table/"Administration">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<add>($po)
@@ -143,20 +145,55 @@ Inherited, see L<Log::Report::Lexicon::Table/"Administration">
 
 =over 4
 
+=item Error: cannot detect charset in $fn
+
+Cast by read()
+
+=item Fault: cannot read from file $fn (unknown charset): $!
+
+Cast by read()
+
+=item Fault: cannot read in $charset from file $fn: $!
+
+Cast by read()
+
+=item Error: header not found for charset in $fn
+
+Cast by read()
+
+=item Error: invalid plural-form algorithm '$alg'
+
+Cast by setupPluralAlgorithm()
+
 =item Error: only acceptable parameter is 'ACTIVE'
+
+Cast by translations()
+
+=item Warning: string '$text' not between quotes at $location
+
+Cast by msgstr()
+
+=item Error: there is no Plural-Forms field in the header, but needed
+
+Cast by pluralIndex()
+
+=item Error: unsupported charset $charset in $fn
+
+Cast by read()
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Log-Report-Lexicon distribution version 1.13,
-built on May 06, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report-Lexicon version 1.14,
+built on September 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2007-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2007-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

@@ -1,11 +1,4 @@
-# Copyrights 2007-2025 by [Mark Overmeer <markov@cpan.org>].
-#  For other contributors see ChangeLog.
-# See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.03.
-package DieTests;{
-our $VERSION = '1.40';
-}
-
+package DieTests;
 use warnings;
 use strict;
 

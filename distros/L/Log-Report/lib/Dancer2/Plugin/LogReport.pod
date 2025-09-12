@@ -76,8 +76,8 @@ addition to) the default redirect handler that is called on a fatal error.
 
 Calls should be made with 1 parameter: the subroutine to call in the case of a
 fatal error. The subroutine is passed 3 parameters: the DSL, the message in
-question, and the reason. The subroutine should return true or false depending
-on whether it handled the error. If it returns false, the next fatal handler is
+question, and the reason. The subroutine should return C<true> or C<false> depending
+on whether it handled the error. If it returns C<false>, the next fatal handler is
 called, and if there are no others then the default redirect fatal handler is
 called.
 
@@ -97,15 +97,15 @@ example: Error handler based on URL (e.g. API)
 
 example: Return JSON responses for requests with content-type of application/json
 
-fatal_handler sub {
+  fatal_handler sub {
     my ($dsl, $msg, $reason, $default) = @_;
 
     (my $ctype = $dsl->request->header('content-type')) =~ s/;.*//;
     return if $ctype ne 'application/json';
     status $reason eq 'PANIC' ? 'Internal Server Error' : 'Bad Request';
     $dsl->send_as(JSON => {
-        error       => 1,
-        description => $msg->toString,
+      error       => 1,
+      description => $msg->toString,
     }, {
         content_type => 'application/json; charset=UTF-8',
     });
@@ -154,21 +154,39 @@ the session hooks, in which case recursive loops can be experienced.
 
 =item $obj-E<gt>B<alert>()
 
+Z<>
+
 =item $obj-E<gt>B<assert>()
+
+Z<>
 
 =item $obj-E<gt>B<error>()
 
+Z<>
+
 =item $obj-E<gt>B<failure>()
+
+Z<>
 
 =item $obj-E<gt>B<fault>()
 
+Z<>
+
 =item $obj-E<gt>B<info>()
+
+Z<>
 
 =item $obj-E<gt>B<mistake>()
 
+Z<>
+
 =item $obj-E<gt>B<notice>()
 
+Z<>
+
 =item $obj-E<gt>B<panic>()
+
+Z<>
 
 =item $obj-E<gt>B<success>()
 
@@ -180,7 +198,11 @@ message in green.
 
 =item $obj-E<gt>B<trace>()
 
+Z<>
+
 =item $obj-E<gt>B<warning>()
+
+Z<>
 
 =back
 
@@ -225,16 +247,16 @@ In its simplest form, this module can be used for more flexible logging
   get '/route' => sub {
       # Stop execution, redirect, and display an error to the user
       $name or error "Please enter a name";
- 
+
       # The same but translated
       $name or error __"Please enter a name";
-  
+
       # The same but translated and with variables
       $name or error __x"{name} is not valid", name => $name;
- 
+
       # Show the user a warning, but continue execution
       mistake "Not sure that's what you wanted";
- 
+
       # Add debug information, can be caught in syslog by adding
       # the (for instance) syslog dispatcher
       trace "Hello world";
@@ -295,9 +317,9 @@ To send messages to a file:
 See L<Log::Report::Dispatcher> for full details of options.
 
 Finally: a Dancer2 script may run many applications.  Each application
-can have its own logger configuration.  However, Log::Report dispatchers
+can have its own logger configuration.  However, L<Log::Report|Log::Report> dispatchers
 are global, so will be shared between Dancer2 applications.  Any attempt
-to create a new Log::Report dispatcher by the same name (as will happen
+to create a new L<Log::Report|Log::Report> dispatcher by the same name (as will happen
 when a new Dancer2 application is started with the same configuration)
 will be ignored.
 
@@ -310,7 +332,7 @@ To use the plugin, you simply use it in your application:
   use Dancer2;
   use Dancer2::Plugin::LogReport %config;
 
-Dancer2::Plugin::LogReport takes the same C<%config> options as
+L<Dancer2::Plugin::LogReport|Dancer2::Plugin::LogReport> takes the same C<%config> options as
 L<Log::Report> itself (see L<Log::Report::import()|Log::Report/"Configuration">).
 
 If you want to send messages from your modules/models, there is
@@ -338,7 +360,7 @@ configuration):
 
 =head3 Exceptions
 
-Log::Report is a combination of a logger and an exception system.  Messages
+L<Log::Report|Log::Report> is a combination of a logger and an exception system.  Messages
 to be logged are I<thrown> to all listening dispatchers to be handled.
 
 This module will also catch any unexpected exceptions:
@@ -384,9 +406,9 @@ colors: C<success>, C<info>, C<warning> or C<danger>.
 When you use L<Dancer2::Template::TTLogReport|Dancer2::Template::TTLogReport> as well, which enables the
 translations of your whole templates, then add C<locale>:
 
-      [% message.toString(locale) | html_entity %]
+  [% message.toString(locale) | html_entity %]
 
-Now, anywhere in your application that you have used Log::Report, you can
+Now, anywhere in your application that you have used L<Log::Report|Log::Report>, you can
 
   warning "Hey user, you should now about this";
 
@@ -399,7 +421,7 @@ nice easy way to return from the function with an error message. One
 way of doing this is with a separate error message variable, but that
 can be messy code. An alternative is to use exceptions, but these
 can be a pain to deal with in terms of catching them.
-Here's how to do it with Log::Report.
+Here's how to do it with L<Log::Report|Log::Report>.
 
 In this example, we do use exceptions, but in a neat, easier to use manner.
 
@@ -436,7 +458,7 @@ no need to worry about any error messages. Both the error and warning
 messages in the above code will have been stored in the messages session
 variable, where they can be displayed using the code in the previous section.
 The C<error> will have caused the code to stop running, and process()
-will have returned false. C<warning> will have simply logged the warning
+will have returned C<false>. C<warning> will have simply logged the warning
 and not caused the function to stop running.
 
 =head3 Logging DBIC database queries and errors
@@ -500,34 +522,45 @@ view the full log information in /var/log/myapp.log
 All configuration is optional. The example configuration file below shows the
 configuration options and defaults.
 
-    plugins:
-      LogReport:
-        # Whether to handle Dancer HTTP errors such as 404s. Currently has
-        # no effect due to unresolved issues saving messages to the session
-        # and accessing the DSL at that time.
-        handle_http_errors: 1
-        # Where to forward users in the event of an uncaught fatal
-        # error within a GET request
-        forward_url: /
-        # Or you can specify a template instead [1.13]
-        forward_template: error_template_file   # Defaults to empty
-        # For a production server (show_errors: 0), this is the text that
-        # will be displayed instead of unexpected exception errors
-        fatal_error_message: An unexpected error has occurred
-        # The levels of messages that will be saved to the session, and
-        # thus displayed to the end user
-        session_messages: [ NOTICE, WARNING, MISTAKE, ERROR, FAULT, ALERT, FAILURE, PANIC ]
+  plugins:
+    LogReport:
+      # Whether to handle Dancer HTTP errors such as 404s. Currently has
+      # no effect due to unresolved issues saving messages to the session
+      # and accessing the DSL at that time.
+      handle_http_errors: 1
+      # Where to forward users in the event of an uncaught fatal
+      # error within a GET request
+      forward_url: /
+      # Or you can specify a template instead [1.13]
+      forward_template: error_template_file   # Defaults to empty
+      # For a production server (show_errors: 0), this is the text that
+      # will be displayed instead of unexpected exception errors
+      fatal_error_message: An unexpected error has occurred
+      # The levels of messages that will be saved to the session, and
+      # thus displayed to the end user
+      session_messages: [ NOTICE, WARNING, MISTAKE, ERROR, FAULT, ALERT, FAILURE, PANIC ]
+
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Error: An unexpected error has occurred
+
+Cast by fatal_handler()
+
+=back
 
 =head1 SEE ALSO
 
-This module is part of Log-Report distribution version 1.40,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report version 1.41,
+built on September 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2007-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2007-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

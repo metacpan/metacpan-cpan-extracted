@@ -35,14 +35,14 @@ GetOptions
  , 'verbose=i'         => \$mode
  , 'version|V'         => \$version
  , 'v+'                => \$mode
-   or pod2usage(1);
+   or exit 1;
 
 if($version)
 {   print "Log::Report $Log::Report::VERSION\n";
     exit 0;
 }
 
-$help && podusage(0);
+$help && pod2usage(0);
 
 # Load domain information, for instance defining context_rules.  The
 # definitions are global, so automatically find their way in the Log::Report

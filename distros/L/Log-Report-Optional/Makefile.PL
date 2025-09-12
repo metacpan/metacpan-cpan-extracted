@@ -1,52 +1,93 @@
 use ExtUtils::MakeMaker;
 
-use 5.008;
+use 5.016;
 
-my $version = '1.07';
+# Use command 'oodist' to produce your whole software release.
+my $version = '1.08';
+my $git      = "https://github.com/markov2/perl5-Log-Report-Optional";
+my $publish  = "../public_html/log-report-optional";
+my $homepage = "http://perl.overmeer.net/CPAN/";
 
-my %prereq  =
-  ( Test::More    => '0.86'
-  , String::Print => '0.91'
+my %oodist   = (
+	oodoc_version => 3.04,
+	first_year => 2013,
+	email    => "markov\@cpan.org",
 
-  # Optional dependency to Log::Report handled in ::Optional.  It is hard
-  # to make that work automatically, where Perl's install tools cannot
-  # handle recursive dependencies.
-  );
+	include  => [
+	],
 
+	use      => [
+		'../String-Print',
+	],
+
+	parser   => {
+		syntax         => 'markov',
+		skip_links     => [ ],
+		pmhead         => undef,
+	},
+
+	tests    => {
+	},
+
+	release  => {
+		publish        => "$publish/source",
+	},
+
+	raw      => {
+		publish        => "$publish/raw",
+	},
+
+	generate => [ {
+		# Add real pod to the releases
+		format         => 'pod3',
+		podtail        => undef,
+	  },
+	  # You may add HTML formatters here.
+	  # You may add exporter configurations here.
+	],
+);
 
 WriteMakefile
-  ( NAME      => 'Log::Report::Optional'
-  , VERSION   => $version
-  , PREREQ_PM => \%prereq
+	NAME      => 'Log::Report::Optional',
+	VERSION   => $version,
 
-  , AUTHOR    => 'Mark Overmeer <mark@overmeer.net>'
-  , ABSTRACT  => 'Log::Report in the lightest form'
-  , LICENSE   => 'perl_5'
+	PREREQ_PM => +{
+		'Test::More'    => '0.86',
+		'String::Print' => '0.91',
+		# Optional dependency to Log::Report handled in ::Optional.  It is hard
+		# to make that work automatically, where Perl's install tools cannot
+		# handle recursive dependencies.
+	},
 
-  , META_MERGE =>
-      { 'meta-spec' => { version => 2 }
-      , resources  =>
-         { repository =>
-            { type => 'git'
-            , url  => 'https://github.com/markov2/perl5-Log-Report-Optional.git'
-            , web  => 'https://github.com/markov2/perl5-Log-Report-Optional'
-            }
-         , homepage => 'http://perl.overmeer.net/CPAN/'
-         , license  => [ 'http://dev.perl.org/licenses/' ]
-         }
-      }
-  );
+	AUTHOR    => 'Mark Overmeer <mark@overmeer.net>',
+	ABSTRACT  => 'Log::Report in its lightest form',
+	LICENSE   => 'perl_5',
 
-sub MY::postamble { <<'__POSTAMBLE' }
+	META_MERGE => {
+		'meta-spec' => { version => 2 },
+		resources   => {
+			repository => {
+				type => 'git',
+				url  => "$git.git",
+				web  => $git,
+			},
+			homepage => $homepage,
+			license  => [ 'http//dev.perl.org/licenses/' ],
+		},
+		prereqs => {
+			develop => {
+				requires => {
+					'OODoc'      => 3.03,
+				}
+			},
+			test => {
+				requires => {
+					'Test::More' => 1.00,
+					'Test::Pod'  => 1.00,
+				}
+			},
+		},
 
-# for OODoc's oodist, DIST
-RAWDIR          = ../public_html/log-report-optional/raw
-DISTDIR         = ../public_html/log-report-optional/source
-
-# for OODoc's oodist, POD
-FIRST_YEAR      = 2013
-EMAIL           = markov@cpan.org
-WEBSITE         = http://perl.overmeer.net/CPAN/
-EXTENDS         = ../String-Print
-
-__POSTAMBLE
+		# You may use multiple set-ups, see "oodist --make"
+		x_oodist => \%oodist,
+	};

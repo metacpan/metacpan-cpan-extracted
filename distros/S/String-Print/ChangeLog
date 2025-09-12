@@ -4,6 +4,16 @@
 All modifications where created by Mark Overmeer, unless explicitly
 stated differently.
 
+version 0.95: Mon  8 Sep 14:06:53 CEST 2025
+
+	Fixes:
+	- printp formats which start with a '%' were not processed
+
+	Improvements:
+	- modifier HTML
+	- add .gitignore
+	- convert to OODoc 3.03
+
 version 0.94: Sun  1 Mar 12:37:41 CET 2020
 
 	Fixes:

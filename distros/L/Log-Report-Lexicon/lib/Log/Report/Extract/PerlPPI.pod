@@ -11,15 +11,15 @@ Log::Report::Extract::PerlPPI - Collect translatable strings from Perl using PPI
 
 =head1 SYNOPSIS
 
- my $ppi = Log::Report::Extract::PerlPPI->new
-  ( lexicon => '/usr/share/locale'
+  my $ppi = Log::Report::Extract::PerlPPI->new(
+    lexicon => '/usr/share/locale',
   );
- $ppi->process('lib/My/Pkg.pm');  # call for each .pm file
- $ppi->showStats;                 # optional
- $ppi->write;
+  $ppi->process('lib/My/Pkg.pm');  # call for each .pm file
+  $ppi->showStats;                 # optional
+  $ppi->write;
 
- # See script  xgettext-perl
- bin/xgettext-perl -p $lexdir @source_dirs
+  # See script  xgettext-perl
+  bin/xgettext-perl -p $lexdir @source_dirs
 
 =head1 DESCRIPTION
 
@@ -37,7 +37,7 @@ applications which can hand po-files, for instance Pootle and Weblate.
 Do not forget to add the new po-file to your distribution (MANIFEST)
 
 Extends L<"DESCRIPTION" in Log::Report::Extract|Log::Report::Extract/"DESCRIPTION">.
- 
+
 =head2 The extraction process
 
 All pm-files need to be processed in one go: no incremental processing!
@@ -59,7 +59,7 @@ will get disabled, not removed.  New msgids will be added and flagged
 =head3 What is extracted?
 
 This script will extract the msgids used in C<__()>, C<__x()>, C<__xn()>,
-and C<__n()> (implemented by L<Log::Report|Log::Report>) For instance
+and C<__n()> (implemented by Log::Report) For instance
 
   __x"msgid", @more
   __x'msgid', @more  <--- no!  syntax error!
@@ -86,14 +86,14 @@ values of C<$format>.
 =head1 METHODS
 
 Extends L<"METHODS" in Log::Report::Extract|Log::Report::Extract/"METHODS">.
- 
+
 =head2 Constructors
 
 Extends L<"Constructors" in Log::Report::Extract|Log::Report::Extract/"Constructors">.
- 
+
 =over 4
 
-=item Log::Report::Extract::PerlPPI-E<gt>B<new>(%options)
+=item $class-E<gt>B<new>(%options)
 
 Inherited, see L<Log::Report::Extract/"Constructors">
 
@@ -102,7 +102,7 @@ Inherited, see L<Log::Report::Extract/"Constructors">
 =head2 Accessors
 
 Extends L<"Accessors" in Log::Report::Extract|Log::Report::Extract/"Accessors">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<addPot>($domain, $pot, %options)
@@ -130,7 +130,7 @@ Inherited, see L<Log::Report::Extract/"Accessors">
 =head2 Processors
 
 Extends L<"Processors" in Log::Report::Extract|Log::Report::Extract/"Processors">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<cleanup>(%options)
@@ -139,9 +139,10 @@ Inherited, see L<Log::Report::Extract/"Processors">
 
 =item $obj-E<gt>B<process>($filename, %options)
 
-Update the domains mentioned in the $filename.  All textdomains defined
+Update the domains mentioned in the C<$filename>.  All textdomains defined
 in the file will get updated automatically, but not written before
 all files where processed.
+Improves base, see L<Log::Report::Extract/"Processors">
 
  -Option --Default
   charset  'iso-8859-1'
@@ -166,16 +167,67 @@ Inherited, see L<Log::Report::Extract/"Processors">
 
 =back
 
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Error: PPI only supports iso-8859-1 (latin-1) on the moment
+
+Cast by process()
+
+=item Fault: cannot create lexicon directory $dir: $!
+
+Cast by new()
+
+=item Fault: cannot read perl from file $filename: $!
+
+Cast by process()
+
+=item Error: count missing in $function in line $line
+
+Cast by process()
+
+=item Error: extractions require an explicit lexicon directory
+
+Cast by new()
+
+=item Info: no Perl in file $filename
+
+Cast by process()
+
+=item Error: no context tags allowed in plural `$msgid'
+
+Cast by store()
+
+=item Info: processing file $fn in $charset
+
+Cast by process()
+
+=item Info: starting new textdomain $domain, template in $filename
+
+Cast by write()
+
+=item Error: string is incorrect at line $line: $error
+
+Cast by process()
+
+=item Warning: use double quotes not single, in $string on $file line $line
+
+Cast by process()
+
+=back
+
 =head1 SEE ALSO
 
-This module is part of Log-Report-Lexicon distribution version 1.13,
-built on May 06, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report-Lexicon version 1.14,
+built on September 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2007-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2007-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

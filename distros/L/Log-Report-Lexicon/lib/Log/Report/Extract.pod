@@ -8,11 +8,10 @@ Log::Report::Extract - Collect translatable strings
 
  Log::Report::Extract is extended by
    Log::Report::Extract::PerlPPI
-   Log::Report::Template::Extract
 
 =head1 SYNOPSIS
 
- # See the extensions
+  # See the extensions
 
 =head1 DESCRIPTION
 
@@ -28,7 +27,9 @@ translations exist yet, one C<textdomain/xx.po> file will be created.
 
 =over 4
 
-=item Log::Report::Extract-E<gt>B<new>(%options)
+=item $class-E<gt>B<new>(%options)
+
+Z<>
 
  -Option --Default
   charset  'utf-8'
@@ -55,6 +56,8 @@ this will be the directory where an C<domain/xx.po> file will be created.
 
 =item $obj-E<gt>B<addPot>($domain, $pot, %options)
 
+Z<>
+
 =item $obj-E<gt>B<charset>()
 
 Returns the character-set used inside the POT files.
@@ -71,7 +74,7 @@ the files in the lexicon directory tree.
 =item $obj-E<gt>B<pots>($domain)
 
 Returns the list of L<Log::Report::Lexicon::POT|Log::Report::Lexicon::POT> objects which contain
-the tables for $domain.
+the tables for C<$domain>.
 
 =back
 
@@ -97,7 +100,7 @@ names, or a HASH where the keys are the named.
 
 =item $obj-E<gt>B<process>($filename, %options)
 
-Update the domains mentioned in the $filename.  All text-domains defined
+Update the domains mentioned in the C<$filename>.  All text-domains defined
 in the file will get updated automatically, but should not written before
 all files are processed.
 
@@ -113,34 +116,57 @@ notice and info.  This could be syslog.  When you have no explicit
 dispatchers in your program, the level of detail get controlled by
 the 'mode':
 
-   use Log::Report mode => 'DEBUG';  # or 'VERBOSE'
+  use Log::Report mode => 'DEBUG';  # or 'VERBOSE'
 
 =item $obj-E<gt>B<store>( $domain, $filename, $linenr, $context, $msg, [$msg_plural] )
 
-Register the existence of a ($msg, $msg_plural) in all POTs of
-the $domain.
+Register the existence of a (C<$msg>, C<$msg_plural>) in all POTs of
+the C<$domain>.
 
 =item $obj-E<gt>B<write>( [$domain], %options )
 
-Update the information of the files related to $domain, by default all
+Update the information of the files related to C<$domain>, by default all
 processed DOMAINS.
 
-All information known about the written $domain is removed from the cache.
-The %options are passed to the C<write()> of the specific lexicon
+All information known about the written C<$domain> is removed from the cache.
+The C<%options> are passed to the C<write()> of the specific lexicon
 manager.
+
+=back
+
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Fault: cannot create lexicon directory $dir: $!
+
+Cast by new()
+
+=item Error: extractions require an explicit lexicon directory
+
+Cast by new()
+
+=item Error: no context tags allowed in plural `$msgid'
+
+Cast by store()
+
+=item Info: starting new textdomain $domain, template in $filename
+
+Cast by write()
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Log-Report-Lexicon distribution version 1.13,
-built on May 06, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report-Lexicon version 1.14,
+built on September 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2007-2025 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2007-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

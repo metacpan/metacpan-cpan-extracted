@@ -1,5 +1,12 @@
 Revision history for MooX-Const:
 
+v0.7.1    2025-09-11 16:42:32+01:00 Europe/London
+  [Bugs]
+  - Fixed warnings about using @_ in signatured subroutines.
+
+  [Tests]
+  - Added more author tests.
+
 v0.7.0    2025-08-09 10:47:22+01:00 Europe/London
   [Incompatible Changes]
   - Minimum Perl version is v5.20.
