@@ -33,7 +33,7 @@ use strict;
 use warnings;
 use English qw( -no_match_vars );
 
-our $VERSION = '20250711';
+our $VERSION = '20250912';
 
 use Carp;
 
@@ -1115,6 +1115,9 @@ sub show_indentation_table {
     # Output indentation table made at closing braces.  This can be helpful for
     # the case of a missing brace in a previously formatted file.
 
+    # skip if problem reading file
+    return if ( $self->[_in_error_] );
+
     # skip if -wc is used (rare); it is too complex to use
     return if ($rOpts_whitespace_cycle);
 
@@ -1200,7 +1203,7 @@ sub show_indentation_table {
     my @output_lines;
     push @output_lines, <<EOM;
 Table of initial nesting level differences at closing braces.
-This might help localize brace errors if the file was previously formatted.
+This might help localize brace errors IF perltidy previously formatted the file.
 line: error=[new brace level]-[old indentation level]
 EOM
     foreach my $i (@pre_indexes) {
@@ -6432,10 +6435,12 @@ EOM
 
         $self->[_in_quote_] = $in_quote;
         $self->[_quote_target_] =
-            $in_quote
-          ? $matching_end_token{$quote_character}
-              ? $matching_end_token{$quote_character}
-              : $quote_character
+          $in_quote
+          ? (
+              $matching_end_token{$quote_character}
+            ? $matching_end_token{$quote_character}
+            : $quote_character
+          )
           : EMPTY_STRING;
         $self->[_rhere_target_list_] = $rhere_target_list;
 
@@ -6832,7 +6837,11 @@ BEGIN {
     # after package NAMESPACE, so expecting TERM)
     # Fix for c250: add new type 'S' for sub (not expecting operator)
     my @q = qw#
-      ; ! + x & ?  F J - p / Y : % f U ~ A G j L P S * . | ^ < = [ m { \ > t
+      ; ! + x & ?  F J - p / Y : % f U ~ A G j L P S * . | ^ < = [ m {
+      #;
+    push @q, "\\";
+    push @q, qw#
+      > t
       || >= != mm *= => .. !~ == && |= .= pp -= =~ += <= %= ^= x= ~~ ** << /=
       &= // >> ~. &. |. ^.
       ... **= <<= >>= &&= ||= //= <=> !~~ &.= |.= ^.= <<~
@@ -7103,7 +7112,9 @@ sub operator_expected {
         return OPERATOR;
     }
 
+    #---------------------
     # Section 2E: bareword
+    #---------------------
     if ( $last_nonblank_type eq 'w' ) {
 
         # It is safest to return UNKNOWN if a possible ? pattern delimiter may
@@ -8844,8 +8855,9 @@ sub do_scan_package {
 
         # These are the only characters which can (currently) form special
         # variables, like $^W: (issue c066).
-        my @q =
-          qw{ ? A B C D E F G H I J K L M N O P Q R S T U V W X Y Z [ \ ] ^ _ };
+        my @q = qw{ ? A B C D E F G H I J K L M N O P Q R S T U V W X Y Z [ };
+        push @q, "\\";
+        push @q, qw{ ] ^ _ };
         @is_special_variable_char{@q} = (1) x scalar(@q);
     } ## end BEGIN
 
@@ -11726,7 +11738,11 @@ BEGIN {
     # fix for c250: added new token type 'P' and 'S'
     my @valid_token_types = qw#
       A b C G L R f h Q k t w i q n p m F pp mm U j J Y Z v P S
-      { } ( ) [ ] ; + - / * | % ! x ~ = \ ? : . < > ^ &
+      { } ( ) [ ] ; + - / * | % ! x ~ =
+      #;
+    push @valid_token_types, "\\";
+    push @valid_token_types, qw#
+      ? : . < > ^ &
       #;
     push( @valid_token_types, @digraphs );
     push( @valid_token_types, @trigraphs );
@@ -11903,7 +11919,11 @@ BEGIN {
     my @value_requestor_type = qw#
       L { ( [ ~ !~ =~ ; . .. ... A : && ! || // = + - x
       **= += -= .= /= *= %= x= &= |= ^= <<= >>= &&= ||= //=
-      <= >= == != => \ > < % * / ? & | ** <=> ~~ !~~ <<~
+      <= >= == != =>
+      #;
+    push @value_requestor_type, "\\";
+    push @value_requestor_type, qw#
+      > < % * / ? & | ** <=> ~~ !~~ <<~
       f F pp mm Y p m U J G j >> << ^ t
       ~. ^. |. &. ^.= |.= &.= ^^
       #;

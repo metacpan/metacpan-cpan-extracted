@@ -1,5 +1,5 @@
 package Task::MemManager;
-$Task::MemManager::VERSION = '0.03';
+$Task::MemManager::VERSION = '0.04';
 use strict;
 use warnings;
 
@@ -29,6 +29,7 @@ my %death_stub;           # Function to call upon object destruction
 my %allocator_of;         # Allocator used to allocate the buffer
 my %memory_region;        # Memory region assigned to the buffer
 my %is_nonoverlapping;    # Is the memory region non-overlapping ?
+my %creation_opts;        # Options used to create the object
 
 # Private functions
 my $consume_or_allocate_private_func;    # Avoids DRY when allocating/consuming
@@ -113,14 +114,18 @@ sub new {
 # Parameters  : $external_buffer_ref - Reference to the external buffer
 #               $num_of_items     - Number of items in the buffer
 #               $size_of_each_item - Size of each item in the buffer
-#               $opts_ref         - Reference to a hash of options. These are:
+#               \$opts          - Reference to a hash of options. 
+#                The ones that control the constructor are the following:
 #                allocator      - Name of the allocator to use
 #                delayed_gc     - Should garbage collection be delayed ?
 #                                 If it evaluates to non-false, it'll delay GC
 #                init_value     - Value to initialize the buffer with (ignored)
 #                death_stub     - Function to call upon object destruction
-#                  it will receive the object's properties and identifier
-#                  as a hash reference if it is defined
+#                                 it will receive the object's properties and 
+#                                 identifier as a hash reference (if defined)
+#               Additional options may be presented and the entire set of 
+#               options will be passed to the malloc function of the 
+#               allocator. 
 # Throws      : Croaks if the buffer allocation fails, or if the allocator
 #                does not provide a consume function
 # Comments    : Default allocator is PerlAlloc, which uses Perl's string
@@ -159,7 +164,7 @@ $consume_or_allocate_private_func = sub {
     }
     my $allocator  = $allocator_function{$allocator_name}{$func};
     my $new_buffer = bless do {
-        my $anon_scalar = $allocator->(@$func_args_ref);
+        my $anon_scalar = $allocator->(@$func_args_ref,$opts_ref);
     }, $self;
     unless ($new_buffer) {
         croak "Failed to allocate buffer using $allocator_name";
@@ -194,7 +199,7 @@ $consume_or_allocate_private_func = sub {
     $num_of_elements{$buffer_identifier}   = $num_of_items;
     $allocator_of{$buffer_identifier}      = $allocator_name;
     $is_nonoverlapping{$buffer_identifier} = 1;
-
+    $creation_opts{buffer_identifier}      = $opts_ref;
     if ( $opts_ref->{delayed_gc} ) {
         $delayed_gc_for{$buffer_identifier} = $new_buffer;
     }
@@ -232,7 +237,7 @@ sub DESTROY {
     delete $size_of_buffer{$identifier};
     delete $size_of_element{$identifier};
     delete $num_of_elements{$identifier};
-
+    delete $creation_opts{$identifier};
 }
 ###############################################################################
 # Usage       : Task::MemManager->extract_buffer_region(pos_start, pos_end);
@@ -333,7 +338,7 @@ Task::MemManager - A memory allocated and manager for low level code in Perl.
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -368,23 +373,54 @@ The default allocator is PerlAlloc, which uses Perl's string functions to alloca
 =head1 METHODS
 
 =head2 new
-
+   Usage      : my $buffer = Task::MemManager->consume($buffer,10,1,
+                {allocator => 'PerlAlloc'});
   Purpose     : Allocates a buffer using a specified allocator.
   Returns     : A reference to the buffer.
   Parameters  : 
     - $num_of_items: Number of items in the buffer.
     - $size_of_each_item: Size of each item in the buffer.
-    - \%opts: Reference to a hash of options. These are:
+    - \%opts: Reference to a hash of options (with defaults under comments):
       - allocator: Name of the allocator to use.
       - delayed_gc: Should garbage collection be delayed?
       - init_value: Value to initialize the buffer with (byte, non UTF!).
       - death_stub: Function to call upon object destruction (if any).
+      Additional options may be specified and the entire hash reference
+      will be passed to the malloc function of the allocator.
   Throws      : Croaks if the buffer allocation fails.
   Comments    : Default allocator is PerlAlloc, which uses Perl's string functions.
                 Default init_value is undef ('zero' zeroes out memory, 
                 any other byte value will initialize memory with that value).
                 Default delayed_gc is 0 (garbage collection is immediate).
 
+=head2 consume
+  Usage       : my $buffer = Task::MemManager->consume($buffer,10,1,
+                {allocator => 'PerlAlloc'});
+  Purpose     : Consumers a buffer created with the specified allocator
+  Returns     : A reference to the buffer
+  Parameters  : $external_buffer_ref - Reference to the external buffer
+                $num_of_items     - Number of items in the buffer
+                $size_of_each_item - Size of each item in the buffer
+                \$opts          - Reference to a hash of options. 
+                The ones that control the constructor are the following:
+                allocator      - Name of the allocator to use
+                delayed_gc     - Should garbage collection be delayed ?
+                                  If it evaluates to non-false, it'll delay GC
+                init_value     - Value to initialize the buffer with (ignored)
+                death_stub     - Function to call upon object destruction
+                                  it will receive the object's properties and 
+                                  identifier as a hash reference (if defined)
+                Additional options may be presented and the entire set of 
+                options will be passed to the malloc function of the 
+                allocator. 
+  Throws      : Croaks if the buffer allocation fails, or if the allocator
+                does not provide a consume function
+  Comments    : Default allocator is PerlAlloc, which uses Perl's string
+                functions,
+                Default init_value is undef ('zero' zeroes out memory, any
+                  byte value will initialize memory with that value)
+                Default delayed_gc is 1 (garbage collection is delayed)
+                
 =head2 extract_buffer_region
 
   Usage       : my $region = Task::MemManager->extract_buffer_region($pos_start, $pos_end);

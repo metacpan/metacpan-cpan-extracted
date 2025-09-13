@@ -12,18 +12,18 @@ use lib::archive "__DATA__";
 use VMod;
 use_ok('VMod2');
 
-is(version->parse($VMod::VERSION), version->parse(1.0), 'version ok');
+is( version->parse($VMod::VERSION), version->parse(1.0), 'version ok' );
 
 my $dfh = *{VMod::DATA};
-ok(fileno($dfh), 'handle ok');
-ok($dfh->can('seek'), 'can seek') if $] ge '5.020';
-ok(seek($dfh, 0, 0), 'seek successful');
+ok( fileno($dfh),       'handle ok' );
+ok( $dfh->can('seek'),  'can seek' ) if $] ge '5.020';
+ok( seek( $dfh, 0, 0 ), 'seek successful' );
 
 local $/ = undef;
 my $data = <$dfh>;
 $data =~ s/^.*\n__DATA__\r?\n/\n/s;
 
-like($data, qr/^\s+TestData\s+$/, 'data ok');
+like( $data, qr/^\s+TestData\s+$/, 'data ok' );
 
 done_testing();
 

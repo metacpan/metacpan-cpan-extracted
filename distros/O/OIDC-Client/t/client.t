@@ -943,10 +943,11 @@ sub test_get_token_refresh_token {
       token_response_parser => $test->mocked_token_response_parser,
       kid_keys => {},
       config => {
-        provider => 'my_provider',
-        id       => 'my_client_id',
-        secret   => 'my_client_secret',
-        scope    => 'my_scope',
+        provider      => 'my_provider',
+        id            => 'my_client_id',
+        secret        => 'my_client_secret',
+        scope         => 'my_scope',
+        refresh_scope => 'my_refresh_scope',
       },
       provider_metadata => { token_url => 'https://my-provider/token' },
     );
@@ -983,9 +984,8 @@ sub test_get_token_refresh_token {
       config => {
         provider => 'my_provider',
         id       => 'my_client_id',
-        secret        => 'my_client_secret',
-        scope         => 'my_scope',
-        refresh_scope => 'my_refresh_scope',
+        secret   => 'my_client_secret',
+        scope    => 'my_scope',
       },
       provider_metadata => { token_url => 'https://my-provider/token' },
     );
@@ -994,6 +994,7 @@ sub test_get_token_refresh_token {
     my $token_response = $client->get_token(
       grant_type    => 'refresh_token',
       refresh_token => 'my_refresh_token',
+      refresh_scope => 'my_refresh_scope',
     );
 
     # Then

@@ -13,7 +13,8 @@ use File::Path qw(remove_tree);
 my $exp_dir;
 
 BEGIN {
-    $ENV{PERL_LIB_ARCHIVE_HOME} = $Bin;
+    $ENV{PERL_LIB_ARCHIVE_HOME}    = $Bin;
+    $ENV{PERL_LIB_ARCHIVE_TESTING} = 1;
     remove_tree( $exp_dir = "$Bin/.lib_archive_extract" );
 }
 

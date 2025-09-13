@@ -1,3 +1,7 @@
+0.94 2025-09-12
+  - add env var PERL_LIB_ARCHIVE_IGNORE
+  - avoid treating running under Devel::Cover as running under a debugger
+
 0.92 2022-04-09
   - automatic expansion to $HOME/.lib_archive_extract under debugger
   - use env var PERL_LIB_ARCHIVE_HOME to set home dir

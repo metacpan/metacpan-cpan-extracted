@@ -1,0 +1,4 @@
+Changes:
+2025.09.10 - Full rewrite to make methods faster
+2025.09.10 - Added method sse_from_ymd()
+2025.09.10 - added method ordinal()

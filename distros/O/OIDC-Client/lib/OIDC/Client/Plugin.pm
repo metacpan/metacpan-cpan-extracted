@@ -332,9 +332,13 @@ sub refresh_token {
   my $refresh_token = $self->get_stored_refresh_token($audience_alias)
     or OIDC::Client::Error->throw("OIDC: no refresh token has been stored");
 
+  my $refresh_scope = $audience_alias ? undef
+                                      : $self->client->config->{refresh_scope};
+
   my $token_response = $self->client->get_token(
     grant_type    => 'refresh_token',
     refresh_token => $refresh_token,
+    $refresh_scope ? (refresh_scope => $refresh_scope) : (),
   );
 
   if (my $id_token = $token_response->id_token) {
@@ -419,7 +423,7 @@ sub exchange_token {
 
 Verifies the JWT access token received in the Authorization header of the current request.
 Throws an exception if an error occurs. Otherwise, stores an L<OIDC::Client::AccessToken> object
-and returns the claims.
+and returns it.
 
 To bypass the token verification in local environment, you can configure the C<mocked_access_token>
 entry (hashref) to be used to create an L<OIDC::Client::AccessToken> object that will be returned

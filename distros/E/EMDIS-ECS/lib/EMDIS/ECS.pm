@@ -35,7 +35,7 @@ BEGIN
 }
 
 # module/package version
-$VERSION = '0.45';
+$VERSION = '0.46';
 
 # file creation mode (octal, a la chmod)
 $FILEMODE = 0660;
@@ -1438,7 +1438,7 @@ __DATA__
 
 =head1 NAME
 
-EMDIS::ECS - ECS utility module
+EMDIS::ECS - Perl implementation of EMDIS Communicatin System (ECS)
 
 =head1 SYNOPSIS
 
@@ -1460,7 +1460,18 @@ EMDIS::ECS - ECS utility module
 
 =head1 DESCRIPTION
 
-This module contains a bunch of miscellaneous ECS related subroutines.
+EMDIS Communication System (ECS) is a specification for secure data
+exchange using encrypted email messages, originally developed as part
+of the European Marrow Donor Information System (EMDIS) project in the
+1990s.
+
+In addition to the EMDIS::ECS Perl module, the EMDIS-ECS tar archive
+includes a docker subdirectory containing several Dockerfile setups
+to aid in testing the software and deploying it under Rocky Linux or
+Ubuntu, and a web-status subdirectory containing resources for an ECS
+Status web page.
+
+This ECS.pm module contains miscellaneous ECS related subroutines.
 However, most of the documentation found here pertains to the Perl ECS
 implementation in general, not those specific subroutines.
 
@@ -1485,8 +1496,7 @@ be satisfied.
 =item Install Perl-ECS
 
 Install Perl, preferably version 5.6.1 or higher.  Then install the
-EMDIS::ECS package.  (Presumably already done if you're reading this
-documentation online.)
+EMDIS::ECS package.
 
 =item Email Account
 

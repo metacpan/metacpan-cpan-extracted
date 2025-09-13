@@ -2,6 +2,7 @@ Changes
 html/Elements/QuickCalls
 html/Helpers/QuickCalls
 html/User/Elements/Portlets/QuickCalls
+html/Views/Component/QuickCalls
 inc/Module/Install.pm
 inc/Module/Install/Base.pm
 inc/Module/Install/Can.pm

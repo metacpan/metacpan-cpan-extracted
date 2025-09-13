@@ -18,7 +18,8 @@ fi
 # convert embedded POD documentation to LaTeX
 pod2latex -out perlecs.tex -full -modify script/ecs_chk_com script/ecs_ctl \
  script/ecs_pid_chk script/ecs_proc_meta script/ecs_proc_msg \
- script/ecs_scan_mail script/ecs_setup script/ecstool lib/EMDIS/ECS.pm \
+ script/ecs_scan_mail script/ecs_setup script/ecs_token script/ecstool \
+ lib/EMDIS/ECS.pm \
  lib/EMDIS/ECS/Config.pm lib/EMDIS/ECS/FileBackedMessage.pm \
  lib/EMDIS/ECS/LockedHash.pm lib/EMDIS/ECS/Message.pm
 

@@ -2,7 +2,7 @@ package RT::Extension::QuickCalls;
 use warnings;
 use strict;
 
-our $VERSION = '1.04';
+our $VERSION = '2.00';
 
 =head1 NAME
 
@@ -10,9 +10,7 @@ RT::Extension::QuickCalls - Quickly create tickets in specific queues with defau
 
 =head1 RT VERSION
 
-Works with RT 4.4, 5.0
-
-To use the QuickCreate option RT must be newer than 4.4.1
+Works with RT 6.0. For RT 5.0 install the latest 1.X version.
 
 =head1 DESCRIPTION
 
@@ -39,11 +37,7 @@ The QuickCalls portlet can also be added to the user summary page:
 
 May need root permissions
 
-=item To use the QuickCreate option apply this patch for RT earlier than 5.0.6
-
-    patch -d /opt/rt5 -p1 < patches/0001-Support-QuickCreate-to-pass-arguments-to-redirect-UR.patch
-
-=item Edit your F</opt/rt4/etc/RT_SiteConfig.pm>
+=item Edit your F</opt/rt6/etc/RT_SiteConfig.pm>
 
 Add this line:
 
@@ -51,7 +45,7 @@ Add this line:
 
 =item Clear your mason cache
 
-    rm -rf /opt/rt4/var/mason_data/obj
+    rm -rf /opt/rt6/var/mason_data/obj
 
 =item Restart your webserver
 
@@ -62,8 +56,12 @@ Add this line:
 You will need to enable the new QuickCalls portlet with a line
 like this in your F<RT_SiteConfig.pm> file:
 
-    Set($HomepageComponents, [qw(QuickCreate Quicksearch MyAdminQueues MySupportQueues MyReminders
-                                 RefreshHomepage QuickCalls)]);
+    Set($HomepageComponents, [qw(QuickCreate QueueList QueueListAllStatuses
+                                 CatalogList CatalogListAllStatuses MyAdminQueues
+                                 MySupportQueues MyReminders RefreshHomepage
+                                 Dashboards SavedSearches FindUser MyAssets
+                                 FindAsset FindGroup SavedSearchSelectUser
+                                 QuickCalls)]);
 
 This is the default portlet list with QuickCalls added to the end
 People can then choose to add the portlet to their homepage
@@ -161,6 +159,25 @@ stay on the dashboard you can use the QuickCreate option:
             { Name => "Bar", Queue => 'Queue2',  Status => 'resolved' },
         ]
     );
+
+=cut
+
+if ( RT->Config->can('RegisterPluginConfig') ) {
+    RT->Config->RegisterPluginConfig(
+        Plugin  => 'QuickCalls',
+        Content => [
+            {
+                Name => 'QuickCalls',
+                Help => 'https://metacpan.org/pod/RT::Extension::QuickCalls#CONFIGURATION',
+            },
+        ],
+        Meta    => {
+            QuickCalls => {
+                Type => 'JSON',
+            },
+        }
+    );
+}
 
 =head1 AUTHOR
 

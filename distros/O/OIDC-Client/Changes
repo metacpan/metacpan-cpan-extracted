@@ -1,5 +1,8 @@
 Changes for OIDC-Client distribution
 
+1.04 2025-09-12
+  - Fix for token refresh : the 'refresh_scope' config should only be used for the current audience
+
 1.03 2025-09-09
   - The refresh token is not stored in the AccessToken object anymore but in its own store
   - The ID token can now be renewed on its own

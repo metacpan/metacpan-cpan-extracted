@@ -1,0 +1,28 @@
+---
+abstract: 'Encryption and Hashing wrapper for ChaCha20-Poly1305 and Argon2'
+author:
+  - 'Jim Melanson <jmelanson1965@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Vigil-Crypt
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Bytes::Random::Secure: '0'
+  Crypt::Argon2: '0'
+  Crypt::AuthEnc::ChaCha20Poly1305: '0'
+  Digest::SHA: '0'
+  Time::Local: '0'
+  perl: '5.010000'
+version: v2.1.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

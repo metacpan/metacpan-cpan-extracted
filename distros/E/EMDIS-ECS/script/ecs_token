@@ -74,6 +74,13 @@ die "Error - unrecognized, invalid, or missing <command>$/" . $USAGE
 
 # if configured, have gpg-agent cache GnuPG passphrase used by "pass"
 if(exists $ENV{PASS_GPG_KEYGRIP} and exists $ENV{PASS_GPG_PASSPHRASE}) {
+
+    # use gpgconf to ensure gpg-agent is started
+    my $gpgconf = exists $ENV{GPG_GPGCONF} ? $ENV{GPG_GPGCONF} : 'gpgconf';
+    my $err = timelimit_cmd($SECSTOR_TIMELIMIT, "$gpgconf --launch gpg-agent");
+    die "Error - gpgconf --launch gpg-agent command failed:  $err\n"
+        if $err;
+
     # default (linux) location of gpg-preset-passphrase program is in
     # /usr/libexec (not on PATH)
     my $gpg_preset_passphrase = exists $ENV{GPG_PRESET_PASSPHRASE}
@@ -84,7 +91,7 @@ if(exists $ENV{PASS_GPG_KEYGRIP} and exists $ENV{PASS_GPG_PASSPHRASE}) {
     # (to prevent "pass" from prompting for it interactively)
     my $keygrip = $ENV{PASS_GPG_KEYGRIP};
     my $passphrase = $ENV{PASS_GPG_PASSPHRASE};
-    my $err = timelimit_cmd(
+    $err = timelimit_cmd(
         $SECSTOR_TIMELIMIT,
         "$gpg_preset_passphrase --preset $keygrip",
         $passphrase);
@@ -396,7 +403,7 @@ __END__
 
 =head1 NAME
 
-ecs_token - Use OAuth 2.0 refresh token to get new access token
+ecs_token - get OAuth 2.0 access token
 
 =head1 SYNOPSIS
 
@@ -432,7 +439,7 @@ usable with all identity providers.
 
 =head2 Usage
 
- ecs_token <command> [options]
+ ecs_token command [options]
 
 =head2 Commands
 
@@ -499,7 +506,7 @@ storage retrieval error, initialize this to the value '0' (zero).
 OAuth 2.0 client id.  Required by the C<ecs_token code>,
 C<ecs_token credentials>, and C<ecs_token refresh> commands.  Example value:
 
- 1083558311832-0q5ul7ffdg6n4fj1p1to6rae88hvhsha.apps.googleusercontent.com
+ 1083[...].apps.googleusercontent.com
 
 =item client_secret
 
@@ -528,7 +535,7 @@ C<ecs_token refresh> command.  Initialized by the C<ecs_token code>
 command.  May also be populated by the C<ecs_token refresh> command.
 Example value:
 
- 1//04Gei0xdQmoxKCgYIARAAGAQSNwF-L9IrizgSeuBmjQf7RNSPpAKUK-wsOFcDicS8jZEmusXSppx09bFyehICh4WkGqRrUj73OH0
+ 1//04Ge[...]3OH0
 
 =item scope
 
@@ -577,7 +584,7 @@ Find the keygrip for the selected key.
 
 Use the keygrip to preset the key's passphrase in the C<gpg-agent> cache.
 
-  echo -n '<gpg_passphrase>' | \
+  echo -n 'gpg_passphrase' | \
     /usr/libexec/gpg-preset-passphrase --preset <gpg_keygrip>
 
 =back
@@ -615,16 +622,17 @@ C<ecs_token>.  E.g.:
   echo -n '0' | \
     pass insert --echo emdis/ecs/oauth/cached_token_timestamp
 
-  echo -n '<client_id>' | \
+  echo -n '1083[...].apps.googleusercontent.com' | \
     pass insert --echo emdis/ecs/oauth/client_id
 
-  echo -n '<client_secret>' | \
+  echo -n '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' | \
     pass insert --echo emdis/ecs/oauth/client_secret
 
-  echo -n 'https://google.github.io/gmail-oauth2-tools/html/oauth2.dance.html' | \
+  echo -n \
+    'https://google.github.io/gmail-oauth2-tools/html/oauth2.dance.html' | \
     pass insert --echo emdis/ecs/oauth/redirect_uri
 
-  echo -n '<refresh_token>' | \
+  echo -n '1//04Ge[...]3OH0' | \
     pass insert --echo emdis/ecs/oauth/refresh_token
 
   echo -n 'https://mail.google.com/' | \
@@ -632,6 +640,37 @@ C<ecs_token>.  E.g.:
 
   echo -n 'https://accounts.google.com/o/oauth2/token' | \
     pass insert --echo emdis/ecs/oauth/token_endpoint
+
+=back
+
+=head2 Environment Variables
+
+The C<pass> program depends on C<gpg-agent> to supply the passphrase it
+uses to decrypt its gpg-encrypted data.  If C<PASS_GPG_KEYGRIP> and
+C<PASS_GPG_PASSPHRASE> environment variables are defined, C<ecs_token>
+uses the information they contain to preset the indicated passphrase.
+
+Additionally, C<GPG_GPGCONF> and C<GPG_PRESET_PASSPHRASE> environment
+variables, respectively, can be configured to override the default
+locations of the C<gpgconf> and C<gpg-preset-passphrase> programs.
+
+=over
+
+=item GPG_GPGCONF
+
+Location of C<gpgconf> program.
+
+=item GPG_PRESET_PASSPHRASE
+
+Location of C<gpg-preset-passphrase> program.
+
+=item PASS_GPG_KEYGRIP
+
+Keygrip identifying the GnuPG key used by C<pass>.
+
+=item PASS_GPG_PASSPHRASE
+
+Passphrase for the GnuPG key used by C<pass>.
 
 =back
 
@@ -783,7 +822,10 @@ Returns a non-zero exit code if an error is encountered.
 =head1 SEE ALSO
 
 EMDIS::ECS::Config, https://gnupg.org/, https://www.passwordstore.org/,
-https://oauth.net/2/, https://datatracker.ietf.org/doc/html/rfc6749
+https://developers.google.com/workspace/gmail/imap/xoauth2-protocol,
+https://datatracker.ietf.org/doc/html/rfc7628,
+https://datatracker.ietf.org/doc/html/rfc6749,
+https://oauth.net/2/
 
 =head1 AUTHOR
 

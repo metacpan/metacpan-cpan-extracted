@@ -543,28 +543,14 @@ Version 0.45 2025-07-21
   password manager) package;  install Authen::SASL::Perl via CPAN
 - LICENSE:  restore missing AGNIS license language about NIH
 
-
-Ideas for Future Enhancements
-=============================
-- send admin message when slow message status > 24 hours
-- add --reprocess feature(s) to ecstool
-- build PPM package
-- add more automated tests, especially for complex operations involving
-  encryption and email
-- add option to use MIME (RFCs 2045-2049) for encrypted email instead of the
-  existing basic ASCII Armor format (use Email::MIME?)
-- refactor and clean up code
-- improve method for handling encr_typ;  allow for use of GnuPG with PGP2
-  protocol
-- modify handling of incoming messages to send admin email and not
-  process message if subject line indicates message is from THIS_NODE
-- add option to tweak scan_mail loop in ecs_scan_mail, to insert 5 second
-  delay and increase maximum loop count to 60 (i.e. what Australia did
-  to accommodate Microsoft Exchange)
-- add option to tweak mbox_get_message function in ecs_scan_mail, to use
-  MIME::QuotedPrint decode_qp function (another Microsoft Exchange
-  workaround)
-- add ecstool option to process a cleartext file
-- allow for automatic reprocessing of self-signed message files
-- add ecstool option to decrypt and assemble a logical message consisting
-  of multiple physical messages
+Version 0.46 2025-09-12
+=======================
+- ECS.pm:  improve introductory info in embedded documentation
+- ecs_token:  use gpgconf to ensure gpg-agent is started before presetting
+  passphrase;  in embedded documentation, add SASL related links, add info
+  about environment variables, and make adjustments to improve generated
+  PDF output
+- generate_pdf.sh:  add script/ecs_token
+- docker/dist/Dockerfile:  add gnupg1 package (provides gpg1)
+- docker/rockylinux/Dockerfile:  add gnupg1 package (provides gpg1)
+- docker/ubuntu/Dockerfile:  add gnupg1 package (provides gpg1)

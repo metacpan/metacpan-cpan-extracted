@@ -1,5 +1,48 @@
 # Perltidy Change Log
 
+## 2025 09 12
+
+    - Fix git #191, where a new check to escape whitespace in a qw() quote
+      in perl-5.43.2 caused Perl::Tidy to emit unwanted warning messages.
+
+    - A new output field for the --dump-block-summary command gives
+      the number of lines of comments and pod in a block.  For subs and
+      anonymous subs, the existence of header comments is also indicated.
+
+    - Added --dump-nested-ternaries, --warn-nested-ternaries, and
+      --nested-ternary-maximum-depth=n. These can be used to locate
+      nested ternary statements in a script.
+
+    - For the --line-up-parentheses option, a line length tolerance was
+      adjusted by 1 character to help keep table formatting unchanged when
+      adding and deleting trailing commas.  This can occasionally change
+      formatting of some small lists when formatted with -lp.
+
+    - In hash key lists which have side comments after sub blocks,
+      long lines which were previously broken before a comma may now
+      be broken after a previous '=>'. This change was made to
+      fix a very rare stability problem. For example:
+
+      OLD:
+        '+' => sub { $turtle->turn( $changes->{"dtheta"} ); }
+        ,               # Turn clockwise
+
+      NEW:
+        '+' =>
+            sub { $turtle->turn( $changes->{"dtheta"} ); },    # Turn clockwise
+
+    - Fixed undefined variable reference when --dump-block-summary was
+      run with --dump-block-types='package'. The dump was okay, but
+      an error message like the following was emitted:
+
+      Use of uninitialized value $seqno in hash element ...
+
+    - The parameter --integer-range-check no longer accepts a 0 value, which
+      allowed integer range checks to be skipped.  This option was included
+      temporarily when new range-checking code was added to provide a
+      workaround in case problems arose with the new logic.  No problems have
+      been encountered, so this has been removed.
+
 ## 2025 07 11
 
     - Update for issue git #187: add vertical alignment of colons

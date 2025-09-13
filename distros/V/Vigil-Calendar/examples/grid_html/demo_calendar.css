@@ -1,0 +1,411 @@
+/*
+This CSS file is used with Vigil::Calendar and the library calendar.lib.
+
+This distro comes with a file called calendar_css.pl. This file will let you
+load the CSS file into the webpage dynamically, specifying the class prefix so
+that you can apply it with different prefixes.
+
+By doing that, you can edit the styles in this file but don't have to edit the
+<prefix> tags. Leave them in place, and the dynamic_css.pl file will automatically
+replace them before deliving the CSS to the browser.
+
+This allows you to have multiple css files with different styles, to apply to
+different calendars. Just make sure dynamic_css.pl maps the correct prefix with
+the correct *.css file.
+ 
+Make sure you call this CSS file in the header of the page that is displaying the calendar.
+
+- Example: 
+    prefix=maincalendar  might map to maincalendar.css
+	prefix=sidebarcal    might map to sidebarcalendar.css
+	prefix=apptcal       might map to appointmentcal.css
+	
+    ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+    ┃      REALLY IMPORTANT       ┃
+    ┃                             ┃
+    ┃  Order of classes matters.  ┃
+    ┃  Do not rearrange sections, ┃
+    ┃       as some rely on       ┃
+    ┃      cascade overrides.     ┃
+    ┃                             ┃
+    ┃     YES, THIS MEANS YOU!    ┃
+    ┃                             ┃
+    ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+This file starts with CSS for GRID calendar format. Scroll further down for AGENDA format.
+
+*/
+
+<PREFIX>-table {border: 2px solid black; width: 75%; max-width: 1050px; border-collapse: collapse; table-layout: fixed; margin: 0 auto;}
+
+/*
+ ┌─────────────────────────────────────────────────────────────────────────────────────────────┐
+ │                                     ROW of DAY NAMES                                        │
+ └─────────────────────────────────────────────────────────────────────────────────────────────┘
+
+		The calendar display has a row at the top that contains: Sunday, Monday .. Saturday
+		These next classes are what applies the styling to that row. You can set *-row to
+		apply to all the days. You can set *-odd & *-even to apply to the days. You can set
+		the individual days. Or you can set only certain individual days as an override.
+		Regardless of how you approach this, DO NOT CHANGE THE ORDER IN WHICH THESE APPEAR!
+*/
+
+<PREFIX>-dayname-all {font-weight: bold; text-align:center;}
+
+<PREFIX>-dayname-odd {}
+
+<PREFIX>-dayname-even {}
+
+<PREFIX>-dayname-sun {}
+
+<PREFIX>-dayname-mon {}
+
+<PREFIX>-dayname-tue {}
+
+<PREFIX>-dayname-wed {}
+
+<PREFIX>-dayname-thu {}
+
+<PREFIX>-dayname-fri {}
+
+/*
+ ┌─────────────────────────────────────────────────────────────────────────────────────────────┐
+ │                                    CALENDAR GRID ROWS                                       │
+ └─────────────────────────────────────────────────────────────────────────────────────────────┘
+ 
+		The calendar displays the days/dates in rows of seven days. There will be between
+		one and six rows. You can apply a style to all rows *-row-all. You can also alternate
+		odd and even rows with *-row-even and *-row-odd. You can override certain weeks to
+		highlight dates or information by specifying the physical week *-week-N
+
+*/
+
+<PREFIX>-row-all {}
+
+<PREFIX>-row-even {}
+
+<PREFIX>-row-odd {}
+
+<PREFIX>-week-1 {}
+
+<PREFIX>-week-2 {}
+
+<PREFIX>-week-3 {}
+
+<PREFIX>-week-4 {}
+
+<PREFIX>-week-5 {}
+
+<PREFIX>-week-6 {}
+
+/*
+ ┌─────────────────────────────────────────────────────────────────────────────────────────────┐
+ │                                         COLUMNS                                             │
+ └─────────────────────────────────────────────────────────────────────────────────────────────┘
+
+		The physical layout of the calendar is columns and rows. One of them has to reign
+		supreme so I made the arbitrary decision to have columns be the king. You can change
+		that by moving the row definitions below the column definitions.
+		
+		Columns will cover the whole calendar, regardless of the date being in the previous month,
+		the current month, of the next/following month. Therefore, all the other possible CSS
+		classes come after columns, so that they will override columns and give you a granular
+		design.
+		
+		NOTE: There is no distinction between columns for previous and next/following months as
+		those dates would mix with current month columns.
+*/
+
+<PREFIX>-col-all { vertical-align: top; border: 1px solid black; padding: 6px; word-wrap: break-word;}
+
+<PREFIX>-col-odd {background-color: #f5f5f5;}
+
+<PREFIX>-col-even {background-color: #dcdcdc;}
+
+<PREFIX>-col-sun {}
+
+<PREFIX>-col-mon {}
+
+<PREFIX>-col-tue {}
+
+<PREFIX>-col-wed {}
+
+<PREFIX>-col-thu {}
+
+<PREFIX>-col-fri {}
+
+<PREFIX>-col-sat {}
+
+/*			
+ ┌─────────────────────────────────────────────────────────────────────────────────────────────┐
+ │                                     DAY of THE WEEK                                         │
+ └─────────────────────────────────────────────────────────────────────────────────────────────┘
+		CURRENT month's day of the week:
+		There is no *-curr-day-all, -odd, -even, -mon, -tue, -wed, -thu, -fri, -sat as they
+		would always be equipvalent to *col-all, etc.
+*/
+
+<PREFIX>-curr-day-today {background-color: #fffcad; color: maroon;}
+
+/* PREVIOUS month's DOW */
+<PREFIX>-prev-day-all {background-color: #c0c0c0;}
+
+<PREFIX>-prev-day-odd {}
+
+<PREFIX>-prev-day-even {}
+
+<PREFIX>-prev-day-sun {}
+
+<PREFIX>-prev-day-mon {}
+
+<PREFIX>-prev-day-tue {}
+
+<PREFIX>-prev-day-wed {}
+
+<PREFIX>-prev-day-thu {}
+
+<PREFIX>-prev-day-fri {}
+
+<PREFIX>-prev-day-sat {}
+
+<PREFIX>-prev-day-today {}
+
+/* NEXT month's DOW */
+<PREFIX>-next-day-all {background-color: #c0c0c0;}
+
+<PREFIX>-next-day-odd {}
+
+<PREFIX>-next-day-even {}
+
+<PREFIX>-next-day-sun {}
+
+<PREFIX>-next-day-mon {}
+
+<PREFIX>-next-day-tue {}
+
+<PREFIX>-next-day-wed {}
+
+<PREFIX>-next-day-thu {}
+
+<PREFIX>-next-day-fri {}
+
+<PREFIX>-next-day-sat {}
+
+<PREFIX>-next-day-today {}
+
+
+/*
+ ┌─────────────────────────────────────────────────────────────────────────────────────────────┐
+ │                                       DAY's NUMBER                                          │
+ └─────────────────────────────────────────────────────────────────────────────────────────────┘
+ 
+		Within the calendar are individual cells for the days of the month. These
+		are <td> cells. Within each <td></td> is a <div></div> that holds the
+		integer for the day's date. You can apply styling to this <div> here.
+
+		The CURRENT month, PREVIOUS month, and NEXT month are all treated differently.
+*/
+
+<PREFIX>-curr-daynum-all {text-align:left;font-family:verdana,helvetica,arial;font-size:16px;color:#000;font-weight:bold;}
+
+<PREFIX>-curr-daynum-odd {}
+
+<PREFIX>-curr-daynum-even {}
+
+<PREFIX>-curr-daynum-sun {}
+
+<PREFIX>-curr-daynum-mon {}
+
+<PREFIX>-curr-daynum-tue {}
+
+<PREFIX>-curr-daynum-wed {}
+
+<PREFIX>-curr-daynum-thu {}
+
+<PREFIX>-curr-daynum-fri {}
+
+<PREFIX>-curr-daynum-sat {}
+
+<PREFIX>-curr-daynum-today {font-size:32px;color:#ff0000;}
+
+/* PREVIOUS month's day numbers */
+<PREFIX>-prev-daynum-all {background-color: #c0c0c0; text-align: left;}
+
+<PREFIX>-prev-daynum-odd {}
+
+<PREFIX>-prev-daynum-even {}
+
+<PREFIX>-prev-daynum-sun {}
+
+<PREFIX>-prev-daynum-mon {}
+
+<PREFIX>-prev-daynum-tue {}
+
+<PREFIX>-prev-daynum-wed {}
+
+<PREFIX>-prev-daynum-thu {}
+
+<PREFIX>-prev-daynum-fri {}
+
+<PREFIX>-prev-daynum-sat {}
+
+/* NEXT month's day numbers */
+<PREFIX>-next-daynum-all {background-color: #c0c0c0; text-align: left;}
+
+<PREFIX>-next-daynum-odd {}
+
+<PREFIX>-next-daynum-even {}
+
+<PREFIX>-next-daynum-sun {}
+
+<PREFIX>-next-daynum-mon {}
+
+<PREFIX>-next-daynum-tue {}
+
+<PREFIX>-next-daynum-wed {}
+
+<PREFIX>-next-daynum-thu {}
+
+<PREFIX>-next-daynum-fri {}
+
+<PREFIX>-next-daynum-sat {}
+
+/*
+ ┌─────────────────────────────────────────────────────────────────────────────────────────────┐
+ │                                  CSS for SPECIFIC DATES                                     │
+ └─────────────────────────────────────────────────────────────────────────────────────────────┘
+		If you are generating this CSS programatically and wish to generate a class for a
+		specific date, then name your class in this format: .date-YYYY-MM-DD
+
+		For example, if you were going to have special CSS for June 19th, 2025
+		then you would name your class
+
+		.date-2025-06-19 {}
+
+		NOTE: the month and day MUST be 2 digits. The year MUST be 4 digits.
+
+		Here is an easy snippet to generate the class name:
+
+	my $classname_to_print_to_css_file = 'date-' . sprintf("%04d%02d%02d", $YEAR, $MONTH, $DAY);
+	
+		You could modify the CSS delivery script (calendar_css.pl) to automatically generate
+		and insert the date classes.
+
+ ┌─────────────────────────────────────────────────────────────────────────────────────────────┐
+ │                                  CSS for AGENDA FORMAT                                      │
+ └─────────────────────────────────────────────────────────────────────────────────────────────┘
+
+  <div class="<prefix>-agenda-wrapper">
+:Repeating Starts
+    <!-- Left column: Date info -->
+    <div class="<prefix>-agenda-dateinfo-all <prefix>-agenda-dateinfo-even <prefix>-agenda-dateinfo-fri <prefix>-agenda-dateinfo-today <prefix>-agenda-dateinfo-date-2025-09-12">
+      <div class="<prefix>-agenda-dateinfo-name-all <prefix>-agenda-dateinfo-name-even <prefix>-agenda-dateinfo-name-fri <prefix>-agenda-dateinfo-name-today <prefix>-agenda-dateinfo-name-date-2025-09-12">Friday</div>
+      <div class="<prefix>-agenda-dateinfo-number-all <prefix>-agenda-dateinfo-number-even <prefix>-agenda-dateinfo-number-fri <prefix>-agenda-dateinfo-number-today <prefix>-agenda-dateinfo-number-date-2025-09-12">12<span class="superscript">th</span></div>
+      <div class="<prefix>-agenda-dateinfo-monthyear-all <prefix>-agenda-dateinfo-monthyear-even <prefix>-agenda-dateinfo-monthyear-fri <prefix>-agenda-dateinfo-monthyear-today <prefix>-agenda-dateinfo-monthyear-date-2025-09-12">September, 2025</div>
+    </div>
+    <!-- Right column: User content -->
+    <div class="<prefix>-agenda-content-all <prefix>-agenda-content-even <prefix>-agenda-content-fri <prefix>-agenda-content-today <prefix>-agenda-content-date-2025-11-15">
+      <!-- Start User Content// -->
+      ~ . join("\n", @$items) . qq~;
+      <!-- //End User Content -->
+    </div>
+:Repeating ends
+  </div>
+
+*/
+
+.superscript {
+    vertical-align: super;
+    font-size: 0.75em;
+}
+
+<PREFIX>-agenda-wrapper {display: flex; flex-direction: column; gap: 1rem; font-family: sans-serif;width: 75%; margin: 0 auto;}
+
+<PREFIX>-agenda-day-all { display: flex; flex-direction: row; border: 2px solid #333; border-radius: 6px; overflow: hidden; background-color: #fefefe;}
+<prefix>-agenda-day-even {}
+<prefix>-agenda-day-mon {}
+<prefix>-agenda-day-tue {}
+<prefix>-agenda-day-wed {}
+<prefix>-agenda-day-thu {}
+<prefix>-agenda-day-fri {}
+<prefix>-agenda-day-sat {}
+<prefix>-agenda-day-sun {}
+<prefix>-agenda-day-today {}
+<prefix>-agenda-day-date-2025-09-18 {} /* Here as an example, remote it. */
+
+<PREFIX>-agenda-dateinfo-all {width: 100px; border-right: 2px solid #333; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 0.5rem; background-color: #f4f4f4;}
+<prefix>-agenda-dateinfo-even {}
+<prefix>-agenda-dateinfo-mon {}
+<prefix>-agenda-dateinfo-tue {}
+<prefix>-agenda-dateinfo-wed {}
+<prefix>-agenda-dateinfo-thu {}
+<prefix>-agenda-dateinfo-fri {}
+<prefix>-agenda-dateinfo-sat {}
+<prefix>-agenda-dateinfo-sun {}
+<prefix>-agenda-dateinfo-today {}
+<prefix>-agenda-date-info-date-2025-09-18 {background-color: #000; color: #fff;} /* Here as an example, remote it. */
+
+<PREFIX>-agenda-dateinfo-name-all {font-family: verdana,helvetica,arial; font-size: 0.85rem; font-weight: normal; text-align: center; color: #000;}
+<prefix>-agenda-dateinfo-name-mon {}
+<prefix>-agenda-dateinfo-name-tue {}
+<prefix>-agenda-dateinfo-name-wed {}
+<prefix>-agenda-dateinfo-name-thu {}
+<prefix>-agenda-dateinfo-name-fri {}
+<prefix>-agenda-dateinfo-name-sat {}
+<prefix>-agenda-dateinfo-name-sun {}
+<prefix>-agenda-dateinfo-name-today {color: #ff0000;}
+<prefix>-agenda-dateinfo-name-date-2025-09-18 {background-color: #000; color: #fff;} /* Here as an example, remote it. */
+
+<PREFIX>-agenda-dateinfo-number-all {font-family: verdana,helvetica,arial; font-size: 1.25rem; font-weight: bold; margin: 0.2rem 0; text-align: center;}
+<prefix>-agenda-dateinfo-number-mon {}
+<prefix>-agenda-dateinfo-number-tue {}
+<prefix>-agenda-dateinfo-number-wed {}
+<prefix>-agenda-dateinfo-number-thu {}
+<prefix>-agenda-dateinfo-number-fri {}
+<prefix>-agenda-dateinfo-number-sat {}
+<prefix>-agenda-dateinfo-number-sun {}
+<prefix>-agenda-dateinfo-number-today {font-size:32px;color:#ff0000;}
+<prefix>-agenda-dateinfo-number-date-2025-09-18 {background-color: #000; color: #fff;} /* Here as an example, remote it. */
+
+<prefix>-agenda-dateinfo-monthyear-all {font-family: verdana,helvetica,arial; font-size: 0.85rem; font-weight: normal; text-align: center; color: #000;}
+<prefix>-agenda-dateinfo-monthyear-mon {}
+<prefix>-agenda-dateinfo-monthyear-tue {}
+<prefix>-agenda-dateinfo-monthyear-wed {}
+<prefix>-agenda-dateinfo-monthyear-thu {}
+<prefix>-agenda-dateinfo-monthyear-fri {}
+<prefix>-agenda-dateinfo-monthyear-sat {}
+<prefix>-agenda-dateinfo-monthyear-sun {}
+<prefix>-agenda-dateinfo-monthyear-today {color: #ff0000;}
+<prefix>-agenda-dateinfo-monthyear-date-2025-09-18 {background-color: #000; color: #fff;} /* Here as an example, remote it. */
+
+<PREFIX>-agenda-content-all {font-family: verdana,helvetica,arial; flex: 1; padding: 0.5rem; text-align: left; background-color: #fff;}
+<prefix>-agenda-content-even {}
+<prefix>-agenda-content-mon {}
+<prefix>-agenda-content-tue {}
+<prefix>-agenda-content-wed {}
+<prefix>-agenda-content-thu {}
+<prefix>-agenda-content-fri {}
+<prefix>-agenda-content-sat {}
+<prefix>-agenda-content-sun {}
+<prefix>-agenda-content-today {}
+<prefix>-agenda-content-date-2025-09-09 {} /* Here as an example, remote it. */
+
+@media (max-width: 600px) {
+    <PREFIX>-agenda-day-all {
+        flex-direction: column;
+    }
+    <PREFIX>-agenda-dateinfo-all {
+        width: 100%;
+        border-right: none;
+        border-bottom: 2px solid #333;
+        flex-direction: row;
+        justify-content: space-around;
+        padding: 0.5rem 0;
+    }
+    <PREFIX>-agenda-dateinfo-name-all, <PREFIX>-agenda-dateinfo-number-all, <PREFIX>-agenda-dateinfo-monthyear-all {
+        margin: 0 0.2rem;
+    }
+    <PREFIX>-agenda-content-all {
+        padding: 0.5rem 0.5rem 0.5rem 0.5rem;
+    }
+}

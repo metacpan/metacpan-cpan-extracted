@@ -11,12 +11,12 @@
 #
 # 2) Build a "perlecs/ubuntu" Docker image based on the Dockerfile.
 #
-#    docker build -t perlecs/ubuntu:0.45-1 .
+#    docker build -t perlecs/ubuntu:0.46-1 .
 #
 # 3) Generate a Docker container based on the image, and run an interactive
 #    bash shell within the container.
 #
-#    docker run --rm -it --name=perlecs_ubuntu  perlecs/ubuntu:0.45-1 /bin/bash
+#    docker run --rm -it --name=perlecs_ubuntu  perlecs/ubuntu:0.46-1 /bin/bash
 #
 # 4) Configure Perl ECS within the docker container.  For example, use
 #    "ecs_setup" to generate an ecs.cfg configuration file, "ecstool" to
@@ -34,14 +34,15 @@
 FROM ubuntu:24.04
 LABEL Maintainer="Joel Schneider <joel@joelschneider.net>"
 LABEL Description="EMDIS::ECS (Perl ECS) on Ubuntu"
-LABEL Version="0.45"
+LABEL Version="0.46"
 
 # install extra Ubuntu packages
 RUN apt-get update -y
 #RUN apt-get upgrade -y perl-modules
 RUN apt-get install -y \
   ca-certificates libmail-imapclient-perl build-essential cpanminus make telnet \
-  pass perl-doc man-db manpages groff-base vim-tiny python3 python3-qpid-proton
+  pass perl-doc man-db manpages groff-base vim-tiny python3 python3-qpid-proton \
+  gnupg1
 
 # create perlecs user
 RUN useradd --comment "Perl ECS user" --shell /bin/bash --create-home perlecs

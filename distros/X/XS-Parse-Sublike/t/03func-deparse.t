@@ -20,6 +20,15 @@ use B::Deparse;
 
 my $deparser = B::Deparse->new();
 
+# The standard boilerplate that we have to go through
+my ( $hint_bits, $warning_bits, $hinthash );
+BEGIN { ( $hint_bits, $warning_bits, $hinthash ) = ( $^H, ${^WARNING_BITS}, \%^H ); }
+$deparser->ambient_pragmas(
+   hint_bits    => $hint_bits,
+   warning_bits => $warning_bits,
+   '%^H'        => $hinthash,
+);
+
 # check that signatured functions deparse the right way
 #   (RT132335)
 

@@ -14,7 +14,7 @@ use MIME::Base64 qw(decode_base64);
 use IO::Uncompress::Gunzip;
 use HTTP::Tiny;
 
-our $VERSION = "0.92";
+our $VERSION = "0.94";
 
 =pod
 
@@ -98,6 +98,11 @@ case you have to use an URL pointing to the file under 'authors/id').
 If the environment variable CPAN_MIRROR is set, it will be used instead of
 'https://www.cpan.org'.
 
+For temporary excluding modules from being loaded via lib::archive the
+environment variable PERL_LIB_ARCHIVE_IGNORE can be set to a regular expression.
+It will be matched against the relative pathname of the modules (e.g. C<JSON/PP.pm>).
+A leading C<!> will be split off and invert the match.
+
 =head1 WHY
 
 There are two use cases that motivated the creation of this module:
@@ -121,6 +126,7 @@ my $rx_url = qr!^(?:CPAN|https?)://!;
 my $tar    = Archive::Tar->new();
 my $home   = $ENV{PERL_LIB_ARCHIVE_HOME} // glob('~');
 
+
 sub import {
     my ( $class, @entries ) = @_;
     my %cache;
@@ -128,6 +134,8 @@ sub import {
     my $caller_file    = (caller)[1];
     my $under_debugger = defined($DB::single);
     my $extract_dir    = $ENV{PERL_LIB_ARCHIVE_EXTRACT} // "$home/.lib_archive_extract";
+    my $ignore         = _get_ignore_sub();
+    my $under_cover    = defined($Devel::Cover::VERSION) && !$ENV{PERL_LIB_ARCHIVE_TESTING};
 
     for my $entry (@entries) {
         my $is_url = $entry =~ /$rx_url/;
@@ -159,9 +167,11 @@ sub import {
 
     unshift @INC, sub {
         my ( $cref, $rel ) = @_;
+        return if $ignore and $ignore->($rel);
         return unless my $rec = $cache{$rel};
         $INC{$rel} = _expand( $rel, $rec->{content}, $rec->{arcver}, $extract_dir )
-            if $ENV{PERL_LIB_ARCHIVE_EXTRACT} or $under_debugger;
+            if $ENV{PERL_LIB_ARCHIVE_EXTRACT}
+            or ( $under_debugger and not $under_cover );
         $INC{$rel} //= $rec->{path} unless $under_debugger;
         open( my $pfh, '<', $rec->{content} ) or croak $!;
         return $pfh;
@@ -239,6 +249,15 @@ sub _expand {
     print $fh $$cref;
     close($fh);
     return $fn;
+}
+
+
+sub _get_ignore_sub {
+    return unless my $txt = $ENV{PERL_LIB_ARCHIVE_IGNORE};
+    my ( $rx, $neg ) = reverse( split( /^(!)/, $txt ) );
+    return unless $rx;
+    $rx = qr($rx);
+    return sub { $neg ? $_[0] !~ /$rx/ : $_[0] =~ /$rx/ };
 }
 
 

@@ -1,5 +1,10 @@
 Revision history for XS-Parse-Sublike
 
+0.39    2025-09-12
+        [BUGFIXES]
+         * Make sure to set `B::Deparse`'s ->ambient_pragmas when running
+           deparse tests (https://github.com/Perl/perl5/issues/23674)
+
 0.38    2025-08-08
         [BUGFIXES]
          * Improvements to handling of anonymous parameters or missing

@@ -136,7 +136,7 @@ BEGIN {
     # then the Release version must be bumped, and it is probably past time for
     # a release anyway.
 
-    $VERSION = '20250711';
+    $VERSION = '20250912';
 } ## end BEGIN
 
 {
@@ -533,17 +533,6 @@ my $md5_hex = sub {
     #   $buf = a string
     # Return:
     #   $digest = its MD5 sum
-
-    # Patch for [rt.cpan.org #88020]
-    # Use utf8::encode since md5_hex() only operates on bytes.
-    # my $digest = md5_hex( utf8::encode($sink_buffer) );
-
-    # Note added 20180114: the above patch did not work correctly.  I'm not
-    # sure why.  But switching to the method recommended in the Perl 5
-    # documentation for Encode worked.  According to this we can either use
-    #    $octets = encode_utf8($string)  or equivalently
-    #    $octets = encode("utf8",$string)
-    # and then calculate the checksum.  So:
     my $octets = Encode::encode( "utf8", $buf );
     my $digest = md5_hex($octets);
     return $digest;
@@ -736,7 +725,11 @@ EOM
     }
 
     my $get_hash_ref = sub {
+
         my ($key) = @_;
+
+        # Get and check a parameter from the input hash
+
         my $hash_ref = $input_hash{$key};
         if ( defined($hash_ref) ) {
             if ( ref($hash_ref) ne 'HASH' ) {
@@ -2771,7 +2764,7 @@ EOM
 } ## end sub process_filter_layer
 
 # For safety, set an upper bound on number of iterations before stopping.
-# The average number of iterations is 2. No known cases exceed 4.
+# The average number of iterations is 2. No known cases exceed 5.
 use constant ITERATION_LIMIT => 6;
 
 sub process_iteration_layer {
@@ -3544,9 +3537,16 @@ sub generate_options {
     $category = 11;                                       # HTML
     $option_category{html} = $category_name[$category];
 
-    # routine to install and check options
+    # Routine to install and check options
     my $add_option = sub {
+
         my ( $long_name, $short_name, $flag ) = @_;
+
+        # Given:
+        #   $long_name  = the full option name, such as 'backup-method'
+        #   $short_name = the abbreviation, such as 'bm'
+        #   $flag       = the Getopt code, such as '=s', see above list
+
         push @option_string, $long_name . $flag;
         $option_category{$long_name} = $category_name[$category];
         if ($short_name) {
@@ -3860,6 +3860,9 @@ sub generate_options {
     ########################################
     $category = 9;    # Other controls
     ########################################
+    $add_option->( 'dump-nested-ternaries',        'dnt',  '!' );
+    $add_option->( 'warn-nested-ternaries',        'wnt',  '!' );
+    $add_option->( 'nested-ternary-maximum-depth', 'ntmd', '=i' );
     $add_option->( 'warn-missing-else',            'wme',  '!' );
     $add_option->( 'add-missing-else',             'ame',  '!' );
     $add_option->( 'add-missing-else-comment',     'amec', '=s' );
@@ -4091,7 +4094,7 @@ sub generate_options {
         'entab-leading-whitespace'                  => [ 0, undef, 0 ],
         'fixed-position-side-comment'               => [ 0, undef, undef ],
         'indent-columns'                            => [ 0, undef, 4 ],
-        'integer-range-check'                       => [ 0, 3,     2 ],
+        'integer-range-check'                       => [ 1, 3,     2 ],
         'interbracket-arrow-complexity'             => [ 0, 2,     1 ],
         'iterations'                                => [ 0, undef, 1 ],
         'keep-old-blank-lines'                      => [ 0, 2,     1 ],
@@ -4128,6 +4131,7 @@ sub generate_options {
         'vertical-tightness-closing'                => [ 0, 3,     undef ],
         'warn-mismatched-arg-overcount-cutoff'      => [ 0, undef, 1 ],
         'warn-mismatched-arg-undercount-cutoff'     => [ 0, undef, 4 ],
+        'nested-ternary-maximum-depth'              => [ 0, undef, 0 ],
         'warn-unique-keys-cutoff'                   => [ 1, undef, 1 ],
         'whitespace-cycle'                          => [ 0, undef, 0 ],
     );
@@ -4807,6 +4811,13 @@ sub make_grep_alias_string {
         $exclude_string =~ s/\s+$//;
         my @q = split /\s+/, $exclude_string;
         @is_excluded_word{@q} = (1) x scalar(@q);
+        foreach my $word (@q) {
+            next if ( $word eq '*' );
+            if ( $word =~ /^\d/ || $word =~ /[^\w]/ ) {
+                my $opt_name = 'grep-alias-exclusion-list';
+                Die("unexpected word in --$opt_name: '$word'\n");
+            }
+        }
     }
 
     # The special option -gaxl='*' removes all defaults
@@ -4827,10 +4838,9 @@ sub make_grep_alias_string {
 
     foreach my $word (@word_list) {
         if ($word) {
-            if ( $word !~ /^\w[\w\d]*$/ ) {
-                Warn(
-                    "unexpected word in --grep-alias-list: '$word' - ignoring\n"
-                );
+            if ( $word =~ /^\d/ || $word =~ /[^\w]/ ) {
+                my $opt_name = 'grep-alias-list';
+                Die("unexpected word in --$opt_name: '$word'\n");
             }
             if ( !$seen{$word} && !$is_excluded_word{$word} ) {
                 $seen{$word}++;
@@ -4920,29 +4930,31 @@ sub check_options {
 EOM
     }
 
+    # Check for integer values out of bounds as follows:
+    #  $integer_range_check=
+    #    1 => quietly reset bad values to defaults
+    #    2 => issue warning and reset bad values to defaults [DEFAULT]
+    #    3 => stop if any values are out of bounds
+    # Note: Previously a value of 0 meant to skip this check. This provided a
+    # workaround in case this logic caused a problem. This is no longer needed.
     my $integer_range_check = $rOpts->{'integer-range-check'};
     if (   !defined($integer_range_check)
-        || $integer_range_check < 0
+        || $integer_range_check <= 0
         || $integer_range_check > 3 )
     {
         $integer_range_check = 2;
     }
 
-    # Check for integer values out of bounds as follows:
-    #  $integer_range_check=
-    #    0 => skip check completely (for stress-testing perltidy only)
-    #    1 => quietly reset bad values to defaults
-    #    2 => issue warning and reset bad values defaults [DEFAULT]
-    #    3 => stop if any values are out of bounds
     if ($integer_range_check) {
         my $Error_message;
         foreach my $opt ( keys %{$rinteger_option_range} ) {
+            my $val = $rOpts->{$opt};
+            next unless ( defined($val) );
             my $range = $rinteger_option_range->{$opt};
             next unless ( defined($range) );
             my ( $min, $max, $default ) = @{$range};
 
-            my $val = $rOpts->{$opt};
-            if ( defined($min) && defined($val) && $val < $min ) {
+            if ( defined($min) && $val < $min ) {
                 $Error_message .= "--$opt=$val but should be >= $min";
                 if ( $integer_range_check < 3 ) {
                     $rOpts->{$opt} = $default;
@@ -4951,7 +4963,7 @@ EOM
                 }
                 $Error_message .= "\n";
             }
-            if ( defined($max) && defined($val) && $val > $max ) {
+            if ( defined($max) && $val > $max ) {
                 $Error_message .= "--$opt=$val but should be <= $max";
                 if ( $integer_range_check < 3 ) {
                     $rOpts->{$opt} = $default;
@@ -5217,12 +5229,12 @@ sub find_file_upwards {
 
 sub expand_command_abbreviations {
 
-    # go through @ARGV and expand any abbreviations
-    # note that @ARGV has been localized
-
     my ( $rexpansion, $rraw_options, $config_file ) = @_;
 
-    # set a pass limit to prevent an infinite loop;
+    # Go through @ARGV and expand any abbreviations
+    # Note that @ARGV has been localized
+
+    # Set a pass limit to prevent an infinite loop;
     # 10 should be plenty, but it may be increased to allow deeply
     # nested expansions.
     my $max_passes = 10;
@@ -5323,9 +5335,13 @@ DIE
     return;
 } ## end sub expand_command_abbreviations
 
-# Debug routine -- this will dump the expansion hash
 sub dump_short_names {
+
     my $rexpansion = shift;
+
+    # do --dump-short-names (-dsn)
+    # Debug routine -- this will dump the expansion hash
+
     print {*STDOUT} <<EOM;
 List of short names.  This list shows how all abbreviations are
 translated into other abbreviations and, eventually, into long names.
@@ -5342,13 +5358,14 @@ EOM
 
 sub check_vms_filename {
 
-    # given a valid filename (the perltidy input file)
+    my $filename = shift;
+
+    # Given a valid filename (the perltidy input file)
     # create a modified filename and separator character
     # suitable for VMS.
     #
     # Contributed by Michael Cartmell
     #
-    my $filename = shift;
     my ( $base, $path ) = fileparse($filename);
 
     # remove explicit ; version
@@ -5448,10 +5465,11 @@ EOS
 
 sub look_for_Windows {
 
-    # determine Windows sub-type and location of
-    # system-wide configuration files
     my $rpending_complaint = shift;
-    my $is_Windows         = ( $OSNAME =~ /win32|dos/i );
+
+    # Determine Windows sub-type and location of
+    # system-wide configuration files
+    my $is_Windows = ( $OSNAME =~ /win32|dos/i );
     my $Windows_type;
     $Windows_type = Win_OS_Type($rpending_complaint) if ($is_Windows);
     return ( $is_Windows, $Windows_type );
@@ -5459,11 +5477,12 @@ sub look_for_Windows {
 
 sub find_config_file {
 
-    # look for a .perltidyrc configuration file
-    # For Windows also look for a file named perltidy.ini
     my ( $is_Windows, $Windows_type, $rconfig_file_chatter,
         $rpending_complaint )
       = @_;
+
+    # Look for a .perltidyrc configuration file
+    # For Windows also look for a file named perltidy.ini
 
     ${$rconfig_file_chatter} .= "# Config file search...system reported as:";
     if ($is_Windows) {
@@ -5605,12 +5624,13 @@ sub find_config_file {
 
 sub Win_Config_Locs {
 
+    my ( $rpending_complaint, $os ) = @_;
+
     # In scalar context returns the OS name (95 98 ME NT3.51 NT4 2000 XP),
     # or undef if its not a win32 OS.  In list context returns OS, System
     # Directory, and All Users Directory.  All Users will be empty on a
     # 9x/Me box.  Contributed by: Yves Orton.
 
-    my ( $rpending_complaint, $os ) = @_;
     if ( !$os ) { $os = Win_OS_Type($rpending_complaint) }
 
     return unless ($os);
@@ -5640,7 +5660,11 @@ sub Win_Config_Locs {
 } ## end sub Win_Config_Locs
 
 sub dump_config_file {
+
     my ( $rconfig_string, $config_file, $rconfig_file_chatter ) = @_;
+
+    # do --dump-profile (-dpro)
+
     print {*STDOUT} "${$rconfig_file_chatter}";
     if ($rconfig_string) {
         my @lines = split /^/, ${$rconfig_string};
@@ -5973,7 +5997,9 @@ EOM
 
 sub parse_args {
 
-    # Parse a command string containing multiple string with possible
+    my ($body) = @_;
+
+    # Parse a command string $body containing multiple string with possible
     # quotes, into individual commands.  It might look like this, for example:
     #
     #    -wba=" + - "  -some-thing -wbb='. && ||'
@@ -5981,7 +6007,6 @@ sub parse_args {
     # There is no need, at present, to handle escaped quote characters.
     # (They are not perltidy tokens, so needn't be in strings).
 
-    my ($body)     = @_;
     my @body_parts = ();
     my $quote_char = EMPTY_STRING;
     my $part       = EMPTY_STRING;
@@ -6037,6 +6062,9 @@ EOM
 sub dump_long_names {
 
     my @names = @_;
+
+    # do --dump-long-names (-dln)
+
     print {*STDOUT} <<EOM;
 # Command line long names (passed to GetOptions)
 #--------------------------------------------------
@@ -6058,7 +6086,11 @@ EOM
 } ## end sub dump_long_names
 
 sub dump_integer_option_range {
+
     my ($rinteger_option_range) = @_;
+
+    # do --dump-integer-option-range (-dior)
+
     print {*STDOUT} "Option, min, max, default\n";
     foreach my $key ( sort keys %{$rinteger_option_range} ) {
         my ( $min, $max, $default ) = @{ $rinteger_option_range->{$key} };
@@ -6071,7 +6103,10 @@ sub dump_integer_option_range {
 } ## end sub dump_integer_option_range
 
 sub dump_defaults {
+
     my @defaults = @_;
+
+    #  do --dump-defaults (-ddf)
     print {*STDOUT} "Default command line options:\n";
     foreach my $line ( sort @defaults ) { print {*STDOUT} "$line\n" }
     return;
@@ -6079,9 +6114,10 @@ sub dump_defaults {
 
 sub readable_options {
 
+    my ( $rOpts, $roption_string ) = @_;
+
     # return options for this run as a string which could be
     # put in a perltidyrc file
-    my ( $rOpts, $roption_string ) = @_;
     my %Getopt_flags;
     my $rGetopt_flags    = \%Getopt_flags;
     my $readable_options = "# Final parameter set for this run.\n";
@@ -6140,6 +6176,8 @@ EOM
 } ## end sub show_version
 
 sub usage {
+
+    # Dump brief usage message if arg is -help or -h, or on certain errors
 
     print {*STDOUT} <<EOF;
 This is perltidy version $VERSION, a perl script indenter.  Usage:

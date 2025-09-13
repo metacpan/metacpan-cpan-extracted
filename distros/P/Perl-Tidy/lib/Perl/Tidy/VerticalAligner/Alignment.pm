@@ -9,13 +9,22 @@ package Perl::Tidy::VerticalAligner::Alignment;
 use strict;
 use warnings;
 
-our $VERSION = '20250711';
+our $VERSION = '20250912';
 
 sub new {
-    my ( $class, $rarg ) = @_;
-    my $self = bless $rarg, $class;
+
+    my ( $class, $rhash ) = @_;
+
+    # Create a new VerticalAligner::Alignment object
+    # Given:
+    #   $rhash = ref to hash for an alignment column
+    # There are just two values in the hash:
+    #   {column}       is the alignment column
+    #   {saved_column} is used to save a column
+
+    my $self = bless $rhash, $class;
     return $self;
-}
+} ## end sub new
 
 sub AUTOLOAD {
 

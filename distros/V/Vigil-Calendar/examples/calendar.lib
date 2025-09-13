@@ -1,0 +1,588 @@
+#Instructions for using this library are at the end of the file.
+
+sub calendar_maker {
+    my %args = @_;
+
+    return '' unless defined $args{calendar_object};
+
+	$args{output_style} = lc($args{output_style}) if defined $args{output_style};
+
+    $args{dayname_ref} = { 1 => 'Sun', 2 => 'Mon', 3 => 'Tue', 4 => 'Wed', 5 => 'Thu', 6 => 'Fri', 7 => 'Sat' } unless $args{dayname_ref} && keys %{ $args{dayname_ref} };
+
+	if($args{output_style} eq 'html_agenda') {
+		_render_html_agenda($args{calendar_object}, $args{css_prefix}, $args{dayname_ref}, $args{content_ref});
+	}
+	elsif($args{output_style} eq 'text_agenda') {
+		_render_text_agenda($args{calendar_object}, $args{dayname_ref}, $args{content_ref})
+	}
+	elsif($args{output_style} eq 'pdf_agenda') {
+		_render_pdf_agenda($args{calendar_object}, $args{dayname_ref}, $args{content_ref},  $args{pdf_draw_callback});
+	}
+	elsif($args{output_style} eq 'pdf_grid') {
+		_render_pdf_monthgrid($args{calendar_object}, $args{dayname_ref}, $args{content_ref},  $args{pdf_draw_callback});
+	} else {
+		return _render_html_monthgrid($args{calendar_object}, $args{css_prefix}, $args{dayname_ref}, $args{content_ref});
+	}
+}
+
+sub _validate_agenda_max_days { return defined $_[0] ? ($_[0] =~ /^\d+$/ ? ($_[0] > 365 ? 365 : abs($_[0])) : 7) : 7; }
+
+sub _render_html_monthgrid {
+	my ($c_obj, $css_prefix, $dayname_ref, $content_ref, ) = @_;
+	
+    my %classnames = %{ get_css_classnames($css_prefix) };
+
+    my $html_grid = qq~
+  <table class="${css_prefix}-table">
+    ~;
+    unless($content_ref->{no_dayname}) {
+	    $html_grid .= qq~
+    <thead>
+      <tr>
+	    ~;
+		for(my $day = 1; $day <= 7; $day++) {
+		    my $this_classnames = $classnames{dayname}{all} . ' ' . ( ( ($day % 2 == 0) ? $classnames{dayname}{even} : $classnames{dayname}{odd} ) ) . ' ' . $classnames{dayname}{$day};
+			$html_grid .= qq~<td class="$this_classnames">$dayname_ref->{$day}</td>\n~;
+		}
+		$html_grid .= qq~
+      </tr>
+	</thead>
+	    ~;
+	}
+	$html_grid .= qq~
+	<tbody>
+    ~;
+	for(my $a = 1; $a <= $c_obj->weeks_in_month; $a++) {
+        $html_grid .= qq~<tr class="${css_prefix}-~ . ($a % 2 == 0 ? 'row-even' : 'row-odd') . qq~ ${css_prefix}-week-$a">~;
+		my @weekdays = $c_obj->week_definition($a);
+		for(my $weekday = 0; $weekday <= 6; $weekday++) {
+		    my $display_year = $c_obj->year;
+		    my $display_month = $c_obj->month;
+			#$weekdays[$weekday] is the current day's date of the seven day loop
+			#$weekdays[$#weekdays] is the date of the seventh day in the loop
+			#  If the current day of the week is greater than the last day of
+			#  the week, then that day belongs to the previous month.
+			#
+			#  If the current day's date of the seven day loop is less than the
+			#  first day's date in the loop, then that day belongs to the
+			#  following month.
+			
+            my $reducer;
+            if(($a == 1) && ($weekdays[$weekday] > $weekdays[$#weekdays])) {
+				#Previous Month - Current day is greater than the last day of the week
+			    $reducer = 'previous';
+				$display_month = $c_obj->month - 1;
+				if($display_month == 0) {
+					$display_month = 12;
+					$display_year  = $c_obj->year - 1;
+				}
+			}
+			elsif(($a == $c_obj->weeks_in_month) && ($weekdays[$weekday] < $weekdays[0])) {
+			    #Next Month - Current day is less than the first day of the week
+			    $reducer = 'next';
+				$display_month = $c_obj->month + 1;
+				if($display_month == 13) {
+					$display_month = 1;
+					$display_year  = $c_obj->year + 1;
+				}
+			} else {
+				#Display Month
+			    $reducer = 'current';
+			}
+
+			my $day_class = $classnames{column}{all};
+			$day_class .= ' ' . ((($weekday + 1) % 2 == 0) ? $classnames{column}{even} : $classnames{column}{odd});
+			$day_class .= ' ' . $classnames{column}{$weekday + 1};
+
+			if($reducer eq 'curr') {
+				$day_class .= ' ' . $classnames{day}{curr}{today}
+			} else {
+			    $day_class .= ' ' . $classnames{day}{$reducer}{all};
+			    $day_class .= ' ' . ((($weekday + 1) % 2 == 0) ? $classnames{day}{$reducer}{even} : $classnames{day}{$reducer}{odd});
+			    $day_class .= ' ' . $classnames{day}{$reducer}{$weekday + 1};
+			}
+			
+			$day_class .= " ${css_prefix}-date-" . sprintf("%04d-%02d-%02d", $display_year, $display_month, $weekdays[$weekday]);
+			my $date_number_class = $classnames{datenumber}{$reducer}{all};
+			$date_number_class .= ' ' . ((($weekday + 1) % 2 == 0) ? $classnames{datenumber}{$reducer}{even} : $classnames{datenumber}{$reducer}{odd});
+			$date_number_class .= ' ' . $classnames{datenumber}{$reducer}{$weekday + 1}; #Sun .. Sat
+
+			my @now = localtime(time);
+			$now[5] += 1900;
+			$now[4] += 1;
+			if( ($display_year == $now[5]) && ($display_month == $now[4]) && ($weekdays[$weekday] == $now[3]) ) {
+				#This date is TODAY
+				$day_class .= " ${css_prefix}-curr-day-today";
+			    $date_number_class .= " ${css_prefix}-curr-daynum-today";
+			}
+			my $display_date = sprintf("%04d-%02d-%02d", $display_year, $display_month, $weekdays[$weekday]);
+			
+            my $items = $content_ref->{$display_date} // [];
+            $items = [$items] unless ref $items eq 'ARRAY';
+            $html_grid .= qq~
+        <td title="$display_date" class="$day_class">
+          <div class="$date_number_class">$weekdays[$weekday]</div>
+            <!-- Content for YEAR: $display_year; MONTH: $display_month; DAY: $weekdays[$weekday]; CSS PREFIX: $css_prefix -->
+              ~ . join("<br>\n", @$items) . qq~
+            <!-- /Your content -->
+        </td>
+			~;
+		}
+		$html_grid .= "</tr>\n";
+	}
+    $html_grid .= qq~
+	</tbody>
+  </table>
+    ~;
+	return $html_grid;
+}
+
+sub _render_pdf_monthgrid {
+    my ($c_obj, $dayname_ref, $content_ref, $draw_cell_callback) = @_;
+	
+	my $display_year  = $content_ref->{print_year}  ? $content_ref->{print_year}  : $c_obj->year;
+	my $display_month = $content_ref->{print_month} ? $content_ref->{print_month} : $c_obj->month;
+	my $display_day   = $content_ref->{print_day}   ? $content_ref->{print_day}   : 1;
+
+    my $first_wday    = $c_obj->weekday(1, $display_month, $display_year);  # 0=Sun
+    my $days_in_month = $c_obj->days_in_month($display_year, $display_month);
+
+    my $day = 1;
+    for my $week (0..5) {  # max 6 weeks in a month
+        for my $wday (0..6) {
+            if ($week == 0 && $wday < $first_wday) {
+                $draw_cell_callback->(undef, $week, $wday);
+            } elsif ($day <= $days_in_month) {
+                my $date_str = sprintf("%04d-%02d-%02d", $display_year, $display_month, $day);
+                my $items = $content_ref->{$date_str} // [];
+                $items = [$items] unless ref $items eq 'ARRAY';
+                $draw_cell_callback->($day, $week, $wday, $items);
+                $day++;
+            } else {
+                $draw_cell_callback->(undef, $week, $wday);
+            }
+        }
+    }
+}
+
+sub _render_html_agenda {
+	my ($c_obj, $css_prefix, $dayname_ref, $content_ref) = @_;
+	
+	$content_ref->{agenda_max_days} = _validate_agenda_max_days($content_ref->{agenda_max_days});
+    
+	my $classnames = get_css_classnames($css_prefix);
+
+	my $display_year  = $content_ref->{print_year}  ? $content_ref->{print_year}  : $c_obj->year;
+	my $display_month = $content_ref->{print_month} ? $content_ref->{print_month} : $c_obj->month;
+	my $display_day   = $content_ref->{print_day}   ? $content_ref->{print_day}   : 1;
+
+    my $sse_tracker = $c_obj->sse_from_ymd($display_year, $display_month, $display_day) + 7200;
+
+	my $count = 0;
+	my $iterator = 0;
+
+    my $html_agenda = qq~<div class="$classnames->{agenda}{wrapper}">\n<!-- CSS PREFIX: $css_prefix -->~;
+	
+	while ($count < $content_ref->{agenda_max_days}) {
+
+        return do {
+			$html_agenda .= 'No Data</div>';
+			$html_agenda;
+		} if $iterator >= 364;
+
+		$sse_tracker += 86400 if $iterator;
+		$iterator++;
+		my @loc_t = localtime($sse_tracker);
+		$display_year  = $loc_t[5] + 1900;
+		$display_month = $loc_t[4] + 1;
+		$display_day   = $loc_t[3];
+        my $display_date = sprintf("%04d-%02d-%02d", $display_year, $display_month, $display_day);
+
+		my $items = $content_ref->{$display_date};
+		# skip undef
+		next unless defined $items;
+		# wrap scalar into array ref
+		$items = [$items] unless ref $items eq 'ARRAY';
+		# skip empty array or array with only empty strings
+		next unless grep { defined && $_ ne '' } @$items;
+
+        $count++;
+		
+		my $weekday = $c_obj->weekday($display_day, $display_month, $display_year);
+
+		my $classnames_day_wrapper = $classnames->{agenda}{day}{all};
+		$classnames_day_wrapper .= ' ' . ( ($weekday % 2 == 0) ? $classnames->{agenda}{day}{even} : $classnames->{agenda}{day}{odd} );
+		$classnames_day_wrapper .= ' ' . $classnames->{agenda}{day}{$weekday};
+		if( ($display_year == $today_ref->{year}) && ($display_month == $today_ref->{month}) && ($display_day == $today_ref->{day}) ) {
+			#This date is TODAY
+			$classnames_day_wrapper .= ' ' . $classnames->{agenda}{day}{today};
+		}
+		$classnames_day_wrapper .= ' ' . "${css_prefix}-agenda-day-date-${display_date}";
+
+		my $classnames_dateinfo_wrapper   = $classnames_day_wrapper =~ s/\-day\-/\-dateinfo\-/gr;
+		my $classnames_dateinfo_name      = $classnames_day_wrapper =~ s/\-day\-/\-dateinfo\-name\-/gr;
+		my $classnames_dateinfo_number    = $classnames_day_wrapper =~ s/\-day\-/\-dateinfo\-number\-/gr;
+		my $classnames_dateinfo_monthyear = $classnames_day_wrapper =~ s/\-day\-/\-dateinfo\-monthyear\-/gr;
+		my $classnames_content            = $classnames_day_wrapper =~ s/\-day\-/\-content\-/gr;
+
+        $html_agenda .= qq~
+  <div class="$classnames_day_wrapper">
+    <!-- Left column: Date info -->
+    <div class="$classnames_dateinfo_wrapper">
+      <div class="$classnames_dateinfo_name">$dayname_ref->{$weekday}</div>
+      <div class="$classnames_dateinfo_number">$display_day<span class="superscript">~ . $c_obj->ordinal($display_day) . qq~</span></div>
+      <div class="$classnames_dateinfo_monthyear">~ . $c_obj->month_name($display_month) . qq~, $display_year</div>
+    </div>
+    <!-- Right column: User content -->
+    <div class="$classnames_content">
+      <!-- Start User Content// -->
+      ~ . join("\n", @$items) . qq~;
+      <!-- //End User Content -->
+    </div>
+  </div>
+		~;
+	}
+	$html_agenda .= '</div>';
+	return $html_agenda;
+}
+
+sub _render_text_agenda {
+	my ($c_obj, $dayname_ref, $content_ref) = @_;
+
+	$content_ref->{agenda_max_days} = _validate_agenda_max_days($content_ref->{agenda_max_days});
+
+	my $display_year  = $content_ref->{print_year}  ? $content_ref->{print_year}  : $c_obj->year;
+	my $display_month = $content_ref->{print_month} ? $content_ref->{print_month} : $c_obj->month;
+	my $display_day   = $content_ref->{print_day}   ? $content_ref->{print_day}   : 1;
+
+    my $sse_tracker = $c_obj->sse_from_ymd($display_year, $display_month, $display_day) + 7200;
+
+	my $count = 0;
+	my $iterator = 0;
+
+    my $text_agenda = '';
+
+	while ($count < $content_ref->{agenda_max_days}) {
+		$iterator++; #We need to count every calendar day we iterate over to track the dates properly.
+		$sse_tracker += 86400 if $iterator;
+		my @loc_t = localtime($sse_tracker);
+		$display_year  = $loc_t[5] + 1900;
+		$display_month = $loc_t[4] + 1;
+		$display_day   = $loc_t[3];
+        my $display_date = sprintf("%04d-%02d-%02d", $display_year, $display_month, $display_day);
+
+		my $items = $content_ref->{$display_date};
+		# skip undef
+		next unless defined $items;
+		# wrap scalar into array ref
+		$items = [$items] unless ref $items eq 'ARRAY';
+		# skip empty array or array with only empty strings
+		next unless grep { defined && $_ ne '' } @$items;
+
+        $count++;
+
+		if($content_ref->{serialize}) {
+			my $serialize_spacer = ' ' x (length($count) + 3);
+			$text_agenda .= "\n($count) ";
+			$text_agenda .= sprintf("%s, %s %d%s, %s", $dayname_ref->{ $c_obj->weekday($display_day, $display_month, $display_year) }, $c_obj->month_name($display_month), $display_day, $c_obj->ordinal($display_day), $display_year) . "\n";
+			$text_agenda .= $serialize_spacer . join("\n$serialize_spacer", @$items) . "\n";
+		} else {
+			$text_agenda .= "\n" if $text_agenda;
+			$text_agenda .= sprintf("%s, %s %d%s, %s", $dayname_ref->{ $c_obj->weekday($display_day, $display_month, $display_year) }, $c_obj->month_name($display_month), $display_day, $c_obj->ordinal($display_day), $display_year) . "\n";
+			$text_agenda .= join("\n", @$items) . "\n";
+		}
+		last if $count >= $content_ref->{agenda_max_days};
+	}
+	return $text_agenda;
+}
+
+sub _render_pdf_agenda {
+    my ($c_obj, $dayname_ref, $content_ref, $draw_callback) = @_;
+
+    $content_ref->{agenda_max_days} = _validate_agenda_max_days($content_ref->{agenda_max_days});
+
+    my $display_year  = $content_ref->{print_year}  // $c_obj->year;
+    my $display_month = $content_ref->{print_month} // $c_obj->month;
+    my $display_day   = $content_ref->{print_day}   // 1;
+
+	my $count = 0;
+	my $iterator = 0;
+	
+    my $sse_tracker = $c_obj->sse_from_ymd($display_year, $display_month, $display_day) + 7200;
+
+    while ($count < $content_ref->{agenda_max_days}) {
+        $sse_tracker += 86400 if $iterator;
+		$iterator++; #We need to count every calendar day we iterate over to track the dates
+		             #properly. YES, this comes after the increment on the line before it.
+        my @loc_t = localtime($sse_tracker);
+        $display_year  = $loc_t[5] + 1900;
+        $display_month = $loc_t[4] + 1;
+        $display_day   = $loc_t[3];
+        my $display_date = sprintf("%04d-%02d-%02d", $display_year, $display_month, $display_day);
+
+		my $items = $content_ref->{$display_date};
+		# skip undef
+		next unless defined $items;
+		# wrap scalar into array ref
+		$items = [$items] unless ref $items eq 'ARRAY';
+		# skip empty array or array with only empty strings
+		next unless grep { defined && $_ ne '' } @$items;
+
+		$count++;
+
+        my $header = sprintf("%s, %s %d%s, %s",
+            $dayname_ref->{ $c_obj->weekday($display_day, $display_month, $display_year) },
+            $c_obj->month_name($display_month),
+            $display_day,
+            $c_obj->ordinal($display_day),
+            $display_year
+        );
+
+		if($content_ref->{serialize}) {
+			my $serialize_spacer = ' ' x (length($count) + 3);
+			# Use the callback to “draw” the header and items
+			$draw_callback->("$serialize_spacer$header");
+			foreach my $item (@$items) {
+				$draw_callback->("$serialize_spacer$item");  # indent for clarity
+			}
+			$draw_callback->('');   # <-- inserts one blank line
+		} else {
+			# Use the callback to “draw” the header and items
+			$draw_callback->($header);
+			foreach my $item (@$items) {
+				$draw_callback->("  $item");  # indent for clarity
+			}
+			$draw_callback->('');   # <-- inserts one blank line
+		}
+    }
+}
+
+sub get_css_classnames {
+	my $pfx = shift;
+	
+	my $make_keys = sub { my ($prefix, $base) = @_; return { map { $_ => "$prefix-$base-$_" } qw(all odd even today) } };
+
+	my %temp = (
+		dayname => { row =>  $pfx . '-dayname-all', odd =>  $pfx . '-dayname-odd', even => $pfx . '-dayname-even' },
+		agenda  => { wrapper => $pfx . '-agenda-wrapper' }
+	);
+	my @shorty = qw(sun mon tue wed thu fri sat);
+
+    $temp{table} = $pfx . '-table';
+	$temp{column} = $make_keys->($pfx, 'col');
+	$temp{row} = $make_keys->($pfx, 'row');
+	delete $temp{column}{today}, $temp{row}{today};
+
+	$temp{datenumber}{current}  = $make_keys->($pfx, 'curr-daynum');
+	$temp{datenumber}{previous} = $make_keys->($pfx, 'prev-daynum');
+	$temp{datenumber}{next}     = $make_keys->($pfx, 'next-daynum');
+	$temp{day}{current} = "$prefix-curr-day-today";
+	$temp{day}{previous} = $make_keys->($pfx, 'prev-day');
+	$temp{day}{next}     = $make_keys->($pfx, 'next-day');
+	$temp{agenda}{day} = $make_keys->($pfx, 'agenda-day');
+	$temp{agenda}{dateinfo} = $make_keys->($pfx, 'agenda-dateinfo');
+	$temp{agenda}{dateinfo}{name}  = $make_keys->($pfx, 'agenda-dateinfo-name');
+	$temp{agenda}{dateinfo}{number} = $make_keys->($pfx, 'agenda-dateinfo-number');
+	$temp{agenda}{dateinfo}{monthyear} = $make_keys->($pfx, 'agenda-dateinfo-monthyear');
+	$temp{agenda}{content} = $make_keys->($pfx, 'agenda-content');
+
+	for (my $wkday = 1; $wkday <= 7; $wkday++) {
+		$temp{dayname}{$wkday} = $pfx . '-dayname-' . $shorty[$wkday - 1];
+		$temp{column}{$wkday}   = $pfx . '-col-' . $shorty[$wkday - 1];
+	    $temp{row}{$wkday}      = $pfx . '-row-' . $wkday unless $wkday == 7;
+		$temp{datenumber}{current}{$wkday}  = $pfx . '-curr-daynum-' . $shorty[$wkday - 1];
+		$temp{datenumber}{previous}{$wkday} = $pfx . '-prev-daynum-' . $shorty[$wkday - 1];
+		$temp{datenumber}{next}{$wkday}     = $pfx . '-next-daynum-' . $shorty[$wkday - 1];
+		$temp{day}{current}{$wkday}  = $pfx . '-curr-day-' . $shorty[$wkday - 1];
+		$temp{day}{previous}{$wkday} = $pfx . '-prev-day-' . $shorty[$wkday - 1];
+		$temp{day}{next}{$wkday}     = $pfx . '-next-day-' . $shorty[$wkday - 1];
+		$temp{agenda}{day}{$wkday}                 = $pfx . '-agenda-day-' . $shorty[$wkday - 1];
+		$temp{agenda}{dateinfo}{$wkday}            = $pfx . '-agenda-dateinfo-' . $shorty[$wkday - 1];
+		$temp{agenda}{dateinfo}{name}{$wkday}      = $pfx . '-agenda-dateinfo-name-' . $shorty[$wkday - 1];
+		$temp{agenda}{dateinfo}{number}{$wkday}    = $pfx . '-agenda-dateinfo-number-' . $shorty[$wkday - 1];
+		$temp{agenda}{dateinfo}{monthyear}{$wkday} = $pfx . '-agenda-dateinfo-monthyear-' . $shorty[$wkday - 1];
+		$temp{agenda}{content}{$wkday}             = $pfx . '-agenda-content-' . $shorty[$wkday - 1];
+	
+	}
+	return \%temp;
+}
+
+("Who's your daddy?") ? "Perl Rocks!" : 1;
+
+__END__
+
+	╔═══════════════════════════════════════════════════════════════════════╗
+	║                              INSTRUCTIONS                             ║
+	╚═══════════════════════════════════════════════════════════════════════╝
+
+This library is provided to work with Vigil::Calendar. Feel free to
+use it and modify it as your requirements dictate. Here is the low-down:
+
+
+    print calendar_html($c_obj, $css_prefix, $dayname_ref, $today_ref, $content_ref);
+
+    ... or ...
+	
+	my $calendar_html = calendar_html($c_obj, $css_prefix, \%dayname, $today_ref, $content_ref);
+	
+Here is a breakdown of the arguments:
+
+    $c_obj:         This is the calendar object handle that you will create in your
+			        main script.
+			
+	$css_prefix:	As defined in the file calendar.css.
+
+					To have multiple calendars on one page, they can share CSS or have
+					completely different CSS. For the calendar that this instance of
+					the library is rendering, provide the unique name used in the CSS
+					classes for this rendering.
+	
+					e.g.
+					my $css_prefix = 'cal1';
+	
+	$dayname_ref:	This is a reference to a hash that tells the subroutine
+					how to name the days of the week.
+					
+					e.g.
+					my %dayname = (
+						1 => 'Sun',
+						2 => 'Mon',
+						3 => 'Tue',
+						4 => 'Wed',
+						5 => 'Thu',
+						6 => 'Fri',
+						7 => 'Sat'
+					);
+					
+					To enter this has a hash reference, enter it: \%dayname
+					
+    $today_ref:     Same as the previous, but it is simply passing the
+                    year, month, and day. This tells the Calendar either
+					what today is OR a day you want to target as today.
+					
+					The CSS has classnames for "today" that will use the
+					values in this reference to be applied.
+
+                    e.g.
+                    my $today_ref = {
+                        year  => localtime(time)[5] + 1900,
+						month => localtime(time)[4] + 1,
+						day   => localtime(time)[3],
+					};
+					
+	$content_ref:   This is a reference to a hash that will hold any
+	                content you wish to place in the calendar output.
+					You must name the keys according to the date of
+					the day to which the content will apply.
+					
+					This is a line of code to quickly create the key:
+					
+					my $display_date = sprintf("%04d-%02d-%02d", $record_year, $record_month, $record_day);
+					
+					e.g.
+					$content{ $display_date } = '5 pm - Presentation';
+					
+					
+	'pdf_draw_callback'
+					When creating PDFs, the module doesn’t know what you want to do with each line of text.
+					The pdf_draw_callback is a subroutine you supply that controls how each line gets drawn.
+
+					What it is
+					A Perl subroutine reference (sub { ... }) that my code will call every time it has a
+					line ready to be placed into the PDF.
+
+					Why you need it
+					Without this, the module can’t know:
+
+						-Where on the page to position text.
+						-What to do when you reach the bottom of the page.
+						-How far to move down between lines.
+
+					The callback gives you full control over placement, page breaks, and styling.
+
+					How you make one
+					You write a subroutine that accepts a line of text as its input, and then does the drawing.
+					
+					For example:
+
+						my $draw_callback = sub {
+							my ($line) = @_;
+
+							# If we’re at the bottom, start a new page
+							if ($y <= $margin_bottom) {
+								$new_page->();
+							}
+
+							# Move to (50, $y) and draw the line
+							$text->translate(50, $y);
+							$text->text($line);
+
+							# Move down for the next line
+							$y -= $line_height;
+						};
+
+						-$line is the text to draw.
+						-$y and $margin_bottom track vertical position.
+						-$new_page->() is a helper you define to start a new page.
+						-$text is the PDF::API2 text object used for output.
+						-$line_height controls spacing.
+
+					NOTE: If you do not want your month grid calendar
+					to have a row with the day names (Sunday .. Saturday),
+					then you must set this semaphore in the $content_ref hash:
+
+                    $content_ref->{no_dayname} = 1;
+
+
+	╔═══════════════════════════════════════════════════════════════════════╗
+	║                         CALLING RENDER ENGINES                        ║
+	╚═══════════════════════════════════════════════════════════════════════╝
+
+	AGENDA STYLE OUTPUT:
+
+	calendar_maker(
+	  'output_style' => 'html_agenda', 
+	  'calendar_object' => $cal,
+	  'css_prefix' => $css_prefix,
+	  'dayname_ref' => $dayname_ref,
+	  'content_ref' => $content_ref
+	);
+
+	calendar_maker(
+	  'output_style' => 'text_agenda', 
+	  'calendar_object' => $cal,
+	  'dayname_ref' => $dayname_ref,
+	  'content_ref' => $content_ref
+	);
+
+	calendar_maker(
+	  'output_style' => 'pdf_agenda', 
+	  'calendar_object' => $cal,
+	  'dayname_ref' => $dayname_ref,
+	  'content_ref' => $content_ref,
+	  'pdf_draw_callback' => $obj
+	);
+
+	MONTH GRID STYLE OUTPUT:
+
+	calendar_maker(
+	  'output_style' => 'html_grid', 
+	  'calendar_object' => $cal,
+	  'css_prefix' => $css_prefix,
+	  'dayname_ref' => $dayname_ref,
+	  'content_ref' => $content_ref
+	);
+
+	calendar_maker(
+	  'output_style' => 'pdf_grid', 
+	  'calendar_object' => $cal,
+	  'dayname_ref' => $dayname_ref,
+	  'content_ref' => $content_ref,
+	  'pdf_draw_callback' => $obj
+	);
+
+	╔═══════════════════════════════════════════════════════════════════════╗
+	║                             SECRET MESSAGE                            ║
+	╚═══════════════════════════════════════════════════════════════════════╝
+
+	>perl -MMIME::Base64 -E "say decode_base64('RGVtbyBmaW5pc2hlZDogTXkgS3VuZy1GdSBpcyBzdHJvbmcuLi4=')"

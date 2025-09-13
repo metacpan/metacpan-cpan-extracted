@@ -481,7 +481,7 @@ sub test_refresh_token_ok {
     cmp_deeply(get_refresh_token($obj),
                'my_refresh_token',
                'expected stored refresh token');
-    cmp_deeply([ $obj->client->next_call(5) ],
+    cmp_deeply([ $obj->client->next_call(6) ],
                [ 'get_token', [ $obj->client, grant_type    => 'refresh_token',
                                               refresh_token => 'my_old_refresh_token' ] ],
                'expected call to client->get_token');
@@ -495,7 +495,9 @@ sub test_refresh_token_ok {
   subtest "refresh_token() with only access token" => sub {
 
     # Given
-    my $obj = build_object();
+    my $obj = build_object(
+      config => { refresh_scope => 'custom scope' }
+    );
     my %access_token = (
       token => 'my_old_access_token',
     );
@@ -525,9 +527,50 @@ sub test_refresh_token_ok {
     cmp_deeply(get_identity($obj),
                undef,
                'no stored identity');
+    cmp_deeply([ $obj->client->next_call(6) ],
+               [ 'get_token', [ $obj->client, grant_type    => 'refresh_token',
+                                              refresh_token => 'my_old_refresh_token',
+                                              refresh_scope => 'custom scope' ] ],
+               'expected call to client->get_token');
+  };
+
+  subtest "refresh_token() for other audience" => sub {
+
+    # Given
+    my $obj = build_object(config => { audience_alias => { my_audience_alias => {audience => 'my_audience'} },
+                                       refresh_scope  => 'custom scope' });
+    my %audience_access_token = (
+      token => 'my_old_audience_access_token',
+    );
+    store_access_token($obj, \%audience_access_token, 'my_audience');
+    store_refresh_token($obj, 'my_old_audience_refresh_token', 'my_audience');
+
+    # When
+    my $access_token = $obj->refresh_token('my_audience_alias');
+
+    # Then
+    my $expected_stored_access_token = {
+      expires_at => re('^\d+$'),
+      token      => 'my_access_token',
+      token_type => 'my_token_type',
+      scopes     => [qw/scope/],
+    };
+    isa_ok($access_token, 'OIDC::Client::AccessToken');
+    cmp_deeply($access_token,
+               noclass($expected_stored_access_token),
+               'expected result');
+    cmp_deeply(get_access_token($obj, 'my_audience'),
+               $expected_stored_access_token,
+               'expected stored access token');
+    cmp_deeply(get_refresh_token($obj, 'my_audience'),
+               'my_refresh_token',
+               'expected stored refresh token');
+    cmp_deeply(get_identity($obj),
+               undef,
+               'no stored identity');
     cmp_deeply([ $obj->client->next_call(5) ],
                [ 'get_token', [ $obj->client, grant_type    => 'refresh_token',
-                                              refresh_token => 'my_old_refresh_token' ] ],
+                                              refresh_token => 'my_old_audience_refresh_token' ] ],
                'expected call to client->get_token');
   };
 
@@ -574,7 +617,7 @@ sub test_refresh_token_ok {
     cmp_deeply(get_access_token($obj),
                undef,
                'no stored access token');
-    cmp_deeply([ $obj->client->next_call(5) ],
+    cmp_deeply([ $obj->client->next_call(6) ],
                [ 'get_token', [ $obj->client, grant_type    => 'refresh_token',
                                               refresh_token => 'my_old_refresh_token' ] ],
                'expected call to client->get_token');

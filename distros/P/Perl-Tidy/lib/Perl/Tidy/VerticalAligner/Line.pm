@@ -10,7 +10,7 @@ package Perl::Tidy::VerticalAligner::Line;
 use strict;
 use warnings;
 
-our $VERSION = '20250711';
+our $VERSION = '20250912';
 use English qw( -no_match_vars );
 
 {
@@ -46,19 +46,35 @@ sub DESTROY {
 
 # Constructor may be called as a class method
 sub new {
-    my ( $class, $ri ) = @_;
-    my $self = bless $ri, $class;
+
+    my ( $class, $rhash ) = @_;
+
+    # Create a new VerticalAligner::Line object
+    # Given:
+    #   $rhash = ref to hash for a Line
+    # This hash contains parameters describing one line.
+    # The parameters currently used by this object are:
+    #   {ralignments} = ref to array of vertical alignment columns
+    #   {jmax} = max index of {ralignments}
+    #   {maximum_line_length} = maximum number of spaces for this line
+
+    my $self = bless $rhash, $class;
     return $self;
-}
+} ## end sub new
 
 sub get_column {
+
     my ( $self, $j ) = @_;
+
+    # Return the current column number of alignment $j
+
     my $alignment = $self->{ralignments}->[$j];
     return unless ( defined($alignment) );
     return $alignment->get_column();
 } ## end sub get_column
 
 sub current_field_width {
+
     my ( $self, $j ) = @_;
 
     # Return number of columns of space between alignments $j and $j-1
@@ -77,7 +93,8 @@ sub increase_field_width {
 
     my ( $self, $j, $pad ) = @_;
 
-    # Increase the width of alignment field $j by $pad spaces
+    # Increase the width of alignment field $j by $pad spaces.
+    # So we must increase the widths of the higher alignments by $pad spaces.
     my $jmax = $self->{jmax};
     foreach ( $j .. $jmax ) {
         my $alignment = $self->{ralignments}->[$_];
@@ -90,7 +107,9 @@ sub increase_field_width {
 
 sub get_available_space_on_right {
     my $self = shift;
+
+    # Return the number of unused columns to the right of the last alignment
     my $jmax = $self->{jmax};
     return $self->{maximum_line_length} - $self->get_column($jmax);
-}
+} ## end sub get_available_space_on_right
 1;

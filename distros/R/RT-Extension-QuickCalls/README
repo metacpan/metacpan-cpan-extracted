@@ -3,9 +3,7 @@ NAME
     with default values
 
 RT VERSION
-    Works with RT 4.4, 5.0
-
-    To use the QuickCreate option RT must be newer than 4.4.1
+    Works with RT 6.0. For RT 5.0 install the latest 1.X version.
 
 DESCRIPTION
     This RT extension allows you to add a QuickCalls portlet to your RT
@@ -25,16 +23,13 @@ INSTALLATION
     make install
         May need root permissions
 
-    To use the QuickCreate option apply this patch for RT earlier than 5.0.6
-            patch -d /opt/rt5 -p1 < patches/0001-Support-QuickCreate-to-pass-arguments-to-redirect-UR.patch
-
-    Edit your /opt/rt4/etc/RT_SiteConfig.pm
+    Edit your /opt/rt6/etc/RT_SiteConfig.pm
         Add this line:
 
             Plugin('RT::Extension::QuickCalls');
 
     Clear your mason cache
-            rm -rf /opt/rt4/var/mason_data/obj
+            rm -rf /opt/rt6/var/mason_data/obj
 
     Restart your webserver
 
@@ -42,8 +37,12 @@ CONFIGURATION
     You will need to enable the new QuickCalls portlet with a line like this
     in your RT_SiteConfig.pm file:
 
-        Set($HomepageComponents, [qw(QuickCreate Quicksearch MyAdminQueues MySupportQueues MyReminders
-                                     RefreshHomepage QuickCalls)]);
+        Set($HomepageComponents, [qw(QuickCreate QueueList QueueListAllStatuses
+                                     CatalogList CatalogListAllStatuses MyAdminQueues
+                                     MySupportQueues MyReminders RefreshHomepage
+                                     Dashboards SavedSearches FindUser MyAssets
+                                     FindAsset FindGroup SavedSearchSelectUser
+                                     QuickCalls)]);
 
     This is the default portlet list with QuickCalls added to the end People
     can then choose to add the portlet to their homepage in Preferences ->

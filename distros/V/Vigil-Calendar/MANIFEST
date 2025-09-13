@@ -1,0 +1,24 @@
+examples/agenda_html/cal_agenda_html.pl
+examples/agenda_html/calendar_css.pl
+examples/agenda_html/demo_calendar.css
+examples/agenda_pdf/cal_agenda_pdf.pl
+examples/agenda_text/cal_agenda_text.pl
+examples/calendar.lib
+examples/css/calendar.css
+examples/css/calendar.css.backup
+examples/grid_html/cal_grid_html.pl
+examples/grid_html/calendar_css.pl
+examples/grid_html/demo_calendar.css
+examples/grid_html/demo_small_calendar.css
+examples/grid_pdf/cal_grid_pdf.pl
+examples/INSTRUCTIONS.md
+lib/Vigil/Calendar.pm
+LICENSE.txt
+README.md
+MANIFEST
+Makefile.PL
+Changes
+t/00_compile.t
+t/01_basic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

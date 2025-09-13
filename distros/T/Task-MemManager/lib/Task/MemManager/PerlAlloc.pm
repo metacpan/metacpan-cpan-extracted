@@ -1,5 +1,5 @@
 package Task::MemManager::PerlAlloc;
-$Task::MemManager::PerlAlloc::VERSION = '0.03';
+$Task::MemManager::PerlAlloc::VERSION = '0.04';
 use strict;
 use warnings;
 use Carp            qw(croak);
@@ -47,12 +47,13 @@ sub get_buffer_address {
 # Parameters  : $num_of_items     - Number of items in the buffer
 #               $size_of_each_item - Size of each item in the buffer
 #               $init_value        - Value to initialize the buffer with
+#               %opts              - Optional parameters to affect allocation
 # Throws      : Croaks if the buffer allocation fails
 # Comments    : None
 # See Also    : n/a
 
 sub malloc {
-    my ( $num_of_items, $size_of_each_item, $init_value ) = @_;
+    my ( $num_of_items, $size_of_each_item, $init_value ,$opts_ref) = @_;
     my $buffer_size = $num_of_items * $size_of_each_item;
 
     my $byte_value =
@@ -112,7 +113,7 @@ Task::MemManager::PerlAlloc - Allocates buffers using Perl's string functions
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 

@@ -11,12 +11,12 @@
 #
 # 2) Build a "perlecs/rockylinux" Docker image based on the Dockerfile.
 #
-#    docker build -t perlecs/rockylinux:0.45-1 .
+#    docker build -t perlecs/rockylinux:0.46-1 .
 #
 # 3) Generate a Docker container based on the image, and run an interactive
 #    bash shell within the container.
 #
-#    docker run --rm -it --name=perlecs_rockylinux  perlecs/rockylinux:0.45-1 /bin/bash
+#    docker run --rm -it --name=perlecs_rockylinux  perlecs/rockylinux:0.46-1 /bin/bash
 #
 # 4) Configure Perl ECS within the docker container.  For example, use
 #    "ecs_setup" to generate an ecs.cfg configuration file, "ecstool" to
@@ -34,7 +34,7 @@
 FROM rockylinux:9
 LABEL Maintainer="Joel Schneider <joel@joelschneider.net>"
 LABEL Description="EMDIS::ECS (Perl ECS) on Rocky Linux"
-LABEL Version="0.45"
+LABEL Version="0.46"
 
 # update installed packages
 RUN yum -y update
@@ -44,11 +44,11 @@ RUN yum -y install \
  perl perl-Env perl-Data-Dumper make perl-ExtUtils-MakeMaker perl-CPAN \
  perl-App-cpanminus gcc perl-Test-Simple perl-Authen-SASL perl-libwww-perl \
  perl-LWP-Protocol-https diffutils less which python3 \
- cyrus-sasl cyrus-sasl-plain
+ cyrus-sasl cyrus-sasl-plain libusbx
 
 # add EPEL repository and install Mail::IMAPClient from there
 RUN yum -y install epel-release
-RUN yum -y install pass perl-Mail-IMAPClient python3-qpid-proton
+RUN yum -y install gnupg1 pass perl-Mail-IMAPClient python3-qpid-proton
 
 # create perlecs user
 RUN useradd --comment "Perl ECS user" --create-home perlecs
