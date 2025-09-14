@@ -2,7 +2,7 @@
 #
 # Tests for Excel::Writer::XLSX::Worksheet data validation methods.
 #
-# Copyright 2000-2024, John McNamara, jmcnamara@cpan.org
+# Copyright 2000-2025, John McNamara, jmcnamara@cpan.org
 #
 # SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
 #
@@ -300,7 +300,7 @@ _is_deep_diff( $got, $expected, $caption );
 
 ###############################################################################
 #
-# Test 19 Integer between 1 and 10 (same as test 1) + Error style == infor..
+# Test 19 Integer between 1 and 10 (same as test 1) + Error style == information.
 #
 
 $worksheet = _new_worksheet( \$got );

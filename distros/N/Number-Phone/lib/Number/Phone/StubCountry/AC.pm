@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20250605193632;
+our $VERSION = 1.20250913135854;
 
 my $formatters = [];
 
@@ -42,11 +42,11 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"24767", "Georgetown",
-"24763", "Travellers\ Hill\ \&\ Airhead",
-"24764", "Two\ Boats",
+$areanames{en} = {"24764", "Two\ Boats",
 "24762", "US\ Base",
-"24766", "Georgetown",};
+"24763", "Travellers\ Hill\ \&\ Airhead",
+"24766", "Georgetown",
+"24767", "Georgetown",};
 my $timezones = {
                '' => [
                        'Atlantic/St_Helena'

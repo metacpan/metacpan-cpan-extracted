@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1 CUSTOMIZING
 
 Customizing you usage of Minima is quite straightforward once you
@@ -23,20 +25,27 @@ F<app.psgi>
 
 =head1 Controllers
 
-The main objective of a controller is to return a valid PSGI response.
-L<Minima::Controller> is provided as a starting point for you to
-subclass and implement your logic as desired.
+A controller is where you implement your application’s logic. Its main
+role is to return a valid PSGI response.
 
-If you don't want to subclass it and are relying on L<Minima::App> to
-instantiate and call your controller, you should note that by default it
-will pass two named arguments to your controller's C<new> method:
+By default, controllers inherit from L<Minima::Controller>, which
+provides convenient lifecycle hooks and helper methods.
 
-    app => $self,
+However, inheritance is not required. A controller can simply provide
+the action methods declared in C<routes.map>. In that case, Minima will
+call the methods directly and expect them to return a valid PSGI
+response. This makes it easy to write very minimal controllers if you
+prefer.
+
+When L<Minima::App> instantiates and calls your controller, it will pass
+two named arguments to C<new>:
+
+    app   => $self,
     route => $m,
 
 Depending on your implementation details (whether your controller is a
-class, package, or another type of object) you may want to use those
-arguments or not.
+class, package, or another type of object) you may or may not use these
+arguments.
 
 =head2 Arguments
 
@@ -52,6 +61,26 @@ controller.
 The matched route as returned by L<Minima::Router>.
 
 =back
+
+=head2 Lifecycle Hooks
+
+Controllers may also define optional lifecycle hooks:
+
+=over 16
+
+=item C<before_action ($method)>
+
+Runs before the action is executed. If it returns a PSGI response, the
+action itself is skipped and that response is returned immediately.
+
+=item C<after_action ($response)>
+
+Runs after the action has completed. It receives the response returned
+by the action, which can be modified in place if needed.
+
+=back
+
+For more details, see L<the run method in Minima::App|Minima::App/run>.
 
 As your controller is called last, remember to return a valid PSGI
 response and you're good to go.

@@ -72,4 +72,30 @@ use Minima::Controller;
     );
 }
 
+# Trimming params
+{
+    my $fake_env = {
+        'plack.request.merged' => Hash::MultiValue->new(
+            name => '  Minima ',
+            password => ' perlclass ',
+            raw_field => ' raw ',
+            multi => ' 0 ',
+            multi => ' 1 ',
+            array => [ ' 0 ', ' 1 ' ],
+            hash => { key => ' value ' },
+        )
+    };
+    my $app = Minima::App->new(environment => $fake_env);
+    my $c = Minima::Controller->new(app => $app);
+
+    my $params = $c->trimmed_params({ exclude => [ 'password', qr/^raw/ ] });
+
+    is( $params->{name}, 'Minima', 'trims scalar' );
+    is( $params->{password}, ' perlclass ', 'excludes string key' );
+    is( $params->{raw_field}, ' raw ', 'excludes key by regex reference' );
+    is( [ $params->get_all('multi') ], [0,1], 'trims values of multi-keys' );
+    is( $params->{array}[1], 1, 'trims elements of array values' );
+    is( $params->{hash}{key}, ' value ', 'leaves hash refs untouched' );
+}
+
 done_testing;

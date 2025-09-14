@@ -1,5 +1,5 @@
 package Task::MemManager;
-$Task::MemManager::VERSION = '0.04';
+$Task::MemManager::VERSION = '0.05';
 use strict;
 use warnings;
 
@@ -338,7 +338,7 @@ Task::MemManager - A memory allocated and manager for low level code in Perl.
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 
@@ -373,6 +373,7 @@ The default allocator is PerlAlloc, which uses Perl's string functions to alloca
 =head1 METHODS
 
 =head2 new
+
    Usage      : my $buffer = Task::MemManager->consume($buffer,10,1,
                 {allocator => 'PerlAlloc'});
   Purpose     : Allocates a buffer using a specified allocator.
@@ -394,6 +395,7 @@ The default allocator is PerlAlloc, which uses Perl's string functions to alloca
                 Default delayed_gc is 0 (garbage collection is immediate).
 
 =head2 consume
+
   Usage       : my $buffer = Task::MemManager->consume($buffer,10,1,
                 {allocator => 'PerlAlloc'});
   Purpose     : Consumers a buffer created with the specified allocator
@@ -420,7 +422,7 @@ The default allocator is PerlAlloc, which uses Perl's string functions to alloca
                 Default init_value is undef ('zero' zeroes out memory, any
                   byte value will initialize memory with that value)
                 Default delayed_gc is 1 (garbage collection is delayed)
-                
+
 =head2 extract_buffer_region
 
   Usage       : my $region = Task::MemManager->extract_buffer_region($pos_start, $pos_end);

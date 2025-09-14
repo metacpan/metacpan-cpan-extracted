@@ -18,6 +18,8 @@ my $t_home = $dir->child('home.ht');
 $t_home->spew('h');
 my $t_about = $dir->child('about.tt');
 $t_about->spew('t');
+my $t_contact = $dir->child('contact.tpl');
+$t_contact->spew('c');
 
 # Basic template check
 like(
@@ -27,7 +29,7 @@ like(
 );
 
 $view->set_template('home.t');
-$view->set_directory('.');
+$view->add_directory('.');
 like(
     dies { $view->render },
     qr/not found/i,
@@ -42,6 +44,60 @@ $config->{template_ext} = 'tt';
 $view->set_template('about');
 is( $view->render, 't', 'adds custom template extension' );
 delete $config->{template_ext};
+
+$view->set_template('contact.tpl');
+is( $view->render, 'c', 'respects named file extension' );
+
+# Manipulating the include path
+$dir->child('templates')->mkdir;
+$dir->child('js')->mkdir;
+my $t_inner = $dir->child('templates/inner.ht');
+$t_inner->spew('i');
+my $t_js = $dir->child('js/script.js');
+$t_js->spew('js');
+
+$view->set_template('inner');
+is( $view->render, 'i', 'accesses default templates include path');
+
+$view->set_template('script.js');
+is( $view->render, 'js', 'accesses default js include path');
+
+$view->clear_directories;
+like(
+    dies { $view->render },
+    qr/not found/i,
+    'clears include path'
+);
+
+$config->{templates_dir} = undef;
+$view = Minima::View::HTML->new(app => $app);
+$view->set_template('home');
+like(
+    dies { $view->render },
+    qr/not found/i,
+    'respects clear include list'
+);
+
+$config->{templates_dir} = [];
+$view = Minima::View::HTML->new(app => $app);
+$view->set_template('home');
+like(
+    dies { $view->render },
+    qr/not found/i,
+    'respects empty include list'
+);
+
+$config->{templates_dir} = [qw/./];
+$view = Minima::View::HTML->new(app => $app);
+$view->set_template('inner');
+like(
+    dies { $view->render },
+    qr/not found/i,
+    'respects custom include list'
+);
+
+$view->set_template('home');
+is( $view->render, 'h', 'reads custom include list' );
 
 # Data
 $view->set_template('home');
@@ -73,10 +129,10 @@ is( $view->render, 'a b', 'outputs proper class set' );
 $t_home->spew('@');
 my $i = 0;
 $dir->child("$_.ht")->spew(++$i) for qw/ pre1 pre2 post1 post2 /;
-$view->add_pre('pre1');
-$view->add_pre('pre2');
-$view->add_post('post1');
-$view->add_post('post2');
+$view->add_before_template('pre1');
+$view->add_before_template('pre2');
+$view->add_after_template('post1');
+$view->add_after_template('post2');
 is( $view->render, '12@34', 'includes extra templates correctly' );
 
 chdir;

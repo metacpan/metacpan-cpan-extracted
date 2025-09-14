@@ -197,6 +197,9 @@ match hash.
 
 =back
 
+For editing support in Vim, see
+L<vim-minima|https://github.com/tessarin/vim-minima>.
+
 =head2 Example
 
     # Main Routes
@@ -239,7 +242,11 @@ Performs a match on the passed Plack C<$env>, or URI, and returnes a
 hash reference containing the controller-action pair as well as extra
 data extracted from the URI match.
 
-    { controller => '...', action => '...' }
+    { controller => '...', action => '...', post => 123 }
+
+The extra keys (like C<post> above) are available in the controller
+through the L<route attribute in
+Minima::Controller|Minima::Controller/route>.
 
 If no match is made and a not found route is registered (via the
 L<C<not_found>|/not_found> directive), its data is returned. If no match
@@ -247,7 +254,8 @@ is found and no special directive is present in the routes file, it
 returns C<undef>.
 
 Note that this does not call the controller. It's up to the user to do
-that in order to perform the intended action.
+that in order to perform the intended action. In a typical application,
+L<Minima::App> will perform the call.
 
 =head2 read_file
 
@@ -267,7 +275,7 @@ notation. Defaults to C<Controller>. See L</Controller> for details.
 =head1 SEE ALSO
 
 L<Minima>, L<Minima::Controller>, L<Router::Simple>, L<Plack>,
-L<perlclass>.
+L<perlclass>, L<vim-minima|https://github.com/tessarin/vim-minima>.
 
 =head1 AUTHOR
 

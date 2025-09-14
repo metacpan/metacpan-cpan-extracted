@@ -2,7 +2,7 @@
 #
 # Tests for Excel::Writer::XLSX::Chart methods.
 #
-# Copyright 2000-2024, John McNamara, jmcnamara@cpan.org
+# Copyright 2000-2025, John McNamara, jmcnamara@cpan.org
 #
 # SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
 #
@@ -303,7 +303,7 @@ is( $got, $expected, $caption );
 
 ###############################################################################
 #
-# Test the _write_d_lbls() method. Pie chart. Postion =
+# Test the _write_d_lbls() method. Pie chart. Position =
 #
 $caption  = " \tChart: _write_d_lbls()";
 $expected = '<c:dLbls><c:showVal val="1"/><c:showLeaderLines val="1"/></c:dLbls>';
@@ -328,7 +328,7 @@ is( $got, $expected, $caption );
 
 ###############################################################################
 #
-# Test the _write_d_lbls() method. Pie chart. Postion = center.
+# Test the _write_d_lbls() method. Pie chart. Position = center.
 #
 $caption  = " \tChart: _write_d_lbls()";
 $expected = '<c:dLbls><c:dLblPos val="ctr"/><c:showVal val="1"/><c:showLeaderLines val="1"/></c:dLbls>';
@@ -354,7 +354,7 @@ is( $got, $expected, $caption );
 
 ###############################################################################
 #
-# Test the _write_d_lbls() method. Pie chart. Postion = inside_end
+# Test the _write_d_lbls() method. Pie chart. Position = inside_end
 #
 $caption  = " \tChart: _write_d_lbls()";
 $expected = '<c:dLbls><c:dLblPos val="inEnd"/><c:showVal val="1"/><c:showLeaderLines val="1"/></c:dLbls>';
@@ -378,7 +378,7 @@ is( $got, $expected, $caption );
 
 ###############################################################################
 #
-# Test the _write_d_lbls() method. Pie chart. Postion = outside_end
+# Test the _write_d_lbls() method. Pie chart. Position = outside_end
 #
 $caption  = " \tChart: _write_d_lbls()";
 $expected = '<c:dLbls><c:dLblPos val="outEnd"/><c:showVal val="1"/><c:showLeaderLines val="1"/></c:dLbls>';

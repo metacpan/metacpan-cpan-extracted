@@ -7,13 +7,16 @@ use Moo;
 use MooX::Options;
 use Cwd;
 use Mojo::Pg;
+use Daje::Workflow::Database;
+use Daje::Workflow::Loader;
+use Daje::Workflow;
 
 use feature 'say';
 use feature 'signatures';
 
 use namespace::clean -except => [qw/_options_data _options_config/];
 
-sub run_workflow($self) {
+sub run_workflow() {
 
     my $pg = Mojo::Pg->new()->dsn(
         "dbi:Pg:dbname=Workflowtest;host=database;port=54321;user=test;password=test"
@@ -34,6 +37,22 @@ sub run_workflow($self) {
     );
     $loader->load();
 
+    my $context->{context}->{template}->{data_section} = "login";
+    $context->{context}->{template}->{source} = "Daje::Document::Template::Mail::Login";
+    $context->{context}->{data}->{name} = "Jan Eskilsson";
+    $context->{context}->{data}->{title} = "Authenticate";
+    $context->{context}->{data}->{id} = 123456;
+
+    my $workflow = Daje::Workflow->new(
+        pg            => $pg,
+        loader        => $loader->loader,
+        workflow_name => 'document_builder',
+        workflow_pkey => '0',
+        context       => $context,
+    );
+
+    $workflow->process("build_document");
+    say $workflow->error->error if $workflow->error->has_error() ;
 }
 
 run_workflow();

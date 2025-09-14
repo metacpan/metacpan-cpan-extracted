@@ -7,7 +7,7 @@ package Excel::Writer::XLSX::Chart;
 #
 # Used in conjunction with Excel::Writer::XLSX.
 #
-# Copyright 2000-2024, John McNamara, jmcnamara@cpan.org
+# Copyright 2000-2025, John McNamara, jmcnamara@cpan.org
 #
 # SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
 #
@@ -29,7 +29,7 @@ use Excel::Writer::XLSX::Utility qw(xl_cell_to_rowcol
   quote_sheetname );
 
 our @ISA     = qw(Excel::Writer::XLSX::Package::XMLwriter);
-our $VERSION = '1.14';
+our $VERSION = '1.15';
 
 
 ###############################################################################
@@ -113,6 +113,7 @@ sub new {
     $self->{_already_inserted}  = 0;
     $self->{_combined}          = undef;
     $self->{_is_secondary}      = 0;
+    $self->{_title}             = {};
 
     $self->{_label_positions}          = {};
     $self->{_label_position_default}   = '';
@@ -393,29 +394,53 @@ sub set_y2_axis {
 #
 sub set_title {
 
-    my $self = shift;
-    my %arg  = @_;
+    my $self  = shift;
+    my %arg   = @_;
+    my $title = {};
 
     my ( $name, $name_formula ) =
       $self->_process_names( $arg{name}, $arg{name_formula} );
 
     my $data_id = $self->_get_data_id( $name_formula, $arg{data} );
 
-    $self->{_title_name}    = $name;
-    $self->{_title_formula} = $name_formula;
-    $self->{_title_data_id} = $data_id;
+    $title->{_name}    = $name;
+    $title->{_formula} = $name_formula;
+    $title->{_data_id} = $data_id;
 
     # Set the font properties if present.
-    $self->{_title_font} = $self->_convert_font_args( $arg{name_font} );
+    $title->{_font} = $self->_convert_font_args( $arg{name_font} );
+    if ( $arg{font} ) {
+        $title->{_font} = $self->_convert_font_args( $arg{font} );
+    }
+
+    # Set the line properties.
+    $title->{_line} = $self->_get_line_properties( $arg{line} );
+
+    # Allow 'border' as a synonym for 'line'.
+    if ( $arg{border} ) {
+        $title->{_line} = $self->_get_line_properties( $arg{border} );
+    }
+
+    # Set the fill properties.
+    $title->{_fill} = $self->_get_fill_properties( $arg{fill} );
+
+    # Set the pattern properties.
+    $title->{_pattern} = $self->_get_pattern_properties( $arg{pattern} );
+
+    # Set the gradient fill properties.
+    $title->{_gradient} = $self->_get_gradient_properties( $arg{gradient} );
 
     # Set the title layout.
-    $self->{_title_layout} = $self->_get_layout_properties( $arg{layout}, 1 );
+    $title->{_layout} = $self->_get_layout_properties( $arg{layout}, 1 );
 
     # Set the title overlay option.
-    $self->{_title_overlay} = $arg{overlay};
+    $title->{_overlay} = $arg{overlay};
 
     # Set the no automatic title option.
-    $self->{_title_none} = $arg{none};
+    $title->{_none} = $arg{none};
+
+    # Copy the title to the main chart object.
+    $self->{_title} = $title;
 }
 
 
@@ -510,7 +535,6 @@ sub show_blanks_as {
 
     $self->{_show_blanks} = $option;
 }
-
 
 
 ###############################################################################
@@ -702,16 +726,8 @@ sub _convert_axis_args {
     my $axis = shift;
     my %arg  = ( %{ $axis->{_defaults} }, @_ );
 
-    my ( $name, $name_formula ) =
-      $self->_process_names( $arg{name}, $arg{name_formula} );
-
-    my $data_id = $self->_get_data_id( $name_formula, $arg{data} );
-
     $axis = {
         _defaults          => $axis->{_defaults},
-        _name              => $name,
-        _formula           => $name_formula,
-        _data_id           => $data_id,
         _reverse           => $arg{reverse},
         _min               => $arg{min},
         _max               => $arg{max},
@@ -731,6 +747,7 @@ sub _convert_axis_args {
         _interval_tick     => $arg{interval_tick},
         _visible           => defined $arg{visible} ? $arg{visible} : 1,
         _text_axis         => 0,
+        _title             => {},
     };
 
     # Map major_gridlines properties.
@@ -785,13 +802,8 @@ sub _convert_axis_args {
         $axis->{_text_axis} = 1;
     }
 
-
-    # Set the font properties if present.
+    # Set the number font properties if present.
     $axis->{_num_font}  = $self->_convert_font_args( $arg{num_font} );
-    $axis->{_name_font} = $self->_convert_font_args( $arg{name_font} );
-
-    # Set the axis name layout.
-    $axis->{_layout} = $self->_get_layout_properties( $arg{name_layout}, 1 );
 
     # Set the line properties for the axis.
     $axis->{_line} = $self->_get_line_properties( $arg{line} );
@@ -803,6 +815,26 @@ sub _convert_axis_args {
     $axis->{_minor_tick_mark} = $self->_get_tick_type($arg{minor_tick_mark});
     $axis->{_major_tick_mark} = $self->_get_tick_type($arg{major_tick_mark});
 
+    # Set the axis title properties.
+    my ( $name, $name_formula ) =
+      $self->_process_names( $arg{name}, $arg{name_formula} );
+    my $data_id = $self->_get_data_id( $name_formula, $arg{data} );
+
+    $axis->{_title}{_name}    = $name;
+    $axis->{_title}{_formula} = $name_formula;
+    $axis->{_title}{_data_id} = $data_id;
+    $axis->{_title}{_font} = $self->_convert_font_args( $arg{name_font} );
+    $axis->{_title}{_layout} = $self->_get_layout_properties( $arg{name_layout}, 1 );
+
+    # Set the format properties.
+    $axis->{_title}{_line} = $self->_get_line_properties( $arg{name_line} );
+    if ( $arg{name_border} ) {
+        $axis->{_title}{_line} = $self->_get_line_properties( $arg{name_border} );
+    }
+
+    $axis->{_title}{_fill} = $self->_get_fill_properties( $arg{name_fill} );
+    $axis->{_title}{_pattern} = $self->_get_pattern_properties( $arg{name_pattern} );
+    $axis->{_title}{_gradient} = $self->_get_gradient_properties( $arg{name_gradient} );
 
     return $axis;
 }
@@ -1884,6 +1916,24 @@ sub _get_labels_properties {
                 $property{font} = $self->_convert_font_args( $property{font} );
             }
 
+
+            # Map user defined label positions to Excel positions.
+            if ( my $position = $property{position} ) {
+
+                if ( exists $self->{_label_positions}->{$position} ) {
+                    if ( $position eq $self->{_label_position_default} ) {
+                        $property{position} = undef;
+                    }
+                    else {
+                        $property{position} = $self->{_label_positions}->{$position};
+                    }
+                }
+                else {
+                    carp "Unsupported label position '$position' for this chart type";
+                    return undef;
+                }
+            }
+
             # Set the line properties for the data labels.
             my $line = $self->_get_line_properties( $property{line} );
 
@@ -2211,23 +2261,23 @@ sub _get_points_properties {
 
 ##############################################################################
 #
-# _has_fill_formatting()
+# _has_formatting()
 #
 # Check if a chart element has line, fill or gradient formatting.
 #
-sub _has_fill_formatting {
+sub _has_formatting {
 
     my $element = shift;
 
-    if (    !$element->{_line}->{_defined}
-        and !$element->{_fill}->{_defined}
-        and !$element->{_pattern}
-        and !$element->{_gradient} )
+    if (   $element->{_line}->{_defined}
+        or $element->{_fill}->{_defined}
+        or $element->{_pattern}
+        or $element->{_gradient} )
     {
-        return 0;
+        return 1;
     }
     else {
-        return 1;
+        return 0;
     }
 }
 
@@ -2559,36 +2609,7 @@ sub _write_chart {
     $self->xml_start_tag( 'c:chart' );
 
     # Write the chart title elements.
-
-    if ( $self->{_title_none} ) {
-
-        # Turn off the title.
-        $self->_write_auto_title_deleted();
-    }
-    else {
-        my $title;
-        if ( $title = $self->{_title_formula} ) {
-            $self->_write_title_formula(
-
-                $title,
-                $self->{_title_data_id},
-                undef,
-                $self->{_title_font},
-                $self->{_title_layout},
-                $self->{_title_overlay}
-            );
-        }
-        elsif ( $title = $self->{_title_name} ) {
-            $self->_write_title_rich(
-
-                $title,
-                undef,
-                $self->{_title_font},
-                $self->{_title_layout},
-                $self->{_title_overlay}
-            );
-        }
-    }
+    $self->_write_chart_title( $self->{_title} );
 
     # Write the c:plotArea element.
     $self->_write_plot_area();
@@ -2602,13 +2623,48 @@ sub _write_chart {
     # Write the c:dispBlanksAs element.
     $self->_write_disp_blanks_as();
 
-
     if ( $self->{_show_na_as_empty} ) {
         # Write the c:extLst element.
         $self->_write_ext_lst_display_na();
     }
 
     $self->xml_end_tag( 'c:chart' );
+}
+
+
+##############################################################################
+#
+# _write_chart_title()
+#
+# Write the <c:title> element. This applies to the main chart title and also
+# axis titles.
+#
+# It differentiates between text, formula and formatting only titles
+#
+sub _write_chart_title {
+
+    my $self      = shift;
+    my $title     = shift;
+    my $is_y_axis = shift;
+
+    if ( $title->{_none} ) {
+        # Turn off the title. For main chart title only.
+        $self->_write_auto_title_deleted();
+        return
+    }
+
+    if ( $title->{_name} ) {
+        # Simple text title.
+        $self->_write_title_rich( $title, $is_y_axis );
+    }
+    elsif ( $title->{_formula} ) {
+        # Formula based title.
+        $self->_write_title_formula( $title, $is_y_axis );
+    }
+    elsif ( _has_formatting( $title ) ) {
+        # Formatting only title.
+        $self->_write_title_format_only( $title );
+    }
 }
 
 
@@ -3316,16 +3372,7 @@ sub _write_cat_axis {
     $self->_write_minor_gridlines( $x_axis->{_minor_gridlines} );
 
     # Write the axis title elements.
-    my $title;
-    if ( $title = $x_axis->{_formula} ) {
-
-        $self->_write_title_formula( $title, $x_axis->{_data_id}, $is_y_axis,
-            $x_axis->{_name_font}, $x_axis->{_layout} );
-    }
-    elsif ( $title = $x_axis->{_name} ) {
-        $self->_write_title_rich( $title, $is_y_axis, $x_axis->{_name_font},
-            $x_axis->{_layout} );
-    }
+    $self->_write_chart_title( $x_axis->{_title}, $is_y_axis );
 
     # Write the c:numFmt element.
     $self->_write_cat_number_format( $x_axis );
@@ -3431,15 +3478,7 @@ sub _write_val_axis {
     $self->_write_minor_gridlines( $y_axis->{_minor_gridlines} );
 
     # Write the axis title elements.
-    my $title;
-    if ( $title = $y_axis->{_formula} ) {
-        $self->_write_title_formula( $title, $y_axis->{_data_id}, $is_y_axis,
-            $y_axis->{_name_font}, $y_axis->{_layout} );
-    }
-    elsif ( $title = $y_axis->{_name} ) {
-        $self->_write_title_rich( $title, $is_y_axis, $y_axis->{_name_font},
-            $y_axis->{_layout} );
-    }
+    $self->_write_chart_title( $y_axis->{_title}, $is_y_axis );
 
     # Write the c:numberFormat element.
     $self->_write_number_format( $y_axis );
@@ -3537,15 +3576,7 @@ sub _write_cat_val_axis {
     $self->_write_minor_gridlines( $x_axis->{_minor_gridlines} );
 
     # Write the axis title elements.
-    my $title;
-    if ( $title = $x_axis->{_formula} ) {
-        $self->_write_title_formula( $title, $x_axis->{_data_id}, $is_y_axis,
-            $x_axis->{_name_font}, $x_axis->{_layout} );
-    }
-    elsif ( $title = $x_axis->{_name} ) {
-        $self->_write_title_rich( $title, $is_y_axis, $x_axis->{_name_font},
-            $x_axis->{_layout} );
-    }
+    $self->_write_chart_title( $x_axis->{_title}, $is_y_axis );
 
     # Write the c:numberFormat element.
     $self->_write_number_format( $x_axis );
@@ -3642,15 +3673,7 @@ sub _write_date_axis {
     $self->_write_minor_gridlines( $x_axis->{_minor_gridlines} );
 
     # Write the axis title elements.
-    my $title;
-    if ( $title = $x_axis->{_formula} ) {
-        $self->_write_title_formula( $title, $x_axis->{_data_id}, undef,
-            $x_axis->{_name_font}, $x_axis->{_layout} );
-    }
-    elsif ( $title = $x_axis->{_name} ) {
-        $self->_write_title_rich( $title, undef, $x_axis->{_name_font},
-            $x_axis->{_layout} );
-    }
+    $self->_write_chart_title($x_axis->{_title});
 
     # Write the c:numFmt element.
     $self->_write_number_format( $x_axis );
@@ -4556,20 +4579,20 @@ sub _write_title_rich {
     my $self      = shift;
     my $title     = shift;
     my $is_y_axis = shift;
-    my $font      = shift;
-    my $layout    = shift;
-    my $overlay   = shift;
 
     $self->xml_start_tag( 'c:title' );
 
     # Write the c:tx element.
-    $self->_write_tx_rich( $title, $is_y_axis, $font );
+    $self->_write_tx_rich( $title->{_name}, $is_y_axis, $title->{_font} );
 
     # Write the c:layout element.
-    $self->_write_layout( $layout, 'text' );
+    $self->_write_layout( $title->{_layout}, 'text' );
 
     # Write the c:overlay element.
-    $self->_write_overlay() if $overlay;
+    $self->_write_overlay() if $title->{_overlay};
+
+    # Write the c:spPr element.
+    $self->_write_sp_pr( $title );
 
     $self->xml_end_tag( 'c:title' );
 }
@@ -4579,31 +4602,56 @@ sub _write_title_rich {
 #
 # _write_title_formula()
 #
-# Write the <c:title> element for a rich string.
+# Write the <c:title> element for a formulas
 #
 sub _write_title_formula {
 
     my $self      = shift;
     my $title     = shift;
-    my $data_id   = shift;
     my $is_y_axis = shift;
-    my $font      = shift;
-    my $layout    = shift;
-    my $overlay   = shift;
 
     $self->xml_start_tag( 'c:title' );
 
     # Write the c:tx element.
-    $self->_write_tx_formula( $title, $data_id );
+    $self->_write_tx_formula( $title->{_formula}, $title->{_data_id} );
 
     # Write the c:layout element.
-    $self->_write_layout( $layout, 'text' );
+    $self->_write_layout( $title->{_layout}, 'text' );
 
     # Write the c:overlay element.
-    $self->_write_overlay() if $overlay;
+    $self->_write_overlay() if $title->{_overlay};
+
+    # Write the c:spPr element.
+    $self->_write_sp_pr( $title );
 
     # Write the c:txPr element.
-    $self->_write_tx_pr( $font, $is_y_axis );
+    $self->_write_tx_pr( $title->{_font}, $is_y_axis );
+
+    $self->xml_end_tag( 'c:title' );
+}
+
+
+##############################################################################
+#
+# _write_title_format_only()
+#
+# Write the <c:title> for a title with formatting but not text change.
+#
+sub _write_title_format_only {
+
+    my $self  = shift;
+    my $title = shift;
+
+    $self->xml_start_tag( 'c:title' );
+
+    # Write the c:layout element.
+    $self->_write_layout( $title->{_layout}, 'text' );
+
+    # Write the c:overlay element.
+    $self->_write_overlay() if $title->{_overlay};
+
+    # Write the c:spPr element.
+    $self->_write_sp_pr( $title );
 
     $self->xml_end_tag( 'c:title' );
 }
@@ -5098,42 +5146,42 @@ sub _write_symbol {
 sub _write_sp_pr {
 
     my $self   = shift;
-    my $series = shift;
+    my $object = shift;
 
-    return if !_has_fill_formatting($series);
+    return if !_has_formatting($object);
 
     $self->xml_start_tag( 'c:spPr' );
 
     # Write the fill elements for solid charts such as pie/doughnut and bar.
-    if ( $series->{_fill}->{_defined} ) {
+    if ( $object->{_fill}->{_defined} ) {
 
-        if ( $series->{_fill}->{none} ) {
+        if ( $object->{_fill}->{none} ) {
 
             # Write the a:noFill element.
             $self->_write_a_no_fill();
         }
         else {
             # Write the a:solidFill element.
-            $self->_write_a_solid_fill( $series->{_fill} );
+            $self->_write_a_solid_fill( $object->{_fill} );
         }
     }
 
-    if ( $series->{_pattern} ) {
+    if ( $object->{_pattern} ) {
 
         # Write the a:pattFill element.
-        $self->_write_a_patt_fill( $series->{_pattern} );
+        $self->_write_a_patt_fill( $object->{_pattern} );
     }
 
-    if ( $series->{_gradient} ) {
+    if ( $object->{_gradient} ) {
 
         # Write the a:gradFill element.
-        $self->_write_a_grad_fill( $series->{_gradient} );
+        $self->_write_a_grad_fill( $object->{_gradient} );
     }
 
 
     # Write the a:ln element.
-    if ( $series->{_line}->{_defined} ) {
-        $self->_write_a_ln( $series->{_line} );
+    if ( $object->{_line}->{_defined} ) {
+        $self->_write_a_ln( $object->{_line} );
     }
 
     $self->xml_end_tag( 'c:spPr' );
@@ -5929,38 +5977,54 @@ sub _write_custom_labels {
         $index++;
         next if !defined $label;
 
+        my $use_custom_formatting = 1;
+
         $self->xml_start_tag( 'c:dLbl' );
 
         # Write the c:idx element.
         $self->_write_idx( $index - 1 );
 
         if ( defined $label->{delete} && $label->{delete} ) {
+
+            # Delete/hide label.
             $self->_write_delete( 1 );
         }
-        elsif ( defined $label->{formula} ) {
-            $self->_write_custom_label_formula( $label );
+        elsif (defined $label->{formula}
+            || defined $label->{value}
+            || $label->{position} )
+        {
 
-            if ( $parent->{position} ) {
-                $self->_write_d_lbl_pos( $parent->{position} );
+            # Write the c:layout element.
+            $self->_write_layout();
+
+            if ( defined $label->{formula} ) {
+                $self->_write_custom_label_formula( $label );
+            }
+            elsif ( defined $label->{value} ) {
+                $self->_write_custom_label_str( $label );
+
+                # String values use spPr formatting.
+                $use_custom_formatting = 0;
+            }
+
+
+            if ( $use_custom_formatting ) {
+                $self->_write_custom_label_format( $label );
+            }
+
+
+            if ( my $position = $label->{position} || $parent->{position} ) {
+                $self->_write_d_lbl_pos( $position );
             }
 
             $self->_write_show_val()      if $parent->{value};
             $self->_write_show_cat_name() if $parent->{category};
             $self->_write_show_ser_name() if $parent->{series_name};
-        }
-        elsif ( defined $label->{value} ) {
-            $self->_write_custom_label_str( $label );
 
-            if ( $parent->{position} ) {
-                $self->_write_d_lbl_pos( $parent->{position} );
-            }
 
-            $self->_write_show_val()      if $parent->{value};
-            $self->_write_show_cat_name() if $parent->{category};
-            $self->_write_show_ser_name() if $parent->{series_name};
         }
         else {
-            $self->_write_custom_label_format_only( $label );
+            $self->_write_custom_label_format( $label );
         }
 
         $self->xml_end_tag( 'c:dLbl' );
@@ -5970,6 +6034,7 @@ sub _write_custom_labels {
 
 ##############################################################################
 #
+
 # _write_custom_label_str()
 #
 # Write parts of the <c:dLbl> element for strings.
@@ -5981,10 +6046,7 @@ sub _write_custom_label_str {
     my $value          = $label->{value};
     my $font           = $label->{font};
     my $is_y_axis      = 0;
-    my $has_formatting = _has_fill_formatting($label);
-
-    # Write the c:layout element.
-    $self->_write_layout();
+    my $has_formatting = _has_formatting($label);
 
     $self->xml_start_tag( 'c:tx' );
 
@@ -6010,15 +6072,12 @@ sub _write_custom_label_formula {
     my $formula        = $label->{formula};
     my $data_id        = $label->{data_id};
     my $font           = $label->{font};
-    my $has_formatting = _has_fill_formatting($label);
+    my $has_formatting = _has_formatting($label);
     my $data;
 
     if ( defined $data_id ) {
         $data = $self->{_formula_data}->[$data_id];
     }
-
-    # Write the c:layout element.
-    $self->_write_layout();
 
     $self->xml_start_tag( 'c:tx' );
 
@@ -6026,24 +6085,20 @@ sub _write_custom_label_formula {
     $self->_write_str_ref( $formula, $data, 'str' );
 
     $self->xml_end_tag( 'c:tx' );
-
-    # Write the data label formating, if any.
-    $self->_write_custom_label_format_only($label);
 }
 
 ##############################################################################
 #
-# _write_custom_label_format_only()
+# _write_custom_label_format()
 #
-# Write parts of the <c:dLbl> element for labels where only the formatting has
-# changed.
+# Write the formatting and font elements for the custom labels.
 #
-sub _write_custom_label_format_only {
+sub _write_custom_label_format {
 
     my $self           = shift;
     my $label          = shift;
     my $font           = $label->{font};
-    my $has_formatting = _has_fill_formatting($label);
+    my $has_formatting = _has_formatting($label);
 
     if ( $has_formatting ) {
 
@@ -7314,8 +7369,12 @@ The properties that can be set are:
     name
     name_font
     name_layout
-    num_font
+    name_line
+    name_fill
+    name_pattern
+    name_gradient
     num_format
+    num_font
     line
     fill
     pattern
@@ -7395,22 +7454,37 @@ The number format is similar to the Worksheet Cell Format C<num_format> apart fr
 
 =item * C<line>
 
-Set the properties of the axis line type such as colour and width. See the L</CHART FORMATTING> section below.
+Set the properties of the axis line/border type such as colour and width. See the L</CHART FORMATTING> section below.
 
     $chart->set_x_axis( line => { none => 1 });
 
-
 =item * C<fill>
 
-Set the fill properties of the axis such as colour. See the L</CHART FORMATTING> section below. Note, in Excel the axis fill is applied to the area of the numbers of the axis and not to the area of the axis bounding box. That background is set from the chartarea fill.
+Set the fill properties of the axis. See the L</CHART FORMATTING> section below. Note, in Excel the axis fill is applied to the area of the numbers of the axis and not to the area of the axis bounding box. That background is set from the chartarea fill.
 
 =item * C<pattern>
 
-Set the pattern properties of the axis such as colour. See the L</CHART FORMATTING> section below.
+Set the pattern properties of the axis. See the L</CHART FORMATTING> section below.
 
 =item * C<gradient>
 
-Set the gradient properties of the axis such as colour. See the L</CHART FORMATTING> section below.
+Set the gradient properties of the axis. See the L</CHART FORMATTING> section below.
+
+=item * C<name_line>
+
+Set the properties of the axis title/name line/border. See the L</CHART FORMATTING> section below.
+
+=item * C<name_fill>
+
+Set the fill properties of the axis title/name. See the L</CHART FORMATTING> section below.
+
+=item * C<name_pattern>
+
+Set the pattern properties of the axis title/name. See the L</CHART FORMATTING> section below.
+
+=item * C<name_gradient>
+
+Set the gradient properties of the axis title/name. See the L</CHART FORMATTING> section below.
 
 =item * C<min>
 
@@ -7702,9 +7776,21 @@ The properties that can be set are:
 
 Set the name (title) for the chart. The name is displayed above the chart. The name can also be a formula such as C<=Sheet1!$A$1>. The name property is optional. The default is to have no chart title.
 
-=item * C<name_font>
+=item * C<font>
 
 Set the font properties for the chart title. See the L</CHART FONTS> section below.
+
+=item * C<fill>
+
+Set the fill properties of the legend such as colour. See the L</CHART FORMATTING> section below.
+
+=item * C<pattern>
+
+Set the pattern fill properties of the legend. See the L</CHART FORMATTING> section below.
+
+=item * C<gradient>
+
+Set the gradient fill properties of the legend. See the L</CHART FORMATTING> section below.
 
 =item * C<overlay>
 
@@ -8484,6 +8570,7 @@ The property elements of the C<custom> lists should be dicts with the following 
     pattern
     gradient
     delete
+    position
 
 The C<value> property should be a string, number or formula string that refers to a cell from which the value will be taken:
 
@@ -8538,6 +8625,11 @@ the maximum and the minimum:
         { delete => 1 },
         undef,
     ];
+
+The C<position> property is used to position the custom data such as "center"
+or "left" relative to the data point. See the explanation for the C<position>
+property of series data labels above.
+
 
 
 =head2 Points
@@ -9367,7 +9459,7 @@ In this case it is just necessary to add a C<y2_axis> parameter to the series an
 
     ...
 
-    # Note: the y2 properites are on the secondary chart.
+    # Note: the y2 properties are on the secondary chart.
     $line_chart2->set_y2_axis( name => 'Target length (mm)' );
 
 
@@ -9402,6 +9494,6 @@ John McNamara jmcnamara@cpan.org
 
 =head1 COPYRIGHT
 
-Copyright MM-MMXXIV, John McNamara.
+Copyright MM-MMXXV, John McNamara.
 
 All Rights Reserved. This module is free software. It may be used, redistributed and/or modified under the same terms as Perl itself.

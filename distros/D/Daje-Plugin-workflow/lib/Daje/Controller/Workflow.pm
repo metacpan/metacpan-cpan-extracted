@@ -5,7 +5,7 @@ use v5.40;
 # NAME
 # ====
 #
-# Daje::Controller::Workflow - It's new $module
+# Daje::Controller::Workflow - Mojolicious controller for Daje::Workflow
 #
 # SYNOPSIS
 # ========
@@ -15,7 +15,7 @@ use v5.40;
 # DESCRIPTION
 # ===========
 #
-# Daje::Controller::Workflow is ...
+# Daje::Controller::Workflow is the controller for accessing Daje::Workflow
 #
 # LICENSE
 # =======
@@ -32,21 +32,22 @@ use v5.40;
 #
 #
 
+use Data::Dumper;
 use Mojo::JSON qw{decode_json};
 
 sub execute($self) {
 
-    my $test = 1;
     # $self->render_later;
-
+    $self->app->log->debug('Daje::Controller::Workflow::execute');
+    my $temp = $self->req->body;
     my ($companies_pkey, $users_pkey) = $self->jwt->companies_users_pkey(
         $self->req->headers->header('X-Token-Check')
     );
 
-    my $data->{data} = decode_json ($self->req->body);
-    $data->{users_fkey} = $users_pkey;
-    $data->{companies_fkey} = $companies_pkey;
-    $data->{data}->{workflow}->{workflow_pkey} = 0 unless $data->{workflow}->{workflow_pkey};
+    my $data->{context} = decode_json ($self->req->body);
+    $data->{context}->{users_fkey} = $users_pkey;
+    $data->{context}->{companies_fkey} = $companies_pkey;
+    $data->{context}->{workflow}->{workflow_pkey} = 0 unless $data->{context}->{workflow}->{workflow_pkey};
     #
     # push @{$data->{actions}}, "$self->stash('wf_action')";
     # $data->{workflow}->{workflow} = $self->stash('workflow');
@@ -56,11 +57,10 @@ sub execute($self) {
     #
     # say Dumper ($data);
     try {
-        $self->workflow->workflow_pkey($data->{data}->{workflow}->{workflow_pkey});
-        $self->workflow->workflow_name($data->{data}->{workflow}->{workflow});
+        $self->workflow->workflow_pkey($data->{context}->{workflow}->{workflow_pkey});
+        $self->workflow->workflow_name($data->{context}->{workflow}->{workflow});
         $self->workflow->context($data);
-
-        $self->workflow->process($data->{data}->{workflow}->{activity});
+        $self->workflow->process($data->{context}->{workflow}->{activity});
         if($self->workflow->error->has_error() == 0) {
             $self->render(json => {'result' => 'success'});
         } else {
@@ -70,10 +70,13 @@ sub execute($self) {
         }
     } catch ($e) {
         $self->render(json => {'result' => 'failed', data => $e});
+        $self->app->log->error('Daje::Controller::Workflow::execute ' . $e);
     };
+    $self->app->log->debug('Daje::Controller::Workflow::execute ends');
 }
 1;
 __END__
+
 
 
 
@@ -83,7 +86,7 @@ __END__
 =head1 NAME
 
 
-Daje::Controller::Workflow - It's new $module
+Daje::Controller::Workflow - Mojolicious controller for Daje::Workflow
 
 
 
@@ -97,11 +100,17 @@ Daje::Controller::Workflow - It's new $module
 =head1 DESCRIPTION
 
 
-Daje::Controller::Workflow is ...
+Daje::Controller::Workflow is the controller for accessing Daje::Workflow
 
 
 
 =head1 REQUIRES
+
+L<Mojo::JSON> 
+
+L<Data::Dumper> 
+
+L<v5.40> 
 
 L<Mojo::Base> 
 

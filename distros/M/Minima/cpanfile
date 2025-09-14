@@ -7,6 +7,7 @@ requires 'Path::Tiny', '0.142';
 requires 'Plack', '1.0050';
 requires 'Router::Simple', '0.17';
 requires 'Template', '3.100';
+requires 'YAML::XS', '0.904.0';
 
 on 'configure' => sub {
     requires 'Module::Build', '0.42';

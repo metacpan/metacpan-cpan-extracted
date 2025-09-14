@@ -1,17 +1,39 @@
 [![Actions Status](https://github.com/janeskil1525/Daje-Workflow/actions/workflows/test.yml/badge.svg)](https://github.com/janeskil1525/Daje-Workflow/actions)
 # NAME
 
-Daje::Workflow - It's new $module
+Daje::Workflow - It's a simple workflow engine
 
 # SYNOPSIS
 
     use Daje::Workflow;
+    use Daje::Workflow::Loader;
+    use Daje::Workflow::Database;
+    use Daje::Workflow::Database::Model;
+
+    my $context->{context}->{some_key_needed_by_some_activity}="";
+
+    my $workflow = Daje::Workflow->new(
+         pg            => $pg,
+         loader        => $loader->loader,
+         workflow_name => 'generate',
+         workflow_pkey => '12',
+         context       => $context,
+    );
+
+    $workflow->process("save_perl_file");
+    say $workflow->error->error if $workflow->error->has_error() ;
 
 # DESCRIPTION
 
-Daje::Workflow is ...
+Daje::Workflow is
 
 # REQUIRES
+
+[Daje::Workflow::Database::Model](https://metacpan.org/pod/Daje%3A%3AWorkflow%3A%3ADatabase%3A%3AModel) 
+
+[Daje::Workflow::Database](https://metacpan.org/pod/Daje%3A%3AWorkflow%3A%3ADatabase) 
+
+[Daje::Workflow::Loader](https://metacpan.org/pod/Daje%3A%3AWorkflow%3A%3ALoader) 
 
 [Daje::Workflow::Errors::Error](https://metacpan.org/pod/Daje%3A%3AWorkflow%3A%3AErrors%3A%3AError) 
 
@@ -24,6 +46,8 @@ Daje::Workflow is ...
 [Daje::Workflow::Database](https://metacpan.org/pod/Daje%3A%3AWorkflow%3A%3ADatabase) 
 
 [Daje::Workflow::Loader](https://metacpan.org/pod/Daje%3A%3AWorkflow%3A%3ALoader) 
+
+[v5.40](https://metacpan.org/pod/v5.40) 
 
 [Mojo::Base](https://metacpan.org/pod/Mojo%3A%3ABase) 
 

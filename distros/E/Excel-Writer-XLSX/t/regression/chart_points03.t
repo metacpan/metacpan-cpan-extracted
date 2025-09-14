@@ -2,7 +2,7 @@
 #
 # Tests the output of Excel::Writer::XLSX against Excel generated files.
 #
-# Copyright 2000-2024, John McNamara, jmcnamara@cpan.org
+# Copyright 2000-2025, John McNamara, jmcnamara@cpan.org
 #
 # SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
 #
@@ -38,7 +38,7 @@ my $workbook  = Excel::Writer::XLSX->new( $got_filename );
 my $worksheet = $workbook->add_worksheet();
 my $chart     = $workbook->add_chart( type => 'pie', embedded => 1 );
 
-# Replicate the cutom colors for testing.
+# Replicate the custom colors for testing.
 $workbook->set_custom_color( 40, 0xCC, 0x00, 0x00 );
 $workbook->set_custom_color( 41, 0x99, 0x00, 0x00 );
 

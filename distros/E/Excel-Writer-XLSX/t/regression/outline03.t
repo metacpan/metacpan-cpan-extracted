@@ -2,7 +2,7 @@
 #
 # Tests the output of Excel::Writer::XLSX against Excel generated files.
 #
-# Copyright 2000-2024, John McNamara, jmcnamara@cpan.org
+# Copyright 2000-2025, John McNamara, jmcnamara@cpan.org
 #
 # SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
 #
@@ -31,7 +31,7 @@ my $ignore_elements = { 'xl/workbook.xml' => ['<workbookView'] };
 ###############################################################################
 #
 # Test the creation of a outlines in a Excel::Writer::XLSX file. These tests
-# are based on the outline programs in the examles directory.
+# are based on the outline programs in the examples directory.
 #
 use Excel::Writer::XLSX;
 

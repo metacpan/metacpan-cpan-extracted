@@ -9,6 +9,7 @@ use Hash::MultiValue;
 use Minima::View::PlainText;
 use Plack::Request;
 use Plack::Response;
+use Scalar::Util qw(reftype);
 
 field $env             :reader;
 field $app      :param :reader;
@@ -27,6 +28,37 @@ ADJUST {
     $response = Plack::Response->new(200);
 
     $params = $self->_get_request_parameters;
+}
+
+method before_action    ($m) { }
+method after_action     ($r) { }
+
+method trimmed_params ($options = {})
+{
+    my $exclude = $options->{exclude} // [];
+    my @params;
+
+    for my ($k, $v) ($params->flatten) {
+        if (defined $v) {
+            my $skip = 0;
+            for my $pat (@$exclude) {
+                if (ref $pat && reftype $pat eq 'REGEXP') {
+                    if (defined $k && $k =~ $pat) { $skip = 1; last }
+                } else {
+                    if (defined $k && $k eq $pat) { $skip = 1; last }
+                }
+            }
+            if (!$skip) {
+                if (!ref $v) {
+                    $v = trim $v;
+                } elsif (ref $v eq ref []) {
+                    $v = [ map { defined $_ ? trim($_) : $_ } @$v ];
+                }
+            }
+        }
+        push @params, $k, $v;
+    }
+    return Hash::MultiValue->new(@params);
 }
 
 method hello
@@ -132,7 +164,18 @@ Minima::Controller - Base class for controllers used with Minima
         app => $app,         # Minima::App
         route => $match,     # a match returned by Minima::Router
     );
-    $controller->hello;
+
+    # Access route parameters (from URI captures)
+    my $post_id = $controller->route->{post};
+
+    # Access request parameters (query string or POST)
+    my $q = $controller->params->get('q');
+
+    # Render a response
+    $controller->render(
+        Minima::View::PlainText->new,
+        "Post: $post_id, search: $q\n"
+    );
 
 =head1 DESCRIPTION
 
@@ -144,6 +187,12 @@ subclasses to interactly directly with Plack.
 Minima::Controller also keeps references to the L<Minima::App> and Plack
 environment. Additionally, it retains data received from the router,
 making it readily available to controllers.
+
+Controllers may also define optional lifecycle hooks: C<before_action>
+(to run checks before an action is executed) and C<after_action> (to run
+logic after an action has completed). For details on how these hooks are
+invoked during dispatch, see L<the C<run> method in
+Minima::App|Minima::App/run>.
 
 This base class is not connected to any view, which is left to methods
 or subclasses. However, it sets a default C<Content-Type> header for the
@@ -170,6 +219,35 @@ reference contains data extracted from the URI by L<Minima::Router>,
 then this data will be made available to the controller through the
 L<C<route>|/route> field.
 
+=head2 before_action
+
+    method before_action ($method)
+
+Optional hook that runs before the action method is invoked. It receives
+the name of the action that is about to be executed.
+
+If it returns a response, that response is immediately returned to the
+client and the action itself will not run. If it returns nothing, the
+normal action flow continues.
+
+This is typically used for authentication, access control, or other
+pre-conditions.
+
+See also: L<Minima::App/run>.
+
+=head2 after_action
+
+    method after_action ($response)
+
+Optional hook that runs after the action has completed. It receives the
+response object returned by the action.
+
+The return value of C<after_action> is ignored; any changes must be made
+directly to the response object. This is typically used for logging,
+instrumentation, or post-processing.
+
+See also: L<Minima::App/run>.
+
 =head2 redirect
 
     method redirect ($url, $code = 302)
@@ -191,6 +269,30 @@ Utility method to call C<render> on the passed view, together with
 optional data, and save to the response body. It then calls
 C<prepare_response> on the passed view and returns the finalized
 response.
+
+=head2 trimmed_params
+
+    method trimmed_params ($options = {})
+
+Returns a new L<Hash::MultiValue> with decoded request parameters where
+leading and trailing whitespace in values has been removed. Keys are
+left unchanged. The original L<C<params>|/params> are not modified.
+Array values are also trimmed element-wise.
+
+Options:
+
+=over 4
+
+=item C<exclude>
+
+Array reference of parameter names (strings) or regular expressions to
+exclude from trimming. For example:
+
+    my $params = $self->trimmed_params(
+            { exclude => [ 'password', qr/^raw_/ ] }
+        );
+
+=back
 
 =head1 EXTRAS
 
@@ -227,7 +329,24 @@ Reference to a L<Minima::App>.
 
 =item C<route>
 
-Hash reference returned by the router.
+The C<route> attribute contains the hash reference returned by
+L<Minima::Router>. In addition to C<controller> and C<action>, it may
+include named captures extracted from the URI pattern.
+
+For example, given this route:
+
+    GET  /blog/{post}   :Main    show_post
+
+The action method can access the captured parameter directly:
+
+    method show_post
+    {
+        my $id = $self->route->{post};
+        ...
+    }
+
+These route parameters are separate from L<C<params>|/params>, which
+holds decoded query string and POST parameters.
 
 =item C<request>
 
@@ -241,6 +360,11 @@ Internal L<Plack::Response>
 
 Decoded GET and POST parameters merged in a L<Hash::MultiValue>. See
 L<"Configuration"|/CONFIGURATION> to set the desired encoding.
+
+Trimming whitespace is not performed automatically. If you need trimmed
+parameters, call L<C<trimmed_params>|/trimmed_params>, which returns a
+new L<Hash::MultiValue> with leading and trailing whitespace removed
+from values (keys are untouched).
 
 =back
 

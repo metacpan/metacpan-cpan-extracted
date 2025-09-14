@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20250605193633;
+our $VERSION = 1.20250913135855;
 
 my $formatters = [
                 {
@@ -98,15 +98,15 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"2432", "Katanga",
-"2436", "North\ Kivu\/South\ Kivu\/Maniema",
+$areanames{en} = {"2431", "Kinshasa",
 "2435", "Oriental\ Province\ \(Kisanga\/Mbandaka\)",
-"2431", "Kinshasa",
+"2436", "North\ Kivu\/South\ Kivu\/Maniema",
+"2432", "Katanga",
 "2434", "Kasai\-Oriental\/Kasai\-Occidental",
 "2433", "Bas\-Congo\/Bandundu",};
-$areanames{fr} = {"2436", "Nord\-Kivu\/Sud\-Kivu\/Maniema",
-"2435", "Province\ Orientale\ \(Kisanga\/Mbandaka\)",
-"243573", "Oriental\ Province\ \(Kisanga\/Mbandaka\)",};
+$areanames{fr} = {"243573", "Oriental\ Province\ \(Kisanga\/Mbandaka\)",
+"2436", "Nord\-Kivu\/Sud\-Kivu\/Maniema",
+"2435", "Province\ Orientale\ \(Kisanga\/Mbandaka\)",};
 my $timezones = {
                '' => [
                        'Africa/Kinshasa',

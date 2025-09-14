@@ -1,0 +1,74 @@
+{
+  "config":{
+    "context": {
+      "sql_path": "/home/jan/Project/SyntaxSorcery/Tools/Generate/conf/generate_sql.ini",
+      "perl_path": "/home/jan/Project/SyntaxSorcery/Tools/Generate/conf/generate_perl.ini",
+      "source_dir": "/home/jan/Project/Daje-Plugin-Users/schema/",
+      "sql_target_dir": "/home/jan/Project/SyntaxSorcery/Tools/Generate/Sql/",
+      "data_dir": "/home/jan/Project/SyntaxSorcery/Tools/Generate/schema/",
+      "target_dir": "/home/jan/Project/SyntaxSorcery/Tools/Generate/schema/",
+      "dbconn": "dbi:Pg:dbname=DB;host=database;port=54321;user=test;password=test",
+      "schema_dir": "/home/jan/Project/Daje-Database/schema/",
+      "perl": {
+        "name_space_dir": "/home/jan/Project/Daje-Plugin-Users/lib/Daje/Database/Model/Super/",
+        "view_name_space_dir": "/home/jan/Project/Daje-Plugin-Users/lib/Daje/Database/View/Super/",
+        "base_space_dir": "/home/jan/Project/Daje-Database-Model/lib/Daje/Database/Model/Super/Common/",
+        "interface_space_dir": "/home/jan/Project/Daje-Plugin-Users/lib/Daje/Database/Model/",
+        "view_interface_space_dir": "/home/jan/Project/Daje-Plugin-Users/lib/Daje/Database/View/",
+        "name_space": "Daje::Database::Model::Super::",
+        "view_name_space": "Daje::Database::View::Super::",
+        "base_name_space": "Daje::Database::Model::Super::Common::",
+        "name_interface": "Daje::Database::Model::",
+        "view_name_interface": "Daje::Database::View::"
+      }
+    },
+    "dsn": "dbi:Pg:dbname=Workflowtest;host=database;port=54321;user=test;password=test",
+    "migrations": [
+      {
+        "class": "Daje::Workflow::Database",
+        "name": "workflow",
+        "migration": 3
+      },
+      {
+        "class": "Daje::Workflow::FileChanged::Database::DB",
+        "name": "file_changed",
+        "migration": 1
+      }
+    ],
+    "workflow": {
+      "path": "/home/jan/Project/Daje-Workflow-Workflows/Workflows",
+      "type": "workflow",
+      "name": "generate",
+      "activities": [
+        {
+          "activity": "changed_files",
+          "order": 1
+        },
+        {
+          "activity": "generate_sql",
+          "order": 2
+        },
+        {
+          "activity": "save_sql_file",
+          "order": 3
+        },
+        {
+          "activity": "generate_schema",
+          "order": 4
+        },
+        {
+          "activity": "save_schema_file",
+          "order": 5
+        },
+        {
+          "activity": "generate_perl",
+          "order": 6
+        },
+        {
+          "activity": "save_perl_file",
+          "order": 7
+        }
+      ]
+    }
+  }
+}

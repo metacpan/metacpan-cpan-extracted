@@ -2,10 +2,6 @@
 
 Crypt::URandom::MonkeyPatch - override core rand function to use system random sources
 
-# VERSION
-
-version v0.1.1
-
 # SYNOPSIS
 
 ```perl
@@ -14,7 +10,7 @@ use Crypt::URandom::MonkeyPatch;
 
 # DESCRIPTION
 
-This module globlly overrides the builtin Perl function `rand` with one based on the operating system's cryptographic
+This module globally overrides the builtin Perl function `rand` with one based on the operating system's cryptographic
 random number source, e.g. `/dev/urandom`.
 
 The purpose of this module is monkey patch legacy code that uses `rand` for security purposes.
@@ -34,36 +30,74 @@ Every time the `rand` function is called, it will output a line such as
 Crypt::URandom::MonkeyPatch::urandom used from Some::Package line 123
 ```
 
-# EXPORTS
+# RECENT CHANGES
 
-## rand
+Changes for version v0.1.2 (2025-09-13)
 
-This globally overrides the builtin `rand` function using 31-bits of data from the operating system's random source.
+- Documentation
+    - Fixed typos.
+    - Updated the security policy.
+    - Generated README using the Dzil UsefulReadme plugin.
+    - Removed the redundant INSTALL guide.
+    - Renamed BUGS to SUPPORT and documented supported versions.
+- Tests
+    - Added and updated author tests.
+    - Moved author tests into the \`xt\` directory.
+    - Added missing development prerequisite.
 
-# KNOWN ISSUES
+See the `Changes` file for more details.
 
-This module is not intended for use with new code, or for use in CPAN modules.  If you are writing new code that needs a
-secure souce of random bytes, then use [Crypt::URandom](https://metacpan.org/pod/Crypt%3A%3AURandom) or see the [CPAN Author's Guide to Random Data for
-Security](https://security.metacpan.org/docs/guides/random-data-for-security.html).
+# REQUIREMENTS
 
-This should only be used when the affected code cannot be updated.
+This module lists the following modules as runtime dependencies:
 
-Because this updates the builtin function globally, it may affect other parts of your code.
+- [Crypt::URandom](https://metacpan.org/pod/Crypt%3A%3AURandom)
+- [constant](https://metacpan.org/pod/constant)
+- [perl](https://metacpan.org/pod/perl) version v5.8.0 or later
+- [strict](https://metacpan.org/pod/strict)
+- [version](https://metacpan.org/pod/version) version 0.77 or later
+- [warnings](https://metacpan.org/pod/warnings)
 
-# SEE ALSO
+See the `cpanfile` file for the full list of prerequisites.
 
-[Crypt::URandom](https://metacpan.org/pod/Crypt%3A%3AURandom)
+# INSTALLATION
 
-[CORE](https://metacpan.org/pod/CORE)
+The latest version of this module (along with any dependencies) can be installed from [CPAN](https://www.cpan.org) with the `cpan` tool that is included with Perl:
 
-[perlfunc](https://metacpan.org/pod/perlfunc)
+```
+cpan Crypt::URandom::MonkeyPatch
+```
 
-# SOURCE
+You can also extract the distribution archive and install this module (along with any dependencies):
 
-The development version is on github at [https://github.com/robrwo/perl-Crypt-URandom-MonkeyPatch](https://github.com/robrwo/perl-Crypt-URandom-MonkeyPatch)
-and may be cloned from [git://github.com/robrwo/perl-Crypt-URandom-MonkeyPatch.git](git://github.com/robrwo/perl-Crypt-URandom-MonkeyPatch.git)
+```
+cpan .
+```
 
-# BUGS
+You can also install this module manually using the following commands:
+
+```
+perl Makefile.PL
+make
+make test
+make install
+```
+
+If you are working with the source repository, then it may not have a `Makefile.PL` file.  But you can use the [Dist::Zilla](https://dzil.org/) tool in anger to build and install this module:
+
+```
+dzil build
+dzil test
+dzil install --install-command="cpan ."
+```
+
+For more information, see [How to install CPAN modules](https://www.cpan.org/modules/INSTALL.html).
+
+# SUPPORT
+
+Only the latest version of this module will be supported.
+
+Only Perl versions released in the past ten (10) years are supported, even though this module may run on earlier versions.
 
 Please report any bugs or feature requests on the bugtracker website
 [https://github.com/robrwo/perl-Crypt-URandom-MonkeyPatch/issues](https://github.com/robrwo/perl-Crypt-URandom-MonkeyPatch/issues)
@@ -76,6 +110,11 @@ feature.
 
 Security issues should not be reported on the bugtracker website. Please see `SECURITY.md` for instructions how to
 report security vulnerabilities.
+
+# SOURCE
+
+The development version is on github at ["robrwo/perl-Crypt-URandom-MonkeyPatch" in github.com](https://metacpan.org/pod/github.com#robrwo-perl-Crypt-URandom-MonkeyPatch)
+and may be cloned from ["robrwo/perl-Crypt-URandom-MonkeyPatch.git" in github.com](https://metacpan.org/pod/github.com#robrwo-perl-Crypt-URandom-MonkeyPatch.git)
 
 # AUTHOR
 
@@ -90,3 +129,11 @@ This is free software, licensed under:
 ```
 The Artistic License 2.0 (GPL Compatible)
 ```
+
+# SEE ALSO
+
+[Crypt::URandom](https://metacpan.org/pod/Crypt%3A%3AURandom)
+
+[CORE](https://metacpan.org/pod/CORE)
+
+[perlfunc](https://metacpan.org/pod/perlfunc)

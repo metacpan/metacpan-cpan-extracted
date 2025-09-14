@@ -6,6 +6,7 @@ use Carp;
 use Minima::App;
 use Path::Tiny;
 use Plack::Test;
+use YAML::XS 'LoadFile';
 
 our $config = {};
 our $app;
@@ -29,7 +30,8 @@ sub import
 
 sub prepare ($file = undef)
 {
-    my $default_config = $base->child('etc/config.pl');
+    my $default_prefix = $base->child('etc/config');
+    my @files = map { "$default_prefix.$_" } qw/ yaml yml pl /;
 
     if ($file) {
         my $file_abs = path($file)->absolute;
@@ -37,14 +39,35 @@ sub prepare ($file = undef)
         croak "Config file `$file` does not exist.\n"
             unless -e $file_abs;
 
-        $config = do $file_abs;
-        croak "Failed to parse config file `$file`: $@\n" if $@;
-
-    } elsif (-e $default_config) {
-        $config = do $default_config;
-        croak "Failed to parse default config file `$default_config`: "
-            . "$@\n" if $@;
+        $file = $file_abs;
     }
+    unshift @files, $file;
+
+    my $adjective;
+
+    for (my $i = 0; $i < @files; $i++) {
+
+        my $f = $files[$i];
+        next unless defined $f && -e $f;
+
+        $adjective = $i ? 'default ' : '';
+
+        if ($f =~ /\.ya?ml$/) {
+            try {
+                $config = LoadFile $f;
+            } catch ($e) {
+                croak "Failed to parse ${adjective}config file "
+                    . "`$f`:\n$e\n";
+            }
+        } else {
+            $config = do $f;
+            croak "Failed to parse ${adjective}config file "
+                . "`$f`: $@\n" if $@;
+        }
+
+        last;
+    }
+
     croak "Config is not a hash reference.\n"
         unless ref $config eq ref {};
 
@@ -81,7 +104,7 @@ Minima::Setup - Setup a Minima web application
 =head1 SYNOPSIS
 
     # app.psgi
-    use Minima::Setup 'config.pl';
+    use Minima::Setup 'config.yaml';
     \&Minima::Setup::init;
 
 =head1 DESCRIPTION
@@ -107,10 +130,12 @@ to L<C<prepare>|/prepare> which can also be called directly.
 Minima::Setup will attempt to read the file and use it to initialize
 L<Minima::App>.
 
-By default, the configuration file is assumed to be F<etc/config.pl>. If
-this file exists and no other location is provided, it will be used. If
-nothing was passed and no file exists at the default location, the app
-will be loaded with an empty configuration hash.
+By default, Minima::Setup searches for configuration files in this
+order: F<etc/config.yaml>, F<etc/config.yml>, then F<etc/config.pl>. The
+first file found is loaded; files with F<.yaml> or F<.yml> extensions
+are parsed as YAML, other extensions are treated as Perl. If no
+configuration file is found and no custom file was passed, the
+application is initialized with an empty configuration hash.
 
 =head1 SUBROUTINES
 

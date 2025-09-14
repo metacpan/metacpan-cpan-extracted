@@ -25,8 +25,7 @@
             "ExtUtils::Install" : "0",
             "ExtUtils::MakeMaker" : "6.64",
             "ExtUtils::Manifest" : "0",
-            "File::ShareDir::Install" : "0.11",
-            "Parallel::ForkManager" : "v0.7.6"
+            "File::ShareDir::Install" : "0.11"
          }
       },
       "configure" : {
@@ -74,6 +73,6 @@
          "url" : "https://github.com/DrHyde/perl-modules-Number-Phone"
       }
    },
-   "version" : "4.0007",
+   "version" : "4.0008",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

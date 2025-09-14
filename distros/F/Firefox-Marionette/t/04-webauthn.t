@@ -16,6 +16,9 @@ SKIP: {
 	if ($^O eq 'MSWin32') {
 		plan skip_all => "Cannot test in a $^O environment";
 	}
+	if ($ENV{GITHUB_RUN_ID}) {
+		plan skip_all => "Running in github causes hangs:$ENV{GITHUB_RUN_ID}";
+	}
 	my $profile = Firefox::Marionette::Profile->new();
 	my @extra_parameters;
 	if ($ENV{FIREFOX_BINARY}) {
@@ -70,6 +73,7 @@ SKIP: {
 		ok($firefox->go('about:blank'), "Loading about:blank");
 		ok($firefox->clear_cache(Firefox::Marionette::Cache::CLEAR_COOKIES()), "Deleting all cookies");
 		ok($firefox->go('https://' . $host_name), "Loading https://$host_name");
+		ok($firefox->find_id('input-email')->clear(), "Clearing username field");
 		ok($firefox->find_id('input-email')->type($user_name), "Entering $user_name for username");
 		ok($firefox->find_id('login-button')->click(), "Clicking login button for $host_name");
 		ok($firefox->await(sub { sleep 1; $firefox->find_class('hero confetti'); }), "Successfully authenticated to $host_name");

@@ -2,10 +2,10 @@
 #
 # Tests for Excel::Writer::XLSX::Worksheet methods.
 #
-# Tests for the _position_object_emus method used to calcualte the twoCellAnchor
+# Tests for the _position_object_emus method used to calculate the twoCellAnchor
 # positions for drawing and chart objects.
 #
-# Copyright 2000-2024, John McNamara, jmcnamara@cpan.org
+# Copyright 2000-2025, John McNamara, jmcnamara@cpan.org
 #
 # SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
 #

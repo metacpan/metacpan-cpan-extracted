@@ -56,7 +56,17 @@ method run
     my $response;
 
     try {
+        # before_action
+        if ($controller->can('before_action')) {
+            my $res = $controller->before_action($method);
+            return $res if $res; # halt
+        }
+        # actual action
         $response = $controller->$method;
+        # after action
+        if ($controller->can('after_action')) {
+            $controller->after_action($response);
+        }
     } catch ($e) {
         my $err = $router->error_route;
         # Something failed. If we're in production
@@ -293,6 +303,32 @@ are described under L</Configuration>.
 Runs the application by querying the router for a match to C<PATH_INFO>
 (the URL in the environment hash) and dispatching it. The enviroment
 must already be set.
+
+The dispatch cycle proceeds as follows:
+
+=over 4
+
+=item 1.
+
+Instantiate the matched controller.
+
+=item 2.
+
+If the controller implements C<before_action>, it is called with the
+method name about to be executed. If it returns a response, that
+response is returned immediately and the action itself is skipped.
+
+=item 3.
+
+Call the action method on the controller.
+
+=item 4.
+
+If the controller implements C<after_action>, it is called with the
+response returned by the action. Any changes should be made directly to
+the response object.
+
+=back
 
 If the controller-action call fails, Minima::App checks for the
 existence of an error route. If the app is I<not in development mode>

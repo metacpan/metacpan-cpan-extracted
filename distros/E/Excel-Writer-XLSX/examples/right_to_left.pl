@@ -3,10 +3,10 @@
 #######################################################################
 #
 # Example of how to change the default worksheet direction from
-# left-to-right to right-to-left as required by some eastern verions
+# left-to-right to right-to-left as required by some eastern versions
 # of Excel.
 #
-# Copyright 2000-2024, John McNamara, jmcnamara@cpan.org
+# Copyright 2000-2025, John McNamara, jmcnamara@cpan.org
 #
 # SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
 #

@@ -26,7 +26,7 @@ no_index:
 provides:
   Daje::Workflow:
     file: lib/Daje/Workflow.pm
-    version: '0.10'
+    version: '0.12'
   Daje::Workflow::Activities:
     file: lib/Daje/Workflow/Activities.pm
   Daje::Workflow::Activities::Closed:
@@ -43,16 +43,17 @@ provides:
   Daje::Workflow::Observers:
     file: lib/Daje/Workflow/Observers.pm
 requires:
+  Daje::Workflow::Config: '0'
   Daje::Workflow::Database: '0.05'
   Daje::Workflow::Database::Model: '0'
   Daje::Workflow::Loader: '0'
   Mojo::Loader: '0'
   Mojo::Pg: '0'
-  perl: '5.040000'
+  perl: v5.40.0
 resources:
   bugtracker: https://github.com/janeskil1525/Daje-Workflow/issues
   homepage: https://github.com/janeskil1525/Daje-Workflow
   repository: https://github.com/janeskil1525/Daje-Workflow.git
-version: '0.10'
+version: '0.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

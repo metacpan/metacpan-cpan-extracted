@@ -1,3 +1,31 @@
+v0.6.1  2025-09-13
+
+        [Documentation-Only]
+        - Improve POD syntax.
+
+v0.6.0  2025-09-13
+
+        [Changes]
+        - Add YAML configuration file support alongside the existing
+          .pl format, with automatic detection.
+        - Add controller lifecycle hooks, allowing short-circuit
+          execution and other customizations.
+        - Add method for trimming parameters in Controller.
+        - Refactor Minima::View::HTML internals with improved template
+          sequencing, clearer structural separation, and new convenience
+          methods.
+        - Separate combined --listen option for greater flexibility and
+          control in minima(1).
+
+        [Fixes]
+        - Fix template extension bug that caused templates to fail to
+          render.
+        - Fix incomplete mention of extensions in documentation.
+
+        [Documentation]
+        - Improve documentation on accessing URI parameters.
+        - Remove superfluous documentation.
+
 v0.5.0  2025-03-17
 
         [Changes]

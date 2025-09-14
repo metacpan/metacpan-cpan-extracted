@@ -10,15 +10,16 @@ use Template::Constants qw/ :debug /;
 use utf8;
 
 field $app                  :param;
-field $directory;
+field @include;
 field $template;
+field @before_template;
+field @after_template;
 field $default_data         = {};
 
 field %settings = (
     block_indexing => 1,    # block robots with a <meta>
     name_as_class => 1,     # include template name in @classes
     theme_color => '',      # hex color for the <meta theme-color>
-    include_extra => ['js'],# extra directories to use as include path
 );
 
 field %content = (
@@ -26,22 +27,42 @@ field %content = (
     description => undef,
     header_scripts => [],   # scripts to be loaded in <head>
     header_css => [],       # CSS to be loaded in <head>
-    pre => [],              # global partials before a template
-    post => [],             # global partials after a template
-    pre_body => [],         # used right before the opening of <body>
+    body_open => [],        # used right after the opening of <body>
+    body_close => [],       # used right before the closing of </body>
     scripts => [],          # scripts to be embedded directly in <body>
-    classes => [],          # classes added to <main>
+    classes => [],          # classes added to <main> or <body>
 );
 
 ADJUST {
     my $config = $app->config;
 
     $content{title} = $config->{default_title} // '';
+
     $settings{block_indexing} = $config->{block_indexing} // 1;
+    $settings{name_as_class} = $config->{name_as_class} // 1;
     $settings{theme_color} = $config->{theme_color} // '';
 
-    $self->set_directory('templates');
+    if (exists $config->{templates_dir}) {
+        if (ref $config->{templates_dir} eq ref []) {
+            $self->add_directory($_)
+                for @{ $config->{templates_dir} };
+        }
+    } else {
+        $self->add_directory('templates');
+        $self->add_directory('js');
+    }
 }
+
+method add_directory        ($d) { push @include, $app->path($d) }
+method clear_directories         { @include = () }
+method set_template         ($t) { $template = $self->_ext($t) }
+method add_before_template  ($p) { push @before_template, $self->_ext($p) }
+method add_after_template   ($p) { push @after_template, $self->_ext($p) }
+method set_default_data     ($d) { $default_data = $d }
+
+method set_block_indexing   ($n = 1) { $settings{block_indexing} = $n }
+method set_name_as_class    ($n = 1) { $settings{name_as_class} = $n }
+method set_theme_color      ($c) { $settings{theme_color} = $c }
 
 method set_title ($t, $d = undef)
 {
@@ -57,33 +78,13 @@ method set_compound_title ($t, $d = undef)
     );
 }
 
-method set_directory ($d)
-{
-    $directory = $app->path($d);
-}
-
-method set_template ($t)
-{
-    $template = $self->_ext($t);
-}
-
-method add_include_path ($d)
-{
-    push @{ $settings{include_extra} }, $app->path($d);
-}
-
-method set_block_indexing ($n = 1) { $settings{block_indexing} = $n }
-method set_name_as_class  ($n = 1) { $settings{name_as_class} = $n }
-
-method set_default_data   ($d) { $default_data = $d }
-
-method add_header_script  ($s) { push @{$content{header_scripts}}, $s }
-method add_header_css     ($c) { push @{$content{header_css}}, $c }
-method add_pre            ($p) { push @{$content{pre}}, $self->_ext($p) }
-method add_post           ($p) { push @{$content{post}}, $self->_ext($p) }
-method add_pre_body       ($p) { push @{$content{pre_body}}, $p }
-method add_script         ($s) { push @{$content{scripts}}, $s }
-method add_class          ($c) { push @{$content{classes}}, $c }
+method set_description      ($d) { $content{description} = $d }
+method add_header_script    ($s) { push @{$content{header_scripts}}, $s }
+method add_header_css       ($c) { push @{$content{header_css}}, $c }
+method add_body_open        ($p) { push @{$content{body_open}}, $p }
+method add_body_close       ($p) { push @{$content{body_close}}, $p }
+method add_script           ($s) { push @{$content{scripts}}, $s }
+method add_class            ($c) { push @{$content{classes}}, $c }
 
 method prepare_response ($response)
 {
@@ -117,14 +118,11 @@ method render ($data = {})
     # Setup Template Toolkit:
     # Create a default and overwrite with user configuration.
     my %tt_default = (
-        INCLUDE_PATH => [ $directory, @{ $settings{include_extra} } ],
+        INCLUDE_PATH => \@include,
         OUTLINE_TAG => '%%',
         ANYCASE => 1,
         ENCODING => 'utf8',
     );
-    if ($app->development) {
-        $tt_default{DEBUG} = DEBUG_UNDEF;
-    }
     my $tt_app_config = $app->config->{tt} // {};
     my %tt_config = ( %tt_default, %$tt_app_config );
     my $tt = Template->new(\%tt_config);
@@ -132,9 +130,9 @@ method render ($data = {})
     # Render
     my ( $body, $r );
 
-    for my $t (@{ $content{pre} }, $template, @{ $content{post} }) {
+    for my $t (@before_template, $template, @after_template) {
         $r = $tt->process($t, $data, \$body);
-        croak "Failed to load template `$t` (at `$directory`): ",
+        croak "Failed to load template `$t` (include path: `@include`): ",
               $tt->error, "\n" unless $r;
     }
 
@@ -146,6 +144,7 @@ method _ext ($file)
 {
     my $ext = $app->config->{template_ext} // 'ht';
     $file = "$file.$ext" unless $file =~ /\.\w+$/;
+    $file;
 }
 
 __END__
@@ -162,7 +161,7 @@ Minima::View::HTML - Render HTML views
 
     my $view = Minima::View::HTML->new(app => $app);
 
-    $view->set_directory('templates'); # where templates resite
+    $view->add_directory('templates'); # where templates reside
     $view->set_template('home');
     $view->set_title('Minima');
     $view->add_script('global.js');
@@ -171,41 +170,63 @@ Minima::View::HTML - Render HTML views
 
 =head1 DESCRIPTION
 
-Minima::View::HTML provides a way to render HTML templates using
-L<Template Toolkit|Template> with ease and a versatile set of data
-and settings.
+Minima::View::HTML renders HTML templates with
+L<Template Toolkit|Template>, providing a simple interface and a
+versatile set of data and settings.
 
-This class holds a reference to a L<Minima::App> object, which is
-primarily used to interact with the configuration hash, where defaults
-may be set to customize its behaviour.
+It holds a reference to a L<Minima::App> object, mainly to access the
+configuration hash, where defaults may be defined to customize its
+behaviour.
 
-Its principle of operation is quite simple: after configuring the
-directory where templates reside (with L<C<set_directory>> or the
-default F<templates> directory) and selecting the template to be used
-(with L<C<set_template>>), the view collects and formats data to pass to
-the template. This final stage ultimately determines how the output is
-structured.
+=head2 Principle of Operation
 
-B<Note:> Minima::View::HTML works with UTF-8 by default, and encodes the
-body response.
+In short, Minima::View::HTML manages data and assembles a sequence of
+templates. This data can be maintained directly by the view (page title,
+scripts to include, etc. — see L<"Data"|/DATA>) or passed right at the
+L<C<render>|/render> call (commonly model or database data — see
+L</Custom Data>).
+
+The sequence always contains a single main template (set with
+L<C<set_template>|/set_template>) and two optional sets to be included
+before and after the main template (set with
+L<C<add_before_template>|/add_before_template> and
+L<C<add_after_template>|/add_after_template>). A typical use is to
+render a header before and a footer after the main content.
+
+Template names are resolved against the include paths, which by default
+contain F<template> and F<js>. This list can be managed with
+L<C<add_directory>|/add_directory>,
+L<C<clear_directories>|/clear_directories> and the
+L<C<templates_dir>|/templates_dir> configuration key. Extensions may be
+omitted, as L<C<template_ext>|/template_ext> is automatically applied.
+
+B<Note:> Minima::View::HTML works in UTF-8 and encodes the body response
+accordingly.
 
 =head1 DATA
+
+Data handled by Minima::View::HTML is grouped as content and settings.
+How this data is used ultimately depends on the template. See the
+templates generated by L<minima(1)|minima> for examples.
+
+Each item has at least one method to manipulate it (see
+L<"Methods"|/METHODS>).
 
 =head2 Content
 
 The following data is managed and made available to template in the
-C<view> hash. Whether it's used for its original purpose or a custom one
-is left to the template implementation itself.
+C<view> hash.
 
 =over 4
 
 =item C<title>
 
-Scalar used as the page title.
+Scalar containing the page title.
 
 =item C<description>
 
-Scalar used as the page description (C<E<lt>metaE<gt>> tag).
+Scalar containing the page description (used in the C<E<lt>metaE<gt>>
+tag).
 
 =item C<header_scripts>
 
@@ -215,18 +236,15 @@ A list of scripts to be included in the header.
 
 A list of linked CSS to be included in the header.
 
-=item C<pre>
+=item C<body_open>
 
-A list of templates to be included before the main template.
+A list of templates to be included immediately after the opening
+C<E<lt>bodyE<gt>> tag, providing a useful insertion point.
 
-=item C<post>
+=item C<body_close>
 
-A list of templates to be included after the main template.
-
-=item C<pre_body>
-
-A list of templates to be included right before the opening
-C<E<lt>bodyE<gt>> tag.
+A list of templates to be included immediately before the closing
+C<E<lt>bodyE<gt>> tag, providing a useful insertion point.
 
 =item C<scripts>
 
@@ -235,25 +253,34 @@ C<E<lt>bodyE<gt>>.
 
 =item C<classes>
 
-A list of CSS classes to be included in C<E<lt>mainE<gt>>. Before being
-passed to the view, the class list will be converted into a scalar (with
-classes separated by spaces). The template name is cleaned up, having
-its extension removed and any dots replaced by dashes (C<tr/./-/>) to be
-able to form valid CSS classes.
+A list of CSS classes to be included in C<E<lt>mainE<gt>> or
+C<E<lt>bodyE<gt>>. Before being passed to the view, the class list
+will be converted into a scalar (with classes separated by spaces).
+
+This list may include the template name, if
+L<C<name_as_class>|/name_as_class> is set. In this case, the template
+name is cleaned up, having its extension removed and any dots replaced
+by dashes (C<tr/./-/>) to be able to form valid CSS classes.
 
 =back
 
 =head2 Settings
 
 The following data is managed and made available to the template in the
-C<view.settings> hash.
+C<view.settings> hash. Each of these keys can also be set directly in
+the L<Minima::App> configuration hash.
 
 =over 4
 
 =item C<block_indexing>
 
 A boolean scalar holding whether or not robots should be blocked from
-indexing the page.
+indexing the page. Defaults to true.
+
+=item C<name_as_class>
+
+A boolean scalar holding whether or not the template name should be
+included in L<C<classes>|/classes>. Defaults to true.
 
 =item C<theme_color>
 
@@ -261,25 +288,37 @@ A color to be set on the C<E<lt>meta name="theme-color"E<gt>> tag.
 
 =back
 
-=head2 Default Data
+=head2 Custom Data
 
-A default data hash can be set using
+Custom data can also be passed directly at the L<C<render>|/render>
+call, which accepts a hash where keys will become variables available to
+the templates.
+
+A default data hash can also be set using
 L<C<set_default_data>|/set_default_data>. This hash serves as a base for
-data passed to L<C<render>|/render>, allowing the data in C<render> to
-overwrite default values as needed.
+data passed to L<C<render>|/render>, allowing the data in
+L<C<render>|/render> to overwrite default values as needed.
 
 This is particularly useful for data available at the time of view
-initialization, which does not depend on the specific controller that
-ultimately renders the view.
+initialization, which does not depend on the specific controller method
+that ultimately renders the view (i.e. user data applicable for all
+methods of the controller).
 
 =head1 CONFIGURATION
 
+In addition to the L<settings|/Settings> keys, the following options are
+available in the main L<Minima::App> configuration hash.
+
+=head2 default_title
+
+Sets a default title, avoiding the need to call
+L<C<set_title>|/set_title> on each page, and enabling the practical use
+of L<C<set_compound_title>|/set_compound_title>.
+
 =head2 tt
 
-The C<tt> key may be used in the main L<Minima::App> configuration hash
-to customize L<Template Toolkit|Template>.
-
-By default, the following configuration is used:
+The C<tt> key may be used to customize L<Template Toolkit|Template>. By
+default, the following configuration is used:
 
     {
         OUTLINE_TAG => '%%',
@@ -287,15 +326,23 @@ By default, the following configuration is used:
         ENCODING => 'utf8',
     }
 
-These can be overwritten. Additionally, if the app is in development
-mode (see L<Minima::App/development>), C<DEBUG> is set to
-C<DEBUG_UNDEF>.
+Any of these may be overwritten.
 
 =head2 template_ext
 
 The C<template_ext> key may be used to set a default file extension for
 templates. By default, F<ht> will be used. This extension is added
 automatically to template file names if none is provided.
+
+=head2 templates_dir
+
+List of directories forming the template include path. If this key
+exists but is not a valid list reference, the include path remains
+empty. If this key does not exist, the include path list will contain
+F<templates> and F<js> by default.
+
+See also: L<C<add_directory>|/add_directory> and
+L<C<clear_directories>|/clear_directories>.
 
 =head1 METHODS
 
@@ -305,11 +352,47 @@ automatically to template file names if none is provided.
 
 Constructs a new object. Requires a L<Minima::App> reference.
 
+=head2 add_after_template
+
+    method add_after_template ($template)
+
+Adds the passed template name to the post-template list.
+
+=head2 add_before_template
+
+    method add_before_template ($template)
+
+Adds the passed template name to the pre-template list.
+
+=head2 add_body_close
+
+    method add_body_close ($template)
+
+Adds the passed template name to the template list for the insertion
+point immediatelly before the closing C<E<lt>/bodyE<gt>> tag.
+
+=head2 add_body_open
+
+    method add_body_open ($template)
+
+Adds the passed template name to the template list for the insertion
+point immediatelly after the opening C<E<lt>bodyE<gt>> tag.
+
 =head2 add_class
 
     method add_class ($class)
 
-Adds the passed class name to the list of C<E<lt>mainE<gt>> classes.
+Adds the passed class name to the list of L<C<classes>|/classes>.
+
+=head2 add_directory
+
+    method add_directory ($directory)
+
+Adds the passed directory as a include path. This method can be called
+multiple times to add multiple paths. Emptying the include list is
+possible with L<C<clear_directories>|/clear_directories>.
+
+See also: L<C<templates_dir>|/templates_dir>.
 
 =head2 add_header_css
 
@@ -323,37 +406,20 @@ Adds the passed CSS file name to the header CSS list.
 
 Adds the passed script to the header script list.
 
-=head2 add_include_path
-
-    method add_include_path ($directory)
-
-Adds the passed directory as a include path in conjunction with the main
-directory (set by L<C<set_directory>|/set_directory>). This method can
-be called multiple times to add multiple paths.
-
-=head2 add_post
-
-    method add_post ($post)
-
-Adds the passed template name to the post-template list.
-
-=head2 add_pre
-
-    method add_pre ($pre)
-
-Adds the passed template name to the pre-template list.
-
-=head2 add_pre_body
-
-    method add_pre_body ($pre)
-
-Adds the passed template name to the pre-body template list.
-
 =head2 add_script
 
     method add_script ($script)
 
 Adds the passed script name to the list of scripts embedded in the body.
+
+=head2 clear_directories
+
+    method clear_directories
+
+Empties the template include path list.
+
+See also: L<C<add_directory>|/add_directory> and
+L<C<templates_dir>|/templates_dir>.
 
 =head2 prepare_response
 
@@ -367,59 +433,60 @@ L<Plack::Response> object.
     method render ($data = {})
 
 Renders the template with the passed data made available to it, as well
-as the standard data (described in L<"Data"|/DATA>) and returns it.
+as the standard data (described in L<"Data"|/DATA>) and returns it. Keys
+in the data hash become variables at the template.
 
-To configure L<Template Toolkit|Template>, visit the
-L<"Configuration"/CONFIGURATION> section. See also
+To configure L<Template Toolkit|Template>, see the
+L<"Configuration"|/CONFIGURATION> section. See also
 L<C<set_default_data>|/set_default_data>.
 
 =head2 set_block_indexing
 
     method set_block_indexing ($bool = 1)
 
-Sets a boolean scalar to indicate if robots should be blocked from
-indexing the page. Defaults to true.
+Sets the boolean scalar L<C</block_indexing>> to indicate if robots
+should be blocked from indexing the page. Defaults to true.
 
 =head2 set_compound_title
 
     method set_compound_title ($title, $description = undef)
 
-Sets a secondary title, using the main title as primary, as well as
-description.
+Appends a secondary title to the main title, separated by a middle dot
+(C<•>). Optionally sets the description.
 
     $v->set_title('Title');
     $v->set_compound_title('Page');
     # Results in: Title • Page
 
-If no primaty title is already set, calling this method produces the
-same effect as L<C<set_title>|/set_title>.
+If no primary title is set, this behaves like
+L<C<set_title>|/set_title>. This method is particularly useful in
+combination with L<C<default_title>|/default_title>.
 
 =head2 set_default_data
 
     method set_default_data ($data)
 
 Sets a default data hash that will be used in rendering pages. The hash
-provided in L<C<render>|/render> is merged with this default data hash.
+provided in L<C<render>|/render> is merged over this default data hash.
 
-=head2 set_directory
+=head2 set_description
 
-    method set_directory ($directory)
+    method set_description ($description)
 
-Sets the main directory where templates reside. If this method is not
-called, the default F<templates> directory will be used.
+Sets the L<C</description>> of the page.
 
 =head2 set_name_as_class
 
     method set_name_as_class ($bool = 1)
 
-Sets a boolean scalar to indicate whether the template name should be
-added to the C<E<lt>mainE<gt>> CSS class list. This is particularly
-useful to target a page on a CSS file by simply using C<.main.template>.
+Sets the boolean scalar L<C</name_as_class>> to indicate whether the
+template name should be added to the L<C</classes>> list. Useful to
+target a page on a CSS file by simply using i.e. C<.main.template>.
 Defaults to true.
 
 =head2 set_template
 
-    method set_template ($title)
+    method set_template ($name)
 
 Sets the template name to be used. If no extension is present, the
 extension set by the L<C<template_ext>|/template_ext> configuration key
@@ -430,7 +497,16 @@ contain a dot (C<.>), except for the one used in the extension.
 
     method set_title ($title, $description = undef)
 
-Sets the title and description (optional).
+Sets the L<C<title>|/title> and L<C<description>|/description>
+(optional). The title may also be set with
+L<C<default_title>|/default_title>. See also
+L<C<set_compound_title>|/set_compound_title>.
+
+=head2 set_theme_color
+
+    method set_theme_color ($color)
+
+Sets the L<C<theme_color>|/theme_color>.
 
 =head1 SEE ALSO
 

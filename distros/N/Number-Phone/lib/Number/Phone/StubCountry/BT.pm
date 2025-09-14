@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20250605193633;
+our $VERSION = 1.20250913135855;
 
 my $formatters = [
                 {
@@ -34,8 +34,9 @@ my $formatters = [
                 {
                   'format' => '$1 $2 $3',
                   'leading_digits' => '
-            [2-68]|
-            7[246]
+            [2-6]|
+            7[246]|
+            8[2-4]
           ',
                   'pattern' => '(\\d)(\\d{3})(\\d{3})'
                 },
@@ -43,7 +44,7 @@ my $formatters = [
                   'format' => '$1 $2 $3 $4',
                   'leading_digits' => '
             1[67]|
-            7
+            [78]
           ',
                   'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{2})'
                 }
@@ -73,7 +74,7 @@ my $validators = {
                 'mobile' => '
           (?:
             1[67]|
-            77
+            [78]7
           )\\d{6}
         ',
                 'pager' => '',
@@ -83,15 +84,17 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"9758", "Paro",
-"97576", "Samdrup\ Jongkhar",
-"9753", "Trongsa",
+$areanames{en} = {"9753", "Trongsa",
+"97582", "Paro",
 "97574", "Samdrup\ Jongkhar",
-"9752", "Thimphu",
 "9756", "Gelephu",
-"9755", "Phuentsholing",
+"97576", "Samdrup\ Jongkhar",
 "9754", "Trashigang",
-"97572", "Samdrup\ Jongkhar",};
+"97584", "Paro",
+"97583", "Paro",
+"97572", "Samdrup\ Jongkhar",
+"9752", "Thimphu",
+"9755", "Phuentsholing",};
 my $timezones = {
                '' => [
                        'Asia/Thimphu'

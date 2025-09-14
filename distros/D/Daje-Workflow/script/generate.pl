@@ -24,8 +24,14 @@ sub run_workflow() {
     );
 
     my $migrations;
-    push @{$migrations}, {class => 'Daje::Workflow::Database', name => 'workflow', migration => 3};
-    push @{$migrations}, {class => 'Daje::Workflow::FileChanged::Database::DB', name => 'file_changed', migration => 1};
+    push @{$migrations}, {
+        class => 'Daje::Workflow::Database', name => 'workflow', migration => 3
+    };
+    push @{$migrations}, {
+        class => 'Daje::Workflow::FileChanged::Database::DB',
+        name => 'file_changed',
+        migration => 1
+    };
 
     Daje::Workflow::Database->new(
         pg          => $pg,
@@ -64,7 +70,7 @@ sub run_workflow() {
         pg            => $pg,
         loader        => $loader->loader,
         workflow_name => 'generate',
-        workflow_pkey => '12',
+        workflow_pkey => '15',
         context       => $context,
     );
     # changed_files

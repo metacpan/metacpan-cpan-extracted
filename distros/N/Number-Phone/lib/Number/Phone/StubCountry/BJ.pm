@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20250605193633;
+our $VERSION = 1.20250913135855;
 
 my $formatters = [
                 {
@@ -82,46 +82,46 @@ my $validators = {
               };
 my %areanames = ();
 $areanames{fr} = {"2292259", "Départements\ Mono\/Couffo\/Zou\/Collines",
-"2292249", "Départements\ Mono\/Couffo\/Zou\/Collines",
 "2292029", "Départements\ Ouémé\/Plateau",
-"2292139", "Départements\ Littoral\/Atlantique",};
-$areanames{en} = {"2292249", "Mono\/Kouffo\/Zou\/Collines\ departments",
-"2292252", "Covè",
+"2292139", "Départements\ Littoral\/Atlantique",
+"2292249", "Départements\ Mono\/Couffo\/Zou\/Collines",};
+$areanames{en} = {"2292026", "Sakété\/Igolo",
+"2292022", "Kandiévé",
 "2292254", "Savalou",
 "2292259", "Mono\/Kouffo\/Zou\/Collines\ departments",
-"2292130", "Cadjehoun",
-"2292246", "Dogbo",
-"2292362", "Nikki\/Ndali",
-"2292380", "Djougou",
-"2292367", "Malanville",
-"2292361", "Parakou",
-"22924", "Tanguiéta",
-"2292241", "Lokossa",
-"2292365", "Banikoara",
-"2292133", "Akpakpa",
-"2292138", "Kouhounou",
-"2292255", "Savè",
-"2292383", "Tanguiéta",
-"2292251", "Bohicon",
-"2292253", "Dassa\-Zoumé",
 "2292135", "Godomey",
-"2292131", "Ganhi",
-"2292243", "Come",
-"2292021", "Ongala",
-"2292363", "Kandi\/Gogounou\/Ségbana",
+"2292251", "Bohicon",
+"2292383", "Tanguiéta",
 "2292025", "Pobè\/Kétou",
-"2292139", "Littoral\/Atlantique\ departments",
-"2292026", "Sakété\/Igolo",
-"2292250", "Abomey",
-"2292022", "Kandiévé",
-"2292024", "Sèmè",
-"2292027", "Adjohoun",
-"2292132", "Jéricho",
-"2292134", "Ouidah",
-"2292137", "Allada",
 "2292382", "Natitingou",
+"2292361", "Parakou",
+"2292243", "Come",
+"2292246", "Dogbo",
+"2292132", "Jéricho",
+"2292250", "Abomey",
+"2292367", "Malanville",
 "2292136", "Abomey\-Calaci",
-"2292029", "Ouémé\/Plateau\ departments",};
+"2292133", "Akpakpa",
+"2292241", "Lokossa",
+"2292363", "Kandi\/Gogounou\/Ségbana",
+"2292252", "Covè",
+"2292130", "Cadjehoun",
+"2292253", "Dassa\-Zoumé",
+"2292137", "Allada",
+"2292362", "Nikki\/Ndali",
+"2292029", "Ouémé\/Plateau\ departments",
+"2292024", "Sèmè",
+"2292131", "Ganhi",
+"2292380", "Djougou",
+"22924", "Tanguiéta",
+"2292365", "Banikoara",
+"2292255", "Savè",
+"2292021", "Ongala",
+"2292138", "Kouhounou",
+"2292249", "Mono\/Kouffo\/Zou\/Collines\ departments",
+"2292027", "Adjohoun",
+"2292139", "Littoral\/Atlantique\ departments",
+"2292134", "Ouidah",};
 my $timezones = {
                '' => [
                        'Africa/Porto-Novo'

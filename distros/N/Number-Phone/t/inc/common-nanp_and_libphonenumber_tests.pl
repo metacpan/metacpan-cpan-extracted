@@ -253,9 +253,22 @@ ok(!defined($CLASS->new('+1 963 563 7242')),  "AB must not be 96");
 my %areas = %Number::Phone::Country::NANP_areas;
 die("Yargh, where's \%Number::Phone::Country::NANP_areas") unless(%areas);
 foreach my $tuple (
-    map { (my $code = $areas{$_}) =~ s/\D.*//; [ $code, $_ ] } sort keys %areas
+    map {
+        my $ISOcode = $_;
+        map { [ $_, $ISOcode ] } split(/\|/, $areas{$ISOcode});
+    } sort keys %areas
 ) {
-    ok(!defined($CLASS->new("+1 ".$tuple->[0]." 163 7242")),  "D digit must be 2-9 (".join(': ', $tuple->[1], $tuple->[0]).")");
+    if($tuple->[1] eq 'DO') {
+        foreach my $D_digit (0, 1) {
+            my $do_num = $CLASS->new("+1 ".$tuple->[0]." ${D_digit}63 7242");
+            ok(defined($do_num), "Dominican Republic has valid numbers in ".$tuple->[0]." with D digit $D_digit");
+            ok($do_num->is_tollfree, "... and they are toll-free");
+        }
+    } else {
+        ok(!defined($CLASS->new("+1 ".$tuple->[0]." 163 7242")),  "D digit must be 2-9 (".join(': ', $tuple->[1], $tuple->[0]).")");
+    }
 }
+
+ok(!$CLASS->new("+1 809 695 8000")->is_tollfree, "a normal Dominican Republic number is not toll-free");
 
 1;

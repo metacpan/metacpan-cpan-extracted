@@ -30,7 +30,7 @@ README.md
 share/templates/+gitignore.stpl
 share/templates/app.psgi.dtpl
 share/templates/cpanfile.dtpl
-share/templates/etc-config.pl.stpl
+share/templates/etc-config.yaml.stpl
 share/templates/etc-routes.map.stpl
 share/templates/lib-Controller-Main.pm.stpl
 share/templates/static-css-main.css.dtpl

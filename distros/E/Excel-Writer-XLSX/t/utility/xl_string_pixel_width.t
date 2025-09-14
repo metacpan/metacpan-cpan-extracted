@@ -2,14 +2,14 @@
 #
 # Tests for Excel::Writer::XLSX::Utility.
 #
-# Copyright 2000-2024, John McNamara, jmcnamara@cpan.org
+# Copyright 2000-2025, John McNamara, jmcnamara@cpan.org
 #
 # SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
 #
 
 use strict;
 use warnings;
-use Excel::Writer::XLSX::Utility qw(xl_string_pixel_width);
+use Excel::Writer::XLSX::Utility qw(xl_cell_autofit_width);
 
 use utf8;
 use Test::More tests => 100;
@@ -17,7 +17,7 @@ use Test::More tests => 100;
 
 ###############################################################################
 #
-# Test the xl_string_pixel_width() function.
+# Test the xl_cell_autofit_width() function.
 #
 my @tests = (
 
@@ -129,7 +129,7 @@ my @tests = (
 for my $test ( @tests ) {
     my $string   = $test->[0];
     my $expected = $test->[1];
-    my $got      = xl_string_pixel_width( $string );
+    my $got      = xl_cell_autofit_width( $string );
     is( $got, $expected, "String = " . $string );
 }
 

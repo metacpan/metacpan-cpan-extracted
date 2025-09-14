@@ -53,9 +53,6 @@ For plain text output.
 
 =back
 
-For HTML views, see L<Minima::View::HTML>. For JSON, see
-L<Minima::View::JSON>.
-
 =head1 METHODS
 
 =head2 new

@@ -7,7 +7,7 @@ package Excel::Writer::XLSX::Utility;
 #
 # Used in conjunction with Excel::Writer::XLSX
 #
-# Copyright 2000-2024, John McNamara, jmcnamara@cpan.org
+# Copyright 2000-2025, John McNamara, jmcnamara@cpan.org
 #
 # SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
 #
@@ -27,7 +27,7 @@ use Digest::MD5 qw(md5_hex);
 use File::Basename 'fileparse';
 
 
-our $VERSION = '1.14';
+our $VERSION = '1.15';
 
 # Row and column functions
 my @rowcol = qw(
@@ -40,7 +40,7 @@ my @rowcol = qw(
   xl_dec_row
   xl_inc_col
   xl_dec_col
-  xl_string_pixel_width
+  xl_cell_autofit_width
 );
 
 # Date and Time functions
@@ -243,8 +243,9 @@ sub quote_sheetname {
             $needs_quoting = 1;
         }
 
-        # Rule 3. Sheet names must not be a valid A1 style cell reference.
-        # Valid means that the row and column values are within Excel limits.
+        # Rule 3. Sheet names must not be a valid A1 style cell reference. Valid
+        # means that the row and column range values must also be within Excel
+        # row and column limits.
         elsif ( $uc_sheetname =~ /^([A-Z]{1,3}\d+)$/ ) {
             my ( $row, $col ) = xl_cell_to_rowcol( $1 );
 
@@ -255,20 +256,23 @@ sub quote_sheetname {
         }
 
         # Rule 4. Sheet names must not *start* with a valid RC style cell
-        # reference. Valid means that the row and column values are within
-        # Excel limits.
+        # reference. Other characters after the valid RC reference are ignored
+        # by Excel. Valid means that the row and column range values must also
+        # be within Excel row and column limits.
+        #
+        # Note: references without trailing characters like R12345 or C12345 are
+        # caught by Rule 3. Negative references like R-12345 are caught by Rule 1
+        # due to the dash.
 
-        # Rule 4a. Check for some single R/C references.
-        elsif ($uc_sheetname eq "R"
-            || $uc_sheetname eq "C"
-            || $uc_sheetname eq "RC" )
-        {
-            $needs_quoting = 1;
-
+        # Rule 4a. Check for sheet names that start with R1 style references.
+        elsif ( $uc_sheetname =~ /^R(\d+)/ ) {
+            my $row = $1;
+            if ( $row > 0 && $row <= $row_max ) {
+                $needs_quoting = 1;
+            }
         }
 
-        # Rule 4b. Check for C1 or RC1 style references. References without
-        # trailing characters (like C12345) are caught by Rule 3.
+        # Rule 4b. Check for sheet names that start with C1 or RC1 style
         elsif ( $uc_sheetname =~ /^R?C(\d+)/ ) {
             my $col = $1;
             if ( $col > 0 && $col <= $col_max ) {
@@ -276,26 +280,14 @@ sub quote_sheetname {
             }
         }
 
-        # Rule 4c. Check for R1C1 style references where both the number
-        # ranges are optional. Note that only 1 of the number ranges is
-        # required to be valid.
-        elsif ( $uc_sheetname =~ /^R(\d+)?C(\d+)?/ ) {
-            if ( defined $1 ) {
-                my $row = $1;
-                if ( $row > 0 && $row <= $row_max ) {
-                    $needs_quoting = 1;
-                }
-            }
-
-            if ( defined $2 ) {
-                my $col = $1;
-                if ( $col > 0 && $col <= $col_max ) {
-                    $needs_quoting = 1;
-                }
-            }
+        # Rule 4c. Check for some single R/C references.
+        elsif ($uc_sheetname eq "R"
+            || $uc_sheetname eq "C"
+            || $uc_sheetname eq "RC" )
+        {
+            $needs_quoting = 1;
         }
     }
-
 
     if ( $needs_quoting ) {
         # Double quote any single quotes.
@@ -303,10 +295,8 @@ sub quote_sheetname {
         $sheetname = q(') . $sheetname . q(');
     }
 
-
     return $sheetname;
 }
-
 
 
 ###############################################################################
@@ -539,14 +529,14 @@ sub xl_date_1904 {
 
 ###############################################################################
 #
-# xl_string_pixel_width($string)
+# xl_cell_autofit_width($string)
 #
 # Get the pixel width of a string based on individual character widths taken
 # from Excel. UTF8 characters are given a default width of 8.
 #
 # Note, Excel adds an additional 7 pixels padding to a cell.
 #
-sub xl_string_pixel_width {
+sub xl_cell_autofit_width {
     my $length = 0;
 
     for my $char (split //, shift) {
@@ -592,7 +582,7 @@ sub get_image_properties {
 
     if ( unpack( 'x A3', $data ) eq 'PNG' ) {
 
-        # Test for PNGs.
+        # Test for PNG files.
         ( $type, $width, $height, $x_dpi, $y_dpi ) =
           _process_png( $data, $filename );
 
@@ -668,7 +658,7 @@ sub _process_png {
             my $y_ppu = unpack "N", substr $data, $offset + 12, 4;
             my $units = unpack "C", substr $data, $offset + 16, 1;
 
-            if ( $units == 1 ) {
+            if ( $units == 1 && $x_ppu && $y_ppu) {
                 $x_dpi = $x_ppu * 0.0254;
                 $y_dpi = $y_ppu * 0.0254;
             }
@@ -1102,6 +1092,24 @@ This functions takes a cell reference string in A1 notation and decrements the c
     my $str = xl_dec_col( '$C1' );     # $B1
     my $str = xl_dec_col( '$E$5' );    # $D$5
 
+
+=head2 xl_cell_autofit_width($string)
+
+    Parameters: $string, The string to calculate the cell width for.
+
+    Returns:    The string autofit width in pixels. Returns 0 if the string is empty.
+
+This function calculates the width required to auto-fit a string in a cell:
+
+    my $width = xl_cell_autofit_width($string);
+
+The Worksheet C<autofit()> method can be used to auto-fit cell data to the optimal column width. However, in some cases you may wish to handle auto-fitting yourself and apply additional logic to limit the maximum and minimum ranges.
+
+The C<xl_cell_autofit_width()> function can be used to perform the required calculation. It works by estimating the pixel width of a string based on the width of each character. It also adds a 7 pixel padding for the cell boundary in the same way that Excel does.
+
+You can use the calculated width in conjunction with Worksheet C<set_column_pixels()> method.
+
+
 =head1 TIME AND DATE FUNCTIONS
 
 Dates and times in Excel are represented by real numbers, for example "Jan 1 2001 12:30:14 PM" is represented by the number 36892.521.
@@ -1304,6 +1312,6 @@ John McNamara jmcnamara@cpan.org
 
 =head1 COPYRIGHT
 
-Copyright MM-MMXXIV, John McNamara.
+Copyright MM-MMXXV, John McNamara.
 
 All Rights Reserved. This module is free software. It may be used, redistributed and/or modified under the same terms as Perl itself.

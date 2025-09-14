@@ -26,10 +26,10 @@ no_index:
 provides:
   Task::MemManager:
     file: lib/Task/MemManager.pm
-    version: '0.04'
+    version: '0.05'
   Task::MemManager::PerlAlloc:
     file: lib/Task/MemManager/PerlAlloc.pm
-    version: '0.04'
+    version: '0.05'
 requires:
   Carp: '0'
   Convert::Scalar: '0'
@@ -41,9 +41,9 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
-  homepage: https://github.com/chrisarg/task-memmanager
-  repository: https://github.com/chrisarg/task-memmanager.git
-version: '0.04'
+  homepage: https://github.com/chrisarg/Task-MemManager
+  repository: https://github.com/chrisarg/Task-MemManager.git
+version: '0.05'
 x_generated_by_perl: v5.38.0
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: MIT

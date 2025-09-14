@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20250605193633;
+our $VERSION = 1.20250913135855;
 
 my $formatters = [
                 {
@@ -46,6 +46,14 @@ my $formatters = [
                 },
                 {
                   'format' => '$1 $2 $3',
+                  'leading_digits' => '
+            60|
+            809
+          ',
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})'
+                },
+                {
+                  'format' => '$1 $2 $3',
                   'leading_digits' => '44',
                   'pattern' => '(\\d{2})(\\d{3})(\\d{4})'
                 },
@@ -57,7 +65,12 @@ my $formatters = [
                 },
                 {
                   'format' => '$1 $2 $3',
-                  'leading_digits' => '9[2-9]',
+                  'leading_digits' => '
+            9(?:
+              10|
+              [2-9]
+            )
+          ',
                   'pattern' => '(\\d)(\\d{4})(\\d{4})'
                 },
                 {
@@ -68,7 +81,7 @@ my $formatters = [
             5[1-3578]|
             6[13-57]|
             8(?:
-              0[1-9]|
+              0[1-8]|
               [1-9]
             )
           ',
@@ -96,7 +109,7 @@ my $formatters = [
               ];
 
 my $validators = {
-                'geographic' => '
+                'fixed_line' => '
           2(?:
             1982[0-6]|
             3314[05-9]
@@ -107,21 +120,47 @@ my $validators = {
                 160|
                 962
               )|
+              2\\d{3}|
               3(?:
-                2\\d\\d|
+                (?:
+                  2\\d|
+                  50
+                )\\d|
                 3(?:
                   [03467]\\d|
                   1[0-35-9]|
                   2[1-9]|
                   5[0-24-9]|
-                  8[0-3]
+                  8[0-389]|
+                  9[0-8]
                 )|
                 600
               )|
               646[59]
             )|
-            80[1-9]\\d\\d|
+            (?:
+              (?:
+                3[2-5]|
+                [47][1-35]|
+                5[1-3578]
+              )\\d|
+              6(?:
+                00|
+                [13-57]\\d
+              )|
+              8(?:
+                0[1-9]|
+                [1-9]\\d
+              )
+            )\\d\\d|
             9(?:
+              (?:
+                10[01]|
+                (?:
+                  [2458]\\d|
+                  7[1-9]
+                )\\d
+              )\\d|
               3(?:
                 [0-57-9]\\d\\d|
                 6(?:
@@ -136,7 +175,6 @@ my $validators = {
                   1[05-9]
                 )
               )|
-              7[1-9]\\d\\d|
               9(?:
                 [03-9]\\d\\d|
                 1(?:
@@ -149,16 +187,164 @@ my $validators = {
                 )
               )
             )
-          )\\d{4}|
+          )\\d{4}
+        ',
+                'geographic' => '
+          2(?:
+            1982[0-6]|
+            3314[05-9]
+          )\\d{3}|
           (?:
-            22|
-            3[2-5]|
-            [47][1-35]|
-            5[1-3578]|
-            6[13-57]|
-            8[1-9]|
-            9[2458]
-          )\\d{7}
+            2(?:
+              1(?:
+                160|
+                962
+              )|
+              2\\d{3}|
+              3(?:
+                (?:
+                  2\\d|
+                  50
+                )\\d|
+                3(?:
+                  [03467]\\d|
+                  1[0-35-9]|
+                  2[1-9]|
+                  5[0-24-9]|
+                  8[0-389]|
+                  9[0-8]
+                )|
+                600
+              )|
+              646[59]
+            )|
+            (?:
+              (?:
+                3[2-5]|
+                [47][1-35]|
+                5[1-3578]
+              )\\d|
+              6(?:
+                00|
+                [13-57]\\d
+              )|
+              8(?:
+                0[1-9]|
+                [1-9]\\d
+              )
+            )\\d\\d|
+            9(?:
+              (?:
+                10[01]|
+                (?:
+                  [2458]\\d|
+                  7[1-9]
+                )\\d
+              )\\d|
+              3(?:
+                [0-57-9]\\d\\d|
+                6(?:
+                  0[02-9]|
+                  [1-9]\\d
+                )
+              )|
+              6(?:
+                [0-8]\\d\\d|
+                9(?:
+                  [02-79]\\d|
+                  1[05-9]
+                )
+              )|
+              9(?:
+                [03-9]\\d\\d|
+                1(?:
+                  [0235-9]\\d|
+                  4[0-24-9]
+                )|
+                2(?:
+                  [0-79]\\d|
+                  8[0-46-9]
+                )
+              )
+            )
+          )\\d{4}
+        ',
+                'mobile' => '
+          2(?:
+            1982[0-6]|
+            3314[05-9]
+          )\\d{3}|
+          (?:
+            2(?:
+              1(?:
+                160|
+                962
+              )|
+              2\\d{3}|
+              3(?:
+                (?:
+                  2\\d|
+                  50
+                )\\d|
+                3(?:
+                  [03467]\\d|
+                  1[0-35-9]|
+                  2[1-9]|
+                  5[0-24-9]|
+                  8[0-389]|
+                  9[0-8]
+                )|
+                600
+              )|
+              646[59]
+            )|
+            (?:
+              (?:
+                3[2-5]|
+                [47][1-35]|
+                5[1-3578]|
+                6[13-57]
+              )\\d|
+              8(?:
+                0[1-8]|
+                [1-9]\\d
+              )
+            )\\d\\d|
+            9(?:
+              (?:
+                10[01]|
+                (?:
+                  [2458]\\d|
+                  7[1-9]
+                )\\d
+              )\\d|
+              3(?:
+                [0-57-9]\\d\\d|
+                6(?:
+                  0[02-9]|
+                  [1-9]\\d
+                )
+              )|
+              6(?:
+                [0-8]\\d\\d|
+                9(?:
+                  [02-79]\\d|
+                  1[05-9]
+                )
+              )|
+              9(?:
+                [03-9]\\d\\d|
+                1(?:
+                  [0235-9]\\d|
+                  4[0-24-9]
+                )|
+                2(?:
+                  [0-79]\\d|
+                  8[0-46-9]
+                )
+              )
+            )
+          )\\d{4}
         ',
                 'pager' => '',
                 'personal_number' => '',
@@ -172,76 +358,76 @@ my $validators = {
                 'voip' => '44\\d{7}'
               };
 my %areanames = ();
-$areanames{es} = {"5623", "Santiago\,\ Región\ Metropolitana",
-"5658", "Arica\,\ Arica\ y\ Parinacota",
-"5622", "Santiago\,\ Región\ Metropolitana",
-"562198", "Santiago\,\ Región\ Metropolitana",
-"56211", "Santiago\,\ Región\ Metropolitana",
-"5661", "Punta\ Arenas\,\ Magallanes",
+$areanames{es} = {"562198", "Santiago\,\ Región\ Metropolitana",
+"5626", "Santiago\,\ Región\ Metropolitana",
 "5667", "Coihaique\,\ Aysén",
-"5626", "Santiago\,\ Región\ Metropolitana",};
-$areanames{en} = {"5653246", "Ovalle\,\ Coquimbo",
+"5658", "Arica\,\ Arica\ y\ Parinacota",
+"5661", "Punta\ Arenas\,\ Magallanes",
+"56211", "Santiago\,\ Región\ Metropolitana",
+"5623", "Santiago\,\ Región\ Metropolitana",
+"5622", "Santiago\,\ Región\ Metropolitana",};
+$areanames{en} = {"5653248", "Ovalle\,\ Coquimbo",
 "5667", "Coyhaique\,\ Aisén",
-"565322", "Ovalle\,\ Coquimbo",
-"56539", "Ovalle\,\ Coquimbo",
-"56532458", "Ovalle\,\ Coquimbo",
-"5653242", "Ovalle\,\ Coquimbo",
-"56536", "Ovalle\,\ Coquimbo",
-"5653249", "Ovalle\,\ Coquimbo",
-"56531", "Ovalle\,\ Coquimbo",
-"565325", "Ovalle\,\ Coquimbo",
-"56532459", "Ovalle\,\ Coquimbo",
-"565321", "Ovalle\,\ Coquimbo",
-"5633", "Quillota\,\ Valparaíso",
-"5665", "Puerto\ Montt\,\ Los\ Lagos",
 "5626", "Santiago\,\ Metropolitan\ Region",
-"56532454", "Ovalle\,\ Coquimbo",
-"565328", "Ovalle\,\ Coquimbo",
-"5653243", "Ovalle\,\ Coquimbo",
-"5653248", "Ovalle\,\ Coquimbo",
 "56533", "Ovalle\,\ Coquimbo",
-"562198", "Santiago\,\ Metropolitan\ Region",
-"565326", "Ovalle\,\ Coquimbo",
-"565323", "Ovalle\,\ Coquimbo",
-"56532457", "Ovalle\,\ Coquimbo",
-"5661", "Punta\ Arenas\,\ Magallanes\ and\ Antártica\ Chilena",
-"5632", "Valparaíso",
-"565329", "Ovalle\,\ Coquimbo",
-"56211", "Santiago\,\ Metropolitan\ Region",
-"565327", "Ovalle\,\ Coquimbo",
-"5663", "Valdivia\,\ Los\ Ríos",
-"5635", "San\ Antonio\,\ Valparaíso",
-"5675", "Curicó\,\ Maule",
-"5653244", "Ovalle\,\ Coquimbo",
-"5672", "Rancagua\,\ O\'Higgins",
-"5653247", "Ovalle\,\ Coquimbo",
-"5645", "Temuco\,\ Araucanía",
-"5651", "La\ Serena\,\ Coquimbo",
-"5622", "Santiago\,\ Metropolitan\ Region",
-"5642", "Chillán\,\ Biobío",
-"56532452", "Ovalle\,\ Coquimbo",
-"565320", "Ovalle\,\ Coquimbo",
-"56538", "Ovalle\,\ Coquimbo",
-"5653241", "Ovalle\,\ Coquimbo",
-"56534", "Ovalle\,\ Coquimbo",
-"56532453", "Ovalle\,\ Coquimbo",
-"5634", "San\ Felipe\,\ Valparaíso",
-"5623", "Santiago\,\ Metropolitan\ Region",
-"5643", "Los\ Angeles\,\ Biobío",
-"5671", "Talca\,\ Maule",
+"56536", "Ovalle\,\ Coquimbo",
 "56537", "Ovalle\,\ Coquimbo",
+"56532457", "Ovalle\,\ Coquimbo",
+"56532459", "Ovalle\,\ Coquimbo",
+"56534", "Ovalle\,\ Coquimbo",
+"5657", "Iquique\,\ Tarapacá",
+"562198", "Santiago\,\ Metropolitan\ Region",
 "5673", "Linares\,\ Maule",
-"5641", "Concepción\,\ Biobío",
-"5652", "Copiapó\,\ Atacama",
+"565328", "Ovalle\,\ Coquimbo",
+"565323", "Ovalle\,\ Coquimbo",
+"5672", "Rancagua\,\ O\'Higgins",
+"56532453", "Ovalle\,\ Coquimbo",
+"565325", "Ovalle\,\ Coquimbo",
+"5635", "San\ Antonio\,\ Valparaíso",
+"5651", "La\ Serena\,\ Coquimbo",
 "5655", "Antofagasta",
-"56535", "Ovalle\,\ Coquimbo",
-"5653240", "Ovalle\,\ Coquimbo",
+"5653242", "Ovalle\,\ Coquimbo",
+"5634", "San\ Felipe\,\ Valparaíso",
+"5653246", "Ovalle\,\ Coquimbo",
+"56211", "Santiago\,\ Metropolitan\ Region",
+"565322", "Ovalle\,\ Coquimbo",
 "5658", "Arica\,\ Arica\ and\ Parinacota",
 "5664", "Osorno\,\ Los\ Lagos",
-"56530", "Ovalle\,\ Coquimbo",
+"565327", "Ovalle\,\ Coquimbo",
+"5641", "Concepción\,\ Biobío",
+"5645", "Temuco\,\ Araucanía",
+"5665", "Puerto\ Montt\,\ Los\ Lagos",
+"5661", "Punta\ Arenas\,\ Magallanes\ and\ Antártica\ Chilena",
+"56538", "Ovalle\,\ Coquimbo",
 "56532456", "Ovalle\,\ Coquimbo",
-"5657", "Iquique\,\ Tarapacá",
-"56532455", "Ovalle\,\ Coquimbo",};
+"5633", "Quillota\,\ Valparaíso",
+"5653249", "Ovalle\,\ Coquimbo",
+"56531", "Ovalle\,\ Coquimbo",
+"56535", "Ovalle\,\ Coquimbo",
+"5653244", "Ovalle\,\ Coquimbo",
+"5663", "Valdivia\,\ Los\ Ríos",
+"5643", "Los\ Angeles\,\ Biobío",
+"5653240", "Ovalle\,\ Coquimbo",
+"5623", "Santiago\,\ Metropolitan\ Region",
+"5653247", "Ovalle\,\ Coquimbo",
+"56532458", "Ovalle\,\ Coquimbo",
+"5653241", "Ovalle\,\ Coquimbo",
+"565329", "Ovalle\,\ Coquimbo",
+"565321", "Ovalle\,\ Coquimbo",
+"5622", "Santiago\,\ Metropolitan\ Region",
+"5653243", "Ovalle\,\ Coquimbo",
+"565326", "Ovalle\,\ Coquimbo",
+"5642", "Chillán\,\ Biobío",
+"5671", "Talca\,\ Maule",
+"5675", "Curicó\,\ Maule",
+"56532455", "Ovalle\,\ Coquimbo",
+"56532454", "Ovalle\,\ Coquimbo",
+"5632", "Valparaíso",
+"5652", "Copiapó\,\ Atacama",
+"56530", "Ovalle\,\ Coquimbo",
+"56532452", "Ovalle\,\ Coquimbo",
+"56539", "Ovalle\,\ Coquimbo",
+"565320", "Ovalle\,\ Coquimbo",};
 my $timezones = {
                '' => [
                        'America/Santiago',

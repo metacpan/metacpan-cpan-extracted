@@ -14,6 +14,7 @@ my $build = Module::Build->new(
         'Plack' => '1.0050',
         'Router::Simple' => '0.17',
         'Template' => '3.100',
+        'YAML::XS' => '0.904.0',
     },
     configure_requires => {
         'Module::Build' => '0.42',

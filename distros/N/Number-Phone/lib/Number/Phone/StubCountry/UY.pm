@@ -22,9 +22,14 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20250605193637;
+our $VERSION = 1.20250913135859;
 
 my $formatters = [
+                {
+                  'format' => '$1',
+                  'leading_digits' => '21',
+                  'pattern' => '(\\d{4,5})'
+                },
                 {
                   'format' => '$1 $2',
                   'pattern' => '(\\d{3})(\\d{3,4})'
@@ -93,7 +98,7 @@ my $validators = {
                 'mobile' => '9[1-9]\\d{6}',
                 'pager' => '',
                 'personal_number' => '',
-                'specialrate' => '(90[0-8]\\d{4})',
+                'specialrate' => '(90[0-8]\\d{4})|(21\\d{2,3})',
                 'toll_free' => '
           0004\\d{2,9}|
           (?:
@@ -104,25 +109,25 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"5984364", "Trinidad\/Flores",
-"598464", "Melo\/Cerro\ Largo",
-"5982", "Montevideo",
-"598435", "Florida",
-"598477", "Artigas",
-"598434", "San\ Jose\ de\ Mayo",
-"598444", "Minas\/Lavalleja",
-"59842", "San\ Carlos",
-"598463", "Tacuarembo",
-"598456", "Fray\ Bentos\/Rio\ Negro",
-"598472", "Paysandu",
-"598453", "Mercedes\/Soriano",
-"598447", "Rocha",
-"598445", "Treinta\ y\ Tres",
-"598462", "Rivera",
+$areanames{en} = {"598433", "Canelones",
 "598452", "Colonia\ del\ Scaramento",
+"598477", "Artigas",
+"598463", "Tacuarembo",
+"5982", "Montevideo",
 "598473", "Salto",
-"598433", "Canelones",
-"598436", "Durazno",};
+"598462", "Rivera",
+"598445", "Treinta\ y\ Tres",
+"598453", "Mercedes\/Soriano",
+"598434", "San\ Jose\ de\ Mayo",
+"598464", "Melo\/Cerro\ Largo",
+"5984364", "Trinidad\/Flores",
+"598472", "Paysandu",
+"598436", "Durazno",
+"598447", "Rocha",
+"598456", "Fray\ Bentos\/Rio\ Negro",
+"598444", "Minas\/Lavalleja",
+"598435", "Florida",
+"59842", "San\ Carlos",};
 my $timezones = {
                '' => [
                        'America/Montevideo'

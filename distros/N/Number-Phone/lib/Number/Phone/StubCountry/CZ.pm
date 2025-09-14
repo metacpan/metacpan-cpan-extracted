@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20250605193635;
+our $VERSION = 1.20250913135857;
 
 my $formatters = [
                 {
@@ -68,17 +68,20 @@ my $validators = {
           )\\d{7}
         ',
                 'mobile' => '
-          (?:
-            60[1-8]\\d|
-            7(?:
-              0(?:
-                [2-5]\\d|
-                60
-              )|
-              19[0-2]|
-              [2379]\\d\\d
+          7(?:
+            060\\d|
+            19(?:
+              [0-4]\\d|
+              50
             )
-          )\\d{5}
+          )\\d{4}|
+          (?:
+            60[1-8]|
+            7(?:
+              0[2-5]|
+              [2379]\\d
+            )
+          )\\d{6}
         ',
                 'pager' => '',
                 'personal_number' => '70[01]\\d{6}',
@@ -97,26 +100,26 @@ my $validators = {
                 'voip' => '9[17]0\\d{6}'
               };
 my %areanames = ();
-$areanames{en} = {"42051", "South\ Moravian\ Region",
+$areanames{en} = {"42038", "South\ Bohemian\ Region",
 "42041", "Ústí\ nad\ Labem\ Region",
+"42055", "Moravian\-Silesian\ Region",
+"42037", "Plzeň\ Region",
+"42051", "South\ Moravian\ Region",
 "42048", "Liberec\ Region",
-"42058", "Olomouc\ Region",
-"42054", "South\ Moravian\ Region",
-"42032", "Central\ Bohemian\ Region",
+"42046", "Pardubice\ Region",
 "42031", "Central\ Bohemian\ Region",
-"42038", "South\ Bohemian\ Region",
-"4202", "Prague",
-"42047", "Ústí\ nad\ Labem\ Region",
+"42032", "Central\ Bohemian\ Region",
 "42057", "Zlín\ Region",
+"42035", "Karlovy\ Vary\ Region",
+"42047", "Ústí\ nad\ Labem\ Region",
+"42056", "Vysočina\ Region",
+"42058", "Olomouc\ Region",
+"42053", "South\ Moravian\ Region",
 "42059", "Moravian\-Silesian\ Region",
 "42049", "Hradec\ Králové\ Region",
-"42053", "South\ Moravian\ Region",
-"42035", "Karlovy\ Vary\ Region",
-"42046", "Pardubice\ Region",
-"42056", "Vysočina\ Region",
-"42055", "Moravian\-Silesian\ Region",
-"42039", "South\ Bohemian\ Region",
-"42037", "Plzeň\ Region",};
+"4202", "Prague",
+"42054", "South\ Moravian\ Region",
+"42039", "South\ Bohemian\ Region",};
 my $timezones = {
                '' => [
                        'Europe/Prague'

@@ -1,7 +1,10 @@
 Revision history for Task-MemManager
 
+0.05      2025-09-13 06:51:51-06:00 America/Denver
+- Fixed documentation formatting
 0.04      2025-09-12 17:52:43-06:00 America/Denver
-
+- Added documentation for consumer
+- Allocators are now optionally passed the constructor options
 0.03      2025-09-10 22:45:12-06:00 America/Denver
 - Updated documentation
 - Fixed error of only assigning the last byte of the buffer to the init value

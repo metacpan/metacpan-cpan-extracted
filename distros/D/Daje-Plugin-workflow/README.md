@@ -9,15 +9,27 @@ Daje::Plugin::workflow - It's new $module
 
 # DESCRIPTION
 
-Daje::Plugin::workflow is ...
+Daje::Plugin::workflow is the Mojolicious plugin for Daje::Workflow
 
 # REQUIRES
 
-[experimental](https://metacpan.org/pod/experimental) 
+[Daje::Plugin::workflow](https://metacpan.org/pod/Daje%3A%3APlugin%3A%3Aworkflow) 
+
+[Daje::Workflow](https://metacpan.org/pod/Daje%3A%3AWorkflow) 
+
+[Daje::Workflow::Loader](https://metacpan.org/pod/Daje%3A%3AWorkflow%3A%3ALoader) 
+
+[Daje::Workflow::Database](https://metacpan.org/pod/Daje%3A%3AWorkflow%3A%3ADatabase) 
 
 [v5.40](https://metacpan.org/pod/v5.40) 
 
+[Mojo::Base](https://metacpan.org/pod/Mojo%3A%3ABase) 
+
 # METHODS
+
+## register
+
+    register();
 
 # AUTHOR
 

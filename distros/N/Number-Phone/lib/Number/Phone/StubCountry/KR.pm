@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20250605193635;
+our $VERSION = 1.20250913135858;
 
 my $formatters = [
                 {
@@ -185,40 +185,40 @@ my $validators = {
                 'voip' => '70\\d{8}'
               };
 my %areanames = ();
-$areanames{en} = {"8243", "Chungbuk",
+$areanames{en} = {"8233", "Gangwon",
 "8253", "Daegu",
-"8252", "Ulsan",
+"8242", "Daejeon",
+"8262", "Gwangju",
+"8254", "Gyeongbuk",
+"8255", "Gyeongnam",
+"8231", "Gyeonggi",
+"8251", "Busan",
+"8243", "Chungbuk",
+"8263", "Jeonbuk",
+"8261", "Jeonnam",
 "8241", "Chungnam",
 "8244", "Sejong\ City",
-"822", "Seoul",
-"8242", "Daejeon",
-"8255", "Gyeongnam",
-"8254", "Gyeongbuk",
-"8251", "Busan",
-"8262", "Gwangju",
+"8252", "Ulsan",
 "8264", "Jeju",
-"8261", "Jeonnam",
-"8233", "Gangwon",
 "8232", "Incheon",
-"8263", "Jeonbuk",
-"8231", "Gyeonggi",};
-$areanames{ko} = {"8253", "대구",
-"8243", "충북",
-"8242", "대전",
-"8255", "경남",
-"8251", "부산",
-"8254", "경북",
-"8252", "울산",
-"822", "서울",
-"8244", "세종",
-"8241", "충남",
-"8264", "제주",
-"8261", "전남",
-"8233", "강원",
-"8262", "광주",
-"8231", "경기",
+"822", "Seoul",};
+$areanames{ko} = {"8243", "충북",
 "8263", "전북",
-"8232", "인천",};
+"8244", "세종",
+"822", "서울",
+"8232", "인천",
+"8264", "제주",
+"8252", "울산",
+"8261", "전남",
+"8241", "충남",
+"8253", "대구",
+"8233", "강원",
+"8251", "부산",
+"8231", "경기",
+"8255", "경남",
+"8242", "대전",
+"8254", "경북",
+"8262", "광주",};
 my $timezones = {
                '' => [
                        'Asia/Seoul'

@@ -62,7 +62,7 @@
       },
       "Daje::Plugin::Workflow" : {
          "file" : "lib/Daje/Plugin/Workflow.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -77,7 +77,7 @@
          "web" : "https://github.com/janeskil1525/Daje-Plugin-Workflow"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

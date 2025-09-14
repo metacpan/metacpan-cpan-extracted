@@ -2,7 +2,7 @@
 #
 # Tests the output of Excel::Writer::XLSX against Excel generated files.
 #
-# Copyright 2000-2024, John McNamara, jmcnamara@cpan.org
+# Copyright 2000-2025, John McNamara, jmcnamara@cpan.org
 #
 # SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
 #
@@ -43,7 +43,7 @@ $worksheet->write( 'A1', 'Foo', $bold );
 $worksheet->write( 'A2', 'Bar', $italic );
 $worksheet->write_rich_string( 'A3', 'a', $bold, 'bc', 'defg' );
 
-# The following contains 2 consectutive formats and should be ignored.
+# The following contains 2 consecutive formats and should be ignored.
 $worksheet->write_rich_string( 'A3', 'a', $bold, $bold, 'bc', 'defg' );
 
 $workbook->close();

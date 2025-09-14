@@ -52,9 +52,10 @@ if ($command eq 'new') {
         app.psgi
         --reload
         --access-log /dev/null
-        --listen
+        --host localhost
+        --port
     );
-    push @plackup, "localhost:$port";
+    push @plackup, $port;
     push @plackup, @ARGV;
 
     exec @plackup;
@@ -131,7 +132,12 @@ Runs the current F<app.psgi> by automatically detecting the next
 available port after 5000 and forwarding the command to L<plackup>.
 Equivalent to:
 
-    plackup --reload --port <port> --access-log /dev/null app.psgi
+    plackup                    \
+        --reload               \
+        --access-log /dev/null \
+        --host localhost       \
+        --port <port>          \
+        app.psgi
 
 Any options passed to B<run> are forwarded directly to plackup.
 

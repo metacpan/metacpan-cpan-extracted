@@ -8,7 +8,7 @@ use Crypt::AuthEnc::ChaCha20Poly1305;
 use Digest::SHA qw(sha256);
 use Crypt::Argon2 qw(argon2id_pass argon2_verify);
 
-our $VERSION = '2.1.0';
+our $VERSION = '2.1.1';
 
 sub new {
     my ($class, $encryption_key) = @_;
@@ -452,12 +452,10 @@ Created: October, 2018.
 
 Last Update: August 2025.
 
-License: Use it as you will, and don't pretend you wrote it - be a mensch.
+=head1 LICENSE
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING
-BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+(Licence)
+
+This module is free software; you may redistribute it and/or modify it under the same terms as Perl itself.
 
 =cut

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use parent qw(Firefox::Marionette::LocalObject);
 
-our $VERSION = '1.67';
+our $VERSION = '1.68';
 
 sub IDENTIFIER { return 'element-6066-11e4-a52e-4f735466cecf' }
 
@@ -38,6 +38,11 @@ sub click {
 sub clear {
     my ($self) = @_;
     return $self->browser()->clear($self);
+}
+
+sub delete_element {
+    my ($self) = @_;
+    return $self->browser()->delete_element($self);
 }
 
 sub scroll {
@@ -335,7 +340,7 @@ Firefox::Marionette::Element - Represents a Firefox element retrieved using the 
 
 =head1 VERSION
 
-Version 1.67
+Version 1.68
 
 =head1 SYNOPSIS
 
@@ -393,6 +398,16 @@ sends a 'click' to the L<element|Firefox::Marionette::Element>.  The browser wil
 =head2 css
 
 accepts a scalar CSS property name as a parameter.  It returns the value of the computed style for that property.
+
+=head2 delete_element
+
+L<delete|https://developer.mozilla.org/en-US/docs/Web/API/Element/remove>'s this element from the DOM
+
+    use Firefox::Marionette();
+
+    my $firefox = Firefox::Marionette->new(visible => 1)->go('https://ebay.com');
+    my $select = $firefox->find_tag('select');
+    $select->delete_element();
 
 =head2 find
 

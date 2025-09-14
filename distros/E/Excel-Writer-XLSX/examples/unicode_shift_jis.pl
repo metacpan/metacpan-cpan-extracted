@@ -5,10 +5,10 @@
 # A simple example of converting some Unicode text to an Excel file using
 # Excel::Writer::XLSX.
 #
-# This example generates some Japenese text from a file with Shift-JIS
+# This example generates some Japanese text from a file with Shift-JIS
 # encoded text.
 #
-# Copyright 2000-2024, John McNamara, jmcnamara@cpan.org
+# Copyright 2000-2025, John McNamara, jmcnamara@cpan.org
 #
 # SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
 #

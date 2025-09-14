@@ -2,6 +2,7 @@ Build.PL
 Changes
 LICENSE
 README.md
+conf/users.json
 cpanfile
 lib/Daje/Workflow.pm
 lib/Daje/Workflow/Activities.pm
@@ -14,6 +15,7 @@ lib/Daje/Workflow/Observers.pm
 minil.toml
 script/documents.pl
 script/generate.pl
+script/runner.pl
 t/00_compile.t
 META.json
 META.yml

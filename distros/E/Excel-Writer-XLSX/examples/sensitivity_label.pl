@@ -5,7 +5,7 @@
 # An example of adding a Sensitivity Label to a Excel::Writer::XLSX workbook
 # via document properties.
 #
-# Copyright 2000-2024, John McNamara, jmcnamara@cpan.org
+# Copyright 2000-2025, John McNamara, jmcnamara@cpan.org
 #
 # SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
 #
@@ -112,7 +112,7 @@
 #
 #
 # Once you have identified the necessary metadata you can add it to a new
-# docuemnt as shown below.
+# document as shown below.
 #
 
 use strict;

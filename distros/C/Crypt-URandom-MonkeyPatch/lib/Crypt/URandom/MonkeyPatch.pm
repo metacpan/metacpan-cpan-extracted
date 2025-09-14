@@ -12,7 +12,7 @@ use Crypt::URandom qw( urandom );
 use constant SIZE => 1 << 31;
 use constant MASK => SIZE - 1;
 
-our $VERSION = 'v0.1.1';
+our $VERSION = 'v0.1.2';
 
 use version 0.77; $VERSION = version->declare($VERSION);
 
@@ -46,7 +46,9 @@ Crypt::URandom::MonkeyPatch - override core rand function to use system random s
 
 =head1 VERSION
 
-version v0.1.1
+version v0.1.2
+
+=for stopwords cryptographic
 
 =head1 SYNOPSIS
 
@@ -54,7 +56,7 @@ version v0.1.1
 
 =head1 DESCRIPTION
 
-This module globlly overrides the builtin Perl function C<rand> with one based on the operating system's cryptographic
+This module globally overrides the builtin Perl function C<rand> with one based on the operating system's cryptographic
 random number source, e.g. F</dev/urandom>.
 
 The purpose of this module is monkey patch legacy code that uses C<rand> for security purposes.
@@ -79,7 +81,7 @@ This globally overrides the builtin C<rand> function using 31-bits of data from 
 =head1 KNOWN ISSUES
 
 This module is not intended for use with new code, or for use in CPAN modules.  If you are writing new code that needs a
-secure souce of random bytes, then use L<Crypt::URandom> or see the L<CPAN Author's Guide to Random Data for
+secure source of random bytes, then use L<Crypt::URandom> or see the L<CPAN Author's Guide to Random Data for
 Security|https://security.metacpan.org/docs/guides/random-data-for-security.html>.
 
 This should only be used when the affected code cannot be updated.
@@ -96,10 +98,14 @@ L<perlfunc>
 
 =head1 SOURCE
 
-The development version is on github at L<https://github.com/robrwo/perl-Crypt-URandom-MonkeyPatch>
-and may be cloned from L<git://github.com/robrwo/perl-Crypt-URandom-MonkeyPatch.git>
+The development version is on github at L<github.com/robrwo/perl-Crypt-URandom-MonkeyPatch>
+and may be cloned from L<github.com/robrwo/perl-Crypt-URandom-MonkeyPatch.git>
 
-=head1 BUGS
+=head1 SUPPORT
+
+Only the latest version of this module will be supported.
+
+Only Perl versions released in the past ten (10) years are supported, even though this module may run on earlier versions.
 
 Please report any bugs or feature requests on the bugtracker website
 L<https://github.com/robrwo/perl-Crypt-URandom-MonkeyPatch/issues>

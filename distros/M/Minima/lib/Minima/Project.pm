@@ -121,8 +121,8 @@ L<Template::Toolkit|Template> and then copied.
 
 =back
 
-The C<.[sd]> extensions are removed and the template name is converted
-to a proper path by L<C<get_templates>|/get_templates>.
+The C<.[sd]tpl> extensions are removed and the template name is
+converted to a proper path by L<C<get_templates>|/get_templates>.
 
 =head1 SUBROUTINES
 

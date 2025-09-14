@@ -85,7 +85,7 @@ file or `tidyall -a` to tidy all files.
 Much of the documentation POD is generated at release time.  Some is generated
 boilerplate; other documentation is built from
 [Pod::Weaver](https://metacpan.org/pod/Pod::Weaver) pseudo-POD directives in
-the source like C<=attr>, C<=method> or C<=export>.
+the source like '=attr', '=method' or '=export'.
 
 If you would like to submit a documentation edit, please limit yourself to the
 documentation you see.

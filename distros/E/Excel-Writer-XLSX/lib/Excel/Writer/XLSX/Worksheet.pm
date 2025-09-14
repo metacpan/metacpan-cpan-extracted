@@ -7,7 +7,7 @@ package Excel::Writer::XLSX::Worksheet;
 #
 # Used in conjunction with Excel::Writer::XLSX
 #
-# Copyright 2000-2024, John McNamara, jmcnamara@cpan.org
+# Copyright 2000-2025, John McNamara, jmcnamara@cpan.org
 #
 # SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
 #
@@ -29,12 +29,12 @@ use Excel::Writer::XLSX::Utility qw(xl_cell_to_rowcol
                                     xl_rowcol_to_cell
                                     xl_col_to_name
                                     xl_range
-                                    xl_string_pixel_width
+                                    xl_cell_autofit_width
                                     quote_sheetname
                                     get_image_properties);
 
 our @ISA     = qw(Excel::Writer::XLSX::Package::XMLwriter);
-our $VERSION = '1.14';
+our $VERSION = '1.15';
 
 
 ###############################################################################
@@ -704,7 +704,7 @@ sub set_column {
     $level = 7 if $level > 7;
 
 
-    # Excel has a maximumn column width of 255 characters.
+    # Excel has a maximum column width of 255 characters.
     if (defined $width && $width > 255.0) {
         $width = 255.0;
     }
@@ -774,7 +774,15 @@ sub set_column_pixels {
 #
 sub autofit {
     my $self      = shift;
+    my $max_width = shift || 255.0;
     my %col_width = ();
+
+    # Convert the autofit maximum pixel width to a column/character width, but
+    # limit it to the Excel max limit.
+    $max_width = _pixels_to_width($max_width);
+    if ( $max_width > 255.0 ) {
+        $max_width = 255.0;
+    }
 
     # Create a reverse lookup for the share strings table so we can convert
     # the string id back to the original string.
@@ -824,14 +832,14 @@ sub autofit {
                         }
 
                         if ( $string !~ /\n/ ) {
-                            $length = xl_string_pixel_width( $string );
+                            $length = xl_cell_autofit_width( $string );
                         }
                         else {
                             # Handle multiline strings.
                             my @segments = split "\n", $string;
                             for my $string ( @segments ) {
                                 my $seg_length =
-                                  xl_string_pixel_width( $string );
+                                  xl_cell_autofit_width( $string );
 
                                 if ( $seg_length > $length ) {
                                     $length = $seg_length;
@@ -879,7 +887,7 @@ sub autofit {
                         # non-zero value.
                         my $value = $cell->[3];
                         if ( $value ) {
-                            $length = xl_string_pixel_width( $value );
+                            $length = xl_cell_autofit_width( $value );
                         }
                     }
                     elsif ( $type eq 'a' || $type eq 'd' ) {
@@ -887,7 +895,7 @@ sub autofit {
                         # Handle array and dynamic formulas.
                         my $value = $cell->[4];
                         if ( $value ) {
-                            $length = xl_string_pixel_width( $value );
+                            $length = xl_cell_autofit_width( $value );
                         }
                     }
 
@@ -919,9 +927,9 @@ sub autofit {
         # additional padding of 7 pixels, like Excel.
         my $width = _pixels_to_width( $pixel_width + 7 );
 
-        # The max column character width in Excel is 255.
-        if ( $width > 255.0 ) {
-            $width = 255.0;
+        # Limit the width to the maximum user or Excel value.
+        if ( $width > $max_width ) {
+            $width = $max_width;
         }
 
         # Add the width to an existing col info structure or add a new one.
@@ -8415,13 +8423,26 @@ sub _write_row {
     push @attributes, ( 's'            => $xf_index ) if $xf_index;
     push @attributes, ( 'customFormat' => 1 )         if $format;
 
-    if ( $height != $self->{_original_row_height} ) {
+
+    # Only add ht parameter if the height is non-default.
+    if (
+        $height != $self->{_original_row_height}
+        || (   $height == $self->{_original_row_height}
+            && $height != $self->{_default_row_height} )
+      )
+    {
         push @attributes, ( 'ht' => $height );
     }
 
     push @attributes, ( 'hidden'       => 1 )         if $hidden;
 
-    if ( $height != $self->{_original_row_height} ) {
+    # Only add customFormat parameter if the height is non-default.
+    if (
+        $height != $self->{_original_row_height}
+        || (   $height == $self->{_original_row_height}
+            && $height != $self->{_default_row_height} )
+      )
+    {
         push @attributes, ( 'customHeight' => 1 );
     }
 
@@ -10254,7 +10275,7 @@ sub _write_cf_rule {
             my $value = $param->{value};
 
             # String "Cell" values must be quoted, apart from ranges.
-            if (   $value !~ /(\$?)([A-Z]{1,3})(\$?)(\d+)/
+            if (   $value !~ /^(\$?)([A-Z]{1,3})(\$?)(\d+)$/
                 && $value !~
                 /^([+-]?)(?=\d|\.\d)\d*(\.\d*)?([Ee]([+-]?\d+))?$/ )
             {
@@ -11372,6 +11393,6 @@ John McNamara jmcnamara@cpan.org
 
 =head1 COPYRIGHT
 
-(c) MM-MMXXIV, John McNamara.
+(c) MM-MMXXV, John McNamara.
 
 All Rights Reserved. This module is free software. It may be used, redistributed and/or modified under the same terms as Perl itself.
