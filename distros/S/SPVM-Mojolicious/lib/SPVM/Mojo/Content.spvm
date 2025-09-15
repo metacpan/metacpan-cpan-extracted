@@ -377,7 +377,7 @@ class Mojo::Content extends Mojo::EventEmitter {
     return $progress;
   }
   
-  method write : void ($chunk : string = undef, $cb : Mojo::EventEmitter::Callback = undef) {
+  method write : void ($chunk : string = undef, $cb : Mojo::Callback = undef) {
     
     $self->{dynamic} = 1;
     
@@ -395,7 +395,7 @@ class Mojo::Content extends Mojo::EventEmitter {
     
   }
   
-  method write_chunk : void ($chunk : string = undef, $cb : Mojo::EventEmitter::Callback = undef) {
+  method write_chunk : void ($chunk : string = undef, $cb : Mojo::Callback = undef) {
     
     unless ($self->{chunked}) {
       $self->headers->set_transfer_encoding("chunked");
@@ -418,7 +418,7 @@ class Mojo::Content extends Mojo::EventEmitter {
     
   }
   
-  method write_sse : void ($event : Mojo::SSE::Event, $cb : Mojo::EventEmitter::Callback) {
+  method write_sse : void ($event : Mojo::SSE::Event, $cb : Mojo::Callback) {
     
     unless ($self->{sse}) {
       $self->headers->set_content_type("text/event-stream");

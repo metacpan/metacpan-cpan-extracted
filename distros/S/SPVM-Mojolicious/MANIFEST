@@ -17,6 +17,8 @@ lib/SPVM/Mojo/ByteStream.pm
 lib/SPVM/Mojo/ByteStream.spvm
 lib/SPVM/Mojo/Cache.pm
 lib/SPVM/Mojo/Cache.spvm
+lib/SPVM/Mojo/Callback.pm
+lib/SPVM/Mojo/Callback.spvm
 lib/SPVM/Mojo/Collection.pm
 lib/SPVM/Mojo/Collection.spvm
 lib/SPVM/Mojo/Content.pm
@@ -39,8 +41,6 @@ lib/SPVM/Mojo/DynamicMethods/Callback.pm
 lib/SPVM/Mojo/DynamicMethods/Callback.spvm
 lib/SPVM/Mojo/EventEmitter.pm
 lib/SPVM/Mojo/EventEmitter.spvm
-lib/SPVM/Mojo/EventEmitter/Callback.pm
-lib/SPVM/Mojo/EventEmitter/Callback.spvm
 lib/SPVM/Mojo/File.pm
 lib/SPVM/Mojo/File.spvm
 lib/SPVM/Mojo/Headers.pm

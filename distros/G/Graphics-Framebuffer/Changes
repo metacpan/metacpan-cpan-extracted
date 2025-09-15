@@ -1765,3 +1765,9 @@ Revision history for Graphics-Framebuffer
 6.73   Sep 10, 2025
 
        Added further warnings about attempting to install on FreeBSD.
+
+6.74   Sep 14, 2025
+
+       Added more code for FreeBSD compatibility.  It will still likely not
+	   work, but it's getting there.  I am no FreeBSD user and FreeBSD is
+	   what would happen if Ikea sold an operating system.

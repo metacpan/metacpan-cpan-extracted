@@ -16,8 +16,13 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <fcntl.h>
-#include <linux/fb.h>
-#include <linux/kd.h>
+#if defined(__linux__)
+    #include <linux/fb.h>
+    #include <linux/kd.h>
+#elif defined(__FreeBSD__)
+    #include <sys/fbio.h>
+    #include <sys/consio.h>
+#endif
 #include <sys/mman.h>
 #include <sys/ioctl.h>
 #include <math.h>
@@ -54,8 +59,8 @@ struct fb_fix_screeninfo finfo;
 // This gets the framebuffer info and populates the above structures, then sends them to Perl
 void c_get_screen_info(char *fb_file) {
     int fbfd = open(fb_file,O_RDWR);
-    ioctl(fbfd, FBIOGET_FSCREENINFO, &finfo);
-    ioctl(fbfd, FBIOGET_VSCREENINFO, &vinfo);
+    ioctl(fbfd, FBIOGET_FSCREENINFO, &finfo); // Get the physical information
+    ioctl(fbfd, FBIOGET_VSCREENINFO, &vinfo); // Get the virtual console information
     close(fbfd);
 
     // This monstrosity pushes the needed values on Perl's stack, like "return" does.

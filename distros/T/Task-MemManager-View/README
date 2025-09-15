@@ -1,0 +1,141 @@
+NAME
+    Task::MemManager::View - Provides convenient views for Task::MemManager
+    buffers
+
+VERSION
+    version 0.01
+
+SYNOPSIS
+        use Task::MemManager;
+        use Task::MemManager::View; # automatically loaded if Task::MemManager is used
+
+        my $buffer = Task::MemManager->new( size => 1000, 1 );
+
+        # Create a PDL view - implied an unsigned 8-bit integer view if pgl_type is not
+        # specified
+        my $pdl_view = $buffer->create_view('PDL', { view_name => 'my_pdl_view' });
+
+        # Retrieve the view later
+        my $retrieved_view = $buffer->get_view('my_pdl_view');
+
+        # Clone the view
+        my $cloned_view = $buffer->clone_view('my_pdl_view');
+
+        # Delete the view when no longer needed
+        $buffer->delete_view('my_pdl_view');
+
+        # New view using a different type PDL type
+        my $pdl_view_16 = $buffer->create_view('PDL', { view_name => 'my_pdl_uint16',
+                                                  pdl_type => 'ushort' });
+
+DESCRIPTION
+    Task::MemManager::View is a module that extends the "Task::MemManager"
+    module by providing convenient views for the memory buffers allocated by
+    the "Task::MemManager" module. It does so, by adding additional methods
+    to the "Task::MemManager" class to create, delete, and retrieve views.
+    Views are implemented as separate modules under the
+    "Task::MemManager::View" namespace. Each view module must implement a
+    set of mandatory methods (see below). The view modules are automatically
+    discovered and loaded when the "Task::MemManager::View" module is
+    loaded. If you do not need a view, do not install the corresponding
+    module, because "Task::MemManager::View" is a graceful module that will
+    load every module under it's namespace.
+
+METHODS
+  create_view
+      Usage       : $view =  $buffer->create_view($view_type, \%options);
+      Purpose     : Create a view of the specified type for the buffer
+      Returns     : The created view
+      Parameters  : $view_type - type of the view (e.g. 'PDL')
+                    \%options - hash reference with options for the view. The
+                                option view_name is reserved for naming the view.
+                                If not specified, a default name is used.
+                    The options are passed as-is to the view's create_view method.
+                    See the documentation of each view module for the supported
+                    options.
+      Throws      : n/a
+      Comments    : Returns undef if the view creation fails for any reason.
+                    Warnings will be generated if DEBUG is set to a non-zero value.
+
+  delete_view
+      Usage       : $buffer->delete_view($view_name);
+      Purpose     : Delete the specified view of the buffer
+      Returns     : nothing
+      Parameters  : $view_name - name of the view to delete
+      Throws      : n/a
+      Comments    : If the view does not exist, nothing happens.
+                    Warnings will be generated if DEBUG is set to a non-zero value
+                    and the view name is not specified, or not found.
+
+  get_view
+      Usage       : $view = $buffer->get_view($view_name);
+      Purpose     : Retrieve the specified view of the buffer
+      Returns     : The requested view or undef if not found
+      Parameters  : $view_name - name of the view to retrieve
+      Throws      : n/a
+      Comments    : If the view does not exist, nothing happens.
+                    Warnings will be generated if DEBUG is set to a non-zero value
+                    and the view name is not specified, or not found.
+
+  clone_view
+      Usage       : $cloned_view = $buffer->clone_view($view_name);
+      Purpose     : Clone the specified view of the buffer
+      Returns     : The cloned view or undef if not found
+      Parameters  : $view_name - name of the view to clone
+      Throws      : n/a
+      Comments    : If the view does not exist, nothing happens.
+                    Warnings will be generated if DEBUG is set to a non-zero value
+                    and the view name is not specified, or not found.
+
+EXAMPLES
+    Please see the examples in the module Task::MemManager::View::PDL
+
+DIAGNOSTICS
+    If you set up the environment variable DEBUG to a non-zero value, then a
+    number of sanity checks will be performed, and the module will carp with
+    an (informative message ?) if something is wrong.
+
+DEPENDENCIES
+    The module extends the "Task::MemManager" module so this is definitely a
+    dependency. It also uses the "Module::Find" and "Module::Runtime"
+    modules to find and load the view modules (so you can count them as
+    dependencies too). By default all installed view modules will be loaded.
+    If you do not need a specific view, do not install the corresponding
+    module. This may change in the future, if I decide to add a mechanism to
+    load only specific view modules.
+
+TODO
+    Open to suggestions. A few foolish ideas of my own include: adding
+    Pandas DataFrame, Polars DataFrame, or Apache Arrow views
+
+SEE ALSO
+    *   <https://metacpan.org/pod/Task::MemManager>
+
+        This module exports various internal perl methods that change the
+        internal representation or state of a perl scalar. All of these work
+        in-place, that is, they modify their scalar argument.
+
+    *   <https://metacpan.org/pod/Inline::C>
+
+        Inline::C is a module that allows you to write Perl subroutines in
+        C.
+
+    *   <https://perldoc.perl.org/perlguts>
+
+        Introduction to the Perl API.
+
+    *   <https://perldoc.perl.org/perlapi>
+
+        Autogenerated documentation for the perl public API.
+
+AUTHOR
+    Christos Argyropoulos, "<chrisarg at cpan.org>"
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2025 by Christos Argyropoulos.
+
+    This is free software; you can redistribute it and/or modify it under
+    the MIT license. The full text of the license can be found in the
+    LICENSE file See <https://en.wikipedia.org/wiki/MIT_License> for more
+    information.
+

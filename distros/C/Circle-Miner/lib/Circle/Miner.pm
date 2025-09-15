@@ -17,11 +17,11 @@ Circle::Miner - The miner module for circle chain sdk.
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 SYNOPSIS
 
@@ -106,6 +106,8 @@ Returns:
 =item * data.blockHeaderHexString: The block header in hex format
 
 =item * data.ipPort: The IP and port of the node
+
+=item * data.channelId: The channel id of the node
 
 =back
 
@@ -296,7 +298,7 @@ sub make_ranges {
     return \@ranges;
 }
 
-=head2 post_my_block($address, $header_hex, $ip_port)
+=head2 post_my_block($address, $header_hex, $channel_id)
 
 Posts a mined block to the network.
 
@@ -308,7 +310,7 @@ Parameters:
 
 =item * $header_hex - The mined block header in hex format (required)
 
-=item * $ip_port    - The IP and port of the node to post to (required)
+=item * $channel_id - The channel id to post to (required)
 
 =back
 
@@ -344,9 +346,9 @@ Example:
 
 sub post_my_block {
     my $self = shift;
-    my ( $address, $header_hex, $channelId ) = @_;
-    if (!$address || !$header_hex || !$channelId) {
-        croak "address header_hex and channelId must be non-empty!";
+    my ( $address, $header_hex, $channel_id ) = @_;
+    if (!$address || !$header_hex || !$channel_id) {
+        croak "address header_hex and channel_id must be non-empty!";
     }
     if (length($address) != 34 || substr($address, 0, 1) ne "1") {
         croak "address is invalid";
@@ -356,7 +358,7 @@ sub post_my_block {
         $url,
         {
             address              => $address,
-            channelId            => $channelId,
+            channelId            => $channel_id,
             blockHeaderHexString => $header_hex
         }
     );

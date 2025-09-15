@@ -47,7 +47,7 @@ Subclasses may choose to emit it, but are not required to do so.
 
 =head2 catch
 
-C<method catch : void ($cb : L<Mojo::EventEmitter::Callback|SPVM::Mojo::EventEmitter::Callback>);>
+C<method catch : void ($cb : L<Mojo::Callback|SPVM::Mojo::Callback>);>
 
 Subscribe to L</"error"> event.
 
@@ -73,7 +73,7 @@ Check if event has subscribers.
 
 =head2 on
 
-C<method on : void ($name : string, $cb : L<Mojo::EventEmitter::Callback|SPVM::Mojo::EventEmitter::Callback>);>
+C<method on : void ($name : string, $cb : L<Mojo::Callback|SPVM::Mojo::Callback>);>
 
 Subscribe to event.
 
@@ -83,7 +83,7 @@ Examples:
 
 =head2 once
 
-C<method once : L<Mojo::EventEmitter::Callback|SPVM::Mojo::EventEmitter::Callback> ($name : string, $cb : L<Mojo::EventEmitter::Callback|SPVM::Mojo::EventEmitter::Callback>);>
+C<method once : L<Mojo::Callback|SPVM::Mojo::Callback> ($name : string, $cb : L<Mojo::Callback|SPVM::Mojo::Callback>);>
 
 Subscribe to event and unsubscribe again after it has been emitted once.
 
@@ -91,7 +91,7 @@ Subscribe to event and unsubscribe again after it has been emitted once.
 
 =head2 subscribers
 
-C<method subscribers : L<Mojo::EventEmitter::Callback|SPVM::Mojo::EventEmitter::Callback>[] ($name : string);>
+C<method subscribers : L<Mojo::Callback|SPVM::Mojo::Callback>[] ($name : string);>
 
 All subscribers for event.
 
@@ -103,13 +103,13 @@ Note that this method returns the copy instead that Mojolicious's one returns it
   
   # Change order of subscribers
   my $subscribers = $e->subscribers("foo");
-  $subscribers = (Mojo::EventEmitter::Callback[])Fn->reverse($subscribers);
+  $subscribers = (Mojo::Callback[])Fn->reverse($subscribers);
   $e->unsubscribe("foo");
   $e->subscribe(foo => $subscribers);
 
 =head2 unsubscribe
 
-C<method unsubscribe : void ($name : string, $cb : L<Mojo::EventEmitter::Callback|SPVM::Mojo::EventEmitter::Callback> = undef);>
+C<method unsubscribe : void ($name : string, $cb : L<Mojo::Callback|SPVM::Mojo::Callback> = undef);>
 
 Unsubscribe from event.
 

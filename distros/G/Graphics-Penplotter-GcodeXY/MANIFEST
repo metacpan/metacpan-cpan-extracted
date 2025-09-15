@@ -23,4 +23,7 @@ script/template.pl
 t/00_compile.t
 t/01-gcode.t
 t/02-alphabet.t
+t/03-svgimport.t
+t/data/LiberationSans-Regular.ttf
+t/data/car-vp.svg
 META.yml

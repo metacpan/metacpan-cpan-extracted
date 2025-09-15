@@ -6,9 +6,11 @@ use warnings;
 use DateTime;
 use Error::Pure qw(err);
 use Mo qw(build default is);
-use Mo::utils 0.28 qw(check_array_object check_isa check_length check_number_id check_required);
+use Mo::utils 0.28 qw(check_isa check_length check_required);
+use Mo::utils::Array qw(check_array_object);
+use Mo::utils::Number qw(check_positive_natural);
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 has hash_type => (
 	is => 'ro',
@@ -47,7 +49,7 @@ sub BUILD {
 	check_required($self, 'hash_type');
 
 	# Check id.
-	check_number_id($self, 'id');
+	check_positive_natural($self, 'id');
 
 	# Check login_name.
 	check_length($self, 'login_name', 50);
@@ -58,7 +60,7 @@ sub BUILD {
 	check_required($self, 'password_hash');
 
 	# Check roles.
-	check_array_object($self, 'roles', 'Data::Login::Role', 'Roles');
+	check_array_object($self, 'roles', 'Data::Login::Role');
 
 	# Check valid_from.
 	check_required($self, 'valid_from');
@@ -231,34 +233,40 @@ Returns L<DateTime> object or undef.
 =head1 ERRORS
 
  new():
-         Parameter 'hash_type' is required.
-         Parameter 'hash_type' must be a 'Data::HashType' object.
-                 Value: %s
-                 Reference: %s
-         Parameter 'id' must be a natural number.
-                 Value: %s
-         Parameter 'login_name' has length greater than '50'.
-                 Value: %s
-         Parameter 'login_name' is required.
-         Parameter 'password_hash' has length greater than '128'.
-                 Value: %s
-         Parameter 'password_hash' is required.
-         Parameter 'roles' must be a array.
-                 Value: %s
-                 Reference: %s
-         Parameter 'valid_from' is required.
-         Parameter 'valid_from' must be a 'DateTime' object.
-                 Value: %s
-                 Reference: %s
-         Parameter 'valid_to' must be a 'DateTime' object.
-                 Value: %s
-                 Reference: %s
-         Parameter 'valid_to' must be older than 'valid_from' parameter.
-                 Value: %s
-                 Valid from: %s
-         Roles isn't 'Data::Login::Role' object.
-                 Value: %s
-                 Reference: %s
+         From Mo::utils:
+                 Parameter 'hash_type' is required.
+                 Parameter 'hash_type' must be a 'Data::HashType' object.
+                         Value: %s
+                         Reference: %s
+                 Parameter 'login_name' has length greater than '50'.
+                         Value: %s
+                 Parameter 'login_name' is required.
+                 Parameter 'password_hash' has length greater than '128'.
+                         Value: %s
+                 Parameter 'password_hash' is required.
+                 Parameter 'valid_from' is required.
+                 Parameter 'valid_from' must be a 'DateTime' object.
+                         Value: %s
+                         Reference: %s
+                 Parameter 'valid_to' must be a 'DateTime' object.
+                         Value: %s
+                         Reference: %s
+                 Parameter 'valid_to' must be older than 'valid_from' parameter.
+                         Value: %s
+                         Valid from: %s
+
+         From Mo::utils::Array::check_array_object():
+                 Parameter 'roles' must be a array.
+                         Value: %s
+                         Reference: %s
+                 Parameter 'roles' with array must contain 'Data::Login::Role' objects.
+                         Value: %s
+                         Reference: %s
+
+         From Mo::utils::Number::check_positive_natural():
+                 Parameter 'id' must be a positive natural number.
+                         Value: %s
+
 
 =head1 EXAMPLE
 
@@ -270,7 +278,7 @@ Returns L<DateTime> object or undef.
  use Data::HashType;
  use Data::Login;
  use Data::Login::Role;
- use Data::Random::Utils qw(is_valid);
+ use Data::Random::Utils 0.02 qw(is_object_currently_valid);
  use DateTime;
 
  my $obj = Data::Login->new(
@@ -333,7 +341,7 @@ Returns L<DateTime> object or undef.
  print 'Login name: '.$obj->login_name."\n";
  print 'Password hash: '.$obj->password_hash."\n";
  print "Active roles:\n";
- print join "\n", map { is_valid($_) ? ' - '.$_->role : () } @{$obj->roles};
+ print join "\n", map { is_object_currently_valid($_) ? ' - '.$_->role : () } @{$obj->roles};
  print "\n";
  print 'Valid from: '.$obj->valid_from->ymd."\n";
 
@@ -352,7 +360,9 @@ Returns L<DateTime> object or undef.
 L<DateTime>,
 L<Error::Pure>,
 L<Mo>,
-L<Mo::utils>.
+L<Mo::utils>,
+L<Mo::utils::Array>,
+L<Mo::utils::Number>.
 
 =head1 REPOSITORY
 
@@ -366,12 +376,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2023-2024 Michal Josef Špaček
+© 2023-2025 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

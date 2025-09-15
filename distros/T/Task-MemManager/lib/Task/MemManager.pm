@@ -1,10 +1,14 @@
 package Task::MemManager;
-$Task::MemManager::VERSION = '0.05';
+$Task::MemManager::VERSION = '0.07';
 use strict;
 use warnings;
 
-use Carp;
+BEGIN {
+    use constant DEBUG => $ENV{DEBUG} // 0;
+}
+use constant { ZERO_STRING_BYTE => 0, };
 use Inline ( C => 'DATA', );
+use Carp;
 use Module::Find;
 use Module::Runtime 'use_module';
 use Scalar::Util;
@@ -16,8 +20,6 @@ Inline->init()
   ;  # alias of refaddr in Ch. 15 & 16 of "Perl Best Practices" (O'Reilly, 2005)
 
 # ABSTRACT: A memory allocator for low level code in Perl.
-
-
 
 # Properties of the Memory Manager class (inside out object attributes)
 my %buffer;               # Memory buffer
@@ -44,6 +46,11 @@ my %allocator_function;
 my @allocator_functions = qw(malloc free get_buffer_address);
 my @optional_functions  = qw(consume);
 TEST_MODULE: foreach my $module_name (@alloc_modules) {
+
+    # Skip the View and GPU modules unless requested explicitly
+    next TEST_MODULE if $module_name =~ /::View$/;
+    next TEST_MODULE if $module_name =~ /::GPU$/;
+
     ( my $key = $module_name ) =~ s/Task::MemManager:://;
     my $alloc_module = use_module($module_name);    # Load the module
     my $number_of_functions =
@@ -52,8 +59,8 @@ TEST_MODULE: foreach my $module_name (@alloc_modules) {
         and $number_of_functions < @allocator_functions )
     {
         push @utility_modules, $module_name;
-        carp "Module $alloc_module does not implement all required methods "
-          . "(@allocator_functions)\n This module will not be used for "
+        warn "Module $alloc_module does not implement all required methods: "
+          . "(@allocator_functions).\nThis module will not be used for "
           . "memory allocation";
         next TEST_MODULE;
     }    ## zero implemented functions is OK, it may be a utility module
@@ -67,7 +74,7 @@ TEST_MODULE: foreach my $module_name (@alloc_modules) {
               $alloc_module->can($function)
             ? $alloc_module->can($function)
             : sub {
-                croak "$module_name does not implement $function";
+                warn "$module_name does not implement $function";
             }
         );
     }
@@ -77,7 +84,8 @@ TEST_MODULE: foreach my $module_name (@alloc_modules) {
 # Usage       : my $buffer = Task::MemManager->new(10, 1, {allocator =>
 #                'PerlAlloc'});
 # Purpose     : Allocates a buffer using the specified allocator
-# Returns     : A reference to the buffer
+# Returns     : A reference to the buffer or undef if the error is survivable
+#               e.g. calling as a class method.
 # Parameters  : $num_of_items     - Number of items in the buffer
 #               $size_of_each_item - Size of each item in the buffer
 #               $opts_ref         - Reference to a hash of options. These are:
@@ -88,8 +96,9 @@ TEST_MODULE: foreach my $module_name (@alloc_modules) {
 #                death_stub     - Function to call upon object destruction
 #                  it will receive the object's properties and identifier
 #                  as a hash reference if it is defined
-# Throws      : Croaks if the buffer allocation fails, or if the allocator
-#                does not exist
+# Throws      : croaks if the buffer allocation fails, or if the allocator
+#                does not exist or if one attempts to allocate a region that
+#                overlaps with an existing buffer.
 # Comments    : Default allocator is PerlAlloc, which uses Perl's string
 #                functions,
 #               Default init_value is undef ('zero' zeroes out memory, any
@@ -98,8 +107,29 @@ TEST_MODULE: foreach my $module_name (@alloc_modules) {
 # See Also    : n/a
 sub new {
     my ( $self, $num_of_items, $size_of_each_item, $opts_ref ) = @_;
+
     my $init_value = $opts_ref->{init_value};
     $opts_ref->{delayed_gc} //= 0;
+
+
+    if ( ref($self) ) {
+        if (DEBUG) {
+            carp "Cannot call new on a (blessed) reference.\n";
+        }
+        return undef;
+    }
+
+    die "Number of items and size of each item must be defined"
+      unless defined $num_of_items and defined $size_of_each_item;
+
+    $init_value =
+      ( !defined $init_value || ( lc $init_value eq 'zero' ) )
+      ? ZERO_STRING_BYTE
+      : (
+          ($init_value) =~ /^\d+$/
+        ? ( ( $init_value < 256 ) ? $init_value : 255 )
+        : ord $init_value
+      );
 
     return $self->$consume_or_allocate_private_func( $num_of_items,
         $size_of_each_item, $opts_ref, 'malloc',
@@ -110,24 +140,26 @@ sub new {
 # Usage       : my $buffer = Task::MemManager->consume($buffer,10,1,
 #                {allocator => 'PerlAlloc'});
 # Purpose     : Consumers a buffer created with the specified allocator
-# Returns     : A reference to the buffer
+# Returns     : A reference to the buffer or undef if the error is survivable
+#               e.g. calling as a class method.
 # Parameters  : $external_buffer_ref - Reference to the external buffer
 #               $num_of_items     - Number of items in the buffer
 #               $size_of_each_item - Size of each item in the buffer
-#               \$opts          - Reference to a hash of options. 
+#               \$opts          - Reference to a hash of options.
 #                The ones that control the constructor are the following:
 #                allocator      - Name of the allocator to use
 #                delayed_gc     - Should garbage collection be delayed ?
 #                                 If it evaluates to non-false, it'll delay GC
 #                init_value     - Value to initialize the buffer with (ignored)
 #                death_stub     - Function to call upon object destruction
-#                                 it will receive the object's properties and 
+#                                 it will receive the object's properties and
 #                                 identifier as a hash reference (if defined)
-#               Additional options may be presented and the entire set of 
-#               options will be passed to the malloc function of the 
-#               allocator. 
-# Throws      : Croaks if the buffer allocation fails, or if the allocator
-#                does not provide a consume function
+#               Additional options may be presented and the entire set of
+#               options will be passed to the malloc function of the
+#               allocator.
+# Throws      : Dies if the buffer allocation fails, or if the allocator
+#                does not provide a consume function, or if one attempts to
+#                consume a region that overlaps with an existing buffer.
 # Comments    : Default allocator is PerlAlloc, which uses Perl's string
 #                functions,
 #               Default init_value is undef ('zero' zeroes out memory, any
@@ -139,6 +171,14 @@ sub consume {
         $opts_ref )
       = @_;
     $opts_ref->{delayed_gc} //= 1;
+
+    unless ( ref($self) ) {
+        if (DEBUG) {
+            carp "Cannot call consume as class method.\n";
+        }
+        return undef;
+    }
+
     return $self->$consume_or_allocate_private_func( $num_of_items,
         $size_of_each_item, $opts_ref, 'consume',
         [ $external_buffer_ref, $num_of_items * $size_of_each_item ] );
@@ -152,7 +192,7 @@ $consume_or_allocate_private_func = sub {
       = @_;
 
     # exit if the number of items or the number of bytes per item is not defined
-    croak "Number of items and size of each item must be defined"
+    die "Number of items and size of each item must be defined"
       unless defined $num_of_items and defined $size_of_each_item;
 
     # Various defaults here
@@ -160,14 +200,15 @@ $consume_or_allocate_private_func = sub {
     my $death_stub     = $opts_ref->{death_stub};
     my $allocator_name = $opts_ref->{allocator} // 'PerlAlloc';
     unless ( exists $allocator_function{$allocator_name} ) {
-        croak "Allocator $allocator_name is not implemented";
+        die "Allocator $allocator_name does not exist.\n";
     }
     my $allocator  = $allocator_function{$allocator_name}{$func};
     my $new_buffer = bless do {
-        my $anon_scalar = $allocator->(@$func_args_ref,$opts_ref);
+        my $anon_scalar = $allocator->( @$func_args_ref, $opts_ref );
     }, $self;
+
     unless ($new_buffer) {
-        croak "Failed to allocate buffer using $allocator_name";
+        die "Failed to allocate buffer using $allocator_name.\n";
     }
     my $buffer_identifier = ident $new_buffer;
 
@@ -175,7 +216,7 @@ $consume_or_allocate_private_func = sub {
     my $start_address =
       $allocator_function{$allocator_name}{get_buffer_address}
       ->( ${$new_buffer} )
-      or croak "Failed to get buffer address";
+      or die "Failed to get buffer address";
     my $end_address = $start_address + $num_of_items * $size_of_each_item - 1;
     while ( my ( $existing_buffer_identifier, $regions_of_buffers ) =
         each %memory_region )
@@ -187,7 +228,7 @@ $consume_or_allocate_private_func = sub {
             # avoids double free in DESTROY - have the OS do the cleanup
             $is_nonoverlapping{$existing_buffer_identifier} = 0;
             $is_nonoverlapping{$buffer_identifier}          = 0;
-            carp "Memory region overlap detected";
+            die "Memory region overlap detected";
         }
     }
 
@@ -200,6 +241,7 @@ $consume_or_allocate_private_func = sub {
     $allocator_of{$buffer_identifier}      = $allocator_name;
     $is_nonoverlapping{$buffer_identifier} = 1;
     $creation_opts{buffer_identifier}      = $opts_ref;
+
     if ( $opts_ref->{delayed_gc} ) {
         $delayed_gc_for{$buffer_identifier} = $new_buffer;
     }
@@ -248,7 +290,7 @@ sub DESTROY {
 #               $pos_end   - The ending position of the region
 # Throws      : n/a
 # Comments    : Returns undef if attempt to overrun buffer, or
-#                if pos_start > pos_end,
+#               if pos_start > pos_end,
 #               if pos_end is missing, then it will be set to the end of the
 #               buffer,
 #               if pos_start is missing, then it will be set to the start of
@@ -338,7 +380,7 @@ Task::MemManager - A memory allocated and manager for low level code in Perl.
 
 =head1 VERSION
 
-version 0.05
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -374,7 +416,7 @@ The default allocator is PerlAlloc, which uses Perl's string functions to alloca
 
 =head2 new
 
-   Usage      : my $buffer = Task::MemManager->consume($buffer,10,1,
+  Usage      : my $buffer = Task::MemManager->consume($buffer,10,1,
                 {allocator => 'PerlAlloc'});
   Purpose     : Allocates a buffer using a specified allocator.
   Returns     : A reference to the buffer.
@@ -388,7 +430,9 @@ The default allocator is PerlAlloc, which uses Perl's string functions to alloca
       - death_stub: Function to call upon object destruction (if any).
       Additional options may be specified and the entire hash reference
       will be passed to the malloc function of the allocator.
-  Throws      : Croaks if the buffer allocation fails.
+  Throws      : Dies if the buffer allocation fails, or if the allocator
+                does not exist, or if one attempts to allocate a region that
+                overlaps with an existing buffer.
   Comments    : Default allocator is PerlAlloc, which uses Perl's string functions.
                 Default init_value is undef ('zero' zeroes out memory, 
                 any other byte value will initialize memory with that value).
@@ -415,8 +459,9 @@ The default allocator is PerlAlloc, which uses Perl's string functions to alloca
                 Additional options may be presented and the entire set of 
                 options will be passed to the malloc function of the 
                 allocator. 
-  Throws      : Croaks if the buffer allocation fails, or if the allocator
-                does not provide a consume function
+  Throws      : Dies if the buffer allocation fails, or if the allocator
+                does not provide a consume function, or if one attempts to
+                consume a region that overlaps with an existing buffer.
   Comments    : Default allocator is PerlAlloc, which uses Perl's string
                 functions,
                 Default init_value is undef ('zero' zeroes out memory, any
@@ -693,7 +738,7 @@ We will then create 2 bonafide Perl scalars, and then we will consume them
 using Task::MemManager::PerlAlloc. We will then try to consume one of the
 two Perl scalars using the memory address of the respective buffer 
 using Task::MemManager::CMalloc to show the detection of overlapping memory 
-regions, which causes the program to croak. Ordinarly, one would anticipate 
+regions, which causes the program to die. Ordinarly, one would anticipate 
 problems during the program shutdown as the DESTROY function is called to deal 
 with the Task::MemManager objects. This is prevented because we track the 
 regions that are overlapping and do not free them in the destructor.
@@ -762,14 +807,21 @@ This example is entirely self-contained.
 
 =head1 DIAGNOSTICS
 
-There are no diagnostics that one can use. The module will croak if the
+There are no diagnostics that one can use. The module will die if the
 allocation fails, so you don't have to worry about error handling. 
+There are some survivable errors, e.g. calling the constructor as a class
+method, in which case the method will return undef. 
+If you set up the environment variable DEBUG to a non-zero value, then
+a number of sanity checks will be performed, and the module will die
+with an (informative message ?) if something is wrong.
 
 =head1 DEPENDENCIES
 
 The module depends on the C<Inline::C> module to access the memory buffer 
-of the Perl scalar using the PerlAPI. In addition it depends implicitly
-on all the dependencies of the memory allocators it uses
+of the Perl scalar using the PerlAPI.
+Allocators are identified and loaded automatically from the
+Task::MemManager namespace using the C<Module::Find> and C<Module::Runtime> 
+modules (so you can count them among the dependencies too).
 
 =head1 TODO
 

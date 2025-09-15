@@ -2,7 +2,7 @@
 # MIT License
 
 class Mojolicious {
-  version "0.018";
+  version "0.019";
   
   use Mojolicious::Routes;
   use Mojo::Log;

@@ -1,0 +1,80 @@
+{
+   "abstract" : "Inertia.js adapter for Mojolicious",
+   "author" : [
+      "kobaken <kentafly88@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.25",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-Inertia",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Mojolicious" : "7.50",
+            "Scalar::Util" : "0",
+            "perl" : "5.016000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Mojo" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Mojolicious::Plugin::Inertia" : {
+         "file" : "lib/Mojolicious/Plugin/Inertia.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kfly8/Mojolicious-Plugin-Inertia/issues"
+      },
+      "homepage" : "https://github.com/kfly8/Mojolicious-Plugin-Inertia",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/kfly8/Mojolicious-Plugin-Inertia.git",
+         "web" : "https://github.com/kfly8/Mojolicious-Plugin-Inertia"
+      }
+   },
+   "version" : "0.01",
+   "x_authority" : "cpan:KFLY",
+   "x_serialization_backend" : "JSON::PP version 4.16",
+   "x_static_install" : 1
+}

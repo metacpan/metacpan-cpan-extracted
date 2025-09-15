@@ -1,4 +1,4 @@
-package SPVM::Mojo::EventEmitter::Callback;
+package SPVM::Mojo::Callback;
 
 
 
@@ -6,15 +6,15 @@ package SPVM::Mojo::EventEmitter::Callback;
 
 =head1 Name
 
-SPVM::Mojo::EventEmitter::Callback - Callback for Mojo::EventEmitter
+SPVM::Mojo::Callback - Callback for Mojo::EventEmitter
 
 =head1 Description
 
-Mojo::EventEmitter::Callback interface in L<SPVM> is the callback for L<Mojo::EventEmitter|SPVM::Mojo::EventEmitter> class.
+Mojo::Callback interface in L<SPVM> is the callback for L<Mojo::EventEmitter|SPVM::Mojo::EventEmitter> class.
 
 =head1 Usage
 
-  interface Mojo::EventEmitter::Callback;
+  interface Mojo::Callback;
 
 =head1 Interface Methods
 

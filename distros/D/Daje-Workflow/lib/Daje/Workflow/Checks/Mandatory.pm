@@ -33,12 +33,16 @@ use Mojo::Base 'Daje::Workflow::Common::Checks::Base', -base, -signatures;
 # janeskil1525 E<lt>janeskil1525@gmail.comE<gt>
 #
 
+use Data::Dumper;
+
 sub check($self) {
     my $result = 1;
     if (length($self->checks()) > 0) {
         my @fields = split(',', $self->checks());
         my $length = scalar @fields;
         for (my $i = 0; $i < $length; $i++) {
+            my $temp = $self->context();
+            say "check " . Dumper($temp);
             if (!exists $self->context->{context}->{payload}->{$fields[$i]}) {
                 $result = 0;
                 $self->error->add_error("Mandatory field '$fields[$i]' is missing")

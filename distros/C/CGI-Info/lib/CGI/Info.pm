@@ -12,7 +12,7 @@ use Object::Configure 0.12;
 use File::Spec;
 use Log::Abstraction 0.10;
 use Params::Get 0.13;
-use Params::Validate::Strict;
+use Params::Validate::Strict 0.11;
 use Net::CIDR;
 use Return::Set;
 use Scalar::Util;
@@ -35,11 +35,11 @@ CGI::Info - Information about the CGI environment
 
 =head1 VERSION
 
-Version 1.06
+Version 1.07
 
 =cut
 
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 =head1 SYNOPSIS
 
@@ -139,7 +139,8 @@ The maximum file size you can upload (-1 for no limit), the default is 512MB.
 The class can be configured at runtime using environments and configuration files,
 for example,
 setting C<$ENV{'CGI__INFO__carp_on_warn'}> causes warnings to use L<Carp>.
-For more information about runtime configuration see L<Object::Configure>.
+For more information about configuring object constructors at runtime,
+see L<Object::Configure>.
 
 =cut
 
@@ -169,19 +170,22 @@ sub new
 	# Load the configuration from a config file, if provided
 	$params = Object::Configure::configure($class, $params);
 
-	if(defined($params->{'expect'})) {
-		# if(ref($params->{expect}) ne 'ARRAY') {
-			# Carp::croak(__PACKAGE__, ': expect must be a reference to an array');
-		# }
-		# # warn __PACKAGE__, ': expect is deprecated, use allow instead';
-		Carp::croak("$class: expect has been deprecated, use allow instead");
-	}
-
 	# Validate logger object has required methods
 	if(defined $params->{'logger'}) {
 		unless(Scalar::Util::blessed($params->{'logger'}) && $params->{'logger'}->can('info') && $params->{'logger'}->can('error')) {
 			Carp::croak("Logger must be an object with info() and error() methods");
 		}
+	}
+
+	if(defined($params->{'expect'})) {
+		# if(ref($params->{expect}) ne 'ARRAY') {
+			# Carp::croak(__PACKAGE__, ': expect must be a reference to an array');
+		# }
+		# # warn __PACKAGE__, ': expect is deprecated, use allow instead';
+		if(my $logger = $params->{'logger'}) {
+			$logger->error("$class: expect has been deprecated, use allow instead");
+		}
+		Carp::croak("$class: expect has been deprecated, use allow instead");
 	}
 
 	# Return the blessed object
@@ -2151,6 +2155,8 @@ things to happen.
 =head1 SEE ALSO
 
 =over 4
+
+=item * Test coverage report: L<https://nigelhorne.github.io/CGI-Info/coverage/>
 
 =item * L<Object::Configure>
 

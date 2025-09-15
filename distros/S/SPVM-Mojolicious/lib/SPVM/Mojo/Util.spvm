@@ -360,4 +360,42 @@ class Mojo::Util {
     return [(object)$params, Fn->substr($value, $offset)];
   }
   
+  static method _options : object[] ($args : object...)  {
+    
+    # The arguments are three pattern.
+    # 1. a value
+    # 2. a value and options
+    # 3. options
+    
+    unless (@$args <= 2) {
+      die "Too many arguments.";
+    }
+    
+    my $arg = (object)undef;
+    my $options = (object[])undef;
+    
+    if (@$args == 0) {
+      # Do nothing
+    }
+    elsif (@$args == 1) {
+      if ($args->[0] isa object[]) {
+        $options = (object[])$args->[0];
+      }
+      else {
+        $arg = $args->[0];
+      }
+    }
+    elsif (@$args == 2) {
+      $arg = $args->[0];
+      if ($args->[1] isa object[]) {
+        $options = (object[])$args->[1];
+      }
+      else {
+        die "The type of the second argument must be object[].";
+      }
+    }
+    
+    return [$arg, $options];
+  }
+
 }

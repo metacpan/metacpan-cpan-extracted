@@ -5,10 +5,12 @@ ignore.txt
 lib/CGI/Info.pm
 LICENCE
 Makefile.PL
-MANIFEST
+MANIFEST			This list of files
 MANIFEST.SKIP
 README
 README.md
+scripts/generate_index.pl
+SECURITY.md
 t/00-load.t
 t/10-compile.t
 t/20-new.t

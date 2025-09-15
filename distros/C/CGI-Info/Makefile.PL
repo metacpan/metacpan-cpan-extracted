@@ -33,9 +33,14 @@ WriteMakefile(
 	CONFIGURE_REQUIRES => {
 		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
 	}, TEST_REQUIRES => {
+		'File::Glob' => 0,
+		'File::Slurp' => 0,
+		'File::stat' => 0,
 		'File::Temp' => 0,
 		'LWP::UserAgent' => 0,
 		'JSON::PP' => 4.02,	# Fix http://www.cpantesters.org/cpan/report/78a1401c-42de-11e9-bf31-80c71e9d5857
+		'POSIX' => 0,
+		'Readonly' => 0,
 		'Test::Carp' => 0,
 		'Test::Compile' => 0,
 		'Test::DescribeMe' => 0,
@@ -62,7 +67,7 @@ WriteMakefile(
 		'Net::CIDR' => 0,
 		'Object::Configure' => 0.12,
 		'Params::Get' => 0.13,
-		'Params::Validate::Strict' => 0.02,
+		'Params::Validate::Strict' => 0.11,
 		'Return::Set' => 0,
 		'Scalar::Util' => 0,
 		'Sys::Hostname' => 0,

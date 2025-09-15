@@ -1,3 +1,9 @@
+0.05 2025-08-02T20:48:13+02:00
+ - Fix example in doc.
+ - Move check_array_object() to Mo::utils::Array.
+ - Rewrite check of id to Mo::utils::Number::check_positive_natural().
+ - Update copyright years.
+
 0.04 2024-05-27T19:41:28+02:00
  - API CHANGE: Remove 'active' parameter from Data::Login::Role.
  - API CHANGE: Parameter 'valid_from' is required in Data::Login::Role.

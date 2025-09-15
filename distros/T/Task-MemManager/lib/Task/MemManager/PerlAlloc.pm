@@ -1,11 +1,29 @@
 package Task::MemManager::PerlAlloc;
-$Task::MemManager::PerlAlloc::VERSION = '0.05';
+$Task::MemManager::PerlAlloc::VERSION = '0.07';
 use strict;
 use warnings;
-use Carp            qw(croak);
+
 use Convert::Scalar qw(len readonly grow readonly_on);
 use Inline ( C => 'DATA', );
-use constant { ZERO_STRING_BYTE => 0, };
+use Config;
+my $MAX_ADDR;
+
+BEGIN {
+    use constant DEBUG => $ENV{DEBUG} // 0;
+    if (DEBUG) {
+        use Carp;
+    }
+    if ( $Config{ptrsize} == 8 ) {
+        $MAX_ADDR = 2**48 - 1;
+    }
+    elsif ( $Config{ptrsize} == 4 ) {
+        $MAX_ADDR = 2**32 - 1;
+    }
+    else {
+        die "Unsupported pointer size: $Config{ptrsize} "
+          . "when initializing the package Task::MemManager::View::PDL\n";
+    }
+}
 
 Inline->init()
   ; ## prevents warning "One or more DATA sections were not processed by Inline"
@@ -46,21 +64,21 @@ sub get_buffer_address {
 # Returns     : A reference to the buffer (to be used by Task::MemManager)
 # Parameters  : $num_of_items     - Number of items in the buffer
 #               $size_of_each_item - Size of each item in the buffer
-#               $init_value        - Value to initialize the buffer with
-# Throws      : Croaks if the buffer allocation fails
+#               $init_value        - Value to initialize the buffer with (0-255)
+# Throws      : dies if the buffer allocation fails
 # Comments    : None
 # See Also    : n/a
 
 sub malloc {
-    my ( $num_of_items, $size_of_each_item, $init_value) = @_;
+    my ( $num_of_items, $size_of_each_item, $init_value ) = @_;
     my $buffer_size = $num_of_items * $size_of_each_item;
 
-    my $byte_value =
-      ( lc $init_value eq 'zero' || !defined $init_value )
-      ? ZERO_STRING_BYTE
-      : ord $init_value;
+    die "Invalid $buffer_size, should be between [0,$MAX_ADDR]\n"
+      if ( !defined($buffer_size)
+        || $buffer_size <= 0
+        || $buffer_size > $MAX_ADDR );
 
-    my $buffer = ( pack "C", $byte_value ) x $buffer_size;
+    my $buffer = ( pack "C", $init_value ) x $buffer_size;
 
     return \$buffer;
 }
@@ -78,7 +96,7 @@ sub malloc {
 #                                  If the length is less than the actual length
 #                                  of the buffer, only the specified length
 #                                  will be consumed.
-# Throws      : Croaks if the external buffer is not defined, or if it is not a
+# Throws      : dies if the external buffer is not defined, or if it is not a
 #               scalar reference or if the length of the external buffer is
 #               non-positive.
 # Comments    : The Perl buffer is *copied* into a new scalar variable, so the
@@ -88,14 +106,19 @@ sub malloc {
 
 sub consume {
     my ( $external_buffer_ref, $length ) = @_;
-    croak "External buffer is not defined" unless defined $external_buffer_ref;
-    croak "External buffer is not a scalar reference"
-      unless ref($external_buffer_ref) eq 'SCALAR';
-    my $current_length = length($$external_buffer_ref);
-    croak "External buffer is read-only" if readonly($external_buffer_ref);
-    croak "Length of external buffer is not positive"
-      unless $current_length > 0;
+    if (DEBUG) {
+        die "External buffer is not defined"
+          unless defined $external_buffer_ref;
+        die "External buffer is not a scalar reference"
+          unless ref($external_buffer_ref) eq 'SCALAR';
+    }
 
+    my $current_length = length($$external_buffer_ref);
+    if (DEBUG) {
+        die "External buffer is read-only" if readonly($external_buffer_ref);
+        die "Length of external buffer is not positive"
+          unless $current_length > 0;
+    }
     my $returned_buffer = $$external_buffer_ref;
     grow( $returned_buffer, $length )
       if $length != $current_length;
@@ -112,7 +135,7 @@ Task::MemManager::PerlAlloc - Allocates buffers using Perl's string functions
 
 =head1 VERSION
 
-version 0.05
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -153,8 +176,11 @@ Returns the memory address of the buffer as a Perl scalar.
 
 =head1 DIAGNOSTICS
 
-There are no diagnostics that one can use. The module will croak if the
+There are no diagnostics that one can use. The module will die if the
 allocation fails, so you don't have to worry about error handling. 
+If you set up the environment variable DEBUG to a non-zero value, then
+a number of sanity checks will be performed, and the module will croak
+with an (informative message ?) if something is wrong.
 
 =head1 DEPENDENCIES
 

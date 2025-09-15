@@ -1,0 +1,112 @@
+How to get cpan2rpm to work under RedHat 6.x:
+
+There are a number of quirks to be aware of when using
+cpan2rpm under RedHat 6.0, 6.1, or 6.2 because of the
+older perl 5.00503 and older ExtUtils::MakeMaker and
+older rpm 3.0.x that comes with it.  If it is feasible
+to upgrade to a more recent RedHat version, I recommend
+to do so.  If it is too inconvenient to upgrade right
+now, but you wish to still use cpan2rpm, then follow
+the instructions below.
+
+Issue #1: LWP is quite painful to install.
+
+LWP is quite painful to install.  I don't recommend even
+attempting to install it (if you haven't already) at least
+until you get cpan2rpm up and running.  Download tarball
+and extract manually.
+
+$ lynx http://[url]/cpan2rpm-xxx.tar.gz
+$ gtar -zxvf cpan2rpm-*.tar.gz
+$ ./cpan2rpm --mk ~/redhat
+
+Issue #2: sudo
+
+I haven't been able to find a real sudo utility that
+works under the old redhat distro.  So here's a hack:
+
+$ mkdir ~/bin
+$ echo -e '#!/usr/bin/perl\nexec "su","-c","@ARGV";' > ~/bin/sudo
+$ chmod 0755 ~/bin/sudo
+
+This isn't as good as the real sudo because you have
+to type the root password instead of your user password.
+But the worst part is that you have to keep typing it,
+whereas the real sudo will cache the password for a
+while after the first successful attempt.  Let me know
+if you think of a better way.
+
+Issue #3: RPM 3.0.x
+
+The old rpm does not have two required macros.
+
+$ echo %__perl /usr/bin/perl >> ~/.rpmmacros
+$ echo %makeinstall make install >> ~/.rpmmacros
+
+The rpms posted on the arix site are not compatible
+with the old rpm.  You'll need to build it manually.
+There is no rpmbuild command on the older versions.
+Just use the rpm command instead.
+
+$ gtar -zxvf cpan2rpm-*.tar.gz
+$ cd cpan2rpm-*
+$ perl Makefile.PL
+$ make
+$ make test
+$ make dist
+$ rpm -ta cpan2rpm-*.tar.gz
+$ sudo rpm -Uvh ~/redhat/RPMS/noarch/cpan2rpm-*.rpm
+Password: <root_password_instead_of_user_password>
+
+Issue #4: Perl 5.005
+
+For security reasons, it is good to use File::Temp
+instead of passing --tempdir= all the time.
+Unfortunately, the old version of File::Spec that
+comes with the old perl is not good enough for
+File::Temp so you'll need to upgrade that first.
+
+$ rm -rf /tmp/cpan2rpm
+$ cpan2rpm --tempdir /tmp/cpan2rpm --install --shadow-pure File::Spec
+$ rm -rf /tmp/cpan2rpm
+$ cpan2rpm --tempdir /tmp/cpan2rpm --install File::Temp
+$ rm -rf /tmp/cpan2rpm
+
+Issue #5: MakeMaker
+
+To upgrade MakeMaker requires a few dependancies first.
+It is probably not necessary nor worth the trouble.
+It is recommened to skip this section,  but if you
+really want to try the new MakeMaker on the old perl,
+then here is how:
+
+# For Pod::Parser
+$ cpan2rpm --install PodParser
+
+# For Term::ANSIColor
+$ cpan2rpm --install ANSIColor
+
+# For Pod::Man
+$ cpan2rpm --shadow-pure podlators
+$ sudo rpm -ql -p ~/redhat/RPMS/i386/perl-podlators-1.25-1.i386.rpm " | xargs -i echo '[ -e {} ] && echo cp --verbose --preserve {} {}.rpmsave' | sh | sh"
+$ sudo rpm --replacefiles -Uvh ~/redhat/RPMS/i386/perl-podlators-1.25-1.i386.rpm
+
+# Test::Harness has a weird author?
+$ cpan2rpm --install --shadow-pure Test::Harness
+
+# And finally ExtUtils::MakeMaker
+# Not sure why that one regex test keeps failing.
+$ cpan2rpm --install --make-no-test --shadow-pure ExtUtils::MakeMaker
+
+Issue #6: HTTP::Lite
+
+It is nice to have a perl module to download the remote URLs on the fly.
+
+cpan2rpm --install HTTP::Lite
+
+It is left as an excercise to the reader to install LWP (bloat).
+
+Good luck!
+
+Rob Brown <bbb@cpan.org>
+$Id: README.redhat6,v 1.5 2003-04-26 20:06:18 bbb Exp $

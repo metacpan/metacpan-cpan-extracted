@@ -165,7 +165,7 @@ class Mojo::Transaction::WebSocket extends Mojo::Transaction {
     $self->handshake->resume;
   }
   
-  method send : void ($msg : object of string|object[]|Mojo::WebSocket::Frame, $cb : Mojo::EventEmitter::Callback = undef) {
+  method send : void ($msg : object of string|object[]|Mojo::WebSocket::Frame, $cb : Mojo::Callback = undef) {
     
     if ($cb) {
       $self->once(drain => $cb);

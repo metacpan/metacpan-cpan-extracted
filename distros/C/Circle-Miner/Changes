@@ -3,3 +3,8 @@ Revision history for Circle-Miner
 0.01    Date/time
         First version, released on an unsuspecting world.
 
+0.02   Mar 28, 2025
+       support common debug config
+
+0.03   Sep 5, 2025
+       revamp the docs for the miner module.

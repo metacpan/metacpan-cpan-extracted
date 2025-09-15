@@ -36,20 +36,20 @@ class Mojolicious::Plugins extends Mojo::EventEmitter {
   # Instance Methods
   method emit_chain : object ($name : string, $arg1 : object = undef, $arg2 : object = undef, $arg3 : object = undef) {
     
-    my $wrapper = (Mojo::EventEmitter::Callback)undef;
+    my $wrapper = (Mojo::Callback)undef;
     
     my $subscribers = $self->subscribers($name);
     
     my $subscribers_length = @$subscribers;
     
-    my $cb = (Mojo::EventEmitter::Callback)undef;
+    my $cb = (Mojo::Callback)undef;
     for (my $i = $subscribers_length - 1; $i >= 0; $i--) {
       
       $cb = $subscribers->[$i];
       
       my $next = $wrapper;
       
-      $wrapper = [$cb : Mojo::EventEmitter::Callback, $next : Mojo::EventEmitter::Callback, $arg1 : object, $arg2 : object, $arg3 : object] method : object () {
+      $wrapper = [$cb : Mojo::Callback, $next : Mojo::Callback, $arg1 : object, $arg2 : object, $arg3 : object] method : object () {
         $cb->($next, $arg1, $arg2, $arg3);
       };
     }

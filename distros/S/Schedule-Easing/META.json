@@ -1,5 +1,5 @@
 {
-	"version" : "0.1.3",
+	"version" : "0.1.4",
 	"name"    : "Schedule-Easing",
 	"author"  : ["Brian Blackmore <BBLACKM@cpan.org>"],
 	"abstract": "Stateless, stable selection of events with increased frequency during a schedule",

@@ -12,7 +12,7 @@ use Crypt::URandom qw( urandom );
 use constant SIZE => 1 << 31;
 use constant MASK => SIZE - 1;
 
-our $VERSION = 'v0.1.2';
+our $VERSION = 'v0.1.3';
 
 use version 0.77; $VERSION = version->declare($VERSION);
 
@@ -26,7 +26,7 @@ sub rand(;$) {
     my ($b) = unpack( "N", urandom(4) ) & MASK;
     if ( $ENV{CRYPT_URANDOM_MONKEYPATCH_DEBUG} ) {
         my ( $package, $filename, $line ) = caller;
-        say STDERR __PACKAGE__ . "::urandom used from ${package} line ${line}";
+        print STDERR __PACKAGE__ . "::urandom used from ${package} line ${line}\n";
     }
     return $a * $b / SIZE;
 }
@@ -46,7 +46,7 @@ Crypt::URandom::MonkeyPatch - override core rand function to use system random s
 
 =head1 VERSION
 
-version v0.1.2
+version v0.1.3
 
 =for stopwords cryptographic
 

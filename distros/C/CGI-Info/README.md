@@ -7,7 +7,8 @@ CGI-Info
 [![CPAN](https://img.shields.io/cpan/v/CGI-Info.svg)](http://search.cpan.org/~nhorne/CGI-Info/)
 ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/nigelhorne/cgi-info/test.yml?branch=master)
 ![Perl Version](https://img.shields.io/badge/perl-5.8+-blue)
-[![Travis Status](https://travis-ci.org/nigelhorne/CGI-Info.svg?branch=master)](https://travis-ci.org/nigelhorne/CGI-Info)
+[![Security Policy](https://img.shields.io/badge/security-policy-blue.svg)](SECURITY.md)
+<!-- [![Travis Status](https://travis-ci.org/nigelhorne/CGI-Info.svg?branch=master)](https://travis-ci.org/nigelhorne/CGI-Info) -->
 [![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://x.com/intent/tweet?text=Information+about+the+CGI+Environment+#perl+#CGI&url=https://github.com/nigelhorne/cgi-info&via=nigelhorne)
 
 # NAME
@@ -16,7 +17,7 @@ CGI::Info - Information about the CGI environment
 
 # VERSION
 
-Version 1.06
+Version 1.07
 
 # SYNOPSIS
 
@@ -112,7 +113,8 @@ It takes other optional parameters:
 The class can be configured at runtime using environments and configuration files,
 for example,
 setting `$ENV{'CGI__INFO__carp_on_warn'}` causes warnings to use [Carp](https://metacpan.org/pod/Carp).
-For more information about runtime configuration see [Object::Configure](https://metacpan.org/pod/Object%3A%3AConfigure).
+For more information about configuring object constructors at runtime,
+see [Object::Configure](https://metacpan.org/pod/Object%3A%3AConfigure).
 
 ## script\_name
 
@@ -572,6 +574,7 @@ things to happen.
 
 # SEE ALSO
 
+- Test coverage report: [https://nigelhorne.github.io/CGI-Info/coverage/](https://nigelhorne.github.io/CGI-Info/coverage/)
 - [Object::Configure](https://metacpan.org/pod/Object%3A%3AConfigure)
 - [HTTP::BrowserDetect](https://metacpan.org/pod/HTTP%3A%3ABrowserDetect)
 - [https://github.com/mitchellkrogza/apache-ultimate-bad-bot-blocker](https://github.com/mitchellkrogza/apache-ultimate-bad-bot-blocker)

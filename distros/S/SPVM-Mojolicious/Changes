@@ -1,3 +1,7 @@
+0.019 2025-09-15
+  [Internal Changes]
+    * Fix generics.
+  
 0.018 2025-09-11
   [Changes]
     * Improve server related classes.

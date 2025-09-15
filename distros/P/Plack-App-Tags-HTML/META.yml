@@ -3,6 +3,9 @@ abstract: 'Plack application for running Tags::HTML objects.'
 author:
   - 'Michal Josef Spacek <skim@cpan.org>'
 build_requires:
+  Class::Utils: 0
+  English: 0
+  Error::Pure::Utils: 0
   ExtUtils::MakeMaker: 6.59
   File::Object: 0
   HTTP::Request::Common: 0
@@ -38,4 +41,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Plack-App-Tags-HTML
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Plack-App-Tags-HTML
-version: '0.17'
+version: '0.19'

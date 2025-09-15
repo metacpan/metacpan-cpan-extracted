@@ -60,7 +60,7 @@
    "provides" : {
       "Daje::Workflow" : {
          "file" : "lib/Daje/Workflow.pm",
-         "version" : "0.12"
+         "version" : "0.13"
       },
       "Daje::Workflow::Activities" : {
          "file" : "lib/Daje/Workflow/Activities.pm"
@@ -74,9 +74,32 @@
       "Daje::Workflow::Checks::Mandatory" : {
          "file" : "lib/Daje/Workflow/Checks/Mandatory.pm"
       },
+      "Daje::Workflow::Common::Activity::Base" : {
+         "file" : "lib/Daje/Workflow/Common/Activity/Base.pm"
+      },
+      "Daje::Workflow::Common::Checks::Base" : {
+         "file" : "lib/Daje/Workflow/Common/Checks/Base.pm"
+      },
       "Daje::Workflow::Create::State" : {
          "file" : "lib/Daje/Workflow/Create/State.pm",
          "version" : "0.01"
+      },
+      "Daje::Workflow::Database" : {
+         "file" : "lib/Daje/Workflow/Database.pm",
+         "version" : "0.19"
+      },
+      "Daje::Workflow::Database::Model" : {
+         "file" : "lib/Daje/Workflow/Database/Model.pm",
+         "version" : "0.16"
+      },
+      "Daje::Workflow::Database::Model::Context" : {
+         "file" : "lib/Daje/Workflow/Database/Model/Context.pm"
+      },
+      "Daje::Workflow::Database::Model::History" : {
+         "file" : "lib/Daje/Workflow/Database/Model/History.pm"
+      },
+      "Daje::Workflow::Database::Model::Workflow" : {
+         "file" : "lib/Daje/Workflow/Database/Model/Workflow.pm"
       },
       "Daje::Workflow::Errors::Error" : {
          "file" : "lib/Daje/Workflow/Errors/Error.pm"
@@ -97,7 +120,7 @@
          "web" : "https://github.com/janeskil1525/Daje-Workflow"
       }
    },
-   "version" : "0.12",
+   "version" : "0.13",
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

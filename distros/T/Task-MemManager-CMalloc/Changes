@@ -1,5 +1,9 @@
 Revision history for Task-MemManager-CMalloc
 
+0.03      2025-09-14 17:14:24-06:00 America/Denver
+- Initial value handled as an integer between 0-255 for allocation purposes
+- Replaced croak with die as the package approaches maturity
+- Added checks to ensure we do not allocate an invalid buffer size
 0.02      2025-09-10 22:45:58-06:00 America/Denver
 - Provided the consume functionality to the module.
 0.01      2024-12-01 20:32:46-07:00 America/Denver

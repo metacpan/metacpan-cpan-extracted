@@ -3,7 +3,7 @@ package Schedule::Easing;
 use strict;
 use warnings;
 
-our $VERSION='0.1.3';
+our $VERSION='0.1.4';
 
 use Carp qw/carp confess/;
 
@@ -78,8 +78,10 @@ sub schedule {
 		foreach my $ease (@{$$self{schedule}}) {
 			if(my %data=$ease->matches($message)) {
 				$scheduled=$ease->schedule(message=>$message,%data);
-				my $intsched=int($scheduled);
-				if($scheduled>$intsched) { $scheduled=1+$intsched }
+				if(defined($scheduled)) {
+					my $intsched=int($scheduled);
+					if($scheduled>$intsched) { $scheduled=1+$intsched }
+				}
 				last;
 			}
 		}
@@ -100,7 +102,7 @@ Schedule::Easing - Stateless, stable filtering of events with ramp-up activation
 
 =head1 VERSION
 
-Version 0.1.3
+Version 0.1.4
 
 =head1 SYNOPSIS
 
@@ -133,6 +135,7 @@ Version 0.1.3
   );
   
   my @matches=$easing->matches(ts=>time(), events=>\@events);
+  my @timestamps=$easing->schedule(events=>\@events);
 
 =head1 DESCRIPTION
 
@@ -219,6 +222,14 @@ Adjusting the values controls the initial and final message rates.  At C<begin=0
 
 For all easing types, if C<final=1>, matching messages are always included after C<tsB>.  When C<finalE<lt>1>, messages that weren't included before C<tsB> will I<never be included> after C<tsB>.
 
+Here is a summary of the message inclusion rates for various combinations of C<begin> and C<final>:
+
+  begin final  <tsA   tsA   tsB  >tsB
+  0     1        0%    0%  100%  100%
+  0.1   0.9     10%   10%   90%   90%
+  1     0      100%  100%    0%    0%
+  0.9   0.1     90%   90%   10%   10%
+
 =head2 Easing Types
 
 The value given to each message when comparing against the currently-computed threshold is determined by the easing type.
@@ -294,6 +305,12 @@ All above examples call C<$easing-E<gt>matches(events=>[event, ...])> using line
 
 An array of event objects can be passed instead of simple strings.  An individual C<event> can be a hash of the form C<{message=>"...",...}> or an array of the form C<[message,...]>, and the C<message> will be used for matching purposes.  The returned list will be the entire matching event objects.
 
+=head2 Relaxing
+
+Support is currently I<experimental>:  Shaping functions and their inverses have been tested for relaxing, but otherwise only a few high level tests have been performed.
+
+Configurations with C<beginE<gt>final> can be used for message reduction, or "relaxing", situations.  Relaxing follows the same behaviors as easing with the notions of starting and ending behaviors flipped.  For individual shaping functions, it's easiest to think of the shape as a vertical mirror image (around the central y-axis).  For example, an easing power curve with C<exponent=2> has C<p=0.25> at the middle timestamp, whereas a relaxing curve has C<p=0.75>; both are still "flatter near the beginning and steeper near the end".
+
 =head1 Validation and Debugging
 
 When a non-fatal error is encountered, C<$$easing{_err}=1> will be set.  At this time no additional information is provided, except as emitted by C<carp>.
@@ -305,6 +322,12 @@ Some parameters to an easing entry are mandatory and will fail initialization vi
 =head2 Expired easing configurations
 
 Initializing the object with C<Schedule::Easing-E<gt>new(warnExpired=>1)> will report if any entries in the schedule have C<tsB> in the past, and C<final=1> or C<final=0>.  This permits discovery and removal of unneeded pattern matchers, which otherwise slow down processing.  When C<finalE<lt>1>, no warnings will be reported since filtering is still active.
+
+=head1 Timestamp Discovery
+
+Timestamp computation is possible for a collection of events by calling C<easing-E<gt>schedule(events=>[...])> and returns a list of items of the form C<[timestamp,event]>.  The C<timestamp> will be undefined if the event is never emitted, and zero if it is always emitted.
+
+Note:  Current C<timestamp> values have "two second accuracy" because of rounding behaviors.  Events may be included starting one second before or after the reported time.
 
 =head1 SEE ALSO
 

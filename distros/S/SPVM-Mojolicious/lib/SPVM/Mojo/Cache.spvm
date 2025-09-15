@@ -4,6 +4,9 @@
 class Mojo::Cache {
   version_from Mojolicious;
   
+  # Fields
+  has max_keys : rw int;
+  
   # Class Method
   static method new : Mojo::Cache () {
     

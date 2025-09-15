@@ -6,9 +6,10 @@ use warnings;
 use DateTime;
 use Error::Pure qw(err);
 use Mo qw(build default is);
-use Mo::utils 0.28 qw(check_isa check_length check_number_id check_required);
+use Mo::utils 0.28 qw(check_isa check_length check_required);
+use Mo::utils::Number qw(check_positive_natural);
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 has id => (
 	is => 'ro',
@@ -30,7 +31,7 @@ sub BUILD {
 	my $self = shift;
 
 	# Check id.
-	check_number_id($self, 'id');
+	check_positive_natural($self, 'id');
 
 	# Check role.
 	check_length($self, 'role', '100');
@@ -153,21 +154,24 @@ Returns L<DateTime> object or undef.
 =head1 ERRORS
 
  new():
-         Parameter 'id' must be a natural number.
-                 Value: %s
-         Parameter 'role' has length greater than '100'.
-                 Value: %s
-         Parameter 'role' is required.
-         Parameter 'valid_from' is required.
-         Parameter 'valid_from' must be a 'DateTime' object.
-                 Value: %s
-                 Reference: %s
-         Parameter 'valid_to' must be a 'DateTime' object.
-                 Value: %s
-                 Reference: %s
-         Parameter 'valid_to' must be older than 'valid_from' parameter.
-                 Value: %s
-                 Valid from: %s
+         From Mo::utils:
+                 Parameter 'role' has length greater than '100'.
+                         Value: %s
+                 Parameter 'role' is required.
+                 Parameter 'valid_from' is required.
+                 Parameter 'valid_from' must be a 'DateTime' object.
+                         Value: %s
+                         Reference: %s
+                 Parameter 'valid_to' must be a 'DateTime' object.
+                         Value: %s
+                         Reference: %s
+                 Parameter 'valid_to' must be older than 'valid_from' parameter.
+                         Value: %s
+                         Valid from: %s
+
+         From Mo::utils::Number::check_positive_natural():
+                 Parameter 'id' must be a positive natural number.
+                         Value: %s
 
 =head1 EXAMPLE
 
@@ -210,7 +214,8 @@ Returns L<DateTime> object or undef.
 L<DateTime>,
 L<Error::Pure>,
 L<Mo>,
-L<Mo::utils>.
+L<Mo::utils>,
+L<Mo::utils::Number>.
 
 =head1 REPOSITORY
 
@@ -224,12 +229,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2023-2024 Michal Josef Špaček
+© 2023-2025 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

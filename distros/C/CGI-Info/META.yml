@@ -4,10 +4,15 @@ author:
   - 'Nigel Horne <njh@nigelhorne.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  File::Glob: '0'
+  File::Slurp: '0'
   File::Temp: '0'
+  File::stat: '0'
   IPC::System::Simple: '0'
   JSON::PP: '4.02'
   LWP::UserAgent: '0'
+  POSIX: '0'
+  Readonly: '0'
   Taint::Runtime: '0'
   Test::Carp: '0'
   Test::CleanNamespaces: '0'
@@ -51,7 +56,7 @@ requires:
   Net::CIDR: '0'
   Object::Configure: '0.12'
   Params::Get: '0.13'
-  Params::Validate::Strict: '0.02'
+  Params::Validate::Strict: '0.11'
   Return::Set: '0'
   Scalar::Util: '0'
   Socket: '0'
@@ -66,5 +71,5 @@ resources:
   bugtracker: https://github.com/nigelhorne/CGI-Info/issues
   homepage: https://metacpan.org/pod/CGI::Info
   repository: git://github.com/nigelhorne/CGI-Info.git
-version: '1.06'
+version: '1.07'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

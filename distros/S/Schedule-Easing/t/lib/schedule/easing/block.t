@@ -27,6 +27,6 @@ subtest 'Includes'=>sub {
 subtest 'Schedule'=>sub {
 	plan tests=>1;
 	my $ease=Schedule::Easing::Block->new(match=>qr/a/);
-	is($ease->schedule(),0,'Always zero');
+	ok(!defined($ease->schedule()),'Always undefined');
 };
 

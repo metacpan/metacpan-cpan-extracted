@@ -111,7 +111,7 @@ if ($meta =~ /^\# (.*?)\n/s) {
 }
 
 print colored(['bright_white'],'Framebuffer.pm Modification'), ' ... ';
-open(my $FILE,'>','lib/Graphics/Framebuffer.pm');
+open(my $FILE,'>','lib/Graphics/Framebuffer.pm') || die "Cannot open 'lib/Graphics/Framebuffer.pm' for writing" ;
 print $FILE $template;
 close($FILE);
 print colored(['bright_green'],'Complete'),"\n\n";
@@ -237,14 +237,27 @@ sub slurp_file {
 
 sub no_framebuffer {
     my $fb_absent = TRUE;
-    foreach my $device (0 .. 31) {
-        foreach my $prefix (qw( /dev/fb /dev/fb/ /dev/graphics/fb/ )) {
-            if (-e "$prefix$device") {
-                $fb_absent = FALSE;
-                print colored(['bright_yellow'],'                FRAMEBUFFER'), ' ... ', colored(['bright_green'],'FOUND'), ' - ', colored(['cyan'],"$prefix$device"),"\n";
-            }
-        }
-    }
+	my $os = `uname`;
+	chomp($os);
+	if ($os eq 'Linux') {
+		foreach my $device (0 .. 31) {
+			foreach my $prefix (qw( /dev/fb /dev/fb/ /dev/graphics/fb/ )) {
+				if (-e "$prefix$device") {
+					$fb_absent = FALSE;
+					print colored(['bright_yellow'],'                FRAMEBUFFER'), ' ... ', colored(['bright_green'],'FOUND'), ' - ', colored(['cyan'],"$prefix$device"),"\n";
+				}
+			}
+		}
+	} elsif ($os eq 'FreeBSD') {
+		foreach my $device (0 .. 15) {
+			my $prefix = '/dev/ttyv';
+			my $path = $prefix . hex($device);
+			if (-e $path) {
+				$fb_absent = FALSE;
+				print colored(['bright_yellow'],'                FRAMEBUFFER'), ' ... ', colored(['bright_green'],'FOUND'), ' - ', colored(['cyan'],"$prefix$device"),"\n";
+			}
+		}
+	}
     if ($fb_absent) {
         print colored(['bright_yellow'],'                FRAMEBUFFER'), ' ... ', colored(['bright_red'],'NOT FOUND'),"\n";
     }

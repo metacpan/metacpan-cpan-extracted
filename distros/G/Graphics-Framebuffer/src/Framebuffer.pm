@@ -591,8 +591,14 @@ This instantiates the framebuffer object
 
 Framebuffer device name.  If this is not defined, then it tries the following devices in the following order:
 
+    Linux
+
       *  /dev/fb0 - 31
       *  /dev/graphics/fb0 - 31
+
+    FreeBSD
+
+      *  /dev/ttyv0 - F
 
 If none of these work, then the module goes into emulation mode.
 
@@ -734,6 +740,8 @@ Why do many video cards use the BGR color order?  Simple, their GPUs operate wit
     } elsif (-e '/usr/local/bin/ffmpeg') {
         $FFMPEG = '/usr/local/bin/ffmpeg';
     }
+	my $os = `/usr/bin/uname`;
+	chomp($os);
     my $self = {
         'SCREEN'        => '',            # The all mighty framebuffer that is mapped to the real framebuffer later
 
@@ -741,6 +749,7 @@ Why do many video cards use the BGR color order?  Simple, their GPUs operate wit
         'VERSION'       => $VERSION,      # Helps with debugging for people sending me dumps
         'HATCHES'       => [@HATCHES],    # Pull in hatches from Imager
         'FFMPEG'        => $FFMPEG,
+		'OS'            => $os,
 
         # Set up the user defined graphics primitives and attributes default values
         'Imager-Has-TrueType'  => $Imager::formats{'tt'}  || 0,
@@ -1064,17 +1073,30 @@ Why do many video cards use the BGR color order?  Simple, their GPUs operate wit
         };
         $self = { %{$self},%{$garbage} };
     }
-    unless (defined($self->{'FB_DEVICE'})) {     # We scan for all 32 possible devices at both possible locations
-        foreach my $dev (0 .. 31) {
-            foreach my $prefix (qw(/dev/fb /dev/fb/ /dev/graphics/fb)) {
-                if (-e "$prefix$dev") {
-                    $self->{'FB_DEVICE'} = "$prefix$dev";
-                    last;
-                }
-            }
-            last if (defined($self->{'FB_DEVICE'}));
-        }
-    }
+	if ($os =~ /FreeBSD/i) {
+		unless (defined($self->{'FB_DEVICE'})) {     # We scan for all 32 possible devices at both possible locations
+			my $prefix = 'dev/ttyv';
+			foreach my $dev (0 .. 15) {
+				my $device = hex($dev);
+				if (-e "$prefix$device") {
+					$self->{'FB_DEVICE'} = "$prefix$device";
+					last;
+				}
+			}
+		}
+	} elsif ($os =~ /Linux/i) {
+		unless (defined($self->{'FB_DEVICE'})) {     # We scan for all 32 possible devices at both possible locations
+			foreach my $dev (0 .. 31) {
+				foreach my $prefix (qw(/dev/fb /dev/fb/ /dev/graphics/fb)) {
+					if (-e "$prefix$dev") {
+						$self->{'FB_DEVICE'} = "$prefix$dev";
+						last;
+					}
+				}
+				last if (defined($self->{'FB_DEVICE'}));
+			}
+		}
+	}
     $self->{'CONSOLE'} = 1;
     eval {
         $self->{'CONSOLE'}      = _slurp('/sys/class/tty/tty0/active');

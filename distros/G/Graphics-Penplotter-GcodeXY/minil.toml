@@ -2,4 +2,8 @@ name = "Graphics-Penplotter-GcodeXY"
 badges = ["github-actions/test.yml"]
 module_maker="ModuleBuildTiny"
 static_install = "auto"
-no_github_issues=true
+no_github_issues = true
+
+[release]
+do_not_push_git = true
+push_to = ""

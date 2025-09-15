@@ -1,0 +1,250 @@
+NAME
+    Task::MemManager::View::PDL - Create PDL views of Task::MemManager
+    buffers
+
+VERSION
+    version 0.01
+
+SYNOPSIS
+      use Task::MemManager::View::PDL; ## this will also import Task::MemManager
+
+      my $length = 10;
+      my $mem = Task::MemManager->new(
+        $length, 1,
+        {
+            init_value => 40,
+            death_stub => sub {
+                my ($obj_ref) = @_;
+                printf "\n ======> Killing 0x%8x <======\n", $obj_ref->{identifier};
+            },
+            #allocator => 'CMalloc',
+        }
+      );
+      # Create a PDL view of a Task::MemManager buffer
+      my $pdl_view =  $mem->create_view('PDL');
+
+      # The same region as uint16_t
+      my $pdl_intview =
+      $mem->create_view( 'PDL', { pdl_type => 'short', view_name => 'PDL_short' } );
+
+DESCRIPTION
+    This module provides an interface to create PDL views of
+    Task::MemManager buffers. It uses Inline::C to interface with the PDL C
+    API. The created views will share memory with the Task::MemManager
+    buffers, so any changes made to the view may be reflected in the buffer
+    and vice versa. The emphasis is on may because PDL may decide to copy
+    the data to a new memory location for its own purposes, e.g. during a
+    transformation operation. In that case, the view will no longer share
+    memory with the original buffer. This opens up some interesting
+    possibilities, e.g. using PDL to transform data in a buffer and then
+    having Task::MemManager manage the transformed data. Refer to the
+    examples to see what is possible.
+
+METHODS
+  create_view
+      Usage       : $view =  $buffer->create_view($buffer_address, $buffer_size \%options);
+      Purpose     : Create a PDL view of the specified type for the buffer
+      Returns     : The created view (a PDL ndarray) or undef on failure
+                    The view is created using the buffer's memory.
+      Parameters  : $buffer_address - address of the buffer's memory
+                    $buffer_size    - size of the buffer's memory in bytes
+                    \%options - hash reference with options for the view. The
+                    supported options are:
+                        pdl_type - the PDL type of the view. Default is 'byte'.
+                                   See the %PDL_types hash for the supported types.
+                        dims     - array reference with the dimensions of the view.
+                                   Default is a one-dimensional view with as many
+                                   elements as fit in the buffer.
+      Throws      : The function will die if an unknown PDL type is specified.
+                    It will warn (but not die) if the buffer size is not a
+                    multiple of the requested number of elements times the
+                    element size.
+      Comments    : Returns undef if the view creation fails for any reason (e.g.
+                    stuff happening inside PDL).
+                    Warnings will be generated if DEBUG is set to a non-zero value.
+
+    The standard PDL types are supported during view creation. The size of
+    these types is hardcoded in the %PDL_types hash, except for 'indx',
+    'ldouble', and 'cldouble', which are determined at runtime using the
+    sizeof operator. The sizes below are based on GCC in an x86_64
+    environment and may need to be adjusted for other compilers:
+
+      my %PDL_types = (
+          sbyte     => [ 0,  1 ],
+          byte      => [ 1,  1 ],
+          short     => [ 2,  2 ],
+          ushort    => [ 3,  2 ],
+          long      => [ 4,  4 ],
+          ulong     => [ 5,  4 ],
+          indx      => [ 6,  4 ],
+          ulonglong => [ 7,  8 ],
+          longlong  => [ 8,  8 ],
+          float     => [ 9,  4 ],
+          double    => [ 10, 8 ],
+          ldouble   => [ 11, 8 ],
+          cfloat    => [ 12, 8 ],
+          cdouble   => [ 13, 8 ],
+          cldouble  => [ 14, 16 ],
+      );
+
+    The hash keys are the PDL type names and the values are [ type_code,
+    size_in_bytes ].
+
+  clone_view
+      Usage       : $view_clone = $view->clone_view();
+      Purpose     : Clone a PDL view
+      Returns     : The cloned view
+      Parameters  : $view - the PDL view to clone
+      Throws      : Nothing
+      Comments    : The cloned view will NOT share memory with the original view.
+                    This is a deep copy.
+
+EXAMPLES
+    Some of the examples are assumed to run sequentially, i.e. the same
+    buffer is used in multiple examples.
+
+  Example 1: Creating views
+      use Task::MemManager;
+      use Task::MemManager::View::PDL;
+
+      my $buffer = Task::MemManager->new_buffer(1024);
+      my $view = $buffer->create_view(0, 1024, { pdl_type => 'float', dims => [ 256, 4 ] });
+
+      if ($view) {
+          print "Created PDL view successfully\n";
+      } else {
+          print "Failed to create PDL view\n";
+      }
+
+  Example 2: Accessing and modifying data through the view
+      use Task::MemManager;
+      use Task::MemManager::View ;
+      use PDL;
+      use PDL::NiceSlice;
+
+      my $length = 10;
+      my $mem = Task::MemManager->new(
+          $length, 1,
+          {
+              init_value => 40,
+              death_stub => sub {
+                  my ($obj_ref) = @_;
+                  printf "\n ======> Killing 0x%8x <======\n", $obj_ref->{identifier};
+              },
+          }
+      );
+
+      # allows to print hex values of a string
+      sub print_hex_values {
+          my ( $string, $bytes_per_line ) = @_;
+          $bytes_per_line //= 8;    # Default to 8 bytes per line if not provided
+
+          my @bytes =
+            unpack( 'C*', $string );    # Unpack the string into a list of bytes
+
+          for ( my $i = 0 ; $i < @bytes ; $i++ ) {
+              printf( "%02X ", $bytes[$i] );   # Print each byte in hexadecimal format
+              print "\n"
+                if ( ( $i + 1 ) % $bytes_per_line == 0 )
+                ;    # Print a newline after every $bytes_per_line bytes
+          }
+          print "\n"
+            if ( @bytes % $bytes_per_line != 0 )
+            ;        # Print a final newline if the last line wasn't complete
+      }
+
+      my $task_buffer = $mem->get_buffer();
+      my $pdl_view =  $mem->create_view('PDL');
+
+      say $pdl_view;
+      print_hex_values($mem->extract_buffer_region(0,9),10);
+
+    Output should be (40 is 0x28 in hex):
+
+      [40 40 40 40 40 40 40 40 40 40]
+      28 28 28 28 28 28 28 28 28 28
+
+  Example 3: Modifying the PDL view in place, modifies the buffer
+    This continues from Example 2.
+
+      $pdl_view(0:4).=20;
+      $pdl_view +=1;  # implied in place
+      say $pdl_view->inplace->sqrt;
+      print_hex_values($mem->extract_buffer_region(0,9),10);
+
+    Output should be:
+
+      28 28 28 28 28 28 28 28 28 28 
+      [4 4 4 4 4 6 6 6 6 6]
+
+  Example 4: Cloning a view
+      say $mem->get_view('PDL_default');
+      say "Clone the view and increment it by one";
+      my $pdl_clone= $mem->clone_view('PDL_default');
+      say "Get an uint16_t view";
+      my $pdl_intview=$mem->create_view('PDL',{pdl_type=>'short',view_name=>'PDL_short'});
+
+      say "Initial View : ",$pdl_view;
+      say " Cloned View : ", $pdl_clone;
+      say "  Int32 View : ",$pdl_intview;
+
+    Output should be:
+
+      Clone the view and increment it by one
+      Get an uint16_t view
+      Initial View : [4 4 4 4 4 6 6 6 6 6]
+      Cloned View : [4 4 4 4 4 6 6 6 6 6]
+        Int32 View : [1028 1028 1540 1542 1542]
+
+DIAGNOSTICS
+    If you set up the environment variable DEBUG to a non-zero value, then a
+    number of sanity checks will be performed, and the module will carp with
+    an (informative message ?) if something is wrong.
+
+DEPENDENCIES
+    The module extends the "Task::MemManager::View" module so this is
+    definitely a dependency. It (obviously) requires the "PDL" (Perl Data
+    Language) module to be installed and the "Inline::C" module to interface
+    with the PDL C API.
+
+TODO
+    Open to suggestions. One idea is to add Magic to the views to support
+    various operations triggered via accessing or modifying the view. For
+    example, one could support GPU memory mapping.
+
+SEE ALSO
+    *   <https://metacpan.org/pod/Task::MemManager>
+
+        This module exports various internal perl methods that change the
+        internal representation or state of a perl scalar. All of these work
+        in-place, that is, they modify their scalar argument.
+
+    *   <https://metacpan.org/pod/Task::MemManager::View>
+
+        This module provides an interface to create views of
+        Task::MemManager buffers using various data processing libraries.
+
+    *   <https://metacpan.org/pod/Inline::C>
+
+        Inline::C is a module that allows you to write Perl subroutines in
+        C.
+
+    *   <https://perldoc.perl.org/perlguts>
+
+        Introduction to the Perl API.
+
+    *   <https://perldoc.perl.org/perlapi>
+
+        Autogenerated documentation for the perl public API.
+
+AUTHOR
+    Christos Argyropoulos, "<chrisarg at cpan.org>"
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2025 by Christos Argyropoulos.
+
+    This is free software; you can redistribute it and/or modify it under
+    the MIT license. The full text of the license can be found in the
+    LICENSE file See <https://en.wikipedia.org/wiki/MIT_License> for more
+    information.
+

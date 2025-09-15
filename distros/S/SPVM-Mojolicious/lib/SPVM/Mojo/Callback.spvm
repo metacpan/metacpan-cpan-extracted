@@ -1,7 +1,7 @@
 # Copyright (c) 2025 Yuki Kimoto
 # MIT License
 
-class Mojo::EventEmitter::Callback : interface_t {
+class Mojo::Callback : interface_t {
   version_from Mojolicious;
   
   # Interface Methods

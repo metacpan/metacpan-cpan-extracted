@@ -9,19 +9,17 @@ use Error::Pure qw(err);
 use Plack::Util::Accessor qw(component constructor_args data data_css data_init data_prepare);
 use Symbol::Get;
 
-our $VERSION = 0.17;
+our $VERSION = 0.19;
 
 sub _css {
 	my ($self, $env) = @_;
 
-	if ($self->{'_component'}->can('process_css')) {
-		my @data_css;
-		if (defined $self->data_css) {
-			push @data_css, @{$self->data_css};
-		}
-
-		$self->{'_component'}->process_css(@data_css);
+	my @data_css;
+	if (defined $self->data_css) {
+		push @data_css, @{$self->data_css};
 	}
+
+	$self->{'_component'}->process_css(@data_css);
 
 	return;
 }
@@ -93,11 +91,11 @@ sub _process_actions {
 	my ($self, $env) = @_;
 
 	if ($self->{'_component'}->can('init')) {
-		my @data = ();
 		if (defined $self->data_init) {
-			push @data, @{$self->data_init};
+			$self->{'_component'}->init(@{$self->data_init});
+		} else {
+			$self->{'_component'}->init;
 		}
-		$self->{'_component'}->init(@data);
 	}
 
 	# Copy Javascript code from component to main object.
@@ -208,7 +206,7 @@ Returns code of app.
 
 =head1 ERRORS
 
- prepare_app():
+ to_app():
          Cannot load component '%s'.
                  Error: %s
          Component must be a instance of 'Tags::HTML' class.
@@ -400,12 +398,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2021-2024 Michal Josef Špaček
+© 2021-2025 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.17
+0.19
 
 =cut

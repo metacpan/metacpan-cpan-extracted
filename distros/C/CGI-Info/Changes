@@ -1,5 +1,8 @@
 Revision history for CGI-Info
 
+1.07	Sun Sep 14 09:16:12 EDT 2025
+	Fix https://ci.appveyor.com/project/nigelhorne/cgi-info-vqpj8/builds/52537979/job/bnag8kvc2htkl3vf
+
 0.106	Thu Aug  7 19:37:56 EDT 2025
 	Added bidswitchbot as a bot
 	Allow 'St Peter&#39;s' as an argument

@@ -1,4 +1,4 @@
-package Graphics::Penplotter::GcodeXY v0.5.13;
+package Graphics::Penplotter::GcodeXY v0.5.16;
 
 use v5.38.2;  # required by List::Util and Term::ANSIcolor (perl testers matrix)
 use strict;
@@ -1566,7 +1566,7 @@ sub findfont {
     # otherwise try to find in the list of locations
     for (@locations) {
         $s = $_ . $name;
-        #print STDOUT "findfont: checking $s\n";
+        #print STDOUT "findfont: checking $s" . $EOL;
         if ( -f $s ) { return $s }
     }
     return $EMPTY_STR;
@@ -1839,7 +1839,7 @@ sub _flushPsegments {
         }
         if ( $k eq 'l' ) {    # lineto, the most frequent instruction
             $self->_addtopage(
-                sprintf "G01 X %.5f Y %.5f\n",
+                sprintf "G01 X %.5f Y %.5f" . $EOL,
                 $self->{psegments}[$i]{dx},
                 $self->{psegments}[$i]{dy}
             );
@@ -1848,7 +1848,7 @@ sub _flushPsegments {
         }
         if ( $k eq 'm' ) {    # moveto
             $self->_addtopage(
-                sprintf "G00 X %.5f Y %.5f\n",
+                sprintf "G00 X %.5f Y %.5f" . $EOL,
                 $self->{psegments}[$i]{dx},
                 $self->{psegments}[$i]{dy}
             );
@@ -1857,7 +1857,7 @@ sub _flushPsegments {
         }
         if ( $k eq 'c' ) {    # comment
             $self->_addtopage(
-                sprintf "(%s)\n",
+                sprintf "(%s)" . $EOL,
                 $self->{psegments}[$i]{s}
             );
             next SEGMENT;
@@ -1967,7 +1967,7 @@ sub _flushHsegments {
     my $d;
     if ( !$len ) {
         if ($self->{check}) {
-            print STDOUT "*** no hsegments found\n"
+            print STDOUT "*** no hsegments found" . $EOL
         }
         return;
     }
@@ -1985,7 +1985,7 @@ sub _flushHsegments {
                 $self->{pencount}++;
             }
             $self->_addtopage(
-                sprintf "G00 X %.5f Y %.5f\n",
+                sprintf "G00 X %.5f Y %.5f" . $EOL,
                 $self->{hsegments}[$i]{dx},
                 $self->{hsegments}[$i]{dy}
             );
@@ -1996,7 +1996,7 @@ sub _flushHsegments {
         }
         if ( $self->{hsegments}[$i]{key} eq 'l' ) {
             $self->_addtopage(
-                sprintf "G01 X %.5f Y %.5f\n",
+                sprintf "G01 X %.5f Y %.5f" . $EOL,
                 $self->{hsegments}[$i]{dx},
                 $self->{hsegments}[$i]{dy}
             );
@@ -2173,7 +2173,7 @@ sub _sameside {
     }
     else {
         if ($self->{check}) {
-            print STDOUT "sameside: cannot determine vertex 1 for $y of $seg1 and $seg2\n"
+            print STDOUT "sameside: cannot determine vertex 1 for $y of $seg1 and $seg2" . $EOL
         }
         return -1;
     }
@@ -2185,7 +2185,7 @@ sub _sameside {
     }
     else {
         if ($self->{check}) {
-            print STDOUT "sameside: cannot determine vertex 2 for $y of $seg1 and $seg2\n"
+            print STDOUT "sameside: cannot determine vertex 2 for $y of $seg1 and $seg2" . $EOL
         }
         return -1;
     }
@@ -2289,16 +2289,16 @@ sub _stats {
     my $self = shift;
     my $f    = $self->{fastdistcount};
     my $s    = $self->{slowdistcount};
-    print STDOUT "=== Object \'" . $self->{id} . "\'===\n";
-    print STDOUT sprintf "Bounding box:  (%.3f,%.3f) (%.3f,%.3f)\n",
+    print STDOUT "=== Object \'" . $self->{id} . "\'===" . $EOL;
+    print STDOUT sprintf "Bounding box:  (%.3f,%.3f) (%.3f,%.3f)" . $EOL,
                     $self->{minx}, $self->{miny}, $self->{maxx}, $self->{maxy};
     $self->_checkp();
     $self->_checkl();
     print STDOUT 'Pen cycles: ' . $self->{pencount} . $EOL;
     print STDOUT 'Distance above the paper: ';
-    print STDOUT sprintf "%.1f inches (%.1f cm, %.1f feet)\n", $f, $f * 2.54, $f * 0.0833;
+    print STDOUT sprintf "%.1f inches (%.1f cm, %.1f feet)" . $EOL, $f, $f * 2.54, $f * 0.0833;
     print STDOUT 'Distance on the paper:    ';
-    print STDOUT sprintf "%.1f inches (%.1f cm, %.1f feet)\n", $s, $s * 2.54, $s * 0.0833;
+    print STDOUT sprintf "%.1f inches (%.1f cm, %.1f feet)" . $EOL, $s, $s * 2.54, $s * 0.0833;
     return 1;
 }
 
@@ -2319,7 +2319,7 @@ sub _closepage {
     my $self = shift;
     my $out  = shift;
     if ( defined $out ) {
-        print $out $self->{trailer} . $EOL;
+        print {$out} $self->{trailer} . $EOL;
     }
     else {
         $self->_addtopage( $self->{trailer} );
@@ -2450,13 +2450,13 @@ sub _warn {
     # we check only the endpoint for now.
     # just assume the line started at (0.1, 0.1)
     if ( ( $x < 0 ) || ( $y < 0 ) ) {
-        print STDOUT "Out of bound: ($x,$y)\n";
+        print STDOUT "Out of bound: ($x,$y)" . $EOL;
         return 0;
     }
     ( $x0clip, $y0clip, $x1clip, $y1clip, $info ) =
         $self->_LiangBarsky( 0, 0, $self->{xsize}, $self->{ysize}, 0.1, 0.1, $x, $y );
     if ( $info != 1 ) {
-        print STDOUT "Out of bound: ($x,$y)\n";
+        print STDOUT "Out of bound: ($x,$y)" . $EOL;
     }
     return 1;
 }
@@ -2565,7 +2565,7 @@ my $best_fit = 'size too big for 4A0 landscape!';
                 last;
             }
     }
-    print STDOUT "best fit landscape: $best_fit\n";
+    print STDOUT "best fit landscape: $best_fit" . $EOL;
     return 1;
 }
 
@@ -2583,7 +2583,7 @@ my $best_fit = 'size too big for 4A0 portrait!';
                 last;
             }
     }
-    print STDOUT "best fit portrait:  $best_fit\n";
+    print STDOUT "best fit portrait:  $best_fit" . $EOL;
     return 1;
 }
 
@@ -2625,7 +2625,7 @@ sub importsvg {
     );
     $first = 1;
     if ($self->{check}) {
-        print STDOUT "$file:\n";
+        print STDOUT "$file:" . $EOL;
     }
     $self->gsave();
     $p->parsefile($file) or die "Error $file: ";
@@ -2814,7 +2814,7 @@ sub _starttag {
         $svgh = $attr{height};
         if ( $svgw && $svgh ) {
             if ($self->{check}) {
-                print STDOUT "SVG size: $svgw x $svgh\n"
+                print STDOUT "SVG size: $svgw x $svgh" . $EOL
             }
         }
         $svgvb = $attr{viewBox};
@@ -2914,14 +2914,14 @@ sub _dopath {
         # we won't see s or S because of the no_smooth option
         if ( $_->{svg_key} =~ m{\A[sS]\z}i ) {
             if ($self->{check}) {
-                print STDOUT "path internal error: s or S command found\n"
+                print STDOUT "path internal error: s or S command found" . $EOL
             }
         }
         # continue bezier t/T command
         # we won't see t or T because of the no_smooth option
         if ( $_->{svg_key} =~ m{\A[tT]\z}i ) {
             if ($self->{check}) {
-                print STDOUT "path internal error: t or T command found\n"
+                print STDOUT "path internal error: t or T command found"
             }
         }
         # arc
@@ -3232,7 +3232,7 @@ sub exporteps {
         }
         # now the postscript
         if ( $op eq $PU ) {
-            print {$out} "stroke\n";
+            print {$out} "stroke" . $EOL;
         }
         if ( $op eq $PD ) {
             # newpath needs to go before the moveto, see next lines
@@ -3243,10 +3243,10 @@ sub exporteps {
                 . $xn * $I2P
                 . $SPACE
                 . $yn * $I2P
-                . " moveto\n";
+                . " moveto" . $EOL;
         }
         if ( $op eq $G01 ) {
-            print {$out} $xn * $I2P . $SPACE . $yn * $I2P . " lineto\n";
+            print {$out} $xn * $I2P . $SPACE . $yn * $I2P . " lineto" . $EOL;
         }
     }
     # the stroke command added because there is no trailer (hack!)
@@ -3259,7 +3259,7 @@ sub exporteps {
         . $EOL;
     close $out;
     if ( $self->{check} ) {
-        print STDOUT sprintf "Bounding box:  (%.3f,%.3f) (%.3f,%.3f)\n",
+        print STDOUT sprintf "Bounding box:  (%.3f,%.3f) (%.3f,%.3f)" . $EOL,
           $minx * $I2P, $miny * $I2P, $maxx * $I2P, $maxy * $I2P;
         $self->_checkp();
         $self->_checkl();
@@ -3716,7 +3716,7 @@ sub _optimize {
         $after = scalar @{ $self->{psegments} };
         print STDOUT 'optimization removed '
             . ( $before - $after )
-            . " instructions\n"
+            . " instructions" . $EOL
     }
     return 1;
 }
@@ -4185,7 +4185,7 @@ sub split {
                 {    # start within border, virtual pen irrelevant
                     if ( $location == $OUT ) {
                         print STDOUT "%info ($prevx,$prevy) -> ($xn,$yn) "
-                                        . "==> ($x1,$y1)->($x2,$y2)\n";
+                                        . "==> ($x1,$y1)->($x2,$y2)" . $EOL;
                         quit('location mismatch error 1,3');
                     }
                     if ( $op == $G00 ) {
@@ -4208,7 +4208,7 @@ sub split {
                 elsif ( $info == 4 ) {    # start outside, end within
                     if ( $location == $IN ) {
                         print STDOUT "%info ($prevx,$prevy) -> ($xn,$yn) "
-                                        . "==> ($x1,$y1)->($x2,$y2)\n";
+                                        . "==> ($x1,$y1)->($x2,$y2)" . $EOL;
                         quit('location mismatch error 4');
                     }
                     if ( $op == $G00 ) {
@@ -4227,7 +4227,7 @@ sub split {
                 {    # both start and end outside boundary, but crosses inside
                     if ( $location == $IN ) {
                         print STDOUT "%info ($prevx,$prevy) -> ($xn,$yn) "
-                                        . "==> ($x1,$y1)->($x2,$y2)\n";
+                                        . "==> ($x1,$y1)->($x2,$y2)" . $EOL;
                         quit('location mismatch error 5');
                     }
                     if ( $op == $G00 ) {

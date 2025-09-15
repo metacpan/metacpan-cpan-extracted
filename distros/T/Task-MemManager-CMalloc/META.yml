@@ -26,16 +26,15 @@ no_index:
 provides:
   Task::MemManager::CMalloc:
     file: lib/Task/MemManager/CMalloc.pm
-    version: '0.02'
+    version: '0.03'
 requires:
-  Carp: '0'
   Inline: '0'
   strict: '0'
   warnings: '0'
 resources:
   homepage: https://github.com/chrisarg/task-memmanager-cmalloc
   repository: https://github.com/chrisarg/task-memmanager-cmalloc.git
-version: '0.02'
+version: '0.03'
 x_generated_by_perl: v5.38.0
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: MIT

@@ -4,43 +4,33 @@
 
 =head2 Documentation
 
-Documentation is likely incomplete.
-
-=head2 Script uses C<Easing::Stream>
-
-(Available with 0.1.3)  Script is currently linewise, but should be updated to leverage C<Easing::Stream>.
+Documentation is likely incomplete, but has also gotten a bit more complex as configuration options become supported (sorry).
 
 =head2 Script timestamps option
 
-(Available with 0.1.3)  C<schedule-easing.pl --timestamps> should work.  It is currently available but not well tested.
+(Available with 0.1.3)  C<schedule-easing.pl --timestamps> should work.  It is currently available but not fully tested.  See notes in L<Schedule::Easing/"Timestamp Discovery">.
 
-=head1 Tests
+=head2 Relaxing, reducing, decreasing messages over time is experimental
 
-All of the following need tests reviewed:
+(Available with 0.1.4) Behavior when C<beginE<gt>final> is partially tested.  Documentation may be incomplete.
 
-=over
+=head2 Power and Step inverses are experimental
 
-=item - C<Easing::schedule>, C<Easing::init>
+The functions have not been tested with the C<timestamps> calculations.
 
-=item - C<Easing::Ease>
+=head2 Timestamp support in Block
 
-=item - C<Easing::Block>
+The C<block> type is currently universal.  It may be useful to have a scheduled blocking event that starts at C<tsA>, or that concludes at C<tsB>, or both.
 
-=item - C<Easing::Stream>
+=head2 Pass type
 
-=item - MD5 edge cases
-
-=back
+Support C<type=pass> that always includes a matching message.  Will help with faster bailout and to avoid unexpected matching against later easing configurations.
 
 =head1 To Review
 
 =head2 C<Schedule::Easing::Stream>, C<alarm()>, and C<clock>
 
 See the comment about the single-use alarm() and how the C<clock> setting overlaps with the timing of batch processing.
-
-=head2 Reducing messages over time
-
-Behavior when C<beginE<gt>final> is undefined/untested.  There may be situations where message reduction is desirable, such as when messages will be removed prior to other cleanup/refactoring/deprecation efforts.
 
 =head2 Item weighting
 
@@ -50,12 +40,12 @@ All line/messages have the same weight.  Message weighting may be a property of 
 
 Both MD5 and Numeric can suffer from notable value gaps.  Currently that requires separate configurations.
 
-=head2 Sets
+=head2 Sets and rolling windows
 
-This library isn't really designed for ongoing rotation though I<sets of names>, such as oncall rotations or words, such as the names of the days of the week.  Preselection via modular arithmetic is a much simpler solution.  Additional examples of name-based scheduling are needed before considering this as an easing option.
+This library isn't designed for ongoing rotation though I<sets of names>, such as oncall rotations or words, such as the names of the days of the week.  Rolling MD5/numeric windows are also not supported at this time (the first 10%, the second 10%, the third 10%, ...).  Preselection via modular arithmetic is a much simpler solution, though it may be beneficial in the long term to support such behavior within a unified configuration.  Additional examples are needed before considering this as an easing option.
 
-=head2 Rolling increasing window
+=head2 Rolling expanding windows
 
-Windows of the form 1, 2, 3, ..., followed by "1 and 2", then "2 and 3", ..., then "1 and 2 and 3".  These can likely be achieved with MD5 using multiple digest captures.
+Windows of the form 1, 2, 3, ..., followed by "1 and 2", then "2 and 3", ..., then "1 and 2 and 3".  These can likely be achieved with MD5 using multiple digest captures.  Additional examples are needed before considering this as an easing option.
 
 =cut

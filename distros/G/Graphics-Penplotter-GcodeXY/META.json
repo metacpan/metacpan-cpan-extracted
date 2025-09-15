@@ -58,6 +58,7 @@
       },
       "test" : {
          "requires" : {
+            "File::Spec" : "0",
             "Test::More" : "0.98"
          }
       }
@@ -65,7 +66,7 @@
    "provides" : {
       "Graphics::Penplotter::GcodeXY" : {
          "file" : "lib/Graphics/Penplotter/GcodeXY.pm",
-         "version" : "v0.5.13"
+         "version" : "v0.5.16"
       }
    },
    "release_status" : "stable",
@@ -77,7 +78,7 @@
          "web" : "https://github.com/gamk67/Graphics-Penplotter-GcodeXY"
       }
    },
-   "version" : "v0.5.13",
+   "version" : "v0.5.16",
    "x_contributors" : [
       "gamk67 <31990368+gamk67@users.noreply.github.com>"
    ],

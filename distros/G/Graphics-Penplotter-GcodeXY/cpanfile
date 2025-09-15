@@ -6,7 +6,6 @@ on 'test' => sub {
 };
 
 requires 'perl', '5.38.2';
-
 requires 'Math::Bezier';
 requires 'Math::Trig';
 requires 'Image::SVG::Transform';
@@ -18,3 +17,5 @@ requires 'Font::FreeType';
 requires 'Term::ANSIColor';
 requires 'File::Temp';
 requires 'Readonly';
+
+test_requires 'File::Spec';

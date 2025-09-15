@@ -1,8 +1,14 @@
 Revision history for Perl extension Graphics-Penplotter-GcodeXY
 
-v0.5.13 2025-09-11T09:44:03Z
-
- 0.5.13 2025-09-11
+v0.5.16 2025-09-14T10:33:56Z
+    - svg test added
+    - fixed output bug
+    - use File::Spec for font path handling in test code
+    - copied Liberation font into t/data
+    - add test_require for File::spec to cpanfile
+    - replace \n by $EOL everywhere necessary for consistency
+    
+0.5.13 2025-09-11
     - cpanfile mods for cpan testers
     - debugging code refactoring
 
@@ -10,7 +16,7 @@ v0.5.13 2025-09-11T09:44:03Z
     - cleanup diagnostics output
     - STDOUT used where possible in print statements
 
-0.5.11 2025-09-06T14:17:35Z
+0.5.11 2025-09-06
     - minor fixes
 
 0.5.10 2025-09-06

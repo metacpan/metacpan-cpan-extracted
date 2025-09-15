@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use parent qw/Schedule::Easing::Ease/;
 
-our $VERSION='0.1.3';
+our $VERSION='0.1.4';
 
 sub _default_keys {
 	my ($self)=@_;
@@ -51,7 +51,7 @@ sub includes {
 
 sub schedule {
 	my ($self)=@_;
-	return 0;
+	return;
 }
 
 1;

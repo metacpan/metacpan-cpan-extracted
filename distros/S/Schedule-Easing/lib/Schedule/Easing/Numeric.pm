@@ -6,7 +6,7 @@ use parent qw/Schedule::Easing::Ease/;
 use Carp qw/carp confess/;
 use Scalar::Util qw/looks_like_number/;
 
-our $VERSION='0.1.3';
+our $VERSION='0.1.4';
 
 sub _default_keys {
 	my ($self)=@_;
@@ -82,8 +82,14 @@ sub schedule {
 	if(!defined($D{value})) { return 0 }
 	if(!looks_like_number($D{value})) { return 0 }
 	my $p=($D{value}-$$self{ymin})/$$self{yrange};
-	if($p<$$self{begin}) { return 0 }
-	if($p>$$self{final}) { return }
+	if($$self{begin}<$$self{final}) {
+		if($p<$$self{begin}) { return 0 }
+		if($p>$$self{final}) { return }
+	}
+	elsif($$self{begin}>$$self{final}) {
+		if($p>$$self{begin}) { return 0 }
+		if($p<$$self{final}) { return }
+	}
 	return $$self{_unshaper}->($p,@$self{qw/tsA tsB begin final/},@{$$self{shapeopt}});
 }
 

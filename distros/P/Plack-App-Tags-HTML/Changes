@@ -1,3 +1,15 @@
+0.19 2025-09-14T16:06:57+02:00
+ - Add test for constructor parameters.
+ - Add test for no component.
+ - Fix test dependencies.
+
+0.18 2025-09-14T15:46:21+02:00
+ - Add test for bad component.
+ - Fix typo in ERRORS section.
+ - Improve init() code.
+ - Remove check for process_css() method, it's in all Tags::HTML instances.
+ - Update copyright years.
+
 0.17 2024-04-21T12:34:17+02:00
  - Add test for 'css_data'.
  - Rewrite examples in doc to version with indented output.

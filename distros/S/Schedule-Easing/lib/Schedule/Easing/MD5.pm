@@ -5,7 +5,7 @@ use warnings;
 use parent qw/Schedule::Easing::Ease/;
 use Digest::MD5 qw/md5/;
 
-our $VERSION='0.1.3';
+our $VERSION='0.1.4';
 
 sub _default_keys {
 	my ($self)=@_;
@@ -56,8 +56,14 @@ sub schedule {
 	if(!$digest) { $digest=$D{message} }
 	if(!$digest) { return $$self{tsA} }
 	my $y=(unpack('L',substr(md5($digest//''),0,4))%$$self{tsrange})/$$self{tsrange};
-	if($y<$$self{begin}) { return 0 }
-	if($y>$$self{final}) { return }
+	if($$self{begin}<$$self{final}) {
+		if($y<$$self{begin}) { return 0 }
+		if($y>$$self{final}) { return }
+	}
+	elsif($$self{begin}>$$self{final}) {
+		if($y>$$self{begin}) { return 0 }
+		if($y<$$self{final}) { return }
+	}
 	return $$self{_unshaper}->($y,@$self{qw/tsA tsB begin final/},@{$$self{shapeopt}});
 }
 

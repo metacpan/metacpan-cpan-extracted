@@ -69,7 +69,7 @@ METHODS
     Returns code of app.
 
 ERRORS
-     prepare_app():
+     to_app():
              Cannot load component '%s'.
                      Error: %s
              Component must be a instance of 'Tags::HTML' class.
@@ -234,10 +234,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2021-2024 Michal Josef Špaček
+    © 2021-2025 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.17
+    0.19
 

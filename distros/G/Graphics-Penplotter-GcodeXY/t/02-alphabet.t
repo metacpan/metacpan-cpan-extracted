@@ -2,13 +2,13 @@
 
 use strict;
 use warnings;
-#use Data::Printer;
-use Data::Dumper;
 use Graphics::Penplotter::GcodeXY;
 use Test::Simple 'no_plan';
 use Font::FreeType;
+use File::Spec;
 
-my $font    = 'LiberationSans-Regular.ttf';
+my $font      = 'LiberationSans-Regular.ttf';
+my $font_path = File::Spec->catfile('t', 'data', $font);
 my $string1 = "EFILTZ";  # 2 crossings
 my $string2 = "ABCDGHJK";
 my $string3 = "MNOPQR";
@@ -32,7 +32,7 @@ my $g = new Graphics::Penplotter::GcodeXY(
 
 my $y = 100;
 my $x = 50;
-my $face = $g->setfont($font, 100);
+my $face = $g->setfont($font_path, 100);
 
    foreach my $i (1 .. 9) {
          ok($g->gsave());

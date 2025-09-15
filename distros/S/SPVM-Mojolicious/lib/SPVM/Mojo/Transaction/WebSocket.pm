@@ -291,7 +291,7 @@ Resume L</"handshake"> transaction.
 
 =head2 send
 
-C<method send : void ($msg : object of string|object[]|L<Mojo::WebSocket::Frame|SPVM::Mojo::WebSocket::Frame>, $cb : L<Mojo::EventEmitter::Callback|SPVM::Mojo::EventEmitter::Callback> = undef);>
+C<method send : void ($msg : object of string|object[]|L<Mojo::WebSocket::Frame|SPVM::Mojo::WebSocket::Frame>, $cb : L<Mojo::Callback|SPVM::Mojo::Callback> = undef);>
 
 Send message or frame non-blocking via WebSocket, the optional drain callback will be executed once all data has been
 written.

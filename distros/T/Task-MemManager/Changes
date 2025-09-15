@@ -1,5 +1,14 @@
 Revision history for Task-MemManager
 
+0.07      2025-09-14 15:17:53-06:00 America/Denver
+- Fixed subtle bug in the new method that was expecting a reference to the class
+0.06      2025-09-14 14:29:14-06:00 America/Denver
+- Moved the generation of the initial value as a byte into the new method
+- Fixed importing of View and GPU modules unless explicitly requested
+- Changed carp to warn and croak to die as we are approaching a stable
+release
+- Added DEBUG constant to control debug output and checks from the environment
+- Added checks to ensure we do not allocate an invalid buffer size
 0.05      2025-09-13 06:51:51-06:00 America/Denver
 - Fixed documentation formatting
 0.04      2025-09-12 17:52:43-06:00 America/Denver

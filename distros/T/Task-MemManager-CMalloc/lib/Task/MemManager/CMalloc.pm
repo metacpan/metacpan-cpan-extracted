@@ -1,10 +1,9 @@
 package Task::MemManager::CMalloc;
-$Task::MemManager::CMalloc::VERSION = '0.02';
+$Task::MemManager::CMalloc::VERSION = '0.03';
 use strict;
 use warnings;
 
 use Config;
-use Carp qw(carp croak);
 use Inline ( C => 'DATA', );
 
 Inline->init()
@@ -18,7 +17,8 @@ BEGIN {
     } elsif ($Config{ptrsize} == 4) {
         $MAX_ADDR = 2**32 - 1;
     } else {
-        croak "Unsupported pointer size: $Config{ptrsize}";
+        die "Unsupported pointer size: $Config{ptrsize} "
+        . "when initializing the package Task::MemManager::CMalloc";
     }
 }
 ##############################################################################
@@ -26,7 +26,7 @@ BEGIN {
 # Purpose     : Frees the buffer allocated by malloc
 # Returns     : n/a
 # Parameters  : $buffer - Reference to the buffer
-# Throws      : Croaks if the buffer cannot be freed
+# Throws      : dies if the buffer cannot be freed
 # Comments    : None
 # See Also    : n/a
 
@@ -34,7 +34,7 @@ sub free {
     my ($buffer) = @_;
     my $in_error = _free_buffer($buffer);
     unless ( defined $in_error ) {
-        croak "Failed to free buffer using C's free";
+        die "Failed to free buffer using C's free";
     }
 }
 
@@ -44,7 +44,7 @@ sub free {
 # Purpose     : Returns the memory address of the buffer
 # Returns     : The memory address of the buffer
 # Parameters  : $buffer - A buffer allocated by malloc
-# Throws      : Croaks if the buffer address cannot be obtained
+# Throws      : dies if the buffer address cannot be obtained
 # Comments    : None
 # See Also    : n/a
 
@@ -60,29 +60,36 @@ sub get_buffer_address {
 # Parameters  : $num_of_items     - Number of items in the buffer
 #               $size_of_each_item - Size of each item in the buffer
 #               $init_value        - Value to initialize the buffer with
-# Throws      : Croaks if the buffer allocation fails
-# Comments    : None
+# Throws      : dies if the buffer allocation fails
+# Comments    : While not used here, Task::MemManager will pass the opts of
+#               the constructor to malloc as the third parameter. 
+# See Also    : n/a
+#
 # See Also    : n/a
 
 sub malloc {
     my ( $num_of_items, $size_of_each_item, $init_value ) = @_;
     my $buffer_size = $num_of_items * $size_of_each_item;
     my $buffer;
+    
+    die "Invalid $buffer_size, should be between [0,$MAX_ADDR]\n"
+      if ( !defined($buffer_size)
+        || $buffer_size <= 0
+        || $buffer_size > $MAX_ADDR );
 
     unless (  $init_value ) {
         $buffer = _alloc_with_malloc($buffer_size);
     }
-    elsif ( lc $init_value eq 'zero' ) {
+    elsif ( $init_value == 0 ) {
         $buffer = _alloc_with_calloc($buffer_size);
     }
     elsif (  $init_value ) {
-        $init_value = ord($init_value);
         $buffer = _alloc_with_malloc_and_set( $buffer_size, $init_value );
     }
 
     # Die without nuance if the buffer allocation fails
     unless ( defined $buffer ) {
-        croak "Failed to allocate buffer using C's malloc";
+        die "Failed to allocate buffer using C's malloc";
     }
     return \$buffer;
 }
@@ -99,7 +106,7 @@ sub malloc {
 #                                This info should be provided by the caller and
 #                                should be accurate to ensure no buffer
 #                                overflows occur.
-# Throws      : Croaks if the external buffer is not defined, or if it is not a
+# Throws      : dies if the external buffer is not defined, or if it is not a
 #               scalar reference or if the length of the external buffer is
 #               non-positive, or not a 64 bit address
 # Comments    : The external buffer value will be zeroed out by
@@ -108,11 +115,11 @@ sub malloc {
 
 sub consume {
     my ( $external_buffer_ref, $length ) = @_;
-    croak "External buffer is not defined" unless defined $external_buffer_ref;
-    croak "External buffer is not a scalar reference"
+    die "External buffer is not defined" unless defined $external_buffer_ref;
+    die "External buffer is not a scalar reference"
       unless ref($external_buffer_ref) eq 'SCALAR';
         
-        croak "Length of external buffer is not a valid memory address"
+        die "Length of external buffer is not a valid memory address"
             unless ($length > 0 && $length < $MAX_ADDR);
     my $return_value = $$external_buffer_ref;
     $$external_buffer_ref = 0;
@@ -127,7 +134,7 @@ Task::MemManager::CMalloc - Allocates buffers using C's malloc
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -174,8 +181,11 @@ Returns the memory address of the buffer as a Perl scalar.
 
 =head1 DIAGNOSTICS
 
-There are no diagnostics that one can use. The module will croak if the
+There are no diagnostics that one can use. The module will die if the
 allocation fails, so you don't have to worry about error handling. 
+If you set up the environment variable DEBUG to a non-zero value, then
+a number of sanity checks will be performed, and the module will die
+with an (informative message ?) if something is wrong.
 
 =head1 DEPENDENCIES
 
