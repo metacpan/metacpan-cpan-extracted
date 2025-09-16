@@ -119,7 +119,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Character Count Options.',
                                   class => 'CharacterCountOptions',
                                   required => [], # TODO
 }                                 );
@@ -129,14 +129,14 @@ __PACKAGE__->method_documentation({
      'data_source' => {
      	datatype => 'DataSource',
      	base_name => 'DataSource',
-     	description => '',
+     	description => 'Represents data source.  There are three types of data, they are CloudFileSystem, RequestFiles, HttpUri.',
      	format => '',
      	read_only => '',
      		},
      'file_info' => {
      	datatype => 'FileInfo',
      	base_name => 'FileInfo',
-     	description => '',
+     	description => 'Represents file information. Include of filename, filesize, and file content(base64String).',
      	format => '',
      	read_only => '',
      		},    

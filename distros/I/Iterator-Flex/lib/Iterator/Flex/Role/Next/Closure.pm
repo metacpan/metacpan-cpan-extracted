@@ -5,7 +5,7 @@ package Iterator::Flex::Role::Next::Closure;
 use strict;
 use warnings;
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 use Iterator::Flex::Utils 'NEXT';
 use Scalar::Util;
@@ -62,7 +62,7 @@ Iterator::Flex::Role::Next::Closure - Construct a next() method for iterators wi
 
 =head1 VERSION
 
-version 0.29
+version 0.30
 
 =head1 METHODS
 

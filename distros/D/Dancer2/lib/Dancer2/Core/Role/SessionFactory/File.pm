@@ -1,6 +1,6 @@
 package Dancer2::Core::Role::SessionFactory::File;
 # ABSTRACT: Role for file-based session factories
-$Dancer2::Core::Role::SessionFactory::File::VERSION = '1.1.2';
+$Dancer2::Core::Role::SessionFactory::File::VERSION = '2.0.0';
 use Moo::Role;
 with 'Dancer2::Core::Role::SessionFactory';
 
@@ -125,7 +125,7 @@ Dancer2::Core::Role::SessionFactory::File - Role for file-based session factorie
 
 =head1 VERSION
 
-version 1.1.2
+version 2.0.0
 
 =head1 DESCRIPTION
 
@@ -182,7 +182,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Alexis Sukrieh.
+This software is copyright (c) 2025 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

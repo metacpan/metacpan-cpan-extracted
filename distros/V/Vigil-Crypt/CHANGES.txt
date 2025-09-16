@@ -1,0 +1,4 @@
+Changes:
+2025.08.15 - Encryption/Decryption rewritten to use Crypt::AuthEnc::ChaCha20Poly1305
+2025.08.15 - Hashing rewritten to use Crypt::Argon2
+

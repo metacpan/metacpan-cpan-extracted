@@ -39,9 +39,14 @@
             "Time::Local" : "0",
             "perl" : "5.010000"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "1.001014"
+         }
       }
    },
    "release_status" : "stable",
-   "version" : "v2.1.1",
+   "version" : "v2.1.2",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

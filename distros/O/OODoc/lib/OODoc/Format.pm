@@ -1,5 +1,5 @@
-# This code is part of Perl distribution OODoc version 3.03.
-# The POD got stripped from this file by OODoc version 3.03.
+# This code is part of Perl distribution OODoc version 3.04.
+# The POD got stripped from this file by OODoc version 3.04.
 # For contributors see file ChangeLog.
 
 # This software is copyright (c) 2003-2025 by Mark Overmeer.
@@ -14,7 +14,7 @@
 #oodist: testing, however the code of this development version may be broken!
 
 package OODoc::Format;{
-our $VERSION = '3.03';
+our $VERSION = '3.04';
 }
 
 use parent 'OODoc::Object';
@@ -137,6 +137,9 @@ sub createManual(@) {panic}
 
 
 sub cleanup($$%) { ... }
+
+
+sub cleanupString($$%) { shift->cleanup(@_) }
 
 
 sub showChapter(@)
@@ -402,9 +405,9 @@ sub showOptionTable(@)
 	{	my ($option, $default) = @$_;
 		my $optman = $option->manual;
 		push @rows, [
-			$self->cleanup($manual, $option->name, tag => 'option_name'),
+			$self->cleanupString($manual, $option->name, tag => 'option_name'),
 			($manual->inherited($option) ? $self->link(undef, $optman) : ''),
-			$self->cleanup($manual, $default->value, tag => 'option_default'),
+			$self->cleanupString($manual, $default->value, tag => 'option_default'),
 		];
 	}
 

@@ -69,7 +69,7 @@ sub new {
 # SplitRemoteSpreadsheetRequest.outPath : (Optional) The folder path where the workbook is stored. The default is null.  ,
 # SplitRemoteSpreadsheetRequest.outStorageName : Output file Storage Name.  ,
 # SplitRemoteSpreadsheetRequest.fontsLocation : Use Custom fonts.  ,
-# SplitRemoteSpreadsheetRequest.regoin : The spreadsheet region setting.  ,
+# SplitRemoteSpreadsheetRequest.region : The spreadsheet region setting.  ,
 # SplitRemoteSpreadsheetRequest.password : The password for opening spreadsheet file.   
 
 {
@@ -143,8 +143,8 @@ sub run_http_request {
         $query_params->{'fontsLocation'} = $client->to_query_value($self->fonts_location);      
     }
 
-    if(defined $self->regoin){
-        $query_params->{'regoin'} = $client->to_query_value($self->regoin);      
+    if(defined $self->region){
+        $query_params->{'region'} = $client->to_query_value($self->region);      
     }
 
     if(defined $self->password){
@@ -227,9 +227,9 @@ __PACKAGE__->method_documentation({
      	format => '',
      	read_only => '',
      		},
-     'regoin' => {
+     'region' => {
      	datatype => 'string',
-     	base_name => 'regoin',
+     	base_name => 'region',
      	description => 'The spreadsheet region setting.',
      	format => '',
      	read_only => '',
@@ -254,7 +254,7 @@ __PACKAGE__->attribute_map( {
     'out_path' => 'outPath',
     'out_storage_name' => 'outStorageName',
     'fonts_location' => 'fontsLocation',
-    'regoin' => 'regoin',
+    'region' => 'region',
     'password' => 'password' 
 } );
 

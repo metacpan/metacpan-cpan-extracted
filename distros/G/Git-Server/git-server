@@ -1,0 +1,148 @@
+#!/usr/bin/env perl
+
+=pod
+
+=head1 NAME
+
+git-server - Secure Git Server with more granular hooks capabilities than default git.
+
+=head1 SYNOPSIS
+
+  Standard Method:
+  With SHELL=/bin/bash, use the following format in ~/.ssh/authorized_keys:
+  command="/path/to/git-server KEY=user1" ssh-ed25519 AAAA_OAX+blah_pub__ user1@workstation
+
+   -- OR --
+
+  Advanced Method:
+  Set SHELL=/path/to/git-server (in /etc/passwd) and
+  Add /path/to/git-server to /etc/shells and
+  Set "PermitUserEnvironment yes" (in /etc/ssh/sshd_config)
+  Then use the following format in ~/.ssh/authorized_keys:
+  environment="KEY=user1" ssh-ed25519 AAAA_OAX+blah_pub__ user1@workstation
+
+=head1 ENV
+
+You can set as many %ENV variables as you want
+within the authorized_keys configuration.
+
+=head2 KEY
+
+KEY has a special meaning to define a word for the associated user
+and KEY should be unique for each public key
+and this can be used for ACL rules.
+
+=head1 INSTALL
+
+This can be used with any existing git repositories or as a drop-in replacement
+for git-shell or you can create a fresh repo on the git host:
+
+  git init --bare project
+
+Then add hooks/run-git-hooks to override the default behavior:
+
+  vi project/hooks/run-git-hooks
+  chmod 755 project/hooks/run-git-hooks
+
+If hooks/run-git-hooks exists from within the repository being targeted,
+then this will run with the correct GIT_DIR
+and any other ENV settings defined in authorized_keys.
+If it doesn't exist, then it will look for a way to use
+these git-server hooks with this project.
+
+=head1 SEE ALSO
+
+Similar functionality to the following:
+
+  gitlab-shell, gitolite, git-shell
+
+=head1 AUTHOR
+
+Rob Brown <bbb@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2015-2025 by Rob Brown <bbb@cpan.org>
+
+This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+=cut
+
+use strict;
+use warnings;
+use Cwd qw(abs_path);
+use FindBin qw($Bin);
+
+our $VERSION = "0.032";
+
+my $ssh = $ENV{SSH_CLIENT} or die "Only SSH allowed\n";
+$SIG{PIPE} = sub { exit 1; };
+my $cmd = undef;
+if (@ARGV == 2 and $ARGV[0] eq "-c") {
+    # Advanced Method:
+    shift; # -c
+    $cmd = shift; # i.e., "git-upload-pack 'project'"
+}
+else {
+    # Standard Method:
+    if (my $o = delete $ENV{SSH_ORIGINAL_COMMAND}) {
+        $cmd = $o;
+    }
+    foreach my $pair (@ARGV) {
+        if ($pair =~ /^(\w+)=(.*)$/) {
+            $ENV{$1} = $2;
+        }
+        else {
+            die "Invalid ENV setting [$pair]\n";
+        }
+    }
+}
+
+my $KEY = $ENV{KEY} || "UNKNOWN";
+my $ip = $ssh =~ /^([\da-f\.:]+) /i ? $1 : "UNKNOWN";
+die localtime().": [$KEY\@$ip] git-server: You don't have shell access!\n" unless $cmd;
+
+my $dir = undef;
+if ($cmd =~ /^(git-[\w\-]+) (.+)$/) {
+    my $op = $1;
+    my $repo = $2;
+    if ($repo =~ /^'(.+)'$/) {
+        $repo = $1;
+        $repo =~ s/\'\\\'\'/\'/g;
+    }
+    $repo =~ s/\.git$//;
+    $repo =~ s/\/+$//;
+    my $home = $ENV{HOME} || (getpwuid $<)[7];
+    foreach my $try ("$repo.git/.git", "$repo.git", "$repo/.git", $repo) {
+        if (-d $try) {
+            $dir = $try;
+            $ENV{GIT_DIR} = abs_path $dir;
+            last;
+        }
+        if ($try =~ s{^/+}{} and -d $try) {
+            $dir = $try;
+            $ENV{GIT_DIR} = abs_path $dir;
+            last;
+        }
+        if ($try =~ s{^~/}{$home/} and -d $try) {
+            $dir = $try;
+            $ENV{GIT_DIR} = abs_path $dir;
+            last;
+        }
+    }
+    # Make sure this looks like a real life sane enough git repo
+    die localtime().": [$KEY\@$ip] git-server: You can't access '$repo' git repository\n" unless $dir && -f "$dir/config" && -d "$dir/refs" && -d "$dir/objects";
+    my $escape_dir = $ENV{GIT_DIR};
+    $escape_dir =~ s/\'/\'\\'\'/g;
+    $escape_dir = "'$escape_dir'";
+    $cmd = "$op $escape_dir";
+}
+else {
+    die localtime().": [$KEY\@$ip] git-server: Unable to run the command: $cmd\n";
+}
+
+# Hand off request to the best handler
+my $handler =
+    -x "$ENV{GIT_DIR}/hooks/run-git-hooks" ? "$ENV{GIT_DIR}/hooks/run-git-hooks" :
+    -x "$Bin/hooks/run-git-hooks" ? "$Bin/hooks/run-git-hooks" : "git-shell";
+exec $handler, "-c", $cmd;

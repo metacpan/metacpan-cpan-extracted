@@ -60,7 +60,7 @@ sub new {
 
 
 # Run Operation Request
-# PostAddTextContentRequest.addTextOptions :    
+# PostAddTextContentRequest.addTextOptions : that specifies the text content and the position where the text should be added.   
 
 {
     my $params = {
@@ -71,7 +71,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_add_text_content' } = { 
-    	summary => 'Adds text content to a workbook at specified positions within cells based on provided options using ASP.NET Core Web API.',
+    	summary => 'Adds text content to a specified location within a document. It requires an object that defines the text to be added and the insertion location.',
         params => $params,
         returns => 'FileInfo',
     };
@@ -121,7 +121,7 @@ __PACKAGE__->method_documentation({
      'add_text_options' => {
      	datatype => 'AddTextOptions',
      	base_name => 'addTextOptions',
-     	description => '',
+     	description => 'that specifies the text content and the position where the text should be added.',
      	format => '',
      	read_only => '',
      		},    

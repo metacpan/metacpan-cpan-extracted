@@ -8,8 +8,8 @@ use AsposeCellsCloud::Object::WordCaseOptions;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**DataSource** | **DataSource** | This class has a public property named "DataSource" of type DataSource that has both a getter and a setter.             |
-**FileInfo** | **FileInfo** |  |
+**DataSource** | **DataSource** | Represents data source.  There are three types of data, they are CloudFileSystem, RequestFiles, HttpUri. |
+**FileInfo** | **FileInfo** | Represents file information. Include of filename, filesize, and file content(base64String). |
 **WordCaseType** | **string** |  |
 **ScopeOptions** | **ScopeOptions** |  |  
 

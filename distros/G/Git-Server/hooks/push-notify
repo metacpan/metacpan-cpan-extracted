@@ -1,0 +1,37 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+my $ssh = $ENV{SSH_CLIENT} or die "Only SSH allowed\n";
+my $base = $ENV{GIT_DIR} or die "GIT hook ENV malfunction!\n";
+my $lock_dir = "$base/logs";
+mkdir $lock_dir, 0755 unless -d $lock_dir;
+my $KEY = $ENV{KEY} || "UNKNOWN";
+
+my $last_pushed = "$lock_dir/pushed";
+open my $fh, ">", $last_pushed or die "$last_pushed: open: $!";
+print $fh localtime()." $ssh $KEY\n";
+close $fh;
+
+my $ip = $ssh =~ /^([\da-f\.:]+) /i ? $1 : "UNKNOWN";
+# $lock_file = "$lock_dir/$ip-$KEY.lock"; # Created by push-notification
+foreach my $lock_file (glob "$lock_dir/*.lock") {
+    if (open my $fh, "<", $lock_file) {
+        if (defined (my $worker = <$fh>) and
+            defined (my $sleeper = <$fh>)) {
+            chomp $worker;
+            chomp $sleeper;
+            if (kill 0, $worker and
+                kill 9, $sleeper) {
+                if ($lock_file =~ m{.*/(.+).lock$}) {
+                    warn localtime().": [$KEY\@$ip] git-server: Sending push notification to $1 ...\n";
+                }
+                else {
+                    die localtime().": [$KEY\@$ip] git-server: Released impossible sleeper (pid=$sleeper) ...\n";
+                }
+            }
+        }
+        close $fh;
+    }
+}

@@ -1,6 +1,6 @@
 # **Spreadsheet Cloud API: postConvertText**
 
- 
+Enhance Excel data through essential text conversions: convert text to numbers, replace characters and line breaks, and remove accents. 
 
 
 ## **Quick Start**
@@ -15,6 +15,7 @@
 POST http://api.aspose.cloud/v3.0/cells/converttext
 ```
 ### **Function Description**
+Effortlessly enhance your Excel data by performing essential text conversions. Convert numbers stored as text to the correct numerical format. Replace unwanted characters and line breaks with desired ones. Transform accented characters into their non-accented equivalents.- **Number Conversion**: Automatically converts text representations of numbers into their numerical equivalents, ensuring data consistency and accuracy.- **Character Replacement**: Provides flexibility in replacing specific characters or line breaks, allowing for customized text manipulation.- **Accent Removal**: Converts accented characters to their non-accented counterparts, simplifying text processing and ensuring compatibility with various systems.- **Usage**: This API is particularly useful for data cleaning and preparation tasks, ensuring that your Excel data is standardized and ready for further analysis or processing.It can be integrated into automated workflows to streamline data handling and reduce manual intervention.
 
 ### The request parameters of **postConvertText** API are: 
 

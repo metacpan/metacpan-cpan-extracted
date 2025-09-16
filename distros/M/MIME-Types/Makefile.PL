@@ -1,52 +1,91 @@
 use ExtUtils::MakeMaker;
 
-require 5.008;
+use 5.016;
 
-my $version  = '2.28';   #!!! scanned by bin/collect_types
+# Use command 'oodist' to produce your whole software release.
+my $version  = '2.29';              #!!! scanned by bin/collect_types
+my $webpages = "../public_html";
+my $git      = "https://github.com/markov2/perl5-MIME-Types";
+my $publish  = "../public_html/mime-types";
+my $homepage = "http://perl.overmeer.net/CPAN/";
+
+my %oodist   = (
+	oodoc_version => 3.05,
+	first_year    => 1999,
+	email         => "markov\@cpan.org",
+
+	include  => [
+	],
+
+	use      => [
+	],
+
+	parser   => {
+		syntax         => 'markov',
+		skip_links     => [
+		],
+		pmhead         => undef,
+	},
+
+	tests    => {
+	},
+
+	release  => {
+		publish        => "$publish/source",
+	},
+
+	raw      => {
+		publish        => "$publish/raw",
+	},
+
+	generate => [ {
+		# Add real pod to the releases
+		format         => 'pod3',
+		podtail        => undef,
+	  },
+ 		  # You may add exporter configurations here.
+	],
+);
 
 WriteMakefile
-  ( NAME      => 'MIME::Types'
-  , VERSION   => $version
-  , PREREQ_PM =>
-    { Test::More     => 0.47
-    , File::Spec     => 0
-    , File::Basename => 0
-    , List::Util     => 0
-    }
-  , AUTHOR    => 'Mark Overmeer <mark@overmeer.net>'
-  , ABSTRACT  => 'Definition of MIME types'
-  , LICENSE   => 'perl_5'
+	NAME      => 'MIME::Types',
+	VERSION   => $version,
+	PREREQ_PM => {
+		'Test::More'     => 0.47,
+    	'File::Spec'     => 0,
+    	'File::Basename' => 0,
+    	'List::Util'     => 0,
+	},
+	AUTHOR    => 'Mark Overmeer <mark@overmeer.net>',
+	ABSTRACT  => 'Definition of MIME types',
+	LICENSE   => 'perl_5',
 
-  , META_MERGE =>
-      { 'meta-spec' => { version => 2 }
-      , resources  =>
-          { repository =>
-              { type => 'git'
-              , url  => 'https://github.com/markov2/perl5-MIME-Types.git'
-              , web  => 'https://github.com/markov2/perl5-MIME-Types'
-              }
-          , homepage => 'http://perl.overmeer.net/CPAN/'
-          , license  => [ 'http://dev.perl.org/licenses/' ]
-          }
-      }
-  );
+	META_MERGE => {
+		'meta-spec' => { version => 2 },
+		resources   => {
+			repository => {
+				type => 'git',
+				url  => "$git.git",
+				web  => $git,
+			},
+			homepage => $homepage,
+			license  => [ 'http//dev.perl.org/licenses/' ],
+		},
+		prereqs => {
+			develop => {
+				requires => {
+					'OODoc' => '3.00',
+					'File::Slurper' => 0,
+				}
+			},
+			test => {
+				requires => {
+					'Test::More' => 1.00,
+					'Test::Pod'  => 1.00,
+				}
+			},
+		},
 
-### used by oodist during production of distribution
-sub MY::postamble { <<'__POSTAMBLE' }
-
-# for DIST
-RAWDIR          = ../public_html/mime-types/raw
-DISTDIR         = ../public_html/mime-types/source
-LICENSE         = perl
-
-# for POD
-FIRST_YEAR      = 1999
-EMAIL           = markov@cpan.org
-WEBSITE         = http://perl.overmeer.net/CPAN/
-
-# for HTML
-HTML_OUTPUT     = ../public_html/mime-types/html
-HTML_DOCROOT    = /mime-types/html
-HTML_PACKAGE    = ../public_html/mime-types/htmlpkg
-
-__POSTAMBLE
+		# You may use multiple set-ups, see "oodist --make"
+		x_oodist => \%oodist,
+	};

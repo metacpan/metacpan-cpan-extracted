@@ -1,6 +1,6 @@
 # **Spreadsheet Cloud API: postTrimContent**
 
- 
+The PostTrimContent API is designed to process and trim content within a specified range in a spreadsheet. This API allows users to remove extra spaces, line breaks, or other unnecessary characters from the content of selected cells. It is particularly useful for cleaning up data entries and ensuring consistency in spreadsheet formatting 
 
 
 ## **Quick Start**
@@ -17,6 +17,7 @@
 POST http://api.aspose.cloud/v3.0/cells/trimcontent
 ```
 ### **Function Description**
+Efficiency: The API efficiently trims content within the specified range, ensuring that only the designated cells are processed. This targeted approach saves time and resources by avoiding unnecessary operations on the entire worksheet.Flexibility: Users can define the exact range of cells to be processed, providing flexibility in handling different data sets and requirements.Data Integrity: By removing extra spaces and line breaks, the API helps maintain data integrity and consistency, which is crucial for accurate data analysis and reporting.Ease of Use: The API is easy to integrate into existing workflows and can be used with minimal setup, making it accessible for both developers and end-users
 
 ### The request parameters of **postTrimContent** API are: 
 

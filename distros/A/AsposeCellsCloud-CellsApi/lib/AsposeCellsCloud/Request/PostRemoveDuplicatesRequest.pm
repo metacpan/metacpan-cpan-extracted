@@ -71,7 +71,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_remove_duplicates' } = { 
-    	summary => '',
+    	summary => 'Efficiently remove duplicate substrings from Excel cells. Select a range, specify delimiters, and apply options to eliminate repeated text segments.',
         params => $params,
         returns => 'FileInfo',
     };

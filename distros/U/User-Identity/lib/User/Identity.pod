@@ -11,14 +11,14 @@ User::Identity - maintain info about a physical person
 
 =head1 SYNOPSIS
 
- use User::Identity;
- my $me = User::Identity->new
-  ( 'john'
-  , firstname => 'John'
-  , surname   => 'Doe'
-  );
- print $me->fullName  # prints "John Doe"
- print $me;           # same
+  use User::Identity;
+  my $me = User::Identity->new(
+	   'john',
+    firstname => 'John',
+    surname   => 'Doe'
+   );
+  print $me->fullName  # prints "John Doe"
+  print $me;           # same
 
 =head1 DESCRIPTION
 
@@ -36,40 +36,40 @@ If you need more kinds of user information, then please contact the
 module author.
 
 Extends L<"DESCRIPTION" in User::Identity::Item|User::Identity::Item/"DESCRIPTION">.
- 
+
 =head1 OVERLOADED
 
 =over 4
 
-=item $obj-E<gt>B<stringification>()
+=item overload: B<""> stringification
 
 When an C<User::Identity> is used as string, it is automatically
 translated into the fullName() of the user involved.
 
 example: 
 
- my $me = User::Identity->new(...)
- print $me;          # same as  print $me->fullName
- print "I am $me\n"; # also stringification
+  my $me = User::Identity->new(...)
+  print $me;          # same as  print $me->fullName
+  print "I am $me\n"; # also stringification
 
 =back
 
 =head1 METHODS
 
 Extends L<"METHODS" in User::Identity::Item|User::Identity::Item/"METHODS">.
- 
+
 =head2 Constructors
 
 Extends L<"Constructors" in User::Identity::Item|User::Identity::Item/"Constructors">.
- 
+
 =over 4
 
-=item User::Identity-E<gt>B<new>( [$name], %options )
+=item $class-E<gt>B<new>( [$name], %options )
 
-Create a new user identity, which will contain all data related 
+Create a new user identity, which will contain all data related
 to a single physical human being.  Most user data can only be
 specified at object construction, because they should never
-change.  A $name may be specified as first argument, but also
+change.  A C<$name> may be specified as first argument, but also
 as option, one way or the other is required.
 
  -Option     --Defined in          --Default
@@ -131,7 +131,7 @@ as option, one way or the other is required.
 =head2 Attributes
 
 Extends L<"Attributes" in User::Identity::Item|User::Identity::Item/"Attributes">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<age>()
@@ -180,7 +180,7 @@ built from "courtesy initials prefix surname title".
 =item $obj-E<gt>B<fullName>()
 
 If this is not specified as value during object construction, it is
-guessed based on other known values like "firstname prefix surname". 
+guessed based on other known values like "firstname prefix surname".
 If a surname is provided without firstname, the nickname is taken
 as firstname.  When a firstname is provided without surname, the
 nickname is taken as surname.  If both are not provided, then
@@ -200,13 +200,13 @@ firstname.
 
 =item $obj-E<gt>B<isFemale>()
 
-See isMale(): return true if we are sure the user is a woman.
+See isMale(): return C<true> if we are sure the user is a woman.
 
 =item $obj-E<gt>B<isMale>()
 
-Returns true if we are sure that the user is male.  This is specified as
+Returns C<true> if we are sure that the user is male.  This is specified as
 gender at instantiation, or derived from the courtesy value.  Methods
-isMale and isFemale are not complementatory: they can both return false
+isMale and isFemale are not complementatory: they can both return C<false>
 for the same user, in which case the gender is undertermined.
 
 =item $obj-E<gt>B<language>()
@@ -244,7 +244,7 @@ smart formatting probably failes.
 =head2 Collections
 
 Extends L<"Collections" in User::Identity::Item|User::Identity::Item/"Collections">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<add>($collection, $role)
@@ -267,9 +267,7 @@ Inherited, see L<User::Identity::Item/"Collections">
 
 Inherited, see L<User::Identity::Item/"Collections">
 
-=item $obj-E<gt>B<type>()
-
-=item User::Identity-E<gt>B<type>()
+=item $any-E<gt>B<type>()
 
 Inherited, see L<User::Identity::Item/"Collections">
 
@@ -282,7 +280,7 @@ Inherited, see L<User::Identity::Item/"Collections">
 =head2 Searching
 
 Extends L<"Searching" in User::Identity::Item|User::Identity::Item/"Searching">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<find>($collection, $role)
@@ -299,41 +297,47 @@ Inherited, see L<User::Identity::Item/"Searching">
 
 The first argument is an object, but not of a class which extends
 L<User::Identity::Collection|User::Identity::Collection>.
+Cast by addCollection()
 
 =item Error: Cannot load collection module for $type ($class).
 
-Either the specified $type does not exist, or that module named $class returns
+Either the specified C<$type> does not exist, or that module named C<$class> returns
 compilation errors.  If the type as specified in the warning is not
 the name of a package, you specified a nickname which was not defined.
 Maybe you forgot the 'require' the package which defines the nickname.
+Cast by addCollection()
 
 =item Error: Creation of a collection via $class failed.
 
-The $class did compile, but it was not possible to create an object
+The C<$class> did compile, but it was not possible to create an object
 of that class using the options you specified.
+Cast by addCollection()
 
 =item Error: Don't know what type of collection you want to add.
 
 If you add a collection, it must either by a collection object or a
 list of options which can be used to create a collection object.  In
 the latter case, the type of collection must be specified.
+Cast by addCollection()
 
 =item Warning: No collection $name
 
-The collection with $name does not exist and can not be created.
+The collection with C<$name> does not exist and can not be created.
+Cast by add()
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of User-Identity distribution version 1.02,
-built on April 17, 2023. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of User-Identity version 1.03,
+built on September 12, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2003-2023 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2003-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

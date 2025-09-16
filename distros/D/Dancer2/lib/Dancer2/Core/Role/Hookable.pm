@@ -1,11 +1,12 @@
 package Dancer2::Core::Role::Hookable;
 # ABSTRACT: Role for hookable objects
-$Dancer2::Core::Role::Hookable::VERSION = '1.1.2';
+$Dancer2::Core::Role::Hookable::VERSION = '2.0.0';
 use Moo::Role;
 use Dancer2::Core;
 use Dancer2::Core::Types;
 use Carp 'croak';
 use Safe::Isa;
+use Sub::Util qw/ subname /;
 
 requires 'supported_hooks', 'hook_aliases';
 
@@ -112,6 +113,10 @@ sub execute_hook {
       $self->log( core => "Entering hook $name" );
 
     for my $hook ( @{ $self->hooks->{$name} } ) {
+
+        $self->log( core => "running hook entry " . subname $hook)
+            if $self->$_isa('Dancer2::Core::App');
+
         $hook->(@_);
     }
 }
@@ -130,7 +135,7 @@ Dancer2::Core::Role::Hookable - Role for hookable objects
 
 =head1 VERSION
 
-version 1.1.2
+version 2.0.0
 
 =head1 AUTHOR
 
@@ -138,7 +143,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Alexis Sukrieh.
+This software is copyright (c) 2025 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

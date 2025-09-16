@@ -1,0 +1,82 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+my $ssh = $ENV{SSH_CLIENT} or die "Only SSH allowed\n";
+my $ip = $ssh =~ /^([\da-f\.:]+) /i ? $1 : "UNKNOWN";
+my $KEY = $ENV{KEY} || "UNKNOWN";
+my $base = $ENV{GIT_DIR} or die "GIT hook ENV malfunction!\n";
+my $log = {};
+my $conf = `git config --list`;
+while ($conf =~ s/^log.(\w+)=(.*)$//m) {
+    $log->{$1} = $2;
+}
+
+$SIG{PIPE} = sub { exit 1; };
+
+# Check for logfile:
+if (my $file = $log->{logfile}) {
+    if ($file =~ m{^[^/]}) {
+        # Force start with a / for absolute path
+        $file = "$base/$file";
+    }
+    if ($file =~ m{^(.*)/[^/]+$}) {
+        # Make sure directory for logfile exists
+        my $log_dir = $1;
+        system mkdir => -p => $log_dir if !-d $log_dir;
+    }
+
+    if (-e $file) {
+        # Check if rotation is needed
+        $log->{compress} = "false" if !exists $log->{compress};
+        $log->{rotate} = 10 if !exists $log->{rotate};
+        $log->{weekly} = "true" if !$log->{daily} and !$log->{weekly};
+        foreach my $bool (qw[compress daily weekly]) {
+            $log->{$bool} //= "false";
+            $log->{$bool} = $log->{$bool}=~/^($|0|f|und|n)/i ? 0 : 1;
+        }
+
+        if ($log->{rotate} =~ /^(\d+)$/) {
+            my $i = $1 + 1;
+            my $mark = "$file.rotate";
+            my $old = (stat $mark)[9] || 0;
+            my $new = time;
+            if ($log->{daily}  && int($old/86400)  != int($new/86400) or
+                $log->{weekly} && int($old/604800) != int($new/604800)) {
+                # Time to rotate
+                if (open my $fh, ">>", $mark) {
+                    close $fh;
+                    utime $new, $new, $mark;
+                    if ($log->{rotate} eq "0") {
+                        # "0" means Unlimited Log Rotations.
+                        # Find the first gap:
+                        $i++ while -e "$file.$i" or -e "$file.$i.gz";
+                    }
+                    while (my $t = $i--) {
+                        rename "$file.$i",    "$file.$t";
+                        rename "$file.$i.gz", "$file.$t.gz";
+                        system gzip => "$file.$t" if $log->{compress} and -e "$file.$t" and !-e "$file.$t.gz";
+                    }
+                    rename $file => "$file.0";
+                }
+            }
+        }
+        system gzip => "$file.0" if $log->{compress} and -e "$file.0" and !-e "$file.0.gz";
+    }
+
+    if (open my $fh, ">>", $file) {
+        while (<STDIN>) {
+            # Send input to logfile
+            print $fh $_;
+        }
+        close $fh;
+    }
+    else {
+        die localtime().": [$KEY\@$ip] git-server: SERVER ERROR! Unable to open log.logfile? [$file] $!\n";
+    }
+}
+else {
+    # Throw away input
+    while (<STDIN>) {}
+}

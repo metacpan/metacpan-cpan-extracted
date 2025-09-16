@@ -9,7 +9,7 @@ use warnings;
 
 use experimental 'signatures', 'postderef';
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 use Scalar::Util qw( refaddr );
 use Ref::Util    qw( is_hashref );
@@ -85,10 +85,12 @@ our %EXPORT_TAGS = (
     default => [qw( %REGISTRY refaddr )],
 );
 
+$EXPORT_TAGS{':all'} = [ map { $_->@* } values %EXPORT_TAGS ];
+
 ## no critic ( AutomaticExportation )
 our @EXPORT = @{ $EXPORT_TAGS{default} };    # ??? is this needed?
 
-our @EXPORT_OK = ( map { @{$_} } values %EXPORT_TAGS, );
+our @EXPORT_OK = ( map { $_->@* } values %EXPORT_TAGS, );
 
 
 use Role::Tiny::With;
@@ -159,7 +161,7 @@ Iterator::Flex::Utils - Internal utilities
 
 =head1 VERSION
 
-version 0.29
+version 0.30
 
 =head1 SUBROUTINES
 

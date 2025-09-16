@@ -5,7 +5,7 @@ package Iterator::Flex::Role::State::Registry;
 use strict;
 use warnings;
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 use Iterator::Flex::Utils qw( :default REG_ITERATOR REG_ITER_STATE :IterStates );
 
@@ -66,7 +66,7 @@ Iterator::Flex::Role::State::Registry - Iterator State is kept in the registry
 
 =head1 VERSION
 
-version 0.29
+version 0.30
 
 =head1 METHODS
 

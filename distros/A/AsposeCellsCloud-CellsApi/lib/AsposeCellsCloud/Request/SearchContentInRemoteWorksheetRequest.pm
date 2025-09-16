@@ -60,13 +60,13 @@ sub new {
 
 
 # Run Operation Request
-# SearchContentInRemoteWorksheetRequest.name : The name of the workbook file to be search.  ,
-# SearchContentInRemoteWorksheetRequest.worksheet : The name of worksheet  ,
-# SearchContentInRemoteWorksheetRequest.searchText : The searched text.  ,
+# SearchContentInRemoteWorksheetRequest.name : Specify the search workbook file name.  ,
+# SearchContentInRemoteWorksheetRequest.worksheet : Specify the search worksheet name.  ,
+# SearchContentInRemoteWorksheetRequest.searchText : Specify the search content.  ,
 # SearchContentInRemoteWorksheetRequest.ignoringCase : Ignore the text of the search.  ,
 # SearchContentInRemoteWorksheetRequest.folder : The folder path where the workbook is stored.  ,
 # SearchContentInRemoteWorksheetRequest.storageName : (Optional) The name of the storage if using custom cloud storage. Use default storage if omitted.  ,
-# SearchContentInRemoteWorksheetRequest.regoin : The spreadsheet region setting.  ,
+# SearchContentInRemoteWorksheetRequest.region : The spreadsheet region setting.  ,
 # SearchContentInRemoteWorksheetRequest.password : The password for opening spreadsheet file.   
 
 {
@@ -130,8 +130,8 @@ sub run_http_request {
         $query_params->{'storageName'} = $client->to_query_value($self->storage_name);      
     }
 
-    if(defined $self->regoin){
-        $query_params->{'regoin'} = $client->to_query_value($self->regoin);      
+    if(defined $self->region){
+        $query_params->{'region'} = $client->to_query_value($self->region);      
     }
 
     if(defined $self->password){
@@ -154,21 +154,21 @@ __PACKAGE__->method_documentation({
      'name' => {
      	datatype => 'string',
      	base_name => 'name',
-     	description => 'The name of the workbook file to be search.',
+     	description => 'Specify the search workbook file name.',
      	format => '',
      	read_only => '',
      		},
      'worksheet' => {
      	datatype => 'string',
      	base_name => 'worksheet',
-     	description => 'The name of worksheet',
+     	description => 'Specify the search worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'search_text' => {
      	datatype => 'string',
      	base_name => 'searchText',
-     	description => 'The searched text.',
+     	description => 'Specify the search content.',
      	format => '',
      	read_only => '',
      		},
@@ -193,9 +193,9 @@ __PACKAGE__->method_documentation({
      	format => '',
      	read_only => '',
      		},
-     'regoin' => {
+     'region' => {
      	datatype => 'string',
-     	base_name => 'regoin',
+     	base_name => 'region',
      	description => 'The spreadsheet region setting.',
      	format => '',
      	read_only => '',
@@ -217,7 +217,7 @@ __PACKAGE__->attribute_map( {
     'ignoring_case' => 'ignoringCase',
     'folder' => 'folder',
     'storage_name' => 'storageName',
-    'regoin' => 'regoin',
+    'region' => 'region',
     'password' => 'password' 
 } );
 

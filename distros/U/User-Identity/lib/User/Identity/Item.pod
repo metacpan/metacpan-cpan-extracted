@@ -27,7 +27,9 @@ has no use by its own.
 
 =over 4
 
-=item User::Identity::Item-E<gt>B<new>( [$name], %options )
+=item $class-E<gt>B<new>( [$name], %options )
+
+Z<>
 
  -Option     --Default
   description  undef
@@ -69,9 +71,9 @@ implement it, or extend the object to suit your needs.
 
 =item $obj-E<gt>B<name>( [$newname] )
 
-The name of this item.  Names are unique within a collection... a second
-object with the same name within any collection will destroy the already
-existing object with that name.
+The new name of this item.  Names are unique within a collection... a
+second object with the same name within any collection will destroy the
+already existing object with that name.
 
 Changing the name of an item is quite dangerous.  You probably want to
 call L<User::Identity::Collection::renameRole()|User::Identity::Collection/"Maintaining roles"> instead.
@@ -84,37 +86,37 @@ call L<User::Identity::Collection::renameRole()|User::Identity::Collection/"Main
 
 =item $obj-E<gt>B<add>($collection, $role)
 
-The $role is added to the $collection.  The $collection is the name of a
+The C<$role> is added to the C<$collection>.  The C<$collection> is the name of a
 collection, which will be created automatically with L<addCollection()|User::Identity::Item/"Collections"> if
-needed.  The $collection can also be specified as existing collection object.
+needed.  The C<$collection> can also be specified as existing collection object.
 
-The $role is anything what is acceptable to
+The C<$role> is anything what is acceptable to
 L<User::Identity::Collection::addRole()|User::Identity::Collection/"Maintaining roles"> of the
-collection at hand, and is returned.  $role typically is a list of
+collection at hand, and is returned.  C<$role> typically is a list of
 parameters for one role, or a reference to an array containing these
 values.
 
 example: 
 
- my $ui   = User::Identity->new(...);
- my $home = $ui->add(location => [home => street => '27 Roadstreet', ...] );
- my $work = $ui->add(location => work, tel => '+31-2231-342-13', ... );
+  my $ui   = User::Identity->new(...);
+  my $home = $ui->add(location => [home => street => '27 Roadstreet', ...] );
+  my $work = $ui->add(location => work, tel => '+31-2231-342-13', ... );
 
- my $travel = User::Identity::Location->new(travel => ...);
- $ui->add(location => $travel);
+  my $travel = User::Identity::Location->new(travel => ...);
+  $ui->add(location => $travel);
 
- my $system = User::Identity::Collection::System->new(...);
- $ui->add($system => 'localhost');
+  my $system = User::Identity::Collection::System->new(...);
+  $ui->add($system => 'localhost');
 
 =item $obj-E<gt>B<addCollection>( $object | <[$type], %options> )
 
 Add a new collection of roles to an item.  This can be achieved in two ways:
-either create an L<User::Identity::Collection|User::Identity::Collection> $object yourself and then
-pass that to this method, or supply all the %options needed to create such
+either create an L<User::Identity::Collection|User::Identity::Collection> C<$object> yourself and then
+pass that to this method, or supply all the C<%options> needed to create such
 an object and it will be created for you.  The object which is added is
 returned, and can be used for many methods directly.
 
-For %options, see the specific type of collection.  Additional options are
+For C<%options>, see the specific type of collection.  Additional options are
 listed below.
 
  -Option--Default
@@ -132,23 +134,23 @@ Predefined type nicknames are C<email>, C<system>, and C<location>.
 
 example: 
 
- my $me   = User::Identity->new(...);
- my $locs = User::Identity::Collection::Locations->new();
- $me->addCollection($locs);
+  my $me   = User::Identity->new(...);
+  my $locs = User::Identity::Collection::Locations->new();
+  $me->addCollection($locs);
 
- my $email = $me->addCollection(type => 'email');
- my $email = $me->addCollection('email');
+  my $email = $me->addCollection(type => 'email');
+  my $email = $me->addCollection('email');
 
 =item $obj-E<gt>B<collection>($name)
 
-In scalar context the collection object with the $name is returned.
+In scalar context the collection object with the C<$name> is returned.
 In list context, all the roles within the collection are returned.
 
 example: 
 
- my @roles = $me->collection('email');        # list of collected items
- my @roles = $me->collection('email')->roles; # same of collected items
- my $coll  = $me->collection('email');        # a User::Identity::Collection
+  my @roles = $me->collection('email');        # list of collected items
+  my @roles = $me->collection('email')->roles; # same of collected items
+  my $coll  = $me->collection('email');        # a User::Identity::Collection
 
 =item $obj-E<gt>B<parent>( [$parent] )
 
@@ -157,9 +159,9 @@ if the object is stand-alone.
 
 =item $obj-E<gt>B<removeCollection>($object|$name)
 
-=item $obj-E<gt>B<type>()
+Z<>
 
-=item User::Identity::Item-E<gt>B<type>()
+=item $any-E<gt>B<type>()
 
 Returns a nice symbolic name for the type.
 
@@ -171,7 +173,7 @@ reached.
 
 example: 
 
- print $email->user->fullName;
+  print $email->user->fullName;
 
 =back
 
@@ -181,17 +183,17 @@ example:
 
 =item $obj-E<gt>B<find>($collection, $role)
 
-Returns the object with the specified $role within the named collection.
+Returns the object with the specified C<$role> within the named collection.
 The collection can be specified as name or object.
 
 example: 
 
- my $role  = $me->find(location => 'work');       # one location
- my $role  = $me->collection('location')->find('work'); # same
+  my $role  = $me->find(location => 'work');       # one location
+  my $role  = $me->collection('location')->find('work'); # same
 
- my $email = $me->addCollection('email');
- $me->find($email => 'work');
- $email->find('work');   # same
+  my $email = $me->addCollection('email');
+  $me->find($email => 'work');
+  $email->find('work');   # same
 
 =back
 
@@ -203,56 +205,65 @@ example:
 
 The first argument is an object, but not of a class which extends
 L<User::Identity::Collection|User::Identity::Collection>.
+Cast by addCollection()
 
 =item Error: Cannot load collection module for $type ($class).
 
-Either the specified $type does not exist, or that module named $class returns
+Either the specified C<$type> does not exist, or that module named C<$class> returns
 compilation errors.  If the type as specified in the warning is not
 the name of a package, you specified a nickname which was not defined.
 Maybe you forgot the 'require' the package which defines the nickname.
+Cast by addCollection()
 
 =item Error: Creation of a collection via $class failed.
 
-The $class did compile, but it was not possible to create an object
+The C<$class> did compile, but it was not possible to create an object
 of that class using the options you specified.
+Cast by addCollection()
 
 =item Error: Don't know what type of collection you want to add.
 
 If you add a collection, it must either by a collection object or a
 list of options which can be used to create a collection object.  In
 the latter case, the type of collection must be specified.
+Cast by addCollection()
 
 =item Error: Each item requires a name
 
 You have to specify a name for each item.  These names need to be
 unique within one collection, but feel free to give the same name
 to an e-mail address and a location.
+Cast by new()
 
 =item Warning: No collection $name
 
-The collection with $name does not exist and can not be created.
+The collection with C<$name> does not exist and can not be created.
+Cast by add()
 
 =item Warning: Unknown option $name for a $class
 
 One used option is not defined.  Check the manual page of the class to
 see which options are accepted.
+Cast by new()
 
 =item Warning: Unknown options @names for a $class
 
 More than one option is not defined.
+Cast by new()
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of User-Identity distribution version 1.02,
-built on April 17, 2023. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of User-Identity version 1.03,
+built on September 12, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2003-2023 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2003-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

@@ -8,7 +8,7 @@ use warnings;
 
 use experimental qw( signatures declared_refs refaliasing);
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 use Ref::Util        ();
 use Role::Tiny       ();
@@ -147,6 +147,7 @@ sub construct ( $CLASS, $in_ipar = {}, $in_gpar = {} ) {    ## no critic (Excess
 
     # these are dealt with in the iterator constructor.
     delete @ipar_k{ METHODS, FREEZE };
+    delete $gpar_k{ +ERROR };
 
     if ( !!%ipar_k || !!%gpar_k ) {
 
@@ -396,7 +397,7 @@ Iterator::Flex::Factory - Create on-the-fly Iterator::Flex classes/objects
 
 =head1 VERSION
 
-version 0.29
+version 0.30
 
 =head1 CLASS METHODS
 

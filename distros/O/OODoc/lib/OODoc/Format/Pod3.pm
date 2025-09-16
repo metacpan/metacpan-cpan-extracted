@@ -1,5 +1,5 @@
-# This code is part of Perl distribution OODoc version 3.03.
-# The POD got stripped from this file by OODoc version 3.03.
+# This code is part of Perl distribution OODoc version 3.04.
+# The POD got stripped from this file by OODoc version 3.04.
 # For contributors see file ChangeLog.
 
 # This software is copyright (c) 2003-2025 by Mark Overmeer.
@@ -14,7 +14,7 @@
 #oodist: testing, however the code of this development version may be broken!
 
 package OODoc::Format::Pod3;{
-our $VERSION = '3.03';
+our $VERSION = '3.04';
 }
 
 use parent 'OODoc::Format::Pod';
@@ -26,6 +26,7 @@ use Log::Report      'oodoc';
 
 use OODoc::Template  ();
 use List::Util       qw/first/;
+use Encode           qw/decode/;
 
 #--------------------
 
@@ -203,7 +204,7 @@ sub subroutines($$$$$$)
 	length $out or return ();
 
 	$out =~ s/\n*$/\n\n/;
-	($out);
+	decode 'UTF-8', $out;
 }
 
 sub diagnostics($$$$$$)
@@ -216,7 +217,7 @@ sub diagnostics($$$$$$)
 	$fh->close;
 
 	$out =~ s/\n*$/\n\n/;
-	($out);
+	decode 'UTF-8', $out;
 }
 
 1;

@@ -15,7 +15,7 @@ Replace text in the worksheet of remoted spreadsheet.
 PUT http://api.aspose.cloud/v4.0/cells/{name}/worksheets/{worksheet}/replace/content
 ```
 ### **Function Description**
-This method replaces specified text within a worksheet of spreadsheet file stored in remote cloud storage.It supports replacing occurrences of the target text across all sheets and cells of the workbook directly within the cloud environment.The operation is performed remotely, eliminating the need to download the file to the local machine.Ensure that you have valid cloud storage credentials and accessible file paths or identifiers for the target spreadsheet.If the source file cannot be accessed, permissions are insufficient, writing to the file fails, or an error occurs during the replacement process (such as an unsupported file format), an appropriate exception will be thrown.Depending on the implementation, the method may return the number of replacements made or the locations of the replaced texts (e.g., sheet name, cell coordinates).Users should specify the exact text to replace and its replacement to ensure accurate modifications.
+This method replaces specified text within a worksheet of spreadsheet file stored in remote cloud storage. It supports replacing occurrences of the target text across all sheets and cells of the workbook directly within the cloud environment. The operation is performed remotely, eliminating the need to download the file to the local machine. Ensure that you have valid cloud storage credentials and accessible file paths or identifiers for the target spreadsheet. If the source file cannot be accessed, permissions are insufficient, writing to the file fails, or an error occurs during the replacement process (such as an unsupported file format), an appropriate exception will be thrown. Depending on the implementation, the method may return the number of replacements made or the locations of the replaced texts (e.g., sheet name, cell coordinates). Users should specify the exact text to replace and its replacement to ensure accurate modifications.## **Error Handling**- **400 Bad Request**: Invalid url.- **401 Unauthorized**:  Authentication has failed, or no credentials were provided.- **404 Not Found**: Source file not accessible.- **500 Server Error** The spreadsheet has encountered an anomaly in obtaining data.## **Key Features and Benefits**- **Remote Worksheet Text Replacement**: Replaces specified text within a worksheet of a spreadsheet file stored in remote cloud storage.- **Comprehensive Replacement**: Supports replacing occurrences of the target text across all cells of the specified worksheet.- **Cloud-Based Processing**: Performs the replacement operation entirely within the cloud environment, eliminating the need to download the file to the local machine.
 
 ### The request parameters of **replaceContentInRemoteWorksheet** API are: 
 
@@ -27,7 +27,7 @@ This method replaces specified text within a worksheet of spreadsheet file store
 |replaceText|String|Query|The replaced text.|
 |folder|String|Query|The folder path where the workbook is stored.|
 |storageName|String|Query|(Optional) The name of the storage if using custom cloud storage. Use default storage if omitted.|
-|regoin|String|Query|The spreadsheet region setting.|
+|region|String|Query|The spreadsheet region setting.|
 |password|String|Query|The password for opening spreadsheet file.|
 
 ### **Response Description**
@@ -64,4 +64,4 @@ This method replaces specified text within a worksheet of spreadsheet file store
 
 ## OpenAPI Specification
 
-The [OpenAPI Specification](https://reference.aspose.cloud/cells/#/SearchControllor/ReplaceContentInRemoteWorksheet) defines a publicly accessible programming interface and lets you carry out REST interactions directly from a web browser.
+The [OpenAPI Specification](https://reference.aspose.cloud/cells/#/SearchController/ReplaceContentInRemoteWorksheet) defines a publicly accessible programming interface and lets you carry out REST interactions directly from a web browser.

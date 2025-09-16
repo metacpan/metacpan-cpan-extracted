@@ -17,7 +17,7 @@ Split a local spreadsheet into the specified format, multi-file.
 PUT http://api.aspose.cloud/v4.0/cells/split/spreadsheet
 ```
 ### **Function Description**
-This method splits a single local spreadsheet file into multiple output files in the specified format (e.g., XLSX, CSV, PDF).Each split file may represent different sheets, sections, or segments of the original document based on user-defined criteria.The operation is performed cloudly, requiring no cloud storage.Ensure that you have the necessary permissions to read the source file and write the resulting files.If the source file cannot be accessed or if an error occurs during the splitting process, an appropriate exception will be thrown.Supported formats for output depend on the available libraries and their capabilities.Users should specify clear criteria for how the input file should be divided to ensure accurate results.
+This method splits a single local spreadsheet file into multiple output files in the specified format (e.g., XLSX, CSV, PDF). Each split file may represent different sheets, sections, or segments of the original document based on user-defined criteria. The operation is performed cloudly, requiring no cloud storage. Ensure that you have the necessary permissions to read the source file and write the resulting files. If the source file cannot be accessed or if an error occurs during the splitting process, an appropriate exception will be thrown. Supported formats for output depend on the available libraries and their capabilities. Users should specify clear criteria for how the input file should be divided to ensure accurate results.## **Error Handling**- **400 Bad Request**: Invalid url.- **401 Unauthorized**:  Authentication has failed, or no credentials were provided.- **404 Not Found**: Source file not accessible.- **500 Server Error** The spreadsheet has encountered an anomaly in obtaining data.## **Key Features and Benefits**- **Local File Splitting**: Splits a single local spreadsheet file into multiple output files in the specified format (e.g., XLSX, CSV, PDF).- **Cloud-Based Processing**: Performs the splitting operation in the cloud, without requiring cloud storage.- **Enhanced Performance**: Processes the file in the cloud, reducing the need for local processing and improving performance.
 
 ### The request parameters of **splitSpreadsheet** API are: 
 
@@ -30,7 +30,7 @@ This method splits a single local spreadsheet file into multiple output files in
 |outPath|String|Query|(Optional) The folder path where the workbook is stored. The default is null.|
 |outStorageName|String|Query|Output file Storage Name.|
 |fontsLocation|String|Query|Use Custom fonts.|
-|regoin|String|Query|The spreadsheet region setting.|
+|region|String|Query|The spreadsheet region setting.|
 |password|String|Query|The password for opening spreadsheet file.|
 
 ### **Response Description**

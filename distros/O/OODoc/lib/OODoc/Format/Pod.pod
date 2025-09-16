@@ -142,6 +142,10 @@ Extends L<"Page generation" in OODoc::Format|OODoc::Format/"Page generation">.
 
 Inherited, see L<OODoc::Format/"Page generation">
 
+=item $obj-E<gt>B<cleanupString>($manual, $string, %options)
+
+Inherited, see L<OODoc::Format/"Page generation">
+
 =item $obj-E<gt>B<createManual>(%options)
 
 The C<%options> are a collection of all options available to C<show*()> methods.
@@ -482,8 +486,8 @@ Cast by simplifyPod()
 
 =head1 SEE ALSO
 
-This module is part of OODoc version 3.03,
-built on September 08, 2025. Website: F<https://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.04,
+built on September 12, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 

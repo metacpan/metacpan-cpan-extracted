@@ -1,0 +1,12 @@
+#!/usr/bin/perl
+
+use warnings;
+use strict;
+
+my @run = ("git-shell", @ARGV);
+if (my $ipc = $ENV{IPC}) {
+    # Using strace -f imposes the danger of split brain trace logs.
+    exec strace => -v => -s => 32768 => -tt => -e => "execve,clone,open,read,write" => -o => "$ipc/log.trace" => @run;
+    # If strace fails to launch, then continue on to @run anyways
+}
+exec @run or die "exec: Failed to spawn! $!\n";

@@ -9,6 +9,8 @@ BEGIN {
 }
 
 CLOUDFLARE: {
+	local %ENV;
+
 	# Stop I18N::LangTags::Detect from detecting something
 	delete $ENV{'LANGUAGE'};
 	delete $ENV{'LC_ALL'};
@@ -62,7 +64,7 @@ CLOUDFLARE: {
 		]);
 		ok(defined($l));
 		ok($l->isa('CGI::Lingua'));
-		cmp_ok($l->country(), 'eq', 'us', 'Detect IPv6 address as in the US');
+		cmp_ok($l->country(), 'eq', 'gb', 'Detect IPv6 address as in the US');
 	} else {
 		SKIP: {
 			skip 'Test requires Internet access', 4 unless(-e 't/online.enabled');

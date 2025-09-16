@@ -6,22 +6,22 @@ MIME::Type - description of one MIME type
 
 =head1 SYNOPSIS
 
- use MIME::Types;
- my $mimetypes = MIME::Types->new;
- my MIME::Type $plaintext = $mimetypes->type('text/plain');
- print $plaintext->mediaType;   # text
- print $plaintext->subType;     # plain
+  use MIME::Types;
+  my $mimetypes = MIME::Types->new;
+  my MIME::Type $plaintext = $mimetypes->type('text/plain');
+  print $plaintext->mediaType;   # text
+  print $plaintext->subType;     # plain
 
- my @ext = $plaintext->extensions;
- print "@ext"                   # txt asc c cc h hh cpp
+  my @ext = $plaintext->extensions;
+  print "@ext"                   # txt asc c cc h hh cpp
 
- print $plaintext->encoding     # 8bit
- if($plaintext->isBinary)       # false
- if($plaintext->isAscii)        # true
- if($plaintext->equals('text/plain') {...}
- if($plaintext eq 'text/plain') # same
+  print $plaintext->encoding     # 8bit
+  if($plaintext->isBinary)       # false
+  if($plaintext->isText)         # true
+  if($plaintext->equals('text/plain') {...}
+  if($plaintext eq 'text/plain') # same
 
- print MIME::Type->simplified('x-appl/x-zip') #  'appl/zip'
+  print MIME::Type->simplified('x-appl/x-zip') #  'appl/zip'
 
 =head1 DESCRIPTION
 
@@ -33,14 +33,7 @@ Objects of C<MIME::Type> store the information on one such type.
 
 =over 4
 
-=item overload: B<string comparison>
-
-When a MIME::Type object is compared to either a string or another
-MIME::Type, the L<equals()|MIME::Type/"Knowledge"> method is called.  Comparison is smart,
-which means that it extends common string comparison with some
-features which are defined in the related RFCs.
-
-=item overload: B<stringification>
+=item overload: B<""> stringification
 
 The stringification (use of the object in a place where a string
 is required) will result in the type name, the same as L<type()|MIME::Type/"Attributes">
@@ -48,9 +41,20 @@ returns.
 
 example: use of stringification
 
- my $mime = MIME::Type->new('text/html');
- print "$mime\n";   # explicit stringification
- print $mime;       # implicit stringification
+  my $mime = MIME::Type->new('text/html');
+  print "$mime\n";   # explicit stringification
+  print $mime;       # implicit stringification
+
+=item overload: B<==> numerical comparison
+
+Compare whether the L<type()|MIME::Type/"Attributes"> of the objects is the same.
+
+=item overload: B<cmp> string comparison
+
+When a L<MIME::Type|MIME::Type> object is compared to either a string or another
+L<MIME::Type|MIME::Type>, the L<equals()|MIME::Type/"Knowledge"> method is called.  Comparison is smart,
+which means that it extends common string comparison with some
+features which are defined in the related RFCs.
 
 =back
 
@@ -60,9 +64,9 @@ example: use of stringification
 
 =over 4
 
-=item MIME::Type-E<gt>B<new>(%options)
+=item $class-E<gt>B<new>(%options)
 
-Create (I<instantiate>) a new MIME::Type object which manages one
+Create (I<instantiate>) a new L<MIME::Type|MIME::Type> object which manages one
 mime type.
 
  -Option    --Default
@@ -134,9 +138,7 @@ type safely.
 Returns a list of extensions which are known to be used for this
 mime type.
 
-=item $obj-E<gt>B<simplified>( [$string] )
-
-=item MIME::Type-E<gt>B<simplified>( [$string] )
+=item $any-E<gt>B<simplified>( [$string] )
 
 Returns the simplified mime type for this object or the specified STRING.
 Mime type names can get officially registered.  Until then, they have to
@@ -146,11 +148,11 @@ of the type.
 
 example: results of simplified()
 
- my $mime = MIME::Type->new(type => 'x-appl/x-zip');
- print $mime->simplified;                     # 'appl/zip'
+  my $mime = MIME::Type->new(type => 'x-appl/x-zip');
+  print $mime->simplified;                     # 'appl/zip'
 
- print $mime->simplified('text/PLAIN');       # 'text/plain'
- print MIME::Type->simplified('x-xyz/x-abc'); # 'xyz/abc'
+  print $mime->simplified('text/PLAIN');       # 'text/plain'
+  print MIME::Type->simplified('x-xyz/x-abc'); # 'xyz/abc'
 
 =item $obj-E<gt>B<system>()
 
@@ -169,12 +171,16 @@ Returns the long type of this object, for instance C<'text/plain'>
 
 =item $obj-E<gt>B<defaultCharset>()
 
-As per RFC6657, all C<text/*> types must either specify a default charset
-in its IANA registration, or require the charset parameter.  Non-text
+[2.29] As per RFC6657, all C<text/*> types must either specify a default
+charset in its IANA registration, or require the charset parameter.  Non-text
 types may require a charset as well.
 
 It is hard to extract this information from the IANA registration files
 automagically, so is manually maintained.
+
+example: default charset use
+
+   $charset //= $type->defaultCharset // 'utf-8';
 
 =item $obj-E<gt>B<equals>($string|$mime)
 
@@ -187,7 +193,7 @@ Old name for L<isText()|MIME::Type/"Knowledge">.
 
 =item $obj-E<gt>B<isBinary>()
 
-Returns true when the type is not known to be text.  See L<isText()|MIME::Type/"Knowledge">.
+Returns C<true> when the type is not known to be text.  See L<isText()|MIME::Type/"Knowledge">.
 
 =item $obj-E<gt>B<isExperimental>()
 
@@ -204,11 +210,11 @@ private use; the subtype starts with C<prs.>
 Mime-types which are not registered by IANA nor defined in RFCs shall
 start with an C<x->.  This counts for as well the media-type as the
 sub-type.  In case either one of the types starts with C<x-> this
-method will return false.
+method will return C<false>.
 
 =item $obj-E<gt>B<isSignature>()
 
-Returns true when the type is in the list of known signatures.
+Returns C<true> when the type is in the list of known signatures.
 
 =item $obj-E<gt>B<isText>()
 
@@ -243,19 +249,21 @@ For C<'text/plain'> it will return C<'plain'>.
 
 When a L<MIME::Type|MIME::Type> object is created, the type itself must be
 specified with the C<type> option flag.
+Cast by new()
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of MIME-Types distribution version 2.28,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of MIME-Types version 2.29,
+built on September 15, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 1999-2025 by [Mark Overmeer <mark@overmeer.net>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 1999-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

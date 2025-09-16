@@ -1,0 +1,210 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+my $ssh = $ENV{SSH_CLIENT} or die "Only SSH allowed\n";
+my $KEY = $ENV{KEY} || "UNKNOWN";
+my $ip = $ssh =~ /^([\da-f\.:]+) /i ? $1 : "UNKNOWN";
+my $how = shift =~ /^([\w\-]+)$/ ? $1 : die localtime().": [$KEY\@$ip] git-server: Proxy invocation malfunction.\n";
+my $base = delete $ENV{GIT_DIR} or die "$0: Unimplemented invocation.\n";
+my $proxy = `git config proxy.url` or exit 0;
+chomp $proxy;
+$proxy or exit 0;
+my $working = "$base.workingdir";
+if (!-d $working) {
+    # If /pre/ couldn't create this directory, then /post/ definitely shouldn't bother trying:
+    exit 0 if $how =~ /post/;
+
+    # Initial setup
+    warn localtime().": [$KEY\@$ip] git-server: Initial proxy setup ...\n";
+    system qw(git clone -o here), $base, $working;
+    chdir $working or die localtime().": [$KEY\@$ip] git-server: Failed local working directory for proxy!\n";
+    0 == system qw(git remote add there), $proxy or system "rm","-rf",$working or die localtime().": [$KEY\@$ip] git-server: Failed to remote add $proxy\n";
+    # Make sure known_hosts contains remote server pub keys for SSH style repos
+    if ($proxy =~ m{^(?:|ssh://)(?:|\w+\@)([a-z0-9\-\.]+)/}i) {
+        my $remotehost = $1;
+        warn localtime().": [$KEY\@$ip] git-server: DEBUG: Detected remote proxy SSH server [$remotehost]\n" if $ENV{DEBUG};
+        `grep '^$remotehost' ~/.ssh/known_hosts` or system "ssh-keyscan $remotehost | grep -v '^#' >> ~/.ssh/known_hosts";
+    }
+    if (0 != system "git fetch there" or !`git ls-remote there`) {
+        system "rm","-rf",$working;
+        if ($ENV{SSH_AUTH_SOCK}) {
+            die localtime().": [$KEY\@$ip] git-server: Unable to reach proxy repo: $proxy\n";
+        }
+        else {
+            die localtime().": [$KEY\@$ip] git-server: Failed to reach proxy. Did you enable ForwardAgent? Hint: \"export GIT_SSH_COMMAND='ssh -A'\"\n";
+        }
+    }
+    if (!-d $working) {
+        die localtime().": [$KEY\@$ip] git-server: Failed to establish link to proxy: $proxy\n";
+    }
+}
+chdir $working or die localtime().": [$KEY\@$ip] git-server: chdir $working: $!\n";
+if (`git config remote.here.url`  ne "$base\n" or
+    `git config remote.there.url` ne "$proxy\n") {
+    # Proxy directory mismatch? Get rid of it!
+    system "rm","-rf",$working;
+    die localtime().": [$KEY\@$ip] git-server: Proxy mismatch. Please try again.\n";
+}
+warn localtime().": [$KEY\@$ip] git-server: DEBUG: Working directory setup correctly.\n" if $ENV{DEBUG};
+my $here  = `git ls-remote here  | sort`;
+my $there = `git ls-remote there | sort` or do {
+    if ($ENV{SSH_AUTH_SOCK}) {
+        warn localtime().": [$KEY\@$ip] git-server: WARNING! Proxy remote worked before but failed this time.\n";
+    }
+    else {
+        warn localtime().": [$KEY\@$ip] git-server: WARNING! Proxy remote failed. Did you enable ForwardAgent this time? Hint: \"export GIT_SSH_COMMAND='ssh -A'\"\n";
+    }
+    exit 0;
+};
+
+# Ignore "HEAD" and ignore everything that isn't a regular branch or tag, such as /pull/ requests:
+s{^(?:.*refs/heads/HEAD|(?!.*refs/(?:heads|tags)/.*).*)\n}{}gm foreach ($here,$there);
+
+if ($here eq $there) {
+    warn localtime().": [$KEY\@$ip] git-server: DEBUG: Two-Way Proxy already synced.\n" if $ENV{DEBUG};
+    open my $fh, ">", "$working/.git/SYNCED";
+    print $fh $here;
+    close $fh;
+    exit 0;
+}
+warn localtime().": [$KEY\@$ip] git-server: Proxy Sync required.\n";
+system qw(git fetch here --tags);
+system qw(git fetch there --tags);
+my $tips = {};
+while ($here =~ s{^(\w+)\s+refs/(\w+)/(\S+)}{}m) {
+    my $hash = $1;
+    my $name = $3;
+    my $type = $2 eq "heads" ? "branch" : $2 eq "tags" ? "tag" : die localtime().": [$KEY\@$ip] git-server: Unimplemented ref type [$2] for [$name]\n";
+    $tips->{here}->{$type}->{$name} = $hash;
+}
+while ($there =~ s{^(\w+)\s+refs/(\w+)/(\S+)}{}m) {
+    my $hash = $1;
+    my $name = $3;
+    my $type = $2 eq "heads" ? "branch" : $2 eq "tags" ? "tag" : die localtime().": [$KEY\@$ip] git-server: Unimplemented ref type [$2] for [$name]\n";
+    $tips->{there}->{$type}->{$name} = $hash;
+}
+my $diff = {};
+foreach my $t (qw[branch tag]) {
+    foreach my $n (keys %{ $tips->{here}->{$t}||={} }) {
+        my $l = $tips->{here}->{$t}->{$n} || "";
+        my $r = $tips->{there}->{$t}->{$n} || "";
+        $diff->{$n} = $t if $l ne $r;
+    }
+    foreach my $n (keys %{ $tips->{there}->{$t}||={} }) {
+        my $l = $tips->{here}->{$t}->{$n} || "";
+        my $r = $tips->{there}->{$t}->{$n} || "";
+        $diff->{$n} = $t if $l ne $r;
+    }
+}
+warn localtime().": [$KEY\@$ip] git-server: DEBUG: Need Sync (".join(" ",sort keys %$diff).")\n" if $ENV{DEBUG};
+foreach my $n (sort keys %$diff) {
+    my $t = $diff->{$n};
+    my $l = $tips->{here}->{$t}->{$n} || "";
+    my $r = $tips->{there}->{$t}->{$n} || "";
+    $l or $r or next;
+    warn localtime().": [$KEY\@$ip] git-server: DEBUG: Sync[$n] local[$l] remote[$r] type($t)\n" if $ENV{DEBUG};
+    if ($how =~ /pre/ and !-s "$working/.git/SYNCED") {
+        # Pre operation, but it still wasn't even synced before either,
+        # so do our best guess to sync Both Ways without deleting anything:
+        # ( local <=> remote ):
+        my ($older, $newer, $target);
+        if ($l and $r) {
+            # Both exist but are different
+            if (`git log $l | grep $r`) {
+                # Remote found in local log, so remote is older. Must update remote to catch up to local:
+                $older = "there";
+                $newer = "here";
+                $target = $l;
+            }
+            if (`git log $r | grep $l`) {
+                # Local found in remote log, so local is older. Must update local to catch up to remote:
+                $older = "here";
+                $newer = "there";
+                $target = $r;
+            }
+        }
+        elsif (!$l) {
+            # Local doesn't exist. Remote does exist. Need to create on local:
+            $older = "here";
+            $newer = "there";
+            $target = $r;
+        }
+        else {
+            # Local does exist. Remote doesn't exist. Need to create on remote:
+            $older = "there";
+            $newer = "here";
+            $target = $l;
+        }
+        if (!$target) {
+            warn localtime().": [$KEY\@$ip] git-server: $t [$n] is too divergent to reconcile automatically.\n";
+            next;
+        }
+        warn localtime().": [$KEY\@$ip] git-server: DEBUG: READY: old[$older] new[$newer] target[$target]\n" if $ENV{DEBUG};
+        if ($t eq "tag") {
+            # Move or create tag $n on $older to $target to match $newer
+            system "(git tag -f $n $target && git push --force $older $n) 1>&2";
+        }
+        elsif ($t eq "branch") {
+            # Update or create branch $n on $older to match $target
+            0 == system "(git checkout $n || git checkout --track $newer/$n) 1>&2" or next;
+            system "(git pull --rebase $newer $n && git push $older $n) 1>&2";
+        }
+    }
+    elsif ($how =~ /pre/) {
+        # Pre operation, but something suddenly became out of sync since the last time?
+        # Thus we know the remote proxy must have changed, which need to be pushed to local:
+        # ( remote => local ):
+        if (!$r) {
+            # Need to delete the local tag or branch
+            system "git $t -d $n 1>&2";
+            system "git push --delete here $n 1>&2";
+        }
+        elsif ($t eq "tag") {
+            # Move tag $n to $r
+            system "(git tag -f $n $r && git push --force here $n) 1>&2";
+        }
+        elsif ($t eq "branch") {
+            # Push remote proxy changes on branch $n to local
+            0 == system "(git checkout $n || git checkout --track there/$n) 1>&2" or next;
+            system "(git pull --rebase there $n && git push here) 1>&2";
+        }
+    }
+    elsif ($how =~ /write/ and -s "$working/.git/SYNCED") {
+        # Post write operation, and it was synced during the Pre operation,
+        # Thus we are confident we just changed local, so push it to remote:
+        # ( local => remote ):
+        if (!$l) {
+            # Need to delete the remote tag or branch
+            system "git $t -d $n 1>&2";
+            system "git push --delete there $n 1>&2";
+        }
+        elsif ($t eq "tag") {
+            # Move tag $n to $l
+            system "(git tag -f $n $l && git push --force there $n) 1>&2";
+        }
+        elsif ($t eq "branch") {
+            # Push local changes on branch $n to remote proxy
+            0 == system "(git checkout $n || git checkout --track here/$n) 1>&2" or next;
+            system "(git pull --rebase here $n && git push there) 1>&2";
+        }
+    }
+    else {
+        # Either post read operation or it wasn't synced before.
+        # So don't try to do anything about these discrepancies this time.
+    }
+}
+$here  = `git ls-remote here  | sort`;
+$there = `git ls-remote there | sort`;
+if ($here eq $there) {
+    warn localtime().": [$KEY\@$ip] git-server: Two-Way Proxy now synced.\n" if $ENV{DEBUG};
+    open my $fh, ">", "$working/.git/SYNCED";
+    print $fh $here;
+    close $fh;
+}
+else {
+    warn localtime().": [$KEY\@$ip] git-server: Unable to complete the Proxy sync.\n" if $ENV{DEBUG};
+    unlink "$working/.git/SYNCED";
+}
+exit 0;

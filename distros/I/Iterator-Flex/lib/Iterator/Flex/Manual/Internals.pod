@@ -13,7 +13,7 @@ Iterator::Flex::Manual::Internals - How Things Work
 
 =head1 VERSION
 
-version 0.29
+version 0.30
 
 =head1 DESCRIPTION
 
@@ -41,25 +41,25 @@ are stored in the C<%Iterator::Flex::Utils::Registry> hash, keyed off of the int
 memory address of the object obtained via L<Scalar::Util/refaddr>.
 The entry in the registry is deleted upon object destruction.
 
-Each registry entry is a hash, with the following structure (constants
-for the keys are available from L<Iterator::Flex::Utils>):
+Each registry entry is an array, with the following structure (constants
+for the indices are available from L<Iterator::Flex::Utils>):
 
   $Registry{ref address}
-    + -- { +ITERATOR }
-         + -- { +CURRENT }
-         + -- { +METHODS }
-         + -- { +NEXT }
-         + -- { +PREV }
-         + -- { +RESET }
-         + -- { +REWIND }
-         + -- { +STATE }
-         + -- { +_DEPENDS }
-         + -- { +_NAME }
-         + -- { +_ROLES }
-    + -- { +GENERAL }
-         + -- { +INPUT_EXHAUSTION }
-         + -- { +EXHAUSTION }
-         + -- { +ERROR }
+    + -- [ ITERATOR ]
+         + -- [ CURRENT ]
+         + -- [ METHODS ]
+         + -- [ NEXT ]
+         + -- [ PREV ]
+         + -- [ RESET ]
+         + -- [ REWIND ]
+         + -- [ STATE ]
+         + -- [ _DEPENDS ]
+         + -- [ _NAME ]
+         + -- [ _ROLES ]
+    + -- [ GENERAL ]
+         + -- [ INPUT_EXHAUSTION ]
+         + -- [ EXHAUSTION ]
+         + -- [ ERROR ]
 
 =head2 Object Construction
 

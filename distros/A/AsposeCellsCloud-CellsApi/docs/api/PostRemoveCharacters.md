@@ -1,6 +1,6 @@
 # **Spreadsheet Cloud API: postRemoveCharacters**
 
- 
+A comprehensive set of tools for cleaning text content within selected cells. It allows users to remove specific characters, character sets, and substrings, ensuring that the text is standardized and free from unwanted symbols or sequences. 
 
 
 ## **Quick Start**
@@ -15,6 +15,7 @@
 POST http://api.aspose.cloud/v3.0/cells/removecharacters
 ```
 ### **Function Description**
+- **Remove custom characters** will delete the characters you specify. To delete several symbols, enter each of them into the Remove custom characters field and the add-in will delete all their instances in the selected cells.- **Remove character sets**.There are several sets of symbols you can pick from the dropdown list:- **Non-printing characters**: delete all non-printing characters like line breaks, the first 32 non-printing characters in the 7-bit ASCII code(values 0 through 31), and additional non-printing characters(values 127, 129, 141, 143, 144, and 157).- **Text characters**: remove all letters from your cells.- **Numeric characters**: delete all digits from the range of interest.- **Symbols**: remove from the cells the following symbols: mathematical, geometric, technical and currency symbols, letter-like symbols such as ?, 1, and ™.- **Punctuation marks**: get rid of all punctuation marks in the selected range.- **Remove a substring**. Delete any combination of characters, for example a word, from the selected cells.
 
 ### The request parameters of **postRemoveCharacters** API are: 
 

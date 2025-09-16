@@ -5,7 +5,7 @@ package Iterator::Flex::Role::Exhaustion::Return;
 use strict;
 use warnings;
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 use Scalar::Util();
 use Iterator::Flex::Utils qw[ :default REG_GENERAL REG_GP_EXHAUSTION ];
@@ -65,7 +65,7 @@ Iterator::Flex::Role::Exhaustion::Return - signal exhaustion by returning a sent
 
 =head1 VERSION
 
-version 0.29
+version 0.30
 
 =head1 METHODS
 

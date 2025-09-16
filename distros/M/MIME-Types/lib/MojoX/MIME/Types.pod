@@ -23,7 +23,7 @@ MojoX::MIME::Types - MIME Types for Mojolicious
 
 =head1 DESCRIPTION
 
-[Added to MIME::Types 2.07]
+[Added to L<MIME::Types|MIME::Types> 2.07]
 This module is a drop-in replacement for Mojolicious::Types, but
 with a more correct handling plus a complete list of types... a huge
 list of types.
@@ -41,10 +41,10 @@ Mojolicious and the differences you get.
 
 =over 4
 
-=item MojoX::MIME::Types-E<gt>B<new>(%options)
+=item $class-E<gt>B<new>(%options)
 
 Create the 'type' handler for Mojolicious.  When you do not specify your
-own MIME::Type object ($mime_type), it will be instantanted for you.
+own L<MIME::Type|MIME::Type> object (C<mime_types>), it will be instantanted for you.
 You create one yourself when you would like to pass some parameter to
 the object constructor.
 
@@ -109,7 +109,7 @@ Added and marked EXPERIMENTAL in Mojo 7.94.
 
 =item $obj-E<gt>B<detect>( $accept, [$prio] )
 
-Returns a list of filename extensions.  The $accept header in HTTP can
+Returns a list of filename extensions.  The C<$accept> header in HTTP can
 contain multiple types, with a priority indication ('q' attributes).
 The returned list contains a list with extensions, the extensions related
 to the highest priority type first.  The C<$prio>-flag is ignored.
@@ -132,10 +132,10 @@ Added and marked EXPERIMENTAL in Mojo 7.94.
 
 =item $obj-E<gt>B<type>( $ext, [$type|\@types] )
 
-Returns the first type name for an extension $ext, unless you specify
+Returns the first type name for an extension C<$ext>, unless you specify
 type names.
 
-When a single $type or an ARRAY of @types are specified, the C<$self>
+When a single C<$type> or an ARRAY of C<@types> are specified, the current
 object is returned.  Nothing is done with the provided info.
 
 =back
@@ -163,7 +163,7 @@ Start your Mojo application like this:
   }
 
 If you have special options for L<MIME::Types::new()|MIME::Types/"Constructors">, then create
-your own MIME::Types object first:
+your own L<MIME::Types|MIME::Types> object first:
 
   my $mt    = MIME::Types->new(%opts);
   my $types = MojoX::MIME::Types->new(mime_types => $mt);
@@ -214,14 +214,15 @@ L<MIME::Types::httpAcceptSelect()|MIME::Types/"HTTP support"> to replace this br
 
 =head1 SEE ALSO
 
-This module is part of MIME-Types distribution version 2.28,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of MIME-Types version 2.29,
+built on September 15, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 1999-2025 by [Mark Overmeer <mark@overmeer.net>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 1999-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

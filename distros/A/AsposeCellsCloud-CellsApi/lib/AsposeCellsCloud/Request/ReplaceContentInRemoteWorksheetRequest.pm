@@ -66,7 +66,7 @@ sub new {
 # ReplaceContentInRemoteWorksheetRequest.replaceText : The replaced text.  ,
 # ReplaceContentInRemoteWorksheetRequest.folder : The folder path where the workbook is stored.  ,
 # ReplaceContentInRemoteWorksheetRequest.storageName : (Optional) The name of the storage if using custom cloud storage. Use default storage if omitted.  ,
-# ReplaceContentInRemoteWorksheetRequest.regoin : The spreadsheet region setting.  ,
+# ReplaceContentInRemoteWorksheetRequest.region : The spreadsheet region setting.  ,
 # ReplaceContentInRemoteWorksheetRequest.password : The password for opening spreadsheet file.   
 
 {
@@ -130,8 +130,8 @@ sub run_http_request {
         $query_params->{'storageName'} = $client->to_query_value($self->storage_name);      
     }
 
-    if(defined $self->regoin){
-        $query_params->{'regoin'} = $client->to_query_value($self->regoin);      
+    if(defined $self->region){
+        $query_params->{'region'} = $client->to_query_value($self->region);      
     }
 
     if(defined $self->password){
@@ -193,9 +193,9 @@ __PACKAGE__->method_documentation({
      	format => '',
      	read_only => '',
      		},
-     'regoin' => {
+     'region' => {
      	datatype => 'string',
-     	base_name => 'regoin',
+     	base_name => 'region',
      	description => 'The spreadsheet region setting.',
      	format => '',
      	read_only => '',
@@ -217,7 +217,7 @@ __PACKAGE__->attribute_map( {
     'replace_text' => 'replaceText',
     'folder' => 'folder',
     'storage_name' => 'storageName',
-    'regoin' => 'regoin',
+    'region' => 'region',
     'password' => 'password' 
 } );
 

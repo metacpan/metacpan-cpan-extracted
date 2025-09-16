@@ -99,7 +99,7 @@ if($^O eq 'darwin') {
 
 WriteMakefile(
     NAME                => 'CGI::Lingua',
-    AUTHOR              => q{Nigel Horne <njh@bandsman.co.uk>},
+    AUTHOR              => q{Nigel Horne <njh@nigelhorne.com>},
     VERSION_FROM        => 'lib/CGI/Lingua.pm',
     ABSTRACT_FROM       => 'lib/CGI/Lingua.pm',
     ((defined($ExtUtils::MakeMaker::VERSION) &&
@@ -119,7 +119,6 @@ WriteMakefile(
 	'I18N::LangTags::Detect' => 1.04,
 	'Data::Validate::IP' => 0.25,	# For is_private_ip
 	'Locale::Codes' => 3.59,	# Silence noisy warn messages in perl 5.28
-	'Log::Abstraction' => 0.05,
 	'Net::Whois::IANA' => 0,
 	'Net::Whois::IP' => 0,
 	'NetAddr::IP' => 0,

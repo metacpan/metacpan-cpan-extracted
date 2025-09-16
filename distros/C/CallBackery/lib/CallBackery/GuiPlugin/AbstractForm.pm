@@ -75,7 +75,7 @@ Return the form data independently from the form phase.
 
 sub formData ($self) {
     my $args = $self->args || {};
-    return $args->{currentFormData} || $args->{formData} || {};
+    return $args->{currentFormData} || $args->{formData} || $args;
 };
 
 
@@ -88,8 +88,6 @@ Return the form phase.
 sub formPhase ($self) {
     my $args = $self->args;
 
-    # if called from CardList or Table plugins
-    return 'instantiate' if $args->{selection};
 
     # data
     if ($args->{currentFormData}) {
@@ -102,9 +100,10 @@ sub formPhase ($self) {
         return "action:$args->{key}" if $args->{key};
     }
 
-    # config
-    if ( $args and not keys $args->%*) {
-        return 'pluginConfig';
+    # if called from CardList or Table plugins
+    if (ref $args eq 'HASH') {
+        return 'pluginConfig' if not keys $args->%*;
+        return 'instanciate';
     }
 
     # catch all, if ever reached
@@ -130,6 +129,7 @@ sub validateData {
     my $self = shift;
     my $fieldName = shift;
     my $formData = shift || {};
+    $self->args($formData);
     my $entry = $self->formCfgMap->{$fieldName};
     if (not ref $entry){
         die mkerror(4095,trm("sorry, don't know the field you are talking about"));

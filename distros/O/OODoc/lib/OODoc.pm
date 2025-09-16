@@ -1,5 +1,5 @@
-# This code is part of Perl distribution OODoc version 3.03.
-# The POD got stripped from this file by OODoc version 3.03.
+# This code is part of Perl distribution OODoc version 3.04.
+# The POD got stripped from this file by OODoc version 3.04.
 # For contributors see file ChangeLog.
 
 # This software is copyright (c) 2003-2025 by Mark Overmeer.
@@ -14,7 +14,7 @@
 #oodist: testing, however the code of this development version may be broken!
 
 package OODoc;{
-our $VERSION = '3.03';
+our $VERSION = '3.04';
 }
 
 use parent 'OODoc::Object';
@@ -22,7 +22,7 @@ use parent 'OODoc::Object';
 use strict;
 use warnings;
 
-our $VERSION = '3.03';  # needed here for own release process
+our $VERSION = '3.04';  # needed here for own release process
 
 use Log::Report    'oodoc';
 
@@ -52,7 +52,7 @@ sub init($)
 	unless(defined $version)
 	{	my $fn         = -f 'version' ? 'version' : -f 'VERSION' ? 'VERSION' : undef;
 		if(defined $fn)
-		{	open my $v, "<", $fn
+		{	open my $v, '<:encoding(UTF-8)', $fn
 				or fault __x"cannot read distribution version from file {file}", file=> $fn;
 			$version = $v->getline;
 			$version = $1 if $version =~ m/(\d+\.[\d\.]+)/;
@@ -121,7 +121,7 @@ sub processFiles(@)
 				: defined $source ? catfile($source, 'VERSION')
 				:                   'VERSION';
 		if(defined $fn)
-		{	open my $v, '<', $fn
+		{	open my $v, '<:encoding(UTF-8)', $fn
 				or fault __x"cannot read version from {file}", file => $fn;
 			$version = $v->getline;
 			$version = $1 if $version =~ m/(\d+\.[\d\.]+)/;

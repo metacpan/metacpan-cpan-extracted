@@ -65,7 +65,7 @@ sub new {
 # SearchSpreadsheetContentRequest.ignoringCase : Ignore the text of the search.  ,
 # SearchSpreadsheetContentRequest.worksheet : Specify the worksheet for the lookup.  ,
 # SearchSpreadsheetContentRequest.cellArea : Specify the cell area for the lookup  ,
-# SearchSpreadsheetContentRequest.regoin : The spreadsheet region setting.  ,
+# SearchSpreadsheetContentRequest.region : The spreadsheet region setting.  ,
 # SearchSpreadsheetContentRequest.password : The password for opening spreadsheet file.   
 
 {
@@ -119,8 +119,8 @@ sub run_http_request {
         $query_params->{'cellArea'} = $client->to_query_value($self->cell_area);      
     }
 
-    if(defined $self->regoin){
-        $query_params->{'regoin'} = $client->to_query_value($self->regoin);      
+    if(defined $self->region){
+        $query_params->{'region'} = $client->to_query_value($self->region);      
     }
 
     if(defined $self->password){
@@ -177,9 +177,9 @@ __PACKAGE__->method_documentation({
      	format => '',
      	read_only => '',
      		},
-     'regoin' => {
+     'region' => {
      	datatype => 'string',
-     	base_name => 'regoin',
+     	base_name => 'region',
      	description => 'The spreadsheet region setting.',
      	format => '',
      	read_only => '',
@@ -200,7 +200,7 @@ __PACKAGE__->attribute_map( {
     'ignoring_case' => 'ignoringCase',
     'worksheet' => 'worksheet',
     'cell_area' => 'cellArea',
-    'regoin' => 'regoin',
+    'region' => 'region',
     'password' => 'password' 
 } );
 

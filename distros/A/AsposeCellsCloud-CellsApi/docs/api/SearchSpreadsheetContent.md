@@ -17,7 +17,7 @@ Search text in the local spreadsheet.
 PUT http://api.aspose.cloud/v4.0/cells/search/content
 ```
 ### **Function Description**
-This method searches for specified text within a local spreadsheet file.It supports searching through all sheets and cells of the workbook, identifying occurrences of the search term.The operation is performed cloudly, requiring no cloud storage. Ensure that you have the necessary permissions to read the source file.If the source file cannot be accessed or if an error occurs during the search process (such as an unsupported file format), an appropriate exception will be thrown.The method may return the locations of the matches (e.g., sheet name, cell coordinates) depending on implementation details.Users should specify the exact search criteria, including case sensitivity and whole word matching options, to refine search results.
+This method searches for specified text within a local spreadsheet file. It supports searching through all sheets and cells of the workbook, identifying occurrences of the search term. The operation is performed cloudly, requiring no cloud storage. Ensure that you have the necessary permissions to read the source file. If the source file cannot be accessed or if an error occurs during the search process (such as an unsupported file format), an appropriate exception will be thrown. The method may return the locations of the matches (e.g., sheet name, cell coordinates) depending on implementation details. Users should specify the exact search criteria, including case sensitivity and whole word matching options, to refine search results.## **Error Handling**- **400 Bad Request**: Invalid url.- **401 Unauthorized**:  Authentication has failed, or no credentials were provided.- **404 Not Found**: Source file not accessible.- **500 Server Error** The spreadsheet has encountered an anomaly in obtaining data.## **Key Features and Benefits**- **Local Spreadsheet Search**: Searches for specified text within a local spreadsheet file.- **Comprehensive Search**: Supports searching through all sheets and cells of the workbook, identifying occurrences of the search term.- **Cloud-Based Processing**: Performs the search operation in the cloud, without requiring cloud storage.
 
 ### The request parameters of **searchSpreadsheetContent** API are: 
 
@@ -28,7 +28,7 @@ This method searches for specified text within a local spreadsheet file.It suppo
 |ignoringCase|Boolean|Query|Ignore the text of the search.|
 |worksheet|String|Query|Specify the worksheet for the lookup.|
 |cellArea|String|Query|Specify the cell area for the lookup|
-|regoin|String|Query|The spreadsheet region setting.|
+|region|String|Query|The spreadsheet region setting.|
 |password|String|Query|The password for opening spreadsheet file.|
 
 ### **Response Description**
@@ -82,4 +82,4 @@ This method searches for specified text within a local spreadsheet file.It suppo
 
 ## OpenAPI Specification
 
-The [OpenAPI Specification](https://reference.aspose.cloud/cells/#/SearchControllor/SearchSpreadsheetContent) defines a publicly accessible programming interface and lets you carry out REST interactions directly from a web browser.
+The [OpenAPI Specification](https://reference.aspose.cloud/cells/#/SearchController/SearchSpreadsheetContent) defines a publicly accessible programming interface and lets you carry out REST interactions directly from a web browser.

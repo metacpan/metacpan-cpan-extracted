@@ -64,7 +64,7 @@ sub new {
 # SearchBrokenLinksInRemoteWorksheetRequest.worksheet : Specify the worksheet for the lookup.  ,
 # SearchBrokenLinksInRemoteWorksheetRequest.folder : The folder path where the workbook is stored.  ,
 # SearchBrokenLinksInRemoteWorksheetRequest.storageName : (Optional) The name of the storage if using custom cloud storage. Use default storage if omitted.  ,
-# SearchBrokenLinksInRemoteWorksheetRequest.regoin : The spreadsheet region setting.  ,
+# SearchBrokenLinksInRemoteWorksheetRequest.region : The spreadsheet region setting.  ,
 # SearchBrokenLinksInRemoteWorksheetRequest.password : The password for opening spreadsheet file.   
 
 {
@@ -78,7 +78,7 @@ sub new {
     __PACKAGE__->method_documentation->{ 'search_broken_links_in_remote_worksheet' } = { 
     	summary => 'Search broken links in the worksheet of remoted spreadsheet.',
         params => $params,
-        returns => 'BrokenLinksReponse',
+        returns => 'BrokenLinksResponse',
     };
 }
 
@@ -120,8 +120,8 @@ sub run_http_request {
         $query_params->{'storageName'} = $client->to_query_value($self->storage_name);      
     }
 
-    if(defined $self->regoin){
-        $query_params->{'regoin'} = $client->to_query_value($self->regoin);      
+    if(defined $self->region){
+        $query_params->{'region'} = $client->to_query_value($self->region);      
     }
 
     if(defined $self->password){
@@ -169,9 +169,9 @@ __PACKAGE__->method_documentation({
      	format => '',
      	read_only => '',
      		},
-     'regoin' => {
+     'region' => {
      	datatype => 'string',
-     	base_name => 'regoin',
+     	base_name => 'region',
      	description => 'The spreadsheet region setting.',
      	format => '',
      	read_only => '',
@@ -191,7 +191,7 @@ __PACKAGE__->attribute_map( {
     'worksheet' => 'worksheet',
     'folder' => 'folder',
     'storage_name' => 'storageName',
-    'regoin' => 'regoin',
+    'region' => 'region',
     'password' => 'password' 
 } );
 

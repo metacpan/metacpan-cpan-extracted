@@ -1,9 +1,10 @@
 package Dancer2::Core::Hook;
 # ABSTRACT: Manipulate hooks with Dancer2
-$Dancer2::Core::Hook::VERSION = '1.1.2';
+$Dancer2::Core::Hook::VERSION = '2.0.0';
 use Moo;
 use Dancer2::Core::Types;
 use Carp;
+use Sub::Util qw/ set_subname subname /;
 
 has name => (
     is       => 'rw',
@@ -28,9 +29,8 @@ has code => (
     required => 1,
     coerce   => sub {
         my ($hook) = @_;
-        sub {
-            my $res;
-            eval { $res = $hook->(@_) };
+        set_subname subname($hook) => sub {
+            my $res = eval { $hook->(@_) };
             croak "Hook error: $@" if $@;
             return $res;
         };
@@ -51,7 +51,7 @@ Dancer2::Core::Hook - Manipulate hooks with Dancer2
 
 =head1 VERSION
 
-version 1.1.2
+version 2.0.0
 
 =head1 SYNOPSIS
 
@@ -92,7 +92,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Alexis Sukrieh.
+This software is copyright (c) 2025 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

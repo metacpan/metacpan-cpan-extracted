@@ -173,7 +173,7 @@ class Mojolicious::Routes::Pattern {
       $captures_list = StringList->new;
       
       for (my $i = 0; $i < $captures_length; $i++) {
-        $captures_list->push($m->captures($i));
+        $captures_list->push($m->captures->[$i]);
       }
     }
     

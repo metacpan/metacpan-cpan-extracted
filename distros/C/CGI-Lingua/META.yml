@@ -1,7 +1,7 @@
 ---
 abstract: 'Create a multilingual web page'
 author:
-  - 'Nigel Horne <njh@bandsman.co.uk>'
+  - 'Nigel Horne <njh@nigelhorne.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
   File::Temp: '0'
@@ -43,7 +43,6 @@ requires:
   Locale::Language: '0'
   Locale::Object: '0.8'
   Locale::Object::Country: '0.78'
-  Log::Abstraction: '0.05'
   Net::Subnet: '0'
   Net::Whois::IANA: '0'
   Net::Whois::IP: '0'
@@ -55,5 +54,5 @@ requires:
 resources:
   bugtracker: https://github.com/nigelhorne/CGI-Lingua/issues
   repository: git://github.com/nigelhorne/CGI-Lingua.git
-version: '0.74'
+version: '0.75'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

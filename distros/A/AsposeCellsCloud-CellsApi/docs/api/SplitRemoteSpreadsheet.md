@@ -17,7 +17,7 @@ Split a spreadsheet in cloud storage into the specified format, multi-file.
 PUT http://api.aspose.cloud/v4.0/cells/{name}/split/spreadsheet
 ```
 ### **Function Description**
-This method splits a single spreadsheet file stored in cloud storage into multiple output files in the specified format (e.g., XLSX, CSV, PDF).Each split file may represent different sheets, sections, or segments of the original document based on user-defined criteria.The operation is performed remotely within the cloud environment, eliminating the need to download the files to the local machine.Ensure that you have valid cloud storage credentials and accessible file paths or identifiers for all input files.If the source file cannot be accessed, permissions are insufficient, or if an error occurs during the splitting process, an appropriate exception will be thrown.Supported formats for output depend on the capabilities of the underlying cloud processing service. Users should specify clear criteria for how the input file should be divided to ensure accurate results.
+This method splits a single spreadsheet file stored in cloud storage into multiple output files in the specified format (e.g., XLSX, CSV, PDF). Each split file may represent different sheets, sections, or segments of the original document based on user-defined criteria. The operation is performed remotely within the cloud environment, eliminating the need to download the files to the local machine. Ensure that you have valid cloud storage credentials and accessible file paths or identifiers for all input files. If the source file cannot be accessed, permissions are insufficient, or if an error occurs during the splitting process, an appropriate exception will be thrown. Supported formats for output depend on the capabilities of the underlying cloud processing service. Users should specify clear criteria for how the input file should be divided to ensure accurate results.## **Error Handling**- **400 Bad Request**: Invalid url.- **401 Unauthorized**:  Authentication has failed, or no credentials were provided.- **404 Not Found**: Source file not accessible.- **500 Server Error** The spreadsheet has encountered an anomaly in obtaining data.## **Key Features and Benefits**- **Cloud Storage Integration**: Splits a single spreadsheet file stored in cloud storage into multiple output files in the specified format (e.g., XLSX, CSV, PDF).- **Remote Processing**: Performs the splitting operation entirely within the cloud environment, eliminating the need to download files to the local machine.- **Enhanced Performance**: Processes the file in the cloud, reducing the need for local processing and improving performance.
 
 ### The request parameters of **splitRemoteSpreadsheet** API are: 
 
@@ -32,7 +32,7 @@ This method splits a single spreadsheet file stored in cloud storage into multip
 |outPath|String|Query|(Optional) The folder path where the workbook is stored. The default is null.|
 |outStorageName|String|Query|Output file Storage Name.|
 |fontsLocation|String|Query|Use Custom fonts.|
-|regoin|String|Query|The spreadsheet region setting.|
+|region|String|Query|The spreadsheet region setting.|
 |password|String|Query|The password for opening spreadsheet file.|
 
 ### **Response Description**

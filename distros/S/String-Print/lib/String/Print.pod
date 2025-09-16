@@ -22,7 +22,7 @@ String::Print - printf alternative
   printp 'dump: %s', \%settings;
 
   # modifiers
-  printi 'price: {price%.2f}', price => 3.14*VAT*EURO;
+  printi 'price: {price%.2f}', price => 3.14 * EURO;
 
   # [0.91] more complex interpolation names
   printi 'filename: {c.filename}', c => \%config;
@@ -31,7 +31,7 @@ String::Print - printf alternative
 
   ### Object Oriented interface
 
-  use String::Print 'oo';      # import nothing
+  use String::Print 'oo', %config;      # import no functions
   my $f = String::Print->new(%config);
   $f->printi('age {years}', years => 12);
   $f->printp('age %d', 12);
@@ -59,8 +59,6 @@ module!
 
 =head1 METHODS
 
-=head2 The Object Oriented interface
-
 See functions L<printi()|String::Print/"FUNCTIONS">, L<sprinti()|String::Print/"FUNCTIONS">, L<printp()|String::Print/"FUNCTIONS">, and L<sprintp()|String::Print/"FUNCTIONS">: you
 can also call them as method.
 
@@ -77,7 +75,7 @@ in multiple source files, or when you need different configurations
 within one program.  In these cases, the hassle of explicitly using the
 object has some benefits.
 
-=head3 Constructors
+=head2 Constructors
 
 =over 4
 
@@ -125,12 +123,12 @@ example:
     encode_for  => 'HTML',
   );
 
-  $f->printi("price: {p EUR}", p => 3.1415); # price: XX3.14 e (X=blank)
+  $f->printi("price: {p EUR}", p => 3.1415); # price: ␣␣3.14 e
   $f->printi("count: {c}", c => undef);      # count: -
 
 =back
 
-=head3 Attributes
+=head2 Attributes
 
 =over 4
 
@@ -151,7 +149,7 @@ Read section L</"Output encoding"> about the details.
 
 =back
 
-=head3 Printing
+=head2 Printing
 
 The following are provided as method and as function.  You find their
 explanation further down on this page.
@@ -185,7 +183,7 @@ B<. Example>
 Calls L<sprinti()|String::Print/"FUNCTIONS"> to fill the C<%data> into C<$format>, and
 then sends it to the C<$fh> (by default the selected file)
 
-  open my $fh, '>', $file;
+  open my $fh, '>:encoding(UTF-8)', $file;
   printi $fh, ...
 
   printi \*STDERR, ...
@@ -256,7 +254,10 @@ example: of the rewrite
 
 =head1 DETAILS
 
-=head2 Why use C<printi()>, not C<printf()>?
+  Your manual-page reader may not support the unicode used
+  in some of the examples below.
+
+=head2 Why use C<printi()> to replace C<printf()>?
 
 The C<printf()> function is provided by Perl's CORE; you do not need
 to install any module to use it.  Why would you use consider using
@@ -334,8 +335,6 @@ Simplified:
 
 Example:
 
-  #XXX Your manual-page reader may not support the unicode used
-  #XXX in the examples below.
   printi "price: {price € %-10s}", price => $cost;
   printi "price: {price € %-10s}", { price => $cost };
   printp "price: %-10{€}s", $cost;
@@ -486,10 +485,12 @@ objects get stringified.
 
 =head2 Interpolation: Modifiers
 
-Modifiers are used to change the value to be inserted, before the characters
-get interpolated in the line.  This is a powerful simplification.  Let's
-discuss this with an example.
+Modifiers are used to change the value to be inserted, before
+the characters get interpolated in the line.  This is a powerful
+simplification.  Some useful modifiers are already provided by default.
+They are also good examples how to write your own.
 
+Let's discuss this with an example.
 In traditional (gnu) gettext, you would write:
 
   printf(gettext("approx pi: %.6f\n"), PI);
@@ -531,9 +532,7 @@ Above example in L<printp()|String::Print/"FUNCTIONS"> syntax, shorter but less 
   printp "%s %2d %-8s 10d %s\n",
      '-rw-r--r--', 7, 'me', 12345, $filename;
 
-=head2 Interpolation: default modifiers
-
-=head3 Default modifier: POSIX format
+=head3 Modifier: POSIX format starts with '%'
 
 As shown in the examples above, you can specify a format.  This can,
 for instance, help you with rounding or columns:
@@ -542,7 +541,7 @@ for instance, help you with rounding or columns:
   printp "weight is {kilogram%d}", kilogram => 127*OUNCE_PER_KILO;
   printp "{filename%-20.20s}\n", filename => $fn;
 
-=head4 - improvements on POSIX format
+=head4 POSIX modifier extension '%S'
 
 The POSIX C<printf()> does not handle unicode strings.  Perl does
 understand that the 's' modifier may need to insert utf8 so does not
@@ -559,7 +558,24 @@ specify its width, then there is no performance penalty for using 'S'.
   # name right aligned, commas on same position, always
   printp "name: {name%20S},\n", name => $some_chinese;
 
-=head3 Default modifier: BYTES
+=head4 POSIX modifier extensions '%[+ -]?[0-9]*[_,.]d'
+
+[0.96] Only available when you print (big) decimals: add an underscore,
+comma, or dot on the thousands.
+
+  printi "{count%_d}\n", count => 1e9;   # 1_000_000_000
+  printi "{count%,d}\n", count => 1e9;   # 1,000,000,000
+  printi "{count%.d}\n", count => 1e9;   # 1.000.000.000
+
+  printi "'{v%10.d}'",  v =>  10000;   # '    10.000';
+  printi "'{v%10_d}'",  v => -10000;   # '   -10_000';
+  printi "'{v%-10.d}'", v =>  10000;   # '10.000    ';
+  printi "'{v%-10.d}'", v => -10000;   # '-10.000   ';
+  printi "'{v%+10,d}'", v =>  10000;   # '   +10,000';
+  printi "'{v% ,d}'",   v =>  10000;   # ' 10,000';
+  printi "'{v% ,d}'",   v => -10000;   # '-10,000';
+
+=head3 Modifier: BYTES
 
 [0.91] Too often, you have to translate a (file) size into humanly readible
 format.  The C<BYTES> modifier simplifies this a lot:
@@ -569,11 +585,11 @@ format.  The C<BYTES> modifier simplifies this a lot:
 The output will always be 6 characters.  Examples are "999  B", "1.2 kB",
 and " 27 MB".
 
-=head3 Default modifier: HTML
+=head3 Modifier: HTML
 
 [0.95] interpolate the parameter with HTML entity encoding.
 
-=head3 Default modifiers: YEAR, DATE, TIME, DT, and DT()
+=head3 Modifiers: YEAR, DATE, TIME, DT, and DT()
 
 [0.91] A set of modifiers help displaying dates and times.  They are a
 little flexible in values they accept, but do not expect miracles: when
@@ -624,14 +640,15 @@ The short form C<DT> is an alias for C<DT(FT)>.  The DT modifier can
 produce different formats:
 
   DT(ASC)     : %a %b %e %T %Y       asctime output
-  DT(FT)      : %F %T                YYYY-MM-DD HH:mm:ss
+  DT(FT)      : %F %T                YYYY-MM-DD HH:MM:SS
   DT(ISO)     : %FT%T%z              iso8601
   DT(RFC822)  : %a, %d %b %y %T %z   email old
   DT(RFC2822) : %a, %d %b %Y %T %z   email newer
+  DT(RFC5322) : %a, %d %b %Y %T %z   email newest [0.96]
 
 You may suggest additional formats, or add your own modifier.
 
-=head3 Default modifiers: //word, //"string", //'string'
+=head3 Modifier: //word, //"string", //'string'
 
 [0.91] By default, an undefined value is shown as text 'C<undef>'.  Empty
 strings are shown as nothing.  This may not be nice.  You may want to
@@ -647,6 +664,14 @@ different kinds of output:
 
   "price: {price//5 EUR}"
   "price: {price EUR//unknown}"
+
+=head3 Modifier: '='
+
+[0.96] As (always trailing) modifier, this will show the interpolated
+name before the value.  It might simplify debugging statements.
+
+  printi "visitors: {count=}", count => 1;      # visitors: count=1
+  printi "v: {count %-8,d =}X", count => 10000; # v: count=10,000␣␣X
 
 =head3 Private modifiers
 
@@ -693,7 +718,7 @@ Another example.  Now, we want to add timestamps.  In this case, we
 decide for modifier names in C<\w>, so we need a blank to separate
 the parameter from the modifer.
 
-=head3 Modifiers: stacking
+=head3 Stacking modifiers
 
 You can add more than one modifier.  The modifiers detect the extend of
 their own information (via a regular expression), and therefore the
@@ -702,10 +727,10 @@ formatter understands where one ends and the next begins.
 The modifiers are called in order:
 
   printi "price: {p€%9s}\n", p => $p; # price: ␣␣␣123.45
-  printi ">{t T%10s}<", t => $now;    # >␣␣12:59:17<
+  printi "!{t T%10s}!", t => $now;    # !␣␣12:59:17!
 
   printp "price: %9{€}s\n", $p;       # price: ␣␣␣123.45
-  printp ">%10{T}s<", $now;           # >␣␣12:59:17<
+  printp "!%10{T}s!", $now;           # !␣␣12:59:17!
 
 =head2 Output encoding
 
@@ -714,7 +739,7 @@ to insert (translated) strings with parameters into HTML templates.
 You can imagine that some of the parameter may need to be encoded to
 HTML in the template, and other not.
 
-=head3 example with Log::Report::Template
+=head3 Example with Log::Report::Template
 
 In pure Template Toolkit, you would write
 
@@ -811,8 +836,8 @@ C<String::Print> is nicely integrated with Log::Report.
 
 =head1 SEE ALSO
 
-This module is part of String-Print version 0.95,
-built on September 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of String-Print version 0.96,
+built on September 12, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

@@ -14,6 +14,7 @@ ok( scalar(@$data) > 0 );
 
 
 $response = subscribe();
+print encode_json($response) . "\n";
 is( $response->{status}, 200 );
 carp(encode_json($response));
 

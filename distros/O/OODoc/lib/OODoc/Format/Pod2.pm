@@ -1,5 +1,5 @@
-# This code is part of Perl distribution OODoc version 3.03.
-# The POD got stripped from this file by OODoc version 3.03.
+# This code is part of Perl distribution OODoc version 3.04.
+# The POD got stripped from this file by OODoc version 3.04.
 # For contributors see file ChangeLog.
 
 # This software is copyright (c) 2003-2025 by Mark Overmeer.
@@ -12,11 +12,9 @@
 #oodist: This file contains OODoc-style documentation which will get stripped
 #oodist: during its release in the distribution.  You can use this file for
 #oodist: testing, however the code of this development version may be broken!
-#oorestyle: use of deprecated IO::Scalar: use open(my)
-
 
 package OODoc::Format::Pod2;{
-our $VERSION = '3.03';
+our $VERSION = '3.04';
 }
 
 use parent 'OODoc::Format::Pod', 'OODoc::Format::TemplateMagic';
@@ -28,6 +26,7 @@ use Log::Report    'oodoc';
 
 use Template::Magic ();
 use File::Spec      ();
+use Encode          qw/decode/;
 
 #--------------------
 
@@ -83,23 +82,23 @@ sub templateChapter($$)
 
 	my @attrs = $self->zoneGetParameters($attrs);
 
-	open my $output, '>', \(my $out);
+	open my $output, '>:encoding(UTF-8)', \(my $out);
 	$self->showOptionalChapter($name, %$args, output => $output, @attrs);
-	$out;
+	decode 'UTF-8', $out;
 }
 
 sub templateDiagnostics($$)
 {	my ($self, $zone, $args) = @_;
-	open my $output, '>', \(my $out);
+	open my $output, '>:encoding(UTF-8)', \(my $out);
 	$self->chapterDiagnostics(%$args, output => $output);
-	$out;
+	decode 'UTF-8', $out;
 }
 
 sub templateAppend($$)
 {	my ($self, $zone, $args) = @_;
-	open my $output, '>', \(my $out);
+	open my $output, '>:encoding(UTF-8)', \(my $out);
 	$self->showAppend(%$args, output => $output);
-	$out;
+	decode 'UTF-8', $out;
 }
 
 1;

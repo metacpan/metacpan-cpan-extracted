@@ -15,7 +15,7 @@ if(-e 't/online.enabled') {
 	eval {
 		CGI::Lingua->new();
 	};
-	ok($@ =~ m/You must give a list of supported languages/);
+	ok($@ =~ m/^Usage:/);
 
 	# Stop I18N::LangTags::Detect from detecting something
 	delete $ENV{'LANGUAGE'};
@@ -36,10 +36,10 @@ if(-e 't/online.enabled') {
 
 	$ENV{'HTTP_ACCEPT_LANGUAGE'} = '';
 	$ENV{'REMOTE_ADDR'} = '66.249.67.232';	# Google
-	$l = CGI::Lingua->new(supported => ['en', 'fr', 'en-gb', 'en-us']);
+	$l = CGI::Lingua->new(['en', 'fr', 'en-gb', 'en-us']);
 	ok(defined($l));
 	ok($l->isa('CGI::Lingua'));
-	ok($l->language() eq 'English');
+	ok($l->name() eq 'English');
 	ok($l->requested_language() eq 'English');
 
 	$l = CGI::Lingua->new(
@@ -354,7 +354,7 @@ if(-e 't/online.enabled') {
 		dont_use_ip => 1,
 		logger => MyLogger->new()
 	}]);
-	cmp_ok($l->language(), 'eq', 'Japanese', 'Checking quality value');
+	cmp_ok($l->preferred_language(), 'eq', 'Japanese', 'Checking quality value');
 
 	# Cover edge case: malformed Accept-Language headers
 	subtest 'Malformed Accept-Language headers' => sub {
@@ -375,7 +375,7 @@ if(-e 't/online.enabled') {
 			my $accept = $test_cases->{$case};
 			local $ENV{'HTTP_ACCEPT_LANGUAGE'} = $accept;
 			my $lingua = CGI::Lingua->new(
-				supported_languages => [qw(en es fr)],
+				[qw(en es fr)],
 			);
 
 			my $result = eval { $lingua->preferred_language() };

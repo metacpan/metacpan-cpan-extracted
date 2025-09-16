@@ -71,7 +71,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_extract_text' } = { 
-    	summary => '',
+    	summary => 'Effortlessly extract text and numbers from Excel cells with precise options. This API allows extraction of first/last characters, text between delimiters, and numbers from strings, with output as static values or formulas.',
         params => $params,
         returns => 'FileInfo',
     };

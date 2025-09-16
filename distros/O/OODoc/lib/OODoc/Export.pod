@@ -393,7 +393,7 @@ examples.  Examples do not always have a name.
 Most subroutine forms can have a list of diagnostics, which are
 sorted errors first, then by description text.  Other types of
 diagnostics will be added soon, to match the levels offered by
-Log::Report.
+L<Log::Report|Log::Report>.
 
   { "id": REF,                               # SAFE
     "type": "error"/"warning"/"info"...,     # SAFE
@@ -422,8 +422,8 @@ Cast by new()
 
 =head1 SEE ALSO
 
-This module is part of OODoc version 3.03,
-built on September 08, 2025. Website: F<https://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.04,
+built on September 12, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 

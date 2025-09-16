@@ -39,7 +39,7 @@ resources:
     - http://dev.perl.org/licenses/
   homepage: https://perl.overmeer.net/oodoc/
   repository: https://github.com/markov2/perl5-OODoc.git
-version: '3.03'
+version: '3.04'
 x_oodist:
   email: perl@overmeer.net
   first_year: 2003

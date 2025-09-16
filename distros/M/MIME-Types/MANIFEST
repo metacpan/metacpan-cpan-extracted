@@ -1,7 +1,6 @@
 ChangeLog
 MANIFEST
 Makefile.PL
-README
 README.md
 lib/MIME/Type.pm
 lib/MIME/Type.pod
@@ -17,7 +16,6 @@ t/21accept.t
 t/22accbest.t
 t/30export.t
 t/40mojo.t
-xt/98perl.t
 xt/99pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

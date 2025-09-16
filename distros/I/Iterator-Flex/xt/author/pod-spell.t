@@ -17,6 +17,7 @@ Astrophysical
 Authoring
 Base
 Basics
+Buffer
 Cache
 Cat
 Caveats
@@ -49,6 +50,7 @@ Next
 Observatory
 Overview
 PassthroughThrow
+Permute
 Prev
 PriorArt
 Product
@@ -63,6 +65,7 @@ Serialization
 Smithsonian
 Stack
 State
+Take
 Throw
 Using
 Utils

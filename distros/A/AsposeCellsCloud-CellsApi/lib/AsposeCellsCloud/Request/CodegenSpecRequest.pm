@@ -60,7 +60,7 @@ sub new {
 
 
 # Run Operation Request
-# CodegenSpecRequest.regoin : The spreadsheet region setting.  ,
+# CodegenSpecRequest.region : The spreadsheet region setting.  ,
 # CodegenSpecRequest.password : The password for opening spreadsheet file.   
 
 {
@@ -98,8 +98,8 @@ sub run_http_request {
     }
     $header_params->{'Content-Type'} = $client->select_header_content_type('application/json');
  
-    if(defined $self->regoin){
-        $query_params->{'regoin'} = $client->to_query_value($self->regoin);      
+    if(defined $self->region){
+        $query_params->{'region'} = $client->to_query_value($self->region);      
     }
 
     if(defined $self->password){
@@ -119,9 +119,9 @@ sub run_http_request {
 
 
 __PACKAGE__->method_documentation({
-     'regoin' => {
+     'region' => {
      	datatype => 'string',
-     	base_name => 'regoin',
+     	base_name => 'region',
      	description => 'The spreadsheet region setting.',
      	format => '',
      	read_only => '',
@@ -137,7 +137,7 @@ __PACKAGE__->method_documentation({
 
 
 __PACKAGE__->attribute_map( {
-    'regoin' => 'regoin',
+    'region' => 'region',
     'password' => 'password' 
 } );
 

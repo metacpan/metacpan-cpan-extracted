@@ -1,3 +1,21 @@
+0.56.4 2025-09-16 11:49:50 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - add mocks for mayAny, userId and userInfo for better compatibility
+
+0.56.3 2025-09-16 11:25:45 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - activate signatures in abstractaction
+
+0.56.2 2025-09-16 11:16:51 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - move all user magic to AbstractAction.pm
+ - undefine user after Massage Config
+
+0.56.1 2025-09-15 23:41:28 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - set args/formData in the validation phase too
+ - fix formData to report data even when there is no selection
+
 0.56.0 2025-09-05 15:52:10 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - the GuiPlugin user property is now always defined

@@ -1,0 +1,260 @@
+Revision History for Git::Server
+
+0.032  2025-09-16 05:00:00
+ - Migrate to real module Git::Server
+ - Allow dangerous non-bare repositories again.
+ - But prevent cloning proxy workingdir.
+ - Ensure octal trace chars are below 0400.
+ - Allow git-deploy to follow updated branch.
+ - Split out test suites.
+ - Show installation from CPAN instead of github.
+ - Other package distribution modifications.
+
+0.031  2025-07-17 21:00:00
+ - Only support bare repositories on the server.
+ - Package distribution modifications.
+
+0.030  2025-06-14 15:00:00
+ - Clear old tmpdir entries from DEBUG sessions.
+ - Make exact branch match stronger than RegEx or
+   "*" branch for restrictedbranch.pushers and
+   restrictedbranch.forcers directives.
+ - Allow repo names to have single quotes.
+ - Honor GIT_SSH_COMMAND in git-client.
+
+0.029  2025-01-23 13:00:00
+ - Fix git-deploy --chdir option
+   (Broken since 0.025)
+
+0.028  2025-01-20 03:00:00
+ - Handle "git ls-remote" as a remote operation.
+ - Initial add of proxy.url feature to do Two-Way
+   sync with external repo from the server side.
+ - Repair --fix-nasty to all host key types.
+   (Broken since 0.018)
+ - Forward compatibility fixes for ssh-keyscan
+   under the new OpenSSH 9.x.
+ - Update docs to handle new ed25519 algorithm.
+ - Split up git-server logic into proxy/git-server.
+ - Combine INSTALL.md docs into single file.
+ - Got rid of confusing contrib/ folder.
+ - Make git-client pass DEBUG env to server.
+ - Automatically configure repo hooks and acl.writers
+   settings upon the first git operation.
+
+0.027  2025-01-13 18:00:00
+ - Backwards compatible fix for git 1.8.x and older.
+
+0.026  2025-01-04 23:00:00
+ - Include commit {time} epoch stamp in webhook details.
+ - And push/pull {git_client_connected} stamp.
+ - And git clone commits list.
+ - Fixed log.rotate logic to ensure rotation.
+ - Make log.rotate "0" mean unlimited rotating log files.
+ - Add restrictedfile.pushers feature to restrict pushing changes
+   to specified file(s) by only allowing certain users.
+ - Add acl.restrictemail feature to whitelist commit Author email.
+ - Add acl.restrictip feature to whitelist IPs.
+
+0.025  2025-01-01 23:00:00
+ - SECURITY: Prevent concurrent --build executions.
+ - Recover from duplicate rebase conflict.
+ - Populate GIT_DIR for convention.
+ - Include git comment line in webhook post.
+ - Add log rotation support:
+   * git config log.logfile logs/access_log
+   * git config log.compress true
+   * git config log.daily true
+   * git config log.weekly false
+   * git config log.rotate 365
+ - Include more commit details to webhook post:
+   Date,Subject,Author,Files
+
+0.024  2024-07-22 12:00:00
+ - SECURITY: git-client wrapper skips calling others again
+ - Remove {old} and {new} elements from webhook data.
+ - Remove rare empty elements in webhook data.
+ - Include {commit} key for {backward} and {forward} lists.
+
+0.023  2024-07-08 19:00:00
+ - Optimize clone case info.
+ - Optimize failed push case info.
+ - Try to only return each branch once for pull requests.
+ - Handle case when commits have two parents.
+ - Include {forward} list in case pushing more than one commit.
+ - Provide {backward} list of reverted commits, if any.
+ - Calculate {forward} list for pull operations.
+
+0.022  2024-06-30 12:00:00
+ - Use GIT_CONFIG_GLOBAL instead of monkeying HOME.
+ - Restore %ENV even when the "pre" hook fails.
+ - Escape and Unescape ENV values properly.
+ - Canonize JSON output.
+ - Fix SIGPIPE crashing in DEBUG mode.
+ - Parse -o "options" properly for DEBUG mode.
+ - Provide {git_client_options} to webhook instead
+   of the cryptic {xmodifiers} string.
+ - Security Optimization: Use block eval instead of
+   more dangerous slower stringy eval cheese method.
+ - Release git client as soon as log files are read
+   so the processing of webhooks can be backgrounded.
+
+0.021  2024-06-26 12:00:00
+ - Fix race condition when backgrounding "post" hook.
+ - Fix proctitle mapping when --chdir is used.
+ - Honor umask setting instead of hard-code 0002.
+ - Add --umask option to override umask.
+ - Remove annoying git-client invocation hint.
+
+0.020  2024-06-20 23:00:00
+ - Hint fix if git-client was invoked unexpectedly.
+ - Add -O <OPTION> for git-client and git-deploy.
+ - Add server support for push-options by fixing:
+   ERR: receiving end does not support push options
+ - Continue git-deploy process when local changes.
+ - More compatible "ps" sniffer on non-linux
+   Operating Systems running "git deploy".
+
+0.019  2024-06-16 20:00:00
+ - Populate GIT_OPTION_* environment variables for
+   "pre" hooks on server when "-o" option is
+   used with the git-client wrapper.
+ - Set env DEBUG when in DEBUG mode.
+ - Keep IPC folder if DEBUG mode is enabled.
+ - OPTIMIZATION: Use exec in "post" hooks.
+ - OPTIMIZATION: Background "post" hook.
+ - Add hooks/git-server-override feature to debug.
+
+0.018  2024-06-16 15:00:00
+ - SECURITY FIX: Prevent client from bypassing
+   restrictedbranch.forcers ACLs.
+ - Fixed strace log octal binary decoding.
+ - Provive IPC ENV for pre hooks as well.
+ - Always run post-* hook, even if pre-* hook fails.
+ - Extract WebHook HTTP Status for post-action.
+ - Fix rebase --abort syntax.
+ - Reduce max processes by losing the "sh -c ..."
+   intermediary middle sandwich process.
+ - Add "git deploy --branch" option.
+ - Add "git deploy --chdir" feature.
+ - Add "git deploy --max-delay" feature.
+ - Add "git deploy --background" option.
+ - Provide push branch info for IPC parser.
+ - Include old and new commit IDs and branch in webhook.
+ - Provide the {common} commit ID where the new
+   git branch was forked from.
+ - Honor GIT_EXIT_STATUS when replaying ipc-parse.
+ - Fixed git agent version sniffer regex.
+ - Update documentation.
+
+0.017  2024-06-07 09:00:00
+ - Allow multiple git-deploy to run in parallel.
+ - Allow git-server to override git-shell.
+ - Let git-deploy work with branch containing "-".
+ - Implement hooks/git-shell wrapper feature.
+ - SECURITY: Block unrecognized git operations.
+ - Pass XMODIFIERS env for extended functionality.
+ - Allow git client to choose to enable DEBUG mode.
+ - Let git client choose the deploy timeout.
+ - Updated MANIFEST to include required files.
+ - Client can now pass XMODIFIERS to git-server
+   for extended functionalities.
+ - Create IPC folder to facilitate communications
+   among different processes.
+ - Extract client "want" and "have" packets.
+ - Add [webhook] callback with following features:
+   * Supports unlimited multiple callback URLs.
+   * Any HTTP or HTTPS URLs.
+   * Allows for insecure HTTPS certificate.
+   * [webhook.__.method] POST method.
+   * [webhook.__.transport] JSON Hash.
+   * Support for IPv4 and IPv6.
+ - Now [webhook] will POST the following information:
+   * Git Operation (clone, pull, push)
+   * Repo SSH URL
+   * Server Git version
+   * Client Git version
+   * Client IP/Port
+   * Client SSH Key used
+
+0.016  2024-05-25 22:00:00
+ - Update TODO wishlist.
+ - Use "git remote rm" instead of "--unset" hack.
+ - Backward compatibility fixes for git 1.7.1
+ - Auto-Respawn git-deploy after update.
+ - Handle git-deploy detached case earlier.
+ - Never default to 'master' branch anymore.
+
+0.015  2024-05-10 01:00:00
+ - Cosmetic adjustments to some messages.
+ - Fix more ID Message format [$KEY@$IP]
+ - Fix syntax of BAK tag suggestion.
+ - Try harder to steal notification lock.
+ - Fix git-deploy to properly deploy changes
+   that got reverted using "push --force"
+   to break out of the rebase detached loop.
+
+0.014  2024-04-21 22:00:00
+ - Consistent ID Message format [$KEY@$IP]
+ - Fix perl path for installing helper scripts
+ - Fix '\' escaping in pushers & forcers syntax
+ - Require backup tag or branch before history
+   can be destroyed.
+ - Add hint that [forcers] can delete a branch.
+
+0.013  2024-04-07 12:00:00
+ - Update INSTALL recipe
+ - Initial add of [forcers] feature to prevent
+   unauthorized users from rewriting git history,
+   such as: git push --force
+ - Include more examples in hooks/INSTALL_ACL.md
+ - Fix Git-Deploy to handle reverted chokes:
+   CRASH: Your branch and origin have
+   diverged and have different commits.
+
+0.012  2019-07-11 14:00:00
+ - Fix "git clone" .gitconfig override
+
+0.011  2019-05-13 12:00:00
+ - Add --fix-nasty option
+ - Use external sleep for easy bypass
+ - Handle special detached commit
+ - Add sample [log] config
+ - Add [restrictedbranch] support
+ - Recover from "fatal: File exists" crash
+
+0.010  2016-04-08 10:00:00
+ - Make "git deploy" default to current branch.
+ - Minor INSTALL doc fixes.
+
+0.009  2016-03-31 12:00:00
+ - Add "git deploy" feature.
+ - Add git-client convenience wrapper.
+ - Add optional log.logfile support.
+
+0.008  2016-02-03 17:00:00
+ - Notify client when quick pulling.
+
+0.007  2016-01-30 22:00:00
+ - Allow git client to checkout repo.git too
+
+0.006  2015-07-27 12:00:00
+ - Fix instant push
+ - Handle case where repo URL starts with tilde ("~")
+ - Handle SSH repo URL with relative path
+
+0.005  2015-07-01 20:00:00
+ - Minor cosmetic changes
+
+0.004  2015-06-27 09:00:00
+ - Include example ACL configuration.
+ - Add automatic deployment instructions (instant push notification)
+
+0.003  2015-06-16 15:15:00
+ - Documental Fixes
+
+0.002  2015-06-16 15:00:00
+ - Documental Fixes Only
+
+0.001  2015-06-16 14:00:00
+ - Original release of git-server

@@ -60,7 +60,7 @@
          "web" : "https://github.com/markov2/perl5-String-Print"
       }
    },
-   "version" : "0.95",
+   "version" : "0.96",
    "x_oodist" : {
       "email" : "markov@cpan.org",
       "first_year" : 2016,
@@ -74,7 +74,9 @@
       "oodoc_version" : 3.04,
       "parser" : {
          "pmhead" : null,
-         "skip_links" : [],
+         "skip_links" : [
+            "Locale::TextDomain"
+         ],
          "syntax" : "markov"
       },
       "raw" : {

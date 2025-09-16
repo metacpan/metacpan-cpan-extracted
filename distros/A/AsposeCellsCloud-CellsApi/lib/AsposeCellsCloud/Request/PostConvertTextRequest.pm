@@ -71,7 +71,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_convert_text' } = { 
-    	summary => '',
+    	summary => 'Enhance Excel data through essential text conversions: convert text to numbers, replace characters and line breaks, and remove accents.',
         params => $params,
         returns => 'FileInfo',
     };

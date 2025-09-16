@@ -1,0 +1,4 @@
+#!/bin/sh
+
+hooks/proxy `basename $0`
+exec hooks/post-action

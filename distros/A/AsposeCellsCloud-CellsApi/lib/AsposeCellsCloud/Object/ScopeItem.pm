@@ -118,36 +118,36 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => 'I`m happy to help! Please provide me with the features you would like me to summarize for the class.            ',
+__PACKAGE__->class_documentation({description => 'Define the specific range in your Excel worksheet where you want the spreadsheet operations to be performed. This ensures that only the cells within the selected range are processed, and any operations are confined to this area.',
                                   class => 'ScopeItem',
                                   required => [], # TODO
 }                                 );
 
 
 __PACKAGE__->method_documentation({
-     'worksheet_name' => {
+     'worksheet' => {
      	datatype => 'string',
-     	base_name => 'WorksheetName',
-     	description => 'A property "WorksheetName" of type string with an initial value of an empty string.            ',
+     	base_name => 'Worksheet',
+     	description => 'The specific worksheet of spreadsheet.',
      	format => '',
      	read_only => '',
      		},
      'ranges' => {
      	datatype => 'ARRAY[string]',
      	base_name => 'Ranges',
-     	description => '',
+     	description => 'The specific ranges of worksheet.',
      	format => '',
      	read_only => '',
      		},    
 });
 
 __PACKAGE__->swagger_types( {
-    'worksheet_name' => 'string',
+    'worksheet' => 'string',
     'ranges' => 'ARRAY[string]' 
 } );
 
 __PACKAGE__->attribute_map( {
-    'worksheet_name' => 'WorksheetName',
+    'worksheet' => 'Worksheet',
     'ranges' => 'Ranges' 
 } );
 

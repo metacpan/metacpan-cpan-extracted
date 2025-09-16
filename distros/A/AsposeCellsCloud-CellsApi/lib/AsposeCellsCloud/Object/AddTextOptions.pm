@@ -37,7 +37,8 @@ use Date::Parse;
 use DateTime;
 use AsposeCellsCloud::Object::BaseOperateOptions;
 use AsposeCellsCloud::Object::DataSource;
-use AsposeCellsCloud::Object::FileInfo; 
+use AsposeCellsCloud::Object::FileInfo;
+use AsposeCellsCloud::Object::ScopeOptions; 
 
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
@@ -137,56 +138,49 @@ __PACKAGE__->method_documentation({
      'data_source' => {
      	datatype => 'DataSource',
      	base_name => 'DataSource',
-     	description => '',
+     	description => 'Represents data source.  There are three types of data, they are CloudFileSystem, RequestFiles, HttpUri.',
      	format => '',
      	read_only => '',
      		},
      'file_info' => {
      	datatype => 'FileInfo',
      	base_name => 'FileInfo',
-     	description => '',
+     	description => 'Represents file information. Include of filename, filesize, and file content(base64String).',
+     	format => '',
+     	read_only => '',
+     		},
+     'scope_options' => {
+     	datatype => 'ScopeOptions',
+     	base_name => 'ScopeOptions',
+     	description => 'Specifies the range of cells within the worksheet where the spreadsheet operations will be performed. This parameter allows users to define the exact area to be processed, ensuring that operations are applied only to the designated cells.',
      	format => '',
      	read_only => '',
      		},
      'text' => {
      	datatype => 'string',
      	base_name => 'Text',
-     	description => '',
-     	format => '',
-     	read_only => '',
-     		},
-     'worksheet' => {
-     	datatype => 'string',
-     	base_name => 'Worksheet',
-     	description => '',
-     	format => '',
-     	read_only => '',
-     		},
-     'range' => {
-     	datatype => 'string',
-     	base_name => 'Range',
-     	description => '',
+     	description => 'Add text content.',
      	format => '',
      	read_only => '',
      		},
      'select_poistion' => {
      	datatype => 'string',
      	base_name => 'SelectPoistion',
-     	description => '',
+     	description => 'Represents where text should be inserted or selected in the spreadsheet.',
      	format => '',
      	read_only => '',
      		},
      'select_text' => {
      	datatype => 'string',
      	base_name => 'SelectText',
-     	description => '',
+     	description => 'Selected text of cell where text should be inserted or selected in the spreadsheet.',
      	format => '',
      	read_only => '',
      		},
      'skip_empty_cells' => {
      	datatype => 'boolean',
      	base_name => 'SkipEmptyCells',
-     	description => '',
+     	description => 'Indicates whether empty cells should be skipped during processing.',
      	format => '',
      	read_only => '',
      		},    
@@ -196,9 +190,8 @@ __PACKAGE__->swagger_types( {
     'name' => 'string',
     'data_source' => 'DataSource',
     'file_info' => 'FileInfo',
+    'scope_options' => 'ScopeOptions',
     'text' => 'string',
-    'worksheet' => 'string',
-    'range' => 'string',
     'select_poistion' => 'string',
     'select_text' => 'string',
     'skip_empty_cells' => 'boolean' 
@@ -208,9 +201,8 @@ __PACKAGE__->attribute_map( {
     'name' => 'Name',
     'data_source' => 'DataSource',
     'file_info' => 'FileInfo',
+    'scope_options' => 'ScopeOptions',
     'text' => 'Text',
-    'worksheet' => 'Worksheet',
-    'range' => 'Range',
     'select_poistion' => 'SelectPoistion',
     'select_text' => 'SelectText',
     'skip_empty_cells' => 'SkipEmptyCells' 

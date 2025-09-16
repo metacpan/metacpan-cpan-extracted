@@ -9,8 +9,8 @@ use AsposeCellsCloud::Object::SplitTextOptions;
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Name** | **string** | The property "Name" is a publicly accessible and overridable property of type string in the class. |
-**DataSource** | **DataSource** |  |
-**FileInfo** | **FileInfo** |  |
+**DataSource** | **DataSource** | Represents data source.  There are three types of data, they are CloudFileSystem, RequestFiles, HttpUri. |
+**FileInfo** | **FileInfo** | Represents file information. Include of filename, filesize, and file content(base64String). |
 **Worksheet** | **string** |  |
 **Range** | **string** |  |
 **SplitDelimitersType** | **string** |  |

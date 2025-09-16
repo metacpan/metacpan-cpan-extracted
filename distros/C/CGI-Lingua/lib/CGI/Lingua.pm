@@ -3,13 +3,12 @@ package CGI::Lingua;
 use warnings;
 use strict;
 
-use Log::Abstraction;
 use Object::Configure;
 use Params::Get;
 use Storable; # RT117983
 use Class::Autouse qw{Carp Locale::Language Locale::Object::Country Locale::Object::DB I18N::AcceptLanguage I18N::LangTags::Detect};
 
-our $VERSION = '0.74';
+our $VERSION = '0.75';
 
 =head1 NAME
 
@@ -17,7 +16,7 @@ CGI::Lingua - Create a multilingual web page
 
 =head1 VERSION
 
-Version 0.74
+Version 0.75
 
 =cut
 
@@ -33,7 +32,7 @@ Based on that list CGI::Lingua tells the application which language the user wou
 
     use CGI::Lingua;
     # ...
-    my $l = CGI::Lingua->new(supported => ['en', 'fr', 'en-gb', 'en-us']);
+    my $l = CGI::Lingua->new(['en', 'fr', 'en-gb', 'en-us']);
     my $language = $l->language();
     if ($language eq 'English') {
 	print '<P>Hello</P>';
@@ -66,7 +65,8 @@ Based on that list CGI::Lingua tells the application which language the user wou
 
 Creates a CGI::Lingua object.
 
-Takes one mandatory parameter: a list of languages, in RFC-1766 format,
+Takes one mandatory parameter, C<supported>,
+a list of languages, in RFC-1766 format,
 that the website supports.
 Language codes are of the form primary-code [ - country-code ] e.g.
 'en', 'en-gb' for English and British English respectively.
@@ -160,11 +160,14 @@ If neither is given, L<Carp> will be used.
 sub new
 {
 	my $class = shift;
-	my $params = Params::Get::get_params(undef, @_);
+	my $params = Params::Get::get_params('supported', @_);
 
 	if(!defined($class)) {
 		if($params) {
 			# Using CGI::Lingua:new(), not CGI::Lingua->new()
+			if(my $logger = $params->{'logger'}) {
+				$logger->error(__PACKAGE__, ' use ->new() not ::new() to instantiate');
+			}
 			croak(__PACKAGE__, ' use ->new() not ::new() to instantiate');
 		}
 
@@ -183,6 +186,9 @@ sub new
 	# }
 	$params->{'supported'} ||= $params->{'supported_languages'};
 	unless($params->{supported}) {
+		if(my $logger = $params->{'logger'}) {
+			$logger->error('You must give a list of supported languages');
+		}
 		Carp::croak('You must give a list of supported languages');
 	}
 
@@ -206,7 +212,7 @@ sub new
 				# $logger->debug('Found - thawing');
 			# }
 			$rc = Storable::thaw($rc);
-			$rc->{_logger} = $params->{'logger'};
+			$rc->{logger} = $params->{'logger'};
 			$rc->{_syslog} = $params->{syslog};
 			$rc->{_cache} = $cache;
 			$rc->{_supported} = $params->{supported};
@@ -238,7 +244,6 @@ sub new
 		# _locale => undef,	# Locale::Object::Country
 		_syslog => $params->{syslog},
 		_dont_use_ip => $params->{dont_use_ip} || 0,
-		_logger => $params->{'logger'},
 		_have_ipcountry => -1,	# -1 = don't know
 		_have_geoip => -1,	# -1 = don't know
 		_have_geoipfree => -1,	# -1 = don't know
@@ -364,9 +369,11 @@ on a site that only serves British English, sublanguage() will return undef.
 sub sublanguage {
 	my $self = shift;
 
+	$self->_trace('Entered sublanguage');
 	unless($self->{_slanguage}) {
 		$self->_find_language();
 	}
+	$self->_trace('Leaving sublanguage ', ($self->{_sublanguage} || 'undef'));
 	return $self->{_sublanguage};
 }
 
@@ -481,16 +488,37 @@ sub _find_language
 		}
 
 		my $requested_sublanguage;
-		if((!$l) && ($http_accept_language =~ /(..)\-(..)/)) {
-			$requested_sublanguage = $2;
-			# Fall back position, e,g. we want US English on a site
-			# only giving British English, so allow it as English.
-			# The calling program can detect that it's not the
-			# wanted flavour of English by looking at
-			# requested_language
-			if($i18n->accepts($1, $self->{_supported})) {
-				$l = $1;
-				$self->_debug("Fallback to $l as sublanguage is not supported");
+		if(!$l) {
+			# FIXME: This scans the HTTP_ACCEPTED_LANGUAGE left to right, it ignores the priority value
+			$self->_debug(__PACKAGE__, ': ', __LINE__, ": look through $http_accept_language for alternatives");
+			while($http_accept_language =~ /(..)\-(..)/g) {
+				$requested_sublanguage = $2;
+				# Fall back position, e,g. we want US English on a site
+				# only giving British English, so allow it as English.
+				# The calling program can detect that it's not the
+				# wanted flavour of English by looking at
+				# requested_language
+				$self->_debug(__PACKAGE__, ': ', __LINE__, ": see if $1 is supported");
+				if($i18n->accepts($1, $self->{_supported})) {
+					$l = $1;
+					$self->_debug("Fallback to $l as sublanguage $requested_sublanguage is not supported");
+					last;
+				}
+			}
+		}
+		if(!$l) {
+			# FIXME: This scans the HTTP_ACCEPTED_LANGUAGE left to right, it ignores the priority value
+			$self->_debug(__PACKAGE__, ': ', __LINE__, ": look harder through $http_accept_language for alternatives");
+			foreach my $possible(split(/,/, $http_accept_language)) {
+				next if($possible =~ /..\-../);	# Already checked those with sublanguages
+				$possible =~ s/;.*$//;
+				$self->_debug(__PACKAGE__, ': ', __LINE__, ": see if $possible is supported");
+				if($i18n->accepts($possible, $self->{_supported})) {
+					$l = $possible;
+					$self->_debug("Fallback to $possible as best alternative");
+					undef $requested_sublanguage;
+					last;
+				}
 			}
 		}
 
@@ -562,12 +590,13 @@ sub _find_language
 								$variety = 'gb';
 							}
 							if(defined(my $c = $self->_code2countryname($variety))) {
+								$self->_debug(__PACKAGE__, ': ', __LINE__, ":  setting sublanguage to $c");
 								$self->{_sublanguage} = $c;
 							}
 							$self->{_slanguage_code_alpha2} = $accepts;
 							if($self->{_sublanguage}) {
 								$self->{_rlanguage} = "$self->{_slanguage} ($self->{_sublanguage})";
-								$self->_debug("_rlanguage: $self->{_rlanguage}");
+								$self->_debug(__PACKAGE__, ': ', __LINE__, ": _rlanguage: $self->{_rlanguage}");
 							}
 							$self->{_sublanguage_code_alpha2} = $variety;
 							unless($from_cache) {
@@ -626,6 +655,8 @@ sub _find_language
 							}
 						}
 						if($@ || !defined($language_name)) {
+							$self->_warn($@) if($@);
+							$self->_debug(__PACKAGE__, ': ', __LINE__, ': setting sublanguage to Unknown');
 							$self->{_sublanguage} = 'Unknown';
 							$self->_warn({
 								warning => "Can't determine values for $http_accept_language"
@@ -647,9 +678,9 @@ sub _find_language
 				}
 			}
 		} elsif($http_accept_language =~ /;/) {
-			# e.g. HTTP_ACCEPT_LANGUAGE=de-DE,de;q=0.9
-			# and we don't support DE at all
-			$self->_warn(__PACKAGE__, ': ', __LINE__, ": lower priority supported language may be missed HTTP_ACCEPT_LANGUAGE=$http_accept_language");
+			# e.g. HTTP_ACCEPT_LANGUAGE=de-DE,de;q=0.9,en-US;q=0.8,en;q=0.7
+			# and we don't support DE at all, but we do accept en-US
+			$self->_notice(__PACKAGE__, ': ', __LINE__, ": couldn't honour HTTP_ACCEPT_LANGUAGE=$http_accept_language, supported languages are: ", join(',', @{$self->{supported}}));
 		}
 		if($self->{_slanguage} && ($self->{_slanguage} ne 'Unknown')) {
 			if($self->{_rlanguage} eq 'Unknown') {
@@ -899,6 +930,7 @@ sub country {
 	Data::Validate::IP->import();
 
 	if(!is_ipv4($ip)) {
+		$self->_debug("$ip isn't IPv4. Is it IPv6?");
 		if($ip eq '::1') {
 			# special case that is easy to handle
 			$ip = '127.0.0.1';
@@ -922,7 +954,7 @@ sub country {
 		$self->{_country} = $self->{_cache}->get(__PACKAGE__ . ":country:$ip");
 		if(defined($self->{_country})) {
 			if($self->{_country} !~ /\D/) {
-				$self->_warn('cache contains a numeric country: ' . $self->{_country});
+				$self->_warn('cache contains a numeric country: ', $self->{_country});
 				$self->{_cache}->remove($ip);
 				delete $self->{_country};	# Seems to be a number
 			} else {
@@ -950,7 +982,7 @@ sub country {
 			$self->{_country} = lc($self->{_country});
 		} elsif(is_ipv4($ip)) {
 			# Although it doesn't say so, it looks like IP::Country is IPv4 only
-			$self->_notice("$ip is not known by IP::Country");
+			$self->_debug("$ip is not known by IP::Country");
 		}
 	}
 	unless(defined($self->{_country})) {
@@ -1018,7 +1050,7 @@ sub country {
 			if($self->{_country}) {
 				if($self->{_country} eq 'EU') {
 					delete($self->{_country});
-				} elsif(($self->{_country} eq 'US') && ($whois->{'StateProv'} eq 'PR')) {
+				} elsif(($self->{_country} eq 'US') && defined($whois->{'StateProv'}) && ($whois->{'StateProv'} eq 'PR')) {
 					# RT#131347: Despite what Whois thinks, Puerto Rico isn't in the US
 					$self->{_country} = 'pr';
 				}
@@ -1081,7 +1113,7 @@ sub country {
 			}
 
 			if($self->{_country} !~ /\D/) {
-				$self->_warn('cache contains a numeric country: ' . $self->{_country});
+				$self->_warn('cache contains a numeric country: ', $self->{_country});
 				delete $self->{_country};	# Seems to be a number
 			} elsif($self->{_cache}) {
 				$self->_debug("Set $ip to $self->{_country}");
@@ -1157,8 +1189,7 @@ sub locale {
 			$candidate =~ s/\s$//g;
 			if($candidate =~ /^[a-zA-Z]{2}-([a-zA-Z]{2})$/) {
 				local $SIG{__WARN__} = undef;
-				my $c = $self->_code2country($1);
-				if($c) {
+				if(my $c = $self->_code2country($1)) {
 					$self->{_locale} = $c;
 					return $c;
 				}
@@ -1170,12 +1201,9 @@ sub locale {
 			HTTP::BrowserDetect->import();
 			my $browser = HTTP::BrowserDetect->new($agent);
 
-			if($browser && $browser->country()) {
-				my $c = $self->_code2country($browser->country());
-				if($c) {
-					$self->{_locale} = $c;
-					return $c;
-				}
+			if($browser && $browser->country() && (my $c = $self->_code2country($browser->country()))) {
+				$self->{_locale} = $c;
+				return $c;
 			}
 		}
 	}
@@ -1250,6 +1278,9 @@ sub time_zone {
 					$self->{_timezone} = JSON::Parse::parse_json($data)->{'timezone'};
 				}
 			} else {
+				if(my $logger = $self->{'logger'}) {
+					$logger->error('You must have LWP::Simple::WithCache installed to connect to ip-api.com');
+				}
 				Carp::croak('You must have LWP::Simple::WithCache installed to connect to ip-api.com');
 			}
 		}
@@ -1299,9 +1330,9 @@ sub _code2country
 
 	return unless($code);
 	if($self->{_country}) {
-		$self->_trace("_code2country $code, country ", $self->{_country});
+		$self->_trace(">_code2country $code, country ", $self->{_country});
 	} else {
-		$self->_trace("_code2country $code");
+		$self->_trace(">_code2country $code");
 	}
 	local $SIG{__WARN__} = sub {
 		if($_[0] !~ /No result found in country table/) {
@@ -1310,6 +1341,7 @@ sub _code2country
 	};
 	my $rc = Locale::Object::Country->new(code_alpha2 => $code);
 	local $SIG{__WARN__} = 'DEFAULT';
+	$self->_trace('<_code2country ', $code || 'undef');
 	return $rc;
 }
 
@@ -1319,7 +1351,7 @@ sub _code2countryname
 	my ($self, $code) = @_;
 
 	return unless($code);
-	$self->_trace("_code2countryname $code");
+	$self->_trace(">_code2countryname $code");
 	unless($self->{_cache}) {
 		my $country = $self->_code2country($code);
 		if(defined($country)) {
@@ -1331,10 +1363,12 @@ sub _code2countryname
 		$self->_trace("_code2countryname found in cache $from_cache");
 		return $from_cache;
 	}
-	$self->_trace('_code2countryname not in cache, storing');
 	if(my $country = $self->_code2country($code)) {
-		return $self->{_cache}->set(__PACKAGE__ . ":code2countryname:$code", $country->name, '1 month');
+		$self->_debug('_code2countryname not in cache, storing');
+		$self->_trace('<_code2countryname ', $country->name());
+		return $self->{_cache}->set(__PACKAGE__ . ":code2countryname:$code", $country->name(), '1 month');
 	}
+	$self->_trace('<_code2countryname undef');
 }
 
 # Log and remember a message
@@ -1378,17 +1412,20 @@ sub _trace {
 sub _warn
 {
 	my $self = shift;
-	my $params = Params::Get::get_params('warning', @_);
+	if(defined($self->{'logger'})) {
+		$self->{'logger'}->warn(\@_);
+	} else {
+		# This shouldn't happen, since Object::Configure always sets something
+		my $params = Params::Get::get_params('warning', @_);
 
-	$self->_log('warn', $params->{'warning'});
-	if(!defined($self->{'logger'})) {
+		$self->_log('warn', $params->{'warning'});
 		Carp::carp($params->{'warning'});
 	}
 }
 
 =head1 AUTHOR
 
-Nigel Horne, C<< <njh at bandsman.co.uk> >>
+Nigel Horne, C<< <njh at nigelhorne.com> >>
 
 =head1 BUGS
 
@@ -1410,6 +1447,8 @@ This means that if you support languages at a lower priority, it may be missed.
 =head1 SEE ALSO
 
 =over 4
+
+=item * Testing Dashboard L<https://nigelhorne.github.io/CGI-Lingua/coverage/>
 
 =item * L<HTTP::BrowserDetect>
 

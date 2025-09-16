@@ -6,13 +6,14 @@ use warnings;
 
 use Test::More;
 
-plan tests => 48;
+plan tests => 51;
 
 my @module_files = (
     'Iterator/Flex.pm',
     'Iterator/Flex/Array.pm',
     'Iterator/Flex/ArrayLike.pm',
     'Iterator/Flex/Base.pm',
+    'Iterator/Flex/Buffer.pm',
     'Iterator/Flex/Cache.pm',
     'Iterator/Flex/Cat.pm',
     'Iterator/Flex/Chunk.pm',
@@ -26,6 +27,7 @@ my @module_files = (
     'Iterator/Flex/Grep.pm',
     'Iterator/Flex/Map.pm',
     'Iterator/Flex/Method.pm',
+    'Iterator/Flex/Permute.pm',
     'Iterator/Flex/Product.pm',
     'Iterator/Flex/Role.pm',
     'Iterator/Flex/Role/Current/Closure.pm',
@@ -54,6 +56,7 @@ my @module_files = (
     'Iterator/Flex/Role/Wrap/Throw.pm',
     'Iterator/Flex/Sequence.pm',
     'Iterator/Flex/Stack.pm',
+    'Iterator/Flex/Take.pm',
     'Iterator/Flex/Utils.pm',
     'Iterator/Flex/Zip.pm'
 );

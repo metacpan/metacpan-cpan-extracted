@@ -1,0 +1,62 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+# Program: restrictip
+# Purpose:
+#   Exits with 0 if there are no problems.
+#   Exits with non-zero and prints message to STDERR if IP is not allowed.
+
+my $restrictip = `git config acl.restrictip` or exit 0;  # No config
+my $ssh = $ENV{SSH_CLIENT} or exit 0;              # Not from SSH?
+my $ip = $ssh =~ /^([\da-f\.:]+) /i ? $1 : die "restrictip: SSH Stank!\n";
+my $KEY = $ENV{KEY} || "UNKNOWN";
+$restrictip =~ s/\s+//g;
+foreach my $cidr (split /,/, $restrictip) {
+    if ($cidr =~ m{^(\d+\.\d+\.\d+\.\d+)(?:|/(\d+))$}) {
+        # IPv4 check
+        my $base = $1;
+        my $prefix = $2 || 32;
+        if ($prefix >= 8 and
+            $prefix <= 32 and
+            $ip =~ /^(\d+\.\d+\.\d+\.\d+)$/) {
+            require Socket;
+            my $should_bits = unpack "B32", Socket::inet_pton(Socket::AF_INET(), $base);
+            my $actual_bits = unpack "B32", Socket::inet_pton(Socket::AF_INET(), $ip);
+            if (substr($should_bits, 0, $prefix) eq
+                substr($actual_bits, 0, $prefix)) {
+                # Prefix MATCH!
+                exit 0;
+            }
+        }
+        else {
+            warn "restrictip: IPv4 CIDR [$cidr] Prefix Stank!\n";
+        }
+    }
+    elsif ($cidr =~ m{^([\da-f\:]+)(?:|/(\d+))$}) {
+        # IPv6 check
+        my $base = $1;
+        my $prefix = $2 || 128;
+        if ($prefix >= 8 and
+            $prefix <= 128 and
+            $ip =~ /^([\da-f\:]+)$/) {
+            require Socket6;
+            my $should_bits = unpack "B128", Socket6::inet_pton(Socket6::AF_INET6(), $base);
+            my $actual_bits = unpack "B128", Socket6::inet_pton(Socket6::AF_INET6(), $ip);
+            if (substr($should_bits, 0, $prefix) eq
+                substr($actual_bits, 0, $prefix)) {
+                # Prefix MATCH!
+                exit 0;
+            }
+        }
+        else {
+            warn "restrictip: IPv6 CIDR [$cidr] Prefix Stank!\n";
+        }
+    }
+    else {
+        die "restrictip: CIDR [$cidr] Too Stank!\n";
+    }
+}
+
+die localtime().": [$KEY\@$ip] git-server: Your IP has been blocked.\n";

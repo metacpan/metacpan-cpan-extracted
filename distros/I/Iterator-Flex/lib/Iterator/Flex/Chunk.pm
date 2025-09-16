@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use experimental 'signatures';
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 use Iterator::Flex::Factory;
 use Iterator::Flex::Utils qw[ THROW STATE EXHAUSTION :IterAttrs :IterStates ];
@@ -144,7 +144,7 @@ Iterator::Flex::Chunk - Chunk Iterator Class
 
 =head1 VERSION
 
-version 0.29
+version 0.30
 
 =head1 METHODS
 
@@ -152,7 +152,7 @@ version 0.29
 
   use Iterator::Flex::Chunk::Constants ':all';
 
-  $iterator = Ierator::Flex::Chunk->new( $coderef, $iterable, ?\%pars );
+  $iterator = Ierator::Flex::Chunk->new( $iterable, ?\%pars );
 
 Returns an iterator which chunks elements returned by
 C<$iterable> Chunked items are returned as an arrayref.

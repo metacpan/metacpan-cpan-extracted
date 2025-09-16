@@ -1,0 +1,335 @@
+#!/usr/bin/env perl
+
+=pod
+
+=head1 NAME
+
+run-git-hooks - Secure Git Server with more granular hooks capabilities than default git.
+
+=head1 SYNOPSIS
+
+  Standard Method:
+  With SHELL=/bin/bash, use the following format in ~/.ssh/authorized_keys:
+  command="~/git-server/gitserver KEY=user1" ssh-ed25519 AAAA_OAX+blah_pub__ user1@workstation
+
+   -- OR --
+
+  Advanced Method:
+  Set SHELL=/path/to/git-server (in /etc/passwd) and
+  Set "PermitUserEnvironment yes" (in /etc/ssh/sshd_config)
+  Then use the following format in ~/.ssh/authorized_keys:
+  environment="KEY=user1" ssh-ed25519 AAAA_OAX+blah_pub__ user1@workstation
+
+=head1 ENV
+
+You can set as many %ENV variables as you want
+within the authorized_keys configuration.
+
+=head2 KEY
+
+KEY has a special meaning to define a word for the associated user
+and will be used for ACL rules.
+
+=head1 INSTALL
+
+This can be used with any existing git repositories or as a drop-in replacement
+for git-shell or you can create a fresh repo on the git host:
+
+  git init --bare project
+
+Then add whatever hooks you want:
+
+  vi project/hooks/pre-read
+  chmod 755 project/hooks/pre-read
+
+Each hook can read the ENV settings defined in authorized_keys.
+
+=head1 HOOKS
+
+All the normal git hooks will continue to work, plus the following:
+
+=head2 hooks/pre-read
+
+Executed before any repository read operation, such as
+"git clone" or "git pull" or "git fetch" or "git ls-remote".
+The Environment variable GIT_PRE_EXIT_STATUS will
+be set to the exit status of this pre-read.
+If this exit status is exactly zero, then the
+git read operation will be executed.
+Otherwise, the git read operation will be aborted.
+
+=head2 hooks/post-read
+
+If the Environment variable GIT_PRE_EXIT_STATUS is defined,
+then post-read will know that the pre-read ran,
+and its exit status will be available in this variable.
+If it does not exist, then pre-read never ran.
+If the Environment variable GIT_EXIT_STATUS is defined,
+then post-read will know that the git operation ran,
+and its exit status will be this variable.
+If it does not exist, then the git operation never ran.
+
+This post-read hook will always be executed regardless
+of the exit statuses of pre-read or the git operation.
+The post-read hook is meant primarily for notification
+and cannot affect the outcome of the git operation.
+
+=head2 hooks/pre-write
+
+Executed before any repository modification attempt,
+such as "git push".
+Unlike the hooks/update hook, this hooks/pre-write
+will always be triggered for write operations, even
+if there are no actual changes that need to be made.
+The Environment variable GIT_PRE_EXIT_STATUS will
+be set to the exit status of this pre-write.
+If this exit status is exactly zero, then the
+git write operation will be executed.
+Otherwise, the git write operation will be aborted.
+
+=head2 hooks/post-write
+
+If the Environment variable GIT_PRE_EXIT_STATUS is defined,
+then post-write will know that the pre-write ran,
+and its exit status will be available in this variable.
+If it does not exist, then pre-write never ran.
+If the Environment variable GIT_EXIT_STATUS is defined,
+then post-write will know that the git operation ran,
+and its exit status will be this variable.
+If it does not exist, then the git operation never ran.
+
+This post-write hook will always be executed regardless
+of the exit statuses of pre-write or the git operation.
+The post-write hook is meant primarily for notification
+and cannot affect the outcome of the git operation.
+
+=head2 hooks/git-shell
+
+If this exists, then it will be executed instead of
+the real git-shell program.
+
+=head1 SEE ALSO
+
+Similar functionality to the following:
+
+  gitlab-shell, gitolite, git-shell
+
+=head1 AUTHOR
+
+Rob Brown <bbb@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2015-2025 by Rob Brown <bbb@cpan.org>
+
+This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+=cut
+
+use strict;
+use warnings;
+use FindBin qw($Bin);
+
+our $VERSION = "0.032";
+
+my $ssh = $ENV{SSH_CLIENT} or die "Only SSH allowed\n";
+$ENV{GIT_CONNECTED_EPOCH} ||= time;
+
+my $git_op_hook = {
+    "git-upload-pack" => "read", # i.e., clone, pull, fetch, ls-remote
+    "git-receive-pack" => "write", # i.e., push
+};
+
+$SIG{PIPE} = sub { exit 1; };
+
+my $cmd = undef;
+if (@ARGV == 2 and $ARGV[0] eq "-c") {
+    shift; # -c
+    $cmd = shift; # i.e., "git-upload-pack 'project'"
+}
+my $KEY = $ENV{KEY} || "UNKNOWN";
+my $ip = $ssh =~ /^([\da-f\.:]+) /i ? $1 : "UNKNOWN";
+die localtime().": [$KEY\@$ip] git-server: Unexpected invocation.\n" unless $cmd;
+
+my $dir = $ENV{GIT_DIR} or die localtime().": [$KEY\@$ip] git-server: Unable to determine repo!\n";
+die localtime().": [$KEY\@$ip] git-server: You can't access '$1' git repository\n" if $dir =~ m{([^/]*\.workingdir)\b};
+
+my $bare = `git config core.bare 2>/dev/null`;
+if ($bare =~ /true/) {
+    # Safe! Nothing to worry about.
+}
+elsif ($bare =~ /false/) {
+    # If non-bare, then make sure no uncommitted changes are sitting on the server.
+    my $where = $dir =~ m{^(.+)/\.git$} ? $1 : $dir;
+    my $server_monkeys = `git diff 2>&1`;
+    if ($? or $server_monkeys) {
+        die localtime().": [$KEY\@$ip] git-server: Illegal uncommitted changes found on Non-bare git server! Manual intervention required.\n".
+            "  Option a) Discard changes: git -C $where checkout .\n".
+            "  Option b) Commit changes: git -C $where commit -a -m 'Keep modifications found on server'\n".
+            "$server_monkeys\n";
+    }
+    if ($where =~ /^(.*?)\/?\.git$/) {
+        my $gitless = $1;
+        my $recommendation = -e $gitless ? "mv -v $gitless $gitless-CRUSTY-PLEASE-DELETE-\$\$ && " : "";
+        $recommendation .= "git clone --bare $where $gitless";
+        $recommendation .= qq{ && (grep -q "ref: " $gitless/HEAD || grep " refs/heads/" $gitless/packed-refs | head -1 | awk '{print "ref: ", \$2}' > $gitless/HEAD)};
+        $recommendation .= qq{ && mv -v $where $where-CRUSTY-PLEASE-DELETE-\$\$};
+        die localtime().": [$KEY\@$ip] git-server: Non-bare git folder ending with '.git' is too dangerous for a server repo! Manual intervention required.\n".
+            "  Recommendation: $recommendation\n";
+    }
+    # Make sure NOT to be stuck on any branch just to be safe.
+    # Otherwise, if the client attempts to push any changes to that branch, it will crash with the following:
+    #   remote: error: refusing to update checked out branch: refs/heads/main
+    open my $head_fh, "<", "$dir/HEAD" or die localtime().": [$KEY\@$ip] git-server: Broken non-bare repo missing $dir/HEAD?\n";
+    my $stuck = <$head_fh> || "";
+    close $head_fh;
+    if ($stuck =~ /^[0-9a-f]+\s*$/) {
+        # Looks like a great detached commit, so it is safe enough to proceed.
+    }
+    else {
+        $stuck =~ m{^ref:\s+refs/heads/(\S+)} or die localtime().": [$KEY\@$ip] git-server: Unable to determine non-bare checkout branch: $stuck\n";
+        my $current_branch = $1;
+        if (`git log 2>&1` =~ /^commit\s+([0-9a-f]+)/m) {
+            my $detach = $1;
+            die localtime().": [$KEY\@$ip] git-server: Non-bare git checkout linked to branch [$current_branch] is too dangerous to use server repo. Manual intervention required.\n".
+                " Option a) Fork a copy into a safe bare git folder: git clone --bare $where $where.git\n".
+                " Option b) Detach checkout from branch to lock onto a safe commit: git -C $where checkout $detach\n";
+        }
+        die localtime().": [$KEY\@$ip] git-server: Unable to determine any commit for non-bare checkout on branch $current_branch\n";
+    }
+}
+else {
+    die localtime().": [$KEY\@$ip] git-server: Broken bare for git repo configuration! $dir/config: ".`git config core.bare 2>&1`."\n";
+}
+
+my $hook = $cmd =~ /^(git-[\w\-]+)/ && $git_op_hook->{$1} or die localtime().": [$KEY\@$ip] git-server: Unimplemented operation!\n";
+
+my $xmods = $ENV{XMODIFIERS} || "";
+if ($xmods) {
+    $cmd !~ /^git-receive-pack\b/ or
+        `git config --list 2>/dev/null` =~ /^receive.advertisePushOptions=/im
+        or system qw(git config --global receive.advertisePushOptions true);
+    $xmods =~ s/(^\s*|\s*$)//g;
+    if ($xmods =~ /\bDEBUG\s*=\s*(.[^\,\n]*)/i) {
+        my $debug = $1;
+        $ENV{DEBUG} =
+            $debug =~ /^(?:|0|off|false)$/i ? 0 :
+            $debug =~ /^(\d+)$/ ? $1 : 1;
+    }
+    my @options = split /\n/, $xmods;
+    $ENV{GIT_OPTION_COUNT} = scalar @options;
+    for (my $i = 0; $i < @options; $i++) {
+        $ENV{"GIT_OPTION_$i"} = $options[$i];
+        warn localtime().": [$KEY\@$ip] git-server: Transported GIT_OPTION_$i=[$options[$i]]\n";
+    }
+}
+
+my $base = $0 =~ /([\w\-\.]+)$/ ? $1 : die "$0: Stank base\n";
+if ($0 !~ m{^\Q$dir\E/hooks/} and    # Launched outside of repo/hooks
+    !-x "$dir/hooks/$base" and       # repo is missing hooks/run-git-hooks
+    -e "$dir/config" and             # repo is properly --bare
+    $Bin =~ m{/hooks$} and           # Launched from "hooks" folder somewhere
+    !-l $Bin and                     # Spawned from real "hooks" folder, not a symlink
+    !-l "$dir/hooks"                 # Repo hooks is not a symlink, (so it's probably the original "sample" stock)
+    || !-d _) {                      # Or it's not even a directory (maybe non-existent or plain "hooks" file or a special mknod file or unix socket)
+    warn localtime().": [$KEY\@$ip] git-server: Automatically configuring repo [$dir] to use hooks properly...\n";
+    # Don't delete stock "hooks" folder in case there is something needed in there. Just move it out of the way to be safe.
+    rename "$dir/hooks","$dir/hooks-CRUSTY-PLEASE-DELETE-$$" and warn "rename: $dir/hooks -> $dir/hooks-CRUSTY-PLEASE-DELETE-$$\n" if lstat "$dir/hooks";
+    symlink $Bin, "$dir/hooks" and warn "symlink: $dir/hooks -> $Bin\n";
+    if (-l "$dir/hooks" and -d "$dir/hooks") {
+        warn localtime().": [$KEY\@$ip] git-server: Successfully upgraded hooks to myself.\n";
+        if (!`git config acl.writers`) {
+            warn localtime().": [$KEY\@$ip] git-server: No [acl.writers] found? Running: [git config acl.writer $KEY]\n";
+            system "git config acl.writers $KEY 1>&2";
+        }
+    }
+    else {
+        warn localtime().": [$KEY\@$ip] git-server: FAILED configuring repo [$dir/hooks]! Manual intervention required.\n";
+    }
+}
+
+# Custom hooks are free to read or write in this IPC folder
+my $tmpdir = "$dir/tmp";
+mkdir $tmpdir, 0700 unless -d $tmpdir;
+$ENV{IPC} = "$tmpdir/current-$hook-$$-io";
+mkdir $ENV{IPC}, 0700;
+die localtime().": [$KEY\@$ip] git-server: Unable to create [$ENV{IPC}] folder! $!\n" unless -d $ENV{IPC};
+
+my $pre_failure = 0;
+if (-x "$dir/hooks/pre-$hook") {
+    if ($pre_failure = spawn($dir, "hooks/pre-$hook")) {
+        warn "pre-$hook: failed! $pre_failure\n";
+    }
+    $ENV{GIT_PRE_EXIT_STATUS} = $pre_failure;
+}
+
+my $git_failure = $pre_failure;
+if (!$git_failure) {
+    my $shell = "$dir/hooks/git-shell";
+    $shell = "git-shell" unless -x $shell;
+    $git_failure = spawn(".", $shell, "-c", $cmd);
+    $ENV{GIT_EXIT_STATUS} = $git_failure;
+}
+
+my $post_failure = 0;
+if (-x "$dir/hooks/post-$hook") {
+    if ($cmd) {
+        # Restore SSH_ORIGINAL_COMMAND in case the post hook wants it.
+        $ENV{SSH_ORIGINAL_COMMAND} = $cmd;
+    }
+    if ($post_failure = spawn($dir, "hooks/post-$hook")) {
+        warn "post-$hook: failed! $post_failure\n";
+    }
+}
+
+if ($ENV{IPC}) {
+    if ($ENV{DEBUG}) {
+        warn localtime().": [$KEY\@$ip] git-server: DEBUG: Leaving $ENV{IPC} intact\n";
+    }
+    else {
+        # Wipe out anything in the IPC folder
+        system "rm", "-rf", glob "$ENV{IPC}*";
+    }
+    if (opendir my $tmp, $tmpdir) {
+        # Look for stale IPC files
+        while (my $f = readdir $tmp) {
+            next if $f !~ /^current-/; # Only wipe stuff that I made
+            my $crusty = "$tmpdir/$f";
+            if ($ENV{DEBUG} && -M $crusty > 32) {
+                warn localtime().": [$KEY\@$ip] git-server: Wiping crusty files: [$crusty] ...\n";
+                system "rm", "-rf", $crusty;
+            }
+            elsif (-M $crusty > 62) {
+                # Silently wipe out old IPC files left over from DEBUG mode.
+                system "rm", "-rf", $crusty;
+            }
+        }
+    }
+}
+
+rmdir $tmpdir; # Only clear if empty
+
+exit $git_failure;
+
+# spawn( $chdir, $cmd, [ @args ] )
+# chdir $chdir
+# before running cmd.
+# Returns the exit status
+sub spawn {
+    my $chdir = shift;
+    my @cmd = @_;
+    my $pid = fork;
+    if ($pid) {
+        # Parent
+        waitpid($pid, 0);
+        return $? & 127 || $? >> 8;
+    }
+    elsif (!defined $pid) {
+        die "fork: $!\n";
+    }
+    else {
+        # Child
+        chdir($chdir) or die "$chdir: chdir: $!\n";
+        exec @cmd or die "From($chdir) $cmd[0]: exec: $!";
+    }
+}

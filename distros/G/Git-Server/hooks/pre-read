@@ -1,0 +1,50 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use FindBin qw($Script);
+
+my $ssh = $ENV{SSH_CLIENT} or die "Only SSH allowed\n";
+my $base = $ENV{GIT_DIR} or die "GIT hook ENV malfunction!\n";
+my $acl = {};
+my $conf = `git config --list`;
+while ($conf =~ s/^acl.(\w+)=(.*)$//m) {
+    my $param = $1;
+    my $keys = $2;
+    foreach my $key (split /,/, $keys) {
+        $acl->{$param}->{$key} = 1;
+    }
+}
+
+$SIG{PIPE} = sub { exit 1; };
+
+my $KEY = $ENV{KEY} || "UNKNOWN";
+my $ip = $ssh =~ /^([\da-f\.:]+) /i ? $1 : "UNKNOWN";
+$conf !~ /^proxy/m or 0 == system "hooks/proxy", $Script or die localtime().": [$KEY\@$ip] git-server: proxy operation failure: $?\n";
+# Verify IP
+if (my $banned = system "hooks/restrictip") {
+    exit $banned;
+}
+if ($acl->{deploy}->{$KEY}) {
+    warn localtime().": [$KEY\@$ip] git-server: PULL waiting for notification ...\n";
+    my $who = "$KEY\@$ip:$base";
+    if (my $notification_error = system "hooks/push-notification", $who or $?) {
+        die localtime().": [$KEY\@$ip] git-server: Too many other concurrent reads. Try again later. (ERROR: $notification_error-$?)\n";
+    }
+}
+# If you can write or deploy, then you can also read
+my $allowed = $acl->{readers}->{$KEY} || $acl->{writers}->{$KEY} || $acl->{deploy}->{$KEY};
+warn localtime().": [$KEY\@$ip] git-server: RUNNING PULL ...\n" if $allowed;
+
+if (my $pid = open my $fh, "|-", "$base/hooks/logger", "") {
+    if ($allowed) {
+        print $fh localtime().": [$KEY\@$ip]: pulled\n";
+    }
+    else {
+        print $fh localtime().": [$KEY\@$ip]: Missing [acl.readers] or [acl.deploy] permission. Blocked clone or pull attempt!\n";
+    }
+    close $fh;
+    die localtime().": [$KEY\@$ip] git-server: SERVER ERROR! log.logfile failed! $?\n" if $?;
+}
+
+die localtime().": [$KEY\@$ip] git-server: You have been banned from clone or pull!\n" unless $allowed;

@@ -4,6 +4,7 @@ author:
   - 'Jim Melanson <jmelanson1965@gmail.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Test::More: '1.001014'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -24,5 +25,5 @@ requires:
   Digest::SHA: '0'
   Time::Local: '0'
   perl: '5.010000'
-version: v2.1.1
+version: v2.1.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -24,14 +24,12 @@
 use strict;
 use warnings;
 use File::Basename qw(dirname);
-use vars qw($VERSION $VX);
-$VERSION = eval { require CPAN::RPM; $CPAN::RPM::VERSION } || "0";
-
 use Getopt::Long;
 use Sys::Hostname;
 
-my ($ME, $RPM, $TMPDIR, %RPMDIR, $CWD, %info, %meta, $ARGS);
+our $VERSION = "2.040";
 
+my ($ME, $RPM, $TMPDIR, %RPMDIR, $CWD, %info, %meta, $ARGS, $VX);
 my $tarRE = q/\.(tar\.(g?z|bz2)|tgz|zip)$/;
 my $docRE = '(readme|changes|todo|license|install|\.txt|\.html)';
 my $HTTPWARN = 0;   # so we don't repeat warnings
@@ -55,8 +53,7 @@ for (@ARGV) {
 # --- support functionality ---------------------------------------------------
 
 END {
-    chdir $CWD;
-    return print("$VERSION\n") if $VX;
+    return print "$VERSION\n" if $VX;
     print "-- Done --\n";
     }
 
@@ -225,6 +222,16 @@ sub init {
             );
         };
 
+    # check directory permissions
+
+    $RPMDIR{BUILD} = getrpm_macdef("_builddir");
+    $RPMDIR{SOURCES} = getrpm_macdef("_sourcedir");
+    $RPMDIR{RPMS} = getrpm_macdef("_rpmdir");
+    $RPMDIR{SRPMS} = getrpm_macdef("_srcrpmdir");
+    $RPMDIR{SPECS} = getrpm_macdef("_specdir");
+    $RPMDIR{ARCH} = getrpm_macdef("_arch");
+    chkdirs();
+
     upgrade() if defined $info{upgrade};
 
     unless ($info{"no-sign"}) {
@@ -235,16 +242,6 @@ sub init {
 
     #   deal with newer versions
     chkupgrade();
-
-    # check directory permissions
-
-    $RPMDIR{BUILD} = getrpm_macdef("_builddir");
-    $RPMDIR{SOURCES} = getrpm_macdef("_sourcedir");
-    $RPMDIR{RPMS} = getrpm_macdef("_rpmdir");
-    $RPMDIR{SRPMS} = getrpm_macdef("_srcrpmdir");
-    $RPMDIR{SPECS} = getrpm_macdef("_specdir");
-    $RPMDIR{ARCH} = getrpm_macdef("_arch");
-    chkdirs();
 
     # sets empty string if not --buildarch and --spec-only
     $info{buildarch} ||= $info{"spec-only"} ? "" : $RPMDIR{ARCH};
@@ -1763,18 +1760,15 @@ sub upgrade {
         exit;
     }
     print "Upgrading...\n";
-    # XXX - Is there a more general way to determine the CPAN URL Prefix?
-    my $url = "$CPAN_BASE/authors/id/B/BB/BBB/cpan2rpm-$ver.tar.gz";
-    unless (write_url($TMPDIR, $url)) {
+    my $tarball = get_cpan_api({ dist => "CPAN::RPM" });
+    if (!$tarball or !-s $tarball) {
         local $\ = $/;
         print "\nERROR: Unable to retrieve tarball, please visit our web\n";
         print "site at: https://github.com/ekkis/cpan2rpm\n";
         print "to download the latest version.\n";
         exit(-1);
         }
-
-    my ($f) = $url =~ m|.*/(.*)|;
-    my @ret = qx|$RPM -ta $TMPDIR/$f 2>&1|;
+    my @ret = qx|$RPM -ta $tarball 2>&1|;
     die "upgrade(): $!" if $?;
     /Wrote:\s+(.*)$/ && ($info{rpm} = $1) && last for reverse @ret;
     inst_rpm(\%info);
@@ -1854,9 +1848,13 @@ cpan2rpm - A Perl module packager
 
 =head1 SYNOPSIS
 
-To download the tarball from CPAN and create an RPM package, its source package and the specfile:
+To download the tarball from CPAN and create an RPM package, its source package, and the specfile:
 
-    cpan2rpm Proc::Daemon /tmp/String-Canonical-1.2.tar.gz
+    cpan2rpm Proc::Daemon
+
+To build from a local tarball:
+
+    cpan2rpm /tmp/String-Canonical-1.2.tar.gz
 
 To install from a URL:
 
@@ -1866,10 +1864,12 @@ To make a package out of the current directory (that contains a module):
 
     cpan2rpm .
 
-To create a list of packages stored in a file:
+Use -f to create multiple RPM packages from a list of modules stored a file:
 
     echo -e 'Proc::Daemon\nString::Canonical' > module-list.txt
     cpan2rpm -f module-list.txt
+      -or-
+    cpan2rpm `cat module-list.txt`
 
 =head1 DESCRIPTION
 

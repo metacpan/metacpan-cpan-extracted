@@ -1,0 +1,504 @@
+#!/usr/bin/perl
+
+use warnings;
+use strict;
+
+sub crash {
+    my $err_message = shift;
+    my $out_message = shift // "{}";
+    $out_message =~ s/\s*$/\n/;
+    print $out_message;
+    defined($err_message) or exit 1;
+    $err_message =~ s/\s*$//;
+    die "$0: $err_message\n";
+}
+
+# my $details_hash = commit_details($commit_id);
+sub commit_details {
+    my $c = shift;
+    my $hash = "HASHREF" eq ref $c && $c->{commit} ? $c : { commit => $c };
+    $c = $hash->{commit};
+    if (my $pid = open my $fh, "-|", qw[git show --format=%ae%n%an%n%ci%n%ct%n%s --name-status], $c) {
+        # %ae%n  Author Email\n
+        chomp ($hash->{email} = <$fh>);
+        # %an%n  Author Name\n
+        chomp ($hash->{name} = <$fh>);
+        # %ci%n  Commit Date\n
+        chomp ($hash->{date} = <$fh>);
+        # %ct%n  Commit Epoch\n
+        chomp ($hash->{time} = <$fh>);
+        # %s   Commit Comment Subject Line
+        $hash->{comment} = <$fh>;
+        # --name-status  Brief File Change Statuses
+        while (<$fh>) {
+            my ($how,$file,$to) = split /[\t\n]/;
+            # $how (A)dded (D)eleted (M)odified (R)enamed (C)opied (T)ypeChange (U)nmerged (X)unknown (B)orkedPairing
+            if (defined $file and length $file) {
+                push @{ $hash->{files} ||= [] }, $file;
+                if (defined $to and length $to) {
+                    push @{ $hash->{files} }, $to;
+                }
+            }
+        }
+        close $fh;
+        waitpid($pid, 0);
+        @{ $hash->{files} } = sort {$a<=>$b} @{ $hash->{files} } if $hash->{files};
+    }
+    if (my $s = $hash->{comment}) {
+        $s =~ s{\s+}{ }g;
+        $s =~ s/\s+$//m;
+        $s =~ s<^(.{80}).{3,}><$1...>s;
+        $hash->{comment} = $s;
+    }
+    return $hash;
+}
+
+# parents_of:
+# Find nearest parent hashes.
+# There might be more than one parent if it's a merge commit.
+# There might be zero parents if it's the very first commit.
+my $memoize_parents_of = {};
+sub parents_of {
+    my $new = shift;
+    return $memoize_parents_of->{$new} if $memoize_parents_of->{$new};
+    chomp (my $pretty = `git cat-file -p $new`);
+    $pretty =~ s/\n\s*\n.*$/\n/s; # Ignore everything after the first nothing line
+    my $parents = [];
+    # There will be one parent for straight forward commit.
+    # There will be two parents for a merge commit.
+    push @$parents, $1 while $pretty =~ s/^parent\s+(\w+)\s*$//m;
+    return $memoize_parents_of->{$new} = $parents;
+}
+
+my $memoize_refs_containing_hash = {};
+sub refs_containing_hash {
+    my $hash = shift;
+    return $memoize_refs_containing_hash->{$hash} if defined $memoize_refs_containing_hash->{$hash};
+    my $refs = {};
+    # Security Emergency Taint Sniffing
+    if ($hash =~ /^(\w+)$/) {
+        $hash = $1;
+        foreach my $refname (`git branch --format '%(refname)' --contains $hash ; git tag --format '%(refname)' --contains $hash`) {
+            chomp $refname;
+            $refs->{$refname} = 1;
+        }
+    }
+    return $memoize_refs_containing_hash->{$hash} = $refs;
+}
+
+# get_fork_hash:
+# Find the nearest common fork hash
+sub get_fork_hash {
+    my $new = shift;
+    my @revs = ($new, @_);
+    if ("@_" =~ /^0*$/) {
+        # Don't bother grinding through the logs if there was nothing old to search for
+        @revs = ();
+    }
+    my $seen = { map {$_ => $_} @revs };
+    while (@revs) {
+        my @prevs = ();
+        foreach my $rev (@revs) {
+            my $tip = $seen->{$rev} or crash "Implementation Fatality! Missing seen value for rev=[$rev] ?\n";
+            my $parents = parents_of($rev);
+            foreach my $prev (@$parents) {
+                if (my $common_tip = $seen->{$prev}) {
+                    # Found where a split came back together
+                    if ($tip ne $new and $common_tip eq $new) {
+                        # This is where an old ancestry smacked into the new ancestory.
+                        # Keep track of myself as the winner old line
+                        my $old = $tip;
+                        my $ret = { old => $old };
+                        # $prev is the winning common hash where nothing has changed
+                        $ret->{common} = $prev if $prev ne $old;
+                        return $ret;
+                    }
+                    elsif ($tip eq $new and $common_tip ne $new) {
+                        # This is where the new line smacked into some old line.
+                        # Keep track of his line as the winning old line
+                        my $old = $common_tip;
+                        my $ret = { old => $old };
+                        # $prev is the winning common hash where nothing has changed
+                        $ret->{common} = $prev if $prev ne $old;
+                        return $ret;
+                    }
+                    else {
+                        # Either old hit another old line, or new hit another new line
+                        # So we don't want to duplicate track this line anymore.
+                        next;
+                    }
+                }
+                $seen->{$prev} = $tip;
+                push @prevs, $prev;
+            }
+        }
+        @revs = @prevs;
+    }
+    return {
+        old  => ("0" x length $new),
+    };
+}
+
+my $ipc = $ENV{IPC} || shift or crash "Not invoked properly from git hooks.";
+
+# Check PLEASE_INT before messing with ENV
+my $signal_who = delete $ENV{PLEASE_INT};
+
+my $pushinfo = "";
+if (open my $fh, "<", "$ipc/pushinfo.log") {
+    $pushinfo = join "", <$fh>;
+    close $fh;
+}
+
+my $log = "";
+if (my $tracefile = "$ipc/log.trace") {
+    if (!-r $tracefile) {
+        # No log.trace? Conjure up a fake log from the current ENV:
+        if (open my $fh, ">>", $tracefile) {
+            my $envs = [];
+            foreach my $key (sort keys %ENV) {
+                my $val = $ENV{$key};
+                $val =~ s/\\/\\\\/g;
+                $val =~ s/\n/\\n/g;
+                push @$envs, qq{"$key=$val"};
+            }
+            $envs = join ", ", @$envs;
+            print $fh qq{12:00:00 execve("fake-run", ["git-shell", "-c", "$ENV{SSH_ORIGINAL_COMMAND}"], [$envs]) = 0\n};
+            my $exit_status = $ENV{GIT_PRE_EXIT_STATUS} || $ENV{GIT_EXIT_STATUS} // -1;
+            print $fh "22:27:08.618365 +++ exited with $exit_status +++\n";
+            close $fh;
+        }
+    }
+    if (open my $fh, "<", $tracefile) {
+        binmode $fh;
+        $log .= join "", <$fh>;
+        close $fh;
+    }
+}
+
+if ($signal_who) {
+    # This is the first point where we don't need the IPC files anymore.
+    # Later, we can do the data processing now that everything is in memory.
+    # Signal parent to wipe out the IPC files and
+    # release the non-debugging git client right NOW.
+    kill INT => $signal_who;
+}
+
+my $client_to_server = "";
+my $server_to_client = "";
+my $stderr = "";
+if (open my $log_fh, "<", \$log) {
+    binmode $log_fh;
+    while (<$log_fh>) {
+        if (/^(.*?execve.*git-shell.* = 0)/) {
+            my $launch = $1;
+            $ENV{SSH_ORIGINAL_COMMAND} ||= $1 if $launch =~ s/.*?execve.*?\[.*git-shell.*?"-c",\s*"([^\"]+)".*?\],\s*//;
+            while ($launch =~ s/\["([^=\"]+)=([^\"]*)",?\s?/\[/) {
+                my $key = $1;
+                my $val = $2;
+                $val =~ s/\\n/\n/g;
+                $val =~ s/\\\\/\\/g;
+                $ENV{$key} ||= $val;
+            }
+        }
+        elsif (/.*\+\+\+ exited with (\d+) \+\+\+\s*$/) {
+            # Found exit code
+            $ENV{GIT_EXIT_STATUS} //= $1;
+        }
+        elsif (/^[\s\d:\.\-]+?(read|write)\(([012]),\s*(.+)/) {
+            my $op = $1;
+            my $fd = $2;
+            my $s = $3;
+            $s = $1 if $s =~ /"(.*)"/;
+            $s =~ s/\\([0-3][0-7]{2}|[0-7]{1,2})/chr oct $1/eg;
+            $s =~ s/\\x([0-9a-f]{2})/chr hex $1/eg;
+            $s =~ s/\\t/\t/g;
+            $s =~ s/\\r/\r/g;
+            $s =~ s/\\n/\n/g;
+            $s =~ s/\\\\/\\/g;
+            if ($op eq "read" and $fd eq "0") {
+                $client_to_server .= $s;
+            }
+            elsif ($op eq "write" and $fd eq "1") {
+                $server_to_client .= $s;
+            }
+            elsif ($op eq "write" and $fd eq "2") {
+                $stderr .= $s;
+            }
+        }
+    }
+    close $log_fh;
+}
+
+my $ssh = $ENV{SSH_CONNECTION} or crash "Only SSH supported";
+my $KEY = $ENV{KEY} || "UNKNOWN";
+my ($ip, $remote_port, $local_ip, $local_port) = split /\ +/, $ssh;
+my $cmd = $ENV{SSH_ORIGINAL_COMMAND} or crash "Unable to determine SSH command";
+my $operation = "";
+if ($cmd =~ /^git-receive-pack\s/) {
+    $operation = "push";
+}
+elsif ($cmd =~ /^git-upload-pack\s/) {
+    $operation = "pull";
+}
+die "Unrecognized invocation [$cmd]\n" unless $operation;
+
+my $extracted = "";
+while ($client_to_server =~ s/^([0-9a-f]{4})//) {
+    my $packet_len = -4 + hex $1;
+    if ($packet_len > 0) {
+        $extracted .= substr($client_to_server, 0, $packet_len, "");
+        $extracted =~ s/\s*$/\n/;
+    }
+}
+#$client_to_server = $extracted.$client_to_server;
+$client_to_server = $extracted;
+$extracted = "";
+while ($server_to_client =~ s/^([0-9a-f]{4})//) {
+    my $packet_len = -4 + hex $1;
+    if ($packet_len > 0) {
+        $extracted .= substr($server_to_client, 0, $packet_len, "");
+        $extracted =~ s/\s*$/\n/;
+    }
+}
+#$server_to_client = $extracted.$server_to_client;
+$server_to_client = $extracted;
+#warn "DEBUG: leftovers=[$log]\n";
+warn "DEBUG: in=[$client_to_server]\n";
+warn "DEBUG: out=[$server_to_client]\n";
+warn "DEBUG: err=[$stderr]\n";
+
+my $info = {};
+
+$info->{debug} = $ENV{DEBUG} if defined $ENV{DEBUG};
+
+$info->{git_client_connected} = $ENV{GIT_CONNECTED_EPOCH} || time;
+
+if (my $i = $ENV{GIT_OPTION_COUNT}) {
+    while (0<=--$i and defined(my $opt = $ENV{"GIT_OPTION_$i"})) {
+        unshift @{ $info->{git_client_options} ||= [] }, $opt;
+    }
+}
+
+if ($ENV{USER} and $ENV{HOME} and my $full = $ENV{GIT_DIR}) {
+    $full =~ s{^\Q$ENV{HOME}\E/*}{};
+    $full ||= ".";
+    $full =~ s/\.git$//;
+    $info->{repo} = "ssh://$ENV{USER}\@[$local_ip]/$full";
+}
+
+$info->{key} = $KEY;
+$info->{client_ip} = $ip;
+$info->{client_port} = $remote_port;
+$info->{server_ip} = $local_ip;
+$info->{server_port} = $local_port;
+
+# Guess client operation based on command they sent
+$info->{operation} = $operation;
+
+my $have = [];
+while ($client_to_server =~ s/\bhave ([0-9a-f]{32,40})\b//) {
+    push @$have, $1;
+}
+my $want = [];
+while ($client_to_server =~ s/\bwant ([0-9a-f]{32,40})\b//) {
+    push @$want, $1;
+}
+if ($operation eq "pull" and @$want and !@$have) {
+    $info->{operation} = "clone";
+}
+
+# Example: agent=git/2.39.3.(Apple.Git-146)
+$info->{client_git_version} = $1 if $client_to_server =~ m{(?:^|\s|\b)agent=([\w/\.\-\(\)]+)};
+$info->{server_git_version} = $1 if $server_to_client =~ m{(?:^|\s|\b)agent=([\w/\.\-\(\)]+)};
+
+$info->{error_code} = $ENV{GIT_PRE_EXIT_STATUS} || $ENV{GIT_EXIT_STATUS} // -1;
+$info->{SUCCESS} = $info->{error_code} ? 0 : 1;
+$info->{refs} = [];
+
+if ($info->{SUCCESS}) {
+    my $refs = $info->{refs};
+    if ($operation eq "push") {
+        # Did the client PUSH anything?
+        # Sniff out tags and branches from pushinfo.log
+        if ($pushinfo and open my $fh, "<", \$pushinfo) {
+            my $ref = {};
+            while (<$fh>) {
+                if (/^(\s*)(\w+):\s*(.*)/) {
+                    if (!length $1) {
+                        push @$refs, $ref if keys %$ref;
+                        $ref = {};
+                    }
+                    $ref->{lc $2} = $3;
+                }
+                else {
+                    s/\s*$//;
+                    warn "pushinfo.log: corrupted=[$_]\n";
+                }
+            }
+            close $fh;
+            push @$refs, $ref if keys %$ref;
+        }
+        else {
+            warn "The push operation didn't actually push anything.\n";
+        }
+        my $pushed_branches = {};
+        foreach my $ref (@$refs) {
+            if ($ref->{type} eq "branch") {
+                $pushed_branches->{$ref->{ref}} = 1;
+            }
+            delete $ref->{force} unless $ref->{force};
+            if ($ref->{crash}) {
+                $info->{SUCCESS} = 0;
+                last;
+            }
+            if (my $new = $ref->{new} and
+                my $old = $ref->{old} and
+                !$ref->{common}) {
+                delete $ref->{new};
+                delete $ref->{old};
+                if ($old =~ /^0+$/) {
+                    $ref->{created} = $new;
+                    if ($ref->{type} eq "branch") {
+                        # Scan back until a different branch is found to guess which commit this was forked from.
+                        my $branched_from = undef;
+                        my $curr = $new;
+                        while ($curr and !$branched_from) {
+                            foreach my $fullref (keys %{ refs_containing_hash($curr)}) {
+                                if ($fullref =~ m{^refs/heads/(.+)$}) {
+                                    if (!$pushed_branches->{$1}) {
+                                        # Found a foreign branch! Remember this commit ID as its origin.
+                                        $ref->{branched_off_commit} = $branched_from = $curr;
+                                        last;
+                                    }
+                                }
+                            }
+                            last if $branched_from;
+                            ($curr) = @{ parents_of($curr) };
+                        }
+                        if ($branched_from) {
+                            my $forward = [ split /\s+/, `git log --reverse --format=%H $branched_from...$new` ];
+                            push @{ $ref->{forward} ||= [] }, map { commit_details($_) } @$forward if @$forward;
+                        }
+                    }
+                    next;
+                }
+                if ($new =~ /^0+$/) {
+                    $ref->{deleted_from} = $old;
+                    next;
+                }
+                if ($ref->{type} eq "tag") {
+                    $ref->{tag_moved_from} = $old;
+                    $ref->{tag_moved_to} = $new;
+                    next;
+                }
+                my $scan = get_fork_hash($new, $old);
+                if (my $common = $scan->{common} || $old) {
+                    if ($common ne $old) {
+                        $ref->{common} = $common;
+                        my $backward = [ split /\s+/, `git log --format=%H $common...$old` ];
+                        push @{ $ref->{backward} ||= [] }, map { commit_details($_) } @$backward if @$backward;
+                    }
+                    my $forward = [ split /\s+/, `git log --reverse --format=%H $common...$new` ];
+                    push @{ $ref->{forward} ||= [] }, map { commit_details($_) } @$forward if @$forward;
+                    next;
+                }
+                warn "BUG! Unable to calculate nearest common parent for old $old to new $new?\n";
+            }
+            else {
+                warn "BUG! Found strange push ref without valid {old} and {new} elements?\n";
+            }
+        }
+    }
+    else {
+        # Did the client PULL anything?
+        # Remember all ref tips
+        my $tip_of_ref = {};
+        my $hash_tip_of = {};
+        # Each commit hash may exist within multiple branches or tags.
+        # Each branch or tag has exactly one tip commit hash.
+        foreach my $tip (`git for-each-ref --format '%(objectname) %(refname)'`) {
+            my ($hash, $refname) = split /\s+/, $tip;
+            $tip_of_ref->{$refname} = $hash;
+            $hash_tip_of->{$hash}->{$refname} = 1;
+        }
+        # Sniff out tags and branches from @$want
+        my $want_ref_hash = {};
+        foreach my $hash (@$want) {
+            my $refnames = refs_containing_hash($hash);
+            foreach my $ref (keys %$refnames) {
+                $want_ref_hash->{$ref}->{$hash} = 1;
+            }
+        }
+        # Search for nearest known hash from @$have
+        my $have_ref_hash = {};
+        foreach my $hash (@$have) {
+            my $refnames = refs_containing_hash($hash);
+            foreach my $ref (keys %$refnames) {
+                $have_ref_hash->{$ref}->{$hash} = 1;
+            }
+        }
+        # Guess which branch each $want hash belongs to
+        foreach my $refname (sort keys %$want_ref_hash) {
+            if ($want_ref_hash->{$refname}->{$tip_of_ref->{$refname}}) {
+                # If the git client did want the refname tip,
+                # Then ignore any other non-tip hashes below that refname.
+                $want_ref_hash->{$refname} = {
+                    $tip_of_ref->{$refname} => 1,
+                };
+            }
+            elsif (1 == scalar keys %{ $want_ref_hash->{$refname} }) {
+                # Only one hash for this branch?
+                # Then this is obviously the branch the $want hash came from.
+                # Nothing else needs to be done.
+            }
+            else {
+                # Pulled branch or tag, but not all the way to its tip? And covering multiple hashes?
+                # This might happen in a rare case where an update had been pushed since this pull.
+                # Pick any non-tip hash contained below this $refname and use that.
+                foreach my $hash (keys %{ $want_ref_hash->{$refname} }) {
+                    # Skip any hash that is a tip of someone else
+                    next if $hash_tip_of->{$hash} and keys %{ $hash_tip_of->{$hash} };
+                    # Keep the first non-tip hash
+                    $want_ref_hash->{$refname} = {
+                        $hash => 1,
+                    };
+                    last;
+                }
+            }
+            my $hashes = [ sort keys %{ $want_ref_hash->{$refname} } ];
+            my $type = $refname =~ s/^refs\/tags\/// ? "tag" :
+                $refname =~ s/^refs\/heads\/// ? "branch" : "";
+            if ($type) {
+                foreach my $hash (@$hashes) {
+                    # Look up old hash based on @$have hashes.
+                    my $scan = get_fork_hash($hash, @$have) || {};
+                    if (my $old = delete $scan->{common} || $scan->{old}) {
+                        delete $scan->{old};
+                        # If "git clone" then start from the beginning
+                        $old = "" if $old =~ /^0+$/;
+                        my $forward = [ split /\s+/, `git log --reverse --format=%H $old...$hash` ];
+                        push @{ $scan->{forward} ||= [] }, @$forward if @$forward;
+                    }
+                    push @$refs, {
+                        ref => $refname,
+                        type => $type,
+                        new => $hash,
+                        %$scan,
+                    };
+                }
+            }
+        }
+    }
+}
+
+if (eval { require JSON }) {
+    print JSON->new->canonical->encode($info)."\n";
+}
+elsif (eval { require Data::Dumper }) {
+    print Data::Dumper::Dumper($info);
+}
+else {
+    print qq{{"error":"Data Transport Failure"}\n};
+}
+exit;

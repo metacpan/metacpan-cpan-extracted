@@ -14,10 +14,10 @@ User::Identity::Archive - base class for archiving user information
 
 =head1 SYNOPSIS
 
- use User::Identity::Archive::Plain;
- my $friends = User::Identity::Archive::Plain->new('friends');
- $friends->from(\*FH);
- $friends->from('.friends');
+  use User::Identity::Archive::Plain;
+  my $friends = User::Identity::Archive::Plain->new('friends');
+  $friends->from(\*FH);
+  $friends->from('.friends');
 
 =head1 DESCRIPTION
 
@@ -26,20 +26,22 @@ where that is done.  Some archivers may limit the kinds of selections
 which can be stored.
 
 Extends L<"DESCRIPTION" in User::Identity::Item|User::Identity::Item/"DESCRIPTION">.
- 
+
 =head1 OVERLOADED
 
 =head1 METHODS
 
 Extends L<"METHODS" in User::Identity::Item|User::Identity::Item/"METHODS">.
- 
+
 =head2 Constructors
 
 Extends L<"Constructors" in User::Identity::Item|User::Identity::Item/"Constructors">.
- 
+
 =over 4
 
-=item User::Identity::Archive-E<gt>B<new>( [$name], %options )
+=item $class-E<gt>B<new>( [$name], %options )
+
+Z<>
 
  -Option     --Defined in          --Default
   description  User::Identity::Item  undef
@@ -64,7 +66,7 @@ Extends L<"Constructors" in User::Identity::Item|User::Identity::Item/"Construct
 =head2 Attributes
 
 Extends L<"Attributes" in User::Identity::Item|User::Identity::Item/"Attributes">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<description>()
@@ -80,7 +82,7 @@ Inherited, see L<User::Identity::Item/"Attributes">
 =head2 Collections
 
 Extends L<"Collections" in User::Identity::Item|User::Identity::Item/"Collections">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<add>($collection, $role)
@@ -103,9 +105,7 @@ Inherited, see L<User::Identity::Item/"Collections">
 
 Inherited, see L<User::Identity::Item/"Collections">
 
-=item $obj-E<gt>B<type>()
-
-=item User::Identity::Archive-E<gt>B<type>()
+=item $any-E<gt>B<type>()
 
 Inherited, see L<User::Identity::Item/"Collections">
 
@@ -118,7 +118,7 @@ Inherited, see L<User::Identity::Item/"Collections">
 =head2 Searching
 
 Extends L<"Searching" in User::Identity::Item|User::Identity::Item/"Searching">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<find>($collection, $role)
@@ -133,8 +133,8 @@ Inherited, see L<User::Identity::Item/"Searching">
 
 =item $obj-E<gt>B<from>($source, %options)
 
-Read definitions from the specified $source, which usually can be a
-filehandle or filename.  The syntax used in the information $source
+Read definitions from the specified C<$source>, which usually can be a
+filehandle or filename.  The syntax used in the information C<$source>
 is archiver dependent.
 
 Not all archivers implement C<from()>, so you may want to check with
@@ -142,9 +142,9 @@ C<UNIVERSAL::can()> beforehand.
 
 example: 
 
- use User::Identity::Archive::Some;
- my $a = User::Identity::Archive::Some->new('xyz');
- $a->from(\*STDIN) if $a->can('from');
+  use User::Identity::Archive::Some;
+  my $a = User::Identity::Archive::Some->new('xyz');
+  $a->from(\*STDIN) if $a->can('from');
 
 =back
 
@@ -156,41 +156,47 @@ example:
 
 The first argument is an object, but not of a class which extends
 L<User::Identity::Collection|User::Identity::Collection>.
+Cast by addCollection()
 
 =item Error: Cannot load collection module for $type ($class).
 
-Either the specified $type does not exist, or that module named $class returns
+Either the specified C<$type> does not exist, or that module named C<$class> returns
 compilation errors.  If the type as specified in the warning is not
 the name of a package, you specified a nickname which was not defined.
 Maybe you forgot the 'require' the package which defines the nickname.
+Cast by addCollection()
 
 =item Error: Creation of a collection via $class failed.
 
-The $class did compile, but it was not possible to create an object
+The C<$class> did compile, but it was not possible to create an object
 of that class using the options you specified.
+Cast by addCollection()
 
 =item Error: Don't know what type of collection you want to add.
 
 If you add a collection, it must either by a collection object or a
 list of options which can be used to create a collection object.  In
 the latter case, the type of collection must be specified.
+Cast by addCollection()
 
 =item Warning: No collection $name
 
-The collection with $name does not exist and can not be created.
+The collection with C<$name> does not exist and can not be created.
+Cast by add()
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of User-Identity distribution version 1.02,
-built on April 17, 2023. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of User-Identity version 1.03,
+built on September 12, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2003-2023 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2003-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

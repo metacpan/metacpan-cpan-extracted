@@ -1,7 +1,7 @@
 {
    "abstract" : "Create a multilingual web page",
    "author" : [
-      "Nigel Horne <njh@bandsman.co.uk>"
+      "Nigel Horne <njh@nigelhorne.com>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
@@ -45,7 +45,6 @@
             "Locale::Language" : "0",
             "Locale::Object" : "0.8",
             "Locale::Object::Country" : "0.78",
-            "Log::Abstraction" : "0.05",
             "Net::Subnet" : "0",
             "Net::Whois::IANA" : "0",
             "Net::Whois::IP" : "0",
@@ -87,6 +86,6 @@
          "x_repository" : "https://github.com/nigelhorne/CGI-Lingua"
       }
    },
-   "version" : "0.74",
+   "version" : "0.75",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

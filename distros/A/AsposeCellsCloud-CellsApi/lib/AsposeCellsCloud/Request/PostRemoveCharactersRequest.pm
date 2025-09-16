@@ -71,7 +71,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'post_remove_characters' } = { 
-    	summary => '',
+    	summary => 'A comprehensive set of tools for cleaning text content within selected cells. It allows users to remove specific characters, character sets, and substrings, ensuring that the text is standardized and free from unwanted symbols or sequences.',
         params => $params,
         returns => 'FileInfo',
     };

@@ -8,3 +8,6 @@ Revision history for Circle-Chain
 
 0.07    2025-03-28
         upgrade the version to fix the conflict.
+
+0.08   2025-09-15
+       use new version of circle miner

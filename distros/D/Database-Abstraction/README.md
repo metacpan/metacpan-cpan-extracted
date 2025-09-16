@@ -15,7 +15,7 @@ Database::Abstraction - Read-only Database Abstraction Layer (ORM)
 
 # VERSION
 
-Version 0.30
+Version 0.31
 
 # DESCRIPTION
 
@@ -343,6 +343,10 @@ so if XML fails for you on a small file force non-slurping mode with
         directory => '/var/dat',
         max_slurp_size => 0     # force to not use slurp and therefore to use SQL
     });
+
+# SEE ALSO
+
+- Test coverage report: [https://nigelhorne.github.io/Database-Abstraction/coverage/](https://nigelhorne.github.io/Database-Abstraction/coverage/)
 
 # LICENSE AND COPYRIGHT
 

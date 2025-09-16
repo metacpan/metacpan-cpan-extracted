@@ -61,7 +61,7 @@ sub new {
 
 # Run Operation Request
 # SpecRequest.version :   ,
-# SpecRequest.regoin : The spreadsheet region setting.  ,
+# SpecRequest.region : The spreadsheet region setting.  ,
 # SpecRequest.password : The password for opening spreadsheet file.   
 
 {
@@ -103,8 +103,8 @@ sub run_http_request {
         $query_params->{'version'} = $client->to_query_value($self->version);      
     }
 
-    if(defined $self->regoin){
-        $query_params->{'regoin'} = $client->to_query_value($self->regoin);      
+    if(defined $self->region){
+        $query_params->{'region'} = $client->to_query_value($self->region);      
     }
 
     if(defined $self->password){
@@ -131,9 +131,9 @@ __PACKAGE__->method_documentation({
      	format => '',
      	read_only => '',
      		},
-     'regoin' => {
+     'region' => {
      	datatype => 'string',
-     	base_name => 'regoin',
+     	base_name => 'region',
      	description => 'The spreadsheet region setting.',
      	format => '',
      	read_only => '',
@@ -150,7 +150,7 @@ __PACKAGE__->method_documentation({
 
 __PACKAGE__->attribute_map( {
     'version' => 'version',
-    'regoin' => 'regoin',
+    'region' => 'region',
     'password' => 'password' 
 } );
 

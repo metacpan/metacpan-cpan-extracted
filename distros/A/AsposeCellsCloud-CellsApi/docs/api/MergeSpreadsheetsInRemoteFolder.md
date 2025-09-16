@@ -15,7 +15,7 @@ Merge spreadsheet files in folder of cloud storage into a specified format file.
 PUT http://api.aspose.cloud/v4.0/cells/merge/remote-spreadsheets
 ```
 ### **Function Description**
-This method merges multiple spreadsheet files stored in cloud storage into a single output file in the specified format (e.g., XLSX, CSV, PDF).The operation is performed remotely, without requiring the files to be downloaded to the local machine.Valid cloud storage credentials and accessible file paths or identifiers are required for all input files.The merging process is executed entirely within the cloud environment, reducing data transfer and improving performance.If any of the source files cannot be accessed, or if an error occurs during the merge or conversion process, an appropriate exception will be thrown.Supported output formats depend on the capabilities of the underlying cloud processing service.
+This method merges multiple spreadsheet files stored in cloud storage into a single output file in the specified format (e.g., XLSX, CSV, PDF). The operation is performed remotely, without requiring the files to be downloaded to the local machine. Valid cloud storage credentials and accessible file paths or identifiers are required for all input files. The merging process is executed entirely within the cloud environment, reducing data transfer and improving performance. If any of the source files cannot be accessed, or if an error occurs during the merge or conversion process, an appropriate exception will be thrown. Supported output formats depend on the capabilities of the underlying cloud processing service.## **Error Handling**- **400 Bad Request**: Invalid url.- **401 Unauthorized**:  Authentication has failed, or no credentials were provided.- **404 Not Found**: Source file not accessible.- **500 Server Error** The spreadsheet has encountered an anomaly in obtaining data.## **Key Features and Benefits**- **Cloud Storage Integration**: Merges multiple spreadsheet files stored in cloud storage into a single output file in the specified format (e.g., XLSX, CSV, PDF).- **Remote Processing**: Performs the merging operation entirely within the cloud environment, eliminating the need to download files to the local machine.- **Efficient Data Handling**: Reduces data transfer and enhances performance by processing files remotely.
 
 ### The request parameters of **mergeSpreadsheetsInRemoteFolder** API are: 
 
@@ -29,7 +29,7 @@ This method merges multiple spreadsheet files stored in cloud storage into a sin
 |outPath|String|Query|(Optional) The folder path where the workbook is stored. The default is null.|
 |outStorageName|String|Query|Output file Storage Name.|
 |fontsLocation|String|Query|Use Custom fonts.|
-|regoin|String|Query|The spreadsheet region setting.|
+|region|String|Query|The spreadsheet region setting.|
 |password|String|Query|The password for opening spreadsheet file.|
 
 ### **Response Description**

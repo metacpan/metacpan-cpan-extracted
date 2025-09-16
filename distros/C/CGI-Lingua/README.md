@@ -16,7 +16,7 @@ CGI::Lingua - Create a multilingual web page
 
 # VERSION
 
-Version 0.74
+Version 0.75
 
 # SYNOPSIS
 
@@ -30,7 +30,7 @@ Based on that list CGI::Lingua tells the application which language the user wou
 
     use CGI::Lingua;
     # ...
-    my $l = CGI::Lingua->new(supported => ['en', 'fr', 'en-gb', 'en-us']);
+    my $l = CGI::Lingua->new(['en', 'fr', 'en-gb', 'en-us']);
     my $language = $l->language();
     if ($language eq 'English') {
         print '<P>Hello</P>';
@@ -63,7 +63,8 @@ Based on that list CGI::Lingua tells the application which language the user wou
 
 Creates a CGI::Lingua object.
 
-Takes one mandatory parameter: a list of languages, in RFC-1766 format,
+Takes one mandatory parameter, `supported`,
+a list of languages, in RFC-1766 format,
 that the website supports.
 Language codes are of the form primary-code \[ - country-code \] e.g.
 'en', 'en-gb' for English and British English respectively.
@@ -246,7 +247,7 @@ CGI::Lingua will make use of that, otherwise it will use ip-api.com
 
 # AUTHOR
 
-Nigel Horne, `<njh at bandsman.co.uk>`
+Nigel Horne, `<njh at nigelhorne.com>`
 
 # BUGS
 
@@ -267,6 +268,7 @@ This means that if you support languages at a lower priority, it may be missed.
 
 # SEE ALSO
 
+- Testing Dashboard [https://nigelhorne.github.io/CGI-Lingua/coverage/](https://nigelhorne.github.io/CGI-Lingua/coverage/)
 - [HTTP::BrowserDetect](https://metacpan.org/pod/HTTP%3A%3ABrowserDetect)
 - [I18N::AcceptLangauge](https://metacpan.org/pod/I18N%3A%3AAcceptLangauge)
 - [Locale::Country](https://metacpan.org/pod/Locale%3A%3ACountry)

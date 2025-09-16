@@ -61,11 +61,11 @@ sub new {
 
 # Run Operation Request
 # ReplaceSpreadsheetContentRequest.Spreadsheet : Upload spreadsheet file.  ,
-# ReplaceSpreadsheetContentRequest.searchText : The searched text.  ,
-# ReplaceSpreadsheetContentRequest.replaceText : The replaced text.  ,
+# ReplaceSpreadsheetContentRequest.searchText : Specify the search content.  ,
+# ReplaceSpreadsheetContentRequest.replaceText : Specify the replace content.  ,
 # ReplaceSpreadsheetContentRequest.worksheet : Specify the worksheet for the replace.  ,
 # ReplaceSpreadsheetContentRequest.cellArea : Specify the cell area for the replace.  ,
-# ReplaceSpreadsheetContentRequest.regoin : The spreadsheet region setting.  ,
+# ReplaceSpreadsheetContentRequest.region : The spreadsheet region setting.  ,
 # ReplaceSpreadsheetContentRequest.password : The password for opening spreadsheet file.   
 
 {
@@ -119,8 +119,8 @@ sub run_http_request {
         $query_params->{'cellArea'} = $client->to_query_value($self->cell_area);      
     }
 
-    if(defined $self->regoin){
-        $query_params->{'regoin'} = $client->to_query_value($self->regoin);      
+    if(defined $self->region){
+        $query_params->{'region'} = $client->to_query_value($self->region);      
     }
 
     if(defined $self->password){
@@ -152,14 +152,14 @@ __PACKAGE__->method_documentation({
      'search_text' => {
      	datatype => 'string',
      	base_name => 'searchText',
-     	description => 'The searched text.',
+     	description => 'Specify the search content.',
      	format => '',
      	read_only => '',
      		},
      'replace_text' => {
      	datatype => 'string',
      	base_name => 'replaceText',
-     	description => 'The replaced text.',
+     	description => 'Specify the replace content.',
      	format => '',
      	read_only => '',
      		},
@@ -177,9 +177,9 @@ __PACKAGE__->method_documentation({
      	format => '',
      	read_only => '',
      		},
-     'regoin' => {
+     'region' => {
      	datatype => 'string',
-     	base_name => 'regoin',
+     	base_name => 'region',
      	description => 'The spreadsheet region setting.',
      	format => '',
      	read_only => '',
@@ -200,7 +200,7 @@ __PACKAGE__->attribute_map( {
     'replace_text' => 'replaceText',
     'worksheet' => 'worksheet',
     'cell_area' => 'cellArea',
-    'regoin' => 'regoin',
+    'region' => 'region',
     'password' => 'password' 
 } );
 

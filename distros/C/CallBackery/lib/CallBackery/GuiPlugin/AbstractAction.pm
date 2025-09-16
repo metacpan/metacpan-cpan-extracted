@@ -20,7 +20,7 @@ The base class for gui forms with actions.
 
 =cut
 
-use Mojo::Base 'CallBackery::GuiPlugin::Abstract';
+use Mojo::Base 'CallBackery::GuiPlugin::Abstract', -signatures;
 
 =head1 ATTRIBUTES
 
@@ -42,6 +42,35 @@ has screenCfg => sub {
         options => $self->screenOpts,
         action  => $self->actionCfg,
     }
+};
+
+# if no user is assigned, all access checks are positive, this allows to explore the
+# modules full capabilities during startup
+has 'user'=> sub ($self) {
+    my $mockUser = bless {}, 'MockUser';
+    unless (defined &MockUser::may) {
+        *MockUser::may = sub ($mockSelf, $right) {
+            # $self->log->debug("MockUser::may($right) -> true");
+            return 1;
+        };
+    }
+    unless (defined &MockUser::mayAny) {
+        *MockUser::mayAny = sub ($mockSelf, $right) {
+            # $self->log->debug("MockUser::may($right) -> true");
+            return 1;
+        };
+    }
+    unless (defined &MockUser::userId) {
+        *MockUser::userId = sub ($mockSelf) {
+            return '__MockUser__';
+        };
+    }
+    unless (defined &MockUser::userInfo) {
+        *MockUser::userInfo = sub ($mockSelf) {
+            return {};
+        };
+    }
+    return $mockUser;
 };
 
 =head2 screenOpts
@@ -130,6 +159,10 @@ sub massageConfig {
             $popup->app($self->app);
             $popup->massageConfig($cfg);
         }
+    }
+    if (ref $self->user eq 'MockUser') {
+        # $self->log->debug("massageConfig is done. undefining user");
+        $self->user(undef);
     }
     return;
 }

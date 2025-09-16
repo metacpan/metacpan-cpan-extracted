@@ -1,12 +1,12 @@
 package Dancer2::CLI::Gen;
 # ABSTRACT: Create new Dancer2 application
-$Dancer2::CLI::Gen::VERSION = '1.1.2';
+$Dancer2::CLI::Gen::VERSION = '2.0.0';
 use Moo;
 use URI;
 use HTTP::Tiny;
 use Path::Tiny;
 use JSON::MaybeXS;
-use Dancer2::Template::Simple;
+use Dancer2::Template::Tiny;
 use Module::Runtime qw( use_module is_module_name );
 use CLI::Osprey
     desc => 'Helper script to create new Dancer2 applications';
@@ -74,9 +74,19 @@ option skel => (
     format_doc => 'directory',
     required   => 0,
     default    => sub{
-        my $self = shift; 
-        path( $self->parent_command->_dist_dir, 'skel' ); 
+        my $self = shift;
+        path( $self->parent_command->_dist_dir, 'skel' );
     },
+);
+
+option skel_name => (
+    is         => 'ro',
+    short      => 'n',
+    doc        => 'skeleton name',
+    format     => 's',
+    format_doc => 'skelname',
+    required   => 0,
+    default    => 'default',
 );
 
 option docker => (
@@ -95,7 +105,7 @@ option git => (
     default    => 0,
 );
 
-option remote => ( 
+option remote => (
     is         => 'ro',
     short      => 'r',
     doc        => 'URI for git repository (implies -g)',
@@ -104,12 +114,26 @@ option remote => (
     required   => 0,
 );
 
+option no_package_files => (
+    is       => 'ro',
+    doc      => "don't create files needed for CPAN packaging",
+    required => 0,
+    default  => 0,
+);
+
+has _engine => (
+    is => 'ro',
+    default => sub {
+        return Dancer2::Template::Tiny->new( config => { start_tag => '[d2%', end_tag => '%2d]' } );
+    },
+);
+
 # Last chance to validate args before we attempt to do something with them
 sub BUILD {
     my ( $self, $args ) = @_;
 
-    $self->osprey_usage( 1, qq{ 
-Invalid application name. Application names must not contain single colons, 
+    $self->osprey_usage( 1, qq{
+Invalid application name. Application names must not contain single colons,
 dots, hyphens or start with a number.
     }) unless is_module_name( $self->application );
 
@@ -133,14 +157,14 @@ sub run {
     $self->_version_check unless $self->no_check;
 
     my $app_name = $self->application;
-    my $app_file = $self->_get_app_file( $app_name );
-    my $app_path = $self->_get_app_path( $self->app_path, $app_name );
+    my $app_file = $self->parent_command->_get_app_file( $app_name );
+    my $app_path = $self->parent_command->_get_app_path( $self->app_path, $app_name );
 
     if( my $dir = $self->directory ) {
         $app_path = path( $self->app_path, $dir );
     }
 
-    my $files_to_copy = $self->_build_file_list( $self->skel, $app_path );
+    my $files_to_copy = $self->_build_file_list( $self->skel . '/' . $self->skel_name, $app_path );
     foreach my $pair( @$files_to_copy ) {
         if( $pair->[0] =~ m/lib\/AppFile.pm$/ ) {
             $pair->[1] = path( $app_path, $app_file );
@@ -158,15 +182,17 @@ sub run {
         apppath          => $app_path,
         appdir           => File::Spec->rel2abs( $app_path ),
         apppath          => $app_path,
-        perl_interpreter => $self->_get_perl_interpreter,
-        cleanfiles       => $self->_get_dashed_name( $app_name ),
+        perl_interpreter => $self->parent_command->_get_perl_interpreter,
+        cleanfiles       => $self->parent_command->_get_dashed_name( $app_name ),
         dancer_version   => $self->parent_command->_dancer2_version,
         docker           => $self->docker,
     };
 
     $self->_copy_templates( $files_to_copy, $vars, $self->overwrite );
-    $self->_create_manifest( $files_to_copy, $app_path );
-    $self->_add_to_manifest_skip( $app_path);
+    unless( $self->no_package_files ) {
+        $self->_create_manifest( $files_to_copy, $app_path );
+        $self->_add_to_manifest_skip( $app_path );
+    }
 
     $self->_check_git( $vars );
     $self->_check_yaml;
@@ -183,7 +209,7 @@ sub _check_git {
 
 WARNING: Couldn't initialize a git repo despite being asked to do so.
 
-To resolve this, cd to your application directory and run the following 
+To resolve this, cd to your application directory and run the following
 commands:
 
   git init
@@ -200,13 +226,13 @@ commands:
         path( $gitignore )->copy( $app_path );
 
         chdir File::Spec->rel2abs( $app_path ) or die "Can't cd to $app_path: $!";
-        if( _run_shell_cmd( 'git', 'init') != 0 or 
-            _run_shell_cmd( 'git', 'add', '.') != 0 or 
+        if( _run_shell_cmd( 'git', 'init') != 0 or
+            _run_shell_cmd( 'git', 'add', '.') != 0 or
             _run_shell_cmd( 'git', 'commit', "-m 'Initial commit of $app_name by Dancer2'" ) != 0 ) {
             print $git_error;
         }
         else {
-            if( $self->remote && 
+            if( $self->remote &&
                 _run_shell_cmd( 'git', 'remote', 'add', 'origin', $self->remote ) != 0 ) {
                 print $git_error;
                 print "  git remote add origin " . $self->remote . "\n";
@@ -242,10 +268,12 @@ sub _how_to_run {
 
     my $app_path = $vars->{ apppath };
     my $app_name = $vars->{ appname };
+
+    print "\nYour new application is ready! To run it:\n";
+
     if( $vars->{ docker } ) {
         my $image = lc $app_name;
         print qq{
-Your new application is ready! To run it:
 
         cd $app_path
         docker build -t ${image} .
@@ -258,18 +286,20 @@ runs on inside of the container.
 
 You may also run your app without Docker:
 };
-    } else {
-        print "\nYour new application is ready! To run it:\n";
     }
+
+    my $install_deps = '';
+    $install_deps = "\n        cpanm --installdeps ."
+        if $self->skel_name ne 'default';
+
     print qq{
-        cd $app_path
+        cd $app_path$install_deps
         plackup bin/app.psgi
 
-To access your application, point your browser to http://localhost:5000
+To access your application, point your browser to http://localhost:5000/
 
 If you need community assistance, the following resources are available:
 - Dancer website: https://perldancer.org
-- Twitter: https://twitter.com/PerlDancer/
 - GitHub: https://github.com/PerlDancer/Dancer2/
 - Mailing list: https://lists.perldancer.org/mailman/listinfo/dancer-users
 - IRC: irc.perl.org#dancer
@@ -290,7 +320,7 @@ sub _build_file_list {
         warn "File not found: $file" unless $file->exists; # Paranoia
         next if $file->basename =~ m{^\.git(/|$)};
         next if $file->is_dir;
-        
+
         my $filename = $file->relative( $from );
         push @result, [ $file, path( $to, $filename )];
     }
@@ -299,9 +329,13 @@ sub _build_file_list {
 
 sub _copy_templates {
     my ( $self, $files, $vars, $overwrite ) = @_;
+    my $app_name  = $vars->{ appname };
 
     foreach my $pair (@$files) {
         my ( $from, $to ) = @{$pair};
+        next if $self->no_package_files && $from =~ /MANIFEST\.SKIP$/;
+        next if $self->no_package_files && $from =~ /Makefile.PL$/;
+
         if ( -f $to && !$overwrite ) {
             print "! $to exists, overwrite? (or rerun this command with -o) [N/y/a]: ";
             my $res = <STDIN>; chomp($res);
@@ -309,13 +343,14 @@ sub _copy_templates {
             next unless ( $res eq 'y' ) or ( $res eq 'a' );
         }
 
+        $to =~ s/AppFile/$app_name/;
         my $to_dir = path( $to )->parent;
         if ( ! $to_dir->is_dir ) {
             print "+ $to_dir\n";
             $to_dir->mkpath;
         }
 
-        # Skeleton files whose names are prefixed with + need to be executable, but we must strip 
+        # Skeleton files whose names are prefixed with + need to be executable, but we must strip
         # that from the name when copying them
         my $to_file = path( $to )->basename;
         my $ex      = ( $to_file =~ s/^\+// );
@@ -330,7 +365,7 @@ sub _copy_templates {
             close $fh;
         }
 
-        if( $from !~ m/\.(ico|jpg|png|css|eot|map|swp|ttf|svg|woff|woff2|js)$/ ) {
+        if( $from !~ m/\.(db|ico|jpg|png|css|eot|map|swp|ttf|svg|woff|woff2|js)$/ ) {
             $content = $self->_process_template($content, $vars);
         }
 
@@ -372,36 +407,9 @@ sub _add_to_manifest_skip {
 sub _process_template {
     my ( $self, $template, $tokens ) = @_;
 
-    my $engine = Dancer2::Template::Simple->new;
-    $engine->{ start_tag } = '[d2%';
-    $engine->{ stop_tag }  = '%2d]';
-    return $engine->render( \$template, $tokens );
+    return $self->_engine->render( \$template, $tokens );
 }
 
-# These are good candidates to move to Dancer2::CLI if other commands 
-# need them later.
-sub _get_app_path {
-    my ( $self, $path, $appname ) = @_;
-    return path( $path, $self->_get_dashed_name( $appname ));
-}
-
-sub _get_app_file {
-    my ( $self, $appname ) = @_;
-    $appname =~ s{::}{/}g;
-    return path( 'lib', "$appname.pm" );
-}
-
-sub _get_perl_interpreter {
-    return -r '/usr/bin/env' ? '#!/usr/bin/env perl' : "#!$^X";
-}
-
-sub _get_dashed_name {
-    my ( $self, $name ) = @_;
-    $name =~ s{::}{-}g;
-    return $name;
-}
-
-# Other utility methods
 sub _version_check {
     my $self    = shift;
     my $version = $self->parent_command->_dancer2_version;
@@ -431,8 +439,8 @@ sub _run_shell_cmd {
 
     my $exit_status = try {
         my $pid = IPC::Open3::open3(
-            my $stdin, 
-            my $stdout, 
+            my $stdin,
+            my $stdout,
             my $stderr = Symbol::gensym,
             @cmds,
         );
@@ -461,7 +469,7 @@ Dancer2::CLI::Gen - Create new Dancer2 application
 
 =head1 VERSION
 
-version 1.1.2
+version 2.0.0
 
 =head1 AUTHOR
 
@@ -469,7 +477,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Alexis Sukrieh.
+This software is copyright (c) 2025 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

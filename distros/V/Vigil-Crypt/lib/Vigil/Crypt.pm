@@ -8,7 +8,7 @@ use Crypt::AuthEnc::ChaCha20Poly1305;
 use Digest::SHA qw(sha256);
 use Crypt::Argon2 qw(argon2id_pass argon2_verify);
 
-our $VERSION = '2.1.1';
+our $VERSION = '2.1.2';
 
 sub new {
     my ($class, $encryption_key) = @_;

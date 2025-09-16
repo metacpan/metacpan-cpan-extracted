@@ -1,0 +1,163 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+if (!$ENV{DEBUG}) {
+    pipe(my $rd_wait, my $wr_wake);
+    if (fork) {
+        # Parent
+        close $wr_wake;
+        # Wait for child to be done
+        sysread $rd_wait, my $char, 1;
+        # Child let go of the pipe.
+        close $rd_wait;
+        open STDIN,  "</dev/null";
+        open STDOUT, ">/dev/null";
+        open STDERR, ">/dev/null";
+        exit 0;
+    }
+    else {
+        # Child
+        $ENV{PLEASE_INT} = $$;
+        # Avoid signalling Parent directly because we want a clean death.
+        # Tell ipc-parse to signal me when the IPC files are ready to wipe.
+        $SIG{INT} = sub {
+            if ($ENV{PLEASE_INT} and $wr_wake) {
+                warn localtime().": PLEASE_INT caught.\n";
+                close $wr_wake;
+                close $rd_wait;
+                delete $ENV{PLEASE_INT};
+            }
+        };
+        # Middle process doesn't need any inputs nor outputs.
+        open STDIN,  "</dev/null";
+        open STDOUT, ">/dev/null";
+        open STDERR, ">/dev/null";
+    }
+}
+
+my $ssh = $ENV{SSH_CLIENT} or die "Only SSH allowed\n";
+my $KEY = $ENV{KEY} || "UNKNOWN";
+my $ip = $ssh =~ /^([\da-f\.:]+) /i ? $1 : "UNKNOWN";
+
+if ($ENV{IPC} and my $dir = $ENV{GIT_DIR}) {
+    my $info = do {
+        my $data = "";
+        if (my $pid = open my $fh, "-|") {
+            $data = join "", <$fh>;
+            close $fh;
+            waitpid($pid, 0);
+        }
+        else {
+            open STDERR, ">", "/dev/null";
+            exec "$dir/hooks/ipc-parse", "" or die "$dir/hooks/ipc-parse: Failed!\n";
+        }
+        $data;
+    };
+    $info =~ s/\s*$//;
+    my $ref = {};
+    if ($info =~ /^\s*\{/) {
+        # Must be JSON
+        $ref = eval {
+            require JSON;
+            return JSON::from_json($info);
+        } || {};
+    }
+    elsif ($info =~ /^\s*\$VAR1\s*=/) {
+        # Must be the silly Dumper
+        my $VAR1 = undef;
+        eval $info;
+        $ref = $VAR1;
+    }
+    else {
+        die localtime().": [$KEY\@$ip] git-server: Unrecognized IPC transport: $info\n";
+    }
+    my $config = `git config --list 2>/dev/null`;
+
+    # Check for any webhook directives
+    my $webhook = {};
+    while ($config =~ s/^webhook\.(.*)\.(\w+)=(.*)/\n/m) {
+        my $url = $1;
+        my $directive = $2;
+        my $val = $3;
+        $webhook->{$url}->{$directive} = $val;
+    }
+    foreach my $url (keys %$webhook) {
+        my $cfg = $webhook->{$url};
+        # Default settings
+        $cfg = {
+            url => $url,
+            method => "post",
+            transport => "json",
+            %$cfg,
+        };
+        my $method = "";
+        my $body = "";
+        my $content_type = "";
+        if ($cfg->{transport} =~ /^json$/i) {
+            die localtime().": [$KEY\@$ip] git-server: Unable to read JSON input:\n$info\n" unless $info =~ /^\s*\{/;
+            $content_type = "application/json";
+            if (eval { require JSON }) {
+                $body = JSON->new->canonical->encode($ref)."\n";
+            }
+            else {
+                warn localtime().": [$KEY\@$ip] git-server: Unable to load JSON.pm?\n";
+                $body = "$info\n";
+            }
+        }
+        else {
+            die localtime().": [$KEY\@$ip] git-server: Unimplemented transport [$cfg->{transport}]\n";
+        }
+        if ($cfg->{method} =~ /^post$/i) {
+            $method = "POST";
+        }
+        else {
+            die localtime().": [$KEY\@$ip] git-server: Unimplemented method [$cfg->{method}]\n";
+        }
+        require IPC::Open3;
+        require Symbol;
+        my ($in,$out,$err) = (Symbol::gensym(),Symbol::gensym(),Symbol::gensym());
+        my $pid = eval {
+            IPC::Open3::open3($in, $out, $err, qw(curl -k -s -w \n%{http_code} --data-binary @- -X), $method, "-HContent-type:$content_type", $url);
+        };
+        if (!$pid) {
+            warn localtime().": [$KEY\@$ip] webhook failed: ($@) $url\n";
+            next;
+        }
+        print $in $body;
+        close $in;
+        my $webhook_output = "";
+        while (<$out>) {
+            $webhook_output .= $_;
+        }
+        close $out;
+        my $webhook_error = "";
+        while (<$err>) {
+            $webhook_error .= $_;
+            s/\s+$//;
+            warn localtime().": [$KEY\@$ip] webhook err: $_\n";
+        }
+        close $err;
+        waitpid $pid, 0;
+        my $curl_exit_status = $? >> 8;
+        my $status_code = "600 CRASHED";
+        if ($webhook_output =~ s/\s*(\d+)\s*$/\n/) {
+            $status_code = $1;
+        }
+        if ($ref->{debug}) {
+            warn localtime().": [$KEY\@$ip] DEBUG webhook:\n";
+            require Data::Dumper;
+            warn Data::Dumper::Dumper({
+                WEBHOOK_ERROR_CODE => $curl_exit_status,
+                WEBHOOK_CFG => $cfg,
+                WEBHOOK_OUT => $webhook_output,
+                WEBHOOK_ERR => $webhook_error,
+                WEBHOOK_HTTP_STATUS => $status_code,
+                INFO => $ref,
+            });
+        }
+    }
+}
+
+exit;

@@ -4,7 +4,7 @@
       "Mark Overmeer <markov@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -30,24 +30,59 @@
             "ExtUtils::MakeMaker" : "0"
          }
       },
+      "develop" : {
+         "requires" : {
+            "OODoc" : "3.00"
+         }
+      },
       "runtime" : {
          "requires" : {
             "Hash::Ordered" : "0.014"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "1",
+            "Test::Pod" : "1"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "homepage" : "http://perl.overmeer.net/CPAN/",
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ],
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/markov2/perl5-User-Identity.git",
          "web" : "https://github.com/markov2/perl5-User-Identity"
       }
    },
-   "version" : "1.02",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "1.03",
+   "x_oodist" : {
+      "email" : "markov@cpan.org",
+      "first_year" : 2003,
+      "generate" : [
+         {
+            "format" : "pod3",
+            "podtail" : null
+         }
+      ],
+      "include" : [],
+      "oodoc_version" : 3.05,
+      "parser" : {
+         "pmhead" : null,
+         "skip_links" : [
+            "AddressBook"
+         ],
+         "syntax" : "markov"
+      },
+      "raw" : {
+         "publish" : "../public_html/user-identity/raw"
+      },
+      "release" : {
+         "publish" : "../public_html/user-identity/source"
+      },
+      "tests" : {},
+      "use" : []
+   },
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

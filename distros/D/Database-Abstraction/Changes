@@ -1,5 +1,10 @@
 Revision history for Database-Abstraction
 
+0.31	Mon Sep 15 20:15:00 EDT 2025
+	Call sth->finish() when needed
+	selectall_arrayref was setting an extra level of reference
+	Added the test dashboard
+
 0.30	Sun Aug 24 15:11:14 EDT 2025
 	slurp mode - remove a data copy
 	selectall_hashref now returns undef if there are no matches

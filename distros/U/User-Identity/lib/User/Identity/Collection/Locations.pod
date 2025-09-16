@@ -18,18 +18,18 @@ The C<User::Identity::Collection::Location> object maintains a set
 L<User::Identity::Location|User::Identity::Location> objects, each describing a physical location.
 
 Extends L<"DESCRIPTION" in User::Identity::Collection|User::Identity::Collection/"DESCRIPTION">.
- 
+
 =head1 OVERLOADED
 
 Extends L<"OVERLOADED" in User::Identity::Collection|User::Identity::Collection/"OVERLOADED">.
- 
+
 =over 4
 
-=item overload: B<@{}>
+=item overload: B<""> stringification
 
 Inherited, see L<User::Identity::Collection/"OVERLOADED">
 
-=item overload: B<stringification >
+=item overload: B<@{}> array dereference
 
 Inherited, see L<User::Identity::Collection/"OVERLOADED">
 
@@ -38,14 +38,16 @@ Inherited, see L<User::Identity::Collection/"OVERLOADED">
 =head1 METHODS
 
 Extends L<"METHODS" in User::Identity::Collection|User::Identity::Collection/"METHODS">.
- 
+
 =head2 Constructors
 
 Extends L<"Constructors" in User::Identity::Collection|User::Identity::Collection/"Constructors">.
- 
+
 =over 4
 
-=item User::Identity::Collection::Locations-E<gt>B<new>( [$name], %options )
+=item $class-E<gt>B<new>( [$name], %options )
+
+Z<>
 
  -Option     --Defined in                --Default
   description  User::Identity::Item        undef
@@ -73,7 +75,7 @@ Extends L<"Constructors" in User::Identity::Collection|User::Identity::Collectio
 =head2 Attributes
 
 Extends L<"Attributes" in User::Identity::Collection|User::Identity::Collection/"Attributes">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<description>()
@@ -97,7 +99,7 @@ Inherited, see L<User::Identity::Collection/"Attributes">
 =head2 Collections
 
 Extends L<"Collections" in User::Identity::Collection|User::Identity::Collection/"Collections">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<add>($collection, $role)
@@ -120,9 +122,7 @@ Inherited, see L<User::Identity::Item/"Collections">
 
 Inherited, see L<User::Identity::Item/"Collections">
 
-=item $obj-E<gt>B<type>()
-
-=item User::Identity::Collection::Locations-E<gt>B<type>()
+=item $any-E<gt>B<type>()
 
 Inherited, see L<User::Identity::Item/"Collections">
 
@@ -135,10 +135,10 @@ Inherited, see L<User::Identity::Item/"Collections">
 =head2 Maintaining roles
 
 Extends L<"Maintaining roles" in User::Identity::Collection|User::Identity::Collection/"Maintaining roles">.
- 
+
 =over 4
 
-=item $obj-E<gt>B<addRole>($role| <[$name],%options> | ARRAY)
+=item $obj-E<gt>B<addRole>($role|([$name], %options))
 
 Inherited, see L<User::Identity::Collection/"Maintaining roles">
 
@@ -159,7 +159,7 @@ Inherited, see L<User::Identity::Collection/"Maintaining roles">
 =head2 Searching
 
 Extends L<"Searching" in User::Identity::Collection|User::Identity::Collection/"Searching">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<find>($name|CODE|undef)
@@ -176,55 +176,67 @@ Inherited, see L<User::Identity::Collection/"Searching">
 
 The first argument is an object, but not of a class which extends
 L<User::Identity::Collection|User::Identity::Collection>.
+Cast by addCollection()
 
 =item Error: Cannot create a $type to add this to my collection.
 
-Some options are specified to create a $type object, which is native to
+Some options are specified to create a C<$type> object, which is native to
 this collection.  However, for some reason this failed.
+Cast by addRole()
 
 =item Error: Cannot load collection module for $type ($class).
 
-Either the specified $type does not exist, or that module named $class returns
+Either the specified C<$type> does not exist, or that module named C<$class> returns
 compilation errors.  If the type as specified in the warning is not
 the name of a package, you specified a nickname which was not defined.
 Maybe you forgot the 'require' the package which defines the nickname.
+Cast by addCollection()
 
 =item Error: Cannot rename $name into $newname: already exists
 
+Cast by renameRole()
+
 =item Error: Cannot rename $name into $newname: doesn't exist
+
+Cast by renameRole()
 
 =item Error: Creation of a collection via $class failed.
 
-The $class did compile, but it was not possible to create an object
+The C<$class> did compile, but it was not possible to create an object
 of that class using the options you specified.
+Cast by addCollection()
 
 =item Error: Don't know what type of collection you want to add.
 
 If you add a collection, it must either by a collection object or a
 list of options which can be used to create a collection object.  In
 the latter case, the type of collection must be specified.
+Cast by addCollection()
 
 =item Warning: No collection $name
 
-The collection with $name does not exist and can not be created.
+The collection with C<$name> does not exist and can not be created.
+Cast by add()
 
 =item Error: Wrong type of role for $collection: requires a $expect but got a $type
 
-Each $collection groups sets of roles of one specific type ($expect).  You
-cannot add objects of a different $type.
+Each C<$collection> groups sets of roles of one specific type (C<$expect>).  You
+cannot add objects of a different C<$type>.
+Cast by addRole()
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of User-Identity distribution version 1.02,
-built on April 17, 2023. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of User-Identity version 1.03,
+built on September 12, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2003-2023 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2003-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

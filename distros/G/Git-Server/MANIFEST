@@ -1,0 +1,33 @@
+Changes
+Makefile.PL
+MANIFEST
+LICENSE
+README.md
+INSTALL.md
+TODO.md
+Git-Server.spec.PL
+Git-Server.spec
+lib/Git/Server.pm
+git-server
+git-client
+git-deploy
+hooks/logger
+hooks/restrictip
+hooks/ipc-parse
+hooks/git-shell
+hooks/run-git-hooks
+hooks/pre-read
+hooks/pre-write
+hooks/pre-receive
+hooks/post-read
+hooks/post-write
+hooks/post-update
+hooks/post-action
+hooks/push-notify
+hooks/push-notification
+hooks/proxy
+t/00-git.t
+t/01-compile-modules.t
+t/02-compile-scripts.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

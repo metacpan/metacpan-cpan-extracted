@@ -130,14 +130,14 @@ __PACKAGE__->method_documentation({
      'data_source' => {
      	datatype => 'DataSource',
      	base_name => 'DataSource',
-     	description => 'This class has a public property named "DataSource" of type DataSource that has both a getter and a setter.            ',
+     	description => 'Represents data source.  There are three types of data, they are CloudFileSystem, RequestFiles, HttpUri.',
      	format => '',
      	read_only => '',
      		},
      'file_info' => {
      	datatype => 'FileInfo',
      	base_name => 'FileInfo',
-     	description => '',
+     	description => 'Represents file information. Include of filename, filesize, and file content(base64String).',
      	format => '',
      	read_only => '',
      		},

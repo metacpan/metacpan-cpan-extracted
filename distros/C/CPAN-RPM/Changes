@@ -1,5 +1,16 @@
 Revision history for cpan2rpm
 
+2.040 09/16/2025 02:00:00
+ - Fix --upgrade to use general URL from CPAN.
+
+2.039 09/15/2025 19:00:00
+ - Whoops! For simplicity and compatibility,
+   move $VERSION back into the cpan2rpm script.
+
+2.038 09/15/2025 18:00:00
+ - More robust running version detection.
+ - Rename RPM for myself back to cpan2rpm.
+
 2.037 09/15/2025 02:00:00
  - Migrate to CPAN::RPM stub
  - Avoid using dangerous https

@@ -1,6 +1,6 @@
 # **Spreadsheet Cloud API: postRemoveDuplicates**
 
- 
+Efficiently remove duplicate substrings from Excel cells. Select a range, specify delimiters, and apply options to eliminate repeated text segments. 
 
 
 ## **Quick Start**
@@ -15,6 +15,7 @@
 POST http://api.aspose.cloud/v3.0/cells/removeduplicates
 ```
 ### **Function Description**
+- **Range Selection**: Define the range of cells to process for duplicate removal.- **Delimiters**: Specify delimiters to identify substrings within cells.- **Options**: Configure options to customize the removal process.- **Usage**:- Ideal for cleaning large datasets by removing redundant text.- Streamlines data preparation, ensuring cells contain unique substrings.
 
 ### The request parameters of **postRemoveDuplicates** API are: 
 

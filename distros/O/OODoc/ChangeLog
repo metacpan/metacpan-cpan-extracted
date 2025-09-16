@@ -7,6 +7,22 @@ TODO:
 	- subs could not only list 'Inherited from', but also 'Extended by'
 	- in POD, group "Inherited" referenced subs?
 
+version 3.04: Fri 12 Sep 13:58:58 CEST 2025
+
+	Changes:
+	- HTML show structural examples before subs
+
+	Fixes:
+	- fix split skip_links
+	- fix warning message with an option uses non-existing P
+	- fix cleanup in HTML
+	- fix utf8 problems
+	- html cleanup structure headers
+
+	Improvements:
+	- html output support numbered items.
+	- html chapters/sections/subsection numbered by default
+
 version 3.03: Mon  8 Sep 12:57:12 CEST 2025
 
 	Changes:

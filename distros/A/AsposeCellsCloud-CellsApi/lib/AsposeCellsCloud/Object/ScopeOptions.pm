@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => 'Here is the class summary: "The features discussed include real-time collaboration, templates for various projects, task assignment and tracking, deadline reminders, and file storage and sharing."            ',
+__PACKAGE__->class_documentation({description => 'Specifies the range of cells within the worksheet where the spreadsheet operations will be performed. This parameter allows users to define the exact area to be processed, ensuring that operations are applied only to the designated cells.',
                                   class => 'ScopeOptions',
                                   required => [], # TODO
 }                                 );
@@ -128,14 +128,14 @@ __PACKAGE__->method_documentation({
      'scope' => {
      	datatype => 'string',
      	base_name => 'Scope',
-     	description => 'Property Summary: The Scope property in the class is decorated with a JsonConverter attribute using StringEnumConverter.            ',
+     	description => 'ScopeOptionsType is a type that represents options or settings that are specific to a particular scope.',
      	format => '',
      	read_only => '',
      		},
      'scope_items' => {
      	datatype => 'ARRAY[ScopeItem]',
      	base_name => 'ScopeItems',
-     	description => '',
+     	description => 'Specifies the designated work area within the worksheet where operations are to be performed. ',
      	format => '',
      	read_only => '',
      		},    

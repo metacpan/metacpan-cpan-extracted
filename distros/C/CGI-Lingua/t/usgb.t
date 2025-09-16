@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 54;
+use Test::More tests => 55;
 use Test::Needs 'CHI';
 use Test::NoWarnings;
 
@@ -39,6 +39,7 @@ USGB: {
 	cmp_ok($l->requested_language(), 'eq', 'English (United Kingdom)');
 	ok($l->language() eq 'English');
 	ok($l->sublanguage() eq 'United Kingdom');
+	ok($l->sublanguage_code_alpha2() eq 'gb');
 
 	$ENV{'HTTP_ACCEPT_LANGUAGE'} = 'en-GB';
 	$l = new_ok('CGI::Lingua' => [

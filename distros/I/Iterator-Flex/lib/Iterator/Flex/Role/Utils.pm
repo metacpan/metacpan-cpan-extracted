@@ -5,7 +5,7 @@ package Iterator::Flex::Role::Utils;
 use strict;
 use warnings;
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 use Ref::Util;
 
@@ -200,7 +200,7 @@ Iterator::Flex::Role::Utils - Role based utilities
 
 =head1 VERSION
 
-version 0.29
+version 0.30
 
 =head1 DESCRIPTION
 

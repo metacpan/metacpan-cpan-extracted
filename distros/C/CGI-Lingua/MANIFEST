@@ -7,6 +7,7 @@ MANIFEST
 MANIFEST.SKIP
 README
 README.md
+scripts/generate_index.pl
 t/00-compile.t
 t/10-load.t
 t/20-new.t
@@ -48,6 +49,7 @@ t/pod-synopsis.t
 t/pod.t
 t/port.t
 t/prereq.t
+t/priority.t
 t/rt131347.t
 t/rt131607.t
 t/rt69509.t

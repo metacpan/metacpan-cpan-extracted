@@ -12,10 +12,10 @@ User::Identity::Archive::Plain - simple, plain text archiver
 
 =head1 SYNOPSIS
 
- use User::Identity::Archive::Plain;
- my $friends = User::Identity::Archive::Plain->new('friends');
- $friends->from(\*FH);
- $friends->from('.friends');
+  use User::Identity::Archive::Plain;
+  my $friends = User::Identity::Archive::Plain->new('friends');
+  $friends->from(\*FH);
+  $friends->from('.friends');
 
 =head1 DESCRIPTION
 
@@ -24,22 +24,24 @@ simple plain text file to store the information of users.  The syntax
 is described in the DETAILS section, below.
 
 Extends L<"DESCRIPTION" in User::Identity::Archive|User::Identity::Archive/"DESCRIPTION">.
- 
+
 =head1 OVERLOADED
 
 Extends L<"OVERLOADED" in User::Identity::Archive|User::Identity::Archive/"OVERLOADED">.
- 
+
 =head1 METHODS
 
 Extends L<"METHODS" in User::Identity::Archive|User::Identity::Archive/"METHODS">.
- 
+
 =head2 Constructors
 
 Extends L<"Constructors" in User::Identity::Archive|User::Identity::Archive/"Constructors">.
- 
+
 =over 4
 
-=item User::Identity::Archive::Plain-E<gt>B<new>( [$name], %options )
+=item $class-E<gt>B<new>( [$name], %options )
+
+Z<>
 
  -Option       --Defined in             --Default
   abbreviations                           []
@@ -64,9 +66,9 @@ a list of predefined names.
 
 =item name => STRING
 
-=item only => ARRAY|ABBREV
+=item only => \@abbrevs|$abbrev
 
-Lists the only information (as (list of) abbreviations) which should be
+Lists the only information (as (LIST of) abbreviations) which should be
 read.  Other information is removed before even checking whether it is
 a valid abbreviation or not.
 
@@ -83,16 +85,16 @@ Sets the default tab-stop width.
 =head2 Attributes
 
 Extends L<"Attributes" in User::Identity::Archive|User::Identity::Archive/"Attributes">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<abbreviation>( $name, [$class] )
 
 Returns the class which is capable of storing information which is
-grouped as $name.  With $class argument, you add (or overrule) the
-definitions of an abbreviation.  The $class is automatically loaded.
+grouped as C<$name>.  With C<$class> argument, you add (or overrule) the
+definitions of an abbreviation.  The C<$class> is automatically loaded.
 
-If $class is C<undef>, then the abbreviation is deleted.  The class
+If C<$class> is C<undef>, then the abbreviation is deleted.  The class
 name which is deleted is returned.
 
 =item $obj-E<gt>B<abbreviations>()
@@ -117,7 +119,7 @@ Inherited, see L<User::Identity::Item/"Attributes">
 =head2 Collections
 
 Extends L<"Collections" in User::Identity::Archive|User::Identity::Archive/"Collections">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<add>($collection, $role)
@@ -140,9 +142,7 @@ Inherited, see L<User::Identity::Item/"Collections">
 
 Inherited, see L<User::Identity::Item/"Collections">
 
-=item $obj-E<gt>B<type>()
-
-=item User::Identity::Archive::Plain-E<gt>B<type>()
+=item $any-E<gt>B<type>()
 
 Inherited, see L<User::Identity::Item/"Collections">
 
@@ -155,7 +155,7 @@ Inherited, see L<User::Identity::Item/"Collections">
 =head2 Searching
 
 Extends L<"Searching" in User::Identity::Archive|User::Identity::Archive/"Searching">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<find>($collection, $role)
@@ -167,13 +167,14 @@ Inherited, see L<User::Identity::Item/"Searching">
 =head2 Access to the archive
 
 Extends L<"Access to the archive" in User::Identity::Archive|User::Identity::Archive/"Access to the archive">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<from>( <$fh|$filename|ARRAY>, %options )
 
-Read the plain text information from the specified $fh, $filename,
-STRING, or ARRAY of lines.
+Read the plain text information from the specified C<$fh>, C<$filename>,
+STRING, or C<ARRAY> of lines.
+Improves base, see L<User::Identity::Archive/"Access to the archive">
 
  -Option --Default
   tabstop  <default from object>
@@ -216,17 +217,17 @@ The syntax is as simple as possible. An extra indentation on a line
 means that the variable or class is a collection within the class on
 the line before.
 
- user markov
-   location home
-      country NL
-   email home
-      address  mark@overmeer.net
-      location home
-   email work
-      address  solutions@overmeer.bet
+  user markov
+    location home
+       country NL
+    email home
+       address  mark@overmeer.net
+       location home
+    email work
+       address  solutions@overmeer.bet
 
- email tux
-    address tux@fish.net
+  email tux
+     address tux@fish.net
 
 The above defines two items: one L<User::Identity|User::Identity> named C<markov>, and
 an e-mail address C<tux>.  The user has two collections: one contains
@@ -242,21 +243,21 @@ in most cases result in an error message.
 If you want to continue on the next line, because your content is too
 large, then add a backslash to the end, like this:
 
- email home
-    description This is my home address,     \
-                But I sometimes use this for \
-                work as well
-    address tux@fish.aq
+  email home
+     description This is my home address,     \
+                 But I sometimes use this for \
+                 work as well
+     address tux@fish.aq
 
 Continuations do not play the game of indentation, so what you also
 can do is:
 
- email home
-    description               \
- This is my home address,     \
- But I sometimes use this for \
- work as well
-    address tux@fish.aq
+  email home
+     description               \
+  This is my home address,     \
+  But I sometimes use this for \
+  work as well
+     address tux@fish.aq
 
 The fields C<comment> and C<address> must be correctly indented.
 The line terminations are lost, which is useful for most fields.  However,
@@ -271,21 +272,21 @@ the same line as real data, as some languages (like Perl) permit.
 You can insert comments and blank lines on all places where you need
 them:
 
- user markov
+  user markov
 
-    # my home address
-    email home
+     # my home address
+     email home
 
-       # useless comment statement
-       address tux@fish.aq
-       location #mind_the_hash
+        # useless comment statement
+        address tux@fish.aq
+        location #mind_the_hash
 
 is equivalent to:
 
- user markov
-    email home
-       address tux@fish.aq
-       location #mind_the_hash
+  user markov
+     email home
+        address tux@fish.aq
+        location #mind_the_hash
 
 =head3 References
 
@@ -297,17 +298,17 @@ street.
 
 To create a reference to an item of someone else, use
 
- user markov
-    location home = user(cleo).location(home)
-    location work
-       organization   MARKOV Solutions
+  user markov
+     location home = user(cleo).location(home)
+     location work
+        organization   MARKOV Solutions
 
 =head3 Configuration parameters
 
 You can add some configuration lines as well.  On the moment, the only
 one defined is
 
- tabstop = 4
+  tabstop = 4
 
 which can be used to change the meaning of tabs in the file.  The default
 setting is 8, but some people prefer 4 (or other values).
@@ -320,43 +321,51 @@ setting is 8, but some people prefer 4 (or other values).
 
 The first argument is an object, but not of a class which extends
 L<User::Identity::Collection|User::Identity::Collection>.
+Cast by addCollection()
 
 =item Error: Cannot load collection module for $type ($class).
 
-Either the specified $type does not exist, or that module named $class returns
+Either the specified C<$type> does not exist, or that module named C<$class> returns
 compilation errors.  If the type as specified in the warning is not
 the name of a package, you specified a nickname which was not defined.
 Maybe you forgot the 'require' the package which defines the nickname.
+Cast by addCollection()
 
 =item Warning: Cannot read archive from $source
 
+Cast by from()
+
 =item Error: Creation of a collection via $class failed.
 
-The $class did compile, but it was not possible to create an object
+The C<$class> did compile, but it was not possible to create an object
 of that class using the options you specified.
+Cast by addCollection()
 
 =item Error: Don't know what type of collection you want to add.
 
 If you add a collection, it must either by a collection object or a
 list of options which can be used to create a collection object.  In
 the latter case, the type of collection must be specified.
+Cast by addCollection()
 
 =item Warning: No collection $name
 
-The collection with $name does not exist and can not be created.
+The collection with C<$name> does not exist and can not be created.
+Cast by add()
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of User-Identity distribution version 1.02,
-built on April 17, 2023. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of User-Identity version 1.03,
+built on September 12, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2003-2023 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2003-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

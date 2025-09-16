@@ -4,7 +4,7 @@ use 5.016;
 
 
 # Use command 'oodist' to produce your whole software release.
-my $version  = '0.95';
+my $version  = '0.96';
 my $git      = "https://github.com/markov2/perl5-String-Print";
 my $publish  = "../public_html/string-print";
 my $homepage = "http://perl.overmeer.net/CPAN/";
@@ -22,7 +22,9 @@ my %oodist   = (
 
 	parser   => {
 		syntax         => 'markov',
-		skip_links     => [ ],
+		skip_links     => [
+			'Locale::TextDomain',
+		],
 		pmhead         => undef,
 	},
 

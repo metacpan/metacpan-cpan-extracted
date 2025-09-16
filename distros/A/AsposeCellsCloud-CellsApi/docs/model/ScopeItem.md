@@ -8,8 +8,8 @@ use AsposeCellsCloud::Object::ScopeItem;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**WorksheetName** | **string** | A property "WorksheetName" of type string with an initial value of an empty string.             |
-**Ranges** | **ARRAY[string]** |  |  
+**Worksheet** | **string** | The specific worksheet of spreadsheet. |
+**Ranges** | **ARRAY[string]** | The specific ranges of worksheet. |  
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

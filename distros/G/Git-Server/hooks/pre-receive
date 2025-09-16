@@ -1,0 +1,206 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+my $KEY = $ENV{KEY} or die localtime().": $0: NO KEY? Commandline Execution Worked!\n";
+my $ip = $ENV{SSH_CLIENT} && $ENV{SSH_CLIENT} =~ /^([\da-f\.:]+) /i ? $1 : "UNKNOWN";
+my $r = "\x01"; # enable bit 2^(fileno STDIN)
+die localtime().": [$KEY\@$ip] git-server: NO pre-receive STDIN? Commandline Execution Worked!\n" if !select $r, undef, undef, 0.2;
+$SIG{__DIE__} = sub {
+    my $why = shift;
+    $why =~ s/\s*$/\n/;
+    ipclog("  CRASH: $why");
+    warn $why;
+    exit 1;
+};
+while (my $push_info = <STDIN>) {
+    my ($old,$new,$ref) = $push_info =~ m{^(\w+) (\w+) ([\w/\.\-]+)} or die localtime().": [$KEY\@$ip] git-server: Invalid pre-receive STDIN!\n";
+    die localtime().": [$KEY\@$ip] git-server: Invalid pre-receive ref!\n" unless $ref;
+    my $branch = ($ref =~ m{^refs/(?:heads|tags)/(.+)} || $ref =~ m{.*/([^/]+)}) ? $1 : $ref;
+    my $type = ($ref =~ m{^refs/tags/}) ? "tag" : "branch";
+    ipclog("REF:$branch");
+    ipclog("  TYPE:$type");
+    ipclog("  OLD:$old");
+    ipclog("  NEW:$new");
+    my $conf = `git config --list`;
+    if ($conf =~ s/^acl.restrictemail=(.+)//m) {
+        my $restrictemail = $1;
+        my $sniffers = [];
+        foreach my $sniff (split /,/, $restrictemail) {
+            $sniff =~ s/^@/\*@/;
+            my $regex = $sniff =~ m{^/(.+)/$} ? qr{$1} : eval {
+                my $wild = $sniff;
+                $wild =~ s/\\/\\\\/g;
+                $wild =~ s/\./\\./g;
+                $wild =~ s/\*/.+/g;
+                return qr{^$wild$};
+            } or die localtime().": [$KEY\@$ip] git-server: Unimplemented [acl.restrictemail] syntax? [$sniff]\n";
+            push @$sniffers, $regex;
+        }
+        my $commits = `git log --reverse --format='%H %ae' $old..$new`;
+        my $prev = $old;
+        while ($commits =~ s/^(\w+)\s+(.*)\n//) {
+            my $commit = $1;
+            my $email = $2;
+            my $matched = 0;
+            foreach my $regex (@$sniffers) {
+                $matched = 1 if $email =~ $regex;
+            }
+            die localtime().": [$KEY\@$ip] git-server: [acl.restrictemail] Illegal email [$email] on commit [$commit]. (Hint: 'git rebase -i $prev ; git commit --reset-author --amend')\n" if !$matched;
+            $prev = $commit;
+        }
+    }
+    while ($conf =~ s{^restrictedbranch\.([^\*\s]+|/.+/)\.pushers=(.+)$}{}m or $conf =~ s/^restrictedbranch\.(.+)\.pushers=(.+)$//m) {
+        my $sniff = $1;
+        my $keys = $2;
+        my $regex = $sniff =~ m{^/(.+)/$} ? qr{$1} : eval {
+            my $wild = $sniff;
+            $wild =~ s/\\/\\\\/g;
+            $wild =~ s/\./\\./g;
+            $wild =~ s/\*/.+/g;
+            return qr{^$wild$};
+        } or die localtime().": [$KEY\@$ip] git-server: Unimplemented [restrictedbranch.pushers] syntax? [$sniff]=>[$keys]\n";
+        if ($branch =~ $regex) {
+            my $allowed = 0;
+            foreach my $key (split /,/, $keys) {
+                $allowed = $sniff if $key eq $KEY;
+            }
+            $allowed or die localtime().": [$KEY\@$ip] git-server: Missing [restrictedbranch.pushers] permission! Failed to modify restricted $type [$branch].\n";
+            last;
+        }
+    }
+    my $can_change_history = 1;
+    while ($conf =~ s{^restrictedbranch\.([^\*\s]+|/.+/)\.forcers=(.+)$}{}m or $conf =~ s/^restrictedbranch\.(.+)\.forcers=(.+)$//m) {
+        my $sniff = $1;
+        my $keys = $2;
+        my $regex = $sniff =~ m{^/(.+)/$} ? qr{$1} : eval {
+            my $wild = $sniff;
+            $wild =~ s/\\/\\\\/g;
+            $wild =~ s/\./\\./g;
+            $wild =~ s/\*/.+/g;
+            return qr{^$wild$};
+        } or die localtime().": [$KEY\@$ip] git-server: Unimplemented [restrictedbranch.forcers] syntax? [$sniff]=>[$keys]\n";
+        if ($branch =~ $regex) {
+            $can_change_history = 0;
+            foreach my $key (split /,/, $keys) {
+                $can_change_history = $sniff if $key eq $KEY;
+            }
+            last;
+        }
+    }
+    if ($old =~ /^0+$/) {
+        ipclog("  FORCE:0");
+        if ($can_change_history) {
+            warn localtime().": [$KEY\@$ip] git-server: Creating new $type [$branch]\n";
+        }
+        else {
+            warn localtime().": [$KEY\@$ip] git-server: Creating unremovable $type [$branch]. (You will not be able to delete it without [restrictedbranch.forcers] permission.)\n";
+        }
+    }
+    elsif ($new =~ /^0+$/) {
+        ipclog("  FORCE:1");
+        if ($can_change_history) {
+            if ($type eq "tag") {
+                warn localtime().": [$KEY\@$ip] git-server: Deleting tag [$branch] from [$old]\n";
+            }
+            else {
+                warn localtime().": [$KEY\@$ip] git-server: DANGER! Pruning entire branch [$branch] from [$old]!\n";
+            }
+        }
+        else {
+            if ($type eq "tag") {
+                die localtime().": [$KEY\@$ip] git-server: Missing [restrictedbranch.forcers] permission! Unable to remove restricted $type [$branch]. Do not run 'git push --delete origin $branch'. Remaining at $old\n";
+            }
+            else {
+                die localtime().": [$KEY\@$ip] git-server: Missing [restrictedbranch.forcers] permission! Unable to prune git history on restricted $type [$branch]. Do not run 'git push --delete origin $branch'. Remaining at $old\n";
+            }
+        }
+    }
+    elsif ($type eq "tag") {
+        ipclog("  FORCE:1");
+        if ($can_change_history) {
+            warn localtime().": [$KEY\@$ip] git-server: FORCE moving existing $type [$branch] from $old to $new\n";
+        }
+        else {
+            die localtime().": [$KEY\@$ip] git-server: Missing [restrictedbranch.forcers] permission! You cannot move restricted tag [$branch]. Do not run 'git push --force origin $branch'\n";
+        }
+    }
+    elsif (`git log $new -- 2>&1 | grep '^commit $old'`) {
+        #warn localtime().": [$KEY\@$ip] git-server: Pushing $new changes to $type [$branch] tip without --force\n";
+        ipclog("  FORCE:0");
+    }
+    else {
+        # MUST HAVE USED: git push --force
+        ipclog("  FORCE:1");
+        if ($can_change_history) {
+            my $tip_hashes = `git show-ref 2>&1`;
+            $tip_hashes =~ s{ refs/\w+/}{ }g;
+            my $matching = {};
+            my $scan_hashes = $tip_hashes;
+            while ($scan_hashes =~ s{^\Q$old\E\s+(\S+)}{}m) {
+                $matching->{$1} = $old;
+            }
+            if (my $found = delete $matching->{$branch}) {
+                if ($found ne $old) {
+                    die localtime().": [$KEY\@$ip] git-server: Server branch [$branch] unexpectedly shows $found instead of $old?\n";
+                }
+                if (!keys %$matching) {
+                    my (undef,undef,undef,$mday,$mon,$year) = gmtime;
+                    my $suggest = sprintf "%s-BAK_%04d-%02d-%02d", $branch, $year+1900, $mon+1, $mday;
+                    die localtime().": [$KEY\@$ip] git-server: Refusing to lose $type $branch history upto $old without a backup branch or tag to hold it. Try 'git tag $suggest $old ; git push origin $suggest' to create a branch on the old tip. If you really wish to lose these changes, then run 'git push --delete origin $suggest' after the branch $branch is rudely '--force' pushed.\n";
+                }
+            }
+            else {
+                die localtime().": [$KEY\@$ip] git-server: SERVER BUG! Unable to find $type [$branch]\n$tip_hashes\nOperation 'push --force' failed!\n";
+            }
+            warn localtime().": [$KEY\@$ip] git-server: Rewriting git history for $type [$branch] using 'push --force' since found backup ref(s) (".join(" ",sort keys %$matching).") still on old tip [$old].\n";
+        }
+        else {
+            die localtime().": [$KEY\@$ip] git-server: Missing [restrictedbranch.forcers] permission! Failed to rewrite git history for restricted $type [$branch]. Do not run 'git push --force'. Try 'git pull --rebase' or 'git pull' to clean up your local repo.\n";
+        }
+    }
+    if ($conf =~ /^restrictedfile\./m) {
+        my $diff = `git diff $old $new | grep '^diff '`;
+        my $files_changed = {};
+        my $files_blocked = {};
+        while ($diff =~ s{^diff .*\bb/(.+?)\r?\n}{}m) {
+            $files_changed->{$1} = 1;
+        }
+        while (keys %$files_changed and $conf =~ s/^restrictedfile\.(.+)\.pushers=(.+)$//m) {
+            my $sniff = $1;
+            my $keys = $2;
+            my $regex = $sniff =~ m{^/(.+)/$} ? qr{$1} : eval {
+                my $wild = $sniff;
+                $wild =~ s/\\/\\\\/g;
+                $wild =~ s/\./\\./g;
+                $wild =~ s/\*/.+/g;
+                return qr{^$wild$};
+            } or die localtime().": [$KEY\@$ip] git-server: Unimplemented [restrictedfile.pushers] syntax? [$sniff]=>[$keys]\n";
+            foreach my $file (keys %$files_changed) {
+                if ($file =~ $regex) {
+                    my $restrict = 1;
+                    foreach my $key (split /,/, $keys) {
+                        $restrict = 0 if $key eq $KEY;
+                    }
+                    $files_blocked->{$file} = $regex if $restrict;
+                }
+            }
+        }
+        if (%$files_blocked) {
+            die localtime().": [$KEY\@$ip] git-server: Missing [restrictedfile.pushers] permission! You can't modify [".join(" ",keys %$files_blocked)."] Do not 'git push' until changes have been reverted. (Hint: 'git diff origin HEAD ".[keys %$files_blocked]->[0]." ; git rebase -i $old')\n";
+        }
+    }
+}
+
+# Remember this info that might be needed later
+sub ipclog {
+    my $entry = shift;
+    $entry =~ s/\s*$/\n/;
+    if ($entry and my $ipc = $ENV{IPC}) {
+        if (open my $fh, ">>", "$ipc/pushinfo.log") {
+            print $fh $entry;
+            close $fh;
+        }
+    }
+}

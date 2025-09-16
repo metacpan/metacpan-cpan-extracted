@@ -63,7 +63,7 @@ sub new {
 # SearchSpreadsheetBrokenLinksRequest.Spreadsheet : Upload spreadsheet file.  ,
 # SearchSpreadsheetBrokenLinksRequest.worksheet : Specify the worksheet for the replace.  ,
 # SearchSpreadsheetBrokenLinksRequest.cellArea : Specify the cell area for the replace.  ,
-# SearchSpreadsheetBrokenLinksRequest.regoin : The spreadsheet region setting.  ,
+# SearchSpreadsheetBrokenLinksRequest.region : The spreadsheet region setting.  ,
 # SearchSpreadsheetBrokenLinksRequest.password : The password for opening spreadsheet file.   
 
 {
@@ -77,7 +77,7 @@ sub new {
     __PACKAGE__->method_documentation->{ 'search_spreadsheet_broken_links' } = { 
     	summary => 'Search broken links in the local spreadsheet.',
         params => $params,
-        returns => 'BrokenLinksReponse',
+        returns => 'BrokenLinksResponse',
     };
 }
 
@@ -109,8 +109,8 @@ sub run_http_request {
         $query_params->{'cellArea'} = $client->to_query_value($self->cell_area);      
     }
 
-    if(defined $self->regoin){
-        $query_params->{'regoin'} = $client->to_query_value($self->regoin);      
+    if(defined $self->region){
+        $query_params->{'region'} = $client->to_query_value($self->region);      
     }
 
     if(defined $self->password){
@@ -153,9 +153,9 @@ __PACKAGE__->method_documentation({
      	format => '',
      	read_only => '',
      		},
-     'regoin' => {
+     'region' => {
      	datatype => 'string',
-     	base_name => 'regoin',
+     	base_name => 'region',
      	description => 'The spreadsheet region setting.',
      	format => '',
      	read_only => '',
@@ -174,7 +174,7 @@ __PACKAGE__->attribute_map( {
     'spreadsheet' => 'Spreadsheet',
     'worksheet' => 'worksheet',
     'cell_area' => 'cellArea',
-    'regoin' => 'regoin',
+    'region' => 'region',
     'password' => 'password' 
 } );
 

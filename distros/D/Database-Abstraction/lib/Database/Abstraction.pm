@@ -53,11 +53,11 @@ Database::Abstraction - Read-only Database Abstraction Layer (ORM)
 
 =head1 VERSION
 
-Version 0.30
+Version 0.31
 
 =cut
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 =head1 DESCRIPTION
 
@@ -343,6 +343,13 @@ sub new {
 	# Load the configuration from a config file, if provided
 	%args = %{Object::Configure::configure($class, \%args)};
 
+	# Validate logger object has required methods
+	if(defined $args{'logger'}) {
+		unless(Scalar::Util::blessed($args{'logger'}) && $args{'logger'}->can('info') && $args{'logger'}->can('error')) {
+			Carp::croak("Logger must be an object with info() and error() methods");
+		}
+	}
+
 	croak("$class: where are the files?") unless($args{'directory'} || $defaults{'directory'});
 
 	croak("$class: ", $args{'directory'} || $defaults{'directory'}, ' is not a directory') unless(-d ($args{'directory'} || $defaults{'directory'}));
@@ -385,15 +392,11 @@ sub set_logger
 	my $self = shift;
 	my $params = Params::Get::get_params('logger', @_);
 
-	if(defined($params->{'logger'})) {
-		if(my $logger = $params->{'logger'}) {
-			if(Scalar::Util::blessed($logger)) {
-				$self->{'logger'} = $logger;
-			} else {
-				$self->{'logger'} = Log::Abstraction->new($logger);
-			}
+	if(my $logger = ($params->{'logger'})) {
+		if(Scalar::Util::blessed($logger)) {
+			$self->{'logger'} = $logger;
 		} else {
-			$self->{'logger'} = Log::Abstraction->new();
+			$self->{'logger'} = Log::Abstraction->new($logger);
 		}
 		return $self;
 	}
@@ -641,7 +644,7 @@ sub _open
 				}
 			} else {
 				# throw Error(-file => "$dir/$table");
-				Carp::croak("Can't find a file called '$dbname' for the table $table in $dir");
+				$self->_fatal("Can't find a file called '$dbname' for the table $table in $dir");
 			}
 			$self->{'type'} = 'XML';
 		}
@@ -681,7 +684,7 @@ sub selectall_arrayref {
 	}
 
 	if($self->{'berkeley'}) {
-		Carp::croak(ref($self), ': selectall_arrayref is meaningless on a NoSQL database');
+		$self->_fatal(ref($self), ': selectall_arrayref is meaningless on a NoSQL database');
 	}
 
 	my $table = $self->_open_table($params);
@@ -690,7 +693,7 @@ sub selectall_arrayref {
 		if(scalar(keys %{$params}) == 0) {
 			$self->_trace("$table: selectall_arrayref fast track return");
 			if(ref($self->{'data'}) eq 'HASH') {
-				return Return::Set::set_return(\values %{$self->{'data'}}, { type => 'arrayref' });
+				return Return::Set::set_return(values %{$self->{'data'}}, { type => 'arrayref' });
 			}
 			return Return::Set::set_return($self->{'data'}, { type => 'arrayref'});
 			# my @rc = values %{$self->{'data'}};
@@ -714,9 +717,8 @@ sub selectall_arrayref {
 	foreach my $c1(sort keys(%{$params})) {	# sort so that the key is always the same
 		my $arg = $params->{$c1};
 		if(ref($arg)) {
-			$self->_fatal("selectall_arrayref(): $query: argument is not a string");
 			# throw Error::Simple("$query: argument is not a string: " . ref($arg));
-			croak("selectall_arrayref(): $query: argument is not a string: ", ref($arg));
+			$self->_fatal("selectall_arrayref(): $query: argument is not a string: ", ref($arg));
 		}
 		if(!defined($arg)) {
 			my @call_details = caller(0);
@@ -862,9 +864,8 @@ sub selectall_array
 	foreach my $c1(sort keys(%{$params})) {	# sort so that the key is always the same
 		my $arg = $params->{$c1};
 		if(ref($arg)) {
-			$self->_fatal("selectall_array(): $query: argument is not a string");
 			# throw Error::Simple("$query: argument is not a string: " . ref($arg));
-			croak("selectall_array(): $query: argument is not a string: ", ref($arg));
+			$self->_fatal("selectall_array(): $query: argument is not a string: ", ref($arg));
 		}
 		if(!defined($arg)) {
 			my @call_details = caller(0);
@@ -1007,9 +1008,8 @@ sub count
 	foreach my $c1(sort keys(%{$params})) {	# sort so that the key is always the same
 		my $arg = $params->{$c1};
 		if(ref($arg)) {
-			$self->_fatal("count(): $query: argument is not a string");
 			# throw Error::Simple("$query: argument is not a string: " . ref($arg));
-			croak("count(): $query: argument is not a string: ", ref($arg));
+			$self->_fatal("count(): $query: argument is not a string: ", ref($arg));
 		}
 		if(!defined($arg)) {
 			my @call_details = caller(0);
@@ -1144,9 +1144,8 @@ sub fetchrow_hashref {
 			my $keyword;
 
 			if(ref($arg)) {
-				$self->_fatal("fetchrow_hashref: $query: argument is not a string");
 				# throw Error::Simple("$query: argument is not a string: " . ref($arg));
-				croak("fetchrow_hash(): $query: argument is not a string: ", ref($arg));
+				$self->_fatal("fetchrow_hash(): $query: argument is not a string: ", ref($arg));
 			}
 
 			if($done_where) {
@@ -1502,6 +1501,7 @@ sub AUTOLOAD {
 		return @rc;
 	}
 	my $rc = $sth->fetchrow_array();	# Return the first match only
+	$sth->finish();
 	if($cache) {
 		return $cache->set($key, $rc, $self->{'cache_duration'});
 	}
@@ -1656,6 +1656,7 @@ sub _warn {
 	my $params = Params::Get::get_params('warning', @_);
 
 	$self->_log('warn', $params->{'warning'});
+	Carp::carp(join('', grep defined, $params->{'warning'}));
 }
 
 # Die
@@ -1664,6 +1665,7 @@ sub _fatal {
 	my $params = Params::Get::get_params('warning', @_);
 
 	$self->_log('error', $params->{'warning'});
+	Carp::croak(join('', grep defined, $params->{'warning'}));
 }
 
 =head1 AUTHOR
@@ -1697,6 +1699,14 @@ so if XML fails for you on a small file force non-slurping mode with
         directory => '/var/dat',
         max_slurp_size => 0	# force to not use slurp and therefore to use SQL
     });
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * Test coverage report: L<https://nigelhorne.github.io/Database-Abstraction/coverage/>
+
+=back
 
 =head1 LICENSE AND COPYRIGHT
 

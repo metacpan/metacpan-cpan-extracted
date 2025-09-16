@@ -1,4 +1,4 @@
-![Aspose.Cells Cloud SDK for Perl](https://img.shields.io/badge/aspose.cells%20Cloud%20SDK-25.5-green?style=for-the-badge&logo=perl) [![Product Page](https://img.shields.io/badge/Product-0288d1?style=for-the-badge&logo=Google-Chrome&logoColor=white)](https://products.aspose.cloud/cells/perl/) [![Documentation](https://img.shields.io/badge/Documentation-388e3c?style=for-the-badge&logo=Hugo&logoColor=white)](https://docs.aspose.cloud/cells/) [![API Ref](https://img.shields.io/badge/Reference-f39c12?style=for-the-badge&logo=html5&logoColor=white)](https://reference.aspose.cloud/cells/) [![Examples](https://img.shields.io/badge/Examples-1565c0?style=for-the-badge&logo=Github&logoColor=white)](https://github.com/aspose-cells-cloud/aspose-cells-cloud-perl/tree/master/examples) [![Blog](https://img.shields.io/badge/Blog-d32f2f?style=for-the-badge&logo=WordPress&logoColor=white)](https://blog.aspose.cloud/categories/aspose.cells-cloud-product-family/) [![Support](https://img.shields.io/badge/Support-7b1fa2?style=for-the-badge&logo=Discourse&logoColor=white)](https://forum.aspose.cloud/c/cells/7) [![License](https://img.shields.io/github/license/aspose-cells-cloud/aspose-cells-cloud-go?style=for-the-badge&logo=rocket&logoColor=white)](https://github.com/aspose-cells-cloud/aspose-cells-cloud-go/blob/master/LICENSE) ![CPAN](https://img.shields.io/cpan/v/AsposeCellsCloud-CellsApi?style=for-the-badge&logo=rocket&logoColor=white)
+![Aspose.Cells Cloud SDK for Perl](https://img.shields.io/badge/aspose.cells%20Cloud%20SDK-25.9-green?style=for-the-badge&logo=perl) [![Product Page](https://img.shields.io/badge/Product-0288d1?style=for-the-badge&logo=Google-Chrome&logoColor=white)](https://products.aspose.cloud/cells/perl/) [![Documentation](https://img.shields.io/badge/Documentation-388e3c?style=for-the-badge&logo=Hugo&logoColor=white)](https://docs.aspose.cloud/cells/) [![API Ref](https://img.shields.io/badge/Reference-f39c12?style=for-the-badge&logo=html5&logoColor=white)](https://reference.aspose.cloud/cells/) [![Examples](https://img.shields.io/badge/Examples-1565c0?style=for-the-badge&logo=Github&logoColor=white)](https://github.com/aspose-cells-cloud/aspose-cells-cloud-perl/tree/master/examples) [![Blog](https://img.shields.io/badge/Blog-d32f2f?style=for-the-badge&logo=WordPress&logoColor=white)](https://blog.aspose.cloud/categories/aspose.cells-cloud-product-family/) [![Support](https://img.shields.io/badge/Support-7b1fa2?style=for-the-badge&logo=Discourse&logoColor=white)](https://forum.aspose.cloud/c/cells/7) [![License](https://img.shields.io/github/license/aspose-cells-cloud/aspose-cells-cloud-go?style=for-the-badge&logo=rocket&logoColor=white)](https://github.com/aspose-cells-cloud/aspose-cells-cloud-go/blob/master/LICENSE) ![CPAN](https://img.shields.io/cpan/v/AsposeCellsCloud-CellsApi?style=for-the-badge&logo=rocket&logoColor=white)
 
 # Quick Start Guide
 
@@ -18,18 +18,17 @@ use MIME::Base64;
 use AsposeCellsCloud::ApiClient;
 use AsposeCellsCloud::CellsApi;
 use AsposeCellsCloud::Configuration;
-use AsposeCellsCloud::Request::PutConvertWorkbookRequest;
+use AsposeCellsCloud::Request::ConvertSpreadsheetRequest;
 
 my $config = AsposeCellsCloud::Configuration->new( client_id => $ENV{'CellsCloudClientId'}, client_secret => $ENV{'CellsCloudClientSecret'});
 my $instance = AsposeCellsCloud::CellsApi->new(AsposeCellsCloud::ApiClient->new( $config));
-my $format = 'csv';
-my $mapFiles = {};           
-$mapFiles->{'CompanySales.xlsx'}= "examples/CompanySales.xlsx";
-my $request = AsposeCellsCloud::Request::PutConvertWorkbookRequest->new();
-$request->{file} =  $mapFiles;
-$request->{format} =  $format;
+
+my $request = AsposeCellsCloud::Request::ConvertSpreadsheetRequest->new();
+$request->{spreadsheet} =  'EmployeeSalesSummary.xlsx';
+$request->{format} = 'pdf';
 my $response = $instance->put_convert_workbook(request=> $request);
-open (my $fh, '>', 'CompanySales.csv') or die "No open CompanySales.csv $!";
+open (my $fh, '>', 'EmployeeSalesSummary.pdf') or die "No open EmployeeSalesSummary.pdf $!";
+binmode($fh);
 print $fh $response;
 close($fh);
 ```
@@ -94,16 +93,15 @@ close($fh);
 - Import/Export: Facilitates importing data from various sources into spreadsheets and exporting spreadsheet data to other formats.
 - Security Management: Offers a range of security features like data encryption, access control, and permission management to safeguard the security and integrity of spreadsheet data.
 
-## Feature & Enhancements in Version v25.6.1
+## Feature & Enhancements in Version v25.9
 
 Full list of issues covering all changes in this release:
 
-|**Summary**| **Category** |
-| :- |:-------------|
-| Support delete blank rows, columns, and worksheets. | New Feature |
-| Optimize search context for remote spreadsheet features by splitting them into independent APIs, each dedicated to a specific operational area. | New Feature |
-| Optimize search broken links for remote spreadsheet features by splitting them into independent APIs, each dedicated to a specific operational area. | New Feature |
-| Optimize replace context for remote spreadsheet features by splitting them into independent APIs, each dedicated to a specific operational area. | New Feature |
+|**Summary**|**Category**|
+| :- | :- |
+| Support trim spreadsheet content in Cells Cloud 4.0. | Improvement  |
+| Support trim worksheet range content in Cells Cloud 4.0. | Improvement  |
+| Fix few issues about spelling error. | Bug  |
 
 ## Available SDKs
 

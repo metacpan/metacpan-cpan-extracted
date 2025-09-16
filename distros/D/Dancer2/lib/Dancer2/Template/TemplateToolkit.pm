@@ -1,13 +1,16 @@
 # ABSTRACT: Template toolkit engine for Dancer2
 
 package Dancer2::Template::TemplateToolkit;
-$Dancer2::Template::TemplateToolkit::VERSION = '1.1.2';
+$Dancer2::Template::TemplateToolkit::VERSION = '2.0.0';
 use Moo;
 use Carp qw<croak>;
 use Dancer2::Core::Types;
 use Dancer2::FileUtils qw<path>;
 use Scalar::Util ();
 use Template;
+
+# Override to use a different Template::Toolkit base class
+has 'template_class' => ( is => 'ro', default => 'Template' );
 
 with 'Dancer2::Core::Role::Template';
 
@@ -37,7 +40,7 @@ sub _build_engine {
         sub { [ $ttt->views ] },
     ];
 
-    my $tt = Template->new(%tt_config);
+    my $tt = $self->template_class->new(%tt_config);
     $Template::Stash::PRIVATE = undef if $self->config->{show_private_variables};
     return $tt;
 }
@@ -101,7 +104,7 @@ Dancer2::Template::TemplateToolkit - Template toolkit engine for Dancer2
 
 =head1 VERSION
 
-version 1.1.2
+version 2.0.0
 
 =head1 SYNOPSIS
 
@@ -204,6 +207,22 @@ PARSER (L<Template::Parser>) and GRAMMAR (L<Template::Grammar>). If you intend t
 several of these components in your app, it is suggested to create an app-specific subclass
 that handles all of them at the same time.
 
+=head2 Custom Template::Toolkit class
+
+When subclassing this module it is possible to use a different
+Template::Toolkit class (for example if you have also subclassed that). To do
+that simply define a different C<template_class> property:
+
+    package Dancer2::Template::TemplateToolkit::FooBar;
+    
+    use Moo;
+    
+    extends 'Dancer2::Template::TemplateToolkit';
+    
+    has '+template_class' => ( default => 'TemplateFooBar' );
+    
+    1;
+
 =head2 Template Caching
 
 L<Template>::Tookit templates can be cached by adding the C<COMPILE_EXT> property to your
@@ -237,7 +256,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Alexis Sukrieh.
+This software is copyright (c) 2025 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

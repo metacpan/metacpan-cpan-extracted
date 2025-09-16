@@ -32,148 +32,157 @@ no_index:
 provides:
   Iterator::Flex:
     file: lib/Iterator/Flex.pm
-    version: '0.29'
+    version: '0.30'
   Iterator::Flex::Array:
     file: lib/Iterator/Flex/Array.pm
-    version: '0.29'
+    version: '0.30'
   Iterator::Flex::ArrayLike:
     file: lib/Iterator/Flex/ArrayLike.pm
-    version: '0.29'
+    version: '0.30'
   Iterator::Flex::Base:
     file: lib/Iterator/Flex/Base.pm
-    version: '0.29'
+    version: '0.30'
+  Iterator::Flex::Buffer:
+    file: lib/Iterator/Flex/Buffer.pm
+    version: '0.30'
   Iterator::Flex::Cache:
     file: lib/Iterator/Flex/Cache.pm
-    version: '0.29'
+    version: '0.30'
   Iterator::Flex::Cat:
     file: lib/Iterator/Flex/Cat.pm
-    version: '0.29'
+    version: '0.30'
   Iterator::Flex::Chunk:
     file: lib/Iterator/Flex/Chunk.pm
-    version: '0.29'
+    version: '0.30'
   Iterator::Flex::Common:
     file: lib/Iterator/Flex/Common.pm
-    version: '0.29'
+    version: '0.30'
   Iterator::Flex::Cycle:
     file: lib/Iterator/Flex/Cycle.pm
-    version: '0.29'
+    version: '0.30'
   Iterator::Flex::Factory:
     file: lib/Iterator/Flex/Factory.pm
-    version: '0.29'
+    version: '0.30'
   Iterator::Flex::Failure:
     file: lib/Iterator/Flex/Failure.pm
-    version: '0.29'
+    version: '0.30'
   Iterator::Flex::Freeze:
     file: lib/Iterator/Flex/Freeze.pm
-    version: '0.29'
+    version: '0.30'
   Iterator::Flex::Gather:
     file: lib/Iterator/Flex/Gather.pm
-    version: '0.29'
+    version: '0.30'
   Iterator::Flex::Gather::Constants:
     file: lib/Iterator/Flex/Gather/Constants.pm
-    version: '0.29'
+    version: '0.30'
   Iterator::Flex::Grep:
     file: lib/Iterator/Flex/Grep.pm
-    version: '0.29'
+    version: '0.30'
   Iterator::Flex::Map:
     file: lib/Iterator/Flex/Map.pm
-    version: '0.29'
+    version: '0.30'
   Iterator::Flex::Method:
     file: lib/Iterator/Flex/Method.pm
-    version: '0.29'
+    version: '0.30'
   Iterator::Flex::Method::Maker:
     file: lib/Iterator/Flex/Method.pm
-    version: '0.29'
+    version: '0.30'
+  Iterator::Flex::Permute:
+    file: lib/Iterator/Flex/Permute.pm
+    version: '0.30'
   Iterator::Flex::Product:
     file: lib/Iterator/Flex/Product.pm
-    version: '0.29'
+    version: '0.30'
   Iterator::Flex::Role:
     file: lib/Iterator/Flex/Role.pm
-    version: '0.29'
+    version: '0.30'
   Iterator::Flex::Role::Current::Closure:
     file: lib/Iterator/Flex/Role/Current/Closure.pm
-    version: '0.29'
+    version: '0.30'
   Iterator::Flex::Role::Current::Method:
     file: lib/Iterator/Flex/Role/Current/Method.pm
-    version: '0.29'
+    version: '0.30'
   Iterator::Flex::Role::Error::Throw:
     file: lib/Iterator/Flex/Role/Error/Throw.pm
-    version: '0.29'
+    version: '0.30'
   Iterator::Flex::Role::Exhaustion::ImportedReturn:
     file: lib/Iterator/Flex/Role/Exhaustion/ImportedReturn.pm
-    version: '0.29'
+    version: '0.30'
   Iterator::Flex::Role::Exhaustion::ImportedThrow:
     file: lib/Iterator/Flex/Role/Exhaustion/ImportedThrow.pm
-    version: '0.29'
+    version: '0.30'
   Iterator::Flex::Role::Exhaustion::PassthroughThrow:
     file: lib/Iterator/Flex/Role/Exhaustion/PassthroughThrow.pm
-    version: '0.29'
+    version: '0.30'
   Iterator::Flex::Role::Exhaustion::Return:
     file: lib/Iterator/Flex/Role/Exhaustion/Return.pm
-    version: '0.29'
+    version: '0.30'
   Iterator::Flex::Role::Exhaustion::Throw:
     file: lib/Iterator/Flex/Role/Exhaustion/Throw.pm
-    version: '0.29'
+    version: '0.30'
   Iterator::Flex::Role::Freeze:
     file: lib/Iterator/Flex/Role/Freeze.pm
-    version: '0.29'
+    version: '0.30'
   Iterator::Flex::Role::Next::ClosedSelf:
     file: lib/Iterator/Flex/Role/Next/ClosedSelf.pm
-    version: '0.29'
+    version: '0.30'
   Iterator::Flex::Role::Next::Closure:
     file: lib/Iterator/Flex/Role/Next/Closure.pm
-    version: '0.29'
+    version: '0.30'
   Iterator::Flex::Role::Prev::Closure:
     file: lib/Iterator/Flex/Role/Prev/Closure.pm
-    version: '0.29'
+    version: '0.30'
   Iterator::Flex::Role::Prev::Method:
     file: lib/Iterator/Flex/Role/Prev/Method.pm
-    version: '0.29'
+    version: '0.30'
   Iterator::Flex::Role::Reset::Closure:
     file: lib/Iterator/Flex/Role/Reset/Closure.pm
-    version: '0.29'
+    version: '0.30'
   Iterator::Flex::Role::Reset::Method:
     file: lib/Iterator/Flex/Role/Reset/Method.pm
-    version: '0.29'
+    version: '0.30'
   Iterator::Flex::Role::Rewind::Closure:
     file: lib/Iterator/Flex/Role/Rewind/Closure.pm
-    version: '0.29'
+    version: '0.30'
   Iterator::Flex::Role::Rewind::Method:
     file: lib/Iterator/Flex/Role/Rewind/Method.pm
-    version: '0.29'
+    version: '0.30'
   Iterator::Flex::Role::State:
     file: lib/Iterator/Flex/Role/State.pm
-    version: '0.29'
+    version: '0.30'
   Iterator::Flex::Role::State::Closure:
     file: lib/Iterator/Flex/Role/State/Closure.pm
-    version: '0.29'
+    version: '0.30'
   Iterator::Flex::Role::State::Registry:
     file: lib/Iterator/Flex/Role/State/Registry.pm
-    version: '0.29'
+    version: '0.30'
   Iterator::Flex::Role::Utils:
     file: lib/Iterator/Flex/Role/Utils.pm
-    version: '0.29'
+    version: '0.30'
   Iterator::Flex::Role::Wrap::Return:
     file: lib/Iterator/Flex/Role/Wrap/Return.pm
-    version: '0.29'
+    version: '0.30'
   Iterator::Flex::Role::Wrap::Self:
     file: lib/Iterator/Flex/Role/Wrap/Self.pm
-    version: '0.29'
+    version: '0.30'
   Iterator::Flex::Role::Wrap::Throw:
     file: lib/Iterator/Flex/Role/Wrap/Throw.pm
-    version: '0.29'
+    version: '0.30'
   Iterator::Flex::Sequence:
     file: lib/Iterator/Flex/Sequence.pm
-    version: '0.29'
+    version: '0.30'
   Iterator::Flex::Stack:
     file: lib/Iterator/Flex/Stack.pm
-    version: '0.29'
+    version: '0.30'
+  Iterator::Flex::Take:
+    file: lib/Iterator/Flex/Take.pm
+    version: '0.30'
   Iterator::Flex::Utils:
     file: lib/Iterator/Flex/Utils.pm
-    version: '0.29'
+    version: '0.30'
   Iterator::Flex::Zip:
     file: lib/Iterator/Flex/Zip.pm
-    version: '0.29'
+    version: '0.30'
 requires:
   Class::Method::Modifiers: '0'
   List::Util: '1.33'
@@ -188,7 +197,7 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Iterator-Flex
   repository: https://gitlab.com/djerius/iterator-flex.git
-version: '0.29'
+version: '0.30'
 x_generated_by_perl: v5.40.3
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: GPL-3.0-only

@@ -5,7 +5,7 @@ package Iterator::Flex::Array;
 use strict;
 use warnings;
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 use Iterator::Flex::Utils ':IterAttrs';
 use Ref::Util;
@@ -160,7 +160,7 @@ Iterator::Flex::Array - Array Iterator Class
 
 =head1 VERSION
 
-version 0.29
+version 0.30
 
 =head1 METHODS
 

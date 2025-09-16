@@ -37,7 +37,8 @@ use Date::Parse;
 use DateTime;
 use AsposeCellsCloud::Object::BaseOperateOptions;
 use AsposeCellsCloud::Object::DataSource;
-use AsposeCellsCloud::Object::FileInfo; 
+use AsposeCellsCloud::Object::FileInfo;
+use AsposeCellsCloud::Object::ScopeOptions; 
 
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
@@ -137,28 +138,21 @@ __PACKAGE__->method_documentation({
      'data_source' => {
      	datatype => 'DataSource',
      	base_name => 'DataSource',
-     	description => '',
+     	description => 'Represents data source.  There are three types of data, they are CloudFileSystem, RequestFiles, HttpUri.',
      	format => '',
      	read_only => '',
      		},
      'file_info' => {
      	datatype => 'FileInfo',
      	base_name => 'FileInfo',
-     	description => '',
+     	description => 'Represents file information. Include of filename, filesize, and file content(base64String).',
      	format => '',
      	read_only => '',
      		},
-     'worksheet' => {
-     	datatype => 'string',
-     	base_name => 'Worksheet',
-     	description => '',
-     	format => '',
-     	read_only => '',
-     		},
-     'range' => {
-     	datatype => 'string',
-     	base_name => 'Range',
-     	description => '',
+     'scope_options' => {
+     	datatype => 'ScopeOptions',
+     	base_name => 'ScopeOptions',
+     	description => 'Specifies the range of cells within the worksheet where the spreadsheet operations will be performed. This parameter allows users to define the exact area to be processed, ensuring that operations are applied only to the designated cells.',
      	format => '',
      	read_only => '',
      		},
@@ -189,8 +183,7 @@ __PACKAGE__->swagger_types( {
     'name' => 'string',
     'data_source' => 'DataSource',
     'file_info' => 'FileInfo',
-    'worksheet' => 'string',
-    'range' => 'string',
+    'scope_options' => 'ScopeOptions',
     'convert_text_type' => 'string',
     'source_characters' => 'string',
     'target_characters' => 'string' 
@@ -200,8 +193,7 @@ __PACKAGE__->attribute_map( {
     'name' => 'Name',
     'data_source' => 'DataSource',
     'file_info' => 'FileInfo',
-    'worksheet' => 'Worksheet',
-    'range' => 'Range',
+    'scope_options' => 'ScopeOptions',
     'convert_text_type' => 'ConvertTextType',
     'source_characters' => 'SourceCharacters',
     'target_characters' => 'TargetCharacters' 

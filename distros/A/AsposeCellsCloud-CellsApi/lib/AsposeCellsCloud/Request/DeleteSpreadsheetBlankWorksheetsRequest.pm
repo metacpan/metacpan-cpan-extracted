@@ -63,7 +63,7 @@ sub new {
 # DeleteSpreadsheetBlankWorksheetsRequest.Spreadsheet : Upload spreadsheet file.  ,
 # DeleteSpreadsheetBlankWorksheetsRequest.outPath : (Optional) The folder path where the workbook is stored. The default is null.  ,
 # DeleteSpreadsheetBlankWorksheetsRequest.outStorageName : Output file Storage Name.  ,
-# DeleteSpreadsheetBlankWorksheetsRequest.regoin : The spreadsheet region setting.  ,
+# DeleteSpreadsheetBlankWorksheetsRequest.region : The spreadsheet region setting.  ,
 # DeleteSpreadsheetBlankWorksheetsRequest.password : The password for opening spreadsheet file.   
 
 {
@@ -75,7 +75,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'delete_spreadsheet_blank_worksheets' } = { 
-    	summary => 'Delete all blank worksheets which do not contain any data or other object.',
+    	summary => 'Delete all blank rows that do not contain any data or other objects.',
         params => $params,
         returns => 'string',
     };
@@ -109,8 +109,8 @@ sub run_http_request {
         $query_params->{'outStorageName'} = $client->to_query_value($self->out_storage_name);      
     }
 
-    if(defined $self->regoin){
-        $query_params->{'regoin'} = $client->to_query_value($self->regoin);      
+    if(defined $self->region){
+        $query_params->{'region'} = $client->to_query_value($self->region);      
     }
 
     if(defined $self->password){
@@ -153,9 +153,9 @@ __PACKAGE__->method_documentation({
      	format => '',
      	read_only => '',
      		},
-     'regoin' => {
+     'region' => {
      	datatype => 'string',
-     	base_name => 'regoin',
+     	base_name => 'region',
      	description => 'The spreadsheet region setting.',
      	format => '',
      	read_only => '',
@@ -174,7 +174,7 @@ __PACKAGE__->attribute_map( {
     'spreadsheet' => 'Spreadsheet',
     'out_path' => 'outPath',
     'out_storage_name' => 'outStorageName',
-    'regoin' => 'regoin',
+    'region' => 'region',
     'password' => 'password' 
 } );
 

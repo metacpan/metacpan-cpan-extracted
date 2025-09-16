@@ -1,0 +1,127 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use Fcntl qw(O_CREAT O_RDWR LOCK_EX LOCK_NB);
+use IO::Handle; # autoflush
+
+# Maximum number of seconds to wait for the next worker to take over.
+my $MAX_PATIENCE = 7200;
+# Minimum delay after push that is required to wait before sleeping.
+my $MIN_PUSH_DELAY = 60;
+my $ssh = $ENV{SSH_CLIENT} or die "Only SSH allowed\n";
+my ($ip) = split / /,$ssh;
+$ip or die "$ssh: SSH protocol malfunction\n";
+my $base = $ENV{GIT_DIR} or die "GIT hook ENV malfunction!\n";
+my $lock_dir = "$base/logs";
+mkdir $lock_dir, 0755 unless -d $lock_dir;
+my $KEY = $ENV{KEY} || "UNKNOWN";
+$SIG{PIPE} = sub { exit 1; };
+if (my $xmods = $ENV{XMODIFIERS}) {
+    if ($xmods =~ /\bdeploy_patience=(\d+)/) {
+        $MAX_PATIENCE = $1 || 1;
+        warn localtime().": [$KEY\@$ip] git-server: Modified Deploy Patience: $MAX_PATIENCE Seconds\n";
+    }
+}
+my $lock_file = "$lock_dir/$ip-$KEY.lock";
+sysopen my $fh, $lock_file, O_CREAT | O_RDWR;
+my $released_worker = 0;
+if (!flock $fh, LOCK_NB | LOCK_EX) {
+    # Someone else is still working?
+    # Well, it looks like his shift is over so he needs to be released.
+    # Now it's my turn to clock in and wait for the push notification.
+    sleep 1; # Wait for the other process to stash PIDs into lock file.
+    # Hopefully, UNIX will allow me to read a file even though it's locked by someone else.
+    chomp (my $worker = <$fh>);
+    chomp (my $sleeper = <$fh>);
+    # Rewind back to the beginning
+    seek $fh, 0, 0;
+    if ($worker and $sleeper and kill 0, $worker) {
+        # Still running?
+        warn localtime().": [$KEY\@$ip] git-server: PUSH NOTIFICATION: Releasing worker (pid=$worker) by killing sleeper (pid=$sleeper) ...\n";
+        $released_worker = kill 9, $sleeper; # WAKE UP!
+    }
+    if ($released_worker) {
+        # SIGKILL was sent, so now patiently wait for him die,
+        # and pry the lock out of his cold dead fingers.
+        $released_worker = 0;
+        my $tries = 3;
+        while ($tries-- and sleep 1) {
+            last if $released_worker = flock $fh, LOCK_NB | LOCK_EX;
+        }
+    }
+    if (!$released_worker) {
+        close $fh; # Let go of lock file
+        # Failed to release someone else or someone else still has the lock?
+        # Then we can't take the flock() baton.
+        # Just git out of here!
+        $worker ||= "[unknown]";
+        $sleeper ||= "[gone]";
+        warn localtime().": [$KEY\@$ip] git-server: PUSH NOTIFICATION: Unable to steal pull lock from worker (pid=$worker) with sleeper (pid=$sleeper) You may proceed.\n";
+        exit;
+    }
+    # Acquired Exclusive Lock!
+    # Safe to continue
+}
+my $last_pushed = "$lock_dir/pushed";
+my $last_pulled = "$lock_dir/$ip-$KEY.pulled";
+my $WHEN_last_pulled = (stat $last_pulled)[9] || 0;
+my $WHEN_last_pushed = (stat $last_pushed)[9] || 0;
+my $should_wait =
+    # Do NOT wait if this is the first time ever doing a pull
+    !-e $last_pulled ? 0 :
+
+    # Always pause if there's never been any push yet
+    !-e $last_pushed ? 1 :
+
+    # Always wait if someone else was barely released to run the git pull
+    $released_worker ? 1 :
+
+    # Only wait if pulled much more recently than the last push
+    $WHEN_last_pulled > $WHEN_last_pushed + $MIN_PUSH_DELAY;
+
+# Update Last Pull Timestamp
+open my $pull, ">", $last_pulled or die "$last_pulled: open: $!";
+print $pull localtime().": [$ssh] Pull initiated\n";
+close $pull;
+
+if (my $sleeper = fork()) {
+    # Parent needs to log the sleeper
+    $fh->autoflush(1);
+    print $fh "$$\n";
+    print $fh "$sleeper\n";
+    truncate $fh, tell $fh;
+    warn localtime().": [$KEY\@$ip] git-server: PUSH NOTIFICATION: Starting worker (pid=$$) waiting for sleeper (pid=$sleeper) to finish ...\n";
+    waitpid $sleeper, 0;
+    my $rbits = "\x01"; # 2 ^ (fileno(STDIN)) = 1
+    if (select $rbits, undef, undef, 0.1) {
+        # Quick probe to make sure we are still connected to the other side
+        # Normally, a "read" operation will never send anything.
+        # So if STDIN is ready to say something, then there must be a problem.
+        # We need to prevent the real git pull from actually running.
+        die "STDIN Broken Pipe or defective git client.\n";
+    }
+}
+else {
+    # Child
+    close $fh; # Let go of the lock before sleeping
+    if ($should_wait) {
+        # Just be patient. Hopefully someone will kill me one day.
+        exec sleep => $MAX_PATIENCE or sleep 1;
+    }
+    # Otherwise, just exit normally;
+    exit;
+}
+
+# Wait for push to fall far enough away to provide safely distinct timestamps
+while (time - ((stat $last_pushed)[9] || 0) < 1) {
+    warn localtime().": [$KEY\@$ip] git-server: PUSH NOTIFICATION: Waiting for recent commit to complete ...\n";
+    sleep 1;
+}
+
+# Throw a warning if a push was too recent.
+if (!$should_wait) {
+    warn localtime().": [$KEY\@$ip] git-server: PUSH NOTIFICATION: Releasing pull due to recent commit. Please pull again ...\n";
+    # git client will probably see the following spewage:
+    # Cannot rebase onto multiple branches
+}

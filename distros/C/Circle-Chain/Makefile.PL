@@ -21,6 +21,7 @@ my %WriteMakefileArgs = (
         'Circle::Wallet' => '0.05',
         'Circle::Block'  => '0.05',
         'Circle::Node'   => '0.05',
+        'Circle::Miner'  => '0.03',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES    => 'Circle-Chain-*' },

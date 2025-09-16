@@ -6,7 +6,20 @@ Mark Overmeer.
 TODO:
 	. Add source http://www.ltsw.se/knbase/internet/mime.htp ?
 
-version 2.28:
+version 2.29: Mon 15 Sep 12:51:21 CEST 2025
+
+	Changes:
+	- require 5.16 (2012), remove xt/98perl.t
+
+	Improvements:
+	- remove html generation and releases.
+	- ::Type->defaultCharset()
+	- remove use of bareword filehandle.
+	- File::Slurp::Tiny -> File::Slurper
+	- iana updates
+	- upgrades to OODoc 3.04
+
+version 2.28: Fri Apr 18 08:54:43 PM CEST 2025
 
 	Fixes:
 	- some 'deprecated' texts made it to types.db.

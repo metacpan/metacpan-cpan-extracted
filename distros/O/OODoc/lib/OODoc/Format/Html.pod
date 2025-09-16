@@ -178,12 +178,13 @@ Extends L<"Page generation" in OODoc::Format|OODoc::Format/"Page generation">.
 
 Inherited, see L<OODoc::Format/"Page generation">
 
-=item $obj-E<gt>B<cleanupString>($manual, $object, %args)
+=item $obj-E<gt>B<cleanupString>($manual, $string, %options)
 
 The general L<OODoc::Parser::cleanupHtml()|OODoc::Parser/"Producing manuals"> is over-eager: it turns
 all pieces of text into paragraphs.  So things, like names of chapters,
 are not paragraphs at all: these simple strings are to be cleaned from
 paragraph information.
+Improves base, see L<OODoc::Format/"Page generation">
 
 =item $obj-E<gt>B<createManual>(%options)
 
@@ -260,10 +261,10 @@ example: expanding template specification into files
   #   index.html show NO
   #   main.html show NO
 
-  my $exp = $self->expandTemplate     (
- {"html/manual/index.html" => [show => 'YES']
+  my $exp = $self->expandTemplate( +{
+      "html/manual/index.html" => [show => 'YES']
       "html/manual/main.html"  => []
-    } , [show => 'NO']);
+  } , [show => 'NO']);
   # will print something like
   #   index.html show YES
   #   main.html show NO
@@ -635,8 +636,8 @@ Cast by templateIndex()
 
 =head1 SEE ALSO
 
-This module is part of OODoc version 3.03,
-built on September 08, 2025. Website: F<https://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.04,
+built on September 12, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 

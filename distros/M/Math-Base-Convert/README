@@ -31,7 +31,7 @@ SYNOPSIS
             xnt             base 64 XML Name Tokens (Nmtoken)
             xid             base 64 XML identifiers (Name)
             b85             base 85 RFC 1924 for IPv6 addresses
-            ascii           base 96 7 bit printible 0x20 - 0x7F
+            ascii           base 95 7 bit printible 0x20 - 0x7F
       );
 
       my $converted = cnv($number,optionalFROM,optionalTO);
@@ -91,7 +91,7 @@ BUILT IN NUMBER SETS
               '$', '%', '&', '(', ')', '*', '+', '-', 
               ';', '<', '=', '>', '?', '@', '^', '_', 
               '', '{', '|', '}', '~']
-      An arbitrary base 96 composed of printable 7 bit ascii
+      An arbitrary base 95 composed of printable 7 bit ascii
       from 0x20 (space) through 0x7F (tilde ~)
       ascii => [
             ' ','!','"','#','$','%','&',"'",'(',')',

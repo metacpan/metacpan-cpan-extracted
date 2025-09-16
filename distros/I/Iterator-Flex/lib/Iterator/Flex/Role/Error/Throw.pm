@@ -5,7 +5,7 @@ package Iterator::Flex::Role::Error::Throw;
 use strict;
 use warnings;
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 use Iterator::Flex::Utils qw( :default REG_GENERAL REG_GP_ERROR  );
 use Ref::Util;
@@ -25,14 +25,22 @@ use namespace::clean;
 
 
 
-sub signal_error ( $self ) {
+
+
+
+
+
+
+sub signal_error ( $self, $message = undef ) {
     $self->set_error;
     my $exception = $REGISTRY{ refaddr $self }[REG_GENERAL][REG_GP_ERROR][1];
 
-    $exception->() if Ref::Util::is_coderef( $exception );
+    my @message = ( $message // () );
+
+    $exception->( @message ) if Ref::Util::is_coderef( $exception );
 
     require Iterator::Flex::Failure;
-    Iterator::Flex::Failure::Error->throw;
+    Iterator::Flex::Failure::Error->throw( @message );
 }
 
 
@@ -60,16 +68,23 @@ Iterator::Flex::Role::Error::Throw - signal error by throwing
 
 =head1 VERSION
 
-version 0.29
+version 0.30
 
 =head1 METHODS
 
 =head2 signal_error
 
-   $iterator->signal_error;
+   $iterator->signal_error( $message );
 
 Signal that an error occurred.  This version sets the
 iterator's error flag and throws an exception.
+
+The default handler throws an exception in the L<Iterator::Flex::Failure::Error> class.
+
+The caller may define a custom error handler when the iterator is
+created.  It must throw an exception.
+
+If C<$message> is defined, it is passed to the error handler.
 
 =head1 INTERNALS
 

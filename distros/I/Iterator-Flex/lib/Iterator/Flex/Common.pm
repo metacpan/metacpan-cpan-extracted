@@ -8,13 +8,15 @@ use warnings;
 
 use experimental qw( postderef signatures );
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 use Exporter 'import';
 
 our @EXPORT_OK = qw[
-  iterator iter iarray icycle icache
-  icat ichain ichunk igather igrep imap iproduct iseq istack ifreeze izip
+  iterator iter iarray ibatch ibuffer icycle icache
+  icat ichain ichunk igather igrep imap
+  ipermute
+  iproduct iseq istack itake ifreeze izip
   thaw
 ];
 
@@ -135,7 +137,6 @@ sub iarray ( $array, $pars = {} ) {
 
 
 
-
 sub icache ( $iterable, $pars = {} ) {
     require Iterator::Flex::Cache;
     Iterator::Flex::Cache->new( $iterable, $pars );
@@ -209,10 +210,20 @@ sub ichain;
 
 
 
+
+
+
+
+
+
+
 sub ichunk ( $iterable, $pars = {} ) {
     require Iterator::Flex::Chunk;
     Iterator::Flex::Chunk->new( $iterable, $pars );
 }
+
+sub ibatch;
+*ibatch = \&ichunk;
 
 
 
@@ -242,6 +253,28 @@ sub ichunk ( $iterable, $pars = {} ) {
 sub icycle ( $array, $pars = {} ) {
     require Iterator::Flex::Cycle;
     return Iterator::Flex::Cycle->new( $array, $pars );
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+sub ibuffer ( $iterable, $n = 0, $pars = {} ) {
+    require Iterator::Flex::Buffer;
+    return Iterator::Flex::Buffer->new( $iterable, $n, $pars );
 }
 
 
@@ -327,6 +360,38 @@ sub igrep : prototype(&$@) ( $code, $iterable, $pars = {} ) {
 sub imap : prototype(&$@) ( $code, $iterable, $pars = {} ) {
     require Iterator::Flex::Map;
     Iterator::Flex::Map->new( $code, $iterable, $pars );
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+sub ipermute {
+    require Iterator::Flex::Permute;
+    return Iterator::Flex::Permute->new( @_ );
 }
 
 
@@ -471,6 +536,41 @@ sub istack ( @args ) {
 
 
 
+sub itake ( @args ) {
+    require Iterator::Flex::Take;
+    Iterator::Flex::Take->new( @args );
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 sub ifreeze : prototype(&$@) ( $code, $iterable, $pars = {} ) {
@@ -567,8 +667,8 @@ __END__
 
 =pod
 
-=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory icat ichain ichunk
-igather istack izip
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory ibatch ibuffer ipermute
+icat ichain ichunk igather istack izip
 
 =head1 NAME
 
@@ -576,7 +676,7 @@ Iterator::Flex::Common - Iterator Generators and Adapters
 
 =head1 VERSION
 
-version 0.29
+version 0.30
 
 =head1 SYNOPSIS
 
@@ -710,7 +810,7 @@ The returned iterator supports the following methods:
 
   $iterator = icache( $iterable, ?\%pars );
 
-The iterator caches the current and previous values of the passed iterator,
+An iterator adapter which caches the current and previous values of the passed iterator,
 See L<Iterator::Flex::Cache> for more details.
 
 The returned iterator supports the following methods:
@@ -770,10 +870,15 @@ If all of the iterables support it.
 
 =head2 ichunk
 
+=head2 ibatch
+
   $iterator = ichunk( $iterable, ?\%pars );
+  $iterator = ibatch( $iterable, ?\%pars );
 
 The iterator turns the input into chunks of C<$par{capacity}> elements,
 returning the chunks as arrayrefs.
+
+C<ibatch> is an alias for C<ichunk>.
 
 See L<Iterator::Flex::Chunk> for more details.
 
@@ -809,6 +914,19 @@ See L<Iterator::Flex::Cycle> for more details.
 =item freeze
 
 =back
+
+=head2 ibuffer
+
+  $iterator = ibuffer( $iterable, $capacity = 0, ?\%pars );
+
+Returns an iterator which on the first call to C<next> extracts
+C<$capacity> elements from C<$iterable>, stores them in a buffer, and
+then returns them one by one.  When the buffer is exhausted, it
+repeats the process.
+
+If C<$capacity> is zero, the C<$iterator> is drained into a buffer.
+
+See L<Iterator::Flex::Buffer> for more details.
 
 =head2 igather
 
@@ -870,6 +988,8 @@ The iterator supports the following methods:
 =item reset
 
 =back
+
+=head2 ipermute
 
 =head2 iproduct
 
@@ -958,6 +1078,35 @@ The returned iterator supports the following methods:
 
 =back
 
+=head2 take
+
+  $iterator = itake( $iterable, $n, ?\%pars );
+
+Yield at most C<$n> elements from C<$iterable>.
+
+If C<< $pars{lazy} >> is false, the first call to C<next> extracts
+C<$n> elements from C<$iterable> and then returns them one by one.
+
+See L<Iterator::Flex::Take> for more details.
+
+The returned iterator supports the following methods:
+
+=over
+
+=item current
+
+=item next
+
+=item prev
+
+=item rewind
+
+=item reset
+
+=item freeze
+
+=back
+
 =head2 ifreeze
 
   $iter = ifreeze { CODE } $iterator, ?\%pars;
@@ -1021,6 +1170,27 @@ Restore an iterator that has been frozen.
 See L<Iterator::Flex::Manual::Serialization> for more information.
 
 =head1 INTERNALS
+
+  $iterator = ipermute( \@array, ?\%pars );
+
+Returns an iterator which will return a permuted version of C<@array>. The
+C<$pars{k}> option may be specified to return a k-permutation.
+
+See L<Iterator::Flex::Permute> for more details.
+
+The iterator supports the following methods:
+
+=over
+
+=item current
+
+=item next
+
+=item rewind
+
+=item reset
+
+=back
 
 =head1 SUPPORT
 

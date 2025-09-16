@@ -27,12 +27,12 @@
       },
       "configure" : {
          "requires" : {
-            "SPVM" : "0.990087"
+            "SPVM" : "0.990089"
          }
       },
       "runtime" : {
          "requires" : {
-            "SPVM" : "0.990087",
+            "SPVM" : "0.990089",
             "SPVM::Compress::Raw::Zlib" : "0.003",
             "SPVM::Digest::SHA" : "0.065",
             "SPVM::File::Basename" : "0.044",
@@ -47,7 +47,7 @@
             "SPVM::MIME::Base64" : "1.003",
             "SPVM::Math" : "1.006",
             "SPVM::Mozilla::CA" : "0.001",
-            "SPVM::Regex" : "0.246",
+            "SPVM::Regex" : "0.249",
             "SPVM::Time::HiRes" : "0.005",
             "SPVM::Time::Local" : "0.112",
             "SPVM::Time::Piece" : "0.003"
@@ -65,6 +65,6 @@
          "web" : "https://github.com/yuki-kimoto/SPVM-Mojolicious"
       }
    },
-   "version" : "0.019",
+   "version" : "0.021",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

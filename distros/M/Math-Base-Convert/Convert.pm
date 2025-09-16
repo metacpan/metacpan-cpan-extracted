@@ -19,7 +19,7 @@ require Math::Base::Convert::Bases;	# drag in BASES
 	Exporter
 );
 
-$VERSION = do { my @r = (q$Revision: 0.11 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r };
+$VERSION = do { my @r = (q$Revision: 0.13 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r };
 
 @EXPORT_OK   = ( qw( cnv cnvpre cnvabs basemap ), @BASES );
 %EXPORT_TAGS = (
@@ -254,7 +254,8 @@ sub cnvpre {
 # if a large base and digit string will fit in a single 32 bit register
     elsif ( $fblen > 32 &&		# big base
 #	    exists $maxdlen{$fbase} &&	# has to exist
-	  ! $slen > $maxdlen{$fbase}) {
+#	  ! $slen > $maxdlen{$fbase}) {
+	$slen <= $maxdlen{$fbase}) {
       $bc->useFROMbaseto32wide;		# CalcPP is faster
     }
     else {				# shortcuts faster for big numbers
@@ -331,7 +332,7 @@ Math::Base::Convert - very fast base to base conversion
 	xnt		base 64 XML Name Tokens (Nmtoken)
 	xid		base 64 XML identifiers (Name)
 	b85		base 85 RFC 1924 for IPv6 addresses
-	ascii		base 96 7 bit printible 0x20 - 0x7F
+	ascii		base 95 7 bit printible 0x20 - 0x7F
   );
 
   my $converted = cnv($number,optionalFROM,optionalTO);
@@ -392,7 +393,7 @@ The functions below return a reference to an array
 	  '$', '%', '&', '(', ')', '*', '+', '-', 
 	  ';', '<', '=', '>', '?', '@', '^', '_', 
 	  '', '{', '|', '}', '~']
-  An arbitrary base 96 composed of printable 7 bit ascii
+  An arbitrary base 95 composed of printable 7 bit ascii
   from 0x20 (space) through 0x7F (tilde ~)
   ascii => [
 	' ','!','"','#','$','%','&',"'",'(',')',

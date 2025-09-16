@@ -1,0 +1,156 @@
+#!/usr/bin/env perl
+
+=pod
+
+=head1 NAME
+
+git-client - Git Client Wrapper
+
+=head1 DESCRIPTION
+
+Wrapper around the real git provide additional functionality.
+
+=head2 GIT_CONFIG Override
+
+Allows for .gitconfig descent override.
+It will traverse up the parent directories until a .gitconfig
+is found, then it will use that instead of only looking at HOME.
+
+=head2 -O <OPTION>
+
+Populates GIT_OPTION_* environment variables on server side.
+These ENV settings will be available to all the server side
+hooks, including the pre-* hooks.
+Note that for this to work, the git ssh server must have
+"AcceptEnv XMODIFIERS" enabled in its sshd_config.
+
+=head2 DEBUG
+
+Sets DEBUG environment on server side to match the same numeric value
+as set on the client invoker.
+
+=head1 INSTALL
+
+Just make sure this program comes BEFORE the
+real "git" program in the PATH.
+
+For example, as super user, you could do this:
+
+  [root@deploy-host ~]# wget -N -P /usr/local/bin https://metacpan.org/dist/Git-Server/source/git-client
+  [root@deploy-host ~]# chmod 755 /usr/local/bin/git-client
+  [root@deploy-host ~]# ln -s -v git-client /usr/local/bin/git
+  [root@deploy-host ~]#
+
+Or as normal user, you could do this:
+
+  [root@deploy-host ~]$ mkdir -p ~/bin
+  [root@deploy-host ~]$ wget -N -P ~/bin https://metacpan.org/dist/Git-Server/source/git-client
+  [root@deploy-host ~]$ chmod 755 ~/bin/git-client
+  [root@deploy-host ~]$ ln -s -v git-client ~/bin/git
+  [root@deploy-host ~]$ grep 'PATH=$HOME/bin' ~/.bash_profile || echo 'export PATH=$HOME/bin:$PATH' | tee -a ~/.bash_profile
+  [root@deploy-host ~]$
+
+=head1 SYNOPSIS
+
+  cd ~/src/github/project
+  touch ../.gitconfig
+  git config --global user.email 'hookbot@github.com'
+  git config --global --list
+
+=head1 PURPOSE
+
+Allows you to use many different .gitconfig files
+within each folder of git repos. If there is no
+.gitconfig within the directory descent structure,
+then it will behave exactly like the normal git.
+
+=head1 AUTHOR
+
+Rob Brown <bbb@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2016-2025 by Rob Brown <bbb@cpan.org>
+
+This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+=cut
+
+use strict;
+use Cwd qw(abs_path);
+
+our $VERSION = "0.032";
+
+if (@ARGV and $ARGV[0] =~ /^(clone|fetch|pull|ls-remote|push)$/) {
+    # Need to search for special "-o" options
+    my $op = $1;
+    my @options = ();
+    push @options, "DEBUG=$ENV{DEBUG}" if defined $ENV{DEBUG};
+    for (my $i = 1; $i < @ARGV; $i++) {
+        my $pre = $ARGV[$i-1];
+        my $option = $ARGV[$i];
+        if ($option =~ /^(--server-option|--push-option)=(.*)$/i) {
+            splice @ARGV, $i, 1, $1, $2;
+            next;
+        }
+        next if $op eq "clone" and $pre eq "-o"; # Don't brick the "-o <origin>" param for git clone
+        if ($pre =~ /^(-o|--(server|push)-option)$/i) {
+            push @options, $option;
+            if ($pre eq "-O") {
+                # Special Capital -O means only transport via XMOD
+                # So must strip it from the real commandline.
+                splice @ARGV, $i-1, 2;
+                # Roll back to handle the 2 args that have been wiped.
+                $i-=2;
+            }
+        }
+    }
+    push @options, $ENV{XMODIFIERS} if $ENV{XMODIFIERS};
+    if (@options) {
+        $ENV{XMODIFIERS} = join "\n", @options;
+        $ENV{GIT_SSH_COMMAND} //= "ssh";
+        $ENV{GIT_SSH_COMMAND} = "$ENV{GIT_SSH_COMMAND} -o SendEnv=XMODIFIERS";
+    }
+}
+
+my $myself = (stat $0)[1] or die "$0: Can't find my inode?\n";
+my $real_git = "/usr/bin/git";
+$ENV{GIT_CLIENT_TRIED} ||= "";
+foreach my $path (split /:/,$ENV{PATH}) {
+    my $try = "$path/git";
+    if (my @stat = stat $try) {
+        if ($stat[1] == $myself) {
+            # Ignore myself
+        }
+        elsif ($ENV{GIT_CLIENT_TRIED} =~ /(?:^|:)\Q$try\E(?:$|:)/) {
+            # Already tried
+        }
+        else {
+            # First executable one in the path that isn't me is the winner
+            $real_git = $try;
+            $ENV{GIT_CLIENT_TRIED} = join ":", $real_git, split /:/, $ENV{GIT_CLIENT_TRIED};
+            last;
+        }
+    }
+}
+
+-x $real_git or die "$real_git: Unable to execute\n";
+
+my $last = ".";
+$ENV{HOME} ||= (getpwnam $<)[7];
+while (1) {
+    my $scan = abs_path( $last eq "." && !-d "$last/.git" ? $last : "$last/.." );
+    last if $scan eq $last or $scan eq $ENV{HOME};
+    $last = $scan;
+    if (-r "$scan/.gitconfig") {
+        if (!$ENV{HOME} or system "diff -q $ENV{HOME}/.gitconfig $scan/.gitconfig >/dev/null") {
+            if (!$ENV{GIT_CONFIG_GLOBAL}) {
+                warn "$scan/.gitconfig: Override\n";
+                $ENV{GIT_CONFIG_GLOBAL} = "$scan/.gitconfig";
+            }
+        }
+        last;
+    }
+}
+
+exec $real_git, @ARGV;

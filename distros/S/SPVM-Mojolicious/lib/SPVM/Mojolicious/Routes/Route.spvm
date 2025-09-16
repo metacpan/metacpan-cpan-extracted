@@ -98,7 +98,7 @@ class Mojolicious::Routes::Route {
         
         my $has_websocket = 0;
         for (my $i = 0; $i < $chain_list->length; $i++) {
-          my $child = (Mojolicious::Routes::Route)$chain_list->get($i);
+          my $child = $chain_list->get($i);
           
           if ($child->is_websocket) {
             $has_websocket = 1;
@@ -275,10 +275,10 @@ class Mojolicious::Routes::Route {
   }
   
   method find : Mojolicious::Routes::Route ($name : string) {
-    return (Mojolicious::Routes::Route)$self->_index->get($name);
+    return $self->_index->get($name);
   }
   
-  private method _index : Hash () {
+  private method _index : Hash of Mojolicious::Routes::Route () {
     
     my $auto = Hash->new;
     
@@ -352,7 +352,7 @@ class Mojolicious::Routes::Route {
     
     my $pattern_strings_list = StringList->new;
     for (my $i = 0; $i < $chain_list->length; $i++) {
-      my $_ = (Mojolicious::Routes::Route)$chain_list->get($i);
+      my $_ = $chain_list->get($i);
       
       my $pattern_string = $_->pattern->render($values, !$_->children_list->length && !$_->partial);
       
@@ -413,7 +413,7 @@ class Mojolicious::Routes::Route {
     my $pattern_unparseds_list = StringList->new;
     
     for (my $i = 0; $i < $chain_list->length; $i++) {
-      my $chain = (Mojolicious::Routes::Route)$chain_list->get($i);
+      my $chain = $chain_list->get($i);
       
       my $pattern_unparsed = $chain->pattern->unparsed // "";
       

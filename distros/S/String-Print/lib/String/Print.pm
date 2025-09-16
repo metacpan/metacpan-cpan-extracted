@@ -1,5 +1,5 @@
-# This code is part of Perl distribution String-Print version 0.95.
-# The POD got stripped from this file by OODoc version 3.04.
+# This code is part of Perl distribution String-Print version 0.96.
+# The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
 # This software is copyright (c) 2016-2025 by Mark Overmeer.
@@ -14,7 +14,7 @@
 #oodist: testing, however the code of this development version may be broken!
 
 package String::Print;{
-our $VERSION = '0.95';
+our $VERSION = '0.96';
 }
 
 
@@ -31,7 +31,7 @@ use POSIX             qw/strftime/;
 use Scalar::Util      qw/blessed reftype/;
 
 my @default_modifiers   = (
-	qr/\%\S+/       => \&_modif_format,
+	qr/\% ?\S+/     => \&_modif_format,
 	qr/BYTES\b/     => \&_modif_bytes,
 	qr/HTML\b/      => \&_modif_html,
 	qr/YEAR\b/      => \&_modif_year,
@@ -39,6 +39,7 @@ my @default_modifiers   = (
 	qr/DT\b/        => \&_modif_dt,
 	qr/DATE\b/      => \&_modif_date,
 	qr/TIME\b/      => \&_modif_time,
+	qr/\=/          => \&_modif_name,
 	qr!//(?:\"[^"]*\"|\'[^']*\'|\w+)! => \&_modif_undef,
 );
 
@@ -185,9 +186,10 @@ sub sprinti($@)
 
 sub _expand($$$)
 {	my ($self, $key, $modifier, $args) = @_;
+	local $args->{varname} = $key;
 
 	my $value;
-	if(index($key, '.')== -1)
+	if(index($key, '.') == -1)
 	{	# simple value
 		$value = exists $args->{$key} ? $args->{$key} : $self->_missingKey($key, $args);
 		$value = $value->($self, $key, $args)
@@ -265,24 +267,8 @@ sub _reportMissingKey($$)
 }
 
 # See dedicated section in explanation in DETAILS
-sub _modif_format($$$$)
-{	my ($self, $format, $value, $args) = @_;
-	defined $value && length $value or return undef;
-
-	use locale;
-	if(ref $value eq 'ARRAY')
-	{	@$value or return '(none)';
-		return +[ map $self->_format_print($format, $_, $args), @$value ];
-	}
-	elsif(ref $value eq 'HASH')
-	{	keys %$value or return '(none)';
-		return +{ map +($_ => $self->_format_print($format, $value->{$_}, $args)), keys %$value } ;
-	}
-
-	$format =~ m/^\%([-+ ]?)([0-9]*)(?:\.([0-9]*))?([sS])$/
-		or return sprintf $format, $value;   # simple: not a string
-
-	my ($padding, $width, $max, $u) = ($1, $2, $3, $4);
+sub _modif_format_s($$$$$)
+{	my ($value, $padding, $width, $max, $u) = @_;
 
 	# String formats like %10s or %-3.5s count characters, not width.
 	# String formats like %10S or %-3.5S are subject to column width.
@@ -314,6 +300,45 @@ sub _modif_format($$$$)
 	:                   (' ' x $pad) . $s->as_string;
 }
 
+sub _modif_format_d($$$$)
+{	my ($value, $padding, $max, $sep) = @_;
+	my $d = sprintf "%d", $value;   # what perl usually does with floats etc
+	my $v = reverse(reverse($d) =~ s/([0-9][0-9][0-9])/$1$sep/gr);
+	$v =~ s/^\.//;
+
+	if($d !~ /^\-/)
+	{	$v = "+$v" if $padding eq '+';
+		$v = " $v" if $padding eq ' ';
+	}
+	$max or return $v;
+
+	my $pad = $max - length $v;
+
+	    $pad <= 0       ? $v 
+	  : $padding eq '-' ? $v . (' ' x $pad)
+	  : $padding eq ''  ? (' ' x $pad) . $v
+	  :   $v;
+}
+
+sub _modif_format($$$$)
+{	my ($self, $format, $value, $args) = @_;
+	defined $value && length $value or return undef;
+
+	use locale;
+	if(ref $value eq 'ARRAY')
+	{	@$value or return '(none)';
+		return +[ map $self->_format_print($format, $_, $args), @$value ];
+	}
+	elsif(ref $value eq 'HASH')
+	{	keys %$value or return '(none)';
+		return +{ map +($_ => $self->_format_print($format, $value->{$_}, $args)), keys %$value } ;
+	}
+
+	  $format =~ m/^\%(\-?)([0-9]*)(?:\.([0-9]*))?([sS])$/ ? _modif_format_s($value, $1, $2, $3, $4)
+	: $format =~ m/^\%([+\ \-]?)([0-9]*)([_,.])d$/ ? _modif_format_d($value, $1, $2, $3)
+	:    return sprintf $format, $value;   # simple: standard perl sprintf()
+}
+
 # See dedicated section in explanation in DETAILS
 sub _modif_bytes($$$)
 {	my ($self, $format, $value, $args) = @_;
@@ -342,11 +367,12 @@ sub _modif_html($$$)
 
 # Be warned: %F and %T (from C99) are not supported on Windows
 my %dt_format = (
-	ASC     => '%a %b %e %H:%M:%S %Y',
-	ISO     => '%Y-%m-%dT%H:%M:%S%z',
-	RFC2822 => '%a, %d %b %Y %H:%M:%S %z',
-	RFC822  => '%a, %d %b %y %H:%M:%S %z',
-	FT      => '%Y-%m-%d %H:%M:%S',
+	ASC     => '%a %b %e %T %Y',
+	ISO     => '%Y-%m-%dT%T%z',
+	RFC822  => '%a, %d %b %y %T %z',
+	RFC2822 => '%a, %d %b %Y %T %z',
+	RFC5322 => '%a, %d %b %Y %T %z',
+	FT      => '%Y-%m-%d %T',
 );
 
 sub _modif_year($$$)
@@ -410,6 +436,11 @@ sub _modif_undef($$$)
 	$format =~ m!//"([^"]*)"|//'([^']*)'|//(\w*)! ? $+ : undef;
 }
 
+sub _modif_name($$$)
+{	my ($self, $format, $value, $args) = @_;
+	"$args->{varname}$format$value";
+}
+
 
 sub printi($$@)
 {	my $self = shift;
@@ -442,13 +473,15 @@ sub _printp_rewrite($)
 			next;
 		}
 
-		$printp =~ s/\%(?:([0-9]+)\$)?      # 1=positional
-						([-+0 \#]*)         # 2=flags
-						([0-9]*|\*)?        # 3=width
-						(?:\.([0-9]*|\*))?  # 4=precission
-						(?:\{ ([^}]*) \})?  # 5=modifiers
-						(\w)                # 6=conversion
-					//x
+		$printp =~ s/
+			\%
+			(?:([0-9]+)\$)?     # 1=positional
+			([-+0 \#]*)         # 2=flags
+			([0-9]*|\*)?        # 3=width
+			(?:\.([0-9]*|\*))?  # 4=precission
+			(?:\{ ([^}]*) \})?  # 5=modifiers
+			(\w)                # 6=conversion
+		//x
 			or die "format error at '$printp' in '$params[0]'";
 
 		$pos       = $1 if $1;

@@ -1,0 +1,368 @@
+#!/usr/bin/env perl
+
+=pod
+
+=head1 NAME
+
+git-deploy - Client for push notification deployment
+
+=head1 DESCRIPTION
+
+git-deploy runs as a git client daemon
+to pull the changes from the git server
+instantly after a push is triggered.
+
+=head1 SYNOPSIS
+
+  git deploy
+    [ [--branch] <branch> ]
+    [ { --chdir | -C } <dir> ]
+    [ --umask <umask> ]
+    [ -O <option> ]
+    [ --build <command> ]
+    [ --fix-nasty ]
+    [ --background ]
+    [ --max-delay <seconds> ]
+
+=head2 --branch <branch>
+
+If a <branch> is specified, then it will update to that branch.
+By default, the current branch is used.
+
+  Example: git deploy --branch master
+
+  --OR--
+
+  Example: git deploy master
+
+=head2 --chdir <dir>
+
+Jump to <dir> prior to running "git pull".
+By default, the current directory is used.
+
+  Example: git deploy --chdir ~/projectx
+
+  --OR--
+
+  Example: git deploy -C ~/projectx
+
+=head2 --umask <umask>
+
+Set umask to <umask> in octal representation.
+This is useful when you need to set the umask prior to running any git commands.
+
+  Example: git deploy --umask 0022
+
+=head2 -O <OPTION>
+
+This -O may be used multiple times from commandline
+in order to pass multiple options to the server hooks.
+This has the same functionality as "git-client -O <OPTION>".
+Populates GIT_OPTION_* environment variables on server side.
+These ENV settings will be available to all the server side
+hooks, including the pre-* hooks.
+
+=head2 --build <COMMAND>
+
+The --build argument is any command you want to execute
+after any files are pulled or updated from git.
+By default, no command is run.
+
+  Example: git deploy --build='make -C src/.'
+
+=head2 --fix-nasty
+
+The --fix-nasty argument will automatically remove the offending
+SSH host entry for the git server from known_hosts. Only use this
+flag if you've changed the SSH server key on the git server host.
+By default, this option is disabled for better security.
+
+  Example: git deploy --fix-nasty
+
+=head2 --background
+
+The --background option will cause the deploy process to detach
+from its invoker and run in the background.
+This is useful when invoked from a cron
+since there is nobody around to see the output anyways.
+By default, this option is disabled so runs in the foreground.
+
+  Example: echo '7 * * * * git deploy --chdir ~/projectz --background' | crontab -
+
+=head2 --max-delay <seconds>
+
+The --max-delay specifies the maximum number of seconds to wait
+for each push notification.
+This is useful when you want to immediately release a previously
+deploying fetch and force pull updates from commandline without
+hanging the console waiting two hours until the next git push.
+By default, max-delay is 7200 seconds (or 2 hours).
+
+  Example: git deploy --max-delay 10
+
+=head1 INSTALL
+
+As super user:
+
+  [root@deploy-host ~]# wget -N -P /usr/local/bin https://metacpan.org/dist/Git-Server/source/git-deploy
+  [root@deploy-host ~]# chmod 755 /usr/local/bin/git-deploy
+  [root@deploy-host ~]#
+
+As deploy user:
+
+  [puller@deploy-host projectz]$ git deploy --branch=master
+  [puller@deploy-host projectz]$ echo '0 * * * * git deploy --chdir ~/projectz </dev/null >/dev/null 2>/dev/null' | crontab -
+  [puller@deploy-host projectz]$
+
+=head1 AUTHOR
+
+Rob Brown <bbb@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2015-2025 by Rob Brown <bbb@cpan.org>
+
+This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+=cut
+
+use strict;
+use Cwd qw(getcwd abs_path);
+use FindBin qw($Script $Bin);
+use Getopt::Long qw(GetOptions);
+use Fcntl qw(LOCK_EX LOCK_NB);
+
+our $VERSION = "0.032";
+
+my @invoked = ($0, @ARGV);
+my $cwd = getcwd();
+my $opts = [];
+my $build = undef;
+my $force_branch = undef;
+my $chdir = undef;
+my $umask = undef;
+my $fix_nasty = undef;
+my $background = undef;
+my $maxpatience = undef;
+GetOptions
+    "O|o:s" => \$opts,
+    "build:s" => \$build,
+    "umask:s" => \$umask,
+    "branch:s" => \$force_branch,
+    "chdir|C:s" => \$chdir,
+    "fix-nasty" => \$fix_nasty,
+    "background" => \$background,
+    "max-delay:i" => \$maxpatience,
+    or exec perldoc => $0;
+
+sub run_how_cmd {
+    my $stderr = shift;
+    my @cmd = @_;
+    if (my $pid = open my $fh_out, "-|") {
+        # Parent process waiting for kid to say something
+        my $output = join "", <$fh_out>;
+        waitpid $pid, 0;
+        my $exit_status = $?;
+        close $fh_out;
+        $? = $exit_status;
+        return $output;
+    }
+    # Child process
+    open STDERR, $stderr;
+    exec @cmd or die "$cmd[0]: Failed to spawn? $!\n";
+}
+
+sub run_output_ignore_err {
+    return run_how_cmd ">/dev/null", @_;
+}
+
+sub run_output_include_err {
+    return run_how_cmd ">&STDOUT", @_;
+}
+
+sub getps {
+    return run_output_ignore_err qw(ps fauwwx)
+        || run_output_include_err qw(ps auwwx);
+}
+
+sub rebuild {
+    if (defined $build) {
+        $0 = "$Script - $cwd: Waiting for build to finish ...";
+        my $lock_file = "$ENV{GIT_DIR}/config";
+        my $lock;
+        print run_output_include_err $build if open $lock, "+<", $lock_file and flock $lock, LOCK_NB | LOCK_EX;
+        close $lock;
+    }
+}
+
+sub current_branch {
+    my $scan = run_output_ignore_err qw(git branch -a);
+    return $1 if $scan =~ m{^\* ([\w/\-]+)}m;
+    if ($scan =~ m{^\* .*detached at (\w+)}m) {
+        $scan = run_output_ignore_err("git", "branch", "-a", "--contains", $1).$scan;
+    }
+    return $1 if $scan =~ m{^\s+([\w/]+)}m;
+    die localtime().": [$$] Unable to determine which branch to deploy.\n$scan\n";
+}
+
+if ($force_branch and @ARGV) {
+    warn "$0: Don't specify both --branch and commandline argument.\n";
+    sleep 1;
+    exec perldoc => $0 or die "$0: help menu unavailable\n";
+}
+$force_branch ||= shift;
+
+if ($chdir) {
+    chdir $chdir or die "chdir: $chdir $!\n";
+    # Relative chdir?
+    if ($chdir =~ /^[^\/]/) {
+        # Clear from args to avoid wrongly double jumping
+        for (my $i = 1; $i < @invoked; $i++) {
+            splice @invoked, --$i, ($2?1:2) if $invoked[$i-1] =~ /^(-C|--chdir)\b(=?).*$/;
+        }
+    }
+    $cwd = getcwd();
+}
+
+$ENV{GIT_DIR} ||= abs_path(`git rev-parse --git-dir 2>/dev/null` =~ /^(.+)/ && $1 || ".git");
+
+if ($umask and $umask =~ /^(\d+)$/) {
+    umask oct $1;
+}
+
+if (@$opts) {
+    push @$opts, $ENV{XMODIFIERS} if $ENV{XMODIFIERS};
+    if (@$opts) {
+        $ENV{XMODIFIERS} = join "\n", @$opts;
+        $ENV{GIT_SSH_COMMAND} = "ssh -o SendEnv=XMODIFIERS";
+    }
+}
+
+$0 = "$Script - Initial checkout";
+run_output_ignore_err "git", "checkout", ($force_branch || current_branch);
+sleep 1;
+rebuild;
+if ($background) {
+    exit if fork;
+    require POSIX;
+    POSIX::setsid();
+    close STDIN;
+    close STDOUT;
+    close STDERR;
+}
+
+if ($maxpatience) {
+    $ENV{GIT_SSH_COMMAND} = "ssh -o SendEnv=XMODIFIERS";
+    $ENV{XMODIFIERS} = "deploy_patience=$maxpatience";
+}
+
+while (1) {
+    $0 = "$Script - $cwd: Waiting for push notification ...";
+    my $update = "";
+    $update .= run_output_include_err qw(git fetch);
+    my $branch = $force_branch || current_branch;
+    $update .= run_output_include_err "git", "checkout", $branch;
+    $update .= run_output_include_err "git", "rebase", "origin/$branch";
+    $0 = "$Script - Scanning updates";
+    $update .= run_output_include_err "git", "rebase", "--abort" if $update =~ /fix conflicts|git rebase.*--continue|you need to resolve your|stop rebasing/;
+    if (-M "$Bin/$Script" < 0) {
+        # Myself update detected so need to respawn
+        warn localtime().": [$$] Auto-update $Script respawning ...\n";
+        sleep 1;
+        exec @invoked or die localtime().": [$$] $Bin/$Script: RESPAWN FATAL CRASH\n";
+    }
+    if ($update =~ /POSSIBLE.*SOMEONE.*DOING.*NASTY/) {
+        warn $update;
+        if ($fix_nasty && $update =~ /host key for (\S+) has changed and you have requested strict checking/) {
+            my $nasty = $1;
+            warn "--fix-nasty: $nasty: Clearing known_hosts ...\n";
+            my $wipe = run_output_include_err "ssh-keygen", "-R", $nasty;
+            if (!$?) {
+                $wipe =~ s/\s*$/\n/;
+                warn $wipe;
+                require Socket;
+                if (my $ip = Socket::inet_ntoa(Socket::inet_aton($nasty))) {
+                    $nasty .= ",$ip";
+                }
+                if (my $real_ssh_server_key = run_output_ignore_err "ssh-keyscan", $nasty) {
+                    $real_ssh_server_key =~ s/^#.*\n//gm;
+                    open my $fh_known, ">>", "$ENV{HOME}/.ssh/known_hosts";
+                    print $fh_known $real_ssh_server_key;
+                    close $fh_known;
+                }
+            }
+        }
+        else {
+            warn "To force deploy to continue anyway, run this: $Script --fix-nasty\n";
+        }
+        last;
+    }
+    if ($update =~ /Your branch.*diverged/) {
+        # Rebase can't work if there are local divergents.
+        warn $update;
+        warn localtime().": [$$] Detected local divergence off [$branch] so doing HARD RESET ...\n";
+        my $hard = "";
+        $hard .= run_output_include_err "git", "checkout", $branch;
+        $hard .= run_output_include_err "git", "reset", "--hard", "origin/$branch";
+        my $running = getps;
+        last if $running =~ /\Q$Script - $cwd\E: Waiting/;
+        $0 = "$Script - $cwd: Waiting because of local divergence";
+        print run_output_include_err qw(sleep 60);
+    }
+    elsif ($update =~ /You have unstaged changes/) {
+        # Rebase can't work if there are local changes.
+        # Make sure there aren't multiple pullers choking on the repo
+        warn $update;
+        my $running = getps;
+        last if $running =~ /\Q$Script - $cwd\E: Waiting/;
+        my $monkey = "";
+        $monkey = ": $1" if $update =~ /^M\s+(\S+)/m;
+        $0 = "$Script - $cwd: Waiting because of local modifications$monkey";
+        print run_output_ignore_err qw(sleep 10);
+    }
+    elsif ($update =~ m{fatal: Unable to create '(.+?)': File exists.}) {
+        # Updates cannot work while lock file exists
+        warn $update;
+        my $broken_lock = $1;
+        $0 = "$Script - Choking Locked: $broken_lock";
+        my $running = getps;
+        last if $running =~ /\Q$Script - $cwd\E: Waiting/;
+        if ($running !~ /git rebase/) {
+            # No other conflicting git process running
+            # So lock file is safe enough to be removed
+            unlink $broken_lock;
+        }
+        else {
+            print run_output_include_err qw(sleep 60);
+        }
+    }
+    elsif ($update =~ m{cannot create.*rebase-apply[\s\S]*?please\s+rm -fr (/.*\.git/rebase-apply)\s}) {
+        # Duplicate rebase choking
+        warn $update;
+        my $choked_rebase = $1;
+        $0 = "$Script - Choking Rebase: $choked_rebase";
+        last if 0.0416 > -M $choked_rebase; # Leave rebase progress alone if still too fresh
+        my $running = getps;
+        last if $running =~ /\Q$Script - $cwd\E: Waiting/;
+        if ($running !~ /git rebase/) {
+            # No other conflicting git process running
+            # So rebase progress is safe to be removed
+            print run_output_include_err "rm","-rfv",$choked_rebase;
+        }
+        else {
+            print run_output_include_err qw(sleep 60);
+        }
+    }
+    # Get out of here if someone is monkeying a local file "error: cannot rebase: You have unstaged changes."
+    last if $update !~ /rewinding head to replay|fast-forward|but expected|Unpacking objects|Cannot rebase|ecent commit/;
+    if ($update =~ /Current branch.*is up to date/) {
+        $0 = "$Script - $cwd: Waiting because everything is updated ...";
+        print "Everything was updated perfectly. Sleeping ...\n";
+        print run_output_ignore_err sleep => (5 + int(55 * rand()));
+    }
+    $0 = "$Script - Update complete";
+    sleep 1;
+    rebuild;
+}
+
+rebuild;

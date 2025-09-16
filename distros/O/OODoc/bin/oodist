@@ -245,7 +245,7 @@ sub extract_distro($%)
 	return if $included_dirs{$dir};
 
 	chdir $dir
-		or fault __x"cannot go to {dir} to extract distribution";
+		or fault __x"cannot go to {dir} to extract distribution", dir => $dir;
 
 	my $lib       = "$dir/lib";
 	push @INC, $lib unless grep $_ eq $lib, @INC;
@@ -894,14 +894,14 @@ __CONFIG
 	use      => [\n\t],
 __INCLUDE
 
-	my @links   = map "\t\t'$_',\n", sort split /[\: ]+/, $makefile->{SKIP_LINKS} // '';
+	my @links   = map "\t\t'$_',\n", sort split /[^\w\:]+/, $makefile->{SKIP_LINKS} // '';
 	my $pmhead  = $makefile->{PMHEAD} // (-f 'PMHEAD.txt'  ? 'PMHEAD.txt'  : undef);
 
 	print <<__PARSER;
 
 	parser   => {
 		syntax         => 'markov',
-		skip_links     => [ @links],
+		skip_links     => [\n@links\t\t],
 		pmhead         => ${ $p->($pmhead) },
 	},
 __PARSER
@@ -928,13 +928,14 @@ __RAW
 	my $podtail = $makefile->{PODTAIL} // (-f 'PODTAIL.txt' ? 'PODTAIL.txt' : undef);
 
 	push @generate, <<__POD;
-	  {	# Add real pod to the releases
+	  {
+		# Add real pod to the releases
 		format         => 'pod3',
 		podtail        => ${ $p->($podtail) },
 	  },
 __POD
 
-	push @generate, $html_output ? <<__HTML : <<'__MAY_HTML';
+	push @generate, $html_output ? <<__HTML : "\t  # You may add HTML formatters here.\n";
 	  {	format         => 'html',
 		webpages       => "\$webpages${ $html_docroot eq '/' ? \'' : \$html_docroot },
 		publish        => "\$publish/${ \basename $makefile->{HTML_PACKAGE}}",
@@ -943,12 +944,8 @@ __POD
 		stylesheet     => ${ $p->($makefile->{HTML_STYLESHEET} // '/oodoc.css') },
 	  },
 __HTML
-	  # You may add HTML formatters here.
-__MAY_HTML
 
-	push @generate, <<'__MAY_EXPORT';
-	  # You may add exporter configurations here.
-__MAY_EXPORT
+	push @generate, "\t\t  # You may add exporter configurations here.\n";
 
 	print <<__TAIL;
 
@@ -978,7 +975,7 @@ WriteMakefile
 		prereqs => {
 			develop => {
 				requires => {
-					'OODoc' => $OODoc::VERSION,
+					'OODoc' => '3.00',
 				}
 			},
 			test => {

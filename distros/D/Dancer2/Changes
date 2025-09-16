@@ -1,3 +1,43 @@
+2.0.0     2025-09-15 17:49:26-04:00 America/New_York
+
+    [ BUG FIXES ]
+    * GH #1701: Split cookie values on & only (Yanick Champoux)
+
+    [ ENHANCEMENTS ]
+    * GH #530: Make data censoring configurable (Yanick Champoux, David
+      Precious)
+    * GH #850: Scaffold tutorial app; allow multiple apps to be scaffolded
+      in core Dancer2 (Jason A. Crome)
+    * GH #1512: Log hook entries as they are executed (Yanick Champoux)
+    * GH #1615: Remove Dancer2::Template::Simple from Dancer2 core (Jason
+      A. Crome)
+    * PR #1637: New, extendable configuration system (Mikko Koivunalho)
+    * GH #1723: Enable use of a different Template Toolkit base class
+      (Andy Beverley)
+    * PR #1727: Don't create CPAN package files when generating new apps
+      (Jason A. Crome)
+    * PR #1731: Retire Template::Tiny fork, use CPAN's (Jason A. Crome,
+      Karen Etheridge, Damien Krotkine, Yanick Champoux)
+    * PR #1736: Allow config system to bootstrap itself (Yanick Champoux)
+    * GH #1737: Add on_hook_exception for errors during hook processing
+      (Andy Beverley)
+    * PR #1739: Add source to on_hook_exception (Andy Beverley)
+    * PR #1742: Refactor CLI for future expansion (Jason A. Crome)
+
+    [ DOCUMENTATION ]
+    * GH #1342: Document skipping private methods in pod coverage tests
+      (Jason A. Crome)
+    * PR #1721: New Dancer2 docs, reorganization of all documentation;
+      from TPRF grant (Jason A. Crome)
+    * PR #1741: Cover items missed in earlier documentation branch (Jason
+      A. Crome)
+
+    [ DEPRECATED ]
+    * None
+
+    [ MISC ]
+    * None
+
 1.1.2     2024-11-25 08:34:51-05:00 America/New_York
 
     [ BUG FIXES ]

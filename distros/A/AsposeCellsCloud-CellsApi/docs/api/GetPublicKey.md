@@ -15,7 +15,7 @@ Get an asymmetric public key.
 GET http://api.aspose.cloud/v4.0/cells/publickey
 ```
 ### **Function Description**
-Retrieves the public key portion of an asymmetric encryption algorithm.Asymmetric encryption algorithms (such as RSA, ECC, etc.) use a pair of keys: a public key and a private key.The public key is used for encrypting data or verifying signatures, while the private key is used for decrypting data or generating signatures.The primary purpose of the GetPublicKey method is to extract and return the public key portion for use when needed.
+Retrieves the public key portion of an asymmetric encryption algorithm. Asymmetric encryption algorithms (such as RSA, ECC, etc.) use a pair of keys: a public key and a private key. The public key is used for encrypting data or verifying signatures, while the private key is used for decrypting data or generating signatures. The primary purpose of the GetPublicKey method is to extract and return the public key portion for use when needed.
 
 ### The request parameters of **getPublicKey** API are: 
 

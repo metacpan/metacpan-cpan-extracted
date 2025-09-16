@@ -120,7 +120,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => 'I`m sorry, but you haven`t provided any specific content for me to summarize. Please provide the features you would like to be summarized.            ',
+__PACKAGE__->class_documentation({description => '',
                                   class => 'TrimContentOptions',
                                   required => [], # TODO
 }                                 );
@@ -130,42 +130,42 @@ __PACKAGE__->method_documentation({
      'data_source' => {
      	datatype => 'DataSource',
      	base_name => 'DataSource',
-     	description => 'This class has a public property named DataSource of type DataSource that has both a getter and a setter method.            ',
+     	description => 'Represents data source.  There are three types of data, they are CloudFileSystem, RequestFiles, HttpUri.',
      	format => '',
      	read_only => '',
      		},
      'file_info' => {
      	datatype => 'FileInfo',
      	base_name => 'FileInfo',
-     	description => '',
+     	description => 'Represents file information. Include of filename, filesize, and file content(base64String).',
      	format => '',
      	read_only => '',
      		},
      'trim_content' => {
      	datatype => 'string',
      	base_name => 'TrimContent',
-     	description => '',
+     	description => 'Trim Content',
      	format => '',
      	read_only => '',
      		},
      'trim_leading' => {
      	datatype => 'boolean',
      	base_name => 'TrimLeading',
-     	description => '',
+     	description => 'If the trim leading value is true, the trim content before and after cell values will be deleted.',
      	format => '',
      	read_only => '',
      		},
      'trim_trailing' => {
      	datatype => 'boolean',
      	base_name => 'TrimTrailing',
-     	description => '',
+     	description => 'If the trim trailing value is true, the trim content before and after cell values will be deleted.',
      	format => '',
      	read_only => '',
      		},
      'trim_space_between_word_to1' => {
      	datatype => 'boolean',
      	base_name => 'TrimSpaceBetweenWordTo1',
-     	description => '',
+     	description => 'When the trim space between word to 1 parameter is true, it enables the removal of extra spaces between words within a cell, ensuring that only a single space is maintained between words.',
      	format => '',
      	read_only => '',
      		},
@@ -179,21 +179,21 @@ __PACKAGE__->method_documentation({
      'remove_extra_line_breaks' => {
      	datatype => 'boolean',
      	base_name => 'RemoveExtraLineBreaks',
-     	description => '',
+     	description => 'When this parameter is enabled (set to True), it deletes extra line breaks within the selected range, ensuring that only necessary line breaks are retained.',
      	format => '',
      	read_only => '',
      		},
      'remove_all_line_breaks' => {
      	datatype => 'boolean',
      	base_name => 'RemoveAllLineBreaks',
-     	description => '',
+     	description => 'When this parameter is enabled (set to True), it removes all line breaks within the selected range, resulting in a continuous block of text without any line breaks.',
      	format => '',
      	read_only => '',
      		},
      'scope_options' => {
      	datatype => 'ScopeOptions',
      	base_name => 'ScopeOptions',
-     	description => '',
+     	description => 'Specifies the range of cells within the worksheet where the spreadsheet operations will be performed. This parameter allows users to define the exact area to be processed, ensuring that operations are applied only to the designated cells.',
      	format => '',
      	read_only => '',
      		},    

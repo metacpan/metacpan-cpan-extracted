@@ -210,6 +210,10 @@ instance.
 
 =back
 
+=item $obj-E<gt>B<cleanupString>($manual, $string, %options)
+
+Format a single line piece of text.  The C<%options> are passed to L<cleanup()|OODoc::Format/"Page generation">.
+
 =item $obj-E<gt>B<createManual>(%options)
 
 Format a manual into the selected format.
@@ -705,8 +709,8 @@ Cast by new()
 
 =head1 SEE ALSO
 
-This module is part of OODoc version 3.03,
-built on September 08, 2025. Website: F<https://perl.overmeer.net/oodoc/>
+This module is part of OODoc version 3.04,
+built on September 12, 2025. Website: F<https://perl.overmeer.net/oodoc/>
 
 =head1 LICENSE
 

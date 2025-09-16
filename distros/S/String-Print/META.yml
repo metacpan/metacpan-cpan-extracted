@@ -28,7 +28,7 @@ requires:
 resources:
   homepage: http://perl.overmeer.net/CPAN/
   repository: https://github.com/markov2/perl5-String-Print.git
-version: '0.95'
+version: '0.96'
 x_oodist:
   email: markov@cpan.org
   first_year: 2016
@@ -40,7 +40,8 @@ x_oodist:
   oodoc_version: 3.04
   parser:
     pmhead: ~
-    skip_links: []
+    skip_links:
+      - Locale::TextDomain
     syntax: markov
   raw:
     publish: ../public_html/string-print/raw

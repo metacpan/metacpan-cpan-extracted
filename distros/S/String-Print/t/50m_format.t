@@ -4,7 +4,8 @@
 use warnings;
 use strict;
 use utf8;
-use Test::More tests => 12;
+
+use Test::More;
 
 use String::Print;
 
@@ -15,7 +16,31 @@ isa_ok($f, 'String::Print');
 
 my $x1 = $f->sprinti("a={a%d} b={b %.2f}", a => 007, b => $pi);
 $x1    =~ s/,/./g;  # locale may output floats with comma
-is($x1, "a=7 b=3.14");
+is $x1, "a=7 b=3.14";
+
+is $f->sprinti("x={v%_d}", v => 1e9), 'x=1_000_000_000';
+is $f->sprinti("x={v%,d}", v => 1e9), 'x=1,000,000,000';
+is $f->sprinti("x={v%.d}", v => 1e9), 'x=1.000.000.000';
+is $f->sprinti("x={v%.d}", v => 1e8), 'x=100.000.000';
+is $f->sprinti("x={v%.d}", v => 1e7), 'x=10.000.000';
+is $f->sprinti("x={v%.d}", v => 1e6), 'x=1.000.000';
+is $f->sprinti("x={v%.d}", v => 1e5), 'x=100.000';
+is $f->sprinti("x={v%.d}", v => 1e4), 'x=10.000';
+is $f->sprinti("x={v%.d}", v => 1e3), 'x=1.000';
+is $f->sprinti("x={v%.d}", v => 100), 'x=100';
+is $f->sprinti("x={v%.d}", v => 10), 'x=10';
+is $f->sprinti("x={v%.d}", v => 1), 'x=1';
+is $f->sprinti("x={v%.d}", v => 0), 'x=0';
+
+is $f->sprinti("x={v%_d}",  v => -1e4), 'x=-10_000';
+is $f->sprinti("x={v%+_d}", v => -1e4), 'x=-10_000';
+is $f->sprinti("x={v%+_d}", v =>  1e4), 'x=+10_000';
+is $f->sprinti("x={v% _d}", v =>  1e4), 'x= 10_000';
+
+is $f->sprinti("x={v%-10.d}", v =>  1e4), 'x=10.000    ';
+is $f->sprinti("x={v%10.d}",  v =>  1e4), 'x=    10.000';
+is $f->sprinti("x={v%-10.d}", v => -1e4), 'x=-10.000   ';
+is $f->sprinti("x={v%10.d}",  v => -1e4), 'x=   -10.000';
 
 # multi-byte characters
 my $short = "€éö";
@@ -32,3 +57,5 @@ is $f->sprinti("h={z%5.3s}x",z => "${short}yz"), "h=  ${short}x";
 is $f->sprinti("i={z%-5.3s}x",z=> "${short}yz"), "i=${short}  x";
 
 #XXX Now re-run the tests with wide display chars.
+
+done_testing;

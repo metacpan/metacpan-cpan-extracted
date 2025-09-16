@@ -15,7 +15,7 @@ Get Access Token Result: The Cells Cloud Get Token API acts as a proxy service,f
 POST http://api.aspose.cloud/v4.0/cells/connect/token
 ```
 ### **Function Description**
-- This API acts as an intermediary proxy, transparently forwarding client authentication requests to the Aspose Cloud authorization service.- Upon successful authentication, the access token issued by Aspose Cloud is returned intact to the caller.- Use cases: Middleware systems requiring integration with Aspose Cloud services that delegate OAuth or similar authentication processes.- Considerations:▸ Ensure valid Aspose Cloud API credentials are registered before invocation.▸ Should be invoked over HTTPS secure channels to prevent token leakage.▸ Securely store returned access tokens and implement proper expiration management.▸ Handle potential error responses (e.g., 401 Unauthorized, 503 Service Unavailable).
+- This API acts as an intermediary proxy, transparently forwarding client authentication requests to the Aspose Cloud authorization service.- Upon successful authentication, the access token issued by Aspose Cloud is returned intact to the caller.- Use cases: Middleware systems requiring integration with Aspose Cloud services that delegate OAuth or similar authentication processes.- Considerations:    ▸ Ensure valid Aspose Cloud API credentials are registered before invocation.    ▸ Should be invoked over HTTPS secure channels to prevent token leakage.  ▸ Securely store returned access tokens and implement proper expiration management.    ▸ Handle potential error responses (e.g., 401 Unauthorized, 503 Service Unavailable). 
 
 ### The request parameters of **postAccessToken** API are: 
 

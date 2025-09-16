@@ -1,6 +1,6 @@
 # **Spreadsheet Cloud API: postSplitText**
 
- 
+Efficiently divides Excel cell content into columns or rows based on specified delimiters or patterns. Supports Character-based splitting, Custom string splitting, Mask and wildcard splitting for pattern-based division, Line break division, Column or row splitting, Delimiter removal or retention. 
 
 
 ## **Quick Start**
@@ -15,6 +15,7 @@
 POST http://api.aspose.cloud/v3.0/cells/splittext
 ```
 ### **Function Description**
+This API simplifies data extraction, making it easier to work with text and numbers in spreadsheets.- **First Characters**: Extract the first character or a specified number of characters from the left of each cell.- **Text Before/After/Between**: Extract text relative to specified characters or substrings.- **Any Position**: Retrieve text from any position within a string by indicating the start position and length.- **Last Characters**: Extract the last character or a specified number of characters from the end of cell values.- **Numbers Extraction**: Extract all numbers from alphanumeric strings for quantitative analysis.
 
 ### The request parameters of **postSplitText** API are: 
 

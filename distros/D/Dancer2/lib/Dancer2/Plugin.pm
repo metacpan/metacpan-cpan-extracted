@@ -1,6 +1,6 @@
 package Dancer2::Plugin;
 # ABSTRACT: base class for Dancer2 plugins
-$Dancer2::Plugin::VERSION = '1.1.2';
+$Dancer2::Plugin::VERSION = '2.0.0';
 use strict;
 use warnings;
 
@@ -632,7 +632,7 @@ Dancer2::Plugin - base class for Dancer2 plugins
 
 =head1 VERSION
 
-version 1.1.2
+version 2.0.0
 
 =head1 SYNOPSIS
 
@@ -1089,13 +1089,30 @@ to call C<plugin_keywords> after the attribute definition.
 
     plugin_keywords 'bar';
 
+=head3 Coverage for Dancer2::Plugin::<Name> is 0.0%, with 15 naked subroutines
+
+To avoid errors caused by missing pod for private plugin methods, write your
+pod coverage test like so:
+
+    pod_coverage_ok(
+        "Dancer2::Plugin::MyAwesomePlugin", {
+            also_private => [
+                qw/
+                  BUILDARGS BUILD ClassHooks PluginKeyword dancer_app
+                  execute_plugin_hook hook keywords on_plugin_import plugin_args
+                  plugin_setting realms realm realm_providers register register_hook
+                  register_plugin request var
+                  /
+            ]
+        });
+
 =head1 AUTHOR
 
 Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Alexis Sukrieh.
+This software is copyright (c) 2025 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

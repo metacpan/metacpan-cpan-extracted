@@ -1,5 +1,5 @@
-# This code is part of Perl distribution OODoc version 3.03.
-# The POD got stripped from this file by OODoc version 3.03.
+# This code is part of Perl distribution OODoc version 3.04.
+# The POD got stripped from this file by OODoc version 3.04.
 # For contributors see file ChangeLog.
 
 # This software is copyright (c) 2003-2025 by Mark Overmeer.
@@ -15,7 +15,7 @@
 #oorestyle: not found P for method expandTemplate($name)
 
 package OODoc::Format::Html;{
-our $VERSION = '3.03';
+our $VERSION = '3.04';
 }
 
 use parent 'OODoc::Format';
@@ -26,6 +26,7 @@ use warnings;
 use Log::Report     'oodoc';
 use OODoc::Template ();
 
+use Encode          qw/decode/;
 use File::Spec::Functions qw/catfile catdir/;
 use File::Find      qw/find/;
 use File::Basename  qw/basename dirname/;
@@ -50,8 +51,10 @@ sub init($)
 
 	my $meta  = delete $args->{html_meta_data} || '';
 	if(my $ss = delete $args->{html_stylesheet})
-	{	$meta   .= qq[<link rel="STYLESHEET" href="$ss">];
+	{	$meta .= qq[<link rel="STYLESHEET" href="$ss">\n];
 	}
+	$meta    .= qq[<meta charset="UTF-8">\n];
+
 	$self->{OFH_meta} = $meta;
 	$self;
 }
@@ -78,7 +81,7 @@ sub cleanup($$%)
 
 sub cleanupString($$@)
 {	my $self = shift;
-	$self->cleanup(@_)
+	$self->SUPER::cleanupString(@_)
 		=~ s!</p>\s*<p>!<br>!grs  # keep line-breaks
 		=~ s!<p\b.*?>!!gr         # remove paragraphing
 		=~ s!\</p\>!!gr;
@@ -91,11 +94,11 @@ sub link($$;$)
 
 	my $jump;
 	if($object->isa('OODoc::Manual'))
-	{	(my $manname = $object->name) =~ s!\:\:!_!g;
+	{	my $manname = $object->name =~ s!\:\:!_!gr;
 		$jump = $self->htmlRoot . "/$manname/index.html";
 	}
 	else
-	{	(my $manname = $manual->name) =~ s!\:\:!_!g;
+	{	my $manname = $manual->name =~ s!\:\:!_!gr;
 		$jump = $self->jumpScript . "?$manname&". $object->unique;
 	}
 
@@ -128,7 +131,7 @@ sub createManual($@)
 
 	unless(defined $self->markers)
 	{	my $markers = catfile $self->workdir, 'markers';
-		open my $mark, ">:encoding(utf8)", $markers
+		open my $mark, ">:encoding(UTF-8)", $markers
 			or fault __x"cannot write markers to {file}", file => $markers;
 		$self->markers($mark);
 		$mark->print($self->htmlRoot, "\n");
@@ -145,7 +148,7 @@ sub createManual($@)
 		print "$manual: $cooked\n" if $verbose > 2;
 		$manifest->add($cooked);
 
-		open my $output, ">:encoding(utf8)", $cooked
+		open my $output, ">:encoding(UTF-8)", $cooked
 			or fault __x"cannot write html manual to {file}", file => $cooked;
 
 		$self->filename(basename $raw);
@@ -186,12 +189,12 @@ sub createOtherPages(@)
 	$self->mkdirhier($dest);
 
 	my @sources;
-	find( { no_chdir => 1,
-			wanted   => sub { my $fn = $File::Find::name;
-							push @sources, $fn if -f $fn;
-							}
-			}, $source
-		);
+	find( +{
+		no_chdir => 1,
+		wanted   => sub {
+			my $fn = $File::Find::name;
+			push @sources, $fn if -f $fn;
+		} }, $source);
 
 	#
 	# Process files, one after the other
@@ -206,7 +209,7 @@ sub createOtherPages(@)
 
 		if($raw =~ $process)
 		{	$self->mkdirhier(dirname $cooked);
-			open my $output, ">:encoding(utf8)", $cooked
+			open my $output, '>:encoding(UTF-8)', $cooked
 				or fault __x"cannot write html to {fn}", fn => $cooked;
 
 			my $options = [];
@@ -240,12 +243,13 @@ sub expandTemplate($$)
 		}
 	}
 	elsif(-d $loc)
-	{	find( { no_chdir => 1,
-				wanted   => sub { my $fn = $File::Find::name;
-								push @result, $fn, $defaults if -f $fn;
-								}
-			}, $loc
-			);
+	{	find( +{
+			no_chdir => 1,
+			wanted   => sub {
+				my $fn = $File::Find::name;
+				push @result, $fn, $defaults if -f $fn;
+			} }, $loc
+		);
 	}
 	elsif(-f $loc) { push @result, $loc => $defaults }
 	else { error __x"cannot find template source '{name}'", name => $loc }
@@ -267,8 +271,8 @@ sub showStructureExpanded(@)
 	my $descr   = $self->cleanup($manual, $text->description, tag => 'block_intro');
 	my $unique  = $text->unique;
 	my $id      = $name =~ s/\W+/_/gr;
-
-	$output->print( qq[\n<h$level id="$id"><a name="$unique">$name</a></h$level>\n$descr] );
+	my $n       = $self->cleanupString($manual, $name);
+	$output->print( qq[\n<h$level id="$id"><a name="$unique">$n</a></h$level>\n$descr] );
 
 	$self->mark($manual, $unique);
 
@@ -286,10 +290,10 @@ sub showStructureExpanded(@)
 
 	# Show the subroutines and examples.
 
-	$self->showSubroutines(%args, subroutines => [ $text->subroutines ]);
 	$self->showExamples(%args, examples => [ $text->examples] )
 		if $examples eq 'EXPAND';
 
+	$self->showSubroutines(%args, subroutines => [ $text->subroutines ]);
 	$self;
 }
 
@@ -304,7 +308,8 @@ sub showStructureRefer(@)
 	my $manual   = $args{manual}  or panic;
 
 	my $link     = $self->link($manual, $text);
-	$output->print( qq[\n<h$level id="$name"><a href="$link">$name</a><h$level>\n] );
+	my $n        =  $self->cleanup($manual, $name);
+	$output->print( qq[\n<h$level id="$name"><a href="$link">$n</a><h$level>\n] );
 	$self;
 }
 
@@ -418,19 +423,21 @@ sub showSubroutineUse(@)
 	  : $type eq 'tie'      ? qq[tie $call, $paramlist]
 	  :     panic "Type $type? for $call";
 
+	my $is_inherited = $manual->inherited($subroutine) ? 'inherited' : '';
 	$output->print( <<SUBROUTINE );
-<div class="sub $type" id="$name">
+<div class="sub $type $is_inherited" id="$name">
 <dl>
 <dt>$use</dt>
 <dd>
 SUBROUTINE
 
-	if($manual->inherited($subroutine))
+	if($is_inherited)
 	{	my $defd    = $subroutine->manual;
 		my $sublink = $self->link($defd, $subroutine, $name);
 		my $manlink = $self->link($manual, $defd);
 		$output->print( qq[Inherited from $sublink in $manlink.<br>\n] );
 	}
+
 	$self;
 }
 
@@ -688,9 +695,11 @@ sub templateInheritance(@)
 	my $chapter = $manual->chapter('INHERITANCE')
 		or return '';
 
-	open my $out, '>', \(my $buffer);
+	open my $out, '>:encoding(UTF-8)', \(my $buffer);
 	$self->showChapter(%$attrs, manual => $self->manual, chapter => $chapter, output => $out);
 	close $out;
+
+	$buffer = decode 'UTF-8', $buffer;   # open to buffer produces bytes :-(
 
 	for($buffer)
 	{	s#\<pre\>\s*(.*?)\</pre\>\n*#\n$1#gs;   # over-eager cleanup
@@ -716,11 +725,11 @@ sub templateChapter($$)
 	defined $manual or panic;
 	my $chapter = $manual->chapter($name) or return '';
 
-	open my $out, '>', \(my $buffer);
+	open my $out, '>:encoding(UTF-8)', \(my $buffer);
 	$self->showChapter(%$attrs, manual => $self->manual, chapter => $chapter, output => $out);
 	close $out;
 
-	$buffer;
+	decode 'UTF-8', $buffer;
 }
 
 

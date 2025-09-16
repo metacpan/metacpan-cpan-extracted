@@ -123,13 +123,10 @@ sub run_http_request {
     } 
     my $_body_data;
 
-
-    if (defined $self->file) {   
-        my $map_file = $self->file;
-        while ( my ($filename,$value) = each( %$map_file ) ) {
-                $form_params->{$filename} = [$value ,$filename,'application/octet-stream'];
-        }
+    if(defined $self->file) { 
+        $form_params->{basename($self->file)} = [$self->file ,basename($self->file),'application/octet-stream'];
     }
+    
  
 
     # authentication setting, if any

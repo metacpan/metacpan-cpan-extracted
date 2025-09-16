@@ -11,12 +11,12 @@ MIME::Types - Definition of MIME types
 
 =head1 SYNOPSIS
 
- use MIME::Types;
- my $mt    = MIME::Types->new(...);    # MIME::Types object
- my $type  = $mt->type('text/plain');  # MIME::Type  object
- my $type  = $mt->mimeTypeOf('gif');
- my $type  = $mt->mimeTypeOf('picture.jpg');
- my @types = $mt->httpAccept('text/html, application/json;q=0.1')
+  use MIME::Types;
+  my $mt    = MIME::Types->new(...);    # MIME::Types object
+  my $type  = $mt->type('text/plain');  # MIME::Type  object
+  my $type  = $mt->mimeTypeOf('gif');
+  my $type  = $mt->mimeTypeOf('picture.jpg');
+  my @types = $mt->httpAccept('text/html, application/json;q=0.1')
 
 =head1 DESCRIPTION
 
@@ -25,8 +25,8 @@ MIME::Types - Definition of MIME types
 
 Media types are used in many applications (for instance as part of e-mail
 and HTTP traffic) to indicate the type of content which is transmitted.
-or expected.  Read RFC6838 at F<https://www.rfc-editor.org/rfc/rfc6838>
-(registrations) and RFC9694 at F<https://www.rfc-editor.org/rfc/rfc9694>
+or expected.  Read L<RFC6838|https://www.rfc-editor.org/rfc/rfc6838>
+(registrations) and L<RFC9694|https://www.rfc-editor.org/rfc/rfc9694>
 (top-levels) for the specification.
 
 Sometimes detailed knowledge about a mime-type is need, however this
@@ -44,7 +44,7 @@ the net!
 If your program uses fork (usually for a daemon), then you want to have
 the type table initialized before you start forking. So, first call
 
-   my $mt = MIME::Types->new;
+  my $mt = MIME::Types->new;
 
 Later, each time you create this object (you may, of course, also reuse
 the object you create here) you will get access to B<the same global table>
@@ -56,7 +56,7 @@ of types.
 
 =over 4
 
-=item MIME::Types-E<gt>B<new>(%options)
+=item $class-E<gt>B<new>(%options)
 
 Create a new C<MIME::Types> object which manages the data.  In the current
 implementation, it does not matter whether you create this object often
@@ -64,9 +64,9 @@ within your program, but in the future this may change.
 
  -Option         --Default
   db_file          <installed source>
-  only_complete    <false>
-  only_iana        <false>
-  skip_extensions  <false>
+  only_complete    <C<false>>
+  only_iana        <C<false>>
+  skip_extensions  <C<false>>
 
 =over 2
 
@@ -113,7 +113,7 @@ C<MIME::Type> which must be experimental: either the main-type or
 the sub-type must start with C<x->.
 
 Please inform the maintainer of this module when registered types
-are missing.  Before version MIME::Types version 1.14, a warning
+are missing.  Before version L<MIME::Types|MIME::Types> version 1.14, a warning
 was produced when an unknown IANA type was added.  This has been
 removed, because some people need that to get their application
 to work locally... broken applications...
@@ -139,11 +139,11 @@ preference)
 
 example: use of mimeTypeOf()
 
- my $types = MIME::Types->new;
- my $mime = $types->mimeTypeOf('gif');
+  my $types = MIME::Types->new;
+  my $mime = $types->mimeTypeOf('gif');
 
- my $mime = $types->mimeTypeOf('picture.jpg');
- print $mime->isBinary;
+  my $mime = $types->mimeTypeOf('picture.jpg');
+  print $mime->isBinary;
 
 =item $obj-E<gt>B<type>($string)
 
@@ -194,31 +194,31 @@ return C<undef>.  It should result in a 406 server response.
 
 example: 
 
-   my $accept = $req->header('Accept');
-   my @have   = map $mt->type($_), qw[text/plain text/html];
-   my @ext    = $mt->httpAcceptBest($accept, @have);
+  my $accept = $req->header('Accept');
+  my @have   = map $mt->type($_), qw[text/plain text/html];
+  my @ext    = $mt->httpAcceptBest($accept, @have);
 
 =item $obj-E<gt>B<httpAcceptSelect>($accept|\@types, @filenames|\@filenames)
 
 [2.07] Like L<httpAcceptBest()|MIME::Types/"HTTP support">, but now we do not return a pair with mime-type
-and filename, not just the type.  If $accept is C<undef>, the first
+and filename, not just the type.  If C<$accept> is C<undef>, the first
 filename is returned.
 
 example: 
 
-   use HTTP::Status ':constants';
-   use File::Glob   'bsd_glob';    # understands blanks in filename
+  use HTTP::Status ':constants';
+  use File::Glob   'bsd_glob';    # understands blanks in filename
 
-   my @filenames   = bsd_glob "$imagedir/$fnbase.*;
-   my $accept      = $req->header('Accept');
-   my ($fn, $mime) = $mt->httpAcceptSelect($accept, @filenames);
-   my $code        = defined $mime ? HTTP_NOT_ACCEPTABLE : HTTP_OK;
+  my @filenames   = bsd_glob "$imagedir/$fnbase.*;
+  my $accept      = $req->header('Accept');
+  my ($fn, $mime) = $mt->httpAcceptSelect($accept, @filenames);
+  my $code        = defined $mime ? HTTP_NOT_ACCEPTABLE : HTTP_OK;
 
 =back
 
 =head1 FUNCTIONS
 
-The next functions are provided for backward compatibility with MIME::Types
+The next functions are provided for backward compatibility with L<MIME::Types|MIME::Types>
 versions [0.06] and below.  This code originates from Jeff Okamoto
 F<okamoto@corp.hp.com> and others.
 
@@ -230,7 +230,7 @@ This function takes a media type and returns a list or anonymous array of
 anonymous three-element arrays whose values are the file name suffix used to
 identify it, the media type, and a content encoding.
 
-TYPE can be a full type name (contains '/', and will be matched in full),
+C<TYPE> can be a full type name (contains '/', and will be matched in full),
 a partial type (which is used as regular expression) or a real regular
 expression.
 
@@ -241,11 +241,11 @@ Like C<mimeTypeOf>, but does not return an C<MIME::Type> object. If the file
 
 example: use of function by_suffix()
 
- use MIME::Types 'by_suffix';
- my ($mediatype, $encoding) = by_suffix('image.gif');
+  use MIME::Types 'by_suffix';
+  my ($mediatype, $encoding) = by_suffix('image.gif');
 
- my $refdata = by_suffix('image.gif');
- my ($mediatype, $encoding) = @$refdata;
+  my $refdata = by_suffix('image.gif');
+  my ($mediatype, $encoding) = @$refdata;
 
 =item B<import_mime_types>()
 
@@ -259,14 +259,15 @@ missing, please contact the maintainer for inclusion.
 
 =head1 SEE ALSO
 
-This module is part of MIME-Types distribution version 2.28,
-built on April 18, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of MIME-Types version 2.29,
+built on September 15, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 1999-2025 by [Mark Overmeer <mark@overmeer.net>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 1999-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

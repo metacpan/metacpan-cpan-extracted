@@ -14,7 +14,7 @@ LANGUAGES: {
 	eval {
 		CGI::Lingua->new();
 	};
-	ok($@ =~ m/You must give a list of supported languages/);
+	ok($@ =~ m/^Usage:/);
 
 	# Stop I18N::LangTags::Detect from detecting something
 	delete $ENV{'LANGUAGE'};

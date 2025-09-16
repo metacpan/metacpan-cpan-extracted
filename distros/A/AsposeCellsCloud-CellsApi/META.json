@@ -63,7 +63,7 @@
       },
       "AsposeCellsCloud::CellsApi" : {
          "file" : "lib/AsposeCellsCloud/CellsApi.pm",
-         "version" : "25.6.1"
+         "version" : "25.9"
       },    
       "AsposeCellsCloud::Configuration" : {
          "file" : "lib/AsposeCellsCloud/Configuration.pm"
@@ -98,6 +98,9 @@
       "AsposeCellsCloud::Object::GoogleDriveStorageFile" : {
          "file" : "lib/AsposeCellsCloud/Object/GoogleDriveStorageFile.pm"
       },
+      "AsposeCellsCloud::Object::AggregateResultByColor" : {
+         "file" : "lib/AsposeCellsCloud/Object/AggregateResultByColor.pm"
+      },
       "AsposeCellsCloud::Object::BrokenLink" : {
          "file" : "lib/AsposeCellsCloud/Object/BrokenLink.pm"
       },
@@ -124,6 +127,9 @@
       },
       "AsposeCellsCloud::Object::PaginatedSaveOptions" : {
          "file" : "lib/AsposeCellsCloud/Object/PaginatedSaveOptions.pm"
+      },
+      "AsposeCellsCloud::Object::SpreadsheetTemplate" : {
+         "file" : "lib/AsposeCellsCloud/Object/SpreadsheetTemplate.pm"
       },
       "AsposeCellsCloud::Object::TextItem" : {
          "file" : "lib/AsposeCellsCloud/Object/TextItem.pm"
@@ -197,8 +203,11 @@
       "AsposeCellsCloud::Object::XpsSaveOptions" : {
          "file" : "lib/AsposeCellsCloud/Object/XpsSaveOptions.pm"
       },
-      "AsposeCellsCloud::Object::BrokenLinksReponse" : {
-         "file" : "lib/AsposeCellsCloud/Object/BrokenLinksReponse.pm"
+      "AsposeCellsCloud::Object::AggregateResultByColorResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/AggregateResultByColorResponse.pm"
+      },
+      "AsposeCellsCloud::Object::BrokenLinksResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/BrokenLinksResponse.pm"
       },
       "AsposeCellsCloud::Object::CellsCloudFileInfoResponse" : {
          "file" : "lib/AsposeCellsCloud/Object/CellsCloudFileInfoResponse.pm"
@@ -1409,6 +1418,12 @@
       "AsposeCellsCloud::Object::WorksheetDataStatistics" : {
          "file" : "lib/AsposeCellsCloud/Object/WorksheetDataStatistics.pm"
       },
+      "AsposeCellsCloud::Request::AggregateCellsByColorRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/AggregateCellsByColorRequest.pm"
+      },
+      "AsposeCellsCloud::Request::MathCalculateRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/MathCalculateRequest.pm"
+      },
       "AsposeCellsCloud::Request::PostAccessTokenRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/PostAccessTokenRequest.pm"
       },
@@ -1421,11 +1436,62 @@
       "AsposeCellsCloud::Request::ExportSpreadsheetAsFormatRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/ExportSpreadsheetAsFormatRequest.pm"
       },
+      "AsposeCellsCloud::Request::ExportWorksheetAsFormatRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/ExportWorksheetAsFormatRequest.pm"
+      },
       "AsposeCellsCloud::Request::ExportChartAsFormatRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/ExportChartAsFormatRequest.pm"
       },
+      "AsposeCellsCloud::Request::ExportTableAsFormatRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/ExportTableAsFormatRequest.pm"
+      },
+      "AsposeCellsCloud::Request::ExportRangeAsFormatRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/ExportRangeAsFormatRequest.pm"
+      },
       "AsposeCellsCloud::Request::ConvertSpreadsheetRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/ConvertSpreadsheetRequest.pm"
+      },
+      "AsposeCellsCloud::Request::ConvertSpreadsheetToPdfRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/ConvertSpreadsheetToPdfRequest.pm"
+      },
+      "AsposeCellsCloud::Request::ConvertSpreadsheetToCsvRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/ConvertSpreadsheetToCsvRequest.pm"
+      },
+      "AsposeCellsCloud::Request::ConvertWorksheetToImageRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/ConvertWorksheetToImageRequest.pm"
+      },
+      "AsposeCellsCloud::Request::ConvertWorksheetToPdfRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/ConvertWorksheetToPdfRequest.pm"
+      },
+      "AsposeCellsCloud::Request::ConvertTableToImageRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/ConvertTableToImageRequest.pm"
+      },
+      "AsposeCellsCloud::Request::ConvertTableToPdfRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/ConvertTableToPdfRequest.pm"
+      },
+      "AsposeCellsCloud::Request::ConvertTableToCsvRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/ConvertTableToCsvRequest.pm"
+      },
+      "AsposeCellsCloud::Request::ConvertTableToHtmlRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/ConvertTableToHtmlRequest.pm"
+      },
+      "AsposeCellsCloud::Request::ConvertTableToJsonRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/ConvertTableToJsonRequest.pm"
+      },
+      "AsposeCellsCloud::Request::ConvertRangeToImageRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/ConvertRangeToImageRequest.pm"
+      },
+      "AsposeCellsCloud::Request::ConvertRangeToPdfRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/ConvertRangeToPdfRequest.pm"
+      },
+      "AsposeCellsCloud::Request::ConvertRangeToCsvRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/ConvertRangeToCsvRequest.pm"
+      },
+      "AsposeCellsCloud::Request::ConvertRangeToHtmlRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/ConvertRangeToHtmlRequest.pm"
+      },
+      "AsposeCellsCloud::Request::ConvertRangeToJsonRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/ConvertRangeToJsonRequest.pm"
       },
       "AsposeCellsCloud::Request::ConvertChartToImageRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/ConvertChartToImageRequest.pm"
@@ -1451,8 +1517,35 @@
       "AsposeCellsCloud::Request::SplitRemoteSpreadsheetRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/SplitRemoteSpreadsheetRequest.pm"
       },
+      "AsposeCellsCloud::Request::ImportDataIntoSpreadsheetRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/ImportDataIntoSpreadsheetRequest.pm"
+      },
       "AsposeCellsCloud::Request::GetPublicKeyRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/GetPublicKeyRequest.pm"
+      },
+      "AsposeCellsCloud::Request::CreateSpreadsheetRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/CreateSpreadsheetRequest.pm"
+      },
+      "AsposeCellsCloud::Request::AddWorksheetToSpreadsheetRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/AddWorksheetToSpreadsheetRequest.pm"
+      },
+      "AsposeCellsCloud::Request::DeleteWorksheetFromSpreadsheetRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/DeleteWorksheetFromSpreadsheetRequest.pm"
+      },
+      "AsposeCellsCloud::Request::RenameWorksheetInSpreadsheetRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/RenameWorksheetInSpreadsheetRequest.pm"
+      },
+      "AsposeCellsCloud::Request::MoveWorksheetInSpreadsheetRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/MoveWorksheetInSpreadsheetRequest.pm"
+      },
+      "AsposeCellsCloud::Request::CompressSpreadsheetRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/CompressSpreadsheetRequest.pm"
+      },
+      "AsposeCellsCloud::Request::ProtectSpreadsheetRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/ProtectSpreadsheetRequest.pm"
+      },
+      "AsposeCellsCloud::Request::UnprotectSpreadsheetRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/UnprotectSpreadsheetRequest.pm"
       },
       "AsposeCellsCloud::Request::SearchSpreadsheetContentRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/SearchSpreadsheetContentRequest.pm"
@@ -1496,6 +1589,12 @@
       "AsposeCellsCloud::Request::CodegenSpecRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/CodegenSpecRequest.pm"
       },
+      "AsposeCellsCloud::Request::TrimSpreadsheetContentRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/TrimSpreadsheetContentRequest.pm"
+      },
+      "AsposeCellsCloud::Request::TrimWorksheetRangeRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/TrimWorksheetRangeRequest.pm"
+      },
       "AsposeCellsCloud::Request::DeleteSpreadsheetBlankRowsRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/DeleteSpreadsheetBlankRowsRequest.pm"
       },
@@ -1504,6 +1603,9 @@
       },
       "AsposeCellsCloud::Request::DeleteSpreadsheetBlankWorksheetsRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/DeleteSpreadsheetBlankWorksheetsRequest.pm"
+      },
+      "AsposeCellsCloud::Request::SwapRangeRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/SwapRangeRequest.pm"
       },
       "AsposeCellsCloud::Request::DownloadFileRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/DownloadFileRequest.pm"
@@ -2575,6 +2677,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "25.6.1",
+   "version" : "25.9",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

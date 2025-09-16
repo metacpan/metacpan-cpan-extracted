@@ -1,5 +1,12 @@
 Revision history for Perl extension Math::Base::Convert
 
+0.13  Mon Sep 15 15:44:16 PDT 2025
+	bug 168226 disambiguate precendence bug introduced by perl 5.42
+
+0.12  Tue Mar 14 15:51:39 PDT 2017
+	correct typo stating 96 ascii characters
+	should be 95 characters
+
 0.11  Thu Oct 22 15:31:10 PDT 2015
 	fix one more typo
 

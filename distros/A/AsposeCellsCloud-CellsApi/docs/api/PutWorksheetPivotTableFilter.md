@@ -7,8 +7,6 @@ Add a pivot filter to the PivotTable.
 
 - **Base URL**: `http://api.aspose.cloud/v3.0`
 - **Authentication Method**: `JWT (OAuth2, application)`  **Token URL**: `https://api.aspose.cloud/connect/token`
-- **Example** 
-
 ## **Interface Details**
 
 ### **Endpoint** 

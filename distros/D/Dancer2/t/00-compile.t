@@ -6,13 +6,16 @@ use warnings;
 
 use Test::More;
 
-plan tests => 58 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 61 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Dancer2.pm',
     'Dancer2/CLI.pm',
     'Dancer2/CLI/Gen.pm',
     'Dancer2/CLI/Version.pm',
+    'Dancer2/ConfigReader.pm',
+    'Dancer2/ConfigReader/Config/Any.pm',
+    'Dancer2/ConfigUtils.pm',
     'Dancer2/Core.pm',
     'Dancer2/Core/App.pm',
     'Dancer2/Core/Cookie.pm',
@@ -31,6 +34,8 @@ my @module_files = (
     'Dancer2/Core/Role/DSL.pm',
     'Dancer2/Core/Role/Engine.pm',
     'Dancer2/Core/Role/Handler.pm',
+    'Dancer2/Core/Role/HasConfig.pm',
+    'Dancer2/Core/Role/HasEnvironment.pm',
     'Dancer2/Core/Role/HasLocation.pm',
     'Dancer2/Core/Role/Hookable.pm',
     'Dancer2/Core/Role/Logger.pm',
@@ -61,8 +66,6 @@ my @module_files = (
     'Dancer2/Serializer/YAML.pm',
     'Dancer2/Session/Simple.pm',
     'Dancer2/Session/YAML.pm',
-    'Dancer2/Template/Implementation/ForkedTiny.pm',
-    'Dancer2/Template/Simple.pm',
     'Dancer2/Template/TemplateToolkit.pm',
     'Dancer2/Template/Tiny.pm',
     'Dancer2/Test.pm'

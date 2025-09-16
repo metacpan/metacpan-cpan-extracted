@@ -22,6 +22,7 @@ sub money($$$$)
 my $g = String::Print->new
   ( modifiers => [ qr/[€₤]/ => \&money ]
   );
+
 isa_ok($g, 'String::Print');
 
 is $g->sprinti("a={p€}", p => $pi), "a=3.14 EUR";

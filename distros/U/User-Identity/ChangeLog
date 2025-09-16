@@ -4,6 +4,15 @@
 All changes are made by Mark Overmeer <markov@cpan.org> unless
 explicitly stated differently.
 
+version 1.03: Fri 12 Sep 15:25:39 CEST 2025
+
+	Changes:
+	- require Perl 5.16 (2012)
+
+	Improvements:
+	- convert to OODoc 3.04
+	- add .gitignore
+
 version 1.02: Mon 17 Apr 10:40:50 CEST 2023
 
 	Changes:

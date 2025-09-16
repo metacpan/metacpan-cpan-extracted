@@ -1,5 +1,5 @@
-# This code is part of Perl distribution OODoc version 3.03.
-# The POD got stripped from this file by OODoc version 3.03.
+# This code is part of Perl distribution OODoc version 3.04.
+# The POD got stripped from this file by OODoc version 3.04.
 # For contributors see file ChangeLog.
 
 # This software is copyright (c) 2003-2025 by Mark Overmeer.
@@ -14,7 +14,7 @@
 #oodist: testing, however the code of this development version may be broken!
 
 package OODoc::Export::JSON;{
-our $VERSION = '3.03';
+our $VERSION = '3.04';
 }
 
 use parent 'OODoc::Export';
@@ -44,7 +44,7 @@ sub write($$%)
 	{	$fh = \*STDOUT;
 	}
 	else
-	{	open $fh, '>:raw', $output
+	{	open $fh, '>:encoding(UTF-8)', $output
 			or fault __x"cannot write output to {file}", file => $output;
 	}
 
