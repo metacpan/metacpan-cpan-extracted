@@ -12,6 +12,7 @@ lib/WWW/Noss/Dir.pm
 lib/WWW/Noss/FeedConfig.pm
 lib/WWW/Noss/FeedReader.pm
 lib/WWW/Noss/FeedReader/Atom.pm
+lib/WWW/Noss/FeedReader/MediaRSS.pm
 lib/WWW/Noss/FeedReader/RSS.pm
 lib/WWW/Noss/GroupConfig.pm
 lib/WWW/Noss/Home.pm
@@ -42,6 +43,8 @@ t/data/dir/b.txt
 t/data/dir/c.txt
 t/data/lynx.html
 t/data/mail-dates
+t/data/mrss-atom.xml
+t/data/mrss-rss.xml
 t/data/opml.xml
 t/data/rfc3339-dates
 t/data/rss.xml

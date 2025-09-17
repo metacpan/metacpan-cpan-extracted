@@ -189,6 +189,20 @@ ok(-d File::Spec->catfile($TMP, '^^two^^'), 'directory render ok');
 
 remove_tree($TMP, { safe => 1 });
 
+$stubb = new_stubb($TMP, 'perl', '-R');
+isa_ok($stubb, 'File::Stubb');
+
+ok($stubb->run, "stubb doesn't die");
+
+ok(-f $TMP, 'restricted render ok');
+is(
+    slurp($TMP),
+    slurp(File::Spec->catfile($TEMPLATES, 'perl.stubb')),
+    'restricted render ok'
+);
+
+unlink $TMP;
+
 done_testing;
 
 END {

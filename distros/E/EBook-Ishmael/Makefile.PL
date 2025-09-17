@@ -3,6 +3,40 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 
+# Package maintainers: if for whatever reason you cannot/don't want to build
+# ishmael's XS components, you can pass NO_XS to `perl Makefile.PL` as a
+# non-zero value to disable the use of XS code. ishmael will use pure-Perl
+# versions of the XS components instead, which will have worse performance than
+# their XS counterparts.
+
+sub extract_argv_var {
+
+    my $var = shift;
+
+    my $idx;
+    my $val;
+
+    for my $i (0 .. $#ARGV) {
+        if ($ARGV[$i] =~ /^\Q$var\E=(.*)$/) {
+            $idx = $i;
+            $val = $1;
+            last;
+        }
+    }
+
+    if (not defined $idx) {
+        return undef;
+    }
+
+    # So that MakeMaker doesn't complain about the custom parameter.
+    splice @ARGV, $idx, 1;
+
+    return $val;
+
+}
+
+my $NO_XS = !! extract_argv_var('NO_XS');
+
 my %WriteMakefileArgs = (
     NAME             => 'EBook::Ishmael',
     AUTHOR           => q{Samuel Young <samyoung12788@gmail.com>},
@@ -29,10 +63,11 @@ my %WriteMakefileArgs = (
         'File::Spec' => '0',
         'File::Temp' => '0.10',
         'File::Which' => '0',
-        'JSON' => '0',
+        'JSON::PP' => '0',
         'List::Util' => '0',
         'MIME::Base64' => '0',
         'XML::LibXML' => '1.70',
+        'XSLoader' => '0',
     },
     EXE_FILES => [
         'bin/ishmael',
@@ -54,6 +89,13 @@ my %WriteMakefileArgs = (
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'EBook-Ishmael-*' },
 );
+
+if ($NO_XS) {
+    @WriteMakefileArgs{ qw(XS C) } = (
+        {},
+        []
+    );
+}
 
 # Compatibility with old versions of ExtUtils::MakeMaker
 unless (eval { ExtUtils::MakeMaker->VERSION('6.64'); 1 }) {

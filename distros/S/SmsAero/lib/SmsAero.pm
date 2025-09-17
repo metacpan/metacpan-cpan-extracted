@@ -11,7 +11,7 @@ use Time::Piece;
 use Log::Log4perl qw(:easy);
 use MIME::Base64;
 
-our $VERSION = '3.0.0';
+our $VERSION = '3.1.0';
 
 use constant {
     GATE_URLS => [
@@ -244,6 +244,41 @@ sub sms_status {
     return $self->_request(
         $self->{_test_mode} ? 'sms/teststatus' : 'sms/status',
         { id => int($sms_id) }
+    );
+}
+
+sub send_telegram {
+    my ($self, %args) = @_;
+
+    $self->_validate_phone_number($args{number});
+    die "Code must be a 4 to 8 digit integer"
+        unless defined $args{code} && $args{code} =~ /^\d{4,8}$/;
+
+    my $data = {
+        code => int($args{code}),
+    };
+
+    if (ref $args{number} eq 'ARRAY') {
+        $data->{numbers} = $args{number};
+    } else {
+        $data->{number} = $args{number};
+    }
+
+    $data->{sign} = $args{sign} if defined $args{sign};
+    $data->{text} = $args{text} if defined $args{text};
+
+    return $self->_request(
+        'telegram/send',
+        $data
+    );
+}
+
+sub telegram_status {
+    my ($self, $telegram_id) = @_;
+
+    return $self->_request(
+        'telegram/status',
+        { id => int($telegram_id) }
     );
 }
 

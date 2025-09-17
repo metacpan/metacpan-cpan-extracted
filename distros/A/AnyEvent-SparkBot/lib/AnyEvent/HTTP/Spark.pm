@@ -1693,6 +1693,7 @@ sub build_get {
   my $args=join '&',@args;
   $uri .=$args;
 
+  $uri=~ s/\?$//s;
   my $get=new HTTP::Request(GET=>$uri,$self->default_headers);
 
   return $self->new_true($get);

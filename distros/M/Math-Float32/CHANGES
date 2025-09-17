@@ -1,4 +1,12 @@
 Revision history for Perl module Math::Float32
 
+0.02
+  -  More tests added.
+  -  Add pack_flt_hex() function.
+  -  Enable handling of base 2 strings that match /^(\s+)?[\-\+]?0b/i
+     The strtof() function does not handle such strings, so we convert
+     them to a hex equivalent before passing them on.
+
 0.01
   -  First release.
+

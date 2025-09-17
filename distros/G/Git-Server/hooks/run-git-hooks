@@ -130,7 +130,7 @@ use strict;
 use warnings;
 use FindBin qw($Bin);
 
-our $VERSION = "0.032";
+our $VERSION = "0.033";
 
 my $ssh = $ENV{SSH_CLIENT} or die "Only SSH allowed\n";
 $ENV{GIT_CONNECTED_EPOCH} ||= time;

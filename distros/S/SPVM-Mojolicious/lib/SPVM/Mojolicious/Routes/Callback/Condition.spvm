@@ -4,10 +4,10 @@
 class Mojolicious::Routes::Callback::Condition : interface_t {
   version_from Mojolicious;
   
-  use Mojolicious::Routes;
+  use Mojolicious::Routes::Route;
   use Mojolicious::Controller;
   use Hash;
   
-  required method : void ($routes : Mojolicious::Routes, $c : Mojolicious::Controller, $captures : Hash of string, $arg : object);
+  required method : int ($route : Mojolicious::Routes::Route, $c : Mojolicious::Controller, $captures : Hash of string, $arg : object);
   
 }

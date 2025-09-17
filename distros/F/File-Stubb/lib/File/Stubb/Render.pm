@@ -1,6 +1,6 @@
 package File::Stubb::Render;
 use 5.016;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 use strict;
 use warnings;
 
@@ -8,7 +8,8 @@ use File::Basename;
 use File::Spec;
 use JSON::PP;
 
-use File::Stubb::SubstTie;
+# TODO: '?' sigil for '#' and '$' restricted targets
+# TODO: Set '$_' in Perl and shell substs to rendered file
 
 my $ILLEGAL_PATH_RX = $^O eq 'MSWin32'
     ? qr/[<>:"\/\\|?*]/
@@ -16,13 +17,23 @@ my $ILLEGAL_PATH_RX = $^O eq 'MSWin32'
 
 my $PATH_SEP = $^O eq 'MSWin32' ? '\\' : '/';
 
-our $SUBST_TARGET_RX = qr/[a-zA-Z0-9_]+/;
-
-# Marker used by stubb to tell the difference between substitution target
-# carets and substituted carets.
-my $UC = "\0";
+our $SUBST_TARGET_NAME_RX = qr/[a-zA-Z0-9_]+/;
 
 my $STDOUT_PATH = '-';
+
+my $SUBST_TARGET_RX = qr{
+    (?<SIGIL> \\? [\?\$!\#])?
+    \^\^
+    \s* (?<TARGET> .*?) \s*
+    \^\^
+}x;
+
+# Path substitution targets only contain basic targets
+my $SUBST_TARGET_PATH_RX = qr{
+    \^\^
+    \s* (?<TARGET> $SUBST_TARGET_NAME_RX) \s*
+    \^\^
+}x;
 
 sub _dir {
 
@@ -86,8 +97,8 @@ sub _pl_subst {
 
     my ($self, $pl) = @_;
 
-    tie local %_, 'File::Stubb::SubstTie', %{ $self->{ Subst } };
-    return eval $pl;
+    local %_ = %{ $self->{ Subst } };
+    return eval("{ no strict; no warnings; $pl }") // '';
 
 }
 
@@ -195,46 +206,48 @@ sub _render_file {
     binmode $wh;
 
     while (my $l = readline $rh) {
-        # Add caret marker
-        $l =~ s/\^\^/^$UC^/g;
-        for my $m ($l =~ m/((?:\\?[\?\$!#])?\^$UC\^\s*.*?\s*\^$UC\^)/g) {
-
-            my $f = substr $m, 0, 1;
-            my ($cont) = $m =~ /\^$UC\^\s*(.+?)\s*\^$UC\^/;
-
-            my $repl;
-
-            if ($f eq '\\') {
-                $repl .= substr $m, 1, 1;
-                $f = '^';
+        $l =~ s{($SUBST_TARGET_RX)}{
+            my $m = $1;
+            my %c = %+;
+            my $repl = '';
+            {
+                if (defined $c{ SIGIL } and $c{ SIGIL } =~ /^\\/) {
+                    # Copy escaped sigil
+                    $repl .= substr $c{ SIGIL }, 1, 1;
+                    $m = substr $m, length $c{ SIGIL };
+                }
+                if (not defined $c{ SIGIL } or $c{ SIGIL } =~ /^\\/) {
+                    my ($targ, $def) = split /\s*\/\/\s*/, $c{ TARGET };
+                    if ($targ !~ /^$SUBST_TARGET_NAME_RX$/) {
+                        $repl = $m;
+                        last;
+                    }
+                    $repl .= exists $self->{ Subst }{ $targ }
+                        ? $self->{ Subst }{ $targ }
+                        : $def // $m;
+                } elsif ($c{ SIGIL } eq '?') {
+                    if ($c{ TARGET } !~ /^$SUBST_TARGET_NAME_RX$/) {
+                        $repl = $m;
+                        last;
+                    }
+                    $repl = exists $self->{ Subst }{ $c{ TARGET } }
+                        ? $self->{ Subst }{ $c{ TARGET } }
+                        : '';
+                } elsif ($c{ SIGIL } eq '$') {
+                    $repl = $self->{ Restricted }
+                        ? $m
+                        : $self->_pl_subst($c{ TARGET });
+                } elsif ($c{ SIGIL } eq '#') {
+                    $repl = $self->{ Restricted }
+                        ? $m
+                        : $self->_qx_subst($c{ TARGET });
+                } elsif ($c{ SIGIL } eq '!') {
+                    $repl = substr $m, 1;
+                }
             }
-
-            if ($f eq '^') {
-                my ($targ, $def) = split /\s*\/\/\s*/, $cont;
-                next unless $targ =~ /^$SUBST_TARGET_RX$/;
-                $repl .= exists $self->{ Subst }{ $targ }
-                    ? $self->{ Subst }{ $targ }
-                    : $def // $m =~ s/$UC//gr;
-            } elsif ($f eq '?') {
-                next unless $cont =~ /^$SUBST_TARGET_RX$/;
-                $repl = exists $self->{ Subst }{ $cont }
-                    ? $self->{ Subst }{ $cont }
-                    : '';
-            } elsif ($f eq '$') {
-                $repl = $self->_pl_subst($cont);
-            } elsif ($f eq '#') {
-                $repl = $self->_qx_subst($cont);
-            } elsif ($f eq '!') {
-                $repl = $m =~ s/$UC//gr;
-            }
-
-            $l =~ s/\Q$m\E/$repl/;
-
-        }
-
-        $l =~ s/$UC//g;
+            $repl;
+        }ge;
         print { $wh } $l;
-
     }
 
     close $rh;
@@ -254,8 +267,8 @@ sub _path_targets {
 
     my %targ;
 
-    for my $m ($path =~ m/\^\^\s*($SUBST_TARGET_RX)\s*\^\^/g) {
-        $targ{ $m } = 1;
+    while (my $m = $path =~ m/($SUBST_TARGET_PATH_RX)/g) {
+        $targ{ $+{ TARGET } } = 1;
     }
 
     return sort keys %targ;
@@ -271,21 +284,17 @@ sub _file_targets {
     binmode $fh;
 
     while (my $l = readline $fh) {
-        for my $m ($l =~ m/((?:\\?[\?\$!#])?\^\^\s*.*?\s*\^\^)/g) {
-
-            my $f = substr $m, 0, 1;
-            my ($cont) = $m =~ m/\^\^\s*(.+?)\s*\^\^/;
-
-            if ($f eq '^' or $f eq '?' or $f eq '\\') {
-                $cont =~ s/\s*\/\/.*$//;
-                next unless $cont =~ /^$SUBST_TARGET_RX$/;
-                $targets->{ basic }{ $cont } = 1;
-            } elsif ($f eq '$') {
-                push @{ $targets->{ perl } }, $cont;
-            } elsif ($f eq '#') {
-                push @{ $targets->{ shell } }, $cont;
+        while (my $m = $l =~ m/($SUBST_TARGET_RX)/g) {
+            my %c = %+;
+            if (not defined $c{ SIGIL } or $c{ SIGIL } eq '?' or $c{ SIGIL } =~ /^\\/) {
+                my $t = $c{ TARGET } =~ s/\s*\/\/.*$//r;
+                next unless $t =~ /^$SUBST_TARGET_NAME_RX$/;
+                $targets->{ basic }{ $t } = 1;
+            } elsif ($c{ SIGIL } eq '$' and not $self->{ Restricted }) {
+                push @{ $targets->{ perl } }, $c{ TARGET };
+            } elsif ($c{ SIGIL } eq '#' and not $self->{ Restricted }) {
+                push @{ $targets->{ shell } }, $c{ TARGET };
             }
-
         }
     }
 
@@ -337,6 +346,7 @@ sub new {
         CopyPerms  => 0,
         Defaults   => 1,
         IgnoreConf => 0,
+        Restricted => 0,
     };
 
     bless $self, $class;
@@ -371,8 +381,12 @@ sub new {
         $self->{ CopyPerms } = !! $param{ copy_perms };
     }
 
+    if (defined $param{ restricted }) {
+        $self->{ Restricted } = !! $param{ restricted };
+    }
+
     for my $k (keys %{ $self->{ Subst } }) {
-        unless ($k =~ /^$SUBST_TARGET_RX$/) {
+        unless ($k =~ /^$SUBST_TARGET_NAME_RX$/) {
             die "'$k' is not a valid substitution target\n";
         }
     }
@@ -421,18 +435,26 @@ sub render_path {
 
     my ($self, $path) = @_;
 
-    my @parts = map {
-        $_ =~ s/\^\^/^$UC^/g;
-        for my $m ($_ =~ m/(\^$UC\^\s*$SUBST_TARGET_RX\s*\^$UC\^)/g) {
-            my ($cont) = $m =~ /\^$UC\^\s*(.+)\s*\^$UC\^/;
-            next unless exists $self->{ Subst }{ $cont };
-            if ($self->{ Subst }{ $cont } =~ $ILLEGAL_PATH_RX) {
-                die "'$cont' path substitution would contain illegal path characters\n";
+    my @parts = split /\Q$PATH_SEP\E/, $path;
+
+    for (@parts) {
+        s{($SUBST_TARGET_PATH_RX)}{
+            my $m = $1;
+            my %c = %+;
+            my $repl = '';
+            {
+                if (not exists $self->{ Subst }{ $c{ TARGET } }) {
+                    $repl = $m;
+                    last;
+                }
+                if ($self->{ Subst }{ $c{ TARGET } } =~ $ILLEGAL_PATH_RX) {
+                    die "'$c{ TARGET }' path substitution would contain illegal path characters\n";
+                }
+                $repl = $self->{ Subst }{ $c{ TARGET } };
             }
-            $_ =~ s/\Q$m\E/$self->{ Subst }{ $cont }/;
-        }
-        $_ =~ s/$UC//gr;
-    } split /\Q$PATH_SEP\E/, $path;
+            $repl;
+        }ge;
+    }
 
     return File::Spec->catfile(@parts);
 
@@ -514,6 +536,22 @@ sub set_copy_perms {
 
 }
 
+sub restricted {
+
+    my ($self) = @_;
+
+    return $self->{ Restricted };
+
+}
+
+sub set_restricted {
+
+    my ($self, $rest) = @_;
+
+    $self->{ Restricted } = !! $rest;
+
+}
+
 sub defaults {
 
     my ($self) = @_;
@@ -587,6 +625,11 @@ the symlinks themselves in template directories. Defaults to true.
 Boolean determining whether to copy the permissions of a template file when
 rendering. Defaults to false.
 
+=item restricted
+
+Boolean determining whether to render files in a "restricted" mode. When
+restricted, Perl targets and shell targets will not be rendered and left as-is.
+
 =item defaults
 
 Boolean determining whether to use any default substitution parameters
@@ -647,6 +690,12 @@ Getter/setter for C<$render>'s follow symlinks flag.
 =item $render->set_copy_perms($copy)
 
 Getter/setter for C<$render>'s copy perms flag.
+
+=item $rest = $render->restricted
+
+=item $render->set_restricted($rest)
+
+Getter/setter for C<$render>'s restricted flag.
 
 =item $def = $render->defaults()
 

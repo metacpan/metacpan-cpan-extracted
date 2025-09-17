@@ -172,8 +172,9 @@ static PADOFFSET MY_pad_add_name(pTHX_ const char *name, STRLEN len, U32 flags, 
 #endif
 
 #if !HAVE_PERL_VERSION(5, 26, 0)
-#  define isIDFIRST_utf8_safe(s, e)  (PERL_UNUSED_ARG(e), isIDFIRST_utf8(s))
-#  define isIDCONT_utf8_safe(s, e)   (PERL_UNUSED_ARG(e), isIDCONT_utf8(s))
+/* PERL_UNUSED_ARG() isn't usable to fix this on early perl versions */
+#  define isIDFIRST_utf8_safe(s, e)  ((void)sizeof(e), isIDFIRST_utf8(s))
+#  define isIDCONT_utf8_safe(s, e)   ((void)sizeof(e), isIDCONT_utf8(s))
 #endif
 
 #ifndef CXp_EVALBLOCK

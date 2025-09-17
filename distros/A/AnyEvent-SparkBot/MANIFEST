@@ -1,11 +1,11 @@
-t/AnyEvent-HTTP-Spark.t
-t/AnyEvent-SparkBot-SharedRole.t
-t/AnyEvent-HTTP-Spark-nonBLock.t
-t/AnyEvent-SparkBot.t
 Makefile.PL
 MANIFEST
-README.md
 Changes
+README.md
+t/AnyEvent-SparkBot.t
+t/AnyEvent-HTTP-Spark.t
+t/AnyEvent-HTTP-Spark-nonBLock.t
+t/AnyEvent-SparkBot-SharedRole.t
 lib/AnyEvent/SparkBot.pm
 lib/AnyEvent/SparkBot/SharedRole.pm
 lib/AnyEvent/HTTP/Spark.pm

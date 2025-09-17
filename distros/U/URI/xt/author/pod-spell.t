@@ -124,6 +124,7 @@ Willing
 Win32
 WithBase
 Zahradník
+_emailauth
 _foreign
 _generic
 _idna
@@ -147,6 +148,7 @@ ddick
 dependabot
 dev
 dorian
+earhart
 ether
 etype
 evalue
@@ -223,6 +225,7 @@ sips
 skaji
 slaven
 smb
+smtp
 snews
 ssh
 symkat

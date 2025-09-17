@@ -61,6 +61,7 @@ sub default_headers  {
   my $h=new HTTP::Headers;
   $h->header(Authorization=>'Bearer ' .$self->token);
   $h->header('Content-Type', 'application/json; charset=UTF-8');
+  $h->header(Accept=>'application/json');
   return $h;
 }
 

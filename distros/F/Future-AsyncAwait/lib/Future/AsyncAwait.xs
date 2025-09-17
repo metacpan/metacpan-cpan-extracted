@@ -1,7 +1,7 @@
 /*  You may distribute under the terms of either the GNU General Public License
  *  or the Artistic License (the same terms as Perl itself)
  *
- *  (C) Paul Evans, 2016-2022 -- leonerd@leonerd.org.uk
+ *  (C) Paul Evans, 2016-2025 -- leonerd@leonerd.org.uk
  */
 #define PERL_NO_GET_CONTEXT
 
@@ -38,6 +38,10 @@
 
 #if HAVE_PERL_VERSION(5, 26, 0)
 #  define HAVE_OP_ARGCHECK
+#endif
+
+#if HAVE_PERL_VERSION(5, 43, 3)
+#  define HAVE_OP_MULTIPARAM
 #endif
 
 #if HAVE_PERL_VERSION(5, 33, 7)
@@ -392,11 +396,9 @@ static int dumpmagic_suspendedstate(pTHX_ DMDContext *ctx, const SV *sv, MAGIC *
 #define suspendedstate_get(cv)  MY_suspendedstate_get(aTHX_ cv)
 static SuspendedState *MY_suspendedstate_get(pTHX_ CV *cv)
 {
-  MAGIC *magic;
-
-  for(magic = mg_find((SV *)cv, PERL_MAGIC_ext); magic; magic = magic->mg_moremagic)
-    if(magic->mg_type == PERL_MAGIC_ext && magic->mg_virtual == &vtbl_suspendedstate)
-      return (SuspendedState *)magic->mg_ptr;
+  MAGIC *mg;
+  if((mg = mg_findext((SV *)cv, PERL_MAGIC_ext, &vtbl_suspendedstate)))
+    return (SuspendedState *)mg->mg_ptr;
 
   return NULL;
 }
@@ -2281,7 +2283,7 @@ static void parse_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx, void *ho
   COP *last_cop = PL_curcop;
   check_optree(aTHX_ ctx->body, NO_FORBID, &last_cop);
 
-#ifdef HAVE_OP_ARGCHECK
+#ifdef HAVE_OP_ARGCHECK   // or HAVE_OP_MULTIPARAM
   /* If the sub body is using signatures, we want to pull the OP_ARGCHECK
    * outside the try block. This has two advantages:
    *   1. arity checks appear synchronous from the perspective of the caller;
@@ -2301,7 +2303,11 @@ static void parse_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx, void *ho
       o = cLISTOPx(lineseq)->op_first;
     }
     if(o->op_type == OP_NEXTSTATE &&
-        OpSIBLING(o)->op_type == OP_ARGCHECK) {
+        (OpSIBLING(o)->op_type == OP_ARGCHECK
+#  ifdef HAVE_OP_MULTIPARAM
+          || OpSIBLING(o)->op_type == OP_MULTIPARAM
+#  endif
+        )) {
       /* Splice out the NEXTSTATE+ARGCHECK ops */
       argcheckop = o; /* technically actually the NEXTSTATE before it */
 

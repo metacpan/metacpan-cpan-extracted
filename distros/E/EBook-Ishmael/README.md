@@ -39,7 +39,6 @@ Windows, although I haven't extensively tested it.
 either CPAN or your system's package manager:
 * `Archive::Zip`
 * `File::Which`
-* `JSON`
 * `XML::LibXML`
 
 **ishmael** also depends on the following programs to be installed on your

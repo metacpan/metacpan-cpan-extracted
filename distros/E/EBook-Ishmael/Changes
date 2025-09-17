@@ -1,5 +1,13 @@
 Revision history for Perl module EBook::Ishmael.
 
+1.09  Sep 16 2025
+  - Ported PalmDoc/Mobi decoding code to XS (C), vastly improving performance
+    for reading some PalmDoc and Mobi ebooks.
+    - If you wish to use the previous pure-Perl version of the decoding code,
+      you can pass NO_XS=1 to perl Makefile.PL to disable the use of XS.
+  - Switched from using JSON to JSON::PP for JSON serialization. This reduces
+    ishmael's dependencies, as JSON::PP is a part of Perl core.
+
 1.08  Sep 01 2025
   - Add support for reading ebooks from standard input when '-' is given as the
     input path.

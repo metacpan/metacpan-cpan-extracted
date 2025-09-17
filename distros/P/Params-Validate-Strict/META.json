@@ -1,7 +1,7 @@
 {
    "abstract" : "Validates a set of parameters against a schema",
    "author" : [
-      "Nigel Horne <njh@bandsman.co.uk>"
+      "Nigel Horne <njh@nigelhorne.com>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
@@ -37,11 +37,20 @@
             "ExtUtils::MakeMaker" : "6.64",
             "List::Util" : "0",
             "Params::Get" : "0.13",
-            "Scalar::Util" : "0"
+            "Scalar::Util" : "0",
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "test" : {
          "requires" : {
+            "File::Glob" : "0",
+            "File::Slurp" : "0",
+            "File::stat" : "0",
+            "IPC::System::Simple" : "0",
+            "JSON::MaybeXS" : "0",
+            "POSIX" : "0",
+            "Readonly" : "0",
             "Test::Compile" : "0",
             "Test::DescribeMe" : "0",
             "Test::Most" : "0",
@@ -51,7 +60,20 @@
       }
    },
    "release_status" : "stable",
-   "resources" : {},
-   "version" : "0.11",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Params-Validate-Strict@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Params-Validate-Strict",
+         "x_url" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Params-Validate-Strict"
+      },
+      "homepage" : "https://metacpan.org/pod/Params::Validate::Strict",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/nigelhorne/Params-Validate-Strict.git",
+         "web" : "https://github.com/nigelhorne/Params-Validate-Strict",
+         "x_repository" : "https://github.com/nigelhorne/Params-Validate-Strict"
+      }
+   },
+   "version" : "0.12",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -409,7 +409,7 @@ dialog_select_feed() {
             'Mark Unread' "Mark all posts in $1 as unread" \
             'Update'      "Update $1" \
             'Reload'      "Reload $1" \
-            'Info'        " View $1 feed information" \
+            'Info'        "View $1 feed information" \
             2> "$dialog_select_feed_tmpsel"
 
         if [ "$?" != '0' ]

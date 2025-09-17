@@ -41,7 +41,7 @@
             <email>samyoung12788 at gmail dot com</email>
             <uri>https://1-1sam.codeberg.page/</uri>
         </author>
-        <content type="html"><p>Post with HTML content.</p></content>
+        <content type="html">&lt;p&gt;Post with HTML content.&lt;/p&gt;</content>
         <link rel="alternate" href="https://phonysite.com/a2"/>
         <category term="test"/>
         <category term="sample"/>

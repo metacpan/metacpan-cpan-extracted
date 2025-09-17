@@ -14,10 +14,9 @@ if($@) {
 my %options = (
   NAME         => 'Math::Float32',
   AUTHOR       => 'Sisyphus (sisyphus at (@) cpan dot (.) org)',
-  ABSTRACT     => "Perl interface to C's  float ('brain float') arithmetic",
+  ABSTRACT     => "Perl interface to C's single precision float arithmetic",
   LICENSE      => 'perl',
   VERSION_FROM => 'Float32.pm',
-  LIBS         =>  ['-lmpfr -lgmp -lquadmath'],
   clean        => { FILES => '*.exe *.txt' },
   META_MERGE   => {
     'meta-spec'  => { version => 2 },
@@ -32,7 +31,6 @@ my %options = (
 );
 
 my $prereq =  { 'Test::More' => '0.88',
-                'Test::Warn' => '0.36',
                 'Exporter'   => '5.58',
               };
 

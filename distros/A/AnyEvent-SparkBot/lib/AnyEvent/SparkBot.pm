@@ -1,6 +1,6 @@
 package AnyEvent::SparkBot;
 
-our $VERSION='1.015';
+our $VERSION='1.017';
 use Modern::Perl;
 use Moo;
 use MooX::Types::MooseLike::Base qw(:all);
@@ -338,15 +338,15 @@ sub handle_message : BENCHMARK_INFO {
             if(exists $activity->{actor}) {
 	      my $actor=$activity->{actor};
 
-	      if($self->currentUser->{displayName} eq $actor->{displayName}) {
+	      if($self->currentUser->{displayName} && $self->currentUser->{displayName} eq $actor->{displayName}) {
 	        $self->log_debug("ignoring message because we sent it");
-                $self->setPing();
+          $self->setPing();
 	        return;
 	      }
   	      $self->run_lookup('que_getMessage',sub {
 	        my ($agent,$id,$result,$req,$resp)=@_;
                 $self->on_message->($self,$result,$eventType,$verb,$json,$req,$resp,$message);
-	      },$activity->{id});
+	      },encode_base64('ciscospark://us/MESSAGE/'.$activity->{id},''));
 	    } 
 	  } elsif($verb eq 'add' and $activity->{object}->{objectType} eq 'person') {
 	    my $args={

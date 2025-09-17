@@ -11,7 +11,7 @@ BEGIN {
 }
 use Pod::Coverage::TrustPod;
 
-my %skip = map { $_ => 1 } qw( URI::IRI URI::_foreign URI::_idna URI::_login URI::_ldap URI::file::QNX URI::ftpes URI::ftps URI::irc URI::nntp URI::urn::isbn URI::urn::oid URI::scp URI::sftp );
+my %skip = map { $_ => 1 } qw( URI::IRI URI::_emailauth URI::_foreign URI::_idna URI::_login URI::_ldap URI::file::QNX URI::ftpes URI::ftps URI::irc URI::nntp URI::urn::isbn URI::urn::oid URI::scp URI::sftp );
 
 my @modules;
 for my $module ( all_modules() ) {
@@ -87,9 +87,6 @@ my %trustme = (
              'URI::news' => [
                               qr/^(?:group|message)$/
                             ],
-             'URI::pop' => [
-                             qr/^(?:auth|user)$/
-                           ],
              'URI::sip' => [
                              qr/^(?:params|params_form)$/
                            ],

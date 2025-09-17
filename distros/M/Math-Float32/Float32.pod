@@ -42,7 +42,7 @@
 =head1 ASSIGNMENT FUNCTIONS
 
     $obj = Math::Float32->new([$val]);
-    $obj = new([$val]);
+    $obj = Math::Float::new([$val]);
      Set $obj to a Math::Float32 object with value $val.
      If $val is not provided, the $obj has the value NaN.
      $val cab be an IV (integer), an NV (perl float), a PV or a
@@ -116,6 +116,11 @@
       print unpack_flt_hex(Math::Float32->new('-0'));      # 80000000
       print unpack_flt_hex(Math::Float32->new(2) ** -149); # 00000001
       print unpack_flt_hex(Math::Float32->new(2) ** 128);  # 7F800000
+
+   $obj = pack_flt_hex($string);
+    Convert the string ($string) returned by unpack_flt_hex()
+    into a Math::Float32 object whose value is the same as the
+    object from which $string was derived.
 
 =head1 MISCELLANEOUS FUNCTIONS
 

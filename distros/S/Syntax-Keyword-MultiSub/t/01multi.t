@@ -2,9 +2,10 @@
 
 use v5.26;
 use warnings;
-use experimental 'signatures';
 
 use Test2::V0;
+
+use experimental 'signatures';
 
 use Syntax::Keyword::MultiSub;
 

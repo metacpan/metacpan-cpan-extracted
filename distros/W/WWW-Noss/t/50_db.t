@@ -89,8 +89,29 @@ is_deeply(
         updated   => 1750011361,
         uid       => 'a1',
         nossuid   => join(';', 'a1', 'atom', 'Test post #1', 'https://phonysite.com/a1', 1750011361),
+        displaytitle => 'Test post #1',
     },
     'post ok'
+);
+
+is_deeply(
+    $obj->post('atom', -5),
+    {
+        nossid    => 1,
+        status    => 'unread',
+        feed      => 'atom',
+        title     => 'Test post #1',
+        link      => 'https://phonysite.com/a1',
+        author    => 'samyoung12788 at gmail dot com (Samuel Young)',
+        category  => [ qw(test sample phony) ],
+        summary   => "<p>Just a plain-text post.</p>\n",
+        published => 1750011361,
+        updated   => 1750011361,
+        uid       => 'a1',
+        nossuid   => join(';', 'a1', 'atom', 'Test post #1', 'https://phonysite.com/a1', 1750011361),
+        displaytitle => 'Test post #1',
+    },
+    'negative post ok'
 );
 
 ok($obj->first_unread('atom'), 'first_unread ok');

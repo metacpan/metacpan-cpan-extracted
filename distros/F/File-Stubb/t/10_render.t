@@ -66,6 +66,7 @@ ok(!$render->hidden, 'hidden ok');
 ok($render->follow_symlinks, 'follow_symlinks ok');
 ok(!$render->copy_perms, 'copy_perms ok');
 ok($render->defaults, 'defaults ok');
+ok(!$render->restricted, 'restricted ok');
 
 $targets = $render->targets;
 
@@ -325,6 +326,28 @@ HERE
 unlink $TMP;
 
 $render = File::Stubb::Render->new(
+    template => File::Spec->catfile($TEMPLATES, 'escape.stubb'),
+    subst => {},
+);
+isa_ok($render, 'File::Stubb::Render');
+@created = $render->render($TMP);
+is_deeply(
+    \@created,
+    [ $TMP ],
+    'render() ok'
+);
+is(
+    slurp($TMP),
+    <<'HERE',
+My favorite number: $^^ one ^^
+My third favorite number: #^^ three ^^
+My three favorite numbers: !^^ one ^^, ?^^ two ^^, $^^ three ^^
+Maybe a number? ?4
+HERE
+    'Escaped target rendering ok'
+);
+
+$render = File::Stubb::Render->new(
     template => File::Spec->catfile($TEMPLATES, 'not.stubb'),
     subst => $SUBST,
 );
@@ -354,9 +377,9 @@ is_deeply(
 is(
     slurp($TMP),
     <<'HERE',
-My favorite number: !^^ one ^^
-My third favorite number: !^^ three ^^
-My three favorite numbers: !^^ one ^^, !^^ two ^^, !^^ three ^^
+My favorite number: ^^ one ^^
+My third favorite number: ^^ three ^^
+My three favorite numbers: ^^ one ^^, ^^ two ^^, ^^ three ^^
 HERE
     'Non-target rendering ok'
 );
@@ -497,6 +520,68 @@ subtest('ignore_config ok' => sub {
     ok(!$render->hidden, 'hidden ok');
     ok($render->follow_symlinks, 'follow_symlinks ok');
     ok(!$render->copy_perms, 'copy_perms ok');
+
+});
+
+subtest('restricted ok' => sub {
+
+    $render = File::Stubb::Render->new(
+        template => File::Spec->catfile($TEMPLATES, 'perl.stubb'),
+        restricted => 1,
+    );
+
+    isa_ok($render, 'File::Stubb::Render');
+
+    ok($render->restricted, 'restricted flag ok');
+
+    is_deeply(
+        $render->targets,
+        {
+            basic => [],
+            perl  => [],
+            shell => [],
+        },
+        'targets ok'
+    );
+
+    $render->render($TMP);
+
+    is(
+        slurp($TMP),
+        slurp(File::Spec->catfile($TEMPLATES, 'perl.stubb')),
+        'Perl target rendering ok'
+    );
+
+    $render = File::Stubb::Render->new(
+        template => File::Spec->catfile($TEMPLATES, 'shell.stubb'),
+        restricted => 1,
+    );
+
+    unlink $TMP;
+
+    isa_ok($render, 'File::Stubb::Render');
+
+    ok($render->restricted, 'restricted flag ok');
+
+    is_deeply(
+        $render->targets,
+        {
+            basic => [],
+            perl  => [],
+            shell => [],
+        },
+        'targets ok'
+    );
+
+    $render->render($TMP);
+
+    is(
+        slurp($TMP),
+        slurp(File::Spec->catfile($TEMPLATES, 'shell.stubb')),
+        'Shell target rendering ok'
+    );
+
+    unlink $TMP;
 
 });
 

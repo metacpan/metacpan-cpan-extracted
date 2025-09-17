@@ -1,12 +1,12 @@
 package EBook::Ishmael::EBook::PalmDoc;
 use 5.016;
-our $VERSION = '1.08';
+our $VERSION = '1.09';
 use strict;
 use warnings;
 
 use Encode qw(decode);
 
-use EBook::Ishmael::Decode qw(lz77_decode);
+use EBook::Ishmael::Decode qw(palmdoc_decode);
 use EBook::Ishmael::EBook::Metadata;
 use EBook::Ishmael::PDB;
 use EBook::Ishmael::TextToHtml;
@@ -52,7 +52,7 @@ sub _decode_record {
     if ($self->{_compression} == 1) {
         return $encode;
     } elsif ($self->{_compression} == 2) {
-        return lz77_decode($encode);
+        return palmdoc_decode($encode);
     }
 
 }

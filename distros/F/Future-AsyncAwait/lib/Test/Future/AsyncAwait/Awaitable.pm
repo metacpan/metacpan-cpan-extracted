@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2020-2024 -- leonerd@leonerd.org.uk
 
-package Test::Future::AsyncAwait::Awaitable 0.70;
+package Test::Future::AsyncAwait::Awaitable 0.71;
 
 use v5.14;
 use warnings;

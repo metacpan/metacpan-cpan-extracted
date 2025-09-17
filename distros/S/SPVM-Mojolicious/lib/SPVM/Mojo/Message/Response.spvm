@@ -114,11 +114,13 @@ class Mojo::Message::Response extends Mojo::Message {
     return Mojo::Cookie::Response->new->parse($headers->get_set_cookie);
   }
   
-  method set_cookies : void ($name : string, $cookies : object[] of Mojo::Cookie::Response|object[]) {
+  method set_cookies : void ($name : string, $cookies : Mojo::Cookie::Response[]|object[]) {{
+    
+    my $cookies = (object[])$cookies;
     
     # Add cookies
     my $headers = $self->headers;
-    for my $cookie (@$cookies) {
+    for my $cookie (@(object[])$cookies) {
       
       my $cookie_ = (Mojo::Cookie::Response)undef;
       if ($cookie isa Mojo::Cookie::Response) {
@@ -133,8 +135,7 @@ class Mojo::Message::Response extends Mojo::Message {
       
       $headers->add("Set-Cookie" => $cookie_->to_string);
     }
-    
-  }
+  }}
   
   method default_message : string ($code : int = -1) {
     if ($code < 0) {

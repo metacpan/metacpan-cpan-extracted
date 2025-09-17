@@ -24,7 +24,6 @@ my %WriteMakefileArgs = (
         'File::Spec' => '0',
         'Getopt::Long' => '0',
         'JSON::PP' => '0',
-        'Tie::Hash' => '0',
     },
     EXE_FILES => [
         'bin/stubb',

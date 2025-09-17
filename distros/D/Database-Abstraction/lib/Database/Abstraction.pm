@@ -53,11 +53,11 @@ Database::Abstraction - Read-only Database Abstraction Layer (ORM)
 
 =head1 VERSION
 
-Version 0.31
+Version 0.32
 
 =cut
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 =head1 DESCRIPTION
 
@@ -151,10 +151,10 @@ Create a driver for the file in .../Database/foo.pm:
     # Regular CSV: There is no entry column and the separators are commas
     sub new
     {
-        my $class = shift;
-        my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
+	my $class = shift;
+	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
-        return $class->SUPER::new(no_entry => 1, sep_char => ',', %args);
+	return $class->SUPER::new(no_entry => 1, sep_char => ',', %args);
     }
 
 You can then use this code to access the data via the driver:
@@ -693,7 +693,25 @@ sub selectall_arrayref {
 		if(scalar(keys %{$params}) == 0) {
 			$self->_trace("$table: selectall_arrayref fast track return");
 			if(ref($self->{'data'}) eq 'HASH') {
-				return Return::Set::set_return(values %{$self->{'data'}}, { type => 'arrayref' });
+				# $self->{'data'} looks like this:
+				#	key1 => {
+				#		entry => key1,
+				#		field1 => value1,
+				#		field2 => value2
+				#	}, key2 => {
+				#		entry => key2,
+				#		field1 => valuea,
+				#		field2 => valueb
+				#	}
+				$self->_debug("$table: returning ", scalar keys %{$self->{'data'}}, ' entries');
+				if(scalar keys %{$self->{'data'}} <= 10) {
+					$self->_debug(Dumper($self->{'data'}));
+				}
+				my @rc;
+				foreach my $k (keys %{$self->{'data'}}) {
+					push @rc, $self->{'data'}->{$k};
+				}
+				return Return::Set::set_return(\@rc, { type => 'arrayref' });
 			}
 			return Return::Set::set_return($self->{'data'}, { type => 'arrayref'});
 			# my @rc = values %{$self->{'data'}};
@@ -1696,8 +1714,8 @@ XML slurping is hard,
 so if XML fails for you on a small file force non-slurping mode with
 
     $foo = MyPackageName::Database::Foo->new({
-        directory => '/var/dat',
-        max_slurp_size => 0	# force to not use slurp and therefore to use SQL
+	directory => '/var/dat',
+	max_slurp_size => 0	# force to not use slurp and therefore to use SQL
     });
 
 =head1 SEE ALSO

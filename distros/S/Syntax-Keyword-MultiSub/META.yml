@@ -9,7 +9,7 @@ configure_requires:
   Module::Build: '0.4004'
   XS::Parse::Sublike::Builder: '0.15'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,12 +18,12 @@ name: Syntax-Keyword-MultiSub
 provides:
   Syntax::Keyword::MultiSub:
     file: lib/Syntax/Keyword/MultiSub.pm
-    version: '0.04'
+    version: '0.05'
 requires:
   XS::Parse::Sublike: '0.15'
   perl: '5.026'
 resources:
   IRC: irc://irc.perl.org/#io-async
   license: http://dev.perl.org/licenses/
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

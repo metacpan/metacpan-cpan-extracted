@@ -2,7 +2,7 @@ package WWW::Noss::Dir;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '1.08';
+our $VERSION = '1.09';
 
 use Exporter qw(import);
 our @EXPORT_OK = qw(dir);

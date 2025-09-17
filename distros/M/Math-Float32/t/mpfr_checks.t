@@ -177,6 +177,22 @@ for my $p(@powers) {
   }
 }
 
+# Test that Math::MPFR::subnormalize_float32
+# fixes a known double-rounding anomaly.
+# Requires Math-MPFR-4.44 or later.
+
+my $s = '2.10194765e-45';
+my $round = 0; # MPFR_RNDN
+my $mpfr_anom1 = Math::MPFR::Rmpfr_init2(8);
+Math::MPFR::Rmpfr_strtofr($mpfr_anom1, $s, 10, 0); # RNDN
+my $anom1 = Math::Float32->new($s);
+cmp_ok(unpack_flt_hex($anom1), 'eq', '00000001', "direct assignment results in '00000001'");
+cmp_ok(Math::MPFR::unpack_float32($mpfr_anom1, $round), 'eq', '00000002', "indirect assignment results in '00000002'");
+cmp_ok($anom1, '!=', Math::Float32->new("$mpfr_anom1"), "double-checked: values are different");
+my $mpfr_anom2 = Math::MPFR::subnormalize_float32($s);
+cmp_ok(Math::MPFR::unpack_float32($mpfr_anom2, $round), 'eq', '00000001', "Math::MPFR::subnormalize_float32() ok");
+cmp_ok($anom1, '==', Math::Float32->new("$mpfr_anom2"), "double-checked: values are equivalent");
+
 done_testing();
 
 sub SET_EMIN_EMAX {

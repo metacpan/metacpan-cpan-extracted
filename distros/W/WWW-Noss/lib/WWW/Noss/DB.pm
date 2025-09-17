@@ -2,7 +2,7 @@ package WWW::Noss::DB;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '1.08';
+our $VERSION = '1.09';
 
 use List::Util qw(all any max none);
 
@@ -80,7 +80,8 @@ CREATE TABLE IF NOT EXISTS posts (
     published INTEGER,
     updated INTEGER,
     uid TEXT,
-    nossuid TEXT NOT NULL
+    nossuid TEXT NOT NULL,
+    displaytitle TEXT
 );
         }
     );
@@ -95,6 +96,7 @@ FROM pragma_table_info('posts');
         )
     };
 
+    # TODO: Someday, we should be able to get rid of this
     # Pre-1.06 databases do not have nossuid, add it.
     if (none { $_ eq 'nossuid' } @post_cols) {
         $self->{ DB }->do(
@@ -119,6 +121,26 @@ SET
     );
             }
         ); # no concat_ws() in the sqlite version we support :-(
+    }
+
+    # Pre-1.09 databases do not have display title, add it.
+    if (none { $_ eq 'displaytitle' } @post_cols) {
+        $self->{ DB }->do(
+            q{
+ALTER TABLE
+    posts
+ADD COLUMN
+    displaytitle TEXT;
+            }
+        );
+        $self->{ DB }->do(
+            q{
+UPDATE
+    posts
+SET
+    displaytitle = title;
+            }
+        );
     }
 
     $self->{ DB }->do(
@@ -283,7 +305,8 @@ INSERT INTO posts(
     published,
     updated,
     uid,
-    nossuid
+    nossuid,
+    displaytitle
 )
 VALUES (
     (0 + ?),
@@ -297,6 +320,7 @@ VALUES (
     (0 + ?),
     (0 + ?),
     ?,
+    ?,
     ?
 )
 ON CONFLICT (nossuid) DO
@@ -305,8 +329,9 @@ SET
     nossid = excluded.nossid,
     author = excluded.author,
     category = excluded.category,
-    summary = excluded.category,
-    updated = excluded.updated;
+    summary = excluded.summary,
+    updated = excluded.updated,
+    displaytitle = excluded.displaytitle;
         },
     );
 
@@ -333,7 +358,8 @@ SET
             $e->{ published },
             $e->{ updated },
             $e->{ uid },
-            $e->{ nossuid }
+            $e->{ nossuid },
+            $e->{ displaytitle },
         );
     }
 
@@ -520,8 +546,12 @@ sub post {
         ? $feed->name
         : $feed;
 
-    my $postref = $self->{ DB }->selectrow_hashref(
-        q{
+    my $postref;
+
+    if ($post < 0) {
+        my $off = -$post - 1;
+        $postref = $self->{ DB }->selectrow_hashref(
+            qq{
 SELECT
     nossid,
     status,
@@ -534,17 +564,47 @@ SELECT
     published,
     updated,
     uid,
-    nossuid
+    nossuid,
+    displaytitle
+FROM
+    posts
+WHERE
+    feed = ?
+ORDER BY
+    nossid DESC
+LIMIT 1 OFFSET $off;
+            },
+            undef,
+            $feed
+        );
+    } else {
+        $postref = $self->{ DB }->selectrow_hashref(
+            q{
+SELECT
+    nossid,
+    status,
+    feed,
+    title,
+    link,
+    author,
+    category,
+    summary,
+    published,
+    updated,
+    uid,
+    nossuid,
+    displaytitle
 FROM
     posts
 WHERE
     feed = ? AND
     nossid = (0 + ?);
-        },
-        undef,
-        $feed,
-        $post
-    );
+            },
+            undef,
+            $feed,
+            $post
+        );
+    }
 
     return undef unless defined $postref;
 
@@ -580,7 +640,8 @@ SELECT
     published,
     updated,
     uid,
-    nossuid
+    nossuid,
+    displaytitle
 FROM
     posts
 WHERE
@@ -671,7 +732,7 @@ sub look {
     my @wheres;
 
     if (defined $title) {
-        push @wheres, 'title REGEXP ' . $self->{ DB }->quote($title);
+        push @wheres, 'displaytitle REGEXP ' . $self->{ DB }->quote($title);
     }
 
     if (@feeds) {
@@ -702,13 +763,13 @@ sub look {
 
     if ($order eq 'feed') {
         $order_clause = qq{
-feed $asc,
+feed COLLATE NOCASE $asc,
 nossid $asc
         };
     } elsif ($order eq 'title') {
         $order_clause = qq{
-title $asc NULLS $last,
-feed $asc,
+displaytitle COLLATE NOCASE $asc NULLS $last,
+feed COLLATE NOCASE $asc,
 nossid $asc
         };
     } elsif ($order eq 'date') {
@@ -718,7 +779,7 @@ CASE
     WHEN updated IS NOT NULL THEN updated
     ELSE published
 END $asc NULLS $first,
-feed $asc,
+feed COLLATE NOCASE $asc,
 nossid $asc
         };
     } else {
@@ -741,7 +802,8 @@ SELECT
     published,
     updated,
     uid,
-    nossuid
+    nossuid,
+    displaytitle
 FROM
     posts
 $where
@@ -988,22 +1050,24 @@ To commit the deleted feeds, you must also call the C<commit()> method.
 
 Returns the hash ref C<\%post> representing post number C<$post> in feed
 C<$feed>. C<$feed> can be a feed name or a L<WWW::Noss::FeedConfig> object.
+If C<$post> is negative, returns the nth post from the end of the feed.
 
 C<\%post> will look something like this:
 
   {
-    nossid    => ...,
-    status    => ...,
-    feed      => ...,
-    title     => ...,
-    link      => ...,
-    author    => ...,
-    category  => [ ... ],
-    summary   => ...,
-    published => ...,
-    updated   => ...,
-    uid       => ...,
-    nossuid   => ...,
+    nossid       => ...,
+    status       => ...,
+    feed         => ...,
+    title        => ...,
+    link         => ...,
+    author       => ...,
+    category     => [ ... ],
+    summary      => ...,
+    published    => ...,
+    updated      => ...,
+    uid          => ...,
+    nossuid      => ...,
+    displaytitle => ...,
   }
 
 Returns C<undef> if no matching post exists.

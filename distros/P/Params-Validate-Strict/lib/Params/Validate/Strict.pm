@@ -18,11 +18,11 @@ Params::Validate::Strict - Validates a set of parameters against a schema
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =cut
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 =head1 SYNOPSIS
 
@@ -38,7 +38,7 @@ our $VERSION = '0.11';
 
     my $validated_input = validate_strict(schema => $schema, input => $input);
 
-    if (defined $validated_input) {
+    if(defined($validated_input)) {
         print "Example 1: Validation successful!\n";
         print 'Username: ', $validated_input->{username}, "\n";
         print 'Age: ', $validated_input->{age}, "\n";	# It's an integer now
@@ -68,7 +68,7 @@ The keys of the hash are the parameter names, and the values are the parameter v
 
 =back
 
-It takes one optional argument:
+It takes two optional arguments:
 
 =over 4
 
@@ -76,6 +76,10 @@ It takes one optional argument:
 
 This parameter describes what to do when a parameter is given that is not in the schema of valid parameters.
 It must be one of C<die> (the default), C<warn>, or C<ignore>.
+
+=item * C<logger>
+
+A logging object that understands messages such as C<error> and C<warn>.
 
 =back
 
@@ -90,7 +94,9 @@ Valid types are C<string>, C<integer>, C<number>, C<hashref>, C<arrayref>, C<obj
 
 =item * C<can>
 
-The parameter must be an object which understands the method C<can>.
+The parameter must be an object that understands the method C<can>.
+C<can> can be a simple scalar string of a method name,
+or an arrayref of a list of method names, all of which must be supported by the object.
 
 =item * C<isa>
 
@@ -129,6 +135,70 @@ A boolean value indicating whether the parameter is optional.
 If true, the parameter is not required.
 If false or omitted, the parameter is required.
 
+=item * C<default>
+
+Populate missing optional parameters with the specified value.
+Note that this value is not validated.
+
+  username => {
+    type => 'string',
+    optional => 1,
+    default => 'guest'
+  }
+
+=item * C<element_type>
+
+Extends the validation to individual elements of arrays.
+
+  tags => {
+    type => 'arrayref',
+    element_type => 'number',
+    min => 1,	# this the length of array ref, not the min value for each of the numbers, for that, add a C<schema> rule
+    max => 5
+  }
+
+=item * C<error_message>
+
+The custom error message to be used in the event of a validation failure.
+
+  age => {
+    type => 'integer',
+    min => 18,
+    error_message => 'You must be at least 18 years old'
+  }
+
+=item * C<schema>
+
+You can validate nested hashrefs and arrayrefs using the C<schema> property:
+
+    my $schema = {
+        user => {
+            type => 'hashref',
+            schema => {
+                name => { type => 'string' },
+                age => { type => 'integer', min => 0 },
+                hobbies => {
+                    type => 'arrayref',
+                    schema => { type => 'string' }, # Validate each element
+                    min => 1 # At least one hobby
+                }
+            }
+        },
+        metadata => {
+            type => 'hashref',
+            schema => {
+                created => { type => 'string' },
+                tags => {
+                    type => 'arrayref',
+                    schema => {
+                        type => 'string',
+                        matches => qr/^[a-z]+$/
+                    }
+                }
+            }
+        }
+    };
+
 =back
 
 If a parameter is optional and its value is C<undef>,
@@ -145,14 +215,14 @@ If the validation is successful, the function will return a reference to a new h
     # Old style
     validate(@_, {
         name => { type => SCALAR },
-        age  => { type => SCALAR, regex => qr/^\d+$/ }
+        age => { type => SCALAR, regex => qr/^\d+$/ }
     });
 
     # New style
     validate_strict(
         schema => {
             name => 'string',
-            age  => { type => 'integer', min => 0 }
+            age => { type => 'integer', min => 0 }
         },
         args => { @_ }
     );
@@ -178,29 +248,33 @@ sub validate_strict
 	my $schema = $params->{'schema'};
 	my $args = $params->{'args'} || $params->{'input'};
 	my $unknown_parameter_handler = $params->{'unknown_parameter_handler'} || 'die';
+	my $logger = $params->{'logger'};
 
 	# Check if schema and args are references to hashes
 	if(ref($schema) ne 'HASH') {
-		croak 'validate_strict: schema must be a hash reference';
+		_error($logger, 'validate_strict: schema must be a hash reference');
 	}
 
 	if(exists($params->{'args'}) && (!defined($args))) {
 		$args = {};
 	} elsif(ref($args) ne 'HASH') {
-		croak 'validate_strict: args must be a hash reference';
+		_error($logger, 'validate_strict: args must be a hash reference');
 	}
 
 	foreach my $key (keys %{$args}) {
 		if(!exists($schema->{$key})) {
 			if($unknown_parameter_handler eq 'die') {
-				croak(__PACKAGE__, "::validate_strict: Unknown parameter '$key'");
+				_error($logger, "::validate_strict: Unknown parameter '$key'");
 			} elsif($unknown_parameter_handler eq 'warn') {
-				carp(__PACKAGE__, "::validate_strict: Unknown parameter '$key'");
+				_warn($logger, "::validate_strict: Unknown parameter '$key'");
 				next;
 			} elsif($unknown_parameter_handler eq 'ignore') {
+				if($logger) {
+					$logger->debug(__PACKAGE__ . "::validate_strict: Unknown parameter '$key'");
+				}
 				next;
 			} else {
-				croak(__PACKAGE__, "::validate_strict: '$unknown_parameter_handler' unknown_parameter_handler must be one of die, warn, ignore");
+				_error($logger, "::validate_strict: '$unknown_parameter_handler' unknown_parameter_handler must be one of die, warn, ignore");
 			}
 		}
 	}
@@ -223,18 +297,22 @@ sub validate_strict
 		# Handle optional parameters
 		if((ref($rules) eq 'HASH') && $rules->{optional}) {
 			if(!exists($args->{$key})) {
+				if($rules->{'default'}) {
+					# Populate missing optional parameters with the specfied output values
+					$validated_args{$key} = $rules->{'default'};
+				}
 				next;	# optional and missing
 			}
 		} elsif(!exists($args->{$key})) {
 			# The parameter is required
-			croak(__PACKAGE__, "::validate_strict: Required parameter '$key' is missing");
+			_error($logger, "validate_strict: Required parameter '$key' is missing");
 		}
 
 		# Validate based on rules
 		if(ref($rules) eq 'HASH') {
 			if((my $min = $rules->{'min'}) && (my $max = $rules->{'max'})) {
 				if($min > $max) {
-					croak(__PACKAGE__, "::validate_strict($key): min must be <= max ($min > $max)");
+					_error($logger, "validate_strict($key): min must be <= max ($min > $max)");
 				}
 			}
 			foreach my $rule_name (keys %$rules) {
@@ -245,14 +323,29 @@ sub validate_strict
 
 					if($type eq 'string') {
 						if(ref($value)) {
-							croak(__PACKAGE__, "::validate_strict: Parameter '$key' must be a string");
+							if($rules->{'error_message'}) {
+								_error($logger, $rules->{'error_message'});
+							} else {
+								_error($logger, "validate_strict: Parameter '$key' must be a string");
+							}
 						}
-						unless((ref($value) eq '') || (defined($value) && ($value =~ /^.*$/))) { # Allow undef for optional strings
-							croak(__PACKAGE__, "::validate_strict: Parameter '$key' must be a string");
+						unless((ref($value) eq '') || (defined($value) && length($value))) {	# Allow undef for optional strings
+							if($rules->{'error_message'}) {
+								_error($logger, $rules->{'error_message'});
+							} else {
+								_error($logger, "validate_strict: Parameter '$key' must be a string");
+							}
 						}
 					} elsif($type eq 'integer') {
+						if(!defined($value)) {
+							next;	# Skip if string is undefined
+						}
 						if($value !~ /^\s*[+\-]?\d+\s*$/) {
-							croak "validate_strict: Parameter '$key' ($value) must be an integer";
+							if($rules->{'error_message'}) {
+								_error($logger, $rules->{'error_message'});
+							} else {
+								_error($logger, "validate_strict: Parameter '$key' ($value) must be an integer");
+							}
 						}
 						$value = int($value); # Coerce to integer
 					} elsif($type eq 'number') {
@@ -260,28 +353,54 @@ sub validate_strict
 							next;	# Skip if string is undefined
 						}
 						if(!Scalar::Util::looks_like_number($value)) {
-							croak(__PACKAGE__, "::validate_strict: Parameter '$key' must be a number");
+							if($rules->{'error_message'}) {
+								_error($logger, $rules->{'error_message'});
+							} else {
+								_error($logger, "validate_strict: Parameter '$key' must be a number");
+							}
 						}
 						# $value = eval $value; # Coerce to number (be careful with eval)
 						$value = 0 + $value;	# Numeric coercion
 					} elsif($type eq 'arrayref') {
+						if(!defined($value)) {
+							next;	# Skip if arrayref is undefined
+						}
 						if(ref($value) ne 'ARRAY') {
-							croak(__PACKAGE__, "::validate_strict: Parameter '$key' must be an arrayref");
+							if($rules->{'error_message'}) {
+								_error($logger, $rules->{'error_message'});
+							} else {
+								_error($logger, "validate_strict: Parameter '$key' must be an arrayref");
+							}
 						}
 					} elsif($type eq 'hashref') {
+						if(!defined($value)) {
+							next;	# Skip if hashref is undefined
+						}
 						if(ref($value) ne 'HASH') {
-							croak(__PACKAGE__, "::validate_strict: Parameter '$key' must be an hashref");
+							if($rules->{'error_message'}) {
+								_error($logger, $rules->{'error_message'});
+							} else {
+								_error($logger, "validate_strict: Parameter '$key' must be an hashref");
+							}
 						}
 					} elsif($type eq 'coderef') {
 						if(ref($value) ne 'CODE') {
-							croak(__PACKAGE__, "::validate_strict: Parameter '$key' must be a coderef");
+							if($rules->{'error_message'}) {
+								_error($logger, $rules->{'error_message'});
+							} else {
+								_error($logger, "validate_strict: Parameter '$key' must be a coderef");
+							}
 						}
 					} elsif($type eq 'object') {
 						if(!Scalar::Util::blessed($value)) {
-							croak(__PACKAGE__, "::validate_strict: Parameter '$key' must be an object");
+							if($rules->{'error_message'}) {
+								_error($logger, $rules->{'error_message'});
+							} else {
+								_error($logger, "validate_strict: Parameter '$key' must be an object");
+							}
 						}
 					} else {
-						croak "validate_strict: Unknown type '$type'";
+						_error($logger, "validate_strict: Unknown type '$type'");
 					}
 				} elsif($rule_name eq 'min') {
 					if($rules->{'type'} eq 'string') {
@@ -289,31 +408,54 @@ sub validate_strict
 							next;	# Skip if string is undefined
 						}
 						if(length($value) < $rule_value) {
-							croak("validate_strict: String parameter '$key' too short, must be at least length $rule_value");
+							if($rules->{'error_message'}) {
+								_error($logger, $rules->{'error_message'});
+							} else {
+								_error($logger, "validate_strict: String parameter '$key' too short, must be at least length $rule_value");
+							}
 						}
 					} elsif($rules->{'type'} eq 'arrayref') {
 						if(!defined($value)) {
 							next;	# Skip if array is undefined
 						}
+						if(ref($value) ne 'ARRAY') {
+							if($rules->{'error_message'}) {
+								_error($logger, $rules->{'error_message'});
+							} else {
+								_error($logger, "validate_strict: Parameter '$key' must be an arrayref");
+							}
+						}
 						if(scalar(@{$value}) < $rule_value) {
-							croak("validate_strict: Parameter '$key' must be at least length $rule_value");
+							if($rules->{'error_message'}) {
+								_error($logger, $rules->{'error_message'});
+							} else {
+								_error($logger, "validate_strict: Parameter '$key' must be at least length $rule_value");
+							}
 						}
 					} elsif($rules->{'type'} eq 'hashref') {
 						if(!defined($value)) {
 							next;	# Skip if hash is undefined
 						}
 						if(scalar(keys(%{$value})) < $rule_value) {
-							croak("validate_strict: Parameter '$key' must contain at least $rule_value keys");
+							if($rules->{'error_message'}) {
+								_error($logger, $rules->{'error_message'});
+							} else {
+								_error($logger, "validate_strict: Parameter '$key' must contain at least $rule_value keys");
+							}
 						}
 					} elsif(($rules->{'type'} eq 'integer') || ($rules->{'type'} eq 'number')) {
 						if(!defined($value)) {
 							next;	# Skip if hash is undefined
 						}
 						if($value < $rule_value) {
-							croak(__PACKAGE__, "::validate_strict: Parameter '$key' must be at least $rule_value");
+							if($rules->{'error_message'}) {
+								_error($logger, $rules->{'error_message'});
+							} else {
+								_error($logger, "validate_strict: Parameter '$key' must be at least $rule_value");
+							}
 						}
 					} else {
-						croak(__PACKAGE__, "::validate_strict: Parameter '$key' has meaningless min value $rule_value");
+						_error($logger, "validate_strict: Parameter '$key' has meaningless min value $rule_value");
 					}
 				} elsif($rule_name eq 'max') {
 					if($rules->{'type'} eq 'string') {
@@ -321,31 +463,54 @@ sub validate_strict
 							next;	# Skip if string is undefined
 						}
 						if(length($value) > $rule_value) {
-							croak("validate_strict: String parameter '$key' too long, must be no longer than $rule_value");
+							if($rules->{'error_message'}) {
+								_error($logger, $rules->{'error_message'});
+							} else {
+								_error($logger, "validate_strict: String parameter '$key' too long, must be no longer than $rule_value");
+							}
 						}
 					} elsif($rules->{'type'} eq 'arrayref') {
 						if(!defined($value)) {
 							next;	# Skip if string is undefined
 						}
+						if(ref($value) ne 'ARRAY') {
+							if($rules->{'error_message'}) {
+								_error($logger, $rules->{'error_message'});
+							} else {
+								_error($logger, "validate_strict: Parameter '$key' must be an arrayref");
+							}
+						}
 						if(scalar(@{$value}) > $rule_value) {
-							croak("validate_strict: Parameter '$key' must contain no more than $rule_value items");
+							if($rules->{'error_message'}) {
+								_error($logger, $rules->{'error_message'});
+							} else {
+								_error($logger, "validate_strict: Parameter '$key' must contain no more than $rule_value items");
+							}
 						}
 					} elsif($rules->{'type'} eq 'hashref') {
 						if(!defined($value)) {
 							next;	# Skip if hash is undefined
 						}
 						if(scalar(keys(%{$value})) > $rule_value) {
-							croak("validate_strict: Parameter '$key' must contain no more than $rule_value keys");
+							if($rules->{'error_message'}) {
+								_error($logger, $rules->{'error_message'});
+							} else {
+								_error($logger, "validate_strict: Parameter '$key' must contain no more than $rule_value keys");
+							}
 						}
 					} elsif(($rules->{'type'} eq 'integer') || ($rules->{'type'} eq 'number')) {
 						if(!defined($value)) {
 							next;	# Skip if hash is undefined
 						}
 						if($value > $rule_value) {
-							croak(__PACKAGE__, "::validate_strict: Parameter '$key' must be no more than $rule_value");
+							if($rules->{'error_message'}) {
+								_error($logger, $rules->{'error_message'});
+							} else {
+								_error($logger, "validate_strict: Parameter '$key' must be no more than $rule_value");
+							}
 						}
 					} else {
-						croak(__PACKAGE__, "::validate_strict: Parameter '$key' has meaningless max value $rule_value");
+						_error($logger, "validate_strict: Parameter '$key' has meaningless max value $rule_value");
 					}
 				} elsif($rule_name eq 'matches') {
 					if(!defined($value)) {
@@ -355,76 +520,194 @@ sub validate_strict
 						if($rules->{'type'} eq 'arrayref') {
 							my @matches = grep { /$rule_value/ } @{$value};
 							if(scalar(@matches) != scalar(@{$value})) {
-								croak "validate_strict: All members of parameter '$key' [", join(', ', @{$value}), "] must match pattern '$rule_value'";
+								if($rules->{'error_message'}) {
+									_error($logger, $rules->{'error_message'});
+								} else {
+									_error($logger, "validate_strict: All members of parameter '$key' [", join(', ', @{$value}), "] must match pattern '$rule_value'");
+								}
 							}
 						} elsif($value !~ $rule_value) {
-							croak "validate_strict: Parameter '$key' ($value) must match pattern '$rule_value'";
+							if($rules->{'error_message'}) {
+								_error($logger, $rules->{'error_message'});
+							} else {
+								_error($logger, "validate_strict: Parameter '$key' ($value) must match pattern '$rule_value'");
+							}
 						}
 					};
 					if($@) {
-						croak(__PACKAGE__, "::validate_strict: Parameter '$key' invalid regex '$rule_value': $@");
+						_error($logger, "validate_strict: Parameter '$key' invalid regex '$rule_value': $@");
 					}
 				} elsif($rule_name eq 'nomatch') {
 					if($rules->{'type'} eq 'arrayref') {
 						my @matches = grep { /$rule_value/ } @{$value};
 						if(scalar(@matches)) {
-							croak "validate_strict: No member of parameter '$key' [", join(', ', @{$value}), "] must match pattern '$rule_value'";
+							if($rules->{'error_message'}) {
+								_error($logger, $rules->{'error_message'});
+							} else {
+								_error($logger, "validate_strict: No member of parameter '$key' [", join(', ', @{$value}), "] must match pattern '$rule_value'");
+							}
 						}
 					} elsif($value =~ $rule_value) {
-						croak "validate_strict: Parameter '$key' ($value) must not match pattern '$rule_value'";
+						if($rules->{'error_message'}) {
+							_error($logger, $rules->{'error_message'});
+						} else {
+							_error($logger, "validate_strict: Parameter '$key' ($value) must not match pattern '$rule_value'");
+						}
 					}
 				} elsif($rule_name eq 'memberof') {
 					if(ref($rule_value) eq 'ARRAY') {
 						if(($rules->{'type'} eq 'integer') || ($rules->{'type'} eq 'number')) {
 							unless(List::Util::any { $_ == $value } @{$rule_value}) {
-								croak "validate_strict: Parameter '$key' ($value) must be one of ", join(', ', @{$rule_value});
+								if($rules->{'error_message'}) {
+									_error($logger, $rules->{'error_message'});
+								} else {
+									_error($logger, "validate_strict: Parameter '$key' ($value) must be one of ", join(', ', @{$rule_value}));
+								}
 							}
 						} else {
 							unless(List::Util::any { $_ eq $value } @{$rule_value}) {
-								croak "validate_strict: Parameter '$key' ($value) must be one of ", join(', ', @{$rule_value});
+								if($rules->{'error_message'}) {
+									_error($logger, $rules->{'error_message'});
+								} else {
+									_error($logger, "validate_strict: Parameter '$key' ($value) must be one of ", join(', ', @{$rule_value}));
+								}
 							}
 						}
 					} else {
-						croak("validate_strict: Parameter '$key' rule ($rule_value) must be an array reference");
+						if($rules->{'error_message'}) {
+							_error($logger, $rules->{'error_message'});
+						} else {
+							_error($logger, "validate_strict: Parameter '$key' rule ($rule_value) must be an array reference");
+						}
 					}
 				} elsif ($rule_name eq 'callback') {
 					unless (defined &$rule_value) {
-						croak(__PACKAGE__, "::validate_strict: callback for '$key' must be a code reference");
+						_error($logger, "validate_strict: callback for '$key' must be a code reference");
 					}
 					my $res = $rule_value->($value);
 					unless ($res) {
-						croak "validate_strict: Parameter '$key' failed custom validation";
+						if($rules->{'error_message'}) {
+							_error($logger, $rules->{'error_message'});
+						} else {
+							_error($logger, "validate_strict: Parameter '$key' failed custom validation");
+						}
 					}
 				} elsif($rule_name eq 'isa') {
 					if($rules->{'type'} eq 'object') {
 						if(!$value->isa($rule_value)) {
-							croak(__PACKAGE__, "::validate_strict: Parameter '$key' must be a '$rule_value' object");
+							_error($logger, "validate_strict: Parameter '$key' must be a '$rule_value' object");
 						}
 					} else {
-						croak(__PACKAGE__, "::validate_strict: Parameter '$key' has meaningless isa value $rule_value");
+						_error($logger, "validate_strict: Parameter '$key' has meaningless isa value $rule_value");
 					}
 				} elsif($rule_name eq 'can') {
 					if($rules->{'type'} eq 'object') {
-						if(!$value->can($rule_value)) {
-							croak(__PACKAGE__, "::validate_strict: Parameter '$key' must be an object that understands the $rule_value method");
+						if(ref($rule_value) eq 'ARRAY') {
+							# List of methods
+							foreach my $method(@{$rule_value}) {
+								if(!$value->can($method)) {
+									_error($logger, "validate_strict: Parameter '$key' must be an object that understands the $method method");
+								}
+							}
+						} elsif(!ref($rule_value)) {
+							if(!$value->can($rule_value)) {
+								_error($logger, "validate_strict: Parameter '$key' must be an object that understands the $rule_value method");
+							}
+						} else {
+							_error($logger, "validate_strict: 'can' rule for Parameter '$key must be either a scalar or an arrayref");
 						}
 					} else {
-						croak(__PACKAGE__, "::validate_strict: Parameter '$key' has meaningless can value $rule_value");
+						_error($logger, "validate_strict: Parameter '$key' has meaningless can value $rule_value");
+					}
+				} elsif($rule_name eq 'element_type') {
+					if($rules->{'type'} eq 'arrayref') {
+						foreach my $member(@{$value}) {
+							if($rule_value eq 'string') {
+								if(ref($member)) {
+									if($rules->{'error_message'}) {
+										_error($logger, $rules->{'error_message'});
+									} else {
+										_error($logger, "$key can only contain strings");
+									}
+								}
+							} elsif($rule_value eq 'number') {
+								if(ref($member) || ($member =~ /\D/)) {
+									if($rules->{'error_message'}) {
+										_error($logger, $rules->{'error_message'});
+									} else {
+										_error($logger, "$key can only contain numbers");
+									}
+								}
+							}
+						}
+					} else {
+						_error($logger, "validate_strict: Parameter '$key' has meaningless element_type value $rule_value");
 					}
 				} elsif($rule_name eq 'optional') {
 					# Already handled at the beginning of the loop
+				} elsif($rule_name eq 'default') {
+					# Handled earlier
+				} elsif($rule_name eq 'error_message') {
+					# Handled in line
+				} elsif($rule_name eq 'schema') {
+					# Nested schema Run the given schema against each element of the array
+					if($rules->{'type'} eq 'arrayref') {
+						if(ref($value) eq 'ARRAY') {
+							foreach my $member(@{$value}) {
+								validate_strict({ input => { $key => $member }, schema => { $key => $rule_value } });
+							}
+						} else {
+							_error($logger, "validate_strict: Parameter '$value' must be an arrayref");
+						}
+					} elsif($rules->{'type'} eq 'hashref') {
+						if(ref($value) eq 'HASH') {
+							if(scalar keys(%{$value})) {
+								validate_strict({ input => $value, schema => $rule_value });
+							}
+						} else {
+							_error($logger, "validate_strict: Parameter '$value' must be an hashref");
+						}
+					} else {
+						_error($logger, "validate_strict: Parameter '$key': 'schema' only supports arrayref and hashref, not $rules->{type}");
+					}
 				} else {
-					croak "validate_strict: Unknown rule '$rule_name'";
+					_error($logger, "validate_strict: Unknown rule '$rule_name'");
 				}
 			}
 		} elsif(ref($rules)) {
-			croak('rules must be hash reference or string');
+			_error($logger, 'rules must be hash reference or string');
 		}
 
 		$validated_args{$key} = $value;
 	}
 
 	return \%validated_args;
+}
+
+# Helper to log error or croak
+sub _error
+{
+	my $logger = shift;
+	my $message = join('', @_);
+
+	if($logger) {
+		$logger->error(__PACKAGE__, ": $message");
+	} else {
+		croak(__PACKAGE__ . ": $message");
+	}
+}
+
+# Helper to log warning or carp
+sub _warn
+{
+	my $logger = shift;
+	my $message = join('', @_);
+
+	if($logger) {
+		$logger->warn(__PACKAGE__, ": $message");
+	} else {
+		carp(__PACKAGE__ . ": $message");
+	}
 }
 
 =head1 AUTHOR
@@ -481,6 +764,8 @@ Nigel Horne, C<< <njh at nigelhorne.com> >>
 =head1 SEE ALSO
 
 =over 4
+
+=item * Test coverage report: L<https://nigelhorne.github.io/Params-Validate-Strict/coverage/>
 
 =item * L<Params::Get>
 

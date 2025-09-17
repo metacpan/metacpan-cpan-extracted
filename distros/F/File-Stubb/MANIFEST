@@ -9,14 +9,12 @@ examples/pl.stubb
 lib/File/Stubb.pm
 lib/File/Stubb/Home.pm
 lib/File/Stubb/Render.pm
-lib/File/Stubb/SubstTie.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
 README.md
 t/01_init.t
 t/10_render.t
-t/20_subst-tie.t
 t/30_home.t
 t/40_stubb.t
 t/data/templates/basic.stubb

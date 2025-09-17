@@ -4,7 +4,6 @@ use strict;
 use warnings;
 
 use Test::Most;
-use Test::Exception;
 use Scalar::Util qw(blessed);
 
 BEGIN { use_ok('Params::Validate::Strict', qw(validate_strict)) }
@@ -35,6 +34,8 @@ subtest 'Type coercion edge cases' => sub {
 		int_field => { type => 'integer', optional => 1 },
 		num_field => { type => 'number', optional => 1 },
 	};
+
+	lives_ok { validate_strict(schema => $schema, args => undef) };
 
 	# Integer edge cases
 	for my $test_case (
@@ -420,14 +421,35 @@ subtest 'Object validation' => sub {
 			schema => {obj => {type => 'object', can => 'test_method'}},
 			args => {obj => $obj}
 		);
-	} 'Object with required method accepted';
+	} 'Object with required method as scalar accepted';
+
+	lives_ok {
+		validate_strict(
+			schema => {obj => { 'type' => 'object', can => ['test_method'] } },
+			args => {obj => $obj}
+		);
+	} 'Object with required method as arrayref accepted';
 
 	throws_ok {
 		validate_strict(
 			schema => {obj => {type => 'object', can => 'nonexistent_method'}},
 			args => {obj => $obj}
 		);
-	} qr/must be an object that understands/, 'Object without required method rejected';
+	} qr/must be an object that understands/, 'Object without required method as scalar rejected';
+
+	throws_ok {
+		validate_strict(
+			schema => {obj => {type => 'object', can => ['test_method', 'nonexistent_method'] } },
+			args => {obj => $obj}
+		);
+	} qr/must be an object that understands/, 'Object without required method in arrayref rejected';
+
+	throws_ok {
+		validate_strict(
+			schema => { 'obj' => { 'type' => 'object', can => {} } },
+			args => {obj => $obj}
+		);
+	} qr/must be either a scalar or an arrayref/, 'Errors when passed hashref to can';
 
 	# Invalid ISA/CAN usage
 	throws_ok {

@@ -1,13 +1,28 @@
 package EBook::Ishmael::Decode;
 use 5.016;
-our $VERSION = '1.08';
 use strict;
 use warnings;
+our $VERSION;
 
-use Exporter 'import';
-our @EXPORT_OK = qw(lz77_decode);
+use Exporter qw(import);
+our @EXPORT_OK = qw(palmdoc_decode);
 
-sub lz77_decode {
+use XSLoader;
+
+my $CAN_XS = 0;
+
+my $decode_sub;
+
+BEGIN {
+    $VERSION = '1.09';
+    $CAN_XS = eval { XSLoader::load('EBook::Ishmael', $VERSION) };
+    $decode_sub = $CAN_XS ? \&xs_palmdoc_decode : \&pp_palmdoc_decode;
+}
+
+sub palmdoc_decode { $decode_sub->(@_); }
+
+# https://wiki.mobileread.com/wiki/PalmDOC#PalmDoc_byte_pair_compression
+sub pp_palmdoc_decode {
 
     my $encode = shift;
 
@@ -57,9 +72,9 @@ EBook::Ishmael::Decode - Ebook decoding routines
 
 =head1 SYNOPSIS
 
-  use App::Ishmael::Decode qw(lz77_decode);
+  use App::Ishmael::Decode qw(palmdoc_decode);
 
-  my $decode = lz77_decode($data);
+  my $decode = palmdoc_decode($data);
 
 =head1 DESCRIPTION
 
@@ -71,7 +86,7 @@ should consult its manual (this is developer documentation).
 
 B<EBook::Ishmael::Decode> does not export any subroutines by default.
 
-=head2 $d = lz77_decode($data)
+=head2 $d = palmdoc_decode($data)
 
 Decodes PalmDoc lz77-encoded C<$data>, returning the decoded data.
 

@@ -4,7 +4,7 @@ Params::Validate::Strict - Validates a set of parameters against a schema
 
 # VERSION
 
-Version 0.11
+Version 0.12
 
 # SYNOPSIS
 
@@ -20,7 +20,7 @@ Version 0.11
 
     my $validated_input = validate_strict(schema => $schema, input => $input);
 
-    if (defined $validated_input) {
+    if(defined($validated_input)) {
         print "Example 1: Validation successful!\n";
         print 'Username: ', $validated_input->{username}, "\n";
         print 'Age: ', $validated_input->{age}, "\n";   # It's an integer now
@@ -46,12 +46,16 @@ This function takes two mandatory arguments:
     A reference to a hash containing the parameters to be validated.
     The keys of the hash are the parameter names, and the values are the parameter values.
 
-It takes one optional argument:
+It takes two optional arguments:
 
 - `unknown_parameter_handler`
 
     This parameter describes what to do when a parameter is given that is not in the schema of valid parameters.
     It must be one of `die` (the default), `warn`, or `ignore`.
+
+- `logger`
+
+    A logging object that understands messages such as `error` and `warn`.
 
 The schema can define the following rules for each parameter:
 
@@ -62,7 +66,9 @@ The schema can define the following rules for each parameter:
 
 - `can`
 
-    The parameter must be an object which understands the method `can`.
+    The parameter must be an object that understands the method `can`.
+    `can` can be a simple scalar string of a method name,
+    or an arrayref of a list of method names, all of which must be supported by the object.
 
 - `isa`
 
@@ -101,6 +107,70 @@ The schema can define the following rules for each parameter:
     If true, the parameter is not required.
     If false or omitted, the parameter is required.
 
+- `default`
+
+    Populate missing optional parameters with the specified value.
+    Note that this value is not validated.
+
+        username => {
+          type => 'string',
+          optional => 1,
+          default => 'guest'
+        }
+
+- `element_type`
+
+    Extends the validation to individual elements of arrays.
+
+        tags => {
+          type => 'arrayref',
+          element_type => 'number',
+          min => 1,   # this the length of array ref, not the min value for each of the numbers, for that, add a C<schema> rule
+          max => 5
+        }
+
+- `error_message`
+
+    The custom error message to be used in the event of a validation failure.
+
+        age => {
+          type => 'integer',
+          min => 18,
+          error_message => 'You must be at least 18 years old'
+        }
+
+- `schema`
+
+    You can validate nested hashrefs and arrayrefs using the `schema` property:
+
+        my $schema = {
+            user => {
+                type => 'hashref',
+                schema => {
+                    name => { type => 'string' },
+                    age => { type => 'integer', min => 0 },
+                    hobbies => {
+                        type => 'arrayref',
+                        schema => { type => 'string' }, # Validate each element
+                        min => 1 # At least one hobby
+                    }
+                }
+            },
+            metadata => {
+                type => 'hashref',
+                schema => {
+                    created => { type => 'string' },
+                    tags => {
+                        type => 'arrayref',
+                        schema => {
+                            type => 'string',
+                            matches => qr/^[a-z]+$/
+                        }
+                    }
+                }
+            }
+        };
+
 If a parameter is optional and its value is `undef`,
 validation will be skipped for that parameter.
 
@@ -115,14 +185,14 @@ If the validation is successful, the function will return a reference to a new h
     # Old style
     validate(@_, {
         name => { type => SCALAR },
-        age  => { type => SCALAR, regex => qr/^\d+$/ }
+        age => { type => SCALAR, regex => qr/^\d+$/ }
     });
 
     # New style
     validate_strict(
         schema => {
             name => 'string',
-            age  => { type => 'integer', min => 0 }
+            age => { type => 'integer', min => 0 }
         },
         args => { @_ }
     );
@@ -190,6 +260,7 @@ Nigel Horne, `<njh at nigelhorne.com>`
 
 # SEE ALSO
 
+- Test coverage report: [https://nigelhorne.github.io/Params-Validate-Strict/coverage/](https://nigelhorne.github.io/Params-Validate-Strict/coverage/)
 - [Params::Get](https://metacpan.org/pod/Params%3A%3AGet)
 - [Params::Validate](https://metacpan.org/pod/Params%3A%3AValidate)
 - [Return::Set](https://metacpan.org/pod/Return%3A%3ASet)

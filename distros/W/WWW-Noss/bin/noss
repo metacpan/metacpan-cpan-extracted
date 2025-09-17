@@ -342,6 +342,13 @@ last update. This option should be used with caution, as performing
 unconditional downloads is wasteful on feed servers and considered bad
 practice.
 
+=item B<--hard>
+
+Force B<noss> to do a hard update on the updated feeds. A hard update means that
+B<noss> will delete all of a feed's previous data prior to updating, meaning
+data like the read/unread status of a post are lost. This option implies
+C<--unconditional>.
+
 =item B<--limit-rate>=I<speed>
 
 Specify the maximum transfer rate for downloads. Speeds are measured in
@@ -385,7 +392,17 @@ Reload cached feeds. Useful for when you make changes to a feed's configuration
 and want B<noss> to recognize the changes. If no feeds are specified, reloads
 all cached feeds.
 
-B<reload> has no unique options.
+B<reload> has the following options:
+
+=over 4
+
+=item B<--hard>
+
+Forces B<noss> to do a hard reload on the updated feeds. A hard reload means
+that B<noss> will delete a feed's data prior to performing the reload, resulting
+in data like posts' read/unread statuses are lost.
+
+=back
 
 =head2 read
 
@@ -393,6 +410,8 @@ B<reload> has no unique options.
 
 Read the specified post's contents from the specified feed via a pager. If no
 specific post is provided, the latest unread post in the feed is selected.
+A negative post ID can be specified to look for a post relative to end of the
+feed instead of the beginning.
 
 B<read> has the following options:
 
@@ -540,7 +559,9 @@ This command has the same options as the C<read> command.
   noss open <feed> <post>
   noss open <feed>
 
-Open the URL of the specified feed or post in a web browser.
+Open the URL of the specified feed or post in a web browser. Like with the
+C<read> and C<cat> commands, a negative post ID can be specified to look for a
+post relative to the end of a feed.
 
 C<open> has the following options:
 

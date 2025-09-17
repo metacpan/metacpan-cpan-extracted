@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021-2023 -- leonerd@leonerd.org.uk
 
-package Syntax::Keyword::MultiSub 0.04;
+package Syntax::Keyword::MultiSub 0.05;
 
 use v5.14;
 use warnings;

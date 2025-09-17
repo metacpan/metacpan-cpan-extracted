@@ -2,9 +2,10 @@ package WWW::Noss::FeedReader::Atom;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '1.08';
+our $VERSION = '1.09';
 
-use WWW::Noss::TextToHtml qw(text2html);
+use WWW::Noss::FeedReader::MediaRSS qw(parse_media_node);
+use WWW::Noss::TextToHtml qw(text2html unescape_html strip_tags);
 use WWW::Noss::Timestamp;
 
 our $NS = 'http://www.w3.org/2005/Atom';
@@ -61,6 +62,26 @@ sub _time {
 
 }
 
+sub _title {
+
+    my ($node) = @_;
+
+    my ($title, $display);
+    $title = $node->textContent;
+    my $type = $node->getAttribute('type') // 'text';
+    if ($type eq 'html') {
+        $display = unescape_html(strip_tags($title));
+    } else {
+        $display = $title;
+    }
+
+    $display =~ s/\s+/ /g;
+    $display =~ s/^\s+|\s+$//g;
+
+    return wantarray ? ($title, $display) : $display;
+
+}
+
 sub _content {
 
     my ($node) = @_;
@@ -70,7 +91,9 @@ sub _content {
 
     if ($type eq 'text') {
         return text2html($node->textContent);
-    } elsif ($type eq 'html' or $type eq 'xhtml') {
+    } elsif ($type eq 'html') {
+        return $node->textContent;
+    } elsif ($type eq 'xhtml') {
         return join '', map { $_->toString } $node->childNodes;
     } elsif (defined $src) {
         return undef;
@@ -90,8 +113,10 @@ sub _summary {
 
     my $type = $node->getAttribute('type') // 'text';
 
-    if ($type =~ /^x?html$/) {
+    if ($type eq 'html') {
         return $node->textContent;
+    } elsif ($type eq 'xhtml') {
+        return join '', map { $_->toString } $node->childNodes;
     } elsif ($type eq 'text') {
         return text2html($node->textContent);
     } else {
@@ -124,10 +149,19 @@ sub _read_entry {
 
         my $name = $n->nodeName;
 
-        if ($name eq 'id') {
+        if ($name =~ /^media:/) {
+            my $c = parse_media_node($n);
+            for my $k (keys %$c) {
+                if (ref $c->{ $k } eq 'ARRAY') {
+                    push @{ $entry->{ $k } }, @{ $c->{ $k } };
+                } else {
+                    $entry->{ $k } //= $c->{ $k };
+                }
+            }
+        } elsif ($name eq 'id') {
             $entry->{ uid } = $n->textContent;
         } elsif ($name eq 'title') {
-            $entry->{ title } = $n->textContent;
+            @{ $entry }{ qw(title displaytitle) } = _title($n);
         } elsif ($name eq 'updated') {
             $entry->{ updated } = _time($n);
         } elsif ($name eq 'author') {
@@ -191,7 +225,7 @@ sub read_feed {
         if ($name eq 'entry') {
             push @entry_nodes, $n;
         } elsif ($name eq 'title') {
-            $channel->{ title } = $n->textContent;
+            $channel->{ title } = _title($n);
         } elsif ($name eq 'link') {
             $channel->{ link } = _link($n);
         } elsif ($name eq 'updated') {

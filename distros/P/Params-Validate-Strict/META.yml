@@ -1,9 +1,16 @@
 ---
 abstract: 'Validates a set of parameters against a schema'
 author:
-  - 'Nigel Horne <njh@bandsman.co.uk>'
+  - 'Nigel Horne <njh@nigelhorne.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  File::Glob: '0'
+  File::Slurp: '0'
+  File::stat: '0'
+  IPC::System::Simple: '0'
+  JSON::MaybeXS: '0'
+  POSIX: '0'
+  Readonly: '0'
   Test::Compile: '0'
   Test::DescribeMe: '0'
   Test::Most: '0'
@@ -29,6 +36,11 @@ requires:
   List::Util: '0'
   Params::Get: '0.13'
   Scalar::Util: '0'
-resources: {}
-version: '0.11'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Params-Validate-Strict
+  homepage: https://metacpan.org/pod/Params::Validate::Strict
+  repository: git://github.com/nigelhorne/Params-Validate-Strict.git
+version: '0.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

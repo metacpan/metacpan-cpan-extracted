@@ -1,0 +1,11 @@
+include/Log.c
+include/Log.h
+lib/XS/Log.pm
+Log.h
+Log.xs
+Makefile.PL
+MANIFEST			This list of files
+t/00base.t
+XS-Log-5.09.tar.gz
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -104,7 +104,7 @@ By default, max-delay is 7200 seconds (or 2 hours).
 
 As super user:
 
-  [root@deploy-host ~]# wget -N -P /usr/local/bin https://metacpan.org/dist/Git-Server/source/git-deploy
+  [root@deploy-host ~]# wget -N -P /usr/local/bin https://raw.githubusercontent.com/hookbot/git-server/master/git-deploy
   [root@deploy-host ~]# chmod 755 /usr/local/bin/git-deploy
   [root@deploy-host ~]#
 
@@ -132,7 +132,7 @@ use FindBin qw($Script $Bin);
 use Getopt::Long qw(GetOptions);
 use Fcntl qw(LOCK_EX LOCK_NB);
 
-our $VERSION = "0.032";
+our $VERSION = "0.033";
 
 my @invoked = ($0, @ARGV);
 my $cwd = getcwd();

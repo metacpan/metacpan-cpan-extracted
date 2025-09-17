@@ -1,5 +1,12 @@
 Revision history for Params-Validate-Strict
 
+0.12	Tue Sep 16 16:25:18 EDT 2025
+	Support the logger argument
+	Remove unneeded regex
+	Allow 'can' to take a list of methods as arrayref
+	Added the default and error_message and schema options
+	Added array element validation for nested validation
+
 0.11	Tue Aug 26 15:02:00 EDT 2025
 	args can now also be input, to be used with Return::Set which takes output
 	Matches and nomatch now works on arrayrefs, checking each member of the array

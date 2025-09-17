@@ -38,8 +38,8 @@ DLSRC = dl_dlopen.xs
 EXE_EXT = 
 FULL_AR = /usr/bin/ar
 LD = cc
-LDDLFLAGS =  -bundle -undefined dynamic_lookup
-LDFLAGS =  
+LDDLFLAGS =  -bundle -undefined dynamic_lookup -fstack-protector-strong
+LDFLAGS =  -fstack-protector-strong
 LIBC = 
 LIB_EXT = .a
 OBJ_EXT = .o
@@ -59,11 +59,11 @@ DIRFILESEP = /
 DFSEP = $(DIRFILESEP)
 NAME = SmsAero
 NAME_SYM = SmsAero
-VERSION = 3.0.0
+VERSION = 3.1.0
 VERSION_MACRO = VERSION
-VERSION_SYM = 3_0_0
+VERSION_SYM = 3_1_0
 DEFINE_VERSION = -D$(VERSION_MACRO)=\"$(VERSION)\"
-XS_VERSION = 3.0.0
+XS_VERSION = 3.1.0
 XS_VERSION_MACRO = XS_VERSION
 XS_DEFINE_VERSION = -D$(XS_VERSION_MACRO)=\"$(XS_VERSION)\"
 INST_ARCHLIB = blib/arch
@@ -262,7 +262,7 @@ RCS_LABEL = rcs -Nv$(VERSION_SYM): -q
 DIST_CP = best
 DIST_DEFAULT = tardist
 DISTNAME = SmsAero
-DISTVNAME = SmsAero-3.0.0
+DISTVNAME = SmsAero-3.1.0
 
 
 # --- MakeMaker macro section:
@@ -518,7 +518,7 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '  URI::Escape: '\''0'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) 'resources:' >> META_new.yml
 	$(NOECHO) $(ECHO) '  repository: https://github.com/smsaero/smsaero_perl' >> META_new.yml
-	$(NOECHO) $(ECHO) 'version: v3.0.0' >> META_new.yml
+	$(NOECHO) $(ECHO) 'version: v3.1.0' >> META_new.yml
 	$(NOECHO) $(ECHO) 'x_serialization_backend: '\''CPAN::Meta::YAML version 0.018'\''' >> META_new.yml
 	-$(NOECHO) $(MV) META_new.yml $(DISTVNAME)/META.yml
 	$(NOECHO) $(ECHO) Generating META.json
@@ -577,7 +577,7 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '         "url" : "https://github.com/smsaero/smsaero_perl"' >> META_new.json
 	$(NOECHO) $(ECHO) '      }' >> META_new.json
 	$(NOECHO) $(ECHO) '   },' >> META_new.json
-	$(NOECHO) $(ECHO) '   "version" : "v3.0.0",' >> META_new.json
+	$(NOECHO) $(ECHO) '   "version" : "v3.1.0",' >> META_new.json
 	$(NOECHO) $(ECHO) '   "x_serialization_backend" : "JSON::PP version 4.06"' >> META_new.json
 	$(NOECHO) $(ECHO) '}' >> META_new.json
 	-$(NOECHO) $(MV) META_new.json $(DISTVNAME)/META.json
@@ -881,7 +881,7 @@ testdb_static test_static :: subdirs-test_static
 # --- MakeMaker ppd section:
 # Creates a PPD (Perl Package Description) for a binary distribution.
 ppd :
-	$(NOECHO) $(ECHO) '<SOFTPKG NAME="SmsAero" VERSION="3.0.0">' > SmsAero.ppd
+	$(NOECHO) $(ECHO) '<SOFTPKG NAME="SmsAero" VERSION="3.1.0">' > SmsAero.ppd
 	$(NOECHO) $(ECHO) '    <ABSTRACT>Send SMS via smsaero.ru</ABSTRACT>' >> SmsAero.ppd
 	$(NOECHO) $(ECHO) '    <AUTHOR>SmsAero &lt;admin@smsaero.ru&gt;</AUTHOR>' >> SmsAero.ppd
 	$(NOECHO) $(ECHO) '    <IMPLEMENTATION>' >> SmsAero.ppd

@@ -13,7 +13,7 @@
 
 name:      perl-Git-Server
 summary:   Git-Server - Secure Git Server with more granular hooks capabilities than default git.
-version:   0.032
+version:   0.033
 release:   1
 vendor:    Rob Brown <bbb@cpan.org>
 packager:  Arix International <cpan2rpm@arix.com>
@@ -24,7 +24,7 @@ buildroot: %{_tmppath}/%{name}-%{version}-%(id -u -n)
 buildarch: noarch
 prefix:    %(echo %{_prefix})
 requires:  strace
-source:    Git-Server-0.032.tar.gz
+source:    Git-Server-0.033.tar.gz
 
 %description
 This is intented to be a drop-in replacement for any standard git server,
@@ -85,7 +85,7 @@ find %{buildroot}%{_prefix}             \
 
 %{__perl} -MFile::Find -le '
     find({ wanted => \&wanted, no_chdir => 1}, "%{buildroot}");
-    print "%doc  Changes INSTALL.md TODO.md README.md LICENSE hooks";
+    print "%doc  INSTALL.md LICENSE TODO.md Changes README.md hooks";
     for my $x (sort @dirs, @files) {
         push @ret, $x unless indirs($x);
         }

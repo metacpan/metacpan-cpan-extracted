@@ -76,14 +76,11 @@ cause the repos to become out of sync, so it may not
 be the best long-term solution to use the proxy feature.
 
 C. Or if you already have the project checked out locally
-on this server, then you can just copy its ".git" folder:
+on this server, then switch it to bare:
 
 ```
-[git@gitsrvhost ~]$ cp -a /tmp/ProjX/.git ~/ProjX
-[git@gitsrvhost ~]$ cd ProjX
-[git@gitsrvhost ProjX]$ git remote rm origin
-[git@gitsrvhost ProjX]$ git config --local --replace-all core.bare true
-[git@gitsrvhost ProjX]$ cd
+[git@gitsrvhost ~]$ git clone --bare /tmp/ProjX ~/ProjX
+[git@gitsrvhost ~]$ rm -rfv /tmp/ProjX
 [git@gitsrvhost ~]$
 ```
 
@@ -157,7 +154,7 @@ Receiving[...]
 To use the "git-client" wrapper for improved "-o" support and .gitconfig overrides:
 
 ```
-[admin@devbox ~]$ sudo wget -N -P /usr/local/bin https://metacpan.org/dist/Git-Server/source/git-client
+[admin@devbox ~]$ sudo wget -N -P /usr/local/bin https://raw.githubusercontent.com/hookbot/git-server/master/git-client
 [admin@devbox ~]$ sudo chmod 755 /usr/local/bin/git-client
 [admin@devbox ~]$ sudo ln -s -v git-client /usr/local/bin/git
 [admin@devbox ~]$
@@ -339,7 +336,7 @@ PUSH NOTIFICATION INSTANT DEPLOY
 1. Install git-deploy on the deploy host:
 
 ```
-[admin@deploy-host ~]$ sudo wget -N -P /usr/local/bin https://metacpan.org/dist/Git-Server/source/git-deploy
+[admin@deploy-host ~]$ sudo wget -N -P /usr/local/bin https://raw.githubusercontent.com/hookbot/git-server/master/git-deploy
 [admin@deploy-host ~]$ sudo chmod 755 /usr/local/bin/git-deploy
 [admin@deploy-host ~]$
 ```

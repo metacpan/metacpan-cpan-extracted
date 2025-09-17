@@ -12,7 +12,7 @@ my $HTML = File::Spec->catfile(qw/t data lynx.html/);
 
 qx/lynx -version 2>&1/;
 
-if ($? == -1) {
+if ($? != 0) {
     plan skip_all => 'lynx not installed';
 }
 

@@ -53,6 +53,6 @@
          "url" : "https://github.com/smsaero/smsaero_perl"
       }
    },
-   "version" : "v3.0.0",
+   "version" : "v3.1.0",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

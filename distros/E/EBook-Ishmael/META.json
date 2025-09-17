@@ -41,10 +41,11 @@
             "File::Spec" : "0",
             "File::Temp" : "0.10",
             "File::Which" : "0",
-            "JSON" : "0",
+            "JSON::PP" : "0",
             "List::Util" : "0",
             "MIME::Base64" : "0",
             "XML::LibXML" : "1.70",
+            "XSLoader" : "0",
             "perl" : "5.016"
          }
       },
@@ -68,6 +69,6 @@
          "web" : "https://codeberg.org/1-1sam/ishmael"
       }
    },
-   "version" : "1.08",
+   "version" : "1.09",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

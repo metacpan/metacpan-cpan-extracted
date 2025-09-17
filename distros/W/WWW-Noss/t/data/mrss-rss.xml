@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:media="http://search.yahoo.com/mrss/">
+<channel>
+    <item>
+        <title>Test post #1</title>
+        <link>https://phonysite.com/r1</link>
+        <description>A text description.</description>
+        <author>samyoung12788 at gmail dot com (Samuel Young)</author>
+        <media:group>
+            <media:title>Test post #1</media:title>
+            <media:description>A text description</media:description>
+            <media:keywords>test, sample, phony</media:keywords>
+            <media:content url="https://phonysite.com/r1"/>
+        </media:group>
+        <guid>r1</guid>
+        <pubDate>Sun, 15 Jun 2025 20:12:20 +0000</pubDate>
+    </item>
+    <item>
+        <author>samyoung12788 at gmail dot com (Samuel Young)</author>
+        <media:content url="https://phonysite.com/r2">
+            <media:title>Test post #2</media:title>
+            <media:description type="html">&lt;p&gt;An HTML description.&lt;/p&gt;</media:description>
+            <media:keywords>tset, elpmas, ynohp</media:keywords>
+        </media:content>
+        <category>test</category>
+        <category>sample</category>
+        <category>phony</category>
+        <guid>r2</guid>
+        <pubDate>Sun, 15 Jun 2025 20:13:13 +0000</pubDate>
+    </item>
+    <item>
+        <media:content url="https://phonysite.com/r3"/>
+        <media:title type="html">&lt;p&gt;Test post #3&lt;/p&gt;</media:title>
+        <media:description type="plain">Another text description.</media:description>
+        <author>samyoung12788 at gmail dot com (Samuel Young)</author>
+        <category>test</category>
+        <category>sample</category>
+        <category>phony</category>
+        <guid>r3</guid>
+        <pubDate>Sun, 15 Jun 2025 20:15:57 +0000</pubDate>
+    </item>
+</channel>
+</rss>

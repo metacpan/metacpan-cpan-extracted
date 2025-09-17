@@ -1,5 +1,8 @@
 Revision history for Database-Abstraction
 
+0.32	Tue Sep 16 08:26:41 EDT 2025
+	Fix fast track return in selectall_arrayref
+
 0.31	Mon Sep 15 20:15:00 EDT 2025
 	Call sth->finish() when needed
 	selectall_arrayref was setting an extra level of reference

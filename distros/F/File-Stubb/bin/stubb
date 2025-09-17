@@ -101,9 +101,10 @@ C<eval>ed Perl code.
 
 Substitution parameters can be accessed via the topic hash variable (C<%_>) in
 the code. C<%_> will be set to a hash of target names as keys and their
-substituted text as values. The C<%_> hash is also special in that it does
-not return C<undef> if a target does not exist, it instead returns an empty
-string, which should hopefully make writing safe Perl a little simpler.
+substituted text as values.
+
+By default, the Perl code will be evaluated with L<strict> and L<warnings>
+disabled.
 
 Because this uses an unprotected C<eval>, it is possible to modify some of
 B<stubb>'s internal data structures through the evaluated code, and cause
@@ -114,6 +115,9 @@ breakages. Don't do that.
 
   # $_{ name } can be set via -s "name => ...", otherwise is an empty string.
   My name is $^^uc $_{ name }^^
+
+These targets will be left alone if B<stubb> is ran in restricted mode (the
+C<-R> option).
 
 =item B<#^^ I<shell code> ^^>
 
@@ -130,6 +134,9 @@ variables.
 
   # $number can be set via -s "numer => ..." on POSIX shells.
   My favorite number is #^^printf "%x" "$number"^^
+
+These targets will be left alone if B<stubb> is ran in restricted mode (the
+C<-R> option).
 
 =item B<\?^^ I<target> ^^>
 
@@ -255,6 +262,11 @@ Enable/disable the following of symlinks in template directories. If disabled,
 B<stubb> will create new symlinks in the stub directory that point to paths that
 are determined from performing text substitution on the targets of the original
 template symlinks. Default behavior is to just follow symlinks.
+
+=item B<-R>|B<--restricted>
+
+Disable the rendering of Perl and shell targets, so that you do not have to
+worry about a render running unwanted code on your system.
 
 =item B<-U>|B<--no-defaults>
 

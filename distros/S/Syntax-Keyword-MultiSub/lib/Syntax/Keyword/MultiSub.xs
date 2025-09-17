@@ -13,6 +13,10 @@
 
 #include "newOP_CUSTOM.c.inc"
 
+#if HAVE_PERL_VERSION(5, 43, 3)
+#  define HAVE_OP_MULTIPARAM
+#endif
+
 struct MultiSubOption {
   int args_min, args_max;
   CV *cv;
@@ -146,19 +150,30 @@ redo:
         args_max = aux[0].iv;
         args_min = args_max - aux[1].iv;
 #endif
-        if(slurpy) {
-          if(final_is_slurpy)
-            croak("Already have a slurpy function body for multi sub %" SVf, name);
+        if(slurpy)
           args_max = -1;
-        }
         goto done;
       }
+
+#ifdef HAVE_OP_MULTIPARAM
+      case OP_MULTIPARAM: {
+        struct op_multiparam_aux *aux = (struct op_multiparam_aux *)cUNOP_AUXo->op_aux;
+        args_min = aux->min_args;
+        args_max = aux->n_positional;
+        if(aux->slurpy)
+          args_max = -1;
+        goto done;
+      }
+#endif
 
       default:
         croak("TODO: Unsure how to find argcheck op within %s", PL_op_name[o->op_type]);
     }
   }
 done: ;
+
+  if(final_is_slurpy && args_max == -1)
+    croak("Already have a slurpy function body for multi sub %" SVf, name);
 
   IV noptions = av_count(optionsav);
   IV optioni;

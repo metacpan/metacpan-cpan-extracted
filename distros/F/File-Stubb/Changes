@@ -1,5 +1,14 @@
 Revision history for stubb (File::Stubb)
 
+0.04  Sep 16 2025
+  - Overhauled template rendering code.
+  - Fix rendering '!' targets.
+  - Add -R|--restricted option. Disable the rendering of Perl and shell targets
+    in a template.
+  - Perl targets are substituted with strict and warnings disabled.
+  - The %_ hash in Perl targets is not tied to a special hash anymore. However,
+    its behavior should be same now that strict and warnings are disabled.
+
 0.03  Jul 04 2025
   - When perform shell rendering, the substitution environment is applied on
     top of the running environment instead of replacing it.

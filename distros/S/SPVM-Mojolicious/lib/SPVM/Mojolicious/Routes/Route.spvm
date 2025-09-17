@@ -111,17 +111,13 @@ class Mojolicious::Routes::Route {
   ;
   
   has methods : rw string[]
-    get {
-      unless (exists $self->{methods}) {
-        $self->{methods} = new string[0];
-      }
-      
-      return $self->{methods};
-    }
-    set ($_ : object of string|string[]) {
+    set ($_ : string|string[]) {
       
       my $methods = (string[])undef;
-      if ($_ isa string) {
+      if (!$_) {
+        # undef
+      }
+      elsif ($_ isa string) {
         $methods = [(string)$_];
       }
       elsif ($_ isa string[]) {
@@ -131,8 +127,10 @@ class Mojolicious::Routes::Route {
         die "The methods field value must be a string, a string array.";
       }
       
-      for (my $i = 0; $i < @$methods; $i++) {
-        $methods->[$i] = Fn->lc($methods->[$i]);
+      if ($methods) {
+        for (my $i = 0; $i < @$methods; $i++) {
+          $methods->[$i] = Fn->uc($methods->[$i]);
+        }
       }
       
       $self->{methods} = $methods;
@@ -423,7 +421,7 @@ class Mojolicious::Routes::Route {
     return Fn->join("", $pattern_unparseds_list->to_array);
   }
   
-  private method _generate_route : Mojolicious::Routes::Route ($methods : object of string|string[], $args : object...) {
+  private method _generate_route : Mojolicious::Routes::Route ($methods : string|string[], $args : object...) {
     
     my $conditions = Hash->new;
     

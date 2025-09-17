@@ -10,6 +10,7 @@ use WWW::Noss::FeedConfig;
 use WWW::Noss::FeedReader qw(read_feed);
 
 my $RSS = File::Spec->catfile(qw/t data rss.xml/);
+my $MRSS = File::Spec->catfile(qw/t data mrss-rss.xml/);
 
 my $feed = WWW::Noss::FeedConfig->new(
     name => 'feed',
@@ -67,6 +68,7 @@ subtest 'RSS entries ok' => sub {
         is_deeply($e->{ category }, [ qw(test sample phony) ], 'category ok');
         is($e->{ uid }, 'r1', 'uid ok');
         is($e->{ published }, 1750018340, 'published ok');
+        is($e->{ displaytitle }, 'Test post #1', 'displaytitle ok');
 
     };
 
@@ -85,6 +87,7 @@ subtest 'RSS entries ok' => sub {
         is_deeply($e->{ category }, [ qw(test sample phony) ], 'category ok');
         is($e->{ uid }, 'r2', 'uid ok');
         is($e->{ published }, 1750018393, 'published ok');
+        is($e->{ displaytitle }, 'Test post #2', 'displaytitle ok');
 
     };
 
@@ -103,8 +106,68 @@ subtest 'RSS entries ok' => sub {
         is_deeply($e->{ category }, [ qw(test sample phony) ], 'category ok');
         is($e->{ uid }, 'r3', 'uid ok');
         is($e->{ published }, 1750018557, 'published ok');
+        is($e->{ displaytitle }, 'Test post #3', 'displaytitle ok');
     };
 
+};
+
+$feed = WWW::Noss::FeedConfig->new(
+    name => 'feed',
+    feed => 'https://phonysite.com',
+    path => $MRSS,
+);
+
+($channel, $entries) = read_feed($feed);
+
+subtest 'MRSS ok' => sub {
+
+    subtest 'entry 1 ok' => sub {
+        my $e = $entries->[0];
+        is($e->{ title }, 'Test post #1', 'title ok');
+        is($e->{ link }, 'https://phonysite.com/r1', 'link ok');
+        is($e->{ summary }, 'A text description.', 'summary ok');
+        is(
+            $e->{ author },
+            'samyoung12788 at gmail dot com (Samuel Young)',
+            'author ok'
+        );
+        is_deeply($e->{ category }, [ qw(phony sample test) ], 'category ok');
+        is($e->{ uid }, 'r1', 'uid ok');
+        is($e->{ published }, 1750018340, 'published ok');
+        is($e->{ displaytitle }, 'Test post #1', 'displaytitle ok');
+    };
+
+    subtest 'entry 2 ok' => sub {
+        my $e = $entries->[1];
+        is($e->{ title }, 'Test post #2', 'title ok');
+        is($e->{ link }, 'https://phonysite.com/r2', 'link ok');
+        is($e->{ summary }, '<p>An HTML description.</p>', 'summary ok');
+        is(
+            $e->{ author },
+            'samyoung12788 at gmail dot com (Samuel Young)',
+            'author ok'
+        );
+        is_deeply($e->{ category }, [ qw(elpmas tset ynohp test sample phony) ], 'category ok');
+        is($e->{ uid }, 'r2', 'uid ok');
+        is($e->{ published }, 1750018393, 'published ok');
+        is($e->{ displaytitle }, 'Test post #2', 'displaytitle ok');
+    };
+
+    subtest 'entry 3 ok' => sub {
+        my $e = $entries->[2];
+        is($e->{ title }, '<p>Test post #3</p>', 'title ok');
+        is($e->{ link }, 'https://phonysite.com/r3', 'link ok');
+        like($e->{ summary }, qr{<p>Another text description.</p>}, 'summary ok');
+        is(
+            $e->{ author },
+            'samyoung12788 at gmail dot com (Samuel Young)',
+            'author ok'
+        );
+        is_deeply($e->{ category }, [ qw(test sample phony) ], 'category ok');
+        is($e->{ uid }, 'r3', 'uid ok');
+        is($e->{ published }, 1750018557, 'published ok');
+        is($e->{ displaytitle }, 'Test post #3', 'displaytitle ok');
+    };
 };
 
 done_testing;

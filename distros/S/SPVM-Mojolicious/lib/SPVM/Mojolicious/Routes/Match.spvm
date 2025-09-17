@@ -5,33 +5,40 @@ class Mojolicious::Routes::Match {
   version_from Mojolicious;
   
   use Mojolicious::Controller;
+  use Mojolicious::Routes;
+  use Mojolicious::Routes::Route;
   
   # Fields
   has root : rw Mojolicious::Routes;
   
-  has endpoint : rw Mojolicious::Routes;
+  has endpoint : rw Mojolicious::Routes::Route;
   
   has position : int;
   
-  has stack : virtual rw object[]
+  has stack : virtual rw Hash[]
     
     get {
-      return $self->stack_list->to_array;
+      return (Hash[])$self->stack_list->to_array;
     }
     set {
       $self->set_stack_list(List->new($_));
     }
   ;
   
-  has stack_list : rw List
+  has stack_list : rw List of Hash
     get {
       unless (exists $self->{stack_list}) {
-        $self->{stack_list} = List->new;
+        $self->{stack_list} = List->new(new Hash[0]);
       }
       
       return $self->{stack_list};
     }
   ;
+  
+  # Undocumented Fields
+  has captures : Hash;
+  
+  has conditions : Hash;
   
   # Class Methods
   static method new : Mojolicious::Routes::Match () {
@@ -46,24 +53,30 @@ class Mojolicious::Routes::Match {
     $self->_match($self->root, $c, $options);
   }
   
-  method path_for : Hash ($arg1 : object, $arg2 : object = undef) {
-
-=pod
-
-    my $name = (string)undef;
-    if ($arg1 isa string) {
-      $name = (string)$arg1;
-      $arg1 = $arg2;
-    }
+  static method _hash_merge : void ($self : Hash, $hash : Hash) {
     
-    my $values = (object[])undef;
-    if ($arg1 isa object[]) {
-      $values = (object[])$arg1;
+    for my $key (@{$hash->keys}) {
+      my $value = $hash->get($key);
+      $self->set($key, $value);
     }
+  }
+  
+  static method _hash_merge_options : void ($self : Hash, $options : object[]) {
+    
+    my $hash = Hash->new($options);
+    
+    &_hash_merge($self, $hash);
+  }
+  
+  method path_for : Hash ($args : object...) {
+    
+    my $_ = Mojo::Util->_options($args);
+    my $name = (string)$_->[0];
+    my $values = Hash->new((object[])$_->[1]);
     
     # Current route
-    my $route = undef;
-    my $current) = !$name || $name eq "current";
+    my $route = (Mojolicious::Routes::Route)undef;
+    my $current = !$name || $name eq "current";
     
     if ($current) {
       unless ($route = $self->endpoint) {
@@ -79,76 +92,123 @@ class Mojolicious::Routes::Match {
     }
     
     # Merge values (clear format)
-    my $captures    = $self->stack->[-1] // {};
-    my %merged      = (%$captures, format => undef, %values);
+    my $stack_list = $self->stack_list;
+    my $captures = (Hash)undef;
+    if ($stack_list->length > 0) {
+      $captures = (Hash)$stack_list->get($stack_list->length - 1) // Hash->new;
+    }
+    else {
+      $captures = Hash->new;
+    }
+    
+    my $merged = Hash->new;
+    &_hash_merge($merged, $captures);
+    &_hash_merge_options($merged, {format => undef});
+    &_hash_merge($merged, $values);
+    
     my $pattern     = $route->pattern;
     my $constraints = $pattern->constraints;
-    $merged{format} = ($current ? $captures->{format} : undef) // $pattern->defaults->{format}
-      if !exists $values{format} && $constraints->{format} && $constraints->{format} ne '1';
     
-    return {path => $route->render(\%merged), websocket => $route->has_websocket};
-
-=cut
-
+    if (!$values->exists("format") && $constraints->get("format") && $constraints->get("format")->(string) ne "1") {
+      $merged->set("format", ($current ? $captures->get("format") : undef) // $pattern->defaults->get("format"));
+    }
+    
+    return Hash->new({path => $route->render($merged), websocket => $route->has_websocket});
   }
   
-  private method _match : void ($r : Mojolicious::Routes, $c : Mojolicious::Controller, $options : Hash) {
+  private method _match : int ($r : Mojolicious::Routes::Route, $c : Mojolicious::Controller, $options : Hash) {
     
-=pod
-
+    my $path_save = $options->get("path")->(string);
+    
     # Pattern
-    my $path    = $options->{path};
+    my $path = $path_save;
     my $partial = $r->partial;
     my $detect  = (my $endpoint = $r->is_endpoint) && !$partial;
-    return undef unless my $captures = $r->pattern->match_partial(\$path, $detect);
-    local $options->{path} = $path;
-    local @{$self->{captures} //= {}}{keys %$captures} = values %$captures;
+    my $captures = $r->pattern->match_partial(my $_ = [$path], $detect);
+    $path = $_->[0];
+    unless ($captures) {
+      return 0;
+    }
+    
+    $self->{captures} //= Hash->new;
+    my $captures_save = $self->{captures}->clone;
+    
+    Fn->defer([$options : Hash, $path_save : string, $captures_save : Hash] method : void () {
+      $options->set("path" => $path_save);
+      $options->set("captures" => $captures_save);
+    });
+    
+    $options->set(path => $path);
+    
+    for my $key (@{$captures->keys}) {
+      my $value = $captures->get($key);
+      $self->{captures}->set($key => $value);
+    }
+    
     $captures = $self->{captures};
-
+    
     # Method
     my $methods = $r->methods;
-    return undef if $methods && !grep { $_ eq $options->{method} } @$methods;
-
+    
+    if ($methods && !@{Fn->grep([$options : Hash]method : int ($_ : string) { $_ eq $options->get("method")->(string); }, $methods)}) {
+      return 0;
+    }
+    
     # Conditions
     if (my $over = $r->requires) {
-      my $conditions = $self->{conditions} ||= $self->root->conditions;
-      for (my $i = 0; $i < @$over; $i += 2) {
-        return undef unless my $condition = $conditions->{$over->[$i]};
-        return undef if !$condition->($r, $c, $captures, $over->[$i + 1]);
+      my $conditions = $self->{conditions} //= $self->root->conditions;
+      for my $key (@{$over->keys}) {
+        my $condition = (Mojolicious::Routes::Callback::Condition)$conditions->get($key);
+        unless ($condition) {
+          return 0;
+        }
+        if (!$condition->($r, $c, $captures, $over->get($key))) {
+          return 0;
+        }
       }
     }
-
+    
     # WebSocket
-    return undef if $r->is_websocket && !$options->{websocket};
-
+    if ($r->is_websocket && !$options->get_int("websocket")) {
+      return 0;
+    }
+    
     # Partial
-    my $empty = !length $path || $path eq '/';
+    my $empty = !length $path || $path eq "/";
     if ($partial) {
-      $captures->{path} = $path;
-      $self->endpoint($r);
+      $captures->set(path => $path);
+      $self->set_endpoint($r);
       $empty = 1;
     }
-
+    
     # Endpoint (or intermediate destination)
     if (($endpoint && $empty) || $r->inline) {
-      push @{$self->stack}, {%$captures};
+      $self->stack_list->push($captures->clone);
       if ($endpoint && $empty) {
-        my $format = $captures->{format};
-        if ($format) { $_->{format} = $format for @{$self->stack} }
-        return !!$self->endpoint($r);
+        my $format = $captures->get_string("format");
+        if ($format) {
+          for (my $i = 0; $i = $self->stack_list->length; $i++) {
+            my $captures = (Hash)$self->stack_list->get($i);
+            $captures->set(format => $format);
+          }
+        }
+        
+        $self->set_endpoint($r);
+        
+        return 1;
       }
-      delete @$captures{qw(app cb)};
+      $captures->delete("app");
+      $captures->delete("cb");
     }
-
+    
     # Match children
-    my $snapshot = $r->parent ? [@{$self->stack}] : [];
+    my $snapshot = $r->parent ? $self->stack_list->clone : List->new(new Hash[0]);
     for my $child (@{$r->children}) {
-      return 1 if $self->_match($child, $c, $options);
-      $self->stack([@$snapshot]);
+      if ($self->_match($child, $c, $options)) {
+        return 1;
+      }
+      $self->set_stack_list($snapshot);
     }
-
-=cut
-
   }
 
 }

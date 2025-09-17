@@ -4,6 +4,8 @@ Makefile.PL
 Float32.pm
 Float32.pod
 Float32.xs
+t/basic.t
+t/bin2hex.t
 t/inf.t
 t/mpfr_checks.t
 t/new.t
@@ -11,6 +13,7 @@ t/next.t
 t/overload_arith.t
 t/overload_cmp.t
 t/subnormal.t
+t/unpack.t
 README
 typemap
 META.yml                                 Module YAML meta-data (added by MakeMaker)

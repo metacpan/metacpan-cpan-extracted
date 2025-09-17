@@ -1,5 +1,29 @@
 Revision history for noss (WWW::Noss)
 
+1.09  Sep 16 2025
+  - Add support for MRSS (MediaRSS) feeds, like those used by YouTube.
+  - Added ability to specify a negative post ID in open, read, cat, and post
+    commands. This allows you to look for a post relative to the end of the
+    feed (-1 corresponds to the last post, -2 to the 2nd to last, etc).
+  - 'list --sort ...' now does alphabetical sorting case-insensitively.
+  - Add --hard option to update and reload commands: Hard reload a feed by
+    deleting it prior to reloading it into noss's database.
+  - For posts that have no title but have a description, noss generates a title
+    from the post's description. If a post has no description, its link is used
+    instead.
+  - Properly read HTML titles in Atom feeds.
+  - Post and feed titles now have whitespace trimmed and truncated.
+  - Fix bug where updating an existing post would replace its contents with
+    its category JSON.
+  - Fix bug introduced in 1.05 that messed up how noss processed Atom HTML post
+    entries.
+  - Fix feeds not being updated with the update command if their cached feed
+    file is deleted.
+  - Consider it an error if a feed was fetched without error but the respective
+    feed file does not exist.
+  - Fix lynx tests on Windows.
+  - Fix formatting code error message.
+
 1.08  Aug 30 2025
   - noss now has its own mascot and logo.
   - Use date of the latest post as the updated date for an Atom feed if it

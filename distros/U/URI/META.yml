@@ -28,166 +28,169 @@ no_index:
 provides:
   URI:
     file: lib/URI.pm
-    version: '5.32'
+    version: '5.33'
   URI::Escape:
     file: lib/URI/Escape.pm
-    version: '5.32'
+    version: '5.33'
   URI::Heuristic:
     file: lib/URI/Heuristic.pm
-    version: '5.32'
+    version: '5.33'
   URI::IRI:
     file: lib/URI/IRI.pm
-    version: '5.32'
+    version: '5.33'
   URI::QueryParam:
     file: lib/URI/QueryParam.pm
-    version: '5.32'
+    version: '5.33'
   URI::Split:
     file: lib/URI/Split.pm
-    version: '5.32'
+    version: '5.33'
   URI::URL:
     file: lib/URI/URL.pm
-    version: '5.32'
+    version: '5.33'
   URI::WithBase:
     file: lib/URI/WithBase.pm
-    version: '5.32'
+    version: '5.33'
   URI::data:
     file: lib/URI/data.pm
-    version: '5.32'
+    version: '5.33'
   URI::file:
     file: lib/URI/file.pm
-    version: '5.32'
+    version: '5.33'
   URI::file::Base:
     file: lib/URI/file/Base.pm
-    version: '5.32'
+    version: '5.33'
   URI::file::FAT:
     file: lib/URI/file/FAT.pm
-    version: '5.32'
+    version: '5.33'
   URI::file::Mac:
     file: lib/URI/file/Mac.pm
-    version: '5.32'
+    version: '5.33'
   URI::file::OS2:
     file: lib/URI/file/OS2.pm
-    version: '5.32'
+    version: '5.33'
   URI::file::QNX:
     file: lib/URI/file/QNX.pm
-    version: '5.32'
+    version: '5.33'
   URI::file::Unix:
     file: lib/URI/file/Unix.pm
-    version: '5.32'
+    version: '5.33'
   URI::file::Win32:
     file: lib/URI/file/Win32.pm
-    version: '5.32'
+    version: '5.33'
   URI::ftp:
     file: lib/URI/ftp.pm
-    version: '5.32'
+    version: '5.33'
   URI::ftpes:
     file: lib/URI/ftpes.pm
-    version: '5.32'
+    version: '5.33'
   URI::ftps:
     file: lib/URI/ftps.pm
-    version: '5.32'
+    version: '5.33'
   URI::geo:
     file: lib/URI/geo.pm
-    version: '5.32'
+    version: '5.33'
   URI::gopher:
     file: lib/URI/gopher.pm
-    version: '5.32'
+    version: '5.33'
   URI::http:
     file: lib/URI/http.pm
-    version: '5.32'
+    version: '5.33'
   URI::https:
     file: lib/URI/https.pm
-    version: '5.32'
+    version: '5.33'
   URI::icap:
     file: lib/URI/icap.pm
-    version: '5.32'
+    version: '5.33'
   URI::icaps:
     file: lib/URI/icaps.pm
-    version: '5.32'
+    version: '5.33'
   URI::irc:
     file: lib/URI/irc.pm
-    version: '5.32'
+    version: '5.33'
   URI::ircs:
     file: lib/URI/ircs.pm
-    version: '5.32'
+    version: '5.33'
   URI::ldap:
     file: lib/URI/ldap.pm
-    version: '5.32'
+    version: '5.33'
   URI::ldapi:
     file: lib/URI/ldapi.pm
-    version: '5.32'
+    version: '5.33'
   URI::ldaps:
     file: lib/URI/ldaps.pm
-    version: '5.32'
+    version: '5.33'
   URI::mailto:
     file: lib/URI/mailto.pm
-    version: '5.32'
+    version: '5.33'
   URI::mms:
     file: lib/URI/mms.pm
-    version: '5.32'
+    version: '5.33'
   URI::news:
     file: lib/URI/news.pm
-    version: '5.32'
+    version: '5.33'
   URI::nntp:
     file: lib/URI/nntp.pm
-    version: '5.32'
+    version: '5.33'
   URI::nntps:
     file: lib/URI/nntps.pm
-    version: '5.32'
+    version: '5.33'
   URI::otpauth:
     file: lib/URI/otpauth.pm
-    version: '5.32'
+    version: '5.33'
   URI::pop:
     file: lib/URI/pop.pm
-    version: '5.32'
+    version: '5.33'
   URI::rlogin:
     file: lib/URI/rlogin.pm
-    version: '5.32'
+    version: '5.33'
   URI::rsync:
     file: lib/URI/rsync.pm
-    version: '5.32'
+    version: '5.33'
   URI::rtsp:
     file: lib/URI/rtsp.pm
-    version: '5.32'
+    version: '5.33'
   URI::rtspu:
     file: lib/URI/rtspu.pm
-    version: '5.32'
+    version: '5.33'
   URI::scp:
     file: lib/URI/scp.pm
-    version: '5.32'
+    version: '5.33'
   URI::sftp:
     file: lib/URI/sftp.pm
-    version: '5.32'
+    version: '5.33'
   URI::sip:
     file: lib/URI/sip.pm
-    version: '5.32'
+    version: '5.33'
   URI::sips:
     file: lib/URI/sips.pm
-    version: '5.32'
+    version: '5.33'
   URI::smb:
     file: lib/URI/smb.pm
-    version: '5.32'
+    version: '5.33'
+  URI::smtp:
+    file: lib/URI/smtp.pm
+    version: '5.33'
   URI::snews:
     file: lib/URI/snews.pm
-    version: '5.32'
+    version: '5.33'
   URI::ssh:
     file: lib/URI/ssh.pm
-    version: '5.32'
+    version: '5.33'
   URI::telnet:
     file: lib/URI/telnet.pm
-    version: '5.32'
+    version: '5.33'
   URI::tn3270:
     file: lib/URI/tn3270.pm
-    version: '5.32'
+    version: '5.33'
   URI::urn:
     file: lib/URI/urn.pm
-    version: '5.32'
+    version: '5.33'
   URI::urn::isbn:
     file: lib/URI/urn/isbn.pm
-    version: '5.32'
+    version: '5.33'
   URI::urn::oid:
     file: lib/URI/urn/oid.pm
-    version: '5.32'
+    version: '5.33'
 requires:
   Carp: '0'
   Cwd: '0'
@@ -212,7 +215,7 @@ resources:
   bugtracker: https://github.com/libwww-perl/URI/issues
   homepage: https://github.com/libwww-perl/URI
   repository: https://github.com/libwww-perl/URI.git
-version: '5.32'
+version: '5.33'
 x_Dist_Zilla:
   perl:
     version: '5.040000'
@@ -413,6 +416,7 @@ x_Dist_Zilla:
             - UNC
             - authdomain
             - cryptographic
+            - earhart
             - etype
             - evalue
             - hotp
@@ -544,7 +548,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v5.32
+          tag: v5.33
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -658,8 +662,8 @@ x_Dist_Zilla:
     version: '6.032'
 x_contributors:
   - 'Gisle Aas <gisle@aas.no>'
-  - 'Karen Etheridge <ether@cpan.org>'
   - 'Olaf Alders <olaf@wundersolutions.com>'
+  - 'Karen Etheridge <ether@cpan.org>'
   - 'Julien Fiegehenn <simbabque@cpan.org>'
   - 'Chase Whitener <capoeirab@cpan.org>'
   - 'Ville Skyttä <ville.skytta@iki.fi>'
@@ -667,10 +671,10 @@ x_contributors:
   - 'David Dick <ddick@cpan.org>'
   - 'Mark Stosberg <mark@stosberg.com>'
   - 'Graham Knop <haarg@haarg.org>'
+  - 'dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>'
   - 'Michael G. Schwern <schwern@pobox.com>'
   - 'Shoichi Kaji <skaji@cpan.org>'
   - 'Branislav Zahradník <happy.barney@gmail.com>'
-  - 'dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>'
   - 'Perlbotics <perlbotix@cpan.org>'
   - 'Jacques Deguest <jack@deguest.jp>'
   - 'James Raspass <jraspass@gmail.com>'

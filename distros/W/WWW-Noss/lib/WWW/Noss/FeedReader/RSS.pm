@@ -2,9 +2,24 @@ package WWW::Noss::FeedReader::RSS;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '1.08';
+our $VERSION = '1.09';
 
+use WWW::Noss::FeedReader::MediaRSS qw(parse_media_node);
 use WWW::Noss::Timestamp;
+
+sub _title {
+
+    my ($node) = @_;
+
+    my ($title, $display);
+    $title = $node->textContent;
+    $display = $title;
+    $display =~ s/\s+/ /g;
+    $display =~ s/^\s+|\s+$//g;
+
+    return wantarray ? ($title, $display) : $title;
+
+}
 
 sub _time {
 
@@ -61,8 +76,17 @@ sub _read_entry {
 
         my $name = $n->nodeName;
 
-        if ($name eq 'title') {
-            $entry->{ title } = $n->textContent;
+        if ($name =~ /^media:/) {
+            my $c = parse_media_node($n);
+            for my $k (keys %$c) {
+                if (ref $c->{ $k } eq 'ARRAY') {
+                    push @{ $entry->{ $k } }, @{ $c->{ $k } };
+                } else {
+                    $entry->{ $k } //= $c->{ $k };
+                }
+            }
+        } elsif ($name eq 'title') {
+            @{ $entry }{ qw(title displaytitle) } = _title($n);
         } elsif ($name eq 'link') {
             $entry->{ link } = $n->textContent;
         } elsif ($name eq 'description') {
@@ -126,7 +150,7 @@ sub read_feed {
         if ($name eq 'item') {
             push @entry_nodes, $n;
         } elsif ($name eq 'title') {
-            $channel->{ title } = $n->textContent;
+            $channel->{ title } = _title($n);
         } elsif ($name eq 'link') {
             $channel->{ link } = $n->textContent;
         } elsif ($name eq 'description') {

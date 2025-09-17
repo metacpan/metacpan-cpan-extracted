@@ -2,13 +2,49 @@ package WWW::Noss::FeedReader;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '1.08';
+our $VERSION = '1.09';
 
 use Exporter qw(import);
 our @EXPORT_OK = qw(read_feed);
 
 use WWW::Noss::FeedReader::Atom;
 use WWW::Noss::FeedReader::RSS;
+use WWW::Noss::TextToHtml qw(strip_tags unescape_html);
+
+# TODO: How to handle relative feed links? (like GingerBill's /article/)
+
+# What is with difference between 'title' and 'displaytitle'?
+# Prior to 1.09, there was only title, which served as both the title to use
+# for internally identifying a post by using it in a post's nossuid, and
+# also the title to show the user when querying posts. The issue is that if I
+# ever wanted to change the way noss processed certain titles, this would
+# interfere with generating posts' nossuids and cause them to be considered
+# new posts. That is why I introduced displaytitle, so that it could serve
+# as the human-readable version of a post's title which could be safely
+# changed without causing issues for existing databases.
+#
+# So basically:
+# title - Internal title used by noss for generating nossuids; should not
+#         change.
+# displaytitle - Title that will be shown to users; can be changed.
+
+sub _title_from_desc {
+
+    my ($desc) = @_;
+
+    return '' if not defined $desc;
+
+    $desc = unescape_html(strip_tags($desc));
+    $desc =~ s/\s+/ /g;
+    $desc =~ s/^\s+|\s+$//g;
+    my $long = length $desc > 40;
+    $desc = substr $desc, 0, 40;
+    $desc =~ s/ $//;
+    $desc .= '...' if $long;
+
+    return $desc;
+
+}
 
 sub read_feed {
 
@@ -46,7 +82,14 @@ sub read_feed {
     }
 
     for my $i (0 .. $#$entries) {
-        unless ($feed->title_ok($entries->[$i]{ title })) {
+        if (not defined $entries->[$i]{ displaytitle }) {
+            if (defined $entries->[$i]{ summary }) {
+                $entries->[$i]{ displaytitle } = _title_from_desc($entries->[$i]{ summary });
+            } elsif (defined $entries->[$i]{ link }) {
+                $entries->[$i]{ displaytitle } = $entries->[$i]{ link };
+            }
+        }
+        unless ($feed->title_ok($entries->[$i]{ displaytitle })) {
             $entries->[$i] = undef;
             next;
         }
@@ -133,17 +176,18 @@ C<\%channel> should look something like this:
 C<\@entries> will be a list of hash refs that look something like this:
 
   {
-    nossid    => ...,
-    status    => ...,
-    feed      => ...,
-    title     => ...,
-    link      => ...,
-    author    => ...,
-    category  => [ ... ],
-    summary   => ...,
-    published => ...,
-    updated   => ...,
-    uid       => ...,
+    nossid       => ...,
+    status       => ...,
+    feed         => ...,
+    title        => ...,
+    link         => ...,
+    author       => ...,
+    category     => [ ... ],
+    summary      => ...,
+    published    => ...,
+    updated      => ...,
+    uid          => ...,
+    displaytitle => ...,
   }
 
 =back

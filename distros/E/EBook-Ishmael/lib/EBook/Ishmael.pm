@@ -1,6 +1,6 @@
 package EBook::Ishmael;
 use 5.016;
-our $VERSION = '1.08';
+our $VERSION = '1.09';
 use strict;
 use warnings;
 
@@ -9,9 +9,9 @@ use File::Basename;
 use File::Path qw(remove_tree);
 use File::Temp qw(tempfile);
 use Getopt::Long;
+use JSON::PP;
 use List::Util qw(max);
 
-use JSON;
 use XML::LibXML;
 
 use EBook::Ishmael::EBook;
@@ -329,7 +329,8 @@ sub meta_json {
         }
     }
 
-    say { $oh } to_json($meta, { utf8 => 1,  pretty => 1, canonical => 1 });
+    my $json = JSON::PP->new->utf8->pretty->canonical;
+    print { $oh } $json->encode($meta);
 
     close $oh unless $self->{Output} eq $STDOUT;
 

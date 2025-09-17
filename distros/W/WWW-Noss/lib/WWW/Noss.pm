@@ -2,7 +2,7 @@ package WWW::Noss;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '1.08';
+our $VERSION = '1.09';
 
 use Cwd;
 use Getopt::Long qw(GetOptionsFromArray);
@@ -30,6 +30,7 @@ my $PRGNAM = 'noss';
 my $PRGVER = $VERSION;
 
 # TODO: Command to view unread post information? (what feeds are unread, how many unread, etc.)
+# TODO: It would be cool if we could somehow add ANSI colors...
 
 my %COMMANDS = (
     'update'   => \&update,
@@ -66,15 +67,13 @@ my %VALID_SORTS = map { $_ => 1 } qw(
 my $Z_FMT = '%c';
 my $Z_UNK = strftime($Z_FMT, localtime 0) =~ s/\w/?/gr;
 
-my $MARK = "\x{fffe}";
-
 my $RATE_RX = qr/^\d+[kmg]?$/i;
 
 my %POST_FMT_CODES = (
     '%' => sub { '%' },
     'f' => sub { $_[0]->{ feed     } },
     'i' => sub { $_[0]->{ nossid   } },
-    't' => sub { $_[0]->{ title    } // ''},
+    't' => sub { $_[0]->{ displaytitle } // ''},
     'u' => sub { $_[0]->{ link     } // 'N/A' },
     'a' => sub { $_[0]->{ author   } // 'N/A' },
     'c' => sub { join ', ', @{ $_[0]->{ category } } },
@@ -805,24 +804,15 @@ sub _fmt {
 
     my @subs;
 
-    for my $m ($fmt =~ m/(%(?:-?\d+)?.)/g) {
-
-        my $c = chop $m;
-
+    $fmt =~ s{%((?:-?\d+)?.)}{
+        my $code = $1;
+        my $c = chop $code;
         unless (exists $codes->{ $c }) {
-            die "'$m$c' is not a valid list formatting code\n";
+            die "'%$code$c' is not a valid formatting code\n";
         }
-
-        # Add $MARK so that subsequent substitutions don't interfere with this
-        # one.
-        my $subst = $m . $MARK . 's';
-
-        $fmt =~ s/\Q$m$c\E/$subst/;
         push @subs, $codes->{ $c };
-
-    }
-
-    $fmt =~ s/$MARK//g;
+        '%' . $code . 's';
+    }ge;
 
     return sub { sprintf $fmt, map { $_->($_[0]) } @subs };
 
@@ -897,9 +887,9 @@ sub _get_feed {
             proxy => $self->{ Proxy },
             proxy_user => $self->{ ProxyUser },
             (
-                !$self->{ Unconditional }
+                !$self->{ Unconditional } && -f $feed->path
                 ? (
-                    time_cond => (-f $feed->path ? $feed->path : undef),
+                    time_cond => $feed->path,
                     etag_compare => (-s $feed->etag ? $feed->etag : undef),
                 )
                 : ()
@@ -921,6 +911,11 @@ sub update {
     my ($self) = @_;
 
     require Parallel::ForkManager;
+
+    # --hard implies --unconditional
+    if ($self->{ HardReload }) {
+        $self->{ Unconditional } = 1;
+    }
 
     my @updates;
 
@@ -981,8 +976,8 @@ sub update {
 
         eval { $self->_get_feed($feed) };
 
-        if ($@ ne '') {
-            my $e = $@;
+        if ($@ ne '' or not -f $feed->path) {
+            my $e = $@ || 'unknown error';
             chomp $e;
             warn sprintf "Failed to fetch %s: %s\n", $feed->feed, $e;
         } else {
@@ -991,7 +986,11 @@ sub update {
             $changed = $newmod != $oldmod;
         }
 
-        $pm->finish(0, $changed ? \$name : undef);
+        if ($self->{ HardReload }) {
+            $pm->finish(0, \$name);
+        } else {
+            $pm->finish(0, $changed ? \$name : undef);
+        }
 
     }
 
@@ -1002,6 +1001,9 @@ sub update {
     for my $c (@change) {
 
         my $new = eval {
+            if ($self->{ HardReload }) {
+                $self->{ DB }->del_feeds($c);
+            }
             $self->{ DB }->load_feed($self->{ Feeds }{ $c });
         };
 
@@ -1075,6 +1077,9 @@ sub reload {
     for my $r (@reloads) {
 
         my $new = eval {
+            if ($self->{ HardReload }) {
+                $self->{ DB }->del_feeds($r);
+            }
             $self->{ DB }->load_feed($self->{ Feeds }{ $r });
         };
 
@@ -1126,6 +1131,9 @@ sub read_post {
     my $post;
 
     if (defined $id) {
+        if ($id !~ /^-?\d+$/) {
+            die "Post ID must be an integar\n";
+        }
         $post = $self->{ DB }->post($feed_name, $id);
         unless (defined $post) {
             die "'$feed_name:$id' does not exist\n";
@@ -1211,6 +1219,7 @@ sub open_post {
 
     my $id = shift @{ $self->{ Args } };
 
+    my $post;
     my $url;
 
     if (not defined $id) {
@@ -1223,7 +1232,10 @@ sub open_post {
             die "$feed_name does not have a homepage URL\n";
         }
     } else {
-        my $post = $self->{ DB }->post($feed_name, $id);
+        if ($id !~ /^-?\d+$/) {
+            die "Post ID must be an integar\n";
+        }
+        $post = $self->{ DB }->post($feed_name, $id);
         if (not defined $post) {
             die "'$feed_name:$id' does not exist\n";
         }
@@ -1240,7 +1252,7 @@ sub open_post {
     }
 
     if (defined $id and not $self->{ NoMark }) {
-        $self->{ DB }->mark('read', $feed_name, $id)
+        $self->{ DB }->mark('read', $feed_name, $post->{ nossid })
             or die "Failed to mark '$feed_name:$id' as read";
         $self->{ DB }->commit;
     }
@@ -1406,7 +1418,7 @@ sub post {
         die "'$feed' is not the name of a feed\n";
     }
 
-    unless ($id =~ /^\d+$/) {
+    unless ($id =~ /^-?\d+$/) {
         die "Post ID must be an integar\n";
     }
 
@@ -1706,7 +1718,7 @@ sub init {
 
     my $self = {
         Cmd           => undef,
-        Args          => undef,
+        Args          => [],
         DataDir       => undef,
         FeedDir       => undef,
         EtagDir       => undef,
@@ -1728,6 +1740,7 @@ sub init {
         Timeout       => undef,
         Proxy         => undef,
         ProxyUser     => undef,
+        HardReload    => 0, # reload, too
         # read
         Pager         => undef,
         NoMark        => 0, # open, too
@@ -1760,6 +1773,7 @@ sub init {
     };
 
     Getopt::Long::config('bundling');
+    Getopt::Long::config('pass_through');
     GetOptionsFromArray(\@argv,
         'config|c=s'      => \$self->{ ConfFile },
         'data|D=s'        => \$self->{ DataDir },
@@ -1785,6 +1799,7 @@ sub init {
         'timeout=f'       => \$self->{ Timeout },
         'proxy=s'         => \$self->{ Proxy },
         'proxy-user=s'    => \$self->{ ProxyUser },
+        'hard'            => \$self->{ HardReload },
         # read
         'pager=s'         => \$self->{ Pager },
         'no-mark'         => \$self->{ NoMark }, # open, too
@@ -1817,17 +1832,33 @@ sub init {
         # misc
         'help|h'    => sub { _HELP(*STDOUT, 0) },
         'version|v' => sub { _VER(*STDOUT, 0)  },
+        '<>' => sub {
+            if (not defined $self->{ Cmd } and $_[0] !~ /^-/) {
+                $self->{ Cmd } = $_[0];
+            } else {
+                if ($_[0] =~ /^-\d+$/) {
+                    # So that negative post arguments (-1, -2, etc.) do not get
+                    # treated like CLI flags.
+                    push @{ $self->{ Args } }, $_[0];
+                } elsif ($_[0] !~ /^-/) {
+                    push @{ $self->{ Args } }, $_[0];
+                } else {
+                    warn "Unknown option: $_[0]\n";
+                    _HELP(*STDERR, 1);
+                }
+            }
+        },
     ) or _HELP(*STDERR, 1);
 
     bless $self, $class;
 
-    $self->{ Cmd } = shift @argv or _HELP(*STDERR, 0);
+    if (not defined $self->{ Cmd }) {
+        _HELP(*STDERR, 0);
+    }
 
     unless (exists $COMMANDS{ $self->{ Cmd } }) {
         die "'$self->{ Cmd }' is not a valid command\n";
     }
-
-    $self->{ Args } = [ @argv ];
 
     $self->{ ConfFile } //= _default_config;
 

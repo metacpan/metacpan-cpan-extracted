@@ -24,7 +24,6 @@ the [Building](#Building) section below.
 * `DBD::SQLite`
 * `JSON`
 * `Parallel::ForkManager`
-* `Time::Piece`
 * `XML::LibXML`
 * `curl` (>= `7.68.0`)
 * `lynx`

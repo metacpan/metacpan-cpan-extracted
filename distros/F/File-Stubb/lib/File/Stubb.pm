@@ -1,6 +1,6 @@
 package File::Stubb;
 use 5.016;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 use strict;
 use warnings;
 
@@ -15,6 +15,8 @@ use constant {
     MODE_BATCH   => 1,
     MODE_LIST    => 2,
 };
+
+$0 =~ s!^.*[/\\]!!;
 
 my $PRGNAM = 'stubb';
 my $PRGVER = $VERSION;
@@ -37,6 +39,7 @@ Options:
   -C|--no-copy-perms
   -w|--follow-symlinks       Toggle whether to follow symlinks or not
   -W|--no-follow-symlinks
+  -R|--restricted            Do not render Perl or shell targets
   -U|--no-defaults           Disable the use of default substitution parameters
   -I|--no-config             Ignore template's configuration file
   -l|--list                  List substitution targets in template
@@ -123,6 +126,7 @@ sub render {
         follow_symlinks => $self->{ FollowLinks },
         copy_perms      => $self->{ CopyPerms   },
         defaults        => $self->{ Defaults    },
+        restricted      => $self->{ Restricted  },
     );
 
     my @created;
@@ -151,6 +155,7 @@ sub list {
         ignore_config   => $self->{ IgnoreConf  },
         hidden          => $self->{ Hidden      },
         follow_symlinks => $self->{ FollowLinks },
+        restricted      => $self->{ Restricted  },
     );
 
     my $targets = $render->targets;
@@ -208,6 +213,7 @@ sub init {
         CopyPerms   => undef,
         Defaults    => undef,
         IgnoreConf  => undef,
+        Restricted  => undef,
     };
 
     bless $self, $class;
@@ -232,6 +238,7 @@ sub init {
         'no-follow-symlinks|W' => sub { $self->{ FollowLinks } = 0 },
         'copy-perms|c'         => sub { $self->{ CopyPerms   } = 1 },
         'no-copy-perms|C'      => sub { $self->{ CopyPerms   } = 0 },
+        'restricted|R'         => sub { $self->{ Restricted  } = 1 },
         'no-defaults|U'        => sub { $self->{ Defaults    } = 0 },
         'no-config|I'          => sub { $self->{ IgnoreConf  } = 1 },
         # Message options

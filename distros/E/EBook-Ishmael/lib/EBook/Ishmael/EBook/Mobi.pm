@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook::Mobi;
 use 5.016;
-our $VERSION = '1.08';
+our $VERSION = '1.09';
 use strict;
 use warnings;
 
@@ -8,7 +8,7 @@ use Encode qw(from_to);
 
 use XML::LibXML;
 
-use EBook::Ishmael::Decode qw(lz77_decode);
+use EBook::Ishmael::Decode qw(palmdoc_decode);
 use EBook::Ishmael::ImageID;
 use EBook::Ishmael::PDB;
 use EBook::Ishmael::MobiHuff;
@@ -17,6 +17,7 @@ use EBook::Ishmael::MobiHuff;
 # which much of this code is based off of.
 
 # TODO: Implement AZW4 support
+# TODO: Add support for UTF16 MOBIs (65002)
 
 my $TYPE    = 'BOOK';
 my $CREATOR = 'MOBI';
@@ -541,7 +542,7 @@ sub _decode_record {
     if ($self->{_compression} == 1) {
         return $encode;
     } elsif ($self->{_compression} == 2) {
-        return lz77_decode($encode);
+        return palmdoc_decode($encode);
     } elsif ($self->{_compression} == 17480) {
         return $self->{_huff}->decode($encode);
     }

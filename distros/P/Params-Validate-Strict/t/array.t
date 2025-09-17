@@ -34,4 +34,22 @@ lives_ok {
 	is_deeply($res, { params => ['abc', 'def'] }, 'Empty schema and args work');
 } 'match checks all members of an array';
 
+lives_ok {
+	my $res = validate_strict({
+		input => { params => [ 'abc', 'def' ] },
+		schema => {
+			params => { type => 'arrayref', element_type => 'string' }
+		}
+	});
+} 'element_type string allows strings';
+
+throws_ok {
+	my $res = validate_strict({
+		input => { params => [ 'abc', 'def' ] },
+		schema => {
+			params => { type => 'arrayref', element_type => 'number' }
+		}
+	});
+} qr/params can only contain numbers/, 'element_type number does not allow strings';
+
 done_testing();

@@ -17,6 +17,7 @@ lib/URI/QueryParam.pm
 lib/URI/Split.pm
 lib/URI/URL.pm
 lib/URI/WithBase.pm
+lib/URI/_emailauth.pm
 lib/URI/_foreign.pm
 lib/URI/_generic.pm
 lib/URI/_idna.pm
@@ -66,6 +67,7 @@ lib/URI/sftp.pm
 lib/URI/sip.pm
 lib/URI/sips.pm
 lib/URI/smb.pm
+lib/URI/smtp.pm
 lib/URI/snews.pm
 lib/URI/ssh.pm
 lib/URI/telnet.pm
@@ -130,6 +132,7 @@ t/scp.t
 t/sftp.t
 t/sip.t
 t/smb.t
+t/smtp.t
 t/sort-hash-query-form.t
 t/split.t
 t/sq-brackets-legacy.t
